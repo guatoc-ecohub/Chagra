@@ -1,0 +1,53 @@
+/*
+ * EscarchaHelada.css — la etiqueta educativa flotante del efecto de escarcha.
+ *
+ * Un chip escarchado, sobrio, que nombra el fenómeno (helada radiativa) sin
+ * tapar el diorama. Vive suelto sobre el <Html> de drei; `pointer-events:none`
+ * para no robarle el arrastre a OrbitControls. Se destiñe al aparecer.
+ */
+.escarcha-etiqueta {
+  pointer-events: none;
+  user-select: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4em;
+  padding: 0.28em 0.66em;
+  border-radius: 999px;
+  font: 600 0.82rem/1.15 system-ui, -apple-system, 'Segoe UI', sans-serif;
+  white-space: nowrap;
+  color: #22384f;
+  background: rgba(238, 246, 255, 0.86);
+  border: 1px solid rgba(150, 190, 224, 0.7);
+  box-shadow: 0 1px 6px rgba(40, 70, 110, 0.18), inset 0 0 6px rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(2px);
+  transform: translateY(2px);
+  opacity: 0;
+  animation: escarcha-etiqueta-entra 900ms ease-out 260ms forwards;
+}
+
+.escarcha-etiqueta__copo {
+  font-size: 0.96em;
+  line-height: 1;
+}
+
+.escarcha-etiqueta__sub {
+  font-weight: 500;
+  font-size: 0.82em;
+  color: #4b6274;
+}
+
+@keyframes escarcha-etiqueta-entra {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Respeto a quien pidió menos movimiento: aparece sin deslizarse. */
+@media (prefers-reduced-motion: reduce) {
+  .escarcha-etiqueta {
+    animation: none;
+    opacity: 1;
+    transform: none;
+  }
+}

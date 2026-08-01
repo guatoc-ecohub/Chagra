@@ -1,0 +1,43 @@
+/*
+ * artesaniaAndina.css — estilos del kit "artesanía andina". Autocontenido:
+ * cero imágenes/fuentes externas; SOLO transform animado (norte rubber-hose:
+ * squash & stretch sutil), apagado bajo reduced-motion.
+ */
+
+.artesania-showcase {
+  display: block;
+  max-width: 100%;
+  height: auto;
+}
+
+.artesania-rotulo {
+  font: 600 11px/1.2 system-ui, sans-serif;
+  letter-spacing: 0.04em;
+  fill: #2a2016;
+}
+
+/* La respiración rubber-hose: squash & stretch leve con overshoot. */
+.artesania-respira {
+  animation: artesania-respira 2.4s ease-in-out infinite;
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+@keyframes artesania-respira {
+  0%,
+  100% {
+    transform: scale(1, 1);
+  }
+  40% {
+    transform: scale(1.04, 0.965);
+  }
+  60% {
+    transform: scale(0.975, 1.035);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .artesania-respira {
+    animation: none;
+  }
+}

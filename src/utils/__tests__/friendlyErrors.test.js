@@ -38,7 +38,7 @@ describe('friendlyMessage', () => {
       expect(friendlyMessage(403)).toBe(FRIENDLY_MESSAGES.AUTH_EXPIRED);
     });
     it('mapea Error con .status=401 a AUTH_EXPIRED', () => {
-      const err = new Error('Unauthorized');
+      const err = /** @type {any} */ (new Error('Unauthorized'));
       err.status = 401;
       expect(friendlyMessage(err)).toBe(FRIENDLY_MESSAGES.AUTH_EXPIRED);
     });
@@ -52,7 +52,7 @@ describe('friendlyMessage', () => {
       expect(friendlyMessage(422)).toBe(FRIENDLY_MESSAGES.VALIDATION);
     });
     it('mapea Error con .status=422 a VALIDATION', () => {
-      const err = new Error('Unprocessable Entity');
+      const err = /** @type {any} */ (new Error('Unprocessable Entity'));
       err.status = 422;
       expect(friendlyMessage(err)).toBe(FRIENDLY_MESSAGES.VALIDATION);
     });
@@ -72,7 +72,7 @@ describe('friendlyMessage', () => {
       expect(friendlyMessage(503)).toBe(FRIENDLY_MESSAGES.SERVER);
     });
     it('mapea Error con .status=500 a SERVER', () => {
-      const err = new Error('Internal Server Error');
+      const err = /** @type {any} */ (new Error('Internal Server Error'));
       err.status = 500;
       expect(friendlyMessage(err)).toBe(FRIENDLY_MESSAGES.SERVER);
     });
@@ -119,7 +119,7 @@ describe('friendlyMessage', () => {
 
   describe('orden y precedencia', () => {
     it('un 401 con mensaje "fetch failed" matchea AUTH antes que NETWORK', () => {
-      const err = new Error('fetch failed: Unauthorized');
+      const err = /** @type {any} */ (new Error('fetch failed: Unauthorized'));
       err.status = 401;
       expect(friendlyMessage(err)).toBe(FRIENDLY_MESSAGES.AUTH_EXPIRED);
     });

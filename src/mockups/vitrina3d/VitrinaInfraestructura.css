@@ -1,0 +1,404 @@
+/*
+ * VitrinaInfraestructura — estilos de la vitrina de piezas de construcción
+ * (#/mockups/vitrina-infra). Cuaderno de laboratorio andino: crema tibia,
+ * tinta profunda, verde páramo y el dorado de la hora dorada del valle.
+ * Móvil-first (320px), táctil (controles >= 44px), autocontenido.
+ */
+
+.vitin {
+  --vitin-crema: #f7f1e2;
+  --vitin-papel: #fffaf0;
+  --vitin-tinta: #2c3324;
+  --vitin-tinta-suave: #5c6350;
+  --vitin-verde: #3f6f4e;
+  --vitin-verde-oscuro: #2d5039;
+  --vitin-dorado: #f2b134;
+  --vitin-borde: #d9cfb4;
+  --vitin-sombra: 0 2px 10px rgba(60, 52, 31, 0.12);
+
+  min-height: 100vh;
+  min-height: 100dvh;
+  background:
+    radial-gradient(1200px 500px at 80% -10%, #fdf6e4 0%, transparent 60%),
+    var(--vitin-crema);
+  color: var(--vitin-tinta);
+  font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  padding-bottom: 3rem;
+}
+
+/* ── Cabecera ─────────────────────────────────────────────────────────────── */
+.vitin__head {
+  padding: 0.9rem 1rem 0.75rem;
+  border-bottom: 2px solid var(--vitin-borde);
+  background: linear-gradient(180deg, var(--vitin-papel) 0%, var(--vitin-crema) 100%);
+  position: relative;
+}
+
+.vitin__headMain {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  max-width: 72rem;
+  margin: 0 auto;
+}
+
+.vitin__back {
+  flex: none;
+  min-height: 44px;
+  padding: 0.45rem 0.85rem;
+  border: 1.5px solid var(--vitin-borde);
+  border-radius: 999px;
+  background: var(--vitin-papel);
+  color: var(--vitin-tinta);
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+.vitin__back:active { transform: translateY(1px); }
+
+.vitin__title {
+  margin: 0;
+  font-size: 1.25rem;
+  line-height: 1.25;
+  color: var(--vitin-verde-oscuro);
+  letter-spacing: 0.01em;
+}
+
+.vitin__sub {
+  margin: 0.3rem 0 0;
+  font-size: 0.87rem;
+  line-height: 1.45;
+  color: var(--vitin-tinta-suave);
+  max-width: 46rem;
+}
+
+/* ── Controles globales ───────────────────────────────────────────────────── */
+.vitin__controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.6rem 1.1rem;
+  max-width: 72rem;
+  margin: 0.8rem auto 0;
+}
+
+.vitin__ctl {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.vitin__ctlLabel,
+.vitin__escalaLabel {
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--vitin-tinta-suave);
+}
+
+.vitin__segmented {
+  display: inline-flex;
+  border: 1.5px solid var(--vitin-borde);
+  border-radius: 999px;
+  overflow: hidden;
+  background: var(--vitin-papel);
+}
+
+.vitin__seg {
+  min-height: 44px;
+  min-width: 44px;
+  padding: 0.4rem 0.9rem;
+  border: none;
+  background: transparent;
+  color: var(--vitin-tinta-suave);
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+.vitin__seg.is-on {
+  background: var(--vitin-verde);
+  color: #fdf9ec;
+}
+
+.vitin__toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  min-height: 44px;
+  font-size: 0.87rem;
+  color: var(--vitin-tinta);
+  cursor: pointer;
+  user-select: none;
+}
+.vitin__toggle input {
+  width: 1.15rem;
+  height: 1.15rem;
+  accent-color: var(--vitin-verde);
+}
+
+/* ── Pestañas de familias ─────────────────────────────────────────────────── */
+.vitin__tabs {
+  display: flex;
+  gap: 0.45rem;
+  overflow-x: auto;
+  padding: 0.75rem 0 0.35rem;
+  max-width: 72rem;
+  margin: 0 auto;
+  scrollbar-width: thin;
+  -webkit-overflow-scrolling: touch;
+}
+
+.vitin__tab {
+  flex: none;
+  min-height: 44px;
+  padding: 0.45rem 0.95rem;
+  border: 1.5px solid var(--vitin-borde);
+  border-radius: 999px;
+  background: var(--vitin-papel);
+  color: var(--vitin-tinta);
+  font-size: 0.88rem;
+  font-weight: 600;
+  white-space: nowrap;
+  cursor: pointer;
+}
+.vitin__tab.is-on {
+  background: var(--vitin-verde-oscuro);
+  border-color: var(--vitin-verde-oscuro);
+  color: #fdf9ec;
+}
+
+/* ── Cuerpo y grilla ──────────────────────────────────────────────────────── */
+.vitin__body {
+  max-width: 72rem;
+  margin: 0 auto;
+  padding: 1rem;
+}
+
+.vitin__grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1rem;
+}
+
+@media (min-width: 640px) {
+  .vitin__grid { grid-template-columns: repeat(2, 1fr); }
+}
+@media (min-width: 1024px) {
+  .vitin__grid { grid-template-columns: repeat(3, 1fr); }
+}
+
+/* ── Tarjeta de pieza ─────────────────────────────────────────────────────── */
+.vitin__card {
+  display: flex;
+  flex-direction: column;
+  border: 1.5px solid var(--vitin-borde);
+  border-radius: 14px;
+  background: var(--vitin-papel);
+  box-shadow: var(--vitin-sombra);
+  overflow: hidden;
+}
+
+.vitin__stage {
+  position: relative;
+  height: 230px;
+  background: linear-gradient(180deg, #f6dcae 0%, #efd3a0 100%);
+  touch-action: none; /* el arrastre gira el diorama, no la página */
+}
+
+.vitin__canvas {
+  position: absolute !important;
+  inset: 0;
+}
+
+.vitin__cargando {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  font-size: 0.85rem;
+  color: #7a6134;
+}
+
+.vitin__ficha {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+}
+.vitin__fichaEmoji {
+  font-size: 3.4rem;
+  filter: drop-shadow(0 3px 4px rgba(90, 62, 20, 0.25));
+}
+.vitin__fichaDims {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #7a6134;
+}
+
+.vitin__meta {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+  padding: 0.8rem 0.9rem 0.95rem;
+}
+
+.vitin__cardTitle {
+  margin: 0;
+  font-size: 1.02rem;
+  color: var(--vitin-verde-oscuro);
+}
+
+.vitin__cardDesc {
+  margin: 0;
+  font-size: 0.85rem;
+  line-height: 1.45;
+  color: var(--vitin-tinta-suave);
+}
+
+.vitin__chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+}
+
+.vitin__chip {
+  font-size: 0.74rem;
+  font-weight: 600;
+  padding: 0.22rem 0.6rem;
+  border-radius: 999px;
+  border: 1px solid var(--vitin-borde);
+  background: var(--vitin-crema);
+  color: var(--vitin-tinta-suave);
+}
+.vitin__chip--dims {
+  background: #eef3e6;
+  border-color: #c7d4b4;
+  color: var(--vitin-verde-oscuro);
+}
+
+.vitin__escala {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  flex-wrap: wrap;
+}
+.vitin__escala .vitin__seg {
+  border: 1.5px solid var(--vitin-borde);
+  border-radius: 999px;
+  background: var(--vitin-papel);
+}
+.vitin__escala .vitin__seg.is-on {
+  background: var(--vitin-verde);
+  border-color: var(--vitin-verde);
+  color: #fdf9ec;
+}
+
+/* ── Demo de colocar ──────────────────────────────────────────────────────── */
+.vitin__colocar {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+}
+
+.vitin__colocarGuia {
+  margin: 0;
+  font-size: 0.9rem;
+  line-height: 1.5;
+  color: var(--vitin-tinta-suave);
+  max-width: 48rem;
+}
+.vitin__colocarGuia strong { color: var(--vitin-verde-oscuro); }
+
+.vitin__colocarCtl {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 0.7rem 1rem;
+}
+
+.vitin__field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--vitin-tinta-suave);
+}
+.vitin__field select {
+  min-height: 44px;
+  padding: 0.4rem 0.7rem;
+  border: 1.5px solid var(--vitin-borde);
+  border-radius: 10px;
+  background: var(--vitin-papel);
+  color: var(--vitin-tinta);
+  font-size: 0.9rem;
+  max-width: 20rem;
+}
+
+.vitin__botonera {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.vitin__accion {
+  min-height: 44px;
+  padding: 0.45rem 0.9rem;
+  border: 1.5px solid var(--vitin-borde);
+  border-radius: 999px;
+  background: var(--vitin-papel);
+  color: var(--vitin-tinta);
+  font-size: 0.88rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+.vitin__accion:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+.vitin__accion--fijar:not(:disabled) {
+  background: var(--vitin-verde);
+  border-color: var(--vitin-verde);
+  color: #fdf9ec;
+}
+
+.vitin__lienzoColocar {
+  position: relative;
+  height: min(62vh, 460px);
+  min-height: 280px;
+  border: 1.5px solid var(--vitin-borde);
+  border-radius: 14px;
+  overflow: hidden;
+  background: linear-gradient(180deg, #f6dcae 0%, #efd3a0 100%);
+  box-shadow: var(--vitin-sombra);
+  touch-action: none;
+}
+
+.vitin__colocarEstado {
+  margin: 0;
+  font-size: 0.84rem;
+  color: var(--vitin-tinta-suave);
+}
+
+.vitin__aviso {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.9rem 1rem;
+  border: 1.5px dashed var(--vitin-borde);
+  border-radius: 12px;
+  background: var(--vitin-papel);
+  font-size: 0.9rem;
+  line-height: 1.5;
+  color: var(--vitin-tinta-suave);
+}
+
+/* Pantallas chicas: cabecera compacta */
+@media (max-width: 420px) {
+  .vitin__headMain { flex-direction: column; }
+  .vitin__stage { height: 200px; }
+}

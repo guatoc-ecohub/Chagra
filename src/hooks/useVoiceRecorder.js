@@ -128,7 +128,7 @@ export default function useVoiceRecorder() {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
       streamRef.current = stream;
 
-      const AC = window.AudioContext || /** @type {typeof AudioContext} */(window).webkitAudioContext;
+      const AC = (window.AudioContext || window.webkitAudioContext);
       const ctx = new AC();
       audioCtxRef.current = ctx;
       const source = ctx.createMediaStreamSource(stream);

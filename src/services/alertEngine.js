@@ -106,7 +106,7 @@ class AlertEngine {
    */
   resolveCoords() {
     try {
-      const p = getProfile() || {};
+      const p = getProfile();
       const lat = Number(p.ubicacion_lat);
       const lng = Number(p.ubicacion_lng);
       if (Number.isFinite(lat) && Number.isFinite(lng)) {
@@ -124,7 +124,7 @@ class AlertEngine {
    */
   resolvePisoTermico() {
     try {
-      const p = getProfile() || {};
+      const p = getProfile();
       const piso = (p.piso_termico || '').toLowerCase().trim();
       if (piso.includes('paramo') || piso.includes('páramo')) return 'paramo';
       if (piso.includes('frio') || piso.includes('frío')) return 'frio';

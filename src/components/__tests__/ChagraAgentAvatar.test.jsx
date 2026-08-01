@@ -1,43 +1,50 @@
 /**
- * ChagraAgentAvatar — task #122.
+ * ChagraAgentAvatar — task #122 + "solo abejita" (2026-07-18).
  *
- * Cubre las extensiones añadidas para el sistema global de notificaciones:
- *   - `glow` prop agrega la clase `chagra-glow` al SVG raíz.
+ * Cubre las extensiones del sistema global de notificaciones sobre el avatar
+ * default del wrapper, que hoy es ANGELITA (la abeja agente):
+ *   - `glow` prop agrega la clase `agt-avatar-glow` al SVG de Angelita.
  *   - `onDoubleClick` se invoca al doble-click del wrapper button.
  *   - a11y: aria-label custom + role="img" + tooltip title presente cuando
  *     hay onDoubleClick.
- *
- * 2026-05-28: el avatar default del wrapper cambió a la foto-realista
- * (ChagraAgentAvatarColibriPhoto). Estos tests verifican la rama SVG, así
- * que el beforeEach fuerza `colibri_svg` en localStorage. La rama foto
- * tiene su propio smoke test (ChagraAgentAvatarColibriPhoto si se añade).
+ *   - migración: los slugs viejos 'colibri'/'colibri_svg' en localStorage
+ *     renderizan Angelita (el colibrí jubiló del rol de agente).
  */
 import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
-import { describe, test, expect, vi, beforeEach, afterEach } from 'vitest';
+import { describe, test, expect, vi, afterEach } from 'vitest';
 import ChagraAgentAvatar from '../ChagraAgentAvatar';
 import ChagraAgentAvatarMaiz from '../ChagraAgentAvatarMaiz';
 
-describe('ChagraAgentAvatar — task #122 glow + double-click', () => {
-  beforeEach(() => {
-    localStorage.setItem('chagra:agent-avatar-type', 'colibri_svg');
-  });
+describe('ChagraAgentAvatar — Angelita default: glow + double-click + migración', () => {
   afterEach(() => {
     localStorage.clear();
   });
-  test('por defecto NO incluye clase chagra-glow', () => {
+  test('por defecto renderiza Angelita SIN clase agt-avatar-glow', () => {
     const { container } = render(<ChagraAgentAvatar state="idle" />);
-    const svg = container.querySelector('svg.chagra-agent-avatar');
+    const svg = container.querySelector('svg.agt-angelita');
     expect(svg).toBeInTheDocument();
-    expect(svg.classList.contains('chagra-glow')).toBe(false);
+    expect(svg.classList.contains('agt-avatar-glow')).toBe(false);
   });
 
-  test('con prop glow={true} agrega clase chagra-glow al SVG', () => {
+  test('con prop glow={true} agrega clase agt-avatar-glow al SVG', () => {
     const { container } = render(<ChagraAgentAvatar state="idle" glow />);
-    const svg = container.querySelector('svg.chagra-agent-avatar');
+    const svg = container.querySelector('svg.agt-angelita');
     expect(svg).toBeInTheDocument();
-    expect(svg.classList.contains('chagra-glow')).toBe(true);
+    expect(svg.classList.contains('agt-avatar-glow')).toBe(true);
+  });
+
+  test('slug legacy colibri_svg en localStorage TAMBIÉN renderiza Angelita', () => {
+    localStorage.setItem('chagra:agent-avatar-type', 'colibri_svg');
+    const { container } = render(<ChagraAgentAvatar state="idle" />);
+    expect(container.querySelector('svg.agt-angelita')).toBeInTheDocument();
+  });
+
+  test('slug legacy colibri en localStorage TAMBIÉN renderiza Angelita', () => {
+    localStorage.setItem('chagra:agent-avatar-type', 'colibri');
+    const { container } = render(<ChagraAgentAvatar state="idle" />);
+    expect(container.querySelector('svg.agt-angelita')).toBeInTheDocument();
   });
 
   test('sin onClick ni onDoubleClick renderiza solo el SVG (no button)', () => {
@@ -79,34 +86,48 @@ describe('ChagraAgentAvatar — task #122 glow + double-click', () => {
     ).toBeInTheDocument();
   });
 
-  test('a11y: tooltip title aparece cuando hay onDoubleClick', () => {
-    render(<ChagraAgentAvatar state="idle" onDoubleClick={() => {}} />);
+  test('a11y: tooltip title del button refleja el ariaLabel', () => {
+    render(
+      <ChagraAgentAvatar
+        state="idle"
+        onDoubleClick={() => {}}
+        ariaLabel="Chagra IA — doble click silencia la voz"
+      />,
+    );
     const btn = screen.getByRole('button');
     expect(btn).toHaveAttribute('title', expect.stringMatching(/doble click/i));
   });
 
-  test('SVG aplica la clase de estado correspondiente', () => {
+  test('el state del agente se mapea al estado de Angelita (data-agt-estado)', () => {
     const { container, rerender } = render(<ChagraAgentAvatar state="thinking" />);
     expect(
-      container.querySelector('svg.chagra-state-thinking'),
+      container.querySelector('svg[data-agt-estado="pensando"]'),
     ).toBeInTheDocument();
     rerender(<ChagraAgentAvatar state="listening" />);
     expect(
-      container.querySelector('svg.chagra-state-listening'),
+      container.querySelector('svg[data-agt-estado="escuchando"]'),
+    ).toBeInTheDocument();
+    rerender(<ChagraAgentAvatar state="speaking" />);
+    expect(
+      container.querySelector('svg[data-agt-estado="respondiendo"]'),
+    ).toBeInTheDocument();
+    rerender(<ChagraAgentAvatar state="idle" />);
+    expect(
+      container.querySelector('svg[data-agt-estado="acompana"]'),
     ).toBeInTheDocument();
   });
 
   test('glow + state coexisten sin conflicto', () => {
     const { container } = render(<ChagraAgentAvatar state="speaking" glow />);
-    const svg = container.querySelector('svg.chagra-agent-avatar');
-    expect(svg.classList.contains('chagra-state-speaking')).toBe(true);
-    expect(svg.classList.contains('chagra-glow')).toBe(true);
+    const svg = container.querySelector('svg.agt-angelita');
+    expect(svg.getAttribute('data-agt-estado')).toBe('respondiendo');
+    expect(svg.classList.contains('agt-avatar-glow')).toBe(true);
   });
 });
 
 describe('ChagraAgentAvatarMaiz — prefers-reduced-motion (task #6240)', () => {
   test('maíz tiene media query prefers-reduced-motion en CSS inline', () => {
-    const { container } = render(<ChagraAgentAvatarMaiz state="idle" />);
+    const { container } = render(<ChagraAgentAvatarMaiz state="idle" onClick={() => {}} onDoubleClick={() => {}} ariaLabel="test" />);
     const styleTag = container.querySelector('style');
     expect(styleTag).toBeInTheDocument();
 
@@ -129,7 +150,7 @@ describe('ChagraAgentAvatarMaiz — prefers-reduced-motion (task #6240)', () => 
     const originalMatchMedia = window.matchMedia;
     window.matchMedia = mockMatchMedia;
 
-    const { container } = render(<ChagraAgentAvatarMaiz state="thinking" glow />);
+    const { container } = render(<ChagraAgentAvatarMaiz state="thinking" glow onClick={() => {}} onDoubleClick={() => {}} ariaLabel="test" />);
     const styleTag = container.querySelector('style');
     const cssContent = styleTag.textContent;
 
@@ -148,7 +169,7 @@ describe('ChagraAgentAvatarMaiz — prefers-reduced-motion (task #6240)', () => 
   });
 
   test('maíz con glow + prefers-reduced-motion usa filtro estático', () => {
-    const { container } = render(<ChagraAgentAvatarMaiz state="idle" glow />);
+    const { container } = render(<ChagraAgentAvatarMaiz state="idle" glow onClick={() => {}} onDoubleClick={() => {}} ariaLabel="test" />);
     const styleTag = container.querySelector('style');
     const cssContent = styleTag.textContent;
 
@@ -161,7 +182,7 @@ describe('ChagraAgentAvatarMaiz — prefers-reduced-motion (task #6240)', () => 
   });
 
   test('maíz: todos los keyframes tienen nombres descriptivos', () => {
-    const { container } = render(<ChagraAgentAvatarMaiz state="idle" />);
+    const { container } = render(<ChagraAgentAvatarMaiz state="idle" onClick={() => {}} onDoubleClick={() => {}} ariaLabel="test" />);
     const styleTag = container.querySelector('style');
     const cssContent = styleTag.textContent;
 

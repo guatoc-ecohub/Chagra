@@ -11,7 +11,7 @@ import { findPersonByName, renameWorker } from '../assetService.js';
 describe('assetService', () => {
   describe('findPersonByName', () => {
     it('retorna null si no hay matches exactos', async () => {
-      fetchFromFarmOS.mockResolvedValue({
+      vi.mocked(fetchFromFarmOS).mockResolvedValue({
         data: [
           { id: '1', attributes: { name: 'Juan Perez' } },
         ],
@@ -22,7 +22,7 @@ describe('assetService', () => {
 
     it('retorna persona con nombre exacto', async () => {
       const person = { id: 'p-1', attributes: { name: 'Maria Lopez' } };
-      fetchFromFarmOS.mockResolvedValue({
+      vi.mocked(fetchFromFarmOS).mockResolvedValue({
         data: [person, { id: 'p-2', attributes: { name: 'Maria' } }],
       });
       const r = await findPersonByName('Maria Lopez');
@@ -35,10 +35,10 @@ describe('assetService', () => {
   describe('renameWorker', () => {
     it('retorna success:true al renombrar', async () => {
       const person = { id: 'p-3', attributes: { name: 'Carlos' } };
-      fetchFromFarmOS.mockResolvedValue({
+      vi.mocked(fetchFromFarmOS).mockResolvedValue({
         data: [person],
       });
-      sendToFarmOS.mockResolvedValue({ data: { id: 'p-3' } });
+      vi.mocked(sendToFarmOS).mockResolvedValue({ data: { id: 'p-3' } });
 
       const r = await renameWorker('Carlos', 'Carlos Actualizado');
       expect(r.success).toBe(true);
@@ -46,7 +46,7 @@ describe('assetService', () => {
     });
 
     it('retorna success:false si persona no encontrada', async () => {
-      fetchFromFarmOS.mockResolvedValue({ data: [] });
+      vi.mocked(fetchFromFarmOS).mockResolvedValue({ data: [] });
       const r = await renameWorker('Inexistente', 'Nuevo');
       expect(r.success).toBe(false);
       expect(r.error).toBe('not_found');
@@ -54,8 +54,8 @@ describe('assetService', () => {
 
     it('retorna success:false si sendToFarmOS falla', async () => {
       const person = { id: 'p-4', attributes: { name: 'ErrorCase' } };
-      fetchFromFarmOS.mockResolvedValue({ data: [person] });
-      sendToFarmOS.mockRejectedValue(new Error('Network failure'));
+      vi.mocked(fetchFromFarmOS).mockResolvedValue({ data: [person] });
+      vi.mocked(sendToFarmOS).mockRejectedValue(new Error('Network failure'));
 
       const r = await renameWorker('ErrorCase', 'Nuevo');
       expect(r.success).toBe(false);

@@ -22,8 +22,8 @@ import React, { useState } from 'react';
  */
 
 // 2026-05-29: video transición Kling vía Magnific entregado por Lili.
-// Generado image-to-image-to-video desde anchors `colibri-anchor-metal.jpg`
-// → `colibri-anchor-organic.jpg`. WebM VP9 480x480 30fps ~930KB en
+// Generado image-to-image-to-video (transición metal→orgánico del colibrí).
+// WebM VP9 480x480 30fps ~930KB en
 // /public/avatar/colibri-transition.webm. Si el navegador no soporta WebM
 // o el fetch falla, onError dispara fallback al still hero (foto#2 pose
 // icónica) sin breaking change visual.
@@ -38,6 +38,7 @@ const STATE_RING = {
 
 const STATE_LABEL = {
   idle: 'Chagra IA',
+  // eslint-disable-next-line chagra-i18n/no-hardcoded-spanish -- label preexistente marcado al re-tocar el archivo; migracion a messages.js (ADR-050) fuera del alcance de este fix
   thinking: 'Chagra IA · pensando',
   speaking: 'Chagra IA · hablando',
   listening: 'Chagra IA · escuchando',

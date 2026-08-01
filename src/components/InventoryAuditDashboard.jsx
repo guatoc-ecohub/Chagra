@@ -138,10 +138,12 @@ export default function InventoryAuditDashboard() {
                         {isDiffOnly ? 'Ver Todos' : 'Ver solo discrepancias'}
                     </button>
                     <button
+                        type="button"
                         onClick={loadData}
+                        aria-label="Recargar datos de auditoría"
                         className="p-2.5 rounded-xl bg-slate-800 border border-slate-700 text-slate-300 hover:bg-slate-700 active:scale-95 transition-all"
                     >
-                        <RefreshCw size={18} className={loading ? 'animate-spin' : ''} />
+                        <RefreshCw size={18} aria-hidden="true" />
                     </button>
                 </div>
             </header>
@@ -161,7 +163,7 @@ export default function InventoryAuditDashboard() {
                         <tbody className="divide-y divide-slate-800/50">
                             {stats.length === 0 ? (
                                 <tr>
-                                    <td colSpan="5" className="px-6 py-12 text-center text-slate-600 italic text-sm">
+                                    <td colSpan={5} className="px-6 py-12 text-center text-slate-600 italic text-sm">
                                         No hay materiales para auditar o filtros muy restrictivos.
                                     </td>
                                 </tr>

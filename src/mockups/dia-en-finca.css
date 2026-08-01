@@ -1,0 +1,386 @@
+/*
+ * dia-en-finca.css — MOCKUP DEV · "El día en su finca" (#/mockups/dia-en-finca)
+ *
+ * La página de hoy del cuaderno de campo, bajo el cielo vivo de la hora.
+ * Paleta de TINTA tomada de la librería de láminas (papel crema, sepia, verde
+ * tallo, ocre surco, rojo fruto solo para la hora límite). El cielo y las lomas
+ * cambian por franja con custom props ([data-franja]); el resto es papel quieto.
+ * Tipografía: serifa de cuaderno para lo que se lee despacio (titular, tareas),
+ * sans del sistema para lo que se opera (chips, botones). Sin fuentes externas.
+ * Reduced-motion: las animaciones de la librería ya caen a fotograma digno;
+ * las propias de esta hoja se apagan abajo.
+ */
+
+.df {
+  --df-serif: 'Iowan Old Style', 'Palatino Linotype', Palatino, Georgia, 'Times New Roman', serif;
+  --df-sans: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+
+  --df-papel: #ece1c4;        /* la página kraft */
+  --df-carta: #fbf6e6;        /* cada carta de papel */
+  --df-tinta: #46381f;        /* tinta sepia */
+  --df-tinta2: #7d6b47;       /* tinta aguada */
+  --df-verde: #3f8f4e;        /* tallo (láminas) */
+  --df-verde-hondo: #2f6b3a;
+  --df-ocre: #b98a2f;         /* surco (láminas) */
+  --df-alerta: #b6432f;       /* fruto maduro: SOLO la hora límite */
+
+  min-height: 100dvh;
+  background: var(--df-papel);
+  color: var(--df-tinta);
+  font-family: var(--df-sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ── Escena por franja: lomas, casa y era acompañan el cielo de la librería ── */
+.df[data-franja='amanecer'] {
+  --df-loma-lejos: #bd8a63; --df-loma: #7f8a50; --df-pasto: #5c7f46;
+  --df-casa: #ecdfc2; --df-casa-techo: #a4562f; --df-casa-puerta: #6a4a2e;
+  --df-era: #c9a35f; --df-era-pata: #8a6a3f;
+}
+.df[data-franja='dia'] {
+  --df-loma-lejos: #8fb98a; --df-loma: #689a5a; --df-pasto: #4d7f43;
+  --df-casa: #f2e7cb; --df-casa-techo: #a4562f; --df-casa-puerta: #6a4a2e;
+  --df-era: #c9a35f; --df-era-pata: #8a6a3f;
+}
+.df[data-franja='tarde'] {
+  --df-loma-lejos: #a4765c; --df-loma: #6d7f4e; --df-pasto: #4e6f42;
+  --df-casa: #e8d7b4; --df-casa-techo: #93492a; --df-casa-puerta: #5d4028;
+  --df-era: #b8924f; --df-era-pata: #7a5c36;
+}
+.df[data-franja='noche'] {
+  --df-loma-lejos: #2c3d4d; --df-loma: #274231; --df-pasto: #1e3327;
+  --df-casa: #c9bd9d; --df-casa-techo: #6d3d24; --df-casa-puerta: #3d2c1c;
+  --df-era: #6d5a38; --df-era-pata: #4a3d27;
+}
+
+/* ── Barra del mockup (no es parte del diseño propuesto) ── */
+.df-mockbar {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 30;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px;
+}
+.df-mockfranjas { display: flex; gap: 6px; }
+.df-mockchip {
+  min-height: 34px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  border: 1px solid rgba(70, 56, 31, 0.35);
+  background: rgba(251, 246, 230, 0.82);
+  color: var(--df-tinta);
+  font: 700 0.8rem/1 var(--df-sans);
+  cursor: pointer;
+}
+.df-mockchip.on { background: var(--df-tinta); color: var(--df-carta); }
+
+.df-shell {
+  max-width: 430px;
+  margin: 0 auto;
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ── 0. El cielo vivo ── */
+.df-cielo { position: relative; overflow: hidden; }
+.df-escena {
+  display: block;
+  width: 100%;
+  height: auto;
+  min-height: 236px;
+  user-select: none;
+}
+.df-scrim {
+  /* reuso .vfx-scrim-bottom (effects): solo se le tiñe el color al scrim */
+  --vfx-scrim-color: rgba(20, 24, 14, 0.62);
+  --vfx-scrim-h: 78%;
+}
+.df-cielo-txt {
+  position: absolute;
+  left: 0; right: 0; bottom: 0;
+  padding: 12px 16px 26px;
+  color: #fdf9ea;
+  text-shadow: 0 1px 10px rgba(10, 14, 8, 0.55);
+}
+.df-fecha {
+  margin: 0 0 4px;
+  font: 700 0.68rem/1.2 var(--df-sans);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  opacity: 0.92;
+}
+.df-titular {
+  margin: 0 0 10px;
+  font: 700 clamp(1.4rem, 6.4vw, 1.8rem)/1.16 var(--df-serif);
+  letter-spacing: -0.01em;
+  max-width: 21ch;
+}
+.df-pulso {
+  list-style: none;
+  margin: 0 0 6px;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.df-pulso li {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: rgba(12, 16, 10, 0.42);
+  border: 1px solid rgba(253, 249, 234, 0.28);
+  font: 600 0.78rem/1.2 var(--df-sans);
+}
+.df-lugar { margin: 0; font: 500 0.72rem/1.3 var(--df-sans); opacity: 0.85; }
+
+/* ── La página del cuaderno ── */
+.df-pagina {
+  position: relative;
+  flex: 1;
+  margin-top: -14px;
+  border-radius: 18px 18px 0 0;
+  background: var(--df-papel);
+  padding: 20px 14px 30px 42px;
+  box-shadow: 0 -8px 22px rgba(24, 18, 6, 0.28);
+}
+.df-grano {
+  /* reuso .scn-kraft (scenes.css) re-teñido: el grano del papel */
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  --scn-kraft-color: rgba(122, 82, 48, 0.06);
+  --scn-kraft-paso: 5px;
+}
+
+/* EL HILO DEL DÍA — el hilo cosido (vfx-flow) que anuda cada tarea a su causa */
+.df-hilo {
+  position: absolute;
+  left: 12px;
+  top: -10px;
+  width: 20px;
+  height: calc(100% - 66px);
+  overflow: visible;
+  pointer-events: none;
+}
+.df-hilo-linea {
+  stroke: var(--df-ocre);
+  stroke-width: 2.2;
+  stroke-linecap: round;
+  stroke-dasharray: 4 8;
+  opacity: 0.85;
+  --vfx-flow-dur: 9s;
+  --vfx-flow-len: 24px;
+}
+.df-nudo {
+  position: absolute;
+  left: -27px;
+  top: 22px;
+  width: 13px;
+  height: 13px;
+  border-radius: 50%;
+  border: 2.2px solid var(--df-ocre);
+  background: var(--df-papel);
+}
+.df-hecha .df-nudo { background: var(--df-verde); border-color: var(--df-verde-hondo); }
+.df-nudo-hoja { border-color: var(--df-verde); border-radius: 50% 2px 50% 50%; }
+
+/* ── Cejas de sección ── */
+.df-ceja {
+  margin: 18px 0 8px;
+  font: 700 0.68rem/1.2 var(--df-sans);
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--df-tinta2);
+}
+.df-ceja:first-of-type { margin-top: 2px; }
+
+/* ── Cartas de papel ── */
+.df-carta {
+  position: relative;
+  background: var(--df-carta);
+  border: 1.5px solid rgba(70, 56, 31, 0.28);
+  border-radius: 12px;
+  padding: 14px 14px 12px;
+  box-shadow: 0 2px 6px rgba(64, 48, 16, 0.12);
+}
+.df-carta + .df-carta { margin-top: 10px; }
+.df-carta-mayor { transform: rotate(-0.35deg); }
+.df-carta-menor { display: flex; gap: 10px; align-items: flex-start; }
+.df-carta-menor:nth-of-type(odd) { transform: rotate(0.3deg); }
+.df-hecha { background: #f1ead3; }
+.df-hecha .df-carta-tit { color: var(--df-tinta2); text-decoration: line-through; text-decoration-thickness: 1.5px; }
+
+.df-porques {
+  list-style: none;
+  margin: 0 0 10px;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+.df-porques li {
+  display: flex;
+  gap: 7px;
+  align-items: baseline;
+  font: 600 0.82rem/1.35 var(--df-sans);
+  color: var(--df-tinta2);
+}
+.df-carta-tit {
+  margin: 0 0 8px;
+  font: 700 1.32rem/1.18 var(--df-serif);
+  color: var(--df-tinta);
+  letter-spacing: -0.01em;
+}
+.df-carta-tit-menor { font-size: 1.05rem; margin-bottom: 5px; }
+.df-paso { margin: 0 0 8px; font: 400 0.95rem/1.5 var(--df-sans); }
+.df-hora {
+  margin: 0 0 12px;
+  font: 700 0.85rem/1.35 var(--df-sans);
+  color: var(--df-alerta);
+}
+.df-carta-pie { display: flex; gap: 8px; }
+
+.df-hice {
+  flex: 1;
+  min-height: 48px;
+  border-radius: 999px;
+  border: 2px solid var(--df-tinta);
+  background: var(--df-carta);
+  color: var(--df-tinta);
+  font: 700 1rem/1.1 var(--df-sans);
+  cursor: pointer;
+  padding: 8px 14px;
+}
+.df-hecha .df-hice {
+  border-color: var(--df-verde-hondo);
+  background: var(--df-verde);
+  color: #fdf9ea;
+}
+.df-hice-menor { flex: 0 0 auto; min-height: 40px; font-size: 0.85rem; padding: 6px 14px; }
+.df-oir {
+  flex: 0 0 auto;
+  width: 48px;
+  min-height: 48px;
+  border-radius: 999px;
+  border: 2px solid rgba(70, 56, 31, 0.45);
+  background: var(--df-carta);
+  font-size: 1.15rem;
+  cursor: pointer;
+}
+
+/* secundarias: cuerpo + lámina/medalla al costado */
+.df-menor-cuerpo { flex: 1; min-width: 0; }
+.df-porque-menor { margin: 0 0 8px; font: 400 0.84rem/1.45 var(--df-sans); color: var(--df-tinta2); }
+.df-porque-marca {
+  font-weight: 700;
+  font-style: italic;
+  font-family: var(--df-serif);
+  color: var(--df-ocre);
+}
+.df-menor-lamina {
+  flex: 0 0 88px;
+  align-self: center;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid rgba(70, 56, 31, 0.18);
+  background: #f4f6ea; /* el cielo de papel de la lámina */
+}
+.df-menor-lamina .lam-mata-svg { max-height: 118px; }
+.df-menor-medalla {
+  flex: 0 0 auto;
+  align-self: center;
+  width: 52px;
+  height: 52px;
+  display: grid;
+  place-items: center;
+  font-size: 1.5rem;
+  border-radius: 50%;
+  background: #e3ecf0;
+  border: 1.5px solid rgba(70, 56, 31, 0.2);
+}
+
+/* ── Para observar hoy ── */
+.df-observar {
+  position: relative;
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  padding: 14px;
+  border-radius: 12px;
+  border: 1.5px dashed var(--df-verde);
+  background: rgba(63, 143, 78, 0.08);
+}
+.df-observar-bicho {
+  flex: 0 0 auto;
+  padding-top: 2px;
+  filter: drop-shadow(0 1px 2px rgba(24, 18, 6, 0.25));
+}
+.df-observar-txt { flex: 1; min-width: 0; }
+.df-observar-invita {
+  margin: 0 0 6px;
+  font: 700 1.02rem/1.3 var(--df-serif);
+  color: var(--df-verde-hondo);
+}
+.df-observar-pregunta { margin: 0 0 10px; font: 400 0.86rem/1.45 var(--df-sans); }
+.df-contar {
+  min-height: 44px;
+  border-radius: 999px;
+  border: 2px solid var(--df-verde-hondo);
+  background: var(--df-carta);
+  color: var(--df-verde-hondo);
+  font: 700 0.9rem/1.1 var(--df-sans);
+  cursor: pointer;
+  padding: 8px 14px;
+}
+
+/* ── Remates ── */
+.df-remate {
+  margin: 22px 0 0;
+  text-align: center;
+  font: 400 italic 0.9rem/1.4 var(--df-serif);
+  color: var(--df-tinta2);
+}
+.df-mocknota {
+  margin: 10px 0 0;
+  text-align: center;
+  font: 600 0.62rem/1.2 var(--df-sans);
+  letter-spacing: 0.12em;
+  color: rgba(70, 56, 31, 0.5);
+}
+
+/* ── Aviso (mockup honesto: "aquí se abre X") ── */
+.df-aviso {
+  position: fixed;
+  left: 50%;
+  bottom: 18px;
+  transform: translateX(-50%);
+  z-index: 40;
+  max-width: min(92vw, 400px);
+  padding: 10px 16px;
+  border-radius: 12px;
+  background: var(--df-tinta);
+  color: var(--df-carta);
+  font: 600 0.85rem/1.4 var(--df-sans);
+  box-shadow: 0 6px 18px rgba(24, 18, 6, 0.35);
+  animation: df-aviso-sube 0.25s ease-out;
+}
+@keyframes df-aviso-sube {
+  from { opacity: 0; transform: translate(-50%, 8px); }
+  to { opacity: 1; transform: translate(-50%, 0); }
+}
+
+/* ── Foco visible y reduced motion ── */
+.df button:focus-visible {
+  outline: 3px solid var(--df-ocre);
+  outline-offset: 2px;
+}
+@media (prefers-reduced-motion: reduce) {
+  .df-aviso { animation: none; }
+  .df-carta-mayor, .df-carta-menor:nth-of-type(odd) { transform: none; }
+}

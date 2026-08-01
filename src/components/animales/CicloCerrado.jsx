@@ -18,7 +18,7 @@ export default function CicloCerrado({ animalKey, onNavigate }) {
     <section className="rounded-2xl border border-lime-600/50 bg-lime-900/25 p-4">
       <h2 className="flex items-center gap-2 text-base font-bold text-lime-200">
         <Recycle size={18} aria-hidden="true" />
-        Cierra el ciclo de tu finca
+        Cierre el ciclo de su finca
       </h2>
       <p className="mt-2 text-sm text-slate-200/90 leading-relaxed">
         {info.abono && <><span className="font-bold text-lime-100">{info.abono}:</span>{' '}</>}

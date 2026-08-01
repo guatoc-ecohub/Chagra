@@ -1,0 +1,3116 @@
+{
+  "beta_vulgaris_cicla_blanca": {
+    "nombres": [],
+    "match": null,
+    "binomio_consultado": "Beta vulgaris",
+    "fuente": "biodiversidad-co"
+  },
+  "brassica_oleracea_acephala_curly": {
+    "nombres": [],
+    "match": null,
+    "binomio_consultado": "Brassica oleracea",
+    "fuente": "biodiversidad-co"
+  },
+  "brassica_oleracea_capitata_alba": {
+    "nombres": [],
+    "match": null,
+    "binomio_consultado": "Brassica oleracea",
+    "fuente": "biodiversidad-co"
+  },
+  "brassica_oleracea_italica": {
+    "nombres": [],
+    "match": null,
+    "binomio_consultado": "Brassica oleracea",
+    "fuente": "biodiversidad-co"
+  },
+  "eugenia_stipitata": {
+    "nombres": [
+      "Arazá",
+      "Guayabo brasilero",
+      "Guayabo peruano"
+    ],
+    "match": "binomio",
+    "binomio_consultado": "Eugenia stipitata",
+    "matched_scientific_name": "Eugenia stipitata",
+    "record_id": "607b49c92d6de9e95383ae2f",
+    "fuente": "biodiversidad-co",
+    "distribucion_co": [
+      "Amazonas",
+      "Antioquia",
+      "Caquetá",
+      "Cundinamarca",
+      "Guaviare",
+      "Meta",
+      "Putumayo"
+    ]
+  },
+  "foeniculum_vulgare": {
+    "nombres": [],
+    "match": null,
+    "binomio_consultado": "Oeniculum vulgare",
+    "fuente": "biodiversidad-co"
+  },
+  "lactuca_sativa_capitata": {
+    "nombres": [],
+    "match": null,
+    "binomio_consultado": "Lactuca sativa",
+    "fuente": "biodiversidad-co"
+  },
+  "lactuca_sativa_crispa_verde": {
+    "nombres": [],
+    "match": null,
+    "binomio_consultado": "Lactuca sativa",
+    "fuente": "biodiversidad-co"
+  },
+  "lactuca_sativa_longifolia_verde": {
+    "nombres": [],
+    "match": null,
+    "binomio_consultado": "Lactuca sativa",
+    "fuente": "biodiversidad-co"
+  },
+  "melissa_officinalis": {
+    "nombres": [],
+    "match": null,
+    "binomio_consultado": "Melissa officinalis",
+    "fuente": "biodiversidad-co"
+  },
+  "passiflora_edulis_morada": {
+    "nombres": [
+      "ceibey",
+      "curuba",
+      "flor de las cinco lagas"
+    ],
+    "match": "binomio",
+    "binomio_consultado": "Passiflora edulis",
+    "matched_scientific_name": "Passiflora edulis",
+    "record_id": "5cebf8528fe61bf73db12654",
+    "fuente": "biodiversidad-co",
+    "distribucion_co": [
+      "Antioquia",
+      "Valle del Cauca"
+    ]
+  },
+  "solanum_lycopersicum_cerasiforme": {
+    "nombres": [],
+    "match": null,
+    "binomio_consultado": "Solanum lycopersicum",
+    "fuente": "biodiversidad-co"
+  },
+  "solanum_lycopersicum_sungold": {
+    "nombres": [],
+    "match": null,
+    "binomio_consultado": "Solanum lycopersicum",
+    "fuente": "biodiversidad-co"
+  },
+  "beta_vulgaris_var_cicla": {
+    "nombres": [],
+    "match": null,
+    "binomio_consultado": "Beta vulgaris",
+    "fuente": "biodiversidad-co"
+  },
+  "borojoa_patinoi": {
+    "nombres": [],
+    "match": null,
+    "binomio_consultado": "Borojoa patinoi",
+    "fuente": "biodiversidad-co"
+  },
+  "mangifera_indica": {
+    "nombres": [
+      "Manga",
+      "Mango",
+      "Melocotón"
+    ],
+    "match": "binomio",
+    "binomio_consultado": "Mangifera indica",
+    "matched_scientific_name": "Mangifera indica",
+    "record_id": "56e78b3b83c45700544e4113",
+    "fuente": "biodiversidad-co"
+  },
+  "citrus_latifolia": {
+    "nombres": [],
+    "match": null,
+    "binomio_consultado": "Citrus latifolia",
+    "fuente": "biodiversidad-co"
+  },
+  "citrus_sinensis": {
+    "nombres": [],
+    "match": "binomio",
+    "binomio_consultado": "Citrus sinensis",
+    "matched_scientific_name": "Citrus sinensis",
+    "record_id": "65612665c6e55fb6c08bb610",
+    "fuente": "biodiversidad-co"
+  },
+  "acca_sellowiana": {
+    "nombres": [],
+    "match": null,
+    "binomio_consultado": "Acca sellowiana",
+    "fuente": "biodiversidad-co"
+  },
+  "physalis_angulata": {
+    "nombres": [
+      "Guchuvo",
+      "Uchuva de monte",
+      "Uvilla",
+      "Vejigón"
+    ],
+    "match": "binomio",
+    "binomio_consultado": "Physalis angulata",
+    "matched_scientific_name": "Physalis angulata",
+    "record_id": "56e7935583c45700544e418d",
+    "fuente": "biodiversidad-co",
+    "distribucion_co": [
+      "Cundinamarca",
+      "Santander",
+      "Tolima"
+    ]
+  },
+  "solanum_melongena": {
+    "nombres": [],
+    "match": null,
+    "binomio_consultado": "Solanum melongena",
+    "fuente": "biodiversidad-co"
+  },
+  "myrciaria_dubia": {
+    "nombres": [
+      "Camucamu",
+      "Guayabo",
+      "Guayabo arrayán"
+    ],
+    "match": "binomio",
+    "binomio_consultado": "Myrciaria dubia",
+    "matched_scientific_name": "Myrciaria dubia",
+    "record_id": "5fe390e877d2704f01277b45",
+    "fuente": "biodiversidad-co",
+    "distribucion_co": [
+      "Amazonas",
+      "Guainía"
+    ]
+  },
+  "myrciaria_cauliflora": {
+    "nombres": [],
+    "match": null,
+    "binomio_consultado": "Myrciaria cauliflora",
+    "fuente": "biodiversidad-co"
+  },
+  "spondias_mombin": {
+    "nombres": [
+      "Ciruelo",
+      "Hobo",
+      "Jobo",
+      "Mango ciruelo",
+      "Mombin",
+      "Pepa de morrocoy",
+      "Ubos"
+    ],
+    "match": "binomio",
+    "binomio_consultado": "Spondias mombin",
+    "matched_scientific_name": "Spondias mombin",
+    "record_id": "56e7a7c783c45700544e42b2",
+    "fuente": "biodiversidad-co",
+    "distribucion_co": [
+      "Amazonas",
+      "Antioquia",
+      "Arauca",
+      "Bolívar",
+      "Caldas",
+      "Caquetá",
+      "Chocó",
+      "Córdoba",
+      "Cundinamarca",
+      "Guaviare",
+      "Huila",
+      "La Guajira",
+      "Magdalena",
+      "Meta",
+      "Norte de santander",
+      "San Andrés, Providencia y Santa Catalina",
+      "Santander",
+      "Sucre",
+      "Tolima",
+      "Valle del Cauca"
+    ]
+  },
+  "bunchosia_armeniaca": {
+    "nombres": [],
+    "match": null,
+    "binomio_consultado": "Bunchosia armeniaca",
+    "fuente": "biodiversidad-co"
+  },
+  "raphanus_sativus_niger": {
+    "nombres": [],
+    "match": null,
+    "binomio_consultado": "Raphanus sativus",
+    "fuente": "biodiversidad-co"
+  },
+  "brassica_oleracea_sabellica": {
+    "nombres": [],
+    "match": null,
+    "binomio_consultado": "Brassica oleracea",
+    "fuente": "biodiversidad-co"
+  },
+  "beta_vulgaris_cicla_morada": {
+    "nombres": [],
+    "match": null,
+    "binomio_consultado": "Beta vulgaris",
+    "fuente": "biodiversidad-co"
+  },
+  "brassica_oleracea_gemmifera": {
+    "nombres": [],
+    "match": null,
+    "binomio_consultado": "Brassica oleracea",
+    "fuente": "biodiversidad-co"
+  },
+  "brassica_oleracea_botrytis": {
+    "nombres": [],
+    "match": null,
+    "binomio_consultado": "Brassica oleracea",
+    "fuente": "biodiversidad-co"
+  },
+  "brassica_rapa": {
+    "nombres": [
+      "MOSTAZA"
+    ],
+    "match": "binomio",
+    "binomio_consultado": "Brassica rapa",
+    "matched_scientific_name": "Brassica rapa",
+    "record_id": "5953f12e2f4fd7bc7f39a272",
+    "fuente": "biodiversidad-co"
+  },
+  "brassica_napus": {
+    "nombres": [],
+    "match": null,
+    "binomio_consultado": "Brassica napus",
+    "fuente": "biodiversidad-co"
+  },
+  "leucaena_leucocephala": {
+    "nombres": [
+      "Acacia blanca",
+      "Acacia forrajera",
+      "Aroma Blanca",
+      "Aroma Boba",
+      "Aroma Mansa",
+      "Barba De Leon",
+      "Carbonero",
+      "Carbonero blanco",
+      "Carbonero Quiebrahacha",
+      "Granadillo Bobo",
+      "Granadino",
+      "Granolino",
+      "Leucaena",
+      "Panelo",
+      "Ucaena"
+    ],
+    "match": "binomio",
+    "binomio_consultado": "Leucaena leucocephala",
+    "matched_scientific_name": "Leucaena leucocephala",
+    "record_id": "56e789da83c45700544e40fa",
+    "fuente": "biodiversidad-co"
+  },
+  "pueraria_phaseoloides": {
+    "nombres": [
+      "Cusú",
+      "Cuzú",
+      "Kudzú Americano"
+    ],
+    "match": "binomio",
+    "binomio_consultado": "Pueraria phaseoloides",
+    "matched_scientific_name": "Pueraria phaseoloides",
+    "record_id": "5915ef88f827bf0c0ced42a6",
+    "fuente": "biodiversidad-co",
+    "distribucion_co": [
+      "Amazonas",
+      "Antioquia",
+      "Caquetá",
+      "Meta",
+      "Valle del Cauca"
+    ]
+  },
+  "mucuna_pruriens": {
+    "nombres": [
+      "Congolo",
+      "Fríjol terciopelo",
+      "Picapica"
+    ],
+    "match": "binomio",
+    "binomio_consultado": "Mucuna pruriens",
+    "matched_scientific_name": "Mucuna pruriens",
+    "record_id": "5fdbc3d5a483b069215bdb54",
+    "fuente": "biodiversidad-co",
+    "distribucion_co": [
+      "Antioquia",
+      "Bolívar",
+      "Boyacá",
+      "Caldas",
+      "Cauca",
+      "Chocó",
+      "Guainía",
+      "Guaviare",
+      "Huila",
+      "Magdalena",
+      "Meta",
+      "Quindío",
+      "Santander",
+      "Sucre",
+      "Valle del Cauca"
+    ]
+  },
+  "flemingia_congesta": {
+    "nombres": [],
+    "match": null,
+    "binomio_consultado": "Lemingia congesta",
+    "fuente": "biodiversidad-co"
+  },
+  "cratylia_argentea": {
+    "nombres": [],
+    "match": null,
+    "binomio_consultado": "Cratylia argentea",
+    "fuente": "biodiversidad-co"
+  },
+  "desmodium_intortum": {
+    "nombres": [
+      "amor seco",
+      "desmodio verde",
+      "pega pega"
+    ],
+    "match": "binomio",
+    "binomio_consultado": "Desmodium intortum",
+    "matched_scientific_name": "Desmodium intortum",
+    "record_id": "595460722f4fd7bc7f39a7cf",
+    "fuente": "biodiversidad-co"
+  },
+  "centrosema_macrocarpum": {
+    "nombres": [],
+    "match": null,
+    "binomio_consultado": "Centrosema macrocarpum",
+    "fuente": "biodiversidad-co"
+  },
+  "stylosanthes_guianensis": {
+    "nombres": [],
+    "match": null,
+    "binomio_consultado": "Stylosanthes guianensis",
+    "fuente": "biodiversidad-co"
+  },
+  "calopogonium_mucunoides": {
+    "nombres": [],
+    "match": null,
+    "binomio_consultado": "Calopogonium mucunoides",
+    "fuente": "biodiversidad-co"
+  },
+  "eucalyptus_globulus": {
+    "nombres": [],
+    "match": null,
+    "binomio_consultado": "Eucalyptus globulus",
+    "fuente": "biodiversidad-co"
+  },
+  "bidens_alba": {
+    "nombres": [],
+    "match": null,
+    "binomio_consultado": "Bidens alba",
+    "fuente": "biodiversidad-co"
+  },
+  "pennisetum_clandestinum": {
+    "nombres": [
+      "Kikuyo",
+      "Pasto africano",
+      "Tapete",
+      "Zacate kikuyu"
+    ],
+    "match": "binomio",
+    "binomio_consultado": "Pennisetum clandestinum",
+    "matched_scientific_name": "Pennisetum clandestinum",
+    "record_id": "56e7987f83c45700544e41e5",
+    "fuente": "biodiversidad-co"
+  },
+  "kyllinga_brevifolia": {
+    "nombres": [],
+    "match": null,
+    "binomio_consultado": "Kyllinga brevifolia",
+    "fuente": "biodiversidad-co"
+  },
+  "genista_monspessulana": {
+    "nombres": [
+      "Retama",
+      "Retamo",
+      "Retamo blanco",
+      "Retamo de jardín",
+      "Retamo liso",
+      "Retamo pequeño"
+    ],
+    "match": "binomio",
+    "binomio_consultado": "Genista monspessulana",
+    "matched_scientific_name": "Genista monspessulana",
+    "record_id": "56e7856583c45700544e40ac",
+    "fuente": "biodiversidad-co",
+    "distribucion_co": [
+      "Antioquia",
+      "Boyacá",
+      "Cauca",
+      "Cundinamarca",
+      "Huila",
+      "Nariño",
+      "Santander",
+      "Tolima"
+    ]
+  },
+  "uva_bifera": {
+    "nombres": [],
+    "match": null,
+    "binomio_consultado": "Uva bifida",
+    "fuente": "biodiversidad-co"
+  },
+  "hedychium_coronarium": {
+    "nombres": [
+      "Ajengibre",
+      "Heliotropo",
+      "Hidotropo",
+      "Inopropio",
+      "Jengibre",
+      "Jilotropos",
+      "Matandrea"
+    ],
+    "match": "binomio",
+    "binomio_consultado": "Hedychium coronarium",
+    "matched_scientific_name": "Hedychium coronarium",
+    "record_id": "56e7860c83c45700544e40b9",
+    "fuente": "biodiversidad-co",
+    "distribucion_co": [
+      "Amazonas",
+      "Antioquia",
+      "Bolívar",
+      "Caldas",
+      "Caquetá",
+      "Cauca",
+      "Chocó",
+      "Cundinamarca",
+      "Magdalena",
+      "Meta",
+      "Nariño",
+      "Putumayo",
+      "Quindío",
+      "Risaralda",
+      "Santander",
+      "Tolima",
+      "Valle del Cauca",
+      "Vaupés"
+    ]
+  },
+  "lantana_camara": {
+    "nombres": [
+      "Bandera española",
+      "Cinconegritos",
+      "Poveda"
+    ],
+    "match": "binomio",
+    "binomio_consultado": "Lantana camara",
+    "matched_scientific_name": "Lantana camara",
+    "record_id": "594944a42f4fd7bc7f397513",
+    "fuente": "biodiversidad-co",
+    "distribucion_co": [
+      "Cundinamarca",
+      "Tolima"
+    ]
+  },
+  "artemisia_absinthium": {
+    "nombres": [],
+    "match": null,
+    "binomio_consultado": "Artemisia absinthium",
+    "fuente": "biodiversidad-co"
+  },
+  "borago_officinalis": {
+    "nombres": [],
+    "match": null,
+    "binomio_consultado": "Borago officinalis",
+    "fuente": "biodiversidad-co"
+  },
+  "melilotus_officinalis": {
+    "nombres": [],
+    "match": null,
+    "binomio_consultado": "Melilotus officinalis",
+    "fuente": "biodiversidad-co"
+  },
+  "hypericum_perforatum": {
+    "nombres": [
+      "Chite",
+      "Corazoncillo"
+    ],
+    "match": "binomio",
+    "binomio_consultado": "Hypericum perforatum",
+    "matched_scientific_name": "Hypericum perforatum",
+    "record_id": "56e7875083c45700544e40d1",
+    "fuente": "biodiversidad-co"
+  },
+  "achillea_millefolium": {
+    "nombres": [],
+    "match": null,
+    "binomio_consultado": "Achillea millefolium",
+    "fuente": "biodiversidad-co"
+  },
+  "cymbopogon_martinii": {
+    "nombres": [],
+    "match": null,
+    "binomio_consultado": "Cymbopogon martinii",
+    "fuente": "biodiversidad-co"
+  },
+  "aloe_arborescens": {
+    "nombres": [],
+    "match": "binomio",
+    "binomio_consultado": "Aloe arborescens",
+    "matched_scientific_name": "Aloe arborescens",
+    "record_id": "56cf63fe3c16479905cba7dc",
+    "fuente": "biodiversidad-co"
+  },
+  "sambucus_nigra": {
+    "nombres": [],
+    "match": null,
+    "binomio_consultado": "Sambucus nigra",
+    "fuente": "biodiversidad-co"
+  },
+  "piper_nigrum": {
+    "nombres": [],
+    "match": null,
+    "binomio_consultado": "Piper nigrum",
+    "fuente": "biodiversidad-co"
+  },
+  "myristica_fragrans": {
+    "nombres": [],
+    "match": null,
+    "binomio_consultado": "Myristica ragrans",
+    "fuente": "biodiversidad-co"
+  },
+  "cinnamomum_verum": {
+    "nombres": [
+      "Canela",
+      "Canelero de Ceilán",
+      "Canelo",
+      "Canelo de Ceilán"
+    ],
+    "match": "binomio",
+    "binomio_consultado": "Cinnamomum verum",
+    "matched_scientific_name": "Cinnamomum verum",
+    "record_id": "56e76b2f83c45700544e3fe2",
+    "fuente": "biodiversidad-co"
+  },
+  "elettaria_cardamomum": {
+    "nombres": [
+      "Cardamomo"
+    ],
+    "match": "binomio",
+    "binomio_consultado": "Elettaria cardamomum",
+    "matched_scientific_name": "Elettaria cardamomum",
+    "record_id": "56e0f87483c45700544e3d00",
+    "fuente": "biodiversidad-co"
+  },
+  "syzygium_aromaticum": {
+    "nombres": [],
+    "match": null,
+    "binomio_consultado": "Syzygium aromaticum",
+    "fuente": "biodiversidad-co"
+  },
+  "pimpinella_anisum": {
+    "nombres": [],
+    "match": null,
+    "binomio_consultado": "Pimpinella anisum",
+    "fuente": "biodiversidad-co"
+  },
+  "foeniculum_vulgare_var_dulce": {
+    "nombres": [],
+    "match": null,
+    "binomio_consultado": "Oeniculum vulgare",
+    "fuente": "biodiversidad-co"
+  },
+  "thymus_serpyllum": {
+    "nombres": [],
+    "match": null,
+    "binomio_consultado": "Thymus serpyllum",
+    "fuente": "biodiversidad-co"
+  },
+  "majorana_hortensis": {
+    "nombres": [
+      "mejorana"
+    ],
+    "match": "binomio",
+    "binomio_consultado": "Origanum majorana",
+    "matched_scientific_name": "Origanum majorana",
+    "record_id": "56e411e683c45700544e3e1b",
+    "fuente": "biodiversidad-co"
+  },
+  "lavandula_angustifolia": {
+    "nombres": [],
+    "match": null,
+    "binomio_consultado": "Lavandula angustifolia",
+    "fuente": "biodiversidad-co"
+  },
+  "prunus_persica": {
+    "nombres": [
+      "Durazno"
+    ],
+    "match": "binomio",
+    "binomio_consultado": "Prunus persica",
+    "matched_scientific_name": "Prunus persica",
+    "record_id": "56e79a0983c45700544e41f9",
+    "fuente": "biodiversidad-co"
+  },
+  "prunus_domestica": {
+    "nombres": [
+      "Ciruelo"
+    ],
+    "match": "binomio",
+    "binomio_consultado": "Prunus domestica",
+    "matched_scientific_name": "Prunus domestica",
+    "record_id": "56e7999383c45700544e41f5",
+    "fuente": "biodiversidad-co"
+  },
+  "prunus_armeniaca": {
+    "nombres": [],
+    "match": null,
+    "binomio_consultado": "Prunus armeniaca",
+    "fuente": "biodiversidad-co"
+  },
+  "cydonia_oblonga": {
+    "nombres": [],
+    "match": null,
+    "binomio_consultado": "Cydonia oblonga",
+    "fuente": "biodiversidad-co"
+  },
+  "ficus_carica": {
+    "nombres": [],
+    "match": null,
+    "binomio_consultado": "Icus carica",
+    "fuente": "biodiversidad-co"
+  },
+  "punica_granatum": {
+    "nombres": [],
+    "match": null,
+    "binomio_consultado": "Punica granatum",
+    "fuente": "biodiversidad-co"
+  },
+  "pyrus_communis": {
+    "nombres": [
+      "Castor",
+      "Higuerilla",
+      "Higuerilla colorada",
+      "Higuerilla negra",
+      "Higuerillo",
+      "Higuerillo blanco",
+      "Pera",
+      "Peral",
+      "Pero",
+      "Ricino"
+    ],
+    "match": "binomio",
+    "binomio_consultado": "Pyrus communis",
+    "matched_scientific_name": "Pyrus communis",
+    "record_id": "56e79c0583c45700544e422e",
+    "fuente": "biodiversidad-co"
+  },
+  "malus_domestica": {
+    "nombres": [],
+    "match": null,
+    "binomio_consultado": "Malus domestica",
+    "fuente": "biodiversidad-co"
+  },
+  "eriobotrya_japonica": {
+    "nombres": [
+      "Mispero",
+      "Níspero",
+      "Nispero de España",
+      "Níspero del Japón",
+      "Níspero japonés"
+    ],
+    "match": "binomio",
+    "binomio_consultado": "Eriobotrya japonica",
+    "matched_scientific_name": "Eriobotrya japonica",
+    "record_id": "56e783ae83c45700544e408e",
+    "fuente": "biodiversidad-co"
+  },
+  "morus_alba": {
+    "nombres": [],
+    "match": null,
+    "binomio_consultado": "Morus alba",
+    "fuente": "biodiversidad-co"
+  },
+  "acacia_mangium": {
+    "nombres": [
+      "ACACIA MANGIUM"
+    ],
+    "match": "binomio",
+    "binomio_consultado": "Acacia mangium",
+    "matched_scientific_name": "Acacia mangium",
+    "record_id": "595d2d742f4fd7bc7f3a1722",
+    "fuente": "biodiversidad-co"
+  },
+  "calliandra_calothyrsus": {
+    "nombres": [],
+    "match": null,
+    "binomio_consultado": "Calliandra calothyrsus",
+    "fuente": "biodiversidad-co"
+  },
+  "albizia_guachapele": {
+    "nombres": [
+      "CEDRO AMARILLO",
+      "IGUA",
+      "IGUAMARILLO",
+      "Masaguaro"
+    ],
+    "match": "binomio",
+    "binomio_consultado": "Albizia guachapele",
+    "matched_scientific_name": "Albizia guachapele",
+    "record_id": "595d35812f4fd7bc7f3a1953",
+    "fuente": "biodiversidad-co"
+  },
+  "cecropia_peltata": {
+    "nombres": [
+      "Grayumo hembra",
+      "Guarumo",
+      "Llagrumo hembra",
+      "Yagrumo",
+      "Yagrumo hembra",
+      "Yarumo"
+    ],
+    "match": "binomio",
+    "binomio_consultado": "Cecropia peltata",
+    "matched_scientific_name": "Cecropia peltata",
+    "record_id": "56cdeca73c16479905cba787",
+    "fuente": "biodiversidad-co",
+    "distribucion_co": [
+      "Arauca",
+      "Atlántico",
+      "Caldas",
+      "Cauca",
+      "Cesar",
+      "Chocó",
+      "Córdoba",
+      "La Guajira",
+      "San Andrés, Providencia y Santa Catalina",
+      "Tolima",
+      "Valle del Cauca",
+      "Vaupés"
+    ]
+  },
+  "mimosa_sensitiva": {
+    "nombres": [],
+    "match": null,
+    "binomio_consultado": "Mimosa sensitiva",
+    "fuente": "biodiversidad-co"
+  },
+  "jacaranda_mimosifolia": {
+    "nombres": [],
+    "match": null,
+    "binomio_consultado": "Jacaranda mimosifolia",
+    "fuente": "biodiversidad-co"
+  },
+  "tabebuia_rosea": {
+    "nombres": [
+      "Apamate",
+      "Flor morado",
+      "Guayacán",
+      "Guayacán rosado",
+      "Ocobo",
+      "Ocobo rosado",
+      "Palo colorado",
+      "Polvillo",
+      "Roble",
+      "Roble venezolano"
+    ],
+    "match": "binomio",
+    "binomio_consultado": "Tabebuia rosea",
+    "matched_scientific_name": "Tabebuia rosea",
+    "record_id": "56e7a93d83c45700544e42bb",
+    "fuente": "biodiversidad-co",
+    "distribucion_co": [
+      "Amazonas",
+      "Antioquia",
+      "Caquetá",
+      "Cundinamarca",
+      "Guaviare",
+      "Magdalena",
+      "Putumayo",
+      "Risaralda",
+      "Santander",
+      "Tolima",
+      "Vaupés"
+    ]
+  },
+  "croton_lechleri": {
+    "nombres": [
+      "Sangre de drago",
+      "Sangre de dragón",
+      "Sangre de grado"
+    ],
+    "match": "binomio",
+    "binomio_consultado": "Croton lechleri",
+    "matched_scientific_name": "Croton lechleri",
+    "record_id": "5fda345187c0944005026719",
+    "fuente": "biodiversidad-co",
+    "distribucion_co": [
+      "Putumayo"
+    ]
+  },
+  "canavalia_ensiformis": {
+    "nombres": [],
+    "match": null,
+    "binomio_consultado": "Canavalia ensiformis",
+    "fuente": "biodiversidad-co"
+  },
+  "vigna_unguiculata": {
+    "nombres": [],
+    "match": null,
+    "binomio_consultado": "Vigna unguiculata",
+    "fuente": "biodiversidad-co"
+  },
+  "lablab_purpureus": {
+    "nombres": [],
+    "match": null,
+    "binomio_consultado": "Lablab purpureus",
+    "fuente": "biodiversidad-co"
+  },
+  "crotalaria_juncea": {
+    "nombres": [],
+    "match": null,
+    "binomio_consultado": "Crotalaria juncea",
+    "fuente": "biodiversidad-co"
+  },
+  "vicia_villosa": {
+    "nombres": [],
+    "match": null,
+    "binomio_consultado": "Vicia villosa",
+    "fuente": "biodiversidad-co"
+  },
+  "avena_sativa": {
+    "nombres": [],
+    "match": null,
+    "binomio_consultado": "Avena sativa",
+    "fuente": "biodiversidad-co"
+  },
+  "hordeum_vulgare": {
+    "nombres": [],
+    "match": null,
+    "binomio_consultado": "Hordeum vulgare",
+    "fuente": "biodiversidad-co"
+  },
+  "secale_cereale": {
+    "nombres": [],
+    "match": null,
+    "binomio_consultado": "Secale cereale",
+    "fuente": "biodiversidad-co"
+  },
+  "triticum_aestivum": {
+    "nombres": [],
+    "match": null,
+    "binomio_consultado": "Triticum aestivum",
+    "fuente": "biodiversidad-co"
+  },
+  "vaccinium_floribundum": {
+    "nombres": [],
+    "match": null,
+    "binomio_consultado": "Vaccinium loribundum",
+    "fuente": "biodiversidad-co"
+  },
+  "agrostis_foliata": {
+    "nombres": [],
+    "match": null,
+    "binomio_consultado": "Agrostis oliata",
+    "fuente": "biodiversidad-co"
+  },
+  "acacia_melanoxylon": {
+    "nombres": [
+      "Acacia",
+      "Acacia australiana",
+      "Acacia de filodios",
+      "Acacia de leño negro",
+      "Acacia de madera negra",
+      "Acacia japonesa",
+      "Acacia negra",
+      "Algarrobo",
+      "Aroma salvaje",
+      "Aromo australiano",
+      "Aromo negro"
+    ],
+    "match": "binomio",
+    "binomio_consultado": "Acacia melanoxylon",
+    "matched_scientific_name": "Acacia melanoxylon",
+    "record_id": "595e5f352f4fd7bc7f3a210a",
+    "fuente": "biodiversidad-co"
+  },
+  "actinidia_deliciosa": {
+    "nombres": [],
+    "match": null,
+    "binomio_consultado": "Actinidia deliciosa",
+    "fuente": "biodiversidad-co"
+  },
+  "agave_americana": {
+    "nombres": [],
+    "match": "binomio",
+    "binomio_consultado": "Agave americana",
+    "matched_scientific_name": "Agave americana americana",
+    "record_id": "65612653c6e55fb6c08ba78c",
+    "fuente": "biodiversidad-co"
+  },
+  "agave_cocui": {
+    "nombres": [],
+    "match": null,
+    "binomio_consultado": "Agave cocui",
+    "fuente": "biodiversidad-co"
+  },
+  "agave_tequilana": {
+    "nombres": [
+      "AGAVE AZUL",
+      "MAGUEY AZUL",
+      "maguey de tequila",
+      "maguey mezcal",
+      "mescal azul",
+      "MEZCAL AZUL",
+      "Mezcal azul tequilero"
+    ],
+    "match": "binomio",
+    "binomio_consultado": "Agave tequilana",
+    "matched_scientific_name": "Agave tequilana",
+    "record_id": "595a6e602f4fd7bc7f39dda2",
+    "fuente": "biodiversidad-co"
+  },
+  "aiphanes_aculeata": {
+    "nombres": [],
+    "match": null,
+    "binomio_consultado": "Aiphanes aculeata",
+    "fuente": "biodiversidad-co"
+  },
+  "aloysia_citrodora": {
+    "nombres": [],
+    "match": null,
+    "binomio_consultado": "Aloysia citrodora",
+    "fuente": "biodiversidad-co"
+  },
+  "amaranthus_caudatus_kiwicha": {
+    "nombres": [],
+    "match": null,
+    "binomio_consultado": "Amaranthus caudatus",
+    "fuente": "biodiversidad-co"
+  },
+  "anacardium_excelsum": {
+    "nombres": [
+      "Aspavé",
+      "Caracol",
+      "Caracolí",
+      "Espavé",
+      "Mijao"
+    ],
+    "match": "binomio",
+    "binomio_consultado": "Anacardium excelsum",
+    "matched_scientific_name": "Anacardium excelsum",
+    "record_id": "56e5007783c45700544e3e6e",
+    "fuente": "biodiversidad-co",
+    "distribucion_co": [
+      "Atlántico",
+      "Bolívar",
+      "Cesar",
+      "Córdoba",
+      "La Guajira",
+      "Magdalena",
+      "Sucre"
+    ]
+  },
+  "andropogon_gayanus": {
+    "nombres": [],
+    "match": null,
+    "binomio_consultado": "Andropogon gayanus",
+    "fuente": "biodiversidad-co"
+  },
+  "anethum_graveolens": {
+    "nombres": [],
+    "match": null,
+    "binomio_consultado": "Anethum graveolens",
+    "fuente": "biodiversidad-co"
+  },
+  "aniba_perutilis": {
+    "nombres": [
+      "Chachajo",
+      "Comino crespo",
+      "Comino real",
+      "Laurel"
+    ],
+    "match": "binomio",
+    "binomio_consultado": "Aniba perutilis",
+    "matched_scientific_name": "Aniba perutilis",
+    "record_id": "567b6e04f289f5a40c0cd32d",
+    "fuente": "biodiversidad-co",
+    "distribucion_co": [
+      "Antioquia",
+      "Caldas",
+      "Huila",
+      "Meta",
+      "Santander",
+      "Valle del Cauca"
+    ]
+  },
+  "annona_mucosa": {
+    "nombres": [],
+    "match": null,
+    "binomio_consultado": "Annona mucosa",
+    "fuente": "biodiversidad-co"
+  },
+  "annona_squamosa": {
+    "nombres": [
+      "anón",
+      "anona blanca",
+      "Cachiman cochon"
+    ],
+    "match": "binomio",
+    "binomio_consultado": "Annona squamosa",
+    "matched_scientific_name": "Annona squamosa",
+    "record_id": "56e5e3d583c45700544e3e88",
+    "fuente": "biodiversidad-co"
+  },
+  "arrabidaea_chica": {
+    "nombres": [],
+    "match": null,
+    "binomio_consultado": "Ridericia chica",
+    "fuente": "biodiversidad-co"
+  },
+  "aspidosperma_polyneuron": {
+    "nombres": [
+      "Carreto",
+      "Carreto blanco",
+      "Comulá",
+      "Costillo",
+      "Costillo acanalado",
+      "Cumulá",
+      "Quimulá"
+    ],
+    "match": "binomio",
+    "binomio_consultado": "Aspidosperma polyneuron",
+    "matched_scientific_name": "Aspidosperma polyneuron",
+    "record_id": "56e5ed0483c45700544e3e8a",
+    "fuente": "biodiversidad-co",
+    "distribucion_co": [
+      "Atlántico",
+      "Bolívar",
+      "Boyacá",
+      "Cesar",
+      "Córdoba",
+      "Cundinamarca",
+      "La Guajira",
+      "Magdalena",
+      "Santander",
+      "Sucre",
+      "Tolima"
+    ]
+  },
+  "attalea_butyracea": {
+    "nombres": [
+      "Canambo",
+      "Corozo de marrano, corozo de puerco",
+      "Corúa, curúa, palma corúa",
+      "Cuesco, palma cuesco",
+      "Curumuta, corozo",
+      "Palma de ramo",
+      "Palma de vino",
+      "Palma dulce",
+      "Palma real, palma rial",
+      "Shebón, yagua"
+    ],
+    "match": "binomio",
+    "binomio_consultado": "Attalea butyracea",
+    "matched_scientific_name": "Attalea butyracea",
+    "record_id": "56d4c7ba3c16479905cba8c3",
+    "fuente": "biodiversidad-co",
+    "distribucion_co": [
+      "Amazonas",
+      "Antioquia",
+      "Arauca",
+      "Atlántico",
+      "Bolívar",
+      "Boyacá",
+      "Caldas",
+      "Caquetá",
+      "Casanare",
+      "Cesar",
+      "Córdoba",
+      "Cundinamarca",
+      "Guainía",
+      "Guaviare",
+      "Huila",
+      "La Guajira",
+      "Magdalena",
+      "Meta",
+      "Norte de santander",
+      "Putumayo",
+      "Quindío",
+      "Risaralda",
+      "Santander"
+    ]
+  },
+  "attalea_speciosa": {
+    "nombres": [],
+    "match": null,
+    "binomio_consultado": "Attalea speciosa",
+    "fuente": "biodiversidad-co"
+  },
+  "axinaea_macrophylla": {
+    "nombres": [],
+    "match": null,
+    "binomio_consultado": "Axinaea macrophylla",
+    "fuente": "biodiversidad-co"
+  },
+  "axonopus_compressus": {
+    "nombres": [
+      "Pasto de alfombra"
+    ],
+    "match": "binomio",
+    "binomio_consultado": "Axonopus compressus",
+    "matched_scientific_name": "Axonopus compressus",
+    "record_id": "56d4d6103c16479905cba8d2",
+    "fuente": "biodiversidad-co"
+  },
+  "azolla_filiculoides": {
+    "nombres": [],
+    "match": null,
+    "binomio_consultado": "Azolla iliculoides",
+    "fuente": "biodiversidad-co"
+  },
+  "beta_vulgaris_altissima": {
+    "nombres": [],
+    "match": null,
+    "binomio_consultado": "Beta vulgaris",
+    "fuente": "biodiversidad-co"
+  },
+  "beta_vulgaris_cicla_amarilla": {
+    "nombres": [],
+    "match": null,
+    "binomio_consultado": "Beta vulgaris",
+    "fuente": "biodiversidad-co"
+  },
+  "beta_vulgaris_cicla_roja": {
+    "nombres": [],
+    "match": null,
+    "binomio_consultado": "Beta vulgaris",
+    "fuente": "biodiversidad-co"
+  },
+  "bocconia_frutescens": {
+    "nombres": [],
+    "match": null,
+    "binomio_consultado": "Bocconia rutescens",
+    "fuente": "biodiversidad-co"
+  },
+  "bombacopsis_quinata": {
+    "nombres": [
+      "Cartageno",
+      "Cedro espinoso",
+      "Cedro macho",
+      "Ceiba"
+    ],
+    "match": "binomio",
+    "binomio_consultado": "Bombacopsis quinata",
+    "matched_scientific_name": "Bombacopsis quinata",
+    "record_id": "56e6242083c45700544e3e9d",
+    "fuente": "biodiversidad-co"
+  },
+  "borojoa_sorbilis": {
+    "nombres": [],
+    "match": null,
+    "binomio_consultado": "Borojoa sorbilis",
+    "fuente": "biodiversidad-co"
+  },
+  "brachiaria_brizantha": {
+    "nombres": [],
+    "match": "binomio",
+    "binomio_consultado": "Urochloa brizantha",
+    "matched_scientific_name": "Urochloa brizantha",
+    "record_id": "56e4654c83c45700544e3e38",
+    "fuente": "biodiversidad-co"
+  },
+  "brachiaria_decumbens": {
+    "nombres": [],
+    "match": "binomio",
+    "binomio_consultado": "Urochloa decumbens",
+    "matched_scientific_name": "Urochloa decumbens",
+    "record_id": "56e7ad8183c45700544e42dc",
+    "fuente": "biodiversidad-co"
+  },
+  "brassica_oleracea_acephala_lacinato": {
+    "nombres": [],
+    "match": null,
+    "binomio_consultado": "Brassica oleracea",
+    "fuente": "biodiversidad-co"
+  },
+  "brassica_oleracea_acephala_red_russian": {
+    "nombres": [],
+    "match": null,
+    "binomio_consultado": "Brassica oleracea",
+    "fuente": "biodiversidad-co"
+  },
+  "brassica_oleracea_capitata_rubra": {
+    "nombres": [],
+    "match": null,
+    "binomio_consultado": "Brassica oleracea",
+    "fuente": "biodiversidad-co"
+  },
+  "brassica_oleracea_sabauda": {
+    "nombres": [],
+    "match": null,
+    "binomio_consultado": "Brassica oleracea",
+    "fuente": "biodiversidad-co"
+  },
+  "brassica_oleracea_var_acephala": {
+    "nombres": [],
+    "match": null,
+    "binomio_consultado": "Brassica oleracea",
+    "fuente": "biodiversidad-co"
+  },
+  "brassica_oleracea_var_capitata": {
+    "nombres": [],
+    "match": null,
+    "binomio_consultado": "Brassica oleracea",
+    "fuente": "biodiversidad-co"
+  },
+  "brassica_rapa_rapifera": {
+    "nombres": [
+      "MOSTAZA"
+    ],
+    "match": "binomio",
+    "binomio_consultado": "Brassica rapa",
+    "matched_scientific_name": "Brassica rapa",
+    "record_id": "5953f12e2f4fd7bc7f39a272",
+    "fuente": "biodiversidad-co"
+  },
+  "brassica_rapa_var_rapa": {
+    "nombres": [
+      "MOSTAZA"
+    ],
+    "match": "binomio",
+    "binomio_consultado": "Brassica rapa",
+    "matched_scientific_name": "Brassica rapa",
+    "record_id": "5953f12e2f4fd7bc7f39a272",
+    "fuente": "biodiversidad-co"
+  },
+  "buddleja_americana": {
+    "nombres": [],
+    "match": null,
+    "binomio_consultado": "Buddleja americana",
+    "fuente": "biodiversidad-co"
+  },
+  "bursera_graveolens": {
+    "nombres": [],
+    "match": null,
+    "binomio_consultado": "Bursera graveolens",
+    "fuente": "biodiversidad-co"
+  },
+  "byrsonima_crassifolia": {
+    "nombres": [],
+    "match": null,
+    "binomio_consultado": "Byrsonima crassifolia",
+    "fuente": "biodiversidad-co"
+  },
+  "caesalpinia_sappan": {
+    "nombres": [],
+    "match": null,
+    "binomio_consultado": "Biancaea sappan",
+    "fuente": "biodiversidad-co"
+  },
+  "cajanus_cajan": {
+    "nombres": [],
+    "match": null,
+    "binomio_consultado": "Cajanus cajan",
+    "fuente": "biodiversidad-co"
+  },
+  "canna_edulis": {
+    "nombres": [],
+    "match": null,
+    "binomio_consultado": "Canna edulis",
+    "fuente": "biodiversidad-co"
+  },
+  "capsicum_pubescens_rocoto": {
+    "nombres": [],
+    "match": null,
+    "binomio_consultado": "Capsicum pubescens",
+    "fuente": "biodiversidad-co"
+  },
+  "cariniana_estrellensis": {
+    "nombres": [],
+    "match": null,
+    "binomio_consultado": "Cariniana estrellensis",
+    "fuente": "biodiversidad-co"
+  },
+  "cariniana_pyriformis": {
+    "nombres": [
+      "Abarco",
+      "Caoba falsa",
+      "Chibugá",
+      "Coco huasco",
+      "Cocoabarco",
+      "Fono tallador",
+      "Papelillo",
+      "Piloncillo",
+      "Poná"
+    ],
+    "match": "binomio",
+    "binomio_consultado": "Cariniana pyriformis",
+    "matched_scientific_name": "Cariniana pyriformis",
+    "record_id": "567c0779f289f5a40c0cd33f",
+    "fuente": "biodiversidad-co",
+    "distribucion_co": [
+      "Antioquia",
+      "Boyacá",
+      "Chocó",
+      "Córdoba",
+      "Norte de santander",
+      "Santander"
+    ]
+  },
+  "cassia_grandis": {
+    "nombres": [
+      "árbol de fuego",
+      "sándalo"
+    ],
+    "match": "binomio",
+    "binomio_consultado": "Cassia grandis",
+    "matched_scientific_name": "Cassia grandis",
+    "record_id": "651f4760fffc965b4a242c9a",
+    "fuente": "biodiversidad-co",
+    "distribucion_co": [
+      "Antioquia",
+      "Bolívar",
+      "Casanare",
+      "Cauca",
+      "Chocó",
+      "La Guajira",
+      "Magdalena",
+      "Meta",
+      "Tolima",
+      "Valle del Cauca"
+    ]
+  },
+  "cattleya_trianae": {
+    "nombres": [
+      "Catleya",
+      "Catleya blanca",
+      "Catleya de Triana",
+      "Flor de mayo",
+      "Flor de San Juan",
+      "Flor nacional",
+      "Lirio de mayo",
+      "Orquídea"
+    ],
+    "match": "binomio",
+    "binomio_consultado": "Cattleya trianae",
+    "matched_scientific_name": "Cattleya trianae",
+    "record_id": "56d907b63c16479905cba983",
+    "fuente": "biodiversidad-co"
+  },
+  "cecropia_telealba": {
+    "nombres": [],
+    "match": null,
+    "binomio_consultado": "Cecropia telealba",
+    "fuente": "biodiversidad-co"
+  },
+  "cestrum_nocturnum": {
+    "nombres": [
+      "Caballero de la noche",
+      "Dama de noche",
+      "Don Diego de la noche",
+      "Galán de la noche",
+      "Jazmín de noche"
+    ],
+    "match": "binomio",
+    "binomio_consultado": "Cestrum nocturnum",
+    "matched_scientific_name": "Cestrum nocturnum",
+    "record_id": "56e72b8483c45700544e3f24",
+    "fuente": "biodiversidad-co"
+  },
+  "chamaemelum_nobile": {
+    "nombres": [],
+    "match": null,
+    "binomio_consultado": "Chamaemelum nobile",
+    "fuente": "biodiversidad-co"
+  },
+  "chrysophyllum_cainito": {
+    "nombres": [
+      "Caimito",
+      "Caimito blanco",
+      "Maduraverde"
+    ],
+    "match": "binomio",
+    "binomio_consultado": "Chrysophyllum cainito",
+    "matched_scientific_name": "Chrysophyllum cainito",
+    "record_id": "63f60cd8132bec1ccd640a54",
+    "fuente": "biodiversidad-co",
+    "distribucion_co": [
+      "Atlántico",
+      "Magdalena",
+      "Sucre"
+    ]
+  },
+  "cinchona_officinalis": {
+    "nombres": [],
+    "match": null,
+    "binomio_consultado": "Cinchona officinalis",
+    "fuente": "biodiversidad-co"
+  },
+  "clethra_fagifolia": {
+    "nombres": [],
+    "match": null,
+    "binomio_consultado": "Clethra agifolia",
+    "fuente": "biodiversidad-co"
+  },
+  "clusia_grandiflora": {
+    "nombres": [],
+    "match": null,
+    "binomio_consultado": "Clusia grandiflora",
+    "fuente": "biodiversidad-co"
+  },
+  "clusia_multiflora": {
+    "nombres": [
+      "Caucho",
+      "Chagualo",
+      "Chagualo de hoja grande",
+      "Cucharo",
+      "Gaque",
+      "Himpano, incienso, manduro",
+      "Sape",
+      "Tampaco"
+    ],
+    "match": "binomio",
+    "binomio_consultado": "Clusia multiflora",
+    "matched_scientific_name": "Clusia multiflora",
+    "record_id": "56e774c083c45700544e400d",
+    "fuente": "biodiversidad-co"
+  },
+  "cnidoscolus_aconitifolius": {
+    "nombres": [
+      "chaya",
+      "copapayo",
+      "PAPAYO MACHO",
+      "PAPAYUELO"
+    ],
+    "match": "binomio",
+    "binomio_consultado": "Cnidoscolus aconitifolius",
+    "matched_scientific_name": "Cnidoscolus aconitifolius",
+    "record_id": "595a86ad2f4fd7bc7f39e4bb",
+    "fuente": "biodiversidad-co"
+  },
+  "colocasia_antiquorum": {
+    "nombres": [],
+    "match": null,
+    "binomio_consultado": "Colocasia antiquorum",
+    "fuente": "biodiversidad-co"
+  },
+  "cosmos_sulphureus": {
+    "nombres": [],
+    "match": null,
+    "binomio_consultado": "Cosmos sulphureus",
+    "fuente": "biodiversidad-co"
+  },
+  "costus_spicatus": {
+    "nombres": [],
+    "match": null,
+    "binomio_consultado": "Costus spicatus",
+    "fuente": "biodiversidad-co"
+  },
+  "crassula_ovata": {
+    "nombres": [],
+    "match": null,
+    "binomio_consultado": "Crassula ovata",
+    "fuente": "biodiversidad-co"
+  },
+  "cuminum_cyminum": {
+    "nombres": [],
+    "match": null,
+    "binomio_consultado": "Cuminum cyminum",
+    "fuente": "biodiversidad-co"
+  },
+  "cymbopogon_flexuosus": {
+    "nombres": [],
+    "match": null,
+    "binomio_consultado": "Cymbopogon lexuosus",
+    "fuente": "biodiversidad-co"
+  },
+  "cymbopogon_nardus": {
+    "nombres": [],
+    "match": null,
+    "binomio_consultado": "Cymbopogon nardus",
+    "fuente": "biodiversidad-co"
+  },
+  "cynara_cardunculus_scolymus": {
+    "nombres": [],
+    "match": null,
+    "binomio_consultado": "Cynara cardunculus",
+    "fuente": "biodiversidad-co"
+  },
+  "cynodon_nlemfuensis": {
+    "nombres": [
+      "Enredalocas",
+      "Estrella",
+      "Estrella Africana",
+      "Pasto Estrella",
+      "Tumbabobos",
+      "Tumbaviejos"
+    ],
+    "match": "binomio",
+    "binomio_consultado": "Cynodon nlemfuensis",
+    "matched_scientific_name": "Cynodon nlemfuensis",
+    "record_id": "56e77b6483c45700544e4035",
+    "fuente": "biodiversidad-co",
+    "distribucion_co": [
+      "Antioquia",
+      "Caldas",
+      "Cauca",
+      "Meta",
+      "Quindío",
+      "Risaralda",
+      "Tolima",
+      "Valle del Cauca"
+    ]
+  },
+  "cyperus_articulatus": {
+    "nombres": [
+      "Eneas",
+      "Hierba de estera",
+      "Junco"
+    ],
+    "match": "binomio",
+    "binomio_consultado": "Cyperus articulatus",
+    "matched_scientific_name": "Cyperus articulatus",
+    "record_id": "56de191e83c45700544e3bfd",
+    "fuente": "biodiversidad-co",
+    "distribucion_co": [
+      "La Guajira"
+    ]
+  },
+  "dahlia_imperialis": {
+    "nombres": [],
+    "match": null,
+    "binomio_consultado": "Dahlia imperialis",
+    "fuente": "biodiversidad-co"
+  },
+  "dicksonia_sellowiana": {
+    "nombres": [],
+    "match": null,
+    "binomio_consultado": "Dicksonia sellowiana",
+    "fuente": "biodiversidad-co"
+  },
+  "dioscorea_japonica": {
+    "nombres": [],
+    "match": null,
+    "binomio_consultado": "Dioscorea japonica",
+    "fuente": "biodiversidad-co"
+  },
+  "dodonaea_viscosa": {
+    "nombres": [
+      "Chamiso",
+      "Chanamo",
+      "Guatacán",
+      "Hayuelo"
+    ],
+    "match": "binomio",
+    "binomio_consultado": "Dodonaea viscosa",
+    "matched_scientific_name": "Dodonaea viscosa",
+    "record_id": "56e782d683c45700544e4082",
+    "fuente": "biodiversidad-co"
+  },
+  "drimys_granadensis": {
+    "nombres": [
+      "Ají de páramo",
+      "Canelo de páramo"
+    ],
+    "match": "binomio",
+    "binomio_consultado": "Drimys granadensis",
+    "matched_scientific_name": "Drimys granadensis",
+    "record_id": "56d047233c16479905cba815",
+    "fuente": "biodiversidad-co",
+    "distribucion_co": [
+      "Antioquia",
+      "Boyacá",
+      "Caldas",
+      "Caquetá",
+      "Cauca",
+      "Cundinamarca",
+      "Huila",
+      "Nariño",
+      "Norte de santander",
+      "Putumayo",
+      "Quindío",
+      "Risaralda",
+      "Santander",
+      "Tolima",
+      "Valle del Cauca"
+    ]
+  },
+  "dysphania_ambrosioides": {
+    "nombres": [
+      "Apazote",
+      "Epazote",
+      "Paico",
+      "Pazote"
+    ],
+    "match": "binomio",
+    "binomio_consultado": "Dysphania ambrosioides",
+    "matched_scientific_name": "Dysphania ambrosioides",
+    "record_id": "651f719c284a2cdd8ddd71a6",
+    "fuente": "biodiversidad-co"
+  },
+  "epiphyllum_phyllanthus": {
+    "nombres": [],
+    "match": "binomio",
+    "binomio_consultado": "Epiphyllum phyllanthus",
+    "matched_scientific_name": "Epiphyllum phyllanthus",
+    "record_id": "5fe6a431e1444ba32ca3105e",
+    "fuente": "biodiversidad-co",
+    "distribucion_co": [
+      "Amazonas",
+      "Antioquia",
+      "Boyacá",
+      "Caldas",
+      "Chocó",
+      "Cundinamarca",
+      "Guainía",
+      "Huila",
+      "La Guajira",
+      "Meta",
+      "Nariño",
+      "Norte de santander",
+      "Quindío",
+      "Santander",
+      "Sucre",
+      "Tolima",
+      "Valle del Cauca"
+    ]
+  },
+  "erythrina_rubrinervia": {
+    "nombres": [],
+    "match": null,
+    "binomio_consultado": "Erythrina rubrinervia",
+    "fuente": "biodiversidad-co"
+  },
+  "escallonia_pendula": {
+    "nombres": [],
+    "match": null,
+    "binomio_consultado": "Escallonia pendula",
+    "fuente": "biodiversidad-co"
+  },
+  "festuca_arundinacea": {
+    "nombres": [],
+    "match": null,
+    "binomio_consultado": "Estuca arundinacea",
+    "fuente": "biodiversidad-co"
+  },
+  "foeniculum_vulgare_azoricum": {
+    "nombres": [],
+    "match": null,
+    "binomio_consultado": "Oeniculum vulgare",
+    "fuente": "biodiversidad-co"
+  },
+  "freziera_canescens": {
+    "nombres": [],
+    "match": null,
+    "binomio_consultado": "Reziera canescens",
+    "fuente": "biodiversidad-co"
+  },
+  "furcraea_andina": {
+    "nombres": [],
+    "match": null,
+    "binomio_consultado": "Urcraea andina",
+    "fuente": "biodiversidad-co"
+  },
+  "gaiadendron_punctatum": {
+    "nombres": [],
+    "match": null,
+    "binomio_consultado": "Gaiadendron punctatum",
+    "fuente": "biodiversidad-co"
+  },
+  "genipa_americana": {
+    "nombres": [
+      "caruto",
+      "genipa",
+      "huito",
+      "irayol",
+      "yagua"
+    ],
+    "match": "binomio",
+    "binomio_consultado": "Genipa americana",
+    "matched_scientific_name": "Genipa americana",
+    "record_id": "5fdb87185a4ab0a71da8ece3",
+    "fuente": "biodiversidad-co",
+    "distribucion_co": [
+      "Amazonas",
+      "Antioquia",
+      "Arauca",
+      "Bolívar",
+      "Caquetá",
+      "Cesar",
+      "Chocó",
+      "Córdoba",
+      "Cundinamarca",
+      "Guaviare",
+      "Huila",
+      "La Guajira",
+      "Magdalena",
+      "Meta",
+      "Nariño",
+      "Putumayo",
+      "Quindío",
+      "Risaralda",
+      "Santander",
+      "Tolima",
+      "Vaupés",
+      "Vichada"
+    ]
+  },
+  "gossypium_barbadense_criollo": {
+    "nombres": [],
+    "match": null,
+    "binomio_consultado": "Gossypium barbadense",
+    "fuente": "biodiversidad-co"
+  },
+  "hibiscus_sabdariffa": {
+    "nombres": [],
+    "match": null,
+    "binomio_consultado": "Hibiscus sabdariffa",
+    "fuente": "biodiversidad-co"
+  },
+  "huberodendron_patinoi": {
+    "nombres": [
+      "Carrá",
+      "Coco volador",
+      "Nogal"
+    ],
+    "match": "binomio",
+    "binomio_consultado": "Huberodendron patinoi",
+    "matched_scientific_name": "Huberodendron patinoi",
+    "record_id": "56e786b383c45700544e40c8",
+    "fuente": "biodiversidad-co",
+    "distribucion_co": [
+      "Antioquia",
+      "Boyacá",
+      "Cauca",
+      "Chocó",
+      "Córdoba",
+      "Nariño",
+      "Risaralda",
+      "Santander",
+      "Valle del Cauca"
+    ]
+  },
+  "hylocereus_undatus": {
+    "nombres": [
+      "Pitahaya blanco",
+      "Pitahaya orejona",
+      "Pitaya"
+    ],
+    "match": "binomio",
+    "binomio_consultado": "Hylocereus undatus",
+    "matched_scientific_name": "Hylocereus undatus",
+    "record_id": "628bd3262fbe162f1724279f",
+    "fuente": "biodiversidad-co"
+  },
+  "ilex_kunthiana": {
+    "nombres": [],
+    "match": null,
+    "binomio_consultado": "Ilex kunthiana",
+    "fuente": "biodiversidad-co"
+  },
+  "illicium_verum": {
+    "nombres": [],
+    "match": null,
+    "binomio_consultado": "Illicium verum",
+    "fuente": "biodiversidad-co"
+  },
+  "inga_alba": {
+    "nombres": [],
+    "match": null,
+    "binomio_consultado": "Inga alba",
+    "fuente": "biodiversidad-co"
+  },
+  "inga_densiflora": {
+    "nombres": [
+      "Guamo común",
+      "Guamo copero",
+      "Guamo macheto",
+      "Guava blanca"
+    ],
+    "match": "binomio",
+    "binomio_consultado": "Inga densiflora",
+    "matched_scientific_name": "Inga densiflora",
+    "record_id": "59432cf92f4fd7bc7f39563e",
+    "fuente": "biodiversidad-co"
+  },
+  "inga_vera": {
+    "nombres": [
+      "GUABA",
+      "GUABO",
+      "guamo"
+    ],
+    "match": "binomio",
+    "binomio_consultado": "Inga vera",
+    "matched_scientific_name": "Inga vera",
+    "record_id": "5943f0642f4fd7bc7f3956c8",
+    "fuente": "biodiversidad-co"
+  },
+  "ipomoea_aquatica": {
+    "nombres": [],
+    "match": null,
+    "binomio_consultado": "Ipomoea aquatica",
+    "fuente": "biodiversidad-co"
+  },
+  "juglans_neotropica": {
+    "nombres": [
+      "Cedro Grande",
+      "Cedro Negro",
+      "Cedro nogal",
+      "Nogal",
+      "Nogal bogotano",
+      "Nogal Sabanero"
+    ],
+    "match": "binomio",
+    "binomio_consultado": "Juglans neotropica",
+    "matched_scientific_name": "Juglans neotropica",
+    "record_id": "607b665e34f800ab540d88ea",
+    "fuente": "biodiversidad-co",
+    "distribucion_co": [
+      "Antioquia",
+      "Boyacá",
+      "Caquetá",
+      "Cauca",
+      "Nariño",
+      "Norte de santander",
+      "Putumayo",
+      "Quindío",
+      "Risaralda",
+      "Santander",
+      "Valle del Cauca"
+    ]
+  },
+  "juncus_effusus": {
+    "nombres": [
+      "junquera"
+    ],
+    "match": "binomio",
+    "binomio_consultado": "Juncus effusus",
+    "matched_scientific_name": "Juncus effusus",
+    "record_id": "5fe369ad8014e7d97c7dd6af",
+    "fuente": "biodiversidad-co",
+    "distribucion_co": [
+      "Antioquia"
+    ]
+  },
+  "kalanchoe_blossfeldiana": {
+    "nombres": [],
+    "match": null,
+    "binomio_consultado": "Kalanchoe blossfeldiana",
+    "fuente": "biodiversidad-co"
+  },
+  "kalanchoe_pinnata": {
+    "nombres": [
+      "Bruja",
+      "Colombiana",
+      "Flor de aire",
+      "Hoja de aire",
+      "Hoja de Colombia",
+      "Hoja de la fortuna",
+      "Hoja de soldado",
+      "Hoja santa",
+      "Kalanchoe",
+      "Patriota",
+      "Planta de la vida"
+    ],
+    "match": "binomio",
+    "binomio_consultado": "Kalanchoe pinnata",
+    "matched_scientific_name": "Kalanchoe pinnata",
+    "record_id": "59152fa2f827bf0c0ced3b50",
+    "fuente": "biodiversidad-co"
+  },
+  "lactuca_sativa_longifolia_morada": {
+    "nombres": [],
+    "match": null,
+    "binomio_consultado": "Lactuca sativa",
+    "fuente": "biodiversidad-co"
+  },
+  "lavandula_dentata": {
+    "nombres": [],
+    "match": null,
+    "binomio_consultado": "Lavandula dentata",
+    "fuente": "biodiversidad-co"
+  },
+  "lecythis_minor": {
+    "nombres": [
+      "Carguero",
+      "Coco, Coco Cristal, Coco de mono",
+      "Cocomono",
+      "Cocuelo",
+      "Coquillo",
+      "Coquito",
+      "Olla de mono",
+      "Olleto",
+      "Ollita de Mona",
+      "Ollita de mono"
+    ],
+    "match": "binomio",
+    "binomio_consultado": "Lecythis minor",
+    "matched_scientific_name": "Lecythis minor",
+    "record_id": "60215ed904df65794f8ec5c3",
+    "fuente": "biodiversidad-co",
+    "distribucion_co": [
+      "Antioquia",
+      "Atlántico",
+      "Bolívar",
+      "Cesar",
+      "Chocó",
+      "Córdoba",
+      "La Guajira",
+      "Magdalena",
+      "Santander",
+      "Sucre",
+      "Valle del Cauca"
+    ]
+  },
+  "lemna_minor": {
+    "nombres": [],
+    "match": null,
+    "binomio_consultado": "Lemna minor",
+    "fuente": "biodiversidad-co"
+  },
+  "levisticum_officinale": {
+    "nombres": [],
+    "match": null,
+    "binomio_consultado": "Levisticum officinale",
+    "fuente": "biodiversidad-co"
+  },
+  "lippia_alba": {
+    "nombres": [],
+    "match": "binomio",
+    "binomio_consultado": "Lippia alba",
+    "matched_scientific_name": "Lippia alba",
+    "record_id": "63a1b6db585f056c5872fd07",
+    "fuente": "biodiversidad-co"
+  },
+  "lolium_perenne": {
+    "nombres": [],
+    "match": null,
+    "binomio_consultado": "Lolium perenne",
+    "fuente": "biodiversidad-co"
+  },
+  "lonchocarpus_velutinus": {
+    "nombres": [],
+    "match": null,
+    "binomio_consultado": "Deguelia utilis",
+    "fuente": "biodiversidad-co"
+  },
+  "magnolia_caricifragrans": {
+    "nombres": [
+      "Apirruncho",
+      "Hojarasco"
+    ],
+    "match": "binomio",
+    "binomio_consultado": "Magnolia caricifragrans",
+    "matched_scientific_name": "Magnolia caricifragrans",
+    "record_id": "566f10fdf289f5a40c0cd275",
+    "fuente": "biodiversidad-co",
+    "distribucion_co": [
+      "Arauca",
+      "Cundinamarca",
+      "Norte de santander"
+    ]
+  },
+  "magnolia_yarumalensis": {
+    "nombres": [
+      "Almanegra",
+      "Boñigo",
+      "Gallinazo morado"
+    ],
+    "match": "binomio",
+    "binomio_consultado": "Magnolia yarumalensis",
+    "matched_scientific_name": "Magnolia yarumalensis",
+    "record_id": "56702b93f289f5a40c0cd2a8",
+    "fuente": "biodiversidad-co",
+    "distribucion_co": [
+      "Antioquia"
+    ]
+  },
+  "malus_domestica_sabanera": {
+    "nombres": [],
+    "match": null,
+    "binomio_consultado": "Malus domestica",
+    "fuente": "biodiversidad-co"
+  },
+  "mammea_americana": {
+    "nombres": [
+      "Abricó",
+      "Albricoque",
+      "Mamey"
+    ],
+    "match": "binomio",
+    "binomio_consultado": "Mammea americana",
+    "matched_scientific_name": "Mammea americana",
+    "record_id": "56e78b0f83c45700544e4111",
+    "fuente": "biodiversidad-co"
+  },
+  "manihot_glaziovii": {
+    "nombres": [],
+    "match": null,
+    "binomio_consultado": "Manihot glaziovii",
+    "fuente": "biodiversidad-co"
+  },
+  "masdevallia_coccinea": {
+    "nombres": [
+      "Banderitas",
+      "Masdevalia",
+      "Orquídea"
+    ],
+    "match": "binomio",
+    "binomio_consultado": "Masdevallia coccinea",
+    "matched_scientific_name": "Masdevallia coccinea",
+    "record_id": "56e786db83c45700544e40ca",
+    "fuente": "biodiversidad-co",
+    "distribucion_co": [
+      "Boyacá",
+      "Norte de santander",
+      "Putumayo",
+      "Santander"
+    ]
+  },
+  "mauritia_minor": {
+    "nombres": [],
+    "match": null,
+    "binomio_consultado": "Mauritia minor",
+    "fuente": "biodiversidad-co"
+  },
+  "medicago_sativa": {
+    "nombres": [],
+    "match": null,
+    "binomio_consultado": "Medicago sativa",
+    "fuente": "biodiversidad-co"
+  },
+  "melicoccus_bijugatus": {
+    "nombres": [
+      "Chupa",
+      "Mamón",
+      "Mamón criollo",
+      "Mamón de mico",
+      "Mamoncillo",
+      "Quenepa",
+      "Vota"
+    ],
+    "match": "binomio",
+    "binomio_consultado": "Melicoccus bijugatus",
+    "matched_scientific_name": "Melicoccus bijugatus",
+    "record_id": "56e78ca083c45700544e412d",
+    "fuente": "biodiversidad-co",
+    "distribucion_co": [
+      "Atlántico",
+      "Bolívar",
+      "Cesar",
+      "Córdoba",
+      "La Guajira",
+      "Magdalena",
+      "Sucre"
+    ]
+  },
+  "miconia_squamulosa": {
+    "nombres": [],
+    "match": null,
+    "binomio_consultado": "Miconia squamulosa",
+    "fuente": "biodiversidad-co"
+  },
+  "mikania_micrantha": {
+    "nombres": [],
+    "match": null,
+    "binomio_consultado": "Mikania micrantha",
+    "fuente": "biodiversidad-co"
+  },
+  "mirabilis_expansa": {
+    "nombres": [],
+    "match": null,
+    "binomio_consultado": "Mirabilis expansa",
+    "fuente": "biodiversidad-co"
+  },
+  "monarda_didyma": {
+    "nombres": [],
+    "match": null,
+    "binomio_consultado": "Monarda didyma",
+    "fuente": "biodiversidad-co"
+  },
+  "morella_pubescens": {
+    "nombres": [
+      "Aromo",
+      "Laurel",
+      "Laurel de cera",
+      "Oliva de cera",
+      "Olivo"
+    ],
+    "match": "binomio",
+    "binomio_consultado": "Morella pubescens",
+    "matched_scientific_name": "Morella pubescens",
+    "record_id": "63aa3409c1244830bdc688e6",
+    "fuente": "biodiversidad-co",
+    "distribucion_co": [
+      "Antioquia",
+      "Boyacá",
+      "Caldas",
+      "Caquetá",
+      "Cauca",
+      "Cesar",
+      "Chocó",
+      "Cundinamarca",
+      "Huila",
+      "La Guajira",
+      "Magdalena",
+      "Nariño",
+      "Norte de santander",
+      "Putumayo",
+      "Quindío",
+      "Risaralda",
+      "Santander",
+      "Tolima"
+    ]
+  },
+  "morus_nigra_mora_de_arbol": {
+    "nombres": [],
+    "match": null,
+    "binomio_consultado": "Morus nigra",
+    "fuente": "biodiversidad-co"
+  },
+  "myrcia_popayanensis": {
+    "nombres": [
+      "Arrayán",
+      "Arrayán comestible",
+      "Arrayana"
+    ],
+    "match": "binomio",
+    "binomio_consultado": "Myrcia popayanensis",
+    "matched_scientific_name": "Myrcia popayanensis",
+    "record_id": "5949e3582f4fd7bc7f397f28",
+    "fuente": "biodiversidad-co"
+  },
+  "myrcianthes_ferreyrae": {
+    "nombres": [],
+    "match": null,
+    "binomio_consultado": "Myrcianthes erreyrae",
+    "fuente": "biodiversidad-co"
+  },
+  "myrcianthes_rhopaloides": {
+    "nombres": [],
+    "match": null,
+    "binomio_consultado": "Myrcianthes rhopaloides",
+    "fuente": "biodiversidad-co"
+  },
+  "myristica_fragrans_americana": {
+    "nombres": [],
+    "match": null,
+    "binomio_consultado": "Myristica ragrans",
+    "fuente": "biodiversidad-co"
+  },
+  "myroxylon_pereirae": {
+    "nombres": [
+      "Balsamo",
+      "Balsamo De Tolu",
+      "Balsamo Del Peru"
+    ],
+    "match": "binomio",
+    "binomio_consultado": "Myroxylon balsamum",
+    "matched_scientific_name": "Myroxylon balsamum",
+    "record_id": "567c0945f289f5a40c0cd343",
+    "fuente": "biodiversidad-co",
+    "distribucion_co": [
+      "Amazonas",
+      "Antioquia",
+      "Bolívar",
+      "Magdalena",
+      "Meta",
+      "Putumayo",
+      "Valle del Cauca"
+    ]
+  },
+  "myrsine_coriacea": {
+    "nombres": [],
+    "match": null,
+    "binomio_consultado": "Myrsine coriacea",
+    "fuente": "biodiversidad-co"
+  },
+  "nasturtium_officinale": {
+    "nombres": [],
+    "match": null,
+    "binomio_consultado": "Nasturtium officinale",
+    "fuente": "biodiversidad-co"
+  },
+  "nectandra_acutifolia": {
+    "nombres": [
+      "Amarillo baboso",
+      "Amarillo lonchero",
+      "Amarillo tolonchero",
+      "Laurel baboso",
+      "Laurel jigua",
+      "Laurel rosado",
+      "Tolonchelo"
+    ],
+    "match": "binomio",
+    "binomio_consultado": "Nectandra acutifolia",
+    "matched_scientific_name": "Nectandra acutifolia",
+    "record_id": "56e78d3383c45700544e4134",
+    "fuente": "biodiversidad-co"
+  },
+  "nigella_sativa": {
+    "nombres": [],
+    "match": null,
+    "binomio_consultado": "Nigella sativa",
+    "fuente": "biodiversidad-co"
+  },
+  "nymphaea_alba_andina": {
+    "nombres": [],
+    "match": null,
+    "binomio_consultado": "Nymphaea alba",
+    "fuente": "biodiversidad-co"
+  },
+  "ochroma_pyramidale": {
+    "nombres": [
+      "Balso",
+      "Balso real",
+      "Carguero",
+      "Lano"
+    ],
+    "match": "binomio",
+    "binomio_consultado": "Ochroma pyramidale",
+    "matched_scientific_name": "Ochroma pyramidale",
+    "record_id": "56e78e3a83c45700544e414b",
+    "fuente": "biodiversidad-co"
+  },
+  "ocotea_calophylla": {
+    "nombres": [],
+    "match": null,
+    "binomio_consultado": "Ocotea calophylla",
+    "fuente": "biodiversidad-co"
+  },
+  "odontoglossum_crispum": {
+    "nombres": [],
+    "match": null,
+    "binomio_consultado": "Oncidium alexandrae",
+    "fuente": "biodiversidad-co"
+  },
+  "oreopanax_floribundum": {
+    "nombres": [],
+    "match": null,
+    "binomio_consultado": "Oreopanax loribundum",
+    "fuente": "biodiversidad-co"
+  },
+  "oreopanax_incisus": {
+    "nombres": [],
+    "match": null,
+    "binomio_consultado": "Oreopanax incisus",
+    "fuente": "biodiversidad-co"
+  },
+  "pachyrhizus_erosus": {
+    "nombres": [],
+    "match": null,
+    "binomio_consultado": "Pachyrhizus erosus",
+    "fuente": "biodiversidad-co"
+  },
+  "pachyrhizus_tuberosus": {
+    "nombres": [],
+    "match": null,
+    "binomio_consultado": "Pachyrhizus tuberosus",
+    "fuente": "biodiversidad-co"
+  },
+  "panicum_maximum_mombasa": {
+    "nombres": [
+      "Guinea",
+      "Guinea pajarito",
+      "Guinedón",
+      "Hierba india",
+      "India",
+      "Indio",
+      "Pasto castiIIa",
+      "Pasto chigüiro",
+      "Pasto guinea",
+      "Pasto indio",
+      "Pasto saboIIa",
+      "Saboyá",
+      "Yerba de Guinea",
+      "Yerba india",
+      "Zaina"
+    ],
+    "match": "binomio",
+    "binomio_consultado": "Megathyrsus maximus",
+    "matched_scientific_name": "Megathyrsus maximus",
+    "record_id": "56e78c7a83c45700544e412a",
+    "fuente": "biodiversidad-co"
+  },
+  "parkia_pendula": {
+    "nombres": [],
+    "match": null,
+    "binomio_consultado": "Parkia pendula",
+    "fuente": "biodiversidad-co"
+  },
+  "paspalum_notatum": {
+    "nombres": [],
+    "match": null,
+    "binomio_consultado": "Paspalum notatum",
+    "fuente": "biodiversidad-co"
+  },
+  "passiflora_edulis_amarilla_colombia": {
+    "nombres": [
+      "ceibey",
+      "curuba",
+      "flor de las cinco lagas"
+    ],
+    "match": "binomio",
+    "binomio_consultado": "Passiflora edulis",
+    "matched_scientific_name": "Passiflora edulis",
+    "record_id": "5cebf8528fe61bf73db12654",
+    "fuente": "biodiversidad-co",
+    "distribucion_co": [
+      "Antioquia",
+      "Valle del Cauca"
+    ]
+  },
+  "passiflora_incarnata": {
+    "nombres": [],
+    "match": null,
+    "binomio_consultado": "Passiflora incarnata",
+    "fuente": "biodiversidad-co"
+  },
+  "pastinaca_sativa": {
+    "nombres": [],
+    "match": null,
+    "binomio_consultado": "Pastinaca sativa",
+    "fuente": "biodiversidad-co"
+  },
+  "petiveria_alliacea": {
+    "nombres": [
+      "Anamú",
+      "Apacina",
+      "Chimú",
+      "Hierba de las gallinitas",
+      "Hierba del zorrillo",
+      "Hoja de zorrillo",
+      "Lancetilla",
+      "Mapurito",
+      "Mucura",
+      "Namú",
+      "Palindera"
+    ],
+    "match": "binomio",
+    "binomio_consultado": "Petiveria alliacea",
+    "matched_scientific_name": "Petiveria alliacea",
+    "record_id": "63e9440d9f79d2bfbc6dfdad",
+    "fuente": "biodiversidad-co"
+  },
+  "petroselinum_crispum_neapolitanum": {
+    "nombres": [],
+    "match": null,
+    "binomio_consultado": "Petroselinum crispum",
+    "fuente": "biodiversidad-co"
+  },
+  "phacelia_tanacetifolia": {
+    "nombres": [],
+    "match": null,
+    "binomio_consultado": "Phacelia tanacetifolia",
+    "fuente": "biodiversidad-co"
+  },
+  "phaseolus_vulgaris_nuna": {
+    "nombres": [],
+    "match": null,
+    "binomio_consultado": "Phaseolus vulgaris",
+    "fuente": "biodiversidad-co"
+  },
+  "phytelephas_macrocarpa": {
+    "nombres": [
+      "Antá",
+      "Cabeza de negro, cuca",
+      "Tagua",
+      "Yarina"
+    ],
+    "match": "binomio",
+    "binomio_consultado": "Phytelephas macrocarpa",
+    "matched_scientific_name": "Phytelephas macrocarpa",
+    "record_id": "5fe408d9f1c567b30853cd83",
+    "fuente": "biodiversidad-co",
+    "distribucion_co": [
+      "Amazonas",
+      "Antioquia",
+      "Boyacá",
+      "Cauca",
+      "Cesar",
+      "Chocó",
+      "Córdoba",
+      "Cundinamarca",
+      "Huila",
+      "Santander",
+      "Tolima",
+      "Valle del Cauca"
+    ]
+  },
+  "phytelephas_seemannii": {
+    "nombres": [],
+    "match": "binomio",
+    "binomio_consultado": "Phytelephas seemannii",
+    "matched_scientific_name": "Phytelephas seemannii",
+    "record_id": "56e8302283c45700544e4368",
+    "fuente": "biodiversidad-co",
+    "distribucion_co": [
+      "Antioquia",
+      "Chocó",
+      "Cundinamarca",
+      "Magdalena",
+      "Nariño",
+      "Norte de santander",
+      "Santander",
+      "Valle del Cauca"
+    ]
+  },
+  "pithecellobium_dulce": {
+    "nombres": [
+      "Chiminango",
+      "Dinde",
+      "Espino Playero",
+      "Gallineral",
+      "Gallinero",
+      "Guamuchil",
+      "Ojito de nena",
+      "Payandé"
+    ],
+    "match": "binomio",
+    "binomio_consultado": "Pithecellobium dulce",
+    "matched_scientific_name": "Pithecellobium dulce",
+    "record_id": "59493f792f4fd7bc7f3972ab",
+    "fuente": "biodiversidad-co"
+  },
+  "polygonum_punctatum": {
+    "nombres": [],
+    "match": null,
+    "binomio_consultado": "Polygonum punctatum",
+    "fuente": "biodiversidad-co"
+  },
+  "polypodium_decumanum": {
+    "nombres": [
+      "Helecho canasta",
+      "Rabo de ardita"
+    ],
+    "match": "binomio",
+    "binomio_consultado": "Phlebodium decumanum",
+    "matched_scientific_name": "Phlebodium decumanum",
+    "record_id": "56e82f6e83c45700544e4361",
+    "fuente": "biodiversidad-co"
+  },
+  "pouteria_torta": {
+    "nombres": [
+      "Caimillo",
+      "Caimitillo",
+      "Caimito",
+      "Caimito de lombriz",
+      "Caimito de rebalse",
+      "Caimito pelao",
+      "Caimo",
+      "Caimo de monte",
+      "Caimo peludo",
+      "Caimo zanca de venado"
+    ],
+    "match": "binomio",
+    "binomio_consultado": "Pouteria torta",
+    "matched_scientific_name": "Pouteria torta",
+    "record_id": "56e3ee5583c45700544e3e14",
+    "fuente": "biodiversidad-co",
+    "distribucion_co": [
+      "Antioquia",
+      "Nariño",
+      "Quindío",
+      "Tolima",
+      "Valle del Cauca"
+    ]
+  },
+  "prosopis_juliflora": {
+    "nombres": [],
+    "match": null,
+    "binomio_consultado": "Prosopis juliflora",
+    "fuente": "biodiversidad-co"
+  },
+  "prunus_avium_ducezno": {
+    "nombres": [],
+    "match": null,
+    "binomio_consultado": "Prunus avium",
+    "fuente": "biodiversidad-co"
+  },
+  "prunus_domestica_ciruela_imperial": {
+    "nombres": [
+      "Ciruelo"
+    ],
+    "match": "binomio",
+    "binomio_consultado": "Prunus domestica",
+    "matched_scientific_name": "Prunus domestica",
+    "record_id": "56e7999383c45700544e41f5",
+    "fuente": "biodiversidad-co"
+  },
+  "prunus_persica_amarilla": {
+    "nombres": [
+      "Durazno"
+    ],
+    "match": "binomio",
+    "binomio_consultado": "Prunus persica",
+    "matched_scientific_name": "Prunus persica",
+    "record_id": "56e79a0983c45700544e41f9",
+    "fuente": "biodiversidad-co"
+  },
+  "prunus_serotina_capuli": {
+    "nombres": [
+      "Cerezo"
+    ],
+    "match": "binomio",
+    "binomio_consultado": "Prunus serotina",
+    "matched_scientific_name": "Prunus serotina",
+    "record_id": "56e79a3383c45700544e41fe",
+    "fuente": "biodiversidad-co"
+  },
+  "pseudobombax_septenatum": {
+    "nombres": [
+      "barrigón",
+      "Bonga",
+      "Ceiba barrigona",
+      "Ceiba de majagua",
+      "Ceiba verde",
+      "Ceibo barrigón",
+      "Majagua"
+    ],
+    "match": "binomio",
+    "binomio_consultado": "Pseudobombax septenatum",
+    "matched_scientific_name": "Pseudobombax septenatum",
+    "record_id": "56e79b8483c45700544e4225",
+    "fuente": "biodiversidad-co"
+  },
+  "pseudosamanea_guachapele": {
+    "nombres": [],
+    "match": null,
+    "binomio_consultado": "Pseudosamanea guachapele",
+    "fuente": "biodiversidad-co"
+  },
+  "psidium_friedrichsthalianum": {
+    "nombres": [],
+    "match": null,
+    "binomio_consultado": "Psidium riedrichsthalianum",
+    "fuente": "biodiversidad-co"
+  },
+  "psophocarpus_tetragonolobus": {
+    "nombres": [],
+    "match": null,
+    "binomio_consultado": "Psophocarpus tetragonolobus",
+    "fuente": "biodiversidad-co"
+  },
+  "pyrus_communis_anjou": {
+    "nombres": [
+      "Castor",
+      "Higuerilla",
+      "Higuerilla colorada",
+      "Higuerilla negra",
+      "Higuerillo",
+      "Higuerillo blanco",
+      "Pera",
+      "Peral",
+      "Pero",
+      "Ricino"
+    ],
+    "match": "binomio",
+    "binomio_consultado": "Pyrus communis",
+    "matched_scientific_name": "Pyrus communis",
+    "record_id": "56e79c0583c45700544e422e",
+    "fuente": "biodiversidad-co"
+  },
+  "raphanus_sativus_longipinnatus": {
+    "nombres": [],
+    "match": null,
+    "binomio_consultado": "Raphanus sativus",
+    "fuente": "biodiversidad-co"
+  },
+  "raphanus_sativus_oleifer": {
+    "nombres": [],
+    "match": null,
+    "binomio_consultado": "Raphanus sativus",
+    "fuente": "biodiversidad-co"
+  },
+  "raphanus_sativus_sativus": {
+    "nombres": [],
+    "match": null,
+    "binomio_consultado": "Raphanus sativus",
+    "fuente": "biodiversidad-co"
+  },
+  "renealmia_alpinia": {
+    "nombres": [
+      "Abebe",
+      "Huevos de sapo",
+      "Jengibre de jardín",
+      "Sarandango"
+    ],
+    "match": "binomio",
+    "binomio_consultado": "Renealmia alpinia",
+    "matched_scientific_name": "Renealmia alpinia",
+    "record_id": "56e8351c83c45700544e4396",
+    "fuente": "biodiversidad-co"
+  },
+  "rubus_glaucus_sin_espinas": {
+    "nombres": [
+      "Mora",
+      "Mora blanca",
+      "Mora de castilla",
+      "Zarzamora azul"
+    ],
+    "match": "binomio",
+    "binomio_consultado": "Rubus glaucus",
+    "matched_scientific_name": "Rubus glaucus",
+    "record_id": "56e428d483c45700544e3e22",
+    "fuente": "biodiversidad-co",
+    "distribucion_co": [
+      "Antioquia",
+      "Caldas",
+      "Cauca",
+      "Chocó",
+      "Cundinamarca",
+      "Huila",
+      "Magdalena",
+      "Norte de santander",
+      "Putumayo",
+      "Quindío",
+      "Santander",
+      "Tolima",
+      "Valle del Cauca"
+    ]
+  },
+  "rubus_idaeus_golden": {
+    "nombres": [
+      "Chordón",
+      "Frambueso",
+      "Mora de Castilla",
+      "Sangüeña",
+      "Sangüezo"
+    ],
+    "match": "binomio",
+    "binomio_consultado": "Rubus idaeus",
+    "matched_scientific_name": "Rubus idaeus",
+    "record_id": "56e79d7a83c45700544e423c",
+    "fuente": "biodiversidad-co"
+  },
+  "rubus_idaeus_heritage": {
+    "nombres": [
+      "Chordón",
+      "Frambueso",
+      "Mora de Castilla",
+      "Sangüeña",
+      "Sangüezo"
+    ],
+    "match": "binomio",
+    "binomio_consultado": "Rubus idaeus",
+    "matched_scientific_name": "Rubus idaeus",
+    "record_id": "56e79d7a83c45700544e423c",
+    "fuente": "biodiversidad-co"
+  },
+  "salvia_officinalis": {
+    "nombres": [],
+    "match": null,
+    "binomio_consultado": "Salvia officinalis",
+    "fuente": "biodiversidad-co"
+  },
+  "sambucus_nigra_peruviana": {
+    "nombres": [],
+    "match": null,
+    "binomio_consultado": "Sambucus nigra",
+    "fuente": "biodiversidad-co"
+  },
+  "sambucus_peruviana": {
+    "nombres": [],
+    "match": null,
+    "binomio_consultado": "Sambucus peruviana",
+    "fuente": "biodiversidad-co"
+  },
+  "sansevieria_trifasciata": {
+    "nombres": [],
+    "match": null,
+    "binomio_consultado": "Dracaena trifasciata",
+    "fuente": "biodiversidad-co"
+  },
+  "selaginella_lepidophylla": {
+    "nombres": [],
+    "match": null,
+    "binomio_consultado": "Selaginella lepidophylla",
+    "fuente": "biodiversidad-co"
+  },
+  "selenicereus_megalanthus": {
+    "nombres": [],
+    "match": null,
+    "binomio_consultado": "Selenicereus megalanthus",
+    "fuente": "biodiversidad-co"
+  },
+  "setaria_sphacelata": {
+    "nombres": [],
+    "match": "binomio",
+    "binomio_consultado": "Setaria sphacelata",
+    "matched_scientific_name": "Setaria sphacelata",
+    "record_id": "56e8385383c45700544e43ae",
+    "fuente": "biodiversidad-co"
+  },
+  "simarouba_amara": {
+    "nombres": [],
+    "match": "binomio",
+    "binomio_consultado": "Simarouba amara",
+    "matched_scientific_name": "Simarouba amara",
+    "record_id": "56e664d683c45700544e3eb5",
+    "fuente": "biodiversidad-co",
+    "distribucion_co": [
+      "Antioquia",
+      "Bolívar",
+      "Casanare",
+      "Huila",
+      "Meta",
+      "Putumayo",
+      "San Andrés, Providencia y Santa Catalina",
+      "Valle del Cauca",
+      "Vichada"
+    ]
+  },
+  "solanum_americanum": {
+    "nombres": [
+      "Brede",
+      "Chilillo",
+      "Hierba Mora",
+      "Pimienta de gallinas",
+      "Yerba mora"
+    ],
+    "match": "binomio",
+    "binomio_consultado": "Solanum americanum",
+    "matched_scientific_name": "Solanum americanum",
+    "record_id": "56e79f9683c45700544e4250",
+    "fuente": "biodiversidad-co"
+  },
+  "solanum_lycopersicum_cerasiforme_uvalina": {
+    "nombres": [],
+    "match": null,
+    "binomio_consultado": "Solanum lycopersicum",
+    "fuente": "biodiversidad-co"
+  },
+  "solanum_muricatum": {
+    "nombres": [],
+    "match": null,
+    "binomio_consultado": "Solanum muricatum",
+    "fuente": "biodiversidad-co"
+  },
+  "solanum_quitoense_amazonico": {
+    "nombres": [
+      "Lulo",
+      "Naranjilla",
+      "Naranjillo",
+      "Toronja"
+    ],
+    "match": "binomio",
+    "binomio_consultado": "Solanum quitoense",
+    "matched_scientific_name": "Solanum quitoense",
+    "record_id": "56e7a59983c45700544e4288",
+    "fuente": "biodiversidad-co",
+    "distribucion_co": [
+      "Caldas",
+      "Chocó",
+      "Cundinamarca",
+      "Valle del Cauca"
+    ]
+  },
+  "solanum_tuberosum_argentina": {
+    "nombres": [],
+    "match": "binomio",
+    "binomio_consultado": "Solanum tuberosum",
+    "matched_scientific_name": "Solanum tuberosum",
+    "record_id": "56e7a66183c45700544e429e",
+    "fuente": "biodiversidad-co",
+    "distribucion_co": [
+      "Antioquia",
+      "Boyacá",
+      "Caldas",
+      "Cauca",
+      "Cundinamarca",
+      "Magdalena",
+      "Nariño",
+      "Norte de santander",
+      "Santander",
+      "Tolima"
+    ]
+  },
+  "spondias_dulcis": {
+    "nombres": [],
+    "match": null,
+    "binomio_consultado": "Spondias dulcis",
+    "fuente": "biodiversidad-co"
+  },
+  "stenocereus_griseus": {
+    "nombres": [
+      "Pitaya",
+      "Pitaya de mayo",
+      "Pitayo de Mayo"
+    ],
+    "match": "binomio",
+    "binomio_consultado": "Stenocereus griseus",
+    "matched_scientific_name": "Stenocereus griseus",
+    "record_id": "5fe0ea5e213e934b5c4794f2",
+    "fuente": "biodiversidad-co",
+    "distribucion_co": [
+      "Cesar",
+      "Huila",
+      "La Guajira",
+      "Magdalena",
+      "Norte de santander",
+      "Santander"
+    ]
+  },
+  "tabebuia_chrysantha": {
+    "nombres": [
+      "guayacán",
+      "Guayacán amarillo",
+      "Palo de arco"
+    ],
+    "match": "binomio",
+    "binomio_consultado": "Tabebuia chrysantha",
+    "matched_scientific_name": "Tabebuia chrysantha",
+    "record_id": "56e7a91a83c45700544e42ba",
+    "fuente": "biodiversidad-co",
+    "distribucion_co": [
+      "Amazonas",
+      "Bolívar",
+      "Cesar",
+      "Chocó",
+      "Córdoba",
+      "Guaviare",
+      "Magdalena",
+      "Tolima"
+    ]
+  },
+  "talisia_olivaeformis": {
+    "nombres": [],
+    "match": null,
+    "binomio_consultado": "Talisia olivaeformis",
+    "fuente": "biodiversidad-co"
+  },
+  "taraxacum_officinale": {
+    "nombres": [
+      "Achicoria",
+      "Amargón",
+      "Chicoria",
+      "Chicoria amarilla",
+      "Colmillo de león",
+      "Diente de león"
+    ],
+    "match": "binomio",
+    "binomio_consultado": "Taraxacum officinale",
+    "matched_scientific_name": "Taraxacum officinale",
+    "record_id": "56e7aa0883c45700544e42c0",
+    "fuente": "biodiversidad-co",
+    "distribucion_co": [
+      "Antioquia",
+      "Boyacá",
+      "Caldas",
+      "Cundinamarca",
+      "Huila",
+      "Nariño",
+      "Putumayo",
+      "Quindío",
+      "Risaralda",
+      "Santander",
+      "Tolima",
+      "Valle del Cauca"
+    ]
+  },
+  "terminalia_amazonia": {
+    "nombres": [
+      "Guacharaco",
+      "Guayabo",
+      "Macano",
+      "Macano amarillo",
+      "Nispero",
+      "Nogal amarillo",
+      "Querebere",
+      "Tanimboca"
+    ],
+    "match": "binomio",
+    "binomio_consultado": "Terminalia amazonia",
+    "matched_scientific_name": "Terminalia amazonia",
+    "record_id": "6077186279243f2f24192a8b",
+    "fuente": "biodiversidad-co"
+  },
+  "theobroma_bicolor": {
+    "nombres": [
+      "Bacao",
+      "Cacao cimarrón",
+      "Cacau do peru",
+      "Macambo",
+      "Maraca",
+      "Maraco"
+    ],
+    "match": "binomio",
+    "binomio_consultado": "Theobroma bicolor",
+    "matched_scientific_name": "Theobroma bicolor",
+    "record_id": "5fe4a6fd55384acb11ee05ad",
+    "fuente": "biodiversidad-co",
+    "distribucion_co": [
+      "Amazonas",
+      "Antioquia",
+      "Caquetá",
+      "Chocó",
+      "Guainía",
+      "Putumayo",
+      "Valle del Cauca",
+      "Vaupés"
+    ]
+  },
+  "tigridia_pavonia": {
+    "nombres": [],
+    "match": null,
+    "binomio_consultado": "Tigridia pavonia",
+    "fuente": "biodiversidad-co"
+  },
+  "tillandsia_complanata": {
+    "nombres": [],
+    "match": "binomio",
+    "binomio_consultado": "Tillandsia complanata",
+    "matched_scientific_name": "Tillandsia complanata",
+    "record_id": "56e83db283c45700544e43d9",
+    "fuente": "biodiversidad-co"
+  },
+  "tithonia_diversifolia": {
+    "nombres": [
+      "Botón de oro",
+      "Girasol mejicano",
+      "Girasol pequeiio",
+      "Mirasol mejicano",
+      "Rayo de sol",
+      "Yerba de bruja"
+    ],
+    "match": "binomio",
+    "binomio_consultado": "Tithonia diversifolia",
+    "matched_scientific_name": "Tithonia diversifolia",
+    "record_id": "593b777a2f4fd7bc7f387e0f",
+    "fuente": "biodiversidad-co"
+  },
+  "typha_dominguensis": {
+    "nombres": [
+      "Piripepe",
+      "Pirivevýi",
+      "Totora"
+    ],
+    "match": "binomio",
+    "binomio_consultado": "Typha domingensis",
+    "matched_scientific_name": "Typha domingensis",
+    "record_id": "56e7ac4883c45700544e42d6",
+    "fuente": "biodiversidad-co"
+  },
+  "vaccinium_corymbosum_emerald": {
+    "nombres": [],
+    "match": null,
+    "binomio_consultado": "Vaccinium corymbosum",
+    "fuente": "biodiversidad-co"
+  },
+  "vallea_stipularis": {
+    "nombres": [],
+    "match": null,
+    "binomio_consultado": "Vallea stipularis",
+    "fuente": "biodiversidad-co"
+  },
+  "vanilla_planifolia": {
+    "nombres": [
+      "Platanillo",
+      "Vainilla"
+    ],
+    "match": "binomio",
+    "binomio_consultado": "Vanilla planifolia",
+    "matched_scientific_name": "Vanilla planifolia",
+    "record_id": "56e841cd83c45700544e43f4",
+    "fuente": "biodiversidad-co",
+    "distribucion_co": [
+      "Antioquia",
+      "Bolívar",
+      "Chocó",
+      "Cundinamarca",
+      "Magdalena",
+      "Nariño",
+      "Sucre",
+      "Valle del Cauca"
+    ]
+  },
+  "verbena_officinalis": {
+    "nombres": [],
+    "match": null,
+    "binomio_consultado": "Verbena officinalis",
+    "fuente": "biodiversidad-co"
+  },
+  "viburnum_triphyllum": {
+    "nombres": [
+      "Chuque",
+      "Garrocho"
+    ],
+    "match": "binomio",
+    "binomio_consultado": "Viburnum triphyllum",
+    "matched_scientific_name": "Viburnum triphyllum",
+    "record_id": "56e0c0f283c45700544e3ced",
+    "fuente": "biodiversidad-co",
+    "distribucion_co": [
+      "Antioquia",
+      "Boyacá",
+      "Cauca",
+      "Cundinamarca",
+      "La Guajira",
+      "Nariño",
+      "Risaralda",
+      "Santander",
+      "Valle del Cauca"
+    ]
+  },
+  "vicia_sativa": {
+    "nombres": [],
+    "match": null,
+    "binomio_consultado": "Vicia sativa",
+    "fuente": "biodiversidad-co"
+  },
+  "victoria_amazonica": {
+    "nombres": [],
+    "match": null,
+    "binomio_consultado": "Victoria amazonica",
+    "fuente": "biodiversidad-co"
+  },
+  "vigna_subterranea": {
+    "nombres": [],
+    "match": null,
+    "binomio_consultado": "Vigna subterranea",
+    "fuente": "biodiversidad-co"
+  },
+  "viola_odorata": {
+    "nombres": [],
+    "match": null,
+    "binomio_consultado": "Viola odorata",
+    "fuente": "biodiversidad-co"
+  },
+  "vismia_baccifera": {
+    "nombres": [],
+    "match": null,
+    "binomio_consultado": "Vismia baccifera",
+    "fuente": "biodiversidad-co"
+  },
+  "weinmannia_microphylla": {
+    "nombres": [],
+    "match": null,
+    "binomio_consultado": "Weinmannia microphylla",
+    "fuente": "biodiversidad-co"
+  },
+  "weinmannia_pubescens": {
+    "nombres": [
+      "Encenillo"
+    ],
+    "match": "binomio",
+    "binomio_consultado": "Weinmannia pubescens",
+    "matched_scientific_name": "Weinmannia pubescens",
+    "record_id": "594945c82f4fd7bc7f397600",
+    "fuente": "biodiversidad-co"
+  },
+  "xanthosoma_violaceum": {
+    "nombres": [],
+    "match": null,
+    "binomio_consultado": "Xanthosoma violaceum",
+    "fuente": "biodiversidad-co"
+  },
+  "zea_mays_capio": {
+    "nombres": [
+      "Maíz"
+    ],
+    "match": "binomio",
+    "binomio_consultado": "Zea mays",
+    "matched_scientific_name": "Zea mays",
+    "record_id": "56e7af7083c45700544e42f5",
+    "fuente": "biodiversidad-co"
+  }
+}

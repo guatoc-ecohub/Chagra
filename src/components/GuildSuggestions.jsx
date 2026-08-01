@@ -2,13 +2,16 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { Sprout, AlertTriangle, Sparkles, Loader2, Check } from 'lucide-react';
 import { getSuggestedCompanions, buildGuildPrompt } from '../services/guildService';
+import { getAllSpecies } from '../db/catalogDB';
 import { SPECIES_DEFAULTS } from '../config/speciesDefaults';
+import { getContextoGeoParaIA } from '../services/perfilFincaService';
 import { CROP_TAXONOMY } from '../config/taxonomy';
 import { registry } from '../core/moduleRegistry';
 import useAssetStore from '../store/useAssetStore';
 import ExternalAiButton from './common/ExternalAiButton';
 import { buildGuildExternalPrompt } from '../services/externalAiPromptBuilder';
 import { fetchWithAuthRetry } from '../services/apiService';
+import { ENV } from '../config/env';
 
 // Autopilot #8 (2026-05-03): re-rank companions putting existing plants first.
 // Reduce friction de "tengo que comprar otra especie", mostrar primero las
@@ -58,6 +61,7 @@ export const GuildSuggestions = ({ speciesId, onSelectCompanion }) => {
   const [aiLoading, setAiLoading] = useState(false);
   const [aiError, setAiError] = useState(null);
   const [EnrichedComp, setEnrichedComp] = useState(null);
+  const [speciesThermalZones, setSpeciesThermalZones] = useState([]);
 
   // Plantas existentes en finca para re-ranking de companions (Autopilot #8).
   const userPlants = useAssetStore((s) => s.plants);
@@ -85,6 +89,24 @@ export const GuildSuggestions = ({ speciesId, onSelectCompanion }) => {
   useEffect(() => {
     setAiSuggestions([]);
     setAiError(null);
+  }, [speciesId]);
+
+  useEffect(() => {
+    if (!speciesId) {
+      setSpeciesThermalZones([]);
+      return undefined;
+    }
+    let alive = true;
+    getAllSpecies()
+      .then((list) => {
+        if (!alive) return;
+        const match = (list || []).find((sp) => sp?.id === speciesId || sp?.slug === speciesId);
+        setSpeciesThermalZones(Array.isArray(match?.pisoTermico?.thermalZones) ? match.pisoTermico.thermalZones : []);
+      })
+      .catch(() => {
+        if (alive) setSpeciesThermalZones([]);
+      });
+    return () => { alive = false; };
   }, [speciesId]);
 
   // Capa 3 enriquecida por módulo Pro si está registrado (ADR-002/011).
@@ -117,7 +139,7 @@ export const GuildSuggestions = ({ speciesId, onSelectCompanion }) => {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          model: 'gemma3:4b',
+          model: ENV.CHAT_MODEL,
           stream: false,
           messages: [
             { role: 'system', content: 'Asistente de diseño de gremios agroecológicos. Responde SOLO en JSON válido, sin texto adicional.' },
@@ -249,7 +271,8 @@ export const GuildSuggestions = ({ speciesId, onSelectCompanion }) => {
               estrato: defaults.estrato,
               companions: companions.map((c) => c.name),
               antagonists: antagonists.map((a) => a.name),
-              thermalZones: defaults.thermalZones || [],
+              ...getContextoGeoParaIA(),
+              speciesThermalZones,
               altitudMsnm: defaults.altitud_msnm?.optimo_min,
             }}
           />

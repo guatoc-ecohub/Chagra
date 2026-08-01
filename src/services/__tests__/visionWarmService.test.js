@@ -12,6 +12,7 @@ beforeEach(() => {
   vi.unstubAllGlobals();
 });
 
+/** @param {*} mockFn @param {*} count */
 const waitForMockCalls = async (mockFn, count) => {
   for (let i = 0; i < 20 && mockFn.mock.calls.length < count; i++) {
     await new Promise((resolve) => setTimeout(resolve, 0));
@@ -26,10 +27,10 @@ describe('warmVisionModel', () => {
     const r = await warmVisionModel();
     expect(r).toBe(true);
     expect(fetchMock).toHaveBeenCalledTimes(1);
-    const [url, opts] = fetchMock.mock.calls[0];
+    const [url, opts] = /** @type {any[]} */ (fetchMock.mock.calls[0]);
     expect(url).toContain('/api/ollama/api/generate');
-    expect(opts.method).toBe('POST');
-    expect(opts.body).toContain('keep_alive');
+    expect(/** @type {any} */ (opts).method).toBe('POST');
+    expect(/** @type {any} */ (opts).body).toContain('keep_alive');
   });
 
   it('retorna false si la respuesta no es ok', async () => {
@@ -67,7 +68,7 @@ describe('warmVisionModel', () => {
     const r2 = await warmVisionModel();  // debe cortocircuitar por el lock
     expect(r2).toBe(true);
     await waitForMockCalls(fetchMock, 1);
-    resolveFetch();
+    /** @type {any} */ (resolveFetch)();
     expect(await p1).toBe(true);
   });
 });

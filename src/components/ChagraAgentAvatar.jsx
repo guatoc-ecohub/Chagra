@@ -1,6 +1,7 @@
-import ChagraAgentAvatarColibri from './ChagraAgentAvatarColibri';
-import ChagraAgentAvatarColibriPhoto from './ChagraAgentAvatarColibriPhoto';
 import ChagraAgentAvatarMaiz from './ChagraAgentAvatarMaiz';
+import ChagraAgentAvatarAngelita from './ChagraAgentAvatarAngelita';
+import ChagraAgentAvatarZariguya from './ChagraAgentAvatarZariguya';
+import Angelita from '../visual/agente/Angelita';
 import useAgentAvatarType from '../hooks/useAgentAvatarType';
 
 /**
@@ -9,21 +10,63 @@ import useAgentAvatarType from '../hooks/useAgentAvatarType';
  * los call-sites siguen usando `<ChagraAgentAvatar .../>` sin cambios.
  *
  * Decisiones del operador:
- *   - 2026-05-27: usuario debe poder elegir entre colibrí o maíz.
- *   - 2026-05-28: reemplazar el R3F que "desatina con todo lo que ya está".
- *     El default 'colibri' ahora apunta al avatar foto-realista (foto
- *     biopunk Lili). El SVG ilustrado vive bajo 'colibri_svg' para quien
- *     prefiera el estilo botánico anterior.
+ *   - 2026-05-27: usuario debe poder elegir avatar.
+ *   - 2026-07-16: "Angelita como el agente, jubila el colibrí". La cara del
+ *     agente pasa a ser Angelita (la abeja angelita, con idle-cerebro, mirada
+ *     y lip-sync).
+ *   - 2026-07-18: el colibrí sale TAMBIÉN de las opciones ("solo abejita").
+ *     Los slugs viejos 'colibri'/'colibri_svg' migran a Angelita en el hook,
+ *     sin acción del usuario. El colibrí queda de fauna decorativa en los
+ *     mundos 3D — nunca como cara del agente.
  *
  * UI de cambio vive en ProfileScreen → Apariencia → Avatar del agente.
  *
  * Mismas props que los avatares hijos: state, size, withLabel, onClick,
- * onDoubleClick, glow, className, ariaLabel.
+ * onDoubleClick, glow, className, ariaLabel (+ visema/confianza que
+ * Angelita entiende y el maíz ignora).
+ *
+ * API "rica" (fix 2026-07-25 — bug: varios call-sites que necesitaban el
+ * vocabulario Spanish completo de Angelita, `angelitaEstados.js` —p.ej.
+ * 'contenta', 'invita', 'acompana'— importaban `<Angelita>` CRUDO, sin pasar
+ * por este dispatcher, así que ignoraban la elección del usuario (AgentFab,
+ * AgentHero, FincaVivaHero, ColibriTransition). Se acepta ahora una prop
+ * alterna `estado` (en vez de `state`) para esos call-sites: si el tipo
+ * elegido no es Angelita, se traduce al vocabulario angosto (idle/thinking/
+ * speaking/listening) que maíz y zarigüeya entienden; si es Angelita, pasa
+ * directo sin perder fidelidad.
+ *
+ * 3ra opción (2026-07-25): 'zariguya' — la zarigüeya (crías al lomo, PR
+ * #2783), adaptador en ChagraAgentAvatarZariguya.jsx.
  */
-export default function ChagraAgentAvatar(props) {
+const STATE_DE_ESTADO_RICO = {
+    acompana: 'idle',
+    escuchando: 'listening',
+    pensando: 'thinking',
+    respondiendo: 'speaking',
+    contenta: 'speaking',
+    invita: 'speaking',
+};
+
+const AVATAR_ANGOSTO = {
+    maiz: ChagraAgentAvatarMaiz,
+    zariguya: ChagraAgentAvatarZariguya,
+};
+
+export default function ChagraAgentAvatar({ estado, ...props }) {
     const [type] = useAgentAvatarType();
-    if (type === 'maiz') return <ChagraAgentAvatarMaiz {...props} />;
-    if (type === 'colibri_svg') return <ChagraAgentAvatarColibri {...props} />;
-    // default + 'colibri' → avatar foto-realista (reemplaza el R3F).
-    return <ChagraAgentAvatarColibriPhoto {...props} />;
+    const ComponenteAngosto = AVATAR_ANGOSTO[type];
+
+    if (estado !== undefined) {
+        // Call-site "rico": solo Angelita entiende el vocabulario completo;
+        // maíz/zarigüeya reciben la traducción angosta (idle/thinking/
+        // speaking/listening).
+        if (ComponenteAngosto) {
+            return <ComponenteAngosto state={STATE_DE_ESTADO_RICO[estado] || 'idle'} {...props} />;
+        }
+        return <Angelita estado={estado} {...props} />;
+    }
+
+    if (ComponenteAngosto) return <ComponenteAngosto {...props} />;
+    // default → Angelita, el agente de Chagra.
+    return <ChagraAgentAvatarAngelita {...props} />;
 }

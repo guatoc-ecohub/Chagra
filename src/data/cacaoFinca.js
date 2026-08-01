@@ -38,7 +38,7 @@ export const CREDITOS_FOTOS_CACAO = [
   { slug: 'injerto', autor: 'Irene Scott / AusAID', lic: 'CC BY 2.0', fuente: 'Wikimedia Commons', url: 'https://commons.wikimedia.org/wiki/File:Cocoa_farmer_Jenny_Kebu_grafting_a_Cocoa_seedling_at_Kebu_farm,_east_of_Honiara._(10687161116).jpg' },
   { slug: 'monilia', autor: 'Jake Rehage (unclecactus)', lic: 'CC0', fuente: 'iNaturalist', url: 'https://www.inaturalist.org/observations/58102409' },
   { slug: 'escoba-bruja', autor: 'Denis Zabin (deniszabin)', lic: 'CC BY 4.0', fuente: 'iNaturalist', url: 'https://www.inaturalist.org/observations/333723904' },
-  { slug: 'mazorca-negra', autor: 'Scot Nelson', lic: 'CC0', fuente: 'Wikimedia Commons', url: 'https://commons.wikimedia.org/wiki/File:Cacao_black_pod_rot_39572305384.jpg' },
+  { slug: 'mazorca-negra', autor: 'Scot Nelson', lic: 'CC0', fuente: 'Wikimedia Commons', url: 'https://commons.wikimedia.org/wiki/File:Cacao_black_pod_rot_29064726523.jpg' },
   { slug: 'cosecha', autor: 'Lolay', lic: 'CC BY 2.0', fuente: 'Wikimedia Commons', url: 'https://commons.wikimedia.org/wiki/File:Cocoa_Pods_and_Seeds.jpg' },
   { slug: 'fermentacion', autor: 'Scot Nelson', lic: 'CC0', fuente: 'Wikimedia Commons', url: 'https://commons.wikimedia.org/wiki/File:Fermentation_of_cacao_seeds.jpg' },
   { slug: 'secado', autor: 'Francesco Veronesi', lic: 'CC BY-SA 2.0', fuente: 'Wikimedia Commons', url: 'https://commons.wikimedia.org/wiki/File:Cocoa_beans_drying_Mpenkro_2014_B002a.jpg' },
@@ -222,6 +222,63 @@ export const ENFERMEDADES_CACAO = [
     fuente: 'AGROSAVIA, FEDECACAO.',
   },
 ];
+
+/**
+ * Otras plagas de la mazorca — grounding curado del DR
+ * grounding-cacao-plagas-colombia (gemini, 2026-06-19), verificado contra
+ * AGROSAVIA/Crossref. NO son hongos como la monilia: son INSECTOS que perforan
+ * o raspan el fruto. El manejo sigue siendo cultural y sanitario (recolección,
+ * embolsado/solarización, control biológico) — Chagra no da dosis de veneno.
+ *
+ * El barrenador (Carmenta foraseminis) tiene DOI real verificado; el trips
+ * (Selenothrips rubrocinctus) es de menor peso y su cifra fina queda como
+ * "dato en camino".
+ */
+export const OTRAS_PLAGAS_CACAO = [
+  {
+    id: 'barrenador',
+    nombre: 'Barrenador del fruto y la semilla',
+    cientifico: 'Carmenta foraseminis',
+    tambien: 'Perforador de la mazorca (Lepidoptera: Sesiidae).',
+    ataca: 'La larva barrena por dentro la mazorca y daña el grano.',
+    comoSeVe: [
+      'Perforaciones en la cáscara de la mazorca con excretas granuladas afuera (los campesinos le dicen la “peca”).',
+      'Por dentro, granos comidos y dañados: se cae el peso y la calidad del grano comercial.',
+    ],
+    umbral: 'En Antioquia llega a llevarse cerca del 30% del grano comercial, y en lotes descuidados hasta el 50%.',
+    manejo: [
+      'Recoja seguido las mazorcas picadas y sáquelas del cultivo; no deje cacota (residuo de cosecha) regada.',
+      'Embolse o solarice las mazorcas infestadas, o entiérrelas bien: se corta el ciclo de la plaga.',
+      'Trampas McPhail con proteína hidrolizada para monitorear.',
+      'Control biológico con la avispita Trichogramma (parasita los huevos).',
+    ],
+    fuente:
+      'AGROSAVIA — Carabalí Muñoz, Senejoa Lizcano y Montes Prado (2018), “Reconocimiento, daño y opciones de manejo de Carmenta foraseminis…”, DOI 10.21930/agrosavia.manual.7402599 (verificado Crossref).',
+  },
+  {
+    id: 'trips',
+    nombre: 'Trips del cacao',
+    cientifico: 'Selenothrips rubrocinctus',
+    tambien: 'Trips de banda roja.',
+    ataca: 'Raspa y chupa la mazorca y el follaje.',
+    comoSeVe: [
+      'Bronceado o plateado en la cáscara de la mazorca y en las hojas, con puntico oscuro (sus excretas).',
+      'En ataques fuertes la mazorca se mancha y el brote se reseca.',
+    ],
+    umbral: {
+      estado: 'dato en camino',
+      fuentePrevista: 'AGROSAVIA / ICA — umbral de acción del trips en cacao (grounded pendiente)',
+    },
+    manejo: [
+      'Elimine residuos de cosecha infestados; embolse o solarice las mazorcas afectadas.',
+      'Favorezca los enemigos naturales (parasitoides de huevos) manejando bien la sombra y sin venenos que los maten.',
+    ],
+    fuente: 'AGROSAVIA / ICA (manejo fitosanitario del cacao). Confianza media.',
+  },
+];
+
+export const OTRAS_PLAGAS_CACAO_FUENTE =
+  'AGROSAVIA, ICA — DR grounding-cacao-plagas-colombia (2026-06-19), DOIs verificados. El barrenador se maneja recogiendo y sacando lo picado; nada de recetas de veneno.';
 
 /**
  * No confundir — el guard visual del "anti_confusion" del nodo monilia:

@@ -54,6 +54,7 @@ const confidenceColor = (c) => {
  *   - observedStages: Array<{code, observed_at, confidence}> (opcional)
  *   - compact: boolean (default false), modo resumen para tarjeta pequeña
  */
+/** @param {{ speciesSlug: string, sowingDate: number, altitudeM?: number, phenologyTemplate?: object, category?: string, observedStages?: any[], compact?: boolean }} props */
 export default function PhenologyTimeline({
   speciesSlug,
   sowingDate,
@@ -76,7 +77,7 @@ export default function PhenologyTimeline({
   // Una ventana genérica (no específica de la especie) marca todo el timeline
   // como aproximado por tipo de cultivo.
   const isGenericEstimate = useMemo(
-    () => windows.some((w) => w.isGeneric),
+    () => windows.some((w) => /** @type {any} */ (w).isGeneric),
     [windows],
   );
 

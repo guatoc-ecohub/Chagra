@@ -32,9 +32,10 @@ const FLOATING_BACK_IDLE_HIDE_MS = 2200;
  * @param {Array} [props.messages=[]] - Lista de mensajes del chat.
  * @param {string} [props.streamingContent=''] - Texto parcial del streaming actual.
  * @param {boolean} [props.isStreaming=false] - Indica si hay un streaming en curso.
- * @param {Function} props.onConsentNeeded - Callback cuando se requiere consentimiento del usuario.
- * @param {Function} props.onRetryOrphan - Callback para reintentar un mensaje huérfano (sin respuesta).
- * @param {Function} props.onCancelDeepResearch - Callback para cancelar una investigación profunda en curso.
+ * @param {Function} [props.onConsentNeeded] - Callback cuando se requiere consentimiento del usuario.
+ * @param {Function} [props.onRetryOrphan] - Callback para reintentar un mensaje huérfano (sin respuesta).
+ * @param {Function} [props.onDismissInsight] - Callback para descartar un insight proactivo.
+ * @param {Function} [props.onCancelDeepResearch] - Callback para cancelar una investigación profunda en curso.
  * @param {Function} [props.onAyudaAction] - Callback del deep-link «Abrir …» de la ayuda groundeada (AYUDA_FUNCIONES).
  * @param {Object|null} [props.proactiveGreeting=null] - Datos del saludo proactivo dinámico.
  * @param {string|null} [props.thinkingPhase=null] - Fase REAL del pipeline mientras
@@ -42,7 +43,7 @@ const FLOATING_BACK_IDLE_HIDE_MS = 2200;
  *   ThinkingSteps la traduce a pasos contextuales con ícono ("Consultando el
  *   catálogo…" → "Revisando el grafo…") y rota los de la fase larga. Si es
  *   null cae al "Pensando" genérico — perceived performance, la espera avanza.
- * @param {Function} props.onBack - Callback para volver a la pantalla anterior.
+ * @param {Function} [props.onBack] - Callback para volver a la pantalla anterior.
  */
 export default function ChatHistory({ messages = [], streamingContent = '', isStreaming = false, thinkingPhase = null, onConsentNeeded, onRetryOrphan, onCancelDeepResearch, onDismissInsight, onAyudaAction, proactiveGreeting = null, onBack }) {
   const bottomRef = useRef(null);
@@ -138,9 +139,9 @@ export default function ChatHistory({ messages = [], streamingContent = '', isSt
                 className="text-slate-200 text-xl mb-2"
                 style={{ fontFamily: "'Baloo 2', 'Nunito', system-ui, sans-serif", fontWeight: 700, letterSpacing: '-0.3px' }}
               >
-                ¡Hola! Soy tu asistente agroecológico.
+                ¡Hola! Soy Angelita, su asistente agroecológica.
               </p>
-              <p className="text-slate-500 text-xs">Puedes hablarme o escribirme sobre tus plantas.</p>
+              <p className="text-slate-500 text-xs">Puede hablarme o escribirme sobre sus plantas.</p>
             </>
           )}
         </div>
@@ -178,7 +179,7 @@ export default function ChatHistory({ messages = [], streamingContent = '', isSt
       {typeof onBack === 'function' && showFloatingBack && (
         <button
           type="button"
-          onClick={onBack}
+          onClick={onBack ? () => onBack() : undefined}
           data-testid="chat-floating-back"
           aria-label="Volver"
           className="chagra-floating-back absolute top-3 left-3 z-20 flex items-center gap-1.5 pl-2 pr-3 py-2 rounded-full bg-slate-900/90 backdrop-blur-sm border border-slate-700 text-amber-300 shadow-lg active:scale-95 hover:bg-slate-800"
@@ -280,7 +281,7 @@ export default function ChatHistory({ messages = [], streamingContent = '', isSt
             <span className="v3-byline-avatar is-streaming">
               <ChagraAgentAvatar
                 state="thinking"
-                size={22}
+                size={30}
                 ariaLabel={MSG.agente.pensandoAria}
               />
             </span>
@@ -300,6 +301,7 @@ export default function ChatHistory({ messages = [], streamingContent = '', isSt
           message={{ role: 'assistant', content: streamingContent }}
           isStreaming={true}
           onConsentNeeded={onConsentNeeded}
+          onRetryOrphan={onRetryOrphan}
         />
       )}
 
@@ -346,7 +348,9 @@ function ProactiveGreeting({ greeting }) {
         className="text-slate-200 text-xl mb-1.5"
         style={{ fontFamily: "'Baloo 2', 'Nunito', system-ui, sans-serif", fontWeight: 700, letterSpacing: '-0.3px' }}
       >
-        {hi}. Soy <span className="text-emerald-300">Chagra</span>.
+        {/* 2026-07-16: el agente ES Angelita (la abeja) — el texto acompaña
+            a la cara que el operador ya ve arriba. */}
+        {hi}. Soy <span className="text-emerald-300">Angelita</span>, de Chagra.
       </p>
       <p
         className="text-slate-300 text-sm leading-relaxed mb-3"

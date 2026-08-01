@@ -15,7 +15,7 @@
  * Español Colombia (usted/tú, SIN voseo).
  */
 import { useState, useEffect, useCallback } from 'react';
-import { List, Snowflake, MapPin, Calendar, Loader2, ChevronLeft, Home, AlertCircle, Trash2, ArrowLeft, Download, CheckCircle2 } from 'lucide-react';
+import { List, Snowflake, MapPin, Loader2, AlertCircle, Trash2, Download, CheckCircle2 } from 'lucide-react';
 import { ScreenShell } from './common/ScreenShell';
 import { glaciarReportes } from '../db/glaciarReportes';
 import { MSG } from '../config/messages.js';
@@ -45,6 +45,7 @@ const ESTADO_EMOJI = {
 /**
  * GlaciarHistorialScreen — pantalla principal del historial.
  */
+/** @param {{ onBack: () => void, onHome?: () => void }} props */
 export default function GlaciarHistorialScreen({ onBack, onHome }) {
   const [reportes, setReportes] = useState([]);
   const [loading, setLoading] = useState(true);

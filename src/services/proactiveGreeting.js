@@ -50,7 +50,7 @@ const HORAS = {
   night: 'Buenas noches',
 };
 
-function saludoPorHora(date = new Date()) {
+export function saludoPorHora(date = new Date()) {
   const h = date.getHours();
   if (h >= 5 && h < 12) return HORAS.morning;
   if (h >= 12 && h < 18) return HORAS.afternoon;
@@ -229,11 +229,11 @@ function buildIdeaLead({ cultivos = [], altitud = null, ensoOutlook = null, date
  * lo clave) e 'idea' (idea contextual, sin inventar alarma).
  *
  * @param {Object} input
- * @param {Array} input.activeAlerts — alertas del alertEngine (#162).
- * @param {Array} input.pendingTasks — tareas log--task pending (#298).
- * @param {Array<{name:string,count:number}>} input.cultivos — inventario agrupado.
- * @param {number|null} input.altitud — altitud de la finca activa (msnm).
- * @param {Object|null} input.ensoOutlook — getEnsoOutlook (ensoContext).
+ * @param {Array} [input.activeAlerts] - alertas del alertEngine (#162).
+ * @param {Array} [input.pendingTasks] - tareas log--task pending (#298).
+ * @param {Array<{name:string,count:number}>} [input.cultivos] - inventario agrupado.
+ * @param {number|null} [input.altitud] - altitud de la finca activa (msnm).
+ * @param {Object|null} [input.ensoOutlook] - getEnsoOutlook (ensoContext).
  * @param {Date} [input.date] - inyectable para test.
  * @param {number} [input.maxItems=2] - cuántos pendientes destacar como máximo.
  * @returns {Greeting}
@@ -253,7 +253,7 @@ export function buildProactiveGreeting({
   // ambas formas por robustez (no regresar a 0 silencioso si cambia el store).
   const alertsArr = Array.isArray(activeAlerts)
     ? activeAlerts
-    : (activeAlerts instanceof Map ? Array.from(activeAlerts.values()) : []);
+    : (/** @type {any} */ (activeAlerts) instanceof Map ? Array.from(/** @type {any} */ (activeAlerts).values()) : []);
 
   const alertItems = alertsArr.map(alertToItem).filter(Boolean);
   const taskItems = pendingTasksToItems(pendingTasks, date.getTime());
@@ -310,14 +310,15 @@ export function buildProactiveGreeting({
  * @param {Date} [deps.date]
  * @returns {Promise<Greeting>}
  */
-export async function resolveProactiveGreeting({
-  activeAlerts = [],
-  getPendingTasks = null,
-  cultivos = [],
-  altitud = null,
-  ensoOutlook = null,
-  date = new Date(),
-} = {}) {
+export async function resolveProactiveGreeting(opts = /** @type {any} */ ({})) {
+  const {
+    activeAlerts = [],
+    getPendingTasks = null,
+    cultivos = [],
+    altitud = null,
+    ensoOutlook = null,
+    date = new Date(),
+  } = opts;
   let pendingTasks = [];
   if (typeof getPendingTasks === 'function') {
     try {

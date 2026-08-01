@@ -194,7 +194,7 @@ export const PISO_TERMICO_MANGO = [
 export const PISO_TERMICO_NOTA =
   'El mango es de TIERRA CÁLIDA (óptimo por debajo de ~1200 msnm). Estas franjas son orientadoras y cambian por región y microclima (una ladera abrigada y soleada rinde más que un cañón húmedo a la misma altura). La regla no cambia: entre más frío, menos mango.';
 
-export const PISO_TERMICO_FUENTE = 'AGROSAVIA (perennialCycles: mangifera_indica, confianza media)';
+export const PISO_TERMICO_FUENTE = 'AGROSAVIA (confianza media)';
 
 /** Luz y agua del mango (cualitativo). GROUNDED: AGROSAVIA. */
 export const AGUA_LUZ_MANGO = {
@@ -240,7 +240,7 @@ export const CICLO_FLOR_MANGO = {
   altitud: 'Tierra cálida, óptimo bajo ~1200 msnm',
   disparador: 'La floración la disparan el calor, el sol y el estrés hídrico de la temporada seca; no un mes fijo del calendario.',
   regionNota: 'Fechas de referencia del Tolima: cambian según la región (en la Costa, los Llanos o el Magdalena medio la temporada cae en otros meses).',
-  fuente: 'AGROSAVIA (perennialCycles: mangifera_indica, confianza media)',
+  fuente: 'AGROSAVIA (confianza media)',
   pasos: [
     {
       id: 'floracion',
@@ -293,7 +293,7 @@ export const MALES_MANGO = [
       { titulo: 'Hongos y bacterias antagonistas', detalle: 'Trichoderma y bacterias antagonistas (biofungicidas) ayudan a controlar el hongo. Funcionan mejor como parte del manejo, acompañando la poda y el florecer en seco.' },
       { titulo: 'Caldo bordelés protector', detalle: 'El caldo bordelés (cobre + cal) sirve de protección preventiva en floración y cuaje. Es apoyo, no reemplaza la poda ni el buen sitio soleado.' },
     ],
-    fuente: 'AGROSAVIA (manejo de antracnosis) · controladores del grafo Chagra',
+    fuente: 'AGROSAVIA (manejo de antracnosis) · controladores del catálogo Chagra',
   },
   {
     id: 'mosca',
@@ -313,7 +313,7 @@ export const MALES_MANGO = [
       { titulo: 'Control biológico', detalle: 'Avispitas parasitoides que atacan las larvas y el hongo Beauveria ayudan en el manejo integrado. Acompañan la recolección de fruta, no la reemplazan.' },
       { titulo: 'Embolsar el fruto', detalle: 'En huerto casero o pocas matas, embolsar los frutos en sazón con bolsa de papel/tela los protege de la picada. Trabajoso pero muy efectivo sin veneno.' },
     ],
-    fuente: 'ICA / AGROSAVIA (manejo de mosca de la fruta) · controladores del grafo Chagra',
+    fuente: 'ICA / AGROSAVIA (manejo de mosca de la fruta) · controladores del catálogo Chagra',
   },
 ];
 

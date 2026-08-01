@@ -10,6 +10,7 @@ import usePrefsStore from '../../store/usePrefsStore';
 import FeedbackButtons from '../FeedbackButtons';
 import AIBetaBadge from '../AIBetaBadge';
 import SemaforoConfianza from './SemaforoConfianza';
+import AgentMarkdown from './AgentMarkdown';
 
 function formatTime(timestamp) {
   if (!timestamp) return '';
@@ -260,14 +261,23 @@ function FuenteBadge({ metadata }) {
   const md = metadata || {};
   const url = typeof md.fuente_url === 'string' ? md.fuente_url.trim() : '';
   const label = (typeof md.fuente === 'string' && md.fuente.trim()) || 'fuente externa';
+  let safeUrl = null;
+  try {
+    const parsedUrl = new URL(url);
+    if (parsedUrl.protocol === 'http:' || parsedUrl.protocol === 'https:') {
+      safeUrl = parsedUrl.href;
+    }
+  } catch {
+    // Una fuente mal formada se degrada a texto plano o se omite.
+  }
 
   // Forma 1: recurso citado → link clickeable. Sello VERDE del semáforo (la
   // fuente es verificable), pero sigue siendo <a> nativo CSP-safe — el toque
   // navega al recurso, no expande nota.
-  if (/^https?:\/\//i.test(url)) {
+  if (safeUrl) {
     return (
       <a
-        href={url}
+        href={safeUrl}
         target="_blank"
         rel="noopener noreferrer"
         data-testid="fuente-badge"
@@ -465,7 +475,7 @@ export default function ChatBubble({ message, isStreaming = false, promptText, o
       {!isUser && (
         <div className="v3-byline" aria-hidden="true">
           <span className={`v3-byline-avatar${isStreaming ? ' is-streaming' : ''}`}>
-            <ChagraAgentAvatar state={agentState} size={22} ariaLabel="Chagra IA" />
+            <ChagraAgentAvatar state={agentState} size={30} ariaLabel="Chagra IA" />
           </span>
           <span>Chagra</span>
         </div>
@@ -505,14 +515,26 @@ export default function ChatBubble({ message, isStreaming = false, promptText, o
           {/* #339: fallback visible si el contenido del assistant llega vacío
               (respuesta degradada del LLM, stream sin tokens, etc.). Nunca
               dejamos la burbuja en blanco — el usuario campesino no debe ver
-              una respuesta "fantasma". Para el usuario sí mostramos su texto
-              tal cual (puede ser vacío sólo si tipeó vacío, que el submit ya
-              previene). Cero hype, español colombiano. */}
-          <p className="text-[15px] leading-relaxed whitespace-pre-wrap">
-            {!isUser && (typeof message.content !== 'string' || message.content.trim().length === 0)
-              ? <span className="italic text-slate-400">No recibí respuesta del asistente. Intenta de nuevo.</span>
-              : message.content}
-          </p>
+              una respuesta "fantasma". Cero hype, español colombiano.
+
+              Task #58: el agente emite markdown (**negritas**, ### títulos,
+              * viñetas). Antes se mostraba CRUDO (whitespace-pre-wrap) y el
+              campesino/niña veía los asteriscos. Ahora las respuestas YA
+              ESTABILIZADAS del agente se renderizan como markdown limpio
+              (AgentMarkdown → escape + DOMPurify). El texto del usuario y el
+              streaming en curso siguen como texto plano: el del usuario no es
+              markdown, y el streaming evita parpadeo por `**` aún sin cerrar. */}
+          {!isUser && (typeof message.content !== 'string' || message.content.trim().length === 0) ? (
+            <p className="text-[15px] leading-relaxed whitespace-pre-wrap">
+              <span className="italic text-slate-400">No recibí respuesta del asistente. Intenta de nuevo.</span>
+            </p>
+          ) : !isUser && !isStreaming ? (
+            <AgentMarkdown content={message.content} />
+          ) : (
+            /* break-words: sin esto una URL o palabra larga sin espacios
+               desborda la burbuja en horizontal a 320px. */
+            <p className="text-[15px] leading-relaxed whitespace-pre-wrap break-words">{message.content}</p>
+          )}
           {/* UX-1 (#284): badge "beta" permanente cerca de cualquier respuesta
               IA del agente. NO reemplaza a SourceBadge (que es la fuente
               grounded vs generativa) — convive. Suprimido para mensajes de

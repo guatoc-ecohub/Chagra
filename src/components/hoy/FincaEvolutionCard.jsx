@@ -12,9 +12,9 @@ import indicatorsData from '../../data/agroecology-indicators.json';
  * datos para un indicador → 'sin datos aun', NUNCA muestra 0.
  *
  * @param {Object} props
- * @param {Array} props.processes - procesos de finca (requerido)
- * @param {Array} props.observations - observaciones (opcional, default [])
- * @param {Function} props.onNavigate - callback para navegación (opcional)
+ * @param {Array} [props.processes] - procesos de finca (default [])
+ * @param {Array} [props.observations] - observaciones (opcional, default [])
+ * @param {Function} [props.onNavigate] - callback para navegación (opcional)
  */
 export default function FincaEvolutionCard({ processes = [], observations = [], onNavigate }) {
   // Obtener etiquetas MESMIS desde el JSON

@@ -42,7 +42,7 @@ describe('ChatBubble — badge de fuente (verificado vs generativo)', () => {
     storeState = {
       showSourceBadges: true,
     };
-    usePrefsStore.mockImplementation((selector) => selector(storeState));
+    vi.mocked(usePrefsStore).mockImplementation((selector) => selector(storeState));
   });
 
   test('Renderiza badge verde cuando metadata.grounded === true', () => {
@@ -348,7 +348,7 @@ describe('ChatBubble — badges anti-alucinación (#18 fuente · #19 auto-correg
 
   beforeEach(() => {
     storeState = { showSourceBadges: true };
-    usePrefsStore.mockImplementation((selector) => selector(storeState));
+    vi.mocked(usePrefsStore).mockImplementation((selector) => selector(storeState));
   });
 
   const base = (metadata) => ({
@@ -392,6 +392,15 @@ describe('ChatBubble — badges anti-alucinación (#18 fuente · #19 auto-correg
     render(
       <ChatBubble
         message={base({ tool_used: 'get_biopreparados', grounded: true, fuente_url: 'javascript:alert(1)' })}
+      />,
+    );
+    expect(screen.queryByTestId('fuente-badge')).not.toBeInTheDocument();
+  });
+
+  test('#18 fuente_url mal formada no se reinterpreta como enlace', () => {
+    render(
+      <ChatBubble
+        message={base({ tool_used: 'get_biopreparados', grounded: true, fuente_url: 'https://%' })}
       />,
     );
     expect(screen.queryByTestId('fuente-badge')).not.toBeInTheDocument();
@@ -521,7 +530,7 @@ describe('ChatBubble — badges anti-alucinación (#18 fuente · #19 auto-correg
 
   test('con showSourceBadges OFF no se renderiza ninguno de los nuevos badges', () => {
     storeState = { showSourceBadges: false };
-    usePrefsStore.mockImplementation((selector) => selector(storeState));
+    vi.mocked(usePrefsStore).mockImplementation((selector) => selector(storeState));
     render(
       <ChatBubble
         message={base({ fuente_url: 'https://agrosavia.co/x', confianza: 'alta', auto_corrected: true })}

@@ -1,0 +1,276 @@
+/*
+ * transicionMundoKit.css — coreografías del kit de transiciones de mundo.
+ *
+ * Todas las variantes comparten el mismo contrato: entre el 45% y el 55% de
+ * la animación la pantalla está 100% CUBIERTA (ahí el host intercambia la
+ * escena, cronometrado por los timers JS del componente — el CSS solo
+ * acompaña con la misma duración via --tmk-ms).
+ *
+ * Variables (las setea el componente):
+ *   --tmk-a   tinte claro del destino (borde de ola, aros, centro del velo)
+ *   --tmk-b   tinte profundo del destino (cuerpo que cubre)
+ *   --tmk-ms  duración total del viaje
+ *
+ * Solo transform/opacity en lo caliente (compositor); la única excepción es
+ * el iris (width/height de UN elemento, ~1s, patrón clásico de agujero con
+ * box-shadow gigante — el inverso no es expresable con clip-path animable).
+ */
+
+.tmk {
+  position: fixed;
+  inset: 0;
+  z-index: 44; /* sobre el velo original (.mundo-viaje, z 40) y el canvas */
+  pointer-events: none;
+  overflow: hidden;
+}
+
+/* ============================== FADE cálido ============================= */
+/* Cross-fade por un gradiente amanecer: cubre, meseta, revela. */
+
+.tmk__velo {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(130% 130% at 50% 42%, var(--tmk-a) 0%, var(--tmk-b) 78%);
+  opacity: 0;
+}
+
+.tmk[data-variante='fade'] .tmk__velo {
+  animation: tmk-cubre-revela var(--tmk-ms) ease-in-out both;
+}
+
+@keyframes tmk-cubre-revela {
+  0% {
+    opacity: 0;
+  }
+  45%,
+  55% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+/* =============================== ZOOM túnel ============================= */
+/* El velo radial escala hacia el observador (entrar) o se aleja (salir)
+ * mientras cubre; los aros pasan como paredes del túnel. */
+
+.tmk[data-variante='zoom'] .tmk__velo {
+  animation:
+    tmk-cubre-revela var(--tmk-ms) ease-in-out both,
+    tmk-zoom-profundidad var(--tmk-ms) cubic-bezier(0.55, 0, 0.35, 1) both;
+  will-change: transform, opacity;
+}
+
+.tmk[data-variante='zoom'][data-direccion='salir'] .tmk__velo {
+  animation-direction: normal, reverse; /* la cobertura NO se invierte; la profundidad sí */
+}
+
+@keyframes tmk-zoom-profundidad {
+  0% {
+    transform: scale(1);
+  }
+  100% {
+    transform: scale(1.55);
+  }
+}
+
+.tmk__aro {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 46vmax;
+  height: 46vmax;
+  margin: -23vmax 0 0 -23vmax;
+  border-radius: 50%;
+  border: 3px solid var(--tmk-a);
+  opacity: 0;
+  animation: tmk-aro calc(var(--tmk-ms) * 0.55) cubic-bezier(0.3, 0, 0.5, 1) both;
+  will-change: transform, opacity;
+}
+
+.tmk__aro--2 {
+  animation-delay: calc(var(--tmk-ms) * 0.14);
+  border-color: var(--tmk-b);
+}
+
+.tmk__aro--3 {
+  animation-delay: calc(var(--tmk-ms) * 0.28);
+}
+
+.tmk[data-variante='zoom'][data-direccion='salir'] .tmk__aro {
+  animation-direction: reverse;
+}
+
+@keyframes tmk-aro {
+  0% {
+    transform: scale(0.12);
+    opacity: 0;
+  }
+  25% {
+    opacity: 0.85;
+  }
+  100% {
+    transform: scale(2.4);
+    opacity: 0;
+  }
+}
+
+/* Extra barato solo tier alto: leve blur del mundo al fondo del túnel. */
+.tmk[data-tier='alto'][data-variante='zoom'] .tmk__velo {
+  backdrop-filter: blur(5px);
+}
+
+/* ============================ IRIS / portal ============================= */
+/* Agujero circular centrado: la sombra gigante es la cobertura; el agujero
+ * se cierra al centro (pantalla cubierta) y reabre sobre la escena nueva.
+ * El borde es el aro del portal. */
+
+.tmk__iris {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 240vmax;
+  height: 240vmax;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  border: 4px solid var(--tmk-a);
+  box-shadow:
+    0 0 0 260vmax var(--tmk-b),
+    inset 0 0 46px var(--tmk-a);
+  animation: tmk-iris var(--tmk-ms) cubic-bezier(0.65, 0, 0.35, 1) both;
+}
+
+.tmk[data-variante='iris'][data-direccion='salir'] .tmk__iris {
+  /* mismo trazo, respiración distinta: salir abre más suave */
+  animation-timing-function: cubic-bezier(0.35, 0, 0.2, 1);
+}
+
+.tmk[data-tier='bajo'] .tmk__iris,
+.tmk[data-reducida='1'] .tmk__iris {
+  border: 0;
+  box-shadow: 0 0 0 260vmax var(--tmk-b);
+}
+
+@keyframes tmk-iris {
+  0% {
+    width: 240vmax;
+    height: 240vmax;
+  }
+  45%,
+  55% {
+    width: 0vmax;
+    height: 0vmax;
+  }
+  100% {
+    width: 240vmax;
+    height: 240vmax;
+  }
+}
+
+/* ============================ WIPE orgánico ============================= */
+/* Bloque de 220vh (ola frente + cuerpo + ola cola) que barre la pantalla:
+ * entrar sube desde abajo; salir baja desde arriba. Solo transform. */
+
+.tmk__wipe {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: 220vh;
+  display: flex;
+  flex-direction: column;
+  animation: tmk-wipe-sube var(--tmk-ms) cubic-bezier(0.6, 0, 0.4, 1) both;
+  will-change: transform;
+}
+
+.tmk[data-variante='wipe'][data-direccion='salir'] .tmk__wipe {
+  animation-name: tmk-wipe-baja;
+}
+
+.tmk__ola {
+  display: block;
+  width: 100%;
+  height: 10vh;
+  flex: none;
+}
+
+.tmk__ola path {
+  fill: var(--tmk-a);
+}
+
+.tmk__ola--cola {
+  transform: scaleY(-1);
+}
+
+.tmk__ola--cola path {
+  fill: var(--tmk-b);
+}
+
+.tmk__wipe-cuerpo {
+  flex: 1;
+  background: linear-gradient(180deg, var(--tmk-a) 0%, var(--tmk-b) 55%);
+}
+
+/* Cobertura en la meseta: bloque en -60vh ⇒ cuerpo tapa 0..100vh completo. */
+@keyframes tmk-wipe-sube {
+  0% {
+    transform: translateY(100vh);
+  }
+  45%,
+  55% {
+    transform: translateY(-60vh);
+  }
+  100% {
+    transform: translateY(-230vh);
+  }
+}
+
+@keyframes tmk-wipe-baja {
+  0% {
+    transform: translateY(-320vh);
+  }
+  45%,
+  55% {
+    transform: translateY(-60vh);
+  }
+  100% {
+    transform: translateY(110vh);
+  }
+}
+
+/* ====================== Reduced motion = corte simple =================== */
+/* Via prop: el componente ya forzó la rama 'fade'; acá la cubierta arranca
+ * YA opaca (el swap de mitad ocurre bajo tapa) y se desvanece corto. */
+
+.tmk[data-reducida='1'] .tmk__velo {
+  animation: tmk-corte var(--tmk-ms) linear both;
+}
+
+@keyframes tmk-corte {
+  0%,
+  62% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+/* Red de seguridad si el host no pasó la prop pero el sistema pide calma:
+ * fuera decoraciones y movimiento, solo el corte simple. */
+@media (prefers-reduced-motion: reduce) {
+  .tmk .tmk__wipe,
+  .tmk .tmk__iris,
+  .tmk .tmk__aro {
+    display: none;
+  }
+
+  .tmk::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: var(--tmk-b);
+    animation: tmk-corte var(--tmk-ms) linear both;
+  }
+}

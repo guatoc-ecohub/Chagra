@@ -1,0 +1,69 @@
+{
+  "species_slug": "pourouma_cecropiifolia",
+  "scientific_name": "Pourouma cecropiifolia Mart.",
+  "common_names": [
+    "Uva caimarona"
+  ],
+  "family": "Urticaceae",
+  "category": "frutales_perennes",
+  "cultivable": true,
+  "conservation_status": "naturalizada",
+  "thermal_zones": [
+    "calido"
+  ],
+  "roles_in_guild": [
+    "crop"
+  ],
+  "antagonists": [],
+  "especies_nativas_sustitutas": [],
+  "propagation": {
+    "metodo_principal": "semilla",
+    "notas": "Semilla recalcitrante; sembrar inmediatamente post-cosecha. Germinacion 30-60 dias. Tambien se propaga por esquejes de ramas semileñosas."
+  },
+  "requirements": {
+    "agua": "alto",
+    "altitud_msnm": {
+      "min_absoluto": 0,
+      "optimo_min": 100,
+      "optimo_max": 500,
+      "max_absoluto": 800
+    },
+    "temperatura_c": {
+      "helada_letal": 5,
+      "optimo_min": 24,
+      "optimo_max": 28,
+      "max_tolerable": 35
+    },
+    "radiacion": "sol_pleno",
+    "drenaje_requerido": "bueno"
+  },
+  "valor_pedagogico": "La uva caimarona (Pourouma cecropiifolia Mart.) es un frutal nativo de la Amazonia colombiana, presente en los departamentos del Caquetá, Putumayo, Amazonas, Guainía, Vaupés y Meta entre 0 y 800 msnm en zonas termicas calidas. Su manejo agronomico incluye propagacion por semilla con germinacion de 30-60 dias, ciclo productivo de 3-5 años hasta primera cosecha, asociaciones con otros frutales amazonicos como arazá (Eugenia stipitata) y camu camu (Myrciaria dubia), y requiere monitoreo de plagas como moscas de la fruta (Anastrepha spp.) y garrapatas en frutos. En el contexto cultural amazonense, los pueblos indigenas Tucano, Witoto, Embera y Kofan consumen tradicionalmente el fruto fresco o fermentado como bebida alcoholica suave. Segun el inventario taxonomico de GBIF Backbone Taxonomy y Plants of the World Online (POWO), su nombre cientifico valido es Pourouma cecropiifolia Mart.",
+  "sources": [
+    {
+      "id": "gbif-taxonomic-backbone",
+      "title": "gbif-taxonomic-backbone",
+      "tier": "A",
+      "url": "https://www.gbif.org/dataset/d7dddbf4-2cf0-4f39-9b2a-bb099caae36c"
+    },
+    {
+      "id": "powo-kew",
+      "title": "powo-kew",
+      "tier": "A",
+      "url": "https://powo.science.kew.org"
+    },
+    {
+      "id": "sib-colombia",
+      "title": "sib-colombia",
+      "tier": "A",
+      "url": "https://sibcolombia.net"
+    },
+    {
+      "id": "bernal-2015-plantas-liquenes-colombia",
+      "title": "bernal-2015-plantas-liquenes-colombia",
+      "tier": "A",
+      "url": "http://catalogoplantasdecolombia.unal.edu.co"
+    }
+  ],
+  "_generated_by": "scripts/build-cycle-content-from-catalog.mjs",
+  "_generated_at": "2026-05-19T00:42:57.379Z"
+}

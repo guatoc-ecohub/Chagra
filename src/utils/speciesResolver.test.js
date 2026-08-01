@@ -47,7 +47,7 @@ describe('normalizeForMatch', () => {
   it('tolera entradas vacías o no-string', () => {
     expect(normalizeForMatch(null)).toBe('');
     expect(normalizeForMatch(undefined)).toBe('');
-    expect(normalizeForMatch(42)).toBe('');
+    expect(normalizeForMatch(/** @type {any} */ (42))).toBe('');
   });
 });
 
@@ -189,8 +189,8 @@ describe('matchSpeciesInCatalog — bordes', () => {
   });
 
   it('NO falla si slug no es string ni si name es un objeto', () => {
-    expect(matchSpeciesInCatalog(CATALOG, 42, {})).toBeNull();
-    expect(matchSpeciesInCatalog(CATALOG, 123, 'Fresa')?.id).toBe('fragaria_ananassa');
+    expect(matchSpeciesInCatalog(CATALOG, /** @type {any} */ (42), /** @type {any} */ ({}))).toBeNull();
+    expect(matchSpeciesInCatalog(CATALOG, /** @type {any} */ (123), 'Fresa')?.id).toBe('fragaria_ananassa');
   });
 });
 

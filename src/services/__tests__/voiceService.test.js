@@ -244,13 +244,13 @@ describe('voiceService', () => {
 
   describe('queueForRetry', () => {
     it('delega en syncManager.saveVoiceRecording con status pending', async () => {
-      syncManager.saveVoiceRecording.mockResolvedValueOnce(undefined);
+      vi.mocked(syncManager.saveVoiceRecording).mockResolvedValueOnce(undefined);
 
       const blob = new Blob([AUDIO_DATA], { type: 'audio/webm;codecs=opus' });
       await queueForRetry(blob, { reason: 'Whisper 503', durationMs: 4500 });
 
       expect(syncManager.saveVoiceRecording).toHaveBeenCalledTimes(1);
-      const callArgs = syncManager.saveVoiceRecording.mock.calls[0];
+      const callArgs = vi.mocked(syncManager.saveVoiceRecording).mock.calls[0];
       expect(callArgs[0]).toBe(blob);
       expect(callArgs[1]).toMatchObject({
         status: 'pending',
@@ -260,13 +260,13 @@ describe('voiceService', () => {
     });
 
     it('usa valores default si metadata está incompleta', async () => {
-      syncManager.saveVoiceRecording.mockResolvedValueOnce(undefined);
+      vi.mocked(syncManager.saveVoiceRecording).mockResolvedValueOnce(undefined);
 
       const blob = new Blob([AUDIO_DATA], { type: 'audio/webm;codecs=opus' });
       await queueForRetry(blob, {});
 
       expect(syncManager.saveVoiceRecording).toHaveBeenCalledTimes(1);
-      const callArgs = syncManager.saveVoiceRecording.mock.calls[0];
+      const callArgs = vi.mocked(syncManager.saveVoiceRecording).mock.calls[0];
       expect(callArgs[1]).toMatchObject({
         status: 'pending',
         lastError: null,
@@ -275,7 +275,7 @@ describe('voiceService', () => {
     });
 
     it('propaga errores de syncManager', async () => {
-      syncManager.saveVoiceRecording.mockRejectedValueOnce(new Error('DB error'));
+      vi.mocked(syncManager.saveVoiceRecording).mockRejectedValueOnce(new Error('DB error'));
 
       const blob = new Blob([AUDIO_DATA], { type: 'audio/webm;codecs=opus' });
 

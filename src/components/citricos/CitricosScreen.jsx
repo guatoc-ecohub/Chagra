@@ -155,13 +155,13 @@ function EstacionVariedades() {
               {v.nombre}
               <span className="text-[11px] italic font-normal text-slate-400">{v.cientifico}</span>
               {v.enGrafo
-                ? <span className="inline-flex items-center gap-1 rounded-full border border-emerald-500/50 bg-emerald-500/15 px-2 py-0.5 text-[10px] font-black uppercase tracking-wide text-emerald-200"><ShieldCheck size={11} aria-hidden="true" /> En el grafo</span>
+                ? <span className="inline-flex items-center gap-1 rounded-full border border-emerald-500/50 bg-emerald-500/15 px-2 py-0.5 text-[10px] font-black uppercase tracking-wide text-emerald-200"><ShieldCheck size={11} aria-hidden="true" /> En el catálogo</span>
                 : <SlotPendiente>ficha en camino</SlotPendiente>}
             </p>
             <p className="mt-1 text-xs leading-snug text-slate-300">{v.nota}</p>
           </div>
         ))}
-        <p className="text-[10px] leading-snug text-slate-500">Fuente: grafo Chagra (citrus_sinensis, citrus_reticulata, citrus_latifolia) · AGROSAVIA / ICA.</p>
+        <p className="text-[10px] leading-snug text-slate-500">Fuente: catálogo Chagra (naranja, mandarina, limón Tahití) · AGROSAVIA / ICA.</p>
       </div>
 
       {/* Por qué injertado (foto real del injerto de yema) */}
@@ -388,7 +388,7 @@ function PlagaCard({ plaga }) {
         </p>
         <div>
           <p className="flex items-center gap-1.5 text-[11px] font-black uppercase tracking-wide text-emerald-300 mb-1.5">
-            <ShieldCheck size={12} aria-hidden="true" /> Manejo sin veneno (biocontroles del grafo)
+            <ShieldCheck size={12} aria-hidden="true" /> Manejo sin veneno
           </p>
           <div className="flex flex-wrap gap-1.5">
             {plaga.biocontrol.map((b, i) => (
@@ -415,7 +415,7 @@ function EstacionPlagas({ onNavigate }) {
       >
         <p>
           Reconocerlos temprano es media pelea ganada. Los bichos buenos y los
-          biocontroles que ve en cada tarjeta salen del grafo Chagra (a qué le
+          biocontroles que ve en cada tarjeta salen del catálogo Chagra (a qué le
           pega cada plaga y quién la controla).
         </p>
       </PedagogicalBlock>
@@ -483,7 +483,7 @@ function EstacionPlagas({ onNavigate }) {
             <span key={i} className="rounded-full border border-slate-600/50 bg-slate-800/40 px-2 py-0.5 text-[11px] text-slate-200">{b}</span>
           ))}
         </div>
-        <p className="text-[10px] leading-snug text-slate-500 mt-2">Fuente: grafo Chagra (biopreparados de las especies cítricas).</p>
+        <p className="text-[10px] leading-snug text-slate-500 mt-2">Fuente: catálogo Chagra (biopreparados de las especies cítricas).</p>
       </div>
 
       {/* Guard anti-receta */}

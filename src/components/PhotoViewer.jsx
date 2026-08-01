@@ -2,6 +2,7 @@ import React, { useState, useRef, useCallback } from 'react';
 import { Maximize2, Minimize2 } from 'lucide-react';
 import useCinemaMode from '../hooks/useCinemaMode';
 
+/** @param {{ src: string, alt?: string, className?: string, children?: import('react').ReactNode, calloutOverlay?: import('react').ReactNode }} props */
 export default function PhotoViewer({
   src,
   alt = '',
@@ -32,7 +33,11 @@ export default function PhotoViewer({
         ref={containerRef}
         className="fixed inset-0 z-[100] bg-black flex items-center justify-center"
         onClick={handleTap}
-        role="presentation"
+        /* a11y: visor a pantalla completa = diálogo modal (antes role=presentation,
+           invisible para el lector de pantalla). El cierre accesible es el botón X. */
+        role="dialog"
+        aria-modal="true"
+        aria-label={alt || 'Foto ampliada'}
       >
         <img
           src={src}

@@ -78,6 +78,7 @@ export default function RegistroUnificadoScreen({ onBack, onSave }) {
     setErrorMsg('');
     try {
       const { saveType, payload } = buildVoicePayload({ ...edited, source: 'manual' }, ctx);
+      // @ts-ignore saveType is string union from buildVoicePayload
       const result = await savePayload(saveType, payload);
       const offline = !result.success || (result.message || '').toLowerCase().includes('local');
       if (result.success || offline) {

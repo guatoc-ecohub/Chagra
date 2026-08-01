@@ -409,7 +409,7 @@ function classifyIntent(t, { species, symptoms, measures, pest }) {
  *
  * @param {string} text — transcripción en español.
  * @param {object} [opts]
- * @param {number} [opts.now=0] — epoch ms de referencia para el tiempo
+ * @param {number} [opts.now=0] - epoch ms de referencia para el tiempo
  *   relativo. Inyectable para tests (no se llama Date.now en el core).
  * @returns {object} registro unificado (ver JSDoc del módulo).
  */

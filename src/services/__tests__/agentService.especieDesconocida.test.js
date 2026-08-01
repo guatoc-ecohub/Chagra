@@ -8,7 +8,11 @@ describe('generateSourceCitationRules — guard de especie desconocida', () => {
   it('incluye la regla de NO describir especies fuera del catálogo', () => {
     const r = generateSourceCitationRules();
     expect(r).toContain('ESPECIE DESCONOCIDA');
-    expect(r).toMatch(/NO inventes su descripción/);
+    // La guarda se reformuló y se endureció: en vez del literal antiguo
+    // "NO inventes su descripción", la regla ahora enumera lo PROHIBIDO para
+    // una especie fuera del catálogo (siembra, manejo, …, descripción, usos).
+    // Verificamos la intención vigente: prohíbe dar la descripción.
+    expect(r).toMatch(/PROHIBIDO[^\n]*descripción/);
   });
 
   it('mantiene la regla previa de nombres científicos', () => {

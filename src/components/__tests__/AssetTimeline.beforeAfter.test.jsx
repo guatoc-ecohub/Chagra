@@ -62,7 +62,7 @@ vi.mock('../../store/useLogStore', () => {
 // Resuelve URLs distintas según el photoId pedido, simulando el hook real
 // (usePhotoUrl) que envuelve photoService.getPhotoById.
 vi.mock('../../hooks/usePhotoUrl', () => ({
-  usePhotoUrl: ({ photoId } = {}) => {
+  usePhotoUrl: ({ photoId } = /** @type {any} */ ({})) => {
     if (photoId === 101) return { loading: false, url: 'blob://foto-vieja', source: 'specific' };
     if (photoId === 202) return { loading: false, url: 'blob://foto-nueva', source: 'specific' };
     return { loading: false, url: null, source: 'missing' };

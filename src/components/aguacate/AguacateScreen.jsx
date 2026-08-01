@@ -16,6 +16,7 @@ import {
   SUELO_AGUA,
   ASOCIACION_AGUACATE,
   MALES_AGUACATE,
+  MALES_FUENTE,
   BIOPREPARADOS_AGUACATE,
   NOTA_SIN_QUIMICOS,
   FLORACION_POLINIZACION,
@@ -292,7 +293,7 @@ function EstacionSuelo({ onNavigate }) {
           </p>
           <p className="mt-1 text-xs leading-snug text-rose-100/90">{a.antagonista.detalle}</p>
         </div>
-        <p className="text-[10px] leading-snug text-slate-500">Compatibilidades del catálogo Chagra (grafo).</p>
+        <p className="text-[10px] leading-snug text-slate-500">Compatibilidades del catálogo Chagra.</p>
       </div>
 
       {/* Puente al cuaderno del suelo */}
@@ -365,6 +366,7 @@ function EstacionSanidad({ onNavigate }) {
       <div className="space-y-2.5" data-testid="aguacate-males">
         {MALES_AGUACATE.map((mal) => <MalCard key={mal.id} mal={mal} />)}
       </div>
+      <p className="text-[10px] leading-snug text-slate-500" data-testid="aguacate-males-fuente">Fuente: {MALES_FUENTE}</p>
 
       {/* Biopreparados groundeados de la especie */}
       <div className="rounded-2xl border border-slate-700/60 bg-[#1a2413]/50 p-4" data-testid="aguacate-biopreparados">
@@ -376,7 +378,7 @@ function EstacionSanidad({ onNavigate }) {
             <span key={i} className="rounded-full border border-slate-600/50 bg-slate-800/40 px-2 py-0.5 text-[11px] text-slate-200">{b}</span>
           ))}
         </div>
-        <p className="mt-2 text-[10px] leading-snug text-slate-500">Biopreparados del grafo Chagra (persea_americana). Son apoyo, no reemplazan el manejo cultural.</p>
+        <p className="mt-2 text-[10px] leading-snug text-slate-500">Biopreparados del catálogo Chagra. Son apoyo, no reemplazan el manejo cultural.</p>
       </div>
 
       {/* Guard anti-receta */}

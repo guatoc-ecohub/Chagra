@@ -25,12 +25,12 @@ const HELADA = {
 describe('CriticalAlertBanner (#315)', () => {
   beforeEach(() => {
     sessionStorage.clear();
-    aggregateNotifications.mockReset();
-    dismissNotification.mockReset();
+    vi.mocked(aggregateNotifications).mockReset();
+    vi.mocked(dismissNotification).mockReset();
   });
 
   it('no renderiza nada cuando no hay alertas críticas', () => {
-    aggregateNotifications.mockReturnValue([
+    vi.mocked(aggregateNotifications).mockReturnValue([
       { id: 'x', severity: 'warning', title: 'Algo menor' },
       { id: 'y', severity: 'info', title: 'Info' },
     ]);
@@ -40,7 +40,7 @@ describe('CriticalAlertBanner (#315)', () => {
   });
 
   it('renderiza el banner cuando hay una crítica (helada)', () => {
-    aggregateNotifications.mockReturnValue([HELADA]);
+    vi.mocked(aggregateNotifications).mockReturnValue([HELADA]);
     render(<CriticalAlertBanner />);
     const banner = screen.getByTestId('critical-alert-banner');
     expect(banner).toBeInTheDocument();
@@ -50,7 +50,7 @@ describe('CriticalAlertBanner (#315)', () => {
   });
 
   it('el CTA navega a la vista del agente y pre-carga el prompt', () => {
-    aggregateNotifications.mockReturnValue([HELADA]);
+    vi.mocked(aggregateNotifications).mockReturnValue([HELADA]);
     const onNavigate = vi.fn();
     render(<CriticalAlertBanner onNavigate={onNavigate} />);
     fireEvent.click(screen.getByText(/Preguntar al agente/));
@@ -59,7 +59,7 @@ describe('CriticalAlertBanner (#315)', () => {
   });
 
   it('descartar oculta el banner y persiste el id en sessionStorage', () => {
-    aggregateNotifications.mockReturnValue([HELADA]);
+    vi.mocked(aggregateNotifications).mockReturnValue([HELADA]);
     render(<CriticalAlertBanner />);
     expect(screen.getByTestId('critical-alert-banner')).toBeInTheDocument();
     fireEvent.click(screen.getByTestId('critical-alert-dismiss'));
@@ -69,7 +69,7 @@ describe('CriticalAlertBanner (#315)', () => {
   });
 
   it('muestra "+N más críticas" cuando hay varias', () => {
-    aggregateNotifications.mockReturnValue([
+    vi.mocked(aggregateNotifications).mockReturnValue([
       HELADA,
       { id: 'demo_2', severity: 'critical', title: 'Sequía severa' },
       { id: 'demo_3', severity: 'critical', title: 'Granizada' },
@@ -79,7 +79,7 @@ describe('CriticalAlertBanner (#315)', () => {
   });
 
   it('una crítica del demo (id demo_*) NO llama a dismissNotification del servicio (solo por-sesión)', () => {
-    aggregateNotifications.mockReturnValue([HELADA]);
+    vi.mocked(aggregateNotifications).mockReturnValue([HELADA]);
     render(<CriticalAlertBanner />);
     fireEvent.click(screen.getByTestId('critical-alert-dismiss'));
     expect(dismissNotification).not.toHaveBeenCalled();

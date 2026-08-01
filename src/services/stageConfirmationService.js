@@ -46,7 +46,7 @@ export async function confirmStage({ processId, newStage, previousStage, reason,
   process.attributes.current_stage = newStage;
   process.attributes.updated_at = Date.now();
   if (reason) {
-    process.attributes.last_stage_change_reason = reason;
+    /** @type {any} */ (process.attributes).last_stage_change_reason = reason;
   }
 
   // Guardar evento de corrección si la etapa observada cambia

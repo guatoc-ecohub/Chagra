@@ -1102,7 +1102,7 @@ export const HOME_MODULES = Object.freeze([
   {
     id: 'clima',
     label: 'Clima',
-    description: 'Pronóstico del clima para tu zona (7 días)',
+    description: 'Pronóstico del clima para su zona (7 días)',
     category: 'principal',
   },
   {
@@ -1277,6 +1277,13 @@ export function isModuleVisible(moduleId) {
 // render (FUSED_EN_ESTADO_DEL_DIA en DashboardLive) para no duplicarlos ni en
 // los perfiles existentes que ya los tenían guardados en su orden.
 export const HOME_MODULE_DEFAULT_ORDER = Object.freeze([
+  // Los de categoría 'principal' van primero: son lo que el campesino mira al
+  // abrir la app. hoyfinca, clima y analisis FALTABAN en esta lista aunque sí
+  // estaban en HOME_MODULES, así que no se dibujaban para nadie sin un orden
+  // guardado — y clima es justo lo que se consulta antes de sembrar o fumigar.
+  'hoyfinca',
+  'clima',
+  'analisis',
   'asociaciones',
   'plantas',
   'hoy',

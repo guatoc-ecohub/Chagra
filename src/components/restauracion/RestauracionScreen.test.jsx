@@ -15,14 +15,8 @@
  *     reforestación, biodiversidad y agente.
  *   - Créditos de fotos con atribución (cumplimiento CC).
  */
-// @types/node no está instalado en el repo (gap conocido y ya tolerado en
-// MundosDeMiFinca.reachability.test.jsx / dataJsonValidity.test.js): tsc no
-// resuelve los specifiers "node:*". Runtime (vitest/node) sí los resuelve.
-// @ts-expect-error TS2591 — ver comentario arriba.
 import fs from 'node:fs';
-// @ts-expect-error TS2591 — ver comentario arriba.
 import path from 'node:path';
-// @ts-expect-error TS2591 — ver comentario arriba.
 import { fileURLToPath } from 'node:url';
 import { describe, it, expect, vi, afterEach } from 'vitest';
 import { render, screen, fireEvent, cleanup } from '@testing-library/react';

@@ -1,7 +1,7 @@
 import { useCallback, useMemo, useState } from 'react';
 import {
   Mic, Sprout, FlaskConical, Ban, RotateCcw, ChevronLeft,
-  Leaf, AlertTriangle, GitBranch, RefreshCw,
+  Leaf, GitBranch, RefreshCw,
 } from 'lucide-react';
 import VoiceCapture from './VoiceCapture';
 import PhenologyTimeline from './PhenologyTimeline';
@@ -142,7 +142,7 @@ function PlantDossierCard({ dossier, altitudeM, onReloadCycles }) {
           )}
           {antagonists.length > 0 && (
             <div>
-              <SectionTitle icon={Ban}>Evita sembrarla junto a</SectionTitle>
+              <SectionTitle icon={Ban} hint={null}>Evita sembrarla junto a</SectionTitle>
               <SpeciesChips list={antagonists} tone="bad" />
             </div>
           )}

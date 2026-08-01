@@ -1,0 +1,17 @@
+{
+  "schema": 1,
+  "bench": "borde-alucinacion",
+  "date": "2026-06-14T08:00:00.000Z",
+  "model": "granite3.3:8b",
+  "config": "PROD",
+  "commit": "fe9ea44",
+  "metrics": {
+    "ah_pct": 16,
+    "pass_pct": 84
+  },
+  "passCount": 23,
+  "failCount": 4,
+  "passPct": 84,
+  "notes": "registro semilla de ejemplo (reingenieria 2026-06-15) — reemplazar con corridas reales",
+  "seed": true
+}

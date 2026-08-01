@@ -20,8 +20,11 @@ import '@testing-library/jest-dom';
 import { describe, test, expect, afterEach, vi, beforeEach } from 'vitest';
 
 let processes = [];
+/** @type {import('vitest').Mock} */
 const createFarmProcess = vi.fn(async () => ({}));
+/** @type {import('vitest').Mock} */
 const recordFarmEvent = vi.fn(async () => ({}));
+/** @type {import('vitest').Mock} */
 const putFarmProcess = vi.fn(async () => ({}));
 
 vi.mock('../../services/farmEventService', () => ({
@@ -237,7 +240,7 @@ describe('SeguimientoProcesoScreen', () => {
     });
 
     // Verificar que el input acepta texto libre (razas no listadas)
-    const inputRaza = screen.getByPlaceholderText('Raza');
+    const inputRaza = /** @type {HTMLInputElement} */ (screen.getByPlaceholderText('Raza'));
     expect(inputRaza).toBeInTheDocument();
 
     // Simular selección de una raza del datalist

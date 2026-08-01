@@ -49,7 +49,7 @@ export function suggestStageFromText(text) {
 /**
  * Crea una observación con sugerencia de etapa incluida.
  */
-export async function suggestStageFromObservation({ processId, text, actor }) {
+export async function suggestStageFromObservation({ processId, text, actor, processHint }) {
   const suggestion = suggestStageFromText(text);
   const extraPayload = {};
   if (suggestion) {
@@ -67,5 +67,6 @@ export async function suggestStageFromObservation({ processId, text, actor }) {
     source: 'operator',
     evidence: suggestion ? `keyword_match:${suggestion.suggestedStage}` : null,
     extraPayload,
+    processHint,
   });
 }

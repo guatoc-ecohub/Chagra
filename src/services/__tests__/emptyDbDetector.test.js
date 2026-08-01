@@ -89,39 +89,39 @@ describe('emptyDbDetector.clearHadDataFlag', () => {
 
 describe('emptyDbDetector.isCurrentlyEmpty', () => {
   it('true cuando assets + logs + media_cache están todos en cero', async () => {
-    openDB.mockResolvedValue(makeFakeDB({ assets: 0, logs: 0, media_cache: 0 }));
+    vi.mocked(openDB).mockResolvedValue(makeFakeDB({ assets: 0, logs: 0, media_cache: 0 }));
     expect(await isCurrentlyEmpty()).toBe(true);
   });
 
   it('false cuando hay aunque sea un asset', async () => {
-    openDB.mockResolvedValue(makeFakeDB({ assets: 1, logs: 0, media_cache: 0 }));
+    vi.mocked(openDB).mockResolvedValue(makeFakeDB({ assets: 1, logs: 0, media_cache: 0 }));
     expect(await isCurrentlyEmpty()).toBe(false);
   });
 
   it('false cuando hay un log aunque no haya assets', async () => {
-    openDB.mockResolvedValue(makeFakeDB({ assets: 0, logs: 1, media_cache: 0 }));
+    vi.mocked(openDB).mockResolvedValue(makeFakeDB({ assets: 0, logs: 1, media_cache: 0 }));
     expect(await isCurrentlyEmpty()).toBe(false);
   });
 
   it('false cuando hay solo una foto suelta', async () => {
-    openDB.mockResolvedValue(makeFakeDB({ assets: 0, logs: 0, media_cache: 1 }));
+    vi.mocked(openDB).mockResolvedValue(makeFakeDB({ assets: 0, logs: 0, media_cache: 1 }));
     expect(await isCurrentlyEmpty()).toBe(false);
   });
 
   it('false (NO alerta) si openDB lanza error — conservador para no romper UI', async () => {
-    openDB.mockRejectedValue(new Error('DB bloqueada'));
+    vi.mocked(openDB).mockRejectedValue(new Error('DB bloqueada'));
     expect(await isCurrentlyEmpty()).toBe(false);
   });
 
   it('ignora stores ausentes (PWA nueva sin schema completo)', async () => {
-    openDB.mockResolvedValue(makeFakeDB({})); // ningún store
+    vi.mocked(openDB).mockResolvedValue(makeFakeDB({})); // ningún store
     expect(await isCurrentlyEmpty()).toBe(true);
   });
 });
 
 describe('emptyDbDetector.shouldWarnDataLoss', () => {
   it('NEVER HAD DATA: no advierte aunque IDB esté vacío', async () => {
-    openDB.mockResolvedValue(makeFakeDB({ assets: 0, logs: 0, media_cache: 0 }));
+    vi.mocked(openDB).mockResolvedValue(makeFakeDB({ assets: 0, logs: 0, media_cache: 0 }));
     // No llamamos markHadData → no hay flag.
 
     const result = await shouldWarnDataLoss();
@@ -132,7 +132,7 @@ describe('emptyDbDetector.shouldWarnDataLoss', () => {
   });
 
   it('HAD DATA + NOW EMPTY: ADVIERTE — caso post-clear-cache', async () => {
-    openDB.mockResolvedValue(makeFakeDB({ assets: 0, logs: 0, media_cache: 0 }));
+    vi.mocked(openDB).mockResolvedValue(makeFakeDB({ assets: 0, logs: 0, media_cache: 0 }));
     markHadData(100);
 
     const result = await shouldWarnDataLoss();
@@ -143,7 +143,7 @@ describe('emptyDbDetector.shouldWarnDataLoss', () => {
   });
 
   it('HAS DATA: no advierte aunque el flag had-data esté seteado', async () => {
-    openDB.mockResolvedValue(makeFakeDB({ assets: 50, logs: 0, media_cache: 0 }));
+    vi.mocked(openDB).mockResolvedValue(makeFakeDB({ assets: 50, logs: 0, media_cache: 0 }));
     markHadData(50);
 
     const result = await shouldWarnDataLoss();
@@ -153,7 +153,7 @@ describe('emptyDbDetector.shouldWarnDataLoss', () => {
   });
 
   it('clearHadDataFlag desactiva la advertencia aunque IDB siga vacío', async () => {
-    openDB.mockResolvedValue(makeFakeDB({ assets: 0, logs: 0, media_cache: 0 }));
+    vi.mocked(openDB).mockResolvedValue(makeFakeDB({ assets: 0, logs: 0, media_cache: 0 }));
     markHadData(7);
     expect((await shouldWarnDataLoss()).shouldWarn).toBe(true);
     clearHadDataFlag();

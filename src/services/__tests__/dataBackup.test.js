@@ -65,7 +65,7 @@ beforeEach(() => {
 
 describe('dataBackup.exportAllData', () => {
   it('devuelve estructura con version, exportedAt, idb y localStorage', async () => {
-    openDB.mockResolvedValue(
+    vi.mocked(openDB).mockResolvedValue(
       makeFakeDB({
         assets: [{ id: 'a1', asset_type: 'plant', attributes: { name: 'Tomate' } }],
         logs: [{ id: 'l1', type: 'log--seeding' }],
@@ -86,7 +86,7 @@ describe('dataBackup.exportAllData', () => {
   });
 
   it('NO exporta claves sensibles de localStorage (token/password/secret)', async () => {
-    openDB.mockResolvedValue(makeFakeDB({ assets: [] }));
+    vi.mocked(openDB).mockResolvedValue(makeFakeDB({ assets: [] }));
     window.localStorage.setItem('access_token', 'super-secret-jwt');
     window.localStorage.setItem('refresh_token', 'refresh-jwt');
     window.localStorage.setItem('user_password', 'plain123');
@@ -104,7 +104,7 @@ describe('dataBackup.exportAllData', () => {
 
   it('serializa blobs de media_cache a dataURL base64', async () => {
     const blob = new Blob(['hola mundo'], { type: 'text/plain' });
-    openDB.mockResolvedValue(
+    vi.mocked(openDB).mockResolvedValue(
       makeFakeDB({
         media_cache: [{ id: 1, logId: 'log-1', blob, mimeType: 'text/plain' }],
       })
@@ -120,7 +120,7 @@ describe('dataBackup.exportAllData', () => {
   });
 
   it('soporta stores nuevos no listados manualmente (itera objectStoreNames real)', async () => {
-    openDB.mockResolvedValue(
+    vi.mocked(openDB).mockResolvedValue(
       makeFakeDB({
         assets: [],
         un_store_nuevo_que_no_estaba_listado: [{ id: 'x', payload: 'datos' }],
@@ -136,7 +136,7 @@ describe('dataBackup.exportAllData', () => {
 
 describe('dataBackup.downloadBackupJSON', () => {
   it('genera un Blob JSON, dispara un click sintético y revoca el ObjectURL', async () => {
-    openDB.mockResolvedValue(makeFakeDB({ assets: [{ id: 'a1', asset_type: 'plant' }] }));
+    vi.mocked(openDB).mockResolvedValue(makeFakeDB({ assets: [{ id: 'a1', asset_type: 'plant' }] }));
 
     const createObjectURL = vi.fn(() => 'blob:mock-url');
     const revokeObjectURL = vi.fn();
@@ -150,9 +150,9 @@ describe('dataBackup.downloadBackupJSON', () => {
     try {
       const result = await downloadBackupJSON();
       expect(createObjectURL).toHaveBeenCalledTimes(1);
-      const blobArg = createObjectURL.mock.calls[0][0];
+      const blobArg = /** @type {any[]} */ (createObjectURL.mock.calls[0])[0];
       expect(blobArg).toBeInstanceOf(Blob);
-      expect(blobArg.type).toBe('application/json');
+      expect(/** @type {any} */ (blobArg).type).toBe('application/json');
       expect(clickSpy).toHaveBeenCalledTimes(1);
       // El filename debe seguir el patrón chagra-backup-YYYY-MM-DD-HHMM.json
       expect(result._filename).toMatch(/^chagra-backup-\d{4}-\d{2}-\d{2}-\d{4}\.json$/);
@@ -170,7 +170,7 @@ describe('dataBackup.downloadBackupJSON', () => {
 
 describe('dataBackup.getBackupSummary', () => {
   it('cuenta items por tipo (plants, structures, logs, photos, pendingTx)', async () => {
-    openDB.mockResolvedValue(
+    vi.mocked(openDB).mockResolvedValue(
       makeFakeDB({
         assets: [
           { id: 'a1', asset_type: 'plant' },
@@ -203,7 +203,7 @@ describe('dataBackup.getBackupSummary', () => {
   });
 
   it('devuelve ceros cuando los stores no existen en el DB (PWA recién instalada)', async () => {
-    openDB.mockResolvedValue(makeFakeDB({})); // ningún store
+    vi.mocked(openDB).mockResolvedValue(makeFakeDB({})); // ningún store
 
     const summary = await getBackupSummary();
 

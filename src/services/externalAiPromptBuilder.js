@@ -12,6 +12,8 @@
  *       hay evidencia — mismo estándar que el prompt principal del agente.
  */
 
+import { normalizeForMatch } from '../utils/speciesResolver.js';
+
 const MAX_USER_FIELD_LEN = 500;
 
 // Patrones de inyección de prompt más comunes en castellano/inglés.
@@ -82,6 +84,50 @@ function resolveThermalZones(thermalZones, altitudMsnm) {
     return derived ? [derived] : [];
 }
 
+function normalizeThermalZoneValue(value) {
+    return normalizeForMatch(value);
+}
+
+function toThermalZoneList(value) {
+    if (Array.isArray(value)) return value.filter(Boolean).map((item) => String(item));
+    if (value == null || value === '') return [];
+    return [String(value)];
+}
+
+function formatThermalZoneList(value) {
+    const zones = toThermalZoneList(value);
+    return zones.length > 0 ? zones.join(', ') : '';
+}
+
+/**
+ * Construye una restriccion dura cuando el piso del usuario no coincide con
+ * los pisos reales de la especie.
+ * @param {string|string[]} userPiso
+ * @param {string[]} speciesThermalZones
+ * @returns {string}
+ */
+export function buildThermalMismatchBlock(userPiso, speciesThermalZones) {
+    const userZones = toThermalZoneList(userPiso);
+    const speciesZones = toThermalZoneList(speciesThermalZones);
+
+    if (userZones.length === 0 || speciesZones.length === 0) return '';
+
+    const userNormalized = new Set(userZones.map(normalizeThermalZoneValue).filter(Boolean));
+    const speciesNormalized = new Set(speciesZones.map(normalizeThermalZoneValue).filter(Boolean));
+
+    if (userNormalized.size === 0 || speciesNormalized.size === 0) return '';
+
+    for (const zone of userNormalized) {
+        if (speciesNormalized.has(zone)) return '';
+    }
+
+    const userLabel = formatThermalZoneList(userZones);
+    const speciesLabel = formatThermalZoneList(speciesZones);
+    if (!userLabel || !speciesLabel) return '';
+
+    return `RESTRICCION DE PISO TERMICO: este cultivo NO figura en el piso ${userLabel}; sus pisos reales son ${speciesLabel}. Si el usuario pregunta por sembrarlo en ${userLabel}, adviertele que es INVIABLE y ofrece alternativas reales; NO valides la siembra.`;
+}
+
 /**
  * Construye un prompt de gremio agroecológico.
  * @param {Object} ctx - Contexto de la especie y el gremio
@@ -91,6 +137,7 @@ function resolveThermalZones(thermalZones, altitudMsnm) {
  * @param {string[]} [ctx.companions] - IDs o nombres de compañeros ya considerados
  * @param {string[]} [ctx.antagonists] - IDs o nombres de antagonistas conocidos
  * @param {string[]} [ctx.thermalZones] - Pisos térmicos (frio, templado, etc.)
+ * @param {string[]} [ctx.speciesThermalZones] - Pisos térmicos reales de la especie
  * @param {number} [ctx.altitudMsnm] - Altitud en metros sobre el nivel del mar
  * @param {string} [ctx.municipio] - Municipio/departamento
  */
@@ -102,12 +149,14 @@ export function buildGuildExternalPrompt(ctx) {
         companions = [],
         antagonists = [],
         thermalZones = [],
+        speciesThermalZones = [],
         altitudMsnm,
         municipio,
     } = ctx;
 
     const resolvedZones = resolveThermalZones(thermalZones, altitudMsnm);
     const zonaTermica = resolvedZones.length > 0 ? resolvedZones.join(', ') : 'no especificado';
+    const thermalMismatchBlock = buildThermalMismatchBlock(resolvedZones, speciesThermalZones);
     const altitudStr = altitudMsnm ? `${altitudMsnm} msnm` : 'altitud no especificada';
     const ubicacion = [altitudStr, municipio].filter(Boolean).join(', ');
     const companionsStr = companions.length > 0 ? companions.join(', ') : 'ninguno aún';
@@ -127,6 +176,7 @@ PREGUNTA:
 Sugiere 5 compañeros adicionales para esta especie en un gremio agroecológico colombiano, priorizando fijación de N, repelencia de plagas, cobertura de suelo, y atractor de polinizadores. Para cada compañero: (a) nombre científico, (b) rol ecológico específico, (c) distancia óptima de siembra, (d) compatibilidad con mi piso térmico.
 
 Responde SOLO en JSON válido: array de objetos con keys name, scientific_name, role, distance_m, notes.` +
+        (thermalMismatchBlock ? `\n\n${thermalMismatchBlock}` : '') +
         ANTI_HALLUCINATION_GUARDRAIL).trim();
 }
 
@@ -136,6 +186,7 @@ Responde SOLO en JSON válido: array de objetos con keys name, scientific_name, 
  * @param {string} ctx.speciesName - Nombre común de la especie
  * @param {string} [ctx.scientificName] - Nombre científico
  * @param {string[]} [ctx.thermalZones] - Pisos térmicos
+ * @param {string[]} [ctx.speciesThermalZones] - Pisos térmicos reales de la especie
  * @param {number} [ctx.altitudMsnm] - Altitud en msnm
  * @param {string} [ctx.municipio] - Municipio/departamento
  * @param {number} [ctx.humedad] - Humedad relativa %
@@ -150,6 +201,7 @@ export function buildDiagnosticExternalPrompt(ctx) {
         speciesName = 'cultivo',
         scientificName,
         thermalZones = [],
+        speciesThermalZones = [],
         altitudMsnm,
         municipio,
         humedad,
@@ -165,6 +217,7 @@ export function buildDiagnosticExternalPrompt(ctx) {
 
     const resolvedZones = resolveThermalZones(thermalZones, altitudMsnm);
     const zonaTermica = resolvedZones.length > 0 ? resolvedZones.join(', ') : 'no especificado';
+    const thermalMismatchBlock = buildThermalMismatchBlock(resolvedZones, speciesThermalZones);
     const altitudStr = altitudMsnm ? `${altitudMsnm} msnm` : 'altitud no especificada';
     const ubicacion = [altitudStr, municipio].filter(Boolean).join(', ');
     const especieFull = scientificName ? `${scientificName} (${speciesName})` : speciesName;
@@ -191,6 +244,7 @@ Realiza un diagnóstico diferencial priorizando causas más probables a esta alt
 (a) prueba casera de confirmación
 (b) biopreparado agroecológico de tratamiento (NO agroquímicos sintéticos; respetar normativa IFOAM)
 (c) medida preventiva para ciclos futuros` +
+        (thermalMismatchBlock ? `\n\n${thermalMismatchBlock}` : '') +
         ANTI_HALLUCINATION_GUARDRAIL).trim();
 }
 
@@ -203,6 +257,7 @@ export function buildOpenExternalPrompt(ctx) {
         speciesName = 'especie',
         scientificName,
         thermalZones = [],
+        speciesThermalZones = [],
         altitudMsnm,
         municipio,
         pregunta: preguntaRaw = '[Escribe tu pregunta aquí]',
@@ -213,6 +268,7 @@ export function buildOpenExternalPrompt(ctx) {
 
     const resolvedZones = resolveThermalZones(thermalZones, altitudMsnm);
     const zonaTermica = resolvedZones.length > 0 ? resolvedZones.join(', ') : 'no especificado';
+    const thermalMismatchBlock = buildThermalMismatchBlock(resolvedZones, speciesThermalZones);
     const altitudStr = altitudMsnm ? `${altitudMsnm} msnm` : 'altitud no especificada';
     const ubicacion = [altitudStr, municipio].filter(Boolean).join(', ');
     const especieFull = scientificName ? `${scientificName} (${speciesName})` : speciesName;
@@ -224,5 +280,5 @@ CONTEXTO:
 - Especie: ${especieFull}
 
 PREGUNTA:
-${pregunta}` + ANTI_HALLUCINATION_GUARDRAIL).trim();
+${pregunta}` + (thermalMismatchBlock ? `\n\n${thermalMismatchBlock}` : '') + ANTI_HALLUCINATION_GUARDRAIL).trim();
 }

@@ -44,7 +44,7 @@ function buildLog(overrides = {}) {
 describe('exportService', () => {
   describe('exportTraceabilityCsv', () => {
     it('cuenta pending correctamente', async () => {
-      logCache.getAll.mockResolvedValue([
+      vi.mocked(logCache.getAll).mockResolvedValue([
         buildLog({ id: 'a', _pending: true }),
         buildLog({ id: 'b', _pending: false }),
         buildLog({ id: 'c', _pending: true }),
@@ -55,7 +55,7 @@ describe('exportService', () => {
     });
 
     it('maneja logs sin quantity', async () => {
-      logCache.getAll.mockResolvedValue([
+      vi.mocked(logCache.getAll).mockResolvedValue([
         buildLog({ id: 'a', quantity: undefined, name: 'Sin cantidad' }),
       ]);
       const r = await exportTraceabilityCsv({ filename: 'nq.csv' });
@@ -63,7 +63,7 @@ describe('exportService', () => {
     });
 
     it('convierte bultos a kg (x50)', async () => {
-      logCache.getAll.mockResolvedValue([
+      vi.mocked(logCache.getAll).mockResolvedValue([
         buildLog({ quantity: { value: 2, unit: 'bultos' } }),
       ]);
       const r = await exportTraceabilityCsv({ filename: 'b.csv' });
@@ -71,7 +71,7 @@ describe('exportService', () => {
     });
 
     it('maneja gramos a kg (x0.001)', async () => {
-      logCache.getAll.mockResolvedValue([
+      vi.mocked(logCache.getAll).mockResolvedValue([
         buildLog({ quantity: { value: 500, unit: 'g' } }),
       ]);
       const r = await exportTraceabilityCsv({ filename: 'g.csv' });
@@ -79,7 +79,7 @@ describe('exportService', () => {
     });
 
     it('maneja mililitros a litros (x0.001)', async () => {
-      logCache.getAll.mockResolvedValue([
+      vi.mocked(logCache.getAll).mockResolvedValue([
         buildLog({ quantity: { value: 250, unit: 'ml' } }),
       ]);
       const r = await exportTraceabilityCsv({ filename: 'ml.csv' });
@@ -87,7 +87,7 @@ describe('exportService', () => {
     });
 
     it('resuelve operario desde relationships.owner', async () => {
-      logCache.getAll.mockResolvedValue([
+      vi.mocked(logCache.getAll).mockResolvedValue([
         buildLog({
           relationships: { owner: { data: { id: 'user-admin' } } },
         }),
@@ -97,7 +97,7 @@ describe('exportService', () => {
     });
 
     it('resuelve categoria sin categoria conocida', async () => {
-      logCache.getAll.mockResolvedValue([
+      vi.mocked(logCache.getAll).mockResolvedValue([
         buildLog({ name: 'Aplicacion de MaterialDesconocido', type: 'log--input' }),
       ]);
       const r = await exportTraceabilityCsv({ filename: 'uk.csv' });
@@ -105,7 +105,7 @@ describe('exportService', () => {
     });
 
     it('retorna Sin categoria para tipo no-input', async () => {
-      logCache.getAll.mockResolvedValue([
+      vi.mocked(logCache.getAll).mockResolvedValue([
         buildLog({ type: 'log--harvest', name: 'Cosecha de cafe' }),
       ]);
       const r = await exportTraceabilityCsv({ filename: 'h.csv' });
@@ -113,7 +113,7 @@ describe('exportService', () => {
     });
 
     it('ordena por timestamp descendente', async () => {
-      logCache.getAll.mockResolvedValue([
+      vi.mocked(logCache.getAll).mockResolvedValue([
         buildLog({ id: 'a', timestamp: 1000 }),
         buildLog({ id: 'b', timestamp: 3000 }),
         buildLog({ id: 'c', timestamp: 2000 }),
@@ -123,7 +123,7 @@ describe('exportService', () => {
     });
 
     it('filtra multiples types', async () => {
-      logCache.getAll.mockResolvedValue([
+      vi.mocked(logCache.getAll).mockResolvedValue([
         buildLog({ id: 'a', type: 'log--input' }),
         buildLog({ id: 'b', type: 'log--harvest' }),
         buildLog({ id: 'c', type: 'log--seeding' }),
@@ -136,7 +136,7 @@ describe('exportService', () => {
     });
 
     it('maneja logs con name que no empieza con Aplicacion de', async () => {
-      logCache.getAll.mockResolvedValue([
+      vi.mocked(logCache.getAll).mockResolvedValue([
         buildLog({ name: 'Cosecha manual', type: 'log--harvest' }),
       ]);
       const r = await exportTraceabilityCsv({ filename: 'nh.csv' });
@@ -144,7 +144,7 @@ describe('exportService', () => {
     });
 
     it('resuelve operario desde relationships.uid', async () => {
-      logCache.getAll.mockResolvedValue([
+      vi.mocked(logCache.getAll).mockResolvedValue([
         buildLog({
           relationships: { uid: { data: { id: 'user-001' } } },
         }),
@@ -156,14 +156,14 @@ describe('exportService', () => {
     // ── TAREA 90: CSV shape, format consistency, edge data combinations ──
 
     it('CSV incluye header completo con 11 columnas', async () => {
-      logCache.getAll.mockResolvedValue([buildLog()]);
+      vi.mocked(logCache.getAll).mockResolvedValue([buildLog()]);
       const r = await exportTraceabilityCsv({ filename: 'hdr.csv' });
       expect(r.rowCount).toBe(1);
       expect(r.filename).toBe('hdr.csv');
     });
 
     it('resultado tiene rowCount, pendingCount y filename', async () => {
-      logCache.getAll.mockResolvedValue([
+      vi.mocked(logCache.getAll).mockResolvedValue([
         buildLog({ _pending: true }),
         buildLog({ _pending: false }),
       ]);
@@ -177,7 +177,7 @@ describe('exportService', () => {
     });
 
     it('filename por defecto incluye fecha ISO', async () => {
-      logCache.getAll.mockResolvedValue([]);
+      vi.mocked(logCache.getAll).mockResolvedValue([]);
       const r = await exportTraceabilityCsv();
       expect(r.filename).toMatch(/chagra_trazabilidad_\d{4}-\d{2}-\d{2}\.csv/);
       expect(r.rowCount).toBe(0);
@@ -185,7 +185,7 @@ describe('exportService', () => {
     });
 
     it('maneja combinacion de tipos: harvest + seeding + observation', async () => {
-      logCache.getAll.mockResolvedValue([
+      vi.mocked(logCache.getAll).mockResolvedValue([
         buildLog({ id: 'a', type: 'log--harvest', name: 'Cosecha de tomate' }),
         buildLog({ id: 'b', type: 'log--seeding', name: 'Siembra de lechuga' }),
         buildLog({ id: 'c', type: 'log--observation', name: 'Hojas amarillas' }),
@@ -195,7 +195,7 @@ describe('exportService', () => {
     });
 
     it('pendingCount cuenta solo _pending=true', async () => {
-      logCache.getAll.mockResolvedValue([
+      vi.mocked(logCache.getAll).mockResolvedValue([
         buildLog({ id: 'a', _pending: true }),
         buildLog({ id: 'b', _pending: false }),
         buildLog({ id: 'c', _pending: undefined }),
@@ -206,7 +206,7 @@ describe('exportService', () => {
     });
 
     it('maneja logs con values decimales en quantity', async () => {
-      logCache.getAll.mockResolvedValue([
+      vi.mocked(logCache.getAll).mockResolvedValue([
         buildLog({ quantity: { value: 3.75, unit: 'kg' } }),
       ]);
       const r = await exportTraceabilityCsv({ filename: 'dec.csv' });
@@ -214,7 +214,7 @@ describe('exportService', () => {
     });
 
     it('maneja log con cantidad cero', async () => {
-      logCache.getAll.mockResolvedValue([
+      vi.mocked(logCache.getAll).mockResolvedValue([
         buildLog({ quantity: { value: 0, unit: 'kg' } }),
       ]);
       const r = await exportTraceabilityCsv({ filename: 'zero.csv' });
@@ -222,7 +222,7 @@ describe('exportService', () => {
     });
 
     it('maneja log con unit vacio en quantity', async () => {
-      logCache.getAll.mockResolvedValue([
+      vi.mocked(logCache.getAll).mockResolvedValue([
         buildLog({ quantity: { value: 10, unit: '' } }),
       ]);
       const r = await exportTraceabilityCsv({ filename: 'no-unit.csv' });
@@ -230,7 +230,7 @@ describe('exportService', () => {
     });
 
     it('maneja multiples materiales con categorias distintas', async () => {
-      logCache.getAll.mockResolvedValue([
+      vi.mocked(logCache.getAll).mockResolvedValue([
         buildLog({ id: 'a', name: 'Aplicacion de Compost', type: 'log--input' }),
         buildLog({ id: 'b', name: 'Aplicacion de Caldo sulfocalcico', type: 'log--input' }),
         buildLog({ id: 'c', name: 'Aplicacion de Bocashi', type: 'log--input' }),
@@ -241,7 +241,7 @@ describe('exportService', () => {
     });
 
     it('filtro por types devuelve vacio si no hay matches', async () => {
-      logCache.getAll.mockResolvedValue([
+      vi.mocked(logCache.getAll).mockResolvedValue([
         buildLog({ type: 'log--harvest' }),
         buildLog({ type: 'log--harvest' }),
       ]);

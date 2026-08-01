@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import React from 'react';
@@ -159,5 +160,13 @@ describe('HoyEnFincaScreen', () => {
     expect(screen.queryByTestId('clima-hoy-card')).toBeNull();
     fireEvent.click(cta);
     expect(onNavigate).toHaveBeenCalledWith('ubicacion-detectada');
+  });
+
+  it('Angelita guía (#24) vuela hasta las alertas y explica su porqué', async () => {
+    render(<HoyEnFincaScreen onNavigate={vi.fn()} />);
+    await waitFor(() => {
+      expect(document.querySelector('.ang-guia__panel')).toBeTruthy();
+    }, { timeout: 2000 });
+    expect(document.querySelector('.ang-guia__panel').textContent).toMatch(/atención/i);
   });
 });

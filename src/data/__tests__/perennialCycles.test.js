@@ -105,7 +105,7 @@ describe('perennialCalculator — resolver', () => {
 
   it('sin datos perennes → null (degrada al ciclo anual)', () => {
     expect(resolvePerennialCycle({ speciesId: 'no_existe', plantingDate: Date.now() })).toBeNull();
-    expect(resolvePerennialCycle({})).toBeNull();
+    expect(resolvePerennialCycle(/** @type {any} */ ({}))).toBeNull();
   });
 
   it('fase establishment cuando aún no llega al mínimo de años', () => {

@@ -1,0 +1,1253 @@
+/* montana-mundos-cine.css — MOCKUP DEV #/mockups/montana-mundos-cine
+ * (prefijo mm2-). PASADA 3 CINEMATOGRÁFICA de "La Montaña de los Mundos".
+ *
+ * Hereda de la pasada 2: 6 capas de cámara con parallax e inercia propia,
+ * luz atmosférica por piso (grades), god-rays, niebla volumétrica de valle
+ * y full-bleed con la UI flotando sobre scrims.
+ *
+ * Qué SUMA la pasada 3:
+ *   - PROFUNDIDAD DE CAMPO: en modo finca el cielo, las cordilleras y el
+ *     primer plano quedan fuera de foco (blur ESTÁTICO por modo — jamás se
+ *     interpola; el cambio ocurre escondido bajo el viaje de cámara). En la
+ *     montaña completa, foco profundo.
+ *   - TRANSICIÓN PULIDA: easing con leve asentamiento en las capas cercanas
+ *     (inercia física), zoom-out majestuoso con duraciones escalonadas, y
+ *     el estado data-viaje — la niebla se ABRE mientras la cámara viaja y
+ *     las etiquetas se retiran hasta que el plano asienta.
+ *   - MOMENTO DE LLEGADA (data-llegada): bloom de hora dorada sobre la
+ *     casa, anillos expansivos, chispas que suben, el pin ⭐ aterriza con
+ *     rebote y la ventana late — one-shot en cada arribo a la finca.
+ *   - TEXTURA: rocas con vetas y pedrisco, cicatrices en el frailejón,
+ *     jirones de niebla a contracorriente, destellos sobre la nieve.
+ *   - VIDA AMBIENTAL por dirección: bandada que cruza (naturalista/verde),
+ *     colibrí (naturalista), luciérnagas (biopunk), hojas cayendo (verde),
+ *     animales que pastan.
+ *
+ * Todo GPU-friendly: SOLO transform y opacity se animan; los degradados
+ * "volumétricos" son fills estáticos (radialGradient pre-suavizado, sin
+ * filter animado). prefers-reduced-motion apaga la vida entera y deja un
+ * plano final digno. Tipografía Baloo 2 / Nunito (ya self-host). */
+
+.mm2 {
+  /* ── Dirección 1 (default): SIERRA NATURALISTA — hora dorada ── */
+  --mm2-cielo-a: #dfa96f;
+  --mm2-cielo-m: #f0cf9a;
+  --mm2-cielo-b: #ece2c4;
+  --mm2-astro: #ffdf8e;
+  --mm2-halo-a: rgba(255, 199, 112, 0.6);
+  --mm2-halo-b: rgba(255, 199, 112, 0);
+  --mm2-rayo: rgba(255, 214, 150, 0.42);
+  --mm2-lejos-a: #dcbb92;
+  --mm2-lejos-b: #d2b083;
+  --mm2-medio-a: #bf9c70;
+  --mm2-medio-b: #b18d63;
+  --mm2-bruma: rgba(255, 236, 200, 0.5);
+  --mm2-niebla-nucleo: rgba(255, 248, 235, 0.72);
+  --mm2-cerca: #4c3a22;
+  --mm2-vineta: rgba(43, 26, 8, 0.34);
+  --mm2-nieve: #fdf6ec;
+  --mm2-nieve-sombra: rgba(96, 116, 168, 0.3);
+  --mm2-paramo: #a8a469;
+  --mm2-frio: #7d9a58;
+  --mm2-templado: #55824a;
+  --mm2-calido: #94aa52;
+  --mm2-valle: #c0bf75;
+  --mm2-rio-a: #93c6be;
+  --mm2-rio-b: #6da9ae;
+  --mm2-rio-orilla: rgba(70, 96, 78, 0.55);
+  --mm2-flujo: rgba(255, 255, 255, 0.75);
+  --mm2-laguna: #9fd0c9;
+  --mm2-borde-piso: rgba(255, 244, 214, 0.42);
+  --mm2-contorno: rgba(40, 52, 26, 0.14);
+  --mm2-luz-ladera: rgba(255, 236, 180, 0.16);
+  --mm2-sombra-ladera: rgba(24, 22, 48, 0.18);
+  --mm2-frailejon-hoja: #b9c46b;
+  --mm2-frailejon-seca: #a08a52;
+  --mm2-frailejon-flor: #e8c95a;
+  --mm2-tronco: #8a6e4b;
+  --mm2-arbolito: #5d7a45;
+  --mm2-casa-muro: #f3e6cf;
+  --mm2-casa-techo: #b3563d;
+  --mm2-casa-teja: rgba(120, 50, 32, 0.55);
+  --mm2-ventana: #ffd166;
+  --mm2-ventana-glow: rgba(255, 209, 102, 0.75);
+  --mm2-puerta: #7a5236;
+  --mm2-camino: rgba(230, 205, 160, 0.8);
+  --mm2-geranio: #d64545;
+  --mm2-cafe-hoja: #3f6b3a;
+  --mm2-cafe-fruto: #d64545;
+  --mm2-cerca-madera: #8a6e4b;
+  --mm2-oveja: #f5efe2;
+  --mm2-vaca: #e3d3ba;
+  --mm2-surco: rgba(90, 116, 62, 0.55);
+  --mm2-mata-papa: #4d7a43;
+  --mm2-troje-cuerpo: #caa36a;
+  --mm2-troje-techo: #8a5c3c;
+  --mm2-grano: #e9c96a;
+  --mm2-toldo-a: #d9603b;
+  --mm2-toldo-b: #f4e9d2;
+  --mm2-fruta-a: #e5a33c;
+  --mm2-fruta-b: #c94f4f;
+  --mm2-mango-copa: #4c8043;
+  --mm2-mango-sombra: #3a6634;
+  --mm2-mango-fruto: #f2a541;
+  --mm2-platano-hoja: #5f9c4a;
+  --mm2-platano-nervio: rgba(36, 74, 30, 0.5);
+  --mm2-platano-tallo: #8aa14f;
+  --mm2-bellota: #8a4a6a;
+  --mm2-cana: #a9bd68;
+  --mm2-piedra: #b7ab8d;
+  --mm2-halo-mundo: rgba(255, 205, 110, 0.9);
+  --mm2-etiqueta-bg: rgba(255, 248, 232, 0.94);
+  --mm2-etiqueta-ink: #4a3a20;
+  --mm2-etiqueta-borde: rgba(122, 82, 54, 0.28);
+  --mm2-velo: rgba(59, 44, 22, 0.45);
+  --mm2-ui-tinta: #fff6e6;
+  --mm2-ui-acento: #b3563d;
+  --mm2-ui-acento-tinta: #fff6ea;
+  --mm2-scrim: rgba(30, 18, 6, 0.38);
+  --mm2-grades-fuerza: 1;
+
+  position: relative;
+  height: 100dvh;
+  overflow: hidden;
+  background: var(--mm2-cielo-m);
+  color: var(--mm2-ui-tinta);
+  font-family: 'Nunito', system-ui, -apple-system, 'Segoe UI', sans-serif;
+}
+
+/* ── Dirección 2: BIOPUNK — noche de neón orgánico (como el home en prod) ── */
+.mm2[data-dir='biopunk'] {
+  --mm2-cielo-a: #091226;
+  --mm2-cielo-m: #0e1c36;
+  --mm2-cielo-b: #16263f;
+  --mm2-astro: #dff6ff;
+  --mm2-halo-a: rgba(34, 211, 238, 0.42);
+  --mm2-halo-b: rgba(34, 211, 238, 0);
+  --mm2-rayo: rgba(125, 235, 255, 0.26);
+  --mm2-lejos-a: #17283f;
+  --mm2-lejos-b: #142338;
+  --mm2-medio-a: #101d33;
+  --mm2-medio-b: #0d192e;
+  --mm2-bruma: rgba(34, 211, 238, 0.1);
+  --mm2-niebla-nucleo: rgba(140, 220, 240, 0.18);
+  --mm2-cerca: #071120;
+  --mm2-vineta: rgba(0, 4, 12, 0.52);
+  --mm2-nieve: #cfe6f2;
+  --mm2-nieve-sombra: rgba(20, 50, 90, 0.45);
+  --mm2-paramo: #143349;
+  --mm2-frio: #123f3e;
+  --mm2-templado: #175035;
+  --mm2-calido: #1d5c33;
+  --mm2-valle: #24683a;
+  --mm2-rio-a: #1b4a66;
+  --mm2-rio-b: #0f2f4a;
+  --mm2-rio-orilla: rgba(34, 211, 238, 0.3);
+  --mm2-flujo: rgba(103, 232, 249, 0.85);
+  --mm2-laguna: #1d5a70;
+  --mm2-borde-piso: rgba(34, 211, 238, 0.5);
+  --mm2-contorno: rgba(103, 232, 249, 0.1);
+  --mm2-luz-ladera: rgba(103, 232, 249, 0.08);
+  --mm2-sombra-ladera: rgba(0, 4, 14, 0.35);
+  --mm2-frailejon-hoja: #3f7a63;
+  --mm2-frailejon-seca: #27503f;
+  --mm2-frailejon-flor: #a3e635;
+  --mm2-tronco: #2a4a44;
+  --mm2-arbolito: #1c4a3c;
+  --mm2-casa-muro: #1b2c44;
+  --mm2-casa-techo: #24405e;
+  --mm2-casa-teja: rgba(103, 232, 249, 0.22);
+  --mm2-ventana: #f0abfc;
+  --mm2-ventana-glow: rgba(240, 171, 252, 0.8);
+  --mm2-puerta: #101d31;
+  --mm2-camino: rgba(34, 211, 238, 0.35);
+  --mm2-geranio: #f0abfc;
+  --mm2-cafe-hoja: #1f5c40;
+  --mm2-cafe-fruto: #fb7185;
+  --mm2-cerca-madera: #2c4258;
+  --mm2-oveja: #b8c7d9;
+  --mm2-vaca: #9fb4c9;
+  --mm2-surco: rgba(47, 191, 143, 0.4);
+  --mm2-mata-papa: #2fbf8f;
+  --mm2-troje-cuerpo: #22354e;
+  --mm2-troje-techo: #2c4a66;
+  --mm2-grano: #fbbf24;
+  --mm2-toldo-a: #22d3ee;
+  --mm2-toldo-b: #16263f;
+  --mm2-fruta-a: #a3e635;
+  --mm2-fruta-b: #f0abfc;
+  --mm2-mango-copa: #1f6b45;
+  --mm2-mango-sombra: #144832;
+  --mm2-mango-fruto: #fbbf24;
+  --mm2-platano-hoja: #2f8a5a;
+  --mm2-platano-nervio: rgba(103, 232, 249, 0.35);
+  --mm2-platano-tallo: #24684a;
+  --mm2-bellota: #c084fc;
+  --mm2-cana: #2f7a52;
+  --mm2-piedra: #23405c;
+  --mm2-halo-mundo: rgba(34, 211, 238, 0.85);
+  --mm2-etiqueta-bg: rgba(8, 18, 34, 0.88);
+  --mm2-etiqueta-ink: #d9fbf3;
+  --mm2-etiqueta-borde: rgba(34, 211, 238, 0.45);
+  --mm2-velo: rgba(4, 10, 22, 0.6);
+  --mm2-ui-tinta: #ecfeff;
+  --mm2-ui-acento: #22d3ee;
+  --mm2-ui-acento-tinta: #06202a;
+  --mm2-scrim: rgba(2, 8, 18, 0.55);
+  --mm2-grades-fuerza: 0.45;
+}
+
+/* ── Dirección 3: VERDE VIVO — mañana botánica luminosa ── */
+.mm2[data-dir='verde'] {
+  --mm2-cielo-a: #9cdbee;
+  --mm2-cielo-m: #c9edda;
+  --mm2-cielo-b: #eef7d6;
+  --mm2-astro: #fff4a3;
+  --mm2-halo-a: rgba(255, 238, 150, 0.65);
+  --mm2-halo-b: rgba(255, 238, 150, 0);
+  --mm2-rayo: rgba(255, 255, 235, 0.42);
+  --mm2-lejos-a: #b9dfc9;
+  --mm2-lejos-b: #abd6bd;
+  --mm2-medio-a: #92c8a8;
+  --mm2-medio-b: #83bd9a;
+  --mm2-bruma: rgba(255, 255, 255, 0.46);
+  --mm2-niebla-nucleo: rgba(255, 255, 255, 0.66);
+  --mm2-cerca: #2c6b3a;
+  --mm2-vineta: rgba(20, 60, 30, 0.22);
+  --mm2-nieve: #ffffff;
+  --mm2-nieve-sombra: rgba(120, 160, 200, 0.28);
+  --mm2-paramo: #b5cf7d;
+  --mm2-frio: #8abf68;
+  --mm2-templado: #5aab5c;
+  --mm2-calido: #a8d162;
+  --mm2-valle: #d3e89e;
+  --mm2-rio-a: #8fd8d2;
+  --mm2-rio-b: #5fbdb7;
+  --mm2-rio-orilla: rgba(60, 120, 80, 0.5);
+  --mm2-flujo: rgba(255, 255, 255, 0.9);
+  --mm2-laguna: #9fe0da;
+  --mm2-borde-piso: rgba(255, 255, 255, 0.55);
+  --mm2-contorno: rgba(30, 70, 36, 0.12);
+  --mm2-luz-ladera: rgba(255, 255, 255, 0.2);
+  --mm2-sombra-ladera: rgba(24, 60, 40, 0.14);
+  --mm2-frailejon-hoja: #c4d97a;
+  --mm2-frailejon-seca: #a89858;
+  --mm2-frailejon-flor: #ffd95e;
+  --mm2-tronco: #9b7b52;
+  --mm2-arbolito: #4f9a54;
+  --mm2-casa-muro: #fffdf2;
+  --mm2-casa-techo: #e0784a;
+  --mm2-casa-teja: rgba(150, 70, 40, 0.4);
+  --mm2-ventana: #ffdf70;
+  --mm2-ventana-glow: rgba(255, 223, 112, 0.7);
+  --mm2-puerta: #8a5c3c;
+  --mm2-camino: rgba(232, 220, 174, 0.9);
+  --mm2-geranio: #e64f4f;
+  --mm2-cafe-hoja: #3e8a4a;
+  --mm2-cafe-fruto: #e64f4f;
+  --mm2-cerca-madera: #9b7b52;
+  --mm2-oveja: #ffffff;
+  --mm2-vaca: #f2e8d8;
+  --mm2-surco: rgba(94, 138, 66, 0.5);
+  --mm2-mata-papa: #4c9a4f;
+  --mm2-troje-cuerpo: #e6c185;
+  --mm2-troje-techo: #a06a44;
+  --mm2-grano: #ffd95e;
+  --mm2-toldo-a: #57b26a;
+  --mm2-toldo-b: #fffdf2;
+  --mm2-fruta-a: #f2a541;
+  --mm2-fruta-b: #e64f4f;
+  --mm2-mango-copa: #57a84e;
+  --mm2-mango-sombra: #418840;
+  --mm2-mango-fruto: #ffb547;
+  --mm2-platano-hoja: #66bb55;
+  --mm2-platano-nervio: rgba(30, 84, 30, 0.4);
+  --mm2-platano-tallo: #94b757;
+  --mm2-bellota: #a05a80;
+  --mm2-cana: #b7d377;
+  --mm2-piedra: #c9c2a4;
+  --mm2-halo-mundo: rgba(120, 200, 90, 0.9);
+  --mm2-etiqueta-bg: rgba(255, 255, 255, 0.94);
+  --mm2-etiqueta-ink: #24532b;
+  --mm2-etiqueta-borde: rgba(60, 130, 70, 0.3);
+  --mm2-velo: rgba(235, 248, 220, 0.55);
+  --mm2-ui-tinta: #f4fbef;
+  --mm2-ui-acento: #3e8a4a;
+  --mm2-ui-acento-tinta: #f4fbef;
+  --mm2-scrim: rgba(16, 44, 24, 0.34);
+  --mm2-grades-fuerza: 0.75;
+}
+
+/* ═══════════ La cámara: viewport full-bleed + capas parallax ═══════════ */
+
+.mm2-viewport {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  touch-action: none;
+  background: linear-gradient(180deg, var(--mm2-cielo-a), var(--mm2-cielo-m) 55%, var(--mm2-cielo-b));
+  transition: background 0.6s ease;
+}
+
+/* Cada capa viaja a su velocidad (transform inline desde React) y con su
+ * propia INERCIA: las lejanas se asientan más lento — la cámara se siente
+ * física, no un scroll. Solo transform: composición GPU pura.
+ * Pasada 3: las capas CERCANAS asientan con un leve sobrepaso (la inercia
+ * de una cámara con peso); las lejanas llegan suaves, sin rebote. */
+.mm2-capa {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  transform-origin: 0 0;
+  will-change: transform;
+  transition: transform 0.95s cubic-bezier(0.3, 0.86, 0.24, 1.02), opacity 0.7s ease;
+  pointer-events: none;
+}
+
+.mm2-capa-cielo { transition-duration: 1.24s, 0.7s; transition-timing-function: cubic-bezier(0.26, 0.7, 0.32, 1), ease; }
+.mm2-capa-lejos { transition-duration: 1.12s, 0.7s; transition-timing-function: cubic-bezier(0.26, 0.72, 0.3, 1), ease; }
+.mm2-capa-medio { transition-duration: 1.02s, 0.7s; }
+.mm2-capa-principal { pointer-events: auto; }
+.mm2-capa-niebla { transition-duration: 0.88s, 0.7s; transition-timing-function: cubic-bezier(0.32, 1.08, 0.3, 1), ease; }
+.mm2-capa-cerca { transition-duration: 0.8s, 0.7s; transition-timing-function: cubic-bezier(0.34, 1.14, 0.3, 1), ease; }
+
+/* Zoom-out a la montaña completa: gran plano general MAJESTUOSO — todas
+ * las capas viajan más lento y escalonadas (el cielo tarda casi 2s en
+ * asentar), sin sobrepaso: la cámara se aleja con solemnidad. */
+.mm2[data-modo='montana'] .mm2-capa { transition-duration: 1.5s, 0.9s; transition-timing-function: cubic-bezier(0.3, 0.6, 0.22, 1), ease; }
+.mm2[data-modo='montana'] .mm2-capa-cielo { transition-duration: 1.9s, 0.9s; }
+.mm2[data-modo='montana'] .mm2-capa-lejos { transition-duration: 1.76s, 0.9s; }
+.mm2[data-modo='montana'] .mm2-capa-medio { transition-duration: 1.62s, 0.9s; }
+.mm2[data-modo='montana'] .mm2-capa-niebla { transition-duration: 1.4s, 0.9s; }
+.mm2[data-modo='montana'] .mm2-capa-cerca { transition-duration: 1.3s, 0.9s; }
+
+/* Al alejar la cámara (montaña completa) el primer plano sale de cuadro. */
+.mm2[data-modo='montana'] .mm2-capa-cerca { opacity: 0; }
+
+/* ── PROFUNDIDAD DE CAMPO (pasada 3) ──
+ * En el plano cercano la cámara enfoca la montaña principal: el cielo y
+ * las cordilleras quedan atrás del foco y el primer plano botánico delante
+ * (bokeh de lente). El blur es ESTÁTICO por modo — nunca se anima: el
+ * cambio se esconde bajo el movimiento del viaje de cámara, así no cuesta
+ * ni un frame en un Android de gama baja. En la montaña completa (gran
+ * plano general) el filtro desaparece: foco profundo de paisaje. */
+.mm2[data-modo='finca'] .mm2-capa-cielo { filter: blur(1.4px); }
+.mm2[data-modo='finca'] .mm2-capa-lejos { filter: blur(2.6px) saturate(0.93); }
+.mm2[data-modo='finca'] .mm2-capa-medio { filter: blur(1.3px); }
+.mm2[data-modo='finca'] .mm2-capa-cerca { filter: blur(2px); }
+
+/* ── LA CÁMARA VIAJA (data-viaje): la niebla se ABRE para dejar pasar el
+ * plano y las etiquetas se retiran — vuelven cuando el encuadre asienta.
+ * Solo opacity: el crossfade corre en el compositor. */
+.mm2[data-viaje] .mm2-capa-niebla { opacity: 0.3; }
+.mm2[data-viaje] .mm2-mundo-etiqueta,
+.mm2[data-viaje] .mm2-finca-pin { opacity: 0; }
+
+.mm2-svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+  overflow: visible; /* el primer plano dibuja más abajo del viewBox */
+}
+
+/* ── LUZ ATMOSFÉRICA POR PISO: el grade cinematográfico ──
+ * Seis planos de color fijos al viewport; solo el del piso activo enciende
+ * (crossfade de opacity — GPU). La temperatura de la luz cuenta la altura:
+ * azul glacial → páramo cian → frío neutro → HORA DORADA en la finca →
+ * ámbar del cálido → turquesa del río. */
+.mm2-grades {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 7;
+}
+
+.mm2-grade {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  transition: opacity 1.1s ease;
+}
+
+.mm2-grade-nevado { background: linear-gradient(180deg, rgba(150, 190, 255, 0.24), rgba(150, 190, 255, 0) 45%, rgba(20, 40, 90, 0.12)); }
+.mm2-grade-paramo { background: linear-gradient(180deg, rgba(160, 218, 228, 0.18), rgba(160, 218, 228, 0) 48%, rgba(30, 70, 80, 0.1)); }
+.mm2-grade-frio { background: linear-gradient(180deg, rgba(190, 228, 200, 0.13), rgba(190, 228, 200, 0) 50%, rgba(36, 66, 46, 0.08)); }
+.mm2-grade-templado { background: linear-gradient(0deg, rgba(255, 170, 80, 0.18), rgba(255, 170, 80, 0) 55%, rgba(255, 220, 160, 0.1)); }
+.mm2-grade-calido { background: linear-gradient(0deg, rgba(255, 150, 60, 0.22), rgba(255, 150, 60, 0) 58%, rgba(255, 200, 120, 0.09)); }
+.mm2-grade-rio { background: linear-gradient(0deg, rgba(60, 190, 180, 0.2), rgba(60, 190, 180, 0) 55%, rgba(200, 240, 240, 0.07)); }
+
+.mm2[data-modo='finca'] .mm2-grade.es-activo { opacity: var(--mm2-grades-fuerza); }
+
+/* Viñeta de cine: enfoca el centro, hunde las esquinas. Estática. */
+.mm2-vineta {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 8;
+  background: radial-gradient(ellipse 130% 105% at 50% 42%, rgba(0, 0, 0, 0) 55%, var(--mm2-vineta) 100%);
+  transition: background 0.6s ease;
+}
+
+/* Scrims: la UI flota sobre el paisaje sin cajas — arriba y abajo un
+ * degradado de cine para que el texto siempre lea. */
+.mm2-scrim-arriba,
+.mm2-scrim-abajo {
+  position: absolute;
+  left: 0;
+  right: 0;
+  pointer-events: none;
+  z-index: 9;
+  transition: background 0.6s ease;
+}
+
+.mm2-scrim-arriba {
+  top: 0;
+  height: 172px;
+  background: linear-gradient(180deg, var(--mm2-scrim), rgba(0, 0, 0, 0));
+}
+
+.mm2-scrim-abajo {
+  bottom: 0;
+  height: 148px;
+  background: linear-gradient(0deg, var(--mm2-scrim), rgba(0, 0, 0, 0));
+}
+
+/* ═══════════ UI flotante (full-bleed: nada en cajas) ═══════════ */
+
+.mm2-cabecera {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 20;
+  padding: 10px 12px 0;
+  pointer-events: none;
+}
+
+.mm2-cabecera > * { pointer-events: auto; }
+
+.mm2-mockbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+}
+
+.mm2-volver {
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  background: rgba(0, 0, 0, 0.28);
+  color: var(--mm2-ui-tinta);
+  font: 700 13px 'Nunito', sans-serif;
+  border-radius: 999px;
+  padding: 6px 13px;
+  cursor: pointer;
+}
+
+.mm2-mockbar-titulo {
+  font: 700 9.5px 'Nunito', sans-serif;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.85);
+  background: rgba(0, 0, 0, 0.28);
+  border-radius: 999px;
+  padding: 5px 10px;
+}
+
+.mm2-titulo {
+  margin: 8px 0 6px;
+  font: 700 20px/1.1 'Baloo 2', 'Nunito', sans-serif;
+  color: var(--mm2-ui-tinta);
+  text-shadow: 0 1px 10px rgba(0, 0, 0, 0.45);
+}
+
+.mm2-direcciones {
+  display: flex;
+  gap: 6px;
+}
+
+.mm2-dir-btn {
+  flex: 1;
+  min-height: 42px;
+  border: 1.5px solid rgba(255, 255, 255, 0.32);
+  border-radius: 14px;
+  background: rgba(0, 0, 0, 0.26);
+  color: var(--mm2-ui-tinta);
+  font: 700 13px 'Nunito', sans-serif;
+  cursor: pointer;
+  transition: background 0.25s ease, color 0.25s ease, border-color 0.25s ease;
+}
+
+.mm2-dir-btn.es-activa {
+  background: var(--mm2-ui-acento);
+  border-color: var(--mm2-ui-acento);
+  color: var(--mm2-ui-acento-tinta);
+}
+
+.mm2-dir-num {
+  display: inline-grid;
+  place-items: center;
+  width: 17px;
+  height: 17px;
+  border-radius: 50%;
+  border: 1.5px solid currentColor;
+  font-size: 10.5px;
+  margin-right: 2px;
+  vertical-align: -3px;
+}
+
+.mm2-dir-lema {
+  margin: 6px 2px 0;
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.92);
+  text-shadow: 0 1px 8px rgba(0, 0, 0, 0.5);
+}
+
+.mm2-dir-lema strong { color: #ffffff; }
+
+/* ── Brújula del piso + pasos + zoom: vidrio flotante sobre el paisaje ── */
+.mm2-brujula {
+  position: absolute;
+  top: 148px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 12;
+  pointer-events: none;
+  transition: opacity 0.5s ease;
+}
+
+/* En la montaña completa los rótulos de piso ya nombran todo — la brújula
+ * se retira para despejar el plano. */
+.mm2[data-modo='montana'] .mm2-brujula { opacity: 0; }
+
+.mm2-brujula-piso {
+  font: 800 12.5px 'Nunito', sans-serif;
+  color: var(--mm2-etiqueta-ink);
+  background: var(--mm2-etiqueta-bg);
+  border: 1px solid var(--mm2-etiqueta-borde);
+  border-radius: 999px;
+  padding: 6px 14px;
+  box-shadow: 0 3px 14px rgba(0, 0, 0, 0.22);
+  white-space: nowrap;
+}
+
+.mm2-paso {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 12;
+  min-height: 40px;
+  border: 1px solid var(--mm2-etiqueta-borde);
+  border-radius: 999px;
+  background: var(--mm2-etiqueta-bg);
+  color: var(--mm2-etiqueta-ink);
+  font: 800 12.5px 'Nunito', sans-serif;
+  padding: 8px 16px;
+  cursor: pointer;
+  box-shadow: 0 3px 12px rgba(0, 0, 0, 0.2);
+}
+
+.mm2-paso-arriba { top: 188px; }
+.mm2-paso-abajo { bottom: 136px; }
+
+.mm2-zoom {
+  position: absolute;
+  bottom: 84px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 21;
+  min-height: 46px;
+  border: none;
+  border-radius: 999px;
+  background: var(--mm2-ui-acento);
+  color: var(--mm2-ui-acento-tinta);
+  font: 800 14.5px 'Nunito', sans-serif;
+  padding: 10px 20px;
+  cursor: pointer;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.3);
+  white-space: nowrap;
+}
+
+/* ── Atajos permanentes flotantes: nada queda detrás de la montaña ── */
+.mm2-atajos {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 22;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 0 12px calc(12px + env(safe-area-inset-bottom, 0px));
+}
+
+.mm2-atajo-anotar {
+  flex: 1;
+  min-height: 52px;
+  border: 1.5px solid rgba(255, 255, 255, 0.35);
+  border-radius: 16px;
+  background: rgba(0, 0, 0, 0.3);
+  color: #ffffff;
+  font: 800 15px 'Nunito', sans-serif;
+  cursor: pointer;
+}
+
+.mm2-atajo-agente {
+  flex: 0 0 auto;
+  width: 58px;
+  height: 58px;
+  border: none;
+  border-radius: 50%;
+  background: var(--mm2-ui-acento);
+  color: var(--mm2-ui-acento-tinta);
+  font: 800 27px/1 'Baloo 2', 'Nunito', sans-serif;
+  cursor: pointer;
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--mm2-ui-acento) 28%, transparent), 0 6px 18px rgba(0, 0, 0, 0.3);
+}
+
+/* ── Aviso honesto del mockup ── */
+.mm2-aviso {
+  position: fixed;
+  left: 50%;
+  bottom: 92px;
+  transform: translateX(-50%);
+  z-index: 60;
+  max-width: min(86vw, 420px);
+  font: 700 13.5px 'Nunito', sans-serif;
+  color: #fffdf4;
+  background: rgba(20, 28, 24, 0.92);
+  border-radius: 14px;
+  padding: 10px 16px;
+  text-align: center;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+}
+
+.mm2 button:focus-visible {
+  outline: 2.5px solid var(--mm2-ui-acento);
+  outline-offset: 2px;
+}
+
+/* ═══════════ Sobre la capa principal: velos, mundos, franjas ═══════════ */
+
+.mm2-velo {
+  position: absolute;
+  left: 0;
+  right: 0;
+  background: var(--mm2-velo);
+  opacity: 1;
+  transition: opacity 0.9s ease, background 0.5s ease;
+  pointer-events: none;
+  z-index: 3;
+}
+
+.mm2-velo-arriba { top: 0; }
+.mm2-velo-abajo { bottom: 0; }
+.mm2[data-modo='montana'] .mm2-velo { opacity: 0; }
+
+.mm2-finca-pin {
+  position: absolute;
+  transform: translate(-50%, -100%);
+  z-index: 4;
+  font: 800 10.5px 'Nunito', sans-serif;
+  color: var(--mm2-etiqueta-ink);
+  background: var(--mm2-etiqueta-bg);
+  border: 1px solid var(--mm2-etiqueta-borde);
+  border-radius: 999px;
+  padding: 3px 7px;
+  white-space: nowrap;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.18);
+  transition: opacity 0.45s ease;
+}
+
+/* En la llegada el pin ATERRIZA: cae con rebote corto después de que la
+ * cámara asienta (la animación manda sobre la transición de data-viaje). */
+.mm2[data-llegada] .mm2-finca-pin {
+  animation: mm2-pin-llega 1.1s cubic-bezier(0.32, 1.4, 0.36, 1) 0.7s both;
+}
+
+/* ── MOMENTO DE LLEGADA A LA FINCA (el "wow" de la pasada 3) ──
+ * Anclado a la casa dentro de la capa principal (viaja y escala con la
+ * montaña). Todo one-shot con forwards: bloom de hora dorada que florece
+ * y se apaga, dos anillos que se expanden, chispas que suben como pavesas
+ * del fogón. Base opacity 0: con reduced-motion (animation: none) nada de
+ * esto aparece — el plano queda digno y quieto. */
+.mm2-llegada {
+  position: absolute;
+  width: 0;
+  height: 0;
+  z-index: 4;
+  pointer-events: none;
+}
+
+.mm2-llegada-bloom {
+  position: absolute;
+  left: -92px;
+  top: -92px;
+  width: 184px;
+  height: 184px;
+  border-radius: 50%;
+  background: radial-gradient(circle, var(--mm2-halo-a), var(--mm2-halo-b) 70%);
+  mix-blend-mode: screen;
+  opacity: 0;
+  animation: mm2-bloom 3s ease-in-out 0.45s forwards;
+}
+
+.mm2-llegada-anillo {
+  position: absolute;
+  left: -30px;
+  top: -30px;
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  border: 2px solid var(--mm2-halo-mundo);
+  opacity: 0;
+  animation: mm2-anillo 1.7s cubic-bezier(0.2, 0.7, 0.3, 1) 0.55s forwards;
+}
+
+.mm2-anillo-2 { animation-delay: 0.95s; }
+
+.mm2-chispa {
+  position: absolute;
+  left: -2px;
+  top: -2px;
+  width: 4.5px;
+  height: 4.5px;
+  border-radius: 50%;
+  background: var(--mm2-halo-mundo);
+  box-shadow: 0 0 6px var(--mm2-halo-mundo);
+  opacity: 0;
+  animation: mm2-chispa 2.1s ease-out var(--mm2-cd, 0.6s) forwards;
+}
+
+/* La ventana de la casa late dos veces al llegar: hay alguien esperando. */
+.mm2[data-llegada] .mm2-casa-ventana { animation: mm2-ventana-late 1.3s ease-in-out 0.75s 2; }
+
+.mm2-mundo {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  width: 38px;
+  height: 38px;
+  padding: 0;
+  border: none;
+  background: transparent;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  z-index: 5;
+  transition: opacity 0.6s ease;
+}
+
+.mm2-mundo-halo {
+  width: 23px;
+  height: 23px;
+  border-radius: 50%;
+  border: 2px solid var(--mm2-halo-mundo);
+  box-shadow: 0 0 10px var(--mm2-halo-mundo), inset 0 0 6px var(--mm2-halo-mundo);
+  animation: mm2-pulso 2.6s ease-in-out infinite;
+}
+
+.mm2-mundo-etiqueta {
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  margin-top: 1px;
+  font: 800 10px 'Nunito', sans-serif;
+  color: var(--mm2-etiqueta-ink);
+  background: var(--mm2-etiqueta-bg);
+  border: 1px solid var(--mm2-etiqueta-borde);
+  border-radius: 999px;
+  padding: 2.5px 6px;
+  white-space: nowrap;
+  transition: opacity 0.45s ease;
+}
+
+.mm2-mundo.es-tenue { opacity: 0.24; pointer-events: none; }
+.mm2[data-modo='montana'] .mm2-mundo { opacity: 0; pointer-events: none; }
+
+.mm2-franja {
+  position: absolute;
+  left: 0;
+  width: 100%;
+  border: none;
+  background: transparent;
+  opacity: 0;
+  pointer-events: none;
+  cursor: pointer;
+  z-index: 6;
+  transition: opacity 0.5s ease;
+}
+
+.mm2[data-modo='montana'] .mm2-franja { opacity: 1; pointer-events: auto; }
+
+.mm2-franja-rotulo {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  font: 800 26px 'Baloo 2', 'Nunito', sans-serif;
+  color: var(--mm2-etiqueta-ink);
+  background: var(--mm2-etiqueta-bg);
+  border: 2px solid var(--mm2-etiqueta-borde);
+  border-radius: 999px;
+  padding: 6px 18px;
+  white-space: nowrap;
+  box-shadow: 0 3px 12px rgba(0, 0, 0, 0.2);
+}
+
+.mm2-franja:focus-visible .mm2-franja-rotulo,
+.mm2-franja:active .mm2-franja-rotulo { border-color: var(--mm2-ui-acento); }
+
+/* ═══════════ Pintura de la escena por dirección ═══════════ */
+
+.mm2-stop-cielo-a { stop-color: var(--mm2-cielo-a); }
+.mm2-stop-cielo-m { stop-color: var(--mm2-cielo-m); }
+.mm2-stop-cielo-b { stop-color: var(--mm2-cielo-b); }
+.mm2-stop-halo-a { stop-color: var(--mm2-halo-a); }
+.mm2-stop-halo-b { stop-color: var(--mm2-halo-b); }
+.mm2-stop-rayo-a { stop-color: var(--mm2-rayo); }
+.mm2-stop-rayo-b { stop-color: rgba(255, 255, 255, 0); }
+.mm2-stop-rio-a { stop-color: var(--mm2-rio-a); }
+.mm2-stop-rio-b { stop-color: var(--mm2-rio-b); }
+.mm2-stop-niebla-a { stop-color: var(--mm2-niebla-nucleo); }
+.mm2-stop-niebla-b { stop-color: rgba(255, 255, 255, 0); }
+.mm2[data-dir='biopunk'] .mm2-stop-niebla-b { stop-color: rgba(140, 220, 240, 0); }
+.mm2-stop-reflejo-a { stop-color: rgba(255, 255, 255, 0.16); }
+.mm2-stop-reflejo-b { stop-color: rgba(255, 255, 255, 0); }
+
+/* Capa cielo */
+.mm2-estrellas { display: none; }
+.mm2[data-dir='biopunk'] .mm2-estrellas { display: block; }
+.mm2-estrella { fill: #cdeffb; animation: mm2-titila 3.2s ease-in-out infinite alternate; }
+.mm2-estrella:nth-of-type(2n) { animation-delay: 1.1s; }
+.mm2-estrella:nth-of-type(3n) { animation-delay: 2s; }
+
+.mm2-astro-disco { fill: var(--mm2-astro); }
+.mm2-astro-crater { fill: rgba(140, 175, 195, 0.5); display: none; }
+.mm2[data-dir='biopunk'] .mm2-astro-crater { display: block; }
+
+/* God-rays: abanico de luz desde el astro. Solo la OPACIDAD respira (GPU);
+ * el degradado del rayo es estático. */
+.mm2-rayo {
+  mix-blend-mode: screen;
+  animation: mm2-rayo-respira 9s ease-in-out infinite alternate;
+}
+.mm2-rayo-2 { animation-delay: 2.4s; animation-duration: 11s; }
+.mm2-rayo-3 { animation-delay: 4.8s; animation-duration: 13s; }
+
+.mm2-nube { fill: rgba(255, 255, 255, 0.8); }
+.mm2-nube-alta { fill: rgba(255, 255, 255, 0.55); }
+.mm2-nube-1 { animation: mm2-deriva 26s ease-in-out infinite alternate; }
+.mm2-nube-2 { animation: mm2-deriva 34s ease-in-out infinite alternate-reverse; }
+.mm2-nube-3 { animation: mm2-deriva 22s ease-in-out infinite alternate; }
+.mm2[data-dir='biopunk'] .mm2-nubes { display: none; }
+
+/* Capas de cordillera: perspectiva atmosférica (lejos = color del cielo) */
+.mm2-lejos-a { fill: var(--mm2-lejos-a); }
+.mm2-lejos-b { fill: var(--mm2-lejos-b); }
+.mm2-medio-a { fill: var(--mm2-medio-a); }
+.mm2-medio-b { fill: var(--mm2-medio-b); }
+.mm2-bruma-banda { fill: var(--mm2-bruma); }
+
+.mm2-aves { display: none; }
+.mm2[data-dir='naturalista'] .mm2-aves {
+  display: block;
+  fill: none;
+  stroke: #6b5334;
+  stroke-width: 1.6;
+  stroke-linecap: round;
+}
+.mm2-ave-1 { animation: mm2-deriva 30s ease-in-out infinite alternate; }
+
+/* Bandada en V (pasada 3): cruza el cielo de lado a lado, desaparece por
+ * el borde y descansa fuera de cuadro antes de volver a pasar. */
+.mm2-bandada { display: none; }
+.mm2[data-dir='naturalista'] .mm2-bandada,
+.mm2[data-dir='verde'] .mm2-bandada {
+  display: block;
+  fill: none;
+  stroke: #5c4a30;
+  stroke-width: 1.7;
+  stroke-linecap: round;
+}
+.mm2[data-dir='verde'] .mm2-bandada { stroke: #3f7a4a; }
+.mm2-bandada-vuelo { animation: mm2-cruza 46s linear infinite; }
+
+/* Capa principal: cuerpo de la montaña */
+.mm2-piso-paramo { fill: var(--mm2-paramo); }
+.mm2-piso-frio { fill: var(--mm2-frio); }
+.mm2-piso-templado { fill: var(--mm2-templado); }
+.mm2-piso-calido { fill: var(--mm2-calido); }
+.mm2-piso-valle { fill: var(--mm2-valle); }
+.mm2-nieve { fill: var(--mm2-nieve); }
+.mm2-nieve-sombra { fill: var(--mm2-nieve-sombra); }
+.mm2-grieta { fill: none; stroke: var(--mm2-nieve-sombra); stroke-width: 1.6; stroke-linecap: round; }
+
+.mm2-borde-piso {
+  fill: none;
+  stroke: var(--mm2-borde-piso);
+  stroke-width: 2;
+  stroke-linecap: round;
+}
+
+.mm2[data-dir='biopunk'] .mm2-borde-piso {
+  stroke-width: 2.4;
+  opacity: 0.85;
+  filter: drop-shadow(0 0 4px rgba(34, 211, 238, 0.8));
+}
+
+/* Curvas de nivel: escala de montaña real, casi invisibles */
+.mm2-contorno { fill: none; stroke: var(--mm2-contorno); stroke-width: 1.4; stroke-linecap: round; }
+
+.mm2-piedra { fill: var(--mm2-piedra); }
+
+/* Textura de roca (pasada 3): afloramientos con vetas y pedrisco */
+.mm2-roca { fill: var(--mm2-piedra); opacity: 0.85; }
+.mm2-roca-veta { fill: none; stroke: rgba(22, 22, 34, 0.24); stroke-width: 1.2; stroke-linecap: round; }
+.mm2-pedrisco circle { fill: var(--mm2-piedra); opacity: 0.7; }
+
+/* Destellos de hielo sobre la nieve: titilan desfasados */
+.mm2-destello { fill: #ffffff; opacity: 0.25; animation: mm2-titila 2.8s ease-in-out infinite alternate; }
+.mm2-destello:nth-of-type(2n) { animation-delay: 0.9s; }
+.mm2-destello:nth-of-type(3n) { animation-delay: 1.8s; }
+
+/* Páramo */
+.mm2-frailejon-tronco { fill: var(--mm2-tronco); }
+.mm2-frailejon-faldon { fill: none; stroke: var(--mm2-frailejon-seca); stroke-width: 2; stroke-linecap: round; }
+.mm2-frailejon-hoja { fill: var(--mm2-frailejon-hoja); }
+.mm2-hoja-int { fill: color-mix(in srgb, var(--mm2-frailejon-hoja) 80%, #ffffff); }
+.mm2-frailejon-tallo { fill: none; stroke: var(--mm2-frailejon-seca); stroke-width: 1.6; stroke-linecap: round; }
+.mm2-frailejon-flor { fill: var(--mm2-frailejon-flor); }
+/* Cicatrices foliares: los anillos de hojas viejas del tronco (textura) */
+.mm2-frailejon-cicatriz { fill: none; stroke: rgba(64, 48, 26, 0.35); stroke-width: 1; stroke-linecap: round; }
+.mm2[data-dir='biopunk'] .mm2-frailejon-cicatriz { stroke: rgba(103, 232, 249, 0.22); }
+.mm2-frailejon-roseta {
+  transform-box: fill-box;
+  transform-origin: 50% 92%;
+  animation: mm2-respira 4.6s ease-in-out infinite alternate;
+}
+
+.mm2-pajonal path {
+  fill: none;
+  stroke: var(--mm2-frailejon-hoja);
+  stroke-width: 2;
+  stroke-linecap: round;
+  opacity: 0.75;
+}
+
+.mm2-laguna { fill: var(--mm2-laguna); }
+.mm2-laguna-brillo { fill: none; stroke: var(--mm2-flujo); stroke-width: 1.6; stroke-linecap: round; opacity: 0.7; }
+
+/* Bosque achaparrado / altoandino */
+.mm2-arbolito { fill: var(--mm2-arbolito); }
+.mm2-arbolito-tronco { fill: var(--mm2-tronco); }
+
+/* Frío */
+.mm2-surcos path { fill: none; stroke: var(--mm2-surco); stroke-width: 5; stroke-linecap: round; }
+.mm2-matas-papa circle { fill: var(--mm2-mata-papa); }
+.mm2-cerca-poste, .mm2-cerca-riel { fill: var(--mm2-cerca-madera); }
+.mm2-oveja { fill: var(--mm2-oveja); }
+.mm2-vaca { fill: var(--mm2-vaca); }
+
+/* Los animales pastan: se inclinan apenas hacia el suelo y vuelven */
+.mm2-pasta {
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
+  animation: mm2-pasta 6.2s ease-in-out infinite;
+}
+.mm2-vaca .mm2-pasta { animation-duration: 7.6s; animation-delay: 1.8s; }
+
+/* Templado: la casa campesina */
+.mm2-casa-muro { fill: var(--mm2-casa-muro); }
+.mm2-casa-techo { fill: var(--mm2-casa-techo); }
+.mm2-casa-teja { fill: none; stroke: var(--mm2-casa-teja); stroke-width: 1.6; stroke-linecap: round; }
+.mm2-casa-columna { fill: var(--mm2-puerta); }
+.mm2-casa-zocalo { fill: var(--mm2-troje-cuerpo); }
+.mm2-casa-chimenea { fill: var(--mm2-casa-techo); }
+.mm2-casa-puerta { fill: var(--mm2-puerta); }
+.mm2-casa-ventana {
+  fill: var(--mm2-ventana);
+  filter: drop-shadow(0 0 4px var(--mm2-ventana-glow));
+}
+.mm2-casa-marco { fill: var(--mm2-puerta); opacity: 0.6; }
+.mm2-casa-camino { fill: none; stroke: var(--mm2-camino); stroke-width: 4; stroke-linecap: round; }
+.mm2-matera { fill: var(--mm2-troje-techo); }
+.mm2-geranio { fill: var(--mm2-geranio); }
+
+.mm2-humo circle { fill: rgba(235, 235, 235, 0.55); }
+.mm2[data-dir='biopunk'] .mm2-humo circle { fill: rgba(167, 230, 255, 0.35); }
+.mm2-humo-1 { animation: mm2-humo 3.2s ease-out infinite; }
+.mm2-humo-2 { animation: mm2-humo 3.2s ease-out infinite 1.05s; }
+.mm2-humo-3 { animation: mm2-humo 3.2s ease-out infinite 2.1s; }
+
+.mm2-troje-cuerpo { fill: var(--mm2-troje-cuerpo); }
+.mm2-troje-techo { fill: var(--mm2-troje-techo); }
+.mm2-troje-pata { fill: var(--mm2-puerta); }
+.mm2-troje-grano { fill: var(--mm2-grano); }
+
+.mm2-cafe-tallo { fill: none; stroke: var(--mm2-tronco); stroke-width: 2; stroke-linecap: round; }
+.mm2-cafe-hoja { fill: var(--mm2-cafe-hoja); }
+.mm2-cafe-fruto { fill: var(--mm2-cafe-fruto); }
+
+.mm2-sombrio path { fill: none; stroke: var(--mm2-tronco); stroke-width: 4; stroke-linecap: round; }
+.mm2-sombrio-copa { fill: var(--mm2-mango-copa); opacity: 0.88; }
+
+.mm2-mercado-meson, .mm2-mercado-tabla { fill: var(--mm2-troje-cuerpo); }
+.mm2-toldo-a { fill: var(--mm2-toldo-a); }
+.mm2-toldo-b { fill: var(--mm2-toldo-b); }
+.mm2-mercado-fruta-a { fill: var(--mm2-fruta-a); }
+.mm2-mercado-fruta-b { fill: var(--mm2-fruta-b); }
+
+/* Cálido */
+.mm2-mango-tronco { fill: none; stroke: var(--mm2-tronco); stroke-width: 6; stroke-linecap: round; }
+.mm2-mango-copa { fill: var(--mm2-mango-copa); }
+.mm2-mango-copa-sombra { fill: var(--mm2-mango-sombra); }
+.mm2-mango-fruto { fill: var(--mm2-mango-fruto); }
+.mm2-mango-pezon { fill: none; stroke: var(--mm2-tronco); stroke-width: 1.4; stroke-linecap: round; }
+.mm2-platano-hoja { fill: var(--mm2-platano-hoja); }
+.mm2-platano-nervio { fill: none; stroke: var(--mm2-platano-nervio); stroke-width: 1.2; stroke-linecap: round; }
+.mm2-platano-tallo { fill: var(--mm2-platano-tallo); }
+.mm2-racimo circle { fill: var(--mm2-grano); }
+.mm2-bellota { fill: var(--mm2-bellota); }
+.mm2-cana-tallo { fill: none; stroke: var(--mm2-cana); stroke-width: 3.4; stroke-linecap: round; }
+.mm2-cana-hoja { fill: none; stroke: var(--mm2-cana); stroke-width: 2; stroke-linecap: round; }
+
+/* Río: orilla + reflejo del cielo + agua que baja + cascada */
+.mm2-rio-orilla { fill: none; stroke: var(--mm2-rio-orilla); stroke-width: 3; }
+.mm2-flujo path {
+  fill: none;
+  stroke: var(--mm2-flujo);
+  stroke-width: 2.4;
+  stroke-linecap: round;
+  stroke-dasharray: 10 16;
+  animation: mm2-baja 2.4s linear infinite;
+  opacity: 0.75;
+}
+.mm2-cascada-caida { fill: rgba(255, 255, 255, 0.55); }
+.mm2[data-dir='biopunk'] .mm2-cascada-caida { fill: rgba(103, 232, 249, 0.45); }
+.mm2-espuma { fill: rgba(255, 255, 255, 0.7); animation: mm2-espuma 1.8s ease-in-out infinite; }
+.mm2-espuma:nth-of-type(2n) { animation-delay: 0.6s; }
+.mm2-espuma:nth-of-type(3n) { animation-delay: 1.2s; }
+
+/* Luz de ladera direccional (el astro está a la derecha) */
+.mm2-stop-ladera-sombra { stop-color: var(--mm2-sombra-ladera); }
+.mm2-stop-ladera-luz { stop-color: var(--mm2-luz-ladera); }
+.mm2-stop-transparente { stop-color: rgba(0, 0, 0, 0); }
+
+/* Micelio: la red viva conecta los pisos (solo biopunk) */
+.mm2-micelio { display: none; }
+.mm2[data-dir='biopunk'] .mm2-micelio {
+  display: block;
+  fill: none;
+  stroke: #67e8f9;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-dasharray: 2 9;
+  opacity: 0.65;
+  filter: drop-shadow(0 0 3px rgba(103, 232, 249, 0.8));
+  animation: mm2-micelio-fluye 7s linear infinite;
+}
+.mm2[data-dir='biopunk'] .mm2-micelio-nodo {
+  fill: #a3e635;
+  stroke: none;
+  animation: mm2-titila 2.8s ease-in-out infinite alternate;
+}
+
+/* Mariposas (solo verde vivo) */
+.mm2-mariposas { display: none; }
+.mm2[data-dir='verde'] .mm2-mariposas { display: block; }
+.mm2-mariposa-1 { fill: #f2a541; animation: mm2-flota 3.6s ease-in-out infinite alternate; }
+.mm2-mariposa-2 { fill: #e05f8a; animation: mm2-flota 4.4s ease-in-out infinite alternate-reverse; }
+
+/* Colibrí (solo naturalista): aleteo rápido + ronda lenta por los geranios */
+.mm2-colibri { display: none; }
+.mm2[data-dir='naturalista'] .mm2-colibri { display: block; }
+.mm2-colibri-torso { fill: #2f8a72; }
+.mm2-colibri-cola { fill: #256b5a; }
+.mm2-colibri-pico { fill: none; stroke: #3c3020; stroke-width: 1.2; stroke-linecap: round; }
+.mm2-colibri-ala {
+  fill: #6cc9a4;
+  transform-box: fill-box;
+  transform-origin: 85% 92%;
+  animation: mm2-aleteo 0.24s ease-in-out infinite alternate;
+}
+.mm2-colibri-ronda { animation: mm2-ronda 5.4s ease-in-out infinite alternate; }
+
+/* Luciérnagas (solo biopunk): parpadean mientras derivan hacia arriba */
+.mm2-luciernagas { display: none; }
+.mm2[data-dir='biopunk'] .mm2-luciernagas { display: block; }
+.mm2-luciernaga { fill: #a3e635; opacity: 0; animation: mm2-luciernaga 6.6s ease-in-out infinite; }
+.mm2-luciernaga:nth-of-type(2n) { animation-delay: 2.2s; animation-duration: 7.8s; }
+.mm2-luciernaga:nth-of-type(3n) { animation-delay: 4.1s; animation-duration: 5.7s; }
+
+/* Hojas que caen (solo verde vivo): giran y planean hasta el suelo */
+.mm2-hojas-caen { display: none; }
+.mm2[data-dir='verde'] .mm2-hojas-caen { display: block; }
+.mm2-hoja-cae { fill: #7fae4f; opacity: 0; animation: mm2-hoja-cae 8.5s linear infinite; }
+.mm2-hoja-cae-2 { animation-delay: 3.1s; animation-duration: 9.6s; }
+.mm2-hoja-cae-3 { animation-delay: 5.7s; animation-duration: 7.4s; }
+
+/* Capa niebla volumétrica: bancos que derivan; el del valle SUBE y se
+ * disipa en loop — la niebla de la Sierra Nevada de verdad. */
+.mm2-banco-1 { animation: mm2-niebla-deriva 26s ease-in-out infinite alternate; }
+.mm2-banco-2 { animation: mm2-niebla-deriva 34s ease-in-out infinite alternate-reverse; }
+.mm2-banco-3 { animation: mm2-niebla-deriva 30s ease-in-out infinite alternate; }
+.mm2-banco-valle { animation: mm2-niebla-sube 22s ease-in-out infinite; }
+.mm2-banco-valle-2 { animation: mm2-niebla-sube 28s ease-in-out infinite 9s; }
+/* Jirones: hilachas finas que derivan A CONTRACORRIENTE de los bancos —
+ * dos velocidades de niebla = volumen (textura de la pasada 3). */
+.mm2-jirones { opacity: 0.7; animation: mm2-niebla-deriva 44s ease-in-out infinite alternate-reverse; }
+
+/* Capa primer plano: siluetas botánicas que enmarcan el plano */
+.mm2-cerca-forma { fill: var(--mm2-cerca); opacity: 0.88; }
+.mm2-cerca-forma-suave { fill: var(--mm2-cerca); opacity: 0.55; }
+
+/* ── Vida de la escena ── */
+@keyframes mm2-pulso {
+  0%, 100% { transform: scale(1); opacity: 0.95; }
+  50% { transform: scale(1.22); opacity: 0.55; }
+}
+
+@keyframes mm2-respira {
+  from { transform: scale(1); }
+  to { transform: scale(1.05); }
+}
+
+@keyframes mm2-humo {
+  0% { transform: translateY(0); opacity: 0.55; }
+  100% { transform: translateY(-18px); opacity: 0; }
+}
+
+@keyframes mm2-baja {
+  from { stroke-dashoffset: 0; }
+  to { stroke-dashoffset: -52; }
+}
+
+@keyframes mm2-espuma {
+  0%, 100% { transform: translateY(0); opacity: 0.7; }
+  50% { transform: translateY(-2.5px); opacity: 0.95; }
+}
+
+@keyframes mm2-micelio-fluye {
+  from { stroke-dashoffset: 0; }
+  to { stroke-dashoffset: -110; }
+}
+
+@keyframes mm2-titila {
+  from { opacity: 0.35; }
+  to { opacity: 1; }
+}
+
+@keyframes mm2-deriva {
+  from { transform: translateX(-14px); }
+  to { transform: translateX(16px); }
+}
+
+@keyframes mm2-flota {
+  from { transform: translate(0, 0) rotate(-6deg); }
+  to { transform: translate(10px, -10px) rotate(8deg); }
+}
+
+@keyframes mm2-rayo-respira {
+  from { opacity: 0.35; }
+  to { opacity: 0.9; }
+}
+
+@keyframes mm2-niebla-deriva {
+  from { transform: translateX(-22px); }
+  to { transform: translateX(26px); }
+}
+
+@keyframes mm2-niebla-sube {
+  0% { transform: translateY(14px); opacity: 0; }
+  22% { opacity: 0.85; }
+  62% { opacity: 0.55; }
+  100% { transform: translateY(-52px); opacity: 0; }
+}
+
+/* ── Pasada 3: vida ambiental ── */
+@keyframes mm2-cruza {
+  0% { transform: translate(-80px, 0); opacity: 0; }
+  4% { opacity: 1; }
+  40% { transform: translate(440px, -24px); opacity: 1; }
+  44% { transform: translate(468px, -26px); opacity: 0; }
+  100% { transform: translate(468px, -26px); opacity: 0; }
+}
+
+@keyframes mm2-aleteo {
+  from { transform: rotate(-22deg); }
+  to { transform: rotate(28deg); }
+}
+
+@keyframes mm2-ronda {
+  from { transform: translate(0, 0); }
+  to { transform: translate(-8px, -5px); }
+}
+
+@keyframes mm2-luciernaga {
+  0%, 100% { opacity: 0; transform: translate(0, 0); }
+  22% { opacity: 0.95; }
+  50% { opacity: 0.25; transform: translate(7px, -9px); }
+  74% { opacity: 0.8; transform: translate(-4px, -16px); }
+}
+
+@keyframes mm2-hoja-cae {
+  0% { opacity: 0; transform: translate(0, -10px) rotate(0deg); }
+  10% { opacity: 0.9; }
+  78% { opacity: 0.85; }
+  100% { opacity: 0; transform: translate(-16px, 46px) rotate(200deg); }
+}
+
+@keyframes mm2-pasta {
+  0%, 52%, 100% { transform: rotate(0deg); }
+  68% { transform: rotate(-4deg) translateY(0.6px); }
+  84% { transform: rotate(-3.4deg) translateY(0.5px); }
+}
+
+/* ── Pasada 3: momento de llegada a la finca ── */
+@keyframes mm2-bloom {
+  0% { opacity: 0; transform: scale(0.55); }
+  35% { opacity: 0.9; }
+  100% { opacity: 0; transform: scale(1.28); }
+}
+
+@keyframes mm2-anillo {
+  0% { opacity: 0.9; transform: scale(0.25); }
+  100% { opacity: 0; transform: scale(2.4); }
+}
+
+@keyframes mm2-chispa {
+  0% { opacity: 0; transform: translate(0, 0) scale(0.5); }
+  18% { opacity: 1; }
+  100% { opacity: 0; transform: translate(var(--mm2-cdx, 0px), var(--mm2-cdy, -60px)) scale(1); }
+}
+
+@keyframes mm2-pin-llega {
+  0% { transform: translate(-50%, -100%) translateY(-14px) scale(0.7); opacity: 0; }
+  60% { transform: translate(-50%, -100%) translateY(2px) scale(1.06); opacity: 1; }
+  100% { transform: translate(-50%, -100%) scale(1); opacity: 1; }
+}
+
+@keyframes mm2-ventana-late {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.6; }
+}
+
+/* La montaña se queda quieta si la persona lo pide: plano final digno,
+ * sin parallax animado, sin vida ni momento de llegada (los elementos del
+ * "wow" tienen base opacity 0 y sin animación jamás aparecen) — pero con
+ * toda la luz, la profundidad de campo y la composición. Sin transición
+ * de cámara el estado de viaje no dura nada: las etiquetas ni parpadean. */
+@media (prefers-reduced-motion: reduce) {
+  .mm2 *, .mm2 *::before, .mm2 *::after {
+    animation: none !important;
+    transition: none !important;
+  }
+
+  .mm2[data-viaje] .mm2-capa-niebla { opacity: 1; }
+  .mm2[data-viaje] .mm2-mundo-etiqueta,
+  .mm2[data-viaje] .mm2-finca-pin { opacity: 1; }
+}

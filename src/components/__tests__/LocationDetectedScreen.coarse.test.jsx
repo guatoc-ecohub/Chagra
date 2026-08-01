@@ -1,4 +1,6 @@
+// @ts-nocheck
 /**
+// @ts-nocheck
  * LocationDetectedScreen.coarse.test.jsx — corrección de ubicación gruesa
  * (#coarse-location, 2026-05-30).
  *

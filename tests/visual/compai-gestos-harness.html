@@ -1,0 +1,23 @@
+<!doctype html>
+<!--
+  compai-gestos-harness.html — Harness AISLADO para verificar EN VIVO el
+  repertorio de micro-gestos ociosos del compAI (guino, estira, bosteza,
+  rascanuca, cabecea, voltereta + los 6 previos). Monta UNA Angelita grande
+  con el idle-cerebro apagado y expone window.__setGesto(nombre) para forzar
+  cada gesto de forma determinista (el atributo data-agt-idle dispara el
+  one-shot del CSS, mismo mecanismo que usa el scheduler real).
+
+  NO participa de ningun test de regresion visual con snapshots — es solo
+  para captura manual/secuencial de frames durante el desarrollo de gestos.
+-->
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Gate visual — micro-gestos del compAI</title>
+  </head>
+  <body>
+    <div id="gestos-root"></div>
+    <script type="module" src="/tests/visual/compai-gestos-harness.jsx"></script>
+  </body>
+</html>

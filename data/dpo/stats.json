@@ -1,0 +1,43 @@
+{
+  "total_pairs": 118,
+  "total_species": 34,
+  "ratio": 0.2,
+  "seed": "chagra-dpo-b7",
+  "train_pairs": 101,
+  "heldout_pairs": 17,
+  "train_species": 27,
+  "heldout_species": 7,
+  "forced_train_species": [
+    "fixed__contacto_inventado_plaga_cuarentenaria"
+  ],
+  "heldout_species_list": [
+    "calendula_officinalis",
+    "erythrina_edulis",
+    "psidium_friedrichsthalianum",
+    "rubus_glaucus",
+    "rubus_idaeus",
+    "solanum_muricatum",
+    "solanum_phureja"
+  ],
+  "type_dist_total": {
+    "cross_thermal": 51,
+    "confusion_especie": 23,
+    "pest_vs_disease": 26,
+    "cross_crop": 9,
+    "contacto_inventado": 9
+  },
+  "type_dist_train": {
+    "cross_thermal": 49,
+    "confusion_especie": 17,
+    "pest_vs_disease": 21,
+    "cross_crop": 5,
+    "contacto_inventado": 9
+  },
+  "type_dist_heldout": {
+    "cross_thermal": 2,
+    "confusion_especie": 6,
+    "pest_vs_disease": 5,
+    "cross_crop": 4,
+    "contacto_inventado": 0
+  }
+}

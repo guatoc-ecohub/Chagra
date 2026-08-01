@@ -1,0 +1,17 @@
+{
+  "date": "2026-07-23",
+  "model": "gemma4:e2b",
+  "index": 69.9,
+  "dimensions": {
+    "recall": 88.2,
+    "grounding": 57.7,
+    "relaciones": 70,
+    "taxonomia": 61.5
+  },
+  "weights": {
+    "grounding": 0.35,
+    "recall": 0.3,
+    "relaciones": 0.2,
+    "taxonomia": 0.15
+  }
+}

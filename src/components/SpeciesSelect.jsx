@@ -3,7 +3,7 @@
  * useEffect. La tarea actual solo reemplaza el pipeline de foto del catálogo.
  */
 import React, { useState, useMemo, useRef, useEffect } from 'react';
-import { Search, ChevronDown, X, Clock, Sparkles, Camera, ImagePlus, Loader2, Bug, Check, AlertCircle, AlertTriangle, HelpCircle, Info, WifiOff } from 'lucide-react';
+import { Search, ChevronDown, X, Clock, Sparkles, Camera, ImagePlus, Bug, Check, AlertCircle, AlertTriangle, HelpCircle, Info, WifiOff } from 'lucide-react';
 import VisionLoadingState from './common/VisionLoadingState';
 import { warmVisionModel } from '../services/visionWarmService';
 import { CROP_TAXONOMY } from '../config/taxonomy';
@@ -97,6 +97,7 @@ const computeRecentSpecies = (plants, allSpecies) => {
   return result;
 };
 
+/** @param {{ value: any, onChange: Function, onAutoFill?: Function, onPhoto?: (blob: Blob) => void }} props */
 export const SpeciesSelect = ({ value, onChange, onAutoFill, onPhoto }) => {
   const [query, setQuery] = useState('');
   const [open, setOpen] = useState(false);
@@ -111,7 +112,8 @@ export const SpeciesSelect = ({ value, onChange, onAutoFill, onPhoto }) => {
   // Se carga async desde catalogDB al mount; si tarda >2s o falla, queda
   // el legacy para no romper offline-first ni la UX del form.
   /** @type {Array<{id:string,name:string,groupId:string,groupLabel:string,nombre_comun?:string,nombre_cientifico?:string}>} */
-  const [allSpecies, setAllSpecies] = useState(LEGACY_SPECIES);
+  const typedSpecies = LEGACY_SPECIES;
+  const [allSpecies, setAllSpecies] = useState(typedSpecies);
   useEffect(() => {
     let cancelled = false;
     const timeoutId = setTimeout(() => {
@@ -409,8 +411,23 @@ export const SpeciesSelect = ({ value, onChange, onAutoFill, onPhoto }) => {
       <div
         className="w-full flex items-center gap-2 p-3 rounded-xl bg-slate-800 border border-slate-700 cursor-pointer"
         onClick={() => setOpen(true)}
+        /* a11y (teclado): cerrado, la caja ES el botón que abre el buscador.
+           Abierto, el foco vive en el input interior. */
+        {...(!open ? {
+          role: 'button',
+          tabIndex: 0,
+          'aria-haspopup': 'listbox',
+          'aria-expanded': false,
+          'aria-label': 'Seleccionar especie: abrir buscador',
+          onKeyDown: (e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+              e.preventDefault();
+              setOpen(true);
+            }
+          },
+        } : {})}
       >
-        <Search size={16} className="text-slate-500 shrink-0" />
+        <Search size={16} className="text-slate-500 shrink-0" aria-hidden="true" />
         {open ? (
           <input
             ref={queryInputRef}
@@ -419,6 +436,7 @@ export const SpeciesSelect = ({ value, onChange, onAutoFill, onPhoto }) => {
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder="Buscar especie… (ej: gulpa, café, mora)"
+            aria-label="Buscar especie"
             className="flex-1 bg-transparent text-white text-sm outline-none"
             onClick={(e) => e.stopPropagation()}
           />
@@ -431,9 +449,10 @@ export const SpeciesSelect = ({ value, onChange, onAutoFill, onPhoto }) => {
           <button
             type="button"
             onClick={(e) => { e.stopPropagation(); handleClear(); }}
+            aria-label="Quitar especie seleccionada"
             className="p-1 hover:bg-slate-700 rounded text-slate-400"
           >
-            <X size={14} />
+            <X size={14} aria-hidden="true" />
           </button>
         )}
         <ChevronDown size={16} className={`text-slate-500 transition-transform ${open ? 'rotate-180' : ''}`} />

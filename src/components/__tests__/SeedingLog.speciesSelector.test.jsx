@@ -54,17 +54,17 @@ describe('SeedingLog — selector de especies del catálogo', () => {
   });
 
   it('usa el SpeciesCombobox (no un input de texto libre para el cultivo)', () => {
-    render(<SeedingLog onBack={() => {}} onSave={() => {}} />);
+    render(<SeedingLog onBack={() => {}} onSave={() => {}} initialData={null} />);
     expect(screen.getByTestId('species-combobox')).toBeInTheDocument();
   });
 
   it('ofrece un campo de ubicación/etiqueta SEPARADO del nombre del cultivo', () => {
-    render(<SeedingLog onBack={() => {}} onSave={() => {}} />);
+    render(<SeedingLog onBack={() => {}} onSave={() => {}} initialData={null} />);
     expect(screen.getByPlaceholderText(/Invernadero #1/i)).toBeInTheDocument();
   });
 
   it('al elegir Fresa el cultivo queda limpio y la ubicación va aparte', async () => {
-    render(<SeedingLog onBack={() => {}} onSave={() => {}} />);
+    render(<SeedingLog onBack={() => {}} onSave={() => {}} initialData={null} />);
     await pickFresa();
 
     // Ubicación en su propio campo (no en el nombre de la especie).
@@ -88,7 +88,7 @@ describe('SeedingLog — selector de especies del catálogo', () => {
   });
 
   it('hila el id canónico del catálogo al ciclo (subject_slug grounded)', async () => {
-    render(<SeedingLog onBack={() => {}} onSave={() => {}} />);
+    render(<SeedingLog onBack={() => {}} onSave={() => {}} initialData={null} />);
     await pickFresa();
     const qty = document.querySelector('input[name="quantity"]');
     fireEvent.change(qty, { target: { value: '5' } });

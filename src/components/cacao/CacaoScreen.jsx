@@ -22,6 +22,8 @@ import {
   PROPAGACION_CACAO,
   PODAS_CACAO,
   ENFERMEDADES_CACAO,
+  OTRAS_PLAGAS_CACAO,
+  OTRAS_PLAGAS_CACAO_FUENTE,
   CACAO_NO_CONFUNDIR,
   CACAO_NO_CONFUNDIR_FUENTE,
   COSECHA_CACAO,
@@ -436,6 +438,52 @@ function EstacionSanidad() {
       </PedagogicalBlock>
 
       {ENFERMEDADES_CACAO.map((e) => <TarjetaEnfermedad key={e.id} e={e} />)}
+
+      {/* Otras plagas de la mazorca (insectos): barrenador y trips */}
+      <div className="rounded-2xl border border-stone-700/60 bg-stone-900/50 p-4 space-y-3" data-testid="cacao-otras-plagas">
+        <p className="flex items-center gap-2 text-sm font-black text-stone-100 uppercase tracking-wide">
+          <Bug size={16} aria-hidden="true" className="text-amber-300" /> Otras plagas de la mazorca
+        </p>
+        <p className="text-xs leading-snug text-stone-300">Estas no son hongos: son insectos que perforan o raspan el fruto. Se manejan recogiendo y sacando lo dañado, no con veneno.</p>
+        <div className="space-y-2.5">
+          {OTRAS_PLAGAS_CACAO.map((p) => (
+            <div key={p.id} className="rounded-xl border border-stone-700/50 bg-stone-950/40 p-3 space-y-2" data-testid={`otra-plaga-${p.id}`}>
+              <div>
+                <p className="text-xs font-bold text-stone-100 leading-tight">{p.nombre} <span className="italic font-normal text-stone-400">({p.cientifico})</span></p>
+                <p className="text-[11px] leading-snug text-stone-400">{p.tambien} {p.ataca}</p>
+              </div>
+              <ul className="space-y-1">
+                {p.comoSeVe.map((s, i) => (
+                  <li key={i} className="flex gap-1.5 text-[11px] leading-snug text-stone-200">
+                    <span aria-hidden="true" className="text-amber-400">•</span><span className="flex-1 min-w-0">{s}</span>
+                  </li>
+                ))}
+              </ul>
+              {typeof p.umbral === 'string' ? (
+                <p className="inline-flex items-center gap-1.5 rounded-lg border border-amber-600/40 bg-amber-500/15 px-2.5 py-1 text-[11px] font-bold text-amber-200">
+                  <TriangleAlert size={12} aria-hidden="true" className="shrink-0" /> {p.umbral}
+                </p>
+              ) : (
+                <p className="text-[11px] italic text-stone-500">Umbral: dato en camino.</p>
+              )}
+              <div className="rounded-lg border border-emerald-700/40 bg-emerald-950/20 p-2.5">
+                <p className="flex items-center gap-1.5 text-[11px] font-black uppercase tracking-wide text-emerald-300 mb-1.5">
+                  <ShieldCheck size={12} aria-hidden="true" /> Cómo se maneja (sin veneno)
+                </p>
+                <ul className="space-y-1">
+                  {p.manejo.map((m, i) => (
+                    <li key={i} className="flex gap-1.5 text-[11px] leading-snug text-stone-200">
+                      <span aria-hidden="true" className="text-emerald-400">•</span><span className="flex-1 min-w-0">{m}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+              <p className="text-[10px] leading-snug text-stone-500">Fuente: {p.fuente}</p>
+            </div>
+          ))}
+        </div>
+        <p className="text-[10px] leading-snug text-stone-500">{OTRAS_PLAGAS_CACAO_FUENTE}</p>
+      </div>
 
       {/* No confundir */}
       <div className="rounded-2xl border border-stone-700/60 bg-stone-900/50 p-4 space-y-3" data-testid="cacao-no-confundir">

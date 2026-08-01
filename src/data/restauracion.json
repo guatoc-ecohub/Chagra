@@ -4,7 +4,7 @@
   "roles_sucesion": {
     "calido_0_1000": {
       "pioneras": ["balso", "matarraton", "guacimo"],
-      "intermedias": ["nacedero", "guadua", "caniafistula"],
+      "intermedias": ["nacedero", "guadua"],
       "climax": ["cedro", "caracoli", "ceiba"]
     },
     "templado_1000_2000": {
@@ -33,7 +33,7 @@
   "invasoras": [
     { "nombre": "Retamo espinoso (Ulex europaeus)", "manejo": "Control manual antes de floracion. NO quemar (rebrota). Minimo 3 anos de seguimiento." },
     { "nombre": "Retamo liso (Genista monspessulana)", "manejo": "Similar al retamo espinoso." },
-    { "nombre": "Kikuyo (Pennisetum clandestinum)", "manejo": "Pastoreo controlado, mulch denso, cobertura de nativas." },
+    { "nombre": "Kikuyo (Cenchrus clandestinus)", "manejo": "Pastoreo controlado, mulch denso, cobertura de nativas." },
     { "nombre": "Ojo de poeta (Thunbergia alata)", "manejo": "Control manual. Trepadora invasora de bordes." }
   ],
   "normativa": [

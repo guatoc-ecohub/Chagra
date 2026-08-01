@@ -97,23 +97,38 @@ function sortedByFile(byFile) {
 }
 
 /**
+ * Devuelve la salida de un proceso tsc que terminó con diagnósticos de tipo.
+ * Un fallo de proceso no tiene un baseline comparable y debe bloquear el gate.
+ *
+ * @param {{ status?: number | null, signal?: string | null, stdout?: string | Buffer, stderr?: string | Buffer }} error
+ * @returns {string}
+ *
+ */
+export function outputFromTscDiagnostic(error) {
+  if (typeof error.status !== 'number') {
+    const detail = error.signal ? ` por señal ${error.signal}` : '';
+    throw new Error(`tsc no terminó correctamente${detail}. El gate no puede comparar un resultado incompleto.`);
+  }
+  return (error.stdout || '') + (error.stderr || '');
+}
+
+/**
  * Corre `tsc --noEmit -p jsconfig.json` y devuelve stdout+stderr combinados.
- * tsc sale con código != 0 cuando hay errores — eso es esperado, no un fallo
- * de esta función.
+ * tsc sale con código != 0 cuando hay errores de tipo, lo cual es esperado.
+ * Los fallos del proceso se propagan para no interpretarlos como cero errores.
  *
  * @returns {string}
  */
 export function runTsc() {
   const tscBin = require.resolve('typescript/bin/tsc');
   try {
-    return execFileSync(process.execPath, [tscBin, '--noEmit', '-p', 'jsconfig.json'], {
+    return execFileSync(process.execPath, [tscBin, '--noEmit', '--pretty', 'false', '-p', 'jsconfig.json'], {
       cwd: REPO_ROOT,
       encoding: 'utf8',
       maxBuffer: 200 * 1024 * 1024,
     });
   } catch (e) {
-    // tsc exit code != 0 al reportar errores: la salida real viene en stdout.
-    return (e.stdout || '') + (e.stderr || '');
+    return outputFromTscDiagnostic(e);
   }
 }
 

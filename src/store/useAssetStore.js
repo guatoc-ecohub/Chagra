@@ -143,9 +143,8 @@ const useAssetStore = create((set, get) => ({
         // assets legítimos que aparecerán en páginas posteriores.
         const allRemoteIdsForType = new Set();
         // Si el sync se aborta o falla parcialmente, NO purgar: el universo
-        // remoto no es confiable. `syncCompletedForType` solo se vuelve true
-        // cuando todas las páginas se procesaron sin signal aborted.
-        let syncCompletedForType = false;
+        // remoto no es confiable. La purga final (abajo) solo corre cuando
+        // todas las páginas se procesaron sin signal aborted.
 
         while (hasMore && !signal?.aborted) {
           const offset = page * pageLimit;
@@ -180,14 +179,11 @@ const useAssetStore = create((set, get) => ({
           break;
         }
         // Universo completo del tipo recolectado → ahora sí, GC final.
-        syncCompletedForType = true;
-        if (syncCompletedForType) {
-          try {
-            await assetCache.purgeAbsent(t, allRemoteIdsForType);
-          } catch (purgeErr) {
-            // Si la purga falla, mejor preservar datos: log y continuar.
-            console.warn(`[Sync] purgeAbsent(${t}) falló — preservando local:`, purgeErr);
-          }
+        try {
+          await assetCache.purgeAbsent(t, allRemoteIdsForType);
+        } catch (purgeErr) {
+          // Si la purga falla, mejor preservar datos: log y continuar.
+          console.warn(`[Sync] purgeAbsent(${t}) falló — preservando local:`, purgeErr);
         }
       }
 
@@ -853,7 +849,7 @@ const useAssetStore = create((set, get) => ({
           capturedAt: new Date().toISOString(),
         },
       });
-      photoRefId = saved?.id || saved?._photoRefId || null;
+      photoRefId = /** @type {any} */ (saved)?.id || /** @type {any} */ (saved)?._photoRefId || null;
     } catch (err) {
       console.error('[Store] Error guardando foto attachment:', err);
       return { success: false, message: 'Error guardando foto local' };
@@ -1004,7 +1000,7 @@ if (typeof window !== 'undefined') {
   };
 
   window.addEventListener('syncCompleted', async (event) => {
-    const { type, id } = event.detail || {};
+    const { type, id } = /** @type {CustomEvent} */ (event).detail || {};
     if (!type) return;
 
     const isAssetOp = type.startsWith('asset_') || type.startsWith('delete_');
@@ -1042,8 +1038,8 @@ if (typeof window !== 'undefined') {
 
 // ADR-030 Regla 4: Stress test de virtualización (056.1).
 // Expuesto globalmente solo en modo DEV para inyectar datos masivos desde consola.
-if (import.meta.env.DEV) {
-  window._mockGenerateAssets = async (count = 1000) => {
+if (/** @type {any} */ (import.meta).env.DEV) {
+  /** @type {any} */ (window)._mockGenerateAssets = async (count = 1000) => {
     console.info(`[Dev] Generando ${count} activos de prueba...`);
     const newPlants = Array.from({ length: count }, (_, i) => ({
       id: crypto.randomUUID(),

@@ -585,8 +585,93 @@ function VinetaMango() {
     );
 }
 
+/** 🌱 Semillero y vivero — túnel de media-sombra, bandeja germinadora y plántulas. */
+function VinetaSemillero() {
+    return (
+        <svg {...SVG_PROPS}>
+            <rect width="180" height="90" fill="#e6f0cf" />
+            {/* sol tibio de mañana */}
+            <circle cx="152" cy="20" r="10" fill="#ffe8a6" />
+            <circle cx="152" cy="20" r="6" fill="#fff4cf" />
+            {/* piso del vivero */}
+            <path d="M-4 60 Q60 52 120 58 T184 54 V90 H-4 Z" fill="#b7c98a" />
+            <path d="M-4 72 Q70 64 184 70 V90 H-4 Z" fill="#8ea85e" />
+            {/* el túnel de media-sombra: arco traslúcido + costillas */}
+            <path d="M22 74 A46 40 0 0 1 114 74 Z" fill="#c7e0a0" opacity=".55" />
+            <g stroke="#8a6a44" strokeWidth="3" fill="none" strokeLinecap="round">
+                <path d="M22 74 A46 40 0 0 1 114 74" />
+                <path d="M40 74 A28 34 0 0 1 96 74" opacity=".8" />
+                <path d="M56 74 A12 30 0 0 1 80 74" opacity=".6" />
+            </g>
+            {/* la bandeja germinadora con brotes por etapa */}
+            <rect x="42" y="66" width="52" height="10" rx="2" fill="#5a4326" />
+            <rect x="44" y="64" width="48" height="4" fill="#3a2c1c" />
+            <g stroke="#3f8f4e" strokeWidth="2.4" strokeLinecap="round" fill="none">
+                <path d="M50 64 v-4" /><path d="M58 64 v-6" /><path d="M66 64 v-8" />
+                <path d="M74 64 v-9 M74 61 q4 -1 5 -4" /><path d="M84 64 v-10 M84 60 q-4 -1 -5 -4 M84 58 q4 -1 5 -4" />
+            </g>
+            {/* la bolsa del repique en primer plano (plántula ya crecida) */}
+            <g transform="translate(140 62)">
+                <path d="M-9 16 L-7 2 L7 2 L9 16 Z" fill="#2a2622" />
+                <path d="M0 2 v-14" stroke="#5a6a2e" strokeWidth="2.6" strokeLinecap="round" fill="none" />
+                <path d="M0 -6 q-6 -2 -8 -8" stroke="#3f8f4e" strokeWidth="2.6" strokeLinecap="round" fill="none" />
+                <path d="M0 -9 q6 -2 8 -8" stroke="#3f8f4e" strokeWidth="2.6" strokeLinecap="round" fill="none" />
+            </g>
+        </svg>
+    );
+}
+
 /** Viñeta por id de mundo (fuente única para tarjeta + pantalla de mundo). */
+/* 🍄 La red del suelo — corte de tierra honda con la red de micelio
+   bioluminiscente enlazando raíces, y pulsos de nutrientes en los hilos. */
+function VinetaMicorrizas() {
+    return (
+        <svg {...SVG_PROPS}>
+            {/* tierra honda: degradado por bandas oscuras */}
+            <rect width="180" height="90" fill="#160f0a" />
+            <path d="M0 0 H180 V16 H0 Z" fill="#28331f" />
+            <path d="M0 16 H180 V40 H0 Z" fill="#1d150d" />
+            <path d="M0 40 H180 V90 H0 Z" fill="#120c08" />
+            {/* dos matas asomando arriba (las que se conectan) */}
+            <g stroke="#8fbf55" strokeWidth="2.6" strokeLinecap="round" fill="none">
+                <path d="M52 16 v-10" /><path d="M52 10 q-6 -1 -9 -6" /><path d="M52 8 q6 -1 9 -6" />
+                <path d="M126 16 v-8" /><path d="M126 11 q6 -1 9 -5" />
+            </g>
+            {/* raíces que bajan */}
+            <g stroke="#c8a878" strokeWidth="2.2" strokeLinecap="round" fill="none" opacity=".9">
+                <path d="M52 18 q-4 14 -12 24 q-4 6 -5 14" />
+                <path d="M52 18 q3 16 10 26" />
+                <path d="M126 18 q4 14 12 22" />
+                <path d="M126 18 q-3 16 -9 26" />
+            </g>
+            {/* la RED de micelio: hilos turquesa que enlazan las raíces */}
+            <g stroke="#37d6b0" strokeWidth="1.5" strokeLinecap="round" fill="none" opacity=".92">
+                <path d="M40 56 q22 -10 44 4 q20 12 44 -2" />
+                <path d="M35 44 q30 14 60 6 q28 -8 50 8" />
+                <path d="M55 70 q26 8 52 -4" />
+                <path d="M84 60 q-10 -18 6 -30" />
+            </g>
+            {/* el PUENTE claro entre las dos matas (el reparto) */}
+            <path d="M60 40 q30 20 66 -2" stroke="#7ef0c8" strokeWidth="2.2" fill="none" opacity=".95" />
+            {/* nodos del micelio (uniones) */}
+            <g fill="#9df5da">
+                <circle cx="40" cy="56" r="2.4" /><circle cx="84" cy="60" r="2.6" />
+                <circle cx="128" cy="58" r="2.4" /><circle cx="95" cy="47" r="2.2" />
+            </g>
+            {/* arbúsculos cálidos en las puntas de raíz (intercambio) */}
+            <g fill="#ffd27a">
+                <circle cx="35" cy="56" r="2.6" /><circle cx="62" cy="58" r="2.4" /><circle cx="141" cy="62" r="2.6" />
+            </g>
+            {/* pulsos de nutrientes corriendo por los hilos */}
+            <circle cx="72" cy="53" r="2" fill="#ffc766" />
+            <circle cx="110" cy="52" r="1.8" fill="#8ef06a" />
+            <circle cx="93" cy="30" r="1.6" fill="#8fd4ff" />
+        </svg>
+    );
+}
+
 const VINETAS = {
+    micorrizas: VinetaMicorrizas,
     cultivos: VinetaCultivos,
     cafe: VinetaCafe,
     aguacate: VinetaAguacate,
@@ -602,6 +687,7 @@ const VINETAS = {
     animales: VinetaAnimales,
     mercado: VinetaMercado,
     disenio: VinetaDisenio,
+    semillero: VinetaSemillero,
 };
 
 /**

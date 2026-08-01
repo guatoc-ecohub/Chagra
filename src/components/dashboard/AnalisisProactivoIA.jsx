@@ -309,7 +309,7 @@ export default function AnalisisProactivoIA({ sensors = [], climaSnapshot = null
                                 label="Cultivos"
                                 count={plants.length}
                                 color="text-emerald-200 bg-emerald-500/10 border-emerald-600/30 hover:bg-emerald-500/20"
-                                onClick={() => onNavigate?.('plantas')}
+                                onClick={() => onNavigate?.('activos')}
                             />
                         )}
                         {pendingTasks > 0 && (

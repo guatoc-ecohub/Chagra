@@ -120,6 +120,7 @@ export function planForcedIntent(intent, text, opts = {}) {
   const prompt = text.trim();
   if (!prompt) return null;
 
+  /** @type {{ intent: string, tool: string|null, args: object|null, stub: boolean, stubResult: object|null, stubMessage: string|null, localGrounding: any, prompt: string, skipNlu: true }} */
   const base = {
     intent,
     tool: null,
@@ -416,7 +417,7 @@ const ANIMAL_PATTERNS = [
 function detectAnimalSilvo(text) {
   const t = String(text);
   for (const [re, animal] of ANIMAL_PATTERNS) {
-    if (/** @type {RegExp} */ (re).test(t)) return animal;
+    if (/** @type {RegExp} */ (re).test(t)) return /** @type {'bovino'|'ovino'|'caprino'} */ (animal);
   }
   return null;
 }

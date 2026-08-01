@@ -37,6 +37,15 @@
 
 import { fetchWithAuthRetry } from './apiService.js';
 import { buildSidecarHeaders } from './tierService.js';
+// Fallo real del canario 2026-07-20: "ICA"/"Fuente" (mención de institución o
+// meta-pregunta) se resolvían a especies fantasma (col rizada / Pennisetum
+// setaceum) y el agente construía la respuesta sobre esa basura porque el
+// único filtro (filterNoiseEntities) corría DESPUÉS de que el LLM ya había
+// respondido (outputGuards.applyOutputGuards). Filtramos AQUÍ, apenas llega la
+// respuesta del sidecar, para que ningún consumidor (prompt del LLM incluido)
+// vea entidades-ruido. outputGuards.js no importa nada (0 imports) → no hay
+// ciclo posible al importarlo desde aquí.
+import { filterNoiseEntities } from './outputGuards.js';
 
 const NLU_TIMEOUT_MS = 18000;
 export const TOOL_TIMEOUT_MS = 5000;
@@ -384,6 +393,24 @@ const ALLOWED_TOOLS = new Set([
   'get_cultivos_viables',
   'get_diseno_finca',
   'get_dosis_biopreparado',
+  // ── Reconciliación allow-list · Fase 3 (SSOT 2026-07-29). main las exponía
+  //    (39 tools), dev no (35) → el NLU las ruteaba y el cliente las rechazaba
+  //    con `not_allowed` → el turno degradaba a RAG SIN grounding en silencio.
+  //    Las 4 son read-only del grafo AGE / dataset institucional local, con args
+  //    que el NLU SÍ rellena desde una frase. VERIFICADAS EN VIVO (200):
+  //  - get_folk_sintoma: mapea un nombre folk de síntoma/enfermedad al grafo
+  //    (args `sintoma`/`cultivo`). Muy ruteada por el NLU. found:false → pide
+  //    foto/descripción, NUNCA inventa a qué plaga corresponde.
+  //  - get_aporte_nutricional: aporte nutricional (ICBF TCAC) por especie
+  //    (arg `species_id_or_name`). found:false si no documentado.
+  //  - get_canales_comercializacion: canales de comercialización por especie
+  //    (arg `species_id_or_name`).
+  //  - get_practicas_agua: prácticas de manejo del agua (arg `accion`:
+  //    conservacion|captacion|tratamiento|riesgo).
+  'get_folk_sintoma',
+  'get_aporte_nutricional',
+  'get_canales_comercializacion',
+  'get_practicas_agua',
   // FASE 2 (deferidas, NO exponer aún):
   //  - get_grado_dia: requiere `fecha_siembra` (ISO YYYY-MM-DD, sin default) que
   //    el NLU no puede sintetizar con fiabilidad desde una frase libre de chat.
@@ -509,7 +536,13 @@ export async function resolveEntities(userMessage, opts = {}) {
   if (!raw || typeof raw !== 'object') return null;
   const grounding = raw.grounding && typeof raw.grounding === 'object' ? raw.grounding : null;
   if (!Array.isArray(raw.entities)) return { entities: [], grounding };
-  return { entities: raw.entities, grounding };
+  // Filtramos entidades-ruido (siglas institucionales, meta-vocabulario de
+  // "dame la fuente/norma", muletillas campesinas) ANTES de devolver — así
+  // ningún consumidor (incluido el prompt del LLM en agentPromptBase.js, que
+  // las presenta como "ENTIDADES RESUELTAS... autoritativo") ve basura como
+  // verdad verificada. applyOutputGuards también filtra (idempotente y puro,
+  // aplicarlo dos veces es inofensivo) — se deja así como defensa en capas.
+  return { entities: filterNoiseEntities(raw.entities), grounding };
 }
 
 /**
@@ -643,6 +676,37 @@ export async function pisoTermicoGuard(userMessage, opts = {}) {
     species_altitud_max: typeof raw.species_altitud_max === 'number' ? raw.species_altitud_max : null,
     viabilidad: typeof raw.viabilidad === 'string' ? raw.viabilidad : null,
     alternativas: Array.isArray(raw.alternativas) ? raw.alternativas.filter((a) => typeof a === 'string') : [],
+    system_prompt_block: typeof raw.system_prompt_block === 'string' ? raw.system_prompt_block : '',
+    reason: typeof raw.reason === 'string' ? raw.reason : '',
+  };
+}
+
+/**
+ * PISO DE SEGURIDAD ANTE VENENOS query-side (chagra-pro P0 #2, determinista,
+ * PRE-LLM). Llama `POST ${BASE}/toxic-safety-guard` con `{ user_message }`: si
+ * la CONSULTA del usuario menciona un plaguicida tóxico/prohibido (clorpirifos,
+ * glifosato, paraquat, lorsban…), el sidecar devuelve un `system_prompt_block`
+ * de advertencia + alternativas MIP para inyectar al system prompt,
+ * INDEPENDIENTE del RAG. Cierra el hueco de la abstención (`low_relevance`),
+ * donde el guard de SALIDA `detectPoisonEndorsement` no ve nada porque el
+ * modelo respondió "no tengo información" sin repetir el nombre del veneno.
+ * FAIL-SAFE: null ante error/timeout → no-op, el turno sigue sin romperse.
+ *
+ * @param {string} userMessage
+ * @returns {Promise<null | {
+ *   has_toxic_mention: boolean,
+ *   toxics: string[],
+ *   system_prompt_block: string,
+ *   reason: string,
+ * }>}
+ */
+export async function toxicSafetyGuard(userMessage) {
+  if (!userMessage || typeof userMessage !== 'string') return null;
+  const raw = await postJson('/toxic-safety-guard', { user_message: userMessage }, NLU_TIMEOUT_MS);
+  if (!raw || typeof raw !== 'object') return null;
+  return {
+    has_toxic_mention: raw.has_toxic_mention === true,
+    toxics: Array.isArray(raw.toxics) ? raw.toxics.filter((t) => typeof t === 'string') : [],
     system_prompt_block: typeof raw.system_prompt_block === 'string' ? raw.system_prompt_block : '',
     reason: typeof raw.reason === 'string' ? raw.reason : '',
   };
@@ -903,6 +967,51 @@ export async function judgeVision(speciesId, imageB64) {
     confidence: typeof raw.confidence === 'number' ? raw.confidence : null,
     motivo: typeof raw.motivo === 'string' ? raw.motivo : '',
   };
+}
+
+/**
+ * Gate ASÍNCRONO del juez de visión (#328). El juez local tarda ~16-23s
+ * (minicpm-v:8b en CPU, fuera de la VRAM del agente) y el sync `/judge-vision`
+ * lo aborta el propio cliente a TOOL_TIMEOUT_MS=5s → veredicto siempre null
+ * (gate muerto). Este par desacopla: `judgeVisionAsync` ENCOLA (202 en ~11ms)
+ * y devuelve `{request_id}`; `judgeVisionResult` recoge el veredicto luego
+ * (poll). Así el diagnóstico NO se bloquea esperando al juez.
+ *
+ * @param {string} speciesId @param {string} imageB64
+ * @returns {Promise<null | {request_id: string}>}
+ */
+export async function judgeVisionAsync(speciesId, imageB64) {
+  if (!speciesId || typeof speciesId !== 'string') return null;
+  if (!imageB64 || typeof imageB64 !== 'string') return null;
+  const raw = await postJson(
+    '/judge-vision-async',
+    { species_id: speciesId, image_b64: imageB64 },
+    TOOL_TIMEOUT_MS,
+  );
+  if (!raw || typeof raw !== 'object' || typeof raw.request_id !== 'string') {
+    return null;
+  }
+  return { request_id: raw.request_id };
+}
+
+/**
+ * Recoge el veredicto async por `request_id` (poll del gate #328). El sidecar
+ * devuelve `{status:'pending'}` mientras el juez CPU no termina, `{status:'done',
+ * plausible, confidence, motivo}` cuando resuelve, o `{status:'error', reason}`.
+ * Pasa el body crudo del sidecar tal cual (el consumidor decide por `status`).
+ *
+ * @param {string} requestId
+ * @returns {Promise<null | {status:'done', plausible:boolean|null, confidence:number|null, motivo:string} | {status:'pending'} | {status:'error', reason?:string}>}
+ */
+export async function judgeVisionResult(requestId) {
+  if (!requestId || typeof requestId !== 'string') return null;
+  const raw = await getJson(
+    '/judge-vision-result',
+    { request_id: requestId },
+    TOOL_TIMEOUT_MS,
+  );
+  if (!raw || typeof raw !== 'object') return null;
+  return raw;
 }
 
 /**

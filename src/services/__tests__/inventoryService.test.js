@@ -81,9 +81,9 @@ describe('projectStock — casos base', () => {
     const maiz = stock.get('maiz');
     expect(maiz.quantity).toBe(10);
     expect(maiz.unit).toBe('kg');
-    expect(maiz.item_id).toBe('maiz');
-    expect(maiz.last_event_id).toBe('r1');
-    expect(maiz.last_updated).toBe(e.timestamp);
+    expect(/** @type {any} */ (maiz).item_id).toBe('maiz');
+    expect(/** @type {any} */ (maiz).last_event_id).toBe('r1');
+    expect(/** @type {any} */ (maiz).last_updated).toBe(e.timestamp);
   });
 
   it('suma múltiples RECEIVED del mismo item', () => {

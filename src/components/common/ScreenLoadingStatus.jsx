@@ -17,6 +17,7 @@ import ChagraGrowLoader from '../ChagraGrowLoader';
  *  - errorMessage (string) — mensaje de error
  *  - onRetry (function) — callback del boton reintentar
  */
+/** @param {{ isLoading?: boolean, loadingMessage?: string, isEmpty?: boolean, hasError?: boolean, emptyTitle?: string, emptyDescription?: string, errorMessage?: string, onRetry?: () => void }} props */
 export default function ScreenLoadingStatus({
   isLoading = false,
   loadingMessage = 'Cargando...',

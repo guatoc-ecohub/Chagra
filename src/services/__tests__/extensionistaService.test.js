@@ -50,9 +50,9 @@ describe('extensionistaService — getFincasDelegadas', () => {
   });
 
   it('devuelve [] para null / undefined / no-string', () => {
-    expect(getFincasDelegadas(null)).toEqual([]);
-    expect(getFincasDelegadas(undefined)).toEqual([]);
-    expect(getFincasDelegadas(123)).toEqual([]);
+    expect(getFincasDelegadas(/** @type {any} */ (null))).toEqual([]);
+    expect(getFincasDelegadas(/** @type {any} */ (undefined))).toEqual([]);
+    expect(getFincasDelegadas(/** @type {any} */ (123))).toEqual([]);
     expect(getFincasDelegadas('')).toEqual([]);
   });
 

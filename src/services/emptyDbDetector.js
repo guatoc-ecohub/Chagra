@@ -35,7 +35,7 @@ export const LAST_MARKED_AT_KEY = 'chagra:last-marked-at';
 /**
  * Setea los flags de "este dispositivo tuvo datos". Idempotente.
  *
- * @param {number} [assetCount] — conteo actual de assets, opcional. Si se
+ * @param {number} [assetCount] - conteo actual de assets, opcional. Si se
  *   pasa, se guarda como `last-asset-count` para mostrar al usuario "antes
  *   tenías N plantas". Si no, se queda con el valor previo (o '0').
  */

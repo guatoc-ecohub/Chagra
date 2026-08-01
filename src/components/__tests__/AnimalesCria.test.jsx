@@ -3,13 +3,8 @@ import { render, screen, fireEvent, within, cleanup } from '@testing-library/rea
 import '@testing-library/jest-dom';
 import { describe, test, expect, vi, afterEach } from 'vitest';
 
-// @types/node no está instalado en el repo (gap conocido, tolerado en otros
-// tests que leen del disco). Runtime (vitest/node) resuelve node:* sin problema.
-// @ts-expect-error TS2591 — ver comentario arriba.
 import fs from 'node:fs';
-// @ts-expect-error TS2591 — ver comentario arriba.
 import path from 'node:path';
-// @ts-expect-error TS2591 — ver comentario arriba.
 import { fileURLToPath } from 'node:url';
 import AnimalesScreen from '../AnimalesScreen';
 import ConejosScreen from '../ConejosScreen';

@@ -318,7 +318,7 @@ export async function buildEpisodicMemoryContext({
       }),
     );
 
-    return buildEpisodicMemoryBlock({ query, resolvedEntities, processes, eventsByProcess, fincaAltitud, now });
+    return buildEpisodicMemoryBlock({ query, resolvedEntities, processes, eventsByProcess: /** @type {any} */ (eventsByProcess), fincaAltitud, now });
   } catch (err) {
     console.warn('[EpisodicMemory] degradando a no-op:', err && err.message);
     return '';

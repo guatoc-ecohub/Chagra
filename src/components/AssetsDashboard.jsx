@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { MSG } from '../config/messages.js';
 import { ArrowLeft, Plus, Trash2, RefreshCw, Building2, Leaf, Search, WifiOff, TreePine, Map as MapIcon, List, Sprout, FlaskConical, Ban, AlertTriangle, Warehouse, Square, ChevronDown } from 'lucide-react';
 import useAssetStore from '../store/useAssetStore';
+import useAngelitaStore from '../store/useAngelitaStore';
 import { Virtuoso } from 'react-virtuoso';
 import { fetchFromFarmOS } from '../services/apiService';
 import AssetDetailView from './AssetDetailView';
@@ -364,7 +365,7 @@ export default function AssetsDashboard({ onBack, initialTab, initialShowForm = 
     setRagLoading(true);
     (async () => {
       try {
-        const insights = await enrichEntity(/** @type {{crop: string, quantity?: number, location?: string}} */ ({ crop: formData.name }));
+        const insights = await enrichEntity(/** @type {any} */ ({ crop: formData.name }));
         if (cancelled) return;
         setRagInsights(insights || null);
       } catch (err) {
@@ -440,6 +441,14 @@ export default function AssetsDashboard({ onBack, initialTab, initialShowForm = 
     setIsSaving(true);
     try {
       await addHarvestLog(asset.id, { ...harvestData, cropName });
+      // #109 "luto y fiesta": al COSECHAR, el compañero baila para celebrar
+      // (estado 'contenta', ya existente — chispas doradas, brinco). Dedup
+      // por evento (asset+momento): esta cosecha puntual no se celebra dos
+      // veces, pero la próxima sí.
+      useAngelitaStore.getState().celebrar({
+        id: `cosecha:${asset.id}:${Date.now()}`,
+        texto: `¡Cosechó ${cropName.toLowerCase()}! Bien merecido — el trabajo de su finca está dando fruto.`,
+      });
       resetHarvestForm();
     } catch (error) {
       console.error('[UI] Error al registrar cosecha:', error);
@@ -818,7 +827,7 @@ export default function AssetsDashboard({ onBack, initialTab, initialShowForm = 
         const plantingDateIso = formData.fechaGerminacion
           ? new Date(formData.fechaGerminacion).toISOString()
           : new Date().toISOString();
-        generatePlanForPlant(/** @type {{assetId: string, speciesSlug: string|null, plantingDate: string}} */ ({
+        generatePlanForPlant(/** @type {any} */ ({
           assetId: assetUUIDs[0],
           speciesSlug: formData.speciesId,
           plantingDate: plantingDateIso,
@@ -1474,7 +1483,7 @@ export default function AssetsDashboard({ onBack, initialTab, initialShowForm = 
         value={formData.notes}
         onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
         placeholder="Notas de campo (opcional)"
-        rows={/** @type {number} */ ("2")}
+        rows={2}
         className="w-full p-3 rounded-xl bg-slate-800 border border-slate-700 text-white text-sm min-h-[56px]"
       />
 
@@ -1622,7 +1631,7 @@ export default function AssetsDashboard({ onBack, initialTab, initialShowForm = 
         value={formData.notes}
         onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
         placeholder="Notas (opcional)"
-        rows={/** @type {number} */ ("2")}
+        rows={2}
         className="w-full p-3 rounded-xl bg-slate-800 border border-slate-700 text-white text-sm min-h-[56px]"
       />
 
@@ -1999,8 +2008,9 @@ export default function AssetsDashboard({ onBack, initialTab, initialShowForm = 
       {/* Map picker modal (Fase 17.3) */}
       {showMapPicker && (
         <MapPicker
-          mode={/** @type {string} */ (showMapPicker)}
+          mode={/** @type {any} */ (showMapPicker)}
           initial={formData.geometry}
+          center={null}
           onSave={(geometry) => {
             setFormData((prev) => ({ ...prev, geometry }));
             setShowMapPicker(false);

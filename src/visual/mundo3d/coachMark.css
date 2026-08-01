@@ -1,0 +1,88 @@
+/*
+ * coachMark.css — estilos del coach-mark del primer ingreso (CoachMarkToque).
+ * Archivo propio (no mundo.css) para no chocar con otros frentes de trabajo.
+ * Autocontenido: cero imágenes/fuentes externas; solo transform/opacity.
+ */
+
+.coach-toque {
+  position: absolute;
+  inset: 0;
+  z-index: 30; /* sobre la escena, debajo del viaje (40) */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.9rem;
+  pointer-events: none; /* jamás roba el toque que está invitando a dar */
+  animation: coach-toque-entra 0.5s ease-out both;
+}
+
+/* El pulso: un anillo que respira sobre la zona de los lugares del valle
+   (los landmarks viven hacia el centro-bajo del encuadre). */
+.coach-toque__pulso {
+  position: relative;
+  width: 58px;
+  height: 58px;
+  margin-top: 12vh;
+  border: 3px solid #fffdf7;
+  border-radius: 50%;
+  box-shadow:
+    0 0 0 2px rgba(42, 32, 22, 0.35),
+    inset 0 0 0 2px rgba(42, 32, 22, 0.35);
+  animation: coach-toque-late 1.6s ease-in-out infinite;
+}
+.coach-toque__pulso::after {
+  content: '';
+  position: absolute;
+  inset: -3px;
+  border: 3px solid rgba(255, 253, 247, 0.8);
+  border-radius: 50%;
+  animation: coach-toque-onda 1.6s ease-out infinite;
+}
+
+.coach-toque__txt {
+  margin: 0;
+  max-width: min(86vw, 22rem);
+  padding: 0.55em 1.1em;
+  font-size: 1rem;
+  font-weight: 700;
+  line-height: 1.3;
+  text-align: center;
+  color: #fffdf7;
+  background: rgba(42, 32, 22, 0.78);
+  border-radius: 999px;
+  text-shadow: 0 1px 4px rgba(10, 20, 10, 0.4);
+}
+
+@keyframes coach-toque-entra {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes coach-toque-late {
+  0%, 100% { transform: scale(0.9); }
+  50% { transform: scale(1.05); }
+}
+@keyframes coach-toque-onda {
+  0% { transform: scale(1); opacity: 0.9; }
+  100% { transform: scale(1.9); opacity: 0; }
+}
+
+/* Calma: anillo estático, sin pulso ni onda (por media query o por prop). */
+@media (prefers-reduced-motion: reduce) {
+  .coach-toque,
+  .coach-toque__pulso {
+    animation: none;
+  }
+  .coach-toque__pulso::after {
+    animation: none;
+    opacity: 0;
+  }
+}
+.coach-toque--calmo,
+.coach-toque--calmo .coach-toque__pulso {
+  animation: none;
+}
+.coach-toque--calmo .coach-toque__pulso::after {
+  animation: none;
+  opacity: 0;
+}

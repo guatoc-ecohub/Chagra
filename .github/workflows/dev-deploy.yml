@@ -60,6 +60,22 @@ jobs:
           # deploy.yml (prod) → prod conserva el colibrí 2D / video actual.
           VITE_COLIBRI: "true"
           VITE_CHAGRA_MCP_TOKEN: ${{ secrets.VITE_CHAGRA_MCP_TOKEN }}
+          # #2593 corpus→chat: base del sidecar (nginx-proxied). DEBE ser
+          # /api/mcp/agro (no /api) o corpusRetriever pega a /api/hybrid-retrieve
+          # → 404 → [] silencioso → el corpus NO se cablea aunque el flag esté ON.
+          # Alineado con sidecarClient.getBaseUrl(). Verificado 2026-07-29.
+          VITE_SIDECAR_URL: "/api/mcp/agro"
+          # #2593 corpus→chat: cablea los ~5900 chunks del corpus server-side
+          # (pgvector + reranker neural bge-reranker-v2-m3 + gate low_relevance)
+          # al RAG del chat. ON en DEV para medir relevancia/latencia; AUSENTE en
+          # deploy.yml (prod) hasta visto bueno. Fail-soft: si falla, RAG cliente.
+          VITE_USE_CORPUS_RETRIEVAL: "true"
+          # SSOT 2026-07-29: dev canónico full-IA. El código de Deep Research ya
+          # vive en dev (deepResearchClient + DeepResearchCard + chip 🔬); solo
+          # faltaba el flag (prod/deploy.yml lo tiene, dev no). Lo prendemos en dev
+          # para que dev = corpus-por-turno + deep-research + todos los guards =
+          # build de referencia contra la que prod se iguala en la promoción.
+          VITE_DEEP_RESEARCH_ENABLED: "true"
           # AVATAR-ESPIRITU / módulos Pro: mismo valor y patrón que deploy.yml
           # (prod). Sin esta variable, loadProModules.js ni intenta el import
           # dinámico y en dev #/espiritu caía SIEMPRE al fallback "no

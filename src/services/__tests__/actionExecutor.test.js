@@ -91,14 +91,18 @@ describe('actionExecutor — ejecución de acciones del agente', () => {
 
     // Mock localStorage
     originalLocalStorage = globalThis.localStorage;
-    globalThis.localStorage = {
+    globalThis.localStorage = /** @type {any} */ ({
       getItem: vi.fn(() => '[]'),
       setItem: vi.fn(),
-    };
+      length: 0,
+      key: vi.fn(),
+      removeItem: vi.fn(),
+      clear: vi.fn(),
+    });
 
     // Mock window.indexedDB (el código lo chequea antes de usar localStorage)
     originalWindow = globalThis.window;
-    globalThis.window = { indexedDB: {} };
+    globalThis.window = /** @type {any} */ ({ indexedDB: /** @type {any} */ ({}) });
 
     // Reset del store mock
     mockStore = {
@@ -117,7 +121,7 @@ describe('actionExecutor — ejecución de acciones del agente', () => {
 
   describe('executeAction — validación de tool', () => {
     it('tool no encontrada → status: failed con error', async () => {
-      getTool.mockReturnValue(null);
+      vi.mocked(getTool).mockReturnValue(null);
       
       const proposal = createProposal('tool_inexistente', { param: 'value' });
       const result = await executeAction(proposal, 'operator-123');
@@ -130,7 +134,7 @@ describe('actionExecutor — ejecución de acciones del agente', () => {
     });
 
     it('tool_name null/undefined → fallback a "no encontrada"', async () => {
-      getTool.mockReturnValue(null);
+      vi.mocked(getTool).mockReturnValue(null);
       
       const proposal = createProposal(null, {});
       const result = await executeAction(proposal, 'operator-123');
@@ -142,7 +146,7 @@ describe('actionExecutor — ejecución de acciones del agente', () => {
 
   describe('executeAction — tool read-only (sin gate)', () => {
     beforeEach(() => {
-      getTool.mockReturnValue(mockToolReadOnly);
+      vi.mocked(getTool).mockReturnValue(mockToolReadOnly);
     });
 
     it('ejecuta directamente sin llamar al callback de gate', async () => {
@@ -168,7 +172,7 @@ describe('actionExecutor — ejecución de acciones del agente', () => {
 
   describe('executeAction — tool con gate humano', () => {
     beforeEach(() => {
-      getTool.mockReturnValue(mockToolWithGate);
+      vi.mocked(getTool).mockReturnValue(mockToolWithGate);
     });
 
     it('sin callback registrado → status: failed', async () => {
@@ -229,7 +233,7 @@ describe('actionExecutor — ejecución de acciones del agente', () => {
       const result = await executeAction(proposal, 'operator-123');
 
       expect(result.status).toBe('executed');
-      expect(result.edited).toBe(true);
+      expect(/** @type {any} */ (result).edited).toBe(true);
       expect(result.result).toEqual({ success: true, message: 'log creado para asset-2' });
     });
 
@@ -250,7 +254,7 @@ describe('actionExecutor — ejecución de acciones del agente', () => {
 
   describe('executeAction — manejo de errores en handler', () => {
     it('handler que falla → captura error y retorna success: false', async () => {
-      getTool.mockReturnValue(mockToolFailing);
+      vi.mocked(getTool).mockReturnValue(mockToolFailing);
 
       const proposal = createProposal('failing_tool', {});
       const result = await executeAction(proposal, 'operator-123');
@@ -268,7 +272,7 @@ describe('actionExecutor — ejecución de acciones del agente', () => {
       });
 
       setActionGateCallback(mockCallback);
-      getTool.mockReturnValue({
+      vi.mocked(getTool).mockReturnValue({
         ...mockToolWithGate,
         handler: async () => { throw new Error('Error en handler con gate'); },
       });
@@ -284,19 +288,19 @@ describe('actionExecutor — ejecución de acciones del agente', () => {
 
   describe('executeAction — casos borde', () => {
     it('proposal null → lanza TypeError (el código no maneja este caso)', async () => {
-      getTool.mockReturnValue(null);
+      vi.mocked(getTool).mockReturnValue(null);
 
       await expect(executeAction(null, 'operator-123')).rejects.toThrow(TypeError);
     });
 
     it('proposal undefined → lanza TypeError (el código no maneja este caso)', async () => {
-      getTool.mockReturnValue(null);
+      vi.mocked(getTool).mockReturnValue(null);
 
       await expect(executeAction(undefined, 'operator-123')).rejects.toThrow(TypeError);
     });
 
     it('operatorId null/undefined → no afecta ejecución', async () => {
-      getTool.mockReturnValue(mockToolReadOnly);
+      vi.mocked(getTool).mockReturnValue(mockToolReadOnly);
 
       const proposal = createProposal('query_info', { query: 'test' });
       const result1 = await executeAction(proposal, null);
@@ -314,7 +318,7 @@ describe('actionExecutor — ejecución de acciones del agente', () => {
         { id: 'action_2', tool_name: 'query_info', status: 'executed' },
       ];
 
-      globalThis.localStorage.getItem.mockReturnValue(JSON.stringify(mockHistory));
+      vi.mocked(globalThis.localStorage.getItem).mockReturnValue(JSON.stringify(mockHistory));
 
       const history = getActionHistory();
 
@@ -323,7 +327,7 @@ describe('actionExecutor — ejecución de acciones del agente', () => {
     });
 
     it('localStorage vacío → retorna []', () => {
-      globalThis.localStorage.getItem.mockReturnValue('[]');
+      vi.mocked(globalThis.localStorage.getItem).mockReturnValue('[]');
 
       const history = getActionHistory();
 
@@ -331,7 +335,7 @@ describe('actionExecutor — ejecución de acciones del agente', () => {
     });
 
     it('localStorage con JSON inválido → retorna []', () => {
-      globalThis.localStorage.getItem.mockReturnValue('invalid json');
+      vi.mocked(globalThis.localStorage.getItem).mockReturnValue('invalid json');
 
       const history = getActionHistory();
 
@@ -345,7 +349,7 @@ describe('actionExecutor — ejecución de acciones del agente', () => {
         status: 'executed',
       }));
 
-      globalThis.localStorage.getItem.mockReturnValue(JSON.stringify(largeHistory));
+      vi.mocked(globalThis.localStorage.getItem).mockReturnValue(JSON.stringify(largeHistory));
 
       const history10 = getActionHistory(10);
       const history50 = getActionHistory(50);
@@ -370,7 +374,7 @@ describe('actionExecutor — ejecución de acciones del agente', () => {
       });
 
       setActionGateCallback(mockCallback);
-      getTool.mockReturnValue(mockToolWithGate);
+      vi.mocked(getTool).mockReturnValue(mockToolWithGate);
 
       const proposal = createProposal('crear_log', { asset_id: 'asset-1' });
       await executeAction(proposal, 'operator-123');
@@ -392,7 +396,7 @@ describe('actionExecutor — ejecución de acciones del agente', () => {
 
   describe('logAuditTrail — integración con localStorage', () => {
     it('ejecución exitosa → escribe en localStorage', async () => {
-      getTool.mockReturnValue(mockToolReadOnly);
+      vi.mocked(getTool).mockReturnValue(mockToolReadOnly);
 
       const proposal = createProposal('query_info', { query: 'test' });
       await executeAction(proposal, 'operator-123');
@@ -404,7 +408,7 @@ describe('actionExecutor — ejecución de acciones del agente', () => {
     });
 
     it('tool no encontrada → escribe en localStorage', async () => {
-      getTool.mockReturnValue(null);
+      vi.mocked(getTool).mockReturnValue(null);
 
       const proposal = createProposal('tool_inexistente', {});
       await executeAction(proposal, 'operator-123');
@@ -413,7 +417,7 @@ describe('actionExecutor — ejecución de acciones del agente', () => {
     });
 
     it('gate rechaza → escribe en localStorage', async () => {
-      getTool.mockReturnValue(mockToolWithGate);
+      vi.mocked(getTool).mockReturnValue(mockToolWithGate);
 
       const mockCallback = vi.fn().mockResolvedValue({
         status: 'rejected',
@@ -433,7 +437,7 @@ describe('actionExecutor — ejecución de acciones del agente', () => {
 
   describe('logAuditTrail — integración con useAssetStore', () => {
     it('ejecución exitosa → llama addLog en el store', async () => {
-      getTool.mockReturnValue(mockToolReadOnly);
+      vi.mocked(getTool).mockReturnValue(mockToolReadOnly);
 
       const proposal = createProposal('query_info', { query: 'test' });
       await executeAction(proposal, 'operator-123');
@@ -453,7 +457,7 @@ describe('actionExecutor — ejecución de acciones del agente', () => {
     });
 
     it('gate rechaza → llama addLog con status rejected', async () => {
-      getTool.mockReturnValue(mockToolWithGate);
+      vi.mocked(getTool).mockReturnValue(mockToolWithGate);
 
       const mockCallback = vi.fn().mockResolvedValue({
         status: 'rejected',
@@ -474,7 +478,7 @@ describe('actionExecutor — ejecución de acciones del agente', () => {
     });
 
     it('store.addLog falla → no rompe flujo principal', async () => {
-      getTool.mockReturnValue(mockToolReadOnly);
+      vi.mocked(getTool).mockReturnValue(mockToolReadOnly);
       mockStore.addLog = vi.fn(() => { throw new Error('Store error'); });
 
       const proposal = createProposal('query_info', { query: 'test' });
@@ -484,7 +488,7 @@ describe('actionExecutor — ejecución de acciones del agente', () => {
     });
 
     it('store sin addLog → no falla', async () => {
-      getTool.mockReturnValue(mockToolReadOnly);
+      vi.mocked(getTool).mockReturnValue(mockToolReadOnly);
       useAssetStore.getState = vi.fn(() => ({}));
 
       const proposal = createProposal('query_info', { query: 'test' });

@@ -70,7 +70,9 @@ import { isDeepResearchEnabled } from '../services/deepResearchClient';
  * (mismo `onSelectIntent`, mismo `data-testid="mode-chip"`, mismo
  * aria-pressed/disabled) — cero mecanismo nuevo, solo una repisa aparte.
  */
-const ChipsToolbar = React.memo(function ChipsToolbar({
+const ChipsToolbar = React.memo(
+/** @param {{ onSelectIntent: (intent: string) => void, activeIntent?: string|null, hasAttachment?: boolean, disabled?: boolean, isPro?: boolean, chipDefs?: any[]|null }} props */
+function ChipsToolbar({
   onSelectIntent,
   activeIntent = null,
   hasAttachment = false,

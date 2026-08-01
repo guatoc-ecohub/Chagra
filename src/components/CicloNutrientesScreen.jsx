@@ -48,7 +48,7 @@ const ANIMALES = [
     emoji: '🐔',
     nombre: 'Gallinas',
     estiercol: 'Gallinaza',
-    detalle: 'Recógela seca de la cama profunda. Compóstala o madúrala antes de usarla (fresca quema las matas).',
+    detalle: 'Recójala seca de la cama profunda. Compóstela o madúrela antes de usarla (fresca quema las matas).',
     alimenta: 'Bocashi',
     text: 'text-amber-200',
     border: 'border-amber-600/40',
@@ -61,7 +61,7 @@ const ANIMALES = [
     emoji: '🐄',
     nombre: 'Vacas',
     estiercol: 'Boñiga (bovinaza)',
-    detalle: 'El estiércol clásico del biol (el biol tradicional de Restrepo se hace con boñiga de vaca). Madúrala antes de aplicarla.',
+    detalle: 'El estiércol clásico del biol (el biol tradicional de Restrepo se hace con boñiga de vaca). Madúrela antes de aplicarla.',
     alimenta: 'Biol, bocashi y compost',
     text: 'text-orange-200',
     border: 'border-orange-600/40',
@@ -74,7 +74,7 @@ const ANIMALES = [
     emoji: '🐖',
     nombre: 'Cerdos',
     estiercol: 'Porcinaza',
-    detalle: 'La porcinaza y el estiércol del lote entran al biol, el supermagro y el compost. Madúrala siempre antes de usar.',
+    detalle: 'La porcinaza y el estiércol del lote entran al biol, el supermagro y el compost. Madúrela siempre antes de usar.',
     alimenta: 'Biol, supermagro y compost',
     text: 'text-pink-200',
     border: 'border-pink-600/40',
@@ -139,7 +139,7 @@ const PASOS_PLAN = [
     momento: 'Al sembrar / trasplantar (día 0)',
     insumo: 'Bocashi al hoyo o surco',
     propio: true,
-    nota: 'Abono de FONDO. Aquí entra la gallinaza de tus gallinas convertida en bocashi.',
+    nota: 'Abono de FONDO. Aquí entra la gallinaza de sus gallinas convertida en bocashi.',
   },
   {
     momento: 'Mientras crece (≈día 15–25)',
@@ -157,7 +157,7 @@ const PASOS_PLAN = [
     momento: 'Mantenimiento (en producción)',
     insumo: 'Té de compost',
     propio: true,
-    nota: 'Microbios para sostener la planta. Sale de tu compost (estiércol maduro de cualquier animal de la finca).',
+    nota: 'Microbios para sostener la planta. Sale de su compost (estiércol maduro de cualquier animal de la finca).',
   },
 ];
 
@@ -192,10 +192,10 @@ export default function CicloNutrientesScreen({ onBack, onHome, onNavigate }) {
       <div className="px-4 pt-4 pb-10 max-w-2xl mx-auto space-y-4">
         {/* Intro — la idea en campesino. */}
         <p className="text-sm text-slate-300 leading-relaxed">
-          En una finca agroecológica nada se bota. Lo que sale de tus animales
-          vuelve a la tierra como comida para las plantas. Aquí ves el camino
+          En una finca agroecológica nada se bota. Lo que sale de sus animales
+          vuelve a la tierra como comida para las plantas. Aquí ve el camino
           completo, eslabón por eslabón: el estiércol del animal se transforma en
-          biopreparado y ese abono entra en el plan de alimentación de tus
+          biopreparado y ese abono entra en el plan de alimentación de sus
           cultivos.
         </p>
 
@@ -214,10 +214,10 @@ export default function CicloNutrientesScreen({ onBack, onHome, onNavigate }) {
         <Card className="border-amber-700/40">
           <h2 className="flex items-center gap-2 text-base font-bold text-amber-200">
             <PawPrint size={18} aria-hidden="true" />
-            1. Tus animales y su estiércol
+            1. Sus animales y su estiércol
           </h2>
           <p className="mt-2 text-sm text-slate-300 leading-relaxed">
-            Cada animal deja un abono distinto. Recógelo y madúralo antes de
+            Cada animal deja un abono distinto. Recójalo y madúrelo antes de
             usarlo (el estiércol fresco quema las matas).
           </p>
           <ul className="mt-3 flex flex-col gap-2">
@@ -249,7 +249,7 @@ export default function CicloNutrientesScreen({ onBack, onHome, onNavigate }) {
           </ul>
           <p className="mt-3 flex items-start gap-2 text-[11px] text-slate-500">
             <Info size={13} className="shrink-0 mt-0.5" aria-hidden="true" />
-            Las abejas no dan abono, pero polinizan tus cultivos y mejoran el
+            Las abejas no dan abono, pero polinizan sus cultivos y mejoran el
             cuaje y la cosecha — también cierran ciclo, por otro lado.
           </p>
         </Card>
@@ -311,7 +311,7 @@ export default function CicloNutrientesScreen({ onBack, onHome, onNavigate }) {
             3. El abono entra en el plan de las plantas
           </h2>
           <p className="mt-2 text-sm text-slate-300 leading-relaxed">
-            En el plan de alimentación de cada cultivo, tu propio abono ocupa los
+            En el plan de alimentación de cada cultivo, su propio abono ocupa los
             pasos clave. Estos son los momentos y qué entra en cada uno:
           </p>
           <ol className="mt-3 flex flex-col gap-2">
@@ -336,7 +336,7 @@ export default function CicloNutrientesScreen({ onBack, onHome, onNavigate }) {
                       p.propio ? 'text-emerald-200' : 'text-stone-300'
                     }`}>
                       {p.propio
-                        ? <><Recycle size={12} aria-hidden="true" /> {p.insumo} — abono de tu finca</>
+                        ? <><Recycle size={12} aria-hidden="true" /> {p.insumo} — abono de su finca</>
                         : <><Mountain size={12} aria-hidden="true" /> {p.insumo} — mineral comprado</>}
                     </p>
                     <p className="mt-1 text-xs text-slate-300/90 leading-snug">{p.nota}</p>
@@ -366,12 +366,12 @@ export default function CicloNutrientesScreen({ onBack, onHome, onNavigate }) {
         <div className="rounded-2xl border border-emerald-700/40 bg-emerald-900/20 p-4">
           <h2 className="flex items-center gap-2 text-base font-bold text-emerald-200">
             <Trees size={18} aria-hidden="true" />
-            Cierra el círculo en tu finca
+            Cierre el círculo en su finca
           </h2>
           <p className="mt-2 text-sm text-emerald-100/90 leading-relaxed">
-            Lleva la cuenta del estiércol que producen tus animales y de los
-            biopreparados que preparas: así sabes cuánto abono propio tienes para
-            el plan de tus cultivos y cuánto te ahorras en abonos comprados.
+            Lleve la cuenta del estiércol que producen sus animales y de los
+            biopreparados que prepara: así sabe cuánto abono propio tiene para
+            el plan de sus cultivos y cuánto se ahorra en abonos comprados.
           </p>
           <button
             type="button"

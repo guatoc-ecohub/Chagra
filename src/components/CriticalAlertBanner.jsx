@@ -42,6 +42,7 @@ function persistDismissed(set) {
   }
 }
 
+/** @param {{ onNavigate?: (view: string) => void }} props */
 export default function CriticalAlertBanner({ onNavigate }) {
   const [tick, setTick] = useState(0);
   const [dismissed, setDismissed] = useState(() => readDismissed());

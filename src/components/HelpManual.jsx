@@ -86,6 +86,7 @@ export default function HelpManual({ onBack, onNavigate }) {
 
       {/* Sub-vistas */}
       {section === 'home' && (
+        // @ts-ignore TS sees HelpHomeScreen as Function type
         <HelpHomeScreen onSelect={setSection} onNavigate={closeAndNavigate} />
       )}
       {section === 'funciones' && (

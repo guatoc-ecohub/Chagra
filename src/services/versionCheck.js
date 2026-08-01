@@ -51,6 +51,7 @@ import { unregisterRegisteredServiceWorker } from './swRegistration';
  */
 /* global __BUILD_SHA__ */
 export const RUNNING_BUILD_SHA =
+  // @ts-expect-error __BUILD_SHA__ defined at build time by Vite
   typeof __BUILD_SHA__ !== 'undefined' ? __BUILD_SHA__ : 'dev';
 
 export const SELF_HEAL_GUARD_KEY = 'chagra:self-heal-reloaded';
@@ -131,7 +132,7 @@ export function isBundleFetchFailure(input) {
  * NUNCA lanza.
  *
  * @param {object} [opts]
- * @param {typeof fetch} [opts.fetchImpl=globalThis.fetch]
+ * @param {(url: string, init?: object) => Promise<{ ok: boolean, status?: number, json: () => Promise<any> }>} [opts.fetchImpl=globalThis.fetch]
  * @param {number} [opts.timeoutMs=VERSION_FETCH_TIMEOUT_MS]
  * @returns {Promise<string|null>}
  */

@@ -119,6 +119,7 @@ export async function detectFincaByGps(fincas, { maxDistanceKm = DEFAULT_MAX_DIS
   let closestDistance = Infinity;
   for (const finca of fincas) {
     if (!Array.isArray(finca.coords) || finca.coords.length !== 2) continue;
+    // @ts-expect-error finca.coords is runtime-validated as [number,number]
     const d = distanceKm(myCoord, finca.coords);
     if (d < closestDistance) {
       closestDistance = d;

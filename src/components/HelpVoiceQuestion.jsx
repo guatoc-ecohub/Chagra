@@ -155,7 +155,7 @@ Formato: párrafo breve (máximo unas 8 oraciones). Sin listas largas salvo que 
       full = await streamOllama(
         OLLAMA_CHAT_URL,
         {
-          model: ENV.NLU_MODEL || 'gemma3:4b',
+          model: ENV.NLU_MODEL || 'gemma4:e2b',
           messages: [
             { role: 'system', content: system },
             { role: 'user', content: userMsg },

@@ -38,6 +38,6 @@ export function listAvailableRegions() {
     slug,
     label: data.label,
     departamentos: data.departamentos || [],
-    nota_apropiacion: data.nota_apropiacion || null,
+    nota_apropiacion: /** @type {any} */ (data).nota_apropiacion || null,
   }));
 }

@@ -1,0 +1,18 @@
+{
+  "_doc": "Set de TAXONOMÍA para test-inteligencia-chagra.mjs. Mide si el agente da el nombre científico CORRECTO (género + epíteto) para especies conocidas del catálogo. Ground-truth = campo scientific_name de la ficha del corpus (verificado 2026-07-23). El match es insensible a mayúsculas/acentos y a la autoría botánica (Juz., L., Mill., …): exige género + epíteto presentes. 'trap' documenta el error histórico que NO debe aparecer (p. ej. papa criolla = phureja, NO tuberosum; angelita = Tetragonisca angustula, NO especie centroamericana).",
+  "queries": [
+    { "id": "TAX-01", "common_name": "papa criolla", "expected_genus": "solanum", "expected_epithet": "phureja", "corpus_slug": "solanum_phureja", "trap": "NO Solanum tuberosum" },
+    { "id": "TAX-02", "common_name": "maíz", "expected_genus": "zea", "expected_epithet": "mays", "corpus_slug": "zea_mays" },
+    { "id": "TAX-03", "common_name": "café", "expected_genus": "coffea", "expected_epithet": "arabica", "corpus_slug": "coffea_arabica" },
+    { "id": "TAX-04", "common_name": "aguacate", "expected_genus": "persea", "expected_epithet": "americana", "corpus_slug": "persea_americana" },
+    { "id": "TAX-05", "common_name": "uchuva", "expected_genus": "physalis", "expected_epithet": "peruviana", "corpus_slug": "physalis_peruviana" },
+    { "id": "TAX-06", "common_name": "lulo", "expected_genus": "solanum", "expected_epithet": "quitoense", "corpus_slug": "solanum_quitoense" },
+    { "id": "TAX-07", "common_name": "mora andina", "expected_genus": "rubus", "expected_epithet": "glaucus", "corpus_slug": "rubus_glaucus" },
+    { "id": "TAX-08", "common_name": "quinua", "expected_genus": "chenopodium", "expected_epithet": "quinoa", "corpus_slug": "chenopodium_quinoa" },
+    { "id": "TAX-09", "common_name": "yuca", "expected_genus": "manihot", "expected_epithet": "esculenta", "corpus_slug": "manihot_esculenta" },
+    { "id": "TAX-10", "common_name": "tomate de árbol", "expected_genus": "solanum", "expected_epithet": "betaceum", "corpus_slug": "solanum_betaceum" },
+    { "id": "TAX-11", "common_name": "arracacha", "expected_genus": "arracacia", "expected_epithet": "xanthorrhiza", "corpus_slug": "arracacia_xanthorrhiza" },
+    { "id": "TAX-12", "common_name": "cebolla cabezona", "expected_genus": "allium", "expected_epithet": "cepa", "corpus_slug": "allium_cepa" },
+    { "id": "TAX-13", "common_name": "mashua o cubio", "expected_genus": "tropaeolum", "expected_epithet": "tuberosum", "corpus_slug": "tropaeolum_tuberosum" }
+  ]
+}

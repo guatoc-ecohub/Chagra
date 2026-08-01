@@ -27,7 +27,7 @@ import { planNluFallback, esSaludoPuro } from '../agentNluFallback.js';
 describe('planNluFallback — invariante: NUNCA devuelve null para un mensaje agro real', () => {
   it('mensaje vacío / no-string → null (no hay nada que groundear)', () => {
     for (const bad of [null, undefined, '', '   ', 42, {}]) {
-      expect(planNluFallback(bad)).toBeNull();
+      expect(planNluFallback(/** @type {any} */ (bad))).toBeNull();
     }
   });
 
@@ -170,7 +170,7 @@ describe('planNluFallback — entidades de baja calidad no rompen', () => {
   });
 
   it('entidades no-array → ignoradas, cae al heurístico', () => {
-    const plan = planNluFallback('cómo riego el café', 'no-soy-array');
+    const plan = planNluFallback('cómo riego el café', /** @type {any} */ ('no-soy-array'));
     expect(plan.tool).toBe('get_species');
     expect(plan.source).toBe('fallback_default_species');
   });
@@ -197,7 +197,7 @@ describe('esSaludoPuro — saludo/smalltalk puro vs pregunta real', () => {
 
   it('input no-string / vacío → false (defensivo)', () => {
     for (const bad of [null, undefined, '', '   ', 42, {}]) {
-      expect(esSaludoPuro(bad)).toBe(false);
+      expect(esSaludoPuro(/** @type {any} */ (bad))).toBe(false);
     }
   });
 });

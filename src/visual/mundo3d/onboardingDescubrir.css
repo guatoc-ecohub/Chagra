@@ -1,0 +1,164 @@
+/*
+ * onboardingDescubrir.css — el primer viaje al valle, sin voz.
+ *
+ * Una tarjeta pequeña abajo-al-centro sobre la escena; el velo NO captura
+ * toques (pointer-events: none) → el valle sigue tocable todo el tiempo.
+ * Paleta del sistema del valle: crema #fffbf2, tinta #2a2016, y el tinte del
+ * mundo en curso vía --od-tinte. Solo transform/opacity animados; el atributo
+ * data-estatico (prop reducedMotion) y prefers-reduced-motion apagan todo.
+ */
+
+.onbdesc {
+  position: absolute;
+  inset: 0;
+  z-index: 6; /* sobre el canvas, junto al botón salir (z-index 5) */
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  padding: 0 12px calc(14px + env(safe-area-inset-bottom, 0px));
+  pointer-events: none; /* el valle queda tocable; solo la tarjeta atrapa */
+}
+
+.onbdesc__tarjeta {
+  pointer-events: auto;
+  width: min(360px, 100%);
+  padding: 1rem 1.1rem 0.95rem;
+  text-align: center;
+  color: #2a2016;
+  background: rgba(255, 251, 242, 0.96);
+  border: 2px solid color-mix(in srgb, var(--od-tinte, #3f8f4e) 55%, transparent);
+  border-radius: 18px;
+  box-shadow: 0 8px 24px rgba(40, 30, 10, 0.24);
+  animation: onbdesc-llega 0.4s ease both;
+}
+@keyframes onbdesc-llega {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ── El medallón: el emoji del lugar dentro de un anillo que respira ────── */
+.onbdesc__medallon {
+  position: relative;
+  width: 58px;
+  height: 58px;
+  margin: 0 auto 0.45rem;
+  display: grid;
+  place-items: center;
+}
+.onbdesc__anillo {
+  position: absolute;
+  inset: 0;
+  border: 2px dashed var(--od-tinte, #3f8f4e);
+  border-radius: 50%;
+  opacity: 0.85;
+  animation: onbdesc-respira 2.6s ease-in-out infinite;
+}
+@keyframes onbdesc-respira {
+  0%, 100% { transform: scale(0.92); opacity: 0.55; }
+  50% { transform: scale(1.06); opacity: 0.95; }
+}
+.onbdesc__emoji {
+  font-size: 1.9rem;
+  line-height: 1;
+}
+
+/* ── Texto ──────────────────────────────────────────────────────────────── */
+.onbdesc__titulo {
+  margin: 0;
+  font-size: 1.06rem;
+  font-weight: 800;
+}
+.onbdesc__pista {
+  margin: 0.35rem 0 0;
+  font-size: 0.9rem;
+  line-height: 1.45;
+}
+.onbdesc__toque {
+  margin: 0.4rem 0 0;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: color-mix(in srgb, var(--od-tinte, #3f8f4e) 78%, #2a2016);
+}
+
+/* ── Semillas de progreso: brotan (se llenan) al pasar por cada lugar ───── */
+.onbdesc__semillas {
+  list-style: none;
+  margin: 0.6rem 0 0;
+  padding: 0;
+  display: flex;
+  justify-content: center;
+  gap: 7px;
+}
+.onbdesc__semilla {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  border: 1.5px solid color-mix(in srgb, #2a2016 45%, transparent);
+  background: transparent;
+  transition: background 0.25s ease, border-color 0.25s ease;
+}
+.onbdesc__semilla--brotada {
+  border-color: var(--od-tinte, #3f8f4e);
+  background: var(--od-tinte, #3f8f4e);
+}
+
+/* ── Acciones ───────────────────────────────────────────────────────────── */
+.onbdesc__acciones {
+  margin-top: 0.75rem;
+  display: flex;
+  justify-content: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+.onbdesc__btn {
+  padding: 0.5em 1.1em;
+  font: inherit;
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: #2a2016;
+  background: #fffdf7;
+  border: 2px solid color-mix(in srgb, #2a2016 30%, transparent);
+  border-radius: 999px;
+  cursor: pointer;
+  transition: transform 0.15s ease, background 0.15s ease;
+}
+.onbdesc__btn--principal {
+  color: #fff;
+  background: var(--od-tinte, #3f8f4e);
+  border-color: var(--od-tinte, #3f8f4e);
+}
+.onbdesc__btn--quieto {
+  font-weight: 600;
+  background: transparent;
+  border-color: transparent;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.onbdesc__btn:hover,
+.onbdesc__btn:focus-visible {
+  transform: translateY(-1px);
+}
+.onbdesc__btn:focus-visible {
+  outline: 2px solid var(--od-tinte, #3f8f4e);
+  outline-offset: 2px;
+}
+
+/* ── Pistas estáticas: reducedMotion (prop) o preferencia del sistema ───── */
+.onbdesc[data-estatico='si'] .onbdesc__tarjeta,
+.onbdesc[data-estatico='si'] .onbdesc__anillo {
+  animation: none;
+}
+.onbdesc[data-estatico='si'] .onbdesc__btn,
+.onbdesc[data-estatico='si'] .onbdesc__semilla {
+  transition: none;
+}
+@media (prefers-reduced-motion: reduce) {
+  .onbdesc__tarjeta,
+  .onbdesc__anillo {
+    animation: none;
+  }
+  .onbdesc__btn,
+  .onbdesc__semilla {
+    transition: none;
+  }
+}

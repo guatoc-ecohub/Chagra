@@ -447,7 +447,7 @@ export function interpretarCromatografia(observaciones) {
   }
 
   // Generar mensaje
-  const mensaje = generarMensajeCampesino(estado, patrones);
+  const mensaje = generarMensajeCampesino(/** @type {EstadoSuelo} */ (estado), patrones);
 
   // Calcular confianza
   const confianza = calcularConfianza(observaciones, puntaje);
@@ -461,13 +461,13 @@ export function interpretarCromatografia(observaciones) {
       ? 'Esta interpretación tiene baja confianza. La cromatografía es cualitativa y depende de las condiciones del ensayo. Compare con otros suelos de su finca para mejor juicio.'
       : '';
 
-  return {
+  return /** @type {any} */ ({
     estado,
     mensaje,
     razones,
     confianza,
     advertencia,
-  };
+  });
 }
 
 /**
@@ -564,17 +564,17 @@ export function crearObservacionDesdeRaw(rawData) {
     }
   }
 
-  return {
+  return /** @type {any} */ ({
     zona: zonaNormalizada,
     colores: coloresNormalizados,
     descripcion: rawData.descripcion || '',
-  };
+  });
 }
 
 /**
  * Valida si una interpretación indica suelo vivo.
  *
- * @param {InterpretacionCromatografia} interpretacion - Interpretación a verificar
+ * @param {Partial<InterpretacionCromatografia> | null | undefined} interpretacion - Interpretación a verificar
  * @returns {boolean} - true si el suelo está vivo
  */
 export function esSueloVivo(interpretacion) {
@@ -584,7 +584,7 @@ export function esSueloVivo(interpretacion) {
 /**
  * Valida si una interpretación indica suelo degradado.
  *
- * @param {InterpretacionCromatografia} interpretacion - Interpretación a verificar
+ * @param {Partial<InterpretacionCromatografia> | null | undefined} interpretacion - Interpretación a verificar
  * @returns {boolean} - true si el suelo está degradado
  */
 export function esSueloDegradado(interpretacion) {
@@ -596,7 +596,7 @@ export function esSueloDegradado(interpretacion) {
 /**
  * Valida si una interpretación indica suelo químicalizado.
  *
- * @param {InterpretacionCromatografia} interpretacion - Interpretación a verificar
+ * @param {Partial<InterpretacionCromatografia> | null | undefined} interpretacion - Interpretación a verificar
  * @returns {boolean} - true si el suelo está químicalizado
  */
 export function esSueloQuimicalizado(interpretacion) {

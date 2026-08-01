@@ -12,9 +12,9 @@ import { warmVisionModel } from '../services/visionWarmService';
  *
  * @param {Object} props
  * @param {Function} props.onPhoto - callback(blob) - Foto procesada/comprimida
- * @param {Function} props.onRemove - callback() - Limpieza de estado
- * @param {string}   props.label - Etiqueta del botón/campo
- * @param {Blob}     props.value - El blob actual (opcional, para persistencia en forms)
+ * @param {Function} [props.onRemove] - callback() - Limpieza de estado
+ * @param {string}   [props.label] - Etiqueta del botón/campo
+ * @param {Blob}     [props.value] - El blob actual (opcional, para persistencia en forms)
  * @param {string}   [props.className] - Estilos extra
  */
 const PhotoCaptureField = ({ onPhoto, onRemove, label = "Capturar Foto", value = null, className = "" }) => {
@@ -70,14 +70,14 @@ const PhotoCaptureField = ({ onPhoto, onRemove, label = "Capturar Foto", value =
             // venga del path full-size de la cámara.
             const preCompressed = await compressImage(file);
             if (!preCompressed.ok) {
-                if (preCompressed.reason === 'too_large') {
+                if (/** @type {any} */ (preCompressed).reason === 'too_large') {
                     setError(IMAGE_TOO_LARGE_MESSAGE);
                 } else {
                     setError('No se pudo procesar la foto. Reintenta.');
                 }
                 return;
             }
-            const { blob } = await captureAndCompress(preCompressed.blob);
+            const { blob } = await captureAndCompress(/** @type {File} */ (/** @type {any} */ (preCompressed.blob)));
             onPhoto(blob);
         } catch (err) {
             console.error('[PhotoField] Error procesando foto:', err);

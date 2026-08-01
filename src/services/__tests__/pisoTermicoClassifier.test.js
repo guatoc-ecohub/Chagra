@@ -31,7 +31,7 @@ describe('clasificarPisoTermico', () => {
   });
 
   it('retorna null para entrada no numerica', () => {
-    expect(clasificarPisoTermico('mil')).toBeNull();
+    expect(clasificarPisoTermico(/** @type {any} */ ('mil'))).toBeNull();
   });
 
   it('retorna null para undefined', () => {

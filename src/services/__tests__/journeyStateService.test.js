@@ -32,14 +32,14 @@ describe('journeyStateService', () => {
   });
 
   it('resolveJourneyState deriva y persiste cuando no hay estado', () => {
-    const s = resolveJourneyState({ fincaSlug: 'f2', processes: [] });
+    const s = resolveJourneyState(/** @type {any} */ ({ fincaSlug: 'f2', processes: [] }));
     expect(s.stageId).toBe('despertar');
     expect(getStoredJourneyState('f2').stageId).toBe('despertar');
   });
 
   it('resolveJourneyState respeta el estado guardado', () => {
     setJourneyState('f3', { stageId: 'equilibrio', accionesHechas: [] });
-    expect(resolveJourneyState({ fincaSlug: 'f3', processes: [] }).stageId).toBe('equilibrio');
+    expect(resolveJourneyState(/** @type {any} */ ({ fincaSlug: 'f3', processes: [] })).stageId).toBe('equilibrio');
   });
 
   it('marcarAccionHecha agrega sin duplicar', () => {

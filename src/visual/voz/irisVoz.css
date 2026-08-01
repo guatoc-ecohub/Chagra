@@ -1,0 +1,148 @@
+/* ════════════════════════════════════════════════════════════════════════════
+   irisVoz.css — la piel de IrisVoz (LA VOZ CON FORMA).
+
+   Paleta de TIERRA, no de neón: la voz de Chagra es una brasa en una cocina
+   de leña, no un holograma. Cuatro estados = cuatro temperaturas del mismo
+   material (nunca cambia la forma, solo la vida que lleva adentro):
+
+     reposo      rescoldo   (pardo apagado — apenas se nota que está viva)
+     escuchando  miel       (ámbar cálido — la atención encendida)
+     pensando    cobre      (más hondo y quieto — el agua dando vueltas)
+     hablando    musgo+miel (verde vivo — la respuesta es cosa que crece)
+
+   Reglas de la casa: solo transform/opacity animados; el glow es filtro
+   ESTÁTICO; prefers-reduced-motion = fotograma quieto pero LEGIBLE por
+   estado (el color y la opacidad cuentan el momento sin loops).
+   ════════════════════════════════════════════════════════════════════════════ */
+
+.iris-voz {
+  /* tinta por defecto = reposo (rescoldo) */
+  --iris-tinta: #8d6b4d;
+  --iris-tinta-2: #6f5844;
+  --iris-brasa-luz: #ffd9a8;
+  --iris-brasa: #d98549;
+  --iris-brasa-borde: rgba(140, 70, 30, 0);
+  --iris-halo: rgba(217, 133, 73, 0.14);
+  --iris-vida: 0;                 /* fotograma estático: cuánta vida extra */
+
+  position: relative;
+  display: inline-block;
+  flex: none;
+}
+
+.iris-voz[data-estado='escuchando'] {
+  --iris-tinta: #e9a94e;
+  --iris-tinta-2: #c98a54;
+  --iris-brasa-luz: #ffe3b0;
+  --iris-brasa: #f0a355;
+  --iris-halo: rgba(233, 169, 78, 0.22);
+  --iris-vida: 0.3;
+}
+
+.iris-voz[data-estado='pensando'] {
+  --iris-tinta: #c57a45;
+  --iris-tinta-2: #9a6a4a;
+  --iris-brasa-luz: #ffce96;
+  --iris-brasa: #d98549;
+  --iris-halo: rgba(197, 122, 69, 0.18);
+  --iris-vida: 0.16;
+}
+
+.iris-voz[data-estado='hablando'] {
+  --iris-tinta: #b7c98a;
+  --iris-tinta-2: #d8b06a;
+  --iris-brasa-luz: #f3e9b0;
+  --iris-brasa: #cabd62;
+  --iris-halo: rgba(183, 201, 138, 0.2);
+  --iris-vida: 0.34;
+}
+
+/* ── halo: la luz que la brasa le presta a la mesa ─────────────────────────── */
+.iv-halo {
+  position: absolute;
+  inset: -18%;
+  border-radius: 50%;
+  pointer-events: none;
+  background: radial-gradient(circle at 50% 50%, var(--iris-halo) 0%, transparent 62%);
+  opacity: 0.6;
+  transition: background 0.7s ease;
+}
+
+/* ── respiración: TODO el iris respira al ritmo de la casa ─────────────────── */
+.iv-respira {
+  width: 100%;
+  height: 100%;
+  animation: iv-respira var(--vfx-beat, 5.2s) ease-in-out infinite;
+}
+
+.iv-respira svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+@keyframes iv-respira {
+  0%, 100% { transform: scale(1); }
+  42% { transform: scale(1.022); }
+  58% { transform: scale(1.018); }
+}
+
+/* ── anillos de agua/tronco ────────────────────────────────────────────────── */
+.iv-anillo {
+  fill: none;
+  stroke: var(--iris-tinta);
+  stroke-linejoin: round;
+  opacity: calc(var(--iv-op-base, 0.4) + var(--iris-vida) * 0.5);
+  transform-box: fill-box;
+  transform-origin: center;
+  transition: stroke 0.7s ease;
+}
+
+/* anillos alternos con la segunda tinta: la veta del tronco, no un arcoíris */
+.iv-anillo-impar { stroke: var(--iris-tinta-2); }
+
+/* ── la trenza de `pensando`: dos grupos contra-rotan lentísimo ──────────────
+   animation-play-state: al salir del estado la rotación se CONGELA donde va
+   (nada salta a cero). Solo transform ⇒ GPU-friendly. */
+.iv-giro {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: iv-giro 46s linear infinite;
+  animation-play-state: paused;
+}
+
+.iv-giro-b {
+  animation-name: iv-giro-contra;
+  animation-duration: 58s;
+}
+
+.iris-voz[data-estado='pensando'] .iv-giro { animation-play-state: running; }
+
+@keyframes iv-giro { to { transform: rotate(360deg); } }
+@keyframes iv-giro-contra { to { transform: rotate(-360deg); } }
+
+/* ── la brasa ──────────────────────────────────────────────────────────────── */
+.iv-brasa {
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+.iv-brasa-aura {
+  fill: var(--iris-brasa);
+  opacity: calc(0.3 + var(--iris-vida));
+  transform-box: fill-box;
+  transform-origin: center;
+  transition: fill 0.7s ease;
+}
+
+/* ── prefers-reduced-motion: fotograma quieto y digno ────────────────────────
+   El rAF no arranca (lo decide IrisVoz.jsx), así que aquí solo apagamos los
+   loops CSS. El estado sigue LEYÉNDOSE: --iris-vida sube la opacidad de los
+   anillos y la aura cuando la voz está activa — color + luz, sin movimiento. */
+@media (prefers-reduced-motion: reduce) {
+  .iv-respira,
+  .iv-giro {
+    animation: none !important;
+  }
+}

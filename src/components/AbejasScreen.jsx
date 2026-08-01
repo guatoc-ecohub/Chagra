@@ -1,6 +1,6 @@
 import React from 'react';
 import {
-  Hexagon, Flower2, HeartPulse, ShieldAlert, Recycle, Info, Droplets,
+  Hexagon, Flower2, ShieldAlert, Recycle, Info, Droplets,
   Sprout, Leaf, AlertTriangle, ArrowRight, CheckCircle2, Home as HomeIcon,
   MessageCircleQuestion,
 } from 'lucide-react';
@@ -40,9 +40,9 @@ import graphStats from '../data/graph-stats-snapshot.json';
  * igual que la convención estática de public/poscosecha/creditos.json. */
 const CREDITOS = {
   'polinizacion-cultivo': {
-    file: 'polinizacion-cultivo.jpg', autor: 'PumpkinSky', licencia: 'CC BY-SA 4.0',
-    licenciaUrl: 'https://creativecommons.org/licenses/by-sa/4.0',
-    fuenteUrl: 'https://commons.wikimedia.org/wiki/File:Pyrus_pyrifolia_(Shinko)_pollinated_by_Apis_mellifera_1crop.jpg',
+    file: 'polinizacion-cultivo.jpg', autor: 'Anita Martinz', licencia: 'CC BY 2.0',
+    licenciaUrl: 'https://creativecommons.org/licenses/by/2.0',
+    fuenteUrl: 'https://commons.wikimedia.org/wiki/File:Apis_mellifera_on_Prunus_flower.jpg',
     fuente: 'Wikimedia Commons',
   },
   angelita: {

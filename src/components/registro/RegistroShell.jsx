@@ -27,7 +27,7 @@ import './registro-shell.css';
  * @param {React.ReactNode} props.children - Cuerpo del formulario / contenido.
  * @param {React.ReactNode} [props.footer] - Barra de acción fija inferior (CTA).
  * @param {React.ReactNode} [props.headerExtra] - Slot a la derecha del header.
- * @returns {JSX.Element}
+ * @returns {React.ReactNode}
  */
 export default function RegistroShell({
   title,
@@ -43,14 +43,14 @@ export default function RegistroShell({
       {/* Header con sello Chagra: icono en un disco con el acento del tema. */}
       <header className="registro-shell__header shrink-0 px-4 pt-4 pb-4 flex items-center gap-3">
         <button
-          onClick={onBack}
+          onClick={/** @type {React.MouseEventHandler<HTMLButtonElement>} */ (onBack)}
           aria-label="Volver"
           className="registro-shell__back shrink-0 min-h-[52px] min-w-[52px] rounded-2xl flex items-center justify-center"
         >
           <ArrowLeft size={26} aria-hidden="true" />
         </button>
         <div className="registro-shell__badge shrink-0 min-h-[52px] min-w-[52px] rounded-2xl flex items-center justify-center" aria-hidden="true">
-          {Icon ? <Icon size={28} /> : null}
+          {Icon ? React.createElement(/** @type {any} */ (Icon), { size: 28 }) : null}
         </div>
         <div className="flex-1 min-w-0">
           <h2 className="registro-shell__title text-2xl font-black leading-tight truncate">{title}</h2>

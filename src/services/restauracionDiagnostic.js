@@ -30,9 +30,10 @@ export function diagnosticarRestauracion(descripcion, opts = {}) {
   // Prioridad: piso/altitud del perfil de la finca; luego señales del texto.
   let piso = opts.piso || pisoDesdeAltitud(opts.altitud);
 
-  for (const [clave, senal] of Object.entries(REST_DATA.senales_voz)) {
+  for (const [clave, signal] of Object.entries(REST_DATA.senales_voz)) {
     const palabras = clave.split('_');
     if (palabras.every((p) => texto.includes(p))) {
+      const /** @type {any} */ senal = signal;
       if (senal.arreglo) arregloId = senal.arreglo;
       if (senal.alerta) {
         if (senal.alerta === 'bonos_carbono') alertas.push(REST_DATA.guardas.bonos_carbono);
@@ -73,7 +74,11 @@ export function formatearGroundingRestauracion(d) {
   const partes = [];
   if (d.arreglo) partes.push(`**Arreglo recomendado:** ${d.arreglo.nombre} — ${d.arreglo.detalle} (${d.arreglo.densidad}).`);
   if (d.especies) {
-    partes.push('**Sucesion ecologica — especies nativas de tu piso termico (usa SOLO estas, NO inventes otras):**');
+    // No todas las especies de la lista son nativas (p. ej. matarraton/guamo son
+    // introducidas de uso agroforestal legitimo) — el rotulo "nativas" aqui era
+    // una sobre-generalizacion falsa (audit AUDIT-RESTAURACION-GROUNDING-2026-07-09.md,
+    // hallazgo #1/#11). Se deja "verificadas" (existen en el catalogo), no "nativas".
+    partes.push('**Sucesion ecologica — especies verificadas de tu piso termico (usa SOLO estas, NO inventes otras):**');
     const fmt = (arr) => arr.map((e) => `${e.nombre} (${e.cientifico})${e.nota ? ` — ${e.nota}` : ''}`).join('; ');
     if (d.especies.pioneras) partes.push(`- Pioneras: ${fmt(d.especies.pioneras)}`);
     if (d.especies.intermedias) partes.push(`- Intermedias: ${fmt(d.especies.intermedias)}`);
@@ -86,7 +91,7 @@ export function formatearGroundingRestauracion(d) {
   }
   if (d.alertas.length > 0) { partes.push('**ALERTAS:**'); d.alertas.forEach((a) => partes.push(`- ${a}`)); }
   if (d.guardas.length > 0) { partes.push('**GUARDAS:**'); d.guardas.forEach((g) => partes.push(`- ${g}`)); }
-  partes.push('IMPORTANTE: recomienda SOLO especies nativas verificadas de la lista anterior; si no hay lista para este piso, dilo y sugiere el vivero local o la CAR. NUNCA inventes nombres de especies.');
+  partes.push('IMPORTANTE: recomienda SOLO especies verificadas de la lista anterior (indica si cada una es nativa o introducida, no asumas que todas son nativas); si no hay lista para este piso, dilo y sugiere el vivero local o la CAR. NUNCA inventes nombres de especies.');
   partes.push(`Fuente: ${d.fuente}`);
   return partes.join('\n\n');
 }

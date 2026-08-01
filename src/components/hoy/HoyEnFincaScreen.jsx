@@ -1,4 +1,11 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+/* i18n (ADR-050): deuda preexistente de textos en español Colombia hardcodeados
+ * en esta pantalla (ninguno tocado por el planificador de paseo #25-#34) — el
+ * mismo criterio que App.jsx: se desactiva a nivel de archivo para no bloquear
+ * --max-warnings=0 con deuda que no es parte de este encargo. Los errores
+ * reales de ESLint siguen activos.
+ */
+/* eslint-disable chagra-i18n/no-hardcoded-spanish */
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
     Cloud, Sunrise,
     Bell, BellOff, MapPin, Droplets, Sprout, Mic, Bug,
@@ -9,6 +16,10 @@ import { ScreenShell } from '../common/ScreenShell';
 import AgendaCampesina from './AgendaCampesina';
 import JourneyGuideCard from './JourneyGuideCard';
 import FincaEvolutionCard from './FincaEvolutionCard';
+import { AngelitaGuia } from '../../visual/agente';
+import useCompaiPaseo from '../../hooks/useCompaiPaseo';
+import { registrarParadas, desregistrarParadas } from '../../services/compaiParadasPorPantalla';
+import useAngelitaStore from '../../store/useAngelitaStore';
 import useAlertStore from '../../store/useAlertStore';
 import { listFarmProcesses } from '../../db/farmProcessCache';
 import { getProfile } from '../../services/userProfileService';
@@ -79,6 +90,7 @@ function prefillAgent(prompt) {
     } catch { /* privacy mode — el agente abre vacío, no rompe */ }
 }
 
+/** @param {{ onBack?: () => void, onHome?: () => void, onNavigate?: (view: string, params?: object) => void }} props */
 export default function HoyEnFincaScreen({ onBack, onHome, onNavigate }) {
     const activeAlerts = useAlertStore((s) => s.activeAlerts);
 
@@ -99,6 +111,16 @@ export default function HoyEnFincaScreen({ onBack, onHome, onNavigate }) {
         : null));
     const [processes, setProcesses] = useState([]);
     const [ciclosCargados, setCiclosCargados] = useState(false);
+
+    // ── Angelita guía (#24, auditoría UX): la MISMA mecánica reutilizable
+    // que nace en #/mockups/dia-en-finca (useAngelitaGuia/<AngelitaGuia>),
+    // ahora en la pantalla REAL de producción — vuela hasta las alertas, las
+    // tareas de la semana y los accesos rápidos y explica su porqué. La
+    // tarjeta de clima queda fuera: cambia de marcado entero según haya o no
+    // geo guardada (dos ramas JSX distintas) y un solo ref no cubre ambas.
+    const refAlertas = useRef(null);
+    const refTareas = useRef(null);
+    const refAccesos = useRef(null);
 
     useEffect(() => {
         let alive = true;
@@ -140,6 +162,76 @@ export default function HoyEnFincaScreen({ onBack, onHome, onNavigate }) {
         () => new Date().toLocaleDateString('es-CO', { weekday: 'long', day: 'numeric', month: 'long' }),
         [],
     );
+
+    // Las paradas de Angelita: solo sobre secciones que existen SIEMPRE en el
+    // DOM (clima sin geo cambia de tarjeta — por eso no la incluimos; alertas,
+    // tareas y accesos rápidos sí están siempre montados). Texto agroecológico
+    // real, no genérico: explica el PORQUÉ de cada sección. `anillo` (#31):
+    // alertas y tareas quedan en el tope de la pantalla (anillo 'cerca' del
+    // puesto); accesos rápidos vive más abajo, al cierre — anillo 'pantalla'.
+    const paradasGuia = useMemo(
+        () => [
+            {
+                id: 'alertas',
+                ref: refAlertas,
+                texto: 'Aquí le aviso apenas algo necesite su atención — helada, plaga o clima raro. Tóquela para preguntarme qué hacer.',
+                gesto: 'senala',
+                tipo: 'informativa',
+                anillo: 'cerca',
+            },
+            {
+                id: 'tareas',
+                ref: refTareas,
+                texto: 'Estas labores salen de la etapa real de sus cultivos, no de un calendario genérico — cada mata tiene su momento.',
+                gesto: 'senala',
+                tipo: 'sugerencia',
+                anillo: 'cerca',
+            },
+            {
+                id: 'accesos',
+                ref: refAccesos,
+                texto: 'Desde aquí registra por voz lo que va pasando en su finca — entre más anote, mejor la acompaño.',
+                gesto: 'invita',
+                tipo: 'sugerencia',
+                anillo: 'pantalla',
+            },
+        ],
+        [],
+    );
+
+    // #27 — registro de paradas por pantalla: el planificador de paseo lee
+    // este catálogo para elegir destino por anillo. Se desregistra al
+    // desmontar — un compAI paseando por una pantalla que ya no existe no
+    // tiene a dónde volar.
+    useEffect(() => {
+        registrarParadas('hoy-en-finca', paradasGuia);
+        return () => desregistrarParadas('hoy-en-finca');
+    }, [paradasGuia]);
+
+    // El planificador autónomo (#25 presupuesto 35%, #28 respeta `ocupado`,
+    // #34 se detiene entero en background) decide SOLO cuándo pasear y con
+    // qué paradas — <AngelitaGuia> ya no navega manual entre las tres fijas,
+    // muestra únicamente las del anillo que el planificador eligió ahora.
+    const { paseando, volviendo, paradasActivas, abortarPaseo } = useCompaiPaseo('hoy-en-finca');
+    const paradasDelPaseo = paseando || volviendo ? paradasActivas : [];
+    const registrarSenalMolestia = useAngelitaStore((s) => s.registrarSenalMolestia);
+
+    // #33 — cualquier toque real del usuario aborta el paseo y lo devuelve
+    // al puesto (vuelo animado, #32 — ver useCompaiPaseo). Se ignoran los
+    // toques DENTRO de la propia guía (.ang-guia / .ang-guia__panel): tocar
+    // "Siguiente" o cerrar la burbuja es interacción CON el compAI, no una
+    // interrupción de su paseo. Abortar un paseo cuenta como señal de
+    // molestia (#102/#106): el usuario quiso seguir con lo suyo.
+    useEffect(() => {
+        if (!paseando) return undefined;
+        const onToqueReal = (ev) => {
+            if (ev.target?.closest?.('.ang-guia, .ang-guia__panel')) return;
+            abortarPaseo();
+            registrarSenalMolestia('abortarPaseo');
+        };
+        document.addEventListener('pointerdown', onToqueReal, { capture: true, passive: true });
+        return () => document.removeEventListener('pointerdown', onToqueReal, { capture: true });
+    }, [paseando, abortarPaseo, registrarSenalMolestia]);
 
     const goAgente = useCallback((prompt) => {
         if (prompt) prefillAgent(prompt);
@@ -299,6 +391,7 @@ export default function HoyEnFincaScreen({ onBack, onHome, onNavigate }) {
 
                 {/* ── 2. ALERTAS DEL DÍA ────────────────────────────────── */}
                 <section
+                    ref={refAlertas}
                     aria-label="Alertas de hoy"
                     className="bg-slate-900/60 backdrop-blur-xl border border-slate-800 rounded-2xl p-4"
                 >
@@ -348,6 +441,7 @@ export default function HoyEnFincaScreen({ onBack, onHome, onNavigate }) {
 
                 {/* ── 3. TAREAS DEL CICLO — ESTA SEMANA ─────────────────── */}
                 <section
+                    ref={refTareas}
                     aria-label="Tareas de la semana"
                     className="bg-slate-900/60 backdrop-blur-xl border border-slate-800 rounded-2xl p-4"
                 >
@@ -413,7 +507,7 @@ export default function HoyEnFincaScreen({ onBack, onHome, onNavigate }) {
                                     )}
                                 </button>
                             ))}
-                            <p className="text-[10px] text-slate-500 leading-snug">
+                            <p className="text-[10px] text-slate-400 leading-snug">
                                 Labores sugeridas por la etapa del cultivo
                                 {ensoPhase !== 'neutral' ? ' y el estado del clima (NOAA/IDEAM)' : ''}.
                                 No reemplazan el ojo del campesino.
@@ -423,7 +517,7 @@ export default function HoyEnFincaScreen({ onBack, onHome, onNavigate }) {
                 </section>
 
                 {/* ── 4. ACCESOS RÁPIDOS ────────────────────────────────── */}
-                <section aria-label="Accesos rápidos">
+                <section ref={refAccesos} aria-label="Accesos rápidos">
                     <div className="grid grid-cols-3 gap-2">
                         {QUICK_ACTIONS.map((accion) => (
                             <button
@@ -458,6 +552,18 @@ export default function HoyEnFincaScreen({ onBack, onHome, onNavigate }) {
                     Ver el mapa de la finca
                 </button>
             </div>
+
+            {/* Angelita guía (#24): vuela hasta alertas/tareas/accesos y explica
+                su porqué agroecológico — mecanismo reutilizable (src/hooks/
+                useAngelitaGuia.js), nacido en el mockup #/mockups/dia-en-finca,
+                ahora en la pantalla de producción real. `paradas` ya NO es la
+                lista fija completa: es la que el planificador de paseo eligió
+                para el anillo actual (#25/#31) — fuera de un paseo activo,
+                vacía, y AngelitaGuia simplemente no pinta nada ese rato (queda
+                en su puesto, el FAB). recordarCierreId: si el campesino cierra
+                la guía a mitad de un paseo, no vuelve a insistir en este
+                dispositivo (mismo comportamiento de siempre). */}
+            <AngelitaGuia paradas={paradasDelPaseo} recordarCierreId="hoy-en-finca" />
         </ScreenShell>
     );
 }

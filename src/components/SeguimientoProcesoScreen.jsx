@@ -49,13 +49,6 @@ const PIG_SANITY_GUARDS = [
   animalDiagnostics?.guardas?.porquinaza_bioseguridad,
   animalDiagnostics?.guardas?.reproduccion_porcina,
 ].filter(Boolean);
-const PIG_STAGE_LABELS = {
-  instalacion: 'Instalación',
-  alimentacion: 'Alimentación',
-  reproduccion: 'Reproducción',
-  sanidad: 'Sanidad',
-  cierre: 'Cierre',
-};
 
 // Etapa inicial por tipo de proceso (primer hito de su secuencia).
 function initialStageFor(processType) {
@@ -96,6 +89,7 @@ const fmtDate = (ms) => {
   catch { return '—'; }
 };
 
+/** @param {{ procesoKey: string, onBack: () => void, onSave?: (msg: string) => void }} props */
 export default function SeguimientoProcesoScreen({ procesoKey, onBack, onSave }) {
   const def = useMemo(() => getSeguimientoDef(procesoKey), [procesoKey]);
   const lands = useAssetStore((s) => s.lands);
@@ -343,7 +337,7 @@ function IniciarProcesoForm({ def, locationOptions, onCancel, onCreated }) {
           notes: notes.trim() || undefined,
         },
       };
-      await createFarmProcess(process);
+      await createFarmProcess(/** @type {import('../types/farmProcess').FarmProcess} */ (/** @type {any} */ (process)));
       // Nota de inicio (opcional) como evento del ciclo.
       if (notes.trim()) {
         await recordFarmEvent({
@@ -963,7 +957,7 @@ function ProcesoDetalle({ def, proceso, stageSeq, locationOptions = [], onReload
       )}
 
       {/* Observaciones (reusa el motor del ciclo) */}
-      <CicloObservacion processId={processId} currentStage={a.current_stage} onSaved={() => { loadEvents(); onReload?.(); }} />
+      <CicloObservacion processId={processId} processHint={a.attributes?.process_type || ''} currentStage={a.current_stage} onSaved={() => { loadEvents(); onReload?.(); }} />
 
       {/* Fotos del proceso */}
       <CicloFotos processId={processId} />

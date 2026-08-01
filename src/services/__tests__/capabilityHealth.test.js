@@ -19,7 +19,7 @@ const makeDeps = (overrides = {}) => ({
 
 describe('checkCapabilityHealth', () => {
   beforeEach(() => {
-    globalThis.fetch = vi.fn(() => Promise.resolve({ ok: true }));
+    globalThis.fetch = /** @type {typeof globalThis.fetch} */ (/** @type {unknown} */ (vi.fn(() => Promise.resolve({ ok: true }))));
     Object.defineProperty(navigator, 'onLine', { value: true, configurable: true });
   });
 

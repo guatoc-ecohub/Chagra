@@ -731,20 +731,20 @@ export class SyncManager {
       flushVisionQueue().catch((e) =>
         console.debug('[sync] flushVisionQueue error:', e?.message || e)
       );
-      recordEvent({
+      recordEvent(/** @type {any} */ ({
         event_type: 'connectivity_state',
         flujo: 'sync_manager',
         connectivity: 'online',
-      }).catch(() => {});
+      })).catch(() => {});
     });
 
     window.addEventListener('offline', () => {
       this.isOnline = false;
-      recordEvent({
+      recordEvent(/** @type {any} */ ({
         event_type: 'connectivity_state',
         flujo: 'sync_manager',
         connectivity: 'offline',
-      }).catch(() => {});
+      })).catch(() => {});
     });
   }
 
@@ -907,12 +907,15 @@ export class SyncManager {
     return 'medium';
   }
 
+  /**
+   * @param {number|string|Date} timestamp
+   */
   calculateDeadlineFromTimestamp(timestamp) {
-    const tsValue = typeof timestamp === 'number' ? timestamp * 1000 : Date.parse(timestamp) || 0;
+    const tsValue = typeof timestamp === 'number' ? timestamp * 1000 : Date.parse(/** @type {string} */ (timestamp)) || 0;
     if (!tsValue) return 'Pendiente';
     const taskDate = new Date(tsValue);
     const nowDate = new Date();
-    const daysDiff = Math.floor((nowDate - taskDate) / (1000 * 60 * 60 * 24));
+    const daysDiff = Math.floor((nowDate.getTime() - taskDate.getTime()) / (1000 * 60 * 60 * 24));
 
     if (daysDiff < 0) {
       const absDaysDiff = Math.abs(daysDiff);

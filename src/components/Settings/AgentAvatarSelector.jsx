@@ -1,42 +1,47 @@
 import { Check } from 'lucide-react';
 import useAgentAvatarType from '../../hooks/useAgentAvatarType';
-import ChagraAgentAvatarColibri from '../ChagraAgentAvatarColibri';
-import ChagraAgentAvatarColibriPhoto from '../ChagraAgentAvatarColibriPhoto';
+import ChagraAgentAvatarAngelita from '../ChagraAgentAvatarAngelita';
 import ChagraAgentAvatarMaiz from '../ChagraAgentAvatarMaiz';
+import ChagraAgentAvatarZariguya from '../ChagraAgentAvatarZariguya';
 
 /**
  * AgentAvatarSelector — selector visual para el avatar del agente IA.
  *
- * 3 opciones: colibrí foto-realista (default), colibrí ilustrado SVG,
- * o planta de maíz. Persiste vía useAgentAvatarType (localStorage
+ * 3 opciones: Angelita la abeja (default), planta de maíz, o la zarigüeya
+ * (crías al lomo). Persiste vía useAgentAvatarType (localStorage
  * `chagra:agent-avatar-type`). Cambio inmediato — afecta a todas las
- * instancias del avatar en la app.
+ * instancias del avatar en la app (FAB, login, chat, onboarding — ver
+ * ChagraAgentAvatar.jsx, el dispatcher del que dependen).
  *
- * 2026-05-28: la opción 'colibri' foto-realista reemplaza al R3F que
- * el operador rechazó. La ilustración SVG sigue accesible bajo
- * 'colibri_svg' para quien prefiera el estilo botánico anterior.
+ * 2026-07-16 (operador): "Angelita como el agente, jubila el colibrí".
+ * 2026-07-18 (operador): el colibrí sale también de las opciones — "solo
+ * abejita". Los slugs viejos 'colibri'/'colibri_svg' migran a 'angelita'
+ * en el hook, sin acción del usuario.
+ * 2026-07-25 (operador): 3ra opción, la zarigüeya (PR #2783, registro
+ * rubber-hose cálido de `visual/creatures/Zariguya.jsx` — NO la zarigüeya
+ * oscura/neón de `dashboard/CriaturasNocturnas.jsx`).
  */
 export default function AgentAvatarSelector() {
     const [type, setType] = useAgentAvatarType();
 
     const OPTIONS = [
         {
-            id: 'colibri',
-            label: 'Colibrí real',
-            sub: 'Foto biopunk (recomendado)',
-            Component: ChagraAgentAvatarColibriPhoto,
-        },
-        {
-            id: 'colibri_svg',
-            label: 'Colibrí ilustrado',
-            sub: 'SVG botánico animado',
-            Component: ChagraAgentAvatarColibri,
+            id: 'angelita',
+            label: 'Angelita, la abeja',
+            sub: 'La vecina que sabe de finca (recomendado)',
+            Component: ChagraAgentAvatarAngelita,
         },
         {
             id: 'maiz',
             label: 'Planta de maíz',
             sub: 'Cultivo ancestral originario',
             Component: ChagraAgentAvatarMaiz,
+        },
+        {
+            id: 'zariguya',
+            label: 'Zarigüeya',
+            sub: 'La que carga a sus crías al lomo',
+            Component: ChagraAgentAvatarZariguya,
         },
     ];
 
@@ -48,7 +53,7 @@ export default function AgentAvatarSelector() {
                     Elige cómo se ve la IA en la app. Cambio inmediato.
                 </p>
             </div>
-            <div className="grid grid-cols-3 gap-2.5">
+            <div className="grid grid-cols-3 gap-2">
                 {OPTIONS.map((opt) => {
                     const selected = type === opt.id;
                     return (
@@ -57,18 +62,18 @@ export default function AgentAvatarSelector() {
                             type="button"
                             onClick={() => setType(opt.id)}
                             aria-pressed={selected}
-                            className={`relative flex flex-col items-center gap-2 px-2 py-4 rounded-xl border-2 transition-all active:scale-95 ${
+                            className={`relative flex flex-col items-center gap-1.5 px-1.5 py-3 rounded-xl border-2 transition-all active:scale-95 ${
                                 selected
                                     ? 'border-emerald-500 bg-emerald-900/20 ring-2 ring-emerald-500/40'
                                     : 'border-slate-700 bg-slate-900 hover:border-slate-600'
                             }`}
                         >
                             {selected && (
-                                <span className="absolute top-2 right-2 inline-flex items-center justify-center w-5 h-5 rounded-full bg-emerald-500 text-white">
+                                <span className="absolute top-1.5 right-1.5 inline-flex items-center justify-center w-5 h-5 rounded-full bg-emerald-500 text-white">
                                     <Check size={12} strokeWidth={3} aria-hidden="true" />
                                 </span>
                             )}
-                            <opt.Component state={selected ? 'thinking' : 'idle'} size={60} />
+                            <opt.Component state={selected ? 'thinking' : 'idle'} size={64} onDoubleClick={() => {}} ariaLabel={opt.label} />
                             <div className="text-center">
                                 <p className="text-xs sm:text-sm font-bold text-slate-100 leading-tight">{opt.label}</p>
                                 <p className="text-[10px] text-slate-500 mt-0.5 leading-tight">{opt.sub}</p>

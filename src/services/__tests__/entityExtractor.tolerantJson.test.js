@@ -20,13 +20,13 @@ import { streamOllama } from '../ollamaStream';
 import { extractEntities, _resetSystemPromptCache } from '../entityExtractor';
 
 beforeEach(() => {
-  streamOllama.mockReset();
+  vi.mocked(streamOllama).mockReset();
   _resetSystemPromptCache();
 });
 
 describe('entityExtractor — parser tolerante NLU (QUICK-6 #269)', () => {
   it('parsea array JSON limpio sin reparación', async () => {
-    streamOllama.mockResolvedValue(
+    vi.mocked(streamOllama).mockResolvedValue(
       '[{"crop":"tomate","quantity":5,"location":"invernadero"}]',
     );
     const out = await extractEntities('Sembré cinco tomates en el invernadero');
@@ -39,7 +39,7 @@ describe('entityExtractor — parser tolerante NLU (QUICK-6 #269)', () => {
     // El modelo emitió dos entidades pero el stream se cortó: falta cerrar el
     // último objeto y el array. El parser local viejo (regex `[...]`) fallaba
     // acá; el tolerante cierra estructura y rescata ambas entidades.
-    streamOllama.mockResolvedValue(
+    vi.mocked(streamOllama).mockResolvedValue(
       '[{"crop":"papa","quantity":3,"location":"lote norte"},'
       + '{"crop":"maiz","quantity":2,"location":"lote norte"',
     );
@@ -51,7 +51,7 @@ describe('entityExtractor — parser tolerante NLU (QUICK-6 #269)', () => {
   });
 
   it('limpia fences markdown alrededor del JSON', async () => {
-    streamOllama.mockResolvedValue(
+    vi.mocked(streamOllama).mockResolvedValue(
       '```json\n[{"crop":"banano","quantity":3,"location":""}]\n```',
     );
     const out = await extractEntities('Sembré tres bananos');
@@ -64,7 +64,7 @@ describe('entityExtractor — parser tolerante NLU (QUICK-6 #269)', () => {
     // inválido (`"quantity"` huérfano), así que el parse falla por completo y
     // extractEntities lanza error. Es la elección CONSERVADORA: preferimos
     // perder el turno a emitir una entidad con un valor fabricado.
-    streamOllama.mockResolvedValue(
+    vi.mocked(streamOllama).mockResolvedValue(
       '[{"crop":"papa","quantity":3,"location":"norte"},{"crop":"yuca","quantity":',
     );
     await expect(extractEntities('papas y yuca')).rejects.toThrow(/no parseable/i);
@@ -74,7 +74,7 @@ describe('entityExtractor — parser tolerante NLU (QUICK-6 #269)', () => {
     // Un array donde un elemento reparable carece de `quantity` válido: el
     // parse SÍ recupera la estructura, pero isValidEntity filtra al inválido
     // en vez de inventarle un quantity.
-    streamOllama.mockResolvedValue(
+    vi.mocked(streamOllama).mockResolvedValue(
       '[{"crop":"papa","quantity":3,"location":"norte"},{"crop":"yuca","location":"sur"}]',
     );
     const out = await extractEntities('papas y yuca');
@@ -84,7 +84,7 @@ describe('entityExtractor — parser tolerante NLU (QUICK-6 #269)', () => {
   });
 
   it('salida totalmente irreparable lanza error (no devuelve data falsa)', async () => {
-    streamOllama.mockResolvedValue('lo siento, no entendí la pregunta');
+    vi.mocked(streamOllama).mockResolvedValue('lo siento, no entendí la pregunta');
     await expect(extractEntities('algo')).rejects.toThrow(/no parseable/i);
   });
 });

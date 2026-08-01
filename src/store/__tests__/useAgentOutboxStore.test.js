@@ -20,28 +20,28 @@ describe('useAgentOutboxStore', function () {
   });
 
   it('refresh carga del servicio', async function () {
-    svcGetAll.mockResolvedValue([{ id: 1 }, { id: 2 }]);
-    svcGetInFlight.mockResolvedValue([{ id: 1 }]);
+    vi.mocked(svcGetAll).mockResolvedValue([{ id: 1 }, { id: 2 }]);
+    vi.mocked(svcGetInFlight).mockResolvedValue([{ id: 1 }]);
     await useAgentOutboxStore.getState().refresh();
     expect(useAgentOutboxStore.getState().items).toHaveLength(2);
   });
 
   it('refresh no explota con error', async function () {
-    svcGetAll.mockRejectedValue(new Error('fail'));
+    vi.mocked(svcGetAll).mockRejectedValue(new Error('fail'));
     await useAgentOutboxStore.getState().refresh();
     expect(useAgentOutboxStore.getState().loading).toBe(false);
   });
 
   it('send persiste y refresca', async function () {
-    svcEnqueue.mockResolvedValue(42);
-    svcGetAll.mockResolvedValue([{ id: 42 }]);
-    svcGetInFlight.mockResolvedValue([{ id: 42 }]);
+    vi.mocked(svcEnqueue).mockResolvedValue(42);
+    vi.mocked(svcGetAll).mockResolvedValue([{ id: 42 }]);
+    vi.mocked(svcGetInFlight).mockResolvedValue([{ id: 42 }]);
     var id = await useAgentOutboxStore.getState().send({ text: 'hi' });
     expect(id).toBe(42);
   });
 
   it('send propaga error', async function () {
-    svcEnqueue.mockRejectedValue(new Error('fail'));
+    vi.mocked(svcEnqueue).mockRejectedValue(new Error('fail'));
     await expect(
       useAgentOutboxStore.getState().send({ text: 'x' })
     ).rejects.toThrow('fail');

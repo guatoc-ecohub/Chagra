@@ -69,6 +69,24 @@ describe('extractPassageText branches', function () {
     const doc = { leccion_agroecologica: 'Leccion viva' };
     expect(extractPassageText(doc)).toBe('Leccion viva');
   });
+
+  it('embebe piso termico (thermal_zones) como frase (RUNPATH #9)', function () {
+    const doc = { thermal_zones: ['templado', 'frio'] };
+    expect(extractPassageText(doc)).toBe('Piso termico: templado, frio.');
+  });
+
+  it('embebe altitud/temperatura/agua desde requirements', function () {
+    const doc = {
+      requirements: {
+        altitud_msnm: { optimo_min: 2200, optimo_max: 2800 },
+        temperatura_c: { optimo_min: 12, optimo_max: 20 },
+        agua: 'medio',
+      },
+    };
+    expect(extractPassageText(doc)).toBe(
+      'Altitud optima: 2200 a 2800 msnm. Temperatura optima: 12 a 20 grados C. Requerimiento de agua: medio.',
+    );
+  });
 });
 
 describe('extractPassageText corpus coverage', function () {

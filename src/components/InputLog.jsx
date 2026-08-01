@@ -163,6 +163,7 @@ export default function InputLog({ onBack, onSave }) {
             name="quantity"
             value={formData.quantity}
             onChange={handleInput}
+            // @ts-ignore placeholder not in strict prop types
             placeholder="0.00"
           />
           <SelectField
@@ -184,6 +185,7 @@ export default function InputLog({ onBack, onSave }) {
           rows={3}
           value={formData.notes}
           onChange={handleInput}
+          // @ts-ignore placeholder not in strict prop types
           placeholder="Ej: el suelo estaba seco, dosis baja…"
         />
       </RegistroShell>

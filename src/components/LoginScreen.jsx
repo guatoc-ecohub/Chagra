@@ -6,12 +6,12 @@ import { setCurrentOperator } from '../services/operatorIdentityService';
 import { setActiveTenantId } from '../services/tenantContext';
 import { version as APP_VERSION } from '../../package.json';
 import ChagraGrowLoader from './ChagraGrowLoader';
-import ChagraAgentAvatarColibri from './ChagraAgentAvatarColibri';
+import ChagraAgentAvatar from './ChagraAgentAvatar';
 import LegalLinks from './LegalLinks';
 import WelcomeStatsHero from './WelcomeStatsHero';
 import useOllamaWarmStore from '../store/useOllamaWarmStore';
 import { prewarmCorpus } from '../services/ragRetriever';
-import useThemeBackgroundStore, { getBackgroundSrc } from '../store/useThemeBackgroundStore';
+import useThemeBackgroundStore, { getBackgroundSrc, esGradiente } from '../store/useThemeBackgroundStore';
 import { friendlyMessage } from '../utils/friendlyErrors';
 
 /**
@@ -168,7 +168,7 @@ export default function LoginScreen({ onLoginSuccess, onSave }) {
           aria-hidden="true"
           className="login-bg-photo absolute inset-0 pointer-events-none bg-cover bg-center"
           style={{
-            backgroundImage: `linear-gradient(rgba(2,6,23,0.72), rgba(2,6,23,0.82) 55%, rgba(2,6,23,0.92)), url('${loginBgSrc}')`,
+            backgroundImage: `linear-gradient(rgba(2,6,23,0.72), rgba(2,6,23,0.82) 55%, rgba(2,6,23,0.92)), ${esGradiente(loginBgSrc) ? loginBgSrc : `url('${loginBgSrc}')`}`,
           }}
         />
       )}
@@ -186,7 +186,10 @@ export default function LoginScreen({ onLoginSuccess, onSave }) {
 
       <main className="relative z-10 w-full max-w-md flex flex-col items-center gap-7 animate-fadeIn">
         {/* ─────────────────────────────────────────────────────────────
-            MARCA — el Colibrí Barbudito (avatar botánico de Chagra IA)
+            MARCA — el compAI que el usuario eligió (ChagraAgentAvatar lee
+            `chagra:agent-avatar-type`; Angelita la abeja por defecto, o su
+            planta de maíz si la escogió en Perfil — fix 2026-07-25: antes
+            este header ignoraba la elección e importaba a Angelita directo)
             posado en un orbe neón. Personaje adulto y elegante, no mascota;
             reemplaza el ícono genérico anterior por el rostro de la marca.
             ───────────────────────────────────────────────────────────── */}
@@ -196,10 +199,10 @@ export default function LoginScreen({ onLoginSuccess, onSave }) {
               aria-hidden="true"
               className="absolute inset-0 rounded-full ring-1 ring-muzo/20 animate-pulse"
             />
-            <ChagraAgentAvatarColibri
+            <ChagraAgentAvatar
               state="idle"
-              size={92}
-              ariaLabel="Colibrí Barbudito, símbolo de Chagra"
+              size={108}
+              ariaLabel="Chagra IA"
             />
           </div>
 

@@ -90,6 +90,7 @@ const LEVEL_CONFIG = {
     },
 };
 
+/** @param {{ className?: string, title?: string, confidence?: number }} props */
 export default function AIBetaBadge({ className = '', title, confidence }) {
     const level = getLevel(confidence);
     const cfg = LEVEL_CONFIG[level];

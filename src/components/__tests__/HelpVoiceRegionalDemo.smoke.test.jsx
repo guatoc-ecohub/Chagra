@@ -21,7 +21,7 @@ describe('HelpVoiceRegionalDemo Smoke Test', () => {
             setVoiceRegion: vi.fn((val) => { storeState.voiceRegion = val; }),
             setVoiceRegionIntensity: vi.fn((val) => { storeState.voiceRegionIntensity = val; })
         };
-        usePrefsStore.mockImplementation((selector) => selector(storeState));
+        vi.mocked(usePrefsStore).mockImplementation((selector) => selector(storeState));
     });
 
     test('Render with default prefs (auto + sutil)', () => {

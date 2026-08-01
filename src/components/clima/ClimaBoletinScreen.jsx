@@ -6,7 +6,7 @@ import {
 import { ScreenShell } from '../common/ScreenShell';
 import CieloENSO from './CieloENSO';
 import { getEnsoPhase, getEnsoLabel, getEnsoPhaseSource } from '../../services/ensoService';
-import { ensoFamily, regionFromProfile, ensoRegionalLine, ENSO_WATCH_2026 } from '../../services/ensoContext';
+import { ensoFamily, regionFromProfile, ensoRegionalLine } from '../../services/ensoContext';
 import { getProfile } from '../../services/userProfileService';
 import {
   PILARES_CLIMA,

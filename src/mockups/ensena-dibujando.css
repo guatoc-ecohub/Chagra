@@ -1,0 +1,235 @@
+/* ════════════════════════════════════════════════════════════════════════
+   ensena-dibujando.css — mockup "el agente enseña dibujando".
+
+   Estética de cuaderno de campo: papel crema, tinta sepia. Las láminas traen
+   sus propios colores fijos (ilustración que enseña), así que el envoltorio
+   solo pone el "escritorio de papel" donde nacen. Todo el prefijo `ed-`.
+   Responsive desde 320px; el movimiento (auto-dibujado) vive en effects.css y
+   ya respeta prefers-reduced-motion.
+   ════════════════════════════════════════════════════════════════════════ */
+
+.ed-root {
+  --ed-papel: #f3ead4;
+  --ed-papel-2: #ede0c4;
+  --ed-tinta: #5c4326;
+  --ed-tinta-2: #8a6b40;
+  --ed-linea: rgba(92, 67, 38, 0.18);
+  --ed-verde: #55702c;
+  min-height: 100%;
+  box-sizing: border-box;
+  padding: 16px clamp(12px, 4vw, 28px) 40px;
+  background:
+    radial-gradient(120% 80% at 50% 0%, #fbf5e6 0%, #f3ead4 60%, #ecdfc1 100%);
+  color: var(--ed-tinta);
+  font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+}
+
+/* ── cabecera ─────────────────────────────────────────────────────────── */
+.ed-top {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  max-width: 640px;
+  margin: 0 auto 14px;
+}
+.ed-back {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 12px;
+  border: 1.5px solid var(--ed-linea);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.4);
+  color: var(--ed-tinta);
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+.ed-back:hover { background: rgba(255, 255, 255, 0.7); }
+.ed-title-wrap { min-width: 0; }
+.ed-title {
+  margin: 2px 0 2px;
+  font-family: 'Georgia', 'Times New Roman', serif;
+  font-size: clamp(1.15rem, 5vw, 1.6rem);
+  font-weight: 700;
+  line-height: 1.15;
+}
+.ed-sub {
+  margin: 0;
+  font-size: 0.85rem;
+  color: var(--ed-tinta-2);
+  line-height: 1.35;
+}
+
+/* ── selector de concepto ─────────────────────────────────────────────── */
+.ed-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  max-width: 640px;
+  margin: 0 auto 16px;
+}
+.ed-chip {
+  padding: 8px 16px;
+  border: 1.5px solid var(--ed-linea);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.45);
+  color: var(--ed-tinta);
+  font-size: 0.86rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s ease, border-color 0.15s ease;
+}
+.ed-chip:hover { background: rgba(255, 255, 255, 0.8); }
+.ed-chip--on {
+  background: var(--ed-tinta);
+  border-color: var(--ed-tinta);
+  color: var(--ed-papel);
+}
+
+/* ── conversación ─────────────────────────────────────────────────────── */
+.ed-chat {
+  max-width: 640px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.ed-msg { display: flex; gap: 8px; }
+.ed-msg--user { justify-content: flex-end; }
+.ed-msg--agent { justify-content: flex-start; }
+
+.ed-avatar {
+  flex: 0 0 auto;
+  width: 34px;
+  height: 34px;
+  margin-top: 2px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--ed-verde);
+  color: #f3ead4;
+}
+
+.ed-bubble {
+  border-radius: 16px;
+  line-height: 1.4;
+  box-shadow: 0 1px 3px rgba(60, 42, 20, 0.08);
+}
+.ed-bubble--user {
+  max-width: 82%;
+  padding: 10px 14px;
+  background: var(--ed-tinta);
+  color: var(--ed-papel);
+  border-bottom-right-radius: 5px;
+  font-size: 0.94rem;
+}
+.ed-bubble--agent {
+  flex: 1 1 auto;
+  min-width: 0;
+  padding: 14px;
+  background: var(--ed-papel);
+  border: 1.5px solid var(--ed-linea);
+  border-bottom-left-radius: 5px;
+}
+
+.ed-lamina-tit {
+  margin: 0 0 8px;
+  font-family: 'Georgia', 'Times New Roman', serif;
+  font-style: italic;
+  font-weight: 700;
+  font-size: 1rem;
+  color: var(--ed-tinta);
+}
+
+/* el papel de la lámina */
+.ed-lamina {
+  margin: 0 0 12px;
+  padding: 8px;
+  border-radius: 10px;
+  background: #f7efdd;
+  border: 1px solid var(--ed-linea);
+  overflow: hidden;
+}
+.ed-lamina-svg { display: block; width: 100%; height: auto; }
+
+.ed-frases {
+  margin: 0 0 12px;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.ed-frases li {
+  position: relative;
+  padding-left: 18px;
+  font-size: 0.92rem;
+  line-height: 1.42;
+}
+.ed-frases li::before {
+  content: '';
+  position: absolute;
+  left: 3px;
+  top: 0.6em;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--ed-verde);
+}
+
+.ed-observa {
+  margin: 0 0 12px;
+  padding: 10px 12px;
+  border-left: 3px solid var(--ed-verde);
+  border-radius: 6px;
+  background: rgba(85, 112, 44, 0.08);
+  font-size: 0.88rem;
+  line-height: 1.4;
+  font-style: italic;
+  color: #43521f;
+}
+.ed-observa-tag {
+  display: block;
+  margin-bottom: 2px;
+  font-style: normal;
+  font-weight: 700;
+  font-size: 0.72rem;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  color: var(--ed-verde);
+}
+
+.ed-redraw {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 13px;
+  border: 1.5px solid var(--ed-linea);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.5);
+  color: var(--ed-tinta);
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+.ed-redraw:hover { background: rgba(255, 255, 255, 0.85); }
+
+/* ── pie ──────────────────────────────────────────────────────────────── */
+.ed-foot {
+  max-width: 640px;
+  margin: 22px auto 0;
+  padding-top: 14px;
+  border-top: 1px dashed var(--ed-linea);
+  font-size: 0.82rem;
+  line-height: 1.45;
+  color: var(--ed-tinta-2);
+  text-align: center;
+}
+.ed-foot strong { color: var(--ed-verde); }
+
+@media (max-width: 380px) {
+  .ed-bubble--user { max-width: 90%; font-size: 0.9rem; }
+  .ed-avatar { width: 28px; height: 28px; }
+}

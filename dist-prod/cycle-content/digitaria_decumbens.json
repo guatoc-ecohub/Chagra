@@ -1,0 +1,76 @@
+{
+  "species_slug": "digitaria_decumbens",
+  "scientific_name": "Digitaria eriantha Steud. cv. Pangola",
+  "common_names": [
+    "Pasto pangola"
+  ],
+  "family": "Poaceae",
+  "category": "abonos_verdes_coberturas",
+  "cultivable": true,
+  "conservation_status": "naturalizada",
+  "thermal_zones": [
+    "calido"
+  ],
+  "roles_in_guild": [
+    "ground_cover",
+    "biomass_producer"
+  ],
+  "antagonists": [],
+  "especies_nativas_sustitutas": [],
+  "propagation": {
+    "methods": [
+      "estolon"
+    ],
+    "best_method": "estolon",
+    "protocol_resumen": "Propagación 100% vegetativa por estolones (no produce semilla viable). 2-3 t/ha de material vegetativo en surcos de 0.5 m al inicio de lluvias. Establecimiento 70-100 días.",
+    "tiempo_a_establecimiento_dias": 85,
+    "notas": "Histórica forrajera del Caribe colombiano (introducida desde Sudáfrica vía Florida en años 1930-40). Hoy desplazada parcialmente por brachiarias pero persiste en fincas tradicionales por su rusticidad.",
+    "fuente": "CIAT Tropical Forages; AGROSAVIA Forrajeras; POWO Kew; Bernal 2015"
+  },
+  "requirements": {
+    "agua": "medio",
+    "altitud_msnm": {
+      "min_absoluto": 0,
+      "optimo_min": 0,
+      "optimo_max": 1200,
+      "max_absoluto": 1700
+    },
+    "temperatura_c": {
+      "helada_letal": 5,
+      "optimo_min": 22,
+      "optimo_max": 30,
+      "max_tolerable": 38
+    },
+    "radiacion": "sol_pleno",
+    "drenaje_requerido": "bueno"
+  },
+  "valor_pedagogico": "El pasto pangola (Digitaria eriantha Steud. cv. Pangola, sin. Digitaria decumbens Stent, Poaceae) es una gramínea forrajera tropical de relevancia histórica en la ganadería del Caribe colombiano, originaria de las sabanas de Sudáfrica (Provincia de Pangola, KwaZulu-Natal, de donde toma el nombre) e introducida al Neotrópico a través de Florida en los años 1930-40 por la USDA-CIAT como forrajera estolonífera para sustituir gramíneas nativas de baja productividad en las llanuras del Caribe tropical. Dominó la ganadería costeña colombiana entre los años 1940 y 1980 antes de ser parcialmente desplazada por la introducción masiva de las brachiarias (B. decumbens, B. brizantha) en los años 1970-80, pero persiste hoy en muchas fincas tradicionales del Caribe (Sucre, Córdoba, Magdalena, Cesar, La Guajira), el Magdalena Medio (Antioquia, Santander) y valles interandinos cálidos (Huila, Tolima, Valle del Cauca bajo) entre 0 y 1.200 msnm en zona térmica cálida sobre suelos bien drenados de fertilidad media. Es gramínea perenne estolonífera-decumbente de 40-80 cm de altura con estolones largos rastreros que enraízan en cada nudo, hojas lineares-lanceoladas glabras verde-medio, inflorescencia en 3-9 racimos digitados al ápice del culmo (similar a Cynodon pero con racimos más largos y delgados), semillas raramente viables (al igual que pasto estrella, la propagación natural es 99% vegetativa por estolones). Su característica agronómica distintiva es la rusticidad: tolerancia a sequía moderada (mejor que brachiarias en períodos secos prolongados del Caribe seco), tolerancia a pastoreo intensivo continuo, persistencia decadal en pradera, manejo simple sin requerimientos altos de fertilidad ni descansos largos. Produce biomasa de 12-18 t MS/ha/año con manejo moderado, soporta carga animal de 2-3.5 UGG/ha en sistemas rotacionales con descanso de 28-35 días entre pastoreos y altura de entrada al pastoreo de 30-40 cm, valor nutricional medio (PC 8-11%, DIVMS 55-62%). Su desempeño es inferior a las brachiarias y Mombasa en condiciones óptimas, pero supera a estas en condiciones marginales: sequía severa, suelos arenosos pobres, manejo mínimo. Por esa razón persiste como reserva forrajera en fincas tradicionales del Caribe colombiano donde la inversión en fertilización y manejo intensivo de brachiarias no es viable. Como las otras gramíneas estoloníferas del trópico (Cynodon nlemfuensis, C. plectostachyus), su implantación 100% vegetativa exige 2-3 t/ha de material de propagación cosechado de pradera madre, siembra en surcos de 0.5 m al inicio de las lluvias, descanso post-establecimiento 70-100 días. Es susceptible a salivazo y a Helminthosporium foliar en estaciones lluviosas. Su naturalización es menos agresiva que brachiarias o pasto estrella: los estolones expanden el potrero pero no colonizan agresivamente bosques secos o sabanas nativas, lo que lo hace relativamente aceptable en sistemas tradicionales del Caribe. Manejo agroecológico: propagación 100% vegetativa por estolones de pradera madre (2-3 t/ha), fertilización inicial mínima (150-200 kg/ha 10-30-10), descanso post-establecimiento 70-100 días, rotación con leguminosas tropicales (Stylosanthes hamata, Centrosema brasilianum, Macroptilium atropurpureum) bien adaptadas al Caribe seco-húmedo, sistemas silvopastoriles con árboles nativos del bosque seco tropical (Caesalpinia ebano, Guazuma ulmifolia, Pithecellobium dulce). Es lección histórica de la ganadería tropical colombiana: pasto sudafricano que dominó la ganadería costeña durante 40 años antes de ser desplazado por gramíneas más productivas, pero cuya rusticidad lo mantiene relevante en fincas tradicionales como recordatorio de que el \"pasto óptimo\" depende del nivel de manejo disponible, y de que la diversidad de gramíneas forrajeras en una región es seguro contra eventos climáticos extremos. Fuentes Tier A: CIAT Tropical Forages Database, AGROSAVIA Manual Forrajeras Tropicales 2022, POWO Kew, GBIF Backbone Taxonomy, Bernal et al. 2015 Catálogo Plantas y Líquenes Colombia.",
+  "sources": [
+    {
+      "id": "agrosavia-forrajeras-2022",
+      "title": "agrosavia-forrajeras-2022",
+      "tier": "A",
+      "url": null
+    },
+    {
+      "id": "powo-kew",
+      "title": "powo-kew",
+      "tier": "A",
+      "url": "https://powo.science.kew.org"
+    },
+    {
+      "id": "gbif-taxonomic-backbone",
+      "title": "gbif-taxonomic-backbone",
+      "tier": "A",
+      "url": "https://www.gbif.org/dataset/d7dddbf4-2cf0-4f39-9b2a-bb099caae36c"
+    },
+    {
+      "id": "bernal-2015-plantas-liquenes-colombia",
+      "title": "bernal-2015-plantas-liquenes-colombia",
+      "tier": "A",
+      "url": "http://catalogoplantasdecolombia.unal.edu.co"
+    }
+  ],
+  "_generated_by": "scripts/build-cycle-content-from-catalog.mjs",
+  "_generated_at": "2026-05-19T00:42:57.389Z"
+}

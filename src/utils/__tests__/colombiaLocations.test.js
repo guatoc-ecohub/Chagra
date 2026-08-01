@@ -112,7 +112,7 @@ describe('findNearestMunicipio — reverse-geocode OFFLINE por centroide (#338)'
   });
 
   it('devuelve null para coordenadas no numericas', () => {
-    expect(findNearestMunicipio('a', 1)).toBeNull();
+    expect(findNearestMunicipio(/** @type {any} */ ('a'), 1)).toBeNull();
     expect(findNearestMunicipio(NaN, NaN)).toBeNull();
     expect(findNearestMunicipio(undefined, undefined)).toBeNull();
   });

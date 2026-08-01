@@ -20,26 +20,26 @@ import Skeleton from '../common/Skeleton';
 describe('Skeleton — usa fondo oscuro', () => {
   test('variante line usa bg-slate-700/40 (oscuro)', () => {
     const { container } = render(<Skeleton variant="line" width="200" />);
-    const el = container.firstChild;
+    const el = /** @type {HTMLElement} */ (container.firstChild);
     expect(el.className).toMatch(/bg-slate-700\/40/);
     expect(el.className).toMatch(/animate-pulse/);
   });
 
   test('variante rect usa bg-slate-700/40 (oscuro)', () => {
     const { container } = render(<Skeleton variant="rect" width={100} height={80} />);
-    const el = container.firstChild;
+    const el = /** @type {HTMLElement} */ (container.firstChild);
     expect(el.className).toMatch(/bg-slate-700\/40/);
   });
 
   test('variante circle usa bg-slate-700/40 (oscuro)', () => {
     const { container } = render(<Skeleton variant="circle" />);
-    const el = container.firstChild;
+    const el = /** @type {HTMLElement} */ (container.firstChild);
     expect(el.className).toMatch(/bg-slate-700\/40/);
   });
 
   test('rol status presente con aria-busy=true', () => {
     const { container } = render(<Skeleton />);
-    const el = container.firstChild;
+    const el = /** @type {HTMLElement} */ (container.firstChild);
     expect(el.getAttribute('role')).toBe('status');
     expect(el.getAttribute('aria-busy')).toBe('true');
   });
@@ -48,12 +48,12 @@ describe('Skeleton — usa fondo oscuro', () => {
     // Tailwind motion-safe:animate-pulse se desactiva automaticamente
     // con prefers-reduced-motion. Verificamos que la clase existe.
     const { container } = render(<Skeleton />);
-    expect(container.firstChild.className).toMatch(/animate-pulse/);
+    expect(/** @type {HTMLElement} */ (container.firstChild).className).toMatch(/animate-pulse/);
   });
 
   test('NO usa bg-white, bg-gray-100, ni bg-slate-100 en el skeleton', () => {
     const { container } = render(<Skeleton />);
-    const cls = container.firstChild.className;
+    const cls = /** @type {HTMLElement} */ (container.firstChild).className;
     expect(cls).not.toMatch(/bg-white/);
     expect(cls).not.toMatch(/bg-gray-/);
     expect(cls).not.toMatch(/bg-slate-100/);

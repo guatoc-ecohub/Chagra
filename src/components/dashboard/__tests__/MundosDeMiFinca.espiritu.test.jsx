@@ -73,15 +73,8 @@ describe('Entrada Pro — El espíritu de su finca', () => {
   test('la vista destino espiritu_pro existe en el router real (App.jsx)', async () => {
     // Anti-huérfano en la otra dirección: la entrada no puede apuntar a una
     // vista fantasma. Mismo criterio que el test de reachability.
-    // @types/node no está instalado en el repo (gap conocido, mismo criterio y
-    // comentario que MundosDeMiFinca.reachability.test.jsx): tsc no resuelve
-    // los specifiers "node:*", pero vitest/node sí. Irreducible sin sumar la
-    // dependencia @types/node al repo entero.
-    // @ts-expect-error TS2591 — ver comentario arriba.
     const fs = await import('node:fs');
-    // @ts-expect-error TS2591 — ver comentario arriba.
     const path = await import('node:path');
-    // @ts-expect-error TS2591 — ver comentario arriba.
     const { fileURLToPath } = await import('node:url');
     const __dir = path.dirname(fileURLToPath(import.meta.url));
     const appSrc = fs.readFileSync(path.resolve(__dir, '../../../App.jsx'), 'utf8');

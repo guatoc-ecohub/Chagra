@@ -3,6 +3,12 @@
   "species_slug": "lactuca_sativa",
   "species_label": "Lechuga (Lactuca sativa)",
   "version": 1,
+  "lifecycle": {
+    "sowing_to_harvest_min_days": 60,
+    "sowing_to_harvest_max_days": 90,
+    "natural_death_days": 95,
+    "nota": "Lechuga: ciclo siembra→cosecha ~60-90 días. Tras la cosecha (corte a ras de suelo) la planta no rebrota: el ciclo comercial termina. Si no se cosecha, eleva el tallo floral (bolting), amarga y muere por senescencia ~95 días. Fuente agronómica general (Agrosavia/FAO) — VALIDAR."
+  },
   "sources": [
     {
       "name": "Agrosavia — Manual de producción de hortalizas de hoja",

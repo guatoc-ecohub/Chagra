@@ -1,24 +1,58 @@
 import { useEffect, useState, useCallback } from 'react';
+import { LLAVE_COMPANERO, LLAVES_HEREDADAS, leerCompanero, escribirCompanero } from '../compai/nucleo/elenco.js';
 
 const STORAGE_KEY = 'chagra:agent-avatar-type';
 
-// 'colibri' = avatar foto-realista (foto biopunk Lili). Es el nuevo
-// default 2026-05-28 ("reemplazar el 3D R3F" — operador). Los usuarios
-// que ya tenían 'colibri' en localStorage automáticamente ven la foto
-// sin migration (mismo slug, distinta implementación).
-//
-// 'colibri_svg' = ilustración SVG (Amazilia libando del abutilón). Antes
-// era el componente detrás de 'colibri'; ahora vive bajo su propio slug
-// para quien prefiera estilo botánico ilustrado.
+// Las llaves que un evento 'storage' de OTRA pestaña puede tocar y que nos
+// interesan: la canónica (#96, compai/nucleo/elenco.js) y la vieja de este
+// mismo stack. 'guatoc.guia' también dispara refresco — es la del otro lado
+// (3d.guatoc.co) — así una elección allá se refleja aquí sin recargar.
+const LLAVES_RELEVANTES = new Set([LLAVE_COMPANERO, STORAGE_KEY, ...LLAVES_HEREDADAS]);
+
+// 'angelita' = Angelita, la abeja angelita (Tetragonisca angustula). ES el
+// agente de Chagra desde 2026-07-16 ("Angelita como el agente, jubila el
+// colibrí" — operador; 2026-07-18: el colibrí sale también de las opciones —
+// "solo abejita"). El colibrí queda de fauna decorativa en los mundos 3D,
+// nunca como cara del agente.
 //
 // 'maiz' = planta de maíz, alternativa cultural ancestral.
-export const AVATAR_TYPES = ['colibri', 'colibri_svg', 'maiz'];
-export const DEFAULT_AVATAR_TYPE = 'colibri';
+//
+// 'zariguya' = la zarigüeya (crías al lomo), 3ra opción (2026-07-25, tras el
+// merge de `art(creatures): la zarigüeya entra al elenco — con las crías al
+// lomo (#2783)`). Adaptador en ChagraAgentAvatarZariguya.jsx.
+export const AVATAR_TYPES = ['angelita', 'maiz', 'zariguya'];
+export const DEFAULT_AVATAR_TYPE = 'angelita';
 
+// Nombre propio para copy que necesita NOMBRAR al compAI elegido (ej. "hábletele
+// a X", el rótulo visible de la transición home→conversación). Los ariaLabel
+// genéricos de los avatares siguen diciendo "Chagra IA" (convención ya usada
+// en WelcomeStatsHero, ChatBubble, AgentHero, InsightProactivoCard, etc.) —
+// este mapa es SOLO para los pocos textos que sí necesitan el nombre propio.
+export const AVATAR_NOMBRE = {
+    angelita: 'Angelita',
+    maiz: 'su planta de maíz',
+    zariguya: 'su zarigüeya',
+};
+
+// Slugs históricos guardados en localStorage de instalaciones viejas:
+// ambos colibríes migran a Angelita sin que el usuario haga nada.
+const LEGACY_TYPES = { colibri: 'angelita', colibri_svg: 'angelita' };
+
+/**
+ * Lee la preferencia con la MISMA precedencia que el núcleo compai (#96: una
+ * sola llave canónica cruzando PWA y 3d.guatoc.co) — pero acotada a los tres
+ * avatares que hoy tienen cuerpo dibujado en esta PWA (`AVATAR_TYPES`). Si el
+ * núcleo devuelve un guía sin arte aquí todavía (jaguar, oso…), esta PWA cae
+ * al default — el otro stack sigue mostrando la elección real.
+ */
 function readPref() {
     try {
+        const canonico = leerCompanero();
+        if (canonico && AVATAR_TYPES.includes(canonico)) return canonico;
+        // Compatibilidad con instalaciones que sólo tienen la llave vieja de
+        // este stack con un slug que el núcleo todavía no conoce (LEGACY_TYPES).
         const raw = localStorage.getItem(STORAGE_KEY);
-        if (raw && AVATAR_TYPES.includes(raw)) return raw;
+        if (raw && LEGACY_TYPES[raw]) return LEGACY_TYPES[raw];
     } catch {
         // private mode / quota → fallback
     }
@@ -27,19 +61,18 @@ function readPref() {
 
 /**
  * Hook que gestiona el tipo de avatar del agente. Lee la preferencia desde
- * localStorage y permite actualizarla con sincronización entre pestañas
- * mediante eventos 'storage' y 'chagra:agent-avatar-changed'.
+ * la llave canónica del compañero (compai/nucleo/elenco.js, #96) y permite
+ * actualizarla con sincronización entre pestañas mediante eventos 'storage'
+ * y 'chagra:agent-avatar-changed'.
  *
- * @returns {[string, Function]} Tupla con el tipo de avatar actual y la función para actualizarlo.
- * @returns {'colibri'|'colibri_svg'|'maiz'} returns.0 - Tipo de avatar actual.
- * @returns {Function} returns.1 - Función updateType(next) que persiste y propaga el nuevo tipo.
+ * @returns {[string, Function]} Tupla con [0] tipo de avatar actual, [1] función para actualizarlo (updateType).
  */
 export default function useAgentAvatarType() {
     const [type, setType] = useState(readPref);
 
     useEffect(() => {
         function onStorage(e) {
-            if (e.key === STORAGE_KEY) setType(readPref());
+            if (e.key && LLAVES_RELEVANTES.has(e.key)) setType(readPref());
         }
         function onCustom(e) {
             if (e.detail && AVATAR_TYPES.includes(e.detail)) setType(e.detail);
@@ -54,11 +87,10 @@ export default function useAgentAvatarType() {
 
     const updateType = useCallback((next) => {
         if (!AVATAR_TYPES.includes(next)) return;
-        try {
-            localStorage.setItem(STORAGE_KEY, next);
-        } catch {
-            // ignore, banner-stateful only
-        }
+        // escribirCompanero deja la llave canónica Y las dos heredadas
+        // (incluida STORAGE_KEY) en el mismo valor — así 3d.guatoc.co recibe
+        // el cambio sin que esta PWA sepa que ese stack existe.
+        escribirCompanero(next);
         setType(next);
         window.dispatchEvent(
             new CustomEvent('chagra:agent-avatar-changed', { detail: next }),

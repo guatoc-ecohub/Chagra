@@ -36,7 +36,7 @@ describe('payloadService', () => {
   describe('savePayload — seeding online genera plan (070.2)', () => {
     beforeEach(() => {
       vi.clearAllMocks();
-      tryGeneratePlanFromSeeding.mockResolvedValue({ steps: [{ id: 'step-1' }] });
+      vi.mocked(tryGeneratePlanFromSeeding).mockResolvedValue({ steps: [{ id: 'step-1' }] });
     });
 
     const makeSeedingPayload = () => ({
@@ -56,7 +56,7 @@ describe('payloadService', () => {
     });
 
     it('llama tryGeneratePlanFromSeeding una sola vez con los datos de la siembra', async () => {
-      sendToFarmOS
+      vi.mocked(sendToFarmOS)
         .mockResolvedValueOnce({ data: { id: PLANT_UUID, type: 'asset--plant' } })
         .mockResolvedValueOnce({ data: { id: 'log-seeding-id', type: 'log--seeding' } });
 
@@ -72,7 +72,7 @@ describe('payloadService', () => {
     });
 
     it('no duplica: una segunda siembra distinta también genera una sola llamada (idempotencia vive en el helper)', async () => {
-      sendToFarmOS
+      vi.mocked(sendToFarmOS)
         .mockResolvedValueOnce({ data: { id: PLANT_UUID, type: 'asset--plant' } })
         .mockResolvedValueOnce({ data: { id: 'log-seeding-id', type: 'log--seeding' } });
 

@@ -1,0 +1,23 @@
+{
+  "_meta": {
+    "version": "v1",
+    "fecha": "2026-07-09",
+    "region": "narino",
+    "scope": "español rural del altiplano nariñense andino (papa, cuy, cebada) — nombres folk campesinos que el corpus genérico Chagra y el glosario del Cauca NO cubren. Mapean a un equivalente estándar (nombre científico de la plaga o término técnico) para que el LLM entienda al campesino pastuso y no responda genérico por mismatch léxico.",
+    "metodologia": "Curados del DR lexico-regional-narinense-andino (gemini, grounded, 2026-06-19) cruzado con AGROSAVIA y Fedepapa (Boletín regional Nariño). Solo se guardan términos FOLK que el LLM probablemente malinterpreta o desconoce; se DESCARTAN los nombres propios de cultivar (Diacol Capiro, ICA Única, Pastusa…) porque son enciclopédicos, no folk, y colisionan con el normalizador. Regla dura: ningún valor contiene a su propia clave (idempotencia). Clave lowercase; el matching es case-insensitive con boundaries de palabra.",
+    "como_extender": "Agregar entrada {local: estandar}. Verificar que el valor NO contenga ninguna clave del glosario (si no, el normalizador cascada). NO meter aquí saber tradicional protegido sin permiso (memoria project-oss-pro-boundary-decisions).",
+    "advertencia_jergas": "Algunos términos son polysem ('gota' se EXCLUYE a propósito: choca con 'gota de agua'). El mapeo es la acepción AGRÍCOLA más frecuente en el altiplano nariñense; es best-effort y va gated por región Nariño.",
+    "fuente": "DR lexico-regional-narinense-andino (gemini grounded, 2026-06-19); AGROSAVIA; Fedepapa — Boletín regional Nariño."
+  },
+  "terminos": {
+    "cobayo": "cuy",
+    "cuyera": "galpón de cuyes",
+    "gusano blanco": "Premnotrypes vorax",
+    "pulguilla saltona": "Epitrix",
+    "pulguilla": "Epitrix",
+    "toya": "papa de rebrote",
+    "toyas": "papa de rebrote",
+    "chicha de jora": "atrayente fermentado de maíz",
+    "criolla colombia": "papa criolla"
+  }
+}

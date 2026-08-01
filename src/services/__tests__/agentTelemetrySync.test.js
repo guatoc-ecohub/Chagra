@@ -18,7 +18,7 @@ import { makeFakeDB, setOnline } from '../../test-utils/index.js';
 let fakeDB;
 
 const { fetchWithAuthRetry } = vi.hoisted(() => ({
-  fetchWithAuthRetry: vi.fn((...args) => global.fetch(...args)),
+  fetchWithAuthRetry: vi.fn((...args) => global.fetch(...(/** @type {Parameters<typeof fetch>} */ (args)))),
 }));
 
 vi.mock('../../db/dbCore.js', () => ({
@@ -49,11 +49,11 @@ beforeEach(() => {
   setOnline(true);
   vi.clearAllMocks();
   
-  global.fetch.mockResolvedValue({
+  vi.mocked(global.fetch).mockResolvedValue(/** @type {Response} */ (/** @type {unknown} */ ({
     ok: true,
     json: async () => ({ success: true }),
-  });
-  vi.mocked(fetchWithAuthRetry).mockImplementation((...args) => global.fetch(...args));
+  })));
+  vi.mocked(fetchWithAuthRetry).mockImplementation((...args) => global.fetch(...(/** @type {Parameters<typeof fetch>} */ (args))));
 });
 
 afterEach(() => {
@@ -176,13 +176,13 @@ describe('agentTelemetrySync — syncAgentTelemetry', () => {
     // Verificar que se llamó a fetch
     expect(global.fetch).toHaveBeenCalledTimes(1);
     expect(fetchWithAuthRetry).toHaveBeenCalledTimes(1);
-    const fetchCall = global.fetch.mock.calls[0];
+    const fetchCall = vi.mocked(global.fetch).mock.calls[0];
     expect(fetchCall[0]).toBe('https://telemetry.example.com/ingest');
     expect(fetchCall[1].method).toBe('POST');
     expect(fetchCall[1].headers['Content-Type']).toBe('application/json');
 
     // Verificar payload anonimizado
-    const payload = JSON.parse(fetchCall[1].body);
+    const payload = JSON.parse(/** @type {string} */ (fetchCall[1].body));
     expect(payload).toHaveLength(2);
 
     // Primer request anonimizado
@@ -337,10 +337,10 @@ describe('agentTelemetrySync — syncAgentTelemetry', () => {
     vi.mocked(listRequests).mockResolvedValue(doneRequests);
 
     // Mock response error
-    global.fetch.mockResolvedValue({
+    vi.mocked(global.fetch).mockResolvedValue(/** @type {Response} */ (/** @type {unknown} */ ({
       ok: false,
       status: 500,
-    });
+    })));
 
     const Result = await syncAgentTelemetry();
 

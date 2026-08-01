@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { Sparkles, Volume2, VolumeX, Trophy, Sprout, Crosshair } from 'lucide-react';
+import { Sparkles, Volume2, VolumeX, Trophy, Sprout, Crosshair, Mountain, Scale } from 'lucide-react';
 import { ScreenShell } from '../common/ScreenShell';
 import FincaWorldScene from './FincaWorldScene';
 import CriaturaCollection from './CriaturaCollection';
@@ -51,7 +51,7 @@ import { fvhSkinClass } from '../../config/fvhSkin';
  * @param {Function} [props.onNavigate]
  */
 export default function MiFincaVivaScreen({ onBack, onHome, onNavigate }) {
-  const profile = useMemo(() => getProfile() || {}, []);
+  const profile = useMemo(() => getProfile(), []);
   const fincaSlug = profile.fincaSlug || profile.slug || 'default';
 
   // Audio on/off — comparte la preferencia con el sonido del agente, así un solo
@@ -300,6 +300,66 @@ export default function MiFincaVivaScreen({ onBack, onHome, onNavigate }) {
             </span>
           </span>
           <Sparkles size={22} className="text-cyan-200 shrink-0" aria-hidden="true" />
+        </button>
+
+        {/* Mi finca (túnel Odyssey): el cruce mágico 2D↔3D. Antes era una joya
+            escondida (solo URL #/mockups/juego-mi-finca); promovido a ruta de
+            primera clase y enlazado aquí (audit juegos 2026-07-16). */}
+        <button
+          type="button"
+          data-testid="entrada-finca-odyssey"
+          onClick={() => irAccion('finca_odyssey')}
+          className="jp-mfv-entrada w-full text-left rounded-2xl p-4 bg-gradient-to-br from-indigo-600/40 to-emerald-800/40 border-2 border-indigo-400/40 hover:border-indigo-300/60 active:scale-[0.99] transition flex items-center gap-3"
+        >
+          <span className="text-4xl shrink-0" aria-hidden="true">🏔️</span>
+          <span className="flex-1 min-w-0">
+            <span className="jp-tinta block text-base font-black text-white">Mi finca en 3D</span>
+            <span className="jp-tinta-suave block text-sm text-indigo-100/90 leading-snug">
+              Entra por el túnel a tu finca en tres dimensiones y aterriza en el
+              huerto para cuidar el riego, las tres hermanas y las abejitas.
+            </span>
+          </span>
+          <Mountain size={22} className="text-indigo-200 shrink-0" aria-hidden="true" />
+        </button>
+
+        {/* Mono vs Poli: comparador de decisión (rendimiento/LER, nitrógeno,
+            ahorro de insumos, control de plaga) con cifras reales y fuente.
+            Rescatado de huérfano total sin ruta (audit juegos 2026-07-16). */}
+        <button
+          type="button"
+          data-testid="entrada-mono-vs-poli"
+          onClick={() => irAccion('mono_vs_poli')}
+          className="jp-mfv-entrada w-full text-left rounded-2xl p-4 bg-gradient-to-br from-amber-600/40 to-emerald-800/40 border-2 border-amber-400/40 hover:border-amber-300/60 active:scale-[0.99] transition flex items-center gap-3"
+        >
+          <span className="text-4xl shrink-0" aria-hidden="true">⚖️</span>
+          <span className="flex-1 min-w-0">
+            <span className="jp-tinta block text-base font-black text-white">Uno solo o varios juntos</span>
+            <span className="jp-tinta-suave block text-sm text-amber-100/90 leading-snug">
+              Compara sembrar un solo cultivo contra varios juntos y mira, con
+              cifras de verdad, cuánto rinde más y ahorra la asociación.
+            </span>
+          </span>
+          <Scale size={22} className="text-amber-200 shrink-0" aria-hidden="true" />
+        </button>
+
+        {/* Ahorcado Contaminado: ahorcado clásico con metáfora de contaminación,
+            dataset fundamentado de síntomas/plaguicidas vetados/alternativas
+            agroecológicas (Tarea #38, juego construido en Tarea #93). */}
+        <button
+          type="button"
+          data-testid="entrada-ahorcado-contaminado"
+          onClick={() => irAccion('ahorcado_contaminado')}
+          className="jp-mfv-entrada w-full text-left rounded-2xl p-4 bg-gradient-to-br from-rose-700/40 to-emerald-800/40 border-2 border-rose-400/40 hover:border-rose-300/60 active:scale-[0.99] transition flex items-center gap-3"
+        >
+          <span className="text-4xl shrink-0" aria-hidden="true">☠️</span>
+          <span className="flex-1 min-w-0">
+            <span className="jp-tinta block text-base font-black text-white">Ahorcado Contaminado</span>
+            <span className="jp-tinta-suave block text-sm text-rose-100/90 leading-snug">
+              Adivina la palabra antes de que la finca se contamine. Síntomas de
+              intoxicación, plaguicidas vetados y alternativas que sí sirven.
+            </span>
+          </span>
+          <Sprout size={22} className="text-rose-200 shrink-0" aria-hidden="true" />
         </button>
 
         {/* Barra de progreso del mundo (alegre, pero honesta: % real) */}

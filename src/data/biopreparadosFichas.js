@@ -97,28 +97,49 @@ export const SAFETY_LABEL = {
  * catálogo en runtime — no se copia aquí.
  * @type {Record<string,{foto?:string,paraQueSirve:string}>}
  */
+// Auditoría de visión 2026-07-09 (ver Chagra-strategy/ops): 8 fotos NO mostraban
+// el biopreparado sino el INGREDIENTE crudo o algo ajeno (biol=planta industrial
+// de biogás; bocashi=compostera de jardín; caldo_bordeles=cristal de sulfato de
+// cobre; humus_liquido=cámara de desechos; lixiviado_frutas=naranjas enteras;
+// supermagro=montón de estiércol; purin_ortiga=jardín botánico con letreros en
+// inglés; compost_maduro=estiércol fresco en barro). Se retiró la `foto` de cada
+// una — mejor sin foto (cae al ícono, patrón FotoAgua) que con desinformación.
+// Solo conservan foto verificada por visión: te_compost (brewer aireado real) y
+// roca_fosforica (fosforita real, fuente Commons confirmada). Huecos documentados
+// para conseguir fotos CC del preparado artesanal real más adelante.
+// Ronda 3 (2026-07-10, audit visión Fable): de esos huecos se recuperaron 2 con
+// CC verificable que SÍ muestran el preparado — caldo_bordeles (el caldo ya
+// preparado) y compost_maduro (vermicompost maduro). Siguen en ícono por falta de
+// CC limpia del preparado real: biol, bocashi, humus_liquido, lixiviado_frutas,
+// purin_ortiga, supermagro y caldo_sulfocalcico. (De purin_ortiga hay un match
+// perfecto en Commons pero su provenance es un frame de YouTube subido por un
+// tercero — CC de validez dudosa —, así que se descartó.)
 export const FICHA_META = {
   // proposito: fertilizacion + estimulante_microbiano
   bocashi: {
-    foto: 'bocashi',
     paraQueSirve: 'Abono sólido fermentado que se mezcla con la tierra: nutre la mata y despierta la vida del suelo.',
   },
   // proposito: fertilizacion + estimulante_microbiano
   biol: {
-    foto: 'biol',
     paraQueSirve: 'Abono líquido foliar de estiércol fermentado sin aire: nutre la hoja y empuja el crecimiento.',
   },
   // dosis (catálogo): «curativo contra pulgón»; proposito: repelente_insectos
   purin_ortiga: {
-    foto: 'purin_ortiga',
     paraQueSirve: 'Nutre y, sobre todo, repele plagas chupadoras: en curativo se usa contra el pulgón.',
   },
   // uso (catálogo): «activo contra hongos y ácaros»; dosis: «escamas, chancros»
+  // SIN foto a propósito: la que había mostraba un ESPÉCIMEN MINERAL (barita +
+  // azufre), no el caldo sulfocálcico (líquido ámbar-rojizo de azufre + cal). Se
+  // retiró — mejor sin foto que con desinformación. Falta una foto CC del caldo
+  // real; cae con elegancia al ícono (patrón FotoAgua) mientras se consigue.
   caldo_sulfocalcico: {
-    foto: 'caldo_sulfocalcico',
     paraQueSirve: 'Fungicida y acaricida foliar: previene y ataca hongos y ácaros; en invierno trata escamas y chancros del tronco.',
   },
   // proposito: fitosanitario_preventivo; uso: aplicar ANTES, en alta humedad
+  // Ronda 3 (2026-07-10): re-fotografiado. La foto retirada en #2274 era un
+  // cristal de sulfato de cobre (el ingrediente); esta muestra el CALDO ya
+  // preparado — líquido azul-verde con la cuchara de revolver. Verificada por
+  // visión; fuente Commons de dominio público confirmada.
   caldo_bordeles: {
     foto: 'caldo_bordeles',
     paraQueSirve: 'Fungicida de cobre de uso preventivo: se asperja antes de que llegue la enfermedad, en épocas de mucha humedad.',
@@ -130,17 +151,14 @@ export const FICHA_META = {
   },
   // proposito: fertilizacion + estimulante_microbiano
   humus_liquido: {
-    foto: 'humus_liquido',
     paraQueSirve: 'Abono líquido de lombriz: nutre la planta y ayuda a que agarre raíz.',
   },
   // uso (catálogo): «aporte de potasio y micronutrientes» en fase reproductiva
   lixiviado_frutas: {
-    foto: 'lixiviado_frutas',
     paraQueSirve: 'Abono líquido rico en potasio para la floración y el llenado del fruto.',
   },
   // uso (catálogo): corrige deficiencias — «clorosis intervenal, brotes deformes»
   supermagro: {
-    foto: 'supermagro',
     paraQueSirve: 'Biofertilizante foliar de micronutrientes: corrige deficiencias (hojas amarillas entre las venas, brotes deformes).',
   },
   // uso (catálogo): «contra Rhizoctonia, Fusarium y Sclerotinia»
@@ -165,6 +183,9 @@ export const FICHA_META = {
     paraQueSirve: 'Aporta potasio y calcio, corrige la acidez suave y, en cordón, repele babosas.',
   },
   // proposito: fertilizacion + estimulante_microbiano
+  // Ronda 3 (2026-07-10): re-fotografiado. La foto retirada en #2274 era
+  // estiércol fresco; esta muestra vermicompost MADURO — la textura oscura y
+  // desmenuzable del abono terminado. Verificada por visión; fuente Commons.
   compost_maduro: {
     foto: 'compost_maduro',
     paraQueSirve: 'Abono sólido maduro: enmienda orgánica que nutre el suelo y despierta su vida.',
@@ -182,16 +203,9 @@ export const FICHA_META = {
  * @type {Array<{slug:string,autor:string,lic:string,url:string}>}
  */
 export const CREDITOS_FOTOS_BIOPREPARADOS = [
-  { slug: 'biol', autor: 'David Medcalf', lic: 'CC BY-SA 2.0', url: 'https://commons.wikimedia.org/wiki/File:A_massive_biodigester_at_Pengelly_Barton_Farm_-_geograph.org.uk_-_8234071.jpg' },
-  { slug: 'bocashi', autor: 'Acabashi', lic: 'CC BY-SA 4.0', url: 'https://commons.wikimedia.org/wiki/File:Compost_heap_Heyrons_High_Easter_Essex_01.jpg' },
-  { slug: 'caldo_bordeles', autor: 'Crystal Titan', lic: 'CC BY-SA 4.0', url: 'https://commons.wikimedia.org/wiki/File:Copper_Sulfate_Crystal.jpg' },
-  { slug: 'caldo_sulfocalcico', autor: 'Robert M. Lavinsky', lic: 'CC BY-SA 3.0', url: 'https://commons.wikimedia.org/wiki/File:Celestine-Sulfur-j08-12a.jpg' },
-  { slug: 'compost_maduro', autor: 'Richard Webb', lic: 'CC BY-SA 2.0', url: 'https://commons.wikimedia.org/wiki/File:A_steaming_pile_-_geograph.org.uk_-_297127.jpg' },
-  { slug: 'humus_liquido', autor: 'SuSanA Secretariat', lic: 'CC BY 2.0', url: 'https://commons.wikimedia.org/wiki/File:Composting_Unit_Ecodomeo_-_Local_de_compostage_Ecodomeo_(6126690435).jpg' },
-  { slug: 'lixiviado_frutas', autor: 'PattayaPatrol', lic: 'CC BY-SA 4.0', url: 'https://commons.wikimedia.org/wiki/File:DFC_3928_A_vibrant_pile_of_fresh_oranges_with_mottled_green-and-orange_skins_ready_to_be_picked_or_enjoyed.jpg' },
-  { slug: 'purin_ortiga', autor: 'دانية دروبي', lic: 'CC BY-SA 4.0', url: 'https://commons.wikimedia.org/wiki/File:Gooseberry_and_Nettle_plant_in_botanical_garden.jpg' },
+  { slug: 'caldo_bordeles', autor: 'Matias Pocobi', lic: 'Dominio público', url: 'https://commons.wikimedia.org/wiki/File:Calda_Bordalesa.jpg' },
+  { slug: 'compost_maduro', autor: 'Thamizhpparithi Maari', lic: 'CC BY-SA 3.0', url: 'https://commons.wikimedia.org/wiki/File:A_Vermi_compost.JPG' },
   { slug: 'roca_fosforica', autor: 'James St. John', lic: 'CC BY 2.0', url: 'https://commons.wikimedia.org/wiki/File:Black_concretionary_phosphorite_(Morris_Member,_Phosphoria_Formation,_mid-Permian;_Waterloo_Mine,_Bear_Lake_County,_Idaho,_USA)_(34327234316).jpg' },
-  { slug: 'supermagro', autor: 'Nadinviki', lic: 'CC BY-SA 4.0', url: 'https://commons.wikimedia.org/wiki/File:COW_DUNG_MANURE.jpg' },
   { slug: 'te_compost', autor: 'Pratiti Dutta', lic: 'CC0', url: 'https://commons.wikimedia.org/wiki/File:WORM_TEA_BREWER.jpg' },
 ];
 

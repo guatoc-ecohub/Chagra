@@ -63,7 +63,7 @@ export const CICLO_AGUACATE = {
   altitud: '1340–2420 msnm (óptimo 1800–2000 para Hass)',
   regionNota:
     'El calendario de floración y cosecha depende fuerte de la localidad, la altitud y el patrón; hay fincas de montaña que producen casi todo el año. No hay un mes fijo que sirva para todas.',
-  fuente: 'AGROSAVIA, Universidad Nacional de Colombia (grafo Chagra: perennialCycles.persea_americana, confianza media)',
+  fuente: 'AGROSAVIA, Universidad Nacional de Colombia (catálogo Chagra, confianza media)',
 };
 
 /**
@@ -217,14 +217,14 @@ export const ASOCIACION_AGUACATE = {
       nombre: 'Hobo / ciruela',
       cientifico: 'Spondias dulcis',
       papel: 'Frutal compatible',
-      detalle: 'Otro frutal que el grafo marca compatible con el aguacate: buena vecina para armar un huerto diverso.',
+      detalle: 'Otro frutal que el catálogo marca compatible con el aguacate: buena vecina para armar un huerto diverso.',
     },
   ],
   antagonista: {
     id: 'eucalipto',
     nombre: 'Eucalipto',
     cientifico: 'Eucalyptus globulus',
-    detalle: 'El grafo lo marca ANTAGONISTA del aguacate: seca y acapara el suelo, y su hojarasca no lo deja. No siembre aguacate a la sombra ni al pie de eucaliptos.',
+    detalle: 'El catálogo lo marca ANTAGONISTA del aguacate: seca y acapara el suelo, y su hojarasca no lo deja. No siembre aguacate a la sombra ni al pie de eucaliptos.',
   },
 };
 
@@ -299,6 +299,15 @@ export const MALES_AGUACATE = [
 ];
 
 /**
+ * Fuente de la sección de plagas — el grafo Chagra da los nodos y el manejo, y
+ * la autoridad publicada es la guía de AGROSAVIA (verificada contra Crossref en
+ * el DR grounding-aguacate-hass-plagas-colombia, 2026-06-19). No añade plagas
+ * fuera del grafo: solo cita la fuente que respalda las que ya están.
+ */
+export const MALES_FUENTE =
+  'Catálogo Chagra + AGROSAVIA — Carabalí Muñoz, Caicedo Vallejo y Holguín (2021), “Guía para el reconocimiento y manejo de las principales plagas de aguacate cv. Hass en Colombia”, DOI 10.21930/agrosavia.nbook.7404913 (verificado Crossref).';
+
+/**
  * Biopreparados de apoyo — GROUNDED: la lista propia de persea_americana en el
  * grafo. Son apoyo agroecológico, no reemplazan el manejo cultural (drenaje,
  * recolección, material sano). No se dan dosis de veneno de síntesis.
@@ -353,7 +362,7 @@ export const FLORACION_POLINIZACION = {
   ],
   abejas: 'Quien lleva el polen de flor a flor son las ABEJAS. Un huerto con colmenas cerca, flores alrededor y sin venenos en plena floración cuaja mucho mejor. Cuidar los polinizadores es cuidar la cosecha.',
   tipoCriolloNota: 'El tipo floral exacto de un criollo local se confirma observando el árbol (a qué hora abre la flor hembra); no se puede afirmar de memoria por variedad.',
-  fuente: 'AGROSAVIA, Universidad Nacional de Colombia (biología floral del aguacate)',
+  fuente: 'AGROSAVIA, Universidad Nacional de Colombia (biología floral del aguacate); polinizadores: Carabalí et al. (2017), “Insectos polinizadores del aguacate cv. Hass en Colombia”, DOI 10.21930/978-958-740-235-3 (verificado Crossref)',
 };
 
 /* ────────────────────────────────────────────────────────────────────────
@@ -401,7 +410,7 @@ export const COSECHA_AGUACATE = {
  */
 export const CREDITOS_FOTOS_AGUACATE = [
   { slug: 'arbol', src: '/aguacate/arbol.jpg', autor: 'Ernani viana 28', licencia: 'CC BY-SA 4.0', licenciaUrl: 'https://creativecommons.org/licenses/by-sa/4.0', fuenteUrl: 'https://commons.wikimedia.org/wiki/File:Abacateiro_com_frutos.jpg' },
-  { slug: 'raices', src: '/aguacate/raices.jpg', autor: 'Karlalhdz', licencia: 'CC BY-SA 4.0', licenciaUrl: 'https://creativecommons.org/licenses/by-sa/4.0', fuenteUrl: 'https://commons.wikimedia.org/wiki/File:Aguacate_con_raices_dentro.jpg' },
+  { slug: 'raices', src: '/aguacate/raices.jpg', autor: 'Alif Arefur', licencia: 'CC BY-SA 4.0', licenciaUrl: 'https://creativecommons.org/licenses/by-sa/4.0', fuenteUrl: 'https://commons.wikimedia.org/wiki/File:Shoot_%26_root_initiation_from_avocado_seed.jpg' },
   { slug: 'flor', src: '/aguacate/flor.jpg', autor: 'B.navez', licencia: 'CC BY-SA 3.0', licenciaUrl: 'https://creativecommons.org/licenses/by-sa/3.0', fuenteUrl: 'https://commons.wikimedia.org/wiki/File:Persea_americana_flowers.jpg' },
   { slug: 'cosecha', src: '/aguacate/cosecha.jpg', autor: 'Leoadec', licencia: 'CC BY-SA 3.0', licenciaUrl: 'https://creativecommons.org/licenses/by-sa/3.0', fuenteUrl: 'https://commons.wikimedia.org/wiki/File:Avocadoes_on_the_branch.jpeg' },
   // Reusadas del mundo Frutales (no suman al presupuesto de fotos nuevas):

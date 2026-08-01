@@ -1,0 +1,84 @@
+{
+  "species_slug": "eryngium_foetidum",
+  "scientific_name": "Eryngium foetidum L.",
+  "common_names": [
+    "Cilantro cimarron"
+  ],
+  "family": "Apiaceae",
+  "category": "atractores_polinizadores",
+  "cultivable": true,
+  "conservation_status": "cultivo_comun",
+  "thermal_zones": [
+    "calido",
+    "templado",
+    "frio"
+  ],
+  "roles_in_guild": [
+    "crop",
+    "pollinator_attractor"
+  ],
+  "antagonists": [],
+  "especies_nativas_sustitutas": [],
+  "propagation": {
+    "metodo_principal": "semilla",
+    "notas": "Germinacion lenta; siembra directa o en bandeja. Una vez establecido, se resiembra solo con facilidad en el huerto."
+  },
+  "requirements": {
+    "agua": "medio",
+    "altitud_msnm": {
+      "min_absoluto": 0,
+      "optimo_min": 500,
+      "optimo_max": 2200,
+      "max_absoluto": 2600
+    },
+    "temperatura_c": {
+      "helada_letal": -2,
+      "optimo_min": 15,
+      "optimo_max": 25,
+      "max_tolerable": 30
+    },
+    "radiacion": "sol_pleno",
+    "drenaje_requerido": "bueno"
+  },
+  "valor_pedagogico": "El cilantro cimarrón o culantro (Eryngium foetidum L., familia Apiaceae) es una apiácea bienal a perenne herbácea nativa de las Américas tropicales (Caribe, Mesoamérica, norte de Sudamérica), cultivada y silvestre en huertos campesinos colombianos por sus hojas dentadas en roseta basal de aroma intenso similar al cilantro común (Coriandrum sativum) pero más estable al calor de cocción. Su aroma característico proviene de aldehídos aromáticos volátiles (E-2-dodecenal, dodecanal) presentes en mayor concentración que en el cilantro común. Se cultiva en Caribe colombiano (Magdalena, Bolívar, Sucre, Córdoba), Antioquia (Urabá, Magdalena medio), Valle del Cauca, Tolima, Huila y Eje cafetero entre 500 y 2.200 msnm en zona térmica cálida a fría, con preferencia por sombra parcial y humedad alta. Ciclo bienal con producción continua de hojas durante 12-18 meses. Rendimientos 0.5-1 t/ha hoja fresca. Lección viva: enseña la relevancia de las especias locales frente a las introducidas, su rol en el hogao colombiano y los sancochos costeños como sustituto resistente al calor de cocción del cilantro común, y su valor como planta multipropósito (condimento, medicinal contra cólicos y gripes, atrayente de polinizadores apícolas por sus inflorescencias verde-amarillas). Manejo agroecológico: siembra directa o en bandeja con germinación lenta 14-21 días, suelo orgánico bien drenado con pH 5.5-7, asocio con plátano y yuca como sombra temporal, cosecha de hojas externas dejando corazón intacto, autoresiembra natural prolífica en el huerto bien manejado, no requiere agroquímicos. Fuentes Tier A: POWO Kew, GBIF Backbone Taxonomy, SIB Colombia, Bernal 2015 Catálogo Plantas Colombia, AGROSAVIA.",
+  "sources": [
+    {
+      "id": "powo-kew",
+      "title": "powo-kew",
+      "tier": "A",
+      "url": "https://powo.science.kew.org"
+    },
+    {
+      "id": "gbif-taxonomic-backbone",
+      "title": "gbif-taxonomic-backbone",
+      "tier": "A",
+      "url": "https://www.gbif.org/dataset/d7dddbf4-2cf0-4f39-9b2a-bb099caae36c"
+    },
+    {
+      "id": "gbif-colombia",
+      "title": "gbif-colombia",
+      "tier": "A",
+      "url": "https://www.gbif.org/country/CO"
+    },
+    {
+      "id": "sib-colombia",
+      "title": "sib-colombia",
+      "tier": "A",
+      "url": "https://sibcolombia.net"
+    },
+    {
+      "id": "bernal-2015-plantas-liquenes-colombia",
+      "title": "bernal-2015-plantas-liquenes-colombia",
+      "tier": "A",
+      "url": "http://catalogoplantasdecolombia.unal.edu.co"
+    },
+    {
+      "id": "agrosavia-tibaitata",
+      "title": "agrosavia-tibaitata",
+      "tier": "A",
+      "url": "https://www.agrosavia.co/investigacion/centros-de-investigacion/tibaitat%C3%A1"
+    }
+  ],
+  "_generated_by": "scripts/build-cycle-content-from-catalog.mjs",
+  "_generated_at": "2026-05-19T00:42:57.370Z"
+}

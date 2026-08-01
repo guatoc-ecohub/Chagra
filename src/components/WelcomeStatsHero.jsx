@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useMemo, useCallback, useRef } from 'react';
 import {
   Sprout, Leaf, BookOpen, Database, Droplet, TreePine, Users, ShieldCheck,
-  FileCheck, Cloud, Maximize2, X, ChevronLeft, ChevronRight, ChevronUp, ChevronDown,
+  FileCheck, Maximize2, X, ChevronLeft, ChevronRight, ChevronUp, ChevronDown,
 } from 'lucide-react';
 import useAssetStore from '../store/useAssetStore';
 import ChagraAgentAvatar from './ChagraAgentAvatar';
@@ -202,8 +202,8 @@ const TONE_CLASSES = {
 };
 
 /**
- * AgentColibriChip — colibri clickable que abre el agente desde el home.
- * Default idle (vuelo estacionario), hover thinking (libando), click navega.
+ * AgentAngelitaChip — Angelita clickable que abre el agente desde el home.
+ * Default idle (vuelo estacionario), hover thinking, click navega.
  * Se anima en mouse over para invitar al click y en touch press en mobile.
  *
  * Bug móvil "Abrir Chagra IA no abre el overlay" (2026-06-20): el botón solo
@@ -217,7 +217,7 @@ const TONE_CLASSES = {
  * para suprimir el ghost-click, deduplicando con `navigatedByTouchRef` para que
  * el click sintético —si igual llega— no navegue dos veces.
  */
-function AgentColibriChip({ onNavigate, size = 26 }) {
+function AgentAngelitaChip({ onNavigate, size = 36 }) {
   const [hover, setHover] = useState(false);
   const [pressed, setPressed] = useState(false);
   const interactive = typeof onNavigate === 'function';
@@ -447,17 +447,17 @@ export default function WelcomeStatsHero({ mode = 'post-login', onNavigate = und
         aria-label="Impacto de Chagra"
       >
         <div className="flex items-center justify-between gap-2 px-1">
-          {/* Header con colibri clickable → abre el agente desde el home.
-              Hover anima a state thinking (libando), click navega y muestra el
+          {/* Header con Angelita clickable → abre el agente desde el home.
+              Hover anima a state thinking, click navega y muestra el
               tap feedback con scale. Si no hay onNavigate, queda inerte como
               header decorativo (ej. en pre-login). */}
           <h2 className="flex items-center gap-2 text-[10px] sm:text-xs font-black uppercase tracking-[0.2em] text-slate-400 min-w-0">
-            <AgentColibriChip onNavigate={onNavigate} size={collapsed ? 20 : 26} />
+            <AgentAngelitaChip onNavigate={onNavigate} size={collapsed ? 28 : 36} />
             <span className="truncate">Chagra · impacto</span>
           </h2>
           <div className="flex items-center gap-2 shrink-0">
             {isPreLogin && !collapsed && (
-              <span className="text-[10px] text-slate-500 italic hidden sm:inline">
+              <span className="text-[10px] text-slate-400 italic hidden sm:inline">
                 {fincasActivas} {fincasActivas === 1 ? 'finca' : 'fincas'} · red Chagra
               </span>
             )}
@@ -540,7 +540,7 @@ export default function WelcomeStatsHero({ mode = 'post-login', onNavigate = und
                   </div>
                 )}
                 {current.caption && (
-                  <div className="text-[10px] sm:text-[11px] text-slate-500 mt-1.5 leading-snug italic">
+                  <div className="text-[10px] sm:text-[11px] text-slate-400 mt-1.5 leading-snug italic">
                     {current.caption}
                   </div>
                 )}
@@ -576,7 +576,7 @@ export default function WelcomeStatsHero({ mode = 'post-login', onNavigate = und
               <div className="text-lg font-black text-lime-300 leading-tight">
                 {isPreLogin ? GLOBAL_FEDERATION_FALLBACK.plantasRegistradas : plantsCount}
               </div>
-              <div className="text-[9px] text-slate-500 truncate">
+              <div className="text-[9px] text-slate-400 truncate">
                 {isPreLogin ? MSG.welcomeStats.plantasRegistradas : (plantsCount === 1 ? MSG.welcomeStats.plantaTuya : MSG.welcomeStats.plantasTuyas)}
               </div>
             </div>
@@ -585,14 +585,14 @@ export default function WelcomeStatsHero({ mode = 'post-login', onNavigate = und
             <BookOpen className="w-3.5 h-3.5 text-violet-400 shrink-0" />
             <div className="min-w-0">
               <div className="text-lg font-black text-violet-300 leading-tight">{catalogStats.ragDocs}</div>
-              <div className="text-[9px] text-slate-500 truncate">Fichas IA</div>
+              <div className="text-[9px] text-slate-400 truncate">Fichas IA</div>
             </div>
           </div>
           <div className="bg-slate-800/30 border border-slate-700/40 rounded-lg p-2 flex items-center gap-2 col-span-2 sm:col-span-1">
             <Leaf className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
             <div className="min-w-0">
               <div className="text-lg font-black text-emerald-300 leading-tight">{catalogStats.species}</div>
-              <div className="text-[9px] text-slate-500 truncate">Especies catálogo</div>
+              <div className="text-[9px] text-slate-400 truncate">Especies catálogo</div>
             </div>
           </div>
         </div>)}
@@ -609,7 +609,7 @@ export default function WelcomeStatsHero({ mode = 'post-login', onNavigate = und
             <div className="flex items-center justify-between gap-2 pt-4">
               <div>
                 <h2 className="flex items-center gap-2.5 text-base sm:text-lg font-black uppercase tracking-wider text-slate-200">
-                  <AgentColibriChip onNavigate={onNavigate} size={38} />
+                  <AgentAngelitaChip onNavigate={onNavigate} size={48} />
                   Chagra · impacto
                 </h2>
                 {isPreLogin && (
@@ -656,7 +656,7 @@ export default function WelcomeStatsHero({ mode = 'post-login', onNavigate = und
                       </div>
                     )}
                     {stat.caption && (
-                      <div className="text-[11px] text-slate-500 mt-2 leading-snug italic">
+                      <div className="text-[11px] text-slate-400 mt-2 leading-snug italic">
                         {stat.caption}
                       </div>
                     )}
@@ -671,7 +671,7 @@ export default function WelcomeStatsHero({ mode = 'post-login', onNavigate = und
               })}
             </div>
 
-            <div className="text-[11px] text-slate-500 italic text-center pt-2 pb-6">
+            <div className="text-[11px] text-slate-400 italic text-center pt-2 pb-6">
               Soberanía alimentaria · agroecología campesina colombiana · código abierto AGPL-3.0
             </div>
           </div>

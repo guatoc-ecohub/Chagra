@@ -63,8 +63,8 @@ export const VARIEDADES_CITRICOS = [
     cientifico: 'Citrus × sinensis',
     foto: 'naranja',
     enGrafo: true,
-    nota: 'La reina del solar: Valencia (jugo), Washington/ombliga (mesa, sin pepa) y las criollas. De clima cálido a medio. La fecha de cosecha varía MUCHO por región; el grafo la marca con confianza baja.',
-    fuente: 'AGROSAVIA / ICA (grafo: citrus_sinensis)',
+    nota: 'La reina del solar: Valencia (jugo), Washington/ombliga (mesa, sin pepa) y las criollas. De clima cálido a medio. La fecha de cosecha varía MUCHO por región; el catálogo la marca con confianza baja.',
+    fuente: 'AGROSAVIA / ICA',
   },
   {
     id: 'mandarina',
@@ -72,8 +72,8 @@ export const VARIEDADES_CITRICOS = [
     cientifico: 'Citrus reticulata',
     foto: 'mandarina',
     enGrafo: true,
-    nota: 'La de pelar con la mano: Arrayana (la criolla colombiana), Oneco, Clementina. Dulce y temprana. Su calendario exacto de cosecha aún es dato en camino en el grafo.',
-    fuente: 'AGROSAVIA / ICA (grafo: citrus_reticulata)',
+    nota: 'La de pelar con la mano: Arrayana (la criolla colombiana), Oneco, Clementina. Dulce y temprana. Su calendario exacto de cosecha aún es dato en camino.',
+    fuente: 'AGROSAVIA / ICA',
   },
   {
     id: 'lima',
@@ -81,8 +81,8 @@ export const VARIEDADES_CITRICOS = [
     cientifico: 'Citrus × latifolia',
     foto: 'limon',
     enGrafo: true,
-    nota: 'El limón de exportación: sin pepa, jugoso, produce casi todo el año. Es el cítrico que MÁS altura aguanta (hasta ~2100 msnm). El grafo lo tiene con confianza alta.',
-    fuente: 'AGROSAVIA (grafo: citrus_latifolia, confianza alta)',
+    nota: 'El limón de exportación: sin pepa, jugoso, produce casi todo el año. Es el cítrico que MÁS altura aguanta (hasta ~2100 msnm). El catálogo lo tiene con confianza alta.',
+    fuente: 'AGROSAVIA (confianza alta)',
   },
   {
     id: 'limon-criollo',
@@ -90,7 +90,7 @@ export const VARIEDADES_CITRICOS = [
     cientifico: 'Citrus × aurantiifolia',
     foto: 'limon',
     enGrafo: false,
-    nota: 'El limoncito de la casa, muy ácido y espinoso, de tierra caliente. Es real y muy sembrado, pero AÚN no tiene ficha propia en el grafo Chagra: se maneja igual que el grupo cítrico.',
+    nota: 'El limoncito de la casa, muy ácido y espinoso, de tierra caliente. Es real y muy sembrado, pero AÚN no tiene ficha propia en el catálogo Chagra: se maneja igual que el grupo cítrico.',
     fuente: 'Uso campesino (nodo propio: dato en camino)',
   },
 ];
@@ -118,8 +118,8 @@ export const INJERTO_CITRICOS = {
 export const ASOCIACION_CITRICOS = {
   especie: 'Arazá',
   cientifico: 'Eugenia stipitata',
-  nota: 'El grafo Chagra reporta a la naranja compatible con el arazá: dos frutales de clima cálido que se acompañan bien en el solar.',
-  fuente: 'grafo Chagra (citrus_sinensis compatible_with eugenia_stipitata)',
+  nota: 'El catálogo Chagra reporta a la naranja compatible con el arazá: dos frutales de clima cálido que se acompañan bien en el solar.',
+  fuente: 'catálogo Chagra (naranja compatible con arazá)',
 };
 
 /* ────────────────────────────────────────────────────────────────────────
@@ -161,7 +161,7 @@ export const PISO_TERMICO = {
       rango: '1800 – 2100 msnm',
       clima: 'El límite',
       apto: 'limite',
-      nota: 'Solo el limón Tahití (lima ácida) aguanta hasta aquí, según el grafo (AGROSAVIA). Naranja y mandarina ya rinden poco. Por encima, mejor no.',
+      nota: 'Solo el limón Tahití (lima ácida) aguanta hasta aquí, según el catálogo (AGROSAVIA). Naranja y mandarina ya rinden poco. Por encima, mejor no.',
     },
     {
       id: 'frio',
@@ -173,7 +173,7 @@ export const PISO_TERMICO = {
   ],
   aguaLuz:
     'Pleno sol y, sobre todo, suelo bien DRENADO: el cítrico odia el encharcamiento (le pudre la raíz y le da gomosis). Riego parejo en la floración y el llenado del fruto; en veranos largos, riego de apoyo para que no bote la cosecha.',
-  fuente: 'grafo Chagra (citrus_latifolia 0–2100 msnm, AGROSAVIA, confianza alta) + práctica ICA',
+  fuente: 'catálogo Chagra (limón Tahití 0–2100 msnm, AGROSAVIA, confianza alta) + práctica ICA',
   // Redirección honesta para fincas de clima frío (no dejar al campesino sin salida).
   redireccionFrio: {
     texto: '¿Su finca es de clima frío alto? El cítrico no es lo suyo. Pregúntele al agente por frutales de frío (mora, tomate de árbol, uchuva).',
@@ -248,7 +248,7 @@ export const PLAGAS_CITRICOS = [
     tipo: 'plaga',
     plagaGrafo: 'Minador de la hoja de cítricos',
     senal: 'Caminitos plateados y retorcidos DENTRO de las hojas nuevas; la hoja se enrolla y se deforma. Pega duro en los arbolitos y en los brotes tiernos. Las heridas que deja abren la puerta a la cancrosis.',
-    biocontrol: ['Avispitas parasitoides (parasitoide del grafo)', 'Caldo ceniza-jabón sobre el brote tierno', 'Aceite de nim en los flujos de brotación'],
+    biocontrol: ['Avispitas parasitoides (parasitoide natural)', 'Caldo ceniza-jabón sobre el brote tierno', 'Aceite de nim en los flujos de brotación'],
   },
   {
     id: 'mosca-fruta',
@@ -265,7 +265,7 @@ export const PLAGAS_CITRICOS = [
     foto: 'psilido',
     plagaGrafo: 'Psílido asiático de los cítricos',
     senal: 'Un insectico chupador que se para "de pico abajo" en los brotes tiernos, casi a 45°. Suelta una melaza que ensucia la hoja. Es peligroso NO por lo que chupa, sino porque reparte el HLB (dragón amarillo) de árbol en árbol.',
-    biocontrol: ['Mariquita roja (depredador del grafo)', 'Hongos entomopatógenos (Beauveria, Isaria/Cordyceps, Paecilomyces)', 'Avispitas parasitoides', 'Vigilar los brotes tiernos, que es donde se cría'],
+    biocontrol: ['Mariquita roja (depredador natural)', 'Hongos entomopatógenos (Beauveria, Isaria/Cordyceps, Paecilomyces)', 'Avispitas parasitoides', 'Vigilar los brotes tiernos, que es donde se cría'],
   },
   {
     id: 'afido-tristeza',
@@ -313,7 +313,7 @@ export const PLAGAS_CITRICOS = [
     tipo: 'enfermedad',
     plagaGrafo: 'Mancha negra de los cítricos',
     senal: 'Manchas negras redondas y hundidas en la cáscara (mancha negra) o pardas en fruto y hoja (alternaria). Dañan la presentación de la fruta y son de control cuarentenario en exportación.',
-    biocontrol: ['Microorganismos de control biológico (biofungicida del grafo)', 'Recoger hojarasca y fruta caída', 'Poda para airear', 'Caldo bordelés protector'],
+    biocontrol: ['Microorganismos de control biológico (biofungicida natural)', 'Recoger hojarasca y fruta caída', 'Poda para airear', 'Caldo bordelés protector'],
   },
 ];
 
@@ -339,7 +339,7 @@ export const HLB_CUARENTENA = {
     'Controle el psílido (su vector): mariquita roja y hongos entomopatógenos, vigilando los brotes tiernos.',
     'REPORTE al ICA si ve los síntomas: es de reporte obligatorio. Un árbol enfermo confirmado se elimina para no contagiar el resto.',
   ],
-  fuente: 'ICA (plaga cuarentenaria) · grafo Chagra (HLB + psílido vector)',
+  fuente: 'ICA (plaga cuarentenaria) · catálogo Chagra (HLB + psílido vector)',
 };
 
 /**
@@ -353,7 +353,7 @@ export const GOMOSIS_PENDIENTE = {
   titulo: 'La gomosis del tronco (Phytophthora)',
   estado: ESTADO_GROUNDED_PENDIENTE,
   texto:
-    'La gomosis —una pudrición del tronco y la raíz que suelta goma— es real y grave en cítricos, pero todavía NO está en el grafo Chagra: por eso no le damos aquí un manejo con dosis (sería inventarlo). Lo que SÍ sirve y está probado es prevenir: drenaje, injerto por encima de la tierra y patrón resistente. Para su caso, el agente o el técnico del ICA.',
+    'La gomosis —una pudrición del tronco y la raíz que suelta goma— es real y grave en cítricos, pero todavía NO está en el catálogo Chagra: por eso no le damos aquí un manejo con dosis (sería inventarlo). Lo que SÍ sirve y está probado es prevenir: drenaje, injerto por encima de la tierra y patrón resistente. Para su caso, el agente o el técnico del ICA.',
 };
 
 /** Biopreparados de apoyo (grounded: lista compartida de las 3 especies cítricas). */
@@ -405,9 +405,9 @@ export const FERTILIZACION_CITRICOS = {
  */
 export const COSECHA_CITRICOS = {
   primeraCosecha: [
-    { id: 'lima', nombre: 'Limón Tahití', valor: '3–4 años', grounded: true, nota: 'Produce casi todo el año, con pico nov–mar (grafo, confianza alta).' },
-    { id: 'naranja', nombre: 'Naranja', valor: '3–5 años', grounded: true, nota: 'El calendario varía mucho por región (grafo, confianza baja).' },
-    { id: 'mandarina', nombre: 'Mandarina', valor: 'dato en camino', grounded: false, nota: 'El ciclo de la mandarina aún no está en el grafo Chagra.' },
+    { id: 'lima', nombre: 'Limón Tahití', valor: '3–4 años', grounded: true, nota: 'Produce casi todo el año, con pico nov–mar (catálogo, confianza alta).' },
+    { id: 'naranja', nombre: 'Naranja', valor: '3–5 años', grounded: true, nota: 'El calendario varía mucho por región (catálogo, confianza baja).' },
+    { id: 'mandarina', nombre: 'Mandarina', valor: 'dato en camino', grounded: false, nota: 'El ciclo de la mandarina aún no está en el catálogo Chagra.' },
   ],
   noClimaterico:
     'El cítrico NO madura después de cogido: hay que cogerlo EN EL PUNTO. Cogido verde, se queda ácido y sin jugo para siempre. La naranja y la mandarina se prueban; el limón Tahití se coge verde-lustroso, el criollo pintón, según el mercado.',
@@ -416,7 +416,7 @@ export const COSECHA_CITRICOS = {
     'Manéjelo con cuidado — el golpe se pudre. Guárdelo fresco, ventilado y a la sombra.',
     'El limón dura más si se coge sin el sol fuerte del mediodía. La fruta con hongo se aparta para que no contagie el resto.',
   ],
-  fuente: 'AGROSAVIA / ICA (grafo: perennialCycles citrus_latifolia y citrus_sinensis)',
+  fuente: 'AGROSAVIA / ICA',
 };
 
 /* ────────────────────────────────────────────────────────────────────────

@@ -114,7 +114,8 @@ export const getAnonSessionId = () => {
  * @param {{ event_type: string, metadata?: object }} params
  * @returns {Promise<object|null>} el registro creado, o null si falló.
  */
-export const recordPilotEvent = async ({ event_type, metadata = {} } = {}) => {
+export const recordPilotEvent = async (params = /** @type {any} */ ({})) => {
+  const { event_type, metadata = {} } = params;
   if (!event_type || typeof event_type !== 'string') return null;
 
   const record = {

@@ -156,6 +156,7 @@ describe('mcp honestidad — buildPriceDeclineContext estrictamente gateado', ()
   let buildPriceDeclineContext;
   let classifyQueryIntent;
 
+  // @ts-ignore
   beforeAll(async () => {
     const agentService = await import('../agentService.js');
     buildPriceDeclineContext = agentService.buildPriceDeclineContext;

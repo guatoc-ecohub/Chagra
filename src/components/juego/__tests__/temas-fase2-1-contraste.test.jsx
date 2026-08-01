@@ -1,4 +1,6 @@
+// @ts-nocheck
 /**
+// @ts-nocheck
  * temas-fase2-1-contraste.test.jsx — Fase 2.1: CONTRASTE de texto por tema.
  *
  * El test visual integral encontró que en los TEMAS CLAROS (nature/minimalista),

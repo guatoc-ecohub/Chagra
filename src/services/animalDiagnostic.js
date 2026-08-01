@@ -9,6 +9,26 @@
  */
 import ANIMAL_DATA from '../data/animal-diagnostics.json';
 
+/**
+ * Resuelve el % maximo de inclusion en dieta de una forrajera segun la
+ * especie animal (monogastricos vs equinos vs rumiantes). UNICA fuente de
+ * verdad de este mapeo — usada tanto por el filtro de recomendarForraje
+ * como por el formateador que inyecta el bloque al LLM, para que nunca
+ * diverjan (bug corregido: antes formatearGroundingAnimal mostraba el %
+ * de rumiantes a aves/equinos, sobreestimando la dosis segura hasta 3x en
+ * forrajeras con antinutricionales como matarraton/cumarina).
+ * @param {string} especieId
+ * @param {object} f forrajera de ANIMAL_DATA.forrajeras
+ * @returns {number}
+ */
+function maxPctParaEspecie(especieId, f) {
+  if (especieId === 'porcino' || especieId === 'cunicola' || especieId === 'avicola') {
+    return f.monogastricos_max_pct;
+  }
+  if (especieId === 'equino') return f.equinos_max_pct;
+  return f.rumiantes_max_pct;
+}
+
 /** @param {string} descripcion @returns {Object|null} */
 export function detectarEspecie(descripcion) {
   if (!descripcion) return null;
@@ -20,8 +40,8 @@ export function detectarEspecie(descripcion) {
   for (const [clave, senal] of senales) {
     const palabras = clave.split('_');
     if (palabras.every((p) => texto.includes(p))) {
-      const especie = ANIMAL_DATA.especies.find((e) => e.id === senal.especie);
-      return especie ? { ...especie, funcion_detectada: senal.funcion || especie.funcion } : null;
+      const especie = ANIMAL_DATA.especies.find((e) => e.id === /** @type {any} */ (senal).especie);
+      return especie ? { ...especie, funcion_detectada: /** @type {any} */ (senal).funcion || especie.funcion } : null;
     }
   }
   return null;
@@ -33,13 +53,7 @@ export function detectarEspecie(descripcion) {
  * @returns {Array<object>}
  */
 export function recomendarForraje(especieId) {
-  const forrajes = ANIMAL_DATA.forrajeras.filter((f) => {
-    if (especieId === 'porcino' || especieId === 'cunicola' || especieId === 'avicola') {
-      return f.monogastricos_max_pct > 0;
-    }
-    if (especieId === 'equino') return f.equinos_max_pct > 0;
-    return f.rumiantes_max_pct > 0;
-  });
+  const forrajes = ANIMAL_DATA.forrajeras.filter((f) => maxPctParaEspecie(especieId, f) > 0);
   return forrajes;
 }
 
@@ -73,16 +87,16 @@ export function getGuardas(especieId) {
  * Diagnostica una especie animal a partir de la descripcion del usuario
  * y retorna forrajes y guardas.
  * @param {string} descripcion
- * @returns {{especie: object|null, forrajes: Array, guardas: Array, sin_datos: boolean, fuente: string}}
+ * @returns {{especie: object|null, forrajes: Array, alimentos: Array, guardas: Array, sin_datos: boolean, fuente: string}}
  */
 export function diagnosticarAnimal(descripcion) {
   if (!descripcion || descripcion.trim().length < 3) {
-    return { especie: null, forrajes: [], guardas: [], sin_datos: true, fuente: ANIMAL_DATA.fuente };
+    return { especie: null, forrajes: [], alimentos: [], guardas: [], sin_datos: true, fuente: ANIMAL_DATA.fuente };
   }
   const texto = descripcion.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
   const especie = detectarEspecie(descripcion);
   if (!especie) {
-    return { especie: null, forrajes: [], guardas: [ANIMAL_DATA.guardas.normativa_ica], sin_datos: true, fuente: ANIMAL_DATA.fuente };
+    return { especie: null, forrajes: [], alimentos: [], guardas: [ANIMAL_DATA.guardas.normativa_ica], sin_datos: true, fuente: ANIMAL_DATA.fuente };
   }
   const forrajes = recomendarForraje(especie.id);
   const alimentos = recomendarAlimentosPecuarios(especie.id);
@@ -107,7 +121,7 @@ export function formatearGroundingAnimal(d) {
   partes.push(`**Especie detectada:** ${d.especie.nombre} (${d.especie.funcion_detectada || d.especie.funcion}).`);
   if (d.forrajes.length > 0) {
     partes.push('**Forrajeras recomendadas:**');
-    d.forrajes.forEach((f) => partes.push(`- ${f.nombre}: max ${d.especie.id === 'porcino' || d.especie.id === 'cunicola' ? f.monogastricos_max_pct : f.rumiantes_max_pct}% inclusion. ${f.guarda}`));
+    d.forrajes.forEach((f) => partes.push(`- ${f.nombre}: max ${maxPctParaEspecie(d.especie.id, f)}% inclusion. ${f.guarda}`));
   }
   if (Array.isArray(d.alimentos) && d.alimentos.length > 0) {
     partes.push('**Alimentos y complementos para porcinos:**');

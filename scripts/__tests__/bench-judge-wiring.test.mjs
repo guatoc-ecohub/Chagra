@@ -48,6 +48,13 @@ describe('parseFromArg — acepta --from path Y --from=path', () => {
 describe('normalizeBenchData — transforma el JSONL real del bench a items evaluables', () => {
   // Una línea del JSONL que escribe bench-agente-completo.mjs: per-model anidado,
   // sin ground_truth ni model_response plano.
+  //
+  // Desde el refactor #1947 (alinear juez/target/flattenDoc), normalizeBenchData
+  // ya NO asume un modelo objetivo por defecto: el target se resuelve en la capa
+  // superior (loadBenchData/resolveTargetDescriptor lo INFIERE del JSONL) o se
+  // pasa explícito. Estos tests unitarios llaman a normalizeBenchData de forma
+  // directa, así que pasan el target explícito del fixture (granite3.3:8b).
+  const TARGET = 'granite3.3:8b';
   const benchLine = {
     prompt_id: 1,
     category: 'species',
@@ -65,8 +72,8 @@ describe('normalizeBenchData — transforma el JSONL real del bench a items eval
     winner: 'granite3_3_8b',
   };
 
-  it('extrae la respuesta del modelo objetivo (granite por defecto) a model_response', () => {
-    const norm = normalizeBenchData([benchLine]);
+  it('extrae la respuesta del modelo objetivo (granite) a model_response', () => {
+    const norm = normalizeBenchData([benchLine], { targetModel: TARGET });
     expect(norm.results).toHaveLength(1);
     const item = norm.results[0];
     expect(item.model_response).toBe(
@@ -77,7 +84,7 @@ describe('normalizeBenchData — transforma el JSONL real del bench a items eval
   });
 
   it('deriva ground_truth de los expected_keywords cuando no hay uno explícito', () => {
-    const norm = normalizeBenchData([benchLine]);
+    const norm = normalizeBenchData([benchLine], { targetModel: TARGET });
     const item = norm.results[0];
     // El ground_truth debe mencionar los conceptos esperados (guía del juez).
     expect(item.ground_truth).toContain('drenaje');
@@ -85,7 +92,7 @@ describe('normalizeBenchData — transforma el JSONL real del bench a items eval
   });
 
   it('propaga expected_keywords y halluc_count del sidecar al item', () => {
-    const norm = normalizeBenchData([benchLine]);
+    const norm = normalizeBenchData([benchLine], { targetModel: TARGET });
     const item = norm.results[0];
     expect(item.expected_keywords).toEqual(['drenaje', 'riego', 'heladas', 'poda']);
     expect(item.sidecar_halluc_count).toBe(0);
@@ -105,7 +112,7 @@ describe('normalizeBenchData — transforma el JSONL real del bench a items eval
       ...benchLine,
       granite3_3_8b: { model: 'granite3.3:8b', response: null, error: 'Timeout' },
     };
-    const norm = normalizeBenchData([errored]);
+    const norm = normalizeBenchData([errored], { targetModel: TARGET });
     expect(norm.results).toHaveLength(0);
     expect(norm.skipped).toBe(1);
   });

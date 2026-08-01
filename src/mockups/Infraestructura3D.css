@@ -1,0 +1,203 @@
+/*
+ * Infraestructura3D.css — vitrina de la librería de infraestructura 3D
+ * (#/mockups/infraestructura-3d). Autocontenida: sin fuentes/imágenes externas.
+ * Móvil-first desde 320px. Fondo de hora dorada del valle; grilla responsiva.
+ * Solo opacity/transform animables.
+ */
+
+.vinf {
+  --vinf-a: #7a5a38;
+  --vinf-b: #f2d9a8;
+  min-height: 100vh;
+  min-height: 100dvh;
+  padding: 1rem 0.9rem 2.5rem;
+  background: linear-gradient(180deg, #f6ead2 0%, #f2e2c4 52%, #ecdcbe 100%);
+  color: #33291c;
+  font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+}
+
+.vinf__head {
+  max-width: 52rem;
+  margin: 0 auto 1.4rem;
+}
+.vinf__kicker {
+  margin: 0 0 0.2rem;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #8a6a3a;
+}
+.vinf__head h1 {
+  margin: 0;
+  font-size: clamp(1.5rem, 5vw, 2.3rem);
+  line-height: 1.14;
+  color: #4a331a;
+}
+.vinf__lema {
+  margin: 0.5rem 0 0;
+  font-size: 0.98rem;
+  line-height: 1.5;
+  color: #5a4630;
+}
+.vinf__barra {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.6rem 1rem;
+  margin-top: 0.9rem;
+}
+.vinf__cuenta {
+  margin: 0;
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: #6a5232;
+}
+.vinf__toggle {
+  appearance: none;
+  border: 1px solid #cbae7e;
+  background: #fbf3e2;
+  color: #5a4326;
+  font: inherit;
+  font-size: 0.86rem;
+  font-weight: 600;
+  padding: 0.42rem 0.9rem;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: transform 0.12s ease, background 0.12s ease;
+}
+.vinf__toggle:hover {
+  background: #f4e7cd;
+}
+.vinf__toggle:active {
+  transform: scale(0.96);
+}
+.vinf__aviso {
+  margin: 0.7rem 0 0;
+  font-size: 0.86rem;
+  color: #6a5232;
+  background: #fbf3e2;
+  border: 1px solid #e4d3ac;
+  border-radius: 0.6rem;
+  padding: 0.55rem 0.75rem;
+}
+
+/* ── Grupos por categoría ─────────────────────────────────────────────────── */
+.vinf__grupo {
+  max-width: 74rem;
+  margin: 0 auto 1.6rem;
+}
+.vinf__cat {
+  margin: 0.4rem 0 0.7rem;
+  font-size: 1.05rem;
+  color: #4a331a;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  border-bottom: 2px solid #e0cca0;
+  padding-bottom: 0.35rem;
+}
+
+.vinf__grid {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.9rem;
+  grid-template-columns: 1fr;
+}
+@media (min-width: 30rem) {
+  .vinf__grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+@media (min-width: 52rem) {
+  .vinf__grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+/* ── Tarjeta ──────────────────────────────────────────────────────────────── */
+.vinf__card {
+  background: #fbf5e8;
+  border: 1px solid #e6d4ab;
+  border-radius: 0.9rem;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(90, 60, 20, 0.08);
+  display: flex;
+  flex-direction: column;
+}
+.vinf__lienzo {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  background: linear-gradient(180deg, #f7ead0 0%, #edd9b4 100%);
+  touch-action: none;
+}
+.vinf__canvas {
+  display: block;
+  width: 100% !important;
+  height: 100% !important;
+}
+.vinf__placeholder {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.3rem;
+}
+.vinf__ph-emoji {
+  font-size: 2.8rem;
+  line-height: 1;
+  filter: saturate(0.85);
+}
+.vinf__ph-txt {
+  font-size: 0.78rem;
+  color: #8a6a3a;
+  font-weight: 600;
+}
+
+.vinf__meta {
+  padding: 0.7rem 0.85rem 0.9rem;
+}
+.vinf__meta h3 {
+  margin: 0;
+  font-size: 1.02rem;
+  color: #43301a;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+.vinf__medidas {
+  margin: 0.25rem 0 0;
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: #8a6a3a;
+  font-variant-numeric: tabular-nums;
+}
+.vinf__desc {
+  margin: 0.4rem 0 0;
+  font-size: 0.9rem;
+  line-height: 1.45;
+  color: #5a4630;
+}
+
+.vinf__pie {
+  max-width: 52rem;
+  margin: 0.5rem auto 0;
+  font-size: 0.9rem;
+  line-height: 1.5;
+  color: #6a5232;
+  background: #fbf3e2;
+  border: 1px solid #e4d3ac;
+  border-radius: 0.7rem;
+  padding: 0.8rem 1rem;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .vinf__toggle {
+    transition: none;
+  }
+}

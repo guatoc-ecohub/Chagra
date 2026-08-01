@@ -1,0 +1,633 @@
+/*
+ * cuadernoVivo.css — el papel, la costura y la tinta de EL CUADERNO VIVO.
+ *
+ * Las tres reglas de la artesanía andina, aplicadas a un cuaderno de finca:
+ *   1. Nada perfectamente recto → ocho radios desiguales en cada esquina,
+ *      cada página cuelga con su giro propio (--cv-giro, determinista),
+ *      el renglón y el subrayado respiran.
+ *   2. El remate se ve → el lomo cosido en cabuya, la puntada de la tapa,
+ *      el hilo que une el eco con su anotación.
+ *   3. La gravedad es la firma → sombras corridas (el papel está APOYADO),
+ *      la hoja prensada pesa sobre la página, nada flota en el éter.
+ *
+ * La tinta tiene edad: cada pieza recibe --cv-tinta-pagina desde JS
+ * (tintaPorEdad) — fresca, asentada o desteñida. El tiempo se ve, no se
+ * cuenta.
+ *
+ * CERO gamificación: no hay clases de "logro", "racha" ni "nivel" aquí, y
+ * no deben agregarse. El fracaso usa el MISMO papel que todo lo demás.
+ *
+ * Colores calcados de paleta madre / PALETA_ANDINA vía cuadernoTokens
+ * (fuente comentada). Solo transform/opacity animados; reduced-motion
+ * (media query O data-reduced) deja el cuaderno quieto.
+ * Prefijo `cv-` para no chocar con nadie. Tono usted en todo texto.
+ */
+
+.cv-cuaderno {
+  /* papel y tinta (espejo de cuadernoTokens.js — fuente única, ver GUIA) */
+  --cv-hoja: #f6efe0; /* PALETA_ANDINA.hueso */
+  --cv-hoja-vieja: #e9dfca; /* hueso→vega 0.28 */
+  --cv-tapa: #ab997b; /* vega→tinta 0.18 — cartón forrado en cabuya */
+  --cv-tapa-oscura: #84745c; /* vega→tinta 0.42 — el lomo manoseado */
+  --cv-renglon: #d7d6d0; /* hueso→añil 0.16 — el renglón azuloso escolar */
+  --cv-margen: #e7a698; /* hueso→cochinilla 0.4 — margen rojo destiñido */
+  --cv-tinta: #241a10; /* NEUTROS.tinta — negro cálido, nunca #000 */
+  --cv-tinta-lapiz: #585044; /* tinta→lámina 0.5 — apuntes a lápiz */
+  --cv-eco: #33305c; /* ACENTOS.indigo — la voz del cuaderno */
+  --cv-hilo: #c9b593; /* TIERRAS.vega — la cabuya */
+  --cv-hilo-oscuro: #8f7f65; /* vega→tinta 0.35 */
+  --cv-sombra: rgba(36, 26, 16, 0.16);
+
+  position: relative;
+  max-width: 46rem;
+  margin: 0 auto;
+  padding: 1rem 1rem 1.4rem;
+  background: var(--cv-tapa);
+  color: var(--cv-tinta);
+  /* regla 1: ocho radios, ninguno repite */
+  border-radius: 16px 12px 17px 13px / 13px 17px 12px 16px;
+  border: 3px solid var(--cv-tinta);
+  box-shadow: 4px 6px 0 var(--cv-sombra);
+  font-size: 0.95rem;
+  line-height: 1.55;
+}
+
+/* ------------------------------------------------------------------ */
+/* LA TAPA Y LA CONTRATAPA — cabuya, costura, título a mano.           */
+/* ------------------------------------------------------------------ */
+
+.cv-tapa,
+.cv-contratapa {
+  position: relative;
+  padding: 1.1rem 1.2rem 1.2rem 2.4rem;
+  color: var(--cv-tinta);
+}
+
+/* regla 2: el lomo cosido — la puntada de cabuya se ve, siempre */
+.cv-tapa__costura {
+  position: absolute;
+  top: 0.5rem;
+  bottom: 0.5rem;
+  left: 0.9rem;
+  width: 0;
+  border-left: 3px dashed var(--cv-hilo-oscuro);
+  /* la puntada no cae recta: apenas se ladea, como cosida a mano */
+  transform: rotate(0.6deg);
+}
+
+.cv-tapa__titulo {
+  margin: 0;
+  font-size: 1.35rem;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+}
+
+.cv-tapa__subrayado {
+  display: block;
+  width: min(14rem, 70%);
+  height: 10px;
+}
+
+.cv-tapa__lema {
+  margin: 0.5rem 0 0;
+  font-style: italic;
+  color: rgba(36, 26, 16, 0.78);
+  max-width: 30rem;
+}
+
+.cv-contratapa__texto {
+  margin: 0;
+  font-style: italic;
+  color: rgba(36, 26, 16, 0.78);
+  max-width: 32rem;
+}
+
+/* ------------------------------------------------------------------ */
+/* SECCIONES — título subrayable y entrada en prosa.                   */
+/* ------------------------------------------------------------------ */
+
+.cv-seccion__titulo {
+  margin: 0 0 0.3rem;
+  font-size: 1.05rem;
+  font-weight: 700;
+}
+
+.cv-seccion__entrada {
+  margin: 0 0 0.9rem;
+  max-width: 34rem;
+  color: rgba(36, 26, 16, 0.82);
+}
+
+.cv-mirada,
+.cv-registro,
+.cv-temporadas,
+.cv-paciencia {
+  margin: 0.9rem 0.4rem;
+  padding: 1rem 1rem 1.2rem;
+  background: var(--cv-hoja);
+  border: 2px solid rgba(36, 26, 16, 0.55);
+  border-radius: 12px 15px 11px 14px / 14px 11px 15px 12px;
+  box-shadow: 3px 4px 0 var(--cv-sombra);
+}
+
+/* ------------------------------------------------------------------ */
+/* LA MIRADA — los cuatro gestos del método, como notas sueltas.       */
+/* ------------------------------------------------------------------ */
+
+.cv-mirada__gestos {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(11.5rem, 1fr));
+  gap: 0.8rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.cv-mirada__gesto {
+  background: var(--cv-hoja);
+  border: 2px solid rgba(36, 26, 16, 0.5);
+  border-radius: 10px 13px 9px 12px / 12px 9px 13px 10px;
+  box-shadow: 2px 3px 0 var(--cv-sombra);
+  padding: 0.7rem 0.8rem 0.85rem;
+  /* cada nota cuelga con su giro propio (regla 1) */
+  transform: rotate(var(--cv-giro, 0deg));
+}
+
+.cv-mirada__glifo {
+  width: 2.1rem;
+  height: 2.1rem;
+  display: block;
+}
+
+.cv-mirada__titulo {
+  margin: 0.25rem 0 0.1rem;
+  font-size: 0.95rem;
+  font-weight: 700;
+}
+
+.cv-mirada__gesto-texto {
+  margin: 0 0 0.3rem;
+  font-style: italic;
+  color: var(--cv-tinta-lapiz);
+  font-size: 0.86rem;
+}
+
+.cv-mirada__texto {
+  margin: 0;
+  font-size: 0.88rem;
+  color: rgba(36, 26, 16, 0.85);
+}
+
+/* ------------------------------------------------------------------ */
+/* LAS PÁGINAS — papel rayado, margen destiñido, tinta con edad.       */
+/* ------------------------------------------------------------------ */
+
+.cv-registro__paginas {
+  display: grid;
+  gap: 1.1rem;
+}
+
+.cv-pagina {
+  position: relative;
+  background:
+    /* el margen rojo del cuaderno escolar, ya destiñido */
+    linear-gradient(
+      90deg,
+      transparent 0 2.1rem,
+      var(--cv-margen) 2.1rem calc(2.1rem + 2px),
+      transparent calc(2.1rem + 2px)
+    ),
+    /* el renglón azuloso: cada 1.7em, finito */
+    repeating-linear-gradient(
+      180deg,
+      transparent 0 calc(1.7em - 1px),
+      var(--cv-renglon) calc(1.7em - 1px) 1.7em
+    ),
+    var(--cv-hoja);
+  border: 2px solid rgba(36, 26, 16, 0.55);
+  border-radius: 9px 13px 10px 14px / 13px 9px 14px 10px;
+  box-shadow: 3px 4px 0 var(--cv-sombra);
+  padding: 0.85rem 1rem 1rem 2.7rem;
+  transform: rotate(var(--cv-giro, 0deg));
+  color: var(--cv-tinta-pagina, var(--cv-tinta));
+}
+
+/* la página vieja: el papel también envejece, no solo la tinta */
+.cv-pagina[data-vieja='true'] {
+  background:
+    linear-gradient(
+      90deg,
+      transparent 0 2.1rem,
+      var(--cv-margen) 2.1rem calc(2.1rem + 2px),
+      transparent calc(2.1rem + 2px)
+    ),
+    repeating-linear-gradient(
+      180deg,
+      transparent 0 calc(1.7em - 1px),
+      rgba(154, 139, 116, 0.35) calc(1.7em - 1px) 1.7em
+    ),
+    var(--cv-hoja-vieja);
+}
+
+.cv-pagina__cabeza {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.6rem;
+}
+
+.cv-pagina__fecha-bloque {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  position: relative;
+}
+
+.cv-pagina__fecha {
+  font-weight: 700;
+  font-size: 1rem;
+}
+
+.cv-pagina__anio {
+  color: var(--cv-tinta-lapiz);
+  font-size: 0.85rem;
+}
+
+.cv-pagina__subrayado {
+  width: 100%;
+  height: 8px;
+  flex-basis: 100%;
+}
+
+.cv-pagina__clima {
+  flex: none;
+  width: 2rem;
+  height: 2rem;
+}
+
+/* la letra del que anota: serif inclinada, la voz manuscrita sin fuente
+   externa (la mano está en el temblor del layout, no en un font kitsch) */
+.cv-pagina__texto {
+  margin: 0.5rem 0 0;
+  font-family: Georgia, 'Times New Roman', serif;
+  font-style: italic;
+  font-size: 1rem;
+  line-height: 1.7em; /* pisa el renglón */
+  max-width: 32rem;
+}
+
+/* los gestos que usó ese día: constancia de método, no insignias */
+.cv-pagina__miradas {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem 0.9rem;
+  margin: 0.6rem 0 0;
+  padding: 0;
+  list-style: none;
+  font-size: 0.8rem;
+  color: var(--cv-tinta-lapiz);
+}
+
+.cv-pagina__mirada {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+.cv-pagina__mirada .cv-glifo-mirada {
+  width: 1.25rem;
+  height: 1.25rem;
+  opacity: 0.75;
+}
+
+/* ── El fracaso digno ──────────────────────────────────────────────── */
+
+/* mismo papel, misma regla: nada rojo, nada de error. Solo su reliquia. */
+.cv-pagina--fracaso .cv-pagina__texto {
+  max-width: 28rem;
+}
+
+.cv-pagina__reliquia {
+  float: right;
+  margin: 0.2rem 0 0.4rem 0.8rem;
+  text-align: center;
+  /* la hoja pesa sobre la página (regla 3): sombra pegadita, giro leve */
+  transform: rotate(-3.5deg);
+}
+
+.cv-pagina__reliquia .cv-hoja-prensada {
+  width: 3.4rem;
+  height: 3.4rem;
+  filter: drop-shadow(1px 2px 0 var(--cv-sombra));
+}
+
+.cv-pagina__reliquia-pie {
+  margin-top: 0.1rem;
+  font-size: 0.72rem;
+  color: var(--cv-tinta-lapiz);
+  font-style: italic;
+  max-width: 6.5rem;
+}
+
+.cv-pagina__remate {
+  clear: both;
+  margin: 0.7rem 0 0;
+  padding-top: 0.4rem;
+  border-top: 1px dashed rgba(36, 26, 16, 0.3);
+  font-size: 0.88rem;
+  font-style: italic;
+  color: var(--cv-tinta-lapiz);
+}
+
+/* ── El eco: la finca hablando con palabras propias ────────────────── */
+
+.cv-eco {
+  position: relative;
+  margin: 0.9rem 0 0 1.2rem;
+  padding-left: 1.1rem;
+}
+
+.cv-eco__hilo {
+  position: absolute;
+  left: 0;
+  top: -0.5rem;
+  bottom: 0.3rem;
+  width: 12px;
+  height: calc(100% + 0.5rem);
+}
+
+.cv-eco__papel {
+  background: rgba(51, 48, 92, 0.06); /* el índigo apenas tiñe el papel */
+  border: 2px dashed rgba(51, 48, 92, 0.45);
+  border-radius: 8px 11px 7px 10px / 10px 7px 11px 8px;
+  padding: 0.55rem 0.75rem 0.65rem;
+  color: var(--cv-eco);
+  max-width: 28rem;
+  /* la nota al margen cuelga apenas (regla 3) */
+  transform: rotate(-0.5deg);
+}
+
+.cv-eco__de {
+  margin: 0;
+  font-size: 0.78rem;
+  letter-spacing: 0.02em;
+  text-transform: none;
+  opacity: 0.85;
+}
+
+.cv-eco__cita {
+  margin: 0.25rem 0 0;
+  padding: 0;
+  border: none;
+  font-family: Georgia, 'Times New Roman', serif;
+  font-style: italic;
+  font-size: 0.95rem;
+}
+
+.cv-eco__nota {
+  margin: 0.4rem 0 0;
+  font-size: 0.82rem;
+  opacity: 0.9;
+}
+
+/* ------------------------------------------------------------------ */
+/* TRES TEMPORADAS — la misma era, lado a lado. El aprendizaje se ve.  */
+/* ------------------------------------------------------------------ */
+
+.cv-temporadas__era {
+  margin: 0 0 0.7rem;
+  font-size: 1.05rem;
+  font-weight: 700;
+}
+
+.cv-temporadas__tiras {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr));
+  gap: 0.8rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  counter-reset: none;
+}
+
+.cv-tira {
+  background: var(--cv-hoja);
+  border: 2px solid rgba(36, 26, 16, 0.5);
+  border-radius: 11px 8px 12px 9px / 9px 12px 8px 11px;
+  box-shadow: 2px 3px 0 var(--cv-sombra);
+  padding: 0.65rem 0.75rem 0.8rem;
+  transform: rotate(var(--cv-giro, 0deg));
+  color: var(--cv-tinta-pagina, var(--cv-tinta));
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.cv-tira__anio {
+  font-weight: 700;
+  font-size: 1.05rem;
+}
+
+.cv-tira__siembra {
+  margin: 0;
+  font-size: 0.84rem;
+  color: var(--cv-tinta-lapiz);
+}
+
+.cv-tira__hitos {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 0.3rem;
+  flex: 1;
+}
+
+.cv-tira__hito {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.35rem;
+  font-size: 0.84rem;
+}
+
+.cv-tira__hito-glifo {
+  flex: none;
+  width: 1.35rem;
+  height: 1.35rem;
+  margin-top: -0.1rem;
+}
+
+/* la cosecha se ESCRIBE, no se grafica: palabras del que cosechó */
+.cv-tira__cosecha {
+  margin: 0.2rem 0 0;
+  padding-top: 0.35rem;
+  border-top: 1px dashed rgba(36, 26, 16, 0.3);
+  font-family: Georgia, 'Times New Roman', serif;
+  font-style: italic;
+  font-size: 0.98rem;
+}
+
+/* el año del fracaso: mismo papel, tinta más vieja — jamás rojo */
+.cv-tira--fracaso {
+  background: var(--cv-hoja-vieja);
+}
+
+.cv-temporadas__leccion {
+  position: relative;
+  margin-top: 1rem;
+  max-width: 34rem;
+}
+
+.cv-temporadas__leccion p {
+  margin: 0;
+  font-family: Georgia, 'Times New Roman', serif;
+  font-style: italic;
+  font-size: 1.02rem;
+}
+
+.cv-temporadas__subrayado,
+.cv-paciencia__subrayado {
+  display: block;
+  width: min(16rem, 80%);
+  height: 9px;
+}
+
+/* ------------------------------------------------------------------ */
+/* LA PACIENCIA — renglones por año, colgados de un hilo. Sin barra.   */
+/* ------------------------------------------------------------------ */
+
+.cv-paciencia__titulo {
+  margin: 0 0 0.6rem;
+  font-size: 1.05rem;
+  font-weight: 700;
+}
+
+.cv-paciencia__cuerpo {
+  position: relative;
+  padding-left: 1.3rem;
+}
+
+.cv-paciencia__hilo {
+  position: absolute;
+  left: 0.15rem;
+  top: 0.2rem;
+  bottom: 0.2rem;
+  width: 12px;
+  height: calc(100% - 0.4rem);
+}
+
+.cv-paciencia__renglones {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 0.55rem;
+}
+
+.cv-paciencia__renglon {
+  display: flex;
+  align-items: baseline;
+  gap: 0.7rem;
+  color: var(--cv-tinta-pagina, var(--cv-tinta));
+}
+
+.cv-paciencia__anio {
+  flex: none;
+  font-weight: 700;
+  font-size: 0.9rem;
+  min-width: 3.1rem;
+}
+
+.cv-paciencia__nota {
+  font-family: Georgia, 'Times New Roman', serif;
+  font-style: italic;
+  font-size: 0.95rem;
+}
+
+.cv-paciencia__remate {
+  position: relative;
+  margin-top: 0.9rem;
+}
+
+.cv-paciencia__remate p {
+  margin: 0;
+  font-weight: 700;
+  font-size: 1rem;
+}
+
+/* ------------------------------------------------------------------ */
+/* TRAZOS — utilidades de los SVG.                                     */
+/* ------------------------------------------------------------------ */
+
+.cv-trazo {
+  display: inline-block;
+  vertical-align: middle;
+}
+
+/* ------------------------------------------------------------------ */
+/* MOVIMIENTO — una sola entrada suave; el papel no baila.             */
+/* Solo transform/opacity; reduced-motion lo deja quieto.              */
+/* ------------------------------------------------------------------ */
+
+@media (prefers-reduced-motion: no-preference) {
+  .cv-cuaderno:not([data-reduced='true']) .cv-pagina,
+  .cv-cuaderno:not([data-reduced='true']) .cv-mirada__gesto,
+  .cv-cuaderno:not([data-reduced='true']) .cv-tira {
+    animation: cv-asienta 480ms cubic-bezier(0.22, 1, 0.36, 1) backwards;
+  }
+
+  /* el papel llega en tandas, como quien va pasando hojas */
+  .cv-cuaderno:not([data-reduced='true']) .cv-pagina:nth-child(2),
+  .cv-cuaderno:not([data-reduced='true']) .cv-mirada__gesto:nth-child(2),
+  .cv-cuaderno:not([data-reduced='true']) .cv-tira:nth-child(2) {
+    animation-delay: 90ms;
+  }
+
+  .cv-cuaderno:not([data-reduced='true']) .cv-pagina:nth-child(3),
+  .cv-cuaderno:not([data-reduced='true']) .cv-mirada__gesto:nth-child(3),
+  .cv-cuaderno:not([data-reduced='true']) .cv-tira:nth-child(3) {
+    animation-delay: 180ms;
+  }
+
+  .cv-cuaderno:not([data-reduced='true']) .cv-pagina:nth-child(n + 4),
+  .cv-cuaderno:not([data-reduced='true']) .cv-mirada__gesto:nth-child(n + 4) {
+    animation-delay: 270ms;
+  }
+}
+
+@keyframes cv-asienta {
+  from {
+    opacity: 0;
+    transform: rotate(var(--cv-giro, 0deg)) translateY(6px);
+  }
+
+  to {
+    opacity: 1;
+    transform: rotate(var(--cv-giro, 0deg)) translateY(0);
+  }
+}
+
+/* ------------------------------------------------------------------ */
+/* PANTALLA ANGOSTA — el cuaderno cabe en la mano.                     */
+/* ------------------------------------------------------------------ */
+
+@media (max-width: 480px) {
+  .cv-cuaderno {
+    padding: 0.6rem 0.5rem 1rem;
+    font-size: 0.92rem;
+  }
+
+  .cv-tapa,
+  .cv-contratapa {
+    padding-left: 1.9rem;
+  }
+
+  .cv-pagina {
+    padding-left: 2.3rem;
+  }
+
+  .cv-eco {
+    margin-left: 0.4rem;
+  }
+}

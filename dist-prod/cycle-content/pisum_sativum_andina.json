@@ -1,0 +1,76 @@
+{
+  "species_slug": "pisum_sativum_andina",
+  "scientific_name": "Pisum sativum L. var. andina",
+  "common_names": [
+    "Arveja andina"
+  ],
+  "family": "Fabaceae",
+  "category": "granos_legumbres",
+  "cultivable": true,
+  "conservation_status": "cultivo_comun",
+  "thermal_zones": [
+    "frio"
+  ],
+  "roles_in_guild": [
+    "crop",
+    "nitrogen_fixer"
+  ],
+  "antagonists": [],
+  "especies_nativas_sustitutas": [],
+  "propagation": {
+    "metodo_principal": "semilla",
+    "notas": "Siembra directa en surcos a 3-5 cm de profundidad. Variedad de crecimiento indeterminado; requiere tutorado con ramas de aliso o cerca de maiz."
+  },
+  "requirements": {
+    "agua": "medio",
+    "altitud_msnm": {
+      "min_absoluto": 1800,
+      "optimo_min": 2200,
+      "optimo_max": 2800,
+      "max_absoluto": 3200
+    },
+    "temperatura_c": {
+      "helada_letal": -4,
+      "optimo_min": 10,
+      "optimo_max": 18,
+      "max_tolerable": 22
+    },
+    "radiacion": "sol_pleno",
+    "drenaje_requerido": "bueno"
+  },
+  "valor_pedagogico": "La arveja andina (Pisum sativum L. var. andina, variedades tradicionales colombianas tipo verde-de-grano y de-vaina) es una leguminosa anual altoandina adaptada a climas fríos y heladas ligeras, cultivada en sistemas campesinos colombianos tradicionales como cultivo de doble propósito (grano seco + verdura fresca) y como abono verde fijador de nitrógeno (~80-120 kg N/ha). Se cultiva en Boyacá altiplano (Tunja, Ventaquemada, Toca), Cundinamarca (Sabana Bogotá, Sumapaz, Pacho), Nariño (Pasto, Yacuanquer) y Cauca entre 1.800 y 3.200 msnm en zona térmica fría. Ciclo 4-6 meses a cosecha vaina verde, 6-7 meses a grano seco. Rendimientos 2-4 t/ha grano. Hábito trepador o semitrepador según variedad, requiere tutorado con varas o malla. Lección viva: enseña el valor de las leguminosas en la rotación andina y el aporte de proteína vegetal de calidad (15-25%) en la dieta campesina, complementando cereales y tubérculos. Manejo agroecológico: siembra a chorrillo en líneas tutoreadas, asocio con maíz (chacra muisca), fertilización con compost al fondo + biol foliar quincenal, control de gorgojo (Bruchus pisorum) con cosecha temprana + secado riguroso + congelado de semilla guardada. Fuentes Tier A: AGROSAVIA Leguminosas Andinas, NRC 1989 Cultivos Andinos, ICA Resolución 3168/2015, POWO Kew, GBIF Backbone Taxonomy.",
+  "sources": [
+    {
+      "id": "gbif-taxonomic-backbone",
+      "title": "gbif-taxonomic-backbone",
+      "tier": "A",
+      "url": "https://www.gbif.org/dataset/d7dddbf4-2cf0-4f39-9b2a-bb099caae36c"
+    },
+    {
+      "id": "powo-kew",
+      "title": "powo-kew",
+      "tier": "A",
+      "url": "https://powo.science.kew.org"
+    },
+    {
+      "id": "agrosavia-leguminosas-andinas",
+      "title": "agrosavia-leguminosas-andinas",
+      "tier": "A",
+      "url": null
+    },
+    {
+      "id": "nrc-1989-cultivos-andinos",
+      "title": "nrc-1989-cultivos-andinos",
+      "tier": "A",
+      "url": null
+    },
+    {
+      "id": "ica-resolucion-3168-2015",
+      "title": "ica-resolucion-3168-2015",
+      "tier": "A",
+      "url": null
+    }
+  ],
+  "_generated_by": "scripts/build-cycle-content-from-catalog.mjs",
+  "_generated_at": "2026-05-19T00:42:57.368Z"
+}

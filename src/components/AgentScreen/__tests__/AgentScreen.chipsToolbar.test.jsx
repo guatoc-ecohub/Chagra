@@ -3,9 +3,18 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 
+/**
+ * @param {any} state
+ */
 function createStoreHook(state) {
+  /**
+   * @param {any} selector
+   */
   const hook = (selector) => (typeof selector === 'function' ? selector(state) : state);
   hook.getState = () => state;
+  /**
+   * @param {any} patch
+   */
   hook.setState = (patch) => Object.assign(state, patch);
   return hook;
 }
@@ -401,7 +410,7 @@ describe('AgentScreen - chips toolbar', () => {
   });
 
   it('V3: colapsa la bandeja en la mochila; el disparador la abre y elegir un modo lo fuerza, la cierra y lo muestra', async () => {
-    render(<AgentScreen onBack={() => {}} />);
+    render(<AgentScreen onBack={() => {}} onNavigate={() => {}} initialContext={null} />);
 
     // El disparador vive en el compositor; la mochila arranca CERRADA (el
     // chat recupera el alto completo). ChipsToolbar NO está montada aún y no

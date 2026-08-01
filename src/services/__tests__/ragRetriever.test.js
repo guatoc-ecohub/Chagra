@@ -62,7 +62,7 @@ const LECHUGA_DOC = {
 };
 
 function setupFetchMock() {
-  globalThis.fetch = vi.fn((url) => {
+  globalThis.fetch = /** @type {typeof globalThis.fetch} */ (/** @type {unknown} */ (vi.fn((url) => {
     const u = String(url);
     if (u.endsWith('/cycle-content/manifest.json')) {
       return Promise.resolve({
@@ -92,7 +92,7 @@ function setupFetchMock() {
       });
     }
     return Promise.resolve({ ok: false, status: 404, headers: { get: () => '' } });
-  });
+  })));
 }
 
 // Catálogo OSS que cubre los slugs sintéticos del manifest de estos describes.
@@ -137,6 +137,25 @@ describe('ragRetriever — corpus extendido v2', () => {
     passages.forEach((p) => {
       expect(p.species).toBe('sluggy_test');
     });
+  });
+
+  it('flattenDoc indexa campos cortos de clima y numericos con contexto', async () => {
+    const { flattenDoc } = await import('../ragRetriever.js');
+    const passages = flattenDoc({
+      species_slug: 'clima_test',
+      clima: 'frio',
+      ph: 5.8,
+      altitud_msnm: 1850,
+      temperatura: 18,
+      humedad: 82,
+      dosis: '2 ml',
+      distancia: '30 cm',
+    });
+
+    expect(passages.length).toBeGreaterThan(0);
+    expect(passages.some((p) => p.text.includes('clima'))).toBe(true);
+    expect(passages.some((p) => p.text.includes('5.8'))).toBe(true);
+    expect(passages.some((p) => p.text.includes('1850'))).toBe(true);
   });
 
   it('retrieve("plan alimentación fresa") devuelve passage con "### Plan de alimentación"', async () => {
@@ -429,7 +448,7 @@ describe('ragRetriever — tier-gate del catalogo (SEC-002 / UXC-004)', () => {
 
   function setupGatedFetchMock(manifest = MANIFEST_GATED) {
     const tracker = { docFetches: new Set() };
-    globalThis.fetch = vi.fn((url) => {
+    globalThis.fetch = /** @type {typeof globalThis.fetch} */ (/** @type {unknown} */ (vi.fn((url) => {
       const u = String(url);
       if (u.endsWith('/cycle-content/manifest.json')) {
         return Promise.resolve({
@@ -451,7 +470,7 @@ describe('ragRetriever — tier-gate del catalogo (SEC-002 / UXC-004)', () => {
         });
       }
       return Promise.resolve({ ok: false, status: 404, headers: { get: () => '' } });
-    });
+    })));
     return tracker;
   }
 
@@ -763,7 +782,7 @@ describe('ragRetriever — anti-regresión fetch serial 491 slugs (PROD-DOWN #12
     const manifest = makeManifest(N);
     const tracker = { docFetches: 0, successful: 0 };
 
-    globalThis.fetch = vi.fn((url) => {
+    globalThis.fetch = /** @type {typeof globalThis.fetch} */ (/** @type {unknown} */ (vi.fn((url) => {
       const u = String(url);
       if (u.endsWith('/cycle-content/manifest.json')) {
         return Promise.resolve({
@@ -793,7 +812,7 @@ describe('ragRetriever — anti-regresión fetch serial 491 slugs (PROD-DOWN #12
         });
       }
       return Promise.resolve({ ok: false, status: 404, headers: { get: () => '' } });
-    });
+    })));
 
     const { retrieve, getCorpusStats } = await import('../ragRetriever.js');
 
@@ -815,7 +834,7 @@ describe('ragRetriever — anti-regresión fetch serial 491 slugs (PROD-DOWN #12
     const manifest = makeManifest(N);
     const tracker = { docFetches: 0, successful: 0, failed: 0 };
 
-    globalThis.fetch = vi.fn((url) => {
+    globalThis.fetch = /** @type {typeof globalThis.fetch} */ (/** @type {unknown} */ (vi.fn((url) => {
       const u = String(url);
       if (u.endsWith('/cycle-content/manifest.json')) {
         return Promise.resolve({
@@ -846,7 +865,7 @@ describe('ragRetriever — anti-regresión fetch serial 491 slugs (PROD-DOWN #12
         });
       }
       return Promise.resolve({ ok: false, status: 404, headers: { get: () => '' } });
-    });
+    })));
 
     const { retrieve, getCorpusStats } = await import('../ragRetriever.js');
 

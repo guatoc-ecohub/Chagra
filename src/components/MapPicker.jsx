@@ -72,7 +72,7 @@ export const MapPicker = ({
   initial = null,
   onSave,
   onCancel,
-  center,  // deja undefined para usar el resolver adaptativo (zona del usuario o Choachí)
+  center = undefined,  // deja undefined para usar el resolver adaptativo (zona del usuario o Choachí)
 }) => {
   // Resolver adaptativo: si el caller no provee `center` explícito, usar
   // centroide de la primera zona del usuario con geometría. Fallback a
@@ -120,8 +120,8 @@ export const MapPicker = ({
   const [isBrave, setIsBrave] = useState(false);
 
   useEffect(() => {
-    if (typeof navigator !== 'undefined' && navigator.brave?.isBrave) {
-      navigator.brave.isBrave().then((b) => setIsBrave(!!b)).catch(() => {});
+    if (typeof navigator !== 'undefined' && /** @type {any} */ (navigator).brave?.isBrave) {
+      /** @type {any} */ (navigator).brave.isBrave().then((b) => setIsBrave(!!b)).catch(() => {});
     }
   }, []);
 

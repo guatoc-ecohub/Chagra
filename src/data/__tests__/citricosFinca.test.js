@@ -1,13 +1,6 @@
 import { describe, it, expect } from 'vitest';
-// @types/node no está instalado en el repo (gap conocido, ya tolerado en
-// MundosDeMiFinca.reachability.test.jsx / dataJsonValidity.test.js): tsc no
-// resuelve los specifiers "node:*". Runtime (vitest/node) los resuelve sin
-// problema; irreducible sin sumar @types/node al repo entero (fuera de alcance).
-// @ts-expect-error TS2591 — ver comentario arriba.
 import { readFileSync, existsSync } from 'node:fs';
-// @ts-expect-error TS2591 — ver comentario arriba.
 import { fileURLToPath } from 'node:url';
-// @ts-expect-error TS2591 — ver comentario arriba.
 import path from 'node:path';
 import {
   VARIEDADES_CITRICOS,

@@ -53,7 +53,7 @@ beforeEach(() => {
 describe('HytaPanel — estados observables', () => {
   it('muestra el estado de carga inicial (spinner)', async () => {
     // getGpuSnapshot nunca resuelve durante este test
-    getGpuSnapshot.mockReturnValue(new Promise(() => {}));
+    vi.mocked(getGpuSnapshot).mockReturnValue(new Promise(() => {}));
     render(<HytaPanel />);
     // Hay dos textos "Detectando": el del panel interno y el del botón.
     const detectandoEls = screen.getAllByText(/detectando/i);
@@ -64,7 +64,7 @@ describe('HytaPanel — estados observables', () => {
   });
 
   it('muestra aviso cuando GPU no está disponible (available=false)', async () => {
-    getGpuSnapshot.mockResolvedValue(snapUnavailable);
+    vi.mocked(getGpuSnapshot).mockResolvedValue(snapUnavailable);
     render(<HytaPanel />);
     await waitFor(() =>
       expect(screen.getByText(/GPU info no disponible/i)).toBeInTheDocument()
@@ -72,7 +72,7 @@ describe('HytaPanel — estados observables', () => {
   });
 
   it('muestra VRAM y nombre del modelo cuando available=true', async () => {
-    getGpuSnapshot.mockResolvedValue(snapAvailable);
+    vi.mocked(getGpuSnapshot).mockResolvedValue(snapAvailable);
     render(<HytaPanel />);
     await waitFor(() =>
       expect(screen.getByText(/VRAM total ocupada/i)).toBeInTheDocument()
@@ -99,7 +99,7 @@ describe('HytaPanel — estados observables', () => {
       ],
       hasGpu: false,
     };
-    getGpuSnapshot.mockResolvedValue(snapNoDetails);
+    vi.mocked(getGpuSnapshot).mockResolvedValue(snapNoDetails);
     render(<HytaPanel />);
     await waitFor(() =>
       expect(screen.getByText('model-sin-detalles')).toBeInTheDocument()
@@ -110,13 +110,13 @@ describe('HytaPanel — estados observables', () => {
   });
 
   it('el botón "Ver GPU detectada" dispara un nuevo snapshot', async () => {
-    getGpuSnapshot.mockResolvedValue(snapUnavailable);
+    vi.mocked(getGpuSnapshot).mockResolvedValue(snapUnavailable);
     render(<HytaPanel />);
     await waitFor(() =>
       expect(screen.getByText(/GPU info no disponible/i)).toBeInTheDocument()
     );
 
-    getGpuSnapshot.mockResolvedValue(snapAvailable);
+    vi.mocked(getGpuSnapshot).mockResolvedValue(snapAvailable);
     const btn = screen.getByRole('button', { name: /ver gpu detectada/i });
     await act(async () => { btn.click(); });
 

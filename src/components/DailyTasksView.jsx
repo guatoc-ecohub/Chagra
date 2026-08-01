@@ -26,6 +26,7 @@ const stageIcons = {
  *   - stageOrder: Array<{code, label}> — orden fenológico
  *   - onCompleteTask: (task) => void — opcional
  */
+/** @param {{ processes?: any[], stageOrder?: any[], onCompleteTask?: (task: object) => void }} props */
 export default function DailyTasksView({ processes = [], stageOrder = [], onCompleteTask }) {
   const allTasks = useMemo(() => {
     const grouped = [];

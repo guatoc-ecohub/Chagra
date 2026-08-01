@@ -195,7 +195,23 @@ export function isDemoSeedHeladaActive() {
 }
 
 /**
+ * @typedef {Object} ChagraNotification
+ * @property {string} id
+ * @property {string} severity - 'critical' | 'warning' | 'info'
+ * @property {string} title
+ * @property {string} [type]
+ * @property {string} [body]
+ * @property {string} [cta_view]
+ * @property {string} [cta_label]
+ * @property {string} [prefilled_prompt]
+ * @property {string} [source_label]
+ * @property {string} [source_url]
+ * @property {number} [created_at]
+ */
+
+/**
  * Sources opcional: { plants, tasks, failedTxCount, hasUpdate, onboardingComplete, bioculturalZone, calendarMonth, iotAlerts }
+ * @returns {ChagraNotification[]}
  */
 export function aggregateNotifications(sources = {}) {
     const dismissed = readDismissedIds();

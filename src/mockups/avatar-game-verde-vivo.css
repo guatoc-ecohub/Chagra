@@ -1,0 +1,766 @@
+/* ==========================================================================
+   AvatarGameVerdeVivo — mockup "El Espíritu de tu Finca", tema VERDE VIVO.
+   Prefijo avv-. Luz de día, verdes vibrantes, campo andino rebosante de vida.
+   ========================================================================== */
+
+.avv-root {
+  --avv-ink: #1c2a16;
+  --avv-papel: #fbfdf4;
+  --avv-borde: #c8d6a8;
+  --avv-verde: #2e8b3d;
+  --avv-verde-hondo: #1d5c2a;
+  --avv-verde-luz: #8fd05a;
+  --avv-lima: #d3f296;
+  --avv-ocre: #e0922e;
+  --avv-crema: #f2f8d9;
+  position: fixed;
+  inset: 0;
+  z-index: 80;
+  overflow: hidden;
+  font-family: 'Nunito', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  color: var(--avv-ink);
+  background: linear-gradient(#8fd4c0, #f2f8d9);
+}
+
+.avv-escena {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+/* ============================== CABEZOTE ============================== */
+
+.avv-cabezote {
+  position: absolute;
+  top: max(12px, env(safe-area-inset-top));
+  left: 14px;
+  right: 14px;
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  pointer-events: none;
+}
+.avv-cabezote > * { pointer-events: auto; }
+
+.avv-volver {
+  flex: 0 0 auto;
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  border: 1.5px solid var(--avv-borde);
+  background: rgba(251, 253, 244, 0.88);
+  color: var(--avv-verde-hondo);
+  font-size: 20px;
+  line-height: 1;
+  cursor: pointer;
+  box-shadow: 0 4px 14px rgba(29, 92, 42, 0.18);
+  backdrop-filter: blur(6px);
+}
+.avv-volver:hover { background: var(--avv-papel); }
+
+.avv-eyebrow {
+  margin: 0;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #3f7a52;
+}
+.avv-titulo {
+  margin: 1px 0 0;
+  font-family: 'Baloo 2', 'Nunito', sans-serif;
+  font-size: clamp(24px, 4.6vw, 40px);
+  line-height: 1.02;
+  color: var(--avv-verde-hondo);
+  text-shadow: 0 2px 0 rgba(255, 255, 255, 0.55);
+}
+.avv-subtitulo {
+  margin: 2px 0 0;
+  font-size: 13.5px;
+  font-weight: 700;
+  color: #35502c;
+  opacity: 0.9;
+}
+
+.avv-cabezote-chips {
+  margin-left: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  align-items: flex-end;
+}
+
+.avv-chip {
+  display: inline-block;
+  padding: 5px 11px;
+  border-radius: 999px;
+  border: 1.5px solid var(--avv-borde);
+  background: rgba(251, 253, 244, 0.88);
+  font-size: 12.5px;
+  font-weight: 800;
+  color: #2c4423;
+  white-space: nowrap;
+  backdrop-filter: blur(6px);
+}
+.avv-chip-vivo {
+  border-color: #8fc86e;
+  background: linear-gradient(120deg, #e9f8d4, #d0efb2);
+  color: var(--avv-verde-hondo);
+  box-shadow: 0 3px 12px rgba(46, 139, 61, 0.22);
+}
+
+/* ============================== ESCENA: VIDA ============================== */
+
+.avv-sol-rayos {
+  transform-origin: 652px 128px;
+  animation: avv-gira 70s linear infinite;
+}
+@keyframes avv-gira { to { transform: rotate(360deg); } }
+
+.avv-nube-1 { animation: avv-deriva 46s ease-in-out infinite alternate; }
+.avv-nube-2 { animation: avv-deriva 58s ease-in-out infinite alternate-reverse; }
+.avv-nube-3 { animation: avv-deriva 38s ease-in-out infinite alternate; }
+@keyframes avv-deriva {
+  from { transform: translateX(-26px); }
+  to { transform: translateX(48px); }
+}
+
+.avv-pajaros { animation: avv-vuelo 34s linear infinite; }
+@keyframes avv-vuelo {
+  from { transform: translate(-90px, 20px); }
+  to { transform: translate(880px, -50px); }
+}
+
+.avv-humo { animation: avv-humea 5s ease-in-out infinite alternate; }
+@keyframes avv-humea { from { opacity: 0.45; } to { opacity: 0.85; } }
+
+.avv-agua-brillo { animation: avv-corre 2.6s linear infinite; }
+@keyframes avv-corre { to { stroke-dashoffset: -52; } }
+
+.avv-hoja-t0 { fill: #4aa84f; }
+.avv-hoja-t1 { fill: #57b45f; }
+.avv-hoja-t2 { fill: #7cc95d; }
+.avv-hoja-t3 { fill: #a9e070; }
+.avv-hoja { transition: rx 0.4s ease, ry 0.4s ease; }
+
+.avv-mece-a { animation: avv-mece 6s ease-in-out infinite alternate; transform-box: fill-box; transform-origin: center; }
+.avv-mece-b { animation: avv-mece 7.4s ease-in-out infinite alternate-reverse; transform-box: fill-box; transform-origin: center; }
+@keyframes avv-mece {
+  from { transform: rotate(-1.4deg) translateX(-3px); }
+  to { transform: rotate(1.4deg) translateX(3px); }
+}
+
+.avv-savia { animation: avv-sube 1.9s linear infinite; }
+@keyframes avv-sube { to { stroke-dashoffset: -44; } }
+
+.avv-flor { animation: avv-brota 0.6s ease-out backwards; }
+.avv-fruto { animation: avv-brota 0.5s cubic-bezier(0.2, 1.6, 0.4, 1) backwards; transform-box: fill-box; }
+@keyframes avv-brota {
+  from { opacity: 0; transform: scale(0.2); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+.avv-mota { animation: avv-flota-mota 9s ease-in-out infinite; opacity: 0.85; }
+@keyframes avv-flota-mota {
+  0%, 100% { transform: translate(0, 0); opacity: 0.25; }
+  30% { opacity: 0.9; }
+  50% { transform: translate(14px, -34px); opacity: 0.7; }
+  80% { opacity: 0.3; }
+}
+
+.avv-micelio path { animation: avv-corre 4s linear infinite; }
+.avv-brilla { animation: avv-brillo 3.2s ease-in-out infinite; }
+@keyframes avv-brillo {
+  0%, 100% { opacity: 0.35; }
+  50% { opacity: 1; }
+}
+
+.avv-late { transform-origin: 0 0; animation: avv-latido 2.4s ease-in-out infinite; }
+.avv-late-halo { animation: avv-latido-halo 2.4s ease-in-out infinite; transform-origin: 0 0; }
+@keyframes avv-latido {
+  0%, 100% { transform: scale(1); }
+  12% { transform: scale(1.09); }
+  24% { transform: scale(1); }
+  36% { transform: scale(1.05); }
+  48% { transform: scale(1); }
+}
+@keyframes avv-latido-halo {
+  0%, 100% { opacity: 0.75; }
+  12% { opacity: 1; }
+  48% { opacity: 0.75; }
+}
+
+/* ============================== NODOS DE MUNDO ============================== */
+
+.avv-nodo { cursor: pointer; outline: none; }
+.avv-nodo-halo {
+  fill: rgba(211, 242, 150, 0.5);
+  animation: avv-halo 3s ease-in-out infinite;
+  transform-box: fill-box;
+  transform-origin: center;
+}
+@keyframes avv-halo {
+  0%, 100% { transform: scale(0.86); opacity: 0.45; }
+  50% { transform: scale(1.05); opacity: 0.8; }
+}
+.avv-nodo-cuerpo {
+  fill: rgba(251, 253, 244, 0.94);
+  filter: drop-shadow(0 3px 6px rgba(29, 92, 42, 0.3));
+}
+.avv-nodo-borde {
+  fill: none;
+  stroke: #57a453;
+  stroke-width: 2.5;
+}
+.avv-nodo-emoji { user-select: none; }
+.avv-nodo-label {
+  font-family: 'Baloo 2', 'Nunito', sans-serif;
+  font-size: 15px;
+  font-weight: 700;
+  fill: var(--avv-verde-hondo);
+  paint-order: stroke;
+  stroke: rgba(251, 253, 244, 0.9);
+  stroke-width: 4px;
+  user-select: none;
+}
+.avv-nodo:hover .avv-nodo-cuerpo,
+.avv-nodo:focus-visible .avv-nodo-cuerpo { fill: #ffffff; }
+.avv-nodo:hover .avv-nodo-borde,
+.avv-nodo:focus-visible .avv-nodo-borde { stroke: var(--avv-ocre); stroke-width: 3.5; }
+.avv-nodo-sel .avv-nodo-borde { stroke: var(--avv-ocre); stroke-width: 4; }
+.avv-nodo-sel .avv-nodo-halo { fill: rgba(224, 146, 46, 0.35); }
+
+/* ============================== AVATAR ============================== */
+
+.avv-avatar { transition: transform 0.5s ease; }
+.avv-flota { animation: avv-flotar 3.4s ease-in-out infinite; transform-box: fill-box; transform-origin: center; }
+@keyframes avv-flotar {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-7px); }
+}
+.avv-respira { animation: avv-respirar 3.8s ease-in-out infinite; transform-box: fill-box; transform-origin: 50% 90%; }
+@keyframes avv-respirar {
+  0%, 100% { transform: scaleY(1); }
+  50% { transform: scaleY(1.035); }
+}
+.avv-ala-a { animation: avv-aleteo 0.28s ease-in-out infinite alternate; transform-box: fill-box; transform-origin: 90% 90%; }
+.avv-ala-b { animation: avv-aleteo 0.28s ease-in-out infinite alternate-reverse; transform-box: fill-box; transform-origin: 90% 90%; }
+@keyframes avv-aleteo {
+  from { transform: rotate(-14deg); opacity: 0.55; }
+  to { transform: rotate(10deg); opacity: 0.95; }
+}
+.avv-aura {
+  fill: none;
+  stroke: #ffe07a;
+  stroke-width: 2.5;
+  stroke-dasharray: 3 7;
+  animation: avv-gira-aura 14s linear infinite, avv-brillo 3s ease-in-out infinite;
+  transform-box: fill-box;
+  transform-origin: center;
+}
+@keyframes avv-gira-aura { to { transform: rotate(360deg); } }
+.avv-micelio-red path { animation: avv-corre 5s linear infinite; }
+
+/* ============================== PANEL DEL ESPÍRITU ============================== */
+
+.avv-panel {
+  position: absolute;
+  top: max(84px, calc(env(safe-area-inset-top) + 72px));
+  right: 14px;
+  width: min(324px, calc(100vw - 28px));
+  max-height: calc(100% - 240px);
+  overflow-y: auto;
+  padding: 16px 16px 14px;
+  border-radius: 22px;
+  border: 1.5px solid var(--avv-borde);
+  background: rgba(251, 253, 244, 0.93);
+  box-shadow: 0 14px 40px rgba(29, 92, 42, 0.28);
+  backdrop-filter: blur(10px);
+}
+
+.avv-panel-cerrar {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  border: 1.5px solid var(--avv-borde);
+  background: var(--avv-papel);
+  color: #476138;
+  font-size: 13px;
+  cursor: pointer;
+}
+.avv-panel-cerrar:hover { background: #eef6da; }
+
+.avv-panel-head {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  margin-bottom: 12px;
+}
+.avv-panel-retrato {
+  flex: 0 0 76px;
+  width: 76px;
+  height: 76px;
+  border-radius: 50%;
+  border: 2.5px solid #8fc86e;
+  background: radial-gradient(circle at 35% 30%, #f4fbe4, #d8efb8);
+  overflow: hidden;
+  box-shadow: inset 0 -6px 12px rgba(46, 139, 61, 0.18);
+}
+.avv-retrato { width: 100%; height: 100%; display: block; }
+
+.avv-panel-eyebrow {
+  margin: 0;
+  font-size: 10.5px;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #3f7a52;
+}
+.avv-panel-nombre {
+  margin: 1px 0 2px;
+  font-family: 'Baloo 2', 'Nunito', sans-serif;
+  font-size: 21px;
+  line-height: 1.05;
+  color: var(--avv-verde-hondo);
+}
+.avv-panel-etapa { margin: 0; font-size: 13px; color: #35502c; }
+.avv-proy-chip {
+  display: inline-block;
+  margin-left: 4px;
+  padding: 1px 8px;
+  border-radius: 999px;
+  background: #ffedc9;
+  border: 1px solid #ecc06a;
+  color: #8a5a10;
+  font-size: 11px;
+  font-weight: 800;
+}
+
+.avv-salud-global {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  padding: 10px 12px;
+  margin-bottom: 12px;
+  border-radius: 16px;
+  background: linear-gradient(120deg, #e9f8d4, #d0efb2);
+  border: 1.5px solid #b5dc8c;
+}
+.avv-salud-num {
+  font-family: 'Baloo 2', 'Nunito', sans-serif;
+  font-size: 34px;
+  line-height: 1;
+  color: var(--avv-verde);
+}
+.avv-salud-estado { margin: 0; font-weight: 800; font-size: 14.5px; color: var(--avv-verde-hondo); }
+.avv-salud-nota { margin: 1px 0 0; font-size: 11.5px; color: #4a6a3c; line-height: 1.25; }
+
+.avv-panel-sub {
+  margin: 0 0 7px;
+  font-family: 'Baloo 2', 'Nunito', sans-serif;
+  font-size: 14.5px;
+  color: #35502c;
+}
+
+.avv-metros { list-style: none; margin: 0 0 13px; padding: 0; display: grid; gap: 7px; }
+.avv-metro {
+  display: grid;
+  grid-template-columns: 20px 86px 1fr 44px;
+  gap: 7px;
+  align-items: center;
+  font-size: 12.5px;
+  font-weight: 700;
+  color: #2c4423;
+}
+.avv-metro-barra {
+  position: relative;
+  height: 11px;
+  border-radius: 999px;
+  background: #e4eecb;
+  border: 1px solid #cadba4;
+  overflow: hidden;
+}
+.avv-metro-lleno {
+  position: absolute;
+  inset: 0 auto 0 0;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #57b45f, #8fd05a);
+  transition: width 0.35s ease;
+}
+.avv-metro-base {
+  position: absolute;
+  top: -1px;
+  bottom: -1px;
+  width: 2px;
+  background: rgba(28, 42, 22, 0.45);
+}
+.avv-metro-valor { text-align: right; font-variant-numeric: tabular-nums; }
+.avv-metro-delta {
+  display: block;
+  font-style: normal;
+  font-size: 10px;
+  color: #b06e10;
+  font-weight: 800;
+}
+
+.avv-etapas { list-style: none; margin: 0 0 13px; padding: 0; display: grid; gap: 6px; }
+.avv-etapa {
+  display: flex;
+  gap: 9px;
+  align-items: flex-start;
+  font-size: 12.5px;
+  color: #5a7050;
+}
+.avv-etapa-punto {
+  flex: 0 0 20px;
+  height: 20px;
+  border-radius: 50%;
+  border: 2px solid #cadba4;
+  background: #f2f8e2;
+  font-size: 11px;
+  line-height: 16px;
+  text-align: center;
+  color: var(--avv-verde);
+}
+.avv-etapa-hecha .avv-etapa-punto { background: #d0efb2; border-color: #8fc86e; }
+.avv-etapa-actual { color: var(--avv-ink); }
+.avv-etapa-actual .avv-etapa-punto {
+  border-color: var(--avv-ocre);
+  background: #ffedc9;
+  color: var(--avv-ocre);
+  box-shadow: 0 0 0 3px rgba(224, 146, 46, 0.22);
+}
+.avv-etapa-texto { line-height: 1.3; }
+.avv-etapa-texto em {
+  display: block;
+  font-style: normal;
+  font-size: 10.5px;
+  color: #7a8a6a;
+}
+
+.avv-anillos-sec {
+  display: flex;
+  gap: 11px;
+  align-items: center;
+  padding: 9px 11px;
+  margin-bottom: 12px;
+  border-radius: 16px;
+  background: #f2f8e2;
+  border: 1.5px solid #d5e4b4;
+  font-size: 12px;
+  color: #4a6a3c;
+  line-height: 1.3;
+}
+.avv-anillos-sec p { margin: 0; }
+.avv-anillos { flex: 0 0 62px; width: 62px; height: 62px; }
+
+/* ============================== BOTONES ============================== */
+
+.avv-btn {
+  display: inline-block;
+  padding: 9px 16px;
+  border-radius: 999px;
+  font-family: 'Baloo 2', 'Nunito', sans-serif;
+  font-size: 14.5px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform 0.12s ease, box-shadow 0.12s ease;
+}
+.avv-btn:hover { transform: translateY(-1px); }
+.avv-btn:active { transform: translateY(0); }
+.avv-btn-suave {
+  width: 100%;
+  border: 1.5px solid #8fc86e;
+  background: #eef8da;
+  color: var(--avv-verde-hondo);
+}
+.avv-btn-suave:hover { background: #e2f3c6; }
+.avv-btn-fuerte {
+  border: none;
+  background: linear-gradient(120deg, #2e8b3d, #57b45f);
+  color: #fbfdf4;
+  box-shadow: 0 6px 18px rgba(46, 139, 61, 0.4);
+}
+.avv-btn-panel { width: auto; box-shadow: 0 6px 18px rgba(29, 92, 42, 0.25); }
+
+/* ============================== MUELLE (tiempo) ============================== */
+
+.avv-muelle {
+  position: absolute;
+  left: 14px;
+  right: 14px;
+  bottom: max(14px, env(safe-area-inset-bottom));
+  display: flex;
+  align-items: flex-end;
+  gap: 10px;
+  pointer-events: none;
+}
+.avv-muelle > * { pointer-events: auto; }
+
+.avv-tiempo {
+  flex: 1;
+  max-width: 560px;
+  margin: 0 auto;
+  padding: 11px 16px 9px;
+  border-radius: 20px;
+  border: 1.5px solid var(--avv-borde);
+  background: rgba(251, 253, 244, 0.93);
+  box-shadow: 0 12px 34px rgba(29, 92, 42, 0.28);
+  backdrop-filter: blur(10px);
+}
+.avv-tiempo-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 10px;
+  margin-bottom: 5px;
+}
+.avv-tiempo-titulo {
+  font-family: 'Baloo 2', 'Nunito', sans-serif;
+  font-size: 14.5px;
+  font-weight: 700;
+  color: var(--avv-verde-hondo);
+  white-space: nowrap;
+}
+.avv-tiempo-lectura {
+  font-size: 12px;
+  font-weight: 800;
+  color: #b06e10;
+  text-align: right;
+  line-height: 1.2;
+}
+
+.avv-tiempo-slider {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 12px;
+  border-radius: 999px;
+  background:
+    linear-gradient(90deg, #57b45f, #8fd05a) 0 0 / var(--avv-t, 0%) 100% no-repeat,
+    #e4eecb;
+  border: 1px solid #cadba4;
+  outline: none;
+  cursor: pointer;
+}
+.avv-tiempo-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, #ffe98a, #e0922e);
+  border: 2.5px solid #fbfdf4;
+  box-shadow: 0 3px 10px rgba(138, 90, 16, 0.5);
+  cursor: grab;
+}
+.avv-tiempo-slider::-moz-range-thumb {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, #ffe98a, #e0922e);
+  border: 2.5px solid #fbfdf4;
+  box-shadow: 0 3px 10px rgba(138, 90, 16, 0.5);
+  cursor: grab;
+}
+.avv-tiempo-slider:focus-visible {
+  box-shadow: 0 0 0 3px rgba(46, 139, 61, 0.4);
+}
+.avv-tiempo-marcas {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 3px;
+  font-size: 10.5px;
+  font-weight: 800;
+  color: #7a8a6a;
+  letter-spacing: 0.02em;
+}
+
+/* ============================== TARJETA DE MUNDO ============================== */
+
+.avv-mundo-card {
+  position: absolute;
+  left: 50%;
+  bottom: 118px;
+  transform: translateX(-50%);
+  width: min(360px, calc(100vw - 28px));
+  padding: 14px 15px 13px;
+  border-radius: 20px;
+  border: 1.5px solid var(--avv-borde);
+  background: rgba(251, 253, 244, 0.96);
+  box-shadow: 0 16px 44px rgba(29, 92, 42, 0.34);
+  backdrop-filter: blur(10px);
+  animation: avv-sube-card 0.28s cubic-bezier(0.2, 1.2, 0.4, 1) backwards;
+}
+@keyframes avv-sube-card {
+  from { opacity: 0; transform: translate(-50%, 14px); }
+  to { opacity: 1; transform: translate(-50%, 0); }
+}
+.avv-mundo-head {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  margin-bottom: 6px;
+}
+.avv-mundo-emoji {
+  flex: 0 0 46px;
+  height: 46px;
+  border-radius: 14px;
+  background: linear-gradient(140deg, #e9f8d4, #d0efb2);
+  border: 1.5px solid #b5dc8c;
+  font-size: 24px;
+  line-height: 44px;
+  text-align: center;
+}
+.avv-mundo-head h3 {
+  margin: 0;
+  font-family: 'Baloo 2', 'Nunito', sans-serif;
+  font-size: 18px;
+  color: var(--avv-verde-hondo);
+}
+.avv-mundo-vinculo {
+  margin: 1px 0 0;
+  font-size: 11.5px;
+  font-weight: 800;
+  color: #b06e10;
+}
+.avv-mundo-lema { margin: 0 0 9px; font-size: 13px; color: #35502c; line-height: 1.35; }
+.avv-mundo-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  margin-bottom: 11px;
+}
+.avv-mundo-chips .avv-chip { font-size: 11.5px; padding: 3px 9px; background: #f2f8e2; }
+
+/* ============================== SELECTOR DE ESPECIE ============================== */
+
+.avv-modal-fondo {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  display: grid;
+  place-items: center;
+  padding: 16px;
+  background: rgba(28, 42, 22, 0.45);
+  backdrop-filter: blur(4px);
+  animation: avv-aparece 0.2s ease backwards;
+}
+@keyframes avv-aparece { from { opacity: 0; } }
+
+.avv-modal {
+  position: relative;
+  width: min(430px, 100%);
+  max-height: calc(100vh - 40px);
+  overflow-y: auto;
+  padding: 20px 18px 16px;
+  border-radius: 26px;
+  border: 1.5px solid var(--avv-borde);
+  background: var(--avv-papel);
+  box-shadow: 0 24px 70px rgba(10, 30, 12, 0.5);
+  animation: avv-sube-modal 0.3s cubic-bezier(0.2, 1.2, 0.4, 1) backwards;
+}
+@keyframes avv-sube-modal {
+  from { opacity: 0; transform: translateY(22px) scale(0.97); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+.avv-modal-titulo {
+  margin: 2px 0 4px;
+  font-family: 'Baloo 2', 'Nunito', sans-serif;
+  font-size: 26px;
+  color: var(--avv-verde-hondo);
+}
+.avv-modal-sub { margin: 0 0 14px; font-size: 13.5px; color: #4a6a3c; line-height: 1.4; }
+.avv-modal-nota {
+  margin: 12px 0 0;
+  font-size: 11.5px;
+  color: #7a8a6a;
+  text-align: center;
+}
+
+.avv-especies { list-style: none; margin: 0; padding: 0; display: grid; gap: 9px; }
+.avv-especie {
+  position: relative;
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  width: 100%;
+  padding: 9px 12px;
+  border-radius: 18px;
+  border: 2px solid #dbe7c2;
+  background: #f7fbec;
+  cursor: pointer;
+  text-align: left;
+  font-family: inherit;
+  transition: border-color 0.15s ease, background 0.15s ease, transform 0.12s ease;
+}
+.avv-especie:hover { border-color: #8fc86e; background: #eef8da; transform: translateY(-1px); }
+.avv-especie-sel { border-color: var(--avv-verde); background: #e2f3c6; }
+.avv-especie-retrato {
+  flex: 0 0 58px;
+  width: 58px;
+  height: 58px;
+  border-radius: 50%;
+  overflow: hidden;
+  background: radial-gradient(circle at 35% 30%, #ffffff, #d8efb8);
+  border: 2px solid #b5dc8c;
+}
+.avv-especie-info { display: grid; gap: 1px; min-width: 0; }
+.avv-especie-info strong {
+  font-family: 'Baloo 2', 'Nunito', sans-serif;
+  font-size: 15.5px;
+  color: var(--avv-verde-hondo);
+}
+.avv-especie-info i { font-size: 11px; color: #7a8a6a; }
+.avv-especie-eje {
+  font-size: 11.5px;
+  font-weight: 800;
+  color: #3f7a52;
+}
+.avv-especie-check {
+  position: absolute;
+  top: 8px;
+  right: 12px;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--avv-verde);
+  color: #fbfdf4;
+  font-size: 12px;
+  font-weight: 800;
+  line-height: 22px;
+  text-align: center;
+}
+
+/* ============================== RESPONSIVE ============================== */
+
+@media (max-width: 720px) {
+  .avv-cabezote-chips { display: none; }
+  .avv-titulo { font-size: 22px; }
+  .avv-panel {
+    top: auto;
+    bottom: 108px;
+    right: 10px;
+    left: 10px;
+    width: auto;
+    max-height: 46vh;
+  }
+  .avv-mundo-card { bottom: 104px; }
+  .avv-muelle { flex-wrap: wrap; }
+}
+
+/* ============================== REDUCED MOTION ============================== */
+
+@media (prefers-reduced-motion: reduce) {
+  .avv-root *,
+  .avv-root *::before,
+  .avv-root *::after {
+    animation: none !important;
+    transition: none !important;
+  }
+}
