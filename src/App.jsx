@@ -149,6 +149,8 @@ const MontanaMundosCampesinoMockup = lazy(() => import('./mockups/MontanaMundosC
 const EntradaCampesinaMockup = lazy(() => import('./mockups/EntradaCampesina'));
 const HomeCampesinoMockup = lazy(() => import('./mockups/HomeCampesino'));
 const BotonAnarquiaMockup = lazy(() => import('./mockups/BotonAnarquia'));
+// El cruce del agente 3D → plano (la abeja cruza el túnel y aterriza de avatar).
+const TransicionAgentePlanoMockup = lazy(() => import('./mockups/TransicionAgentePlano'));
 const AvatarGameBiopunk = lazy(() => import('./mockups/AvatarGameBiopunk'));
 const AvatarGameVerdeVivo = lazy(() => import('./mockups/AvatarGameVerdeVivo'));
 const AvatarGameLibre = lazy(() => import('./mockups/AvatarGameLibre'));
@@ -356,6 +358,10 @@ const FrutalesAndinos3DMockup = lazy(() => import('./mockups/FrutalesAndinos3D')
 const CanaTrapiche3DMockup = lazy(() => import('./mockups/CanaTrapiche3D'));
 const CondorCielo3DMockup = lazy(() => import('./mockups/CondorCielo3D'));
 const NavegadorGrafoDemoMockup = lazy(() => import('./mockups/NavegadorGrafoDemo'));
+// La NAVEGACIÓN UNIFICADA por pisos térmicos: los tres zooms (minimapa de
+// esquina, mapa estratégico de terrazas y la vista global tipo lámina con el
+// nevado y la Chorrera arriba) leyendo el mismo dato mundo→piso.
+const NavegacionPisosMockup = lazy(() => import('./mockups/NavegacionPisosTermicos'));
 const HarvestLog = lazy(() => import('./components/HarvestLog'));
 const SeedingLog = lazy(() => import('./components/SeedingLog'));
 const InputLog = lazy(() => import('./components/InputLog'));
@@ -754,6 +760,7 @@ const MOCKUP_HASH_ROUTES = {
   'mockups/entrada-campesina': 'mockup_entrada_campesina',
   'mockups/home-campesino': 'mockup_home_campesino',
   'mockups/boton-anarquia': 'mockup_boton_anarquia',
+  'mockups/transicion-agente-plano': 'mockup_transicion_agente_plano',
   'mockups/avatar-biopunk': 'mockup_avatar_biopunk',
   'mockups/avatar-verde-vivo': 'mockup_avatar_verde_vivo',
   'mockups/avatar-libre': 'mockup_avatar_libre',
@@ -818,6 +825,7 @@ const MOCKUP_HASH_ROUTES = {
   'mockups/cana-trapiche-3d': 'mockup_cana_trapiche_3d',
   'mockups/condor-cielo-3d': 'mockup_condor_cielo_3d',
   'mockups/navegador-grafo': 'mockup_navegador_grafo',
+  'mockups/navegacion-pisos': 'mockup_navegacion_pisos',
 };
 
 const HASH_VIEW_ROUTES = {
@@ -2073,6 +2081,14 @@ export default function App() {
             </ErrorFallback>
           </ErrorBoundary>
         );
+      case 'mockup_transicion_agente_plano':
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="El agente cruza a lo plano">
+              <TransicionAgentePlanoMockup />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
       case 'mockup_avatar_biopunk':
         return (
           <ErrorBoundary>
@@ -2718,6 +2734,18 @@ export default function App() {
           <ErrorBoundary>
             <ErrorFallback moduleName="El grafo de la finca">
               <NavegadorGrafoDemoMockup />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
+      case 'mockup_navegacion_pisos':
+        // Navegación unificada por pisos térmicos: minimapa + mapa estratégico
+        // + vista global (lámina del paisaje con nevado y Chorrera). Tocar un
+        // mundo navega a su pantalla real. Ruta #/mockups/navegacion-pisos,
+        // sin auth.
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="Navegación por pisos térmicos">
+              <NavegacionPisosMockup onNavigate={navigate} onBack={() => navigate('dashboard')} />
             </ErrorFallback>
           </ErrorBoundary>
         );

@@ -15,6 +15,7 @@ import {
 import { analyzeFoliage } from '../../services/aiService';
 import { captureAndCompress } from '../../services/photoService';
 import { processPhotoItem, buildPhotoUserMessage } from '../../services/agentOutboxPhoto';
+import { useCompaiSegundaOpinionFoto } from '../../hooks/useCompaiSegundaOpinionFoto';
 import { isAnalyzableImageAttachment, buildAttachmentRejection } from '../../services/agentOutboxAttachment';
 import { AGENT_ENTRANCE_CSS, AGENT_COMPOSITOR_CSS, AGENT_V3_CSS, agentEntranceClass } from './agentEntrance';
 import {
@@ -198,6 +199,9 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
   // colibrí dblclick) AgentScreen no se enteraba.
   const ttsEnabled = usePrefsStore((s) => s.ttsEnabled);
   const setTtsEnabled = usePrefsStore((s) => s.setTtsEnabled);
+  // #67/#43: segunda mirada real sobre la MISMA foto (qwen3-vl:4b, en
+  // segundo plano) — habla SÓLO si discrepa con lo que ya se le dijo.
+  const { pedirRevision: pedirSegundaOpinionFoto } = useCompaiSegundaOpinionFoto();
   const setResponseReady = useAgentNotificationStore((s) => s.setResponseReady);
   const setLastNotificationMessage = useAgentNotificationStore((s) => s.setLastMessage);
   const markRead = useAgentNotificationStore((s) => s.markRead);
@@ -3325,6 +3329,33 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
     setAgentPickError('');
   };
 
+  /**
+   * #67/#43 — dispara la segunda mirada real sobre la foto que YA se
+   * diagnosticó en este turno (fire-and-forget: nunca bloquea ni retrasa la
+   * respuesta principal, que ya salió). Si discrepa, `avisar` inserta una
+   * burbuja de asistente NUEVA — el mismo lugar donde ya vive la
+   * conversación — y la habla si el usuario tiene TTS activo (mismo canal
+   * por el que ya viene escuchando). Si coincide, queda en silencio total
+   * (regla del propio módulo): no hay burbuja "confirmado" que sea puro ruido.
+   */
+  const dispararSegundaOpinionFoto = useCallback((blob, finding) => {
+    if (!blob) return;
+    pedirSegundaOpinionFoto({
+      imageBlob: blob,
+      finding,
+      canal: ttsEnabled ? 'voz' : 'texto',
+      avisar: (texto, { canal }) => {
+        setMessages((prev) => [
+          ...prev,
+          { role: 'assistant', content: texto, timestamp: Date.now(), _segundaOpinion: true },
+        ]);
+        if (canal === 'voz' && ttsEnabled) {
+          try { speakSentences(texto); } catch (_) { /* degradar en silencio: el texto ya se pintó */ }
+        }
+      },
+    }).catch(() => { /* pedirSegundaOpinion ya degrada en silencio; esto es cinturón extra */ });
+  }, [pedirSegundaOpinionFoto, ttsEnabled]);
+
   const handleAgentSend = async () => {
     if (state === STATE_RECORDING) return;
     // Shimmer/lift animation al enviar (paridad AgentHero).
@@ -3364,6 +3395,9 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
             finding && typeof finding.confidence === 'number' ? finding.confidence : null,
         },
       });
+      // #67/#43: segunda mirada en segundo plano — no bloquea, no retrasa,
+      // habla solo si discrepa con lo que ya se respondió.
+      dispararSegundaOpinionFoto(item.blob, finding);
       return;
     }
     if (!inputText.trim()) return;
@@ -3509,6 +3543,9 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
               finding && typeof finding.confidence === 'number' ? finding.confidence : null,
           },
         });
+        // #67/#43: segunda mirada en segundo plano — no bloquea, no retrasa,
+        // habla solo si discrepa con lo que ya se respondió.
+        dispararSegundaOpinionFoto(item.blob, finding);
         await outboxMarkAnswered(item.id);
         return true;
       }

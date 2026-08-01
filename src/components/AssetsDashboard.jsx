@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { MSG } from '../config/messages.js';
 import { ArrowLeft, Plus, Trash2, RefreshCw, Building2, Leaf, Search, WifiOff, TreePine, Map as MapIcon, List, Sprout, FlaskConical, Ban, AlertTriangle, Warehouse, Square, ChevronDown } from 'lucide-react';
 import useAssetStore from '../store/useAssetStore';
+import useAngelitaStore from '../store/useAngelitaStore';
 import { Virtuoso } from 'react-virtuoso';
 import { fetchFromFarmOS } from '../services/apiService';
 import AssetDetailView from './AssetDetailView';
@@ -440,6 +441,14 @@ export default function AssetsDashboard({ onBack, initialTab, initialShowForm = 
     setIsSaving(true);
     try {
       await addHarvestLog(asset.id, { ...harvestData, cropName });
+      // #109 "luto y fiesta": al COSECHAR, el compañero baila para celebrar
+      // (estado 'contenta', ya existente — chispas doradas, brinco). Dedup
+      // por evento (asset+momento): esta cosecha puntual no se celebra dos
+      // veces, pero la próxima sí.
+      useAngelitaStore.getState().celebrar({
+        id: `cosecha:${asset.id}:${Date.now()}`,
+        texto: `¡Cosechó ${cropName.toLowerCase()}! Bien merecido — el trabajo de su finca está dando fruto.`,
+      });
       resetHarvestForm();
     } catch (error) {
       console.error('[UI] Error al registrar cosecha:', error);
