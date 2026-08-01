@@ -211,8 +211,10 @@ const AVATAR = {
   danta: AvatarDanta,
 };
 
-/** Un avatar aislado dibujado en su propio SVG (para chips y héroe). */
-function GuardianAvatar({ id, size = 46 }) {
+/** Un avatar aislado dibujado en su propio SVG (para chips y héroe).
+    Exportado: el valle 3D monta el oso negro biopunk como vecino del monte
+    (decisión del operador — este es EL oso, no el rubber-hose café). */
+export function GuardianAvatar({ id, size = 46 }) {
   const Cuerpo = AVATAR[id] || AvatarAbeja;
   return (
     <svg viewBox="-26 -24 52 46" width={size} height={size} aria-hidden="true" focusable="false">

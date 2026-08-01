@@ -51,7 +51,7 @@ export const mediaCache = {
     const sizeBytes = getRecordSizeBytes({ blob });
 
     // LRU eviction antes de agregar libera espacio para el nuevo registro.
-    await evictOldestIfNeeded({ incomingEntries: 1, incomingBytes: sizeBytes });
+    await evictOldestIfNeeded(/** @type {any} */ ({ incomingEntries: 1, incomingBytes: sizeBytes }));
 
     return new Promise((resolve, reject) => {
       const tx = db.transaction(STORES.MEDIA_CACHE, 'readwrite');
@@ -234,7 +234,7 @@ export const mediaCache = {
  * @param {number} options.incomingBytes - bytes que se van a sumar
  * @returns {Promise<number>} - cantidad de entradas eliminadas
  */
-async function evictOldestIfNeeded(options = {}) {
+async function evictOldestIfNeeded(options = /** @type {any} */ ({})) {
   try {
     const db = await openDB();
     const { maxEntries, maxBytes } = getMediaCacheLimits();

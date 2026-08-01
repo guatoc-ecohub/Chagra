@@ -189,7 +189,7 @@ export function deriveRole(profile, opts = {}) {
 
   // 1. Rol explícito declarado en el onboarding.
   const rolExplicito = norm(p.rol);
-  if (rolExplicito && Object.values(PROFILE_ROLES).includes(rolExplicito)) {
+  if (rolExplicito && Object.values(PROFILE_ROLES).includes(/** @type {'campesino'|'tecnico'|'ganadero'|'restaurador'|'guia_glaciar'|'socio'} */ (rolExplicito))) {
     return rolExplicito;
   }
 
@@ -239,11 +239,12 @@ export function deriveRole(profile, opts = {}) {
  * @param {boolean} [args.quiereRestauracion=false]
  * @returns {string[]} intents ordenados (subconjunto de CHIP_INTENTS).
  */
-export function selectChipIntentsForRole({
-  role,
-  tieneAnimales = false,
-  quiereRestauracion = false,
-} = {}) {
+export function selectChipIntentsForRole(opts = /** @type {any} */ ({})) {
+  const {
+    role,
+    tieneAnimales = false,
+    quiereRestauracion = false,
+  } = opts;
   const base = ROLE_BASE_CHIPS[role] || ROLE_BASE_CHIPS[PROFILE_ROLES.campesino];
   const ordered = [...base];
 

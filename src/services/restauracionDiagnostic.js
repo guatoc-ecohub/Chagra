@@ -30,9 +30,10 @@ export function diagnosticarRestauracion(descripcion, opts = {}) {
   // Prioridad: piso/altitud del perfil de la finca; luego señales del texto.
   let piso = opts.piso || pisoDesdeAltitud(opts.altitud);
 
-  for (const [clave, senal] of Object.entries(REST_DATA.senales_voz)) {
+  for (const [clave, signal] of Object.entries(REST_DATA.senales_voz)) {
     const palabras = clave.split('_');
     if (palabras.every((p) => texto.includes(p))) {
+      const /** @type {any} */ senal = signal;
       if (senal.arreglo) arregloId = senal.arreglo;
       if (senal.alerta) {
         if (senal.alerta === 'bonos_carbono') alertas.push(REST_DATA.guardas.bonos_carbono);

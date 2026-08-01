@@ -125,7 +125,6 @@ function normalizeGrainType(tipoSuperficieChagra) {
  * Genera string XML de un Layer CAAML.
  *
  * @param {object} capa - capa Chagra { profundidad, tipoSuperficie, dureza }
- * @param {number} index - índice de la capa (para orden)
  * @returns {string} XML string del Layer
  */
 function generateLayerXml(capa) {

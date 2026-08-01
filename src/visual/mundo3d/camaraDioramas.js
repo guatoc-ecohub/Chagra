@@ -73,13 +73,24 @@ export const ENCUADRES = Object.freeze({
     beat: { retiro: 1.55, arcoY: -0.16, grua: 0.14, lente: 1.12, lambda: 1.6 },
   },
 
-  /* CAFÉ — caminar el cafetal: cámara baja, a la altura del grano, lente
-     tele íntimo. El arco lateral es el más marcado: entrar ENTRE surcos. */
+  /* CAFÉ — la LADERA cafetera desde el camino de llegada: se entra subiendo.
+     ⚠️ Este encuadre ERA [3.1, 1.9, 5.4] / fov 36 — "cámara baja, a la altura
+     del grano". La intención era buena y el resultado, medible y malo: la
+     cámara quedaba DENTRO del cafetal, con la copa de un guamo a UN METRO del
+     ojo, 0,5% de cielo (cuadro tapiado), el tercio alto 32,8% contra el 0,6%
+     del papal —o sea mirando de frente contra la loma— y el cafeto
+     protagonista FUERA DE CUADRO. Es el reclamo "la cámara está tan metida
+     entre las copas que la de arriba a la izquierda corta la vista".
+     Ahora se retira y se levanta: el ojo pasa POR DEBAJO del techo de sombra
+     en vez de entre las copas, la ladera se lee entera con sus surcos a curva
+     de nivel y el cafeto protagonista entra en cuadro.
+     Verificable: `node scripts/diag/encuadre-mundo.mjs cafe --pos 4.2,6.2,13.2
+     --mira -1.4,3,-2.5 --fov 40`. */
   cafe: {
-    posicion: [3.1, 1.9, 5.4],
-    target: [-0.2, 1.05, 0],
-    fov: 36,
-    beat: { retiro: 1.45, arcoY: 0.22, grua: 0.05, lente: 1.1, lambda: 2.0 },
+    posicion: [4.2, 6.2, 13.2],
+    target: [-1.4, 3.0, -2.5],
+    fov: 40,
+    beat: { retiro: 1.35, arcoY: 0.18, grua: 0.1, lente: 1.1, lambda: 2.0 },
   },
 
   /* SANIDAD — mirada de inspección: frontal elevada, sobria, sin arco casi.

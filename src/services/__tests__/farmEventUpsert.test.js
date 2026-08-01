@@ -20,8 +20,10 @@ import { buildUpsertPlaceholder } from '../farmEventService';
 import { newUlid } from '../../utils/id';
 
 // Stores en memoria compartidos por el mock de openDB.
-let procStore; // Map<process_id, FarmProcess>
-let eventStore; // Array<FarmProcessEvent>
+/** @type {Map<any, any>} */
+let procStore;
+/** @type {any[]} */
+let eventStore;
 
 vi.mock('../../db/dbCore', () => {
   const STORES = {
@@ -31,14 +33,20 @@ vi.mock('../../db/dbCore', () => {
 
   // Construye un objectStore IDB-like sobre las estructuras en memoria.
   const makeProcObjectStore = () => ({
+    /**
+     * @param {any} key
+     */
     get(key) {
       const req = { onsuccess: null, onerror: null, result: undefined };
       Promise.resolve().then(() => {
         req.result = procStore.get(key);
-        req.onsuccess?.({ target: req });
+        /** @type {any} */ (req).onsuccess?.({ target: req });
       });
       return req;
     },
+    /**
+     * @param {any} record
+     */
     put(record) {
       procStore.set(record.process_id, record);
       return { onsuccess: null, onerror: null };
@@ -46,21 +54,29 @@ vi.mock('../../db/dbCore', () => {
   });
 
   const makeEventObjectStore = () => ({
+    /**
+     * @param {any} name
+     */
     index(name) {
-      // Solo se usa el índice idempotency_key (dedup).
       return {
+        /**
+         * @param {any} key
+         */
         get(key) {
           const req = { onsuccess: null, onerror: null, result: undefined };
           Promise.resolve().then(() => {
             if (name === 'idempotency_key') {
-              req.result = eventStore.find((e) => e.attributes?.idempotency_key === key);
+              req.result = eventStore.find((e /** @type {any} */) => e.attributes?.idempotency_key === key);
             }
-            req.onsuccess?.({ target: req });
+            /** @type {any} */ (req).onsuccess?.({ target: req });
           });
           return req;
         },
       };
     },
+    /**
+     * @param {any} record
+     */
     add(record) {
       eventStore.push(record);
       return { onsuccess: null, onerror: null };
@@ -71,9 +87,9 @@ vi.mock('../../db/dbCore', () => {
     const tx = { oncomplete: null, onerror: null };
     const proc = makeProcObjectStore();
     const ev = makeEventObjectStore();
-    tx.objectStore = (storeName) => (storeName === STORES.FARM_PROCESSES ? proc : ev);
-    // La transacción "completa" en el siguiente microtask, tras resolver get/add.
-    Promise.resolve().then(() => Promise.resolve().then(() => tx.oncomplete?.()));
+    /** @type {any} */
+    (tx).objectStore = /** @type {any} */ (/** @param {any} storeName */ (storeName) => (storeName === STORES.FARM_PROCESSES ? proc : ev));
+    Promise.resolve().then(() => Promise.resolve().then(() => /** @type {any} */ (tx).oncomplete?.()));
     return tx;
   };
 
@@ -91,7 +107,7 @@ vi.mock('../farmProcessSync', () => ({
 describe('buildUpsertPlaceholder', () => {
   it('arma un proceso válido mínimo sin hint', () => {
     const pid = newUlid();
-    const p = buildUpsertPlaceholder(pid, undefined, 1700000000000);
+    const p = /** @type {any} */ (buildUpsertPlaceholder(pid, undefined, 1700000000000));
     expect(p.process_id).toBe(pid);
     expect(p.type).toBe('farm_process');
     expect(p.attributes.process_type).toBe('sowing');
@@ -122,7 +138,7 @@ describe('buildUpsertPlaceholder', () => {
         updated_at: 1690000000000,
       },
     };
-    const p = buildUpsertPlaceholder(pid, hint, 1700000000000);
+    const p = /** @type {any} */ (buildUpsertPlaceholder(pid, /** @type {any} */ (hint), 1700000000000));
     expect(p.attributes.subject_slug).toBe('fragaria_ananassa');
     expect(p.attributes.subject_label).toBe('Fresa #09');
     expect(p.attributes.subject_kind).toBe('aggregate');
@@ -155,7 +171,7 @@ describe('recordFarmEvent — upsert anti "process not found" (BUG A)', () => {
     expect(eventStore).toHaveLength(1);
     // …y el proceso fue auto-creado (upsert) en el store.
     expect(procStore.has(pid)).toBe(true);
-    expect(procStore.get(pid).attributes._synthetic).toBe(true);
+    expect(/** @type {any} */ (procStore.get(pid)).attributes._synthetic).toBe(true);
   });
 
   it('usa process_hint para enriquecer el proceso auto-creado', async () => {
@@ -182,7 +198,7 @@ describe('recordFarmEvent — upsert anti "process not found" (BUG A)', () => {
       process_id: pid,
       event_type: 'observation',
       payload: { text: 'floreció' },
-      process_hint: hint,
+      process_hint: /** @type {any} */ (hint),
     });
 
     const saved = procStore.get(pid);
@@ -195,7 +211,7 @@ describe('recordFarmEvent — upsert anti "process not found" (BUG A)', () => {
   it('si el proceso YA existe, solo actualiza updated_at (no lo pisa)', async () => {
     const { recordFarmEvent } = await import('../farmEventService');
     const pid = newUlid();
-    const existing = {
+    const existing = /** @type {any} */ ({
       process_id: pid,
       type: 'farm_process',
       attributes: {
@@ -210,7 +226,7 @@ describe('recordFarmEvent — upsert anti "process not found" (BUG A)', () => {
         created_at: 1690000000000,
         updated_at: 1690000000000,
       },
-    };
+    });
     procStore.set(pid, existing);
 
     await recordFarmEvent({
@@ -248,6 +264,6 @@ describe('recordFarmEvent — upsert anti "process not found" (BUG A)', () => {
     });
 
     expect(eventStore).toHaveLength(1);
-    expect(second.attributes.idempotency_key).toBe(first.attributes.idempotency_key);
+    expect(/** @type {any} */ (second.attributes).idempotency_key).toBe(/** @type {any} */ (first.attributes).idempotency_key);
   });
 });

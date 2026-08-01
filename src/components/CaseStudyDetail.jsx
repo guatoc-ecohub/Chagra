@@ -95,7 +95,7 @@ const TimelineEventForm = ({ onSubmit, onCancel }) => {
     try {
       const reader = new FileReader();
       reader.onloadend = () => {
-        setPhotoUrl(reader.result);
+        setPhotoUrl(/** @type {string} */ (reader.result));
         setShowCapture(false);
         setBusy(false);
       };

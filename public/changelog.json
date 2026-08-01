@@ -1,0 +1,23 @@
+{
+  "version": "1.0.55",
+  "entries": [
+    {
+      "date": "2026-07-14",
+      "title": "El valle de su finca ahora es 3D",
+      "body": "Toque los rótulos para entrar a los mundos. La cámara vuela hasta el lugar y se abre la pantalla.",
+      "icon": "🏔️"
+    },
+    {
+      "date": "2026-07-13",
+      "title": "El agente aprendió sobre 77 cultivos nuevos",
+      "body": "Pregúntele sobre café, cacao, plátano, hortalizas, frutales... el catálogo creció de 3 a 77 especies.",
+      "icon": "🌱"
+    },
+    {
+      "date": "2026-07-12",
+      "title": "Modo campo sin internet",
+      "body": "Registre siembras y cosechas por voz aunque no tenga señal. Se sincronizan solas cuando vuelva la conexión.",
+      "icon": "📡"
+    }
+  ]
+}

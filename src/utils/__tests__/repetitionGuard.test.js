@@ -24,9 +24,9 @@ describe('detectAndTruncateRepetition', () => {
   });
 
   it('input no string retorna string vacío', () => {
-    expect(detectAndTruncateRepetition(123)).toBe('');
-    expect(detectAndTruncateRepetition({})).toBe('');
-    expect(detectAndTruncateRepetition([])).toBe('');
+    expect(detectAndTruncateRepetition(/** @type {any} */ (123))).toBe('');
+    expect(detectAndTruncateRepetition(/** @type {any} */ ({}))).toBe('');
+    expect(detectAndTruncateRepetition(/** @type {any} */ ([]))).toBe('');
   });
 
   it('detecta triple repetición de palabra y trunca', () => {

@@ -54,7 +54,7 @@ describe('ttsService — preferencias de voz Kokoro (task #124)', () => {
     });
     globalThis.fetch = fetchMock;
     originalAudio = globalThis.Audio;
-    globalThis.Audio = MockAudio;
+    globalThis.Audio = /** @type {any} */ (MockAudio);
     originalCreateObjectURL = URL.createObjectURL;
     originalRevokeObjectURL = URL.revokeObjectURL;
     URL.createObjectURL = vi.fn(() => 'blob:fake-url');

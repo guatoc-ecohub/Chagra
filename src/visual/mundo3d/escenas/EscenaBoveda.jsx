@@ -106,6 +106,10 @@ function Boveda({ hora }) {
 }
 
 /* Posición del sol en su arco (p 0..1 = este→cenit→oeste). */
+/**
+ * @param {number} p
+ * @returns {[number, number, number]}
+ */
 function arcoSol(p) {
   const x = (p - 0.5) * 12.4;
   const y = Math.sin(Math.max(0, Math.min(1, p)) * Math.PI) * 5.1 + 0.25;
@@ -164,8 +168,10 @@ function CieloVivo({ hora, reducedMotion }) {
     const { horizonte, zenit } = paletaCielo(p);
     // fondo vivo = horizonte de la hora, mezclado 60% hacia la hora dorada madre
     // (misma receta que la base, pero con la p viva del sol).
-    if (scene.background && scene.background.isColor) {
-      scene.background.copy(horizonte).lerp(fondoMadre.current, 0.6);
+    const bg = /** @type {THREE.Color|null} */ (scene.background);
+    if (bg && bg.isColor) {
+      const c = /** @type {THREE.Color} */ (bg);
+      c.copy(horizonte).lerp(fondoMadre.current, 0.6);
     }
     // hemisferio: cachea la luz una vez y tiñe su color de cielo un tercio hacia
     // el cenit vivo (sin tocar intensidad ni groundColor: los fija la base).
@@ -173,7 +179,8 @@ function CieloVivo({ hora, reducedMotion }) {
       hemiRef.current = scene.getObjectByProperty('isHemisphereLight', true) || null;
     }
     if (hemiRef.current) {
-      tmpCielo.current.copy(baseCielo.current).lerp(zenit, 0.3);
+      const ci = /** @type {THREE.Color} */ (baseCielo.current);
+      tmpCielo.current.copy(ci).lerp(zenit, 0.3);
       hemiRef.current.color.copy(tmpCielo.current);
     }
   });
@@ -340,6 +347,11 @@ function RotuloHielo({ yAntes, rAntes }) {
 /* LA MONTAÑA: los cuatro pisos térmicos apilados como troncos de cono (paleta
    del mundo #4). Corona: el casquete de hielo + la LÍNEA ÁMBAR de hasta dónde
    llegaba el hielo (retroceso glaciar) — nota de conciencia, esperanza no colapso. */
+/**
+ * @param {Object} props
+ * @param {Array<{nombre?:string, color?:string, h?:number, r0?:number, r1?:number}>} [props.pisos]
+ * @param {{nieve?:number, retroceso?:number}} [props.glaciar]
+ */
 function Montana({ pisos = PISOS_DEF, glaciar = {} }) {
   const bandas = useMemo(() => {
     // for-loop plano (sin closure que capture los acumuladores): la regla
@@ -486,7 +498,7 @@ function SenalHelada({ densidad = 1, reducedMotion }) {
       {cristales.map((c, i) => (
         <mesh
           key={c.key}
-          position={c.pos}
+          position={/** @type {[number, number, number]} */ (c.pos)}
           rotation={[0, c.fase, 0]}
           ref={(el) => { refs.current[i] = el; }}
         >
@@ -573,6 +585,7 @@ function Diorama({ params, reducedMotion, tier, fauna }) {
   const temporada = params?.temporada ?? 'lluvia';
   const niebla = params?.niebla ?? 0.6;
   const pisos = params?.pisos || PISOS_DEF;
+  /** @type {{nieve?:number, retroceso?:number}} */
   const glaciar = params?.glaciar || {};
   const esDia = hora > 0.06 && hora < 0.9;
   const cima = pisos.reduce((acc, p) => acc + (p.h ?? 0.85), 0);

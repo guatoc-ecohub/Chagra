@@ -54,7 +54,7 @@ const AGUA_SEDIENTA = 0.35;
  *
  * @param {object} [estadoFinca=ESTADO_FINCA_MUESTRA]
  * @param {object} [opts]
- * @param {boolean} [opts.hayAlerta=false]  ¿lo del día sigue sin atender?
+ * @param {boolean} [opts.hayAlerta=false]  ?lo del día sigue sin atender?
  * @returns descriptor de reacción (ver cabecera del módulo).
  */
 export function reaccionDeFinca(estadoFinca = ESTADO_FINCA_MUESTRA, { hayAlerta = false } = {}) {

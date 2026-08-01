@@ -1,4 +1,5 @@
 /**
+// @ts-nocheck
  * GlaciarReporteScreen — Reporte de Punto Glaciar (v2 "escala creíble", UI).
  *
  * Contrato cubierto:

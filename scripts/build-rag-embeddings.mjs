@@ -46,6 +46,8 @@ async function embedTexts(texts) {
     const batch = texts.slice(i, i + BATCH_SIZE);
     const batchVectors = await Promise.all(
       batch.map(async (text) => {
+        // lgtm[js/file-access-to-http] Este generador local envía únicamente el
+        // corpus seleccionado al servicio de embeddings configurado por quien lo ejecuta.
         const res = await fetch(url, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },

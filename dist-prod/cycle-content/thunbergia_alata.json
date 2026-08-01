@@ -1,0 +1,77 @@
+{
+  "species_slug": "thunbergia_alata",
+  "scientific_name": "Thunbergia alata Bojer ex Sims",
+  "common_names": [
+    "Ojo de poeta"
+  ],
+  "family": "Acanthaceae",
+  "category": "especies_invasoras",
+  "cultivable": false,
+  "conservation_status": "invasor",
+  "thermal_zones": [
+    "templado",
+    "frio"
+  ],
+  "roles_in_guild": [
+    "invasive"
+  ],
+  "antagonists": [],
+  "especies_nativas_sustitutas": [
+    "passiflora_ligularis",
+    "passiflora_tripartita_mollissima"
+  ],
+  "propagation": null,
+  "requirements": {
+    "agua": null,
+    "altitud_msnm": {
+      "min_absoluto": 1500,
+      "optimo_min": 2000,
+      "optimo_max": 3000,
+      "max_absoluto": 3300
+    },
+    "temperatura_c": null,
+    "radiacion": null,
+    "drenaje_requerido": null
+  },
+  "valor_pedagogico": "El ojo de poeta o suzanne de ojos negros (Thunbergia alata) es enredadera africana ornamental introducida en Colombia como cercas vivas decorativas. Naturalizada con severidad en zona cafetera, andina media y subandina (1000-2400 msnm). Estrangula vegetación nativa de bordes de quebrada, regeneración de cafetales con sombra y cercas de matarratón/quiebrabarrigo. Listada por IAvH como invasora alta amenaza. Reproducción por semilla y por fragmento de tallo enraizado. Manejo agroecológico: arrancar manualmente con rizoma completo + control biológico aún en investigación + sustituir con enredaderas nativas (passifloras nativas, Mutisia spp.). Resolución 684/2018 MADS la incluye en listado oficial.",
+  "sources": [
+    {
+      "id": "humboldt-invasoras-andes",
+      "title": "humboldt-invasoras-andes",
+      "tier": "A",
+      "url": null
+    },
+    {
+      "id": "issg-uicn-invasoras",
+      "title": "issg-uicn-invasoras",
+      "tier": "A",
+      "url": "http://www.iucngisd.org"
+    },
+    {
+      "id": "res-684-2018-mads",
+      "title": "res-684-2018-mads",
+      "tier": "A",
+      "url": null
+    },
+    {
+      "id": "calderon-saenz-2003-invasoras",
+      "title": "calderon-saenz-2003-invasoras",
+      "tier": "A",
+      "url": null
+    },
+    {
+      "id": "gbif-taxonomic-backbone",
+      "title": "gbif-taxonomic-backbone",
+      "tier": "A",
+      "url": "https://www.gbif.org/dataset/d7dddbf4-2cf0-4f39-9b2a-bb099caae36c"
+    },
+    {
+      "id": "powo-kew",
+      "title": "powo-kew",
+      "tier": "A",
+      "url": "https://powo.science.kew.org"
+    }
+  ],
+  "_generated_by": "scripts/build-cycle-content-from-catalog.mjs",
+  "_generated_at": "2026-05-19T00:42:57.366Z"
+}

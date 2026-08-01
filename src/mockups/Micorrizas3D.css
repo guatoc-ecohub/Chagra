@@ -1,0 +1,246 @@
+/*
+ * Micorrizas3D.css — vitrina del MUNDO SUELO VIVO / red micorrízica
+ * (#/mockups/micorrizas-3d). Autocontenida: sin fuentes/imágenes externas.
+ * Móvil-first desde 320px. Paleta de tierra honda con luz de micelio
+ * bioluminiscente (turquesa/ámbar). Solo opacity/transform se animan.
+ */
+
+.micss {
+  min-height: 100vh;
+  min-height: 100dvh;
+  padding: 1rem 0.9rem 2.5rem;
+  background: linear-gradient(180deg, #10161a 0%, #14100d 46%, #1c140e 100%);
+  color: #e7f2ec;
+  font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+}
+
+.micss__head {
+  max-width: 46rem;
+  margin: 0 auto 1rem;
+}
+.micss__kicker {
+  margin: 0 0 0.2rem;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #6ee6c2;
+}
+.micss__head h1 {
+  margin: 0;
+  font-size: clamp(1.5rem, 5vw, 2.2rem);
+  line-height: 1.15;
+  color: #eafff6;
+}
+.micss__lema {
+  margin: 0.4rem 0 0;
+  font-size: 0.98rem;
+  line-height: 1.45;
+  max-width: 40rem;
+  color: #c3d6cd;
+}
+
+.micss__escena {
+  max-width: 46rem;
+  margin: 0 auto;
+}
+.micss__lienzo {
+  position: relative;
+  height: min(68vh, 34rem);
+  min-height: 320px;
+  border-radius: 14px;
+  overflow: hidden;
+  border: 1px solid rgba(55, 214, 176, 0.28);
+  box-shadow: 0 12px 34px rgba(0, 0, 0, 0.5), inset 0 0 60px rgba(0, 0, 0, 0.55);
+  background: radial-gradient(120% 90% at 50% 12%, #24303a 0%, #12100c 62%, #0b0806 100%);
+}
+.micss__lienzo canvas {
+  display: block;
+  width: 100% !important;
+  height: 100% !important;
+  touch-action: none;
+}
+.micss__cargando {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #7ef0c8;
+  font-size: 0.95rem;
+  letter-spacing: 0.02em;
+}
+
+.micss__barra {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  justify-content: space-between;
+  margin: 0.6rem 0.1rem 0;
+  flex-wrap: wrap;
+}
+.micss__tier {
+  margin: 0;
+  font-size: 0.85rem;
+  color: #a9c2ba;
+  flex: 1 1 12rem;
+}
+.micss__toggle {
+  flex: 0 0 auto;
+  border: 1px solid rgba(126, 240, 200, 0.45);
+  background: rgba(20, 40, 34, 0.7);
+  color: #d7fff0;
+  padding: 0.45rem 0.9rem;
+  border-radius: 999px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+.micss__toggle:active {
+  transform: translateY(1px);
+}
+
+.micss__leyenda-color {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin: 0.7rem 0.1rem 0;
+}
+.micss__chip {
+  font-size: 0.72rem;
+  font-weight: 600;
+  padding: 0.2rem 0.55rem;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.34rem;
+  color: #0d1512;
+}
+.micss__chip::before {
+  content: '';
+  width: 0.6rem;
+  height: 0.6rem;
+  border-radius: 50%;
+  box-shadow: 0 0 6px 1px currentColor;
+}
+.micss__chip--fos { background: #ffc766; }
+.micss__chip--agua { background: #8fd4ff; }
+.micss__chip--carb { background: #8ef06a; }
+.micss__chip--puente { background: #7ef0c8; }
+
+.micss__saberes {
+  max-width: 46rem;
+  margin: 1.6rem auto 0;
+}
+.micss__saberes h2 {
+  margin: 0 0 0.8rem;
+  font-size: 1.15rem;
+  color: #eafff6;
+}
+.micss__saberes ol {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.7rem;
+}
+.micss__saberes li {
+  display: flex;
+  gap: 0.7rem;
+  align-items: flex-start;
+  padding: 0.75rem 0.85rem;
+  border-radius: 12px;
+  background: rgba(30, 44, 38, 0.55);
+  border: 1px solid rgba(55, 214, 176, 0.16);
+}
+.micss__emoji {
+  font-size: 1.4rem;
+  line-height: 1.1;
+  flex: 0 0 auto;
+}
+.micss__saberes b {
+  color: #a9f0d6;
+  display: block;
+  margin-bottom: 0.15rem;
+  font-size: 0.98rem;
+}
+.micss__saberes p {
+  margin: 0;
+  font-size: 0.9rem;
+  line-height: 1.42;
+  color: #c3d6cd;
+}
+.micss__cierre {
+  margin: 1rem 0 0;
+  font-size: 0.95rem;
+  line-height: 1.5;
+  color: #d7ffef;
+  font-style: italic;
+}
+
+/* ── La ficha 2D digna (fallback sin GPU) ─────────────────────────────────── */
+.micss__ficha {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 1rem;
+  text-align: center;
+}
+.micss__ficha-red {
+  position: relative;
+  width: min(72%, 15rem);
+  aspect-ratio: 3 / 2;
+  border-radius: 12px;
+  background: radial-gradient(120% 120% at 50% 0%, #24303a 0%, #100c08 70%);
+  overflow: hidden;
+  box-shadow: inset 0 0 30px rgba(0, 0, 0, 0.6);
+}
+.micss__ficha-mata {
+  position: absolute;
+  bottom: 60%;
+  width: 0.5rem;
+  height: 36%;
+  background: linear-gradient(#8fbf55, #4f7a34);
+  border-radius: 3px;
+}
+.micss__ficha-mata--a { left: 30%; }
+.micss__ficha-mata--b { right: 30%; height: 30%; bottom: 62%; }
+.micss__ficha-hilo {
+  position: absolute;
+  left: 30%;
+  right: 30%;
+  top: 52%;
+  height: 2px;
+  background: linear-gradient(90deg, rgba(55, 214, 176, 0.2), #7ef0c8 50%, rgba(55, 214, 176, 0.2));
+  box-shadow: 0 0 8px 1px rgba(126, 240, 200, 0.6);
+  border-radius: 2px;
+}
+.micss__ficha-pulso {
+  position: absolute;
+  left: 50%;
+  top: 52%;
+  width: 0.55rem;
+  height: 0.55rem;
+  margin: -0.28rem 0 0 -0.28rem;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%, #fff, #ffc766 70%);
+  box-shadow: 0 0 10px 2px rgba(255, 199, 102, 0.7);
+}
+.micss__ficha-nombre {
+  margin: 0.2rem 0 0;
+  font-weight: 700;
+  color: #eafff6;
+}
+.micss__ficha-sub {
+  margin: 0;
+  font-size: 0.85rem;
+  color: #a9c2ba;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .micss__toggle { transition: none; }
+}

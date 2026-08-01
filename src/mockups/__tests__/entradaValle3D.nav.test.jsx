@@ -19,6 +19,7 @@ import '@testing-library/jest-dom';
 import { describe, test, expect, afterEach, vi } from 'vitest';
 
 import EntradaValle3D from '../EntradaValle3D.jsx';
+import { momentoCubiertoTunel } from '../../visual/mundo3d/transiciones/tunelLaminaData.js';
 
 afterEach(() => {
   cleanup();
@@ -26,12 +27,27 @@ afterEach(() => {
   delete window.speechSynthesis;
   delete window.SpeechSynthesisUtterance;
   delete globalThis.SpeechSynthesisUtterance;
+  window.location.hash = '';
 });
 
 /* El viaje dura ~1.05s; con timers falsos lo cumplimos determinista. */
 const cumplirViaje = () => act(() => vi.advanceTimersByTime(1200));
 
 describe('entrada-3d — navegable de punta a punta (valle ↔ mundos)', () => {
+  test('abre una pantalla 2D bajo el túnel de lámina desde el CTA del valle 3D', () => {
+    vi.useFakeTimers();
+    render(<EntradaValle3D onBack={() => {}} />);
+
+    fireEvent.click(screen.getByRole('button', { name: 'Ir a Agua' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Abrir El agua' }));
+
+    expect(screen.getByTestId('tunel-lamina')).toHaveAttribute('data-fase', 'saliendo');
+    expect(window.location.hash).toBe('');
+
+    act(() => vi.advanceTimersByTime(momentoCubiertoTunel('saliendo', 'medio', false)));
+    expect(window.location.hash).toBe('#agua');
+  });
+
   test('entra al mundo del agua, toca una puerta y vuelve al valle', () => {
     vi.useFakeTimers();
     const { container } = render(<EntradaValle3D onBack={() => {}} />);
@@ -114,7 +130,10 @@ describe('entrada-3d — voz con respaldo visible', () => {
     const { container } = render(<EntradaValle3D onBack={() => {}} />);
 
     act(() => vi.advanceTimersByTime(1000));
-    expect(container.querySelector('.valle-companero')).not.toHaveTextContent(/Bienvenido/i);
+    // Antes del primer gesto Angelita no ha dicho nada: la burbuja de voz ni
+    // se monta (el chip ya no lleva frase fija de ánimo — una sola abeja, la
+    // de la escena).
+    expect(container.querySelector('.valle-companero')).toBeNull();
 
     fireEvent.pointerDown(container.querySelector('.valle-root'));
     expect(container.querySelector('.valle-companero')).toHaveTextContent(/Bienvenido/i);
@@ -133,9 +152,9 @@ describe('entrada-3d — voz con respaldo visible', () => {
     class Utterance {
       constructor(text) { this.text = text; }
     }
-    window.speechSynthesis = synth;
-    window.SpeechSynthesisUtterance = Utterance;
-    globalThis.SpeechSynthesisUtterance = Utterance;
+    window.speechSynthesis = /** @type {any} */ (synth);
+    window.SpeechSynthesisUtterance = /** @type {any} */ (Utterance);
+    globalThis.SpeechSynthesisUtterance = /** @type {any} */ (Utterance);
 
     const { container } = render(<EntradaValle3D onBack={() => {}} />);
     fireEvent.pointerDown(container.querySelector('.valle-root'));

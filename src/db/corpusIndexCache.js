@@ -77,7 +77,8 @@ export async function saveCorpusIndex({ docs, idf, avgDocLen, manifestStamp, tie
  *   El índice si existe y coincide manifest+tier; null si no hay, está obsoleto
  *   o falla la lectura (el caller reconstruye desde la red).
  */
-export async function loadCorpusIndex({ manifestStamp, tier } = {}) {
+export async function loadCorpusIndex(opts = /** @type {any} */ ({})) {
+  const { manifestStamp, tier } = opts;
   try {
     const db = await openDB();
     const record = await new Promise((resolve, reject) => {

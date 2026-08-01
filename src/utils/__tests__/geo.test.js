@@ -30,8 +30,8 @@ describe('geoJsonToWkt', () => {
   });
 
   it('retorna vacio sin geometry', () => {
-    expect(geoJsonToWkt(null)).toBe('');
-    expect(geoJsonToWkt({})).toBe('');
+    expect(geoJsonToWkt(/** @type {any} */ (null))).toBe('');
+    expect(geoJsonToWkt(/** @type {any} */ ({}))).toBe('');
   });
 
   it('convierte Polygon a WKT', () => {
@@ -55,14 +55,14 @@ describe('geoJsonToWkt', () => {
 
 describe('closeRing', () => {
   it('cierra ring abierto', () => {
-    const ring = [[0, 0], [1, 0], [1, 1]];
+    const ring = /** @type {[number, number][]} */ ([[0, 0], [1, 0], [1, 1]]);
     const r = closeRing(ring);
     expect(r.length).toBe(4);
     expect(r[3]).toEqual([0, 0]);
   });
 
   it('no modifica ring ya cerrado', () => {
-    const ring = [[0, 0], [1, 0], [1, 1], [0, 0]];
+    const ring = /** @type {[number, number][]} */ ([[0, 0], [1, 0], [1, 1], [0, 0]]);
     expect(closeRing(ring).length).toBe(4);
   });
 
@@ -94,18 +94,18 @@ describe('latLngsToPolygon', () => {
 describe('wktToGeoJson', () => {
   it('parses POINT WKT', () => {
     const r = wktToGeoJson('POINT(-73.9247 4.5306)');
-    expect(r.type).toBe('Point');
-    expect(r.coordinates[0]).toBeCloseTo(-73.9247);
+    expect(/** @type {any} */ (r).type).toBe('Point');
+    expect(/** @type {any} */ (r).coordinates[0]).toBeCloseTo(-73.9247);
   });
 
   it('parses POLYGON WKT', () => {
     const r = wktToGeoJson('POLYGON((-73.9 4.5, -73.8 4.5, -73.9 4.5))');
-    expect(r.type).toBe('Polygon');
+    expect(/** @type {any} */ (r).type).toBe('Polygon');
   });
 
   it('retorna null para WKT invalido', () => {
     expect(wktToGeoJson('')).toBeNull();
-    expect(wktToGeoJson(null)).toBeNull();
+    expect(wktToGeoJson(/** @type {any} */ (null))).toBeNull();
     expect(wktToGeoJson('GARBAGE')).toBeNull();
   });
 });
@@ -133,7 +133,7 @@ describe('haversineMeters', () => {
   });
 
   it('retorna 0 con argumentos faltantes', () => {
-    expect(haversineMeters(null, { lat: 1, lng: 1 })).toBe(0);
+    expect(haversineMeters(/** @type {any} */ (null), { lat: 1, lng: 1 })).toBe(0);
   });
 });
 
@@ -325,17 +325,17 @@ describe('acceptGpsFix — síntoma (a) línea loca', () => {
 
   // --- Fix inválido -------------------------------------------------------------
   it('descarta coordenadas no finitas', () => {
-    expect(acceptGpsFix({ lat: NaN, lng: -73.92 }, null).accepted).toBe(false);
-    expect(acceptGpsFix({ lat: NaN, lng: -73.92 }, null).reason).toBe('invalid');
-    expect(acceptGpsFix(null, null).accepted).toBe(false);
-    expect(acceptGpsFix(null, null).reason).toBe('invalid');
-    expect(acceptGpsFix(undefined, null).accepted).toBe(false);
+    expect(acceptGpsFix({ lat: NaN, lng: -73.92 }, /** @type {any} */ (null)).accepted).toBe(false);
+    expect(acceptGpsFix({ lat: NaN, lng: -73.92 }, /** @type {any} */ (null)).reason).toBe('invalid');
+    expect(acceptGpsFix(/** @type {any} */ (null), null).accepted).toBe(false);
+    expect(acceptGpsFix(/** @type {any} */ (null), null).reason).toBe('invalid');
+    expect(acceptGpsFix(/** @type {any} */ (undefined), null).accepted).toBe(false);
   });
 
   it('descarta fix sin lat o lng pero con otros campos', () => {
-    expect(acceptGpsFix({ accuracy: 8, timestamp: 1000 }, null).accepted).toBe(false);
-    expect(acceptGpsFix({ lat: 1 }, null).accepted).toBe(false);
-    expect(acceptGpsFix({ lng: 1 }, null).accepted).toBe(false);
+    expect(acceptGpsFix(/** @type {any} */ ({ accuracy: 8, timestamp: 1000 }), null).accepted).toBe(false);
+    expect(acceptGpsFix(/** @type {any} */ ({ lat: 1 }), null).accepted).toBe(false);
+    expect(acceptGpsFix(/** @type {any} */ ({ lng: 1 }), null).accepted).toBe(false);
   });
 
   // --- Simulación de sesión real de trazo caminando -----------------------------
@@ -396,7 +396,7 @@ describe('warmupDecision — síntoma (c) precisión 1ª corrida', () => {
   it('NO ancla con accuracy undefined/NaN explícitos', () => {
     expect(warmupDecision({ accuracy: undefined }).warmedUp).toBe(false);
     expect(warmupDecision({ accuracy: NaN }).warmedUp).toBe(false);
-    expect(warmupDecision(null).warmedUp).toBe(false);
+    expect(warmupDecision(/** @type {any} */ (null)).warmedUp).toBe(false);
   });
 
   it('cae a fallback tras el límite de fixes sin accuracy (no cuelga el warm-up)', () => {
@@ -448,7 +448,7 @@ describe('warmupDecision — síntoma (c) precisión 1ª corrida', () => {
       }
     }
     expect(warmedUp).toBe(true);
-    expect(anchor.accuracy).toBe(12); // ancló en el fix preciso, no en el ciego
+    expect(/** @type {any} */ (anchor).accuracy).toBe(12); // ancló en el fix preciso, no en el ciego
   });
 });
 
@@ -477,9 +477,9 @@ describe('dedupeByMinDistance — síntoma (b) jitter casi-duplicado', () => {
 
   it('retorna array vacío para entrada vacía', () => {
     expect(dedupeByMinDistance([])).toEqual([]);
-    expect(dedupeByMinDistance(null)).toEqual([]);
-    expect(dedupeByMinDistance(undefined)).toEqual([]);
-    expect(dedupeByMinDistance('no-array')).toEqual([]);
+    expect(dedupeByMinDistance(/** @type {any} */ (null))).toEqual([]);
+    expect(dedupeByMinDistance(/** @type {any} */ (undefined))).toEqual([]);
+    expect(dedupeByMinDistance(/** @type {any} */ ('no-array'))).toEqual([]);
   });
 
   it('retorna el único punto para array de 1 elemento', () => {
@@ -551,8 +551,8 @@ describe('simplifyDouglasPeucker — síntoma (b) reducir lados que se cruzan', 
 
   it('devuelve la entrada si tiene 2 o menos puntos', () => {
     expect(simplifyDouglasPeucker([], 2).length).toBe(0);
-    expect(simplifyDouglasPeucker(null, 2).length).toBe(0);
-    expect(simplifyDouglasPeucker(undefined, 2).length).toBe(0);
+    expect(simplifyDouglasPeucker(/** @type {any} */ (null), 2).length).toBe(0);
+    expect(simplifyDouglasPeucker(/** @type {any} */ (undefined), 2).length).toBe(0);
     expect(simplifyDouglasPeucker([{ lat: 0, lng: 0 }], 2).length).toBe(1);
     expect(simplifyDouglasPeucker([{ lat: 0, lng: 0 }, { lat: 1, lng: 1 }], 2).length).toBe(2);
   });
@@ -657,7 +657,7 @@ describe('polygonAreaSqMeters', () => {
 
   it('retorna 0 con menos de 3 puntos', () => {
     expect(polygonAreaSqMeters([])).toBe(0);
-    expect(polygonAreaSqMeters(null)).toBe(0);
+    expect(polygonAreaSqMeters(/** @type {any} */ (null))).toBe(0);
     expect(polygonAreaSqMeters([{ lat: 0, lng: 0 }])).toBe(0);
     expect(polygonAreaSqMeters([{ lat: 0, lng: 0 }, { lat: 1, lng: 1 }])).toBe(0);
   });
@@ -728,8 +728,8 @@ describe('buildWalkPolygon — recorrido caminado → anillo estable', () => {
 
   it('devuelve la entrada sin tocar si tiene menos de 3 puntos', () => {
     expect(buildWalkPolygon([]).length).toBe(0);
-    expect(buildWalkPolygon(null)).toEqual([]);
-    expect(buildWalkPolygon(undefined)).toEqual([]);
+    expect(buildWalkPolygon(/** @type {any} */ (null))).toEqual([]);
+    expect(buildWalkPolygon(/** @type {any} */ (undefined))).toEqual([]);
     expect(buildWalkPolygon([{ lat: 0, lng: 0 }, { lat: 1, lng: 1 }]).length).toBe(2);
   });
 
@@ -743,7 +743,7 @@ describe('buildWalkPolygon — recorrido caminado → anillo estable', () => {
     const ring = buildWalkPolygon(square);
     const wkt = geoJsonToWkt(latLngsToPolygon(ring));
     expect(wkt).toContain('POLYGON');
-    const coords = wkt.match(/POLYGON\(\((.+)\)\)/)[1].split(',').map((s) => s.trim());
+    const coords = /** @type {any} */ (wkt.match(/POLYGON\(\((.+)\)\)/))[1].split(',').map(/** @param {*} s */ (s) => s.trim());
     expect(coords[0]).toBe(coords[coords.length - 1]);
   });
 

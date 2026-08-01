@@ -6,12 +6,12 @@ import { setCurrentOperator } from '../services/operatorIdentityService';
 import { setActiveTenantId } from '../services/tenantContext';
 import { version as APP_VERSION } from '../../package.json';
 import ChagraGrowLoader from './ChagraGrowLoader';
-import ChagraAgentAvatarColibri from './ChagraAgentAvatarColibri';
+import ChagraAgentAvatarAngelita from './ChagraAgentAvatarAngelita';
 import LegalLinks from './LegalLinks';
 import WelcomeStatsHero from './WelcomeStatsHero';
 import useOllamaWarmStore from '../store/useOllamaWarmStore';
 import { prewarmCorpus } from '../services/ragRetriever';
-import useThemeBackgroundStore, { getBackgroundSrc } from '../store/useThemeBackgroundStore';
+import useThemeBackgroundStore, { getBackgroundSrc, esGradiente } from '../store/useThemeBackgroundStore';
 import { friendlyMessage } from '../utils/friendlyErrors';
 
 /**
@@ -168,7 +168,7 @@ export default function LoginScreen({ onLoginSuccess, onSave }) {
           aria-hidden="true"
           className="login-bg-photo absolute inset-0 pointer-events-none bg-cover bg-center"
           style={{
-            backgroundImage: `linear-gradient(rgba(2,6,23,0.72), rgba(2,6,23,0.82) 55%, rgba(2,6,23,0.92)), url('${loginBgSrc}')`,
+            backgroundImage: `linear-gradient(rgba(2,6,23,0.72), rgba(2,6,23,0.82) 55%, rgba(2,6,23,0.92)), ${esGradiente(loginBgSrc) ? loginBgSrc : `url('${loginBgSrc}')`}`,
           }}
         />
       )}
@@ -196,10 +196,10 @@ export default function LoginScreen({ onLoginSuccess, onSave }) {
               aria-hidden="true"
               className="absolute inset-0 rounded-full ring-1 ring-muzo/20 animate-pulse"
             />
-            <ChagraAgentAvatarColibri
+            <ChagraAgentAvatarAngelita
               state="idle"
-              size={92}
-              ariaLabel="Colibrí Barbudito, símbolo de Chagra"
+              size={108}
+              ariaLabel="Angelita, la abeja de Chagra"
             />
           </div>
 

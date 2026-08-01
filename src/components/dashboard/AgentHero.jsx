@@ -21,6 +21,7 @@ import { buildCropSuggestions } from '../../data/cropSuggestions';
 import { syncManager } from '../../services/syncManager';
 import { iconForTheme } from './themeIcon';
 import ChagraAgentAvatar from '../ChagraAgentAvatar';
+import Angelita from '../../visual/agente/Angelita';
 import { lunarPhase, solarTimes, moonPathD } from '../../utils/skyEphemeris';
 import { resolveClimaLocation, getCachedClimaSnapshot } from '../../services/climaService';
 import {
@@ -237,34 +238,6 @@ function SkyAstro({ night, condition, moonFraction }) {
     );
 }
 
-// Colibrí 2D del demo (SVG .hummer). Se usa tanto en la escena ambiente (vuela)
-// como DENTRO del botón de enviar (operador 2026-06-06: "el colibrí es enviar").
-// Se factoriza para que ambos usos compartan exactamente el mismo trazo.
-function HummerSvg({ width = 62, height = 46, flap = true }) {
-    return (
-        <svg width={width} height={height} viewBox="0 0 62 46" aria-hidden="true">
-            {/* cuerpo */}
-            <ellipse cx="34" cy="28" rx="11" ry="6.5" fill="#2f7d6b" />
-            <ellipse cx="34" cy="27" rx="9" ry="4.2" fill="#3fa489" />
-            {/* cabeza */}
-            <circle cx="46" cy="24" r="6" fill="#2a6f60" />
-            <circle cx="48.5" cy="22.5" r="1.4" fill="#11332c" />
-            {/* gorguera roja */}
-            <path d="M44 28 q5 2 8 0 q-3 4 -8 3 z" fill="#d05038" />
-            {/* pico largo */}
-            <path d="M52 24 L62 19" stroke="#3a2a18" strokeWidth="2" strokeLinecap="round" />
-            {/* cola */}
-            <path d="M23 28 L8 22 M23 30 L8 32" stroke="#256155" strokeWidth="3" strokeLinecap="round" />
-            {/* ala (animada solo cuando vuela en la escena) */}
-            <g className={flap ? 'wing' : undefined}>
-                <path d="M30 24 C18 6 6 8 2 16 C12 18 22 24 30 30 Z" fill="#4fb89a" opacity=".9" />
-            </g>
-        </svg>
-    );
-}
-
-// Saludos por hora del día. En modo "experto" (nivel detallado) el demo abre
-// con "Hola." en vez de "Buenos días." (COPY.experto.greetHi). Replicamos.
 function greetingForNow(nivel) {
     if (nivel === 'detallado') return 'Hola.';
     const h = typeof Date !== 'undefined' ? new Date().getHours() : 9;
@@ -1007,8 +980,8 @@ export default function AgentHero({ onNavigate }) {
                     transform-origin: center; will-change: transform;
                 }
                 .agentport-hummer svg { display: block; filter: drop-shadow(0 6px 6px rgba(90,60,20,.18)); }
-                /* bio-punk = tema base (sin data-theme): glow neón teal */
-                .agentport-hummer svg { filter: drop-shadow(0 0 8px rgba(25,201,154,.7)) drop-shadow(0 0 16px rgba(25,240,192,.35)); }
+                /* bio-punk = tema base (sin data-theme): glow de miel (ámbar) */
+                .agentport-hummer svg { filter: drop-shadow(0 0 8px rgba(240,178,60,.6)) drop-shadow(0 0 16px rgba(240,200,120,.3)); }
                 [data-theme="nature"] .agentport-hummer svg { filter: drop-shadow(0 6px 6px rgba(90,60,20,.18)); }
                 /* minimalista: SIN colibrí (escena limpia del demo). */
                 [data-theme="minimalista"] .agentport-hummer { display: none !important; }
@@ -1103,7 +1076,7 @@ export default function AgentHero({ onNavigate }) {
                 /* "Abrir Chagra IA" — botón redondo con el avatar del agente.
                    Entrada explícita al overlay desde la portada (tarea #51). */
                 .agentport-open {
-                    width: 38px; height: 38px; flex: none; border-radius: 50%;
+                    width: 52px; height: 52px; flex: none; border-radius: 50%;
                     display: inline-flex; align-items: center; justify-content: center;
                     overflow: hidden; padding: 0; cursor: pointer;
                     background: rgb(var(--c-surface-card) / 0.65);
@@ -1725,11 +1698,12 @@ export default function AgentHero({ onNavigate }) {
                     <div className="agentport-horizon" />
                 </div>
 
-                {/* — COLIBRÍ 2D — vuela en bio-punk y nature (SVG del demo
-                     nature). En minimalista se oculta vía CSS: el demo limpio no
-                     lleva colibrí. — */}
+                {/* — ANGELITA — la abeja agente vuela en bio-punk y nature
+                     ("solo abejita", operador 2026-07-18: el colibrí jubiló).
+                     En minimalista se oculta vía CSS: el demo limpio no lleva
+                     fauna. — */}
                 <div className="agentport-hummer">
-                    <HummerSvg />
+                    <Angelita estado="acompana" size={68} title="Angelita acompaña la portada" />
                 </div>
             </div>
 
@@ -1762,7 +1736,7 @@ export default function AgentHero({ onNavigate }) {
                         title="Abrir Chagra IA"
                         className="agentport-open"
                     >
-                        <ChagraAgentAvatar size={26} state="idle" ariaLabel="Chagra IA" />
+                        <ChagraAgentAvatar size={48} state="idle" ariaLabel="Chagra IA" />
                     </button>
 
                     <div className="agentport-mode" role="tablist" aria-label="Nivel de respuestas">
@@ -2129,7 +2103,7 @@ export default function AgentHero({ onNavigate }) {
                             }}
                         >
                             <div style={{ width: '100%', height: '100%', position: 'relative' }}>
-                              <ChagraAgentAvatar size={38} state={canSend ? 'idle' : 'listening'} ariaLabel="Enviar al agente" />
+                              <ChagraAgentAvatar size={44} state={canSend ? 'idle' : 'listening'} ariaLabel="Enviar al agente" />
                             </div>
                         </button>
                     </div>

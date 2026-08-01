@@ -657,7 +657,7 @@ export default function DashboardLive({ onNavigate, regionalGreeting = null, onL
     // procesos"): Reforestación · Silvopastoreo · Páramo · Cerdos. Gateado por
     // perfil (un urbano no lo ve). En F2 BAJA (audit: es de nicho, no roba el
     // primer scroll); con OFF conserva su posición/rótulo legacy.
-    const renderSeguimiento = ({ f2 } = {}) => ((seguimientoKeys === null || seguimientoKeys.length > 0) && (
+    const renderSeguimiento = ({ f2 } = /** @type {any} */ ({})) => ((seguimientoKeys === null || seguimientoKeys.length > 0) && (
         <div className={`px-4 pt-3 ${fincaVivaFlag ? 'fvh-resto-block' : ''}`}>
             {blockLabel(f2 ? 'Sus proyectos de finca' : 'Seguimiento de procesos', 'from-emerald-400 to-teal-400')}
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3" data-testid="seguimiento-cards">

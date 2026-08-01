@@ -91,6 +91,19 @@ describe('MilpaSimulator', () => {
     expect(within(resultado).getByText(/La ahuyama cuida el suelo/)).toBeInTheDocument();
   });
 
+  it('fusión: el modo ilustrado abre «Las tres hermanas» y Salir vuelve al simulador', () => {
+    render(<MilpaSimulator />);
+    // La entrada única de la Milpa ofrece el juego ilustrado (fusión audit 2026-07-16).
+    const irIlustrado = screen.getByTestId('milpa-modo-ilustrado');
+    fireEvent.click(irIlustrado);
+    // Ahora se ve el mini-juego SVG de las tres hermanas (intro con su CTA propio).
+    expect(screen.getByText('Empezar a sembrar')).toBeInTheDocument();
+    expect(screen.getAllByText('La milpa: las tres hermanas').length).toBeGreaterThan(0);
+    // Y su «Salir» regresa al simulador hondo (una sola Milpa, dos caras).
+    fireEvent.click(screen.getByRole('button', { name: /Salir/ }));
+    expect(screen.getByText('¿Qué quieres sembrar hoy?')).toBeInTheDocument();
+  });
+
   it('permite pasar a la siguiente temporada con parcelas vacías', () => {
     render(<MilpaSimulator />);
     elegirMilpa();

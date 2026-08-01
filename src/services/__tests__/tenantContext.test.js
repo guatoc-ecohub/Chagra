@@ -34,7 +34,7 @@ describe('tenantContext (ADR-036 MVP multi-finca)', () => {
     expect(() => setActiveTenantId('')).toThrow();
     expect(() => setActiveTenantId('   ')).toThrow();
     expect(() => setActiveTenantId(null)).toThrow();
-    expect(() => setActiveTenantId(123)).toThrow();
+    expect(() => setActiveTenantId(/** @type {any} */ (123))).toThrow();
   });
 
   it('trims whitespace from incoming tenantId', () => {

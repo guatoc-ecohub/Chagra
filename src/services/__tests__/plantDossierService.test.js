@@ -124,8 +124,8 @@ describe('getRelationsForPlant', () => {
 
 describe('getCycleForPlant', () => {
   it('devuelve la plantilla fenológica de la especie', () => {
-    vi.mocked(getTemplate).mockReturnValue({ template_id: 't1', species_label: 'Tomate', stages: [{ code: 'sowing' }], sources: [] });
-    expect(getCycleForPlant('solanum_lycopersicum').template_id).toBe('t1');
+    vi.mocked(getTemplate).mockReturnValue(/** @type {any} */ ({ template_id: 't1', species_label: 'Tomate', stages: [{ code: 'sowing', label: 'Siembra', description: '', minDays: 1, maxDays: 30, sourceIndex: 0 }], sources: [] }));
+    expect(/** @type {any} */ (getCycleForPlant('solanum_lycopersicum')).template_id).toBe('t1');
   });
   it('null si no hay plantilla', () => {
     vi.mocked(getTemplate).mockReturnValue(null);
@@ -135,11 +135,11 @@ describe('getCycleForPlant', () => {
 
 describe('getAssociatedCycles', () => {
   it('filtra FarmProcess por subject_slug y ordena recientes primero', async () => {
-    vi.mocked(listFarmProcesses).mockResolvedValue([
+    vi.mocked(listFarmProcesses).mockResolvedValue(/** @type {any} */ ([
       { process_id: 'a', attributes: { subject_slug: 'zea_mays', updated_at: '2026-01-01' } },
       { process_id: 'b', attributes: { subject_slug: 'fragaria_ananassa', updated_at: '2026-06-01' } },
       { process_id: 'c', attributes: { subject_slug: 'fragaria_ananassa', updated_at: '2026-06-10' } },
-    ]);
+    ]));
     const cycles = await getAssociatedCycles('fragaria_ananassa');
     expect(cycles.map((c) => c.process_id)).toEqual(['c', 'b']);
   });
@@ -151,20 +151,20 @@ describe('getAssociatedCycles', () => {
 
 describe('buildPlantDossier', () => {
   it('compone el dossier completo de una planta con slug', async () => {
-    vi.mocked(getTemplate).mockReturnValue({ template_id: 't', species_label: 'Fresa', stages: [], sources: [] });
+    vi.mocked(getTemplate).mockReturnValue(/** @type {any} */ ({ template_id: 't', species_label: 'Fresa', stages: [], sources: [] }));
     vi.mocked(suggestGuildsFor).mockResolvedValue({
       companions: [{ slug: 'allium_sativum', name: 'Ajo', reason: 'r' }],
       antagonists: [{ slug: 'solanum_lycopersicum', name: 'Tomate', reason: 'r' }],
       strata: [],
     });
-    vi.mocked(listFarmProcesses).mockResolvedValue([
+    vi.mocked(listFarmProcesses).mockResolvedValue(/** @type {any} */ ([
       { process_id: 'p1', attributes: { subject_slug: 'fragaria_ananassa', updated_at: '2026-06-10' } },
-    ]);
+    ]));
 
     const d = await buildPlantDossier({ cropSlug: 'fragaria_ananassa', canonical: 'Fresa (Fragaria ananassa)' });
     expect(d.slug).toBe('fragaria_ananassa');
     expect(d.label).toBe('Fresa (Fragaria ananassa)');
-    expect(d.cycle.template_id).toBe('t');
+    expect(/** @type {any} */ (d.cycle).template_id).toBe('t');
     expect(d.bioinsumos.items.length).toBeGreaterThan(0);
     expect(d.relations.companions).toHaveLength(1);
     expect(d.relations.antagonists).toHaveLength(1);

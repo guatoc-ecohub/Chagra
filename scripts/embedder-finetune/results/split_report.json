@@ -1,0 +1,16 @@
+{
+  "n_species_total": 742,
+  "n_species_with_nombres_comunes": 507,
+  "n_regional_labels_raw": 325,
+  "n_regional_label_pairs_valid": 218,
+  "n_regional_label_pairs_skipped_missing_species": 52,
+  "n_pairs_total": 3013,
+  "n_species_with_pairs": 734,
+  "n_species_train": 602,
+  "n_species_test": 132,
+  "n_pairs_train": 2392,
+  "n_pairs_test": 621,
+  "n_confusable_species": 43,
+  "n_families": 130,
+  "split_seed": 1337
+}

@@ -39,7 +39,7 @@ function MaintenanceScreen({ onBack, onSave }) {
     // → fallback 0.7 → reject > 2 MB.
     const compressed = await compressImage(file);
     if (!compressed.ok) {
-      if (compressed.reason === 'too_large') {
+      if (/** @type {any} */ (compressed).reason === 'too_large') {
         window.dispatchEvent(new CustomEvent('chagraToast', {
           detail: { message: IMAGE_TOO_LARGE_MESSAGE },
         }));
@@ -154,6 +154,7 @@ function MaintenanceScreen({ onBack, onSave }) {
           rows={4}
           value={formData.description}
           onChange={handleInput}
+          // @ts-ignore placeholder not in strict prop types
           placeholder="Ej: arreglé la cerca del lote norte, cambié la manguera de riego…"
         />
 
@@ -189,6 +190,7 @@ function MaintenanceScreen({ onBack, onSave }) {
           rows={2}
           value={formData.notes}
           onChange={handleInput}
+          // @ts-ignore placeholder not in strict prop types
           placeholder="Ej: pendiente revisar la otra semana…"
         />
 

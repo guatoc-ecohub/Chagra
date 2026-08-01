@@ -94,7 +94,7 @@ export const WorkerDashboard = () => {
       const wkt = typeof rawGeo === 'object' ? rawGeo?.value : rawGeo;
       const geo = wkt ? wktToGeoJson(wkt) : null;
       const coords = getCoords(geo);
-      const gpsCoordsArr = position ? [position.lon, position.lat] : null;
+      const gpsCoordsArr = position ? /** @type {[number,number]} */ ([position.lon, position.lat]) : null;
       const distance = gpsCoordsArr && coords ? haversineDistance(gpsCoordsArr, coords) : Infinity;
       return { ...task, distance, coords };
     })
@@ -214,7 +214,7 @@ export const WorkerDashboard = () => {
                     <div className="min-w-0">
                       <div className="flex items-center gap-2 mb-0.5">
                         <h4 className="font-bold text-slate-200 text-sm truncate">{taskName}</h4>
-                        <StatusBadge status={task.attributes?.status || task.status} type="task" className="scale-75 origin-left" />
+                        <StatusBadge status={task.attributes?.status || task.status} type="task" onChange={null} className="scale-75 origin-left" />
                       </div>
                       <p className="text-[10px] text-slate-500 uppercase">
                         {task.type?.split('--')[1] || 'tarea'}

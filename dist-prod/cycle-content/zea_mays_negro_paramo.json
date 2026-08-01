@@ -1,0 +1,82 @@
+{
+  "species_slug": "zea_mays_negro_paramo",
+  "scientific_name": "Zea mays L. cv. 'Negro de Páramo'",
+  "common_names": [
+    "Maíz Negro de Páramo"
+  ],
+  "family": "Poaceae",
+  "category": "cereales",
+  "cultivable": true,
+  "conservation_status": "naturalizada",
+  "thermal_zones": [
+    "frio",
+    "paramo"
+  ],
+  "roles_in_guild": [
+    "crop"
+  ],
+  "antagonists": [],
+  "especies_nativas_sustitutas": [],
+  "propagation": {
+    "metodo_principal": "semilla",
+    "notas": "Variedad tradicional cundiboyacense de ciclo largo (7-9 meses), adaptada a zona fría y bordes de páramo. Granos pequeños a medianos de color morado oscuro a negro brillante, ricos en antocianinas. Se conserva en mazorca colgada en cocina campesina para protegerla del gorgojo (Sitophilus zeamais). Siembra directa con maquinaria manual (chuzo, palín)."
+  },
+  "requirements": {
+    "agua": "medio",
+    "altitud_msnm": {
+      "min_absoluto": 2200,
+      "optimo_min": 2600,
+      "optimo_max": 3200,
+      "max_absoluto": 3500
+    },
+    "temperatura_c": {
+      "helada_letal": -2,
+      "optimo_min": 9,
+      "optimo_max": 18,
+      "max_tolerable": 24
+    },
+    "radiacion": "sol_pleno",
+    "drenaje_requerido": "bueno"
+  },
+  "valor_pedagogico": "El maíz negro de páramo (Zea mays L. cv. 'Negro de Páramo') es una variedad nativa cundiboyacense del altiplano andino colombiano, conservada por comunidades campesinas e indígenas Muisca en el ramal oriental de los Andes entre 2.600 y 3.200 msnm (Cundinamarca: Sumapaz, Choachí, Une, Pasca; Boyacá: Cómbita, Tibasosa, Toca, páramo de Rabanal; Nariño: Ipiales, Cumbal). Es uno de los maíces de mayor altitud del mundo, junto con sus parientes peruano-bolivianos (kculli, morado de la sierra), y su pigmentación morado-negra intensa proviene de altas concentraciones de antocianinas (cianidina-3-glucósido) que cumplen función fotoprotectora frente a la radiación UV extrema del páramo. Es lección viva de coevolución cultural y climática: los Muisca seleccionaron por miles de años maíces capaces de granar bajo días cortos, fríos, heladas tardías y radiación UV alta del páramo, generando un acervo genético irrepetible. Hoy menos del 5% de los maíces sembrados en Colombia son variedades nativas (resto: híbridos comerciales tipo ICA V-115, V-305), por lo que cada chagra que conserva maíz negro de páramo es un acto de resistencia genética. Usos tradicionales: chicha de maíz negro (bebida ceremonial Muisca con maguey o yuca dulce), envueltos, arepas pigmentadas para festividades, tinte natural alimentario, harina rica en antioxidantes. Manejo agroecológico: siembra de 'tres hermanas' adaptada al frío (maíz + haba + cubio o ulluco en vez de fríjol y ahuyama tropicales); siembra a inicio lluvias mayores (marzo-abril); 2-3 granos por hoyo, distancia 70 cm x 70 cm; aporque a los 45-60 días; biopreparados: caldo de ceniza preventivo contra cogollero (Spodoptera frugiperda), trichoderma al surco. Conservación de semilla en mazorcas colgadas en cocina con humo de leña para repeler gorgojo. Fuentes Tier A: Pérez Arbeláez 1947, AGROSAVIA Leguminosas Andinas (policultivos), NRC 1989 Cultivos Andinos, Pérez-Rodríguez-Gómez 2008, GBIF Backbone, POWO Kew.",
+  "sources": [
+    {
+      "id": "perez-arbelaez-1947-plantas-utiles",
+      "title": "perez-arbelaez-1947-plantas-utiles",
+      "tier": "A",
+      "url": null
+    },
+    {
+      "id": "agrosavia-leguminosas-andinas",
+      "title": "agrosavia-leguminosas-andinas",
+      "tier": "A",
+      "url": null
+    },
+    {
+      "id": "nrc-1989-cultivos-andinos",
+      "title": "nrc-1989-cultivos-andinos",
+      "tier": "A",
+      "url": null
+    },
+    {
+      "id": "perez-rodriguez-gomez-2008",
+      "title": "perez-rodriguez-gomez-2008",
+      "tier": "A",
+      "url": null
+    },
+    {
+      "id": "gbif-taxonomic-backbone",
+      "title": "gbif-taxonomic-backbone",
+      "tier": "A",
+      "url": "https://www.gbif.org/dataset/d7dddbf4-2cf0-4f39-9b2a-bb099caae36c"
+    },
+    {
+      "id": "powo-kew",
+      "title": "powo-kew",
+      "tier": "A",
+      "url": "https://powo.science.kew.org"
+    }
+  ],
+  "_generated_by": "scripts/build-cycle-content-from-catalog.mjs",
+  "_generated_at": "2026-05-19T00:42:57.381Z"
+}

@@ -50,7 +50,7 @@ export default function InvasiveObservationLog({ onBack, onSave, initialLocation
     // y el usuario quedaba bloqueado (no podía guardar).
     const [catalogStatus, setCatalogStatus] = useState('loading');
     const [photo, setPhoto] = useState(null);
-    const [location, setLocation] = useState(initialWkt ? { wkt: initialWkt } : null);
+    const [location, setLocation] = useState(/** @type {{wkt: string, coords?: [number, number]}|null} */ (initialWkt ? { wkt: initialWkt } : null));
     const [isSaving, setIsSaving] = useState(false);
     const [saveSuccess, setSaveSuccess] = useState(false);
     const [syncedOffline, setSyncedOffline] = useState(false);
@@ -308,7 +308,7 @@ export default function InvasiveObservationLog({ onBack, onSave, initialLocation
                                 onClick={() => setFormData(p => ({ ...p, status: s.id }))}
                                 className={`transition-all ${formData.status === s.id ? 'ring-2 ring-amber-500 ring-offset-2 ring-offset-slate-950 scale-105' : 'opacity-60 hover:opacity-100'}`}
                             >
-                                <StatusBadge status={s.id} type="pest" />
+                                <StatusBadge status={s.id} type="pest" onChange={() => {}} />
                             </button>
                         ))}
                     </div>
@@ -320,7 +320,7 @@ export default function InvasiveObservationLog({ onBack, onSave, initialLocation
                         name="notes"
                         value={formData.notes}
                         onChange={handleInput}
-                        rows="3"
+                        rows={3}
                         className="p-4 rounded-xl bg-slate-900 border border-slate-700 text-xl text-white min-h-[100px]"
                         placeholder="Participantes, biomasa extraída, método..."
                     />

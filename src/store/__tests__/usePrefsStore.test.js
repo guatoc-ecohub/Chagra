@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach } from 'vitest';
-import usePrefsStore from '../usePrefsStore.js';
+import usePrefsStore, { AVATAR_CREATURE_DEFAULT } from '../usePrefsStore.js';
 
 /**
  * Tests de usePrefsStore: preferencias persistidas en localStorage (voz, TTS,
@@ -15,6 +15,7 @@ beforeEach(() => {
     voiceRegionIntensity: 1,
     ttsEnabled: true,
     showSourceBadges: true,
+    avatarCreatureId: AVATAR_CREATURE_DEFAULT,
   });
 });
 
@@ -25,6 +26,7 @@ describe('usePrefsStore — defaults', () => {
     expect(s.voiceRegionIntensity).toBe(1);
     expect(s.ttsEnabled).toBe(true);
     expect(s.showSourceBadges).toBe(true);
+    expect(s.avatarCreatureId).toBe(AVATAR_CREATURE_DEFAULT);
   });
 });
 
@@ -53,5 +55,18 @@ describe('setters actualizan estado y persisten', () => {
     usePrefsStore.getState().setShowSourceBadges(null);
     expect(usePrefsStore.getState().showSourceBadges).toBe(false);
     expect(JSON.parse(localStorage.getItem('chagra:prefs:show-source-badges'))).toBe(false);
+  });
+
+  it('setAvatarCreatureId persiste el slug elegido', () => {
+    usePrefsStore.getState().setAvatarCreatureId('jaguar');
+    expect(usePrefsStore.getState().avatarCreatureId).toBe('jaguar');
+    expect(JSON.parse(localStorage.getItem('chagra:prefs:avatar-creature'))).toBe('jaguar');
+  });
+
+  it('setAvatarCreatureId con valor vacío/no-string cae al default (abeja)', () => {
+    usePrefsStore.getState().setAvatarCreatureId('');
+    expect(usePrefsStore.getState().avatarCreatureId).toBe(AVATAR_CREATURE_DEFAULT);
+    usePrefsStore.getState().setAvatarCreatureId(null);
+    expect(usePrefsStore.getState().avatarCreatureId).toBe(AVATAR_CREATURE_DEFAULT);
   });
 });

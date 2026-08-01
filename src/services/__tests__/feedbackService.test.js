@@ -7,7 +7,10 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 
 const { fetchWithAuthRetry } = vi.hoisted(() => ({
-  fetchWithAuthRetry: vi.fn((...args) => global.fetch(...args)),
+  fetchWithAuthRetry: vi.fn((...args) => {
+    const a = /** @type {[RequestInfo | URL, RequestInit?]} */ (args);
+    return global.fetch(a[0], a[1]);
+  }),
 }));
 
 vi.mock('../apiService.js', () => ({
@@ -22,14 +25,17 @@ describe('feedbackService', () => {
 
   beforeEach(() => {
     // Mock localStorage
-    global.localStorage = {
+    global.localStorage = /** @type {any} */ ({
       getItem: vi.fn(),
       setItem: vi.fn(),
-    };
+    });
     // Mock fetch
     global.fetch = vi.fn();
     fetchWithAuthRetry.mockClear();
-    fetchWithAuthRetry.mockImplementation((...args) => global.fetch(...args));
+    fetchWithAuthRetry.mockImplementation((...args) => {
+      const a = /** @type {[RequestInfo | URL, RequestInit?]} */ (args);
+      return global.fetch(a[0], a[1]);
+    });
   });
 
   afterEach(() => {

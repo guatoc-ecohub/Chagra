@@ -1,0 +1,83 @@
+{
+  "species_slug": "cynodon_nlemfuensis",
+  "scientific_name": "Cynodon nlemfuensis Vanderyst",
+  "common_names": [
+    "Pasto estrella"
+  ],
+  "family": "Poaceae",
+  "category": "abonos_verdes_coberturas",
+  "cultivable": true,
+  "conservation_status": "naturalizada",
+  "thermal_zones": [
+    "calido"
+  ],
+  "roles_in_guild": [
+    "ground_cover",
+    "biomass_producer"
+  ],
+  "antagonists": [],
+  "especies_nativas_sustitutas": [],
+  "propagation": {
+    "methods": [
+      "estolon",
+      "rizoma"
+    ],
+    "best_method": "estolon",
+    "protocol_resumen": "Propagación principal vegetativa por estolones (no produce semilla viable). 2-3 t/ha de material vegetativo plantado a surcos de 0.5 m al inicio de lluvias. Establecimiento 60-90 días por crecimiento estolonífero agresivo.",
+    "tiempo_a_establecimiento_dias": 75,
+    "notas": "Comúnmente confundido con Cynodon dactylon (bermuda). C. nlemfuensis es de mayor porte y productividad. AGROSAVIA mantiene material de propagación certificado de cv. Florona, cv. Tropical, cv. Tifton.",
+    "fuente": "AGROSAVIA Pasto Estrella; CIAT Tropical Forages; POWO Kew; Bernal 2015"
+  },
+  "requirements": {
+    "agua": "medio",
+    "altitud_msnm": {
+      "min_absoluto": 0,
+      "optimo_min": 0,
+      "optimo_max": 1500,
+      "max_absoluto": 1800
+    },
+    "temperatura_c": {
+      "helada_letal": 5,
+      "optimo_min": 22,
+      "optimo_max": 30,
+      "max_tolerable": 38
+    },
+    "radiacion": "sol_pleno",
+    "drenaje_requerido": "bueno"
+  },
+  "valor_pedagogico": "El pasto estrella o estrella africana (Cynodon nlemfuensis Vanderyst, Poaceae, subfamilia Chloridoideae) es una de las gramíneas forrajeras tropicales más importantes en ganadería intensiva colombiana, originaria del África central y oriental (cuenca del Congo, Kenia, Uganda, Tanzania, donde \"nlemfu\" es nombre vernáculo local) e introducida al Neotrópico durante el siglo XX como forrajera de alto desempeño para climas cálidos. Es comúnmente confundida con su pariente cercano Cynodon dactylon (bermuda o pata de gallina, cosmopolita) y con Cynodon plectostachyus (estrella de África, cultivada también en Colombia), pero C. nlemfuensis se distingue por su mayor porte (30-60 cm vs. 10-30 cm de bermuda), mayor productividad de biomasa y mejor valor forrajero. En Colombia se cultiva ampliamente en los Llanos Orientales (Meta, Casanare, Arauca), Magdalena Medio (Antioquia, Santander, Boyacá bajo), Caribe (Sucre, Córdoba, Cesar, Magdalena, La Guajira), Pacífico (Valle bajo), Amazonía deforestada (Caquetá, Putumayo) y piedemontes interandinos (Huila, Tolima, valle del Cauca) entre 0 y 1.500 msnm en zona térmica cálida sobre suelos bien drenados de fertilidad media. Es gramínea perenne estolonífera-rizomatosa de 30-60 cm de altura con estolones largos y agresivos que enraízan en cada nudo, rizomas superficiales-cortos, hojas lineares glabras verde-oscuras, inflorescencia en 4-7 racimos digitados al ápice del culmo dispuestos en forma de estrella radial (de ahí su nombre común \"pasto estrella\"), semillas raramente viables (la propagación natural es 99% vegetativa por estolones, motivo por el cual se establece exclusivamente con material vegetativo en surcos). Su característica agronómica distintiva es la propagación 100% vegetativa por estolones (no se siembra por semilla), lo que tiene una implicación importante: la implantación es más cara y laboriosa que las brachiarias (que sí se siembran por semilla), requiere 2-3 t/ha de material vegetativo, siembra en surcos de 0.5 m al inicio de las lluvias y mano de obra intensiva durante el establecimiento, pero una vez establecido es extremadamente resiliente, con rebrote rapidísimo post-pastoreo (descanso de apenas 21-28 días entre pastoreos), tolerancia a pastoreo intensivo continuo y persistencia decadal en la pradera con manejo mínimo. Produce biomasa de 18-25 t MS/ha/año con buen manejo, soporta carga animal de 3-5 UGG/ha en sistemas rotacionales intensivos con altura de planta de entrada al pastoreo de 30-40 cm, valor nutricional medio-alto (PC 9-13%, DIVMS 58-65%). Es la gramínea forrajera preferida en sistemas de doble propósito (carne + leche) en el trópico bajo colombiano por su tolerancia a pastoreo intensivo y manejo más laxo que las brachiarias (no requiere descansos tan largos ni alturas de entrada altas). Las variedades comerciales más sembradas son: cv. Florona (originalmente seleccionado en Centroamérica, difundido por AGROSAVIA en Colombia); cv. Estrella Africana (germoplasma colectado por CIAT en África oriental); cv. Tropical (selección regional colombiana). Es susceptible a salivazo (Aeneolamia spp.) aunque menos que brachiaria, y a complejos foliares Bipolaris-Curvularia en estaciones lluviosas intensas. Su limitación es la naturalización agresiva: los estolones colonizan rápidamente bordes de pradera, canales de riego, cercas vivas y cultivos vecinos, requiriendo manejo de bordes para prevenir invasión de áreas no destinadas a forraje. Manejo agroecológico: propagación 100% vegetativa por estolones cosechados de pradera madre (2-3 t/ha en surcos de 0.5 m al inicio de lluvias), fertilización inicial moderada (200-300 kg/ha 10-30-10), descanso post-establecimiento 60-90 días, rotación con leguminosas rastreras (Arachis pintoi, Stylosanthes spp.) para mejorar valor nutricional y fijar N biológicamente, sistemas silvopastoriles con Leucaena leucocephala (la combinación pasto estrella + leucaena es referencia continental de productividad ganadera tropical sostenible), manejo de bordes con cercas vivas (Erythrina, Gliricidia) que también funcionan como contención de estolones invasores. Es lección agroecológica de la ganadería tropical: gramínea estolonífera africana de alto desempeño cuyo manejo en sistema silvopastoril con leucaena permite intensificar producción ganadera tropical reduciendo huella ambiental y mejorando bienestar animal por sombra de árboles, pero cuya naturalización agresiva exige manejo cuidadoso de bordes y compromiso con la conservación de áreas no productivas adyacentes. Fuentes Tier A: AGROSAVIA Pasto Estrella, CIAT Tropical Forages Database, POWO Kew, GBIF Backbone Taxonomy, Bernal et al. 2015 Catálogo Plantas y Líquenes Colombia.",
+  "sources": [
+    {
+      "id": "agrosavia-estrella",
+      "title": "agrosavia-estrella",
+      "tier": "A",
+      "url": null
+    },
+    {
+      "id": "agrosavia-silvopastoriles",
+      "title": "agrosavia-silvopastoriles",
+      "tier": "A",
+      "url": null
+    },
+    {
+      "id": "powo-kew",
+      "title": "powo-kew",
+      "tier": "A",
+      "url": "https://powo.science.kew.org"
+    },
+    {
+      "id": "gbif-taxonomic-backbone",
+      "title": "gbif-taxonomic-backbone",
+      "tier": "A",
+      "url": "https://www.gbif.org/dataset/d7dddbf4-2cf0-4f39-9b2a-bb099caae36c"
+    },
+    {
+      "id": "bernal-2015-plantas-liquenes-colombia",
+      "title": "bernal-2015-plantas-liquenes-colombia",
+      "tier": "A",
+      "url": "http://catalogoplantasdecolombia.unal.edu.co"
+    }
+  ],
+  "_generated_by": "scripts/build-cycle-content-from-catalog.mjs",
+  "_generated_at": "2026-05-19T00:42:57.389Z"
+}

@@ -9,6 +9,8 @@ import { esExtensionistaActual } from '../config/extensionistaAccess';
 import ThemeSelector from './common/ThemeSelector';
 import ThemeLivePreview from './common/ThemeLivePreview';
 import AgentAvatarSelector from './Settings/AgentAvatarSelector';
+import AvatarSelector from './Settings/AvatarSelector';
+import useAvatarCreature from '../hooks/useAvatarCreature';
 import BackgroundSelector from './Settings/BackgroundSelector';
 import BackupExportButton from './BackupExportButton';
 import CuadernoPDFButton from './CuadernoPDFButton';
@@ -314,6 +316,9 @@ export default function ProfileScreen({ onBack, onHome }) {
   const selectableThemes = getSelectableThemes(fincaVivaHomePerfilActivo());
   const themeLabel = selectableThemes.find((t) => t.id === theme)?.label || theme;
   const ttsEnabled = usePrefsStore((s) => s.ttsEnabled);
+  // El animal elegido por la persona (Apariencia → "Su animal de la chagra"):
+  // sin foto de perfil, la cédula muestra su bicho en vez del ícono genérico.
+  const avatarCreature = useAvatarCreature();
   const activeFincaSlug = useFincaActiveStore((s) => s.activeFincaSlug);
   const municipio = (() => {
     try { return getProfileMunicipio(); } catch (_) { return null; }
@@ -388,7 +393,13 @@ export default function ProfileScreen({ onBack, onHome }) {
                       data-testid="profile-photo-img"
                     />
                   ) : (
-                    <User size={38} className="text-emerald-400" aria-hidden="true" />
+                    <span data-testid="profile-avatar-creature" className="pointer-events-none">
+                      <avatarCreature.Component
+                        size={56}
+                        animated={false}
+                        title={`Su animal: ${avatarCreature.nombre}`}
+                      />
+                    </span>
                   )}
                 </div>
                 <button
@@ -589,6 +600,9 @@ export default function ProfileScreen({ onBack, onHome }) {
             </div>
 
             <BackgroundSelector />
+            {/* El animal del USUARIO (avatar propio, registro de creatures) —
+                distinto del avatar del agente IA de abajo. */}
+            <AvatarSelector />
             <AgentAvatarSelector />
 
             {/* Estilo de notificación (operador 2026-06-06 + 2026-06-11):

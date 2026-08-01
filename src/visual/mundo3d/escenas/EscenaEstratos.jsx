@@ -162,7 +162,7 @@ function Papa() {
         <meshLambertMaterial color="#6d9748" flatShading />
       </mesh>
       {[[-0.1, 0.3, 0.08], [0.14, 0.28, -0.05]].map((p, k) => (
-        <mesh key={k} position={p}>
+        <mesh key={k} position={/** @type {[number, number, number]} */ (p)}>
           <sphereGeometry args={[0.035, 5, 4]} />
           <meshLambertMaterial color="#d3c2e6" flatShading />
         </mesh>

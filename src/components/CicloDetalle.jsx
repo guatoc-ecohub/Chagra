@@ -197,7 +197,7 @@ export default function CicloDetalle({ cycle, altitudeM, onReload }) {
         catalogImage={species?.imagen || species?.image || species?.media?.image || species?.media || null}
       />
 
-      <FarmProcessSummary process={effectiveCycle} pestRisks={pestRisks} altitudeM={altitudeM} />
+      <FarmProcessSummary process={effectiveCycle} pestRisks={pestRisks} altitudeM={altitudeM} lastObservation={null} />
 
       {/* Etapa actual + confirmar cambio (stageConfirmationService) */}
       <section className="bg-slate-900 border border-slate-800 rounded-xl p-3">
@@ -292,7 +292,8 @@ export default function CicloDetalle({ cycle, altitudeM, onReload }) {
             Labores de esta etapa {urgent.length > 0 && <span className="text-amber-400">· {urgent.length} urgente(s)</span>}
           </h2>
           <ul className="flex flex-col gap-1.5">
-            {tasks.map((t, i) => {
+            {tasks.map((tItem, i) => {
+              const /** @type {any} */ t = tItem;
               const label = t.label || t.name || t.title || String(t);
               const done = !!doneTasks[label];
               return (

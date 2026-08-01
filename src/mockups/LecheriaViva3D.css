@@ -1,0 +1,261 @@
+/*
+ * LecheriaViva3D.css — vitrina del mundo de la cadena láctea
+ * (#/mockups/lecheria-viva-3d). Autocontenida: sin fuentes/imágenes externas.
+ * Móvil-first desde 320px. Paleta de potrero: verde de pasto, bruma clara, la
+ * crema del queso y el pardo del abono. Solo opacity/transform se animan.
+ */
+
+.lviva {
+  min-height: 100vh;
+  min-height: 100dvh;
+  padding: 1rem 0.9rem 2.5rem;
+  background: linear-gradient(180deg, #dfe6cd 0%, #e7e6c9 44%, #eee7cd 100%);
+  color: #2b3226;
+  font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+}
+
+.lviva__head {
+  max-width: 46rem;
+  margin: 0 auto 1rem;
+}
+.lviva__kicker {
+  margin: 0 0 0.2rem;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #5f7a30;
+}
+.lviva__head h1 {
+  margin: 0;
+  font-size: clamp(1.5rem, 5vw, 2.2rem);
+  line-height: 1.15;
+  color: #2e402e;
+}
+.lviva__lema {
+  margin: 0.4rem 0 0;
+  font-size: 0.98rem;
+  line-height: 1.45;
+  max-width: 40rem;
+}
+
+.lviva__escena {
+  max-width: 46rem;
+  margin: 0 auto;
+}
+.lviva__lienzo {
+  position: relative;
+  height: min(66vh, 32rem);
+  min-height: 320px;
+  border-radius: 14px;
+  overflow: hidden;
+  border: 1px solid rgba(95, 122, 48, 0.28);
+  box-shadow: 0 12px 30px rgba(44, 54, 40, 0.16);
+  background: radial-gradient(120% 90% at 50% 20%, #cadfc8 0%, #a6c09c 100%);
+}
+.lviva__lienzo canvas {
+  display: block;
+  width: 100% !important;
+  height: 100% !important;
+  touch-action: none;
+}
+.lecheria-canvas {
+  opacity: 0;
+  transition: opacity 0.6s ease;
+}
+.lecheria-canvas--lista {
+  opacity: 1;
+}
+
+.lviva__cargando {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  font-size: 0.9rem;
+  color: #3c4a38;
+  opacity: 0.85;
+}
+
+.lviva__barra {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin-top: 0.6rem;
+}
+.lviva__tier {
+  margin: 0;
+  font-size: 0.85rem;
+  opacity: 0.85;
+}
+.lviva__toggle {
+  border: 1.5px solid #5f7a30;
+  background: #fff;
+  color: #4f671f;
+  font-weight: 700;
+  font-size: 0.85rem;
+  padding: 0.45rem 0.9rem;
+  border-radius: 999px;
+  cursor: pointer;
+}
+.lviva__toggle:hover,
+.lviva__toggle:focus-visible {
+  background: #5f7a30;
+  color: #fff;
+  outline-offset: 2px;
+}
+
+/* ---- Ficha 2D (fallback digno, sin GPU) ---- */
+.lviva__ficha {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.3rem;
+  background: radial-gradient(120% 90% at 50% 25%, #cfdcc3 0%, #a2b393 100%);
+}
+.lviva__estampa {
+  position: relative;
+  width: 200px;
+  height: 175px;
+  margin-bottom: 0.4rem;
+}
+/* el árbol forrajero, detrás y más alto (el banco de sombra) */
+.lviva__arbol {
+  position: absolute;
+  top: 0;
+  left: 96px;
+  width: 118px;
+  height: 70px;
+  border-radius: 56% 44% 60% 40% / 70% 74% 26% 30%;
+  background: radial-gradient(circle at 42% 30%, #68a54877 0%, #4e8a3e 65%, #3a6c34 100%);
+  box-shadow: inset -8px -6px 14px rgba(0, 0, 0, 0.16);
+}
+.lviva__arbol-tronco {
+  position: absolute;
+  top: 56px;
+  left: 148px;
+  width: 13px;
+  height: 74px;
+  border-radius: 40%;
+  background: linear-gradient(90deg, #4f3c28 0%, #6a5c4a 55%, #4a3a26 100%);
+}
+/* la vaca al frente, cuerpo capsular con manchas */
+.lviva__vaca {
+  position: absolute;
+  bottom: 22px;
+  left: 20px;
+  width: 118px;
+  height: 66px;
+  border-radius: 44% 46% 42% 44% / 58% 58% 42% 42%;
+  background: radial-gradient(circle at 40% 34%, #ffffff 0%, #efe8dc 72%, #ddd4c4 100%);
+  box-shadow: inset -6px -6px 12px rgba(0, 0, 0, 0.12);
+}
+.lviva__vaca::after {
+  /* la ubre — la señal de la vaca de leche */
+  content: '';
+  position: absolute;
+  bottom: -8px;
+  left: 40px;
+  width: 22px;
+  height: 16px;
+  border-radius: 50% 50% 46% 46%;
+  background: #e7b6a6;
+}
+.lviva__vaca-mancha {
+  position: absolute;
+  border-radius: 48% 52% 46% 54%;
+  background: #2a241c;
+}
+.lviva__vaca-mancha--a { top: 10px; left: 22px; width: 30px; height: 24px; }
+.lviva__vaca-mancha--b { top: 26px; left: 66px; width: 24px; height: 20px; }
+.lviva__vaca-cabeza {
+  position: absolute;
+  top: 4px;
+  left: -14px;
+  width: 34px;
+  height: 30px;
+  border-radius: 50% 44% 46% 52%;
+  background: #efe8dc;
+  box-shadow: inset -3px -3px 6px rgba(0, 0, 0, 0.12);
+}
+/* la rueda de queso al pie */
+.lviva__queso {
+  position: absolute;
+  bottom: 6px;
+  left: 150px;
+  width: 40px;
+  height: 26px;
+  border-radius: 50% 50% 44% 44% / 60% 60% 40% 40%;
+  background: linear-gradient(180deg, #f7efd9 0%, #ecdcb2 100%);
+  box-shadow: inset -3px -3px 6px rgba(0, 0, 0, 0.14);
+}
+.lviva__ficha-nombre {
+  margin: 0;
+  font-weight: 800;
+  font-size: 1rem;
+  color: #2e402e;
+}
+.lviva__ficha-sub {
+  margin: 0;
+  font-size: 0.85rem;
+  color: #4c5a44;
+}
+
+/* ---- Saberes ---- */
+.lviva__saberes {
+  max-width: 46rem;
+  margin: 1.6rem auto 0;
+}
+.lviva__saberes h2 {
+  font-size: 1.15rem;
+  margin: 0 0 0.7rem;
+  color: #2e402e;
+}
+.lviva__saberes ol {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.6rem;
+}
+@media (min-width: 640px) {
+  .lviva__saberes ol {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+.lviva__saberes li {
+  display: flex;
+  gap: 0.65rem;
+  align-items: flex-start;
+  background: rgba(255, 255, 255, 0.7);
+  border: 1px solid rgba(95, 122, 48, 0.16);
+  border-radius: 12px;
+  padding: 0.7rem 0.8rem;
+}
+.lviva__emoji {
+  font-size: 1.4rem;
+  line-height: 1.2;
+}
+.lviva__saberes b {
+  display: block;
+  font-size: 0.92rem;
+  color: #2e402e;
+}
+.lviva__saberes li p {
+  margin: 0.15rem 0 0;
+  font-size: 0.86rem;
+  line-height: 1.42;
+}
+.lviva__cierre {
+  margin: 0.9rem 0 0;
+  font-size: 0.9rem;
+  line-height: 1.5;
+  color: #3c4a38;
+  max-width: 42rem;
+}

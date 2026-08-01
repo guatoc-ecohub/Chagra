@@ -112,7 +112,8 @@ export const SpeciesSelect = ({ value, onChange, onAutoFill, onPhoto }) => {
   // Se carga async desde catalogDB al mount; si tarda >2s o falla, queda
   // el legacy para no romper offline-first ni la UX del form.
   /** @type {Array<{id:string,name:string,groupId:string,groupLabel:string,nombre_comun?:string,nombre_cientifico?:string}>} */
-  const [allSpecies, setAllSpecies] = useState(LEGACY_SPECIES);
+  const typedSpecies = LEGACY_SPECIES;
+  const [allSpecies, setAllSpecies] = useState(typedSpecies);
   useEffect(() => {
     let cancelled = false;
     const timeoutId = setTimeout(() => {

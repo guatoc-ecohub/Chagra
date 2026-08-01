@@ -123,12 +123,12 @@ describe('glosarioCaucaService — normalizeUserInput', () => {
     });
 
     test('número → número', () => {
-      expect(normalizeUserInput(42)).toBe(42);
+      expect(normalizeUserInput(/** @type {any} */ (42))).toBe(42);
     });
 
     test('objeto → objeto', () => {
       const obj = { q: 'hola' };
-      expect(normalizeUserInput(obj)).toBe(obj);
+      expect(normalizeUserInput(/** @type {any} */ (obj))).toBe(obj);
     });
 
     test('string vacío → string vacío', () => {
@@ -455,12 +455,12 @@ describe('glosarioCaucaService — localizeAgentOutput', () => {
     });
 
     test('número → número', () => {
-      expect(localizeAgentOutput(42)).toBe(42);
+      expect(localizeAgentOutput(/** @type {any} */ (42))).toBe(42);
     });
 
     test('objeto → objeto', () => {
       const obj = { text: 'hola' };
-      expect(localizeAgentOutput(obj)).toBe(obj);
+      expect(localizeAgentOutput(/** @type {any} */ (obj))).toBe(obj);
     });
 
     test('string vacío → string vacío', () => {

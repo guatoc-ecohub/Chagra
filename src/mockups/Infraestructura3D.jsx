@@ -72,7 +72,7 @@ function useEnVista() {
 function LienzoInfra({ tipo, dims, tier, reducedMotion }) {
   const span = Math.max(dims.largo, dims.ancho, dims.alto);
   const d = span * 1.35 + 2.4;
-  const target = [0, dims.alto * 0.42, 0];
+  const target = /** @type {[number, number, number]} */ ([0, dims.alto * 0.42, 0]);
   return (
     <Canvas
       className="vinf__canvas"
@@ -92,7 +92,7 @@ function LienzoInfra({ tipo, dims, tier, reducedMotion }) {
         <meshLambertMaterial color="#b49873" />
       </mesh>
       <Suspense fallback={null}>
-        <Infraestructura tipo={tipo} dims={dims} tier={tier} reducedMotion={reducedMotion} />
+        <Infraestructura tipo={tipo} dims={dims} params={{}} tier={tier} reducedMotion={reducedMotion} />
       </Suspense>
       <OrbitControls
         target={target}

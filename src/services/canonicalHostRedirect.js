@@ -48,8 +48,18 @@ export function isPreviewHost(hostname) {
   );
 }
 
+export function isProdAppHost(hostname) {
+  // prod.chagra.app = ambiente 3D-first (build app-3d), NO debe redirigir al canónico.
+  return normalizeHostname(hostname) === 'prod.chagra.app';
+}
+
 export function isAllowedHost(hostname) {
-  return isCanonicalHost(hostname) || isLocalDevHost(hostname) || isPreviewHost(hostname);
+  return (
+    isCanonicalHost(hostname) ||
+    isLocalDevHost(hostname) ||
+    isPreviewHost(hostname) ||
+    isProdAppHost(hostname)
+  );
 }
 
 /**

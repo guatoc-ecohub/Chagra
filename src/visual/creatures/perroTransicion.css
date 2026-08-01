@@ -1,0 +1,254 @@
+/* ═══════════════════════════════════════════════════════════════════════════
+   EL CRUCE 3D ↔ 2D DE LOS PERROS GUARDIANES (PerroTransicion.jsx) y la forma
+   héroe (PerroHeroe.jsx) — EL MOMENTO de Dante y Oliver.
+
+   Overlay DOM puro sobre el canvas del valle (cero three en el bundle base).
+   Todo transform/opacity (+ drop-shadow estático); pointer-events: none.
+   Los INSTANTES internos de cada keyframe están calzados con las constantes
+   de PerroTransicion.jsx (una sola fuente de tiempo por timer; el CSS solo
+   dibuja lo que el timer ya decidió):
+
+     heroe  (1150ms): 40%  = PERRO_APAGA_3D_MS  (460ms — el flash pica, el
+                            mesh se apaga SECO, brota el héroe)
+     normal (760ms):  63%  = PERRO_RENACE_3D_MS (480ms — la figura muere
+                            SECA, renace el perrito 3D)
+
+   Archivo propio (no creatures.css): la escena viaja completa en su hoja.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.perro-cruce {
+  position: absolute;
+  inset: 0;
+  z-index: 45; /* sobre canvas y miga, bajo el velo del viaje del host */
+  overflow: hidden;
+  pointer-events: none;
+}
+
+/* El punto del cruce: ancla 0×0 donde el mesh y el dibujo se relevan. El
+   host la coloca con --px/--py (idealmente la proyección en pantalla del
+   perro 3D). El flex de caja 0×0 centra al hijo exacto sobre el punto. */
+.perro-cruce__pos {
+  position: absolute;
+  left: var(--px, 50%);
+  top: var(--py, 60%);
+  width: 0;
+  height: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ── EL DESTELLO del aura (la anticipación del cruce) ─────────────────────
+   Disco radial del color de poder del perro (cobalto Oliver / canela Dante)
+   que HINCHA sobre el perro 3D y pica justo en el swap. */
+.perro-cruce__destello {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 132px;
+  height: 132px;
+  border-radius: 50%;
+  background: radial-gradient(circle, var(--aura-color, #ffd54a) 0%, transparent 62%);
+  transform: translate(-50%, -50%) scale(0.15);
+  opacity: 0;
+  will-change: transform, opacity;
+}
+
+/* ── El anillo del swap (calca del puff de la abeja): revienta en el
+   instante EXACTO del cambio de capa. El delay lo pone inline el componente
+   (delayMs + APAGA/RENACE) — aquí solo la forma. */
+.perro-cruce__puff {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  border: 3px solid var(--aura-color, #ffd54a);
+  transform: translate(-50%, -50%) scale(0.2);
+  opacity: 0;
+  will-change: transform, opacity;
+  animation: perro-cruce-puff 0.32s ease-out both;
+}
+@keyframes perro-cruce-puff {
+  0%   { transform: translate(-50%, -50%) scale(0.25); opacity: 0.9; }
+  100% { transform: translate(-50%, -50%) scale(1.5); opacity: 0; }
+}
+
+.perro-cruce__figura {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  will-change: transform, opacity;
+  filter: drop-shadow(0 8px 16px rgba(15, 25, 12, 0.35));
+}
+
+/* ── A HÉROE (3D→2D): destello hincha → pica al 40% (460ms) → del flash
+   BROTA el héroe más grande, con overshoot elástico de rubber-hose (nace
+   chiquito estirado, pasa de largo, asienta). La opacidad ARRANCA seca en el
+   swap — antes del 40% el único dibujo es el destello (el perro sigue siendo
+   el mesh 3D). ─────────────────────────────────────────────────────────── */
+.perro-cruce--heroe .perro-cruce__destello {
+  animation: perro-cruce-destello-h 1.15s ease-out both;
+}
+@keyframes perro-cruce-destello-h {
+  0%   { transform: translate(-50%, -50%) scale(0.15); opacity: 0; }
+  14%  { opacity: 0.35; }                                             /* empieza a hervir */
+  36%  { transform: translate(-50%, -50%) scale(0.92); opacity: 0.9; }
+  40%  { transform: translate(-50%, -50%) scale(1.1); opacity: 1; }   /* ¡pica! (el swap) */
+  72%  { transform: translate(-50%, -50%) scale(1.7); opacity: 0; }
+  100% { transform: translate(-50%, -50%) scale(1.7); opacity: 0; }
+}
+.perro-cruce--heroe .perro-cruce__figura {
+  animation: perro-cruce-heroe-nace 1.15s cubic-bezier(0.45, 0, 0.55, 1) both;
+}
+@keyframes perro-cruce-heroe-nace {
+  0%, 39.9% { transform: scale(0.24) translateY(8%); opacity: 0; }    /* aún es el mesh */
+  40%  { transform: scale(0.3) translateY(6%) rotate(-6deg); opacity: 1; } /* brota del flash */
+  58%  { transform: scale(1.14) translateY(-4%) rotate(2.5deg); }     /* overshoot: pasa de largo */
+  74%  { transform: scale(0.95) translateY(1%) rotate(-1deg); }       /* rebote de goma */
+  100% { transform: scale(1) translateY(0) rotate(0deg); opacity: 1; } /* héroe plantado */
+}
+
+/* ── A NORMAL (2D→3D): el reverso digno — el héroe se RECOGE (la venia del
+   trabajo cumplido), se encoge hacia el punto del renacer y muere SECO al
+   63% (480ms), donde la señal ya encendió el perrito 3D. El destello lo
+   recoge y se disuelve. ───────────────────────────────────────────────── */
+.perro-cruce--normal .perro-cruce__figura {
+  animation: perro-cruce-heroe-parte 0.76s cubic-bezier(0.5, 0, 0.7, 1) both;
+}
+@keyframes perro-cruce-heroe-parte {
+  0%   { transform: scale(1) translateY(0); opacity: 1; }
+  30%  { transform: scale(1.06, 0.9) translateY(2%); }                /* se recoge: la venia */
+  62%  { transform: scale(0.26) translateY(4%); opacity: 1; }
+  63%  { transform: scale(0.25) translateY(4%); opacity: 0; }         /* SECO: renace el 3D */
+  100% { transform: scale(0.2) translateY(4%); opacity: 0; }
+}
+.perro-cruce--normal .perro-cruce__destello {
+  animation: perro-cruce-destello-n 0.76s ease-in both;
+}
+@keyframes perro-cruce-destello-n {
+  0%   { transform: translate(-50%, -50%) scale(0.3); opacity: 0; }
+  45%  { opacity: 0.5; }
+  62%  { transform: translate(-50%, -50%) scale(1); opacity: 0.95; }  /* recoge la figura */
+  100% { transform: translate(-50%, -50%) scale(1.55); opacity: 0; }
+}
+
+/* ── Gama baja: queda el SWAP (posición + timing son lo que empalma) con
+   fundido simple — sin destello, sin puff, sin overshoot. ──────────────── */
+.perro-cruce[data-tier='bajo'] .perro-cruce__destello,
+.perro-cruce[data-tier='bajo'] .perro-cruce__puff {
+  animation: none;
+  opacity: 0;
+}
+.perro-cruce--heroe[data-tier='bajo'] .perro-cruce__figura {
+  animation-name: perro-cruce-heroe-nace-simple;
+  animation-timing-function: ease-out;
+}
+@keyframes perro-cruce-heroe-nace-simple {
+  0%, 39.9% { transform: scale(0.6); opacity: 0; }
+  40%  { transform: scale(0.7); opacity: 1; }
+  100% { transform: scale(1); opacity: 1; }
+}
+.perro-cruce--normal[data-tier='bajo'] .perro-cruce__figura {
+  animation-name: perro-cruce-heroe-parte-simple;
+  animation-timing-function: ease-in;
+}
+@keyframes perro-cruce-heroe-parte-simple {
+  0%   { transform: scale(1); opacity: 1; }
+  62%  { transform: scale(0.55); opacity: 1; }
+  63%  { transform: scale(0.55); opacity: 0; }
+  100% { transform: scale(0.5); opacity: 0; }
+}
+
+/* RM defensivo: el que monta ya lo salta (PerroTransicion devuelve null con
+   reducedMotion y dispara la señal al instante); si llega montado igual,
+   aquí no se dibuja nada. */
+@media (prefers-reduced-motion: reduce) {
+  .perro-cruce { display: none; }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   LA FORMA HÉROE EN GUARDIA (PerroHeroe.jsx) — los gestos del guardián.
+   Todos de AVISO y arreo, jamás de ataque: el cuerpo embiste al ladrar (en
+   el sitio), señala inclinándose al monte, barre de lado a lado arreando y
+   respira orgulloso vigilando. `--mira` (1|-1) voltea hacia el monte.
+   ═══════════════════════════════════════════════════════════════════════════ */
+.perro-heroe {
+  position: absolute;
+  left: var(--px, 50%);
+  top: var(--py, 60%);
+  width: 0;
+  height: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 44; /* justo bajo el overlay de cruce: el relevo no pelea capas */
+  pointer-events: none;
+}
+.perro-heroe__cuerpo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  will-change: transform;
+  filter: drop-shadow(0 8px 16px rgba(15, 25, 12, 0.35))
+    drop-shadow(0 0 14px var(--aura-color, #ffd54a));
+}
+
+/* LADRA — embestidas cortas EN EL SITIO: coge aire (se echa atrás con
+   squash), suelta el ¡guau! (adelanta el cuerpo con stretch) y recula. La
+   boca la pone el visema V4 pulsado por timer (PerroHeroe.jsx). */
+.perro-heroe--ladra .perro-heroe__cuerpo {
+  animation: perro-heroe-ladra 0.42s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+@keyframes perro-heroe-ladra {
+  0%   { transform: translateX(0) rotate(0deg) scale(1, 1); }
+  22%  { transform: translateX(calc(var(--mira, 1) * -3%)) rotate(calc(var(--mira, 1) * 2deg)) scale(1.03, 0.95); }  /* coge aire */
+  46%  { transform: translateX(calc(var(--mira, 1) * 5%)) rotate(calc(var(--mira, 1) * -4deg)) scale(0.97, 1.05); }  /* ¡guau! */
+  64%  { transform: translateX(calc(var(--mira, 1) * 1.5%)) rotate(0deg) scale(1, 1); }
+  100% { transform: translateX(0) rotate(0deg) scale(1, 1); }
+}
+
+/* SEÑALA — la pose 'señala' del kit hace el brazo; el wrapper sostiene la
+   inclinación hacia el monte (estática: un gesto sostenido, no un tic). */
+.perro-heroe--senala .perro-heroe__cuerpo {
+  transform: rotate(calc(var(--mira, 1) * -3deg));
+}
+
+/* ARREA — barridos laterales amplios del perro que cierra el rebaño,
+   inclinándose en cada viraje (el peso del giro). */
+.perro-heroe--arrea .perro-heroe__cuerpo {
+  animation: perro-heroe-arrea 1.7s ease-in-out infinite;
+}
+@keyframes perro-heroe-arrea {
+  0%   { transform: translateX(-14%) rotate(3deg); }
+  10%  { transform: translateX(-11%) rotate(4deg) scale(0.98, 1.02); } /* apura el viraje */
+  50%  { transform: translateX(14%) rotate(-3deg); }
+  60%  { transform: translateX(11%) rotate(-4deg) scale(0.98, 1.02); }
+  100% { transform: translateX(-14%) rotate(3deg); }
+}
+
+/* VIGILA — quieto y sereno: respiración orgullosa, nada más. El depredador
+   pasa y se le respeta con la mirada. */
+.perro-heroe--vigila .perro-heroe__cuerpo {
+  animation: perro-heroe-vigila 3.2s ease-in-out infinite;
+}
+@keyframes perro-heroe-vigila {
+  0%, 100% { transform: scale(1); }
+  50%      { transform: scale(1.025, 1.035); }
+}
+
+/* Gama baja: gestos del wrapper apagados (queda el héroe plantado con su
+   pose del kit — fotograma digno; el SVG ya poda lo suyo por tier). */
+.perro-heroe[data-tier='bajo'] .perro-heroe__cuerpo {
+  animation: none;
+  transform: none;
+}
+
+/* RM: el héroe se queda (la historia se cuenta), pero quieto. */
+@media (prefers-reduced-motion: reduce) {
+  .perro-heroe__cuerpo {
+    animation: none !important;
+    transform: none !important;
+  }
+}

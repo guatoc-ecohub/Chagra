@@ -447,7 +447,7 @@ export function interpretarCromatografia(observaciones) {
   }
 
   // Generar mensaje
-  const mensaje = generarMensajeCampesino(estado, patrones);
+  const mensaje = generarMensajeCampesino(/** @type {EstadoSuelo} */ (estado), patrones);
 
   // Calcular confianza
   const confianza = calcularConfianza(observaciones, puntaje);
@@ -461,13 +461,13 @@ export function interpretarCromatografia(observaciones) {
       ? 'Esta interpretación tiene baja confianza. La cromatografía es cualitativa y depende de las condiciones del ensayo. Compare con otros suelos de su finca para mejor juicio.'
       : '';
 
-  return {
+  return /** @type {any} */ ({
     estado,
     mensaje,
     razones,
     confianza,
     advertencia,
-  };
+  });
 }
 
 /**
@@ -564,11 +564,11 @@ export function crearObservacionDesdeRaw(rawData) {
     }
   }
 
-  return {
+  return /** @type {any} */ ({
     zona: zonaNormalizada,
     colores: coloresNormalizados,
     descripcion: rawData.descripcion || '',
-  };
+  });
 }
 
 /**

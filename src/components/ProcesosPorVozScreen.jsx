@@ -110,6 +110,7 @@ export default function ProcesosPorVozScreen({ onBack, onSave }) {
       const built = buildDraftsFromVoice({
         transcription: text,
         entities: enriched || [],
+        processType: 'seeding',
         resolveLocation,
         resolveCrop,
       });

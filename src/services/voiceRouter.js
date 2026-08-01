@@ -85,7 +85,7 @@ const str = (v) => (typeof v === 'string' ? v.trim() : '');
  * Llama al NLU del sidecar y devuelve el objeto parseado, o null si falla
  * (offline, timeout, JSON inválido). Nunca lanza.
  */
-async function callNlu(text, { onToken } = {}) {
+async function callNlu(text, { onToken } = /** @type {any} */ ({})) {
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), TIMEOUT_MS);
   try {

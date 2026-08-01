@@ -1,6 +1,7 @@
 import useThemeBackgroundStore, {
   getBackgroundById,
   getBackgroundSrc,
+  esGradiente,
 } from '../../store/useThemeBackgroundStore';
 
 /**
@@ -26,7 +27,7 @@ export default function SelectedBackgroundReveal() {
     <section className="paisaje-reveal" aria-label={`Tu paisaje: ${bg.label}`}>
       <div
         className="paisaje-photo"
-        style={{ backgroundImage: `url('${src}')` }}
+        style={{ backgroundImage: esGradiente(src) ? src : `url('${src}')` }}
         aria-hidden="true"
       />
       <div className="paisaje-scrim" aria-hidden="true" />

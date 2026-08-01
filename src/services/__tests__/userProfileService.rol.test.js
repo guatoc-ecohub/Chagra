@@ -20,12 +20,12 @@ import {
 describe('userProfileService.rol — preguntas por perfil', () => {
   beforeEach(() => {
     const store = new Map();
-    global.localStorage = {
+    global.localStorage = /** @type {any} */ ({
       getItem: vi.fn((key) => store.get(key) || null),
       setItem: vi.fn((key, value) => store.set(key, value)),
       removeItem: vi.fn((key) => store.delete(key)),
       clear: vi.fn(() => store.clear()),
-    };
+    });
   });
 
   it('la pregunta de rol existe y es de opción única con los roles de producto', () => {
@@ -137,12 +137,12 @@ describe('userProfileService.rol — preguntas por perfil', () => {
 describe('userProfileService.rol — buildUserProfileBlock incluye datos nuevos', () => {
   beforeEach(() => {
     const store = new Map();
-    global.localStorage = {
+    global.localStorage = /** @type {any} */ ({
       getItem: vi.fn((key) => store.get(key) || null),
       setItem: vi.fn((key, value) => store.set(key, value)),
       removeItem: vi.fn((key) => store.delete(key)),
       clear: vi.fn(() => store.clear()),
-    };
+    });
   });
 
   it('inyecta rol, animales y manejo de gallinas en el contexto del agente', () => {

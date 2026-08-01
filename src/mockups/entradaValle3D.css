@@ -175,6 +175,39 @@
   transition: transform 0.25s ease; /* voltea hacia donde vuela */
   transform-origin: center;
 }
+/* Angelita TOCABLE (rediseño §6): el billboard central es un botón de verdad
+   — brilla cálido e invita a tocar (tocarla = hablarle a la finca). El brillo
+   es de la ESCENA (este wrapper), no del personaje. */
+.valle-abeja--toque {
+  pointer-events: auto;
+  cursor: pointer;
+  background: none;
+  border: none;
+  padding: 0;
+  margin: 0;
+  font: inherit;
+  /* En CALMA la abeja NO brilla: el dorado permanente no significaba nada y
+     cansaba la vista (feedback del operador). Ahora el brillo tiene PROPÓSITO. */
+  filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.4));
+}
+/* EL DORADO SIGNIFICA ALGO: Angelita se enciende cuando TIENE ALGO QUE DECIRLE
+   — husmeó algo en la finca, hay un aviso, o está celebrando. Cuando calla,
+   se apaga. Así el brillo es información, no ruido. */
+.valle-abeja--toque[data-angelita='husmea'],
+.valle-abeja--toque[data-angelita='aviso'],
+.valle-abeja--toque[data-angelita='celebra'] {
+  animation: valle-abeja-brilla 3.4s ease-in-out infinite;
+}
+@keyframes valle-abeja-brilla {
+  0%, 100% {
+    filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.4))
+      drop-shadow(0 0 10px rgba(255, 214, 140, 0.45));
+  }
+  50% {
+    filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.4))
+      drop-shadow(0 0 18px rgba(255, 222, 150, 0.8));
+  }
+}
 
 /* ── Criaturas sembradas por el valle (colibrí, mariposas, escarabajo,
       lombriz): billboards reusados de la librería de fauna. Decorativas: no
@@ -185,8 +218,9 @@
   will-change: transform;
 }
 
-/* ── El compañero como TARJETA puntual (imagen-first, una sola línea) ──
-      El ser al que se cuida vive también en el DOM: su cara refleja el ánimo. */
+/* ── La BURBUJA DE VOZ de Angelita (solo texto, mientras habla) ──
+      La abeja vive en la ESCENA del valle — una sola. Este chip es su voz
+      escrita (aria-live): aparece con lo dicho y se va solo. */
 .valle-companero {
   position: absolute;
   left: 1.1rem;
@@ -196,7 +230,7 @@
   align-items: center;
   gap: 0.5rem;
   max-width: min(74vw, 22rem);
-  padding: 0.35rem 0.8rem 0.35rem 0.4rem;
+  padding: 0.45rem 0.85rem;
   border: 1px solid rgba(255, 255, 255, 0.16);
   border-radius: 999px;
   background: rgba(15, 24, 30, 0.7);
@@ -271,7 +305,7 @@
 .valle-companero--mundo {
   z-index: 35;
   bottom: 4.9rem;
-  padding: 0.3rem 0.75rem 0.3rem 0.4rem;
+  padding: 0.4rem 0.8rem;
   background: rgba(15, 24, 30, 0.62);
 }
 
@@ -395,6 +429,10 @@
   cursor: pointer;
 }
 .valle-ghost:hover { background: rgba(255, 255, 255, 0.1); }
+
+/* (El panel de LA CASA con el mapa de los 6 portales se retiró — fix del
+   operador 2026-07-16: la casa es vía SECUNDARIA a la ventana de los mundos
+   y los portales-paisaje del valle son la entrada principal.) */
 
 /* ── Barra del agente (abajo, fija) ── */
 .valle-agente {
@@ -582,6 +620,12 @@
   .valle2d__cam,
   .valle2d__abeja,
   .valle-abeja__cara { transition: none; }
+  /* Angelita tocable en calma: brillo fijo digno, sin pulso. */
+  .valle-abeja--toque {
+    animation: none;
+    filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.4))
+      drop-shadow(0 0 12px rgba(255, 214, 140, 0.5));
+  }
 }
 
 @media (max-width: 560px) {

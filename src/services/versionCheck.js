@@ -51,6 +51,7 @@ import { unregisterRegisteredServiceWorker } from './swRegistration';
  */
 /* global __BUILD_SHA__ */
 export const RUNNING_BUILD_SHA =
+  // @ts-expect-error __BUILD_SHA__ defined at build time by Vite
   typeof __BUILD_SHA__ !== 'undefined' ? __BUILD_SHA__ : 'dev';
 
 export const SELF_HEAL_GUARD_KEY = 'chagra:self-heal-reloaded';

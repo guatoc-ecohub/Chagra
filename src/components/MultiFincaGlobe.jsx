@@ -151,7 +151,7 @@ export const MultiFincaGlobe = ({ onSelect }) => {
                 >
                     <TileLayer
                         url="https://{s}.tile.osm.org/{z}/{x}/{y}.png"
-                        attribution='&copy; OpenStreetMap contributors'
+                        attribution='&copy; <a href="https://osm.org/copyright">OSM</a>'
                     />
                     <MapEntryFlyTo phase={entryPhase} />
                     {fincas.map((finca) => {

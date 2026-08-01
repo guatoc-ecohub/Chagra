@@ -1,6 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { ScreenShell } from '../components/common/ScreenShell';
 import { ScanEye, ShieldAlert, Sparkles, Info, Camera, Leaf } from 'lucide-react';
+import {
+    FOTO_DIAGNOSTICO_CAFE,
+    HALLAZGOS_DIAGNOSTICO_CAFE,
+} from './diagnosticoFotoData.js';
 import './diagnostico-sobre-foto.css';
 
 /**
@@ -23,30 +27,6 @@ import './diagnostico-sobre-foto.css';
  * lesión — coordenadas calibradas contra la foto real. Como la caja
  * conserva la proporción, los círculos siguen siendo círculos a 320px.
  */
-
-const FOTO = '/plaga-images/hemileia_vastatrix.jpg';
-
-// Hallazgos de MUESTRA. cx/cy/r en el espacio de la foto (900×675),
-// calibrados sobre las lesiones reales.
-const HALLAZGOS = [
-    {
-        n: 1,
-        sev: 'alta',
-        cx: 508, cy: 292, r: 92,
-        chip: 'Aquí: la roya',
-        titulo: 'El polvillo naranja',
-        detalle:
-            'Por debajo de la hoja ya se ve el polvillo naranja: ahí la roya está soltando espora. Es lo más avanzado de esta hoja.',
-    },
-    {
-        n: 2,
-        sev: 'temprana',
-        cx: 662, cy: 428, r: 54,
-        titulo: 'Manchitas nuevas',
-        detalle:
-            'Unos focos más pequeños y amarillentos, apenas empezando. Por ahí es que se le va regando si no le pone cuidado.',
-    },
-];
 
 function Marcador({ h }) {
     const badgeX = h.cx + h.r * 0.72;
@@ -90,8 +70,8 @@ export default function DiagnosticoSobreFoto({ onBack }) {
     }, [phase]);
 
     // Ancla del chip (marcador 1) en porcentaje, para que siga a la foto.
-    const chipLeft = `${(HALLAZGOS[0].cx / 900) * 100}%`;
-    const chipTop = `${((HALLAZGOS[0].cy - HALLAZGOS[0].r) / 675) * 100}%`;
+    const chipLeft = `${(HALLAZGOS_DIAGNOSTICO_CAFE[0].cx / 900) * 100}%`;
+    const chipTop = `${((HALLAZGOS_DIAGNOSTICO_CAFE[0].cy - HALLAZGOS_DIAGNOSTICO_CAFE[0].r) / 675) * 100}%`;
 
     return (
         <ScreenShell
@@ -120,7 +100,7 @@ export default function DiagnosticoSobreFoto({ onBack }) {
                     <figure className="dx-stage" data-phase={phase}>
                         <img
                             className="dx-photo"
-                            src={FOTO}
+                            src={FOTO_DIAGNOSTICO_CAFE}
                             width="900"
                             height="675"
                             alt="Hoja de café sostenida en la mano, con manchas de polvillo naranja de roya por el envés."
@@ -138,7 +118,7 @@ export default function DiagnosticoSobreFoto({ onBack }) {
                             preserveAspectRatio="none"
                             aria-hidden
                         >
-                            {HALLAZGOS.map((h) => <Marcador key={h.n} h={h} />)}
+                            {HALLAZGOS_DIAGNOSTICO_CAFE.map((h) => <Marcador key={h.n} h={h} />)}
                         </svg>
 
                         {/* etiqueta flotante del hallazgo principal */}
@@ -147,7 +127,7 @@ export default function DiagnosticoSobreFoto({ onBack }) {
                             style={{ left: chipLeft, top: chipTop }}
                         >
                             <span className="dx-chip-num">1</span>
-                            {HALLAZGOS[0].chip}
+                            {HALLAZGOS_DIAGNOSTICO_CAFE[0].chip}
                         </figcaption>
 
                         {/* estado del agente sobre la foto */}
@@ -186,7 +166,7 @@ export default function DiagnosticoSobreFoto({ onBack }) {
 
                         {/* hallazgos numerados = las marcas de la foto */}
                         <ul className="dx-finds">
-                            {HALLAZGOS.map((h) => (
+                            {HALLAZGOS_DIAGNOSTICO_CAFE.map((h) => (
                                 <li key={h.n} className="dx-find" data-sev={h.sev}>
                                     <span className="dx-find-num">{h.n}</span>
                                     <div>

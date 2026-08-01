@@ -1,7 +1,10 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 
 const { fetchWithAuthRetry } = vi.hoisted(() => ({
-  fetchWithAuthRetry: vi.fn((...args) => globalThis.fetch(...args)),
+  fetchWithAuthRetry: vi.fn((...args) => {
+    const a = /** @type {[RequestInfo | URL, RequestInit?]} */ (args);
+    return globalThis.fetch(a[0], a[1]);
+  }),
 }));
 
 vi.mock('../apiService.js', () => ({
@@ -29,7 +32,10 @@ beforeEach(() => {
   clearFeedbackQueue();
   setOnline(true);
   fetchWithAuthRetry.mockClear();
-  fetchWithAuthRetry.mockImplementation((...args) => globalThis.fetch(...args));
+  fetchWithAuthRetry.mockImplementation((...args) => {
+    const a = /** @type {[RequestInfo | URL, RequestInit?]} */ (args);
+    return globalThis.fetch(a[0], a[1]);
+  });
 });
 
 afterEach(() => {

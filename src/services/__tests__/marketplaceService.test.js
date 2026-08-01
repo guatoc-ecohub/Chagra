@@ -19,7 +19,7 @@ describe('formatearCOP', () => {
     expect(formatearCOP(null)).toBeNull();
     expect(formatearCOP(0)).toBeNull();
     expect(formatearCOP(-5)).toBeNull();
-    expect(formatearCOP('abc')).toBeNull();
+    expect(formatearCOP(/** @type {any} */ ('abc'))).toBeNull();
     expect(formatearCOP(undefined)).toBeNull();
   });
 });

@@ -61,7 +61,7 @@ describe('UX-13 — urban land types', () => {
       expect(isUrbanLandType(null)).toBe(false);
       expect(isUrbanLandType(undefined)).toBe(false);
       expect(isUrbanLandType('')).toBe(false);
-      expect(isUrbanLandType(42)).toBe(false);
+      expect(isUrbanLandType(/** @type {any} */ (42))).toBe(false);
     });
   });
 });

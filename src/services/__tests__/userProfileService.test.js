@@ -300,7 +300,7 @@ describe('resolveAltitudToSave — coalesce no-destructivo (#1213-regresion)', (
     });
 
     it('un valor inválido cae al default sin corromper el perfil', () => {
-      setNotificationStyle('xyz');
+      setNotificationStyle(/** @type {any} */ ('xyz'));
       expect(getNotificationStyle()).toBe('demo');
       expect(getProfile().estilo_notificacion).toBe('demo');
     });

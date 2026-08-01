@@ -23,12 +23,12 @@ import { selectSceneVariant, SCENE_KINDS } from '../fincaSceneProfileSelector.js
 describe('estructura de finca (#34) — getters tipados', () => {
   beforeEach(() => {
     const store = new Map();
-    global.localStorage = {
+    global.localStorage = /** @type {any} */ ({
       getItem: vi.fn((key) => store.get(key) || null),
       setItem: vi.fn((key, value) => store.set(key, value)),
       removeItem: vi.fn((key) => store.delete(key)),
       clear: vi.fn(() => store.clear()),
-    };
+    });
   });
 
   describe('getInvernaderoEstructura', () => {

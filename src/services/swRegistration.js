@@ -233,8 +233,8 @@ export function registerServiceWorker(opts = {}) {
 
     // Esperar a que el SW esté activo antes de registrar background sync.
     navigator.serviceWorker.ready.then((registration) => {
-      if (registration.sync) {
-        registration.sync.register('sync-pending-transactions').catch((e) => {
+      if (/** @type {any} */ (registration).sync) {
+        /** @type {any} */ (registration).sync.register('sync-pending-transactions').catch((e) => {
           console.warn('Background Sync no disponible:', e.message);
         });
       }

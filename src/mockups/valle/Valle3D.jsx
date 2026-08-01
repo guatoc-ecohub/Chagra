@@ -23,20 +23,27 @@
 /* Nota: las props de three (position, args, intensity, castShadow, etc.) son
    válidas en el reconciliador de R3F, no en el DOM — el config de ESLint del
    repo no activa react/no-unknown-property, así que no requieren disable. */
-import { Suspense, useMemo, useRef, useState } from 'react';
-import { Canvas, useFrame } from '@react-three/fiber';
+import { Suspense, useEffect, useMemo, useRef, useState } from 'react';
+import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import {
   Html, Float, Stars, OrbitControls, Detailed, Instances, Instance,
 } from '@react-three/drei';
 import * as THREE from 'three';
 import { perfilDeTier } from '../../visual/mundo3d/deviceTier.js';
 import CamaraDirector from '../../visual/mundo3d/escenas/CamaraDirector.jsx';
+import DirectorValle from './DirectorValle.jsx';
 import MonitorRendimiento, {
   detectarTierInicial,
   presupuestoDeTier,
   useTierPerformance,
 } from '../../visual/mundo3d/usePerformanceMonitor.jsx';
 import { AbejaAngelita } from '../../visual/creatures/AbejaAngelita.jsx';
+/* EL CEREBRO DE ANGELITA (auditoría 2026-07-18: estaba construido y
+   DESCONECTADO — ningún componente vivo lo consumía). La abeja del valle
+   (CompaneroAbeja) lo usa para husmear con criterio: comentarios grounded
+   por mundo, con la anti-molestia (cooldowns) resuelta adentro del store. */
+import useAngelitaStore from '../../store/useAngelitaStore';
+import BurbujaAngelita from '../../visual/agente/BurbujaAngelita';
 /* La CAPA DE ESTADO de Angelita (auditoría §5b): módulo puro, sin three — el
    mismo repertorio (mojada/sed/comiendo/vuelo) que usan los mundos 3D. */
 import { reaccionDeFinca, ESTADO_FINCA_MUESTRA } from '../../visual/mundo3d/escenas/reaccionFinca.js';
@@ -44,16 +51,115 @@ import { Colibri } from '../../visual/creatures/Colibri.jsx';
 import { Mariposa } from '../../visual/creatures/Mariposa.jsx';
 import { Escarabajo } from '../../visual/creatures/Escarabajo.jsx';
 import { Lombriz } from '../../visual/creatures/Lombriz.jsx';
-import AnimalesDeFinca from './animales.jsx';
+import AnimalesDeFinca, { MATERIAL_FINCA } from './animales.jsx';
+/* AoE ("Age of Empires del campo"): componentes NUEVOS que densifican y dan
+   vida al valle (cada uno instanciado, draw calls acotados). */
+import LluviaValle from '../../visual/mundo3d/atmosfera/clima/LluviaValle.jsx';
+import NieblaLadera from '../../visual/mundo3d/atmosfera/clima/NieblaLadera.jsx';
+import HeladaValle from '../../visual/mundo3d/atmosfera/clima/HeladaValle.jsx';
+import BosqueDensoValle from './BosqueDensoValle.jsx';
+import CafetalDensoValle from './CafetalDensoValle.jsx';
+import ParamoDensoValle from './ParamoDensoValle.jsx';
+import LaderaAltaValle from './LaderaAltaValle.jsx';
+import ArrieriaValle from './ArrieriaValle.jsx';
+import AguaVivaValle from './AguaVivaValle.jsx';
+import DetalleSueloValle from './DetalleSueloValle.jsx';
+import { CampesinosValle } from './CampesinosValle.jsx';
+import HatoMovil from './HatoMovil.jsx';
+/* Árboles POR ESPECIE (no genéricos): las mismas mallas del bosque altoandino
+   (roble, aliso, gaque) que ya viven en floraParamo — cada árbol se distingue. */
+import { geomRoble, geomAliso, geomGaque } from '../../visual/mundo3d/bosque/floraParamo.geom.js';
+/* Luciérnagas de la noche: el kit instanciado que ya existe (1-3 draw calls),
+   sembrado sobre la tierra baja del valle cuando la franja las trae. */
+import { ParticulasAmbientales } from '../../visual/mundo3d/ParticulasAmbientales.jsx';
+/* Duración canónica de la transición entre franjas (misma que CielosHora). */
+import { TRANSICION } from '../../visual/mundo3d/cielosHoraData.js';
+/* LA DIRECCIÓN del valle (capa de composición sobre valleData): la casa-ancla,
+   los senderos del trajín, los patios de tierra pisada, los vecinos (los
+   personajes en su casa) y la disposición COMPUESTA de los lugares. La ley
+   vive como datos en visual/mundo3d/direccion; las piezas r3f, al lado. */
+import {
+  componerMundos,
+  CASA_VALLE,
+  JERARQUIA_PERSONAJES,
+} from '../../visual/mundo3d/direccion/composicionValle.js';
+import {
+  CasaCampesina,
+  VentanasVivas,
+  PorticosSecundarios,
+  SenderosValle,
+  PatiosLugares,
+  VecinosDelValle,
+  OsoNegroDelMonte,
+} from './composicionValle3D.jsx';
+/* El cóndor de los Andes planeando su térmica sobre el páramo: el vecino de
+   AIRE del valle (billboard SVG, un solo <Html>, matemática O(1)/frame). */
+import CondorBillboard from '../../visual/mundo3d/CondorBillboard.jsx';
+/* La silueta biopunk del cóndor (pase de criaturas): la usa el rato en que
+   se POSA en el pico de la cordillera — el vigía alterna vuelo y percha. */
+import { CriaturaNocturnaAvatar } from '../../components/dashboard/CriaturasNocturnas.jsx';
+/* El ANCLAJE: la sombra de contacto bajo cada landmark (casa, lugares,
+   árboles, matas, vecinos) — sin ella los objetos flotan sobre la loma.
+   2 draw calls instanciados, textura radial pre-horneada, cero costo/frame. */
+import SombrasContacto from './SombrasContacto.jsx';
 import './rotulosValle3D.css';
 import {
   MUNDOS_VALLE,
-  MUNDO_VALLE_BY_ID,
   COSA_DEL_DIA,
   CLIMAS,
   PISOS_TERMICOS,
   VEGETACION_PISOS,
 } from './valleData';
+
+/* ── Los mundos YA COMPUESTOS: la disposición del director encima de los
+      datos crudos. valleData no se toca (otros frentes viven ahí); aquí la
+      escena entera consume ESTA lista — geometría, rótulos, faro y foco. ── */
+const MUNDOS_DIR = componerMundos(MUNDOS_VALLE);
+const MUNDO_DIR_BY_ID = Object.fromEntries(MUNDOS_DIR.map((m) => [m.id, m]));
+
+/* ── EL VOCABULARIO DE ANGELITA (auditoría 2026-07-18): los lugares del
+      valle (valleData.js LUGARES) tienen SU PROPIO id ('cafe', 'cultivos',
+      'micorrizas'…); el motor (angelitaInteligencia.MUNDOS) habla en un
+      vocabulario más ancho ('mis_matas', 'mis_animales', 'clima', 'vender',
+      'aprender', 'bosque', 'paramo', 'finca'). Esta tabla traduce uno al
+      otro para que `comentarioDeMundo`/`entrarMundo` sepan qué decir de
+      cada lugar tocado. */
+const LUGAR_A_MUNDO_ANGELITA = {
+  cultivos: 'mis_matas',
+  cafe: 'mis_matas',
+  suelo: 'mis_matas',
+  sanidad: 'mis_matas',
+  semillero: 'mis_matas',
+  abono: 'mis_matas',
+  micorrizas: 'bosque',
+  animales: 'mis_animales',
+  agua: 'clima',
+  clima: 'clima',
+  mercado: 'vender',
+  disenio: 'bosque',
+  aprender: 'aprender',
+  paramo: 'paramo',
+};
+
+/* Los 6 lugares que Angelita husmea SOLA en reposo — los mismos 6 portales
+   principales (PORTALES_VALLE en composicionValle.js): rotan uno a la vez,
+   espaciados por HUSMEO_MS; el propio store (cooldown de 20 min por mundo)
+   decide si de verdad vale la pena interrumpir. Nunca a mitad de un viaje
+   real, nunca con reduced-motion. */
+const HUSMEO_LUGARES = ['cultivos', 'animales', 'clima', 'mercado', 'aprender', 'disenio'];
+const HUSMEO_PRIMERO_MS = 4200; // el primer husmeo llega pronto: se ve viva al cargar
+const HUSMEO_CADA_MS = 13000; // cadencia entre husmeos (feedback operador: 40s se sentía MUERTA; 13s = viva sin ser errática)
+const HUSMEO_VISIBLE_MS = 7000; // piso: ningún aviso dura menos que esto
+/* Cuánto se queda un aviso en pantalla: lo que tarda la máquina de escribir en
+   ponerlo (≈16 ms por letra) MÁS el tiempo de leerlo con calma (≈70 ms por
+   letra ≈ 170 palabras por minuto, ritmo cómodo para una niña o alguien que
+   lee despacio). Un aviso corto se va rápido; uno largo espera. Techo de 16 s
+   para que Angelita no se quede pegada. */
+function duracionAviso(mensaje) {
+  const n = String(mensaje || '').length;
+  if (!n) return HUSMEO_VISIBLE_MS;
+  return Math.min(16000, Math.max(HUSMEO_VISIBLE_MS, Math.round(n * 16 + n * 70 + 1200)));
+}
 
 /* Altura del terreno por (x,z): la LADERA ANDINA. El eje z es la montaña — al
    fondo (z negativo) trepa al páramo alto, al frente (z positivo) baja a tierra
@@ -77,7 +183,10 @@ const _centrosPiso = PISOS_TERMICOS.map((p) => ({
   color: new THREE.Color(p.color),
   cresta: new THREE.Color(p.cresta),
 }));
-const _colNoche = new THREE.Color('#1f3a2c');
+/* La noche del cine es AZUL, no negra (día por noche): el suelo se enfría
+   hacia un azul-luna y solo 45% — las franjas de pisos térmicos siguen
+   leyéndose como bandas de altitud, apagadas pero presentes. */
+const _colNoche = new THREE.Color('#2c4560');
 
 function colorSueloEnZ(z, alto, nocturno, out) {
   // Buscar los dos centros de piso que rodean a z e interpolar.
@@ -98,7 +207,7 @@ function colorSueloEnZ(z, alto, nocturno, out) {
   out.copy(lo.color).lerp(hi.color, t);
   // Relieve: las crestas más claras; los vallecitos, el color base.
   out.lerp(lo.cresta.clone().lerp(hi.cresta, t), THREE.MathUtils.clamp(alto, 0, 1) * 0.35);
-  if (nocturno) out.lerp(_colNoche, 0.62);
+  if (nocturno) out.lerp(_colNoche, 0.56);
   return out;
 }
 
@@ -153,6 +262,33 @@ const PICOS_CORDILLERA = [
   { x: 12, z: -15, h: 6, r: 4.5, base: 4.0 },
 ];
 
+/* LA SEGUNDA CORDILLERA (perspectiva aérea — la escala se SIENTE, no se
+   informa): otra cadena más lejos y más alta, asomando POR ENTRE los picos
+   cercanos. Vive dentro del fog de la escena, que hace el trabajo de la
+   atmósfera real: en el mediodía claro (nieblaLejos 44) se lee como un
+   fantasma azulado; en el amanecer brumoso desaparece — como las cordilleras
+   de verdad, que aparecen y se van con el aire del día. Los Andes no son una
+   loma: son cadenas detrás de cadenas. 1 draw call instanciado. */
+const PICOS_LEJANOS = [
+  { x: -16, z: -22, h: 10, r: 7.5, base: 3.2 },
+  { x: -6.5, z: -24, h: 12.5, r: 9, base: 3.2 },
+  { x: 2, z: -23, h: 11, r: 8, base: 3.2 },
+  { x: 9.5, z: -24, h: 12, r: 8.5, base: 3.2 },
+  { x: 17, z: -22, h: 9, r: 7, base: 3.2 },
+];
+
+function PicosLejanos({ color }) {
+  return (
+    <Instances limit={PICOS_LEJANOS.length}>
+      <coneGeometry args={[1, 1, 5]} />
+      <meshLambertMaterial color={color} opacity={0.85} transparent />
+      {PICOS_LEJANOS.map((p, i) => (
+        <Instance key={i} position={[p.x, p.base + p.h / 2, p.z]} scale={[p.r, p.h, p.r]} />
+      ))}
+    </Instances>
+  );
+}
+
 function Cordillera({ color, innerRef, perfil }) {
   if (!perfil.materialRico) {
     // Frugal: los 4 picos en UNA InstancedMesh (1 draw call) — un cono unidad
@@ -166,6 +302,7 @@ function Cordillera({ color, innerRef, perfil }) {
             <Instance key={i} position={[p.x, p.base + p.h / 2, p.z]} scale={[p.r, p.h, p.r]} />
           ))}
         </Instances>
+        <PicosLejanos color={color} />
       </group>
     );
   }
@@ -177,12 +314,16 @@ function Cordillera({ color, innerRef, perfil }) {
           <meshStandardMaterial color={color} flatShading roughness={1} opacity={0.92} transparent />
         </mesh>
       ))}
+      <PicosLejanos color={color} />
     </group>
   );
 }
 
-/* ── La quebrada: una cinta de agua que serpentea por el cauce. ── */
-function Quebrada({ color, viva, perfil }) {
+/* ── La quebrada: una cinta de agua que serpentea por el cauce. De noche es
+      LO QUE MÁS BRILLA del suelo (el reflejo de la luna sobre el agua, la
+      firma del día-por-noche): emissive tenue que además guía el ojo ladera
+      abajo — el agua se vuelve el sendero luminoso del valle dormido. ── */
+function Quebrada({ color, viva, perfil, nocturno = false }) {
   const ref = useRef(null);
   useFrame((state) => {
     // `ref` apunta al material (no al mesh): animar su opacidad directamente.
@@ -213,63 +354,198 @@ function Quebrada({ color, viva, perfil }) {
         <meshStandardMaterial
           ref={ref}
           color={color}
+          emissive={nocturno ? '#3f6f9e' : '#000000'}
+          emissiveIntensity={nocturno ? 0.42 : 0}
           transparent
           opacity={0.78}
           roughness={0.25}
           metalness={0.35}
         />
       ) : (
-        <meshLambertMaterial ref={ref} color={color} transparent opacity={0.78} />
+        <meshLambertMaterial
+          ref={ref}
+          color={color}
+          emissive={nocturno ? '#3f6f9e' : '#000000'}
+          emissiveIntensity={nocturno ? 0.42 : 0}
+          transparent
+          opacity={0.78}
+        />
       )}
     </mesh>
   );
 }
 
+/* ── La arboleda POR ESPECIE del landmark 'bosque': roble andino (copa ancha
+      oscura), aliso (cónico de tronco claro) y gaque (domo bajo lustroso) —
+      cada árbol se distingue, nada de conos genéricos. Las mallas son las de
+      floraParamo (color horneado por vértice, 1 draw call por árbol); escala
+      ~0.5 para el diorama. `q` baja el detalle en perfil frugal. ── */
+const SITIOS_ARBOLEDA = [
+  // (El monte del portal "toda mi finca" se espesó: 5 árboles, 3 especies —
+  //  dosel multiespecie, no un parche de conos.)
+  { geom: geomRoble, args: [-0.6, 0, 0.15], esc: 0.55, rot: 0.8, seed: 91 },
+  { geom: geomAliso, args: [0.5, 0, -0.4], esc: 0.5, rot: 2.1, seed: 92 },
+  { geom: geomGaque, args: [0.2, 0, 0.6], esc: 0.55, rot: 4.4, seed: 93 },
+  { geom: geomRoble, args: [0.85, 0, 0.45], esc: 0.42, rot: 3.3, seed: 94 },
+  { geom: geomAliso, args: [-0.35, 0, -0.7], esc: 0.44, rot: 5.2, seed: 95 },
+];
+
+function ArboledaEspecies({ q }) {
+  const arboles = useMemo(
+    () => SITIOS_ARBOLEDA.map((s) => ({ ...s, geo: s.geom({ q }, s.seed) })),
+    [q],
+  );
+  return (
+    <group>
+      {arboles.map((a, i) => (
+        <mesh
+          key={i}
+          geometry={a.geo}
+          material={MATERIAL_FINCA}
+          position={/** @type {[number, number, number]} */ (a.args)}
+          rotation={[0, a.rot, 0]}
+          scale={a.esc}
+          castShadow
+        />
+      ))}
+    </group>
+  );
+}
+
 /* ── Materiales/paletas de cada landmark de mundo, por `tipo`. Formas
       redondeadas (cilindros, conos, esferas) — pocas piezas por lugar para
-      dejar aire. ── */
-function LandmarkGeom({ tipo, tinte, reducedMotion }) {
+      dejar aire. La arboleda va por especie (mallas de floraParamo); `q` baja
+      el detalle geométrico en perfil frugal. ── */
+function LandmarkGeom({ tipo, tinte, reducedMotion, q = 1 }) {
   const [fuerte, suave] = tinte;
   switch (tipo) {
-    case 'milpa': // maíz: cañas altas con penacho + hojas
+    case 'milpa': // LA PARCELA VIVA (estilo granja de Age of Empires, en modo
+      // milpa): la tierra labrada como base, y encima las TRES HERMANAS
+      // juntas — maíz (caña con penacho), fríjol (bejuco enroscado a la
+      // caña) y calabaza (frutos naranjas con su hoja ancha tapando el
+      // suelo). Se lee POLICULTIVO de un vistazo: nada de hileras clonadas.
       return (
         <group>
-          {[-0.42, 0.05, 0.42].map((dx, i) => (
-            <group key={i} position={[dx, 0, (i % 2) * 0.36 - 0.18]}>
-              <mesh position={[0, 0.7, 0]} castShadow>
-                <cylinderGeometry args={[0.05, 0.08, 1.4, 6]} />
+          {/* la tierra labrada de la parcela (la "granja" que se lee de lejos) */}
+          <mesh position={[0, 0.045, 0]} receiveShadow>
+            <boxGeometry args={[2.1, 0.09, 1.7]} />
+            <meshStandardMaterial color="#5f4429" flatShading roughness={1} />
+          </mesh>
+          {/* surcos suaves (dos lomos que cruzan la parcela) */}
+          {[-0.45, 0.35].map((dz, i) => (
+            <mesh key={i} position={[0, 0.09, dz]} rotation={[0, 0, Math.PI / 2]}>
+              <capsuleGeometry args={[0.06, 1.85, 3, 6]} />
+              <meshStandardMaterial color="#6b4e30" flatShading roughness={1} />
+            </mesh>
+          ))}
+          {/* el maíz con su fríjol trepado (quincunce, alturas variadas) */}
+          {[
+            [-0.75, -0.5, 1.35], [-0.1, -0.25, 1.5], [0.6, -0.55, 1.25],
+            [-0.45, 0.25, 1.45], [0.3, 0.4, 1.3],
+          ].map(([dx, dz, h], i) => (
+            <group key={i} position={[dx, 0.08, dz]}>
+              <mesh position={[0, h / 2, 0]} castShadow>
+                <cylinderGeometry args={[0.045, 0.075, h, 6]} />
                 <meshStandardMaterial color={fuerte} flatShading roughness={1} />
               </mesh>
-              {/* hojas: conos aplanados que salen de la caña */}
-              <mesh position={[0.16, 0.9, 0]} rotation={[0, 0, -0.7]} scale={[1, 1, 0.3]}>
-                <coneGeometry args={[0.12, 0.5, 4]} />
+              {/* hojas de la caña */}
+              <mesh position={[0.15, h * 0.62, 0]} rotation={[0, 0, -0.7]} scale={[1, 1, 0.3]}>
+                <coneGeometry args={[0.11, 0.46, 4]} />
                 <meshStandardMaterial color={suave} flatShading roughness={1} />
               </mesh>
-              <mesh position={[-0.16, 0.62, 0]} rotation={[0, Math.PI, -0.7]} scale={[1, 1, 0.3]}>
-                <coneGeometry args={[0.12, 0.5, 4]} />
+              <mesh position={[-0.15, h * 0.44, 0]} rotation={[0, Math.PI, -0.7]} scale={[1, 1, 0.3]}>
+                <coneGeometry args={[0.11, 0.46, 4]} />
                 <meshStandardMaterial color={suave} flatShading roughness={1} />
               </mesh>
-              <mesh position={[0, 1.5, 0]}>
-                <coneGeometry args={[0.08, 0.42, 6]} />
+              {/* el penacho */}
+              <mesh position={[0, h + 0.16, 0]}>
+                <coneGeometry args={[0.07, 0.36, 6]} />
                 <meshStandardMaterial color="#e7c96b" flatShading />
+              </mesh>
+              {/* el FRÍJOL enroscado a la caña (dos vueltas del bejuco) */}
+              <mesh position={[0, h * 0.3, 0]} rotation={[Math.PI / 2.3, 0, 0.2]}>
+                <torusGeometry args={[0.1, 0.028, 5, 10]} />
+                <meshStandardMaterial color="#2f6b34" flatShading roughness={1} />
+              </mesh>
+              <mesh position={[0.02, h * 0.55, 0]} rotation={[Math.PI / 1.9, 0, -0.3]}>
+                <torusGeometry args={[0.09, 0.026, 5, 10]} />
+                <meshStandardMaterial color="#2f6b34" flatShading roughness={1} />
+              </mesh>
+            </group>
+          ))}
+          {/* las CALABAZAS tapando el suelo entre matas (fruto + hoja ancha) */}
+          {[[-0.55, 0.75], [0.15, 0.85], [0.75, 0.1], [-0.85, 0.05]].map(([dx, dz], i) => (
+            <group key={i} position={[dx, 0.09, dz]}>
+              <mesh position={[0, 0.09, 0]} scale={[1, 0.72, 1]} castShadow>
+                <sphereGeometry args={[0.14, 9, 7]} />
+                <meshStandardMaterial color="#d98e2b" flatShading roughness={1} />
+              </mesh>
+              <mesh position={[0, 0.16, 0]}>
+                <cylinderGeometry args={[0.018, 0.025, 0.07, 5]} />
+                <meshStandardMaterial color="#4f7a3a" flatShading />
+              </mesh>
+              {/* la hoja ancha que cubre el suelo */}
+              <mesh position={[0.18, 0.06, 0.1]} rotation={[-Math.PI / 2.2, 0, 0.6]} scale={[1, 1, 0.5]}>
+                <circleGeometry args={[0.16, 7]} />
+                <meshStandardMaterial color={suave} flatShading roughness={1} side={2} />
               </mesh>
             </group>
           ))}
         </group>
       );
-    case 'cafetal': // arbustos redondos con frutos, en la ladera
+    case 'cafetal': // café CON SOMBRÍO (policultivo, no hilera): los arbustos
+      // cargados de cereza roja DEBAJO de su guamo de sombra y con una mata
+      // de plátano al lado — el trío clásico del cafetal campesino.
       return (
         <group>
-          {[-0.5, 0.1, 0.55].map((dx, i) => (
-            <group key={i} position={[dx, 0, (i % 2) * 0.42]}>
+          {/* el GUAMO de sombrío: tronco alto + copa ancha y plana encima */}
+          <group position={[-0.15, 0, -0.1]}>
+            <mesh position={[0, 0.8, 0]} castShadow>
+              <cylinderGeometry args={[0.07, 0.1, 1.6, 6]} />
+              <meshStandardMaterial color="#6b4a2e" flatShading roughness={1} />
+            </mesh>
+            <mesh position={[0, 1.7, 0]} scale={[1, 0.34, 1]} castShadow>
+              <sphereGeometry args={[1.05, 10, 8]} />
+              <meshStandardMaterial color="#3f7a38" flatShading roughness={1} />
+            </mesh>
+          </group>
+          {/* la mata de plátano acompañante (pseudotallo + hojas colgantes) */}
+          <group position={[0.85, 0, -0.45]}>
+            <mesh position={[0, 0.5, 0]} castShadow>
+              <cylinderGeometry args={[0.08, 0.12, 1.0, 7]} />
+              <meshStandardMaterial color="#7a9a55" flatShading roughness={1} />
+            </mesh>
+            {[0, 1, 2, 3].map((k) => (
+              <mesh
+                key={k}
+                position={[0, 0.95, 0]}
+                rotation={[0, (k / 4) * Math.PI * 2 + 0.4, -0.9]}
+                scale={[1, 1, 0.28]}
+                castShadow
+              >
+                <coneGeometry args={[0.2, 0.85, 4]} />
+                <meshStandardMaterial color="#4f9a44" flatShading roughness={1} />
+              </mesh>
+            ))}
+          </group>
+          {/* los arbustos de café bajo la sombra, con su cereza roja */}
+          {[[-0.6, 0.35], [0.05, 0.15], [0.5, 0.55], [-0.2, 0.7]].map(([dx, dz], i) => (
+            <group key={i} position={[dx, 0, dz]}>
               <mesh position={[0, 0.16, 0]}>
                 <cylinderGeometry args={[0.05, 0.07, 0.32, 6]} />
                 <meshStandardMaterial color="#6b4a2e" flatShading />
               </mesh>
               <mesh position={[0, 0.44, 0]} castShadow>
-                <sphereGeometry args={[0.32, 10, 9]} />
+                <sphereGeometry args={[0.3, 10, 9]} />
                 <meshStandardMaterial color={fuerte} flatShading roughness={1} />
               </mesh>
+              {/* la cereza madura que pinta el arbusto */}
+              {[[0.16, 0.5, 0.16], [-0.14, 0.42, 0.18], [0.05, 0.6, -0.2]].map(([bx, by, bz], j) => (
+                <mesh key={j} position={[bx, by, bz]}>
+                  <sphereGeometry args={[0.035, 6, 5]} />
+                  <meshBasicMaterial color="#c9392e" />
+                </mesh>
+              ))}
             </group>
           ))}
         </group>
@@ -311,7 +587,7 @@ function LandmarkGeom({ tipo, tinte, reducedMotion }) {
         </group>
       );
     case 'animales': // los animales de la finca (reemplaza la vieja casita)
-      return <AnimalesDeFinca reducedMotion={reducedMotion} />;
+      return <AnimalesDeFinca reducedMotion={reducedMotion} q={q} />;
     case 'huerta': // camas de la huerta: lomos redondeados con matas
       return (
         <group>
@@ -331,40 +607,8 @@ function LandmarkGeom({ tipo, tinte, reducedMotion }) {
           ))}
         </group>
       );
-    case 'bosque': // arboleda: troncos + copas cónicas Y esféricas mezcladas
-      return (
-        <group>
-          {[
-            [-0.5, 0, 0.95, 'cono'],
-            [0.45, 0.2, 1.2, 'esfera'],
-            [0.05, -0.45, 0.85, 'cono'],
-          ].map(([dx, dz, h, forma], i) => (
-            <group key={i} position={[Number(dx), 0, Number(dz)]}>
-              <mesh position={[0, Number(h) * 0.35, 0]} castShadow>
-                <cylinderGeometry args={[0.08, 0.12, Number(h) * 0.7, 6]} />
-                <meshStandardMaterial color="#6b4a2e" flatShading />
-              </mesh>
-              {forma === 'cono' ? (
-                <mesh position={[0, Number(h) * 0.85, 0]} castShadow>
-                  <coneGeometry args={[0.46, Number(h) * 0.95, 8]} />
-                  <meshStandardMaterial color={fuerte} flatShading roughness={1} />
-                </mesh>
-              ) : (
-                <group position={[0, Number(h) * 0.85, 0]}>
-                  <mesh castShadow>
-                    <sphereGeometry args={[0.42, 10, 9]} />
-                    <meshStandardMaterial color={fuerte} flatShading roughness={1} />
-                  </mesh>
-                  <mesh position={[0.22, 0.18, 0.1]} castShadow>
-                    <sphereGeometry args={[0.26, 9, 8]} />
-                    <meshStandardMaterial color={suave} flatShading roughness={1} />
-                  </mesh>
-                </group>
-              )}
-            </group>
-          ))}
-        </group>
-      );
+    case 'bosque': // arboleda POR ESPECIE: roble andino + aliso + gaque
+      return <ArboledaEspecies q={q} />;
     case 'mercado': // puesto de mercado campesino: toldo a dos aguas + mesa + canasto
       return (
         <group>
@@ -399,32 +643,281 @@ function LandmarkGeom({ tipo, tinte, reducedMotion }) {
       );
     case 'veleta': // poste con veleta que gira con el viento
       return <Veleta color={fuerte} reducedMotion={reducedMotion} />;
-    case 'semillero': // túnel de media-sombra del vivero: arcos + techo traslúcido + bandeja
+    case 'invernadero': // el MICRO-MUNDO del semillero: un invernadero de
+      // verdad — arcos de madera, el plástico traslúcido que brilla al sol,
+      // la puerta abierta y las mesas de germinación adentro. Se destaca
+      // como pieza propia del valle: la fábrica de la matica.
       return (
         <group>
           {/* los arcos del túnel (medio-toroide de pie), en tono madera */}
-          {[-0.42, 0, 0.42].map((dz, i) => (
+          {[-0.65, -0.22, 0.22, 0.65].map((dz, i) => (
             <mesh key={i} position={[0, 0, dz]}>
-              <torusGeometry args={[0.5, 0.028, 6, 18, Math.PI]} />
+              <torusGeometry args={[0.62, 0.03, 6, 18, Math.PI]} />
               <meshStandardMaterial color="#8a6a44" flatShading roughness={1} />
             </mesh>
           ))}
-          {/* el techo de media-sombra (traslúcido) que cubre los arcos */}
+          {/* la cumbrera que amarra los arcos */}
+          <mesh position={[0, 0.62, 0]} rotation={[Math.PI / 2, 0, 0]}>
+            <cylinderGeometry args={[0.025, 0.025, 1.5, 5]} />
+            <meshStandardMaterial color="#8a6a44" flatShading roughness={1} />
+          </mesh>
+          {/* EL PLÁSTICO: la piel traslúcida que hace invernadero (brilla
+              apenas — de lejos se lee el blanco lechoso característico) */}
           <mesh position={[0, 0, 0]} rotation={[Math.PI / 2, 0, 0]}>
-            <cylinderGeometry args={[0.5, 0.5, 1.0, 16, 1, true, Math.PI, Math.PI]} />
-            <meshStandardMaterial color={suave} transparent opacity={0.4} side={2} roughness={1} />
+            <cylinderGeometry args={[0.63, 0.63, 1.44, 16, 1, true, Math.PI, Math.PI]} />
+            <meshStandardMaterial
+              color="#eef7f2"
+              emissive="#dff0e8"
+              emissiveIntensity={0.12}
+              transparent
+              opacity={0.34}
+              side={2}
+              roughness={0.6}
+            />
           </mesh>
-          {/* la bandeja germinadora adentro, con sus brotecitos */}
-          <mesh position={[0, 0.12, 0]}>
-            <boxGeometry args={[0.5, 0.08, 0.6]} />
-            <meshStandardMaterial color="#5a4326" flatShading roughness={1} />
+          {/* el testero trasero cerrado y el delantero con PUERTA abierta */}
+          <mesh position={[0, 0, -0.72]}>
+            <circleGeometry args={[0.62, 16, 0, Math.PI]} />
+            <meshStandardMaterial color="#eef7f2" transparent opacity={0.3} side={2} roughness={0.6} />
           </mesh>
-          {[[-0.14, -0.18], [0.02, 0], [0.16, 0.2], [-0.06, 0.22], [0.1, -0.2]].map(([bx, bz], i) => (
-            <mesh key={i} position={[bx, 0.24, bz]}>
-              <coneGeometry args={[0.045, 0.16, 5]} />
+          <mesh position={[-0.3, 0, 0.72]}>
+            <circleGeometry args={[0.62, 16, Math.PI / 2, Math.PI / 2]} />
+            <meshStandardMaterial color="#eef7f2" transparent opacity={0.3} side={2} roughness={0.6} />
+          </mesh>
+          {/* las DOS mesas de germinación con sus brotecitos en fila viva */}
+          {[-0.26, 0.26].map((dx, i) => (
+            <group key={i} position={[dx, 0, 0]}>
+              <mesh position={[0, 0.18, 0]}>
+                <boxGeometry args={[0.34, 0.05, 1.2]} />
+                <meshStandardMaterial color="#5a4326" flatShading roughness={1} />
+              </mesh>
+              {[-0.42, -0.14, 0.14, 0.42].map((bz, j) => (
+                <mesh key={j} position={[(j % 2) * 0.1 - 0.05, 0.27, bz]}>
+                  <coneGeometry args={[0.05, 0.15, 5]} />
+                  <meshStandardMaterial color={fuerte} flatShading roughness={1} />
+                </mesh>
+              ))}
+            </group>
+          ))}
+          {/* el barril de agua junto a la puerta (el riego del vivero) */}
+          <mesh position={[0.62, 0.14, 0.78]} castShadow>
+            <cylinderGeometry args={[0.11, 0.12, 0.28, 9]} />
+            <meshStandardMaterial color={suave} flatShading roughness={1} />
+          </mesh>
+        </group>
+      );
+    case 'compost': // LA BIOFÁBRICA: la pila de compost con apariencia de tal
+      // — el cajón de madera en U, la pila humeante por capas (estiércol
+      // abajo, material fresco, la capa de paja encima) y la horqueta
+      // clavada. El ciclo estiércol→abono, legible.
+      return (
+        <group>
+          {/* el cajón de madera en U que contiene la pila */}
+          {[
+            { p: [0, 0.16, -0.5], s: [1.15, 0.32, 0.08] },
+            { p: [-0.56, 0.16, -0.05], s: [0.08, 0.32, 0.95] },
+            { p: [0.56, 0.16, -0.05], s: [0.08, 0.32, 0.95] },
+          ].map((w, i) => (
+            <mesh key={i} position={/** @type {any} */ (w.p)} castShadow>
+              <boxGeometry args={/** @type {any} */ (w.s)} />
+              <meshStandardMaterial color="#7a5a38" flatShading roughness={1} />
+            </mesh>
+          ))}
+          {/* la PILA por capas: estiércol oscuro, compost pardo, paja clara */}
+          <mesh position={[0, 0.14, -0.05]} scale={[1, 0.5, 0.9]} castShadow>
+            <sphereGeometry args={[0.48, 10, 8]} />
+            <meshStandardMaterial color="#3d2b1a" flatShading roughness={1} />
+          </mesh>
+          <mesh position={[0, 0.28, -0.05]} scale={[0.82, 0.45, 0.72]}>
+            <sphereGeometry args={[0.48, 10, 8]} />
+            <meshStandardMaterial color="#5f4429" flatShading roughness={1} />
+          </mesh>
+          <mesh position={[0, 0.4, -0.05]} scale={[0.6, 0.35, 0.52]}>
+            <sphereGeometry args={[0.48, 9, 7]} />
+            <meshStandardMaterial color="#c9a55a" flatShading roughness={1} />
+          </mesh>
+          {/* el vaho tibio de la pila trabajando (dos motas traslúcidas) */}
+          <mesh position={[0.08, 0.68, -0.05]}>
+            <sphereGeometry args={[0.09, 7, 6]} />
+            <meshBasicMaterial color="#f2efe4" transparent opacity={0.32} depthWrite={false} />
+          </mesh>
+          <mesh position={[-0.06, 0.84, 0.02]}>
+            <sphereGeometry args={[0.06, 7, 6]} />
+            <meshBasicMaterial color="#f2efe4" transparent opacity={0.22} depthWrite={false} />
+          </mesh>
+          {/* la horqueta clavada en la pila (aquí se trabaja) */}
+          <mesh position={[0.42, 0.42, 0.32]} rotation={[0.5, 0, -0.35]}>
+            <cylinderGeometry args={[0.022, 0.026, 0.8, 5]} />
+            <meshStandardMaterial color="#8a6a44" flatShading roughness={1} />
+          </mesh>
+          {/* la carretilla del viaje potrero→pila (cajón + rueda) */}
+          <group position={[-0.55, 0, 0.55]} rotation={[0, 0.8, 0]}>
+            <mesh position={[0, 0.18, 0]} castShadow>
+              <boxGeometry args={[0.34, 0.14, 0.22]} />
+              <meshStandardMaterial color={fuerte} flatShading roughness={1} />
+            </mesh>
+            <mesh position={[0.16, 0.09, 0]} rotation={[0, 0, Math.PI / 2]}>
+              <cylinderGeometry args={[0.08, 0.08, 0.04, 10]} />
+              <meshStandardMaterial color="#4a3a2a" flatShading roughness={1} />
+            </mesh>
+          </group>
+          {/* LAS CANECAS AZULES DE BIOPREPARADOS sobre su estiba: la seña
+              inconfundible de la biofábrica — el caldo trabajando en sus
+              tanques (nada más en el valle es azul plástico). */}
+          <group position={[0.78, 0, 0.42]} rotation={[0, -0.35, 0]}>
+            {/* la estiba de madera (tarima + dos travesaños que asoman) */}
+            <mesh position={[0, 0.05, 0]} castShadow>
+              <boxGeometry args={[0.66, 0.045, 0.52]} />
+              <meshStandardMaterial color="#8a6a44" flatShading roughness={1} />
+            </mesh>
+            {[-0.2, 0.2].map((dz, i) => (
+              <mesh key={i} position={[0, 0.015, dz]}>
+                <boxGeometry args={[0.7, 0.03, 0.09]} />
+                <meshStandardMaterial color="#6b4a2e" flatShading roughness={1} />
+              </mesh>
+            ))}
+            {/* la caneca grande con su tapa y la mediana */}
+            <mesh position={[-0.16, 0.29, -0.04]} castShadow>
+              <cylinderGeometry args={[0.13, 0.13, 0.42, 9]} />
+              <meshStandardMaterial color="#2f6fa8" flatShading roughness={0.8} />
+            </mesh>
+            <mesh position={[-0.16, 0.52, -0.04]}>
+              <cylinderGeometry args={[0.135, 0.135, 0.035, 9]} />
+              <meshStandardMaterial color="#1f4d78" flatShading roughness={0.8} />
+            </mesh>
+            <mesh position={[0.15, 0.23, 0.05]} castShadow>
+              <cylinderGeometry args={[0.1, 0.1, 0.3, 9]} />
+              <meshStandardMaterial color="#3a86b8" flatShading roughness={0.8} />
+            </mesh>
+            {/* los tarros del biopreparado listos para el lote (en fila) */}
+            {[-0.02, 0.12, 0.26].map((dx, i) => (
+              <mesh key={i} position={[dx, 0.12, 0.28]}>
+                <cylinderGeometry args={[0.045, 0.045, 0.13, 7]} />
+                <meshStandardMaterial color="#e8e0cf" flatShading roughness={1} />
+              </mesh>
+            ))}
+          </group>
+        </group>
+      );
+    case 'saber': // el KIOSCO DEL SABER (portal Aprender): el tablero bajo su
+      // techito de paja, la banca de tronco y el libro abierto — la escuelita
+      // de vereda donde la finca enseña y se juega.
+      return (
+        <group>
+          {/* los dos parales y el techito de paja a un agua */}
+          {[-0.5, 0.5].map((dx, i) => (
+            <mesh key={i} position={[dx, 0.55, -0.15]} castShadow>
+              <cylinderGeometry args={[0.04, 0.05, 1.1, 6]} />
+              <meshStandardMaterial color="#8a6a44" flatShading roughness={1} />
+            </mesh>
+          ))}
+          <mesh position={[0, 1.14, -0.05]} rotation={[0.28, 0, 0]} castShadow>
+            <boxGeometry args={[1.3, 0.07, 0.75]} />
+            <meshStandardMaterial color="#c9a55a" flatShading roughness={1} />
+          </mesh>
+          {/* EL TABLERO verde de escuela, colgado entre los parales */}
+          <mesh position={[0, 0.62, -0.14]}>
+            <boxGeometry args={[0.86, 0.5, 0.05]} />
+            <meshStandardMaterial color="#2e5941" flatShading roughness={1} />
+          </mesh>
+          {/* las tres rayitas de tiza del tablero (la lección de hoy) */}
+          {[0.74, 0.62, 0.5].map((y, i) => (
+            <mesh key={i} position={[i * 0.06 - 0.1, y, -0.11]}>
+              <boxGeometry args={[0.42 - i * 0.1, 0.022, 0.01]} />
+              <meshBasicMaterial color="#f2efe4" />
+            </mesh>
+          ))}
+          {/* la banca de tronco donde se sienta el que aprende */}
+          <mesh position={[0.05, 0.12, 0.55]} rotation={[0, 0.2, Math.PI / 2]} castShadow>
+            <cylinderGeometry args={[0.09, 0.09, 0.9, 8]} />
+            <meshStandardMaterial color="#7a5a38" flatShading roughness={1} />
+          </mesh>
+          {/* el libro abierto sobre la banca (dos tapitas en V) */}
+          <group position={[0.15, 0.24, 0.55]} rotation={[0, -0.4, 0]}>
+            <mesh position={[-0.06, 0, 0]} rotation={[0, 0, 0.5]}>
+              <boxGeometry args={[0.14, 0.015, 0.18]} />
+              <meshStandardMaterial color="#f2efe4" flatShading />
+            </mesh>
+            <mesh position={[0.06, 0, 0]} rotation={[0, 0, -0.5]}>
+              <boxGeometry args={[0.14, 0.015, 0.18]} />
+              <meshStandardMaterial color="#f2efe4" flatShading />
+            </mesh>
+          </group>
+        </group>
+      );
+    case 'frailejonal': // LA PUERTA DEL PÁRAMO: el frailejonal con su niebla
+      // fría — la seña del alto (coherente con MundoParamo3D: frailejones,
+      // piedra y bruma). Tocar aquí sube al mundo del páramo.
+      return (
+        <group>
+          {/* el grupito de frailejones (roseta plateada sobre tronco lanudo) */}
+          {[[-0.5, 0.22, 1], [0.2, -0.3, 0.85], [0.55, 0.35, 0.7], [-0.05, 0.5, 0.6]].map(([x, z, s], i) => (
+            <group key={i} position={[x, 0, z]} scale={s}>
+              <mesh position={[0, 0.45, 0]} castShadow>
+                <cylinderGeometry args={[0.11, 0.14, 0.9, 7]} />
+                <meshStandardMaterial color="#6e6a52" flatShading roughness={1} />
+              </mesh>
+              <mesh position={[0, 0.98, 0]} scale={[1, 0.5, 1]} castShadow>
+                <coneGeometry args={[0.34, 0.5, 8]} />
+                <meshStandardMaterial color={suave} flatShading roughness={1} />
+              </mesh>
+              {/* la flor amarilla del frailejón (la seña de la Espeletia) */}
+              <mesh position={[0.1, 1.16, 0.06]}>
+                <sphereGeometry args={[0.05, 6, 5]} />
+                <meshStandardMaterial color="#e8c94f" flatShading />
+              </mesh>
+            </group>
+          ))}
+          {/* la piedra del alto, con su musgo */}
+          <mesh position={[0.6, 0.12, -0.35]} scale={[1, 0.7, 0.9]} castShadow>
+            <icosahedronGeometry args={[0.22, 0]} />
+            <meshStandardMaterial color="#828b90" flatShading roughness={1} />
+          </mesh>
+          {/* LA NIEBLA FRÍA que arropa el frailejonal (motas traslúcidas que
+              hacen páramo, como el vaho de la pila pero frío) */}
+          {[[-0.35, 0.55, 0.4, 0.3], [0.4, 0.75, 0.1, 0.24], [0, 1.0, -0.25, 0.19]].map(([x, yv, z, r], i) => (
+            <mesh key={i} position={[x, yv, z]}>
+              <sphereGeometry args={[r, 8, 6]} />
+              <meshBasicMaterial color="#dfe8ea" transparent opacity={0.2} depthWrite={false} />
+            </mesh>
+          ))}
+          {/* el hito de piedras apiladas: la seña del sendero de páramo */}
+          {[0.16, 0.11, 0.07].map((r, i) => (
+            <mesh key={i} position={[-0.72, 0.1 + i * 0.17, -0.1]} scale={[1, 0.65, 1]}>
+              <icosahedronGeometry args={[r, 0]} />
               <meshStandardMaterial color={fuerte} flatShading roughness={1} />
             </mesh>
           ))}
+        </group>
+      );
+    case 'hongos': // el suelo vivo: hongos que asoman (el fruto del micelio), con
+      // un halo de red bajo la tierra. Toque para BAJAR al mundo subterráneo.
+      return (
+        <group>
+          {[[-0.3, 0.1, 0.44], [0.16, -0.22, 0.54], [0.42, 0.26, 0.36], [-0.04, 0.42, 0.3]].map(([x, z, h], i) => (
+            <group key={i} position={[x, 0, z]}>
+              {/* pie del hongo, pálido */}
+              <mesh position={[0, h * 0.5, 0]} castShadow>
+                <cylinderGeometry args={[0.05, 0.075, h, 7]} />
+                <meshStandardMaterial color="#e8e0cf" flatShading roughness={1} />
+              </mesh>
+              {/* sombrero que brilla apenas (bioluminiscencia del suelo) */}
+              <mesh position={[0, h + 0.02, 0]} castShadow>
+                <sphereGeometry args={[0.17, 12, 8, 0, Math.PI * 2, 0, Math.PI / 2]} />
+                <meshStandardMaterial color={fuerte} emissive={fuerte} emissiveIntensity={0.35} flatShading roughness={0.8} />
+              </mesh>
+              {/* laminillas claras bajo el sombrero */}
+              <mesh position={[0, h - 0.015, 0]}>
+                <cylinderGeometry args={[0.16, 0.06, 0.03, 10]} />
+                <meshStandardMaterial color={suave} emissive={suave} emissiveIntensity={0.4} />
+              </mesh>
+            </group>
+          ))}
+          {/* el anillo de micelio asomando en la tierra (la red que baja) */}
+          <mesh position={[0, 0.02, 0.1]} rotation={[-Math.PI / 2, 0, 0]}>
+            <ringGeometry args={[0.5, 0.64, 22]} />
+            <meshStandardMaterial color={fuerte} emissive={fuerte} emissiveIntensity={0.3} transparent opacity={0.45} side={2} roughness={1} />
+          </mesh>
         </group>
       );
     default:
@@ -646,11 +1139,13 @@ function Veleta({ color, reducedMotion = false }) {
       eras. Pocas y bien puestas: el valle se siente vivo, no amontonado. Son
       decorativas (aria-hidden) y no capturan toques. ── */
 const CRIATURAS_VALLE = [
-  { crt: 'mariposa', x: -4.0, z: 2.0, dy: 2.0, size: 30, factor: 8 },
-  { crt: 'mariposa', x: -4.8, z: 2.9, dy: 1.5, size: 24, factor: 8 },
-  { crt: 'colibri', x: 3.6, z: 4.4, dy: 1.9, size: 34, factor: 8 },
+  // (posiciones al día con la DISPOSICIÓN COMPUESTA: la milpa cedió a la
+  //  izquierda y la huerta se arrimó a la casa — sus bichos las siguen.)
+  { crt: 'mariposa', x: -4.8, z: 1.9, dy: 2.0, size: 30, factor: 8 },
+  { crt: 'mariposa', x: -5.6, z: 2.8, dy: 1.5, size: 24, factor: 8 },
+  { crt: 'colibri', x: 3.1, z: 3.9, dy: 1.9, size: 34, factor: 8 },
   { crt: 'escarabajo', x: 4.7, z: -2.9, dy: 0.5, size: 28, factor: 7 },
-  { crt: 'lombriz', x: -1.0, z: 5.2, dy: 0.28, size: 26, factor: 6.5 },
+  { crt: 'lombriz', x: -1.2, z: 5.4, dy: 0.28, size: 26, factor: 6.5 },
 ];
 
 function CriaturaSvg({ tipo, size, animated }) {
@@ -687,10 +1182,48 @@ function CriaturasValle({ reducedMotion, cupo, tier }) {
   );
 }
 
+/* ── EL CÓNDOR DEL VALLE: planea Y se posa (alterna) ─────────────────────
+      El vigía del páramo vive dos ratos: la TÉRMICA (CondorBillboard en
+      órbita paciente sobre el filo) y la PERCHA (posado en el pico de la
+      cordillera, quieto — la silueta biopunk del pase de criaturas). El
+      cambio es lento (~45 s volando, ~16 s posado): verlo aterrizar es un
+      premio, no un tic. reduced-motion: queda volando fijo, digno. ── */
+const PERCHA_CONDOR = /** @type {[number, number, number]} */ ([-9, 11.6, -15.5]);
+
+function CondorDelValle({ reducedMotion, tier }) {
+  const [posado, setPosado] = useState(false);
+  useEffect(() => {
+    if (reducedMotion) return undefined;
+    const t = setTimeout(() => setPosado((p) => !p), posado ? 16000 : 45000);
+    return () => clearTimeout(t);
+  }, [posado, reducedMotion]);
+  if (posado) {
+    return (
+      <group position={PERCHA_CONDOR}>
+        <Html center distanceFactor={16} zIndexRange={[6, 0]} pointerEvents="none">
+          <div className="valle-critter" data-vecino="condor-posado" aria-hidden="true">
+            <CriaturaNocturnaAvatar id="condor" size={48} />
+          </div>
+        </Html>
+      </group>
+    );
+  }
+  return (
+    <CondorBillboard
+      centro={[-2, 10.5, -7]}
+      radio={9}
+      px={58}
+      factor={13}
+      animated={!reducedMotion}
+      tier={tier}
+    />
+  );
+}
+
 /* ── Proxy LOD de un landmark (perfil frugal): a distancia, el lugar es una
       silueta de UNA malla con su tinte — el rótulo con emoji ya lo nombra.
       Los tipos que suben (milpa, bosque, veleta) son cono; el resto, domo. ── */
-const PROXY_CONO = new Set(['milpa', 'bosque', 'veleta']);
+const PROXY_CONO = new Set(['milpa', 'bosque', 'veleta', 'saber']);
 
 function ProxyLandmark({ tipo, tinte }) {
   const cono = PROXY_CONO.has(tipo);
@@ -702,19 +1235,54 @@ function ProxyLandmark({ tipo, tinte }) {
   );
 }
 
-/* ── Un mundo como LUGAR navegable: SOLO su geometría. Su etiqueta táctil vive
-      en <RotulosLugares/> (piso en píxeles + foco/proximidad + anti-colisión).
-      En perfil frugal el detalle completo SOLO se dibuja de cerca (<Detailed>):
-      la panorámica de arranque —el peor momento— queda en siluetas baratas. ── */
-function MundoLugar({ mundo, reducedMotion, perfil }) {
+/* ── Un mundo como LUGAR navegable: su geometría — y TOCABLE (dirección del
+      valle): tocar la milpa, el corral o la charca entra al mundo igual que su
+      rótulo. El lugar ES el botón; el rótulo lo nombra. El cursor lo dice en
+      desktop; en el teléfono lo dicen el patio de tierra y el sendero que
+      llegan hasta él. Su etiqueta táctil sigue en <RotulosLugares/> (piso en
+      píxeles + foco/proximidad + anti-colisión). En perfil frugal el detalle
+      completo SOLO se dibuja de cerca (<Detailed>): la panorámica de arranque
+      —el peor momento— queda en siluetas baratas. ── */
+function MundoLugar({ mundo, reducedMotion, perfil, onEntrar = null }) {
   const y = alturaTerreno(mundo.pos[0], mundo.pos[2]);
   const detalle = mundo.tipo === 'veleta' ? (
     <Veleta color={mundo.tinte[0]} reducedMotion={reducedMotion} />
   ) : (
-    <LandmarkGeom tipo={mundo.tipo} tinte={mundo.tinte} reducedMotion={reducedMotion} />
+    <LandmarkGeom
+      tipo={mundo.tipo}
+      tinte={mundo.tinte}
+      reducedMotion={reducedMotion}
+      q={perfil.materialRico ? 1 : 0.55}
+    />
   );
   return (
-    <group position={[mundo.pos[0], y, mundo.pos[2]]} scale={mundo.escala}>
+    <group
+      position={[mundo.pos[0], y, mundo.pos[2]]}
+      scale={mundo.escala}
+      onClick={
+        onEntrar
+          ? (e) => {
+              e.stopPropagation();
+              onEntrar(mundo.id);
+            }
+          : undefined
+      }
+      onPointerOver={
+        onEntrar
+          ? (e) => {
+              e.stopPropagation();
+              document.body.style.cursor = 'pointer';
+            }
+          : undefined
+      }
+      onPointerOut={
+        onEntrar
+          ? () => {
+              document.body.style.cursor = '';
+            }
+          : undefined
+      }
+    >
       {perfil.lod ? (
         <Detailed distances={[0, perfil.lodDistancia]}>
           <group>{detalle}</group>
@@ -742,11 +1310,15 @@ function MundoLugar({ mundo, reducedMotion, perfil }) {
  * mundos en cualquiera de los dos modos visibles — la navegación no cambia. ── */
 const _proj = new THREE.Vector3();
 
-function RotulosLugares({ mundos, focoId, onEntrar, occluders }) {
+function RotulosLugares({ mundos, focoId, onEntrar, occluders, controls = null, kReposo = 1 }) {
   const botones = useRef({});
   const tapados = useRef({});
   const plena = useRef(null);
   const tick = useRef(0);
+  /* ZOOM SEMÁNTICO: la banda vigente ('cerca'|'media'|'lejos'), con histéresis
+     en bandaSemantica() — cruzar el umbral despacio no parpadea. Ver el bloque
+     AoE junto a CamaraViajera para los umbrales y qué muestra cada banda. */
+  const banda = useRef('media');
 
   // Anclas en el mundo: misma altura que tenía la etiqueta original (1.7 dentro
   // del group escalado del landmark → 1.7 × escala en coordenadas del valle).
@@ -765,7 +1337,7 @@ function RotulosLugares({ mundos, focoId, onEntrar, occluders }) {
 
   // La alerta del día (el faro) siempre se reserva su espacio en pantalla.
   const anclaAlerta = useMemo(() => {
-    const a = MUNDO_VALLE_BY_ID[COSA_DEL_DIA.anclaMundo];
+    const a = MUNDO_DIR_BY_ID[COSA_DEL_DIA.anclaMundo];
     if (!a) return null;
     return new THREE.Vector3(a.pos[0], alturaTerreno(a.pos[0], a.pos[2]) + 2.7, a.pos[2]);
   }, []);
@@ -774,6 +1346,18 @@ function RotulosLugares({ mundos, focoId, onEntrar, occluders }) {
     // ~12 pasadas/s alcanzan para rótulos; corre en el PRIMER frame (importa
     // con frameloop='demand' de reduced-motion, que renderiza pocos frames).
     if (tick.current++ % 5 !== 0) return;
+
+    /* La banda del zoom semántico: distancia cámara→mira de los controles
+       (la mira viaja con el pan/foco — la banda sigue al ENCUADRE, no al
+       origen). Sin controles todavía, se queda en 'media' (lo aprobado). */
+    if (controls?.current) {
+      banda.current = bandaSemantica(
+        banda.current,
+        camera.position.distanceTo(controls.current.target),
+        kReposo,
+      );
+    }
+    const enBanda = banda.current;
 
     const enPantalla = (v) => {
       _proj.copy(v).project(camera);
@@ -829,16 +1413,52 @@ function RotulosLugares({ mundos, focoId, onEntrar, occluders }) {
       let modo = 'oculto';
       if (p.elegible) {
         const esPlena = p.id === candidata;
-        const r = esPlena
-          ? rectoDe(p.x, p.y, 76 + p.titulo.length * 9, 48)
-          : rectoDe(p.x, p.y, 44, 44);
-        if (!pisa(r)) {
-          tomados.push(r);
-          modo = esPlena ? 'plena' : 'punto';
+        if (enBanda === 'lejos') {
+          /* ESTRATÉGICA (lejos): el mapa AoE — cada rótulo que quepa muestra
+             su nombre completo; el que no cabe cae a punto-chip, luego cede.
+             La finca entera se entiende de un vistazo. */
+          const rp = rectoDe(p.x, p.y, 76 + p.titulo.length * 9, 48);
+          if (!pisa(rp)) {
+            tomados.push(rp);
+            modo = 'plena';
+          } else {
+            const rq = rectoDe(p.x, p.y, 44, 44);
+            if (!pisa(rq)) {
+              tomados.push(rq);
+              modo = 'punto';
+            }
+          }
+        } else if (enBanda === 'cerca' && p.id !== focoId) {
+          /* DETALLE (cerca): mandan las texturas, los bichos y las matas —
+             solo el lugar apuntado conserva un punto-chip (sigue tocable);
+             el resto descansa. El mundo activo (focoId) cae al caso de abajo
+             y conserva su nombre completo mientras se entra. */
+          if (esPlena) {
+            const rq = rectoDe(p.x, p.y, 44, 44);
+            if (!pisa(rq)) {
+              tomados.push(rq);
+              modo = 'punto';
+            }
+          }
+        } else {
+          /* MEDIA: el comportamiento aprobado tal cual — el apuntado con
+             nombre completo, los demás como punto-chip. */
+          const r = esPlena
+            ? rectoDe(p.x, p.y, 76 + p.titulo.length * 9, 48)
+            : rectoDe(p.x, p.y, 44, 44);
+          if (!pisa(r)) {
+            tomados.push(r);
+            modo = esPlena ? 'plena' : 'punto';
+          }
         }
       }
       const btn = botones.current[p.id];
-      if (btn && btn.dataset.modo !== modo) btn.dataset.modo = modo;
+      if (btn) {
+        if (btn.dataset.modo !== modo) btn.dataset.modo = modo;
+        // La banda queda en el DOM (data-banda): CSS futuro puede reaccionar
+        // (p. ej. chips más grandes en estratégica) sin tocar este JS.
+        if (btn.dataset.banda !== enBanda) btn.dataset.banda = enBanda;
+      }
     }
   });
 
@@ -880,7 +1500,7 @@ function RotulosLugares({ mundos, focoId, onEntrar, occluders }) {
 /* ── La cosa del día: un faro pulsante anclado sobre su mundo. Un SOLO destello.
       Toca la señal → onAlerta() (el agente lo dice y ofrece LA acción). ── */
 function Beacon({ onAlerta, reducedMotion, conLuz = true }) {
-  const ancla = MUNDO_VALLE_BY_ID[COSA_DEL_DIA.anclaMundo];
+  const ancla = MUNDO_DIR_BY_ID[COSA_DEL_DIA.anclaMundo];
   const luz = useRef(null);
   const halo = useRef(null);
   useFrame((state) => {
@@ -931,15 +1551,25 @@ function Beacon({ onAlerta, reducedMotion, conLuz = true }) {
   );
 }
 
-/* ── El COMPAÑERO-JUGADOR: Angelita, la abeja. Es el avatar que vuela por el
-      valle. Al reposo, ronda sobre el valle con vaivén vivo; cuando se toca un
-      mundo (`entrando`), BAJA y se acerca al lugar — "entra" al mundo, y la
-      cámara la acompaña. Su ánimo/energía (salud real de la finca) tiñen su
-      color, su aura y qué tan vivo es su vuelo. Mira hacia donde viaja. ── */
-function CompaneroAbeja({ foco, entrando, animo, energia, reducedMotion, estadoFinca = null, hayAlerta = false }) {
+/* ── El COMPAÑERO-JUGADOR: Angelita, la abeja — UNA SOLA, la del valle.
+      POSICIÓN DE CALMA (feedback del operador): al reposo ya no husmea
+      errática por el valle — flota SERENA sobre el patio de la casa (el
+      corazón del cuadro), con un vaivén mínimo de respiración, y BRILLA:
+      tocarla es hablarle a la finca (`onTocar`). Cuando se toca un mundo
+      (`entrando`), vuela y se acerca al lugar, y la cámara la acompaña. Su
+      ánimo/energía (salud real de la finca) tiñen su color y su vuelo. ── */
+const CALMA_ABEJA = {
+  // Al frente-derecha del corredor, sobre el patio de la casa (no encima del
+  // techo): Angelita ES la anfitriona de la casa-puerta.
+  x: CASA_VALLE.pos[0] + 1.3,
+  z: CASA_VALLE.pos[1] + 1.5,
+};
+
+function CompaneroAbeja({ foco, focoId = null, entrando, animo, energia, reducedMotion, estadoFinca = null, hayAlerta = false, posRef = null, conLuz = false, onTocar = null }) {
   const ref = useRef(null);
   const caraRef = useRef(null);
   const prevX = useRef(foco.x);
+  const yCalma = useMemo(() => alturaTerreno(CALMA_ABEJA.x, CALMA_ABEJA.z), []);
   // Reacción al estado REAL de la finca (§5b): mismo repertorio que los mundos.
   // Con estadoFinca manda la reacción; sin él, el contrato viejo (animo/energia).
   const reaccion = useMemo(
@@ -949,6 +1579,86 @@ function CompaneroAbeja({ foco, entrando, animo, energia, reducedMotion, estadoF
   const animoReal = reaccion?.animo ?? animo;
   const energiaReal = reaccion?.energia ?? energia;
   const vuelo = reaccion?.vuelo;
+
+  // ── EL CEREBRO (auditoría 2026-07-18: existía y nadie lo consumía). Dos
+  //    disparadores alimentan el MISMO store — un solo `estado`/`mensaje`
+  //    en vivo, arbitrado por angelitaInteligencia con su anti-molestia:
+  //      1) NAVEGACIÓN REAL: al entrar a un mundo de verdad (focoId), un
+  //         comentario grounded de ESE mundo.
+  //      2) HUSMEO AUTÓNOMO: en reposo, cada tanto se acerca sola a un
+  //         portal y comenta — el store decide si de verdad interrumpe.
+  const estadoAngelita = useAngelitaStore((s) => s.estado);
+  const mensajeAngelita = useAngelitaStore((s) => s.mensaje);
+  const tipoAngelita = useAngelitaStore((s) => s.tipo);
+  const entrarMundoAngelita = useAngelitaStore((s) => s.entrarMundo);
+  const reposarAngelita = useAngelitaStore((s) => s.reposar);
+
+  // 1) Navegación real: al entrar/salir de un mundo de verdad, la abeja
+  //    husmea ese lugar (o vuelve a calma al salir). `focoId` es el id CRUDO
+  //    del lugar del valle (Escena ya lo resuelve); se traduce al vocabulario
+  //    del motor con LUGAR_A_MUNDO_ANGELITA.
+  const focoIdPrevio = useRef(focoId);
+  useEffect(() => {
+    if (focoId && focoId !== focoIdPrevio.current) {
+      entrarMundoAngelita(LUGAR_A_MUNDO_ANGELITA[focoId] || 'finca', {});
+    } else if (!focoId && focoIdPrevio.current) {
+      reposarAngelita();
+    }
+    focoIdPrevio.current = focoId;
+  }, [focoId, entrarMundoAngelita, reposarAngelita]);
+
+  // 2) Husmeo autónomo: nunca a mitad de un viaje real (entrandoRef, para
+  //    que un viaje NO reinicie la cadencia), nunca con reduced-motion (cero
+  //    errante — reconcilia el feedback previo "POSICIÓN DE CALMA, no
+  //    husmea errática" con el pedido de que la abeja muestre información:
+  //    SUAVE y espaciada, con el cooldown del propio store, no un tic). El
+  //    lugar que autónomamente mira ahora vive en un ref — mover la abeja no
+  //    debe repintar el resto del árbol.
+  const entrandoRef = useRef(entrando);
+  useEffect(() => { entrandoRef.current = entrando; }, [entrando]);
+  const husmeoIdx = useRef(0);
+  const husmeoLugarRef = useRef(null);
+  useEffect(() => {
+    if (reducedMotion) return undefined;
+    let vivo = true;
+    let temporizador = null;
+    let ocultarTimer = null;
+    const tick = () => {
+      if (!vivo) return;
+      /* Cuánto se queda EL AVISO DE ESTA VUELTA: depende de su largo. */
+      let duraEste = HUSMEO_VISIBLE_MS;
+      if (!entrandoRef.current) {
+        const lugar = HUSMEO_LUGARES[husmeoIdx.current % HUSMEO_LUGARES.length];
+        husmeoIdx.current += 1;
+        const mundo = LUGAR_A_MUNDO_ANGELITA[lugar];
+        const decision = mundo ? entrarMundoAngelita(mundo, {}) : null;
+        if (decision?.interrumpe) {
+          husmeoLugarRef.current = lugar;
+          if (ocultarTimer) clearTimeout(ocultarTimer);
+          /* El aviso dura LO QUE CUESTA LEERLO, no un tiempo fijo (feedback del
+             operador: "desaparecen muy rápido"). Escritura + lectura cómoda.
+             Si la decisión no trae texto, cae al piso digno. */
+          duraEste = duracionAviso(decision?.mensaje ?? decision?.texto);
+          ocultarTimer = setTimeout(() => {
+            husmeoLugarRef.current = null;
+            reposarAngelita();
+          }, duraEste);
+        }
+      }
+      /* El siguiente husmeo espera a que el anterior TERMINE de leerse (+ respiro):
+         un aviso largo ya no se lo come el que viene detrás. */
+      temporizador = setTimeout(tick, Math.max(HUSMEO_CADA_MS, duraEste + 3500));
+    };
+    temporizador = setTimeout(tick, HUSMEO_PRIMERO_MS);
+    return () => {
+      vivo = false;
+      if (temporizador) clearTimeout(temporizador);
+      if (ocultarTimer) clearTimeout(ocultarTimer);
+    };
+    // `entrando` vive en entrandoRef a propósito: un viaje real no debe
+    // reiniciar la cadencia del husmeo autónomo.
+  }, [reducedMotion, entrarMundoAngelita, reposarAngelita]);
+
   useFrame((state) => {
     if (!ref.current) return;
     const t = state.clock.elapsedTime;
@@ -961,30 +1671,96 @@ function CompaneroAbeja({ foco, entrando, animo, energia, reducedMotion, estadoF
     const brio = (0.35 + 0.65 * energiaReal) * mVel; // energía y clima animan el vuelo
     const bob = reducedMotion ? 0 : Math.sin(t * (1.6 + brio)) * (0.1 + 0.16 * brio);
     const tembleque = tiembla ? Math.sin(t * 13) * tiembla : 0;
-    // Al reposo deriva en un círculo calmo; al entrar se posa junto al lugar.
-    const vagarX = reducedMotion || entrando ? 0 : Math.sin(t * 0.55) * 0.9 * mVagar;
-    const vagarZ = reducedMotion || entrando ? 0 : Math.cos(t * 0.55) * 0.6 * mVagar;
-    const alto = (entrando ? 1.05 : 2.3) * mAltura;
-    const dest = new THREE.Vector3(
-      foco.x + (entrando ? 0.55 : 0.4 + vagarX) + tembleque,
-      foco.y + alto + bob + tembleque * 0.5,
-      foco.z + (entrando ? 0.7 : 0.6 + vagarZ),
-    );
-    ref.current.position.lerp(dest, (entrando ? 0.05 : 0.045) * mVel);
+    // HUSMEO AUTÓNOMO: mientras no hay viaje real, el lugar que el store
+    // aceptó (husmeoLugarRef) manda un TERCER destino — un solo lugar a la
+    // vez, temporal, nunca un círculo errático.
+    const lugarHusmeo = !entrando ? husmeoLugarRef.current : null;
+    const anclaHusmeo = lugarHusmeo ? MUNDO_DIR_BY_ID[lugarHusmeo] : null;
+    // POSICIÓN DE CALMA: al reposo (sin viaje real NI husmeo activo) Angelita
+    // ya no ronda el valle en un círculo errático — flota serena sobre el
+    // patio de la casa con una deriva mínima y lenta (respiración). Al
+    // entrar a un mundo (real o husmeado) sí vuela y se posa junto al lugar.
+    const vagarX = reducedMotion || entrando || anclaHusmeo ? 0 : Math.sin(t * 0.28) * 0.26 * mVagar;
+    const vagarZ = reducedMotion || entrando || anclaHusmeo ? 0 : Math.cos(t * 0.22) * 0.18 * mVagar;
+    const alto = (entrando ? 1.05 : anclaHusmeo ? 1.4 : 2.2) * mAltura;
+    const dest = entrando
+      ? new THREE.Vector3(
+          foco.x + 0.55 + tembleque,
+          foco.y + alto + bob + tembleque * 0.5,
+          foco.z + 0.7,
+        )
+      : anclaHusmeo
+        ? new THREE.Vector3(
+            anclaHusmeo.pos[0] + 0.5 + tembleque,
+            alturaTerreno(anclaHusmeo.pos[0], anclaHusmeo.pos[2]) + alto + bob + tembleque * 0.5,
+            anclaHusmeo.pos[2] + 0.6,
+          )
+        : new THREE.Vector3(
+            CALMA_ABEJA.x + vagarX + tembleque,
+            yCalma + alto + bob + tembleque * 0.5,
+            CALMA_ABEJA.z + vagarZ,
+          );
+    // 0.045 al salir de foco: el valor de la v2 aprobada (0.035 hacía la
+    // salida pegajosa — regresión detectada en la auditoría 2026-07-16). El
+    // husmeo autónomo vuela más SUAVE que una entrada real decidida (0.03).
+    const kVuelo = entrando ? 0.05 : anclaHusmeo ? 0.03 : 0.045;
+    ref.current.position.lerp(dest, kVuelo * mVel);
+    // Comparte su posición viva para que la cámara de director la SIGA (follow
+    // con lead): copia dentro del Vector3 compartido (mutación por método sobre
+    // un local — no reasigna el prop, como CamaraViajera con controls.current).
+    const destinoPos = posRef ? posRef.current : null;
+    if (destinoPos) destinoPos.copy(ref.current.position);
     if (caraRef.current) {
       const vx = ref.current.position.x - prevX.current;
       if (Math.abs(vx) > 0.0015) caraRef.current.style.transform = `scaleX(${vx < 0 ? -1 : 1})`;
       prevX.current = ref.current.position.x;
     }
   });
-  const size = 44 + Math.round(energiaReal * 14);
+  // 3x más grande (feedback del operador 2026-07-18: la abeja se veía chiquita
+  // y la burbuja la aplastaba). Angelita es la protagonista — que se vea.
+  const [pxMin, pxMax] = JERARQUIA_PERSONAJES.protagonistaPx;
+  const size = Math.round((pxMin + Math.round(energiaReal * (pxMax - pxMin))) * 3);
+  const luz = JERARQUIA_PERSONAJES.luzProtagonista;
   return (
-    <group ref={ref} position={[foco.x + 0.4, foco.y + 2.3, foco.z + 0.6]}>
+    <group ref={ref} position={[CALMA_ABEJA.x, yCalma + 2.2, CALMA_ABEJA.z]}>
+      {/* JERARQUÍA: Angelita es la ÚNICA con luz propia — su calidez baña el
+          terreno bajo su vuelo y el ojo la encuentra primero, sobre todo al
+          atardecer y de noche. Solo donde el perfil ya paga luces extra. */}
+      {conLuz && (
+        <pointLight
+          color={luz.color}
+          intensity={luz.intensidad}
+          distance={luz.alcance}
+          position={[0, -0.2, 0]}
+        />
+      )}
       <Html center distanceFactor={9} zIndexRange={[40, 10]}>
-        <div className="valle-abeja" aria-hidden="true">
+        {/* TOCABLE: Angelita brilla e invita — tocarla es hablarle a la
+            finca (el host abre el agente). Botón real por accesibilidad. */}
+        <button
+          type="button"
+          className="valle-abeja valle-abeja--toque"
+          data-angelita={estadoAngelita || 'calma'}
+          aria-label="Hable con Angelita, la guía de su finca"
+          onClick={
+            onTocar
+              ? (e) => {
+                  e.stopPropagation();
+                  onTocar();
+                }
+              : undefined
+          }
+        >
           <div ref={caraRef} className="valle-abeja__cara">
             <AbejaAngelita
               size={size}
+              pose={
+                estadoAngelita === 'celebra'
+                  ? 'celebra'
+                  : estadoAngelita === 'husmea' || estadoAngelita === 'aviso'
+                    ? 'senala'
+                    : 'vuela'
+              }
               animo={animoReal}
               energia={energiaReal}
               mojada={reaccion?.mojada ?? false}
@@ -993,35 +1769,329 @@ function CompaneroAbeja({ foco, entrando, animo, energia, reducedMotion, estadoF
               animated={!reducedMotion}
             />
           </div>
-        </div>
+        </button>
       </Html>
+      {/* EL CEREBRO SE VE: cuando Angelita husmea (sola o de verdad) o avisa
+          algo, lo dice en una burbuja — nunca queda muda. aria-live para que
+          también se narre a lectores de pantalla. */}
+      {mensajeAngelita && (
+        <Html center position={[0, 1.3, 0]} distanceFactor={9} zIndexRange={[45, 20]} style={{ pointerEvents: 'none' }}>
+          <BurbujaAngelita
+            mensaje={mensajeAngelita}
+            tipo={tipoAngelita || 'informativa'}
+            animado={!reducedMotion}
+          />
+        </Html>
+      )}
     </group>
   );
+}
+
+/* ── APLANE NEW DONK: el "caer dentro del mundo" del flujo vivo valle→mundo.
+      Cuando `aplanando` se enciende (fase 'viajando' de la navegación), la
+      cámara del valle 3D deja su órbita y hace DOLLY hacia el landmark del
+      mundo destino mientras el lente se APLANA a ~22° (casi ortográfico) — el
+      encuadre New Donk: el mundo destino queda de frente y el resto del valle
+      3D asoma en los bordes, SIN velo plano. El overlay DOM (TransicionNewDonk)
+      corre en paralelo: transparente durante el dolly, luego el destello cubre
+      el intercambio de escena. El dolly dura APLANE_S (< ND_MITAD_MS) para
+      cerrar antes de que el host haga el swap bajo el destello.
+
+      Como CamaraDirector, vive junto a los OrbitControls y NO reasigna props:
+      captura la pose de arranque en su primer frame activo y ESCRIBE la cámara
+      solo por MÉTODOS three (lerpVectors/lookAt/setFocalLength — nunca `cam.fov=`
+      ni `controls.enabled=`, que la regla react-hooks/immutability prohíbe).
+      Se monta de ÚLTIMO en la escena → su useFrame corre después del orbit y de
+      CamaraViajera (que además cede con early-return cuando `aplanando`), así
+      tiene la última palabra sin pelear; los controles quedan habilitados como
+      en el establishing de CamaraDirector. Reduced-motion: el hook de navegación
+      salta la fase 'viajando', así que este componente ni se activa (corte
+      directo valle→mundo). ── */
+const APLANE_S = 0.95; // < ND_MITAD_MS (1.05 s): cierra antes del swap
+const APLANE_FOV = 22; // grados: casi ortográfico (el aplane New Donk)
+const _easeAplane = (p) => (p < 0.5 ? 4 * p * p * p : 1 - (-2 * p + 2) ** 3 / 2);
+
+/* FOV → distancia focal por MÉTODO (setFocalLength), como TunelOdyssey: evita
+   reasignar `camera.fov` (react-hooks/immutability) y refresca la projection. */
+function fovAFocal(camPersp, fov) {
+  return (0.5 * camPersp.getFilmHeight()) / Math.tan(THREE.MathUtils.degToRad(fov) / 2);
+}
+
+function AplaneNewDonk({ foco, aplanando }) {
+  const { camera } = useThree();
+  const camPersp = /** @type {import('three').PerspectiveCamera} */ (camera);
+  const anim = useRef({
+    activo: false,
+    p: 0,
+    desde: new THREE.Vector3(),
+    hasta: new THREE.Vector3(),
+    mira: new THREE.Vector3(),
+    fovDesde: 40,
+  });
+  useFrame((_, delta) => {
+    const a = anim.current;
+    if (!aplanando) {
+      a.activo = false;
+      return;
+    }
+    if (!a.activo) {
+      // Primer frame activo: capturar arranque y calcular la "boca" UNA vez.
+      a.activo = true;
+      a.p = 0;
+      a.desde.copy(camPersp.position);
+      a.fovDesde = camPersp.fov;
+      // Mirar el corazón del landmark, un pelo arriba.
+      a.mira.set(foco.x, foco.y + 0.8, foco.z);
+      // Boca: dolly hacia el lugar desde el lado actual de la cámara, con el
+      // ángulo BAJADO (caer sobre el lugar, no verlo de pájaro) a ~6.4 u.
+      const dir = a.desde.clone().sub(a.mira);
+      dir.y *= 0.5;
+      dir.setLength(6.4);
+      a.hasta.copy(a.mira).add(dir);
+    }
+    a.p = Math.min(1, a.p + Math.min(delta, 1 / 20) / APLANE_S);
+    const k = _easeAplane(a.p);
+    camPersp.position.lerpVectors(a.desde, a.hasta, k);
+    camPersp.lookAt(a.mira);
+    // Aplane del lente: fovDesde → 22° con curva k² (el telefoto acelera al
+    // final, el mundo se "endereza" contra la cámara justo antes del destello).
+    const fov = a.fovDesde + (APLANE_FOV - a.fovDesde) * (k * k);
+    camPersp.setFocalLength(fovAFocal(camPersp, fov));
+  });
+  return null;
+}
+
+/* ── PANEO GLOBAL "Age of Empires" (backlog AoE #2) + ZOOM SEMÁNTICO ──
+   El valle entero se puede RECORRER (pan) sin perderse:
+   · LÍMITES del paseo: la mira vive dentro de PAN_LIMITES — la finca completa
+     (lugares en x∈[-5.7,6.4], z∈[-7.6,8.1]) más un poco de aire; nunca el
+     vacío del plano de 34×34. Hay una sobra elástica de PAN_SOBRA unidades:
+     llegar al borde no es un muro seco — el resorte PAN_RESORTE devuelve la
+     mira al área con la misma calma del damping 0.08 aprobado. La corrección
+     mueve mira Y cámara juntas (translación): el borde empuja de vuelta sin
+     torcer el encuadre.
+   · La mira se PEGA AL SUELO mientras se pasea (alturaTerreno + 0.8): pasear
+     hacia el páramo encuadra el páramo, no el aire sobre la tierra baja.
+   · Se eligió OrbitControls con pan habilitado (NO MapControls): MapControls
+     cambia el gesto primario a PAN — rompería "un dedo orbita" (el gesto
+     aprobado) y la coreografía existente que comparte este ref (CamaraViajera
+     + DirectorValle + AplaneNewDonk). El pan clampeado da el mapa AoE sin
+     re-cablear ninguna cámara.
+   · VOLVER AL ENCUADRE DE AUTOR: doble-toque/doble-clic sobre el valle
+     regresa suave (VOLVER_S) a la pose de reposo aprobada (posición + mira).
+     Con reduced-motion el regreso es un corte directo, sin animación. */
+const PAN_LIMITES = { x0: -9, x1: 9, z0: -9.5, z1: 9.5 };
+const PAN_SOBRA = 2.5; // sobra elástica más allá del límite antes del muro duro
+const PAN_RESORTE = 0.12; // resorte de regreso al área (fracción por frame)
+const PAN_PEGA_SUELO = 0.1; // qué tan rápido la mira se pega al terreno al pasear
+const VOLVER_S = 1.15; // duración del regreso al encuadre de autor
+const _volverPos = new THREE.Vector3();
+const _volverMira = new THREE.Vector3();
+
+/* Bandas del ZOOM SEMÁNTICO (por distancia cámara→mira) con HISTÉRESIS: el
+   umbral de entrada y el de salida difieren ~1.5 u — cruzar despacio no hace
+   parpadear los rótulos. Los umbrales de 'lejos' escalan con kReposo: en un
+   teléfono parado la pose de reposo vive más lejos y debe seguir cayendo en
+   banda 'media' (el comportamiento aprobado).
+   · 'cerca' (entra d<11 / sale d>12.5): DETALLE — mandan texturas, bichos y
+     matas; los rótulos se calman (solo el apuntado, como punto-chip).
+   · 'media': el comportamiento aprobado tal cual (apuntado plena, resto punto).
+   · 'lejos' (entra d>21·k / sale d<19.5·k): vista ESTRATÉGICA — el mapa AoE:
+     cada rótulo que quepa en pantalla muestra su nombre completo. */
+const BANDA_CERCA_ENTRA = 11;
+const BANDA_CERCA_SALE = 12.5;
+const BANDA_LEJOS_ENTRA = 21;
+const BANDA_LEJOS_SALE = 19.5;
+
+function bandaSemantica(previa, d, k = 1) {
+  const lejosEntra = BANDA_LEJOS_ENTRA * k;
+  const lejosSale = BANDA_LEJOS_SALE * k;
+  if (previa === 'lejos') return d < lejosSale ? (d < BANDA_CERCA_ENTRA ? 'cerca' : 'media') : 'lejos';
+  if (previa === 'cerca') return d > BANDA_CERCA_SALE ? (d > lejosEntra ? 'lejos' : 'media') : 'cerca';
+  return d > lejosEntra ? 'lejos' : d < BANDA_CERCA_ENTRA ? 'cerca' : 'media';
 }
 
 /* ── Cámara: viaja suavemente hacia el foco (target) cuando cambia de mundo Y
       HACE ZOOM hacia el lugar — la sensación de ENTRAR con la abeja, no un modal
       plano. El acercamiento solo se fuerza durante la transición (una vez llega,
-      suelta el control para que el usuario siga haciendo zoom a mano). ── */
-function CamaraViajera({ foco, focoKey, controls, autoOrbit }) {
+      suelta el control para que el usuario siga haciendo zoom a mano). Durante
+      el APLANE New Donk cede TODO el control a AplaneNewDonk (early-return): no
+      mueve target ni zoom para no pelear con la caída.
+      Además conduce el PANEO ACOTADO (clamp elástico del target), el paseo
+      libre (apaga el recentrado cuando el usuario panea) y el regreso al
+      encuadre de autor por doble-toque — ver el bloque AoE de arriba. ── */
+function CamaraViajera({ foco, focoKey, controls, autoOrbit, aplanando = false, kReposo = 1, miraInicial = null, reposo = null, reducedMotion = false }) {
   const trans = useRef(0);
   const prevKey = useRef(focoKey);
   const entrando = focoKey !== 'valle';
-  useFrame(() => {
-    if (!controls.current) return;
+  /* LA CÁMARA ES DEL USUARIO DESDE QUE LA TOCA: la deriva de reposo
+     (autoRotate) es bienvenida mientras nadie maneja, pero girar el valle
+     BAJO el dedo que está apuntando a un lugar era el "difícil de manejar a
+     ratos" — el chip se corría del toque. El primer gesto de órbita apaga la
+     deriva por el resto de la sesión del valle. */
+  const [tomada, setTomada] = useState(false);
+  /* PASEO LIBRE (pan AoE): true desde que el usuario panea o pellizca (2
+     punteros, o arrastre con botón derecho). Mientras dura, el lerp de
+     recentrado al reposo se apaga — si no, el resorte se tragaba el paseo.
+     Se detecta por GESTO (no por movimiento del target): el DirectorValle
+     también mueve el target con offsets aditivos y dispararía falsos. */
+  const panLibre = useRef(false);
+  /* El regreso al encuadre de autor (doble-toque): animación propia. */
+  const volver = useRef({ activo: false, p: 0, desde: new THREE.Vector3(), desdeMira: new THREE.Vector3() });
+  /* Espejo vivo de props para los listeners DOM (se refresca en useFrame):
+     el efecto de listeners se registra UNA vez y no persigue re-renders. */
+  const vivo = useRef({ entrando, aplanando, reducedMotion, reposo, mira: miraInicial });
+  const { gl } = useThree();
+
+  useEffect(() => {
+    const el = gl.domElement;
+    let activos = 0; // punteros abajo ahora mismo (2+ = pan/pellizco táctil)
+    let bajada = null; // dónde bajó el puntero (distinguir TAP de arrastre)
+    let tapPrevio = null; // el tap anterior (detectar el doble-toque)
+    const onDown = (e) => {
+      activos += 1;
+      if (activos >= 2 || e.button === 2) panLibre.current = true;
+      bajada = { x: e.clientX, y: e.clientY };
+    };
+    const onUp = (e) => {
+      activos = Math.max(0, activos - 1);
+      const v = vivo.current;
+      if (!bajada || v.entrando || v.aplanando) {
+        tapPrevio = null;
+        return;
+      }
+      const movio = Math.hypot(e.clientX - bajada.x, e.clientY - bajada.y) > 9;
+      bajada = null;
+      if (movio) {
+        tapPrevio = null; // fue un arrastre (órbita/pan), no un toque
+        return;
+      }
+      const ahora = performance.now();
+      const esDoble =
+        tapPrevio &&
+        ahora - tapPrevio.t < 350 &&
+        Math.hypot(e.clientX - tapPrevio.x, e.clientY - tapPrevio.y) < 28;
+      if (!esDoble) {
+        tapPrevio = { x: e.clientX, y: e.clientY, t: ahora };
+        return;
+      }
+      tapPrevio = null;
+      /* DOBLE-TOQUE sobre el valle (el canvas — los rótulos DOM no llegan
+         aquí; tocar un mundo entra a él y `entrando` bloquea): VOLVER AL
+         ENCUADRE DE AUTOR. Nadie se queda perdido en el paseo. */
+      panLibre.current = false;
+      const c = controls.current;
+      if (!c || !v.reposo || !v.mira) return;
+      if (v.reducedMotion) {
+        // Calma pedida: corte directo a la pose aprobada, sin viaje.
+        c.object.position.set(v.reposo[0], v.reposo[1], v.reposo[2]);
+        c.target.set(v.mira[0], v.mira[1], v.mira[2]);
+        c.update();
+        return;
+      }
+      const va = volver.current;
+      va.activo = true;
+      va.p = 0;
+      va.desde.copy(c.object.position);
+      va.desdeMira.copy(c.target);
+    };
+    const onCancel = () => {
+      activos = Math.max(0, activos - 1);
+      bajada = null;
+      tapPrevio = null;
+    };
+    el.addEventListener('pointerdown', onDown);
+    el.addEventListener('pointerup', onUp);
+    el.addEventListener('pointercancel', onCancel);
+    return () => {
+      el.removeEventListener('pointerdown', onDown);
+      el.removeEventListener('pointerup', onUp);
+      el.removeEventListener('pointercancel', onCancel);
+    };
+  }, [gl, controls]);
+
+  useFrame((_, delta) => {
+    if (!controls.current || aplanando) return;
     const c = controls.current;
+    const v = vivo.current;
+    v.entrando = entrando;
+    v.aplanando = aplanando;
+    v.reducedMotion = reducedMotion;
+    v.reposo = reposo;
+    v.mira = miraInicial;
     if (focoKey !== prevKey.current) {
       trans.current = 1; // arrancó una nueva "entrada": acompañar el zoom
       prevKey.current = focoKey;
+      panLibre.current = false; // el viaje manda: el paseo libre se cierra
+      volver.current.activo = false;
     }
-    c.target.lerp(new THREE.Vector3(foco.x, foco.y + 0.6, foco.z), 0.06);
+    /* El REGRESO AL ENCUADRE DE AUTOR: mientras corre, manda este frame. */
+    const va = volver.current;
+    if (va.activo) {
+      if (entrando || !reposo) {
+        va.activo = false;
+      } else {
+        va.p = Math.min(1, va.p + Math.min(delta, 1 / 20) / VOLVER_S);
+        const kv = _easeAplane(va.p);
+        const miraV = miraInicial || MIRA_VALLE;
+        _volverPos.set(reposo[0], reposo[1], reposo[2]);
+        _volverMira.set(miraV[0], miraV[1], miraV[2]);
+        c.object.position.lerpVectors(va.desde, _volverPos, kv);
+        c.target.lerpVectors(va.desdeMira, _volverMira, kv);
+        if (va.p >= 1) va.activo = false;
+        c.update();
+        return;
+      }
+    }
+    /* ASIMETRÍA DEL VIAJE (dirección): ENTRAR es decidido (el toque pide ir
+       ya); VOLVER es una exhalación — más lento, el valle se abre con calma y
+       llegar a casa se siente distinto a salir de ella. (El regreso subió de
+       0.042: la exhalación se sentía LENTITUD, feedback del operador.) */
+    const k = entrando ? 0.07 : 0.052;
+    /* En PASEO LIBRE el recentrado al reposo se apaga: la cámara es del
+       usuario (si no, este lerp se tragaba el pan a 5%/frame). Los viajes a
+       mundo (entrando) siempre mandan — panLibre se cierra al cambiar foco. */
+    if (!panLibre.current) {
+      c.target.lerp(new THREE.Vector3(foco.x, foco.y + 0.6, foco.z), k);
+    }
     if (trans.current > 0) {
       const cam = c.object;
       const dir = cam.position.clone().sub(c.target);
-      const deseada = entrando ? 9 : 18; // acercarse al entrar, abrir al volver (más aire)
-      dir.setLength(THREE.MathUtils.lerp(dir.length(), deseada, 0.06));
+      // Acercarse al entrar; al volver, abrir hasta el reposo del ASPECTO
+      // real (kReposo): en un teléfono parado el valle respira más lejos.
+      const deseada = entrando ? 9 : 18 * kReposo;
+      dir.setLength(THREE.MathUtils.lerp(dir.length(), deseada, k));
       cam.position.copy(c.target.clone().add(dir));
-      trans.current = Math.max(0, trans.current - 0.012);
+      trans.current = Math.max(0, trans.current - (entrando ? 0.012 : 0.009));
+    }
+    /* PANEO ACOTADO (AoE): muro duro en límite+sobra, resorte elástico hacia
+       el área — la corrección traslada mira Y cámara juntas para no torcer
+       el encuadre. Con reduced-motion el borde es un clamp seco (sin rebote). */
+    {
+      const t = c.target;
+      const cam = c.object;
+      const antesX = t.x;
+      const antesZ = t.z;
+      let nx = THREE.MathUtils.clamp(t.x, PAN_LIMITES.x0 - PAN_SOBRA, PAN_LIMITES.x1 + PAN_SOBRA);
+      let nz = THREE.MathUtils.clamp(t.z, PAN_LIMITES.z0 - PAN_SOBRA, PAN_LIMITES.z1 + PAN_SOBRA);
+      const kR = reducedMotion ? 1 : PAN_RESORTE;
+      nx += (THREE.MathUtils.clamp(nx, PAN_LIMITES.x0, PAN_LIMITES.x1) - nx) * kR;
+      nz += (THREE.MathUtils.clamp(nz, PAN_LIMITES.z0, PAN_LIMITES.z1) - nz) * kR;
+      if (nx !== antesX || nz !== antesZ) {
+        t.setX(nx);
+        t.setZ(nz);
+        cam.position.setX(cam.position.x + (nx - antesX));
+        cam.position.setZ(cam.position.z + (nz - antesZ));
+      }
+      /* La mira se pega al TERRENO durante el paseo: subir al páramo encuadra
+         el páramo (la cámara sube con ella — translación, no picada). */
+      if (panLibre.current && !entrando) {
+        const dy = (alturaTerreno(t.x, t.z) + 0.8 - t.y) * (reducedMotion ? 1 : PAN_PEGA_SUELO);
+        if (dy !== 0) {
+          t.setY(t.y + dy);
+          cam.position.setY(cam.position.y + dy);
+        }
+      }
     }
     c.update();
   });
@@ -1029,59 +2099,153 @@ function CamaraViajera({ foco, focoKey, controls, autoOrbit }) {
     <OrbitControls
       ref={controls}
       makeDefault
-      enablePan={false}
+      /* PANEO AoE habilitado — acotado por el clamp elástico de arriba. */
+      enablePan
+      /* El pan corre HORIZONTAL sobre la finca (no en el plano de pantalla):
+         la mira nunca vuela al cielo — el mapa se recorre, no se descuelga. */
+      screenSpacePanning={false}
+      panSpeed={0.9}
+      /* TÁCTIL (campesino con teléfono): UN dedo ORBITA — el gesto aprobado —,
+         DOS dedos PANEAN y pellizcan ZOOM. Usable con el pulgar; en desktop
+         el arrastre con botón derecho panea (default de OrbitControls). */
+      touches={{ ONE: THREE.TOUCH.ROTATE, TWO: THREE.TOUCH.DOLLY_PAN }}
       enableZoom
+      /* El target ARRANCA en la mira de reposo (no en el origen): el primer
+         fotograma ya es el encuadre de autor — clave en reduced-motion
+         (frameloop demand), donde el lerp por frame gatea. */
+      target={miraInicial || undefined}
       minDistance={7}
-      maxDistance={28}
+      /* El techo de zoom respeta el reposo del aspecto: si la pose vertical
+         vive más lejos, el clamp no pelea contra ella (antes, en teléfono,
+         el reposo caía FUERA del techo y los controles daban tirones). */
+      maxDistance={Math.max(28, Math.ceil(20 * kReposo) + 4)}
       minPolarAngle={0.45}
       maxPolarAngle={1.18}
-      autoRotate={autoOrbit && !entrando}
-      autoRotateSpeed={0.35}
+      autoRotate={autoOrbit && !entrando && !tomada}
+      /* Deriva de reposo APENAS perceptible (~0.7°/s): a 0.35 el valle giraba
+         ~2°/s y en un minuto la composición de autor ya no estaba en pantalla
+         — y el chip apuntado se corría del dedo. La vida la ponen los bichos
+         y la atmósfera, no el tiovivo. */
+      autoRotateSpeed={0.12}
       enableDamping
+      /* 0.08: la "sensación de lentitud/peso" de la v2 que el operador
+         APROBÓ (la subida a 0.12 fue la regresión de cámara — auditoría
+         v2-vs-actual 2026-07-16: la cámara quedó seca). */
       dampingFactor={0.08}
+      onStart={tomada ? undefined : () => setTomada(true)}
     />
   );
 }
 
-/* La pose de cámara del valle: UNA fuente para el Canvas y para el establishing
-   shot de la CámaraDirector (así el dolly aterriza EXACTO donde siempre). */
-const CAMARA_VALLE = { position: [10.5, 9, 13.5], fov: 40 };
+/* ── EL CICLO DIURNO VIVO: la atmósfera del valle GIRA con la franja del día ──
+      Antes el fondo/niebla/luces se fijaban declarativos por `clima` y cambiar
+      de piel era un CORTE. Este driver (mismo patrón que CielosHora.jsx) las
+      escribe imperativamente en useFrame y AMORTIGUA cada valor hacia la piel
+      nueva (~2.5 s): amanece, atardece y anochece como un giro del día, no un
+      teletransporte. El sol además LLEVA su posición (`c.sol`): rasante al
+      amanecer, cenital al mediodía (sombras cortas), luna desde el otro lado
+      de noche — las sombras del tier alto giran gratis con él.
+      Cero setState y cero alocación por frame (Color/Vector3 mutados in-place);
+      los props declarativos usan la piel del PRIMER montaje, que no cambia.
+      reducedMotion: snap directo al preset (frameloop 'demand' — la calma que
+      pide la preferencia), la franja igual avanza con el reloj. ── */
+const SOL_DEFECTO = [6, 9, 4];
 
-/* ── Contenido de la escena (dentro del Canvas). ── */
-function Escena({ clima, focoId, animo, energia, onEntrar, onAlerta, reducedMotion, perfil, tier = 'alto', estadoFinca = null, hayAlerta = false }) {
-  const controls = useRef(null);
-  // Occluders de los rótulos: solo terreno + cordillera (raycast barato y es
-  // exactamente lo que las etiquetas no deben atravesar).
-  const terrenoRef = useRef(null);
-  const cordilleraRef = useRef(null);
-  const occluders = useMemo(() => [terrenoRef, cordilleraRef], []);
-  const c = CLIMAS[clima];
-  const foco = useMemo(() => {
-    const m = focoId ? MUNDO_VALLE_BY_ID[focoId] : null;
-    // Sin foco, la cámara encuadra el corazón del valle (algo hacia el frente,
-    // regla de tercios) para dar aire y leer la ladera que sube al fondo.
-    if (!m) return new THREE.Vector3(0, 1.0, 1.4);
-    const y = alturaTerreno(m.pos[0], m.pos[2]);
-    return new THREE.Vector3(m.pos[0], y, m.pos[2]);
-  }, [focoId]);
-  const autoOrbit = !reducedMotion && !focoId;
-  const entrando = !!focoId;
-  const nocturno = clima === 'noche';
+function estadoAtmosfera(c) {
+  return {
+    fondo: new THREE.Color(c.cielo[1]),
+    domo: new THREE.Color(c.cielo[0]),
+    suelo: new THREE.Color(c.ambiente),
+    luz: new THREE.Color(c.luz),
+    niebla: new THREE.Color(c.niebla),
+    solPos: new THREE.Vector3(...(c.sol || SOL_DEFECTO)),
+    intensidad: c.intensidad,
+    nieblaLejos: c.nieblaLejos + 8,
+  };
+}
+
+function amortiguarAtmosfera(actual, objetivo, k) {
+  actual.fondo.lerp(objetivo.fondo, k);
+  actual.domo.lerp(objetivo.domo, k);
+  actual.suelo.lerp(objetivo.suelo, k);
+  actual.luz.lerp(objetivo.luz, k);
+  actual.niebla.lerp(objetivo.niebla, k);
+  actual.solPos.lerp(objetivo.solPos, k);
+  actual.intensidad += (objetivo.intensidad - actual.intensidad) * k;
+  actual.nieblaLejos += (objetivo.nieblaLejos - actual.nieblaLejos) * k;
+}
+
+function AtmosferaValle({ c, perfil, reducedMotion }) {
+  const objetivo = useMemo(() => estadoAtmosfera(c), [c]);
+  // La piel del primer montaje: alimenta los valores declarativos del JSX (que
+  // nunca deben cambiar tras montar) — un re-render no pisa la animación.
+  const [ini] = useState(() => c);
+  const [actual] = useState(() => estadoAtmosfera(ini));
+
+  const fondoRef = useRef(null);
+  const fogRef = useRef(null);
+  const hemiRef = useRef(null);
+  const ambRef = useRef(null);
+  const solRef = useRef(null);
+
+  const pintar = (e) => {
+    if (fondoRef.current) fondoRef.current.copy(e.fondo);
+    if (fogRef.current) {
+      fogRef.current.color.copy(e.niebla);
+      fogRef.current.far = e.nieblaLejos;
+    }
+    if (hemiRef.current) {
+      hemiRef.current.intensity = e.intensidad * 0.55;
+      hemiRef.current.color.copy(e.domo);
+      hemiRef.current.groundColor.copy(e.suelo);
+    }
+    if (ambRef.current) {
+      ambRef.current.intensity = e.intensidad * 0.35;
+      ambRef.current.color.copy(e.luz);
+    }
+    if (solRef.current) {
+      solRef.current.intensity = e.intensidad;
+      solRef.current.color.copy(e.luz);
+      solRef.current.position.copy(e.solPos);
+    }
+  };
+
+  // Calma pedida → snap: la piel nueva entra completa, sin animar.
+  useEffect(() => {
+    if (!reducedMotion) return;
+    amortiguarAtmosfera(actual, objetivo, 1);
+    pintar(actual);
+  });
+
+  // Transición viva: amortiguación exponencial estable en dt variable.
+  useFrame((_, dt) => {
+    if (reducedMotion) return;
+    const k = 1 - Math.exp((-3 / TRANSICION.duracion) * Math.min(dt, 0.1));
+    amortiguarAtmosfera(actual, objetivo, k);
+    pintar(actual);
+  });
 
   return (
     <>
-      {!reducedMotion && <MonitorRendimiento key={tier} tier={tier} />}
-      <color attach="background" args={[c.cielo[1]]} />
+      <color ref={fondoRef} attach="background" args={[ini.cielo[1]]} />
       {/* La niebla se paga por fragmento: en perfil 'bajo' se apaga. */}
-      {perfil.fog && <fog attach="fog" args={[c.niebla, 12, c.nieblaLejos + 8]} />}
-      <hemisphereLight intensity={c.intensidad * 0.55} color={c.cielo[0]} groundColor={c.ambiente} />
-      <ambientLight intensity={c.intensidad * 0.35} color={c.luz} />
+      {perfil.fog && (
+        <fog ref={fogRef} attach="fog" args={[ini.niebla, 12, ini.nieblaLejos + 8]} />
+      )}
+      <hemisphereLight
+        ref={hemiRef}
+        intensity={ini.intensidad * 0.55}
+        color={ini.cielo[0]}
+        groundColor={ini.ambiente}
+      />
+      <ambientLight ref={ambRef} intensity={ini.intensidad * 0.35} color={ini.luz} />
       {/* castShadow SOLO en 'alto': sin shadow-map la escena se dibuja UNA vez
           por frame, no dos (DR FIX 1 — el mayor ahorro de GPU de un golpe). */}
       <directionalLight
-        position={[6, 9, 4]}
-        intensity={c.intensidad}
-        color={c.luz}
+        ref={solRef}
+        position={ini.sol || SOL_DEFECTO}
+        intensity={ini.intensidad}
+        color={ini.luz}
         castShadow={perfil.sombras}
         shadow-mapSize={[1024, 1024]}
         shadow-camera-far={30}
@@ -1090,42 +2254,357 @@ function Escena({ clima, focoId, animo, energia, onEntrar, onAlerta, reducedMoti
         shadow-camera-top={12}
         shadow-camera-bottom={-12}
       />
-      {c.estrellas && perfil.estrellas > 0 && (
+    </>
+  );
+}
+
+/* ── LA LUNA DEL VALLE: el disco de plata que AUTORIZA la luz nocturna ──────
+      La noche del cine tiene autora: la direccional fría sale de aquí
+      (CLIMAS.noche.sol apunta desde -x,-z) y verla en el cielo hace legible
+      el contraluz. Discos meshBasic (5 planos transparentes, cero luces
+      extra): corre en TODOS los tiers. Se orienta a la cámara con lookAt
+      (~2 veces/s alcanza — la luna está lejos y el orbit es lento). ── */
+/* La LUNA PONIÉNDOSE tras el filo del páramo (izquierda-fondo, baja sobre el
+   horizonte — en este valle el oriente es +x, por donde sale el sol de
+   CLIMAS.amanecer; una luna en -x va de bajada, como la ve el que madruga):
+   la pose de reposo pica 23° hacia abajo, así que el único cielo del cuadro
+   es la franja rasante sobre la silueta de la ladera — ahí vive la luna.
+   LUZ MOTIVADA: la direccional nocturna (CLIMAS.noche.sol [-13,4.6,-5.2])
+   apunta DESDE este disco — mover la luna es mover también esa luz, o la
+   noche vuelve a mentir. Verificado contra el terreno: el rayo cámara→luna
+   libra la loma (y=6.9 sobre 1.5 en x=-10; 6.2 sobre 3.1 en el borde x=-17)
+   y las cordilleras quedan lejos (z≤-15 la cercana, z≤-22 la lejana). */
+const POS_LUNA = /** @type {[number, number, number]} */ ([-21, 3.4, -8]);
+
+function LunaValle({ reducedMotion }) {
+  const ref = useRef(null);
+  const tick = useRef(0);
+  useFrame(({ camera }) => {
+    if (!ref.current) return;
+    if (tick.current++ % 30 !== 0 && !reducedMotion) return;
+    ref.current.lookAt(camera.position);
+  });
+  return (
+    <group ref={ref} position={POS_LUNA} scale={1.1}>
+      <mesh>
+        <circleGeometry args={[1.15, 36]} />
+        <meshBasicMaterial color="#f2f0e2" transparent opacity={0.98} depthWrite={false} fog={false} />
+      </mesh>
+      {/* mares: sombras suaves que hacen luna, no plato */}
+      <mesh position={[-0.3, 0.26, 0.01]}>
+        <circleGeometry args={[0.3, 18]} />
+        <meshBasicMaterial color="#d4d2c2" transparent opacity={0.5} depthWrite={false} fog={false} />
+      </mesh>
+      <mesh position={[0.34, -0.28, 0.01]}>
+        <circleGeometry args={[0.19, 16]} />
+        <meshBasicMaterial color="#d9d7c6" transparent opacity={0.45} depthWrite={false} fog={false} />
+      </mesh>
+      {/* halo doble: el velo húmedo del páramo alrededor de la luna */}
+      <mesh position={[0, 0, -0.05]}>
+        <circleGeometry args={[2.1, 36]} />
+        <meshBasicMaterial color="#b3cdf0" transparent opacity={0.18} depthWrite={false} fog={false} />
+      </mesh>
+      <mesh position={[0, 0, -0.1]}>
+        <circleGeometry args={[3.6, 36]} />
+        <meshBasicMaterial color="#3d5178" transparent opacity={0.12} depthWrite={false} fog={false} />
+      </mesh>
+    </group>
+  );
+}
+
+/* Caja de las luciérnagas: la tierra baja del frente del valle (referencia
+   ESTABLE — ParticulasAmbientales re-siembra si la caja cambia). */
+const AREA_LUCIERNAGAS = /** @type {[number, number, number]} */ ([18, 2.4, 7]);
+
+/* EL MAR DE NUBES DEL AMANECER (la imagen imposible-pero-verdadera del valle):
+   la niebla de RADIACIÓN se forma de madrugada en el fondo del valle — el
+   suelo bajo irradia su calor al cielo despejado y la humedad condensa
+   abajo, no arriba (DR luz real de los Andes). Desde la finca, a media
+   ladera, se ve EL MAR: la tierra caliente del frente tapada por un colchón
+   blanco y la casa flotando encima, con las cumbres al fondo. Solo existe
+   en la franja del amanecer (el sol se lo bebe en una hora, como en la
+   vereda) — quien madruga lo ve; quien no, no. Banda ESTABLE de módulo:
+   NieblaLadera re-siembra si la referencia cambia. +1 draw call (Points). */
+const BANDA_MAR_NUBES = { x: /** @type {[number, number]} */ ([-11, 11]), z: /** @type {[number, number]} */ ([4.6, 9.6]) };
+
+/* La pose de cámara del valle: UNA fuente para el Canvas y para el establishing
+   shot de la CámaraDirector (así el dolly aterriza EXACTO donde siempre). */
+const CAMARA_VALLE = { position: /** @type {[number, number, number]} */ ([10.5, 9, 13.5]), fov: 40 };
+/* El target de reposo del valle: el corazón del mapa, al que CamaraViajera
+   lleva el target sin foco ((0,1.0,1.4) + 0.6 en y). El establishing del
+   DirectorValle aterriza EXACTO aquí para no dar ningún salto al soltar. */
+const MIRA_VALLE = [0, 1.6, 1.4];
+
+/* El REPOSO CONSCIENTE DEL ASPECTO (dirección de cámara): el fov de three es
+   VERTICAL — en un teléfono parado (aspecto ~0.46) los 40° dejan un fov
+   horizontal de ~19° y la composición entera (lugares en x ∈ [-7.5, 7.5], el
+   oso en el borde del monte) queda FUERA del cuadro: medio valle existía y
+   nadie lo veía (la misma clase de fallo que los árboles tras el macizo de la
+   sierra).
+
+   EL PLANO VERTICAL ES OTRO PLANO (no el mismo, más lejos): retroceder a lo
+   ancho regalaba el 40% del cuadro al cielo vacío y apeñuscaba la finca abajo
+   — los rótulos colisionaban todos y la anti-colisión escondía la mayoría (el
+   "difícil de manejar" del operador). En vertical la cámara SUBE y PICA: la
+   ladera entera (tierra caliente → páramo, 16 u de fondo) corre a lo LARGO de
+   la pantalla, los lugares se separan en vertical y cada rótulo respira. La
+   mira baja y avanza (la finca al centro, el cielo de remate arriba).
+   En landscape (aspecto ≥ 0.9) la pose aprobada queda EXACTA. */
+function poseValleParaAspecto(aspect) {
+  if (!aspect || aspect >= 0.9) {
+    return { position: CAMARA_VALLE.position, fov: CAMARA_VALLE.fov, k: 1, mira: MIRA_VALLE };
+  }
+  const cuanVertical = Math.min(1, (0.9 - aspect) / 0.44); // 0 en 0.9 → 1 en ~0.46
+  // El PLANO PICADO del teléfono parado (misma acimut de la pose aprobada,
+  // polar ~40°): la cámara sube a 18.7 y la mira avanza a la finca (z 3.2).
+  const PICADO = { position: [9.3, 18.7, 15.1], fov: 58, mira: [-0.5, 0.6, 2.7] };
+  const lerp = (a, b) => a + (b - a) * cuanVertical;
+  const position = /** @type {[number, number, number]} */ (
+    CAMARA_VALLE.position.map((v, i) => lerp(v, PICADO.position[i]))
+  );
+  const mira = /** @type {[number, number, number]} */ (
+    MIRA_VALLE.map((v, i) => lerp(v, PICADO.mira[i]))
+  );
+  const fov = Math.round(lerp(CAMARA_VALLE.fov, PICADO.fov));
+  // k = razón de distancia (cámara→mira) contra la pose landscape: gobierna
+  // el zoom de reposo de CamaraViajera y el techo de los controles.
+  const dist = (p, m) => Math.hypot(p[0] - m[0], p[1] - m[1], p[2] - m[2]);
+  const k = dist(position, mira) / dist(CAMARA_VALLE.position, MIRA_VALLE);
+  return { position, fov, k, mira };
+}
+
+/* ── Contenido de la escena (dentro del Canvas). ── */
+function Escena({ clima, focoId, animo, energia, onEntrar, onAlerta, onCasa = null, onAngelita = null, reducedMotion, perfil, tier = 'alto', estadoFinca = null, hayAlerta = false, aplanando = false, camaraDirector = false, beatsRef = null, portada = false, pose = null }) {
+  /* La pose de reposo (aspecto-consciente, viene del host del Canvas). */
+  const poseReposo = pose || { position: CAMARA_VALLE.position, fov: CAMARA_VALLE.fov, k: 1, mira: MIRA_VALLE };
+  const miraReposo = poseReposo.mira || MIRA_VALLE;
+  const controls = useRef(null);
+  /* La cámara de director (FASE 4, flag `camaraDirector`) se monta DESPUÉS de
+     CamaraViajera y gana por orden de frame durante su barrido. `avatarRef`
+     recibe la posición viva de Angelita (Vector3 estable) para el follow. */
+  const avatarRef = useRef(new THREE.Vector3());
+  // Occluders de los rótulos: solo terreno + cordillera (raycast barato y es
+  // exactamente lo que las etiquetas no deben atravesar).
+  const terrenoRef = useRef(null);
+  const cordilleraRef = useRef(null);
+  const occluders = useMemo(() => [terrenoRef, cordilleraRef], []);
+  const c = CLIMAS[clima];
+  const foco = useMemo(() => {
+    const m = focoId ? MUNDO_DIR_BY_ID[focoId] : null;
+    // Sin foco, la cámara encuadra el corazón del valle (algo hacia el frente,
+    // regla de tercios) — la mira de reposo es ASPECTO-CONSCIENTE: en vertical
+    // baja y avanza hacia la finca (CamaraViajera le suma 0.6 en y).
+    if (!m) return new THREE.Vector3(miraReposo[0], miraReposo[1] - 0.6, miraReposo[2]);
+    const y = alturaTerreno(m.pos[0], m.pos[2]);
+    return new THREE.Vector3(m.pos[0], y, m.pos[2]);
+  }, [focoId, miraReposo]);
+  const autoOrbit = !reducedMotion && !focoId;
+  const entrando = !!focoId;
+  const nocturno = clima === 'noche';
+
+  // El ciclo trae estrellas GRADUALES (0..1 del presupuesto del tier: unas
+  // pocas se asoman al atardecer, todas de noche) y luciérnagas por densidad.
+  const fracEstrellas = c.estrellas === true ? 1 : Number(c.estrellas) || 0;
+  const luciernagas = Number(c.luciernagas) || 0;
+  /* Luces prácticas de la finca (0..1): las ventanas se encienden CON el ocaso,
+     no en un switch binario noche/día (ciclo día↔noche, fable 2026-07-18). */
+  const practicas = Number(c.practicas) || 0;
+
+  return (
+    <>
+      {!reducedMotion && <MonitorRendimiento key={tier} tier={tier} />}
+      {/* Fondo + niebla + luces, amortiguadas hacia la franja del día. */}
+      <AtmosferaValle c={c} perfil={perfil} reducedMotion={reducedMotion} />
+      {fracEstrellas > 0 && perfil.estrellas > 0 && (
         <Stars
           radius={40}
           depth={20}
-          count={perfil.estrellas}
+          count={Math.max(24, Math.round(perfil.estrellas * fracEstrellas))}
           factor={3}
           fade
           speed={reducedMotion ? 0 : 1}
         />
       )}
+      {/* Luciérnagas: asoman al atardecer y llenan la noche. Kit instanciado
+          (1 draw call), presupuesto por tier adentro; con reduced-motion
+          quedan quietas a brillo medio — presencia sin parpadeo. */}
+      {luciernagas > 0 && (
+        <ParticulasAmbientales
+          tipo="luciernagas"
+          densidad={luciernagas}
+          tier={/** @type {"bajo"|"alto"|"medio"} */ (tier)}
+          reducedMotion={reducedMotion}
+          area={AREA_LUCIERNAGAS}
+          position={[0, 0.35, 3.6]}
+          semilla={11}
+        />
+      )}
+
+      {/* La LUNA: la autora de la luz nocturna. Verla ancla el contraluz. */}
+      {nocturno && <LunaValle reducedMotion={reducedMotion} />}
 
       <Terreno nocturno={nocturno} innerRef={terrenoRef} perfil={perfil} />
-      <Cordillera color={nocturno ? '#3a4a63' : c.niebla} innerRef={cordilleraRef} perfil={perfil} />
-      <Quebrada color={nocturno ? '#2a4a6a' : '#5fb2c9'} viva={c.lluviaViva} perfil={perfil} />
-      <VegetacionPisos nocturno={nocturno} perfil={perfil} />
-
-      {MUNDOS_VALLE.map((m) => (
-        <MundoLugar key={m.id} mundo={m} reducedMotion={reducedMotion} perfil={perfil} />
-      ))}
-      <RotulosLugares
-        mundos={MUNDOS_VALLE}
-        focoId={focoId}
-        onEntrar={onEntrar}
-        occluders={occluders}
+      {/* AoE: detalle de suelo (pasto corto/flores/piedras) + surcos de cultivo — mata el verde vacío */}
+      <DetalleSueloValle alturaDe={alturaTerreno} tier={tier} reducedMotion={reducedMotion} nocturno={nocturno} />
+      <Cordillera color={nocturno ? '#48598a' : c.niebla} innerRef={cordilleraRef} perfil={perfil} />
+      {/* AGUA VIVA: el hilo que baja del páramo + las acequias que se ramifican
+          a las eras, el semillero y la huerta, con sus compuertas y pozas. */}
+      <AguaVivaValle alturaDe={alturaTerreno} tier={tier} reducedMotion={reducedMotion} nocturno={nocturno} caudal={c.lluviaViva ? 1 : 0.85} />
+      <Quebrada
+        color={nocturno ? '#7fb3d9' : '#5fb2c9'}
+        viva={c.lluviaViva}
+        perfil={perfil}
+        nocturno={nocturno}
       />
+      <VegetacionPisos nocturno={nocturno} perfil={perfil} />
+      {/* AoE: bosque denso 3x + detalle de suelo/surcos + campesinos en faena + hato en movimiento */}
+      <BosqueDensoValle alturaDe={alturaTerreno} tier={tier} reducedMotion={reducedMotion} nocturno={nocturno} />
+      {/* CLIMA VIVO: la lluvia que cae de verdad, la niebla que rueda por la
+          ladera y la ESCARCHA de la helada — el clima real escrito en el suelo. */}
+      {c.lluviaViva && (
+        <LluviaValle alturaDe={alturaTerreno} tier={tier} reducedMotion={reducedMotion} nocturno={nocturno} />
+      )}
+      {clima === 'niebla' && (
+        <NieblaLadera alturaDe={alturaTerreno} tier={tier} reducedMotion={reducedMotion} />
+      )}
+      {clima === 'amanecer' && (
+        <NieblaLadera modo="amanecer" intensidad={0.55} alturaDe={alturaTerreno} tier={tier} reducedMotion={reducedMotion} />
+      )}
+      {/* EL MAR DE NUBES: el colchón de niebla de radiación posado en la
+          tierra baja del frente — la finca amanece FLOTANDO sobre él. Deriva
+          lentísima (el aire quieto de la madrugada); solo bancos, sin
+          jirones (los del cauce ya los pone la NieblaLadera de arriba). */}
+      {clima === 'amanecer' && (
+        <NieblaLadera
+          intensidad={0.5}
+          velocidad={0.45}
+          banda={BANDA_MAR_NUBES}
+          alturaDe={alturaTerreno}
+          tier={tier}
+          reducedMotion={reducedMotion}
+          semilla={43}
+        />
+      )}
+      {hayAlerta && COSA_DEL_DIA.tono === 'helada' && (clima === 'noche' || clima === 'amanecer' || clima === 'helada') && (
+        <HeladaValle alturaDe={alturaTerreno} tier={tier} reducedMotion={reducedMotion} />
+      )}
+      <CafetalDensoValle alturaDe={alturaTerreno} tier={tier} nocturno={nocturno} zona={[{ cx: 5.2, cz: 1.6, rx: 2.6, rz: 2.2 }]} />
+      <ParamoDensoValle alturaDe={alturaTerreno} tier={tier} nocturno={nocturno} />
+      {/* La LADERA ALTA poblada: terrazas de clima frío en policultivo (papa,
+          haba, cubio, arracacha + barbecho), cerca de piedra, camino y abrigo. */}
+      <LaderaAltaValle alturaDe={alturaTerreno} tier={tier} nocturno={nocturno} reducedMotion={reducedMotion} />
+      {!portada && <CampesinosValle alturaDe={alturaTerreno} tier={tier} reducedMotion={reducedMotion} />}
+      {!portada && <HatoMovil alturaDe={alturaTerreno} tier={tier === 'alto' ? 10 : tier === 'bajo' ? 4 : 7} radio={4.8} reducedMotion={reducedMotion} />}
+      {/* LOGÍSTICA VISIBLE (alma Settlers): la mula acarrea estiércol→pila,
+          compost→eras y cosecha→casa por los senderos, y las pilas crecen. */}
+      {!portada && <ArrieriaValle alturaDe={alturaTerreno} tier={tier} reducedMotion={reducedMotion} />}
+
+      {/* LA DIRECCIÓN DEL CUADRO: la casa donde descansa el ojo (su puerta
+          iluminada es la vía SECUNDARIA a la ventana de los mundos), los
+          senderos de tierra pisada que nacen de ella, las VENTANAS VIVAS de
+          los portales principales (la entrada PRINCIPAL: paisajes en
+          miniatura, no espejos), los pórticos humildes de lo secundario, la
+          vista del páramo con su Ent, y los patios bajo cada lugar. */}
+      <CasaCampesina
+        alturaDe={alturaTerreno}
+        perfil={perfil}
+        nocturno={nocturno}
+        practicas={practicas}
+        reducedMotion={reducedMotion}
+        onPuerta={portada ? null : onCasa}
+      />
+      <SenderosValle alturaDe={alturaTerreno} perfil={perfil} />
+      {/* JERARQUÍA DE PORTALES (regla del operador): los 6 grandes son
+          PAISAJES vivos — cada arco enmarca la viñeta 3D de su mundo (cero
+          discos-espejo); los toris de madera quedan SOLO para los lugares
+          secundarios de menos uso. */}
+      <VentanasVivas
+        mundos={MUNDOS_DIR}
+        alturaDe={alturaTerreno}
+        nocturno={nocturno}
+        practicas={practicas}
+        reducedMotion={reducedMotion}
+        perfil={perfil}
+        onEntrar={portada ? null : onEntrar}
+      />
+      <PorticosSecundarios mundos={MUNDOS_DIR} alturaDe={alturaTerreno} />
+      {/* EL ACCESO AL PÁRAMO — el Ent-queñua+frailejones del filo (VistaParamoEnt)
+          se ARCHIVÓ 2026-07-18 (pedido del operador): se veía amontonado en la
+          vista del valle. Ver src/mockups/valle/_archivo/vistaParamo.archivado.jsx.
+          El portal REAL al páramo NO estaba aquí y sigue intacto: el lugar
+          'paramo' de valleData.js (su propio rótulo tocable en el valle) sigue
+          llevando a MundoParamo3D vía wire3DNav.js `paramo: 'diorama_paramo'`. */}
+      {/* El cóndor: planea su térmica sobre el filo del páramo y a ratos se
+          POSA en el pico de la cordillera, de día (de noche duerme en la
+          peña). Un billboard: vive en todos los tiers. */}
+      {!nocturno && <CondorDelValle reducedMotion={reducedMotion} tier={tier} />}
+      {/* EL PESO DE LAS COSAS: la sombra de contacto que planta cada objeto
+          en su loma. Separa la profundidad sin mover nada — la casa, los
+          hitos y las matas dejan de flotar. De noche se atenúa, no se va. */}
+      <SombrasContacto
+        mundos={MUNDOS_DIR}
+        alturaDe={alturaTerreno}
+        nocturno={nocturno}
+        franja={clima}
+      />
+      {!portada && (
+        <PatiosLugares mundos={MUNDOS_DIR} alturaDe={alturaTerreno} nocturno={nocturno} />
+      )}
+
+      {MUNDOS_DIR.map((m) => (
+        <MundoLugar
+          key={m.id}
+          mundo={m}
+          reducedMotion={reducedMotion}
+          perfil={perfil}
+          onEntrar={portada ? null : onEntrar}
+        />
+      ))}
+
+      {/* Los VECINOS del valle (el oso, el borugo, el jaguar…): los personajes
+          en su casa, con presencia digna — acompañan a Angelita sin pelearle
+          el primer plano. Billboards DOM baratos: viven en TODOS los tiers
+          (el operador no debería necesitar GPU rica para conocer al oso);
+          la franja horaria decide quién está afuera. */}
+      <VecinosDelValle
+        alturaDe={alturaTerreno}
+        reducedMotion={reducedMotion}
+        franja={clima}
+      />
+      {/* EL OSO NEGRO del monte (biopunk, decisión del operador): el mayor
+          de los vecinos de tierra, visible en el borde del bosque. */}
+      <OsoNegroDelMonte alturaDe={alturaTerreno} />
+      {/* MODO PORTADA (la cara de prod.chagra.app): el valle es ATMÓSFERA de
+          la entrada — sin rótulos que compitan con el formulario ni faro que
+          pida un toque que aún no puede darse. La vida (criaturas, Angelita,
+          ciclo del día) se queda: la finca espera, no está muerta. */}
+      {!portada && (
+        <RotulosLugares
+          mundos={MUNDOS_DIR}
+          focoId={focoId}
+          onEntrar={onEntrar}
+          occluders={occluders}
+          controls={controls}
+          kReposo={poseReposo.k}
+        />
+      )}
 
       <CriaturasValle reducedMotion={reducedMotion} cupo={perfil.criaturas} tier={tier} />
-      <Beacon onAlerta={onAlerta} reducedMotion={reducedMotion} conLuz={perfil.luzBeacon} />
+      {!portada && (
+        <Beacon onAlerta={onAlerta} reducedMotion={reducedMotion} conLuz={perfil.luzBeacon} />
+      )}
       <CompaneroAbeja
         foco={foco}
+        focoId={focoId}
         entrando={entrando}
         animo={animo}
         energia={energia}
         estadoFinca={estadoFinca}
         hayAlerta={hayAlerta}
         reducedMotion={reducedMotion}
+        posRef={camaraDirector ? avatarRef : null}
+        conLuz={perfil.luzBeacon}
+        onTocar={portada ? null : onAngelita}
       />
 
       <CamaraViajera
@@ -1133,22 +2612,51 @@ function Escena({ clima, focoId, animo, energia, onEntrar, onAlerta, reducedMoti
         focoKey={focoId || 'valle'}
         controls={controls}
         autoOrbit={autoOrbit}
+        aplanando={aplanando}
+        kReposo={poseReposo.k}
+        miraInicial={miraReposo}
+        reposo={poseReposo.position}
+        reducedMotion={reducedMotion}
       />
-      {/* La CÁMARA DE DIRECTOR (FASE 4): el establishing shot del mapa — dolly
-          con arco desde más alto/lejos hasta la pose de siempre, UNA vez por
-          sesión (volver de un mundo no lo repite). Sin `mirada`: el target ya
-          lo lleva CamaraViajera; aquí solo posición + FOV. La respiración del
-          encuadre es aditiva y convive con su lerp. Gama baja o reduced-motion:
-          cámara simple (inerte). */}
-      <CamaraDirector
-        controls={controls}
-        reposo={CAMARA_VALLE.position}
-        duracion={2.4}
-        amplio={1.3}
-        respiro={0.05}
-        activa={!reducedMotion && tier !== 'bajo'}
-        unaVezClave="valle"
-      />
+      {/* La CÁMARA DE DIRECTOR (FASE 4). Con el flag `camaraDirector`:
+          DirectorValle (establishing + follow + beats), montado DESPUÉS de
+          CamaraViajera para ganar por orden de frame durante el barrido. Sin
+          flag: la CamaraDirector clásica intacta (establishing + respiro). Gama
+          baja o reduced-motion: ambas caen a cámara simple (inerte). */}
+      {camaraDirector ? (
+        <DirectorValle
+          controls={controls}
+          reposo={poseReposo.position}
+          mira={miraReposo}
+          fov={poseReposo.fov}
+          foco={foco}
+          avatarRef={avatarRef}
+          beatsRef={beatsRef}
+          entrando={entrando}
+          aplanando={aplanando}
+          activa
+          tier={tier}
+          reducedMotion={reducedMotion}
+          unaVezClave="valle"
+        />
+      ) : (
+        <CamaraDirector
+          controls={controls}
+          reposo={poseReposo.position}
+          /* En portada la llegada es más lenta y amplia (contemplar, no operar)
+             y NO consume la clave 'valle': al cruzar la tranquera, el home aún
+             estrena su propio establishing — llegar dos veces se siente bien. */
+          duracion={portada ? 3.6 : 2.4}
+          amplio={portada ? 1.42 : 1.3}
+          respiro={0.05}
+          activa={!reducedMotion && tier !== 'bajo'}
+          unaVezClave={portada ? 'portada' : 'valle'}
+        />
+      )}
+      {/* El aplane New Donk del flujo vivo — montado de ÚLTIMO para tener la
+          última palabra sobre la cámara mientras cae dentro del mundo. Solo
+          hace algo cuando `aplanando` (fase 'viajando'); inerte el resto. */}
+      <AplaneNewDonk foco={foco} aplanando={aplanando} />
     </>
   );
 }
@@ -1160,29 +2668,89 @@ export default function Valle3D({
   energia = 1,
   onEntrar,
   onAlerta,
+  /* Tocar la puerta iluminada de la casa: la vía SECUNDARIA — lleva a la
+     ventana-puerta de los mundos (el host decide el destino). La entrada
+     principal a cada mundo son sus portales-paisaje, tocados directo. */
+  onCasa = null,
+  /* Tocar a Angelita: hablarle a la finca (el host abre el agente). */
+  onAngelita = null,
   reducedMotion,
   tier = 'alto',
   /* El estado REAL de la finca (auditoría §5b): Angelita SIEMPRE lo refleja,
      también en el mapa. Hoy MUESTRA; codex lo cabla con useFincaViva. */
   estadoFinca = ESTADO_FINCA_MUESTRA,
   hayAlerta = false,
+  /* Flujo vivo valle→mundo (New Donk): mientras el host viaja a un mundo, la
+     cámara del valle hace dolly + aplane hacia el landmark en vez de cortar con
+     velo. El host lo enciende en la fase 'viajando'. */
+  aplanando = false,
+  /* FASE 4 — cámara de director (establishing + follow + beats). Detrás de un
+     flag para no tocar la cámara actual: off = comportamiento clásico. Va
+     gateada por tier/reduced-motion adentro (tier bajo o calma = cámara fija). */
+  camaraDirector = false,
+  /* Buzón de beats coreografiados (fauna/Ent/alerta): el host (EscenaValle)
+     empuja aquí `{ tipo, lado, slug, magico }` y el director lo consume. */
+  beatsRef = null,
+  /* MODO PORTADA (entrada/login 3D-first de prod.chagra.app): el mismo valle
+     vivo pero como paisaje que ESPERA — sin rótulos de mundos ni faro del día,
+     con una llegada de cámara más lenta. La UI de la entrada vive en el host. */
+  portada = false,
 }) {
   const [listo, setListo] = useState(false);
+  /* GUARD DEL NEGRO INTERMITENTE (auditoría 2026-07-16): sin oyente de
+     `webglcontextlost`, el navegador (sobre todo Android con memoria GPU
+     ajustada, o pestañas que vuelven del background) suelta el contexto y el
+     canvas queda NEGRO hasta recargar. `preventDefault()` habilita la
+     restauración automática, y al `webglcontextrestored` esta key REMONTA el
+     <Canvas> entero — contexto nuevo, escena repintada, nunca negro fijo. */
+  const [glKey, setGlKey] = useState(0);
   const tierInicial = useMemo(() => detectarTierInicial({ tier, reducedMotion }), [tier, reducedMotion]);
   /* El PERFIL DE RENDER del tier (DR-3D-PERF-GAMABAJA): 'alto' conserva este
      look intacto; 'medio'/'bajo' degradan sombras, DPR, antialias, densidad e
      instancian lo repetido. El default 'alto' preserva a los hosts viejos. */
   const perfil = useMemo(() => perfilDeTier(tierInicial), [tierInicial]);
   const presupuesto = useMemo(() => presupuestoDeTier(tierInicial), [tierInicial]);
+  /* La pose de reposo según el ASPECTO del equipo (una vez por montaje: girar
+     el teléfono re-monta rutas enteras en la práctica; no vale un resize
+     listener que mueva la cámara bajo los dedos del usuario). */
+  const pose = useMemo(
+    () =>
+      poseValleParaAspecto(
+        typeof window !== 'undefined' && window.innerHeight > 0
+          ? window.innerWidth / window.innerHeight
+          : 1,
+      ),
+    [],
+  );
   return (
     <Canvas
+      key={glKey}
       className={`valle-canvas${listo ? ' valle-canvas--listo' : ''}`}
       shadows={perfil.sombras}
       dpr={presupuesto.dpr}
       gl={{ antialias: tierInicial === 'alto', powerPreference: 'high-performance' }}
-      camera={CAMARA_VALLE}
+      camera={/** @type {any} */ ({ position: pose.position, fov: pose.fov })}
       frameloop={reducedMotion ? 'demand' : 'always'}
-      onCreated={() => setListo(true)}
+      onCreated={({ gl }) => {
+        setListo(true);
+        const canvas = gl.domElement;
+        canvas.addEventListener(
+          'webglcontextlost',
+          (e) => {
+            e.preventDefault(); // habilita la restauración del contexto
+            console.warn('[Valle3D] contexto WebGL perdido; esperando restauración');
+          },
+          false,
+        );
+        canvas.addEventListener(
+          'webglcontextrestored',
+          () => {
+            console.warn('[Valle3D] contexto WebGL restaurado; remontando la escena');
+            setGlKey((k) => k + 1); // remonta el <Canvas>: la escena vuelve a pintar
+          },
+          false,
+        );
+      }}
     >
       <Suspense fallback={null}>
         <Escena
@@ -1194,9 +2762,16 @@ export default function Valle3D({
           hayAlerta={hayAlerta}
           onEntrar={onEntrar}
           onAlerta={onAlerta}
+          onCasa={onCasa}
+          onAngelita={onAngelita}
           reducedMotion={reducedMotion}
           perfil={perfil}
           tier={tierInicial}
+          aplanando={aplanando}
+          camaraDirector={camaraDirector}
+          beatsRef={beatsRef}
+          portada={portada}
+          pose={pose}
         />
       </Suspense>
     </Canvas>

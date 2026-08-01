@@ -37,6 +37,15 @@
 
 import { fetchWithAuthRetry } from './apiService.js';
 import { buildSidecarHeaders } from './tierService.js';
+// Fallo real del canario 2026-07-20: "ICA"/"Fuente" (mención de institución o
+// meta-pregunta) se resolvían a especies fantasma (col rizada / Pennisetum
+// setaceum) y el agente construía la respuesta sobre esa basura porque el
+// único filtro (filterNoiseEntities) corría DESPUÉS de que el LLM ya había
+// respondido (outputGuards.applyOutputGuards). Filtramos AQUÍ, apenas llega la
+// respuesta del sidecar, para que ningún consumidor (prompt del LLM incluido)
+// vea entidades-ruido. outputGuards.js no importa nada (0 imports) → no hay
+// ciclo posible al importarlo desde aquí.
+import { filterNoiseEntities } from './outputGuards.js';
 
 const NLU_TIMEOUT_MS = 18000;
 export const TOOL_TIMEOUT_MS = 5000;
@@ -139,10 +148,12 @@ async function getJson(path, query, timeoutMs) {
 }
 
 /**
- * Wrapper interno: POST con timeout + headers + degrade-to-null.
- * No exportado — el contrato público son planNlu y callTool.
+ * Wrapper POST con timeout + headers + degrade-to-null (offline/timeout/non-2xx → null).
+ * Exportado como primitivo compartido para servicios de feature que hablan con el
+ * mismo sidecar (p.ej. redService.js / RED de trueque). Mantiene el mismo auth-retry,
+ * tier header y degradación graceful que el resto del cliente.
  */
-async function postJson(path, body, timeoutMs) {
+export async function postJson(path, body, timeoutMs) {
   if (!isSidecarEnabled()) return null;
   if (typeof navigator !== 'undefined' && navigator.onLine === false) {
     console.debug('[sidecar] offline — skip', path);
@@ -384,6 +395,15 @@ const ALLOWED_TOOLS = new Set([
   'get_cultivos_viables',
   'get_diseno_finca',
   'get_dosis_biopreparado',
+  // ── Reconciliación 41→46 (fix grounding P0, 2026-07-25): el sidecar/NLU creció
+  //    a 46 tools; estas 4 quedaron ruteables por el NLU pero fuera del whitelist
+  //    → el cliente las rechazaba con not_allowed y el turno degradaba a RAG SIN
+  //    grounding EN SILENCIO. Son read-only del grafo/catálogo con args que el NLU
+  //    SÍ rellena desde una frase de chat (mismo patrón que las ya expuestas):
+  'get_aporte_nutricional', //      aporte nutricional (energía/proteína) por alimento
+  'get_canales_comercializacion', // dónde vender + régimen INVIMA/MADR por cultivo
+  'get_folk_sintoma', //            síntoma campesino → patógeno (muy ruteada por el NLU)
+  'get_practicas_agua', //          prácticas de agua + IRCA rural + protección de cauces
   // FASE 2 (deferidas, NO exponer aún):
   //  - get_grado_dia: requiere `fecha_siembra` (ISO YYYY-MM-DD, sin default) que
   //    el NLU no puede sintetizar con fiabilidad desde una frase libre de chat.
@@ -509,7 +529,13 @@ export async function resolveEntities(userMessage, opts = {}) {
   if (!raw || typeof raw !== 'object') return null;
   const grounding = raw.grounding && typeof raw.grounding === 'object' ? raw.grounding : null;
   if (!Array.isArray(raw.entities)) return { entities: [], grounding };
-  return { entities: raw.entities, grounding };
+  // Filtramos entidades-ruido (siglas institucionales, meta-vocabulario de
+  // "dame la fuente/norma", muletillas campesinas) ANTES de devolver — así
+  // ningún consumidor (incluido el prompt del LLM en agentPromptBase.js, que
+  // las presenta como "ENTIDADES RESUELTAS... autoritativo") ve basura como
+  // verdad verificada. applyOutputGuards también filtra (idempotente y puro,
+  // aplicarlo dos veces es inofensivo) — se deja así como defensa en capas.
+  return { entities: filterNoiseEntities(raw.entities), grounding };
 }
 
 /**
@@ -903,6 +929,47 @@ export async function judgeVision(speciesId, imageB64) {
     confidence: typeof raw.confidence === 'number' ? raw.confidence : null,
     motivo: typeof raw.motivo === 'string' ? raw.motivo : '',
   };
+}
+
+/**
+ * Gate ASÍNCRONO del juez de visión (#328). El juez local tarda ~16-23s
+ * (minicpm-v:8b en CPU, fuera de la VRAM del agente) y el sync `/judge-vision`
+ * lo aborta el propio cliente a TOOL_TIMEOUT_MS=5s → veredicto siempre null.
+ * Este par desacopla: `judgeVisionAsync` ENCOLA (202 en ~11ms) y devuelve
+ * `{request_id}`; `judgeVisionResult` recoge el veredicto luego (poll). Así el
+ * diagnóstico NO se bloquea esperando al juez.
+ *
+ * @param {string} speciesId @param {string} imageB64
+ * @returns {Promise<null | {request_id: string}>}
+ */
+export async function judgeVisionAsync(speciesId, imageB64) {
+  if (!speciesId || typeof speciesId !== 'string') return null;
+  if (!imageB64 || typeof imageB64 !== 'string') return null;
+  const raw = await postJson(
+    '/judge-vision-async',
+    { species_id: speciesId, image_b64: imageB64 },
+    TOOL_TIMEOUT_MS,
+  );
+  if (!raw || typeof raw !== 'object' || typeof raw.request_id !== 'string') {
+    return null;
+  }
+  return { request_id: raw.request_id };
+}
+
+/**
+ * Recoge el veredicto async por `request_id`.
+ * @param {string} requestId
+ * @returns {Promise<null | {status:'done', plausible:boolean|null, confidence:number|null, motivo:string} | {status:'pending'} | {status:'error', reason?:string}>}
+ */
+export async function judgeVisionResult(requestId) {
+  if (!requestId || typeof requestId !== 'string') return null;
+  const raw = await getJson(
+    '/judge-vision-result',
+    { request_id: requestId },
+    TOOL_TIMEOUT_MS,
+  );
+  if (!raw || typeof raw !== 'object') return null;
+  return raw;
 }
 
 /**

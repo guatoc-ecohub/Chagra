@@ -6,8 +6,10 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import {
   Store, Plus, Search, MapPin, Phone, Trash2, ArrowLeft, Tag, Info,
-  Sprout, AlertCircle, CheckCircle2,
+  Sprout, AlertCircle, CheckCircle2, Users, Handshake,
 } from 'lucide-react';
+import RedVecinosPanel from './red/RedVecinosPanel';
+import CierreTratoSheet from './red/CierreTratoSheet';
 import { ScreenShell } from './common/ScreenShell';
 import EmptyStateCampo from './common/EmptyStateCampo.jsx';
 import ErrorStateCampo from './common/ErrorStateCampo.jsx';
@@ -55,7 +57,7 @@ import {
  * @param {(pregunta: string) => void} [props.onAskAgent] - opcional, puente al agente desde la vista "Vender mejor".
  */
 export default function MercadosScreen({ onBack, onNavigate: _onNavigate }) {
-  const [tab, setTab] = useState('explorar'); // 'explorar' | 'publicar'
+  const [tab, setTab] = useState('explorar'); // 'explorar' | 'publicar' | 'vecinos'
   const [publicadas, setPublicadas] = useState([]);
   const [cargando, setCargando] = useState(true);
   const [errorCarga, setErrorCarga] = useState(false);
@@ -154,6 +156,19 @@ export default function MercadosScreen({ onBack, onNavigate: _onNavigate }) {
           >
             <Plus size={16} /> Publicar
           </button>
+          <button
+            type="button"
+            role="tab"
+            aria-selected={tab === 'vecinos'}
+            onClick={() => setTab('vecinos')}
+            className={`flex-1 min-h-[44px] rounded-lg font-bold text-sm flex items-center justify-center gap-2 transition-colors ${
+              tab === 'vecinos'
+                ? 'bg-emerald-600 text-white'
+                : 'bg-slate-800 text-slate-300 hover:bg-slate-700'
+            }`}
+          >
+            <Users size={16} /> Vecinos
+          </button>
         </div>
 
         {tab === 'explorar' && (
@@ -176,6 +191,10 @@ export default function MercadosScreen({ onBack, onNavigate: _onNavigate }) {
         {tab === 'publicar' && (
           <PublicarPanel onPublicada={handlePublicada} onCancelar={() => setTab('explorar')} />
         )}
+
+        {/* RED humana campesino↔campesino: el mercado es la puerta de la red
+            (los tratos alimentan grafo + reputación), por eso vive aquí. */}
+        {tab === 'vecinos' && <RedVecinosPanel />}
       </div>
 
       {detalle && (
@@ -367,6 +386,10 @@ function DetalleOferta({ oferta, onClose, onEliminar }) {
   const ref = resolverPrecioReferencia(oferta.producto);
   const precio = formatearCOP(oferta.precio);
   const cat = CATEGORIAS.find((c) => c.id === oferta.categoria);
+  // RED humana: paso de cierre "¿se concretó el negocio?" — el gesto que
+  // alimenta el grafo social + la reputación (services/red). Solo para
+  // ofertas PROPIAS: el productor registra su propio trato.
+  const [cerrandoTrato, setCerrandoTrato] = useState(false);
 
   return (
     <div
@@ -444,6 +467,19 @@ function DetalleOferta({ oferta, onClose, onEliminar }) {
             Chagra no procesa pagos ni garantiza la transacción.
           </p>
 
+          {/* Cierre de trato (solo ofertas propias): alimenta la RED humana —
+              de este registro salen el grafo social y la reputación ganada. */}
+          {!oferta.demo && (
+            <button
+              type="button"
+              onClick={() => setCerrandoTrato(true)}
+              data-testid="abrir-cierre-trato"
+              className="w-full min-h-[48px] rounded-xl border border-emerald-500/40 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-300 font-bold text-sm flex items-center justify-center gap-2"
+            >
+              <Handshake size={16} /> ¿Ya vendió? Registrar el trato
+            </button>
+          )}
+
           {/* Retirar publicación (solo ofertas propias, no ejemplos) */}
           {!oferta.demo && (
             <button
@@ -456,6 +492,10 @@ function DetalleOferta({ oferta, onClose, onEliminar }) {
           )}
         </div>
       </div>
+
+      {cerrandoTrato && (
+        <CierreTratoSheet oferta={oferta} onClose={() => setCerrandoTrato(false)} onRegistrado={() => setCerrandoTrato(false)} />
+      )}
     </div>
   );
 }

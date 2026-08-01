@@ -1,0 +1,239 @@
+/*
+ * ventanaValle3D.css — la ventana-puerta al valle 3D del home.
+ *
+ * La FIRMA es el MARCO ORGÁNICO QUE RESPIRA: tinta verde profunda cuyo
+ * border-radius muta lentísimo (como tejido vivo), con la enredadera SVG y
+ * esporas bio-glow que laten. Todo lo demás queda quieto y disciplinado.
+ *
+ * Gates de calma/costo:
+ *   · prefers-reduced-motion → TODA animación CSS fuera (un fotograma digno).
+ *   · [data-tier='bajo']     → marco quieto (el equipo humilde no paga vaivén).
+ * El movimiento DENTRO del canvas lo gatea la escena (frameloop a demanda).
+ */
+
+/* ── el botón-ventana (toda la ventana es la puerta) ─────────────────────── */
+.vv {
+  -webkit-tap-highlight-color: transparent;
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0;
+  width: min(400px, 92vw);
+  padding: 0;
+  border: none;
+  background: none;
+  cursor: pointer;
+  font: inherit;
+  color: inherit;
+  transition: transform 0.28s cubic-bezier(0.34, 1.4, 0.5, 1);
+}
+
+.vv:hover,
+.vv:focus-visible {
+  transform: translateY(-2px) scale(1.012);
+}
+.vv:active {
+  transform: translateY(0) scale(0.99);
+}
+
+.vv:focus-visible {
+  outline: none;
+}
+/* el foco visible vive en el MARCO (el outline rectangular pelearía con el blob) */
+.vv:focus-visible .vv-marco {
+  box-shadow:
+    0 0 0 3px #d9f7a6,
+    0 0 0 5px #22301c,
+    0 14px 34px rgba(34, 48, 28, 0.35);
+}
+
+/* Los hijos son transparentes al tacto: el tap SIEMPRE aterriza en el botón
+   (el canvas de r3f nunca se traga el toque de la puerta). */
+.vv-marco,
+.vv-repisa {
+  pointer-events: none;
+}
+
+/* ── el marco orgánico que respira (la firma) ────────────────────────────── */
+.vv-marco {
+  position: relative;
+  display: block;
+  width: 100%;
+  padding: 12px;
+  background:
+    radial-gradient(120% 90% at 50% 0%, #35502c 0%, #22301c 58%, #182312 100%);
+  border-radius: 46% 54% 20% 22% / 38% 40% 16% 17%;
+  box-shadow:
+    0 10px 30px rgba(34, 48, 28, 0.32),
+    0 0 22px rgba(184, 233, 134, 0.18),
+    inset 0 1px 6px rgba(217, 247, 166, 0.28);
+  animation: vv-marco-respira 11s ease-in-out infinite;
+}
+
+@keyframes vv-marco-respira {
+  0%, 100% { border-radius: 46% 54% 20% 22% / 38% 40% 16% 17%; }
+  33%      { border-radius: 52% 48% 23% 19% / 42% 36% 14% 19%; }
+  66%      { border-radius: 48% 52% 18% 24% / 36% 43% 18% 15%; }
+}
+
+/* ── el vidrio: el viewport enmarcado ────────────────────────────────────── */
+.vv-vidrio {
+  position: relative;
+  display: block;
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  overflow: hidden;
+  border-radius: 42% 50% 16% 18% / 34% 36% 12% 13%;
+  background: #eaf0d3; /* el cielo, mientras llega lo demás: nunca un hueco negro */
+  animation: vv-vidrio-respira 11s ease-in-out infinite;
+}
+
+@keyframes vv-vidrio-respira {
+  0%, 100% { border-radius: 42% 50% 16% 18% / 34% 36% 12% 13%; }
+  33%      { border-radius: 48% 44% 19% 15% / 38% 32% 10% 15%; }
+  66%      { border-radius: 44% 48% 14% 20% / 32% 39% 14% 11%; }
+}
+
+/* el canvas 3D llena el vidrio y aparece en un fundido (sin pop) */
+.vv-canvas {
+  position: absolute !important;
+  inset: 0;
+  opacity: 0;
+  transition: opacity 0.6s ease;
+}
+.vv-canvas--lista {
+  opacity: 1;
+}
+
+/* la luz cálida que se cuela por la ventana (vidrio vivo, no video frío) */
+.vv-luz {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(80% 60% at 62% 24%, rgba(246, 215, 138, 0.22) 0%, rgba(246, 215, 138, 0) 60%),
+    radial-gradient(140% 90% at 50% 108%, rgba(34, 48, 28, 0.14) 0%, rgba(34, 48, 28, 0) 46%);
+}
+
+/* ── la enredadera del marco (hojas + zarcillos + esporas que laten) ─────── */
+.vv-enredadera {
+  position: absolute;
+  inset: -14px;
+  width: calc(100% + 28px);
+  height: calc(100% + 28px);
+  overflow: visible;
+}
+
+.vv-espora {
+  animation: vv-late 3.2s ease-in-out infinite;
+  filter: drop-shadow(0 0 4px rgba(217, 247, 166, 0.9));
+  transform-box: fill-box;
+  transform-origin: center;
+}
+.vv-espora--tarde { animation-delay: -1.2s; }
+.vv-espora--lenta { animation-duration: 4.6s; animation-delay: -2.1s; }
+
+@keyframes vv-late {
+  0%, 100% { opacity: 0.55; transform: scale(0.85); }
+  50%      { opacity: 1; transform: scale(1.15); }
+}
+
+/* ── el espejo 2D digno (tier bajo / sin WebGL / fallback de Suspense) ───── */
+.vv-2d {
+  position: absolute;
+  inset: 0;
+}
+.vv-2d__paisaje {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+.vv-2d-respira {
+  animation: vv-respira-suave 8s ease-in-out infinite;
+}
+.vv-2d-espora {
+  animation: vv-late 3.6s ease-in-out infinite;
+  transform-box: fill-box;
+  transform-origin: center;
+}
+.vv-2d-espora--tarde { animation-delay: -1.4s; }
+.vv-2d-espora--lenta { animation-duration: 5s; animation-delay: -2.4s; }
+
+@keyframes vv-respira-suave {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50%      { transform: scale(1.06); opacity: 0.92; }
+}
+
+/* ── la Angelita (2D en el espejo; via drei Html en el 3D) ───────────────── */
+.vv-abeja {
+  filter: drop-shadow(0 3px 5px rgba(34, 48, 28, 0.3));
+}
+.vv-abeja--2d {
+  position: absolute;
+  left: 34%;
+  top: 38%;
+  animation: vv-abeja-flota 5.2s ease-in-out infinite;
+}
+.vv-abeja--quieta,
+.vv-abeja--2d.vv-abeja--quieta {
+  animation: none;
+}
+
+@keyframes vv-abeja-flota {
+  0%, 100% { transform: translate(0, 0); }
+  33%      { transform: translate(9px, -8px); }
+  66%      { transform: translate(-7px, 5px); }
+}
+
+/* el wrapper del Html de drei no debe tapar el tap de la puerta */
+.vv-abeja-html {
+  pointer-events: none;
+}
+
+/* ── la repisa: el rótulo de la puerta ───────────────────────────────────── */
+.vv-repisa {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  margin-top: -14px; /* la repisa se posa sobre el borde bajo del marco */
+  padding: 10px 22px 11px;
+  background: linear-gradient(180deg, #35502c 0%, #22301c 100%);
+  border-radius: 18px;
+  box-shadow:
+    0 6px 16px rgba(34, 48, 28, 0.3),
+    inset 0 1px 3px rgba(217, 247, 166, 0.25);
+  z-index: 1;
+}
+.vv-repisa__titulo {
+  font-weight: 800;
+  font-size: 1.05rem;
+  letter-spacing: 0.01em;
+  color: #f2ecd7;
+}
+.vv-repisa__pista {
+  font-size: 0.78rem;
+  font-weight: 500;
+  color: #b8e986;
+}
+
+/* ── gates de calma y de equipo humilde ──────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  .vv,
+  .vv-marco,
+  .vv-vidrio,
+  .vv-canvas,
+  .vv-espora,
+  .vv-2d-respira,
+  .vv-2d-espora,
+  .vv-abeja--2d {
+    animation: none;
+    transition: none;
+  }
+}
+
+/* gama baja: el marco no paga vaivén (las esporas quedan, son opacity/scale
+   de nodos chiquitos; el blob queda en su primera pose, digno) */
+.vv[data-tier='bajo'] .vv-marco,
+.vv[data-tier='bajo'] .vv-vidrio {
+  animation: none;
+}

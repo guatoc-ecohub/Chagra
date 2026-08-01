@@ -69,12 +69,12 @@ describe('visionQueueService — enqueue', () => {
 
   it('rechaza un kind inválido', async () => {
     await expect(
-      enqueuePhoto({ imageBlob: fakeBlob(), kind: 'invalido' })
+      enqueuePhoto(/** @type {any} */ ({ imageBlob: fakeBlob(), kind: 'invalido' }))
     ).rejects.toThrow();
   });
 
   it('rechaza si falta el imageBlob', async () => {
-    await expect(enqueuePhoto({ kind: 'foliage' })).rejects.toThrow();
+    await expect(enqueuePhoto(/** @type {any} */ ({ kind: 'foliage' }))).rejects.toThrow();
   });
 });
 

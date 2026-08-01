@@ -92,7 +92,7 @@ describe('caseStudyTreatmentRecommender — recommendTreatments', () => {
 
   it('input vacío o muy corto → []', () => {
     expect(recommendTreatments('')).toEqual([]);
-    expect(recommendTreatments(null)).toEqual([]);
+    expect(recommendTreatments(/** @type {any} */ (null))).toEqual([]);
     expect(recommendTreatments('ab')).toEqual([]);
   });
 
@@ -163,13 +163,13 @@ describe('caseStudyTreatmentRecommender — PEST_RULES integrity', () => {
 describe('caseStudyTreatmentRecommender — buildRagContextBlock', () => {
   it('passages vacíos → string vacío', () => {
     expect(buildRagContextBlock([])).toBe('');
-    expect(buildRagContextBlock(null)).toBe('');
-    expect(buildRagContextBlock(undefined)).toBe('');
+    expect(buildRagContextBlock(/** @type {any} */ (null))).toBe('');
+    expect(buildRagContextBlock(/** @type {any} */ (undefined))).toBe('');
   });
 
   it('inserta header + footer + warning anti-alucinación', () => {
     const out = buildRagContextBlock([
-      { species: 'solanum_lycopersicum_cherry', text: 'BT 1g/L foliar al atardecer.', score: 1.2 },
+      { species: 'solanum_lycopersicum_cherry', text: 'BT 1g/L foliar al atardecer.', score: 1.2, key: 'test-key' },
     ]);
     expect(out).toContain(RAG_CONTEXT_HEADER);
     expect(out).toContain('NO viene del usuario');
@@ -180,8 +180,8 @@ describe('caseStudyTreatmentRecommender — buildRagContextBlock', () => {
 
   it('numera los passages y mantiene orden', () => {
     const out = buildRagContextBlock([
-      { species: 'a', text: 'primero' },
-      { species: 'b', text: 'segundo' },
+      { species: 'a', text: 'primero', score: 1.0, key: 'k1' },
+      { species: 'b', text: 'segundo', score: 0.9, key: 'k2' },
     ]);
     expect(out).toMatch(/\[1\] \(a\) primero/);
     expect(out).toMatch(/\[2\] \(b\) segundo/);
@@ -189,8 +189,8 @@ describe('caseStudyTreatmentRecommender — buildRagContextBlock', () => {
 
   it('omite passages sin texto', () => {
     const out = buildRagContextBlock([
-      { species: 'a', text: '   ' },
-      { species: 'b', text: 'útil' },
+      { species: 'a', text: '   ', score: 0.5, key: 'k3' },
+      { species: 'b', text: 'útil', score: 0.8, key: 'k4' },
     ]);
     expect(out).not.toMatch(/\(a\)/);
     expect(out).toMatch(/\(b\) útil/);
@@ -252,7 +252,7 @@ describe('caseStudyTreatmentRecommender — recommendTreatmentsWithRag', () => {
   });
 
   it('si retrieve devuelve no-array (defensa) → ragPassages=[]', async () => {
-    vi.mocked(retrieve).mockResolvedValue(null);
+    vi.mocked(retrieve).mockResolvedValue(/** @type {any} */ (null));
     const result = await recommendTreatmentsWithRag('cogollero');
     expect(result.ragPassages).toEqual([]);
     expect(result.ragContext).toBe('');

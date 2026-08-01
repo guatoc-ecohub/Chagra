@@ -1,0 +1,247 @@
+/*
+ * PapaVivo3D.css — vitrina del mundo de la papa (#/mockups/papa-viva-3d).
+ * Autocontenida: sin fuentes/imágenes externas. Móvil-first desde 320px.
+ * Paleta de piso frío: cielo azul de altura, pajonal amarillo, tierra negra
+ * del caballón y el amarillo criollo del tubérculo. Solo opacity/transform.
+ */
+
+.pviva {
+  min-height: 100vh;
+  min-height: 100dvh;
+  padding: 1rem 0.9rem 2.5rem;
+  /* la ladera de páramo bajo la hora dorada (paleta madre): verde-plata, no celeste */
+  background: linear-gradient(180deg, #dce0d2 0%, #e4e0c9 46%, #ece4ca 100%);
+  color: #2c3128;
+  font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+}
+
+.pviva__head {
+  max-width: 46rem;
+  margin: 0 auto 1rem;
+}
+.pviva__kicker {
+  margin: 0 0 0.2rem;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #7a5a94;
+}
+.pviva__head h1 {
+  margin: 0;
+  font-size: clamp(1.5rem, 5vw, 2.2rem);
+  line-height: 1.15;
+  color: #2f3d2f;
+}
+.pviva__lema {
+  margin: 0.4rem 0 0;
+  font-size: 0.98rem;
+  line-height: 1.45;
+  max-width: 40rem;
+}
+
+.pviva__escena {
+  max-width: 46rem;
+  margin: 0 auto;
+}
+.pviva__lienzo {
+  position: relative;
+  height: min(66vh, 32rem);
+  min-height: 320px;
+  border-radius: 14px;
+  overflow: hidden;
+  border: 1px solid rgba(122, 90, 148, 0.25);
+  box-shadow: 0 12px 30px rgba(42, 52, 44, 0.16);
+  background: radial-gradient(120% 90% at 50% 20%, #c2d8e8 0%, #a4b79e 100%);
+}
+.pviva__lienzo canvas {
+  display: block;
+  width: 100% !important;
+  height: 100% !important;
+  touch-action: none;
+}
+.papal-canvas {
+  opacity: 0;
+  transition: opacity 0.6s ease;
+}
+.papal-canvas--lista {
+  opacity: 1;
+}
+
+.pviva__cargando {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  font-size: 0.9rem;
+  color: #3a4838;
+  opacity: 0.85;
+}
+
+.pviva__barra {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin-top: 0.6rem;
+}
+.pviva__tier {
+  margin: 0;
+  font-size: 0.85rem;
+  opacity: 0.85;
+}
+.pviva__toggle {
+  border: 1.5px solid #7a5a94;
+  background: #fff;
+  color: #7a5a94;
+  font-weight: 700;
+  font-size: 0.85rem;
+  padding: 0.45rem 0.9rem;
+  border-radius: 999px;
+  cursor: pointer;
+}
+.pviva__toggle:hover,
+.pviva__toggle:focus-visible {
+  background: #7a5a94;
+  color: #fff;
+  outline-offset: 2px;
+}
+
+/* ---- Ficha 2D (fallback digno, sin GPU): el surco en CORTE ---- */
+.pviva__ficha {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.3rem;
+  background: linear-gradient(180deg, #c5daea 0%, #cfd8b8 58%, #b9c49e 100%);
+}
+.pviva__estampa {
+  position: relative;
+  width: 190px;
+  height: 185px;
+  margin-bottom: 0.4rem;
+}
+/* la mata de papa, tupida y bajita, sobre el lomo */
+.pviva__mata {
+  position: absolute;
+  top: 12px;
+  left: 52px;
+  width: 88px;
+  height: 62px;
+  border-radius: 48% 52% 44% 56% / 64% 58% 42% 36%;
+  background: radial-gradient(circle at 38% 30%, #699344 0%, #4d7a35 68%, #3d642c 100%);
+  box-shadow: inset -7px -6px 12px rgba(0, 0, 0, 0.2);
+}
+.pviva__flor {
+  position: absolute;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  box-shadow: inset -2px -2px 3px rgba(0, 0, 0, 0.18);
+}
+.pviva__flor--lila { top: -6px; left: 20px; background: #b28cd6; }
+.pviva__flor--blanca { top: -2px; left: 52px; background: #f3eef8; }
+.pviva__flor--lila2 { top: 12px; left: 68px; background: #9a72c4; }
+/* el CABALLÓN: el lomo de tierra amontonada donde la mata va aporcada */
+.pviva__caballon {
+  position: absolute;
+  top: 62px;
+  left: 26px;
+  width: 140px;
+  height: 40px;
+  border-radius: 50% 50% 8% 8% / 100% 100% 10% 10%;
+  background: linear-gradient(180deg, #5c4936 0%, #4a3a2b 55%, #3d2f22 100%);
+  box-shadow: inset -8px -5px 12px rgba(0, 0, 0, 0.22);
+}
+/* el corte de tierra: lo que pasa abajo, donde engorda la papa */
+.pviva__tierra {
+  position: absolute;
+  top: 100px;
+  left: 10px;
+  width: 172px;
+  height: 74px;
+  border-radius: 6px 6px 12px 12px;
+  background: linear-gradient(180deg, #43352a 0%, #382c21 60%, #2f251c 100%);
+  box-shadow: inset 0 4px 8px rgba(0, 0, 0, 0.25);
+}
+.pviva__papa {
+  position: absolute;
+  width: 22px;
+  height: 17px;
+  border-radius: 50%;
+  box-shadow: inset -3px -3px 4px rgba(0, 0, 0, 0.3);
+}
+.pviva__papa--criolla { top: 14px; left: 58px; background: #e5b93c; }
+.pviva__papa--criolla2 { top: 34px; left: 86px; background: #d4a52f; }
+.pviva__papa--roja { top: 40px; left: 34px; background: #a4503a; }
+.pviva__papa--morada { top: 16px; left: 112px; background: #5c3a66; }
+.pviva__papa--criolla3 { top: 44px; left: 128px; width: 16px; height: 13px; background: #e0b23a; }
+.pviva__ficha-nombre {
+  margin: 0;
+  font-weight: 800;
+  font-size: 1rem;
+  color: #2f3d2f;
+}
+.pviva__ficha-sub {
+  margin: 0;
+  font-size: 0.85rem;
+  color: #4a5844;
+}
+
+/* ---- Saberes ---- */
+.pviva__saberes {
+  max-width: 46rem;
+  margin: 1.6rem auto 0;
+}
+.pviva__saberes h2 {
+  font-size: 1.15rem;
+  margin: 0 0 0.7rem;
+  color: #2f3d2f;
+}
+.pviva__saberes ol {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.6rem;
+}
+@media (min-width: 640px) {
+  .pviva__saberes ol {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+.pviva__saberes li {
+  display: flex;
+  gap: 0.65rem;
+  align-items: flex-start;
+  background: rgba(255, 255, 255, 0.7);
+  border: 1px solid rgba(122, 90, 148, 0.16);
+  border-radius: 12px;
+  padding: 0.7rem 0.8rem;
+}
+.pviva__emoji {
+  font-size: 1.4rem;
+  line-height: 1.2;
+}
+.pviva__saberes b {
+  display: block;
+  font-size: 0.92rem;
+  color: #2f3d2f;
+}
+.pviva__saberes li p {
+  margin: 0.15rem 0 0;
+  font-size: 0.86rem;
+  line-height: 1.42;
+}
+.pviva__cierre {
+  margin: 0.9rem 0 0;
+  font-size: 0.9rem;
+  line-height: 1.5;
+  color: #3a4838;
+  max-width: 42rem;
+}

@@ -107,7 +107,7 @@ if (typeof window !== 'undefined') {
 // y rehidrata el estado scoped por asset (Hotfix 11.5 — análogo a Fase 10.3).
 if (typeof window !== 'undefined') {
   window.addEventListener('syncCompleted', async (event) => {
-    const { type, id } = event.detail || {};
+    const { type, id } = /** @type {any} */ (event).detail || {};
     if (!type || !type.startsWith('log--')) return;
 
     try {

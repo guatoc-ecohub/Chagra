@@ -157,8 +157,8 @@ export async function generatePlanForPlant({ assetId, speciesSlug, plantingDate,
     // Actually, let's use the DB directly or fetch JSON since initCatalog is in db/catalogDB.js
     let speciesData = null;
 
-    if (typeof window !== 'undefined' && window.__chagraCatalog) {
-        const speciesList = await window.__chagraCatalog.getAllSpecies();
+    if (typeof window !== 'undefined' && /** @type {any} */ (window).__chagraCatalog) {
+        const speciesList = await /** @type {any} */ (window).__chagraCatalog.getAllSpecies();
         speciesData = speciesList.find(s => s.id === speciesSlug);
     } else {
         // Basic fallback if catalog DB is not initialized here
@@ -306,14 +306,15 @@ async function savePlan(plan) {
  * @param {string} [input.lunarPhase] - opcional, modula offsets
  * @returns {Promise<object|null>} El plan generado, null si no aplica o falló
  */
-export async function tryGeneratePlanFromSeeding({
-  assetId,
-  speciesSlug,
-  plantingDate,
-  plantName,
-  climateZone,
-  lunarPhase,
-} = {}) {
+export async function tryGeneratePlanFromSeeding(opts = /** @type {any} */ ({})) {
+  const {
+    assetId,
+    speciesSlug,
+    plantingDate,
+    plantName,
+    climateZone,
+    lunarPhase,
+  } = opts;
   if (!assetId || !speciesSlug) return null;
 
   // Idempotencia: si ya hay un plan persistido para este asset, no

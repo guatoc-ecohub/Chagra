@@ -138,7 +138,7 @@ describe('FarmProcessConfirmCard', () => {
     const dateInput = screen.getByDisplayValue(new Date().toISOString().split('T')[0]);
     expect(dateInput).toBeDefined();
     fireEvent.change(dateInput, { target: { value: '2026-07-15' } });
-    expect(dateInput.value).toBe('2026-07-15');
+    expect(/** @type {HTMLInputElement} */ (dateInput).value).toBe('2026-07-15');
   });
 
   it('deshabilita inputs durante isSaving', () => {
@@ -155,7 +155,7 @@ describe('FarmProcessConfirmCard', () => {
     expect(screen.getByText('Guardando…')).toBeDefined();
     // Los inputs deben estar disabled
     screen.getAllByRole('textbox').forEach((input) => {
-      expect(input.disabled).toBe(true);
+      expect(/** @type {HTMLInputElement} */ (input).disabled).toBe(true);
     });
   });
 

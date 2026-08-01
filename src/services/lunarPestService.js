@@ -57,6 +57,7 @@ export function pestMonitoringWindow(lunar) {
 
   const inWindow = distanceFromNewMoon <= NEW_MOON_WINDOW_DAYS;
 
+  /** @type {'now'|'past'|'future'} */
   let centerDirection = 'now';
   if (daysSince < daysTo) centerDirection = 'past';
   else if (daysTo < daysSince) centerDirection = 'future';

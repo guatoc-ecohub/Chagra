@@ -3,7 +3,7 @@
    exportarse junto al componente (mismo patrón que NotifPermissionPrompt). */
 import React, { useEffect, useRef, useState } from 'react';
 import { Mic, Camera, BadgeCheck, MapPin, ArrowRight, Volume2, Sparkles, Glasses, Share, Download, WifiOff, Save, Smartphone, Check } from 'lucide-react';
-import ChagraAgentAvatarColibri from './ChagraAgentAvatarColibri';
+import ChagraAgentAvatarAngelita from './ChagraAgentAvatarAngelita';
 import usePwaInstall from '../hooks/usePwaInstall';
 import { MSG } from '../config/messages.js';
 
@@ -260,7 +260,7 @@ export default function BienvenidaFinca({ onUbicar, onClose, onExplorarEjemplo =
         {paso === 0 && (
           <>
             <div className="bienvenida-item bienvenida-flotar" style={{ '--bv-delay': '0ms' }}>
-              <ChagraAgentAvatarColibri size={152} state="idle" ariaLabel="Colibrí de Chagra" />
+              <ChagraAgentAvatarAngelita size={188} state="idle" ariaLabel="Angelita, la abeja de Chagra" />
             </div>
             <div className="bienvenida-item flex flex-col gap-3" style={{ '--bv-delay': '120ms' }}>
               <p className="text-xs font-bold uppercase tracking-[0.2em] text-emerald-400">

@@ -17,10 +17,12 @@ vi.mock('../../config/fincaVivaHomeFlag', () => ({
   fincaVivaHomePerfilActivo: () => flagOn,
 }));
 
-// El avatar es pesado (foto/video/stores). Lo stubbeamos: solo nos importa la
-// CHROME del botón (piel por tema), no el contenido del avatar.
-vi.mock('../ChagraAgentAvatar', () => ({
+// El avatar (Angelita, 2026-07-16: "jubila el colibrí") arrastra el kit
+// rubber-hose completo. Lo stubbeamos: solo nos importa la CHROME del botón
+// (piel por tema), no el contenido del avatar.
+vi.mock('../../visual/agente/Angelita', () => ({
   default: () => <span data-testid="avatar-stub" />,
+  Angelita: () => <span data-testid="avatar-stub" />,
 }));
 
 import AgentFab from '../AgentFab';

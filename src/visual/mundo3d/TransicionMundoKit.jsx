@@ -74,13 +74,13 @@ export default function TransicionMundoKit({
         hechoMitad = true;
         mitadRef.current?.();
       }
-    }, mitadTransicion(variante, tier, reducedMotion));
+    }, mitadTransicion(variante, /** @type {'alto'|'medio'|'bajo'} */ (tier), reducedMotion));
     const tFin = setTimeout(() => {
       if (!hechoFin) {
         hechoFin = true;
         finRef.current?.();
       }
-    }, duracionTransicion(variante, tier, reducedMotion));
+    }, duracionTransicion(variante, /** @type {'alto'|'medio'|'bajo'} */ (tier), reducedMotion));
     return () => {
       hechoMitad = true;
       hechoFin = true;
@@ -93,7 +93,7 @@ export default function TransicionMundoKit({
 
   // reduced-motion = corte simple: siempre la rama 'fade' + cubierta al instante.
   const v = reducedMotion ? 'fade' : VARIANTES.includes(variante) ? variante : 'fade';
-  const total = duracionTransicion(v, tier, reducedMotion);
+  const total = duracionTransicion(v, /** @type {'alto'|'medio'|'bajo'} */ (tier), reducedMotion);
   const conAdornos = tier !== 'bajo' && !reducedMotion;
 
   return (

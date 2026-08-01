@@ -105,14 +105,15 @@ const shouldSample = (rate) => {
  * @param {string|null} [ev.error] - 'fetch' | 'parse' | 'unknown' | null.
  * @returns {Promise<Object|null>} record persistido o null si descartado.
  */
-export const recordRagEvent = async ({
-  surface = 'unknown',
-  query = '',
-  topScore = null,
-  latencyMs = 0,
-  resultCount = 0,
-  error = null,
-} = {}) => {
+export const recordRagEvent = async (opts = /** @type {any} */ ({})) => {
+  const {
+    surface = 'unknown',
+    query = '',
+    topScore = null,
+    latencyMs = 0,
+    resultCount = 0,
+    error = null,
+  } = opts;
   if (!isEnabled()) return null;
   if (!shouldSample(getTelemetryRate())) return null;
 

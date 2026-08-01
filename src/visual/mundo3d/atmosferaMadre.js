@@ -51,20 +51,27 @@ export function mezclar(a, b, t) {
 }
 
 /* La RECETA de coherencia valle↔mundo, como ley única: el cielo propio del
-   arquetipo mezclado 60% hacia la hora dorada (B6). Antes vivía inline en
+   arquetipo mezclado 60% hacia la MADRE (B6). Antes vivía inline en
    EscenaBase3D; aquí es parte de la dirección de arte — si un consumidor nuevo
    (minimapa, preview, thumbnail) necesita "cómo se ve la familia X bajo la
    madre", llama esto y sale IGUAL que la escena. Barato (7 lerps); memoizar
-   en quien llama por `cielo`. */
-export function mezclarCielo(cielo) {
+   en quien llama por `cielo` (+ `madre` si varía).
+
+   CICLO DIURNO VIVO: `madre` por defecto es la hora dorada (ATMOSFERA), pero
+   EscenaBase3D ahora pasa el preset de la FRANJA REAL del día (CIELOS_HORA de
+   cielosHoraData vía useCicloDia): el mundo hereda el amanecer, el mediodía o
+   la noche del valle sin que ningún arquetipo se entere. La identidad propia
+   (el 40%) sobrevive igual. La intensidad del mundo se MULTIPLICA por la de la
+   madre (la noche baja todo). */
+export function mezclarCielo(cielo, madre = ATMOSFERA) {
   const propio = { ...CIELOS.neutro, ...(cielo || {}) };
   return {
-    fondo: mezclar(propio.fondo, ATMOSFERA.fondo, 0.6),
-    cielo: mezclar(propio.cielo, ATMOSFERA.cielo, 0.6),
-    suelo: mezclar(propio.suelo, ATMOSFERA.suelo, 0.6),
-    niebla: mezclar(propio.fondo, ATMOSFERA.niebla, 0.7),
-    alfombra: mezclar(propio.suelo, ATMOSFERA.suelo, 0.5),
-    intensidad: propio.intensidad ?? 1,
+    fondo: mezclar(propio.fondo, madre.fondo, 0.6),
+    cielo: mezclar(propio.cielo, madre.cielo, 0.6),
+    suelo: mezclar(propio.suelo, madre.suelo, 0.6),
+    niebla: mezclar(propio.fondo, madre.niebla, 0.7),
+    alfombra: mezclar(propio.suelo, madre.suelo, 0.5),
+    intensidad: (propio.intensidad ?? 1) * (madre.intensidad ?? 1),
   };
 }
 

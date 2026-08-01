@@ -107,6 +107,11 @@ jobs:
           # prender a "true" tras probar relevancia/latencia con queries reales.
           # Fail-soft: si falla, el chat sigue con el RAG cliente (501 fichas).
           VITE_USE_CORPUS_RETRIEVAL: "false"
+          # Deep Research (2026-07-25): activa el chip 🔬 "Investigacion profunda"
+          # (informe local multi-hop citado sobre grafo AGE + corpus + tools MCP).
+          # Gated ademas por tier Pro (tierService PRO_USERNAMES: admin + ana maria);
+          # endpoint capacity-limited (1 job) y Pro-only server-side (403 free).
+          VITE_DEEP_RESEARCH_ENABLED: "true"
           # GO-LIVE 2026-07-04: home finca-viva a produccion (biopunk2 default,
           # biopunk original de respaldo). Autorizado por el operador. Antes solo
           # en dev-deploy.yml; ahora prod renderiza el home de 4 portales + escenas

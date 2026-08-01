@@ -605,7 +605,7 @@ const CSS_NOCHE = `
 export default function ValleNoche3D() {
   const [listo, setListo] = useState(false);
   const [grillos, setGrillos] = useState(false);
-  const tier = useMemo(() => decidirTier(), []);
+  const tier = useMemo(() => decidirTier().tier, []);
   const reducedMotion = useMemo(
     () =>
       typeof window !== 'undefined' &&

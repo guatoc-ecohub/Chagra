@@ -295,7 +295,7 @@ export default function CarbonoPsaSubvista({ proceso, perfilFinca }) {
                 {metodo.advertencia}
               </p>
             )}
-            <p className="text-3xs text-slate-500 leading-snug mt-1">Fuente: {metodo.citation}.</p>
+            <p className="text-3xs text-slate-500 leading-snug mt-1">Fuente: {/** @type {any} */ (metodo).citation}.</p>
           </details>
         )}
       </section>
