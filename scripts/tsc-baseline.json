@@ -1,6 +1,6 @@
 {
-  "generatedAt": "2026-08-01T20:47:56.300Z",
-  "totalErrors": 710,
+  "generatedAt": "2026-08-01T21:26:22.913Z",
+  "totalErrors": 715,
   "byFile": {
     "src/compai/nucleo/__tests__/datosFinca.test.js": 3,
     "src/compai/nucleo/__tests__/elenco.test.js": 15,
@@ -39,6 +39,7 @@
     "src/mockups/DiaEnFinca.jsx": 2,
     "src/mockups/HojaPruebaValle.jsx": 47,
     "src/mockups/MundoAbejas3D.jsx": 1,
+    "src/mockups/MundoAgua3D.jsx": 1,
     "src/mockups/MundoBoticaCana3D.jsx": 13,
     "src/mockups/MundoFrutales3D.jsx": 2,
     "src/mockups/MundoLecheria3D.jsx": 6,
@@ -117,6 +118,7 @@
     "src/visual/mundo3d/__tests__/gemeloValle2D.smoke.test.jsx": 6,
     "src/visual/mundo3d/__tests__/hiloVidaVista.test.jsx": 1,
     "src/visual/mundo3d/__tests__/usePerformanceMonitor.test.js": 2,
+    "src/visual/mundo3d/agua/chorreraReal.jsx": 4,
     "src/visual/mundo3d/agua/piezasAgua.jsx": 1,
     "src/visual/mundo3d/aguacatal/EscenaAguacatalVivo.jsx": 1,
     "src/visual/mundo3d/artesania/ArtesaniaKit.jsx": 3,
