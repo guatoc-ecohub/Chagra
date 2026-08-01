@@ -43,12 +43,17 @@ import { buildProactiveGreeting, saludoPorHora } from './proactiveGreeting';
  * 1. LOS ESTADOS DE COMPORTAMIENTO — el vocabulario de la API.
  * ────────────────────────────────────────────────────────────────────────── */
 
-/** Los cuatro estados canónicos del comportamiento de Angelita. */
+/** Los estados canónicos del comportamiento de Angelita. */
 export const ESTADOS_COMPORTAMIENTO = /** @type {const} */ ([
   'calma',
   'aviso',
   'celebra',
   'husmea',
+  // #109 "luto y fiesta": luto breve, digno, NUNCA culposo, al registrar una
+  // planta muerta. Comparte prioridad de arbitraje con celebra (un momento
+  // que el motor SÍ debe interrumpir para acompañar), pero su cara y su tono
+  // son opuestos — ver VISUAL_LUTO / ARIA_COMPORTAMIENTO.luto abajo.
+  'luto',
 ]);
 
 /**
@@ -62,12 +67,16 @@ export const ESTADOS_COMPORTAMIENTO = /** @type {const} */ ([
  *   aviso   → 'preocupada' si es urgente; 'invita' si es un aviso tranquilo
  *   celebra → 'contenta'   (brinquito de celebración)
  *   husmea  → 'senala'     (se inclina y apunta a lo que mira del mundo)
+ *   luto    → 'preocupada' (la cara más cercana al recogimiento que YA existe
+ *             — sin fabricar un dibujo nuevo; #109 diferencia el TONO del
+ *             texto y el `tipo` de aviso — visual/burbuja gris — no la pose)
  */
 const VISUAL_CALMA = 'acompana';
 const VISUAL_AVISO_URGENTE = 'preocupada';
 const VISUAL_AVISO_TRANQUILO = 'invita';
 const VISUAL_CELEBRA = 'contenta';
 const VISUAL_HUSMEA = 'senala';
+const VISUAL_LUTO = 'preocupada';
 
 /** Narración para lectores de pantalla — usted, cercano, sin tecnicismos. */
 const ARIA_COMPORTAMIENTO = {
@@ -75,6 +84,7 @@ const ARIA_COMPORTAMIENTO = {
   aviso: 'Angelita tiene algo importante que contarle',
   celebra: 'Angelita está contenta por usted',
   husmea: 'Angelita curiosea y le comenta algo de este mundo',
+  luto: 'Angelita lo acompaña en silencio, con cariño',
 };
 
 /**
@@ -91,6 +101,8 @@ export function estadoVisualDeComportamiento(estado, opts = {}) {
       return VISUAL_CELEBRA;
     case 'husmea':
       return VISUAL_HUSMEA;
+    case 'luto':
+      return VISUAL_LUTO;
     case 'calma':
     default:
       return VISUAL_CALMA;
@@ -108,6 +120,9 @@ const PRIORIDAD = {
   aviso_alta: 100,
   aviso_media: 70,
   celebra: 60,
+  // #109: el luto pesa como un aviso medio — de verdad interrumpe (no es un
+  // dato que espera su turno), pero nunca por encima de una alerta real.
+  luto: 65,
   aviso_baja: 45,
   husmea: 20,
   calma: 0,
@@ -202,8 +217,42 @@ export function mundoDePantalla(pantalla) {
    revienta con `ReferenceError` en tiempo de ejecución — y el build de Vite
    NO lo ve (lo cazaron los tests del store). */
 import { comentarioDeMundo, COMENTARISTA_MUNDO } from '../compai/nucleo/comentarista.js';
+import { preguntaDeAprendiz } from '../compai/nucleo/modoAprendiz.js';
 
 export { comentarioDeMundo, COMENTARISTA_MUNDO };
+export { preguntaDeAprendiz };
+
+/* ─────────────────────────────────────────────────────────────────────────────
+ * 4b. CLIMA VIVO (#111) — traduce una ReaccionClima del núcleo
+ *    (compai/nucleo/climaVivo.js) al mismo contrato `notificaciones` que
+ *    consume `evaluar()`/`resolverComportamiento`, para que pase por la
+ *    MISMA anti-molestia y el MISMO cooldown de aviso que cualquier otra
+ *    alerta — cero camino paralelo, cero timer propio.
+ * ────────────────────────────────────────────────────────────────────────── */
+
+/**
+ * @param {import('../compai/nucleo/climaVivo').ReaccionClima|null} reaccion
+ * @returns {{ hay:boolean, estado:string, severidad:(string|null), lead:(string|null),
+ *   prompt:(string|null), prioridad:number }}
+ */
+export function notificacionDeClima(reaccion) {
+  if (!reaccion) {
+    return { hay: false, estado: 'calma', severidad: null, lead: null, prompt: null, prioridad: PRIORIDAD.calma };
+  }
+  const prioridad = reaccion.severidad === 'alta'
+    ? PRIORIDAD.aviso_alta
+    : reaccion.severidad === 'media'
+      ? PRIORIDAD.aviso_media
+      : PRIORIDAD.aviso_baja;
+  return {
+    hay: true,
+    estado: 'aviso',
+    severidad: reaccion.severidad,
+    lead: reaccion.mensaje,
+    prompt: null,
+    prioridad,
+  };
+}
 
 /* ─────────────────────────────────────────────────────────────────────────────
  * 4. NOTIFICACIONES INTELIGENTES — qué atender hoy, priorizado y sin ruido.
@@ -294,6 +343,7 @@ export const COOLDOWN_MS = {
   aviso_media: 20 * MINUTO,
   aviso_baja: 45 * MINUTO,
   celebra: 0,              // se dedup por logro.id, no por reloj
+  luto: 0,                 // se dedup por evento.id (#109, misma idea de celebra)
   husmea: 20 * MINUTO,     // no comenta el mismo mundo cada vez que pasa
   calma: 0,
 };
@@ -321,6 +371,9 @@ function llaveCooldown(estado, severidad) {
  * @param {number|null} [p.ultimaMs] — cuándo surgió por última vez ESE tipo.
  * @param {boolean} [p.ocupado] — el campesino está a mitad de algo (escribiendo, grabando…).
  * @param {boolean} [p.silenciado] — el usuario pidió silencio a Angelita.
+ * @param {number} [p.molestia] contador adaptativo (#102/#106, sección 7):
+ *   estira/encoge el cooldown base. 0 = cadencia normal. NO afecta aviso_alta
+ *   (urgencia real habla siempre, contador o no).
  * @returns {boolean}
  */
 export function debeHablar({
@@ -330,13 +383,15 @@ export function debeHablar({
   ultimaMs = null,
   ocupado = false,
   silenciado = false,
+  molestia = 0,
 } = {}) {
   if (silenciado) return false;
   if (estado === 'calma' || !estado) return false;
   const urgente = estado === 'aviso' && severidad === 'alta';
   // Nunca interrumpe a mitad de una tarea, salvo urgencia real.
   if (ocupado && !urgente) return false;
-  const requerido = COOLDOWN_MS[llaveCooldown(estado, severidad)] ?? 0;
+  const base = COOLDOWN_MS[llaveCooldown(estado, severidad)] ?? 0;
+  const requerido = urgente ? 0 : cadenciaEfectivaMs(base, molestia);
   if (requerido > 0) {
     if (ultimaMs != null && ahoraMs - ultimaMs < requerido) return false;
   }
@@ -347,9 +402,39 @@ export function debeHablar({
  * 6. EL RESOLVEDOR — arbitra los cuatro comportamientos y arma la decisión.
  * ────────────────────────────────────────────────────────────────────────── */
 
+/** Tope duro de un mensaje del compAI (#59): 2-3 líneas en móvil, no un
+ *  párrafo. ~110 caracteres por línea a un tamaño de burbuja cómodo × 2
+ *  líneas de margen sano antes de la 3ra — más que eso ya lee como el LLM
+ *  completo, no como el compañero de paso. */
+const TOPE_MENSAJE_CHARS = 220;
+
+/**
+ * Recorta un mensaje al tope de la casa SIN cortar a mitad de palabra ni de
+ * oración cuando se puede evitar: prefiere el último punto/interrogación
+ * dentro del tope; si no hay ninguno razonablemente cerca, corta en el
+ * último espacio y cierra con "…". Mensajes ya cortos no se tocan.
+ * @param {string|null} mensaje
+ * @param {number} [tope]
+ * @returns {string|null}
+ */
+export function recortarMensaje(mensaje, tope = TOPE_MENSAJE_CHARS) {
+  if (typeof mensaje !== 'string') return mensaje ?? null;
+  if (mensaje.length <= tope) return mensaje;
+  const ventana = mensaje.slice(0, tope);
+  const ultimaOracion = Math.max(ventana.lastIndexOf('. '), ventana.lastIndexOf('? '), ventana.lastIndexOf('! '));
+  // Sólo usamos el corte "en oración" si no descarta más de un tercio del
+  // tope — si no, es preferible el corte con elipsis a perder media frase.
+  if (ultimaOracion > tope * 0.66) return ventana.slice(0, ultimaOracion + 1).trim();
+  const ultimoEspacio = ventana.lastIndexOf(' ');
+  // Sin espacio usable (una sola palabra/token larguísimo, ej. una URL): se
+  // corta duro al tope menos el "…" — el resultado NUNCA excede `tope`.
+  const corte = ultimoEspacio > 0 ? ventana.slice(0, ultimoEspacio) : ventana.slice(0, Math.max(0, tope - 1));
+  return `${corte.trim()}…`;
+}
+
 /**
  * @typedef {Object} DecisionAngelita
- * @property {('calma'|'aviso'|'celebra'|'husmea')} estado — comportamiento elegido.
+ * @property {('calma'|'aviso'|'celebra'|'husmea'|'luto')} estado — comportamiento elegido.
  * @property {string} visualEstado — estado visual canónico para la cara.
  * @property {string|null} mensaje — lo que dice (null si se queda en calma).
  * @property {string} aria — narración para lector de pantalla.
@@ -360,10 +445,13 @@ export function debeHablar({
  * @property {string|null} logroId — id del logro celebrado (para no repetir).
  */
 
-/** La decisión de reposo: Angelita tranquila, sin mensaje. */
+/**
+ * La decisión de reposo: Angelita tranquila, sin mensaje.
+ * @returns {DecisionAngelita}
+ */
 function decisionCalma() {
   return {
-    estado: 'calma',
+    estado: /** @type {const} */ ('calma'),
     visualEstado: VISUAL_CALMA,
     mensaje: null,
     aria: ARIA_COMPORTAMIENTO.calma,
@@ -386,12 +474,17 @@ function decisionCalma() {
  * @param {ReturnType<typeof notificacionesInteligentes>|null} [ctx.notificaciones]
  * @param {{ id:string, texto:string }|null} [ctx.logro] — logro REAL a celebrar.
  * @param {string|null} [ctx.ultimoLogroId] — último logro ya celebrado (dedup).
+ * @param {{ id:string, texto:string }|null} [ctx.luto] pérdida REAL a lamentar (#109).
+ * @param {string|null} [ctx.ultimoLutoId] última pérdida ya lamentada (dedup, #109).
  * @param {string|null} [ctx.mundo] — mundo actual (para husmear).
  * @param {Object} [ctx.datosMundo] — datos reales del mundo (ver comentarioDeMundo).
  * @param {number} [ctx.ahoraMs]
  * @param {Object} [ctx.ultimaHablaPorLlave] — { [llaveCooldown]: ms } de la última vez.
  * @param {boolean} [ctx.ocupado]
  * @param {boolean} [ctx.silenciado]
+ * @param {number} [ctx.molestia] contador adaptativo (#102/#106, sección 7).
+ * @param {() => number} [ctx.rand] fuente de azar 0..1 para el modo aprendiz
+ *   (#110, inyectable → testeable); default Math.random.
  * @returns {DecisionAngelita}
  */
 export function resolverComportamiento(ctx = {}) {
@@ -399,12 +492,16 @@ export function resolverComportamiento(ctx = {}) {
     notificaciones = null,
     logro = null,
     ultimoLogroId = null,
+    luto = null,
+    ultimoLutoId = null,
     mundo = null,
     datosMundo = {},
     ahoraMs = Date.now(),
     ultimaHablaPorLlave = {},
     ocupado = false,
     silenciado = false,
+    molestia = 0,
+    rand = Math.random,
   } = ctx;
 
   /** @type {Array<{estado:string, prioridad:number, severidad:any, mensaje:string, prompt:string|null, logroId:string|null}>} */
@@ -434,9 +531,28 @@ export function resolverComportamiento(ctx = {}) {
     });
   }
 
-  // Husmea — comentario grounded del mundo donde entró.
+  // Luto (#109) — una pérdida real registrada, aún no acompañada. Mismo
+  // patrón de dedup por id que celebra (nunca dos veces la misma planta).
+  if (luto && luto.id && luto.texto && luto.id !== ultimoLutoId) {
+    candidatos.push({
+      estado: 'luto',
+      prioridad: PRIORIDAD.luto,
+      severidad: null,
+      mensaje: luto.texto,
+      prompt: null,
+      logroId: luto.id,
+    });
+  }
+
+  // Husmea — comentario grounded del mundo donde entró. #110 "modo
+  // aprendiz": a veces, en contexto apto y con probabilidad baja, en vez
+  // del comentario declarativo el compañero PREGUNTA para provocar
+  // observación (dimensión educativa — Julieta 11 años). No tiene cooldown
+  // propio: sigue siendo un 'husmea' normal, así que respeta el MISMO
+  // cooldown por mundo y la MISMA cadencia adaptativa de siempre.
   if (mundo) {
-    const comentario = comentarioDeMundo(mundo, datosMundo);
+    const pregunta = preguntaDeAprendiz({ mundo, datosMundo, rand });
+    const comentario = pregunta || comentarioDeMundo(mundo, datosMundo);
     if (comentario) {
       candidatos.push({
         estado: 'husmea',
@@ -468,6 +584,7 @@ export function resolverComportamiento(ctx = {}) {
     ultimaMs: ultimaHablaPorLlave[llave] ?? null,
     ocupado,
     silenciado,
+    molestia,
   });
 
   if (!surge) return decisionCalma();
@@ -475,7 +592,8 @@ export function resolverComportamiento(ctx = {}) {
   return {
     estado: /** @type {any} */ (ganador.estado),
     visualEstado: estadoVisualDeComportamiento(ganador.estado, { severidad: ganador.severidad }),
-    mensaje: ganador.mensaje,
+    // #59: tope de 2-3 líneas — la burbuja del compAI no es el chat completo.
+    mensaje: recortarMensaje(ganador.mensaje),
     aria: ariaDeComportamiento(ganador.estado),
     severidad: ganador.severidad,
     prioridad: ganador.prioridad,
@@ -490,6 +608,93 @@ export function llaveDeDecision(decision, mundo = null) {
   if (!decision || decision.estado === 'calma') return null;
   if (decision.estado === 'husmea') return `husmea:${mundo}`;
   return llaveCooldown(decision.estado, decision.severidad);
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+ * 7. CADENCIA ADAPTATIVA (#102/#106) — el compañero habla menos si lo
+ *    ignoran/silencian/cierran seguido, y más si le prestan atención.
+ *
+ * Un solo contador entero de "molestia" (persistido en useAngelitaStore, NO
+ * aquí — este módulo sigue siendo puro/sin storage). Sube con señales de
+ * rechazo, baja con señales de atención real. El contador se traduce en un
+ * MULTIPLICADOR sobre los cooldowns base de la sección 5 — nunca los
+ * reemplaza: la cadencia sigue respetando aviso_alta=siempre-puede-hablar,
+ * solo estira/encoge lo demás.
+ *
+ * Rango del contador: [-MOLESTIA_MAX_BUENA, MOLESTIA_MAX] — clamped, nunca
+ * corre libre. Positivo = molesta, negativo = le presta atención.
+ * ────────────────────────────────────────────────────────────────────────── */
+
+const SEGUNDO = 1000;
+
+/** Piso y techo de la cadencia adaptativa (nunca más rápido que el piso, y
+ *  el techo evita un silencio eterno del que ya no se recupera). */
+export const CADENCIA_MIN_MS = 13 * SEGUNDO;
+export const CADENCIA_BASE_MS = 46 * SEGUNDO;
+export const CADENCIA_MAX_MS = 6 * 60 * SEGUNDO;
+
+/** Cuánto sube/baja el contador por cada señal (enteros, para que sea legible
+ *  en devtools/telemetría — nada de floats acumulando error). */
+export const MOLESTIA_DELTA = {
+  silenciar: 3,
+  abortarPaseo: 2,
+  cerrarTipSinLeer: 1,
+  abrirTip: -2,
+  hablarle: -3,
+};
+
+/** El contador de molestia nunca corre libre: clamped a un rango razonable. */
+export const MOLESTIA_MIN = -10;
+export const MOLESTIA_MAX = 15;
+
+/**
+ * Aplica una señal al contador de molestia, clamped. Pura — el store es quien
+ * persiste el resultado. `senal` es `string` (no `keyof typeof MOLESTIA_DELTA`)
+ * a propósito: en runtime puede llegar cualquier string (evento externo,
+ * telemetría futura) y una señal desconocida debe degradar sin mutar el
+ * contador, no romper el tipado en el caller.
+ * @param {number} contadorActual
+ * @param {string} senal una de MOLESTIA_DELTA; desconocida = no-op.
+ * @returns {number} nuevo contador, clamped a [MOLESTIA_MIN, MOLESTIA_MAX].
+ */
+export function aplicarSenalMolestia(contadorActual, senal) {
+  const delta = MOLESTIA_DELTA[senal];
+  if (!Number.isFinite(delta)) return contadorActual;
+  const base = Number.isFinite(contadorActual) ? contadorActual : 0;
+  return Math.min(MOLESTIA_MAX, Math.max(MOLESTIA_MIN, base + delta));
+}
+
+/**
+ * Traduce el contador de molestia a un multiplicador de cadencia: más
+ * molestia → cooldowns más largos (habla menos); más atención (contador
+ * negativo) → cooldowns más cortos (habla más), sin pasar nunca el piso.
+ * Lineal y simple a propósito — es un modulador, no un modelo.
+ * @param {number} contador
+ * @returns {number} multiplicador, ej. 0.6 (más seguido) .. 3 (mucho más raro).
+ */
+export function multiplicadorDeCadencia(contador) {
+  const c = Number.isFinite(contador) ? contador : 0;
+  if (c >= 0) {
+    // 0 → 1x (cadencia base); MOLESTIA_MAX → 3x (mucho más espaciado).
+    return 1 + (c / MOLESTIA_MAX) * 2;
+  }
+  // 0 → 1x; MOLESTIA_MIN → 0.4x (más seguido, nunca por debajo del piso).
+  return 1 + (c / MOLESTIA_MIN) * -0.6;
+}
+
+/**
+ * Cadencia efectiva (ms) para un cooldown base, dado el contador de molestia
+ * — clamped SIEMPRE entre CADENCIA_MIN_MS y CADENCIA_MAX_MS. Úsese para
+ * modular cooldowns de tips/husmeo (no toca aviso_alta, que sigue en 0 =
+ * siempre puede hablar: una helada no espera a que el contador baje).
+ * @param {number} cooldownBaseMs
+ * @param {number} contadorMolestia
+ * @returns {number}
+ */
+export function cadenciaEfectivaMs(cooldownBaseMs, contadorMolestia) {
+  if (!(cooldownBaseMs > 0)) return 0; // 0 = "siempre puede" no se modula
+  const mult = multiplicadorDeCadencia(contadorMolestia);
+  return Math.min(CADENCIA_MAX_MS, Math.max(CADENCIA_MIN_MS, Math.round(cooldownBaseMs * mult)));
 }
 
 export default resolverComportamiento;

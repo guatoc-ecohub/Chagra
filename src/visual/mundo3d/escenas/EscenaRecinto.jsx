@@ -22,6 +22,17 @@ import { CIELOS, PALETA } from '../atmosferaMadre.js';
    estercolero que procesa el estiércol y cierra el ciclo del abono— más
    POLINIZADORES por la cerca) vive en faunaFuncional.js, poblada por mundo. */
 
+/* ENCUADRE propio del corral (QA visual 2026-07-30): la escena es CHICA (cerca
+   en r=1.9) y el zoom genérico del registro (7) dejaba la cámara de reposo a
+   ~9 unidades — el hato se veía de manchitas y la píldora del hotspot central
+   tapaba medio corral. El arquetipo fija aquí su escala REAL: un `zoom` a la
+   medida del corral (niebla, alfombra y órbita proporcionales; permite acercarse
+   más a los animales) y una cámara de reposo más cercana y baja — la mirada de
+   quien se asoma por la cerca — con la que cada animal se lee entero. Solo este
+   arquetipo cambia: `camara`/`entrada.zoom` son contrato ya existente de la base. */
+const ZOOM_CORRAL = 4.6;
+const CAMARA_CORRAL = { position: [2.5, 2.5, 4.35], fov: 42 };
+
 /* Fallback si el mundo no trae hato (retrocompat con el recinto original):
    pocos animales en formato viejo — prueba viva de que el camino legado vive. */
 const HATO_LEGADO = [
@@ -76,7 +87,12 @@ export default function EscenaRecinto(props) {
   const cielo = CIELOS.corral;
   const fauna = faunaDeMundo(props.mundoId, { tier: props.tier });
   return (
-    <EscenaBase3D {...props} cielo={cielo} entrada={{ ...props.entrada, centro: [0, 0.4, 0] }}>
+    <EscenaBase3D
+      {...props}
+      cielo={cielo}
+      camara={CAMARA_CORRAL}
+      entrada={{ ...props.entrada, zoom: ZOOM_CORRAL, centro: [0, 0.4, 0] }}
+    >
       <Diorama
         params={props.params}
         reducedMotion={props.reducedMotion}

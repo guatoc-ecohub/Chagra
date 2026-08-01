@@ -40,7 +40,20 @@ import { Fauna } from './FaunaEscena.jsx';
 import { faunaDeMundo } from '../faunaFuncional.js';
 import { ATMOSFERA, CIELOS, PALETA } from '../atmosferaMadre.js';
 
-const R_BOVEDA = 9;
+/* Radio de la BÓVEDA. Tiene que ENCERRAR a la cámara siempre: la pose de
+   reposo queda a ~9 del origen y el orbit permite alejarse hasta zoom*2.6
+   (~19.5 del target). Con r=9 la cámara quedaba FUERA de la media esfera
+   BackSide y el gradiente del cielo — el protagonista de este mundo — era
+   invisible (se veía el color de fondo plano). 24 cubre todo el rango. */
+const R_BOVEDA = 24;
+
+/* El DESNIVEL del diorama. El framework es inapelable: el target de reposo del
+   orbit es el ORIGEN (CamaraDirector aterriza ahí) y el maxPolarAngle 1.35
+   obliga a mirar ~13° hacia abajo. Con la montaña plantada en y=0 eso era
+   quedarse viendo el pasto. Aquí el mundo ES el cielo: se baja TODO el diorama
+   para que la franja viva (hombros de la montaña, nubes, sol) caiga en el
+   origen y la mirada del framework aterrice en la bóveda, no en el piso. */
+const DY = -2.6;
 
 /* PRNG determinista (LCG), como en EscenaEstratos: mismo dato, mismo cielo. */
 function prng(seed) {
@@ -83,13 +96,19 @@ function paletaCielo(hora) {
    verla por dentro. Es el fondo; no escribe profundidad. */
 function Boveda({ hora }) {
   const geo = useMemo(() => {
-    const g = new THREE.SphereGeometry(R_BOVEDA, 24, 12, 0, Math.PI * 2, 0, Math.PI * 0.52);
+    // thetaLength 0.62π: la falda baja por DEBAJO del horizonte (el diorama
+    // vive hundido DY) para que nunca asome el color de fondo por la rendija.
+    const g = new THREE.SphereGeometry(R_BOVEDA, 24, 12, 0, Math.PI * 2, 0, Math.PI * 0.62);
     const { horizonte, zenit } = paletaCielo(hora);
     const pos = g.attributes.position;
     const tmp = new THREE.Color();
     const colors = new Float32Array(pos.count * 3);
     for (let i = 0; i < pos.count; i++) {
-      const t = Math.min(1, Math.max(0, pos.getY(i) / R_BOVEDA));
+      // Gradiente COMPRIMIDO a la banda que el encuadre deja ver: el orbit
+      // mira ~13° bajo el horizonte, así que del casquete solo se ve hasta
+      // ~y/R 0.35. Sin comprimir, todo el cuadro quedaba en color de
+      // horizonte plano y el cenit vivía fuera de cámara.
+      const t = Math.min(1, Math.max(0, pos.getY(i) / (R_BOVEDA * 0.45)));
       tmp.copy(horizonte).lerp(zenit, t ** 0.8);
       colors[i * 3] = tmp.r;
       colors[i * 3 + 1] = tmp.g;
@@ -100,7 +119,9 @@ function Boveda({ hora }) {
   }, [hora]);
   return (
     <mesh geometry={geo} renderOrder={-10}>
-      <meshBasicMaterial vertexColors side={THREE.BackSide} depthWrite={false} />
+      {/* fog={false}: la niebla de EscenaBase3D es lineal 10.5→34.5 y a r=24
+          lavaría más de la mitad del gradiente. El cielo no se enniebla. */}
+      <meshBasicMaterial vertexColors side={THREE.BackSide} depthWrite={false} fog={false} />
     </mesh>
   );
 }
@@ -321,8 +342,10 @@ const PISOS_DEF = [
    alarma: el texto habla de "hasta aquí llegaba", nunca de catástrofe. */
 function RotuloHielo({ yAntes, rAntes }) {
   const [abierto, setAbierto] = useState(false);
+  // Corrido a un lado del aro (no centrado al frente): centrado tapaba justo
+  // el casquete y la banda de páramo que la línea ámbar quiere contar.
   return (
-    <group position={[0, yAntes + 0.04, rAntes]}>
+    <group position={[1.7, yAntes + 0.24, rAntes]}>
       <Html center distanceFactor={9} zIndexRange={[16, 0]}>
         <button
           type="button"
@@ -459,6 +482,7 @@ function VeloEnso({ velo }) {
         opacity={velo.opacidad}
         side={THREE.BackSide}
         depthWrite={false}
+        fog={false}
         blending={velo.aditivo ? THREE.AdditiveBlending : THREE.NormalBlending}
       />
     </mesh>
@@ -521,8 +545,8 @@ function SenalLadera({ cima = 3.5, reducedMotion }) {
         <boxGeometry args={[0.16, cima * 0.6, 0.05]} />
         <meshBasicMaterial color={PALETA.ambar} transparent opacity={0.5} depthWrite={false} />
       </mesh>
-      <Nube base={[1.5, 3.8, 0.9]} escala={1.15} gris reducedMotion={reducedMotion} />
-      <Lluvia base={[1.5, 3.5, 0.9]} reducedMotion={reducedMotion} />
+      <Nube base={[1.5, 4.0, -2.2]} escala={1.15} gris reducedMotion={reducedMotion} />
+      <Lluvia base={[1.5, 3.7, -2.2]} reducedMotion={reducedMotion} />
     </group>
   );
 }
@@ -532,8 +556,11 @@ function SenalLadera({ cima = 3.5, reducedMotion }) {
    finca (voz de Angelita) y el ONI real por si el técnico mira. Discreto y
    contemplativo: ámbar cálido de "prepárese", jamás rojo de alarma. */
 function RotuloEnso({ idx, fase, onGirar }) {
+  // En la franja del cielo, arriba-izquierda de la montaña y apartado del chip
+  // de «Cuándo llueve»: a y=5.05 el encuadre viejo lo cortaba contra el borde
+  // alto del marco y a y baja pisaba el hotspot.
   return (
-    <group position={[-3.25, 5.05, 0.6]}>
+    <group position={[-3.9, 4.6, -0.5]}>
       <Html center distanceFactor={9} zIndexRange={[18, 0]}>
         <button
           type="button"
@@ -591,37 +618,47 @@ function Diorama({ params, reducedMotion, tier, fauna }) {
   const cima = pisos.reduce((acc, p) => acc + (p.h ?? 0.85), 0);
   return (
     <group>
+      {/* la bóveda queda CENTRADA en el origen (no baja con el diorama): su
+          gradiente está calibrado contra el horizonte de la cámara */}
       <Boveda hora={hora} />
-      {/* el piso de la finca (un disco de tierra bajo el cielo) */}
-      <mesh position={[0, -0.04, 0]} rotation={[-Math.PI / 2, 0, 0]}>
-        <circleGeometry args={[5.6, 36]} />
-        <meshLambertMaterial color="#7f925f" />
-      </mesh>
+      {/* todo lo demás vive hundido DY: la franja del cielo cae en el origen,
+          que es a donde el framework aterriza la mirada */}
+      <group position={[0, DY, 0]}>
+        {/* el piso de la finca (un disco de tierra bajo el cielo; chico a
+            propósito: la protagonista de este mundo es la bóveda, no el pasto) */}
+        <mesh position={[0, -0.04, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+          <circleGeometry args={[4.8, 36]} />
+          <meshLambertMaterial color="#7f925f" />
+        </mesh>
 
-      <Sol hora={hora} reducedMotion={reducedMotion} />
+        <Sol hora={hora} reducedMotion={reducedMotion} />
+        {!esDia && <Luna />}
+        {esDia && hora < 0.55 && <Luna />}
+
+        <Montana pisos={pisos} glaciar={glaciar} />
+        <NieblaParamo niebla={niebla} cima={cima} reducedMotion={reducedMotion} />
+
+        {/* la OSCILACIÓN del año (ENSO) sobre el compás bimodal: velo del cielo +
+            señal de la fase + rótulo-ciclo tocable con la voz de Angelita */}
+        <CapaEnso params={params} tier={tier} cima={cima} reducedMotion={reducedMotion} />
+
+        {/* el cielo con su temporada: nubes siempre; aguacero solo en lluvia.
+            Van DETRÁS de la montaña (z negativo): a la profundidad vieja
+            (z≈0.2, a ~6 de la cámara) pasaban como masas grises pegadas al
+            lente tapando medio cuadro; atrás leen como nubes DEL cielo. */}
+        <Nube base={[-2.6, 3.7, -2.6]} escala={1.15} gris={temporada === 'lluvia'} reducedMotion={reducedMotion} />
+        <Nube base={[2.4, 4.4, -3.1]} escala={0.9} gris={false} reducedMotion={reducedMotion} />
+        {temporada === 'lluvia' && (
+          <>
+            <Nube base={[0.2, 4.7, -2.9]} escala={1.0} gris reducedMotion={reducedMotion} />
+            <Lluvia base={[-2.6, 3.4, -2.6]} reducedMotion={reducedMotion} />
+          </>
+        )}
+
+        {esDia && <Fauna items={fauna} reducedMotion={reducedMotion} />}
+      </group>
       {/* el fondo y la luz de cielo atardecen con el sol (no en hora fija) */}
       <CieloVivo hora={hora} reducedMotion={reducedMotion} />
-      {!esDia && <Luna />}
-      {esDia && hora < 0.55 && <Luna />}
-
-      <Montana pisos={pisos} glaciar={glaciar} />
-      <NieblaParamo niebla={niebla} cima={cima} reducedMotion={reducedMotion} />
-
-      {/* la OSCILACIÓN del año (ENSO) sobre el compás bimodal: velo del cielo +
-          señal de la fase + rótulo-ciclo tocable con la voz de Angelita */}
-      <CapaEnso params={params} tier={tier} cima={cima} reducedMotion={reducedMotion} />
-
-      {/* el cielo con su temporada: nubes siempre; aguacero solo en lluvia */}
-      <Nube base={[-2.6, 3.5, 0.2]} escala={1.15} gris={temporada === 'lluvia'} reducedMotion={reducedMotion} />
-      <Nube base={[2.4, 4.1, -0.6]} escala={0.9} gris={false} reducedMotion={reducedMotion} />
-      {temporada === 'lluvia' && (
-        <>
-          <Nube base={[0.2, 4.3, 0.4]} escala={1.0} gris reducedMotion={reducedMotion} />
-          <Lluvia base={[-2.6, 3.2, 0.2]} reducedMotion={reducedMotion} />
-        </>
-      )}
-
-      {esDia && <Fauna items={fauna} reducedMotion={reducedMotion} />}
     </group>
   );
 }
@@ -632,12 +669,33 @@ export default function EscenaBoveda(props) {
   // El fondo lo dicta la HORA real (veracidad); el hemisferio viene del preset
   // alba de la atmósfera madre (marfil tibio, ya no blanco frío).
   const cielo = { ...CIELOS.alba, fondo: `#${horizonte.getHexString()}` };
+  // Los hotspots vienen de mundoData plantados para el diorama viejo (y 1.7–
+  // 3.4); el diorama ahora vive hundido DY — se bajan con él para que sigan
+  // señalando el mismo punto del cielo (el registro no cambia, solo la pose).
+  const hotspots = useMemo(
+    () => (props.hotspots || []).map((h) => ({
+      ...h,
+      // El almanaque baja un poco más: su píldora plena (la más centrada del
+      // encuadre) cortaba la base de la montaña; sobre el disco de la finca
+      // deja a la protagonista entera y sigue siendo la puerta más visible.
+      pos: [h.pos[0], h.pos[1] + DY - (h.id === 'almanaque' ? 0.55 : 0), h.pos[2]],
+    })),
+    [props.hotspots],
+  );
+  // ENCUADRE legal para el orbit: la pose vieja ([4.6,3.1,8.6] mirando y=3.1,
+  // polar 90°) violaba el maxPolarAngle 1.35 de EscenaBase3D — el clamp más el
+  // target [0,0,0] del framework la dejaban en picado contra el pasto. Esta
+  // pose nace dentro del clamp (polar ≈1.31) y, con el diorama hundido DY,
+  // aterrizar la mirada en el origen ES mirar la bóveda. Lente 50: el más
+  // abierto del set — se viene a mirar el CIELO.
   return (
     <EscenaBase3D
       {...props}
+      hotspots={hotspots}
       cielo={cielo}
-      camara={{ position: [4.6, 3.1, 8.6], fov: 46 }}
-      entrada={{ ...props.entrada, zoom: props.entrada?.zoom ?? 7.5, centro: [0, 2.2, 0] }}
+      camara={{ position: [3.9, 2.3, 7.6], fov: 50 }}
+      piso={DY - 0.04}
+      entrada={{ ...props.entrada, zoom: props.entrada?.zoom ?? 7.5, centro: [0, 0.55, 0] }}
     >
       <Diorama params={props.params} reducedMotion={props.reducedMotion} tier={props.tier} fauna={faunaDeMundo(props.mundoId, { tier: props.tier })} />
     </EscenaBase3D>

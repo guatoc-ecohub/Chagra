@@ -64,6 +64,7 @@ import GpsFincaBanner from './components/GpsFincaBanner';
 import DataLossBanner from './components/DataLossBanner';
 import DemoModeBanner from './components/DemoModeBanner';
 import CriticalAlertBanner from './components/CriticalAlertBanner';
+import CompaiOverlay from './components/CompaiOverlay';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import { ErrorFallback } from './components/common/ErrorFallback';
 // Badge "N pendientes de sincronizar" (rescate #2668 → cableado): offline-first,
@@ -149,6 +150,8 @@ const MontanaMundosCampesinoMockup = lazy(() => import('./mockups/MontanaMundosC
 const EntradaCampesinaMockup = lazy(() => import('./mockups/EntradaCampesina'));
 const HomeCampesinoMockup = lazy(() => import('./mockups/HomeCampesino'));
 const BotonAnarquiaMockup = lazy(() => import('./mockups/BotonAnarquia'));
+// El cruce del agente 3D → plano (la abeja cruza el túnel y aterriza de avatar).
+const TransicionAgentePlanoMockup = lazy(() => import('./mockups/TransicionAgentePlano'));
 const AvatarGameBiopunk = lazy(() => import('./mockups/AvatarGameBiopunk'));
 const AvatarGameVerdeVivo = lazy(() => import('./mockups/AvatarGameVerdeVivo'));
 const AvatarGameLibre = lazy(() => import('./mockups/AvatarGameLibre'));
@@ -172,6 +175,13 @@ const HojaPruebaValleMockup = lazy(() => import('./mockups/HojaPruebaValle'));
 // operador). Reemplaza a BosqueVivo3D, MundoParamo3D y SueloDemo3D (los tres
 // archivados en src/mockups/_archivo/). Ruta #/mockups/paramo-definitivo.
 const ParamoDefinitivoMockup = lazy(() => import('./visual/mundo3d/bosque/MundoEntBosque.jsx'));
+// 3D: EL MONTE QUE VUELVE — el potrero volviéndose bosque, a través del
+// tiempo (50 años, riel no lineal). Rescate de huérfano (deuda
+// "construido-no-cableado": RestauracionEnElTiempo.jsx y su escena
+// EscenaRestauracion/AguaQueVuelve no tenían NINGÚN consumidor). Device-
+// tiering real (3D en equipo que da, corte SVG LaderaEnFranjas si no). Ruta
+// #/mockups/restauracion-tiempo-3d, sin auth.
+const RestauracionTiempo3DMockup = lazy(() => import('./mockups/RestauracionTiempo3D'));
 // 3D: el MUNDO DEL CAFÉ — el cafetal bajo sombra del piso templado: surcos a
 // curva de nivel, cereza madurando verde→pintón→rojo por instancia, el sombrío
 // de guamos y nogales, y la casa-beneficiadero en la bruma. Device-tiering
@@ -205,6 +215,19 @@ const CacaoVivo3DMockup = lazy(() => import('./mockups/CacaoVivo3D'));
 // blanca por instancia, la cosecha de criollas (amarilla/roja/morada) y los
 // frailejones en silueta. Device-tiering real. Ruta #/mockups/papa-viva-3d, sin auth.
 const PapaVivo3DMockup = lazy(() => import('./mockups/PapaVivo3D'));
+// 3D: el MUNDO DE LA YUCA — el yucal de clima medio en el arranque: el tallo
+// leñoso pelado y anillado de cicatrices, el follaje arriba no más, el
+// semillero de estacas inclinadas y el racimo de raíces recién destapado.
+// Rescate de huérfano (construido-no-cableado): YucaViva3D.jsx no tenía
+// entrada en el router. Device-tiering real. Ruta #/mockups/yuca-viva-3d, sin
+// auth.
+const YucaViva3DMockup = lazy(() => import('./mockups/YucaViva3D'));
+// 3D: el MUNDO DE LA QUINUA — el quinual maduro de tierra fría (2.500-3.200
+// m): la ladera a manchas de color por variedad y la era donde se trilla, se
+// avienta y se le lava lo amargo. Rescate de huérfano (construido-no-
+// cableado): QuinuaViva3D.jsx no tenía entrada en el router. Device-tiering
+// real. Ruta #/mockups/quinua-viva-3d, sin auth.
+const QuinuaViva3DMockup = lazy(() => import('./mockups/QuinuaViva3D'));
 // 3D: el MUNDO DE LOS FRUTALES — mango y cítricos juntos, porque juntos
 // enseñan el PISO TÉRMICO: el mango es de tierra caliente y el cítrico sube al
 // clima medio. La escala relativa es la lección: el mango eclipsa al cítrico.
@@ -339,6 +362,10 @@ const FrutalesAndinos3DMockup = lazy(() => import('./mockups/FrutalesAndinos3D')
 const CanaTrapiche3DMockup = lazy(() => import('./mockups/CanaTrapiche3D'));
 const CondorCielo3DMockup = lazy(() => import('./mockups/CondorCielo3D'));
 const NavegadorGrafoDemoMockup = lazy(() => import('./mockups/NavegadorGrafoDemo'));
+// La NAVEGACIÓN UNIFICADA por pisos térmicos: los tres zooms (minimapa de
+// esquina, mapa estratégico de terrazas y la vista global tipo lámina con el
+// nevado y la Chorrera arriba) leyendo el mismo dato mundo→piso.
+const NavegacionPisosMockup = lazy(() => import('./mockups/NavegacionPisosTermicos'));
 const HarvestLog = lazy(() => import('./components/HarvestLog'));
 const SeedingLog = lazy(() => import('./components/SeedingLog'));
 const InputLog = lazy(() => import('./components/InputLog'));
@@ -597,6 +624,10 @@ const MundoSubsuelo = lazy(() => import('./components/juego/MundoSubsuelo'));
 // en asociaciones-comparativa.json. Rescatado de "construido-pero-no-cableado"
 // (audit juegos 2026-07-16): existía exportado en juego/index.js pero sin ruta.
 const MonoVsPoliSimulator = lazy(() => import('./components/juego/MonoVsPoliSimulator'));
+// Ahorcado Contaminado: ahorcado clásico con metáfora de contaminación,
+// consume el dataset fundamentado de síntomas/plaguicidas vetados/
+// alternativas agroecológicas (Tarea #38) — juego construido en Tarea #93.
+const AhorcadoContaminado = lazy(() => import('./components/juego/AhorcadoContaminado'));
 // Modo extensionista (panel supervisor multi-finca, ADR-048 MVP). Gateado por
 // feature flag VITE_FEATURE_EXTENSIONISTA + rol (ver config/extensionistaAccess).
 const ExtensionistaScreen = lazy(() => import('./components/ExtensionistaScreen'));
@@ -703,6 +734,7 @@ const MOCKUP_HASH_ROUTES = {
   'mockups/mundo3d-milpa': 'mockup_mundo3d_milpa',
   'mockups/mundo3d-bosque': 'mockup_mundo3d_bosque',
   'mockups/paramo-definitivo': 'mockup_paramo_definitivo',
+  'mockups/restauracion-tiempo-3d': 'mockup_restauracion_tiempo_3d',
   'mockups/cafetal-vivo-3d': 'mockup_cafetal_vivo_3d',
   'mockups/aguacatal-vivo-3d': 'mockup_aguacatal_vivo_3d',
   'mockups/microcuenca': 'mockup_microcuenca',
@@ -712,6 +744,8 @@ const MOCKUP_HASH_ROUTES = {
   'mockups/invernadero-vivo-3d': 'mockup_invernadero_vivo_3d',
   'mockups/cacao-vivo-3d': 'mockup_cacao_vivo_3d',
   'mockups/papa-viva-3d': 'mockup_papa_viva_3d',
+  'mockups/yuca-viva-3d': 'mockup_yuca_viva_3d',
+  'mockups/quinua-viva-3d': 'mockup_quinua_viva_3d',
   'mockups/frutales-vivo-3d': 'mockup_frutales_vivo_3d',
   'mockups/mundo-piscicultura-3d': 'mockup_mundo_piscicultura_3d',
   'mockups/lecheria-viva-3d': 'mockup_lecheria_viva_3d',
@@ -730,6 +764,7 @@ const MOCKUP_HASH_ROUTES = {
   'mockups/entrada-campesina': 'mockup_entrada_campesina',
   'mockups/home-campesino': 'mockup_home_campesino',
   'mockups/boton-anarquia': 'mockup_boton_anarquia',
+  'mockups/transicion-agente-plano': 'mockup_transicion_agente_plano',
   'mockups/avatar-biopunk': 'mockup_avatar_biopunk',
   'mockups/avatar-verde-vivo': 'mockup_avatar_verde_vivo',
   'mockups/avatar-libre': 'mockup_avatar_libre',
@@ -795,6 +830,7 @@ const MOCKUP_HASH_ROUTES = {
   'mockups/cana-trapiche-3d': 'mockup_cana_trapiche_3d',
   'mockups/condor-cielo-3d': 'mockup_condor_cielo_3d',
   'mockups/navegador-grafo': 'mockup_navegador_grafo',
+  'mockups/navegacion-pisos': 'mockup_navegacion_pisos',
 };
 
 const HASH_VIEW_ROUTES = {
@@ -859,6 +895,7 @@ const HASH_VIEW_ROUTES = {
   'mi-finca-odyssey': 'finca_odyssey',
   'mono-vs-poli': 'mono_vs_poli',
   'monocultivo-policultivo': 'mono_vs_poli',
+  'ahorcado-contaminado': 'ahorcado_contaminado',
   toxicologia: 'toxicologia',
   suelo: 'suelo',
   agua: 'agua',
@@ -1017,7 +1054,7 @@ const MODULE_VIEWS = new Set([
   'biodiversidad', 'informes', 'perfil', 'ayuda', 'help',
   'animales', 'animales_gallinas', 'animales_abejas', 'animales_vacas', 'estiercol', 'compost',
   'animales', 'animales_gallinas', 'animales_abejas', 'animales_vacas', 'animales_conejos', 'animales_caprinos', 'estiercol',
-  'hoy_finca',   'faq', 'evolucion', 'juego', 'defensores', 'milpa', 'doom_finca', 'subsuelo', 'finca_odyssey', 'mono_vs_poli', 'sembrar', 'cosechar', 'mi_cosecha', 'insumos', 'biopreparados',
+  'hoy_finca',   'faq', 'evolucion', 'juego', 'defensores', 'milpa', 'doom_finca', 'subsuelo', 'finca_odyssey', 'mono_vs_poli', 'ahorcado_contaminado', 'sembrar', 'cosechar', 'mi_cosecha', 'insumos', 'biopreparados',
   'observacion', 'reportar_invasora', 'sanidad_sintoma', 'mantenimiento', 'new_task',
   'agente', 'voz', 'voz_planta', 'procesos', 'registro_voz', 'registro_unificado', 'ciclo', 'germinacion', 'ciclo_nutrientes', 'calendario_finca', 'suelo', 'agua', 'clima_boletin', 'salud_suelo', 'semilla', 'poscosecha', 'almacenamiento', 'nutricion', 'aromaticas', 'toxicologia', 'aprende', 'curso', 'directorio', 'mercados',
   'agente', 'voz', 'voz_planta', 'procesos', 'registro_voz', 'registro_unificado', 'ciclo', 'germinacion', 'ciclo_nutrientes', 'calendario_finca', 'suelo', 'agua', 'cafe', 'uchuva', 'frutales', 'clima_boletin', 'salud_suelo', 'semilla', 'poscosecha', 'almacenamiento', 'nutricion', 'toxicologia', 'aprende', 'curso', 'directorio', 'mercados',
@@ -1725,6 +1762,17 @@ export default function App() {
             </ErrorFallback>
           </ErrorBoundary>
         );
+      case 'mockup_restauracion_tiempo_3d':
+        // EL MONTE QUE VUELVE: el potrero volviéndose bosque a través del
+        // tiempo (50 años, riel no lineal). Ruta #/mockups/restauracion-
+        // tiempo-3d, sin auth.
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="El monte que vuelve">
+              <RestauracionTiempo3DMockup />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
       case 'mundo_casa_adentro':
         return (
           <ErrorBoundary>
@@ -1811,6 +1859,32 @@ export default function App() {
           <ErrorBoundary>
             <ErrorFallback moduleName="El mundo de la papa">
               <PapaVivo3DMockup />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
+      case 'mockup_yuca_viva_3d':
+        // Vitrina pública del MUNDO DE LA YUCA: el yucal de clima medio en 3D
+        // REAL — el tallo leñoso pelado y anillado de cicatrices, el follaje
+        // arriba no más, el semillero de estacas inclinadas y el racimo de
+        // raíces recién destapado. En equipo humilde muestra la ficha del
+        // corte. Ruta #/mockups/yuca-viva-3d.
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="El mundo de la yuca">
+              <YucaViva3DMockup />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
+      case 'mockup_quinua_viva_3d':
+        // Vitrina pública del MUNDO DE LA QUINUA: el quinual maduro de tierra
+        // fría en 3D REAL — la ladera a manchas de color por variedad y la
+        // era donde se trilla, se avienta y se le lava lo amargo. En equipo
+        // humilde muestra la ficha de las dos panojas. Ruta
+        // #/mockups/quinua-viva-3d.
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="El mundo de la quinua">
+              <QuinuaViva3DMockup />
             </ErrorFallback>
           </ErrorBoundary>
         );
@@ -2009,6 +2083,14 @@ export default function App() {
           <ErrorBoundary>
             <ErrorFallback moduleName="Botón anarquía">
               <BotonAnarquiaMockup onBack={() => navigate('dashboard')} />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
+      case 'mockup_transicion_agente_plano':
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="El agente cruza a lo plano">
+              <TransicionAgentePlanoMockup />
             </ErrorFallback>
           </ErrorBoundary>
         );
@@ -2672,6 +2754,18 @@ export default function App() {
             </ErrorFallback>
           </ErrorBoundary>
         );
+      case 'mockup_navegacion_pisos':
+        // Navegación unificada por pisos térmicos: minimapa + mapa estratégico
+        // + vista global (lámina del paisaje con nevado y Chorrera). Tocar un
+        // mundo navega a su pantalla real. Ruta #/mockups/navegacion-pisos,
+        // sin auth.
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="Navegación por pisos térmicos">
+              <NavegacionPisosMockup onNavigate={navigate} onBack={() => navigate('dashboard')} />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
       case 'mockup_hoja_prueba_valle':
         // La hoja de prueba de la ley visual del valle: el patrón oro contra el
         // que se compara todo activo nuevo (paleta, bandas, borde) bajo las
@@ -2853,6 +2947,19 @@ export default function App() {
             <ErrorFallback moduleName="Monocultivo vs Policultivo">
               <ScreenShell title="Mono vs Poli" onBack={() => navigate('juego')} onHome={() => navigate('dashboard')}>
                 <MonoVsPoliSimulator />
+              </ScreenShell>
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
+      case 'ahorcado_contaminado':
+        // Ahorcado clásico con metáfora de contaminación (Tarea #93, dataset de
+        // la Tarea #38). No trae navegación propia → lo envolvemos en
+        // ScreenShell (como 'subsuelo'/'mono_vs_poli') para dar Volver/Inicio.
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="Ahorcado Contaminado">
+              <ScreenShell title="Ahorcado Contaminado" onBack={() => navigate('juego')} onHome={() => navigate('dashboard')}>
+                <AhorcadoContaminado />
               </ScreenShell>
             </ErrorFallback>
           </ErrorBoundary>
@@ -4109,6 +4216,8 @@ export default function App() {
       {currentView !== 'loading' && currentView !== 'login' && currentView !== 'oauth-callback' && !currentView.startsWith('mockup_') && <EscuchaOverlay />}
       {currentView === 'dashboard' && <PendingTasksWidget onEdit={(task) => navigate('edit_task', { task })} />}
       {currentView !== 'loading' && currentView !== 'login' && currentView !== 'oauth-callback' && !currentView.startsWith('mockup_') && <SyncProgressIndicator />}
+      {/* CompaiOverlay (R3): compai minimizable en todas las rutas 2D, montado UNA vez aqui. */}
+      {currentView !== 'loading' && currentView !== 'login' && currentView !== 'oauth-callback' && !currentView.startsWith('mockup_') && <CompaiOverlay currentView={currentView} />}
       {/* Badge persistente "N pendientes de sincronizar" (rescate #2668).
           Mismo guard de vista que SyncProgressIndicator: no en pre-auth. */}
       {currentView !== 'loading' && currentView !== 'login' && currentView !== 'oauth-callback' && !currentView.startsWith('mockup_') && <SyncIndicator />}
