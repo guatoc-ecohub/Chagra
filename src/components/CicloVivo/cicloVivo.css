@@ -318,7 +318,41 @@
 .cvivo-state-pill.activo { background: color-mix(in srgb, #4C7A3D 16%, white); color: #2F4A34; }
 .cvivo-state-pill.parcial { background: color-mix(in srgb, var(--cv-gold-strong) 26%, white); color: #6b5309; }
 .cvivo-state-pill.proximamente { background: rgba(107, 90, 71, .12); color: var(--cv-ink-soft); }
+.cvivo-state-pill.precio {
+  background: linear-gradient(135deg, color-mix(in srgb, var(--cv-ocre) 22%, white), color-mix(in srgb, var(--cv-gold-strong) 20%, white));
+  color: #6B5309;
+}
+.cvivo-state-pill.precio.live {
+  background: linear-gradient(135deg, color-mix(in srgb, #4C7A3D 24%, white), color-mix(in srgb, #CDE7CA 30%, white));
+  color: #2F4A34;
+}
+.cvivo-state-pill.precio.quiet {
+  background: rgba(107, 90, 71, .10);
+  color: var(--cv-ink-soft);
+}
 .cvivo-card-cta { margin-left: auto; align-self: center; color: var(--cv-ocre); flex-shrink: 0; }
+
+.cv-chip-stack {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 1px;
+  line-height: 1.06;
+}
+.cv-chip-main {
+  font-size: 12.5px;
+  font-weight: 800;
+}
+.cv-chip-sub {
+  font-size: 10px;
+  font-weight: 700;
+  opacity: .95;
+}
+.cv-chip-subtle {
+  font-size: 9px;
+  font-weight: 600;
+  opacity: .78;
+}
 
 /* Reduce motion */
 @media (prefers-reduced-motion: reduce) {
