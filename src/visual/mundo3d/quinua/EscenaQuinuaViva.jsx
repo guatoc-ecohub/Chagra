@@ -77,8 +77,8 @@ const SOMBRA_QUINUAL = { left: -18, right: 18, top: 14, bottom: -12, far: 50 };
 function construirLadera(seg, plano) {
   const cPasto = new THREE.Color(mezclar(VERDES.frio, VERDES.paramoMusgo, 0.4));
   const cPasto2 = new THREE.Color(mezclar(VERDES.paramoLiquen, VERDES.frio, 0.5));
-  const cSurco = new THREE.Color(mezclar(TIERRAS.turba, TIERRAS.siembra, 0.4));
-  const cEntre = new THREE.Color(mezclar(TIERRAS.turba, NEUTROS.tinta, 0.4));
+  const cSurco = new THREE.Color(mezclar(TIERRAS.turba, TIERRAS.siembra, 0.5));
+  const cEntre = new THREE.Color(mezclar(TIERRAS.turba, NEUTROS.tinta, 0.22));
   const cEra = new THREE.Color(mezclar(TIERRAS.camino, NEUTROS.concreto, 0.35)); // piso duro
   const cHondo = new THREE.Color(mezclar(VERDES.paramoNiebla, VERDES.frio, 0.4)); // el fondo del valle
   return construirTerreno({
@@ -285,11 +285,14 @@ function Diorama({ tier, reducedMotion, foco }) {
     [perfil.segmentosTerreno, perfil.flatShading],
   );
 
+  /* La cordillera del fondo en DOS capas de perspectiva aérea (la lámina de
+     Humboldt): la cercana más verde y honda, la lejana ya casi del color de la
+     bruma. El fog (que arranca detrás del lote) termina el degradado solo. */
   const cerros = useMemo(
     () => ({
-      cerca: mezclar(VERDES.paramoHoja, bruma, 0.3),
-      media: mezclar(VERDES.paramoNiebla, bruma, 0.42),
-      lejos: mezclar(VERDES.altoAndino, bruma, 0.56),
+      cerca: mezclar(VERDES.paramoHoja, bruma, 0.15),
+      media: mezclar(VERDES.paramoNiebla, bruma, 0.28),
+      lejos: mezclar(VERDES.altoAndino, bruma, 0.45),
     }),
     [bruma],
   );
@@ -303,6 +306,10 @@ function Diorama({ tier, reducedMotion, foco }) {
   const casaY = alturaQuinual(SITIO_CASA[0], SITIO_CASA[1]);
   const trillaY = alturaQuinual(SITIO_TRILLA[0], SITIO_TRILLA[1]);
 
+  /* Cuánta luz le FALTA a la hora para que el campo de color se lea (la noche
+     y el atardecer bajan `atm.intensidad`; a mediodía esto es ~0). */
+  const refuerzo = Math.max(0, 1 - atm.intensidad);
+
   return (
     <>
       <AtmosferaMundo
@@ -314,30 +321,70 @@ function Diorama({ tier, reducedMotion, foco }) {
         conNiebla={false}
         sombra={SOMBRA_QUINUAL}
       />
-      {/* la bruma, lejos: que separe planos sin lavar el color */}
-      {perfil.fog && <fog attach="fog" args={[bruma, 30, 74]} />}
+      {/* la bruma, lejos: arranca DETRÁS del lote (la última fila queda a
+          ~30 m de la cámara) para que el fog no le robe saturación a ninguna
+          panoja — solo al fondo del valle y a la cordillera. */}
+      {perfil.fog && <fog attach="fog" args={[bruma, 36, 66]} />}
       {/* Una luz de relleno FRÍA y baja, entrando casi rasante desde el lado
           opuesto al sol: es la que le saca el borde a cada panoja contra la de
           atrás. Sin este contraluz el campo se aplana en una sola mancha. */}
       <directionalLight position={[-9, 3.5, -6]} intensity={0.3} color="#dfe8ea" />
+      {/* EL PISO DE LECTURA del quinual (mismo remedio del papal #2712 y el
+          cafetal #2707): el entregable de este mundo es el COLOR de las
+          panojas, y la hora sola lo deja pastel. Un relleno hemisférico cálido
+          que compensa lo que la hora apaga (a mediodía casi no suma) y una
+          clave dorada fija SIN sombras que enciende la cara de cada panoja
+          sin tocar el dibujo de la sombra proyectada. */}
+      <hemisphereLight
+        color="#f4ead0"
+        groundColor="#463f2c"
+        intensity={0.3 + 1.05 * refuerzo}
+      />
+      <directionalLight
+        position={[7, 10, 5]}
+        color="#ffe9c0"
+        intensity={0.34 + 0.85 * refuerzo}
+      />
 
       {/* LA LADERA que baja, con sus surcos a curva de nivel */}
       <mesh geometry={geoLadera} receiveShadow={perfil.sombras}>
         <meshLambertMaterial vertexColors flatShading={perfil.flatShading} />
       </mesh>
 
-      {/* la segunda cordillera, al otro lado del valle que se abre abajo */}
-      <mesh position={[-13, 1.0, -27]} scale={[12, 5.2, 5]}>
+      {/* LA CORDILLERA del otro lado del valle, en DOS capas traslapadas de
+          lomas HUNDIDAS (solo asoma el arco de arriba): una banda continua de
+          perfiles, no tres domos sueltos con el cielo colándose entre ellos.
+          La capa cercana verdea; la lejana ya se va con la bruma (perspectiva
+          aérea de lámina de Humboldt). */}
+      {/* — la capa cercana — */}
+      <mesh position={[-24, -1.0, -29]} scale={[13, 3.6, 5]}>
+        <sphereGeometry args={[1, 12, 8]} />
+        <meshLambertMaterial color={cerros.cerca} />
+      </mesh>
+      <mesh position={[-6, -0.7, -31]} scale={[15, 4.4, 5]}>
         <sphereGeometry args={[1, 12, 8]} />
         <meshLambertMaterial color={cerros.media} />
       </mesh>
-      <mesh position={[8, 1.6, -30]} scale={[14, 6.4, 6]}>
+      <mesh position={[12, -1.1, -30]} scale={[14, 3.8, 5]}>
+        <sphereGeometry args={[1, 12, 8]} />
+        <meshLambertMaterial color={cerros.cerca} />
+      </mesh>
+      <mesh position={[26, -1.3, -28]} scale={[10, 3.0, 5]}>
+        <sphereGeometry args={[1, 12, 8]} />
+        <meshLambertMaterial color={cerros.media} />
+      </mesh>
+      {/* — la capa lejana, ya casi bruma — */}
+      <mesh position={[-16, -1.2, -38]} scale={[16, 4.6, 6]}>
         <sphereGeometry args={[1, 12, 8]} />
         <meshLambertMaterial color={cerros.lejos} />
       </mesh>
-      <mesh position={[23, 0.6, -26]} scale={[9, 4.2, 5]}>
+      <mesh position={[4, -0.8, -40]} scale={[18, 5.6, 6]}>
         <sphereGeometry args={[1, 12, 8]} />
-        <meshLambertMaterial color={cerros.cerca} />
+        <meshLambertMaterial color={cerros.lejos} />
+      </mesh>
+      <mesh position={[22, -1.4, -38]} scale={[13, 4.0, 6]}>
+        <sphereGeometry args={[1, 12, 8]} />
+        <meshLambertMaterial color={cerros.lejos} />
       </mesh>
 
       {/* EL QUINUAL: el campo de panojas de color */}

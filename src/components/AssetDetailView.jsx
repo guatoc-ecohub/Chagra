@@ -4,6 +4,7 @@ import { X, Calendar, Activity, MapPin, AlertCircle, Images, Skull, Layers, Spro
 import { SplitFlow } from './SplitFlow';
 import PlantCemeteryModal from './PlantCemeteryModal';
 import useAssetStore from '../store/useAssetStore';
+import useAngelitaStore from '../store/useAngelitaStore';
 import AssetTimeline from './AssetTimeline';
 import { InputLogForm } from './InputLogForm';
 import MapPicker from './MapPicker';
@@ -979,6 +980,16 @@ export const AssetDetailView = () => {
           onConfirm={async (_reason) => {
             const updatedAsset = { ...asset, attributes: { ...asset.attributes, status: 'dead' } };
             await updateAsset('plant', updatedAsset, []);
+            // #109 "luto y fiesta": al registrar la baja, el compañero
+            // acompaña en luto — breve, gris, tierno, NUNCA culposo (nunca
+            // "usted la dejó morir": PlantCemeteryModal ya trata la pérdida
+            // como currículo, no como culpa; el compAI sostiene ese mismo
+            // tono). Dedup por asset.id: la misma planta no se lamenta dos
+            // veces.
+            useAngelitaStore.getState().lamentar({
+              id: `luto:${asset.id}`,
+              texto: `Se nos fue ${String(name || 'esta planta').toLowerCase()}. Pasa, y de cada una se aprende algo para la próxima.`,
+            });
             setShowCemeteryModal(false);
           }}
         />

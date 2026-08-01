@@ -85,6 +85,35 @@
   font-size: 0.82rem;
 }
 
+/* El botón de "responder por voz" (#91): disco pequeño alineado con el
+   ícono del tipo, mismo lenguaje visual que EscuchaFab pero en miniatura —
+   no compite con el texto, vive pegado al borde derecho de la burbuja. */
+.angelita-burbuja__escuchar {
+  flex: 0 0 auto;
+  display: grid;
+  place-items: center;
+  width: 1.55rem;
+  height: 1.55rem;
+  margin-top: 0.12rem;
+  border: none;
+  border-radius: 50%;
+  background: var(--ab-fondo-icono);
+  box-shadow: inset 0 0 0 1px var(--ab-borde);
+  color: var(--ab-acento);
+  cursor: pointer;
+  transition: transform 0.15s ease, background 0.15s ease;
+}
+
+.angelita-burbuja__escuchar:hover,
+.angelita-burbuja__escuchar:focus-visible {
+  background: var(--ab-acento);
+  color: rgba(10, 20, 30, 0.92);
+}
+
+.angelita-burbuja__escuchar:active {
+  transform: scale(0.9);
+}
+
 /* Solo para lectores de pantalla (el tipo narrado). */
 .angelita-burbuja__sr {
   position: absolute;

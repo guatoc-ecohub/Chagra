@@ -88,16 +88,22 @@ seed() {
   $DRUSH user:role:add farm_manager "$E2E_OPERADOR_USER" >/dev/null 2>&1 || true
 
   # Token del usuario de test (password grant, mismo flujo que la PWA).
-  local TOK
-  TOK=$($NIX_NET "curl -sS -X POST '$FARMOS_BASE/oauth/token' \
+  local TOK RESP
+  # Capturamos la respuesta CRUDA: si el endpoint OAuth devuelve algo que NO es
+  # JSON (página de error, HTML de nginx/CF, cuerpo vacío), jq crasheaba con
+  # "parse error: Invalid numeric literal" y perdíamos el motivo real. Ahora jq
+  # no rompe (// empty + 2>/dev/null) y en el fallo mostramos el cuerpo crudo.
+  RESP=$($NIX_NET "curl -sS -X POST '$FARMOS_BASE/oauth/token' \
     -H 'Content-Type: application/x-www-form-urlencoded' \
     --data-urlencode 'grant_type=password' \
     --data-urlencode 'client_id=$FARMOS_CLIENT_ID' \
     --data-urlencode 'username=$E2E_OPERADOR_USER' \
     --data-urlencode 'password=$E2E_OPERADOR_PASS' \
-    --data-urlencode 'scope=farm_manager' | jq -r .access_token")
+    --data-urlencode 'scope=farm_manager'")
+  TOK=$(printf '%s' "$RESP" | jq -r '.access_token // empty' 2>/dev/null)
   if [[ -z "$TOK" || "$TOK" == "null" ]]; then
-    echo "FATAL: no se pudo obtener token para $E2E_OPERADOR_USER (¿pass mal? ¿oauth caído?)." >&2
+    echo "FATAL: no se pudo obtener token para $E2E_OPERADOR_USER (¿pass mal? ¿oauth caído? ¿password grant deshabilitado?)." >&2
+    echo "  respuesta cruda del endpoint OAuth (primeros 300 chars): ${RESP:0:300}" >&2
     exit 3
   fi
 

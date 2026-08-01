@@ -5,10 +5,14 @@
  * microsuelo (EscenaEntMaestro). El operador revisó los tres mundos con piezas
  * de páramo y cerró la decisión: queda UNO solo — la escena del páramo
  * definitivo (EscenaBosqueVivo, ahora armada con la cámara y la inmensidad del
- * páramo viejo + el suelo rico dorado) y SIN el Ent ni el campesino ("están
- * horribles"). EscenaEntMaestro se desmonta de aquí sin redibujarse: era un
- * import aparte, sale limpio. El archivo sigue en el repo por si otra
- * composición retoma la lección de las cinco capas.
+ * páramo viejo + el suelo rico dorado). EscenaEntMaestro se desmonta de aquí
+ * sin redibujarse: era un import aparte, sale limpio.
+ *
+ * 2026-07-30: el ENT VUELVE al páramo, pero como la QUEÑUA (Polylepis) con el
+ * cincel reconciliado de `EntGradiente` (el aprobado en `tres-ents-gradiente`,
+ * NO la vieja `EntQuenua` "horrible"). El panel del mundo ya no da la lección
+ * genérica del frailejón: da la LECCIÓN DE LA QUEÑUA (entGuion, grounded) — el
+ * árbol que sostiene el suelo y guarda el agua sobre los 4.000 m.
  *
  * Contrato de mundos: acepta `{tier, reducedMotion}` y llena a su padre. Copy
  * en español de Colombia, en "usted". Autocontenido: CSS embebido, cero
@@ -19,10 +23,26 @@ import { useMemo } from 'react';
 import EscenaBosqueVivo from './EscenaBosqueVivo.jsx';
 import PanelPasos from '../PanelPasos.jsx';
 import { decidirTier, permite3D } from '../deviceTier.js';
+import { getPieza } from '../../../data/entGuion.js';
 
 const CSS = `
 .entb { position: relative; width: 100%; height: 100%; overflow: hidden; background: #c3cfce; }
 `;
+
+/* LA LECCIÓN DE LA QUEÑUA-ENT — la enseñanza del guardián del páramo, tomada
+   del guion pedagógico (`entGuion`, grounded contra el catálogo v3.2). La
+   queñua (coloradito, *Polylepis*) sostiene el suelo sobre los 4.000 m y guarda
+   el agua que baja al valle: es la lección que el brazo del Ent señala y que el
+   panel pone en palabras. Fallback digno por si el id cambiara. */
+const PIEZA_QUENUA = getPieza('coloradito_regula_agua_alta_montana');
+const LECCION_QUENUA = {
+  etiqueta: 'La queñua del páramo',
+  kicker: 'El agua que baja al valle',
+  texto: PIEZA_QUENUA?.snippet_pedagogico
+    || 'La queñua crece donde casi ningún árbol se atreve, arriba de los cuatro '
+    + 'mil metros. Sus raíces sujetan el suelo del páramo y guardan el agua que '
+    + 'baja a los valles. Sin ella, el páramo se deslava.',
+};
 
 /* Acento del páramo para el panel compartido (pajonal dorado y bruma fría). */
 const TEMA_PANEL = {
@@ -54,9 +74,9 @@ export default function MundoEntBosque({ tier: tierProp, reducedMotion: rmProp }
       <style>{CSS}</style>
       <EscenaBosqueVivo tier={tier} reducedMotion={reducedMotion} />
       <PanelPasos
-        etiqueta="El páramo"
-        kicker="La fábrica de agua"
-        texto="Los frailejones peinan la niebla con sus hojas de lana y el musgo la guarda como una esponja. De aquí, gota a gota, nace el agua que baja a su finca."
+        etiqueta={LECCION_QUENUA.etiqueta}
+        kicker={LECCION_QUENUA.kicker}
+        texto={LECCION_QUENUA.texto}
         tema={TEMA_PANEL}
         reducedMotion={reducedMotion}
       />

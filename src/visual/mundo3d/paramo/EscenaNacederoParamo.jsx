@@ -18,6 +18,7 @@ import { useLayoutEffect, useMemo, useRef } from 'react';
 import { useFrame, useThree } from '@react-three/fiber';
 import * as THREE from 'three';
 import SueloRico from '../terreno/SueloRico.jsx';
+import EntGradiente from '../bosque/EntGradiente.jsx';
 import {
   geomFrailejon, geomMortino, geomRomerillo, geomRoca, geomMusgo,
   geomEncenillo, geomAliso, geomGaque, calidadDeTier,
@@ -25,7 +26,7 @@ import {
 import {
   crearNacedero, filoDelNacedero, geomParedTurba, geomRaicesCornisa, geomBloquesTurba,
   geomHilosAgua, geomPoza, geomQuebrada, geomCordilleras, geomRocio,
-  siembraNacedero, EDADES_FRAILEJON, PROSCENIO_NACEDERO,
+  siembraNacedero, EDADES_FRAILEJON, PROSCENIO_NACEDERO, puestoDelGuardian,
 } from './nacederoParamo.geom.js';
 
 /* Un banco: una geometría, un material, N instancias (con cabeceo por mata). */
@@ -86,8 +87,12 @@ function texturaVaho() {
 const BANCOS_NIEBLA = [
   /* LA QUE SE DERRAMA POR EL FILO: se queda ARRIBA, en la boca del anfiteatro.
      Ni un vaho por delante de la pared: la lámina es lo que este mundo existe
-     para enseñar y un velo encima la convierte en un manchón pardo. */
-  { p: [-6.5, 8.4, -9.8], esc: [13, 3.0, 1], op: 0.34, fase: 0.0, amp: 2.4 },
+     para enseñar y un velo encima la convierte en un manchón pardo. El banco
+     izquierdo va BAJO y recostado al hombro del guardián: le envuelve el pie a
+     la queñua (que es su historia — la niebla es su materia prima) pero le
+     deja el rostro libre arriba. Velarle la cara al guardián con su propio
+     vaho es dejar el mundo sin mirador. */
+  { p: [-8.2, 7.3, -9.2], esc: [13, 3.0, 1], op: 0.34, fase: 0.0, amp: 2.4 },
   { p: [6.5, 8.9, -10.6], esc: [14, 3.2, 1], op: 0.32, fase: 1.7, amp: 2.1 },
   /* la bruma de fondo que despega el respaldo del frailejonal (profundidad) */
   { p: [0, 8.5, -22], esc: [86, 7, 1], op: 0.42, fase: 2.6, amp: 2.2 },
@@ -184,6 +189,11 @@ export default function EscenaNacederoParamo({ tier = 'alto', perfil, reducedMot
 
   const siembra = useMemo(() => siembraNacedero(nac, tier, filo), [nac, tier, filo]);
 
+  /* EL GUARDIÁN DEL FRAILEJONAL: la queñua, en el puesto que le resuelve el
+     campo de alturas (hombro izquierdo, afuera del filo, de cara a la
+     portilla — ver `puestoDelGuardian`). */
+  const guardian = useMemo(() => puestoDelGuardian(nac), [nac]);
+
   /* El proscenio: el marco fijo del cuadro (centenarios de primer plano). */
   const proscenio = useMemo(
     () => PROSCENIO_NACEDERO.map((p) => ({
@@ -251,7 +261,10 @@ export default function EscenaNacederoParamo({ tier = 'alto', perfil, reducedMot
   const anclas = useMemo(() => [
     ...proscenio.map((p) => ({ x: p.pos[0], z: p.pos[2], radio: 0.7 * p.escala })),
     ...(siembra.frailejones.centenario || []).map((p) => ({ x: p.pos[0], z: p.pos[2], radio: 0.55 * p.escala })),
-  ], [proscenio, siembra]);
+    /* el guardián también pisa: sin su sombra de contacto, un árbol de este
+       porte parado en la paja se lee flotando */
+    { x: guardian.x, z: guardian.z, radio: 2.0 },
+  ], [proscenio, siembra, guardian]);
 
   const segmentos = tier === 'alto' ? 156 : tier === 'medio' ? 104 : 72;
 
@@ -302,6 +315,20 @@ export default function EscenaNacederoParamo({ tier = 'alto', perfil, reducedMot
         />
       ))}
       <Banco geo={flora.centenario} mat={matTierra} items={proscenio} castShadow={!!perfil.sombras} />
+
+      {/* EL GUARDIÁN DEL FRAILEJONAL: la queñua — el árbol que llega más
+          arriba, asomado sobre el anfiteatro y de cara al sitio donde sale el
+          agua que su copa le quitó a la niebla. El Ent es el de la casa
+          (`EntGradiente`, el mismo del gradiente), tal cual: aquí solo se le
+          da su puesto. Su lección no se monta al pie porque ES el agua, y el
+          agua ya la dibuja este mundo entero. */}
+      <group
+        position={[guardian.x, guardian.y, guardian.z]}
+        rotation={[0, guardian.rotY, 0]}
+        scale={guardian.escala}
+      >
+        <EntGradiente especie="quenua" tier={tier} reducedMotion={reducedMotion} />
+      </group>
 
       {/* la niebla vuelta gota sobre la roseta del frente */}
       {tier !== 'bajo' && <Banco geo={flora.rocio} mat={matAgua} items={rocio} />}

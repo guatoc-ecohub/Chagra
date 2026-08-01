@@ -17,6 +17,7 @@ import EscenaCacaoVivo from './EscenaCacaoVivo.jsx';
 import PanelPasos from '../PanelPasos.jsx';
 import { decidirTier, permite3D } from '../deviceTier.js';
 import { alturaVega } from './floraCacao.geom.js';
+import { getPieza } from '../../../data/entGuion.js';
 
 /* Los cuatro pasos de la lección. Cada `foco` es el punto de la vega que el
    anillo señala mientras se lee (coordenadas del mundo, y sobre el terreno). */
@@ -52,10 +53,28 @@ const PASOS = [
   },
 ];
 
+/* LA LECCIÓN DE LA CEIBA-ENT — el guardián del cacaotal (piso cálido) habla con
+   su pieza del guion pedagógico grounded (`entGuion`, verificada contra el
+   catálogo v3.2). Va APARTE de los cuatro pasos del cultivo, como el guardián
+   del bosque de tres estratos: los pasos enseñan el cacao; la ceiba, por qué el
+   monte grande lo cobija. Fallback digno por si el id cambiara. */
+const LECCION_CEIBA = getPieza('ceiba_sombrio_refugio_biodiversidad');
+
 const CSS = `
 .mcacao { position: relative; width: 100%; height: 100%; overflow: hidden; background: #dce4bd; }
 .mcacao canvas { opacity: 0; transition: opacity 0.9s ease; }
 .mcacao .cacao-canvas--lista canvas, .mcacao canvas.cacao-canvas--lista { opacity: 1; }
+/* La carta del guardián: rincón superior izquierdo (los pasos viven abajo a la
+   izquierda; el sujeto, en el centro). Display-only — deja pasar la órbita. */
+.mcacao-guardian { position: absolute; top: 0.8rem; left: 0.8rem; z-index: 6; max-width: 21rem; margin: 0; padding: 0.55rem 0.9rem 0.62rem; border-radius: 0.8rem; background: rgba(30, 20, 10, 0.72); backdrop-filter: blur(4px); color: #f4ecda; pointer-events: none; }
+.mcacao-guardian h3 { margin: 0 0 0.25rem; font: 700 0.9rem/1.25 system-ui, sans-serif; }
+.mcacao-guardian h3 em { font-weight: 500; font-style: italic; opacity: 0.85; }
+.mcacao-guardian p { margin: 0; font: 500 0.78rem/1.5 system-ui, sans-serif; }
+@media (max-width: 460px) {
+  .mcacao-guardian { max-width: calc(100% - 1.2rem); top: 0.6rem; left: 0.6rem; padding: 0.5rem 0.75rem 0.56rem; }
+  .mcacao-guardian h3 { font-size: 0.84rem; }
+  .mcacao-guardian p { font-size: 0.74rem; }
+}
 @media (prefers-reduced-motion: reduce) {
   .mcacao canvas { transition: none; }
 }
@@ -92,6 +111,19 @@ export default function MundoCacao({ tier: tierProp, reducedMotion: rmProp } = {
     <div className="mcacao">
       <style>{CSS}</style>
       <EscenaCacaoVivo tier={tier} reducedMotion={reducedMotion} foco={actual.foco} />
+
+      {/* EL GUARDIÁN habla: la lección grounded de la ceiba-Ent (el sombrío
+          emergente del cálido), aparte de los pasos del cultivo. Nunca muda. */}
+      {LECCION_CEIBA && (
+        <article className="mcacao-guardian" role="status">
+          <h3>
+            {LECCION_CEIBA.nombre_comun}
+            {' '}
+            <em>{LECCION_CEIBA.nombre_cientifico}</em>
+          </h3>
+          <p>{LECCION_CEIBA.snippet_pedagogico}</p>
+        </article>
+      )}
 
       <PanelPasos
         etiqueta="La lección del cacaotal"

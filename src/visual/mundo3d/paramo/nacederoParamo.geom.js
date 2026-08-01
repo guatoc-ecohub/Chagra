@@ -1111,6 +1111,48 @@ function tinte(r, amt) {
   return [cl(f + h), cl(f), cl(f - h * 0.6)];
 }
 
+/*
+ * EL PUESTO DEL GUARDIÁN — dónde se para la queñua.
+ *
+ * El Ent del páramo (la queñua: `MAPA_PISO_ENT.paramo` en
+ * `pisosBosqueGradiente.js`) monta guardia sobre el hombro izquierdo del
+ * anfiteatro: AFUERA del filo —el hueco es del agua, no de los árboles—, con
+ * el frailejonal alrededor y de cara a la portilla. Mira el sitio exacto donde
+ * el agua se escapa, porque ese es su oficio: la queñua es una fábrica de
+ * agua — su copa y su musgo le quitan el agua a la niebla y el suelo se la
+ * entrega al nacedero. El mundo la para en el único punto donde ese ciclo se
+ * ve entero: la niebla arriba, la turba abajo, el agua saliendo al frente.
+ *
+ * El puesto NO es un número a mano: se camina la dirección elegida hasta pisar
+ * tierra firme fuera del filo (con su holgura) y la cota la pone el campo de
+ * alturas — si mañana la herradura crece, el guardián se corre solo. La
+ * DIRECCIÓN sí es decisión de cuadro: atrás-izquierda, para que desde la vista
+ * madre quede al fondo, asomado sobre el anfiteatro, sin taparle la testera a
+ * la lámina (que es lo que este mundo existe para enseñar).
+ */
+export function puestoDelGuardian(nac) {
+  const l = Math.hypot(-0.42, -0.91);
+  const ux = -0.42 / l;
+  const uz = -0.91 / l;
+  let rad = 6;
+  while (rad < 24 && nac.distHueco(ux * rad, uz * rad) < 2.6) rad += 0.25;
+  rad += 0.7; // un paso más atrás del borde: las raíces no cuelgan del talud
+  const x = ux * rad;
+  const z = uz * rad;
+  return {
+    x,
+    z,
+    y: nac.alturaDe(x, z) - 0.08,
+    /* de cara a la portilla (el sitio de la cámara de reposo): el guardián
+       vigila la salida del agua, no al visitante — que mire ahí es lo que
+       hace que la lección se lea sola */
+    rotY: Math.atan2(0.9 - x, 12.8 - z),
+    /* talla de guardián: por encima del Ent de catálogo, pero de árbol, no de
+       torre — el frailejón centenario le llega a la rodilla, como en el páramo */
+    escala: 1.22,
+  };
+}
+
 /**
  * Reparte el páramo sobre el relieve. Devuelve, por banco, las instancias
  * {pos, rotY, escala, tint, tiltX, tiltZ} que consume el InstancedMesh.
@@ -1141,9 +1183,22 @@ export function siembraNacedero(nac, tier = 'alto', filo = null) {
     return EDADES_FRAILEJON[0];
   };
 
-  /* El sitio de la cámara de reposo, con su radio de respeto. */
-  const CAMARA = { x: 0.9, z: 12.8, radio: 3.4 };
-  const enCorredor = (x, z) => Math.hypot(x - CAMARA.x, z - CAMARA.z) < CAMARA.radio;
+  /* Los sitios de cámara, con su radio de respeto: el de reposo en la
+     portilla y el de la vista del frailejonal — un frailejón pegado al lente
+     convierte la lámina naturalista en una mancha verde sin nombre. */
+  const CAMARAS = [
+    { x: 0.9, z: 12.8, radio: 3.4 },
+    { x: -15.5, z: 14.5, radio: 2.8 },
+  ];
+  const enCorredor = (x, z) => CAMARAS.some((c) => Math.hypot(x - c.x, z - c.z) < c.radio);
+
+  /* El claro del guardián: la queñua necesita el pie libre. Un frailejón
+     metido ENTRE sus raíces se lee como injerto, no como cortejo — el cortejo
+     se queda alrededor, de este radio para afuera. El sotobosque bajo (musgo,
+     romerillo) sí puede arrimársele: eso es exactamente lo que hace en el
+     páramo real, y a un árbol se le ve bien el musgo en los pies. */
+  const guardian = puestoDelGuardian(nac);
+  const enClaro = (x, z) => Math.hypot(x - guardian.x, z - guardian.z) < 2.4;
 
   const meter = (e, x, z, opts = {}) => {
     const esc = (opts.eMin ?? e.eMin) + r() * ((opts.eMax ?? e.eMax) - (opts.eMin ?? e.eMin));
@@ -1170,6 +1225,7 @@ export function siembraNacedero(nac, tier = 'alto', filo = null) {
     if (z > nac.P.borde - 1.5) continue; // ni colgando del despeñadero
     if (nac.pendienteDe(x, z) > 0.85) continue;
     if (enCorredor(x, z)) continue;
+    if (enClaro(x, z)) continue;
     // densidad: cae con la distancia al filo (la niebla moja el borde)
     const cerca = 1 - ss(nac.distHueco(x, z), 1, 16);
     if (r() > 0.3 + cerca * 0.7) continue;
@@ -1192,6 +1248,7 @@ export function siembraNacedero(nac, tier = 'alto', filo = null) {
       const x = p.x + gx * fuera;
       const z = p.z + gz * fuera;
       if (enCorredor(x, z)) continue;
+      if (enClaro(x, z)) continue;
       const viejo = EDADES_FRAILEJON[r() > 0.45 ? 6 : 5];
       // se asoma: el cabeceo mira al vacío
       meter(viejo, x, z, {
