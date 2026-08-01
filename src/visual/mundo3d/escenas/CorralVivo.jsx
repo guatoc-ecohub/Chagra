@@ -19,6 +19,29 @@
  * leer: la preñada lleva una señal rosada sobre el lomo, el vendido queda como
  * huella translúcida (el dato persiste, el animal ya no está).
  *
+ * ── LA PASADA "MUNDO ABIERTO" (peso real, no figuras de plástico) ──────────
+ *
+ * 1. ESQUELETO (FK sobre matrices): cada especie declara HUESOS con pivote y
+ *    padre (raíz → cuello → cabeza → orejas; cola aparte). Los gestos rotan el
+ *    hueso EN SU PIVOTE y la cadena hereda: la vaca baja la cabeza a pastar
+ *    con las patas plantadas, la gallina picotea con el CUELLO (no cabeceando
+ *    el cuerpo entero desde el piso), la cola espanta moscas con latigazos
+ *    esporádicos, las orejas dan su flick. Huesos reales, piel dibujada.
+ * 2. PELAJE (parchePelaje sobre Lambert): sombreado SUAVE (no facetado), con
+ *    countershading (lomo besado por el sol, panza en sombra fría) y un RIM
+ *    dorado de hora dorada en el contorno — el volumen deja de ser "cápsula
+ *    plástica" y se vuelve cuerpo a contraluz. Cero luces extra, cero uniforms:
+ *    el parche vive en el material y sirve igual instanciado o suelto.
+ * 3. ANATOMÍA: masas de hombro y grupa, cuello que une la cabeza al cuerpo,
+ *    papada, giba del cebú (`soloRaza`), manchas de pelaje (`tinte` sobre el
+ *    color de la raza), ojos, orejas caídas (y RECTAS donde la raza lo pide:
+ *    San Pedreño/pietrain via `rotRecta`), borla de cola, pezuñas oscuras.
+ * 4. PESO EN EL PISO: SombrasHato — UNA InstancedMesh de sombras de contacto
+ *    (el mismo truco claymation de SombraContacto, instanciado) alargadas por
+ *    la hora dorada. El fantasma del vendido NO proyecta sombra: es memoria.
+ * 5. MUNDO VIVO: la garcita bueyera parada en el lomo de la vaca grande y unas
+ *    motas de polvo dorado flotando en la luz (solo tier alto, gateadas).
+ *
  * CÓMO se dibuja (escala a N, DR §6 frugal):
  *   · InstancedMesh POR ESPECIE: cada especie es una tabla de PARTES (primitivas
  *     orgánicas, nunca cajas) y cada parte es UN InstancedMesh con N instancias.
@@ -26,9 +49,10 @@
  *   · Culling/LOD gama baja: `computeBoundingSphere()` tras posar matrices
  *     (frustum culling correcto) y en tier 'bajo' las partes `fina` (crestas,
  *     picos, orejas, colas) no se montan — queda la silueta legible.
- *   · Idle pecuario (picotea/respira/balancea/hocica) reescribe SOLO las
- *     matrices de las partes `cuerpo` (las patas quedan plantadas), gateado por
- *     reduced-motion Y device-tier ('bajo' no anima).
+ *   · El idle esquelético reescribe SOLO las matrices de las partes `cuerpo`
+ *     (las patas quedan plantadas), gateado por reduced-motion Y device-tier
+ *     ('bajo' no anima). Las matrices de hueso se cachean por frame (FK una
+ *     vez por animal-hueso, no por parte).
  *
  * El NOMBRE (visión núcleo del operador: "mis animales tienen nombre"):
  *   · Un cartel de madera CLAVADO junto a cada animal con nombre — estaca +
@@ -78,84 +102,221 @@ const PELAJES = ['#c9a06a', '#e7d9c2', '#8a6a55', '#d8b58a', '#efe7d8', '#a55636
    del corral quedan con la oreja caída criolla de siempre. */
 const OREJA_RECTA = new Set(['sanpedreño', 'sanpedreno', 'pietrain']);
 
+/* Tonos fijos de anatomía compartidos (hocico, pezuña, cara de oveja…). */
+const TONO = {
+  hocico: '#e8d3bf',
+  rosado: '#d99a8a',
+  pezuna: '#2e2018',
+  cuerno: '#d9cbb0',
+  caraOveja: '#4a3c30',
+  cresta: '#c85a44',
+  pico: '#e0a63a',
+  borla: '#3a2a20',
+};
+
 /*
- * Cada ESPECIE = gesto de idle + altura de referencia + tabla de PARTES.
- * Parte: { geo, pos, rot?, escala?, color? | porRaza, cuerpo? (la anima el
- * gesto), fina? (LOD: fuera en gama baja), vientre? (la preñez la ensancha) }.
- * Las siluetas vienen de los animales low-poly ya validados del recinto
- * (gallina que picotea, vaca capsular, oveja de vellón) + el cerdo criollo.
+ * EL PELAJE — parche de shader sobre MeshLambert (per-fragment en three moderno).
+ * Tres jugadas, cero uniforms (dirección de arte como constantes, una sola
+ * compilación para todo el hato):
+ *   · countershading: lo que mira ARRIBA se entibia (sol dorado), lo que mira
+ *     ABAJO se enfría y oscurece (rebote de tierra en sombra) → volumen.
+ *   · rim de hora dorada: fresnel cálido en el contorno — el contraluz del
+ *     atardecer sobre el pelo. Más fuerte arriba (de donde viene el sol).
+ *   · funciona igual en InstancedMesh (hato) y meshes sueltas (AnimalMomento):
+ *     la normal se lleva a mundo pasando por instanceMatrix si existe.
+ */
+// eslint-disable-next-line react-refresh/only-export-components -- parche de material compartido con AnimalMomento (misma piel en hato y momentos)
+export function parchePelaje(shader) {
+  shader.vertexShader = shader.vertexShader
+    .replace('#include <common>', '#include <common>\nvarying float vArribaPel;\nvarying vec3 vPosPel;')
+    .replace(
+      '#include <defaultnormal_vertex>',
+      `#include <defaultnormal_vertex>
+	vec3 nPel = objectNormal;
+	#ifdef USE_INSTANCING
+		nPel = ( instanceMatrix * vec4( nPel, 0.0 ) ).xyz;
+	#endif
+	vArribaPel = normalize( ( modelMatrix * vec4( nPel, 0.0 ) ).xyz ).y;
+	vPosPel = position;`,
+    );
+  shader.fragmentShader = shader.fragmentShader
+    .replace('#include <common>', '#include <common>\nvarying float vArribaPel;\nvarying vec3 vPosPel;')
+    .replace(
+      '#include <opaque_fragment>',
+      `float arribaPel = smoothstep( -0.85, 0.9, vArribaPel );
+	float rimPel = pow( 1.0 - clamp( dot( normalize( normal ), normalize( vViewPosition ) ), 0.0, 1.0 ), 2.0 );
+	float granoPel = fract( sin( dot( floor( vPosPel * 64.0 ), vec3( 127.1, 311.7, 74.7 ) ) ) * 43758.5453 );
+	outgoingLight *= mix( vec3( 0.46, 0.43, 0.47 ), vec3( 1.22, 1.12, 0.98 ), arribaPel );
+	outgoingLight *= 0.965 + 0.07 * granoPel;
+	outgoingLight += vec3( 1.0, 0.83, 0.55 ) * rimPel * ( 0.28 + 0.85 * arribaPel );
+	#include <opaque_fragment>`,
+    );
+}
+
+/*
+ * Cada ESPECIE = altura de referencia + ESQUELETO (huesos con pivote/padre/
+ * gesto) + tabla de PARTES.
+ * Hueso:  { padre?, pivote: [x,y,z], gesto, fase? } — `raiz` siempre existe.
+ * Parte:  { geo, pos, rot?, rotRecta? (variante oreja parada), escala?,
+ *          color? | porRaza, tinte? (multiplica el pelaje: manchas), hueso?
+ *          (a qué hueso va pegada; sin hueso = raíz), cuerpo? (se reanima por
+ *          frame), fina? (LOD: fuera en gama baja), vientre? (la preñez la
+ *          ensancha), respira? (late con el aliento), soloRaza? (solo esas
+ *          razas la llevan: la giba del cebú), pata? (índice para el ciclo de
+ *          marcha de AnimalMomento) }.
+ * Todas las especies miran a +x. Siluetas: los animales low-poly validados del
+ * recinto, con la pasada de anatomía de mundo abierto (masas, cuello, ojos).
  */
 // eslint-disable-next-line react-refresh/only-export-components -- tabla de datos compartida con EscenaRecinto/EscenaMercado/AnimalMomento (export pre-existente)
 export const ESPECIES = {
   gallina: {
-    gesto: 'picotea',
     alto: 0.5,
+    sombra: 0.24,
+    huesos: {
+      raiz: { pivote: [0, 0.22, 0], gesto: 'peso' },
+      cuello: { padre: 'raiz', pivote: [0.11, 0.26, 0], gesto: 'picotea' },
+      cabeza: { padre: 'cuello', pivote: [0.175, 0.36, 0], gesto: 'mira' },
+      cola: { padre: 'raiz', pivote: [-0.16, 0.28, 0], gesto: 'colaPluma' },
+    },
     partes: [
-      { geo: ['esfera', [0.16, 8, 6]], pos: [0, 0.2, 0], escala: [1.25, 1, 1], porRaza: true, cuerpo: true, vientre: true },
-      { geo: ['cono', [0.09, 0.2, 5]], pos: [-0.16, 0.28, 0], rot: [0, 0, 0.9], porRaza: true, cuerpo: true },
-      { geo: ['esfera', [0.09, 8, 6]], pos: [0.17, 0.34, 0], porRaza: true, cuerpo: true },
-      { geo: ['cono', [0.05, 0.1, 4]], pos: [0.17, 0.45, 0], color: '#c85a44', cuerpo: true, fina: true },
-      { geo: ['cono', [0.03, 0.09, 4]], pos: [0.27, 0.33, 0], rot: [0, 0, -Math.PI / 2], color: '#e0a63a', cuerpo: true, fina: true },
-      { geo: ['cilindro', [0.015, 0.015, 0.14, 4]], pos: [0.04, 0.05, 0.06], color: '#e0a63a' },
-      { geo: ['cilindro', [0.015, 0.015, 0.14, 4]], pos: [0.04, 0.05, -0.06], color: '#e0a63a' },
+      { geo: ['esfera', [0.165, 14, 10]], pos: [0, 0.22, 0], escala: [1.28, 1, 0.92], porRaza: true, cuerpo: true, vientre: true, respira: true },
+      { geo: ['esfera', [0.1, 10, 8]], pos: [0.1, 0.185, 0], porRaza: true, cuerpo: true, fina: true },
+      { geo: ['esfera', [0.095, 10, 8]], pos: [-0.01, 0.245, 0.115], escala: [1.35, 0.75, 0.5], porRaza: true, tinte: 0.8, cuerpo: true, fina: true },
+      { geo: ['esfera', [0.095, 10, 8]], pos: [-0.01, 0.245, -0.115], escala: [1.35, 0.75, 0.5], porRaza: true, tinte: 0.8, cuerpo: true, fina: true },
+      { geo: ['cono', [0.085, 0.22, 7]], pos: [-0.2, 0.315, 0], rot: [0, 0, 1.0], porRaza: true, tinte: 0.85, hueso: 'cola', cuerpo: true },
+      { geo: ['cilindro', [0.042, 0.055, 0.13, 8]], pos: [0.145, 0.315, 0], rot: [0, 0, -0.35], porRaza: true, hueso: 'cuello', cuerpo: true },
+      { geo: ['esfera', [0.075, 12, 9]], pos: [0.19, 0.4, 0], porRaza: true, hueso: 'cabeza', cuerpo: true },
+      { geo: ['cono', [0.032, 0.075, 5]], pos: [0.185, 0.475, 0], color: TONO.cresta, hueso: 'cabeza', cuerpo: true, fina: true },
+      { geo: ['esfera', [0.024, 6, 5]], pos: [0.245, 0.345, 0], color: TONO.cresta, hueso: 'cabeza', cuerpo: true, fina: true },
+      { geo: ['cono', [0.026, 0.075, 5]], pos: [0.27, 0.395, 0], rot: [0, 0, -Math.PI / 2], color: TONO.pico, hueso: 'cabeza', cuerpo: true },
+      { geo: ['esfera', [0.014, 6, 5]], pos: [0.21, 0.425, 0.058], color: '#241a10', hueso: 'cabeza', cuerpo: true, fina: true },
+      { geo: ['esfera', [0.014, 6, 5]], pos: [0.21, 0.425, -0.058], color: '#241a10', hueso: 'cabeza', cuerpo: true, fina: true },
+      { geo: ['cilindro', [0.012, 0.012, 0.15, 5]], pos: [0.02, 0.075, 0.06], color: TONO.pico, pata: 0 },
+      { geo: ['cilindro', [0.012, 0.012, 0.15, 5]], pos: [0.02, 0.075, -0.06], color: TONO.pico, pata: 1 },
     ],
   },
   vaca: {
-    gesto: 'respira',
     alto: 0.95,
+    sombra: 0.5,
+    huesos: {
+      raiz: { pivote: [0, 0.48, 0], gesto: 'peso' },
+      cuello: { padre: 'raiz', pivote: [0.36, 0.52, 0], gesto: 'pasta' },
+      cabeza: { padre: 'cuello', pivote: [0.47, 0.6, 0], gesto: 'mira' },
+      orejaI: { padre: 'cabeza', pivote: [0.48, 0.665, 0.135], gesto: 'flick' },
+      orejaD: { padre: 'cabeza', pivote: [0.48, 0.665, -0.135], gesto: 'flick', fase: 2.1 },
+      cola: { padre: 'raiz', pivote: [-0.45, 0.58, 0], gesto: 'cola' },
+    },
     partes: [
-      { geo: ['capsula', [0.22, 0.42, 4, 8]], pos: [0, 0.46, 0], rot: [0, 0, Math.PI / 2], porRaza: true, cuerpo: true, vientre: true },
-      { geo: ['esfera', [0.15, 8, 6]], pos: [0.44, 0.5, 0], porRaza: true, cuerpo: true },
-      { geo: ['esfera', [0.09, 8, 6]], pos: [0.56, 0.44, 0], color: '#e8d3bf', cuerpo: true, fina: true },
-      { geo: ['cono', [0.05, 0.12, 4]], pos: [0.4, 0.62, 0.12], rot: [0.5, 0, 0], porRaza: true, cuerpo: true, fina: true },
-      { geo: ['cono', [0.05, 0.12, 4]], pos: [0.4, 0.62, -0.12], rot: [-0.5, 0, 0], porRaza: true, cuerpo: true, fina: true },
-      { geo: ['cilindro', [0.02, 0.02, 0.34, 4]], pos: [-0.42, 0.34, 0], rot: [0, 0, 0.4], color: PALETA.tierraClara, cuerpo: true, fina: true },
-      { geo: ['cilindro', [0.045, 0.04, 0.36, 5]], pos: [0.28, 0.18, 0.13], color: PALETA.tierraClara },
-      { geo: ['cilindro', [0.045, 0.04, 0.36, 5]], pos: [0.28, 0.18, -0.13], color: PALETA.tierraClara },
-      { geo: ['cilindro', [0.045, 0.04, 0.36, 5]], pos: [-0.28, 0.18, 0.13], color: PALETA.tierraClara },
-      { geo: ['cilindro', [0.045, 0.04, 0.36, 5]], pos: [-0.28, 0.18, -0.13], color: PALETA.tierraClara },
+      // el barril del cuerpo + masas de hombro y grupa (la grupa un pelo más
+      // alta: la estampa del ganado de verdad, no un tubo con patas)
+      { geo: ['capsula', [0.23, 0.4, 6, 12]], pos: [0, 0.48, 0], rot: [0, 0, Math.PI / 2], porRaza: true, cuerpo: true, vientre: true, respira: true },
+      { geo: ['esfera', [0.2, 14, 10]], pos: [0.25, 0.5, 0], escala: [1.05, 1.08, 0.96], porRaza: true, cuerpo: true },
+      { geo: ['esfera', [0.205, 14, 10]], pos: [-0.25, 0.52, 0], escala: [1.05, 1.02, 0.98], porRaza: true, cuerpo: true },
+      // manchas de pelaje (tinte sobre el color de la raza), asimétricas
+      { geo: ['esfera', [0.14, 10, 8]], pos: [0.07, 0.52, 0.175], escala: [1.3, 0.9, 0.45], porRaza: true, tinte: 0.62, cuerpo: true, fina: true },
+      { geo: ['esfera', [0.13, 10, 8]], pos: [-0.13, 0.47, -0.175], escala: [1.25, 0.95, 0.45], porRaza: true, tinte: 0.68, cuerpo: true, fina: true },
+      // la giba del cebú (solo esa raza la lleva)
+      { geo: ['esfera', [0.11, 12, 9]], pos: [0.16, 0.7, 0], escala: [1.15, 0.95, 0.85], porRaza: true, soloRaza: ['cebú', 'cebu'], cuerpo: true },
+      // cuello que UNE (la cabeza ya no flota) + papada
+      { geo: ['capsula', [0.1, 0.16, 5, 10]], pos: [0.4, 0.56, 0], rot: [0, 0, -1.0], porRaza: true, hueso: 'cuello', cuerpo: true },
+      { geo: ['capsula', [0.04, 0.14, 4, 8]], pos: [0.42, 0.42, 0], rot: [0, 0, -1.15], porRaza: true, hueso: 'cuello', cuerpo: true, fina: true },
+      // cabeza, hocico, ojos, orejas caídas, cuernos cortos
+      { geo: ['esfera', [0.135, 14, 10]], pos: [0.52, 0.63, 0], escala: [1.2, 1, 0.82], porRaza: true, hueso: 'cabeza', cuerpo: true },
+      { geo: ['esfera', [0.085, 12, 9]], pos: [0.63, 0.575, 0], escala: [1.15, 0.85, 0.9], color: TONO.hocico, hueso: 'cabeza', cuerpo: true, fina: true },
+      { geo: ['esfera', [0.021, 6, 5]], pos: [0.565, 0.68, 0.092], color: '#241a10', hueso: 'cabeza', cuerpo: true, fina: true },
+      { geo: ['esfera', [0.021, 6, 5]], pos: [0.565, 0.68, -0.092], color: '#241a10', hueso: 'cabeza', cuerpo: true, fina: true },
+      { geo: ['cono', [0.05, 0.14, 6]], pos: [0.48, 0.665, 0.135], rot: [1.85, 0, -0.15], porRaza: true, hueso: 'orejaI', cuerpo: true, fina: true },
+      { geo: ['cono', [0.05, 0.14, 6]], pos: [0.48, 0.665, -0.135], rot: [-1.85, 0, -0.15], porRaza: true, hueso: 'orejaD', cuerpo: true, fina: true },
+      { geo: ['cono', [0.026, 0.11, 6]], pos: [0.485, 0.735, 0.075], rot: [0.75, 0, -0.35], color: TONO.cuerno, hueso: 'cabeza', cuerpo: true, fina: true },
+      { geo: ['cono', [0.026, 0.11, 6]], pos: [0.485, 0.735, -0.075], rot: [-0.75, 0, -0.35], color: TONO.cuerno, hueso: 'cabeza', cuerpo: true, fina: true },
+      // cola con borla (espanta moscas — hueso propio)
+      { geo: ['capsula', [0.02, 0.3, 4, 6]], pos: [-0.46, 0.44, 0], rot: [0, 0, 0.32], porRaza: true, hueso: 'cola', cuerpo: true, fina: true },
+      { geo: ['esfera', [0.045, 8, 6]], pos: [-0.515, 0.275, 0], color: TONO.borla, hueso: 'cola', cuerpo: true, fina: true },
+      // patas del color del pelaje + pezuñas oscuras (plantadas: sin `cuerpo`)
+      { geo: ['cilindro', [0.052, 0.042, 0.36, 7]], pos: [0.26, 0.2, 0.135], porRaza: true, pata: 0 },
+      { geo: ['cilindro', [0.052, 0.042, 0.36, 7]], pos: [0.26, 0.2, -0.135], porRaza: true, pata: 1 },
+      { geo: ['cilindro', [0.052, 0.042, 0.36, 7]], pos: [-0.26, 0.2, 0.135], porRaza: true, pata: 2 },
+      { geo: ['cilindro', [0.052, 0.042, 0.36, 7]], pos: [-0.26, 0.2, -0.135], porRaza: true, pata: 3 },
+      { geo: ['cilindro', [0.048, 0.054, 0.055, 7]], pos: [0.26, 0.028, 0.135], color: TONO.pezuna, fina: true },
+      { geo: ['cilindro', [0.048, 0.054, 0.055, 7]], pos: [0.26, 0.028, -0.135], color: TONO.pezuna, fina: true },
+      { geo: ['cilindro', [0.048, 0.054, 0.055, 7]], pos: [-0.26, 0.028, 0.135], color: TONO.pezuna, fina: true },
+      { geo: ['cilindro', [0.048, 0.054, 0.055, 7]], pos: [-0.26, 0.028, -0.135], color: TONO.pezuna, fina: true },
     ],
   },
   oveja: {
-    gesto: 'balancea',
-    alto: 0.6,
+    alto: 0.62,
+    sombra: 0.36,
+    huesos: {
+      raiz: { pivote: [0, 0.37, 0], gesto: 'peso' },
+      cabeza: { padre: 'raiz', pivote: [0.27, 0.42, 0], gesto: 'pasta' },
+      orejaI: { padre: 'cabeza', pivote: [0.315, 0.462, 0.088], gesto: 'flick' },
+      orejaD: { padre: 'cabeza', pivote: [0.315, 0.462, -0.088], gesto: 'flick', fase: 1.4 },
+      cola: { padre: 'raiz', pivote: [-0.33, 0.4, 0], gesto: 'colaCorta' },
+    },
     partes: [
-      { geo: ['icosaedro', [0.22, 0]], pos: [0, 0.34, 0], escala: [1.2, 1, 1], porRaza: true, cuerpo: true, vientre: true },
-      { geo: ['esfera', [0.1, 8, 6]], pos: [0.28, 0.36, 0], color: '#5a4a3e', cuerpo: true },
-      { geo: ['cono', [0.03, 0.1, 4]], pos: [0.28, 0.44, 0.08], rot: [0, 0, -0.6], color: '#5a4a3e', cuerpo: true, fina: true },
-      { geo: ['cono', [0.03, 0.1, 4]], pos: [0.28, 0.44, -0.08], rot: [0, 0, 0.6], color: '#5a4a3e', cuerpo: true, fina: true },
-      { geo: ['cilindro', [0.03, 0.03, 0.24, 4]], pos: [0.14, 0.12, 0.1], color: '#5a4a3e' },
-      { geo: ['cilindro', [0.03, 0.03, 0.24, 4]], pos: [0.14, 0.12, -0.1], color: '#5a4a3e' },
-      { geo: ['cilindro', [0.03, 0.03, 0.24, 4]], pos: [-0.14, 0.12, 0.1], color: '#5a4a3e' },
-      { geo: ['cilindro', [0.03, 0.03, 0.24, 4]], pos: [-0.14, 0.12, -0.1], color: '#5a4a3e' },
+      // el vellón por LOMOS (tres masas): silueta de lana, no icosaedro suelto
+      { geo: ['icosaedro', [0.24, 1]], pos: [0, 0.37, 0], escala: [1.3, 1.02, 1.06], porRaza: true, cuerpo: true, vientre: true, respira: true },
+      { geo: ['icosaedro', [0.15, 1]], pos: [-0.2, 0.42, 0], porRaza: true, cuerpo: true, fina: true },
+      { geo: ['icosaedro', [0.135, 1]], pos: [0.19, 0.35, 0], porRaza: true, cuerpo: true, fina: true },
+      // cara oscura con copete de lana, ojos ámbar, orejas de lado
+      { geo: ['esfera', [0.095, 12, 9]], pos: [0.34, 0.43, 0], escala: [1.25, 1, 0.85], color: TONO.caraOveja, hueso: 'cabeza', cuerpo: true },
+      { geo: ['esfera', [0.062, 8, 6]], pos: [0.315, 0.505, 0], porRaza: true, hueso: 'cabeza', cuerpo: true, fina: true },
+      { geo: ['esfera', [0.016, 6, 5]], pos: [0.375, 0.462, 0.06], color: '#d8b06a', hueso: 'cabeza', cuerpo: true, fina: true },
+      { geo: ['esfera', [0.016, 6, 5]], pos: [0.375, 0.462, -0.06], color: '#d8b06a', hueso: 'cabeza', cuerpo: true, fina: true },
+      { geo: ['cono', [0.026, 0.09, 5]], pos: [0.315, 0.462, 0.088], rot: [1.65, 0, 0], color: TONO.caraOveja, hueso: 'orejaI', cuerpo: true, fina: true },
+      { geo: ['cono', [0.026, 0.09, 5]], pos: [0.315, 0.462, -0.088], rot: [-1.65, 0, 0], color: TONO.caraOveja, hueso: 'orejaD', cuerpo: true, fina: true },
+      { geo: ['esfera', [0.05, 8, 6]], pos: [-0.335, 0.4, 0], porRaza: true, hueso: 'cola', cuerpo: true, fina: true },
+      { geo: ['cilindro', [0.026, 0.023, 0.26, 6]], pos: [0.16, 0.13, 0.09], color: TONO.caraOveja, pata: 0 },
+      { geo: ['cilindro', [0.026, 0.023, 0.26, 6]], pos: [0.16, 0.13, -0.09], color: TONO.caraOveja, pata: 1 },
+      { geo: ['cilindro', [0.026, 0.023, 0.26, 6]], pos: [-0.16, 0.13, 0.09], color: TONO.caraOveja, pata: 2 },
+      { geo: ['cilindro', [0.026, 0.023, 0.26, 6]], pos: [-0.16, 0.13, -0.09], color: TONO.caraOveja, pata: 3 },
     ],
   },
-  /* El cerdo criollo: cuerpo capsular rechoncho, trompa de cilindro, orejas
-     caídas y colita alzada — primitivas orgánicas, como sus vecinos. */
+  /* El cerdo criollo: rechoncho de verdad — jamón y paletilla como masas,
+     orejas volcadas sobre los ojos (o RECTAS: San Pedreño/pietrain via
+     rotRecta), cola en tirabuzón, mancha de barro. */
   cerdo: {
-    gesto: 'hocica',
     alto: 0.62,
+    sombra: 0.4,
+    huesos: {
+      raiz: { pivote: [0, 0.31, 0], gesto: 'peso' },
+      cabeza: { padre: 'raiz', pivote: [0.28, 0.35, 0], gesto: 'hocica' },
+      orejaI: { padre: 'cabeza', pivote: [0.36, 0.46, 0.095], gesto: 'flick' },
+      orejaD: { padre: 'cabeza', pivote: [0.36, 0.46, -0.095], gesto: 'flick', fase: 3.3 },
+      cola: { padre: 'raiz', pivote: [-0.355, 0.37, 0], gesto: 'colaCorta', fase: 0.8 },
+    },
     partes: [
-      { geo: ['capsula', [0.2, 0.34, 4, 8]], pos: [0, 0.3, 0], rot: [0, 0, Math.PI / 2], porRaza: true, cuerpo: true, vientre: true },
-      { geo: ['esfera', [0.13, 8, 6]], pos: [0.32, 0.34, 0], porRaza: true, cuerpo: true },
-      { geo: ['cilindro', [0.055, 0.065, 0.09, 8]], pos: [0.45, 0.31, 0], rot: [0, 0, Math.PI / 2], color: '#d99a8a', cuerpo: true, fina: true },
-      { geo: ['cono', [0.045, 0.11, 4]], pos: [0.3, 0.46, 0.08], rot: [0.75, 0, 0.4], rotRecta: [0.14, 0, 0.06], porRaza: true, cuerpo: true, fina: true },
-      { geo: ['cono', [0.045, 0.11, 4]], pos: [0.3, 0.46, -0.08], rot: [-0.75, 0, 0.4], rotRecta: [-0.14, 0, 0.06], porRaza: true, cuerpo: true, fina: true },
-      { geo: ['cono', [0.018, 0.12, 4]], pos: [-0.3, 0.38, 0], rot: [0, 0, 1.2], color: '#d99a8a', cuerpo: true, fina: true },
-      { geo: ['cilindro', [0.035, 0.032, 0.2, 4]], pos: [0.16, 0.1, 0.1], color: '#7a5c4a' },
-      { geo: ['cilindro', [0.035, 0.032, 0.2, 4]], pos: [0.16, 0.1, -0.1], color: '#7a5c4a' },
-      { geo: ['cilindro', [0.035, 0.032, 0.2, 4]], pos: [-0.16, 0.1, 0.1], color: '#7a5c4a' },
-      { geo: ['cilindro', [0.035, 0.032, 0.2, 4]], pos: [-0.16, 0.1, -0.1], color: '#7a5c4a' },
+      { geo: ['capsula', [0.21, 0.32, 6, 12]], pos: [0, 0.31, 0], rot: [0, 0, Math.PI / 2], porRaza: true, cuerpo: true, vientre: true, respira: true },
+      { geo: ['esfera', [0.175, 14, 10]], pos: [-0.18, 0.325, 0], escala: [1, 1, 1.06], porRaza: true, cuerpo: true },
+      { geo: ['esfera', [0.16, 14, 10]], pos: [0.16, 0.33, 0], porRaza: true, cuerpo: true },
+      { geo: ['esfera', [0.13, 10, 8]], pos: [-0.06, 0.32, 0.165], escala: [1.2, 0.85, 0.5], porRaza: true, tinte: 0.62, cuerpo: true, fina: true },
+      { geo: ['esfera', [0.14, 12, 9]], pos: [0.35, 0.36, 0], escala: [1.05, 0.95, 0.88], porRaza: true, hueso: 'cabeza', cuerpo: true },
+      { geo: ['cilindro', [0.05, 0.062, 0.09, 10]], pos: [0.48, 0.335, 0], rot: [0, 0, Math.PI / 2], color: TONO.rosado, hueso: 'cabeza', cuerpo: true },
+      { geo: ['esfera', [0.018, 6, 5]], pos: [0.415, 0.425, 0.082], color: '#241a10', hueso: 'cabeza', cuerpo: true, fina: true },
+      { geo: ['esfera', [0.018, 6, 5]], pos: [0.415, 0.425, -0.082], color: '#241a10', hueso: 'cabeza', cuerpo: true, fina: true },
+      { geo: ['cono', [0.05, 0.13, 5]], pos: [0.36, 0.475, 0.095], rot: [0.55, 0, 0.95], rotRecta: [0.14, 0, 0.06], porRaza: true, hueso: 'orejaI', cuerpo: true, fina: true },
+      { geo: ['cono', [0.05, 0.13, 5]], pos: [0.36, 0.475, -0.095], rot: [-0.55, 0, 0.95], rotRecta: [-0.14, 0, 0.06], porRaza: true, hueso: 'orejaD', cuerpo: true, fina: true },
+      { geo: ['toro', [0.032, 0.011, 6, 12]], pos: [-0.36, 0.37, 0], rot: [0, 0.4, 0], color: TONO.rosado, hueso: 'cola', cuerpo: true, fina: true },
+      { geo: ['cilindro', [0.04, 0.035, 0.22, 6]], pos: [0.18, 0.11, 0.105], porRaza: true, pata: 0 },
+      { geo: ['cilindro', [0.04, 0.035, 0.22, 6]], pos: [0.18, 0.11, -0.105], porRaza: true, pata: 1 },
+      { geo: ['cilindro', [0.04, 0.035, 0.22, 6]], pos: [-0.18, 0.11, 0.105], porRaza: true, pata: 2 },
+      { geo: ['cilindro', [0.04, 0.035, 0.22, 6]], pos: [-0.18, 0.11, -0.105], porRaza: true, pata: 3 },
     ],
   },
   /* Fallback esquemático (retrocompat): una especie desconocida se dibuja como
-     el Animalito de siempre — cuerpo + cabeza, nunca una caja huérfana. */
+     el Animalito de siempre — cuerpo + cabeza + ojos, nunca una caja huérfana. */
   animal: {
-    gesto: 'balancea',
     alto: 0.6,
+    sombra: 0.32,
+    huesos: {
+      raiz: { pivote: [0, 0.3, 0], gesto: 'peso' },
+      cabeza: { padre: 'raiz', pivote: [0.18, 0.4, 0], gesto: 'mira' },
+    },
     partes: [
-      { geo: ['capsula', [0.18, 0.34, 4, 8]], pos: [0, 0.28, 0], porRaza: true, cuerpo: true, vientre: true },
-      { geo: ['esfera', [0.14, 8, 8]], pos: [0.24, 0.42, 0], porRaza: true, cuerpo: true },
+      { geo: ['capsula', [0.18, 0.34, 6, 10]], pos: [0, 0.28, 0], porRaza: true, cuerpo: true, vientre: true, respira: true },
+      { geo: ['esfera', [0.14, 12, 9]], pos: [0.24, 0.42, 0], porRaza: true, hueso: 'cabeza', cuerpo: true },
+      { geo: ['esfera', [0.018, 6, 5]], pos: [0.31, 0.47, 0.07], color: '#241a10', hueso: 'cabeza', cuerpo: true, fina: true },
+      { geo: ['esfera', [0.018, 6, 5]], pos: [0.31, 0.47, -0.07], color: '#241a10', hueso: 'cabeza', cuerpo: true, fina: true },
     ],
   },
 };
@@ -166,6 +327,7 @@ export function GeometriaParte({ geo }) {
   if (tipo === 'capsula') return <capsuleGeometry args={args} />;
   if (tipo === 'cono') return <coneGeometry args={args} />;
   if (tipo === 'cilindro') return <cylinderGeometry args={args} />;
+  if (tipo === 'toro') return <torusGeometry args={args} />;
   return <icosahedronGeometry args={args} />;
 }
 
@@ -238,6 +400,7 @@ export function normalizarAnimales(lista) {
       momento,
       escala,
       pos,
+      rumbo,
       fase: i * 1.7,
       vientre: estado.startsWith('pre') ? 1.18 : 1,
       color,
@@ -251,35 +414,142 @@ export function normalizarAnimales(lista) {
   });
 }
 
-/* El gesto de idle de la especie como matriz sobre el pivote del piso (las
-   mismas amplitudes chicas del recinto original: vida, no espectáculo). */
-function matrizGesto(m, gesto, t, fase) {
-  if (gesto === 'picotea') {
-    const p = Math.max(0, Math.sin(t * 1.6 + fase));
-    m.makeRotationZ(-(p ** 6) * 0.5);
-  } else if (gesto === 'respira') {
-    m.makeScale(1, 1 + Math.sin(t * 0.9 + fase) * 0.02, 1);
-  } else if (gesto === 'balancea') {
-    m.makeRotationZ(Math.sin(t * 0.8 + fase) * 0.05);
+/* ── La POSE del corral (NO exportada: solo el hato del corral; el mercado
+   posa sus vendidos aparte en AnimalMomento) ────────────────────────────────
+   El rumbo pseudo-aleatorio de normalizarAnimales es honesto pero CIEGO a la
+   cámara: a un animal le puede tocar quedar exactamente de espaldas al encuadre
+   de entrada y su silueta muere (QA visual 2026-07-30: Camilo, el cebú vendido,
+   leía "medio piedra" de espaldas — un lomo translúcido sin cabeza ni patas
+   visibles). Aquí cada animal se orienta TANGENTE al anillo del ciclo — el hato
+   CAMINA el anillo del abono, que es la tesis del mundo — con un jitter
+   determinista por animal (vida, no formación). En tangente, desde cualquier
+   borde del corral el animal queda de perfil o tres cuartos: la silueta
+   (cabeza, lomo, patas) siempre lee. Muta los objetos frescos que devuelve
+   normalizarAnimales; la función compartida no cambia. */
+const _posV = new THREE.Vector3();
+const _posQ = new THREE.Quaternion();
+const _posE = new THREE.Vector3();
+function posarHatoCorral(animales) {
+  for (const a of animales) {
+    const angulo = Math.atan2(a.pos[2], a.pos[0]);
+    const jitter = Math.sin(a.fase * 7.3) * 0.35;
+    const rumbo = -(angulo + Math.PI / 2) + jitter;
+    a.rumbo = rumbo; // la garcita (y quien monte algo sobre el lomo) lo hereda
+    a.mat.compose(
+      _posV.set(a.pos[0], a.pos[1], a.pos[2]),
+      _posQ.setFromAxisAngle(EJE_Y, rumbo),
+      _posE.set(a.escala, a.escala, a.escala),
+    );
+  }
+  return animales;
+}
+
+/* suavizado con clamp (el smoothstep de toda la vida, en JS) */
+const suave01 = (x) => {
+  const t = x < 0 ? 0 : x > 1 ? 1 : x;
+  return t * t * (3 - 2 * t);
+};
+
+/*
+ * EL GESTO DE UN HUESO como rotación local (se aplica EN EL PIVOTE del hueso).
+ * Peso real = amplitudes chicas, ritmos lentos con HOLDS (pastar sostiene la
+ * cabeza abajo, la cola da latigazos esporádicos, la oreja da un flick raro):
+ * vida de potrero, no metrónomo.
+ */
+const _eGesto = new THREE.Euler();
+function matrizGestoHueso(m, gesto, t, fase) {
+  if (gesto === 'peso') {
+    // el cuerpo VIVO: traslada el peso apenas, dos ritmos que no engranan
+    _eGesto.set(Math.sin(t * 0.31 + fase) * 0.013, 0, Math.sin(t * 0.52 + fase * 1.3) * 0.02);
+    m.makeRotationFromEuler(_eGesto);
+  } else if (gesto === 'pasta') {
+    // pastar con HOLD: baja, arranca pasto (mordiscos), sube — ciclo largo
+    const baja = suave01((Math.sin(t * 0.14 + fase) - 0.15) / 0.5);
+    const mordisco = Math.max(0, Math.sin(t * 2.3 + fase)) ** 2 * 0.06 * baja;
+    m.makeRotationZ(-(baja * 1.05 + mordisco));
+  } else if (gesto === 'picotea') {
+    // el picoteo vive en el CUELLO: el cuerpo queda quieto (peso real)
+    const p = Math.max(0, Math.sin(t * 1.7 + fase));
+    m.makeRotationZ(-(p ** 6) * 1.25);
   } else if (gesto === 'hocica') {
-    const p = Math.max(0, Math.sin(t * 1.1 + fase));
-    m.makeRotationZ(-(p ** 4) * 0.22);
+    // hocicar: baja el morro y lo sacude de lado (busca raíces)
+    const p = Math.max(0, Math.sin(t * 1.05 + fase));
+    _eGesto.set(0, Math.sin(t * 4.3 + fase) * 0.12 * p, -(p ** 4) * 0.55);
+    m.makeRotationFromEuler(_eGesto);
+  } else if (gesto === 'mira') {
+    // la cabeza mira alrededor: giros con PAUSA (atención, no péndulo)
+    const g = Math.sin(t * 0.23 + fase * 2.7);
+    m.makeRotationY(Math.sign(g) * suave01(Math.abs(g) * 1.6 - 0.6) * 0.38);
+  } else if (gesto === 'cola') {
+    // vaivén perezoso + latigazo espanta-moscas esporádico
+    const flick = Math.max(0, Math.sin(t * 0.19 + fase * 3)) ** 24 * Math.sin(t * 11) * 0.9;
+    m.makeRotationX(Math.sin(t * 1.15 + fase) * 0.3 + flick);
+  } else if (gesto === 'colaCorta') {
+    // meneo en ráfagas (la colita de la oveja/cerdo cuando está contenta)
+    const rafaga = Math.max(0, Math.sin(t * 0.3 + fase * 2)) ** 8;
+    m.makeRotationX(Math.sin(t * 6 + fase) * rafaga * 0.5);
+  } else if (gesto === 'colaPluma') {
+    m.makeRotationZ(Math.sin(t * 1.3 + fase) * 0.1);
+  } else if (gesto === 'flick') {
+    // la oreja: quieta casi siempre, un flick nervioso de vez en cuando
+    const p = Math.max(0, Math.sin(t * 0.27 + fase * 5)) ** 30;
+    m.makeRotationX(p * Math.sin(t * 17) * 0.5);
   } else {
     m.identity();
   }
 }
 
-const _mTmp = new THREE.Matrix4();
-const _mGesto = new THREE.Matrix4();
-const _mVientre = new THREE.Matrix4();
+/*
+ * FK del esqueleto: la matriz MUNDO de un hueso = padre × T(pivote) × R(gesto)
+ * × T(-pivote). Cacheada por (animal, hueso) y recalculada solo si cambió `t`:
+ * cada hueso se compone UNA vez por frame aunque lo compartan muchas partes.
+ */
+const _huesoCache = new Map();
+const _mPiv = new THREE.Matrix4();
+const _mRot = new THREE.Matrix4();
+function matrizHueso(animal, esp, nombre, t) {
+  const clave = `${animal.id}|${nombre}`;
+  let e = _huesoCache.get(clave);
+  if (!e) {
+    if (_huesoCache.size > 600) _huesoCache.clear(); // hatos que rotan: sin fuga
+    _huesoCache.set(clave, (e = { t: NaN, m: new THREE.Matrix4() }));
+  }
+  if (e.t === t) return e.m;
+  e.t = t;
+  const h = esp.huesos?.[nombre];
+  if (!h) return e.m.copy(animal.mat);
+  const base = h.padre ? matrizHueso(animal, esp, h.padre, t) : animal.mat;
+  matrizGestoHueso(_mRot, h.gesto, t, animal.fase + (h.fase || 0));
+  const [px, py, pz] = h.pivote || [0, 0, 0];
+  e.m
+    .copy(base)
+    .multiply(_mPiv.makeTranslation(px, py, pz))
+    .multiply(_mRot)
+    .multiply(_mPiv.makeTranslation(-px, -py, -pz));
+  return e.m;
+}
 
-/* matriz final de una instancia: animal × (gesto) × (vientre) × parte.
+const _mTmp = new THREE.Matrix4();
+const _mVientre = new THREE.Matrix4();
+const _mResp = new THREE.Matrix4();
+const _cTinte = new THREE.Color();
+
+/* LA POSE VIVA: cada animal congela su esqueleto en un instante DISTINTO
+   (determinista por fase). En una foto fija —o con reduced-motion— el hato no
+   es un ejército de clones en T-pose: una vaca pasta, otra mira de lado, un
+   cerdo hocica. El reloj animado ARRANCA desde ese mismo instante (tPose + t):
+   continuidad sin salto y desincronía gratis entre animales. */
+const tPose = (a) => a.fase * 5.21;
+
+/* matriz final de una instancia: hueso(FK) × (vientre) × parte × (aliento).
    El vientre de la preñada ensancha SOLO las partes `vientre` (el cuerpo),
-   en el espacio del animal (z = los flancos; todas las especies miran a +x). */
+   en el espacio del animal (z = los flancos; todas las especies miran a +x).
+   El ALIENTO late en el espacio local de la parte (la panza se hincha radial,
+   las patas y la cabeza no laten): respiración de barriga, no globo. */
 function componer(destino, animal, parte, conGesto, t) {
-  if (conGesto) {
-    matrizGesto(_mGesto, ESPECIES[animal.especie].gesto, t, animal.fase);
-    destino.multiplyMatrices(animal.mat, _mGesto);
+  const esp = ESPECIES[animal.especie];
+  if (conGesto && esp.huesos) {
+    destino.copy(matrizHueso(animal, esp, parte.hueso || 'raiz', t));
   } else {
     destino.copy(animal.mat);
   }
@@ -287,62 +557,254 @@ function componer(destino, animal, parte, conGesto, t) {
     destino.multiply(_mVientre.makeScale(1, 1.05, animal.vientre));
   }
   destino.multiply(matrizParte(parte, animal.orejaRecta));
+  if (conGesto && parte.respira) {
+    const r = Math.sin(t * 0.9 + animal.fase) * 0.022;
+    destino.multiply(_mResp.makeScale(1 + r, 1 + r * 0.25, 1 + r));
+  }
 }
 
 /*
  * UNA parte de UNA especie como InstancedMesh de N instancias. El pelaje por
- * raza va como color de instancia (material blanco × instanceColor). Los
- * vendidos llegan en su propio grupo `fantasma` (material translúcido).
+ * raza va como color de instancia (material blanco × instanceColor; `tinte`
+ * lo oscurece para manchas) con el parche de pelaje (smooth + countershading +
+ * rim dorado). Los vendidos llegan en su propio grupo `fantasma` (translúcido,
+ * y el rim les da un brillo espectral que les queda bien de memoria).
  */
 function ParteInstanciada({ parte, lista, fantasma, animar, onPick }) {
   const ref = useRef(null);
+  // `soloRaza`: la giba del cebú solo la llevan los cebú — la parte filtra su
+  // propia lista y su InstancedMesh tiene exactamente esas instancias.
+  const listaP = useMemo(
+    () =>
+      parte.soloRaza
+        ? lista.filter((a) => parte.soloRaza.includes((a.raza || '').toLowerCase().trim()))
+        : lista,
+    [lista, parte],
+  );
 
   useLayoutEffect(() => {
     const m = ref.current;
     if (!m) return;
-    lista.forEach((a, i) => {
-      componer(_mTmp, a, parte, false, 0);
+    listaP.forEach((a, i) => {
+      // pose viva congelada (no T-pose): cada animal en su instante propio
+      componer(_mTmp, a, parte, true, tPose(a));
       m.setMatrixAt(i, _mTmp);
-      if (parte.porRaza) m.setColorAt(i, a.color);
+      if (parte.porRaza) {
+        m.setColorAt(i, parte.tinte ? _cTinte.copy(a.color).multiplyScalar(parte.tinte) : a.color);
+      }
     });
     m.instanceMatrix.needsUpdate = true;
     if (m.instanceColor) m.instanceColor.needsUpdate = true;
     // culling correcto: la esfera envolvente se calcula DESDE las instancias
     m.computeBoundingSphere();
-  }, [lista, parte]);
+  }, [listaP, parte]);
 
-  // Idle pecuario instanciado: solo partes `cuerpo` (patas plantadas), solo si
-  // el gate reduced-motion + device-tier lo permite. N chico → costo trivial.
+  // Idle esquelético instanciado: solo partes `cuerpo` (patas plantadas), solo
+  // si el gate reduced-motion + device-tier lo permite. N chico → costo trivial.
   useFrame((state) => {
     const m = ref.current;
     if (!animar || !parte.cuerpo || !m) return;
     const t = state.clock.elapsedTime;
-    lista.forEach((a, i) => {
-      componer(_mTmp, a, parte, true, t);
+    listaP.forEach((a, i) => {
+      // el reloj de cada animal arranca en su pose congelada: cero salto
+      componer(_mTmp, a, parte, true, tPose(a) + t);
       m.setMatrixAt(i, _mTmp);
     });
     m.instanceMatrix.needsUpdate = true;
   });
 
+  if (!listaP.length) return null;
   return (
     <instancedMesh
       ref={ref}
-      args={[undefined, undefined, lista.length]}
+      args={[undefined, undefined, listaP.length]}
       onClick={(e) => {
         e.stopPropagation();
-        const a = lista[e.instanceId];
+        const a = listaP[e.instanceId];
         if (a) onPick(a);
       }}
     >
       <GeometriaParte geo={parte.geo} />
       <meshLambertMaterial
         color={parte.porRaza ? '#ffffff' : parte.color}
-        flatShading
+        onBeforeCompile={parchePelaje}
         transparent={fantasma}
-        opacity={fantasma ? 0.35 : 1}
+        /* 0.35 sobre el piso de madera clara dejaba al fantasma casi invisible
+           (pelaje cebú #d9d2c4 ≈ el piso); 0.45 conserva la poética de la
+           huella pero la silueta vuelve a leer (QA visual 2026-07-30). */
+        opacity={fantasma ? 0.45 : 1}
         depthWrite={!fantasma}
       />
     </instancedMesh>
+  );
+}
+
+/* ── EL PESO EN EL PISO: sombras de contacto del hato, UNA InstancedMesh ──── */
+
+let _texSombraHato = null;
+function texturaSombraHato() {
+  if (!_texSombraHato) {
+    const c = document.createElement('canvas');
+    c.width = 128;
+    c.height = 128;
+    const g = c.getContext('2d');
+    const grad = g.createRadialGradient(64, 64, 8, 64, 64, 62);
+    grad.addColorStop(0, 'rgba(255,255,255,0.95)');
+    grad.addColorStop(0.55, 'rgba(255,255,255,0.4)');
+    grad.addColorStop(1, 'rgba(255,255,255,0)');
+    g.fillStyle = grad;
+    g.fillRect(0, 0, 128, 128);
+    _texSombraHato = new THREE.CanvasTexture(c);
+  }
+  return _texSombraHato;
+}
+
+/* plano acostado (-90° en X), compuesto una vez */
+const _qSombra = new THREE.Quaternion().setFromEuler(new THREE.Euler(-Math.PI / 2, 0, 0));
+const _vSombraP = new THREE.Vector3();
+const _vSombraS = new THREE.Vector3();
+
+/* La sombra que POSA cada animal en el piso (el truco claymation de
+   SombraContacto, instanciado: un solo draw call para todo el hato), alargada
+   hacia -x como toda sombra de hora dorada. El fantasma del vendido NO la
+   proyecta (es memoria, no cuerpo) y los momentos traen la suya propia. */
+function SombrasHato({ animales }) {
+  const ref = useRef(null);
+  const lista = useMemo(
+    () => animales.filter((a) => !a.momento && a.estado !== 'vendido'),
+    [animales],
+  );
+  useLayoutEffect(() => {
+    const m = ref.current;
+    if (!m) return;
+    lista.forEach((a, i) => {
+      const r = (ESPECIES[a.especie].sombra || 0.3) * a.escala;
+      _mTmp.compose(
+        _vSombraP.set(a.pos[0] - r * 0.3, 0.006, a.pos[2]),
+        _qSombra,
+        _vSombraS.set(r * 2.6, r * 1.7, 1),
+      );
+      m.setMatrixAt(i, _mTmp);
+    });
+    m.instanceMatrix.needsUpdate = true;
+    m.computeBoundingSphere();
+  }, [lista]);
+  if (!lista.length) return null;
+  return (
+    <instancedMesh ref={ref} args={[undefined, undefined, lista.length]} renderOrder={1}>
+      <planeGeometry args={[1, 1]} />
+      <meshBasicMaterial
+        map={texturaSombraHato()}
+        color="#2e2012"
+        transparent
+        opacity={0.42}
+        depthWrite={false}
+      />
+    </instancedMesh>
+  );
+}
+
+/* ── MUNDO VIVO: motas de polvo dorado flotando en la luz (tier alto) ─────── */
+function MotasDoradas({ animar }) {
+  const ref = useRef(null);
+  const N = 14;
+  const posar = (m, t) => {
+    for (let i = 0; i < N; i++) {
+      const r = 0.6 + ((i * 0.37) % 1) * 1.1;
+      const a = i * ORO * 2.1 + t * 0.05;
+      const y = 0.25 + ((t * 0.045 + i * 0.171) % 1) * 1.05;
+      const s = 0.7 + 0.5 * Math.sin(t * 0.9 + i * 2.3);
+      _mTmp.compose(
+        _vSombraP.set(Math.cos(a) * r, y, Math.sin(a) * r),
+        _qSombra,
+        _vSombraS.set(s, s, s),
+      );
+      m.setMatrixAt(i, _mTmp);
+    }
+    m.instanceMatrix.needsUpdate = true;
+  };
+  useLayoutEffect(() => {
+    if (!ref.current) return;
+    posar(ref.current, 0.5);
+    ref.current.computeBoundingSphere();
+  });
+  useFrame((state) => {
+    if (!animar || !ref.current) return;
+    posar(ref.current, state.clock.elapsedTime);
+  });
+  return (
+    <instancedMesh ref={ref} args={[undefined, undefined, N]}>
+      <octahedronGeometry args={[0.016, 0]} />
+      <meshBasicMaterial color="#ffdf9e" transparent opacity={0.45} depthWrite={false} />
+    </instancedMesh>
+  );
+}
+
+/* La GARCITA BUEYERA parada en el lomo de la vaca más grande: la compañía de
+   potrero de toda la vida (ella le espulga las moscas). Mira alrededor con
+   pausas. Pocas primitivas, solo tier alto — mundo abierto vivo, no adorno. */
+function GarcitaBueyera({ animales, animar }) {
+  const cabeza = useRef(null);
+  const vaca = useMemo(
+    () =>
+      animales
+        .filter((a) => a.especie === 'vaca' && !a.momento && a.estado !== 'vendido')
+        .sort((a, b) => b.escala - a.escala)[0] || null,
+    [animales],
+  );
+  const sitio = useMemo(() => {
+    if (!vaca) return null;
+    return new THREE.Vector3(-0.22, 0.73, 0.02).applyMatrix4(vaca.mat);
+  }, [vaca]);
+  useFrame((state) => {
+    if (!animar || !cabeza.current) return;
+    const t = state.clock.elapsedTime;
+    const g = Math.sin(t * 0.31 + 1.2);
+    cabeza.current.rotation.y = Math.sign(g) * suave01(Math.abs(g) * 1.7 - 0.7) * 0.8;
+    cabeza.current.position.y = 0.055 + Math.max(0, Math.sin(t * 0.9)) * 0.008;
+  });
+  if (!vaca || !sitio) return null;
+  const esc = 0.85 * vaca.escala;
+  return (
+    <group position={sitio} rotation={[0, vaca.rumbo + 0.5, 0]} scale={esc}>
+      {/* patas de palillo */}
+      <mesh position={[0, -0.045, 0.012]}>
+        <cylinderGeometry args={[0.005, 0.005, 0.09, 4]} />
+        <meshLambertMaterial color={TONO.pico} />
+      </mesh>
+      <mesh position={[0.012, -0.045, -0.012]}>
+        <cylinderGeometry args={[0.005, 0.005, 0.09, 4]} />
+        <meshLambertMaterial color={TONO.pico} />
+      </mesh>
+      {/* cuerpo blanco con colita */}
+      <mesh position={[0, 0.01, 0]} scale={[1.5, 1, 0.85]}>
+        <sphereGeometry args={[0.055, 10, 8]} />
+        <meshLambertMaterial color="#f2ede2" onBeforeCompile={parchePelaje} />
+      </mesh>
+      <mesh position={[-0.085, 0.03, 0]} rotation={[0, 0, 0.9]}>
+        <coneGeometry args={[0.028, 0.07, 5]} />
+        <meshLambertMaterial color="#e8e2d2" onBeforeCompile={parchePelaje} />
+      </mesh>
+      {/* cabeza con cuello en S y pico ámbar */}
+      <group ref={cabeza} position={[0.05, 0.055, 0]}>
+        <mesh position={[0.01, 0.01, 0]} rotation={[0, 0, -0.5]}>
+          <cylinderGeometry args={[0.012, 0.016, 0.06, 5]} />
+          <meshLambertMaterial color="#f2ede2" onBeforeCompile={parchePelaje} />
+        </mesh>
+        <mesh position={[0.035, 0.045, 0]}>
+          <sphereGeometry args={[0.026, 8, 6]} />
+          <meshLambertMaterial color="#f2ede2" onBeforeCompile={parchePelaje} />
+        </mesh>
+        <mesh position={[0.07, 0.042, 0]} rotation={[0, 0, -Math.PI / 2]}>
+          <coneGeometry args={[0.009, 0.045, 4]} />
+          <meshLambertMaterial color={TONO.pico} />
+        </mesh>
+        <mesh position={[0.045, 0.055, 0.019]}>
+          <sphereGeometry args={[0.006, 5, 4]} />
+          <meshBasicMaterial color="#241a10" />
+        </mesh>
+      </group>
+    </group>
   );
 }
 
@@ -600,10 +1062,12 @@ function PlacaAnimal({ animal, onCerrar }) {
 
 /*
  * El HATO completo: instancias por especie (vivos y vendidos-fantasma en
- * grupos aparte), señales de preñez, carteles con nombre y la placa del toque.
+ * grupos aparte), sombras de contacto que lo POSAN en el piso, señales de
+ * preñez, carteles con nombre, la placa del toque y la vida de potrero
+ * (garcita en el lomo, polvo dorado en la luz — solo tier alto).
  */
 export default function CorralVivo({ animales: lista, reducedMotion, tier = 'alto' }) {
-  const animales = useMemo(() => normalizarAnimales(lista || []), [lista]);
+  const animales = useMemo(() => posarHatoCorral(normalizarAnimales(lista || [])), [lista]);
   const [seleccion, setSeleccion] = useState(null);
   // GATE doble: reduced-motion apaga el idle; gama baja tampoco lo paga.
   const animar = !reducedMotion && tier !== 'bajo';
@@ -631,6 +1095,7 @@ export default function CorralVivo({ animales: lista, reducedMotion, tier = 'alt
 
   return (
     <group>
+      <SombrasHato animales={animales} />
       {grupos.map((g) => (
         <Fragment key={g.clave}>
           {ESPECIES[g.especie].partes
@@ -661,6 +1126,8 @@ export default function CorralVivo({ animales: lista, reducedMotion, tier = 'alt
           onPick={alPicar}
         />
       ))}
+      {tier === 'alto' && <GarcitaBueyera animales={animales} animar={animar} />}
+      {tier === 'alto' && <MotasDoradas animar={animar} />}
       <MarcadoresPrenada animales={animales} animar={animar} />
       <CartelesNombres
         animales={animales}

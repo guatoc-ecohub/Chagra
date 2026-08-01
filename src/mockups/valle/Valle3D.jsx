@@ -52,6 +52,15 @@ import useInventarioCompai from '../../hooks/useInventarioCompai';
 import { datosDeMundo } from '../../compai/nucleo/datosFinca.js';
 import { estaOcupado } from '../../services/compaiOcupado.js';
 import BurbujaAngelita from '../../visual/agente/BurbujaAngelita';
+/* #88 — QUE EL COMPAI HABLE SUS TIPS: hasta hoy el husmeo solo pintaba la
+   burbuja (mensajeAngelita), nunca lo decía en voz — speak/speakKokoro ya
+   existían y nadie los llamaba desde aquí. Mismo patrón que useAcompanante
+   (AcompananteMundo.jsx) y el shell (EntradaValle3D.jsx): Kokoro primero,
+   Web Speech si no responde. Gateado por el silencio real del operador
+   (usePrefsStore.ttsEnabled, la misma bandera que apaga la voz en
+   AgentScreen) y por reducedMotion (silencio también es respeto). */
+import { speak, speakKokoro } from '../../services/ttsService.js';
+import usePrefsStore from '../../store/usePrefsStore.js';
 /* La CAPA DE ESTADO de Angelita (auditoría §5b): módulo puro, sin three — el
    mismo repertorio (mojada/sed/comiendo/vuelo) que usan los mundos 3D. */
 import { reaccionDeFinca, ESTADO_FINCA_MUESTRA } from '../../visual/mundo3d/escenas/reaccionFinca.js';
@@ -1941,6 +1950,27 @@ function CompaneroAbeja({ foco, focoId = null, entrando, animo, energia, reduced
   const mensajeAngelita = useAngelitaStore((s) => s.mensaje);
   const tipoAngelita = useAngelitaStore((s) => s.tipo);
   const entrarMundoAngelita = useAngelitaStore((s) => s.entrarMundo);
+
+  /* #88 — EL COMPAI HABLA SUS TIPS: cada vez que llega un mensaje NUEVO
+     (navegación real o husmeo autónomo), además de pintar la burbuja lo DICE.
+     Kokoro primero; si no responde (equipo sin soporte, timeout), cae a la
+     voz del navegador — nunca queda muda una finca que ya escribe. Silencio
+     real (usePrefsStore.ttsEnabled) y reducedMotion apagan la voz sin tocar
+     la burbuja: el texto sigue siendo la voz de quien no puede/no quiere oír. */
+  const ttsEnabled = usePrefsStore((s) => s.ttsEnabled);
+  const dichoRef = useRef(null);
+  useEffect(() => {
+    if (!mensajeAngelita || reducedMotion || !ttsEnabled) return;
+    if (dichoRef.current === mensajeAngelita) return; // ya se dijo este mismo texto
+    dichoRef.current = mensajeAngelita;
+    speakKokoro(mensajeAngelita, { lang: 'es', rate: 0.98 })
+      .then((audio) => {
+        if (!audio) speak(mensajeAngelita, { rate: 0.98, pitch: 1 });
+      })
+      .catch(() => {
+        speak(mensajeAngelita, { rate: 0.98, pitch: 1 });
+      });
+  }, [mensajeAngelita, reducedMotion, ttsEnabled]);
   const reposarAngelita = useAngelitaStore((s) => s.reposar);
 
   /* ── LOS DATOS REALES DE LA FINCA (auditoría 2026-07-26, ítem #38) ────────

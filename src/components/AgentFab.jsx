@@ -2,7 +2,7 @@ import React, { useState, useCallback, useEffect, useRef } from 'react';
 import ChagraAgentAvatar from './ChagraAgentAvatar';
 import useAgentNotificationStore from '../store/useAgentNotificationStore';
 import usePrefsStore from '../store/usePrefsStore';
-import { isSpeaking, stop, replayLast, isKokoroAvailable } from '../services/ttsService';
+import { isSpeaking, stop, replayLast, isKokoroAvailable, speakSentences } from '../services/ttsService';
 import { agentSounds } from '../services/agentSoundService';
 import { fvhSkinClass } from '../config/fvhSkin';
 /* EL CEREBRO DE ANGELITA (auditoría 2026-07-18: construido y DESCONECTADO).
@@ -14,6 +14,11 @@ import useAlertStore from '../store/useAlertStore';
 import useLogStore from '../store/useLogStore';
 import { notificacionesInteligentes } from '../services/angelitaInteligencia';
 import { estaOcupado } from '../services/compaiOcupado.js';
+import { activarEscucha } from '../services/escuchaService';
+import { useCompaiClimaVivo } from '../hooks/useCompaiClimaVivo';
+import { useCompaiSusurroNocturno } from '../hooks/useCompaiSusurroNocturno';
+import { useCompaiAgroecologiaReal } from '../hooks/useCompaiAgroecologiaReal';
+import AgentFabMenu from './AgentFabMenu';
 import './agent-fab-skin.css';
 
 /**
@@ -41,23 +46,42 @@ import './agent-fab-skin.css';
  *
  * Double-click (Task #122, sin cambios): TTS hablando → stop + mute; TTS OFF
  * con último mensaje → replay + unmute.
+ *
+ * ── EL GESTO DE INTERACCIÓN (#66/#70, 2026-07-30) ──────────────────────────
+ * Toque corto y pulsación larga sobre el PERSONAJE se reparten así:
+ *   - TOQUE CORTO  → abre un menú flotante junto al personaje: "Hablar",
+ *     "Enviar foto" y "Que se quede callado hoy" (AgentFabMenu). Antes el
+ *     toque corto navegaba derecho al agente — ahora esa es la opción
+ *     "Hablar" dentro del menú (mismo destino, un paso más explícito).
+ *   - MANTENER PRESIONADO (600 ms) → habla DIRECTO, sin menú: activa el
+ *     micrófono (`activarEscucha`, el mismo trigger desacoplado que usa
+ *     EscuchaFab) al soltar la vibración háptica. Walkie-talkie: se aprieta
+ *     para hablar.
+ *
+ * RESOLUCIÓN DEL CONFLICTO gesto-largo (documentado porque el pedido original
+ * pisaba el silencio #101/#103 que YA vivía en el largo): el silencio
+ * persistente se MUDÓ al menú del toque corto («Que se quede callado hoy»,
+ * el "hoy no" de #107) y se conserva el botón 🔔/🔕 pegado al personaje para
+ * el silencio MANUAL indefinido (#101) — el largo queda libre para "hablar",
+ * que es el gesto más esperable (mantener apretado = walkie-talkie) y el que
+ * pedía el punto 1 explícitamente. Nadie perdió su camino: silenciar
+ * indefinido sigue en el botón 🔔, "hoy no" vive en el menú, hablar es
+ * ahora el largo Y la opción del menú.
  */
 export default function AgentFab({ onNavigate, pantalla = null }) {
   const [hover, setHover] = useState(false);
   const [pressed, setPressed] = useState(false);
+  const [menuAbierto, setMenuAbierto] = useState(false);
 
-  /* ── EL INTERRUPTOR (auditoría 2026-07-26, ítems #101 y #103) ─────────────
-     `silenciar()` existía en el store desde el principio y NO TENÍA UN SOLO
-     BOTÓN que lo llamara: la función estaba ahí y nadie podía usarla. Un
-     personaje omnipresente sin interruptor visible es una decisión de
-     producto agresiva — y es, además, el permiso que compra todo lo demás
-     (subir la presencia al 35% sin válvula de escape es cómo nació Clippy).
-     Dos caminos al mismo flag, porque molesta AHORA y tres pantallas hasta un
-     switch equivale a no tenerlo:
-       · un botón visible pegado al personaje (accesible, con foco propio),
-       · mantener presionado sobre el personaje mismo (600 ms). */
+  /* ── EL INTERRUPTOR MANUAL (auditoría 2026-07-26, ítems #101 y #103) ──────
+     `silenciar()` — silencio INDEFINIDO, hasta que el usuario lo vuelva a
+     prender. Vive en el botón 🔔/🔕 pegado al personaje (accesible, con foco
+     propio). Distinto del "hoy no" (#107, en el menú del gesto): ese se
+     vence solo a medianoche, este no. */
   const silenciado = useAngelitaStore((s) => s.silenciado);
   const silenciar = useAngelitaStore((s) => s.silenciar);
+  const marcarHoyNo = useAngelitaStore((s) => s.marcarHoyNo);
+  const registrarSenalMolestia = useAngelitaStore((s) => s.registrarSenalMolestia);
   const timerLargo = useRef(null);
   const fueLargo = useRef(false);
 
@@ -65,16 +89,23 @@ export default function AgentFab({ onNavigate, pantalla = null }) {
     silenciar(!useAngelitaStore.getState().silenciado);
   }, [silenciar]);
 
+  /** Mantener presionado el personaje: habla DIRECTO, sin menú (#66/#70).
+   *  Hablarle es la señal de ATENCIÓN más fuerte que hay (#102/#106): baja
+   *  el contador de molestia y acelera la cadencia. */
+  const hablarDirecto = useCallback(() => {
+    activarEscucha({ fuente: 'compai_largo' });
+    registrarSenalMolestia('hablarle');
+    try { navigator.vibrate?.(22); } catch { /* sin motor */ }
+  }, [registrarSenalMolestia]);
+
   const iniciarPulsacionLarga = useCallback(() => {
     fueLargo.current = false;
     if (timerLargo.current) clearTimeout(timerLargo.current);
     timerLargo.current = setTimeout(() => {
       fueLargo.current = true;
-      alternarSilencio();
-      // Aviso háptico: en el campo, con guantes, el dedo confirma antes que el ojo.
-      try { navigator.vibrate?.(silenciado ? [12, 40, 12] : 22); } catch { /* sin motor */ }
+      hablarDirecto();
     }, 600);
-  }, [alternarSilencio, silenciado]);
+  }, [hablarDirecto]);
 
   const soltarPulsacionLarga = useCallback(() => {
     if (timerLargo.current) { clearTimeout(timerLargo.current); timerLargo.current = null; }
@@ -119,6 +150,34 @@ export default function AgentFab({ onNavigate, pantalla = null }) {
     return () => { vivo = false; };
   }, [activeAlerts, setLastMessage, setResponseReady]);
 
+  // #111 "Vive el clima real": reacciona al MISMO snapshot de clima que ya
+  // consume el husmeo (climaService, cero red aquí) — pre-lluvia avisa/se
+  // emociona, helada se abriga, sequía pide agua. Pasa por la misma
+  // anti-molestia que cualquier otro aviso (ver useCompaiClimaVivo).
+  useCompaiClimaVivo({
+    onMensaje: (mensaje) => { setLastMessage(mensaje); setResponseReady(true); },
+  });
+
+  // #108 "Susurro nocturno": de noche baja voz + brillo, comenta la fase
+  // lunar real + el clima de mañana, invita a descansar. CANDADO CIENTÍFICO:
+  // susurroDeNoche() jamás menciona sembrar por luna (ver
+  // compai/nucleo/susurroNocturno.js) — sólo dice el hecho astronómico.
+  useCompaiSusurroNocturno({
+    onSusurro: (mensaje, { rate }) => {
+      setLastMessage(mensaje);
+      setResponseReady(true);
+      if (ttsEnabled) speakSentences(mensaje, { rate }).catch(() => { /* degrada a solo texto */ });
+    },
+  });
+
+  // #80/#81 "agroecología según SU finca real": el compañero comenta con lo
+  // que el catálogo Chagra sabe de SU cultivo puntual (rol en el gremio,
+  // temperatura de helada real) — no un inventario genérico. Sin match en
+  // el catálogo, no dice nada nuevo (el husmeo de siempre sigue igual).
+  useCompaiAgroecologiaReal({
+    onMensaje: (mensaje) => { setLastMessage(mensaje); setResponseReady(true); },
+  });
+
   // Estado de Angelita: el tacto manda sobre el aviso, y el aviso sobre el idle.
   const estado = pressed
     ? 'contenta'
@@ -133,16 +192,48 @@ export default function AgentFab({ onNavigate, pantalla = null }) {
   const handleDown = () => { setPressed(true); iniciarPulsacionLarga(); };
   const handleUp = () => { setPressed(false); soltarPulsacionLarga(); };
 
+  // Contexto que el agente recibe al navegar (pantalla de origen, para el
+  // saludo y el pin espacial) — lo comparten "Hablar" y "Enviar foto".
+  const contextoDePantalla = pantalla
+    ? { desdePantalla: pantalla, spatialContext: { pantalla } }
+    : {};
+
   const handleClick = () => {
-    // Si la pulsación larga ya silenció, el dedo NO debe además abrir el
-    // agente: el gesto fue "cállese", no "hábleme".
+    // Si la pulsación larga ya disparó "hablar directo", el dedo NO debe
+    // además abrir el menú: un solo gesto, una sola acción.
     if (fueLargo.current) { fueLargo.current = false; return; }
-    // El shell prod pasa `pantalla` (currentView): viaja como initialContext
-    // para que el saludo y el pin espacial sean sobre la pantalla de origen.
-    onNavigate('agente', pantalla
-      ? { desdePantalla: pantalla, spatialContext: { pantalla } }
-      : undefined);
+    // Tocar el FAB con una respuesta esperándolo es "abrir el tip" (#102/
+    // #106): atención positiva, el contador de molestia baja.
+    if (responseReady) registrarSenalMolestia('abrirTip');
+    setMenuAbierto(true);
   };
+
+  /** Menú → "Hablar": activa el micrófono, igual que el gesto largo. */
+  const handleMenuHablar = useCallback(() => {
+    setMenuAbierto(false);
+    activarEscucha({ fuente: 'compai_menu' });
+    registrarSenalMolestia('hablarle');
+  }, [registrarSenalMolestia]);
+
+  /** Menú → "Enviar foto": abre el agente con la cámara ya disparada. */
+  const handleMenuFoto = useCallback(() => {
+    setMenuAbierto(false);
+    onNavigate('agente', { ...contextoDePantalla, autoOpenCamera: true });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [onNavigate, pantalla]);
+
+  /** Menú → "Que se quede callado hoy": #107, se resetea a medianoche. */
+  const handleMenuHoyNo = useCallback(() => {
+    setMenuAbierto(false);
+    marcarHoyNo();
+  }, [marcarHoyNo]);
+
+  /** El menú se cerró SIN elegir nada: cuenta como señal de molestia — el
+   *  usuario lo abrió y lo cerró sin usarlo (#102/#106). */
+  const handleMenuCerrar = useCallback(() => {
+    setMenuAbierto(false);
+    registrarSenalMolestia('cerrarTipSinLeer');
+  }, [registrarSenalMolestia]);
 
   // Task #122: double-click toggle silencia/reactiva audio global.
   const handleDoubleClick = useCallback(async (e) => {
@@ -187,17 +278,17 @@ export default function AgentFab({ onNavigate, pantalla = null }) {
         className={fvhSkinClass(`chagra-fab${hover ? ' is-hover' : ''}${responseReady ? ' is-ready' : ''}${silenciado ? ' is-silenciada' : ''}`)}
         aria-label={
           silenciado
-            ? 'Chagra IA (en silencio). Tocar para hablarle'
+            ? 'Chagra IA (en silencio). Tocar para abrir el menú'
             : responseReady
               ? 'Chagra IA tiene respuesta nueva'
               : 'Chagra IA, su compañero de Chagra'
         }
         title={
           silenciado
-            ? 'Su compañero está en silencio: no le avisa nada hasta que usted lo vuelva a prender. Tocar para hablarle igual'
+            ? 'Su compañero está en silencio: no le avisa nada hasta que usted lo vuelva a prender. Tocar para abrir el menú igual'
             : responseReady
-              ? 'Chagra IA tiene respuesta nueva. Mantener presionado para que se quede callado'
-              : 'Hablar con Chagra IA. Mantener presionado para que se quede callado'
+              ? 'Chagra IA tiene respuesta nueva. Mantener presionado para hablarle directo'
+              : 'Tocar para el menú (hablar, enviar foto). Mantener presionado para hablarle directo'
         }
         onClick={handleClick}
         onDoubleClick={handleDoubleClick}
@@ -295,6 +386,16 @@ export default function AgentFab({ onNavigate, pantalla = null }) {
       >
         <span aria-hidden="true">{silenciado ? '🔕' : '🔔'}</span>
       </button>
+
+      {/* MENÚ DEL TOQUE CORTO (#66/#70): "Hablar" / "Enviar foto" / "Que se
+          quede callado hoy". Se ancla al mismo puesto que el personaje. */}
+      <AgentFabMenu
+        abierto={menuAbierto}
+        onHablar={handleMenuHablar}
+        onFoto={handleMenuFoto}
+        onHoyNo={handleMenuHoyNo}
+        onCerrar={handleMenuCerrar}
+      />
     </div>
   );
 }

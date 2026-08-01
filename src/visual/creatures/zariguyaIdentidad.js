@@ -139,6 +139,38 @@ export const ZARIGUYA_PROPORCION = {
 };
 
 /*
+ * ZARIGUYA_PRESENCIA — cómo ocupa una escena 3D (el molde es ABEJA_PRESENCIA:
+ * mismos campos, otro animal). La diferencia de fondo: la zarigüeya CAMINA
+ * POR EL PISO — `percha.y` y `rondaAltura` son la altura del CENTRO de su
+ * billboard sobre el SUELO mientras trota (cuerpo bajito de marsupial), no
+ * una altura de vuelo. Se ENCARAMA cuando el foco está en alto (sube al
+ * hotspot como a un tronco) — eso lo decide su coreografía
+ * (ZariguyaCompaiEscena), no estos números.
+ */
+export const ZARIGUYA_PRESENCIA = {
+  /* Billboard <Html>: px base + ganancia por energía (0..1) y el
+     distanceFactor con el que la cámara la escala. Un pelo más grande que la
+     abeja (mamífero con tres crías encima). */
+  billboardBase: 52,
+  billboardPorEnergia: 10,
+  distancia: 7,
+  /* Su percha junto al foco (llega TROTANDO, no volando) y la altura del
+     centro del billboard mientras anda por el piso. */
+  percha: { x: 0.55, y: 0.16, z: 0.7 },
+  rondaAltura: 0.16,
+  /* Sombra de contacto: pegada a ella casi siempre (anda por el suelo); solo
+     se atenúa/ensancha cuando se encarama a un hotspot en alto. */
+  sombra: {
+    radio: 0.3,
+    opacidad: 0.26,
+    opacidadBase: 0.3,
+    opacidadMin: 0.12,
+    atenuaPorAltura: 0.08,
+    ensanchaPorAltura: 0.1,
+  },
+};
+
+/*
  * PERFIL_ZARIGUYA — el perfil de CLIMA→cuerpo para `cuerpoDeClima`
  * (creatureClimaCuerpo.js). Mismo shape que PERFIL_DANTA/PERFIL_BORUGO — se
  * pasa vía la opción `perfil`, así NO hay que tocar el archivo compartido

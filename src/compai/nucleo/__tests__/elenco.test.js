@@ -81,6 +81,11 @@ describe('leerCompanero', () => {
     expect(leerCompanero(null)).toBe(COMPANERO_DEFECTO);
   });
 
+  it('zariguya es un slug válido (entró al elenco 2026-07-25, PR #2783)', () => {
+    const st = new StorageFalso({ [LLAVE_COMPANERO]: 'zariguya' });
+    expect(leerCompanero(st)).toBe('zariguya');
+  });
+
   it('no lanza si el storage tira excepción (modo privado)', () => {
     expect(() => leerCompanero(new StorageRoto())).not.toThrow();
     expect(leerCompanero(new StorageRoto())).toBe(COMPANERO_DEFECTO);

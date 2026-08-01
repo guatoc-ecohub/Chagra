@@ -149,9 +149,24 @@ export { Zariguya } from './Zariguya.jsx';
    DE SILUETA). Solo datos: jamás arrastra three al bundle base — igual que
    dantaIdentidad/jaguarIdentidad. */
 export {
-  ZARIGUYA_FIRMA, ZARIGUYA_PALETA, ZARIGUYA_PROPORCION, ZARIGUYA_SLUG,
-  ZARIGUYA_TINTA, PERFIL_ZARIGUYA,
+  ZARIGUYA_FIRMA, ZARIGUYA_PALETA, ZARIGUYA_PRESENCIA, ZARIGUYA_PROPORCION,
+  ZARIGUYA_SLUG, ZARIGUYA_TINTA, PERFIL_ZARIGUYA,
 } from './zariguyaIdentidad.js';
+/* EL MAÍZ COMPAÑERO — Zea mays, la mata madre de la milpa: LA QUE ALIMENTA.
+   El avatar-planta ('maiz' en useAgentAvatarType) hecho personaje rubber-hose:
+   ARRAIGADO (no viaja — el único del elenco sin pies: tiene montículo y
+   raíces), mecido por la brisa (cada hoja a su compás), coronado por el
+   penacho que VIBRA al reaccionar, con la mazorca al costado como carga y
+   regalo. Su firma sobrevive al negro sobre blanco (ver MAIZ_FIRMA). */
+export { MaizCompai } from './MaizCompai.jsx';
+/* La IDENTIDAD del maíz como datos (paleta milpa + proporciones + firma de
+   silueta + PRESENCIA 3D + perfil de clima — sequía 0.95: la seca se le nota
+   de una). Solo datos: jamás arrastra three al bundle base — igual que
+   zariguyaIdentidad/abejaIdentidad. */
+export {
+  MAIZ_FIRMA, MAIZ_PALETA, MAIZ_PRESENCIA, MAIZ_PROPORCION, MAIZ_SLUG,
+  MAIZ_TINTA, PERFIL_MAIZ,
+} from './maizIdentidad.js';
 /* EL ENT DEL PÁRAMO — el árbol-guardián que enseña (frailejón gigante). NO es un
    bicho: es el corazón del "Bosque Vivo". Hereda la MISMA fundación transversal
    (line-boil, lip-sync, modo-poder=guardián, clima) adaptada a su escala y su
@@ -229,6 +244,7 @@ import Trichogramma from './Trichogramma.jsx';
 import Sirfido from './Sirfido.jsx';
 import Gallina from './Gallina.jsx';
 import Zariguya from './Zariguya.jsx';
+import MaizCompai from './MaizCompai.jsx';
 import EntFrailejon from './EntFrailejon.jsx';
 
 /* Registro consultable: slug → componente + binomio verificado. */
@@ -268,6 +284,9 @@ export const CREATURES = {
   // El marsupial nocturno de la finca (la que sale de noche a limpiar la
   // huerta — con las crías al lomo).
   zariguya: { Component: Zariguya, nombre: 'Zarigüeya (chucha)', cientifico: 'Didelphis marsupialis' },
+  // La mata madre de la milpa (flora compañera, como el Ent): el avatar-planta
+  // arraigado que se mece, alimenta y corona en espiga.
+  maiz: { Component: MaizCompai, nombre: 'Planta de maíz', cientifico: 'Zea mays' },
   // El árbol-maestro del Bosque Vivo (flora, no fauna): el frailejón guardián.
   'ent-frailejon': { Component: EntFrailejon, nombre: 'El Ent del páramo', cientifico: 'Espeletia sp.' },
 };

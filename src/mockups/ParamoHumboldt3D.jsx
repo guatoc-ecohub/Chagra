@@ -16,12 +16,19 @@
  * cielo; adelante, por la portilla, la meseta se despeña y la quebrada se va
  * hecha hilo a la niebla — que es donde están las fincas.
  *
- * Las cuatro vistas cuentan el ciclo entero, en orden:
+ * Las cinco vistas cuentan el ciclo entero, en orden:
  *   1. EL NACEDERO   — el sitio: dónde nace el agua y cómo se ve por dentro.
  *   2. LA LÁMINA     — el corte: por qué la turba es una esponja y por qué el
  *                      agua sale toda a la misma altura de la pared.
  *   3. EL FRAILEJONAL— quién atrapa la niebla, y a qué velocidad (ninguna).
- *   4. EL AGUA QUE BAJA — a dónde va: al filo del mundo y al valle.
+ *   4. LA QUEÑUA     — el guardián: el árbol que le quita el agua a la niebla
+ *                      a lo grande, parado en el filo sobre su frailejonal.
+ *   5. EL AGUA QUE BAJA — a dónde va: al filo del mundo y al valle.
+ *
+ * La cámara es de GRÚA, no de ascensor: nace en el aire con el anfiteatro
+ * entero abajo (plano de establecimiento), baja a la portilla, y cada viaje
+ * entre vistas sube por un arco antes de asentarse — el páramo se cuenta
+ * épico porque lo es, no porque se le grite.
  *
  * Congruencia: paleta madre, materiales madre, `<LuzMadre>` con la familia de
  * cielo `ladera`. Cero rig de luz propio, cero assets externos.
@@ -31,8 +38,14 @@ import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { OrbitControls, AdaptiveDpr } from '@react-three/drei';
 import * as THREE from 'three';
 import EscenaNacederoParamo from '../visual/mundo3d/paramo/EscenaNacederoParamo.jsx';
+import { crearNacedero, puestoDelGuardian } from '../visual/mundo3d/paramo/nacederoParamo.geom.js';
 import { LuzMadre, CIELOS, mezclarCielo } from '../visual/mundo3d/paleta/index.js';
 import { decidirTier, perfilDeTier } from '../visual/mundo3d/deviceTier.js';
+
+/* El guardián manda sobre dos vistas, así que su puesto se resuelve también
+   aquí, con el MISMO campo de alturas determinista que monta la escena — son
+   puras clausuras (cero mallas): crearlo dos veces no cuesta ni diverge. */
+const GUARDIAN = puestoDelGuardian(crearNacedero());
 
 /* ══════════════════════════════════════════════════════════════════════════
    LAS VISTAS — dónde se para la cámara
@@ -62,12 +75,35 @@ const VISTAS = {
     mira: new THREE.Vector3(-2.0, 3.1, -7.0),
     fov: 50,
   },
-  /* EL FRAILEJONAL: arriba en la planicie, a la altura de una roseta, mirando
-     el gentío de todas las edades con el filo y el cielo detrás. */
+  /* EL FRAILEJONAL: arriba en la planicie, BAJO — a la altura de una roseta,
+     no por encima del gentío. El tele (fov corto) aprieta las edades unas
+     contra otras como en una lámina naturalista: roseta nueva, mozo, granado
+     y centenario en el mismo cuadro, y al fondo, sobre el filo, el guardián.
+     La mirada sube apenas: las rosetas quedan contra el cielo, no contra el
+     pasto — un frailejonal se retrata hacia arriba o no se retrata. */
   frailejonal: {
-    pos: new THREE.Vector3(-13.5, 9.0, 12.5),
-    mira: new THREE.Vector3(-2.0, 6.0, -1.0),
-    fov: 46,
+    pos: new THREE.Vector3(-15.5, 7.4, 14.5),
+    mira: new THREE.Vector3(-4.4, 6.8, -6.5),
+    fov: 45,
+  },
+  /* LA QUEÑUA: el retrato del guardián, tomado desde el aire del anfiteatro —
+     parado sobre el vacío que el agua abrió, mirando de abajo hacia arriba al
+     que la fabrica. La cámara queda un poco por debajo del rostro (el héroe
+     se retrata en contrapicado) y el cuadro sube hasta la copa, que es donde
+     está la lección: ahí es donde la niebla entra y no vuelve a salir. */
+  quenua: {
+    /* a 18 del guardián: con menos aire la copa quedaba ROZANDO el borde del
+       cuadro, y la copa ES la lección — un retrato que se la corta (o se la
+       aprieta) cuenta otra cosa. A la corona se le deja cielo encima, como en
+       cualquier lámina que se respete. La cámara queda sobre la boca de la
+       portilla: se le mira desde la puerta por donde su agua se va. */
+    pos: new THREE.Vector3(
+      GUARDIAN.x + Math.sin(GUARDIAN.rotY) * 18,
+      GUARDIAN.y + 2.1,
+      GUARDIAN.z + Math.cos(GUARDIAN.rotY) * 18,
+    ),
+    mira: new THREE.Vector3(GUARDIAN.x, GUARDIAN.y + 5.0, GUARDIAN.z),
+    fov: 50,
   },
   /* EL AGUA QUE BAJA: en la portilla, de espaldas al anfiteatro, viendo cómo
      la quebrada se va al filo del mundo y se cae al valle. */
@@ -104,6 +140,15 @@ const LECCIONES = {
       + '—cosa de un centímetro al año—, así que un frailejón de un metro es más viejo que quien '
       + 'lo está mirando. Se quema en un rato y se demora una vida en volver.',
   },
+  quenua: {
+    titulo: 'La queñua es una fábrica de agua',
+    sub: 'Queñua o colorado · Polylepis · el árbol que llega más arriba',
+    texto: 'El guardián del frailejonal. Mírele la copa: la niebla le entra por ahí y no vuelve '
+      + 'a salir — la copa y su musgo la peinan, el agua se junta en gotas y escurre por el '
+      + 'tronco hasta la turba. Lo que rezuma allá abajo en la pared es esa misma agua. Donde '
+      + 'hay queñuales el nacedero no se seca: por eso el páramo se cuida también sembrando '
+      + 'su árbol.',
+  },
   agua: {
     titulo: 'De aquí para abajo',
     sub: 'La quebrada se va al valle',
@@ -118,6 +163,7 @@ const BOTONES = [
   { id: 'nacedero', texto: 'El nacedero' },
   { id: 'lamina', texto: 'La lámina' },
   { id: 'frailejonal', texto: 'El frailejonal' },
+  { id: 'quenua', texto: 'La queñua' },
   { id: 'agua', texto: 'El agua que baja' },
 ];
 
@@ -127,11 +173,21 @@ const BOTONES = [
 /* Lleva cámara Y objetivo de una vista a otra con interpolación exponencial
    (llega rápido, frena suave). Suelta el mando apenas el usuario toca la
    escena: si el lerp siguiera vivo mientras alguien arrastra, la cámara le
-   pelearía la mano. */
+   pelearía la mano.
+
+   Y el viaje NO es una recta: es un plano de GRÚA. La cámara sube por un arco
+   —proporcional al largo del viaje— y baja a asentarse en la vista. Una
+   recta entre dos vistas atraviesa el cuadro como un ascensor; el arco lo
+   cruza como un vuelo, y de paso enseña el anfiteatro desde arriba en cada
+   cambio, que es la mejor lección de geografía que este mundo puede dar. */
 function Camarografo({ vista, controls, reducedMotion }) {
   const size = useThree((s) => s.size);
   const invalidate = useThree((s) => s.invalidate);
   const animando = useRef(true);
+  /* la grúa del viaje en curso: el largo inicial (d0) fija cuánto sube (lift).
+     d0 en 0 = "mídase en el primer cuadro del viaje" — aquí no se puede leer
+     la cámara (esto corre en render), solo dentro del useFrame. */
+  const viaje = useRef({ d0: 0, lift: 0 });
 
   const destino = useMemo(() => {
     if (vista !== 'nacedero') return VISTAS[vista] || VISTAS.nacederoAncho;
@@ -143,6 +199,7 @@ function Camarografo({ vista, controls, reducedMotion }) {
      abajo jamás corría tras el clic y la cámara no viajaba. */
   useEffect(() => {
     animando.current = true;
+    viaje.current = { d0: 0, lift: 0 };
     invalidate();
   }, [destino, invalidate]);
 
@@ -175,8 +232,23 @@ function Camarografo({ vista, controls, reducedMotion }) {
       animando.current = false;
       return;
     }
+    const v = viaje.current;
+    if (v.d0 <= 0) {
+      v.d0 = Math.max(0.001, cam.position.distanceTo(destino.pos));
+      /* cuánto sube la grúa: con el viaje. Los saltos cortos (el reencuadre
+         ancho↔alto de un resize) casi ni despegan; el vuelo de entrada sube
+         los tres metros enteros. */
+      v.lift = Math.min(3.2, v.d0 * 0.16);
+    }
     const k = 1 - Math.exp(-Math.min(0.1, dt) * 3.0);
+    /* el progreso se lee ANTES del lerp; el seno hace el arco: despega suave,
+       cumbre a mitad de viaje, y aterriza en cero — así el arco jamás corre
+       la marca de llegada. El empujón va multiplicado por k porque el lerp
+       del cuadro siguiente se come justo esa fracción: empujar k cada cuadro
+       sostiene el arco entero, empujar el arco entero lo duplicaría. */
+    const prog = THREE.MathUtils.clamp(1 - cam.position.distanceTo(destino.pos) / v.d0, 0, 1);
     cam.position.lerp(destino.pos, k);
+    cam.position.y += Math.sin(prog * Math.PI) * v.lift * k;
     if (Math.abs(cam.fov - destino.fov) > 0.01) {
       cam.fov += (destino.fov - cam.fov) * k;
       cam.updateProjectionMatrix();
@@ -236,7 +308,7 @@ export default function ParamoHumboldt3D() {
 
   useEffect(() => {
     const alTeclear = (e) => {
-      const i = ['1', '2', '3', '4'].indexOf(e.key);
+      const i = ['1', '2', '3', '4', '5'].indexOf(e.key);
       if (i >= 0) setVista(BOTONES[i].id);
     };
     window.addEventListener('keydown', alTeclear);
@@ -255,7 +327,12 @@ export default function ParamoHumboldt3D() {
         style={{ opacity: listo ? 1 : 0, transition: 'opacity 1s ease' }}
         dpr={perfil.dpr}
         gl={{ antialias: perfil.antialias, powerPreference: 'high-performance' }}
-        camera={{ position: [0.9, 7.4, 12.8], fov: 58, near: 0.3, far: 400 }}
+        /* LA CÁMARA NACE EN EL AIRE, no en la portilla: el primer cuadro es el
+           plano de establecimiento —alto y afuera, el anfiteatro entero y el
+           filo del mundo abajo— y el camarógrafo la baja en grúa hasta la
+           vista madre (~2 s). Con reduced-motion no hay vuelo: el primer
+           cuadro del Camarografo es un corte seco a la portilla. */
+        camera={{ position: [7.5, 18.5, 30], fov: 58, near: 0.3, far: 400 }}
         shadows={!!perfil.sombras}
         frameloop={reducedMotion ? 'demand' : 'always'}
         onCreated={() => setListo(true)}

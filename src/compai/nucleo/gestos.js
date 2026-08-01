@@ -19,6 +19,12 @@
  * pedía el SPEC — *"no es predecible, siempre hace cosas diferentes"*. Con 6
  * gestos y anti-repetición el ciclo se leía; con 12 deja de leerse.
  *
+ * NUEVO 2026-07-30 (Ola 2, batch 1, #13/#14): **`mirausted`** ("mirar al
+ * usuario y volver la vista", distinto del 'mira' curioso que mira ALREDEDOR
+ * sin usted de por medio) y **`cuenta`** ("contar algo con las patitas") —
+ * los 2 gestos del pedido original de #13/#14 que faltaban del repertorio de
+ * 12. Con ellos son **14 momentos**.
+ *
  * Entran AQUÍ y no en `angelitaEstados.js` a propósito: el núcleo es la fuente
  * única, y si el repertorio se quedara en la PWA el compAI de `3d.guatoc.co`
  * heredaría otra vez un personaje más pobre — que es exactamente la divergencia
@@ -47,6 +53,8 @@ export const MOMENTOS_IDLE = {
   rascanuca: { dur: 2400, peso: 1.3 },// se rasca la nuca, medio apenada (rascarse distinto)
   cabecea: { dur: 3600, peso: 0.9 },  // se le van los ojos… zzz… y DESPIERTA de un brinco
   voltereta: { dur: 1700, peso: 0.8 },// pirueta juguetona: vuelta de campana con anticipación
+  mirausted: { dur: 2600, peso: 2.2 },// voltea derecho hacia usted, sostiene, y vuelve a lo suyo
+  cuenta: { dur: 3000, peso: 1.3 },   // cuenta algo con las patitas: toca uno, dos, tres…
   posa: { dur: 1150, peso: 2 },       // aterriza con peso (→ posada → despega)
   posada: { dur: [3400, 5200], peso: 0 }, // descansa posada: alitas plegadas, respira hondo
   despega: { dur: 950, peso: 0 },     // se agacha, coge impulso y vuelve al aire

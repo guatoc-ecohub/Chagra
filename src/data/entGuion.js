@@ -344,6 +344,30 @@ export const ENT_GUION = Object.freeze([
     dato_conservacion:
       'Caryocaraceae, árbol emergente amazónico; nativo_silvestre. Dispersión zoócora primaria por agutí (Dasyprocta fuliginosa), danta (Tapirus terrestris) y roedores silvestres como el borugo.',
   },
+
+  /* ── CONSERVACION — la ceiba: el guardián del piso CÁLIDO ───────────────
+     La pieza que le faltaba a la ceiba-Ent (`EntGradiente` especie="ceiba", el
+     guardián de tierra caliente del gradiente). NO le inventa una simbiosis —
+     la geom de la ceiba es explícita: "ni micorrizas ni simbiosis... dibujamos
+     el árbol, no una lección que todavía no tenemos". Por eso esta lección es
+     sobre el ÁRBOL MISMO (como la de la queñua es el agua y el suelo): el
+     emergente del bosque seco tropical, su sombrío para el cacao/café joven y
+     su papel de refugio de biodiversidad — todo tomado del `valor_pedagogico`
+     de `ceiba_pentandra` en el catálogo v3.2 (los campos copiados coinciden
+     textualmente, invariante del test). */
+  {
+    id: 'ceiba_sombrio_refugio_biodiversidad',
+    tema: 'conservacion',
+    especie_id: 'ceiba_pentandra',
+    nombre_comun: 'Ceiba algodón',
+    nombre_cientifico: 'Ceiba pentandra (L.) Gaertn.',
+    familia_botanica: 'Malvaceae',
+    thermal_zones: ['calido'],
+    snippet_pedagogico:
+      'La ceiba es el árbol más grande del bosque seco tropical: saca su copa muy por encima del monte y le da sombra al cacao y al café cuando están pequeños. Una sola ceiba vieja es casa de orquídeas, aves, micos y perezosos. Cuídela: es sagrada y refugio de vida.',
+    dato_conservacion:
+      'Malvaceae; nativo_silvestre del bosque seco tropical colombiano (Caribe, valle del Magdalena, Pacífico). Emergente de hasta 70 m con raíces tablares; la polinizan murciélagos nectarívoros y una sola ceiba adulta sostiene epífitas, aves y mamíferos arborícolas. Patrimonio bio-cultural de las culturas indígenas del Caribe.',
+  },
 ]);
 
 /* ────────────────────────────────────────────────────────────────────────

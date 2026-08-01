@@ -1,57 +1,10 @@
 import { useCallback, useLayoutEffect, useRef, useState } from 'react';
+import { Mic } from 'lucide-react';
 import Typewriter from '../../components/Typewriter';
 import { aparienciaDeTipo } from './angelitaAvisoTipos';
+import { activarEscucha } from '../../services/escuchaService';
+import { correccionEnPantalla, recortarAviso } from './burbujaAngelitaUtils.js';
 import './angelitaBurbuja.css';
-
-/** Aire mínimo entre la burbuja y el borde de la pantalla (px). */
-const MARGEN_PANTALLA = 10;
-
-/**
- * Cuánto hay que correr la burbuja para que quepa entera en la pantalla.
- *
- * EL BUG QUE ARREGLA (visto en captura, 430 px de ancho): la burbuja va
- * anclada al personaje con `<Html center>` — o sea CENTRADA en su posición de
- * pantalla. Cuando el compAI anda cerca de un borde, media burbuja se sale y
- * el aviso queda cortado. En un teléfono modesto —que es el aparato del
- * usuario— eso significa que el tip sencillamente no se puede leer.
- *
- * Es la misma regla que ya aplica `useAngelitaGuia.calcularPuestoGuia` para
- * las paradas de la guía: nunca tapar, nunca salirse. Pura y testeable — no
- * toca el DOM, sólo calcula.
- *
- * @param {{left:number,right:number}} caja — rect de la burbuja.
- * @param {number} anchoPantalla
- * @param {number} [margen]
- * @returns {number} px a sumar en X (negativo = correr a la izquierda).
- */
-export function correccionEnPantalla(caja, anchoPantalla, margen = MARGEN_PANTALLA) {
-  if (!caja || !Number.isFinite(anchoPantalla) || anchoPantalla <= 0) return 0;
-  const sobraDerecha = caja.right - (anchoPantalla - margen);
-  const faltaIzquierda = margen - caja.left;
-  // Si se sale por los DOS lados es que no cabe: se pega a la izquierda y el
-  // `max-width` del CSS se encarga del resto. Peor sería centrarla y perder
-  // texto por ambos bordes.
-  if (sobraDerecha > 0 && faltaIzquierda > 0) return faltaIzquierda;
-  if (sobraDerecha > 0) return -sobraDerecha;
-  if (faltaIzquierda > 0) return faltaIzquierda;
-  return 0;
-}
-
-/* Un aviso que no se lee de un vistazo no sirve (feedback del operador: "los
-   avisos son muy largos y entre más largos más difíciles de leer"). Se corta
-   en la primera frontera de frase que quepa; si no hay ninguna, en la última
-   palabra completa. Además evita que la máquina de escribir reserve un cajón
-   enorme y vacío mientras arranca. */
-const TOPE_AVISO = 105;
-export function recortarAviso(texto, tope = TOPE_AVISO) {
-  const t = String(texto || '').trim();
-  if (t.length <= tope) return t;
-  const cabe = t.slice(0, tope);
-  const frase = Math.max(cabe.lastIndexOf('. '), cabe.lastIndexOf('? '), cabe.lastIndexOf('! '));
-  if (frase > tope * 0.45) return t.slice(0, frase + 1).trim();
-  const palabra = cabe.lastIndexOf(' ');
-  return `${(palabra > 0 ? cabe.slice(0, palabra) : cabe).trim()}…`;
-}
 
 /**
  * <BurbujaAngelita> — la burbuja con la voz de Angelita: typewriter + color
@@ -71,6 +24,14 @@ export function recortarAviso(texto, tope = TOPE_AVISO) {
  *   - prefers-reduced-motion: el Typewriter muestra todo de una y la entrada
  *     de la burbuja no anima (CSS).
  *
+ * RESPONDER POR VOZ (#91): con `permiteEscucha`, la burbuja suma un botón de
+ * micrófono que dispara `activarEscucha({ fuente: 'tip' })` — el mismo
+ * contrato desacoplado que ya usa EscuchaFab (services/escuchaService.js):
+ * abre el overlay "Chagra está escuchando" con el pipeline Whisper/Kokoro
+ * real, sin que la burbuja sepa nada de grabar audio. Apagado por defecto:
+ * cada llamador decide si el tip que muestra amerita una respuesta hablada
+ * (un tip informativo no la necesita; un aviso que pregunta algo, sí).
+ *
  * @param {Object} props
  * @param {string|null} props.mensaje — lo que dice Angelita (null → no pinta).
  * @param {string} [props.tipo] — uno de TIPOS_AVISO (angelitaAvisoTipos).
@@ -78,6 +39,8 @@ export function recortarAviso(texto, tope = TOPE_AVISO) {
  *   del respeto automático a prefers-reduced-motion).
  * @param {number} [props.velocidadMs=26] — ritmo del typewriter.
  * @param {string} [props.className] — clases extra (posicionamiento del host).
+ * @param {boolean} [props.permiteEscucha=false] — muestra el botón de
+ *   "responder por voz" (#91).
  */
 export default function BurbujaAngelita({
   mensaje,
@@ -85,6 +48,7 @@ export default function BurbujaAngelita({
   animado = true,
   velocidadMs = 16,
   className = '',
+  permiteEscucha = false,
 }) {
   /* NO SE SALE DE LA PANTALLA. Se mide después de pintar y se corrige en X.
      Los hooks van ANTES del `return null` — si no, React ve un número
@@ -159,6 +123,17 @@ export default function BurbujaAngelita({
         <span className="angelita-burbuja__sr">{spec.aria}: </span>
         <Typewriter texto={texto} animado={animado} velocidadMs={velocidadMs} />
       </span>
+      {permiteEscucha && (
+        <button
+          type="button"
+          className="angelita-burbuja__escuchar"
+          onClick={() => activarEscucha({ fuente: 'tip' })}
+          aria-label="Responder por voz a este aviso"
+          title="Hablar con Chagra sobre esto"
+        >
+          <Mic size={14} strokeWidth={2.4} aria-hidden="true" />
+        </button>
+      )}
     </div>
   );
 }

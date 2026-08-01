@@ -46,9 +46,12 @@
   max-width: 46rem;
   margin: 0 auto;
 }
-/* El host <Mundo> llena este marco; en 3D necesita altura real. */
+/* El host <Mundo> llena este marco; en 3D necesita altura real. Con la cámara
+   cercana del corral (QA 2026-07-30) el diorama agradece un pelín más de aire
+   vertical: los overlays del framework (píldora, burbuja del acompañante,
+   invitación de audio) dejan de apilarse sobre el hato. */
 .m3dan__escena .mundo-root {
-  height: min(62vh, 30rem);
+  height: min(68vh, 33rem);
   min-height: 300px;
   border: 1px solid rgba(168, 106, 58, 0.28);
   box-shadow: 0 10px 28px rgba(74, 47, 22, 0.14);
@@ -56,6 +59,19 @@
 .m3dan__escena .mundo-root[data-dim='2d'] {
   height: auto;
   background: #fdf8ee;
+}
+/* Las píldoras de hotspot, a la escala del corral (QA visual 2026-07-30): con
+   la cámara de reposo cercana de este mundo el billboard crece ~1.5x y la
+   píldora central («Todos los animales») tapaba el hato entero. Solo en esta
+   vitrina: tipografía más contenida (todo lo interno es em; el piso táctil de
+   44px del framework queda intacto) y la píldora PLENA baja unos px hacia el
+   borde cercano del corral — queda posada sobre su puerta, no sobre las caras
+   de los animales. margin (no transform): cero pelea con el hover/focus. */
+.m3dan__escena .mundo-hotspot {
+  font-size: 0.8rem;
+}
+.m3dan__escena .mundo-hotspot[data-modo='plena'] {
+  margin-top: 2.6em;
 }
 
 .m3dan__barra {
