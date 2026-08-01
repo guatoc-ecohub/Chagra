@@ -107,11 +107,12 @@ jobs:
           # Gated ademas por tier Pro (tierService PRO_USERNAMES: admin + ana maria);
           # endpoint capacity-limited (1 job) y Pro-only server-side (403 free).
           VITE_DEEP_RESEARCH_ENABLED: "true"
-          # GO-LIVE 2026-07-04: home finca-viva a produccion (biopunk2 default,
-          # biopunk original de respaldo). Autorizado por el operador. Antes solo
-          # en dev-deploy.yml; ahora prod renderiza el home de 4 portales + escenas
-          # vivas por tema en vez del home oscuro tipo agente.
-          VITE_FINCA_VIVA_HOME_PERFIL: "true"
+          # 2026-08-01: chagra.app debe ser la app 2D con login (NO la portada
+          # "finca viva"/valle, que en prod caía rota sin login). El valle 3D pasa a
+          # su propio dominio 3d.chagra.app detras del mismo login (ver
+          # Chagra-strategy/ops/AMBIENTES-CHAGRA.md). Por eso el home-perfil finca-viva
+          # queda OFF en prod. (Antes: "true", GO-LIVE 2026-07-04.)
+          VITE_FINCA_VIVA_HOME_PERFIL: "false"
           # Captura server-side de conversaciones del agente para la auditoría
           # diaria (review de respuestas en todas las aristas). Doble gate: esta
           # flag + hasConsent() por usuario (privacy-first). PII completa (sin
