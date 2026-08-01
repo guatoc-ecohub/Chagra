@@ -1,0 +1,1339 @@
+<!doctype html>
+<html lang="es-CO">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mercado Chagra — Del productor a tu mesa, con nombre y finca</title>
+<meta name="description" content="Mercado público de la red Chagra: productos agroecológicos con procedencia verificable — quién lo produce, en qué finca y en qué vereda.">
+<style>
+/* ============================================================
+   MERCADO CHAGRA — mockup visual standalone
+   Dirección: etiqueta de bulto campesino + sello de trazabilidad vivo.
+   Paleta:
+     --kraft      papel de costal
+     --papel      etiqueta clara
+     --tinta      café-tinta (texto, trazos)
+     --tierra     fondo hero (tierra al atardecer)
+     --hoja       verde monte
+     --bio        verde bioluminiscente (SOLO sello + micro-acentos)
+     --tomate     rojo chonto (acción)
+     --sol        ámbar solar
+   ============================================================ */
+:root{
+  --kraft:#E9D5AC;
+  --kraft-hondo:#DDC28E;
+  --papel:#F6ECD3;
+  --tinta:#3A2A18;
+  --tinta-suave:#6B5232;
+  --tierra:#241A11;
+  --tierra-2:#312415;
+  --hoja:#3E6B3C;
+  --hoja-honda:#28472B;
+  --bio:#A5D437;
+  --bio-honda:#6E9C1E;
+  --tomate:#C24C28;
+  --tomate-hondo:#9E3A1C;
+  --sol:#E8A03C;
+  --crema:#FBF4E2;
+
+  --f-display:"Iowan Old Style","Palatino Linotype",Palatino,Georgia,"Times New Roman",serif;
+  --f-body:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  --f-stencil:ui-monospace,"SF Mono","Cascadia Mono",Menlo,Consolas,monospace;
+
+  --radio:14px;
+  --sombra-tarjeta:0 1px 0 rgba(58,42,24,.25), 0 10px 24px -14px rgba(36,26,17,.45);
+  --max:1160px;
+}
+
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+@media (prefers-reduced-motion: reduce){
+  html{scroll-behavior:auto}
+  *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
+}
+body{
+  margin:0;
+  background:var(--kraft);
+  color:var(--tinta);
+  font-family:var(--f-body);
+  font-size:16px;
+  line-height:1.55;
+  -webkit-font-smoothing:antialiased;
+}
+/* Grano de papel kraft sobre toda la página */
+body::before{
+  content:"";
+  position:fixed; inset:0; z-index:0; pointer-events:none;
+  opacity:.5; mix-blend-mode:multiply;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.42 0 0 0 0 0.33 0 0 0 0 0.20 0 0 0 0.10 0'/%3E%3C/filter%3E%3Crect width='240' height='240' filter='url(%23g)'/%3E%3C/svg%3E");
+}
+main, header.topbar, footer{position:relative; z-index:1}
+
+img,svg{max-width:100%;display:block}
+a{color:inherit}
+button{font:inherit;cursor:pointer}
+
+:focus-visible{
+  outline:3px solid var(--bio-honda);
+  outline-offset:3px;
+  border-radius:4px;
+}
+
+.envoltura{max-width:var(--max);margin:0 auto;padding:0 20px}
+
+/* Eyebrow estarcida — como el marcado de bultos */
+.estarcido{
+  font-family:var(--f-stencil);
+  font-weight:700;
+  font-size:.72rem;
+  letter-spacing:.24em;
+  text-transform:uppercase;
+}
+
+.visualmente-oculto{
+  position:absolute;width:1px;height:1px;padding:0;margin:-1px;
+  overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0;
+}
+
+/* ================= BARRA SUPERIOR ================= */
+.topbar{
+  position:sticky;top:0;z-index:40;
+  background:rgba(233,213,172,.92);
+  backdrop-filter:blur(6px);
+  border-bottom:2px solid var(--tinta);
+}
+.topbar-fila{
+  display:flex;align-items:center;justify-content:space-between;
+  gap:16px;min-height:56px;
+}
+.marca{
+  display:flex;align-items:center;gap:10px;
+  font-family:var(--f-display);font-weight:700;font-size:1.15rem;
+  text-decoration:none;letter-spacing:.01em;
+}
+.marca .hoja-marca{width:26px;height:26px;flex:none}
+.topbar nav{display:flex;gap:4px}
+.topbar nav a{
+  text-decoration:none;padding:8px 12px;border-radius:8px;
+  font-size:.9rem;font-weight:600;color:var(--tinta-suave);
+}
+.topbar nav a:hover{background:rgba(58,42,24,.09);color:var(--tinta)}
+@media (max-width:560px){
+  .marca{font-size:1rem}
+  .topbar nav a{padding:8px 7px;font-size:.8rem}
+  .topbar nav a:last-child{display:none}
+}
+
+/* ================= HERO ================= */
+.hero{
+  position:relative;
+  background:linear-gradient(180deg,#1C140C 0%,var(--tierra) 34%,var(--tierra-2) 100%);
+  color:var(--crema);
+  overflow:hidden;
+}
+.hero-paisaje{position:absolute;inset:0;width:100%;height:100%}
+.hero-contenido{
+  position:relative;z-index:2;
+  padding:88px 0 150px;
+  max-width:640px;
+}
+.hero .estarcido{color:var(--sol);display:flex;align-items:center;gap:12px}
+.hero .estarcido::before{content:"";width:34px;height:2px;background:var(--sol);flex:none}
+.hero h1{
+  font-family:var(--f-display);
+  font-size:clamp(2.5rem,6.4vw,4.4rem);
+  line-height:1.02;
+  margin:.5em 0 .35em;
+  font-weight:700;
+  letter-spacing:-.01em;
+  text-wrap:balance;
+}
+.hero h1 em{
+  font-style:italic;color:var(--bio);
+  text-shadow:0 0 26px rgba(165,212,55,.35);
+}
+.hero .tesis{
+  font-family:var(--f-display);font-style:italic;
+  font-size:clamp(1.1rem,2.4vw,1.4rem);
+  color:#EAD9B8;margin:0 0 14px;
+}
+.hero .detalle{
+  font-size:.98rem;color:#C9B490;max-width:46ch;margin:0 0 30px;
+}
+.hero-cta{
+  display:inline-flex;align-items:center;gap:10px;
+  background:var(--tomate);color:var(--crema);
+  border:2px solid rgba(0,0,0,.25);
+  padding:13px 22px;border-radius:999px;
+  font-weight:700;font-size:1rem;text-decoration:none;
+  box-shadow:0 6px 18px -6px rgba(194,76,40,.6);
+  transition:transform .18s ease, background .18s ease;
+}
+.hero-cta:hover{background:var(--tomate-hondo);transform:translateY(-2px)}
+.hero-cta svg{width:16px;height:16px}
+
+/* pizarra de la semana, medio metida sobre el borde del hero */
+.pizarra{
+  position:relative;z-index:3;
+  margin:-64px auto 0;
+  max-width:var(--max);
+  padding:0 20px;
+}
+.pizarra-interna{
+  background:#20281B;
+  color:#E9EFD8;
+  border:3px solid var(--tinta);
+  border-radius:var(--radio);
+  box-shadow:var(--sombra-tarjeta);
+  padding:16px 22px;
+  display:flex;flex-wrap:wrap;align-items:center;gap:8px 28px;
+}
+.pizarra-interna .titulo-pizarra{
+  font-family:var(--f-display);font-style:italic;font-size:1.05rem;color:var(--bio);
+}
+.pizarra-dato{display:flex;align-items:baseline;gap:8px}
+.pizarra-dato strong{font-family:var(--f-stencil);font-size:1.3rem;color:var(--crema)}
+.pizarra-dato span{font-size:.8rem;color:#B9C79B;letter-spacing:.04em}
+
+/* ================= FILTROS ================= */
+.filtros{padding:44px 0 8px}
+.filtros h2{
+  font-family:var(--f-display);font-size:clamp(1.6rem,3.4vw,2.1rem);
+  margin:0 0 4px;
+}
+.filtros .subtitulo{color:var(--tinta-suave);margin:0 0 22px;font-size:.95rem}
+.grupo-filtro{margin-bottom:14px}
+.grupo-filtro .estarcido{color:var(--tinta-suave);display:block;margin-bottom:8px}
+.chips{
+  display:flex;gap:8px;flex-wrap:wrap;
+  padding:0;margin:0;list-style:none;
+}
+@media (max-width:640px){
+  .chips{flex-wrap:nowrap;overflow-x:auto;padding-bottom:6px;scrollbar-width:thin}
+}
+.chip{
+  --chip-bg:var(--papel);
+  position:relative;
+  display:inline-flex;align-items:center;gap:8px;
+  background:var(--chip-bg);
+  border:2px solid var(--tinta);
+  border-radius:6px 12px 12px 6px;
+  padding:7px 14px 7px 22px;
+  font-size:.88rem;font-weight:600;color:var(--tinta);
+  white-space:nowrap;
+  box-shadow:0 2px 0 rgba(58,42,24,.28);
+  transition:transform .15s ease, background .15s ease;
+}
+/* huequito de etiqueta colgante en cada chip */
+.chip::before{
+  content:"";position:absolute;left:8px;top:50%;
+  width:7px;height:7px;border-radius:50%;
+  transform:translateY(-50%);
+  background:var(--kraft);
+  box-shadow:inset 0 0 0 2px var(--tinta);
+}
+.chip:hover{transform:translateY(-1px);background:var(--crema)}
+.chip[aria-pressed="true"]{
+  background:var(--tinta);color:var(--crema);
+  box-shadow:0 2px 0 rgba(0,0,0,.4);
+}
+.chip[aria-pressed="true"]::before{background:var(--bio);box-shadow:inset 0 0 0 2px var(--bio-honda)}
+.chip .mini-avatar{width:22px;height:22px;border-radius:50%;flex:none;overflow:hidden;border:1.5px solid currentColor}
+.chip .mini-avatar svg{width:100%;height:100%}
+
+.resumen-filtro{
+  display:flex;align-items:center;justify-content:space-between;gap:12px;
+  margin:18px 0 6px;flex-wrap:wrap;
+}
+.resumen-filtro p{margin:0;font-size:.9rem;color:var(--tinta-suave)}
+.resumen-filtro p strong{color:var(--tinta);font-family:var(--f-stencil)}
+.limpiar-filtros{
+  background:none;border:none;text-decoration:underline;
+  color:var(--tinta-suave);font-size:.85rem;padding:6px 4px;
+}
+.limpiar-filtros:hover{color:var(--tomate)}
+.limpiar-filtros[hidden]{display:none}
+
+/* ================= GRILLA DE ETIQUETAS ================= */
+.grilla{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(300px,1fr));
+  gap:34px 26px;
+  padding:26px 0 70px;
+  list-style:none;margin:0;
+}
+.tarjeta{
+  position:relative;
+  background:var(--papel);
+  border:2.5px solid var(--tinta);
+  border-radius:var(--radio);
+  box-shadow:var(--sombra-tarjeta);
+  display:flex;flex-direction:column;
+  transition:transform .2s ease, box-shadow .2s ease;
+}
+/* etiqueta de bulto: leve rotación alternada + hueco reforzado */
+.grilla > li:nth-child(odd) .tarjeta{transform:rotate(-.45deg)}
+.grilla > li:nth-child(even) .tarjeta{transform:rotate(.4deg)}
+.grilla > li .tarjeta:hover,
+.grilla > li .tarjeta:focus-within{
+  transform:rotate(0) translateY(-4px);
+  box-shadow:0 1px 0 rgba(58,42,24,.25), 0 22px 34px -16px rgba(36,26,17,.5);
+}
+.ojal{
+  position:absolute;top:-13px;left:50%;transform:translateX(-50%);
+  width:26px;height:26px;border-radius:50%;
+  background:var(--kraft);
+  border:2.5px solid var(--tinta);
+  box-shadow:inset 0 0 0 4px var(--papel);
+  z-index:3;
+}
+.ojal::after{ /* nudo del cordel */
+  content:"";position:absolute;left:50%;top:50%;
+  width:8px;height:8px;border-radius:50%;
+  transform:translate(-50%,-50%);
+  background:var(--tinta-suave);
+}
+
+.tarjeta-foto{
+  position:relative;
+  border-bottom:2.5px solid var(--tinta);
+  border-radius:calc(var(--radio) - 3px) calc(var(--radio) - 3px) 0 0;
+  overflow:hidden;
+  aspect-ratio:4/3;
+  background:var(--kraft-hondo);
+}
+.tarjeta-foto svg,.tarjeta-foto img{width:100%;height:100%;object-fit:cover}
+
+/* Sello de trazabilidad — el elemento firma */
+.sello{
+  position:absolute;top:10px;right:10px;z-index:4;
+  width:76px;height:76px;
+  transform:rotate(8deg);
+  border:none;background:none;padding:0;
+  filter:drop-shadow(0 0 0 rgba(165,212,55,0));
+  animation:latido-sello 4.5s ease-in-out infinite;
+}
+@keyframes latido-sello{
+  0%,100%{filter:drop-shadow(0 0 2px rgba(165,212,55,.15))}
+  50%{filter:drop-shadow(0 0 10px rgba(165,212,55,.55))}
+}
+.sello svg{width:100%;height:100%}
+.sello:hover,.sello:focus-visible{animation-play-state:paused;filter:drop-shadow(0 0 12px rgba(165,212,55,.7))}
+.sello .globo{
+  position:absolute;right:0;top:calc(100% + 8px);
+  width:max-content;max-width:210px;
+  background:var(--tinta);color:var(--crema);
+  font-size:.75rem;line-height:1.4;text-align:left;
+  padding:8px 11px;border-radius:8px;
+  opacity:0;transform:translateY(-4px) rotate(-8deg);
+  pointer-events:none;
+  transition:opacity .18s ease, transform .18s ease;
+}
+.sello:hover .globo,.sello:focus-visible .globo{opacity:1;transform:translateY(0) rotate(-8deg)}
+
+.tarjeta-cuerpo{padding:16px 18px 18px;display:flex;flex-direction:column;gap:10px;flex:1}
+.linea-lote{
+  display:flex;justify-content:space-between;gap:10px;align-items:baseline;
+  color:var(--tinta-suave);
+}
+.linea-lote .estarcido{font-size:.66rem}
+.linea-lote .lote{font-family:var(--f-stencil);font-size:.7rem;letter-spacing:.08em}
+
+.tarjeta h3{
+  font-family:var(--f-display);font-size:1.42rem;line-height:1.12;
+  margin:0;font-weight:700;letter-spacing:-.005em;
+}
+.tarjeta .variedad{
+  font-family:var(--f-display);font-style:italic;
+  color:var(--tinta-suave);font-size:.98rem;margin:-4px 0 0;
+}
+
+.fila-productor{
+  display:flex;align-items:center;gap:10px;
+  padding:9px 0;
+  border-top:1.5px dashed rgba(58,42,24,.35);
+  border-bottom:1.5px dashed rgba(58,42,24,.35);
+}
+.fila-productor .avatar{
+  width:40px;height:40px;border-radius:50%;flex:none;overflow:hidden;
+  border:2px solid var(--tinta);
+  background:var(--kraft-hondo);
+}
+.fila-productor .avatar svg{width:100%;height:100%}
+.fila-productor .quien{font-size:.86rem;line-height:1.35}
+.fila-productor .quien strong{display:block;font-size:.94rem}
+.fila-productor .quien span{color:var(--tinta-suave)}
+
+.badges{display:flex;flex-wrap:wrap;gap:6px;padding:0;margin:0;list-style:none}
+.badge{
+  display:inline-flex;align-items:center;gap:5px;
+  font-family:var(--f-stencil);font-size:.66rem;font-weight:700;
+  letter-spacing:.1em;text-transform:uppercase;
+  border:1.5px solid var(--tinta);border-radius:5px;
+  padding:4px 8px;color:var(--tinta);
+  background:rgba(233,213,172,.5);
+}
+.badge svg{width:12px;height:12px;flex:none}
+.badge.eco{border-color:var(--hoja-honda);color:var(--hoja-honda);background:rgba(62,107,60,.1)}
+.badge.temporada{border-color:#8A6A2C;color:#7A5C22;background:rgba(232,160,60,.14)}
+.badge.precio{background:var(--tinta);color:var(--crema);border-color:var(--tinta)}
+.badge.agotado{border-color:var(--tomate-hondo);color:var(--tomate-hondo);background:rgba(194,76,40,.1)}
+
+.historia{border:none;padding:0;margin:0}
+.historia summary{
+  list-style:none;display:inline-flex;align-items:center;gap:6px;
+  font-size:.84rem;font-weight:700;color:var(--hoja-honda);
+  cursor:pointer;padding:2px 0;user-select:none;
+}
+.historia summary::-webkit-details-marker{display:none}
+.historia summary::before{content:"❦";font-size:.9rem}
+.historia summary:hover{text-decoration:underline}
+.historia[open] summary::before{content:"✿"}
+.historia p{
+  margin:8px 0 0;font-family:var(--f-display);font-style:italic;
+  font-size:.95rem;color:var(--tinta-suave);line-height:1.5;
+  border-left:3px solid var(--bio);padding-left:12px;
+}
+
+.tarjeta-pie{margin-top:auto;display:flex;gap:8px;align-items:center}
+.btn-interes{
+  flex:1;
+  background:var(--tinta);color:var(--crema);
+  border:2px solid var(--tinta);border-radius:10px;
+  padding:11px 14px;font-weight:700;font-size:.94rem;
+  display:inline-flex;align-items:center;justify-content:center;gap:8px;
+  transition:background .18s ease, transform .12s ease;
+}
+.btn-interes svg{width:15px;height:15px}
+.btn-interes:hover{background:var(--tomate);border-color:var(--tomate-hondo);transform:translateY(-1px)}
+.btn-interes[data-estado="enviado"]{
+  background:var(--hoja);border-color:var(--hoja-honda);cursor:default;transform:none;
+}
+.btn-interes[disabled]{
+  background:transparent;color:var(--tinta-suave);border-style:dashed;cursor:not-allowed;
+}
+
+.sin-resultados{
+  grid-column:1/-1;text-align:center;padding:56px 20px;
+  border:2.5px dashed rgba(58,42,24,.4);border-radius:var(--radio);
+  background:rgba(246,236,211,.5);
+}
+.sin-resultados .canasto-vacio{width:84px;margin:0 auto 14px;opacity:.75}
+.sin-resultados h3{font-family:var(--f-display);margin:0 0 6px;font-size:1.3rem}
+.sin-resultados p{margin:0;color:var(--tinta-suave);font-size:.92rem}
+
+/* ================= CÓMO FUNCIONA ================= */
+.como{
+  background:var(--tierra-2);color:var(--crema);
+  border-top:3px solid var(--tinta);border-bottom:3px solid var(--tinta);
+  padding:58px 0 62px;position:relative;overflow:hidden;
+}
+.como .vena{position:absolute;pointer-events:none;opacity:.16;color:var(--bio)}
+.como .vena.izq{left:-40px;top:-30px;width:280px;transform:rotate(18deg)}
+.como .vena.der{right:-50px;bottom:-40px;width:320px;transform:rotate(-158deg)}
+.como .estarcido{color:var(--bio)}
+.como h2{font-family:var(--f-display);font-size:clamp(1.7rem,3.6vw,2.3rem);margin:8px 0 30px;max-width:22ch}
+.pasos{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:22px;padding:0;margin:0;list-style:none}
+.paso{
+  background:rgba(251,244,226,.05);
+  border:1.5px solid rgba(251,244,226,.22);
+  border-radius:var(--radio);padding:20px 20px 22px;
+}
+.paso .icono-paso{
+  width:46px;height:46px;border-radius:12px;margin-bottom:14px;
+  display:grid;place-items:center;
+  background:rgba(165,212,55,.14);border:1.5px solid rgba(165,212,55,.5);
+  color:var(--bio);
+}
+.paso .icono-paso svg{width:24px;height:24px}
+.paso h3{font-family:var(--f-display);font-size:1.14rem;margin:0 0 6px}
+.paso p{margin:0;font-size:.9rem;color:#CBB995;line-height:1.55}
+
+/* ================= PRODUCTORES ================= */
+.productores{padding:64px 0 76px}
+.productores header{max-width:560px;margin-bottom:34px}
+.productores .estarcido{color:var(--tinta-suave)}
+.productores h2{font-family:var(--f-display);font-size:clamp(1.8rem,4vw,2.5rem);margin:6px 0 8px}
+.productores header p{color:var(--tinta-suave);margin:0}
+.grilla-productores{
+  display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));
+  gap:20px;padding:0;margin:0;list-style:none;
+}
+.perfil{
+  display:flex;gap:16px;align-items:flex-start;
+  background:var(--papel);border:2px solid var(--tinta);border-radius:var(--radio);
+  padding:18px;box-shadow:var(--sombra-tarjeta);
+}
+.perfil .retrato{
+  width:76px;height:76px;flex:none;border-radius:50%;overflow:hidden;
+  border:2.5px solid var(--tinta);background:var(--kraft-hondo);
+  box-shadow:0 0 0 4px var(--papel), 0 0 0 5.5px rgba(58,42,24,.3);
+}
+.perfil .retrato svg{width:100%;height:100%}
+.perfil h3{font-family:var(--f-display);font-size:1.25rem;margin:0}
+.perfil .finca-linea{
+  font-family:var(--f-stencil);font-size:.68rem;letter-spacing:.12em;
+  text-transform:uppercase;color:var(--tinta-suave);margin:3px 0 8px;
+}
+.perfil .bio{font-size:.88rem;margin:0 0 10px;color:var(--tinta-suave);line-height:1.5}
+.perfil .cultiva{display:flex;flex-wrap:wrap;gap:5px;padding:0;margin:0;list-style:none}
+.perfil .cultiva li{
+  font-size:.72rem;font-weight:700;
+  border:1.5px solid var(--hoja-honda);color:var(--hoja-honda);
+  border-radius:999px;padding:2px 9px;background:rgba(62,107,60,.08);
+}
+
+/* ================= FOOTER ================= */
+footer{
+  background:var(--tierra);color:#C9B490;
+  padding:52px 0 40px;border-top:3px solid var(--tinta);
+}
+.footer-fila{display:flex;flex-wrap:wrap;gap:34px;justify-content:space-between;align-items:flex-start}
+.footer-marca{max-width:400px}
+.footer-marca .marca{color:var(--crema);font-size:1.3rem;margin-bottom:10px}
+.footer-marca p{font-size:.9rem;margin:0 0 8px;line-height:1.6}
+.footer-marca .trazable{color:var(--bio);font-weight:600}
+.footer-solar{
+  display:inline-flex;align-items:center;gap:8px;
+  font-family:var(--f-stencil);font-size:.68rem;letter-spacing:.14em;text-transform:uppercase;
+  border:1.5px solid rgba(232,160,60,.5);color:var(--sol);
+  border-radius:999px;padding:6px 12px;margin-top:10px;
+}
+.footer-solar svg{width:14px;height:14px}
+.footer-nota{
+  margin-top:34px;padding-top:18px;
+  border-top:1px solid rgba(201,180,144,.25);
+  font-size:.78rem;display:flex;flex-wrap:wrap;gap:8px 24px;justify-content:space-between;
+}
+.footer-nota span{opacity:.8}
+
+@media (max-width:640px){
+  .hero-contenido{padding:64px 0 130px}
+  .pizarra-interna{gap:6px 18px;padding:14px 16px}
+  .grilla{gap:30px 0}
+  .perfil{flex-direction:row}
+}
+</style>
+</head>
+<body>
+
+<!-- ============ BIBLIOTECA DE ILUSTRACIONES (símbolos SVG) ============ -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <!-- hoja de la marca -->
+    <symbol id="il-hoja-marca" viewBox="0 0 32 32">
+      <path d="M16 29C7 24 4 15 6 5c10-1 19 3 21 13 1 6-4 11-11 11z" fill="#3E6B3C" stroke="#3A2A18" stroke-width="2" stroke-linejoin="round"/>
+      <path d="M9 9c4 5 8 10 13 16" stroke="#A5D437" stroke-width="2" stroke-linecap="round" fill="none"/>
+      <path d="M12 16c2-.5 4-2 5-4M15 21c2.5-.5 5-2 6-4" stroke="#A5D437" stroke-width="1.6" stroke-linecap="round" fill="none"/>
+    </symbol>
+
+    <!-- vena de hoja decorativa (biopunk sutil) -->
+    <symbol id="il-vena" viewBox="0 0 200 240">
+      <path d="M100 235C60 170 55 90 100 8" stroke="currentColor" stroke-width="3" fill="none" stroke-linecap="round"/>
+      <path d="M100 200c-22-8-40-26-46-50M100 160c-18-6-32-20-38-40M100 120c-14-5-25-16-30-32M101 200c22-8 40-26 46-50M101 160c18-6 32-20 38-40M101 120c14-5 25-16 30-32M100 84c-10-4-18-12-22-24M101 84c10-4 18-12 22-24" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/>
+    </symbol>
+
+    <!-- ==== ESCENAS DE PRODUCTO (400x300) ==== -->
+
+    <!-- Cerdo de campo (Javier) -->
+    <symbol id="prod-cerdo-1" viewBox="0 0 400 300">
+      <rect width="400" height="300" fill="#D8E4C0"/>
+      <circle cx="64" cy="52" r="30" fill="#E8A03C" opacity=".85"/>
+      <path d="M0 210h400v90H0z" fill="#7FA35C"/>
+      <path d="M0 218c60-10 120 8 200 2s140-14 200-4v84H0z" fill="#6B9150"/>
+      <!-- cerca -->
+      <path d="M30 160v55M90 155v60M355 150v62" stroke="#8A6A44" stroke-width="9" stroke-linecap="round"/>
+      <path d="M14 172h96M14 196h96M338 168h60" stroke="#8A6A44" stroke-width="6" stroke-linecap="round"/>
+      <!-- cerdo -->
+      <g stroke="#3A2A18" stroke-width="5" stroke-linejoin="round">
+        <ellipse cx="215" cy="185" rx="95" ry="62" fill="#E8A7A0"/>
+        <path d="M138 232v26M180 240v24M252 240v24M290 230v26" stroke-width="12" stroke-linecap="round"/>
+        <circle cx="303" cy="152" r="42" fill="#E8A7A0"/>
+        <path d="M283 118l-12-22 26 8zM322 116l10-23-27 7z" fill="#D98D85"/>
+        <ellipse cx="317" cy="162" rx="17" ry="13" fill="#D98D85"/>
+        <circle cx="311" cy="160" r="2.6" fill="#3A2A18"/><circle cx="323" cy="160" r="2.6" fill="#3A2A18"/>
+        <circle cx="295" cy="144" r="3.4" fill="#3A2A18" stroke="none"/>
+        <path d="M124 172c-14-4-20 10-10 16" fill="none" stroke-width="5" stroke-linecap="round"/>
+      </g>
+      <ellipse cx="215" cy="262" rx="98" ry="9" fill="#57783F" opacity=".6"/>
+      <path d="M60 250c6-10 12-10 18 0M330 254c6-10 12-10 18 0" stroke="#4C6B38" stroke-width="4" fill="none" stroke-linecap="round"/>
+    </symbol>
+
+    <!-- Cerda con lechón (Elkin) -->
+    <symbol id="prod-cerdo-2" viewBox="0 0 400 300">
+      <rect width="400" height="300" fill="#EAD9B0"/>
+      <path d="M0 96c70 22 150 26 240 12s130-8 160 2v190H0z" fill="#C9B47E"/>
+      <path d="M0 205h400v95H0z" fill="#8A6A44"/>
+      <path d="M0 214c80-12 180 10 400-6v92H0z" fill="#7A5C38"/>
+      <!-- cerda pinta -->
+      <g stroke="#3A2A18" stroke-width="5" stroke-linejoin="round">
+        <ellipse cx="185" cy="168" rx="92" ry="58" fill="#E4B49A"/>
+        <path d="M138 148c20-8 42-6 56 8 12 12 34 14 48 4" fill="none" stroke-width="0"/>
+        <path d="M155 132c18 14 20 34-2 48-16 10-14 28 4 36" fill="#7A4B33" stroke-width="0" opacity=".85"/>
+        <circle cx="150" cy="190" r="16" fill="#7A4B33" stroke-width="0" opacity=".85"/>
+        <path d="M112 212v24M158 220v22M216 220v22M252 210v26" stroke-width="11" stroke-linecap="round"/>
+        <circle cx="268" cy="138" r="38" fill="#E4B49A"/>
+        <path d="M250 108l-10-20 24 6zM285 106l8-21-24 7z" fill="#C99578"/>
+        <ellipse cx="281" cy="148" rx="15" ry="11" fill="#C99578"/>
+        <circle cx="276" cy="146" r="2.4" fill="#3A2A18"/><circle cx="287" cy="146" r="2.4" fill="#3A2A18"/>
+        <circle cx="262" cy="130" r="3" fill="#3A2A18" stroke="none"/>
+      </g>
+      <!-- lechón -->
+      <g stroke="#3A2A18" stroke-width="4" stroke-linejoin="round">
+        <ellipse cx="318" cy="216" rx="42" ry="27" fill="#F0BFB8"/>
+        <path d="M288 236v14M310 240v12M334 240v12M350 234v14" stroke-width="7" stroke-linecap="round"/>
+        <circle cx="352" cy="198" r="19" fill="#F0BFB8"/>
+        <path d="M344 183l-6-11 13 3zM362 182l5-11-13 4z" fill="#DFA49B"/>
+        <ellipse cx="359" cy="203" rx="8" ry="6" fill="#DFA49B"/>
+        <circle cx="348" cy="196" r="2" fill="#3A2A18" stroke="none"/>
+      </g>
+    </symbol>
+
+    <!-- Tomate chonto (David) -->
+    <symbol id="prod-tomate" viewBox="0 0 400 300">
+      <rect width="400" height="300" fill="#F3E3BC"/>
+      <path d="M0 236h400v64H0z" fill="#B9A06A"/>
+      <!-- tutor de la mata -->
+      <path d="M200 250V30" stroke="#8A6A44" stroke-width="8" stroke-linecap="round"/>
+      <path d="M200 60c-40 8-64 34-66 62M200 100c42 6 66 30 70 58M200 140c-36 6-56 26-60 50" stroke="#3E6B3C" stroke-width="7" fill="none" stroke-linecap="round"/>
+      <g stroke="#3A2A18" stroke-width="5" stroke-linejoin="round">
+        <path d="M132 96c-20-4-34 8-34 22 8 10 26 12 38 2z" fill="#5B8A4A"/>
+        <path d="M272 132c20-6 34 6 36 20-8 10-26 14-38 4z" fill="#5B8A4A"/>
+        <!-- tomates chonto: ovalados -->
+        <ellipse cx="136" cy="150" rx="30" ry="38" fill="#C7431F"/>
+        <ellipse cx="268" cy="188" rx="32" ry="40" fill="#D14E28"/>
+        <ellipse cx="196" cy="212" rx="34" ry="42" fill="#B93A18"/>
+        <path d="M136 114l-6-12M268 150l-4-12M196 172l-5-12" stroke-width="5" stroke-linecap="round"/>
+        <path d="M124 112c8-6 18-6 24 0-8 6-18 6-24 0zM256 148c8-6 18-6 24 0-8 6-18 6-24 0zM184 170c8-6 18-6 24 0-8 6-18 6-24 0z" fill="#4C7A3D"/>
+      </g>
+      <path d="M122 138c-4 10-4 22 2 32M254 176c-4 10-4 22 2 30" stroke="#F3D8B4" stroke-width="5" fill="none" stroke-linecap="round" opacity=".8"/>
+    </symbol>
+
+    <!-- Huevos criollos -->
+    <symbol id="prod-huevos" viewBox="0 0 400 300">
+      <rect width="400" height="300" fill="#DCE6CC"/>
+      <path d="M0 232h400v68H0z" fill="#9FB37E"/>
+      <!-- gallina al fondo -->
+      <g stroke="#3A2A18" stroke-width="4" stroke-linejoin="round">
+        <ellipse cx="322" cy="150" rx="44" ry="34" fill="#B0552E"/>
+        <path d="M356 128c14-8 24-4 28 4-6 8-16 10-26 6" fill="#B0552E"/>
+        <circle cx="366" cy="118" r="14" fill="#B0552E"/>
+        <path d="M366 104c2-8 8-10 12-6-2 6-6 8-12 6z" fill="#C7431F"/>
+        <path d="M378 118l12 4-12 5z" fill="#E8A03C"/>
+        <circle cx="368" cy="115" r="2.2" fill="#3A2A18" stroke="none"/>
+        <path d="M310 182v14M334 182v14" stroke-width="6" stroke-linecap="round"/>
+        <path d="M292 142c-12 4-18 14-16 24" fill="none"/>
+      </g>
+      <!-- canasto tejido -->
+      <g stroke="#3A2A18" stroke-width="5" stroke-linejoin="round">
+        <path d="M74 190h200l-22 68H98z" fill="#B98A4E"/>
+        <path d="M84 214h182M92 238h166" stroke-width="4"/>
+        <path d="M104 190v66M138 190v68M174 190v68M210 190v68M244 190v66" stroke-width="4"/>
+        <!-- huevos -->
+        <ellipse cx="118" cy="176" rx="21" ry="26" fill="#F2E3C4"/>
+        <ellipse cx="160" cy="168" rx="21" ry="27" fill="#DDA35F"/>
+        <ellipse cx="204" cy="172" rx="21" ry="26" fill="#F2E3C4"/>
+        <ellipse cx="244" cy="176" rx="20" ry="25" fill="#C98A48"/>
+        <ellipse cx="182" cy="188" rx="21" ry="26" fill="#E7C795"/>
+      </g>
+      <path d="M112 166c3-6 8-9 13-9M198 162c3-6 8-9 13-9" stroke="#FBF4E2" stroke-width="4" fill="none" stroke-linecap="round"/>
+    </symbol>
+
+    <!-- Plátano hartón -->
+    <symbol id="prod-platano" viewBox="0 0 400 300">
+      <rect width="400" height="300" fill="#CFE0C2"/>
+      <!-- hoja de plátano gigante -->
+      <g stroke="#3A2A18" stroke-width="5" stroke-linejoin="round">
+        <path d="M40 300C20 180 70 70 190 40c30 90-10 200-90 250z" fill="#4C7A3D"/>
+        <path d="M92 268C80 180 110 100 178 62" stroke-width="6" fill="none"/>
+        <path d="M96 240c-18-6-30-18-36-32M104 200c-16-6-26-16-32-30M116 160c-14-6-22-14-28-26M112 236c22-2 40-10 52-22M124 196c20-2 36-10 46-22M136 156c18-2 30-8 40-20" stroke-width="3.5" fill="none"/>
+      </g>
+      <!-- racimo -->
+      <g stroke="#3A2A18" stroke-width="5" stroke-linejoin="round">
+        <path d="M268 34v52" stroke-width="10" stroke-linecap="round"/>
+        <path d="M212 96c4-22 24-34 56-34s52 12 56 34c2 14-4 26-14 34h-84c-10-8-16-20-14-34z" fill="#7FA35C"/>
+        <path d="M214 130c-16 8-24 24-20 40 24 12 50 6 62-14zM322 130c16 8 24 24 20 40-24 12-50 6-62-14z" fill="#6B9150"/>
+        <path d="M238 128c-8 30-4 58 12 78M268 132c-4 32 2 60 14 76M298 128c6 28 2 54-10 74" stroke-width="14" stroke-linecap="round" stroke="#8FAF4E" fill="none"/>
+        <path d="M238 128c-8 30-4 58 12 78M268 132c-4 32 2 60 14 76M298 128c6 28 2 54-10 74" stroke-width="5" stroke-linecap="round" fill="none" opacity=".9"/>
+      </g>
+      <path d="M0 262h400v38H0z" fill="#8FA36B"/>
+    </symbol>
+
+    <!-- Yuca -->
+    <symbol id="prod-yuca" viewBox="0 0 400 300">
+      <rect width="400" height="300" fill="#EBD9AE"/>
+      <path d="M0 218h400v82H0z" fill="#A67B4B"/>
+      <path d="M0 228c90-12 210 12 400-4v76H0z" fill="#8F6238"/>
+      <!-- hoja palmada de yuca -->
+      <g stroke="#3A2A18" stroke-width="4.5" stroke-linejoin="round">
+        <path d="M310 118V44" stroke-width="6" stroke-linecap="round"/>
+        <path d="M310 118c-4-34-26-52-56-54 10 30 30 48 56 54zM310 118c4-34 26-52 56-54-10 30-30 48-56 54zM310 116c-14-26-14-52 2-72 16 20 14 46-2 72zM310 118c-26-14-38-38-34-66 26 12 40 38 34 66zM310 118c26-14 38-38 34-66-26 12-40 38-34 66z" fill="#4C7A3D"/>
+      </g>
+      <!-- raíces -->
+      <g stroke="#3A2A18" stroke-width="5" stroke-linejoin="round">
+        <path d="M60 206c10-22 42-34 96-30 46 4 66 18 62 34-4 18-34 26-84 22-46-4-80-8-74-26z" fill="#8A5A34"/>
+        <path d="M84 200c20-8 60-10 96-4M96 216c26 6 62 8 88 2" stroke-width="3.5" fill="none" opacity=".7"/>
+        <!-- yuca partida: carne blanca -->
+        <path d="M226 214c-2-20 14-36 44-38 28-2 46 10 46 26 0 18-18 28-46 28-26 0-42-4-44-16z" fill="#8A5A34"/>
+        <ellipse cx="270" cy="214" rx="34" ry="20" fill="#F6ECD3"/>
+        <ellipse cx="270" cy="214" rx="12" ry="7" fill="none" stroke-width="3"/>
+      </g>
+    </symbol>
+
+    <!-- Aguacate -->
+    <symbol id="prod-aguacate" viewBox="0 0 400 300">
+      <rect width="400" height="300" fill="#DCE4C4"/>
+      <path d="M0 244h400v56H0z" fill="#9FB37E"/>
+      <g stroke="#3A2A18" stroke-width="5" stroke-linejoin="round">
+        <!-- entero -->
+        <path d="M136 76c22 0 34 18 38 44 6 40-8 74-38 74s-44-34-38-74c4-26 16-44 38-44z" fill="#3E6B3C"/>
+        <path d="M136 76c-2-10 2-18 10-22" fill="none" stroke-linecap="round"/>
+        <path d="M112 120c-4 22 0 44 10 56" stroke="#A5D437" stroke-width="4" fill="none" stroke-linecap="round" opacity=".7"/>
+        <!-- mitad -->
+        <path d="M268 70c24 0 38 20 42 48 7 44-9 82-42 82s-49-38-42-82c4-28 18-48 42-48z" fill="#4C7A3D"/>
+        <path d="M268 84c18 0 28 15 32 37 5 34-7 63-32 63s-37-29-32-63c3-22 14-37 32-37z" fill="#C8D96A"/>
+        <circle cx="268" cy="152" r="26" fill="#8A5A34"/>
+        <path d="M256 142c4-6 12-8 18-6" stroke="#B98A4E" stroke-width="4" fill="none" stroke-linecap="round"/>
+      </g>
+      <path d="M166 250c8-12 16-12 24 0M330 254c8-12 16-12 24 0" stroke="#7A8F5C" stroke-width="4" fill="none" stroke-linecap="round"/>
+    </symbol>
+
+    <!-- Miel -->
+    <symbol id="prod-miel" viewBox="0 0 400 300">
+      <rect width="400" height="300" fill="#F0DFB2"/>
+      <!-- panal -->
+      <g stroke="#3A2A18" stroke-width="4" fill="#E8A03C" opacity=".95">
+        <path d="M296 44l22 13v26l-22 13-22-13V57zM344 70l22 13v26l-22 13-22-13V83zM296 96l22 13v26l-22 13-22-13v-26zM344 122l22 13v26l-22 13-22-13v-26z"/>
+      </g>
+      <path d="M0 238h400v62H0z" fill="#C9A45C"/>
+      <!-- tarro -->
+      <g stroke="#3A2A18" stroke-width="5" stroke-linejoin="round">
+        <path d="M118 108h108v20c14 12 22 30 22 52 0 44-34 66-76 66s-76-22-76-66c0-22 8-40 22-52z" fill="#D98A2B"/>
+        <path d="M110 96h124v18H110z" fill="#8A5A34"/>
+        <path d="M104 172c30 12 106 12 136 0" fill="none" stroke-width="4" opacity=".65"/>
+        <path d="M134 140c-6 14-8 30-4 44" stroke="#F6C86A" stroke-width="6" fill="none" stroke-linecap="round"/>
+      </g>
+      <!-- cuchara de miel goteando -->
+      <path d="M282 176c0 20-10 32-24 32s-24-12-24-32c10-8 38-8 48 0z" fill="#E8A03C" stroke="#3A2A18" stroke-width="5" stroke-linejoin="round"/>
+      <path d="M258 210c0 10-2 18-8 24" stroke="#E8A03C" stroke-width="8" fill="none" stroke-linecap="round"/>
+      <!-- abeja -->
+      <g stroke="#3A2A18" stroke-width="3.6" stroke-linejoin="round">
+        <ellipse cx="86" cy="70" rx="20" ry="14" fill="#E8A03C"/>
+        <path d="M80 58v24M93 59v22" stroke-width="4"/>
+        <circle cx="64" cy="68" r="8" fill="#3A2A18" stroke="none"/>
+        <path d="M84 52c-2-10 6-16 12-12M92 54c2-8 12-10 16-4" fill="#F6ECD3"/>
+      </g>
+      <path d="M40 96c10 8 10 20 0 28M52 88c14 12 14 30 0 44" stroke="#B98A4E" stroke-width="3" fill="none" stroke-linecap="round" opacity=".6"/>
+    </symbol>
+
+    <!-- Café -->
+    <symbol id="prod-cafe" viewBox="0 0 400 300">
+      <rect width="400" height="300" fill="#DDE3C8"/>
+      <path d="M0 250h400v50H0z" fill="#8A6A44"/>
+      <!-- rama de cafeto -->
+      <g stroke="#3A2A18" stroke-width="5" stroke-linejoin="round">
+        <path d="M50 240C130 190 240 150 360 60" stroke-width="8" fill="none" stroke-linecap="round"/>
+        <path d="M138 196c-8-26 4-46 26-52 12 20 6 44-26 52zM230 150c-6-28 8-46 30-50 10 22 2 44-30 50zM310 100c-4-26 10-42 30-44 8 20 0 40-30 44zM168 210c26-8 46 2 52 22-20 12-44 6-52-22zM258 164c26-6 44 6 48 26-22 10-44 2-48-26z" fill="#4C7A3D"/>
+        <!-- cerezas -->
+        <circle cx="196" cy="184" r="15" fill="#C7431F"/>
+        <circle cx="222" cy="196" r="15" fill="#B93A18"/>
+        <circle cx="286" cy="140" r="14" fill="#C7431F"/>
+        <circle cx="308" cy="152" r="13" fill="#7FA35C"/>
+        <circle cx="342" cy="96" r="13" fill="#B93A18"/>
+      </g>
+      <!-- granos en el suelo -->
+      <g stroke="#3A2A18" stroke-width="4" stroke-linejoin="round">
+        <ellipse cx="96" cy="268" rx="17" ry="12" fill="#7A4B33" transform="rotate(-18 96 268)"/>
+        <ellipse cx="136" cy="276" rx="17" ry="12" fill="#8A5A34" transform="rotate(14 136 276)"/>
+        <ellipse cx="176" cy="268" rx="16" ry="11" fill="#7A4B33" transform="rotate(-10 176 268)"/>
+        <path d="M90 262c4 4 8 8 12 12M132 270c3 4 6 8 8 12M170 262c4 4 7 8 10 11" stroke-width="3"/>
+      </g>
+      <path d="M190 168c2-6 7-10 12-10M280 124c2-6 7-10 12-10" stroke="#F3D8B4" stroke-width="4" fill="none" stroke-linecap="round" opacity=".85"/>
+    </symbol>
+
+    <!-- canasto vacío (estado sin resultados) -->
+    <symbol id="il-canasto-vacio" viewBox="0 0 120 90">
+      <g stroke="#3A2A18" stroke-width="4" stroke-linejoin="round" fill="#B98A4E">
+        <path d="M14 28h92l-12 52H26z"/>
+        <path d="M20 44h80M24 60h72" fill="none" stroke-width="3"/>
+        <path d="M34 28v50M56 28v52M80 28v52M100 28v48" fill="none" stroke-width="3"/>
+        <path d="M38 28c0-14 10-22 22-22s22 8 22 22" fill="none" stroke-width="5"/>
+      </g>
+    </symbol>
+
+    <!-- sello de trazabilidad (firma visual) -->
+    <symbol id="il-sello" viewBox="0 0 100 100">
+      <!-- borde dentado de estampilla -->
+      <circle cx="50" cy="50" r="46" fill="#20281B" stroke="#A5D437" stroke-width="3" stroke-dasharray="3.5 3.1"/>
+      <circle cx="50" cy="50" r="39" fill="none" stroke="#A5D437" stroke-width="1.6"/>
+      <path id="arco-sello" d="M50 15a35 35 0 1 1-.01 0" fill="none"/>
+      <text font-family="ui-monospace,Menlo,monospace" font-size="9.2" font-weight="700" letter-spacing="2.1" fill="#A5D437">
+        <textPath href="#arco-sello">TRAZABLE · CHAGRA · TRAZABLE ·</textPath>
+      </text>
+      <path d="M36 51l9 9 19-20" stroke="#A5D437" stroke-width="6" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+    </symbol>
+
+    <!-- iconitos utilitarios -->
+    <symbol id="ic-hoja" viewBox="0 0 16 16"><path d="M8 14.5C3.8 12 2.2 7.5 3.2 2.8c4.8-.6 9.3 1.4 10.4 6.3.7 3-1.9 5.4-5.6 5.4z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M4.8 4.8c2 2.4 4 5 6.4 7.8" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round"/></symbol>
+    <symbol id="ic-pin" viewBox="0 0 16 16"><path d="M8 1.5A4.7 4.7 0 0 0 3.3 6.2C3.3 9.7 8 14.5 8 14.5s4.7-4.8 4.7-8.3A4.7 4.7 0 0 0 8 1.5z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><circle cx="8" cy="6.2" r="1.7" fill="currentColor"/></symbol>
+    <symbol id="ic-calendario" viewBox="0 0 16 16"><rect x="2" y="3" width="12" height="11" rx="2" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M2 6.5h12M5.5 1.5v3M10.5 1.5v3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></symbol>
+    <symbol id="ic-balanza" viewBox="0 0 16 16"><path d="M8 2v12M4 14h8M8 3.5L3 6c0 1.7 1.1 3 2.5 3S8 7.7 8 6M8 3.5L13 6c0 1.7-1.1 3-2.5 3S8 7.7 8 6" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+    <symbol id="ic-mano" viewBox="0 0 16 16"><path d="M5 8V3.2a1.1 1.1 0 0 1 2.2 0V7m0-2.5a1.1 1.1 0 0 1 2.2 0V7m0-1.6a1.1 1.1 0 0 1 2.2 0V8m0-.4a1.1 1.1 0 0 1 2.2.3c0 3.2-1 7-4.8 7-2.6 0-3.7-1.2-4.8-3.4L3 9.1A1.2 1.2 0 0 1 5 8z" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round"/></symbol>
+    <symbol id="ic-check" viewBox="0 0 16 16"><path d="M2.5 8.5l4 4 7-8.5" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+    <symbol id="ic-flecha-abajo" viewBox="0 0 16 16"><path d="M8 2v11M3.5 8.8L8 13.4l4.5-4.6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+    <symbol id="ic-sol" viewBox="0 0 16 16"><circle cx="8" cy="8" r="3.2" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="M8 1v2M8 13v2M1 8h2M13 8h2M3 3l1.4 1.4M11.6 11.6L13 13M13 3l-1.4 1.4M4.4 11.6L3 13" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></symbol>
+    <symbol id="ic-finca" viewBox="0 0 24 24"><path d="M3 11l9-7 9 7v9H3z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M9 20v-6h6v6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></symbol>
+    <symbol id="ic-etiqueta" viewBox="0 0 24 24"><path d="M12.6 2.5H21v8.4L11.4 20.5a2 2 0 0 1-2.8 0L3 14.9a2 2 0 0 1 0-2.8z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><circle cx="16.2" cy="7.4" r="1.8" fill="currentColor"/></symbol>
+    <symbol id="ic-apreton" viewBox="0 0 24 24"><path d="M2 9l4-4 6 2 6-2 4 4-3 3M8.5 7.5L5 11l2.6 2.6a1.6 1.6 0 0 0 2.3 0M9.9 13.6l1.6 1.6a1.6 1.6 0 0 0 2.3 0M13.8 15.2l.9.9a1.6 1.6 0 0 0 2.3 0L19 14" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  </defs>
+</svg>
+
+<!-- ================= BARRA SUPERIOR ================= -->
+<header class="topbar">
+  <div class="envoltura topbar-fila">
+    <a class="marca" href="#inicio">
+      <svg class="hoja-marca" aria-hidden="true"><use href="#il-hoja-marca"/></svg>
+      Mercado Chagra
+    </a>
+    <nav aria-label="Navegación principal">
+      <a href="#mercado">Mercado</a>
+      <a href="#productores">Productores</a>
+      <a href="#como-funciona">¿Cómo funciona?</a>
+    </nav>
+  </div>
+</header>
+
+<main id="inicio">
+  <!-- ================= HERO ================= -->
+  <section class="hero" aria-labelledby="titulo-hero">
+    <svg class="hero-paisaje" viewBox="0 0 1440 620" preserveAspectRatio="xMidYMax slice" aria-hidden="true" focusable="false">
+      <defs>
+        <linearGradient id="cielo" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stop-color="#1C140C"/>
+          <stop offset=".55" stop-color="#3A2415"/>
+          <stop offset="1" stop-color="#7A4224"/>
+        </linearGradient>
+        <radialGradient id="halo-sol" cx=".5" cy=".5" r=".5">
+          <stop offset="0" stop-color="#F6C86A" stop-opacity=".9"/>
+          <stop offset=".5" stop-color="#E8A03C" stop-opacity=".35"/>
+          <stop offset="1" stop-color="#E8A03C" stop-opacity="0"/>
+        </radialGradient>
+      </defs>
+      <rect width="1440" height="620" fill="url(#cielo)"/>
+      <circle cx="1050" cy="368" r="210" fill="url(#halo-sol)"/>
+      <circle cx="1050" cy="368" r="86" fill="#F2B24C"/>
+      <!-- cordillera en capas -->
+      <path d="M0 400l180-90 150 60 210-120 190 84 170-64 220 96 180-70 140 56v268H0z" fill="#2E4A2C" opacity=".85"/>
+      <path d="M0 468l220-84 190 58 240-96 230 80 200-56 220 76 140-40v214H0z" fill="#233A22"/>
+      <path d="M0 530l260-64 240 44 300-72 300 56 220-40 120 28v138H0z" fill="#182B18"/>
+      <!-- luciérnagas bio sobre el monte -->
+      <g fill="#A5D437">
+        <circle cx="330" cy="430" r="3" opacity=".8"/>
+        <circle cx="512" cy="392" r="2.2" opacity=".6"/>
+        <circle cx="705" cy="452" r="2.6" opacity=".75"/>
+        <circle cx="880" cy="418" r="2" opacity=".5"/>
+        <circle cx="1188" cy="470" r="2.6" opacity=".7"/>
+        <circle cx="1345" cy="428" r="2" opacity=".55"/>
+      </g>
+      <!-- hojas de plátano enmarcando -->
+      <g stroke="#0F1F10" stroke-width="6" stroke-linejoin="round" fill="#1E351D">
+        <path d="M-40 620C-30 470 60 380 210 360c10 120-60 230-250 260z"/>
+        <path d="M1480 620c-10-140-100-230-250-250-10 120 60 220 250 250z"/>
+      </g>
+      <g stroke="#385A33" stroke-width="3.5" fill="none" opacity=".8">
+        <path d="M40 560c40-60 90-110 150-180M1400 560c-40-60-90-100-150-160"/>
+      </g>
+    </svg>
+    <div class="envoltura">
+      <div class="hero-contenido">
+        <p class="estarcido">Red Chagra · Mercado con procedencia</p>
+        <h1 id="titulo-hero">Del productor a tu mesa, <em>con nombre y finca</em></h1>
+        <p class="tesis">Aquí nada llega de una bodega anónima: llega de la finca de alguien.</p>
+        <p class="detalle">Productos criados y cultivados en fincas agroecológicas de la red Chagra. Cada uno lleva quién lo produce, en qué vereda y cómo se crió — con trazabilidad verificable.</p>
+        <a class="hero-cta" href="#mercado">Ver el mercado de esta semana
+          <svg aria-hidden="true"><use href="#ic-flecha-abajo"/></svg>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- pizarra de la semana -->
+  <div class="pizarra">
+    <div class="pizarra-interna" role="status">
+      <span class="titulo-pizarra">Esta semana en el mercado —</span>
+      <span class="pizarra-dato"><strong id="dato-productos">0</strong><span>productos</span></span>
+      <span class="pizarra-dato"><strong id="dato-fincas">0</strong><span>fincas</span></span>
+      <span class="pizarra-dato"><strong id="dato-veredas">0</strong><span>veredas</span></span>
+      <span class="pizarra-dato"><strong>100%</strong><span>con procedencia</span></span>
+    </div>
+  </div>
+
+  <!-- ================= FILTROS + GRILLA ================= -->
+  <section class="filtros envoltura" id="mercado" aria-labelledby="titulo-mercado">
+    <h2 id="titulo-mercado">Lo que hay en el mercado</h2>
+    <p class="subtitulo">Filtra por tipo de producto, por quién lo produce o por vereda. Todo se combina.</p>
+
+    <div class="grupo-filtro">
+      <span class="estarcido" id="et-tipo">Tipo</span>
+      <ul class="chips" role="group" aria-labelledby="et-tipo" id="chips-tipo"></ul>
+    </div>
+    <div class="grupo-filtro">
+      <span class="estarcido" id="et-productor">Productor</span>
+      <ul class="chips" role="group" aria-labelledby="et-productor" id="chips-productor"></ul>
+    </div>
+    <div class="grupo-filtro">
+      <span class="estarcido" id="et-vereda">Vereda</span>
+      <ul class="chips" role="group" aria-labelledby="et-vereda" id="chips-vereda"></ul>
+    </div>
+
+    <div class="resumen-filtro">
+      <p aria-live="polite" id="contador"></p>
+      <button class="limpiar-filtros" id="btn-limpiar" hidden>Quitar filtros</button>
+    </div>
+
+    <ul class="grilla" id="grilla-productos"></ul>
+  </section>
+
+  <!-- ================= CÓMO FUNCIONA ================= -->
+  <section class="como" id="como-funciona" aria-labelledby="titulo-como">
+    <svg class="vena izq" aria-hidden="true"><use href="#il-vena"/></svg>
+    <svg class="vena der" aria-hidden="true"><use href="#il-vena"/></svg>
+    <div class="envoltura">
+      <p class="estarcido">Trazabilidad, no promesas</p>
+      <h2 id="titulo-como">Cada etiqueta cuenta de dónde viene lo que comes</h2>
+      <ol class="pasos">
+        <li class="paso">
+          <span class="icono-paso"><svg aria-hidden="true"><use href="#ic-finca"/></svg></span>
+          <h3>Se publica desde la finca</h3>
+          <p>El productor registra su cosecha o su cría en Chagra, con fecha, manejo agroecológico y lote. De ahí sale lo que ves aquí.</p>
+        </li>
+        <li class="paso">
+          <span class="icono-paso"><svg aria-hidden="true"><use href="#ic-etiqueta"/></svg></span>
+          <h3>Lo ves con nombre y lote</h3>
+          <p>Cada producto trae quién lo produce, en qué vereda y su sello de trazabilidad. Puedes revisar el registro cuando quieras.</p>
+        </li>
+        <li class="paso">
+          <span class="icono-paso"><svg aria-hidden="true"><use href="#ic-apreton"/></svg></span>
+          <h3>Coordinas directo con quien produce</h3>
+          <p>Sin intermediarios: dejas tu interés y el productor te contacta para acordar entrega en el mercado local o en la finca.</p>
+        </li>
+      </ol>
+    </div>
+  </section>
+
+  <!-- ================= PRODUCTORES ================= -->
+  <section class="productores envoltura" id="productores" aria-labelledby="titulo-productores">
+    <header>
+      <p class="estarcido">La gente detrás de la comida</p>
+      <h2 id="titulo-productores">Conoce a los productores</h2>
+      <p>Fincas familiares de la red Chagra. Si te interesa lo que hacen, cualquier producto suyo te conecta con su finca.</p>
+    </header>
+    <ul class="grilla-productores" id="grilla-productores"></ul>
+  </section>
+</main>
+
+<!-- ================= FOOTER ================= -->
+<footer>
+  <div class="envoltura">
+    <div class="footer-fila">
+      <div class="footer-marca">
+        <p class="marca" style="margin:0 0 10px">
+          <svg class="hoja-marca" aria-hidden="true" style="width:24px;height:24px"><use href="#il-hoja-marca"/></svg>
+          Mercado Chagra
+        </p>
+        <p>La cara pública de la trazabilidad de Chagra: <span class="trazable">cada producto tiene un registro verificable</span> de quién lo produjo, dónde y cómo.</p>
+        <p class="footer-solar">
+          <svg aria-hidden="true"><use href="#ic-sol"/></svg>
+          Corre con energía solar, desde una finca fuera de la red
+        </p>
+      </div>
+      <div>
+        <p class="estarcido" style="color:#C9B490;margin:0 0 10px">Secciones</p>
+        <p style="margin:0;font-size:.9rem;line-height:2"><a href="#mercado" style="text-decoration:none">Mercado de la semana</a><br><a href="#productores" style="text-decoration:none">Productores</a><br><a href="#como-funciona" style="text-decoration:none">¿Cómo funciona?</a></p>
+      </div>
+    </div>
+    <div class="footer-nota">
+      <span>Mercado Chagra · mercado.chagra.bio — mockup de diseño, sin ventas en línea todavía.</span>
+      <span>Agroecología real, sin letra menuda.</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+/* ============================================================
+   CONTRATO DE DATOS — reemplazar este objeto por el feed real.
+   Forma acordada:
+   {
+     productos:   [{ id, nombre, variedad, categoria, foto, precio, unidad,
+                     disponible, temporada, agroecologico, trazabilidadUrl,
+                     productor: { id, nombre, avatar, finca, vereda, bio } }],
+     productores: [{ id, nombre, avatar, finca, vereda, bio, productos: [ids] }]
+   }
+   Notas de render:
+   - `foto`/`avatar` vacíos → el mockup usa su ilustración local (por id).
+   - `precio: null` → "Precio a convenir con el productor".
+   ============================================================ */
+const MERCADO_DATA = {
+  productos: [
+    {
+      id: "cerdo-campo-javier", nombre: "Cerdo de campo", variedad: "Levante y ceba en pastoreo",
+      categoria: "proteina", foto: "", precio: null, unidad: "en pie, según peso",
+      disponible: true, temporada: "Todo el año",
+      agroecologico: true, trazabilidadUrl: "#trazabilidad/cerdo-campo-javier",
+      historia: "Los marranos de Javier crecen a campo abierto, con suero, plátano y maíz de la misma finca. Ni jaulas ni afán.",
+      productor: { id: "javier", nombre: "Javier", avatar: "", finca: "Finca La Esperanza", vereda: "El Recreo", bio: "" }
+    },
+    {
+      id: "cerdo-pie-cria-elkin", nombre: "Cerdo de campo", variedad: "Pie de cría y lechones",
+      categoria: "proteina", foto: "", precio: null, unidad: "por animal",
+      disponible: true, temporada: "Camadas cada temporada",
+      agroecologico: true, trazabilidadUrl: "#trazabilidad/cerdo-pie-cria-elkin",
+      historia: "Elkin selecciona sus cerdas de cría por mansedumbre y buena leche. Entrega lechones destetos, sanos y acostumbrados al campo.",
+      productor: { id: "elkin", nombre: "Elkin", avatar: "", finca: "Finca Buenavista", vereda: "La Palma", bio: "" }
+    },
+    {
+      id: "tomate-chonto-david", nombre: "Tomate chonto", variedad: "Orgánico, madurado en mata",
+      categoria: "verdura", foto: "", precio: 5000, unidad: "kg",
+      disponible: true, temporada: "Cosecha semanal",
+      agroecologico: true, trazabilidadUrl: "#trazabilidad/tomate-chonto-david",
+      historia: "David abona con compost de la finca y controla plagas con extractos vegetales. Se cosecha el mismo día que baja al mercado.",
+      productor: { id: "david", nombre: "David", avatar: "", finca: "Finca El Porvenir", vereda: "San Isidro", bio: "" }
+    },
+    {
+      id: "huevos-criollos-rosalba", nombre: "Huevos criollos", variedad: "Gallina feliz, de patio",
+      categoria: "proteina", foto: "", precio: 28000, unidad: "cubeta x30",
+      disponible: true, temporada: "Postura todo el año",
+      agroecologico: true, trazabilidadUrl: "#trazabilidad/huevos-criollos-rosalba",
+      historia: "Las gallinas de doña Rosalba duermen en árbol y escarban monte. Yema naranja de verdad, no de colorante.",
+      productor: { id: "rosalba", nombre: "Rosalba", avatar: "", finca: "Finca El Guayabo", vereda: "La Palma", bio: "" }
+    },
+    {
+      id: "platano-harton-aurelio", nombre: "Plátano hartón", variedad: "Racimo verde o pintón",
+      categoria: "fruta", foto: "", precio: 6000, unidad: "mano",
+      disponible: true, temporada: "Corte cada 15 días",
+      agroecologico: true, trazabilidadUrl: "#trazabilidad/platano-harton-aurelio",
+      historia: "El platanal de don Aurelio crece entre sombrío de guamo, sin un solo riego químico en veinte años.",
+      productor: { id: "aurelio", nombre: "Aurelio", avatar: "", finca: "Finca La Cañada", vereda: "El Recreo", bio: "" }
+    },
+    {
+      id: "yuca-dulce-nubia", nombre: "Yuca dulce", variedad: "Blanca, recién arrancada",
+      categoria: "verdura", foto: "", precio: 3200, unidad: "kg",
+      disponible: false, temporada: "Vuelve en agosto",
+      agroecologico: true, trazabilidadUrl: "#trazabilidad/yuca-dulce-nubia",
+      historia: "Nubia arranca la yuca por encargo, la misma mañana de la entrega, para que no se avinagre. Por eso a veces toca esperar.",
+      productor: { id: "nubia", nombre: "Nubia", avatar: "", finca: "Finca Los Naranjos", vereda: "San Isidro", bio: "" }
+    },
+    {
+      id: "aguacate-hass-teodoro", nombre: "Aguacate", variedad: "Hass de clima frío",
+      categoria: "fruta", foto: "", precio: 8500, unidad: "kg",
+      disponible: true, temporada: "Cosecha principal jun–sep",
+      agroecologico: true, trazabilidadUrl: "#trazabilidad/aguacate-hass-teodoro",
+      historia: "Teodoro deja madurar el hass en el árbol hasta el punto exacto de aceite. Cremoso, sin cámaras de maduración.",
+      productor: { id: "teodoro", nombre: "Teodoro", avatar: "", finca: "Finca Alto del Roble", vereda: "Piedra Grande", bio: "" }
+    },
+    {
+      id: "miel-abejas-marina", nombre: "Miel de abejas", variedad: "Multifloral de monte",
+      categoria: "procesado", foto: "", precio: 38000, unidad: "frasco 500 g",
+      disponible: true, temporada: "Cosecha de mitaca",
+      agroecologico: true, trazabilidadUrl: "#trazabilidad/miel-abejas-marina",
+      historia: "Las colmenas de Marina viven al borde del bosque. Miel cruda, colada a mano, sin calentar ni mezclar.",
+      productor: { id: "marina", nombre: "Marina", avatar: "", finca: "Finca La Colmena", vereda: "Piedra Grande", bio: "" }
+    },
+    {
+      id: "cafe-pergamino-custodio", nombre: "Café de finca", variedad: "Castillo, secado al sol",
+      categoria: "procesado", foto: "", precio: 42000, unidad: "bolsa 500 g",
+      disponible: true, temporada: "Cosecha oct–dic · mitaca abr–may",
+      agroecologico: true, trazabilidadUrl: "#trazabilidad/cafe-pergamino-custodio",
+      historia: "Don Custodio recoge solo cereza madura y seca en marquesina solar. Tueste medio por encargo, molido si lo pides.",
+      productor: { id: "custodio", nombre: "Custodio", avatar: "", finca: "Finca El Mirador", vereda: "Alto Bonito", bio: "" }
+    }
+  ],
+  productores: [
+    { id: "javier", nombre: "Javier", avatar: "", finca: "Finca La Esperanza", vereda: "El Recreo",
+      bio: "Porcicultor de campo. Cría en pastoreo con alimento de la misma finca y lleva registro de cada animal en Chagra.",
+      productos: ["cerdo-campo-javier"] },
+    { id: "elkin", nombre: "Elkin", avatar: "", finca: "Finca Buenavista", vereda: "La Palma",
+      bio: "Se especializó en pie de cría: cerdas mansas, camadas sanas y lechones acostumbrados al campo desde el destete.",
+      productos: ["cerdo-pie-cria-elkin"] },
+    { id: "david", nombre: "David", avatar: "", finca: "Finca El Porvenir", vereda: "San Isidro",
+      bio: "Tomatero orgánico. Compost propio, control biológico y cosecha del día. Su chonto es el que más rápido se agota.",
+      productos: ["tomate-chonto-david"] },
+    { id: "rosalba", nombre: "Rosalba", avatar: "", finca: "Finca El Guayabo", vereda: "La Palma",
+      bio: "Sus gallinas criollas viven sueltas entre frutales. Vende por cubeta y guarda clientela fija hace años.",
+      productos: ["huevos-criollos-rosalba"] },
+    { id: "aurelio", nombre: "Aurelio", avatar: "", finca: "Finca La Cañada", vereda: "El Recreo",
+      bio: "Veinte años cuidando el mismo platanal bajo sombrío de guamo. Corta por encargo, cada quincena.",
+      productos: ["platano-harton-aurelio"] },
+    { id: "nubia", nombre: "Nubia", avatar: "", finca: "Finca Los Naranjos", vereda: "San Isidro",
+      bio: "Yuca y pancoger. Arranca el mismo día de la entrega para que llegue fresca; trabaja por pedidos.",
+      productos: ["yuca-dulce-nubia"] },
+    { id: "teodoro", nombre: "Teodoro", avatar: "", finca: "Finca Alto del Roble", vereda: "Piedra Grande",
+      bio: "Aguacatero de clima frío. Cosecha por punto de aceite, no por calendario, y poda con la luna menguante.",
+      productos: ["aguacate-hass-teodoro"] },
+    { id: "marina", nombre: "Marina", avatar: "", finca: "Finca La Colmena", vereda: "Piedra Grande",
+      bio: "Apicultora. Sus colmenas polinizan medio bosque; su miel cruda se cosecha dos veces al año.",
+      productos: ["miel-abejas-marina"] },
+    { id: "custodio", nombre: "Custodio", avatar: "", finca: "Finca El Mirador", vereda: "Alto Bonito",
+      bio: "Caficultor de ladera. Variedad Castillo, beneficio limpio y secado en marquesina solar.",
+      productos: ["cafe-pergamino-custodio"] }
+  ]
+};
+
+/* ===================== capa de presentación (mockup) ===================== */
+
+const CATEGORIAS = {
+  proteina:  { etiqueta: "Proteína" },
+  verdura:   { etiqueta: "Verdura" },
+  fruta:     { etiqueta: "Fruta" },
+  procesado: { etiqueta: "Procesados" }
+};
+
+/* ilustración local por producto (fallback cuando `foto` viene vacía) */
+const ILUSTRACIONES = {
+  "cerdo-campo-javier": "prod-cerdo-1",
+  "cerdo-pie-cria-elkin": "prod-cerdo-2",
+  "tomate-chonto-david": "prod-tomate",
+  "huevos-criollos-rosalba": "prod-huevos",
+  "platano-harton-aurelio": "prod-platano",
+  "yuca-dulce-nubia": "prod-yuca",
+  "aguacate-hass-teodoro": "prod-aguacate",
+  "miel-abejas-marina": "prod-miel",
+  "cafe-pergamino-custodio": "prod-cafe"
+};
+
+/* Retratos paramétricos (nada de caras fotográficas inventadas) */
+const RETRATOS = {
+  javier:   { piel: "#B97A4E", fondo: "#7FA35C", sombrero: "campesino", camisa: "#4C7A3D", bigote: true },
+  elkin:    { piel: "#8A5A34", fondo: "#E8A03C", sombrero: "cachucha",  camisa: "#3A5A78", bigote: false },
+  david:    { piel: "#C98A5E", fondo: "#C7431F", sombrero: "ninguno",   camisa: "#7A4B33", bigote: false },
+  rosalba:  { piel: "#A66B3F", fondo: "#B0552E", sombrero: "panuelo",   camisa: "#C24C28", bigote: false, pelo: "recogido" },
+  aurelio:  { piel: "#7A4B33", fondo: "#4C7A3D", sombrero: "campesino", camisa: "#8A6A44", bigote: true, canas: true },
+  nubia:    { piel: "#B97A4E", fondo: "#5B8A4A", sombrero: "panuelo",   camisa: "#3E6B3C", bigote: false, pelo: "recogido" },
+  teodoro:  { piel: "#C98A5E", fondo: "#3A5A78", sombrero: "campesino", camisa: "#2F4858", bigote: false },
+  marina:   { piel: "#D9A06B", fondo: "#E8C25C", sombrero: "velo",      camisa: "#B98A4E", bigote: false, pelo: "suelto" },
+  custodio: { piel: "#8A5A34", fondo: "#7A4B33", sombrero: "campesino", camisa: "#B93A18", bigote: true, canas: true }
+};
+
+function svgRetrato(id) {
+  const r = RETRATOS[id] || { piel: "#B97A4E", fondo: "#7FA35C", sombrero: "campesino", camisa: "#4C7A3D" };
+  const t = "#3A2A18";
+  let sombrero = "";
+  if (r.sombrero === "campesino") {
+    sombrero = `<ellipse cx="50" cy="34" rx="34" ry="9" fill="#E9D5AC" stroke="${t}" stroke-width="3"/>
+      <path d="M32 33c0-14 8-22 18-22s18 8 18 22z" fill="#E9D5AC" stroke="${t}" stroke-width="3"/>
+      <path d="M33 30h34" stroke="#8A5A34" stroke-width="4"/>`;
+  } else if (r.sombrero === "cachucha") {
+    sombrero = `<path d="M30 36c0-13 9-21 20-21s20 8 20 21z" fill="#2F4858" stroke="${t}" stroke-width="3"/>
+      <path d="M48 34h26c4 0 5 6 0 6H50z" fill="#2F4858" stroke="${t}" stroke-width="3"/>`;
+  } else if (r.sombrero === "panuelo") {
+    sombrero = `<path d="M28 40c0-16 10-25 22-25s22 9 22 25l-6 4c0-14-6-20-16-20s-16 6-16 20z" fill="#C7431F" stroke="${t}" stroke-width="3"/>
+      <path d="M70 42l8 8-10 1z" fill="#C7431F" stroke="${t}" stroke-width="3"/>`;
+  } else if (r.sombrero === "velo") {
+    sombrero = `<path d="M27 40c0-17 10-26 23-26s23 9 23 26v16h-6V42c0-12-7-19-17-19s-17 7-17 19v14h-6z" fill="#F6ECD3" stroke="${t}" stroke-width="3"/>`;
+  } else if (r.pelo === "suelto") {
+    sombrero = `<path d="M30 42c0-16 9-24 20-24s20 8 20 24v14h-8V44h-24v12h-8z" fill="#3A2A18"/>`;
+  } else {
+    sombrero = `<path d="M31 38c1-12 9-19 19-19s18 7 19 19c-6-6-12-8-19-8s-13 2-19 8z" fill="#3A2A18"/>`;
+  }
+  const moñoOPelo = r.pelo === "recogido"
+    ? `<circle cx="76" cy="30" r="7" fill="#3A2A18"/>` : "";
+  const bigote = r.bigote
+    ? `<path d="M42 60c3-3 6-4 8-2 2-2 5-1 8 2-3 3-13 3-16 0z" fill="${r.canas ? "#CFC4AE" : t}"/>` : "";
+  const canasSien = r.canas
+    ? `<path d="M33 44c2-4 4-7 7-9M67 44c-2-4-4-7-7-9" stroke="#CFC4AE" stroke-width="3" fill="none" stroke-linecap="round"/>` : "";
+  return `<svg viewBox="0 0 100 100" role="img" aria-hidden="true" focusable="false">
+    <rect width="100" height="100" fill="${r.fondo}"/>
+    <path d="M22 100c2-20 13-30 28-30s26 10 28 30z" fill="${r.camisa}" stroke="${t}" stroke-width="3"/>
+    <circle cx="50" cy="48" r="21" fill="${r.piel}" stroke="${t}" stroke-width="3"/>
+    ${moñoOPelo}${sombrero}${canasSien}
+    <circle cx="43" cy="48" r="2.2" fill="${t}"/><circle cx="57" cy="48" r="2.2" fill="${t}"/>
+    ${bigote}
+    <path d="M45 ${r.bigote ? 66 : 60}c3 3 7 3 10 0" stroke="${t}" stroke-width="2.6" fill="none" stroke-linecap="round"/>
+  </svg>`;
+}
+
+const $ = (sel) => document.querySelector(sel);
+const esc = (s) => String(s).replace(/[&<>"']/g, (c) =>
+  ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+
+const formatoPrecio = new Intl.NumberFormat("es-CO", {
+  style: "currency", currency: "COP", maximumFractionDigits: 0
+});
+
+function loteDe(id) {
+  /* número de lote determinístico para el mockup */
+  let h = 0;
+  for (const c of id) h = (h * 31 + c.charCodeAt(0)) % 997;
+  return `CH-2026-${String(100 + h).slice(-3)}`;
+}
+
+/* ---------- estado de filtros ---------- */
+const filtro = { categoria: null, productor: null, vereda: null };
+
+function productosFiltrados() {
+  return MERCADO_DATA.productos.filter((p) =>
+    (!filtro.categoria || p.categoria === filtro.categoria) &&
+    (!filtro.productor || p.productor.id === filtro.productor) &&
+    (!filtro.vereda || p.productor.vereda === filtro.vereda)
+  );
+}
+
+function chip({ etiqueta, valor, grupo, avatarId }) {
+  const activo = filtro[grupo] === valor;
+  const mini = avatarId
+    ? `<span class="mini-avatar" aria-hidden="true">${svgRetrato(avatarId)}</span>` : "";
+  return `<li><button type="button" class="chip" data-grupo="${grupo}" data-valor="${esc(valor ?? "")}"
+    aria-pressed="${activo}">${mini}${esc(etiqueta)}</button></li>`;
+}
+
+function pintarChips() {
+  const cats = Object.entries(CATEGORIAS);
+  $("#chips-tipo").innerHTML =
+    chip({ etiqueta: "Todo", valor: "", grupo: "categoria" }) +
+    cats.map(([v, c]) => chip({ etiqueta: c.etiqueta, valor: v, grupo: "categoria" })).join("");
+
+  $("#chips-productor").innerHTML =
+    chip({ etiqueta: "Cualquiera", valor: "", grupo: "productor" }) +
+    MERCADO_DATA.productores.map((p) =>
+      chip({ etiqueta: p.nombre, valor: p.id, grupo: "productor", avatarId: p.id })).join("");
+
+  const veredas = [...new Set(MERCADO_DATA.productores.map((p) => p.vereda))];
+  $("#chips-vereda").innerHTML =
+    chip({ etiqueta: "Todas", valor: "", grupo: "vereda" }) +
+    veredas.map((v) => chip({ etiqueta: `Vereda ${v}`, valor: v, grupo: "vereda" })).join("");
+}
+
+/* ---------- tarjetas de producto ---------- */
+function tarjetaProducto(p) {
+  const cat = CATEGORIAS[p.categoria]?.etiqueta || p.categoria;
+  const media = p.foto
+    ? `<img src="${esc(p.foto)}" alt="${esc(p.nombre)} — ${esc(p.variedad)}">`
+    : `<svg role="img" aria-label="Ilustración: ${esc(p.nombre)}, ${esc(p.variedad)}"><use href="#${ILUSTRACIONES[p.id] || "prod-tomate"}"/></svg>`;
+  const precio = p.precio != null
+    ? `<li class="badge precio"><svg aria-hidden="true"><use href="#ic-balanza"/></svg>${formatoPrecio.format(p.precio)} / ${esc(p.unidad)}</li>`
+    : `<li class="badge precio"><svg aria-hidden="true"><use href="#ic-balanza"/></svg>Precio a convenir · ${esc(p.unidad)}</li>`;
+  const dispo = p.disponible
+    ? `<li class="badge temporada"><svg aria-hidden="true"><use href="#ic-calendario"/></svg>${esc(p.temporada)}</li>`
+    : `<li class="badge agotado"><svg aria-hidden="true"><use href="#ic-calendario"/></svg>Agotado · ${esc(p.temporada)}</li>`;
+  const boton = p.disponible
+    ? `<button type="button" class="btn-interes" data-producto="${esc(p.id)}">
+         <svg aria-hidden="true"><use href="#ic-mano"/></svg>Me interesa</button>`
+    : `<button type="button" class="btn-interes" disabled>Vuelve pronto</button>`;
+
+  return `<li>
+    <article class="tarjeta" aria-labelledby="t-${esc(p.id)}">
+      <span class="ojal" aria-hidden="true"></span>
+      <div class="tarjeta-foto">
+        ${media}
+        <a class="sello" href="${esc(p.trazabilidadUrl)}"
+           aria-label="Ver trazabilidad de ${esc(p.nombre)} en Chagra, lote ${loteDe(p.id)}">
+          <svg aria-hidden="true"><use href="#il-sello"/></svg>
+          <span class="globo" role="tooltip">Registro verificable en Chagra · lote ${loteDe(p.id)}</span>
+        </a>
+      </div>
+      <div class="tarjeta-cuerpo">
+        <div class="linea-lote">
+          <span class="estarcido">${esc(cat)}</span>
+          <span class="lote">LOTE ${loteDe(p.id)}</span>
+        </div>
+        <h3 id="t-${esc(p.id)}">${esc(p.nombre)}</h3>
+        <p class="variedad">${esc(p.variedad)}</p>
+        <div class="fila-productor">
+          <span class="avatar" aria-hidden="true">${p.productor.avatar ? `<img src="${esc(p.productor.avatar)}" alt="">` : svgRetrato(p.productor.id)}</span>
+          <p class="quien"><strong>${esc(p.productor.nombre)} · ${esc(p.productor.finca)}</strong>
+          <span><svg aria-hidden="true" style="display:inline;width:11px;height:11px;vertical-align:-1px"><use href="#ic-pin"/></svg> Vereda ${esc(p.productor.vereda)}</span></p>
+        </div>
+        <ul class="badges">
+          ${p.agroecologico ? `<li class="badge eco"><svg aria-hidden="true"><use href="#ic-hoja"/></svg>Agroecológico</li>` : ""}
+          ${dispo}
+          ${precio}
+        </ul>
+        <details class="historia">
+          <summary>Su historia</summary>
+          <p>${esc(p.historia || "")}</p>
+        </details>
+        <div class="tarjeta-pie">${boton}</div>
+      </div>
+    </article>
+  </li>`;
+}
+
+function pintarGrilla() {
+  const lista = productosFiltrados();
+  const grilla = $("#grilla-productos");
+  if (!lista.length) {
+    grilla.innerHTML = `<li class="sin-resultados">
+      <svg class="canasto-vacio" aria-hidden="true"><use href="#il-canasto-vacio"/></svg>
+      <h3>El canasto quedó vacío</h3>
+      <p>No hay productos con esa combinación esta semana. Quita algún filtro o vuelve el próximo mercado.</p>
+    </li>`;
+  } else {
+    grilla.innerHTML = lista.map(tarjetaProducto).join("");
+  }
+  const n = lista.length;
+  const hayFiltro = filtro.categoria || filtro.productor || filtro.vereda;
+  $("#contador").innerHTML = `Mostrando <strong>${n}</strong> ${n === 1 ? "producto" : "productos"}${hayFiltro ? " con tus filtros" : " de la semana"}`;
+  $("#btn-limpiar").hidden = !hayFiltro;
+}
+
+/* ---------- productores ---------- */
+function pintarProductores() {
+  $("#grilla-productores").innerHTML = MERCADO_DATA.productores.map((pr) => {
+    const nombres = pr.productos
+      .map((id) => MERCADO_DATA.productos.find((p) => p.id === id))
+      .filter(Boolean)
+      .map((p) => `${p.nombre}`);
+    return `<li>
+      <article class="perfil" aria-labelledby="pr-${esc(pr.id)}">
+        <span class="retrato" aria-hidden="true">${pr.avatar ? `<img src="${esc(pr.avatar)}" alt="">` : svgRetrato(pr.id)}</span>
+        <div>
+          <h3 id="pr-${esc(pr.id)}">${esc(pr.nombre)}</h3>
+          <p class="finca-linea">${esc(pr.finca)} · Vereda ${esc(pr.vereda)}</p>
+          <p class="bio">${esc(pr.bio)}</p>
+          <ul class="cultiva">${nombres.map((nm) => `<li>${esc(nm)}</li>`).join("")}</ul>
+        </div>
+      </article>
+    </li>`;
+  }).join("");
+}
+
+/* ---------- pizarra ---------- */
+function pintarPizarra() {
+  const fincas = new Set(MERCADO_DATA.productores.map((p) => p.finca));
+  const veredas = new Set(MERCADO_DATA.productores.map((p) => p.vereda));
+  $("#dato-productos").textContent = MERCADO_DATA.productos.length;
+  $("#dato-fincas").textContent = fincas.size;
+  $("#dato-veredas").textContent = veredas.size;
+}
+
+/* ---------- interacción ---------- */
+document.addEventListener("click", (ev) => {
+  const chipBtn = ev.target.closest(".chip");
+  if (chipBtn) {
+    const { grupo, valor } = chipBtn.dataset;
+    filtro[grupo] = (valor === "" || filtro[grupo] === valor) ? null : valor;
+    pintarChips();
+    pintarGrilla();
+    return;
+  }
+  const interes = ev.target.closest(".btn-interes[data-producto]");
+  if (interes && interes.dataset.estado !== "enviado") {
+    interes.dataset.estado = "enviado";
+    interes.innerHTML = `<svg aria-hidden="true"><use href="#ic-check"/></svg>Recibido — el productor te contacta`;
+    interes.setAttribute("aria-live", "polite");
+    return;
+  }
+  if (ev.target.closest("#btn-limpiar")) {
+    filtro.categoria = filtro.productor = filtro.vereda = null;
+    pintarChips();
+    pintarGrilla();
+  }
+});
+
+pintarChips();
+pintarGrilla();
+pintarProductores();
+pintarPizarra();
+</script>
+</body>
+</html>
