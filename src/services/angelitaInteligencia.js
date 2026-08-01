@@ -402,6 +402,36 @@ export function debeHablar({
  * 6. EL RESOLVEDOR — arbitra los cuatro comportamientos y arma la decisión.
  * ────────────────────────────────────────────────────────────────────────── */
 
+/** Tope duro de un mensaje del compAI (#59): 2-3 líneas en móvil, no un
+ *  párrafo. ~110 caracteres por línea a un tamaño de burbuja cómodo × 2
+ *  líneas de margen sano antes de la 3ra — más que eso ya lee como el LLM
+ *  completo, no como el compañero de paso. */
+const TOPE_MENSAJE_CHARS = 220;
+
+/**
+ * Recorta un mensaje al tope de la casa SIN cortar a mitad de palabra ni de
+ * oración cuando se puede evitar: prefiere el último punto/interrogación
+ * dentro del tope; si no hay ninguno razonablemente cerca, corta en el
+ * último espacio y cierra con "…". Mensajes ya cortos no se tocan.
+ * @param {string|null} mensaje
+ * @param {number} [tope]
+ * @returns {string|null}
+ */
+export function recortarMensaje(mensaje, tope = TOPE_MENSAJE_CHARS) {
+  if (typeof mensaje !== 'string') return mensaje ?? null;
+  if (mensaje.length <= tope) return mensaje;
+  const ventana = mensaje.slice(0, tope);
+  const ultimaOracion = Math.max(ventana.lastIndexOf('. '), ventana.lastIndexOf('? '), ventana.lastIndexOf('! '));
+  // Sólo usamos el corte "en oración" si no descarta más de un tercio del
+  // tope — si no, es preferible el corte con elipsis a perder media frase.
+  if (ultimaOracion > tope * 0.66) return ventana.slice(0, ultimaOracion + 1).trim();
+  const ultimoEspacio = ventana.lastIndexOf(' ');
+  // Sin espacio usable (una sola palabra/token larguísimo, ej. una URL): se
+  // corta duro al tope menos el "…" — el resultado NUNCA excede `tope`.
+  const corte = ultimoEspacio > 0 ? ventana.slice(0, ultimoEspacio) : ventana.slice(0, Math.max(0, tope - 1));
+  return `${corte.trim()}…`;
+}
+
 /**
  * @typedef {Object} DecisionAngelita
  * @property {('calma'|'aviso'|'celebra'|'husmea'|'luto')} estado — comportamiento elegido.
@@ -562,7 +592,8 @@ export function resolverComportamiento(ctx = {}) {
   return {
     estado: /** @type {any} */ (ganador.estado),
     visualEstado: estadoVisualDeComportamiento(ganador.estado, { severidad: ganador.severidad }),
-    mensaje: ganador.mensaje,
+    // #59: tope de 2-3 líneas — la burbuja del compAI no es el chat completo.
+    mensaje: recortarMensaje(ganador.mensaje),
     aria: ariaDeComportamiento(ganador.estado),
     severidad: ganador.severidad,
     prioridad: ganador.prioridad,
