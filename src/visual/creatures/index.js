@@ -136,6 +136,37 @@ export { Sirfido } from './Sirfido.jsx';
    detrás del ganado y rompe el ciclo de la larva. Dos plumajes (colorada y
    clara sarabiada) para que la parvada no se vea clonada. */
 export { Gallina } from './Gallina.jsx';
+/* LA ZARIGÜEYA (chucha/fara/runcho) — el MARSUPIAL NOCTURNO de la finca: LA
+   QUE CARGA. El personaje base LLEVA LAS CRÍAS AL LOMO (no es un adorno que se
+   agrega después: es su firma de SILUETA y es conducta real de Didelphis —
+   salen del marsupio a los ~70 días y viajan en la espalda mientras la madre
+   forrajea). Su firma no depende del color: crías al lomo, hocico en cuña,
+   cola prensil desnuda con gancho y orejas grandes redondas — todo sobrevive
+   al test de negro sobre blanco (ver ZARIGUYA_FIRMA). */
+export { Zariguya } from './Zariguya.jsx';
+/* La IDENTIDAD de la zarigüeya como datos (paleta ceniza + cara pálida + piel
+   rosada desnuda, proporciones, su perfil de clima y —explícito— su CONTRATO
+   DE SILUETA). Solo datos: jamás arrastra three al bundle base — igual que
+   dantaIdentidad/jaguarIdentidad. */
+export {
+  ZARIGUYA_FIRMA, ZARIGUYA_PALETA, ZARIGUYA_PRESENCIA, ZARIGUYA_PROPORCION,
+  ZARIGUYA_SLUG, ZARIGUYA_TINTA, PERFIL_ZARIGUYA,
+} from './zariguyaIdentidad.js';
+/* EL MAÍZ COMPAÑERO — Zea mays, la mata madre de la milpa: LA QUE ALIMENTA.
+   El avatar-planta ('maiz' en useAgentAvatarType) hecho personaje rubber-hose:
+   ARRAIGADO (no viaja — el único del elenco sin pies: tiene montículo y
+   raíces), mecido por la brisa (cada hoja a su compás), coronado por el
+   penacho que VIBRA al reaccionar, con la mazorca al costado como carga y
+   regalo. Su firma sobrevive al negro sobre blanco (ver MAIZ_FIRMA). */
+export { MaizCompai } from './MaizCompai.jsx';
+/* La IDENTIDAD del maíz como datos (paleta milpa + proporciones + firma de
+   silueta + PRESENCIA 3D + perfil de clima — sequía 0.95: la seca se le nota
+   de una). Solo datos: jamás arrastra three al bundle base — igual que
+   zariguyaIdentidad/abejaIdentidad. */
+export {
+  MAIZ_FIRMA, MAIZ_PALETA, MAIZ_PRESENCIA, MAIZ_PROPORCION, MAIZ_SLUG,
+  MAIZ_TINTA, PERFIL_MAIZ,
+} from './maizIdentidad.js';
 /* EL ENT DEL PÁRAMO — el árbol-guardián que enseña (frailejón gigante). NO es un
    bicho: es el corazón del "Bosque Vivo". Hereda la MISMA fundación transversal
    (line-boil, lip-sync, modo-poder=guardián, clima) adaptada a su escala y su
@@ -182,6 +213,14 @@ export {
   elegirMomentoVida, duracionDeMomentoVida, duracionDeDescanso, crearRitmoPropio,
 } from './vidaEstados.js';
 export { useVidaIdle, useRitmoPropio, useMiradaUsted, prefiereQuietud } from './useVidaIdle.js';
+// LA LEY rubber-hose como datos: tinta/blancos canónicos, easings por fase,
+// compás del line-boil, períodos co-primos del idle y el registro
+// rubber-hose-vs-realista. GUIA humana: src/visual/GUIA-RUBBERHOSE.md.
+export {
+  RH_SPEC_TINTA, RH_SPEC_PUPILA, RH_SPEC_HUESO, RH_SPEC_GUANTE,
+  RH_SPEC_CHISPA, RH_SPEC_CHAPETA, RH_SPEC_BOCA, RH_SPEC_LENGUA,
+  RH_EASE, RH_LINE_BOIL, RH_PERIODOS, RH_REGISTRO, esRubberhose,
+} from './rubberhoseSpec.js';
 
 import AbejaAngelita from './AbejaAngelita.jsx';
 import Colibri from './Colibri.jsx';
@@ -204,6 +243,8 @@ import Crisopa from './Crisopa.jsx';
 import Trichogramma from './Trichogramma.jsx';
 import Sirfido from './Sirfido.jsx';
 import Gallina from './Gallina.jsx';
+import Zariguya from './Zariguya.jsx';
+import MaizCompai from './MaizCompai.jsx';
 import EntFrailejon from './EntFrailejon.jsx';
 
 /* Registro consultable: slug → componente + binomio verificado. */
@@ -240,6 +281,12 @@ export const CREATURES = {
   sirfido: { Component: Sirfido, nombre: 'Mosca de las flores (sírfido)', cientifico: 'Syrphidae' },
   // El animal de patio de la casa campesina (el del gallinero que camina).
   gallina: { Component: Gallina, nombre: 'Gallina criolla', cientifico: 'Gallus gallus domesticus' },
+  // El marsupial nocturno de la finca (la que sale de noche a limpiar la
+  // huerta — con las crías al lomo).
+  zariguya: { Component: Zariguya, nombre: 'Zarigüeya (chucha)', cientifico: 'Didelphis marsupialis' },
+  // La mata madre de la milpa (flora compañera, como el Ent): el avatar-planta
+  // arraigado que se mece, alimenta y corona en espiga.
+  maiz: { Component: MaizCompai, nombre: 'Planta de maíz', cientifico: 'Zea mays' },
   // El árbol-maestro del Bosque Vivo (flora, no fauna): el frailejón guardián.
   'ent-frailejon': { Component: EntFrailejon, nombre: 'El Ent del páramo', cientifico: 'Espeletia sp.' },
 };

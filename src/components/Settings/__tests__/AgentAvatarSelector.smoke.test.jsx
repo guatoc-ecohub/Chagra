@@ -7,11 +7,29 @@ describe('AgentAvatarSelector smoke', () => {
         localStorage.clear();
     });
 
-    it('renderiza 2 opciones: angelita + maiz (el colibrí jubiló)', () => {
+    it('renderiza 3 opciones: angelita + maiz + zarigüeya (el colibrí jubiló)', () => {
         render(<AgentAvatarSelector />);
         expect(screen.getByText('Angelita, la abeja', { selector: 'p' })).toBeInTheDocument();
         expect(screen.getByText('Planta de maíz')).toBeInTheDocument();
+        expect(screen.getByText('Zarigüeya', { selector: 'p' })).toBeInTheDocument();
         expect(screen.queryByText(/colibrí/i)).toBeNull();
+    });
+
+    it('click en zarigüeya cambia la preferencia y persiste en localStorage', () => {
+        render(<AgentAvatarSelector />);
+        const zariguyaBtn = screen.getByText('Zarigüeya', { selector: 'p' }).closest('button');
+        fireEvent.click(zariguyaBtn);
+        expect(zariguyaBtn).toHaveAttribute('aria-pressed', 'true');
+        expect(localStorage.getItem('chagra:agent-avatar-type')).toBe('zariguya');
+        const angelitaBtn = screen.getByText('Angelita, la abeja', { selector: 'p' }).closest('button');
+        expect(angelitaBtn).toHaveAttribute('aria-pressed', 'false');
+    });
+
+    it('localStorage zariguya preselecciona zarigüeya al montar', () => {
+        localStorage.setItem('chagra:agent-avatar-type', 'zariguya');
+        render(<AgentAvatarSelector />);
+        const zariguyaBtn = screen.getByText('Zarigüeya', { selector: 'p' }).closest('button');
+        expect(zariguyaBtn).toHaveAttribute('aria-pressed', 'true');
     });
 
     it('angelita seleccionada por default', () => {

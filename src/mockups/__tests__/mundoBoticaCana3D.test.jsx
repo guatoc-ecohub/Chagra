@@ -107,6 +107,21 @@ describe('MundoBoticaCana3D', () => {
       expect(ojo.getAttribute('position')).toBe('10.4,5.2,3.3');
     });
 
+    test.each([
+      ['1. La caña', '9.5,3.6,-4.5', '10.4,5.2,3.3'],
+      ['2. El molino', '6.2,2.5,1.6', '8,4.8,8.1'],
+      ['3. El jugo', '4.8,1.9,2.8', '7.3,4.2,9.1'],
+      ['4. La paila', '3.2,2.5,4.3', '5.2,4.8,10.7'],
+      ['5. La panela', '0.7,2,5.9', '2.4,4.1,12.5'],
+    ])('cada paso del recorrido panelero mueve la cámara: %s', (nombre, focoEsperado, ojoEsperado) => {
+      const { container } = render(<MundoBoticaCana3D />);
+      fireEvent.click(screen.getByRole('button', { name: nombre }));
+
+      expect(container.querySelector('group[name="foco-paso"]')).toHaveAttribute('position', focoEsperado);
+      expect(container.querySelector('group[name="ojo-paso"]')).toHaveAttribute('position', ojoEsperado);
+      expect(screen.getByRole('button', { name: nombre })).toHaveAttribute('aria-pressed', 'true');
+    });
+
     // Bug de producto: los cinco pasos originales miraban SOLO al trapiche —
     // los canteros de la botica (las siete matas, PR #2701) nunca quedaban
     // cerca de la cámara. Este paso 6 cierra el recorrido volviendo a la casa.

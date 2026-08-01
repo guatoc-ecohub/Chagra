@@ -80,7 +80,7 @@ function PapelCuaderno({ id, w = 360, h = 176 }) {
 /* ═══════════════ LÁMINA 1 · EL CICLO DE LA ANTRACNOSIS ═══════════════
    Cómo se pasa la mancha de fruto en fruto con la lluvia, y dónde el caldo
    bordelés (cobre) corta el ciclo para proteger el fruto sano. */
-function LaminaCicloAntracnosis() {
+export function LaminaCicloAntracnosis() {
   return (
     <svg viewBox="0 0 360 176" role="img" aria-labelledby="ev-l1-t ev-l1-d">
       <title id="ev-l1-t">El ciclo de la antracnosis en el café y cómo el caldo bordelés lo corta</title>

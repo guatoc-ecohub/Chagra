@@ -25,7 +25,7 @@ export default function SaberTradicion({
   children,
   nota = 'Mucha gente lo usa; la ciencia aún no lo tiene bien estudiado.',
   voz = 'Saber de la gente',
-  className,
+  className = '',
 }) {
   const cls = className ? `cfz-tradicion ${className}` : 'cfz-tradicion';
   return (

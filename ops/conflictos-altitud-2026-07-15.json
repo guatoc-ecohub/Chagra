@@ -1,0 +1,26 @@
+[
+  {
+    "id": "tomate",
+    "nombre_comun": "Tomate",
+    "altitud_min_canonica": 0,
+    "altitud_max_canonica": 2400,
+    "altitud_min_msnm": 100,
+    "altitud_max_msnm": 2500
+  },
+  {
+    "id": "maiz",
+    "nombre_comun": "Maíz",
+    "altitud_min_canonica": 0,
+    "altitud_max_canonica": 3000,
+    "altitud_min_msnm": 200,
+    "altitud_max_msnm": 3200
+  },
+  {
+    "id": "frijol",
+    "nombre_comun": "Frijol",
+    "altitud_min_canonica": 0,
+    "altitud_max_canonica": 2800,
+    "altitud_min_msnm": 500,
+    "altitud_max_msnm": 3000
+  }
+]

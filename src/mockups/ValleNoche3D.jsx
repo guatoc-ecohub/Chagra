@@ -18,6 +18,14 @@
  *   - Angelita es la creature rubber-hose real (`AbejaAngelita`) en pose de
  *     reposo, anclada con `Html` — la misma abeja de ValleEnCalma, dormida.
  *
+ * EL CIELO DE A DE VERAS (pulido nocturno): los elementos del firmamento van
+ * con `fog={false}` — el fog del valle es niebla DE TIERRA; a la distancia del
+ * domo se comía la luna y las estrellas enteras. Sobre el páramo se arquea la
+ * Vía Láctea (un Points de estrellas menudas + nebulosas de sprite suave), la
+ * Cruz del Sur con sus punteros (el sur celeste que sí se ve desde los Andes),
+ * estrellas fugaces de vez en cuando y bruma baja que se arrastra por el piso
+ * del valle. La ventana encendida riega su charco ámbar sobre el pasto.
+ *
  * GRILLOS 0 KB (opcionales): coro sintetizado con WebAudio (osciladores puros,
  * cero assets, cero red — cachea limpio offline). SIEMPRE opt-in con botón
  * (nunca autoplay); al silenciar o desmontar se cierra el AudioContext.
@@ -215,47 +223,291 @@ function CieloEstrellado({ n, reducedMotion }) {
         <bufferAttribute attach="attributes-position" args={[datos.pos, 3]} />
         <bufferAttribute attach="attributes-color" args={[datos.col, 3]} />
       </bufferGeometry>
+      {/* fog={false}: el domo está a 30-37 unidades y el fog del valle (far=30)
+          apagaba las estrellas a puntitos fantasma. El cielo no lleva niebla. */}
       <pointsMaterial
         map={spriteEstrella()}
-        size={0.55}
+        size={0.6}
         vertexColors
         transparent
         opacity={0.95}
         depthWrite={false}
         blending={THREE.AdditiveBlending}
         sizeAttenuation
+        fog={false}
       />
     </points>
   );
 }
 
 /* ── La luna andina: disco de plata con dos halos y un par de mares suaves.
-      Da la dirección de la luz principal (la direccional sale de aquí). ── */
+      Da la dirección de la luz principal (la direccional sale de aquí).
+      REPOSICIONADA al tercio izquierdo, colgando justo sobre la cresta del
+      páramo (antes quedaba cortada por el borde superior del encuadre) y con
+      fog={false} en todo: el fog del valle la reducía a un disco fantasma. ── */
 function LunaAndina() {
   return (
-    <group position={[-3.1, 8.3, -15]}>
+    <group position={[-5.5, 6.4, -20]}>
       <mesh>
-        <circleGeometry args={[1.35, 40]} />
-        <meshBasicMaterial color="#f2f0e2" transparent opacity={0.98} depthWrite={false} side={THREE.DoubleSide} />
+        <circleGeometry args={[1.7, 40]} />
+        <meshBasicMaterial color="#f2f0e2" transparent opacity={0.98} depthWrite={false} side={THREE.DoubleSide} fog={false} />
       </mesh>
       {/* mares: sombras suaves que hacen luna, no plato */}
-      <mesh position={[-0.35, 0.3, 0.01]}>
-        <circleGeometry args={[0.34, 20]} />
-        <meshBasicMaterial color="#d4d2c2" transparent opacity={0.55} depthWrite={false} side={THREE.DoubleSide} />
+      <mesh position={[-0.44, 0.38, 0.01]}>
+        <circleGeometry args={[0.43, 20]} />
+        <meshBasicMaterial color="#d4d2c2" transparent opacity={0.55} depthWrite={false} side={THREE.DoubleSide} fog={false} />
       </mesh>
-      <mesh position={[0.4, -0.32, 0.01]}>
-        <circleGeometry args={[0.22, 18]} />
-        <meshBasicMaterial color="#d9d7c6" transparent opacity={0.5} depthWrite={false} side={THREE.DoubleSide} />
+      <mesh position={[0.5, -0.4, 0.01]}>
+        <circleGeometry args={[0.28, 18]} />
+        <meshBasicMaterial color="#d9d7c6" transparent opacity={0.5} depthWrite={false} side={THREE.DoubleSide} fog={false} />
       </mesh>
       <mesh position={[0, 0, -0.05]}>
-        <circleGeometry args={[2.4, 40]} />
-        <meshBasicMaterial color={NOCHE.luz} transparent opacity={0.22} depthWrite={false} side={THREE.DoubleSide} />
+        <circleGeometry args={[3.0, 40]} />
+        <meshBasicMaterial color={NOCHE.luz} transparent opacity={0.2} depthWrite={false} side={THREE.DoubleSide} fog={false} />
       </mesh>
       <mesh position={[0, 0, -0.1]}>
-        <circleGeometry args={[4.0, 40]} />
-        <meshBasicMaterial color={NOCHE.cielo} transparent opacity={0.14} depthWrite={false} side={THREE.DoubleSide} />
+        <circleGeometry args={[5.2, 40]} />
+        <meshBasicMaterial color={NOCHE.cielo} transparent opacity={0.13} depthWrite={false} side={THREE.DoubleSide} fog={false} />
       </mesh>
     </group>
+  );
+}
+
+/* Tonos del río de estrellas: plata azulada en su mayoría, un asomo crema. */
+const TONOS_VIA = ['#c9d4f2', '#aab8e0', '#dfe6ff', '#e6dcc4'];
+
+/* Nebulosas del río: manchas de sprite suave entintadas frío, siguiendo la
+   pendiente del arco. Opacidad mínima: se leen como resplandor, no como humo. */
+const NUBES_VIA = [
+  { p: [-15.5, 5.8, -22.6], rot: 0.3, esc: [11, 4.6], color: '#6f83c0', op: 0.14 },
+  { p: [-5.5, 7.7, -25.8], rot: 0.12, esc: [13, 5.4], color: '#8a7fc4', op: 0.13 },
+  { p: [4.8, 7.8, -25.8], rot: -0.1, esc: [13, 5.2], color: '#7488c2', op: 0.13 },
+  { p: [14.8, 6.0, -22.8], rot: -0.3, esc: [11, 4.4], color: '#8a7fc4', op: 0.12 },
+];
+
+/* ── La Vía Láctea del páramo: el río de estrellas arqueado BAJO sobre las
+      crestas (a la profundidad del domo solo se ve la banda y≈5..10 del
+      encuadre — un arco alto quedaría cortado). UN Points de estrellas menudas
+      (siembra gaussiana alrededor del arco) + 4 nebulosas de sprite. Estático
+      a propósito: el río no parpadea, respira quieto detrás del titileo del
+      CieloEstrellado. ── */
+function ViaLactea({ tier }) {
+  const n = tier === 'alto' ? 620 : tier === 'medio' ? 380 : 160;
+  const datos = useMemo(() => {
+    const rng = crearRng(89);
+    const pos = new Float32Array(n * 3);
+    const col = new Float32Array(n * 3);
+    const color = new THREE.Color();
+    for (let i = 0; i < n; i++) {
+      const j = i * 3;
+      const u = rng() * 2 - 1; // -1..1 a lo largo del arco
+      const espesor = (rng() + rng() + rng() - 1.5) * 1.1; // ~gauss, banda difusa
+      /* el arco vive en la franja de cielo que el encuadre deja sobre las
+         crestas (y≈6..10 a esta profundidad); más abajo lo tapan las lomas */
+      pos[j] = u * 23 + (rng() - 0.5) * 1.6;
+      pos[j + 1] = 5.6 + (1 - u * u) * 2.4 + espesor;
+      pos[j + 2] = -23 - (1 - u * u) * 3.5 + (rng() - 0.5) * 1.4;
+      color.set(TONOS_VIA[Math.floor(rng() * TONOS_VIA.length)]);
+      const brillo = 0.3 + rng() * rng() * 0.7; // casi todas tenues, pocas vivas
+      col[j] = color.r * brillo;
+      col[j + 1] = color.g * brillo;
+      col[j + 2] = color.b * brillo;
+    }
+    return { pos, col };
+  }, [n]);
+  return (
+    <group>
+      <points key={`vialactea:${n}`} frustumCulled={false}>
+        <bufferGeometry>
+          <bufferAttribute attach="attributes-position" args={[datos.pos, 3]} />
+          <bufferAttribute attach="attributes-color" args={[datos.col, 3]} />
+        </bufferGeometry>
+        <pointsMaterial
+          map={spriteEstrella()}
+          size={0.4}
+          vertexColors
+          transparent
+          opacity={0.9}
+          depthWrite={false}
+          blending={THREE.AdditiveBlending}
+          sizeAttenuation
+          fog={false}
+        />
+      </points>
+      {NUBES_VIA.map((nube) => (
+        <mesh key={`${nube.p[0]}:${nube.p[1]}`} position={nube.p} rotation={[0, 0, nube.rot]} scale={[nube.esc[0], nube.esc[1], 1]}>
+          <planeGeometry args={[1, 1]} />
+          <meshBasicMaterial
+            map={spriteEstrella()}
+            color={nube.color}
+            transparent
+            opacity={nube.op}
+            depthWrite={false}
+            blending={THREE.AdditiveBlending}
+            fog={false}
+          />
+        </mesh>
+      ))}
+    </group>
+  );
+}
+
+/* ── La Cruz del Sur con sus punteros (Alfa y Beta Centauri): el sur celeste
+      que SÍ se ve desde los Andes. Seis estrellas fijas, más grandes y firmes
+      que el titileo de fondo — Gacrux tibia porque es gigante roja. ── */
+const CRUZ_DEL_SUR = [
+  [-13.4, 6.3, -24.0, '#f0f4ff'], // Acrux
+  [-12.9, 8.4, -24.3, '#ffd9b0'], // Gacrux (gigante roja)
+  [-14.9, 7.5, -23.7, '#eef3ff'], // Mimosa
+  [-11.9, 7.0, -25.0, '#dfe8ff'], // Delta Crucis
+  [-16.0, 6.4, -22.6, '#fff1d6'], // Alfa Centauri
+  [-15.1, 6.9, -23.0, '#e8efff'], // Beta Centauri
+];
+function CruzDelSur() {
+  const datos = useMemo(() => {
+    const pos = new Float32Array(CRUZ_DEL_SUR.length * 3);
+    const col = new Float32Array(CRUZ_DEL_SUR.length * 3);
+    const color = new THREE.Color();
+    CRUZ_DEL_SUR.forEach(([x, y, z, tono], i) => {
+      const j = i * 3;
+      pos[j] = x; pos[j + 1] = y; pos[j + 2] = z;
+      color.set(tono);
+      col[j] = color.r; col[j + 1] = color.g; col[j + 2] = color.b;
+    });
+    return { pos, col };
+  }, []);
+  return (
+    <points frustumCulled={false}>
+      <bufferGeometry>
+        <bufferAttribute attach="attributes-position" args={[datos.pos, 3]} />
+        <bufferAttribute attach="attributes-color" args={[datos.col, 3]} />
+      </bufferGeometry>
+      <pointsMaterial
+        map={spriteEstrella()}
+        size={1.1}
+        vertexColors
+        transparent
+        opacity={0.95}
+        depthWrite={false}
+        blending={THREE.AdditiveBlending}
+        sizeAttenuation
+        fog={false}
+      />
+    </points>
+  );
+}
+
+/* ── Estrella fugaz: cada tanto (6-15 s) un trazo de plata cruza el cielo alto
+      y se apaga. Cabeza + estela con el mismo sprite radial (la estela es el
+      sprite estirado); envolvente sin(πe) para entrar y salir suave. Estado en
+      ref (cero re-renders); el host no la monta en reduced-motion. ── */
+function EstrellaFugaz() {
+  const grupo = useRef(null);
+  const matEstela = useRef(null);
+  const matCabeza = useRef(null);
+  const st = useRef(null);
+  if (st.current == null) {
+    st.current = { rng: crearRng(97), proximo: 3.2, activo: false, t0: 0, x0: 0, y0: 0, ang: -0.4, dur: 1, vel: 16 };
+  }
+  useFrame(({ clock }) => {
+    const s = st.current;
+    const t = clock.elapsedTime;
+    if (!grupo.current) return;
+    if (!s.activo) {
+      if (t < s.proximo) {
+        grupo.current.visible = false;
+        return;
+      }
+      s.activo = true;
+      s.t0 = t;
+      s.x0 = -14 + s.rng() * 20; // arranca por el poniente alto
+      s.y0 = 6.8 + s.rng() * 1.6;
+      s.ang = -0.3 - s.rng() * 0.25; // cae hacia abajo-derecha
+      s.dur = 0.75 + s.rng() * 0.4;
+      s.vel = 14 + s.rng() * 6;
+    }
+    const e = (t - s.t0) / s.dur;
+    if (e >= 1) {
+      s.activo = false;
+      s.proximo = t + 6 + s.rng() * 9;
+      grupo.current.visible = false;
+      return;
+    }
+    const d = e * s.dur * s.vel;
+    grupo.current.visible = true;
+    grupo.current.position.set(s.x0 + Math.cos(s.ang) * d, s.y0 + Math.sin(s.ang) * d, -24);
+    grupo.current.rotation.z = s.ang;
+    const alfa = Math.sin(Math.PI * e);
+    if (matEstela.current) matEstela.current.opacity = 0.45 * alfa;
+    if (matCabeza.current) matCabeza.current.opacity = 0.9 * alfa;
+  });
+  return (
+    <group ref={grupo} visible={false}>
+      <mesh position={[-1.7, 0, 0]} scale={[3.6, 0.16, 1]}>
+        <planeGeometry args={[1, 1]} />
+        <meshBasicMaterial ref={matEstela} map={spriteEstrella()} color="#dfe8ff" transparent opacity={0} depthWrite={false} blending={THREE.AdditiveBlending} fog={false} />
+      </mesh>
+      <mesh scale={[0.55, 0.55, 1]}>
+        <planeGeometry args={[1, 1]} />
+        <meshBasicMaterial ref={matCabeza} map={spriteEstrella()} color="#ffffff" transparent opacity={0} depthWrite={false} blending={THREE.AdditiveBlending} fog={false} />
+      </mesh>
+    </group>
+  );
+}
+
+/* ── Bruma nocturna: velos de niebla baja que se arrastran por el piso del
+      valle (UN Points de blobs grandes con blending normal — se ocluyen bien
+      detrás de casa y monte). Deriva lentísima con reentrada por el borde;
+      reduced-motion la deja sembrada quieta. ── */
+function BrumaNocturna({ tier, reducedMotion }) {
+  const puntos = useRef(null);
+  const n = tier === 'alto' ? 16 : tier === 'medio' ? 11 : 7;
+  const datos = useMemo(() => {
+    const rng = crearRng(59);
+    const pos = new Float32Array(n * 3);
+    const base = new Float32Array(n * 3);
+    const vel = new Float32Array(n);
+    const fase = new Float32Array(n);
+    for (let i = 0; i < n; i++) {
+      const j = i * 3;
+      base[j] = (rng() - 0.5) * 26;
+      base[j + 1] = 0.35 + rng() * 1.0;
+      base[j + 2] = -9 + rng() * 11;
+      pos[j] = base[j]; pos[j + 1] = base[j + 1]; pos[j + 2] = base[j + 2];
+      vel[i] = 0.06 + rng() * 0.12;
+      fase[i] = rng() * Math.PI * 2;
+    }
+    return { pos, base, vel, fase };
+  }, [n]);
+  useFrame(({ clock }) => {
+    if (reducedMotion || !puntos.current) return;
+    const t = clock.elapsedTime;
+    const geo = puntos.current.geometry;
+    const p = geo.attributes.position.array;
+    const { base, vel, fase } = datos;
+    for (let i = 0; i < vel.length; i++) {
+      const j = i * 3;
+      p[j] = ((base[j] + t * vel[i] + 14) % 28) - 14;
+      p[j + 1] = base[j + 1] + Math.sin(t * 0.12 + fase[i]) * 0.16;
+    }
+    geo.attributes.position.needsUpdate = true;
+  });
+  return (
+    <points ref={puntos} key={`bruma:${n}`} frustumCulled={false}>
+      <bufferGeometry>
+        <bufferAttribute attach="attributes-position" args={[datos.pos, 3]} />
+      </bufferGeometry>
+      <pointsMaterial
+        map={spriteEstrella()}
+        size={5.2}
+        color="#8fa2cf"
+        transparent
+        opacity={0.15}
+        depthWrite={false}
+        sizeAttenuation
+        fog={false}
+      />
+    </points>
   );
 }
 
@@ -370,6 +622,12 @@ function CasaDormida({ reducedMotion }) {
         />
       </mesh>
       <pointLight ref={vela} position={[0.5, 0.9, 1.4]} intensity={0.85} distance={5.5} color={P.ambar} />
+      {/* el charco de luz: la ventana riega su ámbar sobre el pasto de enfrente.
+          Sin él la luz flotaba — con él la casa se ancla a la tierra. */}
+      <mesh position={[0.5, 0.04, 1.7]} rotation={[-Math.PI / 2, 0, 0]} scale={[1, 0.62, 1]}>
+        <circleGeometry args={[0.95, 24]} />
+        <meshBasicMaterial color={P.ambar} transparent opacity={0.12} depthWrite={false} blending={THREE.AdditiveBlending} />
+      </mesh>
     </group>
   );
 }
@@ -406,15 +664,17 @@ function SiluetaLomas({ z, base, amp, semilla, color }) {
 
 /* Fincas vecinas veladas a lo lejos: puntitos ámbar sobre la falda de la loma
    cercana. El valle duerme acompañado — otras cocinas también quedaron con la
-   vela puesta. fog=false para que el punto pinche la niebla como luz real. */
+   vela puesta. fog=false para que el punto pinche la niebla como luz real.
+   La altura sale del MISMO heightfield (+0.2): con `y` fija quedaban
+   enterradas bajo la falda (el terreno ahí sube a ~3.7-4.1). */
 const FINCAS_LEJANAS = [
-  [-6.4, 2.35, -13.6],
-  [5.6, 1.95, -13.6],
-  [10.4, 3.0, -13.7],
+  [-6.4, -13.6],
+  [5.6, -13.6],
+  [10.4, -13.7],
 ];
 function FincasLejanas() {
-  return FINCAS_LEJANAS.map(([x, y, z]) => (
-    <group key={`${x}:${z}`} position={[x, y, z]}>
+  return FINCAS_LEJANAS.map(([x, z]) => (
+    <group key={`${x}:${z}`} position={[x, alturaValle(x, z) + 0.5, z]}>
       <mesh>
         <circleGeometry args={[0.09, 8]} />
         <meshBasicMaterial color={P.ambar} fog={false} transparent opacity={0.9} depthWrite={false} />
@@ -587,7 +847,7 @@ function EscenaNoche({ tier, reducedMotion }) {
   useEffect(() => () => geo.dispose(), [geo]);
 
   const estrellas = Math.round(
-    (tier === 'alto' ? 280 : tier === 'medio' ? 170 : 80) * NOCHE.estrellas,
+    (tier === 'alto' ? 340 : tier === 'medio' ? 210 : 100) * NOCHE.estrellas,
   );
 
   /* `color`/`fog` se adjuntan a la ESCENA: hijos directos, nunca en <group>. */
@@ -597,7 +857,10 @@ function EscenaNoche({ tier, reducedMotion }) {
       {perfil.fog && <fog attach="fog" args={[NOCHE.niebla, NOCHE.nieblaCerca + 4, NOCHE.nieblaLejos]} />}
       <LucesNocturnas />
       <CieloEstrellado n={estrellas} reducedMotion={reducedMotion} />
+      <ViaLactea tier={tier} />
+      <CruzDelSur />
       <LunaAndina />
+      {!reducedMotion && <EstrellaFugaz />}
 
       {/* el abrazo del páramo: dos crestas de silueta y las fincas vecinas */}
       <SiluetaLomas z={-22} base={3.9} amp={1.4} semilla={17} color="#0b1024" />
@@ -608,6 +871,7 @@ function EscenaNoche({ tier, reducedMotion }) {
         <meshLambertMaterial vertexColors flatShading={perfil.flatShading} />
       </mesh>
       <ClaroDeLuna />
+      <BrumaNocturna tier={tier} reducedMotion={reducedMotion} />
 
       <CasaDormida reducedMotion={reducedMotion} />
       <CultivosDormidos />
@@ -641,7 +905,7 @@ function EscenaNoche({ tier, reducedMotion }) {
       />
       <ParticulasAmbientales
         tipo="luciernagas"
-        densidad={0.7}
+        densidad={0.9}
         tier={tier}
         reducedMotion={reducedMotion}
         position={[3.5, 0.1, -3]}
@@ -650,7 +914,7 @@ function EscenaNoche({ tier, reducedMotion }) {
       {/* tercer enjambre en primer plano: profundidad de campo de a de veras */}
       <ParticulasAmbientales
         tipo="luciernagas"
-        densidad={0.8}
+        densidad={1.1}
         tier={tier}
         reducedMotion={reducedMotion}
         position={[0.4, 0.2, 4.4]}
@@ -704,6 +968,7 @@ const CSS_NOCHE = `
 .vnoche-root { position: relative; width: 100%; height: 100dvh; min-height: 320px; overflow: hidden; background: ${NOCHE.fondo}; }
 .vnoche-canvas { position: absolute; inset: 0; opacity: 0; transition: opacity 0.9s ease; }
 .vnoche-canvas--lista { opacity: 1; }
+.vnoche-vineta { position: absolute; inset: 0; pointer-events: none; background: radial-gradient(ellipse 130% 105% at 50% 44%, transparent 58%, rgba(4,6,16,0.5) 100%), linear-gradient(180deg, rgba(4,6,16,0.28) 0%, transparent 18%); }
 .vnoche-chrome { position: absolute; inset: 0; pointer-events: none; display: flex; flex-direction: column; justify-content: space-between; }
 .vnoche-titulo { margin: 0; padding: 0.9rem 1rem 0; color: #e8ebf6; text-shadow: 0 1px 6px rgba(5,7,15,0.8); font: 700 1.15rem/1.2 system-ui, sans-serif; letter-spacing: 0.01em; }
 .vnoche-titulo small { display: block; font: 500 0.8rem/1.3 system-ui, sans-serif; opacity: 0.75; margin-top: 0.15rem; }
@@ -786,7 +1051,9 @@ export default function ValleNoche3D() {
           enableZoom
           minDistance={7}
           maxDistance={19}
-          target={retrato ? [0.7, 1.15, 0] : [0, 1.1, 0]}
+          /* target más alto en paisaje: regala franja de cielo — ahí vive el
+             wow nocturno (luna, Vía Láctea, fugaces) sin perder la casa */
+          target={retrato ? [0.7, 1.15, 0] : [0, 1.5, 0]}
           minPolarAngle={0.55}
           maxPolarAngle={1.42}
           minAzimuthAngle={-1.0}
@@ -799,6 +1066,9 @@ export default function ValleNoche3D() {
         <AdaptiveDpr pixelated />
       </Canvas>
 
+      {/* viñeta cinematográfica: oscurece bordes y cenit, concentra la mirada
+          en la casa y el arco de la Vía Láctea. Puro CSS, cero costo GPU 3D. */}
+      <div className="vnoche-vineta" aria-hidden="true" />
       <div className="vnoche-chrome">
         <h2 className="vnoche-titulo">
           El valle de noche

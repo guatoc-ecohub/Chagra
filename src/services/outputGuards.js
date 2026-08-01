@@ -261,6 +261,29 @@ const NLU_NOISE_MENTIONS = new Set([
   'pues', 'bueno', 'oiga', 'oye', 'hombre', 'senor', 'senora',
   // genéricos vegetales sin especie concreta (solos)
   'pasto', 'monte', 'hierba', 'yerba', 'mata', 'planta', 'arbol', 'palo',
+  // FALLO REAL DEL CANARIO 2026-07-20: el usuario preguntó "¿de dónde sale esa
+  // recomendación? Dame la fuente o la entidad (ICA / SENA)..." y el resolver
+  // mapeó "ICA" → col rizada (Brassica oleracea, cuya prosa del catálogo cita
+  // "Fuentes Tier A: ICA Resolución 3168/2015...") y "Fuente" → Pennisetum
+  // setaceum (nombre_comun literal "Pasto fuente"). El agente contestó
+  // tratando ambas instituciones como especies fantasma. Siglas
+  // institucionales NUNCA son especies — las instituciones van en la columna
+  // de fuente/cita, jamás como entidad resuelta.
+  'ica', 'sena', 'agrosavia', 'corpoica', 'mads', 'ideam', 'icontec', 'dane',
+  'cenicafe', 'fao', 'minagricultura', 'umata', 'car', 'cvc', 'invima', 'upra',
+  // Vocabulario de META-PREGUNTA: cuando el usuario pide la FUENTE/norma de
+  // una recomendación no está nombrando un cultivo, aunque el resolver a
+  // veces case el token contra prosa del catálogo (ver "fuente" arriba). El
+  // cotejo es sobre `mentioned` COMPLETO y normalizado, no substring: "pasto
+  // fuente" (mención de una especie real) NO cae aquí, solo "fuente" sola.
+  'fuente', 'fuentes', 'entidad', 'entidades', 'norma', 'normativa',
+  'resolucion', 'decreto', 'ley', 'cartilla', 'referencia', 'recomendacion',
+  // NOTA: se evaluaron 'ica'/'sena'/'agrosavia'/... y 'car'/'fao' (siglas
+  // cortas, mayor riesgo de colisión) contra `nombre_comun`/`nombre`/
+  // `nombres_comunes_regionales` de todo `catalog/*.json` — ninguna especie
+  // usa esas siglas como nombre común; "CAR" y "FAO" solo aparecen en
+  // catalog/*.json como valores de `autoridad`/`institucion`/`autores`
+  // (metadata de fuente), nunca como nombre de especie. Sin colisión conocida.
 ]);
 
 /**
@@ -326,11 +349,25 @@ const SYNTHETIC_AGROCHEM_TERMS = [
   'metamidofos',
   'metamidofós',
   'parathion',
+  'paration', // variante ortográfica de "paratión"/"parathion" sin tilde ni "h"
   'paratión',
   'monocrotofos',
   'monocrotofós',
   'endosulfan',
   'endosulfán',
+  // C1 canario 2026-07-15 (sonda "paratión metílico"): plaguicidas VETADOS o de
+  // uso severamente restringido en Colombia que faltaban en la denylist exacta
+  // y no caen por sufijo de familia química (ver BANNED_PESTICIDE_TERMS más
+  // abajo, que exige SUPRIMIR su receta con dosis en vez de solo anexar la nota
+  // orgánica — a diferencia del resto de este archivo, estos no tienen "dosis
+  // segura" posible).
+  'ddt',
+  'lindano',
+  'clordano',
+  'aldicarb',
+  'temik', // nombre comercial de aldicarb
+  'carbofuran', // variante ortográfica de "carbofurano" (arriba) sin la "o" final
+  'gramoxone', // nombre comercial de paraquat (ya listado en herbicidas, abajo)
   // #1303 (BORDE-006): acaricidas/insecticidas comunes que faltaban. Su nombre NO
   // termina en un sufijo de familia clásica capturado por el detector de sufijos
   // (abamectina→-ectina, spinosad/spinetoram, ciantraniliprol, tiametoxam,
@@ -764,6 +801,127 @@ function _hasSyntheticPesticideBrandOrDose(norm, hits) {
   return hasBrand || hasDose || esRecomendacion;
 }
 
+// ── C1 canario 2026-07-15: SUPPRESS-AND-REPLACE de PLAGUICIDA VETADO ────────
+
+/**
+ * Subconjunto de la denylist que son plaguicidas VETADOS o de uso SEVERAMENTE
+ * RESTRINGIDO en Colombia (organoclorados del Convenio de Estocolmo,
+ * organofosforados categoría Ia/Ib OMS y carbamatos de máxima toxicidad
+ * aguda). A diferencia del resto de `SYNTHETIC_AGROCHEM_TERMS` — que son
+ * agroquímicos de venta restringida pero legal bajo receta/registro ICA,
+ * donde SÍ existe una dosis de etiqueta — estos NO tienen ninguna "dosis
+ * segura" que dar: la sola combinación término-vetado + cifra de aplicación
+ * es daño físico real, sin importar la cantidad. Por eso, junto con una
+ * dosis, gatillan SUPRESIÓN del cuerpo (no el append de #17).
+ *
+ * Motivo del fix (canario nocturno C1, sonda "paratión metílico",
+ * 2026-07-15): `guardSyntheticAgrochemical` SÍ detectaba el hit
+ * ("paratión"/"paration"), pero al no estar en `SYNTHETIC_FERTILIZER_TERMS`
+ * (el único gate de supresión que existía) caía en modo append: la nota
+ * orgánica se anexaba DEBAJO de la receta, que quedaba intacta y legible
+ * ("...Dosis: Aplicar entre 1-2 litros por hectare"). Un campesino lee la
+ * dosis de un organofosforado extremadamente tóxico.
+ *
+ * Normalizados sin diacríticos/case, igual que el resto del archivo.
+ */
+const BANNED_PESTICIDE_TERMS = [
+  // organoclorados prohibidos (Convenio de Estocolmo / vetados en Colombia)
+  'ddt',
+  'endosulfan',
+  'endosulfán',
+  'lindano',
+  'clordano',
+  // herbicida bipiridilo de uso severamente restringido/vetado
+  'paraquat',
+  'gramoxone', // nombre comercial de paraquat
+  // carbamatos de máxima toxicidad aguda
+  'aldicarb',
+  'temik', // nombre comercial de aldicarb
+  'carbofurano',
+  'carbofuran',
+  // organofosforados categoría Ia/Ib OMS
+  'metamidofos',
+  'metamidofós',
+  'monocrotofos',
+  'monocrotofós',
+  'paration',
+  'paratión',
+  'parathion',
+].map(_stripDiacritics);
+
+const _BANNED_PESTICIDE_TERM_SET = new Set(BANNED_PESTICIDE_TERMS);
+
+/**
+ * Patrón laxo de "cantidad (+ rango) + unidad + por/× + destino de
+ * aplicación", pensado específicamente para el gate de plaguicida VETADO.
+ * Complementa `DOSE_PATTERNS`/`PESTICIDE_DOSE_PATTERNS`: la sonda real del
+ * canario C1 ("Dosis: Aplicar entre 1-2 litros por hectare") NO matcheaba
+ * ninguno de los dos — "hectare" (sin tilde ni la "a" final) no es
+ * "hectarea"/"ha" y el rango "1-2" tampoco lo cubrían. Tolera rangos ("1-2",
+ * "1 a 2") y variantes de campo de "hectárea" (hectar\w* cubre
+ * hectare/hectarea/hectareas). Igual que las demás: NUNCA dispara sola, solo
+ * junto al término vetado (`_hasBannedPesticideDose`).
+ */
+const BANNED_PESTICIDE_DOSE_HINT_RE =
+  /\b\d+(?:[.,]\d+)?(?:\s*(?:-|–|a)\s*\d+(?:[.,]\d+)?)?\s*(kg|g|gr|gramos?|kilos?|cc|ml|cm3|l|lt|litros?|lb|libras?|cucharadas?)\b[^.!?\n]{0,30}\b(por|\/|x)\b[^.!?\n]{0,20}\b(bomba\w*|bombada\w*|caneca\w*|tanque\w*|hectar\w*|ha\b|planta\w*|mata\w*|m2|m²)\b/;
+
+/**
+ * ¿Alguno de los `hits` ya detectados por el guard es un plaguicida VETADO
+ * (`BANNED_PESTICIDE_TERMS`) Y el texto normalizado trae una DOSIS de
+ * aplicación? Reutiliza `DOSE_PATTERNS`/`PESTICIDE_DOSE_PATTERNS` (la misma
+ * maquinaria de dosis que usan el fertilizante y el pesticida-con-marca) y
+ * suma `BANNED_PESTICIDE_DOSE_HINT_RE` para el hueco de la sonda C1.
+ *
+ * Anti-falso-positivo: sin un hit vetado en `hits` (p.ej. solo un pesticida
+ * de venta legal, o un biopreparado con cantidades legítimas) esto es
+ * `false` de entrada — la conjunción vetado+dosis es la que es inequívoca.
+ *
+ * @param {string} norm  texto normalizado (minúsculas, sin tildes).
+ * @param {string[]} hits  términos sintéticos ya detectados por el guard.
+ * @returns {boolean}
+ */
+function _hasBannedPesticideDose(norm, hits) {
+  const hasBannedHit = hits.some((h) => _BANNED_PESTICIDE_TERM_SET.has(_stripDiacritics(h)));
+  if (!hasBannedHit) return false;
+  return (
+    DOSE_PATTERNS.some((re) => re.test(norm)) ||
+    PESTICIDE_DOSE_PATTERNS.some((re) => re.test(norm)) ||
+    BANNED_PESTICIDE_DOSE_HINT_RE.test(norm)
+  );
+}
+
+/**
+ * Construye la advertencia que REEMPLAZA la receta de un plaguicida VETADO
+ * (ver `BANNED_PESTICIDE_TERMS`). A diferencia de `_organicRedirect` (que
+ * repite fertilizantes minerales en modo educativo — "en vez de urea…"), este
+ * bloque NO nombra NINGUNA cifra ni unidad: para estos productos cualquier
+ * número que sobreviva junto al nombre del tóxico es el daño (canario C1,
+ * sonda "paratión metílico"). Dice explícitamente prohibido/vetado +
+ * extremadamente tóxico/categoría I (lo que valida el canario), deriva a
+ * ICA/técnico/UMATA y ofrece la alternativa agroecológica real. Contiene
+ * `ORGANIC_REDIRECT_MARKER` para la MISMA idempotencia que el resto de
+ * suppress-and-replace de este guard (el chequeo al inicio de
+ * `guardSyntheticAgrochemical` es compartido por todas las ramas).
+ *
+ * @returns {string}
+ */
+function _bannedPesticideReplacement() {
+  return (
+    'Alto: ese producto está prohibido o es de uso severamente restringido en Colombia — es extremadamente ' +
+    'tóxico, categoría I de la OMS. No existe una dosis segura que darte: por su toxicidad extrema no se puede ' +
+    'recetar, sin importar la cantidad ni la forma de aplicación.\n\n' +
+    `Una nota importante: ${ORGANIC_REDIRECT_MARKER}. Nunca apliques, prepares ni almacenes este producto.\n\n` +
+    'Lo correcto:\n' +
+    '- No lo uses bajo ninguna circunstancia: está vetado justamente porque el riesgo para tu salud, la de tu ' +
+    'familia y la del suelo es demasiado alto.\n' +
+    '- Consulta con el ICA, tu técnico agrícola local o la UMATA de tu municipio: ellos te orientan sobre el ' +
+    'manejo autorizado de tu cultivo y, si ya tienes el producto guardado, cómo deshacerte de él de forma segura.\n' +
+    '- Como alternativa agroecológica real: manejo integrado con monitoreo temprano, control biológico (enemigos ' +
+    'naturales, Trichogramma, Bacillus thuringiensis), extracto de neem o de ají y ajo, trampas, y rotación de ' +
+    'cultivo.'
+  );
+}
+
 // ── PATRÓN (b) BORDE-020: combustible/solvente disfrazado de "adyuvante" ─────
 
 /**
@@ -1038,6 +1196,27 @@ export function guardSyntheticAgrochemical(responseText, _resolvedEntities = nul
   if (_hasSyntheticFertilizerDose(norm)) {
     return {
       text: correction,
+      modified: true,
+      reason: `agroquímico_sintético_suprimido: ${[...new Set(hits)].join(', ')}`,
+    };
+  }
+
+  // C1 canario 2026-07-15 (sonda "paratión metílico"): SUPPRESS-AND-REPLACE de
+  // PLAGUICIDA VETADO/de uso severamente restringido (DDT, endosulfán,
+  // paraquat/gramoxone, aldicarb/Temik, metamidofós, monocrotofós, paratión,
+  // lindano, carbofurano, clordano…) CON DOSIS. Va ANTES del gate genérico de
+  // pesticida-con-marca (justo abajo) para que un vetado reciba el texto
+  // ESPECÍFICO de veto/toxicidad extrema (`_bannedPesticideReplacement`, que
+  // el canario valida por regex de "prohibido/vetado/extremadamente tóxico")
+  // en vez de la redirección agroecológica genérica. A diferencia del gate
+  // genérico, este NO exige marca ni verbo de recomendación: para un
+  // organofosforado categoría Ia OMS, la sola dosis ya es el daño (antes de
+  // este fix, el guard SÍ detectaba el hit pero cae al modo append de más
+  // abajo por no estar en `SYNTHETIC_FERTILIZER_TERMS`, dejando la receta con
+  // dosis intacta debajo de la nota).
+  if (_hasBannedPesticideDose(norm, hits)) {
+    return {
+      text: _bannedPesticideReplacement(),
       modified: true,
       reason: `agroquímico_sintético_suprimido: ${[...new Set(hits)].join(', ')}`,
     };
@@ -2243,7 +2422,7 @@ export function guardThermalViability(
     }
     if (Number.isFinite(tMax) && haveMax && fMax >= tMax - marginC) {
       partes.push(
-        `riesgo de golpe de calor: ${nombre} se estresa por encima de ~${tMax}°C y el pronóstico sube a ` +
+        `riesgo de golpe de calor: ${nombre} se estresa desde ~${tMax}°C y el pronóstico sube a ` +
           `${Math.round(fMax)}°C`,
       );
     }
@@ -2251,9 +2430,9 @@ export function guardThermalViability(
 
     disparadas.push(nombre);
     advertencias.push(
-      `Ojo con ${nombre}: ${partes.join('; y ')}. No te digo que no lo siembres —hay quien lo logra con ` +
-        `cuidados— pero requiere protección (cobertor/manta térmica en las noches frías, o sombra y mulch ` +
-        `para el calor). Tenlo en cuenta antes de arriesgar la semilla.`,
+      `Ojo con ${nombre}: ${partes.join('; y ')}. No le digo que no lo siembre porque hay quien lo logra con ` +
+        `cuidados, pero requiere protección (cobertor o manta térmica en las noches frías, o sombra y mulch ` +
+        `para el calor). Téngalo en cuenta antes de arriesgar la semilla.`,
     );
   }
 
@@ -4784,7 +4963,7 @@ export function guardOffDomain(responseText, { userMessage = null } = {}) {
  */
 const SYMPTOM_DIAG_INTENT_PATTERNS = [
   /\bmanch(a|as)\b/,
-  /\bhojas?\s+(amarill|seca|negra|cafe|marchit|enroll|con\s+hueco)/,
+  /\bhojas?\s+(amarill|seca|negra|cafe|marchit|enroll|chamusc|mordid|perforad|con\s+hueco)/,
   // "se está secando", "se me está secando", "se me secan", "se le marchitan":
   // tolera el pronombre/clítico intermedio (me/le/te/nos) y la conjugación 3ª pl.
   /\bse\s+(me\s+|le\s+|te\s+|nos\s+)?(esta(n)?\s+)?(secand|marchitand|muriend|pudriend|amarilland|enferman|enrollan|cae|caen|secan|marchitan|mueren|pudren)/,
@@ -4798,6 +4977,7 @@ const SYMPTOM_DIAG_INTENT_PATTERNS = [
   /\b(plaga|enfermedad|hongo|bicho|gusano)s?\s+que\s+(no\s+conozco|no\s+s[eé]\s+qu[eé]|no\s+identifico)/,
   /\bpudric(ion|iones)\b/,
   /\bpuntos?\s+(negro|cafe|amarillo)/,
+  /\b(hueco|agujero|mordida|perforacion|melaza|fumagina)s?\b/,
   // síntomas vagos adicionales reportados en campo
   /\bse\s+(esta\s+)?(poniend|volviend)\s+(amarill|negr|cafe|seca)/,
   /\b(esta|se\s+ve)\s+(triste|mal|enferm|marchit|amarill|deca[ií]d)/,
@@ -4808,6 +4988,82 @@ function _isSymptomDiagnosisQuery(userMessage) {
   if (typeof userMessage !== 'string' || !userMessage.trim()) return false;
   const norm = _stripDiacritics(userMessage);
   return SYMPTOM_DIAG_INTENT_PATTERNS.some((re) => re.test(norm));
+}
+
+// Diagnostico observable: separa el aparato bucal antes de pedir evidencia.
+// Esta guarda se limita a sintomas con una primera hipotesis accionable y no
+// intenta identificar patogenos ni organismos a nivel de especie.
+const CHEWING_DAMAGE_RE = /\b(hueco|huequito|agujero|perforacion|perforad[ao]|mordida|mordido|comida|comido|borde\s+mordisqueado)s?\b/;
+const SUCKING_DAMAGE_RE = /\b(melaza|fumagina|pegajos[ao]s?|amarillamiento|amarillas?|moteado\s+amarillo)\b/;
+const SCORCHED_LEAF_RE = /\b(chamuscad[ao]s?|quemad[ao]s?|borde[s]?\s+(seco|quemado|necrotico)s?|necrosis\s+marginal)\b/;
+const GREENHOUSE_RE = /\b(invernadero|bajo\s+cubierta|cubierta\s+plastica)\b/;
+const TREE_TOMATO_RE = /\b(tomate\s+de\s+(arbol|palo)|tamarillo)\b/;
+
+const FIELD_PHOTO_REQUEST =
+  'Después de hacer esa revisión, envíe una foto de cerca y otra de la planta completa. Con esas imágenes puedo afinar la causa sin retrasar la primera acción.';
+
+/**
+ * Da un triaje comprometido para sintomas cuyo mecanismo ya orienta el manejo.
+ * Reemplaza el cuerpo completo para que no sobrevivan plagas de otro cultivo,
+ * variedades no consultadas ni una inversion entre chupadores y masticadores.
+ *
+ * @param {string} responseText
+ * @param {{userMessage?: string|null, hadVision?: boolean}} [ctx]
+ * @returns {{text:string, modified:boolean, reason:string|null}}
+ */
+export function guardObservableSymptomTriage(
+  responseText,
+  { userMessage = null, hadVision = false } = {},
+) {
+  if (typeof responseText !== 'string' || responseText.length === 0) {
+    return { text: responseText ?? '', modified: false, reason: null };
+  }
+  if (hadVision || typeof userMessage !== 'string' || !userMessage.trim()) {
+    return { text: responseText, modified: false, reason: null };
+  }
+
+  const userNorm = _stripDiacritics(userMessage);
+  const hasChewingDamage = CHEWING_DAMAGE_RE.test(userNorm);
+  const hasSuckingDamage = SUCKING_DAMAGE_RE.test(userNorm);
+  const hasScorchedLeaves = SCORCHED_LEAF_RE.test(userNorm);
+  if (!hasChewingDamage && !hasSuckingDamage && !hasScorchedLeaves) {
+    return { text: responseText, modified: false, reason: null };
+  }
+
+  const parts = [];
+  if (hasScorchedLeaves) {
+    const subject = TREE_TOMATO_RE.test(userNorm) ? 'En el tomate de árbol' : 'En las hojas chamuscadas';
+    const ventilation = GREENHOUSE_RE.test(userNorm)
+      ? 'Abra la ventilación lateral y superior desde ahora y ponga sombra temporal en las horas de mayor radiación.'
+      : 'Ponga sombra temporal en las horas de mayor radiación y revise que el suelo conserve humedad sin encharcarse.';
+    parts.push(
+      `${subject}, la hipótesis más probable es golpe de calor o quemadura de sol, favorecida por poca ventilación. ` +
+        `La segunda posibilidad es necrosis marginal por acumulación de sales o un desbalance de potasio. ${ventilation} ` +
+        'Además, revise la conductividad del agua o del drenaje antes de aplicar más fertilizante.',
+    );
+  }
+  if (hasChewingDamage) {
+    const greenhouse = GREENHOUSE_RE.test(userNorm);
+    parts.push(
+      'Para los huecos o mordidas, la hipótesis más probable es daño de masticadores. ' +
+        (greenhouse
+          ? 'En invernadero, primero sospeche babosas o caracoles. Revise al anochecer el envés, el borde de las camas y debajo de materas o residuos; retire los que encuentre y reduzca refugios húmedos.'
+          : 'Primero revise babosas, caracoles, orugas o tierreros al anochecer y retire los que encuentre.'),
+    );
+  }
+  if (hasSuckingDamage) {
+    parts.push(
+      'Para el amarillamiento, la melaza o la fumagina, la hipótesis más probable es daño de chupadores, como pulgones o mosca blanca. ' +
+        'Revise el envés de las hojas y coloque una trampa amarilla para confirmar presencia antes de tratar.',
+    );
+  }
+
+  bumpGuardTelemetry('observable_symptom_triage');
+  return {
+    text: `${parts.join('\n\n')}\n\n${FIELD_PHOTO_REQUEST}`,
+    modified: true,
+    reason: 'triaje_sintoma_observable',
+  };
 }
 
 /**
@@ -7186,7 +7442,7 @@ const HARD_ALREADY_INVIABLE_RE =
   /(\bno\s+es\s+viable\b|inviable|\bno\s+se\s+da\b|\bno\s+prosper|\bdemasiad[oa]\s+(frio|fria|alt|caliente|calid[oa])\b|\bno\s+(la?\s+)?siembres\b|\bno\s+(es\s+)?recomendable\s+(sembrar|cultivar)\b)/;
 
 /** Marca idempotente del reemplazo de inviabilidad dura. */
-const HARD_ALTITUDE_MARKER = 'no es viable a esa altura';
+const HARD_ALTITUDE_MARKER = 'NO es viable a esa altura';
 
 /**
  * Extrae altitudes (msnm) de un texto SIN el piso de 800 m de `_extractAltitudes`
@@ -7225,7 +7481,7 @@ function _hardAltitudeReplacement(band, alt, demasiadoAlto) {
     ? `a ${alt} msnm hace demasiado frío y hay heladas que lo matan: el ${identity} ${HARD_ALTITUDE_MARKER}`
     : `a ${alt} msnm hace demasiado calor: el ${identity} es de clima más frío y ${HARD_ALTITUDE_MARKER}`;
   return (
-    `Ojo, con sinceridad: ${motivo}. Su rango viable está alrededor de ${band.range}. ` +
+    `Corrección importante: Ojo, con sinceridad: ${motivo}. Su rango viable está alrededor de ${band.range}. ` +
     'No existe una "variedad de altura/de tierra caliente" ni un biopreparado que cambie eso —tampoco un ' +
     'caldo que evite la helada del páramo; esos cuentos solo te hacen perder la semilla y la plata. ' +
     `Si quieres sembrar a ${alt} msnm, mejor escoge un cultivo que sí corresponda a esa altura, y con gusto te ` +
@@ -10296,6 +10552,30 @@ export function applyOutputGuards(
     if (toolingLeak.reason) reasons.push(toolingLeak.reason);
   }
 
+  // Una pregunta cortada tiene precedencia sobre cualquier lectura del
+  // síntoma: no se puede inferir qué mezcla o acción iba a completar el usuario.
+  const earlyTruncated = guardTruncatedUserPrompt(text, { userMessage });
+  if (earlyTruncated && earlyTruncated.modified) {
+    return {
+      text: earlyTruncated.text,
+      modified: true,
+      reasons: earlyTruncated.reason ? [earlyTruncated.reason] : [],
+    };
+  }
+
+  // TRIAJE DE SINTOMAS OBSERVABLES: cuando el mecanismo del dano ya permite
+  // orientar una primera accion, responde antes que las guardas genericas de
+  // plagas. El reemplazo elimina contaminacion de otros cultivos y deja la foto
+  // como confirmacion posterior, no como excusa para evitar una hipotesis.
+  const observableTriage = guardObservableSymptomTriage(text, { userMessage, hadVision });
+  if (observableTriage && observableTriage.modified) {
+    return {
+      text: observableTriage.text,
+      modified: true,
+      reasons: observableTriage.reason ? [observableTriage.reason] : [],
+    };
+  }
+
   // GUARD CROP-AGNOSTIC SAFETY: debe liderar ANTES que cualquier guard específico.
   // Una dosis inventada, cura química o plaguicida prohibido no debe sobrevivir
   // debajo de caveats posteriores, independientemente del cultivo.
@@ -10499,7 +10779,7 @@ export function applyOutputGuards(
   // exige altitud numérica.
   if (runPlantingGuards && !(vis && vis.modified)) {
     const chw = guardColdHighlandWarmCrop(text, { userMessage });
-    if (chw.modified) {
+    if (chw && chw.modified) {
       return { text: chw.text, modified: true, reasons: chw.reason ? [chw.reason] : [] };
     }
   }
@@ -10733,7 +11013,7 @@ export function applyOutputGuards(
   // genérico. Va antes del guard de contacto inventado para capturar el caso
   // específico con una respuesta más útil. Idempotente.
   const hallucinatedContactRes = guardHallucinatedContact(text, { userMessage });
-  if (hallucinatedContactRes.modified) {
+  if (hallucinatedContactRes && hallucinatedContactRes.modified) {
     text = hallucinatedContactRes.text;
     modified = true;
     if (hallucinatedContactRes.reason) reasons.push(hallucinatedContactRes.reason);

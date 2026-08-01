@@ -14,8 +14,13 @@
   display: inline-flex;
   align-items: flex-start;
   gap: 0.45rem;
-  max-width: 400px;
-  min-width: 150px;
+  /* Nunca más ancha que la pantalla. En un teléfono de 430 px una burbuja de
+     400 px centrada en el personaje se salía por el borde y el aviso quedaba
+     cortado — y el usuario es campesino con teléfono modesto. El ajuste fino
+     de la POSICIÓN lo hace `correccionEnPantalla` en BurbujaAngelita.jsx;
+     esto es el techo de ancho. */
+  max-width: min(400px, calc(100vw - 20px));
+  min-width: min(150px, calc(100vw - 20px));
   padding: 0.5rem 0.8rem 0.5rem 0.55rem;
   border: 1px solid var(--ab-borde);
   border-radius: 16px;
@@ -78,6 +83,35 @@
 .angelita-burbuja--nino {
   border-radius: 22px;
   font-size: 0.82rem;
+}
+
+/* El botón de "responder por voz" (#91): disco pequeño alineado con el
+   ícono del tipo, mismo lenguaje visual que EscuchaFab pero en miniatura —
+   no compite con el texto, vive pegado al borde derecho de la burbuja. */
+.angelita-burbuja__escuchar {
+  flex: 0 0 auto;
+  display: grid;
+  place-items: center;
+  width: 1.55rem;
+  height: 1.55rem;
+  margin-top: 0.12rem;
+  border: none;
+  border-radius: 50%;
+  background: var(--ab-fondo-icono);
+  box-shadow: inset 0 0 0 1px var(--ab-borde);
+  color: var(--ab-acento);
+  cursor: pointer;
+  transition: transform 0.15s ease, background 0.15s ease;
+}
+
+.angelita-burbuja__escuchar:hover,
+.angelita-burbuja__escuchar:focus-visible {
+  background: var(--ab-acento);
+  color: rgba(10, 20, 30, 0.92);
+}
+
+.angelita-burbuja__escuchar:active {
+  transform: scale(0.9);
 }
 
 /* Solo para lectores de pantalla (el tipo narrado). */

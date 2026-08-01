@@ -342,6 +342,26 @@ export default function MiFincaVivaScreen({ onBack, onHome, onNavigate }) {
           <Scale size={22} className="text-amber-200 shrink-0" aria-hidden="true" />
         </button>
 
+        {/* Ahorcado Contaminado: ahorcado clásico con metáfora de contaminación,
+            dataset fundamentado de síntomas/plaguicidas vetados/alternativas
+            agroecológicas (Tarea #38, juego construido en Tarea #93). */}
+        <button
+          type="button"
+          data-testid="entrada-ahorcado-contaminado"
+          onClick={() => irAccion('ahorcado_contaminado')}
+          className="jp-mfv-entrada w-full text-left rounded-2xl p-4 bg-gradient-to-br from-rose-700/40 to-emerald-800/40 border-2 border-rose-400/40 hover:border-rose-300/60 active:scale-[0.99] transition flex items-center gap-3"
+        >
+          <span className="text-4xl shrink-0" aria-hidden="true">☠️</span>
+          <span className="flex-1 min-w-0">
+            <span className="jp-tinta block text-base font-black text-white">Ahorcado Contaminado</span>
+            <span className="jp-tinta-suave block text-sm text-rose-100/90 leading-snug">
+              Adivina la palabra antes de que la finca se contamine. Síntomas de
+              intoxicación, plaguicidas vetados y alternativas que sí sirven.
+            </span>
+          </span>
+          <Sprout size={22} className="text-rose-200 shrink-0" aria-hidden="true" />
+        </button>
+
         {/* Barra de progreso del mundo (alegre, pero honesta: % real) */}
         <div>
           <div className="flex items-center justify-between mb-1.5">

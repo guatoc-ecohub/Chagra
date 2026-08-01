@@ -245,12 +245,13 @@ export async function fetchClimaSnapshot({ lat, lng, elevation, forceRefresh = f
         }
         return payload ? withEffectiveEnso(memCache?.payload || payload) : payload;
     })();
-    inFlight = { key, promise };
+    const inFlightToken = {};
+    inFlight = { key, promise, token: inFlightToken };
 
     try {
         return await promise;
     } finally {
-        if (inFlight.promise === promise) inFlight = null;
+        if (inFlight && inFlight.token === inFlightToken) inFlight = null;
     }
 }
 

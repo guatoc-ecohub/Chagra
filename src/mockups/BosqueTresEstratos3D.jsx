@@ -31,21 +31,53 @@ import { Canvas } from '@react-three/fiber';
 import { OrbitControls, AdaptiveDpr } from '@react-three/drei';
 import BosqueTresEstratos from '../visual/mundo3d/bosque/BosqueTresEstratos.jsx';
 import { ESTRATOS } from '../visual/mundo3d/bosque/estratosAltoandinos.geom.js';
+import {
+  MAPA_PISO_ENT,
+  PISO_DEFECTO,
+  protagonistaDePiso,
+  vecinoDePiso,
+} from '../visual/mundo3d/bosque/pisosBosqueGradiente.js';
+import { getPieza } from '../data/entGuion.js';
 import { LuzMadre, CIELOS, mezclarCielo } from '../visual/mundo3d/paleta/index.js';
 import { decidirTier, perfilDeTier } from '../visual/mundo3d/deviceTier.js';
+import usePerfilFincaStore from '../store/usePerfilFincaStore.js';
 
-/* La cámara se para en el CLARO, sobre la lomita, mirando la ORILLA del bosque
-   desde afuera y un poco desde arriba. Es la única posición desde la que los
-   tres pisos se apilan a la vista: metida entre los troncos uno solo ve fustes
-   y las copas quedan cortadas por el borde de la pantalla. Retroceder fue,
-   literalmente, lo que hizo visible la lección. */
-const CAM = /** @type {[number, number, number]} */ ([2.4, 8.6, 31]);
-const MIRA = /** @type {[number, number, number]} */ ([0, 7.2, -9]);
+/* La cámara se para frente al CLARO, mirando al GUARDIÁN del piso: el Ent
+   maestro plantado en el centro (roble/aliso) queda de héroe, con el rodal de
+   los tres estratos abriéndose detrás y el vecino al fondo. Antes miraba la
+   ORILLA de lejos para apilar los tres pisos; ahora se acerca al claro para que
+   el guardián y su cara talladas se lean, sin perder la catedral detrás (que
+   además la niebla vela a partir de los 30). */
+const CAM = /** @type {[number, number, number]} */ ([1.6, 5.2, 28]);
+const MIRA = /** @type {[number, number, number]} */ ([0, 3.8, 11]);
 
 const ORDEN = ['dosel', 'sotobosque', 'suelo'];
 
 const COPY_ENTERO =
   'Así se ve un bosque altoandino: no es una masa de árboles iguales sino tres pisos, y cada piso vive de una luz distinta. Toque un piso para que se lo señale.';
+
+/* ── EL ENT POR PISO TÉRMICO (mismo mapa compartido que la ladera y el páramo) ─
+   El bosque nativo ALTOANDINO de esta vitrina protagoniza los pisos forestales
+   de montaña: templado (roble) y frío (aliso). El páramo tiene su propio mundo
+   (la queñua) y la tierra caliente (ceiba) es bosque SECO tropical, no este
+   bosque de niebla: los dos caen al roble (templado, el default de la casa)
+   para que este mundo siempre muestre un guardián de bosque. El protagonista
+   sale del piso de la finca y su ÚNICO vecino visible, del MISMO módulo
+   compartido `pisosBosqueGradiente` (no a mano). Máximo dos. */
+const PISOS_DE_ESTE_BOSQUE = ['templado', 'frio'];
+function pisoBosqueDe(pisoTermico) {
+  const p = protagonistaDePiso(pisoTermico);
+  return PISOS_DE_ESTE_BOSQUE.includes(p) ? p : PISO_DEFECTO;
+}
+
+/* Ent (roble/aliso) → su pieza del guion pedagógico grounded (`entGuion`,
+   verificado contra el catálogo v3.2). El roble cuenta las bellotas que son
+   despensa del oso; el aliso, el nitrógeno que le fija Frankia. Es la lección
+   que dice el guardián del claro. */
+const LECCION_ENT_ID = {
+  roble: 'roble_bellotas_despensa_fauna',
+  aliso: 'aliso_fija_nitrogeno',
+};
 
 export default function BosqueTresEstratos3D() {
   const [listo, setListo] = useState(false);
@@ -60,6 +92,23 @@ export default function BosqueTresEstratos3D() {
     [],
   );
   const perfil = useMemo(() => perfilDeTier(tier), [tier]);
+
+  /* SU Ent, no un Ent: el guardián sale del piso térmico de la finca
+     (`usePerfilFincaStore`, el mismo store que siembra el valle y la ladera).
+     Sin perfil, con el perfil de demo, o con un piso que este bosque no
+     protagoniza (páramo/cálido) cae al roble. El vecino sale del mapa
+     compartido — máximo dos. */
+  const perfilFinca = usePerfilFincaStore((s) => s.perfil);
+  const { entProtagonista, entVecino, leccionEnt } = useMemo(() => {
+    const piso = pisoBosqueDe(perfilFinca?.pisoTermico);
+    const prot = MAPA_PISO_ENT[piso];
+    const pisoVec = vecinoDePiso(piso);
+    return {
+      entProtagonista: prot,
+      entVecino: pisoVec ? MAPA_PISO_ENT[pisoVec] : null,
+      leccionEnt: getPieza(LECCION_ENT_ID[prot]),
+    };
+  }, [perfilFinca]);
 
   /* La atmósfera: la familia `sotobosque` mezclada 60 % hacia la madre, que es
      la ley de la casa. El fondo y la niebla salen de ahí — ni un hex a mano. */
@@ -113,6 +162,8 @@ export default function BosqueTresEstratos3D() {
           perfil={perfil}
           reducedMotion={reducedMotion}
           destacado={destacado}
+          entProtagonista={entProtagonista}
+          entVecino={entVecino}
         />
 
         <OrbitControls
@@ -136,10 +187,25 @@ export default function BosqueTresEstratos3D() {
       </Canvas>
 
       <div className="bte-chrome">
-        <h2 className="bte-titulo">
-          El bosque nativo: sus tres estratos
-          <small>Doce formas de crecimiento con las que se puede mostrar el catálogo entero</small>
-        </h2>
+        <div className="bte-cabeza">
+          <h2 className="bte-titulo">
+            El bosque nativo: sus tres estratos
+            <small>Doce formas de crecimiento con las que se puede mostrar el catálogo entero</small>
+          </h2>
+
+          {/* EL GUARDIÁN habla: la lección grounded del Ent maestro del piso
+              (el mismo guion pedagógico de la ladera y el páramo). Nunca muda. */}
+          {leccionEnt && (
+            <article className="bte-guardian" role="status">
+              <h3>
+                {leccionEnt.nombre_comun}
+                {' '}
+                <em>{leccionEnt.nombre_cientifico}</em>
+              </h3>
+              <p>{leccionEnt.snippet_pedagogico}</p>
+            </article>
+          )}
+        </div>
 
         <div className="bte-pie">
           <div className="bte-estratos" role="group" aria-label="Estratos del bosque">
@@ -174,8 +240,13 @@ const CSS = `
 .bte-root { position: relative; width: 100%; height: 100dvh; min-height: 320px; overflow: hidden; background: #d7e6c9; }
 .bte-canvas { position: absolute; inset: 0; }
 .bte-chrome { position: absolute; inset: 0; z-index: 7; pointer-events: none; display: flex; flex-direction: column; justify-content: space-between; }
+.bte-cabeza { display: flex; flex-direction: column; align-items: flex-start; gap: 0.55rem; }
 .bte-titulo { margin: 0; padding: 0.9rem 1rem 0; color: #22301f; text-shadow: 0 1px 8px rgba(232,242,223,0.8); font: 700 1.18rem/1.2 system-ui, sans-serif; letter-spacing: 0.01em; }
 .bte-titulo small { display: block; font: 500 0.8rem/1.3 system-ui, sans-serif; opacity: 0.86; margin-top: 0.15rem; }
+.bte-guardian { margin: 0 1rem; max-width: 26rem; padding: 0.55rem 0.95rem 0.65rem; border-radius: 0.8rem; background: rgba(28,40,26,0.72); backdrop-filter: blur(4px); color: #eff5e9; }
+.bte-guardian h3 { margin: 0 0 0.25rem; font: 700 0.9rem/1.25 system-ui, sans-serif; }
+.bte-guardian h3 em { font-weight: 500; font-style: italic; opacity: 0.85; }
+.bte-guardian p { margin: 0; font: 500 0.79rem/1.5 system-ui, sans-serif; }
 .bte-pie { padding: 0 1rem 0.9rem; display: flex; flex-direction: column; align-items: center; gap: 0.55rem; }
 .bte-estratos { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 0.5rem; }
 .bte-carta { margin: 0; max-width: 34rem; text-align: center; padding: 0.5rem 0.95rem; border-radius: 0.7rem; background: rgba(28,40,26,0.66); backdrop-filter: blur(3px); color: #eff5e9; font: 500 0.8rem/1.5 system-ui, sans-serif; }
@@ -187,6 +258,9 @@ const CSS = `
   .bte-titulo { font-size: 1.02rem; padding: 0.7rem 0.8rem 0; }
   .bte-carta { font-size: 0.75rem; max-width: 100%; }
   .bte-boton { padding: 0.4rem 0.8rem; font-size: 0.75rem; }
+  .bte-guardian { margin: 0 0.8rem; max-width: 100%; padding: 0.5rem 0.8rem 0.6rem; }
+  .bte-guardian h3 { font-size: 0.84rem; }
+  .bte-guardian p { font-size: 0.74rem; }
 }
 @media (prefers-reduced-motion: reduce) { .bte-canvas { transition: none !important; } }
 `;

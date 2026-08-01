@@ -1338,6 +1338,103 @@ describe('filterNoiseEntities', () => {
 });
 
 // ──────────────────────────────────────────────────────────────────────────
+// R2 — siglas institucionales y meta-pregunta (fallo real canario 2026-07-20)
+// El canario preguntó "¿de dónde sale esa recomendación? Dame la fuente o la
+// entidad (ICA / SENA)..." y el resolver mapeó "ICA" → col rizada (Brassica
+// oleracea, cuya prosa cita "Fuentes Tier A: ICA Resolución 3168/2015...") y
+// "Fuente" → Pennisetum setaceum (nombre_comun "Pasto fuente"). El agente
+// construyó toda la respuesta sobre esas especies fantasma.
+// ──────────────────────────────────────────────────────────────────────────
+describe('filterNoiseEntities — siglas institucionales y meta-pregunta (canario 2026-07-20)', () => {
+  it('descarta "ICA" aunque haya resuelto a col rizada (Brassica oleracea)', () => {
+    const entities = [
+      { mentioned: 'ICA', kind: 'species', nombre_comun: 'col rizada', nombre_cientifico: 'Brassica oleracea' },
+    ];
+    expect(filterNoiseEntities(entities)).toHaveLength(0);
+  });
+
+  it('descarta "SENA" igual que "ICA"', () => {
+    const entities = [
+      { mentioned: 'SENA', kind: 'species', nombre_comun: 'algo', nombre_cientifico: 'Algo sp.' },
+    ];
+    expect(filterNoiseEntities(entities)).toHaveLength(0);
+  });
+
+  it('descarta "Fuente" aunque haya resuelto a Pennisetum setaceum ("pasto fuente")', () => {
+    const entities = [
+      { mentioned: 'Fuente', kind: 'species', nombre_comun: 'pasto fuente', nombre_cientifico: 'Pennisetum setaceum' },
+    ];
+    expect(filterNoiseEntities(entities)).toHaveLength(0);
+  });
+
+  it('descarta el resto de siglas institucionales y vocabulario de meta-pregunta', () => {
+    const ruido = [
+      'agrosavia', 'corpoica', 'mads', 'ideam', 'icontec', 'dane', 'cenicafe',
+      'fao', 'minagricultura', 'umata', 'car', 'cvc', 'invima', 'upra',
+      'fuentes', 'entidad', 'entidades', 'norma', 'normativa', 'resolucion',
+      'decreto', 'ley', 'cartilla', 'referencia', 'recomendacion',
+    ].map((m) => ({ mentioned: m, kind: 'species' }));
+    expect(filterNoiseEntities(ruido)).toHaveLength(0);
+  });
+
+  it('NO-REGRESIÓN: "pasto fuente" (mención completa de una especie real) se CONSERVA', () => {
+    const entities = [
+      { mentioned: 'pasto fuente', kind: 'species', nombre_comun: 'pasto fuente', nombre_cientifico: 'Pennisetum setaceum' },
+    ];
+    const out = filterNoiseEntities(entities);
+    expect(out).toHaveLength(1);
+    expect(out[0].mentioned).toBe('pasto fuente');
+  });
+
+  it('NO-REGRESIÓN: una especie legítima cualquiera (papa → Solanum tuberosum) se CONSERVA', () => {
+    const entities = [
+      { mentioned: 'papa', kind: 'species', nombre_comun: 'papa', nombre_cientifico: 'Solanum tuberosum' },
+    ];
+    const out = filterNoiseEntities(entities);
+    expect(out).toHaveLength(1);
+    expect(out[0].mentioned).toBe('papa');
+  });
+
+  it('en la cadena: "ICA"→col rizada NO dispara guards sobre la especie fantasma', () => {
+    const resolved = [
+      { mentioned: 'ICA', kind: 'species', nombre_comun: 'col rizada', nombre_cientifico: 'Brassica oleracea' },
+    ];
+    const txt = 'El ICA (Brassica oleracea) se cultiva bien en climas fríos.';
+    const out = applyOutputGuards(txt, { resolvedEntities: resolved });
+    expect(out.modified).toBe(false);
+  });
+
+  it('el cotejo es EXACTO y normalizado: "ICA" (mayúsculas) se filtra igual que "ica"', () => {
+    const entities = [
+      { mentioned: 'ICA', kind: 'species', nombre_comun: 'col rizada', nombre_cientifico: 'Brassica oleracea' },
+      { mentioned: 'ica', kind: 'species', nombre_comun: 'col rizada', nombre_cientifico: 'Brassica oleracea' },
+      { mentioned: 'IcA', kind: 'species', nombre_comun: 'col rizada', nombre_cientifico: 'Brassica oleracea' },
+    ];
+    expect(filterNoiseEntities(entities)).toHaveLength(0);
+  });
+
+  it('LIMITACIÓN CONOCIDA (no es un defecto a esconder): "ICA / SENA" como span largo NO se filtra', () => {
+    // El cotejo de filterNoiseEntities es sobre `mentioned` COMPLETO y
+    // normalizado contra la lista cerrada (NLU_NOISE_MENTIONS.has(...)), no
+    // substring ni tokenización interna. Si el sidecar devuelve un span largo
+    // ("ICA / SENA", la frase completa que el usuario tecleó) en vez del
+    // token institucional suelto ("ICA"), ese span NO es un elemento literal
+    // del Set → el filtro NO lo descarta. Esto es una limitación conocida y
+    // documentada del alcance de este fix, no una regresión: el fix de raíz
+    // (turno 4 del canario 2026-07-20) resolvía tokens sueltos ("ICA",
+    // "Fuente"), que sí quedan cubiertos. Si el resolver empieza a devolver
+    // spans largos con instituciones embebidas, hará falta un guard aparte
+    // (fuera de alcance de este PR).
+    const entities = [
+      { mentioned: 'ICA / SENA', kind: 'species', nombre_comun: 'col rizada', nombre_cientifico: 'Brassica oleracea' },
+    ];
+    const out = filterNoiseEntities(entities);
+    expect(out).toHaveLength(1);
+    expect(out[0].mentioned).toBe('ICA / SENA');
+  });
+});
+
+// ──────────────────────────────────────────────────────────────────────────
 // ORQUESTADOR + telemetría
 // ──────────────────────────────────────────────────────────────────────────
 // ──────────────────────────────────────────────────────────────────────────

@@ -29,13 +29,83 @@ export const ENV = {
   // Modelos de inferencia (configurables sin recompilar).
   // Cambia en .env cuando bumpees el modelo local.
   STT_MODEL: import.meta.env?.VITE_STT_MODEL || 'base',
-  // 2026-07-22: granite3.3:8b → gemma4:e2b, por medición con juez semántico sobre
-  // 70 sondas: granite3.3 contamina el 47,7% de sus respuestas y falla el piso
-  // térmico el 41,7% de las veces (le da consejo de tierra caliente a alguien de
-  // páramo). gemma4:e2b baja a 10% global y 6,7% en piso térmico — 4,8x mejor.
-  // Además pesa 8,1GB cargado contra 7,2GB, y CONVIVE con el embedder del RAG
-  // (snowflake-arctic-embed2) en la M6000 de 12GB, cosa que granite3.3 no hacía:
-  // con granite el embedder daba cudaMalloc OOM y el RAG semántico se apagaba en
-  // silencio. Verificado en vivo: embed 200ms + agente 860-1450ms, conviviendo.
-  NLU_MODEL: import.meta.env?.VITE_NLU_MODEL || 'gemma4:e2b',
+
+  // ─────────────────────────────────────────────────────────────────────
+  // FUENTE DE VERDAD del/los modelo(s) del agente — cambiar SOLO aquí.
+  //
+  // Todo el código de este repo que invoca el LLM del agente (NLU local,
+  // extractor de entidades por voz, chat, chat_complex, visión) DEBE leer
+  // su modelo de una de las 5 claves de abajo. Prohibido volver a
+  // hardcodear el nombre del modelo en servicios/componentes — si aparece
+  // un nuevo caso de uso del agente, agregue una clave aquí, no un literal
+  // disperso.
+  //
+  // El sidecar (chagra-pro, repo aparte) corre su propio NLU real
+  // (agro-mcp nlu.ts) con su propia env var runtime `NLU_MODEL` — ESE valor
+  // vive fuera de este repo y debe alinearse manualmente con este valor.
+  //
+  // Roles:
+  //  - NLU_MODEL:          voiceRouter.callNlu (clasificación+extracción de
+  //                        intención por voz, on-device Ollama directo) y
+  //                        HelpVoiceQuestion (Q&A sobre contenido).
+  //  - EXTRACTOR_MODEL:    entityExtractor (extrae {crop,quantity,location}
+  //                        de la transcripción). Rol propio porque su
+  //                        elección histórica se basó en co-residencia/hot-
+  //                        load en GPU, no en calidad NLU per se.
+  //  - CHAT_MODEL:         llmRouter ROUTES.chat (queries simples).
+  //  - CHAT_COMPLEX_MODEL: llmRouter ROUTES.chat_complex (queries complejas,
+  //                        anti-alucinación taxonómica/piso térmico).
+  //  - VISION_MODEL:       diagnóstico foliar + reconocimiento de especies
+  //                        (aiService.js), pre-warm de cámara
+  //                        (visionWarmService.js) y llmRouter ROUTES.vision.
+  //
+  // 2026-07-23 (PR #2738, §8/§9): gemma4:e4b → gemma3:4b como default de
+  // las 5 claves — unifica agente de texto Y visión en un solo modelo de
+  // 3.3GB. Texto: 81.7 en el índice de inteligencia interno (línea base
+  // reproducible, test #2735), prácticamente empatado con e4b (81.6).
+  // Visión (bench profundo, 18 plagas + 5 sanas control): gemma3:4b saca
+  // 45.5 (33.3% identificación, 100% honestidad) contra 16.9 de
+  // qwen3-vl:8b (11.1% ident., 80% honestidad, swap de ~53s que este
+  // cambio elimina). `llama3.2-vision:11b` queda retirado como primary de
+  // reconocimiento de especies: 0% honestidad, alucina diagnóstico en
+  // TODAS las muestras sanas del bench (peligroso para una feature de
+  // salud de planta). Detalle completo en PR #2738 (bench) y
+  // Chagra-strategy/ops/MODELS.md (fuente única de detalle/bench).
+  //
+  // ⚠️ Caveat metodológico (dejar explícito para revisión humana antes de
+  // producción): el bench de PR #2738 usa un dataset distinto (18 plagas +
+  // 5 sanas, métrica agregada IDENT/HONESTIDAD) del bench "Arena visual
+  // 2026-07-22" ya citado en llmRouter.js (12 casos, presencia SIEMPRE
+  // emparejada con su ausencia), que había marcado gemma3:4b como
+  // "inservible como gate" — fallaba 3/7 casos de AUSENCIA (alucinaba ver
+  // algo que no estaba). El bench nuevo no repite ese diseño pareado
+  // presencia/ausencia específico, así que no re-testea directamente esa
+  // falla puntual; sí corrige un bug real del harness de honestidad
+  // (reconocía solo "no sé" literal). PR #2738 está abierto y marcado
+  // "No mergear — para revisión" al momento de este cambio. Confirmar con
+  // el operador que la lectura de ambos benches se concilia antes de que
+  // este PR llegue a producción (dev→main).
+  // 2026-07-24 (maratón #2738, §10-12): gemma3:4b → qwen3.5:4b como default de
+  // las 5 claves. Ganador ROBUSTO del test exhaustivo (25+ modelos): índice de
+  // texto 84.7 (#1 desplegable; +14.8 vs prod e2b 69.9), y en el set DURO v2 su
+  // ventaja se ABRE de +3 a +13 (razona, no memoriza). Iguala visión (45.5 = gemma3:4b)
+  // y supera al qwen3-vl:8b actual (16.9) sin su swap de 53s. Multimodal + tools +
+  // thinking, 3.4GB → un solo modelo para chat+visión+agente. Contaminación 5% (la
+  // más baja de su nivel). qwen3.5:4b (3.4GB) + qwen3-vl (7.6GB) sí caben juntos si se
+  // quisiera separar visión. Detalle: informe test-inteligencia-chagra-2026-07-23 + MODELS.md.
+  NLU_MODEL: import.meta.env?.VITE_NLU_MODEL || 'qwen3.5:4b',
+  EXTRACTOR_MODEL: import.meta.env?.VITE_EXTRACTOR_MODEL || 'qwen3.5:4b',
+  CHAT_MODEL: import.meta.env?.VITE_LLM_CHAT_MODEL || 'qwen3.5:4b',
+  CHAT_COMPLEX_MODEL: import.meta.env?.VITE_LLM_COMPLEX_MODEL || 'qwen3.5:4b',
+  VISION_MODEL: import.meta.env?.VITE_VISION_MODEL || 'qwen3.5:4b',
+  // ── EL SEGUNDO PASO DEL DIAGNÓSTICO (decisión del operador 2026-07-26) ──
+  // `VISION_MODEL` contesta de una para que el usuario no espere;
+  // `VISION_REVIEW_MODEL` vuelve a mirar la foto en segundo plano y sólo
+  // habla si encuentra algo que el primero pasó por alto.
+  // Medido sobre 19 fotos reales de matas (scripts/bench-vision-matas.mjs):
+  // qwen3.5:4b nunca alarma de más pero dejó pasar la broca del café;
+  // qwen3-vl:4b no deja pasar ninguna enferma (11/11) pero alarma de más y
+  // tarda 2,3× — los errores son de TIPO OPUESTO, así que el segundo cubre
+  // justo el hueco del primero. Ver services/segundaOpinionFoto.js.
+  VISION_REVIEW_MODEL: import.meta.env?.VITE_VISION_REVIEW_MODEL || 'qwen3-vl:4b',
 };

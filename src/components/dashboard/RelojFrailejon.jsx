@@ -33,17 +33,58 @@ const R_PASO = 6.5;
 const MAX_ANILLOS_COMODOS = 12;
 
 export default function RelojFrailejon({ onNavigate }) {
-  const [reloj, setReloj] = useState(null);
+  // undefined = leyendo los registros · null = sin datos (no se dibuja nada
+  // inventado) · objeto = los años reales de la finca.
+  const [reloj, setReloj] = useState(undefined);
 
   useEffect(() => {
     let alive = true;
     getAniosFinca()
-      .then((r) => { if (alive) setReloj(r); })
-      .catch(() => { /* honesto: sin datos no se dibuja nada inventado */ });
+      .then((r) => { if (alive) setReloj(r || null); })
+      .catch(() => { if (alive) setReloj(null); /* honesto: nada inventado */ });
     return () => { alive = false; };
   }, []);
 
-  if (!reloj) return null;
+  // Sin datos reales el reloj no existe: mejor ausencia que historia inventada.
+  if (reloj === null) return null;
+
+  // LEYENDO: el frailejón germina mientras llegan los registros reales — un
+  // esqueleto vivo (semilla que late + anillos punteados girando), no un hueco.
+  if (reloj === undefined) {
+    return (
+      <div
+        className="adm-reloj adm-reloj-espera"
+        data-testid="reloj-frailejon-cargando"
+        role="status"
+        aria-label="Leyendo los anillos de su finca en los registros"
+      >
+        <svg className="adm-reloj-svg" viewBox="0 0 120 120" aria-hidden="true" focusable="false">
+          <circle cx="60" cy="60" r="44" fill="#2dffc4" opacity="0.05" />
+          <circle
+            className="adm-reloj-espera-anillo"
+            cx="60" cy="60" r="20" fill="none"
+            stroke="#57a453" strokeWidth="1.5" strokeDasharray="4 8"
+            strokeLinecap="round" opacity="0.55"
+          />
+          <circle
+            className="adm-reloj-espera-anillo adm-reloj-espera-r2"
+            cx="60" cy="60" r="33" fill="none"
+            stroke="#9dff3f" strokeWidth="1.2" strokeDasharray="3 10"
+            strokeLinecap="round" opacity="0.3"
+          />
+          <circle className="adm-reloj-corazon" cx="60" cy="60" r="4" fill="#ffb54f" />
+          <circle cx="60" cy="60" r="1.6" fill="#fff3c9" />
+        </svg>
+        <span className="adm-reloj-texto">
+          <span className="adm-reloj-cab">EL RELOJ DEL FRAILEJÓN</span>
+          <strong className="adm-reloj-anios">Contando sus anillos…</strong>
+          <span className="adm-reloj-nota">
+            Leyendo los años reales de su finca en los registros.
+          </span>
+        </span>
+      </div>
+    );
+  }
 
   const { anios, primerAnio, anioActual, fincaNueva } = reloj;
   const n = anios.length;

@@ -15,6 +15,7 @@ import {
 import { analyzeFoliage } from '../../services/aiService';
 import { captureAndCompress } from '../../services/photoService';
 import { processPhotoItem, buildPhotoUserMessage } from '../../services/agentOutboxPhoto';
+import { useCompaiSegundaOpinionFoto } from '../../hooks/useCompaiSegundaOpinionFoto';
 import { isAnalyzableImageAttachment, buildAttachmentRejection } from '../../services/agentOutboxAttachment';
 import { AGENT_ENTRANCE_CSS, AGENT_COMPOSITOR_CSS, AGENT_V3_CSS, agentEntranceClass } from './agentEntrance';
 import {
@@ -47,7 +48,8 @@ import { createStreamDeadline } from '../../services/streamDeadline';
 // Sidecar agro-mcp (ADR-045 Fase 2 Step B/C). Detrás de feature flag
 // `VITE_USE_SIDECAR_AGRO_MCP` — con flag off, las funciones devuelven null
 // y el AgentScreen se comporta idéntico al pipeline RAG-only previo.
-import { isSidecarEnabled, planNlu, callTool, executeToolChain, resolveEntities, fermentoPrefilter, biopreparadoGrounding, pisoTermicoGuard, confusionEspecieGuard, pestVsDiseaseGuard, companionSpeciesGuard, postValidate, getClimaIdeam, isToolAllowed } from '../../services/sidecarClient';
+import { isSidecarEnabled, planNlu, callTool, executeToolChain, resolveEntities, fermentoPrefilter, biopreparadoGrounding, pisoTermicoGuard, confusionEspecieGuard, pestVsDiseaseGuard, companionSpeciesGuard, toxicSafetyGuard, postValidate, getClimaIdeam, isToolAllowed } from '../../services/sidecarClient';
+import { retrieveCorpus } from '../../services/corpusRetriever';
 // CHIPS DE MODO (A3/A4, decisión operador 2026-06-02): el router PURO mapea
 // la intención forzada del chip → tool determinístico, SALTANDO el NLU
 // (que misroutea). `planForcedIntent` decide tool+args; `isStubIntent` marca
@@ -197,6 +199,9 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
   // colibrí dblclick) AgentScreen no se enteraba.
   const ttsEnabled = usePrefsStore((s) => s.ttsEnabled);
   const setTtsEnabled = usePrefsStore((s) => s.setTtsEnabled);
+  // #67/#43: segunda mirada real sobre la MISMA foto (qwen3-vl:4b, en
+  // segundo plano) — habla SÓLO si discrepa con lo que ya se le dijo.
+  const { pedirRevision: pedirSegundaOpinionFoto } = useCompaiSegundaOpinionFoto();
   const setResponseReady = useAgentNotificationStore((s) => s.setResponseReady);
   const setLastNotificationMessage = useAgentNotificationStore((s) => s.setLastMessage);
   const markRead = useAgentNotificationStore((s) => s.markRead);
@@ -618,8 +623,9 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
   // normal NO debe re-disparar el prompt.
   useEffect(() => {
     if (!initialContext) return;
-    const { prefilledPrompt, prompt, sourceLabel, sourceUrl, alertContext, autoSend, fromVoice } = initialContext;
+    const { prefilledPrompt, prompt, sourceLabel, sourceUrl, alertContext, autoSend, fromVoice, autoOpenCamera } = initialContext;
     let autoSendTimer = null;
+    let autoCameraTimer = null;
     // Alias defensivo: varias pantallas de mundo pasaban la clave `prompt`
     // (SemillaScreen, PlatanoBanano, Poscosecha, Almacenamiento, Compost,
     // SaludSuelo…) creyendo que prellenaban el input, pero solo se leía
@@ -639,6 +645,16 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
         setInputText(seed);
       }
     }
+    // "Enviar foto" desde el menú del gesto del compañero (#66/#70, AgentFab):
+    // llega con autoOpenCamera y disparamos el mismo input oculto que usa el
+    // botón de cámara del compositor — el diagnóstico real llega después
+    // (handleAgentPhotoPick de siempre); aquí solo destrabamos el picker sin
+    // que el operador tenga que buscar el botón.
+    if (autoOpenCamera) {
+      autoCameraTimer = setTimeout(() => {
+        cameraInputAgentRef.current?.click();
+      }, 250);
+    }
     if (sourceUrl || sourceLabel || alertContext) {
       setAlertContextBanner({
         sourceLabel: sourceLabel || null,
@@ -646,7 +662,10 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
         alertContext: alertContext || null,
       });
     }
-    return () => { if (autoSendTimer) clearTimeout(autoSendTimer); };
+    return () => {
+      if (autoSendTimer) clearTimeout(autoSendTimer);
+      if (autoCameraTimer) clearTimeout(autoCameraTimer);
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -904,7 +923,7 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
   // formatToolEvidence y analyzeQuery viven en agentPromptBase (funciones
   // puras, testeables y medibles fuera de React).
 
-  const callLLM = async (query, contextMemory, contextCorpus, toolEvidence, resolvedEntities, suggestedEntities = null, fermentoBlock = '', subgrafoBloque = '', biopreparadoBlock = '', pisoTermicoBlock = '', confusionEspecieBlock = '', pestVsDiseaseBlock = '', groundingPolicyBlock = '') => {
+  const callLLM = async (query, contextMemory, contextCorpus, toolEvidence, resolvedEntities, suggestedEntities = null, fermentoBlock = '', subgrafoBloque = '', biopreparadoBlock = '', pisoTermicoBlock = '', confusionEspecieBlock = '', pestVsDiseaseBlock = '', groundingPolicyBlock = '', toxicSafetyBlock = '') => {
     // Fase 3 del "pensando" visible: generación en el LLM. Cuando llega el
     // primer token, la UI pasa sola al parcial streaming (streamingContent).
     setThinkingPhase('escribiendo');
@@ -1155,6 +1174,18 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
       ? `\n\n${pestVsDiseaseBlock}`
       : '';
 
+    // PISO DE SEGURIDAD ANTE VENENOS (chagra-pro P0 #2, query-side). El sidecar
+    // /toxic-safety-guard escaneó la CONSULTA del usuario: si nombró un
+    // plaguicida tóxico/prohibido, armó un bloque de advertencia + alternativas
+    // MIP. Va de ÚLTIMO (máxima recency, después de todas las guardas) porque es
+    // seguridad y debe DOMINAR — y es INDEPENDIENTE del RAG: cierra el hueco de
+    // la abstención (el guard de salida no ve el veneno si el modelo no repite
+    // el nombre). '' (no-op) cuando la consulta no menciona veneno o el sidecar
+    // no respondió (degradación graceful — no rompe el turno).
+    const toxicSafetyContext = (typeof toxicSafetyBlock === 'string' && toxicSafetyBlock.trim())
+      ? `\n\n${toxicSafetyBlock}`
+      : '';
+
     // MODO CIENTÍFICO (#17) — bloque answer/hedge/abstain ya formateado por
     // el sidecar (WIRING real de grounding-policy.ts/grounding-prompt-
     // formatter.ts). Va DENTRO del cluster de grounding (después de la cadena
@@ -1199,6 +1230,7 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
       pisoTermico: pisoTermicoSafetyBlock,
       confusionEspecie: confusionEspecieSafetyBlock,
       pestVsDisease: pestVsDiseaseSafetyBlock,
+      toxicSafety: toxicSafetyContext,
     });
 
     const messages = [
@@ -1471,7 +1503,15 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
       await addTurn(operatorId, { role: 'user', content: text.trim() });
 
       const contextMemory = wasFreshSession ? '' : await getContextString(operatorId, 10);
-      const contextCorpus = await retrieve(textForLLM, TOP_N_RAG, 'agente');
+      const contextCorpusBase = await retrieve(textForLLM, TOP_N_RAG, 'agente');
+      // #2593 corpus→chat: suma los chunks del corpus server-side (pgvector +
+      // reranker neural bge-reranker-v2-m3 + gate low_relevance) vía
+      // /hybrid-retrieve. Gated por VITE_USE_CORPUS_RETRIEVAL (OFF por defecto)
+      // y fail-soft (devuelve [] si falla) → sin el flag, cero cambio en el chat.
+      const corpusExtra = await retrieveCorpus(textForLLM, 3);
+      const contextCorpus = corpusExtra.length
+        ? [...contextCorpusBase, ...corpusExtra]
+        : contextCorpusBase;
 
       // ADR-045 Fase 2 Step B/C — sidecar NLU + MCP tool grounding.
       // Solo si flag VITE_USE_SIDECAR_AGRO_MCP=true Y estamos online.
@@ -1523,6 +1563,11 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
       // coinciden). '' por default → no-op (degradación graceful, incluye el
       // caso de desacuerdo catálogo↔heurística — fail-safe a propósito).
       let pestVsDiseaseBlock = '';
+      // PISO DE SEGURIDAD ANTE VENENOS (chagra-pro P0 #2, query-side). Bloque de
+      // advertencia toxicidad + MIP ya formateado por el sidecar
+      // (/toxic-safety-guard) cuando la CONSULTA menciona un plaguicida
+      // tóxico/prohibido. '' por default → no-op (degradación graceful).
+      let toxicSafetyBlock = '';
       // MODO CIENTÍFICO (#17) — WIRING real de grounding-policy.ts/grounding-
       // prompt-formatter.ts (audit 2026-07-04-optimizacion-grounding-
       // velocidad-inteligencia.md win #4). El sidecar decide answer/hedge/
@@ -1565,13 +1610,14 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
           // /resolve-entities (mismo turno, antes del LLM) — CERO latencia
           // serial añadida. Los seis wrappers son no-throw (devuelven null en
           // error/timeout), así que Promise.all no puede rechazar por ellos.
-          const [resolved, fermento, biopreparado, pisoTermico, confusionEspecie, pestVsDisease] = await Promise.all([
+          const [resolved, fermento, biopreparado, pisoTermico, confusionEspecie, pestVsDisease, toxicSafety] = await Promise.all([
             resolveEntities(textForLLM, { fincaAltitud: reAltitud, context: contextMemory }),
             fermentoPrefilter(textForLLM),
             biopreparadoGrounding(textForLLM),
             pisoTermicoGuard(textForLLM, { fincaAltitud: reAltitud, pisoTermico: rePisoTermico }),
             confusionEspecieGuard(textForLLM),
             pestVsDiseaseGuard(textForLLM),
+            toxicSafetyGuard(textForLLM),
           ]);
           const tRE1 = performance.now();
           // FERMENTOS: si el sidecar marcó intención-fermento, inyectamos su
@@ -1648,6 +1694,18 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
               termCategoria: pestVsDisease.term_categoria,
               manejoEquivocadoDetectado: pestVsDisease.manejo_equivocado_detectado,
               reason: pestVsDisease.reason,
+            });
+          }
+          // PISO DE SEGURIDAD ANTE VENENOS (P0 #2): si el sidecar detectó que la
+          // CONSULTA menciona un plaguicida tóxico/prohibido, inyectamos su
+          // bloque de advertencia + MIP (máxima recency, independiente del RAG).
+          // Si el sidecar no respondió (null) o no hay veneno, toxicSafetyBlock
+          // queda '' → no-op, el turno sigue sin romperse (fail-safe).
+          if (toxicSafety && toxicSafety.has_toxic_mention && typeof toxicSafety.system_prompt_block === 'string' && toxicSafety.system_prompt_block.trim()) {
+            toxicSafetyBlock = toxicSafety.system_prompt_block;
+            console.debug('[sidecar] toxic-safety-guard', {
+              toxics: toxicSafety.toxics,
+              reason: toxicSafety.reason,
             });
           }
           if (resolved && Array.isArray(resolved.entities) && resolved.entities.length > 0) {
@@ -2233,7 +2291,7 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
       const deterministicPrice = buildPriceAnswer({ userMessage: text, toolEvidence });
       const rawResponse = deterministicPrice != null
         ? deterministicPrice
-        : await callLLM(textForLLM, contextMemory, contextCorpus, toolEvidence, resolvedEntities, suggestedEntities, fermentoBlock, edgesTruncated, biopreparadoBlock, pisoTermicoBlock, confusionEspecieBlock, pestVsDiseaseBlock, groundingPolicyBlock);
+        : await callLLM(textForLLM, contextMemory, contextCorpus, toolEvidence, resolvedEntities, suggestedEntities, fermentoBlock, edgesTruncated, biopreparadoBlock, pisoTermicoBlock, confusionEspecieBlock, pestVsDiseaseBlock, groundingPolicyBlock, toxicSafetyBlock);
       if (deterministicPrice != null) {
         console.debug('[precio] respuesta determinista SIPSA (sin LLM)', { route: nluRoute });
       }
@@ -3271,6 +3329,33 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
     setAgentPickError('');
   };
 
+  /**
+   * #67/#43 — dispara la segunda mirada real sobre la foto que YA se
+   * diagnosticó en este turno (fire-and-forget: nunca bloquea ni retrasa la
+   * respuesta principal, que ya salió). Si discrepa, `avisar` inserta una
+   * burbuja de asistente NUEVA — el mismo lugar donde ya vive la
+   * conversación — y la habla si el usuario tiene TTS activo (mismo canal
+   * por el que ya viene escuchando). Si coincide, queda en silencio total
+   * (regla del propio módulo): no hay burbuja "confirmado" que sea puro ruido.
+   */
+  const dispararSegundaOpinionFoto = useCallback((blob, finding) => {
+    if (!blob) return;
+    pedirSegundaOpinionFoto({
+      imageBlob: blob,
+      finding,
+      canal: ttsEnabled ? 'voz' : 'texto',
+      avisar: (texto, { canal }) => {
+        setMessages((prev) => [
+          ...prev,
+          { role: 'assistant', content: texto, timestamp: Date.now(), _segundaOpinion: true },
+        ]);
+        if (canal === 'voz' && ttsEnabled) {
+          try { speakSentences(texto); } catch (_) { /* degradar en silencio: el texto ya se pintó */ }
+        }
+      },
+    }).catch(() => { /* pedirSegundaOpinion ya degrada en silencio; esto es cinturón extra */ });
+  }, [pedirSegundaOpinionFoto, ttsEnabled]);
+
   const handleAgentSend = async () => {
     if (state === STATE_RECORDING) return;
     // Shimmer/lift animation al enviar (paridad AgentHero).
@@ -3310,6 +3395,9 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
             finding && typeof finding.confidence === 'number' ? finding.confidence : null,
         },
       });
+      // #67/#43: segunda mirada en segundo plano — no bloquea, no retrasa,
+      // habla solo si discrepa con lo que ya se respondió.
+      dispararSegundaOpinionFoto(item.blob, finding);
       return;
     }
     if (!inputText.trim()) return;
@@ -3455,6 +3543,9 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
               finding && typeof finding.confidence === 'number' ? finding.confidence : null,
           },
         });
+        // #67/#43: segunda mirada en segundo plano — no bloquea, no retrasa,
+        // habla solo si discrepa con lo que ya se respondió.
+        dispararSegundaOpinionFoto(item.blob, finding);
         await outboxMarkAnswered(item.id);
         return true;
       }

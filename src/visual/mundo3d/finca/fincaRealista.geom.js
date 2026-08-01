@@ -538,6 +538,10 @@ RAZAS_CERDO['sanpedreño'] = RAZAS_CERDO.sanpedreno;
 RAZAS_CERDO['casco de mula'] = RAZAS_CERDO.cascoDeMula;
 RAZAS_CERDO.cascodemula = RAZAS_CERDO.cascoDeMula;
 
+// El hato puede registrar la raza sin eñe. Ambas grafías deben usar la misma
+// ficha para evitar que una de ellas caiga al cerdo zungo por defecto.
+RAZAS_CERDO['sanpedreño'] = RAZAS_CERDO.sanpedreno;
+
 /**
  * El cerdo por raza. Mira a +X, patas en y=0, lomo a ~0.62.
  * @returns {{cuerpo: THREE.BufferGeometry, cabeza: THREE.BufferGeometry, pivote: [number,number,number]}}

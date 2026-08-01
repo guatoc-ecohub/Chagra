@@ -253,7 +253,7 @@ const VINETAS = {
 /**
  * @param {Object} props
  * @param {Array<{id: string, nombre: string, tinte: string, abre: string,
- *   onClick: Function, emoji?: string}>} props.puertas — buildPuertas del hero
+ *   onClick: React.MouseEventHandler<HTMLButtonElement>, emoji?: string}>} props.puertas - buildPuertas del hero
  *   (fuente única de destinos; aquí solo se pinta).
  */
 export default function PortalesMano({ puertas }) {

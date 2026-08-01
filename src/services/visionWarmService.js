@@ -25,9 +25,13 @@
  */
 
 import { fetchWithAuthRetry } from './apiService.js';
+import { ENV } from '../config/env';
 
 const OLLAMA_URL = '/api/ollama/api/generate';
-const VISION_MODEL = 'llama3.2-vision:11b';
+// 2026-07-23 (PR #2738 §9): lee de ENV.VISION_MODEL (src/config/env.js,
+// fuente única) — antes hardcodeaba 'llama3.2-vision:11b', retirado por
+// bench (0% honestidad, alucinaba en muestras sanas).
+const VISION_MODEL = ENV.VISION_MODEL;
 // keep_alive 5min: si user demora entre click cámara y submit, el modelo
 // sigue caliente. Si user abandona el flow, Ollama lo desaloja en 5min y
 // libera memoria de GPU. Más corto causaría re-warm si el flow toma >2min.

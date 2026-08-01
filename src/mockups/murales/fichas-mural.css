@@ -1,0 +1,283 @@
+.fm-panel {
+  --fm-tinta: #26331f;
+  --fm-papel: #fffaf0;
+  --fm-verde: #3f7d46;
+  position: absolute;
+  inset: 38px 16px 16px;
+  z-index: 8;
+  display: grid;
+  grid-template-rows: 38px minmax(0, 1fr);
+  overflow: hidden;
+  border: 2px solid rgba(38, 51, 31, 0.72);
+  border-radius: 12px;
+  background: var(--fm-papel);
+  color: var(--fm-tinta);
+  box-shadow: 0 10px 28px rgba(32, 42, 24, 0.3);
+  font-family: 'Trebuchet MS', 'Segoe UI', sans-serif;
+}
+
+.fm-cabecera {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 5px 9px 5px 13px;
+  border-bottom: 1px solid rgba(38, 51, 31, 0.22);
+  background: rgba(246, 238, 216, 0.98);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.fm-tabs {
+  display: flex;
+  gap: 5px;
+}
+
+.fm-tabs button {
+  min-height: 28px;
+  padding: 4px 10px;
+  border: 1px solid rgba(38, 51, 31, 0.3);
+  border-radius: 999px;
+  background: #fffdf7;
+  color: var(--fm-tinta);
+  font: inherit;
+  font-size: 10px;
+  cursor: pointer;
+}
+
+.fm-tabs button[aria-selected='true'] {
+  border-color: var(--fm-tinta);
+  background: #dce9c5;
+  box-shadow: 0 2px 0 var(--fm-tinta);
+}
+
+.fm-contenidos,
+.fm-contenido,
+.fm-ficha {
+  min-height: 0;
+  height: 100%;
+}
+
+.fm-ficha {
+  display: grid;
+  grid-template-columns: minmax(0, 1.45fr) minmax(180px, 0.8fr);
+}
+
+.fm-ficha figure {
+  position: relative;
+  min-width: 0;
+  margin: 0;
+  overflow: hidden;
+  border-right: 2px solid rgba(38, 51, 31, 0.2);
+  background: #e8eedc;
+}
+
+.fm-ficha figcaption {
+  position: absolute;
+  left: 10px;
+  bottom: 9px;
+  padding: 4px 9px;
+  border-radius: 999px;
+  background: rgba(36, 30, 20, 0.82);
+  color: #fffaf0;
+  font-size: 10px;
+  font-weight: 800;
+}
+
+.fm-lectura {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 7px;
+  padding: 14px 15px;
+  background:
+    repeating-linear-gradient(0deg, transparent 0 21px, rgba(84, 93, 62, 0.08) 21px 22px),
+    #fffaf0;
+}
+
+.fm-lectura h3,
+.fm-lectura p {
+  margin: 0;
+}
+
+.fm-lectura h3 {
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: 22px;
+  line-height: 1;
+}
+
+.fm-lectura p {
+  font-size: 11px;
+  line-height: 1.34;
+}
+
+.fm-sobrelinea {
+  color: var(--fm-verde);
+  font-size: 9px !important;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.fm-nota {
+  padding-top: 6px;
+  border-top: 1px dashed rgba(38, 51, 31, 0.32);
+  color: #536047;
+}
+
+.fm-foto img,
+.fm-foto svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.fm-foto img {
+  object-fit: cover;
+}
+
+.fm-foto svg text {
+  fill: #fff;
+  font-size: 26px;
+  font-weight: 900;
+  text-anchor: middle;
+  dominant-baseline: central;
+}
+
+.fm-hallazgo {
+  fill: rgba(40, 20, 10, 0.08);
+  stroke: #ffe685;
+  stroke-width: 8;
+  stroke-dasharray: 22 14;
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: fm-gira 9s linear infinite;
+}
+
+.fm-hallazgo-numero {
+  fill: #b83226;
+  stroke: #fff5c8;
+  stroke-width: 5;
+}
+
+.fm-confianza {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 7px 9px;
+  border-radius: 9px;
+  background: #e2efd1;
+  color: #315d36;
+  font-size: 10px;
+  font-weight: 800;
+}
+
+.fm-confianza strong {
+  font-size: 18px;
+}
+
+.fm-lamina-evidencia svg,
+.fm-lamina-agua svg,
+.fm-lamina-mata svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.fm-lamina-evidencia svg {
+  background: #f6eed6;
+}
+
+.fm-fuente {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding-top: 7px;
+  border-top: 1px dashed rgba(38, 51, 31, 0.3);
+  font-size: 10px;
+}
+
+.fm-fuente small {
+  display: block;
+  color: #6b725e;
+}
+
+.fm-semaforo {
+  width: 13px;
+  height: 13px;
+  flex: none;
+  border: 2px solid #fff;
+  border-radius: 50%;
+  background: #65a84d;
+  box-shadow: 0 0 0 2px #4d7e3d;
+}
+
+.fm-lamina-agua .g2__escena {
+  object-fit: cover;
+}
+
+.fm-pasos {
+  display: grid;
+  gap: 5px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: 10px;
+  font-weight: 700;
+}
+
+.fm-pasos li {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.fm-pasos span {
+  display: grid;
+  width: 19px;
+  height: 19px;
+  place-items: center;
+  border-radius: 50%;
+  background: #4c9bbb;
+  color: white;
+}
+
+.fm-lamina-mata svg {
+  background: #f4f6ea;
+}
+
+.fm-etapas {
+  display: flex;
+  gap: 5px;
+}
+
+.fm-etapas button {
+  display: grid;
+  width: 25px;
+  height: 25px;
+  place-items: center;
+  border: 1px solid #648154;
+  border-radius: 50%;
+  background: #fffef7;
+  color: #385a32;
+  font-size: 10px;
+  font-weight: 900;
+  cursor: pointer;
+}
+
+.fm-etapas button[aria-pressed='true'] {
+  background: #5d914d;
+  color: #fff;
+  box-shadow: 0 2px 0 #26331f;
+}
+
+@keyframes fm-gira {
+  to { transform: rotate(360deg); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fm-hallazgo { animation: none; }
+}

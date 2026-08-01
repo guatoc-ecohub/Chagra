@@ -39,6 +39,18 @@ describe('canonicalHostRedirect', () => {
     expect(isAllowedHost('preview.chagra.app')).toBe(true);
   });
 
+  it('permite 3d.guatoc.co (mundos 3D standalone) sin redirigir', () => {
+    expect(isAllowedHost('3d.guatoc.co')).toBe(true);
+  });
+
+  it('NO permite otros subdominios de guatoc.co (host exacto, no wildcard)', () => {
+    // chagra.guatoc.co es el dominio legado de produccion: debe seguir
+    // rebotando a chagra.app, por eso 3d.guatoc.co se agrega como host
+    // exacto y no como *.guatoc.co.
+    expect(isAllowedHost('chagra.guatoc.co')).toBe(false);
+    expect(isAllowedHost('otra-cosa.guatoc.co')).toBe(false);
+  });
+
   it('redirige una sola vez desde un host externo al canonico', () => {
     const redirect = vi.fn();
     const location = {

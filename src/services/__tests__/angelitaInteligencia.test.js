@@ -21,10 +21,20 @@ import {
   mundoDePantalla,
   comentarioDeMundo,
   notificacionesInteligentes,
+  notificacionDeClima,
   debeHablar,
   resolverComportamiento,
   llaveDeDecision,
   COOLDOWN_MS,
+  CADENCIA_MIN_MS,
+  CADENCIA_BASE_MS,
+  CADENCIA_MAX_MS,
+  MOLESTIA_MIN,
+  MOLESTIA_MAX,
+  aplicarSenalMolestia,
+  multiplicadorDeCadencia,
+  cadenciaEfectivaMs,
+  recortarMensaje,
 } from '../angelitaInteligencia';
 // Contrato con la CARA: los estados visuales canónicos que el dibujo entiende.
 import { ESTADOS_ANGELITA } from '../../visual/agente/angelitaEstados';
@@ -33,8 +43,8 @@ const MINUTO = 60 * 1000;
 const sinVoseo = (s) => expect(s).not.toMatch(/\bvos\b|tenés|querés|podés|\btú\b/i);
 
 describe('estados de comportamiento', () => {
-  it('expone los cuatro estados canónicos', () => {
-    expect(ESTADOS_COMPORTAMIENTO).toEqual(['calma', 'aviso', 'celebra', 'husmea']);
+  it('expone los cinco estados canónicos (incluye luto, #109)', () => {
+    expect(ESTADOS_COMPORTAMIENTO).toEqual(['calma', 'aviso', 'celebra', 'husmea', 'luto']);
   });
 
   it('mapea cada estado a vocabulario VISUAL conocido (contrato con la cara)', () => {
@@ -120,6 +130,21 @@ describe('comentarioDeMundo — grounded + honesto', () => {
     sinVoseo(s);
   });
 
+  it('mis_matas: con `agro` (#80/#81, dato real del catálogo) lo teje en el comentario', () => {
+    const s = comentarioDeMundo('mis_matas', {
+      cultivos: [{ name: 'Fríjol', count: 2 }],
+      agro: 'le fija nitrógeno al suelo — buena vecina para las que comen mucho',
+    });
+    expect(s).toMatch(/fríjol/i);
+    expect(s).toMatch(/nitrógeno/i);
+    sinVoseo(s);
+  });
+
+  it('mis_matas: sin `agro` (sin match en el catálogo) no cambia el texto de siempre', () => {
+    const s = comentarioDeMundo('mis_matas', { cultivos: [{ name: 'Fríjol', count: 2 }] });
+    expect(s).not.toMatch(/ojo:/i);
+  });
+
   it('mis_animales: cuenta real o fallback honesto', () => {
     expect(comentarioDeMundo('mis_animales', { total: 5 })).toMatch(/5 animales/i);
     expect(comentarioDeMundo('mis_animales', {})).toMatch(/cuando anote los suyos/i);
@@ -195,6 +220,33 @@ describe('notificacionesInteligentes', () => {
   });
 });
 
+describe('notificacionDeClima (#111 — vive el clima real)', () => {
+  it('sin reacción (null) → calma, no inventa aviso', () => {
+    const n = notificacionDeClima(null);
+    expect(n.hay).toBe(false);
+    expect(n.estado).toBe('calma');
+    expect(n.severidad).toBeNull();
+  });
+
+  it('reacción de helada (severidad alta) → aviso con prioridad máxima', () => {
+    const n = notificacionDeClima({
+      tipo: 'helada', mensaje: 'Uy, mañana hiela.', estado: 'aviso', severidad: 'alta', gesto: 'abriga',
+    });
+    expect(n.hay).toBe(true);
+    expect(n.estado).toBe('aviso');
+    expect(n.severidad).toBe('alta');
+    expect(n.prioridad).toBe(100);
+    expect(n.lead).toBe('Uy, mañana hiela.');
+  });
+
+  it('reacción de sequía (severidad baja) → prioridad de aviso_baja', () => {
+    const n = notificacionDeClima({
+      tipo: 'sequia', mensaje: 'Tengo sed.', estado: 'aviso', severidad: 'baja', gesto: 'pideAgua',
+    });
+    expect(n.prioridad).toBe(45);
+  });
+});
+
 describe('debeHablar — anti-molestia', () => {
   const ahora = 1_000_000_000;
 
@@ -265,16 +317,73 @@ describe('resolverComportamiento — arbitraje', () => {
     expect(d2.estado).toBe('calma');
   });
 
+  it('lamenta una pérdida real (#109, dedup por id, tono nunca culposo)', () => {
+    const ctx = { ahoraMs: ahora, luto: { id: 'luto-planta-7', texto: 'Se nos fue el tomate. Pasa, y se aprende.' } };
+    const d1 = resolverComportamiento(ctx);
+    expect(d1.estado).toBe('luto');
+    expect(d1.visualEstado).toBe('preocupada');
+    expect(d1.logroId).toBe('luto-planta-7');
+    expect(d1.mensaje).not.toMatch(/usted (la |lo )?(dej[oó]|mat[oó])|su culpa|descuid/i);
+    // ya lamentada → no repite
+    const d2 = resolverComportamiento({ ...ctx, ultimoLutoId: 'luto-planta-7' });
+    expect(d2.estado).toBe('calma');
+  });
+
+  it('luto y celebra son independientes: lamentar una planta no bloquea celebrar un logro', () => {
+    const d = resolverComportamiento({
+      ahoraMs: ahora,
+      logro: { id: 'cosecha-9', texto: '¡Buena cosecha!' },
+      ultimoLutoId: 'luto-planta-7', // otra planta, ya lamentada antes
+    });
+    expect(d.estado).toBe('celebra');
+  });
+
+  it('luto le gana a husmear (prioridad 65 > 20) pero no a un aviso urgente', () => {
+    const d = resolverComportamiento({
+      ahoraMs: ahora,
+      notificaciones: avisoAlto,
+      luto: { id: 'luto-planta-8', texto: 'Se nos fue la lechuga.' },
+      mundo: 'mis_matas',
+      datosMundo: { cultivos: [{ name: 'Café', count: 2 }] },
+    });
+    expect(d.estado).toBe('aviso'); // la helada real manda
+  });
+
   it('husmea un mundo con comentario grounded', () => {
     const d = resolverComportamiento({
       ahoraMs: ahora,
       mundo: 'mis_animales',
       datosMundo: { total: 8 },
+      // rand=1 nunca cae bajo PROBABILIDAD_PREGUNTA (#110): este test cubre
+      // el comentario declarativo, no el modo aprendiz (cubierto aparte).
+      rand: () => 1,
     });
     expect(d.estado).toBe('husmea');
     expect(d.visualEstado).toBe('senala');
     expect(d.mensaje).toMatch(/8 animales/i);
     expect(d.interrumpe).toBe(true);
+  });
+
+  it('#110 modo aprendiz: con rand bajo, el husmeo pregunta en vez de comentar', () => {
+    const d = resolverComportamiento({
+      ahoraMs: ahora,
+      mundo: 'mis_matas',
+      datosMundo: { cultivos: [{ name: 'Tomate', count: 4 }] },
+      rand: () => 0.001, // dentro de PROBABILIDAD_PREGUNTA
+    });
+    expect(d.estado).toBe('husmea'); // sigue siendo husmea, mismo cooldown/prioridad
+    expect(d.mensaje).toMatch(/\?/);
+    expect(d.interrumpe).toBe(true);
+  });
+
+  it('#110 modo aprendiz: con rand alto, sigue el comentario normal (no siempre pregunta)', () => {
+    const d = resolverComportamiento({
+      ahoraMs: ahora,
+      mundo: 'mis_matas',
+      datosMundo: { cultivos: [{ name: 'Tomate', count: 4 }] },
+      rand: () => 0.99,
+    });
+    expect(d.mensaje).toMatch(/tomate/i);
   });
 
   it('husmea respeta cooldown POR MUNDO → si ya comentó ese mundo, calla', () => {
@@ -306,5 +415,94 @@ describe('resolverComportamiento — arbitraje', () => {
     expect(llaveDeDecision({ estado: 'calma' })).toBeNull();
     expect(llaveDeDecision({ estado: 'husmea' }, 'clima')).toBe('husmea:clima');
     expect(llaveDeDecision({ estado: 'aviso', severidad: 'media' })).toBe('aviso_media');
+  });
+});
+
+describe('cadencia adaptativa (#102/#106)', () => {
+  it('aplicarSenalMolestia suma/resta y clampea', () => {
+    expect(aplicarSenalMolestia(0, 'silenciar')).toBe(3);
+    expect(aplicarSenalMolestia(0, 'abrirTip')).toBe(-2);
+    expect(aplicarSenalMolestia(MOLESTIA_MAX, 'silenciar')).toBe(MOLESTIA_MAX); // no se pasa del techo
+    expect(aplicarSenalMolestia(MOLESTIA_MIN, 'hablarle')).toBe(MOLESTIA_MIN); // no se pasa del piso
+    expect(aplicarSenalMolestia(5, 'senalDesconocida')).toBe(5); // señal inválida no muta nada
+  });
+
+  it('multiplicadorDeCadencia: 0 es 1x, molestia estira, atención encoge', () => {
+    expect(multiplicadorDeCadencia(0)).toBe(1);
+    expect(multiplicadorDeCadencia(MOLESTIA_MAX)).toBeCloseTo(3, 5);
+    expect(multiplicadorDeCadencia(MOLESTIA_MIN)).toBeCloseTo(0.4, 5);
+    // monótono: más molestia nunca acelera, más atención nunca frena.
+    expect(multiplicadorDeCadencia(5)).toBeGreaterThan(multiplicadorDeCadencia(0));
+    expect(multiplicadorDeCadencia(-5)).toBeLessThan(multiplicadorDeCadencia(0));
+  });
+
+  it('cadenciaEfectivaMs respeta SIEMPRE el piso de 13s y el techo de 6min', () => {
+    expect(cadenciaEfectivaMs(COOLDOWN_MS.aviso_media, MOLESTIA_MIN)).toBeGreaterThanOrEqual(CADENCIA_MIN_MS);
+    expect(cadenciaEfectivaMs(COOLDOWN_MS.husmea, MOLESTIA_MAX)).toBeLessThanOrEqual(CADENCIA_MAX_MS);
+    // cooldown 0 (aviso_alta) no se modula: sigue "siempre puede".
+    expect(cadenciaEfectivaMs(0, MOLESTIA_MAX)).toBe(0);
+  });
+
+  it('cadenciaEfectivaMs(CADENCIA_BASE_MS, 0) queda cerca de la base (referencia del SPEC ~46s)', () => {
+    expect(cadenciaEfectivaMs(CADENCIA_BASE_MS, 0)).toBe(CADENCIA_BASE_MS);
+  });
+
+  it('debeHablar: con mucha molestia, un cooldown que ya venció sin modular sigue vetado', () => {
+    const ahoraMs = 1000000;
+    // husmea (20 min base) con mucha molestia se estira, pero el TECHO (6 min)
+    // gobierna: a los 3 min SIN modular ya hubiera hablado (era husmea, no
+    // aplica), y CON el multiplicador tampoco alcanza el techo modulado.
+    const tresMin = 3 * 60 * 1000;
+    const sieteMin = 7 * 60 * 1000;
+    const conMolestiaAntesDelTecho = debeHablar({ estado: 'husmea', ahoraMs, ultimaMs: ahoraMs - tresMin, molestia: MOLESTIA_MAX });
+    const conMolestiaTrasElTecho = debeHablar({ estado: 'husmea', ahoraMs, ultimaMs: ahoraMs - sieteMin, molestia: MOLESTIA_MAX });
+    expect(conMolestiaAntesDelTecho).toBe(false); // el techo (6 min) aún no pasó
+    expect(conMolestiaTrasElTecho).toBe(true); // pasado el techo modulado, sí habla
+  });
+
+  it('debeHablar: aviso_alta habla siempre pase lo que pase con la molestia', () => {
+    const ahoraMs = 1000000;
+    expect(debeHablar({
+      estado: 'aviso', severidad: 'alta', ahoraMs, ultimaMs: ahoraMs, molestia: MOLESTIA_MAX,
+    })).toBe(true);
+  });
+});
+
+describe('recortarMensaje (#59 — tope de 2-3 líneas)', () => {
+  it('mensaje corto no se toca', () => {
+    expect(recortarMensaje('Tiene maíz registrado.')).toBe('Tiene maíz registrado.');
+  });
+
+  it('null/undefined pasan igual (nunca lanza)', () => {
+    expect(recortarMensaje(null)).toBeNull();
+    expect(recortarMensaje(undefined)).toBeNull();
+  });
+
+  it('mensaje largo se recorta al tope y nunca lo excede', () => {
+    const largo = 'Esta es una oración normal que describe algo de la finca. '.repeat(6);
+    const r = recortarMensaje(largo);
+    expect(r.length).toBeLessThanOrEqual(220);
+    expect(r.length).toBeLessThan(largo.length);
+  });
+
+  it('prefiere cortar en frontera de oración cuando cae cerca del tope', () => {
+    const primeraFrase = 'Tiene café registrado en su finca, la que más tiene.'; // 53 chars
+    const relleno = 'Y aquí sigue más texto que empuja el mensaje bien largo hasta pasarse.';
+    const r = recortarMensaje(`${primeraFrase} ${relleno}`, 60);
+    expect(r).toBe(primeraFrase);
+    expect(r.endsWith('.')).toBe(true);
+  });
+
+  it('sin frontera de oración cercana, corta en espacio y cierra con elipsis', () => {
+    const r = recortarMensaje('palabra '.repeat(10).trim(), 20);
+    expect(r.endsWith('…')).toBe(true);
+    expect(r.length).toBeLessThanOrEqual(21);
+  });
+
+  it('resolverComportamiento nunca devuelve un mensaje más largo que el tope', () => {
+    const decision = resolverComportamiento({
+      logro: { id: 'cosecha:1', texto: 'X'.repeat(400) },
+    });
+    expect(decision.mensaje.length).toBeLessThanOrEqual(220);
   });
 });

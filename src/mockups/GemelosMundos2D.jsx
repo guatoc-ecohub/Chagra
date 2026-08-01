@@ -452,7 +452,7 @@ function EscenaSanidad() {
   );
 }
 
-function EscenaAgua() {
+export function EscenaAgua() {
   const raw = useId();
   const uid = raw.replace(/:/g, '');
   return (

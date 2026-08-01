@@ -43,7 +43,7 @@ const contexto = await browser.newContext({
 
 async function medir(ciclo) {
   const page = await contexto.newPage();
-  const ruta = `${base.replace(/\/$/, '')}/?ciclo=${ciclo}#/mockups/entrada-3d`;
+  const ruta = `${base.replace(/\/$/, '')}/?ciclo=${ciclo}&auditar=1#/mockups/entrada-3d`;
   await page.goto(ruta, { waitUntil: 'domcontentloaded', timeout: 120000 });
   await page.waitForFunction(() => window.__VALLE_AUDITORIA__?.scene?.children?.length > 5, null, { timeout: 120000 });
   await page.waitForTimeout(4500);

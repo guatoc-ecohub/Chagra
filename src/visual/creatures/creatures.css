@@ -1557,7 +1557,108 @@
   .jaguar-ojos { transition: none !important; }
   /* Aparición: NUNCA invisible — queda PRESENTE, opacidad plena y quieto. */
   .jaguar-aparicion { animation: none !important; opacity: 1 !important; transform: none !important; }
+  /* MARCHA de perfil: quieta a media zancada (fotograma digno, cero anim). */
+  .jaguar-lado-pata, .jaguar-lado-tronco, .jaguar-lado-hombro,
+  .jaguar-lado-cola, .jaguar-lado-colapunta, .jaguar-lado-cabeza,
+  .jaguar-lado-grune, .jaguar-lado-fauce, .jaguar-lado-grunefx,
+  .jaguar-lado-aura { animation: none !important; }
 }
+
+/* ───────────────────────────────────────────────────────────────────────────
+   JAGUAR — MARCHA DE PERFIL (pose 'camina', rig .jaguar-lado del componente).
+   El ciclo de paso REAL de un cuadrúpedo (DR Panthera onca): las patas NO van
+   en pares simétricos sino en SECUENCIA LATERAL de 4 tiempos con las
+   diagonales casi juntas (del-cerca 0 · tras-lejos -.14 · tras-cerca -.52 ·
+   del-lejos -.66 sobre T=1.05s — paso LENTO y pesado, jamás trote nervioso),
+   el tronco con la bóveda del paso (2 botes por ciclo), el omóplato que RUEDA
+   (la seña del felino), la cola baja de contrapeso y la testa con bob en
+   contratiempo… más el GRUÑIDO periódico (cada 6.3s, fuera de compás con el
+   paso): la testa baja y se adelanta, las fauces se abren con colmillos y la
+   garganta se enciende. Imponente y digno, nunca gore. Todo transform/opacity.
+   ─────────────────────────────────────────────────────────────────────────── */
+[data-creature='jaguar'][data-pose='camina'] { overflow: visible; }
+/* la marcha manda: antics genéricos fuera mientras camina */
+[data-pose='camina'] .rh-antic, [data-pose='camina'] .rh-travieso { animation: none; }
+
+.jaguar-lado-pata { transform-box: fill-box; transform-origin: 50% 4%; }
+[data-creature='jaguar'][data-pose='camina'] .jaguar-lado-dc { animation: jaguar-paso-lado 1.05s ease-in-out infinite; }
+[data-creature='jaguar'][data-pose='camina'] .jaguar-lado-tl { animation: jaguar-paso-lado 1.05s ease-in-out -0.14s infinite; }
+[data-creature='jaguar'][data-pose='camina'] .jaguar-lado-tc { animation: jaguar-paso-lado 1.05s ease-in-out -0.52s infinite; }
+[data-creature='jaguar'][data-pose='camina'] .jaguar-lado-dl { animation: jaguar-paso-lado 1.05s ease-in-out -0.66s infinite; }
+@keyframes jaguar-paso-lado {
+  0%, 100% { transform: rotate(14deg); }  /* zancada atrás: el apoyo que empuja */
+  50%      { transform: rotate(-15deg); } /* al frente: el vuelo del paso */
+}
+
+.jaguar-lado-tronco { transform-box: fill-box; transform-origin: 50% 60%; }
+[data-creature='jaguar'][data-pose='camina'] .jaguar-lado-tronco { animation: jaguar-tronco-lado 0.525s ease-in-out infinite; }
+@keyframes jaguar-tronco-lado {
+  0%, 100% { transform: translateY(2.5px) rotate(0.5deg); }
+  50%      { transform: translateY(-3.5px) rotate(-0.3deg); }
+}
+
+.jaguar-lado-hombro { transform-box: fill-box; transform-origin: 50% 100%; }
+[data-creature='jaguar'][data-pose='camina'] .jaguar-lado-hombro { animation: jaguar-hombro-lado 0.525s ease-in-out infinite; }
+@keyframes jaguar-hombro-lado {
+  0%, 100% { transform: translateY(0) scaleY(1); }
+  50%      { transform: translateY(-3px) scaleY(1.08); }
+}
+
+.jaguar-lado-cola { transform-box: fill-box; transform-origin: 97% 72%; }
+[data-creature='jaguar'][data-pose='camina'] .jaguar-lado-cola { animation: jaguar-cola-lado 1.8s ease-in-out infinite alternate; }
+@keyframes jaguar-cola-lado {
+  from { transform: rotate(-3deg); }
+  to   { transform: rotate(5deg); }
+}
+.jaguar-lado-colapunta { transform-box: fill-box; transform-origin: 72% 55%; }
+[data-creature='jaguar'][data-pose='camina'] .jaguar-lado-colapunta { animation: jaguar-colapunta-lado 1.8s ease-in-out -0.25s infinite alternate; }
+@keyframes jaguar-colapunta-lado {
+  from { transform: rotate(-5deg); }
+  to   { transform: rotate(6deg); }
+}
+
+.jaguar-lado-cabeza { transform-box: fill-box; transform-origin: 20% 80%; }
+[data-creature='jaguar'][data-pose='camina'] .jaguar-lado-cabeza { animation: jaguar-cabeza-lado 0.525s ease-in-out -0.12s infinite; }
+@keyframes jaguar-cabeza-lado {
+  0%, 100% { transform: translateY(-1.5px) rotate(-0.7deg); }
+  50%      { transform: translateY(2px) rotate(0.7deg); }
+}
+
+/* EL GRUÑIDO — ciclo largo co-primo con el paso (6.3s vs 1.05s) */
+.jaguar-lado-grune { transform-box: fill-box; transform-origin: 15% 85%; }
+[data-creature='jaguar'][data-pose='camina'] .jaguar-lado-grune { animation: jaguar-grune-lado 6.3s ease-in-out infinite; }
+@keyframes jaguar-grune-lado {
+  0%, 64%, 96%, 100% { transform: translateY(0) rotate(0deg); }
+  70%, 88%           { transform: translateY(11px) translateX(7px) rotate(5.5deg); } /* la testa baja: gruñe */
+}
+.jaguar-lado-fauce { transform-box: fill-box; transform-origin: 8% 12%; }
+[data-creature='jaguar'][data-pose='camina'] .jaguar-lado-fauce { animation: jaguar-fauce-lado 6.3s ease-in-out infinite; }
+@keyframes jaguar-fauce-lado {
+  0%, 64%, 96%, 100% { transform: rotate(0deg); }
+  70% { transform: rotate(24deg); }   /* abre las fauces */
+  76% { transform: rotate(19deg); }   /* vibra el gruñido */
+  82% { transform: rotate(26deg); }
+  88% { transform: rotate(21deg); }
+}
+.jaguar-lado-grunefx { opacity: 0; }
+[data-creature='jaguar'][data-pose='camina'] .jaguar-lado-grunefx { animation: jaguar-grunefx-lado 6.3s ease-in-out infinite; }
+@keyframes jaguar-grunefx-lado {
+  0%, 63%, 95%, 100% { opacity: 0; }
+  70%, 88%           { opacity: 1; } /* colmillos + garganta visibles */
+}
+
+/* el aura del perfil late como la espectral del frontal */
+.jaguar-lado-aura { transform-box: fill-box; transform-origin: 50% 50%; }
+[data-creature='jaguar'][data-pose='camina'] .jaguar-lado-aura { animation: jaguar-aura-espectral 5.2s ease-in-out infinite; }
+
+/* tier bajo: la marcha queda plantada a media zancada (sin ciclos continuos) */
+[data-tier='bajo'] .jaguar-lado-dc, [data-tier='bajo'] .jaguar-lado-dl,
+[data-tier='bajo'] .jaguar-lado-tc, [data-tier='bajo'] .jaguar-lado-tl,
+[data-tier='bajo'] .jaguar-lado-tronco, [data-tier='bajo'] .jaguar-lado-hombro,
+[data-tier='bajo'] .jaguar-lado-cola, [data-tier='bajo'] .jaguar-lado-colapunta,
+[data-tier='bajo'] .jaguar-lado-cabeza, [data-tier='bajo'] .jaguar-lado-grune,
+[data-tier='bajo'] .jaguar-lado-fauce, [data-tier='bajo'] .jaguar-lado-grunefx,
+[data-tier='bajo'] .jaguar-lado-aura { animation: none; }
 
 
 /* ═══════════════════════════════════════════════════════════════════════════
@@ -2766,4 +2867,166 @@
   [data-creature='oso-guardian'][data-resopla='1'] .crt-body,
   [data-creature='oso-guardian'][data-resopla='1'] .oso-cejas,
   [data-creature='oso-guardian'][data-rasca='1'] .crt-body { animation: none !important; }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   ZARIGÜEYA (Didelphis) — la chucha nocturna: LA QUE CARGA (Zariguya.jsx).
+   ───────────────────────────────────────────────────────────────────────────
+   El CARÁCTER de la MADRE TRABAJADORA DE NOCHE: menuda, alerta, curiosa por la
+   nariz y cargada de crías. Movimientos CORTOS y frecuentes (nada del peso de
+   la danta ni de la lentitud del oso): el hocico tantea, las orejas giran, la
+   cola prensil se enrosca sola y las crías se acomodan en el lomo — cada una a
+   su tiempo (delays escalonados: son tres bichos, no un adorno). Aditivo sobre
+   el KIT species-agnostic (no toca a ningún otro bicho). Todo transform/opacity
+   (GPU, gama baja). Gates RM + tier al final.
+   Períodos co-primos entre sí y con la base: boil 2.3s · hocico 3.1s · crías
+   4.3s · cola 5.3s · orejas 6.7s.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* BOIL MENUDO — la zarigüeya no tiene el peso de la mole: respira corto y algo
+   más rápido que la base (bicho chico y despierto). Reescribe SOLO su boil
+   (misma clase .rh-boil, mayor especificidad por data-creature) con longhands
+   para no pisar el resto de props de animación. */
+[data-creature='zariguya'] .rh-boil {
+  animation-name: zari-boil;
+  animation-duration: 2.3s;
+  animation-timing-function: ease-in-out;
+}
+@keyframes zari-boil {
+  0%, 100% { transform: translateY(0) scale(1, 1); }
+  50%      { transform: translateY(0.3px) scale(1.022, 0.978); }  /* respiración corta */
+}
+
+/* EL HOCICO TANTEA — el idle permanente del marsupial: la cuña se mece leve,
+   leyendo el aire (pivote en la base, donde nace del cráneo). */
+.zari-hocico {
+  animation: zari-hocico-tantea 3.1s ease-in-out infinite;
+}
+@keyframes zari-hocico-tantea {
+  0%, 100% { transform: rotate(-2deg); }
+  50%      { transform: rotate(2.6deg); }
+}
+
+/* LAS CRÍAS SE ACOMODAN — cada una se reasienta en el lomo a su tiempo (el
+   delay lo pone el JSX por cría). Movimiento MÍNIMO: el bulto sigue leyéndose,
+   solo se nota que están vivas. */
+.zari-cria {
+  animation: zari-cria-acomoda 4.3s ease-in-out infinite;
+}
+@keyframes zari-cria-acomoda {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  38%      { transform: translateY(-0.35px) rotate(1.8deg); }  /* se afirma con la manito */
+  70%      { transform: translateY(0.2px) rotate(-1.2deg); }
+}
+
+/* LA COLA PRENSIL SE ENROSCA — sola, sin motivo, como de verdad hacen (van
+   agarrando y soltando). Pivote en la base, en la grupa. */
+.zari-cola {
+  animation: zari-cola-enrosca 5.3s ease-in-out infinite;
+}
+@keyframes zari-cola-enrosca {
+  0%, 100% { transform: rotate(0deg) scaleX(1); }
+  45%      { transform: rotate(-4.5deg) scaleX(0.97); }  /* recoge el gancho */
+  75%      { transform: rotate(2.5deg) scaleX(1.02); }   /* y lo suelta */
+}
+
+/* LAS OREJAS GIRAN — desnudas y grandes: son antenas, no adorno. */
+.zari-orejas {
+  animation: zari-orejas 6.7s ease-in-out infinite;
+}
+@keyframes zari-orejas {
+  0%, 100% { transform: rotate(0deg) scaleY(1); }
+  40%      { transform: rotate(-2.4deg) scaleY(1.04); }
+  72%      { transform: rotate(2deg) scaleY(0.98); }
+}
+
+/* ── HUSMEA (su reacción-firma): el hocico en el aire ───────────────────────
+   El marsupial vive por la nariz. Todo se acelera y se hace amplio: la cuña
+   sube y barre a lado y lado, las vibrisas TIEMBLAN, las orejas se enderezan
+   y la cabeza sigue el rastro. */
+[data-creature='zariguya'][data-husmea='1'] .zari-hocico {
+  animation: zari-hocico-husmea 1.05s ease-in-out infinite;
+}
+@keyframes zari-hocico-husmea {
+  0%, 100% { transform: rotate(-7deg) translateY(0.2px); }
+  50%      { transform: rotate(6.5deg) translateY(-0.5px); }  /* lee el aire */
+}
+[data-creature='zariguya'][data-husmea='1'] .zari-bigote {
+  animation: zari-bigote-tiembla 0.42s ease-in-out infinite;
+}
+@keyframes zari-bigote-tiembla {
+  0%, 100% { transform: rotate(-1.6deg) scaleX(1); }
+  50%      { transform: rotate(1.6deg) scaleX(1.04); }
+}
+[data-creature='zariguya'][data-husmea='1'] .zari-orejas {
+  animation: zari-orejas-perk 0.9s ease-in-out infinite;
+}
+@keyframes zari-orejas-perk {
+  0%, 100% { transform: translateY(-0.3px) scaleY(1.07); }
+  50%      { transform: translateY(-0.5px) scaleY(1.12) rotate(1.6deg); }
+}
+[data-creature='zariguya'][data-husmea='1'] .zari-cabeza {
+  animation: zari-cabeza-rastro 2.1s ease-in-out infinite;
+}
+@keyframes zari-cabeza-rastro {
+  0%, 100% { transform: rotate(-2.2deg); }
+  50%      { transform: rotate(3deg); }
+}
+
+/* ── TANATOSIS (hacerse la muerta): el gag más suyo ─────────────────────────
+   Se tumba de lado con las patas tiesas y los ojos cerrados… pero LA COLA
+   SIGUE ENROSCÁNDOSE (no está muerta ni por asomo) y las crías aguantan
+   agarradas. El chiste vive en esa contradicción: si la cola se congelara,
+   sería un cadáver; enroscándose, es una actriz. */
+[data-creature='zariguya'][data-tanatosis='1'] .crt-body {
+  animation: zari-desmayo 2.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+@keyframes zari-desmayo {
+  0%   { transform: rotate(0deg) translateY(0); }
+  22%  { transform: rotate(-9deg) translateY(-0.6px); }   /* el susto (anticipación) */
+  60%  { transform: rotate(74deg) translateY(2.4px); }    /* ¡se tumba! */
+  78%  { transform: rotate(70deg) translateY(2.2px); }    /* rebote de goma */
+  100% { transform: rotate(72deg) translateY(2.3px); }
+}
+/* ojos cerrados (el mismo scaleY del parpadeo, sostenido) */
+[data-creature='zariguya'][data-tanatosis='1'] .rh-blink {
+  animation: none;
+  transform: scaleY(0.12);
+}
+/* la cola NO se hace la muerta: sigue su enroscado, un poco más lento */
+[data-creature='zariguya'][data-tanatosis='1'] .zari-cola {
+  animation-duration: 3.7s;
+}
+/* pero el hocico y las orejas sí se quedan quietos (está "muerta") */
+[data-creature='zariguya'][data-tanatosis='1'] .zari-hocico,
+[data-creature='zariguya'][data-tanatosis='1'] .zari-orejas,
+[data-creature='zariguya'][data-tanatosis='1'] .zari-cria { animation: none; }
+
+/* Los estados husmea y tanatosis PISAN el arrebato (antic/travieso): una
+   zarigüeya siguiendo un rastro —o haciéndose la muerta— no da volteretas. */
+[data-creature='zariguya'][data-husmea='1'] .rh-antic,
+[data-creature='zariguya'][data-husmea='1'] .rh-travieso,
+[data-creature='zariguya'][data-tanatosis='1'] .rh-antic,
+[data-creature='zariguya'][data-tanatosis='1'] .rh-travieso { animation: none; }
+
+/* device-tier 'bajo': el boil reescrito lo reactivaría (misma clase) →
+   re-apagarlo aquí. Lo continuo (hocico, crías, cola, orejas) también se
+   corta; los estados reactivos (husmea/tanatosis) siguen contando la verdad. */
+[data-tier='bajo'][data-creature='zariguya'] .rh-boil,
+[data-tier='bajo'][data-creature='zariguya'] .zari-hocico,
+[data-tier='bajo'][data-creature='zariguya'] .zari-cria,
+[data-tier='bajo'][data-creature='zariguya'] .zari-cola,
+[data-tier='bajo'][data-creature='zariguya'] .zari-orejas { animation: none; }
+
+@media (prefers-reduced-motion: reduce) {
+  [data-creature='zariguya'] .rh-boil,
+  .zari-hocico, .zari-cria, .zari-cola, .zari-orejas, .zari-bigote,
+  [data-creature='zariguya'][data-husmea='1'] .zari-hocico,
+  [data-creature='zariguya'][data-husmea='1'] .zari-bigote,
+  [data-creature='zariguya'][data-husmea='1'] .zari-orejas,
+  [data-creature='zariguya'][data-husmea='1'] .zari-cabeza,
+  [data-creature='zariguya'][data-tanatosis='1'] .crt-body { animation: none !important; }
+  /* la tanatosis es un ESTADO, no solo una animación: con reduced-motion se
+     entrega el fotograma digno (tumbada y quieta), no la criatura de pie. */
+  [data-creature='zariguya'][data-tanatosis='1'] .crt-body { transform: rotate(72deg) translateY(2.3px); }
 }

@@ -294,8 +294,17 @@ const CROP_AGNOSTIC_SAFETY_RULES = [
     'SEGURIDAD: NUNCA inventes una dosis numérica de plaguicida. La dosis sale de la etiqueta registrada ICA y del asistente técnico. Herbicidas no selectivos (glifosato, paraquat) NO se aplican sobre el cultivo.',
   ],
   [
-    [['metamidofos', 'parathion', 'paratión', 'monocrotofos', 'endosulfan', 'lannate', 'metomil']],
-    'SEGURIDAD: productos altamente tóxicos sin registro ICA vigente. Consulta etiqueta actual y asistente técnico. Prefiere opciones agroecológicas.',
+    [[
+      // organofosforados/carbamatos categoría Ia/Ib OMS
+      'metamidofos', 'parathion', 'paratión', 'monocrotofos', 'endosulfan', 'lannate', 'metomil',
+      'aldicarb', 'temik', 'carbofurano', 'carbofuran', 'furadan',
+      // organoclorados/POPs vetados (Convenio de Estocolmo + veto ICA Colombia)
+      'ddt', 'lindano', 'clordano', 'aldrin', 'dieldrin', 'heptacloro', 'toxafeno', 'canfecloro',
+      'mirex', 'pentaclorofenol', 'dibromocloropropano', 'dbcp', '2,4,5-t', 'bhc', 'hch',
+      // herbicida bipiridilo de uso severamente restringido/vetado
+      'paraquat', 'gramoxone',
+    ]],
+    'SEGURIDAD: producto prohibido o vetado en Colombia (uso severamente restringido) — productos altamente tóxicos, categoría I OMS, sin registro ICA vigente. NUNCA des dosis ni receta de aplicación. Consulta etiqueta actual y asistente técnico, o deriva a ICA/UMATA. Prefiere opciones agroecológicas.',
   ],
   [
     [['trichoderma'], ['insecto', 'oruga', 'polilla', 'gusano', 'cogollero', 'trips', 'mosca', 'plaga']],
@@ -631,7 +640,14 @@ CASO B: si NO reconoces el sustantivo como español común ni como planta/plaga/
 ANTI-INVENCIÓN-DE-SÍNTOMAS: NUNCA describas síntomas/problemas/observaciones que el usuario NO escribió ni le atribuyas síntomas genéricos del corpus. Indaga con pregunta abierta, NO afirmación.`);
 
   if (SYMPTOM_QUERY_RE.test(mention)) {
-    sections.push(`REGLA CRÍTICA DIAGNÓSTICO-SIN-EVIDENCIA: si el usuario reporta un síntoma VAGO ("manchas amarillas", "se está secando", "está triste") y se cumplen LAS DOS: (a) NO nombró la especie o no está clara, Y (b) NO adjuntó foto en este turno → PROHIBIDO nombrar un patógeno específico o binomio ("es Phytophthora…", "es el hongo Golovinomyces…") y PROHIBIDO inventar síntomas no escritos. Un síntoma vago tiene MUCHAS causas: responde con (1) un diferencial BREVE sin latín (2-3 causas comunes: falta de nutrientes, exceso/falta de agua, hongo, plaga, sol fuerte) y (2) preguntas para acotar: ¿qué planta es? ¿me envías una foto de la hoja? ¿la mancha está en el haz o el envés? ¿se siente seca o húmeda? ¿hace cuánto empezó? NUNCA cierres con un diagnóstico único y seguro sin esa evidencia. ES PREFERIBLE PEDIR LA FOTO QUE INVENTAR EL HONGO.`);
+    sections.push(`REGLA CRÍTICA DE TRIAJE DE SÍNTOMAS:
+- Huecos, perforaciones o mordidas indican daño de MASTICADORES (babosas, caracoles, tierreros u orugas). NUNCA propongas pulgones ni mosca blanca para explicar huecos: los chupadores no retiran tejido.
+- Amarillamiento acompañado de melaza o fumagina indica daño de CHUPADORES (pulgones o mosca blanca). NUNCA propongas masticadores para explicar ese conjunto.
+- Si la especie y el contexto están claros, comprométete primero con la hipótesis más probable y una acción concreta. Después pide la foto para confirmar; "sin foto es difícil" no puede ser la respuesta principal.
+- En tomate de árbol con hojas chamuscadas bajo invernadero templado, prioriza golpe de calor o quemadura de sol por mala ventilación; como segunda posibilidad, necrosis marginal por sales o desbalance de potasio. En fresa de invernadero con huecos, prioriza babosas.
+- Responde SOLO sobre cultivos mencionados en el turno o registrados como sembrados. No agregues plagas, datos verificados, variedades ni alertas de otros cultivos.
+
+REGLA CRÍTICA DIAGNÓSTICO-SIN-EVIDENCIA: si el usuario reporta un síntoma VAGO ("manchas amarillas", "se está secando", "está triste") y se cumplen LAS DOS: (a) NO nombró la especie o no está clara, Y (b) NO adjuntó foto en este turno, está PROHIBIDO nombrar un patógeno específico o binomio ("es Phytophthora", "es el hongo Golovinomyces") e inventar síntomas no escritos. Un síntoma vago tiene muchas causas: da un diferencial breve sin latín y pregunta por especie, distribución y evolución. Si hay una hipótesis probable por el contexto, declárala con cautela y da una acción de bajo riesgo antes de pedir la foto.`);
   }
 
   // Reglas crop-agnostic (aplican a cualquier cultivo)

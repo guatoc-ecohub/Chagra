@@ -5,11 +5,12 @@
  * que la anti-molestia (cooldown por mundo) funcione entre llamadas sucesivas,
  * que el dedup de logro persista, y que el silencio la deje en calma.
  */
-import { describe, it, expect, beforeEach, vi } from 'vitest';
+import { describe, it, expect, beforeEach } from 'vitest';
 import useAngelitaStore from '../useAngelitaStore';
 
 // El store persiste en localStorage; lo reseteamos entre pruebas.
 const reset = () => {
+  localStorage.clear();
   useAngelitaStore.setState({
     estado: 'calma',
     visualEstado: 'acompana',
@@ -21,7 +22,10 @@ const reset = () => {
     mundoActual: null,
     ultimaHablaPorLlave: {},
     ultimoLogroId: null,
+    ultimoLutoId: null,
     silenciado: false,
+    molestia: 0,
+    hoyNoFecha: null,
   });
 };
 
@@ -61,6 +65,20 @@ describe('useAngelitaStore', () => {
     expect(useAngelitaStore.getState().estado).toBe('calma');
   });
 
+  it('lamentar una pérdida real (#109), con dedup por id — independiente de celebrar', () => {
+    useAngelitaStore.getState().lamentar({ id: 'luto-tomate-3', texto: 'Se nos fue el tomate. Pasa, y se aprende.' });
+    expect(useAngelitaStore.getState().estado).toBe('luto');
+    expect(useAngelitaStore.getState().visualEstado).toBe('preocupada');
+    expect(useAngelitaStore.getState().tipo).toBe('luto');
+    useAngelitaStore.getState().reposar();
+    // mismo evento → ya no se lamenta de nuevo
+    useAngelitaStore.getState().lamentar({ id: 'luto-tomate-3', texto: 'Se nos fue el tomate. Pasa, y se aprende.' });
+    expect(useAngelitaStore.getState().estado).toBe('calma');
+    // celebrar sigue funcionando después de un luto (memorias independientes)
+    useAngelitaStore.getState().celebrar({ id: 'cosecha-1', texto: '¡Buena cosecha!' });
+    expect(useAngelitaStore.getState().estado).toBe('celebra');
+  });
+
   it('silenciar la deja en calma y no habla', () => {
     useAngelitaStore.getState().silenciar(true);
     useAngelitaStore.getState().entrarMundo('clima', { snapshot: { alertas_locales: [{}] } });
@@ -77,5 +95,67 @@ describe('useAngelitaStore', () => {
     expect(useAngelitaStore.getState().estado).toBe('calma');
     // la memoria del cooldown NO se borra al reposar
     expect(useAngelitaStore.getState().ultimaHablaPorLlave).toEqual(memoriaAntes);
+  });
+});
+
+describe('cadencia adaptativa — contador de molestia (#102/#106)', () => {
+  beforeEach(reset);
+
+  it('registrarSenalMolestia sube y baja el contador, clamped', () => {
+    const api = useAngelitaStore.getState();
+    api.registrarSenalMolestia('silenciar');
+    expect(useAngelitaStore.getState().molestia).toBe(3);
+    api.registrarSenalMolestia('abrirTip');
+    expect(useAngelitaStore.getState().molestia).toBe(1);
+  });
+
+  it('silenciar(true) registra una señal de molestia además de silenciar', () => {
+    useAngelitaStore.getState().silenciar(true);
+    const s = useAngelitaStore.getState();
+    expect(s.silenciado).toBe(true);
+    expect(s.molestia).toBeGreaterThan(0);
+  });
+
+  it('el contador de molestia persiste (partialize incluye molestia)', () => {
+    useAngelitaStore.getState().registrarSenalMolestia('silenciar');
+    const persistido = JSON.parse(localStorage.getItem('chagra:angelita:antimolestia'));
+    expect(persistido.state.molestia).toBe(3);
+  });
+});
+
+describe('"hoy no" — descanso del resto del día (#107)', () => {
+  beforeEach(reset);
+
+  it('marcarHoyNo activa hoyNoActivo() y calla a Angelita', () => {
+    const api = useAngelitaStore.getState();
+    api.marcarHoyNo();
+    expect(useAngelitaStore.getState().hoyNoActivo()).toBe(true);
+    api.entrarMundo('clima', { snapshot: { alertas_locales: [{}] } });
+    expect(useAngelitaStore.getState().estado).toBe('calma');
+    expect(useAngelitaStore.getState().mensaje).toBeNull();
+  });
+
+  it('marcarHoyNo también registra una señal de molestia', () => {
+    useAngelitaStore.getState().marcarHoyNo();
+    expect(useAngelitaStore.getState().molestia).toBeGreaterThan(0);
+  });
+
+  it('hoyNoActivo() es false si la fecha guardada no es HOY (vence a medianoche)', () => {
+    useAngelitaStore.setState({ hoyNoFecha: '2020-01-01' });
+    expect(useAngelitaStore.getState().hoyNoActivo()).toBe(false);
+  });
+
+  it('quitarHoyNo desactiva el descanso antes de que venza solo', () => {
+    const api = useAngelitaStore.getState();
+    api.marcarHoyNo();
+    expect(useAngelitaStore.getState().hoyNoActivo()).toBe(true);
+    api.quitarHoyNo();
+    expect(useAngelitaStore.getState().hoyNoActivo()).toBe(false);
+  });
+
+  it('el "hoy no" persiste (partialize incluye hoyNoFecha)', () => {
+    useAngelitaStore.getState().marcarHoyNo();
+    const persistido = JSON.parse(localStorage.getItem('chagra:angelita:antimolestia'));
+    expect(persistido.state.hoyNoFecha).toMatch(/^\d{4}-\d{2}-\d{2}$/);
   });
 });

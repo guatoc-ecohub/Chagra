@@ -23,22 +23,44 @@
 /* Nota: las props de three (position, args, intensity, castShadow, etc.) son
    válidas en el reconciliador de R3F, no en el DOM — el config de ESLint del
    repo no activa react/no-unknown-property, así que no requieren disable. */
-import { Suspense, useEffect, useMemo, useRef, useState } from 'react';
+import { Suspense, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import {
-  Html, Float, Stars, OrbitControls, AdaptiveDpr, Detailed, Instances, Instance,
+  Html, Float, Stars, OrbitControls, Detailed, Instances, Instance,
 } from '@react-three/drei';
 import * as THREE from 'three';
 import { perfilDeTier } from '../../visual/mundo3d/deviceTier.js';
 import CamaraDirector from '../../visual/mundo3d/escenas/CamaraDirector.jsx';
 import DirectorValle from './DirectorValle.jsx';
+import MonitorRendimiento, {
+  detectarTierInicial,
+  presupuestoDeTier,
+  useTierPerformance,
+} from '../../visual/mundo3d/usePerformanceMonitor.jsx';
 import { AbejaAngelita } from '../../visual/creatures/AbejaAngelita.jsx';
 /* EL CEREBRO DE ANGELITA (auditoría 2026-07-18: estaba construido y
    DESCONECTADO — ningún componente vivo lo consumía). La abeja del valle
    (CompaneroAbeja) lo usa para husmear con criterio: comentarios grounded
    por mundo, con la anti-molestia (cooldowns) resuelta adentro del store. */
 import useAngelitaStore from '../../store/useAngelitaStore';
+/* EL COMPAI HABLA CON DATOS REALES (auditoría 2026-07-26, ítem #38): el
+   inventario vivo de la finca + su traducción a lo que cada comentarista sabe
+   leer, y el sensor de "¿está a mitad de algo?" que el motor esperaba desde
+   siempre y nadie alimentaba. Los tres cuelgan del núcleo portable del compAI
+   (src/compai/nucleo) — la fuente única que comparte con 3d.guatoc.co. */
+import useInventarioCompai from '../../hooks/useInventarioCompai';
+import { datosDeMundo } from '../../compai/nucleo/datosFinca.js';
+import { estaOcupado } from '../../services/compaiOcupado.js';
 import BurbujaAngelita from '../../visual/agente/BurbujaAngelita';
+/* #88 — QUE EL COMPAI HABLE SUS TIPS: hasta hoy el husmeo solo pintaba la
+   burbuja (mensajeAngelita), nunca lo decía en voz — speak/speakKokoro ya
+   existían y nadie los llamaba desde aquí. Mismo patrón que useAcompanante
+   (AcompananteMundo.jsx) y el shell (EntradaValle3D.jsx): Kokoro primero,
+   Web Speech si no responde. Gateado por el silencio real del operador
+   (usePrefsStore.ttsEnabled, la misma bandera que apaga la voz en
+   AgentScreen) y por reducedMotion (silencio también es respeto). */
+import { speak, speakKokoro } from '../../services/ttsService.js';
+import usePrefsStore from '../../store/usePrefsStore.js';
 /* La CAPA DE ESTADO de Angelita (auditoría §5b): módulo puro, sin three — el
    mismo repertorio (mojada/sed/comiendo/vuelo) que usan los mundos 3D. */
 import { reaccionDeFinca, ESTADO_FINCA_MUESTRA } from '../../visual/mundo3d/escenas/reaccionFinca.js';
@@ -1394,13 +1416,18 @@ function CriaturaSvg({ tipo, size, animated }) {
   return <Lombriz size={size} animated={animated} />;
 }
 
-function CriaturasValle({ reducedMotion, cupo }) {
+function CriaturasValle({ reducedMotion, cupo, tier }) {
+  const rendimiento = useTierPerformance({ tier, reducedMotion });
+  const cupoVivo = Math.min(
+    cupo ?? rendimiento.presupuesto.maxCriaturasAmbientales,
+    rendimiento.presupuesto.maxCriaturasAmbientales,
+  );
   // Cada criatura es un <Html> (nodo DOM con matriz CSS por frame): en frugal
   // se siembran menos; en 'bajo' ninguna (el valle vive igual con los mundos).
-  if (!cupo) return null;
+  if (!cupoVivo) return null;
   return (
     <group>
-      {CRIATURAS_VALLE.slice(0, cupo).map((c, i) => {
+      {CRIATURAS_VALLE.slice(0, cupoVivo).map((c, i) => {
         const y = alturaTerreno(c.x, c.z) + c.dy;
         return (
           <group key={i} position={[c.x, y, c.z]}>
@@ -1888,7 +1915,57 @@ function CompaneroAbeja({ foco, focoId = null, entrando, animo, energia, reduced
   const mensajeAngelita = useAngelitaStore((s) => s.mensaje);
   const tipoAngelita = useAngelitaStore((s) => s.tipo);
   const entrarMundoAngelita = useAngelitaStore((s) => s.entrarMundo);
+
+  /* #88 — EL COMPAI HABLA SUS TIPS: cada vez que llega un mensaje NUEVO
+     (navegación real o husmeo autónomo), además de pintar la burbuja lo DICE.
+     Kokoro primero; si no responde (equipo sin soporte, timeout), cae a la
+     voz del navegador — nunca queda muda una finca que ya escribe. Silencio
+     real (usePrefsStore.ttsEnabled) y reducedMotion apagan la voz sin tocar
+     la burbuja: el texto sigue siendo la voz de quien no puede/no quiere oír. */
+  const ttsEnabled = usePrefsStore((s) => s.ttsEnabled);
+  const dichoRef = useRef(null);
+  useEffect(() => {
+    if (!mensajeAngelita || reducedMotion || !ttsEnabled) return;
+    if (dichoRef.current === mensajeAngelita) return; // ya se dijo este mismo texto
+    dichoRef.current = mensajeAngelita;
+    speakKokoro(mensajeAngelita, { lang: 'es', rate: 0.98 })
+      .then((audio) => {
+        if (!audio) speak(mensajeAngelita, { rate: 0.98, pitch: 1 });
+      })
+      .catch(() => {
+        speak(mensajeAngelita, { rate: 0.98, pitch: 1 });
+      });
+  }, [mensajeAngelita, reducedMotion, ttsEnabled]);
   const reposarAngelita = useAngelitaStore((s) => s.reposar);
+
+  /* ── LOS DATOS REALES DE LA FINCA (auditoría 2026-07-26, ítem #38) ────────
+     ESTE ERA EL BUG MÁS CARO DEL compAI: los dos disparadores de abajo
+     llamaban `entrarMundoAngelita(mundo, {})` — con el objeto VACÍO. Por eso
+     cada comentario caía a la rama honesta-pero-genérica ("todavía no me ha
+     contado qué tiene sembrado") AUNQUE el usuario tuviera sus matas en
+     IndexedDB. El motor siempre supo hablar con datos; nadie se los pasaba.
+
+     `useInventarioCompai` lee el store de activos (offline-first sobre
+     IndexedDB) y `datosDeMundo` lo traduce a la forma exacta que cada
+     comentarista sabe leer. Cero red, cero dato inventado: finca vacía sigue
+     cayendo a la rama honesta, que es como debe ser. Va por ref para que un
+     cambio de inventario no re-ate la cadencia del husmeo. */
+  const inventarioCompai = useInventarioCompai();
+  const inventarioRef = useRef(inventarioCompai);
+  useEffect(() => { inventarioRef.current = inventarioCompai; }, [inventarioCompai]);
+  /* El clima que el shell alcanzó a cachear — el único dato del husmeo que NO
+     sale del inventario. Sin él, el comentarista del clima dice la verdad. */
+  const climaExtra = useMemo(
+    () => (estadoFinca?.snapshotClima ? { snapshot: estadoFinca.snapshotClima } : undefined),
+    [estadoFinca?.snapshotClima],
+  );
+  const climaExtraRef = useRef(climaExtra);
+  useEffect(() => { climaExtraRef.current = climaExtra; }, [climaExtra]);
+  /* Un solo lugar donde se arman los datos: los dos disparadores lo usan. */
+  const datosParaMundo = useCallback(
+    (mundo) => datosDeMundo(mundo, inventarioRef.current, climaExtraRef.current || {}),
+    [],
+  );
 
   // 1) Navegación real: al entrar/salir de un mundo de verdad, la abeja
   //    husmea ese lugar (o vuelve a calma al salir). `focoId` es el id CRUDO
@@ -1897,12 +1974,13 @@ function CompaneroAbeja({ foco, focoId = null, entrando, animo, energia, reduced
   const focoIdPrevio = useRef(focoId);
   useEffect(() => {
     if (focoId && focoId !== focoIdPrevio.current) {
-      entrarMundoAngelita(LUGAR_A_MUNDO_ANGELITA[focoId] || 'finca', {});
+      const mundo = LUGAR_A_MUNDO_ANGELITA[focoId] || 'finca';
+      entrarMundoAngelita(mundo, datosParaMundo(mundo));
     } else if (!focoId && focoIdPrevio.current) {
       reposarAngelita();
     }
     focoIdPrevio.current = focoId;
-  }, [focoId, entrarMundoAngelita, reposarAngelita]);
+  }, [focoId, entrarMundoAngelita, reposarAngelita, datosParaMundo]);
 
   // 2) Husmeo autónomo: nunca a mitad de un viaje real (entrandoRef, para
   //    que un viaje NO reinicie la cadencia), nunca con reduced-motion (cero
@@ -1928,7 +2006,9 @@ function CompaneroAbeja({ foco, focoId = null, entrando, animo, energia, reduced
         const lugar = HUSMEO_LUGARES[husmeoIdx.current % HUSMEO_LUGARES.length];
         husmeoIdx.current += 1;
         const mundo = LUGAR_A_MUNDO_ANGELITA[lugar];
-        const decision = mundo ? entrarMundoAngelita(mundo, {}) : null;
+        const decision = mundo
+          ? entrarMundoAngelita(mundo, datosParaMundo(mundo), { ocupado: estaOcupado() })
+          : null;
         if (decision?.interrumpe) {
           husmeoLugarRef.current = lugar;
           if (ocultarTimer) clearTimeout(ocultarTimer);
@@ -1953,8 +2033,9 @@ function CompaneroAbeja({ foco, focoId = null, entrando, animo, energia, reduced
       if (ocultarTimer) clearTimeout(ocultarTimer);
     };
     // `entrando` vive en entrandoRef a propósito: un viaje real no debe
-    // reiniciar la cadencia del husmeo autónomo.
-  }, [reducedMotion, entrarMundoAngelita, reposarAngelita]);
+    // reiniciar la cadencia del husmeo autónomo. `datosParaMundo` es estable
+    // (useCallback sin deps, lee refs) — el inventario cambia sin re-atar nada.
+  }, [reducedMotion, entrarMundoAngelita, reposarAngelita, datosParaMundo]);
 
   useFrame((state) => {
     if (!ref.current) return;
@@ -2709,6 +2790,7 @@ function Escena({ clima, focoId, animo, energia, onEntrar, onAlerta, onCasa = nu
 
   return (
     <>
+      {!reducedMotion && <MonitorRendimiento key={tier} tier={tier} />}
       {/* Fondo + niebla + luces, amortiguadas hacia la franja del día. */}
       <AtmosferaValle c={c} perfil={perfil} reducedMotion={reducedMotion} />
       {fracEstrellas > 0 && perfil.estrellas > 0 && (
@@ -2885,7 +2967,7 @@ function Escena({ clima, focoId, animo, energia, onEntrar, onAlerta, onCasa = nu
         />
       )}
 
-      <CriaturasValle reducedMotion={reducedMotion} cupo={perfil.criaturas} />
+      <CriaturasValle reducedMotion={reducedMotion} cupo={perfil.criaturas} tier={tier} />
       {!portada && (
         <Beacon onAlerta={onAlerta} reducedMotion={reducedMotion} conLuz={perfil.luzBeacon} />
       )}
@@ -2953,7 +3035,6 @@ function Escena({ clima, focoId, animo, energia, onEntrar, onAlerta, onCasa = nu
           última palabra sobre la cámara mientras cae dentro del mundo. Solo
           hace algo cuando `aplanando` (fase 'viajando'); inerte el resto. */}
       <AplaneNewDonk foco={foco} aplanando={aplanando} />
-      <AdaptiveDpr pixelated />
     </>
   );
 }
@@ -3008,10 +3089,12 @@ export default function Valle3D({
      restauración automática, y al `webglcontextrestored` esta key REMONTA el
      <Canvas> entero — contexto nuevo, escena repintada, nunca negro fijo. */
   const [glKey, setGlKey] = useState(0);
+  const tierInicial = useMemo(() => detectarTierInicial({ tier, reducedMotion }), [tier, reducedMotion]);
   /* El PERFIL DE RENDER del tier (DR-3D-PERF-GAMABAJA): 'alto' conserva este
      look intacto; 'medio'/'bajo' degradan sombras, DPR, antialias, densidad e
      instancian lo repetido. El default 'alto' preserva a los hosts viejos. */
-  const perfil = useMemo(() => perfilDeTier(tier), [tier]);
+  const perfil = useMemo(() => perfilDeTier(tierInicial), [tierInicial]);
+  const presupuesto = useMemo(() => presupuestoDeTier(tierInicial), [tierInicial]);
   /* La pose de reposo según el ASPECTO del equipo (una vez por montaje: girar
      el teléfono re-monta rutas enteras en la práctica; no vale un resize
      listener que mueva la cámara bajo los dedos del usuario). */
@@ -3029,8 +3112,8 @@ export default function Valle3D({
       key={glKey}
       className={`valle-canvas${listo ? ' valle-canvas--listo' : ''}`}
       shadows={perfil.sombras}
-      dpr={perfil.dpr}
-      gl={{ antialias: perfil.antialias, powerPreference: 'high-performance' }}
+      dpr={presupuesto.dpr}
+      gl={{ antialias: tierInicial === 'alto', powerPreference: 'high-performance' }}
       camera={/** @type {any} */ ({ position: pose.position, fov: pose.fov })}
       frameloop={reducedMotion ? 'demand' : 'always'}
       onCreated={({ gl }) => {
@@ -3068,7 +3151,7 @@ export default function Valle3D({
           onAngelita={onAngelita}
           reducedMotion={reducedMotion}
           perfil={perfil}
-          tier={tier}
+          tier={tierInicial}
           aplanando={aplanando}
           camaraDirector={camaraDirector}
           beatsRef={beatsRef}
