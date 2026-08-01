@@ -30,6 +30,7 @@ import {
   shouldStartNewSession,
 } from '../../services/conversationMemory';
 import { retrieve } from '../../services/ragRetriever';
+import { retrieveCorpus } from '../../services/corpusRetriever';
 import { parseIntent, formatIntentDescription } from '../../services/agentIntentParser';
 import { streamOpenAI } from '../../services/openaiStream';
 import { buildLLMRequest, selectChatRoute } from '../../services/llmRouter';
@@ -1472,7 +1473,14 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
       await addTurn(operatorId, { role: 'user', content: text.trim() });
 
       const contextMemory = wasFreshSession ? '' : await getContextString(operatorId, 10);
-      const contextCorpus = await retrieve(textForLLM, TOP_N_RAG, 'agente');
+      const contextCorpusBase = await retrieve(textForLLM, TOP_N_RAG, 'agente');
+      // #21 corpus→chat: suma los chunks del corpus server-side (5647 dr-fanout)
+      // vía /hybrid-retrieve. Gated por VITE_USE_CORPUS_RETRIEVAL (OFF por defecto)
+      // y fail-soft (devuelve [] si falla) → sin este flag, cero cambio.
+      const corpusExtra = await retrieveCorpus(textForLLM, 3);
+      const contextCorpus = corpusExtra.length
+        ? [...contextCorpusBase, ...corpusExtra]
+        : contextCorpusBase;
 
       // ADR-045 Fase 2 Step B/C — sidecar NLU + MCP tool grounding.
       // Solo si flag VITE_USE_SIDECAR_AGRO_MCP=true Y estamos online.

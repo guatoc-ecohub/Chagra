@@ -102,6 +102,11 @@ jobs:
           # Si sidecar timeout/5xx/red caida, sidecarClient devuelve null y el
           # comportamiento es identico al pre-wiring.
           VITE_USE_SIDECAR_AGRO_MCP: "true"
+          # #21 corpus→chat: suma los 5647 chunks del corpus server-side (dr-fanout
+          # colombiano) al RAG del chat vía /hybrid-retrieve. OFF por defecto —
+          # prender a "true" tras probar relevancia/latencia con queries reales.
+          # Fail-soft: si falla, el chat sigue con el RAG cliente (501 fichas).
+          VITE_USE_CORPUS_RETRIEVAL: "false"
           # Deep Research (2026-07-25): activa el chip 🔬 "Investigacion profunda"
           # (informe local multi-hop citado sobre grafo AGE + corpus + tools MCP).
           # Gated ademas por tier Pro (tierService PRO_USERNAMES: admin + ana maria);
