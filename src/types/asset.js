@@ -1,7 +1,7 @@
 /**
  * @typedef {Object} Asset
  * @property {string} id
- * @property {'asset--plant'|'asset--land'|'asset--structure'|'asset--equipment'|'asset--material'|'asset--sensor'|'asset--person'} type
+ * @property {'asset--plant'|'asset--land'|'asset--structure'|'asset--equipment'|'asset--material'|'asset--sensor'|'asset--person'|'asset--contact'} type
  * @property {Object} attributes
  * @property {string} attributes.name
  * @property {'active'|'archived'} [attributes.status]
