@@ -12,7 +12,9 @@
  * Parallax con la cámara (`cam`). Gama baja: gradientes CSS + SVG livianos.
  * reducedMotion apaga bruma/calor a la deriva. Sin red, es-CO.
  */
-/* eslint-disable chagra-i18n/no-hardcoded-spanish -- arte de juego es-CO. */
+/* eslint-disable react-refresh/only-export-components -- la paleta por piso
+   (PALETAS_PISO/paletaPiso) es parte del contrato de arte del fondo: el juego
+   la usa para pintar suelo y cultivos con el mismo clima. */
 import { memo } from 'react';
 
 /* Paletas por piso térmico (misma familia térmica del repo). */
@@ -94,7 +96,7 @@ function MaizAlto({ x, c = '#7f9e2c' }) {
   );
 }
 
-const EscenarioFondo = memo(function EscenarioFondo(/** @type {any} */ { piso = 'templado', cam = 0, reducedMotion = false }) {
+const EscenarioFondo = memo(function EscenarioFondo(/** @type {any} */ { piso = 'templado', cam = 0, reducedMotion = false, sinSol = false }) {
   const P = paletaPiso(piso);
   const rm = reducedMotion;
 
@@ -108,8 +110,9 @@ const EscenarioFondo = memo(function EscenarioFondo(/** @type {any} */ { piso = 
         style={{ background: `linear-gradient(${P.cielo} 0%, ${P.cieloBajo} 74%)` }}
       />
 
-      {/* sol / astro ambiente */}
-      {piso === 'calido' ? (
+      {/* sol / astro ambiente — se OMITE cuando el jefe del nivel ES el sol
+          (jefe_sequia): un solo astro en el cielo, y ese es el villano */}
+      {sinSol ? null : piso === 'calido' ? (
         <div className={`msc-esc-sol msc-esc-sol--duro ${rm ? '' : 'msc-esc-anim-sol'}`} />
       ) : piso === 'paramo' ? (
         <div className="msc-esc-sol msc-esc-sol--palido" />
@@ -130,11 +133,14 @@ const EscenarioFondo = memo(function EscenarioFondo(/** @type {any} */ { piso = 
         </>
       )}
 
-      {/* lomas lejanas (parallax lento) */}
+      {/* lomas lejanas (parallax lento) — colinas repetidas: el tile cubre
+          todo el recorrido de la cámara sin cortarse en un borde recto */}
       <div
         className="msc-esc-loma msc-esc-loma--lejos"
         style={{
           background: `radial-gradient(120% 100% at 50% 100%, ${P.lomaLejos} 0 60%, transparent 61%)`,
+          backgroundSize: '1400px 100%',
+          backgroundRepeat: 'repeat-x',
           transform: `translate3d(${-cam * 0.28}px,0,0)`,
         }}
       />
@@ -167,11 +173,13 @@ const EscenarioFondo = memo(function EscenarioFondo(/** @type {any} */ { piso = 
         </svg>
       </div>
 
-      {/* lomas cercanas (parallax rápido) */}
+      {/* lomas cercanas (parallax rápido) — mismo tile rodante */}
       <div
         className="msc-esc-loma msc-esc-loma--cerca"
         style={{
           background: `radial-gradient(120% 100% at 40% 100%, ${P.lomaCerca} 0 58%, transparent 59%)`,
+          backgroundSize: '1100px 100%',
+          backgroundRepeat: 'repeat-x',
           transform: `translate3d(${-cam * 0.52}px,0,0)`,
         }}
       />
@@ -193,9 +201,11 @@ function StyleEscenario() {
 .msc-esc-bruma{position:absolute;left:-20%;right:-20%;height:120px;background:linear-gradient(rgba(255,255,255,0),rgba(246,248,246,.72),rgba(255,255,255,0));border-radius:50%;filter:blur(2px);}
 .msc-esc-bruma--a{top:34%;}
 .msc-esc-bruma--b{top:52%;opacity:.7;height:90px;}
-.msc-esc-loma{position:absolute;left:-10%;right:-10%;will-change:transform;}
-.msc-esc-loma--lejos{bottom:20%;height:240px;opacity:.82;}
-.msc-esc-loma--cerca{bottom:12%;height:220px;}
+/* el borde derecho se extiende lo que la cámara puede desplazar el tile
+   (~cam_max × factor): la colina nunca deja ver un corte recto */
+.msc-esc-loma{position:absolute;left:-10%;will-change:transform;}
+.msc-esc-loma--lejos{bottom:20%;height:240px;opacity:.82;right:-620px;}
+.msc-esc-loma--cerca{bottom:12%;height:220px;right:-1060px;}
 .msc-esc-props{position:absolute;left:0;bottom:16%;width:2800px;height:200px;will-change:transform;opacity:.9;}
 .msc-esc-props svg{display:block;}
 
