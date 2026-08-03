@@ -217,10 +217,19 @@ function formatKeyLabel(key) {
     .trim();
 }
 
+/**
+ * Campos técnicos/plumbing que NO se deben indexar porque diluyen el IDF
+ * y no tienen valor semántico para el usuario (ids, slugs, versiones, timestamps).
+ */
+const PLUMBING_FIELDS = new Set([
+  'id', 'slug', 'species_slug', 'speciesid', 'version', 'created_at', 'updated_at', 'timestamp',
+  'createdat', 'updatedat', 'uuid', 'key', '_id', '_key',
+]);
+
 function isContextualField(key, val) {
   if (typeof val === 'number' && Number.isFinite(val)) return true;
   const normalizedKey = normalizeKey(key);
-  return /(^|[^a-z0-9])(clima|ph|altitud|temperatura|dosis|humedad|distancia|msnm)([^a-z0-9]|$)/.test(normalizedKey);
+  return /(^|[^a-z0-9])(clima|ph|altitud|temperatura|dosis|humedad|distancia|msnm|thermal|zone)([^a-z0-9]|$)/.test(normalizedKey);
 }
 
 function buildContextualText(key, val) {
@@ -246,6 +255,9 @@ export function flattenDoc(doc, prefix = '', speciesSlug = null) {
   const fieldLabel = (key) => formatKeyLabel(`${prefix}${key}`.replace(/\.$/, ''));
   const addPassage = (key, val) => {
     const path = `${prefix}${key}`;
+    // Skip plumbing/technical fields that don't add semantic value
+    if (PLUMBING_FIELDS.has(normalizeKey(key))) return;
+
     if (isContextualField(path, val) && (typeof val === 'string' || typeof val === 'number')) {
       passages.push({ key: path, text: buildContextualText(fieldLabel(key), val), species: slug });
     } else if (esTextoIndexable(val)) {
