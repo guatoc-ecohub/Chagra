@@ -203,9 +203,54 @@ function resolveSpeciesSlug(doc, speciesSlug = null) {
   return '';
 }
 
+/**
+ * Campos de identidad de una ficha que llevan el NOMBRE del cultivo pero son
+ * cortos (< 20 chars) o vienen en arrays, por lo que el gate `length > 20` de
+ * `addPassage` los descartaba o los diluía en un passage débil. Sin un passage
+ * que contenga el nombre propio ("maíz", "cebolla", "café"), una consulta
+ * campesina que nombra el cultivo ("cómo abonar el maíz") matcheaba mejor una
+ * ficha de práctica densa (`practica_cogollero_maiz`) que la ficha del cultivo
+ * mismo — el cultivo perdía su propio recall (auditoría RAG idea-57, 2026-08-03).
+ *
+ * `buildIdentityPassage` sintetiza UN passage de identidad por ficha en el nivel
+ * RAÍZ, concatenando estos campos, exento del gate de longitud y atribuido al
+ * slug de especie. Es aditivo (no quita passages existentes) y solo aporta el
+ * nombre del cultivo al índice BM25, así que sube el recall del nombre propio
+ * sin degradar el ranking del contenido pedagógico ni de las prácticas.
+ */
+const IDENTITY_FIELDS = [
+  'common_names', 'common_name', 'nombre_comun', 'nombres_comunes',
+  'scientific_name', 'nombre_cientifico', 'category',
+];
+
+function buildIdentityPassage(doc, slug) {
+  const parts = [];
+  for (const field of IDENTITY_FIELDS) {
+    const val = doc[field];
+    if (typeof val === 'string' && val.trim()) {
+      parts.push(val.trim());
+    } else if (Array.isArray(val)) {
+      val.forEach((v) => {
+        if (typeof v === 'string' && v.trim()) parts.push(v.trim());
+      });
+    }
+  }
+  const text = parts.join(' — ').trim();
+  return text ? { key: '__identity__', text, species: slug } : null;
+}
+
 export function flattenDoc(doc, prefix = '', speciesSlug = null) {
   const slug = resolveSpeciesSlug(doc, speciesSlug);
   const passages = [];
+
+  // Passage de identidad (solo en el nivel raíz de una ficha): garantiza que el
+  // NOMBRE del cultivo esté indexado y atribuido, aunque los campos de nombre
+  // sean cortos y el gate `length > 20` los descarte. Ver IDENTITY_FIELDS.
+  if (prefix === '' && slug) {
+    const identity = buildIdentityPassage(doc, slug);
+    if (identity) passages.push(identity);
+  }
+
   const addPassage = (key, val) => {
     if (typeof val === 'string' && val.length > 20) {
       passages.push({ key: `${prefix}${key}`, text: val, species: slug });

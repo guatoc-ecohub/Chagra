@@ -69,6 +69,20 @@ function extractPassageText(doc) {
   // Concatenamos los pasajes textuales mas representativos: valor_pedagogico,
   // milestones, companions, biopreparados, failure_modes, leccion_agroecologica.
   const parts = [];
+  // IDENTIDAD primero: nombre común + científico + categoría. Sin esto, el
+  // embedding del doc no contenía el NOMBRE del cultivo, así que una consulta
+  // que nombra el cultivo ("el maíz", "la cebolla") tenía baja similitud con su
+  // propia ficha (auditoría RAG idea-57, 2026-08-03). Reproduce a nivel
+  // semántico el passage de identidad que flattenDoc() ya añade al BM25.
+  const identityFields = [
+    'common_names', 'common_name', 'nombre_comun', 'nombres_comunes',
+    'scientific_name', 'nombre_cientifico', 'category',
+  ];
+  for (const field of identityFields) {
+    const val = doc[field];
+    if (typeof val === 'string' && val.trim()) parts.push(val.trim());
+    else if (Array.isArray(val)) val.forEach((v) => { if (typeof v === 'string' && v.trim()) parts.push(v.trim()); });
+  }
   if (doc.valor_pedagogico) parts.push(doc.valor_pedagogico);
   if (Array.isArray(doc.milestones)) {
     doc.milestones.forEach((m) => {
