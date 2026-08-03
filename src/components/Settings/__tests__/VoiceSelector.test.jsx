@@ -97,18 +97,11 @@ describe('VoiceSelector — rediseño mínima fricción', () => {
     expect(opts.rate).toBeCloseTo(1.1);
   });
 
-  test.skip('ya no ofrece a Dora (ef_dora): el operador la quitó', () => {
-    // ESCALAR_A_OPUS: El test espera que Dora (ef_dora) NO esté en la lista,
-    // pero en producción sigue en KOKORO_VOICES. Este test está desincronizado:
-    // - El comentario dice "el operador la quitó"
-    // - Pero en ttsService.js ef_dora sigue presente como opción
-    // - La documentación dice "La dejamos como opción porque algunos usuarios ya se acostumbraron"
-    //
-    // Posibles causas:
-    // 1. Test rancio: se escribió asumiendo que Dora se iba a remover, pero finalmente se quedó
-    // 2. Regresión de producción: se debió remover pero no se hizo
-    //
-    // Opus debe decidir si remover ef_dora de KOKORO_VOICES o actualizar este test.
+  test('ya no ofrece a Dora (ef_dora): el operador la quitó', () => {
+    // Re-activado tras el rebase sobre dev (2026-08-02): ef_dora sale de
+    // KOKORO_VOICES (PR #2854), así que el selector deja de ofrecerla. El
+    // test.skip se introdujo en dev (PR #2932/#2933) mientras dora seguía en
+    // el catálogo; al retirarla vuelve a ser válido.
     render(<VoiceSelector />);
     expect(screen.queryByTestId('voice-option-ef_dora')).not.toBeInTheDocument();
   });
