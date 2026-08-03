@@ -35,6 +35,22 @@
  * de 1 px, sin bloom, sin estratos y sin respiración. Sigue siendo el mismo mapa
  * y sigue diciendo la verdad — solo que quieto. Nunca pantalla negra, nunca el
  * teléfono ahogado.
+ *
+ * NAVEGACIÓN: EL CERRO SE RECORRE, NO SE PADECE
+ * ─────────────────────────────────────────────
+ * Un grafo con 130+ matas y ~900 cuerdas es pura verdad — y una pesadilla de
+ * navegar si lo único que uno puede hacer es dar vueltas y esperar tropezarse
+ * con lo que busca. Aquí el recorrido se piensa como una herramienta:
+ *   · BUSCADOR — se escribe un nombre (común, alias o científico) y el cerro
+ *     VUELA hasta la mata. No hay que encontrarla con el ojo entre 130.
+ *   · GESTOS FLUIDOS — orbitar, acercar Y desplazar (pan), todo con damping.
+ *     El mapa se siente vivo bajo el dedo, no trabado.
+ *   · VOLVER A LA VISTA GENERAL — el botón, tocar el aire, o la tecla Esc: tres
+ *     caminos al mismo lugar, para que nunca se pierda el norte.
+ *   · ROSA DE ALTURAS — un mini-mapa de los pisos térmicos marca dónde está uno
+ *     parado en la montaña. La orientación es del cuerpo, pero la confirma.
+ * Todo esto es CHROME (DOM real) y eventos: cero costo en el bucle de render, y
+ * por eso no le quita un solo fps al teléfono de gama baja.
  */
 
 import { Suspense, lazy, useCallback, useEffect, useMemo, useRef, useState } from 'react';
@@ -71,7 +87,7 @@ const NOMBRE_PISO = {
  * Con `prefers-reduced-motion` no se desliza: se planta de una (que es lo que
  * pidió quien activó esa preferencia).
  */
-function CamaraEnfoque({ enfocado, posiciones, centro, radioMax, reducedMotion }) {
+function CamaraEnfoque({ enfocado, posiciones, centro, radioMax, reducedMotion, irAPiso }) {
   const controles = useThree((s) => s.controls);
   const invalidar = useThree((s) => s.invalidate);
   const destino = useRef(new THREE.Vector3());
@@ -89,18 +105,35 @@ function CamaraEnfoque({ enfocado, posiciones, centro, radioMax, reducedMotion }
     invalidar();
   }, [enfocado, posiciones, centro, radioMax, invalidar]);
 
+  /* Ir a una ALTURA (desde la rosa de pisos): sin enfocar ningún nodo, la cámara
+     sube o baja a la banda y se acerca lo justo para leer ese piso. El eje X/Z se
+     mantiene en el centro del cerro — subir por la montaña, no orbitarla. */
+  useEffect(() => {
+    if (!irAPiso) return;
+    destino.current.set(0, irAPiso.y ?? 0, 0);
+    distDestino.current = Math.max((irAPiso.radio || 3) * 2.4 + 4, radioMax * 1.1 + 4);
+    invalidar();
+  }, [irAPiso, radioMax, invalidar]);
+
   useFrame((state, dt) => {
     if (!controles) return;
-    const k = reducedMotion ? 1 : 1 - Math.exp(-dt * 3.2); // suavizado estable
+    /* Damping exponencial estable (independiente del framerate). Un pelín más
+       vivo que antes (3.2 → 3.8): el vuelo llega con decisión pero sin brusquedad,
+       que es como se siente "espectacular" sin marear. */
+    const k = reducedMotion ? 1 : 1 - Math.exp(-dt * 3.8);
     controles.target.lerp(destino.current, k);
 
     // Acercar/alejar respetando el ángulo que el usuario haya escogido.
     const cam = state.camera;
     const haciaCam = cam.position.clone().sub(controles.target);
     const dist = haciaCam.length() || 0.001;
-    const nueva = THREE.MathUtils.lerp(dist, distDestino.current, k * 0.7);
+    const nueva = THREE.MathUtils.lerp(dist, distDestino.current, k * 0.72);
     cam.position.copy(controles.target).add(haciaCam.multiplyScalar(nueva / dist));
     controles.update();
+    /* Mientras el vuelo no se ha asentado, pedimos otro cuadro: con
+       `frameloop='demand'` (gama baja / reduced-motion) sin esto la cámara se
+       congelaría a mitad de camino. */
+    if (!reducedMotion) invalidar();
   });
 
   return null;
@@ -165,8 +198,188 @@ function CartaNodo({ grafo, nodo, onIr, onCerrar }) {
   );
 }
 
+// ── El buscador ────────────────────────────────────────────────────────────
+/**
+ * Minúsculas sin tildes: el campesino escribe "platano" y encuentra "plátano".
+ * Mismo criterio de normalización que usa el grafo para las plagas.
+ */
+function normalizarBusqueda(s) {
+  return String(s || '')
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[̀-ͯ]/g, '')
+    .trim();
+}
+
+/**
+ * El buscador. Escribir un nombre y el cerro VUELA hasta la mata — sin tener que
+ * encontrarla con el ojo entre 130. Busca en el nombre, en los alias ("también
+ * le dicen…") y en el nombre científico, así que "papa", "criolla" y "Solanum"
+ * caen todos en la papa. Los resultados salen ordenados por peso (grado): lo más
+ * conectado —lo que más enseña— primero.
+ *
+ * Es DOM real y sólo trabaja cuando hay texto: cero costo mientras está cerrado,
+ * y por eso no le quita un cuadro al render del cerro.
+ */
+function BuscadorGrafo({ grafo, onElegir, abierto, onAbrir, onCerrar }) {
+  const [texto, setTexto] = useState('');
+  const entradaRef = useRef(null);
+
+  // Índice de búsqueda: se arma una vez por grafo, no por tecla.
+  const indice = useMemo(() => {
+    const out = [];
+    for (const n of grafo?.nodos || []) {
+      const campos = [n.etiqueta, n.sub, ...(n.nombresComunes || [])]
+        .filter(Boolean)
+        .map(normalizarBusqueda);
+      out.push({ nodo: n, campos, texto: campos.join(' ') });
+    }
+    return out;
+  }, [grafo]);
+
+  const resultados = useMemo(() => {
+    const q = normalizarBusqueda(texto);
+    if (q.length < 2) return [];
+    const hits = [];
+    for (const e of indice) {
+      // Prefijo del nombre pesa más que aparecer en la mitad de un alias.
+      const empiezaNombre = e.campos[0]?.startsWith(q);
+      const contiene = e.texto.includes(q);
+      if (!contiene) continue;
+      hits.push({ nodo: e.nodo, rango: (empiezaNombre ? 0 : 1) });
+    }
+    hits.sort(
+      (a, b) => a.rango - b.rango
+        || (b.nodo.grado || 0) - (a.nodo.grado || 0)
+        || a.nodo.etiqueta.localeCompare(b.nodo.etiqueta),
+    );
+    return hits.slice(0, 8).map((h) => h.nodo);
+  }, [texto, indice]);
+
+  useEffect(() => {
+    if (abierto) entradaRef.current?.focus();
+  }, [abierto]);
+
+  const elegir = (nodo) => {
+    onElegir(nodo.id);
+    setTexto('');
+    onCerrar();
+  };
+
+  const alTeclado = (e) => {
+    if (e.key === 'Escape') { setTexto(''); onCerrar(); e.stopPropagation(); }
+    if (e.key === 'Enter' && resultados[0]) { elegir(resultados[0]); }
+  };
+
+  if (!abierto) {
+    return (
+      <button type="button" className="grafo-buscar-abrir" onClick={onAbrir} aria-label="Buscar una mata en el mapa">
+        <span aria-hidden="true">🔍</span> Buscar
+      </button>
+    );
+  }
+
+  return (
+    <div className="grafo-buscar" role="search">
+      <div className="grafo-buscar__campo">
+        <span className="grafo-buscar__lupa" aria-hidden="true">🔍</span>
+        <input
+          ref={entradaRef}
+          type="search"
+          className="grafo-buscar__input"
+          placeholder="Escriba una mata, plaga o remedio…"
+          value={texto}
+          onChange={(e) => setTexto(e.target.value)}
+          onKeyDown={alTeclado}
+          aria-label="Buscar en el grafo"
+          autoComplete="off"
+          autoCorrect="off"
+          spellCheck="false"
+        />
+        <button
+          type="button"
+          className="grafo-buscar__cerrar"
+          onClick={() => { setTexto(''); onCerrar(); }}
+          aria-label="Cerrar el buscador"
+        >
+          ×
+        </button>
+      </div>
+      {normalizarBusqueda(texto).length >= 2 && (
+        <ul className="grafo-buscar__lista" aria-label="Resultados">
+          {resultados.length === 0 && (
+            <li className="grafo-buscar__vacio">Ninguna coincidencia en el mapa.</li>
+          )}
+          {resultados.map((n) => {
+            const info = TIPOS_NODO[n.tipo];
+            return (
+              <li key={n.id}>
+                <button type="button" className="grafo-buscar__hit" onClick={() => elegir(n)}>
+                  <span
+                    className={`grafo-buscar__figura grafo-buscar__figura--${info.geo}`}
+                    style={{ '--fig-tinte': colorDeNodo(n) }}
+                    aria-hidden="true"
+                  />
+                  <span className="grafo-buscar__nombre">{n.etiqueta}</span>
+                  <span className="grafo-buscar__tipo">{info.etiqueta}</span>
+                </button>
+              </li>
+            );
+          })}
+        </ul>
+      )}
+    </div>
+  );
+}
+
+// ── La rosa de alturas (mini-mapa de pisos) ─────────────────────────────────
+/**
+ * Una regla vertical de la montaña: cada piso es una franja, con su color y su
+ * conteo, y la banda del piso donde vive la mata enfocada se ilumina. No es un
+ * mapa de posición (eso lo hace la niebla en el 3D) — es una BRÚJULA DE ALTURA:
+ * confirma de un vistazo "voy por el frío" sin tener que leer los rótulos del
+ * cerro. Tocar una franja lleva la cámara a esa altura.
+ */
+function MiniMapa({ layout, nodoEnfocado, onIrAPiso }) {
+  // De arriba (nival) hacia abajo (cálido), como se lee una montaña.
+  const franjas = useMemo(() => {
+    const bandas = [...(layout.bandas || [])]
+      .filter((b) => b.id !== 'sin_piso')
+      .sort((a, b) => b.y - a.y);
+    return bandas;
+  }, [layout]);
+
+  if (!franjas.length) return null;
+  const pisoActivo = nodoEnfocado?.tipo === 'especie' ? nodoEnfocado.piso : null;
+
+  return (
+    <nav className="grafo-rosa" aria-label="Alturas de la montaña">
+      {franjas.map((b) => {
+        const activo = pisoActivo === b.id;
+        return (
+          <button
+            key={b.id}
+            type="button"
+            className={`grafo-rosa__franja${activo ? ' grafo-rosa__franja--activa' : ''}`}
+            style={{ '--franja-tinte': TINTE_PISO[b.id] || TINTE_PISO.frio }}
+            onClick={() => onIrAPiso(b)}
+            aria-label={`${b.nombre}${b.altitud ? `, ${b.altitud}` : ''}, ${b.poblacion} matas`}
+            aria-current={activo ? 'true' : undefined}
+          >
+            <span className="grafo-rosa__punto" aria-hidden="true" />
+            <span className="grafo-rosa__txt">
+              <span className="grafo-rosa__nombre">{b.nombre}</span>
+              <span className="grafo-rosa__cuenta">{b.poblacion}</span>
+            </span>
+          </button>
+        );
+      })}
+    </nav>
+  );
+}
+
 // ── La escena ──────────────────────────────────────────────────────────────
-function Escena({ grafo, layout, tier, reducedMotion, enfocado, relacionados, onTocar, onSobre, onFondo }) {
+function Escena({ grafo, layout, tier, reducedMotion, enfocado, relacionados, irAPiso, onTocar, onSobre, onFondo }) {
   const centro = useMemo(
     () => new THREE.Vector3(0, ((layout.yMin ?? 0) + (layout.yMax ?? 0)) / 2, 0),
     [layout],
@@ -218,9 +431,18 @@ function Escena({ grafo, layout, tier, reducedMotion, enfocado, relacionados, on
 
       <OrbitControls
         makeDefault
-        enablePan={false}
+        /* PAN ACTIVADO: desplazar el cerro es media navegación. En pantalla
+           (`screenSpacePanning`) el arrastre con dos dedos / botón derecho mueve
+           el mapa de forma predecible, sin hundirlo bajo tierra. La velocidad
+           baja (0.6) evita que se dispare de las manos. El enfoque manda sobre
+           el pan: al tocar una mata la cámara recentra igual. */
+        enablePan
+        screenSpacePanning
+        panSpeed={0.6}
         enableDamping
-        dampingFactor={0.08}
+        dampingFactor={0.09}
+        rotateSpeed={0.85}
+        zoomSpeed={0.9}
         minDistance={2.5}
         maxDistance={radioTope(layout)}
         /* Nunca por debajo del horizonte ni sobre el polo: desde abajo el mapa
@@ -235,6 +457,7 @@ function Escena({ grafo, layout, tier, reducedMotion, enfocado, relacionados, on
         centro={centro}
         radioMax={layout.radioMax}
         reducedMotion={reducedMotion}
+        irAPiso={irAPiso}
       />
       <AdaptiveDpr pixelated />
     </>
@@ -256,6 +479,14 @@ export default function NavegadorGrafo() {
   const [enfocado, setEnfocado] = useState(null);
   const [sobre, setSobre] = useState(null);
   const [listoCanvas, setListoCanvas] = useState(false);
+  const [buscando, setBuscando] = useState(false);
+  /* La altura pedida desde la rosa de pisos. Un objeto NUEVO cada vez (aunque
+     sea el mismo piso) para que la cámara re-dispare el vuelo si se vuelve a
+     tocar. */
+  const [pisoDestino, setPisoDestino] = useState(null);
+  // Posición del cursor, para que el rótulo del hover lo siga en vez de quedarse
+  // clavado abajo. Sólo en punteros finos (mouse); en táctil no aplica.
+  const [posSobre, setPosSobre] = useState(null);
 
   useEffect(() => {
     let vivo = true;
@@ -286,7 +517,43 @@ export default function NavegadorGrafo() {
   const nodoSobre = sobre && !enfocado ? sobre : null;
 
   const alTocar = useCallback((nodo) => setEnfocado((prev) => (prev === nodo.id ? null : nodo.id)), []);
-  const alFondo = useCallback(() => setEnfocado(null), []);
+  const alFondo = useCallback(() => { setEnfocado(null); setPisoDestino(null); }, []);
+
+  /* Ir a una mata desde el buscador: la enfoca (la cámara vuela sola por el
+     efecto de `enfocado`) y cierra el buscador. */
+  const irAMata = useCallback((id) => { setPisoDestino(null); setEnfocado(id); }, []);
+
+  /* Ir a una altura desde la rosa: suelta el enfoque y manda a la cámara a esa
+     banda. Objeto nuevo → re-dispara aunque sea el mismo piso. */
+  const irAPiso = useCallback((banda) => {
+    setEnfocado(null);
+    setPisoDestino({ y: banda.y, radio: banda.radio, _t: Date.now() });
+  }, []);
+
+  const alSobre = useCallback((nodo, e) => {
+    setSobre(nodo);
+    // Puntero fino (mouse): el rótulo sigue el cursor. Táctil: se queda abajo.
+    if (nodo && e && e.pointerType === 'mouse' && typeof e.clientX === 'number') {
+      setPosSobre({ x: e.clientX, y: e.clientY });
+    } else if (!nodo) {
+      setPosSobre(null);
+    }
+  }, []);
+
+  /* Teclado: Esc siempre vuelve a la vista general (y cierra buscador); "/" o "b"
+     abren el buscador, el atajo universal de "buscar". */
+  useEffect(() => {
+    const onKey = (e) => {
+      if (e.key === 'Escape') { setBuscando(false); alFondo(); }
+      else if ((e.key === '/' || e.key === 'b') && !buscando) {
+        const t = e.target;
+        const editando = t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA');
+        if (!editando) { e.preventDefault(); setBuscando(true); }
+      }
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [alFondo, buscando]);
 
   if (estado !== 'listo') {
     return (
@@ -323,8 +590,9 @@ export default function NavegadorGrafo() {
           reducedMotion={reducedMotion}
           enfocado={enfocado}
           relacionados={relacionados}
+          irAPiso={pisoDestino}
           onTocar={alTocar}
-          onSobre={setSobre}
+          onSobre={alSobre}
           onFondo={alFondo}
         />
         <Suspense fallback={null}>
@@ -340,6 +608,23 @@ export default function NavegadorGrafo() {
             Toque una para ver de qué se acompaña.
           </p>
         </header>
+
+        {/* EL BUSCADOR — la navegación que faltaba: escribir un nombre y volar
+            hasta la mata, en vez de cazarla con el ojo entre 130. */}
+        <BuscadorGrafo
+          grafo={grafo}
+          onElegir={irAMata}
+          abierto={buscando}
+          onAbrir={() => setBuscando(true)}
+          onCerrar={() => setBuscando(false)}
+        />
+
+        {/* LA ROSA DE ALTURAS — la brújula de la montaña: en qué piso está uno. */}
+        <MiniMapa
+          layout={layout}
+          nodoEnfocado={nodoEnfocado}
+          onIrAPiso={irAPiso}
+        />
 
         {/* LA LEYENDA. El mapa se explica solo, pero la leyenda confirma. Va
             abajo y chiquita: es una nota al pie, no el protagonista. */}
@@ -362,9 +647,16 @@ export default function NavegadorGrafo() {
           })}
         </ul>
 
-        {/* El nombre de lo que está debajo del dedo, antes de tocarlo. */}
+        {/* El nombre de lo que está debajo del dedo/cursor, antes de tocarlo. En
+            ratón sigue al cursor (posSobre); en táctil se queda abajo, centrado. */}
         {nodoSobre && (
-          <p className="grafo-sobre" aria-hidden="true">{nodoSobre.etiqueta}</p>
+          <p
+            className={`grafo-sobre${posSobre ? ' grafo-sobre--cursor' : ''}`}
+            aria-hidden="true"
+            style={posSobre ? { left: posSobre.x, top: posSobre.y } : undefined}
+          >
+            {nodoSobre.etiqueta}
+          </p>
         )}
 
         {enfocado && (

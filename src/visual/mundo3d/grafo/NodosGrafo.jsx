@@ -213,7 +213,10 @@ export default function NodosGrafo({
   const alSobre = (tipo) => (e) => {
     e.stopPropagation();
     const item = grupos[tipo]?.[e.instanceId];
-    onSobre?.(item?.nodo || null);
+    /* Se pasa el evento (tiene clientX/clientY y pointerType) para que el rótulo
+       del hover pueda seguir al cursor en ratón. En táctil el consumidor lo
+       ignora y el rótulo se queda abajo. */
+    onSobre?.(item?.nodo || null, e);
   };
 
   return (

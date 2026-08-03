@@ -219,6 +219,260 @@
   max-width: 80vw;
   overflow: hidden;
   text-overflow: ellipsis;
+  pointer-events: none;
+}
+
+/* En ratón el rótulo SIGUE al cursor: se lee sin bajar la vista al pie. Se
+   coloca arriba-derecha del puntero para no taparlo, con `left`/`top` en línea. */
+.grafo-sobre--cursor {
+  left: 0;
+  bottom: auto;
+  transform: translate(0.9rem, -1.9rem);
+  transition: transform 0.05s linear;
+}
+
+/* ── El buscador ──────────────────────────────────────────────────────────
+   La herramienta de navegación que faltaba. El botón cerrado es discreto; abierto
+   es un campo de papel con su lista de resultados. Todo se puede tocar (por eso
+   `pointer-events: auto` sobre el chrome que sí lo apaga). */
+.grafo-buscar-abrir {
+  pointer-events: auto;
+  align-self: flex-start;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  min-height: 40px;
+  padding: 0.45rem 0.9rem;
+  border: var(--g-trazo) solid var(--g-tinta);
+  border-radius: 999px;
+  background: var(--g-crudo);
+  color: var(--g-tinta);
+  font-family: inherit;
+  font-size: 0.85rem;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 3px 0 rgba(42, 32, 22, 0.5);
+  transition: transform 0.12s ease, box-shadow 0.12s ease;
+}
+
+.grafo-buscar-abrir:active {
+  transform: translateY(2px);
+  box-shadow: 0 1px 0 rgba(42, 32, 22, 0.5);
+}
+
+.grafo-buscar {
+  pointer-events: auto;
+  align-self: flex-start;
+  width: min(24rem, 78vw);
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.grafo-buscar__campo {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.35rem 0.55rem;
+  border: var(--g-trazo) solid var(--g-tinta);
+  border-radius: var(--g-radio);
+  background: var(--g-papel);
+  box-shadow: 0 4px 0 rgba(42, 32, 22, 0.4);
+}
+
+.grafo-buscar__lupa {
+  font-size: 0.95rem;
+  opacity: 0.7;
+  flex: none;
+}
+
+.grafo-buscar__input {
+  flex: 1;
+  min-width: 0;
+  border: none;
+  background: none;
+  color: var(--g-tinta);
+  font-family: inherit;
+  font-size: 0.95rem;
+  outline: none;
+}
+
+.grafo-buscar__input::placeholder {
+  color: rgba(42, 32, 22, 0.5);
+}
+
+.grafo-buscar__cerrar {
+  flex: none;
+  width: 30px;
+  height: 30px;
+  border: none;
+  border-radius: 50%;
+  background: none;
+  color: var(--g-tinta);
+  font-size: 1.3rem;
+  line-height: 1;
+  opacity: 0.55;
+  cursor: pointer;
+}
+
+.grafo-buscar__cerrar:hover {
+  opacity: 1;
+  background: rgba(42, 32, 22, 0.08);
+}
+
+/* La lista de resultados: papel, con la misma silueta del nodo al lado del
+   nombre — el buscador habla el mismo idioma que el mapa. */
+.grafo-buscar__lista {
+  margin: 0;
+  padding: 0.3rem;
+  list-style: none;
+  max-height: 44vh;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  border: var(--g-trazo) solid var(--g-tinta);
+  border-radius: var(--g-radio);
+  background: var(--g-papel);
+  box-shadow: 0 5px 0 rgba(42, 32, 22, 0.4);
+}
+
+.grafo-buscar__vacio {
+  padding: 0.5rem 0.6rem;
+  font-size: 0.82rem;
+  color: var(--g-tinta);
+  opacity: 0.6;
+}
+
+.grafo-buscar__hit {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  min-height: 40px;
+  padding: 0.4rem 0.55rem;
+  border: none;
+  border-radius: 10px;
+  background: none;
+  color: var(--g-tinta);
+  font-family: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition: background 0.12s ease;
+}
+
+.grafo-buscar__hit:hover,
+.grafo-buscar__hit:focus-visible {
+  background: rgba(42, 32, 22, 0.09);
+}
+
+.grafo-buscar__figura {
+  width: 15px;
+  height: 15px;
+  flex: none;
+  background: var(--fig-tinte);
+}
+
+.grafo-buscar__figura--mata { border-radius: 50%; }
+.grafo-buscar__figura--plaga { clip-path: polygon(50% 0, 100% 50%, 50% 100%, 0 50%); }
+.grafo-buscar__figura--vasija { clip-path: polygon(28% 0, 72% 0, 100% 42%, 82% 100%, 18% 100%, 0 42%); }
+.grafo-buscar__figura--anillo {
+  border-radius: 50%;
+  background: none;
+  border: 3px solid var(--fig-tinte);
+}
+
+.grafo-buscar__nombre {
+  flex: 1;
+  min-width: 0;
+  font-size: 0.9rem;
+  font-weight: 700;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.grafo-buscar__tipo {
+  flex: none;
+  font-size: 0.68rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  opacity: 0.55;
+}
+
+/* ── La rosa de alturas (mini-mapa de pisos) ──────────────────────────────
+   Una regla vertical de la montaña, pegada a la derecha. Cada franja es el color
+   de su piso; la del piso enfocado se ilumina. Es la brújula: dice en qué altura
+   está uno parado sin tener que leer los rótulos del cerro. */
+.grafo-rosa {
+  pointer-events: auto;
+  position: absolute;
+  top: 50%;
+  right: clamp(0.6rem, 1.6vw, 1rem);
+  transform: translateY(-50%);
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  padding: 0.4rem 0.35rem;
+  border: 1px solid rgba(236, 224, 199, 0.18);
+  border-radius: var(--g-radio);
+  background: rgba(42, 32, 22, 0.62);
+  backdrop-filter: blur(3px);
+}
+
+.grafo-rosa__franja {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  min-height: 30px;
+  padding: 0.2rem 0.35rem 0.2rem 0.25rem;
+  border: none;
+  border-radius: 8px;
+  background: none;
+  color: var(--g-crudo);
+  font-family: inherit;
+  cursor: pointer;
+  transition: background 0.15s ease, transform 0.15s ease;
+}
+
+.grafo-rosa__franja:hover,
+.grafo-rosa__franja:focus-visible {
+  background: rgba(246, 239, 224, 0.1);
+}
+
+.grafo-rosa__franja--activa {
+  background: rgba(246, 239, 224, 0.16);
+  transform: translateX(-3px);
+}
+
+.grafo-rosa__punto {
+  width: 12px;
+  height: 12px;
+  flex: none;
+  border-radius: 3px;
+  background: var(--franja-tinte);
+  border: 1px solid rgba(42, 32, 22, 0.5);
+  box-shadow: 0 0 0 1px rgba(246, 239, 224, 0.12);
+}
+
+.grafo-rosa__franja--activa .grafo-rosa__punto {
+  box-shadow: 0 0 8px var(--franja-tinte), 0 0 0 1px rgba(246, 239, 224, 0.3);
+}
+
+.grafo-rosa__txt {
+  display: flex;
+  align-items: baseline;
+  gap: 0.4rem;
+}
+
+.grafo-rosa__nombre {
+  font-size: 0.72rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.grafo-rosa__cuenta {
+  font-size: 0.66rem;
+  font-variant-numeric: tabular-nums;
+  opacity: 0.6;
 }
 
 /* ── Volver ──────────────────────────────────────────────────────────────── */
@@ -462,6 +716,29 @@
 
   .grafo-leyenda {
     font-size: 0.7rem;
+  }
+
+  /* En teléfono la rosa se encoge a solo puntos de color: sigue siendo la
+     brújula de altura, pero no le roba pantalla al cerro. */
+  .grafo-rosa__txt {
+    display: none;
+  }
+
+  .grafo-rosa {
+    gap: 4px;
+    padding: 0.35rem 0.3rem;
+  }
+
+  .grafo-buscar {
+    width: min(20rem, 88vw);
+  }
+
+  /* El rótulo que sigue al cursor no aplica en táctil: vuelve al pie centrado. */
+  .grafo-sobre--cursor {
+    left: 50% !important;
+    top: auto !important;
+    bottom: 1.1rem;
+    transform: translateX(-50%);
   }
 }
 
