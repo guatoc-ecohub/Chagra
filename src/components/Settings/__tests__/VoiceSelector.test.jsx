@@ -56,9 +56,9 @@ describe('VoiceSelector — rediseño mínima fricción', () => {
   });
 
   test('respeta la voz preferida persistida', () => {
-    localStorage.setItem('chagra:tts:voice', 'pm_santa');
+    localStorage.setItem('chagra:tts:voice', 'em_alex');
     render(<VoiceSelector />);
-    expect(screen.getByTestId('voice-puesta-pm_santa')).toBeInTheDocument();
+    expect(screen.getByTestId('voice-puesta-em_alex')).toBeInTheDocument();
   });
 
   test('UN toque reproduce la voz Y la persiste de una (sin Guardar)', async () => {
@@ -77,7 +77,7 @@ describe('VoiceSelector — rediseño mínima fricción', () => {
 
   test('tocar corta el audio previo antes de reproducir (evita overlap)', async () => {
     render(<VoiceSelector />);
-    fireEvent.click(screen.getByTestId('voice-option-pm_santa'));
+    fireEvent.click(screen.getByTestId('voice-option-em_santa'));
     await waitFor(() => {
       expect(stopTTS).toHaveBeenCalled();
       expect(speakKokoro).toHaveBeenCalledTimes(1);
