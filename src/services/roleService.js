@@ -131,6 +131,17 @@ function normalizeSubUser(subUser) {
   };
 }
 
+/**
+ * Fallback del modo legacy single-user (MVP sin roster todavía): si hay un
+ * tenant logueado pero ningún roster/SubUser resuelto para la finca activa,
+ * ese usuario es dueño de su propia finca (ADR-036 sub-viii, "Responsable
+ * del Tratamiento"). Ver nota extensa en `currentSecurityRole`.
+ * @returns {{ rol: 'dueno' } | null}
+ */
+function legacyOwnerFallback() {
+  return getActiveTenantId() ? { rol: 'dueno' } : null;
+}
+
 function currentSubUserFromRoster() {
   const roster = readRosterForActiveFinca();
   if (!roster || !Array.isArray(roster.usuarios)) return null;
@@ -183,7 +194,9 @@ export function resolvePermisos(subUser) {
 }
 
 export function can(actor, permiso, resourceOwnerDid) {
-  const normalizedActor = normalizeSubUser(actor) || currentSubUserFromRoster();
+  const normalizedActor = normalizeSubUser(actor)
+    || currentSubUserFromRoster()
+    || legacyOwnerFallback();
   if (!normalizedActor) return false;
   const normalizedPermiso = normalizePermiso(permiso) || (
     typeof permiso === 'string' ? permiso.trim().toLowerCase() : ''
@@ -217,7 +230,15 @@ export function canManage(actorRole, targetRole) {
 export function currentSecurityRole() {
   const currentSubUser = currentSubUserFromRoster();
   if (currentSubUser) return currentSubUser.rol;
-  return readFallbackSecurityRole();
+  const fallback = readFallbackSecurityRole();
+  if (fallback) return fallback;
+  // Sin roster todavía para la finca activa (nadie visitó la pantalla de
+  // gestión de usuarios aún) pero SÍ hay un tenant logueado: modo legacy
+  // single-user del MVP (ver `legacyOwnerFallback`). Evita que el gate
+  // (p.ej. AssetsDashboard.handleDelete) bloquee al dueño real solo porque
+  // `fincaRosterService.ensureOwnerBootstrap` todavía no corrió. Roster
+  // explícito con otros roles SIEMPRE gana (se intenta primero, arriba).
+  return legacyOwnerFallback()?.rol ?? null;
 }
 
 export function isNina(subUser) {

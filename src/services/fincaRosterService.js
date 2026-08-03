@@ -132,11 +132,70 @@ function readRosterRaw(fincaSlug) {
 function saveRoster(roster) {
   const normalized = normalizeRoster(roster, roster?.fincaSlug);
   writeStorage(getRosterKey(normalized.fincaSlug), JSON.stringify(normalized));
+  // Notifica a la UI (useSecurityRole, GestionUsuariosScreen) que el roster
+  // cambió, para que se re-hidrate sin recargar (mismo patrón que
+  // 'chagra:profile-changed' en userProfileService).
+  if (typeof window !== 'undefined' && typeof window.dispatchEvent === 'function') {
+    window.dispatchEvent(new CustomEvent('chagra:roster-changed', {
+      detail: { fincaSlug: normalized.fincaSlug },
+    }));
+  }
   return normalized;
 }
 
+/**
+ * Bootstrap del primer usuario: si el roster de la finca NO tiene todavía
+ * ningún usuario activo, el tenant logueado (quien hizo login en farmOS,
+ * dueño de facto de la finca — ADR-036 sub-viii "Responsable del
+ * Tratamiento") se auto-provisiona como `dueno` la primera vez que se
+ * consulta el actor. Sin esto, `addSubUser`/`revokeSubUser` fallan siempre
+ * con "roster actor not available" — nadie podría crear el primer usuario.
+ * Es una escritura idempotente y solo ocurre cuando `usuarios` está vacío.
+ */
+function ensureOwnerBootstrap(fincaSlug) {
+  const roster = getRoster(fincaSlug);
+  const activeUsers = roster.usuarios.filter((user) => user.status !== 'revoked');
+  if (activeUsers.length > 0) return roster;
+
+  const tenantId = getActiveTenantId();
+  if (!tenantId) return roster;
+
+  const owner = normalizeSubUser({
+    nombre: tenantId,
+    rol: 'dueno',
+    fincaSlug: roster.fincaSlug,
+    login: tenantId,
+    ownerDid: undefined,
+    status: 'active',
+    createdAt: nowIso(),
+  }, roster.fincaSlug);
+
+  const nextRoster = {
+    ...roster,
+    usuarios: roster.usuarios.concat(owner),
+    updatedAt: nowIso(),
+  };
+  return saveRoster(nextRoster);
+}
+
 function getActorForFinca(fincaSlug) {
+  ensureOwnerBootstrap(fincaSlug);
   return currentSubUser(fincaSlug);
+}
+
+/**
+ * API pública del bootstrap (ver `ensureOwnerBootstrap`): quien lee el
+ * roster ANTES de mutar (UI, hooks) debe llamar esto primero para
+ * garantizar que el tenant logueado exista como `dueno` si el roster está
+ * vacío. `addSubUser`/`updateSubUserRole`/`revokeSubUser` ya lo hacen
+ * internamente vía `getActorForFinca`; esto es para lectores externos
+ * (`useSecurityRole`, `GestionUsuariosScreen`) que necesitan el roster
+ * poblado ANTES de la primera mutación.
+ * @param {string} fincaSlug
+ * @returns {FincaRoster}
+ */
+export function ensureOwnerBootstrapped(fincaSlug) {
+  return ensureOwnerBootstrap(fincaSlug);
 }
 
 function assertActorCanManage(actor, targetRole) {
