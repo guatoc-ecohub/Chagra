@@ -9,6 +9,43 @@ import { canManage } from './roleService.js';
 import { ROLE_IDS } from '../config/roleCatalog.js';
 import { canAddSubUser, tierAllowsDelegation, tierAllowsRole } from './tierService.js';
 
+/**
+ * @typedef {'dueno'|'esposa'|'trabajador'|'nina'|'asesor'} RoleId
+ * @typedef {'free'|'familiar'|'cuadrilla'|'cooperativa'} TierId
+ */
+
+/**
+ * Un miembro del roster de una finca. Forma canónica producida por
+ * `normalizeSubUser` (ver DISENO-FEDERACION-USUARIOS.md §1.1).
+ * @typedef {Object} SubUser
+ * @property {string} id            ULID local estable.
+ * @property {string} nombre        display name (PII).
+ * @property {RoleId} rol           rol de seguridad.
+ * @property {string} fincaSlug     finca a la que pertenece.
+ * @property {string|null} did      did:key Ed25519 (null hasta que se genera).
+ * @property {string[]} permisos    override opcional sobre el default del rol.
+ * @property {string|null} createdBy did del dueño que lo creó.
+ * @property {string|null} createdAt ISO8601.
+ * @property {'active'|'revoked'} status
+ * @property {string|null} ucanRef  CID del UCAN que respalda su acceso.
+ * @property {string|null} avatar   guardian_especie cosmético.
+ * @property {string|null} login    username farmOS.
+ */
+
+/**
+ * El conjunto de usuarios de UNA finca. Forma canónica producida por
+ * `normalizeRoster` (ver DISENO-FEDERACION-USUARIOS.md §1.2).
+ * @typedef {Object} FincaRoster
+ * @property {string} fincaSlug
+ * @property {string|null} ownerDid
+ * @property {TierId|string} tier
+ * @property {SubUser[]} usuarios
+ * @property {number} schemaVersion
+ * @property {string|null} updatedAt
+ * @property {string|null} sig
+ * @property {string|null} currentSubUserId
+ */
+
 const ROSTER_PREFIX = 'chagra:finca_roster:';
 const ROSTER_SCHEMA_VERSION = 2;
 

@@ -96,7 +96,7 @@ function RolBadge({ rolId }) {
 
 /** Formulario compartido crear/editar. onSubmit recibe { nombre, rol }. */
 function UsuarioForm({
-  initial, onSubmit, onCancel, submitLabel, rolesDisponibles, actorRole,
+  initial = null, onSubmit, onCancel, submitLabel, rolesDisponibles, actorRole,
 }) {
   const [nombre, setNombre] = useState(initial?.nombre || '');
   const [rol, setRol] = useState(initial?.rol || rolesDisponibles[0] || 'trabajador');
