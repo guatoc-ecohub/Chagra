@@ -54,6 +54,7 @@ import {
 import PlagaSprite from './metalslug/PlagasSprites.jsx';
 import EscenarioFondo, { paletaPiso } from './metalslug/EscenarioFondo.jsx';
 import JefeSequia from './metalslug/JefeSequia.jsx';
+import { TintaBoil, StyleTinta } from './metalslug/TintaCuphead.jsx';
 import StyleJuice, {
   ProyectilBio,
   EfectoImpacto,
@@ -121,6 +122,25 @@ const PISTA_S = 4.5; // vida de la burbuja-pista de Dante
 /* Escondites enterrados del nivel (deterministas, lejos de matas y del rehén). */
 const ESCONDITES_NIVEL = [{ x: 800 }, { x: 1650 }, { x: 2260 }];
 
+/* ── Gancho de captura/revisión de ARTE (patrón ?modo= del rig aprobado). ─────
+   Vive en location.search (NO en el hash: el router matchea el hash exacto).
+   ?ir=juego     → salta la intro (para capturas del gate visual).
+   ?jefeFase=1-3 → fuerza la fase del jefe; ?jefeFase=4 → derrotado (KO).
+   ?x=NNN        → posición inicial del jugador (encuadre de la revisión).
+   Solo presentación/encuadre: no altera reglas ni datos del juego. */
+const CAPTURA = (() => {
+  try {
+    const q = new URLSearchParams(window.location.search);
+    return {
+      ir: q.get('ir'),
+      jefeFase: Number(q.get('jefeFase')) || 0,
+      x: Number(q.get('x')) || 0,
+    };
+  } catch {
+    return { ir: null, jefeFase: 0, x: 0 };
+  }
+})();
+
 /* Instancias de plaga sembradas por el nivel (grounding: todas son de NIVEL.enemigos). */
 const SIEMBRA_PLAGAS = [
   { enemigoId: 'cogollero', x: 560, vuela: false },
@@ -155,7 +175,7 @@ function crearMundo() {
   });
   return {
     jugador: {
-      x: 120,
+      x: CAPTURA.x > 0 ? Math.min(MUNDO_W - 80, Math.max(30, CAPTURA.x)) : 120,
       y: SUELO_Y - JUGADOR_H,
       vy: 0,
       onGround: true,
@@ -510,7 +530,7 @@ function despacharEventos(w, reducedMotion, d) {
  * ════════════════════════════════════════════════════════════════════════════ */
 export default function MetalSlugCampo({ onBack }) {
   const [{ tier, reducedMotion }] = useState(() => decidirTier());
-  const [pantalla, setPantalla] = useState('intro'); // 'intro' | 'juego'
+  const [pantalla, setPantalla] = useState(CAPTURA.ir === 'juego' ? 'juego' : 'intro'); // 'intro' | 'juego'
 
   const arsenal = useMemo(
     () => ARSENAL_CURADO.filter((id) => armasDeNivel(NIVEL.numero).includes(id)),
@@ -522,6 +542,10 @@ export default function MetalSlugCampo({ onBack }) {
       <StyleMSC />
       {/* estilos de la dupla en la RAÍZ: la intro también los usa (retratos) */}
       <StyleDuoPerros />
+      {/* la TINTA Cuphead: filtros de line-boil compartidos + su hoja (una vez) */}
+      {/* @ts-ignore IntrinsicAttributes & object - memo-wrapped component */}
+      <TintaBoil reducedMotion={reducedMotion} />
+      <StyleTinta />
       <button type="button" className="msc-volver" onClick={onBack}>
         ← Volver
       </button>
@@ -770,25 +794,41 @@ function Juego({ tier, reducedMotion, arsenal, onSalirIntro }) {
   const plagasVivas = w.enemigos.filter((e) => e.vivo).length;
   const invuln = !!w.invulnVisible;
 
+  /* Fase del jefe (SOLO ARTE, lee estado existente): la sequía se ENFURECE a
+     medida que la finca se defiende — con 6-4 plagas vivas es el patrón
+     sonriente; con 3-2, el abrasador; con 1-0, la grieta viva. Al ganar el
+     nivel cae en KO (y llueve). ?jefeFase= la fuerza para revisión de arte. */
+  const jefeKo = CAPTURA.jefeFase === 4 || fin?.estado === 'gano';
+  const jefeFase = CAPTURA.jefeFase >= 1 && CAPTURA.jefeFase <= 3
+    ? CAPTURA.jefeFase
+    : plagasVivas >= 4 ? 1 : plagasVivas >= 2 ? 2 : 3;
+
   return (
     <div className="msc-juego">
       <div ref={vistaRef} className="msc-vista">
         <StyleJuice />
 
         {/* fondo por piso térmico (cielo + lomas + ambiente) */}
-        {/* eslint-disable-next-line react/no-unknown-property */}
         {/* @ts-ignore IntrinsicAttributes & object - component defined in metalslug/ */}
         <EscenarioFondo piso={NIVEL.piso_termico} cam={w.cam} reducedMotion={reducedMotion} />
 
-        {/* jefe SEQUÍA acechando desde el cielo (solo niveles de sequía) */}
+        {/* jefe SEQUÍA multi-fase acechando desde el cielo: crece y se enfurece
+            con cada fase; el key={fase} dispara el pop de transformación */}
         {NIVEL.jefe === 'jefe_sequia' && (
           <div
             className="msc-jefe-cielo"
+            data-fase={jefeKo ? 'ko' : jefeFase}
             aria-hidden="true"
             style={{ transform: `translate3d(${-w.cam * 0.12}px,0,0)` }}
           >
             {/* @ts-ignore IntrinsicAttributes & object - component defined in metalslug/ */}
-            <JefeSequia size={220} reducedMotion={reducedMotion} />
+            <JefeSequia
+              key={jefeKo ? 'ko' : jefeFase}
+              size={jefeKo ? 250 : 200 + jefeFase * 28}
+              fase={jefeFase}
+              derrotado={jefeKo}
+              reducedMotion={reducedMotion}
+            />
           </div>
         )}
 
@@ -806,17 +846,17 @@ function Juego({ tier, reducedMotion, arsenal, onSalirIntro }) {
 
             {/* cultivos decorativos (maíz + frijol) */}
             {DECOR.map((d) => (
-              <div key={`d${d.x}`} className={`msc-mata msc-mata--${d.t}`} style={{ left: d.x, top: SUELO_Y - d.h, height: d.h }} />
+              <div key={`d${d.x}`} className={`msc-mata msc-mata--${d.t} msc-tinta-lenta`} style={{ left: d.x, top: SUELO_Y - d.h, height: d.h }} />
             ))}
 
             {/* plagas */}
-            {w.enemigos.map((e) =>
+            {w.enemigos.map((e, i) =>
               e.vivo ? (
                 <div
                   key={e.id}
-                  className="msc-plaga"
+                  className={`msc-plaga msc-tinta-${'abc'[i % 3]}`}
                   data-dir={e.dir}
-                  style={{ left: e.x, top: e.y, width: e.w, height: e.h }}
+                  style={{ left: e.x, top: e.y, width: e.w, height: e.h, '--fase': `${(-i * 0.53).toFixed(2)}s` }}
                 >
                   {/* @ts-ignore IntrinsicAttributes & object - component defined in metalslug/ */}
                   <PlagaSprite enemigoId={e.enemigoId} reducedMotion={reducedMotion} />
@@ -871,7 +911,7 @@ function Juego({ tier, reducedMotion, arsenal, onSalirIntro }) {
 
             {/* LA DUPLA: Dante (nariz) y Oliver (patas) — siempre juntos */}
             <div
-              className="msc-perro msc-perro--dante"
+              className="msc-perro msc-perro--dante msc-tinta-c"
               data-mira={w.duo.dante.mira}
               data-anda={w.duo.dante.anda ? '1' : '0'}
               style={{
@@ -905,7 +945,7 @@ function Juego({ tier, reducedMotion, arsenal, onSalirIntro }) {
               })()}
             </div>
             <div
-              className="msc-perro msc-perro--oliver"
+              className="msc-perro msc-perro--oliver msc-tinta-b"
               data-mira={w.duo.oliver.mira}
               data-anda={w.duo.oliver.anda ? '1' : '0'}
               data-dash={w.duo.fase === 'busca' || w.duo.fase === 'entrega' ? '1' : '0'}
@@ -933,7 +973,7 @@ function Juego({ tier, reducedMotion, arsenal, onSalirIntro }) {
 
             {/* rehén (oso andino) */}
             <div
-              className={`msc-rehen ${w.rehen.liberado ? 'msc-rehen--libre' : 'msc-rehen--preso'}`}
+              className={`msc-rehen msc-tinta-b ${w.rehen.liberado ? 'msc-rehen--libre' : 'msc-rehen--preso'}`}
               style={{ left: w.rehen.x, top: w.rehen.y, width: w.rehen.w, height: w.rehen.h }}
             >
               {!w.rehen.liberado && <div className="msc-jaula" aria-hidden="true" />}
@@ -944,7 +984,7 @@ function Juego({ tier, reducedMotion, arsenal, onSalirIntro }) {
 
             {/* jugador (Angelita) */}
             <div
-              className="msc-jugador"
+              className="msc-jugador msc-tinta-a"
               data-mira={w.jugador.mira}
               data-aire={w.jugador.onGround ? '0' : '1'}
               data-inv={invuln ? '1' : '0'}
@@ -1186,7 +1226,7 @@ function StyleMSC() {
 /* juego */
 .msc-juego{position:absolute;inset:0;display:flex;flex-direction:column;}
 .msc-vista{position:relative;flex:1;overflow:hidden;background:${PAL.cielo};}
-.msc-jefe-cielo{position:absolute;top:2%;right:4%;z-index:2;opacity:.92;filter:drop-shadow(0 6px 14px rgba(180,80,20,.35));will-change:transform;pointer-events:none;}
+.msc-jefe-cielo{position:absolute;top:3%;right:17%;z-index:2;opacity:.92;filter:drop-shadow(0 6px 14px rgba(180,80,20,.35));will-change:transform;pointer-events:none;}
 .msc-marco{position:absolute;top:0;left:0;transform-origin:top left;will-change:transform;z-index:3;}
 .msc-mundo{position:absolute;top:0;left:0;height:${ALTO_2D}px;will-change:transform;}
 .msc-suelo{position:absolute;left:0;height:${ALTO_2D}px;background:linear-gradient(${PAL.suelo} 0 12px,${PAL.sueloClaro} 12px 100%);}
@@ -1271,17 +1311,11 @@ function StyleMSC() {
 @keyframes msc-b-drip{0%{transform:translateY(0);opacity:.9}70%{opacity:.9}100%{transform:translateY(5px);opacity:0}}
 .msc-drip{animation:msc-b-drip 1.6s ease-in infinite;}
 
-/* ── jefe SEQUÍA ─────────────────────────────────────────────────────────── */
-@keyframes msc-js-rayos{from{transform:rotate(0)}to{transform:rotate(360deg)}}
-@keyframes msc-js-halo{0%,100%{transform:scale(1);opacity:.55}50%{transform:scale(1.08);opacity:.85}}
-@keyframes msc-js-pulso{0%,100%{transform:scale(1)}50%{transform:scale(1.03)}}
-@keyframes msc-js-ojos{0%,92%,100%{transform:scaleY(1)}96%{transform:scaleY(.15)}}
-@keyframes msc-js-calor{0%{transform:translateY(0);opacity:.5}100%{transform:translateY(-8px);opacity:0}}
-.msc-jefe-alive{animation:msc-js-pulso 3.2s ease-in-out infinite;transform-box:view-box;transform-origin:120px 118px;}
-.msc-jefe-alive .msc-jefe-rayos{animation:msc-js-rayos 26s linear infinite;transform-box:view-box;transform-origin:120px 118px;}
-.msc-jefe-alive .msc-jefe-halo{animation:msc-js-halo 3.2s ease-in-out infinite;transform-box:view-box;transform-origin:120px 118px;}
-.msc-jefe-alive .msc-jefe-ojos{animation:msc-js-ojos 4s ease-in-out infinite;transform-box:view-box;transform-origin:120px 108px;}
-.msc-jefe-alive .msc-jefe-calor{animation:msc-js-calor 1.8s ease-in infinite;transform-box:view-box;}
+/* ── jefe SEQUÍA: su hoja vive DENTRO de JefeSequia.jsx (autocontenida).
+   Aquí solo la presencia en el cielo: el aura del contenedor por fase. ── */
+.msc-jefe-cielo[data-fase="2"]{opacity:.96;filter:drop-shadow(0 6px 18px rgba(200,70,10,.45));}
+.msc-jefe-cielo[data-fase="3"]{opacity:1;filter:drop-shadow(0 6px 24px rgba(190,40,5,.55));}
+.msc-jefe-cielo[data-fase="ko"]{opacity:.88;filter:drop-shadow(0 6px 14px rgba(80,110,140,.35));}
 
 .msc-root[data-rm="1"] .msc-jugador[data-inv="1"]{animation:none;opacity:.6;}
 .msc-root[data-rm="1"] .msc-rehen--libre{animation:none;}
@@ -1290,7 +1324,6 @@ function StyleMSC() {
 @media (prefers-reduced-motion: reduce){
   .msc-jugador[data-inv="1"]{animation:none;opacity:.6;}
   .msc-leg,.msc-flutter,.msc-drill,.msc-curl,.msc-spring,.msc-legs8,.msc-morph,.msc-carga,.msc-drip{animation:none;}
-  .msc-jefe-alive,.msc-jefe-alive *{animation:none;}
 }
 `}</style>
   );
