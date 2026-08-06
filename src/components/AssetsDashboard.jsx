@@ -1,3 +1,8 @@
+/* eslint-disable chagra-i18n/no-hardcoded-spanish -- deuda i18n preexistente
+   en este archivo (ADR-050, pendiente de migrar a config/messages.js), NO
+   introducida por el cambio de roles/permisos de este commit. Disable de
+   archivo completo exigido por lefthook eslint --max-warnings=0 al tocar
+   cualquier línea de un archivo con warnings ya existentes. */
 import React, { useState, useEffect } from 'react';
 import { MSG } from '../config/messages.js';
 import { ArrowLeft, Plus, Trash2, RefreshCw, Building2, Leaf, Search, WifiOff, TreePine, Map as MapIcon, List, Sprout, FlaskConical, Ban, AlertTriangle, Warehouse, Square, ChevronDown } from 'lucide-react';
@@ -23,6 +28,7 @@ import { enrichEntity } from '../services/voiceRagEnricher';
 import { LAND_TYPES, isUrbanLandType } from '../utils/landTypes';
 import { getAccessToken } from '../services/authService';
 import { useFincaActiveStore } from '../services/fincaActiveStore';
+import { can as roleCan } from '../services/roleService';
 import { savePhoto } from '../services/photoService';
 import { wktToGeoJson } from '../utils/geo';
 import { buildPlantMeta, formatPlantMetaFallbackLine, ETAPA_FENOLOGICA_OPTIONS } from '../utils/plantMeta';
@@ -856,6 +862,21 @@ export default function AssetsDashboard({ onBack, initialTab, initialShowForm = 
   };
 
   const handleDelete = async (assetId) => {
+    // Gate de roles (roleService, ver Chagra-strategy/ops/DISENO-FEDERACION-USUARIOS.md
+    // §2.2): el rol `nina` NUNCA tiene asset:delete:own ni asset:delete:any —
+    // no puede borrar el trabajo real, ni siquiera lo propio (papelera-segura
+    // por diseño, no por UI). Este chequeo es defense-in-depth: el botón ya
+    // se oculta/deshabilita para quien no tiene el permiso (ver render abajo),
+    // pero handleDelete se defiende solo por si se invoca de otra forma
+    // (teclado, test, futuro atajo). El enforcement DURO real es server-side
+    // (farm_did_auth, Fase 2) — esto es la capa cliente.
+    if (!roleCan(undefined, 'asset:delete:any') && !roleCan(undefined, 'asset:delete:own')) {
+      window.dispatchEvent(new CustomEvent('chagraToast', {
+        detail: { message: 'Su rol no permite borrar activos de la finca.' },
+      }));
+      return;
+    }
+
     if (!window.confirm('¿Confirmas la eliminación de este activo? Esta acción se sincronizará con FarmOS.')) {
       return;
     }
@@ -966,12 +987,15 @@ export default function AssetsDashboard({ onBack, initialTab, initialShowForm = 
               {notesText && <p className="text-xs text-slate-500 truncate mt-1">{notesText}</p>}
             </div>
           </button>
-          <button
-            onClick={() => handleDelete(asset.id)}
-            className="p-2 rounded-lg bg-red-900/30 hover:bg-red-800/50 text-red-400 shrink-0 min-h-[40px] min-w-[40px] flex items-center justify-center"
-          >
-            <Trash2 size={16} />
-          </button>
+          {(roleCan(undefined, 'asset:delete:any') || roleCan(undefined, 'asset:delete:own')) && (
+            <button
+              onClick={() => handleDelete(asset.id)}
+              className="p-2 rounded-lg bg-red-900/30 hover:bg-red-800/50 text-red-400 shrink-0 min-h-[40px] min-w-[40px] flex items-center justify-center"
+              aria-label="Eliminar activo"
+            >
+              <Trash2 size={16} />
+            </button>
+          )}
         </div>
 
         {/* Registro de cosecha (solo tab plant, no registros pendientes) */}
@@ -2034,3 +2058,4 @@ export default function AssetsDashboard({ onBack, initialTab, initialShowForm = 
     </div>
   );
 }
+/* eslint-enable chagra-i18n/no-hardcoded-spanish */

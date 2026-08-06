@@ -635,9 +635,14 @@ const ExtensionistaScreen = lazy(() => import('./components/ExtensionistaScreen'
 // chagra-pro). La pantalla pública NO contiene código visual: solo consulta el
 // registry y monta el módulo Pro si está presente; si no, fallback discreto.
 const EspirituProScreen = lazy(() => import('./components/EspirituProScreen'));
+// Gestión de usuarios de la finca (roles dueño/esposa/trabajador/niña/asesor,
+// ver Chagra-strategy/ops/DISENO-FEDERACION-USUARIOS.md pieza H). 2D-only,
+// nunca 3D. Gateada por roleService.can('user:manage') — solo dueño/esposa.
+const GestionUsuariosScreen = lazy(() => import('./components/GestionUsuariosScreen'));
 import HomeRegionalGreeting from './components/HomeRegionalGreeting';
 import { fincaVivaHomePerfilActivo } from './config/fincaVivaHomeFlag';
 import { esExtensionistaActual } from './config/extensionistaAccess';
+import { can as roleCan } from './services/roleService';
 
 localforage.config({
   name: 'Chagra',
@@ -849,6 +854,8 @@ const HASH_VIEW_ROUTES = {
   'case-studies': 'casos',
   casos: 'casos',
   extensionista: 'extensionista',
+  usuarios: 'usuarios',
+  'gestion-usuarios': 'usuarios',
   tareas: 'task_log',
   task_log: 'task_log',
   hoy: 'hoy_finca',
@@ -1067,7 +1074,7 @@ const MODULE_VIEWS = new Set([
   'agente', 'voz', 'voz_planta', 'procesos', 'registro_voz', 'registro_unificado', 'ciclo', 'germinacion', 'ciclo_nutrientes', 'calendario_finca', 'suelo', 'agua', 'clima_boletin', 'salud_suelo', 'semilla', 'poscosecha', 'almacenamiento', 'nutricion', 'hortalizas', 'tuberculos', 'toxicologia', 'aprende', 'curso', 'directorio', 'mercados',
   'agente', 'voz', 'voz_planta', 'procesos', 'registro_voz', 'registro_unificado', 'ciclo', 'germinacion', 'ciclo_nutrientes', 'calendario_finca', 'suelo', 'agua', 'milpa_cultivo', 'clima_boletin', 'salud_suelo', 'semilla', 'poscosecha', 'almacenamiento', 'nutricion', 'toxicologia', 'aprende', 'curso', 'directorio', 'mercados',
   'agente', 'voz', 'voz_planta', 'procesos', 'registro_voz', 'registro_unificado', 'ciclo', 'germinacion', 'ciclo_nutrientes', 'calendario_finca', 'suelo', 'agua', 'clima_boletin', 'salud_suelo', 'semilla', 'poscosecha', 'almacenamiento', 'nutricion', 'toxicologia', 'aprende', 'curso', 'directorio', 'plagas', 'mercados',
-  'glaciar', 'glaciar_historial', 'extensionista', 'plant_asset',
+  'glaciar', 'glaciar_historial', 'extensionista', 'usuarios', 'plant_asset',
   'casos', 'caso_detail', 'bitacora_detail', 'edit_task', 'cromatografia', 'ciclo_vivo',
   'usage_stats', 'mercado', 'auditoria_inventario', 'mundo', 'valle3d',
 ]);
@@ -1363,9 +1370,14 @@ export default function App() {
     isAuthenticated().then((isAuth) => {
       if (!isAuth) {
         setSinSesion(true);
-        // La raíz sin sesión aterriza en el valle 3D (tema de entrada). El
-        // login sigue accesible con #login o el botón volver del valle.
-        navigate(hash === 'login' ? 'login' : 'valle3d');
+        // GATE DE LOGIN PARA ANÓNIMOS (2026-08-02): sin token la raíz aterriza
+        // en la pantalla de LOGIN (estado final), no en el valle 3D. chagra.app
+        // debe pedir login. Offline-first se preserva: esta rama SOLO corre para
+        // quien NO tiene token; el usuario ya autenticado (rama `isAuth` abajo)
+        // sigue entrando al dashboard y funcionando offline como siempre — su
+        // token cacheado lo saca de aquí. Las rutas públicas (onboarding-piloto,
+        // mockups, callback OAuth) ya se resolvieron ANTES de este check.
+        navigate('login');
         return;
       }
       const targetView = HASH_VIEW_ROUTES[hash] || 'dashboard';
@@ -1379,6 +1391,13 @@ export default function App() {
       // Gate del modo extensionista (ADR-048): si un usuario sin rol aterriza
       // en #extensionista (flag off o fuera de whitelist), va al dashboard.
       if (targetView === 'extensionista' && !esExtensionistaActual()) {
+        navigate('dashboard');
+        return;
+      }
+      // Gate de gestión de usuarios: solo dueño/esposa (roleService,
+      // permiso user:manage). Un trabajador/niña que aterrice en #usuarios
+      // (link viejo, deep-link) va al dashboard — el módulo NO se monta.
+      if (targetView === 'usuarios' && !roleCan(undefined, 'user:manage')) {
         navigate('dashboard');
         return;
       }
@@ -1399,6 +1418,10 @@ export default function App() {
       if (!routeView) return;
       // Gate extensionista (ADR-048): no montar el panel para quien no tiene rol.
       if (routeView === 'extensionista' && !esExtensionistaActual()) {
+        navigate('dashboard');
+        return;
+      }
+      if (routeView === 'usuarios' && !roleCan(undefined, 'user:manage')) {
         navigate('dashboard');
         return;
       }
@@ -4041,6 +4064,28 @@ export default function App() {
           <ErrorBoundary>
             <ErrorFallback moduleName="Extensionista">
               <ExtensionistaScreen onBack={() => navigate('dashboard')} onHome={() => navigate('dashboard')} />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
+      case 'usuarios':
+        // Gestión de usuarios de la finca (roles dueño/esposa/trabajador/
+        // niña/asesor). 2D-only — regla dura del operador, nunca 3D. ACCESO
+        // por roleService.can('user:manage') (dueño o esposa). La ruta ya
+        // redirige al dashboard antes de llegar aquí si el actor no tiene
+        // el permiso; guarda defensiva por si se monta directo.
+        if (!roleCan(undefined, 'user:manage')) {
+          return (
+            <ErrorBoundary>
+              <ErrorFallback moduleName="Usuarios">
+                <div className="h-[100dvh] bg-slate-950 text-white flex items-center justify-center">Vista no disponible</div>
+              </ErrorFallback>
+            </ErrorBoundary>
+          );
+        }
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="Usuarios">
+              <GestionUsuariosScreen onBack={() => navigate('dashboard')} onHome={() => navigate('dashboard')} />
             </ErrorFallback>
           </ErrorBoundary>
         );
