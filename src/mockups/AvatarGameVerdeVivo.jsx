@@ -260,7 +260,7 @@ function NodoMundo({ mundo, seleccionado, onSelect, r = 26 }) {
 
 /* ============================== ESCENA ============================== */
 
-function EscenaOrganismo({ tn, años: _años, especie, etapaIdx, mundoSel, onMundo }) {
+function EscenaOrganismo({ tn, años, especie, etapaIdx, mundoSel, onMundo }) {
   const s = 0.84 + 0.34 * tn; // crecimiento del organismo aéreo
   const Criatura = CRIATURAS[especie.id];
   const [ax, ay] = especie.anclaje;

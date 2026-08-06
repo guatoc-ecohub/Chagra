@@ -1,7 +1,6 @@
 import { useId } from 'react';
 import './creatures.css';
 import { CreatureFilters } from './_filters.jsx';
-import { LineBoilFilter } from './LineBoilFilter.jsx';
 
 /* Lombriz de tierra — Martiodrilus crassus (lombriz gigante nativa de los
    Andes). Cuerpo curvo segmentado con clitelo (banda clara) y cabecita.
@@ -11,25 +10,20 @@ const VIEWBOX = '-8 -16 30 48';
 
 export function Lombriz({
   size = 64,
-  className = '',
+  className,
   inline = false,
+  // eslint-disable-next-line no-unused-vars
   animated = true,
-  /* Line-boil canónico de la familia (LineBoilFilter) — OPT-IN como en los 9
-     bichos: default false → los consumidores existentes NO cambian. Con
-     animated=false o reduced-motion, seed fija (textura sin vibrar). */
-  lineBoil = false,
   title = 'Lombriz de tierra',
   ...rest
 }) {
   const uid = useId().replace(/[^a-zA-Z0-9]/g, '');
   const glow = `crt-glow-${uid}`;
   const blur = `crt-blur-${uid}`;
-  const boil = `crt-boil-${uid}`;
 
   const defs = (
     <defs>
       <CreatureFilters glow={glow} blur={blur} />
-      {lineBoil && <LineBoilFilter id={boil} animated={animated} />}
     </defs>
   );
   const body = (
@@ -49,14 +43,11 @@ export function Lombriz({
     </g>
   );
 
-  /* El line-boil envuelve todo en un nodo aparte (no colisiona con el glow). */
-  const cuerpoVivo = lineBoil ? <g filter={`url(#${boil})`}>{body}</g> : body;
-
   if (inline) {
     return (
       <g className={className} data-creature="lombriz">
         {defs}
-        {cuerpoVivo}
+        {body}
       </g>
     );
   }
@@ -65,7 +56,7 @@ export function Lombriz({
       role="img" aria-label={title} data-creature="lombriz" {...rest}>
       <title>{title}</title>
       {defs}
-      {cuerpoVivo}
+      {body}
     </svg>
   );
 }

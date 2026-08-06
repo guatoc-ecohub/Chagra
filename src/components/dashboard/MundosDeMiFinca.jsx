@@ -5,12 +5,6 @@
 import { MUNDOS_FINCA } from './mundosFinca';
 import MundoVineta from './MundoVinetas';
 import { useProCapability } from '../../hooks/useProCapability';
-import usePrefsStore from '../../store/usePrefsStore';
-/* Import DIRECTO de deviceTier (no el barrel de mundo3d): este archivo vive en
-   el bundle base del home y solo necesita el tiering (three-free, 0 deps). */
-// El tiering 3D-vs-2D lo decide el propio view EntradaValle3D; el home solo
-// muestra la puerta cuando el usuario prendió el flag. (Se quitó `permite3D`:
-// antes ocultaba la entrada en tier 'bajo' → prender el toggle no hacía nada.)
 import './mundos-finca.css';
 
 /**
@@ -37,29 +31,6 @@ function EspirituGlyph() {
                 strokeLinecap="round"
                 strokeLinejoin="round"
             />
-        </svg>
-    );
-}
-
-/**
- * Glifo del valle 3D: tres lomas andinas con el sol saliendo detrás (SVG
- * inline, cero assets; el color lo hereda del texto, como EspirituGlyph).
- */
-function ValleGlyph() {
-    return (
-        <svg viewBox="0 0 24 24" width="26" height="26" fill="none" aria-hidden="true">
-            {/* el sol detrás de las lomas */}
-            <circle cx="16.2" cy="8.2" r="2.6" stroke="currentColor" strokeWidth="1.5" opacity="0.9" />
-            {/* la loma grande y la loma cercana */}
-            <path
-                d="M2.5 18.5 8 9.5l4.1 6.6 2.4-3.4 5 5.8"
-                stroke="currentColor"
-                strokeWidth="1.6"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-            />
-            {/* el piso del valle */}
-            <path d="M2.5 18.5h19" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" opacity="0.7" />
         </svg>
     );
 }
@@ -93,19 +64,6 @@ export default function MundosDeMiFinca({ onNavigate, mostrarAnimales = true, pl
     // builds sin Pro: CERO rastro (ni botón muerto ni teaser). Reactivo:
     // loadProModules es async, la banda aparece sola cuando el módulo llega.
     const tieneEspiritu = useProCapability('avatar-espiritu');
-
-    // ── Entrada al VALLE 3D (FASE 0 game-dev): detrás del flag de prefs
-    // `valle3d` (default OFF — se prende en Perfil → experiencia) Y del
-    // device-tier: en equipos humildes la banda NI aparece y el home 2D queda
-    // idéntico (es el fallback, no se toca). El tier se decide solo con el
-    // flag prendido (decidirTier crea un canvas WebGL de prueba: no se paga
-    // en cada render del home de todo el mundo).
-    // Si el usuario PRENDIÓ el toggle, la entrada SIEMPRE se muestra — antes un
-    // segundo gate `permite3D(tier)` la ocultaba en equipos tier 'bajo' (reduce-
-    // motion, poca RAM, saveData), así que prender el toggle "no hacía nada".
-    // El view (EntradaValle3D) ya cae a 2D digno en equipos humildes.
-    const valle3dFlag = usePrefsStore((s) => s.valle3d);
-    const mostrarValle3d = Boolean(valle3dFlag);
 
     const abrir = (m) => {
         if (m.portada) onNavigate?.(m.portada);
@@ -184,49 +142,6 @@ export default function MundosDeMiFinca({ onNavigate, mostrarAnimales = true, pl
                 grilla es ~10 tarjetas top-level). El corazón de la escena ya
                 se usó para "Pregunte" (#2230), por eso la entrada vive aquí.
                 Gate arriba (tieneEspiritu): sin módulo Pro no se renderiza. */}
-            {/* ── Entrada al VALLE 3D (vista 'valle3d') ──────────────────────
-                Banda bajo la grilla, misma familia visual que la del espíritu:
-                el valle navegable donde cada mundo es un LUGAR. Gate doble
-                arriba (flag de prefs + device-tier): sin flag o en equipo
-                humilde no se renderiza y el home 2D actual queda intacto. */}
-            {mostrarValle3d && (
-                <button
-                    type="button"
-                    className="mf-espiritu mf-valle3d"
-                    data-testid="entrada-valle3d"
-                    onClick={() => onNavigate?.('valle3d')}
-                    aria-label="El valle de su finca en 3D: recorra sus mundos como lugares reales"
-                >
-                    <span className="mf-espiritu-glifo" aria-hidden="true">
-                        <ValleGlyph />
-                    </span>
-                    <span className="mf-espiritu-txt">
-                        <b>El valle de su finca</b>
-                        <small>Recórrala en 3D: cada mundo es un lugar al que se viaja</small>
-                    </span>
-                    <span className="mf-espiritu-sello" aria-hidden="true">Nuevo</span>
-                </button>
-            )}
-
-            {/* ── Galería de mundos 3D (hub): todos los mundos como portales de
-                piedra con el cruce Odyssey. Mismo gate que el valle (flag +
-                device-tier). Es el índice navegable de TODO el 3D. ── */}
-            {mostrarValle3d && (
-                <button
-                    type="button"
-                    className="mf-espiritu mf-galeria3d"
-                    data-testid="entrada-galeria3d"
-                    onClick={() => onNavigate?.('mockup_vitrina_maestra')}
-                    aria-label="Galería de mundos en 3D: todos los mundos de su finca como portales de piedra"
-                >
-                    <span className="mf-espiritu-glifo" aria-hidden="true">🗺️</span>
-                    <span className="mf-espiritu-txt">
-                        <b>Galería de mundos</b>
-                        <small>Todos sus mundos en 3D, uno por uno, como portales</small>
-                    </span>
-                </button>
-            )}
-
             {tieneEspiritu && (
                 <button
                     type="button"

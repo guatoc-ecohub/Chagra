@@ -1,7 +1,6 @@
 import { useId } from 'react';
 import './creatures.css';
 import { CreatureFilters } from './_filters.jsx';
-import { LineBoilFilter } from './LineBoilFilter.jsx';
 
 /* Mariposa pasionaria — Dione juno (Nymphalidae, alas largas). Cuatro alas
    independientes (delanteras + traseras, izq/der) que abren y cierran, cuerpo,
@@ -10,26 +9,21 @@ const VIEWBOX = '-27 -18 54 40';
 
 export function Mariposa({
   size = 64,
-  className = '',
+  className,
   inline = false,
   animated = true,
-  /* Line-boil canónico de la familia (LineBoilFilter) — OPT-IN como en los 9
-     bichos: default false → los consumidores existentes NO cambian. */
-  lineBoil = false,
   title = 'Mariposa',
   ...rest
 }) {
   const uid = useId().replace(/[^a-zA-Z0-9]/g, '');
   const glow = `crt-glow-${uid}`;
   const blur = `crt-blur-${uid}`;
-  const boil = `crt-boil-${uid}`;
   const alaL = animated ? 'crt-fwing crt-fwing-l' : undefined;
   const alaR = animated ? 'crt-fwing crt-fwing-r' : undefined;
 
   const defs = (
     <defs>
       <CreatureFilters glow={glow} blur={blur} />
-      {lineBoil && <LineBoilFilter id={boil} animated={animated} />}
     </defs>
   );
   const body = (
@@ -61,14 +55,11 @@ export function Mariposa({
     </g>
   );
 
-  /* El line-boil envuelve todo en un nodo aparte (no colisiona con el glow). */
-  const cuerpoVivo = lineBoil ? <g filter={`url(#${boil})`}>{body}</g> : body;
-
   if (inline) {
     return (
       <g className={className} data-creature="mariposa">
         {defs}
-        {cuerpoVivo}
+        {body}
       </g>
     );
   }
@@ -77,7 +68,7 @@ export function Mariposa({
       role="img" aria-label={title} data-creature="mariposa" {...rest}>
       <title>{title}</title>
       {defs}
-      {cuerpoVivo}
+      {body}
     </svg>
   );
 }

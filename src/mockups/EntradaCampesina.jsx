@@ -87,7 +87,7 @@ const MUNDOS = [
    currentColor). Semi-abstractos y legibles al sol; el emoji + el nombre + la
    voz los acompañan (redundancia ícono·texto·voz del DR §3.2). */
 function GlifoMundo({ tipo }) {
-  const p = /** @type {import('react').SVGProps<SVGPathElement>} */ ({ fill: 'none', stroke: 'currentColor', strokeWidth: 2.4, strokeLinecap: 'round', strokeLinejoin: 'round' });
+  const p = { fill: 'none', stroke: 'currentColor', strokeWidth: 2.4, strokeLinecap: 'round', strokeLinejoin: 'round' };
   switch (tipo) {
     case 'mata':
       return (<><path {...p} d="M12 21V11" /><path {...p} d="M12 13C9 13 6.5 11 6.5 8 9.5 8 12 10 12 13Z" /><path {...p} d="M12 12c0-3 2.5-5 5.5-5 0 3-2.5 5-5.5 5Z" /><path {...p} d="M8 21h8" /></>);
@@ -146,8 +146,7 @@ function FincaAmbiente({ franja }) {
 
     const reduce = window.matchMedia?.('(prefers-reduced-motion: reduce)')?.matches;
     const cores = navigator.hardwareConcurrency || 4;
-    // deviceMemory es API experimental (no está en el lib.dom de TS).
-    const mem = /** @type {any} */ (navigator).deviceMemory || 4;
+    const mem = navigator.deviceMemory || 4;
     const gamaBaja = cores <= 4 || mem <= 2;
 
     const esNoche = franja === 'noche';

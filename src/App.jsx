@@ -83,6 +83,11 @@ import { useModoLectura, CSS_LECTURA_GRANDE } from './hooks/useModoLectura';
 
 // Lazy-loaded route components
 const LoginScreen = lazy(() => import('./components/LoginScreen'));
+// Mockup dev (sin gate, datos de muestra): dirección visual del "juego final"
+// — el avatar/espíritu de la finca en tema biopunk. Ruta #/mockups/avatar-biopunk.
+const AvatarGameBiopunk = lazy(() => import('./mockups/AvatarGameBiopunk'));
+const AvatarGameVerdeVivo = lazy(() => import('./mockups/AvatarGameVerdeVivo'));
+const AvatarGameLibre = lazy(() => import('./mockups/AvatarGameLibre'));
 const OAuthCallback = lazy(() => import('./components/OAuthCallback'));
 // Vitrina pública de la librería visual reutilizable (`src/visual/`). Ruta
 // #/mockups/visual-lib, resuelta ANTES del check de sesión (no requiere auth).
@@ -376,12 +381,27 @@ const WorkerHistory = lazy(() => import('./components/WorkerHistory'));
 const BitacoraEntryDetail = lazy(() => import('./components/BitacoraEntryDetail'));
 const InformesScreen = lazy(() => import('./components/InformesScreen'));
 const InventoryDashboard = lazy(() => import('./components/InventoryDashboard').then(m => ({ default: m.InventoryDashboard })));
+// Mockup dev del nuevo FAB del agente (Ⓐ de herramientas que se ensamblan).
+// Ruta #/mockups/boton-anarquia — sin gate ni sesión (no toca datos reales).
+const BotonAnarquiaMockup = lazy(() => import('./mockups/BotonAnarquia'));
 // InventoryPage orquesta la capa de auditoría/reconciliación de inventario
 // (InventoryAuditTrail + InventoryAuditDashboard + InventoryEventTimeline),
 // completa pero huérfana (0 rutas) antes de este wiring — descubribilidad
 // 2026-06-30. Se alcanza desde 'bodega' vía el botón "Auditoría y
 // reconciliación", o directo por hash (#auditoria-inventario).
 const InventoryPage = lazy(() => import('./pages/InventoryPage'));
+// Mockup dev del HOME CON OJOS DE CAMPESINO (rediseño de jerarquía del home:
+// preguntar + anotar + 6 puertas grandes). Ruta #/mockups/home-campesino —
+// sin gate ni sesión (datos de muestra, no toca datos reales).
+const HomeCampesinoMockup = lazy(() => import('./mockups/HomeCampesino'));
+// Mockup dev "La Montaña de los Mundos" (navegación como paisaje vertical de
+// pisos térmicos, 3 direcciones artísticas para decidir dirección visual).
+// Ruta #/mockups/montana-mundos — sin gate ni sesión (datos de muestra).
+const MontanaMundosMockup = lazy(() => import('./mockups/MontanaMundos'));
+// Mockup dev "La entrada definitiva" (dirección campesina: el lucero de mi
+// finca — la entrada respira la hora real de la vereda, una sola cosa brilla).
+// Ruta #/mockups/entrada-campesina — sin gate ni sesión (datos de muestra).
+const EntradaCampesinaMockup = lazy(() => import('./mockups/EntradaCampesina'));
 const BiopreparadosScreen = lazy(() => import('./components/biopreparados/BiopreparadosScreen'));
 const FarmMap = lazy(() => import('./components/FarmMap'));
 const WorkerDashboard = lazy(() => import('./components/WorkerDashboard').then(m => ({ default: m.WorkerDashboard })));
@@ -835,6 +855,10 @@ const MOCKUP_HASH_ROUTES = {
 };
 
 const HASH_VIEW_ROUTES = {
+  'mockups/home-campesino': 'mockup_home_campesino',
+  'mockups/boton-anarquia': 'mockup_boton_anarquia',
+  'mockups/montana-mundos': 'mockup_montana_mundos',
+  'mockups/entrada-campesina': 'mockup_entrada_campesina',
   agente: 'agente',
   'ciclo-vivo': 'ciclo_vivo',
   faq: 'faq',
@@ -1046,6 +1070,11 @@ const HASH_VIEW_ROUTES = {
   cosechar: 'cosechar',
   'mi-cosecha': 'mi_cosecha',
   micosecha: 'mi_cosecha',
+  // Mockup dev del juego final (avatar biopunk): vista aislada con datos de
+  // muestra, sin gate — no toca datos reales ni requiere sesión.
+  'mockups/avatar-biopunk': 'mockup_avatar_biopunk',
+  'mockups/avatar-verde-vivo': 'mockup_avatar_verde_vivo',
+  'mockups/avatar-libre': 'mockup_avatar_libre',
   // Entrada Pro (capability avatar-espiritu). Gated: sin módulo Pro cargado
   // la pantalla degrada a fallback discreto.
   espiritu: 'espiritu_pro',
@@ -1360,6 +1389,42 @@ export default function App() {
     const mockupView = MOCKUP_HASH_ROUTES[hash];
     if (mockupView) {
       Promise.resolve().then(() => navigate(mockupView));
+    // Mockup dev (#/mockups/avatar-biopunk): vista aislada con datos de
+    // muestra — se monta sin sesión (no lee ni escribe datos reales).
+    if (hash === 'mockups/avatar-biopunk') {
+      Promise.resolve().then(() => navigate('mockup_avatar_biopunk'));
+      return;
+    }
+    if (hash === 'mockups/avatar-verde-vivo') {
+      Promise.resolve().then(() => navigate('mockup_avatar_verde_vivo'));
+      return;
+    }
+    if (hash === 'mockups/avatar-libre') {
+      Promise.resolve().then(() => navigate('mockup_avatar_libre'));
+      return;
+    }
+    // Mockup dev (#/mockups/boton-anarquia): vista aislada de decisión visual
+    // — se monta sin sesión (no lee ni escribe datos reales).
+    if (hash === 'mockups/boton-anarquia') {
+      Promise.resolve().then(() => navigate('mockup_boton_anarquia'));
+      return;
+    }
+    // Mockup dev (#/mockups/home-campesino): rediseño del home con ojos de
+    // campesino — se monta sin sesión (no lee ni escribe datos reales).
+    if (hash === 'mockups/home-campesino') {
+      Promise.resolve().then(() => navigate('mockup_home_campesino'));
+      return;
+    }
+    // Mockup dev (#/mockups/montana-mundos): navegación como paisaje de pisos
+    // térmicos — se monta sin sesión (datos de muestra, no toca datos reales).
+    if (hash === 'mockups/montana-mundos') {
+      Promise.resolve().then(() => navigate('mockup_montana_mundos'));
+      return;
+    }
+    // Mockup dev (#/mockups/entrada-campesina): la entrada definitiva campesina
+    // — se monta sin sesión (datos de muestra, no toca datos reales).
+    if (hash === 'mockups/entrada-campesina') {
+      Promise.resolve().then(() => navigate('mockup_entrada_campesina'));
       return;
     }
 
@@ -1412,6 +1477,33 @@ export default function App() {
       }
       const routeView = HASH_VIEW_ROUTES[hash];
       if (!routeView) return;
+      // Mockup dev: sin gate ni sesión (datos de muestra).
+      if (routeView === 'mockup_avatar_biopunk') {
+        navigate(routeView);
+        return;
+      }
+      if (routeView === 'mockup_avatar_verde_vivo' || routeView === 'mockup_avatar_libre') {
+        navigate(routeView);
+        return;
+      }
+      if (routeView === 'mockup_boton_anarquia') {
+        navigate(routeView);
+        return;
+      }
+      if (routeView === 'mockup_home_campesino') {
+        navigate(routeView);
+        return;
+      }
+      // Mockup dev: sin gate ni sesión (datos de muestra).
+      if (routeView === 'mockup_montana_mundos') {
+        navigate(routeView);
+        return;
+      }
+      // Mockup dev: sin gate ni sesión (datos de muestra).
+      if (routeView === 'mockup_entrada_campesina') {
+        navigate(routeView);
+        return;
+      }
       // Gate extensionista (ADR-048): no montar el panel para quien no tiene rol.
       if (routeView === 'extensionista' && !esExtensionistaActual()) {
         navigate('dashboard');
@@ -2845,10 +2937,52 @@ export default function App() {
             />
           </ErrorBoundary>
         );
+      case 'mockup_montana_mundos':
+        // Mockup dev "La Montaña de los Mundos": navegación como paisaje de
+        // pisos térmicos, 3 direcciones artísticas. Full-screen, sin gate —
+        // solo para decidir dirección visual.
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="Mockup Montaña de los Mundos">
+              <MontanaMundosMockup onBack={() => navigate('dashboard')} />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
+      case 'mockup_entrada_campesina':
+        // Mockup dev "La entrada definitiva" (dirección campesina): la entrada
+        // respira la hora real de la vereda, una sola cosa brilla (el lucero
+        // del día). Full-screen, sin gate — solo para decidir dirección visual.
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="Mockup Entrada Campesina">
+              <EntradaCampesinaMockup onBack={() => navigate('dashboard')} />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
       case 'dashboard':
         return (
           <ErrorBoundary>
             <DashboardLiveView onNavigate={navigate} onLogout={handleLogout} lastLogMessage={lastLogMessage} />
+          </ErrorBoundary>
+        );
+      case 'mockup_boton_anarquia':
+        // Mockup dev del nuevo FAB del agente (3 variantes animadas de la Ⓐ
+        // de herramientas). Full-screen, sin gate — solo para decidir dirección.
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="Mockup Botón Anarquía">
+              <BotonAnarquiaMockup onBack={() => navigate('dashboard')} />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
+      case 'mockup_home_campesino':
+        // Mockup dev del home con ojos de campesino (rediseño de jerarquía).
+        // Full-screen, sin gate — solo para decidir dirección.
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="Mockup Home Campesino">
+              <HomeCampesinoMockup onBack={() => navigate('dashboard')} />
+            </ErrorFallback>
           </ErrorBoundary>
         );
       case 'hoy_finca':
@@ -2906,6 +3040,32 @@ export default function App() {
                 onBack={() => navigate('juego')}
                 onHome={() => navigate('dashboard')}
               />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
+      case 'mockup_avatar_biopunk':
+        // Mockup dev del juego final (El Espíritu de tu Finca, biopunk).
+        // Full-screen, datos de muestra, sin gate — solo para decidir dirección.
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="Mockup Avatar Biopunk">
+              <AvatarGameBiopunk onBack={() => navigate('dashboard')} />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
+      case 'mockup_avatar_verde_vivo':
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="Mockup Avatar Verde Vivo">
+              <AvatarGameVerdeVivo onBack={() => navigate('dashboard')} />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
+      case 'mockup_avatar_libre':
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="Mockup Avatar Libre">
+              <AvatarGameLibre onBack={() => navigate('dashboard')} />
             </ErrorFallback>
           </ErrorBoundary>
         );
@@ -4229,6 +4389,7 @@ export default function App() {
       <Suspense fallback={null}>
         {currentView !== 'loading' && currentView !== 'login' && currentView !== 'oauth-callback' && !currentView.startsWith('mockup_') && currentView !== 'voz' && currentView !== 'agente' && currentView !== 'dashboard' && currentView !== 'onboarding-perfil' && currentView !== 'onboarding-perfil-clasico' && <AgentFab onNavigate={navigate} pantalla={currentView} />}
       </Suspense>
+      {currentView !== 'loading' && currentView !== 'login' && currentView !== 'oauth-callback' && currentView !== 'voz' && currentView !== 'agente' && currentView !== 'dashboard' && currentView !== 'onboarding-perfil' && currentView !== 'onboarding-perfil-clasico' && !currentView.startsWith('mockup_') && <AgentFab onNavigate={navigate} />}
       {/* Escucha manos libres (operador 2026-07-05, caso guantes/manos
           embarradas). Abre el widget "Chagra está escuchando" que navega o
           pregunta al agente punta a punta por voz.

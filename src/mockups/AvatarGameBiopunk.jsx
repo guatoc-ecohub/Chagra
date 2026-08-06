@@ -1,4 +1,3 @@
-/* eslint-disable chagra-i18n/no-hardcoded-spanish -- mockup de diseño: texto de muestra, no cadenas de UI de producción (ADR-050) */
 /**
  * AvatarGameBiopunk — MOCKUP de dirección del "juego final de Chagra":
  * El Espíritu de tu Finca (tema biopunk).
@@ -635,11 +634,7 @@ function EscenaOrganismo({ year, especie, etapa, vitalidad, mundoAbierto, onOpen
 /* ------------------------------------------------------------------------- */
 
 export default function AvatarGameBiopunk({ onBack }) {
-  // Con prefers-reduced-motion arrancamos ya en el año final (finca crecida) en
-  // vez de setState dentro del efecto de entrada (react-hooks/set-state-in-effect).
-  const [year, setYear] = useState(() =>
-    window.matchMedia('(prefers-reduced-motion: reduce)').matches ? MAX_ANIO : 0
-  );
+  const [year, setYear] = useState(0);
   const [especieId, setEspecieId] = useState('chivito');
   const [mundo, setMundo] = useState(null);
   const [nota, setNota] = useState('');
@@ -673,8 +668,10 @@ export default function AvatarGameBiopunk({ onBack }) {
   /* cinematográfica de entrada: la finca crece sola hasta 2031 */
   useEffect(() => {
     const quieto = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    // El estado ya arranca en MAX_ANIO via inicializador perezoso; no animamos.
-    if (quieto) return undefined;
+    if (quieto) {
+      setYear(MAX_ANIO);
+      return undefined;
+    }
     const arranque = setTimeout(reproducir, 2300);
     return () => {
       clearTimeout(arranque);
