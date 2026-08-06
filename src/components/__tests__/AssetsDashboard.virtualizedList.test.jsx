@@ -68,6 +68,19 @@ vi.mock('../../services/fincaActiveStore', () => {
   return { useFincaActiveStore, default: useFincaActiveStore };
 });
 
+// roleService: este test cubre virtualización/eliminar, no el sistema de
+// roles (ver roleService.test.js para ese contrato). Sin roster/tenant
+// montado el actor por defecto NO tendría permiso de borrar y el botón se
+// ocultaría (comportamiento correcto para `nina`, ver AssetsDashboard.jsx
+// handleDelete) — se mockea `can` en `true` para mantener el escenario
+// "usuario con permiso" que este archivo prueba.
+vi.mock('../../services/roleService', () => ({
+  can: () => true,
+  canManage: () => true,
+  currentSecurityRole: () => 'dueno',
+  isNina: () => false,
+}));
+
 const removeAsset = vi.fn().mockResolvedValue(undefined);
 const setSelectedAsset = vi.fn();
 const mockAssetState = {
