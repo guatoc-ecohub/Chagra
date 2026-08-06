@@ -1143,6 +1143,41 @@ function LandmarkGeom({ tipo, tinte, reducedMotion, q = 1, forma = null }) {
         </group>
       );
     }
+    case 'chorrera': { // EL SALTO DE LA QUEBRADA: escarpe estratificado + hilo de
+      // agua que cae a un pocito, con su vaho. La seña del alto húmedo — tocar
+      // aquí BAJA al mundo de la chorrera. (anti-conflicto: caso nuevo antes de default.)
+      const ESTRATOS = [0.18, 0.42, 0.66, 0.9];
+      return (
+        <group>
+          {/* el escarpe: lajas apiladas (roca sedimentaria) — INSTANCIADO */}
+          <Instances frames={1} limit={ESTRATOS.length}>
+            <boxGeometry args={[0.7, 0.2, 0.34]} />
+            <meshStandardMaterial color="#6f7a85" flatShading roughness={1} />
+            {ESTRATOS.map((y, i) => (
+              <Instance key={i} position={[0, y, -0.2]} scale={[1 - i * 0.08, 1, 1]} />
+            ))}
+          </Instances>
+          {/* el hilo de agua que cae por el escarpe */}
+          <mesh position={[0, 0.55, -0.02]}>
+            <boxGeometry args={[0.16, 0.86, 0.04]} />
+            <meshStandardMaterial color="#8fc7cf" transparent opacity={0.8} roughness={0.2} metalness={0.3} />
+          </mesh>
+          {/* el pocito cristalino de la base */}
+          <mesh position={[0, 0.06, 0.28]}>
+            <cylinderGeometry args={[0.34, 0.38, 0.1, 18]} />
+            <meshStandardMaterial color="#3a7fa0" transparent opacity={0.82} metalness={0.4} roughness={0.2} />
+          </mesh>
+          {/* el vaho del salto (motas frías, como el frailejonal) */}
+          <Instances frames={1} limit={3}>
+            <sphereGeometry args={[1, 8, 6]} />
+            <meshBasicMaterial color="#dfe8ea" transparent opacity={0.22} depthWrite={false} />
+            {[[0, 0.3, 0.2, 0.22], [-0.12, 0.62, 0.05, 0.16], [0.12, 0.5, 0.15, 0.14]].map(([x, y, z, r], i) => (
+              <Instance key={i} position={[x, y, z]} scale={r} />
+            ))}
+          </Instances>
+        </group>
+      );
+    }
     default:
       return (
         <mesh position={[0, 0.3, 0]}>
