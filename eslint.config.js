@@ -94,6 +94,7 @@ export default defineConfig([
     languageOptions: {
       globals: {
         ...globals.browser,
+        ...globals.node, // Add Node.js globals for process.env, etc.
         ...vitestGlobals,
       },
       parserOptions: {
