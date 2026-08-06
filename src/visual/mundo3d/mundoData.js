@@ -584,6 +584,43 @@ export const MUNDO = {
     // El gemelo 2D digno (mirror → motivo `micorrizas`): la misma red, dibujada.
     fallback2d: { escena: 'mirror' },
   },
+
+  // 🌿 EL BOSQUE NATIVO — el BOSQUE ALTOANDINO DE TRES ESTRATOS (arquetipo SÍ-3D
+  //    nuevo `bosque`). NO es el bosque comestible de la finca (ese es `disenio`,
+  //    que usa `estratos` para los 7 estratos productivos): este es el MONTE
+  //    NATIVO que la abraza — el bosque de niebla de 2400-3300 msnm, leído como
+  //    una lámina de Humboldt viva. Uno se para en el CLARO y mira la orilla del
+  //    rodal: el DOSEL (encenillo, cedro, nogal, palma de cera emergente), el
+  //    SOTOBOSQUE (mano de oso, helecho arbóreo, chusque, arbusto en flor, bejuco
+  //    con bromelias) y el SUELO (helechos, hierba de sombra, cojines de musgo).
+  //    Las epífitas van horneadas sobre los forófitos; la niebla y la luz
+  //    filtrada ponen la atmósfera. Los tres botones señalan cada estrato sin
+  //    salir del mundo. En equipo humilde cae a su ficha 2D digna (la lámina de
+  //    los tres estratos). (anti-conflicto de merge: entrada nueva SIEMPRE al final.)
+  bosque: {
+    pisoTermico: 'frio',
+    escena: 'bosque',
+    valle: { tipo: 'bosque', pos: [6.0, 0, -5.2], escala: 1.1 },
+    params: { seed: 4242, extension: 23 },
+    entrada: { narra: 'bosque' },
+    // El gemelo 2D digno: la lámina de los tres estratos (misma lección en notas).
+    fallback2d: {
+      escena: 'infografia',
+      params: {
+        titulo: 'El bosque nativo altoandino',
+        cifras: [
+          { valor: '2.400–3.300', unidad: 'm', label: 'la altura del bosque de niebla altoandino' },
+          { valor: '3', unidad: 'estratos', label: 'dosel (9–17 m) · sotobosque (2–6 m) · suelo (musgo y helechos)' },
+        ],
+        notas: [
+          'El DOSEL es el techo: encenillo, cedro, nogal y la palma de cera asomando. Su sombra hace el clima de todo lo de abajo.',
+          'El SOTOBOSQUE vive de la luz colada: helechos arbóreos, chusque, arbustos en flor y el bejuco que sube cargando bromelias.',
+          'El SUELO es una esponja de musgo, briofitas y hojarasca que guarda el agua de la niebla y la suelta despacio.',
+          'Las epífitas —orquídeas, bromelias y helechos— viven montadas sobre los troncos sin robarles: son el sello del bosque de niebla.',
+        ],
+      },
+    },
+  },
 };
 
 /** Ids de todos los mundos registrados. */
