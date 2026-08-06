@@ -61,31 +61,20 @@ function encodePairs(lat, lng, pairDigits) {
   return code;
 }
 
-function encodeGrid(lat, lng, gridDigits) {
+function encodeGrid(latRemainder, lngRemainder, gridDigits) {
   let code = '';
-  let latValue = lat + LATITUDE_MAX;
-  let lngValue = lng + LONGITUDE_MAX;
-
-  for (let pairIndex = 0; pairIndex < 5; pairIndex += 1) {
-    const place = 20 / 20 ** pairIndex;
-    const latDigit = Math.floor(latValue / place);
-    const lngDigit = Math.floor(lngValue / place);
-    latValue -= latDigit * place;
-    lngValue -= lngDigit * place;
-  }
-
   let latPlace = 0.000125;
   let lngPlace = 0.000125;
 
   for (let index = 0; index < gridDigits; index += 1) {
     latPlace /= GRID_ROWS;
     lngPlace /= GRID_COLUMNS;
-    const row = Math.floor(latValue / latPlace);
-    const col = Math.floor(lngValue / lngPlace);
+    const row = Math.floor(latRemainder / latPlace);
+    const col = Math.floor(lngRemainder / lngPlace);
     const digit = row * GRID_COLUMNS + col;
     code += ALPHABET[digit];
-    latValue -= row * latPlace;
-    lngValue -= col * lngPlace;
+    latRemainder -= row * latPlace;
+    lngRemainder -= col * lngPlace;
   }
 
   return code;
@@ -99,7 +88,19 @@ export function encodePlusCode(lat, lng, codeLength = 10) {
   const gridDigits = Math.max(0, codeLength - PAIR_CODE_LENGTH);
   let code = encodePairs(point.lat, point.lng, pairDigits);
   if (gridDigits > 0) {
-    code += encodeGrid(point.lat, point.lng, gridDigits);
+    let latValue = point.lat + LATITUDE_MAX;
+    let lngValue = point.lng + LONGITUDE_MAX;
+    let place = 20;
+
+    for (let index = 0; index < pairDigits; index += 2) {
+      const latDigit = Math.floor(latValue / place);
+      const lngDigit = Math.floor(lngValue / place);
+      latValue -= latDigit * place;
+      lngValue -= lngDigit * place;
+      place /= 20;
+    }
+
+    code += encodeGrid(latValue, lngValue, gridDigits);
   }
 
   if (code.length < SEPARATOR_POSITION) {
