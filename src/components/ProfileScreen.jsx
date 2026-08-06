@@ -6,6 +6,7 @@ import {
 } from 'lucide-react';
 import { ScreenShell } from './common/ScreenShell';
 import { esExtensionistaActual } from '../config/extensionistaAccess';
+import { can as roleCan } from '../services/roleService';
 import ThemeSelector from './common/ThemeSelector';
 import ThemeLivePreview from './common/ThemeLivePreview';
 import AgentAvatarSelector from './Settings/AgentAvatarSelector';
@@ -108,6 +109,7 @@ const NIVELES_RESPUESTA = [
 ];
 
 /** Catálogo de secciones del morral. El orden define la rejilla del hub. */
+/* eslint-disable chagra-i18n/no-hardcoded-spanish -- array de config, preexistente; disable puntual exigido por lefthook max-warnings=0 al tocar este archivo (roles/usuarios) */
 const SECTIONS = [
   { id: 'apariencia', label: 'Apariencia', icon: Palette, tint: 'text-amber-400', tintBg: 'bg-amber-900/30 border-amber-700/40', desc: 'Tema, fondo y avatar' },
   { id: 'agente', label: 'Mi agente', icon: Sprout, tint: 'text-emerald-400', tintBg: 'bg-emerald-900/30 border-emerald-700/40', desc: 'Respuestas y voz' },
@@ -119,6 +121,7 @@ const SECTIONS = [
   { id: 'ayuda', label: 'Ayuda', icon: LifeBuoy, tint: 'text-amber-300', tintBg: 'bg-amber-900/30 border-amber-700/40', desc: 'Manual de uso', action: true },
   { id: 'avanzado', label: 'Avanzado', icon: Wrench, tint: 'text-slate-400', tintBg: 'bg-slate-800/60 border-slate-700', desc: 'Modo técnico y más' },
 ];
+/* eslint-enable chagra-i18n/no-hardcoded-spanish */
 
 const SECTION_LABELS = Object.fromEntries(SECTIONS.map((s) => [s.id, s.label]));
 
@@ -1082,6 +1085,35 @@ export default function ProfileScreen({ onBack, onHome }) {
                     <span className="text-xs text-slate-400 leading-snug">
                       Panel del extensionista: revisa el estado de las fincas que
                       supervisas. Vista previa con datos de ejemplo.
+                    </span>
+                  </div>
+                  <ChevronRight size={18} className="text-slate-400 shrink-0" aria-hidden="true" />
+                </button>
+              </div>
+            )}
+
+            {/* Gestión de usuarios de la finca (dueño/esposa/trabajador/niña):
+                SOLO se renderiza si el actor tiene el permiso user:manage
+                (roleService — dueño o esposa). 2D/onboarding, nunca 3D. */}
+            {roleCan(undefined, 'user:manage') && (
+              <div className="space-y-4 bg-slate-900/40 border border-slate-800 rounded-2xl p-5">
+                <div className="flex items-center gap-2 px-1">
+                  <Users size={18} className="text-emerald-400" />
+                  <h3 className="text-sm font-bold text-slate-300 uppercase tracking-wider">Gestión de usuarios</h3>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => {
+                    window.dispatchEvent(new CustomEvent('chagra:nav', { detail: { view: 'usuarios' } }));
+                  }}
+                  data-testid="profile-nav-usuarios"
+                  className="w-full flex items-center justify-between gap-3 p-3 rounded-xl bg-slate-800/50 hover:bg-slate-700/60 transition-colors min-h-[48px] text-left cursor-pointer"
+                >
+                  <div className="flex flex-col gap-0.5 flex-1">
+                    <span className="text-sm font-bold text-slate-200">Usuarios de su finca</span>
+                    <span className="text-xs text-slate-400 leading-snug">
+                      Cree usuarios para su esposa/esposo, trabajadores o sus
+                      hijos. Cada rol define qué puede ver y hacer.
                     </span>
                   </div>
                   <ChevronRight size={18} className="text-slate-400 shrink-0" aria-hidden="true" />
