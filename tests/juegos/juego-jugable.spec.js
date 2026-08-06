@@ -43,14 +43,20 @@ test.describe(`Juego jugable: ${JUEGO_SLUG}`, () => {
     page.on('console', (msg) => {
       if (msg.type() === 'error') {
         const texto = msg.text();
-        // Filtrar errores no críticos (comunes en dev)
+        // La URL del recurso NO viene en el texto del mensaje: para un 404 el
+        // texto es "Failed to load resource: the server responded with a
+        // status of 404". Hay que mirar msg.location().url, o el filtro de
+        // favicon nunca matchea y TODO juego sin favicon reprueba el gate
+        // (falso positivo real, visto 2026-08-05 con angelita-bros).
+        const urlRecurso = msg.location()?.url || '';
+        const ruido = `${texto} ${urlRecurso}`.toLowerCase();
         const noCritico =
-          texto.includes('favicon') ||
-          texto.includes('manifest') ||
+          ruido.includes('favicon') ||
+          ruido.includes('manifest') ||
           texto.includes('401') ||
           texto.includes('403') ||
-          texto.toLowerCase().includes('mixed content') ||
-          texto.toLowerCase().includes('preload');
+          ruido.includes('mixed content') ||
+          ruido.includes('preload');
 
         if (!noCritico) {
           erroresCriticos.push({
