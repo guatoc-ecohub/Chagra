@@ -175,6 +175,7 @@ const messages = {
     iosPaso2: 'Elija “Añadir a pantalla de inicio”.',
   },
   // Bienvenida de PRIMERA VEZ (BienvenidaFinca) — secuencia de 5 momentos.
+  // Bienvenida de PRIMERA VEZ (BienvenidaFinca) — secuencia de 3 momentos.
   // Tono "usted" cordial colombiano, frases cortas (muchos usuarios leen poco).
   bienvenida: {
     eyebrow: 'Bienvenido a Chagra',

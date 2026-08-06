@@ -417,6 +417,7 @@ const ConejosScreen = lazy(() => import('./components/ConejosScreen'));
 const CaprinosScreen = lazy(() => import('./components/CaprinosScreen'));
 const EstiercolScreen = lazy(() => import('./components/EstiercolScreen'));
 const CompostScreen = lazy(() => import('./components/CompostScreen'));
+const EstiercolScreen = lazy(() => import('./components/EstiercolScreen'));
 const AgentScreen = lazy(() => import('./components/AgentScreen/AgentScreen'));
 const OnboardingProfile = lazy(() => import('./components/OnboardingProfile'));
 const OnboardingCondensado = lazy(() => import('./components/OnboardingCondensado'));
@@ -1102,6 +1103,13 @@ const MODULE_VIEWS = new Set([
   'glaciar', 'glaciar_historial', 'extensionista', 'usuarios', 'plant_asset',
   'casos', 'caso_detail', 'bitacora_detail', 'edit_task', 'cromatografia', 'ciclo_vivo',
   'usage_stats', 'mercado', 'auditoria_inventario', 'mundo', 'valle3d',
+  'animales', 'animales_gallinas', 'animales_abejas', 'animales_vacas', 'estiercol',
+  'hoy_finca',   'faq', 'evolucion', 'juego', 'defensores', 'milpa', 'doom_finca', 'subsuelo', 'sembrar', 'cosechar', 'insumos', 'biopreparados',
+  'observacion', 'reportar_invasora', 'sanidad_sintoma', 'mantenimiento', 'new_task',
+  'agente', 'voz', 'voz_planta', 'procesos', 'registro_voz', 'registro_unificado', 'ciclo', 'germinacion', 'ciclo_nutrientes', 'calendario_finca', 'suelo', 'agua', 'clima_boletin', 'salud_suelo', 'semilla', 'poscosecha', 'toxicologia', 'aprende', 'directorio', 'mercados',
+  'glaciar', 'glaciar_historial', 'extensionista', 'plant_asset',
+  'casos', 'caso_detail', 'bitacora_detail', 'edit_task', 'cromatografia', 'ciclo_vivo',
+  'usage_stats', 'mercado', 'auditoria_inventario', 'mundo',
 ]);
 
 // T2: Dashboard como componente propio con suscripción reactiva al store.

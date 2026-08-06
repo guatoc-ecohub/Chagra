@@ -93,6 +93,9 @@ export default function SpeciesFicha({ ficha, onSelectSpecies }) {
       {/* CLAVE DE UN VISTAZO — clima y ciclo escaneables al sol */}
       <GlanceStrip pisoTermico={pisoTermico} fenologia={fenologia} />
 
+      {/* CLAVE DE UN VISTAZO — clima y ciclo escaneables al sol */}
+      <GlanceStrip pisoTermico={pisoTermico} fenologia={fenologia} />
+
       {/* PISO TÉRMICO / ALTITUD */}
       <Section icon={Mountain} title="Piso térmico y clima" accent="amber">
         <PisoTermicoBand pisoTermico={pisoTermico} />

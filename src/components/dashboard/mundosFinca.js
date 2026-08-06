@@ -62,6 +62,8 @@ export const MUNDOS_FINCA = [
             { view: 'calendario_finca', label: 'Calendario de la finca', desc: 'Cuándo sembrar, abonar y cosechar, todo junto', emoji: '🗓️' },
             { view: 'almanaque', label: 'Almanaque campesino', desc: 'El año a lo grande: aguas y secas, qué da su piso térmico y el saber lunar', emoji: '🌙' },
             { view: 'ano_finca', label: 'El año de la finca', desc: 'La línea de tiempo de SU año: qué sembró, cosechó y trabajó, y lo que viene en camino', emoji: '🛤️' },
+            { view: 'directorio', label: 'Qué puedo sembrar', desc: 'Especies para su clima, con qué se llevan y sus plagas', emoji: '🌱' },
+            { view: 'calendario_finca', label: 'Calendario de la finca', desc: 'Cuándo sembrar, abonar y cosechar, todo junto', emoji: '🗓️' },
             { view: 'activos', label: 'Mis matas', desc: 'Las plantas que tiene sembradas y cómo van', emoji: '🪴' },
             { view: 'mapa', label: 'Zonas de la finca', desc: 'Sus lotes, eras y potreros en el mapa', emoji: '🗺️' },
             { view: 'semilla', label: 'Semilla propia', desc: 'Seleccione, guarde y pruebe su semilla criolla', emoji: '🌾' },
@@ -70,6 +72,8 @@ export const MUNDOS_FINCA = [
             { view: 'sembrar', label: 'Registrar una siembra', desc: 'Anote lo que sembró y arranca su ciclo', emoji: '🌽' },
             { view: 'cosechar', label: 'Cosechar', desc: 'Anote lo que recogió', emoji: '🧺' },
             { view: 'mi_cosecha', label: 'Mi cosecha', desc: 'Cuánto ha producido su finca: por cultivo, mes a mes y por lote', emoji: '📊' },
+            { view: 'sembrar', label: 'Registrar una siembra', desc: 'Anote lo que sembró y arranca su ciclo', emoji: '🌽' },
+            { view: 'cosechar', label: 'Cosechar', desc: 'Anote lo que recogió', emoji: '🧺' },
             { view: 'ciclo', label: 'Ciclo de cultivo', desc: 'La vida de la mata etapa por etapa', emoji: '🔄' },
         ],
     },
@@ -183,6 +187,11 @@ export const MUNDOS_FINCA = [
             { view: 'compost', label: 'El compost, paso a paso', desc: 'De la recolección a la tierra negra: mezcla café/verde, volteo, madurez y aplicación', emoji: '🍂' },
             { view: 'estiercol', label: 'Del corral al abono', desc: 'Quítele el olor a la gallinaza, sáquele gas con el biodigestor y saque cuentas', emoji: '🐄' },
         ],
+        titulo: 'Del corral al abono',
+        emoji: '🐄',
+        lema: 'Quítele el olor al estiércol y sáquele abono y gas',
+        tinte: ['#6d7a2e', '#e9ecc9'],
+        directo: { view: 'estiercol' },
     },
     {
         id: 'sanidad',
@@ -216,6 +225,7 @@ export const MUNDOS_FINCA = [
         titulo: 'Los animales',
         emoji: '🐔',
         lema: 'Cría campesina: gallinas, cerdos, conejos, cabras y más',
+        lema: 'Gallinas, vacas, abejas y cerdos: sanidad y manejo',
         tinte: ['#a86a3a', '#f3e3cf'],
         // Gate por perfil: un urbano de balcón no ve este mundo (mismo criterio
         // `mostrarAnimales` del home). El filtro lo aplica MundosDeMiFinca.
@@ -228,6 +238,10 @@ export const MUNDOS_FINCA = [
             { view: 'animales_caprinos', label: 'Cabras y ovejas', desc: 'Leche, carne, lana y majada para el abono', emoji: '🐐' },
             { view: 'animales_vacas', label: 'Vacas', desc: 'Manejo, pastoreo y ordeño', emoji: '🐄' },
             { view: 'animales_abejas', label: 'Abejas y polinización', desc: 'Nativas sin aguijón, colmenas y una finca amiga de polinizadores', emoji: '🐝' },
+            { view: 'animales_gallinas', label: 'Gallinas', desc: 'Postura, sanidad y gallinaza', emoji: '🐔' },
+            { view: 'animales_vacas', label: 'Vacas', desc: 'Manejo, pastoreo y ordeño', emoji: '🐄' },
+            { view: 'animales_abejas', label: 'Abejas', desc: 'Colmenas y polinización de sus cultivos', emoji: '🐝' },
+            { view: 'seguimiento_cerdos', label: 'Cerdos', desc: 'Ciclo de manejo porcino y cama profunda', emoji: '🐖' },
         ],
     },
     {
