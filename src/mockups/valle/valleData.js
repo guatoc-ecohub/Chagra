@@ -17,388 +17,42 @@
    (ADR-050). */
 
 import { MUNDO_BY_ID } from '../../components/dashboard/mundosFinca';
-/* La franja del día sale de UNA fuente (cielosHoraData): el mismo mapa de
-   bandas que usan los mundos 3D — el valle y los dioramas giran juntos. */
-import { horaDeReloj } from '../../visual/mundo3d/cielosHoraData.js';
-
-/* ── 0. LOS PISOS TÉRMICOS: EL GRADIENTE DE ALTITUD DE LA FINCA ANDINA ───────
- * Una finca de ladera TREPA la montaña: del plátano en tierra caliente abajo
- * al frailejón del páramo arriba. Aquí ese gradiente es la ESTRUCTURA del
- * terreno — franjas por altura, cada una con su color (perspectiva de altura)
- * y su vegetación típica. El eje z ES la ladera: al fondo (z negativo) sube al
- * páramo; al frente (z positivo) baja a tierra caliente.
- *
- * Los rangos de altura (msnm) y temperatura salen de la tabla oficial
- * IDEAM/IGAC (src/data/piso-termico.json); aquí se ANCLAN al espacio del valle.
- * Todo lo visual (color del suelo, dónde brota cada mata, la pendiente) se LEE
- * de esta tabla — layout por datos, no a mano. Ordenados de abajo (frente,
- * cálido) hacia arriba (fondo, páramo).
- */
-export const PISOS_TERMICOS = [
-  {
-    id: 'calido',
-    nombre: 'Tierra caliente',
-    msnm: '0–1000 m',
-    tempC: '> 24 °C',
-    z0: 3.4, // borde frontal de la franja (bajo, cerca de la cámara)
-    z1: 8.5, // borde trasero
-    color: '#84a83f', // verde cálido amarillento
-    cresta: '#afc85a',
-    vegetacion: 'platano',
-    cultivos: 'Plátano y frutales',
-  },
-  {
-    id: 'templado',
-    nombre: 'Clima medio',
-    msnm: '1000–2000 m',
-    tempC: '18–24 °C',
-    z0: -0.6,
-    z1: 3.4,
-    color: '#4e9143', // verde vivo
-    cresta: '#77b256',
-    vegetacion: 'cafe',
-    cultivos: 'Café y maíz',
-  },
-  {
-    id: 'frio',
-    nombre: 'Clima frío',
-    msnm: '2000–3000 m',
-    tempC: '12–18 °C',
-    z0: -5.2,
-    z1: -0.6,
-    color: '#3c7f64', // verde-azulado
-    cresta: '#5fa07f',
-    vegetacion: 'papa',
-    cultivos: 'Papa y tubérculos',
-  },
-  {
-    id: 'paramo',
-    nombre: 'Páramo',
-    msnm: '> 3000 m',
-    tempC: '< 12 °C',
-    z0: -11,
-    z1: -5.2,
-    color: '#63807a', // frío grisáceo del alto andino
-    cresta: '#8ba597',
-    vegetacion: 'frailejon',
-    cultivos: 'Frailejones',
-  },
-];
-
-/** Piso térmico al que pertenece una coordenada z del valle. */
-export function pisoEnZ(z) {
-  for (const p of PISOS_TERMICOS) {
-    if (z >= p.z0 && z < p.z1) return p;
-  }
-  // Fuera de rango: el frente cae a cálido, el fondo a páramo.
-  return z >= PISOS_TERMICOS[0].z1 ? PISOS_TERMICOS[0] : PISOS_TERMICOS[PISOS_TERMICOS.length - 1];
-}
-
-/* Matas de MUESTRA sembradas por su piso (pocas y a los lados: dejan aire en
- * el centro y hacen legible el cambio de vegetación por altura). Cada una trae
- * el `tipo` que su piso siembra — la geometría la resuelve la escena. */
-export const VEGETACION_PISOS = [
-  { piso: 'paramo', pos: [-5.6, -7.8] },
-  { piso: 'paramo', pos: [1.2, -8.3] },
-  { piso: 'paramo', pos: [4.8, -6.6] },
-  // ARCHIVADO 2026-07-18 (pedido del operador): estos 3 frailejones extra
-  // arropaban al Ent-queñua de la vista del páramo en [2.2, -7.4]
-  // (VistaParamoEnt, ver src/mockups/valle/_archivo/vistaParamo.archivado.jsx),
-  // que se sacó de la vista del valle por amontonada. Sin el Ent no hacen
-  // falta — el páramo ya se lee con los 3 de arriba. Si se reactiva el Ent,
-  // reactivar también estos tres:
-  //   { piso: 'paramo', pos: [3.3, -7.9] },
-  //   { piso: 'paramo', pos: [2.9, -6.6] },
-  //   { piso: 'paramo', pos: [-7.4, -6.9] },
-  { piso: 'frio', pos: [-6.0, -3.6] },
-  { piso: 'frio', pos: [3.0, -4.4] },
-  { piso: 'frio', pos: [-7.6, -2.4] },
-  { piso: 'templado', pos: [-2.4, 1.0] },
-  { piso: 'templado', pos: [6.2, 2.6] },
-  { piso: 'templado', pos: [-7.4, 1.2] },
-  { piso: 'calido', pos: [-7.9, 8.3] }, // corrida: su puesto viejo quedó dentro del potrero
-  { piso: 'calido', pos: [7.4, 7.2] },
-  { piso: 'calido', pos: [0.9, 8.0] },
-].map((v) => {
-  const piso = PISOS_TERMICOS.find((p) => p.id === v.piso);
-  return { ...v, tipo: piso ? piso.vegetacion : 'platano' };
-});
 
 /* ── 2. LOS MUNDOS COMO LUGARES ─────────────────────────────────────────────
  * Un subconjunto curado de los mundos reales (mundosFinca.js) colocados en el
  * valle. `pos` = [x, y, z] en el terreno; `escala` y `tipo` deciden qué forma
  * procedural los representa (sin GLTF: todo es geometría de three, offline y
  * liviana). El título/emoji/tinte se LEEN del manifiesto real — no se duplican.
- *
- * Se reparten con AIRE por toda la ladera y por sus pisos: la milpa y el café
- * en el clima medio, el bosque trepando al frío, la veleta arriba en el filo
- * del páramo (desde donde se lee el cielo), y el corral, la huerta y el
- * semillero abajo en la tierra caliente. Pocos y separados > muchos amontonados.
- *
- * ESTE ES EL CATÁLOGO COMPLETO, no la lista final: qué lugares le tocan a CADA
- * finca lo decide `construirLugaresValle(perfil)` (abajo) — el valle se siembra
- * del perfil, no es el mismo para todos.
  */
 const LUGARES = [
-  // (Las posiciones finales las manda COMPOSICION_LUGARES — la capa del
-  //  director en visual/mundo3d/direccion; estas son el respaldo crudo.)
-  { id: 'agua', pos: [1.4, 0, -0.2], escala: 1, tipo: 'quebrada' },
-  // El cafetal CON SOMBRÍO: café bajo guamo y plátano — policultivo, no hilera.
-  { id: 'cafe', pos: [4.4, 0, 1.0], escala: 1.05, tipo: 'cafetal' },
-  // La milpa-PARCELA (portal MIS MATAS): maíz + fríjol + calabaza juntos,
-  // leída como granja viva de Age of Empires — jamás monocultivo.
-  { id: 'cultivos', pos: [-4.4, 0, 2.4], escala: 1.15, tipo: 'milpa' },
-  { id: 'suelo', pos: [-1.4, 0, 4.8], escala: 1, tipo: 'era' },
-  { id: 'sanidad', pos: [3.8, 0, 4.9], escala: 0.95, tipo: 'huerta' },
-  // El POTRERO (portal MIS ANIMALES): apartos divididos por cercas vivas de
-  // matarratón, nacedero y botón de oro; los animales regados, no amontonados.
-  // (Escala contenida: el valle cercano de la v2 no aguanta el llano de 48×48.)
-  { id: 'animales', pos: [-5.0, 0, 5.4], escala: 0.82, tipo: 'animales' },
-  { id: 'disenio', pos: [5.2, 0, -3.4], escala: 1.1, tipo: 'bosque' },
-  { id: 'clima', pos: [-3.2, 0, -6.0], escala: 1, tipo: 'veleta' },
-  // El mercado (portal VENDER), abajo en la tierra caliente, cerca de la salida
-  // a la plaza: el puesto con su toldo donde la cosecha sale a venderse.
-  { id: 'mercado', pos: [1.2, 0, 6.6], escala: 1, tipo: 'mercado' },
-  // El INVERNADERO (micro-mundo del semillero): arcos, plástico lechoso y sus
-  // mesas de germinación — donde nace y se cría la matica antes del lote.
-  { id: 'semillero', pos: [-2.6, 0, 6.2], escala: 0.9, tipo: 'invernadero' },
-  // El suelo vivo / red micorrízica, en el corazón cultivado (entre el suelo y
-  // los cultivos): unos hongos que asoman = el fruto de la red bajo tierra. Toque
-  // ahí para BAJAR al mundo subterráneo. (anti-conflicto: lugar nuevo al final.)
-  { id: 'micorrizas', pos: [-2.7, 0, 3.3], escala: 1, tipo: 'hongos' },
-  // La BIOFÁBRICA (mundo real 'abono'): la pila de compost cerca del potrero
-  // pero diferenciada — el ciclo estiércol→abono legible en el mapa.
-  { id: 'abono', pos: [-3.3, 0, 8.1], escala: 0.85, tipo: 'compost' },
-  // El KIOSCO DEL SABER (portal APRENDER): el tablero bajo techito de paja a
-  // la vera del camino de la plaza. Aún sin mundo propio en el manifiesto:
-  // trae su identidad de respaldo (fallbackMundo) mientras el hub de juegos
-  // abre su puerta (otro frente lo construye).
-  {
-    id: 'aprender',
-    pos: [6.4, 0, 4.6],
-    escala: 0.9,
-    tipo: 'saber',
-    fallbackMundo: {
-      titulo: 'Aprender',
-      emoji: '📖',
-      lema: 'Los juegos y saberes de la finca, reunidos en un solo patio.',
-      tinte: ['#b3771d', '#f2dfae'],
-    },
-  },
-  // EL PÁRAMO (la puerta de arriba): el frailejonal con su niebla fría en la
-  // zona alta de la cordillera. Antes el páramo se veía (el Ent en el filo)
-  // pero no tenía ENTRADA propia en el valle; este lugar la abre — tocarla
-  // sube al mundo del páramo (MundoParamo3D, vía diorama_paramo). Sin mundo
-  // propio en el manifiesto: trae su identidad de respaldo.
-  {
-    id: 'paramo',
-    pos: [-0.9, 0, -7.6],
-    escala: 0.95,
-    tipo: 'frailejonal',
-    fallbackMundo: {
-      titulo: 'El páramo',
-      emoji: '🏔️',
-      lema: 'El frailejonal que le peina el agua a la niebla y se la guarda a la finca.',
-      tinte: ['#63807a', '#c9d8d2'],
-    },
-  },
+  { id: 'cultivos', pos: [-3.2, 0, 1.6], escala: 1.15, tipo: 'milpa' },
+  { id: 'cafe', pos: [3.4, 0, 2.2], escala: 1, tipo: 'cafetal' },
+  { id: 'suelo', pos: [-1.1, 0, 3.6], escala: 1, tipo: 'era' },
+  { id: 'agua', pos: [0.6, 0, -1.4], escala: 1, tipo: 'quebrada' },
+  { id: 'animales', pos: [-4.6, 0, -1.8], escala: 1, tipo: 'corral' },
+  { id: 'sanidad', pos: [1.8, 0, 4.4], escala: 0.95, tipo: 'huerta' },
+  { id: 'disenio', pos: [4.8, 0, -2.6], escala: 1.1, tipo: 'bosque' },
+  { id: 'clima', pos: [-3.8, 0, -4.8], escala: 1, tipo: 'veleta' },
 ];
-
-/* Piezas de la vitrina que no forman parte de los 14 lugares históricos.
- * Solo se siembran cuando la persona las agrega para conocerlas. Mantenerlas
- * fuera de LUGARES conserva intacto el perfil demo y los valles existentes. */
-const LUGARES_PARA_CONOCER = [
-  {
-    id: 'cacao', pos: [7.2, 0, 7.8], escala: 0.9, tipo: 'cafetal',
-    fallbackMundo: { titulo: 'El cacao', emoji: '🍫', lema: 'Conozca el cultivo y beneficio del cacao.', tinte: ['#79502d', '#c9873c'] },
-  },
-  {
-    id: 'papa', pos: [6.8, 0, -3.4], escala: 0.9, tipo: 'huerta',
-    fallbackMundo: { titulo: 'La papa', emoji: '🥔', lema: 'Conozca la tierra de la papa.', tinte: ['#8c6a3f', '#c7a36d'] },
-  },
-  {
-    id: 'abejas', pos: [7.4, 0, 1.8], escala: 0.82, tipo: 'saber',
-    fallbackMundo: { titulo: 'Las abejas', emoji: '🐝', lema: 'Conozca las polinizadoras de la finca.', tinte: ['#87651c', '#e8b83a'] },
-  },
-  {
-    id: 'lluvia', pos: [-6.8, 0, -4.8], escala: 0.82, tipo: 'veleta',
-    fallbackMundo: { titulo: 'La lluvia', emoji: '🌧️', lema: 'Conozca cómo se mueve el agua del cielo.', tinte: ['#58758f', '#9fb3c8'] },
-  },
-  {
-    id: 'sierra', pos: [6.2, 0, -7.2], escala: 0.85, tipo: 'bosque',
-    fallbackMundo: { titulo: 'La Sierra', emoji: '🏔️', lema: 'Conozca la montaña completa.', tinte: ['#456353', '#b8c6b6'] },
-  },
-  {
-    id: 'compost', pos: [-6.6, 0, 8.0], escala: 0.8, tipo: 'compost',
-    fallbackMundo: { titulo: 'El compost', emoji: '🍂', lema: 'Conozca cómo vuelve la materia a la tierra.', tinte: ['#59401f', '#a8854c'] },
-  },
-];
-
-/* ── 2b. LA SIEMBRA: QUÉ LUGARES LE TOCAN A ESTA FINCA ───────────────────────
- * El valle se ARMA del perfil (spec del valle dinámico, paso 2): si la persona
- * tiene un balcón, su valle es un balcón; si tiene 10.000 matas, es el valle
- * completo. Aquí vive la regla de QUÉ hay; el DÓNDE lo sigue mandando la capa
- * del director (COMPOSICION_LUGARES en visual/mundo3d/direccion), que no se
- * toca: la función siembra, el director compone.
- *
- * REGLA DURA — un dato que FALTA nunca resta. Solo una respuesta EXPLÍCITA del
- * usuario (`perfil.declarado.*`) o una escala declarada encogen el mundo. Un
- * perfil vacío devuelve el valle de siempre, idéntico.
- *
- * Campos:
- *   escalas   en qué tamaños de mundo cabe el lugar ('balcon'|'invernadero'|'finca')
- *   requiere  (perfil) => boolean — condición extra; devuelve TRUE si el dato falta
- */
-const SIEMBRA_LUGARES = {
-  // La quebrada y su toma: hay finca y hay invernadero, no hay balcón.
-  agua: { escalas: ['finca', 'invernadero'] },
-  // El cafetal solo en la finca abierta, y NUNCA en el páramo (a 3.000+ m no
-  // hay café: fidelidad agroecológica, no capricho).
-  cafe: { escalas: ['finca'], requiere: (p) => p.pisoTermico !== 'paramo' },
-  // La milpa: la mata está en toda escala — es el corazón de Chagra.
-  cultivos: { escalas: ['balcon', 'invernadero', 'finca'] },
-  suelo: { escalas: ['balcon', 'invernadero', 'finca'] },
-  sanidad: { escalas: ['balcon', 'invernadero', 'finca'] },
-  // El potrero solo si de verdad tiene animales (si contestó la pregunta y
-  // quedó vacía —'ninguno'— no se dibuja un potrero que no existe).
-  animales: {
-    escalas: ['finca'],
-    requiere: (p) => !p.declarado.animales || p.animales.length > 0,
-  },
-  disenio: { escalas: ['finca'] },
-  clima: { escalas: ['balcon', 'invernadero', 'finca'] },
-  mercado: { escalas: ['finca', 'invernadero'] },
-  // El invernadero/semillero: si la finca ES un invernadero, obvio que va; si
-  // dijo explícitamente que NO tiene, no se le dibuja uno.
-  semillero: {
-    escalas: ['balcon', 'invernadero', 'finca'],
-    requiere: (p) => p.escala === 'invernadero' || !p.declarado.invernadero || !!p.invernadero,
-  },
-  micorrizas: { escalas: ['balcon', 'invernadero', 'finca'] },
-  abono: { escalas: ['finca', 'invernadero'] },
-  aprender: { escalas: ['balcon', 'invernadero', 'finca'] },
-  // El páramo de arriba: no existe en tierra caliente (< 1.000 m).
-  paramo: { escalas: ['finca'], requiere: (p) => p.pisoTermico !== 'calido' },
-};
-
-const ESCALAS_VALLE = ['balcon', 'invernadero', 'finca'];
-
-/* Lectura DEFENSIVA del perfil. valleData es un módulo de DATOS: no importa el
-   servicio del perfil a propósito (arrastraría el dataset DANE de 186 KB a
-   todo chunk que toque el valle). El perfil se le PASA ya normalizado
-   (services/perfilFincaService.derivarPerfilFinca); aquí solo se sanea. */
-function perfilSeguro(perfil) {
-  const p = perfil && typeof perfil === 'object' ? perfil : {};
-  const d = p.declarado && typeof p.declarado === 'object' ? p.declarado : {};
-  return {
-    escala: ESCALAS_VALLE.includes(p.escala) ? p.escala : 'finca',
-    pisoTermico: typeof p.pisoTermico === 'string' ? p.pisoTermico : null,
-    invernadero: p.invernadero || null,
-    agua: typeof p.agua === 'string' ? p.agua : null,
-    animales: Array.isArray(p.animales) ? p.animales : [],
-    cultiva: Array.isArray(p.cultiva) ? p.cultiva : [],
-    mundosActivos: Array.isArray(p.mundosActivos) ? p.mundosActivos : [],
-    declarado: {
-      escala: !!d.escala,
-      invernadero: !!d.invernadero,
-      animales: !!d.animales,
-      cultiva: !!d.cultiva,
-      agua: !!d.agua,
-      ubicacion: !!d.ubicacion,
-    },
-  };
-}
 
 /**
- * LOS LUGARES DE **SU** VALLE. Siembra el catálogo según el perfil de la finca.
- *
- * - Sin perfil (o perfil de demo) devuelve el catálogo COMPLETO: exactamente
- *   los lugares de siempre, en el mismo orden y con los mismos objetos.
- * - `perfil.escala` manda el tamaño del mundo.
- * - `perfil.mundosActivos` FUERZA la entrada de un mundo que la persona
- *   agregó a mano para conocerlo (la vitrina maestra, paso 5 del spec).
- * - Si por lo que sea la siembra quedara vacía, cae al catálogo completo: el
- *   valle nunca se queda sin lugares.
- *
- * @param {import('../../services/perfilFincaService').PerfilFinca} [perfil]
- * @returns {typeof LUGARES}
+ * Mundos del valle, ya resueltos contra el manifiesto real. Cada uno trae su
+ * `titulo`, `emoji` y `tinte` verdaderos + la geometría de su lugar.
  */
-export function construirLugaresValle(perfil) {
-  const p = perfilSeguro(perfil);
-  const lugares = LUGARES.filter((l) => {
-    if (p.mundosActivos.includes(l.id)) return true; // lo agregó para conocerlo
-    const regla = SIEMBRA_LUGARES[l.id];
-    if (!regla) return true; // lugar nuevo sin regla: se siembra (nunca menos)
-    if (!regla.escalas.includes(p.escala)) return false;
-    if (typeof regla.requiere === 'function' && !regla.requiere(p)) return false;
-    return true;
-  });
-  const opcionales = LUGARES_PARA_CONOCER.filter((l) => p.mundosActivos.includes(l.id));
-  const sembrados = lugares.length > 0 ? [...lugares, ...opcionales] : LUGARES;
-  return sembrados.map((lugar) => {
-    if (lugar.id === 'semillero' && p.invernadero?.tipo) {
-      return { ...lugar, invernaderoTipo: p.invernadero.tipo };
-    }
-    if (lugar.id === 'agua' && p.declarado.agua && p.agua) {
-      return { ...lugar, tipo: p.agua, fuenteAgua: p.agua };
-    }
-    return lugar;
-  });
-}
-
-/** Resuelve un lugar contra el manifiesto real de mundos (título/emoji/tinte). */
-function resolverMundo(l) {
-  /** @type {{ titulo?: string, emoji?: string, lema?: string, tinte?: string[] }} */
-  const real = MUNDO_BY_ID[l.id] || l.fallbackMundo || {};
-  const mundo = {
+export const MUNDOS_VALLE = LUGARES.map((l) => {
+  const real = MUNDO_BY_ID[l.id] || {};
+  return {
     ...l,
     titulo: real.titulo || l.id,
     emoji: real.emoji || '📍',
     lema: real.lema || '',
     tinte: real.tinte || ['#3f8f4e', '#dcedc9'],
   };
-  if (l.id === 'semillero' && l.invernaderoTipo) {
-    const nombres = { cuadrado: 'cuadrado', tunel: 'tipo túnel', casa_sombra: 'de casa malla' };
-    mundo.titulo = `Su invernadero ${nombres[l.invernaderoTipo] || ''}`.trim();
-  }
-  if (l.id === 'agua' && l.fuenteAgua) {
-    const nombres = {
-      quebrada: ['Su quebrada', '🏞️'],
-      tanque: ['Su tanque de agua', '🛢️'],
-      lluvia: ['Su agua lluvia', '🌧️'],
-      acueducto: ['Su acueducto', '🚰'],
-    };
-    const [titulo, emoji] = nombres[l.fuenteAgua] || [mundo.titulo, mundo.emoji];
-    mundo.titulo = titulo;
-    mundo.emoji = emoji;
-  }
-  return mundo;
-}
+});
 
-/**
- * Los mundos de SU valle, ya resueltos contra el manifiesto real. Cada uno trae
- * su `titulo`, `emoji` y `tinte` verdaderos + la geometría de su lugar. Un lugar
- * sin mundo en el manifiesto (el kiosco de aprender) usa su `fallbackMundo`.
- *
- * @param {import('../../services/perfilFincaService').PerfilFinca} [perfil]
- */
-export function construirMundosValle(perfil) {
-  return construirLugaresValle(perfil).map(resolverMundo);
-}
-
-/** Índice por id de una lista de mundos ya construida. */
-export function indexarMundosValle(mundos) {
-  return Object.fromEntries(mundos.map((m) => [m.id, m]));
-}
-
-/**
- * EL VALLE DE MUESTRA (retrocompatible): el catálogo completo resuelto, tal
- * como estaba antes de que el valle se sembrara del perfil. Es el respaldo de
- * quien todavía no recibe un perfil — y el default de toda vista del valle.
- */
-export const MUNDOS_VALLE = LUGARES.map(resolverMundo);
-
-export const MUNDO_VALLE_BY_ID = indexarMundosValle(MUNDOS_VALLE);
+export const MUNDO_VALLE_BY_ID = Object.fromEntries(
+  MUNDOS_VALLE.map((m) => [m.id, m]),
+);
 
 /* ── 1. LA COSA DEL DÍA (una sola, anclada a un lugar) ───────────────────────
  * Un único destello: la alerta del día aparece DONDE toca. Aquí, una helada
@@ -416,162 +70,13 @@ export const COSA_DEL_DIA = {
   accion: { etiqueta: 'Ver cómo proteger del frío', view: 'hoy_finca' },
 };
 
-/* ── EL COMPAÑERO: ANGELITA, LA ABEJA DE LA FINCA ────────────────────────────
- * El avatar-jugador del valle. No es un widget: es un ser al que se cuida (ref
- * Finch). Su ÁNIMO y su ENERGÍA salen del ESTADO REAL de la finca — cuántas
- * matas están vivas, cómo está el agua, y qué clima hace. Datos de MUESTRA: si
- * se productiza, `SALUD_FINCA` viene del backend (logs de matas + Open-Meteo).
- */
-export const SALUD_FINCA = {
-  matasVivas: 34,
-  matasTotal: 41,
-  agua: 0.72, // 0..1 — humedad/reserva de la quebrada y el tanque
-};
-
-/**
- * Ánimo de la abeja según cómo está la finca hoy. Devuelve el ánimo (piel de la
- * creature), la energía (0..1, vivacidad del vuelo/aura) y una frase corta en
- * usted — puntual, sin muros de texto. Prioridad: alerta > sed > clima > salud.
- */
-export function animoDeFinca(clima, { hayAlerta = false, salud = SALUD_FINCA } = {}) {
-  const vivas = salud.matasTotal > 0 ? salud.matasVivas / salud.matasTotal : 1;
-  // Energía base: mezcla de matas vivas y agua, atenuada por el clima duro.
-  // En los filos del día (amanecer/atardecer) la abeja ya baja el ritmo.
-  const climaFactor =
-    clima === 'noche' ? 0.55
-      : clima === 'lluvia' ? 0.8
-        : clima === 'amanecer' || clima === 'atardecer' ? 0.85
-          : 1;
-  const energia = Math.max(0.35, Math.min(1, (vivas * 0.65 + salud.agua * 0.35) * climaFactor));
-
-  if (hayAlerta) {
-    return {
-      animo: 'atento',
-      energia,
-      frase: 'Angelita anda pendiente: hay algo que atender hoy.',
-    };
-  }
-  if (salud.agua < 0.35) {
-    return {
-      animo: 'sediento',
-      energia,
-      frase: 'La abeja la ve con sed: a la finca le hace falta agua.',
-    };
-  }
-  if (clima === 'noche') {
-    return {
-      animo: 'descansa',
-      energia,
-      frase: 'Angelita descansa; la finca duerme tranquila esta noche.',
-    };
-  }
-  if (vivas >= 0.85 && salud.agua >= 0.55) {
-    return {
-      animo: 'pleno',
-      energia,
-      frase: 'Angelita anda contenta: sus matas están vivas y con agua.',
-    };
-  }
-  return {
-    animo: 'sereno',
-    energia,
-    frase: 'La abeja anda serena, echándole ojo a la finca.',
-  };
-}
-
 /* ── 4. EL CLIMA QUE TIÑE EL AMBIENTE ────────────────────────────────────────
  * Reusa las grades de luz de la librería de efectos (src/visual/effects):
  * `grade` = clase modificadora .vfx-grade--* aplicada a un velo DOM sobre el
  * canvas; `cielo`/`luz`/`niebla` alimentan la iluminación de la escena 3D.
  * Una sola geometría, varias "pieles" según el estado real de la vereda.
- *
- * CICLO DIURNO VIVO: además de las pieles de CONDICIÓN (soleado/niebla/lluvia,
- * que vienen del clima real), están las pieles de FRANJA del día (amanecer →
- * mañana → mediodía → tarde → atardecer → noche) que `climaPorHora` recorre
- * con el reloj del dispositivo. Campos del ciclo:
- *   sol         [x,y,z] — posición del sol (o la luna): el ARCO del día, las
- *               sombras giran y se acortan al mediodía;
- *   estrellas   0..1 — fracción del presupuesto de estrellas del tier (true
- *               histórico = 1);
- *   luciernagas 0..2 — multiplicador de densidad de luciérnagas (asoman al
- *               atardecer, plenas de noche; ParticulasAmbientales acota [0,2]);
- *   practicas   0..1 — cuánto encienden las LUCES PRÁCTICAS de la finca (la
- *               ventana y la puerta de la casa, los halos de las ventanas
- *               vivas): la casa prende foco cuando la luz del cielo baja —
- *               al atardecer y en la niebla cerrada, no solo de noche. Campo
- *               opcional (ausente = 0); el cableo vive en Valle3D.
  */
 export const CLIMAS = {
-  amanecer: {
-    etiqueta: 'Amanecer',
-    grade: 'vfx-grade--templado',
-    cielo: ['#a9b4d8', '#f6c9a0'],
-    luz: '#ffc994',
-    ambiente: '#6e5a44',
-    niebla: '#ecc7a2',
-    nieblaLejos: 26,
-    intensidad: 0.95,
-    estrellas: 0.15,
-    sol: [9, 2.5, 5],
-    luciernagas: 0.22, // las últimas se apagan con el alba
-    practicas: 0.35, // la cocina ya está prendida antes de que aclare
-  },
-  manana: {
-    etiqueta: 'Mañana dorada',
-    grade: 'vfx-grade--calido',
-    cielo: ['#a5d3e0', '#f4e3b2'],
-    luz: '#ffe9b8',
-    ambiente: '#8a7a52',
-    niebla: '#eeddb4',
-    nieblaLejos: 36,
-    intensidad: 1.2,
-    estrellas: 0,
-    sol: [8, 6, 4.5],
-    luciernagas: 0,
-  },
-  mediodia: {
-    etiqueta: 'Mediodía',
-    grade: 'vfx-grade--calido',
-    cielo: ['#8fd0e8', '#e9f3ea'],
-    luz: '#fff2d2',
-    ambiente: '#9fb6a0',
-    niebla: '#ddeee6',
-    nieblaLejos: 44,
-    intensidad: 1.35,
-    estrellas: 0,
-    /* Sol CASI CENITAL (DR luz real: a 4-5° N el mediodía es vertical) —
-       sombras cortas y duras pegadas al pie de cada cosa: la seña del
-       mediodía ecuatorial que cualquier campesino reconoce sin leer nada. */
-    sol: [0.8, 14, 1.4],
-    luciernagas: 0,
-  },
-  tarde: {
-    etiqueta: 'Tarde',
-    grade: 'vfx-grade--templado',
-    cielo: ['#9fc4dc', '#f2d9a2'],
-    luz: '#ffdf9f',
-    ambiente: '#8f7247',
-    niebla: '#eccf9d',
-    nieblaLejos: 36,
-    intensidad: 1.1,
-    estrellas: 0,
-    sol: [-5, 7, 4],
-    luciernagas: 0,
-  },
-  atardecer: {
-    etiqueta: 'Atardecer',
-    grade: 'vfx-grade--templado',
-    cielo: ['#c98ba0', '#f0955e'],
-    luz: '#ffb37a',
-    ambiente: '#6e4a3a',
-    niebla: '#e8a97f',
-    nieblaLejos: 24,
-    intensidad: 0.9,
-    estrellas: 0.22, // los primeros luceros se asoman con el sol aún rasante
-    sol: [-8, 2.5, 4.5],
-    luciernagas: 0.55, // el prado empieza a chispear ANTES de que oscurezca
-    practicas: 0.75, // la hora de prender la luz: las ventanas se encienden con el ocaso
-  },
   dorada: {
     etiqueta: 'Hora dorada',
     grade: 'vfx-grade--templado',
@@ -582,8 +87,6 @@ export const CLIMAS = {
     nieblaLejos: 30,
     intensidad: 1.15,
     estrellas: false,
-    sol: [6, 9, 4],
-    luciernagas: 0,
   },
   soleado: {
     etiqueta: 'Soleado',
@@ -595,8 +98,6 @@ export const CLIMAS = {
     nieblaLejos: 38,
     intensidad: 1.35,
     estrellas: false,
-    sol: [2.5, 13, 2], // alto y duro: el sol ecuatorial de día claro
-    luciernagas: 0,
   },
   niebla: {
     etiqueta: 'Niebla',
@@ -608,9 +109,6 @@ export const CLIMAS = {
     nieblaLejos: 15,
     intensidad: 0.85,
     estrellas: false,
-    sol: [6, 9, 4],
-    luciernagas: 0,
-    practicas: 0.4, // en la niebla cerrada la ventana de la casa es el faro
   },
   lluvia: {
     etiqueta: 'Lluvia',
@@ -623,72 +121,37 @@ export const CLIMAS = {
     intensidad: 0.7,
     lluviaViva: true,
     estrellas: false,
-    sol: [6, 9, 4],
-    luciernagas: 0,
-    practicas: 0.35, // el aguacero oscurece: adentro se prende la luz
-  },
-  helada: {
-    /* La MADRUGADA DE HELADA (agroclimático honesto): noche/pre-alba
-       DESPEJADA — el suelo irradia su calor al cielo abierto y escarcha.
-       Por eso aquí hay MÁS estrellas y la niebla se abre (aire limpio y
-       quieto), con la luz azul-acero del frío. La escarcha 3D la pone
-       HeladaValle (atmosfera/clima); este preset viste luz y cielo. */
-    etiqueta: 'Helada',
-    grade: 'vfx-grade--glacial',
-    cielo: ['#16294e', '#3d5b8a'],
-    luz: '#c3d8f2',
-    ambiente: '#3a4f74',
-    niebla: '#243a5e',
-    nieblaLejos: 40,
-    intensidad: 0.8,
-    estrellas: 0.7,
-    sol: [8, 2, 4],
-    luciernagas: 0,
   },
   noche: {
-    /* DÍA POR NOCHE (dirección de fotografía): nadie filma la noche a oscuras.
-       Azul índigo levantado (se VE), luz de luna plateada con intensidad de
-       contraluz, y la niebla abierta para que la ladera entera se lea. Las
-       prácticas (ventana de la casa, luciérnagas, el faro) hacen el resto. */
     etiqueta: 'Noche',
     grade: 'vfx-grade--glacial',
-    cielo: ['#152a52', '#1e3d6e'],
-    luz: '#b3cdf0',
-    ambiente: '#35486b',
-    niebla: '#1d3153',
-    nieblaLejos: 30,
-    intensidad: 0.72,
+    cielo: ['#0b1830', '#132a4e'],
+    luz: '#9fc2e8',
+    ambiente: '#26364f',
+    niebla: '#13203a',
+    nieblaLejos: 22,
+    intensidad: 0.5,
     estrellas: true,
-    /* LUZ MOTIVADA (regla Nolan/Hoytema: toda luz tiene autora visible): la
-       direccional nocturna sale DE la luna que se ve en el cielo — el disco
-       vive en Valle3D.POS_LUNA [-21, 3.4, -8], bajo sobre el filo del
-       páramo. Antes la luz caía desde [-6,7,-4] (una luna alta que no
-       existía en el cuadro); ahora la dirección coincide en acimut y en
-       altura rasante: CONTRALUZ de plata — las lomas que miran a la cámara
-       caen a la penumbra azul del día-por-noche y la quebrada emisiva se
-       vuelve el sendero que más brilla. */
-    sol: [-13, 4.6, -5.2],
-    luciernagas: 1.5, // plenas: la constelación baja del valle (sigue siendo 1 draw call)
-    practicas: 1,
   },
 };
 
 export const ORDEN_CLIMA = ['dorada', 'soleado', 'niebla', 'lluvia', 'noche'];
 
 /**
- * Franja del día según la hora REAL del dispositivo (ancla de veracidad, como
- * Apple Weather): el valle recorre el ciclo completo — amanecer → mañana →
- * mediodía → tarde → atardecer → noche. Un dato verdadero, no decoración
- * inventada. Delegado en cielosHoraData.horaDeReloj: LA fuente de franjas,
- * compartida con los mundos 3D.
- * @returns {'amanecer'|'manana'|'mediodia'|'tarde'|'atardecer'|'noche'}
+ * Estado por defecto según la hora REAL del dispositivo (ancla de veracidad,
+ * como Apple Weather): madrugada/noche → noche; media mañana → soleado; tarde
+ * → hora dorada. Un dato verdadero, no decoración inventada.
  */
 export function climaPorHora(fecha = new Date()) {
-  return horaDeReloj(fecha);
+  const h = fecha.getHours();
+  if (h >= 19 || h < 5) return 'noche';
+  if (h >= 16) return 'dorada';
+  if (h >= 11) return 'soleado';
+  return 'dorada';
 }
 
 /* ── 3. LO QUE EL AGENTE DICE AL PASAR ───────────────────────────────────────
- * El compañero (abeja) narra el mundo cuando la cámara viaja hacia él. Texto
+ * El compañero (colibrí) narra el mundo cuando la cámara viaja hacia él. Texto
  * corto, cálido, en usted; se lee por voz (Web Speech API) si el equipo la trae.
  */
 export const NARRACION = {
@@ -696,29 +159,12 @@ export const NARRACION = {
     'Bienvenido a su finca. Toque un lugar del valle para viajar hasta él, o toque la señal que brilla para saber qué toca hacer hoy.',
   cultivos:
     'Aquí está su milpa: maíz, fríjol y calabaza creciendo juntos como las tres hermanas.',
-  milpa:
-    'La milpa: maíz, fríjol y calabaza sembrados juntos — las tres hermanas que se cuidan entre ellas. El maíz presta el tutor, el fríjol abona y la calabaza tapa el suelo.',
-  cafe: 'El cafetal bajo sombra. El café vive debajo del guamo, cargado de cereza roja. De ahí sale el grano: cereza, pergamino y oro. En la finca no se tuesta.',
+  cafe: 'El cafetal en la ladera. Estas maticas ya están cargando para la próxima cosecha.',
   suelo: 'Las eras y el semillero. La tierra de aquí es la que pide cuidado esta noche.',
   agua: 'La quebrada que baja del monte. De aquí sale el agua para toda la finca.',
-  animales:
-    'El potrero, dividido en apartos por cercas vivas de matarratón, nacedero y botón de oro: la cerca que también es comida y sombra. Los animales andan regados, cada grupo en su aparto.',
+  animales: 'El corral. Las gallinas y el ganado que cierran el ciclo del abono.',
   sanidad:
     'La huerta de la casa. Aquí es donde primero se ven las plagas, para atajarlas a tiempo.',
   disenio: 'El monte y los árboles que sembró. La finca también es el bosque que la abraza.',
   clima: 'Desde aquí se lee el cielo: lo que viene, y qué conviene hacer con la finca.',
-  mercado:
-    'La plaza campesina. Aquí llega su cosecha derecho a la mesa: venda directo, con su sello y a precio justo.',
-  pisos:
-    'Suba por la montaña: del cálido al páramo, cada piso con lo suyo. Arriba manda el frailejón, que le peina el agua a la niebla y la entrega despacio al suelo. Por eso el páramo se cuida, no se ara.',
-  semillero:
-    'El invernadero: el micro-mundo donde nace la matica. La semilla despierta en la bandeja bajo el plástico, se repica a la bolsa y se endurece al sol antes de irse al campo. Del grano fuerte sale la finca fuerte.',
-  abono:
-    'La biofábrica. Del potrero sale el estiércol, aquí se vuelve abono: la pila trabaja sola, con su calorcito y sus lombrices. El ciclo que no bota nada.',
-  aprender:
-    'El kiosco del saber: el tablero donde la finca enseña. Aquí van llegando los juegos y las lecciones del monte.',
-  casa:
-    'Esta es su casa: el corazón de la finca y la puerta de sus mundos. Toque una de las seis puertas para salir a donde necesite.',
-  paramo:
-    'El páramo de su finca: los frailejones le peinan el agua a la niebla y se la entregan despacio al suelo. Por eso el páramo se cuida, no se ara. Entre y véalo de cerca.',
 };

@@ -402,6 +402,11 @@ const MontanaMundosMockup = lazy(() => import('./mockups/MontanaMundos'));
 // finca — la entrada respira la hora real de la vereda, una sola cosa brilla).
 // Ruta #/mockups/entrada-campesina — sin gate ni sesión (datos de muestra).
 const EntradaCampesinaMockup = lazy(() => import('./mockups/EntradaCampesina'));
+// Mockup dev "El valle de mi finca" (entrada definitiva #2, sin límites): un
+// diorama 3D isométrico de la finca (React-Three-Fiber sobre WebGL2, chunk
+// perezoso) donde los 4 sí-o-sí viven en el espacio. Ruta #/mockups/entrada-3d
+// — sin gate ni sesión (datos de muestra, degrada limpio a SVG sin WebGL).
+const EntradaValle3DMockup = lazy(() => import('./mockups/EntradaValle3D'));
 const BiopreparadosScreen = lazy(() => import('./components/biopreparados/BiopreparadosScreen'));
 const FarmMap = lazy(() => import('./components/FarmMap'));
 const WorkerDashboard = lazy(() => import('./components/WorkerDashboard').then(m => ({ default: m.WorkerDashboard })));
@@ -860,6 +865,7 @@ const HASH_VIEW_ROUTES = {
   'mockups/boton-anarquia': 'mockup_boton_anarquia',
   'mockups/montana-mundos': 'mockup_montana_mundos',
   'mockups/entrada-campesina': 'mockup_entrada_campesina',
+  'mockups/entrada-3d': 'mockup_entrada_3d',
   agente: 'agente',
   'ciclo-vivo': 'ciclo_vivo',
   faq: 'faq',
@@ -1433,6 +1439,11 @@ export default function App() {
     // — se monta sin sesión (datos de muestra, no toca datos reales).
     if (hash === 'mockups/entrada-campesina') {
       Promise.resolve().then(() => navigate('mockup_entrada_campesina'));
+    // Mockups dev (#/mockups/*): vistas aisladas de decisión visual — se montan
+    // SIN sesión (datos de muestra, no tocan datos reales).
+    if (hash.startsWith('mockups/') && HASH_VIEW_ROUTES[hash]) {
+      const vistaMockup = HASH_VIEW_ROUTES[hash];
+      Promise.resolve().then(() => navigate(vistaMockup));
       return;
     }
 
@@ -1509,6 +1520,8 @@ export default function App() {
       }
       // Mockup dev: sin gate ni sesión (datos de muestra).
       if (routeView === 'mockup_entrada_campesina') {
+      // Mockups dev (#/mockups/*): sin gate de sesión.
+      if (routeView.startsWith('mockup_')) {
         navigate(routeView);
         return;
       }
@@ -2964,6 +2977,15 @@ export default function App() {
           <ErrorBoundary>
             <ErrorFallback moduleName="Mockup Entrada Campesina">
               <EntradaCampesinaMockup onBack={() => navigate('dashboard')} />
+      case 'mockup_entrada_3d':
+        // Mockup "El valle de mi finca" (entrada definitiva #2): diorama 3D
+        // isométrico navegable (R3F/WebGL2, chunk perezoso) con los 4 sí-o-sí
+        // en el espacio. Full-screen, sin gate — decisión visual. Degrada a
+        // SVG sin WebGL. onBack vuelve al dashboard.
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="El valle de mi finca (3D)">
+              <EntradaValle3DMockup onBack={() => navigate('dashboard')} />
             </ErrorFallback>
           </ErrorBoundary>
         );
