@@ -157,9 +157,6 @@ const HomeCampesinoMockup = lazy(() => import('./mockups/HomeCampesino'));
 const BotonAnarquiaMockup = lazy(() => import('./mockups/BotonAnarquia'));
 // El cruce del agente 3D → plano (la abeja cruza el túnel y aterriza de avatar).
 const TransicionAgentePlanoMockup = lazy(() => import('./mockups/TransicionAgentePlano'));
-const AvatarGameBiopunk = lazy(() => import('./mockups/AvatarGameBiopunk'));
-const AvatarGameVerdeVivo = lazy(() => import('./mockups/AvatarGameVerdeVivo'));
-const AvatarGameLibre = lazy(() => import('./mockups/AvatarGameLibre'));
 // Piezas de decisión visual (acuarela, clima, diagnóstico, evidencia, guardianes).
 const MapaAcuarelaMockup = lazy(() => import('./mockups/MapaAcuarela'));
 const ClimaAtmosferaMockup = lazy(() => import('./mockups/ClimaAtmosfera'));
@@ -381,32 +378,12 @@ const WorkerHistory = lazy(() => import('./components/WorkerHistory'));
 const BitacoraEntryDetail = lazy(() => import('./components/BitacoraEntryDetail'));
 const InformesScreen = lazy(() => import('./components/InformesScreen'));
 const InventoryDashboard = lazy(() => import('./components/InventoryDashboard').then(m => ({ default: m.InventoryDashboard })));
-// Mockup dev del nuevo FAB del agente (Ⓐ de herramientas que se ensamblan).
-// Ruta #/mockups/boton-anarquia — sin gate ni sesión (no toca datos reales).
-const BotonAnarquiaMockup = lazy(() => import('./mockups/BotonAnarquia'));
 // InventoryPage orquesta la capa de auditoría/reconciliación de inventario
 // (InventoryAuditTrail + InventoryAuditDashboard + InventoryEventTimeline),
 // completa pero huérfana (0 rutas) antes de este wiring — descubribilidad
 // 2026-06-30. Se alcanza desde 'bodega' vía el botón "Auditoría y
 // reconciliación", o directo por hash (#auditoria-inventario).
 const InventoryPage = lazy(() => import('./pages/InventoryPage'));
-// Mockup dev del HOME CON OJOS DE CAMPESINO (rediseño de jerarquía del home:
-// preguntar + anotar + 6 puertas grandes). Ruta #/mockups/home-campesino —
-// sin gate ni sesión (datos de muestra, no toca datos reales).
-const HomeCampesinoMockup = lazy(() => import('./mockups/HomeCampesino'));
-// Mockup dev "La Montaña de los Mundos" (navegación como paisaje vertical de
-// pisos térmicos, 3 direcciones artísticas para decidir dirección visual).
-// Ruta #/mockups/montana-mundos — sin gate ni sesión (datos de muestra).
-const MontanaMundosMockup = lazy(() => import('./mockups/MontanaMundos'));
-// Mockup dev "La entrada definitiva" (dirección campesina: el lucero de mi
-// finca — la entrada respira la hora real de la vereda, una sola cosa brilla).
-// Ruta #/mockups/entrada-campesina — sin gate ni sesión (datos de muestra).
-const EntradaCampesinaMockup = lazy(() => import('./mockups/EntradaCampesina'));
-// Mockup dev "El valle de mi finca" (entrada definitiva #2, sin límites): un
-// diorama 3D isométrico de la finca (React-Three-Fiber sobre WebGL2, chunk
-// perezoso) donde los 4 sí-o-sí viven en el espacio. Ruta #/mockups/entrada-3d
-// — sin gate ni sesión (datos de muestra, degrada limpio a SVG sin WebGL).
-const EntradaValle3DMockup = lazy(() => import('./mockups/EntradaValle3D'));
 const BiopreparadosScreen = lazy(() => import('./components/biopreparados/BiopreparadosScreen'));
 const FarmMap = lazy(() => import('./components/FarmMap'));
 const WorkerDashboard = lazy(() => import('./components/WorkerDashboard').then(m => ({ default: m.WorkerDashboard })));
@@ -422,7 +399,6 @@ const ConejosScreen = lazy(() => import('./components/ConejosScreen'));
 const CaprinosScreen = lazy(() => import('./components/CaprinosScreen'));
 const EstiercolScreen = lazy(() => import('./components/EstiercolScreen'));
 const CompostScreen = lazy(() => import('./components/CompostScreen'));
-const EstiercolScreen = lazy(() => import('./components/EstiercolScreen'));
 const AgentScreen = lazy(() => import('./components/AgentScreen/AgentScreen'));
 const OnboardingProfile = lazy(() => import('./components/OnboardingProfile'));
 const OnboardingCondensado = lazy(() => import('./components/OnboardingCondensado'));
@@ -497,7 +473,8 @@ const CanaScreen = lazy(() => import('./components/cana/CanaScreen'));
 // mango (como el café o la caña), más allá de la ficha en Frutales.
 // Photo-forward (patrón Café) y groundeado en el grafo (mangifera_indica:
 // pest_controllers → antracnosis/Anastrepha; compatible_with) + perennialCycles
-// (AGROSAVIA); honestidad térmica (tierra cálida <1200 msnm; >1800 NO va).
+// (AGROSAVIA); honestidad térmica (tierra cálida por debajo de 1200 msnm;
+// por encima de 1800 NO va).
 const MangoScreen = lazy(() => import('./components/mango/MangoScreen'));
 const RestauracionScreen = lazy(() => import('./components/restauracion/RestauracionScreen'));
 // Mundo "Quinua y granos andinos": recuperación de los granos ancestrales de la
@@ -1403,6 +1380,8 @@ export default function App() {
     const mockupView = MOCKUP_HASH_ROUTES[hash];
     if (mockupView) {
       Promise.resolve().then(() => navigate(mockupView));
+      return;
+    }
     // Mockup dev (#/mockups/avatar-biopunk): vista aislada con datos de
     // muestra — se monta sin sesión (no lee ni escribe datos reales).
     if (hash === 'mockups/avatar-biopunk') {
@@ -1439,6 +1418,8 @@ export default function App() {
     // — se monta sin sesión (datos de muestra, no toca datos reales).
     if (hash === 'mockups/entrada-campesina') {
       Promise.resolve().then(() => navigate('mockup_entrada_campesina'));
+      return;
+    }
     // Mockups dev (#/mockups/*): vistas aisladas de decisión visual — se montan
     // SIN sesión (datos de muestra, no tocan datos reales).
     if (hash.startsWith('mockups/') && HASH_VIEW_ROUTES[hash]) {
@@ -1520,6 +1501,9 @@ export default function App() {
       }
       // Mockup dev: sin gate ni sesión (datos de muestra).
       if (routeView === 'mockup_entrada_campesina') {
+        navigate(routeView);
+        return;
+      }
       // Mockups dev (#/mockups/*): sin gate de sesión.
       if (routeView.startsWith('mockup_')) {
         navigate(routeView);
@@ -2977,6 +2961,9 @@ export default function App() {
           <ErrorBoundary>
             <ErrorFallback moduleName="Mockup Entrada Campesina">
               <EntradaCampesinaMockup onBack={() => navigate('dashboard')} />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
       case 'mockup_entrada_3d':
         // Mockup "El valle de mi finca" (entrada definitiva #2): diorama 3D
         // isométrico navegable (R3F/WebGL2, chunk perezoso) con los 4 sí-o-sí
@@ -3911,7 +3898,8 @@ export default function App() {
         // del mango, photo-forward con fotos CC y groundeado en el grafo
         // (mangifera_indica: antracnosis/Anastrepha vía pest_controllers,
         // compatible_with) + perennialCycles (AGROSAVIA). Honestidad térmica:
-        // tierra cálida (<1200 msnm) sí, por encima de ~1800 NO va. Sin dosis
+        // tierra cálida por debajo de 1200 msnm sí, por encima de ~1800 NO va.
+        // Sin dosis
         // químicas inventadas (cifras de sitio = "dato en camino").
         return (
           <ErrorBoundary>
@@ -4016,8 +4004,8 @@ export default function App() {
       case 'mundo':
         // LOS MUNDOS DE MI FINCA (reestructuración 2.0 del home, V4): la
         // pantalla de un mundo agrupa sus funciones y RE-RUTEA a las vistas
-        // reales existentes. data = { mundo: id } (mundosFinca.js); sin data o
-        // con id desconocido muestra el índice de mundos (fallback honesto).
+        // reales existentes. Recibe un id de mundo desde mundosFinca.js; sin
+        // dato o con id desconocido muestra el índice de mundos (fallback honesto).
         return (
           <ErrorBoundary>
             <ErrorFallback moduleName="Mundos de la finca">
@@ -4174,22 +4162,17 @@ export default function App() {
         // ruta un usuario no autorizado llega a esta vista, NO montamos el
         // módulo — devolvemos el fallback estándar. Las navegaciones a #glaciar
         // ya redirigen al dashboard antes de llegar aquí (ver effects de ruta).
-        if (!tieneAccesoGlaciarActual()) {
-          return (
-            <ErrorBoundary>
-              <ErrorFallback moduleName="Glaciar">
-                <div className="h-[100dvh] bg-slate-950 text-white flex items-center justify-center">Vista no disponible</div>
-              </ErrorFallback>
-            </ErrorBoundary>
-          );
-        }
         return (
           <ErrorBoundary>
             <ErrorFallback moduleName="Glaciar">
-              <GlaciarReporteScreen
-                onBack={() => navigate('dashboard')}
-                onVerHistorial={() => navigate('glaciar_historial')}
-              />
+              {!tieneAccesoGlaciarActual() ? (
+                <div className="h-[100dvh] bg-slate-950 text-white flex items-center justify-center">Vista no disponible</div>
+              ) : (
+                <GlaciarReporteScreen
+                  onBack={() => navigate('dashboard')}
+                  onVerHistorial={() => navigate('glaciar_historial')}
+                />
+              )}
             </ErrorFallback>
           </ErrorBoundary>
         );
@@ -4200,16 +4183,13 @@ export default function App() {
         // ruta un usuario no autorizado llega a esta vista, NO montamos el
         // módulo — devolvemos el fallback estándar. Las navegaciones a
         // #glaciar-historial ya redirigen al dashboard antes de llegar aquí.
-        if (!tieneAccesoGlaciarActual()) {
-          return (
-            <ErrorBoundary>
-              <div className="h-[100dvh] bg-slate-950 text-white flex items-center justify-center">Vista no disponible</div>
-            </ErrorBoundary>
-          );
-        }
         return (
           <ErrorBoundary>
-            <GlaciarHistorialScreen onBack={() => navigate('dashboard')} onHome={() => navigate('dashboard')} />
+            {!tieneAccesoGlaciarActual() ? (
+              <div className="h-[100dvh] bg-slate-950 text-white flex items-center justify-center">Vista no disponible</div>
+            ) : (
+              <GlaciarHistorialScreen onBack={() => navigate('dashboard')} onHome={() => navigate('dashboard')} />
+            )}
           </ErrorBoundary>
         );
       case 'perfil':
@@ -4225,19 +4205,14 @@ export default function App() {
         // feature flag VITE_FEATURE_EXTENSIONISTA + rol (config/extensionistaAccess).
         // Las rutas a #extensionista ya redirigen al dashboard antes de llegar
         // aquí si el usuario no tiene rol; guarda defensiva por si se monta directo.
-        if (!esExtensionistaActual()) {
-          return (
-            <ErrorBoundary>
-              <ErrorFallback moduleName="Extensionista">
-                <div className="h-[100dvh] bg-slate-950 text-white flex items-center justify-center">Vista no disponible</div>
-              </ErrorFallback>
-            </ErrorBoundary>
-          );
-        }
         return (
           <ErrorBoundary>
             <ErrorFallback moduleName="Extensionista">
-              <ExtensionistaScreen onBack={() => navigate('dashboard')} onHome={() => navigate('dashboard')} />
+              {!esExtensionistaActual() ? (
+                <div className="h-[100dvh] bg-slate-950 text-white flex items-center justify-center">Vista no disponible</div>
+              ) : (
+                <ExtensionistaScreen onBack={() => navigate('dashboard')} onHome={() => navigate('dashboard')} />
+              )}
             </ErrorFallback>
           </ErrorBoundary>
         );
@@ -4247,19 +4222,14 @@ export default function App() {
         // por roleService.can('user:manage') (dueño o esposa). La ruta ya
         // redirige al dashboard antes de llegar aquí si el actor no tiene
         // el permiso; guarda defensiva por si se monta directo.
-        if (!roleCan(undefined, 'user:manage')) {
-          return (
-            <ErrorBoundary>
-              <ErrorFallback moduleName="Usuarios">
-                <div className="h-[100dvh] bg-slate-950 text-white flex items-center justify-center">Vista no disponible</div>
-              </ErrorFallback>
-            </ErrorBoundary>
-          );
-        }
         return (
           <ErrorBoundary>
             <ErrorFallback moduleName="Usuarios">
-              <GestionUsuariosScreen onBack={() => navigate('dashboard')} onHome={() => navigate('dashboard')} />
+              {!roleCan(undefined, 'user:manage') ? (
+                <div className="h-[100dvh] bg-slate-950 text-white flex items-center justify-center">Vista no disponible</div>
+              ) : (
+                <GestionUsuariosScreen onBack={() => navigate('dashboard')} onHome={() => navigate('dashboard')} />
+              )}
             </ErrorFallback>
           </ErrorBoundary>
         );
@@ -4313,28 +4283,18 @@ export default function App() {
         // inalcanzable porque el componente nunca monta. Chequear navigator.onLine
         // aquí deja ver el aviso claro ("el asistente necesita internet; tus datos
         // sí funcionan sin conexión") aunque el chunk no esté disponible.
-        if (!isAppOnline) {
-          return (
-            <ErrorBoundary>
-              <AgentOfflineGuard onBack={() => navigate('dashboard')} />
-            </ErrorBoundary>
-          );
-        }
-        // 2026-05-28: pasamos currentViewData como initialContext para que
-        // notificaciones críticas (helada, alerta clima) lleguen al agente
-        // con prompt pre-cargado + cita de la fuente (IDEAM/NOAA/CIIFEN/
-        // Open-Meteo) — operador no tiene que re-tipear "tengo alerta de
-        // helada, ¿qué hago?". Si el usuario entra al agente normal (FAB,
-        // tile, etc.), currentViewData es null y el comportamiento previo
-        // se preserva sin cambios.
         return (
           <ErrorBoundary>
             <ErrorFallback moduleName="Agente">
-              <AgentScreen
-                onBack={() => navigate('dashboard')}
-                onNavigate={navigate}
-                initialContext={currentViewData}
-              />
+              {!isAppOnline ? (
+                <AgentOfflineGuard onBack={() => navigate('dashboard')} />
+              ) : (
+                <AgentScreen
+                  onBack={() => navigate('dashboard')}
+                  onNavigate={navigate}
+                  initialContext={currentViewData}
+                />
+              )}
             </ErrorFallback>
           </ErrorBoundary>
         );
