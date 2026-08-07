@@ -20,6 +20,26 @@
   max-width: 46rem;
   margin: 0 auto 1rem;
 }
+.m3dc__volver {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  margin: 0 0 0.65rem;
+  border: 1px solid rgba(76, 127, 160, 0.26);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.88);
+  color: #2d5f81;
+  padding: 0.4rem 0.82rem;
+  font-size: 0.84rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+.m3dc__volver:hover,
+.m3dc__volver:focus-visible {
+  background: #fff;
+  border-color: var(--m3dc-a);
+  outline: none;
+}
 .m3dc__kicker {
   margin: 0 0 0.2rem;
   font-size: 0.78rem;
