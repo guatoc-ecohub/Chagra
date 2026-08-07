@@ -119,6 +119,7 @@ import { CriaturaNocturnaAvatar } from '../../components/dashboard/CriaturasNoct
    árboles, matas, vecinos) — sin ella los objetos flotan sobre la loma.
    2 draw calls instanciados, textura radial pre-horneada, cero costo/frame. */
 import SombrasContacto from './SombrasContacto.jsx';
+import EntsDelValle from './EntsDelValle.jsx';
 import './rotulosValle3D.css';
 import {
   MUNDOS_VALLE,
@@ -2793,6 +2794,10 @@ function Escena({ clima, focoId, animo, energia, onEntrar, onAlerta, onCasa = nu
       {!reducedMotion && <MonitorRendimiento key={tier} tier={tier} />}
       {/* Fondo + niebla + luces, amortiguadas hacia la franja del día. */}
       <AtmosferaValle c={c} perfil={perfil} reducedMotion={reducedMotion} />
+      {/* Los Guardianes del gradiente — el Ent del piso térmico + vecinos.
+          pisoTermico=null → default (templado/roble); cablear el valor real
+          cuando el valle exponga el piso. Rescatado del huérfano 2026-08-01. */}
+      <EntsDelValle pisoTermico={null} alturaDe={alturaTerreno} tier={tier} reducedMotion={reducedMotion} />
       {fracEstrellas > 0 && perfil.estrellas > 0 && (
         <Stars
           radius={40}
