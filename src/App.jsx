@@ -2942,64 +2942,10 @@ export default function App() {
             />
           </ErrorBoundary>
         );
-      case 'mockup_montana_mundos':
-        // Mockup dev "La Montaña de los Mundos": navegación como paisaje de
-        // pisos térmicos, 3 direcciones artísticas. Full-screen, sin gate —
-        // solo para decidir dirección visual.
-        return (
-          <ErrorBoundary>
-            <ErrorFallback moduleName="Mockup Montaña de los Mundos">
-              <MontanaMundosMockup onBack={() => navigate('dashboard')} />
-            </ErrorFallback>
-          </ErrorBoundary>
-        );
-      case 'mockup_entrada_campesina':
-        // Mockup dev "La entrada definitiva" (dirección campesina): la entrada
-        // respira la hora real de la vereda, una sola cosa brilla (el lucero
-        // del día). Full-screen, sin gate — solo para decidir dirección visual.
-        return (
-          <ErrorBoundary>
-            <ErrorFallback moduleName="Mockup Entrada Campesina">
-              <EntradaCampesinaMockup onBack={() => navigate('dashboard')} />
-            </ErrorFallback>
-          </ErrorBoundary>
-        );
-      case 'mockup_entrada_3d':
-        // Mockup "El valle de mi finca" (entrada definitiva #2): diorama 3D
-        // isométrico navegable (R3F/WebGL2, chunk perezoso) con los 4 sí-o-sí
-        // en el espacio. Full-screen, sin gate — decisión visual. Degrada a
-        // SVG sin WebGL. onBack vuelve al dashboard.
-        return (
-          <ErrorBoundary>
-            <ErrorFallback moduleName="El valle de mi finca (3D)">
-              <EntradaValle3DMockup onBack={() => navigate('dashboard')} />
-            </ErrorFallback>
-          </ErrorBoundary>
-        );
       case 'dashboard':
         return (
           <ErrorBoundary>
             <DashboardLiveView onNavigate={navigate} onLogout={handleLogout} lastLogMessage={lastLogMessage} />
-          </ErrorBoundary>
-        );
-      case 'mockup_boton_anarquia':
-        // Mockup dev del nuevo FAB del agente (3 variantes animadas de la Ⓐ
-        // de herramientas). Full-screen, sin gate — solo para decidir dirección.
-        return (
-          <ErrorBoundary>
-            <ErrorFallback moduleName="Mockup Botón Anarquía">
-              <BotonAnarquiaMockup onBack={() => navigate('dashboard')} />
-            </ErrorFallback>
-          </ErrorBoundary>
-        );
-      case 'mockup_home_campesino':
-        // Mockup dev del home con ojos de campesino (rediseño de jerarquía).
-        // Full-screen, sin gate — solo para decidir dirección.
-        return (
-          <ErrorBoundary>
-            <ErrorFallback moduleName="Mockup Home Campesino">
-              <HomeCampesinoMockup onBack={() => navigate('dashboard')} />
-            </ErrorFallback>
           </ErrorBoundary>
         );
       case 'hoy_finca':
@@ -3057,32 +3003,6 @@ export default function App() {
                 onBack={() => navigate('juego')}
                 onHome={() => navigate('dashboard')}
               />
-            </ErrorFallback>
-          </ErrorBoundary>
-        );
-      case 'mockup_avatar_biopunk':
-        // Mockup dev del juego final (El Espíritu de tu Finca, biopunk).
-        // Full-screen, datos de muestra, sin gate — solo para decidir dirección.
-        return (
-          <ErrorBoundary>
-            <ErrorFallback moduleName="Mockup Avatar Biopunk">
-              <AvatarGameBiopunk onBack={() => navigate('dashboard')} />
-            </ErrorFallback>
-          </ErrorBoundary>
-        );
-      case 'mockup_avatar_verde_vivo':
-        return (
-          <ErrorBoundary>
-            <ErrorFallback moduleName="Mockup Avatar Verde Vivo">
-              <AvatarGameVerdeVivo onBack={() => navigate('dashboard')} />
-            </ErrorFallback>
-          </ErrorBoundary>
-        );
-      case 'mockup_avatar_libre':
-        return (
-          <ErrorBoundary>
-            <ErrorFallback moduleName="Mockup Avatar Libre">
-              <AvatarGameLibre onBack={() => navigate('dashboard')} />
             </ErrorFallback>
           </ErrorBoundary>
         );
