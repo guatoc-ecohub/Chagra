@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Adopta un Frailejón - Chagra</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #a8e6cf 0%, #88d8b0 50%, #7ec8a3 100%);
+            min-height: 100vh;
+            color: #2d4a3e;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            text-align: center;
+            padding: 30px 0;
+            color: #1a3a2e;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            color: #1a5a3e;
+        }
+
+        .subtitle {
+            font-size: 1.1rem;
+            color: #2d5a4e;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .frailejon-selection {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            margin: 30px 0;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .species-option {
+            border: 3px solid #7ec8a3;
+            border-radius: 12px;
+            padding: 20px;
+            margin: 15px 0;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+        }
+
+        .species-option:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(126, 200, 163, 0.3);
+            border-color: #5a9a7e;
+        }
+
+        .species-option.selected {
+            border-color: #2d7a5e;
+            background: linear-gradient(135deg, #dcfce7 0%, #bbf7d0 100%);
+        }
+
+        .species-name {
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: #1a5a3e;
+            margin-bottom: 8px;
+        }
+
+        .species-scientific {
+            font-style: italic;
+            color: #4a7a6e;
+            margin-bottom: 10px;
+        }
+
+        .species-description {
+            font-size: 0.95rem;
+            color: #3d6a5e;
+            line-height: 1.5;
+        }
+
+        .adoption-form {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            margin: 30px 0;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            display: none;
+        }
+
+        .adoption-form.visible {
+            display: block;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #2d5a4e;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #7ec8a3;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+        }
+
+        input[type="text"]:focus {
+            outline: none;
+            border-color: #2d7a5e;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #7ec8a3 0%, #5a9a7e 100%);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+        }
+
+        .btn:hover {
+            background: linear-gradient(135deg, #5a9a7e 0%, #3d7a5e 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(126, 200, 163, 0.4);
+        }
+
+        .timeline {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            margin: 30px 0;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            display: none;
+        }
+
+        .timeline.visible {
+            display: block;
+        }
+
+        .timeline-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .frailejon-profile {
+            background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+            border-radius: 12px;
+            padding: 20px;
+            margin: 20px 0;
+            border: 2px solid #7ec8a3;
+        }
+
+        .frailejon-name {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: #1a5a3e;
+            text-align: center;
+            margin-bottom: 15px;
+        }
+
+        .frailejon-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: 8px;
+            padding: 15px;
+            text-align: center;
+            border: 2px solid #a8e6cf;
+        }
+
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #2d7a5e;
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            font-size: 0.85rem;
+            color: #4a7a6e;
+        }
+
+        .timeline-events {
+            position: relative;
+            margin: 30px 0;
+        }
+
+        .timeline-event {
+            position: relative;
+            padding: 20px;
+            margin: 20px 0;
+            background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+            border-radius: 10px;
+            border-left: 4px solid #7ec8a3;
+        }
+
+        .event-year {
+            font-weight: bold;
+            color: #2d7a5e;
+            font-size: 1.2rem;
+            margin-bottom: 8px;
+        }
+
+        .event-title {
+            font-weight: 600;
+            color: #1a5a3e;
+            margin-bottom: 8px;
+        }
+
+        .event-description {
+            color: #3d6a5e;
+            line-height: 1.5;
+        }
+
+        .event-highlight {
+            background: #fef3c7;
+            border-left-color: #f59e0b;
+        }
+
+        .event-soil-warning {
+            background: #fee2e2;
+            border-left-color: #ef4444;
+        }
+
+        .event-soil-good {
+            background: #dcfce7;
+            border-left-color: #22c55e;
+        }
+
+        .info-card {
+            background: linear-gradient(135deg, #fef9c3 0%, #fef08a 100%);
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            border: 2px solid #f59e0b;
+        }
+
+        .info-card h3 {
+            color: #92400e;
+            margin-bottom: 10px;
+        }
+
+        .info-card p {
+            color: #784c0f;
+            line-height: 1.6;
+        }
+
+        .growth-rate-note {
+            background: linear-gradient(135deg, #e0f2fe 0%, #bae6fd 100%);
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            border: 2px solid #0284c7;
+        }
+
+        .growth-rate-note strong {
+            color: #0c4a6e;
+        }
+
+        .growth-rate-note p {
+            color: #0c4a6e;
+            line-height: 1.6;
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2rem;
+            }
+
+            .frailejon-stats {
+                grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🌿 Adopta un Frailejón</h1>
+            <p class="subtitle">Conecta con el ecosistema del páramo de Guatoc y adopta un frailejón virtual. Acompáñalo en su crecimiento a lo largo de los años.</p>
+        </header>
+
+        <div class="frailejon-selection" id="selection">
+            <h2 style="color: #1a5a3e; margin-bottom: 20px;">Elige tu frailejón</h2>
+            
+            <div class="species-option" data-species="grandiflora">
+                <div class="species-name">🌿 Frailejón Mayor (Espeletia grandiflora)</div>
+                <div class="species-scientific">Espeletia grandiflora Humb. & Bonpl.</div>
+                <div class="species-description">
+                    Especie emblemática de los páramos de la Cordillera Oriental. Puede alcanzar hasta 2 metros de altura 
+                    y vivir más de 200 años. Crece aproximadamente 1 cm por año. Especies nativa protegida.
+                </div>
+            </div>
+
+            <div class="species-option" data-species="argentea">
+                <div class="species-name">✨ Frailejón Plateado (Espeletia argentea)</div>
+                <div class="species-scientific">Espeletia argentea Bonpl. & Humb.</div>
+                <div class="species-description">
+                    Con sus hojas plateadas cubiertas de pelos lanosos, este frailejón refleja la intensa radiación UV 
+                    del páramo. Alcanza 1.5 metros de altura y es clave para la captura de agua de niebla.
+                </div>
+            </div>
+        </div>
+
+        <div class="adoption-form" id="adoptionForm">
+            <h2 style="color: #1a5a3e; margin-bottom: 20px;">Dale un nombre a tu frailejón</h2>
+            <div class="form-group">
+                <label for="frailejonName">Nombre del frailejón:</label>
+                <input type="text" id="frailejonName" placeholder="Ej: Paramo, Guatoc, Rocío..." maxlength="30">
+            </div>
+            <button class="btn" id="adoptBtn">Adoptar y Ver Timeline</button>
+        </div>
+
+        <div class="timeline" id="timeline">
+            <div class="timeline-header">
+                <h2 style="color: #1a5a3e;">🌱 Timeline de Crecimiento</h2>
+                <p style="color: #4a7a6e;">La vida de tu frailejón a lo largo de los años</p>
+            </div>
+
+            <div class="growth-rate-note">
+                <strong>📊 Dato científico:</strong>
+                <p>Los frailejones crecen aproximadamente <strong>1 cm por año</strong>. Este ritmo lento es adaptación 
+                a las condiciones extremas del páramo. Un frailejón de 1 metro tiene aproximadamente 100 años de edad.</p>
+            </div>
+
+            <div class="frailejon-profile" id="frailejonProfile"></div>
+            <div class="timeline-events" id="timelineEvents"></div>
+        </div>
+    </div>
+
+    <script src="frailejon.js"></script>
+</body>
+</html>
