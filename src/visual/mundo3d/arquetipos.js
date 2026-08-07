@@ -104,6 +104,18 @@ export const ARQUETIPOS = {
     nombre: 'La red del suelo', clave: 'el wood-wide web: la red de hongos que conecta las raíces y reparte nutrientes bajo tierra',
     ejemplo: 'micorrizas', tambien: [],
   },
+  // EL PÁRAMO, la fábrica de agua: familia propia (una escena espacial genuinamente
+  // nueva — la planicie altoandina sobre 3.000+ m, escala de montaña, con la
+  // inmensidad de la cordillera y el mar de nubes). El frailejón caulirrósula
+  // (enagua de necromasa + roseta plateada) peina el agua a la niebla; el páramo
+  // se CUIDA, no se ara. Render ilustrado tipo lámina de Humboldt + atmósfera
+  // Ghibli. En equipo humilde cae a su ficha 2D (infografía del páramo).
+  // (anti-conflicto: arquetipo 3D nuevo al final del bloque.)
+  paramo: {
+    dim: '3d', role: 'mundo3d-archetype', motivo: 'paramo', espejo: 'infografia',
+    nombre: 'El páramo', clave: 'la fábrica de agua altoandina: frailejonal caulirrósulo, niebla e inmensidad de montaña',
+    ejemplo: 'paramo', tambien: [],
+  },
 
   // ── Arquetipos 2D (primera clase) ────────────────────────────────────────
   mirror: {

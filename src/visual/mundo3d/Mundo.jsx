@@ -47,6 +47,10 @@ const IMPORTA_ESCENA = {
   // El Suelo Vivo (red micorrízica) trae su propia escena flagship (Canvas
   // propio, atmósfera subterránea), fuera de escenas/ pero con el mismo contrato.
   micorrizas: () => import('./micorrizas/EscenaMicorrizas.jsx'),
+  // El Páramo: adaptador (como `valle`) que reusa el páramo definitivo aprobado
+  // (bosque/EscenaBosqueVivo: inmensidad + frailejonal + niebla) y le añade la
+  // capa de navegación del framework.
+  paramo: () => import('./escenas/EscenaParamo.jsx'),
 };
 /* React.lazy EXIGE que la promesa resuelva a `{ default: Componente }`. El
    `importa().then(m => m.default || m)` resolvía al COMPONENTE pelado, así que
