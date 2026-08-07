@@ -1439,7 +1439,7 @@ export default function AgentHero({ onNavigate }) {
                 }
                 /* al abrir, el glifo pasa a esténcil blanco sobre el acento —
                    lo maneja el propio BotonAnarquiaGlyph vía el ancestro
-                   `.is-open` (reglas .is-open .baf-* en su CSS scoped). */
+                   \`.is-open\` (reglas .is-open .baf-* en su CSS scoped). */
                 @keyframes agentport-pulse-ring {
                     0% { box-shadow: 0 0 0 0 rgb(var(--t-accent-rgb) / 0.45); }
                     70% { box-shadow: 0 0 0 12px rgb(var(--t-accent-rgb) / 0); }
