@@ -32,7 +32,10 @@ import { fileURLToPath } from 'node:url';
 
 const AQUI = dirname(fileURLToPath(import.meta.url));
 const ORIGEN = resolve(AQUI, '../src/compai/nucleo');
-const DESTINO_DEFECTO = resolve(AQUI, '../../../demos-src/valle-guatoc/compai');
+// Valle guatoc = ~/demos/3d/ (servido en 3d.guatoc.co raíz) — NO
+// ~/demos-src/valle-guatoc/ (ruta vieja/inexistente) ni ~/demos/valle-guatoc/
+// (basura descartada). Ver memoria feedback_valle_canonico_3d_guatoc.
+const DESTINO_DEFECTO = resolve(AQUI, '../../../demos/3d/compai');
 
 const args = process.argv.slice(2);
 const soloVerificar = args.includes('--check');
