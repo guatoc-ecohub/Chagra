@@ -121,7 +121,7 @@ describe('buildStatements', () => {
       const merges = stmts.filter((s) => s.includes(`MERGE (n:Pest {id: '${pest.id}'})`));
       expect(merges).toHaveLength(1);
       expect(merges[0]).toContain('nombre_cientifico:');
-      expect(merges[0]).toContain(pest.binomio.replace(/'/g, "\\'"));
+      expect(merges[0]).toContain(pest.binomio.replace(/\\/g, '\\\\').replace(/'/g, "\\'"));
     }
   });
 
