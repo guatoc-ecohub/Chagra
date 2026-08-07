@@ -176,7 +176,7 @@ export default function CapaVivaMundo({
   }, [estadoFinca]);
 
   /* ── el aire: nubes según el clima real (default: polen dorado) ── */
-  const clima = estadoFinca?.clima ?? null;
+  const clima = estadoFinca?.climaEscena ?? estadoFinca?.clima ?? null;
   const semilla = useMemo(() => semillaDeMundo(mundoId), [mundoId]);
   const nubes = useMemo(() => nubesDeClima(clima), [clima]);
 

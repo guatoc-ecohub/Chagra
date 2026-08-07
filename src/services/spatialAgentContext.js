@@ -8,10 +8,14 @@
  */
 
 const MAX_CONTEXT_CHARS = 1400;
-
 function cleanText(value, maxLength = 160) {
   if (typeof value !== 'string') return null;
-  const normalized = value.replace(/[\u0000-\u001f\u007f]/g, ' ').trim();
+  let normalized = '';
+  for (const ch of value) {
+    const code = ch.charCodeAt(0);
+    normalized += code < 32 || code === 127 ? ' ' : ch;
+  }
+  normalized = normalized.trim();
   return normalized ? normalized.slice(0, maxLength) : null;
 }
 
@@ -24,8 +28,14 @@ function cleanEstadoFinca(estadoFinca) {
 
   const salud = estadoFinca.saludFinca;
   const cosecha = estadoFinca.cosechaReciente;
+  const climaTexto =
+    typeof estadoFinca.clima === 'string'
+      ? estadoFinca.clima
+      : typeof estadoFinca.climaEscena === 'string'
+        ? estadoFinca.climaEscena
+        : null;
   const cleaned = {
-    clima: cleanText(estadoFinca.clima, 40),
+    clima: cleanText(climaTexto, 40),
     animo: cleanText(estadoFinca.animo, 40),
     energia: cleanNumber(estadoFinca.energia),
     enso: cleanText(estadoFinca.enso, 40),
