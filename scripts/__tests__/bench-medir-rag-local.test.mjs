@@ -1,18 +1,18 @@
 /**
- * Tests para medir-rag-prod.mjs
+ * Tests para medir-rag-local.mjs
  */
 
-import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { readFileSync, writeFileSync, existsSync, mkdirSync } from 'node:fs';
-import { execSync } from 'node:child_process';
+import { describe, it, expect } from 'vitest';
+import { readFileSync, existsSync } from 'node:fs';
+import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT_DIR = join(__dirname, '..', '..');
-const SCRIPT_PATH = join(ROOT_DIR, 'scripts', 'bench', 'medir-rag-prod.mjs');
+const SCRIPT_PATH = join(ROOT_DIR, 'scripts', 'bench', 'medir-rag-local.mjs');
 
-describe('medir-rag-prod', () => {
+describe('medir-rag-local', () => {
   describe('carga del manifest', () => {
     it('debe leer el manifest correctamente', () => {
       const manifestPath = join(ROOT_DIR, 'public', 'cycle-content', 'manifest.json');
@@ -156,20 +156,43 @@ describe('medir-rag-prod', () => {
   });
 
   describe('archivo de salida', () => {
-    it('debe crear docs/bench-rag-prod.json si el script corre', () => {
-      const outputPath = join(ROOT_DIR, 'docs', 'bench-rag-prod.json');
+    it('debe crear docs/bench-rag-local.json si el script corre', () => {
+      const outputPath = join(ROOT_DIR, 'docs', 'bench-rag-local.json');
       
       // Este test verifica que el directorio docs existe y puede crear el archivo
       const docsDir = join(ROOT_DIR, 'docs');
       expect(existsSync(docsDir)).toBe(true);
     });
 
-    it('debe crear docs/bench-rag-prod.md', () => {
-      const docsPath = join(ROOT_DIR, 'docs', 'bench-rag-prod.md');
+    it('debe crear docs/bench-rag-local.md', () => {
+      const docsPath = join(ROOT_DIR, 'docs', 'bench-rag-local.md');
       
       // Este test verifica que el directorio docs existe
       const docsDir = join(ROOT_DIR, 'docs');
       expect(existsSync(docsDir)).toBe(true);
+    });
+  });
+
+  describe('fail-closed PROD_BASE_URL', () => {
+    it('debe fallar ruidosamente (exit != 0) si se define PROD_BASE_URL', () => {
+      const result = spawnSync('node', [SCRIPT_PATH], {
+        env: { ...process.env, PROD_BASE_URL: 'https://chagra.app' },
+        encoding: 'utf8',
+      });
+
+      expect(result.status).not.toBe(0);
+      expect(result.stderr).toContain('PROD_BASE_URL');
+      expect(result.stderr).toContain('NO mide producción');
+    });
+
+    it('NO debe producir resultados de medición cuando falla fail-closed', () => {
+      const result = spawnSync('node', [SCRIPT_PATH], {
+        env: { ...process.env, PROD_BASE_URL: 'https://chagra.app' },
+        encoding: 'utf8',
+      });
+
+      expect(result.stdout).not.toContain('recall@5:');
+      expect(result.status).toBe(64);
     });
   });
 
