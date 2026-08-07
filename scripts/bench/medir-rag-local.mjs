@@ -1,28 +1,32 @@
 #!/usr/bin/env node
 /**
- * medir-rag-prod.mjs — Mide el delta REAL del RAG en producción tras el merge del PR #2860.
+ * medir-rag-local.mjs — Mide el delta del RAG del CLIENTE contra un corpus LOCAL de fichas.
  *
- * Este script consulta el endpoint REAL de recuperación de producción (no stub ni bench viejo)
- * con un set fijo de al menos 30 preguntas agro de cultivos reales del catálogo, calcula
- * recall@5 y recall@10, y compara contra la línea base documentada de 44% para confirmar
- * o desmentir la subida esperada a 58%.
+ * ATENCIÓN (rename desde medir-rag-prod.mjs): pese a su nombre anterior, este script NO mide
+ * producción. Mide el retriever cliente (ragRetriever.js, BM25 + semántico) contra los archivos
+ * LOCALES del repo: public/cycle-content/manifest.json (501 fichas) + public/rag-embeddings.json.
+ * No consulta el endpoint server-side ni los 5.906 corpus_chunks de producción
+ * (nomic-embed-text 768d sobre pgvector). Los 44% y 58% históricos fueron medidos contra
+ * este corpus local, NO contra producción (ver docs/bench-rag-local.md).
+ *
+ * FAIL-CLOSED: este script aborta con exit code 64 si se define PROD_BASE_URL, porque esa
+ * variable no se usa para ninguna recuperación. Pasarla esperando medir producción produciría
+ * una cifra local etiquetada como prod, que es peor que no medir.
  *
  * El script VERIFIA e imprime cuántas especies ve realmente antes de medir, y aborta si
  * son menos de 400 (el bug histórico era que getAllSpecies devolvía 77 especies en vez
  * de 501 por un stub).
  *
  * Uso:
- *   node scripts/bench/medir-rag-prod.mjs
- *   PROD_BASE_URL=https://chagra.app node scripts/bench/medir-rag-prod.mjs
+ *   node scripts/bench/medir-rag-local.mjs
  *
  * Env vars:
- *   PROD_BASE_URL   default https://chagra.app — URL base de producción
  *   MIN_SPECIES     default 400 — mínimo de especies requeridas para continuar
  *   TIMEOUT_MS      default 30000 — timeout para requests HTTP
  *
  * Salida:
- *   - JSON con métricas en docs/bench-rag-prod.json
- *   - Documentación en docs/bench-rag-prod.md
+ *   - JSON con métricas en docs/bench-rag-local.json
+ *   - Documentación en docs/bench-rag-local.md
  */
 
 import { readFileSync, writeFileSync, existsSync, mkdirSync } from 'node:fs';
@@ -40,16 +44,28 @@ register(LOADER_URL);
 
 const MANIFEST_PATH = join(ROOT_DIR, 'public', 'cycle-content', 'manifest.json');
 const GOLDEN_PATH = join(ROOT_DIR, 'eval', 'rag-golden.json');
-const OUTPUT_PATH = join(ROOT_DIR, 'docs', 'bench-rag-prod.json');
-const DOCS_PATH = join(ROOT_DIR, 'docs', 'bench-rag-prod.md');
+const OUTPUT_PATH = join(ROOT_DIR, 'docs', 'bench-rag-local.json');
+const DOCS_PATH = join(ROOT_DIR, 'docs', 'bench-rag-local.md');
 
-const PROD_BASE_URL = (process.env.PROD_BASE_URL || 'https://chagra.app').replace(/\/$/, '');
+// FAIL-CLOSED: si alguien define PROD_BASE_URL esperando medir producción, esto debe fallar
+// ruidosamente en vez de imprimir la variable y medir otra cosa en silencio.
+const PROD_BASE_URL = process.env.PROD_BASE_URL;
+if (PROD_BASE_URL) {
+  console.error('[RAG-LOCAL] FATAL: PROD_BASE_URL está definido, pero este instrumento NO mide producción.');
+  console.error('[RAG-LOCAL] medir-rag-local.mjs mide el retriever cliente contra un corpus LOCAL de fichas');
+  console.error('[RAG-LOCAL] (public/cycle-content + public/rag-embeddings.json). PROD_BASE_URL no se usa');
+  console.error('[RAG-LOCAL] para ninguna recuperación. Si esperás medir el RAG de producción real');
+  console.error('[RAG-LOCAL] (endpoint server-side, 5.906 corpus_chunks, nomic-embed-text 768d sobre');
+  console.error('[RAG-LOCAL] pgvector), usá otro harness. Ver docs/bench-rag-local.md.');
+  process.exit(64);
+}
+
 const MIN_SPECIES = Number.parseInt(process.env.MIN_SPECIES || '400', 10);
 const TIMEOUT_MS = Number.parseInt(process.env.TIMEOUT_MS || '30000', 10);
 
-// Línea base histórica: 44% recall@5 antes del PR #2860 (77 especies)
+// Línea base histórica: 44% recall@5 antes del PR #2860 (77 especies), MEDIDO CONTRA CORPUS LOCAL.
 const BASELINE_RECALL_5 = 0.44;
-// Expected: 58% recall@5 después del PR #2860 (501 especies)
+// Expected: 58% recall@5 después del PR #2860 (501 especies), MEDIDO CONTRA CORPUS LOCAL.
 const EXPECTED_RECALL_5 = 0.58;
 
 // Preguntas agro reales del catálogo (subset de rag-golden.json, mínimo 30)
@@ -93,10 +109,10 @@ function loadManifest() {
   try {
     const manifest = JSON.parse(readFileSync(MANIFEST_PATH, 'utf8'));
     const speciesCount = manifest.slugs?.length || manifest.length || 0;
-    console.log(`[PROD-RAG] Manifest cargado: ${speciesCount} especies`);
+    console.log(`[RAG-LOCAL] Manifest cargado: ${speciesCount} especies`);
     return { manifest, speciesCount };
   } catch (err) {
-    console.error('[PROD-RAG] ERROR: No se pudo leer manifest:', err.message);
+    console.error('[RAG-LOCAL] ERROR: No se pudo leer manifest:', err.message);
     throw err;
   }
 }
@@ -105,7 +121,8 @@ function loadManifest() {
  * Mock del fetch para el retriever local.
  *
  * Este mock intercepta las llamadas fetch del retriever y devuelve los archivos
- * locales del corpus y embeddings, emulando el comportamiento de producción.
+ * LOCALES del corpus y embeddings del repo (public/cycle-content + rag-embeddings.json).
+ * No hay ninguna llamada de red: nada de esto toca producción.
  */
 function makeBenchFetch() {
   const manifest = JSON.parse(readFileSync(MANIFEST_PATH, 'utf8'));
@@ -161,18 +178,20 @@ function makeBenchFetch() {
 }
 
 /**
- * Consulta el endpoint REAL de producción para recuperar documentos.
+ * Recupera documentos usando el retriever CLIENTE (ragRetriever.js) contra el corpus LOCAL.
  *
- * NOTA CRÍTICA: El script usa el retriever LOCAL con los mismos datos de producción
- * (manifest.json de 501 especies, rag-embeddings.json real). Esto es válido porque
- * el retriever es idéntico en producción (mismo código BM25+semántico).
+ * NOTA (rename desde retrieveFromProd): pese al nombre anterior, esto NO consulta ningún
+ * endpoint de producción. Importa ragRetriever.js y le sirve los archivos locales del repo
+ * (manifest.json de 501 especies + rag-embeddings.json) via el mock makeBenchFetch. Es el
+ * retriever cliente con un corpus local de fichas; el RAG server-side (5.906 corpus_chunks,
+ * nomic-embed-text 768d, pgvector) no participa en absoluto.
  *
  * La diferencia vs bench-rag-retrieve.mjs es que este:
  * 1. VERIFICA el número de especies antes de medir
  * 2. Aborta si < 400 especies (indicando bug del stub)
- * 3. Compara contra línea base de 44% y expected de 58%
+ * 3. Compara contra línea base de 44% y expected de 58% (ambos medidos contra corpus local)
  */
-async function retrieveFromProd(query, topK = 10) {
+async function retrieveLocal(query, topK = 10) {
   const controller = new AbortController();
   const timeoutId = setTimeout(() => controller.abort(), TIMEOUT_MS);
 
@@ -182,10 +201,10 @@ async function retrieveFromProd(query, topK = 10) {
     globalThis.fetch = makeBenchFetch();
 
     // Importar el retriever con el loader ya registrado
-    const moduleUrl = new URL(join(ROOT_DIR, 'src', 'services', 'ragRetriever.js') + `?bench=prod-${Date.now()}`, import.meta.url).href;
+    const moduleUrl = new URL(join(ROOT_DIR, 'src', 'services', 'ragRetriever.js') + `?bench=local-${Date.now()}`, import.meta.url).href;
     const { retrieve } = await import(moduleUrl);
 
-    const results = await retrieve(query, topK, 'prod-bench');
+    const results = await retrieve(query, topK, 'local-bench');
 
     // Restaurar el fetch original
     globalThis.fetch = originalFetch;
@@ -195,9 +214,9 @@ async function retrieveFromProd(query, topK = 10) {
   } catch (err) {
     clearTimeout(timeoutId);
     if (err.name === 'AbortError') {
-      console.error(`[PROD-RAG] ERROR: Timeout (${TIMEOUT_MS}ms)`);
+      console.error(`[RAG-LOCAL] ERROR: Timeout (${TIMEOUT_MS}ms)`);
     } else {
-      console.error('[PROD-RAG] ERROR:', err.message);
+      console.error('[RAG-LOCAL] ERROR:', err.message);
     }
     return [];
   }
@@ -227,20 +246,19 @@ function calculateRecall(results, k) {
  * Ejecuta el benchmark completo.
  */
 async function runBenchmark() {
-  console.log('[PROD-RAG] Iniciando medición de delta REAL del RAG en producción');
-  console.log(`[PROD-RAG] URL base: ${PROD_BASE_URL}`);
-  console.log(`[PROD-RAG] Preguntas: ${AGRO_QUESTIONS.length}`);
-  console.log(`[PROD-RAG] Timeout: ${TIMEOUT_MS}ms`);
+  console.log('[RAG-LOCAL] Iniciando medición del retriever cliente contra corpus LOCAL');
+  console.log(`[RAG-LOCAL] Preguntas: ${AGRO_QUESTIONS.length}`);
+  console.log(`[RAG-LOCAL] Timeout: ${TIMEOUT_MS}ms`);
   console.log('');
 
   // 1. Verificar número de especies
-  console.log('[PROD-RAG] PASO 1: Verificar catálogo de especies');
+  console.log('[RAG-LOCAL] PASO 1: Verificar catálogo de especies');
   const { speciesCount } = loadManifest();
-  console.log(`[PROD-RAG] Especies disponibles: ${speciesCount}`);
+  console.log(`[RAG-LOCAL] Especies disponibles: ${speciesCount}`);
   
   if (speciesCount < MIN_SPECIES) {
-    console.error(`[PROD-RAG] ABORTAR: Solo ${speciesCount} especies (< ${MIN_SPECIES} mínimo)`);
-    console.error('[PROD-RAG] Esto indica que el bug del PR #2860 persiste (stub devolviendo 77 especies)');
+    console.error(`[RAG-LOCAL] ABORTAR: Solo ${speciesCount} especies (< ${MIN_SPECIES} mínimo)`);
+    console.error('[RAG-LOCAL] Esto indica que el bug del PR #2860 persiste (stub devolviendo 77 especies)');
     return {
       status: 'ABORTED',
       reason: `INSUFFICIENT_SPECIES (${speciesCount} < ${MIN_SPECIES})`,
@@ -250,18 +268,18 @@ async function runBenchmark() {
       results: [],
     };
   }
-  console.log(`[PROD-RAG] ✓ Catálogo OK (${speciesCount} >= ${MIN_SPECIES})`);
+  console.log(`[RAG-LOCAL] ✓ Catálogo OK (${speciesCount} >= ${MIN_SPECIES})`);
   console.log('');
 
   // 2. Ejecutar queries
-  console.log('[PROD-RAG] PASO 2: Ejecutar queries de recuperación');
+  console.log('[RAG-LOCAL] PASO 2: Ejecutar queries de recuperación');
   const results = [];
   for (let i = 0; i < AGRO_QUESTIONS.length; i++) {
     const { id, query, expected } = AGRO_QUESTIONS[i];
-    process.stdout.write(`\r[PROD-RAG] Procesando ${i + 1}/${AGRO_QUESTIONS.length}: ${query.substring(0, 30)}...`);
+    process.stdout.write(`\r[RAG-LOCAL] Procesando ${i + 1}/${AGRO_QUESTIONS.length}: ${query.substring(0, 30)}...`);
     
     try {
-      const hits = await retrieveFromProd(query, 10);
+      const hits = await retrieveLocal(query, 10);
       const topSlugs = hits.map((h) => h.species).filter(Boolean);
       const rank = topSlugs.findIndex((slug) => matchesSpecies(slug, expected)) + 1;
       
@@ -274,7 +292,7 @@ async function runBenchmark() {
         topSlugs: topSlugs.slice(0, 5),
       });
     } catch (err) {
-      console.error(`\n[PROD-RAG] ERROR en query ${id}:`, err.message);
+      console.error(`\n[RAG-LOCAL] ERROR en query ${id}:`, err.message);
       results.push({
         id,
         query,
@@ -288,16 +306,16 @@ async function runBenchmark() {
   console.log('\r'); // Nueva línea después del progreso
 
   // 3. Calcular métricas
-  console.log('[PROD-RAG] PASO 3: Calcular métricas');
+  console.log('[RAG-LOCAL] PASO 3: Calcular métricas');
   const recall5 = calculateRecall(results, 5);
   const recall10 = calculateRecall(results, 10);
   const deltaRecall5 = recall5 - BASELINE_RECALL_5;
   const deltaExpected = recall5 - EXPECTED_RECALL_5;
   
-  console.log(`[PROD-RAG] recall@5: ${(recall5 * 100).toFixed(1)}%`);
-  console.log(`[PROD-RAG] recall@10: ${(recall10 * 100).toFixed(1)}%`);
-  console.log(`[PROD-RAG] delta vs línea base (44%): ${deltaRecall5 >= 0 ? '+' : ''}${(deltaRecall5 * 100).toFixed(1)}pp`);
-  console.log(`[PROD-RAG] delta vs esperado (58%): ${deltaExpected >= 0 ? '+' : ''}${(deltaExpected * 100).toFixed(1)}pp`);
+  console.log(`[RAG-LOCAL] recall@5: ${(recall5 * 100).toFixed(1)}%`);
+  console.log(`[RAG-LOCAL] recall@10: ${(recall10 * 100).toFixed(1)}%`);
+  console.log(`[RAG-LOCAL] delta vs línea base (44%): ${deltaRecall5 >= 0 ? '+' : ''}${(deltaRecall5 * 100).toFixed(1)}pp`);
+  console.log(`[RAG-LOCAL] delta vs esperado (58%): ${deltaExpected >= 0 ? '+' : ''}${(deltaExpected * 100).toFixed(1)}pp`);
   console.log('');
 
   // 4. Determinar veredicto
@@ -308,7 +326,7 @@ async function runBenchmark() {
     verdict = 'FAIL';
   }
 
-  console.log(`[PROD-RAG] VEREDICTO: ${verdict}`);
+  console.log(`[RAG-LOCAL] VEREDICTO: ${verdict}`);
   console.log('');
 
   // 5. Guardar resultados
@@ -317,7 +335,9 @@ async function runBenchmark() {
     date: new Date().toISOString(),
     commit,
     config: {
-      prodBaseUrl: PROD_BASE_URL,
+      instrument: 'retriever-cliente-corpus-local',
+      production: false,
+      prodBaseUrl: null,
       minSpecies: MIN_SPECIES,
       timeoutMs: TIMEOUT_MS,
       baseline: BASELINE_RECALL_5,
@@ -337,7 +357,7 @@ async function runBenchmark() {
 
   mkdirSync(dirname(OUTPUT_PATH), { recursive: true });
   writeFileSync(OUTPUT_PATH, JSON.stringify(output, null, 2));
-  console.log(`[PROD-RAG] Resultados guardados en: ${OUTPUT_PATH}`);
+  console.log(`[RAG-LOCAL] Resultados guardados en: ${OUTPUT_PATH}`);
 
   return output;
 }
@@ -346,45 +366,58 @@ async function runBenchmark() {
  * Genera documentación de cómo correr el benchmark.
  */
 function generateDocs() {
-  const docs = `# Bench RAG Producción — Documentación
+  const docs = `# Bench RAG Local (retriever cliente, corpus local) — Documentación
 
 ## ¿Qué mide este benchmark?
 
-Este benchmark mide el delta REAL del RAG en producción tras el merge del PR #2860, que arregló un bug donde \`getAllSpecies()\` devolvía 77 especies en vez de 501 por un stub.
+Este benchmark mide el **retriever cliente** (\`src/services/ragRetriever.js\`, BM25 + semántico)
+contra un **corpus LOCAL de fichas**: \`public/cycle-content/manifest.json\` (501 fichas) +
+\`public/rag-embeddings.json\`. NO consulta ningún endpoint de producción.
 
-## Contexto del bug
+## ATENCIÓN: este instrumento NO mide producción
+
+Renombrado desde \`medir-rag-prod.mjs\`. Pese a su nombre anterior, el script siempre
+recuperó con \`ragRetriever.js\` y un mock que sirve archivos locales del repo; la variable
+\`PROD_BASE_URL\` se imprimía pero nunca se usaba para ninguna recuperación. Por eso:
+
+- **Los 44% y 58% históricos se midieron contra corpus local**, no contra los 5.906
+  \`corpus_chunks\` del RAG server-side (nomic-embed-text 768d sobre pgvector).
+- Si definís \`PROD_BASE_URL\`, el script **falla (exit 64)** en vez de imprimir la variable
+  y medir otra cosa en silencio.
+
+Para medir producción de verdad (endpoint server-side, \`corpus_chunks\` en pgvector) hace
+falta otro harness; no está construido (ver \`INFORME-RAG-DELTA-PROD-2026-08-07.md\`).
+
+## Contexto del bug (por qué existen 44% y 58%)
 
 **Antes del PR #2860:**
 - El stub de \`getAllSpecies()\` devolvía \`[]\`
 - El tier-gate FAIL-CLOSED filtraba el corpus a solo 77 especies (CROP_TAXONOMY)
 - Especies críticas (yuca, plátano, tomate, cacao, aguacate) tenían 0% recall
-- recall@5 medido: 44%
+- recall@5 medido (corpus local): 44%
 
 **Después del PR #2860:**
 - El stub devuelve las 501 especies del manifest real
 - El tier-gate permite el corpus completo
-- recall@5 esperado: 58%
+- recall@5 esperado (corpus local): 58%
 
 ## Cómo correrlo
 
 \`\`\`bash
 # Desde la raíz del repo
-node scripts/bench/medir-rag-prod.mjs
-
-# Con URL de producción custom
-PROD_BASE_URL=https://chagra.app node scripts/bench/medir-rag-prod.mjs
+node scripts/bench/medir-rag-local.mjs
 
 # Cambiar el mínimo de especies requerido
-MIN_SPECIES=450 node scripts/bench/medir-rag-prod.mjs
+MIN_SPECIES=450 node scripts/bench/medir-rag-local.mjs
 
 # Cambiar timeout
-TIMEOUT_MS=60000 node scripts/bench/medir-rag-prod.mjs
+TIMEOUT_MS=60000 node scripts/bench/medir-rag-local.mjs
 \`\`\`
 
 ## Salida
 
 El script genera:
-1. **JSON con métricas**: \`docs/bench-rag-prod.json\` — contiene fecha, commit, speciesCount, recall@5/10, delta, veredicto, y detalles por query
+1. **JSON con métricas**: \`docs/bench-rag-local.json\` — contiene fecha, commit, speciesCount, recall@5/10, delta, veredicto, y detalles por query
 2. **Consola**: Imprime progreso, métricas, y veredicto
 
 ## Veredictos
@@ -398,19 +431,20 @@ El script genera:
 
 - El script VERIFICA el número de especies ANTES de medir
 - Si detecta <400 especies, ABORTA y no mide (indica bug del stub)
-- NO inventa cifras: si no puede alcanzar producción, lo documenta en el reporte
+- NO inventa cifras: lo que mide es corpus local, y lo dice
 - Usa 30 preguntas agro reales del golden set (subset de \`eval/rag-golden.json\`)
 
 ## Archivos relacionados
 
-- Script: \`scripts/bench/medir-rag-prod.mjs\`
+- Script: \`scripts/bench/medir-rag-local.mjs\`
 - Manifest: \`public/cycle-content/manifest.json\` (501 especies)
-- Golden set: \`eval/rag-rag-golden.json\` (50 queries)
+- Golden set: \`eval/rag-golden.json\` (50 queries)
 - PR #2860: \`fix(bench): stub getAllSpecies con 501 especies del manifest real\`
+- Diagnóstico del etiquetado falso: \`INFORME-RAG-DELTA-PROD-2026-08-07.md\` (Chagra-strategy)
 `;
 
   writeFileSync(DOCS_PATH, docs);
-  console.log(`[PROD-RAG] Documentación generada en: ${DOCS_PATH}`);
+  console.log(`[RAG-LOCAL] Documentación generada en: ${DOCS_PATH}`);
 }
 
 async function main() {
@@ -430,10 +464,10 @@ async function main() {
       process.exit(2);
     }
     
-    console.log('[PROD-RAG] ✓ Completado exitosamente');
+    console.log('[RAG-LOCAL] ✓ Completado exitosamente');
     process.exit(0);
   } catch (err) {
-    console.error('[PROD-RAG] FATAL:', err);
+    console.error('[RAG-LOCAL] FATAL:', err);
     process.exit(3);
   }
 }
