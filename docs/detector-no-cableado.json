@@ -1,0 +1,6445 @@
+{
+  "exports": [
+    {
+      "type": "named",
+      "name": "UMBRAL_SEQUIA_MM",
+      "file": "src/compai/nucleo/climaVivo.js",
+      "line": 37
+    },
+    {
+      "type": "named",
+      "name": "DIAS_SEQUIA",
+      "file": "src/compai/nucleo/climaVivo.js",
+      "line": 39
+    },
+    {
+      "type": "named",
+      "name": "MUNDOS_COMENTABLES",
+      "file": "src/compai/nucleo/comentarista.js",
+      "line": 19
+    },
+    {
+      "type": "named",
+      "name": "nombreDeAsset",
+      "file": "src/compai/nucleo/datosFinca.js",
+      "line": 31
+    },
+    {
+      "type": "named",
+      "name": "sinSufijoDeInstancia",
+      "file": "src/compai/nucleo/datosFinca.js",
+      "line": 51
+    },
+    {
+      "type": "named",
+      "name": "TAMANO_CANONICO",
+      "file": "src/compai/nucleo/elenco.js",
+      "line": 27
+    },
+    {
+      "type": "named",
+      "name": "ELENCO",
+      "file": "src/compai/nucleo/elenco.js",
+      "line": 34
+    },
+    {
+      "type": "named",
+      "name": "SLUGS_JUBILADOS",
+      "file": "src/compai/nucleo/elenco.js",
+      "line": 52
+    },
+    {
+      "type": "named",
+      "name": "normalizarCompanero",
+      "file": "src/compai/nucleo/elenco.js",
+      "line": 62
+    },
+    {
+      "type": "named",
+      "name": "HORA_INICIO_NOCHE",
+      "file": "src/compai/nucleo/susurroNocturno.js",
+      "line": 32
+    },
+    {
+      "type": "named",
+      "name": "HORA_FIN_NOCHE",
+      "file": "src/compai/nucleo/susurroNocturno.js",
+      "line": 34
+    },
+    {
+      "type": "default",
+      "name": "SuggestedActions",
+      "file": "src/components/AgentScreen/SuggestedActions.jsx",
+      "line": 7
+    },
+    {
+      "type": "default",
+      "name": "AltitudeBadge",
+      "file": "src/components/AltitudeBadge.jsx",
+      "line": 4
+    },
+    {
+      "type": "named",
+      "name": "DISMISS_KEY",
+      "file": "src/components/AndroidInstallBanner.jsx",
+      "line": 6
+    },
+    {
+      "type": "named",
+      "name": "DISMISS_TTL_MS",
+      "file": "src/components/AndroidInstallBanner.jsx",
+      "line": 11
+    },
+    {
+      "type": "default",
+      "name": "AprenderConAgente",
+      "file": "src/components/Aprende/AprenderConAgente.jsx",
+      "line": 409
+    },
+    {
+      "type": "named",
+      "name": "AprenderEntryCard",
+      "file": "src/components/Aprende/AprenderConAgente.jsx",
+      "line": 372
+    },
+    {
+      "type": "default",
+      "name": "BienvenidaFinca",
+      "file": "src/components/BienvenidaFinca.jsx",
+      "line": 144
+    },
+    {
+      "type": "named",
+      "name": "bienvenidaYaVista",
+      "file": "src/components/BienvenidaFinca.jsx",
+      "line": 120
+    },
+    {
+      "type": "named",
+      "name": "marcarBienvenidaVista",
+      "file": "src/components/BienvenidaFinca.jsx",
+      "line": 128
+    },
+    {
+      "type": "default",
+      "name": "BiodiversidadView",
+      "file": "src/components/BiodiversidadView.jsx",
+      "line": 42
+    },
+    {
+      "type": "default",
+      "name": "BitacoraEntryDetail",
+      "file": "src/components/BitacoraEntryDetail.jsx",
+      "line": 116
+    },
+    {
+      "type": "default",
+      "name": "CalendarioFincaScreen",
+      "file": "src/components/CalendarioFincaScreen.jsx",
+      "line": 77
+    },
+    {
+      "type": "default",
+      "name": "CaseStudyDetail",
+      "file": "src/components/CaseStudyDetail.jsx",
+      "line": 904
+    },
+    {
+      "type": "default",
+      "name": "CaseStudyScreen",
+      "file": "src/components/CaseStudyScreen.jsx",
+      "line": 504
+    },
+    {
+      "type": "default",
+      "name": "ChagraAgentAvatarColibri",
+      "file": "src/components/ChagraAgentAvatarColibri.jsx",
+      "line": 57
+    },
+    {
+      "type": "default",
+      "name": "ChagraAgentAvatarColibriPhoto",
+      "file": "src/components/ChagraAgentAvatarColibriPhoto.jsx",
+      "line": 54
+    },
+    {
+      "type": "named",
+      "name": "THERMAL_ZONES",
+      "file": "src/components/ChagraGrowLoader.jsx",
+      "line": 31
+    },
+    {
+      "type": "named",
+      "name": "DEFAULT_SPECIES_BY_ZONE",
+      "file": "src/components/ChagraGrowLoader.jsx",
+      "line": 45
+    },
+    {
+      "type": "named",
+      "name": "SPECIES_META",
+      "file": "src/components/ChagraGrowLoader.jsx",
+      "line": 52
+    },
+    {
+      "type": "named",
+      "name": "thermalZoneFromAltitude",
+      "file": "src/components/ChagraGrowLoader.jsx",
+      "line": 108
+    },
+    {
+      "type": "named",
+      "name": "ChagraCacaoLoader",
+      "file": "src/components/ChagraGrowLoader.jsx",
+      "line": 720
+    },
+    {
+      "type": "named",
+      "name": "ChagraCafeLoader",
+      "file": "src/components/ChagraGrowLoader.jsx",
+      "line": 721
+    },
+    {
+      "type": "named",
+      "name": "ChagraMaizLoader",
+      "file": "src/components/ChagraGrowLoader.jsx",
+      "line": 722
+    },
+    {
+      "type": "named",
+      "name": "ChagraFrailejonLoader",
+      "file": "src/components/ChagraGrowLoader.jsx",
+      "line": 723
+    },
+    {
+      "type": "default",
+      "name": "CicloNutrientesScreen",
+      "file": "src/components/CicloNutrientesScreen.jsx",
+      "line": 188
+    },
+    {
+      "type": "named",
+      "name": "mixHex",
+      "file": "src/components/CicloVivo/cicloVivoArte.js",
+      "line": 16
+    },
+    {
+      "type": "named",
+      "name": "tint",
+      "file": "src/components/CicloVivo/cicloVivoArte.js",
+      "line": 29
+    },
+    {
+      "type": "named",
+      "name": "shade",
+      "file": "src/components/CicloVivo/cicloVivoArte.js",
+      "line": 30
+    },
+    {
+      "type": "named",
+      "name": "CREAM",
+      "file": "src/components/CicloVivo/cicloVivoArte.js",
+      "line": 31
+    },
+    {
+      "type": "named",
+      "name": "DEG0",
+      "file": "src/components/CicloVivo/cicloVivoArte.js",
+      "line": 372
+    },
+    {
+      "type": "named",
+      "name": "R0",
+      "file": "src/components/CicloVivo/cicloVivoArte.js",
+      "line": 373
+    },
+    {
+      "type": "named",
+      "name": "RSTEP",
+      "file": "src/components/CicloVivo/cicloVivoArte.js",
+      "line": 374
+    },
+    {
+      "type": "named",
+      "name": "PISO_ESPECIE_DEFAULT",
+      "file": "src/components/CicloVivo/cicloVivoData.js",
+      "line": 182
+    },
+    {
+      "type": "default",
+      "name": "CompostScreen",
+      "file": "src/components/CompostScreen.jsx",
+      "line": 276
+    },
+    {
+      "type": "default",
+      "name": "CromatografiaScreen",
+      "file": "src/components/CromatografiaScreen.jsx",
+      "line": 221
+    },
+    {
+      "type": "default",
+      "name": "ErrorBoundaryRuta",
+      "file": "src/components/ErrorBoundaryRuta.jsx",
+      "line": 20
+    },
+    {
+      "type": "default",
+      "name": "EspirituProScreen",
+      "file": "src/components/EspirituProScreen.jsx",
+      "line": 29
+    },
+    {
+      "type": "default",
+      "name": "FaqScreen",
+      "file": "src/components/FaqScreen.jsx",
+      "line": 7
+    },
+    {
+      "type": "default",
+      "name": "FermentosView",
+      "file": "src/components/FermentosView.jsx",
+      "line": 161
+    },
+    {
+      "type": "named",
+      "name": "FincaCard",
+      "file": "src/components/FincaCard.jsx",
+      "line": 29
+    },
+    {
+      "type": "default",
+      "name": "GallinasScreen",
+      "file": "src/components/GallinasScreen.jsx",
+      "line": 48
+    },
+    {
+      "type": "default",
+      "name": "GerminacionScreen",
+      "file": "src/components/GerminacionScreen.jsx",
+      "line": 224
+    },
+    {
+      "type": "default",
+      "name": "GestionUsuariosScreen",
+      "file": "src/components/GestionUsuariosScreen.jsx",
+      "line": 282
+    },
+    {
+      "type": "default",
+      "name": "HelpManual",
+      "file": "src/components/HelpManual.jsx",
+      "line": 49
+    },
+    {
+      "type": "default",
+      "name": "InformesScreen",
+      "file": "src/components/InformesScreen.jsx",
+      "line": 97
+    },
+    {
+      "type": "default",
+      "name": "InvasiveObservationLog",
+      "file": "src/components/InvasiveObservationLog.jsx",
+      "line": 40
+    },
+    {
+      "type": "default",
+      "name": "NutricionHumanaScreen",
+      "file": "src/components/NutricionHumanaScreen.jsx",
+      "line": 245
+    },
+    {
+      "type": "default",
+      "name": "OnboardingCondensado",
+      "file": "src/components/OnboardingCondensado.jsx",
+      "line": 351
+    },
+    {
+      "type": "default",
+      "name": "OnboardingTour",
+      "file": "src/components/OnboardingTour.jsx",
+      "line": 40
+    },
+    {
+      "type": "default",
+      "name": "PestMonitoringWindow",
+      "file": "src/components/PestMonitoringWindow.jsx",
+      "line": 21
+    },
+    {
+      "type": "named",
+      "name": "useUserStore",
+      "file": "src/components/PlanEditor.jsx",
+      "line": 9
+    },
+    {
+      "type": "default",
+      "name": "SplashAngelita",
+      "file": "src/components/SplashAngelita.jsx",
+      "line": 8
+    },
+    {
+      "type": "default",
+      "name": "TelemetryAlerts",
+      "file": "src/components/TelemetryAlerts.jsx",
+      "line": 75
+    },
+    {
+      "type": "default",
+      "name": "ToxicologiaScreen",
+      "file": "src/components/ToxicologiaScreen.jsx",
+      "line": 337
+    },
+    {
+      "type": "default",
+      "name": "UpdateAvailableBanner",
+      "file": "src/components/UpdateAvailableBanner.jsx",
+      "line": 17
+    },
+    {
+      "type": "named",
+      "name": "UPDATE_TIMEOUT_MS",
+      "file": "src/components/UpdateAvailableBanner.jsx",
+      "line": 10
+    },
+    {
+      "type": "named",
+      "name": "RELOAD_FALLBACK_MS",
+      "file": "src/components/UpdateAvailableBanner.jsx",
+      "line": 15
+    },
+    {
+      "type": "default",
+      "name": "UsageStatsDashboard",
+      "file": "src/components/UsageStatsDashboard.jsx",
+      "line": 95
+    },
+    {
+      "type": "default",
+      "name": "VacasScreen",
+      "file": "src/components/VacasScreen.jsx",
+      "line": 53
+    },
+    {
+      "type": "default",
+      "name": "VentanaValle3DEscena",
+      "file": "src/components/VentanaValle3DEscena.jsx",
+      "line": 192
+    },
+    {
+      "type": "named",
+      "name": "WorkerDashboard",
+      "file": "src/components/WorkerDashboard.jsx",
+      "line": 47
+    },
+    {
+      "type": "default",
+      "name": "AdminPanel",
+      "file": "src/components/admin/AdminPanel.jsx",
+      "line": 23
+    },
+    {
+      "type": "default",
+      "name": "DashboardAdopcion",
+      "file": "src/components/admin/DashboardAdopcion.jsx",
+      "line": 9
+    },
+    {
+      "type": "default",
+      "name": "AgentMetricsDashboard",
+      "file": "src/components/agent/AgentMetricsDashboard.jsx",
+      "line": 16
+    },
+    {
+      "type": "named",
+      "name": "COLIBRI_TRANSITION_HOLD_MS",
+      "file": "src/components/agent/ColibriTransition.jsx",
+      "line": 36
+    },
+    {
+      "type": "named",
+      "name": "COLIBRI_TRANSITION_FADE_MS",
+      "file": "src/components/agent/ColibriTransition.jsx",
+      "line": 37
+    },
+    {
+      "type": "named",
+      "name": "COLIBRI_TRANSITION_TOTAL_MS",
+      "file": "src/components/agent/ColibriTransition.jsx",
+      "line": 38
+    },
+    {
+      "type": "named",
+      "name": "COLIBRI_TRANSITION_REDUCED_MS",
+      "file": "src/components/agent/ColibriTransition.jsx",
+      "line": 40
+    },
+    {
+      "type": "default",
+      "name": "FeedbackSutil",
+      "file": "src/components/agent/FeedbackSutil.jsx",
+      "line": 18
+    },
+    {
+      "type": "default",
+      "name": "AnoFincaScreen",
+      "file": "src/components/anofinca/AnoFincaScreen.jsx",
+      "line": 88
+    },
+    {
+      "type": "default",
+      "name": "GraficoClimaSemanal",
+      "file": "src/components/clima/GraficoClimaSemanal.jsx",
+      "line": 12
+    },
+    {
+      "type": "named",
+      "name": "BarbuditoVentana",
+      "file": "src/components/colibri/Barbudito.jsx",
+      "line": 242
+    },
+    {
+      "type": "named",
+      "name": "BarbuditoPosado",
+      "file": "src/components/colibri/Barbudito.jsx",
+      "line": 301
+    },
+    {
+      "type": "named",
+      "name": "BarbuditoFlor",
+      "file": "src/components/colibri/Barbudito.jsx",
+      "line": 325
+    },
+    {
+      "type": "named",
+      "name": "BarbuditoCruza",
+      "file": "src/components/colibri/Barbudito.jsx",
+      "line": 351
+    },
+    {
+      "type": "default",
+      "name": "CursoChagra",
+      "file": "src/components/curso/CursoChagra.jsx",
+      "line": 41
+    },
+    {
+      "type": "named",
+      "name": "SEND_TRANSITION_MS",
+      "file": "src/components/dashboard/AgentHero.jsx",
+      "line": 267
+    },
+    {
+      "type": "default",
+      "name": "BiopunkBackground",
+      "file": "src/components/dashboard/BiopunkBackground.jsx",
+      "line": 27
+    },
+    {
+      "type": "named",
+      "name": "CriaturasNocturnasDefs",
+      "file": "src/components/dashboard/CriaturasNocturnas.jsx",
+      "line": 121
+    },
+    {
+      "type": "named",
+      "name": "SeguimientoCard",
+      "file": "src/components/dashboard/FincaCards.jsx",
+      "line": 536
+    },
+    {
+      "type": "named",
+      "name": "relaxRects",
+      "file": "src/components/dashboard/agentRedMenuGeom.js",
+      "line": 63
+    },
+    {
+      "type": "named",
+      "name": "ringPlace",
+      "file": "src/components/dashboard/agentRedMenuGeom.js",
+      "line": 228
+    },
+    {
+      "type": "named",
+      "name": "esIOSLike",
+      "file": "src/components/escucha/escuchaOverlayUtils.js",
+      "line": 5
+    },
+    {
+      "type": "default",
+      "name": "ExtensionistaDashboard",
+      "file": "src/components/extensionista/ExtensionistaDashboard.jsx",
+      "line": 25
+    },
+    {
+      "type": "named",
+      "name": "CRIATURA_JUEGO_SVG",
+      "file": "src/components/juego/CriaturaFinca.jsx",
+      "line": 20
+    },
+    {
+      "type": "default",
+      "name": "DoomFincaScreen",
+      "file": "src/components/juego/DoomFincaScreen.jsx",
+      "line": 314
+    },
+    {
+      "type": "default",
+      "name": "HubJuegos",
+      "file": "src/components/juego/HubJuegos.jsx",
+      "line": 118
+    },
+    {
+      "type": "named",
+      "name": "CELDA",
+      "file": "src/components/juego/doomFincaData.js",
+      "line": 409
+    },
+    {
+      "type": "named",
+      "name": "TRES_HERMANAS",
+      "file": "src/components/juego/milpaData.js",
+      "line": 337
+    },
+    {
+      "type": "named",
+      "name": "HERMANA_POR_ID",
+      "file": "src/components/juego/milpaData.js",
+      "line": 340
+    },
+    {
+      "type": "named",
+      "name": "CIFRAS_MILPA",
+      "file": "src/components/juego/milpaData.js",
+      "line": 341
+    },
+    {
+      "type": "named",
+      "name": "SUP",
+      "file": "src/components/juego/subsueloRedGeom.js",
+      "line": 40
+    },
+    {
+      "type": "named",
+      "name": "MATAS",
+      "file": "src/components/juego/subsueloRedGeom.js",
+      "line": 50
+    },
+    {
+      "type": "named",
+      "name": "vidaFactor",
+      "file": "src/components/juego/subsueloRedGeom.js",
+      "line": 58
+    },
+    {
+      "type": "named",
+      "name": "raicesDeMata",
+      "file": "src/components/juego/subsueloRedGeom.js",
+      "line": 67
+    },
+    {
+      "type": "named",
+      "name": "gotasAgua",
+      "file": "src/components/juego/subsueloRedGeom.js",
+      "line": 245
+    },
+    {
+      "type": "named",
+      "name": "mineralesDelSuelo",
+      "file": "src/components/juego/subsueloRedGeom.js",
+      "line": 279
+    },
+    {
+      "type": "default",
+      "name": "LoteCroquisPlaceholder",
+      "file": "src/components/lotes/LoteCroquisPlaceholder.jsx",
+      "line": 21
+    },
+    {
+      "type": "default",
+      "name": "HojaVidaMataMockup",
+      "file": "src/components/mockups/HojaVidaMataMockup.jsx",
+      "line": 87
+    },
+    {
+      "type": "named",
+      "name": "EJEMPLOS_VOZ",
+      "file": "src/components/modoCampo/EjemplosVoz.jsx",
+      "line": 25
+    },
+    {
+      "type": "default",
+      "name": "ExitosChagra",
+      "file": "src/components/red/ExitosChagra.jsx",
+      "line": 32
+    },
+    {
+      "type": "named",
+      "name": "FieldLabel",
+      "file": "src/components/registro/RegistroFields.jsx",
+      "line": 14
+    },
+    {
+      "type": "named",
+      "name": "FieldError",
+      "file": "src/components/registro/RegistroFields.jsx",
+      "line": 25
+    },
+    {
+      "type": "named",
+      "name": "EXTENSIONISTA_WHITELIST",
+      "file": "src/config/extensionistaAccess.js",
+      "line": 65
+    },
+    {
+      "type": "named",
+      "name": "featureExtensionistaActivo",
+      "file": "src/config/extensionistaAccess.js",
+      "line": 83
+    },
+    {
+      "type": "named",
+      "name": "esExtensionista",
+      "file": "src/config/extensionistaAccess.js",
+      "line": 120
+    },
+    {
+      "type": "named",
+      "name": "esExtensionistaReal",
+      "file": "src/config/extensionistaAccess.js",
+      "line": 162
+    },
+    {
+      "type": "named",
+      "name": "CORDADA_WHITELIST",
+      "file": "src/config/glaciarAccess.js",
+      "line": 52
+    },
+    {
+      "type": "named",
+      "name": "OPERATOR_OVERRIDE_KEY",
+      "file": "src/config/glaciarAccess.js",
+      "line": 118
+    },
+    {
+      "type": "named",
+      "name": "getOperadorWhitelist",
+      "file": "src/config/glaciarAccess.js",
+      "line": 150
+    },
+    {
+      "type": "named",
+      "name": "tieneAccesoGlaciar",
+      "file": "src/config/glaciarAccess.js",
+      "line": 170
+    },
+    {
+      "type": "named",
+      "name": "getMapaNucleo",
+      "file": "src/config/rutasProdChagraApp.js",
+      "line": 1333
+    },
+    {
+      "type": "named",
+      "name": "estaEnNucleo",
+      "file": "src/config/rutasProdChagraApp.js",
+      "line": 1349
+    },
+    {
+      "type": "named",
+      "name": "estaExcluida",
+      "file": "src/config/rutasProdChagraApp.js",
+      "line": 1358
+    },
+    {
+      "type": "named",
+      "name": "estaPendiente",
+      "file": "src/config/rutasProdChagraApp.js",
+      "line": 1367
+    },
+    {
+      "type": "named",
+      "name": "CATEGORY_FALLBACKS",
+      "file": "src/config/speciesDefaults.js",
+      "line": 115
+    },
+    {
+      "type": "named",
+      "name": "CATEGORY_TRACKING_MODE",
+      "file": "src/config/speciesDefaults.js",
+      "line": 130
+    },
+    {
+      "type": "named",
+      "name": "ESTADO_GROUNDED_PENDIENTE",
+      "file": "src/data/aguaFinca.js",
+      "line": 22
+    },
+    {
+      "type": "named",
+      "name": "LLUVIA_MENSUAL_ZONA",
+      "file": "src/data/aguaFinca.js",
+      "line": 35
+    },
+    {
+      "type": "named",
+      "name": "DOSIS_POTABILIZACION",
+      "file": "src/data/aguaFinca.js",
+      "line": 186
+    },
+    {
+      "type": "named",
+      "name": "BIOARENA",
+      "file": "src/data/aguaFinca.js",
+      "line": 231
+    },
+    {
+      "type": "named",
+      "name": "NIVEL_PELIGRO",
+      "file": "src/data/aguaFinca.js",
+      "line": 424
+    },
+    {
+      "type": "named",
+      "name": "DISTANCIA_CORRAL_AGUA",
+      "file": "src/data/aguaFinca.js",
+      "line": 620
+    },
+    {
+      "type": "named",
+      "name": "ESTADO_GROUNDED_PENDIENTE",
+      "file": "src/data/aguacateFinca.js",
+      "line": 38
+    },
+    {
+      "type": "named",
+      "name": "normalizeAyuda",
+      "file": "src/data/ayudaFunciones.js",
+      "line": 136
+    },
+    {
+      "type": "named",
+      "name": "FICHA_META",
+      "file": "src/data/biopreparadosFichas.js",
+      "line": 117
+    },
+    {
+      "type": "named",
+      "name": "ESTADO_GROUNDED_PENDIENTE",
+      "file": "src/data/boticaCampesina.js",
+      "line": 36
+    },
+    {
+      "type": "named",
+      "name": "ESTADO_GROUNDED_PENDIENTE",
+      "file": "src/data/cafeFinca.js",
+      "line": 27
+    },
+    {
+      "type": "named",
+      "name": "DENSIDAD_SIEMBRA",
+      "file": "src/data/cafeFinca.js",
+      "line": 132
+    },
+    {
+      "type": "named",
+      "name": "FERTILIZACION_CAFE",
+      "file": "src/data/cafeFinca.js",
+      "line": 209
+    },
+    {
+      "type": "named",
+      "name": "UMBRAL_MANEJO_BROCA",
+      "file": "src/data/cafeFinca.js",
+      "line": 291
+    },
+    {
+      "type": "named",
+      "name": "ESTADO_GROUNDED_PENDIENTE",
+      "file": "src/data/canaFinca.js",
+      "line": 30
+    },
+    {
+      "type": "named",
+      "name": "VARIEDAD_POR_ZONA",
+      "file": "src/data/canaFinca.js",
+      "line": 96
+    },
+    {
+      "type": "named",
+      "name": "DISTANCIA_SIEMBRA",
+      "file": "src/data/canaFinca.js",
+      "line": 159
+    },
+    {
+      "type": "named",
+      "name": "ESTADO_GROUNDED_PENDIENTE",
+      "file": "src/data/citricosFinca.js",
+      "line": 35
+    },
+    {
+      "type": "named",
+      "name": "DISTANCIA_SIEMBRA",
+      "file": "src/data/citricosFinca.js",
+      "line": 216
+    },
+    {
+      "type": "named",
+      "name": "ESTADO_GROUNDED_PENDIENTE",
+      "file": "src/data/climaBoletines.js",
+      "line": 23
+    },
+    {
+      "type": "named",
+      "name": "LLUVIA_MENSUAL_ZONA",
+      "file": "src/data/climaBoletines.js",
+      "line": 190
+    },
+    {
+      "type": "named",
+      "name": "PROBABILIDAD_TRANSICION",
+      "file": "src/data/climaBoletines.js",
+      "line": 201
+    },
+    {
+      "type": "named",
+      "name": "SUGGESTED_ACTIONS_QUESTIONS",
+      "file": "src/data/exampleQuestions.js",
+      "line": 65
+    },
+    {
+      "type": "named",
+      "name": "AGENT_HERO_QUESTIONS",
+      "file": "src/data/exampleQuestions.js",
+      "line": 70
+    },
+    {
+      "type": "named",
+      "name": "ALL_EXAMPLE_QUESTIONS",
+      "file": "src/data/exampleQuestions.js",
+      "line": 76
+    },
+    {
+      "type": "named",
+      "name": "ESTADO_GROUNDED_PENDIENTE",
+      "file": "src/data/fiqueFinca.js",
+      "line": 39
+    },
+    {
+      "type": "named",
+      "name": "ESTADO_GROUNDED_PENDIENTE",
+      "file": "src/data/frutalesFinca.js",
+      "line": 34
+    },
+    {
+      "type": "named",
+      "name": "DESCARTADOS",
+      "file": "src/data/juegos/ahorcadoContaminado.js",
+      "line": 409
+    },
+    {
+      "type": "named",
+      "name": "ESTADO_GROUNDED_PENDIENTE",
+      "file": "src/data/mangoFinca.js",
+      "line": 42
+    },
+    {
+      "type": "named",
+      "name": "UMBRAL_MANEJO_COGOLLERO",
+      "file": "src/data/milpaFinca.js",
+      "line": 278
+    },
+    {
+      "type": "named",
+      "name": "ESTADO_GROUNDED_PENDIENTE",
+      "file": "src/data/quinuaFinca.js",
+      "line": 33
+    },
+    {
+      "type": "named",
+      "name": "DOSIS_SIEMBRA",
+      "file": "src/data/quinuaFinca.js",
+      "line": 204
+    },
+    {
+      "type": "named",
+      "name": "ESTADO_GROUNDED_PENDIENTE",
+      "file": "src/data/restauracionFinca.js",
+      "line": 35
+    },
+    {
+      "type": "named",
+      "name": "ESTADO_GROUNDED_PENDIENTE",
+      "file": "src/data/uchuvaFinca.js",
+      "line": 45
+    },
+    {
+      "type": "named",
+      "name": "DENSIDAD_SIEMBRA",
+      "file": "src/data/uchuvaFinca.js",
+      "line": 162
+    },
+    {
+      "type": "named",
+      "name": "GRADO_COLOR",
+      "file": "src/data/uchuvaFinca.js",
+      "line": 352
+    },
+    {
+      "type": "named",
+      "name": "DB_NAME",
+      "file": "src/db/dbCore.js",
+      "line": 40
+    },
+    {
+      "type": "named",
+      "name": "addFarmEvent",
+      "file": "src/db/farmProcessCache.js",
+      "line": 71
+    },
+    {
+      "type": "named",
+      "name": "nuevaOfertaId",
+      "file": "src/db/marketplaceOfertas.js",
+      "line": 36
+    },
+    {
+      "type": "named",
+      "name": "nuevoTratoId",
+      "file": "src/db/redTransactions.js",
+      "line": 20
+    },
+    {
+      "type": "named",
+      "name": "AVATAR_NOMBRE",
+      "file": "src/hooks/useAgentAvatarType.js",
+      "line": 31
+    },
+    {
+      "type": "named",
+      "name": "TAMANO_GUIA_DEFECTO",
+      "file": "src/hooks/useAngelitaGuia.js",
+      "line": 46
+    },
+    {
+      "type": "named",
+      "name": "MARGEN_VIEWPORT_DEFECTO",
+      "file": "src/hooks/useAngelitaGuia.js",
+      "line": 48
+    },
+    {
+      "type": "named",
+      "name": "DEMORA_INICIAL_MS_DEFECTO",
+      "file": "src/hooks/useAngelitaGuia.js",
+      "line": 50
+    },
+    {
+      "type": "named",
+      "name": "calcularPuestoGuia",
+      "file": "src/hooks/useAngelitaGuia.js",
+      "line": 103
+    },
+    {
+      "type": "named",
+      "name": "resolveAvatarCreature",
+      "file": "src/hooks/useAvatarCreature.js",
+      "line": 26
+    },
+    {
+      "type": "named",
+      "name": "useBackgroundImage",
+      "file": "src/hooks/useBackgroundImage.js",
+      "line": 96
+    },
+    {
+      "type": "named",
+      "name": "useBusquedaUnificada",
+      "file": "src/hooks/useBusquedaUnificada.js",
+      "line": 15
+    },
+    {
+      "type": "named",
+      "name": "useEstadoFincaReal",
+      "file": "src/hooks/useEstadoFincaReal.js",
+      "line": 27
+    },
+    {
+      "type": "default",
+      "name": "useInsightProactivo",
+      "file": "src/hooks/useInsightProactivo.js",
+      "line": 75
+    },
+    {
+      "type": "named",
+      "name": "useDatosDeMundo",
+      "file": "src/hooks/useInventarioCompai.js",
+      "line": 66
+    },
+    {
+      "type": "default",
+      "name": "useSecurityRole",
+      "file": "src/hooks/useSecurityRole.js",
+      "line": 35
+    },
+    {
+      "type": "named",
+      "name": "useT",
+      "file": "src/hooks/useT.js",
+      "line": 54
+    },
+    {
+      "type": "named",
+      "name": "t",
+      "file": "src/hooks/useT.js",
+      "line": 59
+    },
+    {
+      "type": "named",
+      "name": "THEME_CHANGED_EVENT",
+      "file": "src/hooks/useTheme.js",
+      "line": 172
+    },
+    {
+      "type": "default",
+      "name": "AguacatalVivo3D",
+      "file": "src/mockups/AguacatalVivo3D.jsx",
+      "line": 53
+    },
+    {
+      "type": "default",
+      "name": "AliadosFinca3D",
+      "file": "src/mockups/AliadosFinca3D.jsx",
+      "line": 876
+    },
+    {
+      "type": "default",
+      "name": "AngelitaViva",
+      "file": "src/mockups/AngelitaViva.jsx",
+      "line": 39
+    },
+    {
+      "type": "default",
+      "name": "ArtesaniaAndinaDemo",
+      "file": "src/mockups/ArtesaniaAndinaDemo.jsx",
+      "line": 235
+    },
+    {
+      "type": "default",
+      "name": "AvatarGameBiopunk",
+      "file": "src/mockups/AvatarGameBiopunk.jsx",
+      "line": 637
+    },
+    {
+      "type": "default",
+      "name": "AvatarGameLibre",
+      "file": "src/mockups/AvatarGameLibre.jsx",
+      "line": 376
+    },
+    {
+      "type": "default",
+      "name": "AvatarGameVerdeVivo",
+      "file": "src/mockups/AvatarGameVerdeVivo.jsx",
+      "line": 693
+    },
+    {
+      "type": "default",
+      "name": "BosqueTresEstratos3D",
+      "file": "src/mockups/BosqueTresEstratos3D.jsx",
+      "line": 82
+    },
+    {
+      "type": "default",
+      "name": "BotonAnarquia",
+      "file": "src/mockups/BotonAnarquia.jsx",
+      "line": 409
+    },
+    {
+      "type": "default",
+      "name": "CacaoVivo3D",
+      "file": "src/mockups/CacaoVivo3D.jsx",
+      "line": 53
+    },
+    {
+      "type": "default",
+      "name": "CafetalVivo3D",
+      "file": "src/mockups/CafetalVivo3D.jsx",
+      "line": 52
+    },
+    {
+      "type": "default",
+      "name": "CamaraDirectorDemo",
+      "file": "src/mockups/CamaraDirectorDemo.jsx",
+      "line": 356
+    },
+    {
+      "type": "default",
+      "name": "CanaTrapiche3D",
+      "file": "src/mockups/CanaTrapiche3D.jsx",
+      "line": 57
+    },
+    {
+      "type": "default",
+      "name": "CaraProd3D",
+      "file": "src/mockups/CaraProd3D.jsx",
+      "line": 97
+    },
+    {
+      "type": "default",
+      "name": "CatalogoInfraDemo",
+      "file": "src/mockups/CatalogoInfraDemo.jsx",
+      "line": 245
+    },
+    {
+      "type": "default",
+      "name": "ClimaAtmosfera",
+      "file": "src/mockups/ClimaAtmosfera.jsx",
+      "line": 184
+    },
+    {
+      "type": "default",
+      "name": "ColocarInfraestructura",
+      "file": "src/mockups/ColocarInfraestructura.jsx",
+      "line": 291
+    },
+    {
+      "type": "default",
+      "name": "CondorCielo3D",
+      "file": "src/mockups/CondorCielo3D.jsx",
+      "line": 71
+    },
+    {
+      "type": "default",
+      "name": "ConversacionVoz",
+      "file": "src/mockups/ConversacionVoz.jsx",
+      "line": 137
+    },
+    {
+      "type": "default",
+      "name": "CriaturasNocturnas",
+      "file": "src/mockups/CriaturasNocturnas.jsx",
+      "line": 20
+    },
+    {
+      "type": "default",
+      "name": "DiaEnFinca",
+      "file": "src/mockups/DiaEnFinca.jsx",
+      "line": 240
+    },
+    {
+      "type": "default",
+      "name": "DiagnosticoSobreFoto",
+      "file": "src/mockups/DiagnosticoSobreFoto.jsx",
+      "line": 60
+    },
+    {
+      "type": "default",
+      "name": "EnsenaDibujando",
+      "file": "src/mockups/EnsenaDibujando.jsx",
+      "line": 80
+    },
+    {
+      "type": "default",
+      "name": "EntradaCampesina",
+      "file": "src/mockups/EntradaCampesina.jsx",
+      "line": 356
+    },
+    {
+      "type": "default",
+      "name": "EvidenciaIlustrada",
+      "file": "src/mockups/EvidenciaIlustrada.jsx",
+      "line": 468
+    },
+    {
+      "type": "default",
+      "name": "FrutalesAndinos3D",
+      "file": "src/mockups/FrutalesAndinos3D.jsx",
+      "line": 116
+    },
+    {
+      "type": "default",
+      "name": "GaleriaGemelos2D",
+      "file": "src/mockups/GemelosMundos2D.jsx",
+      "line": 612
+    },
+    {
+      "type": "named",
+      "name": "Gemelo2D",
+      "file": "src/mockups/GemelosMundos2D.jsx",
+      "line": 162
+    },
+    {
+      "type": "named",
+      "name": "GemeloCafe2D",
+      "file": "src/mockups/GemelosMundos2D.jsx",
+      "line": 555
+    },
+    {
+      "type": "named",
+      "name": "GemeloSanidad2D",
+      "file": "src/mockups/GemelosMundos2D.jsx",
+      "line": 573
+    },
+    {
+      "type": "named",
+      "name": "GemeloAgua2D",
+      "file": "src/mockups/GemelosMundos2D.jsx",
+      "line": 591
+    },
+    {
+      "type": "default",
+      "name": "HojaPruebaValle",
+      "file": "src/mockups/HojaPruebaValle.jsx",
+      "line": 286
+    },
+    {
+      "type": "default",
+      "name": "HomeCampesino",
+      "file": "src/mockups/HomeCampesino.jsx",
+      "line": 66
+    },
+    {
+      "type": "default",
+      "name": "InvernaderoVivo3D",
+      "file": "src/mockups/InvernaderoVivo3D.jsx",
+      "line": 52
+    },
+    {
+      "type": "default",
+      "name": "JaguarMonte3D",
+      "file": "src/mockups/JaguarMonte3D.jsx",
+      "line": 128
+    },
+    {
+      "type": "default",
+      "name": "JuegoMiFincaOdyssey",
+      "file": "src/mockups/JuegoMiFincaOdyssey.jsx",
+      "line": 1258
+    },
+    {
+      "type": "default",
+      "name": "LecheriaViva3D",
+      "file": "src/mockups/LecheriaViva3D.jsx",
+      "line": 51
+    },
+    {
+      "type": "default",
+      "name": "MapaAcuarela",
+      "file": "src/mockups/MapaAcuarela.jsx",
+      "line": 185
+    },
+    {
+      "type": "default",
+      "name": "MetalSlugCampo",
+      "file": "src/mockups/MetalSlugCampo.jsx",
+      "line": 511
+    },
+    {
+      "type": "default",
+      "name": "Micorrizas3D",
+      "file": "src/mockups/Micorrizas3D.jsx",
+      "line": 49
+    },
+    {
+      "type": "default",
+      "name": "MockupGuardianesNarrativos",
+      "file": "src/mockups/MockupGuardianesNarrativos.jsx",
+      "line": 215
+    },
+    {
+      "type": "default",
+      "name": "MontanaMundos",
+      "file": "src/mockups/MontanaMundos.jsx",
+      "line": 141
+    },
+    {
+      "type": "default",
+      "name": "MontanaMundosCampesino",
+      "file": "src/mockups/MontanaMundosCampesino.jsx",
+      "line": 723
+    },
+    {
+      "type": "default",
+      "name": "MontanaMundosCine",
+      "file": "src/mockups/MontanaMundosCine.jsx",
+      "line": 741
+    },
+    {
+      "type": "default",
+      "name": "Mundo3DBosque",
+      "file": "src/mockups/Mundo3DBosque.jsx",
+      "line": 41
+    },
+    {
+      "type": "default",
+      "name": "Mundo3DCafe",
+      "file": "src/mockups/Mundo3DCafe.jsx",
+      "line": 62
+    },
+    {
+      "type": "default",
+      "name": "Mundo3DMercado",
+      "file": "src/mockups/Mundo3DMercado.jsx",
+      "line": 73
+    },
+    {
+      "type": "default",
+      "name": "Mundo3DMilpa",
+      "file": "src/mockups/Mundo3DMilpa.jsx",
+      "line": 40
+    },
+    {
+      "type": "default",
+      "name": "Mundo3DSanidad",
+      "file": "src/mockups/Mundo3DSanidad.jsx",
+      "line": 62
+    },
+    {
+      "type": "default",
+      "name": "Mundo3DSemillero",
+      "file": "src/mockups/Mundo3DSemillero.jsx",
+      "line": 63
+    },
+    {
+      "type": "default",
+      "name": "MundoAgua3D",
+      "file": "src/mockups/MundoAgua3D.jsx",
+      "line": 1303
+    },
+    {
+      "type": "default",
+      "name": "MundoCafe3D",
+      "file": "src/mockups/MundoCafe3D.jsx",
+      "line": 867
+    },
+    {
+      "type": "default",
+      "name": "MundoCompost3D",
+      "file": "src/mockups/MundoCompost3D.jsx",
+      "line": 1266
+    },
+    {
+      "type": "default",
+      "name": "MundoFermentos3D",
+      "file": "src/mockups/MundoFermentos3D.jsx",
+      "line": 1065
+    },
+    {
+      "type": "default",
+      "name": "MundoFrutales3D",
+      "file": "src/mockups/MundoFrutales3D.jsx",
+      "line": 711
+    },
+    {
+      "type": "default",
+      "name": "MundoLecheria3D",
+      "file": "src/mockups/MundoLecheria3D.jsx",
+      "line": 1280
+    },
+    {
+      "type": "default",
+      "name": "MundoLeguminosas3D",
+      "file": "src/mockups/MundoLeguminosas3D.jsx",
+      "line": 1169
+    },
+    {
+      "type": "default",
+      "name": "MundoMicrofauna3D",
+      "file": "src/mockups/MundoMicrofauna3D.jsx",
+      "line": 1027
+    },
+    {
+      "type": "default",
+      "name": "MundoPiscicultura3D",
+      "file": "src/mockups/MundoPiscicultura3D.jsx",
+      "line": 843
+    },
+    {
+      "type": "default",
+      "name": "MundoPolinizadores3D",
+      "file": "src/mockups/MundoPolinizadores3D.jsx",
+      "line": 60
+    },
+    {
+      "type": "default",
+      "name": "MundoSanidad3D",
+      "file": "src/mockups/MundoSanidad3D.jsx",
+      "line": 1243
+    },
+    {
+      "type": "default",
+      "name": "MundoSemillero3D",
+      "file": "src/mockups/MundoSemillero3D.jsx",
+      "line": 739
+    },
+    {
+      "type": "default",
+      "name": "MundoSueloVivo3D",
+      "file": "src/mockups/MundoSueloVivo3D.jsx",
+      "line": 1089
+    },
+    {
+      "type": "default",
+      "name": "MundoVergelFrutal3D",
+      "file": "src/mockups/MundoVergelFrutal3D.jsx",
+      "line": 1024
+    },
+    {
+      "type": "default",
+      "name": "MuralesNewDonk",
+      "file": "src/mockups/MuralesNewDonk.jsx",
+      "line": 407
+    },
+    {
+      "type": "default",
+      "name": "NavegacionPisosTermicos",
+      "file": "src/mockups/NavegacionPisosTermicos.jsx",
+      "line": 18
+    },
+    {
+      "type": "default",
+      "name": "NavegadorGrafoDemo",
+      "file": "src/mockups/NavegadorGrafoDemo.jsx",
+      "line": 26
+    },
+    {
+      "type": "default",
+      "name": "NewDonk2Den3D",
+      "file": "src/mockups/NewDonk2Den3D.jsx",
+      "line": 539
+    },
+    {
+      "type": "default",
+      "name": "OnboardingSiembra",
+      "file": "src/mockups/OnboardingSiembra.jsx",
+      "line": 339
+    },
+    {
+      "type": "default",
+      "name": "PapaVivo3D",
+      "file": "src/mockups/PapaVivo3D.jsx",
+      "line": 54
+    },
+    {
+      "type": "default",
+      "name": "ParamoHumboldt3D",
+      "file": "src/mockups/ParamoHumboldt3D.jsx",
+      "line": 287
+    },
+    {
+      "type": "default",
+      "name": "PrimerCultivo",
+      "file": "src/mockups/PrimerCultivo.jsx",
+      "line": 249
+    },
+    {
+      "type": "default",
+      "name": "SaludFinca",
+      "file": "src/mockups/SaludFinca.jsx",
+      "line": 219
+    },
+    {
+      "type": "default",
+      "name": "TransicionAgentePlanoMockup",
+      "file": "src/mockups/TransicionAgentePlano.jsx",
+      "line": 73
+    },
+    {
+      "type": "default",
+      "name": "TransicionesOdysseyDemo",
+      "file": "src/mockups/TransicionesOdysseyDemo.jsx",
+      "line": 57
+    },
+    {
+      "type": "default",
+      "name": "ValleLluvia3D",
+      "file": "src/mockups/ValleLluvia3D.jsx",
+      "line": 882
+    },
+    {
+      "type": "default",
+      "name": "ValleNoche3D",
+      "file": "src/mockups/ValleNoche3D.jsx",
+      "line": 994
+    },
+    {
+      "type": "default",
+      "name": "VitrinaMaestraMundos",
+      "file": "src/mockups/VitrinaMaestraMundos.jsx",
+      "line": 1206
+    },
+    {
+      "type": "default",
+      "name": "VozConForma",
+      "file": "src/mockups/VozConForma.jsx",
+      "line": 126
+    },
+    {
+      "type": "default",
+      "name": "BosqueVivo3D",
+      "file": "src/mockups/_archivo/BosqueVivo3D-legacy.jsx",
+      "line": 47
+    },
+    {
+      "type": "default",
+      "name": "BosqueVivo3D",
+      "file": "src/mockups/_archivo/BosqueVivo3D.jsx",
+      "line": 60
+    },
+    {
+      "type": "default",
+      "name": "CasaAdentro3D",
+      "file": "src/mockups/_archivo/CasaAdentro3D.jsx",
+      "line": 51
+    },
+    {
+      "type": "default",
+      "name": "SueloDemo3D",
+      "file": "src/mockups/_archivo/SueloDemo3D-legacy.jsx",
+      "line": 186
+    },
+    {
+      "type": "default",
+      "name": "SueloDemo3D",
+      "file": "src/mockups/_archivo/SueloDemo3D.jsx",
+      "line": 198
+    },
+    {
+      "type": "named",
+      "name": "TIERRA",
+      "file": "src/mockups/laminas/_kit.jsx",
+      "line": 23
+    },
+    {
+      "type": "named",
+      "name": "PALETAS_PISO",
+      "file": "src/mockups/metalslug/EscenarioFondo.jsx",
+      "line": 19
+    },
+    {
+      "type": "named",
+      "name": "paletaPiso",
+      "file": "src/mockups/metalslug/EscenarioFondo.jsx",
+      "line": 50
+    },
+    {
+      "type": "default",
+      "name": "AcompananteMundo",
+      "file": "src/mockups/valle/AcompananteMundo.jsx",
+      "line": 196
+    },
+    {
+      "type": "named",
+      "name": "narracionDeMundo",
+      "file": "src/mockups/valle/AcompananteMundo.jsx",
+      "line": 44
+    },
+    {
+      "type": "named",
+      "name": "VISTA_PARAMO",
+      "file": "src/mockups/valle/_archivo/vistaParamo.archivado.jsx",
+      "line": 34
+    },
+    {
+      "type": "named",
+      "name": "VistaParamoEnt",
+      "file": "src/mockups/valle/_archivo/vistaParamo.archivado.jsx",
+      "line": 53
+    },
+    {
+      "type": "named",
+      "name": "TRAZADO_AGUA",
+      "file": "src/mockups/valle/aguaVivaValle.geom.js",
+      "line": 61
+    },
+    {
+      "type": "named",
+      "name": "POZAS_AGUA",
+      "file": "src/mockups/valle/aguaVivaValle.geom.js",
+      "line": 109
+    },
+    {
+      "type": "named",
+      "name": "COMPUERTAS_AGUA",
+      "file": "src/mockups/valle/aguaVivaValle.geom.js",
+      "line": 119
+    },
+    {
+      "type": "named",
+      "name": "LIFT",
+      "file": "src/mockups/valle/aguaVivaValle.geom.js",
+      "line": 127
+    },
+    {
+      "type": "named",
+      "name": "rngAgua",
+      "file": "src/mockups/valle/aguaVivaValle.geom.js",
+      "line": 139
+    },
+    {
+      "type": "named",
+      "name": "curvaDeTrazado",
+      "file": "src/mockups/valle/aguaVivaValle.geom.js",
+      "line": 173
+    },
+    {
+      "type": "named",
+      "name": "nivelPoza",
+      "file": "src/mockups/valle/aguaVivaValle.geom.js",
+      "line": 243
+    },
+    {
+      "type": "default",
+      "name": "AnimalesDeFinca",
+      "file": "src/mockups/valle/animales.jsx",
+      "line": 132
+    },
+    {
+      "type": "named",
+      "name": "MATERIAL_FINCA",
+      "file": "src/mockups/valle/animales.jsx",
+      "line": 46
+    },
+    {
+      "type": "named",
+      "name": "acarreoAhora",
+      "file": "src/mockups/valle/arrieriaRutas.js",
+      "line": 116
+    },
+    {
+      "type": "named",
+      "name": "FRANJAS_CAMPO",
+      "file": "src/mockups/valle/campesinosFaenas.js",
+      "line": 28
+    },
+    {
+      "type": "named",
+      "name": "actividadCampesinosAhora",
+      "file": "src/mockups/valle/campesinosFaenas.js",
+      "line": 162
+    },
+    {
+      "type": "named",
+      "name": "CAUCE_VALLE",
+      "file": "src/mockups/valle/siembraValle.js",
+      "line": 146
+    },
+    {
+      "type": "named",
+      "name": "distanciaACauce",
+      "file": "src/mockups/valle/siembraValle.js",
+      "line": 151
+    },
+    {
+      "type": "named",
+      "name": "pendienteEn",
+      "file": "src/mockups/valle/siembraValle.js",
+      "line": 166
+    },
+    {
+      "type": "named",
+      "name": "pisoEnZ",
+      "file": "src/mockups/valle/valleData.js",
+      "line": 89
+    },
+    {
+      "type": "named",
+      "name": "SALUD_FINCA",
+      "file": "src/mockups/valle/valleData.js",
+      "line": 425
+    },
+    {
+      "type": "named",
+      "name": "ORDEN_CLIMA",
+      "file": "src/mockups/valle/valleData.js",
+      "line": 676
+    },
+    {
+      "type": "named",
+      "name": "climaPorHora",
+      "file": "src/mockups/valle/valleData.js",
+      "line": 686
+    },
+    {
+      "type": "default",
+      "name": "VitrinaCriaturas",
+      "file": "src/mockups/vitrina3d/VitrinaCriaturas.jsx",
+      "line": 171
+    },
+    {
+      "type": "default",
+      "name": "VitrinaMundos",
+      "file": "src/mockups/vitrina3d/VitrinaMundos.jsx",
+      "line": 211
+    },
+    {
+      "type": "named",
+      "name": "RUTA_2D_DESDE_3D",
+      "file": "src/prodApp/wire3DNav.js",
+      "line": 16
+    },
+    {
+      "type": "named",
+      "name": "PARTIAL_MARKERS",
+      "file": "src/services/agentPartialMerge.js",
+      "line": 35
+    },
+    {
+      "type": "named",
+      "name": "FULL_ERROR_MESSAGES",
+      "file": "src/services/agentPartialMerge.js",
+      "line": 53
+    },
+    {
+      "type": "named",
+      "name": "normalizeInterruptReason",
+      "file": "src/services/agentPartialMerge.js",
+      "line": 66
+    },
+    {
+      "type": "named",
+      "name": "localizeAgentOutputForRegion",
+      "file": "src/services/agentService.js",
+      "line": 49
+    },
+    {
+      "type": "named",
+      "name": "isFincaInCaucaRegion",
+      "file": "src/services/agentService.js",
+      "line": 53
+    },
+    {
+      "type": "named",
+      "name": "slugifyDepartamento",
+      "file": "src/services/agentService.js",
+      "line": 70
+    },
+    {
+      "type": "named",
+      "name": "LOW_CONFIDENCE_THRESHOLD",
+      "file": "src/services/agentService.js",
+      "line": 1845
+    },
+    {
+      "type": "named",
+      "name": "getTelemetryIngestUrl",
+      "file": "src/services/agentTelemetrySync.js",
+      "line": 89
+    },
+    {
+      "type": "named",
+      "name": "isTelemetrySyncEnabled",
+      "file": "src/services/agentTelemetrySync.js",
+      "line": 246
+    },
+    {
+      "type": "named",
+      "name": "__retrieveRagContextForFoliage",
+      "file": "src/services/aiService.js",
+      "line": 163
+    },
+    {
+      "type": "named",
+      "name": "TROJA_KG_MAZORCA_M3",
+      "file": "src/services/almacenamientoCalculator.js",
+      "line": 100
+    },
+    {
+      "type": "named",
+      "name": "TROJA_ANCHO_POR_CLIMA",
+      "file": "src/services/almacenamientoCalculator.js",
+      "line": 106
+    },
+    {
+      "type": "named",
+      "name": "MOLESTIA_DELTA",
+      "file": "src/services/angelitaInteligencia.js",
+      "line": 638
+    },
+    {
+      "type": "named",
+      "name": "hashStr",
+      "file": "src/services/angelitaVariedad.js",
+      "line": 121
+    },
+    {
+      "type": "named",
+      "name": "validarParafrasis",
+      "file": "src/services/angelitaVariedad.js",
+      "line": 252
+    },
+    {
+      "type": "named",
+      "name": "norm",
+      "file": "src/services/asociacionesFilter.js",
+      "line": 8
+    },
+    {
+      "type": "named",
+      "name": "getCultivosDisponibles",
+      "file": "src/services/asociacionesFilter.js",
+      "line": 55
+    },
+    {
+      "type": "named",
+      "name": "getCultivosFromProfile",
+      "file": "src/services/asociacionesFilter.js",
+      "line": 74
+    },
+    {
+      "type": "named",
+      "name": "SESSION_EXPIRED_EVENT",
+      "file": "src/services/authService.js",
+      "line": 15
+    },
+    {
+      "type": "named",
+      "name": "isCanonicalHost",
+      "file": "src/services/canonicalHostRedirect.js",
+      "line": 24
+    },
+    {
+      "type": "named",
+      "name": "isLocalDevHost",
+      "file": "src/services/canonicalHostRedirect.js",
+      "line": 28
+    },
+    {
+      "type": "named",
+      "name": "isPreviewHost",
+      "file": "src/services/canonicalHostRedirect.js",
+      "line": 41
+    },
+    {
+      "type": "named",
+      "name": "isProdAppHost",
+      "file": "src/services/canonicalHostRedirect.js",
+      "line": 51
+    },
+    {
+      "type": "named",
+      "name": "isThreeDWorldHost",
+      "file": "src/services/canonicalHostRedirect.js",
+      "line": 56
+    },
+    {
+      "type": "named",
+      "name": "buildCaseSummaryInput",
+      "file": "src/services/caseStudyLessonsSummarizer.js",
+      "line": 89
+    },
+    {
+      "type": "named",
+      "name": "RAG_CONTEXT_FOOTER",
+      "file": "src/services/caseStudyTreatmentRecommender.js",
+      "line": 39
+    },
+    {
+      "type": "named",
+      "name": "severityClasses",
+      "file": "src/services/climaService.js",
+      "line": 262
+    },
+    {
+      "type": "named",
+      "name": "FASES_PASEO",
+      "file": "src/services/compaiPaseoPlanificador.js",
+      "line": 43
+    },
+    {
+      "type": "named",
+      "name": "getTier",
+      "file": "src/services/corpusLoader.js",
+      "line": 74
+    },
+    {
+      "type": "named",
+      "name": "resolveCatalogUrl",
+      "file": "src/services/corpusLoader.js",
+      "line": 96
+    },
+    {
+      "type": "named",
+      "name": "cropAlertEngine",
+      "file": "src/services/cropAlertEngine.js",
+      "line": 236
+    },
+    {
+      "type": "named",
+      "name": "didFromPublicKey",
+      "file": "src/services/crypto/didKeyService.js",
+      "line": 147
+    },
+    {
+      "type": "named",
+      "name": "publicKeyFromDid",
+      "file": "src/services/crypto/didKeyService.js",
+      "line": 160
+    },
+    {
+      "type": "named",
+      "name": "ucanToPermisos",
+      "file": "src/services/crypto/ucanService.js",
+      "line": 224
+    },
+    {
+      "type": "named",
+      "name": "downloadCuadernoPDF",
+      "file": "src/services/cuadernoPDF.js",
+      "line": 681
+    },
+    {
+      "type": "named",
+      "name": "PROFILE_SEEDS",
+      "file": "src/services/demoPersonaSeeds.js",
+      "line": 21
+    },
+    {
+      "type": "named",
+      "name": "updatePest",
+      "file": "src/services/doomFincaEngine.js",
+      "line": 171
+    },
+    {
+      "type": "named",
+      "name": "plagaEnMira",
+      "file": "src/services/doomFincaEngine.js",
+      "line": 234
+    },
+    {
+      "type": "named",
+      "name": "checkPestReach",
+      "file": "src/services/doomFincaEngine.js",
+      "line": 266
+    },
+    {
+      "type": "named",
+      "name": "ENSO_PHASES",
+      "file": "src/services/ensoService.js",
+      "line": 28
+    },
+    {
+      "type": "named",
+      "name": "ENSO_LABELS",
+      "file": "src/services/ensoService.js",
+      "line": 29
+    },
+    {
+      "type": "named",
+      "name": "EPISODIC_MAX_PROCESSES",
+      "file": "src/services/episodicMemoryService.js",
+      "line": 34
+    },
+    {
+      "type": "named",
+      "name": "STAGE_LOOKAHEAD_DAYS",
+      "file": "src/services/episodicMemoryService.js",
+      "line": 38
+    },
+    {
+      "type": "named",
+      "name": "FUENTES_ESCUCHA",
+      "file": "src/services/escuchaService.js",
+      "line": 39
+    },
+    {
+      "type": "named",
+      "name": "currentSubUser",
+      "file": "src/services/fincaRosterService.js",
+      "line": 301
+    },
+    {
+      "type": "named",
+      "name": "FINCA_SCOPE_FIELD",
+      "file": "src/services/fincaScope.js",
+      "line": 63
+    },
+    {
+      "type": "named",
+      "name": "isMultiFincaEnabled",
+      "file": "src/services/fincaScope.js",
+      "line": 76
+    },
+    {
+      "type": "named",
+      "name": "getActiveFincaScope",
+      "file": "src/services/fincaScope.js",
+      "line": 105
+    },
+    {
+      "type": "named",
+      "name": "isFincaScopeActive",
+      "file": "src/services/fincaScope.js",
+      "line": 132
+    },
+    {
+      "type": "named",
+      "name": "stampScope",
+      "file": "src/services/fincaScope.js",
+      "line": 153
+    },
+    {
+      "type": "named",
+      "name": "scopeMatches",
+      "file": "src/services/fincaScope.js",
+      "line": 176
+    },
+    {
+      "type": "named",
+      "name": "filterByActiveFinca",
+      "file": "src/services/fincaScope.js",
+      "line": 196
+    },
+    {
+      "type": "named",
+      "name": "SUPERFICIES_CRITICAS",
+      "file": "src/services/glaciarSafety.js",
+      "line": 66
+    },
+    {
+      "type": "named",
+      "name": "PELIGROS_CRITICOS_SIEMPRE",
+      "file": "src/services/glaciarSafety.js",
+      "line": 69
+    },
+    {
+      "type": "named",
+      "name": "__resetGrafoRelationsCache",
+      "file": "src/services/grafoRelations.js",
+      "line": 458
+    },
+    {
+      "type": "named",
+      "name": "selectRelevantAssets",
+      "file": "src/services/guildService.js",
+      "line": 265
+    },
+    {
+      "type": "named",
+      "name": "buildAssetContext",
+      "file": "src/services/guildService.js",
+      "line": 334
+    },
+    {
+      "type": "named",
+      "name": "HORTALIZA_BY_ID",
+      "file": "src/services/hortalizasData.js",
+      "line": 339
+    },
+    {
+      "type": "named",
+      "name": "STAGE_EMOJIS",
+      "file": "src/services/hoyEnFincaService.js",
+      "line": 46
+    },
+    {
+      "type": "named",
+      "name": "formatIncendioContext",
+      "file": "src/services/incendioRiskService.js",
+      "line": 257
+    },
+    {
+      "type": "named",
+      "name": "hasWaterDiagnosticIntent",
+      "file": "src/services/knowledgeIntentRouter.js",
+      "line": 157
+    },
+    {
+      "type": "named",
+      "name": "hasAnimalDiagnosticIntent",
+      "file": "src/services/knowledgeIntentRouter.js",
+      "line": 160
+    },
+    {
+      "type": "named",
+      "name": "SYSTEM_PROMPT_BASE",
+      "file": "src/services/llmGuardrails.js",
+      "line": 25
+    },
+    {
+      "type": "named",
+      "name": "CHAT_STOP_SEQUENCES",
+      "file": "src/services/llmRouter.js",
+      "line": 38
+    },
+    {
+      "type": "named",
+      "name": "keepAliveEfectivo",
+      "file": "src/services/llmRouter.js",
+      "line": 276
+    },
+    {
+      "type": "named",
+      "name": "getLLMEvents",
+      "file": "src/services/llmTelemetryService.js",
+      "line": 126
+    },
+    {
+      "type": "named",
+      "name": "clearLLMTelemetry",
+      "file": "src/services/llmTelemetryService.js",
+      "line": 154
+    },
+    {
+      "type": "named",
+      "name": "pruneLLMTelemetry",
+      "file": "src/services/llmTelemetryService.js",
+      "line": 170
+    },
+    {
+      "type": "named",
+      "name": "exportLLMTelemetry",
+      "file": "src/services/llmTelemetryService.js",
+      "line": 276
+    },
+    {
+      "type": "named",
+      "name": "LOTE_ASSET_TYPE",
+      "file": "src/services/loteService.js",
+      "line": 50
+    },
+    {
+      "type": "named",
+      "name": "wktOf",
+      "file": "src/services/loteService.js",
+      "line": 85
+    },
+    {
+      "type": "named",
+      "name": "loteGeoJson",
+      "file": "src/services/loteService.js",
+      "line": 92
+    },
+    {
+      "type": "named",
+      "name": "PROYECTIL_W",
+      "file": "src/services/metalSlugCampoEngine.js",
+      "line": 30
+    },
+    {
+      "type": "named",
+      "name": "PROYECTIL_H",
+      "file": "src/services/metalSlugCampoEngine.js",
+      "line": 31
+    },
+    {
+      "type": "named",
+      "name": "milpasCompletas",
+      "file": "src/services/milpaGameEngine.js",
+      "line": 1094
+    },
+    {
+      "type": "named",
+      "name": "PHOTO_MAX_DIMENSION",
+      "file": "src/services/operatorPhotoService.js",
+      "line": 71
+    },
+    {
+      "type": "named",
+      "name": "PHOTO_JPEG_QUALITY",
+      "file": "src/services/operatorPhotoService.js",
+      "line": 72
+    },
+    {
+      "type": "named",
+      "name": "guardObservableSymptomTriage",
+      "file": "src/services/outputGuards.js",
+      "line": 5014
+    },
+    {
+      "type": "named",
+      "name": "guardTruncatedUserPrompt",
+      "file": "src/services/outputGuards.js",
+      "line": 8381
+    },
+    {
+      "type": "named",
+      "name": "guardRequestedFabricatedBeneficial",
+      "file": "src/services/outputGuards.js",
+      "line": 8439
+    },
+    {
+      "type": "named",
+      "name": "PISOS_TERMICOS_IDS",
+      "file": "src/services/perfilFincaService.js",
+      "line": 42
+    },
+    {
+      "type": "named",
+      "name": "pisoTermicoDeAltitud",
+      "file": "src/services/perfilFincaService.js",
+      "line": 136
+    },
+    {
+      "type": "named",
+      "name": "derivarEscala",
+      "file": "src/services/perfilFincaService.js",
+      "line": 156
+    },
+    {
+      "type": "named",
+      "name": "derivarAgua",
+      "file": "src/services/perfilFincaService.js",
+      "line": 176
+    },
+    {
+      "type": "named",
+      "name": "normalizarPerfilFinca",
+      "file": "src/services/perfilFincaService.js",
+      "line": 191
+    },
+    {
+      "type": "named",
+      "name": "FOTO_BASE_PLATANO",
+      "file": "src/services/platanoBananoData.js",
+      "line": 344
+    },
+    {
+      "type": "named",
+      "name": "AGUACATE_MS_MINIMO_COLOMBIA",
+      "file": "src/services/poscosechaCalculator.js",
+      "line": 130
+    },
+    {
+      "type": "named",
+      "name": "PROFILE_CHANGED_EVENT",
+      "file": "src/services/profilePresets.js",
+      "line": 42
+    },
+    {
+      "type": "named",
+      "name": "getPresetById",
+      "file": "src/services/profilePresets.js",
+      "line": 96
+    },
+    {
+      "type": "named",
+      "name": "BLOCK_ORDER",
+      "file": "src/services/promptAssembler.js",
+      "line": 79
+    },
+    {
+      "type": "named",
+      "name": "isSemanticEnabled",
+      "file": "src/services/ragRetriever.js",
+      "line": 49
+    },
+    {
+      "type": "named",
+      "name": "getTierGateBlockCount",
+      "file": "src/services/ragRetriever.js",
+      "line": 103
+    },
+    {
+      "type": "named",
+      "name": "RAG_SERVICE",
+      "file": "src/services/ragRetriever.js",
+      "line": 894
+    },
+    {
+      "type": "named",
+      "name": "getTelemetryRate",
+      "file": "src/services/ragTelemetry.js",
+      "line": 58
+    },
+    {
+      "type": "named",
+      "name": "getRagEvents",
+      "file": "src/services/ragTelemetry.js",
+      "line": 157
+    },
+    {
+      "type": "named",
+      "name": "getRagMetrics",
+      "file": "src/services/ragTelemetry.js",
+      "line": 209
+    },
+    {
+      "type": "named",
+      "name": "pruneRagTelemetry",
+      "file": "src/services/ragTelemetry.js",
+      "line": 260
+    },
+    {
+      "type": "named",
+      "name": "clearRagTelemetry",
+      "file": "src/services/ragTelemetry.js",
+      "line": 297
+    },
+    {
+      "type": "named",
+      "name": "setRagTelemetryEnabled",
+      "file": "src/services/ragTelemetry.js",
+      "line": 309
+    },
+    {
+      "type": "named",
+      "name": "isRagTelemetryEnabled",
+      "file": "src/services/ragTelemetry.js",
+      "line": 315
+    },
+    {
+      "type": "named",
+      "name": "RAG_WITH_PHOTOS_SERVICE",
+      "file": "src/services/ragWithPhotos.js",
+      "line": 128
+    },
+    {
+      "type": "named",
+      "name": "PROXIMIDAD_LABEL",
+      "file": "src/services/red/redMatchmaking.js",
+      "line": 22
+    },
+    {
+      "type": "named",
+      "name": "resolvePermisos",
+      "file": "src/services/roleService.js",
+      "line": 176
+    },
+    {
+      "type": "named",
+      "name": "ORTODOXAS",
+      "file": "src/services/semillaCalculator.js",
+      "line": 149
+    },
+    {
+      "type": "named",
+      "name": "HARRINGTON_RANGO",
+      "file": "src/services/semillaCalculator.js",
+      "line": 200
+    },
+    {
+      "type": "named",
+      "name": "OPEN_METEO_SKY_URL",
+      "file": "src/services/skyConditionService.js",
+      "line": 51
+    },
+    {
+      "type": "named",
+      "name": "CLOUD_THRESHOLDS",
+      "file": "src/services/skyConditionService.js",
+      "line": 54
+    },
+    {
+      "type": "named",
+      "name": "DIAG_SUELO_STORAGE_KEY",
+      "file": "src/services/soilDiagnostic.js",
+      "line": 195
+    },
+    {
+      "type": "named",
+      "name": "getSwVersion",
+      "file": "src/services/swRegistration.js",
+      "line": 60
+    },
+    {
+      "type": "named",
+      "name": "isReloadSafe",
+      "file": "src/services/swRegistration.js",
+      "line": 91
+    },
+    {
+      "type": "named",
+      "name": "SyncManager",
+      "file": "src/services/syncManager.js",
+      "line": 22
+    },
+    {
+      "type": "named",
+      "name": "ANA_USERNAME_PENDIENTE",
+      "file": "src/services/tierService.js",
+      "line": 48
+    },
+    {
+      "type": "named",
+      "name": "PRO_USERNAMES",
+      "file": "src/services/tierService.js",
+      "line": 58
+    },
+    {
+      "type": "named",
+      "name": "resolveTier",
+      "file": "src/services/tierService.js",
+      "line": 120
+    },
+    {
+      "type": "named",
+      "name": "NIVEL_TOX_META",
+      "file": "src/services/toxicologiaInsumos.js",
+      "line": 97
+    },
+    {
+      "type": "named",
+      "name": "XTTS_ENABLED_KEY",
+      "file": "src/services/ttsService.js",
+      "line": 120
+    },
+    {
+      "type": "named",
+      "name": "getActiveAudio",
+      "file": "src/services/ttsService.js",
+      "line": 414
+    },
+    {
+      "type": "named",
+      "name": "getSpanishVoice",
+      "file": "src/services/ttsService.js",
+      "line": 781
+    },
+    {
+      "type": "named",
+      "name": "pause",
+      "file": "src/services/ttsService.js",
+      "line": 871
+    },
+    {
+      "type": "named",
+      "name": "resume",
+      "file": "src/services/ttsService.js",
+      "line": 880
+    },
+    {
+      "type": "named",
+      "name": "isPaused",
+      "file": "src/services/ttsService.js",
+      "line": 1061
+    },
+    {
+      "type": "named",
+      "name": "RESOLVER",
+      "file": "src/services/tuberculosData.js",
+      "line": 60
+    },
+    {
+      "type": "named",
+      "name": "TUBERCULO_BY_ID",
+      "file": "src/services/tuberculosData.js",
+      "line": 411
+    },
+    {
+      "type": "named",
+      "name": "getUsageIngestUrl",
+      "file": "src/services/usageTelemetrySync.js",
+      "line": 70
+    },
+    {
+      "type": "named",
+      "name": "getUsageSummaryUrl",
+      "file": "src/services/usageTelemetrySync.js",
+      "line": 78
+    },
+    {
+      "type": "named",
+      "name": "NOTIFICATION_STYLES",
+      "file": "src/services/userProfileService.js",
+      "line": 794
+    },
+    {
+      "type": "named",
+      "name": "PENDING_UPDATE_SHA_KEY",
+      "file": "src/services/versionCheck.js",
+      "line": 58
+    },
+    {
+      "type": "named",
+      "name": "VERSION_FETCH_TIMEOUT_MS",
+      "file": "src/services/versionCheck.js",
+      "line": 61
+    },
+    {
+      "type": "named",
+      "name": "markSelfHealReloaded",
+      "file": "src/services/versionCheck.js",
+      "line": 219
+    },
+    {
+      "type": "named",
+      "name": "readPendingUpdateSha",
+      "file": "src/services/versionCheck.js",
+      "line": 230
+    },
+    {
+      "type": "named",
+      "name": "writePendingUpdateSha",
+      "file": "src/services/versionCheck.js",
+      "line": 239
+    },
+    {
+      "type": "named",
+      "name": "clearPendingUpdateSha",
+      "file": "src/services/versionCheck.js",
+      "line": 248
+    },
+    {
+      "type": "named",
+      "name": "BIODIVERSIDAD_SATURACION",
+      "file": "src/services/vitalidadEspirituService.js",
+      "line": 65
+    },
+    {
+      "type": "named",
+      "name": "SUELO_PENALIZACION_POR_PROBLEMA",
+      "file": "src/services/vitalidadEspirituService.js",
+      "line": 69
+    },
+    {
+      "type": "named",
+      "name": "MESES_POR_TEMPORADA",
+      "file": "src/services/vitalidadEspirituService.js",
+      "line": 71
+    },
+    {
+      "type": "named",
+      "name": "_resetSpeciesIndex",
+      "file": "src/services/voiceFieldExtractor.js",
+      "line": 157
+    },
+    {
+      "type": "named",
+      "name": "markSynced",
+      "file": "src/services/voiceTelemetryService.js",
+      "line": 84
+    },
+    {
+      "type": "named",
+      "name": "LISTEN_OVERLAP",
+      "file": "src/services/wakeWordService.js",
+      "line": 60
+    },
+    {
+      "type": "named",
+      "name": "READY_TRANSFER_NAME",
+      "file": "src/services/wakeWordService.js",
+      "line": 93
+    },
+    {
+      "type": "named",
+      "name": "persistirEnLocalStorage",
+      "file": "src/store/persistMiddleware.js",
+      "line": 14
+    },
+    {
+      "type": "named",
+      "name": "DEFAULT_EMA_MS",
+      "file": "src/store/useAgentQueueStore.js",
+      "line": 50
+    },
+    {
+      "type": "named",
+      "name": "QUEUE_MAX",
+      "file": "src/store/useAgentQueueStore.js",
+      "line": 70
+    },
+    {
+      "type": "named",
+      "name": "getPerfilFincaActual",
+      "file": "src/store/usePerfilFincaStore.js",
+      "line": 132
+    },
+    {
+      "type": "named",
+      "name": "AVATAR_CREATURE_DEFAULT",
+      "file": "src/store/usePrefsStore.js",
+      "line": 41
+    },
+    {
+      "type": "named",
+      "name": "BACKGROUND_CATALOG",
+      "file": "src/store/useThemeBackgroundStore.js",
+      "line": 48
+    },
+    {
+      "type": "named",
+      "name": "esGradiente",
+      "file": "src/store/useThemeBackgroundStore.js",
+      "line": 70
+    },
+    {
+      "type": "named",
+      "name": "DEFAULT_BACKGROUND_ID",
+      "file": "src/store/useThemeBackgroundStore.js",
+      "line": 79
+    },
+    {
+      "type": "named",
+      "name": "DEFAULT_BACKGROUND_SRC",
+      "file": "src/store/useThemeBackgroundStore.js",
+      "line": 87
+    },
+    {
+      "type": "named",
+      "name": "getBackgroundById",
+      "file": "src/store/useThemeBackgroundStore.js",
+      "line": 102
+    },
+    {
+      "type": "named",
+      "name": "getBackgroundSrc",
+      "file": "src/store/useThemeBackgroundStore.js",
+      "line": 111
+    },
+    {
+      "type": "named",
+      "name": "mockDbCoreFactory",
+      "file": "src/test-utils/db-mocks.js",
+      "line": 34
+    },
+    {
+      "type": "named",
+      "name": "fakeIndexedDB",
+      "file": "src/test-utils/db-mocks.js",
+      "line": 112
+    },
+    {
+      "type": "named",
+      "name": "customResponse",
+      "file": "src/test-utils/fetch-mocks.js",
+      "line": 35
+    },
+    {
+      "type": "named",
+      "name": "GeoJSON",
+      "file": "src/types/leaflet-stub.d.ts",
+      "line": 17
+    },
+    {
+      "type": "named",
+      "name": "isLogSplit",
+      "file": "src/types/logSplit.js",
+      "line": 28
+    },
+    {
+      "type": "named",
+      "name": "onAtajo",
+      "file": "src/utils/atajosTeclado.js",
+      "line": 29
+    },
+    {
+      "type": "named",
+      "name": "offAtajo",
+      "file": "src/utils/atajosTeclado.js",
+      "line": 34
+    },
+    {
+      "type": "named",
+      "name": "initAtajos",
+      "file": "src/utils/atajosTeclado.js",
+      "line": 40
+    },
+    {
+      "type": "named",
+      "name": "logAudit",
+      "file": "src/utils/auditLog.js",
+      "line": 12
+    },
+    {
+      "type": "named",
+      "name": "getAuditLog",
+      "file": "src/utils/auditLog.js",
+      "line": 18
+    },
+    {
+      "type": "named",
+      "name": "exportAuditJSON",
+      "file": "src/utils/auditLog.js",
+      "line": 21
+    },
+    {
+      "type": "named",
+      "name": "getAuditErrors",
+      "file": "src/utils/auditLog.js",
+      "line": 26
+    },
+    {
+      "type": "named",
+      "name": "backoff",
+      "file": "src/utils/backoff.js",
+      "line": 17
+    },
+    {
+      "type": "named",
+      "name": "dormirBackoff",
+      "file": "src/utils/backoff.js",
+      "line": 28
+    },
+    {
+      "type": "named",
+      "name": "GPS_SIMPLIFY_TOLERANCE_M",
+      "file": "src/utils/geo.js",
+      "line": 62
+    },
+    {
+      "type": "named",
+      "name": "__resetPlagaImagesCache",
+      "file": "src/utils/plagaImageResolver.js",
+      "line": 101
+    },
+    {
+      "type": "named",
+      "name": "formatLocalHM",
+      "file": "src/utils/skyEphemeris.js",
+      "line": 177
+    },
+    {
+      "type": "named",
+      "name": "formatDayLength",
+      "file": "src/utils/skyEphemeris.js",
+      "line": 192
+    },
+    {
+      "type": "named",
+      "name": "validarCampo",
+      "file": "src/utils/validacionFormularios.js",
+      "line": 20
+    },
+    {
+      "type": "named",
+      "name": "claseBorde",
+      "file": "src/utils/validacionFormularios.js",
+      "line": 46
+    },
+    {
+      "type": "default",
+      "name": "AgentePlanoTransicion",
+      "file": "src/visual/agente/AgentePlanoTransicion.jsx",
+      "line": 57
+    },
+    {
+      "type": "named",
+      "name": "esDiaSoleado",
+      "file": "src/visual/agente/AngelitaEntrada.jsx",
+      "line": 58
+    },
+    {
+      "type": "named",
+      "name": "FASE_TUNEL_POR_SENTIDO",
+      "file": "src/visual/agente/agentePlanoData.js",
+      "line": 41
+    },
+    {
+      "type": "named",
+      "name": "APLANE_MS",
+      "file": "src/visual/agente/agentePlanoData.js",
+      "line": 54
+    },
+    {
+      "type": "named",
+      "name": "LADO_POSADA_MIN",
+      "file": "src/visual/agente/agentePlanoData.js",
+      "line": 58
+    },
+    {
+      "type": "named",
+      "name": "LADO_POSADA_MAX",
+      "file": "src/visual/agente/agentePlanoData.js",
+      "line": 59
+    },
+    {
+      "type": "named",
+      "name": "CONFIANZA",
+      "file": "src/visual/confianza/index.js",
+      "line": 52
+    },
+    {
+      "type": "default",
+      "name": "AbejaTransicion",
+      "file": "src/visual/creatures/AbejaTransicion.jsx",
+      "line": 80
+    },
+    {
+      "type": "named",
+      "name": "CRUCE_ENTRAR_MS",
+      "file": "src/visual/creatures/AbejaTransicion.jsx",
+      "line": 53
+    },
+    {
+      "type": "named",
+      "name": "CRUCE_VOLVER_MS",
+      "file": "src/visual/creatures/AbejaTransicion.jsx",
+      "line": 55
+    },
+    {
+      "type": "named",
+      "name": "AlMontarEscena",
+      "file": "src/visual/creatures/AbejaTransicion.jsx",
+      "line": 72
+    },
+    {
+      "type": "named",
+      "name": "BOIL_SEEDS",
+      "file": "src/visual/creatures/LineBoilFilter.jsx",
+      "line": 23
+    },
+    {
+      "type": "default",
+      "name": "MomentoGuardianes",
+      "file": "src/visual/creatures/MomentoGuardianes.jsx",
+      "line": 87
+    },
+    {
+      "type": "named",
+      "name": "POSICIONES_GUARDIANES",
+      "file": "src/visual/creatures/MomentoGuardianes.jsx",
+      "line": 44
+    },
+    {
+      "type": "named",
+      "name": "OsoAnteojos",
+      "file": "src/visual/creatures/OsoAnteojos.jsx",
+      "line": 72
+    },
+    {
+      "type": "named",
+      "name": "PEREZOSO_PALETA",
+      "file": "src/visual/creatures/Perezoso.jsx",
+      "line": 32
+    },
+    {
+      "type": "named",
+      "name": "PEREZOSO_PROPORCION",
+      "file": "src/visual/creatures/Perezoso.jsx",
+      "line": 46
+    },
+    {
+      "type": "default",
+      "name": "PerroTransicion",
+      "file": "src/visual/creatures/PerroTransicion.jsx",
+      "line": 64
+    },
+    {
+      "type": "named",
+      "name": "PERRO_APAGA_3D_MS",
+      "file": "src/visual/creatures/PerroTransicion.jsx",
+      "line": 44
+    },
+    {
+      "type": "named",
+      "name": "PERRO_CRUCE_HEROE_MS",
+      "file": "src/visual/creatures/PerroTransicion.jsx",
+      "line": 46
+    },
+    {
+      "type": "named",
+      "name": "PERRO_RENACE_3D_MS",
+      "file": "src/visual/creatures/PerroTransicion.jsx",
+      "line": 49
+    },
+    {
+      "type": "named",
+      "name": "PERRO_CRUCE_NORMAL_MS",
+      "file": "src/visual/creatures/PerroTransicion.jsx",
+      "line": 51
+    },
+    {
+      "type": "named",
+      "name": "ESCALON_PERROS_MS",
+      "file": "src/visual/creatures/PerroTransicion.jsx",
+      "line": 54
+    },
+    {
+      "type": "named",
+      "name": "CUERPO_NEUTRO",
+      "file": "src/visual/creatures/creatureClimaCuerpo.js",
+      "line": 50
+    },
+    {
+      "type": "named",
+      "name": "PERFILES",
+      "file": "src/visual/creatures/creatureClimaCuerpo.js",
+      "line": 153
+    },
+    {
+      "type": "named",
+      "name": "ROPA_PERFIL_POR_BICHO",
+      "file": "src/visual/creatures/creatureClimaCuerpo.js",
+      "line": 237
+    },
+    {
+      "type": "named",
+      "name": "ventana",
+      "file": "src/visual/creatures/creatureIdle.js",
+      "line": 88
+    },
+    {
+      "type": "named",
+      "name": "FASES_GUARDIANES",
+      "file": "src/visual/creatures/escenaGuardianes.js",
+      "line": 48
+    },
+    {
+      "type": "named",
+      "name": "useEscenaGuardianes",
+      "file": "src/visual/creatures/escenaGuardianes.js",
+      "line": 146
+    },
+    {
+      "type": "named",
+      "name": "FASE_MS",
+      "file": "src/visual/creatures/faunaAmbiental.js",
+      "line": 100
+    },
+    {
+      "type": "named",
+      "name": "DESCANSO_BASE_MS",
+      "file": "src/visual/creatures/faunaAmbiental.js",
+      "line": 103
+    },
+    {
+      "type": "named",
+      "name": "DESCANSO_POR_SLOT_MS",
+      "file": "src/visual/creatures/faunaAmbiental.js",
+      "line": 104
+    },
+    {
+      "type": "named",
+      "name": "DESCANSO_VARIACION_MS",
+      "file": "src/visual/creatures/faunaAmbiental.js",
+      "line": 105
+    },
+    {
+      "type": "named",
+      "name": "FAUNA_RUBBER",
+      "file": "src/visual/creatures/faunaRubberhose.registry.js",
+      "line": 15
+    },
+    {
+      "type": "named",
+      "name": "MAIZ_FIRMA",
+      "file": "src/visual/creatures/maizIdentidad.js",
+      "line": 47
+    },
+    {
+      "type": "named",
+      "name": "OSO_GUARDIAN_RUANA_ANCLA",
+      "file": "src/visual/creatures/osoGuardianIdentidad.js",
+      "line": 141
+    },
+    {
+      "type": "named",
+      "name": "RH_EASE",
+      "file": "src/visual/creatures/rubberhoseSpec.js",
+      "line": 46
+    },
+    {
+      "type": "named",
+      "name": "RH_PERIODOS",
+      "file": "src/visual/creatures/rubberhoseSpec.js",
+      "line": 76
+    },
+    {
+      "type": "named",
+      "name": "RH_REGISTRO",
+      "file": "src/visual/creatures/rubberhoseSpec.js",
+      "line": 101
+    },
+    {
+      "type": "named",
+      "name": "esRubberhose",
+      "file": "src/visual/creatures/rubberhoseSpec.js",
+      "line": 114
+    },
+    {
+      "type": "named",
+      "name": "RAZAS_GUARDIANES",
+      "file": "src/visual/creatures/senalPerrosGuardianes.js",
+      "line": 25
+    },
+    {
+      "type": "named",
+      "name": "CLASE_PODER",
+      "file": "src/visual/creatures/transformacion.js",
+      "line": 22
+    },
+    {
+      "type": "named",
+      "name": "PODER_MS",
+      "file": "src/visual/creatures/transformacion.js",
+      "line": 64
+    },
+    {
+      "type": "named",
+      "name": "usePoderTemporal",
+      "file": "src/visual/creatures/transformacion.js",
+      "line": 75
+    },
+    {
+      "type": "named",
+      "name": "prefiereQuietud",
+      "file": "src/visual/creatures/useVidaIdle.js",
+      "line": 34
+    },
+    {
+      "type": "named",
+      "name": "MOMENTO_POSE",
+      "file": "src/visual/creatures/vidaEstados.js",
+      "line": 131
+    },
+    {
+      "type": "named",
+      "name": "TINTA_ECO",
+      "file": "src/visual/cuaderno/PaginaCuaderno.jsx",
+      "line": 123
+    },
+    {
+      "type": "named",
+      "name": "CLIMA_TIPOS",
+      "file": "src/visual/cuaderno/TrazoVivo.jsx",
+      "line": 132
+    },
+    {
+      "type": "named",
+      "name": "MIRADA_TIPOS",
+      "file": "src/visual/cuaderno/TrazoVivo.jsx",
+      "line": 225
+    },
+    {
+      "type": "named",
+      "name": "PAGINAS",
+      "file": "src/visual/cuaderno/cuadernoData.js",
+      "line": 65
+    },
+    {
+      "type": "named",
+      "name": "TEMPORADAS",
+      "file": "src/visual/cuaderno/cuadernoData.js",
+      "line": 123
+    },
+    {
+      "type": "named",
+      "name": "LECCION_TEMPORADAS",
+      "file": "src/visual/cuaderno/cuadernoData.js",
+      "line": 159
+    },
+    {
+      "type": "named",
+      "name": "PACIENCIA",
+      "file": "src/visual/cuaderno/cuadernoData.js",
+      "line": 166
+    },
+    {
+      "type": "named",
+      "name": "construirGusano",
+      "file": "src/visual/diferencial/formasBicho.js",
+      "line": 86
+    },
+    {
+      "type": "named",
+      "name": "perfilAncho",
+      "file": "src/visual/diferencial/formasHoja.js",
+      "line": 113
+    },
+    {
+      "type": "named",
+      "name": "construirHoja",
+      "file": "src/visual/diferencial/formasHoja.js",
+      "line": 133
+    },
+    {
+      "type": "named",
+      "name": "mordisco",
+      "file": "src/visual/diferencial/formasHoja.js",
+      "line": 334
+    },
+    {
+      "type": "named",
+      "name": "LAMINAS_DIFERENCIAL",
+      "file": "src/visual/diferencial/index.js",
+      "line": 49
+    },
+    {
+      "type": "named",
+      "name": "ManchaAnillos",
+      "file": "src/visual/diferencial/motivosDano.jsx",
+      "line": 359
+    },
+    {
+      "type": "default",
+      "name": "TazaCafe",
+      "file": "src/visual/iconos/TazaCafe.jsx",
+      "line": 27
+    },
+    {
+      "type": "named",
+      "name": "porPiso",
+      "file": "src/visual/laminas/botanicas/especies/index.js",
+      "line": 51
+    },
+    {
+      "type": "named",
+      "name": "POR_SINTOMA",
+      "file": "src/visual/laminas/botanicas/especies/index.js",
+      "line": 56
+    },
+    {
+      "type": "named",
+      "name": "COBERTURA",
+      "file": "src/visual/laminas/botanicas/especies/index.js",
+      "line": 65
+    },
+    {
+      "type": "named",
+      "name": "platano",
+      "file": "src/visual/laminas/botanicas/especies/pisoCalido.js",
+      "line": 15
+    },
+    {
+      "type": "named",
+      "name": "yuca",
+      "file": "src/visual/laminas/botanicas/especies/pisoCalido.js",
+      "line": 108
+    },
+    {
+      "type": "named",
+      "name": "cacao",
+      "file": "src/visual/laminas/botanicas/especies/pisoCalido.js",
+      "line": 189
+    },
+    {
+      "type": "named",
+      "name": "cana",
+      "file": "src/visual/laminas/botanicas/especies/pisoCalido.js",
+      "line": 267
+    },
+    {
+      "type": "named",
+      "name": "ahuyama",
+      "file": "src/visual/laminas/botanicas/especies/pisoCalido.js",
+      "line": 324
+    },
+    {
+      "type": "named",
+      "name": "aguacate",
+      "file": "src/visual/laminas/botanicas/especies/pisoCalido.js",
+      "line": 406
+    },
+    {
+      "type": "named",
+      "name": "papa",
+      "file": "src/visual/laminas/botanicas/especies/pisoFrio.js",
+      "line": 25
+    },
+    {
+      "type": "named",
+      "name": "papaCriolla",
+      "file": "src/visual/laminas/botanicas/especies/pisoFrio.js",
+      "line": 128
+    },
+    {
+      "type": "named",
+      "name": "ulluco",
+      "file": "src/visual/laminas/botanicas/especies/pisoFrio.js",
+      "line": 164
+    },
+    {
+      "type": "named",
+      "name": "haba",
+      "file": "src/visual/laminas/botanicas/especies/pisoFrio.js",
+      "line": 234
+    },
+    {
+      "type": "named",
+      "name": "arveja",
+      "file": "src/visual/laminas/botanicas/especies/pisoFrio.js",
+      "line": 309
+    },
+    {
+      "type": "named",
+      "name": "curuba",
+      "file": "src/visual/laminas/botanicas/especies/pisoFrio.js",
+      "line": 382
+    },
+    {
+      "type": "named",
+      "name": "cafe",
+      "file": "src/visual/laminas/botanicas/especies/pisoTemplado.js",
+      "line": 14
+    },
+    {
+      "type": "named",
+      "name": "maiz",
+      "file": "src/visual/laminas/botanicas/especies/pisoTemplado.js",
+      "line": 116
+    },
+    {
+      "type": "named",
+      "name": "frijol",
+      "file": "src/visual/laminas/botanicas/especies/pisoTemplado.js",
+      "line": 218
+    },
+    {
+      "type": "named",
+      "name": "arracacha",
+      "file": "src/visual/laminas/botanicas/especies/pisoTemplado.js",
+      "line": 301
+    },
+    {
+      "type": "named",
+      "name": "cebollaLarga",
+      "file": "src/visual/laminas/botanicas/especies/pisoTemplado.js",
+      "line": 373
+    },
+    {
+      "type": "named",
+      "name": "tomate",
+      "file": "src/visual/laminas/botanicas/especies/pisoTemplado.js",
+      "line": 452
+    },
+    {
+      "type": "named",
+      "name": "tomateDeArbol",
+      "file": "src/visual/laminas/botanicas/especies/pisoTemplado.js",
+      "line": 537
+    },
+    {
+      "type": "named",
+      "name": "uchuva",
+      "file": "src/visual/laminas/botanicas/especies/pisoTemplado.js",
+      "line": 609
+    },
+    {
+      "type": "named",
+      "name": "mora",
+      "file": "src/visual/laminas/botanicas/especies/pisoTemplado.js",
+      "line": 675
+    },
+    {
+      "type": "named",
+      "name": "florSolanacea",
+      "file": "src/visual/laminas/botanicas/geometria/flor.js",
+      "line": 63
+    },
+    {
+      "type": "named",
+      "name": "florPapilionacea",
+      "file": "src/visual/laminas/botanicas/geometria/flor.js",
+      "line": 84
+    },
+    {
+      "type": "named",
+      "name": "florRubiacea",
+      "file": "src/visual/laminas/botanicas/geometria/flor.js",
+      "line": 145
+    },
+    {
+      "type": "named",
+      "name": "florRosacea",
+      "file": "src/visual/laminas/botanicas/geometria/flor.js",
+      "line": 158
+    },
+    {
+      "type": "named",
+      "name": "florCucurbitacea",
+      "file": "src/visual/laminas/botanicas/geometria/flor.js",
+      "line": 172
+    },
+    {
+      "type": "named",
+      "name": "florCampanulada",
+      "file": "src/visual/laminas/botanicas/geometria/flor.js",
+      "line": 186
+    },
+    {
+      "type": "named",
+      "name": "florPasiflora",
+      "file": "src/visual/laminas/botanicas/geometria/flor.js",
+      "line": 204
+    },
+    {
+      "type": "named",
+      "name": "florUmbela",
+      "file": "src/visual/laminas/botanicas/geometria/flor.js",
+      "line": 219
+    },
+    {
+      "type": "named",
+      "name": "florGlobosa",
+      "file": "src/visual/laminas/botanicas/geometria/flor.js",
+      "line": 241
+    },
+    {
+      "type": "named",
+      "name": "paniculaPoacea",
+      "file": "src/visual/laminas/botanicas/geometria/flor.js",
+      "line": 257
+    },
+    {
+      "type": "named",
+      "name": "florLauracea",
+      "file": "src/visual/laminas/botanicas/geometria/flor.js",
+      "line": 283
+    },
+    {
+      "type": "named",
+      "name": "florCacao",
+      "file": "src/visual/laminas/botanicas/geometria/flor.js",
+      "line": 296
+    },
+    {
+      "type": "named",
+      "name": "inflorescenciaMusa",
+      "file": "src/visual/laminas/botanicas/geometria/flor.js",
+      "line": 312
+    },
+    {
+      "type": "named",
+      "name": "tuberculo",
+      "file": "src/visual/laminas/botanicas/geometria/fruto.js",
+      "line": 38
+    },
+    {
+      "type": "named",
+      "name": "raizTuberosaCorte",
+      "file": "src/visual/laminas/botanicas/geometria/fruto.js",
+      "line": 81
+    },
+    {
+      "type": "named",
+      "name": "baya",
+      "file": "src/visual/laminas/botanicas/geometria/fruto.js",
+      "line": 111
+    },
+    {
+      "type": "named",
+      "name": "drupaCafe",
+      "file": "src/visual/laminas/botanicas/geometria/fruto.js",
+      "line": 159
+    },
+    {
+      "type": "named",
+      "name": "drupaAguacate",
+      "file": "src/visual/laminas/botanicas/geometria/fruto.js",
+      "line": 195
+    },
+    {
+      "type": "named",
+      "name": "vaina",
+      "file": "src/visual/laminas/botanicas/geometria/fruto.js",
+      "line": 212
+    },
+    {
+      "type": "named",
+      "name": "mazorcaMaiz",
+      "file": "src/visual/laminas/botanicas/geometria/fruto.js",
+      "line": 254
+    },
+    {
+      "type": "named",
+      "name": "mazorcaCacao",
+      "file": "src/visual/laminas/botanicas/geometria/fruto.js",
+      "line": 298
+    },
+    {
+      "type": "named",
+      "name": "dedoPlatano",
+      "file": "src/visual/laminas/botanicas/geometria/fruto.js",
+      "line": 332
+    },
+    {
+      "type": "named",
+      "name": "polidrupa",
+      "file": "src/visual/laminas/botanicas/geometria/fruto.js",
+      "line": 367
+    },
+    {
+      "type": "named",
+      "name": "tallloCana",
+      "file": "src/visual/laminas/botanicas/geometria/fruto.js",
+      "line": 394
+    },
+    {
+      "type": "named",
+      "name": "tuboCebolla",
+      "file": "src/visual/laminas/botanicas/geometria/fruto.js",
+      "line": 423
+    },
+    {
+      "type": "named",
+      "name": "cucurbita",
+      "file": "src/visual/laminas/botanicas/geometria/fruto.js",
+      "line": 434
+    },
+    {
+      "type": "named",
+      "name": "farolillo",
+      "file": "src/visual/laminas/botanicas/geometria/fruto.js",
+      "line": 471
+    },
+    {
+      "type": "named",
+      "name": "escalaDe",
+      "file": "src/visual/laminas/botanicas/geometria/habito.js",
+      "line": 28
+    },
+    {
+      "type": "named",
+      "name": "filotaxia",
+      "file": "src/visual/laminas/botanicas/geometria/habito.js",
+      "line": 39
+    },
+    {
+      "type": "named",
+      "name": "PORTES",
+      "file": "src/visual/laminas/botanicas/geometria/habito.js",
+      "line": 292
+    },
+    {
+      "type": "named",
+      "name": "manoReferencia",
+      "file": "src/visual/laminas/botanicas/geometria/habito.js",
+      "line": 325
+    },
+    {
+      "type": "named",
+      "name": "barraEscala",
+      "file": "src/visual/laminas/botanicas/geometria/habito.js",
+      "line": 341
+    },
+    {
+      "type": "named",
+      "name": "estipula",
+      "file": "src/visual/laminas/botanicas/geometria/hoja.js",
+      "line": 452
+    },
+    {
+      "type": "named",
+      "name": "roya",
+      "file": "src/visual/laminas/botanicas/geometria/sintoma.js",
+      "line": 72
+    },
+    {
+      "type": "named",
+      "name": "gota",
+      "file": "src/visual/laminas/botanicas/geometria/sintoma.js",
+      "line": 113
+    },
+    {
+      "type": "named",
+      "name": "alternaria",
+      "file": "src/visual/laminas/botanicas/geometria/sintoma.js",
+      "line": 145
+    },
+    {
+      "type": "named",
+      "name": "manchaAngular",
+      "file": "src/visual/laminas/botanicas/geometria/sintoma.js",
+      "line": 172
+    },
+    {
+      "type": "named",
+      "name": "antracnosis",
+      "file": "src/visual/laminas/botanicas/geometria/sintoma.js",
+      "line": 197
+    },
+    {
+      "type": "named",
+      "name": "mildeoVelloso",
+      "file": "src/visual/laminas/botanicas/geometria/sintoma.js",
+      "line": 226
+    },
+    {
+      "type": "named",
+      "name": "oidio",
+      "file": "src/visual/laminas/botanicas/geometria/sintoma.js",
+      "line": 245
+    },
+    {
+      "type": "named",
+      "name": "sigatoka",
+      "file": "src/visual/laminas/botanicas/geometria/sintoma.js",
+      "line": 262
+    },
+    {
+      "type": "named",
+      "name": "ojoDeGallo",
+      "file": "src/visual/laminas/botanicas/geometria/sintoma.js",
+      "line": 297
+    },
+    {
+      "type": "named",
+      "name": "minador",
+      "file": "src/visual/laminas/botanicas/geometria/sintoma.js",
+      "line": 320
+    },
+    {
+      "type": "named",
+      "name": "trips",
+      "file": "src/visual/laminas/botanicas/geometria/sintoma.js",
+      "line": 355
+    },
+    {
+      "type": "named",
+      "name": "virusEnrollamiento",
+      "file": "src/visual/laminas/botanicas/geometria/sintoma.js",
+      "line": 377
+    },
+    {
+      "type": "named",
+      "name": "cogollero",
+      "file": "src/visual/laminas/botanicas/geometria/sintoma.js",
+      "line": 404
+    },
+    {
+      "type": "named",
+      "name": "carbon",
+      "file": "src/visual/laminas/botanicas/geometria/sintoma.js",
+      "line": 438
+    },
+    {
+      "type": "named",
+      "name": "manchaAsfalto",
+      "file": "src/visual/laminas/botanicas/geometria/sintoma.js",
+      "line": 467
+    },
+    {
+      "type": "named",
+      "name": "cochinilla",
+      "file": "src/visual/laminas/botanicas/geometria/sintoma.js",
+      "line": 488
+    },
+    {
+      "type": "named",
+      "name": "fumagina",
+      "file": "src/visual/laminas/botanicas/geometria/sintoma.js",
+      "line": 515
+    },
+    {
+      "type": "named",
+      "name": "monilia",
+      "file": "src/visual/laminas/botanicas/geometria/sintoma.js",
+      "line": 536
+    },
+    {
+      "type": "named",
+      "name": "escobaDeBruja",
+      "file": "src/visual/laminas/botanicas/geometria/sintoma.js",
+      "line": 567
+    },
+    {
+      "type": "named",
+      "name": "anilloVascular",
+      "file": "src/visual/laminas/botanicas/geometria/sintoma.js",
+      "line": 609
+    },
+    {
+      "type": "named",
+      "name": "nematodo",
+      "file": "src/visual/laminas/botanicas/geometria/sintoma.js",
+      "line": 633
+    },
+    {
+      "type": "named",
+      "name": "broca",
+      "file": "src/visual/laminas/botanicas/geometria/sintoma.js",
+      "line": 649
+    },
+    {
+      "type": "named",
+      "name": "galeriaInterna",
+      "file": "src/visual/laminas/botanicas/geometria/sintoma.js",
+      "line": 687
+    },
+    {
+      "type": "named",
+      "name": "pudricionRadicular",
+      "file": "src/visual/laminas/botanicas/geometria/sintoma.js",
+      "line": 714
+    },
+    {
+      "type": "named",
+      "name": "ronia",
+      "file": "src/visual/laminas/botanicas/geometria/sintoma.js",
+      "line": 733
+    },
+    {
+      "type": "named",
+      "name": "moko",
+      "file": "src/visual/laminas/botanicas/geometria/sintoma.js",
+      "line": 752
+    },
+    {
+      "type": "named",
+      "name": "TIEMPOS",
+      "file": "src/visual/laminas/botanicas/geometria/sintoma.js",
+      "line": 803
+    },
+    {
+      "type": "named",
+      "name": "semilla",
+      "file": "src/visual/laminas/botanicas/nucleo/rng.js",
+      "line": 16
+    },
+    {
+      "type": "named",
+      "name": "elige",
+      "file": "src/visual/laminas/botanicas/nucleo/rng.js",
+      "line": 43
+    },
+    {
+      "type": "named",
+      "name": "normalEn",
+      "file": "src/visual/laminas/botanicas/nucleo/trazo.js",
+      "line": 49
+    },
+    {
+      "type": "named",
+      "name": "enCuadratica",
+      "file": "src/visual/laminas/botanicas/nucleo/trazo.js",
+      "line": 80
+    },
+    {
+      "type": "named",
+      "name": "SERIF",
+      "file": "src/visual/laminas/botanicas/pintores/tipografia.jsx",
+      "line": 29
+    },
+    {
+      "type": "default",
+      "name": "ShowcaseArtesania",
+      "file": "src/visual/mundo3d/ArtesaniaAndina.jsx",
+      "line": 215
+    },
+    {
+      "type": "named",
+      "name": "PatronesArtesania",
+      "file": "src/visual/mundo3d/ArtesaniaAndina.jsx",
+      "line": 52
+    },
+    {
+      "type": "named",
+      "name": "BandaChumbe",
+      "file": "src/visual/mundo3d/ArtesaniaAndina.jsx",
+      "line": 81
+    },
+    {
+      "type": "named",
+      "name": "GrecaEscalonada",
+      "file": "src/visual/mundo3d/ArtesaniaAndina.jsx",
+      "line": 115
+    },
+    {
+      "type": "named",
+      "name": "FranjasMochila",
+      "file": "src/visual/mundo3d/ArtesaniaAndina.jsx",
+      "line": 135
+    },
+    {
+      "type": "named",
+      "name": "MarcoTelar",
+      "file": "src/visual/mundo3d/ArtesaniaAndina.jsx",
+      "line": 151
+    },
+    {
+      "type": "named",
+      "name": "VasijaSilueta",
+      "file": "src/visual/mundo3d/ArtesaniaAndina.jsx",
+      "line": 181
+    },
+    {
+      "type": "named",
+      "name": "SHOT_DEFECTO",
+      "file": "src/visual/mundo3d/CamaraDirector.jsx",
+      "line": 77
+    },
+    {
+      "type": "named",
+      "name": "resolverShot",
+      "file": "src/visual/mundo3d/CamaraDirector.jsx",
+      "line": 132
+    },
+    {
+      "type": "default",
+      "name": "CielosHora",
+      "file": "src/visual/mundo3d/CielosHora.jsx",
+      "line": 122
+    },
+    {
+      "type": "named",
+      "name": "COACH_TOQUE_MS",
+      "file": "src/visual/mundo3d/CoachMarkToque.jsx",
+      "line": 23
+    },
+    {
+      "type": "default",
+      "name": "GemeloValle2D",
+      "file": "src/visual/mundo3d/GemeloValle2D.jsx",
+      "line": 275
+    },
+    {
+      "type": "named",
+      "name": "HotspotPop",
+      "file": "src/visual/mundo3d/HotspotFeedback.jsx",
+      "line": 303
+    },
+    {
+      "type": "named",
+      "name": "MomentoCrece",
+      "file": "src/visual/mundo3d/MomentosFinca.jsx",
+      "line": 280
+    },
+    {
+      "type": "named",
+      "name": "CARGA_3D_TIMEOUT_MS",
+      "file": "src/visual/mundo3d/Mundo.jsx",
+      "line": 63
+    },
+    {
+      "type": "default",
+      "name": "TransicionMundo",
+      "file": "src/visual/mundo3d/TransicionMundo.jsx",
+      "line": 25
+    },
+    {
+      "type": "named",
+      "name": "VIAJE_MS",
+      "file": "src/visual/mundo3d/TransicionMundo.jsx",
+      "line": 23
+    },
+    {
+      "type": "named",
+      "name": "TransicionWipe",
+      "file": "src/visual/mundo3d/TransicionMundoKit.jsx",
+      "line": 150
+    },
+    {
+      "type": "named",
+      "name": "TransicionIris",
+      "file": "src/visual/mundo3d/TransicionMundoKit.jsx",
+      "line": 151
+    },
+    {
+      "type": "named",
+      "name": "TransicionZoom",
+      "file": "src/visual/mundo3d/TransicionMundoKit.jsx",
+      "line": 152
+    },
+    {
+      "type": "named",
+      "name": "TransicionFade",
+      "file": "src/visual/mundo3d/TransicionMundoKit.jsx",
+      "line": 153
+    },
+    {
+      "type": "default",
+      "name": "TransicionNewDonk",
+      "file": "src/visual/mundo3d/TransicionNewDonk.jsx",
+      "line": 162
+    },
+    {
+      "type": "named",
+      "name": "ND_VIAJE_MS",
+      "file": "src/visual/mundo3d/TransicionNewDonk.jsx",
+      "line": 36
+    },
+    {
+      "type": "named",
+      "name": "ND_MITAD_MS",
+      "file": "src/visual/mundo3d/TransicionNewDonk.jsx",
+      "line": 38
+    },
+    {
+      "type": "named",
+      "name": "ND_APLANE_MS",
+      "file": "src/visual/mundo3d/TransicionNewDonk.jsx",
+      "line": 40
+    },
+    {
+      "type": "named",
+      "name": "ND_REDUCIDA_MS",
+      "file": "src/visual/mundo3d/TransicionNewDonk.jsx",
+      "line": 42
+    },
+    {
+      "type": "named",
+      "name": "ND_MITAD_REDUCIDA_MS",
+      "file": "src/visual/mundo3d/TransicionNewDonk.jsx",
+      "line": 44
+    },
+    {
+      "type": "named",
+      "name": "esViva",
+      "file": "src/visual/mundo3d/agua/cicloAgua.geom.js",
+      "line": 185
+    },
+    {
+      "type": "named",
+      "name": "uDeX",
+      "file": "src/visual/mundo3d/agua/cicloAgua.geom.js",
+      "line": 188
+    },
+    {
+      "type": "named",
+      "name": "xDeU",
+      "file": "src/visual/mundo3d/agua/cicloAgua.geom.js",
+      "line": 195
+    },
+    {
+      "type": "named",
+      "name": "pendienteEn",
+      "file": "src/visual/mundo3d/agua/cicloAgua.geom.js",
+      "line": 252
+    },
+    {
+      "type": "named",
+      "name": "espesores",
+      "file": "src/visual/mundo3d/agua/cicloAgua.geom.js",
+      "line": 268
+    },
+    {
+      "type": "named",
+      "name": "columnaCorte",
+      "file": "src/visual/mundo3d/agua/cicloAgua.geom.js",
+      "line": 292
+    },
+    {
+      "type": "named",
+      "name": "freatico",
+      "file": "src/visual/mundo3d/agua/cicloAgua.geom.js",
+      "line": 352
+    },
+    {
+      "type": "named",
+      "name": "NACIMIENTO",
+      "file": "src/visual/mundo3d/agua/cicloAgua.geom.js",
+      "line": 361
+    },
+    {
+      "type": "named",
+      "name": "FAUNA_AGUA_RIBERA",
+      "file": "src/visual/mundo3d/agua/faunaAcuatica.data.js",
+      "line": 52
+    },
+    {
+      "type": "named",
+      "name": "Sauce",
+      "file": "src/visual/mundo3d/agua/vegetacionRibera.jsx",
+      "line": 60
+    },
+    {
+      "type": "named",
+      "name": "Guadua",
+      "file": "src/visual/mundo3d/agua/vegetacionRibera.jsx",
+      "line": 103
+    },
+    {
+      "type": "default",
+      "name": "MundoAguacatal",
+      "file": "src/visual/mundo3d/aguacatal/MundoAguacatal.jsx",
+      "line": 82
+    },
+    {
+      "type": "named",
+      "name": "FLORA_AGUACATAL",
+      "file": "src/visual/mundo3d/aguacatal/floraAguacatal.geom.js",
+      "line": 108
+    },
+    {
+      "type": "named",
+      "name": "CALIDAD_AGUACATAL",
+      "file": "src/visual/mundo3d/aguacatal/floraAguacatal.geom.js",
+      "line": 118
+    },
+    {
+      "type": "named",
+      "name": "MASAS_COPA",
+      "file": "src/visual/mundo3d/aguacatal/floraAguacatal.geom.js",
+      "line": 253
+    },
+    {
+      "type": "named",
+      "name": "masasDeQ",
+      "file": "src/visual/mundo3d/aguacatal/floraAguacatal.geom.js",
+      "line": 265
+    },
+    {
+      "type": "named",
+      "name": "ARQUETIPOS_KEYS",
+      "file": "src/visual/mundo3d/arquetipos.js",
+      "line": 132
+    },
+    {
+      "type": "named",
+      "name": "CuerdaFique",
+      "file": "src/visual/mundo3d/artesania/ArtesaniaKit.jsx",
+      "line": 60
+    },
+    {
+      "type": "named",
+      "name": "PosteGuadua",
+      "file": "src/visual/mundo3d/artesania/ArtesaniaKit.jsx",
+      "line": 82
+    },
+    {
+      "type": "named",
+      "name": "CercaTejida",
+      "file": "src/visual/mundo3d/artesania/ArtesaniaKit.jsx",
+      "line": 116
+    },
+    {
+      "type": "named",
+      "name": "MarcoTelar",
+      "file": "src/visual/mundo3d/artesania/ArtesaniaKit.jsx",
+      "line": 175
+    },
+    {
+      "type": "named",
+      "name": "PanelArtesanal",
+      "file": "src/visual/mundo3d/artesania/ArtesaniaKit.jsx",
+      "line": 225
+    },
+    {
+      "type": "named",
+      "name": "VasijaChamba",
+      "file": "src/visual/mundo3d/artesania/ArtesaniaKit.jsx",
+      "line": 269
+    },
+    {
+      "type": "named",
+      "name": "CanastoAndino",
+      "file": "src/visual/mundo3d/artesania/ArtesaniaKit.jsx",
+      "line": 285
+    },
+    {
+      "type": "named",
+      "name": "amanar",
+      "file": "src/visual/mundo3d/artesania/geometriasArtesania.js",
+      "line": 37
+    },
+    {
+      "type": "named",
+      "name": "RECETAS_ARTESANIA",
+      "file": "src/visual/mundo3d/artesania/materialesArtesania.js",
+      "line": 30
+    },
+    {
+      "type": "named",
+      "name": "liberarTexturasArtesania",
+      "file": "src/visual/mundo3d/artesania/texturasArtesania.js",
+      "line": 41
+    },
+    {
+      "type": "named",
+      "name": "nudosGuadua",
+      "file": "src/visual/mundo3d/artesania/tramaAndina.js",
+      "line": 127
+    },
+    {
+      "type": "named",
+      "name": "SEGMENTOS_VASIJA",
+      "file": "src/visual/mundo3d/artesaniaAndina.js",
+      "line": 221
+    },
+    {
+      "type": "named",
+      "name": "PHI",
+      "file": "src/visual/mundo3d/artesaniaAndina.js",
+      "line": 247
+    },
+    {
+      "type": "named",
+      "name": "PROPORCION_ANDINA",
+      "file": "src/visual/mundo3d/artesaniaAndina.js",
+      "line": 248
+    },
+    {
+      "type": "named",
+      "name": "SILUETAS_ANDINAS",
+      "file": "src/visual/mundo3d/artesaniaAndina.js",
+      "line": 270
+    },
+    {
+      "type": "named",
+      "name": "perfilGenericoDe",
+      "file": "src/visual/mundo3d/artesaniaAndina.js",
+      "line": 328
+    },
+    {
+      "type": "named",
+      "name": "pathSilueta",
+      "file": "src/visual/mundo3d/artesaniaAndina.js",
+      "line": 360
+    },
+    {
+      "type": "named",
+      "name": "FRANJAS_VIVAS",
+      "file": "src/visual/mundo3d/atmosfera/atmosferaVivaData.js",
+      "line": 50
+    },
+    {
+      "type": "named",
+      "name": "MADRUGADA",
+      "file": "src/visual/mundo3d/atmosfera/atmosferaVivaData.js",
+      "line": 88
+    },
+    {
+      "type": "named",
+      "name": "ARCO_DIA",
+      "file": "src/visual/mundo3d/atmosfera/atmosferaVivaData.js",
+      "line": 127
+    },
+    {
+      "type": "named",
+      "name": "mezclarVivos",
+      "file": "src/visual/mundo3d/atmosfera/atmosferaVivaData.js",
+      "line": 158
+    },
+    {
+      "type": "named",
+      "name": "presetVivoDeHora",
+      "file": "src/visual/mundo3d/atmosfera/atmosferaVivaData.js",
+      "line": 179
+    },
+    {
+      "type": "named",
+      "name": "TEMPORADAS",
+      "file": "src/visual/mundo3d/atmosfera/atmosferaVivaData.js",
+      "line": 214
+    },
+    {
+      "type": "named",
+      "name": "aplicarTemporada",
+      "file": "src/visual/mundo3d/atmosfera/atmosferaVivaData.js",
+      "line": 257
+    },
+    {
+      "type": "named",
+      "name": "MESES_LLUVIA",
+      "file": "src/visual/mundo3d/atmosfera/atmosferaVivaData.js",
+      "line": 284
+    },
+    {
+      "type": "named",
+      "name": "leerTemporadaParam",
+      "file": "src/visual/mundo3d/atmosfera/useAtmosferaViva.js",
+      "line": 34
+    },
+    {
+      "type": "default",
+      "name": "EscenaBeneficos",
+      "file": "src/visual/mundo3d/beneficos/EscenaBeneficos.jsx",
+      "line": 651
+    },
+    {
+      "type": "named",
+      "name": "DET",
+      "file": "src/visual/mundo3d/beneficos/beneficos.geom.js",
+      "line": 52
+    },
+    {
+      "type": "named",
+      "name": "detDeTier",
+      "file": "src/visual/mundo3d/beneficos/beneficos.geom.js",
+      "line": 57
+    },
+    {
+      "type": "named",
+      "name": "fundir",
+      "file": "src/visual/mundo3d/beneficos/beneficos.geom.js",
+      "line": 88
+    },
+    {
+      "type": "named",
+      "name": "pulgonGeom",
+      "file": "src/visual/mundo3d/beneficos/beneficos.geom.js",
+      "line": 114
+    },
+    {
+      "type": "named",
+      "name": "orugaGeom",
+      "file": "src/visual/mundo3d/beneficos/beneficos.geom.js",
+      "line": 133
+    },
+    {
+      "type": "named",
+      "name": "larvaMariquitaGeom",
+      "file": "src/visual/mundo3d/beneficos/beneficos.geom.js",
+      "line": 169
+    },
+    {
+      "type": "named",
+      "name": "mariquitaGeom",
+      "file": "src/visual/mundo3d/beneficos/beneficos.geom.js",
+      "line": 238
+    },
+    {
+      "type": "named",
+      "name": "huevosMariquitaGeom",
+      "file": "src/visual/mundo3d/beneficos/beneficos.geom.js",
+      "line": 285
+    },
+    {
+      "type": "named",
+      "name": "pupaMariquitaGeom",
+      "file": "src/visual/mundo3d/beneficos/beneficos.geom.js",
+      "line": 309
+    },
+    {
+      "type": "named",
+      "name": "crisopaGeom",
+      "file": "src/visual/mundo3d/beneficos/beneficos.geom.js",
+      "line": 329
+    },
+    {
+      "type": "named",
+      "name": "crisopaHuevosGeom",
+      "file": "src/visual/mundo3d/beneficos/beneficos.geom.js",
+      "line": 375
+    },
+    {
+      "type": "named",
+      "name": "larvaCrisopaGeom",
+      "file": "src/visual/mundo3d/beneficos/beneficos.geom.js",
+      "line": 404
+    },
+    {
+      "type": "named",
+      "name": "avispaGeom",
+      "file": "src/visual/mundo3d/beneficos/beneficos.geom.js",
+      "line": 436
+    },
+    {
+      "type": "named",
+      "name": "momiaGeom",
+      "file": "src/visual/mundo3d/beneficos/beneficos.geom.js",
+      "line": 484
+    },
+    {
+      "type": "named",
+      "name": "larvaSirfidoGeom",
+      "file": "src/visual/mundo3d/beneficos/beneficos.geom.js",
+      "line": 517
+    },
+    {
+      "type": "named",
+      "name": "aranaGeom",
+      "file": "src/visual/mundo3d/beneficos/beneficos.geom.js",
+      "line": 540
+    },
+    {
+      "type": "named",
+      "name": "telaGeom",
+      "file": "src/visual/mundo3d/beneficos/beneficos.geom.js",
+      "line": 570
+    },
+    {
+      "type": "named",
+      "name": "tijeretaGeom",
+      "file": "src/visual/mundo3d/beneficos/beneficos.geom.js",
+      "line": 592
+    },
+    {
+      "type": "named",
+      "name": "carabidoGeom",
+      "file": "src/visual/mundo3d/beneficos/beneficos.geom.js",
+      "line": 618
+    },
+    {
+      "type": "named",
+      "name": "aveGeom",
+      "file": "src/visual/mundo3d/beneficos/beneficos.geom.js",
+      "line": 642
+    },
+    {
+      "type": "named",
+      "name": "murcielagoGeom",
+      "file": "src/visual/mundo3d/beneficos/beneficos.geom.js",
+      "line": 660
+    },
+    {
+      "type": "named",
+      "name": "beauveriaGeom",
+      "file": "src/visual/mundo3d/beneficos/beneficos.geom.js",
+      "line": 687
+    },
+    {
+      "type": "named",
+      "name": "metarhiziumGeom",
+      "file": "src/visual/mundo3d/beneficos/beneficos.geom.js",
+      "line": 713
+    },
+    {
+      "type": "named",
+      "name": "trichodermaGeom",
+      "file": "src/visual/mundo3d/beneficos/beneficos.geom.js",
+      "line": 750
+    },
+    {
+      "type": "named",
+      "name": "mataGeom",
+      "file": "src/visual/mundo3d/beneficos/beneficos.geom.js",
+      "line": 789
+    },
+    {
+      "type": "named",
+      "name": "floresGeom",
+      "file": "src/visual/mundo3d/beneficos/beneficos.geom.js",
+      "line": 833
+    },
+    {
+      "type": "named",
+      "name": "rastrojoGeom",
+      "file": "src/visual/mundo3d/beneficos/beneficos.geom.js",
+      "line": 868
+    },
+    {
+      "type": "named",
+      "name": "alambreGeom",
+      "file": "src/visual/mundo3d/beneficos/beneficos.geom.js",
+      "line": 891
+    },
+    {
+      "type": "named",
+      "name": "bandaUmbralGeom",
+      "file": "src/visual/mundo3d/beneficos/beneficos.geom.js",
+      "line": 915
+    },
+    {
+      "type": "named",
+      "name": "ticksUmbralGeom",
+      "file": "src/visual/mundo3d/beneficos/beneficos.geom.js",
+      "line": 920
+    },
+    {
+      "type": "named",
+      "name": "sembrarPulgon",
+      "file": "src/visual/mundo3d/beneficos/beneficos.geom.js",
+      "line": 954
+    },
+    {
+      "type": "named",
+      "name": "ADULTO_SIRFIDO",
+      "file": "src/visual/mundo3d/beneficos/beneficosIdentidad.js",
+      "line": 347
+    },
+    {
+      "type": "named",
+      "name": "INVISIBLES",
+      "file": "src/visual/mundo3d/beneficos/beneficosIdentidad.js",
+      "line": 365
+    },
+    {
+      "type": "named",
+      "name": "HABITAT",
+      "file": "src/visual/mundo3d/beneficos/beneficosIdentidad.js",
+      "line": 489
+    },
+    {
+      "type": "named",
+      "name": "PARAMS",
+      "file": "src/visual/mundo3d/beneficos/dinamicaPlaga.js",
+      "line": 53
+    },
+    {
+      "type": "named",
+      "name": "paso",
+      "file": "src/visual/mundo3d/beneficos/dinamicaPlaga.js",
+      "line": 125
+    },
+    {
+      "type": "named",
+      "name": "serie",
+      "file": "src/visual/mundo3d/beneficos/dinamicaPlaga.js",
+      "line": 164
+    },
+    {
+      "type": "default",
+      "name": "DoselBiodiverso",
+      "file": "src/visual/mundo3d/bosque/DoselBiodiverso.jsx",
+      "line": 85
+    },
+    {
+      "type": "default",
+      "name": "EscenaEntMaestro",
+      "file": "src/visual/mundo3d/bosque/EscenaEntMaestro.jsx",
+      "line": 558
+    },
+    {
+      "type": "default",
+      "name": "MundoEntBosque",
+      "file": "src/visual/mundo3d/bosque/MundoEntBosque.jsx",
+      "line": 64
+    },
+    {
+      "type": "named",
+      "name": "xArroyo",
+      "file": "src/visual/mundo3d/bosque/bosqueTakeA.geom.js",
+      "line": 60
+    },
+    {
+      "type": "named",
+      "name": "PALETA_BOSQUE",
+      "file": "src/visual/mundo3d/bosque/bosqueTakeA.geom.js",
+      "line": 100
+    },
+    {
+      "type": "named",
+      "name": "hornearTierra",
+      "file": "src/visual/mundo3d/bosque/corteSuelo.geom.js",
+      "line": 524
+    },
+    {
+      "type": "named",
+      "name": "DOSEL_TIER",
+      "file": "src/visual/mundo3d/bosque/doselBiodiverso.geom.js",
+      "line": 76
+    },
+    {
+      "type": "named",
+      "name": "CALIDAD_DOSEL",
+      "file": "src/visual/mundo3d/bosque/doselBiodiverso.geom.js",
+      "line": 95
+    },
+    {
+      "type": "named",
+      "name": "CORTEZA",
+      "file": "src/visual/mundo3d/bosque/entQuenua.geom.js",
+      "line": 54
+    },
+    {
+      "type": "named",
+      "name": "ROSTRO_T",
+      "file": "src/visual/mundo3d/bosque/entQuenua.geom.js",
+      "line": 374
+    },
+    {
+      "type": "named",
+      "name": "FOLLAJE",
+      "file": "src/visual/mundo3d/bosque/entQuenua.geom.js",
+      "line": 553
+    },
+    {
+      "type": "named",
+      "name": "factorSonrisa",
+      "file": "src/visual/mundo3d/bosque/entQuenua.geom.js",
+      "line": 695
+    },
+    {
+      "type": "named",
+      "name": "curvaFuste",
+      "file": "src/visual/mundo3d/bosque/entsGradiente.geom.js",
+      "line": 394
+    },
+    {
+      "type": "named",
+      "name": "taperFuste",
+      "file": "src/visual/mundo3d/bosque/entsGradiente.geom.js",
+      "line": 418
+    },
+    {
+      "type": "named",
+      "name": "relieveCorteza",
+      "file": "src/visual/mundo3d/bosque/entsGradiente.geom.js",
+      "line": 439
+    },
+    {
+      "type": "named",
+      "name": "tuboMadera",
+      "file": "src/visual/mundo3d/bosque/entsGradiente.geom.js",
+      "line": 476
+    },
+    {
+      "type": "named",
+      "name": "lobulosCopa",
+      "file": "src/visual/mundo3d/bosque/entsGradiente.geom.js",
+      "line": 656
+    },
+    {
+      "type": "named",
+      "name": "finContrafuerte",
+      "file": "src/visual/mundo3d/bosque/entsGradiente.geom.js",
+      "line": 973
+    },
+    {
+      "type": "named",
+      "name": "geomEspinasCeiba",
+      "file": "src/visual/mundo3d/bosque/entsGradiente.geom.js",
+      "line": 1050
+    },
+    {
+      "type": "named",
+      "name": "ARQUETIPOS_FUERA",
+      "file": "src/visual/mundo3d/bosque/estratosAltoandinos.geom.js",
+      "line": 232
+    },
+    {
+      "type": "named",
+      "name": "arquetiposDe",
+      "file": "src/visual/mundo3d/bosque/estratosAltoandinos.geom.js",
+      "line": 238
+    },
+    {
+      "type": "named",
+      "name": "geomPalmaDeCera",
+      "file": "src/visual/mundo3d/bosque/estratosAltoandinos.geom.js",
+      "line": 456
+    },
+    {
+      "type": "named",
+      "name": "geomManoDeOso",
+      "file": "src/visual/mundo3d/bosque/estratosAltoandinos.geom.js",
+      "line": 813
+    },
+    {
+      "type": "named",
+      "name": "geomHelechoArboreo",
+      "file": "src/visual/mundo3d/bosque/estratosAltoandinos.geom.js",
+      "line": 898
+    },
+    {
+      "type": "named",
+      "name": "geomChusque",
+      "file": "src/visual/mundo3d/bosque/estratosAltoandinos.geom.js",
+      "line": 971
+    },
+    {
+      "type": "named",
+      "name": "geomArbustoFlorecido",
+      "file": "src/visual/mundo3d/bosque/estratosAltoandinos.geom.js",
+      "line": 1030
+    },
+    {
+      "type": "named",
+      "name": "geomBejucoBromelia",
+      "file": "src/visual/mundo3d/bosque/estratosAltoandinos.geom.js",
+      "line": 1111
+    },
+    {
+      "type": "named",
+      "name": "geomHelechoSuelo",
+      "file": "src/visual/mundo3d/bosque/estratosAltoandinos.geom.js",
+      "line": 1195
+    },
+    {
+      "type": "named",
+      "name": "geomHierbaSombra",
+      "file": "src/visual/mundo3d/bosque/estratosAltoandinos.geom.js",
+      "line": 1240
+    },
+    {
+      "type": "named",
+      "name": "geomCojinHojarasca",
+      "file": "src/visual/mundo3d/bosque/estratosAltoandinos.geom.js",
+      "line": 1279
+    },
+    {
+      "type": "named",
+      "name": "POBLACION",
+      "file": "src/visual/mundo3d/bosque/estratosAltoandinos.geom.js",
+      "line": 1344
+    },
+    {
+      "type": "named",
+      "name": "FLORA_TIER",
+      "file": "src/visual/mundo3d/bosque/floraParamo.geom.js",
+      "line": 90
+    },
+    {
+      "type": "named",
+      "name": "Y_BASE",
+      "file": "src/visual/mundo3d/bosque/gradienteAndino.geom.js",
+      "line": 89
+    },
+    {
+      "type": "named",
+      "name": "enEscarpe",
+      "file": "src/visual/mundo3d/bosque/gradienteAndino.geom.js",
+      "line": 172
+    },
+    {
+      "type": "named",
+      "name": "perfilCauce",
+      "file": "src/visual/mundo3d/bosque/gradienteAndino.geom.js",
+      "line": 182
+    },
+    {
+      "type": "named",
+      "name": "nivelAgua",
+      "file": "src/visual/mundo3d/bosque/gradienteAndino.geom.js",
+      "line": 238
+    },
+    {
+      "type": "named",
+      "name": "alturaEnCorte",
+      "file": "src/visual/mundo3d/bosque/gradienteAndino.geom.js",
+      "line": 247
+    },
+    {
+      "type": "named",
+      "name": "horizonteDe",
+      "file": "src/visual/mundo3d/bosque/gradienteAndino.geom.js",
+      "line": 310
+    },
+    {
+      "type": "named",
+      "name": "zCorteDe",
+      "file": "src/visual/mundo3d/bosque/gradienteAndino.geom.js",
+      "line": 329
+    },
+    {
+      "type": "named",
+      "name": "colorSuperficie",
+      "file": "src/visual/mundo3d/bosque/gradienteAndino.geom.js",
+      "line": 381
+    },
+    {
+      "type": "named",
+      "name": "MANANTIAL",
+      "file": "src/visual/mundo3d/bosque/gradienteAndino.geom.js",
+      "line": 605
+    },
+    {
+      "type": "named",
+      "name": "PROF_RED",
+      "file": "src/visual/mundo3d/bosque/gradienteAndino.geom.js",
+      "line": 888
+    },
+    {
+      "type": "named",
+      "name": "ORDEN_PISOS_TERMICOS",
+      "file": "src/visual/mundo3d/bosque/pisosBosqueGradiente.js",
+      "line": 35
+    },
+    {
+      "type": "default",
+      "name": "MundoCacao",
+      "file": "src/visual/mundo3d/cacao/MundoCacao.jsx",
+      "line": 100
+    },
+    {
+      "type": "named",
+      "name": "FLORA_CACAO",
+      "file": "src/visual/mundo3d/cacao/floraCacao.geom.js",
+      "line": 84
+    },
+    {
+      "type": "named",
+      "name": "CALIDAD_CACAO",
+      "file": "src/visual/mundo3d/cacao/floraCacao.geom.js",
+      "line": 94
+    },
+    {
+      "type": "default",
+      "name": "MundoCafetal",
+      "file": "src/visual/mundo3d/cafetal/MundoCafetal.jsx",
+      "line": 80
+    },
+    {
+      "type": "named",
+      "name": "FLORA_CAFETAL",
+      "file": "src/visual/mundo3d/cafetal/floraCafetal.geom.js",
+      "line": 135
+    },
+    {
+      "type": "named",
+      "name": "CALIDAD_CAFETAL",
+      "file": "src/visual/mundo3d/cafetal/floraCafetal.geom.js",
+      "line": 145
+    },
+    {
+      "type": "named",
+      "name": "PISOS_CAFETO",
+      "file": "src/visual/mundo3d/cafetal/floraCafetal.geom.js",
+      "line": 299
+    },
+    {
+      "type": "named",
+      "name": "anguloRamaCafeto",
+      "file": "src/visual/mundo3d/cafetal/floraCafetal.geom.js",
+      "line": 308
+    },
+    {
+      "type": "named",
+      "name": "pisosCafetoDeQ",
+      "file": "src/visual/mundo3d/cafetal/floraCafetal.geom.js",
+      "line": 312
+    },
+    {
+      "type": "named",
+      "name": "PORTES",
+      "file": "src/visual/mundo3d/cafetal/floraCafetal.geom.js",
+      "line": 327
+    },
+    {
+      "type": "named",
+      "name": "REPARTO_PORTES",
+      "file": "src/visual/mundo3d/cafetal/floraCafetal.geom.js",
+      "line": 354
+    },
+    {
+      "type": "named",
+      "name": "porteDeAzar",
+      "file": "src/visual/mundo3d/cafetal/floraCafetal.geom.js",
+      "line": 361
+    },
+    {
+      "type": "named",
+      "name": "puntoEnRama",
+      "file": "src/visual/mundo3d/cafetal/floraCafetal.geom.js",
+      "line": 376
+    },
+    {
+      "type": "named",
+      "name": "SITIO_CAFETO_HERO",
+      "file": "src/visual/mundo3d/cafetal/floraCafetal.geom.js",
+      "line": 772
+    },
+    {
+      "type": "named",
+      "name": "dentroLote",
+      "file": "src/visual/mundo3d/cafetal/floraCafetal.geom.js",
+      "line": 810
+    },
+    {
+      "type": "named",
+      "name": "SITIOS_HERO",
+      "file": "src/visual/mundo3d/cafetal/floraCafetal.geom.js",
+      "line": 831
+    },
+    {
+      "type": "named",
+      "name": "copasSombrio",
+      "file": "src/visual/mundo3d/cafetal/floraCafetal.geom.js",
+      "line": 1092
+    },
+    {
+      "type": "named",
+      "name": "BEAT_DEFECTO",
+      "file": "src/visual/mundo3d/camaraDioramas.js",
+      "line": 45
+    },
+    {
+      "type": "named",
+      "name": "ENCUADRE_DEFECTO",
+      "file": "src/visual/mundo3d/camaraDioramas.js",
+      "line": 54
+    },
+    {
+      "type": "named",
+      "name": "ENCUADRES",
+      "file": "src/visual/mundo3d/camaraDioramas.js",
+      "line": 65
+    },
+    {
+      "type": "named",
+      "name": "ENCUADRE_IDS",
+      "file": "src/visual/mundo3d/camaraDioramas.js",
+      "line": 145
+    },
+    {
+      "type": "named",
+      "name": "Columna",
+      "file": "src/visual/mundo3d/cana/FuegoHornilla.jsx",
+      "line": 159
+    },
+    {
+      "type": "default",
+      "name": "MundoCana",
+      "file": "src/visual/mundo3d/cana/MundoCana.jsx",
+      "line": 41
+    },
+    {
+      "type": "named",
+      "name": "FLORA_CANA",
+      "file": "src/visual/mundo3d/cana/floraCana.geom.js",
+      "line": 156
+    },
+    {
+      "type": "named",
+      "name": "DETALLE",
+      "file": "src/visual/mundo3d/cana/floraCana.geom.js",
+      "line": 165
+    },
+    {
+      "type": "named",
+      "name": "CALIDAD_CANA",
+      "file": "src/visual/mundo3d/cana/floraCana.geom.js",
+      "line": 182
+    },
+    {
+      "type": "named",
+      "name": "geomTalloCana",
+      "file": "src/visual/mundo3d/cana/floraCana.geom.js",
+      "line": 422
+    },
+    {
+      "type": "named",
+      "name": "N_VARIANTES",
+      "file": "src/visual/mundo3d/cana/floraCana.geom.js",
+      "line": 581
+    },
+    {
+      "type": "default",
+      "name": "MundoCasaAdentro",
+      "file": "src/visual/mundo3d/casa/MundoCasaAdentro.jsx",
+      "line": 137
+    },
+    {
+      "type": "named",
+      "name": "HORAS",
+      "file": "src/visual/mundo3d/cielosHoraData.js",
+      "line": 46
+    },
+    {
+      "type": "named",
+      "name": "mezclarPresets",
+      "file": "src/visual/mundo3d/cielosHoraData.js",
+      "line": 272
+    },
+    {
+      "type": "named",
+      "name": "tokenizar",
+      "file": "src/visual/mundo3d/comandoMundo.js",
+      "line": 71
+    },
+    {
+      "type": "named",
+      "name": "FRANJAS_DIA",
+      "file": "src/visual/mundo3d/direccion/composicionValle.js",
+      "line": 236
+    },
+    {
+      "type": "named",
+      "name": "FRANJAS_ANOCHECER",
+      "file": "src/visual/mundo3d/direccion/composicionValle.js",
+      "line": 241
+    },
+    {
+      "type": "named",
+      "name": "rampaValle",
+      "file": "src/visual/mundo3d/direccion/materialValle.js",
+      "line": 47
+    },
+    {
+      "type": "named",
+      "name": "crearMaterialValleVertexColors",
+      "file": "src/visual/mundo3d/direccion/materialValle.js",
+      "line": 95
+    },
+    {
+      "type": "default",
+      "name": "BloomSutil",
+      "file": "src/visual/mundo3d/escenas/BloomSutil.jsx",
+      "line": 31
+    },
+    {
+      "type": "default",
+      "name": "EscenaBoveda",
+      "file": "src/visual/mundo3d/escenas/EscenaBoveda.jsx",
+      "line": 666
+    },
+    {
+      "type": "default",
+      "name": "EscenaCafe",
+      "file": "src/visual/mundo3d/escenas/EscenaCafe.jsx",
+      "line": 271
+    },
+    {
+      "type": "default",
+      "name": "EscenaCalma3D",
+      "file": "src/visual/mundo3d/escenas/EscenaCalma3D.jsx",
+      "line": 256
+    },
+    {
+      "type": "default",
+      "name": "EscenaCutaway",
+      "file": "src/visual/mundo3d/escenas/EscenaCutaway.jsx",
+      "line": 631
+    },
+    {
+      "type": "default",
+      "name": "EscenaEstratos",
+      "file": "src/visual/mundo3d/escenas/EscenaEstratos.jsx",
+      "line": 429
+    },
+    {
+      "type": "default",
+      "name": "EscenaFlujo",
+      "file": "src/visual/mundo3d/escenas/EscenaFlujo.jsx",
+      "line": 335
+    },
+    {
+      "type": "default",
+      "name": "EscenaMercado",
+      "file": "src/visual/mundo3d/escenas/EscenaMercado.jsx",
+      "line": 521
+    },
+    {
+      "type": "default",
+      "name": "EscenaRecinto",
+      "file": "src/visual/mundo3d/escenas/EscenaRecinto.jsx",
+      "line": 86
+    },
+    {
+      "type": "default",
+      "name": "EscenaSanidad",
+      "file": "src/visual/mundo3d/escenas/EscenaSanidad.jsx",
+      "line": 333
+    },
+    {
+      "type": "default",
+      "name": "EscenaSemillero",
+      "file": "src/visual/mundo3d/escenas/EscenaSemillero.jsx",
+      "line": 323
+    },
+    {
+      "type": "default",
+      "name": "EscenaValle",
+      "file": "src/visual/mundo3d/escenas/EscenaValle.jsx",
+      "line": 97
+    },
+    {
+      "type": "named",
+      "name": "coreoCalido",
+      "file": "src/visual/mundo3d/escenas/FaunaCalido.jsx",
+      "line": 55
+    },
+    {
+      "type": "named",
+      "name": "BichoCalido",
+      "file": "src/visual/mundo3d/escenas/FaunaCalido.jsx",
+      "line": 107
+    },
+    {
+      "type": "named",
+      "name": "useArraigoMaiz",
+      "file": "src/visual/mundo3d/escenas/MaizCompaiEscena.jsx",
+      "line": 74
+    },
+    {
+      "type": "named",
+      "name": "useAndanzaZariguya",
+      "file": "src/visual/mundo3d/escenas/ZariguyaCompaiEscena.jsx",
+      "line": 84
+    },
+    {
+      "type": "named",
+      "name": "useEntradaAbeja",
+      "file": "src/visual/mundo3d/escenas/useEntradaAbeja.jsx",
+      "line": 114
+    },
+    {
+      "type": "default",
+      "name": "Biocompostera",
+      "file": "src/visual/mundo3d/estiercol/Biocompostera.jsx",
+      "line": 328
+    },
+    {
+      "type": "named",
+      "name": "MontonMalLlevado",
+      "file": "src/visual/mundo3d/estiercol/Biocompostera.jsx",
+      "line": 290
+    },
+    {
+      "type": "default",
+      "name": "EscenaEstiercol",
+      "file": "src/visual/mundo3d/estiercol/EscenaEstiercol.jsx",
+      "line": 124
+    },
+    {
+      "type": "named",
+      "name": "MANGA",
+      "file": "src/visual/mundo3d/estiercol/biodigestor.geom.js",
+      "line": 72
+    },
+    {
+      "type": "named",
+      "name": "T_NIVEL",
+      "file": "src/visual/mundo3d/estiercol/biodigestor.geom.js",
+      "line": 90
+    },
+    {
+      "type": "named",
+      "name": "NIVEL",
+      "file": "src/visual/mundo3d/estiercol/biodigestor.geom.js",
+      "line": 91
+    },
+    {
+      "type": "named",
+      "name": "fraccionLodo",
+      "file": "src/visual/mundo3d/estiercol/biodigestor.geom.js",
+      "line": 95
+    },
+    {
+      "type": "named",
+      "name": "ZANJA",
+      "file": "src/visual/mundo3d/estiercol/biodigestor.geom.js",
+      "line": 101
+    },
+    {
+      "type": "named",
+      "name": "GROSOR",
+      "file": "src/visual/mundo3d/estiercol/compostera.geom.js",
+      "line": 71
+    },
+    {
+      "type": "named",
+      "name": "ANILLO",
+      "file": "src/visual/mundo3d/estiercol/estiercol.geom.js",
+      "line": 298
+    },
+    {
+      "type": "named",
+      "name": "puntoAnillo",
+      "file": "src/visual/mundo3d/estiercol/estiercol.geom.js",
+      "line": 301
+    },
+    {
+      "type": "named",
+      "name": "estacion",
+      "file": "src/visual/mundo3d/estiercol/estiercol.geom.js",
+      "line": 387
+    },
+    {
+      "type": "named",
+      "name": "curvaTramo",
+      "file": "src/visual/mundo3d/estiercol/estiercol.geom.js",
+      "line": 467
+    },
+    {
+      "type": "default",
+      "name": "ClaroDelJaguar",
+      "file": "src/visual/mundo3d/fauna/ClaroDelJaguar.jsx",
+      "line": 281
+    },
+    {
+      "type": "default",
+      "name": "EscenaFaunaEmblematica",
+      "file": "src/visual/mundo3d/fauna/EscenaFaunaEmblematica.jsx",
+      "line": 240
+    },
+    {
+      "type": "named",
+      "name": "alturaParamo",
+      "file": "src/visual/mundo3d/fauna/EscenaFaunaEmblematica.jsx",
+      "line": 61
+    },
+    {
+      "type": "named",
+      "name": "huesoGeo",
+      "file": "src/visual/mundo3d/fauna/anatomiaFauna.geom.js",
+      "line": 103
+    },
+    {
+      "type": "named",
+      "name": "torsoGeo",
+      "file": "src/visual/mundo3d/fauna/anatomiaFauna.geom.js",
+      "line": 292
+    },
+    {
+      "type": "named",
+      "name": "cabezaGeo",
+      "file": "src/visual/mundo3d/fauna/anatomiaFauna.geom.js",
+      "line": 345
+    },
+    {
+      "type": "named",
+      "name": "pieGeo",
+      "file": "src/visual/mundo3d/fauna/anatomiaFauna.geom.js",
+      "line": 518
+    },
+    {
+      "type": "named",
+      "name": "FICHA_DANTA",
+      "file": "src/visual/mundo3d/fauna/faunaEmblematica.js",
+      "line": 49
+    },
+    {
+      "type": "named",
+      "name": "FICHA_JAGUAR",
+      "file": "src/visual/mundo3d/fauna/faunaEmblematica.js",
+      "line": 113
+    },
+    {
+      "type": "named",
+      "name": "FICHA_PUMA",
+      "file": "src/visual/mundo3d/fauna/faunaEmblematica.js",
+      "line": 178
+    },
+    {
+      "type": "named",
+      "name": "FICHA_OSO",
+      "file": "src/visual/mundo3d/fauna/faunaEmblematica.js",
+      "line": 234
+    },
+    {
+      "type": "named",
+      "name": "FICHA_TIGRILLO",
+      "file": "src/visual/mundo3d/fauna/faunaEmblematica.js",
+      "line": 301
+    },
+    {
+      "type": "named",
+      "name": "FICHA_BORUGO",
+      "file": "src/visual/mundo3d/fauna/faunaEmblematica.js",
+      "line": 357
+    },
+    {
+      "type": "named",
+      "name": "FICHA_COLIBRI",
+      "file": "src/visual/mundo3d/fauna/faunaEmblematica.js",
+      "line": 413
+    },
+    {
+      "type": "named",
+      "name": "FICHA_RANA",
+      "file": "src/visual/mundo3d/fauna/faunaEmblematica.js",
+      "line": 478
+    },
+    {
+      "type": "named",
+      "name": "FICHA_AGUILA",
+      "file": "src/visual/mundo3d/fauna/faunaEmblematica.js",
+      "line": 545
+    },
+    {
+      "type": "named",
+      "name": "GUARDIANES",
+      "file": "src/visual/mundo3d/fauna/faunaEmblematica.js",
+      "line": 612
+    },
+    {
+      "type": "named",
+      "name": "FAUNA_DE_PARAMO",
+      "file": "src/visual/mundo3d/fauna/faunaEmblematica.js",
+      "line": 615
+    },
+    {
+      "type": "named",
+      "name": "fichaDe",
+      "file": "src/visual/mundo3d/fauna/faunaEmblematica.js",
+      "line": 617
+    },
+    {
+      "type": "named",
+      "name": "limitar",
+      "file": "src/visual/mundo3d/fauna/marcha.js",
+      "line": 68
+    },
+    {
+      "type": "named",
+      "name": "PELAJES",
+      "file": "src/visual/mundo3d/fauna/pelajes.js",
+      "line": 220
+    },
+    {
+      "type": "named",
+      "name": "FAUNA_MUNDO",
+      "file": "src/visual/mundo3d/faunaFuncional.js",
+      "line": 125
+    },
+    {
+      "type": "named",
+      "name": "RAZAS_VACA",
+      "file": "src/visual/mundo3d/finca/fincaRealista.geom.js",
+      "line": 305
+    },
+    {
+      "type": "named",
+      "name": "TIPOS_GALLINA",
+      "file": "src/visual/mundo3d/finca/fincaRealista.geom.js",
+      "line": 714
+    },
+    {
+      "type": "default",
+      "name": "MundoFrutales",
+      "file": "src/visual/mundo3d/frutales/MundoFrutales.jsx",
+      "line": 82
+    },
+    {
+      "type": "named",
+      "name": "CALIDAD_FRUTALES",
+      "file": "src/visual/mundo3d/frutales/floraFrutales.geom.js",
+      "line": 124
+    },
+    {
+      "type": "default",
+      "name": "VergelFrutalesAndinos",
+      "file": "src/visual/mundo3d/frutalesAndinos/VergelFrutalesAndinos.jsx",
+      "line": 248
+    },
+    {
+      "type": "named",
+      "name": "P_FRUTAL",
+      "file": "src/visual/mundo3d/frutalesAndinos/frutalesAndinos.geom.js",
+      "line": 53
+    },
+    {
+      "type": "named",
+      "name": "ELENCO_FRUTALES",
+      "file": "src/visual/mundo3d/frutalesAndinos/frutalesAndinos.geom.js",
+      "line": 597
+    },
+    {
+      "type": "named",
+      "name": "__resetGrafoModeloCache",
+      "file": "src/visual/mundo3d/grafo/grafoModelo.js",
+      "line": 100
+    },
+    {
+      "type": "named",
+      "name": "TICK_FEEDBACK",
+      "file": "src/visual/mundo3d/hotspotFeedbackConfig.js",
+      "line": 72
+    },
+    {
+      "type": "named",
+      "name": "GallineroCampo",
+      "file": "src/visual/mundo3d/infraestructura/CatalogoInfra3D.jsx",
+      "line": 122
+    },
+    {
+      "type": "named",
+      "name": "Galpon",
+      "file": "src/visual/mundo3d/infraestructura/CatalogoInfra3D.jsx",
+      "line": 231
+    },
+    {
+      "type": "named",
+      "name": "Establo",
+      "file": "src/visual/mundo3d/infraestructura/CatalogoInfra3D.jsx",
+      "line": 305
+    },
+    {
+      "type": "named",
+      "name": "TrojaSecado",
+      "file": "src/visual/mundo3d/infraestructura/CatalogoInfra3D.jsx",
+      "line": 411
+    },
+    {
+      "type": "named",
+      "name": "TanqueReservorio",
+      "file": "src/visual/mundo3d/infraestructura/CatalogoInfra3D.jsx",
+      "line": 479
+    },
+    {
+      "type": "named",
+      "name": "Compostera",
+      "file": "src/visual/mundo3d/infraestructura/CatalogoInfra3D.jsx",
+      "line": 541
+    },
+    {
+      "type": "named",
+      "name": "esFrugal",
+      "file": "src/visual/mundo3d/infraestructura/Infraestructura.jsx",
+      "line": 40
+    },
+    {
+      "type": "named",
+      "name": "infraPorId",
+      "file": "src/visual/mundo3d/infraestructura/infraestructuraData.js",
+      "line": 206
+    },
+    {
+      "type": "named",
+      "name": "InvernaderoCapilla",
+      "file": "src/visual/mundo3d/infraestructura/piezasInfra.jsx",
+      "line": 422
+    },
+    {
+      "type": "named",
+      "name": "MediaSombra",
+      "file": "src/visual/mundo3d/infraestructura/piezasInfra.jsx",
+      "line": 542
+    },
+    {
+      "type": "named",
+      "name": "GallineroCampo",
+      "file": "src/visual/mundo3d/infraestructura/piezasInfra.jsx",
+      "line": 622
+    },
+    {
+      "type": "named",
+      "name": "Galpon",
+      "file": "src/visual/mundo3d/infraestructura/piezasInfra.jsx",
+      "line": 741
+    },
+    {
+      "type": "named",
+      "name": "Establo",
+      "file": "src/visual/mundo3d/infraestructura/piezasInfra.jsx",
+      "line": 843
+    },
+    {
+      "type": "named",
+      "name": "Compostera",
+      "file": "src/visual/mundo3d/infraestructura/piezasInfra.jsx",
+      "line": 1031
+    },
+    {
+      "type": "named",
+      "name": "TanqueAgua",
+      "file": "src/visual/mundo3d/infraestructura/piezasInfra.jsx",
+      "line": 1092
+    },
+    {
+      "type": "named",
+      "name": "SecaderoCafe",
+      "file": "src/visual/mundo3d/infraestructura/piezasInfra.jsx",
+      "line": 1149
+    },
+    {
+      "type": "default",
+      "name": "MundoInvernadero",
+      "file": "src/visual/mundo3d/invernadero/MundoInvernadero.jsx",
+      "line": 96
+    },
+    {
+      "type": "named",
+      "name": "yBoveda",
+      "file": "src/visual/mundo3d/invernadero/invernadero.geom.js",
+      "line": 72
+    },
+    {
+      "type": "named",
+      "name": "SITIO_ERA",
+      "file": "src/visual/mundo3d/invernadero/invernadero.geom.js",
+      "line": 107
+    },
+    {
+      "type": "named",
+      "name": "posicionesTomate",
+      "file": "src/visual/mundo3d/invernadero/invernadero.geom.js",
+      "line": 272
+    },
+    {
+      "type": "named",
+      "name": "crearGradienteBandas",
+      "file": "src/visual/mundo3d/kit/bandas.js",
+      "line": 33
+    },
+    {
+      "type": "named",
+      "name": "clamp1D",
+      "file": "src/visual/mundo3d/kit/etiquetasAntiColision.js",
+      "line": 63
+    },
+    {
+      "type": "named",
+      "name": "anchoDeChip",
+      "file": "src/visual/mundo3d/kit/etiquetasAntiColision.js",
+      "line": 72
+    },
+    {
+      "type": "named",
+      "name": "resolverModos",
+      "file": "src/visual/mundo3d/kit/etiquetasAntiColision.js",
+      "line": 91
+    },
+    {
+      "type": "default",
+      "name": "MundoValle2D",
+      "file": "src/visual/mundo3d/laminas2d/MundoValle2D.jsx",
+      "line": 12
+    },
+    {
+      "type": "default",
+      "name": "MundoLecheria",
+      "file": "src/visual/mundo3d/lecheria/MundoLecheria.jsx",
+      "line": 89
+    },
+    {
+      "type": "named",
+      "name": "FLORA_LECHERIA",
+      "file": "src/visual/mundo3d/lecheria/floraLecheria.geom.js",
+      "line": 107
+    },
+    {
+      "type": "named",
+      "name": "CALIDAD_LECHERIA",
+      "file": "src/visual/mundo3d/lecheria/floraLecheria.geom.js",
+      "line": 114
+    },
+    {
+      "type": "default",
+      "name": "EscenaMicorrizas",
+      "file": "src/visual/mundo3d/micorrizas/EscenaMicorrizas.jsx",
+      "line": 349
+    },
+    {
+      "type": "named",
+      "name": "raicesDePlanta",
+      "file": "src/visual/mundo3d/micorrizas/micorrizas.geom.js",
+      "line": 123
+    },
+    {
+      "type": "default",
+      "name": "EscenaOlorVisible",
+      "file": "src/visual/mundo3d/olor/EscenaOlorVisible.jsx",
+      "line": 401
+    },
+    {
+      "type": "named",
+      "name": "ALTURA_FUGA",
+      "file": "src/visual/mundo3d/olor/NitrogenoQueSeVa.jsx",
+      "line": 226
+    },
+    {
+      "type": "named",
+      "name": "senalPuno",
+      "file": "src/visual/mundo3d/olor/senalesDelCuerpo.js",
+      "line": 128
+    },
+    {
+      "type": "named",
+      "name": "senalOjos",
+      "file": "src/visual/mundo3d/olor/senalesDelCuerpo.js",
+      "line": 153
+    },
+    {
+      "type": "named",
+      "name": "senalMosca",
+      "file": "src/visual/mundo3d/olor/senalesDelCuerpo.js",
+      "line": 175
+    },
+    {
+      "type": "named",
+      "name": "senalVecino",
+      "file": "src/visual/mundo3d/olor/senalesDelCuerpo.js",
+      "line": 190
+    },
+    {
+      "type": "named",
+      "name": "senalPozo",
+      "file": "src/visual/mundo3d/olor/senalesDelCuerpo.js",
+      "line": 208
+    },
+    {
+      "type": "named",
+      "name": "RECETAS",
+      "file": "src/visual/mundo3d/paleta/materialesMadre.js",
+      "line": 46
+    },
+    {
+      "type": "default",
+      "name": "MundoPapa",
+      "file": "src/visual/mundo3d/papa/MundoPapa.jsx",
+      "line": 80
+    },
+    {
+      "type": "named",
+      "name": "alturaBase",
+      "file": "src/visual/mundo3d/papa/floraPapa.geom.js",
+      "line": 64
+    },
+    {
+      "type": "named",
+      "name": "FILAS_SURCO",
+      "file": "src/visual/mundo3d/papa/floraPapa.geom.js",
+      "line": 75
+    },
+    {
+      "type": "named",
+      "name": "curvaSurco",
+      "file": "src/visual/mundo3d/papa/floraPapa.geom.js",
+      "line": 78
+    },
+    {
+      "type": "named",
+      "name": "dentroLote",
+      "file": "src/visual/mundo3d/papa/floraPapa.geom.js",
+      "line": 92
+    },
+    {
+      "type": "named",
+      "name": "FLORA_PAPA",
+      "file": "src/visual/mundo3d/papa/floraPapa.geom.js",
+      "line": 143
+    },
+    {
+      "type": "named",
+      "name": "CALIDAD_PAPA",
+      "file": "src/visual/mundo3d/papa/floraPapa.geom.js",
+      "line": 153
+    },
+    {
+      "type": "named",
+      "name": "NACEDERO",
+      "file": "src/visual/mundo3d/paramo/nacederoParamo.geom.js",
+      "line": 74
+    },
+    {
+      "type": "named",
+      "name": "COTA_MANANTIAL",
+      "file": "src/visual/mundo3d/paramo/nacederoParamo.geom.js",
+      "line": 114
+    },
+    {
+      "type": "named",
+      "name": "PALETA_TURBERA",
+      "file": "src/visual/mundo3d/paramo/nacederoParamo.geom.js",
+      "line": 119
+    },
+    {
+      "type": "named",
+      "name": "SIEMBRA_TIER",
+      "file": "src/visual/mundo3d/paramo/nacederoParamo.geom.js",
+      "line": 1101
+    },
+    {
+      "type": "named",
+      "name": "HITOS_SIERRA",
+      "file": "src/visual/mundo3d/pisosTermicos.js",
+      "line": 35
+    },
+    {
+      "type": "named",
+      "name": "ATRIBUCION_SIERRA",
+      "file": "src/visual/mundo3d/pisosTermicos.js",
+      "line": 47
+    },
+    {
+      "type": "named",
+      "name": "pisoPorId",
+      "file": "src/visual/mundo3d/pisosTermicos.js",
+      "line": 158
+    },
+    {
+      "type": "named",
+      "name": "pisoPorAltitud",
+      "file": "src/visual/mundo3d/pisosTermicos.js",
+      "line": 168
+    },
+    {
+      "type": "default",
+      "name": "EscenaPolinizadores",
+      "file": "src/visual/mundo3d/polinizadores/EscenaPolinizadores.jsx",
+      "line": 367
+    },
+    {
+      "type": "named",
+      "name": "geomMaracuya",
+      "file": "src/visual/mundo3d/polinizadores/cultivos.geom.js",
+      "line": 83
+    },
+    {
+      "type": "named",
+      "name": "geomFrutoMaracuya",
+      "file": "src/visual/mundo3d/polinizadores/cultivos.geom.js",
+      "line": 120
+    },
+    {
+      "type": "named",
+      "name": "geomAhuyama",
+      "file": "src/visual/mundo3d/polinizadores/cultivos.geom.js",
+      "line": 144
+    },
+    {
+      "type": "named",
+      "name": "geomFrutoAhuyama",
+      "file": "src/visual/mundo3d/polinizadores/cultivos.geom.js",
+      "line": 173
+    },
+    {
+      "type": "named",
+      "name": "geomCafe",
+      "file": "src/visual/mundo3d/polinizadores/cultivos.geom.js",
+      "line": 201
+    },
+    {
+      "type": "named",
+      "name": "geomGranoCafe",
+      "file": "src/visual/mundo3d/polinizadores/cultivos.geom.js",
+      "line": 238
+    },
+    {
+      "type": "named",
+      "name": "geomTubular",
+      "file": "src/visual/mundo3d/polinizadores/floresSindrome.geom.js",
+      "line": 150
+    },
+    {
+      "type": "named",
+      "name": "geomNocturna",
+      "file": "src/visual/mundo3d/polinizadores/floresSindrome.geom.js",
+      "line": 188
+    },
+    {
+      "type": "named",
+      "name": "geomCampana",
+      "file": "src/visual/mundo3d/polinizadores/floresSindrome.geom.js",
+      "line": 235
+    },
+    {
+      "type": "named",
+      "name": "geomPlato",
+      "file": "src/visual/mundo3d/polinizadores/floresSindrome.geom.js",
+      "line": 290
+    },
+    {
+      "type": "named",
+      "name": "geomMargarita",
+      "file": "src/visual/mundo3d/polinizadores/floresSindrome.geom.js",
+      "line": 321
+    },
+    {
+      "type": "named",
+      "name": "geomCopa",
+      "file": "src/visual/mundo3d/polinizadores/floresSindrome.geom.js",
+      "line": 358
+    },
+    {
+      "type": "named",
+      "name": "geomPasiflora",
+      "file": "src/visual/mundo3d/polinizadores/floresSindrome.geom.js",
+      "line": 391
+    },
+    {
+      "type": "named",
+      "name": "CAJA",
+      "file": "src/visual/mundo3d/polinizadores/meliponario.geom.js",
+      "line": 66
+    },
+    {
+      "type": "named",
+      "name": "geomApis",
+      "file": "src/visual/mundo3d/polinizadores/polinizadores.geom.js",
+      "line": 176
+    },
+    {
+      "type": "named",
+      "name": "geomAbejorro",
+      "file": "src/visual/mundo3d/polinizadores/polinizadores.geom.js",
+      "line": 209
+    },
+    {
+      "type": "named",
+      "name": "geomColibri",
+      "file": "src/visual/mundo3d/polinizadores/polinizadores.geom.js",
+      "line": 256
+    },
+    {
+      "type": "named",
+      "name": "geomSirfido",
+      "file": "src/visual/mundo3d/polinizadores/polinizadores.geom.js",
+      "line": 304
+    },
+    {
+      "type": "named",
+      "name": "geomMariposa",
+      "file": "src/visual/mundo3d/polinizadores/polinizadores.geom.js",
+      "line": 344
+    },
+    {
+      "type": "named",
+      "name": "geomAlaMariposa",
+      "file": "src/visual/mundo3d/polinizadores/polinizadores.geom.js",
+      "line": 373
+    },
+    {
+      "type": "named",
+      "name": "geomMurcielago",
+      "file": "src/visual/mundo3d/polinizadores/polinizadores.geom.js",
+      "line": 403
+    },
+    {
+      "type": "named",
+      "name": "geomAlaMurcielago",
+      "file": "src/visual/mundo3d/polinizadores/polinizadores.geom.js",
+      "line": 438
+    },
+    {
+      "type": "named",
+      "name": "geomEscarabajo",
+      "file": "src/visual/mundo3d/polinizadores/polinizadores.geom.js",
+      "line": 467
+    },
+    {
+      "type": "named",
+      "name": "SINDROMES_IDS",
+      "file": "src/visual/mundo3d/polinizadores/polinizadoresIdentidad.js",
+      "line": 297
+    },
+    {
+      "type": "named",
+      "name": "POLINIZADORES_IDS",
+      "file": "src/visual/mundo3d/polinizadores/polinizadoresIdentidad.js",
+      "line": 429
+    },
+    {
+      "type": "named",
+      "name": "visitaSindrome",
+      "file": "src/visual/mundo3d/polinizadores/polinizadoresIdentidad.js",
+      "line": 432
+    },
+    {
+      "type": "named",
+      "name": "bichosDe",
+      "file": "src/visual/mundo3d/polinizadores/polinizadoresIdentidad.js",
+      "line": 436
+    },
+    {
+      "type": "named",
+      "name": "florAbierta",
+      "file": "src/visual/mundo3d/polinizadores/polinizadoresIdentidad.js",
+      "line": 442
+    },
+    {
+      "type": "named",
+      "name": "CULTIVOS_IDS",
+      "file": "src/visual/mundo3d/polinizadores/polinizadoresIdentidad.js",
+      "line": 508
+    },
+    {
+      "type": "named",
+      "name": "cultivoNecesitaRed",
+      "file": "src/visual/mundo3d/polinizadores/polinizadoresIdentidad.js",
+      "line": 511
+    },
+    {
+      "type": "named",
+      "name": "CUAJE_BASE",
+      "file": "src/visual/mundo3d/polinizadores/polinizadoresIdentidad.js",
+      "line": 521
+    },
+    {
+      "type": "named",
+      "name": "CUAJE_TECHO",
+      "file": "src/visual/mundo3d/polinizadores/polinizadoresIdentidad.js",
+      "line": 522
+    },
+    {
+      "type": "named",
+      "name": "UV_FONDO_ROJO",
+      "file": "src/visual/mundo3d/polinizadores/polinizadoresIdentidad.js",
+      "line": 579
+    },
+    {
+      "type": "named",
+      "name": "TIER",
+      "file": "src/visual/mundo3d/polinizadores/polinizadoresIdentidad.js",
+      "line": 611
+    },
+    {
+      "type": "named",
+      "name": "ZONAS",
+      "file": "src/visual/mundo3d/polinizadores/sembrado.js",
+      "line": 40
+    },
+    {
+      "type": "named",
+      "name": "cultivoDeZona",
+      "file": "src/visual/mundo3d/polinizadores/sembrado.js",
+      "line": 311
+    },
+    {
+      "type": "named",
+      "name": "cultivoInfo",
+      "file": "src/visual/mundo3d/polinizadores/sembrado.js",
+      "line": 314
+    },
+    {
+      "type": "default",
+      "name": "MundoQuinua",
+      "file": "src/visual/mundo3d/quinua/MundoQuinua.jsx",
+      "line": 90
+    },
+    {
+      "type": "named",
+      "name": "alturaBase",
+      "file": "src/visual/mundo3d/quinua/floraQuinua.geom.js",
+      "line": 75
+    },
+    {
+      "type": "named",
+      "name": "FILAS_QUINUA",
+      "file": "src/visual/mundo3d/quinua/floraQuinua.geom.js",
+      "line": 87
+    },
+    {
+      "type": "named",
+      "name": "curvaSurco",
+      "file": "src/visual/mundo3d/quinua/floraQuinua.geom.js",
+      "line": 91
+    },
+    {
+      "type": "named",
+      "name": "dentroLote",
+      "file": "src/visual/mundo3d/quinua/floraQuinua.geom.js",
+      "line": 102
+    },
+    {
+      "type": "named",
+      "name": "FLORA_QUINUA",
+      "file": "src/visual/mundo3d/quinua/floraQuinua.geom.js",
+      "line": 192
+    },
+    {
+      "type": "named",
+      "name": "CALIDAD_QUINUA",
+      "file": "src/visual/mundo3d/quinua/floraQuinua.geom.js",
+      "line": 202
+    },
+    {
+      "type": "named",
+      "name": "esqueletoQuinua",
+      "file": "src/visual/mundo3d/quinua/floraQuinua.geom.js",
+      "line": 366
+    },
+    {
+      "type": "named",
+      "name": "N_ESQUELETOS",
+      "file": "src/visual/mundo3d/quinua/floraQuinua.geom.js",
+      "line": 661
+    },
+    {
+      "type": "named",
+      "name": "SEMILLAS_ESQUELETO",
+      "file": "src/visual/mundo3d/quinua/floraQuinua.geom.js",
+      "line": 662
+    },
+    {
+      "type": "named",
+      "name": "variedadEn",
+      "file": "src/visual/mundo3d/quinua/floraQuinua.geom.js",
+      "line": 717
+    },
+    {
+      "type": "default",
+      "name": "EscenaRestauracion",
+      "file": "src/visual/mundo3d/restauracion/EscenaRestauracion.jsx",
+      "line": 265
+    },
+    {
+      "type": "named",
+      "name": "SUC_TIER",
+      "file": "src/visual/mundo3d/restauracion/etapasSucesion.js",
+      "line": 43
+    },
+    {
+      "type": "named",
+      "name": "CALIDAD_SUC",
+      "file": "src/visual/mundo3d/restauracion/etapasSucesion.js",
+      "line": 71
+    },
+    {
+      "type": "named",
+      "name": "distanciaALaSemilla",
+      "file": "src/visual/mundo3d/restauracion/etapasSucesion.js",
+      "line": 79
+    },
+    {
+      "type": "named",
+      "name": "CANAL_X",
+      "file": "src/visual/mundo3d/restauracion/sucesion.geom.js",
+      "line": 58
+    },
+    {
+      "type": "named",
+      "name": "NACIMIENTO_Z",
+      "file": "src/visual/mundo3d/restauracion/sucesion.geom.js",
+      "line": 60
+    },
+    {
+      "type": "named",
+      "name": "ANIO_MIN",
+      "file": "src/visual/mundo3d/restauracion/tiempoSucesion.js",
+      "line": 28
+    },
+    {
+      "type": "default",
+      "name": "EscenaBancoSemillas",
+      "file": "src/visual/mundo3d/semillas/EscenaBancoSemillas.jsx",
+      "line": 723
+    },
+    {
+      "type": "named",
+      "name": "copeteDeSemillas",
+      "file": "src/visual/mundo3d/semillas/bancoSemillas.geom.js",
+      "line": 205
+    },
+    {
+      "type": "named",
+      "name": "curvaFlujo",
+      "file": "src/visual/mundo3d/semillas/bancoSemillas.geom.js",
+      "line": 289
+    },
+    {
+      "type": "named",
+      "name": "variedadPorId",
+      "file": "src/visual/mundo3d/semillas/semillasData.js",
+      "line": 161
+    },
+    {
+      "type": "named",
+      "name": "TEXTOS_BANCO",
+      "file": "src/visual/mundo3d/semillas/semillasData.js",
+      "line": 192
+    },
+    {
+      "type": "default",
+      "name": "GaleriaSierraArboles",
+      "file": "src/visual/mundo3d/sierra/GaleriaSierraArboles.jsx",
+      "line": 1142
+    },
+    {
+      "type": "named",
+      "name": "SierraArbolesDiorama",
+      "file": "src/visual/mundo3d/sierra/GaleriaSierraArboles.jsx",
+      "line": 855
+    },
+    {
+      "type": "default",
+      "name": "SierraCorteVertical",
+      "file": "src/visual/mundo3d/sierra/SierraCorteVertical.jsx",
+      "line": 745
+    },
+    {
+      "type": "named",
+      "name": "SierraCorteDiorama",
+      "file": "src/visual/mundo3d/sierra/SierraCorteVertical.jsx",
+      "line": 627
+    },
+    {
+      "type": "default",
+      "name": "SierraMonte3D",
+      "file": "src/visual/mundo3d/sierra/SierraMonte3D.jsx",
+      "line": 676
+    },
+    {
+      "type": "named",
+      "name": "VARIANTES_TIER",
+      "file": "src/visual/mundo3d/sierra/arbolMayor.geom.js",
+      "line": 818
+    },
+    {
+      "type": "named",
+      "name": "azar",
+      "file": "src/visual/mundo3d/sierra/arbolesMayores.js",
+      "line": 27
+    },
+    {
+      "type": "named",
+      "name": "ARBOLES_MAYORES",
+      "file": "src/visual/mundo3d/sierra/arbolesMayores.js",
+      "line": 53
+    },
+    {
+      "type": "named",
+      "name": "copaBlobs",
+      "file": "src/visual/mundo3d/sierra/arbolesMayores.js",
+      "line": 145
+    },
+    {
+      "type": "named",
+      "name": "tallosArbol",
+      "file": "src/visual/mundo3d/sierra/arbolesMayores.js",
+      "line": 175
+    },
+    {
+      "type": "named",
+      "name": "raicesTablares",
+      "file": "src/visual/mundo3d/sierra/arbolesMayores.js",
+      "line": 203
+    },
+    {
+      "type": "named",
+      "name": "SUBIDA_MAX",
+      "file": "src/visual/mundo3d/sierra/bosqueSierra.js",
+      "line": 59
+    },
+    {
+      "type": "named",
+      "name": "tamanoCacheArboles",
+      "file": "src/visual/mundo3d/sierra/cacheArboles.js",
+      "line": 48
+    },
+    {
+      "type": "named",
+      "name": "VEG_SIERRA_TIER",
+      "file": "src/visual/mundo3d/sierra/sierraBiodiversa.geom.js",
+      "line": 60
+    },
+    {
+      "type": "named",
+      "name": "CALIDAD_SIERRA",
+      "file": "src/visual/mundo3d/sierra/sierraBiodiversa.geom.js",
+      "line": 69
+    },
+    {
+      "type": "named",
+      "name": "VEG_TIER",
+      "file": "src/visual/mundo3d/sierra/sierraMonte.geom.js",
+      "line": 252
+    },
+    {
+      "type": "named",
+      "name": "vegDeTier",
+      "file": "src/visual/mundo3d/sierra/sierraMonte.geom.js",
+      "line": 257
+    },
+    {
+      "type": "named",
+      "name": "CALIDAD_VEG",
+      "file": "src/visual/mundo3d/sierra/sierraMonte.geom.js",
+      "line": 260
+    },
+    {
+      "type": "named",
+      "name": "calidadVeg",
+      "file": "src/visual/mundo3d/sierra/sierraMonte.geom.js",
+      "line": 261
+    },
+    {
+      "type": "named",
+      "name": "geomNiebla",
+      "file": "src/visual/mundo3d/sierra/sierraMonte.geom.js",
+      "line": 309
+    },
+    {
+      "type": "named",
+      "name": "geomPalmera",
+      "file": "src/visual/mundo3d/sierra/sierraMonte.geom.js",
+      "line": 320
+    },
+    {
+      "type": "named",
+      "name": "distribuirVegetacion",
+      "file": "src/visual/mundo3d/sierra/sierraMonte.geom.js",
+      "line": 415
+    },
+    {
+      "type": "named",
+      "name": "SONIDOS_POR_MUNDO",
+      "file": "src/visual/mundo3d/sonidosAmbientales.js",
+      "line": 12
+    },
+    {
+      "type": "named",
+      "name": "iniciarSonidoMundo",
+      "file": "src/visual/mundo3d/sonidosAmbientales.js",
+      "line": 42
+    },
+    {
+      "type": "named",
+      "name": "detenerSonidoMundo",
+      "file": "src/visual/mundo3d/sonidosAmbientales.js",
+      "line": 70
+    },
+    {
+      "type": "named",
+      "name": "VELOCIDAD",
+      "file": "src/visual/mundo3d/suelo-comparado/sueloComparado.geom.js",
+      "line": 987
+    },
+    {
+      "type": "named",
+      "name": "CADENCIAS",
+      "file": "src/visual/mundo3d/suelo-comparado/sueloComparadoTextos.js",
+      "line": 269
+    },
+    {
+      "type": "named",
+      "name": "hotspotsDe",
+      "file": "src/visual/mundo3d/suelo-comparado/sueloComparadoTextos.js",
+      "line": 299
+    },
+    {
+      "type": "named",
+      "name": "Instancias",
+      "file": "src/visual/mundo3d/terreno/SueloRico.jsx",
+      "line": 32
+    },
+    {
+      "type": "named",
+      "name": "PALETA_PARAMO",
+      "file": "src/visual/mundo3d/terreno/sueloRico.geom.js",
+      "line": 40
+    },
+    {
+      "type": "named",
+      "name": "ruidoValor2D",
+      "file": "src/visual/mundo3d/terreno/sueloRico.geom.js",
+      "line": 68
+    },
+    {
+      "type": "named",
+      "name": "MITAD_FRAC",
+      "file": "src/visual/mundo3d/tiemposTransicion.js",
+      "line": 40
+    },
+    {
+      "type": "named",
+      "name": "TUNEL_MS",
+      "file": "src/visual/mundo3d/transiciones/tunelLaminaData.js",
+      "line": 33
+    },
+    {
+      "type": "named",
+      "name": "ESCALA_HOJA_MIN",
+      "file": "src/visual/mundo3d/transiciones/tunelLaminaData.js",
+      "line": 36
+    },
+    {
+      "type": "named",
+      "name": "ESCALA_HOJA_MAX",
+      "file": "src/visual/mundo3d/transiciones/tunelLaminaData.js",
+      "line": 37
+    },
+    {
+      "type": "named",
+      "name": "AMBICION_HOJA",
+      "file": "src/visual/mundo3d/transiciones/tunelLaminaData.js",
+      "line": 40
+    },
+    {
+      "type": "named",
+      "name": "useTunelLamina",
+      "file": "src/visual/mundo3d/transiciones/useTunelLamina.js",
+      "line": 32
+    },
+    {
+      "type": "named",
+      "name": "ANTICIPACION_FRAC",
+      "file": "src/visual/mundo3d/transiciones/velosData.js",
+      "line": 43
+    },
+    {
+      "type": "named",
+      "name": "MESETA_INICIO_FRAC",
+      "file": "src/visual/mundo3d/transiciones/velosData.js",
+      "line": 46
+    },
+    {
+      "type": "named",
+      "name": "MESETA_FIN_FRAC",
+      "file": "src/visual/mundo3d/transiciones/velosData.js",
+      "line": 47
+    },
+    {
+      "type": "named",
+      "name": "EASE_LANZA",
+      "file": "src/visual/mundo3d/transiciones/velosData.js",
+      "line": 65
+    },
+    {
+      "type": "named",
+      "name": "EASE_DESCUBRE",
+      "file": "src/visual/mundo3d/transiciones/velosData.js",
+      "line": 67
+    },
+    {
+      "type": "named",
+      "name": "EASE_REGRESA",
+      "file": "src/visual/mundo3d/transiciones/velosData.js",
+      "line": 69
+    },
+    {
+      "type": "named",
+      "name": "VELO_IDS",
+      "file": "src/visual/mundo3d/transiciones/velosData.js",
+      "line": 116
+    },
+    {
+      "type": "named",
+      "name": "PALETAS_SONORAS",
+      "file": "src/visual/mundo3d/useAudioMundo.js",
+      "line": 46
+    },
+    {
+      "type": "named",
+      "name": "horaDecimal",
+      "file": "src/visual/mundo3d/useCicloDia.js",
+      "line": 29
+    },
+    {
+      "type": "named",
+      "name": "leerCicloParam",
+      "file": "src/visual/mundo3d/useCicloDia.js",
+      "line": 37
+    },
+    {
+      "type": "named",
+      "name": "mapearClima",
+      "file": "src/visual/mundo3d/useFincaViva.js",
+      "line": 69
+    },
+    {
+      "type": "named",
+      "name": "mapearEnso",
+      "file": "src/visual/mundo3d/useFincaViva.js",
+      "line": 84
+    },
+    {
+      "type": "named",
+      "name": "aguaDeLluvia",
+      "file": "src/visual/mundo3d/useFincaViva.js",
+      "line": 110
+    },
+    {
+      "type": "named",
+      "name": "cosechaRecienteDe",
+      "file": "src/visual/mundo3d/useFincaViva.js",
+      "line": 142
+    },
+    {
+      "type": "named",
+      "name": "PATRONES_HAPTICOS",
+      "file": "src/visual/mundo3d/useHaptics.js",
+      "line": 31
+    },
+    {
+      "type": "named",
+      "name": "puedeEntrarAlMundo",
+      "file": "src/visual/mundo3d/useNavegacionMundos.js",
+      "line": 30
+    },
+    {
+      "type": "named",
+      "name": "PRESUPUESTO_TIER",
+      "file": "src/visual/mundo3d/usePerformanceMonitor.jsx",
+      "line": 86
+    },
+    {
+      "type": "named",
+      "name": "useCalidad3D",
+      "file": "src/visual/mundo3d/usePerformanceMonitor.jsx",
+      "line": 351
+    },
+    {
+      "type": "named",
+      "name": "MonitorRendimiento",
+      "file": "src/visual/mundo3d/usePerformanceMonitor.jsx",
+      "line": 425
+    },
+    {
+      "type": "named",
+      "name": "vinetaValle",
+      "file": "src/visual/mundo3d/vitrina/vinetasMundos.geom.js",
+      "line": 157
+    },
+    {
+      "type": "named",
+      "name": "vinetaCafe",
+      "file": "src/visual/mundo3d/vitrina/vinetasMundos.geom.js",
+      "line": 215
+    },
+    {
+      "type": "named",
+      "name": "vinetaAgua",
+      "file": "src/visual/mundo3d/vitrina/vinetasMundos.geom.js",
+      "line": 273
+    },
+    {
+      "type": "named",
+      "name": "vinetaSanidad",
+      "file": "src/visual/mundo3d/vitrina/vinetasMundos.geom.js",
+      "line": 350
+    },
+    {
+      "type": "named",
+      "name": "vinetaMercado",
+      "file": "src/visual/mundo3d/vitrina/vinetasMundos.geom.js",
+      "line": 416
+    },
+    {
+      "type": "named",
+      "name": "vinetaAnimales",
+      "file": "src/visual/mundo3d/vitrina/vinetasMundos.geom.js",
+      "line": 473
+    },
+    {
+      "type": "named",
+      "name": "vinetaSemillero",
+      "file": "src/visual/mundo3d/vitrina/vinetasMundos.geom.js",
+      "line": 546
+    },
+    {
+      "type": "named",
+      "name": "vinetaSuelo",
+      "file": "src/visual/mundo3d/vitrina/vinetasMundos.geom.js",
+      "line": 606
+    },
+    {
+      "type": "named",
+      "name": "vinetaSierra",
+      "file": "src/visual/mundo3d/vitrina/vinetasMundos.geom.js",
+      "line": 677
+    },
+    {
+      "type": "named",
+      "name": "vinetaParamo",
+      "file": "src/visual/mundo3d/vitrina/vinetasMundos.geom.js",
+      "line": 752
+    },
+    {
+      "type": "named",
+      "name": "vinetaLluvia",
+      "file": "src/visual/mundo3d/vitrina/vinetasMundos.geom.js",
+      "line": 828
+    },
+    {
+      "type": "named",
+      "name": "vinetaCompost",
+      "file": "src/visual/mundo3d/vitrina/vinetasMundos.geom.js",
+      "line": 867
+    },
+    {
+      "type": "named",
+      "name": "vinetaCacao",
+      "file": "src/visual/mundo3d/vitrina/vinetasMundos.geom.js",
+      "line": 920
+    },
+    {
+      "type": "named",
+      "name": "vinetaPapa",
+      "file": "src/visual/mundo3d/vitrina/vinetasMundos.geom.js",
+      "line": 992
+    },
+    {
+      "type": "named",
+      "name": "vinetaAbejas",
+      "file": "src/visual/mundo3d/vitrina/vinetasMundos.geom.js",
+      "line": 1048
+    },
+    {
+      "type": "default",
+      "name": "MundoYuca",
+      "file": "src/visual/mundo3d/yuca/MundoYuca.jsx",
+      "line": 88
+    },
+    {
+      "type": "named",
+      "name": "alturaBase",
+      "file": "src/visual/mundo3d/yuca/floraYuca.geom.js",
+      "line": 79
+    },
+    {
+      "type": "named",
+      "name": "PASO_X",
+      "file": "src/visual/mundo3d/yuca/floraYuca.geom.js",
+      "line": 93
+    },
+    {
+      "type": "named",
+      "name": "PASO_Z",
+      "file": "src/visual/mundo3d/yuca/floraYuca.geom.js",
+      "line": 94
+    },
+    {
+      "type": "named",
+      "name": "centroMata",
+      "file": "src/visual/mundo3d/yuca/floraYuca.geom.js",
+      "line": 104
+    },
+    {
+      "type": "named",
+      "name": "CEPAS_ARRANQUE",
+      "file": "src/visual/mundo3d/yuca/floraYuca.geom.js",
+      "line": 118
+    },
+    {
+      "type": "named",
+      "name": "dentroLote",
+      "file": "src/visual/mundo3d/yuca/floraYuca.geom.js",
+      "line": 127
+    },
+    {
+      "type": "named",
+      "name": "FLORA_YUCA",
+      "file": "src/visual/mundo3d/yuca/floraYuca.geom.js",
+      "line": 216
+    },
+    {
+      "type": "named",
+      "name": "CALIDAD_YUCA",
+      "file": "src/visual/mundo3d/yuca/floraYuca.geom.js",
+      "line": 226
+    },
+    {
+      "type": "named",
+      "name": "esqueletoYuca",
+      "file": "src/visual/mundo3d/yuca/floraYuca.geom.js",
+      "line": 356
+    },
+    {
+      "type": "named",
+      "name": "hojasDeEsqueleto",
+      "file": "src/visual/mundo3d/yuca/floraYuca.geom.js",
+      "line": 426
+    },
+    {
+      "type": "named",
+      "name": "N_ESQUELETOS",
+      "file": "src/visual/mundo3d/yuca/floraYuca.geom.js",
+      "line": 826
+    },
+    {
+      "type": "named",
+      "name": "SEMILLAS_ESQUELETO",
+      "file": "src/visual/mundo3d/yuca/floraYuca.geom.js",
+      "line": 829
+    },
+    {
+      "type": "named",
+      "name": "ALTITUD_CIMA",
+      "file": "src/visual/navegacion/pisosNavegacion.js",
+      "line": 83
+    },
+    {
+      "type": "named",
+      "name": "fraccionBanda",
+      "file": "src/visual/navegacion/pisosNavegacion.js",
+      "line": 90
+    },
+    {
+      "type": "named",
+      "name": "MUNDOS_NAVEGACION",
+      "file": "src/visual/navegacion/pisosNavegacion.js",
+      "line": 129
+    },
+    {
+      "type": "named",
+      "name": "CieloDefs",
+      "file": "src/visual/scenes/CieloParametrico.jsx",
+      "line": 26
+    },
+    {
+      "type": "named",
+      "name": "Sky",
+      "file": "src/visual/scenes/CieloParametrico.jsx",
+      "line": 54
+    },
+    {
+      "type": "named",
+      "name": "WashSolBajo",
+      "file": "src/visual/scenes/CieloParametrico.jsx",
+      "line": 170
+    },
+    {
+      "type": "named",
+      "name": "EspirituDefs",
+      "file": "src/visual/scenes/GuardianEspirituBase.jsx",
+      "line": 24
+    },
+    {
+      "type": "named",
+      "name": "CIELOS_ESCENA",
+      "file": "src/visual/scenes/_cielo.js",
+      "line": 32
+    },
+    {
+      "type": "named",
+      "name": "CIELOS_TEMA",
+      "file": "src/visual/scenes/_cielo.js",
+      "line": 58
+    },
+    {
+      "type": "named",
+      "name": "useViewport",
+      "file": "src/visual/scenes/_parallax.js",
+      "line": 37
+    },
+    {
+      "type": "named",
+      "name": "ESTADOS_VOZ",
+      "file": "src/visual/voz/vozViva.js",
+      "line": 11
+    }
+  ],
+  "routes": [],
+  "summary": {
+    "totalFiles": 2212,
+    "totalExports": 5954,
+    "totalImports": 4373,
+    "totalRoutes": 170,
+    "unwiredExports": 1072,
+    "unwiredRoutes": 0
+  }
+}
