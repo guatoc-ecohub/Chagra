@@ -753,6 +753,11 @@ async function callOllama(model, systemPrompt, userPrompt, { ollamaUrl = OLLAMA_
       body: JSON.stringify({
         model,
         stream: false,
+        think: false, // FIX 2026-07-21 (BENCH-MODELOS-PROD): sin esto, modelos con
+        // comportamiento de pensamiento interno no declarado en 'ollama show'
+        // (ej. gemma4:e4b) queman TODO num_predict en contenido invisible ->
+        // message.content='' con done_reason='length'. Verificado inocuo en
+        // granite3.3:8b / granite33-curado (no tienen capability 'thinking').
         messages: [
           { role: 'system', content: systemPrompt },
           { role: 'user', content: userPrompt },
