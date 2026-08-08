@@ -1,0 +1,184 @@
+{
+  "schema_version": "1.0",
+  "generated_at": "2026-08-03",
+  "_meta": {
+    "descripcion": "Dataset sintético de biopreparados agroecológicos colombianos. Basado en conocimiento público de Restrepo Rivera, Agrosavia, Cenicafé. NO reemplaza validación profesional ni registro ICA.",
+    "warning": "Ley 1876/2017: Los biopreparados requieren validación técnica y registro ICA para comercialización. Uso bajo responsabilidad del productor.",
+    "fuentes": [
+      "Restrepo Rivera, J. — ABC de la agricultura orgánica (1996)",
+      "Restrepo Rivera, J. — Manual práctico de biofertilizantes (2007)",
+      "AGROSAVIA — Manual de biopreparados (2015)",
+      "Cenicafé — Manual cafetero (2013)"
+    ]
+  },
+  "biopreparados": [
+    {
+      "id": "bocashi",
+      "nombre": "Bocashi",
+      "tipo": "fermentado",
+      "proposito": ["fertilizacion", "estimulante_microbiano"],
+      "ingredientes_principales": ["gallinaza", "cascarilla_arroz", "tierra_capote", "carbon_vegetal", "afrecho", "melaza", "levadura"],
+      "tiempo_elaboracion_dias": 18,
+      "vida_util_dias": 180,
+      "metodo_aplicacion": "suelo_solido",
+      "safety_class": "bajo",
+      "ppe_required": ["tapabocas"],
+      "dosis_base": "1-2 kg/m² al voleo; 100-300 g/planta en trasplante",
+      "target_por_cultivo": {
+        "hortalizas": "80-150 g/planta",
+        "frutales": "1-2 kg/árbol",
+        "cafeto": "200-400 g/planta joven",
+        "plátano": "300-500 g/planta"
+      },
+      "piso_termico_optimo": ["cálido", "medio", "frío"],
+      "ajuste_altitud": {
+        "bajo_1200": "dosis +20% (mayor actividad microbiana)",
+        "1200_2000": "dosis estándar",
+        "sobre_2000": "dosis -10%, más tiempo fermentación (21 días)"
+      }
+    },
+    {
+      "id": "supermagro",
+      "nombre": "Supermagro",
+      "tipo": "fermentado",
+      "proposito": ["fertilizacion", "micronutrientes"],
+      "ingredientes_principales": ["estiércol_vaca", "leche", "melaza", "sulfatos_minerales"],
+      "tiempo_elaboracion_dias": 90,
+      "vida_util_dias": 365,
+      "metodo_aplicacion": "foliar_diluido",
+      "safety_class": "bajo",
+      "ppe_required": ["guantes"],
+      "dosis_base": "2-7% (200-700 cc por 10L agua)",
+      "target_por_cultivo": {
+        "maíz": "4-5% (400-500 cc/10L)",
+        "papa": "3-4% (300-400 cc/10L)",
+        "café": "5-6% (500-600 cc/10L)",
+        "hortalizas_hoja": "2-3% (200-300 cc/10L)"
+      },
+      "piso_termico_optimo": ["medio", "frío"],
+      "ajuste_altitud": {
+        "bajo_1200": "NO recomendado (exceso evapotranspiración)",
+        "1200_2000": "dosis estándar",
+        "sobre_2000": "dosis +10-20% (mayor demanda micronutrientes)"
+      }
+    },
+    {
+      "id": "caldo_bordeles",
+      "nombre": "Caldo Bordelés",
+      "tipo": "caldo",
+      "proposito": ["fitosanitario_preventivo"],
+      "ingredientes_principales": ["sulfato_cobre", "cal_hidratada", "agua"],
+      "tiempo_elaboracion_dias": 1,
+      "vida_util_dias": 1,
+      "metodo_aplicacion": "foliar_preventivo",
+      "safety_class": "alto",
+      "ppe_required": ["guantes", "careta", "gafas"],
+      "dosis_base": "1% (100g sulfato + 100g cal por 10L agua)",
+      "target_por_cultivo": {
+        "papa": "1% estándar (Phytophthora)",
+        "café": "1-1.5% (roya, ojo de gallo)",
+        "tomate": "0.5-0.75% (mildeo, tizón)",
+        "frutales": "1% postcosecha (antracnosis)"
+      },
+      "piso_termico_optimo": ["medio", "frío"],
+      "ajuste_altitud": {
+        "bajo_1200": "NO aplicar con sol fuerte (fitotoxicidad)",
+        "1200_2000": "dosis estándar",
+        "sobre_2000": "1-1.5% (mayor presión fúngica)"
+      },
+      "contraindicaciones": ["floracion", "cucurbitaceas_jovenes", "menos_21_dias_cosecha"]
+    },
+    {
+      "id": "biol",
+      "nombre": "Biol",
+      "tipo": "fermentado",
+      "proposito": ["fertilizacion", "estimulante"],
+      "ingredientes_principales": ["estiércol", "agua", "leche", "melaza"],
+      "tiempo_elaboracion_dias": 30,
+      "vida_util_dias": 180,
+      "metodo_aplicacion": "suelo_diluido",
+      "safety_class": "bajo",
+      "ppe_required": ["guantes"],
+      "dosis_base": "1:3 a 1:5 con agua",
+      "target_por_cultivo": {
+        "maíz": "1:4 en drench",
+        "fríjol": "1:5 en riego",
+        "café": "1:3 al pie de planta",
+        "hortalizas": "1:4 semanales"
+      },
+      "piso_termico_optimo": ["cálido", "medio", "frío"],
+      "ajuste_altitud": {
+        "bajo_1200": "fermentación 20-25 días (más rápido)",
+        "1200_2000": "fermentación 30 días estándar",
+        "sobre_2000": "fermentación 35-40 días"
+      }
+    }
+  ],
+  "recomendaciones_por_plaga": {
+    "phytophthora": {
+      "biopreparado": "caldo_bordeles",
+      "alternativa": "Trichoderma spp.",
+      "frecuencia": "cada 10-14 días en humedad alta"
+    },
+    "roya_cafe": {
+      "biopreparado": "caldo_bordeles",
+      "alternativa": "Bacillus subtilis",
+      "frecuencia": "preventivo cada 15 días en invierno"
+    },
+    "mosca_blanca": {
+      "biopreparado": "supermagro",
+      "alternativa": "Amblyseius swirskii (depredador)",
+      "frecuencia": "cada 7-10 días foliar"
+    },
+    "deficiencia_micronutrientes": {
+      "biopreparado": "supermagro",
+      "alternativa": "quelatos sintéticos",
+      "frecuencia": "cada 15-21 días"
+    }
+  },
+  "recomendaciones_por_cultivo": {
+    "papa": {
+      "biopreparados_recomendados": ["bocashi", "caldo_bordeles"],
+      "frecuencia": "bocashi al trasplante, caldo bordelés preventivo",
+      "plagas_objetivo": ["phytophthora", "mildeo"]
+    },
+    "café": {
+      "biopreparados_recomendados": ["bocashi", "supermagro", "caldo_bordeles"],
+      "frecuencia": "bocashi anual, supermagro trimestral, caldo bordelés invierno",
+      "plagas_objetivo": ["roya", "ojo_gallo", "cercospora"]
+    },
+    "maíz": {
+      "biopreparados_recomendados": ["bocashi", "supermagro"],
+      "frecuencia": "bocashi siembra, supermagro foliar V6-VT",
+      "plagas_objetivo": ["deficiencia_zinc", "mosca_paja"]
+    },
+    "hortalizas": {
+      "biopreparados_recomendados": ["bocashi", "biol"],
+      "frecuencia": "bocashi cama, biol semanal",
+      "plagas_objetivo": ["deficiencias", "mosca_blanca"]
+    }
+  },
+  "tabla_pisos_terminos": {
+    "cálido": {
+      "rango_altitud_m": "0-1000",
+      "temperatura_promedio_c": ">24",
+      "cultivos_tipicos": ["caña", "cacao", "cítricos", "plátano"]
+    },
+    "medio": {
+      "rango_altitud_m": "1000-2000",
+      "temperatura_promedio_c": "18-24",
+      "cultivos_tipicos": ["café", "maíz", "fríjol", "yuca"]
+    },
+    "frío": {
+      "rango_altitud_m": "2000-3000",
+      "temperatura_promedio_c": "12-18",
+      "cultivos_tipicos": ["papa", "uña_de_gato", "cebolla_cabezona", "moras"]
+    },
+    "páramo": {
+      "rango_altitud_m": ">3000",
+      "temperatura_promedio_c": "<12",
+      "cultivos_tipicos": ["frailejón", "papa_patriarca"]
+    }
+  },
+  " Ley_1876_2017_nota": "Esta herramienta es educativa. La Ley 1876 de 2017 regula el registro, uso y comercialización de bioinsumos en Colombia. Para venta o aplicación a terceros, se requiere registro ICA. El uso propio queda bajo responsabilidad del productor y debe seguir buenas prácticas de manufactura y manejo ambiental."
+}
