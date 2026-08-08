@@ -48,6 +48,7 @@ import { createStreamDeadline } from '../../services/streamDeadline';
 // `VITE_USE_SIDECAR_AGRO_MCP` — con flag off, las funciones devuelven null
 // y el AgentScreen se comporta idéntico al pipeline RAG-only previo.
 import { isSidecarEnabled, planNlu, callTool, executeToolChain, resolveEntities, fermentoPrefilter, biopreparadoGrounding, pisoTermicoGuard, confusionEspecieGuard, pestVsDiseaseGuard, companionSpeciesGuard, postValidate, getClimaIdeam, isToolAllowed } from '../../services/sidecarClient';
+import { retrieveCorpus } from '../../services/corpusRetriever';
 // CHIPS DE MODO (A3/A4, decisión operador 2026-06-02): el router PURO mapea
 // la intención forzada del chip → tool determinístico, SALTANDO el NLU
 // (que misroutea). `planForcedIntent` decide tool+args; `isStubIntent` marca
