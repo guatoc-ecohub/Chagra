@@ -1,4 +1,4 @@
-// Screenshots de "Mi Finca Viva" (juego para Julieta) en 3 estados:
+// Screenshots de "Mi Finca Viva" (el juego de la finca) en 3 estados:
 //   1) finca vacía (invitación a sembrar)
 //   2) finca próspera (mundo crecido + criaturas + misiones)
 //   3) celebración de subida de nivel
@@ -7,7 +7,7 @@
 // auth stub en IDB, intercept de backend para no rebotar a login, y seed de
 // farm_processes/farm_process_events vía la propia DB del app (ya migrada).
 //
-// Uso: node scripts/juego-julieta-shots.mjs <baseURL>
+// Uso: node scripts/juego-mi-finca-viva-shots.mjs <baseURL>
 import { chromium } from 'playwright';
 import { execSync } from 'node:child_process';
 import fs from 'node:fs';
@@ -161,10 +161,10 @@ async function gotoJuego(page) {
     // 1) FINCA VACÍA — sin seed
     console.log('[1/3] finca vacía');
     await gotoJuego(page);
-    await shot('juego-julieta-1-vacia.png');
+    await shot('juego-mi-finca-viva-1-vacia.png');
 
     // 2) FINCA PRÓSPERA — seed + recargar para que el juego lea los datos.
-    //    Pre-sella lastLevel alto para NO disparar la celebración acá.
+    //    Pre-sella lastLevel alto para NO disparar la celebración aquí.
     console.log('[2/3] finca próspera');
     await seedFarm(page, seedData());
     await page.evaluate(() => {
@@ -173,7 +173,7 @@ async function gotoJuego(page) {
     await page.goto(`${BASE}/`, { waitUntil: 'domcontentloaded', timeout: 40000 });
     await sleep(1200);
     await gotoJuego(page);
-    await shot('juego-julieta-2-prospera.png');
+    await shot('juego-mi-finca-viva-2-prospera.png');
 
     // 3) CELEBRACIÓN — bajar lastLevel a 0 para que detecte subida.
     console.log('[3/3] celebración subida de nivel');
@@ -190,13 +190,13 @@ async function gotoJuego(page) {
       console.log('  (celebración no apareció — el seed quizá no subió de nivel)');
     }
     await sleep(800);
-    await shot('juego-julieta-3-celebracion.png');
+    await shot('juego-mi-finca-viva-3-celebracion.png');
 
     console.log('\n=== page errors ===');
     console.log(errs.length ? errs.slice(0, 20).join('\n') : '(ninguno)');
   } catch (e) {
     console.error('FALLO:', e.message);
-    try { await shot('juego-julieta-ERROR.png'); } catch { /* */ }
+    try { await shot('juego-mi-finca-viva-ERROR.png'); } catch { /* */ }
     process.exitCode = 1;
   } finally {
     await browser.close();

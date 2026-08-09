@@ -51,7 +51,7 @@ src/
 │   ├── charts/                 # Data visualization
 │   ├── dashboard/              # Dashboard widgets
 │   ├── hoy/                    # "Hoy en la finca" module
-│   ├── juego/                  # Ludificacion (Julieta)
+│   ├── juego/                  # Ludificacion (Mi Finca Viva)
 │   ├── Settings/               # App configuration
 │   ├── AgentFab.jsx            # Floating action button
 │   ├── ErrorBoundary.jsx       # Error boundaries per route

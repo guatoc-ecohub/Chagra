@@ -1,6 +1,6 @@
 # Mi Finca Viva — la capa lúdica de Chagra para niñas y niños
 
-> Un regalo para Julieta (y para cualquier niña que quiera ver crecer su finca).
+> Un regalo para cualquier niña que quiera ver crecer su finca.
 > Una capa de juego **encima** del motor de evolución agroecológica que ya
 > existe — **no** un juego paralelo con datos inventados.
 
@@ -144,8 +144,8 @@ fincaGameStateService.js   ← NUEVO: persiste lo mínimo (último nivel visto +
   navegación a acciones reales. (14 tests)
 
 Verificación visual con Playwright (chromium del nix-store, datos sembrados en
-IndexedDB): ver `scripts/juego-julieta-shots.mjs`. Screenshots de los 3 estados
-(finca vacía, finca próspera, celebración) en `/tmp/juego-julieta-*.png`.
+IndexedDB): ver `scripts/juego-mi-finca-viva-shots.mjs`. Screenshots de los 3 estados
+(finca vacía, finca próspera, celebración) en `/tmp/juego-mi-finca-viva-*.png`.
 
 ## 6. Cómo jugar
 

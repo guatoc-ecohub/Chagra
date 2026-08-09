@@ -99,7 +99,7 @@ Capa de lógica de negocio. Cada archivo es un módulo ES con funciones exportad
 |--------|----------------|
 | `fincaActiveStore.js` | Finca activa seleccionada por el usuario |
 | `fincaEvolutionService.js` | Evolución de la finca en el tiempo |
-| `fincaGameService.js` | Lógica de ludificación (Julieta) |
+| `fincaGameService.js` | Lógica de ludificación (Mi Finca Viva) |
 | `fincaGameStateService.js` | Estado del juego (niveles, logros) |
 
 ## Social & Extension

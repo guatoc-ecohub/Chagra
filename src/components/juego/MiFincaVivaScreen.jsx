@@ -26,7 +26,7 @@ import { recordGameStart, recordGameComplete } from '../../services/usageTelemet
 import { fvhSkinClass } from '../../config/fvhSkin';
 
 /**
- * MiFincaVivaScreen — el JUEGO "Mi Finca Viva" para Julieta (y toda niña).
+ * MiFincaVivaScreen — el JUEGO "Mi Finca Viva" (para toda niña que quiera ver crecer su finca).
  *
  * Una capa lúdica ENCIMA del motor de evolución de finca: la finca es un mundo
  * vivo que florece a medida que los indicadores REALES suben (fincaEvolution
