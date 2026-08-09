@@ -830,11 +830,16 @@ export function parseBatchAHVerdicts(raw) {
  * @param {{ timeoutMs?: number }} [opts]
  * @returns {Promise<string>}
  */
-export async function spawnClaudeCode(prompt, { timeoutMs = 300_000 } = {}) {
+export async function spawnClaudeCode(prompt, { timeoutMs = 300_000, model } = {}) {
   const { execFile } = await import('node:child_process');
   const { promisify } = await import('node:util');
   const execFileAsync = promisify(execFile);
-  const { stdout } = await execFileAsync('claude-code', ['-p', prompt], {
+  // El juez SIEMPRE lleva --model explícito. Sin el flag, claude-code usa el default
+  // de la sesión (Opus): más lento y, peor, NO reproducible — el score dependería de
+  // en qué máquina/sesión se corrió el bench. `RECOMMENDED_ANTHROPIC_JUDGE_MODEL` ya
+  // declaraba sonnet como juez canónico desde 2026-05-31 y nunca se cableó aquí.
+  const judgeModel = model || process.env.JUDGE_MODEL || 'sonnet';
+  const { stdout } = await execFileAsync('claude-code', ['-p', '--model', judgeModel, prompt], {
     timeout: timeoutMs,
     maxBuffer: 1024 * 1024 * 4, // 4MB — suficiente para un batch de 10 veredictos
     encoding: 'utf-8',
@@ -866,7 +871,7 @@ export async function spawnClaudeCode(prompt, { timeoutMs = 300_000 } = {}) {
 export function makeClaudeCliJudgeCall({ spawnImpl, timeoutMs = 300_000 } = {}) {
   const doSpawn = typeof spawnImpl === 'function'
     ? spawnImpl
-    : (prompt) => spawnClaudeCode(prompt, { timeoutMs });
+    : (prompt) => spawnClaudeCode(prompt, { timeoutMs, model: process.env.JUDGE_MODEL || "sonnet" });
 
   return async function claudeCliJudgeCall(items) {
     const arr = Array.isArray(items) ? items : [];
@@ -1095,7 +1100,7 @@ export function parseContaminationVerdicts(raw) {
 export function makeContaminationJudgeCall({ spawnImpl, timeoutMs = 300_000 } = {}) {
   const doSpawn = typeof spawnImpl === 'function'
     ? spawnImpl
-    : (prompt) => spawnClaudeCode(prompt, { timeoutMs });
+    : (prompt) => spawnClaudeCode(prompt, { timeoutMs, model: process.env.JUDGE_MODEL || "sonnet" });
 
   return async function contaminationJudgeCall(items) {
     const arr = Array.isArray(items) ? items : [];
