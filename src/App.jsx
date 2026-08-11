@@ -40,6 +40,7 @@ import useAlertStore from './store/useAlertStore';
 // comentario abajo donde se removió el render).
 // import FieldFeedback from './components/FieldFeedback';
 const AgentFab = lazy(() => import('./components/AgentFab'));
+const CompaiFotosOverlay = lazy(() => import('./components/CompaiFotosOverlay'));
 // EscuchaFab (el FAB de tap "barbudito de páramo") DESHABILITADO por decisión
 // del operador 2026-07-07: modo campo = WAKE-WORD SOLO ("hola chagra"). El
 // único FAB visible es el compai elegido (AgentFab). El overlay SÍ se importa:
@@ -4243,6 +4244,7 @@ export default function App() {
           y la línea del render de abajo. */}
       {/* {!['loading', 'login', 'oauth-callback', 'onboarding-perfil', 'ubicacion-detectada', 'dashboard', 'agente', 'voz', 'voz_planta', 'registro_voz'].includes(currentView) && <EscuchaFab />} */}
       {currentView !== 'loading' && currentView !== 'login' && currentView !== 'oauth-callback' && !currentView.startsWith('mockup_') && <EscuchaOverlay />}
+      {currentView !== 'loading' && currentView !== 'login' && currentView !== 'oauth-callback' && !currentView.startsWith('mockup_') && <CompaiFotosOverlay onNavigate={navigate} />}
       {currentView === 'dashboard' && <PendingTasksWidget onEdit={(task) => navigate('edit_task', { task })} />}
       {currentView !== 'loading' && currentView !== 'login' && currentView !== 'oauth-callback' && !currentView.startsWith('mockup_') && <SyncProgressIndicator />}
       {/* Badge persistente "N pendientes de sincronizar" (rescate #2668).
