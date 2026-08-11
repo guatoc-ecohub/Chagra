@@ -15,7 +15,9 @@
  * (corte simple). Normalmente ni se monta: el hook ya salta las fases.
  */
 import { useEffect, useRef } from 'react';
-import { AbejaAngelita } from '../creatures/AbejaAngelita.jsx';
+import ChagraAgentAvatar from '../../components/ChagraAgentAvatar.jsx';
+import useCompaiElegido from './escenas/useCompaiElegido.js';
+import { AVATAR_NOMBRE, DEFAULT_AVATAR_TYPE } from '../../hooks/useAgentAvatarType.js';
 import { tinteDeMundo, tituloDeMundo } from './resolverMundo.js';
 import './mundo.css';
 
@@ -30,6 +32,8 @@ export default function TransicionMundo({
   reducedMotion = false,
   onFin,
 }) {
+  const { avatarType } = useCompaiElegido();
+  const nombreCompai = AVATAR_NOMBRE[avatarType] || AVATAR_NOMBRE[DEFAULT_AVATAR_TYPE];
   const finRef = useRef(onFin);
   // Ref "ultima version": se actualiza en un effect (no en render) para que el
   // timer llame siempre al `onFin` mas fresco sin re-armar el temporizador.
@@ -67,10 +71,17 @@ export default function TransicionMundo({
     >
       <div className="mundo-viaje__velo" aria-hidden="true" />
       <div className="mundo-viaje__abeja" aria-hidden="true">
-        <AbejaAngelita size={72} animo={animo} energia={energia} animated />
+        <ChagraAgentAvatar
+          estado={animo}
+          size={72}
+          animo={animo}
+          energia={energia}
+          animated
+          ariaLabel={`${nombreCompai}, compañero de Chagra`}
+        />
       </div>
       <p className="mundo-viaje__txt">
-        {entra ? `Angelita lo lleva a ${tituloDeMundo(mundoId)}…` : 'De vuelta al valle…'}
+        {entra ? `${nombreCompai} lo lleva a ${tituloDeMundo(mundoId)}…` : 'De vuelta al valle…'}
       </p>
     </div>
   );
