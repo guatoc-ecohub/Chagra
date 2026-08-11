@@ -92,7 +92,7 @@ export const OSO_BASTON_FIRMA = Object.freeze({
    amarilla y orquídea de Mayo (Cattleya trianae) lila. */
 export const OSO_BASTON_PALETA = {
   cuerpo: '#2b1c11',        // pelaje café-negro cálido (tierra tostada de día)
-  cuerpoLuz: '#4d3722',     // luz de sol andino sobre lomo y hombros
+  cuerpoLuz: '#5a4128',     // luz de sol andino sobre lomo y hombros
   cuerpoSombra: '#170e07',  // sombra ventral cálida (nunca negro industrial)
   golilla: '#1e130a',       // el pelaje denso de cuello y hombros (costura cabeza-cuerpo)
   anteojo: '#f2e3bd',       // los AROS crema (LA firma de la especie)

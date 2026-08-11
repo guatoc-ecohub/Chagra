@@ -67,8 +67,10 @@ const SILUETA_ERGUIDA =
   + 'C 3.2,-8.4 -3.2,-8.4 -5.0,-7.2 Z';  // el trapecio, oculto tras el cráneo
 
 /* LA MEDIA LUNA del pecho (el babero pectoral real de la especie): creciente
-   que abre a la derecha, colgada con un giro de gracia. */
-const LUNA_PECHO = 'M 0,-5.1 A 2.85,2.85 0 1 0 0,0.5 A 3.25,3.25 0 0 1 0,-5.1 Z';
+   que abre a la derecha, colgada con un giro de gracia. CHICA y ALTA — vive en
+   el pecho, bajo la garganta; el primer render la tenía gigante al centro de
+   la panza y leía "luna en barriga", no babero pectoral. */
+const LUNA_PECHO = 'M 0,-5.2 A 2.05,2.05 0 1 0 0,-1.1 A 2.4,2.4 0 0 1 0,-5.2 Z';
 
 /* GOLILLA — el pelaje denso de cuello y hombros, en mechones. Como sombra
    suave (sin trazo, sin dobladillo: la lección del guardián), cose la cabeza
@@ -235,9 +237,9 @@ export function OsoBaston({
     ? <BocaVisema cx={0} cy={-9.35} w={3.4} prof={1.2} visema={visema} ink={INK} />
     : (
       <g>
-        <path d="M -1.9,-9.5 Q 0,-7.9 1.9,-9.5 Q 0,-8.9 -1.9,-9.5 Z"
+        <path d="M -2.2,-9.55 Q 0,-7.65 2.2,-9.55 Q 0,-8.75 -2.2,-9.55 Z"
           fill="#fffaf0" stroke={INK} strokeWidth="0.4" strokeLinejoin="round" />
-        <Sonrisa cx={0} cy={-9.5} w={3.8} prof={1.6} ink={INK} />
+        <Sonrisa cx={0} cy={-9.55} w={4.4} prof={1.8} ink={INK} />
       </g>
     );
 
@@ -378,26 +380,33 @@ export function OsoBaston({
       {/* GOLILLA — la costura de la cabeza al cuerpo (sombra, sin dobladillo) */}
       <path d={GOLILLA} fill={P.golilla} opacity="0.55" aria-hidden="true" />
 
-      {/* ═══ LA MEDIA LUNA del pecho (el babero de la especie, con gracia) */}
-      <g transform="rotate(12 0 -2.3)" aria-hidden="true">
-        <path d={LUNA_PECHO} transform="translate(0,0.4)" fill={`url(#${lunaGrad})`}
-          stroke={P.pechoSombra} strokeWidth="0.3" />
+      {/* ═══ LA MEDIA LUNA del pecho (el babero de la especie, con gracia):
+          chica y ALTA, colgada bajo la garganta — no un emblema de barriga. */}
+      <g transform="rotate(12 0 -3.2)" aria-hidden="true">
+        <path d={LUNA_PECHO} fill={`url(#${lunaGrad})`}
+          stroke={P.pechoSombra} strokeWidth="0.28" />
         {/* dos trazos de buril sobre la luna: textura de plancha, no sticker */}
-        <g stroke={P.pechoSombra} strokeWidth="0.25" opacity="0.55" fill="none">
-          <path d="M -2.1,-3.4 C -1.7,-2.9 -1.5,-2.3 -1.6,-1.7" />
-          <path d="M -2.4,-1.2 C -2.1,-0.8 -2.0,-0.3 -2.1,0.1" />
+        <g stroke={P.pechoSombra} strokeWidth="0.22" opacity="0.55" fill="none">
+          <path d="M -1.5,-4.4 C -1.2,-4.0 -1.1,-3.5 -1.2,-3.1" />
+          <path d="M -1.7,-2.7 C -1.5,-2.4 -1.4,-2.0 -1.5,-1.7" />
         </g>
       </g>
 
       {/* ═══ BRAZO EN JARRA (izquierdo): tubo de goma del hombro a la cadera,
-          guante crema apoyado — la chulería amable de la referencia. */}
+          guante crema apoyado — la chulería amable de la referencia. El codo
+          sale BIEN AFUERA de la silueta (el primer render lo tenía pegado al
+          flanco y el guante leía como bola suelta) y el tubo lleva su filo de
+          luz para despegarse del pelaje oscuro. */}
       <g className={vivo ? 'crt-brazo-l rh-sway' : 'crt-brazo-l'}
         style={{ transformBox: 'fill-box', transformOrigin: 'top right', animationDelay: '-0.3s' }}>
-        <path d="M -4.9,-4.6 C -8.8,-4.6 -10.6,-1.6 -9.5,0.9 C -8.9,2.3 -8.1,3.3 -7.2,4.0"
+        <path d="M -4.9,-4.8 C -9.6,-4.9 -11.6,-1.6 -10.3,1.2 C -9.6,2.7 -8.6,3.9 -7.5,4.6"
           stroke={INK} strokeWidth="2.4" fill="none" strokeLinecap="round" />
-        <circle cx="-6.9" cy="4.3" r="1.85" fill={RH_GLOVE} stroke={INK} strokeWidth="0.7" />
+        {/* el filo de luz del canto externo (separa el tubo del cuerpo) */}
+        <path d="M -5.2,-5.7 C -9.4,-5.8 -11.3,-2.8 -10.4,0.2" stroke={P.cuerpoLuz}
+          strokeWidth="0.45" fill="none" strokeLinecap="round" opacity="0.55" aria-hidden="true" />
+        <circle cx="-7.2" cy="4.9" r="1.85" fill={RH_GLOVE} stroke={INK} strokeWidth="0.7" />
         {/* nudillos del guante en jarra */}
-        <path d="M -7.9,3.6 C -8.1,4.1 -8.0,4.7 -7.6,5.1" stroke={INK} strokeWidth="0.35"
+        <path d="M -8.2,4.2 C -8.4,4.7 -8.3,5.3 -7.9,5.7" stroke={INK} strokeWidth="0.35"
           fill="none" strokeLinecap="round" opacity="0.6" aria-hidden="true" />
       </g>
 
@@ -418,13 +427,13 @@ export function OsoBaston({
             izquierdo cierra completo; el derecho abre por abajo y DERRAMA su
             lágrima hacia el hocico. */}
         <g aria-hidden="true" fill="none" strokeLinecap="round">
-          <ellipse cx="-1.9" cy="-12.7" rx={PR.anteojoR} ry={PR.anteojoR * 1.12}
-            transform="rotate(-7 -1.9 -12.7)" stroke={P.anteojo} strokeWidth="0.8" />
-          <ellipse cx="1.9" cy="-12.7" rx={PR.anteojoR} ry={PR.anteojoR * 1.12}
-            transform="rotate(7 1.9 -12.7)" stroke={P.anteojo} strokeWidth="0.8"
-            strokeDasharray="7.6 2.4" strokeDashoffset="-8.4" />
-          <path d="M 3.1,-11.5 C 3.6,-10.4 3.4,-9.4 2.6,-8.7"
-            stroke={P.anteojo} strokeWidth="0.65" opacity="0.9" />
+          <ellipse cx="-2.0" cy="-12.75" rx={PR.anteojoR * 1.19} ry={PR.anteojoR * 1.32}
+            transform="rotate(-7 -2.0 -12.75)" stroke={P.anteojo} strokeWidth="0.7" />
+          <ellipse cx="2.0" cy="-12.75" rx={PR.anteojoR * 1.19} ry={PR.anteojoR * 1.32}
+            transform="rotate(7 2.0 -12.75)" stroke={P.anteojo} strokeWidth="0.7"
+            strokeDasharray="8.6 2.6" strokeDashoffset="-9.4" />
+          <path d="M 3.25,-11.4 C 3.75,-10.3 3.5,-9.3 2.7,-8.6"
+            stroke={P.anteojo} strokeWidth="0.6" opacity="0.9" />
         </g>
 
         {/* CEJAS de goma: la izquierda ALZADA (travieso noble de la referencia) */}
@@ -435,7 +444,7 @@ export function OsoBaston({
 
         {/* OJOS Cuphead del kit (catchlight, parpadeo, la mirada que reconoce) */}
         <OjosRubber
-          ojos={[{ cx: -1.9, cy: -12.7, r: 1.42 }, { cx: 1.9, cy: -12.7, r: 1.42 }]}
+          ojos={[{ cx: -2.0, cy: -12.75, r: 1.5 }, { cx: 2.0, cy: -12.75, r: 1.5 }]}
           mirar={[0.2, 0.1]}
           parpadea={vivo}
           ink={INK}

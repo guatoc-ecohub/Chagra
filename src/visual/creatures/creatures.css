@@ -3164,6 +3164,20 @@
   50%      { transform: rotate(7deg); }
 }
 
+/* ── CELEBRA — el flourish del caminante, con AMPLITUD PROPIA: el grupo
+   .crt-brazo-r carga el bastón entero (30 unidades de palo), así que el
+   rh-g-brazo-r genérico lo sacaba VOLANDO del encuadre. El oso alza el cayado
+   apenas unos grados — festivo sin perder el piso. Pisa el genérico por
+   especificidad (dos atributos). */
+[data-creature='oso-baston'][data-pose='celebra'] .crt-brazo-r {
+  animation: osb-celebra-alza 1.15s cubic-bezier(0.34, 1.56, 0.64, 1) infinite;
+}
+@keyframes osb-celebra-alza {
+  0%, 100% { transform: rotate(0deg); }
+  45%      { transform: rotate(-8deg); }
+  62%      { transform: rotate(-5.5deg); }
+}
+
 /* Los estados del caminante PISAN el arrebato (antic/travieso): un oso que
    florece, resopla o camina no da además vueltas de campana. */
 [data-creature='oso-baston'][data-florece='1'] .rh-antic,
@@ -3195,7 +3209,8 @@
   [data-creature='oso-baston'][data-pose='camina'] .osb-pierna-i,
   [data-creature='oso-baston'][data-pose='camina'] .osb-pierna-d,
   [data-creature='oso-baston'][data-pose='camina'] .osb-baston,
-  [data-creature='oso-baston'][data-pose='camina'] .crt-brazo-l { animation: none !important; }
+  [data-creature='oso-baston'][data-pose='camina'] .crt-brazo-l,
+  [data-creature='oso-baston'][data-pose='celebra'] .crt-brazo-r { animation: none !important; }
   /* Fotograma digno del florecer: el halo se queda encendido y quieto. */
   [data-creature='oso-baston'][data-florece='1'] .osb-halo { opacity: 0.45; }
 }
