@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import ChagraAgentAvatar from '../ChagraAgentAvatar';
-import useAgentAvatarType, { AVATAR_NOMBRE, DEFAULT_AVATAR_TYPE } from '../../hooks/useAgentAvatarType';
+import useCompaiElegido from '../../visual/mundo3d/escenas/useCompaiElegido.js';
+import { AVATAR_NOMBRE, DEFAULT_AVATAR_TYPE } from '../../hooks/useAgentAvatarType';
 
 /**
  * Transición home → conversación (~2s): el compAI que el usuario eligió.
@@ -83,7 +84,7 @@ const CSS = `
 function AngelitaOverlay({ onDone }) {
   const [leaving, setLeaving] = useState(false);
   const doneRef = useRef(null);
-  const [avatarType] = useAgentAvatarType();
+  const { avatarType } = useCompaiElegido();
   const nombreAgente = AVATAR_NOMBRE[avatarType] || AVATAR_NOMBRE[DEFAULT_AVATAR_TYPE];
 
   // ref-latest del callback fuera de render (react-hooks/refs).
@@ -113,17 +114,17 @@ function AngelitaOverlay({ onDone }) {
     >
       <style>{CSS}</style>
       <span className="agente-tx-abeja">
-        <Angelita
+        <ChagraAgentAvatar
           estado="invita"
           size={Math.round(Math.min(
             typeof window !== 'undefined' ? window.innerWidth * 0.62 : 280,
             300,
           ))}
           animated={!reduce}
-          title="Angelita lo lleva a la conversación"
+          ariaLabel={`${nombreAgente} lo lleva a la conversación`}
         />
       </span>
-      <span className="agente-tx-nombre">Angelita</span>
+      <span className="agente-tx-nombre">{nombreAgente}</span>
     </div>
   );
 }

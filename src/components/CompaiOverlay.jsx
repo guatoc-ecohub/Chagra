@@ -7,10 +7,12 @@
 /* eslint-disable chagra-i18n/no-hardcoded-spanish */
 import React, { useState, useCallback, useMemo } from 'react';
 import { X, Volume2 } from 'lucide-react';
-import ChagraAgentAvatarAngelita from './ChagraAgentAvatarAngelita';
+import ChagraAgentAvatar from './ChagraAgentAvatar';
+import useCompaiElegido from '../visual/mundo3d/escenas/useCompaiElegido.js';
+import { AVATAR_NOMBRE, DEFAULT_AVATAR_TYPE } from '../hooks/useAgentAvatarType.js';
 
 /**
- * CompaiOverlay — Angelita minimizable y contextual en todas las rutas 2D.
+ * CompaiOverlay — el compai elegido, minimizable y contextual en todas las rutas 2D.
  *
  * Un componente global que monta UNA sola vez en el layout raíz (App.jsx),
  * visible en todas las rutas 2D (Home, Perfil, Catálogo, Mapa, etc.).
@@ -29,10 +31,8 @@ import ChagraAgentAvatarAngelita from './ChagraAgentAvatarAngelita';
  *   - currentView (string): ruta actual (dashboard, perfil, mapa, etc.)
  *     Viene de App.jsx currentView state.
  *
- * Nota: No importa Angelita directamente (reutiliza
- * ChagraAgentAvatarAngelita que ya la adapta). El selector de avatar
- * está en Settings/AvatarSelector; CompaiOverlay siempre muestra
- * Angelita (decisión del operador 2026-07-16).
+ * Nota: el cuerpo pasa por ChagraAgentAvatar, que resuelve el mismo compai que
+ * el resto de la aplicación. El selector vive en onboarding y Perfil.
  */
 
 /**
@@ -71,18 +71,29 @@ const RUTA_HINTS = {
     descripcion: 'Gallinas, cerdos, ganado y abejas. Aquí pueden anotar las observaciones de cada uno.',
   },
   default: {
-    titulo: 'Angelita está aquí',
-    descripcion: 'Soy Angelita, su compañera en Chagra. Toque para obtener ayuda en esta pantalla.',
+    titulo: 'Su compai está aquí',
+    descripcion: 'Su compai le acompaña en Chagra. Toque para obtener ayuda en esta pantalla.',
   },
 };
 
 /**
  * Obtiene el hint para una ruta dada.
  */
-function getHintForRuta(ruta) {
-  if (!ruta) return RUTA_HINTS.default;
+function getHintForRuta(ruta, nombreCompai = 'Angelita') {
+  const hintDefault = {
+    ...RUTA_HINTS.default,
+    titulo: `${nombreCompai} está aquí`,
+    descripcion: `Soy ${nombreCompai}, su compañero en Chagra. Toque para obtener ayuda en esta pantalla.`,
+  };
+
+  if (!ruta) {
+    return hintDefault;
+  }
 
   // Busca exacta
+  if (ruta === 'default') {
+    return hintDefault;
+  }
   if (RUTA_HINTS[ruta]) {
     return RUTA_HINTS[ruta];
   }
@@ -94,7 +105,7 @@ function getHintForRuta(ruta) {
   }
 
   // Fallback absoluto
-  return RUTA_HINTS.default;
+  return hintDefault;
 }
 
 /**
@@ -110,11 +121,13 @@ function escucharTexto(texto) {
  * CompaiOverlay — el componente principal.
  */
 export default function CompaiOverlay({ currentView = 'dashboard' }) {
+  const { avatarType } = useCompaiElegido();
+  const nombreCompai = AVATAR_NOMBRE[avatarType] || AVATAR_NOMBRE[DEFAULT_AVATAR_TYPE];
   const [isOpen, setIsOpen] = useState(false);
   const [compaiState, setCompaiState] = useState('idle'); // idle, thinking, speaking, listening
   const [lastView, setLastView] = useState(currentView);
 
-  const hint = useMemo(() => getHintForRuta(currentView), [currentView]);
+  const hint = useMemo(() => getHintForRuta(currentView, nombreCompai), [currentView, nombreCompai]);
 
   // Al cambiar de ruta, cierra el panel (UX: no queda abierto entre pantallas).
   // Detecta el cambio comparando lastView ≠ currentView; luego actualiza ambos.
@@ -150,14 +163,14 @@ export default function CompaiOverlay({ currentView = 'dashboard' }) {
         type="button"
         onClick={handleToggle}
         className="pointer-events-auto relative inline-flex items-center justify-center w-16 h-16 rounded-full bg-gradient-to-br from-emerald-500 to-emerald-600 shadow-lg hover:shadow-xl hover:scale-110 transition-transform active:scale-95"
-        aria-label="Abrir ayuda de Angelita"
+        aria-label={`Abrir ayuda de ${nombreCompai}`}
         aria-expanded={isOpen}
         data-testid="compai-bubble"
       >
-        <ChagraAgentAvatarAngelita
+        <ChagraAgentAvatar
           size={56}
           state={compaiState}
-          ariaLabel="Angelita, asistente de Chagra"
+          ariaLabel={`${nombreCompai}, asistente de Chagra`}
         />
       </button>
 
@@ -176,7 +189,7 @@ export default function CompaiOverlay({ currentView = 'dashboard' }) {
               type="button"
               onClick={handleClose}
               className="flex-shrink-0 p-1 text-slate-400 hover:text-slate-200 hover:bg-slate-800 rounded-lg transition-colors"
-              aria-label="Cerrar panel de Angelita"
+              aria-label={`Cerrar panel de ${nombreCompai}`}
               data-testid="compai-close-btn"
             >
               <X size={20} />

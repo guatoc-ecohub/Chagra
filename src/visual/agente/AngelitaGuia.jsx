@@ -54,6 +54,8 @@ export function AngelitaGuia({
   recordarCierreId = undefined,
   demoraInicialMs = undefined,
   className = '',
+  AvatarComponent = null,
+  nombreCompai = 'Angelita',
 }) {
   const guia = useAngelitaGuia(paradas, { activo, tamano, recordarCierreId, demoraInicialMs });
 
@@ -78,14 +80,23 @@ export function AngelitaGuia({
           type="button"
           className="ang-guia__cuerpo"
           onClick={avanzar}
-          aria-label={guia.esUltima ? 'Angelita: cerrar la guía' : 'Angelita: ver lo siguiente'}
-        >
-          <Angelita estado={guia.parada.gesto} direccion={guia.direccion} size={tamano} />
+            aria-label={guia.esUltima ? `${nombreCompai}: cerrar la guía` : `${nombreCompai}: ver lo siguiente`}
+          >
+          {AvatarComponent ? (
+            <AvatarComponent
+              estado={guia.parada.gesto}
+              direccion={guia.direccion}
+              size={tamano}
+              ariaLabel={nombreCompai}
+            />
+          ) : (
+            <Angelita estado={guia.parada.gesto} direccion={guia.direccion} size={tamano} />
+          )}
         </button>
       </div>
 
       {guia.visible && (
-        <div className="ang-guia__panel" role="group" aria-label="Guía de Angelita">
+        <div className="ang-guia__panel" role="group" aria-label={`Guía de ${nombreCompai}`}>
           <BurbujaAngelita
             mensaje={guia.parada.texto}
             tipo={guia.parada.tipo}
@@ -109,7 +120,7 @@ export function AngelitaGuia({
             <button
               type="button"
               className="ang-guia__cerrar"
-              aria-label="Cerrar la guía de Angelita"
+              aria-label={`Cerrar la guía de ${nombreCompai}`}
               onClick={guia.cerrar}
             >
               ×
