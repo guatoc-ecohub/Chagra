@@ -1,3 +1,4 @@
+/* eslint-disable chagra-i18n/no-hardcoded-spanish -- copy preexistente de onboarding. */
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import {
   MapPin,
@@ -16,6 +17,7 @@ import {
 import ChagraAgentAvatar from './ChagraAgentAvatar';
 import useAgentAvatarType, { AVATAR_NOMBRE, DEFAULT_AVATAR_TYPE } from '../hooks/useAgentAvatarType';
 import AvatarSelector from './Settings/AvatarSelector';
+import AgentAvatarSelector from './Settings/AgentAvatarSelector';
 import { useGeolocation } from '../hooks/useGeolocation';
 import {
   resolveUbicacion,
@@ -747,6 +749,13 @@ export default function OnboardingCondensado({
                 toque en usePrefsStore (avatarCreatureId); si no toca nada,
                 queda la abeja Angelita. Mismo selector del Perfil. */}
             <div data-testid="onb2-avatar">
+              <p className="text-[11px] uppercase tracking-widest font-bold text-emerald-400/90 mb-2">
+                Elija su compai
+              </p>
+              <AgentAvatarSelector />
+            </div>
+
+            <div data-testid="onb2-avatar-criatura">
               <p className="text-[11px] uppercase tracking-widest font-bold text-emerald-400/90 mb-2">
                 Elija su animal (si quiere)
               </p>

@@ -4246,7 +4246,7 @@ export default function App() {
       {currentView === 'dashboard' && <PendingTasksWidget onEdit={(task) => navigate('edit_task', { task })} />}
       {currentView !== 'loading' && currentView !== 'login' && currentView !== 'oauth-callback' && !currentView.startsWith('mockup_') && <SyncProgressIndicator />}
       {/* CompaiOverlay (R3): compai minimizable en todas las rutas 2D, montado UNA vez aqui. */}
-      {currentView !== 'loading' && currentView !== 'login' && currentView !== 'oauth-callback' && !currentView.startsWith('mockup_') && <CompaiOverlay currentView={currentView} />}
+      {currentView !== 'loading' && currentView !== 'login' && currentView !== 'oauth-callback' && currentView !== 'dashboard' && !currentView.startsWith('mockup_') && <CompaiOverlay currentView={currentView} />}
       {/* Badge persistente "N pendientes de sincronizar" (rescate #2668).
           Mismo guard de vista que SyncProgressIndicator: no en pre-auth. */}
       {currentView !== 'loading' && currentView !== 'login' && currentView !== 'oauth-callback' && !currentView.startsWith('mockup_') && <SyncIndicator />}
