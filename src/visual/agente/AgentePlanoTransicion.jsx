@@ -49,7 +49,7 @@
  *   la esquina estándar del compAI (destinoFabPorDefecto).
  */
 import { useEffect, useMemo, useRef } from 'react';
-import { AbejaAngelita } from '../creatures/AbejaAngelita.jsx';
+import ChagraAgentAvatar from '../../components/ChagraAgentAvatar.jsx';
 import { relojAgentePlano, varsDeCruce, LADO_VUELO } from './agentePlanoData.js';
 import { useCruceAgentePlano, limpiarCruceAgente } from './senalAgentePlano.js';
 import './agentePlano.css';
@@ -152,7 +152,14 @@ export default function AgentePlanoTransicion({
         <span className="apt__pulso" />
         <div className="apt__vuelo">
           <div className="apt__giro">
-            <AbejaAngelita size={LADO_VUELO} animo={animo} energia={energia} animated />
+            <ChagraAgentAvatar
+              estado={animo}
+              size={LADO_VUELO}
+              animo={animo}
+              energia={energia}
+              animated
+              ariaLabel="Compañero de Chagra"
+            />
           </div>
         </div>
         <span className="apt__puff" />
@@ -174,7 +181,14 @@ export default function AgentePlanoTransicion({
           <div className="apt__arcoY">
             <span className="apt__sombra" />
             <div className="apt__cuerpo">
-              <AbejaAngelita size={LADO_VUELO} animo={animo} energia={energia} animated />
+              <ChagraAgentAvatar
+                estado={animo}
+                size={LADO_VUELO}
+                animo={animo}
+                energia={energia}
+                animated
+                ariaLabel="Compañero de Chagra"
+              />
             </div>
             <span className="apt__onda" />
           </div>
