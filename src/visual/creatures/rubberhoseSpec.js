@@ -102,6 +102,7 @@ export const RH_REGISTRO = Object.freeze({
   personajes: Object.freeze([
     'abeja-angelita', 'colibri', 'oso-andino', 'rana-andina', 'perezoso',
     'ardilla', 'jaguar', 'morrocoy', 'borugo',       // los 9 bichos
+    'oso-baston',                                     // el caminante del bastón florecido
     'ent-frailejon',                                  // el árbol-maestro
     'lombriz', 'mariposa', 'escarabajo',              // aliados de escena
     'mariquita', 'abejorro',                          // fauna benéfica (kit frh)

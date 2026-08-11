@@ -140,6 +140,19 @@ export const IDLE_PERFILES = {
     celebra: { dur: 2.0, grados: 360 },
     noche: { freq: 0.55, amp: 0.07, rot: -8 },
   },
+  /* Tremarctos ornatus, dirección CAMINANTE (oso del bastón): el mismo pesado
+     entrañable de la especie, pero de trocha — respira hondo apoyado en el
+     bastón, se detiene más seguido (su "aseo" es revisar la corona florecida)
+     y de noche acampa: se acurruca junto al cayado. */
+  'oso-baston': {
+    medio: 'suelo', poseBase: 'anda',
+    respira: { freq: 1.0, amp: 0.05, vaiven: 0.24 },
+    vuelta: { base: 38, jitter: 5, dur: 2.0, grados: 360, anticipo: 18 },
+    aseo: { base: 13, jitter: 4, dur: 1.5 },
+    percha: { base: 44, jitter: 8, dur: 8.5 },
+    celebra: { dur: 2.0, grados: 360 },
+    noche: { freq: 0.6, amp: 0.065, rot: -7 },
+  },
   /* Didelphis — la chucha nocturna CARGADA DE CRÍAS: pasos cortos y
      frecuentes, se para a husmear cada nada (su "aseo" es tantear el aire) y
      no da volteretas largas — lleva tres bichos en el lomo. De noche NO se
