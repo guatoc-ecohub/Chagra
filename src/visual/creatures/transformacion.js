@@ -44,6 +44,7 @@ export const AURA_POR_BICHO = Object.freeze({
   dalmata: '#3b7dff',          // AZUL COBALTO leal (el perro atlético de la casa)
   beagle: '#c9772e',           // CANELA DE RASTRO (la nariz de oro del sabueso)
   zariguya: '#ff9ecb',         // ROSA DE LUNA (la piel desnuda de orejas, trufa y cola prensil, encendida de noche: el color de LA QUE CARGA)
+  luciernaga: '#c7ff4e',       // VERDE-LINTERNA (el amarillo-verde frío de la bioluminiscencia: el color de LA QUE LEE LA NOCHE)
 });
 
 /* Aura por defecto si el slug no está mapeado (la dorada de la guía). */

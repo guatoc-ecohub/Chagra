@@ -3030,3 +3030,153 @@
      entrega el fotograma digno (tumbada y quieta), no la criatura de pie. */
   [data-creature='zariguya'][data-tanatosis='1'] .crt-body { transform: rotate(72deg) translateY(2.3px); }
 }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   LA LUCIÉRNAGA (cocuyo, Lampyridae) — el escarabajo bioluminiscente GUÍA.
+   La LINTERNA es su alma y su medidor vivo del cambio climático (data-eco):
+   late suave en reposo, FUERTE con ecosistema sano, TITILA débil con
+   degradación, atenta al leer la noche. Todo transform/opacity (GPU, gama
+   baja). RM lo congela abajo (fotograma digno). Calcado del arte aprobado
+   (demos/luciernaga).
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* BOB de vuelo (flota lento, de noche): sube y baja como una lucecita. */
+.luci-flota { animation: luci-flota 3.4s ease-in-out infinite; }
+@keyframes luci-flota {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  50%      { transform: translateY(-7px) rotate(-1.2deg); }
+}
+
+/* ALAS membranosas (bajo los élitros): abanican rápido y borroso. */
+.luci-ala-i { animation: luci-ala-i 0.9s ease-in-out infinite; }
+.luci-ala-d { animation: luci-ala-d 0.9s ease-in-out .12s infinite; }
+@keyframes luci-ala-i {
+  0%, 100% { transform: scaleX(1) rotate(0deg); }
+  50%      { transform: scaleX(0.82) rotate(-6deg); }
+}
+@keyframes luci-ala-d {
+  0%, 100% { transform: scaleX(1) rotate(0deg); }
+  50%      { transform: scaleX(0.82) rotate(6deg); }
+}
+
+/* ANTENAS filiformes con follow-through (vivas, como los bombillos de la abeja). */
+.luci-antena-i { animation: luci-antena-i 1.9s ease-in-out infinite alternate; }
+.luci-antena-d { animation: luci-antena-d 2.2s ease-in-out .25s infinite alternate; }
+@keyframes luci-antena-i { from { transform: rotate(-4deg); } to { transform: rotate(6deg); } }
+@keyframes luci-antena-d { from { transform: rotate(4deg); } to { transform: rotate(-6deg); } }
+
+/* ── LA LINTERNA — base (reposo/'normal'): late suave y constante ─────────────*/
+.luci-linterna-halo { animation: luci-latido 2.6s ease-in-out infinite; }
+.luci-linterna-core { animation: luci-brilla 2.6s ease-in-out infinite; }
+@keyframes luci-latido {
+  0%, 100% { transform: scale(0.9); opacity: 0.5; }
+  50%      { transform: scale(1.08); opacity: 0.82; }
+}
+@keyframes luci-brilla {
+  0%, 100% { opacity: 0.72; transform: scale(0.97); }
+  50%      { opacity: 1; transform: scale(1.05); }
+}
+
+/* ECO='sano' — ecosistema sano: la linterna late FUERTE, grande y regular. */
+[data-creature='luciernaga'][data-eco='sano'] .luci-linterna-halo { animation: luci-latido-fuerte 1.6s ease-in-out infinite; }
+[data-creature='luciernaga'][data-eco='sano'] .luci-linterna-core { animation: luci-brilla-fuerte 1.6s ease-in-out infinite; }
+[data-creature='luciernaga'][data-eco='pacto'] .luci-linterna-halo { animation: luci-latido-fuerte 2.2s ease-in-out infinite; }
+[data-creature='luciernaga'][data-eco='pacto'] .luci-linterna-core { animation: luci-brilla-fuerte 2.2s ease-in-out infinite; }
+@keyframes luci-latido-fuerte {
+  0%, 100% { transform: scale(1.2); opacity: 0.9; }
+  50%      { transform: scale(1.5); opacity: 1; }
+}
+@keyframes luci-brilla-fuerte {
+  0%, 100% { opacity: 0.9; transform: scale(1.05); }
+  50%      { opacity: 1; transform: scale(1.16); }
+}
+
+/* ECO='leer' — leyendo la noche: pulso más rápido y atento. */
+[data-creature='luciernaga'][data-eco='leer'] .luci-linterna-halo { animation-duration: 1.9s; }
+[data-creature='luciernaga'][data-eco='leer'] .luci-linterna-core { animation-duration: 1.9s; }
+[data-creature='luciernaga'][data-eco='leer'] .luci-antena-i,
+[data-creature='luciernaga'][data-eco='leer'] .luci-antena-d,
+[data-creature='luciernaga'][data-lee='1'] .luci-antena-i,
+[data-creature='luciernaga'][data-lee='1'] .luci-antena-d { animation-duration: 0.9s; }
+/* la testa se yergue y se ladea leyendo la noche */
+[data-creature='luciernaga'][data-eco='leer'] .luci-testa,
+[data-creature='luciernaga'][data-lee='1'] .luci-testa { animation: luci-lee 3.2s ease-in-out infinite; }
+@keyframes luci-lee {
+  0%, 100% { transform: rotate(-2.6deg) translateY(0); }
+  50%      { transform: rotate(2.6deg) translateY(-4px); }
+}
+
+/* ECO='degradado' — el aviso del cambio climático: la linterna TITILA débil e
+   irregular, a punto de apagarse. */
+[data-creature='luciernaga'][data-eco='degradado'] .luci-linterna-halo { animation: luci-titila-halo 1.7s steps(1, end) infinite; }
+[data-creature='luciernaga'][data-eco='degradado'] .luci-linterna-core { animation: luci-titila-core 1.7s steps(1, end) infinite; }
+@keyframes luci-titila-halo {
+  0%, 18% { opacity: 0.4; transform: scale(0.8); }
+  20%, 44% { opacity: 0.08; transform: scale(0.7); }
+  46%, 60% { opacity: 0.34; transform: scale(0.82); }
+  62%, 100% { opacity: 0.06; transform: scale(0.68); }
+}
+@keyframes luci-titila-core {
+  0%, 18% { opacity: 0.85; }
+  20%, 44% { opacity: 0.16; }
+  46%, 60% { opacity: 0.7; }
+  62%, 100% { opacity: 0.12; }
+}
+
+/* DESTELLA (idle) — el fogonazo de la linterna: un pulso brillante y corto. */
+[data-creature='luciernaga'][data-destella='1'] .luci-linterna-core { animation: luci-destella 1.3s ease-out infinite; }
+[data-creature='luciernaga'][data-destella='1'] .luci-linterna-halo { animation: luci-destella-halo 1.3s ease-out infinite; }
+@keyframes luci-destella {
+  0%   { opacity: 0.5; transform: scale(0.9); }
+  20%  { opacity: 1; transform: scale(1.2); }
+  100% { opacity: 0.62; transform: scale(0.95); }
+}
+@keyframes luci-destella-halo {
+  0%   { opacity: 0.35; transform: scale(0.85); }
+  20%  { opacity: 0.95; transform: scale(1.45); }
+  100% { opacity: 0.45; transform: scale(0.9); }
+}
+
+/* device-tier 'bajo': corta lo continuo. La LINTERNA sigue (su señal es la
+   razón de ser del personaje — como los estados reactivos de la familia). */
+[data-tier='bajo'][data-creature='luciernaga'] .rh-boil,
+[data-tier='bajo'][data-creature='luciernaga'] .luci-flota,
+[data-tier='bajo'][data-creature='luciernaga'] .luci-ala-i,
+[data-tier='bajo'][data-creature='luciernaga'] .luci-ala-d,
+[data-tier='bajo'][data-creature='luciernaga'] .luci-antena-i,
+[data-tier='bajo'][data-creature='luciernaga'] .luci-antena-d { animation: none; }
+
+@media (prefers-reduced-motion: reduce) {
+  [data-creature='luciernaga'] .rh-boil,
+  .luci-flota, .luci-ala-i, .luci-ala-d, .luci-antena-i, .luci-antena-d,
+  .luci-linterna-halo, .luci-linterna-core, .luci-testa { animation: none !important; }
+  /* fotograma digno: la linterna queda ENCENDIDA (presente), nunca apagada. */
+  [data-creature='luciernaga'] .luci-linterna-core { opacity: 0.95; }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   JAGUAR — PAISAJE DEL MIEDO (su poder en el kart). El "landscape of fear" es
+   real en ecología: la sola presencia del depredador ápice altera la conducta
+   de las presas en TODO el paisaje sin depredación directa. El gesto lo lee:
+   una ONDA de presencia que se expande, la mirada que se afila y el aura que
+   sube. Reusa la mirada seria (cejas fruncidas, ojos almendrados) del acecho.
+   ═══════════════════════════════════════════════════════════════════════════ */
+[data-creature='jaguar'][data-paisaje-del-miedo='1'] .jaguar-cejas {
+  animation: jaguar-cejas-frunce 1.1s ease-in-out infinite;
+}
+/* la ONDA de miedo: anillos concéntricos que se expanden y se desvanecen (el
+   miedo que se propaga por el terreno). Cada anillo con su delay inline. */
+.jaguar-miedo-onda { animation: jaguar-miedo-onda 2.4s ease-out infinite; }
+@keyframes jaguar-miedo-onda {
+  0%   { transform: scale(0.45); opacity: 0; }
+  15%  { opacity: 0.7; }
+  100% { transform: scale(2.6); opacity: 0; }
+}
+/* al soltar el miedo, el aura espectral y los ojos suben de intensidad. */
+[data-creature='jaguar'][data-paisaje-del-miedo='1'] .jaguar-aura-espectral { opacity: 0.26; }
+[data-creature='jaguar'][data-paisaje-del-miedo='1'] .jaguar-ojo-brillo { opacity: 0.95; }
+
+[data-tier='bajo'][data-creature='jaguar'] .jaguar-miedo-onda { animation: none; }
+@media (prefers-reduced-motion: reduce) {
+  .jaguar-miedo-onda { animation: none !important; opacity: 0.3; }
+}

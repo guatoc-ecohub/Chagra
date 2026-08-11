@@ -42,10 +42,14 @@ export const ELENCO = {
   // el cruce por el núcleo (bug encontrado cableando #96).
   zariguya: { nombre: 'Zarigüeya', gentilicio: 'la zarigüeya', enPWA: true },
   oso: { nombre: 'Oso andino', gentilicio: 'el oso andino', enPWA: false },
-  jaguar: { nombre: 'Jaguar', gentilicio: 'el jaguar', enPWA: false },
+  // El jaguar cruzó a la PWA el 2026-08-11 (2.5D vivo: idle + paisaje del miedo):
+  // Jaguar.jsx ya vive en src/visual/creatures y está en el registro CREATURES.
+  jaguar: { nombre: 'Jaguar', gentilicio: 'el jaguar', enPWA: true },
   guacamaya: { nombre: 'Guacamaya', gentilicio: 'la guacamaya', enPWA: false },
   chivito: { nombre: 'Chivito', gentilicio: 'Chivito', enPWA: false },
-  luciernaga: { nombre: 'Luciérnaga', gentilicio: 'la luciérnaga', enPWA: false },
+  // La luciérnaga cruzó a la PWA el 2026-08-11 (Luciernaga.jsx: escarabajo
+  // bioluminiscente con la linterna-bioindicador, en el registro CREATURES).
+  luciernaga: { nombre: 'Luciérnaga', gentilicio: 'la luciérnaga', enPWA: true },
 };
 
 /** Slugs jubilados que migran solos, sin que el usuario haga nada. */
