@@ -1,4 +1,6 @@
-import { Angelita } from './Angelita.jsx';
+import ChagraAgentAvatar from '../../components/ChagraAgentAvatar.jsx';
+import useCompaiElegido from '../mundo3d/escenas/useCompaiElegido.js';
+import { AVATAR_NOMBRE, DEFAULT_AVATAR_TYPE } from '../../hooks/useAgentAvatarType.js';
 import BurbujaAngelita from './BurbujaAngelita.jsx';
 import { useAngelitaGuia } from '../../hooks/useAngelitaGuia.js';
 import './angelita-guia.css';
@@ -55,8 +57,11 @@ export function AngelitaGuia({
   demoraInicialMs = undefined,
   className = '',
   AvatarComponent = null,
-  nombreCompai = 'Angelita',
+  nombreCompai = undefined,
 }) {
+  const { avatarType } = useCompaiElegido();
+  const nombreElegido = nombreCompai || AVATAR_NOMBRE[avatarType] || AVATAR_NOMBRE[DEFAULT_AVATAR_TYPE];
+  const AvatarActivo = AvatarComponent || ChagraAgentAvatar;
   const guia = useAngelitaGuia(paradas, { activo, tamano, recordarCierreId, demoraInicialMs });
 
   if (!guia.parada) return null;
@@ -80,23 +85,19 @@ export function AngelitaGuia({
           type="button"
           className="ang-guia__cuerpo"
           onClick={avanzar}
-            aria-label={guia.esUltima ? `${nombreCompai}: cerrar la guía` : `${nombreCompai}: ver lo siguiente`}
+            aria-label={guia.esUltima ? `${nombreElegido}: cerrar la guía` : `${nombreElegido}: ver lo siguiente`}
           >
-          {AvatarComponent ? (
-            <AvatarComponent
-              estado={guia.parada.gesto}
-              direccion={guia.direccion}
-              size={tamano}
-              ariaLabel={nombreCompai}
-            />
-          ) : (
-            <Angelita estado={guia.parada.gesto} direccion={guia.direccion} size={tamano} />
-          )}
+          <AvatarActivo
+            estado={guia.parada.gesto}
+            direccion={guia.direccion}
+            size={tamano}
+            ariaLabel={nombreElegido}
+          />
         </button>
       </div>
 
       {guia.visible && (
-        <div className="ang-guia__panel" role="group" aria-label={`Guía de ${nombreCompai}`}>
+        <div className="ang-guia__panel" role="group" aria-label={`Guía de ${nombreElegido}`}>
           <BurbujaAngelita
             mensaje={guia.parada.texto}
             tipo={guia.parada.tipo}
@@ -120,7 +121,7 @@ export function AngelitaGuia({
             <button
               type="button"
               className="ang-guia__cerrar"
-              aria-label={`Cerrar la guía de ${nombreCompai}`}
+              aria-label={`Cerrar la guía de ${nombreElegido}`}
               onClick={guia.cerrar}
             >
               ×
