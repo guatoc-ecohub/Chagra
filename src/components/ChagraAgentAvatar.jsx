@@ -2,7 +2,7 @@ import ChagraAgentAvatarMaiz from './ChagraAgentAvatarMaiz';
 import ChagraAgentAvatarAngelita from './ChagraAgentAvatarAngelita';
 import ChagraAgentAvatarZariguya from './ChagraAgentAvatarZariguya';
 import Angelita from '../visual/agente/Angelita';
-import useAgentAvatarType from '../hooks/useAgentAvatarType';
+import useCompaiElegido from '../visual/mundo3d/escenas/useCompaiElegido.js';
 
 /**
  * ChagraAgentAvatar — wrapper que delega según preferencia del usuario
@@ -52,8 +52,8 @@ const AVATAR_ANGOSTO = {
     zariguya: ChagraAgentAvatarZariguya,
 };
 
-export default function ChagraAgentAvatar({ estado, ...props }) {
-    const [type] = useAgentAvatarType();
+export default function ChagraAgentAvatar({ estado = undefined, ...props }) {
+    const { avatarType: type } = useCompaiElegido();
     const ComponenteAngosto = AVATAR_ANGOSTO[type];
 
     if (estado !== undefined) {
