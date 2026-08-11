@@ -29,7 +29,9 @@
  * efecto vive aparte en escenas/CamaraNewDonk.jsx (chunk vendor-three).
  */
 import { useEffect, useRef } from 'react';
-import { AbejaAngelita } from '../creatures/AbejaAngelita.jsx';
+import ChagraAgentAvatar from '../../components/ChagraAgentAvatar.jsx';
+import useCompaiElegido from './escenas/useCompaiElegido.js';
+import { AVATAR_NOMBRE, DEFAULT_AVATAR_TYPE } from '../../hooks/useAgentAvatarType.js';
 import { tinteDeMundo, tituloDeMundo } from './resolverMundo.js';
 
 /** Duración total del viaje New Donk (ms). */
@@ -167,6 +169,8 @@ export default function TransicionNewDonk({
   onMitad,
   onFin,
 }) {
+  const { avatarType } = useCompaiElegido();
+  const nombreCompai = AVATAR_NOMBRE[avatarType] || AVATAR_NOMBRE[DEFAULT_AVATAR_TYPE];
   const mitadRef = useRef(onMitad);
   const finRef = useRef(onFin);
   // Refs "última versión": se actualizan en un effect (no en render) para que
@@ -217,7 +221,7 @@ export default function TransicionNewDonk({
       <div className="tnd tnd--corte" style={estilo} role="status" aria-live="polite" data-testid="tnd">
         <style>{CSS_TND}</style>
         <p className="tnd__txt" style={{ opacity: 1, animation: 'none' }}>
-          {`Angelita lo lleva a ${tituloDeMundo(mundoId)}…`}
+          {`${nombreCompai} lo lleva a ${tituloDeMundo(mundoId)}…`}
         </p>
       </div>
     );
@@ -229,9 +233,16 @@ export default function TransicionNewDonk({
       <div className="tnd__vineta" aria-hidden="true" />
       <div className="tnd__destello" aria-hidden="true" />
       <div className="tnd__abeja" aria-hidden="true">
-        <AbejaAngelita size={76} animo={animo} energia={energia} animated />
+        <ChagraAgentAvatar
+          estado={animo}
+          size={76}
+          animo={animo}
+          energia={energia}
+          animated
+          ariaLabel={`${nombreCompai}, compañero de Chagra`}
+        />
       </div>
-      <p className="tnd__txt">{`Angelita lo lleva a ${tituloDeMundo(mundoId)}…`}</p>
+      <p className="tnd__txt">{`${nombreCompai} lo lleva a ${tituloDeMundo(mundoId)}…`}</p>
     </div>
   );
 }

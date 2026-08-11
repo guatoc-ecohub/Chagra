@@ -42,9 +42,10 @@ import useAlertStore from './store/useAlertStore';
 const AgentFab = lazy(() => import('./components/AgentFab'));
 // EscuchaFab (el FAB de tap "barbudito de páramo") DESHABILITADO por decisión
 // del operador 2026-07-07: modo campo = WAKE-WORD SOLO ("hola chagra"). El
-// único FAB visible es el colibrí (AgentFab). El overlay SÍ se importa: lo abre
-// el wake-word vía activarEscucha() (useModoCampo/onWake). Para re-habilitar el
-// tap, descomentar el import y el render de <EscuchaFab /> más abajo.
+// único FAB visible es el compai elegido (AgentFab). El overlay SÍ se importa:
+// lo abre el wake-word vía activarEscucha() (useModoCampo/onWake). Para
+// re-habilitar el tap, descomentar el import y el render de <EscuchaFab /> más
+// abajo.
 // import EscuchaFab from './components/escucha/EscuchaFab';
 const EscuchaOverlay = lazy(() => import('./components/escucha/EscuchaOverlay'));
 // AgentOfflineGuard DEBE ser eager (static import): es la pantalla que se
@@ -65,7 +66,6 @@ import GpsFincaBanner from './components/GpsFincaBanner';
 import DataLossBanner from './components/DataLossBanner';
 import DemoModeBanner from './components/DemoModeBanner';
 import CriticalAlertBanner from './components/CriticalAlertBanner';
-import CompaiOverlay from './components/CompaiOverlay';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import { ErrorFallback } from './components/common/ErrorFallback';
 // Badge "N pendientes de sincronizar" (rescate #2668 → cableado): offline-first,
@@ -4261,13 +4261,13 @@ export default function App() {
           decisión del operador: lo quería fuera. La entrada por voz sigue
           disponible dentro del agente / compositor; este era solo el FAB
           global. */}
-      {/* AgentFab (colibrí flotante "respuesta lista") en TODAS las pantallas
-          MENOS el home/dashboard (operador 2026-06-06): en el home el colibrí
+      {/* AgentFab (el compai elegido, "respuesta lista") en TODAS las pantallas
+          MENOS el home/dashboard (operador 2026-06-06): en el home el compai
           ya es el botón de ENVIAR del compositor, así que el FAB flotante ahí
-          duplicaría el ave. Sigue en el resto para anunciar "respuesta lista".
-          Tampoco en onboarding-perfil (tarea #16): el FAB se encimaba sobre el
-          CTA "Explorar con finca de ejemplo" del footer y la usuaria nueva aún
-          no conoce al agente — ruido en su primer flujo. */}
+          duplicaría la presencia. Sigue en el resto para anunciar "respuesta
+          lista". Tampoco en onboarding-perfil (tarea #16): el FAB se encimaba
+          sobre el CTA "Explorar con finca de ejemplo" del footer y la usuaria
+          nueva aún no conoce al agente, ruido en su primer flujo. */}
       <Suspense fallback={null}>
         {currentView !== 'loading' && currentView !== 'login' && currentView !== 'oauth-callback' && !currentView.startsWith('mockup_') && currentView !== 'voz' && currentView !== 'agente' && currentView !== 'dashboard' && currentView !== 'onboarding-perfil' && currentView !== 'onboarding-perfil-clasico' && <AgentFab onNavigate={navigate} pantalla={currentView} />}
         {currentView !== 'loading' && currentView !== 'login' && currentView !== 'oauth-callback' && !currentView.startsWith('mockup_') && currentView !== 'voz' && currentView !== 'agente' && currentView !== 'dashboard' && currentView !== 'onboarding-perfil' && currentView !== 'onboarding-perfil-clasico' && <AgentFab onNavigate={navigate} />}
@@ -4278,8 +4278,8 @@ export default function App() {
 
           DECISIÓN OPERADOR 2026-07-07 — MODO CAMPO = WAKE-WORD SOLO: el FAB de
           tap ("barbudito de páramo", EscuchaFab) NO se muestra a los usuarios.
-          El único FAB visible sigue siendo el colibrí (AgentFab, "respuesta
-          lista"). El overlay se abre EXCLUSIVAMENTE por el wake-word "hola
+          El único FAB visible sigue siendo el compai elegido (AgentFab,
+          "respuesta lista"). El overlay se abre EXCLUSIVAMENTE por el wake-word "hola
           chagra" (useModoCampo.onWake → activarEscucha({fuente:'wakeword'})),
           que solo corre con VITE_MODO_CAMPO=true y modo campo activado (opt-in).
           Para re-habilitar el tap: descomentar el import de EscuchaFab (arriba)
@@ -4288,8 +4288,6 @@ export default function App() {
       {currentView !== 'loading' && currentView !== 'login' && currentView !== 'oauth-callback' && !currentView.startsWith('mockup_') && <EscuchaOverlay />}
       {currentView === 'dashboard' && <PendingTasksWidget onEdit={(task) => navigate('edit_task', { task })} />}
       {currentView !== 'loading' && currentView !== 'login' && currentView !== 'oauth-callback' && !currentView.startsWith('mockup_') && <SyncProgressIndicator />}
-      {/* CompaiOverlay (R3): compai minimizable en todas las rutas 2D, montado UNA vez aqui. */}
-      {currentView !== 'loading' && currentView !== 'login' && currentView !== 'oauth-callback' && currentView !== 'dashboard' && !currentView.startsWith('mockup_') && <CompaiOverlay currentView={currentView} />}
       {/* Badge persistente "N pendientes de sincronizar" (rescate #2668).
           Mismo guard de vista que SyncProgressIndicator: no en pre-auth. */}
       {currentView !== 'loading' && currentView !== 'login' && currentView !== 'oauth-callback' && !currentView.startsWith('mockup_') && <SyncIndicator />}
