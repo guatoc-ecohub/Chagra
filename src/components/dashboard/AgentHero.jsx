@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState, useCallback } from 'react';
-import { Mic, Square, Camera, X } from 'lucide-react';
+import { Mic, Square, Camera, X, MessageCircle, Send } from 'lucide-react';
 import useVoiceRecorder from '../../hooks/useVoiceRecorder';
 import { captureAndCompress } from '../../services/photoService';
 import { isAnalyzableImageAttachment } from '../../services/agentOutboxAttachment';
@@ -1737,7 +1737,7 @@ export default function AgentHero({ onNavigate }) {
                         title="Abrir Chagra IA"
                         className="agentport-open"
                     >
-                        <ChagraAgentAvatar size={48} state="idle" ariaLabel="Chagra IA" />
+                        <MessageCircle size={24} aria-hidden="true" />
                     </button>
 
                     <div className="agentport-mode" role="tablist" aria-label="Nivel de respuestas">
@@ -2084,9 +2084,8 @@ export default function AgentHero({ onNavigate }) {
                             {isRecording ? <Square size={16} strokeWidth={2.5} aria-hidden="true" /> : <Mic size={18} strokeWidth={2.5} aria-hidden="true" />}
                         </button>
 
-                        {/* Enviar — usa el mismo colibrí foto/video del FAB global.
-                            Comportamiento del demo: con el campo VACÍO no se apaga;
-                            tocarlo abre el menú didáctico de capacidades. */}
+                        {/* Enviar: el compai vive una sola vez en la escena superior;
+                            este control conserva la acción sin duplicar su dibujo. */}
                         <button
                             type="button"
                             onClick={handleSendText}
@@ -2103,9 +2102,7 @@ export default function AgentHero({ onNavigate }) {
                               position: 'relative'
                             }}
                         >
-                            <div style={{ width: '100%', height: '100%', position: 'relative' }}>
-                              <ChagraAgentAvatar size={44} state={canSend ? 'idle' : 'listening'} ariaLabel="Enviar al agente" />
-                            </div>
+                            <Send size={20} aria-hidden="true" />
                         </button>
                     </div>
 
