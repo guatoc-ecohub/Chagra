@@ -31,7 +31,7 @@
  */
 import { lazy, Suspense } from 'react';
 import { permite3D } from './deviceTier.js';
-import { AbejaAngelita } from '../creatures/AbejaAngelita.jsx';
+import ChagraAgentAvatar from '../../components/ChagraAgentAvatar.jsx';
 import './ValleEnCalma.css';
 
 const EscenaCalma3D = lazy(() => import('./escenas/EscenaCalma3D.jsx'));
@@ -89,7 +89,14 @@ function Calma2D({ reducedMotion }) {
 
       {/* Angelita posada en la flor dorada, alas quietas, respirando lento */}
       <div className={`vcalma-abeja vcalma-abeja--2d${reducedMotion ? ' vcalma-abeja--quieta' : ''}`}>
-        <AbejaAngelita size={46} animo="descansa" energia={0.4} animated={false} />
+        <ChagraAgentAvatar
+          estado="acompana"
+          size={46}
+          animo="descansa"
+          energia={0.4}
+          animated={false}
+          ariaLabel="Compañero de Chagra"
+        />
       </div>
     </div>
   );
