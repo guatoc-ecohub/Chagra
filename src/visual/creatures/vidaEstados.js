@@ -120,6 +120,14 @@ export const VIDA_REPERTORIO = {
       reposo: { dur: 4400, peso: 1 }, // 1× rh-g-reposo — con tres crías encima, poco
     },
   },
+  luciernaga: {
+    descanso: [3000, 7200], // nocturna atareada: lee la noche y vuelve a flotar
+    momentos: {
+      destella: { dur: 2600, peso: 2.5 }, // 2× luci-destella 1.3s — el fogonazo de la linterna
+      lee: { dur: 3200, peso: 1.2 }, // 1× luci-lee 3.2s — se yergue y lee la noche (antenas atentas)
+      reposo: { dur: 4400, peso: 1 }, // 1× rh-g-reposo — bicho menudo, descansa poco
+    },
+  },
   dalmata: {
     descanso: [2600, 6400], // perro joven: gesticula seguido, casi no se aquieta
     momentos: {

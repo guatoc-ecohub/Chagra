@@ -129,6 +129,18 @@ export const IDLE_PERFILES = {
     celebra: { dur: 1.2, grados: 360 },
     noche: { freq: 1.1, amp: 0.045, rot: -5 },
   },
+  /* Lampyridae — la luciérnaga NOCTURNA: vuela lento y bajo, flota más que
+     dardea (su punto es la luz, no la carrera), y de noche NO se apaga: es
+     cuando sale a leer la noche y a brillar (freq alta, se acurruca casi nada). */
+  luciernaga: {
+    medio: 'aire', poseBase: 'vuela',
+    respira: { freq: 1.7, amp: 0.036, vaiven: 0.3 },
+    vuelta: { base: 24, jitter: 3, dur: 1.4, grados: 360, anticipo: 24 },
+    aseo: { base: 10, jitter: 3, dur: 0.9 },
+    percha: { base: 34, jitter: 6, dur: 5.5 },
+    celebra: { dur: 1.5, grados: 360 },
+    noche: { freq: 1.5, amp: 0.05, rot: -3 },
+  },
   /* Tremarctos ornatus — pesado y entrañable: respira hondo, voltereta lenta,
      se rasca la panza largo y se sienta un buen rato. */
   'oso-andino': {

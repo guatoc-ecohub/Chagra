@@ -305,6 +305,14 @@ export function Jaguar({
      OPT-IN: los omóplatos SUBEN, la cabeza BAJA y el cuerpo avanza lento y
      controlado (el acecho felino). Su otra reacción-firma. Default false. */
   acecha = false,
+  /* ── PAISAJE DEL MIEDO (su PODER en el kart — landscape of fear) ────────────
+     OPT-IN: el jaguar SUELTA su presencia depredadora — una ONDA que se expande
+     por el terreno, la mirada se afila (cejas fruncidas, ojos almendrados) y el
+     aura sube. Concepto ecológico real: la sola presencia del depredador ápice
+     altera la conducta de las presas en TODO el paisaje sin tocarlas (ver
+     JAGUAR_PODER_KART). Es de ÁREA: el miedo no elige a uno. Default false → los
+     consumidores existentes NO cambian. */
+  paisajeDelMiedo = false,
   /* ── VIDA PROPIA (idle-cerebro v2 — la vara de Angelita) ───────────────────
      Default ON: un reloj con jitter hojea el repertorio de la especie
      (vidaEstados.js) — el bicho EXISTE aunque nadie le hable. Cada instancia
@@ -378,6 +386,7 @@ export function Jaguar({
   useMiradaUsted(raizRef, vida && vivo && tier !== 'bajo');
   const rugeFx = ruge || momento === 'ruge';
   const acechaFx = acecha || momento === 'acecha';
+  const miedoFx = paisajeDelMiedo;
   const poseFx = momento === 'reposo' ? 'reposo' : pose;
   const marchando = poseFx === 'camina';
 
@@ -946,9 +955,29 @@ export function Jaguar({
   // → cero costo para los consumidores actuales. La APARICIÓN espectral lo
   // envuelve por fuera (nodo aparte: opacity+scale de materialización, sin
   // pisar el transform de la levitación); solo anima con data-aparicion.
+  // PAISAJE DEL MIEDO — la onda de presencia depredadora que se expande por el
+  // terreno (su poder de ÁREA en el kart). Anillos concéntricos que crecen y se
+  // desvanecen; cada uno con su delay para leerse como oleadas. Solo se dibuja
+  // con paisajeDelMiedo; anima solo viva (la clase la pone el CSS por
+  // data-paisaje-del-miedo). Va DETRÁS del felino (radia desde él).
+  const ondaMiedo = miedoFx ? (
+    <g className="jaguar-miedo" aria-hidden="true">
+      {[0, -0.8, -1.6].map((d, i) => (
+        <circle key={i}
+          className={vivo ? 'jaguar-miedo-onda' : undefined}
+          cx="0" cy="2" r="6" fill="none"
+          stroke={i === 1 ? P.iris : P.espectral}
+          strokeWidth={0.9 - i * 0.15}
+          opacity={vivo ? undefined : 0.3}
+          style={{ transformBox: 'fill-box', transformOrigin: 'center', animationDelay: `${d}s` }} />
+      ))}
+    </g>
+  ) : null;
+
   const cuerpoVivo = (
     <g className="jaguar-aparicion" style={{ transformBox: 'fill-box', transformOrigin: 'center' }}>
       <g className="jaguar-levita" style={{ transformBox: 'fill-box', transformOrigin: 'center' }}>
+        {ondaMiedo}
         {conBoil}
       </g>
     </g>
@@ -964,6 +993,7 @@ export function Jaguar({
     'data-mojado': ropa?.mojado ? '1' : undefined,
     'data-ruge': rugeFx ? '1' : undefined,
     'data-acecha': acechaFx ? '1' : undefined,
+    'data-paisaje-del-miedo': miedoFx ? '1' : undefined,
     'data-revelacion': revelacion ? '1' : undefined,
     'data-aparicion': aparicion ? '1' : undefined,
     'data-vida': momento || undefined,

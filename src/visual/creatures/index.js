@@ -68,7 +68,7 @@ export { Jaguar } from './Jaguar.jsx';
 /* La IDENTIDAD del jaguar como datos (paleta leonada + rosetas, proporciones y
    su perfil de clima). Solo datos: jamás arrastra three al bundle base — igual
    que abejaIdentidad/faunaAndina. */
-export { JAGUAR_PALETA, JAGUAR_PROPORCION, JAGUAR_SLUG, PERFIL_JAGUAR } from './jaguarIdentidad.js';
+export { JAGUAR_PALETA, JAGUAR_PROPORCION, JAGUAR_SLUG, PERFIL_JAGUAR, JAGUAR_PODER_KART } from './jaguarIdentidad.js';
 export { Morrocoy } from './Morrocoy.jsx';
 /* La IDENTIDAD del morrocoy como datos (paleta bronce + escudos hexagonales,
    proporciones y su perfil de clima). Solo datos: jamás arrastra three al bundle
@@ -166,6 +166,20 @@ export {
   ZARIGUYA_FIRMA, ZARIGUYA_PALETA, ZARIGUYA_PRESENCIA, ZARIGUYA_PROPORCION,
   ZARIGUYA_SLUG, ZARIGUYA_TINTA, PERFIL_ZARIGUYA,
 } from './zariguyaIdentidad.js';
+/* LA LUCIÉRNAGA (cocuyo) — el ESCARABAJO bioluminiscente de la finca: la GUÍA
+   nocturna, científica y BIOINDICADORA (la misma familia de personaje-guía que
+   la abeja Angelita). Su LINTERNA es un medidor vivo del cambio climático (prop
+   `eco`): late fuerte con ecosistema sano, titila débil con degradación. Fiel a
+   que es un escarabajo con escudo (pronoto), no una mosca ni una abeja. */
+export { Luciernaga } from './Luciernaga.jsx';
+/* La IDENTIDAD de la luciérnaga como datos (paleta bioluminiscente + proporciones
+   + su CONTRATO DE SILUETA + los estados de la linterna-bioindicador + presencia
+   3D + perfil de clima). Solo datos: jamás arrastra three al bundle base — igual
+   que zariguyaIdentidad/jaguarIdentidad. */
+export {
+  LUCIERNAGA_FIRMA, LUCIERNAGA_PALETA, LUCIERNAGA_PRESENCIA, LUCIERNAGA_PROPORCION,
+  LUCIERNAGA_SLUG, LUCIERNAGA_TINTA, LUCIERNAGA_ESTADOS_ECO, PERFIL_LUCIERNAGA,
+} from './luciernagaIdentidad.js';
 /* EL MAÍZ COMPAÑERO — Zea mays, la mata madre de la milpa: LA QUE ALIMENTA.
    El avatar-planta ('maiz' en useAgentAvatarType) hecho personaje rubber-hose:
    ARRAIGADO (no viaja — el único del elenco sin pies: tiene montículo y
@@ -259,6 +273,7 @@ import Trichogramma from './Trichogramma.jsx';
 import Sirfido from './Sirfido.jsx';
 import Gallina from './Gallina.jsx';
 import Zariguya from './Zariguya.jsx';
+import Luciernaga from './Luciernaga.jsx';
 import MaizCompai from './MaizCompai.jsx';
 import EntFrailejon from './EntFrailejon.jsx';
 
@@ -302,6 +317,9 @@ export const CREATURES = {
   // El marsupial nocturno de la finca (la que sale de noche a limpiar la
   // huerta — con las crías al lomo).
   zariguya: { Component: Zariguya, nombre: 'Zarigüeya (chucha)', cientifico: 'Didelphis marsupialis' },
+  // El escarabajo bioluminiscente de la finca (la guía que lee la noche — su
+  // linterna es un medidor vivo del cambio climático).
+  luciernaga: { Component: Luciernaga, nombre: 'Luciérnaga (cocuyo)', cientifico: 'Lampyridae' },
   // La mata madre de la milpa (flora compañera, como el Ent): el avatar-planta
   // arraigado que se mece, alimenta y corona en espiga.
   maiz: { Component: MaizCompai, nombre: 'Planta de maíz', cientifico: 'Zea mays' },
