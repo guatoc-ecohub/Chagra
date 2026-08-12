@@ -9,7 +9,7 @@
  *   - cubre el test permanente del punto de acceso #1
  *     (tests/unit/exampleQuestions.entrypoint.test.jsx).
  *
- * Tenerlas acá (y no inline en cada componente) garantiza que NO puedan
+ * Tenerlas aquí (y no inline en cada componente) garantiza que NO puedan
  * divergir entre la UI y el test: el test importa exactamente estos arrays.
  *
  * Español colombiano (tú/usted). NUNCA voseo argentino (memoria

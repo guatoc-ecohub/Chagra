@@ -2,7 +2,7 @@
  * hoja — el generador de LÁMINA FOLIAR. El corazón del motor.
  *
  * La hoja es el carácter diagnóstico más usado por el campesino: es lo que
- * mira primero, y es donde aparece casi toda enfermedad. Por eso acá NADA es
+ * mira primero, y es donde aparece casi toda enfermedad. Por eso aquí NADA es
  * decorativo — forma, nervadura, borde y filotaxia son parámetros con nombre
  * botánico y salen dibujados como son:
  *
@@ -112,7 +112,7 @@ function mediaLamina(forma, borde, len, ancho, rng, op = {}) {
       [-atras * 0.45, -w0 * 0.95],
       [-atras, -w0 * 0.5],
       [-atras * 0.82, -w0 * 0.12],
-      [len * 0.045, 0], // el fondo del seno: acá muere el pecíolo
+      [len * 0.045, 0], // el fondo del seno: aquí muere el pecíolo
     ];
     return { pts: [...lobulo.reverse(), arranque, ...pts.slice(1)], seno: len * 0.045 };
   }
@@ -184,7 +184,7 @@ function nervios(tipo, forma, len, ancho, rng, extra = {}) {
 
   if (tipo === 'paralela') {
     /* Gramínea: el nervio central grueso y las venas corriendo de base a
-       punta SIN ramificar. Por acá se rasga la hoja. */
+       punta SIN ramificar. Por aquí se rasga la hoja. */
     d.principal = `M0 0 L${len.toFixed(1)} 0`;
     const k = extra.venas ?? 7;
     for (let i = 1; i <= k; i += 1) {

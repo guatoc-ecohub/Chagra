@@ -274,7 +274,7 @@ export const cana = {
   piso: 'calido',
   altitud: [0, 1900],
   altitudOptima: [0, 1500],
-  climaNota: 'La Hoya del Río Suárez (Santander/Boyacá, 1200-1900 msnm) es la de mayor tradición: las noches frescas concentran la sacarosa.',
+  climaNota: 'La Hoya del Río Suárez (Santander/Boyaquí, 1200-1900 msnm) es la de mayor tradición: las noches frescas concentran la sacarosa.',
   alturaM: 3.5,
   fuente: 'corpus-parcial',
 
@@ -359,7 +359,7 @@ export const ahuyama = {
     color: ['#f2c33a', '#e2c04c'],
     fuente: 'corpus',
     nota: 'MONOICA: macho y hembra separadas EN LA MISMA MATA. La hembra trae la ahuyamita ya puesta debajo de la flor (ovario ínfero); el macho va en pedúnculo largo y desnudo. Aprender a distinguirlas responde el "botó la flor y no cargó": las que botó eran los machos, y eso es normal.',
-    cocina: 'Las flores MASCULINAS se cosechan temprano en la mañana y se rellenan con queso o huevo — patrimonio culinario de Cundinamarca y Boyacá. Cosechar machos no cuesta cosecha.',
+    cocina: 'Las flores MASCULINAS se cosechan temprano en la mañana y se rellenan con queso o huevo — patrimonio culinario de Cundinamarca y Boyaquí. Cosechar machos no cuesta cosecha.',
   },
   fruto: {
     tipo: 'cucurbita',
@@ -479,7 +479,7 @@ export const aguacate = {
       cara: 'haz',
       gravedad: 'baja',
       senal: 'Capa NEGRA tipo HOLLÍN sobre la hoja.',
-      alerta: 'NO ataca el tejido: crece sobre la MELAZA de los chupadores (pulgón, mosca blanca, escama). Se resuelve controlando el INSECTO. El fungicida acá es plata botada.',
+      alerta: 'NO ataca el tejido: crece sobre la MELAZA de los chupadores (pulgón, mosca blanca, escama). Se resuelve controlando el INSECTO. El fungicida aquí es plata botada.',
       fuente: 'corpus',
     },
     {

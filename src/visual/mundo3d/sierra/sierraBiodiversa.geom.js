@@ -12,7 +12,7 @@
  *   · Los CUATRO árboles mayores de `arbolMayor.geom.js` (los mismos de la
  *     galería huérfana `GaleriaSierraArboles`), cada uno en SU piso:
  *        ceiba/Ceiba pentandra ....... cálido   (<1000 m) — raíces tablares
- *        guayacán/Handroanthus ....... templado (1000–2000 m) — florece de oro
+ *        guayaquín/Handroanthus ....... templado (1000–2000 m) — florece de oro
  *        roble andino/Quercus ........ frío     (2000–3000 m) — copa ancha
  *        queñua/Polylepis quadrijuga . filo del páramo — el bosque más alto
  *   · El FRAILEJÓN/Espeletia (roseta plateada + enagua) de `sierraMonte.geom.js`,

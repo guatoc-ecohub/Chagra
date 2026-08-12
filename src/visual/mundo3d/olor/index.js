@@ -15,7 +15,7 @@
  * LAS TRES DECISIONES DE ARTE
  *
  * 1. EL AMONÍACO ES DORADO, NO VERDE. Un humito verde tóxico es mentira dos
- *    veces: el amoníaco es incoloro, y "verde veneno" dice "sáquelo de acá"
+ *    veces: el amoníaco es incoloro, y "verde veneno" dice "sáquelo de aquí"
  *    cuando hay que decir "eso es SUYO, no lo deje ir". Las motas son del color
  *    del grano de maíz, porque eso son: el abono que ya pagó, saliéndose por el
  *    techo. Duele porque es bonito y se va.
@@ -63,7 +63,7 @@
  * descarga three) o el corte de perfil, y abajo la palada de material seco.
  *
  * Complementa a `../estiercol/` (el biodigestor y la compostera): allá está la
- * SOLUCIÓN, acá el PROBLEMA. Este módulo termina justo donde aquel empieza —
+ * SOLUCIÓN, aquí el PROBLEMA. Este módulo termina justo donde aquel empieza —
  * en la cama que sale como abono semicompostado.
  */
 export { default } from './OlorVisible.jsx';
@@ -92,7 +92,7 @@ export {
 export { COLORES, COCHERA, BEBEDERO } from './olor.geom.js';
 
 /*
- * EscenaOlorVisible NO se re-exporta acá a propósito: importa three y
+ * EscenaOlorVisible NO se re-exporta aquí a propósito: importa three y
  * @react-three, y este índice lo consume gente que no quiere ese peso. Se monta
  * perezosa desde OlorVisible.jsx y en ningún otro lado.
  */

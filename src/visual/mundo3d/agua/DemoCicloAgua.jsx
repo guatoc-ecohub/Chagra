@@ -14,7 +14,7 @@
  *              se ha ido. La derecha lleva rato seca. Esa es la escena.
  *
  * Y con el deslizador de HORA, la otra lección: llevá la hora a la una de la
- * tarde y mirá el aspersor de enfrente — las gotas se evaporan antes de tocar
+ * tarde y mira el aspersor de enfrente — las gotas se evaporan antes de tocar
  * el suelo. Volvé a las 6 y llegan enteras. El goteo llega siempre.
  *
  * NO está cableada a ninguna ruta (mismo contrato que DemoAtmosferaViva). Quien

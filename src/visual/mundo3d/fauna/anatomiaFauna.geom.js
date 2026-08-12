@@ -6,7 +6,7 @@
  * → un material blanco y una draw-call por pieza. Cero assets, todo procedural,
  * corre headless.
  *
- * PERO acá hay una diferencia de fondo con la finca: la vaca de `fincaRealista`
+ * PERO aquí hay una diferencia de fondo con la finca: la vaca de `fincaRealista`
  * pasta quieta y se fusiona ENTERA; estos caminan. Un cuerpo fusionado no puede
  * caminar. Así que el reparto es otro:
  *

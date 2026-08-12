@@ -268,7 +268,7 @@ export function paniculaPoacea(rng, op = {}) {
       s,
       y,
       l,
-      /* las anteras colgantes: el maíz suelta el polen al viento desde acá */
+      /* las anteras colgantes: el maíz suelta el polen al viento desde aquí */
       anteras: plumosa
         ? null
         : Array.from({ length: 5 }, (_, k) => ({ t: 0.3 + (k / 5) * 0.66, largo: alto * 0.05 })),

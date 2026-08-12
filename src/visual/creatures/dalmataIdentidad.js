@@ -31,7 +31,7 @@ export { RH_INK as DALMATA_TINTA } from './_rubberhose.jsx';
 export const DALMATA_SLUG = 'dalmata';
 
 /* ── DÁLMATA — Canis lupus familiaris (el perro atlético moteado). Nace BLANCO
-   y las manchas le salen después: acá lo dibujamos adulto, con su firma plena —
+   y las manchas le salen después: aquí lo dibujamos adulto, con su firma plena —
    manchas negras REDONDAS, bien definidas y SEPARADAS sobre blanco puro
    (distribuidas por todo el cuerpo, orejas caídas moteadas, hasta la cola).
    Ojos café alerta y amables, trufa negra, lengüita rosada que jadea feliz. */

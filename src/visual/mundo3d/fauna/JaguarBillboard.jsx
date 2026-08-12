@@ -62,7 +62,7 @@ const ESTILO_JAGUAR = {
 };
 
 /* Velocidades en unidades de mundo por segundo. El jaguar real camina con paso
-   medido; acá el paso es LENTO a propósito y el acecho es la mitad de lento. */
+   medido; aquí el paso es LENTO a propósito y el acecho es la mitad de lento. */
 const V_ANDA = 0.62;
 const V_ACECHA = 0.24;
 

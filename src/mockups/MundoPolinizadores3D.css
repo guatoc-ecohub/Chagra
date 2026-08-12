@@ -60,7 +60,7 @@
   touch-action: none;
 }
 /* El contenedor `.polz-mundo` (de polinizadores.css) vive dentro del lienzo y
-   llena todo el alto disponible; acá solo se ajusta al marco recortado. */
+   llena todo el alto disponible; aquí solo se ajusta al marco recortado. */
 .mpoliniz__lienzo .polz-mundo {
   position: absolute;
   inset: 0;

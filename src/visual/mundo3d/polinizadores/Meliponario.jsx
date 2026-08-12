@@ -18,7 +18,7 @@
  *     estado frente a una piquera de angelita reconoce esa quietud antes que
  *     cualquier otra cosa de este mundo.
  *
- * Y hay tráfico: las angelitas del enjambre salen de acá y vuelven cargadas a
+ * Y hay tráfico: las angelitas del enjambre salen de aquí y vuelven cargadas a
  * descargar. La caja no es un adorno con abejas alrededor — es de donde salen.
  *
  * TIER-SAFE: las cajas son pocas (2-3) y van instanciadas; las guardianas son un
@@ -111,7 +111,7 @@ export default function Meliponario({
       for (let k = 0; k < base; k++) {
         const enElBorde = k % 3 === 0; // unas paradas, otras en vuelo
         out.push({
-          // Las de vuelo se quedan clavadas a un palmo de la boca, mirándola.
+          // Las de vuelo se quedan clavadas a un palmo de la boca, mirandola.
           x: bocaX + (enElBorde ? 0.03 : 0.08 + r() * 0.1),
           y: bocaY + (r() - 0.5) * 0.07,
           z: bocaZ + (r() - 0.5) * 0.09,

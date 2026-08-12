@@ -187,7 +187,7 @@ function FichaSenal({ enf, especie, x, y, ancho, alto }) {
         </g>
       )}
 
-      {/* si el dato no está en el corpus, se dice acá y no en letra chica */}
+      {/* si el dato no está en el corpus, se dice aquí y no en letra chica */}
       {enf.sinDato && (
         <g transform={`translate(8 ${alto - 12})`}>
           <Texto x={0} y={0} tam={7.5} color="#a8752b" cursiva>

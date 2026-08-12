@@ -66,7 +66,7 @@ export default function ProcesosPorVozScreen({ onBack, onSave }) {
   );
 
   // Resolución para buildDraftsFromVoice. La extracción ya resuelve la ubicación
-  // (entity.location) y el slug (entity.cropSlug); acá solo normalizamos. Lo que
+  // (entity.location) y el slug (entity.cropSlug); aquí solo normalizamos. Lo que
   // no quede resuelto, el campesino lo completa en la tarjeta antes de confirmar.
   const resolveLocation = useCallback((loc) => {
     if (loc && loc.id) return { id: loc.id, type: loc.type || 'asset--land', label: loc.name || loc.label };

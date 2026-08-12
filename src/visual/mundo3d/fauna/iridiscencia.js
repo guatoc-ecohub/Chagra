@@ -8,7 +8,7 @@
  * capas de melanina de un grosor del orden de la longitud de onda de la luz, y
  * lo que hace es INTERFERENCIA DE PELÍCULA DELGADA: cancela unos colores y
  * refuerza otros según el CAMINO ÓPTICO — que depende del ángulo con que la
- * mirás. Por eso el mismo colibrí, sin moverse ni cambiar de luz, pasa de verde
+ * miras. Por eso el mismo colibrí, sin moverse ni cambiar de luz, pasa de verde
  * a violeta cuando vos girás la cabeza. Un colibrí pintado de verde es un
  * colibrí muerto: le falta lo único que lo hacía brillar.
  *

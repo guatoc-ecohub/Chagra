@@ -171,7 +171,7 @@ void main() {
   // EL CORTE. Con salud baja se abren huecos: la hifa se pica y después se
   // parte. Colapsar el anillo entero a su centro deja triángulos de área cero
   // (invisibles) y nos ahorra el "discard", que en gama baja se paga caro.
-  // (Ojo: nada de acentos graves acá adentro — esto es un template literal de
+  // (Ojo: nada de acentos graves aquí adentro — esto es un template literal de
   // JS y un acento grave suelto lo parte en dos. Ya pasó.)
   float corte = 1.0;
   if (s < 0.72) {
@@ -205,7 +205,7 @@ void main() {
   // La red viva brilla; la apagada apenas se insinúa. La TRAZA FANTASMA (lo que
   // queda donde la red pasaba) es recurso de arte, no afirmación biológica: dice
   // "aquí HABÍA" y "aquí PUEDE volver". Sin ella el lado apagado sería un vacío
-  // y se leería "acá nunca hubo nada" — justo la mentira que la pieza combate.
+  // y se leería "aquí nunca hubo nada" — justo la mentira que la pieza combate.
   float a = uOpacidad * mix(0.30, 1.0, smoothstep(0.0, 1.0, vSalud));
   gl_FragColor = vec4(vColor, a);
 }
@@ -814,7 +814,7 @@ function Mundo({ tier, reducedMotion, frenteRef, destino, onAbrir }) {
 
   const { matas, puntas } = useMemo(() => sistemaRaices(params), [params]);
   const libres = useMemo(() => nodosLibres(params), [params]);
-  /* `matas` no es opcional acá: sin ellas no se tejen los PUENTES y la red no
+  /* `matas` no es opcional aquí: sin ellas no se tejen los PUENTES y la red no
      cruza de una mata a otra — que es lo único que esta escena existe para
      mostrar. Ver la nota en `construirRed`. */
   const { nodos, hilos } = useMemo(
@@ -981,7 +981,7 @@ export default function EscenaSueloComparado({ tier = 'medio', reducedMotion = f
 /* Las dos cadencias (`CADENCIAS` en los textos) son la rima que remata la pieza:
    el bulto dice "repita cada tres o cuatro semanas" y la guadaña dice "repita el
    corte cada tres o cuatro semanas". Mismo ritmo, mismo trabajo, otro destino.
-   No está montada acá todavía: va en la lámina 2D que acompaña la escena, donde
+   No está montada aquí todavía: va en la lámina 2D que acompaña la escena, donde
    el texto puede respirar. Queda anotado para que no se pierda — es el mejor
    hallazgo del corpus y sería una lástima. */
 export { FRENTE };

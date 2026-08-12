@@ -93,7 +93,7 @@ export const PAL = {
   ceniza: '#5c5348',
 
   // Cuerpos (cada bicho se reconoce de un vistazo).
-  // La angelita NO tiene colores propios acá: son los de su identidad aprobada.
+  // La angelita NO tiene colores propios aquí: son los de su identidad aprobada.
   angelitaCuerpo: ABEJA_PALETA.cuerpo,
   angelitaCabeza: ABEJA_PALETA.testa, // cabeza oscura real del meliponino
   angelitaTorax: ABEJA_PALETA.torax, // torax oscuro del meliponino real
@@ -341,7 +341,7 @@ export const POLINIZADORES = {
     pica: true,
     social: true,
     anida: 'colmena',
-    dice: 'Traída de Europa, africanizada acá: da más miel y SÍ pica. Trabaja duro.',
+    dice: 'Traída de Europa, africanizada aquí: da más miel y SÍ pica. Trabaja duro.',
     visita: ['cartel_amarillo', 'melifera_borde', 'plana_racimo', 'guia_uv', 'robusta_olor'],
     escala: 0.85,
     caracter: { vel: 2.0, agilidad: 3.0, bob: 0.06, bobHz: 2.8, erratico: 0.2, cierne: 0.1, dardea: 0, vibra: false, nocturno: false, carga: 1 },
@@ -356,7 +356,7 @@ export const POLINIZADORES = {
     anida: 'suelo', // anida en el suelo y en la vegetación baja: la quema lo mata
     dice: 'Grande y peludo. Zumba contra la flor para sacarle el polen: eso NADIE más lo hace igual. Sin él, el maracuyá no cuaja.',
     visita: ['pasiflora', 'guia_uv', 'cartel_amarillo', 'melifera_borde'],
-    escala: 1.35, // el más grande de los insectos de acá
+    escala: 1.35, // el más grande de los insectos de aquí
     caracter: { vel: 1.6, agilidad: 2.0, bob: 0.11, bobHz: 1.9, erratico: 0.3, cierne: 0.25, dardea: 0, vibra: true, nocturno: false, carga: 1.3 },
   },
   colibri: {

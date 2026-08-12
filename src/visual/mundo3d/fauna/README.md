@@ -10,7 +10,7 @@ En Chagra hay dos registros:
 | Registro       | Quiénes                                       | Dónde vive        |
 | -------------- | --------------------------------------------- | ----------------- |
 | **rubber-hose** | los 9 bichos, Angelita — caricatura con alma  | `creatures/`      |
-| **realista**    | danta, jaguar, oso, colibrí, arlequín…        | **acá**           |
+| **realista**    | danta, jaguar, oso, colibrí, arlequín…        | **aquí**           |
 
 Este módulo **no importa nada de `creatures/`** a propósito. Ni los tokens de
 color. Mezclar los registros es exactamente lo que hay que evitar, y la forma
@@ -62,7 +62,7 @@ implementado (la vía angosta de la marcha `acecho`).
 
 *Aquila chrysaetos* es paleártica. La rapaz grande del páramo colombiano, con
 fuente IAvH en el grounding del proyecto, es el **águila de páramo**
-*Geranoaetus melanoleucus*. Es la que está acá.
+*Geranoaetus melanoleucus*. Es la que está aquí.
 
 ### 3. La rana: **Atelopus**, no *Phyllobates*
 
@@ -173,7 +173,7 @@ cuadrúpedo y una mesa que camina.
 
 La gorguera del colibrí **no tiene pigmento**. Tiene bárbulas que hacen
 interferencia de película delgada: el color depende del **ángulo** con que la
-mirás. Por eso el mismo bicho, sin moverse ni cambiar de luz, pasa de verde a
+miras. Por eso el mismo bicho, sin moverse ni cambiar de luz, pasa de verde a
 violeta cuando girás la cabeza.
 
 Y la física tiene dirección: a mayor ángulo, el reflejo se corre hacia el azul

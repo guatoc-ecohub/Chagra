@@ -77,7 +77,7 @@ function hoja(tam, q, color = PAL.hoja, brillo = 1) {
 
 /*
  * El emparrado: dos horcones, un alambre y la guía trepando con sus zarcillos.
- * La flor (pasiflora) NO va acá — la siembra la escena como flor instanciada,
+ * La flor (pasiflora) NO va aquí — la siembra la escena como flor instanciada,
  * porque las flores son actores del mundo, no decorado de la mata.
  */
 export function geomMaracuya({ q = 1, alto = 1.5, largo = 1.9 } = {}, seed = 41) {

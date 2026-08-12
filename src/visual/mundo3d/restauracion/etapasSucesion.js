@@ -411,7 +411,7 @@ export function colgarEpifitas(dist, n, seed = 606) {
     arr.push({
       // Al pie del tronco del anfitrión...
       pos: [t.pos[0] + Math.cos(ang) * rad, t.pos[1], t.pos[2] + Math.sin(ang) * rad],
-      // ...y trepada hasta acá, pero solo hasta donde el árbol haya llegado.
+      // ...y trepada hasta aquí, pero solo hasta donde el árbol haya llegado.
       alto: (1.4 + r() * 1.1) * t.escala,
       huesped: { nace: t.nace, madura: t.madura, exp: t.exp },
       rotY: ang,

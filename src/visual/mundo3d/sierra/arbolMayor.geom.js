@@ -520,7 +520,7 @@ export const ESPECIES = {
      toda la hoja y estalla en oro. Es el árbol donde la jerarquía de ramas queda
      a la vista, así que el ramaje tiene que aguantar el primer plano. */
   guayacan: {
-    nombre: 'Guayacán amarillo',
+    nombre: 'Guayaquín amarillo',
     cientifico: 'Handroanthus chrysanthus',
     rasgo: 'florece de oro, sin una sola hoja',
     piso: 'templado',

@@ -3,7 +3,7 @@
  *
  * Todo lo demás de esta librería es contexto: esto es el uso. El campesino
  * pone su hoja al lado de la lámina y compara. Si la lámina exagera, lo asusta
- * y fumiga de más; si la suaviza, llega tarde. Así que cada síntoma de acá
+ * y fumiga de más; si la suaviza, llega tarde. Así que cada síntoma de aquí
  * sale de una descripción LITERAL del corpus de plagas (135 pares), y las
  * cuatro reglas del oficio son:
  *

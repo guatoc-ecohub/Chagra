@@ -85,7 +85,7 @@
         },
         {
           "codigo": "91798",
-          "name": "Tarapacá",
+          "name": "Tarapaquí",
           "lat": -2.890126,
           "lng": -69.741745,
           "altitud": null
@@ -1550,7 +1550,7 @@
         }
       ]
     },
-    "Boyacá": {
+    "Boyaquí": {
       "codigo": "15",
       "municipios": [
         {
@@ -1604,7 +1604,7 @@
         },
         {
           "codigo": "15104",
-          "name": "Boyacá",
+          "name": "Boyaquí",
           "lat": 5.454578,
           "lng": -73.361945,
           "altitud": null
@@ -2052,7 +2052,7 @@
         },
         {
           "codigo": "15572",
-          "name": "Puerto Boyacá",
+          "name": "Puerto Boyaquí",
           "lat": 5.976646,
           "lng": -74.587782,
           "altitud": null
@@ -2101,7 +2101,7 @@
         },
         {
           "codigo": "15646",
-          "name": "Samacá",
+          "name": "Samaquí",
           "lat": 5.492161,
           "lng": -73.485589,
           "altitud": null
@@ -2241,7 +2241,7 @@
         },
         {
           "codigo": "15764",
-          "name": "Soracá",
+          "name": "Soraquí",
           "lat": 5.500898,
           "lng": -73.332804,
           "altitud": null
@@ -2304,7 +2304,7 @@
         },
         {
           "codigo": "15808",
-          "name": "Tinjacá",
+          "name": "Tinjaquí",
           "lat": 5.579713,
           "lng": -73.646847,
           "altitud": null
@@ -3842,7 +3842,7 @@
         },
         {
           "codigo": "25099",
-          "name": "Bojacá",
+          "name": "Bojaquí",
           "lat": 4.737205,
           "lng": -74.344594,
           "altitud": 2598
@@ -5557,7 +5557,7 @@
         },
         {
           "codigo": "52207",
-          "name": "Consacá",
+          "name": "Consaquí",
           "lat": 1.207854,
           "lng": -77.466136,
           "altitud": null

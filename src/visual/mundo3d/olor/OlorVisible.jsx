@@ -28,7 +28,7 @@ import PaladaDeSeco from './PaladaDeSeco.jsx';
 import CocheraEnCorte from './CocheraEnCorte.jsx';
 import './olor.css';
 
-/* three + @react-three entran acá y en ningún otro lado. */
+/* three + @react-three entran aquí y en ningún otro lado. */
 const EscenaOlorVisible = lazy(() => import('./EscenaOlorVisible.jsx'));
 
 /**

@@ -2,7 +2,7 @@
  * elenco — QUIÉN ACOMPAÑA AL USUARIO. Núcleo portable.
  *
  * El problema que cierra: hasta hoy había DOS llaves de compañero y DOS
- * elencos. El usuario elegía el oso en `3d.guatoc.co` (`guatoc.guia`), abría
+ * elencos. El usuario eligea el oso en `3d.guatoc.co` (`guatoc.guia`), abría
  * la PWA (`chagra:agent-avatar-type`) y lo recibía la abeja. Se rompía la
  * continuidad que ambos lados se habían esforzado en construir.
  *

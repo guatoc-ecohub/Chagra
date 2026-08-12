@@ -14,7 +14,7 @@ import PhotoViewer from './PhotoViewer';
  * NOTA: el análisis de visión EN VIVO está deshabilitado por límite de VRAM
  * (M6000 12GB — el bench de visión falla con "kv cache"). La foto se adjunta
  * como evidencia con visionResult vacío; cuando la GPU lo permita, se conecta
- * recognizeSpeciesGrounded/analyzeFoliage acá.
+ * recognizeSpeciesGrounded/analyzeFoliage aquí.
  */
 export default function CicloFotos({ processId }) {
   const inputRef = useRef(null);

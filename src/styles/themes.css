@@ -14,7 +14,7 @@
  *                           del home finca viva ("Finca Organismo"), decidida
  *                           en JS (FincaVivaHero → ESCENA_VIVA_POR_TEMA), no
  *                           en CSS. Por eso NO existe (ni debe existir) un
- *                           bloque [data-theme="biopunk2"] acá.
+ *                           bloque [data-theme="biopunk2"] aquí.
  *   - bio-punk            → estilo BASE original (respaldo). NO lleva
  *                           data-theme. Lienzo "cosecha mística" (§4). Tokens
  *                           de color en :root de index.css. Escena isométrica
@@ -26,12 +26,12 @@
  *
  * ARQUITECTURA (refactor theming P0 2026-06-04):
  * ----------------------------------------------------------------------------
- * El grueso del theming ya NO vive acá. Las ~726 clases de color del PWA
+ * El grueso del theming ya NO vive aquí. Las ~726 clases de color del PWA
  * (slate/emerald/amber + acentos custom, incluidas las variantes de opacidad
  * `/40` `/60`) se resuelven contra variables `--c-*` definidas en index.css
  * (`:root` = biopunk exacto; `[data-theme="…"]` redefine ~30 vars). Esa
  * indirección por CSS-var en el ORIGEN reemplaza los cientos de overrides
- * `!important` clase-por-clase que antes vivían acá y solo cubrían ~25/726
+ * `!important` clase-por-clase que antes vivían aquí y solo cubrían ~25/726
  * clases (de ahí el "Frankenstein" en temas claros).
  *
  * Este archivo conserva SOLO lo que la indirección de color NO puede resolver:
@@ -469,7 +469,7 @@
 
 /* Superficie + borde del badge → tarjeta/línea suave del tema.
  * NOTA semáforo 2026-07: los overrides de [data-testid="ai-beta-badge"]
- * [data-confidence-level="low"] que vivían acá se retiraron — colapsaban el
+ * [data-confidence-level="low"] que vivían aquí se retiraron — colapsaban el
  * nivel "low" (rojo) a tinta verde neutra en los claros, contradiciendo el
  * semáforo de confianza. El sello nuevo (src/styles/sello-confianza.css) ya
  * trae su propio override AA por tema claro para el nivel rojo. */

@@ -688,7 +688,7 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
       // Bug UX 2026-05-30: marcamos la razón ANTES de abortar para que el
       // catch de runAgentPipeline preserve el parcial con el marcador
       // "cancelado por ti" en vez de borrarlo. NO seteamos streamingContent('')
-      // ni error acá: el flujo del pipeline (catch + finally) se encarga del
+      // ni error aquí: el flujo del pipeline (catch + finally) se encarga del
       // merge del estado final y empuja la burbuja con el parcial conservado.
       cancelReasonRef.current = 'cancel';
       activeControllerRef.current.abort();
@@ -1405,7 +1405,7 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
       return result.fullText;
     } catch (e) {
       if (e.name === 'AbortError') {
-        // Bug UX 2026-05-30: NO aplastamos el parcial acá. Propagamos un error
+        // Bug UX 2026-05-30: NO aplastamos el parcial aquí. Propagamos un error
         // tipado con la razón de interrupción ('timeout'/'cancel'/'abort') para
         // que runAgentPipeline corra el merge del estado final y preserve el
         // texto streamed si lo hubo. cancelReasonRef lo setea handleCancelLLM
@@ -2667,7 +2667,7 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
 
       // Task #122: cachear el último mensaje del agente en el store global
       // para que el doble-click del avatar (cualquier pantalla) pueda re-
-      // reproducirlo via replayLast(). responseReady NO se setea acá porque
+      // reproducirlo via replayLast(). responseReady NO se setea aquí porque
       // el usuario ESTÁ en AgentScreen — el glow se activa cuando alguien
       // sale a otra pantalla mid-stream y vuelve a recibir respuesta tarde.
       // Para cubrir ese caso, también lo seteamos pero igualmente markRead
@@ -3263,7 +3263,7 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
   // Pick de una rama de la MANO (AgentRedMenu) en la conversación. Routing
   // ÚNICO compartido con el home (mapCapabilityPick): `ask` → pregunta directa,
   // `nav` → navegar a otra vista, `photo` → abrir la cámara. soon/down/
-  // unavailable ya los bloquea AgentRedMenu antes de llegar acá.
+  // unavailable ya los bloquea AgentRedMenu antes de llegar aquí.
   const handleManoPick = (cap) => {
     const acted = mapCapabilityPick(cap, {
       onAsk: (prompt) => {

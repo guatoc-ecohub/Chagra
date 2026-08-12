@@ -5,7 +5,7 @@
  * la lleva. Cuando hay dosel, la niebla se queda enredada entre los árboles — y
  * esa humedad quieta es la que trae el musgo, las epífitas y, al final, el agua.
  *
- * Por eso acá la niebla NO es decoración de fondo: su opacidad la manda el mismo
+ * Por eso aquí la niebla NO es decoración de fondo: su opacidad la manda el mismo
  * `dosel()` del que cuelga todo lo demás. Aparece porque el monte creció. Es una
  * consecuencia, no un efecto.
  *

@@ -885,7 +885,7 @@ function Diorama({ tier, reducedMotion, pose }) {
 
       {/* Sombra de contacto de la queñua-Ent. En alto/medio la pone SueloRico
           (anclas de la escena); en 'bajo' SueloRico no dibuja sombras, así que
-          el kit la planta acá para que el guardián no flote. */}
+          el kit la planta aquí para que el guardián no flote. */}
       {!perfil.sombrasContacto && (
         <SombraContacto pos={[-1.2, 0.04, 1.4]} radio={1.6} color="#20281c" opacidad={0.34} orden={2} />
       )}

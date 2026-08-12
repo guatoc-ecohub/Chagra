@@ -37,7 +37,7 @@ import { getActiveTenantId } from '../services/tenantContext.js';
 // ─────────────────────────────────────────────────────────────────────────────
 // WHITELIST — editar SOLO este Set para dar/quitar acceso al módulo glaciar.
 // Son los beta testers de "La Cordada". Los usernames se normalizan
-// (trim + lowercase) en el match, así que el formato exacto acá no es crítico.
+// (trim + lowercase) en el match, así que el formato exacto aquí no es crítico.
 // ─────────────────────────────────────────────────────────────────────────────
 
 /**
@@ -66,7 +66,7 @@ export const CORDADA_WHITELIST = new Set([
 // le entrega el set ESTRECHO de guía (clima/páramo/reforestación) — lo contrario
 // de "acceso total". Pertenecer a la Cordada NO debe estrechar el home.
 //
-// Por eso el operador tiene su PROPIA whitelist: estar acá NO deriva un rol de
+// Por eso el operador tiene su PROPIA whitelist: estar aquí NO deriva un rol de
 // producto; es un BYPASS del gating del home/chips para que el operador
 // (admin/demo/debug) vea SIEMPRE TODO. El operador ve el tile glaciar vía
 // `tieneAccesoGlaciar` (que incluye a esOperador), SIN hardcodear su username
@@ -78,7 +78,7 @@ export const CORDADA_WHITELIST = new Set([
 
 /**
  * Set de usernames farmOS del/los OPERADOR(es) del producto (admin/testing).
- * Estar acá da VISIÓN TOTAL del home (todos los módulos + las 4 tarjetas de
+ * Estar aquí da VISIÓN TOTAL del home (todos los módulos + las 4 tarjetas de
  * seguimiento + el catálogo completo de chips vivos), saltándose el gating por
  * perfil.
  *

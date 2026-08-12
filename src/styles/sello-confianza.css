@@ -22,7 +22,7 @@
  *
  * Theming: los niveles se resuelven contra las vars --c-* de index.css (la
  * indirección por tema ya remapea emerald/amber/slate a tintas AA en los
- * temas claros). El rojo no tiene token --c-*, así que se define acá con
+ * temas claros). El rojo no tiene token --c-*, así que se define aquí con
  * override explícito para los temas de papel.
  * ========================================================================== */
 

@@ -12,12 +12,12 @@
  * y el otro un arbolito de 4 años de vida. Por eso TODA lámina de esta
  * colección lleva silueta humana (1,65 m) o mano (18 cm) — nunca ninguna.
  *
- * La silueta va sobria y de perfil neutro, sin sombrero ni ruana: acá es un
+ * La silueta va sobria y de perfil neutro, sin sombrero ni ruana: aquí es un
  * INSTRUMENTO DE MEDIDA, no un personaje. Los personajes de Chagra viven en
- * `visual/creatures` y tienen otro oficio; meter uno acá volvería caricatura
+ * `visual/creatures` y tienen otro oficio; meter uno aquí volvería caricatura
  * una lámina científica, que es justo lo que esta colección no puede ser.
  *
- * FILOTAXIA: dónde se prende cada hoja. Es carácter diagnóstico duro y acá
+ * FILOTAXIA: dónde se prende cada hoja. Es carácter diagnóstico duro y aquí
  * manda sobre el dibujo — el café tiene hojas OPUESTAS y el aguacate
  * ALTERNAS, y esa sola diferencia los separa a diez metros de distancia.
  */

@@ -38,7 +38,7 @@ export const VISTA_PARAMO = {
 };
 
 /* Cursor-mano al pasar sobre el Ent (antes reusaba el mismo helper de
-   composicionValle3D.jsx — se copia acá para que este archivo quede
+   composicionValle3D.jsx — se copia aquí para que este archivo quede
    autocontenido). */
 const alApuntar = (e) => {
   e.stopPropagation();

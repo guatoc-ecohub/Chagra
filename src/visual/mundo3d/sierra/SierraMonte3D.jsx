@@ -127,7 +127,7 @@ function Macizo({ tier, onEntrar }) {
     return perfil.flatShading ? g.toNonIndexed() : g;
   }, [perfil.segmentosTerreno, perfil.flatShading]);
 
-  // Cinco especies REALES, una por piso (ceiba/guayacán/roble/queñua) + frailejón
+  // Cinco especies REALES, una por piso (ceiba/guayaquín/roble/queñua) + frailejón
   // coronando el páramo. Reusan la geometría de arbolMayor.geom / sierraMonte.geom.
   const geos = useMemo(() => geomsEspeciesSierra(q), [q]);
 
@@ -172,7 +172,7 @@ function Macizo({ tier, onEntrar }) {
         onPointerOver={() => { document.body.style.cursor = 'pointer'; }}
         onPointerOut={() => { document.body.style.cursor = ''; }}
       />
-      {/* ceiba (cálido), guayacán (templado), roble (frío) y queñua (filo del
+      {/* ceiba (cálido), guayaquín (templado), roble (frío) y queñua (filo del
           páramo): las cuatro especies mayores reales, cada una en su piso. */}
       <Especie geo={geos.ceiba} mat={matVeg} items={dist.ceiba} castShadow={sombra} />
       <Especie geo={geos.guayacan} mat={matVeg} items={dist.guayacan} castShadow={sombra} />

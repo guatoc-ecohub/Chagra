@@ -51,7 +51,7 @@ import { esOperador } from './glaciarAccess.js';
 // WHITELIST — editar SOLO este Set para dar/quitar el rol extensionista.
 // Son los usuarios con perfil de asesor de extensión / técnico / líder de
 // asociación. Los usernames se normalizan (trim + lowercase) en el match, así
-// que el formato exacto acá no es crítico.
+// que el formato exacto aquí no es crítico.
 // ─────────────────────────────────────────────────────────────────────────────
 
 /**

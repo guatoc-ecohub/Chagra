@@ -52,7 +52,7 @@ export const ZONAS = [
       { sindrome: 'plana_racimo', planta: 'margarita-monte', peso: 0.16 },
     ],
     peso: 0.3,
-    anidan: true, // de acá SALEN los silvestres (y acá se refugian)
+    anidan: true, // de aquí SALEN los silvestres (y aquí se refugian)
   },
   {
     id: 'huerta',

@@ -81,7 +81,7 @@ export default function MiFincaEvolucionScreen({ onBack, onHome, onNavigate }) {
   );
 
   // Estado y siguiente paso del viaje agroecológico (mismo motor que la guía
-  // del Home — JourneyGuideCard). Solo lectura acá: el avance se hace allá.
+  // del Home — JourneyGuideCard). Solo lectura aquí: el avance se hace allá.
   const journey = useMemo(
     () => resolveJourneyState({ fincaSlug, processes }),
     [fincaSlug, processes],

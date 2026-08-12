@@ -12,7 +12,7 @@
  *   - bosque/floraParamo.geom.js + entQuenua.geom.js  → verdes de páramo,
  *     plata de frailejón, cortezas, musgo, líquen.
  *   - sierra/GaleriaSierraArboles.jsx + arbolesMayores.js → el eje térmico
- *     cálido→nival, roca, laguna, nieve, guayacán.
+ *     cálido→nival, roca, laguna, nieve, guayaquín.
  *   - mockups/valle/valleData.js (PISOS/CLIMAS)       → verdes por piso,
  *     luces por hora.
  *   - finca/fincaRealista.geom.js                     → maíz, café, tierras
@@ -169,7 +169,7 @@ export const ACENTOS = {
   cafeCereza: '#c23227', // finca, la cereza madura del cafeto
   maizTextil: '#f4c542', // fauna, el rombo/chakana de las guardas
   maizGrano: '#e2c04c', // finca, el grano de la mazorca
-  guayacan: '#f2c33a', // sierra, la flor dorada maciza del guayacán
+  guayacan: '#f2c33a', // sierra, la flor dorada maciza del guayaquín
   frailejonFlor: '#e0c24a', // bosque, los capítulos amarillos
   ambar: '#d9a13b', // = PALETA.ambar: señal, alerta amable (nunca rojo UI)
   indigo: '#33305c', // bosque, la baya del mortiño (el índigo textil)

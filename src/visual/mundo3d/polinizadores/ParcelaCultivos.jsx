@@ -17,7 +17,7 @@
  *   CAFÉ      → con red o sin red, DA CAFÉ. Con red da más. Esa media tinta es
  *               importante: si todo fuera catástrofe, nadie creería el resto.
  *   MAÍZ      → EL CONTRAPESO. Ni un hilo lo toca jamás, y aun así da mazorca
- *               llena, porque su polen viaja en el VIENTO. Está acá para que el
+ *               llena, porque su polen viaja en el VIENTO. Está aquí para que el
  *               mundo no diga una mentira bonita: sin abejas no se acaba la
  *               comida — se acaba la VARIEDAD. El que exagera, pierde al que
  *               sabe; y el campesino sabe que su maíz nunca necesitó una abeja.

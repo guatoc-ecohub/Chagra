@@ -433,7 +433,7 @@ export function muestrasDeLuz(hilos) {
 
 /*
  * NODOS del micelio: los puntos donde el rizomorfo se une a una raíz o a otro
- * rizomorfo. El DR hornea oclusión en las uniones de rama (se OSCURECEN); acá el
+ * rizomorfo. El DR hornea oclusión en las uniones de rama (se OSCURECEN); aquí el
  * signo se invierte: en una red viva la unión es el sitio de intercambio y tiene
  * que ser lo más brillante. Son los nodos los que hacen que una maraña se lea
  * como GRAFO — sin ellos hay líneas, pero no hay red.
@@ -606,7 +606,7 @@ export function hornearTierra(geo, capa, { luces = [] } = {}) {
 export function construirTerreno(corte, { tier = 'alto' } = {}) {
   const x0 = corte.x - ANCHO_CUT / 2;
   const x1 = corte.x + ANCHO_CUT / 2;
-  const zF = corte.z + CARA; // la cara del corte: el terreno llega hasta acá
+  const zF = corte.z + CARA; // la cara del corte: el terreno llega hasta aquí
   const zAtrasCorte = corte.z - CARA; // el fondo del bloque de la vitrina
   const ATRAS = 15;
   const HONDO = 9.5;

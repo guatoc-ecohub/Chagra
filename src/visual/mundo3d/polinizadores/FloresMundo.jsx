@@ -20,7 +20,7 @@
  * abeja: se ve que no es para ella.
  *
  * Cuesta cero: cada geometría ya trae los dos juegos de color horneados
- * (`floresSindrome.geom.js`) y acá solo se cambia el atributo activo. Sin
+ * (`floresSindrome.geom.js`) y aquí solo se cambia el atributo activo. Sin
  * shaders, sin rebuild, sin costo en gama baja.
  *
  * TIER-SAFE: una geometría fusionada por síndrome → UN InstancedMesh por
@@ -41,7 +41,7 @@ const _v = new THREE.Vector3();
 const _s = new THREE.Vector3();
 
 /* Cuánto tarda una flor en abrirse o cerrarse (s). Sin prisa: una flor no es un
-   interruptor. La ahuyama se demora toda la mañana; acá se comprime, pero el
+   interruptor. La ahuyama se demora toda la mañana; aquí se comprime, pero el
    gesto es el mismo — se despereza. */
 const APERTURA_S = 2.6;
 

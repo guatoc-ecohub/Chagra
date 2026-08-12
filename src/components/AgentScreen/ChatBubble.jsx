@@ -176,7 +176,7 @@ function SourceBadge({ metadata }) {
   // AFFECTS-GATE (anti-contaminación cruzada de cultivo): la evidencia surfaceó
   // un organismo (plaga) que NO afecta al cultivo en foco — la arista AFFECTS no
   // existe (ej. la BROCA, plaga de café, en una conversación de cacao). El sello
-  // "Catálogo verificado" YA se degradó aguas arriba (grounded=false); acá lo
+  // "Catálogo verificado" YA se degradó aguas arriba (grounded=false); aquí lo
   // decimos explícito y honesto: el dato es de OTRO cultivo. Ámbar, no verde.
   // Wording sobrio, cero hype. Ver services/affectsGate.js.
   const crossCrop = md.cross_crop === true;

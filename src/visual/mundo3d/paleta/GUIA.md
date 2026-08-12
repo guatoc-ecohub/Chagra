@@ -26,12 +26,12 @@ componente** (`LuzMadre.jsx`) para escenas fuera del framework.
 import { VERDES, TIERRAS, CORTEZAS, AGUAS, ACENTOS, NEUTROS } from '../paleta';
 ```
 
-- **Verdes**: elegí por PISO TÉRMICO, no por gusto. Tierra caliente →
+- **Verdes**: elige por PISO TÉRMICO, no por gusto. Tierra caliente →
   `VERDES.calido` (oliva); templado → `VERDES.trabajo`; frío → `VERDES.frio`;
   páramo → los `paramo*` (apagados, con plata). Rampa completa: `EJE_TERMICO`.
 - **El único azul es el agua** (`AGUAS.*`) y el índigo textil
   (`ACENTOS.indigo`) como acento. Cielos: los pone la atmósfera, no vos.
-- **Acentos a cucharadas**: `ACENTOS` (cochinilla, maíz, guayacán…) es para
+- **Acentos a cucharadas**: `ACENTOS` (cochinilla, maíz, guayaquín…) es para
   una cinta, una baya, una señal — jamás para superficies grandes.
 - **La casa campesina es UNA**: `CASA` (encalado, zócalo, teja/tejaSombra,
   carpintería, bejuco) viene del valle — el estándar. Si tu mundo tiene casa,
@@ -72,12 +72,12 @@ Recetas: `follaje`, `corteza`, `tierra`, `roca`, `agua`, `musgo`, `madera`,
 
 Override legítimo: `extra.color` para la variante de especie
 (`CORTEZAS.quenual` vs `CORTEZAS.roble`). Override sospechoso: cambiar
-roughness/metalness — si lo necesitás, probablemente va una receta nueva acá.
+roughness/metalness — si lo necesitás, probablemente va una receta nueva aquí.
 
-## 3. Luz: dentro del framework no hacés nada; fuera, `<LuzMadre>`
+## 3. Luz: dentro del framework no hazs nada; fuera, `<LuzMadre>`
 
 - **Mundo dentro de `EscenaBase3D`** (arquetipos): la luz YA es esta. No
-  montés luces propias; a lo sumo elegí tu `CIELOS.familia`.
+  montés luces propias; a lo sumo elige tu `CIELOS.familia`.
 - **Escena standalone** (galería, mockup, preview con su propio `<Canvas>`):
 
 ```jsx

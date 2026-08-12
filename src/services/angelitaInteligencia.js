@@ -22,7 +22,7 @@
  *   1. CERO invención de datos agronómicos. Si no hay dato real, se usa un
  *      mensaje de acompañamiento honesto y genérico (una pregunta, una
  *      invitación) — nunca una cifra, dosis, precio o pronóstico inventado.
- *   2. Español de Colombia, USTED cálido. Nunca voseo (ni "vos", ni "tenés").
+ *   2. Español de Colombia, USTED cálido. Nunca voseo (ni "vos", ni "tienes").
  *   3. Anti-molestia (lección Clippy): frecuencia y timing con criterio; nunca
  *      interrumpe a mitad de una tarea salvo urgencia real; local-first, todo
  *      funciona offline (este módulo NO hace red).

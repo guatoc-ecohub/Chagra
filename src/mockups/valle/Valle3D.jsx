@@ -444,7 +444,7 @@ function ArboledaEspecies({ q }) {
    PERF-VALLE-INSTANCING 2026-07-23 — por qué TODA <Instances/> de este
    archivo lleva `frames={1}`: por defecto drei recalcula la matriz de CADA
    instancia en CADA frame (para soportar instancias que se mueven). Todo lo
-   que se instancia acá (matas, landmarks) es geometría ESTÁTICA — se siembra
+   que se instancia aquí (matas, landmarks) es geometría ESTÁTICA — se siembra
    una vez y no vuelve a moverse — así que ese recálculo perpetuo es puro
    desperdicio de CPU. Con ~50 bloques <Instances/> nuevos, el desperdicio
    dejó de ser gratis: la primera pasada (sin `frames`) BAJÓ el fps pese a

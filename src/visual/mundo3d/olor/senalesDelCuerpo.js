@@ -33,7 +33,7 @@
  * material dos veces: inventando un dato que él se negó a dar, y cambiando un
  * saber que el campesino puede usar mañana por una cifra que solo puede mirar.
  *
- * Así que lo que se lee acá abajo es lo que se siente en el cuerpo. Nada más.
+ * Así que lo que se lee aquí abajo es lo que se siente en el cuerpo. Nada más.
  *
  * ────────────────────────────────────────────────────────────────────────────
  * Y SIN REGAÑO.
@@ -114,13 +114,13 @@ export function paradaDe(carbono) {
  *   "Si la cama al apretarla con la mano se siente húmeda pero no gotea (...),
  *    va bien."
  *
- * OJO CON LA ASIMETRÍA — acá se cometía un error fácil. En la PILA DE COMPOST
+ * OJO CON LA ASIMETRÍA — aquí se cometía un error fácil. En la PILA DE COMPOST
  * pasarse de seco sí existe: "si se desmorona completamente seco, le falta agua
  * y el proceso se frena". Pero eso es de la pila, no de la CAMA. Sobre la cama
  * el maestro nunca dice "se pasó de cascarilla"; dice lo contrario: "cualquier
  * material carbonado seco es mejor que no echar nada".
  *
- * Por eso acá solo hay tres estados y el último es el bueno: en la cama, el puño
+ * Por eso aquí solo hay tres estados y el último es el bueno: en la cama, el puño
  * detecta EXCESO DE AGUA, no falta. Una cama profunda viva siempre conserva su
  * humedad (fermenta, calienta), así que "se desmorona seca" no existe en esta
  * pieza — y si existiera, estaríamos regañando al que hizo todo bien.

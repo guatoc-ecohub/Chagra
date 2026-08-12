@@ -86,7 +86,7 @@ largo, `u` a lo ancho): así cae siempre dentro y sigue la forma, sin medir a
 ojo. Los huecos de mordisco van **estirados en la dirección de la vena**,
 porque el bicho esquiva la nervadura dura y se come lo blandito de en medio.
 
-## Errores ya cometidos acá (no repetirlos)
+## Errores ya cometidos aquí (no repetirlos)
 
 - **Huecos que parecían flores.** `blob()` con armónicos (l, l+2) y poco ruido
   da un trébol. Al subirle el ruido dio **estrellas**. Se arregló con
