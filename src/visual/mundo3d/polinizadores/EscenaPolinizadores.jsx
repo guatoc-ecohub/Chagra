@@ -142,7 +142,7 @@ function RinconDeMonte({ tier, sombras }) {
 }
 
 /* La cerca viva: los postes vivos del corredor. Las flores las siembra el
-   sembrado (zona 'borde'); acá van los palos que las sostienen. */
+   sembrado (zona 'borde'); aquí van los palos que las sostienen. */
 function CercaViva({ tier, sombras }) {
   const postes = useMemo(() => {
     const r = rng(515);

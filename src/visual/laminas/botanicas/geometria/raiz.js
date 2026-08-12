@@ -5,7 +5,7 @@
  * garabatos bajo la línea del suelo, iguales para la papa que para el frijol.
  * Acá no. La raíz es el órgano que decide cómo se siembra, cómo se aporca,
  * cuánto aguanta la sequía y por dónde entra la enfermedad — y el campesino
- * que abre un hoyo VE esto. Si la lámina miente acá, no sirve para nada.
+ * que abre un hoyo VE esto. Si la lámina miente aquí, no sirve para nada.
  *
  * La distinción que sostiene media lámina de esta librería:
  *

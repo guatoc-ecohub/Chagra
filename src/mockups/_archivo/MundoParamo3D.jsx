@@ -2813,7 +2813,7 @@ function EscenaParamo({ tier, reducedMotion, fabrica, leccion }) {
       <FrailejonalInstanciado n={nFrailejones} />
 
       {/* ══ ANCLA DE ESCALA HUMANA ══ un frailejón ANCIANO (patriarca de ~3 m)
-          con una CAMINANTE del páramo a su pie, mirándolo. Es LA vara de medir
+          con una CAMINANTE del páramo a su pie, mirandolo. Es LA vara de medir
           del cuadro: sin una figura de tamaño conocido, un frailejonal en la
           niebla podría ser de matas de un palmo o de tres metros y el ojo no
           tiene cómo saberlo (la lección de Shadow of the Colossus).

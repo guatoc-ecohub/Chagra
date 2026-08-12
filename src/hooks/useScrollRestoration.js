@@ -35,7 +35,7 @@ const armedViews = new Set();
  *
  * Targetea `<main>` del ScreenShell (único scroll container por screen).
  * Si la screen no usa ScreenShell, fallback a window.scroll (no aplica
- * acá pero seguro).
+ * aquí pero seguro).
  *
  * Throttle: actualiza sessionStorage cada 200ms durante scroll para
  * minimizar writes (sessionStorage es sync). Restore es instantáneo en

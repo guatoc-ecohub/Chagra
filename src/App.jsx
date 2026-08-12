@@ -75,7 +75,7 @@ import { ErrorFallback } from './components/common/ErrorFallback';
 // incluso si la app arrancó ya online con la cola vieja sin disparar eventos.
 import SyncIndicator from './components/SyncIndicator';
 // Modo lectura (letra grande) para adultos mayores (rescate #2668 → cableado).
-// Se monta acá SOLO por su efecto de boot: relee localStorage y reaplica la
+// Se monta aquí SOLO por su efecto de boot: relee localStorage y reaplica la
 // clase `chagra-lectura-grande` en <html> al cargar la app (si no se llama
 // desde algún componente montado siempre, el ajuste elegido en Perfil no
 // sobreviviría a un refresh). El toggle real vive en ProfileScreen.
@@ -1172,7 +1172,7 @@ function DashboardLiveView({ onNavigate, onLogout }) {
 
 export default function App() {
   useTheme();
-  // Modo lectura (letra grande, T49): se llama acá SOLO por el efecto de
+  // Modo lectura (letra grande, T49): se llama aquí SOLO por el efecto de
   // montaje (relee localStorage y reaplica la clase en <html>). El toggle
   // visible vive en ProfileScreen › Apariencia; esta instancia no se usa
   // para renderizar nada, existe para que el ajuste sobreviva a un refresh
@@ -4249,7 +4249,7 @@ export default function App() {
           Mismo guard de vista que SyncProgressIndicator: no en pre-auth. */}
       {currentView !== 'loading' && currentView !== 'login' && currentView !== 'oauth-callback' && !currentView.startsWith('mockup_') && <SyncIndicator />}
       {/* CSS de Modo lectura (T49): la regla vive en useModoLectura.js; se
-          inyecta acá una sola vez, siempre montada, para que el toggle de
+          inyecta aquí una sola vez, siempre montada, para que el toggle de
           Perfil › Apariencia tenga efecto en toda la app. */}
       <style>{CSS_LECTURA_GRANDE}</style>
       {toast && (

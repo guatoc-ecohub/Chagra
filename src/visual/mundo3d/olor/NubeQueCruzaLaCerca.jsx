@@ -23,7 +23,7 @@
  * ────────────────────────────────────────────────────────────────────────────
  * SIN SERMÓN — la regla más difícil de esta pieza.
  *
- * Lo que NO hay acá: ningún vecino con cara de asco, ninguna manito tapándose
+ * Lo que NO hay aquí: ningún vecino con cara de asco, ninguna manito tapándose
  * la nariz, ningún globo de diálogo, ninguna marca roja sobre la casa. Habría
  * sido facilísimo y habría arruinado la pieza entera, porque convierte un
  * problema técnico en una acusación moral — y el campesino no tiene la culpa de

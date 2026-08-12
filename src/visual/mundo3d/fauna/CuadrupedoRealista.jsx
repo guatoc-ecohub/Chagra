@@ -14,8 +14,8 @@
  *
  * REPARTO DE ESPACIOS (importa, y es lo que evita que el bicho patine):
  *   · `raiz`   — va por la senda. Posición y rumbo. NO se bambolea.
- *   · `cuerpo` — hijo de raíz: acá vive TODO el bamboleo (alza, rodada,
- *     cabeceo). Torso, cuello y cabeza cuelgan de acá.
+ *   · `cuerpo` — hijo de raíz: aquí vive TODO el bamboleo (alza, rodada,
+ *     cabeceo). Torso, cuello y cabeza cuelgan de aquí.
  *   · las PATAS — hijas de RAÍZ, no del cuerpo. Esto es a propósito: el pie se
  *     planta contra el SUELO, no contra un cuerpo que sube y baja. La cadera se
  *     saca aplicando la matriz del cuerpo a mano. Si las patas colgaran del
@@ -125,7 +125,7 @@ export default function CuadrupedoRealista({
   /* La geometría del cuerpo, en números que el frame necesita a mano */
   const med = useMemo(() => {
     const t = ficha.torso;
-    /* el eje del torso: la cruz menos el radio del pecho. De acá cuelga TODO. */
+    /* el eje del torso: la cruz menos el radio del pecho. De aquí cuelga TODO. */
     const torsoY = ficha.alzada - t.radio * t.pecho;
     return {
       torsoY,
@@ -309,7 +309,7 @@ export default function CuadrupedoRealista({
 
   return (
     <group ref={raiz} scale={escala}>
-      {/* el cuerpo: acá vive el bamboleo */}
+      {/* el cuerpo: aquí vive el bamboleo */}
       <group ref={cuerpo}>
         <mesh geometry={piezas.torso} material={material} castShadow={!!perfil?.sombras} />
         <mesh ref={cuelloM} geometry={piezas.cuello} material={material} />

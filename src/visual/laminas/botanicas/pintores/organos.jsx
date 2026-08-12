@@ -79,7 +79,7 @@ const verdeDe = (piso) => VERDE_POR_PISO[piso] || VERDE_POR_PISO.templado;
 /** Una lámina foliar suelta (o un foliolo). Es la unidad de pintura. */
 function Lamina({ geo, verde, cara, spec, sintoma, etapa, cid }) {
   /* HAZ vs ENVÉS no son el mismo verde: el envés siempre es más pálido y más
-     gris. Pintarlos iguales es EL error del aficionado — y acá además tiene
+     gris. Pintarlos iguales es EL error del aficionado — y aquí además tiene
      consecuencia práctica, porque media enfermedad sólo se ve por el envés. */
   const relleno = cara === 'enves' ? (spec.envesGlauco ? LAVADO.glauco : verde.enves) : verde.haz;
 

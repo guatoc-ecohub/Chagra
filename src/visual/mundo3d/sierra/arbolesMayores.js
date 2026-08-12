@@ -10,7 +10,7 @@
  * papel. Hacia abajo, el elegido de cada piso:
  *   páramo   → queñua        (Polylepis quadrijuga)  — nudosa, cobriza, copa compacta
  *   frío     → roble andino  (Quercus humboldtii)    — el gran árbol: copa ancha y densa
- *   templado → guayacán      (Handroanthus chrysanthus) — floración dorada, sin hojas
+ *   templado → guayaquín      (Handroanthus chrysanthus) — floración dorada, sin hojas
  *   cálido   → ceiba         (Ceiba pentandra)       — raíces tablares, copa emergente
  *
  * HONESTIDAD (anti-adorno): son emblemas ECOLÓGICOS del piso, no cultígenos de
@@ -39,7 +39,7 @@ const lerp = (a, b, t) => a + (b - a) * t;
  *   · alto        — altura del árbol en unidades de mundo (silueta relativa:
  *                   el roble y la ceiba dominan; la queñua es baja y nudosa).
  *   · corteza     — { base, clara } color del tronco (vertexColors del leño).
- *   · copa        — { base, clara } color del follaje (o de la FLOR en guayacán).
+ *   · copa        — { base, clara } color del follaje (o de la FLOR en guayaquín).
  *   · forma       — receta de silueta que lee `ArbolMayor.jsx`:
  *       tipo        'multitronco'|'columna'|'emergente'  (estructura del tronco)
  *       troncos     nº de tallos (queñua multitallo; los demás 1)
@@ -48,7 +48,7 @@ const lerp = (a, b, t) => a + (b - a) * t;
  *       blobs       nº de nubes de follaje que forman la copa
  *       inclina     inclinación del árbol en radianes (queñua ladeada por viento)
  *       tablares    nº de raíces tablares (solo ceiba; 0 en el resto)
- *       floracion   true → la copa es FLOR maciza (guayacán), no hojas
+ *       floracion   true → la copa es FLOR maciza (guayaquín), no hojas
  */
 export const ARBOLES_MAYORES = {
   quenua: {
@@ -91,7 +91,7 @@ export const ARBOLES_MAYORES = {
   },
   guayacan: {
     piso: 'templado',
-    nombre: 'Guayacán amarillo',
+    nombre: 'Guayaquín amarillo',
     cientifico: 'Handroanthus chrysanthus',
     rasgo: 'florece de amarillo, sin una sola hoja',
     alto: 2.2,

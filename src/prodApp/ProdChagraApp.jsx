@@ -264,7 +264,7 @@ function parseHash() {
 //    instalada (sin barra del navegador) son TRAMPAS: el campesino entra y no
 //    puede volver. Para estas, el shell superpone un botón de casa. Las vistas
 //    con salida propia (valle, mundos con AcompananteMundo, pantallas con
-//    ScreenShell) NO están acá — un segundo botón de casa confundiría.
+//    ScreenShell) NO están aquí — un segundo botón de casa confundiría.
 const VISTAS_SIN_SALIDA = new Set([
   'valle3d_noche',
   'sierra_global', 'sierra', 'vista_sierra',

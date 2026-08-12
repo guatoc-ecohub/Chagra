@@ -10,7 +10,7 @@
  *
  * NO HAY MANGO NI CÍTRICOS en este vergel, y no es un olvido: son de piso
  * cálido y este es el elenco de clima frío que el catálogo respalda. Ponerlos
- * acá "para que se vea más lleno" es enseñar mal.
+ * aquí "para que se vea más lleno" es enseñar mal.
  *
  * LEY DE LA CASA: color de la paleta madre, luz de `<LuzMadre>` sobre la
  * familia `CIELOS.huerta`, y toda geometría fusionada por `fusionarSeguro`.

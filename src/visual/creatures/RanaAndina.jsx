@@ -56,7 +56,7 @@ export function RanaAndina({
      visema opcional ('V1'..'V4') que produce useLipSync desde el RMS del TTS: la
      BOCOTA de la rana cambia de forma cuando el agente narra. Sin visema (o 'V1')
      = la sonrisa de siempre → avatares/catálogo no cambian. El HOOK vive aparte
-     (no cuelga un AnalyserNode por instancia); acá solo se consume el estado. */
+     (no cuelga un AnalyserNode por instancia); aquí solo se consume el estado. */
   visema = null,
   /* ── VESTUARIO por clima+hora (ropaDeClima) ───────────────────────────────
      OPT-IN: con vestuario=true la rana del páramo húmedo se abriga según el
@@ -260,7 +260,7 @@ export function RanaAndina({
 
   if (inline) {
     // En modo inline el power-up lo pone el host DOM (::before/mix-blend no
-    // aplican a SVG); acá solo marcamos data-poder por si el host lo consulta.
+    // aplican a SVG); aquí solo marcamos data-poder por si el host lo consulta.
     return (
       <g ref={raizRef} className={className} style={estiloRaiz} data-poder={poder ? '1' : undefined} {...estadoAttrs}>
         {defs}

@@ -45,7 +45,7 @@
  *
  * — y creo que es lo mejor que tiene esta pieza.
  *
- * La cámara no gira sola: acá el que se mueve es el manejo, no el punto de
+ * La cámara no gira sola: aquí el que se mueve es el manejo, no el punto de
  * vista. Y el encuadre inicial trae los tres actos en una sola toma: la fosa en
  * primer plano (el que calla), la cochera en el medio (el que roba) y la casa
  * del vecino al fondo (el que reclama).
@@ -365,7 +365,7 @@ function Diorama({ carbono, tier, reducedMotion }) {
       <NubeQueCruzaLaCerca aireRef={aireRef} reducedMotion={reducedMotion} />
 
       {/*
-        Sin autoRotate: el que se mueve acá es el manejo, no el punto de vista.
+        Sin autoRotate: el que se mueve aquí es el manejo, no el punto de vista.
         `maxPolarAngle` casi horizontal (1.53) es LA decisión de esta escena:
         deja que uno se agache hasta la altura de la gallina y respire lo que
         ella respira. `target` a 0.55 m — no al centro geométrico de la cochera,
@@ -404,7 +404,7 @@ export default function EscenaOlorVisible({ carbono = 0, tier = 'alto', reducedM
 
   /*
    * La cámara arranca donde se para el que llega a mirar su cochera: a metro y
-   * medio, un poco de lado. Desde acá entran los tres actos en una toma — la
+   * medio, un poco de lado. Desde aquí entran los tres actos en una toma — la
    * fosa cerca (el que calla), la cochera en el medio (el que roba) y la casa
    * del vecino al fondo (el que reclama).
    */

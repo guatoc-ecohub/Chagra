@@ -92,7 +92,7 @@ const ARCO_TOTAL = ARCO.reduce((a, b) => a + b, 0);
  * sitio: la lección no ocurre en otro planeta. Ese césped era la mitad del "aire
  * muerto" que quedaba en el encuadre.
  *
- * Pero acá la cámara mira el corte de frente y de cerca, así que:
+ * Pero aquí la cámara mira el corte de frente y de cerca, así que:
  *   · toda mata con z > 2.5 se para ENTRE la cámara y la vitrina → tapa la
  *     lección (y además se saldría del macizo, cuya cara llega a z = 2.75);
  *   · toda mata sobre la huella del corte (con margen) quedaría plantada en el
@@ -496,7 +496,7 @@ function Diorama({ tier, reducedMotion }) {
         color="#f0ead8"
       />
       {/*
-        NO va acá el pointLight turquesa de relleno que había antes en
+        NO va aquí el pointLight turquesa de relleno que había antes en
         [x, -1.6, z+1]. Estaba DELANTE de la cara del corte y lo que hacía era
         pintarle un halo verde al barro plano: ESE era el "brillo" que se veía en
         vez de la red (la red estaba enterrada y no aportaba un solo píxel).

@@ -1203,7 +1203,7 @@ export default function AssetsDashboard({ onBack, initialTab, initialShowForm = 
     <>
       {/* Selector de zona contenedora (Fase 17 · BUG #7 2026-06-21).
           Antes "Zona contenedora *" obligatoria y vacía por defecto: si el
-          campesino no elegía, la planta caía silenciosa en "Sin zona asignada".
+          campesino no eligea, la planta caía silenciosa en "Sin zona asignada".
           Ahora: lenguaje campesino, auto-asigna si la finca tiene una sola zona
           (ver efecto arriba) y ofrece "Sin zona por ahora" como elección
           EXPLÍCITA (reasignable después desde la tarjeta de huérfanas). */}

@@ -86,7 +86,7 @@ export const OSO_GUARDIAN_PROPORCION = {
   cinturaY: 1.0,
   cruzX: 5.8,        // dónde asoma la paletilla al costado del cráneo
   cruzY: -10.9,      // altura de la cruz (por encima de la base del cráneo)
-  cuelloY: -14.2,    // el trapecio sube hasta acá, ESCONDIDO tras el cráneo
+  cuelloY: -14.2,    // el trapecio sube hasta aquí, ESCONDIDO tras el cráneo
   hombroX: 8.7,      // el deltoides: de ahí nace la pata delantera
   hombroY: -7.0,
   sueloY: 13.4,      // la línea de suelo donde apoyan las cuatro plantas
@@ -108,7 +108,7 @@ export const OSO_GUARDIAN_PROPORCION = {
  *     dibujarle hombros al oso primero. Sin cruz no hay dónde apoyarla.
  *   · Abierta al frente (eso la separa del poncho, que es cerrado).
  *   · Colores sobrios del altiplano cundiboyacense: negro, azul oscuro, gris
- *     oscuro. Las franjas rojas/amarillas son la variante vieja y acá
+ *     oscuro. Las franjas rojas/amarillas son la variante vieja y aquí
  *     COMPETÍAN en área con la luna del pecho, que es el emblema. Fuera.
  *   · Al frío se echa una punta sobre el hombro contrario. Eso resuelve dos
  *     cosas de una: es el gesto auténtico documentado Y deja el pecho abierto,

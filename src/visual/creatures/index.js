@@ -224,7 +224,7 @@ export {
 
 import AbejaAngelita from './AbejaAngelita.jsx';
 import Colibri from './Colibri.jsx';
-/* OsoAndino y OsoAnteojos NO se importan acá a propósito: están archivados y
+/* OsoAndino y OsoAnteojos NO se importan aquí a propósito: están archivados y
    fuera del registro CREATURES. Solo entra el guardián. */
 import OsoGuardian from './OsoGuardian.jsx';
 import RanaAndina from './RanaAndina.jsx';

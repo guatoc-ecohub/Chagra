@@ -79,7 +79,7 @@ export function Borugo({
   /* ── LIP-SYNC (sistema transversal, useLipSync) ────────────────────────────
      visema opcional ('V1'..'V4') que produce useLipSync desde el RMS del TTS: la
      boca se abre cuando el agente narra. Sin visema (o 'V1') = la sonrisa de
-     goma de siempre → avatares/catálogo no cambian. El HOOK vive aparte; acá
+     goma de siempre → avatares/catálogo no cambian. El HOOK vive aparte; aquí
      solo se consume. */
   visema = null,
   /* ── VESTUARIO por clima+hora (ropaDeClima) ───────────────────────────────
@@ -125,7 +125,7 @@ export function Borugo({
      aura PLATA LUNAR de 4 capas (glow, boost, ingravidez, corrientes) — su firma
      cuando "sube de nivel": el ser protegido que se revela seguro bajo la luna.
      El host lo enciende un rato con usePoderTemporal(). En modo inline el
-     power-up lo pone el host DOM (::before/mix-blend no aplican a nodos SVG); acá
+     power-up lo pone el host DOM (::before/mix-blend no aplican a nodos SVG); aquí
      solo marcamos data-poder por si el host lo consulta. */
   poder = false,
   /* ── PROP POR MUNDO (herramienta en la patita — propsPorMundo/PropEnMano) ─────
@@ -345,7 +345,7 @@ export function Borugo({
 
   if (inline) {
     // En modo inline el power-up lo pone el host DOM (::before/mix-blend no
-    // aplican a SVG); acá solo marcamos data-poder por si el host lo consulta.
+    // aplican a SVG); aquí solo marcamos data-poder por si el host lo consulta.
     return (
       <g ref={raizRef} className={className} style={estiloRaiz} data-poder={poder ? '1' : undefined} {...estadoAttrs}>
         {defs}

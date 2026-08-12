@@ -3,13 +3,13 @@
  *
  * Una lámina botánica es mitad dibujo y mitad aparato crítico, y el aparato
  * es lo que la vuelve un documento en vez de una ilustración. Las
- * convenciones de acá tienen doscientos años y no se discuten:
+ * convenciones de aquí tienen doscientos años y no se discuten:
  *
  *   - EL BINOMIO VA EN CURSIVA y con su autoridad en redonda: *Solanum
  *     tuberosum* L. No es pedantería — es lo que permite que un campesino de
- *     Boyacá y un agrónomo de Nariño hablen de la misma mata cuando cada uno
+ *     Boyaquí y un agrónomo de Nariño hablen de la misma mata cuando cada uno
  *     la llama distinto. La lámina también trae los nombres regionales, en
- *     versalitas, porque ésos son los que la gente usa de verdad.
+ *     versalitas, porque éeres son los que la gente usa de verdad.
  *   - LAS FIGURAS SE NUMERAN (Fig. 1, Fig. 2…) y se citan en el pie. Sin
  *     número, un detalle es un adorno; con número, es una referencia.
  *   - EL RÓTULO NO TOCA EL DIBUJO. Va afuera y llega con un HILO finísimo que
@@ -151,7 +151,7 @@ export function Seccion({ x, y, ancho, titulo, nota }) {
 }
 
 /** Párrafo con quiebre de línea manual: SVG no reflowea, así que el texto se
- *  parte acá por conteo de caracteres. Rústico y suficiente — el alternativo
+ *  parte aquí por conteo de caracteres. Rústico y suficiente — el alternativo
  *  es <foreignObject>, que rompe la captura rsvg del harness. */
 export function Parrafo({ x, y, texto, ancho = 60, tam = 9.5, interlinea = 1.35, color = TINTA.rotulo, cursiva = false, max = 99 }) {
   const palabras = String(texto).split(/\s+/);

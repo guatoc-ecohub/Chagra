@@ -33,7 +33,7 @@
  * centímetros de cama, y cuando se lo preguntan responde "no le voy a inventar
  * un número" y remite a la UMATA. Su pedagogía está construida sobre señales
  * del cuerpo —la prueba del puño, el ardor de ojos, el olor a tierra— PRECISA-
- * MENTE en lugar de métricas. Así que acá no hay HUD con ppm ni barra de
+ * MENTE en lugar de métricas. Así que aquí no hay HUD con ppm ni barra de
  * "eficiencia": las curvas de abajo son dirección de ARTE (cómo se ve el gas),
  * no una tabla de laboratorio. El que juzga es el ojo, como en la finca.
  *

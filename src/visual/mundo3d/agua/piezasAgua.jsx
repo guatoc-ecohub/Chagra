@@ -96,7 +96,7 @@ function abollar(geo, amt) {
 
 /*
  * "¿Por qué cuidan tanto el páramo si yo no vivo ni siembro allá arriba?"
- * (corpus). Porque esto de acá: la roseta peina la niebla, la gota escurre por
+ * (corpus). Porque esto de aquí: la roseta peina la niebla, la gota escurre por
  * el tallo y la turbera la guarda. El frailejón no es un adorno andino — es la
  * primera pieza del acueducto.
  *

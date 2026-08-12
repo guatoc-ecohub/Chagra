@@ -191,7 +191,7 @@ const PUNTOS_VIENTRE = [
   { cx: -3.1, cy: 2.5, r: 0.21 }, { cx: 2.9, cy: 2.0, r: 0.19 },
 ];
 /* CARA: en el jaguar real la cabeza lleva sobre todo puntos sólidos y rosetas
-   PEQUEÑAS — por eso acá el radio baja y cada una lleva un solo punto interno. */
+   PEQUEÑAS — por eso aquí el radio baja y cada una lleva un solo punto interno. */
 const ROSETAS_CARA = [
   { cx: -3.4, cy: -10.6, r: 0.95, rot: 25, o: 0.8, motas: 1 },
   { cx: 3.4, cy: -10.6, r: 0.95, rot: 200, o: 0.8, motas: 1 },
@@ -285,7 +285,7 @@ export function Jaguar({
      visema opcional ('V1'..'V4') que produce useLipSync desde el RMS del TTS: la
      boca se abre cuando el agente narra. Sin visema (o 'V1') = la sonrisa de
      goma de siempre → avatares/catálogo no cambian. El HOOK vive aparte (no
-     cuelga un AnalyserNode por instancia); acá solo se consume. El RUGIDO manda
+     cuelga un AnalyserNode por instancia); aquí solo se consume. El RUGIDO manda
      sobre el visema (una fiera que ruge no articula fonemas). */
   visema = null,
   /* ── VESTUARIO por clima+hora (ropaDeClima) ───────────────────────────────
@@ -329,7 +329,7 @@ export function Jaguar({
      aura PÚRPURA depredadora de 4 capas (glow, boost, ingravidez, corrientes) —
      su firma cuando "sube de nivel". El host lo enciende un rato con
      usePoderTemporal(). En modo inline el power-up lo pone el host DOM
-     (::before/mix-blend no aplican a nodos SVG); acá solo marcamos data-poder por
+     (::before/mix-blend no aplican a nodos SVG); aquí solo marcamos data-poder por
      si el host lo consulta. */
   poder = false,
   /* ── REVELACIÓN DEL ESPÍRITU (estado héroe — su entrada cinematográfica) ────
@@ -976,7 +976,7 @@ export function Jaguar({
 
   if (inline) {
     // En modo inline el power-up lo pone el host DOM (::before/mix-blend no
-    // aplican a SVG); acá solo marcamos data-poder por si el host lo consulta.
+    // aplican a SVG); aquí solo marcamos data-poder por si el host lo consulta.
     return (
       <g ref={raizRef} className={className} style={estiloRaiz} data-poder={poder ? '1' : undefined} {...estadoAttrs}>
         {defs}

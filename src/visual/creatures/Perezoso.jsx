@@ -23,7 +23,7 @@ import { auraDeBicho } from './transformacion.js';
    rama, respiración honda. Es el más LENTO y ZEN del grupo. Su color de poder es
    el TURQUESA/teal (distinto del verde de la rana): irónicamente el perezoso
    "se activa" también en slow-motion. La IDENTIDAD (paleta + proporciones) vive
-   acá inline (self-contained); el CLIMA→cuerpo, en `creatureClimaCuerpo.js` con
+   aquí inline (self-contained); el CLIMA→cuerpo, en `creatureClimaCuerpo.js` con
    PERFIL_PEREZOSO (pelaje templado que empapa despacio, mole que la niebla apenas
    difumina) — y NUNCA suda: la calma total no se acalora. */
 const VIEWBOX = '-15 -20 30 39';
@@ -84,7 +84,7 @@ export function Perezoso({
   /* ── LIP-SYNC (sistema transversal, useLipSync) ────────────────────────────
      visema opcional ('V1'..'V4') que produce useLipSync desde el RMS del TTS: la
      boca se abre LENTA cuando el agente narra. Sin visema (o 'V1') = la sonrisa
-     serena de siempre → avatares/catálogo no cambian. El HOOK vive aparte; acá
+     serena de siempre → avatares/catálogo no cambian. El HOOK vive aparte; aquí
      solo se consume. */
   visema = null,
   /* ── VESTUARIO por clima+hora (ropaDeClima) ───────────────────────────────
@@ -125,7 +125,7 @@ export function Perezoso({
      TURQUESA de 4 capas (glow, boost, ingravidez, corrientes) — su firma al
      "subir de nivel" (irónicamente, también en cámara lenta). En modo inline el
      power-up lo pone el host DOM (::before/mix-blend no aplican a nodos SVG);
-     acá solo marcamos data-poder por si el host lo consulta. */
+     aquí solo marcamos data-poder por si el host lo consulta. */
   poder = false,
   /* ── PROP POR MUNDO (herramienta en la garra — propsPorMundo/PropEnMano) ─────
      mundoId opcional: al ENTRAR a un mundo el perezoso carga su herramienta
@@ -337,7 +337,7 @@ export function Perezoso({
 
   if (inline) {
     // En modo inline el power-up lo pone el host DOM (::before/mix-blend no
-    // aplican a SVG); acá solo marcamos data-poder por si el host lo consulta.
+    // aplican a SVG); aquí solo marcamos data-poder por si el host lo consulta.
     return (
       <g ref={raizRef} className={className} style={estiloRaiz} data-poder={poder ? '1' : undefined} {...estadoAttrs}>
         {defs}

@@ -190,7 +190,7 @@
 
 /* SE ACICALA — aseo de abeja: la manita derecha sube a la antena (rebasa),
    da dos pasaditas y recoge; la cabeza se agacha hacia la manita y los ojos
-   se van bizcos arriba, mirándose la antena. Vecina, no logo. */
+   se van bizcos arriba, mirandose la antena. Vecina, no logo. */
 [data-agente='angelita'][data-agt-vivo='1'][data-agt-idle='acicala'] .crt-brazo-r {
   animation: agt-acicala-brazo 3s cubic-bezier(0.4, 0, 0.3, 1.3) 1;
 }
@@ -214,7 +214,7 @@
 }
 [data-agente='angelita'][data-agt-vivo='1'][data-agt-idle='acicala'] .rh-mirada {
   animation: none;
-  transform: translate(0.4px, -0.45px);  /* bizca, mirándose la antena */
+  transform: translate(0.4px, -0.45px);  /* bizca, mirandose la antena */
 }
 
 /* SE RASCA — la manita izquierda a la barriguita: ras-ras-ras y suelta con
@@ -1097,7 +1097,7 @@
   animation: agt-mirada-habla 3.4s ease-in-out infinite;
 }
 @keyframes agt-mirada-habla {
-  0%, 30%, 100% { transform: translate(-0.42px, 0.1px); }  /* le habla mirándolo */
+  0%, 30%, 100% { transform: translate(-0.42px, 0.1px); }  /* le habla mirandolo */
   40%, 52% { transform: translate(0.3px, -0.42px); }       /* busca la palabra arriba */
   62%  { transform: translate(-0.42px, 0.1px); }           /* vuelve para el remate */
   78%, 86% { transform: translate(-0.5px, 0.18px); }       /* énfasis: se acerca con los ojos */

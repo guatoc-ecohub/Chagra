@@ -114,7 +114,7 @@ const SILUETA_MOLE =
   + 'C -9.9,-1.4 -10.2,-4.0 -9.7,-5.8 '     // costillar: el pecho es profundo
   + 'C -9.0,-7.8 -7.6,-9.6 -5.8,-10.9 '     // CRUZ: la paletilla sube
   + 'C -4.8,-11.8 -4.0,-12.8 -2.7,-13.6 '   // cuello corto: el trapecio…
-  + 'C -1.5,-14.2 1.5,-14.2 2.7,-13.6 '     // …y acá va oculto tras el cráneo
+  + 'C -1.5,-14.2 1.5,-14.2 2.7,-13.6 '     // …y aquí va oculto tras el cráneo
   + 'C 4.0,-12.8 4.8,-11.8 5.8,-10.9 '
   + 'C 7.6,-9.6 9.0,-7.8 9.7,-5.8 '
   + 'C 10.2,-4.0 9.9,-1.4 10.2,1.0 '
@@ -129,7 +129,7 @@ const SILUETA_MOLE =
  * terminar".
  *
  * El muslo ya vive en la silueta (es el bulto de la grupa); lo que falta y se
- * dibuja acá es la CAÑA que baja de ese muslo hasta el tobillo. Va por delante
+ * dibuja aquí es la CAÑA que baja de ese muslo hasta el tobillo. Va por delante
  * del flanco, así que se lee por su contorno sobre el cuerpo oscuro. */
 function canaTrasera(s) {
   const x = (v) => (s * v).toFixed(2);
@@ -687,7 +687,7 @@ export function OsoGuardian({
   const estiloRaiz = { ...ritmoPropio, ...estiloClima };
 
   if (inline) {
-    // En modo inline el power-up lo pone el host DOM; acá solo data-poder.
+    // En modo inline el power-up lo pone el host DOM; aquí solo data-poder.
     return (
       <g ref={raizRef} className={className} style={estiloRaiz} data-poder={poder ? '1' : undefined} {...estadoAttrs}>
         {defs}

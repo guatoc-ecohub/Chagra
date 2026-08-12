@@ -4,7 +4,7 @@
  * El enjambre no es decorado que revolotea: es el motor del mundo. Cada bicho
  * busca SU flor, cobra su néctar, carga su polen y —cuando ese polen llega a otra
  * flor de la misma planta— TEJE un hilo de la red. La cosecha que se ve en
- * `ParcelaCultivos` sale de acá, de estos viajes, uno por uno.
+ * `ParcelaCultivos` sale de aquí, de estos viajes, uno por uno.
  *
  * ── LO QUE EL VUELO ENSEÑA (sin una sola etiqueta) ──────────────────────────
  * · AFINIDAD: cada quien va solo a las flores de su síndrome. El colibrí jamás
@@ -278,7 +278,7 @@ export default function EnjambrePolinizadores({
         b.estado = 'liba';
         b.t = TIEMPO_LIBA[b.esp] * (0.7 + Math.random() * 0.6);
 
-        /* ── EL ACTO: acá se decide si esto fue polinización o fue un paseo ──
+        /* ── EL ACTO: aquí se decide si esto fue polinización o fue un paseo ──
            Si trae polen de OTRA flor de la MISMA planta, el polen viajó: eso es
            un hilo. Si trae polen de otra especie, no pasa nada — se pierde, como
            en la vida. Y si el viaje fue macho→hembra en la ahuyama, o entre dos
@@ -303,7 +303,7 @@ export default function EnjambrePolinizadores({
         b.objetivo = null;
       }
 
-      /* --- Libando: acá está el carácter --------------------------------- */
+      /* --- Libando: aquí está el carácter --------------------------------- */
       let vibra = 0;
       if (b.estado === 'liba') {
         b.t -= dt;

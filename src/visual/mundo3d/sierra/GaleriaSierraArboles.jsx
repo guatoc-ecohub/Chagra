@@ -3,13 +3,13 @@
  * piso térmico. Uno se aleja del valle y ve la cordillera andina escalonada; cada
  * franja de altitud muestra su mundo como un DIORAMA anclado en su ÁRBOL MAYOR
  * —el hito del piso—: la queñua arriba en el páramo, el roble en el frío, el
- * guayacán en el templado, la ceiba abajo en el cálido. Desde cada árbol se
+ * guayaquín en el templado, la ceiba abajo en el cálido. Desde cada árbol se
  * entra a su mundo.
  *
  * ── LO QUE APORTA (sobre VistaGlobalSierra, que es el establishing del macizo) ──
  *   1. El ÁRBOL MAYOR por piso como ancla de navegación (ArbolMayor.jsx), cada
  *      uno con su VIÑETA de vida propia: palmas y costa junto a la ceiba, la
- *      alfombra dorada y los cafetos bajo el guayacán, el robledal de niebla,
+ *      alfombra dorada y los cafetos bajo el guayaquín, el robledal de niebla,
  *      la laguna y los frailejones del páramo. Cada diorama invita a entrar.
  *   2. Un SLIDER CLIMÁTICO hoy→2050 que muestra el CORRIMIENTO de los pisos: con
  *      el calentamiento las bandas suben, el páramo se contrae y la nieve
@@ -46,7 +46,7 @@
  * material Lambert con colores por vértice (banding por altitud + roca por
  * pendiente, calculados UNA vez por paso de clima, no por frame). Presupuesto
  * por `tier` (perfilDeTier): las viñetas densas solo en 'alto'; 'medio' guarda
- * la alfombra del guayacán y la laguna; 'bajo' deja el claro y el hito.
+ * la alfombra del guayaquín y la laguna; 'bajo' deja el claro y el hito.
  * `reducedMotion` congela cóndor, niebla, mecido, deriva de cámara y migración.
  *
  * ── EXPORTS ─────────────────────────────────────────────────────────────────────
@@ -664,7 +664,7 @@ function VinetaPiso({ pisoId, ancla, def, tier, reducedMotion }) {
         </>
       )}
 
-      {/* TEMPLADO: la ALFOMBRA DORADA del guayacán (florece pelado y suelta su
+      {/* TEMPLADO: la ALFOMBRA DORADA del guayaquín (florece pelado y suelta su
           flor al suelo: es su firma) + cafetos con su grano rojo */}
       {pisoId === 'templado' && media && (
         <mesh position={[0, 0.075, 0]} rotation={[tilt, 0, 0]}>

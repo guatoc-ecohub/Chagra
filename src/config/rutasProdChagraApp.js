@@ -3,7 +3,7 @@
  * =================================================
  *
  * Este archivo DECLARA (no monta) qué rutas y componentes van al frontend
- * limpio de prod.chagra.app. Es data-driven: el shell de ruteo lo consumirá
+ * limpio de prod.chagra.app. Es data-driven: el shell de ruteo lo consumira
  * vía imports sin hardcodear paths en JSX.
  *
  * Tres secciones:
@@ -1108,7 +1108,7 @@ export const EXCLUIDO = [
   },
 
   // ── Duplicados de Entrada ──────────────────────────────────────
-  // `mockup_entrada_campesina` SALIÓ de acá (fix 2026-07-25): el motivo era
+  // `mockup_entrada_campesina` SALIÓ de aquí (fix 2026-07-25): el motivo era
   // falso — EntradaCampesina (tarjeta 2D de un solo pulgar) y EntradaValle3D
   // (escena 3D navegable) NO son duplicados, son las dos vistas que el
   // encargo pide (campesino simple vs. técnico completo). Verificado con

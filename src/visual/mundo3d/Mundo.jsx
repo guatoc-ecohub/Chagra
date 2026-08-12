@@ -183,7 +183,7 @@ function MundoInterno({
             />
           )}
         </div>
-        {/* Sin invitación de audio acá: el aviso de caída ya ocupa ese lugar
+        {/* Sin invitación de audio aquí: el aviso de caída ya ocupa ese lugar
             (señal mala ≠ momento de invitar); queda para la próxima entrada. */}
         <AvisoCaida3D tinte={tinte} onReintentar={reintentar3D} />
         <MigaVolver onSalir={onSalir} mundoId={mundoId} />

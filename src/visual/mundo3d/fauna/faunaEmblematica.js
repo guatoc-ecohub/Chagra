@@ -6,7 +6,7 @@
  *      danta mide 0.85 m a la cruz y un arlequín mide 4 cm, y si eso no es
  *      verdad en el mundo, todo lo demás es decoración.
  *   2. LA MARCHA. Cómo apoya, en qué orden, con qué postura de pie. Ver
- *      `marcha.js`: ahí está el motor; acá, qué marcha le toca a quién.
+ *      `marcha.js`: ahí está el motor; aquí, qué marcha le toca a quién.
  *   3. EL ALMA. Qué pasa entre este animal y el campesino. Sin esto, esto es
  *      un catálogo de bichos.
  *
@@ -22,7 +22,7 @@
  *   par por par: el corpus es de conflicto y convivencia, no trae ni una
  *   medida, ni un tono, ni una cadencia. La única seña morfológica de todo el
  *   corpus es la huella de tres dedos de la danta (línea 91). Todo lo demás de
- *   anatomía acá es conocimiento zoológico general, marcado `[zoología]` — no
+ *   anatomía aquí es conocimiento zoológico general, marcado `[zoología]` — no
  *   grounding del proyecto. Si mañana aparece un DR de fauna con medidas, ESTE
  *   es el archivo que se corrige.
  *
@@ -30,7 +30,7 @@
  *  TRES CORRECCIONES AL ENCARGO (con fuente; ver README §correcciones)
  * ─────────────────────────────────────────────────────────────────────────────
  * · El jaguar NO se lleva el ternero: ese conflicto es del PUMA (corpus:107) y
- *   el jaguar tiene CERO menciones en el corpus. Por eso el puma está acá.
+ *   el jaguar tiene CERO menciones en el corpus. Por eso el puma está aquí.
  * · El "águila real de montaña" no existe en Colombia (Aquila chrysaetos es
  *   paleártica). La del páramo es Geranoaetus melanoleucus (IAvH).
  * · La rana va de Atelopus (arlequín de páramo), no de Phyllobates (rana
@@ -172,7 +172,7 @@ export const FICHA_JAGUAR = {
 
 /* -------------------------------------------------------------------------- */
 /*  PUMA — Puma concolor                                                      */
-/*  El felino que el corpus SÍ documenta. Está acá porque sin él, el conflicto */
+/*  El felino que el corpus SÍ documenta. Está aquí porque sin él, el conflicto */
 /*  del ternero queda colgado de la especie equivocada.                       */
 /* -------------------------------------------------------------------------- */
 export const FICHA_PUMA = {
@@ -211,7 +211,7 @@ export const FICHA_PUMA = {
   cabezaBaja: 0.34,
   /*
    * REGISTRO DIRECTO — el dato de locomoción más preciso de todo el corpus, y
-   * es de acá (78): "suele dejar huellas en línea casi recta, una detrás de
+   * es de aquí (78): "suele dejar huellas en línea casi recta, una detrás de
    * otra, porque camina pisando con la pata trasera casi en el mismo punto
    * donde pisó la delantera". La marcha `acecho` lo implementa.
    */
@@ -420,7 +420,7 @@ export const FICHA_COLIBRI = {
 
   /*
    * [zoología] 11–13 cm de largo total, 4–5 g. Endémico de Colombia (páramos
-   * de Cundinamarca y Boyacá).
+   * de Cundinamarca y Boyaquí).
    *
    * OJO — no es el colibrí del imaginario: el Oxypogon es PARDO, de PICO CORTO
    * Y RECTO (rarísimo en un colibrí: es su adaptación al páramo, donde come
@@ -450,7 +450,7 @@ export const FICHA_COLIBRI = {
    *
    * Lo honesto es lo que ve el ojo, que tiene el mismo problema: un BORRÓN.
    * Por eso el ala se dibuja como el arco que barre, no como un ala. La verdad
-   * acá es la mancha, no el ala.
+   * aquí es la mancha, no el ala.
    */
   aleteoHz: 28,
   /* el ocho: el ala del colibrí gira en la muñeca y da sustentación en LOS DOS
@@ -484,7 +484,7 @@ export const FICHA_RANA = {
   pelaje: RANA,
 
   /*
-   * [zoología] 3–5 cm. LO DIMINUTO ES EL PUNTO: acá va a escala real, 4 cm, y
+   * [zoología] 3–5 cm. LO DIMINUTO ES EL PUNTO: aquí va a escala real, 4 cm, y
    * la escena la trae cerca de la cámara en vez de agrandarla. Un arlequín del
    * tamaño de un gato sería una mentira sobre lo que se está perdiendo.
    */

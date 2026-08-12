@@ -1161,7 +1161,7 @@ function Escena({ tier, reducedMotion, seleccion }) {
 /* ═══════════════════ EL CHROME (DOM) ═══════════════════ */
 
 /* La cadencia del apicultor y el aire de los rótulos. Rubber-hose: el cuerpo
-   respira, el brazo del cuadro sube y baja mirándolo, el humo del ahumador
+   respira, el brazo del cuadro sube y baja mirandolo, el humo del ahumador
    sube y se disuelve. Reduced-motion lo congela todo en fotograma digno. */
 const CSS_ABEJAS = `
 .abj-persona svg { overflow: visible; }

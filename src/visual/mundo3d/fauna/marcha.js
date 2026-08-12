@@ -50,9 +50,9 @@
  *    que sube y baja son los omóplatos. Por eso el jaguar lee a jaguar.
  *
  * FUENTE: el corpus de conservación es de CONFLICTO y CONVIVENCIA — no trae ni
- * una medida ni una cadencia (se verificó). La biomecánica de acá es
+ * una medida ni una cadencia (se verificó). La biomecánica de aquí es
  * conocimiento zoológico general, marcado como tal en `faunaEmblematica.js`.
- * Lo que el corpus SÍ aporta y está honrado acá: el registro directo del
+ * Lo que el corpus SÍ aporta y está honrado aquí: el registro directo del
  * felino ("huellas en línea casi recta… pisando con la pata trasera casi en el
  * mismo punto donde pisó la delantera", teacher-conservacion.jsonl:78).
  *
@@ -261,7 +261,7 @@ export function balanceoDelCuerpo(t, marcha, alzada) {
  *  · ungulado — la danta pisa en la pezuña: el tobillo va alto y casi vertical
  *    sobre el punto de apoyo.
  *
- * El `ancla` NO se elige acá: viene de `ANCLA_PIE` (anatomiaFauna.geom), que es
+ * El `ancla` NO se elige aquí: viene de `ANCLA_PIE` (anatomiaFauna.geom), que es
  * dónde está de verdad la suela dentro de la geometría del pie. Que el motor y
  * la malla lean el MISMO número es lo que evita el error mudo de todo rig — el
  * animal hundido dos centímetros en el suelo, o flotando encima. Un solo lugar
@@ -350,7 +350,7 @@ const _abajo = new THREE.Vector3(0, -1, 0);
  * Posa una malla-hueso para que vaya de `desde` a `hasta`.
  *
  * La geometría del hueso se construye colgando del origen hacia -Y con largo
- * `largoBase` (ver `anatomiaFauna.geom.js`); acá se la orienta y se la estira
+ * `largoBase` (ver `anatomiaFauna.geom.js`); aquí se la orienta y se la estira
  * en Y hasta la distancia REAL. Que el hueso se estire solo es a propósito: la
  * articulación nunca abre un hueco, pase lo que pase con el IK. En un rig que
  * nadie va a poder mirar cuadro a cuadro, lo que se arma bien POR CONSTRUCCIÓN

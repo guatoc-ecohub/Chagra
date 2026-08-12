@@ -43,7 +43,7 @@ const sx = (x) => (x - X_MIN) * ESCALA;
 const sy = (z) => (z - Z_MIN) * ESCALA;
 
 /* La quebrada: los MISMOS waypoints del tubo 3D (Valle3D.Quebrada los define
-   inline en la escena — si se mueven allá, moverlos acá). Nace en el páramo
+   inline en la escena — si se mueven allá, moverlos aquí). Nace en el páramo
    y baja a la tierra caliente. */
 const QUEBRADA_PTS = [
   [-3.4, -7.2],

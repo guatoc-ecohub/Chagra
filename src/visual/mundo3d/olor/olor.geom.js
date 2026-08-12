@@ -4,7 +4,7 @@
  * El escenario del problema. Todo en METROS (1 unidad = 1 m) y eso no es un
  * detalle técnico: es la pieza. Si la gallina no mide lo que mide una gallina,
  * el argumento —que ella respira un aire y el dueño respira otro, en el mismo
- * cuarto— se cae. Las alturas viven en `aireCargado.ALTURAS` y acá se obedecen.
+ * cuarto— se cae. Las alturas viven en `aireCargado.ALTURAS` y aquí se obedecen.
  *
  * Qué hay:
  *   · Piso          — losa con PENDIENTE hacia un canal. La pendiente es el
@@ -24,7 +24,7 @@
  *   · Cuerpos       — gallina, cerdo, persona: siluetas planas a escala real.
  *
  * Los cuerpos son SILUETAS, no personajes. Decisión de arte deliberada: los
- * bichos rubber-hose de Chagra son actores con nombre y carisma, y acá un actor
+ * bichos rubber-hose de Chagra son actores con nombre y carisma, y aquí un actor
  * carismático robaría la escena — el protagonista es el aire. Estas son figuras
  * de referencia, como las de un plano de arquitectura: están para decir "a esta
  * altura hay una cabeza viva". Planas, oscuras, calladas.
@@ -33,7 +33,7 @@
  * geometría con el color horneado en vertexColors → una draw-call. Cero assets,
  * todo procedural, corre headless.
  *
- * Solo mallas y datos: nada de WebGL ni de r3f acá.
+ * Solo mallas y datos: nada de WebGL ni de r3f aquí.
  */
 import * as THREE from 'three';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
@@ -45,7 +45,7 @@ import { mezclar, TIERRAS, CORTEZAS, NEUTROS, ACENTOS, NIEBLAS, PALETA, AGUAS } 
 /* ------------------------------------------------------------------ */
 
 /*
- * LA DECISIÓN DE ARTE DE TODA LA PIEZA está en dos líneas de acá abajo.
+ * LA DECISIÓN DE ARTE DE TODA LA PIEZA está en dos líneas de aquí abajo.
  *
  * El amoníaco NO se pinta de verde tóxico. El humito verde de caricatura es
  * mentira dos veces: el amoníaco es incoloro, y "verde tóxico" le dice al
@@ -387,7 +387,7 @@ export function geomCharco() {
  * La fosa está AFUERA de la cochera, en el punto más bajo, donde el canal
  * entrega. Es un hueco en la tierra con un brocal de piedra. Nada más. Su
  * quietud es el punto: mientras el amoníaco monta un espectáculo dorado adentro,
- * acá afuera no pasa nada visible — y esto es lo que mata.
+ * aquí afuera no pasa nada visible — y esto es lo que mata.
  */
 export function geomFosa() {
   const p = [];

@@ -163,7 +163,7 @@ export const COLIBRI = {
    *
    * El tornasol del colibrí NO es pigmento: es interferencia de película
    * delgada en las bárbulas de la pluma. Por eso el color depende del ÁNGULO
-   * con que lo mirás, no de qué tan iluminado esté. Y la física tiene
+   * con que lo miras, no de qué tan iluminado esté. Y la física tiene
    * dirección: a mayor ángulo de incidencia, el reflejo se corre hacia el
    * AZUL (blue-shift). Esta rampa es esa física, con colores de la paleta:
    *
@@ -200,7 +200,7 @@ export const RANA = {
 /* -------------------------------------------------------------------------- */
 /*  ÁGUILA DE PÁRAMO — Geranoaetus melanoleucus                               */
 /*  La rapaz que el páramo colombiano SÍ tiene (fuente IAvH). El "águila real" */
-/*  (Aquila chrysaetos) es paleártica: no existe acá. Ver README §correcciones.*/
+/*  (Aquila chrysaetos) es paleártica: no existe aquí. Ver README §correcciones.*/
 /* -------------------------------------------------------------------------- */
 export const AGUILA = {
   /* pizarra: el gris CÁLIDO de la lámina oscurecido — pecho y capucha */

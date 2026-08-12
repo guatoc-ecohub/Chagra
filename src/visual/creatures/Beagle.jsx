@@ -97,7 +97,7 @@ export function Beagle({
   /* ── MODO PODER (transformación / power-up CANELA DE RASTRO) ────────────────
      OPT-IN: con poder=true (standalone) el beagle se envuelve en su aura
      CANELA de 4 capas — la nariz de oro del sabueso. En modo inline el
-     power-up lo pone el host DOM; acá solo marcamos data-poder. */
+     power-up lo pone el host DOM; aquí solo marcamos data-poder. */
   poder = false,
   /* ── PROP POR MUNDO (herramienta en la patica — propsPorMundo/PropEnMano) ────
      mundoId opcional: al ENTRAR a un mundo el beagle carga su herramienta.
@@ -425,7 +425,7 @@ export function Beagle({
   const estiloRaiz = { ...ritmoPropio, ...estiloClima };
 
   if (inline) {
-    // En modo inline el power-up lo pone el host DOM; acá solo data-poder.
+    // En modo inline el power-up lo pone el host DOM; aquí solo data-poder.
     return (
       <g ref={raizRef} className={className} style={estiloRaiz} data-poder={poder ? '1' : undefined} {...estadoAttrs}>
         {defs}

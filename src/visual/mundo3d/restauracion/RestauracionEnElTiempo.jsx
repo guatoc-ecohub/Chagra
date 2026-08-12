@@ -23,7 +23,7 @@ import LineaTiempo from './LineaTiempo.jsx';
 import LaderaEnFranjas from './LaderaEnFranjas.jsx';
 import './restauracion.css';
 
-/* three + @react-three entran acá y en ningún otro lado. */
+/* three + @react-three entran aquí y en ningún otro lado. */
 const EscenaRestauracion = lazy(() => import('./EscenaRestauracion.jsx'));
 
 /**

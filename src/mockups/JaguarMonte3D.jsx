@@ -16,7 +16,7 @@
  *
  * DIRECCIÓN DE ARTE (todo de la casa, nada inventado por fuera):
  *   - Paleta madre (`visual/mundo3d/paleta`): VERDES por piso térmico, TIERRAS,
- *     CORTEZAS. Ni un hex suelto de vegetación inventado acá.
+ *     CORTEZAS. Ni un hex suelto de vegetación inventado aquí.
  *   - Luz: `<LuzMadre>` con la familia `CIELOS.sotobosque` mezclada por
  *     `mezclarCielo` (la ley del 60% hacia la madre). Cero rig propio.
  *   - El felino es el SVG rubber-hose de `creatures/Jaguar.jsx` colgado como

@@ -84,7 +84,7 @@ export function Dalmata({
   /* ── LIP-SYNC (sistema transversal, useLipSync) ────────────────────────────
      visema opcional ('V1'..'V4') que produce useLipSync desde el RMS del TTS: la
      boca se abre cuando el agente narra. Sin visema (o 'V1') = la sonrisa de
-     goma de siempre → avatares/catálogo no cambian. El HOOK vive aparte; acá
+     goma de siempre → avatares/catálogo no cambian. El HOOK vive aparte; aquí
      solo se consume. */
   visema = null,
   /* ── VESTUARIO por clima+hora (ropaDeClima) ───────────────────────────────
@@ -125,7 +125,7 @@ export function Dalmata({
   /* ── MODO PODER (transformación / power-up AZUL COBALTO) ────────────────────
      OPT-IN: con poder=true (y en modo standalone) el dálmata se envuelve en su
      aura AZUL COBALTO leal de 4 capas — su firma cuando "sube de nivel". En
-     modo inline el power-up lo pone el host DOM; acá solo marcamos data-poder. */
+     modo inline el power-up lo pone el host DOM; aquí solo marcamos data-poder. */
   poder = false,
   /* ── PROP POR MUNDO (herramienta en la pata — propsPorMundo/PropEnMano) ──────
      mundoId opcional: al ENTRAR a un mundo el dálmata carga su herramienta.
@@ -422,7 +422,7 @@ export function Dalmata({
   const estiloRaiz = { ...ritmoPropio, ...estiloClima };
 
   if (inline) {
-    // En modo inline el power-up lo pone el host DOM; acá solo data-poder.
+    // En modo inline el power-up lo pone el host DOM; aquí solo data-poder.
     return (
       <g ref={raizRef} className={className} style={estiloRaiz} data-poder={poder ? '1' : undefined} {...estadoAttrs}>
         {defs}

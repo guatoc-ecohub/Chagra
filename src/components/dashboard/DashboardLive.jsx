@@ -116,7 +116,7 @@ const FincaVivaHero = lazy(() => import('./FincaVivaHero'));
 
 // Orden por defecto + fuente del orden persistido: viven en userProfileService
 // (HOME_MODULE_DEFAULT_ORDER / getModuleOrder / setModuleOrder). DEFAULT_ORDER
-// se mantiene acá como alias para el fail-open de la visibilidad por perfil.
+// se mantiene aquí como alias para el fail-open de la visibilidad por perfil.
 const DEFAULT_ORDER = HOME_MODULE_DEFAULT_ORDER;
 
 // Secciones que ya viven FUNDIDAS en la cabecera del día (EstadoDelDiaCard,

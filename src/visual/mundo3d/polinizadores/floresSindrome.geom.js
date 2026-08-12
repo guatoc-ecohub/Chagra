@@ -62,7 +62,7 @@ function pintar(geo, colorHex, { guia = false, brillo = 1 } = {}) {
   _c.set(colorHex);
   const h = { r: _c.r * brillo, g: _c.g * brillo, b: _c.b * brillo };
   // Cómo lo ve ella. Si es guía UV, para ella es casi luz pura: la flor le grita
-  // "por acá está el néctar" en un canal que nosotros no tenemos.
+  // "por aquí está el néctar" en un canal que nosotros no tenemos.
   let a;
   if (guia) {
     _c.set(UV_GUIA);
@@ -183,7 +183,7 @@ export function geomTubular({ q = 1 } = {}, seed = 1) {
  * BROCHA — la flor de noche del guamo (murciélago).
  * Una brocha de estambres pálidos: grande para que se note en la oscuridad,
  * blanca porque el blanco es lo único que refleja la poca luz de la noche, y
- * con olor fuerte (que se dibuja como VAHO en la escena, no acá).
+ * con olor fuerte (que se dibuja como VAHO en la escena, no aquí).
  */
 export function geomNocturna({ q = 1 } = {}, seed = 2) {
   const r = rng(seed);

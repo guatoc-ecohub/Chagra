@@ -6,7 +6,7 @@
  * cambiara entre panel y panel, el campesino no sabría si lo que ve distinto
  * es el daño o es la hoja. Controlando la hoja, lo único que varía es el daño.
  *
- * Por eso la hoja NO se dibuja a mano tres veces: se CONSTRUYE una vez acá,
+ * Por eso la hoja NO se dibuja a mano tres veces: se CONSTRUYE una vez aquí,
  * en tiempo de módulo (cero costo por render, cero `Math.random` en pintura,
  * arte byte-idéntico entre capturas), y las tres láminas la consumen.
  *
@@ -247,7 +247,7 @@ export function puntoEnHoja(t, u, hoja = HOJA) {
  * OJO — lección aprendida mirando el primer render: si se suman armónicos
  * (l y l+2) con poco ruido, sale un TRÉBOL. Un hueco de mordisco dibujado
  * así parece una flor pegada en la hoja, y arruina la lámina entera. Por eso
- * acá van tres frecuencias NO armónicas (l, l+3, l+7), ruido de verdad
+ * aquí van tres frecuencias NO armónicas (l, l+3, l+7), ruido de verdad
  * encima, y `alargue`+`rot` para estirar la marca en la dirección que le toca
  * (los huecos de mordisco se estiran ENTRE vena y vena, porque el bicho
  * esquiva la nervadura dura).

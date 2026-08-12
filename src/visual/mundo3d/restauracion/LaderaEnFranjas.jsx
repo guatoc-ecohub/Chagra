@@ -2,7 +2,7 @@
  * LaderaEnFranjas — la misma ladera, para el teléfono que no aguanta 3D.
  *
  * Gama baja NO es gama castigada. El campesino con un teléfono humilde tiene el
- * mismo derecho a ver su potrero hacerse monte, así que acá está la ladera entera
+ * mismo derecho a ver su potrero hacerse monte, así que aquí está la ladera entera
  * —erosión, barreras, pioneras, dosel, agua, fauna— en un corte de perfil dibujado
  * con SVG: unos veinte nodos, cero WebGL, cero texturas, cero descarga.
  *
@@ -13,7 +13,7 @@
  * la vez. Una sola verdad sobre el tiempo, dos maneras de dibujarla.
  *
  * Un corte de perfil, además, muestra una cosa que la 3D esconde: la ladera es una
- * PENDIENTE, y todo lo que pasa acá pasa porque el agua baja por ella.
+ * PENDIENTE, y todo lo que pasa aquí pasa porque el agua baja por ella.
  */
 import { crecer, cobertura, dosel, agua, fauna } from './tiempoSucesion.js';
 

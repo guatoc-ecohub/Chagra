@@ -52,7 +52,7 @@ export function mundoTieneProp(mundoId) {
 }
 
 /* Los ids de prop que el registro de dibujos DEBE saber pintar (contrato: si
-   agregás un mundo→prop nuevo acá, agregá su dibujo en PropEnMano.DIBUJO_PROP).
+   agregás un mundo→prop nuevo aquí, agregá su dibujo en PropEnMano.DIBUJO_PROP).
    El test cruza ambos para que no quede un mundo apuntando a un prop sin dibujo. */
 export const PROPS_CONOCIDOS = Object.freeze(
   Array.from(new Set(Object.values(PROP_POR_MUNDO))),

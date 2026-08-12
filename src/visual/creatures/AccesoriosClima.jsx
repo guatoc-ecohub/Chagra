@@ -7,7 +7,7 @@
  * mismo componente viste a cualquier bicho sin saber su dibujo. Rubber-hose
  * andino: contorno cálido, ruana con franjas, sombrero aguadeño de paja.
  *
- * `mojado`/`niebla` NO se dibujan acá (la creature ya los cuenta con sus gotas y
+ * `mojado`/`niebla` NO se dibujan aquí (la creature ya los cuenta con sus gotas y
  * la opacidad de `cuerpoDeClima`): este módulo es SOLO la ropa que se pone.
  */
 

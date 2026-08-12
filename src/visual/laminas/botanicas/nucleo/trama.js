@@ -8,7 +8,7 @@
  * Donde el órgano se hunde, los puntos se aprietan; donde recibe luz, se
  * abren hasta desaparecer y queda el papel desnudo.
  *
- * Reglas del oficio, embebidas acá para que ninguna especie las viole:
+ * Reglas del oficio, embebidas aquí para que ninguna especie las viole:
  *   1. El punto NO tiene contorno y es más chico de lo que uno cree
  *      (r ≈ 0.3-0.55 en un pliego de 1000 de ancho).
  *   2. La densidad se GRADÚA, nunca se corta con un filo. Un parche de puntos
@@ -47,7 +47,7 @@ export function puntillismo(rng, caja, sombra, op = {}) {
     const v = rng();
     const s = sujeta(sombra(u, v), 0, 1);
     /* Rechazo por densidad: el punto sólo prende si el azar cae bajo la
-       sombra. De acá sale el degradé de densidad sin un solo gradiente. */
+       sombra. De aquí sale el degradé de densidad sin un solo gradiente. */
     if (s <= umbral || rng() > s) continue;
     pts.push({
       x: x + u * w,

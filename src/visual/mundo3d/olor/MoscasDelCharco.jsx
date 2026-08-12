@@ -6,7 +6,7 @@
  *  ponen sus huevos y las larvas se desarrollan en pocos días. (...) Si tiene
  *  mucho olor, casi con seguridad también tiene mucha mosca; son la misma causa."
  *
- * EL DETALLE QUE HACE HONESTA ESTA ESCENA: acá las moscas cuelgan de
+ * EL DETALLE QUE HACE HONESTA ESTA ESCENA: aquí las moscas cuelgan de
  * `aire.saturacion` —el material empapado—, NO de `aire.amoniaco`. Se ve en la
  * primera línea del useFrame y es la diferencia entre enseñar y decorar.
  *
@@ -114,7 +114,7 @@ export default function MoscasDelCharco({ aireRef, n = 26, reducedMotion = false
 
     /*
      * LA LÍNEA. Las moscas siguen al AGUA, no al olor. Cambiar
-     * `a.moscas` (que sale de la saturación) por `a.amoniaco` acá sería repetir
+     * `a.moscas` (que sale de la saturación) por `a.amoniaco` aquí sería repetir
      * la creencia que esta pieza vino a corregir.
      */
     const cuantas = Math.round(n * a.moscas);

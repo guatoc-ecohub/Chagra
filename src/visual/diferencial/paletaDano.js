@@ -71,7 +71,7 @@ export const PLAGA = {
   pata: '#5b4128',
   /* el rastro. Ojo: en la mata de verdad la caquita es verde-parda y casi no
      se ve contra la hoja — por eso mismo la gente no la busca. En la lámina
-     va un punto más oscura, porque acá el trabajo es ENSEÑAR a verla; si se
+     va un punto más oscura, porque aquí el trabajo es ENSEÑAR a verla; si se
      mimetiza como en el campo, la lámina no enseña nada. */
   frass: '#312811',
   frassClaro: '#584a24',

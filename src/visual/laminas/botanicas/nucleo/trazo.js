@@ -3,7 +3,7 @@
  *
  * La lámina botánica NO tiene líneas rectas ni arcos de compás: tiene curvas
  * de contorno continuas que nacen de un perfil. Todo el motor dibuja con
- * polilíneas de muestreo denso y las suaviza acá, en un solo lugar, con
+ * polilíneas de muestreo denso y las suaviza aquí, en un solo lugar, con
  * Catmull-Rom → Bézier cúbica. Así el borde de una hoja entera sale liso y el
  * de una hoja aserrada sale con diente REAL (mismos puntos, otra costura).
  *

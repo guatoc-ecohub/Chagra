@@ -244,7 +244,7 @@ export const CONCESION = {
     'Entiendo el afán: eso enmontado da rabia, y el químico es barato y sirve. En una '
     + 'invasión muy brava de una maleza que no sale con nada, una aplicación puntual y '
     + 'bien dirigida puede ser la única salida real, y no se la vamos a negar solo por '
-    + 'principio. Eso es la excepción. Lo que no hacemos acá es recetarlo como rutina '
+    + 'principio. Eso es la excepción. Lo que no hacemos aquí es recetarlo como rutina '
     + 'de calendario.',
   fuente: 'dpo-frontera-agroecologica [17]',
 };
@@ -275,7 +275,7 @@ export const CADENCIAS = {
     fuente: 'dpo-frontera-agroecologica [0, 5, 9, 18] — campo `rejected`',
   },
   guadana: {
-    voz: 'Lo que hacemos acá',
+    voz: 'Lo que hacemos aquí',
     texto:
       'Corte antes de que la maleza florezca y déjela ahí encima como cobertura '
       + 'muerta: eso ahoga la que va naciendo y además abona. Toca repetir el corte '

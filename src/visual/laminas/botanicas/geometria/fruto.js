@@ -239,7 +239,7 @@ export function vaina(rng, op = {}) {
   return {
     tipo: 'vaina',
     valva: suave([...arriba, ...abajo.reverse()], true, 0.5),
-    /* la sutura ventral: por acá abre la vaina cuando se desgrana */
+    /* la sutura ventral: por aquí abre la vaina cuando se desgrana */
     sutura: suave(abajo, false, 0.5),
     semillas,
     /* el pico: la vaina termina en punta, no redonda */

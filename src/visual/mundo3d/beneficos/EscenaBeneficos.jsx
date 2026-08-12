@@ -12,7 +12,7 @@
  *               fumiga de amplio espectro. Todo cae a cero… y después el pulgón,
  *               que se reproduce rapidísimo, EXPLOTA sin nadie que lo pare.
  *
- * Nadie narra eso: lo dice la curva. Las poblaciones que se ven acá NO están
+ * Nadie narra eso: lo dice la curva. Las poblaciones que se ven aquí NO están
  * animadas a mano — salen de `dinamicaPlaga.js`, que es un Lotka-Volterra con
  * techo logístico. Si el modelo dijera otra cosa, la escena mostraría otra cosa.
  * A un campesino que se juega la comida no se le hace propaganda.
@@ -265,7 +265,7 @@ function ArcoMariquita({ tier, mat, reducedMotion }) {
  * Las dos parcelas dibujan los mismos bichos: si cada una tallara los suyos,
  * habría dos larvas de mariquita, dos pulgones, dos de cada cosa en memoria —
  * el doble de geometría para dibujar exactamente lo mismo. En el teléfono para
- * el que esto está hecho, eso no es un detalle. Se talla acá, se comparte allá,
+ * el que esto está hecho, eso no es un detalle. Se talla aquí, se comparte allá,
  * y cada parcela solo pone SUS matrices (que es lo único que de verdad difiere).
  *
  * Lo único que NO entra al taller es la mata: su forma depende de la SALUD, que
@@ -333,7 +333,7 @@ function Parcela({ parcela, estado, tier, mat, perfil, reducedMotion, esNoche, t
   );
 
   /* El borde: flores + rastrojo (viva) o alambre pelado (limpia). LA TRIADA
-     dibujada — y su ausencia también dibujada. Del taller, no talladas acá. */
+     dibujada — y su ausencia también dibujada. Del taller, no talladas aquí. */
   const geoBorde = conHabitat ? taller.flores : null;
   const geoFondo = conHabitat ? taller.rastrojo : taller.alambre;
 
@@ -394,7 +394,7 @@ function Parcela({ parcela, estado, tier, mat, perfil, reducedMotion, esNoche, t
   const geoPedicelo = conHabitat ? taller.pedicelo : null;
 
   /* Solo se libera lo PROPIO de esta parcela (la mata, que depende de su salud).
-     Lo del taller lo libera el taller: liberar acá una geometría COMPARTIDA
+     Lo del taller lo libera el taller: liberar aquí una geometría COMPARTIDA
      dejaría a la otra parcela dibujando un buffer muerto. */
   useEffect(() => () => geoMata && geoMata.dispose(), [geoMata]);
 

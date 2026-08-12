@@ -451,7 +451,7 @@ function Escena({ tier, reducedMotion, paso, vertical }) {
   const cantidad = tier === 'alto' ? 8 : tier === 'medio' ? 6 : 4;
   /* La parcela activa según el paso elegido en el DOM: de aquí sale a dónde
      caminan las gallinas y a dónde se traslada el tractor. Antes `paso`
-     nunca llegaba hasta acá. */
+     nunca llegaba hasta aquí. */
   const activa = useMemo(() => PARCELAS.find((p) => p.id === paso) ?? PARCELAS[0], [paso]);
   const controls = useRef(null);
   return (

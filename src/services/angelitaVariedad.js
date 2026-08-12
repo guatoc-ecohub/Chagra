@@ -141,9 +141,9 @@ function fechaSeed(ahoraMs) {
  * ────────────────────────────────────────────────────────────────────────── */
 
 /* Aperturas cortas en usted colombiano. La vacía mantiene el base puro en el
-   pool. "Sumercé" es de la casa (Cundinamarca/Boyacá — la finca es Choachí). */
+   pool. "Sumercé" es de la casa (Cundinamarca/Boyaquí — la finca es Choachí). */
 const APERTURAS_POR_TIPO = {
-  bienvenida: ['', '¡Qué gusto verle! ', 'Bienvenido de nuevo. ', 'Sumercé, ¡qué bueno tenerle por acá! '],
+  bienvenida: ['', '¡Qué gusto verle! ', 'Bienvenido de nuevo. ', 'Sumercé, ¡qué bueno tenerle por aquí! '],
   informativa: ['', 'Mire: ', 'Le cuento: ', 'Sumercé, '],
   sugerencia: ['', 'Mire: ', 'Una idea: ', 'Sumercé, '],
   atencion: ['', 'Ojo con esto: ', 'No se le olvide: ', 'Pendiente: '],
@@ -224,11 +224,11 @@ export function variantesDeterministas(base, tipo = 'informativa') {
  * ────────────────────────────────────────────────────────────────────────── */
 
 /* Voseo, tuteo y muletillas ajenas: la casa habla de usted, colombiano.
-   Nota: NO usamos \b porque en JS no corta tras vocal acentuada ("mirá",
+   Nota: NO usamos \b porque en JS no corta tras vocal acentuada ("mira",
    "tú") — bordes explícitos con espacios/puntuación. */
 const BORDE_I = /(^|[\s.,;:!?¡¿"'(—])/u;
 const VETO_PALABRAS =
-  '(vos|che|sos|ten[eé]s|pod[eé]s|quer[eé]s|sab[eé]s|mir[aá]|fijate|fij[aá]te|dale|t[uú]|tienes|puedes|quieres|sabes|debes|tus)';
+  '(vos|che|eres|ten[eé]s|pod[eé]s|quer[eé]s|sab[eé]s|mir[aá]|fijate|fij[aá]te|listo|t[uú]|tienes|puedes|quieres|sabes|debes|tus)';
 const BORDE_F = /(?=$|[\s.,;:!?¡¿"')—])/u;
 const VETO_TRATO = new RegExp(BORDE_I.source + VETO_PALABRAS + BORDE_F.source, 'iu');
 /* Fugas de idioma o de rol del LLM. */

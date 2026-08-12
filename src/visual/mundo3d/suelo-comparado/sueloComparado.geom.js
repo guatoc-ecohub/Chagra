@@ -109,7 +109,7 @@
  *   6. NADA de absolutismo. El corpus mismo [17] concede: "en una invasión muy
  *      agresiva... un uso puntual y muy focalizado puede ser la única salida
  *      real, y no se lo voy a negar solo por principio. Pero eso es la
- *      excepción... Lo que no hacemos acá es recetarlo como rutina de
+ *      excepción... Lo que no hacemos aquí es recetarlo como rutina de
  *      calendario." Esa concesión VA en la pieza. Un arte que no concede nada no
  *      lo creen, y con razón.
  *
@@ -461,7 +461,7 @@ export function curvaHilo(pa, pb, idx) {
  * muerto en el suelo. Dice dos cosas a la vez: aquí HABÍA red (el campesino
  * perdió algo que no sabía que tenía), y aquí PUEDE volver (la traza es el molde
  * por donde se re-teje [49]). Sin la traza, el lado apagado sería un vacío y no
- * se leería la pérdida — se leería "acá nunca hubo nada", que es justo la
+ * se leería la pérdida — se leería "aquí nunca hubo nada", que es justo la
  * mentira que la pieza combate.
  */
 /*
@@ -485,7 +485,7 @@ export function curvaHilo(pa, pb, idx) {
  * basura por frame, un solo draw-call para toda la red — viva, rota y fantasma.
  *
  * El módulo sigue puro y headless: emite números, no GLSL. El shader vive en el
- * .jsx, que es donde va el look. `saludEn()` de acá y el `smoothstep` de allá
+ * .jsx, que es donde va el look. `saludEn()` de aquí y el `smoothstep` de allá
  * calculan LO MISMO a propósito (ver la nota en el shader): así el test en Node
  * y el pixel en pantalla no se pueden contradecir.
  */

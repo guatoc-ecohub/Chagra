@@ -64,7 +64,7 @@ function ObservationScreen({ onBack, onSave }) {
 
   // Bug 069.10 — validación inline para description + date. `locationId` no
   // tiene input en la UI todavía (queda en el handleSave check legacy) — no se
-  // incluye acá para no deshabilitar el botón de forma permanente.
+  // incluye aquí para no deshabilitar el botón de forma permanente.
   /** @type {{ description?: string, date?: string }} */
   const errors = useMemo(() => {
     const e = {};

@@ -821,7 +821,7 @@ export function dentroLote(wx, wz) {
 /*
  * Los CAFETOS PROTAGONISTAS del primer plano: tres matas grandes y CARGADAS que
  * flanquean el camino de entrada (los surcos arrancan en z=2.6; estos viven más
- * acá, donde la cámara llega). Son la respuesta al reclamo "el café no se
+ * aquí, donde la cámara llega). Son la respuesta al reclamo "el café no se
  * distingue como planta": a esta distancia los pisos de ramas plagiotrópicas,
  * la hoja elíptica oscura y el racimo de cereza PEGADO a la rama se leen sin
  * ayuda. Deterministas y en TODOS los tiers (son pocos y son la lección).

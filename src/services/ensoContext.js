@@ -67,7 +67,7 @@ export const ENSO_WATCH_2026 = Object.freeze({
 const REGION_IMPACTS = Object.freeze({
     andina: {
         label: 'Región Andina',
-        nino: 'El Niño en los Andes trae menos lluvia y más días calurosos. Paradoja documentada (IDEAM/Cenicafé, DR-MISSION-4): en el altiplano frío (papa de Boyacá/Cundinamarca) el cielo despejado aumenta la pérdida de calor en la noche y dispara MÁS heladas, no menos — el Niño 2015-16 costó cerca de 25.000 t de papa por esto.',
+        nino: 'El Niño en los Andes trae menos lluvia y más días calurosos. Paradoja documentada (IDEAM/Cenicafé, DR-MISSION-4): en el altiplano frío (papa de Boyaquí/Cundinamarca) el cielo despejado aumenta la pérdida de calor en la noche y dispara MÁS heladas, no menos — el Niño 2015-16 costó cerca de 25.000 t de papa por esto.',
         nina: 'La Niña en los Andes trae más lluvia, suelos sobresaturados y mayor riesgo de deslizamientos en ladera (UPRA/UNGRD) y de hongos (mildiu/gota) en papa y café.',
         vigilancia: 'Con vigilancia de Niño: en piso frío reserva agua para riego nocturno anti-helada; en café/cacao templado prepara sombrío y mulch para amortiguar el calor que se espera si entra el Niño.',
     },
@@ -134,7 +134,7 @@ const DEPTO_TO_REGION = Object.freeze({
     'amazonas': 'amazonia', 'caquetá': 'amazonia', 'caqueta': 'amazonia',
     'putumayo': 'amazonia', 'guaviare': 'amazonia', 'guainía': 'amazonia',
     'guainia': 'amazonia', 'vaupés': 'amazonia', 'vaupes': 'amazonia',
-    'boyacá': 'andina', 'boyaca': 'andina', 'cundinamarca': 'andina',
+    'boyaquí': 'andina', 'boyaca': 'andina', 'cundinamarca': 'andina',
     'quindío': 'andina', 'quindio': 'andina', 'caldas': 'andina',
     'risaralda': 'andina', 'antioquia': 'andina', 'santander': 'andina',
     'tolima': 'andina', 'huila': 'andina',

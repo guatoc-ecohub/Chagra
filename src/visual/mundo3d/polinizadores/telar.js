@@ -9,7 +9,7 @@
  *
  * Pero hay una diferencia que lo cambia todo: la red del hongo YA ESTÁ AHÍ. Esta
  * hay que TEJERLA todos los días, vuelo por vuelo, y se puede CORTAR en una tarde
- * con una bomba de espalda. Por eso acá los hilos no se hornean: nacen, se
+ * con una bomba de espalda. Por eso aquí los hilos no se hornean: nacen, se
  * cansan y se apagan. Lo que se ve es un tejido que se sostiene solo mientras
  * haya quien lo teja.
  *

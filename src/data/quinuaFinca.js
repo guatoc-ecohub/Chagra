@@ -111,7 +111,7 @@ export const GRANOS_ANDINOS = [
     pisoTermico: 'Frío a páramo · 3500–4200 msnm (óptimo)',
     proteina: '14–19 %',
     saponina: false,
-    resumen: 'La prima chiquita y más brava de la quinua: mata de 30–70 cm que aguanta heladas hasta −8 °C, donde ningún otro grano prospera. Ventajón: no tiene saponinas, así que NO hay que lavarla. Reintroducida en Nariño y Boyacá.',
+    resumen: 'La prima chiquita y más brava de la quinua: mata de 30–70 cm que aguanta heladas hasta −8 °C, donde ningún otro grano prospera. Ventajón: no tiene saponinas, así que NO hay que lavarla. Reintroducida en Nariño y Boyaquí.',
     nutriNota: 'Proteína 14–19 % completa (con lisina), alta en hierro, calcio, magnesio y zinc, y libre de gluten (NRC/FAO). Composición ICBF: dato en camino.',
     fuente: 'NRC 1989 · FAO 2013 · AGROSAVIA — rescate andino (grafo chagra_kg)',
   },
@@ -183,7 +183,7 @@ export const SIEMBRA_GRANOS = [
     epoca: 'Al iniciar las lluvias del altiplano (octubre–noviembre en su cuna puneña). Ciclo corto: 4–6 meses.',
     distancia: 'Al voleo, tapando muy poquito (0,5–1 cm) por lo menuda de la semilla (≈1 mm).',
     piso: 'El grano de altura extrema: frío a páramo, óptimo 3500–4200 msnm. Aguanta heladas hasta −8 °C, granizo, sequía y suelos salinos o ácidos.',
-    manejo: 'Sol pleno. Es el «seguro de vida» del altiplano: donde la quinua y la papa ya sufren, la cañihua todavía da. Reintroducida en Nariño (Cumbal, Túquerres) y Boyacá (Rabanal, Pisba).',
+    manejo: 'Sol pleno. Es el «seguro de vida» del altiplano: donde la quinua y la papa ya sufren, la cañihua todavía da. Reintroducida en Nariño (Cumbal, Túquerres) y Boyaquí (Rabanal, Pisba).',
     fuente: 'Ficha de ciclo (NRC 1989 · FAO 2013 · AGROSAVIA)',
   },
   {

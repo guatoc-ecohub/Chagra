@@ -7,7 +7,7 @@
  * El encargo decía "águila real de montaña". El águila real (Aquila chrysaetos)
  * es paleártica: no hay ninguna en Colombia. La rapaz grande que el páramo
  * colombiano SÍ tiene, y que el grounding del proyecto lista con fuente IAvH, es
- * el águila de páramo o águila mora: Geranoaetus melanoleucus. Es la que va acá.
+ * el águila de páramo o águila mora: Geranoaetus melanoleucus. Es la que va aquí.
  *
  * ─────────────────────────────────────────────────────────────────────────────
  *  EL PLANEO ES LA ÚNICA LOCOMOCIÓN DOCUMENTADA DE ESTA ESPECIE
@@ -25,7 +25,7 @@
  * Y VA LEJOS Y ALTO, a propósito: 26 m de radio, 16 de altura. Un águila
  * pegada a la cámara sería un títere. Así se la ve de verdad — una silueta
  * lejos, dando vueltas, que uno mira un rato desde abajo con la mano de visera.
- * La distancia no es una limitación acá: es el encuadre correcto.
+ * La distancia no es una limitación aquí: es el encuadre correcto.
  *
  * EL ALABEO SALE DE LA FÍSICA, no del gusto: un ave que gira se INCLINA hacia
  * adentro, y cuánto depende de su velocidad y del radio (tan θ = v²/r·g). Se
