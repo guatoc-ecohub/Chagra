@@ -21,6 +21,7 @@
     "validate:ngsi": "node scripts/export-ngsi-ld.mjs",
     "hooks:install": "lefthook install",
     "tsc:check": "tsc --noEmit -p jsconfig.json",
+    "typecheck": "NODE_OPTIONS=--max-old-space-size=512 tsc -p jsconfig.json --noEmit",
     "perf-budget": "node scripts/check-perf-budget.mjs",
     "wake-word:vendor-libs": "node scripts/wake-word/vendor-libs.mjs",
     "wake-word:generate-samples": "node scripts/wake-word/generate-samples.mjs",
