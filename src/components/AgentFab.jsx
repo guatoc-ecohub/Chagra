@@ -20,6 +20,7 @@ import { useCompaiSusurroNocturno } from '../hooks/useCompaiSusurroNocturno';
 import { useCompaiAgroecologiaReal } from '../hooks/useCompaiAgroecologiaReal';
 import useTtsAmplitude, { visemaFromAmplitude } from '../hooks/useTtsAmplitude.js';
 import AgentFabMenu from './AgentFabMenu';
+import CompaiGuiaPantalla from './CompaiGuiaPantalla';
 import './agent-fab-skin.css';
 
 /**
@@ -417,6 +418,12 @@ export default function AgentFab({ onNavigate, pantalla = null }) {
         onHoyNo={handleMenuHoyNo}
         onCerrar={handleMenuCerrar}
       />
+
+      {/* LA GUÍA DE PANTALLA (Fase 2): el mismo compAI se presenta al entrar
+          a una pantalla, explica qué hay y qué puede hacer ahí, y lo lee en
+          voz alta. Un solo compAI: se monta DENTRO del FAB y hereda su ancla.
+          Al tocarla abre el agente (respuesta agro real, agro-MCP). */}
+      <CompaiGuiaPantalla pantalla={pantalla} onNavigate={onNavigate} />
     </div>
   );
 }
