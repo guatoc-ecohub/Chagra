@@ -1,0 +1,38 @@
+{
+  "model_type": "needle",
+  "architectures": ["NeedleForToolCalling"],
+  "name_or_path": "Cactus-Compute/needle2",
+  "vocab_size": 8192,
+  "hidden_size": 512,
+  "num_hidden_layers": 27,
+  "num_attention_heads": 8,
+  "num_key_value_heads": 4,
+  "head_dim": 64,
+  "max_position_embeddings": 2048,
+  "rope_theta": 100000.0,
+  "tie_word_embeddings": true,
+  "torch_dtype": "float16",
+  "total_parameters": 44900000,
+  "sliding_window": 256,
+  "attention": "gqa",
+  "mlp": "hadamard",
+  "extras": {
+    "engram": {"sites": [2, 15], "orders": [2, 3], "slots": 8192, "sub_dim": 128, "conv_taps": 4, "conv_dilation": 3},
+    "mhc_lanes": 4,
+    "heads": ["contrastive_retrieval", "confidence"]
+  },
+  "quantization": {
+    "method": "cactus-quants",
+    "scheme": "embedding=4,mhc=4,default=2",
+    "effective_bits": 2.2,
+    "group_size": 128,
+    "kv_cache_bits": 8,
+    "activation_bits": 8
+  },
+  "deployment": {
+    "format": "cact",
+    "binary_size_mb": 14,
+    "session_ram_mb": 28,
+    "runtime": "self-contained C++ / WebAssembly, no dependencies"
+  }
+}
