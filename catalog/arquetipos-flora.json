@@ -1,0 +1,1404 @@
+{
+  "version": "1.0.0",
+  "fecha_generacion": "2026-08-05T21:29:22.581Z",
+  "catalogos_procesados": [
+    "chagra-catalog-seed-v3.1.json"
+  ],
+  "total_especies": 72,
+  "estadisticas": {
+    "total_especies": 72,
+    "por_arquetipo": {
+      "herbacea-erecta": 21,
+      "arbol-dosel-copa-ancha": 18,
+      "arbusto-denso": 12,
+      "graminea-macolla": 4,
+      "VETADA": 2,
+      "rastrera-tapizante": 6,
+      "trepadora-liana": 2,
+      "helecho-arboreo": 1,
+      "suculenta-cactacea": 2,
+      "palma": 3,
+      "epifita": 1
+    },
+    "por_confianza": {
+      "alta": 15,
+      "media": 41,
+      "baja": 16
+    },
+    "vetadas": 2,
+    "sin_piso_termico": 0,
+    "por_categoria": {
+      "hortalizas_hoja": 3,
+      "abonos_verdes_coberturas": 5,
+      "atractores_polinizadores": 5,
+      "especies_invasoras": 6,
+      "cereales": 5,
+      "medicinales_alelopaticas": 8,
+      "frutales_perennes": 18,
+      "tuberculos_raices": 9,
+      "granos_legumbres": 4,
+      "hortalizas_fruto_flor": 1,
+      "arboles_sombra": 5,
+      "fibras_no_maderables": 1,
+      "ornamentales_nativas": 1,
+      "cercas_vivas": 1
+    }
+  },
+  "clasificaciones": [
+    {
+      "especie_id": "allium_fistulosum",
+      "nombre_cientifico": "Allium fistulosum L.",
+      "familia_botanica": "Amaryllidaceae",
+      "category": "hortalizas_hoja",
+      "estrato": null,
+      "arquetipo": "herbacea-erecta",
+      "altura_m": {
+        "min": 0.3,
+        "max": 1.5,
+        "unidad": "m"
+      },
+      "piso_termico": [
+        "templado",
+        "frio"
+      ],
+      "confianza": 0.45,
+      "razon": "Categoría de cultivo herbáceo, confianza baja por falta de estrato"
+    },
+    {
+      "especie_id": "alnus_acuminata",
+      "nombre_cientifico": "Alnus acuminata Kunth",
+      "familia_botanica": "Betulaceae",
+      "category": "abonos_verdes_coberturas",
+      "estrato": "alto",
+      "arquetipo": "arbol-dosel-copa-ancha",
+      "altura_m": {
+        "min": 8,
+        "max": 25,
+        "unidad": "m"
+      },
+      "piso_termico": [
+        "frio"
+      ],
+      "confianza": 0.68,
+      "razon": "Estrato alto indica árbol de dosel"
+    },
+    {
+      "especie_id": "calendula_officinalis",
+      "nombre_cientifico": "Calendula officinalis L.",
+      "familia_botanica": "Asteraceae",
+      "category": "atractores_polinizadores",
+      "estrato": "medio",
+      "arquetipo": "arbusto-denso",
+      "altura_m": {
+        "min": 2,
+        "max": 6,
+        "unidad": "m"
+      },
+      "piso_termico": [
+        "templado",
+        "frio"
+      ],
+      "confianza": 0.5,
+      "razon": "Estrato medio, arbusto por defecto"
+    },
+    {
+      "especie_id": "cenchrus_clandestinus",
+      "nombre_cientifico": "Cenchrus clandestinus (Hochst. ex Chiov.) Morrone",
+      "familia_botanica": "Poaceae",
+      "category": "especies_invasoras",
+      "estrato": "bajo",
+      "arquetipo": "graminea-macolla",
+      "altura_m": {
+        "min": 0.3,
+        "max": 1.5,
+        "unidad": "m"
+      },
+      "piso_termico": [
+        "templado",
+        "frio"
+      ],
+      "confianza": 0.85,
+      "razon": "Familia botánica Poaceae es característica del arquetipo"
+    },
+    {
+      "especie_id": "chenopodium_quinoa",
+      "nombre_cientifico": "Chenopodium quinoa Willd.",
+      "familia_botanica": "Amaranthaceae",
+      "category": "cereales",
+      "estrato": null,
+      "arquetipo": "herbacea-erecta",
+      "altura_m": {
+        "min": 0.3,
+        "max": 1.5,
+        "unidad": "m"
+      },
+      "piso_termico": [
+        "templado",
+        "frio"
+      ],
+      "confianza": 0.45,
+      "razon": "Categoría de cultivo herbáceo, confianza baja por falta de estrato"
+    },
+    {
+      "especie_id": "coffea_arabica",
+      "nombre_cientifico": "Coffea arabica L.",
+      "familia_botanica": "Rubiaceae",
+      "category": "medicinales_alelopaticas",
+      "estrato": "medio",
+      "arquetipo": "arbusto-denso",
+      "altura_m": {
+        "min": 1.5,
+        "max": 4,
+        "unidad": "m"
+      },
+      "piso_termico": [
+        "templado"
+      ],
+      "confianza": 0.65,
+      "razon": "Categoría medicinal/alelopática con estrato medio/bajo"
+    },
+    {
+      "especie_id": "coriandrum_sativum",
+      "nombre_cientifico": "Coriandrum sativum L.",
+      "familia_botanica": "Apiaceae",
+      "category": "hortalizas_hoja",
+      "estrato": null,
+      "arquetipo": "herbacea-erecta",
+      "altura_m": {
+        "min": 0.3,
+        "max": 1.5,
+        "unidad": "m"
+      },
+      "piso_termico": [
+        "templado",
+        "frio"
+      ],
+      "confianza": 0.45,
+      "razon": "Categoría de cultivo herbáceo, confianza baja por falta de estrato"
+    },
+    {
+      "especie_id": "erythrina_edulis",
+      "nombre_cientifico": "Erythrina edulis Triana ex Micheli",
+      "familia_botanica": "Fabaceae",
+      "category": "frutales_perennes",
+      "estrato": "alto",
+      "arquetipo": "arbol-dosel-copa-ancha",
+      "altura_m": {
+        "min": 10,
+        "max": 35,
+        "unidad": "m"
+      },
+      "piso_termico": [
+        "templado",
+        "frio"
+      ],
+      "confianza": 0.75,
+      "razon": "Categoría de árbol con estrato alto"
+    },
+    {
+      "especie_id": "eucalyptus_globulus",
+      "nombre_cientifico": "Eucalyptus globulus Labill.",
+      "familia_botanica": "Myrtaceae",
+      "category": "especies_invasoras",
+      "estrato": "emergente",
+      "arquetipo": "VETADA",
+      "altura_m": {
+        "min": 40,
+        "max": 70,
+        "unidad": "m"
+      },
+      "piso_termico": [
+        "templado",
+        "frio"
+      ],
+      "confianza": 1,
+      "razon": "Especie vetada del proyecto (eucalipto, pino, retamo, acacia invasora)"
+    },
+    {
+      "especie_id": "fragaria_ananassa",
+      "nombre_cientifico": "Fragaria × ananassa (Duchesne ex Weston) Duchesne ex Rozier",
+      "familia_botanica": "Rosaceae",
+      "category": "frutales_perennes",
+      "estrato": "rastrero",
+      "arquetipo": "rastrera-tapizante",
+      "altura_m": {
+        "min": 0.05,
+        "max": 0.5,
+        "unidad": "m"
+      },
+      "piso_termico": [
+        "frio",
+        "templado"
+      ],
+      "confianza": 0.7,
+      "razon": "Estrato rastrero indica planta tapizante"
+    },
+    {
+      "especie_id": "ipomoea_batatas",
+      "nombre_cientifico": "Ipomoea batatas (L.) Lam.",
+      "familia_botanica": "Convolvulaceae",
+      "category": "tuberculos_raices",
+      "estrato": null,
+      "arquetipo": "trepadora-liana",
+      "altura_m": {
+        "min": 0.3,
+        "max": 1,
+        "unidad": "m"
+      },
+      "piso_termico": [
+        "templado",
+        "calido"
+      ],
+      "confianza": 0.88,
+      "razon": "Género ipomoea trepador/liana"
+    },
+    {
+      "especie_id": "inga_edulis",
+      "nombre_cientifico": "Inga edulis Mart.",
+      "familia_botanica": "Fabaceae",
+      "category": "frutales_perennes",
+      "estrato": "alto",
+      "arquetipo": "arbol-dosel-copa-ancha",
+      "altura_m": {
+        "min": 10,
+        "max": 35,
+        "unidad": "m"
+      },
+      "piso_termico": [
+        "calido",
+        "templado"
+      ],
+      "confianza": 0.75,
+      "razon": "Categoría de árbol con estrato alto"
+    },
+    {
+      "especie_id": "lactuca_sativa_capitata",
+      "nombre_cientifico": "Lactuca sativa var. capitata L.",
+      "familia_botanica": "Asteraceae",
+      "category": "hortalizas_hoja",
+      "estrato": null,
+      "arquetipo": "herbacea-erecta",
+      "altura_m": {
+        "min": 0.3,
+        "max": 1.5,
+        "unidad": "m"
+      },
+      "piso_termico": [
+        "frio",
+        "templado"
+      ],
+      "confianza": 0.45,
+      "razon": "Categoría de cultivo herbáceo, confianza baja por falta de estrato"
+    },
+    {
+      "especie_id": "lupinus_mutabilis",
+      "nombre_cientifico": "Lupinus mutabilis Sweet",
+      "familia_botanica": "Fabaceae",
+      "category": "granos_legumbres",
+      "estrato": null,
+      "arquetipo": "herbacea-erecta",
+      "altura_m": {
+        "min": 0.2,
+        "max": 0.8,
+        "unidad": "m"
+      },
+      "piso_termico": [
+        "frio"
+      ],
+      "confianza": 0.45,
+      "razon": "Categoría de cultivo herbáceo, confianza baja por falta de estrato"
+    },
+    {
+      "especie_id": "melissa_officinalis",
+      "nombre_cientifico": "Melissa officinalis L.",
+      "familia_botanica": "Lamiaceae",
+      "category": "medicinales_alelopaticas",
+      "estrato": null,
+      "arquetipo": "herbacea-erecta",
+      "altura_m": {
+        "min": 0.2,
+        "max": 0.8,
+        "unidad": "m"
+      },
+      "piso_termico": [
+        "templado",
+        "frio"
+      ],
+      "confianza": 0.25,
+      "razon": "Sin información morfológica suficiente, herbácea por defecto (REVISAR)"
+    },
+    {
+      "especie_id": "mentha_spicata",
+      "nombre_cientifico": "Mentha spicata L.",
+      "familia_botanica": "Lamiaceae",
+      "category": "medicinales_alelopaticas",
+      "estrato": null,
+      "arquetipo": "herbacea-erecta",
+      "altura_m": {
+        "min": 0.2,
+        "max": 0.8,
+        "unidad": "m"
+      },
+      "piso_termico": [
+        "calido",
+        "templado",
+        "frio"
+      ],
+      "confianza": 0.25,
+      "razon": "Sin información morfológica suficiente, herbácea por defecto (REVISAR)"
+    },
+    {
+      "especie_id": "origanum_vulgare",
+      "nombre_cientifico": "Origanum vulgare L.",
+      "familia_botanica": "Lamiaceae",
+      "category": "medicinales_alelopaticas",
+      "estrato": null,
+      "arquetipo": "herbacea-erecta",
+      "altura_m": {
+        "min": 0.2,
+        "max": 0.8,
+        "unidad": "m"
+      },
+      "piso_termico": [
+        "templado",
+        "frio"
+      ],
+      "confianza": 0.25,
+      "razon": "Sin información morfológica suficiente, herbácea por defecto (REVISAR)"
+    },
+    {
+      "especie_id": "phaseolus_vulgaris",
+      "nombre_cientifico": "Phaseolus vulgaris L.",
+      "familia_botanica": "Fabaceae",
+      "category": "granos_legumbres",
+      "estrato": "medio",
+      "arquetipo": "arbusto-denso",
+      "altura_m": {
+        "min": 2,
+        "max": 6,
+        "unidad": "m"
+      },
+      "piso_termico": [
+        "frio",
+        "templado",
+        "calido"
+      ],
+      "confianza": 0.5,
+      "razon": "Estrato medio, arbusto por defecto"
+    },
+    {
+      "especie_id": "physalis_peruviana",
+      "nombre_cientifico": "Physalis peruviana L.",
+      "familia_botanica": "Solanaceae",
+      "category": "frutales_perennes",
+      "estrato": "bajo",
+      "arquetipo": "herbacea-erecta",
+      "altura_m": {
+        "min": 0.3,
+        "max": 1.5,
+        "unidad": "m"
+      },
+      "piso_termico": [
+        "templado",
+        "frio"
+      ],
+      "confianza": 0.6,
+      "razon": "Estrato bajo, herbácea por defecto"
+    },
+    {
+      "especie_id": "pteridium_aquilinum",
+      "nombre_cientifico": "Pteridium aquilinum (L.) Kuhn",
+      "familia_botanica": "Dennstaedtiaceae",
+      "category": "especies_invasoras",
+      "estrato": "bajo",
+      "arquetipo": "helecho-arboreo",
+      "altura_m": {
+        "min": 0.3,
+        "max": 1.5,
+        "unidad": "m"
+      },
+      "piso_termico": [
+        "templado",
+        "frio"
+      ],
+      "confianza": 0.85,
+      "razon": "Familia botánica Dennstaedtiaceae es característica del arquetipo"
+    },
+    {
+      "especie_id": "solanum_betaceum",
+      "nombre_cientifico": "Solanum betaceum Cav.",
+      "familia_botanica": "Solanaceae",
+      "category": "frutales_perennes",
+      "estrato": "medio",
+      "arquetipo": "arbol-dosel-copa-ancha",
+      "altura_m": {
+        "min": 3,
+        "max": 8,
+        "unidad": "m"
+      },
+      "piso_termico": [
+        "templado",
+        "frio"
+      ],
+      "confianza": 0.55,
+      "razon": "Estrato medio con categoría frutal/arbol"
+    },
+    {
+      "especie_id": "solanum_lycopersicum_san_marzano",
+      "nombre_cientifico": "Solanum lycopersicum 'San Marzano'",
+      "familia_botanica": "Solanaceae",
+      "category": "hortalizas_fruto_flor",
+      "estrato": "medio",
+      "arquetipo": "arbusto-denso",
+      "altura_m": {
+        "min": 2,
+        "max": 6,
+        "unidad": "m"
+      },
+      "piso_termico": [
+        "templado",
+        "frio"
+      ],
+      "confianza": 0.5,
+      "razon": "Estrato medio, arbusto por defecto"
+    },
+    {
+      "especie_id": "theobroma_cacao",
+      "nombre_cientifico": "Theobroma cacao L.",
+      "familia_botanica": "Malvaceae",
+      "category": "frutales_perennes",
+      "estrato": "alto",
+      "arquetipo": "arbol-dosel-copa-ancha",
+      "altura_m": {
+        "min": 10,
+        "max": 35,
+        "unidad": "m"
+      },
+      "piso_termico": [
+        "calido"
+      ],
+      "confianza": 0.75,
+      "razon": "Categoría de árbol con estrato alto"
+    },
+    {
+      "especie_id": "trifolium_repens",
+      "nombre_cientifico": "Trifolium repens L.",
+      "familia_botanica": "Fabaceae",
+      "category": "abonos_verdes_coberturas",
+      "estrato": "bajo",
+      "arquetipo": "herbacea-erecta",
+      "altura_m": {
+        "min": 0.3,
+        "max": 1.5,
+        "unidad": "m"
+      },
+      "piso_termico": [
+        "frio"
+      ],
+      "confianza": 0.6,
+      "razon": "Estrato bajo, herbácea por defecto"
+    },
+    {
+      "especie_id": "ulex_europaeus",
+      "nombre_cientifico": "Ulex europaeus L.",
+      "familia_botanica": "Fabaceae",
+      "category": "especies_invasoras",
+      "estrato": "medio",
+      "arquetipo": "VETADA",
+      "altura_m": {
+        "min": 2,
+        "max": 6,
+        "unidad": "m"
+      },
+      "piso_termico": [
+        "templado",
+        "frio"
+      ],
+      "confianza": 1,
+      "razon": "Especie vetada del proyecto (eucalipto, pino, retamo, acacia invasora)"
+    },
+    {
+      "especie_id": "urtica_dioica",
+      "nombre_cientifico": "Urtica dioica L.",
+      "familia_botanica": "Urticaceae",
+      "category": "medicinales_alelopaticas",
+      "estrato": "bajo",
+      "arquetipo": "arbusto-denso",
+      "altura_m": {
+        "min": 0.3,
+        "max": 1.5,
+        "unidad": "m"
+      },
+      "piso_termico": [
+        "templado",
+        "frio"
+      ],
+      "confianza": 0.65,
+      "razon": "Categoría medicinal/alelopática con estrato medio/bajo"
+    },
+    {
+      "especie_id": "zea_mays",
+      "nombre_cientifico": "Zea mays L.",
+      "familia_botanica": "Poaceae",
+      "category": "cereales",
+      "estrato": "alto",
+      "arquetipo": "graminea-macolla",
+      "altura_m": {
+        "min": 8,
+        "max": 25,
+        "unidad": "m"
+      },
+      "piso_termico": [
+        "frio",
+        "templado",
+        "calido"
+      ],
+      "confianza": 0.85,
+      "razon": "Familia botánica Poaceae es característica del arquetipo"
+    },
+    {
+      "especie_id": "amaranthus_caudatus",
+      "nombre_cientifico": "Amaranthus caudatus L.",
+      "familia_botanica": "Amaranthaceae",
+      "category": "cereales",
+      "estrato": null,
+      "arquetipo": "herbacea-erecta",
+      "altura_m": {
+        "min": 0.3,
+        "max": 1.5,
+        "unidad": "m"
+      },
+      "piso_termico": [
+        "frio"
+      ],
+      "confianza": 0.45,
+      "razon": "Categoría de cultivo herbáceo, confianza baja por falta de estrato"
+    },
+    {
+      "especie_id": "arracacia_xanthorrhiza",
+      "nombre_cientifico": "Arracacia xanthorrhiza Bancr.",
+      "familia_botanica": "Apiaceae",
+      "category": "tuberculos_raices",
+      "estrato": null,
+      "arquetipo": "herbacea-erecta",
+      "altura_m": {
+        "min": 0.3,
+        "max": 1,
+        "unidad": "m"
+      },
+      "piso_termico": [
+        "templado",
+        "frio"
+      ],
+      "confianza": 0.4,
+      "razon": "Tubérculo/raíz, herbácea por defecto (confianza baja)"
+    },
+    {
+      "especie_id": "rubus_glaucus",
+      "nombre_cientifico": "Rubus glaucus Benth.",
+      "familia_botanica": "Rosaceae",
+      "category": "frutales_perennes",
+      "estrato": "alto",
+      "arquetipo": "arbol-dosel-copa-ancha",
+      "altura_m": {
+        "min": 10,
+        "max": 35,
+        "unidad": "m"
+      },
+      "piso_termico": [
+        "templado",
+        "frio"
+      ],
+      "confianza": 0.75,
+      "razon": "Categoría de árbol con estrato alto"
+    },
+    {
+      "especie_id": "solanum_quitoense",
+      "nombre_cientifico": "Solanum quitoense Lam.",
+      "familia_botanica": "Solanaceae",
+      "category": "frutales_perennes",
+      "estrato": "medio",
+      "arquetipo": "arbol-dosel-copa-ancha",
+      "altura_m": {
+        "min": 3,
+        "max": 8,
+        "unidad": "m"
+      },
+      "piso_termico": [
+        "templado",
+        "frio"
+      ],
+      "confianza": 0.55,
+      "razon": "Estrato medio con categoría frutal/arbol"
+    },
+    {
+      "especie_id": "matricaria_chamomilla",
+      "nombre_cientifico": "Matricaria chamomilla L.",
+      "familia_botanica": "Asteraceae",
+      "category": "atractores_polinizadores",
+      "estrato": null,
+      "arquetipo": "herbacea-erecta",
+      "altura_m": {
+        "min": 0.2,
+        "max": 0.8,
+        "unidad": "m"
+      },
+      "piso_termico": [
+        "templado",
+        "frio"
+      ],
+      "confianza": 0.25,
+      "razon": "Sin información morfológica suficiente, herbácea por defecto (REVISAR)"
+    },
+    {
+      "especie_id": "daucus_carota_subsp_sativus",
+      "nombre_cientifico": "Daucus carota L. subsp. sativus (Hoffm.) Arcang.",
+      "familia_botanica": "Apiaceae",
+      "category": "tuberculos_raices",
+      "estrato": null,
+      "arquetipo": "herbacea-erecta",
+      "altura_m": {
+        "min": 0.3,
+        "max": 1,
+        "unidad": "m"
+      },
+      "piso_termico": [
+        "frio",
+        "templado"
+      ],
+      "confianza": 0.4,
+      "razon": "Tubérculo/raíz, herbácea por defecto (confianza baja)"
+    },
+    {
+      "especie_id": "mucuna_pruriens",
+      "nombre_cientifico": "Mucuna pruriens (L.) DC.",
+      "familia_botanica": "Fabaceae",
+      "category": "abonos_verdes_coberturas",
+      "estrato": "rastrero",
+      "arquetipo": "rastrera-tapizante",
+      "altura_m": {
+        "min": 0.05,
+        "max": 0.5,
+        "unidad": "m"
+      },
+      "piso_termico": [
+        "calido",
+        "templado"
+      ],
+      "confianza": 0.7,
+      "razon": "Estrato rastrero indica planta tapizante"
+    },
+    {
+      "especie_id": "aloe_vera",
+      "nombre_cientifico": "Aloe vera (L.) Burm.f.",
+      "familia_botanica": "Asphodelaceae",
+      "category": "medicinales_alelopaticas",
+      "estrato": null,
+      "arquetipo": "suculenta-cactacea",
+      "altura_m": {
+        "min": 0.2,
+        "max": 0.8,
+        "unidad": "m"
+      },
+      "piso_termico": [
+        "calido",
+        "templado"
+      ],
+      "confianza": 0.85,
+      "razon": "Familia botánica Asphodelaceae es característica del arquetipo"
+    },
+    {
+      "especie_id": "solanum_tuberosum",
+      "nombre_cientifico": "Solanum tuberosum L.",
+      "familia_botanica": "Solanaceae",
+      "category": "tuberculos_raices",
+      "estrato": null,
+      "arquetipo": "herbacea-erecta",
+      "altura_m": {
+        "min": 0.3,
+        "max": 1,
+        "unidad": "m"
+      },
+      "piso_termico": [
+        "frio",
+        "paramo"
+      ],
+      "confianza": 0.4,
+      "razon": "Tubérculo/raíz, herbácea por defecto (confianza baja)"
+    },
+    {
+      "especie_id": "solanum_tuberosum_pastusa_suprema",
+      "nombre_cientifico": "Solanum tuberosum L. subsp. tuberosum cv. 'Pastusa Suprema'",
+      "familia_botanica": "Solanaceae",
+      "category": "tuberculos_raices",
+      "estrato": null,
+      "arquetipo": "herbacea-erecta",
+      "altura_m": {
+        "min": 0.3,
+        "max": 1,
+        "unidad": "m"
+      },
+      "piso_termico": [
+        "frio"
+      ],
+      "confianza": 0.4,
+      "razon": "Tubérculo/raíz, herbácea por defecto (confianza baja)"
+    },
+    {
+      "especie_id": "manihot_esculenta",
+      "nombre_cientifico": "Manihot esculenta Crantz",
+      "familia_botanica": "Euphorbiaceae",
+      "category": "tuberculos_raices",
+      "estrato": "medio",
+      "arquetipo": "arbusto-denso",
+      "altura_m": {
+        "min": 2,
+        "max": 6,
+        "unidad": "m"
+      },
+      "piso_termico": [
+        "calido"
+      ],
+      "confianza": 0.5,
+      "razon": "Estrato medio, arbusto por defecto"
+    },
+    {
+      "especie_id": "plantago_major",
+      "nombre_cientifico": "Plantago major L.",
+      "familia_botanica": "Plantaginaceae",
+      "category": "medicinales_alelopaticas",
+      "estrato": "rastrero",
+      "arquetipo": "rastrera-tapizante",
+      "altura_m": {
+        "min": 0.05,
+        "max": 0.5,
+        "unidad": "m"
+      },
+      "piso_termico": [
+        "templado",
+        "frio",
+        "paramo"
+      ],
+      "confianza": 0.7,
+      "razon": "Estrato rastrero indica planta tapizante"
+    },
+    {
+      "especie_id": "crotalaria_juncea",
+      "nombre_cientifico": "Crotalaria juncea L.",
+      "familia_botanica": "Fabaceae",
+      "category": "abonos_verdes_coberturas",
+      "estrato": "medio",
+      "arquetipo": "arbusto-denso",
+      "altura_m": {
+        "min": 2,
+        "max": 6,
+        "unidad": "m"
+      },
+      "piso_termico": [
+        "calido",
+        "templado"
+      ],
+      "confianza": 0.5,
+      "razon": "Estrato medio, arbusto por defecto"
+    },
+    {
+      "especie_id": "tithonia_diversifolia",
+      "nombre_cientifico": "Tithonia diversifolia (Hemsl.) A.Gray",
+      "familia_botanica": "Asteraceae",
+      "category": "abonos_verdes_coberturas",
+      "estrato": "medio",
+      "arquetipo": "arbusto-denso",
+      "altura_m": {
+        "min": 2,
+        "max": 6,
+        "unidad": "m"
+      },
+      "piso_termico": [
+        "calido",
+        "templado"
+      ],
+      "confianza": 0.5,
+      "razon": "Estrato medio, arbusto por defecto"
+    },
+    {
+      "especie_id": "cedrela_odorata",
+      "nombre_cientifico": "Cedrela odorata L.",
+      "familia_botanica": "Meliaceae",
+      "category": "arboles_sombra",
+      "estrato": "alto",
+      "arquetipo": "arbol-dosel-copa-ancha",
+      "altura_m": {
+        "min": 10,
+        "max": 35,
+        "unidad": "m"
+      },
+      "piso_termico": [
+        "calido",
+        "templado"
+      ],
+      "confianza": 0.75,
+      "razon": "Categoría de árbol con estrato alto"
+    },
+    {
+      "especie_id": "cordia_alliodora",
+      "nombre_cientifico": "Cordia alliodora (Ruiz & Pav.) Oken",
+      "familia_botanica": "Boraginaceae",
+      "category": "arboles_sombra",
+      "estrato": "alto",
+      "arquetipo": "arbol-dosel-copa-ancha",
+      "altura_m": {
+        "min": 10,
+        "max": 35,
+        "unidad": "m"
+      },
+      "piso_termico": [
+        "calido",
+        "templado"
+      ],
+      "confianza": 0.75,
+      "razon": "Categoría de árbol con estrato alto"
+    },
+    {
+      "especie_id": "swietenia_macrophylla",
+      "nombre_cientifico": "Swietenia macrophylla King",
+      "familia_botanica": "Meliaceae",
+      "category": "arboles_sombra",
+      "estrato": "alto",
+      "arquetipo": "arbol-dosel-copa-ancha",
+      "altura_m": {
+        "min": 10,
+        "max": 35,
+        "unidad": "m"
+      },
+      "piso_termico": [
+        "calido"
+      ],
+      "confianza": 0.75,
+      "razon": "Categoría de árbol con estrato alto"
+    },
+    {
+      "especie_id": "tabebuia_rosea",
+      "nombre_cientifico": "Tabebuia rosea (Bertol.) DC.",
+      "familia_botanica": "Bignoniaceae",
+      "category": "arboles_sombra",
+      "estrato": "alto",
+      "arquetipo": "arbol-dosel-copa-ancha",
+      "altura_m": {
+        "min": 10,
+        "max": 35,
+        "unidad": "m"
+      },
+      "piso_termico": [
+        "calido",
+        "templado"
+      ],
+      "confianza": 0.75,
+      "razon": "Categoría de árbol con estrato alto"
+    },
+    {
+      "especie_id": "tabebuia_chrysantha",
+      "nombre_cientifico": "Tabebuia chrysantha (Jacq.) G.Nicholson",
+      "familia_botanica": "Bignoniaceae",
+      "category": "arboles_sombra",
+      "estrato": "alto",
+      "arquetipo": "arbol-dosel-copa-ancha",
+      "altura_m": {
+        "min": 10,
+        "max": 35,
+        "unidad": "m"
+      },
+      "piso_termico": [
+        "calido",
+        "templado"
+      ],
+      "confianza": 0.75,
+      "razon": "Categoría de árbol con estrato alto"
+    },
+    {
+      "especie_id": "melinis_minutiflora",
+      "nombre_cientifico": "Melinis minutiflora P.Beauv.",
+      "familia_botanica": "Poaceae",
+      "category": "especies_invasoras",
+      "estrato": "bajo",
+      "arquetipo": "graminea-macolla",
+      "altura_m": {
+        "min": 0.3,
+        "max": 1.5,
+        "unidad": "m"
+      },
+      "piso_termico": [
+        "calido",
+        "templado"
+      ],
+      "confianza": 0.85,
+      "razon": "Familia botánica Poaceae es característica del arquetipo"
+    },
+    {
+      "especie_id": "eichhornia_crassipes",
+      "nombre_cientifico": "Eichhornia crassipes (Mart.) Solms [sinónimo histórico; nombre POWO actual: Pontederia crassipes Mart.]",
+      "familia_botanica": "Pontederiaceae",
+      "category": "especies_invasoras",
+      "estrato": null,
+      "arquetipo": "herbacea-erecta",
+      "altura_m": {
+        "min": 0.2,
+        "max": 0.8,
+        "unidad": "m"
+      },
+      "piso_termico": [
+        "calido",
+        "templado"
+      ],
+      "confianza": 0.25,
+      "razon": "Sin información morfológica suficiente, herbácea por defecto (REVISAR)"
+    },
+    {
+      "especie_id": "salvia_hispanica",
+      "nombre_cientifico": "Salvia hispanica L.",
+      "familia_botanica": "Lamiaceae",
+      "category": "cereales",
+      "estrato": null,
+      "arquetipo": "herbacea-erecta",
+      "altura_m": {
+        "min": 0.3,
+        "max": 1.5,
+        "unidad": "m"
+      },
+      "piso_termico": [
+        "templado",
+        "calido"
+      ],
+      "confianza": 0.45,
+      "razon": "Categoría de cultivo herbáceo, confianza baja por falta de estrato"
+    },
+    {
+      "especie_id": "cajanus_cajan",
+      "nombre_cientifico": "Cajanus cajan (L.) Huth",
+      "familia_botanica": "Fabaceae",
+      "category": "granos_legumbres",
+      "estrato": "medio",
+      "arquetipo": "arbusto-denso",
+      "altura_m": {
+        "min": 2,
+        "max": 6,
+        "unidad": "m"
+      },
+      "piso_termico": [
+        "calido",
+        "templado"
+      ],
+      "confianza": 0.5,
+      "razon": "Estrato medio, arbusto por defecto"
+    },
+    {
+      "especie_id": "persea_americana",
+      "nombre_cientifico": "Persea americana Mill.",
+      "familia_botanica": "Lauraceae",
+      "category": "frutales_perennes",
+      "estrato": "alto",
+      "arquetipo": "arbol-dosel-copa-ancha",
+      "altura_m": {
+        "min": 10,
+        "max": 35,
+        "unidad": "m"
+      },
+      "piso_termico": [
+        "calido",
+        "templado"
+      ],
+      "confianza": 0.75,
+      "razon": "Categoría de árbol con estrato alto"
+    },
+    {
+      "especie_id": "musa_paradisiaca",
+      "nombre_cientifico": "Musa × paradisiaca L.",
+      "familia_botanica": "Musaceae",
+      "category": "frutales_perennes",
+      "estrato": "alto",
+      "arquetipo": "arbol-dosel-copa-ancha",
+      "altura_m": {
+        "min": 10,
+        "max": 35,
+        "unidad": "m"
+      },
+      "piso_termico": [
+        "calido",
+        "templado"
+      ],
+      "confianza": 0.75,
+      "razon": "Categoría de árbol con estrato alto"
+    },
+    {
+      "especie_id": "carludovica_palmata",
+      "nombre_cientifico": "Carludovica palmata Ruiz & Pav.",
+      "familia_botanica": "Cyclanthaceae",
+      "category": "fibras_no_maderables",
+      "estrato": null,
+      "arquetipo": "palma",
+      "altura_m": {
+        "min": 0.2,
+        "max": 0.8,
+        "unidad": "m"
+      },
+      "piso_termico": [
+        "calido",
+        "templado"
+      ],
+      "confianza": 0.85,
+      "razon": "Familia botánica Cyclanthaceae es característica del arquetipo"
+    },
+    {
+      "especie_id": "vaccinium_corymbosum",
+      "nombre_cientifico": "Vaccinium corymbosum L.",
+      "familia_botanica": "Ericaceae",
+      "category": "frutales_perennes",
+      "estrato": "medio",
+      "arquetipo": "arbol-dosel-copa-ancha",
+      "altura_m": {
+        "min": 3,
+        "max": 8,
+        "unidad": "m"
+      },
+      "piso_termico": [
+        "frio",
+        "templado"
+      ],
+      "confianza": 0.55,
+      "razon": "Estrato medio con categoría frutal/arbol"
+    },
+    {
+      "especie_id": "vaccinium_meridionale",
+      "nombre_cientifico": "Vaccinium meridionale Sw.",
+      "familia_botanica": "Ericaceae",
+      "category": "frutales_perennes",
+      "estrato": "medio",
+      "arquetipo": "arbol-dosel-copa-ancha",
+      "altura_m": {
+        "min": 3,
+        "max": 8,
+        "unidad": "m"
+      },
+      "piso_termico": [
+        "frio",
+        "paramo"
+      ],
+      "confianza": 0.55,
+      "razon": "Estrato medio con categoría frutal/arbol"
+    },
+    {
+      "especie_id": "oryza_sativa",
+      "nombre_cientifico": "Oryza sativa L.",
+      "familia_botanica": "Poaceae",
+      "category": "cereales",
+      "estrato": "medio",
+      "arquetipo": "graminea-macolla",
+      "altura_m": {
+        "min": 2,
+        "max": 6,
+        "unidad": "m"
+      },
+      "piso_termico": [
+        "calido"
+      ],
+      "confianza": 0.85,
+      "razon": "Familia botánica Poaceae es característica del arquetipo"
+    },
+    {
+      "especie_id": "vanilla_planifolia",
+      "nombre_cientifico": "Vanilla planifolia Jacks. ex Andrews",
+      "familia_botanica": "Orchidaceae",
+      "category": "medicinales_alelopaticas",
+      "estrato": "medio",
+      "arquetipo": "epifita",
+      "altura_m": {
+        "min": 1.5,
+        "max": 4,
+        "unidad": "m"
+      },
+      "piso_termico": [
+        "calido"
+      ],
+      "confianza": 0.85,
+      "razon": "Familia botánica Orchidaceae es característica del arquetipo"
+    },
+    {
+      "especie_id": "selenicereus_megalanthus",
+      "nombre_cientifico": "Selenicereus megalanthus (K.Schum. ex Vaupel) Moran",
+      "familia_botanica": "Cactaceae",
+      "category": "frutales_perennes",
+      "estrato": "medio",
+      "arquetipo": "suculenta-cactacea",
+      "altura_m": {
+        "min": 3,
+        "max": 8,
+        "unidad": "m"
+      },
+      "piso_termico": [
+        "calido",
+        "templado"
+      ],
+      "confianza": 0.85,
+      "razon": "Familia botánica Cactaceae es característica del arquetipo"
+    },
+    {
+      "especie_id": "plukenetia_volubilis",
+      "nombre_cientifico": "Plukenetia volubilis L.",
+      "familia_botanica": "Euphorbiaceae",
+      "category": "granos_legumbres",
+      "estrato": "medio",
+      "arquetipo": "arbusto-denso",
+      "altura_m": {
+        "min": 2,
+        "max": 6,
+        "unidad": "m"
+      },
+      "piso_termico": [
+        "calido"
+      ],
+      "confianza": 0.5,
+      "razon": "Estrato medio, arbusto por defecto"
+    },
+    {
+      "especie_id": "anacardium_occidentale",
+      "nombre_cientifico": "Anacardium occidentale L.",
+      "familia_botanica": "Anacardiaceae",
+      "category": "frutales_perennes",
+      "estrato": "alto",
+      "arquetipo": "arbol-dosel-copa-ancha",
+      "altura_m": {
+        "min": 10,
+        "max": 35,
+        "unidad": "m"
+      },
+      "piso_termico": [
+        "calido"
+      ],
+      "confianza": 0.75,
+      "razon": "Categoría de árbol con estrato alto"
+    },
+    {
+      "especie_id": "bactris_gasipaes",
+      "nombre_cientifico": "Bactris gasipaes Kunth",
+      "familia_botanica": "Arecaceae",
+      "category": "frutales_perennes",
+      "estrato": "alto",
+      "arquetipo": "palma",
+      "altura_m": {
+        "min": 10,
+        "max": 35,
+        "unidad": "m"
+      },
+      "piso_termico": [
+        "calido"
+      ],
+      "confianza": 0.85,
+      "razon": "Familia botánica Arecaceae es característica del arquetipo"
+    },
+    {
+      "especie_id": "annona_muricata",
+      "nombre_cientifico": "Annona muricata L.",
+      "familia_botanica": "Annonaceae",
+      "category": "frutales_perennes",
+      "estrato": "medio",
+      "arquetipo": "arbol-dosel-copa-ancha",
+      "altura_m": {
+        "min": 3,
+        "max": 8,
+        "unidad": "m"
+      },
+      "piso_termico": [
+        "calido"
+      ],
+      "confianza": 0.55,
+      "razon": "Estrato medio con categoría frutal/arbol"
+    },
+    {
+      "especie_id": "dioscorea_alata_rotundata",
+      "nombre_cientifico": "Dioscorea alata L. / Dioscorea rotundata Poir.",
+      "familia_botanica": "Dioscoreaceae",
+      "category": "tuberculos_raices",
+      "estrato": "rastrero",
+      "arquetipo": "rastrera-tapizante",
+      "altura_m": {
+        "min": 0.05,
+        "max": 0.5,
+        "unidad": "m"
+      },
+      "piso_termico": [
+        "calido"
+      ],
+      "confianza": 0.7,
+      "razon": "Estrato rastrero indica planta tapizante"
+    },
+    {
+      "especie_id": "oxalis_tuberosa",
+      "nombre_cientifico": "Oxalis tuberosa Molina",
+      "familia_botanica": "Oxalidaceae",
+      "category": "tuberculos_raices",
+      "estrato": "rastrero",
+      "arquetipo": "rastrera-tapizante",
+      "altura_m": {
+        "min": 0.05,
+        "max": 0.5,
+        "unidad": "m"
+      },
+      "piso_termico": [
+        "frio",
+        "paramo"
+      ],
+      "confianza": 0.7,
+      "razon": "Estrato rastrero indica planta tapizante"
+    },
+    {
+      "especie_id": "ullucus_tuberosus",
+      "nombre_cientifico": "Ullucus tuberosus Caldas",
+      "familia_botanica": "Basellaceae",
+      "category": "tuberculos_raices",
+      "estrato": "rastrero",
+      "arquetipo": "rastrera-tapizante",
+      "altura_m": {
+        "min": 0.05,
+        "max": 0.5,
+        "unidad": "m"
+      },
+      "piso_termico": [
+        "frio",
+        "paramo"
+      ],
+      "confianza": 0.7,
+      "razon": "Estrato rastrero indica planta tapizante"
+    },
+    {
+      "especie_id": "rosa_hybrida",
+      "nombre_cientifico": "Rosa × hybrida hort.",
+      "familia_botanica": "Rosaceae",
+      "category": "atractores_polinizadores",
+      "estrato": "bajo",
+      "arquetipo": "herbacea-erecta",
+      "altura_m": {
+        "min": 0.3,
+        "max": 1.5,
+        "unidad": "m"
+      },
+      "piso_termico": [
+        "frio",
+        "templado"
+      ],
+      "confianza": 0.6,
+      "razon": "Estrato bajo, herbácea por defecto"
+    },
+    {
+      "especie_id": "chrysanthemum_morifolium",
+      "nombre_cientifico": "Chrysanthemum × morifolium Ramat.",
+      "familia_botanica": "Asteraceae",
+      "category": "atractores_polinizadores",
+      "estrato": "bajo",
+      "arquetipo": "herbacea-erecta",
+      "altura_m": {
+        "min": 0.3,
+        "max": 1.5,
+        "unidad": "m"
+      },
+      "piso_termico": [
+        "frio",
+        "templado"
+      ],
+      "confianza": 0.6,
+      "razon": "Estrato bajo, herbácea por defecto"
+    },
+    {
+      "especie_id": "dianthus_caryophyllus",
+      "nombre_cientifico": "Dianthus caryophyllus L.",
+      "familia_botanica": "Caryophyllaceae",
+      "category": "atractores_polinizadores",
+      "estrato": "bajo",
+      "arquetipo": "herbacea-erecta",
+      "altura_m": {
+        "min": 0.3,
+        "max": 1.5,
+        "unidad": "m"
+      },
+      "piso_termico": [
+        "frio",
+        "templado"
+      ],
+      "confianza": 0.6,
+      "razon": "Estrato bajo, herbácea por defecto"
+    },
+    {
+      "especie_id": "vitis_vinifera",
+      "nombre_cientifico": "Vitis vinifera L.",
+      "familia_botanica": "Vitaceae",
+      "category": "frutales_perennes",
+      "estrato": "medio",
+      "arquetipo": "trepadora-liana",
+      "altura_m": {
+        "min": 3,
+        "max": 8,
+        "unidad": "m"
+      },
+      "piso_termico": [
+        "calido",
+        "templado"
+      ],
+      "confianza": 0.88,
+      "razon": "Género vitis trepador/liana"
+    },
+    {
+      "especie_id": "elaeis_guineensis",
+      "nombre_cientifico": "Elaeis guineensis Jacq.",
+      "familia_botanica": "Arecaceae",
+      "category": "frutales_perennes",
+      "estrato": "alto",
+      "arquetipo": "palma",
+      "altura_m": {
+        "min": 10,
+        "max": 35,
+        "unidad": "m"
+      },
+      "piso_termico": [
+        "calido"
+      ],
+      "confianza": 0.85,
+      "razon": "Familia botánica Arecaceae es característica del arquetipo"
+    },
+    {
+      "especie_id": "heliconia_psittacorum",
+      "nombre_cientifico": "Heliconia psittacorum L.f.",
+      "familia_botanica": "Heliconiaceae",
+      "category": "ornamentales_nativas",
+      "estrato": "medio",
+      "arquetipo": "arbusto-denso",
+      "altura_m": {
+        "min": 2,
+        "max": 6,
+        "unidad": "m"
+      },
+      "piso_termico": [
+        "calido",
+        "templado"
+      ],
+      "confianza": 0.5,
+      "razon": "Estrato medio, arbusto por defecto"
+    },
+    {
+      "especie_id": "murraya_paniculata",
+      "nombre_cientifico": "Murraya paniculata (L.) Jack",
+      "familia_botanica": "Rutaceae",
+      "category": "cercas_vivas",
+      "estrato": "medio",
+      "arquetipo": "arbusto-denso",
+      "altura_m": {
+        "min": 2,
+        "max": 6,
+        "unidad": "m"
+      },
+      "piso_termico": [
+        "calido",
+        "templado"
+      ],
+      "confianza": 0.5,
+      "razon": "Estrato medio, arbusto por defecto"
+    }
+  ]
+}
