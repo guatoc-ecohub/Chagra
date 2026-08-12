@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Needle F0 aislado</title>
+    <style>
+      body { font: 16px system-ui, sans-serif; margin: 2rem auto; max-width: 58rem; padding: 0 1rem; }
+      code, pre { background: #f3f4f6; border-radius: .35rem; padding: .15rem .3rem; }
+      pre { overflow: auto; padding: 1rem; white-space: pre-wrap; }
+      .ok { color: #176b35; }
+      .fail { color: #a11; }
+    </style>
+  </head>
+  <body>
+    <h1>Needle F0 aislado</h1>
+    <p id="status">Inicializando Web Worker...</p>
+    <pre id="output" aria-live="polite"></pre>
+    <script>
+      const status = document.querySelector('#status');
+      const output = document.querySelector('#output');
+      const worker = new Worker('./worker.js', { type: 'module' });
+      const pending = new Map();
+      let nextId = 0;
+
+      function callWorker(type, payload = {}) {
+        return new Promise((resolve, reject) => {
+          const id = ++nextId;
+          pending.set(id, { resolve, reject });
+          worker.postMessage({ id, type, ...payload });
+        });
+      }
+
+      worker.addEventListener('message', (event) => {
+        const message = event.data;
+        if (message.type === 'error') {
+          status.textContent = `ERROR: ${message.error}`;
+          status.className = 'fail';
+        }
+        if (!message.id) return;
+        const item = pending.get(message.id);
+        if (!item) return;
+        pending.delete(message.id);
+        if (message.error) item.reject(new Error(message.error));
+        else item.resolve(message);
+      });
+
+      window.needleF0 = { callWorker, setStatus: (text) => { status.textContent = text; } };
+      navigator.serviceWorker.register('./sw.js').catch((error) => {
+        status.textContent = `ERROR de Service Worker: ${error.message}`;
+        status.className = 'fail';
+      });
+      window.needleReady = callWorker('load').then((message) => {
+        status.textContent = `Listo. Carga WASM + pesos: ${message.loadMs.toFixed(1)} ms`;
+        return message;
+      }).catch((error) => {
+        status.textContent = `ERROR de carga: ${error.message}`;
+        status.className = 'fail';
+        throw error;
+      });
+    </script>
+  </body>
+</html>
