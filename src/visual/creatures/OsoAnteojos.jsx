@@ -375,7 +375,7 @@ export function OsoAnteojos({
 
   if (inline) {
     // En modo inline el power-up lo pone el host DOM (::before/mix-blend no
-    // aplican a SVG); acá solo marcamos data-poder por si el host lo consulta.
+    // aplican a SVG); aquí solo marcamos data-poder por si el host lo consulta.
     return (
       <g ref={raizRef} className={className} style={estiloRaiz} data-poder={poder ? '1' : undefined} {...estadoAttrs}>
         {defs}

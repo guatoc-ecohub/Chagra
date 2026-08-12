@@ -181,7 +181,7 @@ export const EMISIVOS = {
   portal: CASA.ventana, // '#ffd9a0' — el corazón de la ventana-mundo
 };
 
-/* Los acentos (cochinilla, maíz, guayacán…) SIGUEN siendo de ACENTOS de la
+/* Los acentos (cochinilla, maíz, guayaquín…) SIGUEN siendo de ACENTOS de la
    paleta madre: a cucharadas — una cinta, una flor, una baya — jamás una
    superficie. Regla de dosis: máximo UN acento por objeto y nunca más del
    5% del área visible de la pieza. */

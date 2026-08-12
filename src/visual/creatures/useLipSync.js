@@ -6,7 +6,7 @@
  * derivar VISEMAS de la energía RMS en tiempo real
  * (ficha DR animación rubber-hose §2). La lógica pura (umbral RMS →
  * visema, debounce anti-castañeteo, boca de relleno) vive en `lipSyncCore.js`
- * (testeada sin navegador); acá solo está el cableado del audio + rAF.
+ * (testeada sin navegador); aquí solo está el cableado del audio + rAF.
  *
  * Species-agnostic: devuelve un `data-visema` ('V1'..'V4') que CUALQUIER creature
  * pone en su nodo raíz; el SVG dibuja las 4 bocas a su manera.

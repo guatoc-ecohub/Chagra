@@ -23,7 +23,7 @@
  * EL MISMO MODELO. Este archivo importa `aire()` y `densidadEnAltura()` — las
  * mismísimas funciones que mueven la escena 3D. No hay una "versión 2D" de la
  * física con números aparte: si mañana se afina la curva del amoníaco, se afinan
- * las dos a la vez. Es la regla de la casa (una sola fuente de verdad) y acá
+ * las dos a la vez. Es la regla de la casa (una sola fuente de verdad) y aquí
  * además evita que el corte y la escena se contradigan, que sería fatal en una
  * pieza cuyo tema es "esto es lo que de verdad está pasando".
  *

@@ -29,7 +29,7 @@ ser alguien.
 
 ## 2. Parámetros canónicos (la física de la goma)
 
-Todos viven en `rubberhoseSpec.js` — acá solo se explican.
+Todos viven en `rubberhoseSpec.js` — aquí solo se explican.
 
 ### Tinta y blancos (jerarquía fija)
 | Token | Hex | Qué es |

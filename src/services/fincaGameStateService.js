@@ -7,7 +7,7 @@
  *     y disparar la celebración una sola vez.
  *   - `misionesHechas`: ids de misiones de "aprender" que la niña marcó a mano
  *     (leer una ficha GUATOC no deja rastro en los indicadores; las acciones
- *     reales —sembrar, cosechar— sí, y esas NO se guardan acá: se derivan).
+ *     reales —sembrar, cosechar— sí, y esas NO se guardan aquí: se derivan).
  *
  * Persistencia: localStorage (estado mínimo, tipo preferencia por finca,
  * offline-first; degrada limpio en modo privado, igual que journeyStateService).

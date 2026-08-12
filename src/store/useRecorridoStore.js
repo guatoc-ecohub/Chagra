@@ -12,7 +12,7 @@ import {
  *
  * Acumula las observaciones que el campesino narra mientras camina la finca con
  * el modo campo prendido, SIN apagar la escucha. Cada observación entra por voz
- * → captura GPS → resuelve lote (recorridoService) → se apila acá.
+ * → captura GPS → resuelve lote (recorridoService) → se apila aquí.
  *
  * Composición con modo campo: este store NO maneja la escucha ni el wake-word
  * (eso vive en useModoCampo / escuchaService cuando aterrice). El hook de voz

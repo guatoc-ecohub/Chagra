@@ -135,7 +135,7 @@ export function Colibri({
      aura TORNASOL de 4 capas (glow radial cian→magenta, boost, ingravidez,
      corrientes alternadas). El host lo enciende un rato con usePoderTemporal().
      En modo inline el power-up lo pone el host DOM (::before/mix-blend no
-     aplican a nodos SVG); acá solo marcamos data-poder. */
+     aplican a nodos SVG); aquí solo marcamos data-poder. */
   poder = false,
   /* ── PROP POR MUNDO (herramienta en las patitas — propsPorMundo/PropEnMano) ─
      mundoId opcional: al ENTRAR a un mundo el colibrí carga su herramienta
@@ -334,7 +334,7 @@ export function Colibri({
 
   if (inline) {
     // En modo inline el power-up lo pone el host DOM (::before/mix-blend no
-    // aplican a SVG); acá solo marcamos data-poder por si el host lo consulta.
+    // aplican a SVG); aquí solo marcamos data-poder por si el host lo consulta.
     return (
       <g ref={raizRef} className={className} style={estiloRaiz} data-poder={poder ? '1' : undefined} {...estadoAttrs}>
         {defs}

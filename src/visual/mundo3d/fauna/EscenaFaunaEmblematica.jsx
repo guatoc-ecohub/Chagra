@@ -4,7 +4,7 @@
  * El encargo, textual: "No un modelo en T-pose girando: que caminen de verdad".
  * Así que esto no es una galería de modelos: es un pedazo de monte con sendas, y
  * cada animal recorre la suya a SU velocidad real, con SU marcha. Nadie posa.
- * Si mirás un rato, la danta pasa dos veces y el jaguar se detiene a mirarte.
+ * Si miras un rato, la danta pasa dos veces y el jaguar se detiene a mirarte.
  *
  * ESCALA REAL, sin excepciones. La danta mide 85 cm a la cruz y el arlequín mide
  * cuatro centímetros, y en esta escena esa proporción es verdad. Eso trae un
@@ -20,7 +20,7 @@
  *      en `pelajes.js`, con la receta de la mezcla al lado.
  *   §2 materiales por receta → `crearMaterialVertexColors` / `crearMaterialMadre`.
  *   §3 escena standalone → `<LuzMadre>` + `mezclarCielo`, sin calcar números.
- *   §4 el bloom no se monta acá.
+ *   §4 el bloom no se monta aquí.
  *   §5 acentos con cuentagotas: el ÚNICO que grita en todo el cuadro es el oro
  *      del arlequín — y grita porque es aposematismo, no porque quede lindo.
  */
@@ -178,7 +178,7 @@ function Monte({ perfil }) {
  * que los animales se pisen, y para que el ojo tenga siempre a alguien
  * caminando cerca y a alguien lejos.
  *
- * El jaguar va acá aunque NO sea fauna de páramo (es de tierra caliente): el
+ * El jaguar va aquí aunque NO sea fauna de páramo (es de tierra caliente): el
  * encargo lo pide como guardián y esta escena es una galería de guardianes, no
  * un inventario ecológico. La ficha lo dice y el README lo dice. Que la
  * licencia esté anotada es lo que la vuelve una decisión y no un error.

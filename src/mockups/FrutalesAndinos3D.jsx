@@ -97,7 +97,7 @@ const SABERES = [
     emoji: '🌡️',
     titulo: 'Todas son de clima frío',
     texto:
-      'Este vergel es de tierra fría andina. Por eso acá no hay mango ni naranjos: esos son de piso cálido y no comparten ni la altura, ni el manejo, ni las plagas. Mezclarlos en un mismo dibujo confunde más de lo que enseña.',
+      'Este vergel es de tierra fría andina. Por eso aquí no hay mango ni naranjos: esos son de piso cálido y no comparten ni la altura, ni el manejo, ni las plagas. Mezclarlos en un mismo dibujo confunde más de lo que enseña.',
   },
   {
     emoji: '🍃',

@@ -383,7 +383,7 @@ export const cebollaLarga = {
   altitudOptima: [1800, 2800],
   alturaM: 0.6,
   fuente: 'corpus',
-  lugar: 'Aquitania, Boyacá — la orilla del lago de Tota.',
+  lugar: 'Aquitania, Boyaquí — la orilla del lago de Tota.',
 
   porte: { tipo: 'herbacea', alto: 150, nodos: 5, filo: 'disticha', grosor: 5 },
   hoja: {

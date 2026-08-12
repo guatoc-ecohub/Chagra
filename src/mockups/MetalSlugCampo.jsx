@@ -939,7 +939,7 @@ function Juego({ tier, reducedMotion, arsenal, onSalirIntro }) {
               {!w.rehen.liberado && <div className="msc-jaula" aria-hidden="true" />}
               {/* @ts-ignore IntrinsicAttributes & object - memo-wrapped component */}
               <SpriteOso tier={tier} reducedMotion={reducedMotion} />
-              {!w.rehen.liberado && <div className="msc-sos" aria-hidden="true">¡SOS!</div>}
+              {!w.rehen.liberado && <div className="msc-eres" aria-hidden="true">¡SOS!</div>}
             </div>
 
             {/* jugador (Angelita) */}
@@ -1205,7 +1205,7 @@ function StyleMSC() {
 .msc-rehen{position:absolute;display:grid;place-items:end center;}
 .msc-jaula{position:absolute;inset:-6px -4px 0;border:3px solid #6b6b6b;border-radius:8px;background:repeating-linear-gradient(90deg,transparent 0 10px,rgba(80,80,80,.55) 10px 13px);pointer-events:none;}
 .msc-rehen--libre .msc-jaula{display:none;}
-.msc-sos{position:absolute;top:-20px;left:50%;transform:translateX(-50%);background:#e0532b;color:#fff;font-weight:900;font-size:12px;padding:1px 7px;border-radius:8px;border:2px solid ${PAL.tinta};}
+.msc-eres{position:absolute;top:-20px;left:50%;transform:translateX(-50%);background:#e0532b;color:#fff;font-weight:900;font-size:12px;padding:1px 7px;border-radius:8px;border:2px solid ${PAL.tinta};}
 .msc-rehen--libre{animation:msc-brinco .5s ease;}
 
 /* HUD */

@@ -9,9 +9,9 @@
  *  QUÉ COLIBRÍ ES ESTE (y por qué no es el que uno se imagina)
  * ─────────────────────────────────────────────────────────────────────────────
  * El guardián de Chagra es el Oxypogon guerinii: endémico de Colombia, de los
- * páramos de Cundinamarca y Boyacá. Y NO se parece al colibrí del imaginario:
+ * páramos de Cundinamarca y Boyaquí. Y NO se parece al colibrí del imaginario:
  * es PARDO, de PICO CORTO Y RECTO, con una cresta blanca eréctil y una barba
- * larga iridiscente. El pico corto es su adaptación al páramo — acá arriba come
+ * larga iridiscente. El pico corto es su adaptación al páramo — aquí arriba come
  * tanto insecto como néctar, y un pico de espada no le sirve.
  *
  * El código viejo del repo lo pintaba turquesa con un pico más largo que el
@@ -312,7 +312,7 @@ export default function ColibriGuardian({
         {/*
           LA BARBA — colgando de la garganta, con su +Z mirando adelante y abajo:
           esa normal ES lo que `iridiscencia` mide contra la cámara. La geometría
-          no es decorativa acá: es el instrumento.
+          no es decorativa aquí: es el instrumento.
         */}
         <mesh
           ref={barba}

@@ -31,7 +31,7 @@ Onboarding (Profile vs Siembra mockup), juegos (MiFincaViva, Defensores, Milpa, 
 import { NUCLEO_3D, NUCLEO_APP, EXCLUIDO, PENDIENTE_DECISION, estaEnNucleo, getMapaNucleo } from './config/rutasProdChagraApp';
 ```
 
-El shell de ruteo consumirá `getMapaNucleo()` para montar solo las rutas del núcleo. Las rutas excluidas se ignoran. Las pendientes quedan comentadas/inactivas hasta decisión.
+El shell de ruteo consumira `getMapaNucleo()` para montar solo las rutas del núcleo. Las rutas excluidas se ignoran. Las pendientes quedan comentadas/inactivas hasta decisión.
 
 ## No se borra nada
 

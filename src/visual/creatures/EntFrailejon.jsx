@@ -162,7 +162,7 @@ export function EntFrailejon({
      abre. Se siente que va a INTERVENIR. Sobrio y épico. */
   poder = false,
   /* ── ENSEÑA: postura de maestro (se inclina un poco, la roseta atenta). El
-     TEXTO lo trae useEntGuion; acá solo marcamos data-ensena para la postura. */
+     TEXTO lo trae useEntGuion; aquí solo marcamos data-ensena para la postura. */
   ensena = false,
   /* Device-tier: 'bajo' apaga el idle continuo (boil + mecido) y deja lo
      reactivo. Sin prop (standalone) = pleno. */

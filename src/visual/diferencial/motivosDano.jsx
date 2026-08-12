@@ -18,7 +18,7 @@ import {
  * limpia. En la naturaleza no hay círculos perfectos. Cada mancha sale de
  * `blob()` (contorno lobulado) o de nubes de granos con semilla fija. Un
  * círculo naranja plano sería un dibujo inventado; el polvo de la roya de la
- * foto es GRANO, y así se pinta acá.
+ * foto es GRANO, y así se pinta aquí.
  */
 
 /** useId trae ':' y eso rompe los url(#..) de SVG. Lo limpiamos. */
@@ -404,7 +404,7 @@ export function ManchaAnillos({ cx, cy, r, semilla = 8 }) {
  * la mata: la hoja vieja no se lo puede prestar al cogollo).
  *
  * Se dibuja al revés que las otras marcas: la lámina ya viene amarilla desde
- * `HojaBase tinteLamina`, y acá se repone EL VERDE que sobrevive pegado a la
+ * `HojaBase tinteLamina`, y aquí se repone EL VERDE que sobrevive pegado a la
  * vena. Eso es exactamente lo que pasa en la mata.
  */
 export function ClorosisHierro() {
@@ -472,7 +472,7 @@ export function ClorosisNitrogeno() {
       </defs>
       {/* el apagón, de la punta hacia la base: SIN una sola línea de borde */}
       <path d={HOJA.contorno} fill={`url(#${grad})`} />
-      {/* la nervadura apenas se insinúa: acá NO se queda verde como en el
+      {/* la nervadura apenas se insinúa: aquí NO se queda verde como en el
           hierro — se va apagando con toda la hoja, y por eso no hay redecilla */}
       <g fill="none" stroke={DEFICIENCIA.nitroVerdeQueQueda} strokeLinecap="round" opacity="0.28">
         <path d={HOJA.nervioCentral} strokeWidth="1.6" />
@@ -694,7 +694,7 @@ export function Vineta({ x, y, color, lineas, tam = 7.6, interlinea = 9.4 }) {
  * La lupa: el recuadro redondo del detalle.
  * En una lámina botánica el detalle NO es un zoom del mismo dibujo — se
  * vuelve a dibujar con más información, que es justo lo que uno gana al
- * acercar la cara a la mata. Así se hace acá.
+ * acercar la cara a la mata. Así se hace aquí.
  */
 export function Lupa({ cx, cy, r, titulo, children, tinta = TINTA.media }) {
   const uid = usarId('lupa');

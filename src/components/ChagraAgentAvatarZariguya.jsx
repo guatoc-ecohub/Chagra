@@ -11,7 +11,7 @@ import Zariguya from '../visual/creatures/Zariguya';
  * 'listening', glow, withLabel, onClick/onDoubleClick) al vocabulario de VIDA
  * de `Zariguya.jsx` (`visual/creatures/`) — el registro rubber-hose CÁLIDO
  * del elenco canónico. OJO: existe otra zarigüeya en
- * `dashboard/CriaturasNocturnas.jsx`, biopunk oscuro/neón — esa NO se usa acá
+ * `dashboard/CriaturasNocturnas.jsx`, biopunk oscuro/neón — esa NO se usa aquí
  * (mezclar registros es un error de diseño ya señalado). Cero lógica nueva de
  * agente, cero cambios en `visual/creatures/` (solo lectura/import, igual que
  * el resto de adaptadores de este archivo con Angelita).

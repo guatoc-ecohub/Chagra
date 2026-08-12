@@ -186,7 +186,7 @@ export function useTheme() {
   }, [theme]);
 
   // Sincronía entre instancias del hook (same-tab): otra pantalla/selector
-  // cambió el tema → esta instancia re-lee. Sin dispatch acá (solo setTheme
+  // cambió el tema → esta instancia re-lee. Sin dispatch aquí (solo setTheme
   // emite) — no hay riesgo de loop.
   useEffect(() => {
     const onThemeChanged = (e) => {

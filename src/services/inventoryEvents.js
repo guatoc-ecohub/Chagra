@@ -208,7 +208,7 @@ function nextSequenceNumber() {
 
 /**
  * Crea un log entry completo con id ULID, timestamp, device hash, sequence.
- * El operator_id_hash debe inyectarse desde el authService (no se calcula acá
+ * El operator_id_hash debe inyectarse desde el authService (no se calcula aquí
  * para no requerir importar el HMAC stack).
  *
  * @param {string} eventType - uno de EVENT_TYPES

@@ -69,7 +69,7 @@ export function AbejaAngelita({
      visema opcional ('V1'..'V4') que produce useLipSync desde el RMS del TTS:
      la boquita cambia de forma al hablar. Sin visema (o 'V1') = la sonrisa de
      siempre → los avatares/catálogo no cambian. El HOOK vive aparte para no
-     colgar un AnalyserNode en cada instancia; acá solo se consume el estado. */
+     colgar un AnalyserNode en cada instancia; aquí solo se consume el estado. */
   visema = null,
   /* ── VESTUARIO por clima+hora (ropaDeClima) ───────────────────────────────
      OPT-IN: con vestuario=true la abeja se abriga según el clima real (ruana de
@@ -388,7 +388,7 @@ export function AbejaAngelita({
 
   if (inline) {
     // En modo inline el power-up lo pone el host DOM (::before/mix-blend no
-    // aplican a SVG); acá solo marcamos data-poder por si el host lo consulta.
+    // aplican a SVG); aquí solo marcamos data-poder por si el host lo consulta.
     return (
       <g className={className} style={estiloClima} data-poder={poder ? '1' : undefined} {...estadoAttrs}>
         {defs}

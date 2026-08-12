@@ -76,7 +76,7 @@ const PESTANAS = [
 
 /* ── Helpers puros ─────────────────────────────────────────────────────────── */
 
-/* Medidas en texto campesino: "15 × 6 × 3 m" (coma decimal, como se dice acá). */
+/* Medidas en texto campesino: "15 × 6 × 3 m" (coma decimal, como se dice aquí). */
 const num = (v) => `${Math.round(v * 10) / 10}`.replace('.', ',');
 const medidasTexto = (d) => `${num(d.largo)} × ${num(d.ancho)} × ${num(d.alto)} m`;
 

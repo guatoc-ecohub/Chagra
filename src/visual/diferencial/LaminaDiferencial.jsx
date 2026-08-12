@@ -113,7 +113,7 @@ const MORDIDAS = [
   bocado(0.55, 0.46, 3, 45, { alargue: 1.9, rot: VENA_DER, lobulos: 3, rugosidad: 0.22 }),
 ];
 
-/* La ventana: acá el gusano raspó lo blandito y dejó el costillar. */
+/* La ventana: aquí el gusano raspó lo blandito y dejó el costillar. */
 const VENTANAS = [
   bocado(0.6, -0.44, 7.5, 91, { alargue: 1.5, rot: VENA_IZQ, lobulos: 3, rugosidad: 0.26 }),
 ];

@@ -4,7 +4,7 @@
  * Una ladera. Un año que se puede mover. Nada más.
  *
  * La cámara NO gira sola, y eso es a propósito. En las otras escenas el mundo se
- * pasea para lucirse; acá el que se mueve es el TIEMPO. Uno se para en el filo de
+ * pasea para lucirse; aquí el que se mueve es el TIEMPO. Uno se para en el filo de
  * abajo de su lote —como quien llega a mirar la ladera— y desde ahí ve pasar
  * cincuenta años. Si la cámara también anduviera dando vueltas, el movimiento
  * dejaría de significar "está creciendo". Se puede arrastrar con el dedo si uno
@@ -232,7 +232,7 @@ function Diorama({ anioRef, anio, tier, reducedMotion }) {
       )}
 
       {/*
-        Sin autoRotate: acá el que corre es el tiempo, no la cámara. Uno se para
+        Sin autoRotate: aquí el que corre es el tiempo, no la cámara. Uno se para
         en el filo de abajo del lote y mira para arriba. Se puede girar con el
         dedo, pero sola no se mueve.
       */}

@@ -82,7 +82,7 @@ export const PAL = {
    * NO HAY CIELO NI NIEBLA ACÁ, Y ES A PROPÓSITO: "los cielos los pone la
    * atmósfera, no vos" (paleta/GUIA.md §1). La escena toma su día de `ATMOSFERA`
    * y su noche de `CIELOS_HORA.noche`, mezclados con la ley 60%-hacia-la-madre.
-   * Declarar acá un `cieloNoche` propio era exactamente la deriva de calcos que
+   * Declarar aquí un `cieloNoche` propio era exactamente la deriva de calcos que
    * el módulo `paleta/` existe para matar — se hizo, y se borró.
    */
 
@@ -527,7 +527,7 @@ export const UMBRAL = {
   /* El nivel, en la escala normalizada de `dinamicaPlaga` (0..1). */
   nivel: 0.55,
   que: 'El punto donde la plaga ya le baja la cosecha de verdad.',
-  antes: 'Gastar acá es perder plata Y matar al ejército. La plaga baja no duele.',
+  antes: 'Gastar aquí es perder plata Y matar al ejército. La plaga baja no duele.',
   despues: 'Acá sí conviene actuar — con lo más selectivo que haya, no con la bomba.',
   /* Un umbral REAL y citable, para que la banda no sea un número inventado:
      Cenicafé fija la acción en broca por encima del 2% de frutos infestados,
@@ -562,7 +562,7 @@ export const PARCELAS = [
     fondo: 'rastrojo',
     suelo: 'sueloVivo',
     fumiga: false,
-    /* Los benéficos VIVEN acá porque tienen las tres cosas. */
+    /* Los benéficos VIVEN aquí porque tienen las tres cosas. */
     habitat: ['comida', 'flores', 'refugio'],
   },
   {
@@ -586,7 +586,7 @@ export const PARCELAS = [
 
 /*
  * Contrato del arte. Si al final una de estas frases no se lee EN EL DIBUJO,
- * el mundo falló, por bonito que haya quedado. Se dejan escritas acá para que
+ * el mundo falló, por bonito que haya quedado. Se dejan escritas aquí para que
  * cualquiera que toque esta carpeta pueda medir contra qué.
  */
 export const RELATO = [

@@ -12,7 +12,7 @@ import { OSO_GUARDIAN_RUANA, OSO_GUARDIAN_TINTA } from './osoGuardianIdentidad.j
  * Ahora los tiene, y la prenda se cuelga de ellos.
  *
  * Lo que manda la DR `la-ruana-andina-colombiana` (gemini, 2026-06-19) y que
- * está dibujado acá punto por punto:
+ * está dibujado aquí punto por punto:
  *
  *   · PESO. Lana virgen de oveja, cerca de un kilo. Cae con gravedad: los
  *     pliegues se asientan, se abren hacia el ruedo y no flotan. El vaivén

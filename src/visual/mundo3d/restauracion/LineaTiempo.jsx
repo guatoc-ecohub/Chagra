@@ -19,7 +19,7 @@
  *
  * · NADIE DICE "CARGANDO" NI "FELICITACIONES". No hay premio al final ni barra de
  *   progreso: hay una ladera y unos años. La dirección educativa de Chagra es
- *   observación, fracaso y paciencia — no gamificación. El único "logro" acá es
+ *   observación, fracaso y paciencia — no gamificación. El único "logro" aquí es
  *   que el agua volvió, y volvió porque alguien esperó.
  *
  * En "usted", como toda la UI. Se maneja con el dedo, con las flechas del teclado

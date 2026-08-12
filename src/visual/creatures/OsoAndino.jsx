@@ -49,7 +49,7 @@ export function OsoAndino({
      visema opcional ('V1'..'V4') que produce useLipSync desde el RMS del TTS:
      la bocota se abre AMPLIA al hablar (voz grave de papá-noel). Sin visema (o
      'V1') = la sonrisa de siempre → avatares/catálogo no cambian. El HOOK vive
-     aparte (no cuelga un AnalyserNode por instancia); acá solo se consume. */
+     aparte (no cuelga un AnalyserNode por instancia); aquí solo se consume. */
   visema = null,
   /* ── VESTUARIO por clima+hora (ropaDeClima) ───────────────────────────────
      OPT-IN: con vestuario=true el oso se abriga según el clima real (RUANA
@@ -92,7 +92,7 @@ export function OsoAndino({
      ROJA berserker de 4 capas (glow, boost, ingravidez, corrientes) — su firma
      cuando "sube de nivel". El host lo enciende un rato con usePoderTemporal().
      En modo inline el power-up lo pone el host DOM (::before/mix-blend no aplican
-     a nodos SVG); acá solo marcamos data-poder por si el host lo consulta. */
+     a nodos SVG); aquí solo marcamos data-poder por si el host lo consulta. */
   poder = false,
   /* ── PROP POR MUNDO (herramienta en la zarpa — propsPorMundo/PropEnMano) ─────
      mundoId opcional: al ENTRAR a un mundo el oso carga su herramienta
@@ -307,7 +307,7 @@ export function OsoAndino({
 
   if (inline) {
     // En modo inline el power-up lo pone el host DOM (::before/mix-blend no
-    // aplican a SVG); acá solo marcamos data-poder por si el host lo consulta.
+    // aplican a SVG); aquí solo marcamos data-poder por si el host lo consulta.
     return (
       <g ref={raizRef} className={className} style={estiloRaiz} data-poder={poder ? '1' : undefined} {...estadoAttrs}>
         {defs}

@@ -48,7 +48,7 @@ export function Ardilla({
   /* ── LIP-SYNC (sistema transversal, useLipSync) ────────────────────────────
      visema opcional ('V1'..'V4') que produce useLipSync desde el RMS del TTS:
      la boquita se abre al hablar (voz ágil y chillona). Sin visema (o 'V1') = la
-     sonrisa de siempre → avatares/catálogo no cambian. El HOOK vive aparte; acá
+     sonrisa de siempre → avatares/catálogo no cambian. El HOOK vive aparte; aquí
      solo se consume. */
   visema = null,
   /* ── VESTUARIO por clima+hora (ropaDeClima) ───────────────────────────────
@@ -87,7 +87,7 @@ export function Ardilla({
   /* ── MODO PODER (transformación / power-up ÁMBAR — transformacion.css) ──────
      OPT-IN: con poder=true (standalone) la ardilla se envuelve en su aura ÁMBAR
      de 4 capas (glow, boost, ingravidez, corrientes) — su firma al "subir de
-     nivel". En modo inline lo pone el host DOM; acá solo marcamos data-poder. */
+     nivel". En modo inline lo pone el host DOM; aquí solo marcamos data-poder. */
   poder = false,
   /* ── PROP POR MUNDO (herramienta en la patita — propsPorMundo/PropEnMano) ────
      mundoId opcional: al ENTRAR a un mundo la ardilla carga su herramienta
@@ -307,7 +307,7 @@ export function Ardilla({
   const estiloRaiz = { ...ritmoPropio, ...estiloClima };
 
   if (inline) {
-    // En modo inline el power-up lo pone el host DOM; acá solo marcamos data-poder.
+    // En modo inline el power-up lo pone el host DOM; aquí solo marcamos data-poder.
     return (
       <g ref={raizRef} className={className} style={estiloRaiz} data-poder={poder ? '1' : undefined} {...estadoAttrs}>
         {defs}

@@ -7,7 +7,7 @@
  * REGISTRO — la regla que no se rompe: en Chagra hay DOS registros y no se
  * mezclan. Los 9 bichos de `creatures/` son rubber-hose (caricatura con alma,
  * ya aprobada). Esto es lo OTRO: la fauna que el campesino ve o teme de verdad,
- * y va realista. No se importa nada de `creatures/` acá, a propósito.
+ * y va realista. No se importa nada de `creatures/` aquí, a propósito.
  */
 export {
   FAUNA_EMBLEMATICA,

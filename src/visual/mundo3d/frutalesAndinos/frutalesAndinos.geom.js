@@ -3,7 +3,7 @@
  *
  * El elenco de frutales andinos que el catálogo respalda: MORA de Castilla,
  * LULO, TOMATE DE ÁRBOL, GRANADILLA, UCHUVA, GULUPA y CURUBA. Ni una más: si no
- * está en esta lista, no se dibuja acá. (El mango y los cítricos son de piso
+ * está en esta lista, no se dibuja aquí. (El mango y los cítricos son de piso
  * cálido y no pertenecen a este vergel; dibujarlos "a ojo" junto a estos siete
  * sería enseñar mal una cosa fácil de verificar en el campo.)
  *
@@ -593,7 +593,7 @@ export function construirArbolLindero(semilla = 1) {
 }
 
 /* El elenco, como dato: lo que la escena siembra y lo que la ficha explica.
-   Si una especie no está acá, no se dibuja en este vergel. */
+   Si una especie no está aquí, no se dibuja en este vergel. */
 export const ELENCO_FRUTALES = [
   { id: 'mora', nombre: 'Mora de Castilla', cientifico: 'Rubus glaucus', porte: 'cañas en espaldera' },
   { id: 'lulo', nombre: 'Lulo', cientifico: 'Solanum quitoense', porte: 'arbusto de hoja grande' },

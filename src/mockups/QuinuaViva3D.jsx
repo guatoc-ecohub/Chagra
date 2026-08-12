@@ -135,7 +135,7 @@ export default function QuinuaViva3D() {
           helada, el suelo salino, la sequía. Por eso los Andes llevan miles de
           años sembrándola, y por eso vale la pena que no se pierda ninguna de
           sus variedades — cada una guarda una respuesta distinta para un año
-          distinto. En Colombia se da bien en Nariño, Boyacá y Cundinamarca.
+          distinto. En Colombia se da bien en Nariño, Boyaquí y Cundinamarca.
         </p>
       </section>
     </main>

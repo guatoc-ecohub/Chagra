@@ -120,13 +120,13 @@
     "id": "trigo-jawahir-icarda",
     "entity_slug": "trigo",
     "titulo": "Variedad Jawahir: trigo duro que aguanta la sequía",
-    "dato": "La variedad de trigo duro Jawahir, desarrollada con material genético del pariente silvestre Triticum araraticum del banco de genes de ICARDA, produce cosecha donde otras variedades apenas rinden. El sistema funciona mejor cuando se combina con cero labranza. Este resultado viene del norte de África (Marruecos) y no ha sido validado directamente en Colombia, pero es análogo a las zonas secas de Nariño y Boyacá.",
+    "dato": "La variedad de trigo duro Jawahir, desarrollada con material genético del pariente silvestre Triticum araraticum del banco de genes de ICARDA, produce cosecha donde otras variedades apenas rinden. El sistema funciona mejor cuando se combina con cero labranza. Este resultado viene del norte de África (Marruecos) y no ha sido validado directamente en Colombia, pero es análogo a las zonas secas de Nariño y Boyaquí.",
     "cifra": "Más de 1,5 t/ha en sequía severa; +40 % con cero labranza vs manejo convencional",
     "binomio": "Triticum durum",
     "fuente": "ICARDA / INRA Marruecos, proyecto DIIVA-PR / Crop Trust BOLD 2023",
     "doi": "https://icarda.org/media/news/jawahir-wheat-brings-drought-resilience-morocco",
     "non_co": true,
-    "region_analoga": "Marruecos (Magreb); análogo a zonas áridas de Nariño alto y Boyacá",
+    "region_analoga": "Marruecos (Magreb); análogo a zonas áridas de Nariño alto y Boyaquí",
     "leccion_base": "suelo"
   },
   {

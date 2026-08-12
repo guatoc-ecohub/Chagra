@@ -6,7 +6,7 @@
  * Lo que NO se hizo, y por qué:
  *   · Humito verde saliendo en volutas → mentira dos veces. El amoníaco es
  *     incoloro, y el verde-tóxico le dice al campesino "eso es veneno ajeno,
- *     sáquelo de acá", cuando lo que hay que decirle es "eso es SUYO".
+ *     sáquelo de aquí", cuando lo que hay que decirle es "eso es SUYO".
  *   · Nube que sube en columna → una chimenea es un evento, algo que pasa. El
  *     amoníaco no pasa: ESTÁ. Todo el día, quieto, encima de los animales.
  *   · Partículas verdes flotando → convierte el aire en un efecto de videojuego.

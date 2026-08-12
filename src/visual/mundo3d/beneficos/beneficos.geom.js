@@ -3,7 +3,7 @@
  *
  * three-core, corre headless: cero contexto GL, cero azar por frame (PRNG con
  * semilla), cero assets externos. La escena (`EscenaBeneficos.jsx`) le pone luz,
- * cadencia y la dinámica de `dinamicaPlaga.js`; acá solo vive la FORMA.
+ * cadencia y la dinámica de `dinamicaPlaga.js`; aquí solo vive la FORMA.
  *
  * ── REGISTRO: REALISTA (ver GUIA-RUBBERHOSE.md §1) ─────────────────────────
  * Esto es fauna secundaria del monte, no personajes. Por construcción, en este
@@ -21,14 +21,14 @@
  *     que el campesino tiene que aprender a ver. Es la protagonista.
  *   · la crisopa → sus huevos CON PEDICELO, que parecen alfileres.
  *   · la avispa → la CINTURA y el ovipositor; y su obra: LA MOMIA.
- *   · el sírfido → acá SOLO la larva (el adulto vive en `polinizadores/`).
+ *   · el sírfido → aquí SOLO la larva (el adulto vive en `polinizadores/`).
  *   · Beauveria → la PELUSA BLANCA que cubre; Metarhizium → el VERDE.
  *
  * ── GAMA BAJA (el teléfono del campesino manda) ────────────────────────────
  * Todo es low-poly con vertex colors, para que la escena pueda fusionar
  * (`mergeGeometries`) o instanciar (`InstancedMesh`) y bajar a ~1 draw-call por
  * especie con UN material (`crearMaterialVertexColors`). Ninguna geometría de
- * acá pasa de unas decenas de triángulos: son bichos de 3mm vistos de cerca, no
+ * aquí pasa de unas decenas de triángulos: son bichos de 3mm vistos de cerca, no
  * héroes de cinemática. Los segmentos se piden por `det` (detalle por tier).
  */
 import * as THREE from 'three';
@@ -154,7 +154,7 @@ export function orugaGeom(tier = 'medio') {
  * manchas naranjas, muy distinta al adulto redondo" — el campesino la ve, no la
  * reconoce, y la mata. Está matando a la mariquita que más pulgón le come.
  *
- * Todo acá está al servicio de que se lea, se recuerde y no se confunda:
+ * Todo aquí está al servicio de que se lea, se recuerde y no se confunda:
  *   · SEGMENTADA y AHUSADA hacia la cola — la silueta de "cocodrilito", lo más
  *     lejos posible del domo redondo del adulto. La confusión es el enemigo:
  *     el dibujo tiene que gritar "NO me parezco a lo que vos conocés".
@@ -232,7 +232,7 @@ export function larvaMariquitaGeom(tier = 'medio') {
 /*
  * La mariquita ADULTA: el domo rojo con puntos. La única que el campesino ya
  * reconoce — y, en el reloj de su vida, la etapa MÁS CORTA. Se dibuja bien
- * porque es el ancla: el ojo aterriza acá y entiende que el cocodrilito de al
+ * porque es el ancla: el ojo aterriza aquí y entiende que el cocodrilito de al
  * lado es el mismo bicho.
  */
 export function mariquitaGeom(tier = 'medio') {
@@ -492,7 +492,7 @@ export function momiaGeom(tier = 'medio', abierta = true) {
     p.push(poner(disco(0.13, d, PAL.momiaTapa), { rot: [-Math.PI / 2, 0, 0], pos: [0, 0.29, -0.04] }));
     /* LA TAPITA, medio levantada, colgando de su bisagra de quitina. Ese
        detalle —que quede colgando y no desaparezca— es lo que hace que se lea
-       "acá salió algo vivo" y no "acá hay un hueco". */
+       "aquí salió algo vivo" y no "aquí hay un hueco". */
     p.push(poner(disco(0.13, d, PAL.momia), { rot: [-2.2, 0, 0], pos: [0, 0.36, -0.26] }));
   }
   return fundir(p);
@@ -688,7 +688,7 @@ export function beauveriaGeom(tier = 'medio') {
   const d = detDeTier(tier);
   const r = rng(451);
   /* el cuerpo de la broca: escarabajito negro, "del tamaño de una cabeza de
-     alfiler" — acá agrandado, porque si no, no se enseña nada. */
+     alfiler" — aquí agrandado, porque si no, no se enseña nada. */
   const p = [poner(esfera(0.26, d, PAL.mariquitaPunto), { esc: [0.8, 0.8, 1.25] })];
   /* LA PELUSA: la erupción blanca que lo cubre todo. */
   const pelos = tier === 'bajo' ? 10 : tier === 'medio' ? 22 : 40;
@@ -714,7 +714,7 @@ export function metarhiziumGeom(tier = 'medio') {
   const d = detDeTier(tier);
   const r = rng(77);
   const p = [];
-  /* la chiza: "larva blanca, gorda, curvada en C" — acá ya verde, ya vencida. */
+  /* la chiza: "larva blanca, gorda, curvada en C" — aquí ya verde, ya vencida. */
   const segs = tier === 'bajo' ? 5 : 8;
   for (let i = 0; i < segs; i++) {
     const t = i / (segs - 1);
@@ -895,7 +895,7 @@ export function alambreGeom(tier = 'medio') {
     const x = -1.2 + i * 1.2;
     p.push(poner(cilindro(0.045, 0.04, 1.1, d, PAL.ceniza), { pos: [x, 0.55, 0] }));
   }
-  /* dos hilos de alambre y ni una hoja: nadie vive acá */
+  /* dos hilos de alambre y ni una hoja: nadie vive aquí */
   for (const y of [0.6, 0.95]) {
     p.push(poner(cilindro(0.008, 0.008, 3.2, d, PAL.ceniza), { pos: [0, y, 0], rot: [0, 0, Math.PI / 2] }));
   }

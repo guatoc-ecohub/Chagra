@@ -2,7 +2,7 @@
  * dinamicaPlaga — EL ARGUMENTO, HECHO NÚMEROS.
  *
  * Esta es la pieza que decide si el mundo dice la verdad o solo hace una
- * animación bonita. La escena NO decide a mano "acá el pulgón explota porque
+ * animación bonita. La escena NO decide a mano "aquí el pulgón explota porque
  * queda dramático": corre este modelo y DIBUJA EL RESULTADO. Si el modelo dijera
  * otra cosa, la escena mostraría otra cosa. Esa es la diferencia entre enseñar y
  * hacer propaganda — y a un campesino que se juega la comida no se le hace

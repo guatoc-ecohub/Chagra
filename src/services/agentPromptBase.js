@@ -242,7 +242,7 @@ const GLOSARIO_REGIONAL = [
   [['palo'], '- palo = árbol grande (tronco principal)'],
   [['almacigo'], '- almácigo = vivero / semillero'],
   [['soca'], '- soca = rebrote del café después de cosecha o poda fuerte'],
-  [['encerrar'], '- encerrar = cosechar (uso Boyacá, también "recoger")'],
+  [['encerrar'], '- encerrar = cosechar (uso Boyaquí, también "recoger")'],
   [['trillar'], '- trillar = separar grano de cáscara'],
   [['chamizo'], '- chamizo = ramas secas / Chusquea (bambú andino) que invade lote'],
   [['chusque'], '- chusque = Chusquea sp. (bambú andino, frecuente en cafetales)'],
@@ -631,7 +631,7 @@ REGLA: si el usuario dice solo "picudo" sin especificar cultivo, pide cuál cult
 
   const regional = GLOSARIO_REGIONAL.filter(([keys]) => _mentionsAny(mention, keys)).map(([, l]) => l);
   if (regional.length > 0) {
-    sections.push(`Glosario regionalismos campesinos (Boyacá / Caldas / Choachí):\n${regional.join('\n')}`);
+    sections.push(`Glosario regionalismos campesinos (Boyaquí / Caldas / Choachí):\n${regional.join('\n')}`);
   }
 
   sections.push(`COLOQUIAL vs DESCONOCIDO:

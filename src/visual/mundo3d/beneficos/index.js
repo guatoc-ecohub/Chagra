@@ -61,6 +61,6 @@ export {
 
 export { PARAMS, paso, serie, muestra, espejo, veredicto } from './dinamicaPlaga.js';
 
-/* La escena NO se re-exporta acá a propósito: arrastraría three (y react-three)
+/* La escena NO se re-exporta aquí a propósito: arrastraría three (y react-three)
    al bundle base y este barrel dejaría de ser seguro. Se importa perezosa desde
    el host, como manda la casa. */

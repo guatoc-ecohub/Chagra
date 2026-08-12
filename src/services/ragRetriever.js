@@ -694,7 +694,7 @@ async function embedQuery(queryText) {
       // conserva pero en Ollama 0.24 NO fuerza CPU (verificado en vivo) — la
       // mitigación que sí funciona es keep_alive:'0s'.
       //
-      // INVARIANTE CRÍTICA: el modelo de acá DEBE coincidir con el que indexó
+      // INVARIANTE CRÍTICA: el modelo de aquí DEBE coincidir con el que indexó
       // `public/rag-embeddings.json`. Si no coinciden, cosineSimilarity() descarta
       // todos los pares por `a.length !== b.length` (dimensiones distintas) y el
       // híbrido cae a BM25-only EN SILENCIO (+0.0pp semántico). Ya pasó el

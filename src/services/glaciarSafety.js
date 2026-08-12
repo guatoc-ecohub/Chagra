@@ -207,7 +207,7 @@ export function evaluarSeguridadGlaciar(reporte = {}) {
     return { ...EST.peligro, razones: razonesPeligro };
   }
 
-  // A partir de acá NO hay disparadores 🔴.
+  // A partir de aquí NO hay disparadores 🔴.
   const razonesPrecaucion = [];
 
   // ── 🟡 hielo azul con dureza H2 ──

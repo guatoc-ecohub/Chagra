@@ -34,7 +34,7 @@
  * rojo. Sería traicionar el dato: si el H₂S se viera, no mataría a nadie. Mata
  * PORQUE no se ve y porque deja de olerse justo cuando abunda.
  *
- * Así que acá el peligro es una lámina pardo-violácea, opaca y absolutamente
+ * Así que aquí el peligro es una lámina pardo-violácea, opaca y absolutamente
  * inmóvil, que llena el hueco hasta el ras del brocal — como si la fosa
  * estuviera llena de un agua que no refleja. No hay burbujas, no hay volutas,
  * no pasa nada. El que se asoma mete la cabeza adentro sin enterarse.

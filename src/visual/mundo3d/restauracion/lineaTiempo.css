@@ -62,7 +62,7 @@
   color: var(--lt-tenue);
   max-width: 54ch;
   /* Alto fijo: el panel no debe saltar al cambiar de etapa (el ojo está en la
-     ladera, no acá abajo). */
+     ladera, no aquí abajo). */
   min-height: 3.6em;
 }
 

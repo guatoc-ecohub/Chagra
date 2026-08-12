@@ -338,7 +338,7 @@
   36% { transform: translate(-1.1px, -0.4px) rotate(4deg); }   /* wobble (double-take) */
   41% { transform: translate(0.4px, 0.2px) rotate(-2deg); }    /* rebote de vuelta */
   59% { transform: translate(0.25px, 0) rotate(3.5deg); }      /* wiggle: menea… */
-  63% { transform: translate(-0.25px, 0) rotate(-3.5deg); }    /* …para acá… */
+  63% { transform: translate(-0.25px, 0) rotate(-3.5deg); }    /* …para aquí… */
   67% { transform: translate(0.15px, 0) rotate(2deg); }        /* …y asienta contenta */
   79% { transform: translate(0, -0.95px) rotate(4deg); }       /* brinquito curioso */
   84% { transform: translate(0, 0.3px) rotate(-2deg); }
@@ -872,7 +872,7 @@
   49%  { transform: translate(3.9px, -1.1px) rotate(11deg); }     /* anticipa al revés */
   54%  { transform: translate(-2.7px, 1.2px) rotate(-11deg); }    /* dardo de vuelta */
   58%  { transform: translate(-2.1px, 0.9px) rotate(-3deg); }     /* asienta elástico */
-  71%  { transform: translate(-2.2px, 1px) rotate(-4deg); }       /* se cierne acá */
+  71%  { transform: translate(-2.2px, 1px) rotate(-4deg); }       /* se cierne aquí */
   75%  { transform: translate(-1.9px, -2.5px) rotate(4deg); }     /* dardo vertical corto */
   79%  { transform: translate(-1.7px, -2.1px) rotate(0deg); }
   91%, 100% { transform: translate(0, 0) rotate(0deg); }          /* vuelve al centro */

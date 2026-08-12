@@ -113,7 +113,7 @@ const OPTION_EMOJI = {
  * preguntas de lista (cultivos) los toques se van sumando con coma.
  */
 const EXAMPLE_CHIPS = {
-  region: { values: ['Choachí', 'Fómeque', 'Cauca', 'Boyacá'], append: false },
+  region: { values: ['Choachí', 'Fómeque', 'Cauca', 'Boyaquí'], append: false },
   cultivos_actuales: { values: ['Café', 'Plátano', 'Tomate', 'Mora', 'Maíz'], append: true },
   cultivos_interes: { values: ['Aguacate', 'Cacao', 'Uchuva', 'Hortalizas'], append: true },
   invernadero_tamano: { values: ['6 x 10 metros', 'Uno pequeño', 'Media hectárea'], append: false },

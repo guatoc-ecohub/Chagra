@@ -182,7 +182,7 @@ export const CLIMAS = {
     burbujas: 0.38, // MENOS gas: se ve
     velocidad: 0.55, // y más lento: se ve
     invernadero: true, // la respuesta: ganarle grados al páramo
-    nota: 'En tierra fría rinde menos: las mismas bacterias trabajan lentas y el estiércol tiene que quedarse muchos más días adentro para dar el mismo gas. Por eso acá se le pone el invernadero encima y se le busca el sol.',
+    nota: 'En tierra fría rinde menos: las mismas bacterias trabajan lentas y el estiércol tiene que quedarse muchos más días adentro para dar el mismo gas. Por eso aquí se le pone el invernadero encima y se le busca el sol.',
   },
 };
 
@@ -431,7 +431,7 @@ export function recorridoGas() {
     new THREE.Vector3(TOMA_GAS.x, TOMA_GAS.y + 0.04, -0.02),
     new THREE.Vector3(TOMA_GAS.x - 0.35, TOMA_GAS.y + 0.26, 0.34),
     new THREE.Vector3(-1.6, 0.42, 0.76),
-    trampa, // ── la manguera baja: el agua se junta acá y se saca
+    trampa, // ── la manguera baja: el agua se junta aquí y se saca
     new THREE.Vector3(-2.3, 0.36, 1.5),
     new THREE.Vector3(VALVULA.pos[0], VALVULA.aguaY + 0.5, VALVULA.pos[2] - 0.02), // al sello
   ];

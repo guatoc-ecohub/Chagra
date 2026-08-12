@@ -8,12 +8,12 @@
  *
  * LEY DE LA CASA, sin excepciones:
  *   - Color: SOLO de la paleta madre (`../paleta`). Ni un hex de vegetación
- *     inventado acá; lo que falta se deriva con `mezclar` desde el pariente.
+ *     inventado aquí; lo que falta se deriva con `mezclar` desde el pariente.
  *   - Luz: `<LuzMadre>` con la familia `CIELOS.sotobosque` mezclada 60% hacia la
  *     madre por `mezclarCielo`. Cero rig propio, cero números calcados.
  *   - Geometría fusionada: `fusionarSeguro` SIEMPRE. Mezclar una geometría
  *     indexada con una no indexada hace que `mergeGeometries` devuelva null EN
- *     SILENCIO y la especie no se dibuje — acá truena y dice quién falló.
+ *     SILENCIO y la especie no se dibuje — aquí truena y dice quién falló.
  *   - La fauna es SVG colgado como billboard (`JaguarBillboard`), nunca un
  *     felino de geometría procedural.
  *
@@ -157,7 +157,7 @@ function construirArbol() {
 }
 
 /* Una mata de hierba: dos cuñas cruzadas, color por vértice (mismo atributo que
-   el árbol para que la ley de fusión se cumpla también acá). */
+   el árbol para que la ley de fusión se cumpla también aquí). */
 function construirMata() {
   const partes = [];
   const pintar = (g, hex) => {

@@ -2,7 +2,7 @@
  * Los textos de UI de esta tarjeta (título "Mi finca viva", aria-labels,
  * resúmenes) son strings de interfaz. Su migración a src/config/messages.js es
  * la TAREA i18n de ADR-050 (transversal a toda la app), fuera del alcance de
- * esta feature visual. Se silencia el warning soft acá para no arrastrar ese
+ * esta feature visual. Se silencia el warning soft aquí para no arrastrar ese
  * refactor i18n — mismo criterio que FincaCards.jsx en este mismo directorio. */
 import { useEffect, useMemo, useState } from 'react';
 import { Sprout, ChevronRight } from 'lucide-react';
