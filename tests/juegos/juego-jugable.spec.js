@@ -89,7 +89,10 @@ test.describe(`Juego jugable: ${JUEGO_SLUG}`, () => {
     await page.goto(JUEGO_URL, { waitUntil: 'domcontentloaded', timeout: 30000 });
 
     // Esperar a que el canvas esté presente y tenga tamaño > 0
-    const canvas = page.locator('canvas');
+    // Prioridad: canvas con id="game", fallback al primer canvas
+    const canvasGame = page.locator('canvas#game');
+    const canvasCount = await page.locator('canvas').count();
+    const canvas = canvasCount > 0 && (await canvasGame.count()) > 0 ? canvasGame : page.locator('canvas').first();
     await expect(canvas, 'El juego debe tener un elemento canvas').toBeVisible({ timeout: 15000 });
 
     // Validar que el canvas tenga dimensiones reales (no 0x0)
@@ -172,7 +175,10 @@ test.describe(`Juego jugable: ${JUEGO_SLUG}`, () => {
     await expect(page, 'La página debe cargar').toHaveTitle(/./); // Cualquier título no vacío
 
     // Verificar que haya un canvas visible
-    const canvas = page.locator('canvas');
+    // Prioridad: canvas con id="game", fallback al primer canvas
+    const canvasGame = page.locator('canvas#game');
+    const canvasCount = await page.locator('canvas').count();
+    const canvas = canvasCount > 0 && (await canvasGame.count()) > 0 ? canvasGame : page.locator('canvas').first();
     await expect(canvas, 'Debe haber un canvas visible').toBeVisible({ timeout: 15000 });
 
     // Validar que el canvas esté en el viewport y sea interactuable
