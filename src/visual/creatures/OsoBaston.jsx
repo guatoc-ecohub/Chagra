@@ -139,7 +139,7 @@ export function OsoBaston({
   vida = true,
   /* Device-tier: 'bajo' apaga el idle continuo; el bastón y su corona quedan
      en fotograma digno (la firma no se negocia, la cadencia sí). */
-  tier,
+  tier = undefined,
   /* Line-boil (opt-in, capa cara): la línea que respira años-30. */
   lineBoil = false,
   /* MODO PODER (opt-in, standalone): aura VERDE del bastón florecido. */
