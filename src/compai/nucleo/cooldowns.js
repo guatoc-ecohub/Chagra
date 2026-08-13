@@ -23,7 +23,7 @@ export const LLAVE_HEREDADA_ANGELITA = 'chagra:angelita:antimolestia';
 /**
  * Lee los cooldowns del compañero, mirando la llave canónica y, si está vacía,
  * la heredada. Nunca lanza (modo privado, cuota llena).
- * @param {Storage} [storage] — inyectable para tests.
+ * @param {Storage} [storage] - inyectable para tests.
  * @returns {Record<string, number>} cooldowns { [llave]: timestampMs }.
  */
 export function leerCooldowns(storage) {

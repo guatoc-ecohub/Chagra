@@ -18,6 +18,18 @@ class StorageFalso {
     this._items[key] = value;
   }
 
+  removeItem(key) {
+    delete this._items[key];
+  }
+
+  key(index) {
+    return Object.keys(this._items)[index] ?? null;
+  }
+
+  get length() {
+    return Object.keys(this._items).length;
+  }
+
   clear() {
     this._items = {};
   }
@@ -92,8 +104,12 @@ describe('cooldowns — núcleo portable', () => {
 
   it('falla silenciosamente en modo privado (storage lanza excepción)', () => {
     const stMalvado = {
+      length: 0,
       getItem: () => { throw new Error('modo privado'); },
       setItem: () => { throw new Error('modo privado'); },
+      removeItem: () => { throw new Error('modo privado'); },
+      key: () => null,
+      clear: () => { throw new Error('modo privado'); },
     };
 
     expect(() => leerCooldowns(stMalvado)).not.toThrow();
