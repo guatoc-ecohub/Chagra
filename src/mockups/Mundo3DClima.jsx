@@ -37,7 +37,8 @@ const LEYENDA = [
   { emoji: '❄️', titulo: 'La helada avisa', texto: 'En los pisos fríos la helada llega de madrugada con cielo despejado. Leerla a tiempo salva la papa y la mora de una mala noche.' },
 ];
 
-export default function Mundo3DClima() {
+/** @param {{ onBack?: () => void }} [props] */
+export default function Mundo3DClima({ onBack = undefined } = {}) {
   // Device-tiering REAL (una vez): gama baja / ahorro / menos-movimiento → 2D.
   const decision = useMemo(() => decidirTier(), []);
   const reducedMotion = useMemo(
@@ -59,6 +60,11 @@ export default function Mundo3DClima() {
   return (
     <main className="m3dc" style={{ '--m3dc-a': TINTE[0], '--m3dc-b': TINTE[1] }}>
       <header className="m3dc__head">
+        {onBack && (
+          <button type="button" className="m3dc__volver" onClick={onBack}>
+            ← Volver
+          </button>
+        )}
         <p className="m3dc__kicker">Los mundos de su finca · vitrina</p>
         <h1>El mundo del clima</h1>
         <p className="m3dc__lema">
