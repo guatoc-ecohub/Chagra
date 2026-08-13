@@ -512,7 +512,11 @@ function AguaQuebrada({ reducedMotion }) {
         <sphereGeometry args={[1, 8, 5]} />
         <meshBasicMaterial color="#eef7f3" transparent opacity={0.55} depthWrite={false} />
         {ESPUMAS_QUIETAS.map((e, i) => (
-          <Instance key={i} position={e.pos} scale={e.escala} />
+          <Instance
+            key={i}
+            position={/** @type {[number, number, number]} */ (e.pos)}
+            scale={/** @type {[number, number, number]} */ (e.escala)}
+          />
         ))}
       </Instances>
 
@@ -539,7 +543,7 @@ function AguaQuebrada({ reducedMotion }) {
           <sphereGeometry args={[1, 8, 6]} />
           <meshBasicMaterial color="#e6efec" transparent opacity={0.07} depthWrite={false} />
           {MOTAS.map((m, i) => (
-            <Instance key={i} position={m.pos} scale={m.r} />
+            <Instance key={i} position={/** @type {[number, number, number]} */ (m.pos)} scale={m.r} />
           ))}
         </Instances>
       </group>
@@ -592,7 +596,13 @@ function MonteQuebrada() {
         <boxGeometry args={[1, 1, 1]} />
         <meshLambertMaterial color="#ffffff" flatShading />
         {FARALLONES.map((f, i) => (
-          <Instance key={i} position={f.pos} rotation={f.rot} scale={f.escala} color={f.color} />
+          <Instance
+            key={i}
+            position={/** @type {[number, number, number]} */ (f.pos)}
+            rotation={/** @type {[number, number, number]} */ (f.rot)}
+            scale={/** @type {[number, number, number]} */ (f.escala)}
+            color={f.color}
+          />
         ))}
       </Instances>
 
@@ -601,7 +611,13 @@ function MonteQuebrada() {
         <dodecahedronGeometry args={[1, 0]} />
         <meshLambertMaterial color="#ffffff" flatShading />
         {CANTOS.map((c, i) => (
-          <Instance key={i} position={c.pos} rotation={c.rot} scale={c.escala} color={c.color} />
+          <Instance
+            key={i}
+            position={/** @type {[number, number, number]} */ (c.pos)}
+            rotation={/** @type {[number, number, number]} */ (c.rot)}
+            scale={/** @type {[number, number, number]} */ (c.escala)}
+            color={c.color}
+          />
         ))}
       </Instances>
 
@@ -610,7 +626,13 @@ function MonteQuebrada() {
         <sphereGeometry args={[1, 6, 4]} />
         <meshLambertMaterial color="#ffffff" />
         {GUIJARROS.map((g, i) => (
-          <Instance key={i} position={g.pos} rotation={g.rot} scale={g.escala} color={g.color} />
+          <Instance
+            key={i}
+            position={/** @type {[number, number, number]} */ (g.pos)}
+            rotation={/** @type {[number, number, number]} */ (g.rot)}
+            scale={/** @type {[number, number, number]} */ (g.escala)}
+            color={g.color}
+          />
         ))}
       </Instances>
     </group>
