@@ -20,9 +20,13 @@
  * amanecer; el de la sequía, la luz blanca del mediodía), el device-tiering real
  * (decidirTier/perfilDeTier), el PRNG determinista de particulasData (crearRng —
  * cero Math.random en render), el kit ParticulasAmbientales (polen ambiental y
- * el vaho del microclima) y las piezas InvernaderoTunel/AlmacenBodega de
+ * el vaho del microclima), las piezas InvernaderoTunel/AlmacenBodega de
  * piezasInfra (importadas tal cual; el reservorio es propio porque su nivel de
- * agua debe ANIMARSE, y el disco del TanqueAgua del catálogo es fijo).
+ * agua debe ANIMARSE, y el disco del TanqueAgua del catálogo es fijo) y el
+ * VOCABULARIO rubber-hose ya canónico de momentosData.js/kit/ruido.js
+ * (clamp01/easeOutBack/arcoDeVuelo, smoothstep): este demo antes reimplementaba
+ * su propio `reboteSuave`/`suave` a mano — la MISMA curva que ya vive en
+ * MomentosFinca.jsx (el vuelo del fruto al canasto). Ahora hay una sola.
  *
  * FRUGALIDAD bajo frameloop="demand": nada corre por frame en reposo. Cada
  * transición se auto-sostiene con invalidate() dentro de su useFrame y SUELTA el
@@ -43,6 +47,8 @@ import {
   InvernaderoTunel,
   AlmacenBodega,
 } from '../visual/mundo3d/infraestructura/piezasInfra.jsx';
+import { clamp01, easeOutBack, arcoDeVuelo } from '../visual/mundo3d/momentosData.js';
+import { smoothstep } from '../visual/mundo3d/kit/ruido.js';
 
 /* ── Dirección de arte local (derivada de la madre, nunca inventada) ───────── */
 
@@ -56,18 +62,6 @@ const PASTO_SECO = '#b8a35f'; // el mismo reseco de los efectos de vida del cat�
 const CIELO_BASE = new THREE.Color(ATMOSFERA.fondo);
 const CIELO_LLUVIA = new THREE.Color(mezclar(ATMOSFERA.fondo, CIELOS_HORA.amanecer.relleno, 0.55));
 const CIELO_SEQUIA = new THREE.Color(mezclar(ATMOSFERA.fondo, CIELOS_HORA.mediodia.luz, 0.6));
-
-/* ── Helpers puros (rubber-hose) ───────────────────────────────────────────── */
-
-const clamp01 = (v) => Math.min(1, Math.max(0, v));
-const suave = (t) => t * t * (3 - 2 * t); // smoothstep: arranca y llega sin golpe
-
-/* ease-out-back: llega, se pasa tantico y asienta (overshoot rubber-hose). */
-function reboteSuave(t) {
-  const c1 = 1.70158;
-  const c3 = c1 + 1;
-  return 1 + c3 * Math.pow(t - 1, 3) + c1 * Math.pow(t - 1, 2);
-}
 
 /* ── Constantes de cada diorama ────────────────────────────────────────────── */
 
@@ -227,7 +221,7 @@ function EscenaInvernadero({ prendido, tier, reducedMotion }) {
       const paso = Math.min(Math.abs(dif), Math.min(delta, 0.05) / DUR_CRECIDA);
       crecida.current += Math.sign(dif) * paso;
     }
-    const e = reboteSuave(clamp01(crecida.current));
+    const e = easeOutBack(clamp01(crecida.current));
     g.scale.set(0.84 + e * 0.16, 0.72 + e * 0.58, 0.84 + e * 0.16);
     if (!reducedMotion && Math.abs(objetivo - crecida.current) > 1e-4) invalidate();
   });
@@ -350,15 +344,16 @@ function EscenaAlmacen({ guardadas, volando, alAterrizar, reducedMotion }) {
         const g = sacosVuelo.current[i];
         if (!g) continue;
         const ti = clamp01((t - i * ESCALON_SACO) / DUR_SACO);
-        const e = suave(ti);
+        const e = smoothstep(0, 1, ti);
+        const arco = arcoDeVuelo(e);
         const o = ORIGENES_SACO[i];
         const d = destinos[i];
         g.position.set(
           o[0] + (d[0] - o[0]) * e,
-          o[1] + (d[1] - o[1]) * e + Math.sin(Math.PI * e) * ALTURA_ARCO,
+          o[1] + (d[1] - o[1]) * e + arco * ALTURA_ARCO,
           o[2] + (d[2] - o[2]) * e,
         );
-        const sy = 1 + 0.35 * Math.sin(Math.PI * e);
+        const sy = 1 + 0.35 * arco;
         const sxz = 1 / Math.sqrt(sy);
         g.scale.set(sxz, sy, sxz);
       }
