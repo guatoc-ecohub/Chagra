@@ -9,11 +9,14 @@
  *
  * REGLA DEL FALLBACK: todo tipo del registro sin `EscenaComponent` propio cae
  * a Angelita (mejor la abeja que un compañero volando con coreografía ajena).
- * Desde 2026-07-29 los TRES tipos tienen presencia propia: Angelita
- * (useEntradaAbeja, la nativa), el MAÍZ (MaizCompaiEscena: arraigado, brota y
- * se inclina al foco) y la ZARIGÜEYA (ZariguyaCompaiEscena: trota por el piso
- * y se encarama — jamás vuela). El mundo refleja la elección SIN tocar
- * EscenaBase3D ni las escenas de cada mundo.
+ * Desde 2026-08-13 los SEIS tipos tienen presencia propia: Angelita
+ * (useEntradaAbeja, la nativa), el MAÍZ (arraigado: brota y se inclina), la
+ * ZARIGÜEYA (trota por el piso y se encarama — jamás vuela), el JAGUAR
+ * (acecha, camina pesado y silencioso, se echa — jamás vuela ni trota), el
+ * OSO DEL BASTÓN (anda erguido y lento, se apoya en el cayado, florece al
+ * llegar) y la LUCIÉRNAGA (deriva lento y PULSA LUZ — vuela, pero jamás como
+ * la abeja). El mundo refleja la elección SIN tocar EscenaBase3D ni las
+ * escenas de cada mundo.
  *
  * NOTA de peso: desde que Fable registró las escenas, este módulo SÍ arrastra
  * arte (y three, transitivamente). Es correcto: vive dentro de escenas/ (el
@@ -23,8 +26,14 @@
 import { ABEJA_PRESENCIA } from '../../creatures/abejaIdentidad.js';
 import { MAIZ_PRESENCIA } from '../../creatures/maizIdentidad.js';
 import { ZARIGUYA_PRESENCIA } from '../../creatures/zariguyaIdentidad.js';
+import { JAGUAR_PRESENCIA } from '../../creatures/jaguarIdentidad.js';
+import { OSO_BASTON_PRESENCIA } from '../../creatures/osoBastonIdentidad.js';
+import { LUCIERNAGA_PRESENCIA } from '../../creatures/luciernagaIdentidad.js';
 import { MaizCompaiEscena } from './MaizCompaiEscena.jsx';
 import { ZariguyaCompaiEscena } from './ZariguyaCompaiEscena.jsx';
+import { JaguarCompaiEscena } from './JaguarCompaiEscena.jsx';
+import { OsoBastonCompaiEscena } from './OsoBastonCompaiEscena.jsx';
+import { LuciernagaCompaiEscena } from './LuciernagaCompaiEscena.jsx';
 import { AVATAR_TYPES, DEFAULT_AVATAR_TYPE } from '../../../hooks/useAgentAvatarType.js';
 
 /**
@@ -68,15 +77,19 @@ const REGISTRO = {
   // trotando, merodea, se encarama al foco en alto y husmea. Crías al lomo
   // de serie (su firma). Jamás vuela.
   zariguya: { EscenaComponent: ZariguyaCompaiEscena, presencia: ZARIGUYA_PRESENCIA, especie: 'zariguya', pendienteFable: false },
-  // Jaguar, oso del bastón y luciérnaga (ítem #8 del GAP compAI, 2026-08-13):
-  // ya tienen cuerpo 2.5D propio (avatares/catálogo) pero TODAVÍA no tienen
-  // coreografía de presencia 3D en los mundos (billboard/percha/sombra
-  // propios) — `pendienteFable:true` los deja explícitos como pendientes.
-  // Caen a la regla del fallback: se ven como Angelita dentro de un mundo 3D
-  // hasta que Fable les construya su propio `EscenaComponent`.
-  jaguar: { EscenaComponent: null, presencia: ABEJA_PRESENCIA, especie: 'jaguar', pendienteFable: true },
-  'oso-baston': { EscenaComponent: null, presencia: ABEJA_PRESENCIA, especie: 'oso-baston', pendienteFable: true },
-  luciernaga: { EscenaComponent: null, presencia: ABEJA_PRESENCIA, especie: 'luciernaga', pendienteFable: true },
+  // El JAGUAR compañero (fable F26): felino DE SUELO — entra acechando desde
+  // el borde, camina pesado y silencioso (rodar de hombros, cero bob), viaja
+  // con la marcha de perfil del cuerpo, patrulla en óvalos amplios y se echa.
+  // Jamás vuela, jamás trota.
+  jaguar: { EscenaComponent: JaguarCompaiEscena, presencia: JAGUAR_PRESENCIA, especie: 'jaguar', pendienteFable: false },
+  // El OSO DEL BASTÓN compañero (fable F26): caminante de trocha — llega a
+  // pie, anda erguido y LENTO, se detiene a apoyarse en el cayado, y al
+  // llegar a su marca el bastón FLORECE (su ecología hecha celebración).
+  'oso-baston': { EscenaComponent: OsoBastonCompaiEscena, presencia: OSO_BASTON_PRESENCIA, especie: 'oso-baston', pendienteFable: false },
+  // La LUCIÉRNAGA compañera (fable F26): sí vuela, pero NO como la abeja —
+  // se ENCIENDE por pulsos al entrar, deriva lento y bajo, PULSA luz, se
+  // detiene a leer la noche y con alerta de finca titila 'degradado'.
+  luciernaga: { EscenaComponent: LuciernagaCompaiEscena, presencia: LUCIERNAGA_PRESENCIA, especie: 'luciernaga', pendienteFable: false },
 };
 
 /**
