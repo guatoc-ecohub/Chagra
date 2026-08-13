@@ -142,8 +142,8 @@ describe('creatureIdle — gates (noche, reduced-motion, tier)', () => {
 });
 
 describe('creatureIdle — genérica por especie (misma máquina, otro animal)', () => {
-  it('los cuatro perfiles de la casa existen y declaran su medio', () => {
-    for (const slug of ['abeja-angelita', 'colibri', 'oso-andino', 'rana-dorada']) {
+  it('los perfiles de la casa existen y declaran su medio', () => {
+    for (const slug of ['abeja-angelita', 'colibri', 'luciernaga', 'guacamaya', 'chivito', 'oso-andino', 'rana-dorada']) {
       expect(IDLE_PERFILES[slug]).toBeDefined();
       expect(['aire', 'suelo']).toContain(IDLE_PERFILES[slug].medio);
       expect(IDLE_PERFILES[slug].poseBase).toBeTruthy();

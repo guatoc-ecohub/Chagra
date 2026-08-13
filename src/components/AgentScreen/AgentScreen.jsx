@@ -154,7 +154,7 @@ import { fincaVivaHomePerfilActivo } from '../../config/fincaVivaHomeFlag';
 // texto del turno (cultivo detectado → dato con fuente que el usuario no vio).
 // El hook useInsightProactivo exporta estas funciones puras; aquí las usamos
 // imperativamente al cerrar cada turno para ofrecer el insight DENTRO del chat.
-import { detectarSlugEnTexto, elegirInsight } from '../../hooks/useInsightProactivo';
+import { detectarSlugEnTexto, elegirInsight, detectarInsightCatalogo } from '../../hooks/useInsightProactivo';
 import usePrefsStore from '../../store/usePrefsStore';
 import useAssetStore from '../../store/useAssetStore';
 import useAgentNotificationStore from '../../store/useAgentNotificationStore';
@@ -2583,6 +2583,16 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
           if (candidato && candidato.id) {
             insightProactivo = candidato;
             insightsVistosRef.current = [...insightsVistosRef.current, candidato.id];
+          }
+        }
+        // Las cards históricas cubren cultivos conocidos. Para el resto, el
+        // resolver consulta el catálogo real y sólo deriva un dato estructurado
+        // si existe evidencia utilizable.
+        if (!insightProactivo && typeof detectarInsightCatalogo === 'function') {
+          const resultadoCatalogo = await detectarInsightCatalogo(textoTurno, insightsVistosRef.current);
+          if (resultadoCatalogo?.insight?.id) {
+            insightProactivo = resultadoCatalogo.insight;
+            insightsVistosRef.current = [...insightsVistosRef.current, resultadoCatalogo.insight.id];
           }
         }
       } catch (e) {
