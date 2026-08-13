@@ -1,4 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { ENV } from '../../config/env.js';
 
 // Mocks DEBEN declararse antes del import del módulo bajo test.
 // Audit 2026-05-18 #4: integramos RAG en analyzeFoliage; estos tests
@@ -167,7 +168,7 @@ describe('aiService — analyzeFoliage integración RAG', () => {
 
     expect(streamOllamaMock).toHaveBeenCalledTimes(1);
     const [, body, , options] = streamOllamaMock.mock.calls[0];
-    expect(body.model).toBe('qwen3-vl:8b');
+    expect(body.model).toBe(ENV.VISION_MODEL);
     expect(body.prompt).toContain('<CONTEXTO_CIENTÍFICO>');
     expect(body.prompt).toContain('Mycosphaerella fragariae');
     expect(body.prompt).toContain('caldo bordelés');
