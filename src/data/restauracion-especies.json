@@ -25,9 +25,7 @@
         { "nombre": "Chilco", "cientifico": "Baccharis latifolia", "nota": "Colonizador rapido de taludes" }
       ],
       "intermedias": [
-        { "nombre": "Arrayan", "cientifico": "Myrcianthes leucoxyla", "nota": "Aguanta sequia, fruto para aves" },
-        { "nombre": "Roble andino", "cientifico": "Quercus humboldtii", "nota": "Lento, madera densa, >100 anos" },
-        { "nombre": "Encenillo", "cientifico": "Weinmannia tomentosa", "nota": "Tipico de bosque andino" }
+        { "nombre": "Roble andino", "cientifico": "Quercus humboldtii", "nota": "Lento, madera densa, >100 anos" }
       ],
       "climax": [
         { "nombre": "Laurel de cera", "cientifico": "Morella pubescens", "nota": "Sostiene fauna, laderas" },
@@ -41,6 +39,7 @@
         { "nombre": "Mortino", "cientifico": "Hesperomeles goudotiana", "nota": "Fruto silvestre, suelo acido" }
       ],
       "intermedias": [
+        { "nombre": "Arrayan", "cientifico": "Myrcianthes leucoxyla", "nota": "Bosque altoandino 2500-3200msnm (grafo chagra_kg), fruto para aves — reubicado desde templado (audit fix/cross-thermal-altitud-filter, 2026-07-10)" },
         { "nombre": "Encenillo", "cientifico": "Weinmannia tomentosa", "nota": "Bosque altoandino" },
         { "nombre": "Polylepis", "cientifico": "Polylepis quadrijuga", "nota": "Arbol mas alto del mundo a >4000m. Corteza paperosa. Amenazado" }
       ],
