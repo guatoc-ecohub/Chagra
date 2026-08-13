@@ -54,6 +54,9 @@ const IMPORTA_ESCENA = {
   // El bosque nativo altoandino de 3 estratos: escena a ESCALA DE BOSQUE,
   // autocontenida (Canvas propio) como el valle — no un diorama de la base.
   bosque: () => import('./escenas/EscenaBosque.jsx'),
+  // La QUEBRADA con su salto (bosque de niebla andino): cauce rocoso, chorrera,
+  // pozo cristalino y helechos arborescentes. (anti-conflicto: importador nuevo al final.)
+  chorrera: () => import('./escenas/EscenaChorrera.jsx'),
 };
 /* React.lazy EXIGE que la promesa resuelva a `{ default: Componente }`. El
    `importa().then(m => m.default || m)` resolvía al COMPONENTE pelado, así que
