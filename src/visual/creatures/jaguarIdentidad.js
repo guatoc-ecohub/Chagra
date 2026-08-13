@@ -83,3 +83,27 @@ export const PERFIL_JAGUAR = Object.freeze({
   difusa: 0.5,
   sequia: 0.3,
 });
+
+/*
+ * JAGUAR_PODER_KART — el PODER del jaguar como piloto del kart, derivado de la
+ * ecología (no al revés). Mismo shape que el `poder` de los pilotos benéficos
+ * (id, alcance, titulo, efecto, porQue) para que el juego lo consuma sin
+ * traducción. El GESTO que lo representa en el cuerpo 2.5D es el prop
+ * `paisajeDelMiedo` de Jaguar.jsx (la onda de presencia + la mirada afilada).
+ *
+ * El "paisaje del miedo" (landscape of fear) es un concepto ecológico real: la
+ * sola PRESENCIA de un depredador ápice como el jaguar (Panthera onca) altera
+ * la conducta de las presas en TODO el paisaje —dónde comen, por dónde pasan—
+ * sin que medie una sola depredación. Por eso el poder es de ÁREA y NO apunta a
+ * nadie: no caza a un rival, reordena a todos con solo estar ahí.
+ */
+export const JAGUAR_PODER_KART = Object.freeze({
+  id: 'paisaje-del-miedo',
+  alcance: 'area',
+  titulo: 'Paisaje del miedo',
+  efecto: 'Suelta una onda de presencia depredadora: los rivales cercanos frenan y '
+    + 'se dispersan un instante, sin tocarlos. No apunta a nadie — cambia el terreno.',
+  porQue: 'El "paisaje del miedo" es real en ecología: la sola presencia del jaguar, '
+    + 'depredador ápice, altera la conducta de las presas en todo el paisaje sin '
+    + 'depredación directa. El poder es de ÁREA porque el miedo no elige a uno: los reordena a todos.',
+});
