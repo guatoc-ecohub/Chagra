@@ -14,7 +14,7 @@ import { chromium } from 'playwright';
 
 const PORT = process.env.PORT || '5178';
 const BASE = `http://127.0.0.1:${PORT}`;
-const OUT = process.env.OUT_DIR || '/tmp/claude-1000/-home-kortux/93695a3d-dc16-45f5-8c0e-608e6e767ffd/scratchpad/subsuelo-shots';
+const OUT = process.env.OUT_DIR || '/tmp/chagra-shots/subsuelo';
 const FIXED_MS = new Date('2026-06-17T10:30:00-05:00').getTime();
 
 function resolveChromium() {

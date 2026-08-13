@@ -1,6 +1,6 @@
 # Bitácora — Whitelist 3d.guatoc.co + rebase PR #2764
 
-Repo: `/home/kortux/Workspace/chagra`. Todo contra `origin/dev`, nunca `main`.
+Repo: `<WORKSPACE>/chagra`. Todo contra `origin/dev`, nunca `main`.
 
 ## Paso 0 — Setup
 
@@ -43,4 +43,3 @@ Repo: `/home/kortux/Workspace/chagra`. Todo contra `origin/dev`, nunca `main`.
 - Rama actualizada y pusheada (`git push origin rescate/consistencia-rubberhose-d4`, con `LEFTHOOK_EXCLUDE=eslint`).
 - `gh pr view 2764` después del push: **`mergeable: MERGEABLE`** (antes `CONFLICTING`). `mergeStateStatus: UNSTABLE` — los checks de CI (vitest, tsc-gate, bundle sizes, E2E) quedaron en `pending` justo al pushear, aún no corren. **NO mergeado** (por instrucción explícita de la tarea) — queda listo para que el operador lo revise/mergee cuando los checks terminen.
 - **Lo que no pude verificar y por qué**: no esperé a que terminaran los checks de CI en GitHub Actions (vitest/tsc-gate/E2E) porque tardan varios minutos y la tarea pedía dejarlo "mergeable", no verde-en-CI; el build y los tests SÍ los corrí localmente y están verdes salvo los 5 fallos pre-existentes documentados arriba. Tampoco verifiqué visualmente en navegador las 3 criaturas migradas (Escarabajo/Lombriz/Mariposa) ni el line-boil — el merge fue de texto/datos (un solo conflicto en un archivo de configuración numérica), no toqué su lógica ni su CSS, y sus tests unitarios (incluidos en el 771/776) pasan.
-

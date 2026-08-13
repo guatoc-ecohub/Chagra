@@ -2,7 +2,7 @@
 // Necesario porque swiftshader NO re-renderiza geometría instanciada nueva (el páramo salía byte-idéntico).
 // Uso: node gate-real-gpu.mjs <dist-dir> <ruta1>=<nombre1> [<ruta2>=<nombre2> ...]
 //   ej: node gate-real-gpu.mjs /path/dist '/#/mockups/mundo-paramo-3d=paramo'
-import pw from '/home/kortux/Workspace/chagra/node_modules/playwright/index.js';
+import pw from 'playwright';
 const { chromium } = pw;
 import { spawn } from 'node:child_process';
 import { setTimeout as sleep } from 'node:timers/promises';
