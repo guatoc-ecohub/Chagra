@@ -141,6 +141,28 @@ export const IDLE_PERFILES = {
     celebra: { dur: 1.5, grados: 360 },
     noche: { freq: 1.5, amp: 0.05, rot: -3 },
   },
+  /* Guacamaya: vuelo amplio de dosel, con pausas largas en una rama y un
+     banqueo más lento que el de un colibrí. */
+  guacamaya: {
+    medio: 'aire', poseBase: 'vuela',
+    respira: { freq: 1.25, amp: 0.045, vaiven: 0.24 },
+    vuelta: { base: 30, jitter: 4, dur: 1.7, grados: 360, anticipo: 20 },
+    aseo: { base: 15, jitter: 4, dur: 1.2 },
+    percha: { base: 42, jitter: 8, dur: 8 },
+    celebra: { dur: 1.8, grados: 360 },
+    noche: { freq: 0.65, amp: 0.06, rot: -5 },
+  },
+  /* Chivito de páramo: colibrí pequeño de aire frío, con aleteo inquieto y
+     descansos breves en la flor. */
+  chivito: {
+    medio: 'aire', poseBase: 'vuela',
+    respira: { freq: 2.45, amp: 0.032, vaiven: 0.39 },
+    vuelta: { base: 18, jitter: 2.5, dur: 0.9, grados: 360, anticipo: 23 },
+    aseo: { base: 10, jitter: 2.5, dur: 0.75 },
+    percha: { base: 28, jitter: 5, dur: 4.5 },
+    celebra: { dur: 1.3, grados: 360 },
+    noche: { freq: 1.0, amp: 0.045, rot: -4 },
+  },
   /* Tremarctos ornatus — pesado y entrañable: respira hondo, voltereta lenta,
      se rasca la panza largo y se sienta un buen rato. */
   'oso-andino': {

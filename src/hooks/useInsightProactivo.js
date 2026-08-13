@@ -10,11 +10,13 @@
  * @param {string[]} insightsVistos — ids de insight ya vistos por el usuario
  * @returns {{ oferta: object|null, aceptar: () => void, rechazar: () => void }}
  */
-import { useState, useMemo, useCallback } from 'react';
+import { useEffect, useState, useMemo, useCallback } from 'react';
 import todasLasCards from '../data/agro-insight-cards.json';
+import { findCropInText } from '../services/speciesResolver';
+import { datoAgroecologicoReal } from '../compai/nucleo/agroecologia.js';
 
-// Mapa de palabras clave → entity_slug
-// Incluye nombres comunes colombianos y variaciones regionales.
+// Alias de compatibilidad para las cards históricas. La detección nueva no
+// depende de esta lista: consulta findCropInText contra el catálogo vivo.
 const SLUG_KEYWORDS = {
   cafe: ['café', 'cafe', 'cafeto', 'coffea', 'cafetal', 'broca', 'roya', 'guamo cafetero'],
   papa: ['papa', 'potato', 'tubérculo', 'tuberculo', 'gota', 'tecia', 'polilla guatemalteca'],
@@ -67,6 +69,53 @@ export function elegirInsight(slug, insightsVistos = []) {
 }
 
 /**
+ * Convierte un dato estructurado del catálogo en una oferta de insight. La
+ * card es derivada de campos verificables, no una ficha nueva ni un resumen de
+ * prosa libre.
+ *
+ * @param {{species: object, slug: string, matchedName: string}} match
+ * @param {string[]} insightsVistos
+ * @returns {object|null}
+ */
+export function insightDesdeCatalogo(match, insightsVistos = []) {
+  if (!match?.slug || insightsVistos.includes(`catalogo-${match.slug}-agro`)) return null;
+  const especie = match.species || {};
+  const nombre = especie.nombre_comun || especie.name_es || match.matchedName;
+  // El núcleo conserva copy histórico con separadores largos; la tarjeta es
+  // UI nueva y respeta la convención pública de no usar em dash.
+  const dato = datoAgroecologicoReal(nombre, especie)?.replace(/\s+—\s+/g, ', ');
+  if (!dato) return null;
+  const fuentes = Array.isArray(especie.source_ids) ? especie.source_ids.filter(Boolean) : [];
+  return {
+    id: `catalogo-${match.slug}-agro`,
+    entity_slug: match.slug,
+    titulo: `Un dato de ${nombre}`,
+    dato,
+    fuente: fuentes.length > 0 ? `Catálogo Chagra: ${fuentes.join(', ')}` : 'Catálogo Chagra',
+    non_co: false,
+    region_analoga: null,
+    leccion_base: 'asociaciones',
+  };
+}
+
+/**
+ * Busca una oferta para cualquier cultivo nombrado explícitamente en el
+ * catálogo real. Primero conserva la prioridad de las cards curadas; cuando no
+ * hay card, deriva una oferta sólo si existe un dato estructurado utilizable.
+ *
+ * @param {string} texto
+ * @param {string[]} insightsVistos
+ * @returns {Promise<{slug:string, insight:object}|null>}
+ */
+export async function detectarInsightCatalogo(texto, insightsVistos = []) {
+  const match = await findCropInText(texto);
+  if (!match) return null;
+  const curado = elegirInsight(match.slug, insightsVistos);
+  const insight = curado || insightDesdeCatalogo(match, insightsVistos);
+  return insight ? { slug: match.slug, insight } : null;
+}
+
+/**
  * Hook principal.
  *
  * @param {string} textoChat
@@ -74,12 +123,32 @@ export function elegirInsight(slug, insightsVistos = []) {
  */
 export default function useInsightProactivo(textoChat, insightsVistos = []) {
   const [estado, setEstado] = useState('idle'); // 'idle' | 'ofreciendo' | 'aceptado' | 'rechazado'
+  const [catalogo, setCatalogo] = useState(null);
 
-  const slug = useMemo(() => detectarSlugEnTexto(textoChat), [textoChat]);
+  const slugLegacy = useMemo(() => detectarSlugEnTexto(textoChat), [textoChat]);
+  const insightCurado = useMemo(() => {
+    if (!slugLegacy) return null;
+    return elegirInsight(slugLegacy, insightsVistos);
+  }, [slugLegacy, insightsVistos]);
+
+  useEffect(() => {
+    let vivo = true;
+    if (insightCurado) {
+      setCatalogo(null);
+      return () => { vivo = false; };
+    }
+    setCatalogo(null);
+    detectarInsightCatalogo(textoChat, insightsVistos)
+      .then((resultado) => { if (vivo) setCatalogo(resultado); })
+      .catch(() => { if (vivo) setCatalogo(null); });
+    return () => { vivo = false; };
+  }, [textoChat, insightsVistos, insightCurado]);
+
+  const slug = slugLegacy || catalogo?.slug || null;
   const insight = useMemo(() => {
     if (!slug) return null;
-    return elegirInsight(slug, insightsVistos);
-  }, [slug, insightsVistos]);
+    return insightCurado || catalogo?.insight || elegirInsight(slug, insightsVistos);
+  }, [slug, insightCurado, catalogo, insightsVistos]);
 
   // Oferta activa solo si hay insight disponible y no hemos decidido
   const oferta = (insight && estado === 'idle') ? insight : null;
