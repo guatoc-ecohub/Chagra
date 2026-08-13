@@ -44,6 +44,7 @@ export const AURA_POR_BICHO = Object.freeze({
   dalmata: '#3b7dff',          // AZUL COBALTO leal (el perro atlético de la casa)
   beagle: '#c9772e',           // CANELA DE RASTRO (la nariz de oro del sabueso)
   zariguya: '#ff9ecb',         // ROSA DE LUNA (la piel desnuda de orejas, trufa y cola prensil, encendida de noche: el color de LA QUE CARGA)
+  'oso-baston': '#43c24f',     // VERDE DEL BASTÓN FLORECIDO (hoja viva encendida: el caminante que hace germinar — distinto del verde-zen de la rana, la semilla de la danta y la menta del guardián)
 });
 
 /* Aura por defecto si el slug no está mapeado (la dorada de la guía). */
