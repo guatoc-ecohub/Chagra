@@ -1,5 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { ENV } from '../../config/env.js';
+
+const CANONICAL_VISION_MODEL = 'qwen3-vl:8b';
+const RETIRED_VISION_MODEL_PATTERN = /^(granite|gemma|ministral)/i;
 
 // Mocks DEBEN declararse antes del import del módulo bajo test.
 // Audit 2026-05-18 #4: integramos RAG en analyzeFoliage; estos tests
@@ -168,7 +170,9 @@ describe('aiService — analyzeFoliage integración RAG', () => {
 
     expect(streamOllamaMock).toHaveBeenCalledTimes(1);
     const [, body, , options] = streamOllamaMock.mock.calls[0];
-    expect(body.model).toBe(ENV.VISION_MODEL);
+    // No se compara contra ENV.VISION_MODEL porque el código bajo prueba produce ese mismo valor.
+    expect(body.model).toBe(CANONICAL_VISION_MODEL);
+    expect(body.model).not.toMatch(RETIRED_VISION_MODEL_PATTERN);
     expect(body.prompt).toContain('<CONTEXTO_CIENTÍFICO>');
     expect(body.prompt).toContain('Mycosphaerella fragariae');
     expect(body.prompt).toContain('caldo bordelés');
