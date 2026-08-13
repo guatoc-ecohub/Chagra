@@ -46,8 +46,11 @@ import { execFileSync } from 'node:child_process';
 // Excluye archivos que a propósito contienen las formas voseantes como DATO
 // (fixtures de test del propio filtro, el filtro mismo, este script, y datos
 // de topónimos que dan falsos positivos por substring — mismo criterio que
-// el guard `voseo-scan` en lefthook.yml).
-const EXCLUDE_RE = /voseoFilter|__tests__|\.test\.|scan-voseo|colombia-locations|\.dane\./;
+// el guard `voseo-scan` en lefthook.yml). `public/valle/` es un árbol
+// VENDOREADO (sincronizado completo por scripts/sync-valle.mjs desde otro
+// repo, three r160 aislado): sus comentarios no son autoría de este repo y
+// no pasan por este guard, mismo criterio que ESLint con public/vendor/**.
+const EXCLUDE_RE = /voseoFilter|__tests__|\.test\.|scan-voseo|colombia-locations|\.dane\.|^public\/valle\//;
 
 const CODE_EXT_RE = /\.(js|jsx|mjs|ts|tsx)$/;
 
