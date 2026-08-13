@@ -44,6 +44,18 @@ export const VIDA_REPERTORIO = {
       reposo: { dur: 8800, peso: 1 }, // 2× rh-g-reposo 4.4s — el guardián se sienta
     },
   },
+  /* Tremarctos ornatus, dirección CAMINANTE (el oso del bastón). El mismo
+     temperamento lento de la especie, pero su gesto estrella no es rascarse:
+     es detenerse a HACER FLORECER el bastón (el dispersor de semillas hecho
+     gesto). */
+  'oso-baston': {
+    descanso: [4200, 9800], // caminante pausado: anda, se planta, florece
+    momentos: {
+      florece: { dur: 3400, peso: 2 }, // 2× osb-florece 1.7s — el bastón late EN FLOR
+      resopla: { dur: 4500, peso: 1.5 }, // 3× oso-resoplido 1.5s · 5× oso-cejas-frunce 0.9s
+      reposo: { dur: 8800, peso: 1 }, // 2× rh-g-reposo 4.4s — el caminante se aquieta
+    },
+  },
   colibri: {
     descanso: [2600, 6400], // hiperactivo: casi no se queda quieto
     momentos: {

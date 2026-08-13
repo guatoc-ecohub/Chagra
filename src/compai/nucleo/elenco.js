@@ -42,6 +42,10 @@ export const ELENCO = {
   // el cruce por el núcleo (bug encontrado cableando #96).
   zariguya: { nombre: 'Zarigüeya', gentilicio: 'la zarigüeya', enPWA: true },
   oso: { nombre: 'Oso andino', gentilicio: 'el oso andino', enPWA: false },
+  // El oso del bastón cruzó a la PWA el 2026-08-11 (OsoBaston.jsx: la dirección
+  // CAMINANTE de la referencia aprobada — erguido, Cuphead de día, bastón
+  // florecido de frailejón y orquídea — en el registro CREATURES).
+  'oso-baston': { nombre: 'Oso del bastón', gentilicio: 'el oso del bastón', enPWA: true },
   jaguar: { nombre: 'Jaguar', gentilicio: 'el jaguar', enPWA: false },
   guacamaya: { nombre: 'Guacamaya', gentilicio: 'la guacamaya', enPWA: false },
   chivito: { nombre: 'Chivito', gentilicio: 'Chivito', enPWA: false },

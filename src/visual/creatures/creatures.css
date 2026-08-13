@@ -3030,3 +3030,187 @@
      entrega el fotograma digno (tumbada y quieta), no la criatura de pie. */
   [data-creature='zariguya'][data-tanatosis='1'] .crt-body { transform: rotate(72deg) translateY(2.3px); }
 }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   EL OSO DEL BASTÓN (oso-baston) — Tremarctos ornatus CAMINANTE de los Andes.
+   Cuarta dirección del oso: erguido, Cuphead de día, con su BASTÓN FLORECIDO
+   (frailejón + orquídea) más alto que él. ADITIVO: reusa los keyframes
+   familiares del oso (oso-boil, oso-resoplido, oso-cejas-frunce, oso-vaho) y
+   los gestos species-agnostic rh-g-*; lo PROPIO es el bastón vivo (vaivén
+   plantado en la contera), el FLORECE (su gesto-firma: la corola late con
+   overshoot y el halo verde se enciende) y el CAMINA (ciclo de andar con
+   bastón para kart/mundos). Todo transform/opacity (GPU, gama baja). Gates
+   RM + tier al final del bloque.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* Tempo de especie: respiración PESADA de mole (mismo compás familiar) y
+   parpadeo/dardeo un pelo más vivos que el guardián (es el oso travieso). */
+[data-creature='oso-baston'] .rh-boil {
+  animation-name: oso-boil;
+  animation-duration: 4.4s;
+  transform-box: fill-box;
+  transform-origin: center bottom;
+}
+[data-creature='oso-baston'] .rh-blink { animation-duration: 7.1s; }
+[data-creature='oso-baston'] .rh-mirada { animation-duration: 9.7s; }
+
+/* EL BASTÓN plantado se mece apenas — el origen vive en la CONTERA (inline:
+   center bottom), así la base jamás se despega del suelo. */
+.osb-baston { animation: osb-baston-vaiven 5.6s ease-in-out infinite; }
+@keyframes osb-baston-vaiven {
+  0%, 100% { transform: rotate(-0.8deg); }
+  50%      { transform: rotate(1.1deg); }
+}
+
+/* La CORONA respira y las hojas de la enredadera cabecean (secondary motion,
+   períodos co-primos con el vaivén del palo). */
+.osb-corola { animation: osb-corola 3.7s ease-in-out infinite; }
+@keyframes osb-corola {
+  0%, 100% { transform: scale(1) rotate(-1.4deg); }
+  50%      { transform: scale(1.04) rotate(1.2deg); }
+}
+.osb-hoja { animation: osb-hoja 2.9s ease-in-out infinite alternate; }
+@keyframes osb-hoja {
+  from { transform: rotate(-2.6deg); }
+  to   { transform: rotate(3.4deg); }
+}
+
+/* El POLEN flota de la corona (delays/duraciones inline lo desparejan). */
+.osb-polen { animation: osb-polen 6.5s ease-in-out infinite; }
+@keyframes osb-polen {
+  0%, 100% { transform: translateY(0); opacity: 0.22; }
+  50%      { transform: translateY(-2.6px); opacity: 0.72; }
+}
+
+/* ── FLORECE — su gesto-firma (momento del idle-cerebro o prop del host): el
+   bastón se yergue, la corola late FUERTE con el overshoot de la casa y el
+   halo verde se enciende. 1.7s → dur 3400 en vidaEstados = 2 ciclos exactos. */
+[data-creature='oso-baston'][data-florece='1'] .osb-corola {
+  animation: osb-florece 1.7s cubic-bezier(0.34, 1.56, 0.64, 1) infinite;
+}
+@keyframes osb-florece {
+  0%, 100% { transform: scale(1) rotate(0deg); }
+  45%      { transform: scale(1.22) rotate(2deg); }
+  62%      { transform: scale(1.14) rotate(-1deg); }
+}
+[data-creature='oso-baston'][data-florece='1'] .osb-halo {
+  animation: osb-halo-florece 1.7s ease-in-out infinite;
+}
+@keyframes osb-halo-florece {
+  0%, 100% { opacity: 0.18; transform: scale(0.92); }
+  50%      { opacity: 0.6; transform: scale(1.22); }
+}
+[data-creature='oso-baston'][data-florece='1'] .osb-baston {
+  animation: osb-baston-yergue 1.7s cubic-bezier(0.34, 1.56, 0.64, 1) infinite;
+}
+@keyframes osb-baston-yergue {
+  0%, 100% { transform: rotate(0deg); }
+  45%      { transform: rotate(-2.6deg); }
+}
+[data-creature='oso-baston'][data-florece='1'] .osb-polen { animation-duration: 2.2s; }
+
+/* ── RESOPLA — el huff familiar de los osos de la casa, ADITIVO (reusa
+   oso-resoplido / oso-cejas-frunce / oso-vaho vía .crt-vaho-mota). */
+[data-creature='oso-baston'][data-resopla='1'] .crt-body {
+  animation: oso-resoplido 1.5s cubic-bezier(0.4, 0, 0.5, 1) infinite;
+  transform-box: fill-box;
+  transform-origin: center bottom;
+}
+[data-creature='oso-baston'][data-resopla='1'] .oso-cejas {
+  animation: oso-cejas-frunce 0.9s ease-in-out infinite;
+}
+
+/* ── CAMINA — el ciclo de ANDAR CON BASTÓN (pose del host: kart, mundos,
+   travesías). Paso PESADO de plantígrado a 1.3s: el cuerpo boya y se ladea,
+   las piernas alternan del origen de cadera, el bastón planta y levanta a
+   contratiempo y el brazo en jarra acompaña. */
+[data-creature='oso-baston'][data-pose='camina'] .crt-body {
+  animation: osb-camina-cuerpo 1.3s ease-in-out infinite;
+  transform-box: fill-box;
+  transform-origin: center bottom;
+}
+@keyframes osb-camina-cuerpo {
+  0%, 100% { transform: translateY(0) rotate(-1.3deg); }
+  25%      { transform: translateY(-1.5px) rotate(0deg); }
+  50%      { transform: translateY(0) rotate(1.3deg); }
+  75%      { transform: translateY(-1.5px) rotate(0deg); }
+}
+[data-creature='oso-baston'][data-pose='camina'] .osb-pierna-i {
+  animation: osb-paso-i 1.3s ease-in-out infinite;
+}
+[data-creature='oso-baston'][data-pose='camina'] .osb-pierna-d {
+  animation: osb-paso-d 1.3s ease-in-out infinite;
+}
+@keyframes osb-paso-i {
+  0%, 100% { transform: rotate(11deg); }
+  50%      { transform: rotate(-11deg); }
+}
+@keyframes osb-paso-d {
+  0%, 100% { transform: rotate(-11deg); }
+  50%      { transform: rotate(11deg); }
+}
+[data-creature='oso-baston'][data-pose='camina'] .osb-baston {
+  animation: osb-baston-camina 1.3s ease-in-out infinite;
+}
+@keyframes osb-baston-camina {
+  0%, 100% { transform: rotate(3.5deg); }
+  50%      { transform: rotate(-6.5deg); }
+}
+[data-creature='oso-baston'][data-pose='camina'] .crt-brazo-l {
+  animation: osb-brazo-camina 1.3s ease-in-out infinite;
+}
+@keyframes osb-brazo-camina {
+  0%, 100% { transform: rotate(-5deg); }
+  50%      { transform: rotate(7deg); }
+}
+
+/* ── CELEBRA — el flourish del caminante, con AMPLITUD PROPIA: el grupo
+   .crt-brazo-r carga el bastón entero (30 unidades de palo), así que el
+   rh-g-brazo-r genérico lo sacaba VOLANDO del encuadre. El oso alza el cayado
+   apenas unos grados — festivo sin perder el piso. Pisa el genérico por
+   especificidad (dos atributos). */
+[data-creature='oso-baston'][data-pose='celebra'] .crt-brazo-r {
+  animation: osb-celebra-alza 1.15s cubic-bezier(0.34, 1.56, 0.64, 1) infinite;
+}
+@keyframes osb-celebra-alza {
+  0%, 100% { transform: rotate(0deg); }
+  45%      { transform: rotate(-8deg); }
+  62%      { transform: rotate(-5.5deg); }
+}
+
+/* Los estados del caminante PISAN el arrebato (antic/travieso): un oso que
+   florece, resopla o camina no da además vueltas de campana. */
+[data-creature='oso-baston'][data-florece='1'] .rh-antic,
+[data-creature='oso-baston'][data-florece='1'] .rh-travieso,
+[data-creature='oso-baston'][data-resopla='1'] .rh-antic,
+[data-creature='oso-baston'][data-resopla='1'] .rh-travieso,
+[data-creature='oso-baston'][data-pose='camina'] .rh-antic,
+[data-creature='oso-baston'][data-pose='camina'] .rh-travieso { animation: none; }
+
+/* device-tier 'bajo': fuera el idle continuo (boil reescrito, bastón, corola,
+   hojas, polen, cejas); los estados reactivos siguen contando la verdad y la
+   FIRMA (bastón coronado) queda en fotograma digno. */
+[data-tier='bajo'][data-creature='oso-baston'] .rh-boil,
+[data-tier='bajo'][data-creature='oso-baston'] .oso-cejas,
+[data-tier='bajo'][data-creature='oso-baston'] .osb-baston,
+[data-tier='bajo'][data-creature='oso-baston'] .osb-corola,
+[data-tier='bajo'][data-creature='oso-baston'] .osb-hoja,
+[data-tier='bajo'][data-creature='oso-baston'] .osb-polen { animation: none; }
+
+@media (prefers-reduced-motion: reduce) {
+  .osb-baston, .osb-corola, .osb-hoja, .osb-polen,
+  [data-creature='oso-baston'] .rh-boil,
+  [data-creature='oso-baston'][data-florece='1'] .osb-corola,
+  [data-creature='oso-baston'][data-florece='1'] .osb-halo,
+  [data-creature='oso-baston'][data-florece='1'] .osb-baston,
+  [data-creature='oso-baston'][data-resopla='1'] .crt-body,
+  [data-creature='oso-baston'][data-resopla='1'] .oso-cejas,
+  [data-creature='oso-baston'][data-pose='camina'] .crt-body,
+  [data-creature='oso-baston'][data-pose='camina'] .osb-pierna-i,
+  [data-creature='oso-baston'][data-pose='camina'] .osb-pierna-d,
+  [data-creature='oso-baston'][data-pose='camina'] .osb-baston,
+  [data-creature='oso-baston'][data-pose='camina'] .crt-brazo-l,
+  [data-creature='oso-baston'][data-pose='celebra'] .crt-brazo-r { animation: none !important; }
+  /* Fotograma digno del florecer: el halo se queda encendido y quieto. */
+  [data-creature='oso-baston'][data-florece='1'] .osb-halo { opacity: 0.45; }
+}

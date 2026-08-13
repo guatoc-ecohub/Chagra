@@ -48,6 +48,20 @@ export {
   OSO_GUARDIAN_PALETA, OSO_GUARDIAN_PROPORCION, OSO_GUARDIAN_RUANA_ANCLA,
   OSO_GUARDIAN_SLUG, OSO_GUARDIAN_TINTA, PERFIL_OSO_GUARDIAN,
 } from './osoGuardianIdentidad.js';
+/* EL OSO DEL BASTÓN — Tremarctos ornatus en su CUARTA dirección: el CAMINANTE
+   de los Andes de la referencia aprobada (Cuphead de día: erguido, sonrisa
+   amplia, guantes crema, botas de trocha) con su firma — el BASTÓN FLORECIDO
+   (frailejón + orquídea, ver OSO_BASTON_FLORA) más alto que él. Su gesto
+   `florece` es su ecología (dispersor de semillas) hecha estado visual. */
+export { OsoBaston } from './OsoBaston.jsx';
+/* La IDENTIDAD del oso del bastón como datos (paleta tierra + verde dominante,
+   proporciones, su CONTRATO DE SILUETA, la botánica del bastón, presencia 3D
+   y perfil de clima). Solo datos: jamás arrastra three al bundle base — igual
+   que osoGuardianIdentidad/luciernagaIdentidad. */
+export {
+  OSO_BASTON_FIRMA, OSO_BASTON_FLORA, OSO_BASTON_PALETA, OSO_BASTON_PRESENCIA,
+  OSO_BASTON_PROPORCION, OSO_BASTON_SLUG, OSO_BASTON_TINTA, PERFIL_OSO_BASTON,
+} from './osoBastonIdentidad.js';
 export { RanaAndina } from './RanaAndina.jsx';
 export { Ardilla } from './Ardilla.jsx';
 export { Jaguar } from './Jaguar.jsx';
@@ -227,6 +241,7 @@ import Colibri from './Colibri.jsx';
 /* OsoAndino y OsoAnteojos NO se importan acá a propósito: están archivados y
    fuera del registro CREATURES. Solo entra el guardián. */
 import OsoGuardian from './OsoGuardian.jsx';
+import OsoBaston from './OsoBaston.jsx';
 import RanaAndina from './RanaAndina.jsx';
 import Perezoso from './Perezoso.jsx';
 import Ardilla from './Ardilla.jsx';
@@ -259,6 +274,9 @@ export const CREATURES = {
      valle (mismo patrón que el borugo). Los componentes quedan en disco por
      historia, por si alguna vez se rehacen. */
   'oso-guardian': { Component: OsoGuardian, nombre: 'Oso de anteojos', cientifico: 'Tremarctos ornatus' },
+  // La dirección CAMINANTE del mismo oso (la referencia Cuphead aprobada):
+  // erguido, botas y guantes, y el bastón florecido — el dispersor de semillas.
+  'oso-baston': { Component: OsoBaston, nombre: 'Oso del bastón', cientifico: 'Tremarctos ornatus' },
   'rana-andina': { Component: RanaAndina, nombre: 'Rana arlequín andina', cientifico: 'Atelopus spp.' },
   perezoso: { Component: Perezoso, nombre: 'Perezoso de tres dedos', cientifico: 'Bradypus variegatus' },
   ardilla: { Component: Ardilla, nombre: 'Ardilla de cola roja', cientifico: 'Notosciurus granatensis' },
