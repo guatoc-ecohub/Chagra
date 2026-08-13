@@ -3,11 +3,12 @@ import { getPerspectiveFitDistanceForSilhouette } from './cameraFit.js';
 import { projectHotspot, snapHotspotsToSurface } from './hotspots.js';
 import { SPECIES } from './speciesData.js';
 
-const canvas = document.querySelector('#species-canvas');
-const stage = document.querySelector('#stage-wrap');
-const hotspotLayer = document.querySelector('#hotspot-layer');
-const posterFallback = document.querySelector('#poster-fallback');
-const posterImage = document.querySelector('#poster-image');
+const canvas = /** @type {HTMLCanvasElement} */ (document.querySelector('#species-canvas'));
+const stage = /** @type {HTMLElement} */ (document.querySelector('#stage-wrap'));
+const hotspotLayer = /** @type {HTMLElement} */ (document.querySelector('#hotspot-layer'));
+const posterFallback = /** @type {HTMLElement} */ (document.querySelector('#poster-fallback'));
+const posterImage = /** @type {HTMLImageElement} */ (document.querySelector('#poster-image'));
+const hotspotCard = /** @type {HTMLElement} */ (document.querySelector('#hotspot-card'));
 const model = { group: null, anchors: [], species: SPECIES[0], fitDistance: 2.4, maxExtent: 1 };
 const state = {
   autoRotate: true,
@@ -52,6 +53,14 @@ function makeMaterial(color, roughness = 0.72) {
   return new THREE.MeshStandardMaterial({ color, roughness, metalness: 0.02 });
 }
 
+/**
+ * @param {import('three').Object3D} group
+ * @param {import('three').BufferGeometry} geometry
+ * @param {import('three').Material} material
+ * @param {[number, number, number]} position
+ * @param {[number, number, number]} [scale]
+ * @param {[number, number, number]} [rotation]
+ */
 function addMesh(group, geometry, material, position, scale = [1, 1, 1], rotation = [0, 0, 0]) {
   const mesh = new THREE.Mesh(geometry, material);
   mesh.position.set(...position);
@@ -62,6 +71,13 @@ function addMesh(group, geometry, material, position, scale = [1, 1, 1], rotatio
   return mesh;
 }
 
+/**
+ * @param {import('three').Object3D} group
+ * @param {import('three').Material} material
+ * @param {[number, number, number]} position
+ * @param {[number, number, number]} scale
+ * @param {[number, number, number]} rotation
+ */
 function addLeaf(group, material, position, scale, rotation) {
   return addMesh(
     group,
@@ -73,6 +89,12 @@ function addLeaf(group, material, position, scale, rotation) {
   );
 }
 
+/**
+ * @param {import('three').Object3D} group
+ * @param {import('three').Material} material
+ * @param {[number, number, number]} position
+ * @param {[number, number, number]} [scale]
+ */
 function addFruit(group, material, position, scale = [0.18, 0.18, 0.18]) {
   return addMesh(group, new THREE.SphereGeometry(0.5, 18, 12), material, position, scale);
 }
@@ -250,7 +272,7 @@ function updateOcclusion() {
 function updateHotspots() {
   const rect = stage.getBoundingClientRect();
   model.anchors.forEach((anchor) => {
-    const button = hotspotLayer.querySelector(`[data-id="${anchor.id}"]`);
+    const button = /** @type {HTMLElement|null} */ (hotspotLayer.querySelector(`[data-id="${anchor.id}"]`));
     if (!button) return;
     const point = new THREE.Vector3(...anchor.position).applyMatrix4(model.group.matrixWorld);
     const projected = projectHotspot([point.x, point.y, point.z], { camera, width: rect.width, height: rect.height, THREE });
@@ -297,10 +319,10 @@ function setRotation(enabled) {
 function openHotspot(id) {
   const hotspot = model.species.hotspots.find((item) => item.id === id);
   if (!hotspot) return;
-  document.querySelector('#hotspot-card').hidden = false;
+  hotspotCard.hidden = false;
   document.querySelector('#hotspot-name').textContent = hotspot.label;
   document.querySelector('#hotspot-note').textContent = hotspot.note;
-  hotspotLayer.querySelectorAll('.hotspot-button').forEach((button) => button.setAttribute('aria-pressed', String(button.dataset.id === id)));
+  hotspotLayer.querySelectorAll('.hotspot-button').forEach((/** @type {HTMLElement} */ button) => button.setAttribute('aria-pressed', String(button.dataset.id === id)));
 }
 
 function updateCard(species) {
@@ -353,8 +375,8 @@ function setSpecies(species) {
   model.maxExtent = vertices.reduce((max, point) => Math.max(max, Math.hypot(point[0], point[1], point[2])), 1);
   setupAnchors(vertices);
   updateCard(species);
-  document.querySelectorAll('.species-item').forEach((button) => button.setAttribute('aria-pressed', String(button.dataset.id === species.id)));
-  document.querySelector('#hotspot-card').hidden = true;
+  document.querySelectorAll('.species-item').forEach((/** @type {HTMLElement} */ button) => button.setAttribute('aria-pressed', String(button.dataset.id === species.id)));
+  hotspotCard.hidden = true;
   setPoster(false);
   state.phase = 0;
   lastOcclusion = new Map();
@@ -380,7 +402,7 @@ function buildSpeciesList() {
 }
 
 function bindControls() {
-  document.querySelectorAll('[data-distance]').forEach((button) => button.addEventListener('click', () => {
+  document.querySelectorAll('[data-distance]').forEach((/** @type {HTMLElement} */ button) => button.addEventListener('click', () => {
     state.distance = button.dataset.distance;
     document.querySelectorAll('[data-distance]').forEach((item) => item.classList.toggle('is-active', item === button));
     requestRender();
@@ -405,7 +427,7 @@ function bindControls() {
     event.preventDefault();
     setRotation(false);
     state.distance = event.deltaY > 0 ? 'wide' : 'close';
-    document.querySelectorAll('[data-distance]').forEach((item) => item.classList.toggle('is-active', item.dataset.distance === state.distance));
+    document.querySelectorAll('[data-distance]').forEach((/** @type {HTMLElement} */ item) => item.classList.toggle('is-active', item.dataset.distance === state.distance));
     requestRender();
   }, { passive: false });
 }

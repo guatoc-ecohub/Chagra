@@ -66,6 +66,14 @@ export function isExcludedFromCameraFit(object) {
 /**
  * Collects real geometry vertices from a Three.js tree. Three is injected by
  * the browser entry to keep this module straightforward to test in Vitest.
+ * The `import('three')` references below are type-only (erased at compile
+ * time) — they do not add a runtime dependency on the package.
+ *
+ * `root` stays untyped (`{*}`): it's traversed generically (`.isMesh`,
+ * `.geometry`) across whatever Object3D subclasses the scene graph holds,
+ * which is looser than the `Object3D` base type.
+ * @param {*} root
+ * @param {{ THREE?: typeof import('three'), camera?: import('three').Camera, pivotWorld?: import('three').Vector3|null }} [options]
  */
 export function collectSilhouetteVertices(root, { THREE, camera, pivotWorld = null } = {}) {
   if (!root || !THREE || !camera) return [];
@@ -92,6 +100,9 @@ export function collectSilhouetteVertices(root, { THREE, camera, pivotWorld = nu
   return vertices;
 }
 
+/**
+ * @param {{ root?: import('three').Object3D, camera: import('three').PerspectiveCamera, THREE?: typeof import('three'), pivotWorld?: import('three').Vector3, fill?: number, minDistance?: number }} params
+ */
 export function cameraFitFromSilhouette({ root, camera, THREE, pivotWorld, fill = 0.78, minDistance = 1 }) {
   const vertices = collectSilhouetteVertices(root, { THREE, camera, pivotWorld });
   return getPerspectiveFitDistanceForSilhouette(vertices, {

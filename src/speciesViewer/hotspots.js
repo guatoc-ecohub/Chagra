@@ -54,6 +54,10 @@ export function ndcToPixels(ndc, width, height) {
   };
 }
 
+/**
+ * @param {[number, number, number]} point
+ * @param {{ camera?: import('three').Camera, width?: number, height?: number, THREE?: typeof import('three') }} [options]
+ */
 export function projectHotspot(point, { camera, width, height, THREE } = {}) {
   if (!camera || !THREE || !point) return { visible: false, x: 0, y: 0 };
   const projected = new THREE.Vector3(point[0], point[1], point[2]).project(camera);
