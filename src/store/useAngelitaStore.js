@@ -8,6 +8,7 @@ import {
 } from '../services/angelitaInteligencia';
 import { variarMensaje } from '../services/angelitaVariedad';
 import { tipoDeDecision } from '../visual/agente/angelitaAvisoTipos';
+import { LLAVE_COOLDOWNS, LLAVE_HEREDADA_ANGELITA, leerCooldowns, escribirCooldowns } from '../compai/nucleo/cooldowns.js';
 
 /**
  * useAngelitaStore — LA API EN VIVO del comportamiento de Angelita.
@@ -48,6 +49,10 @@ import { tipoDeDecision } from '../visual/agente/angelitaAvisoTipos';
  * localStorage — para que la cadencia sobreviva recargas y Angelita no repita
  * lo mismo al volver. Cero red: todo funciona offline. Sólo persistimos lo
  * mínimo; el mensaje en curso es efímero por sesión.
+ *
+ * CROSS-STACK 2D-3D (#compai-estado-cruza-2d-3d): Los cooldowns ahora viven bajo
+ * la llave canónica 'compai:cooldowns' (núcleo portable) que comparten todos
+ * los compañeros, migrando desde la llave histórica 'chagra:angelita:antimolestia'.
  *
  * TELEMETRÍA LOCAL (#106): `registrarSenalMolestia` es también el único punto
  * de telemetría de "cuánto molesta" — un contador en memoria, SIN PII, que
@@ -255,8 +260,38 @@ const useAngelitaStore = create(
       },
     }),
     {
-      name: 'chagra:angelita:antimolestia',
+      name: LLAVE_COOLDOWNS, // 'compai:cooldowns' — llave canónica cross-stack
       storage: createJSONStorage(() => localStorage),
+      // CROSS-STACK: migrar desde la llave heredada al iniciar
+      onRehydrateStorage: () => (state) => {
+        if (!state) return;
+
+        // Intentar migrar cooldowns desde la llave heredada
+        try {
+          const cooldownsHeredados = leerCooldowns(localStorage);
+          if (Object.keys(cooldownsHeredados).length > 0) {
+            state.setState({ ultimaHablaPorLlave: cooldownsHeredados });
+          }
+        } catch {
+          // Si falla, usar el estado por defecto (vacío)
+        }
+
+        // Configurar un listener para escribir en ambas llaves cuando cambien los cooldowns
+        const originalSetState = state.setState;
+        state.setState = (partial, replace) => {
+          const result = originalSetState(partial, replace);
+          // Después de cada actualización, escribir cooldowns en ambas llaves
+          try {
+            const cooldowns = state.getState().ultimaHablaPorLlave;
+            if (cooldowns && Object.keys(cooldowns).length > 0) {
+              escribirCooldowns(cooldowns, localStorage);
+            }
+          } catch {
+            // Modo privado: fallar silenciosamente
+          }
+          return result;
+        };
+      },
       // Sólo la memoria anti-molestia sobrevive recargas — el mensaje en curso no.
       partialize: (s) => ({
         ultimaHablaPorLlave: s.ultimaHablaPorLlave,
