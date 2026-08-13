@@ -1,24 +1,24 @@
 name: Unit Tests (vitest)
 
-# Gate de tests unitarios del PUNTO DE ACCESO #1 (preguntas-ejemplo / chips).
-# Hasta ahora la suite vitest NO corría en CI — solo Playwright E2E. Este job
-# cierra ese hueco para lo más sensible: que el test
-# tests/unit/exampleQuestions.entrypoint.test.jsx corra en CADA PR.
+# Gate de tests unitarios inteligente: detecta automáticamente qué tests correr
+# basándose en los archivos cambiados en el PR.
 #
-# Política del operador ("esto debe probarse cada vez que valga la pena"): el
-# job corre SIEMPRE en PRs a main y en push a main — es barato (segundos, sin
-# GPU, sin red). Los `paths` de abajo están documentados como la SUPERFICIE del
-# agente que, al cambiar, hace imprescindible este gate: si tocás el AgentScreen,
-# los guards de salida, el filtro de voseo, el agentService o los componentes de
-# chips, este test debe pasar antes del merge.
+# ANTES: tenía HARDCODED 5 archivos fijos que siempre corría, sin importar qué
+# cambiara. Esto significaba que un PR que cambiara, por ejemplo, un componente
+# de Settings, no validaba los tests de ese componente.
 #
-# ALCANCE (por qué no la suite completa todavía): el job arranca enfocado en el
-# test del entrypoint + sus dependencias deterministas (chips, outputGuards,
-# voseoFilter, catalog-count) porque 2 tests preexistentes de visión
-# (aiService.visionCache / visionCacheService) son CI-flaky por diferencias de
-# SubtleCrypto.digest entre runners — pasan local pero fallan en ubuntu-latest.
-# Ampliar este gate a `npm run test:unit` (suite completa) queda pendiente de
-# estabilizar esos 2 tests; ver el cuerpo del PR para el detalle.
+# AHORA: usa scripts/detect-changed-tests.mjs para mapear archivos cambiados a
+# sus tests correspondientes. Si cambiás src/components/QuickChipsBar.jsx, corre
+# src/components/__tests__/QuickChipsBar.smoke.test.jsx. Si cambiás un service,
+# corre los tests de ese service.
+#
+# POLÍTICA: el job corre SIEMPRE en PRs a main/dev/app-3d y en push a main.
+# Es barato (segundos, sin GPU, sin red). Si no hay tests relevantes (p.ej.
+# cambiás solo README.md), el gate pasa sin fallar (output vacío).
+#
+# ALCANCE: cubre toda la superficie de tests unitarios del repo. Tests flaky de
+# visión (aiService.visionCache / visionCacheService) se excluyen por ahora
+# debido a diferencias de SubtleCrypto.digest entre runners.
 on:
   pull_request:
     branches: [main, dev, app-3d]
@@ -60,11 +60,20 @@ jobs:
       # Test del PUNTO DE ACCESO #1 + dependencias deterministas. Determinista
       # en CI (sin crypto/IndexedDB/red). Falla RUIDOSAMENTE si un chip-ejemplo
       # devuelve vacío/error tras el pipeline de salida.
-      - name: Run entrypoint unit tests
+      #
+      # CAMBIO: ahora detecta automáticamente los tests relacionados con archivos
+      # cambiados en el PR, en lugar de correr siempre los mismos 5 archivos fijos.
+      # Esto permite que el gate sea relevante para lo que realmente cambió.
+      - name: Detect changed files and map to tests
+        id: detect-tests
+        run: |
+          TESTS=$(node scripts/detect-changed-tests.mjs)
+          echo "tests=$TESTS" >> $GITHUB_OUTPUT
+          echo "Detected tests: $TESTS"
+
+      - name: Run relevant unit tests
+        # Si no hay tests relevantes, el gate pasa sin fallar (output vacío).
+        # Si hay tests relevantes, corre solo esos.
         run: >-
           npm run test:unit --
-          tests/unit/exampleQuestions.entrypoint.test.jsx
-          tests/unit/outputGuards.test.js
-          tests/unit/catalog-count.test.js
-          src/components/__tests__/QuickChipsBar.smoke.test.jsx
-          src/components/__tests__/ChipsToolbar.smoke.test.jsx
+          ${{ steps.detect-tests.outputs.tests }}
