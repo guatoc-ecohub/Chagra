@@ -4,6 +4,7 @@ import {
   CANONICAL_REDIRECT_GUARD_KEY,
   buildCanonicalUrl,
   isAllowedHost,
+  isStagingHost,
   runCanonicalHostRedirectGuard,
 } from '../canonicalHostRedirect.js';
 
@@ -37,6 +38,29 @@ describe('canonicalHostRedirect', () => {
     expect(isAllowedHost('localhost')).toBe(true);
     expect(isAllowedHost('127.0.0.1')).toBe(true);
     expect(isAllowedHost('preview.chagra.app')).toBe(true);
+  });
+
+  it('permite el host de staging y sus subdominios acotados', () => {
+    expect(isStagingHost('preprod.chagra.app')).toBe(true);
+    expect(isStagingHost('api.preprod.chagra.app')).toBe(true);
+    expect(isAllowedHost('preprod.chagra.app')).toBe(true);
+  });
+
+  it('no redirige desde preprod hacia produccion', () => {
+    const redirect = vi.fn();
+    const result = runCanonicalHostRedirectGuard({
+      location: {
+        hostname: 'preprod.chagra.app',
+        pathname: '/agente',
+        search: '?demo=1',
+        hash: '#/voz',
+      },
+      sessionStorage: storage,
+      redirect,
+    });
+
+    expect(result).toEqual({ redirected: false, reason: 'allowed-host' });
+    expect(redirect).not.toHaveBeenCalled();
   });
 
   it('permite 3d.guatoc.co (mundos 3D standalone) sin redirigir', () => {
