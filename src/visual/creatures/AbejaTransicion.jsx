@@ -42,7 +42,7 @@
  *      mismo punto ~100 ms después: empalme de capas. La señal se auto-resetea
  *      al montar la siguiente escena (no hay que limpiarla a mano).
  */
-import { useEffect, useRef } from 'react';
+import { createElement, useEffect, useRef } from 'react';
 import { AbejaAngelita } from './AbejaAngelita.jsx';
 import './creatures.css';
 
@@ -79,6 +79,7 @@ export function AlMontarEscena({ onMonta }) {
 
 export default function AbejaTransicion({
   sentido = 'entrar', // 'entrar' (2D se clava al mundo) | 'volver' (brota del mundo)
+  Cuerpo = AbejaAngelita,
   animo = 'sereno',
   energia = 1,
   tier = 'alto',
@@ -115,7 +116,7 @@ export default function AbejaTransicion({
       <div className="abeja-cruce__pos">
         <div className="abeja-cruce__vuelo">
           <div className="abeja-cruce__giro">
-            <AbejaAngelita size={76} animo={animo} energia={energia} animated tier={tier} />
+            {createElement(Cuerpo, { size: 76, animo, energia, animated: true, tier })}
           </div>
         </div>
         {sentido === 'entrar' && <span className="abeja-cruce__puff" />}

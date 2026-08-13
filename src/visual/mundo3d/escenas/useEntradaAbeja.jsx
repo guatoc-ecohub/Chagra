@@ -11,11 +11,17 @@
  *
  * Vive dentro de escenas/ (chunk perezoso `vendor-three`): importa @react-three
  * y three, así que NUNCA se importa desde el barrel base del framework.
+ *
+ * El nombre se conserva a propósito: este hook sigue siendo la coreografía
+ * nativa y fallback de Angelita. El ruteo del guía elegido vive en
+ * `CompaiTransicion`/`compaiRegistry`, sin convertir este hook en un dispatcher.
  */
 /* eslint-disable react-refresh/only-export-components -- este módulo (hook de
    coreografía + su componente de escena) se importa SIEMPRE perezoso dentro de
    un <Canvas> vía EscenaBase3D; no es hot-reload-sensible. Van juntos a propósito:
    la creature posee el cuerpo, la escena posee la coreografía (contrato del DR). */
+/* eslint-disable react-hooks/immutability, react-hooks/refs -- R3F ejecuta el
+   movimiento y la visibilidad de este hook imperativamente dentro de useFrame. */
 import { useEffect, useMemo, useRef } from 'react';
 import { useFrame } from '@react-three/fiber';
 import { Html } from '@react-three/drei';

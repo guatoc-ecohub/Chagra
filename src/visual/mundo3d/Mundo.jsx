@@ -25,7 +25,7 @@ import Mundo2D from './Mundo2D.jsx';
 import useAudioMundo from './useAudioMundo.js';
 import useFincaViva from './useFincaViva.js';
 import InvitacionAudioMundo from './InvitacionAudioMundo.jsx';
-import AbejaTransicion, { AlMontarEscena } from '../creatures/AbejaTransicion.jsx';
+import { AlMontarEscena } from '../creatures/AbejaTransicion.jsx';
 import './mundo.css';
 
 /* Los dioramas 3D se cargan PEREZOSO: three/@react-three viven en su propio
@@ -66,6 +66,11 @@ const IMPORTA_ESCENA = {
 const ESCENAS_3D = Object.fromEntries(
   Object.entries(IMPORTA_ESCENA).map(([k, importa]) => [k, lazy(() => importa().then(m => ({ default: (/** @type {any} */ (m)).default || m })))]),
 );
+
+/* El portal consulta el registro dentro del chunk perezoso de mundos. Mantener
+   este import dinámico evita arrastrar compaiRegistry y sus escenas 3D al bundle
+   base, incluso aunque el portal viva en este host. */
+const CompaiTransicion = lazy(() => import('./escenas/CompaiTransicion.jsx'));
 
 /* Cuánto esperamos el chunk 3D antes de la CAÍDA DIGNA al 2D. Con señal
    intermitente (el caso normal del campo) un fetch colgado NO lanza error —
@@ -236,17 +241,19 @@ function MundoInterno({
               juntos). Enciende el overlay de Angelita cruzando de 2D a 3D. */}
           <AlMontarEscena onMonta={() => { if (!reducedMotion) setCruce('entrar'); }} />
         </Suspense>
-        {/* El overlay del cruce 2D→3D (Angelita "entra" a la escena). Se
-            desmonta solo al terminar (onFin); reducedMotion → no monta nada. */}
+        {/* El overlay cruza al compañero elegido. La resolución vive en el
+            chunk lazy para conservar el límite del bundle base. */}
         {cruce === 'entrar' && !reducedMotion && (
-          <AbejaTransicion
-            sentido="entrar"
-            tier={tier}
-            animo={animo}
-            energia={energia}
-            reducedMotion={reducedMotion}
-            onFin={() => setCruce(null)}
-          />
+          <Suspense fallback={null}>
+            <CompaiTransicion
+              sentido="entrar"
+              tier={tier}
+              animo={animo}
+              energia={energia}
+              reducedMotion={reducedMotion}
+              onFin={() => setCruce(null)}
+            />
+          </Suspense>
         )}
         {/* Invitación de PRIMER USO del sonido ambiental (una sola vez): vive
             en el host para cubrir app y vitrinas por igual (allá no hay Perfil). */}
