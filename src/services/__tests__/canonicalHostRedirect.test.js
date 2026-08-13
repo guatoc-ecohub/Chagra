@@ -63,6 +63,29 @@ describe('canonicalHostRedirect', () => {
     expect(redirect).not.toHaveBeenCalled();
   });
 
+  it.each(['preprod.example.com', 'preprod-cualquiera.io'])(
+    'rechaza %s aunque contenga el token preprod',
+    (hostname) => {
+      expect(isStagingHost(hostname)).toBe(false);
+      expect(isAllowedHost(hostname)).toBe(false);
+
+      const redirect = vi.fn();
+      const result = runCanonicalHostRedirectGuard({
+        location: {
+          hostname,
+          pathname: '/agente',
+          search: '?demo=1',
+          hash: '#/voz',
+        },
+        sessionStorage: storage,
+        redirect,
+      });
+
+      expect(result).toEqual({ redirected: true, reason: 'redirected-to-canonical' });
+      expect(redirect).toHaveBeenCalledWith(`https://${CANONICAL_HOSTNAME}/agente?demo=1#/voz`);
+    },
+  );
+
   it('permite 3d.guatoc.co (mundos 3D standalone) sin redirigir', () => {
     expect(isAllowedHost('3d.guatoc.co')).toBe(true);
   });
