@@ -18,6 +18,7 @@ import { activarEscucha } from '../services/escuchaService';
 import { useCompaiClimaVivo } from '../hooks/useCompaiClimaVivo';
 import { useCompaiSusurroNocturno } from '../hooks/useCompaiSusurroNocturno';
 import { useCompaiAgroecologiaReal } from '../hooks/useCompaiAgroecologiaReal';
+import useTtsAmplitude, { visemaFromAmplitude } from '../hooks/useTtsAmplitude.js';
 import AgentFabMenu from './AgentFabMenu';
 import './agent-fab-skin.css';
 
@@ -72,6 +73,7 @@ export default function AgentFab({ onNavigate, pantalla = null }) {
   const [hover, setHover] = useState(false);
   const [pressed, setPressed] = useState(false);
   const [menuAbierto, setMenuAbierto] = useState(false);
+  const { level: ttsLevel } = useTtsAmplitude();
 
   /* ── EL INTERRUPTOR MANUAL (auditoría 2026-07-26, ítems #101 y #103) ──────
      `silenciar()` — silencio INDEFINIDO, hasta que el usuario lo vuelva a
@@ -215,12 +217,27 @@ export default function AgentFab({ onNavigate, pantalla = null }) {
     registrarSenalMolestia('hablarle');
   }, [registrarSenalMolestia]);
 
+  /** Menú → "Escuchar": lectura breve del contexto actual por Kokoro. */
+  const handleMenuEscuchar = useCallback(() => {
+    setMenuAbierto(false);
+    const lugar = pantalla ? pantalla.replaceAll('_', ' ') : 'esta pantalla';
+    speakSentences(`Estoy en ${lugar}. Puede preguntarme por texto, hablarme o enviarme una foto de su finca.`)
+      .catch(() => {});
+    registrarSenalMolestia('escuchar');
+  }, [pantalla, registrarSenalMolestia]);
+
   /** Menú → "Enviar foto": abre el agente con la cámara ya disparada. */
   const handleMenuFoto = useCallback(() => {
     setMenuAbierto(false);
     onNavigate('agente', { ...contextoDePantalla, autoOpenCamera: true });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [onNavigate, pantalla]);
+
+  /** Menú → "Ver fotos": abre únicamente fotos locales disponibles. */
+  const handleMenuFotos = useCallback(() => {
+    setMenuAbierto(false);
+    window.dispatchEvent(new CustomEvent('chagra:compai-fotos', { detail: { pantalla } }));
+  }, [pantalla]);
 
   /** Menú → "Que se quede callado hoy": #107, se resetea a medianoche. */
   const handleMenuHoyNo = useCallback(() => {
@@ -342,8 +359,10 @@ export default function AgentFab({ onNavigate, pantalla = null }) {
             la elección por completo). */}
         <span style={{ pointerEvents: 'none', display: 'flex' }} aria-hidden="true">
           <ChagraAgentAvatar
-            estado={estado}
+            // eslint-disable-next-line chagra-i18n/no-hardcoded-spanish -- estado visual canónico del agente
+            estado={ttsLevel > 0.035 ? 'respondiendo' : estado}
             size={82}
+            visema={visemaFromAmplitude(ttsLevel)}
             direccion="izquierda"
             className={responseReady ? 'agt-avatar-glow' : undefined}
             title="Chagra IA"
@@ -391,8 +410,10 @@ export default function AgentFab({ onNavigate, pantalla = null }) {
           quede callado hoy". Se ancla al mismo puesto que el personaje. */}
       <AgentFabMenu
         abierto={menuAbierto}
+        onEscuchar={handleMenuEscuchar}
         onHablar={handleMenuHablar}
         onFoto={handleMenuFoto}
+        onFotos={handleMenuFotos}
         onHoyNo={handleMenuHoyNo}
         onCerrar={handleMenuCerrar}
       />

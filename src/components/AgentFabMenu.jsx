@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from 'react';
-import { Mic, Camera, MoonStar } from 'lucide-react';
+import { Mic, Camera, MoonStar, Volume2, Images } from 'lucide-react';
 
 /**
  * AgentFabMenu — el menú flotante del TOQUE CORTO sobre el personaje
@@ -20,7 +20,7 @@ import { Mic, Camera, MoonStar } from 'lucide-react';
  * Español de Colombia (usted), sin voseo. Reduced-motion: sin transiciones
  * con `prefers-reduced-motion` (transform/opacity a secas, ya son baratas).
  */
-export default function AgentFabMenu({ abierto, onHablar, onFoto, onHoyNo, onCerrar }) {
+export default function AgentFabMenu({ abierto, onEscuchar, onHablar, onFoto, onFotos, onHoyNo, onCerrar }) {
   const menuRef = useRef(null);
   const primerBotonRef = useRef(null);
 
@@ -75,6 +75,16 @@ export default function AgentFabMenu({ abierto, onHablar, onFoto, onHoyNo, onCer
           ref={primerBotonRef}
           type="button"
           role="menuitem"
+          onClick={onEscuchar}
+          className="agt-fab-menu-item"
+          style={itemStyle}
+        >
+          <Volume2 size={18} strokeWidth={2} aria-hidden="true" />
+          <span>Escuchar</span>
+        </button>
+        <button
+          type="button"
+          role="menuitem"
           onClick={onHablar}
           className="agt-fab-menu-item"
           style={itemStyle}
@@ -90,7 +100,17 @@ export default function AgentFabMenu({ abierto, onHablar, onFoto, onHoyNo, onCer
           style={itemStyle}
         >
           <Camera size={18} strokeWidth={2} aria-hidden="true" />
-          <span>Enviar foto</span>
+          <span>Enviar una foto</span>
+        </button>
+        <button
+          type="button"
+          role="menuitem"
+          onClick={onFotos}
+          className="agt-fab-menu-item"
+          style={itemStyle}
+        >
+          <Images size={18} strokeWidth={2} aria-hidden="true" />
+          <span>Ver fotos</span>
         </button>
         <button
           type="button"
