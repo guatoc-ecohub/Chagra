@@ -24,7 +24,9 @@
  * useCompaiElegido, que ya viven ahí. JAMÁS importarlo desde el bundle base.
  */
 import { ABEJA_PRESENCIA } from '../../creatures/abejaIdentidad.js';
+import { MaizCompai } from '../../creatures/MaizCompai.jsx';
 import { MAIZ_PRESENCIA } from '../../creatures/maizIdentidad.js';
+import { Zariguya } from '../../creatures/Zariguya.jsx';
 import { ZARIGUYA_PRESENCIA } from '../../creatures/zariguyaIdentidad.js';
 import { JAGUAR_PRESENCIA } from '../../creatures/jaguarIdentidad.js';
 import { OSO_BASTON_PRESENCIA } from '../../creatures/osoBastonIdentidad.js';
@@ -58,6 +60,9 @@ import { AVATAR_TYPES, DEFAULT_AVATAR_TYPE } from '../../../hooks/useAgentAvatar
  * @property {(import('react').ComponentType|null)} EscenaComponent  la escena 3D
  *   PROPIA del compañero (coreografía + cuerpo). `null` → usa la coreografía y el
  *   cuerpo de Angelita (AbejaEscena) como fallback, sin regresión.
+ * @property {(import('react').ComponentType|null)} PortalComponent  el cuerpo 2D
+ *   que cruza hacia el mundo. `null` → el portal de Angelita, igual que el
+ *   fallback 3D.
  * @property {CompaiPresencia} presencia  cómo se dimensiona/posa en 3D.
  * @property {string} especie  slug `data-creature` del cuerpo activo.
  * @property {boolean} pendienteFable  aún sin arte 3D propio (cae a la abeja).
@@ -69,27 +74,50 @@ import { AVATAR_TYPES, DEFAULT_AVATAR_TYPE } from '../../../hooks/useAgentAvatar
    nativo que CompaiEscena monta directo — registrarla aquí sería un ciclo de
    imports con useEntradaAbeja sin ganar nada. */
 const REGISTRO = {
-  angelita: { EscenaComponent: null, presencia: ABEJA_PRESENCIA, especie: 'abeja-angelita', pendienteFable: false },
+  angelita: {
+    EscenaComponent: null,
+    PortalComponent: null,
+    presencia: ABEJA_PRESENCIA,
+    especie: 'abeja-angelita',
+    pendienteFable: false,
+  },
   // El MAÍZ compañero (fable #5): arraigado — brota del montículo, se mece
   // con brisa asimétrica, se INCLINA hacia el foco y el penacho vibra.
-  maiz: { EscenaComponent: MaizCompaiEscena, presencia: MAIZ_PRESENCIA, especie: 'maiz', pendienteFable: false },
+  maiz: {
+    EscenaComponent: MaizCompaiEscena,
+    PortalComponent: MaizCompai,
+    presencia: MAIZ_PRESENCIA,
+    especie: 'maiz',
+    pendienteFable: false,
+  },
   // La ZARIGÜEYA compañera (fable #5): marsupial nocturno DE PISO — llega
   // trotando, merodea, se encarama al foco en alto y husmea. Crías al lomo
   // de serie (su firma). Jamás vuela.
-  zariguya: { EscenaComponent: ZariguyaCompaiEscena, presencia: ZARIGUYA_PRESENCIA, especie: 'zariguya', pendienteFable: false },
+  zariguya: {
+    EscenaComponent: ZariguyaCompaiEscena,
+    PortalComponent: Zariguya,
+    presencia: ZARIGUYA_PRESENCIA,
+    especie: 'zariguya',
+    pendienteFable: false,
+  },
   // El JAGUAR compañero (fable F26): felino DE SUELO — entra acechando desde
   // el borde, camina pesado y silencioso (rodar de hombros, cero bob), viaja
   // con la marcha de perfil del cuerpo, patrulla en óvalos amplios y se echa.
-  // Jamás vuela, jamás trota.
-  jaguar: { EscenaComponent: JaguarCompaiEscena, presencia: JAGUAR_PRESENCIA, especie: 'jaguar', pendienteFable: false },
+  // Jamás vuela, jamás trota. Su PortalComponent (cuerpo 2D del portal) sigue
+  // pendiente — F26 solo cubrió la presencia 3D — así que el portal cruza
+  // con el cuerpo de Angelita hasta que exista (regla del fallback, ver
+  // cuerpoPortalDe en CompaiTransicion.jsx).
+  jaguar: { EscenaComponent: JaguarCompaiEscena, PortalComponent: null, presencia: JAGUAR_PRESENCIA, especie: 'jaguar', pendienteFable: false },
   // El OSO DEL BASTÓN compañero (fable F26): caminante de trocha — llega a
   // pie, anda erguido y LENTO, se detiene a apoyarse en el cayado, y al
   // llegar a su marca el bastón FLORECE (su ecología hecha celebración).
-  'oso-baston': { EscenaComponent: OsoBastonCompaiEscena, presencia: OSO_BASTON_PRESENCIA, especie: 'oso-baston', pendienteFable: false },
+  // PortalComponent pendiente, mismo criterio que el jaguar.
+  'oso-baston': { EscenaComponent: OsoBastonCompaiEscena, PortalComponent: null, presencia: OSO_BASTON_PRESENCIA, especie: 'oso-baston', pendienteFable: false },
   // La LUCIÉRNAGA compañera (fable F26): sí vuela, pero NO como la abeja —
   // se ENCIENDE por pulsos al entrar, deriva lento y bajo, PULSA luz, se
   // detiene a leer la noche y con alerta de finca titila 'degradado'.
-  luciernaga: { EscenaComponent: LuciernagaCompaiEscena, presencia: LUCIERNAGA_PRESENCIA, especie: 'luciernaga', pendienteFable: false },
+  // PortalComponent pendiente, mismo criterio que el jaguar.
+  luciernaga: { EscenaComponent: LuciernagaCompaiEscena, PortalComponent: null, presencia: LUCIERNAGA_PRESENCIA, especie: 'luciernaga', pendienteFable: false },
 };
 
 /**
@@ -104,6 +132,7 @@ export function resolverCompai(avatarType) {
   return {
     avatarType: pedido,
     EscenaComponent: base.EscenaComponent ?? null,
+    PortalComponent: base.PortalComponent ?? null,
     presencia: base.presencia ?? ABEJA_PRESENCIA,
     especie: base.especie ?? 'abeja-angelita',
     pendienteFable: !!base.pendienteFable,

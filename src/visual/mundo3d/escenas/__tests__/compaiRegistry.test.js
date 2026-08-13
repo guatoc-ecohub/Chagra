@@ -1,6 +1,10 @@
 import { describe, it, expect } from 'vitest';
 import { resolverCompai, COMPAI_REGISTRO } from '../compaiRegistry.js';
+import { cuerpoPortalDe } from '../CompaiTransicion.jsx';
 import { ABEJA_PRESENCIA } from '../../../creatures/abejaIdentidad.js';
+import { AbejaAngelita } from '../../../creatures/AbejaAngelita.jsx';
+import { MaizCompai } from '../../../creatures/MaizCompai.jsx';
+import { Zariguya } from '../../../creatures/Zariguya.jsx';
 import { AVATAR_TYPES } from '../../../../hooks/useAgentAvatarType.js';
 
 describe('compaiRegistry.resolverCompai', () => {
@@ -70,6 +74,28 @@ describe('compaiRegistry.resolverCompai', () => {
     expect(c.avatarType).toBe('angelita');
     expect(c.EscenaComponent).toBeNull();
     expect(c.esFallback).toBe(true);
+  });
+
+  it('el portal cruza el cuerpo del guía elegido', () => {
+    expect(cuerpoPortalDe(resolverCompai('angelita'))).toBe(AbejaAngelita);
+    expect(cuerpoPortalDe(resolverCompai('maiz'))).toBe(MaizCompai);
+    expect(cuerpoPortalDe(resolverCompai('zariguya'))).toBe(Zariguya);
+    expect(resolverCompai('maiz').PortalComponent).not.toBe(resolverCompai('angelita').PortalComponent);
+    expect(resolverCompai('zariguya').PortalComponent).not.toBe(resolverCompai('angelita').PortalComponent);
+  });
+
+  it('jaguar, oso del bastón y luciérnaga: escena 3D propia, pero el portal 2D aún cae a Angelita', () => {
+    // F26 (2026-08-13) solo resolvió la presencia 3D de los tres — el cuerpo
+    // 2D del portal (PortalComponent) sigue pendiente, así que cuerpoPortalDe
+    // debe seguir cayendo a Angelita sin lanzar (regla del fallback en
+    // CompaiTransicion.jsx, independiente de pendienteFable/EscenaComponent).
+    for (const tipo of ['jaguar', 'oso-baston', 'luciernaga']) {
+      expect(() => resolverCompai(tipo)).not.toThrow();
+      const c = resolverCompai(tipo);
+      expect(c.pendienteFable).toBe(false);
+      expect(typeof c.EscenaComponent).toBe('function');
+      expect(cuerpoPortalDe(c)).toBe(AbejaAngelita);
+    }
   });
 
   it('tipo desconocido o vacío → default Angelita (nunca lanza)', () => {
