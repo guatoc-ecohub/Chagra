@@ -20,7 +20,7 @@ import useAssetStore from './store/useAssetStore';
 import { fetchFromFarmOS } from './services/apiService';
 import { PRIMARY_WORKER_NAME } from './config/workerConfig';
 import { tieneAccesoGlaciarActual, esOperadorActual } from './config/glaciarAccess';
-import { getProfile } from './services/userProfileService';
+import { getProfile, getMarco3DPreference } from './services/userProfileService';
 import { parseSeguimientoView } from './config/seguimientoProcesos';
 import NetworkStatusBar from './components/NetworkStatusBar';
 import PendingTasksWidget from './components/PendingTasksWidget';
@@ -85,6 +85,10 @@ import { useModoLectura, CSS_LECTURA_GRANDE } from './hooks/useModoLectura';
 // Lazy-loaded route components
 const LoginScreen = lazy(() => import('./components/LoginScreen'));
 const OAuthCallback = lazy(() => import('./components/OAuthCallback'));
+// Marco de entrada OPCIONAL: el valle 3D vanilla (iframe same-origin a
+// /valle/, three r160 aislado del r180 de la app — ver ValleMarcoScreen.jsx).
+// Perezoso: solo baja el chunk quien activó `marco3d` en su perfil.
+const ValleMarcoScreen = lazy(() => import('./components/ValleMarcoScreen'));
 // Vitrina pública de la librería visual reutilizable (`src/visual/`). Ruta
 // #/mockups/visual-lib, resuelta ANTES del check de sesión (no requiere auth).
 const VisualLib = lazy(() => import('./mockups/VisualLib'));
@@ -1194,6 +1198,23 @@ export default function App() {
   // entrada. `sinSesion` recuerda que no hay auth para que el botón volver del
   // valle mande a login (y no al dashboard vacío).
   const [sinSesion, setSinSesion] = useState(false);
+  // Marco de entrada OPCIONAL (valle 3D vanilla, ver ValleMarcoScreen.jsx):
+  // estado REACTIVO, no una lectura directa de getMarco3DPreference() en cada
+  // render. Por qué: `case 'dashboard'` es la MISMA vista tanto para el marco
+  // 3D como para la entrada simple — "salir del marco 3D" (ValleMarcoScreen
+  // → onExit → navigate('dashboard')) navega a la vista en la que YA estamos
+  // (mismo string), y setCurrentView(mismoValor) no dispara re-render en
+  // React. Sin este estado propio, el botón "Entrada simple" quedaba inerte
+  // (persistía la preferencia pero la pantalla no cambiaba — bug real,
+  // detectado por tests/e2e-valle-marco.spec.js). Se sincroniza con
+  // `chagra:profile-changed` (el mismo evento genérico que ya escucha
+  // DashboardLive) para reaccionar también al toggle desde ProfileScreen.
+  const [marco3dActivo, setMarco3dActivo] = useState(() => getMarco3DPreference());
+  useEffect(() => {
+    const handler = () => setMarco3dActivo(getMarco3DPreference());
+    window.addEventListener('chagra:profile-changed', handler);
+    return () => window.removeEventListener('chagra:profile-changed', handler);
+  }, []);
   // Estado online reactivo: usado para mostrar el aviso offline del agente
   // ANTES de intentar el dynamic import de AgentScreen (ver `case 'agente'`).
   // Sin esto, abrir el agente offline con su chunk no cacheado caía en el
@@ -2863,6 +2884,24 @@ export default function App() {
           </ErrorBoundary>
         );
       case 'dashboard':
+        // Marco de entrada OPCIONAL (valle 3D vanilla, default OFF): gate
+        // DOBLE — `currentView === 'dashboard'` solo se alcanza tras
+        // `isAuthenticated()` en el boot (loading → login|dashboard, ver
+        // efecto de arranque más arriba), y `!sinSesion` es el mismo
+        // centinela que usa el resto del shell para "hay sesión real". Sin
+        // los dos, jamás se monta el iframe — la entrada simple de siempre
+        // no cambia para quien no activó la preferencia. `marco3dActivo` es
+        // el estado REACTIVO (no una lectura fresca de getMarco3DPreference()
+        // acá mismo, ver su declaración arriba) — necesario porque "salir del
+        // marco 3D" navega a esta MISMA vista ('dashboard'), y sin estado
+        // propio ese cambio de preferencia nunca dispararía un re-render.
+        if (!sinSesion && marco3dActivo) {
+          return (
+            <ErrorBoundary>
+              <ValleMarcoScreen onExit={() => navigate('dashboard')} />
+            </ErrorBoundary>
+          );
+        }
         return (
           <ErrorBoundary>
             <DashboardLiveView onNavigate={navigate} onLogout={handleLogout} lastLogMessage={lastLogMessage} />
