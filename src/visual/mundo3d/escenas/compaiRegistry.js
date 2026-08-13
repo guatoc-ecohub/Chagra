@@ -68,6 +68,15 @@ const REGISTRO = {
   // trotando, merodea, se encarama al foco en alto y husmea. Crías al lomo
   // de serie (su firma). Jamás vuela.
   zariguya: { EscenaComponent: ZariguyaCompaiEscena, presencia: ZARIGUYA_PRESENCIA, especie: 'zariguya', pendienteFable: false },
+  // Jaguar, oso del bastón y luciérnaga (ítem #8 del GAP compAI, 2026-08-13):
+  // ya tienen cuerpo 2.5D propio (avatares/catálogo) pero TODAVÍA no tienen
+  // coreografía de presencia 3D en los mundos (billboard/percha/sombra
+  // propios) — `pendienteFable:true` los deja explícitos como pendientes.
+  // Caen a la regla del fallback: se ven como Angelita dentro de un mundo 3D
+  // hasta que Fable les construya su propio `EscenaComponent`.
+  jaguar: { EscenaComponent: null, presencia: ABEJA_PRESENCIA, especie: 'jaguar', pendienteFable: true },
+  'oso-baston': { EscenaComponent: null, presencia: ABEJA_PRESENCIA, especie: 'oso-baston', pendienteFable: true },
+  luciernaga: { EscenaComponent: null, presencia: ABEJA_PRESENCIA, especie: 'luciernaga', pendienteFable: true },
 };
 
 /**

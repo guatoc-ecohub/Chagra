@@ -40,7 +40,8 @@
  * @module useAngelitaGuia
  */
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
-import { variarMensaje } from '../services/angelitaVariedad';
+import { variarMensaje, precalentarPoolIdle } from '../services/angelitaVariedad';
+import useIdleDetection from './useIdleDetection.js';
 
 /** Tamaño de avatar por defecto (px) — pensado para el corte 390px de campo. */
 export const TAMANO_GUIA_DEFECTO = 64;
@@ -48,6 +49,13 @@ export const TAMANO_GUIA_DEFECTO = 64;
 export const MARGEN_VIEWPORT_DEFECTO = 14;
 /** Espera antes de aparecer — deja asentar el layout, sin teatro innecesario. */
 export const DEMORA_INICIAL_MS_DEFECTO = 550;
+/** Sin tocar la pantalla este rato → se asume que el usuario está leyendo la
+ *  parada actual, buen momento para precalentar el pool LLM de las próximas
+ *  (ítem #60 del GAP compAI, 2026-08-13 — "tiempo muerto en tips gratis"). */
+export const PRECALENTAR_IDLE_MS_DEFECTO = 5000;
+/** Cuántas paradas por delante se precalientan — un par alcanza; el usuario
+ *  rara vez salta más de 1-2 antes de que el pool ya esté tibio de nuevo. */
+const PRECALENTAR_VENTANA = 2;
 
 /** Resuelve el elemento real de una parada: ref de React o función getter. */
 function elementoDe(parada) {
@@ -282,6 +290,32 @@ export function useAngelitaGuia(paradas = [], opciones = {}) {
     if (!paradaTextoActual) return null;
     return variar ? variarMensaje(paradaTextoActual, paradaTipoActual || 'sugerencia') : paradaTextoActual;
   }, [paradaTextoActual, paradaTipoActual, variar]);
+
+  // PRECALENTAR EN IDLE (#60): el guion completo (`paradas`) ya se conoce de
+  // entrada — a diferencia del store de avisos proactivos, que no sabe el
+  // próximo mensaje hasta que decide mostrarlo. Si el usuario deja de tocar
+  // la pantalla mientras lee la parada activa, es tiempo muerto real: se
+  // aprovecha para precalentar el pool LLM de las próximas 1-2 paradas, así
+  // cuando el usuario avance ya pueden sonar con paráfrasis fresca en vez de
+  // la plantilla determinista del primer instante. Se apaga solo si `variar`
+  // está apagado (no hay pool que precalentar) o si sólo hay una parada.
+  const idleGuia = useIdleDetection(
+    PRECALENTAR_IDLE_MS_DEFECTO,
+    activo && !cerrada && variar && total > 1,
+  );
+  useEffect(() => {
+    if (!idleGuia) return;
+    const desde = indiceRef.current + 1;
+    const candidatos = paradasRef.current
+      .slice(desde, desde + PRECALENTAR_VENTANA)
+      .map((p) => ({ base: p?.texto, tipo: p?.tipo || 'sugerencia' }))
+      .filter((m) => typeof m.base === 'string' && m.base.trim());
+    if (candidatos.length) precalentarPoolIdle(candidatos);
+    // indiceEfectivo también en deps: si el usuario navega mientras el
+    // detector YA estaba idle (p. ej. por voz/teclado, eventos que
+    // useIdleDetection no escucha) la ventana de "próximas paradas" se
+    // recalcula igual — no depende de que idleGuia vuelva a alternar.
+  }, [idleGuia, indiceEfectivo]);
 
   const siguiente = useCallback(() => {
     setIndice((i) => Math.min(i + 1, Math.max(paradasRef.current.length - 1, 0)));

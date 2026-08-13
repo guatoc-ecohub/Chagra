@@ -3,13 +3,17 @@ import useAgentAvatarType from '../../hooks/useAgentAvatarType';
 import ChagraAgentAvatarAngelita from '../ChagraAgentAvatarAngelita';
 import ChagraAgentAvatarMaiz from '../ChagraAgentAvatarMaiz';
 import ChagraAgentAvatarZariguya from '../ChagraAgentAvatarZariguya';
+import ChagraAgentAvatarJaguar from '../ChagraAgentAvatarJaguar';
+import ChagraAgentAvatarOsoBaston from '../ChagraAgentAvatarOsoBaston';
+import ChagraAgentAvatarLuciernaga from '../ChagraAgentAvatarLuciernaga';
 
 /**
  * AgentAvatarSelector — selector visual para el avatar del agente IA.
  *
- * 3 opciones: Angelita la abeja (default), planta de maíz, o la zarigüeya
- * (crías al lomo). Persiste vía useAgentAvatarType (localStorage
- * `chagra:agent-avatar-type`). Cambio inmediato — afecta a todas las
+ * 6 opciones: Angelita la abeja (default), planta de maíz, zarigüeya (crías
+ * al lomo), jaguar, oso del bastón, luciérnaga. Persiste vía
+ * useAgentAvatarType (localStorage `chagra:agent-avatar-type` + llave
+ * canónica `compai:companero`, #96). Cambio inmediato — afecta a todas las
  * instancias del avatar en la app (FAB, login, chat, onboarding — ver
  * ChagraAgentAvatar.jsx, el dispatcher del que dependen).
  *
@@ -20,6 +24,12 @@ import ChagraAgentAvatarZariguya from '../ChagraAgentAvatarZariguya';
  * 2026-07-25 (operador): 3ra opción, la zarigüeya (PR #2783, registro
  * rubber-hose cálido de `visual/creatures/Zariguya.jsx` — NO la zarigüeya
  * oscura/neón de `dashboard/CriaturasNocturnas.jsx`).
+ * 2026-08-13 (ítem #8 del GAP compAI — elenco unificado): 4ta-6ta opción,
+ * jaguar/oso del bastón/luciérnaga — ya tenían cuerpo 2.5D dibujado y ya
+ * estaban `enPWA:true` en `compai/nucleo/elenco.js` desde el 2026-08-11
+ * (#96), pero este selector se había quedado en 3. Guacamaya y chivito NO
+ * entran todavía: sin cuerpo 2.5D propio en la PWA (`ELENCO[...].enPWA` en
+ * `compai/nucleo/elenco.js` sigue en `false` para ambos).
  */
 export default function AgentAvatarSelector() {
     const [type, setType] = useAgentAvatarType();
@@ -42,6 +52,24 @@ export default function AgentAvatarSelector() {
             label: 'Zarigüeya',
             sub: 'La que carga a sus crías al lomo',
             Component: ChagraAgentAvatarZariguya,
+        },
+        {
+            id: 'jaguar',
+            label: 'Jaguar',
+            sub: 'El guardián de monte',
+            Component: ChagraAgentAvatarJaguar,
+        },
+        {
+            id: 'oso-baston',
+            label: 'Oso del bastón',
+            sub: 'El caminante de los Andes',
+            Component: ChagraAgentAvatarOsoBaston,
+        },
+        {
+            id: 'luciernaga',
+            label: 'Luciérnaga',
+            sub: 'La que lee la noche',
+            Component: ChagraAgentAvatarLuciernaga,
         },
     ];
 

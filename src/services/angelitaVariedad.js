@@ -143,9 +143,13 @@ function fechaSeed(ahoraMs) {
 /* Aperturas cortas en usted colombiano. La vacía mantiene el base puro en el
    pool. "Sumercé" es de la casa (Cundinamarca/Boyacá — la finca es Choachí). */
 const APERTURAS_POR_TIPO = {
+  // Pool de aperturas coloquiales por diseño (no copy de UI a migrar a
+  // messages.js) — de ahí los disables puntuales abajo.
+  // eslint-disable-next-line chagra-i18n/no-hardcoded-spanish
   bienvenida: ['', '¡Qué gusto verle! ', 'Bienvenido de nuevo. ', 'Sumercé, ¡qué bueno tenerle por acá! '],
   informativa: ['', 'Mire: ', 'Le cuento: ', 'Sumercé, '],
   sugerencia: ['', 'Mire: ', 'Una idea: ', 'Sumercé, '],
+  // eslint-disable-next-line chagra-i18n/no-hardcoded-spanish
   atencion: ['', 'Ojo con esto: ', 'No se le olvide: ', 'Pendiente: '],
   alerta: ['', 'Atención: ', 'Importante: '],
   celebracion: ['', '¡Qué alegría! ', '¡Muy bien! ', '¡Eso es! '],
@@ -350,6 +354,51 @@ export async function refrescarPoolLLM(base, tipo = 'informativa') {
     }
   } catch {
     /* offline / LLM caído / abort: silencio — la capa determinista sostiene */
+  }
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+ * PRECALENTAR EL POOL EN IDLE (ítem #60 del GAP compAI, 2026-08-13).
+ * ────────────────────────────────────────────────────────────────────────── */
+
+/** Cuántos mensajes se precalientan como máximo por llamada — el usuario
+ *  puede estar idle un ratito nomás; no vale la pena ráfaga de red. */
+const PRECALENTAR_MAX_POR_LLAMADA = 3;
+
+/**
+ * Convierte tiempo muerto (el usuario dejó de tocar la pantalla) en tips ya
+ * enriquecidos: hasta ahora `refrescarPoolLLM` solo se disparaba DESPUÉS de
+ * mostrar un mensaje — la primera vez que alguien lo veía, sonaba siempre a
+ * plantilla determinista (el LLM apenas empezaba a trabajar para la SIGUIENTE
+ * vez). Cuando el caller conoce mensajes que van a mostrarse pronto pero
+ * TODAVÍA no se mostraron —el guion completo de una guía (`useAngelitaGuia`,
+ * los `paradas[].texto` que siguen), o cualquier lista de avisos por venir—
+ * puede pasarlos aquí durante un momento de inactividad real: cuando por fin
+ * le toque el turno a ese mensaje, `variarMensaje` ya puede encontrar una
+ * paráfrasis LLM lista en el pool, en vez de arrancar la petición recién ahí.
+ *
+ * Respeta TODOS los guardrails existentes de `refrescarPoolLLM` sin
+ * duplicarlos (cooldown por base, tope de variantes por base, offline,
+ * timeout): esta función solo decide QUÉ precalentar y CUÁNTO de una vez.
+ * Fire-and-forget, nunca lanza, nunca bloquea a quien la llama.
+ *
+ * @param {Array<string|{base?:string, tipo?:string}>} mensajes — candidatos a
+ *   precalentar, en orden de prioridad (los primeros ganan el cupo).
+ * @param {{ maxPorLlamada?: number }} [opts]
+ * @returns {Promise<void>} resuelta cuando todos los intentos terminaron
+ *   (útil en tests; nadie en producción necesita esperarla).
+ */
+export async function precalentarPoolIdle(mensajes, opts = {}) {
+  try {
+    if (!Array.isArray(mensajes) || mensajes.length === 0) return;
+    const cupo = Number.isFinite(opts.maxPorLlamada) ? opts.maxPorLlamada : PRECALENTAR_MAX_POR_LLAMADA;
+    const candidatos = mensajes
+      .map((m) => (typeof m === 'string' ? { base: m, tipo: 'informativa' } : m))
+      .filter((m) => m && typeof m.base === 'string' && m.base.trim())
+      .slice(0, Math.max(0, cupo));
+    await Promise.all(candidatos.map((m) => refrescarPoolLLM(m.base, m.tipo || 'informativa')));
+  } catch {
+    /* precalentar es un lujo, no un contrato: cualquier falla queda en silencio */
   }
 }
 

@@ -8,14 +8,26 @@
  *
  * Anti-fabricación: si no hay dato real, se devuelve null para cada campo.
  * La escena 3D muestra "en camino" en vez de inventar.
+ *
+ * `enso`/`cosechaReciente` deshardcodeados (ítem #78 del GAP compAI,
+ * 2026-08-13 — "el mejor momento del producto y hoy se pierde entero"):
+ * antes salían siempre `'neutro'`/`null` sin mirar ningún dato. Se
+ * reutilizan las MISMAS fuentes reales que `useFincaViva.js` (el hook
+ * hermano que sí está montado en el mundo 3D) en vez de reinventarlas:
+ * `ensoService.getEnsoPhase()` (NOAA/IDEAM cacheado, con override manual) +
+ * `mapearEnso()`, y `useCosechaStore` (logs `log--harvest` de IndexedDB) +
+ * `cosechaRecienteDe()` (ventana de 14 días — pasado eso ya no es "hoy").
  */
 import { useState, useEffect } from 'react';
+import useCosechaStore from '../store/useCosechaStore.js';
+import { getEnsoPhase } from '../services/ensoService.js';
+import { mapearEnso, cosechaRecienteDe } from '../visual/mundo3d/useFincaViva.js';
 
 /**
  * @typedef {Object} EstadoFincaReal
  * @property {string} clima — 'dorada'|'soleado'|'niebla'|'lluvia'|'noche'|null
  * @property {string|null} enso — 'nino'|'nina'|'neutro'
- * @property {Object|null} cosechaReciente — { cultivo: string, mundoId: string }
+ * @property {Object|null} cosechaReciente — { cultivo: string, mundoId: null } (ver cosechaRecienteDe)
  * @property {Object|null} saludFinca — { matasVivas: number, matasTotal: number, agua: boolean }
  * @property {Array|null} animales — [{ especie, nombre, raza, estado }]
  */
@@ -33,6 +45,18 @@ export function useEstadoFincaReal() {
     animales: null,
   }));
   const [cargando, setCargando] = useState(true);
+
+  // El store de cosecha (log--harvest en IndexedDB) es global y puede llegar
+  // ya caliente de otra pantalla (Mi cosecha, useFincaViva). Nos suscribimos
+  // para que `cosechaReciente` se recalcule cuando llegue/cambie, y lo
+  // calentamos si nadie lo hizo todavía (mismo patrón de useFincaViva.js).
+  const cosechaSummary = useCosechaStore((s) => s.summary);
+  const cosechaCargando = useCosechaStore((s) => s.isLoading);
+  useEffect(() => {
+    if (cosechaSummary == null && !cosechaCargando) {
+      useCosechaStore.getState().loadHarvests();
+    }
+  }, [cosechaSummary, cosechaCargando]);
 
   useEffect(() => {
     let cancelado = false;
@@ -80,8 +104,8 @@ export function useEstadoFincaReal() {
         if (!cancelado) {
           setEstadoFinca({
             clima,
-            enso: 'neutro',
-            cosechaReciente: null,
+            enso: mapearEnso(getEnsoPhase()),
+            cosechaReciente: cosechaRecienteDe(cosechaSummary),
             saludFinca: matasVivas > 0 ? {
               matasVivas,
               matasTotal: plantas.length || 0,
@@ -98,7 +122,7 @@ export function useEstadoFincaReal() {
 
     cargar();
     return () => { cancelado = true; };
-  }, []);
+  }, [cosechaSummary]);
 
   return { estadoFinca, cargando };
 }

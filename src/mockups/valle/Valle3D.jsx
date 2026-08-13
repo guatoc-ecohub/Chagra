@@ -51,6 +51,7 @@ import useAngelitaStore from '../../store/useAngelitaStore';
 import useInventarioCompai from '../../hooks/useInventarioCompai';
 import { datosDeMundo } from '../../compai/nucleo/datosFinca.js';
 import { estaOcupado } from '../../services/compaiOcupado.js';
+import { husmeoCadenciaMs, vueltasCompletas } from './husmeoCadencia.js';
 import BurbujaAngelita from '../../visual/agente/BurbujaAngelita';
 /* #88 — QUE EL COMPAI HABLE SUS TIPS: hasta hoy el husmeo solo pintaba la
    burbuja (mensajeAngelita), nunca lo decía en voz — speak/speakKokoro ya
@@ -166,7 +167,11 @@ const LUGAR_A_MUNDO_ANGELITA = {
    real, nunca con reduced-motion. */
 const HUSMEO_LUGARES = ['cultivos', 'animales', 'clima', 'mercado', 'aprender', 'disenio'];
 const HUSMEO_PRIMERO_MS = 4200; // el primer husmeo llega pronto: se ve viva al cargar
-const HUSMEO_CADA_MS = 13000; // cadencia entre husmeos (feedback operador: 40s se sentía MUERTA; 13s = viva sin ser errática)
+/* Cadencia entre husmeos: YA NO un número fijo. `husmeoCadenciaMs` (ítem #58
+   del GAP compAI, 2026-08-13) reconcilia el SPEC (46s) con el feedback en
+   vivo del operador (13s: "40s se sentía MUERTA") — arranca en 13s y se
+   asienta hacia 46s tras varias vueltas sin que el usuario interactúe. Ver
+   ./husmeoCadencia.js. */
 const HUSMEO_VISIBLE_MS = 7000; // piso: ningún aviso dura menos que esto
 /* Cuánto se queda un aviso en pantalla: lo que tarda la máquina de escribir en
    ponerlo (≈16 ms por letra) MÁS el tiempo de leerlo con calma (≈70 ms por
@@ -2007,6 +2012,12 @@ function CompaneroAbeja({ foco, focoId = null, entrando, animo, energia, reduced
     [],
   );
 
+  // Cuántos husmeos autónomos van sonados (ver husmeoCadencia.js, #58) — vive
+  // arriba de los dos efectos porque el #1 (navegación real) la REINICIA: el
+  // usuario acaba de interactuar de verdad, así que el husmeo vuelve a
+  // sonar "vivo" (13s) en vez de seguir asentado hacia el ritmo del SPEC.
+  const husmeoIdx = useRef(0);
+
   // 1) Navegación real: al entrar/salir de un mundo de verdad, la abeja
   //    husmea ese lugar (o vuelve a calma al salir). `focoId` es el id CRUDO
   //    del lugar del valle (Escena ya lo resuelve); se traduce al vocabulario
@@ -2016,6 +2027,10 @@ function CompaneroAbeja({ foco, focoId = null, entrando, animo, energia, reduced
     if (focoId && focoId !== focoIdPrevio.current) {
       const mundo = LUGAR_A_MUNDO_ANGELITA[focoId] || 'finca';
       entrarMundoAngelita(mundo, datosParaMundo(mundo));
+      // El usuario interactuó de verdad: la cadencia del husmeo autónomo
+      // vuelve a arrancar "viva" (#58) — no se queda asentada en 46s solo
+      // porque llevaba rato sin que nadie tocara nada ANTES de esta visita.
+      husmeoIdx.current = 0;
     } else if (!focoId && focoIdPrevio.current) {
       reposarAngelita();
     }
@@ -2031,7 +2046,6 @@ function CompaneroAbeja({ foco, focoId = null, entrando, animo, energia, reduced
   //    debe repintar el resto del árbol.
   const entrandoRef = useRef(entrando);
   useEffect(() => { entrandoRef.current = entrando; }, [entrando]);
-  const husmeoIdx = useRef(0);
   const husmeoLugarRef = useRef(null);
   useEffect(() => {
     if (reducedMotion) return undefined;
@@ -2062,9 +2076,12 @@ function CompaneroAbeja({ foco, focoId = null, entrando, animo, energia, reduced
           }, duraEste);
         }
       }
-      /* El siguiente husmeo espera a que el anterior TERMINE de leerse (+ respiro):
-         un aviso largo ya no se lo come el que viene detrás. */
-      temporizador = setTimeout(tick, Math.max(HUSMEO_CADA_MS, duraEste + 3500));
+      /* El siguiente husmeo espera a que el anterior TERMINE de leerse (+
+         respiro): un aviso largo ya no se lo come el que viene detrás. La
+         cadencia BASE (#58) ya no es fija: arranca en 13s ("viva") y se
+         asienta hacia los 46s del SPEC tras varias vueltas sin interacción. */
+      const cadenciaBase = husmeoCadenciaMs(vueltasCompletas(husmeoIdx.current, HUSMEO_LUGARES.length));
+      temporizador = setTimeout(tick, Math.max(cadenciaBase, duraEste + 3500));
     };
     temporizador = setTimeout(tick, HUSMEO_PRIMERO_MS);
     return () => {
