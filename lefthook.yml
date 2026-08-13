@@ -157,6 +157,21 @@ pre-commit:
       glob: "catalog/*.json"
       run: node scripts/validate-catalog.mjs --lenient-schema
 
+    sync-compai-nucleo-check:
+      # El compAI vive en dos stacks (esta PWA + el valle 3D en ~/demos/3d,
+      # checkout local SIN remoto). `src/compai/nucleo/` es la fuente única;
+      # sync-compai-nucleo.mjs copia hacia el valle. Sin este guard, un editor
+      # puede tocar el núcleo acá y olvidarse de correr el sync — los dos
+      # compAI empiezan a decir cosas distintas SIN que nadie se entere hasta
+      # notarlo a ojo (esto pasó de verdad: oso-baston/jaguar/luciernaga
+      # cruzaron a la PWA el 2026-08-11 y el valle quedó desactualizado hasta
+      # el 2026-08-13 — ítem #8 del GAP compAI). Solo corre si cambia el
+      # núcleo. En máquinas sin `~/demos/3d` (CI, otros contribuidores) el
+      # script detecta el destino ausente y sale 0 — no aplica, no es un
+      # falso rojo.
+      glob: "src/compai/nucleo/*.js"
+      run: node scripts/sync-compai-nucleo.mjs --check
+
 commit-msg:
   commands:
     conventional:

@@ -16,9 +16,15 @@
  *   node scripts/sync-compai-nucleo.mjs --check    NO copia; sale 1 si hay deriva
  *   node scripts/sync-compai-nucleo.mjs --destino /otra/ruta
  *
- * `--check` es lo que va en CI/lefthook: si alguien edita la copia de
- * `valle-guatoc/` en vez del origen, se entera de inmediato en vez de
- * descubrirlo cuando los dos compAI ya digan cosas distintas.
+ * `--check` está enganchado en `lefthook.yml` (pre-commit, glob
+ * `src/compai/nucleo/*.js`): si alguien edita el núcleo y no corre el sync,
+ * el commit falla ahí mismo en vez de descubrirse cuando los dos compAI ya
+ * digan cosas distintas. NO está en GitHub Actions CI a propósito: el
+ * DESTINO (`~/demos/3d`, el valle 3D vivo) es un checkout LOCAL sin remoto
+ * — no existe en el runner de CI ni en la máquina de otro contribuidor, así
+ * que ahí `--check` sale 0 sin verificar nada (destino ausente = "no
+ * aplica", ver `main()`). El gate real vive donde vive el valle: la misma
+ * máquina que corre lefthook.
  *
  * INVARIANTE QUE SE VERIFICA EN CADA CORRIDA: ningún archivo del núcleo puede
  * importar nada fuera de su propio directorio. Si alguien mete un `import` a
@@ -78,6 +84,16 @@ function main() {
   if (!existsSync(ORIGEN)) {
     console.error(`✗ no existe el origen: ${ORIGEN}`);
     process.exit(1);
+  }
+
+  // El destino (~/demos/3d/compai) es un checkout LOCAL sin remoto — no
+  // existe en CI ni en máquinas de otros contribuidores. Si no existe, el
+  // --check no aplica (nada que verificar aquí): salir en 0 en vez de marcar
+  // deriva en TODOS los archivos por "destino ausente" (bug encontrado
+  // cableando este script a lefthook, ítem #8 del GAP compAI 2026-08-13).
+  if (soloVerificar && !existsSync(DESTINO)) {
+    console.log(`○ ${DESTINO} no existe en esta máquina — --check no aplica (nada que sincronizar aquí).`);
+    return;
   }
 
   const archivos = archivosDelNucleo();

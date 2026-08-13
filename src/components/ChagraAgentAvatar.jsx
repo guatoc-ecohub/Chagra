@@ -1,6 +1,9 @@
 import ChagraAgentAvatarMaiz from './ChagraAgentAvatarMaiz';
 import ChagraAgentAvatarAngelita from './ChagraAgentAvatarAngelita';
 import ChagraAgentAvatarZariguya from './ChagraAgentAvatarZariguya';
+import ChagraAgentAvatarJaguar from './ChagraAgentAvatarJaguar';
+import ChagraAgentAvatarOsoBaston from './ChagraAgentAvatarOsoBaston';
+import ChagraAgentAvatarLuciernaga from './ChagraAgentAvatarLuciernaga';
 import Angelita from '../visual/agente/Angelita';
 import useCompaiElegido from '../visual/mundo3d/escenas/useCompaiElegido.js';
 
@@ -37,6 +40,10 @@ import useCompaiElegido from '../visual/mundo3d/escenas/useCompaiElegido.js';
  *
  * 3ra opción (2026-07-25): 'zariguya' — la zarigüeya (crías al lomo, PR
  * #2783), adaptador en ChagraAgentAvatarZariguya.jsx.
+ *
+ * 4ta-6ta opción (2026-08-13, ítem #8 del GAP compAI — elenco unificado):
+ * 'jaguar', 'oso-baston', 'luciernaga' — ya tenían cuerpo 2.5D y ya estaban
+ * `enPWA:true` en el núcleo (#96) pero ningún selector los ofrecía.
  */
 const STATE_DE_ESTADO_RICO = {
     acompana: 'idle',
@@ -50,6 +57,9 @@ const STATE_DE_ESTADO_RICO = {
 const AVATAR_ANGOSTO = {
     maiz: ChagraAgentAvatarMaiz,
     zariguya: ChagraAgentAvatarZariguya,
+    jaguar: ChagraAgentAvatarJaguar,
+    'oso-baston': ChagraAgentAvatarOsoBaston,
+    luciernaga: ChagraAgentAvatarLuciernaga,
 };
 
 export default function ChagraAgentAvatar({ estado = undefined, ...props }) {
