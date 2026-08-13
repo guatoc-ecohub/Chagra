@@ -30,6 +30,7 @@ import {
   getNotificationStyle, setNotificationStyle, getTelemetryConsent,
   setTelemetryConsent, HOME_MODULES, getModuleVisibility, setModuleVisibility,
   hasManualModuleVisibility, getProfile, saveProfile, getProfileMunicipio,
+  getMarco3DPreference, setMarco3DPreference,
 } from '../services/userProfileService';
 import { selectHomeModuleVisibilityMap } from '../services/homeModuleSelector';
 import { tieneAccesoGlaciarActual, esOperadorActual, operatorOverrideActivo, setOperatorOverride } from '../config/glaciarAccess';
@@ -764,6 +765,11 @@ export default function ProfileScreen({ onBack, onHome }) {
 
             {/* FASE 0 game-dev: la entrada 3D del valle desde el home (flag). */}
             <Valle3DSection />
+
+            {/* Marco de entrada OPCIONAL: el valle 3D vanilla (3d.guatoc.co,
+                three r160 aislado en su propio iframe) — DISTINTO del toggle
+                de arriba, ver Marco3DSection. */}
+            <Marco3DSection />
           </div>
         )}
 
@@ -1391,6 +1397,64 @@ function Valle3DSection() {
           todos los mundos siguen completos en su versión de siempre.
         </p>
       )}
+    </div>
+  );
+}
+
+/**
+ * Marco3DSection — marco de entrada OPCIONAL: el valle 3D VANILLA (el mismo
+ * build que sirve 3d.guatoc.co) embebido a pantalla completa en un <iframe>
+ * (ValleMarcoScreen.jsx), detrás de sesión. Persiste en el perfil (`marco3d`,
+ * userProfileService), DEFAULT OFF.
+ *
+ * NO ES `Valle3DSection` de arriba: ese toggle prende una banda del diorama
+ * propio de la app (EntradaValle3D, React-Three-Fiber, three r180) dentro del
+ * dashboard. Este prende el valle vanilla completo (three r160, aislado en su
+ * propio importmap) que REEMPLAZA la entrada entera — dos experiencias,
+ * copy deliberadamente distinto para no confundirlas.
+ */
+function Marco3DSection() {
+  const [marco3d, setMarco3dState] = useState(() => getMarco3DPreference());
+
+  return (
+    <div className="space-y-4 bg-slate-900/40 border border-slate-800 rounded-2xl p-5">
+      <div className="flex items-center gap-2 px-1">
+        <Mountain size={18} className="text-emerald-400" />
+        <h3 className="text-sm font-bold text-slate-300 uppercase tracking-wider">Marco de inicio</h3>
+      </div>
+
+      <label className="flex items-center justify-between gap-3 p-3 rounded-xl bg-slate-800/50 cursor-pointer min-h-[48px]">
+        <div className="flex flex-col gap-0.5 flex-1">
+          <span className="text-sm font-bold text-slate-200">Entrar por el valle 3D (3d.guatoc.co)</span>
+          <span className="text-xs text-slate-400 leading-snug">
+            Reemplaza la entrada simple por el valle 3D completo — los mundos
+            y el kart en pantalla completa. Puede volver a la entrada simple
+            en cualquier momento, desde dentro del valle o apagando esta
+            opción.
+          </span>
+        </div>
+        <button
+          type="button"
+          role="switch"
+          aria-checked={marco3d}
+          aria-label="Activar o desactivar el marco de entrada del valle 3D"
+          data-testid="marco3d-toggle"
+          onClick={() => {
+            const next = !marco3d;
+            setMarco3dState(next);
+            setMarco3DPreference(next);
+          }}
+          className={`tap-target relative w-12 h-7 rounded-full transition-colors shrink-0 ${
+            marco3d ? 'bg-emerald-600' : 'bg-slate-700'
+          }`}
+        >
+          <span
+            className={`absolute top-0.5 left-0.5 w-6 h-6 bg-white rounded-full shadow transition-transform ${
+              marco3d ? 'translate-x-5' : 'translate-x-0'
+            }`}
+          />
+        </button>
+      </label>
     </div>
   );
 }

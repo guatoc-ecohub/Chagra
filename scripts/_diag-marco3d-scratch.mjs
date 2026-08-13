@@ -1,0 +1,95 @@
+import { chromium } from '@playwright/test';
+import { execSync } from 'node:child_process';
+
+function detectChromiumPath() {
+  try {
+    const which = execSync('which chromium 2>/dev/null', { encoding: 'utf8' }).trim();
+    if (which) return which;
+  } catch {}
+  return undefined;
+}
+
+const ORIGIN = 'http://localhost:5173';
+const USER = 'diag-valle-marco';
+
+async function mockBackend(page) {
+  await page.context().route('**/oauth/token', (route) =>
+    route.fulfill({
+      status: 200, contentType: 'application/json',
+      body: JSON.stringify({ access_token: 'diag-token', refresh_token: 'diag-refresh', token_type: 'Bearer', expires_in: 3600 }),
+    }),
+  );
+  const emptyJsonApi = JSON.stringify({ data: [], jsonapi: { version: '1.0' } });
+  for (const pattern of ['**/api/asset/**', '**/api/log/**', '**/api/taxonomy_term/**', '**/api/user/**']) {
+    await page.context().route(pattern, (route) =>
+      route.fulfill({ status: 200, contentType: 'application/vnd.api+json', body: emptyJsonApi }),
+    );
+  }
+  await page.context().route('**/fincas-publicas.json', (route) =>
+    route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify([]) }),
+  );
+}
+
+async function seedSession(page, marco3d) {
+  await page.addInitScript(
+    ({ username, marco3dPref }) => {
+      window.localStorage.setItem('chagra:active_tenant_id', username);
+      const profile = { rol: 'operador', vocacion: 'mixta', finca_tipo: 'integral', nivel_respuestas: 'detallado', marco3d: marco3dPref };
+      window.localStorage.setItem('chagra:profile:v1', JSON.stringify(profile));
+      window.localStorage.setItem(`chagra:profile:v1:${username}`, JSON.stringify(profile));
+    },
+    { username: USER, marco3dPref: marco3d },
+  );
+}
+
+async function login(page) {
+  await page.evaluate(async (username) => {
+    const authMod = await import('/src/services/authService.js');
+    const result = await authMod.authenticateUser(username, 'diag-pwd');
+    if (!result.success) throw new Error('login mock failed');
+    const tenantMod = await import('/src/services/tenantContext.js');
+    tenantMod.setActiveTenantId(username);
+  }, USER);
+}
+
+const browser = await chromium.launch({
+  args: ['--no-sandbox', '--disable-setuid-sandbox'],
+  executablePath: detectChromiumPath(),
+});
+
+const context = await browser.newContext({ viewport: { width: 1280, height: 800 } });
+const page = await context.newPage();
+const logs = [];
+page.on('console', (msg) => logs.push(`[console:${msg.type()}] ${msg.text()}`));
+page.on('pageerror', (err) => logs.push(`[pageerror] ${err.message}`));
+page.on('frameattached', (frame) => {
+  frame.on('console', (msg) => logs.push(`[iframe-console:${msg.type()}] ${msg.text()}`));
+});
+await seedSession(page, true);
+await mockBackend(page);
+await page.goto(ORIGIN, { waitUntil: 'domcontentloaded' });
+await login(page);
+await page.goto(ORIGIN, { waitUntil: 'domcontentloaded' });
+await page.waitForLoadState('networkidle').catch(() => {});
+const iframeHandle = await page.waitForSelector('[data-testid="valle-marco-screen"] iframe', { timeout: 10000 });
+const frame = await iframeHandle.contentFrame();
+await page.waitForTimeout(4000);
+console.log('--- iframe URL ---', frame.url());
+const canvasInfo = await frame.evaluate(() => {
+  const canvases = Array.from(document.querySelectorAll('canvas'));
+  return canvases.map((c) => {
+    let gl = null;
+    try { gl = c.getContext('webgl2') || c.getContext('webgl'); } catch (e) { /* noop */ }
+    return {
+      width: c.width, height: c.height,
+      hasGL: !!gl,
+      glRenderer: gl ? gl.getParameter(gl.RENDERER) : null,
+      glError: gl ? gl.getError() : null,
+    };
+  });
+}).catch((e) => ({ error: String(e) }));
+console.log('--- canvas info ---', JSON.stringify(canvasInfo, null, 2));
+console.log('--- logs (last 60) ---');
+for (const l of logs.slice(-60)) console.log(l);
+await context.close();
+await browser.close();

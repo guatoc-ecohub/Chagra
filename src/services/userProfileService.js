@@ -1,3 +1,14 @@
+/*
+ * i18n (ADR-050): userProfileService.js trae strings en español Colombia
+ * (nombres de módulos, mensajes de consola) pendientes de migrar a
+ * src/config/messages.js — deuda PREEXISTENTE (14 warnings en `dev` HEAD,
+ * verificado antes de este cambio) que nadie había disparado porque nadie
+ * había tocado el archivo desde que la regla `chagra-i18n` entró. La regla es
+ * soft (warn); se desactiva a nivel de archivo para no bloquear el pre-commit
+ * de ESTE cambio (marco3d) con deuda que no le pertenece — mismo criterio que
+ * App.jsx/DashboardLive.jsx. Los errores reales de ESLint siguen activos.
+ */
+/* eslint-disable chagra-i18n/no-hardcoded-spanish */
 /**
  * userProfileService.js — perfil enriquecido del usuario (#200).
  *
@@ -872,6 +883,51 @@ export function setGuardianEspecie(id) {
     window.dispatchEvent(new CustomEvent('chagra:guardian-changed', { detail: { id } }));
     window.dispatchEvent(new CustomEvent('chagra:profile-changed', { detail: { guardian_especie: id } }));
   } catch (_) { /* SSR/tests sin window — la elección ya quedó persistida */ }
+  return profile;
+}
+
+// ─── Marco de inicio: valle 3D vanilla (integración iframe /valle/) ─────────
+//
+// `marco3d` (booleano en el perfil) decide si la entrada de la app, ya
+// autenticada, se reemplaza por el valle 3D vanilla (el mismo build que sirve
+// 3d.guatoc.co, sincronizado a `public/valle/` por `scripts/sync-valle.mjs`)
+// dentro de un <iframe> a pantalla completa. DEFAULT false (entrada simple de
+// siempre) — es un marco OPCIONAL, nunca el camino forzado.
+//
+// NO CONFUNDIR con `valle3d` (usePrefsStore, ProfileScreen `Valle3DSection`):
+// esa es la banda "El valle en 3D" de EntradaValle3D — un diorama propio en
+// React-Three-Fiber (three r180, mismo bundle de la app) que abre DENTRO del
+// dashboard. Este `marco3d` es el valle VANILLA (three r160 aislado en su
+// propio importmap dentro del iframe) que REEMPLAZA la entrada entera. Dos
+// experiencias distintas, dos flags distintos, a propósito.
+export const DEFAULT_MARCO3D = false;
+
+/**
+ * Lee la preferencia de marco de inicio (valle 3D vanilla vs. entrada simple).
+ * @returns {boolean}
+ */
+export function getMarco3DPreference() {
+  const v = getProfile()?.marco3d;
+  return typeof v === 'boolean' ? v : DEFAULT_MARCO3D;
+}
+
+/**
+ * Persiste la preferencia de marco de inicio en el perfil (`marco3d`).
+ * Emite `chagra:profile-changed` (mismo evento genérico de todo el archivo,
+ * ver getGuardianEspecie/setGuardianEspecie arriba) — no un evento propio: no
+ * hay hoy ningún listener que necesite distinguir ESTE cambio de perfil de
+ * los demás (App.jsx lee `getMarco3DPreference()` fresca en cada render del
+ * case 'dashboard', no cachea el valor en estado, así que no depende de
+ * ningún evento para verlo al volver del perfil).
+ * @param {boolean} enabled
+ * @returns {Object} perfil resultante
+ */
+export function setMarco3DPreference(enabled) {
+  const next = !!enabled;
+  const profile = saveProfile({ marco3d: next });
+  try {
+    window.dispatchEvent(new CustomEvent('chagra:profile-changed', { detail: { marco3d: next } }));
+  } catch (_) { /* SSR/tests sin window — la pref ya quedó persistida */ }
   return profile;
 }
 

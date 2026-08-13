@@ -30,6 +30,13 @@ const THRESHOLDS = {
 // el grounding diferido, no pesan en el arranque, así que se excluyen del techo de
 // 27.5 MB (que mide peso de arranque, no disco total). Crecieron a 33 MB y estaban
 // contándose contra el budget por accidente (falta de exclusión), no por bloat eager.
+//
+// Valle 3D vanilla (dist/valle, ~17 MB — scripts/sync-valle.mjs): marco de
+// entrada OPCIONAL detrás de un toggle de perfil (default OFF, ver
+// ValleMarcoScreen.jsx / userProfileService.getMarco3DPreference). Se sirve
+// dentro de un <iframe> SOLO si el usuario lo activó — nunca se precachea en
+// install (offline-cache del valle es trabajo aparte). Mismo criterio que el
+// resto de esta lista: cache-on-use, no pesa en el arranque.
 const LAZY_EXCLUDED_PREFIXES = [
   join(DIST, 'vendor', 'tfjs'),
   join(DIST, 'vendor', 'speech-commands'),
@@ -38,6 +45,7 @@ const LAZY_EXCLUDED_PREFIXES = [
   join(DIST, 'rag-embeddings.json'),
   join(DIST, 'cycle-content'),
   join(DIST, 'plaga-images'),
+  join(DIST, 'valle'),
 ];
 
 function formatSize(bytes) {
