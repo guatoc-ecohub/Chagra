@@ -80,6 +80,8 @@ const COPY_ENTERO =
    fondo. Deterministas (nada de Math.random — react-hooks/purity) y quietas
    (dignas con reduced-motion: la niebla del bosque no corre). No cruzan el claro
    ni el primer plano: solo acumulan bruma donde la distancia ya la vela. */
+/** @typedef {{ pos: [number, number, number], r: number, op: number }} PufNiebla */
+/** @type {PufNiebla[]} */
 const PUFS_NIEBLA = [
   { pos: [-9, 2.6, -12], r: 4.6, op: 0.3 },
   { pos: [7, 3.4, -15], r: 5.2, op: 0.28 },
@@ -110,6 +112,15 @@ function NieblaFondo({ color }) {
  * @param {boolean} [props.reducedMotion]
  * @param {(view:string, data?:object)=>void} [props.onHotspot]
  * @param {'alto'|'medio'|'bajo'} [props.tier]
+ * @param {object}   [props.entrada]      contrato uniforme del host (Mundo.jsx)
+ * @param {string}   [props.animo]        ídem — no se usa: este mundo se cuenta
+ *   solo con su flora
+ * @param {number}   [props.energia]      ídem
+ * @param {object}   [props.estadoFinca]  ídem
+ * @param {boolean}  [props.hayAlerta]    ídem
+ * @param {object[]} [props.hotspots]     ídem
+ * @param {string[]} [props.tinte]        ídem
+ * @param {string}   [props.mundoId]      ídem
  */
 export default function EscenaBosque({
   params,
