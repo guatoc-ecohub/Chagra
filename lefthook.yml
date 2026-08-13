@@ -43,8 +43,12 @@ pre-commit:
         files="{staged_files}"
         [ -z "$files" ] && exit 0
         # Filtra archivos de reglas + docs que legítimamente discuten los
-        # patterns como texto de normativa.
-        filtered=$(echo "$files" | tr ' ' '\n' | grep -vE "^(oss-pro/PROHIBITED|lefthook\.yml|oss-pro/README\.md|CONTRIBUTING\.md|AGENTS\.md)" || true)
+        # patterns como texto de normativa, y public/valle/ (árbol vanilla
+        # sincronizado completo desde otro repo — scripts/sync-valle.mjs —
+        # donde "burnout"/"valuation" son términos de juego de carreras y de
+        # substring en librerías vendoreadas (three-mesh-bvh "evaluation"),
+        # falsos positivos inevitables sin editar el repo fuente).
+        filtered=$(echo "$files" | tr ' ' '\n' | grep -vE "^(oss-pro/PROHIBITED|lefthook\.yml|oss-pro/README\.md|CONTRIBUTING\.md|AGENTS\.md|public/valle/)" || true)
         [ -z "$filtered" ] && exit 0
         # Patrones universales — identificadores específicos (codenames de
         # agentes propios, infra interna) viven en chagra-pro/PROHIBITED_INTERNAL.md
@@ -127,11 +131,13 @@ pre-commit:
     eslint:
       glob: "*.{js,jsx,ts,tsx}"
       # public/vendor/** (#2088, modo campo): librerías de terceros vendoreadas
-      # TAL CUAL (UMD minificado TF.js/speech-commands). Ya están en
+      # TAL CUAL (UMD minificado TF.js/speech-commands). public/valle/**
+      # (marco de entrada opcional, scripts/sync-valle.mjs): árbol vanilla
+      # sincronizado completo, mismo criterio. Ambas ya están en
       # eslint.config.js globalIgnores, pero --max-warnings=0 cuenta el propio
       # warning de "ignorado por patrón" — hay que excluirlas del glob acá
-      # también para no romper el commit de un vendor legítimo.
-      exclude: '\.d\.ts$|^public/vendor/'
+      # también para no romper el commit de un vendor/valle legítimo.
+      exclude: '\.d\.ts$|^public/vendor/|^public/valle/'
       run: npx eslint {staged_files} --max-warnings=0
 
     # auto-bump-version REMOVIDO 2026-06-02: el bump de versión se movió a
