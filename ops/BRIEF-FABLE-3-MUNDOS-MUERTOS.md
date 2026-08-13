@@ -55,10 +55,10 @@ No redibuje lo que ya está: **reencuadre**.
 
 ## 1. `mundo-gallinero-3d` — «visualmente lindo pero no hace nada»
 
-**Archivo:** `/home/kortux/Workspace/chagra/src/mockups/MundoGallinero3D.jsx` (290 líneas)
+**Archivo:** `<WORKSPACE>/chagra/src/mockups/MundoGallinero3D.jsx` (290 líneas)
 **Capturas:**
-- `/home/kortux/Workspace/chagra/ops/capturas/mundos-muertos-2026-07-21/gallinero-movil-390.png`
-- `/home/kortux/Workspace/chagra/ops/capturas/mundos-muertos-2026-07-21/gallinero-ancho-1280.png`
+- `<WORKSPACE>/chagra/ops/capturas/mundos-muertos-2026-07-21/gallinero-movil-390.png`
+- `<WORKSPACE>/chagra/ops/capturas/mundos-muertos-2026-07-21/gallinero-ancho-1280.png`
 
 ### Qué tiene puesto que no se mueve ni responde
 
@@ -137,10 +137,10 @@ qué pasa si usted **no** rota.
 
 ## 2. `mundo-botica-cana-3d` — «va por buen camino, le faltan 2 o 3 pasadas»
 
-**Archivo:** `/home/kortux/Workspace/chagra/src/mockups/MundoBoticaCana3D.jsx` (1327 líneas)
+**Archivo:** `<WORKSPACE>/chagra/src/mockups/MundoBoticaCana3D.jsx` (1327 líneas)
 **Capturas:**
-- `/home/kortux/Workspace/chagra/ops/capturas/mundos-muertos-2026-07-21/botica-cana-movil-390.png`
-- `/home/kortux/Workspace/chagra/ops/capturas/mundos-muertos-2026-07-21/botica-cana-ancho-1280-etiquetas.png`
+- `<WORKSPACE>/chagra/ops/capturas/mundos-muertos-2026-07-21/botica-cana-movil-390.png`
+- `<WORKSPACE>/chagra/ops/capturas/mundos-muertos-2026-07-21/botica-cana-ancho-1280-etiquetas.png`
 
 El operador tiene razón en que va por buen camino: es el más trabajado de los tres. **El buey SÍ
 gira** — verificado, va dentro del grupo `vuelta` en `Trapiche` (línea 721), que rota con `useFrame`.
@@ -211,8 +211,8 @@ pegado abajo. **La pasada que falta es mudar ese saber a la escena.**
 
 ## 3. `mundo-abejas-3d` — «se ve medianamente bien pero no hace nada»
 
-**Archivo:** `/home/kortux/Workspace/chagra/src/mockups/MundoAbejas3D.jsx` (270 líneas)
-**Captura:** `/home/kortux/Workspace/chagra/ops/capturas/mundos-muertos-2026-07-21/abejas-movil-390.png`
+**Archivo:** `<WORKSPACE>/chagra/src/mockups/MundoAbejas3D.jsx` (270 líneas)
+**Captura:** `<WORKSPACE>/chagra/ops/capturas/mundos-muertos-2026-07-21/abejas-movil-390.png`
 (este es el único que sí carga en `https://chagra-dev.guatoc.co/#/mockups/mundo-abejas-3d`)
 
 ### Qué tiene puesto que no se mueve ni responde

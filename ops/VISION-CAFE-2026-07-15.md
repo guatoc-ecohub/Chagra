@@ -133,7 +133,7 @@ total de entrenamiento).
 ## 3. Conteos reales (post-fusión, post-limpieza)
 
 Generado por `scripts/ml/vision-cafe/prep_manifest.py` (ver
-`/home/kortux/datasets/cafe/manifests/prep_summary.json` para el JSON completo).
+`<WORKSPACE>/datasets/cafe/manifests/prep_summary.json` para el JSON completo).
 
 - BRACOL: 1747 filas en `dataset.csv` → 62 excluidas por `predominant_stress==5` (mixed/empate,
   ambiguo para etiqueta única) → 342 sin archivo de imagen recuperable (el zip corrupto, sección
@@ -302,7 +302,7 @@ de BRACOL) predijo "sana" con 0.606 — por encima del umbral, otro falso negati
 trampa de taxonomía documentada en la sección 2: aunque hubiera acertado con "cercospora" ahí,
 habría sido un acierto de nombre común, no de hongo.
 
-Tabla completa y JSON crudo: `/home/kortux/qlora-out/vision-cafe/eval_18_results.json`, generado
+Tabla completa y JSON crudo: `<WORKSPACE>/qlora-out/vision-cafe/eval_18_results.json`, generado
 por `scripts/ml/vision-cafe/eval_18.py` (evaluado con una copia congelada de las 18 fotos
 originales — ver nota en el script sobre por qué no se leyó `public/plaga-images/` en vivo).
 
@@ -351,7 +351,7 @@ camino:
   (`dynamo=False`) porque el exportador nuevo por-default de torch≥2.9 requiere el paquete
   opcional `onnxscript`, no instalado en el venv `qlora-dpo` (no se instaló nada nuevo ahí, por
   la regla dura de no tocar ese venv sin `--no-deps`).
-- Artefactos en `/home/kortux/qlora-out/vision-cafe/`: `model.pt` (16.3 MB, peso principal),
+- Artefactos en `<WORKSPACE>/qlora-out/vision-cafe/`: `model.pt` (16.3 MB, peso principal),
   `model.onnx` (16.0 MB), `MANIFEST.json`, `classes.json`, `cpu_only_check.json`,
   `eval_18_results.json` / `eval_18_results_run2.json`, `test_results_run1.json` /
   `test_results_run2.json`, `train_log_run1.json` / `train_log_run2.json`.

@@ -1,6 +1,6 @@
 {
   "tag": "finetuned",
-  "model": "/home/kortux/qlora-out/embedder/finetuned",
+  "model": "<WORKSPACE>/qlora-out/embedder/finetuned",
   "n_test_pairs": 621,
   "n_corpus_docs": 742,
   "global": {

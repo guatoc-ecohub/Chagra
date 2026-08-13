@@ -24,8 +24,9 @@ import { execFileSync } from 'node:child_process';
 import { join } from 'node:path';
 
 const ALPHA = process.env.ALPHA_HOST || 'alpha';
-const CAPS = '/home/kortux/Workspace/chagra/ops/capturas/mundos-muertos-2026-07-21';
-const SALIDA = '/home/kortux/Workspace/chagra/data/arena-visual';
+const REPO_ROOT = process.env.CHAGRA_REPO || process.cwd();
+const CAPS = join(REPO_ROOT, 'ops/capturas/mundos-muertos-2026-07-21');
+const SALIDA = join(REPO_ROOT, 'data/arena-visual');
 
 const MODELOS = (argVal('--modelos') || 'gemma4:e4b,qwen2.5vl:7b,gemma4:e2b').split(',');
 

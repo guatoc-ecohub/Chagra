@@ -3,7 +3,7 @@
 **Fecha**: 2026-07-26
 **Operador**: "dale merge a todo lo que puedas ya"
 **Destino**: `dev` (🔴 **NO** `main` — hay otro agente corriendo `dev`→`main`)
-**Worktree de trabajo**: `/home/kortux/Workspace/wt-merge-a-dev`
+**Worktree de trabajo**: `<WORKSPACE>/wt-merge-a-dev`
 **Rama de integración**: `integra/merge-a-dev-2026-07-26` (nace de `origin/dev` @ `3ef4954d`)
 **Host**: `stg` (GPU real Vega 10 — requisito del gate visual)
 
@@ -12,10 +12,10 @@
 ## Paso 0 — Reconocimiento (hecho)
 
 ### Estado del repo al arrancar
-- `/home/kortux/Workspace/chagra` estaba en `feat/compai-fuente-unica` @ `315e497d`.
+- `<WORKSPACE>/chagra` estaba en `feat/compai-fuente-unica` @ `315e497d`.
 - **WIP del operador**: el árbol principal estaba LIMPIO salvo un untracked:
   - `ops/DIAGNOSTICO-brecha-dev-main.md` (untracked, ajeno)
-- `lugares.js` en `demos-src`: **no existe** bajo `/home/kortux/Workspace` — no hay riesgo de colarlo.
+- `lugares.js` en `demos-src`: **no existe** bajo `<WORKSPACE>` — no hay riesgo de colarlo.
   Aun así: **rutas explícitas siempre, nunca `git add -A`**.
 - 28 stashes preexistentes, 40+ worktrees, 1446 refs de rama. **No se borra nada.**
 
@@ -24,7 +24,7 @@
 no sobre el `dev` local rancio.
 
 ### Otro agente en curso (no tocar)
-- `/home/kortux/Workspace/wt-integra-dev-main` → rama `integra/dev-a-main-2026-07-26` @ `389123d2`.
+- `<WORKSPACE>/wt-integra-dev-main` → rama `integra/dev-a-main-2026-07-26` @ `389123d2`.
 - Ya contiene **todo** `origin/dev` (0 commits detrás) y **37 adelante**.
 - ⚠️ Consecuencia: lo que yo meta a `dev` **llega después** de que ese agente hiciera su fusión.
   **Tendrá que re-mergear `dev` para llevárselo.** Queda avisado en el reporte.
@@ -79,7 +79,7 @@ _(se va llenando abajo)_
 
 ### WIP del operador: re-verificado al arrancar el paso
 Entre el reconocimiento y este paso **aparecieron 2 archivos modificados** en
-`/home/kortux/Workspace/chagra` (otro agente / el operador trabajando en vivo):
+`<WORKSPACE>/chagra` (otro agente / el operador trabajando en vivo):
 
 ```
  M src/services/aiService.js           md5 99cba2a7f520830962a6ec7628b29179  (+70)
@@ -131,7 +131,7 @@ era su propia caché de `node_modules` arrastrando dos versiones de React
 (**build en verde y la app muerta**).
 
 Por eso se levantó un worktree **limpio de `origin/dev` @ `3ef4954d`** en
-`/home/kortux/Workspace/wt-baseline-dev`. Todo rojo se corre **igual** ahí:
+`<WORKSPACE>/wt-baseline-dev`. Todo rojo se corre **igual** ahí:
 - falla igual en dev limpio → **preexistente**: se declara, no se arregla acá;
 - falla solo con el merge → **es mío**: se arregla o se para.
 
@@ -156,14 +156,14 @@ El script **aborta** si el renderer dice swiftshader/llvmpipe/subzero/software:
 una captura de software no prueba nada y aprobaría a ciegas.
 
 ### El WIP del operador se MUEVE solo — y no soy yo
-A mitad de trabajo, `/home/kortux/Workspace/chagra` pasó de 2 a 8 archivos
+A mitad de trabajo, `<WORKSPACE>/chagra` pasó de 2 a 8 archivos
 tocados y **cambió de rama** a `feat/compai-cableado-vision` (nueva):
 `visionWarmService.js`, `AgentScreen.segundaOpinion.test.jsx`, etc.
 Los md5 de `aiService.js` y `segundaOpinionFoto.js` cambiaron **dos veces**.
 
-Esto **no es mío**: en `/home/kortux/Workspace/chagra` sólo hice lecturas,
+Esto **no es mío**: en `<WORKSPACE>/chagra` sólo hice lecturas,
 `git fetch` y `git worktree add`. Nunca escribí un archivo rastreado ahí — todo
-mi trabajo vive en `/home/kortux/Workspace/wt-merge-a-dev`.
+mi trabajo vive en `<WORKSPACE>/wt-merge-a-dev`.
 
 Lo importante para el merge: **`feat/compai-fuente-unica` sigue clavada en
 `315e497d`**. El trabajo en curso (el cableado de visión) salió a **otra rama**,
