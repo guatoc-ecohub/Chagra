@@ -1,11 +1,15 @@
+/**
+ * Archivado en 2026-07-22 porque mezclaba configuracion y primer registro.
+ * OnboardingCondensado lo reemplaza; PrimerRegistroCard conserva sus tres CTA.
+ */
 import React, { useState } from 'react';
 import { Camera, Mic, Pencil, MapPin, Check } from 'lucide-react';
-import useAssetStore from '../store/useAssetStore';
-import { getContextoGeoFinca } from '../services/perfilFincaService';
-import { getProfile, saveProfile } from '../services/userProfileService';
-import { getPisoTermicoInfo } from '../services/locationService';
-import { useAutosave } from '../hooks/useAutosave';
-import { MSG } from '../config/messages.js';
+import useAssetStore from '../../store/useAssetStore';
+import { getContextoGeoFinca } from '../../services/perfilFincaService';
+import { getProfile, saveProfile } from '../../services/userProfileService';
+import { getPisoTermicoInfo } from '../../services/locationService';
+import { useAutosave } from '../../hooks/useAutosave';
+import { MSG } from '../../config/messages.js';
 
 /**
  * OnboardingHero, empty-state cold-start del dashboard (DR-030 QW5).

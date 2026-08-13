@@ -42,7 +42,7 @@ vi.mock('../FincaVivaHero', () => ({
   },
 }));
 vi.mock('../FincaRedInstitucional', () => ({ default: () => <div /> }));
-vi.mock('../../OnboardingHero', () => ({ default: () => <div /> }));
+vi.mock('../../PrimerRegistroCard', () => ({ default: () => <div /> }));
 vi.mock('../SelectedBackgroundReveal', () => ({ default: () => <div /> }));
 vi.mock('../MiFincaVivaHomeCard', () => ({ default: () => <div /> }));
 vi.mock('../../CaseStudyTopWidget', () => ({ default: () => null }));

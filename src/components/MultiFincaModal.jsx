@@ -1,8 +1,10 @@
+/* eslint-disable chagra-i18n/no-hardcoded-spanish -- deuda i18n preexistente;
+   esta consolidacion solo renombra el modal tecnico que consume. */
 import React, { useState, useEffect } from 'react';
 import { X, Globe, LayoutGrid, Info } from 'lucide-react';
 import MultiFincaGlobe from './MultiFincaGlobe';
 import { FincaGrid } from './FincaCard';
-import OnboardingModal from './OnboardingModal';
+import FarmOSSetupModal from './FarmOSSetupModal';
 import { useFincaActiveStore } from '../services/fincaActiveStore';
 
 export default function MultiFincaModal({ onClose }) {
@@ -131,7 +133,7 @@ export default function MultiFincaModal({ onClose }) {
             </div>
 
             {showOnboarding && selectedFinca && (
-                <OnboardingModal
+                <FarmOSSetupModal
                     finca={selectedFinca}
                     onClose={() => setShowOnboarding(false)}
                     onConfigureLater={() => setShowOnboarding(false)}
