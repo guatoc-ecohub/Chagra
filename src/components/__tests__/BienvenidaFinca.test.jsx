@@ -27,7 +27,7 @@ vi.mock('../../services/ttsService', () => ({
 import BienvenidaFinca, {
   bienvenidaYaVista,
   marcarBienvenidaVista,
-} from '../BienvenidaFinca';
+} from '../_archivo/BienvenidaFinca';
 import { MSG } from '../../config/messages.js';
 
 beforeEach(() => {
