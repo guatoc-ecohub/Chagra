@@ -1955,10 +1955,14 @@ function CompaneroAbeja({ foco, focoId = null, entrando, animo, energia, reduced
   const inventarioRef = useRef(inventarioCompai);
   useEffect(() => { inventarioRef.current = inventarioCompai; }, [inventarioCompai]);
   /* El clima que el shell alcanzó a cachear — el único dato del husmeo que NO
-     sale del inventario. Sin él, el comentarista del clima dice la verdad. */
+     sale del inventario. Sin él, el comentarista del clima dice la verdad.
+     Dependencia por el objeto completo (no `?.snapshotClima` recortado):
+     mismo patrón que `reaccion` arriba — React Compiler solo puede preservar
+     la memoización manual si la dep declarada coincide con lo que infiere
+     (objeto completo), no con una propiedad anidada más específica. */
   const climaExtra = useMemo(
     () => (estadoFinca?.snapshotClima ? { snapshot: estadoFinca.snapshotClima } : undefined),
-    [estadoFinca?.snapshotClima],
+    [estadoFinca],
   );
   const climaExtraRef = useRef(climaExtra);
   useEffect(() => { climaExtraRef.current = climaExtra; }, [climaExtra]);
@@ -2797,7 +2801,12 @@ function Escena({ clima, focoId, animo, energia, onEntrar, onAlerta, onCasa = nu
       {/* Los Guardianes del gradiente — el Ent del piso térmico + vecinos.
           pisoTermico=null → default (templado/roble); cablear el valor real
           cuando el valle exponga el piso. Rescatado del huérfano 2026-08-01. */}
-      <EntsDelValle pisoTermico={null} alturaDe={alturaTerreno} tier={tier} reducedMotion={reducedMotion} />
+      <EntsDelValle
+        pisoTermico={null}
+        alturaDe={alturaTerreno}
+        tier={/** @type {'alto'|'medio'|'bajo'} */ (tier)}
+        reducedMotion={reducedMotion}
+      />
       {fracEstrellas > 0 && perfil.estrellas > 0 && (
         <Stars
           radius={40}
