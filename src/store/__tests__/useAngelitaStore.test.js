@@ -118,7 +118,7 @@ describe('cadencia adaptativa — contador de molestia (#102/#106)', () => {
 
   it('el contador de molestia persiste (partialize incluye molestia)', () => {
     useAngelitaStore.getState().registrarSenalMolestia('silenciar');
-    const persistido = JSON.parse(localStorage.getItem('chagra:angelita:antimolestia'));
+    const persistido = JSON.parse(localStorage.getItem('compai:cooldowns'));
     expect(persistido.state.molestia).toBe(3);
   });
 });
@@ -155,7 +155,36 @@ describe('"hoy no" — descanso del resto del día (#107)', () => {
 
   it('el "hoy no" persiste (partialize incluye hoyNoFecha)', () => {
     useAngelitaStore.getState().marcarHoyNo();
-    const persistido = JSON.parse(localStorage.getItem('chagra:angelita:antimolestia'));
+    const persistido = JSON.parse(localStorage.getItem('compai:cooldowns'));
     expect(persistido.state.hoyNoFecha).toMatch(/^\d{4}-\d{2}-\d{2}$/);
+  });
+});
+
+describe('cross-stack 2D-3D: el cooldown ahora SÍ cruza (#compai-estado-cruza-2d-3d)', () => {
+  beforeEach(reset);
+
+  it('SOLUCIÓN: los cooldowns ahora usan una llave genérica compartida', () => {
+    // Después de la implementación, los cooldowns deberían usar 'compai:cooldowns'
+    // que es genérica y puede ser compartida por todos los compañeros.
+
+    // Simulamos que el usuario usa el compañero y entra a mis_matas
+    const api = useAngelitaStore.getState();
+    api.entrarMundo('mis_matas', { cultivos: [{ name: 'Café', count: 4 }] });
+
+    // Verificamos que el compañero habló (cooldown activado)
+    expect(useAngelitaStore.getState().estado).toBe('husmea');
+    const cooldowns = useAngelitaStore.getState().ultimaHablaPorLlave;
+    expect(cooldowns).toHaveProperty('husmea:mis_matas');
+
+    // El cooldown ahora se guardó bajo 'compai:cooldowns' (genérico)
+    const cooldownsGenericos = localStorage.getItem('compai:cooldowns');
+    expect(cooldownsGenericos).not.toBeNull();
+
+    const cooldownsParseados = JSON.parse(cooldownsGenericos);
+    // Zustand persist guarda el estado en { state: {...}, version: N }
+    expect(cooldownsParseados.state.ultimaHablaPorLlave).toHaveProperty('husmea:mis_matas');
+
+    // Ahora los cooldowns crucen entre compañeros porque usan una llave genérica
+    // que puede ser leída por cualquier compañero (abeja, jaguar, etc.)
   });
 });
