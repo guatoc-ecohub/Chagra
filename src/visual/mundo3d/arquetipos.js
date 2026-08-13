@@ -127,6 +127,17 @@ export const ARQUETIPOS = {
     nombre: 'El bosque nativo', clave: 'el bosque altoandino de niebla y sus tres estratos: dosel, sotobosque y suelo, con epífitas',
     ejemplo: 'bosque', tambien: [],
   },
+  // La QUEBRADA CON SALTO: una metáfora espacial genuinamente nueva — el agua
+  // que CAE (no la que baja por pendiente, que es `flujo`). El cauce rocoso de
+  // alta pendiente, la chorrera sobre el escarpe estratificado, el pozo
+  // cristalino y el bosque de niebla (helechos arborescentes, musgo, epífitas).
+  // En equipo humilde cae a su espejo 2D (motivo `chorrera`).
+  // (anti-conflicto: arquetipo 3D nuevo al final del bloque.)
+  chorrera: {
+    dim: '3d', role: 'mundo3d-archetype', motivo: 'chorrera', espejo: 'mirror',
+    nombre: 'La quebrada con salto', clave: 'el agua que cae: chorrera sobre escarpe, pozo cristalino y bosque de niebla',
+    ejemplo: 'chorrera', tambien: [],
+  },
 
   // ── Arquetipos 2D (primera clase) ────────────────────────────────────────
   mirror: {
