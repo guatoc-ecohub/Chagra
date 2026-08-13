@@ -7,11 +7,14 @@ describe('AgentAvatarSelector smoke', () => {
         localStorage.clear();
     });
 
-    it('renderiza 3 opciones: angelita + maiz + zarigüeya (el colibrí jubiló)', () => {
+    it('renderiza las 6 opciones del elenco unificado (el colibrí jubiló)', () => {
         render(<AgentAvatarSelector />);
         expect(screen.getByText('Angelita, la abeja', { selector: 'p' })).toBeInTheDocument();
         expect(screen.getByText('Planta de maíz')).toBeInTheDocument();
         expect(screen.getByText('Zarigüeya', { selector: 'p' })).toBeInTheDocument();
+        expect(screen.getByText('Jaguar', { selector: 'p' })).toBeInTheDocument();
+        expect(screen.getByText('Oso del bastón', { selector: 'p' })).toBeInTheDocument();
+        expect(screen.getByText('Luciérnaga', { selector: 'p' })).toBeInTheDocument();
         expect(screen.queryByText(/colibrí/i)).toBeNull();
     });
 
@@ -67,5 +70,33 @@ describe('AgentAvatarSelector smoke', () => {
         render(<AgentAvatarSelector />);
         const angelitaBtn = screen.getByText('Angelita, la abeja', { selector: 'p' }).closest('button');
         expect(angelitaBtn).toHaveAttribute('aria-pressed', 'true');
+    });
+
+    // Ítem #8 del GAP compAI (2026-08-13): jaguar, oso del bastón y
+    // luciérnaga ya tenían cuerpo 2.5D y ya estaban `enPWA:true` en el
+    // núcleo (#96), pero el selector se había quedado en 3 opciones.
+    it.each([
+        ['jaguar', 'Jaguar'],
+        ['oso-baston', 'Oso del bastón'],
+        ['luciernaga', 'Luciérnaga'],
+    ])('click en %s cambia la preferencia y persiste en localStorage', (slug, label) => {
+        render(<AgentAvatarSelector />);
+        const btn = screen.getByText(label, { selector: 'p' }).closest('button');
+        fireEvent.click(btn);
+        expect(btn).toHaveAttribute('aria-pressed', 'true');
+        expect(localStorage.getItem('chagra:agent-avatar-type')).toBe(slug);
+        const angelitaBtn = screen.getByText('Angelita, la abeja', { selector: 'p' }).closest('button');
+        expect(angelitaBtn).toHaveAttribute('aria-pressed', 'false');
+    });
+
+    it.each([
+        ['jaguar', 'Jaguar'],
+        ['oso-baston', 'Oso del bastón'],
+        ['luciernaga', 'Luciérnaga'],
+    ])('localStorage %s preselecciona esa opción al montar', (slug, label) => {
+        localStorage.setItem('chagra:agent-avatar-type', slug);
+        render(<AgentAvatarSelector />);
+        const btn = screen.getByText(label, { selector: 'p' }).closest('button');
+        expect(btn).toHaveAttribute('aria-pressed', 'true');
     });
 });

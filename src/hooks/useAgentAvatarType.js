@@ -20,7 +20,14 @@ const LLAVES_RELEVANTES = new Set([LLAVE_COMPANERO, STORAGE_KEY, ...LLAVES_HERED
 // 'zariguya' = la zarigüeya (crías al lomo), 3ra opción (2026-07-25, tras el
 // merge de `art(creatures): la zarigüeya entra al elenco — con las crías al
 // lomo (#2783)`). Adaptador en ChagraAgentAvatarZariguya.jsx.
-export const AVATAR_TYPES = ['angelita', 'maiz', 'zariguya'];
+//
+// 'jaguar', 'oso-baston', 'luciernaga' = elenco unificado (ítem #8 del GAP
+// compAI, 2026-08-13): los tres ya tenían cuerpo 2.5D dibujado y ya estaban
+// marcados `enPWA:true` en `compai/nucleo/elenco.js` (#96) desde el
+// 2026-08-11, pero ningún selector los ofrecía — bug encontrado en la
+// re-auditoría del GAP. Adaptadores en ChagraAgentAvatarJaguar.jsx,
+// ChagraAgentAvatarOsoBaston.jsx, ChagraAgentAvatarLuciernaga.jsx.
+export const AVATAR_TYPES = ['angelita', 'maiz', 'zariguya', 'jaguar', 'oso-baston', 'luciernaga'];
 export const DEFAULT_AVATAR_TYPE = 'angelita';
 
 // Nombre propio para copy que necesita NOMBRAR al compAI elegido (ej. "hábletele
@@ -32,6 +39,9 @@ export const AVATAR_NOMBRE = {
     angelita: 'Angelita',
     maiz: 'su planta de maíz',
     zariguya: 'su zarigüeya',
+    jaguar: 'el jaguar',
+    'oso-baston': 'el oso del bastón',
+    luciernaga: 'la luciérnaga',
 };
 
 // Slugs históricos guardados en localStorage de instalaciones viejas:
@@ -40,10 +50,10 @@ const LEGACY_TYPES = { colibri: 'angelita', colibri_svg: 'angelita' };
 
 /**
  * Lee la preferencia con la MISMA precedencia que el núcleo compai (#96: una
- * sola llave canónica cruzando PWA y 3d.guatoc.co) — pero acotada a los tres
+ * sola llave canónica cruzando PWA y 3d.guatoc.co) — pero acotada a los seis
  * avatares que hoy tienen cuerpo dibujado en esta PWA (`AVATAR_TYPES`). Si el
- * núcleo devuelve un guía sin arte aquí todavía (jaguar, oso…), esta PWA cae
- * al default — el otro stack sigue mostrando la elección real.
+ * núcleo devuelve un guía sin arte aquí todavía (guacamaya, chivito…), esta
+ * PWA cae al default — el otro stack sigue mostrando la elección real.
  */
 function readPref() {
     try {
