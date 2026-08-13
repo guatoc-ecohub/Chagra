@@ -93,7 +93,8 @@ describe('AgentFab — menú del toque corto, cableado VIVO (#66/#70)', () => {
     const onEscucha = vi.fn();
     window.addEventListener(EVENTO_ESCUCHA, onEscucha);
     render(<AgentFab onNavigate={() => {}} />);
-    fireEvent.click(screen.getByRole('button', { name: /Chagra IA, su compañero de Chagra/i }));
+    // Buscar el botón con un texto más flexible que cubra todos los estados
+    fireEvent.click(screen.getByRole('button', { name: /Chagra IA/i }));
     fireEvent.click(screen.getByRole('menuitem', { name: /^Hablar$/i }));
     expect(onEscucha).toHaveBeenCalledTimes(1);
     expect(screen.queryByRole('menu')).not.toBeInTheDocument(); // se cierra al elegir
@@ -103,8 +104,10 @@ describe('AgentFab — menú del toque corto, cableado VIVO (#66/#70)', () => {
   it('menú → "Enviar foto" navega al agente con autoOpenCamera', () => {
     const onNavigate = vi.fn();
     render(<AgentFab onNavigate={onNavigate} pantalla="mundo_cultivos" />);
-    fireEvent.click(screen.getByRole('button', { name: /Chagra IA, su compañero de Chagra/i }));
-    fireEvent.click(screen.getByRole('menuitem', { name: /Enviar foto/i }));
+    // Buscar el botón con un texto más flexible
+    fireEvent.click(screen.getByRole('button', { name: /Chagra IA/i }));
+    // Buscar el menuitem con un regex más flexible (el texto dice "Enviar una foto")
+    fireEvent.click(screen.getByRole('menuitem', { name: /Enviar.*foto/i }));
     expect(onNavigate).toHaveBeenCalledWith('agente', expect.objectContaining({
       autoOpenCamera: true,
       desdePantalla: 'mundo_cultivos',
@@ -114,7 +117,8 @@ describe('AgentFab — menú del toque corto, cableado VIVO (#66/#70)', () => {
   it('menú → "Que se quede callado hoy" activa hoyNoActivo() REAL en el store (#107)', () => {
     useAngelitaStore.setState({ hoyNoFecha: null });
     render(<AgentFab onNavigate={() => {}} />);
-    fireEvent.click(screen.getByRole('button', { name: /Chagra IA, su compañero de Chagra/i }));
+    // Buscar el botón con un texto más flexible
+    fireEvent.click(screen.getByRole('button', { name: /Chagra IA/i }));
     fireEvent.click(screen.getByRole('menuitem', { name: /Que se quede callado hoy/i }));
     expect(useAngelitaStore.getState().hoyNoActivo()).toBe(true);
     // Angelita queda en calma: entrarMundo con datos reales no debe hablar.
@@ -125,9 +129,11 @@ describe('AgentFab — menú del toque corto, cableado VIVO (#66/#70)', () => {
   it('cerrar el menú sin elegir nada registra una señal de molestia (#102/#106)', () => {
     useAngelitaStore.setState({ molestia: 0 });
     render(<AgentFab onNavigate={() => {}} />);
-    fireEvent.click(screen.getByRole('button', { name: /Chagra IA, su compañero de Chagra/i }));
+    // Buscar el botón con un texto más flexible
+    fireEvent.click(screen.getByRole('button', { name: /Chagra IA/i }));
+    const initialMolestia = useAngelitaStore.getState().molestia;
     fireEvent.keyDown(document, { key: 'Escape' });
-    expect(useAngelitaStore.getState().molestia).toBeGreaterThan(0);
+    expect(useAngelitaStore.getState().molestia).toBe(initialMolestia + 1);
   });
 });
 
@@ -144,7 +150,8 @@ describe('AgentFab — cadencia adaptativa: señales de atención positiva (#102
   it('menú → "Hablar" también baja el contador de molestia', () => {
     useAngelitaStore.setState({ molestia: 5 });
     render(<AgentFab onNavigate={() => {}} />);
-    fireEvent.click(screen.getByRole('button', { name: /Chagra IA, su compañero de Chagra/i }));
+    // Buscar el botón con un texto más flexible
+    fireEvent.click(screen.getByRole('button', { name: /Chagra IA/i }));
     fireEvent.click(screen.getByRole('menuitem', { name: /^Hablar$/i }));
     expect(useAngelitaStore.getState().molestia).toBeLessThan(5);
   });
@@ -156,5 +163,67 @@ describe('AgentFab — cadencia adaptativa: señales de atención positiva (#102
     fireEvent.click(screen.getByRole('button', { name: /Chagra IA tiene respuesta nueva/i }));
     expect(useAngelitaStore.getState().molestia).toBeLessThan(5);
     useAgentNotificationStore.setState({ responseReady: false, lastAssistantMessage: null });
+  });
+});
+
+describe('AgentFab — unificación con EscuchaFab (#compai-mic-fab-unify)', () => {
+  it('activarEscucha está disponible en el gesto largo (antes solo en EscuchaFab)', () => {
+    const onEscucha = vi.fn();
+    window.addEventListener(EVENTO_ESCUCHA, onEscucha);
+    render(<AgentFab onNavigate={() => {}} />);
+    const personaje = screen.getByRole('button', { name: /Chagra IA/i });
+
+    fireEvent.touchStart(personaje);
+    act(() => {
+      vi.advanceTimersByTime(650);
+    });
+    expect(onEscucha).toHaveBeenCalledTimes(1);
+    window.removeEventListener(EVENTO_ESCUCHA, onEscucha);
+  });
+
+  it('activarEscucha está disponible en el menú "Hablar" (antes solo en EscuchaFab)', () => {
+    const onEscucha = vi.fn();
+    window.addEventListener(EVENTO_ESCUCHA, onEscucha);
+    render(<AgentFab onNavigate={() => {}} />);
+    fireEvent.click(screen.getByRole('button', { name: /Chagra IA/i }));
+    fireEvent.click(screen.getByRole('menuitem', { name: /^Hablar$/i }));
+    expect(onEscucha).toHaveBeenCalledTimes(1);
+    window.removeEventListener(EVENTO_ESCUCHA, onEscucha);
+  });
+
+  it('ambos métodos de escucha usan la misma función activarEscucha', () => {
+    const onEscuchaGestoLargo = vi.fn();
+    const onEscuchaMenu = vi.fn();
+    const handleGestoLargo = (e) => {
+      if (e.detail?.fuente === 'compai_largo') {
+        onEscuchaGestoLargo();
+      }
+    };
+    const handleMenu = (e) => {
+      if (e.detail?.fuente === 'compai_menu') {
+        onEscuchaMenu();
+      }
+    };
+
+    window.addEventListener(EVENTO_ESCUCHA, handleGestoLargo);
+    render(<AgentFab onNavigate={() => {}} />);
+    const personaje = screen.getByRole('button', { name: /Chagra IA/i });
+
+    // Test gesto largo
+    fireEvent.touchStart(personaje);
+    act(() => { vi.advanceTimersByTime(650); });
+    expect(onEscuchaGestoLargo).toHaveBeenCalledTimes(1);
+
+    // Test menú - necesitamos limpiar y volver a renderizar
+    cleanup();
+    window.removeEventListener(EVENTO_ESCUCHA, handleGestoLargo);
+    window.addEventListener(EVENTO_ESCUCHA, handleMenu);
+    render(<AgentFab onNavigate={() => {}} />);
+    const personaje2 = screen.getByRole('button', { name: /Chagra IA/i });
+    fireEvent.click(personaje2);
+    fireEvent.click(screen.getByRole('menuitem', { name: /^Hablar$/i }));
+    expect(onEscuchaMenu).toHaveBeenCalledTimes(1);
+
+    window.removeEventListener(EVENTO_ESCUCHA, handleMenu);
   });
 });
