@@ -60,11 +60,20 @@ jobs:
       # Test del PUNTO DE ACCESO #1 + dependencias deterministas. Determinista
       # en CI (sin crypto/IndexedDB/red). Falla RUIDOSAMENTE si un chip-ejemplo
       # devuelve vacío/error tras el pipeline de salida.
-      - name: Run entrypoint unit tests
+      #
+      # CAMBIO: ahora detecta automáticamente los tests relacionados con archivos
+      # cambiados en el PR, en lugar de correr siempre los mismos 5 archivos fijos.
+      # Esto permite que el gate sea relevante para lo que realmente cambió.
+      - name: Detect changed files and map to tests
+        id: detect-tests
+        run: |
+          TESTS=$(node scripts/detect-changed-tests.mjs)
+          echo "tests=$TESTS" >> $GITHUB_OUTPUT
+          echo "Detected tests: $TESTS"
+
+      - name: Run relevant unit tests
+        # Si no hay tests relevantes, el gate pasa sin fallar (output vacío).
+        # Si hay tests relevantes, corre solo esos.
         run: >-
           npm run test:unit --
-          tests/unit/exampleQuestions.entrypoint.test.jsx
-          tests/unit/outputGuards.test.js
-          tests/unit/catalog-count.test.js
-          src/components/__tests__/QuickChipsBar.smoke.test.jsx
-          src/components/__tests__/ChipsToolbar.smoke.test.jsx
+          ${{ steps.detect-tests.outputs.tests }}
