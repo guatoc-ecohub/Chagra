@@ -21,7 +21,9 @@
  * useCompaiElegido, que ya viven ahí. JAMÁS importarlo desde el bundle base.
  */
 import { ABEJA_PRESENCIA } from '../../creatures/abejaIdentidad.js';
+import { MaizCompai } from '../../creatures/MaizCompai.jsx';
 import { MAIZ_PRESENCIA } from '../../creatures/maizIdentidad.js';
+import { Zariguya } from '../../creatures/Zariguya.jsx';
 import { ZARIGUYA_PRESENCIA } from '../../creatures/zariguyaIdentidad.js';
 import { MaizCompaiEscena } from './MaizCompaiEscena.jsx';
 import { ZariguyaCompaiEscena } from './ZariguyaCompaiEscena.jsx';
@@ -49,6 +51,9 @@ import { AVATAR_TYPES, DEFAULT_AVATAR_TYPE } from '../../../hooks/useAgentAvatar
  * @property {(import('react').ComponentType|null)} EscenaComponent  la escena 3D
  *   PROPIA del compañero (coreografía + cuerpo). `null` → usa la coreografía y el
  *   cuerpo de Angelita (AbejaEscena) como fallback, sin regresión.
+ * @property {(import('react').ComponentType|null)} PortalComponent  el cuerpo 2D
+ *   que cruza hacia el mundo. `null` → el portal de Angelita, igual que el
+ *   fallback 3D.
  * @property {CompaiPresencia} presencia  cómo se dimensiona/posa en 3D.
  * @property {string} especie  slug `data-creature` del cuerpo activo.
  * @property {boolean} pendienteFable  aún sin arte 3D propio (cae a la abeja).
@@ -60,23 +65,41 @@ import { AVATAR_TYPES, DEFAULT_AVATAR_TYPE } from '../../../hooks/useAgentAvatar
    nativo que CompaiEscena monta directo — registrarla aquí sería un ciclo de
    imports con useEntradaAbeja sin ganar nada. */
 const REGISTRO = {
-  angelita: { EscenaComponent: null, presencia: ABEJA_PRESENCIA, especie: 'abeja-angelita', pendienteFable: false },
+  angelita: {
+    EscenaComponent: null,
+    PortalComponent: null,
+    presencia: ABEJA_PRESENCIA,
+    especie: 'abeja-angelita',
+    pendienteFable: false,
+  },
   // El MAÍZ compañero (fable #5): arraigado — brota del montículo, se mece
   // con brisa asimétrica, se INCLINA hacia el foco y el penacho vibra.
-  maiz: { EscenaComponent: MaizCompaiEscena, presencia: MAIZ_PRESENCIA, especie: 'maiz', pendienteFable: false },
+  maiz: {
+    EscenaComponent: MaizCompaiEscena,
+    PortalComponent: MaizCompai,
+    presencia: MAIZ_PRESENCIA,
+    especie: 'maiz',
+    pendienteFable: false,
+  },
   // La ZARIGÜEYA compañera (fable #5): marsupial nocturno DE PISO — llega
   // trotando, merodea, se encarama al foco en alto y husmea. Crías al lomo
   // de serie (su firma). Jamás vuela.
-  zariguya: { EscenaComponent: ZariguyaCompaiEscena, presencia: ZARIGUYA_PRESENCIA, especie: 'zariguya', pendienteFable: false },
+  zariguya: {
+    EscenaComponent: ZariguyaCompaiEscena,
+    PortalComponent: Zariguya,
+    presencia: ZARIGUYA_PRESENCIA,
+    especie: 'zariguya',
+    pendienteFable: false,
+  },
   // Jaguar, oso del bastón y luciérnaga (ítem #8 del GAP compAI, 2026-08-13):
   // ya tienen cuerpo 2.5D propio (avatares/catálogo) pero TODAVÍA no tienen
   // coreografía de presencia 3D en los mundos (billboard/percha/sombra
   // propios) — `pendienteFable:true` los deja explícitos como pendientes.
   // Caen a la regla del fallback: se ven como Angelita dentro de un mundo 3D
   // hasta que Fable les construya su propio `EscenaComponent`.
-  jaguar: { EscenaComponent: null, presencia: ABEJA_PRESENCIA, especie: 'jaguar', pendienteFable: true },
-  'oso-baston': { EscenaComponent: null, presencia: ABEJA_PRESENCIA, especie: 'oso-baston', pendienteFable: true },
-  luciernaga: { EscenaComponent: null, presencia: ABEJA_PRESENCIA, especie: 'luciernaga', pendienteFable: true },
+  jaguar: { EscenaComponent: null, PortalComponent: null, presencia: ABEJA_PRESENCIA, especie: 'jaguar', pendienteFable: true },
+  'oso-baston': { EscenaComponent: null, PortalComponent: null, presencia: ABEJA_PRESENCIA, especie: 'oso-baston', pendienteFable: true },
+  luciernaga: { EscenaComponent: null, PortalComponent: null, presencia: ABEJA_PRESENCIA, especie: 'luciernaga', pendienteFable: true },
 };
 
 /**
@@ -91,6 +114,7 @@ export function resolverCompai(avatarType) {
   return {
     avatarType: pedido,
     EscenaComponent: base.EscenaComponent ?? null,
+    PortalComponent: base.PortalComponent ?? null,
     presencia: base.presencia ?? ABEJA_PRESENCIA,
     especie: base.especie ?? 'abeja-angelita',
     pendienteFable: !!base.pendienteFable,
