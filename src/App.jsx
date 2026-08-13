@@ -371,6 +371,9 @@ const NavegadorGrafoDemoMockup = lazy(() => import('./mockups/NavegadorGrafoDemo
 // esquina, mapa estratégico de terrazas y la vista global tipo lámina con el
 // nevado y la Chorrera arriba) leyendo el mismo dato mundo→piso.
 const NavegacionPisosMockup = lazy(() => import('./mockups/NavegacionPisosTermicos'));
+// #/mockups/agente-dibuja — vitrina "el agente dibuja en sus respuestas de
+// forma fiable" (DR 2026-07-11), también pública/sin auth.
+const AgenteDibuja = lazy(() => import('./mockups/AgenteDibuja'));
 const HarvestLog = lazy(() => import('./components/HarvestLog'));
 const SeedingLog = lazy(() => import('./components/SeedingLog'));
 const InputLog = lazy(() => import('./components/InputLog'));
@@ -840,6 +843,7 @@ const MOCKUP_HASH_ROUTES = {
   'mockups/condor-cielo-3d': 'mockup_condor_cielo_3d',
   'mockups/navegador-grafo': 'mockup_navegador_grafo',
   'mockups/navegacion-pisos': 'mockup_navegacion_pisos',
+  'mockups/agente-dibuja': 'mockup_agente_dibuja',
 };
 
 const HASH_VIEW_ROUTES = {
@@ -2818,6 +2822,17 @@ export default function App() {
           <ErrorBoundary>
             <ErrorFallback moduleName="La hoja de prueba del valle">
               <HojaPruebaValleMockup />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
+      case 'mockup_agente_dibuja':
+        // Vitrina pública "el agente dibuja en sus respuestas de forma fiable".
+        // Ruta #/mockups/agente-dibuja, sin auth: muestra respuestas del agente
+        // con su lámina (del conjunto cerrado LAMINAS_FIABLES) dibujándose sola.
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="El agente dibuja">
+              <AgenteDibuja onBack={() => navigate('dashboard')} />
             </ErrorFallback>
           </ErrorBoundary>
         );
