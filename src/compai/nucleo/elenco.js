@@ -46,10 +46,14 @@ export const ELENCO = {
   // CAMINANTE de la referencia aprobada — erguido, Cuphead de día, bastón
   // florecido de frailejón y orquídea — en el registro CREATURES).
   'oso-baston': { nombre: 'Oso del bastón', gentilicio: 'el oso del bastón', enPWA: true },
-  jaguar: { nombre: 'Jaguar', gentilicio: 'el jaguar', enPWA: false },
+  // El jaguar cruzó a la PWA el 2026-08-11 (2.5D vivo: idle + paisaje del miedo):
+  // Jaguar.jsx ya vive en src/visual/creatures y está en el registro CREATURES.
+  jaguar: { nombre: 'Jaguar', gentilicio: 'el jaguar', enPWA: true },
   guacamaya: { nombre: 'Guacamaya', gentilicio: 'la guacamaya', enPWA: false },
   chivito: { nombre: 'Chivito', gentilicio: 'Chivito', enPWA: false },
-  luciernaga: { nombre: 'Luciérnaga', gentilicio: 'la luciérnaga', enPWA: false },
+  // La luciérnaga cruzó a la PWA el 2026-08-11 (Luciernaga.jsx: escarabajo
+  // bioluminiscente con la linterna-bioindicador, en el registro CREATURES).
+  luciernaga: { nombre: 'Luciérnaga', gentilicio: 'la luciérnaga', enPWA: true },
 };
 
 /** Slugs jubilados que migran solos, sin que el usuario haga nada. */
