@@ -1,6 +1,6 @@
 {
   "fecha": "2026-07-23T06:10:36.448Z",
-  "dist": "/home/kortux/Workspace/chagra/dist",
+  "dist": "<WORKSPACE>/chagra/dist",
   "ventanaMedicionMs": 15000,
   "asentamientoMs": 8000,
   "rates": [
