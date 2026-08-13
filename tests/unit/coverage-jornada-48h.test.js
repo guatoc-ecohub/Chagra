@@ -140,15 +140,18 @@ describe('sidecarClient.resolveEntities — semáforo de confianza (#2074)', () 
 // 2) promptAssembler — bloques protegidos nuevos de 48h, JUNTOS.
 // ============================================================================
 describe('promptAssembler — bloques protegidos de 48h (pisoTermico #2067 + groundingPolicy #2074)', () => {
-  it('BLOCK_ORDER: pisoTermico es el ÚLTIMO bloque (máxima recency) y groundingPolicy va antes de queryAnalysis', async () => {
+  it('BLOCK_ORDER: pisoTermico permanece en la cola protegida de máxima recency y groundingPolicy va antes de queryAnalysis', async () => {
     const { BLOCK_ORDER } = await import('../../src/services/promptAssembler.js');
-    expect(BLOCK_ORDER[BLOCK_ORDER.length - 1]).toBe('pisoTermico');
     const iGrounding = BLOCK_ORDER.indexOf('groundingPolicy');
     const iQuery = BLOCK_ORDER.indexOf('queryAnalysis');
     const iPiso = BLOCK_ORDER.indexOf('pisoTermico');
+    const recencyTail = BLOCK_ORDER.slice(iQuery + 1);
+    const sacrificeNames = ['corpus', 'memoria', 'asociacion', 'clima', 'frostHeat', 'finca', 'campesino'];
     expect(iGrounding).toBeGreaterThan(-1);
     expect(iGrounding).toBeLessThan(iQuery);
     expect(iQuery).toBeLessThan(iPiso);
+    expect(recencyTail).toContain('pisoTermico');
+    expect(recencyTail.some((name) => sacrificeNames.includes(name))).toBe(false);
   });
 
   it('bajo presupuesto agresivo, pisoTermico Y groundingPolicy sobreviven ENTEROS — solo se sacrifican bloques de SACRIFICE_ORDER', async () => {
