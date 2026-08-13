@@ -73,7 +73,7 @@ function speciesNames(species) {
   ];
   return raw
     .filter((name) => typeof name === 'string')
-    .flatMap((name) => name.split(/[\/;,]/))
+    .flatMap((name) => name.split(/[/;,]/))
     .map(fold)
     .filter((name) => name.length >= 3);
 }
@@ -209,6 +209,7 @@ export async function findCropInText(texto) {
   const query = fold(texto);
   if (!query) return null;
   const { all } = await buildSpeciesIndex();
+  /** @type {{species: object, slug: string, matchedName: string, match: 'exact', confidence: number}[]} */
   const candidates = [];
 
   for (const species of all) {
