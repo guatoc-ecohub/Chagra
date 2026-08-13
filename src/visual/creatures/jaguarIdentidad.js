@@ -85,6 +85,38 @@ export const PERFIL_JAGUAR = Object.freeze({
 });
 
 /*
+ * JAGUAR_PRESENCIA — cómo ocupa una escena 3D (el molde es ABEJA_PRESENCIA:
+ * mismos campos, otro animal). El jaguar es FELINO DE SUELO: `percha.y` y
+ * `rondaAltura` son la altura del CENTRO de su billboard sobre el PISO
+ * mientras camina — jamás una altura de vuelo (no vuela, no trota: acecha).
+ * Se planta un paso más allá del foco que la zarigüeya (distancia de
+ * depredador que observa) y su sombra de contacto es FIRME: un felino grande
+ * PESA (sombraSuelo es parte de su identidad — "no un sticker").
+ */
+export const JAGUAR_PRESENCIA = {
+  /* Billboard <Html>: px base + ganancia por energía (0..1) y el
+     distanceFactor de cámara. Grande (felino imponente) pero con ganancia
+     corta: su poder es CONTENIDO — la energía no lo agranda, lo afila. */
+  billboardBase: 58,
+  billboardPorEnergia: 8,
+  distancia: 6,
+  /* Su marca junto al foco (llega CAMINANDO, agazapado) y la altura del
+     centro del billboard mientras anda por el piso. */
+  percha: { x: 0.62, y: 0.3, z: 0.72 },
+  rondaAltura: 0.3,
+  /* Sombra de contacto con peso real: casi siempre pegada a él (nunca se
+     despega del suelo); apenas se atenúa si la coreografía lo sube a algo. */
+  sombra: {
+    radio: 0.46,
+    opacidad: 0.3,
+    opacidadBase: 0.36,
+    opacidadMin: 0.16,
+    atenuaPorAltura: 0.1,
+    ensanchaPorAltura: 0.06,
+  },
+};
+
+/*
  * JAGUAR_PODER_KART — el PODER del jaguar como piloto del kart, derivado de la
  * ecología (no al revés). Mismo shape que el `poder` de los pilotos benéficos
  * (id, alcance, titulo, efecto, porQue) para que el juego lo consuma sin
