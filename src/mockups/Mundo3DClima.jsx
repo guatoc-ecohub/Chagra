@@ -37,7 +37,8 @@ const LEYENDA = [
   { emoji: '❄️', titulo: 'La helada avisa', texto: 'En los pisos fríos la helada llega de madrugada con cielo despejado. Leerla a tiempo salva la papa y la mora de una mala noche.' },
 ];
 
-export default function Mundo3DClima({ onBack }) {
+/** @param {{ onBack?: () => void }} [props] */
+export default function Mundo3DClima({ onBack = undefined } = {}) {
   // Device-tiering REAL (una vez): gama baja / ahorro / menos-movimiento → 2D.
   const decision = useMemo(() => decidirTier(), []);
   const reducedMotion = useMemo(
