@@ -347,11 +347,11 @@ describe('AgentHero — foto: cámara O galería, solo imágenes (B2, 2026-06-06
   });
 });
 
-describe('AgentHero — colibrí = enviar + botón de perfil (operador 2026-06-06)', () => {
-  test('el botón de enviar lleva el mismo avatar colibrí del FAB global', () => {
+describe('AgentHero — acción de enviar + botón de perfil (operador 2026-06-06)', () => {
+  test('el botón de enviar conserva su icono y no duplica el compai', () => {
     const { container } = render(<AgentHero onNavigate={vi.fn()} />);
     const sendBtn = screen.getByLabelText('Enviar al agente');
-    expect(sendBtn.querySelector('[data-testid="avatar"]')).toBeTruthy();
+    expect(sendBtn.querySelector('svg')).toBeTruthy();
     // Ya no hay un input que fuerce cámara.
     expect(container.querySelector('input[capture]')).toBeNull();
   });

@@ -161,4 +161,12 @@ describe('HoyEnFincaScreen', () => {
     fireEvent.click(cta);
     expect(onNavigate).toHaveBeenCalledWith('ubicacion-detectada');
   });
+
+  it('Angelita guía (#24) vuela hasta las alertas y explica su porqué', async () => {
+    render(<HoyEnFincaScreen onNavigate={vi.fn()} />);
+    await waitFor(() => {
+      expect(document.querySelector('.ang-guia__panel')).toBeTruthy();
+    }, { timeout: 2000 });
+    expect(document.querySelector('.ang-guia__panel').textContent).toMatch(/atención/i);
+  });
 });

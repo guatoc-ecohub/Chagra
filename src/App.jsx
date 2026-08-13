@@ -20,7 +20,7 @@ import useAssetStore from './store/useAssetStore';
 import { fetchFromFarmOS } from './services/apiService';
 import { PRIMARY_WORKER_NAME } from './config/workerConfig';
 import { tieneAccesoGlaciarActual, esOperadorActual } from './config/glaciarAccess';
-import { getProfile } from './services/userProfileService';
+import { getProfile, getMarco3DPreference } from './services/userProfileService';
 import { parseSeguimientoView } from './config/seguimientoProcesos';
 import NetworkStatusBar from './components/NetworkStatusBar';
 import PendingTasksWidget from './components/PendingTasksWidget';
@@ -40,11 +40,13 @@ import useAlertStore from './store/useAlertStore';
 // comentario abajo donde se removió el render).
 // import FieldFeedback from './components/FieldFeedback';
 const AgentFab = lazy(() => import('./components/AgentFab'));
+const CompaiFotosOverlay = lazy(() => import('./components/CompaiFotosOverlay'));
 // EscuchaFab (el FAB de tap "barbudito de páramo") DESHABILITADO por decisión
 // del operador 2026-07-07: modo campo = WAKE-WORD SOLO ("hola chagra"). El
-// único FAB visible es el colibrí (AgentFab). El overlay SÍ se importa: lo abre
-// el wake-word vía activarEscucha() (useModoCampo/onWake). Para re-habilitar el
-// tap, descomentar el import y el render de <EscuchaFab /> más abajo.
+// único FAB visible es el compai elegido (AgentFab). El overlay SÍ se importa:
+// lo abre el wake-word vía activarEscucha() (useModoCampo/onWake). Para
+// re-habilitar el tap, descomentar el import y el render de <EscuchaFab /> más
+// abajo.
 // import EscuchaFab from './components/escucha/EscuchaFab';
 const EscuchaOverlay = lazy(() => import('./components/escucha/EscuchaOverlay'));
 // AgentOfflineGuard DEBE ser eager (static import): es la pantalla que se
@@ -83,6 +85,10 @@ import { useModoLectura, CSS_LECTURA_GRANDE } from './hooks/useModoLectura';
 // Lazy-loaded route components
 const LoginScreen = lazy(() => import('./components/LoginScreen'));
 const OAuthCallback = lazy(() => import('./components/OAuthCallback'));
+// Marco de entrada OPCIONAL: el valle 3D vanilla (iframe same-origin a
+// /valle/, three r160 aislado del r180 de la app — ver ValleMarcoScreen.jsx).
+// Perezoso: solo baja el chunk quien activó `marco3d` en su perfil.
+const ValleMarcoScreen = lazy(() => import('./components/ValleMarcoScreen'));
 // Vitrina pública de la librería visual reutilizable (`src/visual/`). Ruta
 // #/mockups/visual-lib, resuelta ANTES del check de sesión (no requiere auth).
 const VisualLib = lazy(() => import('./mockups/VisualLib'));
@@ -149,6 +155,8 @@ const MontanaMundosCampesinoMockup = lazy(() => import('./mockups/MontanaMundosC
 const EntradaCampesinaMockup = lazy(() => import('./mockups/EntradaCampesina'));
 const HomeCampesinoMockup = lazy(() => import('./mockups/HomeCampesino'));
 const BotonAnarquiaMockup = lazy(() => import('./mockups/BotonAnarquia'));
+// El cruce del agente 3D → plano (la abeja cruza el túnel y aterriza de avatar).
+const TransicionAgentePlanoMockup = lazy(() => import('./mockups/TransicionAgentePlano'));
 const AvatarGameBiopunk = lazy(() => import('./mockups/AvatarGameBiopunk'));
 const AvatarGameVerdeVivo = lazy(() => import('./mockups/AvatarGameVerdeVivo'));
 const AvatarGameLibre = lazy(() => import('./mockups/AvatarGameLibre'));
@@ -172,6 +180,13 @@ const HojaPruebaValleMockup = lazy(() => import('./mockups/HojaPruebaValle'));
 // operador). Reemplaza a BosqueVivo3D, MundoParamo3D y SueloDemo3D (los tres
 // archivados en src/mockups/_archivo/). Ruta #/mockups/paramo-definitivo.
 const ParamoDefinitivoMockup = lazy(() => import('./visual/mundo3d/bosque/MundoEntBosque.jsx'));
+// 3D: EL MONTE QUE VUELVE — el potrero volviéndose bosque, a través del
+// tiempo (50 años, riel no lineal). Rescate de huérfano (deuda
+// "construido-no-cableado": RestauracionEnElTiempo.jsx y su escena
+// EscenaRestauracion/AguaQueVuelve no tenían NINGÚN consumidor). Device-
+// tiering real (3D en equipo que da, corte SVG LaderaEnFranjas si no). Ruta
+// #/mockups/restauracion-tiempo-3d, sin auth.
+const RestauracionTiempo3DMockup = lazy(() => import('./mockups/RestauracionTiempo3D'));
 // 3D: el MUNDO DEL CAFÉ — el cafetal bajo sombra del piso templado: surcos a
 // curva de nivel, cereza madurando verde→pintón→rojo por instancia, el sombrío
 // de guamos y nogales, y la casa-beneficiadero en la bruma. Device-tiering
@@ -205,6 +220,25 @@ const CacaoVivo3DMockup = lazy(() => import('./mockups/CacaoVivo3D'));
 // blanca por instancia, la cosecha de criollas (amarilla/roja/morada) y los
 // frailejones en silueta. Device-tiering real. Ruta #/mockups/papa-viva-3d, sin auth.
 const PapaVivo3DMockup = lazy(() => import('./mockups/PapaVivo3D'));
+// 3D: el MUNDO DE LA YUCA — el yucal de clima medio en el arranque: el tallo
+// leñoso pelado y anillado de cicatrices, el follaje arriba no más, el
+// semillero de estacas inclinadas y el racimo de raíces recién destapado.
+// Rescate de huérfano (construido-no-cableado): YucaViva3D.jsx no tenía
+// entrada en el router. Device-tiering real. Ruta #/mockups/yuca-viva-3d, sin
+// auth.
+const YucaViva3DMockup = lazy(() => import('./mockups/YucaViva3D'));
+// 3D: el MUNDO DE LA QUINUA — el quinual maduro de tierra fría (2.500-3.200
+// m): la ladera a manchas de color por variedad y la era donde se trilla, se
+// avienta y se le lava lo amargo. Rescate de huérfano (construido-no-
+// cableado): QuinuaViva3D.jsx no tenía entrada en el router. Device-tiering
+// real. Ruta #/mockups/quinua-viva-3d, sin auth.
+const QuinuaViva3DMockup = lazy(() => import('./mockups/QuinuaViva3D'));
+// 3D: el MUNDO DE LOS FRUTALES — mango y cítricos juntos, porque juntos
+// enseñan el PISO TÉRMICO: el mango es de tierra caliente y el cítrico sube al
+// clima medio. La escala relativa es la lección: el mango eclipsa al cítrico.
+// Brote de hoja vino del mango, panícula terminal, pecíolo alado y espinas del
+// cítrico. Device-tiering real. Ruta #/mockups/frutales-vivo-3d, sin auth.
+const FrutalesVivo3DMockup = lazy(() => import('./mockups/FrutalesVivo3D'));
 // 3D: el MUNDO DE LOS ESTANQUES — la piscicultura de la finca por piso térmico
 // en una sola ladera: la quebrada baja al estanque frío (trucha, agua
 // oxigenada), el caño sigue al estanque cálido (mojarra + cachama en
@@ -276,6 +310,9 @@ const JuegoLaMilpaMockup = lazy(() => import('./mockups/JuegoLaMilpa'));
 // de crecimiento con los que se representa el catálogo de flora sin modelar las
 // 581 especies una por una.
 const BosqueTresEstratos3DMockup = lazy(() => import('./mockups/BosqueTresEstratos3D'));
+// Vitrina del MUNDO `bosque` cableado (arquetipo nuevo → EscenaBosque): monta
+// <Mundo mundoId="bosque"> del framework. Ruta #/mockups/mundo-bosque-nativo.
+const MundoBosqueNativo3DMockup = lazy(() => import('./mockups/MundoBosqueNativo3D'));
 // Los TRES ÁRBOLES MAESTROS del gradiente andino: un Ent por piso térmico
 // (roble, aliso y la queñua que ya existía), el agua que baja del páramo al
 // templado y la red de micorrizas que amarra sus raíces en la cara cortada
@@ -330,6 +367,13 @@ const FrutalesAndinos3DMockup = lazy(() => import('./mockups/FrutalesAndinos3D')
 const CanaTrapiche3DMockup = lazy(() => import('./mockups/CanaTrapiche3D'));
 const CondorCielo3DMockup = lazy(() => import('./mockups/CondorCielo3D'));
 const NavegadorGrafoDemoMockup = lazy(() => import('./mockups/NavegadorGrafoDemo'));
+// La NAVEGACIÓN UNIFICADA por pisos térmicos: los tres zooms (minimapa de
+// esquina, mapa estratégico de terrazas y la vista global tipo lámina con el
+// nevado y la Chorrera arriba) leyendo el mismo dato mundo→piso.
+const NavegacionPisosMockup = lazy(() => import('./mockups/NavegacionPisosTermicos'));
+// #/mockups/agente-dibuja — vitrina "el agente dibuja en sus respuestas de
+// forma fiable" (DR 2026-07-11), también pública/sin auth.
+const AgenteDibuja = lazy(() => import('./mockups/AgenteDibuja'));
 const HarvestLog = lazy(() => import('./components/HarvestLog'));
 const SeedingLog = lazy(() => import('./components/SeedingLog'));
 const InputLog = lazy(() => import('./components/InputLog'));
@@ -365,7 +409,6 @@ const CaprinosScreen = lazy(() => import('./components/CaprinosScreen'));
 const EstiercolScreen = lazy(() => import('./components/EstiercolScreen'));
 const CompostScreen = lazy(() => import('./components/CompostScreen'));
 const AgentScreen = lazy(() => import('./components/AgentScreen/AgentScreen'));
-const OnboardingProfile = lazy(() => import('./components/OnboardingProfile'));
 const OnboardingCondensado = lazy(() => import('./components/OnboardingCondensado'));
 const LocationDetectedScreen = lazy(() => import('./components/LocationDetectedScreen'));
 const VoiceCapture = lazy(() => import('./components/VoiceCapture'));
@@ -588,6 +631,10 @@ const MundoSubsuelo = lazy(() => import('./components/juego/MundoSubsuelo'));
 // en asociaciones-comparativa.json. Rescatado de "construido-pero-no-cableado"
 // (audit juegos 2026-07-16): existía exportado en juego/index.js pero sin ruta.
 const MonoVsPoliSimulator = lazy(() => import('./components/juego/MonoVsPoliSimulator'));
+// Ahorcado Contaminado: ahorcado clásico con metáfora de contaminación,
+// consume el dataset fundamentado de síntomas/plaguicidas vetados/
+// alternativas agroecológicas (Tarea #38) — juego construido en Tarea #93.
+const AhorcadoContaminado = lazy(() => import('./components/juego/AhorcadoContaminado'));
 // Modo extensionista (panel supervisor multi-finca, ADR-048 MVP). Gateado por
 // feature flag VITE_FEATURE_EXTENSIONISTA + rol (ver config/extensionistaAccess).
 const ExtensionistaScreen = lazy(() => import('./components/ExtensionistaScreen'));
@@ -595,9 +642,14 @@ const ExtensionistaScreen = lazy(() => import('./components/ExtensionistaScreen'
 // chagra-pro). La pantalla pública NO contiene código visual: solo consulta el
 // registry y monta el módulo Pro si está presente; si no, fallback discreto.
 const EspirituProScreen = lazy(() => import('./components/EspirituProScreen'));
+// Gestión de usuarios de la finca (roles dueño/esposa/trabajador/niña/asesor,
+// ver Chagra-strategy/ops/DISENO-FEDERACION-USUARIOS.md pieza H). 2D-only,
+// nunca 3D. Gateada por roleService.can('user:manage') — solo dueño/esposa.
+const GestionUsuariosScreen = lazy(() => import('./components/GestionUsuariosScreen'));
 import HomeRegionalGreeting from './components/HomeRegionalGreeting';
 import { fincaVivaHomePerfilActivo } from './config/fincaVivaHomeFlag';
 import { esExtensionistaActual } from './config/extensionistaAccess';
+import { can as roleCan } from './services/roleService';
 
 localforage.config({
   name: 'Chagra',
@@ -694,6 +746,7 @@ const MOCKUP_HASH_ROUTES = {
   'mockups/mundo3d-milpa': 'mockup_mundo3d_milpa',
   'mockups/mundo3d-bosque': 'mockup_mundo3d_bosque',
   'mockups/paramo-definitivo': 'mockup_paramo_definitivo',
+  'mockups/restauracion-tiempo-3d': 'mockup_restauracion_tiempo_3d',
   'mockups/cafetal-vivo-3d': 'mockup_cafetal_vivo_3d',
   'mockups/aguacatal-vivo-3d': 'mockup_aguacatal_vivo_3d',
   'mockups/microcuenca': 'mockup_microcuenca',
@@ -703,6 +756,9 @@ const MOCKUP_HASH_ROUTES = {
   'mockups/invernadero-vivo-3d': 'mockup_invernadero_vivo_3d',
   'mockups/cacao-vivo-3d': 'mockup_cacao_vivo_3d',
   'mockups/papa-viva-3d': 'mockup_papa_viva_3d',
+  'mockups/yuca-viva-3d': 'mockup_yuca_viva_3d',
+  'mockups/quinua-viva-3d': 'mockup_quinua_viva_3d',
+  'mockups/frutales-vivo-3d': 'mockup_frutales_vivo_3d',
   'mockups/mundo-piscicultura-3d': 'mockup_mundo_piscicultura_3d',
   'mockups/lecheria-viva-3d': 'mockup_lecheria_viva_3d',
   'mockups/mundo3d-clima': 'mockup_mundo3d_clima',
@@ -720,6 +776,7 @@ const MOCKUP_HASH_ROUTES = {
   'mockups/entrada-campesina': 'mockup_entrada_campesina',
   'mockups/home-campesino': 'mockup_home_campesino',
   'mockups/boton-anarquia': 'mockup_boton_anarquia',
+  'mockups/transicion-agente-plano': 'mockup_transicion_agente_plano',
   'mockups/avatar-biopunk': 'mockup_avatar_biopunk',
   'mockups/avatar-verde-vivo': 'mockup_avatar_verde_vivo',
   'mockups/avatar-libre': 'mockup_avatar_libre',
@@ -760,6 +817,7 @@ const MOCKUP_HASH_ROUTES = {
   'mockups/valle-noche-3d': 'mockup_valle_noche_3d',
   'mockups/juego-la-milpa': 'mockup_juego_la_milpa',
   'mockups/bosque-tres-estratos': 'mockup_bosque_tres_estratos',
+  'mockups/mundo-bosque-nativo': 'mockup_mundo_bosque_nativo',
   'mockups/tres-ents-gradiente': 'mockup_tres_ents_gradiente',
   'mockups/paramo-humboldt-3d': 'mockup_paramo_humboldt_3d',
   'mockups/camara-director': 'mockup_camara_director',
@@ -784,6 +842,8 @@ const MOCKUP_HASH_ROUTES = {
   'mockups/cana-trapiche-3d': 'mockup_cana_trapiche_3d',
   'mockups/condor-cielo-3d': 'mockup_condor_cielo_3d',
   'mockups/navegador-grafo': 'mockup_navegador_grafo',
+  'mockups/navegacion-pisos': 'mockup_navegacion_pisos',
+  'mockups/agente-dibuja': 'mockup_agente_dibuja',
 };
 
 const HASH_VIEW_ROUTES = {
@@ -802,6 +862,8 @@ const HASH_VIEW_ROUTES = {
   'case-studies': 'casos',
   casos: 'casos',
   extensionista: 'extensionista',
+  usuarios: 'usuarios',
+  'gestion-usuarios': 'usuarios',
   tareas: 'task_log',
   task_log: 'task_log',
   hoy: 'hoy_finca',
@@ -848,6 +910,7 @@ const HASH_VIEW_ROUTES = {
   'mi-finca-odyssey': 'finca_odyssey',
   'mono-vs-poli': 'mono_vs_poli',
   'monocultivo-policultivo': 'mono_vs_poli',
+  'ahorcado-contaminado': 'ahorcado_contaminado',
   toxicologia: 'toxicologia',
   suelo: 'suelo',
   agua: 'agua',
@@ -1006,7 +1069,7 @@ const MODULE_VIEWS = new Set([
   'biodiversidad', 'informes', 'perfil', 'ayuda', 'help',
   'animales', 'animales_gallinas', 'animales_abejas', 'animales_vacas', 'estiercol', 'compost',
   'animales', 'animales_gallinas', 'animales_abejas', 'animales_vacas', 'animales_conejos', 'animales_caprinos', 'estiercol',
-  'hoy_finca',   'faq', 'evolucion', 'juego', 'defensores', 'milpa', 'doom_finca', 'subsuelo', 'finca_odyssey', 'mono_vs_poli', 'sembrar', 'cosechar', 'mi_cosecha', 'insumos', 'biopreparados',
+  'hoy_finca',   'faq', 'evolucion', 'juego', 'defensores', 'milpa', 'doom_finca', 'subsuelo', 'finca_odyssey', 'mono_vs_poli', 'ahorcado_contaminado', 'sembrar', 'cosechar', 'mi_cosecha', 'insumos', 'biopreparados',
   'observacion', 'reportar_invasora', 'sanidad_sintoma', 'mantenimiento', 'new_task',
   'agente', 'voz', 'voz_planta', 'procesos', 'registro_voz', 'registro_unificado', 'ciclo', 'germinacion', 'ciclo_nutrientes', 'calendario_finca', 'suelo', 'agua', 'clima_boletin', 'salud_suelo', 'semilla', 'poscosecha', 'almacenamiento', 'nutricion', 'aromaticas', 'toxicologia', 'aprende', 'curso', 'directorio', 'mercados',
   'agente', 'voz', 'voz_planta', 'procesos', 'registro_voz', 'registro_unificado', 'ciclo', 'germinacion', 'ciclo_nutrientes', 'calendario_finca', 'suelo', 'agua', 'cafe', 'uchuva', 'frutales', 'clima_boletin', 'salud_suelo', 'semilla', 'poscosecha', 'almacenamiento', 'nutricion', 'toxicologia', 'aprende', 'curso', 'directorio', 'mercados',
@@ -1019,7 +1082,7 @@ const MODULE_VIEWS = new Set([
   'agente', 'voz', 'voz_planta', 'procesos', 'registro_voz', 'registro_unificado', 'ciclo', 'germinacion', 'ciclo_nutrientes', 'calendario_finca', 'suelo', 'agua', 'clima_boletin', 'salud_suelo', 'semilla', 'poscosecha', 'almacenamiento', 'nutricion', 'hortalizas', 'tuberculos', 'toxicologia', 'aprende', 'curso', 'directorio', 'mercados',
   'agente', 'voz', 'voz_planta', 'procesos', 'registro_voz', 'registro_unificado', 'ciclo', 'germinacion', 'ciclo_nutrientes', 'calendario_finca', 'suelo', 'agua', 'milpa_cultivo', 'clima_boletin', 'salud_suelo', 'semilla', 'poscosecha', 'almacenamiento', 'nutricion', 'toxicologia', 'aprende', 'curso', 'directorio', 'mercados',
   'agente', 'voz', 'voz_planta', 'procesos', 'registro_voz', 'registro_unificado', 'ciclo', 'germinacion', 'ciclo_nutrientes', 'calendario_finca', 'suelo', 'agua', 'clima_boletin', 'salud_suelo', 'semilla', 'poscosecha', 'almacenamiento', 'nutricion', 'toxicologia', 'aprende', 'curso', 'directorio', 'plagas', 'mercados',
-  'glaciar', 'glaciar_historial', 'extensionista', 'plant_asset',
+  'glaciar', 'glaciar_historial', 'extensionista', 'usuarios', 'plant_asset',
   'casos', 'caso_detail', 'bitacora_detail', 'edit_task', 'cromatografia', 'ciclo_vivo',
   'usage_stats', 'mercado', 'auditoria_inventario', 'mundo', 'valle3d',
 ]);
@@ -1138,6 +1201,23 @@ export default function App() {
   // entrada. `sinSesion` recuerda que no hay auth para que el botón volver del
   // valle mande a login (y no al dashboard vacío).
   const [sinSesion, setSinSesion] = useState(false);
+  // Marco de entrada OPCIONAL (valle 3D vanilla, ver ValleMarcoScreen.jsx):
+  // estado REACTIVO, no una lectura directa de getMarco3DPreference() en cada
+  // render. Por qué: `case 'dashboard'` es la MISMA vista tanto para el marco
+  // 3D como para la entrada simple — "salir del marco 3D" (ValleMarcoScreen
+  // → onExit → navigate('dashboard')) navega a la vista en la que YA estamos
+  // (mismo string), y setCurrentView(mismoValor) no dispara re-render en
+  // React. Sin este estado propio, el botón "Entrada simple" quedaba inerte
+  // (persistía la preferencia pero la pantalla no cambiaba — bug real,
+  // detectado por tests/e2e-valle-marco.spec.js). Se sincroniza con
+  // `chagra:profile-changed` (el mismo evento genérico que ya escucha
+  // DashboardLive) para reaccionar también al toggle desde ProfileScreen.
+  const [marco3dActivo, setMarco3dActivo] = useState(() => getMarco3DPreference());
+  useEffect(() => {
+    const handler = () => setMarco3dActivo(getMarco3DPreference());
+    window.addEventListener('chagra:profile-changed', handler);
+    return () => window.removeEventListener('chagra:profile-changed', handler);
+  }, []);
   // Estado online reactivo: usado para mostrar el aviso offline del agente
   // ANTES de intentar el dynamic import de AgentScreen (ver `case 'agente'`).
   // Sin esto, abrir el agente offline con su chunk no cacheado caía en el
@@ -1315,9 +1395,14 @@ export default function App() {
     isAuthenticated().then((isAuth) => {
       if (!isAuth) {
         setSinSesion(true);
-        // La raíz sin sesión aterriza en el valle 3D (tema de entrada). El
-        // login sigue accesible con #login o el botón volver del valle.
-        navigate(hash === 'login' ? 'login' : 'valle3d');
+        // GATE DE LOGIN PARA ANÓNIMOS (2026-08-02): sin token la raíz aterriza
+        // en la pantalla de LOGIN (estado final), no en el valle 3D. chagra.app
+        // debe pedir login. Offline-first se preserva: esta rama SOLO corre para
+        // quien NO tiene token; el usuario ya autenticado (rama `isAuth` abajo)
+        // sigue entrando al dashboard y funcionando offline como siempre — su
+        // token cacheado lo saca de aquí. Las rutas públicas (onboarding-piloto,
+        // mockups, callback OAuth) ya se resolvieron ANTES de este check.
+        navigate('login');
         return;
       }
       const targetView = HASH_VIEW_ROUTES[hash] || 'dashboard';
@@ -1331,6 +1416,13 @@ export default function App() {
       // Gate del modo extensionista (ADR-048): si un usuario sin rol aterriza
       // en #extensionista (flag off o fuera de whitelist), va al dashboard.
       if (targetView === 'extensionista' && !esExtensionistaActual()) {
+        navigate('dashboard');
+        return;
+      }
+      // Gate de gestión de usuarios: solo dueño/esposa (roleService,
+      // permiso user:manage). Un trabajador/niña que aterrice en #usuarios
+      // (link viejo, deep-link) va al dashboard — el módulo NO se monta.
+      if (targetView === 'usuarios' && !roleCan(undefined, 'user:manage')) {
         navigate('dashboard');
         return;
       }
@@ -1351,6 +1443,10 @@ export default function App() {
       if (!routeView) return;
       // Gate extensionista (ADR-048): no montar el panel para quien no tiene rol.
       if (routeView === 'extensionista' && !esExtensionistaActual()) {
+        navigate('dashboard');
+        return;
+      }
+      if (routeView === 'usuarios' && !roleCan(undefined, 'user:manage')) {
         navigate('dashboard');
         return;
       }
@@ -1714,6 +1810,17 @@ export default function App() {
             </ErrorFallback>
           </ErrorBoundary>
         );
+      case 'mockup_restauracion_tiempo_3d':
+        // EL MONTE QUE VUELVE: el potrero volviéndose bosque a través del
+        // tiempo (50 años, riel no lineal). Ruta #/mockups/restauracion-
+        // tiempo-3d, sin auth.
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="El monte que vuelve">
+              <RestauracionTiempo3DMockup />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
       case 'mundo_casa_adentro':
         return (
           <ErrorBoundary>
@@ -1800,6 +1907,47 @@ export default function App() {
           <ErrorBoundary>
             <ErrorFallback moduleName="El mundo de la papa">
               <PapaVivo3DMockup />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
+      case 'mockup_yuca_viva_3d':
+        // Vitrina pública del MUNDO DE LA YUCA: el yucal de clima medio en 3D
+        // REAL — el tallo leñoso pelado y anillado de cicatrices, el follaje
+        // arriba no más, el semillero de estacas inclinadas y el racimo de
+        // raíces recién destapado. En equipo humilde muestra la ficha del
+        // corte. Ruta #/mockups/yuca-viva-3d.
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="El mundo de la yuca">
+              <YucaViva3DMockup />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
+      case 'mockup_quinua_viva_3d':
+        // Vitrina pública del MUNDO DE LA QUINUA: el quinual maduro de tierra
+        // fría en 3D REAL — la ladera a manchas de color por variedad y la
+        // era donde se trilla, se avienta y se le lava lo amargo. En equipo
+        // humilde muestra la ficha de las dos panojas. Ruta
+        // #/mockups/quinua-viva-3d.
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="El mundo de la quinua">
+              <QuinuaViva3DMockup />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
+      case 'mockup_frutales_vivo_3d':
+        // Vitrina pública del MUNDO DE LOS FRUTALES: mango y cítricos en la
+        // misma escena en 3D REAL, porque juntos enseñan el PISO TÉRMICO — el
+        // mango es de tierra caliente y el cítrico sube al clima medio. El
+        // mango con su copa más ancha que alta, el brote de hoja color vino y
+        // la panícula terminal; el cítrico compacto, con pecíolo alado y
+        // espinas. La escala relativa ES la lección. En equipo humilde muestra
+        // la ficha. Ruta #/mockups/frutales-vivo-3d.
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="El mundo de los frutales">
+              <FrutalesVivo3DMockup />
             </ErrorFallback>
           </ErrorBoundary>
         );
@@ -1983,6 +2131,14 @@ export default function App() {
           <ErrorBoundary>
             <ErrorFallback moduleName="Botón anarquía">
               <BotonAnarquiaMockup onBack={() => navigate('dashboard')} />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
+      case 'mockup_transicion_agente_plano':
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="El agente cruza a lo plano">
+              <TransicionAgentePlanoMockup />
             </ErrorFallback>
           </ErrorBoundary>
         );
@@ -2510,6 +2666,18 @@ export default function App() {
             </ErrorFallback>
           </ErrorBoundary>
         );
+      case 'mockup_mundo_bosque_nativo':
+        // Vitrina del MUNDO `bosque` cableado (arquetipo nuevo → EscenaBosque):
+        // monta <Mundo mundoId="bosque"> del framework, con device-tiering real.
+        // Prueba de punta a punta el registro del bosque de niebla de 3 estratos.
+        // Ruta #/mockups/mundo-bosque-nativo, sin auth.
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="El mundo del bosque nativo">
+              <MundoBosqueNativo3DMockup />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
       case 'mockup_tres_ents_gradiente':
         // LOS TRES ÁRBOLES MAESTROS DEL GRADIENTE: un Ent por piso térmico —
         // el roble andino (Quercus humboldtii, templado y frío, con sus
@@ -2634,6 +2802,18 @@ export default function App() {
             </ErrorFallback>
           </ErrorBoundary>
         );
+      case 'mockup_navegacion_pisos':
+        // Navegación unificada por pisos térmicos: minimapa + mapa estratégico
+        // + vista global (lámina del paisaje con nevado y Chorrera). Tocar un
+        // mundo navega a su pantalla real. Ruta #/mockups/navegacion-pisos,
+        // sin auth.
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="Navegación por pisos térmicos">
+              <NavegacionPisosMockup onNavigate={navigate} onBack={() => navigate('dashboard')} />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
       case 'mockup_hoja_prueba_valle':
         // La hoja de prueba de la ley visual del valle: el patrón oro contra el
         // que se compara todo activo nuevo (paleta, bandas, borde) bajo las
@@ -2642,6 +2822,17 @@ export default function App() {
           <ErrorBoundary>
             <ErrorFallback moduleName="La hoja de prueba del valle">
               <HojaPruebaValleMockup />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
+      case 'mockup_agente_dibuja':
+        // Vitrina pública "el agente dibuja en sus respuestas de forma fiable".
+        // Ruta #/mockups/agente-dibuja, sin auth: muestra respuestas del agente
+        // con su lámina (del conjunto cerrado LAMINAS_FIABLES) dibujándose sola.
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="El agente dibuja">
+              <AgenteDibuja onBack={() => navigate('dashboard')} />
             </ErrorFallback>
           </ErrorBoundary>
         );
@@ -2672,13 +2863,12 @@ export default function App() {
           </ErrorBoundary>
         );
       case 'onboarding-perfil-clasico':
-        // #200: el onboarding extendido ORIGINAL (hasta 25 preguntas
-        // condicionales). Se conserva cableado (features no huérfanas) como
-        // camino largo/diagnóstico mientras el operador valida el condensado.
+        // Alias de compatibilidad para enlaces guardados antes de consolidar
+        // el onboarding. Ambos paths montan el unico flujo vigente.
         return (
           <ErrorBoundary>
-            <OnboardingProfile
-              onComplete={() => navigate('ubicacion-detectada', { next: 'dashboard' })}
+            <OnboardingCondensado
+              onComplete={() => navigate('dashboard')}
               onClose={() => navigate(currentViewData?.back || 'dashboard')}
               onExplorarEjemplo={async () => {
                 try {
@@ -2707,6 +2897,24 @@ export default function App() {
           </ErrorBoundary>
         );
       case 'dashboard':
+        // Marco de entrada OPCIONAL (valle 3D vanilla, default OFF): gate
+        // DOBLE — `currentView === 'dashboard'` solo se alcanza tras
+        // `isAuthenticated()` en el boot (loading → login|dashboard, ver
+        // efecto de arranque más arriba), y `!sinSesion` es el mismo
+        // centinela que usa el resto del shell para "hay sesión real". Sin
+        // los dos, jamás se monta el iframe — la entrada simple de siempre
+        // no cambia para quien no activó la preferencia. `marco3dActivo` es
+        // el estado REACTIVO (no una lectura fresca de getMarco3DPreference()
+        // en este mismo punto, ver su declaración arriba) — necesario porque "salir del
+        // marco 3D" navega a esta MISMA vista ('dashboard'), y sin estado
+        // propio ese cambio de preferencia nunca dispararía un re-render.
+        if (!sinSesion && marco3dActivo) {
+          return (
+            <ErrorBoundary>
+              <ValleMarcoScreen onExit={() => navigate('dashboard')} />
+            </ErrorBoundary>
+          );
+        }
         return (
           <ErrorBoundary>
             <DashboardLiveView onNavigate={navigate} onLogout={handleLogout} lastLogMessage={lastLogMessage} />
@@ -2815,6 +3023,19 @@ export default function App() {
             <ErrorFallback moduleName="Monocultivo vs Policultivo">
               <ScreenShell title="Mono vs Poli" onBack={() => navigate('juego')} onHome={() => navigate('dashboard')}>
                 <MonoVsPoliSimulator />
+              </ScreenShell>
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
+      case 'ahorcado_contaminado':
+        // Ahorcado clásico con metáfora de contaminación (Tarea #93, dataset de
+        // la Tarea #38). No trae navegación propia → lo envolvemos en
+        // ScreenShell (como 'subsuelo'/'mono_vs_poli') para dar Volver/Inicio.
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="Ahorcado Contaminado">
+              <ScreenShell title="Ahorcado Contaminado" onBack={() => navigate('juego')} onHome={() => navigate('dashboard')}>
+                <AhorcadoContaminado />
               </ScreenShell>
             </ErrorFallback>
           </ErrorBoundary>
@@ -3899,6 +4120,28 @@ export default function App() {
             </ErrorFallback>
           </ErrorBoundary>
         );
+      case 'usuarios':
+        // Gestión de usuarios de la finca (roles dueño/esposa/trabajador/
+        // niña/asesor). 2D-only — regla dura del operador, nunca 3D. ACCESO
+        // por roleService.can('user:manage') (dueño o esposa). La ruta ya
+        // redirige al dashboard antes de llegar aquí si el actor no tiene
+        // el permiso; guarda defensiva por si se monta directo.
+        if (!roleCan(undefined, 'user:manage')) {
+          return (
+            <ErrorBoundary>
+              <ErrorFallback moduleName="Usuarios">
+                <div className="h-[100dvh] bg-slate-950 text-white flex items-center justify-center">Vista no disponible</div>
+              </ErrorFallback>
+            </ErrorBoundary>
+          );
+        }
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="Usuarios">
+              <GestionUsuariosScreen onBack={() => navigate('dashboard')} onHome={() => navigate('dashboard')} />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
       case 'casos':
         return (
           <ErrorBoundary>
@@ -4045,13 +4288,13 @@ export default function App() {
           decisión del operador: lo quería fuera. La entrada por voz sigue
           disponible dentro del agente / compositor; este era solo el FAB
           global. */}
-      {/* AgentFab (colibrí flotante "respuesta lista") en TODAS las pantallas
-          MENOS el home/dashboard (operador 2026-06-06): en el home el colibrí
+      {/* AgentFab (el compai elegido, "respuesta lista") en TODAS las pantallas
+          MENOS el home/dashboard (operador 2026-06-06): en el home el compai
           ya es el botón de ENVIAR del compositor, así que el FAB flotante ahí
-          duplicaría el ave. Sigue en el resto para anunciar "respuesta lista".
-          Tampoco en onboarding-perfil (tarea #16): el FAB se encimaba sobre el
-          CTA "Explorar con finca de ejemplo" del footer y la usuaria nueva aún
-          no conoce al agente — ruido en su primer flujo. */}
+          duplicaría la presencia. Sigue en el resto para anunciar "respuesta
+          lista". Tampoco en onboarding-perfil (tarea #16): el FAB se encimaba
+          sobre el CTA "Explorar con finca de ejemplo" del footer y la usuaria
+          nueva aún no conoce al agente, ruido en su primer flujo. */}
       <Suspense fallback={null}>
         {currentView !== 'loading' && currentView !== 'login' && currentView !== 'oauth-callback' && !currentView.startsWith('mockup_') && currentView !== 'voz' && currentView !== 'agente' && currentView !== 'dashboard' && currentView !== 'onboarding-perfil' && currentView !== 'onboarding-perfil-clasico' && <AgentFab onNavigate={navigate} pantalla={currentView} />}
       </Suspense>
@@ -4061,14 +4304,15 @@ export default function App() {
 
           DECISIÓN OPERADOR 2026-07-07 — MODO CAMPO = WAKE-WORD SOLO: el FAB de
           tap ("barbudito de páramo", EscuchaFab) NO se muestra a los usuarios.
-          El único FAB visible sigue siendo el colibrí (AgentFab, "respuesta
-          lista"). El overlay se abre EXCLUSIVAMENTE por el wake-word "hola
+          El único FAB visible sigue siendo el compai elegido (AgentFab,
+          "respuesta lista"). El overlay se abre EXCLUSIVAMENTE por el wake-word "hola
           chagra" (useModoCampo.onWake → activarEscucha({fuente:'wakeword'})),
           que solo corre con VITE_MODO_CAMPO=true y modo campo activado (opt-in).
           Para re-habilitar el tap: descomentar el import de EscuchaFab (arriba)
           y la línea del render de abajo. */}
       {/* {!['loading', 'login', 'oauth-callback', 'onboarding-perfil', 'ubicacion-detectada', 'dashboard', 'agente', 'voz', 'voz_planta', 'registro_voz'].includes(currentView) && <EscuchaFab />} */}
       {currentView !== 'loading' && currentView !== 'login' && currentView !== 'oauth-callback' && !currentView.startsWith('mockup_') && <EscuchaOverlay />}
+      {currentView !== 'loading' && currentView !== 'login' && currentView !== 'oauth-callback' && !currentView.startsWith('mockup_') && <CompaiFotosOverlay onNavigate={navigate} />}
       {currentView === 'dashboard' && <PendingTasksWidget onEdit={(task) => navigate('edit_task', { task })} />}
       {currentView !== 'loading' && currentView !== 'login' && currentView !== 'oauth-callback' && !currentView.startsWith('mockup_') && <SyncProgressIndicator />}
       {/* Badge persistente "N pendientes de sincronizar" (rescate #2668).

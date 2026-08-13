@@ -23,7 +23,7 @@
 /* Nota: las props de three (position, args, intensity, castShadow, etc.) son
    válidas en el reconciliador de R3F, no en el DOM — el config de ESLint del
    repo no activa react/no-unknown-property, así que no requieren disable. */
-import { Suspense, useEffect, useMemo, useRef, useState } from 'react';
+import { Suspense, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import {
   Html, Float, Stars, OrbitControls, Detailed, Instances, Instance,
@@ -43,7 +43,25 @@ import { AbejaAngelita } from '../../visual/creatures/AbejaAngelita.jsx';
    (CompaneroAbeja) lo usa para husmear con criterio: comentarios grounded
    por mundo, con la anti-molestia (cooldowns) resuelta adentro del store. */
 import useAngelitaStore from '../../store/useAngelitaStore';
+/* EL COMPAI HABLA CON DATOS REALES (auditoría 2026-07-26, ítem #38): el
+   inventario vivo de la finca + su traducción a lo que cada comentarista sabe
+   leer, y el sensor de "¿está a mitad de algo?" que el motor esperaba desde
+   siempre y nadie alimentaba. Los tres cuelgan del núcleo portable del compAI
+   (src/compai/nucleo) — la fuente única que comparte con 3d.guatoc.co. */
+import useInventarioCompai from '../../hooks/useInventarioCompai';
+import { datosDeMundo } from '../../compai/nucleo/datosFinca.js';
+import { estaOcupado } from '../../services/compaiOcupado.js';
+import { husmeoCadenciaMs, vueltasCompletas } from './husmeoCadencia.js';
 import BurbujaAngelita from '../../visual/agente/BurbujaAngelita';
+/* #88 — QUE EL COMPAI HABLE SUS TIPS: hasta hoy el husmeo solo pintaba la
+   burbuja (mensajeAngelita), nunca lo decía en voz — speak/speakKokoro ya
+   existían y nadie los llamaba desde aquí. Mismo patrón que useAcompanante
+   (AcompananteMundo.jsx) y el shell (EntradaValle3D.jsx): Kokoro primero,
+   Web Speech si no responde. Gateado por el silencio real del operador
+   (usePrefsStore.ttsEnabled, la misma bandera que apaga la voz en
+   AgentScreen) y por reducedMotion (silencio también es respeto). */
+import { speak, speakKokoro } from '../../services/ttsService.js';
+import usePrefsStore from '../../store/usePrefsStore.js';
 /* La CAPA DE ESTADO de Angelita (auditoría §5b): módulo puro, sin three — el
    mismo repertorio (mojada/sed/comiendo/vuelo) que usan los mundos 3D. */
 import { reaccionDeFinca, ESTADO_FINCA_MUESTRA } from '../../visual/mundo3d/escenas/reaccionFinca.js';
@@ -102,6 +120,7 @@ import { CriaturaNocturnaAvatar } from '../../components/dashboard/CriaturasNoct
    árboles, matas, vecinos) — sin ella los objetos flotan sobre la loma.
    2 draw calls instanciados, textura radial pre-horneada, cero costo/frame. */
 import SombrasContacto from './SombrasContacto.jsx';
+import EntsDelValle from './EntsDelValle.jsx';
 import './rotulosValle3D.css';
 import {
   MUNDOS_VALLE,
@@ -148,7 +167,11 @@ const LUGAR_A_MUNDO_ANGELITA = {
    real, nunca con reduced-motion. */
 const HUSMEO_LUGARES = ['cultivos', 'animales', 'clima', 'mercado', 'aprender', 'disenio'];
 const HUSMEO_PRIMERO_MS = 4200; // el primer husmeo llega pronto: se ve viva al cargar
-const HUSMEO_CADA_MS = 13000; // cadencia entre husmeos (feedback operador: 40s se sentía MUERTA; 13s = viva sin ser errática)
+/* Cadencia entre husmeos: YA NO un número fijo. `husmeoCadenciaMs` (ítem #58
+   del GAP compAI, 2026-08-13) reconcilia el SPEC (46s) con el feedback en
+   vivo del operador (13s: "40s se sentía MUERTA") — arranca en 13s y se
+   asienta hacia 46s tras varias vueltas sin que el usuario interactúe. Ver
+   ./husmeoCadencia.js. */
 const HUSMEO_VISIBLE_MS = 7000; // piso: ningún aviso dura menos que esto
 /* Cuánto se queda un aviso en pantalla: lo que tarda la máquina de escribir en
    ponerlo (≈16 ms por letra) MÁS el tiempo de leerlo con calma (≈70 ms por
@@ -1126,6 +1149,41 @@ function LandmarkGeom({ tipo, tinte, reducedMotion, q = 1, forma = null }) {
         </group>
       );
     }
+    case 'chorrera': { // EL SALTO DE LA QUEBRADA: escarpe estratificado + hilo de
+      // agua que cae a un pocito, con su vaho. La seña del alto húmedo — tocar
+      // aquí BAJA al mundo de la chorrera. (anti-conflicto: caso nuevo antes de default.)
+      const ESTRATOS = [0.18, 0.42, 0.66, 0.9];
+      return (
+        <group>
+          {/* el escarpe: lajas apiladas (roca sedimentaria) — INSTANCIADO */}
+          <Instances frames={1} limit={ESTRATOS.length}>
+            <boxGeometry args={[0.7, 0.2, 0.34]} />
+            <meshStandardMaterial color="#6f7a85" flatShading roughness={1} />
+            {ESTRATOS.map((y, i) => (
+              <Instance key={i} position={[0, y, -0.2]} scale={[1 - i * 0.08, 1, 1]} />
+            ))}
+          </Instances>
+          {/* el hilo de agua que cae por el escarpe */}
+          <mesh position={[0, 0.55, -0.02]}>
+            <boxGeometry args={[0.16, 0.86, 0.04]} />
+            <meshStandardMaterial color="#8fc7cf" transparent opacity={0.8} roughness={0.2} metalness={0.3} />
+          </mesh>
+          {/* el pocito cristalino de la base */}
+          <mesh position={[0, 0.06, 0.28]}>
+            <cylinderGeometry args={[0.34, 0.38, 0.1, 18]} />
+            <meshStandardMaterial color="#3a7fa0" transparent opacity={0.82} metalness={0.4} roughness={0.2} />
+          </mesh>
+          {/* el vaho del salto (motas frías, como el frailejonal) */}
+          <Instances frames={1} limit={3}>
+            <sphereGeometry args={[1, 8, 6]} />
+            <meshBasicMaterial color="#dfe8ea" transparent opacity={0.22} depthWrite={false} />
+            {[[0, 0.3, 0.2, 0.22], [-0.12, 0.62, 0.05, 0.16], [0.12, 0.5, 0.15, 0.14]].map(([x, y, z, r], i) => (
+              <Instance key={i} position={[x, y, z]} scale={r} />
+            ))}
+          </Instances>
+        </group>
+      );
+    }
     default:
       return (
         <mesh position={[0, 0.3, 0]}>
@@ -1898,7 +1956,67 @@ function CompaneroAbeja({ foco, focoId = null, entrando, animo, energia, reduced
   const mensajeAngelita = useAngelitaStore((s) => s.mensaje);
   const tipoAngelita = useAngelitaStore((s) => s.tipo);
   const entrarMundoAngelita = useAngelitaStore((s) => s.entrarMundo);
+
+  /* #88 — EL COMPAI HABLA SUS TIPS: cada vez que llega un mensaje NUEVO
+     (navegación real o husmeo autónomo), además de pintar la burbuja lo DICE.
+     Kokoro primero; si no responde (equipo sin soporte, timeout), cae a la
+     voz del navegador — nunca queda muda una finca que ya escribe. Silencio
+     real (usePrefsStore.ttsEnabled) y reducedMotion apagan la voz sin tocar
+     la burbuja: el texto sigue siendo la voz de quien no puede/no quiere oír. */
+  const ttsEnabled = usePrefsStore((s) => s.ttsEnabled);
+  const dichoRef = useRef(null);
+  useEffect(() => {
+    if (!mensajeAngelita || reducedMotion || !ttsEnabled) return;
+    if (dichoRef.current === mensajeAngelita) return; // ya se dijo este mismo texto
+    dichoRef.current = mensajeAngelita;
+    speakKokoro(mensajeAngelita, { lang: 'es', rate: 0.98 })
+      .then((audio) => {
+        if (!audio) speak(mensajeAngelita, { rate: 0.98, pitch: 1 });
+      })
+      .catch(() => {
+        speak(mensajeAngelita, { rate: 0.98, pitch: 1 });
+      });
+  }, [mensajeAngelita, reducedMotion, ttsEnabled]);
   const reposarAngelita = useAngelitaStore((s) => s.reposar);
+
+  /* ── LOS DATOS REALES DE LA FINCA (auditoría 2026-07-26, ítem #38) ────────
+     ESTE ERA EL BUG MÁS CARO DEL compAI: los dos disparadores de abajo
+     llamaban `entrarMundoAngelita(mundo, {})` — con el objeto VACÍO. Por eso
+     cada comentario caía a la rama honesta-pero-genérica ("todavía no me ha
+     contado qué tiene sembrado") AUNQUE el usuario tuviera sus matas en
+     IndexedDB. El motor siempre supo hablar con datos; nadie se los pasaba.
+
+     `useInventarioCompai` lee el store de activos (offline-first sobre
+     IndexedDB) y `datosDeMundo` lo traduce a la forma exacta que cada
+     comentarista sabe leer. Cero red, cero dato inventado: finca vacía sigue
+     cayendo a la rama honesta, que es como debe ser. Va por ref para que un
+     cambio de inventario no re-ate la cadencia del husmeo. */
+  const inventarioCompai = useInventarioCompai();
+  const inventarioRef = useRef(inventarioCompai);
+  useEffect(() => { inventarioRef.current = inventarioCompai; }, [inventarioCompai]);
+  /* El clima que el shell alcanzó a cachear — el único dato del husmeo que NO
+     sale del inventario. Sin él, el comentarista del clima dice la verdad.
+     Dependencia por el objeto completo (no `?.snapshotClima` recortado):
+     mismo patrón que `reaccion` arriba — React Compiler solo puede preservar
+     la memoización manual si la dep declarada coincide con lo que infiere
+     (objeto completo), no con una propiedad anidada más específica. */
+  const climaExtra = useMemo(
+    () => (estadoFinca?.snapshotClima ? { snapshot: estadoFinca.snapshotClima } : undefined),
+    [estadoFinca],
+  );
+  const climaExtraRef = useRef(climaExtra);
+  useEffect(() => { climaExtraRef.current = climaExtra; }, [climaExtra]);
+  /* Un solo lugar donde se arman los datos: los dos disparadores lo usan. */
+  const datosParaMundo = useCallback(
+    (mundo) => datosDeMundo(mundo, inventarioRef.current, climaExtraRef.current || {}),
+    [],
+  );
+
+  // Cuántos husmeos autónomos van sonados (ver husmeoCadencia.js, #58) — vive
+  // arriba de los dos efectos porque el #1 (navegación real) la REINICIA: el
+  // usuario acaba de interactuar de verdad, así que el husmeo vuelve a
+  // sonar "vivo" (13s) en vez de seguir asentado hacia el ritmo del SPEC.
+  const husmeoIdx = useRef(0);
 
   // 1) Navegación real: al entrar/salir de un mundo de verdad, la abeja
   //    husmea ese lugar (o vuelve a calma al salir). `focoId` es el id CRUDO
@@ -1907,12 +2025,17 @@ function CompaneroAbeja({ foco, focoId = null, entrando, animo, energia, reduced
   const focoIdPrevio = useRef(focoId);
   useEffect(() => {
     if (focoId && focoId !== focoIdPrevio.current) {
-      entrarMundoAngelita(LUGAR_A_MUNDO_ANGELITA[focoId] || 'finca', {});
+      const mundo = LUGAR_A_MUNDO_ANGELITA[focoId] || 'finca';
+      entrarMundoAngelita(mundo, datosParaMundo(mundo));
+      // El usuario interactuó de verdad: la cadencia del husmeo autónomo
+      // vuelve a arrancar "viva" (#58) — no se queda asentada en 46s solo
+      // porque llevaba rato sin que nadie tocara nada ANTES de esta visita.
+      husmeoIdx.current = 0;
     } else if (!focoId && focoIdPrevio.current) {
       reposarAngelita();
     }
     focoIdPrevio.current = focoId;
-  }, [focoId, entrarMundoAngelita, reposarAngelita]);
+  }, [focoId, entrarMundoAngelita, reposarAngelita, datosParaMundo]);
 
   // 2) Husmeo autónomo: nunca a mitad de un viaje real (entrandoRef, para
   //    que un viaje NO reinicie la cadencia), nunca con reduced-motion (cero
@@ -1923,7 +2046,6 @@ function CompaneroAbeja({ foco, focoId = null, entrando, animo, energia, reduced
   //    debe repintar el resto del árbol.
   const entrandoRef = useRef(entrando);
   useEffect(() => { entrandoRef.current = entrando; }, [entrando]);
-  const husmeoIdx = useRef(0);
   const husmeoLugarRef = useRef(null);
   useEffect(() => {
     if (reducedMotion) return undefined;
@@ -1938,7 +2060,9 @@ function CompaneroAbeja({ foco, focoId = null, entrando, animo, energia, reduced
         const lugar = HUSMEO_LUGARES[husmeoIdx.current % HUSMEO_LUGARES.length];
         husmeoIdx.current += 1;
         const mundo = LUGAR_A_MUNDO_ANGELITA[lugar];
-        const decision = mundo ? entrarMundoAngelita(mundo, {}) : null;
+        const decision = mundo
+          ? entrarMundoAngelita(mundo, datosParaMundo(mundo), { ocupado: estaOcupado() })
+          : null;
         if (decision?.interrumpe) {
           husmeoLugarRef.current = lugar;
           if (ocultarTimer) clearTimeout(ocultarTimer);
@@ -1952,9 +2076,12 @@ function CompaneroAbeja({ foco, focoId = null, entrando, animo, energia, reduced
           }, duraEste);
         }
       }
-      /* El siguiente husmeo espera a que el anterior TERMINE de leerse (+ respiro):
-         un aviso largo ya no se lo come el que viene detrás. */
-      temporizador = setTimeout(tick, Math.max(HUSMEO_CADA_MS, duraEste + 3500));
+      /* El siguiente husmeo espera a que el anterior TERMINE de leerse (+
+         respiro): un aviso largo ya no se lo come el que viene detrás. La
+         cadencia BASE (#58) ya no es fija: arranca en 13s ("viva") y se
+         asienta hacia los 46s del SPEC tras varias vueltas sin interacción. */
+      const cadenciaBase = husmeoCadenciaMs(vueltasCompletas(husmeoIdx.current, HUSMEO_LUGARES.length));
+      temporizador = setTimeout(tick, Math.max(cadenciaBase, duraEste + 3500));
     };
     temporizador = setTimeout(tick, HUSMEO_PRIMERO_MS);
     return () => {
@@ -1963,8 +2090,9 @@ function CompaneroAbeja({ foco, focoId = null, entrando, animo, energia, reduced
       if (ocultarTimer) clearTimeout(ocultarTimer);
     };
     // `entrando` vive en entrandoRef a propósito: un viaje real no debe
-    // reiniciar la cadencia del husmeo autónomo.
-  }, [reducedMotion, entrarMundoAngelita, reposarAngelita]);
+    // reiniciar la cadencia del husmeo autónomo. `datosParaMundo` es estable
+    // (useCallback sin deps, lee refs) — el inventario cambia sin re-atar nada.
+  }, [reducedMotion, entrarMundoAngelita, reposarAngelita, datosParaMundo]);
 
   useFrame((state) => {
     if (!ref.current) return;
@@ -2722,6 +2850,15 @@ function Escena({ clima, focoId, animo, energia, onEntrar, onAlerta, onCasa = nu
       {!reducedMotion && <MonitorRendimiento key={tier} tier={tier} />}
       {/* Fondo + niebla + luces, amortiguadas hacia la franja del día. */}
       <AtmosferaValle c={c} perfil={perfil} reducedMotion={reducedMotion} />
+      {/* Los Guardianes del gradiente — el Ent del piso térmico + vecinos.
+          pisoTermico=null → default (templado/roble); cablear el valor real
+          cuando el valle exponga el piso. Rescatado del huérfano 2026-08-01. */}
+      <EntsDelValle
+        pisoTermico={null}
+        alturaDe={alturaTerreno}
+        tier={/** @type {'alto'|'medio'|'bajo'} */ (tier)}
+        reducedMotion={reducedMotion}
+      />
       {fracEstrellas > 0 && perfil.estrellas > 0 && (
         <Stars
           radius={40}

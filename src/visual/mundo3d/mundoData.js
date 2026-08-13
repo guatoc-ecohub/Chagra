@@ -584,6 +584,116 @@ export const MUNDO = {
     // El gemelo 2D digno (mirror → motivo `micorrizas`): la misma red, dibujada.
     fallback2d: { escena: 'mirror' },
   },
+
+  // 🏔️ EL PÁRAMO — la FÁBRICA DE AGUA de la finca (arquetipo SÍ-3D `paramo`). El
+  //    mundo alto de la cordillera: la planicie altoandina sobre 3.000+ m, con el
+  //    FRAILEJONAL caulirrósulo (tallo vestido de enagua de necromasa + roseta
+  //    afelpada plateada que le peina el agua a la niebla), el pajonal/sotobosque,
+  //    la NIEBLA densa en capas y la INMENSIDAD de la montaña (cordillera y mar de
+  //    nubes). Render ilustrado tipo lámina de Humboldt + atmósfera Ghibli, huesos
+  //    reales (estructura/escala/altitud EXACTAS del DR-paramo-frailejon). El
+  //    páramo se CUIDA, no se ara: sus puertas hablan de agua, conservación y vida.
+  //    Reusa el páramo definitivo aprobado (bosque/EscenaBosqueVivo) — cero arte
+  //    nuevo. En equipo humilde cae a su ficha 2D (infografía del páramo).
+  //    (anti-conflicto de merge: entrada de mundo nueva SIEMPRE al final.)
+  paramo: {
+    pisoTermico: 'paramo',
+    escena: 'paramo',
+    // La puerta de arriba del valle (zona alta/lejana de la ladera): espeja el
+    // landmark de valleData (LUGARES.paramo) para el mapa navegable.
+    valle: { tipo: 'frailejonal', pos: [-0.9, 0, -7.6], escala: 0.95 },
+    params: {},
+    // Puertas del páramo (por DATOS). Cada `view` es una vista REAL de App.jsx.
+    // `pos` queda para el anclaje 3D fino de Opus; la capa DOM usa emoji+label.
+    hotspots: [
+      { id: 'agua', pos: [-1.6, 3.4, 0.6], emoji: '💧', label: 'La fábrica de agua', view: 'agua', data: { tema: 'nacimiento' } },
+      { id: 'cuidar', pos: [4.1, 3.0, -3.9], emoji: '🏔️', label: 'El páramo se cuida, no se ara', view: 'restauracion' },
+      { id: 'vida', pos: [1.9, 2.6, 1.7], emoji: '🦅', label: 'La vida del páramo', view: 'biodiversidad' },
+    ],
+    entrada: { zoom: 9, narra: 'paramo' },
+    // El gemelo 2D digno: la ficha del páramo (misma lección, en cifras y notas).
+    fallback2d: {
+      escena: 'infografia',
+      params: {
+        titulo: 'El páramo, la fábrica de agua',
+        cifras: [
+          { valor: '3.000–4.200', unidad: 'm', label: 'la altura del páramo andino, por encima del bosque altoandino y bajo las nieves' },
+          { valor: '~1', unidad: 'cm/año', label: 'lo que crece un frailejón: los grandes son viejísimos, por eso la colonia va dispersa' },
+          { valor: '~50', unidad: '%', label: 'de los páramos del mundo están en Colombia: un ecosistema casi único que nos toca cuidar' },
+        ],
+        notas: [
+          'El frailejón peina el agua de la niebla con sus hojas de lana (tricomas) y la enagua de hojas muertas lo abriga del frío; el musgo la guarda como esponja y la suelta despacio al suelo.',
+          'De aquí, gota a gota, nace el agua que baja a la finca. Por eso el páramo se cuida, no se ara: ni ganado, ni quema, ni papa en lo alto.',
+          'Es un mundo de niebla y frío: casi sin árboles, con frailejonal y pajonal sobre suelo negro y turberas. La vida de aquí —cóndor, oso, venadito— vive de esa agua.',
+        ],
+      },
+    },
+  },
+
+  // 🌿 EL BOSQUE NATIVO — el BOSQUE ALTOANDINO DE TRES ESTRATOS (arquetipo SÍ-3D
+  //    nuevo `bosque`). NO es el bosque comestible de la finca (ese es `disenio`,
+  //    que usa `estratos` para los 7 estratos productivos): este es el MONTE
+  //    NATIVO que la abraza — el bosque de niebla de 2400-3300 msnm, leído como
+  //    una lámina de Humboldt viva. Uno se para en el CLARO y mira la orilla del
+  //    rodal: el DOSEL (encenillo, cedro, nogal, palma de cera emergente), el
+  //    SOTOBOSQUE (mano de oso, helecho arbóreo, chusque, arbusto en flor, bejuco
+  //    con bromelias) y el SUELO (helechos, hierba de sombra, cojines de musgo).
+  //    Las epífitas van horneadas sobre los forófitos; la niebla y la luz
+  //    filtrada ponen la atmósfera. Los tres botones señalan cada estrato sin
+  //    salir del mundo. En equipo humilde cae a su ficha 2D digna (la lámina de
+  //    los tres estratos). (anti-conflicto de merge: entrada nueva SIEMPRE al final.)
+  bosque: {
+    pisoTermico: 'frio',
+    escena: 'bosque',
+    valle: { tipo: 'bosque', pos: [6.0, 0, -5.2], escala: 1.1 },
+    params: { seed: 4242, extension: 23 },
+    entrada: { narra: 'bosque' },
+    // El gemelo 2D digno: la lámina de los tres estratos (misma lección en notas).
+    fallback2d: {
+      escena: 'infografia',
+      params: {
+        titulo: 'El bosque nativo altoandino',
+        cifras: [
+          { valor: '2.400–3.300', unidad: 'm', label: 'la altura del bosque de niebla altoandino' },
+          { valor: '3', unidad: 'estratos', label: 'dosel (9–17 m) · sotobosque (2–6 m) · suelo (musgo y helechos)' },
+        ],
+        notas: [
+          'El DOSEL es el techo: encenillo, cedro, nogal y la palma de cera asomando. Su sombra hace el clima de todo lo de abajo.',
+          'El SOTOBOSQUE vive de la luz colada: helechos arbóreos, chusque, arbustos en flor y el bejuco que sube cargando bromelias.',
+          'El SUELO es una esponja de musgo, briofitas y hojarasca que guarda el agua de la niebla y la suelta despacio.',
+          'Las epífitas —orquídeas, bromelias y helechos— viven montadas sobre los troncos sin robarles: son el sello del bosque de niebla.',
+        ],
+      },
+    },
+  },
+
+  // 💦 LA CHORRERA — la QUEBRADA DE MONTAÑA con su salto (arquetipo SÍ-3D nuevo
+  //    `chorrera`). No es el `flujo` (el agua que BAJA por la pendiente para
+  //    regar): aquí el agua CAE. El bosque de niebla andino (~2200–2800 msnm)
+  //    hecho lugar: el cauce rocoso estrecho de alta pendiente, la CHORRERA
+  //    sobre el escarpe estratificado (roca sedimentaria angular), el POZO
+  //    cristalino de guijarros pulidos en la base, la escalera de terrazas y
+  //    micro-cascadas, y el bosque prehistórico de helechos arborescentes,
+  //    musgo aterciopelado y epífitas bajo la niebla. Huesos reales de la
+  //    quebrada de Guatoc (DR-chorrera-quebrada-guatoc), piel dibujada estilo
+  //    lámina naturalista de Humboldt + atmósfera Ghibli. Agua SIN física
+  //    (planos + shader + sprites). En equipo humilde cae a su espejo 2D.
+  //    (anti-conflicto de merge: entrada de mundo nueva SIEMPRE al final.)
+  chorrera: {
+    pisoTermico: 'frio',
+    escena: 'chorrera',
+    valle: { tipo: 'chorrera', pos: [2.4, 0, -3.6], escala: 1 },
+    params: {},
+    hotspots: [
+      { id: 'salto', pos: [0, 2.2, -0.6], emoji: '💦', label: 'El salto de agua', view: 'agua', data: { tema: 'nacimiento' } },
+      { id: 'pozo', pos: [0.15, 0.7, 0.35], emoji: '💧', label: 'El pozo cristalino', view: 'biodiversidad' },
+      { id: 'helechos', pos: [-2.85, 1.6, 1.7], emoji: '🌿', label: 'Helechos y musgos', view: 'restauracion' },
+      { id: 'ronda', pos: [2.7, 1.4, 1.15], emoji: '🌳', label: 'La ronda que la cuida', view: 'restauracion' },
+    ],
+    entrada: { zoom: 8.5, centro: [0, 1.7, -0.3], narra: 'chorrera' },
+    // El gemelo 2D digno (mirror → motivo `chorrera`): la misma quebrada, dibujada.
+    fallback2d: { escena: 'mirror' },
+  },
 };
 
 /** Ids de todos los mundos registrados. */

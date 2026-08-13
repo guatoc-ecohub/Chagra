@@ -202,6 +202,22 @@ const LUGARES = [
       tinte: ['#63807a', '#c9d8d2'],
     },
   },
+  // LA CHORRERA (mundo real 'chorrera'): el salto de la quebrada arriba en el
+  // monte húmedo, entre el bosque (disenio) y el filo del clima. Tocarla baja a
+  // la quebrada con su salto, su pozo y sus helechos. Sin mundo en el manifiesto:
+  // trae su identidad de respaldo. (anti-conflicto: lugar nuevo al final.)
+  {
+    id: 'chorrera',
+    pos: [3.0, 0, -5.6],
+    escala: 1,
+    tipo: 'chorrera',
+    fallbackMundo: {
+      titulo: 'La chorrera',
+      emoji: '💦',
+      lema: 'El salto de la quebrada: el agua que cae del monte a un pozo cristalino, entre helechos y niebla.',
+      tinte: ['#4f8f8a', '#cfe3e0'],
+    },
+  },
 ];
 
 /* Piezas de la vitrina que no forman parte de los 14 lugares históricos.
@@ -231,6 +247,14 @@ const LUGARES_PARA_CONOCER = [
   {
     id: 'compost', pos: [-6.6, 0, 8.0], escala: 0.8, tipo: 'compost',
     fallbackMundo: { titulo: 'El compost', emoji: '🍂', lema: 'Conozca cómo vuelve la materia a la tierra.', tinte: ['#59401f', '#a8854c'] },
+  },
+  // El BOSQUE NATIVO altoandino de tres estratos (mundo `bosque`): el monte de
+  // niebla que abraza la finca, arriba en el frío. Tocarlo abre el bosque de
+  // dosel/sotobosque/suelo leído como una lámina de Humboldt viva. Pieza "para
+  // conocer" (no altera el perfil demo), igual que la Sierra. (Al final: anti-conflicto.)
+  {
+    id: 'bosque', pos: [6.0, 0, -5.2], escala: 1.1, tipo: 'bosque',
+    fallbackMundo: { titulo: 'El bosque nativo', emoji: '🌿', lema: 'El bosque altoandino de niebla y sus tres estratos: dosel, sotobosque y suelo.', tinte: ['#3f6f3a', '#c4d6c0'] },
   },
 ];
 
@@ -279,6 +303,9 @@ const SIEMBRA_LUGARES = {
   aprender: { escalas: ['balcon', 'invernadero', 'finca'] },
   // El páramo de arriba: no existe en tierra caliente (< 1.000 m).
   paramo: { escalas: ['finca'], requiere: (p) => p.pisoTermico !== 'calido' },
+  // La chorrera: accidente de montaña húmeda; solo en finca abierta y nunca en
+  // tierra caliente (una quebrada con salto es del monte templado-frío).
+  chorrera: { escalas: ['finca'], requiere: (p) => p.pisoTermico !== 'calido' },
 };
 
 const ESCALAS_VALLE = ['balcon', 'invernadero', 'finca'];
@@ -721,4 +748,6 @@ export const NARRACION = {
     'Esta es su casa: el corazón de la finca y la puerta de sus mundos. Toque una de las seis puertas para salir a donde necesite.',
   paramo:
     'El páramo de su finca: los frailejones le peinan el agua a la niebla y se la entregan despacio al suelo. Por eso el páramo se cuida, no se ara. Entre y véalo de cerca.',
+  chorrera:
+    'La chorrera de la quebrada: el agua baja del monte y salta por la roca hasta un pozo cristalino, entre helechos gigantes, musgo y niebla. Así se ve el agua de su finca donde nace y cae.',
 };

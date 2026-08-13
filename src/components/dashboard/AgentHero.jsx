@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState, useCallback } from 'react';
-import { Mic, Square, Camera, X } from 'lucide-react';
+import { Mic, Square, Camera, X, MessageCircle, Send } from 'lucide-react';
 import useVoiceRecorder from '../../hooks/useVoiceRecorder';
 import { captureAndCompress } from '../../services/photoService';
 import { isAnalyzableImageAttachment } from '../../services/agentOutboxAttachment';
@@ -19,9 +19,8 @@ import {
 } from '../../services/userProfileService';
 import { buildCropSuggestions } from '../../data/cropSuggestions';
 import { syncManager } from '../../services/syncManager';
-import { iconForTheme } from './themeIcon';
+import BotonAnarquiaGlyph from './BotonAnarquiaGlyph';
 import ChagraAgentAvatar from '../ChagraAgentAvatar';
-import Angelita from '../../visual/agente/Angelita';
 import { lunarPhase, solarTimes, moonPathD } from '../../utils/skyEphemeris';
 import { resolveClimaLocation, getCachedClimaSnapshot } from '../../services/climaService';
 import {
@@ -1388,9 +1387,12 @@ export default function AgentHero({ onNavigate }) {
                 .agentport-iconbtn:active { transform: scale(0.9); }
                 .agentport-iconbtn:disabled { opacity: 0.4; cursor: not-allowed; }
 
-                /* Botón Ⓐ — herramienta. Ícono del tema dentro; anillo que respira
-                   (pulseRing del demo) y se rellena con el acento al abrir. */
-                .agentport-tool { padding: 7px; }
+                /* Botón Ⓐ — herramienta. Dentro vive "El Machetazo Forjado"
+                   (BotonAnarquiaGlyph, variante #4): el aro de la propia Ⓐ hace
+                   de borde del FAB, así que el padding es mínimo para que el
+                   glifo llene el botón. Anillo que respira (pulseRing del demo)
+                   y acento al abrir. */
+                .agentport-tool { padding: 2px; }
                 .agentport-tool .agentport-tool-ico { width: 100%; height: 100%; display: inline-flex; }
                 .agentport-tool .agentport-tool-ico svg { width: 100%; height: 100%; display: block; }
                 .agentport-tool:not(.is-open) {
@@ -1407,15 +1409,9 @@ export default function AgentHero({ onNavigate }) {
                     0%, 100% { box-shadow: 0 0 12px -2px rgb(var(--t-accent-rgb) / 0.55); }
                     50% { box-shadow: 0 0 24px 2px rgb(var(--t-accent-rgb) / 0.85); }
                 }
-                /* al abrir, el ícono se vuelve blanco para contrastar con el acento
-                   (cubre también los rellenos de la Ⓐ de herramientas: cabeza del
-                   azadón, hoja y punta del machete) */
-                .agentport-tool.is-open .agentport-tool-ico path,
-                .agentport-tool.is-open .agentport-tool-ico line,
-                .agentport-tool.is-open .agentport-tool-ico circle[stroke] { stroke: #fff; }
-                .agentport-tool.is-open .agentport-tool-ico circle[fill],
-                .agentport-tool.is-open .agentport-tool-ico polygon[fill],
-                .agentport-tool.is-open .agentport-tool-ico path[fill]:not([fill="none"]) { fill: #fff; }
+                /* al abrir, el glifo pasa a esténcil blanco sobre el acento —
+                   lo maneja el propio BotonAnarquiaGlyph vía el ancestro
+                   \`.is-open\` (reglas .is-open .baf-* en su CSS scoped). */
                 @keyframes agentport-pulse-ring {
                     0% { box-shadow: 0 0 0 0 rgb(var(--t-accent-rgb) / 0.45); }
                     70% { box-shadow: 0 0 0 12px rgb(var(--t-accent-rgb) / 0); }
@@ -1698,12 +1694,14 @@ export default function AgentHero({ onNavigate }) {
                     <div className="agentport-horizon" />
                 </div>
 
-                {/* — ANGELITA — la abeja agente vuela en bio-punk y nature
-                     ("solo abejita", operador 2026-07-18: el colibrí jubiló).
-                     En minimalista se oculta vía CSS: el demo limpio no lleva
-                     fauna. — */}
+                {/* — EL COMPAI ELEGIDO — Angelita la abeja por defecto, o el
+                     maíz si el usuario lo escogió (fix 2026-07-25: antes
+                     Angelita SIEMPRE, ignorando la elección). Vuela/crece en
+                     bio-punk y nature ("solo abejita", operador 2026-07-18:
+                     el colibrí jubiló). En minimalista se oculta vía CSS: el
+                     demo limpio no lleva fauna. — */}
                 <div className="agentport-hummer">
-                    <Angelita estado="acompana" size={68} title="Angelita acompaña la portada" />
+                    <ChagraAgentAvatar estado="acompana" size={68} title="Chagra IA" ariaLabel="Chagra IA" />
                 </div>
             </div>
 
@@ -1736,7 +1734,7 @@ export default function AgentHero({ onNavigate }) {
                         title="Abrir Chagra IA"
                         className="agentport-open"
                     >
-                        <ChagraAgentAvatar size={48} state="idle" ariaLabel="Chagra IA" />
+                        <MessageCircle size={24} aria-hidden="true" />
                     </button>
 
                     <div className="agentport-mode" role="tablist" aria-label="Nivel de respuestas">
@@ -2043,15 +2041,18 @@ export default function AgentHero({ onNavigate }) {
                             aria-expanded={menuOpen && !menuClosing}
                             className={['agentport-iconbtn agentport-tool !w-11 !h-11', menuOpen && !menuClosing ? 'is-open' : ''].join(' ')}
                         >
-                            {/* key={theme}: al cambiar el tema el ícono se REMONTA →
-                                corre el markSwap del demo (y la "forja" de la Ⓐ de
-                                herramientas vuelve a dibujarse trazo a trazo). */}
+                            {/* Glifo Ⓐ = "El Machetazo Forjado" (variante #4 elegida por
+                                el operador 2026-07-09): pala + azadón + machete se estampan
+                                a golpes y FORMAN la A; el aro de la Ⓐ es el borde del FAB.
+                                Es el MISMO glifo en todos los temas (identidad del agente).
+                                key={theme}: al cambiar el tema el ícono se REMONTA → corre
+                                el markSwap del demo y el estampado vuelve a dibujarse. */}
                             <span
                                 key={theme}
                                 className={['agentport-tool-ico', themeSwapped ? 'agentport-swap' : ''].join(' ')}
                                 aria-hidden="true"
                             >
-                                {iconForTheme(theme)}
+                                <BotonAnarquiaGlyph />
                             </span>
                         </button>
 
@@ -2083,9 +2084,8 @@ export default function AgentHero({ onNavigate }) {
                             {isRecording ? <Square size={16} strokeWidth={2.5} aria-hidden="true" /> : <Mic size={18} strokeWidth={2.5} aria-hidden="true" />}
                         </button>
 
-                        {/* Enviar — usa el mismo colibrí foto/video del FAB global.
-                            Comportamiento del demo: con el campo VACÍO no se apaga;
-                            tocarlo abre el menú didáctico de capacidades. */}
+                        {/* Enviar: el compai vive una sola vez en la escena superior;
+                            este control conserva la acción sin duplicar su dibujo. */}
                         <button
                             type="button"
                             onClick={handleSendText}
@@ -2102,9 +2102,7 @@ export default function AgentHero({ onNavigate }) {
                               position: 'relative'
                             }}
                         >
-                            <div style={{ width: '100%', height: '100%', position: 'relative' }}>
-                              <ChagraAgentAvatar size={44} state={canSend ? 'idle' : 'listening'} ariaLabel="Enviar al agente" />
-                            </div>
+                            <Send size={20} aria-hidden="true" />
                         </button>
                     </div>
 

@@ -11,7 +11,7 @@
  *     renderizan Angelita (el colibrí jubiló del rol de agente).
  */
 import React from 'react';
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen, fireEvent, act } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { describe, test, expect, vi, afterEach } from 'vitest';
 import ChagraAgentAvatar from '../ChagraAgentAvatar';
@@ -45,6 +45,19 @@ describe('ChagraAgentAvatar — Angelita default: glow + double-click + migraci�
     localStorage.setItem('chagra:agent-avatar-type', 'colibri');
     const { container } = render(<ChagraAgentAvatar state="idle" />);
     expect(container.querySelector('svg.agt-angelita')).toBeInTheDocument();
+  });
+
+  test('cambia al compai elegido cuando llega el evento global del selector', () => {
+    const { container } = render(<ChagraAgentAvatar state="idle" />);
+    expect(container.querySelector('svg.agt-angelita')).toBeInTheDocument();
+
+    act(() => {
+      localStorage.setItem('compai:companero', 'maiz');
+      window.dispatchEvent(new CustomEvent('chagra:agent-avatar-changed', { detail: 'maiz' }));
+    });
+
+    expect(container.querySelector('svg.chagra-maiz')).toBeInTheDocument();
+    expect(container.querySelector('svg.agt-angelita')).not.toBeInTheDocument();
   });
 
   test('sin onClick ni onDoubleClick renderiza solo el SVG (no button)', () => {

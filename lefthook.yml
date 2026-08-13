@@ -43,8 +43,12 @@ pre-commit:
         files="{staged_files}"
         [ -z "$files" ] && exit 0
         # Filtra archivos de reglas + docs que legítimamente discuten los
-        # patterns como texto de normativa.
-        filtered=$(echo "$files" | tr ' ' '\n' | grep -vE "^(oss-pro/PROHIBITED|lefthook\.yml|oss-pro/README\.md|CONTRIBUTING\.md|AGENTS\.md)" || true)
+        # patterns como texto de normativa, y public/valle/ (árbol vanilla
+        # sincronizado completo desde otro repo — scripts/sync-valle.mjs —
+        # donde "burnout"/"valuation" son términos de juego de carreras y de
+        # substring en librerías vendoreadas (three-mesh-bvh "evaluation"),
+        # falsos positivos inevitables sin editar el repo fuente).
+        filtered=$(echo "$files" | tr ' ' '\n' | grep -vE "^(oss-pro/PROHIBITED|lefthook\.yml|oss-pro/README\.md|CONTRIBUTING\.md|AGENTS\.md|public/valle/)" || true)
         [ -z "$filtered" ] && exit 0
         # Patrones universales — identificadores específicos (codenames de
         # agentes propios, infra interna) viven en chagra-pro/PROHIBITED_INTERNAL.md
@@ -127,11 +131,13 @@ pre-commit:
     eslint:
       glob: "*.{js,jsx,ts,tsx}"
       # public/vendor/** (#2088, modo campo): librerías de terceros vendoreadas
-      # TAL CUAL (UMD minificado TF.js/speech-commands). Ya están en
+      # TAL CUAL (UMD minificado TF.js/speech-commands). public/valle/**
+      # (marco de entrada opcional, scripts/sync-valle.mjs): árbol vanilla
+      # sincronizado completo, mismo criterio. Ambas ya están en
       # eslint.config.js globalIgnores, pero --max-warnings=0 cuenta el propio
       # warning de "ignorado por patrón" — hay que excluirlas del glob acá
-      # también para no romper el commit de un vendor legítimo.
-      exclude: '\.d\.ts$|^public/vendor/'
+      # también para no romper el commit de un vendor/valle legítimo.
+      exclude: '\.d\.ts$|^public/vendor/|^public/valle/'
       run: npx eslint {staged_files} --max-warnings=0
 
     # auto-bump-version REMOVIDO 2026-06-02: el bump de versión se movió a
@@ -156,6 +162,21 @@ pre-commit:
       # si cambian catalog/ o schema/.
       glob: "catalog/*.json"
       run: node scripts/validate-catalog.mjs --lenient-schema
+
+    sync-compai-nucleo-check:
+      # El compAI vive en dos stacks (esta PWA + el valle 3D en ~/demos/3d,
+      # checkout local SIN remoto). `src/compai/nucleo/` es la fuente única;
+      # sync-compai-nucleo.mjs copia hacia el valle. Sin este guard, un editor
+      # puede tocar el núcleo acá y olvidarse de correr el sync — los dos
+      # compAI empiezan a decir cosas distintas SIN que nadie se entere hasta
+      # notarlo a ojo (esto pasó de verdad: oso-baston/jaguar/luciernaga
+      # cruzaron a la PWA el 2026-08-11 y el valle quedó desactualizado hasta
+      # el 2026-08-13 — ítem #8 del GAP compAI). Solo corre si cambia el
+      # núcleo. En máquinas sin `~/demos/3d` (CI, otros contribuidores) el
+      # script detecta el destino ausente y sale 0 — no aplica, no es un
+      # falso rojo.
+      glob: "src/compai/nucleo/*.js"
+      run: node scripts/sync-compai-nucleo.mjs --check
 
 commit-msg:
   commands:

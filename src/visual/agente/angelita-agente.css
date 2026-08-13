@@ -267,6 +267,346 @@
   filter: blur(0.42px);
 }
 
+/* SE PICA EL OJO (guino) — el gesto que el operador nombró por su nombre en el
+   SPEC y que faltaba en el repertorio. Un PARPADEO es biología: los dos ojos,
+   involuntario. Un GUIÑO es complicidad: UN solo ojo, a propósito, y con la
+   cabecita ladeada de "usted y yo sabemos". Por eso se anima el PRIMER <g>
+   de .rh-blink (el ojo GRANDE, el cercano a usted — verificado en captura:
+   guiñar el lejano se pierde contra la cabeza oscura) y NO el grupo entero.
+   1.8s = MOMENTOS_IDLE.guino.dur (regla dura: el keyframe y el scheduler
+   miden lo mismo o el empalme salta). */
+[data-agente='angelita'][data-agt-vivo='1'][data-agt-idle='guino'] .rh-blink {
+  animation: none;  /* el parpadeo normal calla: el guiño debe leerse solo */
+}
+[data-agente='angelita'][data-agt-vivo='1'][data-agt-idle='guino'] .rh-blink > g:first-of-type {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: agt-guino 1.8s cubic-bezier(0.4, 0, 0.3, 1.2) 1;
+}
+@keyframes agt-guino {
+  0%, 26%   { transform: scale(1.09) scaleY(1); }
+  36%       { transform: scale(1.09) scaleY(0.06); }  /* se cierra, decidido */
+  56%       { transform: scale(1.09) scaleY(0.06); }  /* lo sostiene: es a propósito */
+  70%       { transform: scale(1.09) scaleY(1.14); }  /* se abre pasado de rosca */
+  100%      { transform: scale(1.09) scaleY(1); }
+}
+/* …y el cuerpo lo acompaña con un ladeo corto — el guiño es de la CRIATURA,
+   no de un ojo suelto. */
+[data-agente='angelita'][data-agt-vivo='1'][data-agt-idle='guino'] .agt-cuerpo {
+  animation: agt-guino-cuerpo 1.8s ease-in-out 1;
+}
+@keyframes agt-guino-cuerpo {
+  0%, 100% { transform: rotate(0deg) scale(1, 1); }
+  34%      { transform: rotate(-3.4deg) scale(1.02, 0.98); }  /* ladea y guiña */
+  62%      { transform: rotate(-2.6deg) scale(1, 1); }
+  82%      { transform: rotate(0.8deg) scale(0.99, 1.01); }   /* vuelve, satisfecha */
+}
+
+/* SE ESTIRA — el desperezo de goma: los dos bracitos suben por encima de la
+   cabeza, el cuerpo se alarga (stretch con arqueo) sosteniendo el gusto, los
+   ojos se aprietan… y suelta todo con un squash de alivio. Rubber-hose puro:
+   anticipación chiquita, estirón pasado de rosca, asentada con rebote. */
+[data-agente='angelita'][data-agt-vivo='1'][data-agt-idle='estira'] .crt-brazo-r {
+  animation: agt-estira-brazo-r 2.6s cubic-bezier(0.4, 0, 0.3, 1.25) 1;
+}
+@keyframes agt-estira-brazo-r {
+  0%, 100% { transform: rotate(0deg); }
+  14%  { transform: rotate(8deg); }      /* anticipa: recoge un pelo */
+  32%  { transform: rotate(-152deg); }   /* ¡arriba! (rebasa; visible junto a la antena) */
+  40%, 62% { transform: rotate(-144deg); } /* sostiene el estirón */
+  86%  { transform: rotate(5deg); }      /* suelta con follow-through */
+}
+[data-agente='angelita'][data-agt-vivo='1'][data-agt-idle='estira'] .crt-brazo-l {
+  animation: agt-estira-brazo-l 2.6s cubic-bezier(0.4, 0, 0.3, 1.25) 1;
+}
+@keyframes agt-estira-brazo-l {
+  0%, 100% { transform: rotate(0deg); }
+  14%  { transform: rotate(-8deg); }
+  34%  { transform: rotate(168deg); }    /* el gemelo, un pelín tarde */
+  42%, 62% { transform: rotate(158deg); }
+  88%  { transform: rotate(-4deg); }
+}
+[data-agente='angelita'][data-agt-vivo='1'][data-agt-idle='estira'] .agt-cuerpo {
+  animation: agt-estira-cuerpo 2.6s ease-in-out 1;
+}
+@keyframes agt-estira-cuerpo {
+  0%, 100% { transform: rotate(0deg) scale(1, 1); }
+  14%  { transform: rotate(1.5deg) scale(1.05, 0.94); }   /* se recoge: prepara */
+  36%, 58% { transform: rotate(-2.5deg) scale(0.9, 1.14); } /* el estirón, arqueada */
+  74%  { transform: rotate(0.8deg) scale(1.07, 0.92); }   /* squash de alivio */
+  88%  { transform: rotate(-0.3deg) scale(0.985, 1.015); }
+}
+/* Los ojos se aprietan de gusto en pleno estirón. */
+[data-agente='angelita'][data-agt-vivo='1'][data-agt-idle='estira'] .rh-blink {
+  animation: agt-estira-ojos 2.6s ease-in-out 1;
+}
+@keyframes agt-estira-ojos {
+  0%, 24%, 100% { transform: scaleY(1); }
+  36%, 58% { transform: scaleY(0.12); }  /* apretaditos: quéee rico */
+  70%  { transform: scaleY(1.1); }
+}
+
+/* BOSTEZA — el bostezo de goma: la cabecita se echa atrás, la boca se abre
+   ENORME (el arco de la sonrisa estirado a garganta), los ojos se cierran
+   despacito… y la manita llega TARDE a taparla (comedia de resorte). Cierra
+   con un sacudoncito de "ya pasó". 3.2s = MOMENTOS_IDLE.bosteza.dur. */
+[data-agente='angelita'][data-agt-vivo='1'][data-agt-idle='bosteza'] .crt-boca {
+  animation: agt-bosteza-boca 3.2s ease-in-out 1;
+}
+@keyframes agt-bosteza-boca {
+  0%, 12%, 100% { transform: scale(1, 1); }
+  30%  { transform: scale(1.25, 3.6) translateY(0.25px); }  /* se abre en grande */
+  52%  { transform: scale(1.3, 4.2) translateY(0.3px); }    /* el pico del bostezo */
+  72%  { transform: scale(1.05, 1.6); }                     /* se va cerrando */
+  84%  { transform: scale(0.97, 0.9); }                     /* chasquidito final */
+}
+[data-agente='angelita'][data-agt-vivo='1'][data-agt-idle='bosteza'] .crt-cabeza {
+  animation: agt-bosteza-cabeza 3.2s ease-in-out 1;
+}
+@keyframes agt-bosteza-cabeza {
+  0%, 100% { transform: rotate(0deg); }
+  30%, 55% { transform: rotate(-5deg) translateY(-0.4px); }  /* se echa atrás */
+  76%  { transform: rotate(1.2deg); }                        /* cae de vuelta */
+}
+[data-agente='angelita'][data-agt-vivo='1'][data-agt-idle='bosteza'] .agt-cuerpo {
+  animation: agt-bosteza-cuerpo 3.2s ease-in-out 1;
+}
+@keyframes agt-bosteza-cuerpo {
+  0%, 100% { transform: rotate(0deg) scale(1, 1); }
+  28%, 54% { transform: rotate(-1.6deg) scale(0.95, 1.08); }  /* toma aire */
+  70%  { transform: rotate(0.6deg) scale(1.05, 0.94); }       /* lo suelta */
+  84%  { transform: rotate(-0.4deg) scale(0.99, 1.01); }
+}
+/* La manita que llega tarde a tapar la boca (comedia). */
+[data-agente='angelita'][data-agt-vivo='1'][data-agt-idle='bosteza'] .crt-brazo-r {
+  animation: agt-bosteza-brazo 3.2s cubic-bezier(0.4, 0, 0.3, 1.3) 1;
+}
+@keyframes agt-bosteza-brazo {
+  0%, 34%, 100% { transform: rotate(0deg); }
+  52%  { transform: rotate(-118deg); }   /* sube… ya el bostezo va a la mitad */
+  58%, 68% { transform: rotate(-108deg); } /* tapa (tarde, pero tapa) */
+  88%  { transform: rotate(4deg); }      /* recoge con rebote */
+}
+/* Los ojos se cierran despacito con el bostezo (no es el parpadeo). */
+[data-agente='angelita'][data-agt-vivo='1'][data-agt-idle='bosteza'] .rh-blink {
+  animation: agt-bosteza-ojos 3.2s ease-in-out 1;
+}
+@keyframes agt-bosteza-ojos {
+  0%, 14%, 100% { transform: scaleY(1); }
+  34%, 62% { transform: scaleY(0.08); }  /* cerraditos por el bostezo */
+  80%  { transform: scaleY(1.08); }      /* reabre con brillo */
+}
+
+/* SE RASCA LA NUCA — el "rascarse distinto": la manita derecha va ATRÁS de la
+   cabeza (no a la barriguita), ras-ras cortito, la cabeza se agacha apenada y
+   los ojos se van de reojo arriba — la vecina pillada en la duda. */
+[data-agente='angelita'][data-agt-vivo='1'][data-agt-idle='rascanuca'] .crt-brazo-r {
+  animation: agt-rascanuca-brazo 2.4s cubic-bezier(0.4, 0, 0.3, 1.3) 1;
+}
+@keyframes agt-rascanuca-brazo {
+  0%, 100% { transform: rotate(0deg); }
+  16%  { transform: rotate(-170deg); }  /* al filo de la coronilla (rebasa) */
+  26%  { transform: rotate(-158deg); }
+  36%  { transform: rotate(-167deg); }  /* ras… */
+  46%  { transform: rotate(-157deg); }
+  56%  { transform: rotate(-165deg); }  /* …ras */
+  66%  { transform: rotate(-159deg); }
+  88%  { transform: rotate(4deg); }     /* recoge con rebote */
+}
+[data-agente='angelita'][data-agt-vivo='1'][data-agt-idle='rascanuca'] .crt-cabeza {
+  animation: agt-rascanuca-cabeza 2.4s ease-in-out 1;
+}
+@keyframes agt-rascanuca-cabeza {
+  0%, 100% { transform: rotate(0deg); }
+  20%, 64% { transform: rotate(6deg) translateY(0.45px); }  /* se agacha, apenada */
+  82%  { transform: rotate(-1.2deg); }
+}
+[data-agente='angelita'][data-agt-vivo='1'][data-agt-idle='rascanuca'] .agt-cuerpo {
+  animation: agt-rascanuca-cuerpo 2.4s ease-in-out 1;
+}
+@keyframes agt-rascanuca-cuerpo {
+  0%, 100% { transform: rotate(0deg) scale(1, 1); }
+  22%, 60% { transform: rotate(1.8deg) scale(1.015, 0.985); }
+  80%  { transform: rotate(-0.5deg) scale(1, 1); }
+}
+[data-agente='angelita'][data-agt-vivo='1'][data-agt-idle='rascanuca'] .rh-mirada {
+  animation: none;
+  transform: translate(-0.5px, -0.4px);  /* de reojo arriba: ¿me vieron? */
+}
+
+/* CABECEA — se le van los ojos: la cabeza pesa, cae a cabezadas (dos intentos
+   de resistir), brotan las zetitas… y DESPIERTA de un brinco con sacudón y
+   mirada de "¡yo no estaba dormida!". El gesto más largo del repertorio (3.6s)
+   porque el sueño no se actúa con afán. */
+[data-agente='angelita'][data-agt-vivo='1'][data-agt-idle='cabecea'] .agt-cuerpo {
+  animation: agt-cabecea-cuerpo 3.6s ease-in-out 1;
+}
+@keyframes agt-cabecea-cuerpo {
+  0%, 100% { transform: rotate(0deg) translateY(0) scale(1, 1); }
+  20%  { transform: rotate(3deg) translateY(0.5px) scale(1.01, 0.99); }   /* pesa… */
+  30%  { transform: rotate(1.2deg) translateY(0.2px) scale(1, 1); }       /* se resiste */
+  48%  { transform: rotate(5.5deg) translateY(0.9px) scale(1.02, 0.97); } /* cae más hondo */
+  58%  { transform: rotate(4.8deg) translateY(0.8px) scale(1.01, 0.985); }
+  64%  { transform: rotate(6deg) translateY(1px) scale(1.02, 0.97); }     /* el fondo */
+  70%  { transform: rotate(-3.5deg) translateY(-0.7px) scale(0.96, 1.06); } /* ¡BRINCO! */
+  76%  { transform: rotate(2deg) translateY(0.1px) scale(1.03, 0.97); }   /* sacudón */
+  82%  { transform: rotate(-1.4deg) translateY(0) scale(0.99, 1.01); }
+  90%  { transform: rotate(0.5deg) translateY(0); }
+}
+/* Los párpados pesan con la cabeza y se ABREN de sopetón en el brinco. */
+[data-agente='angelita'][data-agt-vivo='1'][data-agt-idle='cabecea'] .rh-blink {
+  animation: agt-cabecea-ojos 3.6s ease-in-out 1;
+}
+@keyframes agt-cabecea-ojos {
+  0%, 100% { transform: scaleY(1); }
+  20%  { transform: scaleY(0.45); }   /* párpados a media asta */
+  30%  { transform: scaleY(0.8); }    /* lucha… */
+  48%, 64% { transform: scaleY(0.08); } /* vencidos */
+  70%  { transform: scaleY(1.22); }   /* ¡ABIERTOS! (pasados de rosca) */
+  82%  { transform: scaleY(0.95); }
+}
+/* Tras el susto mira a los lados: ¿alguien me vio? */
+[data-agente='angelita'][data-agt-vivo='1'][data-agt-idle='cabecea'] .rh-mirada {
+  animation: agt-cabecea-mirada 3.6s ease-in-out 1;
+}
+@keyframes agt-cabecea-mirada {
+  0%, 66%, 100% { transform: translate(0, 0); }
+  74%  { transform: translate(-0.6px, -0.1px); }  /* ¿me vieron? */
+  84%  { transform: translate(0.55px, -0.1px); }  /* ¿y por allá? */
+}
+/* Las zetitas brotan mientras duerme y se ESFUMAN con el brinco (el susto se
+   las lleva). Viven montadas todo el acompana (opacity 0); el ATRIBUTO del
+   gesto dispara su one-shot — mismo reloj que el cuerpo. */
+.agt-zzz { opacity: 0; }
+[data-agente='angelita'][data-agt-vivo='1'][data-agt-idle='cabecea'] .agt-zzz {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: agt-zzz-flota 3.6s ease-in-out 1;
+}
+[data-agente='angelita'][data-agt-vivo='1'][data-agt-idle='cabecea'] .agt-zzz--2 { animation-name: agt-zzz-flota-2; }
+@keyframes agt-zzz-flota {
+  0%, 24%  { opacity: 0; transform: translate(0, 1.5px) scale(0.6); }
+  36%  { opacity: 0.75; transform: translate(0.3px, 0.4px) scale(0.9); }
+  62%  { opacity: 0.7; transform: translate(0.9px, -1.2px) scale(1); }
+  68%, 100% { opacity: 0; transform: translate(1.1px, -1.8px) scale(1.05); } /* el brinco se las lleva */
+}
+@keyframes agt-zzz-flota-2 {
+  0%, 34%  { opacity: 0; transform: translate(0, 1.8px) scale(0.5); }
+  46%  { opacity: 0.6; transform: translate(0.4px, 0.3px) scale(0.85); }
+  64%  { opacity: 0.55; transform: translate(1px, -1.4px) scale(1); }
+  69%, 100% { opacity: 0; transform: translate(1.2px, -2px) scale(1.05); }
+}
+
+/* VOLTERETA — la pirueta juguetona: se recoge (anticipación de resorte), da la
+   vuelta de campana COMPLETA con las alitas a tope, rebasa un pelo y asienta
+   esponjada. La chispa de circo del repertorio — poco peso en el azar para que
+   sea un regalo, no una rutina. */
+[data-agente='angelita'][data-agt-vivo='1'][data-agt-idle='voltereta'] .agt-cuerpo {
+  animation: agt-voltereta 1.7s cubic-bezier(0.5, 0, 0.28, 1.12) 1;
+}
+@keyframes agt-voltereta {
+  0%   { transform: rotate(0deg) scale(1, 1); }
+  16%  { transform: rotate(16deg) scale(1.1, 0.88); }      /* se recoge: allá voy */
+  62%  { transform: rotate(-352deg) scale(0.94, 1.08); }   /* ¡la vuelta entera! */
+  78%  { transform: rotate(-368deg) scale(1.04, 0.96); }   /* rebasa un pelito */
+  90%  { transform: rotate(-358deg) scale(0.99, 1.01); }
+  100% { transform: rotate(-360deg) scale(1, 1); }
+}
+[data-agente='angelita'][data-agt-vivo='1'][data-agt-idle='voltereta'] .crt-wing {
+  animation-duration: 0.07s;
+  filter: blur(0.45px);
+}
+/* En plena vuelta los ojos se cierran de emoción (como en la montaña rusa). */
+[data-agente='angelita'][data-agt-vivo='1'][data-agt-idle='voltereta'] .rh-blink {
+  animation: agt-voltereta-ojos 1.7s ease-in-out 1;
+}
+@keyframes agt-voltereta-ojos {
+  0%, 12%, 100% { transform: scaleY(1); }
+  30%, 58% { transform: scaleY(0.1); }   /* ¡wiii! */
+  74%  { transform: scaleY(1.15); }      /* reabre encantada */
+}
+
+/* MIRA-Y-VUELVE — deja lo que está haciendo, VOLTEA la cabecita derecho hacia
+   usted (el frente, no de reojo como 'mira'), sostiene el contacto un
+   instante — y vuelve la vista a lo suyo. Es el gesto de "¿me está viendo?" /
+   "sigo aquí con usted", distinto del 'mira' curioso (que mira ALREDEDOR, sin
+   usted de por medio). 2.6s = MOMENTOS_IDLE.mirausted.dur. */
+[data-agente='angelita'][data-agt-vivo='1'][data-agt-idle='mirausted'] .crt-cabeza {
+  animation: agt-mirausted-cabeza 2.6s ease-in-out 1;
+}
+@keyframes agt-mirausted-cabeza {
+  0%, 12%, 100% { transform: rotate(0deg); }
+  32%  { transform: rotate(-6deg); }   /* voltea derecho hacia usted */
+  38%, 68% { transform: rotate(-5.2deg); } /* sostiene la mirada */
+  84%  { transform: rotate(1deg); }    /* vuelve a lo suyo, con un pelín de overshoot */
+}
+[data-agente='angelita'][data-agt-vivo='1'][data-agt-idle='mirausted'] .rh-mirada {
+  animation: agt-mirausted-pupila 2.6s ease-in-out 1;
+}
+@keyframes agt-mirausted-pupila {
+  0%, 12%, 100% { transform: translate(0, 0); }
+  32%, 68% { transform: translate(0, 0.35px); }  /* pupilas al frente, hacia usted */
+}
+/* Los ojos se abren un poco más al reconocerla a usted (atención, no susto). */
+[data-agente='angelita'][data-agt-vivo='1'][data-agt-idle='mirausted'] .rh-blink {
+  animation: agt-mirausted-ojos 2.6s ease-in-out 1;
+}
+@keyframes agt-mirausted-ojos {
+  0%, 12%, 100% { transform: scaleY(1); }
+  32%, 68% { transform: scaleY(1.1); }
+}
+[data-agente='angelita'][data-agt-vivo='1'][data-agt-idle='mirausted'] .agt-cuerpo {
+  animation: agt-mirausted-cuerpo 2.6s ease-in-out 1;
+}
+@keyframes agt-mirausted-cuerpo {
+  0%, 100% { transform: rotate(0deg); }
+  32%, 68% { transform: rotate(-1.5deg); }  /* un ladeo chiquito, del cuerpo entero */
+}
+
+/* CUENTA CON LAS PATITAS — la vecina que enumera algo con las manitas: cada
+   bracito baja y "toca" como si contara con los dedos (uno… dos…), la cabeza
+   acompaña el conteo con un cabeceo breve por cada toque. Asíncrono (el
+   brazo derecho cuenta primero, el izquierdo remata) para que no se lea como
+   un espejo perfecto — una criatura contando, no un metrónomo.
+   3.0s = MOMENTOS_IDLE.cuenta.dur. */
+[data-agente='angelita'][data-agt-vivo='1'][data-agt-idle='cuenta'] .crt-brazo-r {
+  animation: agt-cuenta-brazo-r 3.0s cubic-bezier(0.4, 0, 0.3, 1.2) 1;
+}
+@keyframes agt-cuenta-brazo-r {
+  0%, 10%, 100% { transform: rotate(0deg); }
+  22%  { transform: rotate(-96deg); }   /* uno… */
+  30%  { transform: rotate(-84deg); }
+  46%  { transform: rotate(-100deg); }  /* dos… */
+  54%  { transform: rotate(-84deg); }
+  86%  { transform: rotate(4deg); }     /* recoge */
+}
+[data-agente='angelita'][data-agt-vivo='1'][data-agt-idle='cuenta'] .crt-brazo-l {
+  animation: agt-cuenta-brazo-l 3.0s cubic-bezier(0.4, 0, 0.3, 1.2) 1;
+}
+@keyframes agt-cuenta-brazo-l {
+  0%, 58%, 100% { transform: rotate(0deg); }
+  70%  { transform: rotate(88deg); }    /* tres — el remate, un pelín tarde */
+  78%  { transform: rotate(76deg); }
+  90%  { transform: rotate(-3deg); }
+}
+[data-agente='angelita'][data-agt-vivo='1'][data-agt-idle='cuenta'] .crt-cabeza {
+  animation: agt-cuenta-cabeza 3.0s ease-in-out 1;
+}
+@keyframes agt-cuenta-cabeza {
+  0%, 10%, 100% { transform: rotate(0deg) translateY(0); }
+  22%, 30% { transform: rotate(-2.2deg) translateY(0.3px); }  /* asiente: uno */
+  46%, 54% { transform: rotate(-2.4deg) translateY(0.35px); } /* dos */
+  70%, 78% { transform: rotate(2deg) translateY(0.3px); }     /* tres */
+  90%  { transform: rotate(0deg) translateY(0); }
+}
+[data-agente='angelita'][data-agt-vivo='1'][data-agt-idle='cuenta'] .agt-cuerpo {
+  animation: agt-cuenta-cuerpo 3.0s ease-in-out 1;
+}
+@keyframes agt-cuenta-cuerpo {
+  0%, 100% { transform: scale(1, 1); }
+  26%, 50%, 74% { transform: scale(1.015, 0.985); }  /* un pulsito por cada toque */
+}
+
 /* SE POSA — aterrizar CUESTA: se alza un pelo eligiendo el sitio, baja con
    peso (ease-in), amortigua con squash y queda abajo (fill forwards empalma
    con la quietud de 'posada'). Las alitas siguen frenando en el aire. */

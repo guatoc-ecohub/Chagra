@@ -79,6 +79,14 @@ export default defineConfig([
     // NO son código propio — lintearlas tira cientos de falsos + (exports/
     // require UMD, vars de una letra minificadas, etc.).
     'public/vendor/**',
+    // Valle 3D vanilla (ADR marco de entrada, ver ValleMarcoScreen.jsx):
+    // `public/valle/**` es un árbol SINCRONIZADO COMPLETO desde el repo
+    // vanilla del valle (scripts/sync-valle.mjs, three r160, su propio
+    // importmap), no código autoría de este repo — mismo criterio que
+    // public/vendor/** de arriba. Lintear con las reglas de este repo (React
+    // hooks, i18n, etc.) sobre cientos de archivos vanilla no aporta y se
+    // re-generaría en cada re-sync.
+    'public/valle/**',
   ]),
   {
     // Configs Node (playwright/vite/etc.) — requieren globals.node.
@@ -94,6 +102,7 @@ export default defineConfig([
     languageOptions: {
       globals: {
         ...globals.browser,
+        ...globals.node, // Add Node.js globals for process.env, etc.
         ...vitestGlobals,
       },
       parserOptions: {

@@ -1,8 +1,8 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import { execSync } from 'node:child_process'
-import { readFileSync, writeFileSync } from 'node:fs'
-import { resolve } from 'node:path'
+import { existsSync, readFileSync, statSync, writeFileSync } from 'node:fs'
+import { extname, join, resolve } from 'node:path'
 
 // SHA del build para el self-heal por versión (src/services/versionCheck.js).
 // Prioridad:
@@ -21,6 +21,47 @@ function resolveBuildSha() {
 }
 
 const BUILD_SHA = resolveBuildSha();
+
+// Plugin DEV-ONLY: sirve `public/valle/**/*.html` (el valle 3D vanilla, ver
+// src/components/ValleMarcoScreen.jsx + scripts/sync-valle.mjs) como archivo
+// estático crudo, sin pasar por el pipeline de `vite dev` para *.html.
+//
+// POR QUÉ: `vite dev` (a diferencia de `vite preview`/nginx — sirv puro, ya
+// verificado limpio) intercepta TODA request de navegación que acepta
+// `text/html` con su propio middleware de "SPA fallback"/transformIndexHtml,
+// e ignora los `index.html` (y cualquier *.html) que ya existen bajo
+// `publicDir` — es una limitación conocida de Vite en dev (no de este repo):
+// cualquier HTML anidado en `public/` distinto del root se pisa por el
+// index.html DE LA APP. Sin este bypass, el iframe del marco de entrada
+// carga Chagra-dentro-de-Chagra en vez del valle bajo `npm run dev` (rompe
+// SOLO la experiencia de dev local — detectado por captura real de
+// navegador, no por curl: curl con Accept por defecto no dispara el
+// fallback y da un falso verde). El build de producción (`vite preview`,
+// dist/ real) NO necesita este bypass — ahí no hay servidor de dev, solo
+// archivos estáticos, y ya sirve `public/valle/**` correctamente.
+function serveValleHtmlInDev() {
+  const VALLE_DIR = resolve(import.meta.dirname, 'public', 'valle');
+  const MIME_BY_EXT = { '.html': 'text/html; charset=utf-8' };
+  return {
+    name: 'chagra-serve-valle-html-dev',
+    apply: 'serve',
+    configureServer(server) {
+      server.middlewares.use((req, res, next) => {
+        const urlPath = (req.url || '').split('?')[0].split('#')[0];
+        if (!urlPath.startsWith('/valle/')) return next();
+        if (extname(urlPath) !== '.html' && !urlPath.endsWith('/')) return next();
+        const rel = urlPath.endsWith('/') ? `${urlPath}index.html` : urlPath;
+        const filePath = join(VALLE_DIR, rel.slice('/valle/'.length));
+        if (!filePath.startsWith(VALLE_DIR) || !existsSync(filePath) || !statSync(filePath).isFile()) {
+          return next();
+        }
+        res.setHeader('Content-Type', MIME_BY_EXT[extname(filePath)] || 'application/octet-stream');
+        res.setHeader('Cache-Control', 'no-cache');
+        res.end(readFileSync(filePath));
+      });
+    },
+  };
+}
 
 // Plugin: emite dist/version.json con el SHA del build al cerrar el bundle.
 // El cliente lo fetchea (no-store) para detectar que corre un bundle viejo y
@@ -59,7 +100,7 @@ function emitBuildMetadata() {
 }
 
 export default defineConfig({
-  plugins: [react(), emitBuildMetadata()],
+  plugins: [react(), emitBuildMetadata(), serveValleHtmlInDev()],
   // Inyecta el SHA del build como literal en el bundle (versionCheck.js lo lee
   // como __BUILD_SHA__). JSON.stringify para que quede como string válido.
   define: {
@@ -81,6 +122,7 @@ export default defineConfig({
       input: {
         main: resolve(import.meta.dirname, 'index.html'),
         mercado: resolve(import.meta.dirname, 'mercado.html'),
+        speciesViewer: resolve(import.meta.dirname, 'species-visor.html'),
       },
       output: {
         manualChunks(id) {

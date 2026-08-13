@@ -28,8 +28,7 @@ import {
 import { CSS } from '@dnd-kit/utilities';
 import { GripVertical, Snowflake, ChevronRight, Layers, TestTube, ShieldAlert, BookOpen, ClipboardList, Recycle, FlaskConical, Wheat, Droplets, Wrench, Eye, CalendarDays, Sprout, HelpCircle, Store, Mic, CloudRain, Leaf, Gauge, Stethoscope } from 'lucide-react';
 import AgentHero from './AgentHero';
-import OnboardingHero from '../OnboardingHero';
-import BienvenidaFinca, { bienvenidaYaVista } from '../BienvenidaFinca';
+import PrimerRegistroCard from '../PrimerRegistroCard';
 import {
     getProfile,
     getModuleVisibility,
@@ -397,13 +396,8 @@ export default function DashboardLive({ onNavigate, regionalGreeting = null, onL
         }
     });
     const iotAlerts = useAssetStore((s) => s.iotAlerts) || [];
-    // Primer uso (feat/onboarding-ayuda): sin plantas registradas se re-monta
-    // el OnboardingHero existente (quedó huérfano del DashboardView legacy al
-    // pasar a DashboardLive 2026-05-28). Trae el Paso 1 "piso térmico" —
-    // filtro maestro de todos los módulos — + las 3 rutas de registro.
-    // Si falta capturar/confirmar el piso, el Paso 1 se muestra como banner
-    // compacto flotando SOBRE el AgentHero (overlay, no empuja el hero — ver
-    // el bloque de render); ya confirmado, las 3 rutas bajan al flujo normal.
+    // Primer uso: OnboardingCondensado concentra la configuracion. Cuando ya
+    // existe perfil, PrimerRegistroCard conserva las tres rutas operativas.
     const plantsCount = useAssetStore((s) => s.plants.length);
     const [needsPisoCapture] = useState(() => {
         const p = getProfile();
@@ -411,16 +405,6 @@ export default function DashboardLive({ onNavigate, regionalGreeting = null, onL
         const hasAltitud = p.finca_altitud !== '' && p.finca_altitud != null && Number.isFinite(alt);
         return !hasAltitud || p.piso_confirmado !== '1';
     });
-    // Bienvenida de PRIMERA VEZ (BienvenidaFinca): recorrido de 5 momentos
-    // (colibrí + capacidades estrella + "hola Chagra" manos-libres +
-    // instalar la app + ubicación mágica) que se muestra UNA
-    // sola vez, con la MISMA señal de primer uso del banner compacto (sin
-    // plantas y sin piso) + flag persistente "ya la vi". Capa 100% visual:
-    // "Ubicar mi finca" delega en la ruta existente 'ubicacion-detectada';
-    // al saltar queda el flujo de siempre (banner del piso térmico).
-    const [showBienvenida, setShowBienvenida] = useState(
-        () => plantsCount === 0 && needsPisoCapture && !bienvenidaYaVista(),
-    );
 
     // HOME "Finca Viva" por perfil (flag VITE_FINCA_VIVA_HOME_PERFIL). Se evalúa
     // una vez al montar. Con la flag ON: (1) la escena de la finca se muestra
@@ -671,33 +655,6 @@ export default function DashboardLive({ onNavigate, regionalGreeting = null, onL
             className="relative flex flex-col w-full h-full overflow-y-auto pb-6"
             data-scroll-key="dashboard-live"
         >
-            {/* BIENVENIDA de primera vez — overlay a pantalla completa SOBRE
-                cualquiera de las dos portadas (AgentHero / Finca Viva). Solo
-                se monta en el verdadero primer uso y una sola vez (flag en
-                localStorage dentro del componente). */}
-            {showBienvenida && (
-                <BienvenidaFinca
-                    onUbicar={() => {
-                        setShowBienvenida(false);
-                        onNavigate('ubicacion-detectada');
-                    }}
-                    onClose={() => setShowBienvenida(false)}
-                    onExplorarEjemplo={async () => {
-                        // SKIP rico: sembrar la finca de ejemplo (multi-piso,
-                        // grounded al catálogo) y quedarse en el home, que la
-                        // renderiza POBLADA sin recargar (seedExampleFinca
-                        // re-hidrata el asset store). Import perezoso: no pesa en
-                        // el bundle del dashboard salvo que se use.
-                        try {
-                            const { seedExampleFinca } = await import('../../services/demoFincaEjemplo');
-                            await seedExampleFinca();
-                        } catch (err) {
-                            console.error('[DashboardLive] No se pudo sembrar la finca de ejemplo:', err);
-                        }
-                        setShowBienvenida(false);
-                    }}
-                />
-            )}
             {/* PORTADA del home — depende de la flag VITE_FINCA_VIVA_HOME_PERFIL:
                 ─────────────────────────────────────────────────────────────────
                 · Flag ON  → la ESCENA ISOMÉTRICA "Finca Viva" (mockup F2) es el
@@ -746,7 +703,7 @@ export default function DashboardLive({ onNavigate, regionalGreeting = null, onL
                             data-testid="dashboard-onboarding-top"
                         >
                             <div className="pointer-events-auto mx-auto w-full max-w-[26rem]">
-                                <OnboardingHero onNavigate={onNavigate} compact />
+                                <PrimerRegistroCard onNavigate={onNavigate} compact />
                             </div>
                         </div>
                     )}
@@ -1078,7 +1035,7 @@ export default function DashboardLive({ onNavigate, regionalGreeting = null, onL
             {/* Primer uso con piso ya confirmado: las 3 rutas de registro. */}
             {plantsCount === 0 && !needsPisoCapture && (
                 <div className="px-4 pt-3">
-                    <OnboardingHero onNavigate={onNavigate} />
+                    <PrimerRegistroCard onNavigate={onNavigate} />
                 </div>
             )}
 

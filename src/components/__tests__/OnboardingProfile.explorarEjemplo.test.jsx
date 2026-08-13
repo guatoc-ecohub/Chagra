@@ -11,7 +11,7 @@
 import React from 'react';
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { render, screen, fireEvent, cleanup, waitFor } from '@testing-library/react';
-import OnboardingProfile from '../OnboardingProfile';
+import OnboardingProfile from '../_archivo/OnboardingProfile';
 
 beforeEach(() => {
   window.localStorage.clear();

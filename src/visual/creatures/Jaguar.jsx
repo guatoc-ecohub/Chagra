@@ -261,7 +261,19 @@ export function Jaguar({
      'anda' (base, con acecho de hombros) | 'celebra' (brinca con brazos en V +
      overshoot) | 'reposo' (respira hondo, agazapado) | 'señala' (se inclina al
      POI y apunta con la zarpa). Solo corren viva (animated); con animated=false
-     o reduced-motion queda en fotograma digno e imponente. */
+     o reduced-motion queda en fotograma digno e imponente.
+     ── 'camina' (MARCHA DE PERFIL): el host la pide cuando el jaguar SE
+     DESPLAZA por una escena (JaguarBillboard fase anda/acecha). El cuerpo
+     frontal cede a un rig LATERAL (.jaguar-lado) con ciclo de marcha real de
+     cuadrúpedo — 4 patas desfasadas en secuencia lateral (diagonales casi
+     juntas), bóveda del paso, omóplato que rueda, cola baja de contrapeso y
+     GRUÑIDO periódico — fiel al DR de Panthera onca (cuerpo compacto, patas
+     cortas y gruesas, cola corta, testa maciza baja, pupila REDONDA, paso
+     lento y pesado). El traslado ENTRE mundos NO usa esta pose: el jaguar es
+     místico y ahí se aparece (aparicion/revelacion), no trota. El espejo
+     según el rumbo lo pone el host (scaleX del wrapper, como ya hace el
+     billboard). Sin patinaje: la cadencia (1.05s/ciclo) casa con el paso
+     lento del billboard (V_ANDA 0.62 u/s). */
   pose = 'anda',
   animo = 'sereno',
   energia = 1,
@@ -293,6 +305,14 @@ export function Jaguar({
      OPT-IN: los omóplatos SUBEN, la cabeza BAJA y el cuerpo avanza lento y
      controlado (el acecho felino). Su otra reacción-firma. Default false. */
   acecha = false,
+  /* ── PAISAJE DEL MIEDO (su PODER en el kart — landscape of fear) ────────────
+     OPT-IN: el jaguar SUELTA su presencia depredadora — una ONDA que se expande
+     por el terreno, la mirada se afila (cejas fruncidas, ojos almendrados) y el
+     aura sube. Concepto ecológico real: la sola presencia del depredador ápice
+     altera la conducta de las presas en TODO el paisaje sin tocarlas (ver
+     JAGUAR_PODER_KART). Es de ÁREA: el miedo no elige a uno. Default false → los
+     consumidores existentes NO cambian. */
+  paisajeDelMiedo = false,
   /* ── VIDA PROPIA (idle-cerebro v2 — la vara de Angelita) ───────────────────
      Default ON: un reloj con jitter hojea el repertorio de la especie
      (vidaEstados.js) — el bicho EXISTE aunque nadie le hable. Cada instancia
@@ -366,7 +386,9 @@ export function Jaguar({
   useMiradaUsted(raizRef, vida && vivo && tier !== 'bajo');
   const rugeFx = ruge || momento === 'ruge';
   const acechaFx = acecha || momento === 'acecha';
+  const miedoFx = paisajeDelMiedo;
   const poseFx = momento === 'reposo' ? 'reposo' : pose;
+  const marchando = poseFx === 'camina';
 
   // CLIMA → cuerpo (determinista, una vez por render): tinte + opacidad al
   // contorno. El jaguar no tiene alas (velocidadAlas siempre 1: no se usa).
@@ -735,14 +757,197 @@ export function Jaguar({
     </g>
   );
 
+  // ── MARCHA DE PERFIL (.jaguar-lado, pose 'camina') ─────────────────────────
+  // El rig LATERAL con el que el jaguar CAMINA por una escena (el frontal
+  // sentado no puede caminar creíble — veredicto del operador). Fiel al DR:
+  // cuerpo compacto y profundo, patas cortas y GRUESAS (doble trazo tinta +
+  // pelaje), cola CORTA llevada baja con anillos y punta negra, testa maciza
+  // BAJA de depredador solapada al pecho, pupila REDONDA de gran felino,
+  // trufa grande, bigotes gruesos, rosetas anillo-roto ESPACIADAS (misma
+  // fuente <Roseta/>: la regla de oro anti-leopardo también de perfil) y la
+  // capa mística del DR chamánico (aura, estrellas del pelaje = la noche
+  // estrellada, glifo cobre, bruma, motas). La CADENCIA vive en creatures.css
+  // (jaguar-lado-*): ciclo 1.05s de 4 tiempos, gruñido cada 6.3s. Dibujado
+  // mirando a la DERECHA; el host espeja con scaleX según el rumbo.
+  const lado = marchando ? (
+    <g className="jaguar-lado" transform="translate(0 -3.6) scale(0.08)" filter={`url(#${glow})`}>
+      {/* aura mística que late (violeta espectral + calor del pelaje) */}
+      <g className="jaguar-lado-aura" aria-hidden="true">
+        <ellipse cx="0" cy="60" rx="235" ry="175" fill={P.espectral} opacity="0.12" filter={`url(#${blur})`} />
+        <ellipse cx="0" cy="75" rx="185" ry="135" fill={P.cuerpo} opacity={auraOp} filter={`url(#${blur})`} />
+      </g>
+      {/* sombra de suelo (peso) */}
+      <ellipse cx="5" cy="212" rx="180" ry="17" fill={P.sombraSuelo} filter={`url(#${blur})`} aria-hidden="true" />
+
+      <g className="jaguar-lado-tronco">
+        {/* COLA corta llevada BAJA (DR): manchas en la base → anillos → punta negra */}
+        <g className="jaguar-lado-cola">
+          <g className="jaguar-lado-colapunta">
+            <path d="M-128,50 C -172,66 -204,62 -226,38 C -238,24 -238,4 -228,-8"
+              fill="none" stroke={RH_INK} strokeWidth="24" strokeLinecap="round" />
+            <path d="M-128,50 C -172,66 -204,62 -226,38 C -238,24 -238,4 -228,-8"
+              fill="none" stroke={P.cuerpo} strokeWidth="18.5" strokeLinecap="round" />
+            <g fill={P.roseta} opacity="0.8">
+              <circle cx="-156" cy="58" r="4.6" /><circle cx="-178" cy="58" r="4.2" />
+            </g>
+            <path d="M-214,50 C -228,38 -236,20 -232,0"
+              fill="none" stroke={P.roseta} strokeWidth="19.5" strokeLinecap="butt"
+              strokeDasharray="7.5 11" strokeDashoffset="-3" />
+            <circle cx="-228" cy="-10" r="11.5" fill={P.roseta} />
+          </g>
+        </g>
+
+        {/* patas del lado de ALLÁ (pelaje en sombra — profundidad) */}
+        <g className="jaguar-lado-pata jaguar-lado-dl">
+          <path d="M68,108 C 72,140 70,168 66,190" fill="none" stroke={RH_INK} strokeWidth="30" strokeLinecap="round" />
+          <path d="M68,108 C 72,140 70,168 66,190" fill="none" stroke={P.cuerpoSombra} strokeWidth="23.5" strokeLinecap="round" />
+          <ellipse cx="66" cy="196" rx="23" ry="13" fill="#dcc9a2" stroke={RH_INK} strokeWidth="3.5" />
+        </g>
+        <g className="jaguar-lado-pata jaguar-lado-tl">
+          <path d="M-108,108 C -114,140 -112,168 -106,190" fill="none" stroke={RH_INK} strokeWidth="32" strokeLinecap="round" />
+          <path d="M-108,108 C -114,140 -112,168 -106,190" fill="none" stroke={P.cuerpoSombra} strokeWidth="25.5" strokeLinecap="round" />
+          <ellipse cx="-106" cy="196" rx="24" ry="13" fill="#dcc9a2" stroke={RH_INK} strokeWidth="3.5" />
+        </g>
+
+        {/* TRONCO compacto y PROFUNDO (DR: nada de silueta alargada) */}
+        <ellipse cx="-8" cy="84" rx="138" ry="77" fill={`url(#${pelaje})`} stroke={RH_INK} strokeWidth="5" />
+        <ellipse cx="-10" cy="132" rx="110" ry="26" fill={P.vientre} opacity="0.88" />
+        <g fill="none" stroke={RH_INK} strokeWidth="2.2" opacity="0.18" strokeLinecap="round" aria-hidden="true">
+          <path d="M-96,52 C -120,84 -118,120 -96,142" />
+          <path d="M96,60 C 112,88 110,118 92,138" />
+        </g>
+        {/* ROSETAS del flanco — misma <Roseta/> del frontal (anillo roto +
+            puntos internos), grandes y ESPACIADAS como manda el DR */}
+        <g aria-hidden="true">
+          <Roseta cx={-96} cy={52} r={20} rot={130} motas={2} ink={P.roseta} centro={P.rosetaCentro} />
+          <Roseta cx={-28} cy={40} r={23} rot={15} motas={3} ink={P.roseta} centro={P.rosetaCentro} />
+          <Roseta cx={44} cy={50} r={20} rot={250} motas={3} ink={P.roseta} centro={P.rosetaCentro} />
+          <Roseta cx={-118} cy={108} r={15} rot={320} motas={2} ink={P.roseta} centro={P.rosetaCentro} opacity={0.92} />
+          <Roseta cx={-58} cy={104} r={17.5} rot={40} motas={2} ink={P.roseta} centro={P.rosetaCentro} />
+          <Roseta cx={14} cy={102} r={16} rot={205} motas={2} ink={P.roseta} centro={P.rosetaCentro} opacity={0.92} />
+          <Roseta cx={82} cy={98} r={14} rot={85} motas={2} ink={P.roseta} centro={P.rosetaCentro} opacity={0.9} />
+          <Roseta cx={108} cy={40} r={13} rot={300} motas={1} ink={P.roseta} centro={P.rosetaCentro} opacity={0.9} />
+        </g>
+        {/* la noche estrellada sobre el pelaje (DR chamánico) */}
+        <g aria-hidden="true">
+          <Estrella cx={-44} cy={50} r={9} color={P.estrella} vivo={vivo} delay={0} />
+          <Estrella cx={28} cy={38} r={10} color={P.estrella} vivo={vivo} delay={-1.2} />
+          <Estrella cx={-98} cy={80} r={7.5} color={P.estrella} vivo={vivo} delay={-2.4} />
+          <Estrella cx={52} cy={80} r={8} color={P.estrella} vivo={vivo} delay={-3.1} />
+        </g>
+        {/* glifo espiral del hombro (ornamento, nunca arma) */}
+        <g className="jaguar-glifos" aria-hidden="true" fill="none" stroke={P.cobre}
+          strokeWidth="3" strokeLinecap="round" opacity="0.3">
+          <path transform="translate(52 52) scale(5.5)" d={GLIFO_ESPIRAL} />
+        </g>
+        {/* OMÓPLATO que rueda al andar (la seña del jaguar) */}
+        <g className="jaguar-lado-hombro">
+          <path d="M34,26 Q 76,-12 116,30 Q 76,12 34,26 Z" fill={P.hombro} stroke={RH_INK} strokeWidth="4" strokeLinejoin="round" />
+        </g>
+
+        {/* patas del lado de ACÁ */}
+        <g className="jaguar-lado-pata jaguar-lado-tc">
+          <path d="M-74,112 C -70,144 -72,172 -76,192" fill="none" stroke={RH_INK} strokeWidth="35" strokeLinecap="round" />
+          <path d="M-74,112 C -70,144 -72,172 -76,192" fill="none" stroke={`url(#${pelaje})`} strokeWidth="28.5" strokeLinecap="round" />
+          <g fill={P.roseta} opacity="0.55"><circle cx="-71" cy="140" r="3.6" /><circle cx="-74" cy="166" r="3" /></g>
+          <ellipse cx="-76" cy="197" rx="26" ry="14" fill={P.vientre} stroke={RH_INK} strokeWidth="4" />
+          <path d="M-86,190 L-86,204 M-76,192 L-76,206 M-66,190 L-66,204" stroke="#8a6a2e" strokeWidth="2.2" opacity="0.6" />
+        </g>
+        <g className="jaguar-lado-pata jaguar-lado-dc">
+          <path d="M96,112 C 102,144 100,172 96,192" fill="none" stroke={RH_INK} strokeWidth="34" strokeLinecap="round" />
+          <path d="M96,112 C 102,144 100,172 96,192" fill="none" stroke={`url(#${pelaje})`} strokeWidth="27.5" strokeLinecap="round" />
+          <g fill={P.roseta} opacity="0.55"><circle cx="100" cy="140" r="3.6" /><circle cx="98" cy="166" r="3" /></g>
+          <ellipse cx="96" cy="197" rx="26" ry="14" fill={P.vientre} stroke={RH_INK} strokeWidth="4" />
+          <path d="M86,190 L86,204 M96,192 L96,206 M106,190 L106,204" stroke="#8a6a2e" strokeWidth="2.2" opacity="0.6" />
+        </g>
+
+        {/* CUELLO/PECHO: la masa que une la testa baja con el tronco */}
+        <path d="M48,14 C 92,-20 158,-22 182,14 C 194,38 184,66 152,78 C 112,92 66,76 48,44 Z"
+          fill={`url(#${pelaje})`} stroke={RH_INK} strokeWidth="5" strokeLinejoin="round" />
+
+        {/* CABEZA de perfil: wrapper del GRUÑIDO + bob del paso. Porte BAJO de
+            depredador (DR: la testa puede ir más baja que los hombros). */}
+        <g className="jaguar-lado-grune">
+          <g className="jaguar-lado-cabeza">
+            <circle cx="138" cy="-34" r="22" fill={`url(#${pelaje})`} stroke={RH_INK} strokeWidth="4.5" />
+            <circle cx="138" cy="-32" r="10.5" fill={P.oreja} />
+            <circle cx="133" cy="-43" r="5" fill={P.roseta} />
+            {/* GRUÑIDO: garganta + colmillos (opacity 0 fuera del gruñido) */}
+            <g className="jaguar-lado-grunefx">
+              <path d="M208,28 C 230,22 250,24 260,20 C 258,42 238,54 212,48 Z" fill="#7e1d14" />
+              <path d="M244,24 L250,44 L234,30 Z" fill={P.colmillo} stroke={RH_INK} strokeWidth="1.2" />
+              <path d="M220,28 L224,42 L212,32 Z" fill={P.colmillo} stroke={RH_INK} strokeWidth="1" />
+            </g>
+            {/* MANDÍBULA (pivota al gruñir) */}
+            <g className="jaguar-lado-fauce">
+              <path d="M216,38 C 232,43 246,41 254,33 C 252,45 240,50 222,46 C 216,43 214,41 216,38 Z"
+                fill="#dcc49c" stroke={RH_INK} strokeWidth="3.2" strokeLinejoin="round" />
+              <path d="M246,34 L240,46 L233,36 Z" fill={P.colmillo} stroke={RH_INK} strokeWidth="1" />
+            </g>
+            {/* cráneo + morro corto y macizo */}
+            <ellipse cx="172" cy="0" rx="58" ry="51" fill={`url(#${pelaje})`} stroke={RH_INK} strokeWidth="5" />
+            <ellipse cx="234" cy="18" rx="31" ry="24" fill={`url(#${pelaje})`} stroke={RH_INK} strokeWidth="4" />
+            <path d="M228,14 C 243,9 256,13 260,19 C 256,27 243,30 230,27 Z" fill={P.hocico} opacity="0.95" />
+            <g fill={P.roseta} opacity="0.5" aria-hidden="true">
+              <circle cx="238" cy="18" r="1.8" /><circle cx="246" cy="21" r="1.5" /><circle cx="234" cy="24" r="1.5" />
+            </g>
+            {/* bigotes largos y gruesos (DR) */}
+            <g fill="none" stroke={P.vibrisa} strokeWidth="2.3" strokeLinecap="round" opacity="0.65" aria-hidden="true">
+              <path d="M244,16 C 262,10 278,10 290,4" />
+              <path d="M245,21 C 263,18 279,20 292,16" />
+              <path d="M243,26 C 259,27 273,32 285,32" />
+            </g>
+            {/* trufa GRANDE rosada-negruzca (DR) */}
+            <path d="M252,4 C 262,2 269,8 268,14 C 267,20 258,23 251,20 Z" fill="#6b3a34" stroke={RH_INK} strokeWidth="1.4" />
+            {/* puntos sólidos de la cara (patrón real por zona) */}
+            <g fill={P.roseta} opacity="0.6" aria-hidden="true">
+              <circle cx="166" cy="-28" r="2.8" /><circle cx="184" cy="-22" r="2.3" />
+              <circle cx="150" cy="-6" r="2.5" /><circle cx="204" cy="-14" r="2" />
+            </g>
+            <Roseta cx={152} cy={18} r={12} rot={25} motas={1} ink={P.roseta} centro={P.rosetaCentro} opacity={0.8} />
+            {/* CEJA fiera + OJO ámbar con pupila REDONDA de gran felino (DR) */}
+            <path d="M182,-26 L210,-17" stroke={RH_INK} strokeWidth="3.6" strokeLinecap="round" fill="none" />
+            <g>
+              <ellipse cx="200" cy="-6" rx="9" ry="9.6" fill="#fffbe8" stroke={RH_INK} strokeWidth="1.8" />
+              <circle cx="201" cy="-5" r="6.6" fill={P.iris} />
+              <circle cx="201.5" cy="-4.5" r="3.1" fill={P.roseta} />
+              <circle cx="204" cy="-8" r="1.7" fill="#fff" />
+            </g>
+            {/* tapetum: el ojo que devuelve la luz (místico, respira por CSS) */}
+            <circle className={vivo ? 'jaguar-ojo-brillo' : undefined} cx="201" cy="-5" r="7.5"
+              fill={P.ojoBrillo} opacity="0.4" filter={`url(#${blur})`} aria-hidden="true"
+              style={{ transformBox: 'fill-box', transformOrigin: 'center' }} />
+            <g aria-hidden="true">
+              <Estrella cx={158} cy={-22} r={7.5} color={P.estrella} vivo={vivo} delay={-1.8} />
+            </g>
+          </g>
+        </g>
+      </g>
+
+      {/* bruma etérea a los pies + motas del espíritu */}
+      <ellipse className={vivo ? 'jaguar-bruma' : undefined} cx="0" cy="206" rx="185" ry="20"
+        fill={P.bruma} opacity="0.09" filter={`url(#${blur})`}
+        style={{ transformBox: 'fill-box', transformOrigin: 'center' }} aria-hidden="true" />
+      <g aria-hidden="true" fill={P.mota}>
+        <circle className={vivo ? 'jaguar-mota' : undefined} cx="-160" cy="30" r="4.5" opacity="0.3" />
+        <circle className={vivo ? 'jaguar-mota' : undefined} cx="150" cy="-40" r="3.8" opacity="0.3"
+          style={vivo ? { animationDelay: '-2.4s' } : undefined} />
+        <circle className={vivo ? 'jaguar-mota' : undefined} cx="-60" cy="-70" r="3.4" opacity="0.3"
+          style={vivo ? { animationDelay: '-4.1s' } : undefined} />
+      </g>
+    </g>
+  ) : null;
+
   // Antics de VIDA (períodos co-primos) SOLO viva; nodos aparte para no pisar el
   // boil de `.crt-body`. El CSS los apaga con RM / tier bajo / ánimo bajo /
-  // durante los gestos (celebra/reposo/señala) y estados (ruge/acecha).
+  // durante los gestos (celebra/reposo/señala) y estados (ruge/acecha) — y en
+  // la MARCHA (pose camina, CSS), donde el perfil ya lleva su propia cadencia.
+  const figura = marchando ? lado : body;
   const conAntics = vivo ? (
     <g className="rh-antic">
-      <g className="rh-travieso">{body}</g>
+      <g className="rh-travieso">{figura}</g>
     </g>
-  ) : body;
+  ) : figura;
   // El line-boil (contorno que hierve) envuelve TODO el dibujo cuando se pide.
   const conBoil = lineBoil ? <g filter={`url(#${boil})`}>{conAntics}</g> : conAntics;
   // La LEVITACIÓN de la revelación envuelve todo (ingravidez del espíritu):
@@ -750,9 +955,29 @@ export function Jaguar({
   // → cero costo para los consumidores actuales. La APARICIÓN espectral lo
   // envuelve por fuera (nodo aparte: opacity+scale de materialización, sin
   // pisar el transform de la levitación); solo anima con data-aparicion.
+  // PAISAJE DEL MIEDO — la onda de presencia depredadora que se expande por el
+  // terreno (su poder de ÁREA en el kart). Anillos concéntricos que crecen y se
+  // desvanecen; cada uno con su delay para leerse como oleadas. Solo se dibuja
+  // con paisajeDelMiedo; anima solo viva (la clase la pone el CSS por
+  // data-paisaje-del-miedo). Va DETRÁS del felino (radia desde él).
+  const ondaMiedo = miedoFx ? (
+    <g className="jaguar-miedo" aria-hidden="true">
+      {[0, -0.8, -1.6].map((d, i) => (
+        <circle key={i}
+          className={vivo ? 'jaguar-miedo-onda' : undefined}
+          cx="0" cy="2" r="6" fill="none"
+          stroke={i === 1 ? P.iris : P.espectral}
+          strokeWidth={0.9 - i * 0.15}
+          opacity={vivo ? undefined : 0.3}
+          style={{ transformBox: 'fill-box', transformOrigin: 'center', animationDelay: `${d}s` }} />
+      ))}
+    </g>
+  ) : null;
+
   const cuerpoVivo = (
     <g className="jaguar-aparicion" style={{ transformBox: 'fill-box', transformOrigin: 'center' }}>
       <g className="jaguar-levita" style={{ transformBox: 'fill-box', transformOrigin: 'center' }}>
+        {ondaMiedo}
         {conBoil}
       </g>
     </g>
@@ -768,6 +993,7 @@ export function Jaguar({
     'data-mojado': ropa?.mojado ? '1' : undefined,
     'data-ruge': rugeFx ? '1' : undefined,
     'data-acecha': acechaFx ? '1' : undefined,
+    'data-paisaje-del-miedo': miedoFx ? '1' : undefined,
     'data-revelacion': revelacion ? '1' : undefined,
     'data-aparicion': aparicion ? '1' : undefined,
     'data-vida': momento || undefined,

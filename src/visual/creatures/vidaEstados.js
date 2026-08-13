@@ -44,6 +44,18 @@ export const VIDA_REPERTORIO = {
       reposo: { dur: 8800, peso: 1 }, // 2× rh-g-reposo 4.4s — el guardián se sienta
     },
   },
+  /* Tremarctos ornatus, dirección CAMINANTE (el oso del bastón). El mismo
+     temperamento lento de la especie, pero su gesto estrella no es rascarse:
+     es detenerse a HACER FLORECER el bastón (el dispersor de semillas hecho
+     gesto). */
+  'oso-baston': {
+    descanso: [4200, 9800], // caminante pausado: anda, se planta, florece
+    momentos: {
+      florece: { dur: 3400, peso: 2 }, // 2× osb-florece 1.7s — el bastón late EN FLOR
+      resopla: { dur: 4500, peso: 1.5 }, // 3× oso-resoplido 1.5s · 5× oso-cejas-frunce 0.9s
+      reposo: { dur: 8800, peso: 1 }, // 2× rh-g-reposo 4.4s — el caminante se aquieta
+    },
+  },
   colibri: {
     descanso: [2600, 6400], // hiperactivo: casi no se queda quieto
     momentos: {
@@ -98,6 +110,22 @@ export const VIDA_REPERTORIO = {
       olfatea: { dur: 3300, peso: 2.5 }, // 6× borugo-olfateo 0.55s · 3× orejas 1.1s
       acurruca: { dur: 4600, peso: 1 }, // 1× borugo-acurruca 4.6s — el corazón del cierre
       reposo: { dur: 4400, peso: 1 }, // 1× rh-g-reposo
+    },
+  },
+  zariguya: {
+    descanso: [3000, 7200], // nocturna atareada: se para a oler cada nada
+    momentos: {
+      husmea: { dur: 3150, peso: 2.5 }, // 3× zari-hocico-husmea 1.05s — vive por la nariz
+      tanatosis: { dur: 2600, peso: 0.6 }, // 1× zari-desmayo 2.6s — rarísimo, y por eso gracioso
+      reposo: { dur: 4400, peso: 1 }, // 1× rh-g-reposo — con tres crías encima, poco
+    },
+  },
+  luciernaga: {
+    descanso: [3000, 7200], // nocturna atareada: lee la noche y vuelve a flotar
+    momentos: {
+      destella: { dur: 2600, peso: 2.5 }, // 2× luci-destella 1.3s — el fogonazo de la linterna
+      lee: { dur: 3200, peso: 1.2 }, // 1× luci-lee 3.2s — se yergue y lee la noche (antenas atentas)
+      reposo: { dur: 4400, peso: 1 }, // 1× rh-g-reposo — bicho menudo, descansa poco
     },
   },
   dalmata: {

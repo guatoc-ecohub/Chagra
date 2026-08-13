@@ -31,8 +31,8 @@ import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 import { CIELOS_HORA, mezclaHex } from '../cielosHoraData.js';
 import { crearRng } from '../particulasData.js';
-import { alturaBosque } from './bosqueTakeA.geom.js';
-import { geomFrailejon } from './floraParamo.geom.js';
+import { alturaBosque, abraParamo, ABRA } from './bosqueTakeA.geom.js';
+import { geomFrailejon, geomAliso } from './floraParamo.geom.js';
 
 const clamp = (v, a, b) => Math.min(b, Math.max(a, v));
 const smoothstep = (a, b, x) => {
@@ -462,6 +462,140 @@ function FrailejonalHorizonte({ n, q }) {
   return <instancedMesh ref={ref} args={[geo, mat, sitios.length]} frustumCulled={false} />;
 }
 
+/* ── EL ALISAL DEL VECINO — el piso FRÍO, en silueta ladera abajo ───────────
+      Decisión del operador (2026-07-30): el páramo es el TOPE del gradiente,
+      así que su único vecino visible es el piso de ABAJO (frío = ALISO), como
+      SILUETA ladera abajo por la abra — cuenta "a dónde va el agua que aquí
+      nace" sin abrir un segundo mundo navegable. Máximo dos: la queñua al
+      frente, el alisal al fondo (`pisosBosqueGradiente.vecinoDePiso`).
+      El rodal vive SOBRE LA FALDA (misma fórmula de cota que la malla, como
+      el frailejonal del horizonte) pero por DEBAJO del filo del páramo — donde
+      el frailejón ya no crece, empieza el bosque del vecino. Se dibuja SIN fog
+      con el lavado de aire horneado en su color: cuando la marea de niebla
+      cierra, el alisal queda asomado entre la bruma como una línea de monte —
+      que es exactamente como se ve un alisal desde un páramo real. */
+function AlisalVecino({ pal, n }) {
+  const ref = useRef(null);
+  const geo = useMemo(() => geomAliso({ q: 0.45 }, 941), []);
+  // Silueta, no retrato: un solo color plano (la geometría trae su color por
+  // vértice, pero a esta distancia el detalle miente — el aire lo aplana).
+  const color = useMemo(
+    () => mezclaHex(mezclaHex(pal.cuchilla, '#2f4636', 0.5), pal.aireAzul, 0.36),
+    [pal],
+  );
+  const mat = useMemo(() => new THREE.MeshBasicMaterial({ color, fog: false }), [color]);
+  const sitios = useMemo(() => {
+    const rng = crearRng(947);
+    const lista = [];
+    let intentos = 0;
+    while (lista.length < n && intentos < n * 40) {
+      intentos += 1;
+      // Por PASO de la falda (la cota sale de la misma fórmula que la malla).
+      // La banda del alisal se planta ALTO en la falda —justo por debajo del
+      // filo del páramo— y CEÑIDA al corredor de la abra: así aparece como una
+      // línea de monte oscuro sobre el horizonte, en el hueco por donde el
+      // frailejonal se abre y el agua se despeña. Más abajo se hunde en el mar
+      // de nubes y ya no se lee.
+      const t = 0.2 + rng() * rng() * 0.16;
+      const r = faldaRadio(t);
+      // El azimut se sortea CERCA del rumbo de la abra (no en todo el anillo):
+      // el alisal es una mancha en el corredor, no un cinturón alrededor. Va en
+      // la convención de `abraParamo` (θ = atan2(z, x)): wx=cos·r, wz=sin·r.
+      const theta = ABRA.az + (rng() - 0.5) * ABRA.ancho * 1.4;
+      const wx = Math.cos(theta) * r, wz = Math.sin(theta) * r;
+      if (abraParamo(wx, wz) < 0.5) continue; // solo el corredor de la abra
+      const y = faldaAltura(t, wx, wz);
+      if (y > 0.4 || y < -12) continue; // ladera abajo, pero sobre el mar
+      lista.push({
+        wx, wz, y,
+        esc: 1.9 + rng() * 1.8,
+        giro: rng() * Math.PI * 2,
+        ladeo: (rng() - 0.5) * 0.16,
+      });
+    }
+    return lista;
+  }, [n]);
+  useLayoutEffect(() => {
+    const mesh = ref.current;
+    if (!mesh || !sitios.length) return;
+    const dummy = new THREE.Object3D();
+    sitios.forEach((s, i) => {
+      dummy.position.set(s.wx, s.y, s.wz);
+      dummy.rotation.set(s.ladeo, s.giro, 0);
+      dummy.scale.setScalar(s.esc);
+      dummy.updateMatrix();
+      mesh.setMatrixAt(i, dummy.matrix);
+    });
+    mesh.instanceMatrix.needsUpdate = true;
+  }, [sitios]);
+  useLayoutEffect(() => () => {
+    geo.dispose();
+    mat.dispose();
+  }, [geo, mat]);
+  if (!sitios.length) return null;
+  return (
+    <instancedMesh ref={ref} args={[geo, mat, sitios.length]} frustumCulled={false} renderOrder={-68} />
+  );
+}
+
+/* ── LA CHORRERA DE LA ABRA — el agua que nace aquí, yéndose ────────────────
+      El feedback recurrente: "la caída se simula, pero NO conecta el paisaje
+      con la cascada". Este hilo la amarra: en el azimut exacto de la abra, la
+      quebrada del páramo se despeña por la falda hecha un hilo blanco que se
+      pierde hacia el alisal del vecino — nacedero → filo → caída → el piso de
+      abajo, en un solo trazo. Una cinta de triángulos sobre la falda (misma
+      cota que la malla + un palmo), lechosa arriba y lavada al aire abajo. */
+function construirChorrera(pal, aOff = 0) {
+  // El rumbo del corredor de la abra, en la convención de `abraParamo`
+  // (θ = atan2(z, x)): la caída baja recta por el eje de la abra.
+  const theta = ABRA.az + aOff;
+  const dirx = Math.cos(theta), dirz = Math.sin(theta);
+  // perpendicular en planta (para el ancho de la cinta)
+  const perpx = -dirz, perpz = dirx;
+  const pasos = 16;
+  const pos = [];
+  const col = [];
+  const cAlta = new THREE.Color(mezclaHex(LECHOSA, pal.nube, 0.3));
+  const cBaja = new THREE.Color(mezclaHex(pal.aireAzul, LECHOSA, 0.35));
+  const c = new THREE.Color();
+  const punto = (t, lado) => {
+    const r = faldaRadio(t);
+    const wx = dirx * r, wz = dirz * r;
+    // ancho perpendicular al rumbo (en planta): crece al caer, como una caída real
+    const w = (0.22 + t * 1.5) * lado;
+    return [wx + perpx * w, faldaAltura(t, wx, wz) + 0.14, wz + perpz * w];
+  };
+  for (let i = 0; i < pasos; i++) {
+    const t0 = 0.16 + (i / pasos) * 0.36;
+    const t1 = 0.16 + ((i + 1) / pasos) * 0.36;
+    const a0 = punto(t0, -1), b0 = punto(t0, 1), a1 = punto(t1, -1), b1 = punto(t1, 1);
+    c.copy(cAlta).lerp(cBaja, i / pasos);
+    const meter = (p) => { pos.push(p[0], p[1], p[2]); col.push(c.r, c.g, c.b); };
+    meter(a0); meter(a1); meter(b0);
+    meter(b0); meter(a1); meter(b1);
+  }
+  const g = new THREE.BufferGeometry();
+  g.setAttribute('position', new THREE.BufferAttribute(new Float32Array(pos), 3));
+  g.setAttribute('color', new THREE.BufferAttribute(new Float32Array(col), 3));
+  return g;
+}
+function ChorreraDeLaAbra({ pal }) {
+  const geo = useMemo(() => construirChorrera(pal), [pal]);
+  useLayoutEffect(() => () => geo.dispose(), [geo]);
+  return (
+    <mesh geometry={geo} renderOrder={-67} frustumCulled={false}>
+      <meshBasicMaterial
+        vertexColors
+        transparent
+        opacity={0.62}
+        depthWrite={false}
+        fog={false}
+        side={THREE.DoubleSide}
+      />
+    </mesh>
+  );
+}
+
 /* ── EL SOL VELADO ──────────────────────────────────────────────────────────
       La mancha pálida tras la niebla, dibujada EXACTO donde la franja pone su
       luz direccional: lo que el ojo ve como fuente es de verdad la fuente. De
@@ -492,12 +626,16 @@ function SolVelado({ pal, franja }) {
 /**
  * El fondo de inmensidad del páramo definitivo. Montar dentro del <Canvas>.
  * Mira hacia la ABRA (bosqueTakeA): por ahí se despeña la falda y se ve el mar.
- * @param {{franja: string, tier?: 'alto'|'medio'|'bajo', reducedMotion?: boolean}} props
+ * `vecino` = el árbol del piso térmico de abajo ('aliso' | null): si viene, el
+ * rodal del vecino se dibuja en silueta ladera abajo por la abra, con la
+ * chorrera que amarra el agua del páramo con ese piso (decisión 2026-07-30).
+ * @param {{franja: string, tier?: 'alto'|'medio'|'bajo', reducedMotion?: boolean, vecino?: string|null}} props
  */
-export default function FondoParamo({ franja, tier = 'alto', reducedMotion = false }) {
+export default function FondoParamo({ franja, tier = 'alto', reducedMotion = false, vecino = null }) {
   const pal = useMemo(() => paletaFondo(franja), [franja]);
   const nNubes = tier === 'alto' ? 46 : tier === 'medio' ? 28 : 14;
   const nHorizonte = tier === 'alto' ? 64 : tier === 'medio' ? 36 : 0;
+  const nAlisal = tier === 'alto' ? 16 : tier === 'medio' ? 10 : 6;
   const q = tier === 'alto' ? 0.5 : 0.42;
   return (
     <group>
@@ -508,6 +646,8 @@ export default function FondoParamo({ franja, tier = 'alto', reducedMotion = fal
       {tier !== 'bajo' && <NubesAltas pal={pal} n={tier === 'alto' ? 5 : 3} />}
       <FaldaParamo pal={pal} />
       {nHorizonte > 0 && <FrailejonalHorizonte n={nHorizonte} q={q} />}
+      {vecino === 'aliso' && <AlisalVecino pal={pal} n={nAlisal} />}
+      {vecino === 'aliso' && <ChorreraDeLaAbra pal={pal} />}
     </group>
   );
 }

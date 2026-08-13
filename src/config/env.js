@@ -98,4 +98,14 @@ export const ENV = {
   CHAT_MODEL: import.meta.env?.VITE_LLM_CHAT_MODEL || 'qwen3.5:4b',
   CHAT_COMPLEX_MODEL: import.meta.env?.VITE_LLM_COMPLEX_MODEL || 'qwen3.5:4b',
   VISION_MODEL: import.meta.env?.VITE_VISION_MODEL || 'qwen3.5:4b',
+  // ── EL SEGUNDO PASO DEL DIAGNÓSTICO (decisión del operador 2026-07-26) ──
+  // `VISION_MODEL` contesta de una para que el usuario no espere;
+  // `VISION_REVIEW_MODEL` vuelve a mirar la foto en segundo plano y sólo
+  // habla si encuentra algo que el primero pasó por alto.
+  // Medido sobre 19 fotos reales de matas (scripts/bench-vision-matas.mjs):
+  // qwen3.5:4b nunca alarma de más pero dejó pasar la broca del café;
+  // qwen3-vl:4b no deja pasar ninguna enferma (11/11) pero alarma de más y
+  // tarda 2,3× — los errores son de TIPO OPUESTO, así que el segundo cubre
+  // justo el hueco del primero. Ver services/segundaOpinionFoto.js.
+  VISION_REVIEW_MODEL: import.meta.env?.VITE_VISION_REVIEW_MODEL || 'qwen3-vl:4b',
 };

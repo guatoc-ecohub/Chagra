@@ -289,6 +289,91 @@ function Nubes() {
   );
 }
 
+/* ═══════════════════ EL CIELO DE LA HORA DORADA (RDR) ═══════════════════
+   No un color plano de fondo: una BÓVEDA GRADADA — cenit dorado que cae a un
+   horizonte de bruma cálida y, bajo el sol, un rescoldo anaranjado — con el
+   disco del sol bajo posado sobre la loma. Todo por color de vértice y esferas
+   aditivas: cero shader de dispersión realista. La hora dorada de mundo abierto
+   (Red Dead) pero PINTADA, que es como la pediría una lámina (Humboldt es
+   ilustrado, no fotográfico). */
+function construirBoveda() {
+  const geo = new THREE.SphereGeometry(48, 24, 16);
+  const pos = geo.attributes.position;
+  const col = new Float32Array(pos.count * 3);
+  const cCenit = new THREE.Color(DORADA.cielo);
+  const cHorizonte = new THREE.Color(mezclar(DORADA.niebla, DORADA.luz, 0.5));
+  const cRescoldo = new THREE.Color(mezclar(DORADA.niebla, '#e2934a', 0.55));
+  const c = new THREE.Color();
+  for (let i = 0; i < pos.count; i++) {
+    const y = pos.getY(i) / 48; // -1 (abajo) .. 1 (cenit)
+    c.copy(cHorizonte).lerp(cCenit, smoothstep(-0.1, 0.78, y));
+    if (y < 0.12) c.lerp(cRescoldo, smoothstep(0.12, -0.3, y) * 0.72);
+    col[i * 3] = c.r; col[i * 3 + 1] = c.g; col[i * 3 + 2] = c.b;
+  }
+  geo.setAttribute('color', new THREE.BufferAttribute(col, 3));
+  return geo;
+}
+function Boveda() {
+  const geo = useMemo(() => construirBoveda(), []);
+  useEffect(() => () => geo.dispose(), [geo]);
+  return (
+    <mesh geometry={geo} scale={[1, 0.66, 1]} position={[0, -3, 0]}>
+      <meshBasicMaterial vertexColors side={THREE.BackSide} depthWrite={false} fog={false} />
+    </mesh>
+  );
+}
+
+/* El sol bajo de la hora dorada: disco cálido con dos halos aditivos, en la
+   dirección del sol direccional de la escena (así la luz y su fuente concuerdan). */
+function SolDorado() {
+  const posicion = useMemo(() => {
+    const dir = new THREE.Vector3(...DORADA.solPos).normalize();
+    return [dir.x * 33, Math.max(11, dir.y * 34), dir.z * 36 - 6];
+  }, []);
+  return (
+    <group position={/** @type {[number, number, number]} */ (posicion)}>
+      <mesh><sphereGeometry args={[1.9, 20, 16]} /><meshBasicMaterial color="#fff3d2" fog={false} /></mesh>
+      <mesh><sphereGeometry args={[3.0, 20, 16]} /><meshBasicMaterial color="#ffdf9c" transparent opacity={0.42} depthWrite={false} fog={false} /></mesh>
+      <mesh><sphereGeometry args={[4.8, 20, 16]} /><meshBasicMaterial color="#f6c261" transparent opacity={0.16} depthWrite={false} fog={false} /></mesh>
+    </group>
+  );
+}
+
+/* Aves lejanas cruzando el atardecer: el mundo abierto RESPIRA. Tres siluetas
+   en «V» que planean muy alto y muy lejos, aleteando lento, sin robar cuadro. */
+const AVES = [[-15, 12.5, -22, 0.0, 0.5], [-4, 14, -25, 1.5, 0.62], [8, 11.5, -21, 2.7, 0.42]];
+function Aves({ reducedMotion }) {
+  const grupo = useRef(/** @type {any} */ (null));
+  useFrame(({ clock }) => {
+    const g = grupo.current;
+    if (!g || reducedMotion) return;
+    const t = clock.elapsedTime;
+    for (let i = 0; i < g.children.length; i++) {
+      const ave = g.children[i];
+      const d = AVES[i];
+      ave.position.x = d[0] + Math.sin(t * 0.05 + d[3]) * 6.5;
+      ave.position.y = d[1] + Math.sin(t * 0.5 + d[3]) * 0.5;
+      const bat = Math.sin(t * 6 + d[3]) * 0.42;
+      if (ave.children[0]) ave.children[0].rotation.z = 0.5 + bat;
+      if (ave.children[1]) ave.children[1].rotation.z = -0.5 - bat;
+    }
+  });
+  return (
+    <group ref={grupo}>
+      {AVES.map((d, i) => (
+        <group key={i} position={[d[0], d[1], d[2]]} scale={d[4]}>
+          {[1, -1].map((s) => (
+            <mesh key={s} rotation={[0, 0, s * 0.5]}>
+              <boxGeometry args={[1.7, 0.06, 0.26]} />
+              <meshBasicMaterial color={C.tinta} fog={false} />
+            </mesh>
+          ))}
+        </group>
+      ))}
+    </group>
+  );
+}
+
 /* ═══════════════════ EL SURCO DE FLORES ═══════════════════
    Dos hileras cortas y apretadas (el mundo cabe en pantalla angosta). Cada
    flor con su especie de color, su escala y su fase de brisa. */
@@ -653,12 +738,13 @@ function Persona({ posicion, df = 8, reducedMotion, title, children }) {
 
 /* El rótulo corto que distingue las dos viviendas. Español de Colombia, sin
    párrafos: dos renglones que se leen de un vistazo desde el celular. */
-function Rotulo({ posicion, titulo, texto, df = 11 }) {
+function Rotulo({ posicion, titulo, latin, texto, df = 11 }) {
   return (
     <group position={posicion}>
       <Html center distanceFactor={df} zIndexRange={[22, 0]} pointerEvents="none">
         <div className="abj-chip" aria-hidden="true">
           <b>{titulo}</b>
+          {latin ? <i>{latin}</i> : null}
           <span>{texto}</span>
         </div>
       </Html>
@@ -982,12 +1068,54 @@ function Encuadre() {
   );
 }
 
+/* ═══════════════════ CÁMARA PETER JACKSON ═══════════════════
+   Mientras nadie toca la escena, la cámara hace la TOMA ÉPICA ENVOLVENTE: una
+   grúa lenta que orbita el colmenar, sube y baja, y respira acercándose y
+   alejándose sobre el claro dorado. Sigue el `target` que la tarjeta activa va
+   moviendo (EnfocarSeleccion). Al primer arrastre le cede el mando a
+   OrbitControls, que recalcula su esfera desde la posición ACTUAL de la cámara
+   (offset = posición − target por cuadro): el relevo no da salto. Corre en un
+   useFrame propio DESPUÉS del de OrbitControls, así su encuadre es el que manda.
+   No toca CamaraDirector — es la cámara propia de este mundo. */
+function CamaraJackson({ controlsRef, libre, reducedMotion }) {
+  const cam = useThree((s) => s.camera);
+  const ancho = useThree((s) => s.size.width);
+  const alto = useThree((s) => s.size.height);
+  const mira = useRef(new THREE.Vector3(0, 0.85, 1.9));
+  const angosto = ancho / Math.max(1, alto) < 1.05;
+  useFrame(({ clock }) => {
+    if (!cam) return;
+    const ctr = controlsRef.current;
+    if (ctr) mira.current.copy(ctr.target);
+    if (!libre) return;
+    const m = mira.current;
+    const radBase = angosto ? 12.8 : 11.4;
+    const hgtBase = angosto ? 4.7 : 5.2;
+    if (reducedMotion) {
+      const az = 0.72;
+      cam.position.set(m.x + Math.sin(az) * radBase, hgtBase, m.z + Math.cos(az) * radBase);
+      cam.lookAt(m);
+      return;
+    }
+    const t = clock.elapsedTime;
+    const az = 0.64 + Math.sin(t * 0.045) * 0.6; // el barrido envolvente
+    const rad = radBase + Math.sin(t * 0.031) * 1.9; // el dolly respirado
+    const hgt = hgtBase + Math.sin(t * 0.05 + 1.2) * 1.15; // la grúa que sube y baja
+    cam.position.set(m.x + Math.sin(az) * rad, hgt, m.z + Math.cos(az) * rad);
+    cam.lookAt(m);
+  });
+  return null;
+}
+
 function Escena({ tier, reducedMotion, seleccion }) {
   const perfil = perfilDeTier(tier);
   const forrajeras = tier === 'bajo' ? FORRAJERAS.slice(0, 3) : tier === 'medio' ? FORRAJERAS.slice(0, 5) : FORRAJERAS;
   const guardianas = tier === 'bajo' ? GUARDIANAS.slice(0, 1) : GUARDIANAS;
   const controlsRef = useRef(/** @type {any} */ (null));
   const objetivoInicial = ZONAS[seleccion] || ZONAS.polinizacion;
+  /* la cámara Peter Jackson vuela sola hasta que el visitante arrastra; ahí le
+     cede el mando a OrbitControls */
+  const [libre, setLibre] = useState(true);
   /* los canales entre hermanos (visitas y rastro) arrancan limpios cada vez que
      el mundo se monta */
   const rastroOn = tier !== 'bajo';
@@ -1001,6 +1129,9 @@ function Escena({ tier, reducedMotion, seleccion }) {
       <directionalLight position={/** @type {[number, number, number]} */ (DORADA.solPos)} intensity={DORADA.sol} color={DORADA.luz} />
       <directionalLight position={[-7, 5, -6]} intensity={DORADA.rellenoInt} color={DORADA.relleno} />
 
+      <Boveda />
+      <SolDorado />
+      <Aves reducedMotion={reducedMotion} />
       <Nubes />
       <Prado perfil={perfil} />
       <Monte />
@@ -1022,11 +1153,13 @@ function Escena({ tier, reducedMotion, seleccion }) {
       <Rotulo
         posicion={[LANGSTROTH_POS[0] - 1.0, 2.75, LANGSTROTH_POS[2] + 0.55]}
         titulo="Colmena Langstroth"
+        latin="Apis mellifera"
         texto="panales de cera en cuadros"
       />
       <Rotulo
         posicion={[MELIPONA_POS[0] - 0.15, 2.15, MELIPONA_POS[2] - 0.1]}
         titulo="Caja melipona"
+        latin="Tetragonisca angustula"
         texto="potes de cerumen y piquera de tubo"
       />
 
@@ -1043,9 +1176,10 @@ function Escena({ tier, reducedMotion, seleccion }) {
       {rastroOn ? <RastroPolen reducedMotion={reducedMotion} /> : null}
 
       <ParticulasAmbientales tipo="polen" tier={tier} reducedMotion={reducedMotion} area={[9, 3, 6]} position={[0, 1.0, 1.2]} />
-      <OrbitControls ref={controlsRef} makeDefault enablePan={false} minDistance={7} maxDistance={22} minPolarAngle={0.6} maxPolarAngle={1.36} target={objetivoInicial} />
+      <OrbitControls ref={controlsRef} makeDefault enablePan={false} minDistance={7} maxDistance={22} minPolarAngle={0.6} maxPolarAngle={1.36} target={objetivoInicial} onStart={() => setLibre(false)} />
       <EnfocarSeleccion seleccion={seleccion} reducedMotion={reducedMotion} controlsRef={controlsRef} />
       <Encuadre />
+      <CamaraJackson controlsRef={controlsRef} libre={libre} reducedMotion={reducedMotion} />
       {tier === 'alto' ? <AdaptiveDpr pixelated /> : null}
     </>
   );
@@ -1067,13 +1201,69 @@ const CSS_ABEJAS = `
 @keyframes abjMira { 0%, 100% { transform: rotate(-2deg); } 50% { transform: rotate(3deg); } }
 @keyframes abjHumo { 0% { transform: translateY(6px) scale(0.7); opacity: 0.85; } 100% { transform: translateY(-26px) scale(1.5); opacity: 0; } }
 .abj-persona--quieta *, .abj-persona--quieta { animation: none !important; }
-.abj-chip { pointer-events: none; display: flex; flex-direction: column; gap: 1px; width: max-content; max-width: 104px; padding: 4px 10px; border-radius: 12px; background: rgba(54, 38, 20, 0.84); color: #fdf3dd; font-family: ui-sans-serif, system-ui, sans-serif; text-wrap: balance; box-shadow: 0 3px 9px rgba(48, 32, 10, 0.34); }
-.abj-chip b { font: 700 11px/1.25 ui-sans-serif, system-ui, sans-serif; letter-spacing: 0.01em; white-space: nowrap; }
-.abj-chip span { font: 500 9.5px/1.3 ui-sans-serif, system-ui, sans-serif; color: #f0d59a; }
+/* El rótulo, como la CÉDULA de una lámina naturalista: papel envejecido, tinta
+   sepia, título en versalitas serif y el binomio en itálica — la anotación de
+   Humboldt, no un chip de interfaz. */
+.abj-chip { pointer-events: none; display: flex; flex-direction: column; gap: 1px; width: max-content; max-width: 118px; padding: 5px 11px 6px; border-radius: 3px; background: linear-gradient(#faf1d6, #f0e2ba); color: #4a3320; font-family: Georgia, Cambria, serif; text-wrap: balance; border: 1px solid rgba(96, 66, 30, 0.55); box-shadow: 0 4px 11px rgba(58, 38, 12, 0.3), inset 0 0 0 3px rgba(255, 252, 240, 0.5); }
+.abj-chip b { font: 700 10.5px/1.24 Georgia, Cambria, serif; letter-spacing: 0.03em; text-transform: uppercase; color: #3c2a15; white-space: nowrap; }
+.abj-chip i { font: italic 600 9.5px/1.2 Georgia, Cambria, serif; letter-spacing: 0.01em; color: #7a5626; }
+.abj-chip span { font: 500 9px/1.32 ui-sans-serif, system-ui, sans-serif; color: #6b4f26; }
+
+/* ═══════════════════ LA LÁMINA HUMBOLDT ═══════════════════
+   El diorama enmarcado como una PLANCHA de historia natural: doble filete de
+   tinta, viñeta de papel envejecido, folio de lámina, brújula, escala gráfica y
+   cartucho con los binomios. Puro DOM sobre el Canvas, pointer-events: none,
+   para que el marco no estorbe el arrastre. */
+.abj-lamina { position: absolute; inset: 0; z-index: 3; pointer-events: none; }
+.abj-lamina__marco { position: absolute; inset: 13px; border: 1px solid rgba(74, 52, 26, 0.62); border-radius: 20px 20px 74px 20px; box-shadow: inset 0 0 0 4px rgba(255, 250, 228, 0.32), inset 0 0 120px rgba(74, 46, 18, 0.34), inset 0 0 34px rgba(74, 46, 18, 0.18); }
+.abj-lamina__marco::before { content: ''; position: absolute; inset: 5px; border: 0.6px solid rgba(74, 52, 26, 0.42); border-radius: 15px 15px 66px 15px; }
+.abj-lamina__folio { position: absolute; top: 24px; left: 30px; font: 700 0.62rem/1 Georgia, Cambria, serif; letter-spacing: 0.28em; text-transform: uppercase; color: #5a3f1e; opacity: 0.82; }
+.abj-lamina__brujula { position: absolute; top: 20px; right: 26px; width: 46px; height: 46px; opacity: 0.82; }
+.abj-lamina__cartucho { position: absolute; left: 50%; bottom: 22px; transform: translateX(-50%); display: flex; flex-direction: column; align-items: center; gap: 5px; padding: 7px 20px; border: 0.8px solid rgba(74, 52, 26, 0.5); border-radius: 4px; background: linear-gradient(#fbf3d8ee, #efe1b8ee); box-shadow: 0 6px 16px rgba(58, 38, 12, 0.24); max-width: min(84%, 440px); }
+.abj-lamina__cartucho h3 { margin: 0; font: italic 600 0.9rem/1.18 Georgia, Cambria, serif; color: #3c2a15; text-align: center; letter-spacing: 0.01em; }
+.abj-lamina__cartucho small { font: 500 0.62rem/1.2 Georgia, Cambria, serif; letter-spacing: 0.18em; text-transform: uppercase; color: #7a5626; }
+.abj-lamina__escala { display: block; margin-top: 1px; }
+@media (max-width: 560px) {
+  .abj-lamina__cartucho h3 { font-size: 0.76rem; }
+  .abj-lamina__folio { top: 20px; left: 24px; }
+}
 @media (prefers-reduced-motion: reduce) {
   .abj-cuerpo, .abj-brazo, .abj-cabeza, .abj-humo { animation: none !important; }
 }
 `;
+
+/* La plancha grabada que envuelve el diorama: marco, folio, brújula, escala y
+   cartucho con los dos binomios del mundo. Todo aria-hidden y sin eventos. */
+function LaminaHumboldt() {
+  return (
+    <div className="abj-lamina" aria-hidden="true">
+      <div className="abj-lamina__marco" />
+      <span className="abj-lamina__folio">Lámina VII</span>
+      <svg className="abj-lamina__brujula" viewBox="0 0 60 60" fill="none">
+        <circle cx="30" cy="30" r="23" stroke="#5a3f1e" strokeWidth="1" />
+        <circle cx="30" cy="30" r="15" stroke="#5a3f1e" strokeWidth="0.5" opacity="0.55" />
+        {[0, 90, 180, 270].map((a) => (
+          <path key={a} d="M30 8 L33 30 L30 30 Z" fill="#5a3f1e" transform={`rotate(${a} 30 30)`} opacity={a === 0 ? 1 : 0.62} />
+        ))}
+        {[45, 135, 225, 315].map((a) => (
+          <path key={a} d="M30 14 L31.6 30 L30 30 Z" fill="none" stroke="#5a3f1e" strokeWidth="0.5" transform={`rotate(${a} 30 30)`} opacity="0.5" />
+        ))}
+        <text x="30" y="6.5" textAnchor="middle" fontFamily="Georgia, serif" fontSize="7" fontWeight="700" fill="#5a3f1e">N</text>
+      </svg>
+      <div className="abj-lamina__cartucho">
+        <small>Colmenar andino · hora dorada</small>
+        <h3>Tetragonisca angustula &amp; Apis mellifera</h3>
+        <svg className="abj-lamina__escala" width="150" height="18" viewBox="0 0 150 18" fill="none">
+          {[0, 1, 2, 3, 4].map((i) => (
+            <rect key={i} x={12 + i * 24} y="7" width="24" height="5" fill={i % 2 ? 'none' : '#5a3f1e'} stroke="#5a3f1e" strokeWidth="0.7" />
+          ))}
+          <text x="12" y="5.5" textAnchor="middle" fontFamily="Georgia, serif" fontSize="6.5" fill="#5a3f1e">0</text>
+          <text x="132" y="5.5" textAnchor="middle" fontFamily="Georgia, serif" fontSize="6.5" fill="#5a3f1e">5 m</text>
+        </svg>
+      </div>
+    </div>
+  );
+}
 
 const TARJETAS = [
   {
@@ -1128,6 +1318,7 @@ export default function MundoAbejas3D() {
         >
           <Escena tier={decision.tier} reducedMotion={decision.reducedMotion} seleccion={seleccion} />
         </Canvas>
+        <LaminaHumboldt />
         <p style={estilos.pista}>{decision.reducedMotion ? 'Vista quieta para su comodidad' : 'Arrastre para recorrer el colmenar'}</p>
       </section>
       <section style={estilos.tarjetas} aria-label="Aprenda con el colmenar">

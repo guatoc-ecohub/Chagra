@@ -48,6 +48,11 @@ import { fetchWithAuthRetry } from './apiService';
  * ────────────────────────────────────────────────────────────────────────── */
 
 const STORAGE_KEY = 'chagra:angelita:variedad:v1';
+/** #62 — telemetría local plantilla-vs-LLM: cuenta de dónde salió cada
+ *  variante mostrada. Sin red, sin PII — sólo un contador por origen, para
+ *  que el operador pueda ver si el pool LLM de verdad está enriqueciendo el
+ *  habla o si el compañero suena siempre a plantilla determinista. */
+const TELEMETRIA_KEY = 'chagra:angelita:variedad:telemetria:v1';
 /** Máximo de mensajes base recordados (LRU por timestamp). */
 const MAX_BASES = 40;
 /** Ring buffer: últimos N mostrados por mensaje base. */
@@ -138,9 +143,13 @@ function fechaSeed(ahoraMs) {
 /* Aperturas cortas en usted colombiano. La vacía mantiene el base puro en el
    pool. "Sumercé" es de la casa (Cundinamarca/Boyacá — la finca es Choachí). */
 const APERTURAS_POR_TIPO = {
+  // Pool de aperturas coloquiales por diseño (no copy de UI a migrar a
+  // messages.js) — de ahí los disables puntuales abajo.
+  // eslint-disable-next-line chagra-i18n/no-hardcoded-spanish
   bienvenida: ['', '¡Qué gusto verle! ', 'Bienvenido de nuevo. ', 'Sumercé, ¡qué bueno tenerle por acá! '],
   informativa: ['', 'Mire: ', 'Le cuento: ', 'Sumercé, '],
   sugerencia: ['', 'Mire: ', 'Una idea: ', 'Sumercé, '],
+  // eslint-disable-next-line chagra-i18n/no-hardcoded-spanish
   atencion: ['', 'Ojo con esto: ', 'No se le olvide: ', 'Pendiente: '],
   alerta: ['', 'Atención: ', 'Importante: '],
   celebracion: ['', '¡Qué alegría! ', '¡Muy bien! ', '¡Eso es! '],
@@ -349,6 +358,51 @@ export async function refrescarPoolLLM(base, tipo = 'informativa') {
 }
 
 /* ─────────────────────────────────────────────────────────────────────────────
+ * PRECALENTAR EL POOL EN IDLE (ítem #60 del GAP compAI, 2026-08-13).
+ * ────────────────────────────────────────────────────────────────────────── */
+
+/** Cuántos mensajes se precalientan como máximo por llamada — el usuario
+ *  puede estar idle un ratito nomás; no vale la pena ráfaga de red. */
+const PRECALENTAR_MAX_POR_LLAMADA = 3;
+
+/**
+ * Convierte tiempo muerto (el usuario dejó de tocar la pantalla) en tips ya
+ * enriquecidos: hasta ahora `refrescarPoolLLM` solo se disparaba DESPUÉS de
+ * mostrar un mensaje — la primera vez que alguien lo veía, sonaba siempre a
+ * plantilla determinista (el LLM apenas empezaba a trabajar para la SIGUIENTE
+ * vez). Cuando el caller conoce mensajes que van a mostrarse pronto pero
+ * TODAVÍA no se mostraron —el guion completo de una guía (`useAngelitaGuia`,
+ * los `paradas[].texto` que siguen), o cualquier lista de avisos por venir—
+ * puede pasarlos aquí durante un momento de inactividad real: cuando por fin
+ * le toque el turno a ese mensaje, `variarMensaje` ya puede encontrar una
+ * paráfrasis LLM lista en el pool, en vez de arrancar la petición recién ahí.
+ *
+ * Respeta TODOS los guardrails existentes de `refrescarPoolLLM` sin
+ * duplicarlos (cooldown por base, tope de variantes por base, offline,
+ * timeout): esta función solo decide QUÉ precalentar y CUÁNTO de una vez.
+ * Fire-and-forget, nunca lanza, nunca bloquea a quien la llama.
+ *
+ * @param {Array<string|{base?:string, tipo?:string}>} mensajes — candidatos a
+ *   precalentar, en orden de prioridad (los primeros ganan el cupo).
+ * @param {{ maxPorLlamada?: number }} [opts]
+ * @returns {Promise<void>} resuelta cuando todos los intentos terminaron
+ *   (útil en tests; nadie en producción necesita esperarla).
+ */
+export async function precalentarPoolIdle(mensajes, opts = {}) {
+  try {
+    if (!Array.isArray(mensajes) || mensajes.length === 0) return;
+    const cupo = Number.isFinite(opts.maxPorLlamada) ? opts.maxPorLlamada : PRECALENTAR_MAX_POR_LLAMADA;
+    const candidatos = mensajes
+      .map((m) => (typeof m === 'string' ? { base: m, tipo: 'informativa' } : m))
+      .filter((m) => m && typeof m.base === 'string' && m.base.trim())
+      .slice(0, Math.max(0, cupo));
+    await Promise.all(candidatos.map((m) => refrescarPoolLLM(m.base, m.tipo || 'informativa')));
+  } catch {
+    /* precalentar es un lujo, no un contrato: cualquier falla queda en silencio */
+  }
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
  * LA API — variarMensaje: síncrona, instantánea, nunca falla.
  * ────────────────────────────────────────────────────────────────────────── */
 
@@ -377,9 +431,16 @@ export function variarMensaje(base, tipo = 'informativa', opts = {}) {
     entrada.ts = opts.ahoraMs ?? Date.now();
 
     // El pool: base + deterministas + lo que el LLM haya dejado listo.
+    // `origenLlm` recuerda cuáles del pool son paráfrasis LLM (#62,
+    // telemetría) — el resto (base intacto + variantesDeterministas) son
+    // "plantilla": ropaje determinista, cero red.
     const pool = variantesDeterministas(b, tipo);
+    const origenLlm = new Set();
     for (const v of entrada.llm) {
-      if (!pool.includes(v)) pool.push(v);
+      if (!pool.includes(v)) {
+        pool.push(v);
+        origenLlm.add(v);
+      }
     }
     if (pool.length === 0) return b;
 
@@ -398,6 +459,9 @@ export function variarMensaje(base, tipo = 'informativa', opts = {}) {
     entrada.vistos = [...entrada.vistos, hashStr(elegida)].slice(-MAX_VISTOS);
     guardarEstado();
 
+    // #62: telemetría de origen — base intacto / plantilla determinista / LLM.
+    registrarOrigenVariante(origenLlm.has(elegida) ? 'llm' : elegida === b ? 'base' : 'plantilla');
+
     // La capa LLM trabaja para la PRÓXIMA vez — jamás para esta.
     if (!opts.sinLLM) {
       refrescarPoolLLM(b, tipo).catch(() => {});
@@ -409,11 +473,66 @@ export function variarMensaje(base, tipo = 'informativa', opts = {}) {
   }
 }
 
+/* ─────────────────────────────────────────────────────────────────────────────
+ * #62 — TELEMETRÍA LOCAL: plantilla-vs-LLM.
+ * ────────────────────────────────────────────────────────────────────────── */
+
+/** Fallback en memoria del contador (mismo patrón que `memoria` de arriba). */
+let telemetria = null;
+
+function leerTelemetria() {
+  if (telemetria) return telemetria;
+  try {
+    const crudo = globalThis.localStorage?.getItem(TELEMETRIA_KEY);
+    if (crudo) {
+      const parsed = JSON.parse(crudo);
+      if (parsed && typeof parsed === 'object') {
+        telemetria = { base: 0, plantilla: 0, llm: 0, ...parsed };
+        return telemetria;
+      }
+    }
+  } catch {
+    /* storage roto/lleno: seguimos en memoria */
+  }
+  telemetria = { base: 0, plantilla: 0, llm: 0 };
+  return telemetria;
+}
+
+/**
+ * Registra de dónde salió la variante que se acaba de mostrar. Uso interno
+ * de `variarMensaje` (no hace falta llamarla a mano salvo en tests).
+ * @param {'base'|'plantilla'|'llm'} origen
+ */
+export function registrarOrigenVariante(origen) {
+  if (origen !== 'base' && origen !== 'plantilla' && origen !== 'llm') return;
+  const t = leerTelemetria();
+  t[origen] = (t[origen] || 0) + 1;
+  try {
+    globalThis.localStorage?.setItem(TELEMETRIA_KEY, JSON.stringify(t));
+  } catch {
+    /* quota/privado: el contador en RAM sigue sirviendo esta sesión */
+  }
+}
+
+/**
+ * El resumen de telemetría acumulado: cuántas veces sonó el mensaje base
+ * intacto, cuántas una variante determinista (plantilla) y cuántas una
+ * paráfrasis del LLM. Útil para ver si el pool LLM de verdad enriquece el
+ * habla o si el compañero suena siempre a plantilla.
+ * @returns {{base:number, plantilla:number, llm:number, total:number}}
+ */
+export function resumenTelemetriaVariedad() {
+  const t = leerTelemetria();
+  return { base: t.base, plantilla: t.plantilla, llm: t.llm, total: t.base + t.plantilla + t.llm };
+}
+
 /** Solo para tests: borra la memoria de variedad (RAM + storage). */
 export function _resetVariedad() {
   memoria = null;
+  telemetria = null;
   try {
     globalThis.localStorage?.removeItem(STORAGE_KEY);
+    globalThis.localStorage?.removeItem(TELEMETRIA_KEY);
   } catch {
     /* sin storage */
   }

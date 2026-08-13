@@ -1,3 +1,4 @@
+/* eslint-disable chagra-i18n/no-hardcoded-spanish -- copy preexistente de onboarding. */
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import {
   MapPin,
@@ -12,9 +13,16 @@ import {
   Search,
   AlertCircle,
   SkipForward,
+  BadgeCheck,
+  Camera,
+  Download,
+  Mic,
+  Share,
 } from 'lucide-react';
-import ChagraAgentAvatarAngelita from './ChagraAgentAvatarAngelita';
+import ChagraAgentAvatar from './ChagraAgentAvatar';
+import useAgentAvatarType, { AVATAR_NOMBRE, DEFAULT_AVATAR_TYPE } from '../hooks/useAgentAvatarType';
 import AvatarSelector from './Settings/AvatarSelector';
+import AgentAvatarSelector from './Settings/AgentAvatarSelector';
 import { useGeolocation } from '../hooks/useGeolocation';
 import {
   resolveUbicacion,
@@ -36,6 +44,7 @@ import {
   resolveAltitudToSave,
 } from '../services/userProfileService';
 import usePerfilFincaStore from '../store/usePerfilFincaStore';
+import usePwaInstall from '../hooks/usePwaInstall';
 
 /**
  * OnboardingCondensado — la reescritura del onboarding (spec 2026-07-08).
@@ -55,8 +64,8 @@ import usePerfilFincaStore from '../store/usePerfilFincaStore';
  *
  * Todo lo demás (hectáreas, invernadero, manejo, riego, preferencias...) se
  * DIFIERE a la voz / progressive profiling / ProfileScreen — ver el flag
- * `deferred` en PROFILE_QUESTIONS. El flujo viejo (OnboardingProfile) queda
- * cableado en la ruta 'onboarding-perfil-clasico' (sin huérfanos).
+ * `deferred` en PROFILE_QUESTIONS. La ruta histórica
+ * 'onboarding-perfil-clasico' queda como alias de este mismo flujo.
  *
  * Persistencia: MISMAS claves de perfil que el flujo viejo + las nuevas de
  * vereda (vereda_codigo / vereda_source geométrico / barrio). 100% client-side
@@ -65,9 +74,11 @@ import usePerfilFincaStore from '../store/usePerfilFincaStore';
  * la ubicación GUARDADA del perfil).
  *
  * Visual: tokens de tema existentes (onboarding-piso-primary/secondary,
- * bienvenida-costura como progreso), colibrí como guía, botón "Escuchar"
- * (TTS perezoso), tarjetas grandes con emoji (baja alfabetización), avance
- * automático en elección única. Español colombiano (usted, SIN voseo).
+ * bienvenida-costura como progreso), el compAI elegido como guía (fix
+ * 2026-07-25: antes decía "colibrí", jubilado como cara del agente desde
+ * 2026-07-18), botón "Escuchar" (TTS perezoso), tarjetas grandes con emoji
+ * (baja alfabetización), avance automático en elección única. Español
+ * colombiano (usted, SIN voseo).
  *
  * Props:
  *   - onComplete(profile): al terminar o saltar todo.
@@ -352,6 +363,12 @@ export default function OnboardingCondensado({
 }) {
   const [paso, setPaso] = useState(0);
   const [sembrando, setSembrando] = useState(false);
+  // El compAI que el usuario ya eligió (o Angelita por defecto, ver
+  // useAgentAvatarType) — fix 2026-07-25: antes esta pantalla mostraba
+  // Angelita SIEMPRE, sin importar la elección, y despedía al usuario
+  // nombrando al colibrí jubilado.
+  const [avatarType] = useAgentAvatarType();
+  const { canInstall, installed, isIos, promptInstall } = usePwaInstall();
   // Marca de inicio para onboarding_tiempo_segundos (regla react: nada impuro
   // en render — se fija una sola vez al montar).
   const startedAtRef = useRef(null);
@@ -667,7 +684,7 @@ export default function OnboardingCondensado({
           <>
             <div className="flex items-center gap-4">
               <div className="shrink-0">
-                <ChagraAgentAvatarAngelita size={96} state="idle" ariaLabel="Angelita, la abeja de Chagra" />
+                <ChagraAgentAvatar size={96} state="idle" ariaLabel="Chagra IA" />
               </div>
               <div className="min-w-0">
                 <h1 className="text-2xl font-black leading-tight text-slate-100">
@@ -739,6 +756,13 @@ export default function OnboardingCondensado({
                 toque en usePrefsStore (avatarCreatureId); si no toca nada,
                 queda la abeja Angelita. Mismo selector del Perfil. */}
             <div data-testid="onb2-avatar">
+              <p className="text-[11px] uppercase tracking-widest font-bold text-emerald-400/90 mb-2">
+                Elija su compai
+              </p>
+              <AgentAvatarSelector />
+            </div>
+
+            <div data-testid="onb2-avatar-criatura">
               <p className="text-[11px] uppercase tracking-widest font-bold text-emerald-400/90 mb-2">
                 Elija su animal (si quiere)
               </p>
@@ -1158,8 +1182,8 @@ export default function OnboardingCondensado({
 
         {/* ═══ LISTO ═══ */}
         {paso === 6 && (
-          <div className="flex-1 flex flex-col items-center justify-center text-center gap-5">
-            <ChagraAgentAvatarAngelita size={168} state="speaking" ariaLabel="Angelita, la abeja de Chagra" />
+          <div className="flex-1 flex flex-col items-center justify-center text-center gap-4">
+            <ChagraAgentAvatar size={168} state="speaking" ariaLabel="Chagra IA" />
             <div className="flex flex-col gap-2">
               <h1 className="text-3xl font-black leading-tight text-slate-100">
                 Su finca está lista 🌱
@@ -1169,9 +1193,48 @@ export default function OnboardingCondensado({
                 {pisoInfo ? ` · clima ${pisoInfo.label.toLowerCase()}` : ''}
               </p>
               <p className="text-sm text-slate-400">
-                Ahora háblele al colibrí: «Hola Chagra, ¿cuándo abono el café?»
+                Ahora háblele a {AVATAR_NOMBRE[avatarType] || AVATAR_NOMBRE[DEFAULT_AVATAR_TYPE]}: «Hola Chagra, ¿cuándo abono el café?»
               </p>
             </div>
+            <div
+              className="grid w-full grid-cols-3 gap-2"
+              aria-label="Capacidades principales de Chagra"
+              data-testid="onb2-capacidades"
+            >
+              {[
+                { Icon: Mic, label: 'Hablar por voz' },
+                { Icon: Camera, label: 'Mostrar una foto' },
+                { Icon: BadgeCheck, label: 'Revisar fuentes' },
+              ].map(({ Icon, label }) => (
+                <div key={label} className="rounded-xl border border-slate-700 bg-slate-900 p-2 text-xs text-slate-300">
+                  {React.createElement(Icon, {
+                    size: 20,
+                    className: 'mx-auto mb-1 text-emerald-300',
+                    'aria-hidden': true,
+                  })}
+                  {label}
+                </div>
+              ))}
+            </div>
+            {installed ? (
+              <p className="text-sm font-bold text-emerald-300" data-testid="onb2-pwa-instalada">
+                Chagra ya está instalada en este equipo.
+              </p>
+            ) : canInstall ? (
+              <button
+                type="button"
+                onClick={promptInstall}
+                className="onboarding-piso-secondary inline-flex items-center justify-center gap-2"
+                data-testid="onb2-instalar-pwa"
+              >
+                <Download size={18} aria-hidden="true" /> Instalar Chagra
+              </button>
+            ) : isIos ? (
+              <p className="text-xs text-slate-400" data-testid="onb2-instalar-ios">
+                Para instalarla, toque <Share size={14} className="inline" aria-hidden="true" /> Compartir y luego
+                Añadir a pantalla de inicio.
+              </p>
+            ) : null}
           </div>
         )}
 

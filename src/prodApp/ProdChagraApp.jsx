@@ -103,7 +103,7 @@ const LAZY_MAP = {
   AgentScreen: lazy(() => import('../components/AgentScreen/AgentScreen.jsx')),
   ProfileScreen: lazy(() => import('../components/ProfileScreen.jsx')),
   EspirituProScreen: lazy(() => import('../components/EspirituProScreen.jsx')),
-  OnboardingProfile: lazy(() => import('../components/OnboardingProfile.jsx')),
+  OnboardingCondensado: lazy(() => import('../components/OnboardingCondensado.jsx')),
   HoyEnFincaScreen: lazy(() => import('../components/hoy/HoyEnFincaScreen.jsx')),
   MiFincaEvolucionScreen: lazy(() => import('../components/hoy/MiFincaEvolucionScreen.jsx')),
   DirectorioEspeciesScreen: lazy(() => import('../components/DirectorioEspecies/DirectorioEspeciesScreen.jsx')),
@@ -180,9 +180,10 @@ const LAZY_MAP = {
   AprenderConAgente: lazy(() => import('../components/Aprende/AprenderConAgente.jsx')),
   CursoChagra: lazy(() => import('../components/curso/CursoChagra.jsx')),
   DashboardLive: lazy(() => import('../components/dashboard/DashboardLive.jsx')),
+  // Reactivada (fix 2026-07-25, sacada de EXCLUIDO — ver rutasProdChagraApp.js).
+  EntradaCampesina: lazy(() => import('../mockups/EntradaCampesina.jsx')),
 
   // ── PENDIENTE_DECISION (operador dijo "nada afuera") ────────────
-  OnboardingCondensado: lazy(() => import('../components/OnboardingCondensado.jsx')),
   OnboardingSiembra: lazy(() => import('../mockups/OnboardingSiembra.jsx')),
   // La sala de juegos: el hub que hace VISIBLES los juegos (#juegos) desde
   // Aprender. Los dos de abajo estaban en el manifiesto SIN entrada aquí →

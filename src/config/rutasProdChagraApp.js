@@ -411,6 +411,16 @@ export const NUCLEO_APP = [
     importLazy: 'src/components/dashboard/DashboardLive.jsx',
     categoria: '2D-app',
   },
+  // Reactivada (fix 2026-07-25, sacada de EXCLUIDO): tarjeta 2D de un solo
+  // pulgar para el camino simple (campesino, baja alfabetización). NO es
+  // duplicado de EntradaValle3D — ese motivo era falso, verificado con
+  // capturas (EXPERIENCIA-ONBOARDING-2026-07-25.md §1.4).
+  {
+    path: 'mockup_entrada_campesina',
+    componente: 'EntradaCampesina',
+    importLazy: 'src/mockups/EntradaCampesina.jsx',
+    categoria: '2D-app',
+  },
   {
     path: 'ubicacion-detectada',
     componente: 'LocationDetectedScreen',
@@ -443,8 +453,14 @@ export const NUCLEO_APP = [
   // ── Onboarding ──────────────────────────────────────────────────
   {
     path: 'onboarding-perfil',
-    componente: 'OnboardingProfile',
-    importLazy: 'src/components/OnboardingProfile.jsx',
+    componente: 'OnboardingCondensado',
+    importLazy: 'src/components/OnboardingCondensado.jsx',
+    categoria: '2D-app',
+  },
+  {
+    path: 'onboarding-perfil-clasico',
+    componente: 'OnboardingCondensado',
+    importLazy: 'src/components/OnboardingCondensado.jsx',
     categoria: '2D-app',
   },
 
@@ -1098,10 +1114,12 @@ export const EXCLUIDO = [
   },
 
   // ── Duplicados de Entrada ──────────────────────────────────────
-  {
-    path: 'mockup_entrada_campesina',
-    motivo: 'Duplicado de EntradaValle3D. EntradaValle3D es la definitiva.',
-  },
+  // `mockup_entrada_campesina` SALIÓ de acá (fix 2026-07-25): el motivo era
+  // falso — EntradaCampesina (tarjeta 2D de un solo pulgar) y EntradaValle3D
+  // (escena 3D navegable) NO son duplicados, son las dos vistas que el
+  // encargo pide (campesino simple vs. técnico completo). Verificado con
+  // capturas — ver `ops/EXPERIENCIA-ONBOARDING-2026-07-25.md §1.4`. Ahora
+  // vive en NUCLEO_APP.
   {
     path: 'mockup_home_campesino',
     motivo: 'Home duplicado. DashboardLive + AgentHero es el home real.',
@@ -1156,7 +1174,7 @@ export const EXCLUIDO = [
   },
   {
     path: 'mockup_primer_cultivo',
-    motivo: 'Onboarding viejo. Reemplazado por OnboardingProfile/OnboardingCondensado.',
+    motivo: 'Onboarding viejo. Reemplazado por OnboardingCondensado.',
   },
   {
     path: 'mockup_guardianes',
@@ -1211,18 +1229,11 @@ export const EXCLUIDO = [
 export const PENDIENTE_DECISION = [
   // ── Onboarding: ¿Profile o Siembra (mockup)? ──────────────────
   {
-    path: 'onboarding-perfil-clasico',
-    componente: 'OnboardingCondensado',
-    importLazy: 'src/components/OnboardingCondensado.jsx',
-    decision: null,
-    motivo: 'Variante clásica del onboarding. Decidir si convive con OnboardingProfile o se elimina.',
-  },
-  {
     path: 'mockup_onboarding_siembra',
     componente: 'OnboardingSiembra',
     importLazy: 'src/mockups/OnboardingSiembra.jsx',
     decision: null,
-    motivo: 'Onboarding como ritual de siembra (SVG animado). ¿Reemplaza o complementa OnboardingProfile?',
+    motivo: 'Onboarding como ritual de siembra (SVG animado). ¿Reemplaza o complementa OnboardingCondensado?',
   },
 
   // ── Juegos PROMOVIDOS a NUCLEO_APP (smoke-test OK, 2026-07-14) ─
