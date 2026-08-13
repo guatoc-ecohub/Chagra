@@ -200,6 +200,10 @@ function SueloBosque({ mat, extension }) {
  *   piso térmico de la finca (`roble`|`aliso`), que se planta en el claro.
  * @param {string|null} [props.entVecino]  especie del Ent vecino, apagado y al
  *   fondo. Se salta en gama baja.
+ * @param {number} [props.extension]  extensión (m) de la siembra del rodal,
+ *   heredada de `params.extension` del mundo (ver `poblarBosque`).
+ * @param {number} [props.seed]  semilla determinista de la siembra, heredada
+ *   de `params.seed` del mundo (ver `poblarBosque`).
  */
 export default function BosqueTresEstratos({
   tier = 'alto',
