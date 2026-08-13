@@ -151,6 +151,7 @@ const LUGAR_A_MUNDO_ANGELITA = {
   semillero: 'mis_matas',
   abono: 'mis_matas',
   micorrizas: 'bosque',
+  chorrera: 'clima',
   animales: 'mis_animales',
   agua: 'clima',
   clima: 'clima',
@@ -158,14 +159,15 @@ const LUGAR_A_MUNDO_ANGELITA = {
   disenio: 'bosque',
   aprender: 'aprender',
   paramo: 'paramo',
+  cacao: 'mis_matas',
+  papa: 'mis_matas',
+  abejas: 'mis_animales',
+  lluvia: 'clima',
+  sierra: 'bosque',
+  compost: 'mis_matas',
+  bosque: 'bosque',
 };
 
-/* Los 6 lugares que Angelita husmea SOLA en reposo — los mismos 6 portales
-   principales (PORTALES_VALLE en composicionValle.js): rotan uno a la vez,
-   espaciados por HUSMEO_MS; el propio store (cooldown de 20 min por mundo)
-   decide si de verdad vale la pena interrumpir. Nunca a mitad de un viaje
-   real, nunca con reduced-motion. */
-const HUSMEO_LUGARES = ['cultivos', 'animales', 'clima', 'mercado', 'aprender', 'disenio'];
 const HUSMEO_PRIMERO_MS = 4200; // el primer husmeo llega pronto: se ve viva al cargar
 /* Cadencia entre husmeos: YA NO un número fijo. `husmeoCadenciaMs` (ítem #58
    del GAP compAI, 2026-08-13) reconcilia el SPEC (46s) con el feedback en
@@ -195,6 +197,44 @@ function alturaTerreno(x, z) {
   const ondul = Math.sin(x * 0.42) * 0.14 + Math.cos(z * 0.36 + x * 0.2) * 0.12;
   const cauce = -0.32 * Math.exp(-((x - 1.2) ** 2) / 6) * Math.exp(-((z + 1) ** 2) / 55);
   return subida + ondul + cauce;
+}
+
+/**
+ * Devuelve los landmarks cuyo volumen aproximado cruza el frustum actual.
+ * La decisión se toma contra la cámara viva, no contra la lista de portales
+ * ni contra un orden fijo. El radio incluye el volumen de la geometría para
+ * que un lugar parcialmente visible también pueda recibir un husmeo.
+ *
+ * @param {Array<{id:string, pos:number[], escala?:number}>} mundos
+ * @param {import('three').Camera|null|undefined} camera
+ * @returns {string[]}
+ */
+export function lugaresVisiblesEnFrustum(mundos, camera) {
+  if (!Array.isArray(mundos) || !camera) return [];
+  const projection = new THREE.Matrix4().multiplyMatrices(
+    camera.projectionMatrix,
+    camera.matrixWorldInverse,
+  );
+  const frustum = new THREE.Frustum().setFromProjectionMatrix(projection);
+  const centro = new THREE.Vector3();
+  const visibles = [];
+
+  for (const mundo of mundos) {
+    if (!mundo?.id || !Array.isArray(mundo.pos)) continue;
+    const escala = Math.abs(Number(mundo.escala) || 1);
+    centro.set(
+      Number(mundo.pos[0]) || 0,
+      Number.isFinite(mundo.pos[1]) ? mundo.pos[1] : alturaTerreno(mundo.pos[0], mundo.pos[2]),
+      Number(mundo.pos[2]) || 0,
+    );
+    if (frustum.intersectsSphere(new THREE.Sphere(centro, Math.max(1.2, escala * 1.5)))) {
+      visibles.push({ id: mundo.id, distancia: camera.position.distanceToSquared(centro) });
+    }
+  }
+
+  // La proximidad a la cámara hace estable la elección mientras el usuario
+  // mueve los controles, pero la fuente de candidatos sigue siendo el frustum.
+  return visibles.sort((a, b) => a.distancia - b.distancia).map(({ id }) => id);
 }
 
 /* Color del suelo a una altura z: interpola entre los colores de los pisos
@@ -1930,10 +1970,12 @@ const CALMA_ABEJA = {
   z: CASA_VALLE.pos[1] + 1.5,
 };
 
-function CompaneroAbeja({ foco, focoId = null, entrando, animo, energia, reducedMotion, estadoFinca = null, hayAlerta = false, posRef = null, conLuz = false, onTocar = null }) {
+function CompaneroAbeja({ foco, focoId = null, entrando, animo, energia, reducedMotion, estadoFinca = null, hayAlerta = false, posRef = null, conLuz = false, onTocar = null, mundos = MUNDOS_DIR }) {
   const ref = useRef(null);
   const caraRef = useRef(null);
   const prevX = useRef(foco.x);
+  const { camera } = useThree();
+  const mundosById = useMemo(() => Object.fromEntries(mundos.map((m) => [m.id, m])), [mundos]);
   const yCalma = useMemo(() => alturaTerreno(CALMA_ABEJA.x, CALMA_ABEJA.z), []);
   // Reacción al estado REAL de la finca (§5b): mismo repertorio que los mundos.
   // Con estadoFinca manda la reacción; sin él, el contrato viejo (animo/energia).
@@ -2017,6 +2059,8 @@ function CompaneroAbeja({ foco, focoId = null, entrando, animo, energia, reduced
   // usuario acaba de interactuar de verdad, así que el husmeo vuelve a
   // sonar "vivo" (13s) en vez de seguir asentado hacia el ritmo del SPEC.
   const husmeoIdx = useRef(0);
+  const lugaresVisiblesRef = useRef([]);
+  const barridoFrustumRef = useRef(0);
 
   // 1) Navegación real: al entrar/salir de un mundo de verdad, la abeja
   //    husmea ese lugar (o vuelve a calma al salir). `focoId` es el id CRUDO
@@ -2057,30 +2101,33 @@ function CompaneroAbeja({ foco, focoId = null, entrando, animo, energia, reduced
       /* Cuánto se queda EL AVISO DE ESTA VUELTA: depende de su largo. */
       let duraEste = HUSMEO_VISIBLE_MS;
       if (!entrandoRef.current) {
-        const lugar = HUSMEO_LUGARES[husmeoIdx.current % HUSMEO_LUGARES.length];
-        husmeoIdx.current += 1;
-        const mundo = LUGAR_A_MUNDO_ANGELITA[lugar];
-        const decision = mundo
-          ? entrarMundoAngelita(mundo, datosParaMundo(mundo), { ocupado: estaOcupado() })
-          : null;
-        if (decision?.interrumpe) {
-          husmeoLugarRef.current = lugar;
-          if (ocultarTimer) clearTimeout(ocultarTimer);
-          /* El aviso dura LO QUE CUESTA LEERLO, no un tiempo fijo (feedback del
-             operador: "desaparecen muy rápido"). Escritura + lectura cómoda.
-             Si la decisión no trae texto, cae al piso digno. */
-          duraEste = duracionAviso(decision?.mensaje ?? decision?.texto);
-          ocultarTimer = setTimeout(() => {
-            husmeoLugarRef.current = null;
-            reposarAngelita();
-          }, duraEste);
+        const lugaresVisibles = lugaresVisiblesRef.current;
+        if (lugaresVisibles.length > 0) {
+          const lugar = lugaresVisibles[husmeoIdx.current % lugaresVisibles.length];
+          husmeoIdx.current += 1;
+          const mundo = LUGAR_A_MUNDO_ANGELITA[lugar];
+          const decision = mundo
+            ? entrarMundoAngelita(mundo, datosParaMundo(mundo), { ocupado: estaOcupado() })
+            : null;
+          if (decision?.interrumpe) {
+            husmeoLugarRef.current = lugar;
+            if (ocultarTimer) clearTimeout(ocultarTimer);
+            /* El aviso dura LO QUE CUESTA LEERLO, no un tiempo fijo (feedback del
+               operador: "desaparecen muy rápido"). Escritura + lectura cómoda.
+               Si la decisión no trae texto, cae al piso digno. */
+            duraEste = duracionAviso(decision?.mensaje ?? decision?.texto);
+            ocultarTimer = setTimeout(() => {
+              husmeoLugarRef.current = null;
+              reposarAngelita();
+            }, duraEste);
+          }
         }
       }
       /* El siguiente husmeo espera a que el anterior TERMINE de leerse (+
          respiro): un aviso largo ya no se lo come el que viene detrás. La
          cadencia BASE (#58) ya no es fija: arranca en 13s ("viva") y se
          asienta hacia los 46s del SPEC tras varias vueltas sin interacción. */
-      const cadenciaBase = husmeoCadenciaMs(vueltasCompletas(husmeoIdx.current, HUSMEO_LUGARES.length));
+      const cadenciaBase = husmeoCadenciaMs(vueltasCompletas(husmeoIdx.current, Math.max(1, lugaresVisiblesRef.current.length)));
       temporizador = setTimeout(tick, Math.max(cadenciaBase, duraEste + 3500));
     };
     temporizador = setTimeout(tick, HUSMEO_PRIMERO_MS);
@@ -2096,6 +2143,13 @@ function CompaneroAbeja({ foco, focoId = null, entrando, animo, energia, reduced
 
   useFrame((state) => {
     if (!ref.current) return;
+    // El barrido es barato y no requiere raycasts: sólo clasifica los lugares
+    // que la cámara ya encuadra. Se actualiza varias veces por segundo para
+    // que un paneo cambie el conjunto de candidatos sin repintar React.
+    if (barridoFrustumRef.current++ % 6 === 0) {
+      lugaresVisiblesRef.current = lugaresVisiblesEnFrustum(mundos, camera)
+        .filter((id) => LUGAR_A_MUNDO_ANGELITA[id] && mundosById[id]);
+    }
     const t = state.clock.elapsedTime;
     // Modificadores de reaccionDeFinca: mojada pesa (baja/lenta), sed baja a
     // buscar agua, comiendo tiembla mordisqueando. Sin estado, todo queda en 1.
@@ -2110,7 +2164,7 @@ function CompaneroAbeja({ foco, focoId = null, entrando, animo, energia, reduced
     // aceptó (husmeoLugarRef) manda un TERCER destino — un solo lugar a la
     // vez, temporal, nunca un círculo errático.
     const lugarHusmeo = !entrando ? husmeoLugarRef.current : null;
-    const anclaHusmeo = lugarHusmeo ? MUNDO_DIR_BY_ID[lugarHusmeo] : null;
+    const anclaHusmeo = lugarHusmeo ? mundosById[lugarHusmeo] : null;
     // POSICIÓN DE CALMA: al reposo (sin viaje real NI husmeo activo) Angelita
     // ya no ronda el valle en un círculo errático — flota serena sobre el
     // patio de la casa con una deriva mínima y lenta (respiración). Al
@@ -3040,6 +3094,7 @@ function Escena({ clima, focoId, animo, energia, onEntrar, onAlerta, onCasa = nu
       <CompaneroAbeja
         foco={foco}
         focoId={focoId}
+        mundos={mundos}
         entrando={entrando}
         animo={animo}
         energia={energia}

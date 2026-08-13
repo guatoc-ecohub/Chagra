@@ -48,6 +48,49 @@ const fold = (s) =>
     .trim()
     .replace(/\s+/g, ' ');
 
+/** @param {object} species */
+function canonicalSlug(species) {
+  return species?.slug || species?.species_slug || species?.id || null;
+}
+
+/**
+ * El catálogo OSS y el catálogo ampliado usan nombres de campo distintos.
+ * Normalizar aquí mantiene un solo camino para resolver ambos sin duplicar
+ * fichas ni mantener una lista de cultivos en la UI.
+ *
+ * @param {object} species
+ * @returns {string[]}
+ */
+function speciesNames(species) {
+  const raw = [
+    species?.name_es,
+    species?.name_la,
+    species?.nombre_comun,
+    species?.nombre_cientifico,
+    ...(Array.isArray(species?.nombres_comunes) ? species.nombres_comunes : []),
+    ...(Array.isArray(species?.common_names) ? species.common_names : []),
+    ...(Array.isArray(species?.nombre_comunes_regionales) ? species.nombre_comunes_regionales : []),
+  ];
+  return raw
+    .filter((name) => typeof name === 'string')
+    .flatMap((name) => name.split(/[\/;,]/))
+    .map(fold)
+    .filter((name) => name.length >= 3);
+}
+
+/** @param {object} species */
+function esCultivo(species) {
+  return species?.cultivable === true
+    || (Array.isArray(species?.roles_in_guild) && species.roles_in_guild.includes('crop'));
+}
+
+/** @param {string} text @param {string} query */
+function contieneFraseCompleta(text, query) {
+  if (!text || !query) return false;
+  const escaped = query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  return new RegExp(`(?:^|\\s)${escaped}(?:$|\\s)`, 'i').test(text);
+}
+
 /**
  * Cache del índice de species por slug/name. Se invalida si el catálogo
  * cambia (rara vez en runtime). KISS: TTL por sesión.
@@ -61,24 +104,18 @@ async function buildSpeciesIndex() {
     const bySlug = new Map();
     const byName = new Map();
     for (const sp of all) {
-      if (!sp || !sp.slug) continue;
-      bySlug.set(fold(sp.slug), sp);
-      if (sp.name_es) byName.set(fold(sp.name_es), sp);
-      if (sp.name_la) byName.set(fold(sp.name_la), sp);
-      // Nombres regionales también indexados (opcional, depende del schema).
-      if (Array.isArray(sp.nombres_comunes)) {
-        for (const n of sp.nombres_comunes) {
-          if (typeof n === 'string') byName.set(fold(n), sp);
-        }
-      }
+      const slug = canonicalSlug(sp);
+      if (!sp || !slug) continue;
+      bySlug.set(fold(slug), sp);
+      for (const name of speciesNames(sp)) byName.set(name, sp);
     }
-    speciesIndexCache = { bySlug, byName };
+    speciesIndexCache = { bySlug, byName, all: Array.isArray(all) ? all : [] };
     return speciesIndexCache;
   } catch (e) {
     // catalogDB no listo o vacío — devolver índices vacíos, el caller
     // recibirá null y skippeará silenciosamente.
     console.warn('[speciesResolver] catálogo no disponible, RAG-only:', e?.message || e);
-    return { bySlug: new Map(), byName: new Map() };
+    return { bySlug: new Map(), byName: new Map(), all: [] };
   }
 }
 
@@ -103,12 +140,12 @@ export async function resolveSpecies(name, opts = {}) {
   // 1. Exact slug
   if (bySlug.has(q)) {
     const sp = bySlug.get(q);
-    return { species: sp, slug: sp.slug, match: 'exact', confidence: 1.0 };
+    return { species: sp, slug: canonicalSlug(sp), match: 'exact', confidence: 1.0 };
   }
   // 2. Exact name (español/latín/regional)
   if (byName.has(q)) {
     const sp = byName.get(q);
-    return { species: sp, slug: sp.slug, match: 'exact', confidence: 1.0 };
+    return { species: sp, slug: canonicalSlug(sp), match: 'exact', confidence: 1.0 };
   }
 
   // 3. RAG fallback — usar BM25 sobre cycle-content para encontrar species
@@ -157,6 +194,36 @@ export async function resolveSpecies(name, opts = {}) {
     match: 'fuzzy',
     confidence,
   };
+}
+
+/**
+ * Encuentra una mención explícita de un cultivo en un texto usando sólo
+ * nombres presentes en el catálogo vivo. Se prioriza el nombre más largo para
+ * que "tomate de árbol" no pierda frente a "tomate". No usa RAG ni adivina una
+ * especie cuando no hay una coincidencia textual verificable.
+ *
+ * @param {string} texto
+ * @returns {Promise<{species: object, slug: string, matchedName: string, match: 'exact', confidence: number}|null>}
+ */
+export async function findCropInText(texto) {
+  const query = fold(texto);
+  if (!query) return null;
+  const { all } = await buildSpeciesIndex();
+  const candidates = [];
+
+  for (const species of all) {
+    if (!esCultivo(species)) continue;
+    const slug = canonicalSlug(species);
+    if (!slug) continue;
+    for (const name of speciesNames(species)) {
+      if (contieneFraseCompleta(query, name)) {
+        candidates.push({ species, slug, matchedName: name, match: 'exact', confidence: 1 });
+      }
+    }
+  }
+
+  candidates.sort((a, b) => b.matchedName.length - a.matchedName.length);
+  return candidates[0] || null;
 }
 
 /**
