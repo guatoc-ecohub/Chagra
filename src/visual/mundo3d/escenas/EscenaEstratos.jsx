@@ -16,10 +16,11 @@
  * comestible de siempre (retro-compatible byte a byte para `disenio`).
  */
 import { useMemo } from 'react';
+import * as THREE from 'three';
 import EscenaBase3D from './EscenaBase3D.jsx';
 import { Fauna } from './FaunaEscena.jsx';
 import { faunaDeMundo } from '../faunaFuncional.js';
-import { CIELOS, PALETA } from '../atmosferaMadre.js';
+import { CIELOS, PALETA, mezclarCielo } from '../atmosferaMadre.js';
 
 /* La fauna funcional por estrato (POLINIZADORES en dosel/sotobosque + un
    DESCOMPONEDOR en la hojarasca, para `disenio`; POLINIZADORES del aire
@@ -238,12 +239,127 @@ function SiluetaCultivo({ tipo, x, y, z, esc = 1 }) {
 }
 
 /* Puf de niebla del páramo (capta agua): esfera achatada, translúcida, quieta
-   (digna con reduced-motion: no se mueve, no desaparece). */
-function Niebla({ x, y, z, r = 0.5 }) {
+   (digna con reduced-motion: no se mueve, no desaparece). `sx` la estira a lo
+   ancho para los jirones de piso al pie de la cordillera. */
+function Niebla({ x, y, z, r = 0.5, sx = 1 }) {
   return (
-    <mesh position={[x, y, z]} scale={[1, 0.34, 1]}>
+    <mesh position={[x, y, z]} scale={[sx, 0.34, 1]}>
       <sphereGeometry args={[r, 8, 6]} />
       <meshBasicMaterial color="#eef4f4" transparent opacity={0.5} />
+    </mesh>
+  );
+}
+
+/* ═══ La cordillera del fondo (mirada Humboldt) ══════════════════════════════
+ * Un heightfield low-poly de UNA malla con dos crestas: la verde cercana y los
+ * nevados lejanos. Es la receta de terreno del mundo del páramo (ruido
+ * determinista de senos + campanas de Gauss + colores por vértice): relieve
+ * con masa y volumen, no siluetas contables. Las bandas de color cuentan el
+ * mismo cuento térmico del diorama —verde dominante abajo, verde-plata de
+ * frailejón arriba, nieve sólo en los picos— y la perspectiva aérea tiñe lo
+ * hondo hacia la niebla REAL de la escena (mezclarCielo(CIELOS.ladera)), para
+ * que la cordillera se funda con el cielo en vez de flotar delante.
+ * Determinista: la misma cordillera siempre, sin Math.random. */
+const CORD = { ancho: 17, fondo: 6.6, zFrente: -2.2, segX: 96, segZ: 30 };
+const suavizar = (a, b, x) => {
+  const t = Math.min(Math.max((x - a) / (b - a), 0), 1);
+  return t * t * (3 - 2 * t);
+};
+const campana = (x, c, s) => Math.exp(-((x - c) * (x - c)) / (2 * s * s));
+function ruidoCordillera(x, z) {
+  return (
+    Math.sin(x * 0.8 + z * 0.6) * 0.5 +
+    Math.sin(x * 1.9 - z * 1.4 + 2.3) * 0.3 +
+    Math.sin(x * 3.1 + z * 2.7 + 5.1) * 0.2
+  );
+}
+/* Altura del relieve: amplitud por Gauss a lo largo de x, sección de Gauss en
+   z (lomo redondo con masa, no triángulo). La cresta lejana es la más alta
+   (los nevados); la cercana queda en el verde y el subpáramo. */
+function alturaCordillera(x, z) {
+  const cercana =
+    (1.35 * campana(x, -2.9, 2.2) +
+      1.15 * campana(x, 1.7, 1.8) +
+      1.0 * campana(x, 5.9, 2.4) +
+      0.95 * campana(x, -6.9, 2.6)) *
+    campana(z, -3.6, 1.2);
+  const nevados =
+    (3.05 * campana(x, -3.0, 2.4) +
+      2.6 * campana(x, 4.9, 3.0) +
+      2.55 * campana(x, -6.4, 3.2)) *
+    campana(z, -6.8, 1.5);
+  let h = 0.15 + cercana + nevados;
+  h += ruidoCordillera(x * 0.9, z * 0.9) * 0.16 * (1 + h * 0.3); // más arrugas arriba
+  // La falda muere en los bordes de la franja: nada de tajos contra el cielo.
+  h *= suavizar(CORD.zFrente, CORD.zFrente - 0.9, z);
+  h *= suavizar(CORD.zFrente - CORD.fondo, CORD.zFrente - CORD.fondo + 0.9, z);
+  h *= 1 - suavizar(6.6, 8.4, Math.abs(x));
+  return Math.max(h, 0.02);
+}
+function construirCordillera() {
+  const { ancho, fondo, zFrente, segX, segZ } = CORD;
+  const nx = segX + 1;
+  const nz = segZ + 1;
+  const pos = new Float32Array(nx * nz * 3);
+  const col = new Float32Array(nx * nz * 3);
+  const cClaro = new THREE.Color(PALETA.follajeClaro);
+  const cVerde = new THREE.Color(PALETA.follaje);
+  const cMonte = new THREE.Color(PALETA.follajeOscuro);
+  const cParamo = new THREE.Color('#b3bda0'); // el plateado del frailejón
+  const cNieve = new THREE.Color('#e9f1f2');
+  // La lejanía muere en la niebla REAL de la escena, teñida hacia el sage del
+  // páramo: la luz dorada la entibia sola — cream puro daría desierto, no Andes.
+  const cBruma = new THREE.Color(mezclarCielo(CIELOS.ladera).niebla).lerp(cParamo, 0.3);
+  const c = new THREE.Color();
+  let p = 0;
+  for (let iz = 0; iz < nz; iz++) {
+    const z = zFrente - (fondo * iz) / segZ;
+    for (let ix = 0; ix < nx; ix++) {
+      const x = -ancho / 2 + (ancho * ix) / segX;
+      const y = alturaCordillera(x, z);
+      pos[p] = x;
+      pos[p + 1] = y;
+      pos[p + 2] = z;
+      // las franjas altitudinales: verde de monte que se enfría al subir. Los
+      // verdes van HONDOS a propósito: la luz dorada de la escena lava los
+      // olivas a caqui, y esta ladera tiene que leer VERDE (verde-dominante).
+      c.copy(cVerde).lerp(cMonte, suavizar(0.45, 1.6, y));
+      // la franja de páramo va ANGOSTA y arriba (Humboldt: el bosque sube
+      // hasta casi el filo; el pálido es faja, no cuerpo) y la nieve, puntas.
+      c.lerp(cParamo, suavizar(2.05, 2.55, y));
+      c.lerp(cNieve, suavizar(2.6, 2.95, y));
+      // claros de sol moteados en lo verde + perspectiva aérea hacia el fondo
+      c.lerp(cClaro, 0.15 * (ruidoCordillera(x * 1.7, z * 1.7) * 0.5 + 0.5) * (1 - suavizar(1.7, 2.3, y)));
+      c.lerp(cBruma, 0.42 * suavizar(zFrente - 2.0, zFrente - fondo + 0.4, z));
+      col[p] = c.r;
+      col[p + 1] = c.g;
+      col[p + 2] = c.b;
+      p += 3;
+    }
+  }
+  const idx = [];
+  for (let iz = 0; iz < segZ; iz++) {
+    for (let ix = 0; ix < segX; ix++) {
+      const a = iz * nx + ix;
+      const b = a + 1;
+      const d = a + nx;
+      const e = d + 1;
+      idx.push(a, d, b, b, d, e);
+    }
+  }
+  let geo = new THREE.BufferGeometry();
+  geo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+  geo.setAttribute('color', new THREE.BufferAttribute(col, 3));
+  geo.setIndex(idx);
+  geo = geo.toNonIndexed(); // caras planas de verdad (una normal por cara)
+  geo.computeVertexNormals();
+  return geo;
+}
+function Cordillera() {
+  const geo = useMemo(() => construirCordillera(), []);
+  return (
+    <mesh geometry={geo}>
+      <meshLambertMaterial vertexColors flatShading />
     </mesh>
   );
 }
@@ -320,33 +436,15 @@ function DioramaPisos({ params, reducedMotion, fauna }) {
        cortado y medio lienzo vacío abajo. Los hotspots de `pisos` en
        mundoData.js bajan lo mismo. */
     <group position={[0, -1.55, 0]}>
-      {/* la ladera al fondo: silueta de montaña por capas (profundidad) */}
-      <mesh position={[-0.6, 1.3, -3.4]}>
-        <coneGeometry args={[3.3, 4.6, 5]} />
-        <meshLambertMaterial color="#9fb4bc" flatShading />
-      </mesh>
-      <mesh position={[1.4, 1.0, -3.0]}>
-        <coneGeometry args={[2.6, 3.7, 5]} />
-        <meshLambertMaterial color="#adc0c6" flatShading />
-      </mesh>
-      {/* nieve en los picos: remata el cuento térmico (arriba, el frío manda) */}
-      <mesh position={[-0.6, 3.22, -3.39]}>
-        <coneGeometry args={[0.52, 0.78, 5]} />
-        <meshLambertMaterial color="#e9f1f2" flatShading />
-      </mesh>
-      <mesh position={[1.4, 2.6, -2.99]}>
-        <coneGeometry args={[0.34, 0.52, 5]} />
-        <meshLambertMaterial color="#e9f1f2" flatShading />
-      </mesh>
-      {/* cordillera lejana, más pálida: una capa más de profundidad */}
-      <mesh position={[3.1, 0.7, -4.8]}>
-        <coneGeometry args={[3.6, 2.8, 4]} />
-        <meshLambertMaterial color="#c2d1d6" flatShading />
-      </mesh>
-      <mesh position={[-3.4, 0.6, -4.9]}>
-        <coneGeometry args={[3.2, 2.5, 4]} />
-        <meshLambertMaterial color="#c6d4d8" flatShading />
-      </mesh>
+      {/* la cordillera al fondo: relieve con masa (mirada Humboldt) — verde
+          dominante, subpáramo plateado y nevados que se funden con la bruma */}
+      <Cordillera />
+      {/* niebla de piso: jirones al pie de la cordillera y en el vallecito
+          entre las dos crestas (la misma niebla del páramo, estirada) */}
+      <Niebla x={-4.6} y={1.3} z={-3.3} r={0.8} sx={2.4} />
+      <Niebla x={3.0} y={1.1} z={-3.2} r={0.7} sx={2.0} />
+      <Niebla x={-0.8} y={1.85} z={-5.3} r={0.9} sx={2.8} />
+      <Niebla x={5.4} y={1.5} z={-5.1} r={0.8} sx={2.2} />
 
       {/* las cuatro terrazas que suben, cada una con su color térmico */}
       {pisos.map((p, i) => (
