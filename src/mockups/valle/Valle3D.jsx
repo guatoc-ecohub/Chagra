@@ -2797,7 +2797,12 @@ function Escena({ clima, focoId, animo, energia, onEntrar, onAlerta, onCasa = nu
       {/* Los Guardianes del gradiente — el Ent del piso térmico + vecinos.
           pisoTermico=null → default (templado/roble); cablear el valor real
           cuando el valle exponga el piso. Rescatado del huérfano 2026-08-01. */}
-      <EntsDelValle pisoTermico={null} alturaDe={alturaTerreno} tier={tier} reducedMotion={reducedMotion} />
+      <EntsDelValle
+        pisoTermico={null}
+        alturaDe={alturaTerreno}
+        tier={/** @type {'alto'|'medio'|'bajo'} */ (tier)}
+        reducedMotion={reducedMotion}
+      />
       {fracEstrellas > 0 && perfil.estrellas > 0 && (
         <Stars
           radius={40}
