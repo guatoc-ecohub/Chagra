@@ -7,7 +7,7 @@ describe('AgentAvatarSelector smoke', () => {
         localStorage.clear();
     });
 
-    it('renderiza las 7 opciones del elenco unificado (colibrí jubilado, maíz retirado)', () => {
+    it('renderiza las 6 opciones con cuerpo propio (colibrí jubilado, maíz/guacamaya retirados)', () => {
         render(<AgentAvatarSelector />);
         expect(screen.getByText('Angelita, la abeja', { selector: 'p' })).toBeInTheDocument();
         expect(screen.getByText('Zarigüeya', { selector: 'p' })).toBeInTheDocument();
@@ -15,9 +15,12 @@ describe('AgentAvatarSelector smoke', () => {
         expect(screen.getByText('Oso de anteojos', { selector: 'p' })).toBeInTheDocument();
         expect(screen.getByText('Luciérnaga', { selector: 'p' })).toBeInTheDocument();
         expect(screen.getByText('Chivito de páramo', { selector: 'p' })).toBeInTheDocument();
-        expect(screen.getByText('Guacamaya', { selector: 'p' })).toBeInTheDocument();
         expect(screen.queryByText(/colibrí/i)).toBeNull();
         expect(screen.queryByText(/maíz/i)).toBeNull();
+        expect(screen.queryByText(/Guacamaya/i)).toBeNull();
+        // dante y oliver están en AVATAR_TYPES pero NO en el selector (sin arte propio aún)
+        expect(screen.queryByText(/Dante/i)).toBeNull();
+        expect(screen.queryByText(/Oliver/i)).toBeNull();
     });
 
     it('click en zarigüeya cambia la preferencia y persiste en localStorage', () => {
@@ -48,6 +51,11 @@ describe('AgentAvatarSelector smoke', () => {
         expect(screen.queryByText('Planta de maíz')).toBeNull();
     });
 
+    it('guacamaya ya NO es una opción del selector (retirado 2026-08-14, roster-8)', () => {
+        render(<AgentAvatarSelector />);
+        expect(screen.queryByText(/Guacamaya/i)).toBeNull();
+    });
+
     it('localStorage maiz (usuario viejo) NO rompe el selector: cae a angelita', () => {
         localStorage.setItem('chagra:agent-avatar-type', 'maiz');
         render(<AgentAvatarSelector />);
@@ -69,15 +77,36 @@ describe('AgentAvatarSelector smoke', () => {
         expect(angelitaBtn).toHaveAttribute('aria-pressed', 'true');
     });
 
-    // Ítem #8 del GAP compAI (2026-08-13, ampliado 2026-08-14 con el roster-7
-    // completo): jaguar, oso de anteojos, luciérnaga, chivito y guacamaya ya
-    // tienen cuerpo 2.5D y `enPWA:true` en el núcleo (#96).
+    it('slug legacy guacamaya en localStorage migra a angelita seleccionada (roster-8)', () => {
+        localStorage.setItem('chagra:agent-avatar-type', 'guacamaya');
+        render(<AgentAvatarSelector />);
+        const angelitaBtn = screen.getByText('Angelita, la abeja', { selector: 'p' }).closest('button');
+        expect(angelitaBtn).toHaveAttribute('aria-pressed', 'true');
+    });
+
+    it('localStorage dante (sin arte propio) cae a angelita seleccionada', () => {
+        localStorage.setItem('chagra:agent-avatar-type', 'dante');
+        render(<AgentAvatarSelector />);
+        const angelitaBtn = screen.getByText('Angelita, la abeja', { selector: 'p' }).closest('button');
+        expect(angelitaBtn).toHaveAttribute('aria-pressed', 'true');
+    });
+
+    it('localStorage oliver (sin arte propio) cae a angelita seleccionada', () => {
+        localStorage.setItem('chagra:agent-avatar-type', 'oliver');
+        render(<AgentAvatarSelector />);
+        const angelitaBtn = screen.getByText('Angelita, la abeja', { selector: 'p' }).closest('button');
+        expect(angelitaBtn).toHaveAttribute('aria-pressed', 'true');
+    });
+
+    // Ítem #8 del GAP compAI (2026-08-13, ampliado 2026-08-14 con el roster-7,
+    // luego roster-8): jaguar, oso de anteojos, luciérnaga, chivito ya tienen
+    // cuerpo 2.5D y `enPWA:true` en el núcleo (#96). guacamaya se retiró en
+    // roster-8 (2026-08-14), dante/oliver entran pero sin arte propio aún.
     it.each([
         ['jaguar', 'Jaguar'],
         ['oso-baston', 'Oso de anteojos'],
         ['luciernaga', 'Luciérnaga'],
         ['chivito-punk', 'Chivito de páramo'],
-        ['guacamaya', 'Guacamaya'],
     ])('click en %s cambia la preferencia y persiste en localStorage', (slug, label) => {
         render(<AgentAvatarSelector />);
         const btn = screen.getByText(label, { selector: 'p' }).closest('button');
@@ -93,7 +122,6 @@ describe('AgentAvatarSelector smoke', () => {
         ['oso-baston', 'Oso de anteojos'],
         ['luciernaga', 'Luciérnaga'],
         ['chivito-punk', 'Chivito de páramo'],
-        ['guacamaya', 'Guacamaya'],
     ])('localStorage %s preselecciona esa opción al montar', (slug, label) => {
         localStorage.setItem('chagra:agent-avatar-type', slug);
         render(<AgentAvatarSelector />);

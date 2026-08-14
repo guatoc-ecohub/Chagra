@@ -5,19 +5,25 @@ import ChagraAgentAvatarZariguya from '../ChagraAgentAvatarZariguya';
 import ChagraAgentAvatarJaguar from '../ChagraAgentAvatarJaguar';
 import ChagraAgentAvatarOsoBaston from '../ChagraAgentAvatarOsoBaston';
 import ChagraAgentAvatarLuciernaga from '../ChagraAgentAvatarLuciernaga';
-import ChagraAgentAvatarGuacamaya from '../ChagraAgentAvatarGuacamaya';
 import ChagraAgentAvatarChivitoPunk from '../ChagraAgentAvatarChivitoPunk';
 
 /**
  * AgentAvatarSelector — selector visual para el avatar del agente IA.
  *
- * Los 7 canónicos (decisión del operador, 2026-08-14): Angelita la abeja
- * (default), jaguar, oso de anteojos, zarigüeya (crías al lomo), luciérnaga,
- * chivito de páramo, guacamaya. Persiste vía useAgentAvatarType (localStorage
+ * ROSTER-8 (decisión del operador, 2026-08-14): Angelita la abeja (default),
+ * jaguar, oso de anteojos, zarigüeya (crías al lomo), luciérnaga, chivito de
+ * páramo, dante, oliver. Persiste vía useAgentAvatarType (localStorage
  * `chagra:agent-avatar-type` + llave canónica `compai:companero`, #96).
  * Cambio inmediato — afecta a todas las instancias del avatar en la app
  * (FAB, login, chat, onboarding — ver ChagraAgentAvatar.jsx, el dispatcher
  * del que dependen).
+ *
+ * REGLA DE HONESTIDAD VISUAL: este selector SOLO ofrece opciones que tienen
+ * un componente PROPIO en ChagraAgentAvatar.jsx. Si un avatarType no tiene
+ * cuerpo dibujado aún (dante, oliver — su arte es de Fable y está en hold del
+ * operador), NO se ofrece aquí aunque esté en AVATAR_TYPES. El usuario nunca
+ * selecciona un avatar y recibe otro diferente (el bug "elijo Dante y en la
+ * pista sale el chivito" que el operador castigó).
  *
  * 2026-07-16 (operador): "Angelita como el agente, jubila el colibrí".
  * 2026-07-18 (operador): el colibrí sale también de las opciones — "solo
@@ -30,19 +36,28 @@ import ChagraAgentAvatarChivitoPunk from '../ChagraAgentAvatarChivitoPunk';
  * jaguar/oso de anteojos/luciérnaga — ya tenían cuerpo 2.5D dibujado y ya
  * estaban `enPWA:true` en `compai/nucleo/elenco.js` desde el 2026-08-11
  * (#96), pero este selector se había quedado en 3.
- * 2026-08-14 (unificación compAI a los 7 canónicos, decisión del operador):
- *   - 'maiz' SE RETIRA del selector (queda como slug jubilado que migra solo
+ * 2026-08-14 (roster-7 → roster-8, decisión del operador):
+ *   - 'maiz' SE RETIRÓ del selector (queda como slug jubilado que migra solo
  *     a 'angelita', ver `compai/nucleo/elenco.js` SLUGS_JUBILADOS — nunca se
  *     borra en silencio lo que un usuario tenía guardado).
+ *   - 'guacamaya' SE RETIRÓ del selector (roster-8): migra a 'angelita' en
+ *     LEGACY_TYPES de useAgentAvatarType.js para que nadie se quede en estado
+ *     inválido. Su cuerpo sigue existiendo (ChagraAgentAvatarGuacamaya.jsx),
+ *     pero ya no es una opción elegible — el operador decidió priorizar
+ *     dante/oliver en su lugar.
+ *   - 'dante' y 'oliver' entran al roster-8 pero NO tienen arte propio aún
+ *     (diseños de Fable en hold del operador). Quedan en AVATAR_TYPES pero
+ *     NO se ofrecen en este selector hasta que existan ChagraAgentAvatarDante.jsx
+ *     y ChagraAgentAvatarOliver.jsx. Mientras tanto, caen a Angelita por el
+ *     fallback de ChagraAgentAvatar.jsx.
  *   - 'oso-baston' se re-etiqueta "Oso de anteojos" (el nombre común de
  *     Tremarctos ornatus): mismo cuerpo (OsoBaston.jsx, 4ta dirección de
  *     arte ya aprobada), mismo slug interno (compat de localStorage) — NO es
  *     un oso nuevo.
- *   - Últimas dos opciones: guacamaya y chivito de páramo, reusando el rig
- *     F24 del valle (`visual/creatures/GuacamayaCompai.jsx`/`ChivitoPunk.jsx`
- *     — NO `Guacamaya.jsx`, el billboard decorativo de FaunaCalido.jsx) en
- *     vez de redibujarse a mano — `ELENCO[...].enPWA` ya está en `true` para
- *     ambos en `compai/nucleo/elenco.js`.
+ *   - 'chivito-punk' ("chivito de páramo"): reusa el rig F24 del valle
+ *     (`visual/creatures/ChivitoPunk.jsx` — NO `Guacamaya.jsx`, el billboard
+ *     decorativo de FaunaCalido.jsx) en vez de redibujarse a mano —
+ *     `ELENCO[...].enPWA` ya está en `true` en `compai/nucleo/elenco.js`.
  */
 export default function AgentAvatarSelector() {
     const [type, setType] = useAgentAvatarType();
@@ -83,12 +98,6 @@ export default function AgentAvatarSelector() {
             label: 'Chivito de páramo',
             sub: 'El que vela por el agua que nace arriba',
             Component: ChagraAgentAvatarChivitoPunk,
-        },
-        {
-            id: 'guacamaya',
-            label: 'Guacamaya',
-            sub: 'La bandera del bosque tropical',
-            Component: ChagraAgentAvatarGuacamaya,
         },
     ];
 
