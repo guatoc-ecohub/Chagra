@@ -1,42 +1,23 @@
-import Jaguar from '../visual/creatures/Jaguar';
+import CompaiLamina from '../visual/creatures/laminaViva/CompaiLamina.jsx';
 
 /**
  * ChagraAgentAvatarJaguar — el jaguar (Panthera onca) como CARA del agente de
- * Chagra, 4ta opción del elenco (junto a Angelita, maíz y zarigüeya).
+ * Chagra, 4ta opción del elenco.
  *
- * Cierra parte del ítem #8 del GAP compAI (2026-08-13): el jaguar ya tenía
- * cuerpo dibujado (`Jaguar.jsx`, 2.5D vivo con idle + paisaje del miedo,
- * commit `075f6a0d2`) y ya estaba marcado `enPWA:true` en
- * `compai/nucleo/elenco.js` (#96) — pero ningún selector lo ofrecía. Este
- * adaptador es el que faltaba para que el picker de la PWA lo exponga.
+ * LÁMINA VIVA (feat/compai-laminas-en-movimiento): el cuerpo YA NO es el SVG
+ * rubber-hose dibujado a mano (`visual/creatures/Jaguar.jsx`) — es la lámina
+ * Humboldt real (`compai/laminas/jaguar.png`, el jaguar de perfil caminando)
+ * recortada en capas y rigeada, ver
+ * `visual/creatures/laminaViva/CompaiLamina.jsx`. Jaguar.jsx sigue en disco
+ * sin tocar (fauna ambiental del valle sigue usándola) — este adaptador solo
+ * cambia SU cuerpo.
  *
- * Adaptador puro (mismo contrato que ChagraAgentAvatarZariguya): traduce la
- * API histórica del avatar del agente (state 'idle'|'thinking'|'speaking'|
- * 'listening', glow, withLabel, onClick/onDoubleClick) al vocabulario de VIDA
- * de `Jaguar.jsx` (`visual/creatures/`). Cero lógica nueva de agente, cero
- * cambios en `visual/creatures/`.
- *
- *   - idle       → pose 'anda' (base, con acecho de hombros).
- *   - thinking   → pose 'anda' + `acecha=true`: el felino se agazapa y avanza
- *                  lento — su reacción-firma leída como "atento/calculando".
- *   - speaking   → pose 'celebra' (la más expresiva) + visema del lip-sync.
- *   - listening  → pose 'reposo': respira hondo, agazapado y atento.
+ * Adaptador puro (mismo contrato que los hermanos): traduce la API histórica
+ * del avatar del agente (state 'idle'|'thinking'|'speaking'|'listening',
+ * glow, withLabel, onClick/onDoubleClick) al `estado` que CompaiLamina
+ * entiende — la lámina no tiene capa de acecho/lip-sync propia (alcance
+ * mínimo ojos+cabeza+respiración, ver el docstring de CompaiLamina).
  */
-const POSE_DE_STATE = {
-    idle: 'anda',
-    thinking: 'anda',
-    speaking: 'celebra',
-    listening: 'reposo',
-};
-
-const ACECHA_DE_STATE = {
-    thinking: true,
-};
-
-const VISEMA_DE_STATE = {
-    speaking: 'V2',
-};
-
 export default function ChagraAgentAvatarJaguar({
     state = 'idle',
     size = 48,
@@ -47,16 +28,10 @@ export default function ChagraAgentAvatarJaguar({
     className = '',
     ariaLabel = 'Chagra IA',
 }) {
-    const pose = POSE_DE_STATE[state] || 'anda';
-    const acecha = !!ACECHA_DE_STATE[state];
-    const visema = VISEMA_DE_STATE[state] || null;
-
     const bicho = (
-        <Jaguar
-            pose={pose}
-            acecha={acecha}
-            visema={visema}
-            tier={undefined}
+        <CompaiLamina
+            tipo="jaguar"
+            estado={state}
             size={size}
             title={ariaLabel}
             className={className}

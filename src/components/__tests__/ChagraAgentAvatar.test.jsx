@@ -3,12 +3,24 @@
  *
  * Cubre las extensiones del sistema global de notificaciones sobre el avatar
  * default del wrapper, que hoy es ANGELITA (la abeja agente):
- *   - `glow` prop agrega la clase `agt-avatar-glow` al SVG de Angelita.
+ *   - `glow` prop agrega la clase `agt-avatar-glow` al cuerpo.
  *   - `onDoubleClick` se invoca al doble-click del wrapper button.
  *   - a11y: aria-label custom + role="img" + tooltip title presente cuando
  *     hay onDoubleClick.
  *   - migración: los slugs viejos 'colibri'/'colibri_svg' en localStorage
  *     renderizan Angelita (el colibrí jubiló del rol de agente).
+ *
+ * ACTUALIZADO (feat/compai-laminas-en-movimiento): el cuerpo default (y el de
+ * jaguar/oso-baston/zariguya/luciernaga/chivito-punk, todos con lámina real)
+ * dejó de ser un `<svg class="agt-angelita">`/`<svg data-creature>` dibujado a
+ * mano — es `<div data-creature data-lamina-viva="1" role="img">` con la
+ * lámina Humboldt recortada en capas (CompaiLamina.jsx). `data-agt-estado`
+ * también cambia: ya no lleva el vocabulario RICO de Angelita
+ * ('pensando'/'escuchando'/...) sino la familia de reacción que la lámina sí
+ * puede expresar ('pensativa'/'atenta'/'animada'/'base' — ver
+ * `canonizarEstado` en laminaIdle.js). Guacamaya (sin lámina propia, ver
+ * laminaAnatomia.js) sigue con el `<svg>` viejo — no aparece en este archivo,
+ * el default del wrapper es angelita.
  */
 import React from 'react';
 import { render, screen, fireEvent, act } from '@testing-library/react';
@@ -23,46 +35,46 @@ describe('ChagraAgentAvatar — Angelita default: glow + double-click + migraci�
   });
   test('por defecto renderiza Angelita SIN clase agt-avatar-glow', () => {
     const { container } = render(<ChagraAgentAvatar state="idle" />);
-    const svg = container.querySelector('svg.agt-angelita');
-    expect(svg).toBeInTheDocument();
-    expect(svg.classList.contains('agt-avatar-glow')).toBe(false);
+    const cuerpo = container.querySelector('[data-creature="angelita"]');
+    expect(cuerpo).toBeInTheDocument();
+    expect(cuerpo.classList.contains('agt-avatar-glow')).toBe(false);
   });
 
-  test('con prop glow={true} agrega clase agt-avatar-glow al SVG', () => {
+  test('con prop glow={true} agrega clase agt-avatar-glow al cuerpo', () => {
     const { container } = render(<ChagraAgentAvatar state="idle" glow />);
-    const svg = container.querySelector('svg.agt-angelita');
-    expect(svg).toBeInTheDocument();
-    expect(svg.classList.contains('agt-avatar-glow')).toBe(true);
+    const cuerpo = container.querySelector('[data-creature="angelita"]');
+    expect(cuerpo).toBeInTheDocument();
+    expect(cuerpo.classList.contains('agt-avatar-glow')).toBe(true);
   });
 
   test('slug legacy colibri_svg en localStorage TAMBIÉN renderiza Angelita', () => {
     localStorage.setItem('chagra:agent-avatar-type', 'colibri_svg');
     const { container } = render(<ChagraAgentAvatar state="idle" />);
-    expect(container.querySelector('svg.agt-angelita')).toBeInTheDocument();
+    expect(container.querySelector('[data-creature="angelita"]')).toBeInTheDocument();
   });
 
   test('slug legacy colibri en localStorage TAMBIÉN renderiza Angelita', () => {
     localStorage.setItem('chagra:agent-avatar-type', 'colibri');
     const { container } = render(<ChagraAgentAvatar state="idle" />);
-    expect(container.querySelector('svg.agt-angelita')).toBeInTheDocument();
+    expect(container.querySelector('[data-creature="angelita"]')).toBeInTheDocument();
   });
 
   test('cambia al compai elegido cuando llega el evento global del selector', () => {
     const { container } = render(<ChagraAgentAvatar state="idle" />);
-    expect(container.querySelector('svg.agt-angelita')).toBeInTheDocument();
+    expect(container.querySelector('[data-creature="angelita"]')).toBeInTheDocument();
 
     act(() => {
       localStorage.setItem('compai:companero', 'jaguar');
       window.dispatchEvent(new CustomEvent('chagra:agent-avatar-changed', { detail: 'jaguar' }));
     });
 
-    expect(container.querySelector('svg[data-creature="jaguar"]')).toBeInTheDocument();
-    expect(container.querySelector('svg.agt-angelita')).not.toBeInTheDocument();
+    expect(container.querySelector('[data-creature="jaguar"]')).toBeInTheDocument();
+    expect(container.querySelector('[data-creature="angelita"]')).not.toBeInTheDocument();
   });
 
   test('maiz se retiró del roster (2026-08-14): el evento global con maiz ya no cambia el avatar', () => {
     const { container } = render(<ChagraAgentAvatar state="idle" />);
-    expect(container.querySelector('svg.agt-angelita')).toBeInTheDocument();
+    expect(container.querySelector('[data-creature="angelita"]')).toBeInTheDocument();
 
     act(() => {
       window.dispatchEvent(new CustomEvent('chagra:agent-avatar-changed', { detail: 'maiz' }));
@@ -70,13 +82,13 @@ describe('ChagraAgentAvatar — Angelita default: glow + double-click + migraci�
 
     // 'maiz' ya no está en AVATAR_TYPES: el hook ignora el evento y el
     // avatar se queda en Angelita (no en chagra-maiz).
-    expect(container.querySelector('svg.agt-angelita')).toBeInTheDocument();
+    expect(container.querySelector('[data-creature="angelita"]')).toBeInTheDocument();
   });
 
-  test('sin onClick ni onDoubleClick renderiza solo el SVG (no button)', () => {
+  test('sin onClick ni onDoubleClick renderiza solo el dibujo (no button)', () => {
     const { container } = render(<ChagraAgentAvatar state="idle" />);
     expect(container.querySelector('button')).toBeNull();
-    expect(container.querySelector('svg')).toBeInTheDocument();
+    expect(container.querySelector('[data-lamina-viva]')).toBeInTheDocument();
   });
 
   test('con onDoubleClick envuelve en button y dispara el handler', () => {
@@ -124,30 +136,30 @@ describe('ChagraAgentAvatar — Angelita default: glow + double-click + migraci�
     expect(btn).toHaveAttribute('title', expect.stringMatching(/doble click/i));
   });
 
-  test('el state del agente se mapea al estado de Angelita (data-agt-estado)', () => {
+  test('el state del agente se mapea a la familia de reacción de la lámina (data-agt-estado)', () => {
     const { container, rerender } = render(<ChagraAgentAvatar state="thinking" />);
     expect(
-      container.querySelector('svg[data-agt-estado="pensando"]'),
+      container.querySelector('[data-creature="angelita"][data-agt-estado="pensativa"]'),
     ).toBeInTheDocument();
     rerender(<ChagraAgentAvatar state="listening" />);
     expect(
-      container.querySelector('svg[data-agt-estado="escuchando"]'),
+      container.querySelector('[data-creature="angelita"][data-agt-estado="atenta"]'),
     ).toBeInTheDocument();
     rerender(<ChagraAgentAvatar state="speaking" />);
     expect(
-      container.querySelector('svg[data-agt-estado="respondiendo"]'),
+      container.querySelector('[data-creature="angelita"][data-agt-estado="animada"]'),
     ).toBeInTheDocument();
     rerender(<ChagraAgentAvatar state="idle" />);
     expect(
-      container.querySelector('svg[data-agt-estado="acompana"]'),
+      container.querySelector('[data-creature="angelita"][data-agt-estado="base"]'),
     ).toBeInTheDocument();
   });
 
   test('glow + state coexisten sin conflicto', () => {
     const { container } = render(<ChagraAgentAvatar state="speaking" glow />);
-    const svg = container.querySelector('svg.agt-angelita');
-    expect(svg.getAttribute('data-agt-estado')).toBe('respondiendo');
-    expect(svg.classList.contains('agt-avatar-glow')).toBe(true);
+    const cuerpo = container.querySelector('[data-creature="angelita"]');
+    expect(cuerpo.getAttribute('data-agt-estado')).toBe('animada');
+    expect(cuerpo.classList.contains('agt-avatar-glow')).toBe(true);
   });
 });
 

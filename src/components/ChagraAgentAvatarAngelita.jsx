@@ -1,4 +1,4 @@
-import Angelita from '../visual/agente/Angelita';
+import CompaiLamina from '../visual/creatures/laminaViva/CompaiLamina.jsx';
 
 /**
  * ChagraAgentAvatarAngelita — Angelita (la abeja angelita, Tetragonisca
@@ -10,12 +10,22 @@ import Angelita from '../visual/agente/Angelita';
  * (polinizador en los mundos 3D, `colibri_svg` como preferencia explícita) —
  * pero deja de ser el asistente.
  *
+ * LÁMINA VIVA (feat/compai-laminas-en-movimiento): el cuerpo YA NO es el SVG
+ * dibujado a mano (`visual/agente/Angelita.jsx`) — es la lámina Humboldt real
+ * (`compai/laminas/angelita.png`) recortada en capas y rigeada rubber-hose,
+ * ver `visual/creatures/laminaViva/CompaiLamina.jsx`. Angelita.jsx SIGUE
+ * viva y sin tocar: la usan directo los call-sites que necesitan su
+ * vocabulario conversacional completo (burbuja de pensar, gota de
+ * preocupación, signo "no sé", chispas — overlays SVG que la lámina no
+ * reproduce, fuera del alcance de este cambio). Este adaptador es SOLO la
+ * cara compacta del avatar (FAB/selector/overlay), no el chat.
+ *
  * Adaptador puro: traduce la API histórica del avatar del agente
  * (state 'idle'|'thinking'|'speaking'|'listening', glow, withLabel,
  * onClick/onDoubleClick) al vocabulario de estados de Angelita
  * (angelitaEstados.js). Cero lógica nueva de agente.
  *
- * Español de Colombia (usted), sin voseo. SVG + CSS: liviano, sin three.
+ * Español de Colombia (usted), sin voseo.
  */
 
 /* API histórica → estados conversacionales de Angelita. Un state desconocido
@@ -46,15 +56,19 @@ export default function ChagraAgentAvatarAngelita({
 }) {
     const estado = ESTADO_DE_STATE[state] || 'acompana';
     const abeja = (
-        <Angelita
+        <CompaiLamina
+            tipo="angelita"
             estado={estado}
             size={size}
             visema={visema}
-            confianza={confianza}
             className={`${glow ? 'agt-avatar-glow ' : ''}${className}`.trim() || undefined}
             title={ariaLabel}
         />
     );
+    // `confianza` (anillo de certeza del modo científico) es un overlay SVG
+    // de Angelita.jsx que la lámina no reproduce (ver docstring del módulo) —
+    // se acepta el prop por paridad de API pero no tiene efecto visual aquí.
+    void confianza;
 
     const contenido = withLabel ? (
         <span style={{ display: 'inline-flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>

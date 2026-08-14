@@ -1,43 +1,23 @@
-import OsoBaston from '../visual/creatures/OsoBaston';
+import CompaiLamina from '../visual/creatures/laminaViva/CompaiLamina.jsx';
 
 /**
  * ChagraAgentAvatarOsoBaston — el oso del bastón (Tremarctos ornatus,
  * caminante de los Andes) como CARA del agente de Chagra, 5ta opción del
  * elenco.
  *
- * Cierra parte del ítem #8 del GAP compAI (2026-08-13): el oso del bastón ya
- * tenía cuerpo dibujado (`OsoBaston.jsx`, cruzó a la PWA el 2026-08-11) y ya
- * estaba marcado `enPWA:true` bajo el slug `oso-baston` en
- * `compai/nucleo/elenco.js` (#96) — pero ningún selector lo ofrecía. Este
- * adaptador es el que faltaba.
+ * LÁMINA VIVA (feat/compai-laminas-en-movimiento): el cuerpo YA NO es el SVG
+ * rubber-hose dibujado a mano (`visual/creatures/OsoBaston.jsx`) — es la
+ * lámina Humboldt real (`compai/laminas/oso-baston.png`, el oso con bastón
+ * florecido de frailejón y orquídea) recortada en capas y rigeada, ver
+ * `visual/creatures/laminaViva/CompaiLamina.jsx`. OsoBaston.jsx sigue en
+ * disco sin tocar — este adaptador solo cambia SU cuerpo.
  *
- * Adaptador puro (mismo contrato que ChagraAgentAvatarZariguya): traduce la
- * API histórica del avatar del agente (state 'idle'|'thinking'|'speaking'|
- * 'listening', glow, withLabel, onClick/onDoubleClick) al vocabulario de VIDA
- * de `OsoBaston.jsx` (`visual/creatures/`). Cero lógica nueva de agente, cero
- * cambios en `visual/creatures/`.
- *
- *   - idle       → pose 'anda' (base, plantado en su trocha).
- *   - thinking   → pose 'anda' + `resopla=true`: el huff pesado con vaho —
- *                  su reacción-firma leída como "atento/calculando".
- *   - speaking   → pose 'celebra' (el bastón late en flor) + visema.
- *   - listening  → pose 'reposo': se posa atento.
+ * Adaptador puro (mismo contrato que los hermanos): traduce la API histórica
+ * del avatar del agente (state 'idle'|'thinking'|'speaking'|'listening',
+ * glow, withLabel, onClick/onDoubleClick) al `estado` que CompaiLamina
+ * entiende — sin capa de resoplido/lip-sync propia (alcance mínimo
+ * ojos+cabeza+respiración, ver el docstring de CompaiLamina).
  */
-const POSE_DE_STATE = {
-    idle: 'anda',
-    thinking: 'anda',
-    speaking: 'celebra',
-    listening: 'reposo',
-};
-
-const RESOPLA_DE_STATE = {
-    thinking: true,
-};
-
-const VISEMA_DE_STATE = {
-    speaking: 'V2',
-};
-
 export default function ChagraAgentAvatarOsoBaston({
     state = 'idle',
     size = 48,
@@ -48,15 +28,10 @@ export default function ChagraAgentAvatarOsoBaston({
     className = '',
     ariaLabel = 'Chagra IA',
 }) {
-    const pose = POSE_DE_STATE[state] || 'anda';
-    const resopla = !!RESOPLA_DE_STATE[state];
-    const visema = VISEMA_DE_STATE[state] || null;
-
     const bicho = (
-        <OsoBaston
-            pose={pose}
-            resopla={resopla}
-            visema={visema}
+        <CompaiLamina
+            tipo="oso-baston"
+            estado={state}
             size={size}
             title={ariaLabel}
             className={className}
