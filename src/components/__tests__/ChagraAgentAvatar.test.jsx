@@ -52,12 +52,25 @@ describe('ChagraAgentAvatar — Angelita default: glow + double-click + migraci�
     expect(container.querySelector('svg.agt-angelita')).toBeInTheDocument();
 
     act(() => {
-      localStorage.setItem('compai:companero', 'maiz');
+      localStorage.setItem('compai:companero', 'jaguar');
+      window.dispatchEvent(new CustomEvent('chagra:agent-avatar-changed', { detail: 'jaguar' }));
+    });
+
+    expect(container.querySelector('svg[data-creature="jaguar"]')).toBeInTheDocument();
+    expect(container.querySelector('svg.agt-angelita')).not.toBeInTheDocument();
+  });
+
+  test('maiz se retiró del roster (2026-08-14): el evento global con maiz ya no cambia el avatar', () => {
+    const { container } = render(<ChagraAgentAvatar state="idle" />);
+    expect(container.querySelector('svg.agt-angelita')).toBeInTheDocument();
+
+    act(() => {
       window.dispatchEvent(new CustomEvent('chagra:agent-avatar-changed', { detail: 'maiz' }));
     });
 
-    expect(container.querySelector('svg.chagra-maiz')).toBeInTheDocument();
-    expect(container.querySelector('svg.agt-angelita')).not.toBeInTheDocument();
+    // 'maiz' ya no está en AVATAR_TYPES: el hook ignora el evento y el
+    // avatar se queda en Angelita (no en chagra-maiz).
+    expect(container.querySelector('svg.agt-angelita')).toBeInTheDocument();
   });
 
   test('sin onClick ni onDoubleClick renderiza solo el SVG (no button)', () => {

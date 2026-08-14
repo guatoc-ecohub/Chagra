@@ -851,6 +851,15 @@ export function setNotificationStyle(style) {
  *   - chivito: Oxypogon guerinii (chivito/barbudito de páramo) — grounded puya_clava_herculis.json
  *   - danta:   Tapirus pinchaque (danta de montaña) — grounded vaccinium_floribundum.json
  *   - rana:    Phyllobates terribilis (rana dorada) — endémica del Chocó, real y verificable
+ *
+ * @deprecated (2026-08-14) `GuardianEspiritu.jsx` — el selector de 5 fauna
+ * que consumía este par lectura/escritura — se DESCONECTÓ de DashboardLive.jsx
+ * y MontanaMundosCampesino.jsx (unificación compAI: la elección de compañero
+ * vive ahora en `AgentAvatarSelector`/`useAgentAvatarType`, roster de 7). Este
+ * servicio y `guardian_especie` NO se borran — quedan funcionales por si algún
+ * perfil viejo todavía lo tiene guardado — pero ya no hay UI que escriba en
+ * ellos. NO confundir con `vitalidadEspirituService.js` (otro sistema, activo,
+ * no tocado por esta deprecación).
  */
 export const GUARDIAN_ESPECIE_IDS = Object.freeze(['abeja', 'oso', 'chivito', 'danta', 'rana']);
 /** Guardián por defecto: la abeja angelita (protagonista del mockup aprobado). */
@@ -861,6 +870,8 @@ export const DEFAULT_GUARDIAN_ESPECIE = 'abeja';
  * persistido si es válido; `null` si el usuario aún no ha elegido (para que el
  * home pueda distinguir "sin elegir" de "eligió el default").
  *
+ * @deprecated ver la nota de GUARDIAN_ESPECIE_IDS — GuardianEspiritu.jsx ya no
+ * está montado en ningún lugar de la app (2026-08-14).
  * @returns {'abeja'|'oso'|'chivito'|'danta'|'rana'|null}
  */
 export function getGuardianEspecie() {
@@ -873,6 +884,8 @@ export function getGuardianEspecie() {
  * desconocidos para no corromper el perfil. Emite `chagra:guardian-changed` y
  * `chagra:profile-changed` para que el home/saludo re-lean el espíritu en vivo.
  *
+ * @deprecated ver la nota de GUARDIAN_ESPECIE_IDS — GuardianEspiritu.jsx ya no
+ * está montado en ningún lugar de la app (2026-08-14).
  * @param {'abeja'|'oso'|'chivito'|'danta'|'rana'} id
  * @returns {Object|null} perfil resultante, o null si el id era inválido
  */
