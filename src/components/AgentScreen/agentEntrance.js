@@ -62,7 +62,27 @@ export const AGENT_COMPOSITOR_CSS = `
     position: relative; overflow: hidden;
     flex-direction: column; align-items: stretch;
   }
+  /* REINVENCIÓN "organismo que conversa": el compositor lleva una COSTURA VIVA —
+     una hebra del acento del tema en el borde superior que respira, para que el
+     pill se sienta parte del organismo, no una caja muerta sobre la escena. */
+  .as-bar::before {
+    content: ''; position: absolute; top: 0; left: 14px; right: 14px; height: 2px;
+    border-radius: 2px; pointer-events: none;
+    background: linear-gradient(90deg,
+      transparent,
+      rgba(var(--t-accent-rgb, 25, 201, 154), 0.85) 30%,
+      rgba(var(--t-accent-rgb, 25, 201, 154), 0.85) 70%,
+      transparent);
+    animation: as-costura-viva 4.2s ease-in-out infinite;
+  }
+  @keyframes as-costura-viva {
+    0%, 100% { opacity: 0.35; }
+    50%      { opacity: 0.9; }
+  }
   .as-bar.is-recording { border-color: rgba(244,63,94,0.6); }
+  .as-bar.is-recording::before {
+    background: linear-gradient(90deg, transparent, rgba(244,63,94,0.9) 30%, rgba(244,63,94,0.9) 70%, transparent);
+  }
   .as-bar:focus-within {
     border-color: rgba(16,185,129,0.55);
     box-shadow: 0 10px 30px -12px rgba(0,0,0,0.5), 0 0 0 3px rgba(16,185,129,0.12);
@@ -167,6 +187,7 @@ export const AGENT_COMPOSITOR_CSS = `
      texto"). El overlay trae su propio estilo en agent/AgentShell.jsx. */
   @media (prefers-reduced-motion: reduce) {
     .as-shimmer::after, .as-sending { animation: none !important; }
+    .as-bar::before { animation: none !important; opacity: 0.55; }
     .as-tool { animation: none !important; }
     .as-mic-big { animation: none !important; }
     /* Grabación sin movimiento: cae a un anillo estático (::before congelado
