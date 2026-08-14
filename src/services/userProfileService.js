@@ -895,11 +895,13 @@ export function setGuardianEspecie(id) {
 // siempre) — es un marco OPCIONAL, nunca el camino forzado.
 //
 // NO CONFUNDIR con `valle3d` (usePrefsStore, ProfileScreen `Valle3DSection`):
-// esa es la banda "El valle en 3D" de EntradaValle3D — un diorama propio en
-// React-Three-Fiber (three r180, mismo bundle de la app) que abre DENTRO del
-// dashboard. Este `marco3d` es el valle VANILLA (three r160 aislado en su
-// propio importmap dentro del iframe) que REEMPLAZA la entrada entera. Dos
-// experiencias distintas, dos flags distintos, a propósito.
+// esa es la banda "El valle en 3D" en el dashboard (App.jsx `case 'valle3d'`)
+// — desde task #42 (2026-08-14) también abre el MISMO valle vanilla (antes
+// abría `EntradaValle3D`, un diorama aparte en React-Three-Fiber). La
+// diferencia entre los dos flags es la FORMA de entrar, no el destino: este
+// `marco3d` REEMPLAZA la entrada entera; `valle3d` solo agrega una banda
+// dentro del dashboard. Dos flags distintos a propósito (ver ValleMarcoScreen.jsx,
+// "DOS PUERTAS, UN VALLE").
 export const DEFAULT_MARCO3D = false;
 
 /**

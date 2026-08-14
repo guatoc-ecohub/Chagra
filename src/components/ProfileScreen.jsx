@@ -1345,6 +1345,12 @@ function SonidoSection() {
  * Doble gate: además del flag, el device-tier (deviceTier.js) decide — en
  * equipos humildes la banda no aparece y el home 2D sigue idéntico. Acá se
  * le dice honesto al usuario qué verá su equipo.
+ *
+ * DESDE task #42 (2026-08-14) la banda monta el mismo `<ValleMarcoScreen>`
+ * (valle vanilla canónico) que `Marco3DSection` de abajo — antes abría un
+ * diorama aparte (`EntradaValle3D`, React-Three-Fiber). Sigue siendo una
+ * PUERTA distinta a propósito (banda dentro del dashboard, no reemplaza toda
+ * la entrada): ver la nota "DOS PUERTAS, UN VALLE" en ValleMarcoScreen.jsx.
  */
 function Valle3DSection() {
   const valle3d = usePrefsStore((s) => s.valle3d ?? false);
@@ -1407,11 +1413,12 @@ function Valle3DSection() {
  * (ValleMarcoScreen.jsx), detrás de sesión. Persiste en el perfil (`marco3d`,
  * userProfileService), DEFAULT OFF.
  *
- * NO ES `Valle3DSection` de arriba: ese toggle prende una banda del diorama
- * propio de la app (EntradaValle3D, React-Three-Fiber, three r180) dentro del
- * dashboard. Este prende el valle vanilla completo (three r160, aislado en su
- * propio importmap) que REEMPLAZA la entrada entera — dos experiencias,
- * copy deliberadamente distinto para no confundirlas.
+ * DISTINTO de `Valle3DSection` de arriba en la FORMA de entrar, no en el
+ * DESTINO — desde task #42 (2026-08-14) las dos puertas montan el mismo
+ * `<ValleMarcoScreen>` (el valle vanilla canónico). Este toggle REEMPLAZA la
+ * entrada entera (`case 'dashboard'`); el de arriba solo agrega una banda
+ * dentro del dashboard (`case 'valle3d'`) — dos formas de llegar al mismo
+ * valle, copy deliberadamente distinto para no confundir la FORMA.
  */
 function Marco3DSection() {
   const [marco3d, setMarco3dState] = useState(() => getMarco3DPreference());

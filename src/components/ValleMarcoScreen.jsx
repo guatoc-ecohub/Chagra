@@ -1,7 +1,7 @@
 /*
- * ValleMarcoScreen — el "marco de entrada" OPCIONAL: el valle 3D vanilla
- * (three r160, el mismo build que sirve 3d.guatoc.co) embebido a pantalla
- * completa dentro del shell autenticado, vía <iframe src="/valle/index.html">.
+ * ValleMarcoScreen — el "marco de entrada" al valle 3D vanilla (three r160,
+ * el mismo build que sirve 3d.guatoc.co) embebido a pantalla completa vía
+ * <iframe src="/valle/index.html">.
  *
  * POR QUÉ IFRAME (decisión del operador, no rediseñar): el valle vanilla
  * corre three r160 con su propio importmap, AISLADO del three r180 que usa
@@ -10,22 +10,50 @@
  * estático vive en `public/valle/` (sincronizado por `scripts/sync-valle.mjs`
  * desde el repo vanilla — ver ese script para qué se copia y qué NO).
  *
- * NO CONFUNDIR con `Valle3DSection`/`valle3d` de ProfileScreen.jsx: ese es
- * OTRO valle — un diorama propio en React-Three-Fiber (EntradaValle3D) que
- * abre DENTRO del dashboard. Este componente es el valle vanilla completo,
- * REEMPLAZANDO la entrada.
+ * DOS PUERTAS, UN VALLE (recableado task #42, 2026-08-14): este componente
+ * hoy tiene DOS puntos de montaje en App.jsx, cada uno con su propio flag de
+ * perfil — `marco3d` (Marco3DSection, REEMPLAZA la entrada entera en `case
+ * 'dashboard'`) y `valle3d` (Valle3DSection, banda en "Los mundos de su
+ * finca" → `case 'valle3d'`). Antes de este recableado, `valle3d` abría
+ * `EntradaValle3D` — un diorama APARTE en React-Three-Fiber que nunca vio
+ * los rigs compai rediseñados (F24/F25) que sólo aterrizaron en el valle
+ * vanilla. Regla de oro: re-rutear, no reimplementar — las dos puertas
+ * montan ESTE mismo componente; `EntradaValle3D` (src/mockups/EntradaValle3D)
+ * sigue existiendo intacto como vitrina de diseño en `#/mockups/entrada-3d`
+ * (`case 'mockup_entrada_3d'`) y como home de `prod.chagra.app`
+ * (ProdChagraApp.jsx tiene su propio router, ajeno a este) — fuera de
+ * alcance de este cambio.
+ *
+ * EL COMPAI ELEGIDO VIAJA SOLO (sin plomería nueva) — el iframe es
+ * SAME-ORIGIN (`/valle/index.html` vive bajo el mismo dominio que la PWA),
+ * así que comparte el localStorage del documento padre: `leerCompanero()`
+ * dentro del valle vanilla (compai/elenco.js, el mismo módulo portado, ver
+ * src/compai/nucleo/elenco.js) lee la MISMA llave canónica `compai:companero`
+ * que ya escribió `escribirCompanero()` en la PWA (useAgentAvatarType.js).
+ * Además se pasa `?compai=<slug>` explícito en el src del iframe — lo honran
+ * hoy los mundos autónomos que ya saben leerlo (siembra.js, el kart), no el
+ * portal principal (`main.js`: ahí `?compai=1` es OTRO flag, booleano, para
+ * un overlay de guía-lámina opt-in — colisión de nombre heredada del repo
+ * vanilla, no se resuelve aquí). Pasarlo no hace daño (main.js lo ignora al
+ * no ser `'1'`) y sirve de refuerzo si algún día el portal empieza a leerlo.
  *
  * GATE DE LOGIN: App.jsx solo monta este componente cuando `currentView ===
- * 'dashboard'` (alcanzable únicamente tras `isAuthenticated()` en el boot) Y
- * la preferencia de perfil `marco3d` está en true. Sin sesión, este
- * componente JAMÁS se monta — no hay ruta que lo alcance sin pasar por el
- * gate de auth de App.jsx.
+ * 'dashboard'`/`'valle3d'` (ambos alcanzables únicamente tras
+ * `isAuthenticated()` en el boot: la raíz sin sesión aterriza en `login`, ver
+ * App.jsx). Sin sesión, este componente JAMÁS se monta.
  *
  * Sin sandbox: el iframe es same-origin y necesita ejecutar su propio JS de
  * módulo (importmap) — un `sandbox` a medias lo rompería. La CSP del
- * documento padre (index.html, default-src 'self') no aplica al documento
- * del iframe (otro HTML, otro contexto); `/valle/index.html` no trae su
- * propia CSP, igual que en 3d.guatoc.co hoy.
+ * documento padre (index.html, `default-src 'self'`) YA permite este iframe
+ * SIN NINGÚN CAMBIO: no hay directiva `frame-src` propia, así que el
+ * fallback a `default-src 'self'` cubre un iframe same-origin como este —
+ * distinto sería embeber el valle como ORIGEN REMOTO cross-origin (p. ej. si
+ * en vez de este bundle sincronizado se apuntara directo a 3d.guatoc.co),
+ * que sí necesitaría `frame-src` explícito en la CSP; no es el caso aquí, ni
+ * lo será mientras el marco siga sirviendo la copia same-origin de
+ * `public/valle/`. La CSP del documento padre no aplica al documento del
+ * iframe (otro HTML, otro contexto); `/valle/index.html` no trae su propia
+ * CSP, igual que en 3d.guatoc.co hoy.
  *
  * FULLSCREEN — DOS CAPAS, NINGUNA CONFIADA SOLA: el valle vanilla (standalone
  * en 3d.guatoc.co) pide Fullscreen API por su cuenta al cargar. Este marco NO
@@ -56,14 +84,28 @@
  *      específico no aplica aquí (sí sigue aplicando en 3d.guatoc.co
  *      standalone, fuera del marco).
  */
-import { useCallback, useEffect } from 'react';
+import { useCallback, useEffect, useMemo } from 'react';
 import { setMarco3DPreference } from '../services/userProfileService';
+import { leerCompanero } from '../compai/nucleo/elenco.js';
 
 /**
  * @param {Object} props
  * @param {() => void} props.onExit - vuelve a la entrada simple del home.
+ * @param {boolean} [props.apagaMarco3dAlSalir] - si TRUE, salir apaga la
+ *   preferencia de perfil `marco3d` (Marco3DSection en ProfileScreen.jsx) —
+ *   comportamiento HISTÓRICO de la puerta `dashboard`: sin esto el usuario
+ *   quedaba sin forma de volver a la entrada simple salvo por Perfil (ver
+ *   docstring del archivo). La puerta `valle3d` (banda de "Los mundos de su
+ *   finca", Valle3DSection) NO debe tocar esta preferencia AJENA — apagarla
+ *   por sorpresa desactivaría un ajuste que esa persona nunca prendió.
+ *   Default false: quien no lo pasa explícito no muta ninguna preferencia.
  */
-export default function ValleMarcoScreen({ onExit }) {
+export default function ValleMarcoScreen({ onExit, apagaMarco3dAlSalir = false }) {
+  // EL COMPAI ELEGIDO (ver docstring del archivo): se lee UNA vez al montar
+  // — leerCompanero() no lanza y ya trae su propio default ('angelita'), así
+  // que esto nunca deja el src del iframe sin `compai`.
+  const compai = useMemo(() => leerCompanero(), []);
+  const valleSrc = `/valle/index.html?compai=${encodeURIComponent(compai)}`;
   // Guard de fullscreen (capa 2, ver docstring del archivo): mientras este
   // componente está montado, si CUALQUIER cosa entra a fullscreen en este
   // documento (el iframe promovido desde su contenido interno), se revierte
@@ -96,9 +138,9 @@ export default function ValleMarcoScreen({ onExit }) {
   // reactiva desde su perfil. Evita dejarlo atrapado en pantalla completa
   // sin salida.
   const volverASimple = useCallback(() => {
-    setMarco3DPreference(false);
+    if (apagaMarco3dAlSalir) setMarco3DPreference(false);
     onExit?.();
-  }, [onExit]);
+  }, [onExit, apagaMarco3dAlSalir]);
 
   return (
     <div className="fixed inset-0 z-40 bg-black" data-testid="valle-marco-screen">
@@ -124,8 +166,10 @@ export default function ValleMarcoScreen({ onExit }) {
         // `npm run build` + `vite preview`) sirve `/valle/` bien porque ahí
         // no hay SPA fallback de dev — pero un filename explícito resuelve
         // igual de directo en AMBOS casos (dev y prod), así que se usa
-        // siempre para no depender de esa asimetría.
-        src="/valle/index.html"
+        // siempre para no depender de esa asimetría. `?compai=<slug>` viaja
+        // explícito (ver docstring del archivo, "EL COMPAI ELEGIDO VIAJA
+        // SOLO") además del localStorage ya compartido same-origin.
+        src={valleSrc}
         title="Valle 3D de Guatoc"
         className="absolute inset-0 w-full h-full border-0"
         // Sin allow="fullscreen"/allowFullScreen a propósito — ver docstring

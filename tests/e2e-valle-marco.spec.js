@@ -9,8 +9,9 @@ import { test, expect } from '@playwright/test';
  *   2. Con sesión y `marco3d=false` (default), la entrada es la simple de
  *      siempre (dashboard clásico), sin iframe.
  *   3. Con sesión y `marco3d=true`, la entrada es el iframe a pantalla
- *      completa `src="/valle/index.html"`, y "Entrada simple" apaga la
- *      preferencia y vuelve al dashboard.
+ *      completa `src="/valle/index.html?compai=<slug>"` (el compai elegido
+ *      viaja como querystring — task #42, ver ValleMarcoScreen.jsx), y
+ *      "Entrada simple" apaga la preferencia y vuelve al dashboard.
  *
  * Backend mockeado igual que tests/e2e-integral-logueado.spec.js (mismo
  * patrón: seedSession + mockBackend + login vía authService real contra
@@ -137,7 +138,9 @@ test.describe('marco de entrada — valle 3D vanilla (iframe)', () => {
     const marco = page.getByTestId('valle-marco-screen');
     await expect(marco).toBeVisible({ timeout: 20000 });
     const iframe = marco.locator('iframe');
-    await expect(iframe).toHaveAttribute('src', '/valle/index.html');
+    // `?compai=<slug>` viaja siempre (leerCompanero() trae su propio default
+    // 'angelita' — nunca vacío), así que el match es por prefijo, no exacto.
+    await expect(iframe).toHaveAttribute('src', /^\/valle\/index\.html\?compai=/);
 
     await page.getByTestId('valle-marco-salir').click();
     // Timeout generoso (default 5000ms no alcanza): CONFIRMADO por
