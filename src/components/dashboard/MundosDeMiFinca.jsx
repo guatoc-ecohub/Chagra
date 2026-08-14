@@ -8,9 +8,12 @@ import { useProCapability } from '../../hooks/useProCapability';
 import usePrefsStore from '../../store/usePrefsStore';
 /* Import DIRECTO de deviceTier (no el barrel de mundo3d): este archivo vive en
    el bundle base del home y solo necesita el tiering (three-free, 0 deps). */
-// El tiering 3D-vs-2D lo decide el propio view EntradaValle3D; el home solo
-// muestra la puerta cuando el usuario prendió el flag. (Se quitó `permite3D`:
-// antes ocultaba la entrada en tier 'bajo' → prender el toggle no hacía nada.)
+// El home solo muestra la puerta cuando el usuario prendió el flag. (Se quitó
+// `permite3D` de este archivo: antes ocultaba la entrada en tier 'bajo' →
+// prender el toggle no hacía nada — el tiering de la vista de destino, si
+// aplica, es asunto suyo, no de esta banda.) Desde task #42 (2026-08-14) la puerta abre
+// el valle vanilla canónico (ValleMarcoScreen, ver App.jsx `case 'valle3d'`),
+// no el diorama EntradaValle3D.
 import './mundos-finca.css';
 
 /**

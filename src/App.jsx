@@ -2911,7 +2911,11 @@ export default function App() {
         if (!sinSesion && marco3dActivo) {
           return (
             <ErrorBoundary>
-              <ValleMarcoScreen onExit={() => navigate('dashboard')} />
+              {/* apagaMarco3dAlSalir: ESTA puerta sí debe apagar `marco3d` al
+                  salir (comportamiento histórico, ver ValleMarcoScreen.jsx) —
+                  distinto de la puerta `valle3d` más abajo, que no toca esta
+                  preferencia. */}
+              <ValleMarcoScreen onExit={() => navigate('dashboard')} apagaMarco3dAlSalir />
             </ErrorBoundary>
           );
         }
@@ -3872,23 +3876,42 @@ export default function App() {
           </ErrorBoundary>
         );
       case 'valle3d':
-        // EL VALLE 3D DESDE EL HOME (FASE 0 del plan game-dev): la MISMA
-        // EntradaValle3D de la vitrina (#/mockups/entrada-3d) montada como
-        // vista REAL de la app, con `onNavigate`: las puertas de los mundos
-        // abren las pantallas de verdad (regla de oro: re-rutear, nunca
-        // reimplementar). Se llega por la banda de MundosDeMiFinca, gated por
-        // el flag de prefs `valle3d` (default OFF, Perfil) + device-tier;
-        // adentro el tiering decide 3D pleno/frugal o el valle 2D digno.
+        // EL VALLE 3D DESDE EL HOME (task #42, recableado 2026-08-14): esta
+        // vista abría `EntradaValle3D` — un diorama APARTE en
+        // React-Three-Fiber (three r180) que nunca vio los rigs compai
+        // rediseñados (F24/F25): esos SOLO aterrizaron en el valle vanilla
+        // (three r160, `~/demos/3d`, servido en 3d.guatoc.co). Se llega por
+        // la banda de MundosDeMiFinca, gated por el flag de prefs `valle3d`
+        // (Perfil → Valle3DSection) + device-tier.
+        //
+        // Ahora monta el MISMO <ValleMarcoScreen> que ya usa `case
+        // 'dashboard'`/Marco3DSection (regla de oro: re-rutear, nunca
+        // reimplementar un segundo embed) — el valle CANÓNICO, con lo
+        // último, en vez del mockup. `apagaMarco3dAlSalir` se omite a
+        // propósito: esta puerta no debe tocar la preferencia `marco3d`,
+        // ajena a la suya (ver ValleMarcoScreen.jsx).
+        //
+        // EL COMPAI viaja solo (ValleMarcoScreen lee `leerCompanero()` y lo
+        // suma como `?compai=<slug>` al iframe — ver su docstring).
+        //
+        // LÍMITE CONOCIDO (no resuelto en este cambio): `EntradaValle3D`
+        // aceptaba `initialMundoId`/`currentViewData?.mundo` para saltar
+        // directo a un mundo puntual (deep-link de voz, ver
+        // escuchaIntentRouter.js `rutaMundo3D`). El valle vanilla SÍ soporta
+        // saltar a un mundo autónomo por querystring (`?mundo=<id>` en
+        // `~/demos/3d/main.js`), pero su vocabulario de ids
+        // (abejas/siembra/cafetal/mercado/aguacatal/papa/invernadero/ceiba/
+        // paramo/animales) NO calza 1:1 con el de la PWA
+        // (cafe/agua/suelo/animales/sanidad/mercado/clima/semillero) — mapear
+        // eso a ciegas arriesgaba mandar a la persona al mundo EQUIVOCADO,
+        // así que se deja fuera de alcance: hoy esos deep-links aterrizan en
+        // la entrada general del valle, no en el mundo puntual pedido por
+        // voz. `EntradaValle3D` sigue intacto en `#/mockups/entrada-3d`
+        // (`case 'mockup_entrada_3d'`, arriba) como referencia de diseño.
         return (
           <ErrorBoundary>
             <ErrorFallback moduleName="El valle de su finca (3D)">
-              <EntradaValle3DMockup
-                onBack={() => navigate(sinSesion ? 'login' : 'dashboard')}
-                // @ts-ignore navigate signature
-                onNavigate={navigate}
-                // @ts-ignore initialMundoId not in strict type
-                initialMundoId={currentViewData?.mundo}
-              />
+              <ValleMarcoScreen onExit={() => navigate(sinSesion ? 'login' : 'dashboard')} />
             </ErrorFallback>
           </ErrorBoundary>
         );
