@@ -1,42 +1,22 @@
-import { Luciernaga } from '../visual/creatures/Luciernaga';
+import CompaiLamina from '../visual/creatures/laminaViva/CompaiLamina.jsx';
 
 /**
  * ChagraAgentAvatarLuciernaga — la luciérnaga (cocuyo, Lampyridae) como CARA
  * del agente de Chagra, 6ta opción del elenco.
  *
- * Cierra parte del ítem #8 del GAP compAI (2026-08-13): la luciérnaga ya
- * tenía cuerpo dibujado (`Luciernaga.jsx`, cruzó a la PWA el 2026-08-11) y ya
- * estaba marcada `enPWA:true` en `compai/nucleo/elenco.js` (#96) — pero
- * ningún selector la ofrecía. Este adaptador es el que faltaba.
+ * LÁMINA VIVA (feat/compai-laminas-en-movimiento): el cuerpo YA NO es el SVG
+ * rubber-hose dibujado a mano (`visual/creatures/Luciernaga.jsx`) — es la
+ * lámina Humboldt real (`compai/laminas/luciernaga.png`) recortada en capas
+ * y rigeada, ver `visual/creatures/laminaViva/CompaiLamina.jsx`.
+ * Luciernaga.jsx sigue en disco sin tocar — este adaptador solo cambia SU
+ * cuerpo.
  *
- * Adaptador puro (mismo contrato que ChagraAgentAvatarZariguya): traduce la
- * API histórica del avatar del agente (state 'idle'|'thinking'|'speaking'|
- * 'listening', glow, withLabel, onClick/onDoubleClick) al vocabulario de VIDA
- * de `Luciernaga.jsx` (`visual/creatures/`). Cero lógica nueva de agente,
- * cero cambios en `visual/creatures/`.
- *
- *   - idle       → pose 'vuela' (base, flota).
- *   - thinking   → pose 'vuela' + `eco='leer'`: la linterna pulsa atenta
- *                  mientras "lee la noche" — su reacción-firma científica
- *                  leída como "pensando".
- *   - speaking   → pose 'celebra' + visema del lip-sync.
- *   - listening  → pose 'reposo': se posa atenta.
+ * Adaptador puro (mismo contrato que los hermanos): traduce la API histórica
+ * del avatar del agente (state 'idle'|'thinking'|'speaking'|'listening',
+ * glow, withLabel, onClick/onDoubleClick) al `estado` que CompaiLamina
+ * entiende — sin capa de eco/lip-sync propia (alcance mínimo
+ * ojos+cabeza+respiración, ver el docstring de CompaiLamina).
  */
-const POSE_DE_STATE = {
-    idle: 'vuela',
-    thinking: 'vuela',
-    speaking: 'celebra',
-    listening: 'reposo',
-};
-
-const ECO_DE_STATE = {
-    thinking: 'leer',
-};
-
-const VISEMA_DE_STATE = {
-    speaking: 'V2',
-};
-
 export default function ChagraAgentAvatarLuciernaga({
     state = 'idle',
     size = 48,
@@ -47,16 +27,10 @@ export default function ChagraAgentAvatarLuciernaga({
     className = '',
     ariaLabel = 'Chagra IA',
 }) {
-    const pose = POSE_DE_STATE[state] || 'vuela';
-    const eco = ECO_DE_STATE[state] || null;
-    const visema = VISEMA_DE_STATE[state] || null;
-
     const bicho = (
-        <Luciernaga
-            pose={pose}
-            eco={eco}
-            visema={visema}
-            tier={undefined}
+        <CompaiLamina
+            tipo="luciernaga"
+            estado={state}
             size={size}
             title={ariaLabel}
             className={className}

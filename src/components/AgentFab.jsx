@@ -1,5 +1,8 @@
 import React, { useState, useCallback, useEffect, useRef } from 'react';
 import ChagraAgentAvatar from './ChagraAgentAvatar';
+import CompaiLamina from '../visual/creatures/laminaViva/CompaiLamina.jsx';
+import { tieneLaminaViva } from '../visual/creatures/laminaViva/laminaAnatomia.js';
+import useCompaiElegido from '../visual/mundo3d/escenas/useCompaiElegido.js';
 import useAgentNotificationStore from '../store/useAgentNotificationStore';
 import usePrefsStore from '../store/usePrefsStore';
 import { isSpeaking, stop, replayLast, isKokoroAvailable, speakSentences } from '../services/ttsService';
@@ -74,6 +77,16 @@ export default function AgentFab({ onNavigate, pantalla = null }) {
   const [pressed, setPressed] = useState(false);
   const [menuAbierto, setMenuAbierto] = useState(false);
   const { level: ttsLevel } = useTtsAmplitude();
+  // LÁMINA VIVA (feat/compai-laminas-en-movimiento): el compAI elegido
+  // (useCompaiElegido, la MISMA llave canónica que CompaiOverlay/el
+  // selector) se dibuja con la lámina real recortada + rigeada en vez del
+  // SVG/rig vectorial a mano — ver CompaiLamina.jsx. `guacamaya` no tiene
+  // lámina PNG propia todavía (solo el rig vectorial F24, ver
+  // laminaAnatomia.js) — para ese caso (y cualquier slug futuro sin
+  // lámina) se cae al dispatcher de siempre (ChagraAgentAvatar), NUNCA se
+  // inventa arte para completarla.
+  const { avatarType: compaiElegido } = useCompaiElegido();
+  const hayLamina = tieneLaminaViva(compaiElegido);
 
   /* ── EL INTERRUPTOR MANUAL (auditoría 2026-07-26, ítems #101 y #103) ──────
      `silenciar()` — silencio INDEFINIDO, hasta que el usuario lo vuelva a
@@ -349,25 +362,36 @@ export default function AgentFab({ onNavigate, pantalla = null }) {
         }}
       >
         {/* pointer-events:none — CRÍTICO: el click debe caer en el BOTÓN, nunca
-            en el SVG. Angelita (o el maíz, o la zarigüeya) se REMONTA al
-            cambiar de estado (key=estado en su .agt-vuelo) y hover/pressed
-            cambian el estado: si el mousedown cae en un nodo del dibujo que se
-            desconecta antes del mouseup, el navegador se traga el click
-            (verificado con playwright 2026-07-16). `estado` viaja en el
-            vocabulario RICO de Angelita — ChagraAgentAvatar lo traduce si el
-            usuario eligió otro compAI (fix 2026-07-25: antes este FAB ignoraba
-            la elección por completo). */}
+            en el dibujo. hover/pressed cambian el estado: si el mousedown cae
+            en un nodo que se desconecta antes del mouseup, el navegador se
+            traga el click (verificado con playwright 2026-07-16). `estado`
+            viaja en el vocabulario RICO de Angelita — CompaiLamina lo
+            entiende directo (canonizarEstado); ChagraAgentAvatar lo traduce
+            para el respaldo sin lámina (fix 2026-07-25: antes este FAB
+            ignoraba la elección de compAI por completo). */}
         <span style={{ pointerEvents: 'none', display: 'flex' }} aria-hidden="true">
-          <ChagraAgentAvatar
-            // eslint-disable-next-line chagra-i18n/no-hardcoded-spanish -- estado visual canónico del agente
-            estado={ttsLevel > 0.035 ? 'respondiendo' : estado}
-            size={82}
-            visema={visemaFromAmplitude(ttsLevel)}
-            direccion="izquierda"
-            className={responseReady ? 'agt-avatar-glow' : undefined}
-            title="Chagra IA"
-            ariaLabel="Chagra IA"
-          />
+          {hayLamina ? (
+            <CompaiLamina
+              tipo={compaiElegido}
+              // eslint-disable-next-line chagra-i18n/no-hardcoded-spanish -- estado visual canónico del agente
+              estado={ttsLevel > 0.035 ? 'respondiendo' : estado}
+              size={82}
+              direccion="izquierda"
+              className={responseReady ? 'agt-avatar-glow' : undefined}
+              title="Chagra IA"
+            />
+          ) : (
+            <ChagraAgentAvatar
+              // eslint-disable-next-line chagra-i18n/no-hardcoded-spanish -- estado visual canónico del agente
+              estado={ttsLevel > 0.035 ? 'respondiendo' : estado}
+              size={82}
+              visema={visemaFromAmplitude(ttsLevel)}
+              direccion="izquierda"
+              className={responseReady ? 'agt-avatar-glow' : undefined}
+              title="Chagra IA"
+              ariaLabel="Chagra IA"
+            />
+          )}
         </span>
       </button>
 
