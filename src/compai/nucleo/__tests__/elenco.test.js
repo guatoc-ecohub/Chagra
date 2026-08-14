@@ -47,8 +47,17 @@ describe('leerCompanero', () => {
   });
 
   it('si la canónica está vacía, migra desde chagra:agent-avatar-type', () => {
-    const st = new StorageFalso({ 'chagra:agent-avatar-type': 'maiz' });
-    expect(leerCompanero(st)).toBe('maiz');
+    const st = new StorageFalso({ 'chagra:agent-avatar-type': 'jaguar' });
+    expect(leerCompanero(st)).toBe('jaguar');
+  });
+
+  it('maiz se retiró del selector (2026-08-14): migra a angelita en cualquier llave', () => {
+    expect(leerCompanero(/** @type {any} */ (new StorageFalso({ [LLAVE_COMPANERO]: 'maiz' })))).toBe('angelita');
+    expect(leerCompanero(/** @type {any} */ (new StorageFalso({ 'chagra:agent-avatar-type': 'maiz' })))).toBe('angelita');
+  });
+
+  it('chivito (sin punk) colapsó a chivito-punk (2026-08-14): migra solo', () => {
+    expect(leerCompanero(/** @type {any} */ (new StorageFalso({ [LLAVE_COMPANERO]: 'chivito' })))).toBe('chivito-punk');
   });
 
   it('si sólo hay guatoc.guia, migra desde ahí', () => {

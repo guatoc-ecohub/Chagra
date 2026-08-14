@@ -33,7 +33,13 @@ export const TAMANO_CANONICO = 14.2;
  */
 export const ELENCO = {
   angelita: { nombre: 'Angelita', gentilicio: 'la abeja de la casa', enPWA: true },
-  maiz: { nombre: 'Maíz', gentilicio: 'la planta de maíz', enPWA: true },
+  // El MAÍZ se retiró del selector el 2026-08-14 (unificación compAI a los 7
+  // canónicos: angelita/jaguar/oso/zariguya/luciernaga/chivito-punk/guacamaya
+  // — decisión del operador). Ya NO es una entrada del elenco: quien lo tenga
+  // guardado migra solo a Angelita vía SLUGS_JUBILADOS, abajo. El cuerpo 3D
+  // (MaizCompai/MaizCompaiEscena) sigue existiendo en el código — solo se
+  // retira como opción elegible.
+  //
   // La zarigüeya entró al elenco de la PWA el 2026-07-25 (PR #2783, crías al
   // lomo) — DESPUÉS de que este núcleo se escribió el 2026-07-26 y se le
   // olvidó incluirla aquí. Sin esta entrada, normalizarCompanero('zariguya')
@@ -41,6 +47,11 @@ export const ELENCO = {
   // silencio: la tercera opción de useAgentAvatarType.js nunca sobrevivía
   // el cruce por el núcleo (bug encontrado cableando #96).
   zariguya: { nombre: 'Zarigüeya', gentilicio: 'la zarigüeya', enPWA: true },
+  // 'oso' (Oso andino genérico) NUNCA tuvo cuerpo propio en la PWA — sigue
+  // sin uno a propósito (decisión del operador 2026-08-14: "NO crees un oso
+  // nuevo"). El oso SELECCIONABLE es 'oso-baston' (abajo): mismo animal
+  // (Tremarctos ornatus), la identidad ya aprobada, etiqueta visible "Oso de
+  // anteojos" en el selector (AgentAvatarSelector.jsx).
   oso: { nombre: 'Oso andino', gentilicio: 'el oso andino', enPWA: false },
   // El oso del bastón cruzó a la PWA el 2026-08-11 (OsoBaston.jsx: la dirección
   // CAMINANTE de la referencia aprobada — erguido, Cuphead de día, bastón
@@ -49,15 +60,33 @@ export const ELENCO = {
   // El jaguar cruzó a la PWA el 2026-08-11 (2.5D vivo: idle + paisaje del miedo):
   // Jaguar.jsx ya vive en src/visual/creatures y está en el registro CREATURES.
   jaguar: { nombre: 'Jaguar', gentilicio: 'el jaguar', enPWA: true },
-  guacamaya: { nombre: 'Guacamaya', gentilicio: 'la guacamaya', enPWA: false },
-  chivito: { nombre: 'Chivito', gentilicio: 'Chivito', enPWA: false },
+  // La guacamaya cruzó a la PWA el 2026-08-14 (GuacamayaCompai.jsx: reusa el rig F24
+  // del valle — `visual/creatures/arte-valle/guacamaya.*` — en vez de
+  // redibujarse a mano).
+  guacamaya: { nombre: 'Guacamaya', gentilicio: 'la guacamaya', enPWA: true },
+  // 🔧 CORRECCIÓN (2026-08-14, unificación compAI a 7): `chivito` y
+  // `chivito-punk` eran DOS entradas para el mismo personaje — el pájaro del
+  // páramo, normal quieto y con cresta sólo cuando habla, no dos esqueletos
+  // distintos (mismo criterio que la corrección espejo en
+  // `~/demos/3d/compai/elenco.js` del 2026-08-13). Colapsadas a UNA:
+  // `chivito-punk` (el slug que ya usan onboarding/portales/marco/idleMachine
+  // del lado del valle). Quien tuviera guardado el `chivito` viejo migra solo
+  // — ver SLUGS_JUBILADOS abajo. Cruzó a la PWA el mismo día (ChivitoPunk.jsx,
+  // rig F24 reusado, igual que la guacamaya).
+  'chivito-punk': { nombre: 'Chivito', gentilicio: 'el chivito', enPWA: true },
   // La luciérnaga cruzó a la PWA el 2026-08-11 (Luciernaga.jsx: escarabajo
   // bioluminiscente con la linterna-bioindicador, en el registro CREATURES).
   luciernaga: { nombre: 'Luciérnaga', gentilicio: 'la luciérnaga', enPWA: true },
 };
 
 /** Slugs jubilados que migran solos, sin que el usuario haga nada. */
-export const SLUGS_JUBILADOS = { colibri: 'angelita', colibri_svg: 'angelita' };
+export const SLUGS_JUBILADOS = {
+  colibri: 'angelita', colibri_svg: 'angelita',
+  // El maíz se retiró del selector el 2026-08-14 — ver la nota en ELENCO.
+  maiz: 'angelita',
+  // `chivito` (sin punk) era el mismo pájaro antes de la colapsada de arriba.
+  chivito: 'chivito-punk',
+};
 
 /** El compañero por defecto cuando no hay ninguna elección guardada. */
 export const COMPANERO_DEFECTO = 'angelita';

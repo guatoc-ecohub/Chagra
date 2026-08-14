@@ -1,21 +1,23 @@
 import { Check } from 'lucide-react';
 import useAgentAvatarType from '../../hooks/useAgentAvatarType';
 import ChagraAgentAvatarAngelita from '../ChagraAgentAvatarAngelita';
-import ChagraAgentAvatarMaiz from '../ChagraAgentAvatarMaiz';
 import ChagraAgentAvatarZariguya from '../ChagraAgentAvatarZariguya';
 import ChagraAgentAvatarJaguar from '../ChagraAgentAvatarJaguar';
 import ChagraAgentAvatarOsoBaston from '../ChagraAgentAvatarOsoBaston';
 import ChagraAgentAvatarLuciernaga from '../ChagraAgentAvatarLuciernaga';
+import ChagraAgentAvatarGuacamaya from '../ChagraAgentAvatarGuacamaya';
+import ChagraAgentAvatarChivitoPunk from '../ChagraAgentAvatarChivitoPunk';
 
 /**
  * AgentAvatarSelector — selector visual para el avatar del agente IA.
  *
- * 6 opciones: Angelita la abeja (default), planta de maíz, zarigüeya (crías
- * al lomo), jaguar, oso del bastón, luciérnaga. Persiste vía
- * useAgentAvatarType (localStorage `chagra:agent-avatar-type` + llave
- * canónica `compai:companero`, #96). Cambio inmediato — afecta a todas las
- * instancias del avatar en la app (FAB, login, chat, onboarding — ver
- * ChagraAgentAvatar.jsx, el dispatcher del que dependen).
+ * Los 7 canónicos (decisión del operador, 2026-08-14): Angelita la abeja
+ * (default), jaguar, oso de anteojos, zarigüeya (crías al lomo), luciérnaga,
+ * chivito de páramo, guacamaya. Persiste vía useAgentAvatarType (localStorage
+ * `chagra:agent-avatar-type` + llave canónica `compai:companero`, #96).
+ * Cambio inmediato — afecta a todas las instancias del avatar en la app
+ * (FAB, login, chat, onboarding — ver ChagraAgentAvatar.jsx, el dispatcher
+ * del que dependen).
  *
  * 2026-07-16 (operador): "Angelita como el agente, jubila el colibrí".
  * 2026-07-18 (operador): el colibrí sale también de las opciones — "solo
@@ -25,11 +27,22 @@ import ChagraAgentAvatarLuciernaga from '../ChagraAgentAvatarLuciernaga';
  * rubber-hose cálido de `visual/creatures/Zariguya.jsx` — NO la zarigüeya
  * oscura/neón de `dashboard/CriaturasNocturnas.jsx`).
  * 2026-08-13 (ítem #8 del GAP compAI — elenco unificado): 4ta-6ta opción,
- * jaguar/oso del bastón/luciérnaga — ya tenían cuerpo 2.5D dibujado y ya
+ * jaguar/oso de anteojos/luciérnaga — ya tenían cuerpo 2.5D dibujado y ya
  * estaban `enPWA:true` en `compai/nucleo/elenco.js` desde el 2026-08-11
- * (#96), pero este selector se había quedado en 3. Guacamaya y chivito NO
- * entran todavía: sin cuerpo 2.5D propio en la PWA (`ELENCO[...].enPWA` en
- * `compai/nucleo/elenco.js` sigue en `false` para ambos).
+ * (#96), pero este selector se había quedado en 3.
+ * 2026-08-14 (unificación compAI a los 7 canónicos, decisión del operador):
+ *   - 'maiz' SE RETIRA del selector (queda como slug jubilado que migra solo
+ *     a 'angelita', ver `compai/nucleo/elenco.js` SLUGS_JUBILADOS — nunca se
+ *     borra en silencio lo que un usuario tenía guardado).
+ *   - 'oso-baston' se re-etiqueta "Oso de anteojos" (el nombre común de
+ *     Tremarctos ornatus): mismo cuerpo (OsoBaston.jsx, 4ta dirección de
+ *     arte ya aprobada), mismo slug interno (compat de localStorage) — NO es
+ *     un oso nuevo.
+ *   - Últimas dos opciones: guacamaya y chivito de páramo, reusando el rig
+ *     F24 del valle (`visual/creatures/GuacamayaCompai.jsx`/`ChivitoPunk.jsx`
+ *     — NO `Guacamaya.jsx`, el billboard decorativo de FaunaCalido.jsx) en
+ *     vez de redibujarse a mano — `ELENCO[...].enPWA` ya está en `true` para
+ *     ambos en `compai/nucleo/elenco.js`.
  */
 export default function AgentAvatarSelector() {
     const [type, setType] = useAgentAvatarType();
@@ -40,12 +53,6 @@ export default function AgentAvatarSelector() {
             label: 'Angelita, la abeja',
             sub: 'La vecina que sabe de finca (recomendado)',
             Component: ChagraAgentAvatarAngelita,
-        },
-        {
-            id: 'maiz',
-            label: 'Planta de maíz',
-            sub: 'Cultivo ancestral originario',
-            Component: ChagraAgentAvatarMaiz,
         },
         {
             id: 'zariguya',
@@ -61,7 +68,7 @@ export default function AgentAvatarSelector() {
         },
         {
             id: 'oso-baston',
-            label: 'Oso del bastón',
+            label: 'Oso de anteojos',
             sub: 'El caminante de los Andes',
             Component: ChagraAgentAvatarOsoBaston,
         },
@@ -70,6 +77,18 @@ export default function AgentAvatarSelector() {
             label: 'Luciérnaga',
             sub: 'La que lee la noche',
             Component: ChagraAgentAvatarLuciernaga,
+        },
+        {
+            id: 'chivito-punk',
+            label: 'Chivito de páramo',
+            sub: 'El que vela por el agua que nace arriba',
+            Component: ChagraAgentAvatarChivitoPunk,
+        },
+        {
+            id: 'guacamaya',
+            label: 'Guacamaya',
+            sub: 'La bandera del bosque tropical',
+            Component: ChagraAgentAvatarGuacamaya,
         },
     ];
 

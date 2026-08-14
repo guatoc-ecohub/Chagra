@@ -22,6 +22,20 @@ import { PRIMARY_WORKER_NAME } from './config/workerConfig';
 import { tieneAccesoGlaciarActual, esOperadorActual } from './config/glaciarAccess';
 import { getProfile, getMarco3DPreference } from './services/userProfileService';
 import { parseSeguimientoView } from './config/seguimientoProcesos';
+// Manifiesto de rutas (fuente única de qué es 2D vs 3D) — usado SOLO para
+// decidir dónde vive CompaiOverlay (ver el mount más abajo). getMapaNucleo()
+// itera ~200 entradas (NUCLEO_3D+NUCLEO_APP con alias); se cachea UNA vez a
+// nivel de módulo, no en cada render.
+import { getMapaNucleo } from './config/rutasProdChagraApp.js';
+
+const MAPA_RUTAS_PROD = getMapaNucleo();
+
+/** ¿La ruta actual es 2D-app según el manifiesto? Rutas fuera del manifiesto
+ *  (mockups, legacy sin migrar…) NO cuentan — CompaiOverlay solo vive donde
+ *  el manifiesto lo declara explícitamente 2D. */
+function esRuta2DApp(ruta) {
+  return MAPA_RUTAS_PROD.get(ruta)?.categoria === '2D-app';
+}
 import NetworkStatusBar from './components/NetworkStatusBar';
 import PendingTasksWidget from './components/PendingTasksWidget';
 import SyncProgressIndicator from './components/common/SyncProgressIndicator';
@@ -41,6 +55,12 @@ import useAlertStore from './store/useAlertStore';
 // import FieldFeedback from './components/FieldFeedback';
 const AgentFab = lazy(() => import('./components/AgentFab'));
 const CompaiFotosOverlay = lazy(() => import('./components/CompaiFotosOverlay'));
+// CompaiOverlay (el compai elegido, minimizable y contextual) — construido y
+// testeado (CompaiOverlay.test.jsx) pero NUNCA montado hasta ahora (hallazgo
+// 2026-08-14, unificación compAI). Vive SOLO en rutas 2D (categoria '2D-app'
+// del manifiesto rutasProdChagraApp.js) — en 3D el compai ya vive en la
+// escena (regla "UNA SOLA ABEJA #2341", no se duplica).
+const CompaiOverlay = lazy(() => import('./components/CompaiOverlay'));
 // EscuchaFab (el FAB de tap "barbudito de páramo") DESHABILITADO por decisión
 // del operador 2026-07-07: modo campo = WAKE-WORD SOLO ("hola chagra"). El
 // único FAB visible es el compai elegido (AgentFab). El overlay SÍ se importa:
@@ -4386,6 +4406,13 @@ export default function App() {
       {/* {!['loading', 'login', 'oauth-callback', 'onboarding-perfil', 'ubicacion-detectada', 'dashboard', 'agente', 'voz', 'voz_planta', 'registro_voz'].includes(currentView) && <EscuchaFab />} */}
       {currentView !== 'loading' && currentView !== 'login' && currentView !== 'oauth-callback' && !currentView.startsWith('mockup_') && <EscuchaOverlay />}
       {currentView !== 'loading' && currentView !== 'login' && currentView !== 'oauth-callback' && !currentView.startsWith('mockup_') && <CompaiFotosOverlay onNavigate={navigate} />}
+      {/* CompaiOverlay — el compai elegido, minimizable y contextual, en
+          TODAS las rutas 2D (categoria '2D-app' del manifiesto
+          rutasProdChagraApp.js). NUNCA en rutas 3D: ahí el compai ya vive
+          dentro de la escena (regla "UNA SOLA ABEJA #2341" — no duplicar). */}
+      <Suspense fallback={null}>
+        {esRuta2DApp(currentView) && <CompaiOverlay currentView={currentView} />}
+      </Suspense>
       {currentView === 'dashboard' && <PendingTasksWidget onEdit={(task) => navigate('edit_task', { task })} />}
       {currentView !== 'loading' && currentView !== 'login' && currentView !== 'oauth-callback' && !currentView.startsWith('mockup_') && <SyncProgressIndicator />}
       {/* Badge persistente "N pendientes de sincronizar" (rescate #2668).
