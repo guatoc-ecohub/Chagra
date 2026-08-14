@@ -7,7 +7,7 @@ describe('AgentAvatarSelector smoke', () => {
         localStorage.clear();
     });
 
-    it('renderiza las 7 opciones del elenco unificado (colibrí jubilado, maíz retirado)', () => {
+    it('renderiza las 6 opciones con cuerpo propio (roster-8, guacamaya retirada)', () => {
         render(<AgentAvatarSelector />);
         expect(screen.getByText('Angelita, la abeja', { selector: 'p' })).toBeInTheDocument();
         expect(screen.getByText('Zarigüeya', { selector: 'p' })).toBeInTheDocument();
@@ -15,9 +15,11 @@ describe('AgentAvatarSelector smoke', () => {
         expect(screen.getByText('Oso de anteojos', { selector: 'p' })).toBeInTheDocument();
         expect(screen.getByText('Luciérnaga', { selector: 'p' })).toBeInTheDocument();
         expect(screen.getByText('Chivito de páramo', { selector: 'p' })).toBeInTheDocument();
-        expect(screen.getByText('Guacamaya', { selector: 'p' })).toBeInTheDocument();
+        expect(screen.queryByText('Guacamaya', { selector: 'p' })).toBeNull();
         expect(screen.queryByText(/colibrí/i)).toBeNull();
         expect(screen.queryByText(/maíz/i)).toBeNull();
+        expect(screen.queryByText(/dante/i)).toBeNull();
+        expect(screen.queryByText(/oliver/i)).toBeNull();
     });
 
     it('click en zarigüeya cambia la preferencia y persiste en localStorage', () => {
@@ -55,6 +57,13 @@ describe('AgentAvatarSelector smoke', () => {
         expect(angelitaBtn).toHaveAttribute('aria-pressed', 'true');
     });
 
+    it('localStorage guacamaya (usuario viejo) NO rompe el selector: cae a angelita', () => {
+        localStorage.setItem('chagra:agent-avatar-type', 'guacamaya');
+        render(<AgentAvatarSelector />);
+        const angelitaBtn = screen.getByText('Angelita, la abeja', { selector: 'p' }).closest('button');
+        expect(angelitaBtn).toHaveAttribute('aria-pressed', 'true');
+    });
+
     it('slug legacy colibri_svg en localStorage migra a angelita seleccionada', () => {
         localStorage.setItem('chagra:agent-avatar-type', 'colibri_svg');
         render(<AgentAvatarSelector />);
@@ -69,15 +78,14 @@ describe('AgentAvatarSelector smoke', () => {
         expect(angelitaBtn).toHaveAttribute('aria-pressed', 'true');
     });
 
-    // Ítem #8 del GAP compAI (2026-08-13, ampliado 2026-08-14 con el roster-7
-    // completo): jaguar, oso de anteojos, luciérnaga, chivito y guacamaya ya
-    // tienen cuerpo 2.5D y `enPWA:true` en el núcleo (#96).
+    // Ítem #8 del GAP compAI (2026-08-13, ampliado 2026-08-14 con el roster-8
+    // completo): jaguar, oso de anteojos, luciérnaga, chivito ya tienen cuerpo
+    // 2.5D y `enPWA:true` en el núcleo (#96). guacamaya se retiró.
     it.each([
         ['jaguar', 'Jaguar'],
         ['oso-baston', 'Oso de anteojos'],
         ['luciernaga', 'Luciérnaga'],
         ['chivito-punk', 'Chivito de páramo'],
-        ['guacamaya', 'Guacamaya'],
     ])('click en %s cambia la preferencia y persiste en localStorage', (slug, label) => {
         render(<AgentAvatarSelector />);
         const btn = screen.getByText(label, { selector: 'p' }).closest('button');
@@ -93,11 +101,16 @@ describe('AgentAvatarSelector smoke', () => {
         ['oso-baston', 'Oso de anteojos'],
         ['luciernaga', 'Luciérnaga'],
         ['chivito-punk', 'Chivito de páramo'],
-        ['guacamaya', 'Guacamaya'],
     ])('localStorage %s preselecciona esa opción al montar', (slug, label) => {
         localStorage.setItem('chagra:agent-avatar-type', slug);
         render(<AgentAvatarSelector />);
         const btn = screen.getByText(label, { selector: 'p' }).closest('button');
         expect(btn).toHaveAttribute('aria-pressed', 'true');
+    });
+
+    it('dante y oliver NO están en el selector (sin arte propio)', () => {
+        render(<AgentAvatarSelector />);
+        expect(screen.queryByText('Dante')).toBeNull();
+        expect(screen.queryByText('Oliver')).toBeNull();
     });
 });

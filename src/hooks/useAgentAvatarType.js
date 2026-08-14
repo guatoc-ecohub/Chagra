@@ -26,19 +26,29 @@ const LLAVES_RELEVANTES = new Set([LLAVE_COMPANERO, STORAGE_KEY, ...LLAVES_HERED
 // re-auditoría del GAP. Adaptadores en ChagraAgentAvatarJaguar.jsx,
 // ChagraAgentAvatarOsoBaston.jsx, ChagraAgentAvatarLuciernaga.jsx.
 //
-// 'guacamaya', 'chivito-punk' = los últimos dos del roster-7 (2026-08-14,
-// unificación compAI a los 7 canónicos del operador). Reusan el rig F24 del
-// valle (`visual/creatures/arte-valle/`, ver GuacamayaCompai.jsx/ChivitoPunk.jsx
-// — NO `Guacamaya.jsx`, el billboard decorativo de FaunaCalido.jsx) — no se
-// redibujaron a mano. Adaptadores en ChagraAgentAvatarGuacamaya.jsx,
-// ChagraAgentAvatarChivitoPunk.jsx.
+// 'chivito-punk' = el chivito de páramo (roster-7, 2026-08-14). Reusa el rig
+// F24 del valle (`visual/creatures/arte-valle/`, ver ChivitoPunk.jsx — NO
+// `Chivito.jsx`, el billboard decorativo de FaunaCalido.jsx) — no se
+// redibujó a mano. Adaptador en ChagraAgentAvatarChivitoPunk.jsx.
+//
+// 'dante', 'oliver' = roster-8 (2026-08-14). Aún sin arte propio (es de Fable,
+// hoy en hold del operador) — entran con `pendienteFable:true` y caen a Angelita
+// por el fallback de CompaiTransicion.jsx. Los adaptadores
+// ChagraAgentAvatarDante.jsx y ChagraAgentAvatarOliver.jsx NO existen aún — se
+// crearán cuando Fable complete sus diseños.
+//
+// 'guacamaya' SE RETIRÓ del roster el 2026-08-14 (decisión del operador): sigue
+// existiendo como slug jubilado (compai/nucleo/elenco.js SLUGS_JUBILADOS,
+// migra solo a 'angelita') para que ningún usuario con guacamaya guardado en
+// localStorage se quede en un estado inválido, pero ya no es una opción
+// elegible aquí ni en AgentAvatarSelector.jsx.
 //
 // 'maiz' SE RETIRÓ del roster el 2026-08-14 (decisión del operador): sigue
 // existiendo como slug jubilado (compai/nucleo/elenco.js SLUGS_JUBILADOS,
 // migra solo a 'angelita') para que ningún usuario con maiz guardado en
 // localStorage se quede en un estado inválido, pero ya no es una opción
 // elegible aquí ni en AgentAvatarSelector.jsx.
-export const AVATAR_TYPES = ['angelita', 'zariguya', 'jaguar', 'oso-baston', 'luciernaga', 'chivito-punk', 'guacamaya'];
+export const AVATAR_TYPES = ['angelita', 'zariguya', 'jaguar', 'oso-baston', 'luciernaga', 'chivito-punk', 'dante', 'oliver'];
 export const DEFAULT_AVATAR_TYPE = 'angelita';
 
 // Nombre propio para copy que necesita NOMBRAR al compAI elegido (ej. "hábletele
@@ -53,18 +63,19 @@ export const AVATAR_NOMBRE = {
     'oso-baston': 'el oso de anteojos',
     luciernaga: 'la luciérnaga',
     'chivito-punk': 'el chivito',
-    guacamaya: 'la guacamaya',
+    dante: 'Dante',
+    oliver: 'Oliver',
 };
 
 // Slugs históricos guardados en localStorage de instalaciones viejas:
-// ambos colibríes migran a Angelita sin que el usuario haga nada.
-const LEGACY_TYPES = { colibri: 'angelita', colibri_svg: 'angelita' };
+// ambos colibríes y guacamaya migran a Angelita sin que el usuario haga nada.
+const LEGACY_TYPES = { colibri: 'angelita', colibri_svg: 'angelita', guacamaya: 'angelita' };
 
 /**
  * Lee la preferencia con la MISMA precedencia que el núcleo compai (#96: una
  * sola llave canónica cruzando PWA y 3d.guatoc.co) — pero acotada a los seis
  * avatares que hoy tienen cuerpo dibujado en esta PWA (`AVATAR_TYPES`). Si el
- * núcleo devuelve un guía sin arte aquí todavía (guacamaya, chivito…), esta
+ * núcleo devuelve un guía sin arte aquí todavía (dante, oliver), esta
  * PWA cae al default — el otro stack sigue mostrando la elección real.
  */
 function readPref() {

@@ -55,20 +55,44 @@ describe('compaiRegistry.resolverCompai', () => {
     }
   });
 
-  it('guacamaya y chivito-punk: cuerpo 2.5D en la PWA, PERO todavía pendientes en 3D (caen a Angelita)', () => {
-    // Roster-7 (2026-08-14): entraron con cuerpo 2.5D reusando el rig F24 del
-    // valle (GuacamayaCompai.jsx/ChivitoPunk.jsx), sin coreografía 3D propia
-    // aún — mismo estado transitorio que jaguar/oso-baston/luciernaga ANTES de F26.
-    for (const tipo of ['guacamaya', 'chivito-punk']) {
+  it('chivito-punk: cuerpo 2.5D en la PWA, PERO todavía pendiente en 3D (cae a Angelita)', () => {
+    // Roster-8 (2026-08-14): tiene cuerpo 2.5D reusando el rig F24 del valle
+    // (ChivitoPunk.jsx), sin coreografía 3D propia aún — mismo estado transitorio
+    // que jaguar/oso-baston/luciernaga ANTES de F26.
+    const c = resolverCompai('chivito-punk');
+    expect(c.avatarType).toBe('chivito-punk');
+    expect(c.pendienteFable, 'chivito-punk debería seguir pendienteFable').toBe(true);
+    expect(c.EscenaComponent).toBeNull();
+    expect(c.esFallback).toBe(true);
+    expect(c.especie).toBe('chivito-punk');
+    // Cae a la presencia de la abeja (regla del fallback) — no lanza.
+    expect(c.presencia).toBe(ABEJA_PRESENCIA);
+  });
+
+  it('dante y oliver: AÚN sin cuerpo 2.5D en la PWA ni coreografía 3D (caen a Angelita)', () => {
+    // Roster-8 (2026-08-14): entran con `pendienteFable:true` y caen a Angelita
+    // en el mundo 3D (regla del fallback). Los adaptadores
+    // ChagraAgentAvatarDante.jsx y ChagraAgentAvatarOliver.jsx NO existen aún —
+    // se crearán cuando Fable complete sus diseños.
+    for (const tipo of ['dante', 'oliver']) {
       const c = resolverCompai(tipo);
       expect(c.avatarType).toBe(tipo);
-      expect(c.pendienteFable, `${tipo} debería seguir pendienteFable`).toBe(true);
+      expect(c.pendienteFable, `${tipo} debería estar pendienteFable`).toBe(true);
       expect(c.EscenaComponent).toBeNull();
       expect(c.esFallback).toBe(true);
       expect(c.especie).toBe(tipo);
       // Cae a la presencia de la abeja (regla del fallback) — no lanza.
       expect(c.presencia).toBe(ABEJA_PRESENCIA);
     }
+  });
+
+  it('guacamaya se retiró del roster (2026-08-14): resuelve como cualquier tipo desconocido, cae a Angelita', () => {
+    // AVATAR_TYPES ya no incluye 'guacamaya' — resolverCompai lo trata igual que
+    // 'colibri'/'oso' (basura/retirado), nunca lanza.
+    const c = resolverCompai('guacamaya');
+    expect(c.avatarType).toBe('angelita');
+    expect(c.EscenaComponent).toBeNull();
+    expect(c.esFallback).toBe(true);
   });
 
   it('los cinco compañeros con escena propia son DISTINTOS entre sí (ni presencia ni escena repetida)', () => {
@@ -118,7 +142,7 @@ describe('compaiRegistry.resolverCompai', () => {
   });
 
   it('tipo desconocido, retirado o vacío → default Angelita (nunca lanza)', () => {
-    for (const basura of ['colibri', 'oso', 'maiz', '', null, undefined]) {
+    for (const basura of ['colibri', 'oso', 'guacamaya', 'maiz', '', null, undefined]) {
       const c = resolverCompai(basura);
       expect(c.avatarType).toBe('angelita');
       expect(c.EscenaComponent).toBeNull();

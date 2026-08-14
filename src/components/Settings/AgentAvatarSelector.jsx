@@ -5,19 +5,22 @@ import ChagraAgentAvatarZariguya from '../ChagraAgentAvatarZariguya';
 import ChagraAgentAvatarJaguar from '../ChagraAgentAvatarJaguar';
 import ChagraAgentAvatarOsoBaston from '../ChagraAgentAvatarOsoBaston';
 import ChagraAgentAvatarLuciernaga from '../ChagraAgentAvatarLuciernaga';
-import ChagraAgentAvatarGuacamaya from '../ChagraAgentAvatarGuacamaya';
 import ChagraAgentAvatarChivitoPunk from '../ChagraAgentAvatarChivitoPunk';
 
 /**
  * AgentAvatarSelector — selector visual para el avatar del agente IA.
  *
- * Los 7 canónicos (decisión del operador, 2026-08-14): Angelita la abeja
- * (default), jaguar, oso de anteojos, zarigüeya (crías al lomo), luciérnaga,
- * chivito de páramo, guacamaya. Persiste vía useAgentAvatarType (localStorage
- * `chagra:agent-avatar-type` + llave canónica `compai:companero`, #96).
- * Cambio inmediato — afecta a todas las instancias del avatar en la app
- * (FAB, login, chat, onboarding — ver ChagraAgentAvatar.jsx, el dispatcher
- * del que dependen).
+ * Los 6 canónicos con cuerpo propio (decisión del operador, 2026-08-14):
+ * Angelita la abeja (default), jaguar, oso de anteojos, zarigüeya (crías al
+ * lomo), luciérnaga, chivito de páramo. Persiste vía useAgentAvatarType
+ * (localStorage `chagra:agent-avatar-type` + llave canónica
+ * `compai:companero`, #96). Cambio inmediato — afecta a todas las instancias
+ * del avatar en la app (FAB, login, chat, onboarding — ver ChagraAgentAvatar.jsx,
+ * el dispatcher del que dependen).
+ *
+ * NOTA: dante y oliver NO están en el selector porque aún no tienen arte propio
+ * (es de Fable, hoy en hold del operador). Cuando Fable complete sus diseños,
+ * se agregarán ChagraAgentAvatarDante.jsx y ChagraAgentAvatarOliver.jsx.
  *
  * 2026-07-16 (operador): "Angelita como el agente, jubila el colibrí".
  * 2026-07-18 (operador): el colibrí sale también de las opciones — "solo
@@ -30,19 +33,20 @@ import ChagraAgentAvatarChivitoPunk from '../ChagraAgentAvatarChivitoPunk';
  * jaguar/oso de anteojos/luciérnaga — ya tenían cuerpo 2.5D dibujado y ya
  * estaban `enPWA:true` en `compai/nucleo/elenco.js` desde el 2026-08-11
  * (#96), pero este selector se había quedado en 3.
- * 2026-08-14 (unificación compAI a los 7 canónicos, decisión del operador):
- *   - 'maiz' SE RETIRA del selector (queda como slug jubilado que migra solo
- *     a 'angelita', ver `compai/nucleo/elenco.js` SLUGS_JUBILADOS — nunca se
- *     borra en silencio lo que un usuario tenía guardado).
+ * 2026-08-14 (roster-8, decisión del operador):
+ *   - 'guacamaya' SE RETIRA del selector (queda como slug jubilado que migra
+ *     solo a 'angelita', ver `compai/nucleo/elenco.js` SLUGS_JUBILADOS —
+ *     nunca se borra en silencio lo que un usuario tenía guardado).
+ *   - 'dante' y 'oliver' se agregan al roster-8, pero NO al selector porque
+ *     aún no tienen arte propio (es de Fable, hoy en hold del operador).
  *   - 'oso-baston' se re-etiqueta "Oso de anteojos" (el nombre común de
  *     Tremarctos ornatus): mismo cuerpo (OsoBaston.jsx, 4ta dirección de
  *     arte ya aprobada), mismo slug interno (compat de localStorage) — NO es
  *     un oso nuevo.
- *   - Últimas dos opciones: guacamaya y chivito de páramo, reusando el rig
- *     F24 del valle (`visual/creatures/GuacamayaCompai.jsx`/`ChivitoPunk.jsx`
- *     — NO `Guacamaya.jsx`, el billboard decorativo de FaunaCalido.jsx) en
- *     vez de redibujarse a mano — `ELENCO[...].enPWA` ya está en `true` para
- *     ambos en `compai/nucleo/elenco.js`.
+ *   - 'chivito-punk' reusa el rig F24 del valle (`visual/creatures/ChivitoPunk.jsx`
+ *     — NO `Chivito.jsx`, el billboard decorativo de FaunaCalido.jsx) en
+ *     vez de redibujarse a mano — `ELENCO[...].enPWA` ya está en `true` en
+ *     `compai/nucleo/elenco.js`.
  */
 export default function AgentAvatarSelector() {
     const [type, setType] = useAgentAvatarType();
@@ -83,12 +87,6 @@ export default function AgentAvatarSelector() {
             label: 'Chivito de páramo',
             sub: 'El que vela por el agua que nace arriba',
             Component: ChagraAgentAvatarChivitoPunk,
-        },
-        {
-            id: 'guacamaya',
-            label: 'Guacamaya',
-            sub: 'La bandera del bosque tropical',
-            Component: ChagraAgentAvatarGuacamaya,
         },
     ];
 
