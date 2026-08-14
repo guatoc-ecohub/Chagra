@@ -607,6 +607,13 @@ export default function ProfileScreen({ onBack, onHome }) {
               <ThemeSelector />
             </div>
 
+            {/* MARCO 3D del home (2026-08-14): junto al selector de tema
+                porque cambia la PIEL de la portada (FincaVivaHero), no la
+                forma de entrar a la app — ver el docstring de
+                PortadaMarco3DSection para la distinción con Marco3DSection
+                (sección "Mi agente"). */}
+            <PortadaMarco3DSection />
+
             <BackgroundSelector />
             {/* El animal del USUARIO (avatar propio, registro de creatures) —
                 distinto del avatar del agente IA de abajo. */}
@@ -1336,6 +1343,76 @@ function SonidoSection() {
 }
 
 /**
+ * PortadaMarco3DSection — "MARCO 3D" del HOME (2026-08-14), sección
+ * Apariencia (junto al selector de tema, NO en "Mi agente" con las dos de
+ * abajo).
+ *
+ * Toggle "Marco 3D — el valle vivo como portada" persistido en usePrefsStore
+ * (key `chagra:prefs:marco3d`, default OFF). Con él ON, la PORTADA del home
+ * (FincaVivaHero, en la ranura donde hoy va la escena viva del tema, escala
+ * 'finca') muestra el valle 3D vanilla (mismo build que 3d.guatoc.co, iframe
+ * same-origin a `/valle/index.html`, mismo patrón `leerCompanero()` de
+ * ValleMarcoScreen.jsx) EN VEZ de la escena 2D del tema activo — el resto
+ * del hero (overlays, portales, columna del agente) sigue montado encima sin
+ * cambios. Con él OFF el home queda EXACTAMENTE como hoy.
+ *
+ * DISTINTO de `Marco3DSection`/`Valle3DSection` (sección "Mi agente" más
+ * abajo, flag `marco3d` de userProfileService, gate `getMarco3DPreference`/
+ * `setMarco3DPreference`): esos DOS toggles reemplazan la entrada ENTERA de
+ * la app (`case 'dashboard'`/banda "Los mundos de su finca" en App.jsx) por
+ * `<ValleMarcoScreen>` a pantalla completa. Este toggle vive en usePrefsStore
+ * (no en el perfil) y solo cambia la RANURA de la escena dentro de
+ * FincaVivaHero — el hero entero sigue montado. Dos preferencias con nombre
+ * corto parecido por diseños paralelos (misma fecha, alcance distinto); ver
+ * la nota de `STORAGE_KEY_MARCO3D` en `src/store/usePrefsStore.js` para la
+ * distinción completa. Si esto confunde en QA, es una señal real — no un
+ * error de este componente — para que el operador decida si unificar los
+ * nombres en una pasada aparte.
+ */
+function PortadaMarco3DSection() {
+  const marco3d = usePrefsStore((s) => s.marco3d ?? false);
+  const setMarco3d = usePrefsStore((s) => s.setMarco3d);
+
+  return (
+    <div className="space-y-4 bg-slate-900/40 border border-slate-800 rounded-2xl p-5">
+      <div className="flex items-center gap-2 px-1">
+        <Mountain size={18} className="text-sky-400" />
+        <h3 className="text-sm font-bold text-slate-300 uppercase tracking-wider">Marco 3D</h3>
+      </div>
+
+      <label className="flex items-center justify-between gap-3 p-3 rounded-xl bg-slate-800/50 cursor-pointer min-h-[48px]">
+        <div className="flex flex-col gap-0.5 flex-1">
+          <span className="text-sm font-bold text-slate-200">Marco 3D — el valle vivo como portada</span>
+          <span className="text-xs text-slate-400 leading-snug">
+            Muestra el valle 3D en la portada de su finca, en vez de la
+            escena del tema. El resto de la pantalla sigue igual — puede
+            apagarlo cuando quiera y la portada vuelve a su escena de
+            siempre.
+          </span>
+        </div>
+        <button
+          type="button"
+          role="switch"
+          aria-checked={marco3d}
+          aria-label="Activar o desactivar el marco 3D de la portada"
+          data-testid="portada-marco3d-toggle"
+          onClick={() => setMarco3d(!marco3d)}
+          className={`tap-target relative w-12 h-7 rounded-full transition-colors shrink-0 ${
+            marco3d ? 'bg-sky-600' : 'bg-slate-700'
+          }`}
+        >
+          <span
+            className={`absolute top-0.5 left-0.5 w-6 h-6 bg-white rounded-full shadow transition-transform ${
+              marco3d ? 'translate-x-5' : 'translate-x-0'
+            }`}
+          />
+        </button>
+      </label>
+    </div>
+  );
+}
+
+/**
  * Valle3DSection — FASE 0 del plan game-dev 3D (2026-07-11).
  *
  * Toggle "El valle en 3D" persistido en usePrefsStore (key
@@ -1419,6 +1496,12 @@ function Valle3DSection() {
  * entrada entera (`case 'dashboard'`); el de arriba solo agrega una banda
  * dentro del dashboard (`case 'valle3d'`) — dos formas de llegar al mismo
  * valle, copy deliberadamente distinto para no confundir la FORMA.
+ *
+ * TAMBIÉN distinto de `PortadaMarco3DSection` (sección Apariencia, arriba en
+ * este archivo, flag `marco3d` de usePrefsStore): ese toggle NO reemplaza la
+ * entrada — solo cambia la escena dentro de FincaVivaHero. Nombre corto
+ * parecido por diseños paralelos del mismo día; ver su docstring para la
+ * distinción completa.
  */
 function Marco3DSection() {
   const [marco3d, setMarco3dState] = useState(() => getMarco3DPreference());

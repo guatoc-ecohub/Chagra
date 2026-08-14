@@ -82,6 +82,22 @@ describe('ProfileScreen — el morral (hub bento)', () => {
     expect(document.documentElement.getAttribute('data-theme')).toBe('nature');
   });
 
+  test('Apariencia trae el toggle "Marco 3D" (portada del home) y persiste en usePrefsStore', () => {
+    render(<ProfileScreen onBack={() => {}} onHome={() => {}} />);
+    fireEvent.click(screen.getByTestId('profile-section-apariencia'));
+
+    const toggle = screen.getByTestId('portada-marco3d-toggle');
+    expect(toggle).toHaveAttribute('aria-checked', 'false');
+
+    fireEvent.click(toggle);
+    expect(toggle).toHaveAttribute('aria-checked', 'true');
+    expect(JSON.parse(localStorage.getItem('chagra:prefs:marco3d'))).toBe(true);
+
+    fireEvent.click(toggle);
+    expect(toggle).toHaveAttribute('aria-checked', 'false');
+    expect(JSON.parse(localStorage.getItem('chagra:prefs:marco3d'))).toBe(false);
+  });
+
   test('el nivel de respuestas del agente persiste en el perfil', () => {
     render(<ProfileScreen onBack={() => {}} onHome={() => {}} />);
     fireEvent.click(screen.getByTestId('profile-section-agente'));

@@ -42,6 +42,21 @@ const STORAGE_KEY_VALLE3D_MIGRATED = 'chagra:prefs:valle3d:migrated-v2-2d-defaul
 // arrastrar los SVG de fauna a todo consumidor del store.
 const STORAGE_KEY_AVATAR_CREATURE = 'chagra:prefs:avatar-creature';
 export const AVATAR_CREATURE_DEFAULT = 'abeja-angelita';
+// "MARCO 3D" del home (2026-08-14): decide si la PORTADA (FincaVivaHero,
+// ranura de la escena viva del tema, escala==='finca') muestra el valle 3D
+// canónico (iframe same-origin a /valle/index.html) en vez de la escena 2D
+// del tema. Default OFF: el home 2D queda idéntico para quien no lo activa.
+// DISTINTO de `marco3d` en userProfileService (getMarco3DPreference /
+// setMarco3DPreference, Marco3DSection en ProfileScreen → sección "Mi
+// agente"): ESE flag reemplaza la entrada ENTERA de la app (case 'dashboard'
+// en App.jsx) por <ValleMarcoScreen> a pantalla completa, sin el resto del
+// hero. ESTE flag (usePrefsStore, sección "Apariencia") solo cambia la
+// ranura de la escena DENTRO de FincaVivaHero — el resto del hero (overlays,
+// portales, columna del agente) sigue montado encima, igual que con
+// cualquier otra escena de tema. Dos preferencias con el mismo nombre corto
+// por diseños paralelos; ver el comentario de Marco3DSection en
+// ProfileScreen.jsx para la distinción completa.
+const STORAGE_KEY_MARCO3D = 'chagra:prefs:marco3d';
 
 function load(key, fallback) {
   try {
@@ -81,6 +96,7 @@ const usePrefsStore = create((set, _get) => ({
   sonido: load(STORAGE_KEY_SONIDO, 'off'),
   valle3d: loadValle3d(),
   avatarCreatureId: load(STORAGE_KEY_AVATAR_CREATURE, AVATAR_CREATURE_DEFAULT),
+  marco3d: load(STORAGE_KEY_MARCO3D, false),
 
   setVoiceRegion: (region) => {
     save(STORAGE_KEY_VOICE_REGION, region);
@@ -126,6 +142,12 @@ const usePrefsStore = create((set, _get) => ({
     const bool = Boolean(flag);
     save(STORAGE_KEY_VALLE3D, bool);
     set({ valle3d: bool });
+  },
+
+  setMarco3d: (flag) => {
+    const bool = Boolean(flag);
+    save(STORAGE_KEY_MARCO3D, bool);
+    set({ marco3d: bool });
   },
 }));
 

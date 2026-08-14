@@ -8,6 +8,8 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { listFarmProcesses } from '../../db/farmProcessCache';
 import useAssetStore from '../../store/useAssetStore';
 import useCosechaStore from '../../store/useCosechaStore';
+import usePrefsStore from '../../store/usePrefsStore';
+import { leerCompanero } from '../../compai/nucleo/elenco.js';
 import { buildFincaScene } from '../../services/fincaSceneService';
 import { buildVitalidadEspiritu } from '../../services/vitalidadEspirituService';
 import { getDiagnosticoSueloGuardado } from '../../services/soilDiagnostic';
@@ -302,6 +304,27 @@ export default function FincaVivaHero({ onNavigate, onOpenAgent, onGestionar, on
 
   const tieneFincaPropia = !children; // children = red institucional del extensionista.
 
+  // ── MARCO 3D DE LA PORTADA (2026-08-14) ───────────────────────────────────
+  // Preferencia `marco3d` en usePrefsStore (Perfil → Apariencia, junto al
+  // selector de tema): con ella ON, la ranura de la escena viva de ESTE hero
+  // (donde va <EscenaViva>/<SceneFinca> más abajo) muestra en su lugar el
+  // valle 3D vanilla canónico — mismo iframe same-origin a
+  // `/valle/index.html` y mismo patrón `leerCompanero()` que ya usa
+  // ValleMarcoScreen.jsx (ver ese componente para el porqué del iframe y de
+  // por qué aquí no se pide fullscreen). El resto del hero (overlays, portales, columna
+  // del agente) sigue montado ENCIMA sin cambios — esto solo reemplaza la
+  // escena, no la portada entera. DISTINTO del flag `marco3d` de
+  // userProfileService/Marco3DSection (reemplaza la entrada completa de la
+  // app) — ver el comentario de STORAGE_KEY_MARCO3D en usePrefsStore.js.
+  const marco3d = usePrefsStore((s) => s.marco3d ?? false);
+  const marco3dHeroActivo = marco3d && escala === 'finca' && tieneFincaPropia;
+  // El compai elegido viaja SOLO (sin plomería nueva): leerCompanero() lee la
+  // llave canónica compartida same-origin (ver docstring de ValleMarcoScreen,
+  // "EL COMPAI ELEGIDO VIAJA SOLO"). Se calcula siempre (barato, no lanza)
+  // aunque el marco 3D esté apagado, para no condicionar un Hook.
+  const compaiPortada = useMemo(() => leerCompanero(), []);
+  const marco3dValleSrc = `/valle/index.html?compai=${encodeURIComponent(compaiPortada)}`;
+
   // ── ESCENA VIVA DEL TEMA (escala finca) ──────────────────────────────────
   // Cada tema monta SU escena de autor para la portada (ver mapa en el import):
   // la "Finca Organismo" en biopunk2 (default), "El Árbol de la Vida" en
@@ -572,7 +595,12 @@ export default function FincaVivaHero({ onNavigate, onOpenAgent, onGestionar, on
 
         <main className="fvh-main">
           {/* ── ESCENA ISOMÉTRICA (o slot institucional) ────────────────────── */}
-          <div className={`fvh-escena-wrap${escenaVivaActiva ? ' fvh-escena-wrap--viva' : ''}${organismoActivo ? ' fvh-escena-wrap--organismo' : ''}`}>
+          {/* Con el marco 3D activo la ranura muestra el valle (formato ancho,
+              no el retrato 390×486 de las escenas de autor) — por eso los
+              modificadores --viva/--organismo NO aplican cuando
+              marco3dHeroActivo, aunque escenaVivaActiva siga siendo true por
+              el tema (la iframe no es esa escena). */}
+          <div className={`fvh-escena-wrap${(!marco3dHeroActivo && escenaVivaActiva) ? ' fvh-escena-wrap--viva' : ''}${(!marco3dHeroActivo && organismoActivo) ? ' fvh-escena-wrap--organismo' : ''}`}>
             <div className="fvh-escena">
               {/* globo del agente colibrí */}
               <button
@@ -594,7 +622,25 @@ export default function FincaVivaHero({ onNavigate, onOpenAgent, onGestionar, on
                   {escala === 'balcon' && <SceneBalcon poblada={poblada} cielo={atmosferaTema} />}
                   {escala === 'invernadero' && <SceneInvernadero poblada={poblada} cielo={atmosferaTema} />}
                   {escala === 'finca' && (
-                    escenaVivaActiva ? (
+                    marco3dHeroActivo ? (
+                      /* MARCO 3D DE LA PORTADA (ver el bloque de comentarios
+                         junto a `marco3d`/`marco3dHeroActivo` más arriba):
+                         mismo iframe same-origin que ValleMarcoScreen.jsx,
+                         mismo `?compai=<slug>` explícito + localStorage
+                         compartido. Sin fullscreen (no hace falta: la ranura
+                         ya cubre el mismo alto/ancho que las demás escenas
+                         por CSS) y sin guard de fullscreen propio — ESTE
+                         marco nunca lo pide, a diferencia del valle de
+                         entrada completo. */
+                      <div className="fvh-escena-marco3d" data-testid="fvh-escena-marco3d">
+                        <iframe
+                          src={marco3dValleSrc}
+                          title="Valle 3D de Guatoc"
+                          className="fvh-escena-marco3d-iframe"
+                          data-testid="fvh-marco3d-iframe"
+                        />
+                      </div>
+                    ) : escenaVivaActiva ? (
                       /* ESCENA VIVA DEL TEMA ACTIVO (organismo/árbol de la
                          vida/huerto/trazo). Lleva la estructura declarada
                          (#34): la estructura de cada escena porta el marcador
@@ -624,9 +670,11 @@ export default function FincaVivaHero({ onNavigate, onOpenAgent, onGestionar, on
                       2026-07-18: el colibrí jubiló del rol de insignia del
                       agente). La mariposa y la abeja emoji (fauna que
                       prospera) sólo aparecen cuando la finca está poblada.
-                      Con una ESCENA VIVA de tema activa NO se superpone
-                      fauna: cada escena trae la suya. */}
-                  {!escenaVivaActiva && (
+                      Con una ESCENA VIVA de tema activa (o con el marco 3D
+                      activo — trae su propio compai animado dentro del
+                      valle) NO se superpone fauna: cada escena trae la
+                      suya. */}
+                  {!escenaVivaActiva && !marco3dHeroActivo && (
                   <div className="fvh-bichos" aria-hidden="true">
                     {/* Con la flag VITE_COLIBRI ON (dev) = modo A/B TEMPORAL
                         de barbuditos de páramo (fauna decorativa, no el
