@@ -1,19 +1,24 @@
-import ChivitoPunk from '../visual/creatures/ChivitoPunk';
+import CompaiLamina from '../visual/creatures/laminaViva/CompaiLamina.jsx';
 
 /**
  * ChagraAgentAvatarChivitoPunk — el chivito de páramo (Oxypogon guerinii)
- * como CARA del agente de Chagra, 6ta opción del elenco unificado
- * (2026-08-14). Slug canónico `chivito-punk` (colapso `chivito`→`chivito-punk`
- * ya resuelto en `compai/nucleo/elenco.js`, #96 — un solo pájaro, no dos).
+ * como CARA del agente de Chagra. Slug canónico `chivito-punk` (colapso
+ * `chivito`→`chivito-punk` resuelto en `compai/nucleo/elenco.js`, #96 — un
+ * solo pájaro, no dos).
  *
- * Cierra el ítem #8 del GAP compAI: el chivito no tenía cuerpo en la PWA
- * (`ELENCO['chivito-punk'].enPWA` seguía `false`); ahora lo tiene reusando el
- * rig F24 del valle (`visual/creatures/ChivitoPunk.jsx`, ver ese archivo).
+ * LÁMINA VIVA (feat/compai-laminas-en-movimiento): el cuerpo YA NO es el rig
+ * vectorial F24 reusado del valle (`visual/creatures/ChivitoPunk.jsx`,
+ * `arte-valle/chivito.rig.svg`) — es la lámina Humboldt real
+ * (`compai/laminas/chivito-punk.png`) recortada en capas y rigeada, ver
+ * `visual/creatures/laminaViva/CompaiLamina.jsx`. El SPEC del operador
+ * rechazó explícitamente el redibujo a vector como técnica ("eso ya se
+ * intentó y está MAL") — ChivitoPunk.jsx queda en disco sin tocar, este
+ * adaptador solo cambia SU cuerpo.
  *
  * Adaptador puro (mismo contrato que los hermanos ChagraAgentAvatar*): traduce
  * la API histórica del avatar del agente (state 'idle'|'thinking'|'speaking'|
- * 'listening', glow, withLabel, onClick/onDoubleClick) al `state` que
- * `ChivitoPunk.jsx` ya entiende directo.
+ * 'listening', glow, withLabel, onClick/onDoubleClick) al `estado` que
+ * CompaiLamina entiende.
  */
 export default function ChagraAgentAvatarChivitoPunk({
     state = 'idle',
@@ -26,8 +31,9 @@ export default function ChagraAgentAvatarChivitoPunk({
     ariaLabel = 'Chagra IA',
 }) {
     const bicho = (
-        <ChivitoPunk
-            state={state}
+        <CompaiLamina
+            tipo="chivito-punk"
+            estado={state}
             size={size}
             title={ariaLabel}
             className={className}

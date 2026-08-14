@@ -17,12 +17,12 @@ vi.mock('../../config/fincaVivaHomeFlag', () => ({
   fincaVivaHomePerfilActivo: () => flagOn,
 }));
 
-// El avatar (Angelita, 2026-07-16: "jubila el colibrí") arrastra el kit
-// rubber-hose completo. Lo stubbeamos: solo nos importa la CHROME del botón
+// El avatar (Angelita por defecto, lámina viva desde
+// feat/compai-laminas-en-movimiento — ver CompaiLamina.jsx) arrastra carga de
+// imagen + rig por capas. Lo stubbeamos: solo nos importa la CHROME del botón
 // (piel por tema), no el contenido del avatar.
-vi.mock('../../visual/agente/Angelita', () => ({
+vi.mock('../../visual/creatures/laminaViva/CompaiLamina.jsx', () => ({
   default: () => <span data-testid="avatar-stub" />,
-  Angelita: () => <span data-testid="avatar-stub" />,
 }));
 
 import AgentFab from '../AgentFab';
