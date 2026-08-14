@@ -55,11 +55,13 @@ describe('compaiRegistry.resolverCompai', () => {
     }
   });
 
-  it('guacamaya y chivito-punk: cuerpo 2.5D en la PWA, PERO todavía pendientes en 3D (caen a Angelita)', () => {
-    // Roster-7 (2026-08-14): entraron con cuerpo 2.5D reusando el rig F24 del
-    // valle (GuacamayaCompai.jsx/ChivitoPunk.jsx), sin coreografía 3D propia
-    // aún — mismo estado transitorio que jaguar/oso-baston/luciernaga ANTES de F26.
-    for (const tipo of ['guacamaya', 'chivito-punk']) {
+  it('dante, oliver y chivito-punk: cuerpo 2.5D en la PWA, PERO todavía pendientes en 3D (caen a Angelita)', () => {
+    // Roster-8 (2026-08-14): dante y oliver entraron sin arte 3D propio (es de
+    // Fable, hoy en hold del operador). chivito-punk tiene cuerpo 2.5D reusando
+    // el rig F24 del valle (ChivitoPunk.jsx). Los tres están pendientes de
+    // coreografía 3D propia — mismo estado transitorio que jaguar/oso-baston/
+    // luciernaga ANTES de F26.
+    for (const tipo of ['dante', 'oliver', 'chivito-punk']) {
       const c = resolverCompai(tipo);
       expect(c.avatarType).toBe(tipo);
       expect(c.pendienteFable, `${tipo} debería seguir pendienteFable`).toBe(true);
@@ -80,8 +82,8 @@ describe('compaiRegistry.resolverCompai', () => {
   });
 
   it('la regla del fallback sigue viva: entrada sin escena caería a Angelita sin lanzar', () => {
-    // Un tipo real (guacamaya/chivito-punk) o inventado, cae al default con
-    // esFallback:true, jamás throw.
+    // Un tipo real (dante/oliver/chivito-punk, pendientes de Fable) o inventado,
+    // cae al default con esFallback:true, jamás throw.
     const c = resolverCompai('tipo-que-no-existe');
     expect(c.avatarType).toBe('angelita');
     expect(c.EscenaComponent).toBeNull();
@@ -108,21 +110,47 @@ describe('compaiRegistry.resolverCompai', () => {
     }
   });
 
-  it('maiz se retiró del roster (2026-08-14): resuelve como cualquier tipo desconocido, cae a Angelita', () => {
-    // AVATAR_TYPES ya no incluye 'maiz' — resolverCompai lo trata igual que
-    // 'colibri'/'oso' (basura/retirado), nunca lanza.
-    const c = resolverCompai('maiz');
-    expect(c.avatarType).toBe('angelita');
-    expect(c.EscenaComponent).toBeNull();
-    expect(c.esFallback).toBe(true);
+  it('maiz y guacamaya se retiraron del roster (2026-08-14): resuelven como tipos desconocidos, caen a Angelita', () => {
+    // AVATAR_TYPES ya no incluye 'maiz' ni 'guacamaya' — resolverCompai los
+    // trata igual que 'colibri'/'oso' (basura/retirado), nunca lanza.
+    for (const retirado of ['maiz', 'guacamaya']) {
+      const c = resolverCompai(retirado);
+      expect(c.avatarType).toBe('angelita');
+      expect(c.EscenaComponent).toBeNull();
+      expect(c.esFallback).toBe(true);
+    }
   });
 
   it('tipo desconocido, retirado o vacío → default Angelita (nunca lanza)', () => {
-    for (const basura of ['colibri', 'oso', 'maiz', '', null, undefined]) {
+    for (const basura of ['colibri', 'oso', 'maiz', 'guacamaya', '', null, undefined]) {
       const c = resolverCompai(basura);
       expect(c.avatarType).toBe('angelita');
       expect(c.EscenaComponent).toBeNull();
     }
+  });
+
+  it('dante y oliver están en el roster (2026-08-14) y se comportan como pendientes de Fable', () => {
+    // Ambos entran con pendienteFable:true (sin arte 3D propio) y caen a
+    // Angelita por el fallback de CompaiTransicion.jsx.
+    for (const tipo of ['dante', 'oliver']) {
+      const c = resolverCompai(tipo);
+      expect(c.avatarType).toBe(tipo);
+      expect(c.pendienteFable).toBe(true);
+      expect(c.EscenaComponent).toBeNull();
+      expect(c.esFallback).toBe(true);
+      expect(c.especie).toBe(tipo);
+      // Cae a la presencia de la abeja (regla del fallback) — no lanza.
+      expect(c.presencia).toBe(ABEJA_PRESENCIA);
+    }
+  });
+
+  it('guacamaya se retiró del roster (2026-08-14): resuelve como tipo desconocido, cae a Angelita', () => {
+    // AVATAR_TYPES ya no incluye 'guacamaya' — resolverCompai lo trata como
+    // basura/retirado, nunca lanza.
+    const c = resolverCompai('guacamaya');
+    expect(c.avatarType).toBe('angelita');
+    expect(c.EscenaComponent).toBeNull();
+    expect(c.esFallback).toBe(true);
   });
 
   it('siempre devuelve una entrada usable (presencia + especie presentes)', () => {

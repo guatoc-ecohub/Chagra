@@ -17,14 +17,14 @@
  * PULSA LUZ — vuela, pero jamás como la abeja). El mundo refleja la elección
  * SIN tocar EscenaBase3D ni las escenas de cada mundo.
  *
- * ROSTER A 7 (2026-08-14, decisión del operador): 'maiz' SE RETIRÓ del
- * selector — su REGISTRO y las importaciones de MaizCompai/MaizCompaiEscena
- * salieron de aquí (el cuerpo sigue existiendo en `visual/creatures/`, solo
- * dejó de estar cableado a un avatarType elegible; ver
- * `compai/nucleo/elenco.js` SLUGS_JUBILADOS para la migración). Entraron
- * 'guacamaya' y 'chivito-punk' — YA tienen cuerpo 2.5D en la PWA pero AÚN no
- * coreografía 3D propia, quedan `pendienteFable:true` (caen a Angelita aquí,
- * igual que jaguar/oso-baston/luciernaga antes de F26).
+ * ROSTER A 8 (2026-08-14, decisión del operador): 'maiz' y 'guacamaya' SE
+ * RETIRARON del selector — sus REGISTROS y las importaciones salieron de aquí
+ * (los cuerpos siguen existiendo en `visual/creatures/`, solo dejaron de estar
+ * cableados a un avatarType elegible; ver `compai/nucleo/elenco.js`
+ * SLUGS_JUBILADOS para la migración). Quedaron 'chivito-punk' (con cuerpo
+ * 2.5D en la PWA pero sin coreografía 3D propia, `pendienteFable:true`, cae a
+ * Angelita aquí) y entraron 'dante' y 'oliver' (AÚN sin arte 3D propio,
+ * también `pendienteFable:true`, caen a Angelita aquí por el mismo fallback).
  *
  * NOTA de peso: desde que Fable registró las escenas, este módulo SÍ arrastra
  * arte (y three, transitivamente). Es correcto: vive dentro de escenas/ (el
@@ -86,9 +86,10 @@ const REGISTRO = {
     especie: 'abeja-angelita',
     pendienteFable: false,
   },
-  // El MAÍZ compañero SALIÓ del registro el 2026-08-14 (retirado del roster,
-  // ver la nota "ROSTER A 7" arriba) — MaizCompaiEscena.jsx/MaizCompai.jsx
-  // siguen en el repo, solo dejaron de estar cableados aquí.
+  // El MAÍZ y la GUACAMAYA compañeros SALIERON del registro el 2026-08-14
+  // (retirados del roster, ver la nota "ROSTER A 8" arriba) — sus compAI
+  // siguen existiendo en `visual/creatures/`, solo dejaron de estar cableados
+  // aquí.
   //
   // La ZARIGÜEYA compañera (fable #5): marsupial nocturno DE PISO — llega
   // trotando, merodea, se encarama al foco en alto y husmea. Crías al lomo
@@ -118,14 +119,20 @@ const REGISTRO = {
   // detiene a leer la noche y con alerta de finca titila 'degradado'.
   // PortalComponent pendiente, mismo criterio que el jaguar.
   luciernaga: { EscenaComponent: LuciernagaCompaiEscena, PortalComponent: null, presencia: LUCIERNAGA_PRESENCIA, especie: 'luciernaga', pendienteFable: false },
-  // La GUACAMAYA y el CHIVITO DE PÁRAMO (roster-7, 2026-08-14): ya tienen
-  // cuerpo 2.5D en la PWA (GuacamayaCompai.jsx/ChivitoPunk.jsx, reusan el rig F24
-  // del valle) pero TODAVÍA no tienen coreografía 3D propia — quedan
-  // `pendienteFable:true` y caen a Angelita en el mundo 3D (regla del
-  // fallback, igual que jaguar/oso-baston/luciernaga antes de F26). Cuando
-  // alguien las coreografíe, sus PRESENCIA de placeholder ya están sembradas
-  // en `guacamayaIdentidad.js`/`chivitoIdentidad.js` (visual/creatures/).
-  guacamaya: { EscenaComponent: null, PortalComponent: null, presencia: null, especie: 'guacamaya', pendienteFable: true },
+  // DANTE y OLIVER (roster-8, 2026-08-14): AÚN sin arte 3D propio (es de
+  // Fable, hoy en hold del operador). Entran con `pendienteFable:true` y caen
+  // a Angelita en el mundo 3D por el fallback de CompaiTransicion.jsx —
+  // mismo mecanismo que jaguar/oso-baston/luciernaga antes de F26. Cuando
+  // Fable complete sus escenas, sus PRESENCIA se sembrarán en
+  // `danteIdentidad.js`/`oliverIdentidad.js` (visual/creatures/).
+  dante: { EscenaComponent: null, PortalComponent: null, presencia: null, especie: 'dante', pendienteFable: true },
+  oliver: { EscenaComponent: null, PortalComponent: null, presencia: null, especie: 'oliver', pendienteFable: true },
+  // El CHIVITO DE PÁRAMO (roster-8, 2026-08-14): ya tiene cuerpo 2.5D en la
+  // PWA (ChivitoPunk.jsx, reusa el rig F24 del valle) pero TODAVÍA no tiene
+  // coreografía 3D propia — queda `pendienteFable:true` y cae a Angelita en
+  // el mundo 3D (regla del fallback, igual que jaguar/oso-baston/luciernaga
+  // antes de F26). Cuando alguien lo coreografíe, su PRESENCIA de placeholder
+  // ya está sembrada en `chivitoIdentidad.js` (visual/creatures/).
   'chivito-punk': { EscenaComponent: null, PortalComponent: null, presencia: null, especie: 'chivito-punk', pendienteFable: true },
 };
 
