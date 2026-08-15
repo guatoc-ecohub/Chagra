@@ -177,6 +177,84 @@ export const COLA = {
  */
 export const CUERPO_PIVOTE = [330, 140];
 
+/* ════════════════════════════════════════════════════════════════════════════
+ * PIEZAS NUEVAS PARA LA VIDA (rama `feat/jaguar-miss-minutes`).
+ *
+ * El objetivo de esta rama NO es cortar mejor la piel (eso ya lo hizo
+ * `feat/jaguar-pulido` — cuerpo/cabeza/patas×3/cola/2 párpados, aprobado por
+ * el operador) sino DARLE LA VIDA DE ANGELITA a esa piel: que ESCUCHE (pare
+ * la oreja), HABLE (mueva la mandíbula con el lip-sync) y VEA/gesticule con
+ * el mismo sistema de `Angelita.jsx` (useVidaIdle + useRitmoPropio +
+ * useMiradaUsted + useLipSync). Para eso hacen falta piezas que el corte
+ * aprobado no separaba: las DOS OREJAS y la MANDÍBULA.
+ *
+ * MEDIDO sobre `jaguar-natural.png` (705×394) igual que el resto de este
+ * archivo: perfil de contorno superior columna a columna + recortes 10× a
+ * ojo (script Node/`sharp` no versionado, `_gate/`), y verificado que las
+ * piezas nuevas se restan de la cabeza sin dejar hueco (0% de píxeles
+ * perdidos en la recomposición — la misma garantía dura que ya daba capas.js).
+ * ════════════════════════════════════════════════════════════════════════════ */
+
+/**
+ * OREJA IZQUIERDA (la del lado izquierdo de la lámina, x pequeño). Caja en X
+ * (con bordes suaves) × un desvanecido por la BASE (la oreja deja de existir
+ * hacia abajo, donde se funde con la frente — no hay borde de alfa que la
+ * separe del cráneo, igual que las patas se funden con el tronco). El
+ * `pivote` es la BASE de la oreja (donde articula): al parar/mecer la oreja
+ * rota desde ahí, así la punta se mueve y la base casi no.
+ *
+ * ANTI-HUECO (verificado con recorte offline `sharp`): la oreja se RESTA de la
+ * cabeza SOLO por su parte alta (`baseSub`, más arriba que `base`), no entera —
+ * así la BASE de la oreja queda TAMBIÉN en la cabeza (misma piel; la oreja la
+ * tapa en reposo → compuesto idéntico) y, cuando la oreja rota desde el pivote,
+ * la piel de la cabeza RESPALDA la base y no se abre fondo. Aun así la rotación
+ * es CHICA y SIN levantar (solo giro): levantar la oreja destaparía fondo bajo
+ * ella (medido — ver el reporte).
+ */
+export const OREJA_IZQ = {
+  box: { x0: 0, x1: 52, xFade: 8 },
+  base: { y0: 40, y1: 58 },      // la PIEZA: opaca arriba (punta), se desvanece hacia la base
+  baseSub: { y0: 18, y1: 34 },   // lo que se RESTA de la cabeza: solo la parte ALTA
+  pivote: [36, 52],
+};
+
+/** OREJA DERECHA (lado derecho de la lámina, x grande). Misma técnica. */
+export const OREJA_DER = {
+  box: { x0: 108, x1: 160, xFade: 8 },
+  base: { y0: 40, y1: 58 },
+  baseSub: { y0: 18, y1: 34 },
+  pivote: [124, 52],
+};
+
+/**
+ * MANDÍBULA / boca (el maxilar inferior + mentón). Caja en X × un desvanecido
+ * por la LÍNEA DE LA BOCA (la mandíbula empieza DEBAJO de los labios ~y150 y
+ * baja al mentón ~y196). El `pivote` es la charnela (comisura), arriba-centro:
+ * al hablar la pieza baja + rota apenas desde ahí, como una mandíbula real.
+ *
+ * HONESTIDAD (lo dice el reporte): la lámina es un RETRATO DE BOCA CERRADA. Al
+ * bajar la mandíbula se abre un hueco entre labio superior y mentón; detrás NO
+ * hay píxeles de fauces (la foto no los tiene). Ese hueco lo tapa un INTERIOR
+ * DE BOCA SINTÉTICO (`BOCA`, dibujado en JaguarLaminaViva.jsx — el ÚNICO píxel
+ * que no sale del PNG en todo el jaguar). Es un lip-sync creíble a tamaño de
+ * avatar, pero para una boca abierta 100% fiel al trazo de Humboldt haría
+ * falta un dibujito de fauces del operador (las otras láminas —`jaguar-
+ * actuando`/`jaguar-gesto`— tienen boca abierta pero en estilo caricatura, no
+ * pegan con esta cabeza realista). Ver el reporte.
+ */
+export const MANDIBULA = {
+  box: { x0: 42, x1: 132, xFade: 10 },
+  labio: { y0: 146, y1: 160 },    // se desvanece hacia arriba (bajo el labio)
+  menton: { y0: 184, y1: 204 },   // …y hacia abajo (fin del mentón): NO invade el cuello
+  pivote: [87, 150],
+};
+
+/**
+ * Centro de la BOCA (comisura) para el interior sintético y el punto de
+ * apertura de la mandíbula. En px de la lámina (se convierte a % del stage).
+ */
+export const BOCA = { cx: 87, cy: 152, ancho: 46 };
+
 export default {
   CARPETA_LAMINA,
   ARCHIVO_LAMINA,
@@ -193,4 +271,8 @@ export default {
   PATA_TRASERA,
   COLA,
   CUERPO_PIVOTE,
+  OREJA_IZQ,
+  OREJA_DER,
+  MANDIBULA,
+  BOCA,
 };

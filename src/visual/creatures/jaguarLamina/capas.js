@@ -62,6 +62,7 @@
  */
 import {
   CABEZA, OJO, OJO_2, PATAS_DEL_ENVOLVENTE, CORTE_PATAS_DEL, SOLAPE_PATA_DEL_CERCA, PATA_TRASERA, COLA,
+  OREJA_IZQ, OREJA_DER, MANDIBULA,
 } from './anatomia.js';
 
 const clamp = (v, a, b) => (v < a ? a : v > b ? b : v);
@@ -114,6 +115,43 @@ function mascaraCola(x, y) {
   return ss(COLA.cut.u0, COLA.cut.u1, proyeccion(x, y, COLA.cut));
 }
 
+/** Máscara de una OREJA: caja en X (bordes suaves) × desvanecido hacia la
+ *  BASE (opaca arriba —la punta—, se funde a 0 hacia abajo donde nace del
+ *  cráneo, que no tiene borde de alfa propio). Igual patrón que las patas
+ *  (`mascaraApendice`) pero con la Y invertida (la oreja "cuelga hacia
+ *  arriba"). */
+function mascaraOreja(x, y, { box, base }) {
+  const { x0, x1, xFade } = box;
+  const fx = ss(x0, x0 + xFade, x) * (1 - ss(x1 - xFade, x1, x));
+  const fbase = 1 - ss(base.y0, base.y1, y);
+  return fx * fbase;
+}
+
+/** Máscara de la oreja para RESTARLA de la cabeza: igual que `mascaraOreja`
+ *  pero se corta más ARRIBA (`baseSub`) — deja la BASE de la oreja también en
+ *  la cabeza, de respaldo para que la rotación no abra fondo (ver anatomia.js,
+ *  ANTI-HUECO). La PIEZA de oreja sí usa la máscara completa (`mascaraOreja`),
+ *  así en reposo la oreja tapa esa base compartida y el compuesto es idéntico. */
+function mascaraOrejaSub(x, y, { box, baseSub }) {
+  const { x0, x1, xFade } = box;
+  const fx = ss(x0, x0 + xFade, x) * (1 - ss(x1 - xFade, x1, x));
+  const fbase = 1 - ss(baseSub.y0, baseSub.y1, y);
+  return fx * fbase;
+}
+
+/** Máscara de la MANDÍBULA: caja en X × desvanecido por la LÍNEA DE LA BOCA
+ *  (opaca DEBAJO del labio, se funde a 0 hacia arriba). Es la mitad inferior
+ *  de la cara: al bajarla se abre la boca. */
+function mascaraMandibula(x, y) {
+  const { box, labio, menton } = MANDIBULA;
+  const { x0, x1, xFade } = box;
+  const fx = ss(x0, x0 + xFade, x) * (1 - ss(x1 - xFade, x1, x));
+  // opaca ENTRE el labio (arriba) y el fin del mentón (abajo): la mandíbula
+  // es solo el maxilar inferior, no baja al cuello.
+  const fy = ss(labio.y0, labio.y1, y) * (1 - ss(menton.y0, menton.y1, y));
+  return fx * fy;
+}
+
 /**
  * Fracción "lejana" (0..1) dentro del envolvente de las patas delanteras:
  * 0 = lado cerca (blanco/rayado, la pata que queda atrás en esta pose),
@@ -150,6 +188,7 @@ function fraccionCercaPatasDel(x, y) {
  *   no cargó (naturalWidth/Height en 0) — en producción no debería hacer
  *   falta, pero blinda contra un `onload` que dispara antes de tiempo.
  * @returns {{W:number,H:number,cuerpo:HTMLCanvasElement,cabeza:HTMLCanvasElement,
+ *   orejaIzq:HTMLCanvasElement,orejaDer:HTMLCanvasElement,mandibula:HTMLCanvasElement,
  *   patasDelCerca:HTMLCanvasElement,patasDelLejana:HTMLCanvasElement,
  *   pataTrasera:HTMLCanvasElement,cola:HTMLCanvasElement,
  *   parpado:{cv:HTMLCanvasElement,x0:number,y0:number,w:number,h:number},
@@ -182,7 +221,26 @@ export function hornearJaguar(img, dims = {}) {
   // `patasDelLejana` pinta ENCIMA en el DOM con el corte ajustado; debajo,
   // `patasDelCerca` es más ancha que su mitad "justa" para respaldar el
   // hueco que abre la rotación cuando las dos patas divergen de fase.
+  // `mCabeza` es la cabeza COMPLETA (incluye orejas y mandíbula): se usa para
+  // (a) excluir la cabeza de las demás piezas y (b) el corte duro del cuerpo —
+  // así el cuerpo sigue borrándose bajo TODA la testa, orejas y mandíbula
+  // incluidas (sin esto el cuerpo reclamaría los píxeles de oreja/mandíbula que
+  // ahora la cabeza-render no pinta → 0% de píxeles perdidos se mantiene).
   const mCabeza = (x, y) => mascaraCabeza(x, y);
+  // Piezas NUEVAS de la vida: las orejas (arriba de todo) y la mandíbula
+  // (mitad inferior de la cara). Se recortan DENTRO de la cabeza (× mCabeza)
+  // para no invadir cuello/cuerpo, y se RESTAN de la cabeza-render (abajo).
+  const mOrejaIzq = (x, y) => mascaraOreja(x, y, OREJA_IZQ) * mCabeza(x, y);
+  const mOrejaDer = (x, y) => mascaraOreja(x, y, OREJA_DER) * mCabeza(x, y);
+  const mMandibula = (x, y) => mascaraMandibula(x, y) * mCabeza(x, y);
+  // La cabeza que se PINTA = cabeza completa menos lo que ahora vive aparte. Las
+  // orejas se restan por su parte ALTA (`mascaraOrejaSub`): la BASE queda en la
+  // cabeza de respaldo (anti-hueco al rotar). La oreja-pieza (arriba, con la
+  // máscara completa) tapa esa base en reposo → compuesto idéntico. La
+  // mandíbula sí se resta entera (baja en bloque, no rota desde dentro).
+  const mCabezaRender = (x, y) => mCabeza(x, y)
+    * (1 - mascaraOrejaSub(x, y, OREJA_IZQ)) * (1 - mascaraOrejaSub(x, y, OREJA_DER))
+    * (1 - mMandibula(x, y));
   const mApendiceDel = (x, y) => mascaraApendice(x, y, PATAS_DEL_ENVOLVENTE) * (1 - mCabeza(x, y));
   const mPataDelLejana = (x, y) => mApendiceDel(x, y) * fraccionLejanaPatasDel(x, y);
   const mPataDelCerca = (x, y) => mApendiceDel(x, y) * fraccionCercaPatasDel(x, y);
@@ -217,7 +275,10 @@ export function hornearJaguar(img, dims = {}) {
     W,
     H,
     cuerpo: pintar(mCuerpo),
-    cabeza: pintar(mCabeza),
+    cabeza: pintar(mCabezaRender),
+    orejaIzq: pintar(mOrejaIzq),
+    orejaDer: pintar(mOrejaDer),
+    mandibula: pintar(mMandibula),
     patasDelCerca: pintar(mPataDelCerca),
     patasDelLejana: pintar(mPataDelLejana),
     pataTrasera: pintar(mPataTrasera),
