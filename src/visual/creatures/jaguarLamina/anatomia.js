@@ -27,21 +27,39 @@
  * se verificó con ojo humano en vivo — eso queda para el gate GPU del
  * operador.
  *
- * LAS 4 PIEZAS RECORTADAS (más el cuerpo, que es el resto):
+ * LAS PIEZAS RECORTADAS (más el cuerpo, que es el resto):
  *   - cabeza: corte CASI VERTICAL (la pose es de perfil, no frontal — por
  *     eso el eje no es horizontal como en los bustos de piloto-lamina.js),
  *     con una franja de mezcla + un desvanecido adicional por Y (la mandíbula
  *     no puede seguir "siendo cabeza" más abajo del cuello real).
- *   - patasDelanteras: las DOS patas delanteras se recortan como UNA sola
- *     pieza. Se intentó separarlas — en esta lámina las patas delantera y
- *     trasera-lejana están tan próximas y su límite de alfa es tan continuo
- *     que un corte propio entre ellas se veía como una fractura, no como una
- *     articulación (ver el reporte de la tarea). Rota como bloque desde el
- *     hombro: pierde la alternancia de zancada individual del rig, gana no
- *     partir el arte donde no hay borde real.
+ *   - patasDelanteras (`pulido 2026-08-14`, `feat/jaguar-pulido`): las DOS
+ *     patas delanteras YA SE SEPARAN en dos piezas independientes,
+ *     `patasDelCerca`/`patasDelLejana`. El intento anterior (`feat/jaguar-
+ *     lamina-sobre-esqueleto`) las dejó como un solo bloque porque asumió que
+ *     hacía falta un borde de ALFA (transparencia) entre ellas para
+ *     cortarlas limpio — no lo hay, es pelaje sólido de punta a punta. Pero
+ *     SÍ hay un borde de COLOR nítido y consistente: la pata que queda atrás
+ *     en la zancada se ve del lado interno/vientre (blanco crema con rayas
+ *     negras) y la que va adelante se ve del lado externo (rosetas
+ *     anaranjadas) — es la MISMA lámina mostrando el gesto de caminar, con
+ *     las dos patas ya en fases distintas. Se midió ese borde por color
+ *     (script Node/`sharp`, no versionado: para cada fila Y se buscó el
+ *     cruce del signo de R-G-B entre "blanquecino" y "anaranjado" — ver
+ *     `CORTE_PATAS_DEL`) y salió una recta casi vertical con una leve
+ *     inclinación (~22px de deriva en ~150px de alto), consistente con la
+ *     línea que separa ambas patas a simple vista. `CORTE_PATAS_DEL` corta
+ *     el envolvente COMPARTIDO `PATAS_DEL_ENVOLVENTE` en dos mitades
+ *     complementarias (se suman a 1 en todo punto — nunca se disputan ni
+ *     dejan hueco un mismo píxel), igual que ya hacían `CABEZA`/`COLA` con
+ *     su propia recta de corte. Cada pieza pivota con la fase REAL del rig
+ *     (`~/demos/3d/compai/rigs/jaguar.css`, `#jaguarLado`): `delCerca` en 0s,
+ *     `delLejos` en -.66s — antes el bloque único solo usaba la fase 0s para
+ *     AMBAS patas, que era la causa real de "van en bloque" (ver
+ *     jaguarLamina.css).
  *   - pataTrasera: la pata trasera CERCANA (la única con silueta separable
  *     con confianza; la trasera-lejana no se distingue del cuerpo/la cercana
- *     en el alfa de esta lámina — no se inventa un corte donde no hay señal).
+ *     en el alfa de esta lámina — no se inventa un corte donde no hay señal;
+ *     sigue sin cortarse, documentado como límite pendiente).
  *   - cola: corte casi vertical en la base de la cola (arranca detrás de la
  *     grupa). Una sola pieza rígida — el rig separa cola/punta de cola en dos
  *     huesos (`colaLado`/`colaLadoPunta`); aquí solo se replica el hueso base
@@ -73,15 +91,70 @@ export const CABEZA = {
   pivote: [215, 235],
 };
 
-/** El ojo visible (perfil/¾: el otro ojo, más lejano, no se midió — ver README de la tarea). */
+/**
+ * Los DOS ojos visibles: la testa está girada ¾ hacia cámara (no es un
+ * perfil puro), así que ambos ojos entran en cuadro y se miden los dos —
+ * antes solo se cortaba `OJO` (el derecho/más central) y el parpadeo era un
+ * GUIÑO de un solo ojo, ni siquiera un parpadeo real. Medidos por centroide
+ * de brillo (`sd[i]>190 && sd[i+1]>150 && brillo>60`, script Node/`sharp` no
+ * versionado) + lectura fina a ojo sobre un recorte 10× para el radio real
+ * del anillo oscuro del párpado (el centroide de brillo solo agarra el
+ * iris encendido, más chico que el ojo completo).
+ */
 export const OJO = { cx: 115, cy: 79, r: 22 };
+export const OJO_2 = { cx: 48, cy: 78, r: 17 };
 
-/** Caja + banda de articulación (en Y) para un apéndice que cuelga del cuerpo. */
-export const PATAS_DELANTERAS = {
+/**
+ * Envolvente COMPARTIDA de las dos patas delanteras (caja en X + banda de
+ * articulación en Y, igual que antes) — ya NO es una pieza, es la caja que
+ * `CORTE_PATAS_DEL` reparte entre `PATA_DEL_CERCA`/`PATA_DEL_LEJANA`.
+ */
+export const PATAS_DEL_ENVOLVENTE = {
   box: { x0: 145, x1: 300, xFade: 15 },
   joint: { y0: 228, y1: 258 },
-  pivote: [220, 238],
 };
+
+/**
+ * La recta que separa las dos patas delanteras DENTRO de
+ * `PATAS_DEL_ENVOLVENTE` (mismo formato que `CABEZA.cuello`/`COLA.cut`: banda
+ * proyectada sobre (px,py)+(nx,ny)). Medida por cruce de color fila a fila
+ * (R-B pasa de bajo/blanquecino a alto/anaranjado alrededor de x≈167..190
+ * entre y=225 y y=380 — casi vertical, con una leve inclinación hacia la
+ * izquierda al bajar). `u>0` = lado LEJANO (anaranjado, pata que va
+ * adelante); `u<0` = lado CERCA (blanco/rayado, pata que queda atrás).
+ * Banda de mezcla angosta (18px sobre 705 de ancho, <1% del cuadro): no hay
+ * borde de alfa que suavizar, así que se mantiene apenas lo justo para que
+ * el filo no se vea aserrado a full-size, sin generar un halo doble
+ * perceptible al tamaño de avatar. Este corte lo usa `patasDelLejana`
+ * (la pieza de ENCIMA en el DOM/z-order) — ver `SOLAPE_PATA_DEL_CERCA`
+ * para la pieza de ABAJO.
+ */
+export const CORTE_PATAS_DEL = {
+  px: 179, py: 310, nx: 0.99, ny: 0.1406, u0: -9, u1: 9,
+};
+
+/**
+ * Cuánto INVADE `patasDelCerca` (la pieza de ABAJO en el z-order) el
+ * territorio de `patasDelLejana` más allá de `CORTE_PATAS_DEL.u1`, antes de
+ * desvanecerse del todo. Verificado con captura real (Playwright + Chromium,
+ * `feat/jaguar-pulido`): con el corte simétrico simple (cada pata solo su
+ * mitad) aparecía una línea de fondo visible entre las dos patas en varios
+ * fotogramas — las dos piezas pivotan sobre puntos DISTINTOS y en fases
+ * DISTINTAS, así que a full amplitud (lejos del pivote, cerca de la garra)
+ * dejan de coincidir con el corte estático y se abre un hueco. Solución
+ * estándar de recorte en papel articulado: la pieza de ABAJO se hace más
+ * ANCHA que su mitad "justa" para que, aunque la de ARRIBA se corra, siga
+ * habiendo piel real (no fondo) debajo. Es piel propia del animal (mismo
+ * píxel fuente) — no se inventa nada, solo se re-reparte cuánto de esa
+ * piel le toca a cada capa.
+ */
+export const SOLAPE_PATA_DEL_CERCA = 55;
+
+/** Pata delantera que en esta pose queda ATRÁS (lado interno/vientre, blanco-rayado). */
+export const PATA_DEL_CERCA = { pivote: [160, 236] };
+
+/** Pata delantera que en esta pose va ADELANTE (lado externo, rosetas anaranjadas). */
+export const PATA_DEL_LEJANA = { pivote: [208, 236] };
 
 export const PATA_TRASERA = {
   box: { x0: 455, x1: 590, xFade: 15 },
@@ -105,5 +178,19 @@ export const COLA = {
 export const CUERPO_PIVOTE = [330, 140];
 
 export default {
-  CARPETA_LAMINA, ARCHIVO_LAMINA, ANCHO, ALTO, CABEZA, OJO, PATAS_DELANTERAS, PATA_TRASERA, COLA, CUERPO_PIVOTE,
+  CARPETA_LAMINA,
+  ARCHIVO_LAMINA,
+  ANCHO,
+  ALTO,
+  CABEZA,
+  OJO,
+  OJO_2,
+  PATAS_DEL_ENVOLVENTE,
+  CORTE_PATAS_DEL,
+  SOLAPE_PATA_DEL_CERCA,
+  PATA_DEL_CERCA,
+  PATA_DEL_LEJANA,
+  PATA_TRASERA,
+  COLA,
+  CUERPO_PIVOTE,
 };
