@@ -832,7 +832,7 @@ export function setNotificationStyle(style) {
  * especie nativa colombiana REAL y verificable — nombre científico grounded en
  * el catálogo/grafo de Chagra (fauna emblemática, NUNCA inventada). La lista
  * canónica con nombre común/científico/fuente vive en el componente
- * `GuardianEspiritu.jsx` (fuente de verdad visual); acá solo validamos el id
+ * `GuardianEspiritu.jsx` (fuente de verdad visual); aquí solo validamos el id
  * persistido para no corromper el perfil.
  *
  *   - abeja:   Tetragonisca angustula (abeja angelita) — grounded animal-diagnostics.json
@@ -1027,7 +1027,7 @@ export function buildUserProfileBlock(profile) {
   return `=== PERFIL DEL USUARIO (personaliza tus respuestas a este contexto) ===
 ${lines.join('\n')}${tono}
 Adapta cultivos, clima y recomendaciones a este perfil. Si un dato del perfil
-contradice lo que el usuario dice ahora, dale prioridad a lo que dice ahora.
+contradice lo que el usuario dice ahora, da prioridad a lo que dice ahora.
 === FIN PERFIL DEL USUARIO ===`;
 }
 

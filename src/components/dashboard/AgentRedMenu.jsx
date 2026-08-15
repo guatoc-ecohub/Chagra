@@ -29,7 +29,7 @@ import {
  *     alto (height:100%).
  *   - UNA SOLA Ⓐ (operador 2026-06-10): el menú NO renderiza nodo raíz propio.
  *     La raíz geométrica de la red ES el botón Ⓐ real del compositor (vive en
- *     AgentHero, abajo-izquierda); el padre lo comparte vía `anchorRef` y acá
+ *     AgentHero, abajo-izquierda); el padre lo comparte vía `anchorRef` y aquí
  *     se mide su centro REAL en coordenadas del lienzo. Con overflow visible
  *     (refinamiento sin-cortes 2026-06-10) cada trazo NACE dentro del disco
  *     del botón (rimPoint) y viaja sobre el borde del compositor — la unión
@@ -462,7 +462,7 @@ export default function AgentRedMenu({ onPick, disabled = false, anchorRef = nul
     const vnI = root.querySelector('[data-arm="vnI"]');
     const hintEl = root.querySelector('[data-arm="hint"]');
 
-    /* estado de simulación por grupo/hoja (paths SVG creados acá). */
+    /* estado de simulación por grupo/hoja (paths SVG creados aquí). */
     const sim = RING.map((g, i) => {
       const el = root.querySelector(`[data-arm-group="${i}"]`);
       return {

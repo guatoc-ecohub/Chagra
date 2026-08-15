@@ -130,7 +130,7 @@
 }
 
 /* Luz volumétrica: haces cónicos que giran despacio detrás de todo. La
- * opacidad la pone el JSX con la voz real; acá solo el giro (transform). */
+ * opacidad la pone el JSX con la voz real; aquí solo el giro (transform). */
 .portal-rayos {
   position: absolute;
   inset: -14px;
@@ -374,7 +374,7 @@
 
 /* --- Acciones tamaño GUANTE ------------------------------------------------
  * El caso de uso es manos con guantes/barro: el botón primario ocupa todo el
- * ancho y mide ≥72px de alto. Nada de targets de 40px acá. */
+ * ancho y mide ≥72px de alto. Nada de targets de 40px aquí. */
 .escucha-acciones {
   width: 100%;
   display: flex;

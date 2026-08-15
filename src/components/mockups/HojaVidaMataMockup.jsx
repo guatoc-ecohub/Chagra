@@ -140,7 +140,7 @@ const EVENTOS = [
     fecha: '26 jun',
     tipo: 'actual',
     titulo: 'Primeros tomates',
-    nota: 'Cuajó y maduró el primer racimo. Desde acá se cosecha parejo, a medida que van pintando.',
+    nota: 'Cuajó y maduró el primer racimo. Desde aquí se cosecha parejo, a medida que van pintando.',
   },
 ];
 

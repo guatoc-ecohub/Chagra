@@ -11,7 +11,7 @@ calidad dispar. Aquí vive la **versión canónica** de cada uno.
 ## Regla de la casa
 
 > **Antes de dibujar un personaje de fauna, búscalo aquí.**
-> Si existe → **reúsalo** (y si podés, **mejorá** la versión canónica en su
+> Si existe → **reúsalo** (y si puedes, **mejorá** la versión canónica en su
 > archivo, para que todos hereden la mejora).
 > Si dibujás un personaje nuevo reutilizable → **agregalo aquí en el mismo PR**
 > (componente + entrada en `index.js` + fila en esta tabla).

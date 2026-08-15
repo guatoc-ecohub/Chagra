@@ -9,14 +9,14 @@
 // contenido validado por Restrepo Rivera / Agrosavia / ICA que ya vive en el
 // catálogo, para que un campesino de baja alfabetización pueda prepararlo
 // mirando el dibujo. La fuente real se cita desde el objeto del catálogo
-// (`biopreparado.fuente`), no desde acá.
+// (`biopreparado.fuente`), no desde aquí.
 //
 // Cobertura: 15 biopreparados con receta COMPLETA en el catálogo
 // (proceso_resumen + ingredientes + dosis + tiempo). Caen al texto los que NO
 // traen receta campesina completa en el seed; hoy solo `biofertilizante_algas`
 // (extracto hidrolizado industrial, sin cantidades de preparación en el seed →
 // reproducirlo exigiría inventar, y eso está prohibido).
-// Para los biopreparados sin entrada acá, el componente devuelve null y la UI
+// Para los biopreparados sin entrada aquí, el componente devuelve null y la UI
 // cae con elegancia al `proceso_resumen` en texto (sin diagrama).
 
 /**

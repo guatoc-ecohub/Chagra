@@ -35,7 +35,7 @@ import DATA from '../data/extensionista-fincas.json';
  *
  * Mantener alineado con los `estado` posibles del seed
  * (src/data/extensionista-fincas.json). Si el seed trae un estado no listado
- * acá, `clasificarEstadoFinca` degrada a neutro (no rompe el render).
+ * aquí, `clasificarEstadoFinca` degrada a neutro (no rompe el render).
  *
  * @constant {Record<string, { label: string, severidad: number, tono: string }>}
  */

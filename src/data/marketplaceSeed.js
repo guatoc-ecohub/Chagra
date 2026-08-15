@@ -82,7 +82,7 @@ export const OFERTAS_SEED = Object.freeze([
     moneda: 'COP',
     finca: 'Finca El Mirador',
     vereda: 'Vereda Aguas Claras',
-    municipio: 'Boyacá',
+    municipio: 'Boyaquí',
     contactoTel: '',
     nota: 'Recolección del día. Entrega en agrofería del domingo.',
     createdAt: 0,

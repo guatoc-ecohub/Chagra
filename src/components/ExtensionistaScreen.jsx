@@ -130,7 +130,7 @@ function FincaCard({ finca }) {
 
 /** @param {{ onBack: () => void, onHome?: () => void }} props */
 export default function ExtensionistaScreen({ onBack, onHome }) {
-  // Guard defensivo de rol (App.jsx ya redirige, pero repetimos acá por si la
+  // Guard defensivo de rol (App.jsx ya redirige, pero repetimos aquí por si la
   // pantalla se monta por una ruta directa). Si no hay rol → no construimos el
   // tablero ni mostramos fincas.
   const tieneRol = esExtensionistaActual();

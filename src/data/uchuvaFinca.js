@@ -361,12 +361,12 @@ export const GRADO_COLOR = {
 
 /**
  * La uchuva como fruta de exportación. GROUNDED (cycle-content Tier A): Colombia
- * es el principal exportador mundial; zonas de Cundinamarca, Boyacá, Antioquia
+ * es el principal exportador mundial; zonas de Cundinamarca, Boyaquí, Antioquia
  * y Nariño entre 1.800 y 2.800 msnm. El "cómo" fino del acopio/frío se remite
  * al mundo de poscosecha y almacenamiento.
  */
 export const POSCOSECHA_UCHUVA = {
-  intro: 'La uchuva es la fruta estrella de la exportación colombiana: Colombia es el principal exportador del mundo, sobre todo desde Cundinamarca, Boyacá, Antioquia y Nariño, en la tierra fría entre 1.800 y 2.800 msnm. Por eso la poscosecha define la plata: una fruta mal manejada se cae del negocio.',
+  intro: 'La uchuva es la fruta estrella de la exportación colombiana: Colombia es el principal exportador del mundo, sobre todo desde Cundinamarca, Boyaquí, Antioquia y Nariño, en la tierra fría entre 1.800 y 2.800 msnm. Por eso la poscosecha define la plata: una fruta mal manejada se cae del negocio.',
   pasos: [
     {
       id: 'seleccion',

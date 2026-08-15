@@ -80,7 +80,7 @@ function Ejemplo({ ejemplo }) {
 
 export default function EjemplosVoz() {
   // Se lee UNA vez al montar: si el usuario cambia la preferencia del sistema
-  // con el panel abierto, el próximo montaje la recoge (suficiente acá).
+  // con el panel abierto, el próximo montaje la recoge (suficiente aquí).
   const [sinMovimiento] = useState(prefiereMenosMovimiento);
   const [idx, setIdx] = useState(0);
 

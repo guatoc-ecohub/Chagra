@@ -17,7 +17,7 @@ la misma firma de props**: una lámina no tiene `size`/`inline` — se dibuja a
 ## Regla de la casa
 
 > **Antes de dibujar una lámina de cuaderno, búscala aquí.**
-> Si existe → **reúsala** (y si podés, **mejorá** la versión canónica en su
+> Si existe → **reúsala** (y si puedes, **mejorá** la versión canónica en su
 > archivo, para que todos hereden la mejora).
 > Si dibujás una lámina nueva reutilizable → **agregala aquí en el mismo PR**
 > (componente + entrada en `index.js` + fila en esta tabla).

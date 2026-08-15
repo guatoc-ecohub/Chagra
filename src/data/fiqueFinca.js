@@ -20,7 +20,7 @@
  * fuentes Tier A: GBIF, POWO Kew, Bernal 2015, Pérez Arbeláez 1947, Agrosavia
  * Tibaitatá, SiB Colombia, IAvH):
  *   - Furcraea andina Trel. (Asparagaceae/Agavoideae): xerófita rosetada nativa
- *     andina; laderas 1500–2600 msnm; Santander, Boyacá, Cauca, Nariño, Antioquia.
+ *     andina; laderas 1500–2600 msnm; Santander, Boyaquí, Cauca, Nariño, Antioquia.
  *   - Propagación vegetativa por bulbillos aéreos de la panícula o por hijuelos
  *     basales; vivero 6–12 meses; distancia 2.5–3 m (monocultivo) o 1–1.5 m en
  *     seto/cerca viva; cosecha de hojas desde 4–6 años (8–12 hojas/planta/año);
@@ -66,7 +66,7 @@ export const FICHA_FIQUE = {
   cientifico: 'Furcraea andina Trel.',
   familia: 'Asparagaceae (subfamilia Agavoideae)',
   altitud: '1500–2600 msnm (óptimo); aguanta de 800 a 3000',
-  zonas: 'Santander, Boyacá, Cauca, Nariño, Antioquia, Cundinamarca y Tolima',
+  zonas: 'Santander, Boyaquí, Cauca, Nariño, Antioquia, Cundinamarca y Tolima',
   descripcion:
     'Una roseta gigante de hojas (pencas) gruesas, largas y con dientes en el borde, verdes grisáceas. Vive en las laderas secas y semihúmedas de los Andes. Es planta nativa: la cultivaron los pueblos Muisca, Guane y Lache mucho antes de la llegada española, y de ella sale la cabuya, la fibra vegetal de Colombia.',
   fuente: 'Catálogo Chagra (Furcraea andina) · Bernal 2015 · Pérez Arbeláez 1947',
@@ -246,7 +246,7 @@ export const USOS_FIQUE = [
  * Muisca/Guane/Lache; identidad santandereano-boyacense; soberanía textil).
  */
 export const CULTURA_FIQUE =
-  'El fique es patrimonio vivo: fibra nativa domesticada por los pueblos Muisca, Guane y Lache milenios antes de la Colonia, y hoy seña de identidad de Santander y Boyacá. Sembrarlo y beneficiarlo es sostener un oficio y una soberanía textil propia, con una fibra que nace en la ladera y vuelve a la tierra sin contaminar.';
+  'El fique es patrimonio vivo: fibra nativa domesticada por los pueblos Muisca, Guane y Lache milenios antes de la Colonia, y hoy seña de identidad de Santander y Boyaquí. Sembrarlo y beneficiarlo es sostener un oficio y una soberanía textil propia, con una fibra que nace en la ladera y vuelve a la tierra sin contaminar.';
 
 /* ────────────────────────────────────────────────────────────────────────
  * ESTACIÓN 5 · BAGAZO Y JUGO (aprovechar sin contaminar el agua)

@@ -415,7 +415,7 @@ export function buildFincaGameState({
   // Acepta procesos en shape real (anidado en .attributes) o plano (tests).
   const flatProcesses = Array.isArray(processes) ? processes.map(flattenProcess) : [];
 
-  // Motor real: cero fabricación vive acá adentro.
+  // Motor real: cero fabricación vive aquí adentro.
   const evolution = evaluarEvolucionFinca({ processes: flatProcesses, observations });
   const nivel = Math.max(0, Math.min(MAX_LEVEL, evolution.nivelGliessman));
   const mundo = WORLD_STAGES[nivel];
