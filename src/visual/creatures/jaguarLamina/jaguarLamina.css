@@ -9,8 +9,8 @@
  * visema) y este CSS solo la CONSUME sobre cada pieza:
  *
  *   señal (hook/estado)                → qué pieza mueve, acá
- *   --rh-blink-dur/-delay (ritmo)      → parpadeo REAL de los dos ojos, cada
- *                                        instancia a su aire + guiño ocasional
+ *   --rh-blink-dur/-delay (ritmo)      → parpadeo REAL de los dos ojos juntos,
+ *                                        cada instancia a su aire (cadencia rh)
  *   data-rh-mira + --rh-mx/--rh-my     → la CABEZA gira siguiendo al usuario
  *   data-vida=acecha|ruge|reposo       → el idle-cerebro: acecho (agacha),
  *                                        bostezo/rugido (abre fauces), reposo
@@ -98,31 +98,28 @@
   50%      { transform: rotate(2.4deg); }
 }
 
-/* ═══ PARPADEO REAL con RITMO PROPIO + GUIÑO ════════════════════════════════
-   Los dos ojos cierran JUNTOS (parpadeo real). El ciclo largo = 3× la duración
-   propia del blink (calc con la var del ritmo): tres parpadeos sincronizados
-   por vuelta. El ojo central (`.jlv-parpado-der`) además PICA EL OJO (guiño
-   deliberado) una vez por vuelta — la chispa de Angelita, adaptada al felino.
-   Polaridad: el párpado es un parche de piel que TAPA el ojo (scaleY≈1 cerrado,
-   scaleY≈0 abierto/oculto). */
+/* ═══ PARPADEO REAL con RITMO PROPIO ═════════════════════════════════════════
+   ANTES: un ciclo 3× lento (≈15s) con cierres de ~300ms `linear` y un GUIÑO
+   sostenido (párpado a medias, 3.5% del ciclo) — se leía como un "aplastón"
+   raro del parche de párpado, no como un parpadeo. AHORA copia EXACTO la
+   cadencia probada de la familia (Angelita/rubber-hose: `rh-blink`/`frh-blink`
+   en creatures.css) — un parpadeo suelto + un blink-blink doble por vuelta,
+   cierres rápidos de ~110ms— así el jaguar parpadea IGUAL de sutil y natural
+   que el resto del elenco. Los dos ojos comparten el MISMO --rh-blink-dur/
+   -delay (vars en la raíz), así que cierran JUNTOS: un parpadeo real, no un
+   guiño de un ojo. Polaridad INVERTIDA respecto a la familia: acá el párpado
+   es un parche de piel que TAPA el ojo, así scaleY(0)=retraído (ojo abierto) y
+   scaleY(1)=tapado (ojo cerrado). */
 .jlv-parpado {
   position: absolute;
   transform-origin: 50% 0%;
-  animation: jlv-blink3 calc(var(--rh-blink-dur, 5.2s) * 3) linear var(--rh-blink-delay, 0s) infinite;
+  animation: jlv-blink var(--rh-blink-dur, 5.6s) linear var(--rh-blink-delay, 0s) infinite;
 }
-.jlv-parpado.jlv-parpado-der { animation-name: jlv-blink3-guino; }
-@keyframes jlv-blink3 {
-  0%, 28%, 33%, 61%, 66%, 94%, 99%, 100% { transform: scaleY(0.02); }
-  30%, 31.5% { transform: scaleY(0.96); }   /* parpadeo 1 (ambos ojos) */
-  63%, 64.5% { transform: scaleY(0.96); }   /* parpadeo 2 */
-  96%, 97.5% { transform: scaleY(0.96); }   /* parpadeo 3 */
-}
-@keyframes jlv-blink3-guino {
-  0%, 28%, 33%, 45%, 53%, 61%, 66%, 94%, 99%, 100% { transform: scaleY(0.02); }
-  30%, 31.5% { transform: scaleY(0.96); }
-  47.5%, 51% { transform: scaleY(0.92); }   /* EL GUIÑO: cierre deliberado y sostenido, solo este ojo */
-  63%, 64.5% { transform: scaleY(0.96); }
-  96%, 97.5% { transform: scaleY(0.96); }
+@keyframes jlv-blink {
+  0%, 36%, 40%, 74%, 78%, 82%, 86%, 100% { transform: scaleY(0); }  /* ojo abierto */
+  38% { transform: scaleY(1); }   /* parpadeo suelto */
+  76% { transform: scaleY(1); }   /* blink-blink: dos golpes seguidos */
+  80% { transform: scaleY(1); }
 }
 
 /* ═══ LA MIRADA — la cabeza sigue al usuario (useMiradaUsted) ════════════════

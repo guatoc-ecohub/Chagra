@@ -5,10 +5,11 @@
  * nivel de archivo para no bloquear el pre-commit con deuda preexistente.
  */
 /* eslint-disable chagra-i18n/no-hardcoded-spanish */
-import React, { useState, useCallback, useMemo } from 'react';
+import React, { useState, useCallback, useMemo, useRef } from 'react';
 import { X, Volume2 } from 'lucide-react';
 import ChagraAgentAvatar from './ChagraAgentAvatar';
 import useCompaiElegido from '../visual/mundo3d/escenas/useCompaiElegido.js';
+import useCompaiRoam from '../hooks/useCompaiRoam.js';
 import { AVATAR_NOMBRE, DEFAULT_AVATAR_TYPE } from '../hooks/useAgentAvatarType.js';
 
 /**
@@ -18,11 +19,17 @@ import { AVATAR_NOMBRE, DEFAULT_AVATAR_TYPE } from '../hooks/useAgentAvatarType.
  * visible en todas las rutas 2D (Home, Perfil, Catálogo, Mapa, etc.).
  *
  * Estados:
- *   - Minimizado (por defecto): burbuja flotante con avatar del compai
- *   - Expandido: panel con guía contextual, botón de voz
+ *   - Minimizado (por defecto): el compai a fondo TRANSPARENTE (sin disco de
+ *     color detrás — un felino realista se veía aplastado en el círculo verde),
+ *     con tamaño legible y sombra suave, que DEAMBULA por la franja inferior
+ *     (~30% del ancho) para leerse vivo (useCompaiRoam).
+ *   - Expandido: panel con guía contextual, botón de voz.
  *
  * Comportamiento:
- *   - Toque en burbuja → abre panel (toggle)
+ *   - Toque en el compai → abre panel (toggle); mientras el panel está abierto
+ *     el compai vuelve a casa y se queda quieto (no se corre bajo la guía).
+ *   - El compai camina de un lado a otro con cadencia lenta y se espeja hacia
+ *     donde anda; el jaguar corre su marcha real ('caminando') al desplazarse.
  *   - El hint cambia según la ruta actual (mapa ruta→hint, extensible)
  *   - Botón "Escuchar" usa TTS (kokoro, fail-silent si no hay saldo)
  *   - Respeta preferencias del usuario (avatar seleccionado en AvatarSelector)
@@ -127,6 +134,12 @@ export default function CompaiOverlay({ currentView = 'dashboard' }) {
   const [compaiState, setCompaiState] = useState('idle'); // idle, thinking, speaking, listening
   const [lastView, setLastView] = useState(currentView);
 
+  // El compai DEAMBULA por la franja inferior (~30% del ancho): se pausa (y
+  // vuelve a casa) mientras el panel está abierto para que no se corra bajo la
+  // guía. El regreso es la misma caminata (nunca un salto). Ver useCompaiRoam.
+  const roamRef = useRef(null);
+  const { caminando, hacia } = useCompaiRoam(roamRef, { pausado: isOpen });
+
   const hint = useMemo(() => getHintForRuta(currentView, nombreCompai), [currentView, nombreCompai]);
 
   // Al cambiar de ruta, cierra el panel (UX: no queda abierto entre pantallas).
@@ -153,31 +166,63 @@ export default function CompaiOverlay({ currentView = 'dashboard' }) {
     setIsOpen(false);
   }, []);
 
+  // Un felino/animal realista (jaguar) NO cabe digno en un disco chico: se le
+  // da más tamaño para que se LEA. Los compai chicos (abeja, luciérnaga…) van
+  // en un tamaño intermedio, cómodo, sin disco de color detrás.
+  const esRealista = avatarType === 'jaguar';
+  const avatarSize = esRealista ? 112 : 84;
+
+  // Mientras deambula, el jaguar corre su MARCHA real ('caminando'); el resto
+  // conserva su estado (no tienen pose de marcha) y solo se espejan. Un estado
+  // conversacional (hablar/escuchar/pensar) siempre gana a la caminata.
+  const estadoAvatar = esRealista && caminando && compaiState === 'idle'
+    ? 'caminando'
+    : compaiState;
+
+  // Los compai miran a la IZQUIERDA por defecto (la lámina del jaguar tiene la
+  // testa a la izquierda); al volver hacia la derecha se espejan. GATE GPU: si
+  // el sentido sale invertido para algún compai, es voltear este mapeo.
+  const espejo = hacia === 'derecha' ? 'scaleX(-1)' : 'none';
+
   return (
     <div
       className="fixed bottom-4 right-4 z-40 pointer-events-none"
       data-testid="compai-overlay-container"
     >
-      {/* Burbuja flotante (siempre visible) */}
-      <button
-        type="button"
-        onClick={handleToggle}
-        className="pointer-events-auto relative inline-flex items-center justify-center w-16 h-16 rounded-full bg-gradient-to-br from-emerald-500 to-emerald-600 shadow-lg hover:shadow-xl hover:scale-110 transition-transform active:scale-95"
-        aria-label={`Abrir ayuda de ${nombreCompai}`}
-        aria-expanded={isOpen}
-        data-testid="compai-bubble"
-      >
-        <ChagraAgentAvatar
-          size={56}
-          state={compaiState}
-          ariaLabel={`${nombreCompai}, asistente de Chagra`}
-        />
-      </button>
+      {/* El compai que deambula (roamRef desplaza SOLO este nodo por la franja;
+          el panel queda anclado a la esquina). */}
+      <div ref={roamRef} className="will-change-transform">
+        {/* Presencia flotante SIN disco de color: el compai a fondo transparente,
+            con una sombra suave que lo asienta sobre cualquier pantalla. */}
+        <button
+          type="button"
+          onClick={handleToggle}
+          className="pointer-events-auto relative inline-flex items-center justify-center bg-transparent border-none p-0 hover:scale-105 transition-transform active:scale-95 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-400 rounded-2xl"
+          aria-label={`Abrir ayuda de ${nombreCompai}`}
+          aria-expanded={isOpen}
+          data-testid="compai-bubble"
+        >
+          <span
+            className="inline-flex"
+            style={{
+              transform: espejo,
+              transition: 'transform 0.35s ease',
+              filter: 'drop-shadow(0 6px 9px rgba(0, 0, 0, 0.34))',
+            }}
+          >
+            <ChagraAgentAvatar
+              size={avatarSize}
+              state={estadoAvatar}
+              ariaLabel={`${nombreCompai}, asistente de Chagra`}
+            />
+          </span>
+        </button>
+      </div>
 
       {/* Panel expandido (solo si isOpen) */}
       {isOpen && (
         <div
-          className="pointer-events-auto absolute bottom-20 right-0 w-80 bg-slate-900/95 border border-slate-700 rounded-2xl p-4 shadow-2xl backdrop-blur-sm"
+          className="pointer-events-auto absolute bottom-full mb-3 right-0 w-80 bg-slate-900/95 border border-slate-700 rounded-2xl p-4 shadow-2xl backdrop-blur-sm"
           data-testid="compai-panel"
         >
           {/* Header: título + cerrar */}
