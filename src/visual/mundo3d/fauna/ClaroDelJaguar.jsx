@@ -11,26 +11,36 @@
  *     inventado acá; lo que falta se deriva con `mezclar` desde el pariente.
  *   - Luz: `<LuzMadre>` con la familia `CIELOS.sotobosque` mezclada 60% hacia la
  *     madre por `mezclarCielo`. Cero rig propio, cero números calcados.
+ *   - FOLLAJE = MASA. Las copas NUNCA son poliedros de caras contables: los
+ *     árboles del monte son los del dosel andino (`doselBiodiverso.geom` —
+ *     nogal cafetero, cedro y aliso, técnica copa-masa del queñual) y el
+ *     sotobosque son helechos arbóreos del mismo taller. Aquí no se dibuja
+ *     ningún árbol propio.
  *   - Geometría fusionada: `fusionarSeguro` SIEMPRE. Mezclar una geometría
  *     indexada con una no indexada hace que `mergeGeometries` devuelva null EN
  *     SILENCIO y la especie no se dibuje — acá truena y dice quién falló.
  *   - La fauna es SVG colgado como billboard (`JaguarBillboard`), nunca un
  *     felino de geometría procedural.
+ *   - Los árboles se mecen (dos senos desfasados por instancia, los números
+ *     del bosque de tres estratos): un monte quieto está mal.
  *
- * RENDIMIENTO: el monte entero son 3 InstancedMesh (árbol, mata, piedra) sobre
- * geometrías ya fusionadas → 3 draw calls; Lambert flatShading sin shadow-map;
- * los conteos salen de `perfilDeTier`. Con `reducedMotion` el frameloop pasa a
- * demanda y el jaguar queda quieto y digno.
+ * RENDIMIENTO: el monte entero son 5 InstancedMesh (nogal, cedro, aliso,
+ * helecho, piedra) sobre geometrías ya fusionadas → un draw call por banco;
+ * material de vegetación según `perfilDeTier` (el mismo criterio del dosel),
+ * sin shadow-map; la calidad geométrica sale de `calidadDosel`. Con
+ * `reducedMotion` el frameloop pasa a demanda, el mecido se apaga y el jaguar
+ * queda quieto y digno.
  *
  * Vive en el chunk perezoso `vendor-three` (importa three/@react-three).
  */
 import { useEffect, useMemo, useRef } from 'react';
 import * as THREE from 'three';
-import { Canvas } from '@react-three/fiber';
+import { Canvas, useFrame } from '@react-three/fiber';
 import { OrbitControls, AdaptiveDpr } from '@react-three/drei';
-import { VERDES, TIERRAS, CORTEZAS, CIELOS, mezclar, mezclarCielo, LuzMadre } from '../paleta/index.js';
+import { VERDES, TIERRAS, CIELOS, mezclar, mezclarCielo, LuzMadre } from '../paleta/index.js';
 import { perfilDeTier } from '../deviceTier.js';
-import { fusionarSeguro, poner } from '../bosque/sombreadoVegetal.js';
+import { fusionarSeguro } from '../bosque/sombreadoVegetal.js';
+import { geomNogal, geomCedro, geomAliso, geomHelecho, calidadDosel } from '../bosque/doselBiodiverso.geom.js';
 import { crearRng } from '../particulasData.js';
 import JaguarBillboard from './JaguarBillboard.jsx';
 
@@ -47,9 +57,6 @@ const P = {
   pastoSombra: mezclar(VERDES.monte, NIEBLA, 0.26),
   sendero: mezclar(TIERRAS.camino, NIEBLA, 0.22),
   hojarasca: mezclar(TIERRAS.mantillo, NIEBLA, 0.2),
-  copa: mezclar(VERDES.monte, NIEBLA, 0.3),
-  copaSol: mezclar(VERDES.templado, NIEBLA, 0.26),
-  tronco: mezclar(CORTEZAS.roble, NIEBLA, 0.22),
   piedra: mezclar(TIERRAS.piedra, NIEBLA, 0.3),
 };
 
@@ -125,53 +132,10 @@ function construirClaro(seg) {
   return geo;
 }
 
-/* ── UN ÁRBOL DEL MONTE en una sola geometría ────────────────────────────────
-   Tronco (cilindro: INDEXADO) + tres bloques de copa (icosaedros: NO indexados).
-   Justo la mezcla que hace que `mergeGeometries` devuelva null sin decir nada.
-   Por eso pasa por `fusionarSeguro`, que desindexa todo y truena si algo falla.
-   El color va por vértice para que UN InstancedMesh baste. */
-function construirArbol() {
-  const partes = [];
-  const pintar = (g, hex) => {
-    const n = g.attributes.position.count;
-    const col = new Float32Array(n * 3);
-    const c = new THREE.Color(hex);
-    for (let i = 0; i < n; i++) { col[i * 3] = c.r; col[i * 3 + 1] = c.g; col[i * 3 + 2] = c.b; }
-    g.setAttribute('color', new THREE.BufferAttribute(col, 3));
-    return g;
-  };
-  // el tronco (indexado de fábrica)
-  partes.push(pintar(poner(new THREE.CylinderGeometry(0.16, 0.26, 2.6, 6), [0, 1.3, 0]), P.tronco));
-  // la copa en tres masas desiguales (no indexadas de fábrica)
-  const masas = [
-    { pos: [0, 3.1, 0], r: 1.25, hex: P.copaSol },
-    { pos: [-0.72, 2.5, 0.34], r: 0.92, hex: P.copa },
-    { pos: [0.66, 2.62, -0.38], r: 0.85, hex: P.copa },
-  ];
-  masas.forEach((m) => {
-    const g = new THREE.IcosahedronGeometry(m.r, 0);
-    g.scale(1, 0.82, 1);
-    partes.push(pintar(poner(g, m.pos), m.hex));
-  });
-  return fusionarSeguro(partes, 'arbol-del-claro');
-}
-
-/* Una mata de hierba: dos cuñas cruzadas, color por vértice (mismo atributo que
-   el árbol para que la ley de fusión se cumpla también acá). */
-function construirMata() {
-  const partes = [];
-  const pintar = (g, hex) => {
-    const n = g.attributes.position.count;
-    const col = new Float32Array(n * 3);
-    const c = new THREE.Color(hex);
-    for (let i = 0; i < n; i++) { col[i * 3] = c.r; col[i * 3 + 1] = c.g; col[i * 3 + 2] = c.b; }
-    g.setAttribute('color', new THREE.BufferAttribute(col, 3));
-    return g;
-  };
-  partes.push(pintar(poner(new THREE.ConeGeometry(0.16, 0.5, 4), [0, 0.25, 0]), P.pastoSol));
-  partes.push(pintar(poner(new THREE.ConeGeometry(0.13, 0.38, 4), [0.11, 0.19, 0.08], [0, 0.7, 0.3]), P.pasto));
-  return fusionarSeguro(partes, 'mata-del-claro');
-}
+/* Los árboles y helechos NO se construyen aquí: vienen del dosel andino
+   (`doselBiodiverso.geom`), con la copa-masa que ya pasó el gate de follaje.
+   La única geometría propia del claro es la piedra — que sí puede ser
+   facetada, porque es piedra. */
 
 function construirPiedra() {
   const g = new THREE.DodecahedronGeometry(1, 0);
@@ -185,8 +149,10 @@ function construirPiedra() {
 }
 
 /* Siembra instanciada genérica: coloca `n` copias con la geometría dada,
-   evitando el corredor del sendero (por donde anda el felino). */
-function Sembrado({ geo, n, semilla, escala, aparta = 0, sinFrente = null, sobreSuelo = 0 }) {
+   evitando el corredor del sendero (por donde anda el felino). Con `mece`
+   ({amp, per}) las copias cabecean por instancia — dos senos desfasados, el
+   patrón del bosque de tres estratos. */
+function Sembrado({ geo, mat, n, semilla, escala, aparta = 0, sinFrente = null, sobreSuelo = 0, mece = null }) {
   const ref = useRef(null);
   const sitios = useMemo(() => {
     const rng = crearRng(semilla);
@@ -211,6 +177,7 @@ function Sembrado({ geo, n, semilla, escala, aparta = 0, sinFrente = null, sobre
         esc: escala[0] + rng() * (escala[1] - escala[0]),
         giro: rng() * Math.PI * 2,
         ladeo: (rng() - 0.5) * 0.16,
+        fase: rng() * Math.PI * 2,
       });
     }
     return lista;
@@ -230,28 +197,74 @@ function Sembrado({ geo, n, semilla, escala, aparta = 0, sinFrente = null, sobre
     m.instanceMatrix.needsUpdate = true;
   }, [sitios, sobreSuelo]);
 
+  const dummy = useMemo(() => (mece ? new THREE.Object3D() : null), [mece]);
+  useFrame(({ clock }) => {
+    if (!mece || !dummy) return;
+    const m = ref.current;
+    if (!m || !sitios.length) return;
+    const t = clock.getElapsedTime();
+    const w = (Math.PI * 2) / mece.per;
+    for (let i = 0; i < sitios.length; i++) {
+      const s = sitios[i];
+      /* Dos senos desfasados: el cabeceo no es un metrónomo. */
+      const a = Math.sin(t * w + s.fase) * mece.amp;
+      const b = Math.sin(t * w * 0.61 + s.fase * 1.7) * mece.amp * 0.7;
+      dummy.position.set(s.x, s.y + sobreSuelo * s.esc, s.z);
+      dummy.rotation.set(s.ladeo + a, s.giro, s.ladeo * 0.6 + b);
+      dummy.scale.setScalar(s.esc);
+      dummy.updateMatrix();
+      m.setMatrixAt(i, dummy.matrix);
+    }
+    m.instanceMatrix.needsUpdate = true;
+  });
+
   if (!sitios.length) return null;
-  return (
-    <instancedMesh ref={ref} args={[geo, undefined, sitios.length]} frustumCulled={false}>
-      <meshLambertMaterial vertexColors flatShading />
-    </instancedMesh>
-  );
+  return <instancedMesh ref={ref} args={[geo, mat, sitios.length]} frustumCulled={false} />;
 }
+
+/* Cuánto mece el viento a cada estrato (los números del bosque de tres
+   estratos: el dosel cabecea amplio y lento, el sotobosque está resguardado). */
+const MECIDO = {
+  arbol: { amp: 0.03, per: 4.6 },
+  helecho: { amp: 0.014, per: 3.4 },
+};
 
 function Claro({ tier, reducedMotion }) {
   const perfil = useMemo(() => perfilDeTier(tier), [tier]);
   const rico = tier === 'alto';
+  const q = calidadDosel(tier);
 
   const geoClaro = useMemo(() => construirClaro(rico ? 76 : 46), [rico]);
-  const geoArbol = useMemo(() => construirArbol(), []);
-  const geoMata = useMemo(() => construirMata(), []);
+  // Las semillas 3, 4, 12 y 8 son las canónicas del dosel: las MISMAS siluetas
+  // que ya pasaron el gate de follaje-masa en el bosque, no variantes nuevas.
+  // El aliso (copa cónica de cañada) cierra la banda media de la vaguada.
+  const geoNogal = useMemo(() => geomNogal({ q }, 3), [q]);
+  const geoCedro = useMemo(() => geomCedro({ q }, 4), [q]);
+  const geoAliso = useMemo(() => geomAliso({ q }, 12), [q]);
+  const geoHelecho = useMemo(() => geomHelecho({ q }, 8), [q]);
   const geoPiedra = useMemo(() => construirPiedra(), []);
   useEffect(() => () => {
-    geoClaro.dispose(); geoArbol.dispose(); geoMata.dispose(); geoPiedra.dispose();
-  }, [geoClaro, geoArbol, geoMata, geoPiedra]);
+    geoClaro.dispose(); geoNogal.dispose(); geoCedro.dispose(); geoAliso.dispose(); geoHelecho.dispose(); geoPiedra.dispose();
+  }, [geoClaro, geoNogal, geoCedro, geoAliso, geoHelecho, geoPiedra]);
 
-  const nArbol = rico ? 54 : tier === 'medio' ? 34 : 20;
-  const nMata = rico ? 170 : tier === 'medio' ? 90 : 40;
+  // El material de la vegetación es el del dosel (color horneado por vértice,
+  // rico/frugal según perfil). La piedra va aparte: ella SÍ es facetada.
+  const matVegetal = useMemo(() => {
+    const base = { vertexColors: true, flatShading: perfil.flatShading };
+    return perfil.materialRico
+      ? new THREE.MeshStandardMaterial({ ...base, roughness: 0.9, metalness: 0 })
+      : new THREE.MeshLambertMaterial(base);
+  }, [perfil.materialRico, perfil.flatShading]);
+  const matPiedra = useMemo(
+    () => new THREE.MeshLambertMaterial({ vertexColors: true, flatShading: true }),
+    [],
+  );
+  useEffect(() => () => { matVegetal.dispose(); matPiedra.dispose(); }, [matVegetal, matPiedra]);
+
+  const nNogal = rico ? 26 : tier === 'medio' ? 16 : 9;
+  const nCedro = rico ? 17 : tier === 'medio' ? 11 : 6;
+  const nAliso = rico ? 14 : tier === 'medio' ? 8 : 4;
+  const nHelecho = rico ? 48 : tier === 'medio' ? 28 : 14;
 
   return (
     <>
@@ -259,9 +272,11 @@ function Claro({ tier, reducedMotion }) {
       <mesh geometry={geoClaro} receiveShadow={false}>
         <meshLambertMaterial vertexColors flatShading />
       </mesh>
-      <Sembrado geo={geoArbol} n={nArbol} semilla={17} escala={[0.85, 1.65]} aparta={0.72} sinFrente={2.5} />
-      <Sembrado geo={geoMata} n={nMata} semilla={53} escala={[0.6, 1.35]} />
-      <Sembrado geo={geoPiedra} n={rico ? 26 : 12} semilla={91} escala={[0.14, 0.4]} sobreSuelo={0.4} />
+      <Sembrado geo={geoNogal} mat={matVegetal} n={nNogal} semilla={17} escala={[0.72, 1.22]} aparta={0.72} sinFrente={2.5} mece={reducedMotion ? null : MECIDO.arbol} />
+      <Sembrado geo={geoCedro} mat={matVegetal} n={nCedro} semilla={29} escala={[0.72, 1.22]} aparta={0.72} sinFrente={2.5} mece={reducedMotion ? null : MECIDO.arbol} />
+      <Sembrado geo={geoAliso} mat={matVegetal} n={nAliso} semilla={41} escala={[0.72, 1.22]} aparta={0.72} sinFrente={2.5} mece={reducedMotion ? null : MECIDO.arbol} />
+      <Sembrado geo={geoHelecho} mat={matVegetal} n={nHelecho} semilla={53} escala={[0.35, 0.7]} sinFrente={3} mece={reducedMotion ? null : MECIDO.helecho} />
+      <Sembrado geo={geoPiedra} mat={matPiedra} n={rico ? 26 : 12} semilla={91} escala={[0.14, 0.4]} sobreSuelo={0.4} />
 
       {/* EL FELINO: el SVG de la casa, pisando el terreno del claro. */}
       <JaguarBillboard
