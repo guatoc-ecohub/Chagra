@@ -105,6 +105,8 @@ import { useModoLectura, CSS_LECTURA_GRANDE } from './hooks/useModoLectura';
 // Lazy-loaded route components
 const LoginScreen = lazy(() => import('./components/LoginScreen'));
 const OAuthCallback = lazy(() => import('./components/OAuthCallback'));
+// Spike técnico local: el chunk y su ruta solo existen en desarrollo.
+const RiveSpike = import.meta.env.DEV ? lazy(() => import('./dev/RiveSpike')) : null;
 // Marco de entrada OPCIONAL: el valle 3D vanilla (iframe same-origin a
 // /valle/, three r160 aislado del r180 de la app — ver ValleMarcoScreen.jsx).
 // Perezoso: solo baja el chunk quien activó `marco3d` en su perfil.
@@ -866,6 +868,10 @@ const MOCKUP_HASH_ROUTES = {
   'mockups/agente-dibuja': 'mockup_agente_dibuja',
 };
 
+if (import.meta.env.DEV) {
+  MOCKUP_HASH_ROUTES['dev/rive-spike'] = 'dev_rive_spike';
+}
+
 const HASH_VIEW_ROUTES = {
   agente: 'agente',
   'ciclo-vivo': 'ciclo_vivo',
@@ -1385,6 +1391,11 @@ export default function App() {
     const pathname = window.location.pathname.replace(/^\/+|\/+$/g, '').toLowerCase();
     const hash = window.location.hash.replace(/^#\/?/, '').toLowerCase();
     const search = new URLSearchParams(window.location.search);
+
+    if (import.meta.env.DEV && pathname === 'dev/rive-spike') {
+      Promise.resolve().then(() => navigate('dev_rive_spike'));
+      return;
+    }
 
     // Callback OAuth (Authorization Code + PKCE): farmOS redirige a
     // /callback?code=...&state=... tras /oauth/authorize. Detectamos la ruta
@@ -2669,6 +2680,15 @@ export default function App() {
           <ErrorBoundary>
             <ErrorFallback moduleName="Cámara de director">
               <CamaraDirectorDemoMockup />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
+      case 'dev_rive_spike':
+        if (!import.meta.env.DEV || !RiveSpike) return <LoadingFallback view="loading" />;
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="Spike Rive">
+              <RiveSpike />
             </ErrorFallback>
           </ErrorBoundary>
         );

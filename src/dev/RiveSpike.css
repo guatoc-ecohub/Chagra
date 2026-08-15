@@ -1,0 +1,190 @@
+.rive-spike {
+  min-height: 100dvh;
+  box-sizing: border-box;
+  padding: clamp(1.25rem, 3vw, 3rem);
+  color: #e7f5ec;
+  background:
+    radial-gradient(circle at 18% 0%, rgba(43, 135, 93, .24), transparent 32rem),
+    linear-gradient(135deg, #07130f 0%, #0c1d18 48%, #10110c 100%);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+}
+
+.rive-spike__header,
+.rive-spike__grid {
+  width: min(1180px, 100%);
+  margin: 0 auto;
+}
+
+.rive-spike__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 2rem;
+  margin-bottom: 2rem;
+}
+
+.rive-spike__eyebrow,
+.rive-card__kicker {
+  margin: 0 0 .7rem;
+  color: #90d9a9;
+  font-size: .68rem;
+  letter-spacing: .2em;
+}
+
+.rive-spike h1,
+.rive-spike h2,
+.rive-spike p { margin-top: 0; }
+
+.rive-spike h1 {
+  max-width: 740px;
+  margin-bottom: .75rem;
+  color: #fbf4d1;
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: clamp(2.15rem, 6vw, 5.4rem);
+  font-weight: 500;
+  letter-spacing: -.05em;
+  line-height: .94;
+}
+
+.rive-spike__lede {
+  color: #a6b8ac;
+  font-family: ui-sans-serif, system-ui, sans-serif;
+  font-size: 1rem;
+}
+
+.rive-spike__back {
+  flex: 0 0 auto;
+  padding: .65rem .8rem;
+  border: 1px solid rgba(144, 217, 169, .4);
+  border-radius: 999px;
+  color: #b5e9c3;
+  font-size: .7rem;
+  text-decoration: none;
+}
+
+.rive-spike__grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.rive-card {
+  min-width: 0;
+  padding: clamp(1rem, 2vw, 1.5rem);
+  border: 1px solid rgba(156, 201, 166, .18);
+  border-radius: 1.25rem;
+  background: rgba(9, 23, 18, .76);
+  box-shadow: 0 1.5rem 4rem rgba(0, 0, 0, .22);
+}
+
+.rive-card--wide { grid-column: 1 / -1; }
+
+.rive-card__heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.rive-card h2 {
+  margin-bottom: 0;
+  color: #f4f1d5;
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: clamp(1.25rem, 2vw, 1.8rem);
+  font-weight: 500;
+}
+
+.rive-status {
+  display: inline-flex;
+  flex: 0 0 auto;
+  padding: .3rem .45rem;
+  border: 1px solid rgba(166, 184, 172, .3);
+  border-radius: .35rem;
+  color: #a6b8ac;
+  font-size: .63rem;
+  line-height: 1;
+}
+
+.rive-status--ok { color: #8de4a8; border-color: rgba(141, 228, 168, .45); }
+.rive-status--accent { color: #f2cf7d; border-color: rgba(242, 207, 125, .45); }
+
+.rive-stage {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: .8rem;
+  min-height: 260px;
+}
+
+.rive-stage__source,
+.rive-stage__plane {
+  width: 100%;
+  min-height: 260px;
+  border-radius: .9rem;
+  background: #020604;
+  box-shadow: inset 0 0 0 1px rgba(144, 217, 169, .15);
+}
+
+.rive-stage__source { display: block; height: 100%; object-fit: contain; }
+
+.rive-stage__plane {
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(145deg, #18251e, #080d0a);
+}
+
+.rive-stage__plane canvas { display: block; width: 100%; height: 100%; }
+.rive-stage__plane span {
+  position: absolute;
+  right: .7rem;
+  bottom: .6rem;
+  color: rgba(222, 242, 221, .62);
+  font-size: .58rem;
+  letter-spacing: .12em;
+}
+
+.rive-card__note {
+  margin: .85rem 0 0;
+  color: #93aa9a;
+  font-family: ui-sans-serif, system-ui, sans-serif;
+  font-size: .82rem;
+}
+
+.rive-card code,
+.rive-card pre { color: #c9e6a9; }
+
+.rive-facts { margin: 0; }
+.rive-facts div { padding: .65rem 0; border-bottom: 1px solid rgba(156, 201, 166, .12); }
+.rive-facts div:last-child { border-bottom: 0; }
+.rive-facts dt { color: #7fa68d; font-size: .62rem; letter-spacing: .13em; }
+.rive-facts dd { margin: .3rem 0 0; overflow-wrap: anywhere; font-size: .78rem; }
+
+.rive-inputs { display: grid; gap: .45rem; min-height: 5rem; margin: 0 0 1rem; padding: 0; list-style: none; }
+.rive-inputs li { display: flex; justify-content: space-between; gap: .8rem; padding: .45rem .55rem; border-radius: .45rem; background: rgba(144, 217, 169, .08); font-size: .75rem; }
+.rive-inputs__empty { color: #8c9d91; }
+
+.rive-button {
+  cursor: pointer;
+  padding: .7rem .85rem;
+  border: 1px solid #c7df98;
+  border-radius: .55rem;
+  color: #10190f;
+  background: #c7df98;
+  font: inherit;
+  font-size: .72rem;
+}
+
+.rive-map { display: grid; grid-template-columns: repeat(4, 1fr); gap: .6rem; margin-top: 1.2rem; }
+.rive-map div { padding: .75rem; border-left: 2px solid #c7df98; background: rgba(199, 223, 152, .07); }
+.rive-map strong { display: block; color: #f2cf7d; font-size: .78rem; }
+.rive-map span { display: block; margin-top: .4rem; color: #9fb2a4; font-family: ui-sans-serif, system-ui, sans-serif; font-size: .73rem; line-height: 1.35; }
+
+.rive-card--logs pre { max-height: 11rem; overflow: auto; margin: 0; color: #a9c9ae; font-size: .68rem; line-height: 1.65; white-space: pre-wrap; }
+
+@media (max-width: 760px) {
+  .rive-spike__header { display: block; }
+  .rive-spike__back { display: inline-block; margin-top: .4rem; }
+  .rive-spike__grid { grid-template-columns: 1fr; }
+  .rive-stage { grid-template-columns: 1fr; }
+  .rive-map { grid-template-columns: repeat(2, 1fr); }
+}

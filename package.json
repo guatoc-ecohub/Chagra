@@ -38,6 +38,7 @@
     "@dnd-kit/utilities": "^3.2.2",
     "@react-three/drei": "^10.7.7",
     "@react-three/fiber": "^9.6.1",
+    "@rive-app/canvas": "^2.40.0",
     "@sqlite.org/sqlite-wasm": "^3.53.0-build1",
     "jspdf": "^4.2.1",
     "leaflet": "^1.9.4",
