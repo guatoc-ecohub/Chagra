@@ -67,7 +67,7 @@ export const BACKGROUND_CATALOG = Object.freeze([
 /**
  * Id del fondo por defecto universal — "Páramo completo" (biopunk-1).
  * Decisión operador 2026-06-06. Cualquier id desconocido o localStorage
- * legado con el viejo 'default' (Clásico, ya eliminado) resuelve acá.
+ * legado con el viejo 'default' (Clásico, ya eliminado) resuelve aquí.
  */
 export const DEFAULT_BACKGROUND_ID = 'biopunk-1';
 

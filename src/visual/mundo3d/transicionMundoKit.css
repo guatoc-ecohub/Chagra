@@ -240,7 +240,7 @@
 }
 
 /* ====================== Reduced motion = corte simple =================== */
-/* Via prop: el componente ya forzó la rama 'fade'; acá la cubierta arranca
+/* Via prop: el componente ya forzó la rama 'fade'; aquí la cubierta arranca
  * YA opaca (el swap de mitad ocurre bajo tapa) y se desvanece corto. */
 
 .tmk[data-reducida='1'] .tmk__velo {

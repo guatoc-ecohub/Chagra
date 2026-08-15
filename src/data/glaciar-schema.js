@@ -2,8 +2,8 @@
  * glaciar-schema.js — esquema del Reporte de Punto Glaciar (v2 "escala creíble").
  *
  * Módulo para guías de glaciar (validación en campo, p. ej. Cocuy, Ruiz,
- * Cordillera Blanca). Todos los enums viven acá para que sean fáciles de
- * mantener. NO hardcodear estos valores en la pantalla: importar desde acá.
+ * Cordillera Blanca). Todos los enums viven aquí para que sean fáciles de
+ * mantener. NO hardcodear estos valores en la pantalla: importar desde aquí.
  *
  * Español Colombia (usted/tú, SIN voseo). Tono de campo, claro y corto.
  *

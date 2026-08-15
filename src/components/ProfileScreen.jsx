@@ -1256,7 +1256,7 @@ function Valle3DSection() {
   const valle3d = usePrefsStore((s) => s.valle3d ?? false);
   const setValle3d = usePrefsStore((s) => s.setValle3d);
   // El tiering se evalúa una vez al montar la pantalla (crea un canvas WebGL
-  // de prueba; barato acá, no en cada home).
+  // de prueba; barato aquí, no en cada home).
   const [equipo] = useState(() => decidirTier());
   const equipoAguanta = permite3D(equipo.tier);
 

@@ -180,7 +180,7 @@ export default function SeedingLog({ onBack, onSave, initialData: initialDataRaw
   const handleSave = async () => {
     if (isSaving) return;
     // Bug 069.10 — re-validar antes de enviar; marca todos los campos como touched
-    // para que los errores se vean si el operador llegó acá con el botón deshabilitado vencido.
+    // para que los errores se vean si el operador llegó aquí con el botón deshabilitado vencido.
     if (hasErrors) {
       setTouched({ crop: true, quantity: true, date: true });
       onSave('Revisa los campos marcados', true);
@@ -302,7 +302,7 @@ export default function SeedingLog({ onBack, onSave, initialData: initialDataRaw
       setLocationLabel('');
       setPhoto(null);
       // UX-25: PhotoCaptureField maneja su preview/ObjectURL internamente
-      // — no necesitamos revoke manual acá.
+      // — no necesitamos revoke manual aquí.
       setCoordinates([]);
       setTimeout(() => onBack(), 500);
     } catch (error) {

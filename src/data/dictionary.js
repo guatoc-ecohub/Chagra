@@ -1086,7 +1086,7 @@ export const DICTIONARY = [
     emoji: '🦠',
     definicion_simple: 'Microorganismo parecido a un hongo (oomicete) que mata tomate y papa rapidísimo cuando hace frío y húmedo. Aparecen manchas oscuras en hojas y se extiende en días.',
     definicion_ampliada: 'Phytophthora infestans es un oomicete (no exactamente "hongo" sino organismo similar) causante del tizón tardío (late blight) en Solanaceae: tomate, papa, principalmente. Históricamente responsable de la Gran Hambruna Irlandesa (1845-1852).\n\nSíntomas: manchas oscuras (marrón-negro) en hojas, expansión rápida con halo amarillo, tallos y frutos también afectados, pelusa blanquecina en envés en alta humedad. Esporula de noche con humedad >95% y temp 10-25°C — perfectos para los Andes colombianos.\n\nManejo agroecológico: ventilación + drenaje, evitar riego foliar nocturno, caldo bordelés preventivo en épocas húmedas, variedades menos susceptibles, rotación de cultivos. Cero biocidas sintéticos ahorran ese ciclo, pero requiere prevención obsesiva.',
-    contexto_cultural: 'En Cundinamarca y Boyacá, Phytophthora limita producción de tomate chonto y papa. Es razón por la que en chagras agroecológicas se prefieren variedades resistentes y manejo preventivo sobre fungicidas curativos.',
+    contexto_cultural: 'En Cundinamarca y Boyaquí, Phytophthora limita producción de tomate chonto y papa. Es razón por la que en chagras agroecológicas se prefieren variedades resistentes y manejo preventivo sobre fungicidas curativos.',
     ver_tambien: ['fitopatogeno', 'caldo-bordeles', 'tomate', 'papa'],
     fuentes: ['Agrios 2005 — Plant Pathology', 'Agrosavia — Manual manejo Phytophthora'],
   },

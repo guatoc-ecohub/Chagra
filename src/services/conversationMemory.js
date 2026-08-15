@@ -677,7 +677,7 @@ function _toolConcept(ev) {
  *
  *   { species_id: string, edge_type: string, target_id: string }
  *
- * Esto es DISTINTO del grounding de visión (`recognizeSpeciesGrounded`): acá
+ * Esto es DISTINTO del grounding de visión (`recognizeSpeciesGrounded`): aquí
  * nos importan las RELACIONES del chat (café→guamo COMPATIBLE_WITH, plaga
  * controlada por biopreparado, etc.), no la validación de una especie.
  *

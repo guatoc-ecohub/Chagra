@@ -63,7 +63,7 @@ const BIOPREP_KEYWORDS_RE =
  * la longitud lo distingue de un saludo suelto. Sobre el texto normalizado.
  */
 const GREETING_RE =
-  /^\s*(hola|holas|buenas|buenos\s+dias|buenas\s+(tardes|noches)|que\s+mas|qu?iubo|hey|hello|gracias|muchas\s+gracias|chao|listo|oki?|dale|saludos)\b/i;
+  /^\s*(hola|holas|buenas|buenos\s+dias|buenas\s+(tardes|noches)|que\s+mas|qu?iubo|hey|hello|gracias|muchas\s+gracias|chao|listo|oki?|listo|saludos)\b/i;
 
 /**
  * META-AYUDA / capacidades de la app y pedido de consejo SIN sujeto ("qué puedes

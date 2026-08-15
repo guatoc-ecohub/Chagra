@@ -65,7 +65,7 @@ function applyVoseoGuard(text) {
  *
  * Esta lista NO es exhaustiva; el operador puede experimentar con las
  * otras voces ef_ / em_ en futuras iteraciones. Si descubrimos una voz
- * específicamente colombiana en upstream, la agregamos acá.
+ * específicamente colombiana en upstream, la agregamos aquí.
  */
 /*
  * FIX 2026-07-10 (voz "robótica") — CAUSA RAÍZ: en Kokoro el PRIMER prefijo es el
@@ -567,7 +567,7 @@ function playSentenceBlob(url, rate) {
     audio.onended = () => { cleanup(); resolve(); };
     audio.onerror = (e) => { cleanup(); reject(e); };
     // Estado "hablando": true al arrancar la frase. El false lo emite el
-    // FIN DE LA CADENA en speakSentences (no acá) — así no hay flicker
+    // FIN DE LA CADENA en speakSentences (no aquí) — así no hay flicker
     // true→false→true entre frase y frase.
     notifySpeaking(true);
     audio.play().catch((e) => { cleanup(); reject(e); });
@@ -1060,7 +1060,7 @@ export async function replayLast({ useKokoro = null } = {}) {
     return true;
   } catch (_) {
     // speakKokoro ya hace fallback interno a speak() en error, así que si
-    // tira hasta acá es algo raro. No bloquear el caller.
+    // tira hasta aquí es algo raro. No bloquear el caller.
     return false;
   }
 }

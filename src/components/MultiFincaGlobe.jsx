@@ -23,7 +23,7 @@ const PHASE_HIGHLIGHT_MS = 2500;
 const FADED_OPACITY = 0.4;
 
 // Vista contextual de entrada: Colombia centro-andino para que se reconozcan otras fincas registradas
-// (Choachí, Boyacá, Santa Marta, etc.) cuando existan. flyTo a Choachí tras PHASE_INITIAL_MS.
+// (Choachí, Boyaquí, Santa Marta, etc.) cuando existan. flyTo a Choachí tras PHASE_INITIAL_MS.
 const COLOMBIA_VIEW = { center: [4.5, -74.5], zoom: 6 };
 const CHOACHI_VIEW = { center: [4.5167, -73.9333], zoom: 9 };
 

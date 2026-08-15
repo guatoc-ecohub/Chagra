@@ -32,7 +32,7 @@
  *   4. OBSERVAR — qué mirar los próximos días: en cuánto asoma, qué es normal
  *      y qué sí es para ponerle ojo. Mirar despacio también es trabajo.
  *   5. ESPERAR — la paciencia y el reencuadre del fracaso: la primera mata no
- *      se mide en cosecha, se mide en lo que usted aprendió mirándola.
+ *      se mide en cosecha, se mide en lo que usted aprendió mirandola.
  *
  * Stack: SVG + CSS, cero deps nuevas. REUSA la librería visual: CapaCielo
  * (scenes) para el cielo real de la vereda, la clase .scn-kraft (scenes.css)
@@ -284,7 +284,7 @@ export default function PrimerCultivo({ onBack = undefined } = {}) {
       case 'observar':
         return `Ya sembró. Ahora aprenda a mirar. ${mata.asoma} Esto es normal: ${mata.normal} Póngale ojo si: ${mata.ojo}`;
       case 'esperar':
-        return 'Puede que asome, puede que no. Si no asoma, no falló usted: así se aprende. La primera mata no se mide en cosecha, se mide en lo que usted aprendió mirándola.';
+        return 'Puede que asome, puede que no. Si no asoma, no falló usted: así se aprende. La primera mata no se mide en cosecha, se mide en lo que usted aprendió mirandola.';
       default:
         return '';
     }
@@ -519,7 +519,7 @@ export default function PrimerCultivo({ onBack = undefined } = {}) {
                 sembrar, y anote qué cambió.
               </p>
               <p className="pc-remate">
-                La primera mata no se mide en cosecha. Se mide en lo que usted aprendió mirándola.
+                La primera mata no se mide en cosecha. Se mide en lo que usted aprendió mirandola.
               </p>
 
               <button

@@ -157,7 +157,7 @@
   36% { transform: translate(-1.1px, -0.4px) rotate(4deg); }   /* wobble (double-take) */
   41% { transform: translate(0.4px, 0.2px) rotate(-2deg); }    /* rebote de vuelta */
   59% { transform: translate(0.25px, 0) rotate(3.5deg); }      /* wiggle: menea… */
-  63% { transform: translate(-0.25px, 0) rotate(-3.5deg); }    /* …para acá… */
+  63% { transform: translate(-0.25px, 0) rotate(-3.5deg); }    /* …para aquí… */
   67% { transform: translate(0.15px, 0) rotate(2deg); }        /* …y asienta contenta */
   79% { transform: translate(0, -0.95px) rotate(4deg); }       /* brinquito curioso */
   84% { transform: translate(0, 0.3px) rotate(-2deg); }

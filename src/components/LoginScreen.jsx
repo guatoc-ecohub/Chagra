@@ -137,7 +137,7 @@ export default function LoginScreen({ onLoginSuccess, onSave }) {
       // Hotfix prod-down 2026-06-02: pre-cargar el corpus RAG en background
       // junto al warm-up de Ollama. Antes, loadCorpus() corría serial al
       // disparar la PRIMERA query (incluido un saludo) y colgaba ~3min. Pre-
-      // cargándolo acá (fire-and-forget, no bloqueante) el corpus queda
+      // cargándolo aquí (fire-and-forget, no bloqueante) el corpus queda
       // cacheado durante el tiempo humano login→dashboard→agente.
       try {
         prewarmCorpus();

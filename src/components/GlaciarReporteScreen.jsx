@@ -592,7 +592,7 @@ export default function GlaciarReporteScreen({ onBack, onVerHistorial = null }) 
             {/* Lectura puntual rápida */}
             <Label className="mt-5">Lectura puntual rápida (superficie)</Label>
             <p className="text-[11px] text-slate-500 -mt-1 mb-2">
-              Si no quiere registrar el perfil completo, marque la superficie y su dureza acá.
+              Si no quiere registrar el perfil completo, marque la superficie y su dureza aquí.
             </p>
             <SuperficieGrid
               value={form.tipoSuperficie}

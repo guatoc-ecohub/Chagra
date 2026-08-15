@@ -109,7 +109,7 @@ export default function ChatHistory({ messages = [], streamingContent = '', isSt
 
   // Empty state: aprovechamos el espacio vacío para mostrar el colibrí
   // libando en su tamaño más grande de toda la app (size=200). El header
-  // ya tiene una versión chiquita (size=40) — acá vive en grande, como
+  // ya tiene una versión chiquita (size=40) — aquí vive en grande, como
   // primera impresión del agente.
   //
   // SALUDO PROACTIVO (#162/#298/#331): si AgentScreen ya resolvió el saludo

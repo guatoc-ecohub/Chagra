@@ -11,7 +11,7 @@
  *   y crea GitHub Issues en repo Chagra
  *
  * Audio capture (usuaria piloto, voto operador 2026-05-02): grabar es más rápido
- * que tipear "hice click acá y pasó X" en el campo. Reusa useVoiceRecorder
+ * que tipear "hice click aquí y pasó X" en el campo. Reusa useVoiceRecorder
  * (mismo hook que VoiceCapture), sin pipeline Whisper/qwen, solo Blob
  * crudo persistido para review humano post-sesión.
  *
