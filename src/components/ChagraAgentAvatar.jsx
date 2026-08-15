@@ -53,6 +53,16 @@ import useCompaiElegido from '../visual/mundo3d/escenas/useCompaiElegido.js';
  * `Guacamaya.jsx` — ese ya existía como billboard decorativo de
  * FaunaCalido.jsx), no se redibujaron a mano. Los 7: angelita, jaguar,
  * oso-baston, zariguya, luciernaga, chivito-punk, guacamaya.
+ *
+ * 'jaguar' CAMBIÓ DE TÉCNICA (2026-08-14, mismo día): dejó de ser el dibujo
+ * a mano (`visual/creatures/Jaguar.jsx`, kit rubber-hose) detrás de
+ * `ChagraAgentAvatarJaguar.jsx` — el operador rechazó esa vía y una lámina
+ * aplanada con parpadeo falso — y pasó a reusar el rig F24 del valle
+ * (`visual/creatures/JaguarCompai.jsx`, misma técnica que guacamaya/
+ * chivito-punk). El slot en `AVATAR_ANGOSTO` no cambió (sigue siendo
+ * `ChagraAgentAvatarJaguar.jsx`); solo cambió qué cuerpo renderiza ese
+ * adaptador por dentro. `Jaguar.jsx` sigue vivo para las escenas 3D del
+ * mundo y el kart, intacto.
  */
 const STATE_DE_ESTADO_RICO = {
     acompana: 'idle',

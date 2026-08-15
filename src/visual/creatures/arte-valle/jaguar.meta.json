@@ -1,0 +1,14 @@
+{
+  "wrap": "jaguarWrap",
+  "pielKart": {
+    "cuerpo": { "grad": "gPelaje", "stop": 1 },
+    "cuerpo2": { "fill": "#f6ecd2" },
+    "cabeza": { "grad": "gPelaje", "stop": 1 },
+    "detalle": { "fill": "#1c1207" },
+    "extras": {
+      "pielBase": { "grad": "gPelaje", "stop": 1 },
+      "pielCentro": { "fill": "#a8741a" },
+      "pielTinta": { "fill": "#1c1207" }
+    }
+  }
+}

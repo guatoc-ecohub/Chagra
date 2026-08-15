@@ -1,42 +1,29 @@
-import Jaguar from '../visual/creatures/Jaguar';
+import JaguarCompai from '../visual/creatures/JaguarCompai';
 
 /**
  * ChagraAgentAvatarJaguar — el jaguar (Panthera onca) como CARA del agente de
- * Chagra, 4ta opción del elenco (junto a Angelita, maíz y zarigüeya).
+ * Chagra, 4ta opción del elenco unificado.
  *
- * Cierra parte del ítem #8 del GAP compAI (2026-08-13): el jaguar ya tenía
- * cuerpo dibujado (`Jaguar.jsx`, 2.5D vivo con idle + paisaje del miedo,
- * commit `075f6a0d2`) y ya estaba marcado `enPWA:true` en
- * `compai/nucleo/elenco.js` (#96) — pero ningún selector lo ofrecía. Este
- * adaptador es el que faltaba para que el picker de la PWA lo exponga.
+ * REEMPLAZO 2026-08-14 (rig vivo, técnica guacamaya): este adaptador
+ * apuntaba antes a `visual/creatures/Jaguar.jsx`, un cuerpo dibujado A MANO
+ * con el kit rubber-hose. El operador rechazó esa vía (componentes nativos
+ * que dibujan SVG a mano) y también un intento de lámina aplanada con
+ * parpadeo falso — la ÚNICA técnica aprobada es el rig F24 REUSADO del valle
+ * (esqueleto vivo: bob, respiración, parpadeo, mirada, cola con inercia),
+ * la misma que ya corre en `ChagraAgentAvatarGuacamaya.jsx`/
+ * `ChagraAgentAvatarChivitoPunk.jsx`. Ahora este adaptador renderiza
+ * `JaguarCompai.jsx` (rig+defs+css del valle inlineados, NO redibujados —
+ * ver ese archivo). `visual/creatures/Jaguar.jsx` (el dibujo a mano) SIGUE
+ * VIVO para las escenas 3D del mundo y el kart — este cambio SOLO mueve el
+ * cuerpo detrás del selector de avatar de la PWA.
  *
- * Adaptador puro (mismo contrato que ChagraAgentAvatarZariguya): traduce la
- * API histórica del avatar del agente (state 'idle'|'thinking'|'speaking'|
- * 'listening', glow, withLabel, onClick/onDoubleClick) al vocabulario de VIDA
- * de `Jaguar.jsx` (`visual/creatures/`). Cero lógica nueva de agente, cero
- * cambios en `visual/creatures/`.
- *
- *   - idle       → pose 'anda' (base, con acecho de hombros).
- *   - thinking   → pose 'anda' + `acecha=true`: el felino se agazapa y avanza
- *                  lento — su reacción-firma leída como "atento/calculando".
- *   - speaking   → pose 'celebra' (la más expresiva) + visema del lip-sync.
- *   - listening  → pose 'reposo': respira hondo, agazapado y atento.
+ * Adaptador puro (mismo contrato que los hermanos ChagraAgentAvatar*): traduce
+ * la API histórica del avatar del agente (state 'idle'|'thinking'|'speaking'|
+ * 'listening', glow, withLabel, onClick/onDoubleClick) al `state` que
+ * `JaguarCompai.jsx` ya entiende directo (no necesita traducción de pose —
+ * el rig reusado solo distingue idle/hablar por ahora en light DOM, ver nota
+ * en ese archivo).
  */
-const POSE_DE_STATE = {
-    idle: 'anda',
-    thinking: 'anda',
-    speaking: 'celebra',
-    listening: 'reposo',
-};
-
-const ACECHA_DE_STATE = {
-    thinking: true,
-};
-
-const VISEMA_DE_STATE = {
-    speaking: 'V2',
-};
-
 export default function ChagraAgentAvatarJaguar({
     state = 'idle',
     size = 48,
@@ -47,16 +34,9 @@ export default function ChagraAgentAvatarJaguar({
     className = '',
     ariaLabel = 'Chagra IA',
 }) {
-    const pose = POSE_DE_STATE[state] || 'anda';
-    const acecha = !!ACECHA_DE_STATE[state];
-    const visema = VISEMA_DE_STATE[state] || null;
-
     const bicho = (
-        <Jaguar
-            pose={pose}
-            acecha={acecha}
-            visema={visema}
-            tier={undefined}
+        <JaguarCompai
+            state={state}
             size={size}
             title={ariaLabel}
             className={className}
