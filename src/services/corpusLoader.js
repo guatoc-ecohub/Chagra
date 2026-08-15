@@ -30,7 +30,10 @@
 const SQLITE_MAGIC = 'SQLite format 3\0';
 const TIER_OSS = 'OSS';
 const TIER_PRO = 'PRO';
-const DEFAULT_CATALOG_URL = '/catalog.sqlite';
+// Base-aware: el mismo bundle se sirve en / (chagra.guatoc.co) y en /app/
+// (3d.guatoc.co); una ruta raíz fija 404ea en el segundo (parche a mano
+// dae78b1 en el bundle desplegado — esto lo vuelve permanente en el source).
+const DEFAULT_CATALOG_URL = `${import.meta.env.BASE_URL || '/'}catalog.sqlite`;
 // Timeout defensivo del fetch del catálogo (~1.2 MB). En rural lento un fetch
 // colgado indefinidamente bloquearía el preload; abortamos y dejamos que el
 // retry/los componentes reintenten on-demand.

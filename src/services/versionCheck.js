@@ -56,7 +56,8 @@ export const RUNNING_BUILD_SHA =
 
 export const SELF_HEAL_GUARD_KEY = 'chagra:self-heal-reloaded';
 export const PENDING_UPDATE_SHA_KEY = 'chagra:self-heal-pending-sha';
-export const VERSION_ENDPOINT = '/version.json';
+// Base-aware: en 3d.guatoc.co el bundle vive bajo /app/ y /version.json 404ea.
+export const VERSION_ENDPOINT = `${import.meta.env.BASE_URL || '/'}version.json`;
 // Timeout corto: el self-heal NO debe bloquear el boot ni colgarse en red rural.
 export const VERSION_FETCH_TIMEOUT_MS = 4000;
 const BUNDLE_FETCH_FAILURE_RE =

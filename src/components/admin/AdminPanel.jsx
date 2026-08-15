@@ -41,7 +41,7 @@ export default function AdminPanel() {
   }, []);
 
   useEffect(() => {
-    fetch('/version.json', { cache: 'no-store' })
+    fetch(`${import.meta.env.BASE_URL || '/'}version.json`, { cache: 'no-store' })
       .then(r => r.ok ? r.json() : null)
       .then(setBuildInfo)
       .catch(() => {});
