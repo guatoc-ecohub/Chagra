@@ -39,7 +39,11 @@
  * @param {boolean} [opciones.activo=true]
  * @param {boolean} [opciones.pausado=false]  fuerza el regreso a casa.
  * @param {number} [opciones.fraccionAncho=0.3]  franja recorrible (0..1 del ancho).
- * @returns {{ caminando: boolean, hacia: 'izquierda'|'derecha' }}
+ * @returns {{ caminando: boolean, hacia: 'izquierda'|'derecha', parada: number }}
+ *   `parada` es un contador que se INCREMENTA cada vez que el compai LLEGA a un
+ *   punto de su paseo y se detiene a descansar (no cuando vuelve a casa por
+ *   `pausado`). Sirve para el "moverse-para-explicar": el host muestra el
+ *   mensaje contextual de la pantalla en cada parada (ver CompaiOverlay).
  */
 import { useEffect, useRef, useState } from 'react';
 
@@ -68,6 +72,11 @@ export default function useCompaiRoam(ref, opciones = {}) {
 
   const [caminando, setCaminando] = useState(false);
   const [hacia, setHacia] = useState(/** @type {'izquierda'|'derecha'} */ ('izquierda'));
+  // Contador de paradas del paseo (llegó a un punto y descansa) — dispara el
+  // mensaje contextual en el host. Vive en un ref para persistir entre re-runs
+  // del effect; solo se sube a estado (discreto) cuando cambia.
+  const [parada, setParada] = useState(0);
+  const paradasRef = useRef(0);
 
   // Espejos vivos leídos DENTRO del rAF (el efecto del loop no se recrea al
   // togglear `pausado`: lo consulta por ref en cada frame → reacción inmediata).
@@ -156,8 +165,12 @@ export default function useCompaiRoam(ref, opciones = {}) {
           marcarCaminando(false);
           if (!pausadoRef.current) {
             // Llegó a un punto del paseo: descansa antes de la próxima caminata.
+            // Marca la PARADA (moverse-para-explicar): el host muestra aquí el
+            // mensaje contextual de la pantalla mientras dura el reposo.
             fase = 'reposo';
             reposoHasta = ts + PAUSA_MIN_MS + Math.random() * (PAUSA_MAX_MS - PAUSA_MIN_MS);
+            paradasRef.current += 1;
+            setParada(paradasRef.current);
           } else {
             // Aterrizó en casa con el panel abierto: mira hacia la pantalla.
             marcarHacia('izquierda');
@@ -183,5 +196,5 @@ export default function useCompaiRoam(ref, opciones = {}) {
     };
   }, [activo, ref, fraccionAncho]);
 
-  return { caminando, hacia };
+  return { caminando, hacia, parada };
 }

@@ -8,7 +8,7 @@
  * (JaguarLaminaViva.jsx: useRitmoPropio / useVidaIdle / useMiradaUsted +
  * visema) y este CSS solo la CONSUME sobre cada pieza:
  *
- *   señal (hook/estado)                → qué pieza mueve, acá
+ *   señal (hook/estado)                → qué pieza mueve, aquí
  *   --rh-blink-dur/-delay (ritmo)      → parpadeo REAL de los dos ojos juntos,
  *                                        cada instancia a su aire (cadencia rh)
  *   data-rh-mira + --rh-mx/--rh-my     → la CABEZA gira siguiendo al usuario
@@ -17,15 +17,17 @@
  *   data-agt-estado=listening          → PARA LA OREJA + ladea la testa
  *   data-agt-estado=speaking + --jlv-jaw→ mandíbula que habla (lip-sync)
  *   data-agt-estado=thinking           → mira arriba, orejas atrás
- *   data-agt-estado=caminando          → la marcha REAL (fase diagonal del rig)
+ *   data-agt-estado=caminando          → bob de cuerpo/cabeza + balanceo SUTIL
+ *                                        de patas (el andar se lee del roaming)
  *
  * Amplitudes/tiempos: los gestos-firma del jaguar copian el ESPÍRITU del rig
  * viejo (`Jaguar.jsx` + creatures.css: acecho baja la testa y agazapa el
  * cuerpo; el rugido abre las fauces y levanta la testa; cola de contrapeso) y
- * del kit rubber-hose (`rh-blink` doble-golpe, `rh-sway` follow-through). La
- * marcha diagonal (`jlv-pasoLado`, fases delCerca 0s / delLejos -.66s /
- * trasCerca -.52s) es la trasplantada de `#jaguarLado` en el pulido anterior;
- * acá solo pasa a correr SOLO al caminar, no como loop permanente.
+ * del kit rubber-hose (`rh-blink` doble-golpe, `rh-sway` follow-through). El
+ * "caminar" YA NO finge un gait diagonal por-pata (un dibujo plano de una sola
+ * pose lo fantasmea como "3-4 patas" — feedback del operador): se lee del
+ * DESPLAZAMIENTO real del compai por la pantalla (`useCompaiRoam`) + el bob del
+ * cuerpo/cabeza + la cola; las patas solo balancean sutil, en fase con el bob.
  *
  * HONESTIDAD: el interior de boca (`.jlv-bocaInterior`) es SINTÉTICO (la lámina
  * es de boca cerrada — ver JaguarLaminaViva.jsx / anatomia.js). Es lo único que
@@ -73,11 +75,12 @@
   50%      { transform: translateY(0.6%) rotate(0.4deg); }
 }
 
-/* patas — micro-ajuste de peso en idle (que no queden congeladas mid-paso),
-   con fases distintas para que no vayan en bloque. */
-.jlv-patasDelCercaPivote  { position: absolute; inset: 0; animation: jlv-pata-idle 4.4s ease-in-out infinite; }
-.jlv-patasDelLejanaPivote { position: absolute; inset: 0; animation: jlv-pata-idle 4.4s ease-in-out -1.5s infinite; }
-.jlv-pataTrasPivote       { position: absolute; inset: 0; animation: jlv-pata-idle 4.4s ease-in-out -2.9s infinite; }
+/* patas — micro-ajuste de peso en idle (que no queden congeladas mid-paso).
+   Las delanteras son UN bloque (`jlv-patasDelPivote`): balanceo sutil, sin
+   partirlas en dos piezas que fantasmeen "3-4 patas". La trasera va a su aire
+   (está lejos en X, no solapa con las delanteras → no puede duplicar contorno). */
+.jlv-patasDelPivote { position: absolute; inset: 0; animation: jlv-pata-idle 4.4s ease-in-out infinite; }
+.jlv-pataTrasPivote { position: absolute; inset: 0; animation: jlv-pata-idle 4.4s ease-in-out -2.2s infinite; }
 @keyframes jlv-pata-idle {
   0%, 100% { transform: rotate(0deg); }
   50%      { transform: rotate(1.5deg); }
@@ -107,7 +110,7 @@
    cierres rápidos de ~110ms— así el jaguar parpadea IGUAL de sutil y natural
    que el resto del elenco. Los dos ojos comparten el MISMO --rh-blink-dur/
    -delay (vars en la raíz), así que cierran JUNTOS: un parpadeo real, no un
-   guiño de un ojo. Polaridad INVERTIDA respecto a la familia: acá el párpado
+   guiño de un ojo. Polaridad INVERTIDA respecto a la familia: aquí el párpado
    es un parche de piel que TAPA el ojo, así scaleY(0)=retraído (ojo abierto) y
    scaleY(1)=tapado (ojo cerrado). */
 .jlv-parpado {
@@ -203,23 +206,34 @@
 @keyframes jlv-oreja-atras-izq { 0%, 100% { transform: rotate(0deg); } 50% { transform: rotate(5deg); } }
 @keyframes jlv-oreja-atras-der { 0%, 100% { transform: rotate(0deg); } 50% { transform: rotate(-5deg); } }
 
-/* ═══ CAMINA (caminando) — la marcha REAL (fase diagonal del rig) ════════════ */
-[data-agt-estado='caminando'] .jlv-cuerpoPivote { animation: jlv-cuerpoBob 0.525s ease-in-out infinite; }
+/* ═══ CAMINA (caminando) ═════════════════════════════════════════════════════
+   HONESTIDAD (feedback del operador: "las patas de adelante a veces se ven 3 y
+   4"): un dibujo PLANO de una sola pose NO da un gait real por-pata sin
+   fantasma — cualquier corte por color deja un filo que, al rotar cada mitad
+   por su lado, duplica el contorno. Así que el "caminar" NO se finge con un
+   péndulo grande por-pata: se LEE del DESPLAZAMIENTO real del compai por la
+   pantalla (`useCompaiRoam`) + el bob del cuerpo/cabeza + la cola. Las patas
+   (un solo bloque cada grupo) solo hacen un balanceo SUTIL sincronizado con ese
+   bob — nunca dos piezas en fase opuesta. Para un gait real habría que dibujar
+   las patas separadas (ver anatomia.js `PATAS_DEL`). */
+[data-agt-estado='caminando'] .jlv-cuerpoPivote { animation: jlv-cuerpoBob 0.6s ease-in-out infinite; }
 @keyframes jlv-cuerpoBob {
-  0%, 100% { transform: translateY(3.2%) rotate(0.5deg); }
-  50%      { transform: translateY(-4.5%) rotate(-0.3deg); }
+  0%, 100% { transform: translateY(2.4%) rotate(0.4deg); }
+  50%      { transform: translateY(-3.2%) rotate(-0.3deg); }
 }
-[data-agt-estado='caminando'] .jlv-cabezaPivote { animation: jlv-cabezaBob 0.525s ease-in-out -0.12s infinite; }
+[data-agt-estado='caminando'] .jlv-cabezaPivote { animation: jlv-cabezaBob 0.6s ease-in-out -0.14s infinite; }
 @keyframes jlv-cabezaBob {
-  0%, 100% { transform: translateY(-2.9%) rotate(-0.7deg); }
-  50%      { transform: translateY(3.9%) rotate(0.7deg); }
+  0%, 100% { transform: translateY(-2.2%) rotate(-0.6deg); }
+  50%      { transform: translateY(2.8%) rotate(0.6deg); }
 }
-[data-agt-estado='caminando'] .jlv-patasDelCercaPivote  { animation: jlv-pasoLado 1.05s ease-in-out infinite; }
-[data-agt-estado='caminando'] .jlv-patasDelLejanaPivote { animation: jlv-pasoLado 1.05s ease-in-out -0.66s infinite; }
-[data-agt-estado='caminando'] .jlv-pataTrasPivote       { animation: jlv-pasoLado 1.05s ease-in-out -0.52s infinite; }
-@keyframes jlv-pasoLado {
-  0%, 100% { transform: rotate(8deg); }
-  50%      { transform: rotate(-9deg); }
+/* Balanceo SUTIL del bloque de patas, en fase con el bob del cuerpo (mismo
+   0.6s). Delanteras y trasera van a la MISMA fase y amplitud chica: no hay
+   corte interno ni fase opuesta que pueda fantasmear una pata de más. */
+[data-agt-estado='caminando'] .jlv-patasDelPivote { animation: jlv-patasBalanceo 0.6s ease-in-out infinite; }
+[data-agt-estado='caminando'] .jlv-pataTrasPivote { animation: jlv-patasBalanceo 0.6s ease-in-out infinite; }
+@keyframes jlv-patasBalanceo {
+  0%, 100% { transform: rotate(2deg); }
+  50%      { transform: rotate(-2deg); }
 }
 [data-agt-estado='caminando'] .jlv-colaPivote { animation: jlv-cola 1.8s ease-in-out infinite alternate; }
 
@@ -283,8 +297,7 @@
 [data-tier='bajo'] .jlv-stage,
 [data-tier='bajo'] .jlv-cuerpoPivote,
 [data-tier='bajo'] .jlv-cabezaPivote,
-[data-tier='bajo'] .jlv-patasDelCercaPivote,
-[data-tier='bajo'] .jlv-patasDelLejanaPivote,
+[data-tier='bajo'] .jlv-patasDelPivote,
 [data-tier='bajo'] .jlv-pataTrasPivote,
 [data-tier='bajo'] .jlv-colaPivote,
 [data-tier='bajo'] .jlv-orejaIzqPivote,
@@ -292,7 +305,7 @@
 
 @media (prefers-reduced-motion: reduce) {
   .jlv-stage, .jlv-cuerpoPivote, .jlv-cabezaGesto, .jlv-cabezaMira, .jlv-cabezaPivote,
-  .jlv-patasDelCercaPivote, .jlv-patasDelLejanaPivote, .jlv-pataTrasPivote, .jlv-colaPivote,
+  .jlv-patasDelPivote, .jlv-pataTrasPivote, .jlv-colaPivote,
   .jlv-orejaIzqPivote, .jlv-orejaDerPivote, .jlv-mandibulaPivote, .jlv-bocaInterior, .jlv-parpado {
     animation: none !important;
     transition: none !important;

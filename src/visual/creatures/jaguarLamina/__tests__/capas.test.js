@@ -11,9 +11,9 @@
  */
 import { describe, it, expect } from 'vitest';
 import { hornearJaguar, haySoporteCanvas } from '../capas.js';
-import {
-  ANCHO, ALTO, CABEZA, OJO, OJO_2, PATAS_DEL_ENVOLVENTE, CORTE_PATAS_DEL, SOLAPE_PATA_DEL_CERCA,
-  PATA_DEL_CERCA, PATA_DEL_LEJANA, PATA_TRASERA, COLA, CUERPO_PIVOTE,
+import anatomiaDefault, {
+  ANCHO, ALTO, CABEZA, OJO, OJO_2, PATAS_DEL,
+  PATA_TRASERA, COLA, CUERPO_PIVOTE,
   OREJA_IZQ, OREJA_DER, MANDIBULA, BOCA,
 } from '../anatomia.js';
 
@@ -66,7 +66,7 @@ describe('anatomia.js — forma de las constantes que capas.js consume', () => {
   });
 
   it('las cajas de patas y el corte de cola quedan dentro del canvas', () => {
-    for (const pieza of [PATAS_DEL_ENVOLVENTE.box, PATA_TRASERA.box]) {
+    for (const pieza of [PATAS_DEL.box, PATA_TRASERA.box]) {
       expect(pieza.x0).toBeGreaterThanOrEqual(0);
       expect(pieza.x1).toBeLessThanOrEqual(ANCHO);
       expect(pieza.x1).toBeGreaterThan(pieza.x0);
@@ -75,28 +75,33 @@ describe('anatomia.js — forma de las constantes que capas.js consume', () => {
     expect(COLA.pivote[0]).toBeLessThan(ANCHO);
   });
 
-  it('CORTE_PATAS_DEL (pulido: separa las dos patas delanteras) trae recta + banda válida', () => {
-    expect(CORTE_PATAS_DEL).toMatchObject({
-      px: expect.any(Number), py: expect.any(Number), nx: expect.any(Number), ny: expect.any(Number),
-    });
-    expect(CORTE_PATAS_DEL.u1).toBeGreaterThan(CORTE_PATAS_DEL.u0);
+  it('PATAS_DEL es UN SOLO bloque (caja + articulación + pivote único) — sin corte por color que fantasmee 3-4 patas', () => {
+    // caja en X válida + banda de articulación en Y.
+    expect(PATAS_DEL.box.x1).toBeGreaterThan(PATAS_DEL.box.x0);
+    expect(PATAS_DEL.box.xFade).toBeGreaterThan(0);
+    expect(PATAS_DEL.joint.y1).toBeGreaterThan(PATAS_DEL.joint.y0);
+    // un ÚNICO pivote (el hombro), dentro de su propia caja: rota como bloque,
+    // no dos piezas que puedan divergir de fase.
+    expect(PATAS_DEL.pivote).toHaveLength(2);
+    expect(PATAS_DEL.pivote[0]).toBeGreaterThanOrEqual(PATAS_DEL.box.x0);
+    expect(PATAS_DEL.pivote[0]).toBeLessThanOrEqual(PATAS_DEL.box.x1);
   });
 
-  it('SOLAPE_PATA_DEL_CERCA (respaldo anti-hueco entre las dos patas) es un margen positivo', () => {
-    expect(SOLAPE_PATA_DEL_CERCA).toBeGreaterThan(0);
+  it('la separación de patas delanteras (pulido anterior) quedó REVERTIDA — sus constantes ya no existen (lock de regresión)', () => {
+    // Si alguna vuelve, el bloque limpio se re-partiría y el 3-4-patas volvería.
+    for (const nombre of ['PATA_DEL_CERCA', 'PATA_DEL_LEJANA', 'CORTE_PATAS_DEL', 'SOLAPE_PATA_DEL_CERCA', 'PATAS_DEL_ENVOLVENTE']) {
+      expect(anatomiaDefault[nombre]).toBeUndefined();
+    }
   });
 
-  it('los pivotes de patas/cola/cabeza/cuerpo son puntos [x,y] dentro del lienzo, y las dos patas delanteras pivotan distinto', () => {
-    for (const piv of [CABEZA.pivote, PATA_DEL_CERCA.pivote, PATA_DEL_LEJANA.pivote, PATA_TRASERA.pivote, COLA.pivote, CUERPO_PIVOTE]) {
+  it('los pivotes de patas/cola/cabeza/cuerpo son puntos [x,y] dentro del lienzo', () => {
+    for (const piv of [CABEZA.pivote, PATAS_DEL.pivote, PATA_TRASERA.pivote, COLA.pivote, CUERPO_PIVOTE]) {
       const [x, y] = piv;
       expect(x).toBeGreaterThanOrEqual(0);
       expect(x).toBeLessThanOrEqual(ANCHO);
       expect(y).toBeGreaterThanOrEqual(0);
       expect(y).toBeLessThanOrEqual(ALTO);
     }
-    // si los pivotes de las dos patas delanteras coincidieran, volverían a
-    // rotar como un solo bloque aunque las máscaras ya estén separadas.
-    expect(PATA_DEL_CERCA.pivote[0]).not.toBeCloseTo(PATA_DEL_LEJANA.pivote[0], 0);
   });
 });
 

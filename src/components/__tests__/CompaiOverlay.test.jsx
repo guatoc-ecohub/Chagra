@@ -118,6 +118,41 @@ describe('CompaiOverlay', () => {
     });
   });
 
+  it('debe traer hints enriquecidos de rutas 2D principales (agente, hoy_finca)', async () => {
+    render(<CompaiOverlay currentView="agente" />);
+    fireEvent.click(screen.getByTestId('compai-bubble'));
+    await waitFor(() => {
+      expect(screen.getByText('Pregúntele a su compai')).toBeInTheDocument();
+    });
+  });
+
+  it('debe resolver el catálogo por alias del manifiesto (directorio/especies/plagas)', async () => {
+    const { rerender } = render(<CompaiOverlay currentView="especies" />);
+    fireEvent.click(screen.getByTestId('compai-bubble'));
+    await waitFor(() => {
+      expect(screen.getByText('Catálogo de especies')).toBeInTheDocument();
+    });
+    rerender(<CompaiOverlay currentView="directorio" />);
+    fireEvent.click(screen.getByTestId('compai-bubble'));
+    await waitFor(() => {
+      expect(screen.getByText('Catálogo de especies')).toBeInTheDocument();
+    });
+  });
+
+  it('debe resolver subrutas por prefijo (animales_gallinas → animales)', async () => {
+    render(<CompaiOverlay currentView="animales_gallinas" />);
+    fireEvent.click(screen.getByTestId('compai-bubble'));
+    await waitFor(() => {
+      expect(screen.getByText('Sus animales')).toBeInTheDocument();
+    });
+  });
+
+  it('la burbuja de parada NO aparece hasta que el compai llega a una parada (parada=0 al montar)', () => {
+    render(<CompaiOverlay currentView="dashboard" />);
+    // Recién montado el roam no ha parado (parada=0) → sin burbuja de parada.
+    expect(screen.queryByTestId('compai-burbuja')).not.toBeInTheDocument();
+  });
+
   it('debe usar el hint default para rutas desconocidas', async () => {
     render(<CompaiOverlay currentView="ruta-desconocida" />);
     const bubble = screen.getByTestId('compai-bubble');

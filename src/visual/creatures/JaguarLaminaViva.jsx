@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import {
   CARPETA_LAMINA, ARCHIVO_LAMINA, ANCHO, ALTO,
-  CABEZA, PATA_DEL_CERCA, PATA_DEL_LEJANA, PATA_TRASERA, COLA, CUERPO_PIVOTE,
+  CABEZA, PATAS_DEL, PATA_TRASERA, COLA, CUERPO_PIVOTE,
   OREJA_IZQ, OREJA_DER, MANDIBULA, BOCA,
 } from './jaguarLamina/anatomia.js';
 import { hornearJaguar } from './jaguarLamina/capas.js';
@@ -111,8 +111,7 @@ export default function JaguarLaminaViva({
   const orejaIzqHostRef = useRef(null);
   const orejaDerHostRef = useRef(null);
   const mandibulaHostRef = useRef(null);
-  const patasDelCercaHostRef = useRef(null);
-  const patasDelLejanaHostRef = useRef(null);
+  const patasDelHostRef = useRef(null);
   const pataTrasHostRef = useRef(null);
   const colaHostRef = useRef(null);
   const parpadoHostRef = useRef(null);
@@ -157,8 +156,7 @@ export default function JaguarLaminaViva({
       montar(capas.orejaIzq, orejaIzqHostRef);
       montar(capas.orejaDer, orejaDerHostRef);
       montar(capas.mandibula, mandibulaHostRef);
-      montar(capas.patasDelCerca, patasDelCercaHostRef);
-      montar(capas.patasDelLejana, patasDelLejanaHostRef);
+      montar(capas.patasDel, patasDelHostRef);
       montar(capas.pataTrasera, pataTrasHostRef);
       montar(capas.cola, colaHostRef);
 
@@ -258,11 +256,10 @@ export default function JaguarLaminaViva({
           >
             <div ref={cuerpoHostRef} className="jlv-capa" />
 
-            <div className={cls('jlv-patasDelCercaPivote')} style={{ position: 'absolute', inset: 0, transformOrigin: pctOf(PATA_DEL_CERCA.pivote) }}>
-              <div ref={patasDelCercaHostRef} className="jlv-capa" />
-            </div>
-            <div className={cls('jlv-patasDelLejanaPivote')} style={{ position: 'absolute', inset: 0, transformOrigin: pctOf(PATA_DEL_LEJANA.pivote) }}>
-              <div ref={patasDelLejanaHostRef} className="jlv-capa" />
+            {/* PATAS DELANTERAS — un SOLO bloque (sin corte interno que
+                fantasmee "3-4 patas"): balanceo sutil sincronizado con el bob. */}
+            <div className={cls('jlv-patasDelPivote')} style={{ position: 'absolute', inset: 0, transformOrigin: pctOf(PATAS_DEL.pivote) }}>
+              <div ref={patasDelHostRef} className="jlv-capa" />
             </div>
             <div className={cls('jlv-pataTrasPivote')} style={{ position: 'absolute', inset: 0, transformOrigin: pctOf(PATA_TRASERA.pivote) }}>
               <div ref={pataTrasHostRef} className="jlv-capa" />
