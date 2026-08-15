@@ -41,17 +41,14 @@
  *     contenedor, el ancho/alto en % del canvas resolvía a 0×0 (confirmado
  *     con `getBoundingClientRect` en Chromium real). El párpado de
  *     `feat/jaguar-lamina-sobre-esqueleto` no era "chico", NO RENDERIZABA.
- *   - Las dos patas delanteras (`patasDelCerca`/`patasDelLejana`) se cortan
- *     con `CORTE_PATAS_DEL`. Ya NO son complementarias 1:1: `patasDelLejana`
- *     (pinta ENCIMA) usa el corte ajustado; `patasDelCerca` (pinta ABAJO) es
- *     más ancha (`SOLAPE_PATA_DEL_CERCA`) para respaldar el hueco que abre
- *     la rotación cuando las dos patas divergen de fase — ver
- *     `fraccionCercaPatasDel` más abajo y el docstring de
- *     `SOLAPE_PATA_DEL_CERCA` en anatomia.js (encontrado con captura real:
- *     sin el solape, un fondo visible se colaba entre las dos patas en
- *     varios fotogramas del ciclo). Antes (`feat/jaguar-lamina-sobre-
- *     esqueleto`) era una sola pieza que rotaba como bloque; ver el
- *     docstring de `anatomia.js` para el método de medición del corte.
+ *   - Las patas delanteras son UN SOLO bloque (`PATAS_DEL`) — cortado del
+ *     envolvente completo, sin dividirlas por color. La división en dos piezas
+ *     `patasDelCerca`/`patasDelLejana` del pulido anterior se REVIRTIÓ: al
+ *     rotar cada mitad por su lado el borde compartido fantasmeaba como un
+ *     contorno doble ("las patas de adelante a veces se ven 3 y 4", feedback
+ *     del operador). Un dibujo plano de una sola pose no se deja separar en un
+ *     gait limpio; ver el docstring de `anatomia.js` (`PATAS_DEL`) para el
+ *     porqué de fondo y el límite honesto.
  *
  * Defensivo por diseño: si `canvas.getContext('2d')` no está disponible
  * (jsdom sin el paquete `canvas`, navegador exótico) `hornearJaguar()`
@@ -61,7 +58,7 @@
  * @module visual/creatures/jaguarLamina/capas
  */
 import {
-  CABEZA, OJO, OJO_2, PATAS_DEL_ENVOLVENTE, CORTE_PATAS_DEL, SOLAPE_PATA_DEL_CERCA, PATA_TRASERA, COLA,
+  CABEZA, OJO, OJO_2, PATAS_DEL, PATA_TRASERA, COLA,
   OREJA_IZQ, OREJA_DER, MANDIBULA,
 } from './anatomia.js';
 
@@ -105,7 +102,7 @@ function mascaraApendice(x, y, { box, joint }) {
   return fx * fy;
 }
 
-/** Distancia (con signo) de (x,y) a la recta (px,py)+(nx,ny) — mismo formato que usan `CABEZA.cuello`/`COLA.cut`/`CORTE_PATAS_DEL`. */
+/** Distancia (con signo) de (x,y) a la recta (px,py)+(nx,ny) — mismo formato que usan `CABEZA.cuello`/`COLA.cut`. */
 function proyeccion(x, y, corte) {
   return corte.nx * (x - corte.px) + corte.ny * (y - corte.py);
 }
@@ -153,33 +150,6 @@ function mascaraMandibula(x, y) {
 }
 
 /**
- * Fracción "lejana" (0..1) dentro del envolvente de las patas delanteras:
- * 0 = lado cerca (blanco/rayado, la pata que queda atrás en esta pose),
- * 1 = lado lejana (anaranjado, la pata que va adelante). Esta es la máscara
- * AJUSTADA (corte estrecho) — la usa `patasDelLejana`, la pieza que va
- * ENCIMA en el z-order (ver JaguarLaminaViva.jsx).
- */
-function fraccionLejanaPatasDel(x, y) {
-  return ss(CORTE_PATAS_DEL.u0, CORTE_PATAS_DEL.u1, proyeccion(x, y, CORTE_PATAS_DEL));
-}
-
-/**
- * Fracción "cerca" (0..1) — la usa `patasDelCerca`, la pieza que va ABAJO en
- * el z-order. NO es el complemento exacto de `fraccionLejanaPatasDel`: se
- * mantiene opaca más allá del corte, invadiendo `SOLAPE_PATA_DEL_CERCA` px
- * el territorio "lejana" antes de desvanecerse (ver el docstring de
- * `SOLAPE_PATA_DEL_CERCA` en anatomia.js — es el respaldo para que un hueco
- * de rotación entre las dos patas revele piel real, no el fondo). Como esta
- * pieza queda TAPADA por `patasDelLejana` donde ambas coinciden, el reparto
- * en reposo se ve idéntico al corte ajustado — el solape solo se nota
- * cuando las dos patas rotan a fases distintas.
- */
-function fraccionCercaPatasDel(x, y) {
-  const u = proyeccion(x, y, CORTE_PATAS_DEL);
-  return 1 - ss(CORTE_PATAS_DEL.u1, CORTE_PATAS_DEL.u1 + SOLAPE_PATA_DEL_CERCA, u);
-}
-
-/**
  * Hornea las 5 capas + el parche de párpado a partir de la imagen ya
  * cargada. Devuelve canvases del MISMO tamaño que el PNG (comparten
  * encuadre — cero cuentas de UV por capa).
@@ -189,7 +159,7 @@ function fraccionCercaPatasDel(x, y) {
  *   falta, pero blinda contra un `onload` que dispara antes de tiempo.
  * @returns {{W:number,H:number,cuerpo:HTMLCanvasElement,cabeza:HTMLCanvasElement,
  *   orejaIzq:HTMLCanvasElement,orejaDer:HTMLCanvasElement,mandibula:HTMLCanvasElement,
- *   patasDelCerca:HTMLCanvasElement,patasDelLejana:HTMLCanvasElement,
+ *   patasDel:HTMLCanvasElement,
  *   pataTrasera:HTMLCanvasElement,cola:HTMLCanvasElement,
  *   parpado:{cv:HTMLCanvasElement,x0:number,y0:number,w:number,h:number},
  *   parpado2:{cv:HTMLCanvasElement,x0:number,y0:number,w:number,h:number}}|null}
@@ -213,14 +183,12 @@ export function hornearJaguar(img, dims = {}) {
   }
   const sd = src.data;
 
-  // Prioridad: cabeza > patasDelCerca/patasDelLejana > pataTrasera > cola >
-  // cuerpo. Cada una se calcula EXCLUYENDO lo que ya reclamaron las de mayor
-  // prioridad — así dos piezas nunca compiten semi-opacas por el mismo
-  // píxel. Las dos patas delanteras SÍ se solapan a propósito entre ELLAS
-  // (ver `fraccionCercaPatasDel`/`SOLAPE_PATA_DEL_CERCA` en anatomia.js):
-  // `patasDelLejana` pinta ENCIMA en el DOM con el corte ajustado; debajo,
-  // `patasDelCerca` es más ancha que su mitad "justa" para respaldar el
-  // hueco que abre la rotación cuando las dos patas divergen de fase.
+  // Prioridad: cabeza > patasDel > pataTrasera > cola > cuerpo. Cada una se
+  // calcula EXCLUYENDO lo que ya reclamaron las de mayor prioridad — así dos
+  // piezas nunca compiten semi-opacas por el mismo píxel. Las patas delanteras
+  // son UN SOLO bloque (`PATAS_DEL`): ya no hay corte interno entre dos mitades
+  // que, al rotar en fases distintas, fantasmeaba como "3-4 patas" (ver el
+  // docstring de este módulo y de `anatomia.js`).
   // `mCabeza` es la cabeza COMPLETA (incluye orejas y mandíbula): se usa para
   // (a) excluir la cabeza de las demás piezas y (b) el corte duro del cuerpo —
   // así el cuerpo sigue borrándose bajo TODA la testa, orejas y mandíbula
@@ -241,13 +209,11 @@ export function hornearJaguar(img, dims = {}) {
   const mCabezaRender = (x, y) => mCabeza(x, y)
     * (1 - mascaraOrejaSub(x, y, OREJA_IZQ)) * (1 - mascaraOrejaSub(x, y, OREJA_DER))
     * (1 - mMandibula(x, y));
-  const mApendiceDel = (x, y) => mascaraApendice(x, y, PATAS_DEL_ENVOLVENTE) * (1 - mCabeza(x, y));
-  const mPataDelLejana = (x, y) => mApendiceDel(x, y) * fraccionLejanaPatasDel(x, y);
-  const mPataDelCerca = (x, y) => mApendiceDel(x, y) * fraccionCercaPatasDel(x, y);
+  const mPatasDel = (x, y) => mascaraApendice(x, y, PATAS_DEL) * (1 - mCabeza(x, y));
   const mPataTrasera = (x, y) => mascaraApendice(x, y, PATA_TRASERA) * (1 - mCabeza(x, y));
   const mCola = (x, y) => mascaraCola(x, y) * (1 - mCabeza(x, y)) * (1 - mPataTrasera(x, y));
   const hard = (m) => 1 - ss(0.93, 1.0, m);
-  const mCuerpo = (x, y) => hard(mCabeza(x, y)) * hard(mPataDelCerca(x, y)) * hard(mPataDelLejana(x, y))
+  const mCuerpo = (x, y) => hard(mCabeza(x, y)) * hard(mPatasDel(x, y))
     * hard(mPataTrasera(x, y)) * hard(mCola(x, y));
 
   const pintar = (mascara) => {
@@ -279,8 +245,7 @@ export function hornearJaguar(img, dims = {}) {
     orejaIzq: pintar(mOrejaIzq),
     orejaDer: pintar(mOrejaDer),
     mandibula: pintar(mMandibula),
-    patasDelCerca: pintar(mPataDelCerca),
-    patasDelLejana: pintar(mPataDelLejana),
+    patasDel: pintar(mPatasDel),
     pataTrasera: pintar(mPataTrasera),
     cola: pintar(mCola),
     parpado,
