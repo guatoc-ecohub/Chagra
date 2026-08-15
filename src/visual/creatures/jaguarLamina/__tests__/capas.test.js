@@ -14,6 +14,7 @@ import { hornearJaguar, haySoporteCanvas } from '../capas.js';
 import {
   ANCHO, ALTO, CABEZA, OJO, OJO_2, PATAS_DEL_ENVOLVENTE, CORTE_PATAS_DEL, SOLAPE_PATA_DEL_CERCA,
   PATA_DEL_CERCA, PATA_DEL_LEJANA, PATA_TRASERA, COLA, CUERPO_PIVOTE,
+  OREJA_IZQ, OREJA_DER, MANDIBULA, BOCA,
 } from '../anatomia.js';
 
 describe('haySoporteCanvas', () => {
@@ -96,5 +97,48 @@ describe('anatomia.js — forma de las constantes que capas.js consume', () => {
     // si los pivotes de las dos patas delanteras coincidieran, volverían a
     // rotar como un solo bloque aunque las máscaras ya estén separadas.
     expect(PATA_DEL_CERCA.pivote[0]).not.toBeCloseTo(PATA_DEL_LEJANA.pivote[0], 0);
+  });
+});
+
+/* Piezas de LA VIDA (rama `feat/jaguar-miss-minutes`): las dos orejas (para
+   parar la oreja al escuchar) y la mandíbula (para el lip-sync). Verificado
+   offline con `sharp` que se restan de la cabeza sin perder píxeles (0%). */
+describe('anatomia.js — piezas nuevas para la vida (orejas + mandíbula)', () => {
+  it('las DOS orejas son cajas separadas (una a cada lado de la cabeza), con base y pivote válidos', () => {
+    for (const oreja of [OREJA_IZQ, OREJA_DER]) {
+      expect(oreja.box.x1).toBeGreaterThan(oreja.box.x0);
+      expect(oreja.box.x0).toBeGreaterThanOrEqual(0);
+      expect(oreja.box.x1).toBeLessThanOrEqual(ANCHO);
+      expect(oreja.box.xFade).toBeGreaterThan(0);
+      // se desvanece hacia la base (donde nace del cráneo): y1 > y0.
+      expect(oreja.base.y1).toBeGreaterThan(oreja.base.y0);
+      expect(oreja.pivote).toHaveLength(2);
+    }
+    // orejas a lados distintos: si se solaparan, no serían dos orejas.
+    expect(OREJA_DER.box.x0).toBeGreaterThan(OREJA_IZQ.box.x1);
+    // el pivote (la base que articula) cae dentro de su propia caja.
+    expect(OREJA_IZQ.pivote[0]).toBeGreaterThanOrEqual(OREJA_IZQ.box.x0);
+    expect(OREJA_IZQ.pivote[0]).toBeLessThanOrEqual(OREJA_IZQ.box.x1);
+    expect(OREJA_DER.pivote[0]).toBeGreaterThanOrEqual(OREJA_DER.box.x0);
+    expect(OREJA_DER.pivote[0]).toBeLessThanOrEqual(OREJA_DER.box.x1);
+  });
+
+  it('la mandíbula abre ENTRE el labio (arriba) y el fin del mentón (abajo) — no invade el cuello', () => {
+    expect(MANDIBULA.box.x1).toBeGreaterThan(MANDIBULA.box.x0);
+    expect(MANDIBULA.labio.y1).toBeGreaterThan(MANDIBULA.labio.y0);
+    expect(MANDIBULA.menton.y1).toBeGreaterThan(MANDIBULA.menton.y0);
+    // el mentón (fin de la pieza) queda DEBAJO del labio (inicio): pieza acotada.
+    expect(MANDIBULA.menton.y0).toBeGreaterThan(MANDIBULA.labio.y1);
+    // el pivote (charnela) está en la línea del labio, dentro del canvas.
+    expect(MANDIBULA.pivote[0]).toBeGreaterThan(0);
+    expect(MANDIBULA.pivote[0]).toBeLessThan(ANCHO);
+  });
+
+  it('BOCA (interior sintético) es un punto con ancho, dentro del canvas', () => {
+    expect(BOCA.cx).toBeGreaterThan(0);
+    expect(BOCA.cx).toBeLessThan(ANCHO);
+    expect(BOCA.cy).toBeGreaterThan(0);
+    expect(BOCA.cy).toBeLessThan(ALTO);
+    expect(BOCA.ancho).toBeGreaterThan(0);
   });
 });
