@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { tmpdir } from 'node:os';
 
@@ -20,8 +20,7 @@ import {
 let tempRoot;
 
 beforeEach(() => {
-  tempRoot = join(tmpdir(), `reindex-rag-${Date.now()}-${Math.random().toString(16).slice(2)}`);
-  mkdirSync(tempRoot, { recursive: true });
+  tempRoot = mkdtempSync(join(tmpdir(), 'reindex-rag-'));
 });
 
 afterEach(() => {
