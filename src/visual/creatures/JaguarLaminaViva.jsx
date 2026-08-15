@@ -53,8 +53,8 @@ const JAW_DE_VISEMA = { V1: 0, V2: 0.42, V3: 1, V4: 0.36 };
  *     cuerpo por CSS (jaguarLamina.css): escuchando PARA LA OREJA e inclina la
  *     testa; hablando mueve la mandíbula; pensando mira arriba; idle vive.
  *
- * QUÉ SÍ ARTICULA (verificable con GPU por el operador): parpadeo con ritmo
- * propio + guiño ocasional (pica el ojo, como Angelita); mirada que sigue al
+ * QUÉ SÍ ARTICULA (verificable con GPU por el operador): parpadeo real de los
+ * dos ojos juntos con ritmo propio (cadencia rh, como Angelita); mirada que sigue al
  * usuario (giro de cabeza — ver la nota de honestidad de la pupila abajo);
  * orejas que se paran al escuchar y se mecen en idle; mandíbula que baja con
  * el lip-sync; gestos de vida (acecho, bostezo/rugido) que agachan/levantan la
@@ -185,7 +185,8 @@ export default function JaguarLaminaViva({
           h.replaceChildren(cv);
         }
       };
-      // El ojo `parpado` (OJO, el más central) lleva además el GUIÑO ocasional.
+      // Los dos ojos comparten el mismo ritmo (vars en la raíz) → parpadean
+      // JUNTOS (parpadeo real, cadencia rh — ver jaguarLamina.css jlv-blink).
       montarParpado(capas.parpado, parpadoHostRef, 'jlv-parpado-der');
       montarParpado(capas.parpado2, parpado2HostRef);
 
