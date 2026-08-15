@@ -11,7 +11,10 @@
  */
 import { describe, it, expect } from 'vitest';
 import { hornearJaguar, haySoporteCanvas } from '../capas.js';
-import { ANCHO, ALTO, CABEZA, OJO, PATAS_DELANTERAS, PATA_TRASERA, COLA, CUERPO_PIVOTE } from '../anatomia.js';
+import {
+  ANCHO, ALTO, CABEZA, OJO, OJO_2, PATAS_DEL_ENVOLVENTE, CORTE_PATAS_DEL, SOLAPE_PATA_DEL_CERCA,
+  PATA_DEL_CERCA, PATA_DEL_LEJANA, PATA_TRASERA, COLA, CUERPO_PIVOTE,
+} from '../anatomia.js';
 
 describe('haySoporteCanvas', () => {
   it('devuelve un booleano y no truena aunque jsdom no traiga canvas real', () => {
@@ -48,16 +51,21 @@ describe('anatomia.js — forma de las constantes que capas.js consume', () => {
     expect(CABEZA.pivote).toHaveLength(2);
   });
 
-  it('OJO cae dentro del canvas', () => {
-    expect(OJO.cx).toBeGreaterThan(0);
-    expect(OJO.cx).toBeLessThan(ANCHO);
-    expect(OJO.cy).toBeGreaterThan(0);
-    expect(OJO.cy).toBeLessThan(ALTO);
-    expect(OJO.r).toBeGreaterThan(0);
+  it('OJO y OJO_2 (pulido: los DOS ojos, no solo uno) caen dentro del canvas', () => {
+    for (const ojo of [OJO, OJO_2]) {
+      expect(ojo.cx).toBeGreaterThan(0);
+      expect(ojo.cx).toBeLessThan(ANCHO);
+      expect(ojo.cy).toBeGreaterThan(0);
+      expect(ojo.cy).toBeLessThan(ALTO);
+      expect(ojo.r).toBeGreaterThan(0);
+    }
+    // los dos ojos son puntos DISTINTOS — si coincidieran, OJO_2 no estaría
+    // realmente midiendo el segundo ojo (regresión silenciosa a un solo ojo).
+    expect(OJO.cx).not.toBeCloseTo(OJO_2.cx, 0);
   });
 
   it('las cajas de patas y el corte de cola quedan dentro del canvas', () => {
-    for (const pieza of [PATAS_DELANTERAS.box, PATA_TRASERA.box]) {
+    for (const pieza of [PATAS_DEL_ENVOLVENTE.box, PATA_TRASERA.box]) {
       expect(pieza.x0).toBeGreaterThanOrEqual(0);
       expect(pieza.x1).toBeLessThanOrEqual(ANCHO);
       expect(pieza.x1).toBeGreaterThan(pieza.x0);
@@ -66,13 +74,27 @@ describe('anatomia.js — forma de las constantes que capas.js consume', () => {
     expect(COLA.pivote[0]).toBeLessThan(ANCHO);
   });
 
-  it('los pivotes de patas/cola/cabeza/cuerpo son puntos [x,y] dentro del lienzo', () => {
-    for (const piv of [CABEZA.pivote, PATAS_DELANTERAS.pivote, PATA_TRASERA.pivote, COLA.pivote, CUERPO_PIVOTE]) {
+  it('CORTE_PATAS_DEL (pulido: separa las dos patas delanteras) trae recta + banda válida', () => {
+    expect(CORTE_PATAS_DEL).toMatchObject({
+      px: expect.any(Number), py: expect.any(Number), nx: expect.any(Number), ny: expect.any(Number),
+    });
+    expect(CORTE_PATAS_DEL.u1).toBeGreaterThan(CORTE_PATAS_DEL.u0);
+  });
+
+  it('SOLAPE_PATA_DEL_CERCA (respaldo anti-hueco entre las dos patas) es un margen positivo', () => {
+    expect(SOLAPE_PATA_DEL_CERCA).toBeGreaterThan(0);
+  });
+
+  it('los pivotes de patas/cola/cabeza/cuerpo son puntos [x,y] dentro del lienzo, y las dos patas delanteras pivotan distinto', () => {
+    for (const piv of [CABEZA.pivote, PATA_DEL_CERCA.pivote, PATA_DEL_LEJANA.pivote, PATA_TRASERA.pivote, COLA.pivote, CUERPO_PIVOTE]) {
       const [x, y] = piv;
       expect(x).toBeGreaterThanOrEqual(0);
       expect(x).toBeLessThanOrEqual(ANCHO);
       expect(y).toBeGreaterThanOrEqual(0);
       expect(y).toBeLessThanOrEqual(ALTO);
     }
+    // si los pivotes de las dos patas delanteras coincidieran, volverían a
+    // rotar como un solo bloque aunque las máscaras ya estén separadas.
+    expect(PATA_DEL_CERCA.pivote[0]).not.toBeCloseTo(PATA_DEL_LEJANA.pivote[0], 0);
   });
 });

@@ -25,7 +25,33 @@
  *   - El párpado es un parche de LA PROPIA lámina (el área ENCIMA del ojo,
  *     igual que `laminaCapas.js` del intento anterior — ver README ahí)
  *     recortado a elipse y alfa-recortado con la silueta real de la cabeza
- *     en el punto de destino.
+ *     en el punto de destino. Desde el pulido `feat/jaguar-pulido`
+ *     (2026-08-14) se hornean DOS parches (`parpado`/`parpado2`, uno por
+ *     ojo) — antes solo se cortaba uno y el "parpadeo" era en realidad un
+ *     guiño de un solo ojo. Los dos comparten el mismo `@keyframes`
+ *     (parpadeo sincronizado, como un animal real) y el parche creció de
+ *     2.1r×1.6r a 3.1r×2.6r (ver `parcheParpado`) — verificado con
+ *     Playwright+Chromium que agrandarlo SÍ mueve la aguja (más píxeles con
+ *     diferencia real entre abierto/cerrado a 48px), y que el resultado
+ *     sigue leyendo como piel/pelo real (no un párpado dibujado) a 240px.
+ *     BUG DE FONDO encontrado y corregido en este mismo pulido (no es un
+ *     ajuste de tamaño, es la causa real de "no se ve"): el `<div>` que
+ *     hostea cada `<canvas>` de párpado en `JaguarLaminaViva.jsx` tenía
+ *     `position:absolute` SIN `inset:0` — sin tamaño definido en su
+ *     contenedor, el ancho/alto en % del canvas resolvía a 0×0 (confirmado
+ *     con `getBoundingClientRect` en Chromium real). El párpado de
+ *     `feat/jaguar-lamina-sobre-esqueleto` no era "chico", NO RENDERIZABA.
+ *   - Las dos patas delanteras (`patasDelCerca`/`patasDelLejana`) se cortan
+ *     con `CORTE_PATAS_DEL`. Ya NO son complementarias 1:1: `patasDelLejana`
+ *     (pinta ENCIMA) usa el corte ajustado; `patasDelCerca` (pinta ABAJO) es
+ *     más ancha (`SOLAPE_PATA_DEL_CERCA`) para respaldar el hueco que abre
+ *     la rotación cuando las dos patas divergen de fase — ver
+ *     `fraccionCercaPatasDel` más abajo y el docstring de
+ *     `SOLAPE_PATA_DEL_CERCA` en anatomia.js (encontrado con captura real:
+ *     sin el solape, un fondo visible se colaba entre las dos patas en
+ *     varios fotogramas del ciclo). Antes (`feat/jaguar-lamina-sobre-
+ *     esqueleto`) era una sola pieza que rotaba como bloque; ver el
+ *     docstring de `anatomia.js` para el método de medición del corte.
  *
  * Defensivo por diseño: si `canvas.getContext('2d')` no está disponible
  * (jsdom sin el paquete `canvas`, navegador exótico) `hornearJaguar()`
@@ -34,7 +60,9 @@
  *
  * @module visual/creatures/jaguarLamina/capas
  */
-import { CABEZA, OJO, PATAS_DELANTERAS, PATA_TRASERA, COLA } from './anatomia.js';
+import {
+  CABEZA, OJO, OJO_2, PATAS_DEL_ENVOLVENTE, CORTE_PATAS_DEL, SOLAPE_PATA_DEL_CERCA, PATA_TRASERA, COLA,
+} from './anatomia.js';
 
 const clamp = (v, a, b) => (v < a ? a : v > b ? b : v);
 const ss = (a, b, x) => { const t = clamp((x - a) / (b - a), 0, 1); return t * t * (3 - 2 * t); };
@@ -76,11 +104,41 @@ function mascaraApendice(x, y, { box, joint }) {
   return fx * fy;
 }
 
+/** Distancia (con signo) de (x,y) a la recta (px,py)+(nx,ny) — mismo formato que usan `CABEZA.cuello`/`COLA.cut`/`CORTE_PATAS_DEL`. */
+function proyeccion(x, y, corte) {
+  return corte.nx * (x - corte.px) + corte.ny * (y - corte.py);
+}
+
 /** Máscara de la cola: banda casi-vertical en su base. */
 function mascaraCola(x, y) {
-  const { cut } = COLA;
-  const u = cut.nx * (x - cut.px) + cut.ny * (y - cut.py);
-  return ss(cut.u0, cut.u1, u);
+  return ss(COLA.cut.u0, COLA.cut.u1, proyeccion(x, y, COLA.cut));
+}
+
+/**
+ * Fracción "lejana" (0..1) dentro del envolvente de las patas delanteras:
+ * 0 = lado cerca (blanco/rayado, la pata que queda atrás en esta pose),
+ * 1 = lado lejana (anaranjado, la pata que va adelante). Esta es la máscara
+ * AJUSTADA (corte estrecho) — la usa `patasDelLejana`, la pieza que va
+ * ENCIMA en el z-order (ver JaguarLaminaViva.jsx).
+ */
+function fraccionLejanaPatasDel(x, y) {
+  return ss(CORTE_PATAS_DEL.u0, CORTE_PATAS_DEL.u1, proyeccion(x, y, CORTE_PATAS_DEL));
+}
+
+/**
+ * Fracción "cerca" (0..1) — la usa `patasDelCerca`, la pieza que va ABAJO en
+ * el z-order. NO es el complemento exacto de `fraccionLejanaPatasDel`: se
+ * mantiene opaca más allá del corte, invadiendo `SOLAPE_PATA_DEL_CERCA` px
+ * el territorio "lejana" antes de desvanecerse (ver el docstring de
+ * `SOLAPE_PATA_DEL_CERCA` en anatomia.js — es el respaldo para que un hueco
+ * de rotación entre las dos patas revele piel real, no el fondo). Como esta
+ * pieza queda TAPADA por `patasDelLejana` donde ambas coinciden, el reparto
+ * en reposo se ve idéntico al corte ajustado — el solape solo se nota
+ * cuando las dos patas rotan a fases distintas.
+ */
+function fraccionCercaPatasDel(x, y) {
+  const u = proyeccion(x, y, CORTE_PATAS_DEL);
+  return 1 - ss(CORTE_PATAS_DEL.u1, CORTE_PATAS_DEL.u1 + SOLAPE_PATA_DEL_CERCA, u);
 }
 
 /**
@@ -92,8 +150,10 @@ function mascaraCola(x, y) {
  *   no cargó (naturalWidth/Height en 0) — en producción no debería hacer
  *   falta, pero blinda contra un `onload` que dispara antes de tiempo.
  * @returns {{W:number,H:number,cuerpo:HTMLCanvasElement,cabeza:HTMLCanvasElement,
- *   patasDelanteras:HTMLCanvasElement,pataTrasera:HTMLCanvasElement,cola:HTMLCanvasElement,
- *   parpado:{cv:HTMLCanvasElement,x0:number,y0:number,w:number,h:number}}|null}
+ *   patasDelCerca:HTMLCanvasElement,patasDelLejana:HTMLCanvasElement,
+ *   pataTrasera:HTMLCanvasElement,cola:HTMLCanvasElement,
+ *   parpado:{cv:HTMLCanvasElement,x0:number,y0:number,w:number,h:number},
+ *   parpado2:{cv:HTMLCanvasElement,x0:number,y0:number,w:number,h:number}}|null}
  */
 export function hornearJaguar(img, dims = {}) {
   const { ancho, altoPx } = dims;
@@ -114,15 +174,23 @@ export function hornearJaguar(img, dims = {}) {
   }
   const sd = src.data;
 
-  // Prioridad: cabeza > patasDelanteras > pataTrasera > cola > cuerpo. Cada
-  // una se calcula EXCLUYENDO lo que ya reclamaron las de mayor prioridad —
-  // así dos piezas nunca compiten semi-opacas por el mismo píxel.
+  // Prioridad: cabeza > patasDelCerca/patasDelLejana > pataTrasera > cola >
+  // cuerpo. Cada una se calcula EXCLUYENDO lo que ya reclamaron las de mayor
+  // prioridad — así dos piezas nunca compiten semi-opacas por el mismo
+  // píxel. Las dos patas delanteras SÍ se solapan a propósito entre ELLAS
+  // (ver `fraccionCercaPatasDel`/`SOLAPE_PATA_DEL_CERCA` en anatomia.js):
+  // `patasDelLejana` pinta ENCIMA en el DOM con el corte ajustado; debajo,
+  // `patasDelCerca` es más ancha que su mitad "justa" para respaldar el
+  // hueco que abre la rotación cuando las dos patas divergen de fase.
   const mCabeza = (x, y) => mascaraCabeza(x, y);
-  const mPatasDelanteras = (x, y) => mascaraApendice(x, y, PATAS_DELANTERAS) * (1 - mCabeza(x, y));
+  const mApendiceDel = (x, y) => mascaraApendice(x, y, PATAS_DEL_ENVOLVENTE) * (1 - mCabeza(x, y));
+  const mPataDelLejana = (x, y) => mApendiceDel(x, y) * fraccionLejanaPatasDel(x, y);
+  const mPataDelCerca = (x, y) => mApendiceDel(x, y) * fraccionCercaPatasDel(x, y);
   const mPataTrasera = (x, y) => mascaraApendice(x, y, PATA_TRASERA) * (1 - mCabeza(x, y));
   const mCola = (x, y) => mascaraCola(x, y) * (1 - mCabeza(x, y)) * (1 - mPataTrasera(x, y));
   const hard = (m) => 1 - ss(0.93, 1.0, m);
-  const mCuerpo = (x, y) => hard(mCabeza(x, y)) * hard(mPatasDelanteras(x, y)) * hard(mPataTrasera(x, y)) * hard(mCola(x, y));
+  const mCuerpo = (x, y) => hard(mCabeza(x, y)) * hard(mPataDelCerca(x, y)) * hard(mPataDelLejana(x, y))
+    * hard(mPataTrasera(x, y)) * hard(mCola(x, y));
 
   const pintar = (mascara) => {
     const cv = lienzo(W, H);
@@ -143,16 +211,19 @@ export function hornearJaguar(img, dims = {}) {
   };
 
   const parpado = parcheParpado(sd, W, H, OJO);
+  const parpado2 = parcheParpado(sd, W, H, OJO_2);
 
   return {
     W,
     H,
     cuerpo: pintar(mCuerpo),
     cabeza: pintar(mCabeza),
-    patasDelanteras: pintar(mPatasDelanteras),
+    patasDelCerca: pintar(mPataDelCerca),
+    patasDelLejana: pintar(mPataDelLejana),
     pataTrasera: pintar(mPataTrasera),
     cola: pintar(mCola),
     parpado,
+    parpado2,
   };
 }
 
@@ -161,11 +232,26 @@ export function hornearJaguar(img, dims = {}) {
  * (misma idea que `laminaCapas.js` del intento anterior: piel/pelo propio
  * del animal, nunca un color inventado), lo recorta a elipse y lo
  * alfa-recorta con la silueta real de la cabeza en el punto de DESTINO.
+ *
+ * `pulido 2026-08-14`: el parche creció de 2.1r×1.6r a 3.1r×2.6r — a 22px de
+ * radio en la lámina (705px de ancho), el ojo entero mide apenas 3-4px reales
+ * en pantalla a tamaño de avatar (48px totales, ver `JaguarLaminaViva.jsx`
+ * para el bug de fondo — `inset:0` faltante — que antes dejaba el párpado en
+ * 0×0). Con el bug ya corregido, se midió con Playwright+Chromium (captura
+ * real, congelando animaciones y comparando abierto/cerrado píxel a píxel)
+ * que agrandar el parche de 2.5r×2.1r a 3.1r×2.6r sube el conteo de píxeles
+ * con cambio real (diff>30 en 0-765) de 104 a 154 sobre ~48×27px de imagen —
+ * mejora medible, no solo estética. Sigue siendo piel/pelo propio del animal
+ * (nunca se inventa un párpado dibujado) — solo se agranda el RECORTE, no se
+ * cambia la técnica. A 48px el cambio sigue siendo sutil (el piso está en
+ * cuántos píxeles reales tiene el ojo en la foto fuente, no en el código);
+ * a partir de ~100-150px de avatar el parpadeo se ve completo y convincente
+ * (verificado visualmente, ver el reporte de la tarea).
  */
 function parcheParpado(sd, W, H, ojo) {
   const { cx, cy, r } = ojo;
-  const w = Math.ceil(r * 2.1);
-  const h = Math.ceil(r * 1.6);
+  const w = Math.ceil(r * 3.1);
+  const h = Math.ceil(r * 2.6);
   const fx0 = Math.round(cx - w / 2);
   const fy0 = Math.round(cy - r * 1.5 - h / 2);
   const x0 = Math.round(cx - w / 2);

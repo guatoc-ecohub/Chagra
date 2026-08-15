@@ -27,8 +27,15 @@
  *     de pivotar sobre él. Documentado explícitamente: NO es fidelidad
  *     completa, es el ajuste de seguridad que le corresponde a un pivote
  *     medido a ojo sobre una lámina en vez de tallado en el hueso del rig.
+ *     FASES REALES del rig (`pulido 2026-08-14`, antes solo se usaba 0s
+ *     para el bloque único de patas delanteras — la causa de "camina en
+ *     bloque"): delCerca 0s, delLejos -.66s, trasCerca -.52s (trasLejos
+ *     -.14s no se trasplanta: esa pata no está cortada, ver anatomia.js).
  *   colaLadoOndea   (#colaLado, rotate puro — sin conversión) → jlv-cola
- *   rhBlink         (.ojo, scaleY puro, universal en frontal y perfil) → jlv-parpado
+ *   rhBlink         (.ojo, scaleY puro, universal en frontal y perfil) →
+ *     jlv-parpado, REAJUSTADO en el pulido (ver la nota debajo de
+ *     `jlv-blink`): mismo espíritu de doble-golpe, curva propia (no un
+ *     calco 1:1) porque el original era imperceptible a tamaño de avatar.
  *   .flota          (#jaguar, ambiente frontal — se reusa como bob GLOBAL
  *     del stage completo, ry≈altura total 394)
  *     -5px→-1.3% / 5px→1.3%       → jlv-stage
@@ -90,12 +97,21 @@
 }
 
 /* patas — péndulo desde el pivote (pasoLado), amplitud reducida x0.6 — ver
-   nota de cabecera. patasDelanteras = fase "delCerca" (0s); pataTrasera =
-   fase "trasCerca" (-.52s), su diagonal real en el rig de 4 patas. */
-.jlv-patasDelPivote {
+   nota de cabecera. Las CUATRO fases son las reales de `#jaguarLado` en
+   jaguar.css (T=1.05s): patasDelCerca 0s · patasDelLejana -.66s · pataTras
+   (trasCerca) -.52s. Antes (`feat/jaguar-lamina-sobre-esqueleto`) las dos
+   patas delanteras compartían la fase 0s en un solo bloque — ESA era la
+   causa real de "camina en bloque"; con las patas ya separadas en capas.js,
+   acá solo hacía falta ponerle a cada una su fase del rig. */
+.jlv-patasDelCercaPivote {
   position: absolute;
   inset: 0;
   animation: jlv-pasoLado 1.05s ease-in-out infinite;
+}
+.jlv-patasDelLejanaPivote {
+  position: absolute;
+  inset: 0;
+  animation: jlv-pasoLado 1.05s ease-in-out -0.66s infinite;
 }
 .jlv-pataTrasPivote {
   position: absolute;
@@ -118,31 +134,46 @@
   to   { transform: rotate(5deg); }
 }
 
-/* párpado — parpadeo real con doble golpe (rhBlink de jaguar.css).
-   OJO con la polaridad: el rig anima `.ojo` (el globo ocular ENTERO, dibujo
-   vectorial) escalándolo a scaleY(.1) para "cerrarlo" — eso solo funciona
-   en vector. Acá el párpado es una PIEZA DE PIEL PROPIA que se desliza
-   ENCIMA del ojo (misma técnica que `piloto-lamina.js`), así que la
-   polaridad es la inversa: abierto=escala~0 (parche oculto), cerrado=
-   escala~1 (parche cubre el ojo). Los % de keyframe, la duración (5.9s) y
-   la curva (el doble golpe en 37%/75%/79%) son un calco exacto de
-   `rhBlink` — solo se invierte `scaleY → 1 - scaleY` para que la MISMA
-   curva cierre el párpado en vez de aplastar el globo ocular. */
+/* párpado — parpadeo real, LOS DOS OJOS a la vez (`.jlv-parpado` se monta
+   dos veces, una por ojo — ver JaguarLaminaViva.jsx — con el MISMO
+   keyframe: un parpadeo sincronizado, no un guiño). OJO con la polaridad:
+   el rig anima `.ojo` (el globo ocular ENTERO, dibujo vectorial)
+   escalándolo a scaleY(.1) para "cerrarlo" — eso solo funciona en vector.
+   Acá el párpado es una PIEZA DE PIEL PROPIA que se desliza ENCIMA del ojo
+   (misma técnica que `piloto-lamina.js`), así que la polaridad es la
+   inversa: abierto=escala~0 (parche oculto), cerrado=escala~1 (parche
+   cubre el ojo).
+
+   REAJUSTADO en el pulido (`feat/jaguar-pulido`, 2026-08-14) — el calco
+   original de `rhBlink` (5.9s, cierres de solo ~2% de ciclo ≈ 120ms) era
+   CORRECTO para el rig vectorial grande, pero a 48px de avatar el ojo mide
+   ~1.5px en pantalla: un cierre de 120ms sin ningún tramo sostenido es
+   invisible en la práctica (medido por el operador con GPU, ver el reporte
+   de la tarea). La curva de acá conserva el mismo ESPÍRITU de doble golpe
+   (un parpadeo principal + uno corto de seguimiento) pero con:
+     - ciclo más corto (4.2s vs 5.9s) → parpadea más seguido, más chance de
+       que lo agarre un vistazo corto ("más frecuente", pedido explícito).
+     - un tramo SOSTENIDO cerrado real (79%→84%, ~210ms a 4.2s de ciclo) en
+       vez de un pico instantáneo — es la duración la que hace perceptible
+       el cambio, no solo el tamaño del parche (que también creció, ver
+       `parcheParpado` en capas.js).
+     - cierre más completo (.97 vs .9) — "guiño más marcado" sin llegar a
+       forma de caricatura (sigue siendo la piel real deslizándose, no un
+       párpado dibujado). */
 .jlv-parpado {
   position: absolute;
   transform-origin: 50% 0%;
-  animation: jlv-blink 5.9s linear infinite;
+  animation: jlv-blink 4.2s linear infinite;
 }
 @keyframes jlv-blink {
-  0%, 35%, 39%, 73%, 77%, 81%, 85%, 100% { transform: scaleY(0.001); }
-  37% { transform: scaleY(0.9); }
-  75% { transform: scaleY(0.9); }
-  79% { transform: scaleY(0.86); }
+  0%, 76%, 90%, 100% { transform: scaleY(0.001); }
+  79%, 84%           { transform: scaleY(0.97); }
+  93%, 96%           { transform: scaleY(0.85); }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .jlv-stage, .jlv-cuerpoPivote, .jlv-cabezaPivote, .jlv-patasDelPivote,
-  .jlv-pataTrasPivote, .jlv-colaPivote, .jlv-parpado {
+  .jlv-stage, .jlv-cuerpoPivote, .jlv-cabezaPivote, .jlv-patasDelCercaPivote,
+  .jlv-patasDelLejanaPivote, .jlv-pataTrasPivote, .jlv-colaPivote, .jlv-parpado {
     animation: none !important;
   }
   .jlv-parpado { visibility: hidden !important; }

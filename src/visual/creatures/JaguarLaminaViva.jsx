@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import {
   CARPETA_LAMINA, ARCHIVO_LAMINA, ANCHO, ALTO,
-  CABEZA, PATAS_DELANTERAS, PATA_TRASERA, COLA, CUERPO_PIVOTE,
+  CABEZA, PATA_DEL_CERCA, PATA_DEL_LEJANA, PATA_TRASERA, COLA, CUERPO_PIVOTE,
 } from './jaguarLamina/anatomia.js';
 import { hornearJaguar } from './jaguarLamina/capas.js';
 import './jaguarLamina/jaguarLamina.css';
@@ -10,11 +10,11 @@ const JAGUAR_SLUG = 'jaguar';
 
 /**
  * JaguarLaminaViva — la LÁMINA real de Humboldt (`jaguar-natural.png`,
- * `~/demos/3d/compai/laminas/`) recortada en 5 capas por alfa (cuerpo,
- * cabeza, patas delanteras, pata trasera, cola) y montada sobre el
- * ESQUELETO real del rig (`~/demos/3d/compai/rigs/jaguar.rig.svg` +
- * `jaguar.css`, variante de perfil `#jaguarLado` — la que le corresponde a
- * esta pose de jaguar caminando de lado).
+ * `~/demos/3d/compai/laminas/`) recortada en capas por alfa (cuerpo, cabeza,
+ * patas delanteras ×2, pata trasera, cola) y montada sobre el ESQUELETO real
+ * del rig (`~/demos/3d/compai/rigs/jaguar.rig.svg` + `jaguar.css`, variante
+ * de perfil `#jaguarLado` — la que le corresponde a esta pose de jaguar
+ * caminando de lado).
  *
  * LA FUSIÓN, en una frase: el rig aporta los HUESOS (pivotes + curvas de
  * animación reales, portadas 1:1 a `jaguarLamina.css`); la lámina aporta la
@@ -23,25 +23,35 @@ const JAGUAR_SLUG = 'jaguar';
  * `jaguarLamina/jaguarLamina.css` (qué transform de qué keyframe del rig le
  * toca a cada pieza, con la conversión de unidad documentada).
  *
- * QUÉ SE MUEVE: cuerpo (bóveda del paso), cabeza (bob en contratiempo),
- * patas delanteras y pata trasera (péndulo desde el hombro/cadera, en fase
- * diagonal como un cuadrúpedo real), cola (ondea desde la base), ojo
- * (parpadeo real — un parche de la propia piel se desliza sobre el ojo,
- * nunca un dibujo nuevo). Bob ambiental del cuerpo entero (asentado con
+ * QUÉ SE MUEVE: cuerpo (bóveda del paso), cabeza (bob en contratiempo), las
+ * DOS patas delanteras + la pata trasera (péndulo desde el hombro/cadera,
+ * cada una con la fase REAL del rig — `#jaguarLado` en jaguar.css: delCerca
+ * 0s, delLejos -.66s, trasCerca -.52s — así que ya alternan de verdad en vez
+ * de moverse en bloque), cola (ondea desde la base), LOS DOS ojos (parpadeo
+ * real y sincronizado — un parche de la propia piel se desliza sobre cada
+ * ojo, nunca un dibujo nuevo). Bob ambiental del cuerpo entero (asentado con
  * peso), calcado de `.flota` del rig.
  *
+ * PULIDO `feat/jaguar-pulido` (2026-08-14) sobre `feat/jaguar-lamina-sobre-
+ * esqueleto` (372a3a8c): las dos patas delanteras se separaron (antes un
+ * bloque único, ver `SOLAPE_PATA_DEL_CERCA` en anatomia.js para el respaldo
+ * anti-hueco que hizo falta) y el parpadeo — que en la rama anterior NO
+ * RENDERIZABA (bug real: el host del párpado tenía `position:absolute` sin
+ * `inset:0`, así que el `<canvas>` con ancho/alto en % resolvía a 0×0;
+ * encontrado con `getBoundingClientRect` en Chromium real, no era un tema de
+ * tamaño) — ahora parpadea de VERDAD, con los DOS ojos sincronizados, parche
+ * más grande y un ciclo con hold real (ver `jaguarLamina.css`, `jlv-blink`).
+ * Ver el reporte de la tarea para el detalle de qué se verificó y qué límite
+ * del dibujo plano sigue de pie.
+ *
  * QUÉ NO SE LOGRÓ (documentado, no escondido — ver el reporte de la tarea):
- *   - Patas delantera y trasera-lejana no se separaron: en esta lámina no
- *     hay borde de alfa limpio entre ellas, así que las delanteras rotan
- *     como UN bloque (pierden la alternancia de zancada individual).
- *   - Solo la pata trasera CERCANA se recortó; la lejana no es separable
- *     del cuerpo con confianza en este PNG.
+ *   - La pata trasera-lejana sigue sin separarse: no es distinguible del
+ *     cuerpo/la trasera-cercana en el alfa de esta lámina.
  *   - Sin marcha real (foot-plant/lift): es un péndulo de amplitud reducida
  *     alrededor de la pose ya caminando de la foto, no un ciclo de zancada
  *     completo — la lámina es UNA pose fija, no un sprite-sheet de marcha.
  *   - Sin gruñido/fauces (el rig lo tiene en `#jaguarLado`): la lámina es un
  *     retrato de boca cerrada, no hay píxeles de fauces abiertas que robar.
- *   - Solo un ojo (el visible en esta pose ¾); el otro no se midió.
  *
  * DEGRADACIÓN: mientras la imagen carga, o si el navegador no puede hornear
  * canvas 2D (jsdom de los tests), se muestra la lámina PLANA (`<img>`, la
@@ -80,10 +90,12 @@ export default function JaguarLaminaViva({
 }) {
   const cuerpoHostRef = useRef(null);
   const cabezaHostRef = useRef(null);
-  const patasDelHostRef = useRef(null);
+  const patasDelCercaHostRef = useRef(null);
+  const patasDelLejanaHostRef = useRef(null);
   const pataTrasHostRef = useRef(null);
   const colaHostRef = useRef(null);
   const parpadoHostRef = useRef(null);
+  const parpado2HostRef = useRef(null);
   const [listo, setListo] = useState(false);
 
   useEffect(() => {
@@ -103,25 +115,31 @@ export default function JaguarLaminaViva({
       };
       capaCompleta(capas.cuerpo);
       capaCompleta(capas.cabeza);
-      capaCompleta(capas.patasDelanteras);
+      capaCompleta(capas.patasDelCerca);
+      capaCompleta(capas.patasDelLejana);
       capaCompleta(capas.pataTrasera);
       capaCompleta(capas.cola);
       cuerpoHostRef.current?.replaceChildren(capas.cuerpo);
       cabezaHostRef.current?.replaceChildren(capas.cabeza);
-      patasDelHostRef.current?.replaceChildren(capas.patasDelanteras);
+      patasDelCercaHostRef.current?.replaceChildren(capas.patasDelCerca);
+      patasDelLejanaHostRef.current?.replaceChildren(capas.patasDelLejana);
       pataTrasHostRef.current?.replaceChildren(capas.pataTrasera);
       colaHostRef.current?.replaceChildren(capas.cola);
 
-      const p = capas.parpado;
-      const cv = p.cv;
-      cv.className = 'jlv-parpado';
-      cv.style.left = `${(p.x0 / capas.W) * 100}%`;
-      cv.style.top = `${(p.y0 / capas.H) * 100}%`;
-      cv.style.width = `${(p.w / capas.W) * 100}%`;
-      cv.style.height = `${(p.h / capas.H) * 100}%`;
-      cv.style.display = 'block';
-      if (!animated) cv.style.animation = 'none';
-      parpadoHostRef.current?.replaceChildren(cv);
+      /** Monta un parche de párpado ya horneado (`{cv,x0,y0,w,h}`) en su host. */
+      const montarParpado = (parche, host) => {
+        const cv = parche.cv;
+        cv.className = 'jlv-parpado';
+        cv.style.left = `${(parche.x0 / capas.W) * 100}%`;
+        cv.style.top = `${(parche.y0 / capas.H) * 100}%`;
+        cv.style.width = `${(parche.w / capas.W) * 100}%`;
+        cv.style.height = `${(parche.h / capas.H) * 100}%`;
+        cv.style.display = 'block';
+        if (!animated) cv.style.animation = 'none';
+        host.current?.replaceChildren(cv);
+      };
+      montarParpado(capas.parpado, parpadoHostRef);
+      montarParpado(capas.parpado2, parpado2HostRef);
 
       setListo(true);
     };
@@ -186,10 +204,17 @@ export default function JaguarLaminaViva({
             <div ref={cuerpoHostRef} className="jlv-capa" />
 
             <div
-              className={animated ? 'jlv-patasDelPivote' : undefined}
-              style={{ position: 'absolute', inset: 0, transformOrigin: pctOf(PATAS_DELANTERAS.pivote) }}
+              className={animated ? 'jlv-patasDelCercaPivote' : undefined}
+              style={{ position: 'absolute', inset: 0, transformOrigin: pctOf(PATA_DEL_CERCA.pivote) }}
             >
-              <div ref={patasDelHostRef} className="jlv-capa" />
+              <div ref={patasDelCercaHostRef} className="jlv-capa" />
+            </div>
+
+            <div
+              className={animated ? 'jlv-patasDelLejanaPivote' : undefined}
+              style={{ position: 'absolute', inset: 0, transformOrigin: pctOf(PATA_DEL_LEJANA.pivote) }}
+            >
+              <div ref={patasDelLejanaHostRef} className="jlv-capa" />
             </div>
 
             <div
@@ -211,7 +236,18 @@ export default function JaguarLaminaViva({
               style={{ position: 'absolute', inset: 0, transformOrigin: pctOf(CABEZA.pivote) }}
             >
               <div ref={cabezaHostRef} className="jlv-capa" />
-              <div ref={parpadoHostRef} style={{ position: 'absolute' }} />
+              {/* `inset: 0` es OBLIGATORIO acá — sin él, este wrapper (position:
+                  absolute sin más) no tiene tamaño definido, y el <canvas> del
+                  párpado (ancho/alto en %, ver montarParpado) resuelve esos
+                  porcentajes contra un contenedor sin tamaño → 0×0 real (medido
+                  con getBoundingClientRect en Chromium: width=0, height=0). Bug
+                  encontrado en el pulido `feat/jaguar-pulido`: el párpado NO
+                  "se veía chico" a 48px como se pensaba — no se veía PORQUE NO
+                  RENDERIZABA, con o sin `inset:0` el bug era el mismo en la
+                  versión sin pulir. Con `inset:0` el wrapper hereda el tamaño
+                  completo de `jlv-cabezaPivote` y el % del canvas resuelve bien. */}
+              <div ref={parpadoHostRef} style={{ position: 'absolute', inset: 0 }} />
+              <div ref={parpado2HostRef} style={{ position: 'absolute', inset: 0 }} />
             </div>
           </div>
         </div>
