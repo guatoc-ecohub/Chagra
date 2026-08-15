@@ -581,33 +581,36 @@ export function geomHelecho({ q = 1 } = {}, seed = 8) {
   pintarPorVertice(fuste, (x, y, z) => tmp.copy(t1).lerp(t2, (Math.sin(x * 9 + z * 9 + y * 3) * 0.5 + 0.5) * 0.7));
   partes.push(fuste);
 
-  // Corona = MASA de frondas: casquete achatado de matojos-nube (copa-masa del
-  // queñual) cuyo borde ARQUEA afuera-abajo — el lóbulo del borde cae por
-  // debajo del ápice, que es lo que hace paraguas vivo al Cyathea sin que las
-  // frondas se cuenten de a una.
+  // Corona = MASA de frondas en PARAGUAS: la silueta del Cyathea no es una
+  // bola sobre el fuste sino un casquete ANCHO y BAJO (W/H ≥ 3) cuyo borde
+  // arquea afuera-abajo. El arco es parámetro del layout de lóbulos de la
+  // misma copa-masa: un casquete PLANO y ancho en el ápice y un anillo de
+  // borde que lo solapa y cae por debajo del nacimiento de las frondas.
+  // Lóbulos POCOS y GRANDES a propósito: el tamaño del matojo escala con el
+  // radio del lóbulo — lóbulos chicos dan moras sueltas, no masa.
   const top = curva.getPointAt(1);
   const alcance = 0.9 + r() * 0.6; // el mismo alcance que tenían las frondas
-  const lobs = [{ c: [top.x, top.y + 0.12, top.z], radio: alcance * 0.48 }];
-  const nLob = Math.max(4, Math.round(6 * q));
-  for (let i = 0; i < nLob; i++) {
-    const ang = (i / nLob) * Math.PI * 2 + r() * 0.4;
-    const rad = alcance * (0.46 + r() * 0.18);
+  const lobs = [{ c: [top.x, top.y, top.z], radio: alcance * 0.46 }];
+  const nBorde = Math.max(5, Math.round(6 * q));
+  for (let i = 0; i < nBorde; i++) {
+    const ang = (i / nBorde) * Math.PI * 2 + r() * 0.4;
+    const rad = alcance * (0.74 + r() * 0.06);
     lobs.push({
       c: [
         top.x + Math.cos(ang) * rad,
-        top.y + 0.06 - rad * 0.36 + r() * 0.05, // cuanto más afuera, más cae
+        top.y + 0.02 - rad * 0.28 + r() * 0.04, // cuanto más afuera, más cae
         top.z + Math.sin(ang) * rad,
       ],
-      radio: alcance * (0.3 + r() * 0.1),
+      radio: alcance * 0.3,
     });
   }
   copaMasa(lobs, {
     base: PB.helechoFronda, sol: PB.helechoFrondaSol, luz: PB.helechoFrondaLuz,
-    q, seed: seed + 7, achatado: 0.45, huecos: 0.4, mordida: 0.5, ao: 0.68, densidad: 8,
+    q, seed: seed + 7, achatado: 0.3, huecos: 0.3, mordida: 0.5, ao: 0.68, densidad: 8,
   }).forEach((cc) => partes.push(cc));
-  // cogollo tierno (crozier) más claro, asomado sobre la cresta de la masa
+  // cogollo tierno (crozier) más claro, incrustado en la cresta de la masa
   const cogollo = matojoNube(0.16 + r() * 0.06, seed * 5, 0.4);
-  poner(cogollo, [top.x, top.y + 0.18 + alcance * 0.26, top.z]);
+  poner(cogollo, [top.x, top.y + 0.08 + alcance * 0.12, top.z]);
   partes.push(pintar(cogollo, PB.helechoFrondaLuz));
   return fusionar(partes, 'helecho');
 }
