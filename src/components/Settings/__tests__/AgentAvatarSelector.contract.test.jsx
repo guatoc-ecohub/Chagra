@@ -14,8 +14,8 @@
  * - "Eligo a Dante y en la pista sale el chivito" (karts)
  * - "Eligo a Guacamaya y me sale la abeja" (selector 2D)
  *
- * @see PR #2912 (feat(compai): actualizar roster a 8 compAI)
- * @see GLM task #selector-roster-ocho-honesto
+ * @see PR-2912 (feat(compai): actualizar roster a 8 compAI)
+ * @see GLM task selector-roster-ocho-honesto
  */
 import { describe, test, expect } from 'vitest';
 import { render } from '@testing-library/react';
