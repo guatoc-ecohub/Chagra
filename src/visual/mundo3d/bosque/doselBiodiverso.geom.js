@@ -557,8 +557,10 @@ export function geomSieteCueros({ q = 1 } = {}, seed = 7) {
 /* -------------------------------------------------------------------------- */
 
 /*
- * Fuste fibroso esbelto rematado por una CORONA de frondas arqueadas (planos
- * alargados que caen en abanico). La silueta más de bosque de niebla que hay.
+ * Fuste fibroso esbelto rematado por una CORONA-MASA: un casquete achatado de
+ * matojos-nube que arquea afuera-abajo (la técnica copa-masa del queñual, la
+ * misma del dosel). Nada de anillos de conos contables — hojas = MASA. La
+ * silueta más de bosque de niebla que hay.
  */
 export function geomHelecho({ q = 1 } = {}, seed = 8) {
   const r = rng(seed);
@@ -579,26 +581,33 @@ export function geomHelecho({ q = 1 } = {}, seed = 8) {
   pintarPorVertice(fuste, (x, y, z) => tmp.copy(t1).lerp(t2, (Math.sin(x * 9 + z * 9 + y * 3) * 0.5 + 0.5) * 0.7));
   partes.push(fuste);
 
-  // Corona de frondas: planos largos que arquean hacia afuera-abajo.
+  // Corona = MASA de frondas: casquete achatado de matojos-nube (copa-masa del
+  // queñual) cuyo borde ARQUEA afuera-abajo — el lóbulo del borde cae por
+  // debajo del ápice, que es lo que hace paraguas vivo al Cyathea sin que las
+  // frondas se cuenten de a una.
   const top = curva.getPointAt(1);
-  const nF = Math.max(5, Math.round(9 * q));
-  for (let i = 0; i < nF; i++) {
-    const ang = (i / nF) * Math.PI * 2 + r() * 0.3;
-    const largo = 0.9 + r() * 0.6;
-    const fronda = new THREE.ConeGeometry(0.14, largo, 4, 1);
-    // arquea: apunta hacia afuera y algo arriba, luego cae (leve inclinación)
-    apuntar(
-      fronda,
-      [top.x + Math.cos(ang) * largo * 0.35, top.y + 0.12 + r() * 0.06, top.z + Math.sin(ang) * largo * 0.35],
-      [Math.cos(ang) * 0.9, 0.35 - r() * 0.3, Math.sin(ang) * 0.9],
-      [1, 1, 0.28],
-    );
-    const cc = new THREE.Color(PB.helechoFronda).lerp(new THREE.Color(PB.helechoFrondaSol), r());
-    partes.push(pintar(fronda, cc));
+  const alcance = 0.9 + r() * 0.6; // el mismo alcance que tenían las frondas
+  const lobs = [{ c: [top.x, top.y + 0.12, top.z], radio: alcance * 0.48 }];
+  const nLob = Math.max(4, Math.round(6 * q));
+  for (let i = 0; i < nLob; i++) {
+    const ang = (i / nLob) * Math.PI * 2 + r() * 0.4;
+    const rad = alcance * (0.46 + r() * 0.18);
+    lobs.push({
+      c: [
+        top.x + Math.cos(ang) * rad,
+        top.y + 0.06 - rad * 0.36 + r() * 0.05, // cuanto más afuera, más cae
+        top.z + Math.sin(ang) * rad,
+      ],
+      radio: alcance * (0.3 + r() * 0.1),
+    });
   }
-  // cogollo tierno (crozier) más claro en el centro
+  copaMasa(lobs, {
+    base: PB.helechoFronda, sol: PB.helechoFrondaSol, luz: PB.helechoFrondaLuz,
+    q, seed: seed + 7, achatado: 0.45, huecos: 0.4, mordida: 0.5, ao: 0.68, densidad: 8,
+  }).forEach((cc) => partes.push(cc));
+  // cogollo tierno (crozier) más claro, asomado sobre la cresta de la masa
   const cogollo = matojoNube(0.16 + r() * 0.06, seed * 5, 0.4);
-  poner(cogollo, [top.x, top.y + 0.14, top.z]);
+  poner(cogollo, [top.x, top.y + 0.18 + alcance * 0.26, top.z]);
   partes.push(pintar(cogollo, PB.helechoFrondaLuz));
   return fusionar(partes, 'helecho');
 }
