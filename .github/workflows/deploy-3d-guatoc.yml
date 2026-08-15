@@ -2,22 +2,14 @@ name: Deploy mundos 3D (3d.guatoc.co)
 
 # Despliegue automatico del SPA publico (build --base=/app/) que sirve los 19
 # mundos aprobados en 3d.guatoc.co, cada uno via su stub /<slug>/ ->
-# /app/#/mockups/<slug> (ver ops/bitacora/montar-19-mundos.md en
-# Chagra-strategy, repo privado, para el detalle completo).
+# /app/#/mockups/<slug>.
 #
 # ALCANCE: este workflow SOLO redespliega /app/ (el bundle de la SPA con los
-# mockups). NO toca el valle (3d.guatoc.co/ raiz, vendorizado en un repo APARTE
-# sin remoto, ~/demos-src/valle-guatoc en el host de deploy) ni el indice
-# /mundos/ (paginas estaticas de mano, cambian poco). Decision documentada:
-# ampliar esto a un pipeline que tambien reconstruya el valle requiere mover
-# ese repo a algo con su propio trigger -- no se resuelve aqui.
+# mockups). NO toca el valle ni el indice /mundos/.
 #
-# Target: /home/kortux/demos/3d/app/ en alpha, servido por microapp-3d.service
-# (systemd --user + tunel Cloudflare ya configurado, ver ~/.local/bin/microapp-deploy).
-# El runner de GH Actions corre en alpha como usuario "runner", miembro del
-# grupo "users" (mismo grupo dueno del arbol ~/demos/3d/); el directorio se
-# dejo group-writable (chmod g+w + setgid) para que este workflow pueda
-# escribir sin sudo -- el rsync de abajo mantiene ese modo en cada corrida.
+# Target: /home/kortux/demos/3d/app/ en alpha, servido por microapp-3d.service.
+# El runner debe tener acceso de escritura a esta ruta. No usar $HOME: el
+# servicio del runner define HOME en su propio work tree.
 
 on:
   push:
@@ -63,32 +55,41 @@ jobs:
           VITE_CHAGRA_MCP_TOKEN: ${{ secrets.VITE_CHAGRA_MCP_TOKEN }}
 
       - if: env.SKIP_DEPLOY != '1'
-        name: Deploy a ~/demos/3d/app/
+        name: Deploy a /home/kortux/demos/3d/app/
         run: |
           set -e
-          TARGET="$HOME/demos/3d/app"
+          TARGET=/home/kortux/demos/3d/app
+          test -d "$(dirname "$TARGET")" || {
+            echo "El padre del target no existe: $TARGET"
+            exit 1
+          }
           mkdir -p "$TARGET"
           umask 002
-          # --chmod mantiene el arbol group-writable en cada corrida (el
-          # runner escribe como usuario "runner", grupo "users" -- mismo
-          # grupo dueno del arbol; sin esto, un rsync -a heredaria el umask
-          # por defecto y la SIGUIENTE corrida podria perder el permiso).
           rsync -a --delete --chmod=Du=rwx,Dg=rwx,Do=rx,Fu=rw,Fg=rw,Fo=r \
             dist/ "$TARGET/"
 
       - if: env.SKIP_DEPLOY != '1'
-        name: Verify deployment
+        name: Verify served deployment
         run: |
-          TARGET="$HOME/demos/3d/app"
-          test -f "$TARGET/index.html" || exit 1
-          HASH=$(sha256sum "$TARGET/index.html" | cut -d' ' -f1)
-          echo "3d.guatoc.co/app deploy OK: $(date -Iseconds) | index.html sha256: ${HASH:0:12}"
+          set -euo pipefail
+          VERIFY_URL=https://3d.guatoc.co/app/index.html
+          EXPECTED_HASH=$(sha256sum dist/index.html | cut -d' ' -f1)
+          SERVED_HASH=$(nix-shell -p curl --run \
+            "curl -fsSL --retry 3 --retry-delay 1 --max-time 20 $VERIFY_URL" \
+            | sha256sum | cut -d' ' -f1)
+          echo "dist/index.html sha256:   $EXPECTED_HASH"
+          echo "servido por $VERIFY_URL: $SERVED_HASH"
+          if [ "$EXPECTED_HASH" != "$SERVED_HASH" ]; then
+            echo "Deploy INCOMPLETO: el servidor no sirve el build que se acaba de construir."
+            exit 1
+          fi
+          echo "Deploy servido OK: $(date -Iseconds)"
 
       - if: env.SKIP_DEPLOY != '1'
         name: Verify referenced assets exist
         run: |
           set -euo pipefail
-          TARGET="$HOME/demos/3d/app"
+          TARGET=/home/kortux/demos/3d/app
           INDEX="$TARGET/index.html"
           test -f "$INDEX" || { echo "index.html ausente en $TARGET"; exit 1; }
           refs=$(grep -oE '/app/assets/[A-Za-z0-9._/-]+\.(js|css)' "$INDEX" | sort -u || true)
@@ -112,8 +113,11 @@ jobs:
       - if: env.SKIP_DEPLOY != '1'
         name: curl smoke test (200 en 3 rutas)
         run: |
+          set -euo pipefail
           sleep 5
           for p in "" "cafetal-vivo-3d/" "bosque-tres-estratos/"; do
-            code=$(curl -s -o /dev/null -w "%{http_code}" --max-time 10 "https://3d.guatoc.co/$p" || echo 000)
+            code=$(nix-shell -p curl --run \
+              "curl -fsS -o /dev/null -w '%{http_code}' --max-time 10 https://3d.guatoc.co/$p")
             echo "https://3d.guatoc.co/$p -> $code"
+            test "$code" = 200
           done
