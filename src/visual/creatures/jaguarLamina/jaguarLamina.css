@@ -1,0 +1,149 @@
+/* jaguarLamina.css — LAS MISMAS animaciones del rig real, trasplantadas.
+ *
+ * Cada @keyframes de acá es una copia de un @keyframes de
+ * `~/demos/3d/compai/rigs/jaguar.css` (bloque `#jaguarLado`, la variante de
+ * PERFIL — es la que le corresponde a `jaguar-natural.png`, un jaguar
+ * caminando visto de lado; el `#cuerpoRig` FRONTAL de ese archivo es para
+ * la pose de cara, no aplica acá). Se preserva el mismo % de keyframe, la
+ * misma duración, el mismo timing-function y el mismo desfase entre piezas
+ * — lo único que cambia es la UNIDAD de las traslaciones: el rig anima un
+ * SVG de viewBox fijo en px propios; acá el stage escala con el prop
+ * `size`, así que cada `translateY(Npx)` del rig se reexpresa como
+ * `N / <dimensión de referencia de esa pieza en el rig> %` (ese % de CSS
+ * ya es relativo al alto del propio elemento — mismo efecto proporcional
+ * que el `transform-box:fill-box` del rig). Las rotaciones NO se tocan
+ * (un grado es un grado, no hay unidad que convertir).
+ *
+ * Correspondencias (rig → acá), con la conversión aplicada:
+ *   troncoLadoBob   (#troncoLado,  ry=77 del <ellipse> del tronco)
+ *     2.5px→3.2% / -3.5px→-4.5%   → jlv-cuerpoPivote (jlv-cuerpoBob)
+ *   cabezaLadoBob   (#cabezaLado,  ry=51 del <ellipse> del cráneo)
+ *     -1.5px→-2.9% / 2px→3.9%     → jlv-cabezaPivote (jlv-cabezaBob)
+ *   pasoLado        (patas, rotate puro — sin conversión)
+ *     14deg↔-15deg  ESCALADO ×0.6 (8deg↔-9deg): la pierna del rig es un
+ *     trazo vectorial con el pivote exacto en el hueso; acá el pivote se
+ *     MIDIÓ a ojo sobre una foto — con la amplitud completa, un pivote un
+ *     poco corrido se ve como que la pata se "descuelga" del cuerpo en vez
+ *     de pivotar sobre él. Documentado explícitamente: NO es fidelidad
+ *     completa, es el ajuste de seguridad que le corresponde a un pivote
+ *     medido a ojo sobre una lámina en vez de tallado en el hueso del rig.
+ *   colaLadoOndea   (#colaLado, rotate puro — sin conversión) → jlv-cola
+ *   rhBlink         (.ojo, scaleY puro, universal en frontal y perfil) → jlv-parpado
+ *   .flota          (#jaguar, ambiente frontal — se reusa como bob GLOBAL
+ *     del stage completo, ry≈altura total 394)
+ *     -5px→-1.3% / 5px→1.3%       → jlv-stage
+ *
+ * NO trasplantado (documentado, no inventado):
+ *   - hombroLadoRueda: el omóplato es una FORMA VECTORIAL propia del rig
+ *     (`#hombroLado`), sin equivalente recortable en una lámina fotográfica
+ *     (no hay un borde de alfa que separe "omóplato" de "torso").
+ *   - colaLadoPunta: la cola acá es UNA pieza rígida (ver anatomia.js); el
+ *     rig anima base y punta por separado, esto solo replica la base.
+ *   - gruneLado/fauceLado/gruneFx (el gruñido periódico): requiere arte de
+ *     fauces abiertas que la lámina no tiene (retrato de cuerpo entero,
+ *     boca cerrada) — dibujarla sería inventar lámina, prohibido por el SPEC.
+ *   - rhMirada (deriva de pupila): el `.ojo` de `#jaguarLado` en el SVG del
+ *     rig NO tiene un `<g class="pupila">` propio (solo el `.ojo` frontal lo
+ *     tiene) — el rig mismo no mueve la pupila en la vista de perfil, así
+ *     que no hay transform que trasplantar acá.
+ */
+
+.jlv-stage {
+  position: relative;
+  display: block;
+  animation: jlv-stageBob 3.4s ease-in-out infinite alternate;
+  transform-origin: 50% 50%;
+}
+@keyframes jlv-stageBob {
+  from { transform: translateY(-1.3%) rotate(-0.5deg); }
+  to   { transform: translateY(1.3%) rotate(0.5deg); }
+}
+
+.jlv-capa {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+/* tronco/cuerpo — bóveda del paso + cabeceo sutil (troncoLadoBob) */
+.jlv-cuerpoPivote {
+  position: absolute;
+  inset: 0;
+  animation: jlv-cuerpoBob 0.525s ease-in-out infinite;
+}
+@keyframes jlv-cuerpoBob {
+  0%, 100% { transform: translateY(3.2%) rotate(0.5deg); }
+  50%      { transform: translateY(-4.5%) rotate(-0.3deg); }
+}
+
+/* cabeza — bob al paso, contratiempo del tronco (cabezaLadoBob) */
+.jlv-cabezaPivote {
+  position: absolute;
+  inset: 0;
+  animation: jlv-cabezaBob 0.525s ease-in-out -0.12s infinite;
+}
+@keyframes jlv-cabezaBob {
+  0%, 100% { transform: translateY(-2.9%) rotate(-0.7deg); }
+  50%      { transform: translateY(3.9%) rotate(0.7deg); }
+}
+
+/* patas — péndulo desde el pivote (pasoLado), amplitud reducida x0.6 — ver
+   nota de cabecera. patasDelanteras = fase "delCerca" (0s); pataTrasera =
+   fase "trasCerca" (-.52s), su diagonal real en el rig de 4 patas. */
+.jlv-patasDelPivote {
+  position: absolute;
+  inset: 0;
+  animation: jlv-pasoLado 1.05s ease-in-out infinite;
+}
+.jlv-pataTrasPivote {
+  position: absolute;
+  inset: 0;
+  animation: jlv-pasoLado 1.05s ease-in-out -0.52s infinite;
+}
+@keyframes jlv-pasoLado {
+  0%, 100% { transform: rotate(8deg); }
+  50%      { transform: rotate(-9deg); }
+}
+
+/* cola — ondea con peso desde la base (colaLadoOndea) */
+.jlv-colaPivote {
+  position: absolute;
+  inset: 0;
+  animation: jlv-colaOndea 1.8s ease-in-out infinite alternate;
+}
+@keyframes jlv-colaOndea {
+  from { transform: rotate(-3deg); }
+  to   { transform: rotate(5deg); }
+}
+
+/* párpado — parpadeo real con doble golpe (rhBlink de jaguar.css).
+   OJO con la polaridad: el rig anima `.ojo` (el globo ocular ENTERO, dibujo
+   vectorial) escalándolo a scaleY(.1) para "cerrarlo" — eso solo funciona
+   en vector. Acá el párpado es una PIEZA DE PIEL PROPIA que se desliza
+   ENCIMA del ojo (misma técnica que `piloto-lamina.js`), así que la
+   polaridad es la inversa: abierto=escala~0 (parche oculto), cerrado=
+   escala~1 (parche cubre el ojo). Los % de keyframe, la duración (5.9s) y
+   la curva (el doble golpe en 37%/75%/79%) son un calco exacto de
+   `rhBlink` — solo se invierte `scaleY → 1 - scaleY` para que la MISMA
+   curva cierre el párpado en vez de aplastar el globo ocular. */
+.jlv-parpado {
+  position: absolute;
+  transform-origin: 50% 0%;
+  animation: jlv-blink 5.9s linear infinite;
+}
+@keyframes jlv-blink {
+  0%, 35%, 39%, 73%, 77%, 81%, 85%, 100% { transform: scaleY(0.001); }
+  37% { transform: scaleY(0.9); }
+  75% { transform: scaleY(0.9); }
+  79% { transform: scaleY(0.86); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .jlv-stage, .jlv-cuerpoPivote, .jlv-cabezaPivote, .jlv-patasDelPivote,
+  .jlv-pataTrasPivote, .jlv-colaPivote, .jlv-parpado {
+    animation: none !important;
+  }
+  .jlv-parpado { visibility: hidden !important; }
+}

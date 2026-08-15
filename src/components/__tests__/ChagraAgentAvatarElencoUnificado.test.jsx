@@ -8,6 +8,13 @@
  * exponía. Estos wrappers cierran ese hueco — mismo contrato que
  * ChagraAgentAvatarZariguya (state/size/withLabel/onClick/onDoubleClick/
  * glow/className/ariaLabel).
+ *
+ * Jaguar (2026-08-14, `feat/jaguar-lamina-sobre-esqueleto`): dejó de ser
+ * `<svg>` — ahora es `JaguarLaminaViva`, la lámina real recortada en capas
+ * montada en `<div>`s sobre las transformaciones del rig. El CONTRATO
+ * observable (role="img", data-creature, data-visema) es el mismo; el tag
+ * raíz no. `raiz(container)` deja que cada caso elija cómo encontrar su
+ * nodo raíz sin forzar `svg` donde ya no hay uno.
  */
 import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
@@ -19,30 +26,33 @@ import ChagraAgentAvatarLuciernaga from '../ChagraAgentAvatarLuciernaga';
 import ChagraAgentAvatarGuacamaya from '../ChagraAgentAvatarGuacamaya';
 import ChagraAgentAvatarChivitoPunk from '../ChagraAgentAvatarChivitoPunk';
 
+const raizSvg = (container, slug) => container.querySelector(`svg[data-creature="${slug}"]`);
+const raizDiv = (container, slug) => container.querySelector(`div[data-creature="${slug}"]`);
+
 const CASOS = [
-    { Component: ChagraAgentAvatarJaguar, nombre: 'Jaguar', slug: 'jaguar' },
-    { Component: ChagraAgentAvatarOsoBaston, nombre: 'Oso del bastón', slug: 'oso-baston' },
-    { Component: ChagraAgentAvatarLuciernaga, nombre: 'Luciérnaga', slug: 'luciernaga' },
-    { Component: ChagraAgentAvatarGuacamaya, nombre: 'Guacamaya', slug: 'guacamaya' },
-    { Component: ChagraAgentAvatarChivitoPunk, nombre: 'Chivito', slug: 'chivito-punk' },
+    { Component: ChagraAgentAvatarJaguar, nombre: 'Jaguar', slug: 'jaguar', raiz: raizDiv },
+    { Component: ChagraAgentAvatarOsoBaston, nombre: 'Oso del bastón', slug: 'oso-baston', raiz: raizSvg },
+    { Component: ChagraAgentAvatarLuciernaga, nombre: 'Luciérnaga', slug: 'luciernaga', raiz: raizSvg },
+    { Component: ChagraAgentAvatarGuacamaya, nombre: 'Guacamaya', slug: 'guacamaya', raiz: raizSvg },
+    { Component: ChagraAgentAvatarChivitoPunk, nombre: 'Chivito', slug: 'chivito-punk', raiz: raizSvg },
 ];
 
 // for...of en vez de describe.each: con describe.each, el linter no rastrea
 // el uso de `Component` dentro de las closures anidadas de cada `test()` (se
 // lee como parámetro sin usar aunque SÍ se use en el JSX).
-for (const { Component, nombre, slug } of CASOS) {
+for (const { Component, nombre, slug, raiz } of CASOS) {
     describe(`ChagraAgentAvatar${nombre}`, () => {
         test(`renderiza el cuerpo real de ${nombre} (data-creature=${slug})`, () => {
             const { container } = render(<Component state="idle" />);
-            const svg = container.querySelector(`svg[data-creature="${slug}"]`);
-            expect(svg).toBeInTheDocument();
-            expect(svg).toHaveAttribute('role', 'img');
+            const nodo = raiz(container, slug);
+            expect(nodo).toBeInTheDocument();
+            expect(nodo).toHaveAttribute('role', 'img');
         });
 
-        test('sin onClick ni onDoubleClick renderiza solo el SVG (no button)', () => {
+        test('sin onClick ni onDoubleClick renderiza solo el dibujo (no button)', () => {
             const { container } = render(<Component state="idle" />);
             expect(container.querySelector('button')).toBeNull();
-            expect(container.querySelector('svg')).toBeInTheDocument();
+            expect(raiz(container, slug)).toBeInTheDocument();
         });
 
         test('con onDoubleClick envuelve en button y dispara el handler', () => {
@@ -65,8 +75,7 @@ for (const { Component, nombre, slug } of CASOS) {
 
         test('state="speaking" pasa un visema (lip-sync) al cuerpo', () => {
             const { container } = render(<Component state="speaking" />);
-            const svg = container.querySelector('svg');
-            expect(svg).toHaveAttribute('data-visema');
+            expect(raiz(container, slug)).toHaveAttribute('data-visema');
         });
     });
 }

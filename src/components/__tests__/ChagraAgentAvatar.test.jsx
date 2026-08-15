@@ -56,7 +56,10 @@ describe('ChagraAgentAvatar — Angelita default: glow + double-click + migraci�
       window.dispatchEvent(new CustomEvent('chagra:agent-avatar-changed', { detail: 'jaguar' }));
     });
 
-    expect(container.querySelector('svg[data-creature="jaguar"]')).toBeInTheDocument();
+    // Jaguar dejó de ser SVG (feat/jaguar-lamina-sobre-esqueleto): ahora es
+    // la lámina real recortada en capas, montada en <div>s — el contrato
+    // observable (data-creature, role=img) es el mismo, el tag no.
+    expect(container.querySelector('[data-creature="jaguar"]')).toBeInTheDocument();
     expect(container.querySelector('svg.agt-angelita')).not.toBeInTheDocument();
   });
 
