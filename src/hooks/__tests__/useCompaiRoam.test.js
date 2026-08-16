@@ -126,12 +126,15 @@ describe('useCompaiRoam', () => {
     try {
       const raf = instalarRafManual();
       const el = document.createElement('div');
+      const efecto = document.createElement('span');
       const ref = { current: el };
+      const efectoMisticoRef = { current: efecto };
       const { result } = renderHook(() => useCompaiRoam(ref, {
         pausado: false,
         mistico: true,
         fraccionAncho: 1,
         zonas: ['abajo', 'arriba'],
+        efectoMisticoRef,
       }));
 
       act(() => { raf.cb?.(2000); });
@@ -139,6 +142,7 @@ describe('useCompaiRoam', () => {
       expect(result.current.caminando).toBe(true);
       expect(el.style.transform).toContain(', 0, 0)');
       expect(el.style.opacity).toBe('');
+      expect(efecto.style.filter).toBe('');
 
       // Llega horizontalmente a x=-15 y queda en reposo en la zona abajo.
       for (let t = 2300; t <= 3000; t += 100) {
@@ -151,21 +155,28 @@ describe('useCompaiRoam', () => {
       // Termina el reposo horizontal y empieza el fade vertical hacia arriba.
       act(() => { raf.cb?.(7000); });
       expect(Number(el.style.opacity)).toBeLessThan(1);
+      expect(efecto.style.filter).toContain('blur(');
+      expect(efecto.style.transform).toContain('scale(');
       expect(el.style.transform).toContain(', 0, 0)');
 
       // El fade-out termina con opacity=0 y el mismo nodo cambia solo de Y.
-      for (let t = 7100; t <= 7400; t += 100) {
+      for (let t = 7100; t <= 8000; t += 100) {
         act(() => { raf.cb?.(t); });
       }
       expect(el.style.opacity).toBe('0');
+      expect(efecto.style.filter).toContain('blur(6.00px)');
+      expect(efecto.style.transform).toContain('scale(0.9000)');
+      expect(efecto.style.filter).toContain('drop-shadow');
       expect(el.style.transform).toContain('translate3d(-15.0px, -384.0px, 0)');
 
       // El fade-in lo deja visible en la zona arriba, conservando el x.
-      for (let t = 7500; t <= 7900; t += 100) {
+      for (let t = 8100; t <= 9100; t += 100) {
         act(() => { raf.cb?.(t); });
       }
       expect(el.style.transform).toContain('translate3d(-15.0px, -384.0px, 0)');
       expect(el.style.opacity).toBe('1');
+      expect(efecto.style.filter).toBe('');
+      expect(efecto.style.transform).toBe('');
       expect(result.current.zona).toBe('arriba');
       expect(result.current.parada).toBeGreaterThanOrEqual(2);
     } finally {

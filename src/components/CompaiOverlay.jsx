@@ -268,11 +268,13 @@ export default function CompaiOverlay({ currentView = 'dashboard' }) {
   // `parada` se incrementa cada vez que LLEGA a un punto de su paseo — con eso
   // hacemos el "moverse-para-explicar" (ver la burbuja de parada más abajo).
   const roamRef = useRef(null);
+  const efectoMisticoRef = useRef(null);
   const zonas = useMemo(() => getZonasForRuta(currentView), [currentView]);
   const { caminando, hacia, zona = 'abajo', parada } = useCompaiRoam(roamRef, {
     pausado: isOpen,
     mistico: true,
     zonas,
+    efectoMisticoRef,
   });
 
   // El mensaje contextual de la pantalla actual (capa BASE: qué es esta
@@ -383,11 +385,13 @@ export default function CompaiOverlay({ currentView = 'dashboard' }) {
               filter: 'drop-shadow(0 6px 9px rgba(0, 0, 0, 0.34))',
             }}
           >
-            <ChagraAgentAvatar
-              size={avatarSize}
-              state={estadoAvatar}
-              ariaLabel={`${nombreCompai}, asistente de Chagra`}
-            />
+            <span ref={efectoMisticoRef} className="inline-flex will-change-transform" data-testid="compai-dissolve">
+              <ChagraAgentAvatar
+                size={avatarSize}
+                state={estadoAvatar}
+                ariaLabel={`${nombreCompai}, asistente de Chagra`}
+              />
+            </span>
           </span>
         </button>
       </div>

@@ -42,6 +42,8 @@
  * @param {number} [opciones.fraccionAncho=0.3]  franja recorrible (0..1 del ancho).
  * @param {boolean} [opciones.mistico=false]  fade y teleport vertical opt-in.
  * @param {string[]} [opciones.zonas]  orden de zonas verticales del modo místico.
+ * @param {{ current: HTMLElement|null }} [opciones.efectoMisticoRef] nodo
+ *   interno donde se pintan blur, scale y glow sin pisar el transform del roam.
  * @returns {{ caminando: boolean, hacia: 'izquierda'|'derecha', zona: string, parada: number }}
  *   `parada` es un contador que se INCREMENTA cada vez que el compai LLEGA a un
  *   punto de su paseo y se detiene a descansar (no cuando vuelve a casa por
@@ -63,7 +65,7 @@ const ARRANQUE_MS = 900;
 /** dt máximo por frame (s): acota el salto al volver de pestaña oculta. */
 const DT_MAX = 0.05;
 /** Duración de cada aparición/desaparición mística (ms). */
-const DURACION_FADE_MS = 220;
+const DURACION_FADE_MS = 520;
 /** Zonas verticales de respaldo, de abajo hacia arriba. */
 const ZONAS_MISTICAS_DEFAULT = ['abajo', 'medio', 'arriba'];
 /** Distancia vertical relativa al anclaje inferior de la pantalla. */
@@ -76,6 +78,38 @@ function prefiereQuietud() {
     && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 }
 
+/**
+ * Pinta el dissolve en el wrapper interno, sin tocar el transform del roam.
+ * La opacidad sigue viviendo en el nodo externo para conservar el contrato
+ * anterior del hook y que el teleport vertical permanezca invisible.
+ */
+function pintarEfectoMistico(node, progreso, apareciendo) {
+  if (!node) return;
+  const t = Math.max(0, Math.min(1, progreso));
+  // Ease-out: la llegada se siente suave y la niebla se disipa al final.
+  const easeOut = 1 - ((1 - t) ** 3);
+  const blur = apareciendo ? 6 * (1 - easeOut) : 6 * easeOut;
+  const scale = apareciendo
+    ? 0.9 + (0.1 * easeOut)
+    : 1 + (0.08 * easeOut);
+  const brightness = apareciendo ? 1 + (0.24 * (1 - easeOut)) : 1;
+  const glow = apareciendo ? 10 * (1 - easeOut) : 0;
+  const glowOpacity = apareciendo ? 0.34 * (1 - easeOut) : 0;
+  const glowFilter = glow > 0
+    ? ` drop-shadow(0 0 ${glow.toFixed(1)}px rgba(255, 218, 137, ${glowOpacity.toFixed(2)}))`
+    : '';
+
+  node.style.filter = `blur(${blur.toFixed(2)}px) brightness(${brightness.toFixed(3)})${glowFilter}`;
+  node.style.transform = `scale(${scale.toFixed(4)})`;
+}
+
+function limpiarEfectoMistico(node) {
+  if (!node) return;
+  node.style.opacity = '';
+  node.style.filter = '';
+  node.style.transform = '';
+}
+
 export default function useCompaiRoam(ref, opciones = {}) {
   const {
     activo = true,
@@ -83,6 +117,7 @@ export default function useCompaiRoam(ref, opciones = {}) {
     fraccionAncho = 0.3,
     mistico = false,
     zonas = null,
+    efectoMisticoRef = null,
   } = opciones;
 
   const [caminando, setCaminando] = useState(false);
@@ -106,10 +141,12 @@ export default function useCompaiRoam(ref, opciones = {}) {
 
   useEffect(() => {
     const el = ref.current;
+    const efectoEl = efectoMisticoRef?.current;
     if (!activo || !el || prefiereQuietud()
       || typeof window === 'undefined' || typeof window.requestAnimationFrame !== 'function') {
       if (el) el.style.transform = '';
       if (el && mistico) el.style.opacity = '';
+      if (mistico) limpiarEfectoMistico(efectoEl);
       return undefined;
     }
 
@@ -227,6 +264,7 @@ export default function useCompaiRoam(ref, opciones = {}) {
         fase = 'camina';
         transicionMs = 0;
         pintarOpacidad(1);
+        if (mistico) limpiarEfectoMistico(efectoEl);
       } else if (fase === 'reposo') {
         if (ts >= reposoHasta) {
           if (mistico && proximoPasoEsVertical) {
@@ -246,13 +284,17 @@ export default function useCompaiRoam(ref, opciones = {}) {
 
       if (fase === 'desaparece') {
         transicionMs += dt * 1000;
-        pintarOpacidad(1 - transicionMs / DURACION_FADE_MS);
+        const progreso = Math.min(transicionMs / DURACION_FADE_MS, 1);
+        const suavizado = 1 - ((1 - progreso) ** 3);
+        pintarOpacidad(1 - suavizado);
+        if (mistico) pintarEfectoMistico(efectoEl, progreso, false);
         if (transicionMs >= DURACION_FADE_MS) {
           y = objetivoY;
           zonaRef.current = zonaObjetivo;
           setZona(zonaObjetivo);
           pintar();
           pintarOpacidad(0);
+          if (mistico) pintarEfectoMistico(efectoEl, 0, true);
           transicionMs = 0;
           fase = 'aparece';
         }
@@ -261,9 +303,13 @@ export default function useCompaiRoam(ref, opciones = {}) {
 
       if (fase === 'aparece') {
         transicionMs += dt * 1000;
-        pintarOpacidad(transicionMs / DURACION_FADE_MS);
+        const progreso = Math.min(transicionMs / DURACION_FADE_MS, 1);
+        const suavizado = 1 - ((1 - progreso) ** 3);
+        pintarOpacidad(suavizado);
+        if (mistico) pintarEfectoMistico(efectoEl, progreso, true);
         if (transicionMs >= DURACION_FADE_MS) {
           pintarOpacidad(1);
+          if (mistico) limpiarEfectoMistico(efectoEl);
           transicionMs = 0;
           fase = 'reposo';
           reposoHasta = ts + PAUSA_MIN_MS + Math.random() * (PAUSA_MAX_MS - PAUSA_MIN_MS);
@@ -311,8 +357,9 @@ export default function useCompaiRoam(ref, opciones = {}) {
       caminandoRef.current = false;
       el.style.transform = '';
       if (mistico) el.style.opacity = '';
+      if (mistico) limpiarEfectoMistico(efectoEl);
     };
-  }, [activo, ref, fraccionAncho, mistico]);
+  }, [activo, efectoMisticoRef, ref, fraccionAncho, mistico]);
 
   return { caminando, hacia, zona, parada };
 }
