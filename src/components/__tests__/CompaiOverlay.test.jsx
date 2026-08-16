@@ -1,4 +1,13 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
+
+const { mockUseCompaiRoam } = vi.hoisted(() => ({
+  mockUseCompaiRoam: vi.fn(),
+}));
+
+vi.mock('../../hooks/useCompaiRoam.js', () => ({
+  default: mockUseCompaiRoam,
+}));
+
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import CompaiOverlay from '../CompaiOverlay.jsx';
 
@@ -16,6 +25,7 @@ import CompaiOverlay from '../CompaiOverlay.jsx';
 describe('CompaiOverlay', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    mockUseCompaiRoam.mockReturnValue({ caminando: false, hacia: 'izquierda', parada: 0 });
   });
 
   it('debe montarse sin errores', () => {
@@ -27,6 +37,19 @@ describe('CompaiOverlay', () => {
     render(<CompaiOverlay currentView="dashboard" />);
     const bubble = screen.getByTestId('compai-bubble');
     expect(bubble).toBeInTheDocument();
+  });
+
+  it('debe prender mistico y resolver anclas desde la ruta actual', () => {
+    render(<CompaiOverlay currentView="mapa" />);
+
+    expect(mockUseCompaiRoam).toHaveBeenCalledWith(
+      expect.anything(),
+      expect.objectContaining({
+        pausado: false,
+        mistico: true,
+        anclas: [0.24, 0.62, 0.9],
+      }),
+    );
   });
 
   it('no debe renderizar el panel si isOpen es false', () => {

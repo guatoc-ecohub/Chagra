@@ -87,11 +87,73 @@ describe('useCompaiRoam', () => {
     const raf = instalarRafManual();
     const el = document.createElement('div');
     el.style.transform = 'translate3d(-20px, 0, 0)';
+    el.style.opacity = '0.2';
     const ref = { current: el };
-    const { result } = renderHook(() => useCompaiRoam(ref, { pausado: false }));
+    const { result } = renderHook(() => useCompaiRoam(ref, {
+      pausado: false,
+      mistico: true,
+      anclas: [0.2, 0.8],
+    }));
     expect(el.style.transform).toBe('');
+    expect(el.style.opacity).toBe('');
     expect(raf.cb).toBeNull();
     expect(result.current.caminando).toBe(false);
+  });
+
+  it('mistico apagado conserva el roam y no toca opacity', () => {
+    const raf = instalarRafManual();
+    const el = document.createElement('div');
+    el.style.opacity = '0.7';
+    const ref = { current: el };
+    const { result } = renderHook(() => useCompaiRoam(ref, {
+      pausado: false,
+      mistico: false,
+    }));
+
+    act(() => { raf.cb?.(2000); });
+    act(() => { raf.cb?.(2200); });
+
+    expect(result.current.caminando).toBe(true);
+    expect(el.style.transform).toContain('translate3d(-');
+    expect(el.style.opacity).toBe('0.7');
+  });
+
+  it('mistico hace fade, teletransporta al siguiente ancla y vuelve a aparecer', () => {
+    const anchoOriginal = window.innerWidth;
+    Object.defineProperty(window, 'innerWidth', { value: 30, configurable: true });
+    try {
+      const raf = instalarRafManual();
+      const el = document.createElement('div');
+      const ref = { current: el };
+      const { result } = renderHook(() => useCompaiRoam(ref, {
+        pausado: false,
+        mistico: true,
+        fraccionAncho: 1,
+        anclas: [1, 0.5],
+      }));
+
+      act(() => { raf.cb?.(2000); });
+      for (let t = 2100; t <= 3900; t += 100) {
+        act(() => { raf.cb?.(t); });
+      }
+      expect(result.current.parada).toBeGreaterThanOrEqual(1);
+      expect(el.style.transform).toContain('translate3d(-30.0px, 0, 0)');
+
+      // Termina el reposo de la primera parada y comienza el fade-out.
+      act(() => { raf.cb?.(8000); });
+      expect(Number(el.style.opacity)).toBeLessThan(1);
+
+      // El fade-out termina con opacity=0 y el mismo nodo ya está en el
+      // siguiente punto. Luego el fade-in lo deja visible otra vez.
+      for (let t = 8100; t <= 9000; t += 100) {
+        act(() => { raf.cb?.(t); });
+      }
+      expect(el.style.transform).toContain('translate3d(-15.0px, 0, 0)');
+      expect(el.style.opacity).toBe('1');
+      expect(result.current.parada).toBeGreaterThanOrEqual(2);
+    } finally {
+      Object.defineProperty(window, 'innerWidth', { value: anchoOriginal, configurable: true });
+    }
   });
 
   it('gate activo=false: limpia el transform y no agenda frames', () => {
@@ -124,7 +186,11 @@ describe('useCompaiRoam', () => {
     const el = document.createElement('div');
     const ref = { current: el };
     const { result, rerender } = renderHook(
-      ({ pausado }) => useCompaiRoam(ref, { pausado }),
+      ({ pausado }) => useCompaiRoam(ref, {
+        pausado,
+        mistico: true,
+        anclas: [0.2, 0.8],
+      }),
       { initialProps: { pausado: false } },
     );
 

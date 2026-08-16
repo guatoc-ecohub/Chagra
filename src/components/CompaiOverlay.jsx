@@ -185,6 +185,50 @@ const RUTA_HINTS = {
 };
 
 /**
+ * Puntos de aparición del compai en la franja baja segura. Son una capa
+ * paralela a RUTA_HINTS: el texto sigue resolviéndose igual, pero el modo
+ * místico sabe dónde reaparecer para acompañar cada pantalla.
+ * Los valores son proporciones del recorrido horizontal, no posiciones del
+ * contenido, para que nunca tape la cámara ni el contenido principal.
+ */
+const ANCLAS_CORTAS = [0.16, 0.54, 0.86];
+const ANCLAS_CENTRADAS = [0.24, 0.62, 0.9];
+const RUTA_ANCLAS = {
+  dashboard: ANCLAS_CORTAS,
+  agente: ANCLAS_CENTRADAS,
+  perfil: ANCLAS_CORTAS,
+  hoy_finca: ANCLAS_CENTRADAS,
+  evolucion: ANCLAS_CORTAS,
+  directorio: ANCLAS_CENTRADAS,
+  especies: ANCLAS_CENTRADAS,
+  plagas: ANCLAS_CENTRADAS,
+  catalogo: ANCLAS_CENTRADAS,
+  defensores: ANCLAS_CORTAS,
+  asociaciones: ANCLAS_CENTRADAS,
+  registro_unificado: ANCLAS_CORTAS,
+  sembrar: ANCLAS_CENTRADAS,
+  cosechar: ANCLAS_CENTRADAS,
+  insumos: ANCLAS_CORTAS,
+  observacion: ANCLAS_CENTRADAS,
+  voz: ANCLAS_CORTAS,
+  mapa: ANCLAS_CENTRADAS,
+  clima_boletin: ANCLAS_CORTAS,
+  agua: ANCLAS_CENTRADAS,
+  suelo: ANCLAS_CORTAS,
+  mundo_cultivos: ANCLAS_CENTRADAS,
+  plantas: ANCLAS_CENTRADAS,
+  calendario_finca: ANCLAS_CORTAS,
+  germinacion: ANCLAS_CENTRADAS,
+  animales: ANCLAS_CORTAS,
+  biopreparados: ANCLAS_CENTRADAS,
+  historial: ANCLAS_CORTAS,
+  bitacora: ANCLAS_CORTAS,
+  informes: ANCLAS_CENTRADAS,
+  aprende: ANCLAS_CORTAS,
+  default: ANCLAS_CORTAS,
+};
+
+/**
  * Obtiene el hint para una ruta dada.
  */
 function getHintForRuta(ruta, nombreCompai = 'Angelita') {
@@ -216,6 +260,14 @@ function getHintForRuta(ruta, nombreCompai = 'Angelita') {
   return hintDefault;
 }
 
+/** Resuelve las anclas con el mismo fallback exacto/prefijo de los hints. */
+function getAnclasForRuta(ruta) {
+  if (!ruta || ruta === 'default') return RUTA_ANCLAS.default;
+  if (RUTA_ANCLAS[ruta]) return RUTA_ANCLAS[ruta];
+  const prefijo = ruta.split('_')[0];
+  return RUTA_ANCLAS[prefijo] || RUTA_ANCLAS.default;
+}
+
 /**
  * Escucha el texto en voz alta (TTS kokoro, fail-silent).
  */
@@ -241,7 +293,12 @@ export default function CompaiOverlay({ currentView = 'dashboard' }) {
   // `parada` se incrementa cada vez que LLEGA a un punto de su paseo — con eso
   // hacemos el "moverse-para-explicar" (ver la burbuja de parada más abajo).
   const roamRef = useRef(null);
-  const { caminando, hacia, parada } = useCompaiRoam(roamRef, { pausado: isOpen });
+  const anclas = useMemo(() => getAnclasForRuta(currentView), [currentView]);
+  const { caminando, hacia, parada } = useCompaiRoam(roamRef, {
+    pausado: isOpen,
+    mistico: true,
+    anclas,
+  });
 
   // El mensaje contextual de la pantalla actual (capa BASE: qué es esta
   // pantalla). El compai lo muestra al parar y al abrir el panel.

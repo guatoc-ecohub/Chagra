@@ -39,6 +39,8 @@
  * @param {boolean} [opciones.activo=true]
  * @param {boolean} [opciones.pausado=false]  fuerza el regreso a casa.
  * @param {number} [opciones.fraccionAncho=0.3]  franja recorrible (0..1 del ancho).
+ * @param {boolean} [opciones.mistico=false]  fade y teleport opt-in entre paradas.
+ * @param {number[]} [opciones.anclas]  posiciones seguras como fracciones de la franja.
  * @returns {{ caminando: boolean, hacia: 'izquierda'|'derecha', parada: number }}
  *   `parada` es un contador que se INCREMENTA cada vez que el compai LLEGA a un
  *   punto de su paseo y se detiene a descansar (no cuando vuelve a casa por
@@ -59,6 +61,10 @@ const PAUSA_MAX_MS = 5600;
 const ARRANQUE_MS = 900;
 /** dt máximo por frame (s): acota el salto al volver de pestaña oculta. */
 const DT_MAX = 0.05;
+/** Duración de cada aparición/desaparición mística (ms). */
+const DURACION_FADE_MS = 220;
+/** Anclas seguras de respaldo, expresadas como fracción de la franja inferior. */
+const ANCLAS_MISTICAS_DEFAULT = [0.18, 0.52, 0.84];
 
 /** ¿El usuario pidió quietud? (mismo criterio que useVidaIdle). */
 function prefiereQuietud() {
@@ -68,7 +74,13 @@ function prefiereQuietud() {
 }
 
 export default function useCompaiRoam(ref, opciones = {}) {
-  const { activo = true, pausado = false, fraccionAncho = 0.3 } = opciones;
+  const {
+    activo = true,
+    pausado = false,
+    fraccionAncho = 0.3,
+    mistico = false,
+    anclas = null,
+  } = opciones;
 
   const [caminando, setCaminando] = useState(false);
   const [hacia, setHacia] = useState(/** @type {'izquierda'|'derecha'} */ ('izquierda'));
@@ -82,6 +94,8 @@ export default function useCompaiRoam(ref, opciones = {}) {
   // togglear `pausado`: lo consulta por ref en cada frame → reacción inmediata).
   const pausadoRef = useRef(pausado);
   useEffect(() => { pausadoRef.current = pausado; }, [pausado]);
+  const anclasRef = useRef(anclas);
+  useEffect(() => { anclasRef.current = anclas; }, [anclas]);
   const caminandoRef = useRef(false);
   const haciaRef = useRef(/** @type {'izquierda'|'derecha'} */ ('izquierda'));
 
@@ -90,6 +104,7 @@ export default function useCompaiRoam(ref, opciones = {}) {
     if (!activo || !el || prefiereQuietud()
       || typeof window === 'undefined' || typeof window.requestAnimationFrame !== 'function') {
       if (el) el.style.transform = '';
+      if (el && mistico) el.style.opacity = '';
       return undefined;
     }
 
@@ -97,9 +112,12 @@ export default function useCompaiRoam(ref, opciones = {}) {
     let rafId = 0;
     let x = 0;              // posición actual (px, ≤ 0: casa = esquina, se aleja a la izquierda)
     let objetivo = 0;      // destino de la caminata en curso
-    let fase = /** @type {'reposo'|'camina'} */ ('reposo');
+    let fase = /** @type {'reposo'|'camina'|'desaparece'|'aparece'} */ ('reposo');
     let reposoHasta = 0;   // timestamp (ms) en que termina la pausa
     let ultimoTs = 0;      // para el dt
+    let transicionMs = 0;
+    let anclaIndice = 0;
+    let primerRecorrido = true;
 
     const distancia = () => {
       const w = (window.innerWidth || 0);
@@ -108,6 +126,10 @@ export default function useCompaiRoam(ref, opciones = {}) {
 
     const pintar = () => {
       el.style.transform = x ? `translate3d(${x.toFixed(1)}px, 0, 0)` : '';
+    };
+
+    const pintarOpacidad = (valor) => {
+      if (mistico) el.style.opacity = String(Math.max(0, Math.min(1, valor)));
     };
 
     const marcarCaminando = (v) => {
@@ -133,6 +155,29 @@ export default function useCompaiRoam(ref, opciones = {}) {
       return destino;
     };
 
+    const siguienteAncla = (d) => {
+      const candidatas = Array.isArray(anclasRef.current) && anclasRef.current.length > 0
+        ? anclasRef.current
+        : ANCLAS_MISTICAS_DEFAULT;
+      const valor = Number(candidatas[anclaIndice % candidatas.length]);
+      anclaIndice += 1;
+      if (!Number.isFinite(valor)) return null;
+      return -d * Math.max(0, Math.min(1, valor));
+    };
+
+    const iniciarFadeTeleport = (d) => {
+      const destino = siguienteAncla(d);
+      if (destino === null) {
+        objetivo = nuevoDestino(d);
+        fase = 'camina';
+        return;
+      }
+      objetivo = destino;
+      transicionMs = 0;
+      fase = 'desaparece';
+      marcarCaminando(false);
+    };
+
     const loop = (ts) => {
       if (cancelado) return;
       rafId = window.requestAnimationFrame(loop);
@@ -147,14 +192,51 @@ export default function useCompaiRoam(ref, opciones = {}) {
         // Regreso a casa: la misma caminata, hacia x=0.
         objetivo = 0;
         fase = 'camina';
+        transicionMs = 0;
+        pintarOpacidad(1);
       } else if (fase === 'reposo') {
         if (ts >= reposoHasta) {
-          objetivo = nuevoDestino(d);
-          fase = 'camina';
+          if (mistico && primerRecorrido) {
+            objetivo = siguienteAncla(d);
+            fase = 'camina';
+            primerRecorrido = false;
+          } else if (mistico) {
+            iniciarFadeTeleport(d);
+          } else {
+            objetivo = nuevoDestino(d);
+            fase = 'camina';
+          }
         }
       } else if (objetivo < -d) {
         // La franja se encogió (rotación/resize): recentra el destino.
         objetivo = -d;
+      }
+
+      if (fase === 'desaparece') {
+        transicionMs += dt * 1000;
+        pintarOpacidad(1 - transicionMs / DURACION_FADE_MS);
+        if (transicionMs >= DURACION_FADE_MS) {
+          x = objetivo;
+          pintar();
+          pintarOpacidad(0);
+          transicionMs = 0;
+          fase = 'aparece';
+        }
+        return;
+      }
+
+      if (fase === 'aparece') {
+        transicionMs += dt * 1000;
+        pintarOpacidad(transicionMs / DURACION_FADE_MS);
+        if (transicionMs >= DURACION_FADE_MS) {
+          pintarOpacidad(1);
+          transicionMs = 0;
+          fase = 'reposo';
+          reposoHasta = ts + PAUSA_MIN_MS + Math.random() * (PAUSA_MAX_MS - PAUSA_MIN_MS);
+          paradasRef.current += 1;
+          setParada(paradasRef.current);
+        }
+        return;
       }
 
       if (fase === 'camina') {
@@ -193,8 +275,9 @@ export default function useCompaiRoam(ref, opciones = {}) {
       if (rafId) window.cancelAnimationFrame(rafId);
       caminandoRef.current = false;
       el.style.transform = '';
+      if (mistico) el.style.opacity = '';
     };
-  }, [activo, ref, fraccionAncho]);
+  }, [activo, ref, fraccionAncho, mistico]);
 
   return { caminando, hacia, parada };
 }
