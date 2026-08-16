@@ -5,9 +5,9 @@
  * El compai NO se queda clavado en la esquina: camina de un lado a otro sobre
  * una franja de ~30% del ancho (`fraccionAncho`), con cadencia lenta —
  * caminatas cortas separadas por pausas— para que se lea VIVO, no un ícono
- * fijo. El movimiento vive en el eje X sobre la línea de base ya existente
- * (el host mantiene el anclaje vertical `bottom-*`): así nunca sube a tapar la
- * cámara ni el contenido, solo recorre la franja baja segura.
+ * fijo. El movimiento horizontal vive en el eje X sobre la línea de base ya
+ * existente. En modo místico, el eje Y cambia de zona con fade y teleport,
+ * para aparecer un momento junto a la sección que explica y volver a moverse.
  *
  * REÚSO vs NUEVO: el "cerebro" de paseo que ya existía (`useCompaiPaseo` +
  * `compaiPaseoPlanificador`) decide CUÁNDO comentar una parada (semántica de
@@ -20,8 +20,9 @@
  * `style.transform` del nodo vía `ref` en un `requestAnimationFrame` (mismo
  * patrón DOM-directo que `useMiradaUsted`: cero re-renders al andar). Solo se
  * sube a estado de React lo DISCRETO que el host necesita para pintar —
- * `caminando` (para poner al bicho en su pose de marcha) y `hacia` (para
- * espejarlo hacia donde anda)— y solo cuando CAMBIA, no cada frame.
+ * `caminando` (para poner al bicho en su pose de marcha), `hacia` (para
+ * espejarlo hacia donde anda) y `zona` (para contextualizar el hint)— y solo
+ * cuando CAMBIAN, no cada frame.
  *
  * GATES DE LA CASA:
  *   · prefers-reduced-motion → NO deambula (se queda en casa, quieto). La
@@ -39,9 +40,9 @@
  * @param {boolean} [opciones.activo=true]
  * @param {boolean} [opciones.pausado=false]  fuerza el regreso a casa.
  * @param {number} [opciones.fraccionAncho=0.3]  franja recorrible (0..1 del ancho).
- * @param {boolean} [opciones.mistico=false]  fade y teleport opt-in entre paradas.
- * @param {number[]} [opciones.anclas]  posiciones seguras como fracciones de la franja.
- * @returns {{ caminando: boolean, hacia: 'izquierda'|'derecha', parada: number }}
+ * @param {boolean} [opciones.mistico=false]  fade y teleport vertical opt-in.
+ * @param {string[]} [opciones.zonas]  orden de zonas verticales del modo místico.
+ * @returns {{ caminando: boolean, hacia: 'izquierda'|'derecha', zona: string, parada: number }}
  *   `parada` es un contador que se INCREMENTA cada vez que el compai LLEGA a un
  *   punto de su paseo y se detiene a descansar (no cuando vuelve a casa por
  *   `pausado`). Sirve para el "moverse-para-explicar": el host muestra el
@@ -63,8 +64,10 @@ const ARRANQUE_MS = 900;
 const DT_MAX = 0.05;
 /** Duración de cada aparición/desaparición mística (ms). */
 const DURACION_FADE_MS = 220;
-/** Anclas seguras de respaldo, expresadas como fracción de la franja inferior. */
-const ANCLAS_MISTICAS_DEFAULT = [0.18, 0.52, 0.84];
+/** Zonas verticales de respaldo, de abajo hacia arriba. */
+const ZONAS_MISTICAS_DEFAULT = ['abajo', 'medio', 'arriba'];
+/** Distancia vertical relativa al anclaje inferior de la pantalla. */
+const DESPLAZAMIENTO_ZONA = { abajo: 0, medio: 0.32, arriba: 0.64 };
 
 /** ¿El usuario pidió quietud? (mismo criterio que useVidaIdle). */
 function prefiereQuietud() {
@@ -79,11 +82,12 @@ export default function useCompaiRoam(ref, opciones = {}) {
     pausado = false,
     fraccionAncho = 0.3,
     mistico = false,
-    anclas = null,
+    zonas = null,
   } = opciones;
 
   const [caminando, setCaminando] = useState(false);
   const [hacia, setHacia] = useState(/** @type {'izquierda'|'derecha'} */ ('izquierda'));
+  const [zona, setZona] = useState('abajo');
   // Contador de paradas del paseo (llegó a un punto y descansa) — dispara el
   // mensaje contextual en el host. Vive en un ref para persistir entre re-runs
   // del effect; solo se sube a estado (discreto) cuando cambia.
@@ -94,8 +98,9 @@ export default function useCompaiRoam(ref, opciones = {}) {
   // togglear `pausado`: lo consulta por ref en cada frame → reacción inmediata).
   const pausadoRef = useRef(pausado);
   useEffect(() => { pausadoRef.current = pausado; }, [pausado]);
-  const anclasRef = useRef(anclas);
-  useEffect(() => { anclasRef.current = anclas; }, [anclas]);
+  const zonasRef = useRef(zonas);
+  useEffect(() => { zonasRef.current = zonas; }, [zonas]);
+  const zonaRef = useRef('abajo');
   const caminandoRef = useRef(false);
   const haciaRef = useRef(/** @type {'izquierda'|'derecha'} */ ('izquierda'));
 
@@ -110,14 +115,17 @@ export default function useCompaiRoam(ref, opciones = {}) {
 
     let cancelado = false;
     let rafId = 0;
-    let x = 0;              // posición actual (px, ≤ 0: casa = esquina, se aleja a la izquierda)
-    let objetivo = 0;      // destino de la caminata en curso
+    let x = 0;              // posición actual horizontal (px, casa = esquina)
+    let y = 0;              // posición vertical actual (px, zona abajo = casa)
+    let objetivo = 0;      // destino de la caminata horizontal en curso
+    let objetivoY = 0;     // destino vertical del próximo teleport
+    let zonaObjetivo = 'abajo';
     let fase = /** @type {'reposo'|'camina'|'desaparece'|'aparece'} */ ('reposo');
     let reposoHasta = 0;   // timestamp (ms) en que termina la pausa
     let ultimoTs = 0;      // para el dt
     let transicionMs = 0;
-    let anclaIndice = 0;
-    let primerRecorrido = true;
+    let zonaIndice = 0;
+    let proximoPasoEsVertical = false;
 
     const distancia = () => {
       const w = (window.innerWidth || 0);
@@ -125,7 +133,9 @@ export default function useCompaiRoam(ref, opciones = {}) {
     };
 
     const pintar = () => {
-      el.style.transform = x ? `translate3d(${x.toFixed(1)}px, 0, 0)` : '';
+      el.style.transform = x || y
+        ? `translate3d(${x.toFixed(1)}px, ${y ? `${y.toFixed(1)}px` : '0'}, 0)`
+        : '';
     };
 
     const pintarOpacidad = (valor) => {
@@ -155,24 +165,40 @@ export default function useCompaiRoam(ref, opciones = {}) {
       return destino;
     };
 
-    const siguienteAncla = (d) => {
-      const candidatas = Array.isArray(anclasRef.current) && anclasRef.current.length > 0
-        ? anclasRef.current
-        : ANCLAS_MISTICAS_DEFAULT;
-      const valor = Number(candidatas[anclaIndice % candidatas.length]);
-      anclaIndice += 1;
-      if (!Number.isFinite(valor)) return null;
-      return -d * Math.max(0, Math.min(1, valor));
+    const candidatasZona = () => {
+      const candidatas = Array.isArray(zonasRef.current) && zonasRef.current.length > 0
+        ? zonasRef.current
+        : ZONAS_MISTICAS_DEFAULT;
+      const validas = candidatas.filter((valor) => (
+        Object.prototype.hasOwnProperty.call(DESPLAZAMIENTO_ZONA, valor)
+      ));
+      return validas.length > 0 ? validas : ZONAS_MISTICAS_DEFAULT;
     };
 
-    const iniciarFadeTeleport = (d) => {
-      const destino = siguienteAncla(d);
-      if (destino === null) {
-        objetivo = nuevoDestino(d);
+    const desplazamientoParaZona = (valor) => {
+      const proporcion = DESPLAZAMIENTO_ZONA[valor] || 0;
+      return -(window.innerHeight || 0) * proporcion;
+    };
+
+    const siguienteZona = () => {
+      const candidatas = candidatasZona();
+      for (let intento = 0; intento < candidatas.length; intento += 1) {
+        const siguiente = candidatas[zonaIndice % candidatas.length];
+        zonaIndice += 1;
+        if (siguiente !== zonaRef.current) return siguiente;
+      }
+      return null;
+    };
+
+    const iniciarFadeTeleport = () => {
+      const destino = siguienteZona();
+      if (!destino) {
+        objetivo = nuevoDestino(distancia());
         fase = 'camina';
         return;
       }
-      objetivo = destino;
+      zonaObjetivo = destino;
+      objetivoY = desplazamientoParaZona(destino);
       transicionMs = 0;
       fase = 'desaparece';
       marcarCaminando(false);
@@ -189,20 +215,26 @@ export default function useCompaiRoam(ref, opciones = {}) {
       const d = distancia();
 
       if (pausadoRef.current) {
-        // Regreso a casa: la misma caminata, hacia x=0.
+        // Regreso a casa: la misma caminata, hacia x=0 y zona abajo.
         objetivo = 0;
+        y = 0;
+        zonaObjetivo = 'abajo';
+        proximoPasoEsVertical = false;
+        if (zonaRef.current !== 'abajo') {
+          zonaRef.current = 'abajo';
+          setZona('abajo');
+        }
         fase = 'camina';
         transicionMs = 0;
         pintarOpacidad(1);
       } else if (fase === 'reposo') {
         if (ts >= reposoHasta) {
-          if (mistico && primerRecorrido) {
-            objetivo = siguienteAncla(d);
-            fase = 'camina';
-            primerRecorrido = false;
-          } else if (mistico) {
-            iniciarFadeTeleport(d);
+          if (mistico && proximoPasoEsVertical) {
+            proximoPasoEsVertical = false;
+            iniciarFadeTeleport();
           } else {
+            // El eje X siempre es una caminata recta. El modo místico nunca
+            // reemplaza esta marcha por un teleport horizontal.
             objetivo = nuevoDestino(d);
             fase = 'camina';
           }
@@ -216,7 +248,9 @@ export default function useCompaiRoam(ref, opciones = {}) {
         transicionMs += dt * 1000;
         pintarOpacidad(1 - transicionMs / DURACION_FADE_MS);
         if (transicionMs >= DURACION_FADE_MS) {
-          x = objetivo;
+          y = objetivoY;
+          zonaRef.current = zonaObjetivo;
+          setZona(zonaObjetivo);
           pintar();
           pintarOpacidad(0);
           transicionMs = 0;
@@ -251,6 +285,7 @@ export default function useCompaiRoam(ref, opciones = {}) {
             // mensaje contextual de la pantalla mientras dura el reposo.
             fase = 'reposo';
             reposoHasta = ts + PAUSA_MIN_MS + Math.random() * (PAUSA_MAX_MS - PAUSA_MIN_MS);
+            proximoPasoEsVertical = Boolean(mistico);
             paradasRef.current += 1;
             setParada(paradasRef.current);
           } else {
@@ -279,5 +314,5 @@ export default function useCompaiRoam(ref, opciones = {}) {
     };
   }, [activo, ref, fraccionAncho, mistico]);
 
-  return { caminando, hacia, parada };
+  return { caminando, hacia, zona, parada };
 }

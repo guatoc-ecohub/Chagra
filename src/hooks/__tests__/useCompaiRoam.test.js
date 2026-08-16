@@ -92,7 +92,7 @@ describe('useCompaiRoam', () => {
     const { result } = renderHook(() => useCompaiRoam(ref, {
       pausado: false,
       mistico: true,
-      anclas: [0.2, 0.8],
+      zonas: ['abajo', 'medio', 'arriba'],
     }));
     expect(el.style.transform).toBe('');
     expect(el.style.opacity).toBe('');
@@ -118,9 +118,11 @@ describe('useCompaiRoam', () => {
     expect(el.style.opacity).toBe('0.7');
   });
 
-  it('mistico hace fade, teletransporta al siguiente ancla y vuelve a aparecer', () => {
+  it('mistico camina horizontal sin fade y teletransporta solo en vertical', () => {
     const anchoOriginal = window.innerWidth;
+    const altoOriginal = window.innerHeight;
     Object.defineProperty(window, 'innerWidth', { value: 30, configurable: true });
+    Object.defineProperty(window, 'innerHeight', { value: 600, configurable: true });
     try {
       const raf = instalarRafManual();
       const el = document.createElement('div');
@@ -129,30 +131,46 @@ describe('useCompaiRoam', () => {
         pausado: false,
         mistico: true,
         fraccionAncho: 1,
-        anclas: [1, 0.5],
+        zonas: ['abajo', 'arriba'],
       }));
 
       act(() => { raf.cb?.(2000); });
-      for (let t = 2100; t <= 3900; t += 100) {
+      act(() => { raf.cb?.(2200); });
+      expect(result.current.caminando).toBe(true);
+      expect(el.style.transform).toContain(', 0, 0)');
+      expect(el.style.opacity).toBe('');
+
+      // Llega horizontalmente a x=-15 y queda en reposo en la zona abajo.
+      for (let t = 2300; t <= 3000; t += 100) {
         act(() => { raf.cb?.(t); });
       }
-      expect(result.current.parada).toBeGreaterThanOrEqual(1);
-      expect(el.style.transform).toContain('translate3d(-30.0px, 0, 0)');
-
-      // Termina el reposo de la primera parada y comienza el fade-out.
-      act(() => { raf.cb?.(8000); });
-      expect(Number(el.style.opacity)).toBeLessThan(1);
-
-      // El fade-out termina con opacity=0 y el mismo nodo ya está en el
-      // siguiente punto. Luego el fade-in lo deja visible otra vez.
-      for (let t = 8100; t <= 9000; t += 100) {
-        act(() => { raf.cb?.(t); });
-      }
+      expect(result.current.parada).toBe(1);
+      expect(result.current.zona).toBe('abajo');
       expect(el.style.transform).toContain('translate3d(-15.0px, 0, 0)');
+
+      // Termina el reposo horizontal y empieza el fade vertical hacia arriba.
+      act(() => { raf.cb?.(7000); });
+      expect(Number(el.style.opacity)).toBeLessThan(1);
+      expect(el.style.transform).toContain(', 0, 0)');
+
+      // El fade-out termina con opacity=0 y el mismo nodo cambia solo de Y.
+      for (let t = 7100; t <= 7400; t += 100) {
+        act(() => { raf.cb?.(t); });
+      }
+      expect(el.style.opacity).toBe('0');
+      expect(el.style.transform).toContain('translate3d(-15.0px, -384.0px, 0)');
+
+      // El fade-in lo deja visible en la zona arriba, conservando el x.
+      for (let t = 7500; t <= 7900; t += 100) {
+        act(() => { raf.cb?.(t); });
+      }
+      expect(el.style.transform).toContain('translate3d(-15.0px, -384.0px, 0)');
       expect(el.style.opacity).toBe('1');
+      expect(result.current.zona).toBe('arriba');
       expect(result.current.parada).toBeGreaterThanOrEqual(2);
     } finally {
       Object.defineProperty(window, 'innerWidth', { value: anchoOriginal, configurable: true });
+      Object.defineProperty(window, 'innerHeight', { value: altoOriginal, configurable: true });
     }
   });
 
@@ -189,7 +207,7 @@ describe('useCompaiRoam', () => {
       ({ pausado }) => useCompaiRoam(ref, {
         pausado,
         mistico: true,
-        anclas: [0.2, 0.8],
+        zonas: ['abajo', 'medio', 'arriba'],
       }),
       { initialProps: { pausado: false } },
     );

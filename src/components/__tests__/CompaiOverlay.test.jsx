@@ -25,7 +25,7 @@ import CompaiOverlay from '../CompaiOverlay.jsx';
 describe('CompaiOverlay', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    mockUseCompaiRoam.mockReturnValue({ caminando: false, hacia: 'izquierda', parada: 0 });
+    mockUseCompaiRoam.mockReturnValue({ caminando: false, hacia: 'izquierda', zona: 'abajo', parada: 0 });
   });
 
   it('debe montarse sin errores', () => {
@@ -39,7 +39,7 @@ describe('CompaiOverlay', () => {
     expect(bubble).toBeInTheDocument();
   });
 
-  it('debe prender mistico y resolver anclas desde la ruta actual', () => {
+  it('debe prender mistico y pasar el orden de zonas verticales', () => {
     render(<CompaiOverlay currentView="mapa" />);
 
     expect(mockUseCompaiRoam).toHaveBeenCalledWith(
@@ -47,9 +47,20 @@ describe('CompaiOverlay', () => {
       expect.objectContaining({
         pausado: false,
         mistico: true,
-        anclas: [0.24, 0.62, 0.9],
+        zonas: ['abajo', 'medio', 'arriba'],
       }),
     );
+  });
+
+  it('debe contextualizar el hint según la zona vertical donde está parado', () => {
+    mockUseCompaiRoam.mockReturnValue({ caminando: false, hacia: 'izquierda', zona: 'medio', parada: 1 });
+
+    render(<CompaiOverlay currentView="mapa" />);
+
+    expect(screen.getByTestId('compai-burbuja')).toHaveTextContent(
+      'parte del medio de la pantalla',
+    );
+    expect(screen.getByTestId('compai-burbuja')).toHaveTextContent('Su finca en el mapa');
   });
 
   it('no debe renderizar el panel si isOpen es false', () => {

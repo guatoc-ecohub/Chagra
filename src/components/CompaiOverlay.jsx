@@ -185,47 +185,15 @@ const RUTA_HINTS = {
 };
 
 /**
- * Puntos de aparición del compai en la franja baja segura. Son una capa
- * paralela a RUTA_HINTS: el texto sigue resolviéndose igual, pero el modo
- * místico sabe dónde reaparecer para acompañar cada pantalla.
- * Los valores son proporciones del recorrido horizontal, no posiciones del
- * contenido, para que nunca tape la cámara ni el contenido principal.
+ * Zonas de aparición del compai. Son una capa paralela a RUTA_HINTS: el texto
+ * sigue resolviéndose igual, pero el modo místico sabe qué sección vertical
+ * está explicando cuando reaparece.
  */
-const ANCLAS_CORTAS = [0.16, 0.54, 0.86];
-const ANCLAS_CENTRADAS = [0.24, 0.62, 0.9];
-const RUTA_ANCLAS = {
-  dashboard: ANCLAS_CORTAS,
-  agente: ANCLAS_CENTRADAS,
-  perfil: ANCLAS_CORTAS,
-  hoy_finca: ANCLAS_CENTRADAS,
-  evolucion: ANCLAS_CORTAS,
-  directorio: ANCLAS_CENTRADAS,
-  especies: ANCLAS_CENTRADAS,
-  plagas: ANCLAS_CENTRADAS,
-  catalogo: ANCLAS_CENTRADAS,
-  defensores: ANCLAS_CORTAS,
-  asociaciones: ANCLAS_CENTRADAS,
-  registro_unificado: ANCLAS_CORTAS,
-  sembrar: ANCLAS_CENTRADAS,
-  cosechar: ANCLAS_CENTRADAS,
-  insumos: ANCLAS_CORTAS,
-  observacion: ANCLAS_CENTRADAS,
-  voz: ANCLAS_CORTAS,
-  mapa: ANCLAS_CENTRADAS,
-  clima_boletin: ANCLAS_CORTAS,
-  agua: ANCLAS_CENTRADAS,
-  suelo: ANCLAS_CORTAS,
-  mundo_cultivos: ANCLAS_CENTRADAS,
-  plantas: ANCLAS_CENTRADAS,
-  calendario_finca: ANCLAS_CORTAS,
-  germinacion: ANCLAS_CENTRADAS,
-  animales: ANCLAS_CORTAS,
-  biopreparados: ANCLAS_CENTRADAS,
-  historial: ANCLAS_CORTAS,
-  bitacora: ANCLAS_CORTAS,
-  informes: ANCLAS_CENTRADAS,
-  aprende: ANCLAS_CORTAS,
-  default: ANCLAS_CORTAS,
+const ZONAS_MISTICAS = ['abajo', 'medio', 'arriba'];
+const HINTS_POR_ZONA = {
+  arriba: 'Estoy en la parte de arriba de la pantalla, junto al encabezado y la información principal.',
+  medio: 'Estoy en la parte del medio de la pantalla, donde puede explorar el contenido principal.',
+  abajo: 'Estoy en la parte de abajo de la pantalla, junto a las acciones y controles para avanzar.',
 };
 
 /**
@@ -260,12 +228,19 @@ function getHintForRuta(ruta, nombreCompai = 'Angelita') {
   return hintDefault;
 }
 
-/** Resuelve las anclas con el mismo fallback exacto/prefijo de los hints. */
-function getAnclasForRuta(ruta) {
-  if (!ruta || ruta === 'default') return RUTA_ANCLAS.default;
-  if (RUTA_ANCLAS[ruta]) return RUTA_ANCLAS[ruta];
-  const prefijo = ruta.split('_')[0];
-  return RUTA_ANCLAS[prefijo] || RUTA_ANCLAS.default;
+/** Resuelve el orden vertical del modo místico sin tocar RUTA_HINTS. */
+function getZonasForRuta() {
+  return ZONAS_MISTICAS;
+}
+
+/** Agrega al hint de ruta el contexto de la zona donde está el compai. */
+function getHintForZona(ruta, zona, nombreCompai = 'Angelita') {
+  const hintBase = getHintForRuta(ruta, nombreCompai);
+  const contexto = HINTS_POR_ZONA[zona] || HINTS_POR_ZONA.abajo;
+  return {
+    ...hintBase,
+    descripcion: `${contexto} ${hintBase.descripcion}`,
+  };
 }
 
 /**
@@ -287,17 +262,17 @@ export default function CompaiOverlay({ currentView = 'dashboard' }) {
   const [compaiState, setCompaiState] = useState('idle'); // idle, thinking, speaking, listening
   const [lastView, setLastView] = useState(currentView);
 
-  // El compai DEAMBULA por la franja inferior (~30% del ancho): se pausa (y
-  // vuelve a casa) mientras el panel está abierto para que no se corra bajo la
-  // guía. El regreso es la misma caminata (nunca un salto). Ver useCompaiRoam.
+  // El compai camina horizontalmente por la franja inferior (~30% del ancho)
+  // y, en modo místico, cambia de sección vertical con fade. Se pausa (y
+  // vuelve a casa) mientras el panel está abierto. Ver useCompaiRoam.
   // `parada` se incrementa cada vez que LLEGA a un punto de su paseo — con eso
   // hacemos el "moverse-para-explicar" (ver la burbuja de parada más abajo).
   const roamRef = useRef(null);
-  const anclas = useMemo(() => getAnclasForRuta(currentView), [currentView]);
-  const { caminando, hacia, parada } = useCompaiRoam(roamRef, {
+  const zonas = useMemo(() => getZonasForRuta(currentView), [currentView]);
+  const { caminando, hacia, zona = 'abajo', parada } = useCompaiRoam(roamRef, {
     pausado: isOpen,
     mistico: true,
-    anclas,
+    zonas,
   });
 
   // El mensaje contextual de la pantalla actual (capa BASE: qué es esta
@@ -306,7 +281,10 @@ export default function CompaiOverlay({ currentView = 'dashboard' }) {
   // p.ej. "hoy toca regar el lote 2" o "tiene 3 registros sin sincronizar" —
   // como capa ADITIVA sobre este hint, leyendo del store de pendientes + perfil
   // de finca. Es un gancho: NO inventar datos aquí; la fuente se cablea aparte.
-  const hint = useMemo(() => getHintForRuta(currentView, nombreCompai), [currentView, nombreCompai]);
+  const hint = useMemo(
+    () => getHintForZona(currentView, zona, nombreCompai),
+    [currentView, nombreCompai, zona],
+  );
 
   // Burbuja de PARADA ("moverse-para-explicar"): el compai camina, llega a un
   // punto y —mientras descansa ahí (unos segundos)— muestra el mensaje de esta
@@ -362,7 +340,7 @@ export default function CompaiOverlay({ currentView = 'dashboard' }) {
       className="fixed bottom-4 right-4 z-40 pointer-events-none"
       data-testid="compai-overlay-container"
     >
-      {/* El compai que deambula (roamRef desplaza SOLO este nodo por la franja;
+      {/* El compai que deambula (roamRef desplaza SOLO este nodo por la pantalla;
           el panel queda anclado a la esquina). La burbuja de parada viaja
           DENTRO de este nodo → se queda pegada al compai donde se detuvo. */}
       <div ref={roamRef} className="will-change-transform relative">
