@@ -1,0 +1,67 @@
+import GuacamayaCompai from '../visual/creatures/GuacamayaCompai';
+
+/**
+ * ChagraAgentAvatarGuacamaya — la guacamaya bandera (Ara macao) como CARA del
+ * agente de Chagra, 7ma opción del elenco unificado (2026-08-14).
+ *
+ * Cierra el ítem #8 del GAP compAI: la guacamaya no tenía cuerpo en la PWA
+ * (`ELENCO.guacamaya.enPWA` seguía `false`); ahora lo tiene reusando el rig
+ * F24 del valle (`visual/creatures/GuacamayaCompai.jsx`, ver ese archivo para
+ * el detalle — rig+defs+css inlineados, NO redibujado a mano; el nombre NO
+ * es `Guacamaya.jsx` porque ese archivo ya existía: el billboard decorativo
+ * de `FaunaCalido.jsx`, otro dibujo, otro propósito).
+ *
+ * Adaptador puro (mismo contrato que los hermanos ChagraAgentAvatar*): traduce
+ * la API histórica del avatar del agente (state 'idle'|'thinking'|'speaking'|
+ * 'listening', glow, withLabel, onClick/onDoubleClick) al `state` que
+ * `GuacamayaCompai.jsx` ya entiende directo (no necesita traducción de pose —
+ * el rig reusado solo distingue idle/hablar por ahora, ver nota en ese
+ * archivo).
+ */
+export default function ChagraAgentAvatarGuacamaya({
+    state = 'idle',
+    size = 48,
+    withLabel = false,
+    onClick = undefined,
+    onDoubleClick = undefined,
+    glow = false,
+    className = '',
+    ariaLabel = 'Chagra IA',
+}) {
+    const bicho = (
+        <GuacamayaCompai
+            state={state}
+            size={size}
+            title={ariaLabel}
+            className={className}
+            style={glow ? { filter: 'drop-shadow(0 0 10px rgba(224,36,32,0.65))' } : undefined}
+        />
+    );
+
+    const contenido = withLabel ? (
+        <span style={{ display: 'inline-flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>
+            {bicho}
+            <span style={{ font: '600 0.7rem/1 system-ui, sans-serif', color: '#94a3b8' }}>
+                Guacamaya
+            </span>
+        </span>
+    ) : bicho;
+
+    // Paridad con los avatares hermanos: con handlers, botón real (teclado +
+    // lector de pantalla); sin handlers, solo el dibujo.
+    if (onClick || onDoubleClick) {
+        return (
+            <button
+                type="button"
+                onClick={onClick}
+                onDoubleClick={onDoubleClick}
+                aria-label={ariaLabel}
+                title={ariaLabel}
+                style={{ background: 'none', border: 'none', padding: 0, cursor: 'pointer', lineHeight: 0 }}
+            >
+                {contenido}
+            </button>
+        );
+    }
+    return contenido;
+}

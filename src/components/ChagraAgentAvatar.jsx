@@ -1,9 +1,10 @@
-import ChagraAgentAvatarMaiz from './ChagraAgentAvatarMaiz';
 import ChagraAgentAvatarAngelita from './ChagraAgentAvatarAngelita';
 import ChagraAgentAvatarZariguya from './ChagraAgentAvatarZariguya';
 import ChagraAgentAvatarJaguar from './ChagraAgentAvatarJaguar';
 import ChagraAgentAvatarOsoBaston from './ChagraAgentAvatarOsoBaston';
 import ChagraAgentAvatarLuciernaga from './ChagraAgentAvatarLuciernaga';
+import ChagraAgentAvatarGuacamaya from './ChagraAgentAvatarGuacamaya';
+import ChagraAgentAvatarChivitoPunk from './ChagraAgentAvatarChivitoPunk';
 import Angelita from '../visual/agente/Angelita';
 import useCompaiElegido from '../visual/mundo3d/escenas/useCompaiElegido.js';
 
@@ -26,7 +27,7 @@ import useCompaiElegido from '../visual/mundo3d/escenas/useCompaiElegido.js';
  *
  * Mismas props que los avatares hijos: state, size, withLabel, onClick,
  * onDoubleClick, glow, className, ariaLabel (+ visema/confianza que
- * Angelita entiende y el maíz ignora).
+ * Angelita entiende y el resto ignora).
  *
  * API "rica" (fix 2026-07-25 — bug: varios call-sites que necesitaban el
  * vocabulario Spanish completo de Angelita, `angelitaEstados.js` —p.ej.
@@ -35,7 +36,7 @@ import useCompaiElegido from '../visual/mundo3d/escenas/useCompaiElegido.js';
  * AgentHero, FincaVivaHero, ColibriTransition). Se acepta ahora una prop
  * alterna `estado` (en vez de `state`) para esos call-sites: si el tipo
  * elegido no es Angelita, se traduce al vocabulario angosto (idle/thinking/
- * speaking/listening) que maíz y zarigüeya entienden; si es Angelita, pasa
+ * speaking/listening) que el resto del elenco entiende; si es Angelita, pasa
  * directo sin perder fidelidad.
  *
  * 3ra opción (2026-07-25): 'zariguya' — la zarigüeya (crías al lomo, PR
@@ -44,6 +45,14 @@ import useCompaiElegido from '../visual/mundo3d/escenas/useCompaiElegido.js';
  * 4ta-6ta opción (2026-08-13, ítem #8 del GAP compAI — elenco unificado):
  * 'jaguar', 'oso-baston', 'luciernaga' — ya tenían cuerpo 2.5D y ya estaban
  * `enPWA:true` en el núcleo (#96) pero ningún selector los ofrecía.
+ *
+ * ROSTER A 7 (2026-08-14, decisión del operador): 'maiz' SE RETIRÓ (migra
+ * solo a Angelita, ver `compai/nucleo/elenco.js` SLUGS_JUBILADOS) y entraron
+ * los últimos dos, 'guacamaya' y 'chivito-punk' — reusan el rig F24 del
+ * valle (`visual/creatures/GuacamayaCompai.jsx`/`ChivitoPunk.jsx`, NO
+ * `Guacamaya.jsx` — ese ya existía como billboard decorativo de
+ * FaunaCalido.jsx), no se redibujaron a mano. Los 7: angelita, jaguar,
+ * oso-baston, zariguya, luciernaga, chivito-punk, guacamaya.
  */
 const STATE_DE_ESTADO_RICO = {
     acompana: 'idle',
@@ -55,11 +64,12 @@ const STATE_DE_ESTADO_RICO = {
 };
 
 const AVATAR_ANGOSTO = {
-    maiz: ChagraAgentAvatarMaiz,
     zariguya: ChagraAgentAvatarZariguya,
     jaguar: ChagraAgentAvatarJaguar,
     'oso-baston': ChagraAgentAvatarOsoBaston,
     luciernaga: ChagraAgentAvatarLuciernaga,
+    guacamaya: ChagraAgentAvatarGuacamaya,
+    'chivito-punk': ChagraAgentAvatarChivitoPunk,
 };
 
 export default function ChagraAgentAvatar({ estado = undefined, ...props }) {

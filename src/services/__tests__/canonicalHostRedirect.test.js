@@ -40,10 +40,32 @@ describe('canonicalHostRedirect', () => {
     expect(isAllowedHost('preview.chagra.app')).toBe(true);
   });
 
-  it('permite el host de staging y sus subdominios acotados', () => {
+  it('permite únicamente los hosts de staging conocidos', () => {
     expect(isStagingHost('preprod.chagra.app')).toBe(true);
-    expect(isStagingHost('api.preprod.chagra.app')).toBe(true);
+    expect(isStagingHost('chagra-dev.guatoc.co')).toBe(true);
+    expect(isStagingHost('localhost')).toBe(true);
+    expect(isStagingHost('127.0.0.1')).toBe(true);
     expect(isAllowedHost('preprod.chagra.app')).toBe(true);
+  });
+
+  it('rechaza un dominio tercero que contiene el token preprod', () => {
+    expect(isStagingHost('preprod.example.com')).toBe(false);
+    expect(isAllowedHost('preprod.example.com')).toBe(false);
+
+    const redirect = vi.fn();
+    const result = runCanonicalHostRedirectGuard({
+      location: {
+        hostname: 'preprod.example.com',
+        pathname: '/agente',
+        search: '?demo=1',
+        hash: '#/voz',
+      },
+      sessionStorage: storage,
+      redirect,
+    });
+
+    expect(result).toEqual({ redirected: true, reason: 'redirected-to-canonical' });
+    expect(redirect).toHaveBeenCalledWith(`https://${CANONICAL_HOSTNAME}/agente?demo=1#/voz`);
   });
 
   it('no redirige desde preprod hacia produccion', () => {
@@ -98,7 +120,7 @@ describe('canonicalHostRedirect', () => {
     expect(isAllowedHost('otra-cosa.guatoc.co')).toBe(false);
   });
 
-  it('redirige una sola vez desde un host externo al canonico', () => {
+  it('redirige el dominio legado de produccion a chagra.app', () => {
     const redirect = vi.fn();
     const location = {
       hostname: 'chagra.guatoc.co',

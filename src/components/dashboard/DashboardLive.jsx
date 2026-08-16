@@ -61,11 +61,13 @@ import CicloVivoWidget from '../CicloVivo/CicloVivoWidget';
 // las funciones dispersas del home F2 en 9 mundos coherentes (mundosFinca.js).
 // Solo se monta con la flag F2 ON; el legacy conserva sus tiles.
 import MundosDeMiFinca from './MundosDeMiFinca';
-// SELECTOR DEL GUARDIÁN (espíritu de la finca) — portado del mockup aprobado
-// #/mockups/avatar-biopunk. Fauna nativa colombiana REAL (grounded), la elección
-// persiste en el perfil (userProfileService: guardian_especie). Vive en el menú
-// vivo (ambos layouts) para que sea público, no huérfano.
-import GuardianEspiritu from './GuardianEspiritu';
+// GuardianEspiritu (selector de 5 fauna, portado de #/mockups/avatar-biopunk)
+// se DESMONTÓ de aquí el 2026-08-14 (unificación compAI): era un sistema
+// paralelo desconectado del roster real de 7 compañeros. "Su guardián" pasa a
+// ser el mismo AgentAvatarSelector que usa el resto de la app (Perfil →
+// Apariencia) — un solo selector de compañero, no dos. El archivo
+// GuardianEspiritu.jsx sigue en el repo (no se borró), solo dejó de montarse.
+import AgentAvatarSelector from '../Settings/AgentAvatarSelector';
 import ArbolDeMundos from './ArbolDeMundos';
 import ClimaStrip from './ClimaStrip';
 import HoyEnFincaStrip from './HoyEnFincaStrip';
@@ -760,14 +762,15 @@ export default function DashboardLive({ onNavigate, regionalGreeting = null, onL
                 </div>
             )}
 
-            {/* SU GUARDIÁN — el espíritu de la finca (mockup #/mockups/avatar-biopunk).
-                Vive en el menú vivo en AMBOS layouts (F2 y legacy/prod) para que sea
-                público y no huérfano. Especies nativas colombianas REALES (grounded);
-                la elección PERSISTE en el perfil (guardian_especie) y re-tiñe su
-                propio HUD + emite chagra:guardian-changed para el saludo/espíritu. */}
+            {/* SU COMPAÑERO — quién lo acompaña en Chagra. Vive en el menú vivo en
+                AMBOS layouts (F2 y legacy/prod) para que sea público y no huérfano.
+                Reemplaza al viejo "Su guardián" (GuardianEspiritu, 5 fauna, sistema
+                paralelo desconectado del roster real) por el MISMO
+                AgentAvatarSelector que usa Perfil → Apariencia (2026-08-14,
+                unificación compAI: un solo selector de compañero, roster de 7). */}
             <div className="px-4 pt-3 fvh-resto-block" data-testid="bloque-guardian">
-                {blockLabel('Su guardián', 'from-teal-400 to-violet-400')}
-                <GuardianEspiritu />
+                {blockLabel('Su compañero', 'from-teal-400 to-violet-400')}
+                <AgentAvatarSelector />
             </div>
 
             {fincaVivaFlag ? (
