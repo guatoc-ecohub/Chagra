@@ -15,8 +15,6 @@ const LLAVES_RELEVANTES = new Set([LLAVE_COMPANERO, STORAGE_KEY, ...LLAVES_HERED
 // "solo abejita"). El colibrí queda de fauna decorativa en los mundos 3D,
 // nunca como cara del agente.
 //
-// 'maiz' = planta de maíz, alternativa cultural ancestral.
-//
 // 'zariguya' = la zarigüeya (crías al lomo), 3ra opción (2026-07-25, tras el
 // merge de `art(creatures): la zarigüeya entra al elenco — con las crías al
 // lomo (#2783)`). Adaptador en ChagraAgentAvatarZariguya.jsx.
@@ -27,7 +25,20 @@ const LLAVES_RELEVANTES = new Set([LLAVE_COMPANERO, STORAGE_KEY, ...LLAVES_HERED
 // 2026-08-11, pero ningún selector los ofrecía — bug encontrado en la
 // re-auditoría del GAP. Adaptadores en ChagraAgentAvatarJaguar.jsx,
 // ChagraAgentAvatarOsoBaston.jsx, ChagraAgentAvatarLuciernaga.jsx.
-export const AVATAR_TYPES = ['angelita', 'maiz', 'zariguya', 'jaguar', 'oso-baston', 'luciernaga'];
+//
+// 'guacamaya', 'chivito-punk' = los últimos dos del roster-7 (2026-08-14,
+// unificación compAI a los 7 canónicos del operador). Reusan el rig F24 del
+// valle (`visual/creatures/arte-valle/`, ver GuacamayaCompai.jsx/ChivitoPunk.jsx
+// — NO `Guacamaya.jsx`, el billboard decorativo de FaunaCalido.jsx) — no se
+// redibujaron a mano. Adaptadores en ChagraAgentAvatarGuacamaya.jsx,
+// ChagraAgentAvatarChivitoPunk.jsx.
+//
+// 'maiz' SE RETIRÓ del roster el 2026-08-14 (decisión del operador): sigue
+// existiendo como slug jubilado (compai/nucleo/elenco.js SLUGS_JUBILADOS,
+// migra solo a 'angelita') para que ningún usuario con maiz guardado en
+// localStorage se quede en un estado inválido, pero ya no es una opción
+// elegible aquí ni en AgentAvatarSelector.jsx.
+export const AVATAR_TYPES = ['angelita', 'zariguya', 'jaguar', 'oso-baston', 'luciernaga', 'chivito-punk', 'guacamaya'];
 export const DEFAULT_AVATAR_TYPE = 'angelita';
 
 // Nombre propio para copy que necesita NOMBRAR al compAI elegido (ej. "hábletele
@@ -37,11 +48,12 @@ export const DEFAULT_AVATAR_TYPE = 'angelita';
 // este mapa es SOLO para los pocos textos que sí necesitan el nombre propio.
 export const AVATAR_NOMBRE = {
     angelita: 'Angelita',
-    maiz: 'su planta de maíz',
     zariguya: 'su zarigüeya',
     jaguar: 'el jaguar',
-    'oso-baston': 'el oso del bastón',
+    'oso-baston': 'el oso de anteojos',
     luciernaga: 'la luciérnaga',
+    'chivito-punk': 'el chivito',
+    guacamaya: 'la guacamaya',
 };
 
 // Slugs históricos guardados en localStorage de instalaciones viejas:

@@ -53,13 +53,24 @@ export function isProdAppHost(hostname) {
   return normalizeHostname(hostname) === 'prod.chagra.app';
 }
 
+const STAGING_HOSTS = new Set([
+  'preprod.chagra.app',
+  'chagra-dev.guatoc.co',
+  'localhost',
+  '127.0.0.1',
+]);
+
 export function isStagingHost(hostname) {
   // preprod.chagra.app = ambiente de STAGING que sirve la rama dev antes de que
   // llegue a main/prod. Si rebotara al canónico (chagra.app), el staging mandaría
-  // a producción y no probaría nada. Se trata como host permitido, igual que dev
-  // o preview. Los subdominios futuros deben seguir bajo preprod.chagra.app.
+  // a producción y no probaría nada. El dominio propio queda anclado: se acepta
+  // preprod.chagra.app y sus subdominios, más la lista exacta de hosts de staging
+  // heredados. Un host tercero no entra solo porque contenga el token `preprod`.
   const host = normalizeHostname(hostname);
-  return host === 'preprod.chagra.app' || host.endsWith('.preprod.chagra.app');
+  return (
+    STAGING_HOSTS.has(host) ||
+    host.endsWith('.preprod.chagra.app')
+  );
 }
 
 export function isThreeDWorldHost(hostname) {

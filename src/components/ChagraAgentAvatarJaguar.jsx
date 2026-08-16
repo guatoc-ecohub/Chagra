@@ -1,38 +1,28 @@
-import Jaguar from '../visual/creatures/Jaguar';
+import JaguarLaminaViva from '../visual/creatures/JaguarLaminaViva';
 
 /**
  * ChagraAgentAvatarJaguar — el jaguar (Panthera onca) como CARA del agente de
  * Chagra, 4ta opción del elenco (junto a Angelita, maíz y zarigüeya).
  *
- * Cierra parte del ítem #8 del GAP compAI (2026-08-13): el jaguar ya tenía
- * cuerpo dibujado (`Jaguar.jsx`, 2.5D vivo con idle + paisaje del miedo,
- * commit `075f6a0d2`) y ya estaba marcado `enPWA:true` en
- * `compai/nucleo/elenco.js` (#96) — pero ningún selector lo ofrecía. Este
- * adaptador es el que faltaba para que el picker de la PWA lo exponga.
+ * Rama `feat/jaguar-lamina-sobre-esqueleto` (2026-08-14): reemplaza el
+ * cuerpo vector (`Jaguar.jsx`, rubber-hose dibujado a mano) por
+ * `JaguarLaminaViva` — la lámina Humboldt REAL (`jaguar-natural.png`)
+ * recortada en capas y montada sobre las transformaciones REALES del rig
+ * `~/demos/3d/compai/rigs/jaguar.rig.svg`+`jaguar.css`. Ver el docstring de
+ * `JaguarLaminaViva.jsx` para el detalle de la fusión piel+esqueleto y lo
+ * que quedó fuera de alcance. `Jaguar.jsx` NO se borra (otros consumidores
+ * —p.ej. paisaje del miedo del valle— pueden seguir usándolo).
  *
  * Adaptador puro (mismo contrato que ChagraAgentAvatarZariguya): traduce la
  * API histórica del avatar del agente (state 'idle'|'thinking'|'speaking'|
- * 'listening', glow, withLabel, onClick/onDoubleClick) al vocabulario de VIDA
- * de `Jaguar.jsx` (`visual/creatures/`). Cero lógica nueva de agente, cero
- * cambios en `visual/creatures/`.
- *
- *   - idle       → pose 'anda' (base, con acecho de hombros).
- *   - thinking   → pose 'anda' + `acecha=true`: el felino se agazapa y avanza
- *                  lento — su reacción-firma leída como "atento/calculando".
- *   - speaking   → pose 'celebra' (la más expresiva) + visema del lip-sync.
- *   - listening  → pose 'reposo': respira hondo, agazapado y atento.
+ * 'listening', glow, withLabel, onClick/onDoubleClick) al contrato de
+ * `JaguarLaminaViva`. El rig de perfil (`#jaguarLado` en jaguar.css) NO
+ * tiene variantes por estado — solo define la pose de marcha — así que acá
+ * `state` viaja como `data-agt-estado` (paridad de API / accesibilidad) sin
+ * cambiar la pose: inventar una reacción por estado sería agregar un
+ * transform que no existe en el rig real, y el SPEC de esta rama es ceñirse
+ * a los que SÍ existen.
  */
-const POSE_DE_STATE = {
-    idle: 'anda',
-    thinking: 'anda',
-    speaking: 'celebra',
-    listening: 'reposo',
-};
-
-const ACECHA_DE_STATE = {
-    thinking: true,
-};
-
 const VISEMA_DE_STATE = {
     speaking: 'V2',
 };
@@ -47,16 +37,12 @@ export default function ChagraAgentAvatarJaguar({
     className = '',
     ariaLabel = 'Chagra IA',
 }) {
-    const pose = POSE_DE_STATE[state] || 'anda';
-    const acecha = !!ACECHA_DE_STATE[state];
     const visema = VISEMA_DE_STATE[state] || null;
 
     const bicho = (
-        <Jaguar
-            pose={pose}
-            acecha={acecha}
+        <JaguarLaminaViva
+            estado={state}
             visema={visema}
-            tier={undefined}
             size={size}
             title={ariaLabel}
             className={className}

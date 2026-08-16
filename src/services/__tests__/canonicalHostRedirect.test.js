@@ -40,9 +40,12 @@ describe('canonicalHostRedirect', () => {
     expect(isAllowedHost('preview.chagra.app')).toBe(true);
   });
 
-  it('permite el host de staging y sus subdominios acotados', () => {
+  it('permite únicamente los hosts de staging conocidos', () => {
     expect(isStagingHost('preprod.chagra.app')).toBe(true);
     expect(isStagingHost('api.preprod.chagra.app')).toBe(true);
+    expect(isStagingHost('chagra-dev.guatoc.co')).toBe(true);
+    expect(isStagingHost('localhost')).toBe(true);
+    expect(isStagingHost('127.0.0.1')).toBe(true);
     expect(isAllowedHost('preprod.chagra.app')).toBe(true);
   });
 
@@ -98,7 +101,7 @@ describe('canonicalHostRedirect', () => {
     expect(isAllowedHost('otra-cosa.guatoc.co')).toBe(false);
   });
 
-  it('redirige una sola vez desde un host externo al canonico', () => {
+  it('redirige el dominio legado de produccion a chagra.app', () => {
     const redirect = vi.fn();
     const location = {
       hostname: 'chagra.guatoc.co',
