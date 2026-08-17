@@ -37,6 +37,7 @@ const IDS_DE_SIEMPRE = [
   'abono',
   'aprender',
   'paramo',
+  'chorrera',
 ];
 
 describe('construirLugaresValle — compatibilidad con el valle de siempre', () => {
