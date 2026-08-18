@@ -1,7 +1,7 @@
 /*
- * CHIVITO_CSS_TEXTO — snapshot en JS del texto de `chivito.css` (copia verbatim del
- * rig F24, ver ese archivo), EXPUESTO COMO STRING en vez de importado con
- * `?raw`.
+ * CHIVITO_CSS_TEXTO — snapshot en JS del texto de `_archivo/chivito.css` (copia
+ * verbatim del rig F24, ver ese archivo), EXPUESTO COMO STRING en vez de
+ * importado con `?raw`.
  *
  * Motivo: este proyecto corre vitest con `css: false` (vitest.config.js) —
  * esa flag intercepta CUALQUIER import cuyo path matchee `.css` (incluido

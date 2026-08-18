@@ -5,6 +5,12 @@
  * ese archivo para el detalle completo del enfoque (namespacing de ids,
  * recorte del CSS de página → CSS de rig, limitación de `:host` en light DOM).
  *
+ * ARCHIVADO (2026-08-18): los SVGs originales del rig se movieron a
+ * `visual/creatures/_archivo/` tras la migración a `ChivitoPunkLaminaViva`
+ * (lámina real aprobada sobre el rig vivo). Este componente queda por
+ * compatibilidad con consumidores del valle; la dirección vigente para la
+ * PWA es `ChivitoPunkLaminaViva`.
+ *
  * El slug canónico es `chivito-punk` (colapso `chivito`→`chivito-punk` ya
  * resuelto en `compai/nucleo/elenco.js`, #96) — el rig trae DOS crestas
  * (`#crestaNormal`/`#crestaPunk`) que el CSS original alterna por
@@ -13,16 +19,16 @@
  * reposo — igual que documenta la nota del operador en `elenco.js`: "un solo
  * rig", la cresta punk es el gesto de hablar, no una especie aparte.
  *
- * El CSS llega vía `chivitoCssTexto.js` (snapshot JS de `arte-valle/chivito.css`,
+ * El CSS llega vía `chivitoCssTexto.js` (snapshot JS de `_archivo/chivito.css`,
  * copia verbatim del valle), NO `?raw` directo sobre el `.css` — vitest corre
  * con `css:false` (vitest.config.js) e intercepta cualquier import `.css*`
  * (incluido con query `?raw`) devolviendo un módulo vacío solo en tests; ver
  * la nota en `chivitoCssTexto.js`.
  */
 import { useId, useMemo } from 'react';
-import rigSvg from './arte-valle/chivito.rig.svg?raw';
-import defsSvg from './arte-valle/chivito.defs.svg?raw';
-import cssCompleto from './arte-valle/chivitoCssTexto.js';
+import rigSvg from './_archivo/chivito.rig.svg?raw';
+import defsSvg from './_archivo/chivito.defs.svg?raw';
+import cssCompleto from './_archivo/chivitoCssTexto.js';
 import { idsDeclaradosEnSvg, namespaceSvg, namespaceCss, extraerCssDelRig } from './arte-valle/nsRigValle.js';
 import { CHIVITO_SLUG, CHIVITO_NOMBRE } from './chivitoIdentidad.js';
 
