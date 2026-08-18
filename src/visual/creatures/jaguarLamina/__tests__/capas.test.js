@@ -5,9 +5,9 @@
  * soporte, la degradación defensiva (nunca truena, nunca revienta con un
  * canvas vacío) y que las constantes de anatomía tengan la forma que
  * `capas.js` espera. La verificación PIXEL a pixel (¿el corte cae donde
- * dice `anatomia.js`?) se hizo offline con `sharp` en `_gate/anatomia-
- * jaguar/` (no versionado — ver el reporte de la tarea) porque jsdom no da
- * para reproducirla en CI sin el paquete `canvas`.
+ * dice `anatomia.js`?) vive en la recomposición de control del set de arte
+ * (`rigs2d/jaguar/_build/build-cuerpo.mjs`: 0.035% de huecos contra la
+ * lámina original) y en el gate GPU del operador.
  */
 import { describe, it, expect } from 'vitest';
 import { hornearJaguar, haySoporteCanvas } from '../capas.js';
@@ -15,7 +15,18 @@ import anatomiaDefault, {
   ANCHO, ALTO, CABEZA, OJO, OJO_2, PATAS_DEL,
   PATA_TRASERA, COLA, CUERPO_PIVOTE,
   OREJA_IZQ, OREJA_DER, MANDIBULA, BOCA,
+  CORTE_PATAS_DEL, RIG_MARCHA, MARCHA, CAPAS_RIG,
 } from '../anatomia.js';
+
+/** Imagen falsa con las dimensiones de la lámina (jsdom no carga PNG). */
+const imgFalsa = () => /** @type {any} */ ({ naturalWidth: ANCHO, naturalHeight: ALTO });
+const setFalso = () => ({
+  lamina: imgFalsa(),
+  cuerpo: imgFalsa(),
+  delLejana: imgFalsa(),
+  trasCercana: imgFalsa(),
+  trasLejana: imgFalsa(),
+});
 
 describe('haySoporteCanvas', () => {
   it('devuelve un booleano y no truena aunque jsdom no traiga canvas real', () => {
@@ -25,18 +36,26 @@ describe('haySoporteCanvas', () => {
 
 describe('hornearJaguar — degradación defensiva', () => {
   it('sin canvas.getContext(\'2d\') real, devuelve null (nunca truena)', () => {
-    /** @type {HTMLImageElement} */
-    const imgFalsa = /** @type {any} */ ({ naturalWidth: ANCHO, naturalHeight: ALTO });
-    const resultado = hornearJaguar(imgFalsa, { ancho: ANCHO, altoPx: ALTO });
+    const resultado = hornearJaguar(setFalso(), { ancho: ANCHO, altoPx: ALTO });
     // jsdom sin el paquete `canvas`: getContext('2d') es null/indefinido →
     // haySoporteCanvas() debe dar false y hornearJaguar debe devolver null.
     expect(resultado === null || typeof resultado === 'object').toBe(true);
     if (!haySoporteCanvas()) expect(resultado).toBeNull();
   });
 
-  it('sin dimensiones (imagen no cargada) devuelve null, no revienta', () => {
-    const imgSinCargar = /** @type {any} */ ({ naturalWidth: 0, naturalHeight: 0 });
-    expect(hornearJaguar(imgSinCargar, {})).toBeNull();
+  it('sin dimensiones (lámina no cargada) devuelve null, no revienta', () => {
+    const set = setFalso();
+    set.lamina = /** @type {any} */ ({ naturalWidth: 0, naturalHeight: 0 });
+    expect(hornearJaguar(set, {})).toBeNull();
+  });
+
+  it('si falta cualquiera de las capas del rig (PNG que no cargó) devuelve null — el llamador se queda en la lámina plana', () => {
+    for (const clave of ['lamina', 'cuerpo', 'delLejana', 'trasCercana', 'trasLejana']) {
+      const set = setFalso();
+      set[clave] = null;
+      expect(hornearJaguar(set, { ancho: ANCHO, altoPx: ALTO })).toBeNull();
+    }
+    expect(hornearJaguar(null, { ancho: ANCHO, altoPx: ALTO })).toBeNull();
   });
 });
 
@@ -46,7 +65,7 @@ describe('anatomia.js — forma de las constantes que capas.js consume', () => {
     expect(ALTO).toBe(394);
   });
 
-  it('CABEZA trae la recta de corte + el desvanecido de mandíbula', () => {
+  it('CABEZA trae la recta de corte + el desvanecido de mandíbula (corte face-safe, nunca un rectángulo)', () => {
     expect(CABEZA.cuello).toMatchObject({ px: expect.any(Number), py: expect.any(Number), nx: expect.any(Number), ny: expect.any(Number) });
     expect(CABEZA.fadeMandibula.y1).toBeGreaterThan(CABEZA.fadeMandibula.y0);
     expect(CABEZA.pivote).toHaveLength(2);
@@ -75,25 +94,6 @@ describe('anatomia.js — forma de las constantes que capas.js consume', () => {
     expect(COLA.pivote[0]).toBeLessThan(ANCHO);
   });
 
-  it('PATAS_DEL es UN SOLO bloque (caja + articulación + pivote único) — sin corte por color que fantasmee 3-4 patas', () => {
-    // caja en X válida + banda de articulación en Y.
-    expect(PATAS_DEL.box.x1).toBeGreaterThan(PATAS_DEL.box.x0);
-    expect(PATAS_DEL.box.xFade).toBeGreaterThan(0);
-    expect(PATAS_DEL.joint.y1).toBeGreaterThan(PATAS_DEL.joint.y0);
-    // un ÚNICO pivote (el hombro), dentro de su propia caja: rota como bloque,
-    // no dos piezas que puedan divergir de fase.
-    expect(PATAS_DEL.pivote).toHaveLength(2);
-    expect(PATAS_DEL.pivote[0]).toBeGreaterThanOrEqual(PATAS_DEL.box.x0);
-    expect(PATAS_DEL.pivote[0]).toBeLessThanOrEqual(PATAS_DEL.box.x1);
-  });
-
-  it('la separación de patas delanteras (pulido anterior) quedó REVERTIDA — sus constantes ya no existen (lock de regresión)', () => {
-    // Si alguna vuelve, el bloque limpio se re-partiría y el 3-4-patas volvería.
-    for (const nombre of ['PATA_DEL_CERCA', 'PATA_DEL_LEJANA', 'CORTE_PATAS_DEL', 'SOLAPE_PATA_DEL_CERCA', 'PATAS_DEL_ENVOLVENTE']) {
-      expect(anatomiaDefault[nombre]).toBeUndefined();
-    }
-  });
-
   it('los pivotes de patas/cola/cabeza/cuerpo son puntos [x,y] dentro del lienzo', () => {
     for (const piv of [CABEZA.pivote, PATAS_DEL.pivote, PATA_TRASERA.pivote, COLA.pivote, CUERPO_PIVOTE]) {
       const [x, y] = piv;
@@ -102,6 +102,73 @@ describe('anatomia.js — forma de las constantes que capas.js consume', () => {
       expect(y).toBeGreaterThanOrEqual(0);
       expect(y).toBeLessThanOrEqual(ALTO);
     }
+  });
+});
+
+/* El rig 2.5D: la base SIN patas + 4 patas propias. El lock de regresión del
+   "3-4 patas" cambió de forma: ya no prohíbe el corte de delanteras (la
+   naranja SÍ se corta con `CORTE_PATAS_DEL` — su respaldo ahora es la pata
+   blanca PRE-CORTADA, no la otra mitad del mismo plano), prohíbe que vuelva
+   el REPARTO del envolvente en dos mitades (`PATA_DEL_CERCA`/`_LEJANA` +
+   solape), que era lo que fantasmeaba el contorno doble. */
+describe('anatomia.js — rig de marcha (capas propias + esqueleto)', () => {
+  it('la base del ensamble es el cuerpo INPAINT (sin patas) + 3 patas PNG propias', () => {
+    expect(CAPAS_RIG.cuerpo).toMatch(/inpaint/);
+    for (const clave of ['delLejana', 'trasCercana', 'trasLejana']) {
+      expect(CAPAS_RIG[clave]).toMatch(/^pata-/);
+    }
+  });
+
+  it('el reparto viejo del envolvente en dos mitades NO volvió (lock de regresión del 3-4 patas)', () => {
+    for (const nombre of ['PATA_DEL_CERCA', 'PATA_DEL_LEJANA', 'SOLAPE_PATA_DEL_CERCA', 'PATAS_DEL_ENVOLVENTE']) {
+      expect(anatomiaDefault[nombre]).toBeUndefined();
+    }
+    // el corte medido sí existe — extrae SOLO la pieza naranja de la lámina.
+    expect(CORTE_PATAS_DEL).toMatchObject({ px: expect.any(Number), nx: expect.any(Number) });
+  });
+
+  it('RIG_MARCHA: EXACTAMENTE 4 patas, cadena articulación→rodilla→pie dentro del lienzo y en orden vertical', () => {
+    const claves = Object.keys(RIG_MARCHA);
+    expect(claves).toHaveLength(4);
+    expect(claves.sort()).toEqual(['delCercana', 'delLejana', 'trasCercana', 'trasLejana']);
+    for (const rig of Object.values(RIG_MARCHA)) {
+      for (const punto of [rig.articulacion, rig.rodilla, rig.pie, rig.anclaje]) {
+        expect(punto[0]).toBeGreaterThanOrEqual(0);
+        expect(punto[0]).toBeLessThanOrEqual(ANCHO);
+        expect(punto[1]).toBeGreaterThanOrEqual(0);
+        expect(punto[1]).toBeLessThanOrEqual(ALTO);
+      }
+      // la cadena baja: articulación arriba, rodilla en medio, pie al suelo.
+      expect(rig.rodilla[1]).toBeGreaterThan(rig.articulacion[1]);
+      expect(rig.pie[1]).toBeGreaterThan(rig.rodilla[1]);
+      // el corte del arte cae en la rodilla medida.
+      expect(rig.rodillaCorte).toBe(rig.rodilla[1]);
+      // el vértice de flexión tiene lado definido (±1).
+      expect(Math.abs(rig.lado)).toBe(1);
+    }
+    // las delanteras doblan por el carpo (vértice adelante), las traseras por
+    // el corvejón (vértice atrás) — si un signo se voltea, la pata se
+    // dobla al revés (rodilla de flamenco).
+    expect(RIG_MARCHA.delLejana.lado).toBe(-1);
+    expect(RIG_MARCHA.delCercana.lado).toBe(-1);
+    expect(RIG_MARCHA.trasCercana.lado).toBe(1);
+    expect(RIG_MARCHA.trasLejana.lado).toBe(1);
+  });
+
+  it('las fases de contacto son los 4 cuartos del ciclo en secuencia lateral (tras cercana → del cercana → tras lejana → del lejana)', () => {
+    expect(RIG_MARCHA.trasCercana.fase).toBe(0);
+    expect(RIG_MARCHA.delCercana.fase).toBe(0.25);
+    expect(RIG_MARCHA.trasLejana.fase).toBe(0.5);
+    expect(RIG_MARCHA.delLejana.fase).toBe(0.75);
+  });
+
+  it('MARCHA: duty de marcha (mayoría del ciclo apoyado) y velocidad acoplada al roam', () => {
+    expect(MARCHA.duty).toBeGreaterThan(0.5);
+    expect(MARCHA.duty).toBeLessThan(1);
+    expect(MARCHA.amplitud).toBeGreaterThan(0);
+    // DEBE coincidir con PX_POR_SEG de useCompaiRoam.js — es lo que clava la
+    // pisada al desplazamiento real (cero moonwalk).
+    expect(MARCHA.velocidadPxS).toBe(34);
   });
 });
 
