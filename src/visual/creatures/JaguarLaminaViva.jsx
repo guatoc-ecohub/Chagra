@@ -111,6 +111,7 @@ export default function JaguarLaminaViva({
   ...rest
 }) {
   const raizRef = useRef(null);
+  const respaldoHostRef = useRef(null);
   const cuerpoHostRef = useRef(null);
   const cabezaHostRef = useRef(null);
   const orejaIzqHostRef = useRef(null);
@@ -171,6 +172,7 @@ export default function JaguarLaminaViva({
         cv.style.display = 'block';
         if (host) host.replaceChildren(cv);
       };
+      montar(capas.respaldo, respaldoHostRef.current);
       montar(capas.cuerpo, cuerpoHostRef.current);
       montar(capas.cola, colaHostRef.current);
       montar(capas.cabeza, cabezaHostRef.current);
@@ -348,6 +350,15 @@ export default function JaguarLaminaViva({
             lejana DETRÁS del cuerpo (se ve por la ventana del muslo), y la
             naranja + cabeza encima de todo. */}
         <div style={{ position: 'absolute', inset: 0, display: listo ? 'block' : 'none' }}>
+          {/* RESPALDO DE COSTURAS — piel estática de la propia lámina bajo
+              cada corte interno (ver capas.js): al FONDO del todo, solo
+              asoma donde a las piezas les falte alfa (las bandas de
+              crossfade) o cuando una pieza en movimiento destapa su corte.
+              Dentro de su jlv-masa para seguir el bob del paso. */}
+          <div className="jlv-masa">
+            <div ref={respaldoHostRef} className="jlv-capa" />
+          </div>
+
           {renderPata('trasLejana')}
 
           <div className="jlv-masa">

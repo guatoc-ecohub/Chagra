@@ -76,6 +76,25 @@ function lienzo(w, h) {
 
 /* ═══ SECCIÓN PURA — máscaras y alfas ideales (sin DOM) ═══════════════════ */
 
+/**
+ * Resta DURA para la capa de ABAJO de un par: conserva el píxel COMPLETO
+ * hasta que la pieza de encima es ~totalmente opaca. Con la resta blanda
+ * `(1-m)`, en la banda del desvanecido ambas capas quedan semiopacas y el
+ * compuesto over pierde alfa (0.5 over 0.5 = 0.75): ésa es la COSTURA — la
+ * banda pálida que se ve cruzando torso y anca. Con la resta dura el
+ * compuesto suma el alfa original completo en toda la banda (m + 1·(1-m) =
+ * 1) y la costura desaparece; al animarse, la pieza desliza sobre piel
+ * completa de respaldo en vez de sobre el residuo translúcido.
+ *
+ * El umbral 0.996 (antes 0.93 en los kits hermanos) deja el residuo máximo
+ * de la rampa en ~0,36/255 — por debajo del umbral medible de déficit
+ * (déficit = alfaOriginal − alfaCompuesto > 0,5/255, la métrica del informe
+ * del lote). Las VENTANAS (restas sobre la capa de ENCIMA para revelar lo de
+ * abajo, como la ventana del muslo) se quedan suaves: ahí la capa de abajo
+ * está intacta y no hay pérdida.
+ */
+export const hard = (m) => 1 - ss(0.996, 1, m);
+
 /** Máscara de la cabeza: banda proyectada sobre la recta del cuello, MÁS un
  *  desvanecido por Y (la cabeza no sigue existiendo bajo la mandíbula real —
  *  ver el docstring de `anatomia.js`; es lo que hace el corte FACE-SAFE:
@@ -104,7 +123,7 @@ function mascaraApendice(x, y, { box, joint }) {
 function mascaraPataNaranja(x, y) {
   const c = CORTE_PATAS_DEL;
   const u = c.nx * (x - c.px) + c.ny * (y - c.py);
-  return mascaraApendice(x, y, PATAS_DEL) * ss(c.u0, c.u1, u) * (1 - mascaraCabeza(x, y));
+  return mascaraApendice(x, y, PATAS_DEL) * ss(c.u0, c.u1, u) * hard(mascaraCabeza(x, y));
 }
 
 /* ── Geometría de la ventana del muslo trasero lejano + borde de cola.
@@ -140,7 +159,7 @@ function ventanaTrasLejana(x, y) {
  *  cabeza, menos la banda de inserción de la pata trasera cercana, menos la
  *  ventana del muslo lejano. Fórmula 1:1 de `build-cuerpo.mjs`. */
 function mascaraCola(x, y) {
-  return ss(-20, 20, x - 465) * (1 - mascaraCabeza(x, y))
+  return ss(-20, 20, x - 465) * hard(mascaraCabeza(x, y))
     * (1 - ss(228, 258, y) * ss(455, 470, x) * (1 - ss(575, 590, x)))
     * (1 - ventanaTrasLejana(x, y));
 }
@@ -188,9 +207,12 @@ export function mascaras() {
   const mOrejaIzq = (x, y) => mascaraOreja(x, y, OREJA_IZQ) * mCabeza(x, y);
   const mOrejaDer = (x, y) => mascaraOreja(x, y, OREJA_DER) * mCabeza(x, y);
   const mMandibula = (x, y) => mascaraMandibula(x, y) * mCabeza(x, y);
+  // Restas DURAS (ver `hard`): la cabeza conserva el píxel completo bajo el
+  // desvanecido de orejas y mandíbula — cero costura en reposo, y al abrir
+  // la boca o girar la oreja se revela piel real, no un anillo translúcido.
   const mCabezaRender = (x, y) => mCabeza(x, y)
-    * (1 - mascaraOrejaSub(x, y, OREJA_IZQ)) * (1 - mascaraOrejaSub(x, y, OREJA_DER))
-    * (1 - mMandibula(x, y));
+    * hard(mascaraOrejaSub(x, y, OREJA_IZQ)) * hard(mascaraOrejaSub(x, y, OREJA_DER))
+    * hard(mMandibula(x, y));
   return {
     mCabezaRender,
     mOrejaIzq,
@@ -278,6 +300,69 @@ export function capasIdeales(fuentes, W, H) {
   capas.orejaIzq = { alfa: capaMascara(m.mOrejaIzq), fuente: 'lamina' };
   capas.orejaDer = { alfa: capaMascara(m.mOrejaDer), fuente: 'lamina' };
   capas.mandibula = { alfa: capaMascara(m.mMandibula), fuente: 'lamina' };
+
+  /* ── RESPALDO DE COSTURAS — piel estática de la propia lámina, al FONDO
+     del apilado. Dos términos, cero color inventado:
+
+     1. BANDAS: alrededor de todo corte INTERNO (píxel de capa con alfa
+        parcial donde la lámina es opaca — la silueta AA queda fuera porque
+        ahí la lámina también es parcial), dilatadas ±10px. Es el `baseSub`
+        de las orejas generalizado: cuando cola/cabeza/pata deslizan su
+        desvanecido fuera del complemento horneado (respira, mira, gait),
+        siempre caen sobre piel completa — la costura tampoco se abre EN
+        MOVIMIENTO. Las bandas viven solo en articulaciones y cortes (nunca
+        una extremidad entera): no hay patas fantasma.
+
+     2. RELLENO EXACTO en reposo: donde el compuesto over de todas las capas
+        aún queda por debajo del alfa de la lámina (las fronteras horneadas
+        de los PNG del rig, que el runtime no puede reformar), el respaldo
+        aporta exactamente el alfa que falta — la recomposición da la lámina
+        EXACTA (0 huecos totalmente transparentes Y 0 píxeles con déficit
+        alfa > 0,5/255, la métrica del informe del lote). ── */
+  {
+    const compuesto = new Float32Array(N);
+    const banda = new Uint8Array(N);
+    for (const { alfa } of Object.values(capas)) {
+      for (let p = 0; p < N; p++) {
+        const a = alfa[p];
+        if (a > 0) compuesto[p] = a + compuesto[p] * (1 - a);
+        if (a > 0.02 && a < 0.98 && fuentes.lamina[p] > 0.98) banda[p] = 1;
+      }
+    }
+    const RADIO = 10;
+    const dilatada = new Uint8Array(N);
+    const paso = new Uint8Array(N);
+    for (let y = 0; y < H; y++) {
+      for (let x = 0; x < W; x++) {
+        const p = y * W + x;
+        for (let k = Math.max(0, x - RADIO); k <= Math.min(W - 1, x + RADIO); k++) {
+          if (banda[y * W + k]) { paso[p] = 1; break; }
+        }
+      }
+    }
+    for (let y = 0; y < H; y++) {
+      for (let x = 0; x < W; x++) {
+        const p = y * W + x;
+        for (let k = Math.max(0, y - RADIO); k <= Math.min(H - 1, y + RADIO); k++) {
+          if (paso[k * W + x]) { dilatada[p] = 1; break; }
+        }
+      }
+    }
+    const respaldo = new Float32Array(N);
+    for (let p = 0; p < N; p++) {
+      const a = fuentes.lamina[p];
+      if (a <= 0) continue;
+      // La banda solo aporta piel COMPLETA donde la lámina es ~opaca: sobre
+      // la textura semitransparente (pelo suelto, bigotes) duplicar alfa la
+      // endurecería; ahí basta el relleno exacto del reposo.
+      if (dilatada[p] && a > 0.98) {
+        respaldo[p] = a;
+      } else if (compuesto[p] < a && compuesto[p] < 0.9999) {
+        respaldo[p] = (a - compuesto[p]) / (1 - compuesto[p]);
+      }
+    }
+    capas.respaldo = { alfa: respaldo, fuente: 'lamina' };
+  }
   return capas;
 }
 
@@ -313,7 +398,8 @@ function alfaDe(datos, N) {
  *   trasLejana: HTMLImageElement}} imagenes
  * @param {{ancho?: number, altoPx?: number}} [dims]  fallback si la lámina
  *   aún no midió (naturalWidth/Height en 0).
- * @returns {{W:number, H:number, cuerpo:HTMLCanvasElement,
+ * @returns {{W:number, H:number, respaldo:HTMLCanvasElement,
+ *   cuerpo:HTMLCanvasElement,
  *   cola:HTMLCanvasElement, cabeza:HTMLCanvasElement,
  *   orejaIzq:HTMLCanvasElement, orejaDer:HTMLCanvasElement,
  *   mandibula:HTMLCanvasElement,
@@ -354,7 +440,7 @@ export function hornearJaguar(imagenes, dims = {}) {
     const d = im.data;
     for (let p = 0; p < N; p++) {
       const a = alfa[p];
-      if (a <= 0.004) continue;
+      if (a <= 0) continue;
       const i = p * 4;
       d[i] = sd[i]; d[i + 1] = sd[i + 1]; d[i + 2] = sd[i + 2];
       d[i + 3] = a * 255;
@@ -378,6 +464,7 @@ export function hornearJaguar(imagenes, dims = {}) {
   return {
     W,
     H,
+    respaldo: pintarCapa(ideales.respaldo),
     cuerpo: pintarCapa(ideales.cuerpo),
     cola: pintarCapa(ideales.cola),
     cabeza: pintarCapa(ideales.cabeza),
