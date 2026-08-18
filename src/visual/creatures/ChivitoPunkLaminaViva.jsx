@@ -25,6 +25,111 @@ const ESTADO_CANON = {
    V1 (cerrado) = 0 → se ve EXACTO como la lámina aprobada. */
 const JAW_DE_VISEMA = { V1: 0, V2: 0.42, V3: 1, V4: 0.36 };
 
+/*
+ * La lámina trae los párpados como dos parches de la propia piel. El CSS base
+ * del puerto conserva un guiño doble, pero su interpolación deja el parche a
+ * medio camino demasiado tiempo. Este override solo vive para este montaje:
+ * cierre corto, pausa breve y apertura rápida, con una sola fase compartida.
+ * Las demás clases de vida siguen siendo las del kit y del archivo CSS propio.
+ */
+const CHIVITO_MOTION_STYLE_ID = 'chivito-punk-lamina-viva-motion';
+const CHIVITO_MOTION_CSS = `
+.clv-parpado-natural {
+  transform-origin: 50% 0%;
+  animation-name: clv-parpadeo-natural;
+  animation-timing-function: linear;
+}
+@keyframes clv-parpadeo-natural {
+  0%, 43.4%, 47.2%, 100% { transform: scaleY(0); }
+  44.0% { transform: scaleY(0.18); }
+  44.7%, 46.1% { transform: scaleY(1); }
+  46.7% { transform: scaleY(0.2); }
+}
+
+/* Idle: el cuerpo respira y se mece en cuatro tiempos, con gesto pequeño. */
+.clv-stage-vivo-idle {
+  animation: clv-stage-vivo-idle 3.35s ease-in-out infinite;
+}
+@keyframes clv-stage-vivo-idle {
+  0%, 100% { transform: translateY(-0.8%) rotate(-0.15deg); }
+  28% { transform: translateY(0.2%) rotate(0.18deg); }
+  55% { transform: translateY(-0.45%) rotate(-0.2deg); }
+  78% { transform: translateY(0.45%) rotate(0.16deg); }
+}
+.clv-cuerpo-vivo-idle {
+  animation: clv-cuerpo-vivo-idle 3.15s ease-in-out infinite;
+}
+@keyframes clv-cuerpo-vivo-idle {
+  0%, 100% { transform: translateY(0) rotate(0deg) scale(1); }
+  26% { transform: translateY(-0.38%) rotate(-0.28deg) scale(1.006); }
+  52% { transform: translateY(-0.82%) rotate(0.38deg) scale(1.014); }
+  76% { transform: translateY(-0.16%) rotate(-0.2deg) scale(1.006); }
+}
+.clv-cabeza-viva-idle {
+  animation: clv-cabeza-viva-idle 2.9s ease-in-out infinite;
+}
+@keyframes clv-cabeza-viva-idle {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  30% { transform: translateY(0.28%) rotate(-0.42deg); }
+  58% { transform: translateY(-0.34%) rotate(0.62deg); }
+  82% { transform: translateY(0.16%) rotate(-0.28deg); }
+}
+.clv-mano-viva-idle {
+  animation: clv-mano-viva-idle 4.1s ease-in-out infinite;
+}
+@keyframes clv-mano-viva-idle {
+  0%, 100% { transform: rotate(0deg); }
+  24% { transform: rotate(-1.4deg); }
+  52% { transform: rotate(1.1deg); }
+  78% { transform: rotate(-0.7deg); }
+}
+
+/* Caminando: conserva la pose única, pero suma avance elástico de cuerpo,
+   testa y escenario para que el estado se lea como desplazamiento. */
+.clv-stage-vivo-caminando {
+  animation: clv-stage-vivo-caminando 0.82s ease-in-out infinite;
+}
+@keyframes clv-stage-vivo-caminando {
+  0%, 100% { transform: translateY(0.35%) rotate(0.4deg); }
+  50% { transform: translateY(-0.55%) rotate(-0.4deg); }
+}
+.clv-cuerpo-vivo-caminando {
+  animation: clv-cuerpo-vivo-caminando 0.55s ease-in-out infinite;
+}
+@keyframes clv-cuerpo-vivo-caminando {
+  0%, 100% { transform: translateY(1.8%) rotate(0.75deg) scale(0.998); }
+  50% { transform: translateY(-2.4%) rotate(-0.75deg) scale(1.008); }
+}
+.clv-cabeza-vivo-caminando {
+  animation: clv-cabeza-vivo-caminando 0.55s ease-in-out -0.14s infinite;
+}
+@keyframes clv-cabeza-vivo-caminando {
+  0%, 100% { transform: translateY(-1.8%) rotate(-0.7deg); }
+  50% { transform: translateY(2.2%) rotate(0.7deg); }
+}
+.clv-mano-vivo-caminando {
+  animation: clv-mano-vivo-caminando 0.55s ease-in-out -0.28s infinite;
+}
+@keyframes clv-mano-vivo-caminando {
+  0%, 100% { transform: rotate(-0.8deg); }
+  50% { transform: rotate(1.6deg); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .clv-parpado-natural,
+  .clv-stage-vivo-idle,
+  .clv-cuerpo-vivo-idle,
+  .clv-cabeza-viva-idle,
+  .clv-mano-viva-idle,
+  .clv-stage-vivo-caminando,
+  .clv-cuerpo-vivo-caminando,
+  .clv-cabeza-vivo-caminando,
+  .clv-mano-vivo-caminando {
+    animation: none !important;
+  }
+}
+`;
+
 /**
  * ChivitoPunkLaminaViva — la LÁMINA aprobada del chivito de páramo punk
  * (`chivito-punk.png`: la cresta mohawk de puntas moradas, la barba-gorguera
@@ -118,6 +223,14 @@ export default function ChivitoPunkLaminaViva({
   const momento = useVidaIdle(CHIVITO_SLUG, activoVida && enIdle);
   useMiradaUsted(raizRef, activoVida && canon !== 'speaking');
 
+  useEffect(() => {
+    if (typeof document === 'undefined' || document.getElementById(CHIVITO_MOTION_STYLE_ID)) return;
+    const styleTag = document.createElement('style');
+    styleTag.id = CHIVITO_MOTION_STYLE_ID;
+    styleTag.textContent = CHIVITO_MOTION_CSS;
+    document.head.appendChild(styleTag);
+  }, []);
+
   const jaw = JAW_DE_VISEMA[visema] ?? 0;
 
   useEffect(() => {
@@ -147,7 +260,7 @@ export default function ChivitoPunkLaminaViva({
          canvas es el fix del bug 0×0 del jaguar — no quitarlo.) */
       const montarParpado = (parche, host) => {
         const cv = parche.cv;
-        cv.className = 'clv-parpado';
+        cv.className = 'clv-parpado clv-parpado-natural';
         cv.style.position = 'absolute';
         cv.style.inset = '0';
         cv.style.width = '100%';
@@ -187,6 +300,14 @@ export default function ChivitoPunkLaminaViva({
   const aspecto = ANCHO / ALTO;
   const anchoStage = aspecto >= 1 ? size : size * aspecto;
   const altoStage = aspecto >= 1 ? size / aspecto : size;
+  const movimiento = animated
+    ? (enIdle ? 'idle' : canon === 'caminando' ? 'caminando' : null)
+    : null;
+  const movimientoClase = (base) => {
+    const clases = cls(base)?.split(' ') || [];
+    if (movimiento) clases.push(`${clases[clases.length - 1]}-${movimiento}`);
+    return clases.join(' ') || undefined;
+  };
 
   /** @param {number[]} punto  → "x% y%" para transform-origin. */
   const pctOf = (punto) => `${(punto[0] / ANCHO) * 100}% ${(punto[1] / ALTO) * 100}%`;
@@ -220,7 +341,7 @@ export default function ChivitoPunkLaminaViva({
       {...rest}
     >
       <div
-        className={cls('clv-stage')}
+        className={movimientoClase('clv-stage')}
         style={{ position: 'relative', width: anchoStage, height: altoStage }}
       >
         {/* Lámina plana — respaldo permanente si Canvas2D no está disponible
@@ -238,13 +359,13 @@ export default function ChivitoPunkLaminaViva({
         )}
         <div style={{ position: 'absolute', inset: 0, display: listo ? 'block' : 'none' }}>
           <div
-            className={cls('clv-cuerpoPivote')}
+            className={movimientoClase('clv-cuerpoPivote clv-cuerpo-vivo')}
             style={{ position: 'absolute', inset: 0, transformOrigin: pctOf(CUERPO_PIVOTE) }}
           >
             <div ref={cuerpoHostRef} className="clv-capa" />
 
             {/* LA MANO DEL LÁPIZ — gesticula desde la muñeca. */}
-            <div className={cls('clv-manoPivote')} style={{ position: 'absolute', inset: 0, transformOrigin: pctOf(MANO_LAPIZ.pivote) }}>
+            <div className={movimientoClase('clv-manoPivote clv-mano-vivo')} style={{ position: 'absolute', inset: 0, transformOrigin: pctOf(MANO_LAPIZ.pivote) }}>
               <div ref={manoHostRef} className="clv-capa" />
             </div>
 
@@ -254,7 +375,7 @@ export default function ChivitoPunkLaminaViva({
                 pieza cabeza (entera, regla dura) — azota con la testa. */}
             <div className={cls('clv-cabezaGesto')} style={{ position: 'absolute', inset: 0, transformOrigin: pctOf(CABEZA.pivote) }}>
               <div className={cls('clv-cabezaMira')} style={{ position: 'absolute', inset: 0, transformOrigin: pctOf(CABEZA.pivote) }}>
-                <div className={cls('clv-cabezaPivote')} style={{ position: 'absolute', inset: 0, transformOrigin: pctOf(CABEZA.pivote) }}>
+                <div className={movimientoClase('clv-cabezaPivote clv-cabeza-viva')} style={{ position: 'absolute', inset: 0, transformOrigin: pctOf(CABEZA.pivote) }}>
                   <div ref={cabezaHostRef} className="clv-capa" />
 
                   {/* INTERIOR DE BOCA SINTÉTICO (el único píxel no-lámina):
