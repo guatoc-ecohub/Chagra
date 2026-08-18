@@ -40,22 +40,33 @@ const alfaDe = async (file) => {
   return { alfa, W: info.width, H: info.height };
 };
 
-/** Compuesto over (conmutativo en alfa) y métricas contra la lámina. */
+/** Compuesto over (conmutativo en alfa) y métricas contra la lámina.
+ *  Además del déficit (alfa que FALTA), mide el dual que se nos escapó en la
+ *  primera versión del candado: el EXCESO (alfa que SOBRA) —
+ *   - fuera: píxel compuesto > 0 donde la lámina NO tiene píxel (silueta
+ *     desbordada: la franja de piel sintética bajo el vientre venía de aquí).
+ *   - exceso20: (alfaCompuesto − alfaOriginal)·255 > 20 dentro de la silueta
+ *     (doblado de alfa en píxeles semitransparentes bajo solapes de piezas). */
 function medir(original, capas) {
   let visible = 0; let huecos = 0; let deficit = 0; let maxDeficit255 = 0;
+  let fuera = 0; let exceso20 = 0;
   const alfas = Object.values(capas).map((c) => c.alfa || c);
   for (let p = 0; p < original.length; p++) {
     const a = original[p];
-    if (a <= 0) continue;
-    visible += 1;
     let over = 0;
     for (const capa of alfas) over = capa[p] + over * (1 - capa[p]);
+    if (a <= 0) {
+      if (over > 0) fuera += 1;
+      continue;
+    }
+    visible += 1;
     if (over === 0) huecos += 1;
     const d255 = (a - over) * 255;
     if (d255 > 0.5) deficit += 1;
     if (d255 > maxDeficit255) maxDeficit255 = d255;
+    if (-d255 > 20) exceso20 += 1;
   }
-  return { visible, huecos, deficit, maxDeficit255 };
+  return { visible, huecos, deficit, maxDeficit255, fuera, exceso20 };
 }
 
 let fuentes; let W; let H; let ideales;
@@ -105,6 +116,23 @@ describe('recomposición del rig contra la lámina aprobada', () => {
     const m = medir(fuentes.lamina, sinRespaldo);
     expect(m.huecos).toBeGreaterThan(400);
     expect(m.deficit).toBeGreaterThan(2000);
+  });
+
+  it('0 píxeles de compuesto FUERA de la silueta y exceso interior acotado (el dual del déficit: piel que sobra, no que falta)', () => {
+    const m = medir(fuentes.lamina, ideales);
+    // El recorte a silueta garantiza cero absoluto fuera del contorno.
+    expect(m.fuera).toBe(0);
+    // Dentro de la silueta queda el doblado de alfa sobre píxeles
+    // semitransparentes bajo solapes deliberados (rodilla, bases de oreja):
+    // 769 px medidos al introducir el recorte, filamentos de 1px pegados a
+    // contornos que el arte ya dibuja oscuros. Tope = medido + 15%.
+    expect(m.exceso20).toBeLessThan(769 * 1.15);
+  });
+
+  it('control NEGATIVO del recorte: con el cuerpo-inpaint SIN recortar reaparece la piel sintética bajo el vientre (4.721 px fuera de silueta)', () => {
+    const conCuerpoCrudo = { ...ideales, cuerpo: { alfa: fuentes.cuerpo, fuente: 'cuerpo' } };
+    const m = medir(fuentes.lamina, conCuerpoCrudo);
+    expect(m.fuera).toBeGreaterThan(4000);
   });
 
   it('anti-deriva: la masa del respaldo queda acotada (si una máscara regresa y abre costuras nuevas, el respaldo crecería en silencio — esto lo delata)', () => {
