@@ -4,7 +4,7 @@ import {
   CABEZA, OREJA_IZQ, OREJA_DER, MANDIBULA, BOCA,
   BRAZO_LAPIZ, BRAZO_BRUJULA, COLA, CUERPO_PIVOTE,
 } from './zariguyaLamina/anatomia.js';
-import { hornearZariguya } from './zariguyaLamina/capas.js';
+import { hornearZariguya, haySoporteCanvas } from './zariguyaLamina/capas.js';
 import { useVidaIdle, useRitmoPropio, useMiradaUsted } from './useVidaIdle.js';
 import { ZARIGUYA_SLUG } from './zariguyaIdentidad.js';
 import './zariguyaLamina/zariguyaLamina.css';
@@ -24,12 +24,107 @@ const ESTADO_CANON = {
    lámina aprobada (que ya sonríe con la boca abierta — abrir es abrir MÁS). */
 const JAW_DE_VISEMA = { V1: 0, V2: 0.42, V3: 1, V4: 0.36 };
 
+/* Pivote del PESO en el suelo, entre las dos patas (px de lámina): el
+   esqueleto de PIE carga el peso de una pata a la otra girando desde aquí
+   — medido sobre las patas de la lámina (izq x 125-210, der x 290-335,
+   contacto y≈425-435). Vive aquí y no en anatomia.js porque no corta capa:
+   es un hueso del rig, no una pieza de la piel. */
+const PESO_PIVOTE = [230, 430];
+
+/* ═══ DESGUANTE — manos de zarigüeya reales (pedido de Julieta) ═════════════
+   La lámina trae guantes blancos tipo Cuphead/Mickey; Julieta pidió manos de
+   verdad. NO se redibuja nada: se RETIÑE el blanco-papel del guante al tono
+   carne MEDIDO en las patas de la propia lámina (210,180,152 en los deditos),
+   conservando tinta, sombreado y lo que la mano sostiene. La matemática es
+   PARIDAD copy-paste con `_gate/zariguya-lamina/desguante-proto.mjs`, que la
+   verificó offline con sharp: 0 píxeles blanco-guante (L>205) residuales en
+   las dos manos, brújula y lápiz intactos.
+   Regiones y umbrales MEDIDOS (mismo método de anatomia.js):
+   - Mano del lápiz: elipse (60,180) r 52×50 — cubre guante + nudillos que
+     caen en la cápsula del antebrazo. El lápiz NO se excluye: su madera
+     clara comparte tono con el papel y el matiz carne la respeta (excluirlo
+     dejaba un halo blanco de guante pegado al eje, medido en el proto v1).
+   - Mano de la brújula: elipse (152,262) r 44×40 — incluye el puño. La CARA
+     de la brújula (pergamino, blancos hasta x≈128 y solo sobre y≈266) se
+     protege con un semiplano medido con fundido de 3.5px: el borde cae
+     dentro de la banda de tinta del contorno del dedo, invisible.
+   - Solo píxeles CLAROS (rampa de luminancia 170→210): la tinta del grabado
+     y el sombreado quedan intactos — la mano resultante es la MISMA mano,
+     desnuda. */
+const MANOS_DESNUDAS = [
+  { elipse: { cx: 60, cy: 180, rx: 52, ry: 50 }, guarda: null },
+  { elipse: { cx: 152, cy: 262, rx: 44, ry: 40 },
+    guarda: (x, y) => (y < 266 ? suave(129.5, 133, x) : 1) },
+];
+/* blanco-papel del guante medido (242,226,198) → carne de las patas. */
+const CARNE_F = [210 / 242, 180 / 226, 152 / 198];
+
+function suave(a, b, x) {
+  const t = Math.min(1, Math.max(0, (x - a) / (b - a)));
+  return t * t * (3 - 2 * t);
+}
+
+/** Retiñe in-place los blancos de guante a carne (bloque paridad del proto). */
+function desguantar(d, W, H) {
+  for (const { elipse, guarda } of MANOS_DESNUDAS) {
+    const { cx, cy, rx, ry } = elipse;
+    const x0 = Math.max(0, Math.floor(cx - rx));
+    const x1 = Math.min(W - 1, Math.ceil(cx + rx));
+    const y0 = Math.max(0, Math.floor(cy - ry));
+    const y1 = Math.min(H - 1, Math.ceil(cy + ry));
+    for (let y = y0; y <= y1; y++) {
+      for (let x = x0; x <= x1; x++) {
+        const rn = Math.hypot((x - cx) / rx, (y - cy) / ry);
+        if (rn > 1) continue;
+        const i = (y * W + x) * 4;
+        if (!d[i + 3]) continue;
+        const L = 0.299 * d[i] + 0.587 * d[i + 1] + 0.114 * d[i + 2];
+        let t = suave(170, 210, L) * (1 - suave(0.92, 1, rn));
+        if (guarda) t *= guarda(x, y);
+        if (!t) continue;
+        d[i] *= 1 - t * (1 - CARNE_F[0]);
+        d[i + 1] *= 1 - t * (1 - CARNE_F[1]);
+        d[i + 2] *= 1 - t * (1 - CARNE_F[2]);
+      }
+    }
+  }
+}
+
+/**
+ * Aplica el desguante a la lámina cargada y devuelve el lienzo listo para
+ * hornear. Defensivo como capas.js: sin Canvas2D real (o canvas tainted)
+ * devuelve la imagen tal cual — la lámina plana de respaldo (y el primer
+ * fotograma mientras hornea) conserva los guantes, honestamente: sin
+ * píxeles no hay retinte posible.
+ * @param {HTMLImageElement} img
+ * @returns {HTMLImageElement|HTMLCanvasElement}
+ */
+function desguantarLamina(img) {
+  if (!haySoporteCanvas()) return img;
+  const cv = document.createElement('canvas');
+  cv.width = ANCHO;
+  cv.height = ALTO;
+  const g = cv.getContext('2d', { willReadFrequently: true });
+  g.drawImage(img, 0, 0, ANCHO, ALTO);
+  let im;
+  try {
+    im = g.getImageData(0, 0, ANCHO, ALTO);
+  } catch {
+    return img;
+  }
+  desguantar(im.data, ANCHO, ALTO);
+  g.putImageData(im, 0, 0);
+  return cv;
+}
+
 /**
  * ZariguyaLaminaViva — la LÁMINA aprobada de la zarigüeya (`zariguya.png`,
- * estilo grabado: erguida, guante blanco con lápiz en la mano alzada,
- * brújula en la otra, cola prensil en C) recortada en capas por alfa y
- * montada sobre un rig con la VIDA de Angelita — hermana 1:1 de
- * `JaguarLaminaViva.jsx` (leer su docstring para el porqué del método).
+ * estilo grabado: erguida, lápiz en la mano alzada, brújula en la otra,
+ * cola prensil en C) recortada en capas por alfa y montada sobre un rig con
+ * la VIDA de Angelita — hermana 1:1 de `JaguarLaminaViva.jsx` (leer su
+ * docstring para el porqué del método). Los guantes blancos tipo Mickey de
+ * la lámina original se RETIÑEN a manos de zarigüeya reales al hornear
+ * (DESGUANTE, pedido de Julieta — ver el bloque arriba).
  *
  * DE DÓNDE SALE CADA COSA (reúso, no reinvento):
  *   · La PIEL y el corte por alfa: `zariguyaLamina/capas.js` + `anatomia.js`
@@ -44,12 +139,22 @@ const JAW_DE_VISEMA = { V1: 0, V2: 0.42, V3: 1, V4: 0.36 };
  *     mandíbula; pensando alza el LÁPIZ y escribe en el aire (para eso
  *     carga lápiz); idle vive (respira, la cola prensil se enrosca sola).
  *
- * QUÉ SÍ ARTICULA: parpadeo real de los dos ojos juntos con ritmo propio;
+ * QUÉ SÍ ARTICULA: parpadeo real de los dos ojos juntos con ritmo propio
+ * (cadencia un poco más pausada que la familia — pedido del operador);
  * mirada por giro de cabeza; orejas que se paran al escuchar; mandíbula con
  * lip-sync sobre la sonrisa abierta; el brazo del lápiz que escribe al
  * pensar; la manito de la brújula con micro-vaivén; la cola prensil que se
  * enrosca y mece; tanatosis (el gag: se hace la muerta un instante, ojos
  * cerrados) y husmeo del idle-cerebro.
+ *
+ * EL ESQUELETO DE PIE (huesos del rig, no piezas de la piel): además de los
+ * pivotes que cortan capa, el rig monta (a) el PESO — un pivote en el suelo
+ * entre las patas desde el que todo el cuerpo carga el peso de una pata a la
+ * otra, en idle como sway lento y en `caminando` como balanceo al compás del
+ * paso — y (b) dos MUÑECAS (pivote en el centro de cada mano) que dan
+ * follow-through a lo que sostiene: el lápiz tantea, la brújula se consulta.
+ * Amplitudes chicas a propósito (≤2°): la muñeca mueve el codo-costura tan
+ * poco como el hombro mueve la mano (misma tolerancia ya gateada).
  *
  * HONESTIDAD (lo que el dibujo plano NO da — no se disfraza):
  *   · Al abrir MÁS la boca se destapa una franja sin píxeles: la tapa el
@@ -124,7 +229,9 @@ export default function ZariguyaLaminaViva({
     img.decoding = 'async';
     img.onload = () => {
       if (!vivo) return;
-      const capas = hornearZariguya(img, { ancho: ANCHO, altoPx: ALTO });
+      // DESGUANTE antes de hornear: TODAS las capas (y el inpaint de pecho,
+      // que clona del mismo origen) heredan las manos desnudas coherentes.
+      const capas = hornearZariguya(desguantarLamina(img), { ancho: ANCHO, altoPx: ALTO });
       if (!capas || !vivo) return; // sin canvas → se queda en la lámina plana
       const montar = (cv, host) => {
         cv.style.position = 'absolute';
@@ -227,6 +334,12 @@ export default function ZariguyaLaminaViva({
           />
         )}
         <div style={{ position: 'absolute', inset: 0, display: listo ? 'block' : 'none' }}>
+          {/* EL PESO — hueso raíz del esqueleto de pie: gira desde el suelo,
+              entre las patas (sway de peso en idle; balanceo al caminar). */}
+          <div
+            className={cls('zlv-pesoPivote')}
+            style={{ position: 'absolute', inset: 0, transformOrigin: pctOf(PESO_PIVOTE) }}
+          >
           <div
             className={cls('zlv-cuerpoPivote')}
             style={{ position: 'absolute', inset: 0, transformOrigin: pctOf(CUERPO_PIVOTE) }}
@@ -238,15 +351,21 @@ export default function ZariguyaLaminaViva({
 
             <div ref={cuerpoHostRef} className="zlv-capa" />
 
-            {/* LA BRÚJULA en la manito contra el pecho — micro-vaivén; el
-                pecho detrás va inpaintado (capas.js), no se abre hueco. */}
+            {/* LA BRÚJULA en la manito contra el pecho — micro-vaivén del
+                hombro + MUÑECA que la consulta; el pecho detrás va
+                inpaintado (capas.js), no se abre hueco. */}
             <div className={cls('zlv-brazoBrujulaPivote')} style={{ position: 'absolute', inset: 0, transformOrigin: pctOf(BRAZO_BRUJULA.pivote) }}>
-              <div ref={brazoBrujulaHostRef} className="zlv-capa" />
+              <div className={cls('zlv-munecaBrujulaPivote')} style={{ position: 'absolute', inset: 0, transformOrigin: pctOf([BRAZO_BRUJULA.guante.cx, BRAZO_BRUJULA.guante.cy]) }}>
+                <div ref={brazoBrujulaHostRef} className="zlv-capa" />
+              </div>
             </div>
 
-            {/* EL LÁPIZ en la mano alzada — escribe en el aire al pensar. */}
+            {/* EL LÁPIZ en la mano alzada — escribe en el aire al pensar;
+                la MUÑECA tantea con follow-through. */}
             <div className={cls('zlv-brazoLapizPivote')} style={{ position: 'absolute', inset: 0, transformOrigin: pctOf(BRAZO_LAPIZ.pivote) }}>
-              <div ref={brazoLapizHostRef} className="zlv-capa" />
+              <div className={cls('zlv-munecaLapizPivote')} style={{ position: 'absolute', inset: 0, transformOrigin: pctOf([BRAZO_LAPIZ.guante.cx, BRAZO_LAPIZ.guante.cy]) }}>
+                <div ref={brazoLapizHostRef} className="zlv-capa" />
+              </div>
             </div>
 
             {/* LA CABEZA — tres envoltorios anidados (gesto → mira → idle),
@@ -292,6 +411,7 @@ export default function ZariguyaLaminaViva({
                 </div>
               </div>
             </div>
+          </div>
           </div>
         </div>
       </div>
