@@ -1,0 +1,10 @@
+export { default as JaguarAntes } from './jaguar/antes/JaguarLaminaVivaAntes.jsx';
+export { default as JaguarDespues } from '../JaguarLaminaViva.jsx';
+export { default as ZariguyaAntes } from './zariguya/antes/ZariguyaLaminaVivaAntes.jsx';
+export { default as ZariguyaDespues } from '../ZariguyaLaminaViva.jsx';
+export { default as LuciernagaAntes } from './luciernaga/antes/LuciernagaLaminaVivaAntes.jsx';
+export { default as LuciernagaDespues } from '../LuciernagaLaminaViva.jsx';
+export { default as OsoAntes } from './oso/antes/OsoBastonLaminaVivaAntes.jsx';
+export { default as OsoDespues } from '../OsoBastonLaminaViva.jsx';
+export { default as ChivitoAntes } from './chivito/antes/ChivitoPunkLaminaVivaAntes.jsx';
+export { default as ChivitoDespues } from '../ChivitoPunkLaminaViva.jsx';

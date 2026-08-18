@@ -1,4 +1,4 @@
-import Zariguya from '../visual/creatures/Zariguya';
+import ZariguyaLaminaViva from '../visual/creatures/ZariguyaLaminaViva';
 
 /**
  * ChagraAgentAvatarZariguya — la zarigüeya (crías al lomo) como CARA del
@@ -26,22 +26,6 @@ import Zariguya from '../visual/creatures/Zariguya';
  *                  sobre su sonrisa.
  *   - listening  → pose 'reposo': se posa erguida y atenta.
  */
-const POSE_DE_STATE = {
-    idle: 'anda',
-    thinking: 'anda',
-    speaking: 'celebra',
-    listening: 'reposo',
-};
-
-const HUSMEA_DE_STATE = {
-    thinking: true,
-};
-
-// eslint-disable-next-line chagra-i18n/no-hardcoded-spanish
-const VISEMA_DE_STATE = {
-    speaking: 'V2',
-};
-
 export default function ChagraAgentAvatarZariguya({
     state = 'idle',
     size = 48,
@@ -52,15 +36,11 @@ export default function ChagraAgentAvatarZariguya({
     className = '',
     ariaLabel = 'Chagra IA',
 }) {
-    const pose = POSE_DE_STATE[state] || 'anda';
-    const husmea = !!HUSMEA_DE_STATE[state];
-    const visema = VISEMA_DE_STATE[state] || null;
-
     const bicho = (
-        <Zariguya
-            pose={pose}
-            husmea={husmea}
-            visema={visema}
+        <ZariguyaLaminaViva
+            estado={state}
+            visema={state === 'speaking' ? 'V2' : null}
+            animated
             size={size}
             title={ariaLabel}
             className={className}

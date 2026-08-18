@@ -1,0 +1,249 @@
+/* chivitoLamina.css — LA VIDA DE ANGELITA sobre la piel de la lámina del
+ * chivito de páramo punk. Puerto del sistema del jaguar lámina-viva
+ * (jaguarLamina.css) vía el puerto más reciente (luciernagaLamina.css) a la
+ * anatomía y el CARÁCTER del chivito:
+ *
+ *   señal (hook/estado)                → qué pieza mueve, aquí
+ *   --rh-blink-dur/-delay (ritmo)      → parpadeo REAL de los dos ojos juntos,
+ *                                        cada instancia a su aire (cadencia rh)
+ *   data-rh-mira + --rh-mx/--rh-my     → la CABEZA gira siguiendo al usuario
+ *   data-vida=rockea|apunta|reposo     → el idle-cerebro (vidaEstados.js):
+ *                                        headbang punk (la cresta azota) /
+ *                                        escribe en el aire con el lápiz /
+ *                                        reposo con sacudón
+ *   data-agt-estado=listening          → ladea la testa atento + parpadea menos
+ *   data-agt-estado=speaking + --clv-jaw → pico inferior que habla (lip-sync)
+ *   data-agt-estado=thinking           → mira arriba y golpetea el lápiz
+ *   data-agt-estado=caminando          → bob saltarín de colibrí (el andar se
+ *                                        lee del roaming, como el jaguar)
+ *
+ * LA CRESTA PUNK NUNCA ES PIEZA APARTE: es la firma del personaje y viaja
+ * ENTERA dentro de la cabeza (regla dura de la orden) — el headbang de
+ * `rockea` la azota porque mueve la TESTA COMPLETA, no un recorte.
+ *
+ * Las PATAS, la LIBRETA con su ala y la COLA son estáticas (plantadas /
+ * abrazada / base oculta — límites honestos documentados en anatomia.js);
+ * se mueven solo CON el cuerpo (respiración).
+ *
+ * HONESTIDAD: el interior de boca (`.clv-bocaInterior`) es SINTÉTICO (la
+ * lámina tiene el pico cerrado). Es lo único que no sale del PNG. La mirada
+ * es GIRO DE CABEZA, no pupila suelta (recortar la pupila obligaría a
+ * repintar el iris que destapa — prohibido).
+ *
+ * Gates de la casa: reduced-motion congela todo en fotograma digno (párpado
+ * oculto, pico cerrado); `data-tier='bajo'` corta lo continuo. */
+
+.clv-stage {
+  position: relative;
+  display: block;
+  transform-origin: 50% 50%;
+  animation: clv-stageBob 4.2s ease-in-out infinite alternate;
+}
+@keyframes clv-stageBob {
+  from { transform: translateY(-0.6%); }
+  to   { transform: translateY(0.6%); }
+}
+
+.clv-capa {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+/* ═══ IDLE VIVO (por defecto) — alive-in-place ═══════════════════════════════
+   Respira, la testa cabecea suave (la cresta acompaña con el mismo giro),
+   la mano del lápiz se mece apenas. */
+.clv-cuerpoPivote { position: absolute; inset: 0; animation: clv-respira 3.6s ease-in-out infinite; }
+@keyframes clv-respira {
+  0%, 100% { transform: translateY(0) scale(1); }
+  50%      { transform: translateY(-0.4%) scale(1.012); }
+}
+
+.clv-cabezaGesto { position: absolute; inset: 0; }
+.clv-cabezaMira  { position: absolute; inset: 0; transition: transform 0.5s cubic-bezier(0.2, 0.7, 0.3, 1); }
+.clv-cabezaPivote { position: absolute; inset: 0; animation: clv-cabeza-idle 3.6s ease-in-out infinite; }
+@keyframes clv-cabeza-idle {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  50%      { transform: translateY(0.5%) rotate(0.6deg); }
+}
+
+/* la mano del lápiz — micro-mecido desde la muñeca (viva, no congelada). */
+.clv-manoPivote { position: absolute; inset: 0; animation: clv-mano-idle 4.6s ease-in-out infinite; }
+@keyframes clv-mano-idle {
+  0%, 100% { transform: rotate(0deg); }
+  50%      { transform: rotate(-2deg); }
+}
+
+/* ═══ PARPADEO REAL con RITMO PROPIO ═════════════════════════════════════════
+   Cadencia probada de la familia (rh-blink: un parpadeo suelto + un
+   blink-blink doble por vuelta, cierres ~110ms). Los dos ojos comparten
+   --rh-blink-dur/-delay (vars en la raíz) → cierran JUNTOS. Polaridad
+   invertida respecto al kit SVG: el párpado es un parche de piel que TAPA
+   el ojo — scaleY(0)=retraído (abierto), scaleY(1)=tapado (cerrado). */
+.clv-parpado {
+  position: absolute;
+  transform-origin: 50% 0%;
+  animation: clv-blink var(--rh-blink-dur, 5.6s) linear var(--rh-blink-delay, 0s) infinite;
+}
+@keyframes clv-blink {
+  0%, 36%, 40%, 74%, 78%, 82%, 86%, 100% { transform: scaleY(0); }  /* ojo abierto */
+  38% { transform: scaleY(1); }   /* parpadeo suelto */
+  76% { transform: scaleY(1); }   /* blink-blink: dos golpes seguidos */
+  80% { transform: scaleY(1); }
+}
+
+/* ═══ LA MIRADA — la cabeza sigue al usuario (useMiradaUsted) ════════════════ */
+[data-rh-mira='usted'] .clv-cabezaMira {
+  transform: translate(
+    calc(var(--rh-mx, 0px) * var(--clv-mira-k, 4)),
+    calc(var(--rh-my, 0px) * var(--clv-mira-k, 4))
+  );
+}
+
+/* ═══ MANDÍBULA / LIP-SYNC — el pico inferior baja con el visema ═════════════
+   --clv-jaw (0..1, del visema) baja el pico desde la comisura (abre en
+   tijera) y revela el interior sintético. En reposo (jaw=0) se ve EXACTO
+   como la lámina aprobada (el pico cerrado). */
+.clv-mandibulaPivote {
+  position: absolute;
+  inset: 0;
+  transition: transform 0.13s ease;
+  transform: translateY(calc(var(--clv-jaw, 0) * 1.6%)) rotate(calc(var(--clv-jaw, 0) * 3deg));
+}
+.clv-bocaInterior {
+  pointer-events: none;
+  background: radial-gradient(ellipse 100% 125% at 50% 0%, #5f2a24 0%, #3a1512 60%, #1c0a08 100%);
+  border-radius: 46% 46% 50% 50% / 20% 20% 86% 86%;
+  transform: scaleY(var(--clv-jaw, 0));
+  transition: transform 0.13s ease;
+}
+
+/* HABLA (speaking) — aleteo de pico MODULADO por el visema: incluso con un
+   visema estático (el adaptador manda 'V2') se ve hablando; con visemas
+   reales del lip-sync la amplitud sigue la voz. La testa acompaña con
+   énfasis chico (canta, es punk). */
+[data-agt-estado='speaking'] .clv-mandibulaPivote {
+  animation: clv-habla 0.34s ease-in-out infinite;
+}
+@keyframes clv-habla {
+  0%, 100% { transform: translateY(calc(var(--clv-jaw, 0.42) * 0.8%)) rotate(calc(var(--clv-jaw, 0.42) * 1.4deg)); }
+  50%      { transform: translateY(calc(var(--clv-jaw, 0.42) * 1.9%)) rotate(calc(var(--clv-jaw, 0.42) * 3.4deg)); }
+}
+[data-agt-estado='speaking'] .clv-bocaInterior {
+  animation: clv-habla-interior 0.34s ease-in-out infinite;
+}
+@keyframes clv-habla-interior {
+  0%, 100% { transform: scaleY(calc(var(--clv-jaw, 0.42) * 0.5)); }
+  50%      { transform: scaleY(calc(var(--clv-jaw, 0.42) * 1)); }
+}
+[data-agt-estado='speaking'] .clv-cabezaGesto { animation: clv-canta-cabeza 0.68s ease-in-out infinite; }
+@keyframes clv-canta-cabeza {
+  0%, 100% { transform: rotate(0deg) translateY(0); }
+  50%      { transform: rotate(0.8deg) translateY(-0.4%); }
+}
+
+/* ═══ ESCUCHA (listening) — ladea la testa atento, parpadea menos ════════════
+   (El chivito no tiene orejas ni antenas que parar: su atención es toda de
+   testa — se inclina hacia usted con twitch de pájaro, la cresta acompaña.) */
+[data-agt-estado='listening'] .clv-cabezaGesto { animation: clv-escucha-cabeza 2.8s ease-in-out infinite; }
+@keyframes clv-escucha-cabeza {
+  0%        { transform: rotate(0deg) translateY(0); }
+  20%, 100% { transform: rotate(-2.4deg) translateY(-0.5%); }
+  55%       { transform: rotate(-3.2deg) translateY(-0.7%); }   /* twitch de atención */
+  75%       { transform: rotate(-2.4deg) translateY(-0.5%); }
+}
+[data-agt-estado='listening'] .clv-parpado { animation-duration: calc(var(--rh-blink-dur, 5.2s) * 4.5); }
+[data-agt-estado='listening'] .clv-manoPivote { animation: none; }
+
+/* ═══ PIENSA (thinking) — mira arriba y GOLPETEA EL LÁPIZ (su firma de
+   escribano de páramo: piensa con la herramienta en la mano) ════════════════ */
+[data-agt-estado='thinking'] .clv-cabezaGesto { animation: clv-piensa-cabeza 4.6s ease-in-out infinite; }
+@keyframes clv-piensa-cabeza {
+  0%, 100% { transform: rotate(0deg) translateY(0); }
+  50%      { transform: rotate(-1.4deg) translateY(-1.2%); }
+}
+[data-agt-estado='thinking'] .clv-manoPivote { animation: clv-lapiz-tap 0.92s ease-in-out infinite; }
+@keyframes clv-lapiz-tap {
+  0%, 100% { transform: rotate(0deg); }
+  50%      { transform: rotate(-3.4deg); }
+}
+
+/* ═══ CAMINA (caminando) — bob saltarín; el andar se lee del roaming ═════════
+   (Mismo criterio honesto del jaguar: un dibujo plano de una sola pose no da
+   un gait por-pata sin fantasma; las patas están plantadas y quietas.) */
+[data-agt-estado='caminando'] .clv-cuerpoPivote { animation: clv-cuerpoBob 0.55s ease-in-out infinite; }
+@keyframes clv-cuerpoBob {
+  0%, 100% { transform: translateY(1.6%) rotate(0.4deg); }
+  50%      { transform: translateY(-2.2%) rotate(-0.4deg); }
+}
+[data-agt-estado='caminando'] .clv-cabezaPivote { animation: clv-cabezaBob 0.55s ease-in-out -0.12s infinite; }
+@keyframes clv-cabezaBob {
+  0%, 100% { transform: translateY(-1.6%) rotate(-0.5deg); }
+  50%      { transform: translateY(2%) rotate(0.5deg); }
+}
+
+/* ═══ IDLE-CEREBRO (data-vida) — los gestos del chivito (vidaEstados.js:
+   rockea 4×0.65s · apunta 4×0.8s · reposo 4.4s). Solo en idle. ═══════════════ */
+/* ROCKEA — el headbang punk: la testa (con TODA la cresta encima) azota al
+   compás; el cuerpo marca el pogo abajo. Giros chicos: es un avatar, no un
+   mosh pit — pero se lee. */
+[data-vida='rockea'] .clv-cabezaGesto { animation: clv-rockea-cabeza 0.65s ease-in-out infinite; }
+@keyframes clv-rockea-cabeza {
+  0%, 100% { transform: rotate(1.6deg) translateY(-0.8%); }
+  50%      { transform: rotate(-2.2deg) translateY(1%); }
+}
+[data-vida='rockea'] .clv-cuerpoPivote { animation: clv-rockea-pogo 0.65s ease-in-out infinite; }
+@keyframes clv-rockea-pogo {
+  0%, 100% { transform: translateY(0) scale(1); }
+  50%      { transform: translateY(-0.6%) scale(1.01); }
+}
+
+/* APUNTA — escribe en el aire con el lápiz (el escribano de páramo): la
+   mano gira desde la muñeca a ritmo de trazo, la testa sigue el apunte. */
+[data-vida='apunta'] .clv-manoPivote { animation: clv-apunta-mano 0.8s ease-in-out infinite; }
+@keyframes clv-apunta-mano {
+  0%, 100% { transform: rotate(0deg); }
+  35%      { transform: rotate(-4.5deg); }
+  70%      { transform: rotate(-1.5deg); }
+}
+[data-vida='apunta'] .clv-cabezaGesto { animation: clv-apunta-cabeza 3.2s ease-in-out infinite; }
+@keyframes clv-apunta-cabeza {
+  0%, 100% { transform: rotate(0deg); }
+  50%      { transform: rotate(1.8deg) translateY(0.5%); }   /* mira hacia el lápiz */
+}
+
+/* REPOSO — respira hondo y da un sacudón de cabeza al entrar (la firma
+   "me sacudo" de Angelita adaptada). 8.8s = 2× el dur del momento. */
+[data-vida='reposo'] .clv-cuerpoPivote { animation: clv-reposo-cuerpo 4.4s ease-in-out infinite; }
+@keyframes clv-reposo-cuerpo {
+  0%, 100% { transform: translateY(0) scale(1); }
+  50%      { transform: translateY(0.7%) scale(1.018); }
+}
+[data-vida='reposo'] .clv-cabezaGesto { animation: clv-reposo-cabeza 8.8s ease-in-out infinite; }
+@keyframes clv-reposo-cabeza {
+  0%, 12%, 100% { transform: rotate(0deg); }
+  3%  { transform: rotate(-2.4deg); }
+  6%  { transform: rotate(2.4deg); }
+  9%  { transform: rotate(-1deg); }
+}
+
+/* ═══ GATES DE LA CASA ═══════════════════════════════════════════════════════ */
+/* gama baja: corta lo continuo decorativo (el idle-cerebro y la mirada ya
+   los apaga el JS). */
+[data-tier='bajo'] .clv-stage,
+[data-tier='bajo'] .clv-cuerpoPivote,
+[data-tier='bajo'] .clv-cabezaPivote,
+[data-tier='bajo'] .clv-manoPivote { animation: none; }
+
+@media (prefers-reduced-motion: reduce) {
+  .clv-stage, .clv-cuerpoPivote, .clv-cabezaGesto, .clv-cabezaMira, .clv-cabezaPivote,
+  .clv-manoPivote, .clv-mandibulaPivote, .clv-bocaInterior, .clv-parpado {
+    animation: none !important;
+    transition: none !important;
+  }
+  .clv-cabezaMira, .clv-mandibulaPivote { transform: none !important; }
+  .clv-bocaInterior { transform: scaleY(0) !important; }  /* pico cerrado, digno */
+  .clv-parpado { visibility: hidden !important; }          /* ojos abiertos, quietos */
+}

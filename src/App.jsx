@@ -112,6 +112,7 @@ const ValleMarcoScreen = lazy(() => import('./components/ValleMarcoScreen'));
 // Vitrina pública de la librería visual reutilizable (`src/visual/`). Ruta
 // #/mockups/visual-lib, resuelta ANTES del check de sesión (no requiere auth).
 const VisualLib = lazy(() => import('./mockups/VisualLib'));
+const CompaiVitrina = lazy(() => import('./components/CompaiVitrina.jsx'));
 // ── Galería de mockups aspiracionales (diseño) ──────────────────────────────
 // Rutas públicas `#/mockups/<slug>`: vitrinas de discovery sin gate ni sesión
 // (datos de muestra, no tocan datos reales). Todas resuelven vía
@@ -757,6 +758,7 @@ const LoadingFallback = ({ view = null }) => {
 // check de sesión — cualquiera con el enlace las abre sin cuenta, igual que
 // #onboarding-piloto. El hash llega ya normalizado (sin `#`/`#/`).
 const MOCKUP_HASH_ROUTES = {
+  'compai-vitrina': 'compai_vitrina',
   'mockups/visual-lib': 'mockup_visual_lib',
   // Galería aspiracional (3D + voz + superficies definitivas + piezas de diseño).
   'mockups/entrada-3d': 'mockup_entrada_3d',
@@ -1386,6 +1388,11 @@ export default function App() {
     const hash = window.location.hash.replace(/^#\/?/, '').toLowerCase();
     const search = new URLSearchParams(window.location.search);
 
+    if (pathname === 'compai-vitrina') {
+      Promise.resolve().then(() => navigate('compai_vitrina'));
+      return;
+    }
+
     // Callback OAuth (Authorization Code + PKCE): farmOS redirige a
     // /callback?code=...&state=... tras /oauth/authorize. Detectamos la ruta
     // (pathname `callback`/`oauth/callback`, hash `callback`, o presencia de
@@ -1742,6 +1749,14 @@ export default function App() {
           <ErrorBoundary>
             <ErrorFallback moduleName="Librería visual">
               <VisualLib />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
+      case 'compai_vitrina':
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="Vitrina de compais">
+              <CompaiVitrina />
             </ErrorFallback>
           </ErrorBoundary>
         );

@@ -1,4 +1,4 @@
-import OsoBaston from '../visual/creatures/OsoBaston';
+import OsoBastonLaminaViva from '../visual/creatures/OsoBastonLaminaViva';
 
 /**
  * ChagraAgentAvatarOsoBaston — el oso del bastón (Tremarctos ornatus,
@@ -23,21 +23,6 @@ import OsoBaston from '../visual/creatures/OsoBaston';
  *   - speaking   → pose 'celebra' (el bastón late en flor) + visema.
  *   - listening  → pose 'reposo': se posa atento.
  */
-const POSE_DE_STATE = {
-    idle: 'anda',
-    thinking: 'anda',
-    speaking: 'celebra',
-    listening: 'reposo',
-};
-
-const RESOPLA_DE_STATE = {
-    thinking: true,
-};
-
-const VISEMA_DE_STATE = {
-    speaking: 'V2',
-};
-
 export default function ChagraAgentAvatarOsoBaston({
     state = 'idle',
     size = 48,
@@ -48,15 +33,11 @@ export default function ChagraAgentAvatarOsoBaston({
     className = '',
     ariaLabel = 'Chagra IA',
 }) {
-    const pose = POSE_DE_STATE[state] || 'anda';
-    const resopla = !!RESOPLA_DE_STATE[state];
-    const visema = VISEMA_DE_STATE[state] || null;
-
     const bicho = (
-        <OsoBaston
-            pose={pose}
-            resopla={resopla}
-            visema={visema}
+        <OsoBastonLaminaViva
+            estado={state}
+            visema={state === 'speaking' ? 'V2' : null}
+            animated
             size={size}
             title={ariaLabel}
             className={className}

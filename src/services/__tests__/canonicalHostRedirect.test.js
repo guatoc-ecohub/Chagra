@@ -4,6 +4,7 @@ import {
   CANONICAL_REDIRECT_GUARD_KEY,
   buildCanonicalUrl,
   isAllowedHost,
+  isCompaiVitrinaHost,
   isStagingHost,
   runCanonicalHostRedirectGuard,
 } from '../canonicalHostRedirect.js';
@@ -87,6 +88,11 @@ describe('canonicalHostRedirect', () => {
 
   it('permite 3d.guatoc.co (mundos 3D standalone) sin redirigir', () => {
     expect(isAllowedHost('3d.guatoc.co')).toBe(true);
+  });
+
+  it('permite el host público de la vitrina de compais', () => {
+    expect(isCompaiVitrinaHost('integracion-agente.guatoc.co')).toBe(true);
+    expect(isAllowedHost('integracion-agente.guatoc.co')).toBe(true);
   });
 
   it('NO permite otros subdominios de guatoc.co (host exacto, no wildcard)', () => {

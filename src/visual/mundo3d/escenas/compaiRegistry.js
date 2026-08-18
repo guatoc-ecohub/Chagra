@@ -32,7 +32,11 @@
  * useCompaiElegido, que ya viven ahí. JAMÁS importarlo desde el bundle base.
  */
 import { ABEJA_PRESENCIA } from '../../creatures/abejaIdentidad.js';
-import { Zariguya } from '../../creatures/Zariguya.jsx';
+import ZariguyaLaminaViva from '../../creatures/ZariguyaLaminaViva.jsx';
+import JaguarLaminaViva from '../../creatures/JaguarLaminaViva.jsx';
+import LuciernagaLaminaViva from '../../creatures/LuciernagaLaminaViva.jsx';
+import OsoBastonLaminaViva from '../../creatures/OsoBastonLaminaViva.jsx';
+import ChivitoPunkLaminaViva from '../../creatures/ChivitoPunkLaminaViva.jsx';
 import { ZARIGUYA_PRESENCIA } from '../../creatures/zariguyaIdentidad.js';
 import { JAGUAR_PRESENCIA } from '../../creatures/jaguarIdentidad.js';
 import { OSO_BASTON_PRESENCIA } from '../../creatures/osoBastonIdentidad.js';
@@ -95,7 +99,7 @@ const REGISTRO = {
   // de serie (su firma). Jamás vuela.
   zariguya: {
     EscenaComponent: ZariguyaCompaiEscena,
-    PortalComponent: Zariguya,
+    PortalComponent: ZariguyaLaminaViva,
     presencia: ZARIGUYA_PRESENCIA,
     especie: 'zariguya',
     pendienteFable: false,
@@ -107,17 +111,17 @@ const REGISTRO = {
   // pendiente — F26 solo cubrió la presencia 3D — así que el portal cruza
   // con el cuerpo de Angelita hasta que exista (regla del fallback, ver
   // cuerpoPortalDe en CompaiTransicion.jsx).
-  jaguar: { EscenaComponent: JaguarCompaiEscena, PortalComponent: null, presencia: JAGUAR_PRESENCIA, especie: 'jaguar', pendienteFable: false },
+  jaguar: { EscenaComponent: JaguarCompaiEscena, PortalComponent: JaguarLaminaViva, presencia: JAGUAR_PRESENCIA, especie: 'jaguar', pendienteFable: false },
   // El OSO DEL BASTÓN compañero (fable F26): caminante de trocha — llega a
   // pie, anda erguido y LENTO, se detiene a apoyarse en el cayado, y al
   // llegar a su marca el bastón FLORECE (su ecología hecha celebración).
   // PortalComponent pendiente, mismo criterio que el jaguar.
-  'oso-baston': { EscenaComponent: OsoBastonCompaiEscena, PortalComponent: null, presencia: OSO_BASTON_PRESENCIA, especie: 'oso-baston', pendienteFable: false },
+  'oso-baston': { EscenaComponent: OsoBastonCompaiEscena, PortalComponent: OsoBastonLaminaViva, presencia: OSO_BASTON_PRESENCIA, especie: 'oso-baston', pendienteFable: false },
   // La LUCIÉRNAGA compañera (fable F26): sí vuela, pero NO como la abeja —
   // se ENCIENDE por pulsos al entrar, deriva lento y bajo, PULSA luz, se
   // detiene a leer la noche y con alerta de finca titila 'degradado'.
   // PortalComponent pendiente, mismo criterio que el jaguar.
-  luciernaga: { EscenaComponent: LuciernagaCompaiEscena, PortalComponent: null, presencia: LUCIERNAGA_PRESENCIA, especie: 'luciernaga', pendienteFable: false },
+  luciernaga: { EscenaComponent: LuciernagaCompaiEscena, PortalComponent: LuciernagaLaminaViva, presencia: LUCIERNAGA_PRESENCIA, especie: 'luciernaga', pendienteFable: false },
   // La GUACAMAYA y el CHIVITO DE PÁRAMO (roster-7, 2026-08-14): ya tienen
   // cuerpo 2.5D en la PWA (GuacamayaCompai.jsx/ChivitoPunk.jsx, reusan el rig F24
   // del valle) pero TODAVÍA no tienen coreografía 3D propia — quedan
@@ -126,7 +130,7 @@ const REGISTRO = {
   // alguien las coreografíe, sus PRESENCIA de placeholder ya están sembradas
   // en `guacamayaIdentidad.js`/`chivitoIdentidad.js` (visual/creatures/).
   guacamaya: { EscenaComponent: null, PortalComponent: null, presencia: null, especie: 'guacamaya', pendienteFable: true },
-  'chivito-punk': { EscenaComponent: null, PortalComponent: null, presencia: null, especie: 'chivito-punk', pendienteFable: true },
+  'chivito-punk': { EscenaComponent: null, PortalComponent: ChivitoPunkLaminaViva, presencia: null, especie: 'chivito-punk', pendienteFable: true },
 };
 
 /**

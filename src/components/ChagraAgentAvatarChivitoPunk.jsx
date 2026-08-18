@@ -1,4 +1,4 @@
-import ChivitoPunk from '../visual/creatures/ChivitoPunk';
+import ChivitoPunkLaminaViva from '../visual/creatures/ChivitoPunkLaminaViva';
 
 /**
  * ChagraAgentAvatarChivitoPunk — el chivito de páramo (Oxypogon guerinii)
@@ -26,8 +26,10 @@ export default function ChagraAgentAvatarChivitoPunk({
     ariaLabel = 'Chagra IA',
 }) {
     const bicho = (
-        <ChivitoPunk
-            state={state}
+        <ChivitoPunkLaminaViva
+            estado={state}
+            visema={state === 'speaking' ? 'V2' : null}
+            animated
             size={size}
             title={ariaLabel}
             className={className}

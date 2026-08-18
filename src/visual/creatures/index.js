@@ -65,6 +65,13 @@ export {
 export { RanaAndina } from './RanaAndina.jsx';
 export { Ardilla } from './Ardilla.jsx';
 export { Jaguar } from './Jaguar.jsx';
+/* Láminas vivas de los compais: la misma piel aprobada que usa el selector
+   de agente, con rig, idle y movimiento en cada instancia. */
+export { default as JaguarLaminaViva } from './JaguarLaminaViva.jsx';
+export { default as ZariguyaLaminaViva } from './ZariguyaLaminaViva.jsx';
+export { default as LuciernagaLaminaViva } from './LuciernagaLaminaViva.jsx';
+export { default as OsoBastonLaminaViva } from './OsoBastonLaminaViva.jsx';
+export { default as ChivitoPunkLaminaViva } from './ChivitoPunkLaminaViva.jsx';
 /* La IDENTIDAD del jaguar como datos (paleta leonada + rosetas, proporciones y
    su perfil de clima). Solo datos: jamás arrastra three al bundle base — igual
    que abejaIdentidad/faunaAndina. */

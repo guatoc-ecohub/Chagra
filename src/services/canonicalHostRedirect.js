@@ -78,6 +78,10 @@ export function isThreeDWorldHost(hostname) {
   return normalizeHostname(hostname) === '3d.guatoc.co';
 }
 
+export function isCompaiVitrinaHost(hostname) {
+  return normalizeHostname(hostname) === 'integracion-agente.guatoc.co';
+}
+
 export function isAllowedHost(hostname) {
   return (
     isCanonicalHost(hostname) ||
@@ -85,7 +89,8 @@ export function isAllowedHost(hostname) {
     isPreviewHost(hostname) ||
     isProdAppHost(hostname) ||
     isStagingHost(hostname) ||
-    isThreeDWorldHost(hostname)
+    isThreeDWorldHost(hostname) ||
+    isCompaiVitrinaHost(hostname)
   );
 }
 

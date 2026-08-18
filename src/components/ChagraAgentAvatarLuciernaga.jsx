@@ -1,4 +1,4 @@
-import { Luciernaga } from '../visual/creatures/Luciernaga';
+import LuciernagaLaminaViva from '../visual/creatures/LuciernagaLaminaViva';
 
 /**
  * ChagraAgentAvatarLuciernaga — la luciérnaga (cocuyo, Lampyridae) como CARA
@@ -22,21 +22,6 @@ import { Luciernaga } from '../visual/creatures/Luciernaga';
  *   - speaking   → pose 'celebra' + visema del lip-sync.
  *   - listening  → pose 'reposo': se posa atenta.
  */
-const POSE_DE_STATE = {
-    idle: 'vuela',
-    thinking: 'vuela',
-    speaking: 'celebra',
-    listening: 'reposo',
-};
-
-const ECO_DE_STATE = {
-    thinking: 'leer',
-};
-
-const VISEMA_DE_STATE = {
-    speaking: 'V2',
-};
-
 export default function ChagraAgentAvatarLuciernaga({
     state = 'idle',
     size = 48,
@@ -47,16 +32,12 @@ export default function ChagraAgentAvatarLuciernaga({
     className = '',
     ariaLabel = 'Chagra IA',
 }) {
-    const pose = POSE_DE_STATE[state] || 'vuela';
-    const eco = ECO_DE_STATE[state] || null;
-    const visema = VISEMA_DE_STATE[state] || null;
-
     const bicho = (
-        <Luciernaga
-            pose={pose}
-            eco={eco}
-            visema={visema}
-            tier={undefined}
+        <LuciernagaLaminaViva
+            estado={state}
+            eco={state === 'thinking' ? 'leer' : null}
+            visema={state === 'speaking' ? 'V2' : null}
+            animated
             size={size}
             title={ariaLabel}
             className={className}

@@ -1,69 +1,61 @@
 /**
- * jaguarLamina/capas — hornea `jaguar-natural.png` en 5 capas por ALFA
- * (cuerpo + cabeza + patasDelanteras + pataTrasera + cola) más el parche de
- * párpado, puerto DOM/Canvas2D de `hornear()` en `~/demos/3d/juegos/
- * chagra-kart/js/piloto-lamina.js` («el piloto es la LÁMINA, y la lámina
- * ESTÁ VIVA») generalizado de 2 piezas (cuerpo/cabeza, más brazo opcional) a
- * 4, con PRIORIDAD entre ellas.
+ * jaguarLamina/capas — hornea las capas del jaguar-rig 2.5D en canvases
+ * listos para el ensamble de `JaguarLaminaViva.jsx`.
  *
- * EL MÉTODO (idéntico en espíritu al original — ver su docstring largo si
- * hace falta el porqué completo):
- *   - Todo el color sale del PNG. Aquí solo se decide, píxel a píxel, QUÉ
- *     ALFA le toca a cada capa — cero dibujo nuevo.
- *   - Cada pieza "de encima" (cabeza, patasDelanteras, pataTrasera, cola) se
- *     DESVANECE en el borde de su corte (`smoothstep`). El CUERPO de abajo
- *     NO se desvanece: se borra con corte duro SOLO donde una pieza de
- *     encima ya es ≥93% opaca — el mismo detalle que evita la banda
- *     translúcida en piloto-lamina.js.
- *   - Con 4 piezas (no 1) hace falta un ORDEN DE PRIORIDAD para que dos
- *     piezas nunca se disputen el mismo píxel al mismo tiempo (si no, ambas
- *     se pintan semi-opacas ahí y el compuesto sale más claro/oscuro de lo
- *     debido). Prioridad: cabeza > patasDelanteras > pataTrasera > cola >
- *     cuerpo. Cada máscara se multiplica por `(1 - máscara de mayor
- *     prioridad)` antes de decidir su propio borde — mismo patrón que usa
- *     piloto-lamina.js entre `mBrazo` y `mCabeza`.
- *   - El párpado es un parche de LA PROPIA lámina (el área ENCIMA del ojo,
- *     igual que `laminaCapas.js` del intento anterior — ver README ahí)
- *     recortado a elipse y alfa-recortado con la silueta real de la cabeza
- *     en el punto de destino. Desde el pulido `feat/jaguar-pulido`
- *     (2026-08-14) se hornean DOS parches (`parpado`/`parpado2`, uno por
- *     ojo) — antes solo se cortaba uno y el "parpadeo" era en realidad un
- *     guiño de un solo ojo. Los dos comparten el mismo `@keyframes`
- *     (parpadeo sincronizado, como un animal real) y el parche creció de
- *     2.1r×1.6r a 3.1r×2.6r (ver `parcheParpado`) — verificado con
- *     Playwright+Chromium que agrandarlo SÍ mueve la aguja (más píxeles con
- *     diferencia real entre abierto/cerrado a 48px), y que el resultado
- *     sigue leyendo como piel/pelo real (no un párpado dibujado) a 240px.
- *     BUG DE FONDO encontrado y corregido en este mismo pulido (no es un
- *     ajuste de tamaño, es la causa real de "no se ve"): el `<div>` que
- *     hostea cada `<canvas>` de párpado en `JaguarLaminaViva.jsx` tenía
- *     `position:absolute` SIN `inset:0` — sin tamaño definido en su
- *     contenedor, el ancho/alto en % del canvas resolvía a 0×0 (confirmado
- *     con `getBoundingClientRect` en Chromium real). El párpado de
- *     `feat/jaguar-lamina-sobre-esqueleto` no era "chico", NO RENDERIZABA.
- *   - Las patas delanteras son UN SOLO bloque (`PATAS_DEL`) — cortado del
- *     envolvente completo, sin dividirlas por color. La división en dos piezas
- *     `patasDelCerca`/`patasDelLejana` del pulido anterior se REVIRTIÓ: al
- *     rotar cada mitad por su lado el borde compartido fantasmeaba como un
- *     contorno doble ("las patas de adelante a veces se ven 3 y 4", feedback
- *     del operador). Un dibujo plano de una sola pose no se deja separar en un
- *     gait limpio; ver el docstring de `anatomia.js` (`PATAS_DEL`) para el
- *     porqué de fondo y el límite honesto.
+ * DE DÓNDE SALE CADA PIEZA (dos fuentes, misma registración 705×394):
+ *   · Capas PRE-CORTADAS del set de arte (`public/compai/laminas/jaguar-rig/`,
+ *     horneadas offline en `~/demos/3d/compai/rigs2d/jaguar/` — ver su
+ *     NOTAS.md): `cuerpo-inpaint.png` (cuerpo SIN patas/cabeza/cola, con los
+ *     píxeles ocultos rellenados por clonado de la propia lámina) y las 3
+ *     patas con alfa propio (`pata-del-lejana`, `pata-tras-cercana`,
+ *     `pata-tras-lejana`). Gracias al inpaint la base tiene EXACTAMENTE cero
+ *     patas: al montar las 4 piezas de pata hay 4 patas — nunca 6-7 fantasma.
+ *   · Cortes por ALFA sobre `jaguar-natural.png` (la lámina), con las rectas
+ *     MEDIDAS de `anatomia.js` — el mismo método smoothstep de
+ *     piloto-lamina.js («la lámina ESTÁ VIVA»): la CABEZA (face-safe: banda
+ *     del cuello + desvanecido de mandíbula — nunca un rectángulo que muerda
+ *     bigotes), sus piezas de vida (orejas/mandíbula/párpados), la COLA (con
+ *     la grupa, menos la ventana del muslo lejano) y la CUARTA pata
+ *     (delantera cercana naranja: envolvente `PATAS_DEL` × lado u>0 de
+ *     `CORTE_PATAS_DEL`).
  *
- * Defensivo por diseño: si `canvas.getContext('2d')` no está disponible
- * (jsdom sin el paquete `canvas`, navegador exótico) `hornearJaguar()`
- * devuelve `null` y el llamador se queda en el `<img>` plano de la lámina
- * completa — nunca truena, nunca pinta un rectángulo vacío.
+ * La geometría de recomposición (ventana del muslo, borde de cola, corte
+ * naranja) es un PUERTO 1:1 de `_build/lib.mjs` + `_build/build-cuerpo.mjs`
+ * del set de arte, cuya recomposición de control contra la lámina original
+ * dio 0.035% de huecos — ésa es la garantía de registración de este ensamble.
+ *
+ * PARA EL GAIT, cada pata se PARTE en dos segmentos rígidos por la rodilla
+ * medida (`factoresRodilla`): banda horizontal con SOLAPE de respaldo (el
+ * inferior sube 14px por encima del corte, el superior baja 10px por debajo)
+ * — al flexionar la rodilla el solape mantiene la articulación cubierta sin
+ * abrir fondo, el truco estándar del papel articulado (mismo espíritu que el
+ * anti-hueco de las orejas). Ambos segmentos son la MISMA piel: en reposo el
+ * compuesto es idéntico a la pieza entera.
+ *
+ * SECCIÓN PURA vs SECCIÓN CANVAS: toda la matemática de alfa (máscaras,
+ * partición de rodilla, alfa ideal de cada capa) vive en funciones PURAS
+ * exportadas (`mascaras`, `factoresRodilla`, `capasIdeales`) que no tocan el
+ * DOM: las consumen por igual `hornearJaguar` (que solo COLOREA esos alfas
+ * con los píxeles del PNG que corresponda) y el candado de recomposición de
+ * `__tests__` — sin fórmulas duplicadas que puedan divergir (la lección del
+ * verificador de la zarigüeya).
+ *
+ * Defensivo por diseño: sin `canvas.getContext('2d')` (jsdom sin el paquete
+ * `canvas`, navegador exótico) `hornearJaguar()` devuelve null y el llamador
+ * se queda en el `<img>` plano de la lámina completa — nunca truena, nunca
+ * pinta un rectángulo vacío. Lo mismo si falta cualquiera de las 5 imágenes.
  *
  * @module visual/creatures/jaguarLamina/capas
  */
 import {
-  CABEZA, OJO, OJO_2, PATAS_DEL, PATA_TRASERA, COLA,
+  CABEZA, OJO, OJO_2, PATAS_DEL,
   OREJA_IZQ, OREJA_DER, MANDIBULA,
+  CORTE_PATAS_DEL, RIG_MARCHA,
 } from './anatomia.js';
 
 const clamp = (v, a, b) => (v < a ? a : v > b ? b : v);
 const ss = (a, b, x) => { const t = clamp((x - a) / (b - a), 0, 1); return t * t * (3 - 2 * t); };
+const lerp = (a, b, t) => a + (b - a) * t;
 
 export function haySoporteCanvas() {
   if (typeof document === 'undefined') return false;
@@ -82,10 +74,31 @@ function lienzo(w, h) {
   return c;
 }
 
+/* ═══ SECCIÓN PURA — máscaras y alfas ideales (sin DOM) ═══════════════════ */
+
+/**
+ * Resta DURA para la capa de ABAJO de un par: conserva el píxel COMPLETO
+ * hasta que la pieza de encima es ~totalmente opaca. Con la resta blanda
+ * `(1-m)`, en la banda del desvanecido ambas capas quedan semiopacas y el
+ * compuesto over pierde alfa (0.5 over 0.5 = 0.75): ésa es la COSTURA — la
+ * banda pálida que se ve cruzando torso y anca. Con la resta dura el
+ * compuesto suma el alfa original completo en toda la banda (m + 1·(1-m) =
+ * 1) y la costura desaparece; al animarse, la pieza desliza sobre piel
+ * completa de respaldo en vez de sobre el residuo translúcido.
+ *
+ * El umbral 0.996 (antes 0.93 en los kits hermanos) deja el residuo máximo
+ * de la rampa en ~0,36/255 — por debajo del umbral medible de déficit
+ * (déficit = alfaOriginal − alfaCompuesto > 0,5/255, la métrica del informe
+ * del lote). Las VENTANAS (restas sobre la capa de ENCIMA para revelar lo de
+ * abajo, como la ventana del muslo) se quedan suaves: ahí la capa de abajo
+ * está intacta y no hay pérdida.
+ */
+export const hard = (m) => 1 - ss(0.996, 1, m);
+
 /** Máscara de la cabeza: banda proyectada sobre la recta del cuello, MÁS un
  *  desvanecido por Y (la cabeza no sigue existiendo bajo la mandíbula real —
- *  ver el docstring de `anatomia.js`, es lo que evita que la pata delantera
- *  quede clasificada como cabeza). */
+ *  ver el docstring de `anatomia.js`; es lo que hace el corte FACE-SAFE:
+ *  jamás un rectángulo que muerda bigotes u hocico). */
 function mascaraCabeza(x, y) {
   const { cuello, fadeMandibula } = CABEZA;
   const u = cuello.nx * (x - cuello.px) + cuello.ny * (y - cuello.py);
@@ -94,7 +107,8 @@ function mascaraCabeza(x, y) {
   return base * mandibula;
 }
 
-/** Máscara de un apéndice colgante (pata): caja en X con bordes suaves × banda de articulación en Y. */
+/** Máscara de un apéndice colgante: caja en X con bordes suaves × banda de
+ *  articulación en Y (el envolvente de las delanteras). */
 function mascaraApendice(x, y, { box, joint }) {
   const { x0, x1, xFade } = box;
   const fx = ss(x0, x0 + xFade, x) * (1 - ss(x1 - xFade, x1, x));
@@ -102,21 +116,57 @@ function mascaraApendice(x, y, { box, joint }) {
   return fx * fy;
 }
 
-/** Distancia (con signo) de (x,y) a la recta (px,py)+(nx,ny) — mismo formato que usan `CABEZA.cuello`/`COLA.cut`. */
-function proyeccion(x, y, corte) {
-  return corte.nx * (x - corte.px) + corte.ny * (y - corte.py);
+/** Pata delantera cercana (naranja): envolvente × lado u>0 del corte medido.
+ *  El respaldo detrás del filo ya no es la otra mitad del plano (eso
+ *  fantasmeaba "3-4 patas") sino la pata blanca PRE-CORTADA + el pecho
+ *  inpainted — ver el docstring de `CORTE_PATAS_DEL` en anatomia.js. */
+function mascaraPataNaranja(x, y) {
+  const c = CORTE_PATAS_DEL;
+  const u = c.nx * (x - c.px) + c.ny * (y - c.py);
+  return mascaraApendice(x, y, PATAS_DEL) * ss(c.u0, c.u1, u) * hard(mascaraCabeza(x, y));
 }
 
-/** Máscara de la cola: banda casi-vertical en su base. */
+/* ── Geometría de la ventana del muslo trasero lejano + borde de cola.
+ *    PUERTO 1:1 de `_build/lib.mjs` del set de arte (misma fuente que horneó
+ *    `cuerpo-inpaint.png`): pieza y ventana DEBEN casar exacto. ── */
+const interp = (pts, v) => {
+  if (v <= pts[0][0]) return pts[0][1];
+  for (let i = 1; i < pts.length; i++) {
+    if (v <= pts[i][0]) return lerp(pts[i - 1][1], pts[i][1], (v - pts[i - 1][0]) / (pts[i][0] - pts[i - 1][0]));
+  }
+  return pts[pts.length - 1][1];
+};
+const TAIL_IZQ = [[200, 545], [206, 547], [212, 550], [218, 553], [224, 555], [230, 558], [236, 562],
+  [242, 565], [248, 569], [254, 574], [260, 578], [266, 584], [272, 592], [278, 600], [284, 612], [290, 631]];
+const xTail = (y) => (y > 292 ? 700 : interp(TAIL_IZQ, y));
+
+/** Ventana por la que se ve la pata trasera lejana (franja del muslo + tira
+ *  junto a la grupa + tramo libre bajo la grupa — polígonos medidos por runs
+ *  de alfa en el set de arte). Se resta de la COLA (el cuerpo-inpaint ya la
+ *  trae transparente). */
+function ventanaTrasLejana(x, y) {
+  const noTail = 1 - ss(xTail(y) - 6, xTail(y) - 1, x);
+  const xSliv = interp([[210, 545], [232, 540], [254, 522]], y);
+  const sliver = ss(498, 504, x) * (1 - ss(xSliv - 3, xSliv + 2, x)) * ss(208, 215, y) * (1 - ss(246, 254, y)) * noTail;
+  const xStr = interp([[250, 556], [270, 547], [290, 536]], y);
+  const strip = ss(xStr - 3, xStr + 3, x) * (1 - ss(586, 592, x)) * ss(246, 254, y) * (1 - ss(288, 296, y)) * noTail;
+  const libre = ss(514, 520, x) * (1 - ss(592, 598, x)) * ss(288, 296, y) * (1 - ss(372, 378, y));
+  return Math.max(sliver, Math.max(strip, libre));
+}
+
+/** Máscara de la COLA (incluye la grupa desde x≈465, como el hueso
+ *  `colaLadoOndea` del rig viejo): banda vertical en la base, menos la
+ *  cabeza, menos la banda de inserción de la pata trasera cercana, menos la
+ *  ventana del muslo lejano. Fórmula 1:1 de `build-cuerpo.mjs`. */
 function mascaraCola(x, y) {
-  return ss(COLA.cut.u0, COLA.cut.u1, proyeccion(x, y, COLA.cut));
+  return ss(-20, 20, x - 465) * hard(mascaraCabeza(x, y))
+    * (1 - ss(228, 258, y) * ss(455, 470, x) * (1 - ss(575, 590, x)))
+    * (1 - ventanaTrasLejana(x, y));
 }
 
 /** Máscara de una OREJA: caja en X (bordes suaves) × desvanecido hacia la
  *  BASE (opaca arriba —la punta—, se funde a 0 hacia abajo donde nace del
- *  cráneo, que no tiene borde de alfa propio). Igual patrón que las patas
- *  (`mascaraApendice`) pero con la Y invertida (la oreja "cuelga hacia
- *  arriba"). */
+ *  cráneo, que no tiene borde de alfa propio). */
 function mascaraOreja(x, y, { box, base }) {
   const { x0, x1, xFade } = box;
   const fx = ss(x0, x0 + xFade, x) * (1 - ss(x1 - xFade, x1, x));
@@ -143,111 +193,306 @@ function mascaraMandibula(x, y) {
   const { box, labio, menton } = MANDIBULA;
   const { x0, x1, xFade } = box;
   const fx = ss(x0, x0 + xFade, x) * (1 - ss(x1 - xFade, x1, x));
-  // opaca ENTRE el labio (arriba) y el fin del mentón (abajo): la mandíbula
-  // es solo el maxilar inferior, no baja al cuello.
   const fy = ss(labio.y0, labio.y1, y) * (1 - ss(menton.y0, menton.y1, y));
   return fx * fy;
 }
 
 /**
- * Hornea las 5 capas + el parche de párpado a partir de la imagen ya
- * cargada. Devuelve canvases del MISMO tamaño que el PNG (comparten
- * encuadre — cero cuentas de UV por capa).
- * @param {HTMLImageElement} img
- * @param {{ancho?: number, altoPx?: number}} [dims]  fallback si `img` aún
- *   no cargó (naturalWidth/Height en 0) — en producción no debería hacer
- *   falta, pero blinda contra un `onload` que dispara antes de tiempo.
- * @returns {{W:number,H:number,cuerpo:HTMLCanvasElement,cabeza:HTMLCanvasElement,
- *   orejaIzq:HTMLCanvasElement,orejaDer:HTMLCanvasElement,mandibula:HTMLCanvasElement,
- *   patasDel:HTMLCanvasElement,
- *   pataTrasera:HTMLCanvasElement,cola:HTMLCanvasElement,
- *   parpado:{cv:HTMLCanvasElement,x0:number,y0:number,w:number,h:number},
- *   parpado2:{cv:HTMLCanvasElement,x0:number,y0:number,w:number,h:number}}|null}
+ * El juego COMPLETO de máscaras con sus prioridades resueltas — una sola
+ * fuente de verdad para `capasIdeales` (y por lo tanto para el runtime y
+ * para el candado de recomposición de `__tests__`).
  */
-export function hornearJaguar(img, dims = {}) {
-  const { ancho, altoPx } = dims;
-  if (!haySoporteCanvas()) return null;
-  const W = img.naturalWidth || ancho;
-  const H = img.naturalHeight || altoPx;
-  if (!W || !H) return null;
-
-  const base = lienzo(W, H);
-  const bctx = base.getContext('2d', { willReadFrequently: true });
-  bctx.drawImage(img, 0, 0, W, H);
-  let src;
-  try {
-    src = bctx.getImageData(0, 0, W, H);
-  } catch {
-    // canvas "tainted" (CORS) o getImageData no implementado.
-    return null;
-  }
-  const sd = src.data;
-
-  // Prioridad: cabeza > patasDel > pataTrasera > cola > cuerpo. Cada una se
-  // calcula EXCLUYENDO lo que ya reclamaron las de mayor prioridad — así dos
-  // piezas nunca compiten semi-opacas por el mismo píxel. Las patas delanteras
-  // son UN SOLO bloque (`PATAS_DEL`): ya no hay corte interno entre dos mitades
-  // que, al rotar en fases distintas, fantasmeaba como "3-4 patas" (ver el
-  // docstring de este módulo y de `anatomia.js`).
-  // `mCabeza` es la cabeza COMPLETA (incluye orejas y mandíbula): se usa para
-  // (a) excluir la cabeza de las demás piezas y (b) el corte duro del cuerpo —
-  // así el cuerpo sigue borrándose bajo TODA la testa, orejas y mandíbula
-  // incluidas (sin esto el cuerpo reclamaría los píxeles de oreja/mandíbula que
-  // ahora la cabeza-render no pinta → 0% de píxeles perdidos se mantiene).
+export function mascaras() {
   const mCabeza = (x, y) => mascaraCabeza(x, y);
-  // Piezas NUEVAS de la vida: las orejas (arriba de todo) y la mandíbula
-  // (mitad inferior de la cara). Se recortan DENTRO de la cabeza (× mCabeza)
-  // para no invadir cuello/cuerpo, y se RESTAN de la cabeza-render (abajo).
   const mOrejaIzq = (x, y) => mascaraOreja(x, y, OREJA_IZQ) * mCabeza(x, y);
   const mOrejaDer = (x, y) => mascaraOreja(x, y, OREJA_DER) * mCabeza(x, y);
   const mMandibula = (x, y) => mascaraMandibula(x, y) * mCabeza(x, y);
-  // La cabeza que se PINTA = cabeza completa menos lo que ahora vive aparte. Las
-  // orejas se restan por su parte ALTA (`mascaraOrejaSub`): la BASE queda en la
-  // cabeza de respaldo (anti-hueco al rotar). La oreja-pieza (arriba, con la
-  // máscara completa) tapa esa base en reposo → compuesto idéntico. La
-  // mandíbula sí se resta entera (baja en bloque, no rota desde dentro).
+  // Restas DURAS (ver `hard`): la cabeza conserva el píxel completo bajo el
+  // desvanecido de orejas y mandíbula — cero costura en reposo, y al abrir
+  // la boca o girar la oreja se revela piel real, no un anillo translúcido.
   const mCabezaRender = (x, y) => mCabeza(x, y)
-    * (1 - mascaraOrejaSub(x, y, OREJA_IZQ)) * (1 - mascaraOrejaSub(x, y, OREJA_DER))
-    * (1 - mMandibula(x, y));
-  const mPatasDel = (x, y) => mascaraApendice(x, y, PATAS_DEL) * (1 - mCabeza(x, y));
-  const mPataTrasera = (x, y) => mascaraApendice(x, y, PATA_TRASERA) * (1 - mCabeza(x, y));
-  const mCola = (x, y) => mascaraCola(x, y) * (1 - mCabeza(x, y)) * (1 - mPataTrasera(x, y));
-  const hard = (m) => 1 - ss(0.93, 1.0, m);
-  const mCuerpo = (x, y) => hard(mCabeza(x, y)) * hard(mPatasDel(x, y))
-    * hard(mPataTrasera(x, y)) * hard(mCola(x, y));
+    * hard(mascaraOrejaSub(x, y, OREJA_IZQ)) * hard(mascaraOrejaSub(x, y, OREJA_DER))
+    * hard(mMandibula(x, y));
+  return {
+    mCabezaRender,
+    mOrejaIzq,
+    mOrejaDer,
+    mMandibula,
+    mPataNaranja: mascaraPataNaranja,
+    mCola: mascaraCola,
+  };
+}
 
-  const pintar = (mascara) => {
+/** Solape de respaldo del corte de rodilla (px de lámina): el segmento
+ *  inferior sube por encima del corte y el superior baja por debajo — al
+ *  flexionar, la articulación queda siempre cubierta por piel propia. */
+export const RODILLA_SOLAPE = { supHasta: 10, supFeather: 8, infDesde: 14, infFeather: 6 };
+
+/** Factores de partición sup/inf de una pata en la Y dada (rodilla en
+ *  `corteY`): la banda de solape donde ambos son 1 es el anti-hueco. */
+export function factoresRodilla(y, corteY) {
+  const { supHasta, supFeather, infDesde, infFeather } = RODILLA_SOLAPE;
+  return {
+    fSup: 1 - ss(corteY + supHasta - supFeather, corteY + supHasta, y),
+    fInf: ss(corteY - infDesde, corteY - infDesde + infFeather, y),
+  };
+}
+
+/**
+ * capasIdeales — el ALFA ideal (float, sin redondeo de canvas) de CADA capa
+ * del ensamble, a partir de los alfas de los 5 PNG. Es la verdad única que
+ * `hornearJaguar` pinta y que el candado de recomposición verifica.
+ *
+ * @param {{lamina:Float32Array, cuerpo:Float32Array, delLejana:Float32Array,
+ *   trasCercana:Float32Array, trasLejana:Float32Array}} fuentes  alfas 0..1
+ * @param {number} W
+ * @param {number} H
+ * @returns {Object<string, {alfa: Float32Array, fuente: string}>}  por capa:
+ *   su alfa ideal y de QUÉ PNG salen sus colores.
+ */
+/**
+ * Recorte a SILUETA: ninguna capa del rig puede aportar alfa donde la lámina
+ * no tiene píxel. Los PNG horneados DESBORDAN el contorno aprobado
+ * (`cuerpo-inpaint` 4.721 px de piel sintética bajo la línea del vientre,
+ * medido 2026-08-18; las patas lejanas ~430 px más) y en reposo esa piel
+ * sobrante quedaba A LA VISTA sobre el fondo: la franja horizontal con
+ * muesca bajo el vientre. Es el dual del déficit: el candado medía "alfa que
+ * falta" pero no "alfa que sobra". El recorte vive en el espacio del canvas,
+ * así que viaja con la pieza al animarse: una pata rotada muestra solo
+ * píxeles que existían dentro de la silueta, reubicados por el transform.
+ */
+export function recortarASilueta(src, silueta, N) {
+  const out = new Float32Array(N);
+  for (let p = 0; p < N; p++) out[p] = Math.min(src[p], silueta[p]);
+  return out;
+}
+
+export function capasIdeales(fuentes, W, H) {
+  const m = mascaras();
+  const N = W * H;
+  const rig = {};
+  for (const clave of ['cuerpo', 'delLejana', 'trasCercana', 'trasLejana']) {
+    rig[clave] = recortarASilueta(fuentes[clave], fuentes.lamina, N);
+  }
+
+  const capaMascara = (mask) => {
+    const alfa = new Float32Array(N);
+    for (let y = 0; y < H; y++) {
+      for (let x = 0; x < W; x++) {
+        const p = y * W + x;
+        const a = fuentes.lamina[p];
+        if (a > 0) alfa[p] = a * clamp(mask(x, y), 0, 1);
+      }
+    }
+    return alfa;
+  };
+
+  const partir = (alfaBase, corteY) => {
+    const sup = new Float32Array(N);
+    const inf = new Float32Array(N);
+    for (let y = 0; y < H; y++) {
+      const { fSup, fInf } = factoresRodilla(y, corteY);
+      for (let x = 0; x < W; x++) {
+        const p = y * W + x;
+        const a = alfaBase[p];
+        if (!a) continue;
+        if (fSup > 0) sup[p] = a * fSup;
+        if (fInf > 0) inf[p] = a * fInf;
+      }
+    }
+    return { sup, inf };
+  };
+
+  const capas = {};
+  capas.cuerpo = { alfa: rig.cuerpo, fuente: 'cuerpo' };
+  for (const clave of ['delLejana', 'trasCercana', 'trasLejana']) {
+    const { sup, inf } = partir(rig[clave], RIG_MARCHA[clave].rodillaCorte);
+    capas[`${clave}-sup`] = { alfa: sup, fuente: clave };
+    capas[`${clave}-inf`] = { alfa: inf, fuente: clave };
+  }
+  {
+    const naranja = capaMascara(m.mPataNaranja);
+    const { sup, inf } = partir(naranja, RIG_MARCHA.delCercana.rodillaCorte);
+    capas['delCercana-sup'] = { alfa: sup, fuente: 'lamina' };
+    capas['delCercana-inf'] = { alfa: inf, fuente: 'lamina' };
+  }
+  capas.cola = { alfa: capaMascara(m.mCola), fuente: 'lamina' };
+  capas.cabeza = { alfa: capaMascara(m.mCabezaRender), fuente: 'lamina' };
+  capas.orejaIzq = { alfa: capaMascara(m.mOrejaIzq), fuente: 'lamina' };
+  capas.orejaDer = { alfa: capaMascara(m.mOrejaDer), fuente: 'lamina' };
+  capas.mandibula = { alfa: capaMascara(m.mMandibula), fuente: 'lamina' };
+
+  /* ── RESPALDO DE COSTURAS — piel estática de la propia lámina, al FONDO
+     del apilado. Dos términos, cero color inventado:
+
+     1. BANDAS: alrededor de todo corte INTERNO (píxel de capa con alfa
+        parcial donde la lámina es opaca — la silueta AA queda fuera porque
+        ahí la lámina también es parcial), dilatadas ±10px. Es el `baseSub`
+        de las orejas generalizado: cuando cola/cabeza/pata deslizan su
+        desvanecido fuera del complemento horneado (respira, mira, gait),
+        siempre caen sobre piel completa — la costura tampoco se abre EN
+        MOVIMIENTO. Las bandas viven solo en articulaciones y cortes (nunca
+        una extremidad entera): no hay patas fantasma.
+
+     2. RELLENO EXACTO en reposo: donde el compuesto over de todas las capas
+        aún queda por debajo del alfa de la lámina (las fronteras horneadas
+        de los PNG del rig, que el runtime no puede reformar), el respaldo
+        aporta exactamente el alfa que falta — la recomposición da la lámina
+        EXACTA (0 huecos totalmente transparentes Y 0 píxeles con déficit
+        alfa > 0,5/255, la métrica del informe del lote). ── */
+  {
+    const compuesto = new Float32Array(N);
+    const banda = new Uint8Array(N);
+    for (const { alfa } of Object.values(capas)) {
+      for (let p = 0; p < N; p++) {
+        const a = alfa[p];
+        if (a > 0) compuesto[p] = a + compuesto[p] * (1 - a);
+        if (a > 0.02 && a < 0.98 && fuentes.lamina[p] > 0.98) banda[p] = 1;
+      }
+    }
+    const RADIO = 10;
+    const dilatada = new Uint8Array(N);
+    const paso = new Uint8Array(N);
+    for (let y = 0; y < H; y++) {
+      for (let x = 0; x < W; x++) {
+        const p = y * W + x;
+        for (let k = Math.max(0, x - RADIO); k <= Math.min(W - 1, x + RADIO); k++) {
+          if (banda[y * W + k]) { paso[p] = 1; break; }
+        }
+      }
+    }
+    for (let y = 0; y < H; y++) {
+      for (let x = 0; x < W; x++) {
+        const p = y * W + x;
+        for (let k = Math.max(0, y - RADIO); k <= Math.min(H - 1, y + RADIO); k++) {
+          if (paso[k * W + x]) { dilatada[p] = 1; break; }
+        }
+      }
+    }
+    const respaldo = new Float32Array(N);
+    for (let p = 0; p < N; p++) {
+      const a = fuentes.lamina[p];
+      if (a <= 0) continue;
+      // La banda solo aporta piel COMPLETA donde la lámina es ~opaca: sobre
+      // la textura semitransparente (pelo suelto, bigotes) duplicar alfa la
+      // endurecería; ahí basta el relleno exacto del reposo.
+      if (dilatada[p] && a > 0.98) {
+        respaldo[p] = a;
+      } else if (compuesto[p] < a && compuesto[p] < 0.9999) {
+        respaldo[p] = (a - compuesto[p]) / (1 - compuesto[p]);
+      }
+    }
+    capas.respaldo = { alfa: respaldo, fuente: 'lamina' };
+  }
+  return capas;
+}
+
+/* ═══ SECCIÓN CANVAS — colorear los alfas ideales con la piel real ════════ */
+
+/** Dibuja una imagen ya cargada en un lienzo W×H y devuelve sus píxeles.
+ *  null si el canvas queda "tainted" (CORS) o la imagen no midió. */
+function pixelesDe(img, W, H) {
+  const cv = lienzo(W, H);
+  const g = cv.getContext('2d', { willReadFrequently: true });
+  g.drawImage(img, 0, 0, W, H);
+  try {
+    return { cv, datos: g.getImageData(0, 0, W, H).data };
+  } catch {
+    return null;
+  }
+}
+
+/** El canal alfa 0..1 de un RGBA ya extraído. */
+function alfaDe(datos, N) {
+  const alfa = new Float32Array(N);
+  for (let p = 0; p < N; p++) alfa[p] = datos[p * 4 + 3] / 255;
+  return alfa;
+}
+
+/**
+ * Hornea el set completo del rig a partir de las 5 imágenes ya cargadas.
+ * Devuelve canvases del MISMO tamaño que la lámina (comparten encuadre —
+ * cero cuentas de UV por capa).
+ *
+ * @param {{lamina: HTMLImageElement, cuerpo: HTMLImageElement,
+ *   delLejana: HTMLImageElement, trasCercana: HTMLImageElement,
+ *   trasLejana: HTMLImageElement}} imagenes
+ * @param {{ancho?: number, altoPx?: number}} [dims]  fallback si la lámina
+ *   aún no midió (naturalWidth/Height en 0).
+ * @returns {{W:number, H:number, respaldo:HTMLCanvasElement,
+ *   cuerpo:HTMLCanvasElement,
+ *   cola:HTMLCanvasElement, cabeza:HTMLCanvasElement,
+ *   orejaIzq:HTMLCanvasElement, orejaDer:HTMLCanvasElement,
+ *   mandibula:HTMLCanvasElement,
+ *   patas:Object<string,{superior:HTMLCanvasElement, inferior:HTMLCanvasElement}>,
+ *   parpado:{cv:HTMLCanvasElement,x0:number,y0:number,w:number,h:number},
+ *   parpado2:{cv:HTMLCanvasElement,x0:number,y0:number,w:number,h:number}}|null}
+ */
+export function hornearJaguar(imagenes, dims = {}) {
+  if (!imagenes || !imagenes.lamina) return null;
+  const { ancho, altoPx } = dims;
+  if (!haySoporteCanvas()) return null;
+  const W = imagenes.lamina.naturalWidth || ancho;
+  const H = imagenes.lamina.naturalHeight || altoPx;
+  if (!W || !H) return null;
+  for (const clave of ['cuerpo', 'delLejana', 'trasCercana', 'trasLejana']) {
+    if (!imagenes[clave]) return null;
+  }
+
+  const N = W * H;
+  const rgbas = {};
+  const alfas = {};
+  for (const clave of ['lamina', 'cuerpo', 'delLejana', 'trasCercana', 'trasLejana']) {
+    const px = pixelesDe(imagenes[clave], W, H);
+    if (!px) return null;
+    rgbas[clave] = px.datos;
+    alfas[clave] = alfaDe(px.datos, N);
+  }
+
+  const ideales = capasIdeales(alfas, W, H);
+
+  /* Colorea un alfa ideal con los píxeles del PNG fuente (el color SIEMPRE
+     sale de un PNG del set; aquí solo se aplica el alfa ya decidido). */
+  const pintarCapa = ({ alfa, fuente }) => {
+    const sd = rgbas[fuente];
     const cv = lienzo(W, H);
     const g = cv.getContext('2d');
     const im = g.createImageData(W, H);
     const d = im.data;
-    for (let y = 0; y < H; y++) {
-      for (let x = 0; x < W; x++) {
-        const i = (y * W + x) * 4;
-        const a = sd[i + 3];
-        if (!a) { d[i + 3] = 0; continue; }
-        d[i] = sd[i]; d[i + 1] = sd[i + 1]; d[i + 2] = sd[i + 2];
-        d[i + 3] = a * mascara(x, y);
-      }
+    for (let p = 0; p < N; p++) {
+      const a = alfa[p];
+      if (a <= 0) continue;
+      const i = p * 4;
+      d[i] = sd[i]; d[i + 1] = sd[i + 1]; d[i + 2] = sd[i + 2];
+      d[i + 3] = a * 255;
     }
     g.putImageData(im, 0, 0);
     return cv;
   };
 
+  const patas = {};
+  for (const clave of Object.keys(RIG_MARCHA)) {
+    patas[clave] = {
+      superior: pintarCapa(ideales[`${clave}-sup`]),
+      inferior: pintarCapa(ideales[`${clave}-inf`]),
+    };
+  }
+
+  const sd = rgbas.lamina;
   const parpado = parcheParpado(sd, W, H, OJO);
   const parpado2 = parcheParpado(sd, W, H, OJO_2);
 
   return {
     W,
     H,
-    cuerpo: pintar(mCuerpo),
-    cabeza: pintar(mCabezaRender),
-    orejaIzq: pintar(mOrejaIzq),
-    orejaDer: pintar(mOrejaDer),
-    mandibula: pintar(mMandibula),
-    patasDel: pintar(mPatasDel),
-    pataTrasera: pintar(mPataTrasera),
-    cola: pintar(mCola),
+    respaldo: pintarCapa(ideales.respaldo),
+    cuerpo: pintarCapa(ideales.cuerpo),
+    cola: pintarCapa(ideales.cola),
+    cabeza: pintarCapa(ideales.cabeza),
+    orejaIzq: pintarCapa(ideales.orejaIzq),
+    orejaDer: pintarCapa(ideales.orejaDer),
+    mandibula: pintarCapa(ideales.mandibula),
+    patas,
     parpado,
     parpado2,
   };
@@ -261,18 +506,10 @@ export function hornearJaguar(img, dims = {}) {
  *
  * `pulido 2026-08-14`: el parche creció de 2.1r×1.6r a 3.1r×2.6r — a 22px de
  * radio en la lámina (705px de ancho), el ojo entero mide apenas 3-4px reales
- * en pantalla a tamaño de avatar (48px totales, ver `JaguarLaminaViva.jsx`
- * para el bug de fondo — `inset:0` faltante — que antes dejaba el párpado en
- * 0×0). Con el bug ya corregido, se midió con Playwright+Chromium (captura
- * real, congelando animaciones y comparando abierto/cerrado píxel a píxel)
- * que agrandar el parche de 2.5r×2.1r a 3.1r×2.6r sube el conteo de píxeles
- * con cambio real (diff>30 en 0-765) de 104 a 154 sobre ~48×27px de imagen —
- * mejora medible, no solo estética. Sigue siendo piel/pelo propio del animal
- * (nunca se inventa un párpado dibujado) — solo se agranda el RECORTE, no se
- * cambia la técnica. A 48px el cambio sigue siendo sutil (el piso está en
- * cuántos píxeles reales tiene el ojo en la foto fuente, no en el código);
- * a partir de ~100-150px de avatar el parpadeo se ve completo y convincente
- * (verificado visualmente, ver el reporte de la tarea).
+ * en pantalla a tamaño de avatar. Verificado con Playwright+Chromium que
+ * agrandarlo SÍ mueve la aguja (píxeles con cambio real 104→154 a 48px) y que
+ * sigue leyendo como piel/pelo real a 240px. Sigue siendo piel propia del
+ * animal — solo se agranda el RECORTE, no se cambia la técnica.
  */
 function parcheParpado(sd, W, H, ojo) {
   const { cx, cy, r } = ojo;
