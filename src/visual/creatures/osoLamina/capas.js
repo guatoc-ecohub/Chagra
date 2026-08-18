@@ -9,8 +9,12 @@
  *   - Todo el color sale del PNG. Aquí solo se decide, píxel a píxel, QUÉ
  *     ALFA le toca a cada capa — cero dibujo nuevo.
  *   - Cada pieza "de encima" (cabeza, orejas, mandíbula, corona) se DESVANECE
- *     en el borde de su corte (`smoothstep`). El CUERPO de abajo se borra con
- *     corte duro SOLO donde una pieza de encima ya es ≥93% opaca.
+ *     en el borde de su corte (`smoothstep`). Toda RESTA sobre una capa de
+ *     abajo (cuerpo bajo cabeza/corona, cabeza bajo orejas/mandíbula) es de
+ *     corte DURO: solo se borra donde la pieza de encima ya es ≥99,6% opaca
+ *     (ver `hard` en `mascaras()` — con restas blandas `(1-m)` la banda del
+ *     desvanecido quedaba semiopaca en AMBAS capas y el compuesto over
+ *     perdía alfa: la costura pálida que midió el informe del lote).
  *   - ANTI-HUECO por RESPALDO (el "cuerpo-inpaint" honesto de la casa): el
  *     cuerpo se recorta contra versiones SUB de cabeza y corona (la línea de
  *     corte corrida hacia dentro de la pieza), así la franja de la costura
@@ -139,7 +143,13 @@ function mascaraCoronaSub(x, y) {
  * de corona — ver el docstring del módulo).
  */
 export function mascaras() {
-  const hard = (m) => 1 - ss(0.93, 1.0, m);
+  // Corte DURO: la capa de ABAJO conserva el píxel COMPLETO hasta que la
+  // pieza de encima es ~opaca. Umbral 0,996 (antes 0,93): en la rampa
+  // 0,996→1 el residuo máximo del compuesto over es (1−m)·ss(0.996,1,m) ≤
+  // 0,004·0,26 ≈ 0,27/255 < 0,5/255 — por debajo de lo medible con la
+  // métrica del informe (déficit = alfaOriginal − alfaCompuesto > 0,5/255).
+  // Con 0,93 la rampa dejaba residuos de hasta ~4,6/255: costura medible.
+  const hard = (m) => 1 - ss(0.996, 1, m);
   const mCabeza = (x, y) => mascaraCabeza(x, y);
   const mOrejaIzq = (x, y) => mascaraOreja(x, y, OREJA_IZQ) * mCabeza(x, y);
   const mOrejaDer = (x, y) => mascaraOreja(x, y, OREJA_DER) * mCabeza(x, y);
@@ -147,10 +157,20 @@ export function mascaras() {
   // La cabeza que se PINTA = cabeza completa menos lo que ahora vive aparte.
   // Las orejas se restan solo por su parte ALTA (`baseSub`): la base queda de
   // respaldo. La mandíbula se resta entera (baja en bloque).
+  //
+  // Las restas son de corte DURO, no (1−m): con (1−m), en la banda del
+  // desvanecido ambas capas quedan semiopacas y el compuesto "pieza over
+  // cabeza-restada" pierde alfa (0,5 over 0,5 = 0,75 — banda pálida; medido:
+  // 301 déficits >0,5/255, máx 63,75/255). Con hard la cabeza conserva el
+  // píxel completo de respaldo y la pieza pinta encima: en reposo el
+  // compuesto es idéntico a la lámina; al ARTICULAR (mandíbula que baja,
+  // oreja que gira) se revela piel real de respaldo, no un anillo
+  // translúcido. Regla: resta sobre capa de ABAJO → dura; ventana sobre
+  // capa de ENCIMA → suave.
   const mCabezaRender = (x, y) => mCabeza(x, y)
-    * (1 - mascaraOrejaSub(x, y, OREJA_IZQ)) * (1 - mascaraOrejaSub(x, y, OREJA_DER))
-    * (1 - mMandibula(x, y));
-  const mCorona = (x, y) => mascaraCorona(x, y) * (1 - mCabeza(x, y));
+    * hard(mascaraOrejaSub(x, y, OREJA_IZQ)) * hard(mascaraOrejaSub(x, y, OREJA_DER))
+    * hard(mMandibula(x, y));
+  const mCorona = (x, y) => mascaraCorona(x, y) * hard(mCabeza(x, y));
   const mCuerpo = (x, y) => hard(mascaraCabeza(x, y, CABEZA.cuelloSub))
     * hard(mascaraCoronaSub(x, y));
   return {
