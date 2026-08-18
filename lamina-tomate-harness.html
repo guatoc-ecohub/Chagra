@@ -1,0 +1,35 @@
+<!doctype html>
+<!-- Harness de arte: la lámina del tomate Humboldt PLANA, sin 3D.
+     Sirve para juzgar la ilustración sola (doctrina: primero la lámina
+     plana, después la escena). No entra al build: es herramienta de gate. -->
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <title>Lámina tomate Humboldt — harness</title>
+    <style>
+      body { margin: 0; background: #d8d2c0; }
+      #zoom { image-rendering: auto; }
+    </style>
+  </head>
+  <body>
+    <script type="module">
+      import { atlasTomateHumboldt, ATLAS_TILE_W, ATLAS_TILE_H } from './src/visual/mundo3d/invernadero/tomateHumboldt.js';
+      const tex = atlasTomateHumboldt(20260818);
+      const atlas = tex.image;
+      // vista 1: el atlas entero a media escala
+      const medio = document.createElement('canvas');
+      medio.width = atlas.width / 2;
+      medio.height = atlas.height / 2;
+      medio.getContext('2d').drawImage(atlas, 0, 0, medio.width, medio.height);
+      document.body.appendChild(medio);
+      // vista 2: el primer tile a tamaño natural (el detalle de plancha)
+      const zoom = document.createElement('canvas');
+      zoom.id = 'zoom';
+      zoom.width = ATLAS_TILE_W;
+      zoom.height = ATLAS_TILE_H;
+      zoom.getContext('2d').drawImage(atlas, 0, 0, ATLAS_TILE_W, ATLAS_TILE_H, 0, 0, ATLAS_TILE_W, ATLAS_TILE_H);
+      document.body.appendChild(zoom);
+      window.__laminaLista = true;
+    </script>
+  </body>
+</html>
