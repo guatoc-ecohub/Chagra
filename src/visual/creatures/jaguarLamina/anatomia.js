@@ -281,27 +281,55 @@ export const CORTE_PATAS_DEL = {
  *   la lámina es un fotograma de zancada, no la neutra). En las delanteras la
  *   Y del anclaje sube 3px sobre la pisada de reposo: la pata dibujada está
  *   casi en extensión total y sin ese margen el IK recortaría el alcance en
- *   los extremos de zancada.
+ *   los extremos de zancada. En la trasera lejana el X del anclaje queda 12px
+ *   ADELANTE del pie de reposo (no 20): re-centrar su barrido hacia el reposo
+ *   acota la rotación del muslo y la cápsula sintética no asoma por detrás de
+ *   la grupa (refino 2026-08-18, ver abajo).
  *
  *   `rodillaCorte` = dónde se parte el arte de la pata en segmento superior /
  *   inferior (banda horizontal con solape de respaldo — ver capas.js).
+ *
+ * REFINO DE PATAS (2026-08-18, feedback del operador: traseras con la
+ * articulación rara, delanteras "algo raro" en el ciclo):
+ *   `plieMax` = tope de FLEXIÓN de la rodilla en grados sobre el reposo. El IK
+ *   lo convierte en un piso de distancia articulación→pie (`dMin`): si el
+ *   objetivo del vuelo queda más cerca, el pie se proyecta sobre la misma
+ *   recta (el carpo delantero llegaba a −59° y la zarpa se enroscaba contra
+ *   la pata blanca leyéndose rota; con 36° dobla claro sin enroscarse). En
+ *   APOYO el tope NUNCA muerde (verificado en marcha.test.js): la pisada
+ *   clavada no se toca.
+ *   PIVOTES traseros ARRIBA (240 → 226/228): la cabeza del fémur vive DENTRO
+ *   del cuerpo, no en el borde del corte. Con el pivote en el borde, el arte
+ *   del muslo barría con brazo de palanca largo: la cápsula sintética del
+ *   muslo lejano asomaba por detrás de la grupa (~12px), las islitas de
+ *   pelaje del cuerpo quedaban desfasadas sobre la pata y la ventana vacante
+ *   mostraba fondo (la cuña beige del gif). Pivote adentro + anclaje
+ *   re-centrado + `amplitud` 25 dejan el borde superior del arte trasero en
+ *   ≤5px de desplazamiento en los extremos — bajo los desvanecidos.
+ *   `lift` traseras 16/14 → 10: en la marcha felina los pies traseros
+ *   levantan poco; menos lift = menos colapso de `d` = menos pistón de cadera
+ *   (la trasera cercana pasaba de −43° a −33° de pico).
  */
 export const RIG_MARCHA = {
   delLejana: {
     articulacion: [160, 236], rodilla: [154, 332], pie: [155, 384],
     lado: -1, fase: 0.75, lift: 14, anclaje: [160, 381], rodillaCorte: 332,
+    plieMax: 36,
   },
   delCercana: {
     articulacion: [208, 236], rodilla: [196, 335], pie: [193, 386],
     lado: -1, fase: 0.25, lift: 14, anclaje: [208, 383], rodillaCorte: 335,
+    plieMax: 36,
   },
   trasCercana: {
-    articulacion: [428, 240], rodilla: [448, 298], pie: [385, 357],
-    lado: 1, fase: 0, lift: 16, anclaje: [420, 357], rodillaCorte: 298,
+    articulacion: [428, 226], rodilla: [448, 298], pie: [385, 357],
+    lado: 1, fase: 0, lift: 10, anclaje: [420, 357], rodillaCorte: 298,
+    plieMax: 26,
   },
   trasLejana: {
-    articulacion: [522, 240], rodilla: [570, 315], pie: [540, 363],
-    lado: 1, fase: 0.5, lift: 14, anclaje: [520, 363], rodillaCorte: 315,
+    articulacion: [522, 228], rodilla: [570, 315], pie: [540, 363],
+    lado: 1, fase: 0.5, lift: 10, anclaje: [528, 363], rodillaCorte: 315,
+    plieMax: 26,
   },
 };
 
@@ -317,7 +345,7 @@ export const RIG_MARCHA = {
  */
 export const MARCHA = {
   duty: 0.62,
-  amplitud: 30,
+  amplitud: 25,
   velocidadPxS: 34,
   bob: 2.2,
 };
