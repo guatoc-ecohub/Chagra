@@ -67,6 +67,30 @@ function normalize(str) {
     .trim();
 }
 
+// Mapa de variantes de grafía comunes en español (b↔v, s/c/z)
+const GRAPHY_VARIANTS = {
+  'curuba': ['curubo'],
+  'curubo': ['curuba'],
+  'uchuva': ['uvilla'],
+  'uvilla': ['uchuva'],
+  // Agregar más variantes según sea necesario
+};
+
+// Verificar si dos strings son similares bajo correcciones de grafía comunes
+function areSimilarWithGraphy(str1, str2) {
+  const norm1 = normalize(str1);
+  const norm2 = normalize(str2);
+
+  // Si son idénticos después de normalizar, retornar true
+  if (norm1 === norm2) return true;
+
+  // Buscar en el mapa de variantes conocidas
+  if (GRAPHY_VARIANTS[norm1] && GRAPHY_VARIANTS[norm1].includes(norm2)) return true;
+  if (GRAPHY_VARIANTS[norm2] && GRAPHY_VARIANTS[norm2].includes(norm1)) return true;
+
+  return false;
+}
+
 // Palabras comunes que NO son nombres de especies
 const STOPWORDS = new Set([
   'el', 'la', 'los', 'las', 'un', 'una', 'unos', 'unas', 'de', 'en', 'a',
@@ -113,8 +137,8 @@ function extractSpeciesPairs(text) {
       continue;
     }
 
-    // Validar que el nombre científico parece válido (debe tener al menos dos palabras, primera mayúscula)
-    if (!/^[A-Z][a-z]/.test(scientificClean)) {
+    // Validar que el nombre científico parece válido (debe empezar con mayúscula)
+    if (!/^[A-Z][a-záéíóúñ]/i.test(scientificClean)) {
       continue;
     }
 
@@ -151,25 +175,47 @@ function extractSpeciesPairs(text) {
 function findSpeciesInCatalog(catalog, searchTerm) {
   const normalized = normalize(searchTerm);
   const species = catalog.species || [];
-  
+
   // Búsqueda exacta primero
-  const exactMatch = species.find(s => 
+  const exactMatch = species.find(s =>
     normalize(s.nombre_comun) === normalized ||
     normalize(s.nombre_cientifico) === normalized ||
     s.id === normalized
   );
-  
+
   if (exactMatch) return exactMatch;
-  
-  // Búsqueda por substring (para variantes de grafía)
-  const substringMatch = species.find(s => 
+
+  // Búsqueda por substring en nombre común y científico (para variantes de grafía)
+  const substringMatch = species.find(s =>
     normalize(s.nombre_comun).includes(normalized) ||
     normalized.includes(normalize(s.nombre_comun)) ||
     normalize(s.nombre_cientifico).includes(normalized) ||
     normalized.includes(normalize(s.nombre_cientifico))
   );
-  
-  return substringMatch;
+
+  if (substringMatch) return substringMatch;
+
+  // Búsqueda con corrección de grafía (b↔v)
+  const graphyMatch = species.find(s =>
+    areSimilarWithGraphy(s.nombre_comun, searchTerm) ||
+    areSimilarWithGraphy(s.nombre_cientifico, searchTerm) ||
+    areSimilarWithGraphy(s.nombre_comun, normalized) ||
+    areSimilarWithGraphy(searchTerm, s.nombre_comun)
+  );
+
+  if (graphyMatch) return graphyMatch;
+
+  // Búsqueda en nombres comunes regionales (variantes de grafía locales)
+  const regionalMatch = species.find(s =>
+    Array.isArray(s.nombre_comunes_regionales) &&
+    s.nombre_comunes_regionales.some(regional =>
+      normalize(regional).includes(normalized) ||
+      normalized.includes(normalize(regional)) ||
+      areSimilarWithGraphy(regional, searchTerm)
+    )
+  );
+
+  return regionalMatch;
 }
 
 // Calcular confianza de la detección
