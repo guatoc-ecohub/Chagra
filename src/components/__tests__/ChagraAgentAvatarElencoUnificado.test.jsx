@@ -21,6 +21,7 @@
  * alfa), así que su raíz también pasó de `svg` a `div`.
  * Chivito (`feat/chivito-punk-lamina-viva`): misma migración que el jaguar —
  * ahora es `ChivitoPunkLaminaViva` (la lámina aprobada en capas, raíz
+ * `<div>`), mismo contrato observable.
  * Luciérnaga (`feat/luciernaga-lamina-viva`): misma migración que el jaguar
  * — ahora es `LuciernagaLaminaViva` (la lámina aprobada en capas, raíz
  * `<div>`), mismo contrato observable.
@@ -41,8 +42,6 @@ const raizDiv = (container, slug) => container.querySelector(`div[data-creature=
 const CASOS = [
     { Component: ChagraAgentAvatarJaguar, nombre: 'Jaguar', slug: 'jaguar', raiz: raizDiv },
     { Component: ChagraAgentAvatarOsoBaston, nombre: 'Oso del bastón', slug: 'oso-baston', raiz: raizDiv },
-    { Component: ChagraAgentAvatarLuciernaga, nombre: 'Luciérnaga', slug: 'luciernaga', raiz: raizSvg },
-    { Component: ChagraAgentAvatarOsoBaston, nombre: 'Oso del bastón', slug: 'oso-baston', raiz: raizSvg },
     { Component: ChagraAgentAvatarLuciernaga, nombre: 'Luciérnaga', slug: 'luciernaga', raiz: raizDiv },
     { Component: ChagraAgentAvatarGuacamaya, nombre: 'Guacamaya', slug: 'guacamaya', raiz: raizSvg },
     { Component: ChagraAgentAvatarChivitoPunk, nombre: 'Chivito', slug: 'chivito-punk', raiz: raizDiv },

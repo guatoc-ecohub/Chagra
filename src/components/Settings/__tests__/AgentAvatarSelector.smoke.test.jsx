@@ -20,6 +20,22 @@ describe('AgentAvatarSelector smoke', () => {
         expect(screen.queryByText(/maíz/i)).toBeNull();
     });
 
+    it('monta las cinco láminas vivas en las opciones seleccionables', () => {
+        render(<AgentAvatarSelector />);
+        const laminaViva = [
+            ['jaguar', 'Jaguar'],
+            ['zariguya', 'Zarigüeya'],
+            ['luciernaga', 'Luciérnaga'],
+            ['oso-baston', 'Oso de anteojos'],
+            ['chivito-punk', 'Chivito de páramo'],
+        ];
+
+        for (const [slug, label] of laminaViva) {
+            const opcion = screen.getByText(label, { selector: 'p' }).closest('button');
+            expect(opcion.querySelector(`div[data-creature="${slug}"]`), `${slug} no monta una lámina viva`).toBeTruthy();
+        }
+    });
+
     it('click en zarigüeya cambia la preferencia y persiste en localStorage', () => {
         render(<AgentAvatarSelector />);
         const zariguyaBtn = screen.getByText('Zarigüeya', { selector: 'p' }).closest('button');
