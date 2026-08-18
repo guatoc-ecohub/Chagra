@@ -12,6 +12,15 @@ import SeedingLog from '../SeedingLog';
  * antes.
  */
 
+// Mock ENV para evitar el fallback "Configuración de siembra no disponible"
+vi.mock('../../config/env.js', () => ({
+  ENV: {
+    FARMOS_CLIENT_ID: 'test-client-id',
+    FARMOS_CLIENT_SECRET: 'test-secret',
+    FARMOS_URL: 'https://test.farmos.com',
+  },
+}));
+
 // Mock pesado de servicios externos no relevantes al smoke.
 vi.mock('../../services/payloadService', () => ({
   savePayload: vi.fn().mockResolvedValue({ success: true, message: 'ok' }),

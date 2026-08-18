@@ -7,6 +7,15 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 // calendario. Estos tests fijan el contrato del fix: selector del catálogo +
 // etiqueta de ubicación SEPARADA + id canónico hilado al ciclo.
 
+// Mock ENV para evitar el fallback "Configuración de siembra no disponible"
+vi.mock('../../config/env.js', () => ({
+  ENV: {
+    FARMOS_CLIENT_ID: 'test-client-id',
+    FARMOS_CLIENT_SECRET: 'test-secret',
+    FARMOS_URL: 'https://test.farmos.com',
+  },
+}));
+
 vi.mock('../../db/catalogDB', () => ({
   getAllSpecies: vi.fn().mockResolvedValue([
     { id: 'fragaria_ananassa', nombre_comun: 'Fresa', nombre_cientifico: 'Fragaria × ananassa', categoria: 'frutal', tracking_mode: 'individual' },
