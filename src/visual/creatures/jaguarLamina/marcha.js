@@ -34,14 +34,22 @@ const clamp = (v, a, b) => (v < a ? a : v > b ? b : v);
 const ssuave = (t) => { const u = clamp(t, 0, 1); return u * u * (3 - 2 * u); };
 const largo = (a, b) => Math.hypot(b[0] - a[0], b[1] - a[1]);
 
-/** Rig derivado: largos de hueso y ángulos de reposo por pata (una sola vez). */
+/** Rig derivado: largos de hueso, ángulos de reposo y piso de distancia del
+ *  tope de flexión (`plieMax` → `dMin`, ley del coseno sobre el ángulo
+ *  interior de reposo) por pata — una sola vez. */
 export const PATAS = Object.fromEntries(
   Object.entries(RIG_MARCHA).map(([clave, rig]) => {
     const L1 = largo(rig.articulacion, rig.rodilla);
     const L2 = largo(rig.rodilla, rig.pie);
     const a1Reposo = Math.atan2(rig.rodilla[1] - rig.articulacion[1], rig.rodilla[0] - rig.articulacion[0]);
     const a2Reposo = Math.atan2(rig.pie[1] - rig.rodilla[1], rig.pie[0] - rig.rodilla[0]);
-    return [clave, { ...rig, clave, L1, L2, a1Reposo, a2Reposo }];
+    const dReposo = largo(rig.articulacion, rig.pie);
+    const thReposo = Math.acos(clamp(
+      (L1 * L1 + L2 * L2 - dReposo * dReposo) / (2 * L1 * L2), -1, 1,
+    ));
+    const thMin = thReposo - (rig.plieMax || 60) / GRADOS;
+    const dMin = Math.sqrt(Math.max(0, L1 * L1 + L2 * L2 - 2 * L1 * L2 * Math.cos(thMin)));
+    return [clave, { ...rig, clave, L1, L2, a1Reposo, a2Reposo, dMin }];
   }),
 );
 
@@ -51,9 +59,15 @@ export const PATAS = Object.fromEntries(
  * rodilla. `rodilla` es relativa al segmento superior (los wrappers CSS van
  * anidados: rodilla dentro de cadera — cadena FK estándar).
  *
- * Si el objetivo queda fuera de alcance se recorta la distancia sobre la
- * misma recta (la pata se estira sin dislocarse; a escala de avatar el
- * recorte es subpíxel — documentado en RIG_MARCHA.anclaje).
+ * Si el objetivo queda fuera de alcance —o MÁS CERCA de lo que permite el
+ * tope de flexión `plieMax` (el piso `dMin`)— se proyecta el objetivo sobre
+ * la misma recta articulación→objetivo y se resuelve hacia el proyectado:
+ * la pata se estira o deja de plegarse sin dislocarse. El piso solo puede
+ * morder a MEDIO VUELO (pie en el aire — el paso se lee igual); en apoyo la
+ * pisada queda fuera del piso por construcción (verificado en marcha.test.js),
+ * así el foot-plant nunca se sacrifica. Sin la proyección, la rodilla seguía
+ * plegándose hacia el objetivo real y el tope no acotaba nada (el carpo
+ * delantero llegaba a −59° y la zarpa se leía rota — feedback del operador).
  *
  * @param {typeof PATAS[string]} pata
  * @param {number} fx  objetivo del pie (px de lámina)
@@ -67,14 +81,17 @@ export function resolverIK(pata, fx, fy) {
   // margen mínimo (0.01px): las delanteras están CASI en extensión total en
   // reposo — un margen generoso aquí recortaría su alcance de reposo y el IK
   // ya no devolvería 0°/0° sobre la lámina (tirón al entrar a la marcha).
-  const d = clamp(Math.hypot(dx, dy), Math.abs(pata.L1 - pata.L2) + 0.01, pata.L1 + pata.L2 - 0.01);
+  const piso = Math.max(Math.abs(pata.L1 - pata.L2) + 0.01, pata.dMin || 0);
+  const d = clamp(Math.hypot(dx, dy), piso, pata.L1 + pata.L2 - 0.01);
   const base = Math.atan2(dy, dx);
+  const tx = hx + d * Math.cos(base);
+  const ty = hy + d * Math.sin(base);
   const cosAlfa = (pata.L1 * pata.L1 + d * d - pata.L2 * pata.L2) / (2 * pata.L1 * d);
   const alfa = Math.acos(clamp(cosAlfa, -1, 1));
   const a1 = base - pata.lado * alfa;
   const kx = hx + pata.L1 * Math.cos(a1);
   const ky = hy + pata.L1 * Math.sin(a1);
-  const a2 = Math.atan2(fy - ky, fx - kx);
+  const a2 = Math.atan2(ty - ky, tx - kx);
   const cadera = (a1 - pata.a1Reposo) * GRADOS;
   const rodilla = (a2 - pata.a2Reposo) * GRADOS - cadera;
   return { cadera, rodilla };

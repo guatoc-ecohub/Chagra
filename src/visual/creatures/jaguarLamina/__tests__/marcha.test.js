@@ -40,10 +40,12 @@ describe('resolverIK — 2 huesos sobre los puntos medidos', () => {
         for (const dy of [0, -pata.lift]) {
           const { cadera, rodilla } = resolverIK(pata, ax + dx, ay + dy);
           const [px, py] = fkPie(pata, cadera, rodilla);
-          // Si el objetivo excede el alcance, el IK recorta sobre la misma
-          // recta (la pata no se disloca): comparar contra el alcanzable.
+          // Si el objetivo excede el alcance —o queda dentro del piso del
+          // tope de flexión (dMin)— el IK proyecta sobre la misma recta (la
+          // pata no se disloca ni se pliega de más): comparar contra el
+          // proyectado.
           const d = Math.hypot(ax + dx - pata.articulacion[0], ay + dy - pata.articulacion[1]);
-          const dOk = Math.min(d, pata.L1 + pata.L2 - 0.01);
+          const dOk = Math.min(Math.max(d, pata.dMin), pata.L1 + pata.L2 - 0.01);
           const eslon = dOk / d;
           const ox = pata.articulacion[0] + (ax + dx - pata.articulacion[0]) * eslon;
           const oy = pata.articulacion[1] + (ay + dy - pata.articulacion[1]) * eslon;
@@ -136,18 +138,48 @@ describe('poseMarcha — el ciclo cuadrúpedo completo', () => {
     }
   });
 
-  it('devuelve ángulos acotados (piezas que doblan, no aspas de molino): cadera < 48°, rodilla < 60°', () => {
-    // Los picos reales del ciclo: ~42° de cadera trasera (apoyo tardío y recogida del vuelo) (el
-    // fémur felino barre eso al extender la zancada) y ~52° de rodilla en las
-    // delanteras a medio vuelo (el carpo flexionado con la garra colgando
-    // hacia atrás). Lo que este test acota es el desastre (aspas girando
+  it('devuelve ángulos acotados (piezas que doblan, no aspas de molino): cadera < 40°, rodilla < 42°', () => {
+    // Los picos reales del ciclo tras el refino 2026-08-18: ~33° de cadera
+    // trasera cercana (recogida del vuelo con el pivote del fémur adentro
+    // del cuerpo) y 36° de rodilla delantera (el tope plieMax mordiendo a
+    // medio vuelo). Lo que este test acota es el desastre (aspas girando
     // vueltas completas), no la flexión natural.
     const T = 1;
     for (const t of [0, 0.13, 0.29, 0.41, 0.57, 0.73, 0.89]) {
       const pose = poseMarcha(t * T, T, 1);
       for (const ang of Object.values(pose.patas)) {
-        expect(Math.abs(ang.cadera)).toBeLessThan(48);
-        expect(Math.abs(ang.rodilla)).toBeLessThan(60);
+        expect(Math.abs(ang.cadera)).toBeLessThan(40);
+        expect(Math.abs(ang.rodilla)).toBeLessThan(42);
+      }
+    }
+  });
+
+  it('el tope de flexión (plieMax) se respeta en TODO el ciclo — la zarpa nunca se enrosca (el −59° del carpo que se leía "pata rota")', () => {
+    const T = 1;
+    for (let i = 0; i < 160; i++) {
+      const pose = poseMarcha((i / 160) * T, T, 1);
+      for (const [clave, ang] of Object.entries(pose.patas)) {
+        // la rodilla FK es exactamente la rotación de la articulación de
+        // rodilla sobre el reposo: su magnitud es el pliegue (o extensión).
+        expect(Math.abs(ang.rodilla)).toBeLessThan(PATAS[clave].plieMax + 0.6);
+      }
+    }
+  });
+
+  it('el piso dMin del tope NUNCA muerde en apoyo: la pisada clavada no se sacrifica por el pliegue', () => {
+    const T = 1;
+    for (let i = 0; i < 400; i++) {
+      const ciclo = i / 400;
+      const bob = MARCHA.bob * Math.sin(4 * Math.PI * ciclo);
+      for (const pata of Object.values(PATAS)) {
+        const fase = (ciclo + 1 - pata.fase) % 1;
+        const objetivo = pieEnCiclo(pata, fase);
+        if (!objetivo.apoyo) continue;
+        const d = Math.hypot(
+          objetivo.x - pata.articulacion[0],
+          objetivo.y - bob - pata.articulacion[1],
+        );
+        expect(d).toBeGreaterThan(pata.dMin);
       }
     }
   });
