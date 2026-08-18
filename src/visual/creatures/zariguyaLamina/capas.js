@@ -3,7 +3,7 @@
  * cabeza + orejas ×2 + mandíbula + brazoLapiz + brazoBrujula + cola) más los
  * dos parches de párpado. Hermana de `jaguarLamina/capas.js`: el MISMO
  * método (máscaras suaves `smoothstep`, prioridades para que dos piezas
- * nunca se disputen un píxel, corte duro del cuerpo solo bajo pieza ≥93%
+ * nunca se disputen un píxel, corte duro del cuerpo solo bajo pieza ≥99,6%
  * opaca, párpados robados de la propia piel) con dos diferencias medidas:
  *
  *   - BRAZOS por PRIMITIVAS (cápsula/elipse) en vez de cajas: el brazo del
@@ -164,7 +164,14 @@ export function mascaraCola(x, y) {
  * DENTRO de la cabeza) > cola > cuerpo.
  */
 export function mascaras() {
-  const hard = (m) => 1 - ss(0.93, 1.0, m);
+  // Resta DURA: la capa de abajo conserva el píxel completo hasta que la
+  // pieza de encima es ~opaca. El umbral era 0,93 y su rampa 0,93→1 dejaba
+  // un residuo medible: 1.159 px con déficit alfa >0,5/255 (déficit =
+  // alfaOriginal − alfaCompuestoOver, en float), máx 4,5/255 — invisible al
+  // ojo pero contable (ops/INFORME-LOTE-LAMINA-ALCANCE-Y-CLAIM.md). Con
+  // 0,996→1 el peor residuo de la rampa es ~0,36/255 < 0,5/255: cae bajo el
+  // umbral medible. El patrón hard ya estaba — solo se aprieta el umbral.
+  const hard = (m) => 1 - ss(0.996, 1, m);
   const mBrazoLapiz = (x, y) => mascaraBrazoLapiz(x, y);
   const mBrazoBrujula = (x, y) => mascaraBrazoBrujula(x, y) * hard(mBrazoLapiz(x, y));
   // La cabeza EXCLUYE los brazos con corte DURO (hard), no con (1-m): en la
@@ -188,7 +195,9 @@ export function mascaras() {
   const mCabezaRender = (x, y) => mCabezaFull(x, y)
     * hard(mascaraOrejaSub(x, y, OREJA_IZQ)) * hard(mascaraOrejaSub(x, y, OREJA_DER))
     * hard(mMandibula(x, y));
-  const mCola = (x, y) => mascaraCola(x, y) * (1 - mCabezaFull(x, y));
+  // hard() también aquí por consistencia con el resto de restas (medido:
+  // cambia 0 píxeles — mCabezaFull es 0 en toda la banda de la cola).
+  const mCola = (x, y) => mascaraCola(x, y) * hard(mCabezaFull(x, y));
   const mCuerpo = (x, y) => hard(mCabezaFull(x, y)) * hard(mBrazoLapiz(x, y))
     * hard(mBrazoBrujula(x, y)) * hard(mCola(x, y));
   return {
