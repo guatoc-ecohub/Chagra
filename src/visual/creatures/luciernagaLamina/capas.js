@@ -116,6 +116,40 @@ function mascaraLinterna(x, y) {
 }
 
 /**
+ * El juego COMPLETO de máscaras con sus prioridades resueltas — una sola
+ * fuente de verdad para `hornearLuciernaga`, el candado de tests y los
+ * medidores offline (patrón `zariguyaLamina/capas.js`: el medidor importa
+ * ESTAS fórmulas, no una copia que no vería un fix).
+ *
+ * Prioridad: antenas > cabeza > mandíbula > manoLapiz > linterna > cuerpo.
+ * `mCabezaFull` es la cabeza COMPLETA (incluye mentón y las bases de
+ * antena): sirve para (a) excluir la cabeza de la mano y (b) el corte duro
+ * del cuerpo — así el cuerpo se borra bajo TODA la testa.
+ */
+export function mascaras() {
+  const hard = (m) => 1 - ss(0.93, 1.0, m);
+  const mCabezaFull = (x, y) => mascaraCabeza(x, y);
+  const mAntenaIzq = (x, y) => mascaraAntena(x, y, ANTENA_IZQ);
+  const mAntenaDer = (x, y) => mascaraAntena(x, y, ANTENA_DER);
+  const mMandibula = (x, y) => mascaraMandibula(x, y) * mCabezaFull(x, y);
+  // La cabeza que se PINTA = testa completa menos lo que vive aparte. Las
+  // antenas se restan por su parte ALTA (`baseSub`): la base queda TAMBIÉN
+  // en la cabeza (anti-hueco al girar); la mandíbula se resta entera (baja
+  // en bloque, el interior sintético respalda el hueco).
+  const mCabezaRender = (x, y) => mCabezaFull(x, y)
+    * (1 - mascaraAntenaSub(x, y, ANTENA_IZQ)) * (1 - mascaraAntenaSub(x, y, ANTENA_DER))
+    * (1 - mMandibula(x, y));
+  const mManoLapiz = (x, y) => mascaraMano(x, y) * (1 - mCabezaFull(x, y));
+  const mLinterna = (x, y) => mascaraLinterna(x, y);
+  const mCuerpo = (x, y) => hard(mCabezaFull(x, y)) * hard(mAntenaIzq(x, y))
+    * hard(mAntenaDer(x, y)) * hard(mManoLapiz(x, y)) * hard(mLinterna(x, y));
+  return {
+    mCuerpo, mCabezaRender, mMandibula, mAntenaIzq, mAntenaDer,
+    mManoLapiz, mLinterna, mCabezaFull,
+  };
+}
+
+/**
  * Hornea las capas + los parches de párpado a partir de la imagen ya
  * cargada. Devuelve canvases del MISMO tamaño que el PNG (comparten
  * encuadre — cero cuentas de UV por capa).
@@ -148,26 +182,9 @@ export function hornearLuciernaga(img, dims = {}) {
   }
   const sd = src.data;
 
-  // Prioridad: antenas > cabeza > mandíbula > manoLapiz > linterna > cuerpo.
-  // `mCabezaFull` es la cabeza COMPLETA (incluye mentón y las bases de
-  // antena): sirve para (a) excluir la cabeza de la mano y (b) el corte
-  // duro del cuerpo — así el cuerpo se borra bajo TODA la testa.
-  const mCabezaFull = (x, y) => mascaraCabeza(x, y);
-  const mAntIzq = (x, y) => mascaraAntena(x, y, ANTENA_IZQ);
-  const mAntDer = (x, y) => mascaraAntena(x, y, ANTENA_DER);
-  const mMandibula = (x, y) => mascaraMandibula(x, y) * mCabezaFull(x, y);
-  // La cabeza que se PINTA = testa completa menos lo que vive aparte. Las
-  // antenas se restan por su parte ALTA (`baseSub`): la base queda TAMBIÉN
-  // en la cabeza (anti-hueco al girar); la mandíbula se resta entera (baja
-  // en bloque, el interior sintético respalda el hueco).
-  const mCabezaRender = (x, y) => mCabezaFull(x, y)
-    * (1 - mascaraAntenaSub(x, y, ANTENA_IZQ)) * (1 - mascaraAntenaSub(x, y, ANTENA_DER))
-    * (1 - mMandibula(x, y));
-  const mMano = (x, y) => mascaraMano(x, y) * (1 - mCabezaFull(x, y));
-  const mLinterna = (x, y) => mascaraLinterna(x, y);
-  const hard = (m) => 1 - ss(0.93, 1.0, m);
-  const mCuerpo = (x, y) => hard(mCabezaFull(x, y)) * hard(mAntIzq(x, y))
-    * hard(mAntDer(x, y)) * hard(mMano(x, y)) * hard(mLinterna(x, y));
+  // Prioridad y fórmulas: la sección pura `mascaras()` — única fuente de
+  // verdad compartida con el candado de tests y los medidores offline.
+  const m = mascaras();
 
   const pintar = (mascara) => {
     const cv = lienzo(W, H);
@@ -193,13 +210,13 @@ export function hornearLuciernaga(img, dims = {}) {
   return {
     W,
     H,
-    cuerpo: pintar(mCuerpo),
-    cabeza: pintar(mCabezaRender),
-    mandibula: pintar(mMandibula),
-    antenaIzq: pintar(mAntIzq),
-    antenaDer: pintar(mAntDer),
-    manoLapiz: pintar(mMano),
-    linterna: pintar(mLinterna),
+    cuerpo: pintar(m.mCuerpo),
+    cabeza: pintar(m.mCabezaRender),
+    mandibula: pintar(m.mMandibula),
+    antenaIzq: pintar(m.mAntenaIzq),
+    antenaDer: pintar(m.mAntenaDer),
+    manoLapiz: pintar(m.mManoLapiz),
+    linterna: pintar(m.mLinterna),
     parpado,
     parpado2,
   };
@@ -251,4 +268,4 @@ function parcheParpado(sd, W, H, ojo) {
   return { cv, x0, y0, w, h };
 }
 
-export default { hornearLuciernaga, haySoporteCanvas };
+export default { hornearLuciernaga, haySoporteCanvas, mascaras };
