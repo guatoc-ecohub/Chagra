@@ -1,0 +1,66 @@
+{
+  "species_slug": "thymus_serpyllum",
+  "scientific_name": "Thymus serpyllum L.",
+  "common_names": [
+    "Tomillo silvestre"
+  ],
+  "family": "Lamiaceae",
+  "category": "medicinales_alelopaticas",
+  "cultivable": true,
+  "conservation_status": "cultivo_comun",
+  "thermal_zones": [
+    "templado",
+    "frio"
+  ],
+  "roles_in_guild": [
+    "crop",
+    "ground_cover",
+    "pest_repellent"
+  ],
+  "antagonists": [],
+  "especies_nativas_sustitutas": [],
+  "propagation": {
+    "metodo_principal": "division_mata",
+    "notas": "Propagación por acodo natural o división de matas en primavera. Crece como cubresuelos rastrero en suelos rocosos y pobres."
+  },
+  "requirements": {
+    "agua": "bajo",
+    "altitud_msnm": {
+      "min_absoluto": 1000,
+      "optimo_min": 1800,
+      "optimo_max": 2800,
+      "max_absoluto": 3200
+    },
+    "temperatura_c": {
+      "helada_letal": -15,
+      "optimo_min": 10,
+      "optimo_max": 20,
+      "max_tolerable": 28
+    },
+    "radiacion": "sol_pleno",
+    "drenaje_requerido": "excelente"
+  },
+  "valor_pedagogico": "El tomillo silvestre o serpol (Thymus serpyllum L., Lamiaceae) es una aromática mediterránea perenne rastrera (5-15 cm altura, tallos extendidos 30-60 cm) distinta del tomillo común Thymus vulgaris (porte erecto). Adaptada a zonas templadas-frías colombianas (1500-2800 msnm: Cundinamarca, Boyacá, Nariño, Antioquia frío). Lección viva de cobertura vegetal permanente que enseña cómo proteger el suelo vivo: sus tallos rastreros forman alfombras densas que reducen evaporación de humedad superficial 30-50%, suprimen malezas competitivas por sombra y alelopatía suave, refugian arañas predadoras (Lycosidae) y carábidos que controlan biológicamente larvas de lepidópteros. Su aceite esencial concentra timol (35-50%) y carvacrol (10-15%), terpenos volátiles con actividad antifúngica y antibacterial demostrada contra Botrytis cinerea, Fusarium oxysporum y Erwinia amylovora. Floración rosa-púrpura atrae abejas, abejorros nativos (Bombus atratus) y mariposas. Manejo agroecológico: propagación por división de mata o esquejes, suelo pobre bien drenado pleno sol (NO tolera encharcamiento ni sombra densa), riego moderado, poda anual post-floración. Asocio: lechuga, fresa, repollo, rosas.",
+  "sources": [
+    {
+      "id": "perez-arbelaez-1947-plantas-utiles",
+      "title": "perez-arbelaez-1947-plantas-utiles",
+      "tier": "A",
+      "url": null
+    },
+    {
+      "id": "gbif-taxonomic-backbone",
+      "title": "gbif-taxonomic-backbone",
+      "tier": "A",
+      "url": "https://www.gbif.org/dataset/d7dddbf4-2cf0-4f39-9b2a-bb099caae36c"
+    },
+    {
+      "id": "powo-kew",
+      "title": "powo-kew",
+      "tier": "A",
+      "url": "https://powo.science.kew.org"
+    }
+  ],
+  "_generated_by": "scripts/build-cycle-content-from-catalog.mjs",
+  "_generated_at": "2026-05-19T00:42:57.378Z"
+}

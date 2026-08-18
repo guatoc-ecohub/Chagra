@@ -1,0 +1,83 @@
+{
+  "species_slug": "eleocharis_dulcis",
+  "scientific_name": "Eleocharis dulcis (Burm.f.) Trin. ex Hensch.",
+  "common_names": [
+    "Castaña de agua china"
+  ],
+  "family": "Cyperaceae",
+  "category": "tuberculos_raices",
+  "cultivable": true,
+  "conservation_status": "naturalizada",
+  "thermal_zones": [
+    "calido",
+    "templado"
+  ],
+  "roles_in_guild": [
+    "crop",
+    "ground_cover"
+  ],
+  "antagonists": [],
+  "especies_nativas_sustitutas": [],
+  "propagation": {
+    "methods": [
+      "tuberculo"
+    ],
+    "best_method": "tuberculo",
+    "protocol_resumen": "Propagación vegetativa por cormelos (tubérculos pequeños del rizoma) plantados directamente en camas inundables permanentes (5-15 cm lámina de agua sostenida), distancia 30 x 30 cm. CRÍTICO: requiere inundación permanente sostenida (paddy field-arrozal-chinampa) durante todo el ciclo de 7-9 meses. Ciclo: planta 7-9 meses, secar campo últimas 4-6 semanas para inducir maduración tubérculo, cosecha por excavación manual al drenar la cama.",
+    "tiempo_a_establecimiento_dias": 30,
+    "notas": "Ciperácea acuática emergente — nicho ECOLÓGICO ACUÁTICO ESPECÍFICO no replicable en cultivo seco. Requiere inundación permanente 5-15 cm de lámina de agua durante todo el ciclo — incompatible con sistemas agrícolas convencionales de secano. Tubérculos subterráneos (cormelos) crujientes blancos dulces — gastronomía asiática chino-tailandesa.",
+    "fuente": "POWO Kew Eleocharis dulcis; FAO Ecocrop; NRC 1989"
+  },
+  "requirements": {
+    "agua": "alto",
+    "altitud_msnm": {
+      "min_absoluto": 0,
+      "optimo_min": 100,
+      "optimo_max": 1200,
+      "max_absoluto": 1800
+    },
+    "temperatura_c": {
+      "helada_letal": 5,
+      "optimo_min": 22,
+      "optimo_max": 30,
+      "max_tolerable": 36
+    },
+    "radiacion": "sol_pleno",
+    "drenaje_requerido": "pantanoso"
+  },
+  "valor_pedagogico": "La castaña de agua china (Eleocharis dulcis (Burm.f.) Trin. ex Hensch., familia Cyperaceae) es una ciperácea acuática emergente herbácea perenne originaria del sudeste asiático tropical (sur de China, Vietnam, Tailandia, Camboya, Laos, Indonesia, Filipinas, India oriental, Sri Lanka) donde se cultiva ancestralmente hace ~3000 años en arrozales-chinampas inundables del valle del río Yangtze chino y deltas del Mekong vietnamita-tailandés-camboyano como tubérculo dulce-crujiente característico de la gastronomía asiática chino-tailandesa-vietnamita (chop suey, sopas wonton, rollitos primavera, stir-fries, ensaladas frescas — su crocancia se preserva incluso tras cocción larga, propiedad culinaria única). Distribuida pantropicalmente como cultivo emergente y como especie acuática naturalizada en humedales tropicales-subtropicales. Introducida experimentalmente en Colombia en últimas décadas en zonas con sistemas acuáticos manejados (Valle del Cauca — Cali, Palmira, Yumbo; Tolima — Espinal, Saldaña; Huila — Neiva, Garzón; Llanos Orientales — Casanare, Meta zonas inundables ribera de río) entre 0 y 1.800 msnm en zonas térmicas cálidas-templadas con disponibilidad de agua permanente. Lección viva PEDAGÓGICAMENTE EXCELENTE de NICHO ECOLÓGICO ACUÁTICO ESPECÍFICO INSUSTITUIBLE — ATENCIÓN PEDAGÓGICA CRÍTICA: este cultivo requiere INUNDACIÓN PERMANENTE SOSTENIDA durante todo el ciclo de 7-9 meses (5-15 cm de lámina de agua estable continua sobre la cama-arrozal-chinampa) — patrón ecológico-agronómico INCOMPATIBLE con sistemas agrícolas convencionales de secano-riego intermitente — solo cultivable en arrozales-paddy fields-camellones-chinampas-camas pantanosas inundables permanentes alimentadas por escorrentía continua, manantial, río o canal de riego sostenido — lección agronómica fundamental sobre cómo cada especie tiene su nicho ecológico específico no negociable y sobre cómo los sistemas agrícolas asiáticos del arroz desarrollaron ecosistemas inundables productivos sofisticados (arrozales-chinampas-paddy fields) que también albergan castaña de agua, lotus Nelumbo nucifera, taro Colocasia, cana de azúcar, y peces como tilapia-carpa en policultivos acuáticos multiespecíficos integrados. Planta herbácea perenne acaule con tallos cilíndricos huecos verde-azulados emergentes (50-150 cm altura — los 'tallos' son técnicamente escapos foliares modificados, las hojas verdaderas reducidas a vainas basales en Cyperaceae) que emergen verticales del rizoma subterráneo horizontal blanco-amarillento, inflorescencia espiguilla terminal pequeña marrón-paja cilíndrica (2-4 cm) con flores pequeñas anemófilas autógamas (autopolinización viento — no requiere polinizadores), frutos aquenios pequeños marrones (rara vez se reproduce sexualmente en cultivo — predomina propagación vegetativa por cormelos del rizoma), tubérculos subterráneos cormelos redondeados (2-4 cm diámetro) corteza marrón-rojiza-negruzca rugosa con pulpa blanca-crema crujiente dulce (de allí el epíteto 'dulcis' — los más dulces de las Cyperaceae) rica en almidón resistente, azúcares simples, vitaminas C-B6-tiamina-niacina, minerales K-Mg-Fe-Zn-Cu-Mn, fibra dietética, polisacáridos, y un compuesto fenólico característico (puchiin) que preserva crocancia tras cocción — propiedad culinaria única no replicable por otros tubérculos. Manejo agroecológico acuático específico: cultivo en arrozales-camas pantanosas inundables permanentes (lámina de agua 5-15 cm sostenida durante todo el ciclo), propagación vegetativa por cormelos del rizoma plantados a 5-10 cm profundidad en suelo encharcado-pantanoso a inicio de período lluvioso, distancia 30 x 30 cm (111000 plantas/ha — densidad alta tipo arrozal), no requiere fertilización (los humedales tropicales son sistemas naturalmente fértiles + cianobacterias fijadoras N libres-Azolla-Anabaena en agua), asocio tradicional con arroz acuático Oryza sativa y peces tilapia-carpa-cachama en policultivo acuático integrado, manejo: drenar el campo las últimas 4-6 semanas antes de cosecha para inducir maduración del tubérculo y facilitar arranque manual, cosecha por excavación manual al drenar la cama, almacenamiento post-cosecha en agua fresca o tierra húmeda 2-4 meses (perecedero), rendimientos 10-25 t/ha cormelos. Función en chagra/huerto escolar tropical-subtropical con disponibilidad hídrica permanente como tubérculo acuático emergente de gastronomía asiática, cultivo de nicho ecológico acuático específico (camas inundables-chinampas-arrozales), lección viva extraordinaria sobre nicho ecológico no negociable, sistemas agrícolas acuáticos asiáticos del arroz, y policultivos acuáticos multiespecíficos integrados (arroz-castaña-taro-tilapia-Azolla). ADVERTENCIA AGRONÓMICA CRÍTICA: incompatible con sistemas de secano — requiere inundación permanente. Fuentes Tier A: NRC 1989 Lost Crops Incas Andes (sección cultivos acuáticos), FAO Ecocrop Eleocharis dulcis, POWO Kew, GBIF Backbone Taxonomy, SIB Colombia.",
+  "sources": [
+    {
+      "id": "gbif-taxonomic-backbone",
+      "title": "gbif-taxonomic-backbone",
+      "tier": "A",
+      "url": "https://www.gbif.org/dataset/d7dddbf4-2cf0-4f39-9b2a-bb099caae36c"
+    },
+    {
+      "id": "powo-kew",
+      "title": "powo-kew",
+      "tier": "A",
+      "url": "https://powo.science.kew.org"
+    },
+    {
+      "id": "fao-ecocrop",
+      "title": "fao-ecocrop",
+      "tier": "A",
+      "url": "https://gaez.fao.org/pages/ecocrop"
+    },
+    {
+      "id": "nrc-1989-cultivos-andinos",
+      "title": "nrc-1989-cultivos-andinos",
+      "tier": "A",
+      "url": null
+    },
+    {
+      "id": "sib-colombia",
+      "title": "sib-colombia",
+      "tier": "A",
+      "url": "https://sibcolombia.net"
+    }
+  ],
+  "_generated_by": "scripts/build-cycle-content-from-catalog.mjs",
+  "_generated_at": "2026-05-19T00:42:57.398Z"
+}

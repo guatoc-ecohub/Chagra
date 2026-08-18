@@ -1,0 +1,89 @@
+{
+  "species_slug": "colocasia_antiquorum",
+  "scientific_name": "Colocasia antiquorum Schott",
+  "common_names": [
+    "Taro asiático"
+  ],
+  "family": "Araceae",
+  "category": "tuberculos_raices",
+  "cultivable": true,
+  "conservation_status": "naturalizada",
+  "thermal_zones": [
+    "calido",
+    "templado"
+  ],
+  "roles_in_guild": [
+    "crop",
+    "ground_cover"
+  ],
+  "antagonists": [],
+  "especies_nativas_sustitutas": [],
+  "propagation": {
+    "methods": [
+      "tuberculo"
+    ],
+    "best_method": "tuberculo",
+    "protocol_resumen": "Propagación vegetativa por cormos hijos pequeños (cormelos secundarios — 'eddoes' de 50-150 g) o trozos de cormo principal con yemas, siembra en hoyos 15-25 cm de profundidad con materia orgánica al fondo, distancia 60-80 cm entre plantas x 80-100 cm entre surcos. Requiere humedad alta sostenida (camas inundables alternativas). Ciclo 7-10 meses cosecha cormos.",
+    "tiempo_a_establecimiento_dias": 21,
+    "notas": "Aroidea de tubérculo principal pequeño con MUCHOS hijos-cormelos secundarios pequeños — patrón diferenciador con Colocasia esculenta (que produce 1-2 cormos grandes principales). Ideal para chinampas-camellones inundables. Variedad asiática de la papa china. Toxicidad de oxalato de calcio en crudo — requiere cocción.",
+    "fuente": "POWO Kew Colocasia antiquorum; FAO Ecocrop; AGROSAVIA Manual Tubérculos Andinos 2017"
+  },
+  "requirements": {
+    "agua": "alto",
+    "altitud_msnm": {
+      "min_absoluto": 0,
+      "optimo_min": 100,
+      "optimo_max": 1500,
+      "max_absoluto": 2000
+    },
+    "temperatura_c": {
+      "helada_letal": 5,
+      "optimo_min": 22,
+      "optimo_max": 30,
+      "max_tolerable": 35
+    },
+    "radiacion": "sombra_parcial",
+    "drenaje_requerido": "moderado"
+  },
+  "valor_pedagogico": "El taro asiático o papa china (Colocasia antiquorum Schott, familia Araceae, subfamilia Aroideae) es una aroidea herbácea perenne tuberosa originaria del sudeste asiático tropical (India oriental — Bengala, Bangladesh, Myanmar, Tailandia, Camboya, Vietnam, sur de China, Malasia, Indonesia, Filipinas) donde se cultiva ancestralmente hace ~9000-10000 años como uno de los cultivos tuberosos tropicales más antiguos del mundo (junto con yuca Manihot esculenta de América y batata Ipomoea batatas de Sudamérica). Considerada por taxónomos modernos como variedad-cultivar o subespecie del complejo Colocasia esculenta (L.) Schott — con quien se cruza fácilmente y comparte morfología general — pero diferenciada hortícola-comercialmente por su patrón de tuberización característico: produce un cormo principal pequeño-mediano (200-800 g) acompañado de MUCHOS cormos hijos secundarios pequeños llamados 'cormelos' o 'eddoes' (50-150 g cada uno, 5-15 por planta) — patrón diferenciador clave con Colocasia esculenta var. esculenta clásica (la 'taro dasheen' americano-pacífico que produce 1-2 cormos principales grandes de 1-3 kg con pocos cormelos) — diferencia hortícola comercial fundamental. Naturalizada en Colombia desde introducción asiática post-canal-Panamá y migraciones chinas-japonesas al Pacífico colombiano. Se cultiva tradicionalmente en Costa Pacífica colombiana (Valle del Cauca — Buenaventura; Cauca — Guapi, Timbiquí; Nariño — Tumaco), Caribe húmedo (Córdoba, Sucre, Bolívar, Antioquia Urabá-Bajo Cauca, Chocó), Magdalena medio antioqueño-santandereano, Eje Cafetero zonas húmedas (Quindío, Risaralda templado húmedo, Caldas), Tolima-Huila zonas húmedas riberas de río, Llanos Orientales (Casanare, Meta zonas inundables), Amazonía colombiana (Putumayo, Caquetá, Amazonas — Leticia) entre 0 y 2.000 msnm en zonas térmicas cálidas-templadas húmedas-superhúmedas tropicales-ecuatoriales con alta disponibilidad hídrica. Lección viva PEDAGÓGICAMENTE EXCELENTE de tuberización múltiple aroidea y sistemas agrícolas inundables: enseña a niñas y niños la diferencia botánica entre cormos primarios y secundarios (cormelos-eddoes), las chinampas-camellones inundables mesoamericanas y los sistemas agrícolas asiáticos de cultivo en agua (los taros se cultivan tradicionalmente en arrozales-paddy fields asiáticos por su tolerancia a inundación prolongada), y la importancia del oxalato de calcio como mecanismo de defensa anti-herbivoría en Araceae (TODA la planta cruda contiene cristales de oxalato de calcio en forma de rafidios que causan irritación bucal-traqueal severa — requiere cocción prolongada por hervor o vapor o asado para destruir los rafidios y hacer la planta comestible — lección biológica importante de toxinas vegetales y manejo culinario tradicional). Planta herbácea perenne acaule con cormo principal subterráneo + cormelos hijos secundarios numerosos, hojas grandes peltado-sagitadas-cordiformes verde oscuras brillantes (30-80 cm largo) con peciolos largos suculentos verde-violáceos-purpúreos (60-150 cm altura) — aspecto ornamental tropical, inflorescencia espádice envuelto en espata amarillo-verdosa (rara en cultivo — predomina propagación vegetativa por cormelos), planta perenne en clima cálido (resiembra anual en climas con estación seca marcada). Manejo agroecológico tropical húmedo: propagación vegetativa por cormos hijos pequeños (cormelos-eddoes 50-150 g) o trozos de cormo principal con yemas, siembra en hoyos 15-25 cm con compost-bocashi-materia orgánica al fondo, distancia 60-80 cm x 80-100 cm, requiere humedad alta sostenida (riego frecuente o ubicación en bajos-vegas-orillas de quebrada-camas inundables alternativas tipo chinampa mesoamericana), tolera encharcamiento moderado (camas inundables son ideales), asocio tradicional con plátano-yuca-borojó-chontaduro en chagras pacíficas húmedas y con maíz-arroz-yuca en milpas caribeñas, control biológico de tizón Phytophthora colocasiae con podas sanitarias + drenaje superficial + caldo bordelés moderado + rotación 3 años, cosecha por arranque manual a los 7-10 meses, los cormelos hijos se cosechan continuamente dejando el cormo principal seguir produciendo, rendimientos 10-25 t/ha cormos totales (cormo principal + cormelos hijos). Función en chagra/huerto escolar tropical-subtropical húmedo como tubérculo aroideo asiático naturalizado de seguridad alimentaria, ground cover hojas grandes ornamentales tropicales, cultivo ideal para sistemas inundables-chinampas-camellones, lección viva extraordinaria de tuberización múltiple aroidea y manejo culinario de toxinas oxalato calcio. Fuentes Tier A: AGROSAVIA Manual Tubérculos Andinos 2017, FAO Ecocrop Colocasia, POWO Kew, GBIF Backbone Taxonomy, Bernal 2015 Catálogo Plantas Colombia, SIB Colombia.",
+  "sources": [
+    {
+      "id": "gbif-taxonomic-backbone",
+      "title": "gbif-taxonomic-backbone",
+      "tier": "A",
+      "url": "https://www.gbif.org/dataset/d7dddbf4-2cf0-4f39-9b2a-bb099caae36c"
+    },
+    {
+      "id": "powo-kew",
+      "title": "powo-kew",
+      "tier": "A",
+      "url": "https://powo.science.kew.org"
+    },
+    {
+      "id": "fao-ecocrop",
+      "title": "fao-ecocrop",
+      "tier": "A",
+      "url": "https://gaez.fao.org/pages/ecocrop"
+    },
+    {
+      "id": "agrosavia-manual-tuberculos-andinos-2017",
+      "title": "agrosavia-manual-tuberculos-andinos-2017",
+      "tier": "A",
+      "url": null
+    },
+    {
+      "id": "bernal-2015-plantas-liquenes-colombia",
+      "title": "bernal-2015-plantas-liquenes-colombia",
+      "tier": "A",
+      "url": "http://catalogoplantasdecolombia.unal.edu.co"
+    },
+    {
+      "id": "sib-colombia",
+      "title": "sib-colombia",
+      "tier": "A",
+      "url": "https://sibcolombia.net"
+    }
+  ],
+  "_generated_by": "scripts/build-cycle-content-from-catalog.mjs",
+  "_generated_at": "2026-05-19T00:42:57.398Z"
+}

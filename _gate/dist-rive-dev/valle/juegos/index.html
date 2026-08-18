@@ -1,0 +1,192 @@
+<!doctype html>
+<html lang="es-CO">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#23150f">
+<title>Chagra · Sala de juegos</title>
+<style>
+  :root{
+    --ink:#f7ebd7;
+    --ink-dim:#d8c2a6;
+    --wood:#4e2f1f;
+    --wood-2:#6d452b;
+    --wall:#d8c29d;
+    --wall-2:#b38b5d;
+    --crt:#7ff0d2;
+    --warm:#ffce71;
+    --shadow:#100805;
+    --accent:#79a85d;
+  }
+  html,body{margin:0;height:100%;overflow:hidden;background:var(--shadow);color:var(--ink);font-family:Georgia,"Times New Roman",serif}
+  body{touch-action:none;overscroll-behavior:none}
+  #app{
+    position:fixed;inset:0;overflow:hidden;
+    background:
+      radial-gradient(1200px 780px at 50% 24%, rgba(255,222,160,.16), transparent 58%),
+      radial-gradient(800px 440px at 20% 0%, rgba(121,168,93,.08), transparent 55%),
+      linear-gradient(180deg,#1a0f0a 0%,#26150f 30%,#1a100b 100%);
+  }
+  #gameFrame{
+    position:absolute;inset:0;width:100%;height:100%;
+    border:0;background:#090705;opacity:0;pointer-events:none;
+    transition:opacity .24s ease;
+  }
+  #salaCanvas{
+    position:absolute;inset:0;width:100%;height:100%;display:block;
+    pointer-events:auto;
+  }
+  #salaCanvas.hidden{pointer-events:none}
+  #overlay{
+    position:absolute;inset:0;z-index:6;pointer-events:none;
+  }
+  #card{
+    position:absolute;left:14px;top:14px;max-width:min(92vw,430px);
+    background:linear-gradient(180deg,rgba(41,23,14,.86),rgba(20,13,9,.72));
+    border:1px solid rgba(255,237,206,.15);
+    border-radius:18px;padding:12px 14px 12px;
+    box-shadow:0 12px 28px rgba(0,0,0,.25);
+  }
+  #brand{
+    display:flex;align-items:center;gap:10px;letter-spacing:.08em;text-transform:uppercase;
+    font-size:11px;color:var(--warm);opacity:.92
+  }
+  #brand .mark{
+    width:11px;height:11px;border-radius:50%;
+    background:radial-gradient(circle at 35% 35%, #fff2c1 0 18%, #ffb14d 22% 48%, #6d3514 55% 100%);
+    box-shadow:0 0 18px rgba(255,191,97,.55);
+  }
+  #title{
+    margin:8px 0 4px;font-size:clamp(24px,4.8vw,48px);line-height:.95;
+    color:#fff2d0;font-style:italic;text-wrap:balance
+  }
+  #meta{
+    margin:0;font-size:14px;line-height:1.45;color:var(--ink-dim)
+  }
+  #meta strong{color:#fff1c3}
+  #legend{
+    display:flex;gap:8px;flex-wrap:wrap;margin-top:10px
+  }
+  .chip{
+    display:inline-flex;align-items:center;gap:6px;
+    padding:6px 10px;border-radius:999px;
+    background:rgba(255,255,255,.06);
+    border:1px solid rgba(255,255,255,.08);
+    color:#f6e4c2;font-size:12px;line-height:1
+  }
+  .chip b{color:#fff2d2}
+  #stationCard{
+    position:absolute;right:14px;top:14px;max-width:min(42vw,390px);
+    background:linear-gradient(180deg,rgba(255,245,223,.93),rgba(238,223,187,.86));
+    color:#3d2416;border:2px solid rgba(84,52,29,.28);
+    border-radius:16px;padding:12px 14px 11px;
+    box-shadow:0 14px 34px rgba(0,0,0,.22);
+  }
+  #stationName{
+    margin:0;font-size:18px;font-style:italic;line-height:1.1;color:#5a2617
+  }
+  #stationState{
+    margin:5px 0 0;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:#6b4a2d
+  }
+  #stationHint{
+    margin:8px 0 0;font-size:13px;line-height:1.45;color:#4a3320
+  }
+  #controls{
+    position:absolute;left:0;right:0;bottom:12px;z-index:8;
+    display:flex;justify-content:space-between;align-items:flex-end;gap:12px;
+    padding:0 12px;pointer-events:none;
+  }
+  .pad{display:flex;gap:10px;pointer-events:auto}
+  .btn{
+    appearance:none;border:1px solid rgba(255,239,208,.74);
+    background:linear-gradient(180deg,rgba(73,42,23,.88),rgba(31,18,10,.92));
+    color:#fff3d5;border-radius:18px;
+    width:64px;height:64px;display:grid;place-items:center;
+    font-size:24px;font-weight:700;box-shadow:0 10px 18px rgba(0,0,0,.24);
+    user-select:none;-webkit-user-select:none;touch-action:none;
+  }
+  .btn:active,.btn.down{transform:translateY(2px) scale(.98)}
+  #enterBtn{
+    width:132px;font-size:14px;letter-spacing:.05em;text-transform:uppercase
+  }
+  #enterBtn strong{display:block;font-size:22px;line-height:1}
+  #backBtn{
+    position:absolute;left:14px;bottom:88px;z-index:9;pointer-events:auto;
+    appearance:none;border:1px solid rgba(255,240,220,.72);
+    background:linear-gradient(180deg,rgba(247,235,210,.95),rgba(224,206,166,.92));
+    color:#402615;border-radius:999px;padding:10px 14px;
+    font:700 13px Georgia,serif;box-shadow:0 10px 20px rgba(0,0,0,.22);
+    opacity:0;transform:translateY(8px);pointer-events:none;
+    transition:opacity .24s ease,transform .24s ease;
+  }
+  #backBtn.show{opacity:1;transform:translateY(0);pointer-events:auto}
+  #toast{
+    position:absolute;left:50%;top:18px;transform:translateX(-50%) translateY(-8px);
+    z-index:10;background:rgba(255,241,206,.97);color:#3a2418;
+    border:2px solid rgba(60,35,20,.88);border-radius:999px;
+    padding:8px 14px;font-size:14px;box-shadow:0 10px 22px rgba(0,0,0,.22);
+    opacity:0;transition:opacity .22s ease,transform .22s ease
+  }
+  #toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+  #grain{
+    position:absolute;inset:0;pointer-events:none;z-index:7;opacity:.07;
+    background:
+      repeating-linear-gradient(0deg, rgba(255,255,255,.03) 0 1px, transparent 1px 3px),
+      repeating-linear-gradient(90deg, rgba(0,0,0,.03) 0 1px, transparent 1px 4px);
+  }
+  @media (max-width:760px){
+    #card{max-width:calc(100vw - 28px)}
+    #stationCard{
+      top:auto;right:12px;left:12px;bottom:106px;max-width:none
+    }
+    #controls{bottom:12px}
+    .btn{width:60px;height:60px;border-radius:16px}
+    #enterBtn{width:118px}
+    #backBtn{bottom:92px}
+  }
+</style>
+<script type="importmap">
+{
+  "imports": {
+    "three": "../../vendor/three.module.js"
+  }
+}
+</script>
+</head>
+<body>
+<div id="app">
+  <iframe id="gameFrame" title="Juego seleccionado" aria-hidden="true"></iframe>
+  <canvas id="salaCanvas"></canvas>
+  <div id="grain"></div>
+  <div id="overlay">
+    <div id="card">
+      <div id="brand"><span class="mark"></span>Chagra · sala de juegos</div>
+      <h1 id="title">Domo del valle</h1>
+      <p id="meta">Desde el domo se entra a la sala. Usa flechas, arrastre o los botones para moverte entre estaciones. <strong>Espacio</strong> o tocar <strong>Entrar</strong> abre el juego.</p>
+      <div id="legend">
+        <span class="chip"><b>◀ ▶</b> cambiar estación</span>
+        <span class="chip"><b>Arrastre</b> en celular</span>
+        <span class="chip"><b>Espacio</b> entrar</span>
+      </div>
+    </div>
+    <div id="stationCard">
+      <h2 id="stationName"></h2>
+      <div id="stationState"></div>
+      <p id="stationHint"></p>
+    </div>
+    <button id="backBtn" type="button">Volver a la sala</button>
+    <div id="controls" aria-label="Controles de la sala">
+      <div class="pad">
+        <button class="btn" id="leftBtn" aria-label="Estación anterior">◀</button>
+        <button class="btn" id="rightBtn" aria-label="Estación siguiente">▶</button>
+      </div>
+      <div class="pad">
+        <button class="btn" id="enterBtn" aria-label="Entrar al juego"><span>Entrar</span><strong>↵</strong></button>
+      </div>
+    </div>
+    <div id="toast" role="status" aria-live="polite"></div>
+  </div>
+</div>
+<script type="module" src="./_sala/sala.js"></script>
+</body>
+</html>

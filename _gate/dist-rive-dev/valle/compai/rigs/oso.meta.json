@@ -1,0 +1,13 @@
+{
+  "wrap": "osoWrap",
+  "pielKart": {
+    "cuerpo": { "grad": "gPelaje", "stop": 1 },
+    "cuerpo2": { "grad": "gPecho", "stop": 0 },
+    "cabeza": { "grad": "gPelaje", "stop": 1 },
+    "detalle": { "grad": "gPelaje", "stop": 2 },
+    "extras": {
+      "hocico": { "grad": "gHocico", "stop": 0 },
+      "orejaIn": { "fill": "#2a1c12" }
+    }
+  }
+}

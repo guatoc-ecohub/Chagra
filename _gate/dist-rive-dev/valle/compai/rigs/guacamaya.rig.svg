@@ -1,0 +1,158 @@
+<g id="guacaWrap">
+      <g id="guaca" filter="url(#boil)">
+        <g class="flota">
+         <g id="anticRig"><g id="traviesoRig">
+          <g id="cuerpoRig">
+
+            <!-- ============ COLA MUY LARGA Y FLUIDA (bajo el cuerpo) ============ -->
+            <g transform="translate(0,132)">
+              <!-- par externo (rojo profundo) -->
+              <g id="colaExterna" class="colaCapa">
+                <g stroke="#2a140b" stroke-width="4">
+                  <g transform="rotate(13)"><use href="#plumaCola" fill="#a8151a" transform="scale(.62)"/></g>
+                  <g transform="rotate(-13)"><use href="#plumaCola" fill="#a8151a" transform="scale(.62)"/></g>
+                </g>
+              </g>
+              <!-- par medio (escarlata) -->
+              <g id="colaMedia" class="colaCapa">
+                <g stroke="#2a140b" stroke-width="4">
+                  <g transform="rotate(6.5)"><use href="#plumaCola" fill="url(#gColaRoja)" transform="scale(.84)"/></g>
+                  <g transform="rotate(-6.5)"><use href="#plumaCola" fill="url(#gColaRoja)" transform="scale(.84)"/></g>
+                </g>
+              </g>
+              <!-- pluma central larguísima, escarlata con punta AZUL -->
+              <g id="colaCentro" class="colaCapa">
+                <g transform="scale(1.06)">
+                  <use href="#plumaCola" fill="url(#gColaRoja)" stroke="#2a140b" stroke-width="4.5"/>
+                  <!-- punta azul (Ara macao) -->
+                  <path d="M-8,196 C -9,232 -5,258 2,266 C 9,258 13,232 12,196 C 8,203 -4,203 -8,196 Z"
+                        fill="url(#gAzulAla)" stroke="#16244e" stroke-width="3"/>
+                  <!-- raquis -->
+                  <path d="M2,24 C 1,110 1,190 2,252" stroke="#7c0e12" stroke-width="2.2" fill="none" opacity=".7"/>
+                </g>
+              </g>
+            </g>
+
+            <!-- ============ ALAS — NACEN DE LOS HOMBROS DEL CUERPO ============ -->
+            <!-- ala izquierda: hombro en (-52,10) del torso -->
+            <g transform="translate(-52,10)">
+              <g class="fantasmaAla"><path d="M-8,4 C -64,-8 -118,14 -150,72 C -106,90 -50,66 -6,30 Z" fill="#e02420" fill-opacity=".28" filter="url(#blurAla)"/></g>
+              <g id="alaIzq" class="ala"><use href="#alaBandera"/></g>
+            </g>
+            <!-- ala derecha: hombro en (52,10), espejo exacto -->
+            <g transform="translate(52,10) scale(-1,1)">
+              <g class="fantasmaAla"><path d="M-8,4 C -64,-8 -118,14 -150,72 C -106,90 -50,66 -6,30 Z" fill="#e02420" fill-opacity=".28" filter="url(#blurAla)"/></g>
+              <g id="alaDer" class="ala"><use href="#alaBandera"/></g>
+            </g>
+
+            <!-- patitas grises zigodáctilas -->
+            <g stroke="#4a4a52" stroke-width="7" fill="none" stroke-linecap="round">
+              <path d="M-20,146 C -24,162 -22,172 -13,176 M-20,146 C -30,160 -36,168 -42,168"/>
+              <path d="M20,146 C 24,162 22,172 13,176 M20,146 C 30,160 36,168 42,168"/>
+            </g>
+
+            <!-- ============ CUERPO — torso escarlata elegante (gota) ============ -->
+            <path d="M0,-30 C 36,-24 56,12 55,62 C 54,112 30,150 0,156 C -30,150 -54,112 -55,62 C -56,12 -36,-24 0,-30 Z"
+                  fill="url(#gEscarlata)" stroke="#2a140b" stroke-width="4.5"/>
+            <!-- pecho con luz -->
+            <path d="M-26,-6 C -38,22 -38,62 -26,92 C -12,74 -8,26 -14,-8 Z" fill="#ff7a52" opacity=".5"/>
+            <!-- escamitas de plumón del pecho -->
+            <g stroke="#a8151a" stroke-width="2" fill="none" opacity=".5" stroke-linecap="round">
+              <path d="M-16,58 C -10,64 -2,66 6,64"/>
+              <path d="M-8,84 C -2,90 6,92 14,90"/>
+              <path d="M-20,108 C -14,114 -6,116 2,114"/>
+              <path d="M4,34 C 10,40 18,42 26,40"/>
+            </g>
+
+            <!-- ============ CABEZA — SOLO cara blanca + ojos + pico ============ -->
+            <g id="cabezaRig">
+              <!-- cabeza escarlata -->
+              <circle cx="0" cy="-64" r="56" fill="url(#gCabeza)" stroke="#2a140b" stroke-width="4.5"/>
+              <!-- luz de la corona -->
+              <path d="M-36,-96 C -18,-108 18,-108 36,-96 C 20,-104 -20,-104 -36,-96 Z" fill="#ff8a66" opacity=".7"/>
+
+              <!-- CARA BLANCA desnuda (la firma) -->
+              <path d="M-50,-72 C -55,-38 -32,-16 0,-16 C 32,-16 55,-38 50,-72 C 30,-88 -30,-88 -50,-72 Z"
+                    fill="#f6f0e4" stroke="#e2d8c6" stroke-width="2"/>
+              <!-- líneas finas concéntricas de plumitas rojas (patrón real) -->
+              <g stroke="#e02420" stroke-width="1.7" opacity=".7" fill="none" stroke-linecap="round">
+                <path d="M-43,-70 C -32,-68 -20,-68 -10,-71"/>
+                <path d="M-45,-58 C -32,-56 -18,-56 -6,-59"/>
+                <path d="M-43,-45 C -30,-43 -17,-43 -5,-46"/>
+                <path d="M-38,-32 C -27,-31 -16,-32 -8,-35"/>
+                <path d="M43,-70 C 32,-68 20,-68 10,-71"/>
+                <path d="M45,-58 C 32,-56 18,-56 6,-59"/>
+                <path d="M43,-45 C 30,-43 17,-43 5,-46"/>
+                <path d="M38,-32 C 27,-31 16,-32 8,-35"/>
+              </g>
+              <!-- rubor (las guacamayas de verdad se sonrojan) -->
+              <ellipse cx="-36" cy="-36" rx="8" ry="5.5" fill="#f0a08a" opacity=".4"/>
+              <ellipse cx="36" cy="-36" rx="8" ry="5.5" fill="#f0a08a" opacity=".4"/>
+
+              <!-- OJOS grandes y carismáticos -->
+              <g class="ojo">
+                <circle cx="-25" cy="-62" r="16.5" fill="#fdfbf2"/>
+                <circle cx="-25" cy="-62" r="16.5" fill="none" stroke="#2a140b" stroke-width="3"/>
+                <g class="pupila">
+                  <circle cx="-23" cy="-60" r="9.5" fill="#d89422"/>
+                  <circle cx="-23" cy="-60" r="5.2" fill="#1a0f08"/>
+                  <circle cx="-20" cy="-64" r="3" fill="#ffffff"/>
+                  <circle cx="-27" cy="-56" r="1.4" fill="#ffffff" opacity=".8"/>
+                </g>
+              </g>
+              <g class="ojo">
+                <circle cx="25" cy="-62" r="16.5" fill="#fdfbf2"/>
+                <circle cx="25" cy="-62" r="16.5" fill="none" stroke="#2a140b" stroke-width="3"/>
+                <g class="pupila">
+                  <circle cx="27" cy="-60" r="9.5" fill="#d89422"/>
+                  <circle cx="27" cy="-60" r="5.2" fill="#1a0f08"/>
+                  <circle cx="30" cy="-64" r="3" fill="#ffffff"/>
+                  <circle cx="23" cy="-56" r="1.4" fill="#ffffff" opacity=".8"/>
+                </g>
+              </g>
+
+              <!-- ============ PICO curvo GRANDE gris oscuro ============ -->
+              <g id="pico" transform="translate(0,-26)">
+                <!-- mandíbula inferior (LIP-SYNC por JS) + lengua -->
+                <g id="picoBajo">
+                  <path d="M-19,4 C -10,13 10,13 19,4 C 15,24 7,36 0,40 C -7,36 -15,24 -19,4 Z"
+                        fill="#26262c" stroke="#141418" stroke-width="3.4" stroke-linejoin="round"/>
+                  <ellipse cx="0" cy="14" rx="7.5" ry="4.5" fill="#8a3028"/>
+                </g>
+                <!-- maxila superior grande y ganchuda -->
+                <path d="M-29,-8 C -29,-30 -14,-42 0,-42 C 14,-42 29,-30 29,-8
+                         C 29,8 19,24 6,36 C 2,40 -2,40 -4,35 C -8,28 -7,20 -5,13
+                         C -16,12 -26,4 -29,-8 Z"
+                      fill="url(#gPicoAlto)" stroke="#141418" stroke-width="4" stroke-linejoin="round"/>
+                <!-- culmen con luz -->
+                <path d="M-2,-38 C 10,-36 21,-26 24,-10 C 17,-24 7,-32 -2,-34 Z" fill="#8a8a96" opacity=".85"/>
+                <!-- narinas -->
+                <ellipse cx="-13" cy="-27" rx="2.8" ry="2.2" fill="#f6f0e4"/>
+                <ellipse cx="13" cy="-27" rx="2.8" ry="2.2" fill="#f6f0e4"/>
+              </g>
+            </g><!-- /cabezaRig -->
+
+          </g><!-- /cuerpoRig -->
+         </g></g><!-- /travieso /antic -->
+
+          <!-- semillas que caen (dispersar) -->
+          <g fill="#5a3818" stroke="#2a140b" stroke-width="2">
+            <ellipse class="semilla"    cx="46" cy="120" rx="6" ry="8"/>
+            <ellipse class="semilla s2" cx="76" cy="90"  rx="5" ry="7"/>
+            <ellipse class="semilla s3" cx="24" cy="142" rx="5.5" ry="7.5"/>
+          </g>
+
+        </g><!-- /flota -->
+      </g><!-- /guaca -->
+
+      <!-- JAULA (amenaza: tráfico de fauna) -->
+      <g id="jaula" stroke="#3a2c1c" stroke-width="7" opacity="0">
+        <rect x="-170" y="-280" width="340" height="580" rx="14" fill="none"/>
+        <line x1="-113" y1="-280" x2="-113" y2="300"/>
+        <line x1="-56" y1="-280" x2="-56" y2="300"/>
+        <line x1="0" y1="-280" x2="0" y2="300"/>
+        <line x1="56" y1="-280" x2="56" y2="300"/>
+        <line x1="113" y1="-280" x2="113" y2="300"/>
+        <path d="M-170,-280 C -70,-322 70,-322 170,-280" fill="none"/>
+      </g>
+    </g>

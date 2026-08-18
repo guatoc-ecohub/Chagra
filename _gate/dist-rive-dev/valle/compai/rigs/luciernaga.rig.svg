@@ -1,0 +1,146 @@
+<g id="luciernagaWrap">
+      <g id="luciernaga" filter="url(#boil)">
+        <g class="flota">
+         <g id="anticRig"><g id="traviesoRig">
+          <g id="cuerpoRig">
+
+            <!-- aura suave de lectura (separa del fondo oscuro) -->
+            <ellipse cx="0" cy="40" rx="160" ry="190" fill="url(#gAura)"/>
+
+            <!-- halo grande de la linterna (detrás del cuerpo) -->
+            <circle id="linternaHalo" cx="0" cy="152" r="78" fill="url(#gHalo)"/>
+
+            <!-- ALAS membranosas (detrás de los élitros, borrosas) -->
+            <g transform="translate(-30,18) rotate(14)"><g id="alaIzq" class="alaMemb">
+              <path d="M0,0 C -46,-8 -100,-4 -134,-44 C -100,-64 -48,-42 -8,-6 Z" transform="rotate(20 0 0)" fill="#e5d5a2" opacity=".16" filter="url(#blurAla)"/>
+              <path d="M0,0 C -46,-8 -100,-4 -134,-44 C -100,-64 -48,-42 -8,-6 Z" fill="#ecdfb2" opacity=".28"/>
+            </g></g>
+            <g transform="translate(30,18) rotate(-14)"><g id="alaDer" class="alaMemb">
+              <path d="M0,0 C 46,-8 100,-4 134,-44 C 100,-64 48,-42 8,-6 Z" transform="rotate(-20 0 0)" fill="#e5d5a2" opacity=".16" filter="url(#blurAla)"/>
+              <path d="M0,0 C 46,-8 100,-4 134,-44 C 100,-64 48,-42 8,-6 Z" fill="#ecdfb2" opacity=".28"/>
+            </g></g>
+
+            <!-- PATAS traseras y medias (6 patas en total con las delanteras) -->
+            <g stroke="#140d07" stroke-width="8.5" stroke-linecap="round" fill="none">
+              <!-- traseras -->
+              <path d="M-26,102 C -50,118 -64,142 -62,164"/>
+              <path d="M26,102 C 50,118 64,142 62,164"/>
+              <!-- medias -->
+              <path d="M-52,56 C -86,66 -110,72 -124,64"/>
+              <path d="M52,56 C 86,66 110,72 124,64"/>
+            </g>
+            <g fill="#140d07">
+              <circle cx="-62" cy="166" r="4.2"/><circle cx="62" cy="166" r="4.2"/>
+              <circle cx="-125" cy="64" r="4.2"/><circle cx="125" cy="64" r="4.2"/>
+            </g>
+
+            <!-- ÉLITROS (alas endurecidas). Cuerpo MACIZO y compacto de altura fría
+                 (linaje andino Pseudolychnuris / Photinus de páramo): más ancho y
+                 achatado que una luciérnaga esbelta de tierra caliente. -->
+            <g>
+              <path d="M0,-16 C -44,-16 -74,10 -76,50 C -78,86 -54,114 -24,124 C -12,129 12,129 24,124 C 54,114 78,86 76,50 C 74,10 44,-16 0,-16 Z"
+                    fill="url(#gElytra)" stroke="#140d07" stroke-width="4.5"/>
+              <!-- brillo de volumen en cada élitro -->
+              <ellipse cx="-38" cy="18" rx="14" ry="32" fill="#59503c" opacity=".35" transform="rotate(-9 -38 18)"/>
+              <ellipse cx="38" cy="18" rx="14" ry="32" fill="#59503c" opacity=".35" transform="rotate(9 38 18)"/>
+              <!-- margen lateral pálido (rasgo de muchas Lampyridae) -->
+              <path d="M-72,24 C -74,58 -58,96 -28,118" stroke="#c79a52" stroke-width="5.5" fill="none" stroke-linecap="round" opacity=".85"/>
+              <path d="M72,24 C 74,58 58,96 28,118" stroke="#c79a52" stroke-width="5.5" fill="none" stroke-linecap="round" opacity=".85"/>
+              <!-- sutura central (los dos élitros se juntan) -->
+              <path d="M0,-8 L0,120" stroke="#0e0904" stroke-width="4" stroke-linecap="round"/>
+              <path d="M-3,-6 L-3,114" stroke="#4a4130" stroke-width="1.6" opacity=".6"/>
+              <path d="M3,-6 L3,114" stroke="#4a4130" stroke-width="1.6" opacity=".6"/>
+              <!-- punteado de los élitros (textura de la cutícula) -->
+              <g fill="#0e0904" opacity=".38">
+                <circle cx="-46" cy="38" r="1.6"/><circle cx="-40" cy="62" r="1.6"/><circle cx="-48" cy="82" r="1.5"/>
+                <circle cx="-34" cy="98" r="1.5"/><circle cx="46" cy="38" r="1.6"/><circle cx="40" cy="62" r="1.6"/>
+                <circle cx="48" cy="82" r="1.5"/><circle cx="34" cy="98" r="1.5"/>
+              </g>
+              <!-- escutelo (triangulito entre la base de los élitros) -->
+              <path d="M-12,-12 L12,-12 L0,9 Z" fill="#1a140c" stroke="#0e0904" stroke-width="1.5"/>
+            </g>
+
+            <!-- ABDOMEN ventral pálido con segmentos, asomando bajo los élitros -->
+            <path d="M-28,116 C -32,138 -18,168 0,168 C 18,168 32,138 28,116 Z" fill="#d8c489" stroke="#140d07" stroke-width="3"/>
+            <path d="M-25,128 C -9,134 9,134 25,128" stroke="#140d07" stroke-width="2" fill="none" opacity=".45"/>
+
+            <!-- LINTERNA (órgano bioluminiscente en los últimos segmentos) -->
+            <g id="linternaCore">
+              <path d="M-24,132 C -28,150 -16,168 0,168 C 16,168 28,150 24,132 C 8,138 -8,138 -24,132 Z" fill="url(#gLinterna)"/>
+              <path d="M-20,148 C -6,152 6,152 20,148" stroke="#f0cf72" stroke-width="2" fill="none" opacity=".6"/>
+              <ellipse cx="0" cy="150" rx="11" ry="9" fill="#fff9e6" opacity=".92"/>
+            </g>
+
+            <g id="testaRig">
+            <!-- CABEZA (parcialmente encapuchada por el pronoto) -->
+            <g id="cabeza">
+              <path d="M-38,-46 C -40,-16 -26,-2 0,-2 C 26,-2 40,-16 38,-46 C 30,-58 -30,-58 -38,-46 Z"
+                    fill="#241c13" stroke="#140d07" stroke-width="3.5"/>
+
+              <!-- OJOS compuestos, grandes y vidriosos -->
+              <g class="ojo">
+                <ellipse cx="-22" cy="-32" rx="21" ry="23" fill="#fbfbf2"/>
+                <ellipse cx="-22" cy="-32" rx="21" ry="23" fill="none" stroke="#140d07" stroke-width="3"/>
+                <g class="pupila">
+                  <circle cx="-19" cy="-30" r="11" fill="#171009"/>
+                  <circle cx="-15" cy="-34" r="4.2" fill="#ffffff"/>
+                  <circle cx="-23" cy="-26" r="2" fill="#ffffff" opacity=".8"/>
+                </g>
+              </g>
+              <g class="ojo">
+                <ellipse cx="22" cy="-32" rx="21" ry="23" fill="#fbfbf2"/>
+                <ellipse cx="22" cy="-32" rx="21" ry="23" fill="none" stroke="#140d07" stroke-width="3"/>
+                <g class="pupila">
+                  <circle cx="25" cy="-30" r="11" fill="#171009"/>
+                  <circle cx="29" cy="-34" r="4.2" fill="#ffffff"/>
+                  <circle cx="21" cy="-26" r="2" fill="#ffffff" opacity=".8"/>
+                </g>
+              </g>
+
+              <!-- cachetes campesinos (calidez, como la abeja angelita) -->
+              <ellipse class="cachete" cx="-31" cy="-13" rx="8.5" ry="5.5" fill="#e5866a" opacity=".55"/>
+              <ellipse class="cachete" cx="31" cy="-13" rx="8.5" ry="5.5" fill="#e5866a" opacity=".55"/>
+              <!-- boca amable / mandíbulas insinuadas -->
+              <ellipse id="boca" cx="0" cy="-9" rx="7" ry="4.5" fill="#3a2114"/>
+              <path d="M-9,-13 C -5,-10 -2,-10 0,-11 M9,-13 C 5,-10 2,-10 0,-11" stroke="#140d07" stroke-width="2" fill="none" stroke-linecap="round"/>
+            </g>
+
+            <!-- ANTENAS filiformes (base oculta bajo el pronoto) -->
+            <g transform="translate(-24,-50)"><g id="antenaIzq" class="antena">
+              <path d="M0,0 C -14,-30 -26,-56 -22,-84" stroke="#140d07" stroke-width="6" fill="none" stroke-linecap="round"/>
+              <circle class="antenaBulbo" cx="-22" cy="-86" r="5.4" fill="#2a1c10" stroke="#140d07" stroke-width="2"/>
+            </g></g>
+            <g transform="translate(24,-50)"><g id="antenaDer" class="antena">
+              <path d="M0,0 C 14,-30 26,-56 22,-84" stroke="#140d07" stroke-width="6" fill="none" stroke-linecap="round"/>
+              <circle class="antenaBulbo" cx="22" cy="-86" r="5.4" fill="#2a1c10" stroke="#140d07" stroke-width="2"/>
+            </g></g>
+
+            <!-- PRONOTO (escudo que encapucha la cabeza; borde cálido rojo-coral) -->
+            <g id="pronoto">
+              <path d="M-66,-56 C -74,-88 -46,-106 0,-106 C 46,-106 74,-88 66,-56 C 42,-42 -42,-42 -66,-56 Z"
+                    fill="url(#gPronoto)" stroke="#140d07" stroke-width="4.5"/>
+              <!-- mancha oscura central (patrón real Lampyridae) -->
+              <ellipse cx="0" cy="-74" rx="31" ry="19" fill="#211a12"/>
+              <!-- dos ventanas cálidas a los lados de la mancha -->
+              <ellipse cx="-40" cy="-72" rx="9" ry="12" fill="#f0a48c" opacity=".8"/>
+              <ellipse cx="40" cy="-72" rx="9" ry="12" fill="#f0a48c" opacity=".8"/>
+              <!-- reflejo del borde superior -->
+              <path d="M-48,-78 C -34,-98 34,-98 48,-78" stroke="#f6c3b0" stroke-width="3.5" fill="none" stroke-linecap="round" opacity=".7"/>
+            </g>
+            </g><!-- /testaRig -->
+
+            <!-- BRAZOS (patas delanteras que gesticulan; manitas cálidas) -->
+            <g transform="translate(-30,6)"><g id="brazoIzq" class="brazo">
+              <path d="M0,0 C -26,-6 -46,-2 -62,-14" stroke="#140d07" stroke-width="9" fill="none" stroke-linecap="round"/>
+              <circle cx="-66" cy="-16" r="12" fill="#efe1af" stroke="#140d07" stroke-width="3.5"/>
+            </g></g>
+            <g transform="translate(30,6)"><g id="brazoDer" class="brazo">
+              <path d="M0,0 C 26,-6 46,-2 62,-14" stroke="#140d07" stroke-width="9" fill="none" stroke-linecap="round"/>
+              <circle cx="66" cy="-16" r="12" fill="#efe1af" stroke="#140d07" stroke-width="3.5"/>
+            </g></g>
+
+          </g><!-- /cuerpoRig -->
+         </g></g><!-- /travieso /antic -->
+        </g><!-- /flota -->
+      </g><!-- /luciernaga -->
+    </g>

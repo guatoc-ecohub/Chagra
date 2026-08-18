@@ -1,0 +1,2 @@
+page.waitForFunction: Target page, context or browser has been closed
+    at /tmp/claude-1000/-home-kortux-Workspace/4b9d3c03-8459-4d1f-80fb-d673d10ad19a/scratchpad/rive-standalone-probe.mjs:32:14
