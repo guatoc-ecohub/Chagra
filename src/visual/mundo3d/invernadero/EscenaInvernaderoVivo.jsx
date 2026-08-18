@@ -403,7 +403,7 @@ const FAUNA_INVERNADERO = [
   { tipo: 'colibri', base: [4.1, 1.4, 5.2], patron: 'revoloteo', size: 28, fase: 1.2, df: 10 },
 ];
 
-function Diorama({ tier, reducedMotion, foco }) {
+function Diorama({ tier, reducedMotion, foco, especie, cantidad, layout }) {
   const perfil = perfilDeTier(tier);
   const conteos = useMemo(() => invernaderoDeTier(tier), [tier]);
 
@@ -553,7 +553,13 @@ function Diorama({ tier, reducedMotion, foco }) {
 
       {/* LA VIDA sembrada: bandejas, brotes que respiran, bolsas, tomate,
           frutos madurando y la hortaliza. */}
-      <FloraInvernadero tier={tier} reducedMotion={reducedMotion} />
+      <FloraInvernadero
+        tier={tier}
+        reducedMotion={reducedMotion}
+        especie={especie}
+        cantidad={cantidad}
+        layout={layout}
+      />
 
       {/* LA ALFOMBRA DE LUZ DIFUSA: el charco sin borde que la mancha deja en
           las camas — deriva de poniente a oriente con el día. Dos elipses
@@ -649,9 +655,16 @@ function Diorama({ tier, reducedMotion, foco }) {
 
 /**
  * El micro-mundo del invernadero campesino. Montar SOLO perezosa (lazy).
- * @param {{tier?: 'alto'|'medio'|'bajo', reducedMotion?: boolean, foco?: number[]|null}} props
+ * @param {{tier?: 'alto'|'medio'|'bajo', reducedMotion?: boolean, foco?: number[]|null, especie?: string, cantidad?: number, layout?: string|object}} props
  */
-export default function EscenaInvernaderoVivo({ tier = 'alto', reducedMotion = false, foco = null }) {
+export default function EscenaInvernaderoVivo({
+  tier = 'alto',
+  reducedMotion = false,
+  foco = null,
+  especie = 'tomate',
+  cantidad = 1500,
+  layout = 'surcos',
+}) {
   const perfil = perfilDeTier(tier);
   const [listo, setListo] = useState(false);
   return (
@@ -664,7 +677,14 @@ export default function EscenaInvernaderoVivo({ tier = 'alto', reducedMotion = f
       frameloop={reducedMotion ? 'demand' : 'always'}
       onCreated={() => setListo(true)}
     >
-      <Diorama tier={tier} reducedMotion={reducedMotion} foco={foco} />
+      <Diorama
+        tier={tier}
+        reducedMotion={reducedMotion}
+        foco={foco}
+        especie={especie}
+        cantidad={cantidad}
+        layout={layout}
+      />
     </Canvas>
   );
 }

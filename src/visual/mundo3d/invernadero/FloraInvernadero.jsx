@@ -19,6 +19,7 @@ import * as THREE from 'three';
 import { perfilDeTier } from '../deviceTier.js';
 import {
   invernaderoDeTier,
+  normalizarCultivo,
   distribucionInvernadero,
   geomBandeja,
   geomBrote,
@@ -129,23 +130,30 @@ function BrotesVivos({ geo, mat, items, respiran }) {
 
 /**
  * La capa viva del invernadero. Montar dentro del <Canvas>.
- * @param {{tier?: 'alto'|'medio'|'bajo', reducedMotion?: boolean}} props
+ * @param {{tier?: 'alto'|'medio'|'bajo', reducedMotion?: boolean, especie?: string, cantidad?: number, layout?: string|object}} props
  */
-export default function FloraInvernadero({ tier = 'alto', reducedMotion = false }) {
+export default function FloraInvernadero({
+  tier = 'alto',
+  reducedMotion = false,
+  especie = 'tomate',
+  cantidad = 1500,
+  layout = 'surcos',
+}) {
   const perfil = perfilDeTier(tier);
-  const conteos = useMemo(() => invernaderoDeTier(tier), [tier]);
+  const cultivo = useMemo(() => normalizarCultivo({ especie, cantidad, layout }), [especie, cantidad, layout]);
+  const conteos = useMemo(() => invernaderoDeTier(tier, cultivo), [tier, cultivo]);
 
   // Geometrías unitarias (una vez por montaje).
   const geos = useMemo(
     () => ({
       bandeja: geomBandeja(),
       brote: geomBrote(),
-      tomate: geomTomatePlanta(7),
-      fruto: geomTomateFruto(),
+      cultivo: cultivo.especieInfo.geometria === 'tomate' ? geomTomatePlanta(7) : geomHortaliza(9),
+      fruto: cultivo.especieInfo.fruto ? geomTomateFruto() : null,
       hortaliza: geomHortaliza(9),
       bolsa: geomBolsa(11),
     }),
-    [],
+    [cultivo.especieInfo.geometria, cultivo.especieInfo.fruto],
   );
 
   // Material único con vertexColors (el color viene horneado por familia; el
@@ -194,7 +202,7 @@ export default function FloraInvernadero({ tier = 'alto', reducedMotion = false 
       <Especie geo={geos.bolsa} mat={mat} items={dist.bolsa} />
 
       {/* El tomate tutorado y sus racimos madurando de abajo hacia arriba. */}
-      <Especie geo={geos.tomate} mat={mat} items={dist.tomate} castShadow={sombra} />
+      <Especie geo={geos.cultivo} mat={mat} items={dist.cultivo} castShadow={sombra} />
       <Especie geo={geos.fruto} mat={matLustre} items={dist.fruto} />
 
       {/* La hortaliza de la cama derecha + la era de endurecimiento afuera. */}

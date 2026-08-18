@@ -21,6 +21,24 @@ import './InvernaderoVivo3D.css';
 
 const MundoInvernadero = lazy(() => import('../visual/mundo3d/invernadero/MundoInvernadero.jsx'));
 
+const OPCIONES_CANTIDAD = [1500, 3000, 5000, 10000];
+const OPCIONES_ESPECIE = [
+  { id: 'tomate', nombre: 'Tomate' },
+  { id: 'pimenton', nombre: 'Pimentón' },
+  { id: 'lechuga', nombre: 'Lechuga' },
+];
+
+function cultivoInicial() {
+  if (typeof window === 'undefined') return { especie: 'tomate', cantidad: 1500, layout: 'surcos' };
+  const params = new URLSearchParams(window.location.search);
+  const cantidad = Number(params.get('cantidad'));
+  return {
+    especie: params.get('especie') || 'tomate',
+    cantidad: OPCIONES_CANTIDAD.includes(cantidad) ? cantidad : 1500,
+    layout: ['surcos', 'franjas', 'compacto'].includes(params.get('layout')) ? params.get('layout') : 'surcos',
+  };
+}
+
 /* Lo que enseña el invernadero (verificado, en "usted"). */
 const SABERES = [
   {
@@ -60,8 +78,11 @@ export default function InvernaderoVivo3D() {
   );
   const puede3D = permite3D(decision.tier);
   const [ver2d, setVer2d] = useState(false);
+  const [cultivo, setCultivo] = useState(cultivoInicial);
   const tier = ver2d || !puede3D ? 'bajo' : decision.tier;
   const mostrar3D = puede3D && !ver2d;
+  const especieNombre = OPCIONES_ESPECIE.find((o) => o.id === cultivo.especie)?.nombre || 'Tomate';
+  const cantidadTexto = new Intl.NumberFormat('es-CO').format(cultivo.cantidad);
 
   return (
     <main className="invivo">
@@ -76,6 +97,57 @@ export default function InvernaderoVivo3D() {
       </header>
 
       <section className="invivo__escena" aria-label="El invernadero campesino en 3D">
+        <form className="invivo__config" aria-label="Configurar cultivo">
+          <div className="invivo__config-head">
+            <div>
+              <p className="invivo__config-kicker">Escala del cultivo</p>
+              <p className="invivo__config-title">{especieNombre}, {cantidadTexto} plantas</p>
+            </div>
+            <span className="invivo__config-badge">Instancing GPU</span>
+          </div>
+          <div className="invivo__config-grid">
+            <label>
+              Especie
+              <select
+                value={cultivo.especie}
+                onChange={(event) => setCultivo((actual) => ({ ...actual, especie: event.target.value }))}
+              >
+                {OPCIONES_ESPECIE.map((opcion) => (
+                  <option key={opcion.id} value={opcion.id}>
+                    {opcion.nombre}
+                  </option>
+                ))}
+              </select>
+            </label>
+            <label>
+              Cantidad
+              <select
+                value={cultivo.cantidad}
+                onChange={(event) => setCultivo((actual) => ({ ...actual, cantidad: Number(event.target.value) }))}
+              >
+                {OPCIONES_CANTIDAD.map((cantidad) => (
+                  <option key={cantidad} value={cantidad}>
+                    {new Intl.NumberFormat('es-CO').format(cantidad)} plantas
+                  </option>
+                ))}
+              </select>
+            </label>
+            <label>
+              Distribución
+              <select
+                value={cultivo.layout}
+                onChange={(event) => setCultivo((actual) => ({ ...actual, layout: event.target.value }))}
+              >
+                <option value="surcos">Surcos de trabajo</option>
+                <option value="franjas">Franjas largas</option>
+                <option value="compacto">Masa compacta</option>
+              </select>
+            </label>
+          </div>
+          <p className="invivo__config-note">
+            Una geometría compartida por familia, miles de transformaciones instanciadas. El tomate es la configuración prioritaria.
+          </p>
+        </form>
         <div className="invivo__lienzo">
           {mostrar3D ? (
             <Suspense
@@ -85,7 +157,13 @@ export default function InvernaderoVivo3D() {
                 </div>
               }
             >
-              <MundoInvernadero tier={tier} reducedMotion={reducedMotion} />
+              <MundoInvernadero
+                tier={tier}
+                reducedMotion={reducedMotion}
+                especie={cultivo.especie}
+                cantidad={cultivo.cantidad}
+                layout={cultivo.layout}
+              />
             </Suspense>
           ) : (
             <FichaInvernadero />

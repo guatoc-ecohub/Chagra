@@ -28,7 +28,7 @@ import SyncProgressIndicator from './components/common/SyncProgressIndicator';
 import useOllamaWarmStore from './store/useOllamaWarmStore';
 import { syncAgentTelemetry } from './services/agentTelemetrySync';
 import { syncUsageTelemetry } from './services/usageTelemetrySync';
-import useThemeBackgroundStore, { getBackgroundSrc } from './store/useThemeBackgroundStore';
+import useThemeBackgroundStore, { getBackgroundSrc, esGradiente } from './store/useThemeBackgroundStore';
 import useAlertStore from './store/useAlertStore';
 // PERF-1 (medido 2026-07): `cropAlertEngine.js` → `farmProcessCache.js` →
 // `catalogDB.js` (~217KB + WASM sqlite). Un import ESTÁTICO aquí lo metía en
@@ -1475,9 +1475,13 @@ export default function App() {
   const selectedBackground = useThemeBackgroundStore((s) => s.selected);
   useEffect(() => {
     const src = getBackgroundSrc(selectedBackground);
-    // Precargar solo el full elegido para que el cambio sea inmediato.
-    const img = new Image();
-    img.src = src;
+    // Solo precargar rutas de imagen. Un gradiente CSS no es una URL y
+    // convertirlo en `new Image().src` genera un 404 que contamina los gates
+    // visuales de cualquier mundo, aunque la página sí esté viva.
+    if (!esGradiente(src)) {
+      const img = new Image();
+      img.src = src;
+    }
     document.body.style.setProperty('--app-bg-image', `url('${src}')`);
     // La foto de biodiversidad elegida debe VERSE en bio-punk en todas las
     // pantallas, incluso cuando coincide con el default (operador 2026-06-09:

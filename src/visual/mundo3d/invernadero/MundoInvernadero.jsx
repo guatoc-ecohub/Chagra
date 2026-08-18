@@ -91,9 +91,16 @@ const TEMA_PANEL = {
 /**
  * El micro-mundo del invernadero, completo: escena + pasos didácticos.
  * Montar SOLO perezoso (lazy); llena a su contenedor.
- * @param {{tier?: 'alto'|'medio'|'bajo', reducedMotion?: boolean}} props
+ * @param {{tier?: 'alto'|'medio'|'bajo', reducedMotion?: boolean, foco?: number[]|null, especie?: string, cantidad?: number, layout?: string|object}} props
  */
-export default function MundoInvernadero({ tier: tierProp, reducedMotion: rmProp } = {}) {
+export default function MundoInvernadero({
+  tier: tierProp,
+  reducedMotion: rmProp,
+  foco: focoProp,
+  especie = 'tomate',
+  cantidad = 1500,
+  layout = 'surcos',
+} = {}) {
   // Contrato de mundos: props del host si llegan; si se monta suelto,
   // auto-detección del equipo (no matar la gama baja).
   const auto = useMemo(() => decidirTier(), []);
@@ -106,7 +113,14 @@ export default function MundoInvernadero({ tier: tierProp, reducedMotion: rmProp
   return (
     <div className="minvernadero">
       <style>{CSS}</style>
-      <EscenaInvernaderoVivo tier={tier} reducedMotion={reducedMotion} foco={actual.foco} />
+      <EscenaInvernaderoVivo
+        tier={tier}
+        reducedMotion={reducedMotion}
+        foco={focoProp ?? actual.foco}
+        especie={especie}
+        cantidad={cantidad}
+        layout={layout}
+      />
 
       <PanelPasos
         etiqueta="La lección del invernadero"
