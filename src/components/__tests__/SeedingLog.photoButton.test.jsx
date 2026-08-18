@@ -17,11 +17,39 @@ vi.mock('../../services/payloadService', () => ({
   savePayload: vi.fn().mockResolvedValue({ success: true, message: 'ok' }),
 }));
 vi.mock('../../services/photoService', () => ({
-  savePhoto: vi.fn(),
+  savePhoto: vi.fn().mockResolvedValue({ id: 'photo-123' }),
 }));
 
-// Mock de PhotoCaptureField para verificar que SeedingLog lo monta
-// con los props correctos (sin necesidad de simular cámara real).
+// Mock de ENV para evitar el early return cuando !ENV.FARMOS_CLIENT_ID
+vi.mock('../../config/env', () => ({
+  ENV: {
+    FARMOS_CLIENT_ID: 'test-client-id',
+    FARMOS_URL: 'https://farmos.test.com',
+  },
+}));
+
+// Mock de servicios que usa SeedingLog
+vi.mock('../../services/getAllSpecies', () => ({
+  getAllSpecies: vi.fn().mockResolvedValue([]),
+}));
+
+vi.mock('../../services/buildDraftFromSeeding', () => ({
+  buildDraftFromSeeding: vi.fn().mockResolvedValue(null),
+}));
+
+vi.mock('../../services/createFarmProcess', () => ({
+  createFarmProcess: vi.fn().mockResolvedValue(),
+}));
+
+vi.mock('../../utils/extractVarieties', () => ({
+  extractVarieties: vi.fn().mockReturnValue([]),
+}));
+
+vi.mock('../../utils/varietyHelpText', () => ({
+  varietyHelpText: vi.fn().mockReturnValue(''),
+}));
+
+// Mock de componentes que usa SeedingLog (no relevantes al test)
 vi.mock('../PhotoCaptureField', () => ({
   default: (props) => (
     <div
@@ -31,6 +59,22 @@ vi.mock('../PhotoCaptureField', () => ({
       data-has-onremove={typeof props.onRemove === 'function' ? 'yes' : 'no'}
     />
   ),
+}));
+
+vi.mock('../DateField', () => ({
+  default: () => <div data-testid="date-field-stub" />,
+}));
+
+vi.mock('../SpeciesCombobox', () => ({
+  default: () => <div data-testid="species-combobox-stub" />,
+}));
+
+// Mock de iconos lucide-react
+vi.mock('lucide-react', () => ({
+  AlertCircle: () => <span data-testid="alert-circle-icon" />,
+  ArrowLeft: () => <span data-testid="arrow-left-icon" />,
+  CheckCircle: () => <span data-testid="check-circle-icon" />,
+  MapPin: () => <span data-testid="map-pin-icon" />,
 }));
 
 describe('UX-25 — SeedingLog usa PhotoCaptureField', () => {
