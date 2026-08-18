@@ -1,0 +1,86 @@
+{
+  "species_slug": "pseudosamanea_guachapele",
+  "scientific_name": "Pseudosamanea guachapele (Kunth) Harms",
+  "common_names": [
+    "Igua"
+  ],
+  "family": "Fabaceae",
+  "category": "arboles_sombra",
+  "cultivable": true,
+  "conservation_status": "nativo_silvestre",
+  "thermal_zones": [
+    "calido",
+    "templado"
+  ],
+  "roles_in_guild": [
+    "biomass_producer",
+    "nitrogen_fixer",
+    "windbreak",
+    "pollinator_attractor"
+  ],
+  "antagonists": [],
+  "especies_nativas_sustitutas": [],
+  "propagation": {
+    "methods": [
+      "semilla"
+    ],
+    "best_method": "semilla",
+    "protocol_resumen": "Semilla con escarificación mecánica o agua caliente 80°C remojo 24 h. Germinación 70-85% a 8-15 días. Vivero a sol pleno 4-6 meses. Plantación definitiva a 30-40 cm. Crecimiento rápido bosque seco.",
+    "tiempo_a_establecimiento_dias": 60,
+    "notas": "Especie pionera bosque seco tropical Magdalena medio y valles interandinos. Madera amarillo-anaranjada apreciada. Excelente sombrío cafetal-cacaotal-ganadero. Florece dorado intenso pre-foliación (lluvias).",
+    "fuente": "Bernal 2015 Catálogo Plantas Colombia; POWO; Agrosavia silvopastoriles; CIAT manuales bosque seco"
+  },
+  "requirements": {
+    "agua": "bajo",
+    "altitud_msnm": {
+      "min_absoluto": 0,
+      "optimo_min": 200,
+      "optimo_max": 1400,
+      "max_absoluto": 1800
+    },
+    "temperatura_c": {
+      "helada_letal": 6,
+      "optimo_min": 22,
+      "optimo_max": 30,
+      "max_tolerable": 36
+    },
+    "radiacion": "sol_pleno",
+    "drenaje_requerido": "bueno"
+  },
+  "valor_pedagogico": "El iguá o guachapele (Pseudosamanea guachapele (Kunth) Harms, Fabaceae subfamilia Mimosoideae) es uno de los árboles emblemáticos del bosque seco tropical (bs-T) colombiano, un ecosistema crítico y entre los más amenazados del país por la expansión ganadera-agrícola: queda menos del 8% de la cobertura original. Nativo del Neotrópico, en Colombia se distribuye dominante en valles interandinos secos del Magdalena medio (Tolima, Huila, Cundinamarca, Boyacá, Santander), Cauca (Valle, Cauca), Patía, Sinú-San Jorge (Córdoba, Sucre), Caribe seco (La Guajira, Cesar, Magdalena, Bolívar) y piedemonte llanero entre 0-1.400 msnm en zona térmica cálida a templada. Árbol caducifolio de 15-25 m de altura con copa amplia en forma de paraguas, fuste recto cilíndrico, corteza grisácea fisurada, hojas bipinnadas con folíolos pequeños caducas en estación seca, flores blanco-cremosas en cabezuelas globulosas pequeñas melíferas, frutos en vaina linear comprimida marrón-negra dehiscente con 6-10 semillas. Su característica más relevante es la madera marrón-amarillenta a anaranjada dura semipesada apreciada en ebanistería fina, construcción rural, postes para cerca viva y leña de alta calidad. Como leguminosa Mimosoideae fija nitrógeno biológico mediante asociación con rizobios y bacterias diazotróficas, aporte crítico en bosque seco con suelos típicamente pobres y compactados. En sistemas silvopastoriles del Magdalena medio y Caribe seco acepta densidades 80-120 árb/ha proveyendo sombrío al ganado bovino que ramonea sus rebrotes tiernos sin daño (forraje suplementario rico en proteína 18-22% MS), reduciendo el estrés térmico del ganado en climas extremos (32-36°C) y mejorando la productividad lechera-cárnica. Como pionera de crecimiento rápido (turno de aprovechamiento maderable 15-25 años) y altamente resistente a sequía prolongada de 4-6 meses, es especie clave en restauración de bs-T degradado, donde tolera suelos compactados por ganadería extensiva y rebrota vigoroso tras corte controlado. Su floración masiva blanco-dorada pre-foliación al inicio de las lluvias es atractor crítico para abejas nativas sin aguijón (Meliponini: Tetragonisca angustula, Melipona, Trigona), abejorros Bombus, y avifauna polinizadora del bosque seco. Manejo agroecológico: propagación por semilla con escarificación mecánica o remojo en agua caliente 80°C por 24 h (germinación 70-85% a 8-15 días), vivero a sol pleno 4-6 meses, plantación definitiva a 30-40 cm, distancia 6×6 m en silvopastoril, poda formativa los primeros 3 años para fuste recto. Es lección extraordinaria de cómo las leguminosas pioneras nativas del bs-T pueden simultáneamente proveer sombrío al ganado, forraje suplementario, madera fina, fijación biológica de N (sustituye fertilizante sintético), restaurar suelos degradados y atraer polinizadores nativos: un solo árbol que prestá 5 servicios ecosistémicos en uno de los ecosistemas más amenazados de Colombia. Es además ejemplo de soberanía técnica: especie nativa adaptada a sequía y compactación, contrasta con la promoción de exóticas (leucaena, gliricidia) que requieren más manejo. Fuentes Tier A: Bernal et al. 2015 Catálogo Plantas y Líquenes Colombia, POWO Kew, GBIF Backbone Taxonomy, Agrosavia silvopastoriles bs-T, Humboldt bosque seco tropical Colombia.",
+  "companions_markdown": "### Especies asociadas favorables\n\nEstas especies favorecen el cultivo cuando se siembran cerca:\n- coffea_arabica — Café caturra / Castillo / Cenicafé 1 (Coffea arabica L.)\n- cordia_alliodora — Nogal cafetero (Cordia alliodora (Ruiz & Pav.) Oken)\n- gliricidia_sepium — Matarratón (Gliricidia sepium (Jacq.) Kunth ex Walp.)\n- tabebuia_rosea — Guayacán rosado (Tabebuia rosea (Bertol.) DC.)",
+  "sources": [
+    {
+      "id": "bernal-2015-plantas-liquenes-colombia",
+      "title": "bernal-2015-plantas-liquenes-colombia",
+      "tier": "A",
+      "url": "http://catalogoplantasdecolombia.unal.edu.co"
+    },
+    {
+      "id": "powo-kew",
+      "title": "powo-kew",
+      "tier": "A",
+      "url": "https://powo.science.kew.org"
+    },
+    {
+      "id": "gbif-taxonomic-backbone",
+      "title": "gbif-taxonomic-backbone",
+      "tier": "A",
+      "url": "https://www.gbif.org/dataset/d7dddbf4-2cf0-4f39-9b2a-bb099caae36c"
+    },
+    {
+      "id": "agrosavia-silvopastoriles",
+      "title": "agrosavia-silvopastoriles",
+      "tier": "A",
+      "url": null
+    },
+    {
+      "id": "humboldt-flora-alto-andina",
+      "title": "humboldt-flora-alto-andina",
+      "tier": "A",
+      "url": null
+    }
+  ],
+  "_generated_by": "scripts/build-cycle-content-from-catalog.mjs",
+  "_generated_at": "2026-05-19T00:42:57.389Z"
+}

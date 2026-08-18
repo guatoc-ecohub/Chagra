@@ -1,0 +1,82 @@
+{
+  "species_slug": "daucus_carota_subsp_sativus",
+  "scientific_name": "Daucus carota L. subsp. sativus (Hoffm.) Arcang.",
+  "common_names": [
+    "Zanahoria"
+  ],
+  "family": "Apiaceae",
+  "category": "tuberculos_raices",
+  "cultivable": true,
+  "conservation_status": "cultivo_comun",
+  "thermal_zones": [
+    "frio",
+    "templado"
+  ],
+  "roles_in_guild": [
+    "crop"
+  ],
+  "antagonists": [],
+  "especies_nativas_sustitutas": [],
+  "propagation": {
+    "metodo_principal": "semilla",
+    "notas": "Siembra directa en suelo suelto y profundo. Germinacion lenta (14-21 dias); requiere humedad constante en la capa superficial."
+  },
+  "requirements": {
+    "agua": "medio",
+    "altitud_msnm": {
+      "min_absoluto": 800,
+      "optimo_min": 1500,
+      "optimo_max": 2700,
+      "max_absoluto": 3200
+    },
+    "temperatura_c": {
+      "helada_letal": -4,
+      "optimo_min": 15,
+      "optimo_max": 20,
+      "max_tolerable": 28
+    },
+    "radiacion": "sol_pleno",
+    "drenaje_requerido": "excelente"
+  },
+  "valor_pedagogico": "La zanahoria (Daucus carota L. subsp. sativus (Hoffm.) Arcang., familia Apiaceae) es una apiácea bienal cultivada de raíz pivotante engrosada anaranjada (variedad Chantenay, Nantes, Imperator) a violeta (variedades ancestrales), domesticada desde la zanahoria silvestre euroasiática y aclimatada exitosamente en huertos andinos colombianos por su riqueza en β-caroteno (provitamina A), α-caroteno, luteína, fibra dietaria y azúcares simples. Se cultiva en Cundinamarca (Sabana de Bogotá, Funza, Madrid, Mosquera, Subachoque, Sopó), Boyacá (Tunja, Sotaquirá, Sutamarchán, Villa de Leyva, Cucaita), Nariño (Pasto, Sapuyes, Túquerres) y Eje cafetero alto entre 1.500 y 2.700 msnm en zona térmica templada a fría. Ciclo 90-120 días desde siembra a cosecha. Rendimientos 25-45 t/ha raíz fresca, primer cultivo hortícola por área en sabana de Bogotá. Lección viva de calidad y estructura del suelo: la zanahoria revela la estructura física del suelo al desarrollarse — suelos compactos, pedregosos o con costras superficiales producen raíces deformes, bifurcadas o cortas, enseñando la importancia crítica de la preparación profunda de cama (25-30 cm), aireación y descompactación previa, y la incorporación de materia orgánica fina y compostada. Es bioindicador de calidad de labranza y fertilidad estructural. Manejo agroecológico: siembra directa a chorrillo en surcos a 25 cm con cubierta superficial 0.5 cm de tierra fina, germinación lenta 14-21 días requiere humedad constante en capa superficial (riego frecuente y poco volumen), raleo en dos pases a los 30 y 45 días dejando 4-5 cm entre plantas, asocio con cebolla larga (Allium fistulosum) que repele mosca de la zanahoria (Psila rosae), rotación obligatoria 3 años. Fuentes Tier A: AGROSAVIA Manual Hortalizas, POWO Kew, GBIF Backbone Taxonomy, ICA Resolución 3168/2015, Bernal 2015 Catálogo Plantas Colombia.",
+  "sources": [
+    {
+      "id": "powo-kew",
+      "title": "powo-kew",
+      "tier": "A",
+      "url": "https://powo.science.kew.org"
+    },
+    {
+      "id": "gbif-taxonomic-backbone",
+      "title": "gbif-taxonomic-backbone",
+      "tier": "A",
+      "url": "https://www.gbif.org/dataset/d7dddbf4-2cf0-4f39-9b2a-bb099caae36c"
+    },
+    {
+      "id": "gbif-colombia",
+      "title": "gbif-colombia",
+      "tier": "A",
+      "url": "https://www.gbif.org/country/CO"
+    },
+    {
+      "id": "agrosavia-tibaitata",
+      "title": "agrosavia-tibaitata",
+      "tier": "A",
+      "url": "https://www.agrosavia.co/investigacion/centros-de-investigacion/tibaitat%C3%A1"
+    },
+    {
+      "id": "bernal-2015-plantas-liquenes-colombia",
+      "title": "bernal-2015-plantas-liquenes-colombia",
+      "tier": "A",
+      "url": "http://catalogoplantasdecolombia.unal.edu.co"
+    },
+    {
+      "id": "ica-resolucion-3168-2015",
+      "title": "ica-resolucion-3168-2015",
+      "tier": "A",
+      "url": null
+    }
+  ],
+  "_generated_by": "scripts/build-cycle-content-from-catalog.mjs",
+  "_generated_at": "2026-05-19T00:42:57.373Z"
+}

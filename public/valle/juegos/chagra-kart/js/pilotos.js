@@ -1,0 +1,311 @@
+// ── pilotos.js — elenco, poderes e ítems canónicos de Chagra Kart ──────────
+// Datos puros para que la UI, la física y los efectos consuman IDs estables.
+
+export const PILOTOS = [
+  {
+    id: 'angelita',
+    nombre: 'Angelita',
+    especie: 'abeja sin aguijon',
+    cientifico: 'Tetragonisca angustula',
+    desbloqueado: true,
+    costoSemillas: 0,
+    poder: 'Remolino de alas',
+    resumen: 'Succiona y gira a los rivales cercanos.',
+    color: 0xf5cf54,
+    estilo: 'angelita',
+  },
+  {
+    id: 'jaguar',
+    nombre: 'El Jaguar',
+    especie: 'felino tope',
+    cientifico: 'Panthera onca',
+    desbloqueado: true,
+    costoSemillas: 0,
+    poder: 'Paisaje del miedo',
+    resumen: 'Los rivales frenan solos y pierden agarre.',
+    color: 0x4d3724,
+    estilo: 'jaguar',
+  },
+  {
+    id: 'oso',
+    nombre: 'El Oso',
+    especie: 'oso',
+    cientifico: '',
+    desbloqueado: true,
+    costoSemillas: 0,
+    // El encargo aprueba el piloto visual, pero no define un poder nuevo.
+    // Se deja explícito para no inventar una mecánica que el encargo no pidió.
+    poder: 'Poder pendiente',
+    resumen: 'Piloto compai aprobado en lámina 2.5D.',
+    color: 0x34322d,
+    estilo: 'oso',
+  },
+  {
+    id: 'zariguya',
+    nombre: 'La Zarigüeya',
+    especie: 'zarigüeya',
+    cientifico: '',
+    desbloqueado: true,
+    costoSemillas: 0,
+    // El encargo aprueba el piloto visual, pero no define un poder nuevo.
+    poder: 'Poder pendiente',
+    resumen: 'Piloto compai aprobado en lámina 2.5D.',
+    color: 0x3b302b,
+    estilo: 'zariguya',
+  },
+  {
+    id: 'dante',
+    nombre: 'Dante',
+    especie: 'beagle',
+    cientifico: '',
+    desbloqueado: true,
+    costoSemillas: 0,
+    poder: 'Las babas',
+    resumen: 'Deja un hilo largo que hace patinar.',
+    color: 0xcaa064,
+    estilo: 'dante',
+  },
+  {
+    id: 'oliver',
+    nombre: 'Oliver',
+    especie: 'dalmata',
+    cientifico: '',
+    desbloqueado: true,
+    costoSemillas: 0,
+    poder: 'La locura',
+    resumen: 'Desordena a todos y provoca choques.',
+    color: 0xeae7de,
+    estilo: 'oliver',
+  },
+  {
+    id: 'luciernaga',
+    nombre: 'La Luciernaga',
+    especie: 'luciernaga',
+    cientifico: '',
+    desbloqueado: true,
+    costoSemillas: 0,
+    poder: 'La luz fria',
+    resumen: 'Piloto compai aprobado en lamina 2.5D.',
+    color: 0x4a4033,
+    estilo: 'luciernaga',
+  },
+  {
+    id: 'chivito-punk',
+    nombre: 'El Chivito Punk',
+    especie: 'chivito',
+    cientifico: '',
+    desbloqueado: true,
+    costoSemillas: 0,
+    poder: 'El chispazo',
+    resumen: 'Piloto compai aprobado en lamina 2.5D. Version punk del chivito.',
+    color: 0x3a352e,
+    estilo: 'chivito-punk',
+  },
+  {
+    id: 'chivito',
+    nombre: 'El Chivito',
+    especie: 'chivito',
+    cientifico: '',
+    desbloqueado: true,
+    costoSemillas: 0,
+    poder: 'Poder pendiente',
+    resumen: 'Piloto compai aprobado en lamina 2.5D.',
+    color: 0x4a4438,
+    estilo: 'chivito',
+  },
+  {
+    id: 'crisopa',
+    nombre: 'La Crisopa',
+    especie: 'crisopa verde',
+    cientifico: 'Chrysoperla externa',
+    desbloqueado: false,
+    costoSemillas: 2,
+    poder: 'Suelta las larvas',
+    resumen: 'Larvas que se prenden y frenan rivales.',
+    color: 0xa7d96c,
+    estilo: 'crisopa',
+  },
+  {
+    id: 'avispita',
+    nombre: 'La Avispita de la broca',
+    especie: 'avispita parasitoide',
+    cientifico: 'Cephalonomia stephanoderis',
+    desbloqueado: false,
+    costoSemillas: 4,
+    poder: 'Tiro dirigido',
+    resumen: 'Persigue al puntero y lo acosa.',
+    color: 0xd9a13b,
+    estilo: 'avispita',
+  },
+  {
+    id: 'mariquita',
+    nombre: 'La Mariquita',
+    especie: 'coccinelido',
+    cientifico: 'Cryptolaemus montrouzieri',
+    desbloqueado: false,
+    costoSemillas: 6,
+    poder: 'Barre la pista',
+    resumen: 'Limpia obstaculos del carril propio.',
+    // Cryptolaemus montrouzieri es NARANJA y negra, no la mariquita roja de
+    // siete puntos del imaginario. Estaba en 0xd63a31 (rojo) y el swatch del
+    // menu contradecia al modelo. El naranja es el mismo de pilotos-beneficos.
+    color: 0xd9721b,
+    estilo: 'mariquita',
+  },
+  {
+    id: 'momificador',
+    nombre: 'El Momificador',
+    especie: 'avispa parasitoide',
+    cientifico: 'Aphidius colemani',
+    desbloqueado: false,
+    costoSemillas: 8,
+    poder: 'Momia',
+    resumen: 'Congela al rival de adelante por un instante.',
+    // Aphidius colemani es una avispita NEGRA; lo dorado es la momia del pulgon
+    // parasitado, que es su marca. El gris palido que habia no era ninguno de
+    // los dos. Mismo bug que tenia la mariquita (rojo por naranja): el swatch
+    // del menu contradecia al modelo y a la especie.
+    color: 0x17171d,
+    estilo: 'momificador',
+  },
+  {
+    id: 'murcielago',
+    nombre: 'El Murcielago',
+    especie: 'murcielago nectarivoro',
+    cientifico: 'Glossophaga soricina',
+    desbloqueado: false,
+    costoSemillas: 10,
+    poder: 'Cae la noche',
+    resumen: 'Oscurece la pista para los demas.',
+    // Glossophaga soricina es pardo canela, no morado. El 0x5b4a66 era
+    // murcielago generico de Halloween, justo lo que el encargo prohibia:
+    // es un nectarivoro polinizador, no un bicho de disfraz.
+    color: 0x7c5636,
+    estilo: 'murcielago',
+  },
+  {
+    id: 'morpho',
+    nombre: 'La Morpho',
+    especie: 'mariposa azul',
+    cientifico: 'Morpho menelaus',
+    desbloqueado: false,
+    costoSemillas: 12,
+    poder: 'Destello azul',
+    resumen: 'Encandila a los que vienen atras.',
+    color: 0x2e6ad8,
+    estilo: 'morpho',
+  },
+  {
+    id: 'beauveria',
+    nombre: 'Beauveria',
+    especie: 'hongo entomopatogeno',
+    cientifico: 'Beauveria bassiana',
+    desbloqueado: false,
+    costoSemillas: 14,
+    poder: 'Esporas',
+    resumen: 'Nube blanca que frena de a poco.',
+    color: 0xe8ece3,
+    estilo: 'beauveria',
+  },
+];
+
+export const ITEMS = [
+  {
+    id: 'biol',
+    nombre: 'Biol',
+    efecto: 'turbo',
+    color: 0x65b85d,
+    duracion: 1.6,
+  },
+  {
+    id: 'ceniza',
+    nombre: 'Ceniza',
+    efecto: 'humo',
+    color: 0x8a8a82,
+    duracion: 1.5,
+  },
+  {
+    id: 'melaza',
+    nombre: 'Melaza',
+    efecto: 'pegajoso',
+    color: 0xcd8f44,
+    duracion: 2.0,
+  },
+  {
+    id: 'ortiga',
+    nombre: 'Ortiga',
+    efecto: 'pica',
+    color: 0x7ec95e,
+    duracion: 1.6,
+  },
+  {
+    id: 'trampa-azul',
+    nombre: 'Trampa azul',
+    efecto: 'pega',
+    color: 0x5f8fd9,
+    duracion: 2.0,
+  },
+  {
+    id: 'caldo-bordeles',
+    nombre: 'Caldo bordeles',
+    efecto: 'encandila',
+    color: 0x7fc4d9,
+    duracion: 1.7,
+  },
+  {
+    id: 'semilla-nativa',
+    nombre: 'Semillas nativas',
+    efecto: 'moneda',
+    color: 0xe7d46a,
+    duracion: 0,
+  },
+];
+
+export const PILOTO_POR_ID = Object.fromEntries(PILOTOS.map((p) => [p.id, p]));
+export const ITEM_POR_ID = Object.fromEntries(ITEMS.map((i) => [i.id, i]));
+
+export const PILOTOS_CASA = ['angelita', 'jaguar', 'oso', 'zariguya', 'dante', 'oliver', 'luciernaga', 'chivito-punk', 'chivito'];
+
+// El onboarding puede entregar el slug del compañero (`avatarType`) y no
+// todos los compañeros del valle tienen todavía un piloto modelado en Kart.
+// Los pilotos conservan su identidad y su poder por ID, sin convertir un
+// compañero desconocido en otra especie por accidente.
+export const PILOTO_POR_COMPAI = Object.freeze({
+  angelita: 'angelita',
+  jaguar: 'jaguar',
+  dante: 'dante',
+  chivito: 'chivito',
+  oso: 'oso',
+  zariguya: 'zariguya',
+  luciernaga: 'luciernaga',
+  oliver: 'oliver',
+  crisopa: 'crisopa',
+  avispita: 'avispita',
+  mariquita: 'mariquita',
+  momificador: 'momificador',
+  murcielago: 'murcielago',
+  morpho: 'morpho',
+  beauveria: 'beauveria',
+});
+
+export function pilotoDesdeCompai(compaiId) {
+  const pilotoId = PILOTO_POR_COMPAI[String(compaiId || '').trim()];
+  return pilotoId && PILOTO_POR_ID[pilotoId] ? pilotoId : null;
+}
+
+export function pilotoDesbloqueado(pilotoId, semillas = 0) {
+  const p = PILOTO_POR_ID[pilotoId];
+  if (!p) return false;
+  return p.desbloqueado || semillas >= p.costoSemillas;
+}
+
+export function semillasParaPiloto(pilotoId) {
+  return PILOTO_POR_ID[pilotoId]?.costoSemillas ?? 0;
+}
+
+export function pilotosDisponibles(semillas = 0) {
+  return PILOTOS.map((p) => ({
+    ...p,
+    desbloqueado: pilotoDesbloqueado(p.id, semillas),
+  }));
+}

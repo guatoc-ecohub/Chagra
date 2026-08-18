@@ -1,0 +1,240 @@
+<!doctype html>
+<html lang="es-CO">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Los árboles del frío — Chagra 3D</title>
+<style>
+  html,body{margin:0;height:100%;background:#9fb4ad;overflow:hidden}
+  canvas{display:block}
+  #hud{position:fixed;top:8px;left:8px;z-index:5;font:12px/1.5 ui-monospace,monospace;
+    color:#eef4ee;background:rgba(20,30,24,.62);padding:6px 10px;border-radius:8px;
+    pointer-events:none;white-space:pre}
+  .rotulo{position:fixed;z-index:4;transform:translate(-50%,-100%);pointer-events:none;
+    font:600 13px/1.2 system-ui,sans-serif;color:#fff;text-shadow:0 1px 3px rgba(0,0,0,.8);
+    background:rgba(24,36,28,.55);padding:3px 8px;border-radius:6px;text-align:center}
+  .rotulo i{display:block;font-size:10px;font-weight:400;opacity:.85}
+</style>
+<script type="importmap">
+{
+  "imports": {
+    "three": "../vendor/three.module.js",
+    "three/addons/": "../vendor/addons/"
+  }
+}
+</script>
+</head>
+<body>
+<div id="hud">cargando…</div>
+<script type="module">
+import * as THREE from 'three';
+import {
+  crearArbolAltoandino, crearBosqueAltoandino, ESPECIES_FRIO, texturaAtlasImpostor,
+} from '../lib3d/flora/arbolesAltoandinos.js';
+
+// vista=atlas: inspección directa del atlas de impostores (diagnóstico de gate)
+if (new URLSearchParams(location.search).get('vista') === 'atlas') {
+  const tex = texturaAtlasImpostor(5);
+  const cv = tex.image;
+  cv.style.cssText = 'position:fixed;inset:0;width:100%;height:auto;image-rendering:pixelated;background:#223';
+  document.body.appendChild(cv);
+  document.getElementById('hud').textContent = 'atlas impostores (5 tiles)';
+  window.__stats = { fps: 60, atlas: true };
+  throw new Error('vista atlas: solo inspección');
+}
+import { tickVientoMundos } from '../lib3d/flora/vientoMundos.js';
+import { texturaMoteado } from '../lib3d/flora/FollajeMasa.js';
+import { crearBrumaVolumetrica } from '../lib3d/fx/brumaVolumetrica.js';
+
+const q = new URLSearchParams(location.search);
+const vista = q.get('vista') ?? 'suelo';
+const conBruma = q.get('bruma') !== '0';
+const conRotulos = q.get('rotulos') === '1';
+const objetivoArboles = parseInt(q.get('arboles') ?? '0', 10);
+
+// ── ruido barato del mundo (terreno y humedad) ───────────────────────────────
+function hash2(x, z) { const h = Math.sin(x * 127.1 + z * 311.7) * 43758.5453; return h - Math.floor(h); }
+function vnoise(x, z) {
+  const xi = Math.floor(x), zi = Math.floor(z), xf = x - xi, zf = z - zi;
+  const u = xf * xf * (3 - 2 * xf), v = zf * zf * (3 - 2 * zf);
+  const a = hash2(xi, zi), b = hash2(xi + 1, zi), c = hash2(xi, zi + 1), d = hash2(xi + 1, zi + 1);
+  return a + (b - a) * u + (c - a) * v + (a - b - c + d) * u * v;
+}
+function fbm(x, z, oct = 4) {
+  let s = 0, amp = 1, f = 1, n = 0;
+  for (let i = 0; i < oct; i++) { s += amp * vnoise(x * f, z * f); n += amp; amp *= 0.5; f *= 2.07; }
+  return s / n;
+}
+// la vaguada del aliso cruza el mundo en diagonal
+const ejeVaguada = (x, z) => (x * 0.6 + z * 0.25);
+const humedadEn = (x, z) => Math.min(1, Math.exp(-Math.pow(ejeVaguada(x, z) / 26, 2)) + fbm(x * 0.05, z * 0.05, 2) * 0.25);
+const alturaEn = (x, z) => (fbm(x * 0.012 + 3, z * 0.012 - 5, 4) - 0.5) * 7
+  - Math.exp(-Math.pow(ejeVaguada(x, z) / 30, 2)) * 1.9;
+
+// ── escena base ──────────────────────────────────────────────────────────────
+const renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: 'high-performance' });
+renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+renderer.setSize(innerWidth, innerHeight);
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure = 1.04;
+document.body.appendChild(renderer.domElement);
+
+const escena = new THREE.Scene();
+const colorAire = new THREE.Color(vista === 'lineup' ? '#c3d2cb' : '#b7c9c2');
+escena.background = colorAire;
+escena.fog = new THREE.FogExp2(colorAire, vista === 'lineup' ? 0.0016 : 0.0055);
+
+const camara = new THREE.PerspectiveCamera(50, innerWidth / innerHeight, 0.1, 900);
+
+const hemi = new THREE.HemisphereLight('#d3e2da', '#2c3424', 1.0);
+escena.add(hemi);
+// el sol entra por detrás-derecha de la cámara (todas las vistas miran hacia -z)
+const solDir = new THREE.Vector3(0.42, 0.62, 0.5).normalize();
+const sol = new THREE.DirectionalLight('#fff3da', 1.65);
+sol.position.copy(solDir).multiplyScalar(80);
+escena.add(sol);
+
+// ── terreno ──────────────────────────────────────────────────────────────────
+const plano = vista === 'lineup';
+{
+  const L = plano ? 160 : 360;
+  const segs = plano ? 8 : 130;
+  const g = new THREE.PlaneGeometry(L, L, segs, segs);
+  g.rotateX(-Math.PI / 2);
+  const P = g.attributes.position;
+  const col = new Float32Array(P.count * 3);
+  const humus = new THREE.Color('#4f4634'), hoja = new THREE.Color('#615a41');
+  const musgo = new THREE.Color('#47592f'), tmp = new THREE.Color();
+  for (let i = 0; i < P.count; i++) {
+    const x = P.getX(i), z = P.getZ(i);
+    if (!plano) P.setY(i, alturaEn(x, z));
+    const n = fbm(x * 0.06 + 9, z * 0.06 - 2, 3);
+    tmp.copy(humus).lerp(hoja, n);
+    if (fbm(x * 0.1 - 4, z * 0.1 + 6, 2) > 0.52) tmp.lerp(musgo, 0.6);
+    col[i * 3] = tmp.r; col[i * 3 + 1] = tmp.g; col[i * 3 + 2] = tmp.b;
+  }
+  g.setAttribute('color', new THREE.BufferAttribute(col, 3));
+  g.computeVertexNormals();
+  // el mapa MULTIPLICA contra el color por vértice: tiene que ser detalle casi
+  // neutro-claro, o el piso se hunde a chocolate y los claros leen como huecos
+  const mapa = texturaMoteado(THREE, { base: '#c4bcac', claro: '#d8d0c0', oscuro: '#a49a88', manchas: 460, seed: 6 });
+  mapa.repeat.set(64, 64);
+  const suelo = new THREE.Mesh(g, new THREE.MeshStandardMaterial({
+    vertexColors: true, map: mapa, roughness: 1, metalness: 0,
+  }));
+  escena.add(suelo);
+}
+
+// ── contenido por vista ──────────────────────────────────────────────────────
+const ORDEN = ['encenillo', 'aliso', 'sietecueros', 'gaque', 'mano_de_oso'];
+let bosque = null, bruma = null;
+const rotulos = [];
+
+if (vista === 'lineup' || vista === 'hero') {
+  const lista = vista === 'hero' ? [q.get('especie') ?? 'encenillo'] : ORDEN;
+  const paso = 12.5;
+  lista.forEach((especie, i) => {
+    const x = (i - (lista.length - 1) / 2) * paso;
+    const arbol = crearArbolAltoandino(especie, { seed: 3 + i });
+    arbol.grupo.position.set(x, 0, 0);
+    escena.add(arbol.grupo);
+    if (conRotulos) {
+      const div = document.createElement('div');
+      div.className = 'rotulo';
+      const meta = ESPECIES_FRIO[especie];
+      div.innerHTML = `${meta.comun}<i>${meta.cientifico}</i>`;
+      document.body.appendChild(div);
+      rotulos.push({ div, pos: new THREE.Vector3(x, arbol.H + 2.2, 0) });
+    }
+  });
+  camara.position.set(0, 6.4, vista === 'hero' ? 24 : 44);
+  camara.lookAt(0, 6.6, 0);
+} else {
+  // bosque: el área sale del objetivo de árboles (densidad fija 3.2/100 m²)
+  const lado = objetivoArboles > 0 ? Math.sqrt(objetivoArboles * 100 / 3.2) : 240;
+  const mitad = lado / 2;
+  const rDetalle = q.get('rdetalle') ? parseFloat(q.get('rdetalle')) : undefined;
+  bosque = crearBosqueAltoandino({
+    area: { x0: -mitad, x1: mitad, z0: -mitad, z1: mitad },
+    alturaEn, humedadEn,
+    seed: 20260807,
+    ...(rDetalle !== undefined ? { rDetalle } : {}),
+  });
+  escena.add(bosque.grupo);
+
+  if (conBruma) {
+    const puntos = [];
+    for (const a of bosque.arboles) {
+      if (a.x * a.x + a.z * a.z < 135 * 135 && puntos.length < 190 && hash2(a.x, a.z) < 0.45) {
+        // un tercio de la niebla se ENGANCHA al dosel (la firma del bosque de
+        // niebla vista desde arriba); el resto anda entre los troncos
+        const enDosel = hash2(a.z * 3.1, a.x * 1.7) < 0.35;
+        puntos.push({ x: a.x, y: a.y + (enDosel ? a.alto * 0.72 : 0), z: a.z });
+      }
+    }
+    // en la vista cenital el velo tiene que vivir LEJOS (los claros del dosel
+    // están a 90-130 m de la cámara); a ras de suelo, cerca.
+    bruma = crearBrumaVolumetrica(THREE, {
+      puntos, jirones: 160, haces: 10, solDir,
+      seed: 47, lejos: vista === 'dosel' ? [90, 210] : [60, 125], dispersion: 4.6,
+    });
+    escena.add(bruma.grupo);
+  }
+
+  if (vista === 'suelo') {
+    const cy = alturaEn(6, 10);
+    camara.position.set(6, cy + 1.65, 10);
+    camara.lookAt(-18, cy + 3.4, -22);
+  } else if (vista === 'dosel') {
+    camara.position.set(-14, alturaEn(-14, 124) + 30, 124);
+    camara.lookAt(-24, 7, -6);
+  } else { // perf
+    const cy = alturaEn(0, 40);
+    camara.position.set(0, cy + 5, 40);
+    camara.lookAt(-24, cy + 2, -50);
+  }
+}
+
+// ── HUD + reloj ──────────────────────────────────────────────────────────────
+const hud = document.getElementById('hud');
+const reloj = new THREE.Clock();
+let frames = 0, tUlt = performance.now(), fps = 0, msEMA = 0;
+const v2 = new THREE.Vector3();
+
+function loop() {
+  requestAnimationFrame(loop);
+  const t0 = performance.now();
+  const dt = Math.min(reloj.getDelta(), 0.1);
+  tickVientoMundos(reloj.elapsedTime);
+  if (bosque) bosque.actualizar(camara);
+  if (bruma) bruma.tick(dt);
+  renderer.render(escena, camara);
+  msEMA = msEMA * 0.94 + (performance.now() - t0) * 0.06;
+
+  frames++;
+  const ahora = performance.now();
+  if (ahora - tUlt >= 1000) {
+    fps = frames * 1000 / (ahora - tUlt);
+    frames = 0; tUlt = ahora;
+    const inf = renderer.info.render;
+    const st = bosque ? bosque.stats() : { arboles: ORDEN.length };
+    hud.textContent = `${fps.toFixed(1)} FPS · ${(inf.triangles / 1000).toFixed(0)}k tris · ${inf.calls} calls · ${msEMA.toFixed(2)} ms JS\n`
+      + `árboles: ${st.arboles}${st.porEspecie ? ' · ' + Object.entries(st.porEspecie).map(([k, v]) => `${k}:${v}`).join(' ') : ''}`;
+    window.__stats = { fps, tris: inf.triangles, calls: inf.calls, ms: msEMA, arboles: st.arboles };
+  }
+  for (const r of rotulos) {
+    v2.copy(r.pos).project(camara);
+    r.div.style.left = `${(v2.x * 0.5 + 0.5) * innerWidth}px`;
+    r.div.style.top = `${(-v2.y * 0.5 + 0.5) * innerHeight}px`;
+  }
+}
+loop();
+
+addEventListener('resize', () => {
+  camara.aspect = innerWidth / innerHeight;
+  camara.updateProjectionMatrix();
+  renderer.setSize(innerWidth, innerHeight);
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,65 @@
+{
+  "species_slug": "beta_vulgaris_altissima",
+  "scientific_name": "Beta vulgaris L. subsp. vulgaris var. altissima",
+  "common_names": [
+    "Betarraga azucarera"
+  ],
+  "family": "Amaranthaceae",
+  "category": "tuberculos_raices",
+  "cultivable": true,
+  "conservation_status": "cultivo_comun",
+  "thermal_zones": [
+    "templado",
+    "frio"
+  ],
+  "roles_in_guild": [
+    "crop",
+    "biomass_producer"
+  ],
+  "antagonists": [],
+  "especies_nativas_sustitutas": [],
+  "propagation": {
+    "metodo_principal": "semilla",
+    "notas": "Variedad de remolacha seleccionada por alto contenido de sacarosa. Raiz blanca alargada; requiere suelos profundos y ricos en potasio para maxima produccion de azucar."
+  },
+  "requirements": {
+    "agua": "medio",
+    "altitud_msnm": {
+      "min_absoluto": 800,
+      "optimo_min": 1500,
+      "optimo_max": 2800,
+      "max_absoluto": 3200
+    },
+    "temperatura_c": {
+      "helada_letal": -4,
+      "optimo_min": 14,
+      "optimo_max": 20,
+      "max_tolerable": 26
+    },
+    "radiacion": "sol_pleno",
+    "drenaje_requerido": "bueno"
+  },
+  "valor_pedagogico": "La acelga forrajera o betarraga azucarera (Beta vulgaris L. ssp. vulgaris var. altissima, Amaranthaceae) es una variedad seleccionada del mismo complejo botánico de la acelga de hoja y la remolacha de mesa, cultivada en zonas templadas-frías colombianas (1800-3000 msnm: Sabana de Bogotá, Boyacá altiplano, Nariño) como forraje para vacas lecheras y conejos. Lección viva de mejoramiento genético histórico: las primeras betarragas eran raíces fibrosas similares a zanahorias delgadas; agricultores europeos del siglo XVIII y XIX seleccionaron año tras año plantas con raíces más gruesas y dulces hasta lograr la remolacha azucarera moderna (15-20% sacarosa) y la forrajera (más biomasa foliar y radical, menor azúcar pero más volumen). Aporta forraje fresco rico en proteína cruda (10-14% en hojas), calcio, potasio y betacarotenos. Manejo agroecológico: siembra directa a chorro continuo en surcos a 50 cm, ralear a 30 cm entre plantas, suelo profundo bien drenado pH 6.5-7.5, encalado SOLO si pH<5.5 con análisis previo, fertilización con compost maduro y bocashi, cosecha escalonada de hojas externas dejando el corazón crecer. Asocio: trébol blanco, alfalfa, raygrass.",
+  "sources": [
+    {
+      "id": "powo-kew",
+      "title": "powo-kew",
+      "tier": "A",
+      "url": "https://powo.science.kew.org"
+    },
+    {
+      "id": "gbif-taxonomic-backbone",
+      "title": "gbif-taxonomic-backbone",
+      "tier": "A",
+      "url": "https://www.gbif.org/dataset/d7dddbf4-2cf0-4f39-9b2a-bb099caae36c"
+    },
+    {
+      "id": "ica-resolucion-3168-2015",
+      "title": "ica-resolucion-3168-2015",
+      "tier": "A",
+      "url": null
+    }
+  ],
+  "_generated_by": "scripts/build-cycle-content-from-catalog.mjs",
+  "_generated_at": "2026-05-19T00:42:57.376Z"
+}

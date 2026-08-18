@@ -1,0 +1,82 @@
+{
+  "species_slug": "dioscorea_cayennensis",
+  "scientific_name": "Dioscorea cayennensis Lam.",
+  "common_names": [
+    "Ñame amarillo"
+  ],
+  "family": "Dioscoreaceae",
+  "category": "tuberculos_raices",
+  "cultivable": true,
+  "conservation_status": "naturalizada",
+  "thermal_zones": [
+    "calido"
+  ],
+  "roles_in_guild": [
+    "crop",
+    "ground_cover"
+  ],
+  "antagonists": [],
+  "especies_nativas_sustitutas": [],
+  "propagation": {
+    "methods": [
+      "tuberculo"
+    ],
+    "best_method": "tuberculo",
+    "protocol_resumen": "Propagación por trozos de tubérculo (semilla-tubérculo) de 150-300 g con yemas viables, siembra en hoyos profundos 30-40 cm con compost al fondo, distancia 1 x 1 m. Requiere tutorado obligatorio. Ciclo 10-12 meses. Rendimiento 8-20 t/ha. Adaptado a trópico húmedo del Pacífico colombiano (lluvias 3000-7000 mm anuales).",
+    "tiempo_a_establecimiento_dias": 30,
+    "notas": "Dioscoreácea trepadora con tubérculo único de pulpa AMARILLA (rica en carotenoides — diferencia clave con D. rotundata pulpa blanca y D. alata pulpa blanca-violácea). Naturalizado en Pacífico colombiano afrocolombiano y Caribe húmedo. Ciclo más largo (10-12 meses) y requerimiento hídrico mayor que D. rotundata.",
+    "fuente": "AGROSAVIA Manual Tubérculos Andinos 2017; POWO Kew; NRC 1996 Lost Crops Africa Vol III"
+  },
+  "requirements": {
+    "agua": "alto",
+    "altitud_msnm": {
+      "min_absoluto": 0,
+      "optimo_min": 0,
+      "optimo_max": 500,
+      "max_absoluto": 900
+    },
+    "temperatura_c": {
+      "helada_letal": 8,
+      "optimo_min": 24,
+      "optimo_max": 30,
+      "max_tolerable": 35
+    },
+    "radiacion": "sol_pleno",
+    "drenaje_requerido": "bueno"
+  },
+  "valor_pedagogico": "El ñame amarillo (Dioscorea cayennensis Lam., familia Dioscoreaceae) es una dioscoreácea herbácea perenne trepadora vigorosa originaria del África Occidental tropical húmedo (Costa de Marfil, Liberia, Sierra Leona, Guinea, Guinea-Bissau — bosque húmedo tropical más que sabana) donde se ha cultivado por milenios junto con D. rotundata (el otro 'ñame guineano') aunque genéticamente distinto. Introducida en América durante el comercio transatlántico de esclavos como cultivo de subsistencia afroamericano, naturalizada profundamente en Costa Pacífica colombiana donde encuentra condiciones ecológicas óptimas (lluvias 3000-7000 mm anuales — el Chocó biogeográfico es uno de los lugares más lluviosos del planeta, equivalente al cinturón ñamero africano húmedo). Se cultiva tradicionalmente en Costa Pacífica colombiana (Chocó — Quibdó, Bajo Baudó, Istmina, Condoto, San José del Palmar; Valle del Cauca — Buenaventura, Bajo San Juan; Cauca — Guapi, Timbiquí, López de Micay; Nariño — Tumaco, Olaya Herrera, Roberto Payán, Barbacoas, Magüí), Caribe húmedo de Bolívar-Córdoba (María La Baja, San Juan Nepomuceno, San Onofre, Tolú), Magdalena medio antioqueño (Bajo Cauca, Magdalena medio), Urabá antioqueño (Apartadó, Turbo, Chigorodó) y Catatumbo norte santandereano entre 0 y 900 msnm en zonas térmicas cálidas húmedas-superhúmedas tropicales pluviales. Lección viva PEDAGÓGICAMENTE EXCELENTE de cultivo afrocolombiano del Pacífico de seguridad alimentaria: enseña a niñas y niños la riqueza nutricional del ñame amarillo (carbohidratos 70-75%, proteínas 5-7%, CAROTENOIDES — provitamina A, beta-caroteno — que dan el característico color amarillo a la pulpa, antioxidantes naturales, riboflavina, niacina, vitamina C, minerales K-Mg-Mn-Cu), su rol como cultivo patrimonial afrocolombiano del Pacífico biogeográfico, y la adaptación extrema a lluvias superpluviales tropicales chocoanas (3000-7000 mm/año — sobrevive incluso a inundaciones temporales en suelos con buen drenaje interno). Diferencia diagnóstica taxonómica clave con D. rotundata y D. alata: D. cayennensis tiene tubérculo único subcilíndrico-cordiforme con pulpa AMARILLA-OCRE característica (rica en carotenoides — diferenciador inmediato con D. rotundata pulpa blanca-cremosa y D. alata pulpa blanca a veces violácea), ciclo 10-12 meses (más largo que D. rotundata 9-11 y D. alata 8-10 — el ñame de ciclo más largo del catálogo), preferencia ecológica por bosques húmedos tropicales pluviales del Chocó biogeográfico (D. rotundata por sabanas africanas y Caribe colombiano semihúmedo, D. alata por trópicos húmedos asiáticos), tallos cilíndricos espinescentes en la base como D. rotundata, hojas cordiformes-acuminadas grandes verde oscuras. Planta trepadora vigorosa con tallos cilíndricos verdes-marrón, hojas cordiformes-acuminadas alternas grandes (10-25 cm) verde oscuras brillantes, planta dioica con flores masculinas-femeninas separadas en plantas distintas (espigas axilares pequeñas blanco-amarillentas), tubérculo único subcilíndrico-cordiforme vertical (2-12 kg, ocasionalmente hasta 20 kg) corteza marrón-oscura rugosa con pulpa amarilla-ocre firme harinosa rica en almidón (65-75% peso seco), carotenoides (provitamina A), proteínas (5-7%), fibra (3-5%), polisacáridos mucilaginosos. Manejo agroecológico afrocolombiano del Pacífico tradicional: propagación por trozos de tubérculo-semilla 150-300 g con yemas viables, siembra en hoyos profundos 30-40 cm con compost-tierra negra al fondo, distancia 1 m x 1 m (10000 plantas/ha), tutorado obligatorio en espaldera o tutor vivo con guadua-caña brava-chontaduro-plátano, asocio tradicional milpa pacífica con plátano-yuca-chontaduro-borojó en sistemas multiestrato afrocolombianos, control biológico de antracnosis Colletotrichum gloeosporioides + roya Puccinia con podas sanitarias y rotación 3-4 años, manejo del agua con drenaje superficial en surcos elevados (camas raised beds) para evitar encharcamiento prolongado a pesar de las altas lluvias, cosecha 10-12 meses por arranque manual, almacenamiento post-cosecha en pilas ventiladas a la sombra 3-5 meses (más perecedero que D. rotundata por mayor contenido hídrico-carotenoide). Rendimientos 8-20 t/ha tubérculo según manejo y variedad. Función en chagra/huerto escolar afrocolombiano del Pacífico como TUBÉRCULO BASE DE LA SEGURIDAD ALIMENTARIA AFROPACÍFICA, cultivo patrimonial afrocolombiano del Chocó biogeográfico, ñame de pulpa carotenoide-amarilla con provitamina A nutricionalmente superior, lección viva de adaptación tropical superpluvial chocoana, sistema productivo tradicional de comunidades negras del Pacífico colombiano. Fuentes Tier A: AGROSAVIA Manual Tubérculos Andinos 2017, POWO Kew, GBIF Backbone Taxonomy, Bernal 2015 Catálogo Plantas Colombia, SIB Colombia.",
+  "sources": [
+    {
+      "id": "gbif-taxonomic-backbone",
+      "title": "gbif-taxonomic-backbone",
+      "tier": "A",
+      "url": "https://www.gbif.org/dataset/d7dddbf4-2cf0-4f39-9b2a-bb099caae36c"
+    },
+    {
+      "id": "powo-kew",
+      "title": "powo-kew",
+      "tier": "A",
+      "url": "https://powo.science.kew.org"
+    },
+    {
+      "id": "agrosavia-manual-tuberculos-andinos-2017",
+      "title": "agrosavia-manual-tuberculos-andinos-2017",
+      "tier": "A",
+      "url": null
+    },
+    {
+      "id": "bernal-2015-plantas-liquenes-colombia",
+      "title": "bernal-2015-plantas-liquenes-colombia",
+      "tier": "A",
+      "url": "http://catalogoplantasdecolombia.unal.edu.co"
+    },
+    {
+      "id": "sib-colombia",
+      "title": "sib-colombia",
+      "tier": "A",
+      "url": "https://sibcolombia.net"
+    }
+  ],
+  "_generated_by": "scripts/build-cycle-content-from-catalog.mjs",
+  "_generated_at": "2026-05-19T00:42:57.398Z"
+}
