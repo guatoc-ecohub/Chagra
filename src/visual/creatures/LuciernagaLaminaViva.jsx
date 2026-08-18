@@ -5,7 +5,10 @@ import {
   MANO_LAPIZ, CUERPO_PIVOTE,
 } from './luciernagaLamina/anatomia.js';
 import { hornearLuciernaga } from './luciernagaLamina/capas.js';
-import { useVidaIdle, useRitmoPropio, useMiradaUsted } from './useVidaIdle.js';
+import {
+  useVidaIdle, useRitmoPropio, useMiradaUsted, prefiereQuietud,
+} from './useVidaIdle.js';
+import './creatures.css';
 import './luciernagaLamina/luciernagaLamina.css';
 
 const LUCIERNAGA_SLUG = 'luciernaga';
@@ -115,6 +118,8 @@ export default function LuciernagaLaminaViva({
   const mandibulaHostRef = useRef(null);
   const parpadoHostRef = useRef(null);
   const parpado2HostRef = useRef(null);
+  const blinkTimersRef = useRef([]);
+  const blinkNextRef = useRef(0);
   const [listo, setListo] = useState(false);
 
   const canon = ESTADO_CANON[estado] || 'idle';
@@ -164,14 +169,12 @@ export default function LuciernagaLaminaViva({
         cv.style.width = '100%';
         cv.style.height = '100%';
         cv.style.display = 'block';
-        if (!animated) {
-          // Fotograma digno = ojos ABIERTOS: sin la animación de parpadeo el
-          // transform por defecto es scaleY(1) (párpado TAPANDO el ojo, por
-          // la polaridad invertida del parche) — hay que retraerlo explícito.
-          // (Misma política que prefers-reduced-motion en el CSS.)
-          cv.style.animation = 'none';
-          cv.style.transform = 'scaleY(0)';
-        }
+        /* El párpado es un parche de piel invertido: 0 = ojo abierto. El
+           blink natural lo conduce el reloj irregular de abajo, no el loop
+           fijo de `luciernagaLamina.css`. */
+        cv.style.animation = 'none';
+        cv.style.transform = 'scaleY(0)';
+        cv.style.transition = 'transform 92ms cubic-bezier(0.34, 0.05, 0.64, 1)';
         const h = host.current;
         if (h) {
           h.style.position = 'absolute';
@@ -194,6 +197,55 @@ export default function LuciernagaLaminaViva({
     img.src = CARPETA_LAMINA + ARCHIVO_LAMINA;
     return () => { vivo = false; };
   }, [animated]);
+
+  /* Parpadeo humano: una pausa larga, cierre suave y, de vez en cuando, un
+     segundo cierre corto. Cada instancia tira su propia cadencia y la fase
+     no coincide con `useRitmoPropio`, así que el ojo no delata un metrónomo.
+     Se manipulan los dos canvas juntos para conservar el parpadeo real de la
+     lámina, sin tocar ni repintar la cara. */
+  useEffect(() => {
+    const limpiar = () => {
+      window.clearTimeout(blinkNextRef.current);
+      blinkTimersRef.current.forEach((timer) => window.clearTimeout(timer));
+      blinkTimersRef.current = [];
+    };
+    limpiar();
+
+    if (!listo || !animated || tier === 'bajo' || prefiereQuietud()) return undefined;
+
+    const parpados = () => [parpadoHostRef, parpado2HostRef]
+      .map((host) => host.current?.firstElementChild)
+      .filter(Boolean);
+    const abrir = () => {
+      parpados().forEach((cv) => { cv.style.transform = 'scaleY(0)'; });
+    };
+    const cerrar = () => {
+      parpados().forEach((cv) => { cv.style.transform = 'scaleY(1)'; });
+    };
+    const programar = () => {
+      const pausa = 2500 + Math.random() * 3900;
+      blinkNextRef.current = window.setTimeout(() => {
+        cerrar();
+        const abrirTimer = window.setTimeout(abrir, 88 + Math.random() * 42);
+        blinkTimersRef.current.push(abrirTimer);
+
+        // Un doble blink aparece solo a veces, como un ajuste humano, no como
+        // una segunda mitad fija de cada vuelta.
+        if (Math.random() < 0.18) {
+          const segundoTimer = window.setTimeout(() => {
+            cerrar();
+            const segundoAbrirTimer = window.setTimeout(abrir, 76 + Math.random() * 34);
+            blinkTimersRef.current.push(segundoAbrirTimer);
+          }, 180 + Math.random() * 125);
+          blinkTimersRef.current.push(segundoTimer);
+        }
+        programar();
+      }, pausa);
+    };
+
+    programar();
+    return limpiar;
+  }, [listo, animated, tier]);
 
   const aspecto = ANCHO / ALTO;
   const anchoStage = aspecto >= 1 ? size : size * aspecto;
@@ -223,6 +275,7 @@ export default function LuciernagaLaminaViva({
       data-creature={LUCIERNAGA_SLUG}
       data-agt-estado={estado}
       data-visema={visema || undefined}
+      data-llv-blink={animated ? 'natural' : 'quieto'}
       data-vida={animated && momento ? momento : undefined}
       data-eco={eco || undefined}
       data-tier={tier || undefined}
@@ -250,26 +303,34 @@ export default function LuciernagaLaminaViva({
         )}
         <div style={{ position: 'absolute', inset: 0, display: listo ? 'block' : 'none' }}>
           <div
-            className={cls('llv-cuerpoPivote')}
+            className={animated && enIdle ? 'llv-rubberhoseSway rh-sway' : 'llv-rubberhoseSway'}
             style={{ position: 'absolute', inset: 0, transformOrigin: pctOf(CUERPO_PIVOTE) }}
           >
-            <div ref={cuerpoHostRef} className="llv-capa" />
+            <div
+              className={animated && enIdle ? 'llv-rubberhoseGesture rh-travieso' : 'llv-rubberhoseGesture'}
+              style={{ position: 'absolute', inset: 0, transformOrigin: pctOf(CUERPO_PIVOTE) }}
+            >
+              <div
+                className={cls('llv-cuerpoPivote')}
+                style={{ position: 'absolute', inset: 0, transformOrigin: pctOf(CUERPO_PIVOTE) }}
+              >
+                <div ref={cuerpoHostRef} className="llv-capa" />
 
-            {/* LA LINTERNA — capa que LATE por filtro (llv-linterna), jamás
-                se mueve: las piernas que la cruzan viven en el cuerpo. */}
-            <div ref={linternaHostRef} className={cls('llv-linterna') || 'llv-capa'} style={{ position: 'absolute', inset: 0 }} />
+                {/* LA LINTERNA — capa que LATE por filtro (llv-linterna), jamás
+                    se mueve: las piernas que la cruzan viven en el cuerpo. */}
+                <div ref={linternaHostRef} className={cls('llv-linterna') || 'llv-capa'} style={{ position: 'absolute', inset: 0 }} />
 
-            {/* LA MANO DEL LÁPIZ — gesticula desde la muñeca. */}
-            <div className={cls('llv-manoPivote')} style={{ position: 'absolute', inset: 0, transformOrigin: pctOf(MANO_LAPIZ.pivote) }}>
-              <div ref={manoHostRef} className="llv-capa" />
-            </div>
+                {/* LA MANO DEL LÁPIZ — gesticula desde la muñeca. */}
+                <div className={cls('llv-manoPivote')} style={{ position: 'absolute', inset: 0, transformOrigin: pctOf(MANO_LAPIZ.pivote) }}>
+                  <div ref={manoHostRef} className="llv-capa" />
+                </div>
 
-            {/* LA CABEZA — tres envoltorios anidados: gesto (idle-cerebro/
-                estado) → mira (giro hacia el usuario) → bob. Se COMPONEN sin
-                pisarse (cada uno su transform). Las antenas van DENTRO (giran
-                con la testa) y DEBAJO de la cabeza-render (la base se esconde
-                tras la frente). */}
-            <div className={cls('llv-cabezaGesto')} style={{ position: 'absolute', inset: 0, transformOrigin: pctOf(CABEZA.pivote) }}>
+                {/* LA CABEZA — tres envoltorios anidados: gesto (idle-cerebro/
+                    estado) → mira (giro hacia el usuario) → bob. Se COMPONEN sin
+                    pisarse (cada uno su transform). Las antenas van DENTRO (giran
+                    con la testa) y DEBAJO de la cabeza-render (la base se esconde
+                    tras la frente). */}
+                <div className={cls('llv-cabezaGesto')} style={{ position: 'absolute', inset: 0, transformOrigin: pctOf(CABEZA.pivote) }}>
               <div className={cls('llv-cabezaMira')} style={{ position: 'absolute', inset: 0, transformOrigin: pctOf(CABEZA.pivote) }}>
                 <div className={cls('llv-cabezaPivote')} style={{ position: 'absolute', inset: 0, transformOrigin: pctOf(CABEZA.pivote) }}>
                   {/* ANTENAS-lámina: se paran al escuchar, se mecen en idle. */}
@@ -307,6 +368,8 @@ export default function LuciernagaLaminaViva({
                   <div ref={parpadoHostRef} style={{ position: 'absolute' }} />
                   <div ref={parpado2HostRef} style={{ position: 'absolute' }} />
                 </div>
+              </div>
+            </div>
               </div>
             </div>
           </div>
