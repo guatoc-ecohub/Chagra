@@ -127,11 +127,16 @@ describe('anatomia.js — forma de las constantes que capas.js consume', () => {
     }
   });
 
-  it('BOCA (interior sintético) es un punto con ancho, dentro del canvas', () => {
+  it('BOCA (interior sintético) es un punto con ancho y alto, dentro del canvas', () => {
     expect(BOCA.cx).toBeGreaterThan(0);
     expect(BOCA.cx).toBeLessThan(ANCHO);
     expect(BOCA.cy).toBeGreaterThan(0);
     expect(BOCA.cy).toBeLessThan(ALTO);
     expect(BOCA.ancho).toBeGreaterThan(0);
+    // CANDADO (fuga cerrada POR el gate 2.5D): el interior no puede ser más
+    // alto que lo que el pico bajado tapa — asoma por los fades y pinta
+    // sobre la barba. El pico baja ~10-16px: alto acotado a ≤30px.
+    expect(BOCA.alto).toBeGreaterThan(0);
+    expect(BOCA.alto).toBeLessThanOrEqual(30);
   });
 });
