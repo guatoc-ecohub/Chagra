@@ -95,7 +95,7 @@ describe('temas claros — indirección CSS-var (index.css)', () => {
 function themeBlock(selector) {
   const re =
     selector === ':root'
-      ? /:root\s*\{([\s\S]*?)\n\}/ // primer :root (mapa --c-* + --fx-*)
+      ? /:root[\s\S]*?\{([\s\S]*?)\n\}/ // primer :root (mapa --c-* + --fx-*)
       : new RegExp(`\\[data-theme="${selector}"\\]\\s*\\{([\\s\\S]*?)\\}`);
   const m = indexCss.match(re);
   return m ? m[1] : null;

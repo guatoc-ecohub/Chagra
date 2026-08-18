@@ -95,12 +95,6 @@ export const KOKORO_VOICES = Object.freeze([
     description: 'Voz de hombre, natural y clara.',
     gender: 'masculina',
   },
-  {
-    id: 'ef_dora',
-    label: 'Dora',
-    description: 'Voz de mujer, suave y clara.',
-    gender: 'femenina',
-  },
 ]);
 
 export const DEFAULT_KOKORO_VOICE = 'em_santa';
