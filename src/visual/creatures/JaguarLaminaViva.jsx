@@ -195,7 +195,13 @@ export default function JaguarLaminaViva({
         cv.style.width = '100%';
         cv.style.height = '100%';
         cv.style.display = 'block';
-        if (!animated) cv.style.animation = 'none';
+        // Sin animación no hay keyframe que lo retraiga y el transform por
+        // defecto (none = scaleY(1)) deja el parche TAPANDO el ojo: retraer
+        // explícito, como el bloque reduced-motion del CSS y la luciérnaga.
+        if (!animated) {
+          cv.style.animation = 'none';
+          cv.style.transform = 'scaleY(0)';
+        }
         const h = host.current;
         if (h) {
           h.style.position = 'absolute';

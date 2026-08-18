@@ -250,9 +250,30 @@ export function factoresRodilla(y, corteY) {
  * @returns {Object<string, {alfa: Float32Array, fuente: string}>}  por capa:
  *   su alfa ideal y de QUÉ PNG salen sus colores.
  */
+/**
+ * Recorte a SILUETA: ninguna capa del rig puede aportar alfa donde la lámina
+ * no tiene píxel. Los PNG horneados DESBORDAN el contorno aprobado
+ * (`cuerpo-inpaint` 4.721 px de piel sintética bajo la línea del vientre,
+ * medido 2026-08-18; las patas lejanas ~430 px más) y en reposo esa piel
+ * sobrante quedaba A LA VISTA sobre el fondo: la franja horizontal con
+ * muesca bajo el vientre. Es el dual del déficit: el candado medía "alfa que
+ * falta" pero no "alfa que sobra". El recorte vive en el espacio del canvas,
+ * así que viaja con la pieza al animarse: una pata rotada muestra solo
+ * píxeles que existían dentro de la silueta, reubicados por el transform.
+ */
+export function recortarASilueta(src, silueta, N) {
+  const out = new Float32Array(N);
+  for (let p = 0; p < N; p++) out[p] = Math.min(src[p], silueta[p]);
+  return out;
+}
+
 export function capasIdeales(fuentes, W, H) {
   const m = mascaras();
   const N = W * H;
+  const rig = {};
+  for (const clave of ['cuerpo', 'delLejana', 'trasCercana', 'trasLejana']) {
+    rig[clave] = recortarASilueta(fuentes[clave], fuentes.lamina, N);
+  }
 
   const capaMascara = (mask) => {
     const alfa = new Float32Array(N);
@@ -283,9 +304,9 @@ export function capasIdeales(fuentes, W, H) {
   };
 
   const capas = {};
-  capas.cuerpo = { alfa: Float32Array.from(fuentes.cuerpo), fuente: 'cuerpo' };
+  capas.cuerpo = { alfa: rig.cuerpo, fuente: 'cuerpo' };
   for (const clave of ['delLejana', 'trasCercana', 'trasLejana']) {
-    const { sup, inf } = partir(fuentes[clave], RIG_MARCHA[clave].rodillaCorte);
+    const { sup, inf } = partir(rig[clave], RIG_MARCHA[clave].rodillaCorte);
     capas[`${clave}-sup`] = { alfa: sup, fuente: clave };
     capas[`${clave}-inf`] = { alfa: inf, fuente: clave };
   }
