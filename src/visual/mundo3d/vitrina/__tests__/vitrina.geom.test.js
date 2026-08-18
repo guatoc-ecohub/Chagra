@@ -121,12 +121,12 @@ describe('el paisaje del mirador', () => {
   });
 });
 
-describe('las quince viñetas-diorama', () => {
-  it('hay viñeta para los QUINCE mundos del manifiesto', () => {
+describe('las dieciséis viñetas-diorama', () => {
+  it('hay viñeta para los DIECISÉIS mundos del manifiesto', () => {
     const mundos = [
       'valle', 'cafe', 'agua', 'sanidad', 'mercado', 'animales',
       'semillero', 'suelo', 'sierra', 'paramo', 'lluvia', 'compost',
-      'cacao', 'papa', 'abejas',
+      'cacao', 'papa', 'abejas', 'bosque',
     ];
     expect(Object.keys(VINETAS_GEOM).sort()).toEqual([...mundos].sort());
   });
