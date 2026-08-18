@@ -130,6 +130,35 @@ function mascaraCoronaSub(x, y) {
 }
 
 /**
+ * El juego COMPLETO de máscaras con sus prioridades resueltas — UNA sola
+ * fuente de verdad para `hornearOso`, el candado de tests y los medidores
+ * offline (patrón de la zarigüeya: sin copias de fórmulas que puedan
+ * divergir). Prioridad: cabeza > corona > cuerpo; orejas y mandíbula viven
+ * DENTRO de la cabeza (× mCabeza) y se restan de la cabeza-render; el cuerpo
+ * se recorta contra las versiones SUB (respaldo anti-hueco en cuello y base
+ * de corona — ver el docstring del módulo).
+ */
+export function mascaras() {
+  const hard = (m) => 1 - ss(0.93, 1.0, m);
+  const mCabeza = (x, y) => mascaraCabeza(x, y);
+  const mOrejaIzq = (x, y) => mascaraOreja(x, y, OREJA_IZQ) * mCabeza(x, y);
+  const mOrejaDer = (x, y) => mascaraOreja(x, y, OREJA_DER) * mCabeza(x, y);
+  const mMandibula = (x, y) => mascaraMandibula(x, y) * mCabeza(x, y);
+  // La cabeza que se PINTA = cabeza completa menos lo que ahora vive aparte.
+  // Las orejas se restan solo por su parte ALTA (`baseSub`): la base queda de
+  // respaldo. La mandíbula se resta entera (baja en bloque).
+  const mCabezaRender = (x, y) => mCabeza(x, y)
+    * (1 - mascaraOrejaSub(x, y, OREJA_IZQ)) * (1 - mascaraOrejaSub(x, y, OREJA_DER))
+    * (1 - mMandibula(x, y));
+  const mCorona = (x, y) => mascaraCorona(x, y) * (1 - mCabeza(x, y));
+  const mCuerpo = (x, y) => hard(mascaraCabeza(x, y, CABEZA.cuelloSub))
+    * hard(mascaraCoronaSub(x, y));
+  return {
+    mCabeza, mCuerpo, mCorona, mCabezaRender, mMandibula, mOrejaIzq, mOrejaDer,
+  };
+}
+
+/**
  * Hornea las capas + el parche de párpado a partir de la imagen ya cargada.
  * Devuelve canvases del MISMO tamaño que el PNG (comparten encuadre — cero
  * cuentas de UV por capa).
@@ -160,24 +189,7 @@ export function hornearOso(img, dims = {}) {
   }
   const sd = src.data;
 
-  // Prioridad: cabeza > corona > cuerpo. Orejas y mandíbula viven DENTRO de
-  // la cabeza (× mCabeza) y se restan de la cabeza-render; el cuerpo se
-  // recorta contra las versiones SUB (respaldo anti-hueco en cuello y base
-  // de corona — ver el docstring del módulo).
-  const mCabeza = (x, y) => mascaraCabeza(x, y);
-  const mOrejaIzq = (x, y) => mascaraOreja(x, y, OREJA_IZQ) * mCabeza(x, y);
-  const mOrejaDer = (x, y) => mascaraOreja(x, y, OREJA_DER) * mCabeza(x, y);
-  const mMandibula = (x, y) => mascaraMandibula(x, y) * mCabeza(x, y);
-  // La cabeza que se PINTA = cabeza completa menos lo que ahora vive aparte.
-  // Las orejas se restan solo por su parte ALTA (`baseSub`): la base queda de
-  // respaldo. La mandíbula se resta entera (baja en bloque).
-  const mCabezaRender = (x, y) => mCabeza(x, y)
-    * (1 - mascaraOrejaSub(x, y, OREJA_IZQ)) * (1 - mascaraOrejaSub(x, y, OREJA_DER))
-    * (1 - mMandibula(x, y));
-  const mCorona = (x, y) => mascaraCorona(x, y) * (1 - mCabeza(x, y));
-  const hard = (m) => 1 - ss(0.93, 1.0, m);
-  const mCuerpo = (x, y) => hard(mascaraCabeza(x, y, CABEZA.cuelloSub))
-    * hard(mascaraCoronaSub(x, y));
+  const m = mascaras();
 
   const pintar = (mascara) => {
     const cv = lienzo(W, H);
@@ -200,12 +212,12 @@ export function hornearOso(img, dims = {}) {
   return {
     W,
     H,
-    cuerpo: pintar(mCuerpo),
-    cabeza: pintar(mCabezaRender),
-    orejaIzq: pintar(mOrejaIzq),
-    orejaDer: pintar(mOrejaDer),
-    mandibula: pintar(mMandibula),
-    corona: pintar(mCorona),
+    cuerpo: pintar(m.mCuerpo),
+    cabeza: pintar(m.mCabezaRender),
+    orejaIzq: pintar(m.mOrejaIzq),
+    orejaDer: pintar(m.mOrejaDer),
+    mandibula: pintar(m.mMandibula),
+    corona: pintar(m.mCorona),
     parpado: parcheParpado(sd, W, H, OJO),
   };
 }
@@ -257,4 +269,4 @@ function parcheParpado(sd, W, H, ojo) {
   return { cv, x0, y0, w, h };
 }
 
-export default { hornearOso, haySoporteCanvas, interpolarY };
+export default { hornearOso, haySoporteCanvas, interpolarY, mascaras };
