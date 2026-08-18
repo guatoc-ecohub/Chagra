@@ -64,12 +64,16 @@ describe('SW cache bucket names', () => {
     expect(code).toContain("'/favicon.svg'");
   });
 
-  it('precachea corpus RAG en RAG_GROUNDING_PRECACHE', async () => {
+  it('precachea grafo-relations.json en RAG_GROUNDING_PRECACHE', async () => {
+    // NOTA: Desde la refactorización de optimización de install time, los archivos
+    // pesados (rag-embeddings.json ~1.7MB, cycle-content/ ~3.4MB) ya NO se precachean
+    // en install. En su lugar, se cachean on-demand (cache-on-use) en el fetch handler.
+    // Solo el grafo-relations.json (~66KB) se precachea en install. Ver comentario en
+    // public/sw.js líneas 79-91.
     const code = await import('node:fs').then((fs) =>
       fs.readFileSync(SW_PATH, 'utf8'),
     );
-    expect(code).toContain("'/rag-embeddings.json'");
-    expect(code).toContain("'/cycle-content/manifest.json'");
+    expect(code).toContain("'/grafo-relations.json'");
     expect(code).toContain('RAG_GROUNDING_PRECACHE');
   });
 
