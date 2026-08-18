@@ -1,0 +1,72 @@
+{
+  "species_slug": "eriobotrya_japonica",
+  "scientific_name": "Eriobotrya japonica (Thunb.) Lindl.",
+  "common_names": [
+    "Níspero japonés"
+  ],
+  "family": "Rosaceae",
+  "category": "frutales_perennes",
+  "cultivable": true,
+  "conservation_status": "cultivo_comun",
+  "thermal_zones": [
+    "templado",
+    "frio"
+  ],
+  "roles_in_guild": [
+    "crop",
+    "pollinator_attractor",
+    "windbreak"
+  ],
+  "antagonists": [],
+  "especies_nativas_sustitutas": [],
+  "propagation": {
+    "metodo_principal": "injerto",
+    "notas": "Injerto sobre patrón franco (semilla) para variedades selectas; semilla simple también viable pero con variabilidad alta; entrada en producción 3-5 años; árbol siempreverde productivo 40+ años."
+  },
+  "requirements": {
+    "agua": "medio",
+    "altitud_msnm": {
+      "min_absoluto": 1200,
+      "optimo_min": 1700,
+      "optimo_max": 2400,
+      "max_absoluto": 2700
+    },
+    "temperatura_c": {
+      "helada_letal": -3,
+      "optimo_min": 14,
+      "optimo_max": 24,
+      "max_tolerable": 30
+    },
+    "radiacion": "sol_pleno",
+    "drenaje_requerido": "bueno"
+  },
+  "valor_pedagogico": "El níspero japonés (Eriobotrya japonica (Thunb.) Lindl., Rosaceae) es un frutal subtropical siempreverde originario del sureste de China y naturalizado en Japón hace más de 1.000 años, introducido a Colombia a fines del siglo XIX y ampliamente adoptado en altiplanos templado-fríos como árbol de patio campesino. Crece entre 1.700 y 2.400 msnm en zonas térmicas templadas a templado-frías, presente en Antioquia (Rionegro, La Ceja, El Retiro, Marinilla, Carmen de Viboral, La Unión, Sonsón), Cundinamarca (Sasaima, La Mesa, Anolaima, Subachoque, Tabio, Sopó, Tenjo, Cogua), Boyacá (Villa de Leyva, Moniquirá, Paipa, Duitama, Tibasosa), Tolima (Líbano, Murillo, Anzoátegui), Caldas (Manizales, Villamaría), Risaralda (Santa Rosa de Cabal, Pereira), Quindío (Salento, Calarcá) y Norte de Santander (Pamplona, Chinácota). Árbol de 4-10 m de altura, copa redondeada-densa, hábito robusto. Hojas grandes (15-30 cm) coriáceas elípticas con envés tomentoso ferrugíneo característico, persistentes (siempreverde). Flores blanco-cremosas pequeñas (1-2 cm) en panícula terminal pubescente, muy fragantes, floración invernal (julio-septiembre en Colombia), atractivo para Apis mellifera en época de escasez de néctar (importante en planeación apícola). Frutos en pomo ovoide-piriforme de 3-5 cm, piel amarillo-naranja aterciopelada delgada, pulpa amarillo-anaranjada jugosa dulce-acidulada perfumada (10-13° Brix) con 2-5 semillas grandes brunas. Lección viva de patrimonio frutícola asiático-andino y soberanía alimentaria templada-subtropical: enseña a niñas y niños la importancia de los frutales de cosecha invernal (febrero-mayo en Colombia) que complementan la oferta frutícola del año, y reivindica el níspero antioqueño-cundiboyacense como fruto patrimonial. Manejo agroecológico: poda mínima de formación (árbol naturalmente bien estructurado), distancia 6×6 m (278 árboles/ha), aclareo de frutos para tamaño comercial, fertilización con compost + biol foliar, control de Anastrepha fraterculus con trampas McPhail + Beauveria bassiana, manejo de Pseudomonas syringae con poda sanitaria + cobre, control de Aspidiotus (escamas) con jabón potásico + sulfocálcico. Asocios: café variedades de sombra parcial en zona templada, plátano dominico hartón compañero histórico, frijol arbustivo bajo árbol joven. Fuentes Tier A: POWO Kew, GBIF Backbone Taxonomy, AGROSAVIA Manual Frutales Tropicales, Pérez-Arbeláez 1947 Plantas Útiles.",
+  "sources": [
+    {
+      "id": "powo-kew",
+      "title": "powo-kew",
+      "tier": "A",
+      "url": "https://powo.science.kew.org"
+    },
+    {
+      "id": "gbif-taxonomic-backbone",
+      "title": "gbif-taxonomic-backbone",
+      "tier": "A",
+      "url": "https://www.gbif.org/dataset/d7dddbf4-2cf0-4f39-9b2a-bb099caae36c"
+    },
+    {
+      "id": "agrosavia-manual-frutales-tropicales",
+      "title": "agrosavia-manual-frutales-tropicales",
+      "tier": "A",
+      "url": null
+    },
+    {
+      "id": "perez-arbelaez-1947-plantas-utiles",
+      "title": "perez-arbelaez-1947-plantas-utiles",
+      "tier": "A",
+      "url": null
+    }
+  ],
+  "_generated_by": "scripts/build-cycle-content-from-catalog.mjs",
+  "_generated_at": "2026-05-19T00:42:57.387Z"
+}

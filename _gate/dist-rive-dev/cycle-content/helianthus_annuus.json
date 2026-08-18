@@ -1,0 +1,81 @@
+{
+  "species_slug": "helianthus_annuus",
+  "scientific_name": "Helianthus annuus L.",
+  "common_names": [
+    "Girasol"
+  ],
+  "family": "Asteraceae",
+  "category": "atractores_polinizadores",
+  "cultivable": true,
+  "conservation_status": "cultivo_comun",
+  "thermal_zones": [
+    "calido",
+    "templado",
+    "frio"
+  ],
+  "roles_in_guild": [
+    "pollinator_attractor",
+    "crop",
+    "dynamic_accumulator",
+    "biomass_producer"
+  ],
+  "antagonists": [],
+  "especies_nativas_sustitutas": [],
+  "propagation": {
+    "metodo_principal": "semilla",
+    "notas": "Siembra directa a sitio definitivo, 2-3 cm profundidad, distancia 30-60 cm entre plantas. Germinación 5-12 días. Ciclo 90-120 días. Cosecha de capítulo cuando reverso vira marrón y semillas se desprenden con presión leve."
+  },
+  "requirements": {
+    "agua": "medio",
+    "altitud_msnm": {
+      "min_absoluto": 0,
+      "optimo_min": 0,
+      "optimo_max": 2200,
+      "max_absoluto": 2800
+    },
+    "temperatura_c": {
+      "helada_letal": -2,
+      "optimo_min": 18,
+      "optimo_max": 28,
+      "max_tolerable": 35
+    },
+    "radiacion": "sol_pleno",
+    "drenaje_requerido": "bueno"
+  },
+  "valor_pedagogico": "El Girasol (Helianthus annuus L., Asteraceae) es una especie anual originaria de Norteamérica (cuenca del Mississippi, México, suroeste de Estados Unidos) cultivada en Colombia y todo el Neotrópico como ornamental masivo, productora de semilla comestible y oleaginosa, y atrayente excepcional de polinizadores. Sus capítulos compuestos (inflorescencias) son uno de los íconos botánicos universales y su heliotropismo (seguimiento del sol por capítulos jóvenes, fenómeno reversible mediado por crecimiento diferencial del tallo bajo el control del reloj circadiano) es lección viva de fisiología vegetal para huerta escolar. En Colombia se cultiva entre 0 y 2.800 msnm en zonas térmicas cálida a fría: Sabana de Bogotá, valles interandinos del Magdalena y Cauca, Caribe seco, Eje Cafetero, Antioquia. Manejo agronómico: siembra directa a sitio definitivo en suelo bien drenado y soleado, 2-3 cm profundidad, distancia 30-60 cm entre plantas y 60-90 cm entre surcos, germinación 5-12 días, ciclo total 90-120 días según variedad (enanas 80 días, gigantes 130+ días). El capítulo puede albergar entre 100 y 2.000 flores tubulares (flósculos del disco) rodeadas por las flores liguladas amarillas vistosas (radio), cada flósculo polinizado produce una semilla (técnicamente cipsela). Atracción de polinizadores: una sola planta puede sostener decenas de abejas (Apis mellifera, Trigona spp., Melipona spp.) y abejorros nativos (Bombus spp.) simultáneamente durante la floración, y es flor visitada también por mariposas y aves granívoras (loros, pericos, jilgueros) que aprovechan las semillas maduras. Asociación clásica con la \"milpa mesoamericana\": maíz + frijol + calabaza + girasol como cuarta hermana en borde para atracción de polinizadores y defensa contra plagas (acumula áfidos lejos de las hortalizas). Producción de aceite: las variedades oleaginosas modernas alcanzan 40-50% de aceite en semilla (insaturado, rico en ácido linoleico y vitamina E), siendo el girasol uno de los tres aceites vegetales más consumidos en el mundo junto con palma y soya. Las semillas tostadas o crudas son consumo humano directo en muchas culturas (pipas en España, sunflower seeds en Estados Unidos, pepas de mirasol en México). La torta residual del prensado es alimento balanceado de alta calidad para aves y porcinos. Acumulador dinámico de potasio y fósforo del subsuelo (sistema radical pivotante profundo de 1.5-2 m), su biomasa al final del ciclo es excelente abono verde si se incorpora antes de la lignificación del tallo. Uso ancestral: pueblos originarios de Norteamérica lo cultivaban hace 4.000+ años como cuarto cultivo principal (maíz, frijol, calabaza, girasol), Aztecas y Mayas lo veneraban como flor solar simbólica (la flor mira al sol como el alma busca a Dios), llegada a Europa siglo XVI vía conquistadores españoles desde México (de ahí \"mirasol\" y \"girasol\"). Manejo en chagra: siembra perimetral o en hileras intercaladas con hortalizas, como planta atrayente y trampa, asociación con maíz-frijol-calabaza, cosecha del capítulo cuando reverso vira marrón claro y las brácteas se secan, secado al sol 1-2 semanas antes de desgrane manual. Fuentes Tier A: POWO Kew, GBIF Backbone Taxonomy, FAO Ecocrop, Pérez Arbeláez 1947 Plantas Útiles Colombia, JBB Plantas Medicinales.",
+  "companions_markdown": "### Especies asociadas favorables\n\nEstas especies favorecen el cultivo cuando se siembran cerca:\n- cucurbita_maxima — Calabaza / Auyama (Cucurbita maxima Duchesne)\n- phaseolus_vulgaris — Frijol arbustivo / voluble (Phaseolus vulgaris L.)\n- zea_mays — Maíz criollo (Zea mays L.)",
+  "sources": [
+    {
+      "id": "gbif-taxonomic-backbone",
+      "title": "gbif-taxonomic-backbone",
+      "tier": "A",
+      "url": "https://www.gbif.org/dataset/d7dddbf4-2cf0-4f39-9b2a-bb099caae36c"
+    },
+    {
+      "id": "powo-kew",
+      "title": "powo-kew",
+      "tier": "A",
+      "url": "https://powo.science.kew.org"
+    },
+    {
+      "id": "fao-ecocrop",
+      "title": "fao-ecocrop",
+      "tier": "A",
+      "url": "https://gaez.fao.org/pages/ecocrop"
+    },
+    {
+      "id": "perez-arbelaez-1947-plantas-utiles",
+      "title": "perez-arbelaez-1947-plantas-utiles",
+      "tier": "A",
+      "url": null
+    },
+    {
+      "id": "jbb-plantas-medicinales",
+      "title": "jbb-plantas-medicinales",
+      "tier": "A",
+      "url": null
+    }
+  ],
+  "_generated_by": "scripts/build-cycle-content-from-catalog.mjs",
+  "_generated_at": "2026-05-19T00:42:57.394Z"
+}

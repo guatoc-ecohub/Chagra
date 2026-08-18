@@ -1,0 +1,115 @@
+{
+  "ts": "2026-08-15T22:39:51.002Z",
+  "url": "https://chagra-dev.guatoc.co/",
+  "gpu": {
+    "ok": true,
+    "renderer": "ANGLE (NVIDIA Corporation, Quadro M6000/PCIe/SSE2, OpenGL 4.5.0)",
+    "vendor": "Google Inc. (NVIDIA Corporation)",
+    "version": "WebGL 2.0 (OpenGL ES 3.0 Chromium)",
+    "isSoftware": false
+  },
+  "overlayPresent": true,
+  "jaguarPresent": true,
+  "viewportW": 1440,
+  "franjaEsperada_px": 432,
+  "roam": {
+    "samples": 297,
+    "maxAbsTx": 432,
+    "minTx": -432,
+    "pctAncho": "30.0",
+    "estadosVistos": [
+      "thinking"
+    ],
+    "caminandoFrames": 0,
+    "paradasVistas": 3,
+    "walkShots": 16,
+    "stopShots": 3
+  },
+  "legCrops": [],
+  "burbuja": {
+    "shot": "/home/kortux/Workspace/chagra/_gate/compai-dev-dominio/burbuja-parada-final.png",
+    "rect": {
+      "x": 1185,
+      "y": 722.25,
+      "w": 224,
+      "h": 121.75,
+      "right": 1409,
+      "bottom": 844
+    },
+    "texto": "Bienvenido a su finca Este es su tablero: aquí ve el clima de hoy, las tareas pendientes y accesos rápidos al Mapa, al Catálogo y a registrar lo que hizo en la finca.",
+    "vw": 1440,
+    "vh": 980,
+    "dentroViewport": true,
+    "botonesCriticosEnPantalla": [],
+    "botonesTapados": []
+  },
+  "vivo": {
+    "parpado_animName": "jlv-blink",
+    "cuerpo_animName": "jlv-respira",
+    "cola_animName": "jlv-cola",
+    "parpado_scaleY_range": [
+      "0.000",
+      "0.885"
+    ],
+    "parpado_varia": true,
+    "cuerpo_transformDistinct": 69,
+    "cola_transformDistinct": 69,
+    "vidasObservadas": []
+  },
+  "console": {
+    "total": 57,
+    "errors": 13,
+    "warnings": 17,
+    "pageErrors": 0,
+    "reqFail": 2,
+    "nan": 0
+  },
+  "consoleErrors": [
+    "Error registrando Service Worker: TypeError: Cannot read properties of undefined (reading 'scope')\n    at https://chagra-dev.guatoc.co/assets/main-BZbjveqD.js:1372:54129",
+    "Failed to load module script: Expected a JavaScript-or-Wasm module script but the server responded with a MIME type of \"text/html\". Strict MIME type checking is enforced for module scripts per HTML sp",
+    "Failed to load module script: Expected a JavaScript-or-Wasm module script but the server responded with a MIME type of \"text/html\". Strict MIME type checking is enforced for module scripts per HTML sp",
+    "Failed to load module script: Expected a JavaScript-or-Wasm module script but the server responded with a MIME type of \"text/html\". Strict MIME type checking is enforced for module scripts per HTML sp",
+    "Failed to load resource: the server responded with a status of 400 ()",
+    "Failed to load resource: the server responded with a status of 400 ()",
+    "Error registrando Service Worker: TypeError: Cannot read properties of undefined (reading 'scope')\n    at https://chagra-dev.guatoc.co/assets/main-BZbjveqD.js:1372:54129",
+    "Failed to load module script: Expected a JavaScript-or-Wasm module script but the server responded with a MIME type of \"text/html\". Strict MIME type checking is enforced for module scripts per HTML sp",
+    "Failed to load module script: Expected a JavaScript-or-Wasm module script but the server responded with a MIME type of \"text/html\". Strict MIME type checking is enforced for module scripts per HTML sp",
+    "Failed to load resource: the server responded with a status of 400 ()",
+    "Failed to load module script: Expected a JavaScript-or-Wasm module script but the server responded with a MIME type of \"text/html\". Strict MIME type checking is enforced for module scripts per HTML sp",
+    "Failed to load resource: the server responded with a status of 400 ()",
+    "Failed to load resource: the server responded with a status of 400 ()"
+  ],
+  "reqFailures": [
+    {
+      "url": "https://chagra-dev.guatoc.co/cdn-cgi/rum?",
+      "err": "net::ERR_ABORTED"
+    },
+    {
+      "url": "https://chagra-dev.guatoc.co/catalog.sqlite",
+      "err": "net::ERR_ABORTED"
+    }
+  ],
+  "walkFrames": [
+    "/home/kortux/Workspace/chagra/_gate/compai-dev-dominio/caminado-00_tx-124_thinking.png",
+    "/home/kortux/Workspace/chagra/_gate/compai-dev-dominio/caminado-01_tx-148_thinking.png",
+    "/home/kortux/Workspace/chagra/_gate/compai-dev-dominio/caminado-02_tx-167_thinking.png",
+    "/home/kortux/Workspace/chagra/_gate/compai-dev-dominio/caminado-03_tx-188_thinking.png",
+    "/home/kortux/Workspace/chagra/_gate/compai-dev-dominio/caminado-04_tx-211_thinking.png",
+    "/home/kortux/Workspace/chagra/_gate/compai-dev-dominio/caminado-05_tx-231_thinking.png",
+    "/home/kortux/Workspace/chagra/_gate/compai-dev-dominio/caminado-06_tx-249_thinking.png",
+    "/home/kortux/Workspace/chagra/_gate/compai-dev-dominio/caminado-07_tx-271_thinking.png",
+    "/home/kortux/Workspace/chagra/_gate/compai-dev-dominio/caminado-08_tx-291_thinking.png",
+    "/home/kortux/Workspace/chagra/_gate/compai-dev-dominio/caminado-09_tx-310_thinking.png",
+    "/home/kortux/Workspace/chagra/_gate/compai-dev-dominio/caminado-10_tx-330_thinking.png",
+    "/home/kortux/Workspace/chagra/_gate/compai-dev-dominio/caminado-11_tx-352_thinking.png",
+    "/home/kortux/Workspace/chagra/_gate/compai-dev-dominio/caminado-12_tx-374_thinking.png",
+    "/home/kortux/Workspace/chagra/_gate/compai-dev-dominio/caminado-13_tx-394_thinking.png",
+    "/home/kortux/Workspace/chagra/_gate/compai-dev-dominio/caminado-14_tx-412_thinking.png",
+    "/home/kortux/Workspace/chagra/_gate/compai-dev-dominio/caminado-15_tx-432_thinking.png"
+  ],
+  "stopFrames": [
+    "/home/kortux/Workspace/chagra/_gate/compai-dev-dominio/parada-01_tx-432.png",
+    "/home/kortux/Workspace/chagra/_gate/compai-dev-dominio/parada-02_tx0.png",
+    "/home/kortux/Workspace/chagra/_gate/compai-dev-dominio/parada-03_tx-432.png"
+  ]
+}
