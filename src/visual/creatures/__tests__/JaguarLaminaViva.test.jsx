@@ -82,3 +82,33 @@ describe('JaguarLaminaViva — contrato base', () => {
     expect(raiz.style.filter).toContain('drop-shadow');
   });
 });
+
+describe('JaguarLaminaViva — la VIDA (hooks de Angelita cableados)', () => {
+  it('el ritmo propio viaja como vars CSS (parpadeo por instancia, anti-metrónomo)', () => {
+    const { container } = render(<JaguarLaminaViva />);
+    const raiz = /** @type {HTMLElement} */ (container.querySelector('[data-creature="jaguar"]'));
+    expect(raiz.style.getPropertyValue('--rh-blink-dur')).toMatch(/s$/);
+    expect(raiz.style.getPropertyValue('--rh-blink-delay')).toMatch(/s$/);
+  });
+
+  it('el visema fija el nivel de apertura de la mandíbula (--jlv-jaw) para el lip-sync', () => {
+    const { container: cerrada } = render(<JaguarLaminaViva />);
+    const raizCerrada = /** @type {HTMLElement} */ (cerrada.querySelector('[data-creature="jaguar"]'));
+    expect(raizCerrada.style.getPropertyValue('--jlv-jaw')).toBe('0');
+
+    const { container: hablando } = render(<JaguarLaminaViva visema="V3" />);
+    // V3 (boca abierta amplia) → mandíbula totalmente abajo.
+    const raizHablando = /** @type {HTMLElement} */ (hablando.querySelector('[data-creature="jaguar"]'));
+    expect(raizHablando.style.getPropertyValue('--jlv-jaw')).toBe('1');
+  });
+
+  it('tier viaja como data-tier (gama baja apaga lo continuo)', () => {
+    const { container } = render(<JaguarLaminaViva tier="bajo" />);
+    expect(container.querySelector('[data-creature="jaguar"]')).toHaveAttribute('data-tier', 'bajo');
+  });
+
+  it('acepta el estado "caminando" (la marcha real) sin romper el contrato', () => {
+    const { container } = render(<JaguarLaminaViva estado="caminando" />);
+    expect(container.querySelector('[data-creature="jaguar"]')).toHaveAttribute('data-agt-estado', 'caminando');
+  });
+});

@@ -1,62 +1,53 @@
-/* jaguarLamina.css — LAS MISMAS animaciones del rig real, trasplantadas.
+/* jaguarLamina.css — LA VIDA DE ANGELITA sobre la piel de la lámina.
  *
- * Cada @keyframes de acá es una copia de un @keyframes de
- * `~/demos/3d/compai/rigs/jaguar.css` (bloque `#jaguarLado`, la variante de
- * PERFIL — es la que le corresponde a `jaguar-natural.png`, un jaguar
- * caminando visto de lado; el `#cuerpoRig` FRONTAL de ese archivo es para
- * la pose de cara, no aplica acá). Se preserva el mismo % de keyframe, la
- * misma duración, el mismo timing-function y el mismo desfase entre piezas
- * — lo único que cambia es la UNIDAD de las traslaciones: el rig anima un
- * SVG de viewBox fijo en px propios; acá el stage escala con el prop
- * `size`, así que cada `translateY(Npx)` del rig se reexpresa como
- * `N / <dimensión de referencia de esa pieza en el rig> %` (ese % de CSS
- * ya es relativo al alto del propio elemento — mismo efecto proporcional
- * que el `transform-box:fill-box` del rig). Las rotaciones NO se tocan
- * (un grado es un grado, no hay unidad que convertir).
+ * Antes (`feat/jaguar-pulido`) esto era un LOOP DE MARCHA: bob + patas en
+ * péndulo + un parpadeo. El operador lo resumió: "da asco, ≈10% de animación".
+ * Esta rama (`feat/jaguar-miss-minutes`) le da a la misma piel el sistema de
+ * vida de `agente/Angelita.jsx` — pero como la lámina es un mapa de bits (capas
+ * <canvas> en <div>, no SVG), la VIDA la producen los MISMOS hooks de Angelita
+ * (JaguarLaminaViva.jsx: useRitmoPropio / useVidaIdle / useMiradaUsted +
+ * visema) y este CSS solo la CONSUME sobre cada pieza:
  *
- * Correspondencias (rig → acá), con la conversión aplicada:
- *   troncoLadoBob   (#troncoLado,  ry=77 del <ellipse> del tronco)
- *     2.5px→3.2% / -3.5px→-4.5%   → jlv-cuerpoPivote (jlv-cuerpoBob)
- *   cabezaLadoBob   (#cabezaLado,  ry=51 del <ellipse> del cráneo)
- *     -1.5px→-2.9% / 2px→3.9%     → jlv-cabezaPivote (jlv-cabezaBob)
- *   pasoLado        (patas, rotate puro — sin conversión)
- *     14deg↔-15deg  ESCALADO ×0.6 (8deg↔-9deg): la pierna del rig es un
- *     trazo vectorial con el pivote exacto en el hueso; acá el pivote se
- *     MIDIÓ a ojo sobre una foto — con la amplitud completa, un pivote un
- *     poco corrido se ve como que la pata se "descuelga" del cuerpo en vez
- *     de pivotar sobre él. Documentado explícitamente: NO es fidelidad
- *     completa, es el ajuste de seguridad que le corresponde a un pivote
- *     medido a ojo sobre una lámina en vez de tallado en el hueso del rig.
- *   colaLadoOndea   (#colaLado, rotate puro — sin conversión) → jlv-cola
- *   rhBlink         (.ojo, scaleY puro, universal en frontal y perfil) → jlv-parpado
- *   .flota          (#jaguar, ambiente frontal — se reusa como bob GLOBAL
- *     del stage completo, ry≈altura total 394)
- *     -5px→-1.3% / 5px→1.3%       → jlv-stage
+ *   señal (hook/estado)                → qué pieza mueve, aquí
+ *   --rh-blink-dur/-delay (ritmo)      → parpadeo REAL de los dos ojos juntos,
+ *                                        cada instancia a su aire (cadencia rh)
+ *   data-rh-mira + --rh-mx/--rh-my     → la CABEZA gira siguiendo al usuario
+ *   data-vida=acecha|ruge|reposo       → el idle-cerebro: acecho (agacha),
+ *                                        bostezo/rugido (abre fauces), reposo
+ *   data-agt-estado=listening          → PARA LA OREJA + ladea la testa
+ *   data-agt-estado=speaking + --jlv-jaw→ mandíbula que habla (lip-sync)
+ *   data-agt-estado=thinking           → mira arriba, orejas atrás
+ *   data-agt-estado=caminando          → bob de cuerpo/cabeza + balanceo SUTIL
+ *                                        de patas (el andar se lee del roaming)
  *
- * NO trasplantado (documentado, no inventado):
- *   - hombroLadoRueda: el omóplato es una FORMA VECTORIAL propia del rig
- *     (`#hombroLado`), sin equivalente recortable en una lámina fotográfica
- *     (no hay un borde de alfa que separe "omóplato" de "torso").
- *   - colaLadoPunta: la cola acá es UNA pieza rígida (ver anatomia.js); el
- *     rig anima base y punta por separado, esto solo replica la base.
- *   - gruneLado/fauceLado/gruneFx (el gruñido periódico): requiere arte de
- *     fauces abiertas que la lámina no tiene (retrato de cuerpo entero,
- *     boca cerrada) — dibujarla sería inventar lámina, prohibido por el SPEC.
- *   - rhMirada (deriva de pupila): el `.ojo` de `#jaguarLado` en el SVG del
- *     rig NO tiene un `<g class="pupila">` propio (solo el `.ojo` frontal lo
- *     tiene) — el rig mismo no mueve la pupila en la vista de perfil, así
- *     que no hay transform que trasplantar acá.
+ * Amplitudes/tiempos: los gestos-firma del jaguar copian el ESPÍRITU del rig
+ * viejo (`Jaguar.jsx` + creatures.css: acecho baja la testa y agazapa el
+ * cuerpo; el rugido abre las fauces y levanta la testa; cola de contrapeso) y
+ * del kit rubber-hose (`rh-blink` doble-golpe, `rh-sway` follow-through). El
+ * "caminar" YA NO finge un gait diagonal por-pata (un dibujo plano de una sola
+ * pose lo fantasmea como "3-4 patas" — feedback del operador): se lee del
+ * DESPLAZAMIENTO real del compai por la pantalla (`useCompaiRoam`) + el bob del
+ * cuerpo/cabeza + la cola; las patas solo balancean sutil, en fase con el bob.
+ *
+ * HONESTIDAD: el interior de boca (`.jlv-bocaInterior`) es SINTÉTICO (la lámina
+ * es de boca cerrada — ver JaguarLaminaViva.jsx / anatomia.js). Es lo único que
+ * no sale del PNG. La mirada es GIRO DE CABEZA, no pupila suelta (no se puede
+ * recortar la pupila sin repintar el iris que destapa).
+ *
+ * Gates de la casa: reduced-motion congela todo en fotograma digno (párpado
+ * oculto, boca cerrada); `data-tier='bajo'` corta lo continuo (respiración,
+ * mecidos) — el idle-cerebro y la mirada ya los apaga el JS en gama baja.
  */
 
 .jlv-stage {
   position: relative;
   display: block;
-  animation: jlv-stageBob 3.4s ease-in-out infinite alternate;
   transform-origin: 50% 50%;
+  animation: jlv-stageBob 4.6s ease-in-out infinite alternate;
 }
 @keyframes jlv-stageBob {
-  from { transform: translateY(-1.3%) rotate(-0.5deg); }
-  to   { transform: translateY(1.3%) rotate(0.5deg); }
+  from { transform: translateY(-0.7%); }
+  to   { transform: translateY(0.7%); }
 }
 
 .jlv-capa {
@@ -67,83 +58,259 @@
   display: block;
 }
 
-/* tronco/cuerpo — bóveda del paso + cabeceo sutil (troncoLadoBob) */
-.jlv-cuerpoPivote {
-  position: absolute;
-  inset: 0;
-  animation: jlv-cuerpoBob 0.525s ease-in-out infinite;
-}
-@keyframes jlv-cuerpoBob {
-  0%, 100% { transform: translateY(3.2%) rotate(0.5deg); }
-  50%      { transform: translateY(-4.5%) rotate(-0.3deg); }
+/* ═══ IDLE VIVO (por defecto) — alive-in-place, no treadmill ═════════════════
+   Respira, la testa cabecea suave, la cola y las orejas se mecen con
+   follow-through, las patas hacen micro-ajuste de peso (no marcha). */
+.jlv-cuerpoPivote { position: absolute; inset: 0; animation: jlv-respira 3.7s ease-in-out infinite; }
+@keyframes jlv-respira {
+  0%, 100% { transform: translateY(0) scale(1); }
+  50%      { transform: translateY(-0.5%) scale(1.012); }
 }
 
-/* cabeza — bob al paso, contratiempo del tronco (cabezaLadoBob) */
-.jlv-cabezaPivote {
-  position: absolute;
-  inset: 0;
-  animation: jlv-cabezaBob 0.525s ease-in-out -0.12s infinite;
-}
-@keyframes jlv-cabezaBob {
-  0%, 100% { transform: translateY(-2.9%) rotate(-0.7deg); }
-  50%      { transform: translateY(3.9%) rotate(0.7deg); }
+.jlv-cabezaGesto { position: absolute; inset: 0; }
+.jlv-cabezaMira  { position: absolute; inset: 0; transition: transform 0.5s cubic-bezier(0.2, 0.7, 0.3, 1); }
+.jlv-cabezaPivote { position: absolute; inset: 0; animation: jlv-cabeza-idle 3.7s ease-in-out infinite; }
+@keyframes jlv-cabeza-idle {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  50%      { transform: translateY(0.6%) rotate(0.4deg); }
 }
 
-/* patas — péndulo desde el pivote (pasoLado), amplitud reducida x0.6 — ver
-   nota de cabecera. patasDelanteras = fase "delCerca" (0s); pataTrasera =
-   fase "trasCerca" (-.52s), su diagonal real en el rig de 4 patas. */
-.jlv-patasDelPivote {
-  position: absolute;
-  inset: 0;
-  animation: jlv-pasoLado 1.05s ease-in-out infinite;
-}
-.jlv-pataTrasPivote {
-  position: absolute;
-  inset: 0;
-  animation: jlv-pasoLado 1.05s ease-in-out -0.52s infinite;
-}
-@keyframes jlv-pasoLado {
-  0%, 100% { transform: rotate(8deg); }
-  50%      { transform: rotate(-9deg); }
+/* patas — micro-ajuste de peso en idle (que no queden congeladas mid-paso).
+   Las delanteras son UN bloque (`jlv-patasDelPivote`): balanceo sutil, sin
+   partirlas en dos piezas que fantasmeen "3-4 patas". La trasera va a su aire
+   (está lejos en X, no solapa con las delanteras → no puede duplicar contorno). */
+.jlv-patasDelPivote { position: absolute; inset: 0; animation: jlv-pata-idle 4.4s ease-in-out infinite; }
+.jlv-pataTrasPivote { position: absolute; inset: 0; animation: jlv-pata-idle 4.4s ease-in-out -2.2s infinite; }
+@keyframes jlv-pata-idle {
+  0%, 100% { transform: rotate(0deg); }
+  50%      { transform: rotate(1.5deg); }
 }
 
-/* cola — ondea con peso desde la base (colaLadoOndea) */
-.jlv-colaPivote {
-  position: absolute;
-  inset: 0;
-  animation: jlv-colaOndea 1.8s ease-in-out infinite alternate;
-}
-@keyframes jlv-colaOndea {
+/* cola — contrapeso con peso desde la base (colaLadoOndea del rig). */
+.jlv-colaPivote { position: absolute; inset: 0; animation: jlv-cola 3.8s ease-in-out infinite alternate; }
+@keyframes jlv-cola {
   from { transform: rotate(-3deg); }
   to   { transform: rotate(5deg); }
 }
 
-/* párpado — parpadeo real con doble golpe (rhBlink de jaguar.css).
-   OJO con la polaridad: el rig anima `.ojo` (el globo ocular ENTERO, dibujo
-   vectorial) escalándolo a scaleY(.1) para "cerrarlo" — eso solo funciona
-   en vector. Acá el párpado es una PIEZA DE PIEL PROPIA que se desliza
-   ENCIMA del ojo (misma técnica que `piloto-lamina.js`), así que la
-   polaridad es la inversa: abierto=escala~0 (parche oculto), cerrado=
-   escala~1 (parche cubre el ojo). Los % de keyframe, la duración (5.9s) y
-   la curva (el doble golpe en 37%/75%/79%) son un calco exacto de
-   `rhBlink` — solo se invierte `scaleY → 1 - scaleY` para que la MISMA
-   curva cierre el párpado en vez de aplastar el globo ocular. */
+/* orejas — mecido de follow-through (rh-sway del kit), fases distintas. */
+.jlv-orejaIzqPivote { position: absolute; inset: 0; animation: jlv-oreja-sway 3.4s ease-in-out infinite; }
+.jlv-orejaDerPivote { position: absolute; inset: 0; animation: jlv-oreja-sway 3.4s ease-in-out -1.1s infinite; }
+@keyframes jlv-oreja-sway {
+  0%, 100% { transform: rotate(0deg); }
+  50%      { transform: rotate(2.4deg); }
+}
+
+/* ═══ PARPADEO REAL con RITMO PROPIO ═════════════════════════════════════════
+   ANTES: un ciclo 3× lento (≈15s) con cierres de ~300ms `linear` y un GUIÑO
+   sostenido (párpado a medias, 3.5% del ciclo) — se leía como un "aplastón"
+   raro del parche de párpado, no como un parpadeo. AHORA copia EXACTO la
+   cadencia probada de la familia (Angelita/rubber-hose: `rh-blink`/`frh-blink`
+   en creatures.css) — un parpadeo suelto + un blink-blink doble por vuelta,
+   cierres rápidos de ~110ms— así el jaguar parpadea IGUAL de sutil y natural
+   que el resto del elenco. Los dos ojos comparten el MISMO --rh-blink-dur/
+   -delay (vars en la raíz), así que cierran JUNTOS: un parpadeo real, no un
+   guiño de un ojo. Polaridad INVERTIDA respecto a la familia: aquí el párpado
+   es un parche de piel que TAPA el ojo, así scaleY(0)=retraído (ojo abierto) y
+   scaleY(1)=tapado (ojo cerrado). */
 .jlv-parpado {
   position: absolute;
   transform-origin: 50% 0%;
-  animation: jlv-blink 5.9s linear infinite;
+  animation: jlv-blink var(--rh-blink-dur, 5.6s) linear var(--rh-blink-delay, 0s) infinite;
 }
 @keyframes jlv-blink {
-  0%, 35%, 39%, 73%, 77%, 81%, 85%, 100% { transform: scaleY(0.001); }
-  37% { transform: scaleY(0.9); }
-  75% { transform: scaleY(0.9); }
-  79% { transform: scaleY(0.86); }
+  0%, 36%, 40%, 74%, 78%, 82%, 86%, 100% { transform: scaleY(0); }  /* ojo abierto */
+  38% { transform: scaleY(1); }   /* parpadeo suelto */
+  76% { transform: scaleY(1); }   /* blink-blink: dos golpes seguidos */
+  80% { transform: scaleY(1); }
 }
 
+/* ═══ LA MIRADA — la cabeza sigue al usuario (useMiradaUsted) ════════════════
+   --rh-mx/--rh-my (px chicos que setea el hook) × --jlv-mira-k (∝ tamaño, lo
+   pone el componente) → la testa se orienta hacia el puntero y vuelve sola. */
+[data-rh-mira='usted'] .jlv-cabezaMira {
+  transform: translate(
+    calc(var(--rh-mx, 0px) * var(--jlv-mira-k, 4)),
+    calc(var(--rh-my, 0px) * var(--jlv-mira-k, 4))
+  );
+}
+
+/* ═══ MANDÍBULA / LIP-SYNC — la mandíbula-lámina baja con el visema ══════════
+   --jlv-jaw (0..1, del visema) baja la mandíbula-pieza y revela el interior
+   sintético. En reposo (jaw=0) se ve EXACTO como la lámina aprobada. */
+.jlv-mandibulaPivote {
+  position: absolute;
+  inset: 0;
+  transition: transform 0.13s ease;
+  transform: translateY(calc(var(--jlv-jaw, 0) * 5.5%)) rotate(calc(var(--jlv-jaw, 0) * 4deg));
+}
+.jlv-bocaInterior {
+  pointer-events: none;
+  background: radial-gradient(ellipse 100% 125% at 50% 0%, #71302a 0%, #431814 60%, #240c0a 100%);
+  border-radius: 42% 42% 52% 52% / 14% 14% 90% 90%;
+  transform: scaleY(var(--jlv-jaw, 0));
+  transition: transform 0.13s ease;
+}
+
+/* HABLA (speaking) — aleteo de mandíbula MODULADO por el visema: incluso con un
+   visema estático (el adaptador manda 'V2') se ve hablando; con visemas reales
+   del lip-sync, la amplitud sigue la voz. */
+[data-agt-estado='speaking'] .jlv-mandibulaPivote {
+  animation: jlv-habla 0.34s ease-in-out infinite;
+}
+@keyframes jlv-habla {
+  0%, 100% { transform: translateY(calc(var(--jlv-jaw, 0.42) * 2.4%)) rotate(calc(var(--jlv-jaw, 0.42) * 1.8deg)); }
+  50%      { transform: translateY(calc(var(--jlv-jaw, 0.42) * 6.5%)) rotate(calc(var(--jlv-jaw, 0.42) * 5deg)); }
+}
+[data-agt-estado='speaking'] .jlv-bocaInterior {
+  animation: jlv-habla-interior 0.34s ease-in-out infinite;
+}
+@keyframes jlv-habla-interior {
+  0%, 100% { transform: scaleY(calc(var(--jlv-jaw, 0.42) * 0.5)); }
+  50%      { transform: scaleY(calc(var(--jlv-jaw, 0.42) * 1)); }
+}
+
+/* ═══ ESCUCHA (listening) — PARA LA OREJA + ladea la testa + parpadea menos ══ */
+[data-agt-estado='listening'] .jlv-orejaIzqPivote { animation: jlv-orejaIzq-perk 2.8s ease-in-out infinite; }
+[data-agt-estado='listening'] .jlv-orejaDerPivote { animation: jlv-orejaDer-perk 2.8s ease-in-out infinite; }
+/* PERK = solo GIRO desde la base (nada de levantar: levantar destaparía fondo
+   bajo la oreja — medido). La base-keep de capas.js respalda el giro sin hueco;
+   por eso la amplitud puede ser franca (±8° hold, ±10° en el twitch). */
+@keyframes jlv-orejaIzq-perk {
+  0%        { transform: rotate(0deg); }
+  20%, 100% { transform: rotate(-8deg); }
+  55%       { transform: rotate(-10deg); }  /* twitch de atención */
+  75%       { transform: rotate(-8deg); }
+}
+@keyframes jlv-orejaDer-perk {
+  0%        { transform: rotate(0deg); }
+  20%, 100% { transform: rotate(8deg); }
+  55%       { transform: rotate(10deg); }
+  75%       { transform: rotate(8deg); }
+}
+[data-agt-estado='listening'] .jlv-cabezaGesto { animation: jlv-escucha-cabeza 4s ease-in-out infinite; }
+@keyframes jlv-escucha-cabeza {
+  0%, 100% { transform: rotate(0deg) translateY(0); }
+  50%      { transform: rotate(-2.2deg) translateY(-0.6%); }
+}
+[data-agt-estado='listening'] .jlv-parpado { animation-duration: calc(var(--rh-blink-dur, 5.2s) * 4.5); }
+
+/* ═══ PIENSA (thinking) — mira arriba, orejas apenas atrás ═══════════════════ */
+[data-agt-estado='thinking'] .jlv-cabezaGesto { animation: jlv-piensa-cabeza 4.6s ease-in-out infinite; }
+@keyframes jlv-piensa-cabeza {
+  0%, 100% { transform: rotate(0deg) translateY(0); }
+  50%      { transform: rotate(-1.4deg) translateY(-1.4%); }
+}
+[data-agt-estado='thinking'] .jlv-orejaIzqPivote { animation: jlv-oreja-atras-izq 4.6s ease-in-out infinite; }
+[data-agt-estado='thinking'] .jlv-orejaDerPivote { animation: jlv-oreja-atras-der 4.6s ease-in-out infinite; }
+@keyframes jlv-oreja-atras-izq { 0%, 100% { transform: rotate(0deg); } 50% { transform: rotate(5deg); } }
+@keyframes jlv-oreja-atras-der { 0%, 100% { transform: rotate(0deg); } 50% { transform: rotate(-5deg); } }
+
+/* ═══ CAMINA (caminando) ═════════════════════════════════════════════════════
+   HONESTIDAD (feedback del operador: "las patas de adelante a veces se ven 3 y
+   4"): un dibujo PLANO de una sola pose NO da un gait real por-pata sin
+   fantasma — cualquier corte por color deja un filo que, al rotar cada mitad
+   por su lado, duplica el contorno. Así que el "caminar" NO se finge con un
+   péndulo grande por-pata: se LEE del DESPLAZAMIENTO real del compai por la
+   pantalla (`useCompaiRoam`) + el bob del cuerpo/cabeza + la cola. Las patas
+   (un solo bloque cada grupo) solo hacen un balanceo SUTIL sincronizado con ese
+   bob — nunca dos piezas en fase opuesta. Para un gait real habría que dibujar
+   las patas separadas (ver anatomia.js `PATAS_DEL`). */
+[data-agt-estado='caminando'] .jlv-cuerpoPivote { animation: jlv-cuerpoBob 0.6s ease-in-out infinite; }
+@keyframes jlv-cuerpoBob {
+  0%, 100% { transform: translateY(2.4%) rotate(0.4deg); }
+  50%      { transform: translateY(-3.2%) rotate(-0.3deg); }
+}
+[data-agt-estado='caminando'] .jlv-cabezaPivote { animation: jlv-cabezaBob 0.6s ease-in-out -0.14s infinite; }
+@keyframes jlv-cabezaBob {
+  0%, 100% { transform: translateY(-2.2%) rotate(-0.6deg); }
+  50%      { transform: translateY(2.8%) rotate(0.6deg); }
+}
+/* Balanceo SUTIL del bloque de patas, en fase con el bob del cuerpo (mismo
+   0.6s). Delanteras y trasera van a la MISMA fase y amplitud chica: no hay
+   corte interno ni fase opuesta que pueda fantasmear una pata de más. */
+[data-agt-estado='caminando'] .jlv-patasDelPivote { animation: jlv-patasBalanceo 0.6s ease-in-out infinite; }
+[data-agt-estado='caminando'] .jlv-pataTrasPivote { animation: jlv-patasBalanceo 0.6s ease-in-out infinite; }
+@keyframes jlv-patasBalanceo {
+  0%, 100% { transform: rotate(2deg); }
+  50%      { transform: rotate(-2deg); }
+}
+[data-agt-estado='caminando'] .jlv-colaPivote { animation: jlv-cola 1.8s ease-in-out infinite alternate; }
+
+/* ═══ IDLE-CEREBRO (data-vida) — los gestos del jaguar (vidaEstados.js) ══════
+   Solo en idle (el JS apaga el cerebro en los demás estados). */
+/* ACECHO — la testa BAJA, el cuerpo se agazapa, las orejas al frente
+   (copia el espíritu de jaguar-acecho-cabeza/-cuerpo del rig viejo). */
+[data-vida='acecha'] .jlv-cabezaGesto { animation: jlv-acecha-cabeza 3.2s ease-in-out infinite; }
+@keyframes jlv-acecha-cabeza {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  42%, 70% { transform: translateY(2.4%) rotate(2deg); }
+}
+[data-vida='acecha'] .jlv-cuerpoPivote { animation: jlv-acecha-cuerpo 3.2s ease-in-out infinite; }
+@keyframes jlv-acecha-cuerpo {
+  0%, 100% { transform: translateY(0) scaleY(1); }
+  42%, 70% { transform: translateY(1.4%) scaleY(0.975); }
+}
+[data-vida='acecha'] .jlv-orejaIzqPivote { animation: jlv-acecha-orejaIzq 3.2s ease-in-out infinite; }
+[data-vida='acecha'] .jlv-orejaDerPivote { animation: jlv-acecha-orejaDer 3.2s ease-in-out infinite; }
+@keyframes jlv-acecha-orejaIzq { 0%, 100% { transform: rotate(0deg); } 42%, 70% { transform: rotate(-6deg); } }
+@keyframes jlv-acecha-orejaDer { 0%, 100% { transform: rotate(0deg); } 42%, 70% { transform: rotate(-4deg); } }
+
+/* RUGIDO / BOSTEZO — abre las fauces (jaw=1 lo pone el JS), levanta la testa,
+   orejas apenas atrás. 1.6s ×2 = 3.2s (el dur del momento 'ruge'). */
+[data-vida='ruge'] .jlv-cabezaGesto { animation: jlv-ruge-cabeza 1.6s ease-in-out infinite; }
+@keyframes jlv-ruge-cabeza {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  45%, 62% { transform: translateY(-1.6%) rotate(-2deg); }
+}
+[data-vida='ruge'] .jlv-mandibulaPivote { animation: jlv-ruge-jaw 1.6s ease-in-out infinite; }
+@keyframes jlv-ruge-jaw {
+  0%, 100% { transform: translateY(0.6%) rotate(0.5deg); }
+  45%, 62% { transform: translateY(7%) rotate(6deg); }
+}
+[data-vida='ruge'] .jlv-bocaInterior { animation: jlv-ruge-interior 1.6s ease-in-out infinite; }
+@keyframes jlv-ruge-interior {
+  0%, 100% { transform: scaleY(0.12); }
+  45%, 62% { transform: scaleY(1); }
+}
+[data-vida='ruge'] .jlv-orejaIzqPivote { animation: jlv-oreja-atras-izq 1.6s ease-in-out infinite; }
+[data-vida='ruge'] .jlv-orejaDerPivote { animation: jlv-oreja-atras-der 1.6s ease-in-out infinite; }
+
+/* REPOSO — respira hondo y da un SACUDÓN de cabeza al entrar (adapta el
+   "se rasca/sacude" de Angelita a la anatomía del felino). 8.8s = el dur. */
+[data-vida='reposo'] .jlv-cuerpoPivote { animation: jlv-reposo-cuerpo 4.4s ease-in-out infinite; }
+@keyframes jlv-reposo-cuerpo {
+  0%, 100% { transform: translateY(0) scale(1); }
+  50%      { transform: translateY(0.8%) scale(1.02); }
+}
+[data-vida='reposo'] .jlv-cabezaGesto { animation: jlv-reposo-cabeza 8.8s ease-in-out infinite; }
+@keyframes jlv-reposo-cabeza {
+  0%, 12%, 100% { transform: rotate(0deg); }
+  3%  { transform: rotate(-2.6deg); }   /* sacudón: la firma "me rasco/me sacudo" */
+  6%  { transform: rotate(2.6deg); }
+  9%  { transform: rotate(-1deg); }
+}
+
+/* ═══ GATES DE LA CASA ══════════════════════════════════════════════════════ */
+/* gama baja: corta lo continuo decorativo (el idle-cerebro y la mirada ya los
+   apaga el JS). Los estados reactivos (lip-sync, escucha) siguen. */
+[data-tier='bajo'] .jlv-stage,
+[data-tier='bajo'] .jlv-cuerpoPivote,
+[data-tier='bajo'] .jlv-cabezaPivote,
+[data-tier='bajo'] .jlv-patasDelPivote,
+[data-tier='bajo'] .jlv-pataTrasPivote,
+[data-tier='bajo'] .jlv-colaPivote,
+[data-tier='bajo'] .jlv-orejaIzqPivote,
+[data-tier='bajo'] .jlv-orejaDerPivote { animation: none; }
+
 @media (prefers-reduced-motion: reduce) {
-  .jlv-stage, .jlv-cuerpoPivote, .jlv-cabezaPivote, .jlv-patasDelPivote,
-  .jlv-pataTrasPivote, .jlv-colaPivote, .jlv-parpado {
+  .jlv-stage, .jlv-cuerpoPivote, .jlv-cabezaGesto, .jlv-cabezaMira, .jlv-cabezaPivote,
+  .jlv-patasDelPivote, .jlv-pataTrasPivote, .jlv-colaPivote,
+  .jlv-orejaIzqPivote, .jlv-orejaDerPivote, .jlv-mandibulaPivote, .jlv-bocaInterior, .jlv-parpado {
     animation: none !important;
+    transition: none !important;
   }
-  .jlv-parpado { visibility: hidden !important; }
+  .jlv-cabezaMira, .jlv-mandibulaPivote { transform: none !important; }
+  .jlv-bocaInterior { transform: scaleY(0) !important; }  /* boca cerrada, digna */
+  .jlv-parpado { visibility: hidden !important; }          /* ojos abiertos, quietos */
 }
