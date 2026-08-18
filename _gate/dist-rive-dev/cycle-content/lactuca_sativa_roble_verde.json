@@ -1,0 +1,71 @@
+{
+  "species_slug": "lactuca_sativa_roble_verde",
+  "scientific_name": "Lactuca sativa L.",
+  "common_names": [
+    "Lechuga hoja de roble verde"
+  ],
+  "family": "Asteraceae",
+  "category": "hortalizas_hoja",
+  "cultivable": true,
+  "conservation_status": "cultivo_comun",
+  "thermal_zones": [
+    "templado",
+    "frio"
+  ],
+  "roles_in_guild": [
+    "crop",
+    "ground_cover"
+  ],
+  "antagonists": [],
+  "especies_nativas_sustitutas": [],
+  "propagation": {
+    "metodo_principal": "semilla",
+    "notas": "Trasplante a los 25-30 días; excelente para siembra escalonada por su rápido rebrote."
+  },
+  "requirements": {
+    "agua": "medio",
+    "altitud_msnm": {
+      "min_absoluto": 1000,
+      "optimo_min": 1800,
+      "optimo_max": 2800,
+      "max_absoluto": 3000
+    },
+    "temperatura_c": {
+      "helada_letal": -4,
+      "optimo_min": 10,
+      "optimo_max": 20,
+      "max_tolerable": 26
+    },
+    "radiacion": "sol_pleno",
+    "drenaje_requerido": "bueno"
+  },
+  "valor_pedagogico": "La lechuga hoja de roble verde (Lactuca sativa L.) se cultiva ampliamente en Colombia entre 1000-3000 msnm, particularmente en zonas térmicas templadas y frías de Cundinamarca y Boyacá. Su manejo agronómico incluye propagación por semilla con trasplante a los 25-30 días, ciclo de 45-60 días, asociaciones beneficiosas con zanahoria y radish que mejora la biodiversidad del huerto, y requiere manejo de plagas como áfidos y caracoles mediante monitoreo y biopreparados andinos. En el contexto campesino andino, esta verdura de hoja ha sido incorporada recientemente a las dietas locales como fuente fresca de vitaminas A y K, complementando cultivos tradicionales de papa y maíz. Según el inventario taxonómico de GBIF Backbone Taxonomy y Plants of the World Online (POWO), su nombre científico válido es Lactuca sativa L.",
+  "sources": [
+    {
+      "id": "gbif-taxonomic-backbone",
+      "title": "gbif-taxonomic-backbone",
+      "tier": "A",
+      "url": "https://www.gbif.org/dataset/d7dddbf4-2cf0-4f39-9b2a-bb099caae36c"
+    },
+    {
+      "id": "powo-kew",
+      "title": "powo-kew",
+      "tier": "A",
+      "url": "https://powo.science.kew.org"
+    },
+    {
+      "id": "agrosavia-sol-andina",
+      "title": "agrosavia-sol-andina",
+      "tier": "A",
+      "url": "https://www.agrosavia.co"
+    },
+    {
+      "id": "ica-resolucion-3168-2015",
+      "title": "ica-resolucion-3168-2015",
+      "tier": "A",
+      "url": null
+    }
+  ],
+  "_generated_by": "scripts/build-cycle-content-from-catalog.mjs",
+  "_generated_at": "2026-05-19T00:42:57.362Z"
+}

@@ -1,0 +1,1 @@
+import{N as e,P as t}from"./main-CHv4HWj2.js";import{t as n}from"./creatures-CejhJLSa.js";function r(){return i(t(e=>e.avatarCreatureId))}function i(t){let r=t&&n[t]?t:e,i=n[r];return{id:r,Component:i.Component,nombre:i.nombre,cientifico:i.cientifico}}export{r as t};

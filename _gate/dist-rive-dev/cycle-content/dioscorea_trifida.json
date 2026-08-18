@@ -1,0 +1,59 @@
+{
+  "species_slug": "dioscorea_trifida",
+  "scientific_name": "Dioscorea trifida L.f.",
+  "common_names": [
+    "Ibia / Name andino"
+  ],
+  "family": "Dioscoreaceae",
+  "category": "tuberculos_raices",
+  "cultivable": true,
+  "conservation_status": "cultivo_comun",
+  "thermal_zones": [
+    "templado",
+    "frio"
+  ],
+  "roles_in_guild": [
+    "crop",
+    "ground_cover"
+  ],
+  "antagonists": [],
+  "especies_nativas_sustitutas": [],
+  "propagation": {
+    "metodo_principal": "tuberculo",
+    "notas": "Propagacion por secciones de tuberculo con yemas o por bulbillos aereos. Requiere sustrato suelto y profundo."
+  },
+  "requirements": {
+    "agua": "medio",
+    "altitud_msnm": {
+      "min_absoluto": 1000,
+      "optimo_min": 1800,
+      "optimo_max": 2600,
+      "max_absoluto": 3000
+    },
+    "temperatura_c": {
+      "helada_letal": -1,
+      "optimo_min": 14,
+      "optimo_max": 20,
+      "max_tolerable": 26
+    },
+    "radiacion": "sol_pleno",
+    "drenaje_requerido": "bueno"
+  },
+  "valor_pedagogico": "El ñame trifoliado o cush-cush (Dioscorea trifida L.f.) es una dioscoreácea perenne trepadora cultivada por sus tubérculos comestibles ricos en almidón (~20% peso fresco), tradicional en la cocina afrocolombiana de las costas Pacífica y Atlántica. Se cultiva en zonas cálidas y templadas bajas: Chocó (Quibdó, Tadó), Valle del Cauca, Cauca (Buenaventura), Magdalena, Bolívar y Cesar entre 0 y 1.500 msnm en zona térmica cálida. Propagación por trozos de tubérculo o cabeza. Ciclo 8-10 meses a cosecha; rendimientos 8-15 t/ha. Crecimiento trepador exige tutorado con varas o árboles vivos. Manejo agroecológico: asocio con yuca, plátano y maíz en sistemas multipiso, fertilización orgánica al fondo (bocashi), control de gorgojo (Cyrtomenus bergi) con manejo cultural y rotación. Fuentes Tier A: AGROSAVIA, ICA Resolución 3168/2015, POWO Kew, GBIF Backbone Taxonomy, Catálogo Plantas y Líquenes Colombia.",
+  "sources": [
+    {
+      "id": "agrosavia-manual-tuberculos-andinos-2017",
+      "title": "agrosavia-manual-tuberculos-andinos-2017",
+      "tier": "A",
+      "url": null
+    },
+    {
+      "id": "powo-kew",
+      "title": "powo-kew",
+      "tier": "A",
+      "url": "https://powo.science.kew.org"
+    }
+  ],
+  "_generated_by": "scripts/build-cycle-content-from-catalog.mjs",
+  "_generated_at": "2026-05-19T00:42:57.369Z"
+}
