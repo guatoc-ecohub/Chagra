@@ -1,0 +1,88 @@
+{
+  "species_slug": "brassica_rapa_var_rapa",
+  "scientific_name": "Brassica rapa var. rapa L.",
+  "common_names": [
+    "Nabo"
+  ],
+  "family": "Brassicaceae",
+  "category": "tuberculos_raices",
+  "cultivable": true,
+  "conservation_status": "cultivo_comun",
+  "thermal_zones": [
+    "frio",
+    "templado"
+  ],
+  "roles_in_guild": [
+    "crop"
+  ],
+  "antagonists": [],
+  "especies_nativas_sustitutas": [],
+  "propagation": {
+    "metodo_principal": "semilla",
+    "notas": "Siembra directa a chorrillo. Ciclo rapido (60-80 dias). Tanto la raiz como las hojas son comestibles."
+  },
+  "requirements": {
+    "agua": "medio",
+    "altitud_msnm": {
+      "min_absoluto": 1000,
+      "optimo_min": 2000,
+      "optimo_max": 3000,
+      "max_absoluto": 3500
+    },
+    "temperatura_c": {
+      "helada_letal": -6,
+      "optimo_min": 12,
+      "optimo_max": 18,
+      "max_tolerable": 26
+    },
+    "radiacion": "sol_pleno",
+    "drenaje_requerido": "bueno"
+  },
+  "valor_pedagogico": "El nabo (Brassica rapa var. rapa L., familia Brassicaceae) es una brasicácea bienal cultivada de raíz hipocotílica engrosada blanca a violeta, originaria de Europa y norte de Asia, cultivada tradicionalmente en huertos andinos colombianos por su doble aprovechamiento alimentario y forrajero. La raíz globosa o aplanada (5-15 cm diámetro) contiene azúcares simples, glucosinolatos sinigrina-tipo (acción anticancerígena documentada) y vitamina C, mientras las hojas verde-oscuras pubescentes son ricas en calcio, hierro y β-caroteno. Se cultiva en Cundinamarca (Sabana de Bogotá, Subachoque, Tabio, Sopó, Madrid), Boyacá (Tunja, Sotaquirá, Sutamarchán, Villa de Leyva), Nariño (Pasto, Túquerres, Sapuyes) y zonas frías altoandinas entre 2.000 y 3.000 msnm en zona térmica fría. Ciclo rápido 60-80 días desde siembra a cosecha. Rendimientos 20-35 t/ha raíz fresca, 8-12 t/ha hoja. Lección viva de aprovechamiento integral y zero-waste agrícola: el nabo demuestra que una misma planta puede generar alimento de la raíz (cocción, encurtidos, sopas) y de la hoja (salteados, ensaladas, forraje animal), minimizando el desperdicio y maximizando aporte nutricional por área cultivada, principio clave en sistemas de seguridad alimentaria campesina. Manejo agroecológico: siembra directa a chorrillo o golpe a 25-30 cm entre plantas, raleo a los 25-30 días, asocio con zanahoria y lechuga para uso eficiente de suelo, rotación obligatoria 3 años con leguminosas para romper ciclo de Plasmodiophora brassicae (hernia de col), forraje verde para bovinos y ovinos en finca diversificada, cosecha pre-floración antes de fibrosa la raíz. Fuentes Tier A: AGROSAVIA Manual Hortalizas, POWO Kew, GBIF Backbone Taxonomy, ICA Resolución 3168/2015, Bernal 2015 Catálogo Plantas Colombia.",
+  "sources": [
+    {
+      "id": "powo-kew",
+      "title": "powo-kew",
+      "tier": "A",
+      "url": "https://powo.science.kew.org"
+    },
+    {
+      "id": "gbif-taxonomic-backbone",
+      "title": "gbif-taxonomic-backbone",
+      "tier": "A",
+      "url": "https://www.gbif.org/dataset/d7dddbf4-2cf0-4f39-9b2a-bb099caae36c"
+    },
+    {
+      "id": "gbif-colombia",
+      "title": "gbif-colombia",
+      "tier": "A",
+      "url": "https://www.gbif.org/country/CO"
+    },
+    {
+      "id": "agrosavia-tibaitata",
+      "title": "agrosavia-tibaitata",
+      "tier": "A",
+      "url": "https://www.agrosavia.co/investigacion/centros-de-investigacion/tibaitat%C3%A1"
+    },
+    {
+      "id": "bernal-2015-plantas-liquenes-colombia",
+      "title": "bernal-2015-plantas-liquenes-colombia",
+      "tier": "A",
+      "url": "http://catalogoplantasdecolombia.unal.edu.co"
+    },
+    {
+      "id": "ica-resolucion-3168-2015",
+      "title": "ica-resolucion-3168-2015",
+      "tier": "A",
+      "url": null
+    },
+    {
+      "id": "agrosavia-forrajeras-2022",
+      "title": "agrosavia-forrajeras-2022",
+      "tier": "A",
+      "url": null
+    }
+  ],
+  "_generated_by": "scripts/build-cycle-content-from-catalog.mjs",
+  "_generated_at": "2026-05-19T00:42:57.373Z"
+}

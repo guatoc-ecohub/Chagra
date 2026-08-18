@@ -1,0 +1,353 @@
+{
+  "glInfo": {
+    "vendor": "Google Inc. (NVIDIA Corporation)",
+    "renderer": "ANGLE (NVIDIA Corporation, Quadro M6000/PCIe/SSE2, OpenGL 4.5.0)",
+    "version": "WebGL 2.0 (OpenGL ES 3.0 Chromium)"
+  },
+  "pageErrors": [],
+  "failedRequests": [],
+  "warnings": [
+    {
+      "type": "warning",
+      "text": "Service Worker registration blocked by Playwright"
+    },
+    {
+      "type": "warning",
+      "text": "[API] Token no disponible. Continuando en modo offline."
+    },
+    {
+      "type": "warning",
+      "text": "[LogStore] Fallo en pull de log--seeding: Token no disponible."
+    },
+    {
+      "type": "warning",
+      "text": "[API] Token no disponible. Continuando en modo offline."
+    },
+    {
+      "type": "warning",
+      "text": "[LogStore] Fallo en pull de log--planting: Token no disponible."
+    },
+    {
+      "type": "warning",
+      "text": "[API] Token no disponible. Continuando en modo offline."
+    },
+    {
+      "type": "warning",
+      "text": "[LogStore] Fallo en pull de log--harvest: Token no disponible."
+    },
+    {
+      "type": "warning",
+      "text": "[API] Token no disponible. Continuando en modo offline."
+    },
+    {
+      "type": "warning",
+      "text": "[LogStore] Fallo en pull de log--input: Token no disponible."
+    },
+    {
+      "type": "warning",
+      "text": "[API] Token no disponible. Continuando en modo offline."
+    },
+    {
+      "type": "warning",
+      "text": "[LogStore] Fallo en pull de log--task: Token no disponible."
+    },
+    {
+      "type": "warning",
+      "text": "[API] Token no disponible. Continuando en modo offline."
+    },
+    {
+      "type": "warning",
+      "text": "[LogStore] Fallo en pull de log--observation: Token no disponible."
+    },
+    {
+      "type": "warning",
+      "text": "[AlertEngine] Ya está corriendo, ignorando start() duplicado."
+    },
+    {
+      "type": "warning",
+      "text": "[App] Catálogo no se pudo preload (los componentes lo reintentarán al usarlos): RuntimeError: Aborted(both async and sync fetching of the wasm failed). Build with -sASSERTIONS for more info.\n    at abort (http://localhost:5199/node_modules/.vite/deps/@sqlite__org_sqlite-wasm.js?v=9400d1d5:393:11)\n    at instantiateArrayBuffer (http://localhost:5199/node_modules/.vite/deps/@sqlite__org_sqlite-wasm.js?v=9400d1d5:420:4)\n    at async createWasm (http://localhost:5199/node_modules/.vite/deps/@sqlite__org_sqlite-wasm.js?v=9400d1d5:456:37)\n    at async sqlite3InitModule (http://localhost:5199/node_modules/.vite/deps/@sqlite__org_sqlite-wasm.js?v=9400d1d5:3229:20)\n    at async doInit (http://localhost:5199/src/db/catalogDB.js:6:18)"
+    },
+    {
+      "type": "warning",
+      "text": "[App] Catálogo no se pudo preload (los componentes lo reintentarán al usarlos): RuntimeError: Aborted(both async and sync fetching of the wasm failed). Build with -sASSERTIONS for more info.\n    at abort (http://localhost:5199/node_modules/.vite/deps/@sqlite__org_sqlite-wasm.js?v=9400d1d5:393:11)\n    at instantiateArrayBuffer (http://localhost:5199/node_modules/.vite/deps/@sqlite__org_sqlite-wasm.js?v=9400d1d5:420:4)\n    at async createWasm (http://localhost:5199/node_modules/.vite/deps/@sqlite__org_sqlite-wasm.js?v=9400d1d5:456:37)\n    at async sqlite3InitModule (http://localhost:5199/node_modules/.vite/deps/@sqlite__org_sqlite-wasm.js?v=9400d1d5:3229:20)\n    at async doInit (http://localhost:5199/src/db/catalogDB.js:6:18)"
+    },
+    {
+      "type": "warning",
+      "text": "[catalogDB.getCatalogStats] failed, using fallback: RuntimeError: Aborted(both async and sync fetching of the wasm failed). Build with -sASSERTIONS for more info.\n    at abort (http://localhost:5199/node_modules/.vite/deps/@sqlite__org_sqlite-wasm.js?v=9400d1d5:393:11)\n    at instantiateArrayBuffer (http://localhost:5199/node_modules/.vite/deps/@sqlite__org_sqlite-wasm.js?v=9400d1d5:420:4)\n    at async createWasm (http://localhost:5199/node_modules/.vite/deps/@sqlite__org_sqlite-wasm.js?v=9400d1d5:456:37)\n    at async sqlite3InitModule (http://localhost:5199/node_modules/.vite/deps/@sqlite__org_sqlite-wasm.js?v=9400d1d5:3229:20)\n    at async doInit (http://localhost:5199/src/db/catalogDB.js:6:18)"
+    },
+    {
+      "type": "warning",
+      "text": "[catalogDB.getCatalogStats] failed, using fallback: RuntimeError: Aborted(both async and sync fetching of the wasm failed). Build with -sASSERTIONS for more info.\n    at abort (http://localhost:5199/node_modules/.vite/deps/@sqlite__org_sqlite-wasm.js?v=9400d1d5:393:11)\n    at instantiateArrayBuffer (http://localhost:5199/node_modules/.vite/deps/@sqlite__org_sqlite-wasm.js?v=9400d1d5:420:4)\n    at async createWasm (http://localhost:5199/node_modules/.vite/deps/@sqlite__org_sqlite-wasm.js?v=9400d1d5:456:37)\n    at async sqlite3InitModule (http://localhost:5199/node_modules/.vite/deps/@sqlite__org_sqlite-wasm.js?v=9400d1d5:3229:20)\n    at async doInit (http://localhost:5199/src/db/catalogDB.js:6:18)"
+    },
+    {
+      "type": "warning",
+      "text": "[Auth] Intentando login password grant (DEPRECATED) para: admin"
+    },
+    {
+      "type": "warning",
+      "text": "[operatorIdentity] Generated NEW account_uuid_master. Backup recommended."
+    },
+    {
+      "type": "warning",
+      "text": "[RAG] No se pudo cargar el catálogo para tier-gate — degradando FAIL-CLOSED al subconjunto seguro: Aborted(both async and sync fetching of the wasm failed). Build with -sASSERTIONS for more info."
+    },
+    {
+      "type": "warning",
+      "text": "[RAG] Tier gate FAIL-CLOSED (#1): 501 slugs → 44 del subconjunto seguro (CROP_TAXONOMY). Sin catálogo confiable no se sirve RAG amplio."
+    },
+    {
+      "type": "warning",
+      "text": "Service Worker registration blocked by Playwright"
+    },
+    {
+      "type": "warning",
+      "text": "[AlertEngine] Ya está corriendo, ignorando start() duplicado."
+    },
+    {
+      "type": "warning",
+      "text": "[App] Catálogo no se pudo preload (los componentes lo reintentarán al usarlos): RuntimeError: Aborted(both async and sync fetching of the wasm failed). Build with -sASSERTIONS for more info.\n    at abort (http://localhost:5199/node_modules/.vite/deps/@sqlite__org_sqlite-wasm.js?v=9400d1d5:393:11)\n    at instantiateArrayBuffer (http://localhost:5199/node_modules/.vite/deps/@sqlite__org_sqlite-wasm.js?v=9400d1d5:420:4)\n    at async createWasm (http://localhost:5199/node_modules/.vite/deps/@sqlite__org_sqlite-wasm.js?v=9400d1d5:456:37)\n    at async sqlite3InitModule (http://localhost:5199/node_modules/.vite/deps/@sqlite__org_sqlite-wasm.js?v=9400d1d5:3229:20)\n    at async doInit (http://localhost:5199/src/db/catalogDB.js:6:18)"
+    },
+    {
+      "type": "warning",
+      "text": "[App] Catálogo no se pudo preload (los componentes lo reintentarán al usarlos): RuntimeError: Aborted(both async and sync fetching of the wasm failed). Build with -sASSERTIONS for more info.\n    at abort (http://localhost:5199/node_modules/.vite/deps/@sqlite__org_sqlite-wasm.js?v=9400d1d5:393:11)\n    at instantiateArrayBuffer (http://localhost:5199/node_modules/.vite/deps/@sqlite__org_sqlite-wasm.js?v=9400d1d5:420:4)\n    at async createWasm (http://localhost:5199/node_modules/.vite/deps/@sqlite__org_sqlite-wasm.js?v=9400d1d5:456:37)\n    at async sqlite3InitModule (http://localhost:5199/node_modules/.vite/deps/@sqlite__org_sqlite-wasm.js?v=9400d1d5:3229:20)\n    at async doInit (http://localhost:5199/src/db/catalogDB.js:6:18)"
+    },
+    {
+      "type": "warning",
+      "text": "[RAG] No se pudo cargar el catálogo para tier-gate — degradando FAIL-CLOSED al subconjunto seguro: Aborted(both async and sync fetching of the wasm failed). Build with -sASSERTIONS for more info."
+    },
+    {
+      "type": "warning",
+      "text": "[RAG] Tier gate FAIL-CLOSED (#1): 501 slugs → 44 del subconjunto seguro (CROP_TAXONOMY). Sin catálogo confiable no se sirve RAG amplio."
+    },
+    {
+      "type": "warning",
+      "text": "The resource http://localhost:5199/fonts/nunito-latin.woff2 was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropriate `as` value and it is preloaded intentionally."
+    },
+    {
+      "type": "warning",
+      "text": "The resource http://localhost:5199/fonts/nunito-latin.woff2 was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropriate `as` value and it is preloaded intentionally."
+    }
+  ],
+  "errors": [
+    {
+      "type": "error",
+      "text": "Error registrando Service Worker: TypeError: Cannot read properties of undefined (reading 'scope')\n    at http://localhost:5199/src/services/swRegistration.js:195:60"
+    },
+    {
+      "type": "error",
+      "text": "Failed to load resource: the server responded with a status of 404 (Not Found)"
+    },
+    {
+      "type": "error",
+      "text": "Failed to load resource: the server responded with a status of 403 (Forbidden)"
+    },
+    {
+      "type": "error",
+      "text": "wasm streaming compile failed: TypeError: Failed to execute 'compile' on 'WebAssembly': HTTP status code is not ok"
+    },
+    {
+      "type": "error",
+      "text": "falling back to ArrayBuffer instantiation"
+    },
+    {
+      "type": "error",
+      "text": "Failed to load resource: the server responded with a status of 403 (Forbidden)"
+    },
+    {
+      "type": "error",
+      "text": "failed to asynchronously prepare wasm: both async and sync fetching of the wasm failed"
+    },
+    {
+      "type": "error",
+      "text": "Aborted(both async and sync fetching of the wasm failed)"
+    },
+    {
+      "type": "error",
+      "text": "Exception loading sqlite3 module: RuntimeError: Aborted(both async and sync fetching of the wasm failed). Build with -sASSERTIONS for more info.\n    at abort (http://localhost:5199/node_modules/.vite/deps/@sqlite__org_sqlite-wasm.js?v=9400d1d5:393:11)\n    at instantiateArrayBuffer (http://localhost:5199/node_modules/.vite/deps/@sqlite__org_sqlite-wasm.js?v=9400d1d5:420:4)\n    at async createWasm (http://localhost:5199/node_modules/.vite/deps/@sqlite__org_sqlite-wasm.js?v=9400d1d5:456:37)\n    at async sqlite3InitModule (http://localhost:5199/node_modules/.vite/deps/@sqlite__org_sqlite-wasm.js?v=9400d1d5:3229:20)\n    at async doInit (http://localhost:5199/src/db/catalogDB.js:6:18)"
+    },
+    {
+      "type": "error",
+      "text": "[SQLite WASM] Failed to initialize catalog db: RuntimeError: Aborted(both async and sync fetching of the wasm failed). Build with -sASSERTIONS for more info.\n    at abort (http://localhost:5199/node_modules/.vite/deps/@sqlite__org_sqlite-wasm.js?v=9400d1d5:393:11)\n    at instantiateArrayBuffer (http://localhost:5199/node_modules/.vite/deps/@sqlite__org_sqlite-wasm.js?v=9400d1d5:420:4)\n    at async createWasm (http://localhost:5199/node_modules/.vite/deps/@sqlite__org_sqlite-wasm.js?v=9400d1d5:456:37)\n    at async sqlite3InitModule (http://localhost:5199/node_modules/.vite/deps/@sqlite__org_sqlite-wasm.js?v=9400d1d5:3229:20)\n    at async doInit (http://localhost:5199/src/db/catalogDB.js:6:18)"
+    },
+    {
+      "type": "error",
+      "text": "Failed to load resource: the server responded with a status of 403 (Forbidden)"
+    },
+    {
+      "type": "error",
+      "text": "wasm streaming compile failed: TypeError: Failed to execute 'compile' on 'WebAssembly': HTTP status code is not ok"
+    },
+    {
+      "type": "error",
+      "text": "falling back to ArrayBuffer instantiation"
+    },
+    {
+      "type": "error",
+      "text": "Failed to load resource: the server responded with a status of 403 (Forbidden)"
+    },
+    {
+      "type": "error",
+      "text": "failed to asynchronously prepare wasm: both async and sync fetching of the wasm failed"
+    },
+    {
+      "type": "error",
+      "text": "Aborted(both async and sync fetching of the wasm failed)"
+    },
+    {
+      "type": "error",
+      "text": "Exception loading sqlite3 module: RuntimeError: Aborted(both async and sync fetching of the wasm failed). Build with -sASSERTIONS for more info.\n    at abort (http://localhost:5199/node_modules/.vite/deps/@sqlite__org_sqlite-wasm.js?v=9400d1d5:393:11)\n    at instantiateArrayBuffer (http://localhost:5199/node_modules/.vite/deps/@sqlite__org_sqlite-wasm.js?v=9400d1d5:420:4)\n    at async createWasm (http://localhost:5199/node_modules/.vite/deps/@sqlite__org_sqlite-wasm.js?v=9400d1d5:456:37)\n    at async sqlite3InitModule (http://localhost:5199/node_modules/.vite/deps/@sqlite__org_sqlite-wasm.js?v=9400d1d5:3229:20)\n    at async doInit (http://localhost:5199/src/db/catalogDB.js:6:18)"
+    },
+    {
+      "type": "error",
+      "text": "[SQLite WASM] Failed to initialize catalog db: RuntimeError: Aborted(both async and sync fetching of the wasm failed). Build with -sASSERTIONS for more info.\n    at abort (http://localhost:5199/node_modules/.vite/deps/@sqlite__org_sqlite-wasm.js?v=9400d1d5:393:11)\n    at instantiateArrayBuffer (http://localhost:5199/node_modules/.vite/deps/@sqlite__org_sqlite-wasm.js?v=9400d1d5:420:4)\n    at async createWasm (http://localhost:5199/node_modules/.vite/deps/@sqlite__org_sqlite-wasm.js?v=9400d1d5:456:37)\n    at async sqlite3InitModule (http://localhost:5199/node_modules/.vite/deps/@sqlite__org_sqlite-wasm.js?v=9400d1d5:3229:20)\n    at async doInit (http://localhost:5199/src/db/catalogDB.js:6:18)"
+    },
+    {
+      "type": "error",
+      "text": "Invalid ARIA attribute `%s`. Did you mean `%s`? ariaLabel aria-label"
+    },
+    {
+      "type": "error",
+      "text": "In HTML, %s cannot be a descendant of <%s>.\nThis will cause a hydration error.%s <button> button \n\n  ...\n    <Suspense fallback={<LoadingFallback>}>\n      <div className=\"anim-scree...\">\n        <ErrorBoundary>\n          <DashboardLiveView onNavigate={function} onLogout={function} lastLogMessage=\"\">\n            <div className=\"relative h...\">\n              <Suspense>\n              <div className=\"relative z...\" style={{opacity:1}}>\n                <div>\n                <DashboardLive onNavigate={function} regionalGreeting={<HomeRegionalGreeting>}>\n                  <div className=\"relative f...\" data-scroll-key=\"dashboard-...\">\n                    <div>\n                    <AgentHero>\n                    <div className=\"contents\" data-testid={undefined}>\n                      <div className=\"contents\">\n                        <div className=\"px-4 pt-3 ...\" data-testid=\"bloque-gua...\">\n                          <p>\n                          <AgentAvatarSelector>\n                            <div className=\"bg-slate-9...\">\n                              <div>\n                              <div className=\"grid grid-...\">\n>                               <button\n>                                 type=\"button\"\n>                                 onClick={function onClick}\n>                                 aria-pressed={true}\n>                                 className=\"relative flex flex-col items-center gap-1.5 px-1.5 py-3 rounded-xl border...\"\n>                               >\n                                  <span>\n                                  <ChagraAgentAvatarAngelita state=\"thinking\" size={64} ...>\n>                                   <button\n>                                     type=\"button\"\n>                                     onClick={undefined}\n>                                     onDoubleClick={function onDoubleClick}\n>                                     aria-label=\"Angelita, la abeja\"\n>                                     title=\"Angelita, la abeja\"\n>                                     style={{background:\"none\",border:\"none\",padding:0,cursor:\"pointer\",lineHeight:0}}\n>                                   >\n                                  ...\n                                ...\n                        ...\n"
+    },
+    {
+      "type": "error",
+      "text": "<%s> cannot contain a nested %s.\nSee this log for the ancestor stack trace. button <button>"
+    },
+    {
+      "type": "error",
+      "text": "Failed to load resource: the server responded with a status of 404 (Not Found)"
+    },
+    {
+      "type": "error",
+      "text": "Failed to load resource: the server responded with a status of 404 (Not Found)"
+    },
+    {
+      "type": "error",
+      "text": "Failed to load resource: the server responded with a status of 403 (Forbidden)"
+    },
+    {
+      "type": "error",
+      "text": "wasm streaming compile failed: TypeError: Failed to execute 'compile' on 'WebAssembly': HTTP status code is not ok"
+    },
+    {
+      "type": "error",
+      "text": "falling back to ArrayBuffer instantiation"
+    },
+    {
+      "type": "error",
+      "text": "Failed to load resource: the server responded with a status of 403 (Forbidden)"
+    },
+    {
+      "type": "error",
+      "text": "failed to asynchronously prepare wasm: both async and sync fetching of the wasm failed"
+    },
+    {
+      "type": "error",
+      "text": "Aborted(both async and sync fetching of the wasm failed)"
+    },
+    {
+      "type": "error",
+      "text": "Exception loading sqlite3 module: RuntimeError: Aborted(both async and sync fetching of the wasm failed). Build with -sASSERTIONS for more info.\n    at abort (http://localhost:5199/node_modules/.vite/deps/@sqlite__org_sqlite-wasm.js?v=9400d1d5:393:11)\n    at instantiateArrayBuffer (http://localhost:5199/node_modules/.vite/deps/@sqlite__org_sqlite-wasm.js?v=9400d1d5:420:4)\n    at async createWasm (http://localhost:5199/node_modules/.vite/deps/@sqlite__org_sqlite-wasm.js?v=9400d1d5:456:37)\n    at async sqlite3InitModule (http://localhost:5199/node_modules/.vite/deps/@sqlite__org_sqlite-wasm.js?v=9400d1d5:3229:20)\n    at async doInit (http://localhost:5199/src/db/catalogDB.js:6:18)\n    at async getAllSpecies (http://localhost:5199/src/db/catalogDB.js:79:19)\n    at async buildCorpus (http://localhost:5199/src/services/ragRetriever.js:384:26)"
+    },
+    {
+      "type": "error",
+      "text": "[SQLite WASM] Failed to initialize catalog db: RuntimeError: Aborted(both async and sync fetching of the wasm failed). Build with -sASSERTIONS for more info.\n    at abort (http://localhost:5199/node_modules/.vite/deps/@sqlite__org_sqlite-wasm.js?v=9400d1d5:393:11)\n    at instantiateArrayBuffer (http://localhost:5199/node_modules/.vite/deps/@sqlite__org_sqlite-wasm.js?v=9400d1d5:420:4)\n    at async createWasm (http://localhost:5199/node_modules/.vite/deps/@sqlite__org_sqlite-wasm.js?v=9400d1d5:456:37)\n    at async sqlite3InitModule (http://localhost:5199/node_modules/.vite/deps/@sqlite__org_sqlite-wasm.js?v=9400d1d5:3229:20)\n    at async doInit (http://localhost:5199/src/db/catalogDB.js:6:18)\n    at async getAllSpecies (http://localhost:5199/src/db/catalogDB.js:79:19)\n    at async buildCorpus (http://localhost:5199/src/services/ragRetriever.js:384:26)"
+    },
+    {
+      "type": "error",
+      "text": "Failed to load resource: the server responded with a status of 404 (Not Found)"
+    },
+    {
+      "type": "error",
+      "text": "Error registrando Service Worker: TypeError: Cannot read properties of undefined (reading 'scope')\n    at http://localhost:5199/src/services/swRegistration.js:195:60"
+    },
+    {
+      "type": "error",
+      "text": "Failed to load resource: the server responded with a status of 404 (Not Found)"
+    },
+    {
+      "type": "error",
+      "text": "Failed to load resource: the server responded with a status of 404 (Not Found)"
+    },
+    {
+      "type": "error",
+      "text": "Failed to load resource: the server responded with a status of 403 (Forbidden)"
+    },
+    {
+      "type": "error",
+      "text": "wasm streaming compile failed: TypeError: Failed to execute 'compile' on 'WebAssembly': HTTP status code is not ok"
+    },
+    {
+      "type": "error",
+      "text": "falling back to ArrayBuffer instantiation"
+    },
+    {
+      "type": "error",
+      "text": "Failed to load resource: the server responded with a status of 404 (Not Found)"
+    },
+    {
+      "type": "error",
+      "text": "Failed to load resource: the server responded with a status of 403 (Forbidden)"
+    },
+    {
+      "type": "error",
+      "text": "failed to asynchronously prepare wasm: both async and sync fetching of the wasm failed"
+    },
+    {
+      "type": "error",
+      "text": "Aborted(both async and sync fetching of the wasm failed)"
+    },
+    {
+      "type": "error",
+      "text": "Exception loading sqlite3 module: RuntimeError: Aborted(both async and sync fetching of the wasm failed). Build with -sASSERTIONS for more info.\n    at abort (http://localhost:5199/node_modules/.vite/deps/@sqlite__org_sqlite-wasm.js?v=9400d1d5:393:11)\n    at instantiateArrayBuffer (http://localhost:5199/node_modules/.vite/deps/@sqlite__org_sqlite-wasm.js?v=9400d1d5:420:4)\n    at async createWasm (http://localhost:5199/node_modules/.vite/deps/@sqlite__org_sqlite-wasm.js?v=9400d1d5:456:37)\n    at async sqlite3InitModule (http://localhost:5199/node_modules/.vite/deps/@sqlite__org_sqlite-wasm.js?v=9400d1d5:3229:20)\n    at async doInit (http://localhost:5199/src/db/catalogDB.js:6:18)"
+    },
+    {
+      "type": "error",
+      "text": "[SQLite WASM] Failed to initialize catalog db: RuntimeError: Aborted(both async and sync fetching of the wasm failed). Build with -sASSERTIONS for more info.\n    at abort (http://localhost:5199/node_modules/.vite/deps/@sqlite__org_sqlite-wasm.js?v=9400d1d5:393:11)\n    at instantiateArrayBuffer (http://localhost:5199/node_modules/.vite/deps/@sqlite__org_sqlite-wasm.js?v=9400d1d5:420:4)\n    at async createWasm (http://localhost:5199/node_modules/.vite/deps/@sqlite__org_sqlite-wasm.js?v=9400d1d5:456:37)\n    at async sqlite3InitModule (http://localhost:5199/node_modules/.vite/deps/@sqlite__org_sqlite-wasm.js?v=9400d1d5:3229:20)\n    at async doInit (http://localhost:5199/src/db/catalogDB.js:6:18)"
+    },
+    {
+      "type": "error",
+      "text": "Failed to load resource: the server responded with a status of 403 (Forbidden)"
+    },
+    {
+      "type": "error",
+      "text": "wasm streaming compile failed: TypeError: Failed to execute 'compile' on 'WebAssembly': HTTP status code is not ok"
+    },
+    {
+      "type": "error",
+      "text": "falling back to ArrayBuffer instantiation"
+    },
+    {
+      "type": "error",
+      "text": "Failed to load resource: the server responded with a status of 403 (Forbidden)"
+    },
+    {
+      "type": "error",
+      "text": "failed to asynchronously prepare wasm: both async and sync fetching of the wasm failed"
+    },
+    {
+      "type": "error",
+      "text": "Aborted(both async and sync fetching of the wasm failed)"
+    },
+    {
+      "type": "error",
+      "text": "Exception loading sqlite3 module: RuntimeError: Aborted(both async and sync fetching of the wasm failed). Build with -sASSERTIONS for more info.\n    at abort (http://localhost:5199/node_modules/.vite/deps/@sqlite__org_sqlite-wasm.js?v=9400d1d5:393:11)\n    at instantiateArrayBuffer (http://localhost:5199/node_modules/.vite/deps/@sqlite__org_sqlite-wasm.js?v=9400d1d5:420:4)\n    at async createWasm (http://localhost:5199/node_modules/.vite/deps/@sqlite__org_sqlite-wasm.js?v=9400d1d5:456:37)\n    at async sqlite3InitModule (http://localhost:5199/node_modules/.vite/deps/@sqlite__org_sqlite-wasm.js?v=9400d1d5:3229:20)\n    at async doInit (http://localhost:5199/src/db/catalogDB.js:6:18)\n    at async getAllSpecies (http://localhost:5199/src/db/catalogDB.js:79:19)\n    at async buildCorpus (http://localhost:5199/src/services/ragRetriever.js:384:26)"
+    },
+    {
+      "type": "error",
+      "text": "[SQLite WASM] Failed to initialize catalog db: RuntimeError: Aborted(both async and sync fetching of the wasm failed). Build with -sASSERTIONS for more info.\n    at abort (http://localhost:5199/node_modules/.vite/deps/@sqlite__org_sqlite-wasm.js?v=9400d1d5:393:11)\n    at instantiateArrayBuffer (http://localhost:5199/node_modules/.vite/deps/@sqlite__org_sqlite-wasm.js?v=9400d1d5:420:4)\n    at async createWasm (http://localhost:5199/node_modules/.vite/deps/@sqlite__org_sqlite-wasm.js?v=9400d1d5:456:37)\n    at async sqlite3InitModule (http://localhost:5199/node_modules/.vite/deps/@sqlite__org_sqlite-wasm.js?v=9400d1d5:3229:20)\n    at async doInit (http://localhost:5199/src/db/catalogDB.js:6:18)\n    at async getAllSpecies (http://localhost:5199/src/db/catalogDB.js:79:19)\n    at async buildCorpus (http://localhost:5199/src/services/ragRetriever.js:384:26)"
+    },
+    {
+      "type": "error",
+      "text": "In HTML, %s cannot be a descendant of <%s>.\nThis will cause a hydration error.%s <button> button \n\n  ...\n    <Suspense fallback={<LoadingFallback>}>\n      <div className=\"anim-scree...\">\n        <ErrorBoundary>\n          <DashboardLiveView onNavigate={function} onLogout={function} lastLogMessage=\"\">\n            <div className=\"relative h...\">\n              <Suspense>\n              <div className=\"relative z...\" style={{opacity:1}}>\n                <div>\n                <DashboardLive onNavigate={function} regionalGreeting={<HomeRegionalGreeting>}>\n                  <div className=\"relative f...\" data-scroll-key=\"dashboard-...\">\n                    <div>\n                    <AgentHero>\n                    <div className=\"contents\" data-testid={undefined}>\n                      <div className=\"contents\">\n                        <div className=\"px-4 pt-3 ...\" data-testid=\"bloque-gua...\">\n                          <p>\n                          <AgentAvatarSelector>\n                            <div className=\"bg-slate-9...\">\n                              <div>\n                              <div className=\"grid grid-...\">\n>                               <button\n>                                 type=\"button\"\n>                                 onClick={function onClick}\n>                                 aria-pressed={false}\n>                                 className=\"relative flex flex-col items-center gap-1.5 px-1.5 py-3 rounded-xl border...\"\n>                               >\n                                  <ChagraAgentAvatarAngelita state=\"idle\" size={64} ...>\n>                                   <button\n>                                     type=\"button\"\n>                                     onClick={undefined}\n>                                     onDoubleClick={function onDoubleClick}\n>                                     aria-label=\"Angelita, la abeja\"\n>                                     title=\"Angelita, la abeja\"\n>                                     style={{background:\"none\",border:\"none\",padding:0,cursor:\"pointer\",lineHeight:0}}\n>                                   >\n                                  ...\n                                ...\n                        ...\n"
+    },
+    {
+      "type": "error",
+      "text": "<%s> cannot contain a nested %s.\nSee this log for the ancestor stack trace. button <button>"
+    },
+    {
+      "type": "error",
+      "text": "Failed to load resource: the server responded with a status of 404 (Not Found)"
+    }
+  ]
+}

@@ -1,0 +1,82 @@
+{
+  "species_slug": "solanum_sessiliflorum",
+  "scientific_name": "Solanum sessiliflorum Dunal",
+  "common_names": [
+    "Cocona"
+  ],
+  "family": "Solanaceae",
+  "category": "hortalizas_fruto_flor",
+  "cultivable": true,
+  "conservation_status": "cultivo_comun",
+  "thermal_zones": [
+    "calido"
+  ],
+  "roles_in_guild": [
+    "crop",
+    "pollinator_attractor"
+  ],
+  "antagonists": [],
+  "especies_nativas_sustitutas": [],
+  "propagation": {
+    "metodo_principal": "semilla",
+    "notas": "Germinacion rapida (7-14 dias); se trasplanta a los 30 dias. Nativa de la Amazonia colombiana; crece bien en suelos acidos. Fruto usado en jugos y preparaciones tradicionales."
+  },
+  "requirements": {
+    "agua": "medio",
+    "altitud_msnm": {
+      "min_absoluto": 0,
+      "optimo_min": 50,
+      "optimo_max": 400,
+      "max_absoluto": 700
+    },
+    "temperatura_c": {
+      "helada_letal": 5,
+      "optimo_min": 22,
+      "optimo_max": 30,
+      "max_tolerable": 35
+    },
+    "radiacion": "sol_pleno",
+    "drenaje_requerido": "bueno"
+  },
+  "valor_pedagogico": "La cocona o tomate amazónico (Solanum sessiliflorum Dunal, familia Solanaceae) es una solanácea arbustiva semi-perenne (1-2.5 m altura) nativa silvestre y domesticada de la cuenca amazónica suroccidental (Colombia, Ecuador, Perú, Brasil), cultivada tradicionalmente por comunidades indígenas amazónicas como cultivo de chagra y frutal subutilizado con altísimo potencial nutricional. Produce frutos globosos a piriformes anaranjado-rojizos (3-7 cm) con pulpa amarilla ácida-aromática rica en hierro (1.5-2.5 mg/100g, hasta 4 veces más que el tomate común), niacina, vitamina B1, B2, ácido fólico, β-caroteno y compuestos fenólicos antioxidantes. Se distribuye en Amazonas (Leticia, Puerto Nariño, La Pedrera, Tarapacá), Vaupés (Mitú, Carurú), Caquetá (Florencia, Solano, Cartagena del Chairá), Putumayo (Mocoa, Puerto Asís, La Hormiga), Guainía (Puerto Inírida), Guaviare (San José) entre 50 y 400 msnm en zona térmica cálida húmeda. Ciclo bienal a semi-perenne, primera cosecha 6-10 meses, productividad sostenida 2-3 años. Rendimientos 15-30 t/ha fruto fresco. Lección viva: fruto amazónico con alto potencial nutritivo subutilizado, enseñando el potencial de especies nativas neotropicales subutilizadas (NUS — Neglected and Underutilized Species, FAO) en la seguridad alimentaria de regiones tropicales, su rol en la chagra indígena amazónica (Tikuna, Yagua, Cocama, Witoto, Murui, Bora) como cultivo complementario a la yuca brava (Manihot esculenta), y su valor en la fortificación nutricional natural por su excepcional contenido de hierro biodisponible (clave en lucha contra anemia infantil amazónica). Manejo agroecológico: propagación por semilla con germinación rápida 7-14 días, trasplante a campo a los 30-45 días con sustrato rico en materia orgánica, asocio en chagra con yuca, plátano, piña, achiote (Bixa orellana) y guama (Inga edulis) como sombra parcial, tolerancia a suelos ácidos (pH 4.5-6) típicos de oxisoles amazónicos, no requiere fertilización química, control biológico de mosca del fruto (Anastrepha spp.) con trampas. Fuentes Tier A: SINCHI Amazonia Colombiana, POWO Kew, GBIF Backbone Taxonomy, Bernal 2015 Catálogo Plantas Colombia, SIB Colombia.",
+  "sources": [
+    {
+      "id": "powo-kew",
+      "title": "powo-kew",
+      "tier": "A",
+      "url": "https://powo.science.kew.org"
+    },
+    {
+      "id": "gbif-taxonomic-backbone",
+      "title": "gbif-taxonomic-backbone",
+      "tier": "A",
+      "url": "https://www.gbif.org/dataset/d7dddbf4-2cf0-4f39-9b2a-bb099caae36c"
+    },
+    {
+      "id": "gbif-colombia",
+      "title": "gbif-colombia",
+      "tier": "A",
+      "url": "https://www.gbif.org/country/CO"
+    },
+    {
+      "id": "bernal-2015-plantas-liquenes-colombia",
+      "title": "bernal-2015-plantas-liquenes-colombia",
+      "tier": "A",
+      "url": "http://catalogoplantasdecolombia.unal.edu.co"
+    },
+    {
+      "id": "sib-colombia",
+      "title": "sib-colombia",
+      "tier": "A",
+      "url": "https://sibcolombia.net"
+    },
+    {
+      "id": "sinchi-amazonia-colombiana",
+      "title": "sinchi-amazonia-colombiana",
+      "tier": "A",
+      "url": null
+    }
+  ],
+  "_generated_by": "scripts/build-cycle-content-from-catalog.mjs",
+  "_generated_at": "2026-05-19T00:42:57.375Z"
+}

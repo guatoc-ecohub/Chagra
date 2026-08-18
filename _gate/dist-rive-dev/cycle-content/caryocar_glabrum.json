@@ -1,0 +1,82 @@
+{
+  "species_slug": "caryocar_glabrum",
+  "scientific_name": "Caryocar glabrum (Aubl.) Pers.",
+  "common_names": [
+    "Almendro silvestre amazónico"
+  ],
+  "family": "Caryocaraceae",
+  "category": "arboles_sombra",
+  "cultivable": true,
+  "conservation_status": "nativo_silvestre",
+  "thermal_zones": [
+    "calido"
+  ],
+  "roles_in_guild": [
+    "biomass_producer",
+    "pollinator_attractor",
+    "nurse_plant"
+  ],
+  "antagonists": [],
+  "especies_nativas_sustitutas": [],
+  "propagation": {
+    "methods": [
+      "semilla"
+    ],
+    "best_method": "semilla",
+    "protocol_resumen": "Semilla grande dentro de endocarpo leñoso espinoso (pirena) del fruto drupáceo —similar a C. amygdaliferum pero ligeramente más pequeño. Despulpado y escarificación mecánica del endocarpo. Germinación lenta 60-120 días en bandejas con sustrato orgánico. Trasplante a bolsa grande 5-10 L a los 4 meses. Plantación definitiva a los 8-12 meses. Crecimiento juvenil 0.8-1.5 m/año. Productivo de fruta desde los 10-15 años.",
+    "tiempo_a_establecimiento_dias": 240,
+    "notas": "Almendra oleaginosa muy rica en grasas (45-60% lípidos) y proteínas (15-20%) —similar a Caryocar amygdaliferum pero con perfil ligeramente más insaturado. Pulpa carnosa amarillo-anaranjada comestible. Hojas glabras (sin pubescencia) diferencian de C. amygdaliferum."
+  },
+  "requirements": {
+    "agua": "medio",
+    "altitud_msnm": {
+      "min_absoluto": 0,
+      "optimo_min": 100,
+      "optimo_max": 700,
+      "max_absoluto": 1000
+    },
+    "temperatura_c": {
+      "helada_letal": 14,
+      "optimo_min": 22,
+      "optimo_max": 30,
+      "max_tolerable": 35
+    },
+    "radiacion": "sol_pleno",
+    "drenaje_requerido": "bueno"
+  },
+  "valor_pedagogico": "El almendro silvestre amazónico glabro o pequiá amazónico glabro (Caryocar glabrum (Aubl.) Pers., familia Caryocaraceae) es un árbol perennifolio GIGANTE EMERGENTE de 25-40 m de altura con fuste recto cilíndrico y frutos drupáceos grandes con almendra oleaginosa comestible, nativo del bosque húmedo tropical bajo amazónico de tierra firme y vegas de río de Sudamérica tropical (Amazonía colombiana, peruana, ecuatoriana, brasileña, venezolana, Guayanas) en piso térmico CÁLIDO (0-1.000 msnm). En Colombia se distribuye en la Amazonía baja (Amazonas, Caquetá bajo, Putumayo bajo, Vaupés, Guainía, Guaviare) y piedemonte amazónico, en el mismo rango que su pariente cercano Caryocar amygdaliferum (catálogo Chagra) del cual se distingue por las hojas GLABRAS (sin pubescencia, de ahí el epíteto \"glabrum\") versus las hojas pubescentes de C. amygdaliferum, y por drupas ligeramente más pequeñas (6-9 cm vs 8-12 cm) y por preferencia hábitat de tierra firme bien drenada frente a vegas y suelos hidromorfizados. Pertenece a la familia Caryocaraceae —pequeña familia oleaginosa neotropical de ~25 especies en 2 géneros— y produce frutos drupáceos con pulpa carnosa amarillo-anaranjada exterior comestible y endocarpo leñoso espinoso (pirena) que contiene 1-4 semillas-almendra oleaginosas muy ricas en grasas (45-60% lípidos saturados e insaturados, perfil ligeramente más insaturado que C. amygdaliferum) y proteínas (15-20%). Es PRODUCTO NTFP (non-timber forest product) emergente en cadenas de valor de la Amazonía colombiana —pueblos indígenas Tikuna del trapecio amazónico, Bora, Uitoto, Murui-Muinane, Yucuna, Tanimuka del medio-bajo Caquetá-Apaporis-Vaupés, y comunidades campesino-ribereñas del eje Leticia-Puerto Nariño cosechan tradicionalmente del bosque silvestre (recolección de frutos caídos en estación lluviosa) y consumen tostado, cocido, en pulpa fresca, o procesado como aceite local. La presencia paralela de C. amygdaliferum y C. glabrum en el mismo rango amazónico colombiano es un caso de PARES BOTÁNICOS HERMANOS (sister species) que ocupan microhabitats diferenciados (vegas/hidromorfismo vs. tierra firme bien drenada) — un ejemplo clásico de especiación ecológica por partición de hábitat. El fruto es dispersado por agutíes (Dasyprocta fuliginosa), dantas (Tapirus terrestris), sahínos (Pecari tajacu), monos lanudos (Lagothrix lagothricha) y churucos, en zoocoria primaria con caché y reentierro. Manejo agroecológico amazónico: vivero con semilla recalcitrante (siembra inmediata post-cosecha de drupa), despulpado y escarificación mecánica del endocarpo, germinación lenta 60-120 días, plantación 20-50 ind/ha en sistemas agroforestales amazónicos multiestrato asociada a copoazú (Theobroma grandiflorum), açaí (Euterpe oleracea), palma chontaduro (Bactris gasipaes), inga (Inga spp.), plátano hartón; productivo de fruta a los 10-15 años; restauración 50-100 ind/ha en mosaicos del bosque húmedo tropical bajo amazónico de tierra firme. Lección viva sobre PARES BOTÁNICOS HERMANOS (Caryocar amygdaliferum vs C. glabrum como especiación ecológica por partición de hábitat), OLEAGINOSAS AMAZÓNICAS NATIVAS (alternativa a aceites industriales importados), NTFP COMUNITARIOS, ZOOCORIA POR FAUNA AMAZÓNICA MEGAFAUNA TROPICAL y CARACTERES TAXONÓMICOS DIFERENCIALES (glabro vs pubescente, drupa pequeña vs grande, hidromorfo vs tierra firme). Fuentes Tier A: POWO Kew, GBIF Backbone Taxonomy, GBIF Colombia, SINCHI Amazonía Colombiana, Bernal et al. 2015 Catálogo Plantas y Líquenes Colombia.",
+  "sources": [
+    {
+      "id": "powo-kew",
+      "title": "powo-kew",
+      "tier": "A",
+      "url": "https://powo.science.kew.org"
+    },
+    {
+      "id": "gbif-taxonomic-backbone",
+      "title": "gbif-taxonomic-backbone",
+      "tier": "A",
+      "url": "https://www.gbif.org/dataset/d7dddbf4-2cf0-4f39-9b2a-bb099caae36c"
+    },
+    {
+      "id": "gbif-colombia",
+      "title": "gbif-colombia",
+      "tier": "A",
+      "url": "https://www.gbif.org/country/CO"
+    },
+    {
+      "id": "sinchi-amazonia-colombiana",
+      "title": "sinchi-amazonia-colombiana",
+      "tier": "A",
+      "url": null
+    },
+    {
+      "id": "bernal-2015-plantas-liquenes-colombia",
+      "title": "bernal-2015-plantas-liquenes-colombia",
+      "tier": "A",
+      "url": "http://catalogoplantasdecolombia.unal.edu.co"
+    }
+  ],
+  "_generated_by": "scripts/build-cycle-content-from-catalog.mjs",
+  "_generated_at": "2026-05-19T00:42:57.402Z"
+}

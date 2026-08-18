@@ -1,0 +1,242 @@
+<!doctype html>
+<html lang="es-CO">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>La quebrada y la chorrera — aguaParamo</title>
+<link rel="icon" href="data:,">
+<style>
+  html,body{margin:0;height:100%;overflow:hidden;background:#0a0a0f}
+  #c{display:block;width:100vw;height:100vh}
+  #hud{position:fixed;left:12px;bottom:10px;color:#fff;opacity:.6;font:12px system-ui;text-shadow:0 1px 3px #000;pointer-events:none}
+</style>
+<script type="importmap">
+{
+  "imports": {
+    "three": "./vendor/three.module.js",
+    "three/addons/": "./vendor/addons/"
+  }
+}
+</script>
+</head>
+<body>
+<canvas id="c"></canvas>
+<div id="hud"></div>
+<script type="module">
+// Entrada PUBLICADA de la quebrada y la chorrera — sirve el módulo GANADOR
+// del A/B del agua: lib3d/fx/aguaParamo.js (decisión del operador, 0b5e73f).
+// Portada del módulo archivado lib/agua.js el 2026-08-11; conserva la MISMA
+// geografía del harness original: meseta + acantilado ESCALONADO en tres
+// repisas (la chorrera salta por ellas) + vallecito por donde la quebrada
+// corre hacia la cámara. Render con la factura del valle vivo (AgX 1,55): la
+// condición bajo la que se juzgó el A/B. ?vista=amplia|chorrera|quebrada
+import * as THREE from 'three';
+import { crearQuebrada, crearChorrera, crearHelechosRibera } from './lib3d/fx/aguaParamo.js';
+import { crearBrumaVolumetrica } from './lib3d/fx/brumaVolumetrica.js';
+
+const canvas = document.getElementById('c');
+const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
+renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+renderer.setSize(innerWidth, innerHeight);
+renderer.outputColorSpace = THREE.SRGBColorSpace;
+renderer.toneMapping = THREE.AgXToneMapping;           // comparador-agua.html:92
+renderer.toneMappingExposure = 1.55;                   // — el A/B se juzgó así
+
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0x9fb8c9);          // cielo de bosque de niebla
+scene.fog = new THREE.Fog(0x9fb8c9, 190, 480);
+
+const camera = new THREE.PerspectiveCamera(55, innerWidth / innerHeight, 0.1, 900);
+
+// ── LUZ: sol de mañana (la MISMA dirección que se pasa a los shaders) ──
+const SOL = new THREE.Vector3(0.62, 0.45, 0.60).normalize();
+const dir = new THREE.DirectionalLight(0xfff2dc, 2.1);
+dir.position.copy(SOL).multiplyScalar(200);
+scene.add(dir);
+scene.add(new THREE.HemisphereLight(0xbcd3e0, 0x4a5a3a, 0.85));
+
+// ── TERRENO: meseta (y≈40) → acantilado en 3 repisas → vallecito (y≈3) ──
+const smooth = (a, b, x) => { const t = Math.min(1, Math.max(0, (x - a) / (b - a))); return t * t * (3 - 2 * t); };
+function fbm(x, z) {
+  let v = 0, a = 1, f = 0.030;
+  for (let o = 0; o < 3; o++) {
+    v += a * Math.sin(x * f * 1.7 + z * f) * Math.cos(z * f * 1.3 - x * f * 0.6);
+    a *= 0.5; f *= 2.1;
+  }
+  return v;
+}
+// la escalera suave: 3 peldaños francos entre z=-124 (arriba) y z=-86 (abajo)
+function escalera(t) {                                   // t: 0 valle → 1 meseta
+  const n = 3, s = t * n, i = Math.floor(s), f = s - i;
+  const soft = f * f * f * (f * (f * 6 - 15) + 10);      // quintic: repisa plana
+  return Math.min(1, (i + soft) / n);
+}
+// el cauce de la quebrada (thalweg): nace en la poza y serpentea a la cámara
+const CAUCE = [
+  { x: 2, z: -78 }, { x: 10, z: -52 }, { x: -6, z: -16 },
+  { x: 12, z: 22 }, { x: -3, z: 58 }, { x: 7, z: 96 }, { x: 2, z: 130 },
+];
+const cauceCurve = new THREE.CatmullRomCurve3(
+  CAUCE.map((p) => new THREE.Vector3(p.x, 0, p.z)), false, 'centripetal', 0.5);
+const CAUCE_PTS = [];
+for (let i = 0; i <= 160; i++) CAUCE_PTS.push(cauceCurve.getPoint(i / 160));
+function distCauce(x, z) {
+  let d = 1e9;
+  for (const p of CAUCE_PTS) {
+    const dx = x - p.x, dz = z - p.z;
+    const dd = dx * dx + dz * dz;
+    if (dd < d) d = dd;
+  }
+  return Math.sqrt(d);
+}
+function heightAt(x, z) {
+  const k = smooth(-86, -124, z);                        // 0 valle → 1 meseta
+  let h = 3 + 37 * escalera(k);
+  h += Math.max(0, -z - 20) * 0.005;                     // el valle sube apenas hacia la pared
+  h -= Math.max(0, z - 40) * 0.012;                      // y cae despacio hacia la cámara
+  const dc = distCauce(x, z);
+  // el relieve NO pisa el cauce: los bultos fbm se aplanan sobre él
+  // (v1: el carve de 1,6 u contra ruido de ±1,1 dejaba la lámina ENTERRADA)
+  h += fbm(x, z) * (1.1 - k * 0.5) * smooth(3.5, 8.5, dc);
+  // la VAGUADA del anfitrión (suave, solo en el valle). La ZANJA del cauce ya
+  // no se talla acá: es contrato de crearQuebrada — el suelo se excava con
+  // profundidadEn() al armar la malla (el patrón de paramo.js).
+  h -= 1.5 * (1 - smooth(1.5, 9, dc)) * (1 - k);
+  return h;
+}
+
+// ── LA QUEBRADA (antes de la malla: su zanja excava el suelo) ────────────────
+const quebrada = crearQuebrada(THREE, {
+  puntos: CAUCE, alturaEn: heightAt, ancho: 3.5, hundir: 0.7,
+  piedras: 20, chispas: 60, seed: 7, solDir: SOL, muestras: 170,
+});
+scene.add(quebrada.grupo);
+
+// el vaso de la poza al pie de la chorrera (ahí vivirá el pozo de la caída).
+// Pegado a la pared y CORTO: si alcanza la boca de la quebrada, la orilla del
+// lecho (que drapea heightAt, sin este vaso) queda de sardinel flotando.
+const dPoza = (x, z) => Math.hypot(x - 2, z + 83.5);
+// el suelo REAL del mundo: terreno − zanja de la quebrada − vaso de la poza
+const terrenoY = (x, z) => heightAt(x, z) - quebrada.profundidadEn(x, z)
+  - 0.85 * (1 - smooth(2.5, 5.5, dPoza(x, z)));
+
+{ // malla del terreno con color por vértice: verde-dominante, roca en lo empinado
+  // rejilla de 1 u: el emplume de la zanja (~2-4 u) cae sobre varios vértices
+  // — con 2 u el borde excavado se leía como diente de sierra
+  const W = 300, D = 340, SX = 300, SZ = 340;
+  const g = new THREE.PlaneGeometry(W, D, SX, SZ);
+  g.rotateX(-Math.PI / 2);
+  g.translate(0, 0, -35);
+  const pos = g.attributes.position;
+  const colArr = new Float32Array(pos.count * 3);
+  const cPasto = new THREE.Color(0x4d7a35);              // pasto de ladera
+  const cMonte = new THREE.Color(0x39642c);              // monte más hondo
+  const cRoca = new THREE.Color(0x6b675e);               // piedra del escarpe
+  const cHum = new THREE.Color(0x35502c);                // orilla húmeda
+  const tmp = new THREE.Color();
+  for (let i = 0; i < pos.count; i++) {
+    const x = pos.getX(i), z = pos.getZ(i);
+    const y = terrenoY(x, z);
+    pos.setY(i, y);
+    const dy = Math.abs(terrenoY(x + 2, z) - y) + Math.abs(terrenoY(x, z + 2) - y);
+    const rocaK = smooth(1.4, 3.6, dy);
+    const verde = tmp.copy(cPasto).lerp(cMonte, smooth(-1, 1, fbm(x * 1.7, z * 1.7)));
+    verde.lerp(cHum, smooth(9, 3, distCauce(x, z)) * 0.7);
+    verde.lerp(cRoca, rocaK);
+    verde.offsetHSL(0, 0, (fbm(x * 3.1, z * 2.7)) * 0.02);
+    colArr.set([verde.r, verde.g, verde.b], i * 3);
+  }
+  g.setAttribute('color', new THREE.BufferAttribute(colArr, 3));
+  g.computeVertexNormals();
+  const m = new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 0.96 });
+  scene.add(new THREE.Mesh(g, m));
+}
+
+// ── LA CHORRERA: del labio de la meseta al pie, saltando las TRES repisas ────
+const labioBase = heightAt(0, -121);
+const pieBase = heightAt(2, -80.5);
+const pozaY = pieBase - 0.25;                          // lámina de la poza
+const grupoY = pozaY - 0.06;                           // origen local de la caída
+const altoCaida = labioBase + 0.55 - grupoY;
+// el perfil de la pared REAL: muestreo del terreno labio→pie invertido por
+// altura — caraEn(t) da el offset LOCAL de la cara del escarpe a esa altura
+// (rutaCaida le aplica su running-max + suavizado: la cascada abraza las repisas)
+const PERFIL = [];
+for (let i = 0; i <= 120; i++) {
+  const f = i / 120;
+  const px = 2 * f, pz = -121 + 38 * f;                // el hilo deriva x 0→2
+  PERFIL.push({ x: px, z: pz, y: heightAt(px, pz) });
+}
+function caraEn(t) {
+  const y = grupoY + altoCaida * t;
+  let i = 0;
+  while (i < PERFIL.length - 1 && PERFIL[i + 1].y > y) i++;
+  const a = PERFIL[i], b = PERFIL[Math.min(i + 1, PERFIL.length - 1)];
+  const f = a.y <= b.y ? 0 : Math.min(1, Math.max(0, (a.y - y) / (a.y - b.y)));
+  // +121: a offset local del grupo (anclado al labio) · +0,35: el agua corre
+  // APENAS por delante de la roca
+  return { x: a.x + (b.x - a.x) * f, z: a.z + (b.z - a.z) * f + 121 + 0.35 };
+}
+const chorrera = crearChorrera(THREE, {
+  alto: altoCaida, ancho: 3.4, saltos: 3, deriva: 0, caraEn,
+  pozo: 5.2, gotas: 26, calidad: 'alta', seed: 3, solDir: SOL,
+});
+chorrera.grupo.position.set(0, grupoY, -121);
+scene.add(chorrera.grupo);
+
+// la neblina del impacto NO vive en la chorrera: anclas → brumaVolumetrica
+// (el cableado del comparador, la escena donde se juzgó el A/B).
+// El PIE manda: el ancla del impacto final se repite para que la mayoría de
+// los jirones nazcan donde el agua golpea la poza, no repartidos por la pared.
+const anclas = [];
+chorrera.anclasBruma.forEach((a, i) => {
+  const p = { x: a.x, y: grupoY + a.y - 0.5, z: -121 + a.z };
+  const veces = i === chorrera.anclasBruma.length - 1 ? 5 : 2;
+  for (let k = 0; k < veces; k++) anclas.push(p);
+});
+const bruma = crearBrumaVolumetrica(THREE, {
+  puntos: anclas, jirones: 56, haces: 0, seed: 47,
+  dispersion: 3.0, solDir: SOL, color: 0xe6efec, intensidad: 1,
+  // lejos > distancia de la cámara amplia (~155 u al pie): con [70,120] los
+  // jirones colapsaban por distancia y la captura salía SIN neblina al pie
+  cerca: [2, 6], lejos: [170, 300],
+});
+scene.add(bruma.grupo);
+
+// ── ribera: helechos arborescentes (follaje = MASA, verde-dominante) ──
+const helechos = crearHelechosRibera(THREE, {
+  puntos: CAUCE, alturaEn: heightAt, n: 28, seed: 977, aparte: 9,
+});
+scene.add(helechos.grupo);
+// update(t) avanza el reloj COMPARTIDO de vientoMundos (las copas respiran)
+
+// ── VISTAS del gate ──
+const vista = new URLSearchParams(location.search).get('vista') || 'amplia';
+const VISTAS = {
+  amplia: { pos: [40, 30, 66], mira: [0, 14, -70] },
+  chorrera: { pos: [13, 9, -44], mira: [0, 24, -104] },
+  quebrada: { pos: [18, 6.2, 44], mira: [-6, 0.8, -8] },
+};
+const v = VISTAS[vista] || VISTAS.amplia;
+camera.position.set(...v.pos);
+camera.lookAt(...v.mira);
+document.getElementById('hud').textContent = `aguaParamo — vista: ${vista}`;
+
+addEventListener('resize', () => {
+  camera.aspect = innerWidth / innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(innerWidth, innerHeight);
+});
+
+const clock = new THREE.Clock();
+renderer.setAnimationLoop(() => {
+  const dt = Math.min(0.05, clock.getDelta());
+  quebrada.tick(dt);
+  chorrera.tick(dt);
+  bruma.tick(dt);
+  helechos.update(clock.elapsedTime);   // el reloj COMPARTIDO de vientoMundos
+  renderer.render(scene, camera);
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,94 @@
+{
+  "species_slug": "myrcianthes_ferreyrae",
+  "scientific_name": "Myrcianthes ferreyrae (McVaugh) McVaugh",
+  "common_names": [
+    "Arrayán negro"
+  ],
+  "family": "Myrtaceae",
+  "category": "arboles_sombra",
+  "cultivable": true,
+  "conservation_status": "nativo_silvestre",
+  "thermal_zones": [
+    "frio"
+  ],
+  "roles_in_guild": [
+    "pollinator_attractor",
+    "nurse_plant",
+    "biomass_producer"
+  ],
+  "antagonists": [
+    "eucalyptus_globulus",
+    "pinus_patula"
+  ],
+  "especies_nativas_sustitutas": [],
+  "propagation": {
+    "methods": [
+      "semilla",
+      "esqueje"
+    ],
+    "best_method": "semilla",
+    "protocol_resumen": "Propagación por semilla fresca de bayas maduras negras, despulpadas inmediatamente y sembradas en sustrato turba-arena con sombra parcial 50%. Germinación 30-60 días. Trasplante 4-6 meses. Plantación 12-18 meses. Esqueje semileñoso con AIB (enraizamiento 30-50%, más difícil que arrayán de hoja menuda). Crecimiento lento-moderado 30-50 cm/año.",
+    "tiempo_a_establecimiento_dias": 540,
+    "notas": "Distinto al arrayán común (Myrcianthes leucoxyla) y al arrayán de hoja menuda (M. rhopaloides) — sus bayas son NEGRAS en madurez (no rojas-violáceas) por mayor contenido de antocianinas oscuras. Comestibles, sabor dulce-resinoso intenso."
+  },
+  "requirements": {
+    "agua": "medio",
+    "altitud_msnm": {
+      "min_absoluto": 2000,
+      "optimo_min": 2300,
+      "optimo_max": 2900,
+      "max_absoluto": 3200
+    },
+    "temperatura_c": {
+      "helada_letal": -6,
+      "optimo_min": 8,
+      "optimo_max": 15,
+      "max_tolerable": 22
+    },
+    "radiacion": "sol_pleno",
+    "drenaje_requerido": "bueno"
+  },
+  "valor_pedagogico": "Myrcianthes ferreyrae (McVaugh) McVaugh (arrayán negro, arrayán de Ferreyra — familia Myrtaceae) es un árbol perennifolio (6-15 m altura) nativo de los Andes de Colombia, Ecuador y Perú, distribuido en bosque alto andino entre 2000 y 3200 msnm en piso térmico FRÍO. En Colombia se encuentra en Cundinamarca, Boyacá, Antioquia, Nariño, Cauca y Santander. Es la TERCERA especie del género Myrcianthes en Chagra (junto con M. rhopaloides arrayán de hoja menuda, y la conocida M. leucoxyla arrayán común de Bogotá) — y se distingue por sus BAYAS NEGRAS EN MADUREZ (no rojas-violáceas como M. rhopaloides ni anaranjadas-rojizas como M. leucoxyla) por mayor contenido de ANTOCIANINAS OSCURAS (cianidina-3-glucósido, peonidina-3-glucósido y derivados). Las bayas negras son COMESTIBLES con sabor dulce-resinoso intenso (más concentrado que el arrayán común), usadas en mermeladas, compotas y vinos artesanales en comunidades campesinas del altiplano cundiboyacense y nariñense. El epíteto 'ferreyrae' honra al botánico peruano Ramón Ferreyra Huerta (1910-2005), pionero de la botánica andina peruana y descriptor de cientos de especies de la flora del Perú y Ecuador. Lección viva sobre BOTÁNICA DE MYRCIANTHES, ANTOCIANINAS EN BAYAS DE MYRTACEAE y HISTORIA DE LA BOTÁNICA NEOTROPICAL: el género Myrcianthes en Colombia tiene al menos 3-4 especies arbóreas alto-andinas (M. leucoxyla, M. rhopaloides, M. ferreyrae, M. orthostemon) que se diferencian por color de baya, tamaño de hoja y porte del árbol — todas comparten la 'firma' Myrtaceae: corteza exfoliante canela, hojas opuestas aromáticas, flores con muchos estambres, bayas comestibles. Las antocianinas oscuras de M. ferreyrae son INTERESANTES PARA NUTRACÉUTICA — antioxidantes potentes con perfil similar al de los arándanos (Vaccinium spp.) y a las moras (Morus nigra). En restauración de Cruz Verde-Sumapaz, Chingaza, Iguaque y la Cordillera Central, el arrayán negro se planta en sotobosque y borde de rodal restaurado junto con otros arrayanes y gaque y encenillo, formando corredores frutales para avifauna alto-andina (mirlas patiblancas, atrapamoscas, semilleros) en la ESTACIÓN SECA diciembre-marzo cuando otros frutos escasean — servicio ecosistémico crítico. Manejo agroecológico: propagación por semilla fresca con sombra parcial 50%; trasplante 4-6 meses; plantación 12-18 meses; crecimiento 30-50 cm/año; asocio con M. rhopaloides, gaque y encenillo; densidades 150-300 ind/ha. Fuentes Tier A: POWO Kew, GBIF Backbone Taxonomy, GBIF Colombia, Humboldt Flora Alto-Andina, Libro Rojo Plantas Colombia, JBB Plantas Medicinales.",
+  "companions_markdown": "### Especies asociadas favorables\n\nEstas especies favorecen el cultivo cuando se siembran cerca:\n- clusia_multiflora — Gaque (Clusia multiflora Kunth)\n- myrcianthes_rhopaloides — Arrayán de hoja menuda (Myrcianthes rhopaloides (Kunth) McVaugh)\n- weinmannia_tomentosa — Encenillo (Weinmannia tomentosa L. f.)",
+  "antagonists_markdown": "### Antagonistas (no asociar)\n\nEvite sembrar estas especies cerca; compiten o comparten plagas/patógenos:\n- eucalyptus_globulus — Eucalipto blanco (Eucalyptus globulus Labill.)\n- pinus_patula — Pino pátula (Pinus patula Schiede ex Schltdl. & Cham.)",
+  "sources": [
+    {
+      "id": "powo-kew",
+      "title": "powo-kew",
+      "tier": "A",
+      "url": "https://powo.science.kew.org"
+    },
+    {
+      "id": "gbif-taxonomic-backbone",
+      "title": "gbif-taxonomic-backbone",
+      "tier": "A",
+      "url": "https://www.gbif.org/dataset/d7dddbf4-2cf0-4f39-9b2a-bb099caae36c"
+    },
+    {
+      "id": "gbif-colombia",
+      "title": "gbif-colombia",
+      "tier": "A",
+      "url": "https://www.gbif.org/country/CO"
+    },
+    {
+      "id": "humboldt-flora-alto-andina",
+      "title": "humboldt-flora-alto-andina",
+      "tier": "A",
+      "url": null
+    },
+    {
+      "id": "libro-rojo-plantas-colombia",
+      "title": "libro-rojo-plantas-colombia",
+      "tier": "A",
+      "url": null
+    },
+    {
+      "id": "jbb-plantas-medicinales",
+      "title": "jbb-plantas-medicinales",
+      "tier": "A",
+      "url": null
+    }
+  ],
+  "_generated_by": "scripts/build-cycle-content-from-catalog.mjs",
+  "_generated_at": "2026-05-19T00:42:57.403Z"
+}

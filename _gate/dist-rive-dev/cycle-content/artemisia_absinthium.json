@@ -1,0 +1,89 @@
+{
+  "species_slug": "artemisia_absinthium",
+  "scientific_name": "Artemisia absinthium L.",
+  "common_names": [
+    "Ajenjo"
+  ],
+  "family": "Asteraceae",
+  "category": "medicinales_alelopaticas",
+  "cultivable": true,
+  "conservation_status": "cultivo_comun",
+  "thermal_zones": [
+    "templado",
+    "frio"
+  ],
+  "roles_in_guild": [
+    "crop",
+    "pest_repellent"
+  ],
+  "antagonists": [],
+  "especies_nativas_sustitutas": [],
+  "propagation": {
+    "metodo_principal": "division_mata",
+    "notas": "Propagacion por semilla o division de raiz. Crece vigorosamente en suelos pobres. Sus aceites amargos (tuyona) son potentes repelentes de plagas en el huerto."
+  },
+  "requirements": {
+    "agua": "bajo",
+    "altitud_msnm": {
+      "min_absoluto": 1500,
+      "optimo_min": 2000,
+      "optimo_max": 2800,
+      "max_absoluto": 3200
+    },
+    "temperatura_c": {
+      "helada_letal": -15,
+      "optimo_min": 10,
+      "optimo_max": 20,
+      "max_tolerable": 26
+    },
+    "radiacion": "sol_pleno",
+    "drenaje_requerido": "excelente"
+  },
+  "valor_pedagogico": "El ajenjo (Artemisia absinthium L., familia Asteraceae) es una asterácea perenne subarbustiva aromática originaria de Eurasia templada y norte de África, naturalizada y cultivada en huertos andinos colombianos por su intenso aroma alcanforado y sabor amargo, atribuibles a aceites esenciales ricos en α-tuyona y β-tuyona (35-60% del aceite esencial), absintina, anabsintina y artemisinina-relacionados. Su follaje plateado-pubescente, hojas profundamente lobuladas y capítulos pequeños amarillo-grisáceos son rasgos diagnósticos. Se cultiva en Cundinamarca (Sabana de Bogotá, Sopó, Tabio), Boyacá (Tunja, Sutamarchán, Villa de Leyva), Antioquia (oriente, Santuario, La Ceja) y Eje cafetero entre 2.000 y 2.800 msnm en zona térmica fría seca. Ciclo perenne, productividad sostenida 3-5 años antes de renovar plantación. Rendimientos 0.6-1.2 t/ha hierba seca. Lección viva de alelopatía: su fuerte olor y sabor amargo enseñan cómo las plantas se defienden químicamente en la naturaleza mediante metabolitos secundarios disuasorios para herbívoros y fitófagos. Tradicionalmente usada en macerados acuosos y purines fermentados para control biológico de plagas en la chagra (pulgones Myzus persicae, mosca blanca Bemisia tabaci, larvas de lepidópteros Plutella xylostella, polilla del tomate Tuta absoluta), aplicación foliar 10-15 g hoja seca/litro de agua reposo 24 h. Manejo agroecológico: propagación por división de mata o esquejes (más confiable que semilla), siembra en bordes perimetrales del huerto como repelente vivo, asocio con coles para protección contra mariposa de la col, no consumir en embarazo por toxicidad de tuyona, cosecha foliar pre-floración para máxima concentración de aceites. Fuentes Tier A: POWO Kew, GBIF Backbone Taxonomy, AGROSAVIA, Bernal 2015 Catálogo Plantas Colombia, Pamplona-Roger 2006 Plantas Medicinales.",
+  "sources": [
+    {
+      "id": "powo-kew",
+      "title": "powo-kew",
+      "tier": "A",
+      "url": "https://powo.science.kew.org"
+    },
+    {
+      "id": "gbif-taxonomic-backbone",
+      "title": "gbif-taxonomic-backbone",
+      "tier": "A",
+      "url": "https://www.gbif.org/dataset/d7dddbf4-2cf0-4f39-9b2a-bb099caae36c"
+    },
+    {
+      "id": "gbif-colombia",
+      "title": "gbif-colombia",
+      "tier": "A",
+      "url": "https://www.gbif.org/country/CO"
+    },
+    {
+      "id": "agrosavia-tibaitata",
+      "title": "agrosavia-tibaitata",
+      "tier": "A",
+      "url": "https://www.agrosavia.co/investigacion/centros-de-investigacion/tibaitat%C3%A1"
+    },
+    {
+      "id": "bernal-2015-plantas-liquenes-colombia",
+      "title": "bernal-2015-plantas-liquenes-colombia",
+      "tier": "A",
+      "url": "http://catalogoplantasdecolombia.unal.edu.co"
+    },
+    {
+      "id": "pamplona-roger-2006-plantas-medicinales",
+      "title": "pamplona-roger-2006-plantas-medicinales",
+      "tier": "B",
+      "url": null
+    },
+    {
+      "id": "restrepo-2007-biopreparados",
+      "title": "restrepo-2007-biopreparados",
+      "tier": "B",
+      "url": null
+    }
+  ],
+  "_generated_by": "scripts/build-cycle-content-from-catalog.mjs",
+  "_generated_at": "2026-05-19T00:42:57.371Z"
+}

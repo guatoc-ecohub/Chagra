@@ -1,0 +1,24 @@
+{
+  "wrap": "chivitoWrap",
+  "pielKart": {
+    "cuerpo": { "grad": "gCuerpo", "stop": 0 },
+    "cuerpo2": { "fill": "#f0ead6" },
+    "cabeza": { "fill": "#262b1c" },
+    "detalle": { "fill": "#2c2318" },
+    "extras": {
+      "ala": { "fill": "#7d8a44" },
+      "colaCentro": { "grad": "gCola", "stop": 0 },
+      "cara": { "fill": "#f2eddc" },
+      "barba": { "fill": "#2fa35c" },
+      "barbaSombra": { "fill": "#157a42" },
+      "pico": { "fill": "#6e6e66" },
+      "crestaPluma": { "fill": "#2b3a22" },
+      "crestaPluma2": { "fill": "#3c5029" },
+      "crestaBase": { "fill": "#f6efdc" },
+      "punkPua": { "fill": "#d8d8cd" },
+      "punkPua2": { "fill": "#e2e2d8" },
+      "punkPunta": { "fill": "#8b3fd1" },
+      "mejilla": { "fill": "#e3a99a" }
+    }
+  }
+}

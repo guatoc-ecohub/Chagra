@@ -1,0 +1,95 @@
+{
+  "species_slug": "cattleya_trianae",
+  "scientific_name": "Cattleya trianae Linden & Rchb.f.",
+  "common_names": [
+    "Flor de Mayo"
+  ],
+  "family": "Orchidaceae",
+  "category": "ornamentales_nativas",
+  "cultivable": true,
+  "conservation_status": "en_peligro",
+  "thermal_zones": [
+    "templado"
+  ],
+  "roles_in_guild": [
+    "pollinator_attractor"
+  ],
+  "antagonists": [],
+  "especies_nativas_sustitutas": [],
+  "propagation": {
+    "methods": [
+      "division_mata",
+      "pseudobulbo",
+      "micropropagacion"
+    ],
+    "best_method": "division_mata",
+    "protocol_resumen": "División de mata con mínimo 3-4 pseudobulbos por sección, herida desinfectada con canela molida o fungicida orgánico. Sustrato corteza de pino + carbón + musgo en proporción 3:1:1, riego cada 5-7 días dejando secar entre riegos. Crecimiento lento: 3-5 años a primera floración desde keiki. Micropropagación in vitro vía siembra asimbiótica en medio Knudson C es la vía industrial. PROHIBIDA EXTRACCIÓN SILVESTRE — CITES Apéndice II + Res. MADS 0192/2014 vedan tránsito sin permiso AGRO-CITES.",
+    "tiempo_a_establecimiento_dias": 365,
+    "notas": "Floración Marzo-Mayo (de ahí \"flor de mayo\"). Polinizada por abejas Euglossini machos atraídas por fragancia floral. PROPAGACIÓN ÉTICA: solo de plantas con CITES de origen (vivero registrado ICA) o esquejes de cultivo familiar legal — extracción silvestre es delito ambiental (Ley 1333/2009) y acelera extinción.",
+    "fuente": "Ortiz-Valdivieso 1991 Native Colombian Orchids; Bernal 2015; JBB Plantas Medicinales; CITES Appendix II"
+  },
+  "requirements": {
+    "agua": "medio",
+    "altitud_msnm": {
+      "min_absoluto": 800,
+      "optimo_min": 1200,
+      "optimo_max": 1800,
+      "max_absoluto": 2200
+    },
+    "temperatura_c": {
+      "helada_letal": 6,
+      "optimo_min": 15,
+      "optimo_max": 24,
+      "max_tolerable": 30
+    },
+    "radiacion": "sombra_parcial",
+    "drenaje_requerido": "excelente"
+  },
+  "valor_pedagogico": "La flor de mayo o cattleya de Triana (Cattleya trianae Linden & Rchb.f., Orchidaceae) es la flor nacional de Colombia y una de las orquídeas más icónicas y patrimoniales del país. Especie epífita endémica del bosque húmedo premontano y nublado de la Cordillera Oriental y Central de los Andes colombianos entre 800 y 2.200 msnm, principalmente en los departamentos de Cundinamarca, Tolima, Huila, Quindío, Risaralda, Antioquia, Santander y Caldas, en bosque andino y subandino. Fue descrita en 1860 por Linden y Reichenbach hijo, nombrada en honor al naturalista colombiano José Jerónimo Triana. Su elección como flor nacional en 1936 reconoce los colores de la bandera colombiana presentes en la flor: blanco del perianto, amarillo del callo del labelo y rojo-magenta del labelo. Es planta epífita simpodial con pseudobulbos cilíndricos engrosados de 15-30 cm que almacenan agua y nutrientes (adaptación a la estacionalidad de los bosques nublados), hoja única terminal coriácea de 20-30 cm, e inflorescencia con 1-2 flores grandes (15-20 cm de diámetro) altamente fragantes con perianto blanco-rosado lila y labelo amarillo-magenta característico. Floración entre marzo y mayo (de ahí el nombre \"flor de mayo\"), coincidiendo con la subida de temperatura del trópico andino. Polinización exclusiva por abejas Euglossini machos (familia Apidae) atraídas por los compuestos terpénicos volátiles de su fragancia (geraniol, linalool, eugenol) que las abejas recolectan para fines reproductivos. Conservación: catalogada en peligro (EN) por la UICN y libro rojo de plantas de Colombia, sus poblaciones silvestres se redujeron drásticamente durante los siglos XIX-XX por extracción masiva ilegal para el mercado europeo y norteamericano de orquídeas exóticas, y por destrucción del bosque nublado andino. Está protegida por la Convención CITES (Apéndice II — toda Orchidaceae está en CITES II), la Resolución MADS 0192/2014 y la Ley 1333/2009 de Procedimiento Sancionatorio Ambiental: la extracción de especímenes silvestres sin permiso es delito ambiental. Reproducción ética y conservación: la única forma legal y ética de tener cattleyas trianae es adquirirlas de viveros registrados ante ICA que tienen permiso CITES para producción comercial mediante micropropagación in vitro (siembra asimbiótica en medio Knudson C, desarrollo en frasco 18-24 meses, aclimatación en invernadero 6-12 meses, planta floración a 4-6 años). También es legal la multiplicación familiar por división de mata de ejemplares de cultivo previo. Cultivo doméstico: ideal en apartamento o patio sombreado con maceta de barro perforada o canastilla colgante, sustrato corteza de pino + carbón vegetal + musgo Sphagnum en proporción 3:1:1, riego por inmersión cada 5-7 días dejando secar entre riegos (las raíces aéreas son sensibles al pudrimiento), humedad relativa 60-80%, sombra 50-70%, fertilización balanceada cuarteada cada 15 días en fase de crecimiento activo. Floración anual. Programas de conservación: JBB, IAvH, MADS y la Sociedad Colombiana de Orquideología desarrollan programas de reintroducción ex-situ → in-situ en bosques nublados restaurados con permiso ambiental, devolviendo genotipos al hábitat original. Es lección patrimonial extraordinaria: símbolo nacional cuya preservación depende de tres acciones combinadas (conservación de bosque andino nublado, propagación ética legal vía vivero CITES, y rechazo absoluto al tráfico ilegal de plantas silvestres), un ejemplo viviente de cómo Colombia puede honrar su biodiversidad emblemática mediante ciencia, ley y cuidado comunitario en lugar de saqueo. Fuentes Tier A: Bernal et al. 2015 Catálogo Plantas y Líquenes Colombia, POWO Kew, GBIF Backbone Taxonomy, IAvH Humboldt Flora Alto-Andina, SiB Colombia, JBB Plantas Medicinales, libro rojo plantas Colombia.",
+  "sources": [
+    {
+      "id": "bernal-2015-plantas-liquenes-colombia",
+      "title": "bernal-2015-plantas-liquenes-colombia",
+      "tier": "A",
+      "url": "http://catalogoplantasdecolombia.unal.edu.co"
+    },
+    {
+      "id": "powo-kew",
+      "title": "powo-kew",
+      "tier": "A",
+      "url": "https://powo.science.kew.org"
+    },
+    {
+      "id": "gbif-taxonomic-backbone",
+      "title": "gbif-taxonomic-backbone",
+      "tier": "A",
+      "url": "https://www.gbif.org/dataset/d7dddbf4-2cf0-4f39-9b2a-bb099caae36c"
+    },
+    {
+      "id": "humboldt-flora-alto-andina",
+      "title": "humboldt-flora-alto-andina",
+      "tier": "A",
+      "url": null
+    },
+    {
+      "id": "sib-colombia",
+      "title": "sib-colombia",
+      "tier": "A",
+      "url": "https://sibcolombia.net"
+    },
+    {
+      "id": "jbb-plantas-medicinales",
+      "title": "jbb-plantas-medicinales",
+      "tier": "A",
+      "url": null
+    },
+    {
+      "id": "libro-rojo-plantas-colombia",
+      "title": "libro-rojo-plantas-colombia",
+      "tier": "A",
+      "url": null
+    }
+  ],
+  "_generated_by": "scripts/build-cycle-content-from-catalog.mjs",
+  "_generated_at": "2026-05-19T00:42:57.390Z"
+}

@@ -1,0 +1,86 @@
+{
+  "species_slug": "cedrela_odorata",
+  "scientific_name": "Cedrela odorata L.",
+  "common_names": [
+    "Cedro real"
+  ],
+  "family": "Meliaceae",
+  "category": "arboles_sombra",
+  "cultivable": true,
+  "conservation_status": "nativo_protegido",
+  "thermal_zones": [
+    "calido",
+    "templado"
+  ],
+  "roles_in_guild": [
+    "biomass_producer",
+    "windbreak",
+    "nurse_plant",
+    "pollinator_attractor"
+  ],
+  "antagonists": [],
+  "especies_nativas_sustitutas": [],
+  "propagation": {
+    "methods": [
+      "semilla"
+    ],
+    "best_method": "semilla",
+    "protocol_resumen": "Semilla alada recolectada de cápsulas dehiscentes en estación seca. Sin tratamiento pre-germinativo. Germinación 70-90% a 15-25 días en bandejas con sustrato orgánico. Trasplante a bolsa 1.5-2 kg a las 6 semanas. Plantación definitiva a los 4-6 meses (30-40 cm altura). Vivero a sombra parcial 50%.",
+    "tiempo_a_establecimiento_dias": 60,
+    "notas": "Crítico manejo contra Hypsipyla grandella (barrenador del cedro) que perfora yema apical y deforma fuste. Asocio con sombrío parcial (café, cacao) o plantación bajo dosel disminuye ataque vs plantación a plena exposición.",
+    "fuente": "Cárdenas & Salinas 2007 'Libro Rojo Plantas Colombia'; CONIF/Cárdenas; CATIE manuales agroforestales meliáceas tropicales"
+  },
+  "requirements": {
+    "agua": "medio",
+    "altitud_msnm": {
+      "min_absoluto": 0,
+      "optimo_min": 200,
+      "optimo_max": 1500,
+      "max_absoluto": 1900
+    },
+    "temperatura_c": {
+      "helada_letal": 2,
+      "optimo_min": 18,
+      "optimo_max": 28,
+      "max_tolerable": 34
+    },
+    "radiacion": "sol_pleno",
+    "drenaje_requerido": "bueno"
+  },
+  "valor_pedagogico": "El cedro real (Cedrela odorata L., Meliaceae) es uno de los árboles maderables más patrimoniales de la América tropical, nativo desde el sur de México hasta el norte de Argentina. En Colombia se distribuye en bosques húmedos y secos tropicales y premontanos de las regiones Caribe (Magdalena, Cesar, Bolívar, Sucre, Córdoba, La Guajira), Andina (valles interandinos del Magdalena, Cauca, Patía, en Tolima, Huila, Valle, Antioquia, Santander, Norte de Santander), Pacífico (Chocó, Valle), Orinoquía (piedemonte llanero Casanare, Meta) y Amazonía (piedemonte caqueteño y putumayense) entre 0 y 1.500 msnm en zona térmica cálida a templada. Árbol caducifolio de 20-35 m de altura con fuste recto cilíndrico y corteza fisurada, hojas pinnadas grandes con folíolos lanceolados que despiden olor característico a ajo o cedro al romperlas (epíteto 'odorata'), flores pequeñas blanco-verdosas en panículas terminales melíferas, cápsulas leñosas dehiscentes con semillas aladas dispersadas por viento. Madera aromática rojiza muy apreciada en ebanistería fina, instrumentos musicales (guitarras clásicas), cajas para puros cubanos, construcción naval, mueblería de lujo. Históricamente sobreexplotada: poblaciones silvestres reducidas en >70% del rango original, listada en Apéndice III CITES Colombia y Libro Rojo Plantas Colombia como vulnerable. Su asocio agroecológico clásico es con café y cacao bajo sombrío diversificado, donde el dosel parcial reduce hasta un 60% el ataque del barrenador Hypsipyla grandella (lepidóptero Pyralidae que perfora la yema apical y deforma el fuste en plantaciones puras a plena exposición), aporta biomasa hojarasca rica en N, hospeda fauna polinizadora y eventualmente provee madera de valor patrimonial para herencia familiar (turno 25-35 años a diámetros >40 cm). Manejo agroecológico: vivero a sombra 50%, plantación definitiva entre cacaotales o cafetales, podas de formación años 2-4 para fuste recto, raleos progresivos años 8-14-20, cosecha de semilla genéticamente seleccionada. Es lección de soberanía maderera: en lugar de teca asiática o pino radiata exótico, el cedro colombiano provee maderas finas locales con menor huella ecológica y valor cultural patrimonial. Fuentes Tier A: Cárdenas & Salinas 2007 Libro Rojo Plantas Colombia, Bernal et al. 2015 Catálogo Plantas y Líquenes Colombia, POWO Kew, GBIF Backbone Taxonomy, CATIE/CONIF manuales agroforestales meliáceas tropicales.",
+  "companions_markdown": "### Especies asociadas favorables\n\nEstas especies favorecen el cultivo cuando se siembran cerca:\n- coffea_arabica — Café caturra / Castillo / Cenicafé 1 (Coffea arabica L.)\n- cordia_alliodora — Nogal cafetero (Cordia alliodora (Ruiz & Pav.) Oken)\n- erythrina_edulis — Chachafruto / Balú (Erythrina edulis Triana ex Micheli)\n- inga_edulis — Guamo (Inga edulis Mart.)",
+  "sources": [
+    {
+      "id": "libro-rojo-plantas-colombia",
+      "title": "libro-rojo-plantas-colombia",
+      "tier": "A",
+      "url": null
+    },
+    {
+      "id": "bernal-2015-plantas-liquenes-colombia",
+      "title": "bernal-2015-plantas-liquenes-colombia",
+      "tier": "A",
+      "url": "http://catalogoplantasdecolombia.unal.edu.co"
+    },
+    {
+      "id": "powo-kew",
+      "title": "powo-kew",
+      "tier": "A",
+      "url": "https://powo.science.kew.org"
+    },
+    {
+      "id": "gbif-taxonomic-backbone",
+      "title": "gbif-taxonomic-backbone",
+      "tier": "A",
+      "url": "https://www.gbif.org/dataset/d7dddbf4-2cf0-4f39-9b2a-bb099caae36c"
+    },
+    {
+      "id": "perez-arbelaez-1947-plantas-utiles",
+      "title": "perez-arbelaez-1947-plantas-utiles",
+      "tier": "A",
+      "url": null
+    }
+  ],
+  "_generated_by": "scripts/build-cycle-content-from-catalog.mjs",
+  "_generated_at": "2026-05-19T00:42:57.388Z"
+}
