@@ -1,0 +1,71 @@
+{
+  "species_slug": "bartsia_santolinifolia",
+  "scientific_name": "Bartsia santolinifolia (Kunth) Benth.",
+  "common_names": [
+    "Santolina paramuna"
+  ],
+  "family": "Orobanchaceae",
+  "category": "ornamentales_nativas",
+  "cultivable": false,
+  "conservation_status": "nativo_silvestre",
+  "thermal_zones": [
+    "paramo",
+    "frio"
+  ],
+  "roles_in_guild": [
+    "pollinator_attractor",
+    "ground_cover"
+  ],
+  "antagonists": [],
+  "especies_nativas_sustitutas": [],
+  "propagation": {
+    "metodo_principal": "semilla",
+    "notas": "Hierba perenne paramuna hemiparásita facultativa de raíces de otras especies (Orobanchaceae es familia de plantas parásitas y hemiparásitas), con hojas pequeñas finamente divididas (parecidas a las de santolina mediterránea, de ahí el epíteto), tallos erectos y flores tubulares moradas-violáceas vistosas atractivas para colibríes de altura. Ecológicamente compleja: requiere asocio radicular con planta hospedera (pajonal de Calamagrostis o frailejón). NO cultivable en condiciones convencionales por dependencia obligada de hospedera. Valor in-situ paramuno."
+  },
+  "requirements": {
+    "agua": "medio",
+    "altitud_msnm": {
+      "min_absoluto": 2800,
+      "optimo_min": 3200,
+      "optimo_max": 3900,
+      "max_absoluto": 4300
+    },
+    "temperatura_c": {
+      "helada_letal": -12,
+      "optimo_min": 2,
+      "optimo_max": 10,
+      "max_tolerable": 17
+    },
+    "radiacion": "sol_pleno",
+    "drenaje_requerido": "bueno"
+  },
+  "valor_pedagogico": "La santolina paramuna o trompetilla de páramo (Bartsia santolinifolia (Kunth) Benth., familia Orobanchaceae, anteriormente clasificada en Scrophulariaceae sensu lato antes de la reorganización filogenética de las Lamiales) es una hierba perenne paramuna emblemática de los frailejonales-pajonales colombianos, reconocible por sus hojas pequeñas finamente divididas (lobulado-pinnadas, 1-3 cm largo) muy similares en aspecto a las de la santolina mediterránea (Santolina chamaecyparissus) — de ahí el epíteto específico 'santolinifolia' = con hojas de santolina —, sus tallos erectos cespitosos de 10-40 cm altura, y especialmente por sus flores tubulares vistosas (2-3 cm largo) de corola morada-violácea intensa con dos labios bilabiados (labio superior estrecho-galeado, labio inferior trilobado) que la hacen una de las plantas más atractivas visualmente del paisaje paramuno colombiano y un importante recurso nectarífero para colibríes de altura. En Colombia se distribuye en páramos y subpáramos de las tres cordilleras (Oriental: Sumapaz, Chingaza, Cocuy, Pisba, Santurbán; Central: Los Nevados, Las Hermosas, Puracé, Doña Juana; Occidental: Frontino-Urrao, Paramillo, Tatamá) entre 2.800 y 4.300 msnm, con óptimo en 3.200-3.900 msnm en pajonales de Calamagrostis, frailejonales de Espeletia y matorrales paramunos de Diplostephium-Pentacalia-Hypericum. Lección viva de parasitismo radicular vegetal en ecosistemas paramunos y de evolución de Orobanchaceae: la familia Orobanchaceae es una familia botánicamente fascinante porque incluye un gradiente evolutivo completo desde plantas autótrofas no parásitas (Lindenbergia) hasta hemiparásitas facultativas (Bartsia, Pedicularis, Castilleja, Euphrasia, Rhinanthus, Odontites — que tienen clorofila y fotosintetizan pero también extraen agua y nutrientes minerales de raíces de plantas hospederas a través de órganos especializados llamados haustorios) hasta holoparásitas obligadas (Orobanche, Cistanche, Phelipanche, Striga, Conopholis, Aphyllon — que carecen de clorofila completa y dependen 100% del flujo de fotosintatos del hospedero). Bartsia santolinifolia es HEMIPARÁSITA FACULTATIVA: contiene clorofila y fotosintetiza pero también desarrolla haustorios radiculares que penetran en las raíces de plantas hospederas (típicamente gramíneas paramunas como Calamagrostis effusa, Calamagrostis bogotensis, Festuca dolichophylla, Agrostis perennans y en menor grado frailejones de Espeletia y otras dicotiledóneas paramunas) de las cuales extrae agua, nitrógeno mineral, fósforo, potasio y otros nutrientes minerales que complementan su nutrición autotrófica. Esta estrategia mixta hemiparásita le da ventaja competitiva en suelos paramunos pobres en nutrientes y secos por exposición a viento-radiación-helada. La consecuencia ecológica práctica es enorme: B. santolinifolia (y todas las Bartsia/Pedicularis/Castilleja paramunas) son ECOLÓGICAMENTE NO-AISLABLES de sus hospederas. Cualquier intento de cultivo ex-situ en jardín-vivero requiere presencia obligada de Calamagrostis u otra hospedera apropiada en el mismo macetón-cantero; el cultivo en monocultivo aislado fracasa por carencia de fuente haustorial. Esta dependencia obligada con el cortejo florístico paramuno hace que B. santolinifolia sea una especie indicadora robusta de integridad ecosistémica paramuna: solo persiste en páramos con cobertura de pajonal-frailejonal funcional, declina rápidamente con degradación por quema-pastoreo-minería. Servicio ecosistémico: recurso nectarífero estratégico para avifauna nectarívora paramuna especializada — colibríes de altura como Eriocnemis cupreoventris (zamarrito cobrizo), Eriocnemis vestita (calzadito gorgiazul), Aglaeactis cupripennis (rayito brillante), Pterophanes cyanopterus (alas grandes alizafiro), Lesbia victoriae (cola larga azul), Oxypogon guerinii (chivito), Aglaiocercus kingii (cola larga verdiazul), Coeligena lutetiae (incaco coliplomo). La flor tubular morada de B. santolinifolia es coevolutivamente apropiada al pico-recto-largo de estos colibríes. Manejo (NO cultivo doméstico recomendado por dependencia obligada de hospedera y por pertenencia a ecosistema paramuno protegido por Ley 1930/2018): observación in-situ en páramo, fotografía, estudio ecológico. NO recolectar en Parques Nacionales Naturales sin permiso CAR. Si se requiere para restauración ecológica de páramo degradado, propagación por semilla en asocio obligado con Calamagrostis (siembra simultánea de pajonal + Bartsia), germinación 30-60 días, plantación definitiva 8-10 meses asociada a pajonal establecido, asocio con otras especies paramunas (Espeletia, Hypericum, Disterigma, Pernettya, Senecio). Fuentes Tier A: POWO Kew, GBIF Taxonomic Backbone, GBIF Colombia, Bernal 2015 Catálogo Plantas Colombia, Humboldt Flora de Páramos, Molau Bartsia Monograph, JBB Jardín Botánico de Bogotá.",
+  "sources": [
+    {
+      "id": "powo-kew",
+      "title": "powo-kew",
+      "tier": "A",
+      "url": "https://powo.science.kew.org"
+    },
+    {
+      "id": "gbif-taxonomic-backbone",
+      "title": "gbif-taxonomic-backbone",
+      "tier": "A",
+      "url": "https://www.gbif.org/dataset/d7dddbf4-2cf0-4f39-9b2a-bb099caae36c"
+    },
+    {
+      "id": "gbif-colombia",
+      "title": "gbif-colombia",
+      "tier": "A",
+      "url": "https://www.gbif.org/country/CO"
+    },
+    {
+      "id": "bernal-2015-plantas-liquenes-colombia",
+      "title": "bernal-2015-plantas-liquenes-colombia",
+      "tier": "A",
+      "url": "http://catalogoplantasdecolombia.unal.edu.co"
+    }
+  ],
+  "_generated_by": "scripts/build-cycle-content-from-catalog.mjs",
+  "_generated_at": "2026-05-19T00:42:57.399Z"
+}

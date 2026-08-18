@@ -1,0 +1,88 @@
+{
+  "species_slug": "mauritia_minor",
+  "scientific_name": "Mauritia minor Burret",
+  "common_names": [
+    "Canangucho menor"
+  ],
+  "family": "Arecaceae",
+  "category": "frutales_perennes",
+  "cultivable": true,
+  "conservation_status": "nativo_silvestre",
+  "thermal_zones": [
+    "calido"
+  ],
+  "roles_in_guild": [
+    "crop",
+    "pollinator_attractor"
+  ],
+  "antagonists": [],
+  "especies_nativas_sustitutas": [],
+  "propagation": {
+    "methods": [
+      "semilla"
+    ],
+    "best_method": "semilla",
+    "protocol_resumen": "Semilla muy recalcitrante (pierde viabilidad en 4-6 semanas a temperatura ambiente). Pretratamiento: limpiar de pulpa, escarificado mecánico ligero o remojo 48-72h. Germinación lenta 60-180 días en sustrato húmedo permanente (turba + arena 2:1). Palma DIOICA (machos y hembras separadas — solo hembras producen frutos), productiva a 8-12 años desde semilla. Plantación en humedales-aguajales-morichales naturales o restauración de zonas bajas inundables.",
+    "tiempo_a_establecimiento_dias": 180,
+    "notas": "Distinta de Mauritia flexuosa (canangucho mayor / moriche / aguaje grande, palma emblema Llanos-Amazonía colombiana) — Mauritia minor es palma de menor porte (8-15 m vs 25-35 m), distribución más restringida a humedales bajos Vaupés-Guainía-Putumayo-Caquetá-Amazonas Orinoquia y enclaves específicos.",
+    "fuente": "POWO Kew; GBIF; Sinchi Amazonía colombiana; Pérez Arbeláez 1947; SiB Colombia"
+  },
+  "requirements": {
+    "agua": "pantanoso",
+    "altitud_msnm": {
+      "min_absoluto": 100,
+      "optimo_min": 150,
+      "optimo_max": 500,
+      "max_absoluto": 800
+    },
+    "temperatura_c": {
+      "helada_letal": 8,
+      "optimo_min": 23,
+      "optimo_max": 30,
+      "max_tolerable": 36
+    },
+    "radiacion": "sol_pleno",
+    "drenaje_requerido": "pantanoso"
+  },
+  "valor_pedagogico": "El canangucho menor o moriche pequeño (Mauritia minor Burret, Arecaceae) es una palma neotropical nativa de humedales y aguajales de zonas bajas inundables de la cuenca amazónica-orinoquia colombo-venezolano-brasileña (Colombia: Vaupés, Guainía, Vichada, Putumayo, Caquetá, Amazonas, enclaves específicos en Meta y Casanare; Venezuela: Amazonas y Bolívar; Brasil: Roraima, Amazonas — humedales restringidos), distinta de su hermana mucho más conocida Mauritia flexuosa (canangucho mayor / moriche / aguaje / buriti — la palma emblema de los Llanos colombo-venezolanos y de la Amazonía peruano-brasileña, frecuente en morichales-aguajales-buritizales — palma de hasta 25-35 m altura). Mauritia minor es palma de PORTE MENOR (8-15 m altura vs 25-35 m de M. flexuosa) y distribución mucho MÁS RESTRINGIDA a humedales bajos del piedemonte amazónico-orinoquia entre 100 y 500 msnm, con preferencia por suelos saturados permanentemente (carácter de Mauritia compartido — adaptación a anegamiento crónico con neumatóforos y raíces adventicias aéreas), temperaturas cálidas 23-30 °C, sol pleno. Palma SOLITARIA (no cespitosa, distinta de Bactris, Astrocaryum) con estipe único columnar liso gris-marrón con cicatrices foliares anulares prominentes, corona apical de 8-15 hojas grandes palmadas-costapalmadas verde-claro brillante (3-5 m largo) con segmentos rígidos pendulares colgantes característicos de Mauritia (la \"corona péndula\" da el aspecto inconfundible del género). Característica botánica destacada: DIOICIA ESTRICTA — los individuos son macho o hembra separados (no hermafroditas), solo las palmas hembras producen frutos. Inflorescencias grandes pendulares ramificadas con miles de flores pequeñas amarillo-cremosas polinizadas principalmente por escarabajos y mosquitas-de-las-palmas (Curculionidae, Drosophilidae). Frutos drupa elipsoide-aovada pequeña-mediana (3-5 cm — significativamente más pequeños que los de M. flexuosa que alcanzan 5-7 cm) con cáscara escamosa marrón-rojiza brillante característica de Mauritia (escamas romboidales imbricadas — carácter taxonómico inmediato del género), pulpa amarillo-anaranjada fibrosa-cremosa aceitosa muy rica en betacaroteno (provitamina A — concentraciones altas, lección nutricional sobre biofortificación natural), aceite vegetal comestible, ácidos grasos insaturados y vitamina E, con un hueso grande interno. Importancia cultural y ecológica enorme para pueblos indígenas amazónico-orinoquia (Tikuna, Huitoto, Bora, Sikuani, Cubeo, Kurripaco, Wayuu interior, Piapoco) que aprovechan toda la palma: frutos para alimento humano (consumo directo, masas fermentadas-no-fermentadas, jugos refrescantes \"champu de canangucho\"), hojas para techos de malocas y artesanías-canastos-esteras, fibras para cuerdas-redes-hamacas tradicionales, larvas comestibles de gorgojos (Rhynchophorus palmarum — \"mojojoy\") que crecen en estipes muertos como fuente proteica destacada de las dietas indígenas, palmito comestible de palmas jóvenes (en sostenibilidad — no debe extraerse de poblaciones silvestres). Función pedagógica excepcional: enseña a niñas y niños (1) palmas Arecaceae como familia clave de selva tropical-humedales sudamericanos (junto con Euterpe açaí, Bactris chontaduro, Attalea seje-mil-pesos, Astrocaryum corozo, Oenocarpus seje-bacaba), (2) DIOICIA estricta como sistema reproductivo (compárese con monoicas como cocotero, palma africana, dátiles), (3) adaptaciones a humedales tropicales saturados (neumatóforos, raíces adventicias aéreas, copa péndula tolerante a vientos), (4) BIOFORTIFICACIÓN NATURAL con betacaroteno-provitamina A — el canangucho es uno de los frutos más ricos en provitamina A del planeta (lección nutricional sobre soberanía alimentaria indígena vs alimentos ultraprocesados industriales), (5) aprovechamiento integral indígena de la palma (alimento humano-techo-fibras-larvas comestibles-palmito) como ejemplo de \"todo se aprovecha\" — sostenibilidad cultural amazónica, (6) DISTINCIÓN entre canangucho menor (M. minor — palma pequeña restringida humedales bajos) vs canangucho mayor (M. flexuosa — palma grande Llanos-Amazonía-Pantanal) — lección taxonómica de especies hermanas congenéricas con distribución y tamaño distintos. Fuentes Tier A: GBIF, POWO Kew, Sinchi Amazonía colombiana, Pérez Arbeláez 1947, SiB Colombia, Bernal 2015.",
+  "sources": [
+    {
+      "id": "gbif-taxonomic-backbone",
+      "title": "gbif-taxonomic-backbone",
+      "tier": "A",
+      "url": "https://www.gbif.org/dataset/d7dddbf4-2cf0-4f39-9b2a-bb099caae36c"
+    },
+    {
+      "id": "powo-kew",
+      "title": "powo-kew",
+      "tier": "A",
+      "url": "https://powo.science.kew.org"
+    },
+    {
+      "id": "sinchi-amazonia-colombiana",
+      "title": "sinchi-amazonia-colombiana",
+      "tier": "A",
+      "url": null
+    },
+    {
+      "id": "perez-arbelaez-1947-plantas-utiles",
+      "title": "perez-arbelaez-1947-plantas-utiles",
+      "tier": "A",
+      "url": null
+    },
+    {
+      "id": "sib-colombia",
+      "title": "sib-colombia",
+      "tier": "A",
+      "url": "https://sibcolombia.net"
+    },
+    {
+      "id": "bernal-2015-plantas-liquenes-colombia",
+      "title": "bernal-2015-plantas-liquenes-colombia",
+      "tier": "A",
+      "url": "http://catalogoplantasdecolombia.unal.edu.co"
+    }
+  ],
+  "_generated_by": "scripts/build-cycle-content-from-catalog.mjs",
+  "_generated_at": "2026-05-19T00:42:57.399Z"
+}

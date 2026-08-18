@@ -1,0 +1,9 @@
+{
+  "version": 1,
+  "description": "Catálogo de casos de estudio demo seed. Hidratan al store on first-run vía hydrateDemoCases() (idempotente por id).",
+  "cases": [
+    "demo-mancha-foliar-fresa.json",
+    "demo-trozador-tomate.json",
+    "demo-deficiencia-n-lechuga.json"
+  ]
+}

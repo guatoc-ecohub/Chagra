@@ -1,0 +1,77 @@
+{
+  "species_slug": "capsicum_baccatum_aji_amarillo",
+  "scientific_name": "Capsicum baccatum L.",
+  "common_names": [
+    "Ají amarillo andino"
+  ],
+  "family": "Solanaceae",
+  "category": "hortalizas_fruto_flor",
+  "cultivable": true,
+  "conservation_status": "cultivo_comun",
+  "thermal_zones": [
+    "templado",
+    "frio"
+  ],
+  "roles_in_guild": [
+    "crop",
+    "pollinator_attractor"
+  ],
+  "antagonists": [],
+  "especies_nativas_sustitutas": [],
+  "propagation": {
+    "metodo_principal": "semilla",
+    "notas": "Germinación 10-20 días a 20-25°C (más lenta que C. annuum). Trasplante a las 8 semanas. Distancia 60-80 cm. Ciclo 5-7 meses a primera cosecha. Más rústico al frío andino que otras especies de Capsicum."
+  },
+  "requirements": {
+    "agua": "medio",
+    "altitud_msnm": {
+      "min_absoluto": 600,
+      "optimo_min": 1500,
+      "optimo_max": 2800,
+      "max_absoluto": 3000
+    },
+    "temperatura_c": {
+      "helada_letal": 0,
+      "optimo_min": 15,
+      "optimo_max": 25,
+      "max_tolerable": 32
+    },
+    "radiacion": "sol_pleno",
+    "drenaje_requerido": "bueno"
+  },
+  "valor_pedagogico": "El ají amarillo andino (Capsicum baccatum L., Solanaceae) es una de las cinco especies de ají domesticadas en los Andes precolombinos, originaria del altiplano boliviano-peruano-noroeste argentino y cultivada ancestralmente en los Andes ecuatorianos y colombianos desde el sur de Nariño hasta Boyacá-Cundinamarca, con presencia documentada en las regiones Andina (Nariño, Cauca, Valle del Cauca, Huila, Tolima, Cundinamarca, Boyacá, Santander) entre 600 y 3.000 msnm en zonas térmicas templadas y frías — su adaptación al clima fresco-frío andino es su rasgo más distintivo frente a otras especies de Capsicum que prefieren climas cálidos. Pertenece a la familia Solanaceae (igual que tomate, papa, pimentón, lulo, tomate de árbol, uchuva, rocoto, ají dulce, ulluco) y al género Capsicum sección Baccatum, hermana evolutiva de C. pubescens (rocoto) con la que comparte adaptación a altitudes altas. El fruto característico es alargado-fusiforme (8-15 cm), color amarillo intenso a anaranjado cuando maduro, con picor moderado a alto (30.000-50.000 SHU equivalente a cayena), sabor afrutado-frutal distintivo con notas a piña-mango (debido a ésteres aromáticos únicos de la especie), excelente para conservas en escabeche, pastas, salsas y cocina andina tradicional. Carácter diagnóstico: corolas blanco-cremas con manchas amarillas en la base de los pétalos (única en el género Capsicum cultivado), distinto a las corolas blanco-puras de C. annuum/chinense. Su nombre quechua 'kellu uchu' significa literalmente 'ají amarillo' y constituye uno de los condimentos icónicos de la cocina peruano-boliviana (papa a la huancaína, ají de gallina, escabeche) que también se cultiva en Colombia andina. Es lección viva de bio-diversidad cultivada y soberanía alimentaria que enseña a niñas y niños cómo cada especie de ají se adaptó a un piso térmico distinto: el chinense al trópico cálido, el baccatum al andino fresco, el pubescens al frío. Manejo agroecológico: propagación por semilla (germinación 10-20 días a 20-25°C, más lenta que C. annuum por adaptación a clima fresco), trasplante a las 8 semanas, distancia 60-80 cm entre plantas, riego regular sin encharcamiento, tutorado obligatorio (planta puede alcanzar 1.5-2 m), cosecha escalonada 5-7 meses, frutos verdes para escabeche y maduros amarillos para pastas. Companion plants: albahaca, cebollín, zanahoria, lechuga. Función en chagra como hortaliza-condimento andina de alto valor agroalimentario y cultural. Fuentes Tier A: GBIF Backbone Taxonomy, POWO Kew, Bernal 2015, AGROSAVIA Manual Frutales Tropicales, Pérez-Arbeláez 1947.",
+  "sources": [
+    {
+      "id": "gbif-taxonomic-backbone",
+      "title": "gbif-taxonomic-backbone",
+      "tier": "A",
+      "url": "https://www.gbif.org/dataset/d7dddbf4-2cf0-4f39-9b2a-bb099caae36c"
+    },
+    {
+      "id": "powo-kew",
+      "title": "powo-kew",
+      "tier": "A",
+      "url": "https://powo.science.kew.org"
+    },
+    {
+      "id": "bernal-2015-plantas-liquenes-colombia",
+      "title": "bernal-2015-plantas-liquenes-colombia",
+      "tier": "A",
+      "url": "http://catalogoplantasdecolombia.unal.edu.co"
+    },
+    {
+      "id": "agrosavia-manual-frutales-tropicales",
+      "title": "agrosavia-manual-frutales-tropicales",
+      "tier": "A",
+      "url": null
+    },
+    {
+      "id": "perez-arbelaez-1947-plantas-utiles",
+      "title": "perez-arbelaez-1947-plantas-utiles",
+      "tier": "A",
+      "url": null
+    }
+  ],
+  "_generated_by": "scripts/build-cycle-content-from-catalog.mjs",
+  "_generated_at": "2026-05-19T00:42:57.393Z"
+}

@@ -1,0 +1,70 @@
+{
+  "species_slug": "desmodium_intortum",
+  "scientific_name": "Desmodium intortum (Mill.) Urb.",
+  "common_names": [
+    "Desmodium verde"
+  ],
+  "family": "Fabaceae",
+  "category": "abonos_verdes_coberturas",
+  "cultivable": true,
+  "conservation_status": "naturalizada",
+  "thermal_zones": [
+    "calido",
+    "templado"
+  ],
+  "roles_in_guild": [
+    "nitrogen_fixer",
+    "ground_cover",
+    "pest_repellent"
+  ],
+  "antagonists": [],
+  "especies_nativas_sustitutas": [],
+  "propagation": null,
+  "requirements": {
+    "agua": null,
+    "altitud_msnm": {
+      "min_absoluto": 0,
+      "optimo_min": 500,
+      "optimo_max": 1800,
+      "max_absoluto": 2200
+    },
+    "temperatura_c": null,
+    "radiacion": null,
+    "drenaje_requerido": null
+  },
+  "valor_pedagogico": "El desmodium verde (Desmodium intortum (Mill.) Urb., Fabaceae-Faboideae) es una leguminosa herbácea rastrera-trepadora perenne nativa de Mesoamérica-Caribe ampliamente difundida en Colombia entre 500 y 1.800 msnm como cobertura viva, forraje y abono verde en sistemas agroforestales de café, cacao, cítricos y frutales (Antioquia, Caldas, Quindío, Risaralda, Tolima, Huila, Valle del Cauca, Cauca, Santander, Cundinamarca cafetera, Casanare premontano). Hierba perenne de tallos delgados (1-3 m largo) postrados o trepadores cubiertos de pelos uncinados (ganchudos) que se adhieren a la ropa y animales — característica que justifica el nombre vernáculo \"pega-pega\". Hojas alternas trifoliadas, foliolo central rómbico-ovado mayor (4-7 cm) verde-oscuro brillante, con manchitas plateadas en el haz en algunas formas. Inflorescencias en racimos axilares con flores papilionadas pequeñas (5-7 mm) rosado-lila a púrpura. Frutos en legumbres articuladas (lomentos) con 5-8 segmentos uncinados que se desprenden individualmente y se adhieren para dispersión zoocórica. Fija nitrógeno biológico atmosférico (~80-150 kg N/ha/año) con Bradyrhizobium. Cobertura viva multipropósito: (1) protege el suelo contra erosión hídrica e impacto de gotas en pendientes cafeteras, (2) suprime malezas competidoras (efecto alelopático leve sobre gramíneas), (3) aporta N y biomasa al suelo (15-30 ton MS/ha/año), (4) forraje complementario para bovinos y conejos (16-22% PC, digestibilidad 55-65%), (5) atractor de polinizadores nativos y enemigos naturales (avispas, mariquitas), (6) componente clave del esquema \"push-pull\" agroecológico africano-colombiano (repele lepidópteros plaga del maíz por emisión de volátiles). Manejo agroecológico: propagación por semilla escarificada (lija o agua caliente, 50-70% germinación en 10-20 días) o estolón enraizado, siembra al voleo a 4-8 kg/ha o líneas a 50 cm, establecimiento 3-5 meses, manejo por pastoreo controlado, segado o poda parcial cada 60-90 días, persistencia 4-8 años, asocia bien con Brachiaria, Megathyrsus, Cynodon y con maíz-frijol-yuca. Lección viva de ecología de leguminosas tropicales: enseña que las \"malezas pega-pega\" del campesinado son en realidad fijadoras de N que dejan el suelo más fértil, y que el manejo agroecológico convierte adversarias en aliadas. Fuentes Tier A: GBIF, POWO Kew, AGROSAVIA Silvopastoriles, AGROSAVIA Forrajeras 2022, AGROSAVIA Leguminosas Andinas.",
+  "sources": [
+    {
+      "id": "gbif-taxonomic-backbone",
+      "title": "gbif-taxonomic-backbone",
+      "tier": "A",
+      "url": "https://www.gbif.org/dataset/d7dddbf4-2cf0-4f39-9b2a-bb099caae36c"
+    },
+    {
+      "id": "powo-kew",
+      "title": "powo-kew",
+      "tier": "A",
+      "url": "https://powo.science.kew.org"
+    },
+    {
+      "id": "agrosavia-silvopastoriles",
+      "title": "agrosavia-silvopastoriles",
+      "tier": "A",
+      "url": null
+    },
+    {
+      "id": "agrosavia-forrajeras-2022",
+      "title": "agrosavia-forrajeras-2022",
+      "tier": "A",
+      "url": null
+    },
+    {
+      "id": "agrosavia-leguminosas-andinas",
+      "title": "agrosavia-leguminosas-andinas",
+      "tier": "A",
+      "url": null
+    }
+  ],
+  "_generated_by": "scripts/build-cycle-content-from-catalog.mjs",
+  "_generated_at": "2026-05-19T00:42:57.387Z"
+}

@@ -1,0 +1,82 @@
+{
+  "species_slug": "valeriana_arborea",
+  "scientific_name": "Valeriana arborea Killip",
+  "common_names": [
+    "Valeriana arbórea (Valeriana arborea)"
+  ],
+  "family": "Caprifoliaceae",
+  "category": "ornamentales_nativas",
+  "cultivable": false,
+  "conservation_status": "endemica_colombia",
+  "thermal_zones": [
+    "paramo"
+  ],
+  "roles_in_guild": [
+    "nurse_plant",
+    "pollinator_attractor"
+  ],
+  "antagonists": [],
+  "especies_nativas_sustitutas": [],
+  "propagation": {
+    "metodo_principal": "semilla",
+    "notas": "Aquenios pequeños con vilano plumoso. Recolección temporada seca. Germinación 30-60 días en sustrato turba + arena 2:1 bajo invernadero de altura. Trasplante bolsa 4-6 meses. Plantación >12 meses a 15-20 cm. Esquejes semileñosos con auxinas también viables (~40-60% prendimiento). Crecimiento lento (~5-8 cm/año). Endémico Colombia, protegido por Ley 1930/2018."
+  },
+  "requirements": {
+    "agua": "alto",
+    "altitud_msnm": {
+      "min_absoluto": 3000,
+      "optimo_min": 3200,
+      "optimo_max": 3800,
+      "max_absoluto": 4100
+    },
+    "temperatura_c": {
+      "helada_letal": -10,
+      "optimo_min": 3,
+      "optimo_max": 11,
+      "max_tolerable": 16
+    },
+    "radiacion": "sol_pleno",
+    "drenaje_requerido": "bueno"
+  },
+  "valor_pedagogico": "La valeriana arbórea (Valeriana arborea Killip, familia Caprifoliaceae sensu APG IV, antes Valerianaceae) es una rareza ecológica y taxonómica del páramo colombiano: una valeriana arborescente — hábito altamente inusual en un género (Valeriana ~250 especies pantemperadas) dominado por hierbas y subarbustos. Endémica de Colombia, restringida a complejos paramunos de la cordillera Oriental (Sumapaz, Chingaza, Cocuy) y porciones del Macizo Colombiano (3.000-4.100 msnm). Descrita por Ellsworth Killip (1890-1968), botánico del Smithsonian Institution especialista en flora andina, durante sus expediciones colombianas 1922-1944. Filogenias moleculares recientes (Bell 2004, Donoghue et al. 2003) reposicionaron Valerianaceae dentro de Caprifoliaceae sensu lato APG IV, agrupándola con Lonicera, Sambucus y Dipsacus en el clado Dipsacales. Arbusto arborescente erecto 1.5-3.5 m altura con tronco corto y ramificación esparcida desde baja, corteza pardo-grisácea estriada. Hojas opuestas decusadas (rasgo diagnóstico de Dipsacales) pinnatífidas a pinnatipartidas (8-18 cm largo) con 3-7 pares de foliolos lanceolados aserrados, glabras a subglabras, fuertemente aromáticas al frote por presencia de valepotriatos y ácido valérico (principios activos sedantes característicos del género — uso etnomédico documentado para infusiones calmantes en tradición campesina cundiboyacense, aunque siempre con la advertencia de NO confundir con especies cultivadas medicinales y de NO extraer del páramo). Inflorescencia en cima corimbiforme terminal grande con numerosas flores pequeñas blancas a blanco-rosadas tubulares 4-7 mm, polinización entomófila por himenópteros andinos (Bombus, abejas Halictidae, Andrenidae), sírfidos y mariposas paramunas. Aquenios pequeños comprimidos coronados por vilano plumoso, dispersión anemócora eficiente. Servicio ecosistémico: recurso polinizador en plena temporada de floración paramuna, nurse plant para regeneración de especies más lentas, contribución a la diversidad estructural del frailejonal-pajonal. Lección viva de biogeografía y radiación adaptativa: el género Valeriana es uno de los grupos angiospermos con mayor proporción de endemismos paramunos colombiano-andinos (>40 especies neotropicales con epicentro andino), V. arborea ilustra la radiación adaptativa \"isleña\" del género en los páramos colombianos, con hábitos que van desde herbáceo rastrero (V. pavonii) a arborescente erecto (V. arborea) pasando por subarbustivo (V. jatamansi andina). Amenazas: extracción ilegal para uso etnomédico (a pesar de la prohibición), quema, fragmentación, expansión papera. Protección legal: Ley 1930/2018, Resolución 1912/2017 MADS-IAvH listado nacional especies amenazadas (varias Valeriana paramunas listadas), Decreto 1076/2015 MADS Compilatorio. Estado conservación: Vulnerable (VU) a En Peligro (EN) según localidad — endemismo restringido + amenaza activa. Manejo agroecológico (restauración ecológica con autorización CAR; PROHIBIDA la extracción etnomédica): recolección aquenios maduros temporada seca, vivero de altura con sustrato turba + arena 2:1, plantación 200-500 ind/ha en frailejonales paramunos en restauración, asocio con Espeletia spp., Aragoa abietina, Hypericum juniperinum. Esquejes semileñosos viables como alternativa propagativa. Fuentes Tier A: Bernal 2015 Catálogo Plantas Colombia (endemismo + autoría), Humboldt Flora Alto-Andina, Libro Rojo Plantas Colombia, GBIF Taxonomic Backbone, POWO Kew, Ley 1930/2018.",
+  "sources": [
+    {
+      "id": "bernal-2015-plantas-liquenes-colombia",
+      "title": "bernal-2015-plantas-liquenes-colombia",
+      "tier": "A",
+      "url": "http://catalogoplantasdecolombia.unal.edu.co"
+    },
+    {
+      "id": "humboldt-flora-alto-andina",
+      "title": "humboldt-flora-alto-andina",
+      "tier": "A",
+      "url": null
+    },
+    {
+      "id": "libro-rojo-plantas-colombia",
+      "title": "libro-rojo-plantas-colombia",
+      "tier": "A",
+      "url": null
+    },
+    {
+      "id": "gbif-taxonomic-backbone",
+      "title": "gbif-taxonomic-backbone",
+      "tier": "A",
+      "url": "https://www.gbif.org/dataset/d7dddbf4-2cf0-4f39-9b2a-bb099caae36c"
+    },
+    {
+      "id": "powo-kew",
+      "title": "powo-kew",
+      "tier": "A",
+      "url": "https://powo.science.kew.org"
+    },
+    {
+      "id": "ley-1930-2018-paramos",
+      "title": "ley-1930-2018-paramos",
+      "tier": "A",
+      "url": null
+    }
+  ],
+  "_generated_by": "scripts/build-cycle-content-from-catalog.mjs",
+  "_generated_at": "2026-05-19T00:42:57.404Z"
+}
