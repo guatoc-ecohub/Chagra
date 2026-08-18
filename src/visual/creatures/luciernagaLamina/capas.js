@@ -10,9 +10,9 @@
  *   - Todo el color sale del PNG. Aquí solo se decide, píxel a píxel, QUÉ
  *     ALFA le toca a cada capa — cero dibujo nuevo.
  *   - Cada pieza "de encima" se DESVANECE en el borde de su corte
- *     (`smoothstep`). El CUERPO de abajo NO se desvanece: se borra con
- *     corte duro SOLO donde una pieza de encima ya es ≥93% opaca — el
- *     detalle que evita la banda translúcida.
+ *     (`smoothstep`). Las capas de ABAJO NO se desvanecen: se borran con
+ *     corte duro SOLO donde la pieza de encima ya es ~opaca (≥99,6%) — el
+ *     detalle que evita la banda translúcida (ver `hard` en `mascaras()`).
  *   - ORDEN DE PRIORIDAD para que dos piezas nunca se disputen el mismo
  *     píxel: antenas > cabeza > mandíbula > manoLapiz > linterna > cuerpo.
  *     (Las antenas van sobre la cabeza con el patrón ANTI-HUECO de las
@@ -127,7 +127,15 @@ function mascaraLinterna(x, y) {
  * del cuerpo — así el cuerpo se borra bajo TODA la testa.
  */
 export function mascaras() {
-  const hard = (m) => 1 - ss(0.93, 1.0, m);
+  // Corte DURO para restar una pieza de la capa de ABAJO: la capa conserva
+  // el píxel COMPLETO hasta que la pieza de encima es ~opaca (umbral 0,996;
+  // con el 0,93 anterior, en la banda del desvanecido ambas capas quedaban
+  // semiopacas y el compuesto over perdía alfa — el informe midió 1.778 px
+  // con déficit >0,5/255, máx 63,75/255: banda pálida visible). El residuo
+  // máximo de esta rampa es ~0,36/255 < 0,5/255: por debajo de lo medible.
+  // Regla de la casa: resta sobre capa de ABAJO → dura; VENTANA sobre capa
+  // de ENCIMA (p. ej. las piernas en la linterna) → suave.
+  const hard = (m) => 1 - ss(0.996, 1, m);
   const mCabezaFull = (x, y) => mascaraCabeza(x, y);
   const mAntenaIzq = (x, y) => mascaraAntena(x, y, ANTENA_IZQ);
   const mAntenaDer = (x, y) => mascaraAntena(x, y, ANTENA_DER);
@@ -135,11 +143,17 @@ export function mascaras() {
   // La cabeza que se PINTA = testa completa menos lo que vive aparte. Las
   // antenas se restan por su parte ALTA (`baseSub`): la base queda TAMBIÉN
   // en la cabeza (anti-hueco al girar); la mandíbula se resta entera (baja
-  // en bloque, el interior sintético respalda el hueco).
+  // en bloque, el interior sintético respalda el hueco). Las restas son de
+  // corte DURO: con (1-m), en la banda de fade el compuesto "pieza over
+  // cabeza-restada" da 0,5 over 0,5 = 0,75 de alfa — un anillo translúcido
+  // PERMANENTE en los flancos de las antenas y bajo la mandíbula. Con hard
+  // la cabeza conserva el píxel completo de respaldo y la pieza pinta
+  // encima: en reposo el compuesto es idéntico a la lámina; al articular,
+  // el respaldo estático queda detrás.
   const mCabezaRender = (x, y) => mCabezaFull(x, y)
-    * (1 - mascaraAntenaSub(x, y, ANTENA_IZQ)) * (1 - mascaraAntenaSub(x, y, ANTENA_DER))
-    * (1 - mMandibula(x, y));
-  const mManoLapiz = (x, y) => mascaraMano(x, y) * (1 - mCabezaFull(x, y));
+    * hard(mascaraAntenaSub(x, y, ANTENA_IZQ)) * hard(mascaraAntenaSub(x, y, ANTENA_DER))
+    * hard(mMandibula(x, y));
+  const mManoLapiz = (x, y) => mascaraMano(x, y) * hard(mCabezaFull(x, y));
   const mLinterna = (x, y) => mascaraLinterna(x, y);
   const mCuerpo = (x, y) => hard(mCabezaFull(x, y)) * hard(mAntenaIzq(x, y))
     * hard(mAntenaDer(x, y)) * hard(mManoLapiz(x, y)) * hard(mLinterna(x, y));
