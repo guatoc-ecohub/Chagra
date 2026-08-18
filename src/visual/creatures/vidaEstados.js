@@ -128,6 +128,18 @@ export const VIDA_REPERTORIO = {
       reposo: { dur: 4400, peso: 1 }, // 1× rh-g-reposo — bicho menudo, descansa poco
     },
   },
+  /* Oxypogon guerinii, versión punk (rama `feat/chivito-punk-lamina-viva`).
+     Colibrí de páramo: inquieto como el colibrí de arriba, pero su firma no
+     es acicalarse — es el headbang (la cresta mohawk azota con la testa) y
+     apuntar en el aire con el lápiz (el escribano de páramo). */
+  'chivito-punk': {
+    descanso: [2600, 6400], // punk de páramo: colibrí al fin, casi no para
+    momentos: {
+      rockea: { dur: 2600, peso: 2.5 }, // 4× clv-rockea-cabeza 0.65s — headbang, la cresta entera azota
+      apunta: { dur: 3200, peso: 1.5 }, // 4× clv-apunta-mano 0.8s (1× clv-apunta-cabeza 3.2s) — escribe en el aire
+      reposo: { dur: 4400, peso: 0.8 }, // 1× rh-g-reposo — descansa POCO, es punk
+    },
+  },
   dalmata: {
     descanso: [2600, 6400], // perro joven: gesticula seguido, casi no se aquieta
     momentos: {

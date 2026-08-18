@@ -19,6 +19,9 @@
  * Oso del bastón (2026-08-18, `feat/oso-lamina-viva`): mismo trasplante —
  * ahora es `OsoBastonLaminaViva` (la lámina real `oso.png` en capas por
  * alfa), así que su raíz también pasó de `svg` a `div`.
+ * Chivito (`feat/chivito-punk-lamina-viva`): misma migración que el jaguar —
+ * ahora es `ChivitoPunkLaminaViva` (la lámina aprobada en capas, raíz
+ * `<div>`), mismo contrato observable.
  */
 import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
@@ -38,7 +41,7 @@ const CASOS = [
     { Component: ChagraAgentAvatarOsoBaston, nombre: 'Oso del bastón', slug: 'oso-baston', raiz: raizDiv },
     { Component: ChagraAgentAvatarLuciernaga, nombre: 'Luciérnaga', slug: 'luciernaga', raiz: raizSvg },
     { Component: ChagraAgentAvatarGuacamaya, nombre: 'Guacamaya', slug: 'guacamaya', raiz: raizSvg },
-    { Component: ChagraAgentAvatarChivitoPunk, nombre: 'Chivito', slug: 'chivito-punk', raiz: raizSvg },
+    { Component: ChagraAgentAvatarChivitoPunk, nombre: 'Chivito', slug: 'chivito-punk', raiz: raizDiv },
 ];
 
 // for...of en vez de describe.each: con describe.each, el linter no rastrea
