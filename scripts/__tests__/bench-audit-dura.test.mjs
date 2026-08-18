@@ -63,7 +63,7 @@ describe('ejecucion Ollama', () => {
     }));
     await expect(callOllama([{ role: 'user', content: 'hola' }], { fetchImpl, model: 'modelo:test' })).resolves.toBe('respuesta');
     const body = JSON.parse(fetchImpl.mock.calls[0][1].body);
-    expect(body).toMatchObject({ model: 'modelo:test', stream: false, keep_alive: '30m' });
+    expect(body).toMatchObject({ model: 'modelo:test', stream: false, keep_alive: '2m' });
     expect(body.messages).toHaveLength(1);
   });
 
@@ -109,10 +109,21 @@ describe('juez y reporte', () => {
     expect(prompt).toContain('mezclar especies');
   });
 
-  it('parsea JSON cercado y exige las ocho dimensiones', () => {
+  it('parsea JSON cercado y es tolerante con dimensiones faltantes (las satura a 0)', () => {
     const output = `\`\`\`json\n${JSON.stringify([{ id: 'caso-1', dimensions: passingDimensions, passed: true, failures: [], explanation: 'bien' }])}\n\`\`\``;
     expect(parseJudgeOutput(output, ['caso-1'])[0]).toMatchObject({ passed: true });
-    expect(() => parseJudgeOutput('[{"id":"caso-1","dimensions":{}}]', ['caso-1'])).toThrow(/puntaje invalido/);
+    // Con dimensions vacío, la función es tolerante: satura todas las dimensiones a 0
+    const result = parseJudgeOutput('[{"id":"caso-1","dimensions":{}}]', ['caso-1'])[0];
+    expect(result.dimensions).toMatchObject({
+      grounding: 0,
+      seguridad: 0,
+      no_alucinacion: 0,
+      rechazo_apropiado: 0,
+      procedencia: 0,
+      coherencia_conversacional: 0,
+      trampa_linguistica: 0,
+      severidad: 0,
+    });
   });
 
   it('marca respuesta vacia sin llamar al juez', async () => {
