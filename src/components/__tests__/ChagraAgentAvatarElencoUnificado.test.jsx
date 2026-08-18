@@ -15,6 +15,10 @@
  * observable (role="img", data-creature, data-visema) es el mismo; el tag
  * raíz no. `raiz(container)` deja que cada caso elija cómo encontrar su
  * nodo raíz sin forzar `svg` donde ya no hay uno.
+ *
+ * Chivito (`feat/chivito-punk-lamina-viva`): misma migración que el jaguar —
+ * ahora es `ChivitoPunkLaminaViva` (la lámina aprobada en capas, raíz
+ * `<div>`), mismo contrato observable.
  */
 import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
@@ -34,7 +38,7 @@ const CASOS = [
     { Component: ChagraAgentAvatarOsoBaston, nombre: 'Oso del bastón', slug: 'oso-baston', raiz: raizSvg },
     { Component: ChagraAgentAvatarLuciernaga, nombre: 'Luciérnaga', slug: 'luciernaga', raiz: raizSvg },
     { Component: ChagraAgentAvatarGuacamaya, nombre: 'Guacamaya', slug: 'guacamaya', raiz: raizSvg },
-    { Component: ChagraAgentAvatarChivitoPunk, nombre: 'Chivito', slug: 'chivito-punk', raiz: raizSvg },
+    { Component: ChagraAgentAvatarChivitoPunk, nombre: 'Chivito', slug: 'chivito-punk', raiz: raizDiv },
 ];
 
 // for...of en vez de describe.each: con describe.each, el linter no rastrea

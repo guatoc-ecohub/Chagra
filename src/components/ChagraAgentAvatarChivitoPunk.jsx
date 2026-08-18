@@ -1,20 +1,33 @@
-import ChivitoPunk from '../visual/creatures/ChivitoPunk';
+import ChivitoPunkLaminaViva from '../visual/creatures/ChivitoPunkLaminaViva';
 
 /**
  * ChagraAgentAvatarChivitoPunk — el chivito de páramo (Oxypogon guerinii)
- * como CARA del agente de Chagra, 6ta opción del elenco unificado
+ * versión punk como CARA del agente de Chagra, del elenco unificado
  * (2026-08-14). Slug canónico `chivito-punk` (colapso `chivito`→`chivito-punk`
  * ya resuelto en `compai/nucleo/elenco.js`, #96 — un solo pájaro, no dos).
  *
- * Cierra el ítem #8 del GAP compAI: el chivito no tenía cuerpo en la PWA
- * (`ELENCO['chivito-punk'].enPWA` seguía `false`); ahora lo tiene reusando el
- * rig F24 del valle (`visual/creatures/ChivitoPunk.jsx`, ver ese archivo).
+ * Rama `feat/chivito-punk-lamina-viva` (quinta del lote lámina-viva):
+ * reemplaza el cuerpo del rig F24 del valle (`ChivitoPunk.jsx`, SVG reusado)
+ * por `ChivitoPunkLaminaViva` — la lámina APROBADA (`chivito-punk.png`: la
+ * cresta mohawk de puntas moradas, la barba-gorguera, el lápiz alzado y la
+ * libreta) recortada en capas por alfa y montada sobre el mismo sistema de
+ * vida del jaguar lámina-viva, la luciérnaga y Angelita. Ver el docstring de
+ * `ChivitoPunkLaminaViva.jsx` para el detalle de la fusión piel+rig y los
+ * límites honestos. `ChivitoPunk.jsx` NO se borra (otros consumidores del
+ * valle pueden seguir usándolo), igual que `Jaguar.jsx` y `Luciernaga.jsx`
+ * cuando sus especies pasaron a lámina-viva.
  *
- * Adaptador puro (mismo contrato que los hermanos ChagraAgentAvatar*): traduce
- * la API histórica del avatar del agente (state 'idle'|'thinking'|'speaking'|
- * 'listening', glow, withLabel, onClick/onDoubleClick) al `state` que
- * `ChivitoPunk.jsx` ya entiende directo.
+ * Adaptador puro (mismo contrato que ChagraAgentAvatarJaguar): traduce la
+ * API histórica del avatar del agente (state 'idle'|'thinking'|'speaking'|
+ * 'listening', glow, withLabel, onClick/onDoubleClick) al contrato de
+ * `ChivitoPunkLaminaViva`. El `state` viaja directo como `estado` (el CSS
+ * del rig reacciona por data-agt-estado: escuchando ladea la testa,
+ * hablando abre el pico en tijera, pensando golpetea el lápiz).
  */
+const VISEMA_DE_STATE = {
+    speaking: 'V2',
+};
+
 export default function ChagraAgentAvatarChivitoPunk({
     state = 'idle',
     size = 48,
@@ -25,9 +38,12 @@ export default function ChagraAgentAvatarChivitoPunk({
     className = '',
     ariaLabel = 'Chagra IA',
 }) {
+    const visema = VISEMA_DE_STATE[state] || null;
+
     const bicho = (
-        <ChivitoPunk
-            state={state}
+        <ChivitoPunkLaminaViva
+            estado={state}
+            visema={visema}
             size={size}
             title={ariaLabel}
             className={className}
