@@ -10,9 +10,9 @@
  *   - Todo el color sale del PNG. Aquí solo se decide, píxel a píxel, QUÉ
  *     ALFA le toca a cada capa — cero dibujo nuevo.
  *   - Cada pieza "de encima" se DESVANECE en el borde de su corte
- *     (`smoothstep`). El CUERPO de abajo NO se desvanece: se borra con
- *     corte duro SOLO donde una pieza de encima ya es ≥93% opaca — el
- *     detalle que evita la banda translúcida.
+ *     (`smoothstep`). Las capas de ABAJO NO se desvanecen: se borran con
+ *     corte duro SOLO donde la pieza de encima ya es ~opaca (umbral 0,996
+ *     — ver `mascaras()`), el detalle que evita la banda translúcida.
  *   - ORDEN DE PRIORIDAD para que dos piezas nunca se disputen el mismo
  *     píxel: cabeza > mandíbula > manoLapiz > cuerpo. (La CRESTA no es
  *     pieza: viaja ENTERA dentro de la cabeza — regla dura de la orden.)
@@ -96,13 +96,27 @@ function mascaraMano(x, y) {
  * bajo TODA la testa.
  */
 export function mascaras() {
-  const hard = (m) => 1 - ss(0.93, 1.0, m);
+  // Corte DURO (umbral 0,996): la capa de ABAJO conserva su píxel COMPLETO
+  // hasta que la pieza de encima es ~opaca. Con restas blandas `(1-m)` (el
+  // defecto que midió el informe del lote: 2.364 px con déficit
+  // alfaOriginal − alfaCompuestoOver > 0,5/255, máx 63,75/255 — banda
+  // pálida visible), en la banda del desvanecido ambas capas quedan
+  // semiopacas y el compuesto over pierde alfa. Con el umbral viejo (0,93)
+  // el corte duro aún dejaba residuo medible en su propia rampa; con 0,996
+  // el residuo máximo de la rampa es ~0,36/255 < 0,5/255 medible.
+  // REGLA: resta sobre la capa de ABAJO → dura (el respaldo queda entero y
+  // la pieza pinta encima); ventana sobre la capa de ENCIMA (labio,
+  // muñeca, cuello) → suave (ahí el crossfade sí es el dibujo).
+  const hard = (m) => 1 - ss(0.996, 1, m);
   const mCabezaFull = (x, y) => mascaraCabeza(x, y);
   const mMandibula = (x, y) => mascaraMandibula(x, y) * mCabezaFull(x, y);
   // La cabeza que se PINTA = testa completa (cresta incluida) menos la
-  // mandíbula (baja en bloque, el interior sintético respalda el hueco).
-  const mCabezaRender = (x, y) => mCabezaFull(x, y) * (1 - mMandibula(x, y));
-  const mManoLapiz = (x, y) => mascaraMano(x, y) * (1 - mCabezaFull(x, y));
+  // mandíbula con corte DURO: la cabeza conserva el píxel completo de
+  // respaldo bajo el pico inferior y éste pinta encima — en reposo el
+  // compuesto es idéntico a la lámina; al bajar el pico, el interior
+  // sintético (BOCA) sigue tapando el hueco por delante del respaldo.
+  const mCabezaRender = (x, y) => mCabezaFull(x, y) * hard(mMandibula(x, y));
+  const mManoLapiz = (x, y) => mascaraMano(x, y) * hard(mCabezaFull(x, y));
   const mCuerpo = (x, y) => hard(mCabezaFull(x, y)) * hard(mManoLapiz(x, y));
   return { mCabezaFull, mMandibula, mCabezaRender, mManoLapiz, mCuerpo };
 }
