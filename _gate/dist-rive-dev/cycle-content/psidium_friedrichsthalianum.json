@@ -1,0 +1,89 @@
+{
+  "species_slug": "psidium_friedrichsthalianum",
+  "scientific_name": "Psidium friedrichsthalianum (O.Berg) Nied.",
+  "common_names": [
+    "Guayaba ácida"
+  ],
+  "family": "Myrtaceae",
+  "category": "frutales_perennes",
+  "cultivable": true,
+  "conservation_status": "nativo_silvestre",
+  "thermal_zones": [
+    "calido",
+    "templado"
+  ],
+  "roles_in_guild": [
+    "crop",
+    "pollinator_attractor"
+  ],
+  "antagonists": [],
+  "especies_nativas_sustitutas": [],
+  "propagation": {
+    "metodo_principal": "semilla",
+    "notas": "Semilla ortodoxa (tolera secado) — viabilidad 1-2 años con almacenamiento seco. Germinación 20-40 días en semilleros con sombra parcial. Vivero 6-8 meses. Trasplante a 4x4 m o 5x5 m. Primera fructificación 2-3 años. Tolerante a Tephritidae (mosca de la fruta) por menor tamaño y mayor acidez que la guayaba dulce común (Psidium guajava), considerada portainjerto resistente a nematodos y enfermedades del suelo."
+  },
+  "requirements": {
+    "agua": "medio",
+    "altitud_msnm": {
+      "min_absoluto": 0,
+      "optimo_min": 200,
+      "optimo_max": 1400,
+      "max_absoluto": 1800
+    },
+    "temperatura_c": {
+      "helada_letal": 4,
+      "optimo_min": 20,
+      "optimo_max": 28,
+      "max_tolerable": 34
+    },
+    "radiacion": "sol_pleno",
+    "drenaje_requerido": "bueno"
+  },
+  "valor_pedagogico": "La guayaba ácida o cas (Psidium friedrichsthalianum (O.Berg) Nied., familia Myrtaceae) es un árbol pequeño-mediano (5-10 m altura, tronco característico de corteza papirácea exfoliante color cobrizo-canela) nativo de Mesoamérica (Costa Rica, Nicaragua, Panamá, sur de México) y noroccidente sudamericano (vertiente pacífica y amazónica de Colombia: Chocó, Valle del Cauca, Cauca, Nariño, Putumayo, Caquetá, Amazonas), donde aparece naturalmente en bosques húmedos tropicales secundarios y se cultiva tradicionalmente en huertas familiares por sus frutos altamente ácidos. Produce frutos esféricos pequeños a medianos (3-5 cm diámetro) de cáscara amarilla brillante lisa al madurar, pulpa blanca-rosada muy ácida (pH 2.5-3.0) con numerosas semillas pequeñas duras, sabor que combina la guayaba dulce común con un toque cítrico y resinoso muy distintivo. Lección viva: árbol-puente entre Centroamérica y Sudamérica que enseña cinco conceptos críticos: (1) la diferencia entre las dos especies del género Psidium domesticadas — la guayaba dulce común (P. guajava) cosmopolita y supercultivada, versus la guayaba ácida (P. friedrichsthalianum) regional y artesanal — como ejemplo de domesticación parcial y mantenimiento de variabilidad silvestre cercana al ancestro, lección útil para entender el continuo silvestre-cultivado; (2) el rol del intercambio biótico de plantas útiles a lo largo del puente terrestre centroamericano-sudamericano post-cierre del istmo de Panamá (3 millones de años atrás), parte del Gran Intercambio Biótico Americano (GABI); (3) el uso como portainjerto resistente — la guayaba ácida es la planta madre injertable preferida para injertar guayaba dulce comercial (P. guajava) en zonas con problemas de Meloidogyne incognita (nematodo del nudo radical) o hongos del suelo, lección práctica de injertación interespecífica y manejo agroecológico de patógenos sin agroquímicos; (4) la cultura gastronómica costarricense del 'fresco de cas' (jugo agridulce con azúcar) como ejemplo de patrimonio gastronómico regional asociado a una sola especie botánica, lección de etnobiología aplicada; (5) los compuestos volátiles aromáticos de la familia Myrtaceae (eugenol, mirceno, limoneno, ácido ascórbico abundante 100-200 mg/100 g) como base bioquímica del aroma característico y de las propiedades antimicrobianas reconocidas en medicina tradicional para tratamiento de afecciones gastrointestinales y respiratorias. Manejo agroecológico: siembra en huertas familiares y cercas vivas; asocio con cítricos, plátano, lulo amazónico y café; cosecha manual escalonada (mayo-agosto en piedemonte amazónico colombiano); cero agroquímicos; control biológico de Anastrepha fraterculus (mosca de la fruta) por trampas McPhail con cebos proteínicos y bolsas de papel sobre frutos en desarrollo. Fuentes Tier A: POWO Kew, GBIF Backbone Taxonomy, GBIF Colombia, AGROSAVIA Manual Frutales Tropicales, Bernal 2015 Catálogo Plantas Colombia, SINCHI Amazonía, FAO EcoCrop.",
+  "sources": [
+    {
+      "id": "powo-kew",
+      "title": "powo-kew",
+      "tier": "A",
+      "url": "https://powo.science.kew.org"
+    },
+    {
+      "id": "gbif-taxonomic-backbone",
+      "title": "gbif-taxonomic-backbone",
+      "tier": "A",
+      "url": "https://www.gbif.org/dataset/d7dddbf4-2cf0-4f39-9b2a-bb099caae36c"
+    },
+    {
+      "id": "gbif-colombia",
+      "title": "gbif-colombia",
+      "tier": "A",
+      "url": "https://www.gbif.org/country/CO"
+    },
+    {
+      "id": "agrosavia-manual-frutales-tropicales",
+      "title": "agrosavia-manual-frutales-tropicales",
+      "tier": "A",
+      "url": null
+    },
+    {
+      "id": "bernal-2015-plantas-liquenes-colombia",
+      "title": "bernal-2015-plantas-liquenes-colombia",
+      "tier": "A",
+      "url": "http://catalogoplantasdecolombia.unal.edu.co"
+    },
+    {
+      "id": "sinchi-amazonia-colombiana",
+      "title": "sinchi-amazonia-colombiana",
+      "tier": "A",
+      "url": null
+    },
+    {
+      "id": "fao-ecocrop",
+      "title": "fao-ecocrop",
+      "tier": "A",
+      "url": "https://gaez.fao.org/pages/ecocrop"
+    }
+  ],
+  "_generated_by": "scripts/build-cycle-content-from-catalog.mjs",
+  "_generated_at": "2026-05-19T00:42:57.383Z"
+}

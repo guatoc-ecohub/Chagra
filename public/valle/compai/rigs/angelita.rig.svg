@@ -1,0 +1,181 @@
+<g id="angelitaWrap">
+      <g id="angelita" filter="url(#boil)">
+        <g class="flota">
+          <g id="poseRig">
+           <g id="anticRig"><g id="traviesoRig">
+            <g id="cuerpoRig">
+              <g transform="scale(13.5)">
+
+                <!-- aura viva ambar -->
+                <circle cx="1.5" cy="-0.3" r="8.4" fill="url(#gAuraAbeja)"/>
+
+                <!-- ALITAS DE TUL: raiz junto al torax (donde el cuerpo encuentra
+                     la cabeza), tendidas sobre el abdomen -->
+                <g id="alaTras" class="ala">
+                  <path d="M5.6,-2.7 C -0.8,-8.4 -8.4,-7.4 -10.3,-3.9
+                           C -8.0,-1.9 -1.2,-2.3 5.6,-2.7 Z"
+                    fill="#ffe8c0" opacity="0.5" stroke="rgba(42,26,12,0.30)" stroke-width="0.4"/>
+                  <path d="M-1.6,-6.1 C -5.0,-5.8 -7.6,-4.9 -9.2,-4.0" stroke="rgba(42,26,12,0.18)" stroke-width="0.3" fill="none" stroke-linecap="round"/>
+                </g>
+                <g id="alaDel" class="ala">
+                  <path d="M5.8,-2.2 C 0.6,-6.3 -5.2,-5.8 -6.9,-3.2
+                           C -5.0,-1.7 0.6,-1.9 5.8,-2.2 Z"
+                    fill="#fff3da" opacity="0.44" stroke="rgba(42,26,12,0.26)" stroke-width="0.4"/>
+                </g>
+
+                <!-- CUERPO: abdomen ambar palido, redondo y tierno (culito). La
+                     cabeza (oscura, redonda) se monta ARRIBA-DERECHA sobre este
+                     cuerpo -> silueta de 2 partes limpia, sin blob ni anillo -->
+                <path d="M-9.8,1.4
+                         C -9.7,-1.5 -7.6,-3.9 -4.2,-4.7
+                         C -1.6,-5.4 1.4,-5.2 3.5,-4.1
+                         C 4.5,-5.2 5.8,-6.2 7.8,-6.35
+                         C 10.1,-6.5 12.5,-5.5 13.75,-3.2
+                         C 14.5,-1.6 14.5,0.7 13.7,2.5
+                         C 12.85,4.0 11.2,4.4 9.2,4.3
+                         C 7.2,4.2 5.7,3.9 4.6,3.2
+                         C 3.6,4.4 0.8,5.7 -3.2,5.9
+                         C -6.4,6.0 -9.2,5.0 -9.8,1.4 Z"
+                      fill="url(#gAbdomen)" stroke="#2a1a0c" stroke-width="1.25"/>
+                <!-- brillo especular del abdomen -->
+                <ellipse cx="-3.8" cy="-1.7" rx="3.7" ry="1.7" fill="#ffe7a8" opacity="0.5"/>
+                <!-- tergitas: hilos canela SUAVES (jamas bandas negras) -->
+                <g stroke="#cf9a4a" stroke-width="0.5" fill="none" stroke-linecap="round" opacity="0.5">
+                  <path d="M-7.0,-2.1 Q-7.8,0.6 -6.8,3.2"/>
+                  <path d="M-4.3,-3.2 Q-5.4,0.6 -4.1,4.1"/>
+                  <path d="M-1.6,-3.7 Q-2.7,0.6 -1.4,4.5"/>
+                </g>
+
+                <!-- PATITAS de manguera con pie crema: cuelgan del abdomen con la
+                     RAIZ VISIBLE sobre el cuerpo (nada de patas flotando sueltas) -->
+                <g class="patita">
+                  <path d="M-2.6,4.6 C-3.2,6.4 -3.3,7.8 -2.9,9.0" stroke="#2a1a0c" stroke-width="1.95" fill="none" stroke-linecap="round"/>
+                  <ellipse cx="-2.9" cy="9.2" rx="1.5" ry="0.94" fill="#fff2d6" stroke="#2a1a0c" stroke-width="0.72"/>
+                </g>
+                <g class="patita p2">
+                  <path d="M1.0,4.9 C0.6,6.7 0.6,8.1 1.1,9.3" stroke="#2a1a0c" stroke-width="1.95" fill="none" stroke-linecap="round"/>
+                  <ellipse cx="1.1" cy="9.5" rx="1.5" ry="0.94" fill="#fff2d6" stroke="#2a1a0c" stroke-width="0.72"/>
+                </g>
+
+                <!-- CABEZA OSCURA REDONDA como RELLENO SIN TRAZO dentro de la
+                     silueta unica: la cabeza fluye del cuerpo por un cuello suave
+                     (transicion de color, no costura). El contorno es UNO solo -->
+                <path d="M3.9,-3.8
+                         C 4.7,-5.0 5.9,-6.1 7.8,-6.3
+                         C 10.0,-6.45 12.4,-5.45 13.65,-3.2
+                         C 14.4,-1.6 14.4,0.7 13.6,2.45
+                         C 12.8,3.9 11.2,4.3 9.2,4.2
+                         C 7.3,4.15 5.8,3.85 4.7,3.1
+                         C 4.0,1.9 3.8,-1.6 3.9,-3.8 Z"
+                      fill="#33281a"/>
+                <!-- pelusa suave del occipucio (arriba-atras), da volumen -->
+                <ellipse cx="6.9" cy="-3.4" rx="1.7" ry="1.1" fill="#4a3720" opacity="0.5" transform="rotate(-24 6.9 -3.4)"/>
+
+                <!-- BRACITOS de manguera con miton crema: cuelgan del pecho oscuro
+                     (bajo la cara), raiz sobre la cabeza -> conectados, no flotan -->
+                <g id="brazoIzq" class="brazo">
+                  <path d="M3.4,4.2 C2.7,5.2 2.4,6.3 2.8,7.2" stroke="#2a1a0c" stroke-width="2.0" fill="none" stroke-linecap="round"/>
+                  <circle cx="2.8" cy="7.5" r="1.5" fill="#fff2d6" stroke="#2a1a0c" stroke-width="0.72"/>
+                </g>
+                <g id="brazoDer" class="brazo">
+                  <path d="M5.6,4.3 C6.5,5.3 7.0,6.4 6.6,7.3" stroke="#2a1a0c" stroke-width="2.1" fill="none" stroke-linecap="round"/>
+                  <circle cx="6.6" cy="7.6" r="1.55" fill="#fff2d6" stroke="#2a1a0c" stroke-width="0.72"/>
+                </g>
+
+                <!-- CARA + rasgos: ladean con vida sobre la corona oscura -->
+                <g id="cabezaRig">
+                  <!-- CLIPEO: cara clara OVALADA que ocupa casi toda la cabeza;
+                       el oscuro queda como gorra en la coronilla-nuca (media luna),
+                       jamas rodeando/ahogando la cara -->
+                  <ellipse cx="10.1" cy="-0.8" rx="4.3" ry="4.35" fill="url(#gCara)"/>
+
+                  <!-- chapetas campesinas (rubor suave bajo los ojos) -->
+                  <ellipse class="cachete" cx="11.7" cy="1.6" rx="1.05" ry="0.72" fill="#f2907a" opacity="0.6"/>
+                  <ellipse class="cachete" cx="7.5" cy="1.4" rx="0.82" ry="0.56" fill="#f2907a" opacity="0.55"/>
+
+                  <!-- boca: sonrisa de goma / boca abierta al hablar -->
+                  <g id="bocaSonrisa">
+                    <path d="M7.3,1.9 Q10.0,4.7 12.7,1.8 Q12.5,4.35 10.0,4.75 Q7.5,4.35 7.3,1.9 Z" fill="#2a1a0c"/>
+                    <path d="M7.75,2.4 Q10.0,4.05 12.25,2.3 L11.95,3.35 Q10.0,4.4 8.05,3.4 Z" fill="#fff8ea"/>
+                    <g stroke="#d8b98c" stroke-width="0.18" fill="none">
+                      <path d="M8.9,2.95 L8.95,3.8"/><path d="M10.0,3.25 L10.0,4.1"/><path d="M11.1,2.9 L11.1,3.75"/>
+                    </g>
+                  </g>
+                  <g id="bocaHabla">
+                    <ellipse cx="10.0" cy="2.75" rx="1.12" ry="1.08" fill="#8a3b34" stroke="#2a1a0c" stroke-width="0.8"/>
+                    <path d="M9.2,3.32 Q10.0,3.95 10.8,3.32 Z" fill="#d1615a"/>
+                  </g>
+
+                  <!-- OJOS de goma, expresivos y LIMPIOS (pupila grande + catchlight) -->
+                  <g class="ojo">
+                    <circle cx="11.2" cy="-1.0" r="2.35" fill="#fffaf0" stroke="#2a1a0c" stroke-width="0.8"/>
+                    <g class="pupila">
+                      <circle cx="11.55" cy="-0.5" r="1.55" fill="#20130a"/>
+                      <path d="M11.55,-0.5 L10.6,-1.75 A1.55,1.55 0 0 1 12.5,-1.75 Z" fill="#fffaf0"/>
+                      <circle cx="11.1" cy="-1.35" r="0.42" fill="#fffdf7"/>
+                    </g>
+                  </g>
+                  <g class="ojo">
+                    <circle cx="7.2" cy="-1.2" r="1.7" fill="#fffaf0" stroke="#2a1a0c" stroke-width="0.62"/>
+                    <g class="pupila">
+                      <circle cx="7.55" cy="-0.8" r="1.12" fill="#20130a"/>
+                      <path d="M7.55,-0.8 L6.9,-1.72 A1.12,1.12 0 0 1 8.25,-1.7 Z" fill="#fffaf0"/>
+                      <circle cx="7.22" cy="-1.42" r="0.32" fill="#fffdf7"/>
+                    </g>
+                  </g>
+
+                  <!-- ANTENAS GENICULADAS (escapo recto + codo marcado + flagelo
+                       curvo + bombillo que arrastra), brotan de la coronilla -->
+                  <g class="antena a1">
+                    <path d="M7.6,-4.6 L7.0,-6.7 C7.6,-8.0 8.3,-8.9 8.1,-10.0" stroke="#2a1a0c" stroke-width="1.05" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+                    <circle cx="8.1" cy="-10.2" r="1.05" fill="#2a1a0c"/>
+                  </g>
+                  <g class="antena a2">
+                    <path d="M10.4,-4.6 L11.4,-6.6 C10.8,-7.9 10.7,-9.0 11.4,-10.1" stroke="#2a1a0c" stroke-width="1.05" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+                    <circle cx="11.4" cy="-10.3" r="1.05" fill="#2a1a0c"/>
+                  </g>
+
+                  <!-- GAFAS Miss-Minutes LIMPIAS: dos lentes redondos SEPARADOS
+                       (sin solape sucio), tinte ahumado que deja leer los ojitos,
+                       puente + patilla claros, un solo brillo por lente -->
+                  <g id="gafas">
+                    <!-- lente lejano (marco marcado -> se lee como GAFAS, no ojos) -->
+                    <circle cx="7.2" cy="-1.2" r="1.86" fill="url(#gLente)" fill-opacity="0.3" stroke="#1c0f05" stroke-width="0.55"/>
+                    <!-- lente cercano -->
+                    <circle cx="11.2" cy="-1.0" r="2.52" fill="url(#gLente)" fill-opacity="0.3" stroke="#1c0f05" stroke-width="0.65"/>
+                    <!-- PUENTE: barra clara sobre la nariz que une los dos lentes -->
+                    <path d="M8.25,-2.05 Q8.9,-2.7 9.55,-2.25" stroke="#1c0f05" stroke-width="0.8" fill="none" stroke-linecap="round"/>
+                    <!-- PATILLA clara del lente lejano hacia la sien -->
+                    <path d="M5.55,-1.45 C4.9,-1.7 4.55,-1.95 4.45,-2.5" stroke="#1c0f05" stroke-width="0.72" fill="none" stroke-linecap="round"/>
+                    <!-- brillo de vidrio: un barrido limpio por lente (senala cristal) -->
+                    <g class="gafasChispa" stroke="#fff6e2" stroke-linecap="round" opacity="0.92" fill="none">
+                      <path d="M9.7,-2.05 Q10.7,-2.95 11.85,-2.15" stroke-width="0.95"/>
+                      <path d="M10.55,-0.2 L11.4,-1.5" stroke-width="0.4"/>
+                      <path d="M6.4,-1.95 Q7.15,-2.6 8.0,-1.95" stroke-width="0.68"/>
+                    </g>
+                  </g>
+
+                  <!-- la probóscide del forrajeo: baja DESDE LA BOCA a libar la flor -->
+                  <g id="lengua" transform="translate(10.0 3.0)">
+                    <g class="lenguaAnim">
+                      <path d="M0,0 C-0.4,2.4 0.4,4.1 0,5.8" stroke="#c9524e" stroke-width="1.05" fill="none" stroke-linecap="round"/>
+                      <circle cx="0" cy="6.0" r="1.0" fill="#c9524e"/>
+                    </g>
+                  </g>
+                </g>
+
+                <!-- polen que se suelta al forrajear -->
+                <g id="motasPolen" fill="#e2a83e">
+                  <circle class="mota" cx="12.6" cy="5.4" r="0.8"/>
+                  <circle class="mota m2" cx="10.2" cy="7.2" r="0.55"/>
+                  <circle class="mota m3" cx="13.6" cy="6.6" r="0.65"/>
+                  <circle class="mota m4" cx="11.4" cy="8.6" r="0.5"/>
+                </g>
+
+              </g>
+            </g>
+           </g></g>
+          </g>
+        </g>
+      </g>
+    </g>

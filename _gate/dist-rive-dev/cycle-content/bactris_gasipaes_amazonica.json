@@ -1,0 +1,95 @@
+{
+  "species_slug": "bactris_gasipaes_amazonica",
+  "scientific_name": "Bactris gasipaes Kunth var. gasipaes (ecotipo amazónico)",
+  "common_names": [
+    "Pijuayo amazónico"
+  ],
+  "family": "Arecaceae",
+  "category": "frutales_perennes",
+  "cultivable": true,
+  "conservation_status": "cultivo_comun",
+  "thermal_zones": [
+    "calido"
+  ],
+  "roles_in_guild": [
+    "crop",
+    "biomass_producer",
+    "living_fence"
+  ],
+  "antagonists": [],
+  "especies_nativas_sustitutas": [],
+  "propagation": {
+    "metodo_principal": "semilla",
+    "notas": "Semilla recalcitrante: sembrar fresca, germinación lenta (3-6 meses, requiere paciencia). Vivero 8-12 meses en bolsa con sombra 50%. Trasplante a 5x5 m o 6x6 m. Ecotipo amazónico se diferencia del chocoano (Pacífico) por frutos más harinosos y menos aceitosos, racimos con espinas más cortas y palmas cespitosas (multicaule rebrotante) lo cual permite cosecha sustentable indefinida. Tradicionalmente cultivado en chagras tikuna, huitoto y bora."
+  },
+  "requirements": {
+    "agua": "alto",
+    "altitud_msnm": {
+      "min_absoluto": 0,
+      "optimo_min": 100,
+      "optimo_max": 600,
+      "max_absoluto": 1000
+    },
+    "temperatura_c": {
+      "helada_letal": 10,
+      "optimo_min": 23,
+      "optimo_max": 30,
+      "max_tolerable": 36
+    },
+    "radiacion": "sol_pleno",
+    "drenaje_requerido": "bueno"
+  },
+  "valor_pedagogico": "El pijuayo amazónico o chontaduro de tierra firme (Bactris gasipaes Kunth ecotipo amazónico, familia Arecaceae) es una palmera cespitosa multicaule (8-20 m altura, 4-12 estípites por mata) cultivada milenariamente en chagras de pueblos indígenas amazónicos colombianos (tikuna, huitoto, bora, ocaina, miraña, andoke en el trapecio amazónico) y de la Amazonía peruana, ecuatoriana y brasileña. Se diferencia del ecotipo chocoano del Pacífico colombiano (Tumaco, Buenaventura, Quibdó) por tres rasgos: (1) frutos más harinosos y menos aceitosos (12-18% lípidos vs 20-30% en chocoano), de mayor contenido de almidón y carotenoides (provitamina A), (2) racimos con espinas más cortas o ausentes en algunas variedades amazónicas seleccionadas tradicionalmente, (3) hábito cespitoso pleno (multicaule rebrotante) que permite cosecha sustentable indefinida — al cortar un estípite para palmito o por vejez, los hijuelos basales continúan la mata, contrastando con palmas monocaules como Euterpe precatoria que mueren al cortarlas. Produce racimos pesados con 50-300 frutos drupáceos elipsoidales (3-6 cm) anaranjados-rojizos en madurez con pulpa harinosa-fibrosa muy rica en almidón, carotenoides, proteína (5-7%) y aceites, semilla central dura comestible (sabor a coco) — fruto cocido en agua con sal por 30-60 minutos, consumo cotidiano en mercados de Leticia, Florencia, Mocoa, Mitú e Inírida. Lección viva: palmera-emblema de la chagra amazónica colombiana que enseña cuatro conceptos críticos: (1) la diferencia funcional entre ecotipos amazónico (harinoso, multicaule, cosecha sustentable) y chocoano (aceitoso, monocaule en algunas variedades, mayor rendimiento por individuo) como ejemplo de domesticación independiente paralela por dos pueblos diferentes (indígenas amazónicos vs afrocolombianos del Pacífico) durante 6.000-10.000 años, registro arqueobotánico en la Amazonía peruana documenta domesticación temprana en el Holoceno medio; (2) el concepto de domesticación pre-colombina de palmeras y la pérdida de biodiversidad varietal tradicional, ya que la chagra de cada comunidad maneja 3-8 ecotipos locales irreproducibles ex-situ (banco de germoplasma vivo); (3) la importancia nutricional: el pijuayo aporta proteína completa (8 aminoácidos esenciales), almidón resistente y carotenoides en una sola pieza, siendo uno de los alimentos básicos más completos del trópico americano; (4) la cosecha sustentable por hábito cespitoso contrastada con palmeras monocaules, lección magistral de manejo sostenible de productos forestales no maderables. Manejo agroecológico: siembra en chagras junto a yuca, plátano, copoazú y piña; cosecha manual con sopladera o trepa tradicional con peconha; cero agroquímicos; control natural de Rhynchophorus palmarum (gualpa, picudo de la palma) por trampas con feromonas. Fuentes Tier A: POWO Kew, GBIF Backbone Taxonomy, GBIF Colombia, AGROSAVIA Manual Frutales Tropicales, Bernal 2015 Catálogo Plantas Colombia, SINCHI Amazonía, FAO EcoCrop.",
+  "sources": [
+    {
+      "id": "powo-kew",
+      "title": "powo-kew",
+      "tier": "A",
+      "url": "https://powo.science.kew.org"
+    },
+    {
+      "id": "gbif-taxonomic-backbone",
+      "title": "gbif-taxonomic-backbone",
+      "tier": "A",
+      "url": "https://www.gbif.org/dataset/d7dddbf4-2cf0-4f39-9b2a-bb099caae36c"
+    },
+    {
+      "id": "gbif-colombia",
+      "title": "gbif-colombia",
+      "tier": "A",
+      "url": "https://www.gbif.org/country/CO"
+    },
+    {
+      "id": "agrosavia-manual-frutales-tropicales",
+      "title": "agrosavia-manual-frutales-tropicales",
+      "tier": "A",
+      "url": null
+    },
+    {
+      "id": "sinchi-amazonia-colombiana",
+      "title": "sinchi-amazonia-colombiana",
+      "tier": "A",
+      "url": null
+    },
+    {
+      "id": "bernal-2015-plantas-liquenes-colombia",
+      "title": "bernal-2015-plantas-liquenes-colombia",
+      "tier": "A",
+      "url": "http://catalogoplantasdecolombia.unal.edu.co"
+    },
+    {
+      "id": "fao-ecocrop",
+      "title": "fao-ecocrop",
+      "tier": "A",
+      "url": "https://gaez.fao.org/pages/ecocrop"
+    },
+    {
+      "id": "perez-arbelaez-1947-plantas-utiles",
+      "title": "perez-arbelaez-1947-plantas-utiles",
+      "tier": "A",
+      "url": null
+    }
+  ],
+  "_generated_by": "scripts/build-cycle-content-from-catalog.mjs",
+  "_generated_at": "2026-05-19T00:42:57.382Z"
+}

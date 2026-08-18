@@ -1,0 +1,383 @@
+
+  :root{
+    --tinta:#191309;
+    --crema:#f4ead2;
+    --beige:#f0ddb2;
+    --menta:#67d9b8;
+    --nocturno:#0c1b22;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html,body{height:100%}
+  body{
+    font-family:Georgia,'Times New Roman',serif;
+    background:linear-gradient(180deg,#142033 0%,#1a3a3c 55%,#0c1b22 100%);
+    color:var(--crema);
+    overflow-x:hidden;
+    min-height:100vh;
+  }
+  #lienzo{position:relative;max-width:940px;margin:0 auto;min-height:100vh}
+  #escena{display:block;width:100%;height:auto}
+
+  header{position:absolute;top:16px;left:0;right:0;text-align:center;z-index:5;pointer-events:none}
+  header h1{
+    font-size:clamp(26px,4.6vw,44px);font-style:italic;font-weight:700;
+    color:#ecf2da;letter-spacing:.5px;
+    text-shadow:0 0 20px rgba(103,217,184,.28),0 2px 0 rgba(0,0,0,.45);
+  }
+  header p{
+    margin-top:4px;font-size:clamp(12px,1.8vw,16px);letter-spacing:3px;
+    text-transform:uppercase;color:#8fbf9e;
+  }
+  header p em{font-style:italic;text-transform:none;letter-spacing:1px;color:#b9dcb8}
+
+  #burbuja{
+    position:absolute;left:4%;top:14%;max-width:340px;z-index:6;
+    background:var(--crema);border:3px solid var(--tinta);border-radius:18px;
+    padding:14px 18px;font-size:clamp(14px,2vw,18px);line-height:1.45;font-style:italic;
+    color:#241a10;
+    box-shadow:0 0 26px rgba(103,217,184,.2),4px 5px 0 rgba(0,0,0,.35);
+    opacity:0;transform:translateY(10px) scale(.92);transform-origin:40% 110%;
+    transition:opacity .35s ease,transform .35s cubic-bezier(.34,1.56,.64,1);
+    pointer-events:none;
+  }
+  #burbuja.visible{opacity:1;transform:translateY(0) scale(1)}
+  #burbuja::after{
+    content:'';position:absolute;left:56px;bottom:-14px;width:22px;height:22px;
+    background:var(--crema);border-right:3px solid var(--tinta);border-bottom:3px solid var(--tinta);
+    transform:rotate(45deg) skew(12deg,12deg);
+  }
+
+  #controles{
+    position:absolute;bottom:14px;left:0;right:0;z-index:7;
+    display:flex;gap:8px;justify-content:center;flex-wrap:wrap;padding:0 10px;
+  }
+  #controles button{
+    font-family:inherit;font-size:clamp(11px,1.6vw,14px);font-style:italic;
+    padding:8px 14px;border-radius:999px;cursor:pointer;
+    background:var(--crema);color:var(--tinta);border:2.5px solid var(--tinta);
+    box-shadow:0 3px 0 rgba(0,0,0,.45);
+    transition:transform .12s ease;
+  }
+  #controles button:hover{transform:translateY(-2px)}
+  #controles button.activo{background:#1c4035;color:#dff2df;border-color:#67d9b8}
+
+  #placa{
+    position:absolute;bottom:62px;right:12px;z-index:5;
+    font-size:clamp(10px,1.4vw,13px);letter-spacing:2px;color:#7fae8f;
+    text-transform:uppercase;pointer-events:none;text-shadow:0 1px 3px rgba(0,0,0,.6);
+  }
+
+  /* =========================================================
+     OSO DE ANTEOJOS — rig rubber-hose (Tremarctos ornatus)
+     El guardián NEGRO del bosque de niebla: pelaje azabache
+     azulado, anteojos crema ASIMÉTRICOS, pecho crema, hocico
+     canela, menta bioluminiscente MEDIDA (biopunk sutil).
+     ========================================================= */
+  #osoWrap{transition:transform 1.9s cubic-bezier(.45,.05,.25,1)}
+  #oso{transform-box:fill-box;transform-origin:50% 92%;transition:transform 1.2s ease,filter .9s ease}
+
+  /* PESO — el oso NO flota: se balancea sobre sus plantas, lento,
+     con la gravedad de la mole (nada del bob aéreo del colibrí). */
+  #peso{transform-box:fill-box;transform-origin:50% 96%;animation:balancea 4.6s ease-in-out infinite alternate}
+  @keyframes balancea{
+    from{transform:rotate(-1.1deg) translateY(0)}
+    to  {transform:rotate( 1.3deg) translateY(-4px)}
+  }
+  /* respira: la mole hincha el pecho despacio */
+  #cuerpoRig{transform-box:fill-box;transform-origin:50% 100%;animation:respira 3.4s ease-in-out infinite alternate}
+  @keyframes respira{
+    from{transform:scale(1,1)}
+    to  {transform:scale(1.018,.982)}
+  }
+
+  /* cabeza: ladeo curioso, lento y digno */
+  #cabezaRig{transform-box:fill-box;transform-origin:50% 92%;animation:cabezaLadeo 5.2s ease-in-out infinite}
+  @keyframes cabezaLadeo{0%,100%{transform:rotate(-1.8deg)}50%{transform:rotate(2deg)}}
+  :host([data-estado="hablar"]) #cabezaRig,
+  :host([data-estado="pacto"]) #cabezaRig{animation:cabezaHabla 2.6s ease-in-out infinite}
+  @keyframes cabezaHabla{0%,100%{transform:rotate(-2.2deg) translateY(0)}50%{transform:rotate(2.4deg) translateY(-4px)}}
+  :host([data-estado="sembrar"]) #cabezaRig{animation:none;transform:rotate(-5deg) translateY(-5px)}
+  :host([data-estado="amenaza"]) #cabezaRig{animation:cabezaTriste 5.5s ease-in-out infinite}
+  @keyframes cabezaTriste{0%,100%{transform:rotate(-1deg) translateY(7px)}50%{transform:rotate(1deg) translateY(9px)}}
+
+  /* orejas: micro follow-through */
+  .oreja{transform-box:fill-box;transform-origin:50% 100%;animation:orejaTic 6.4s ease-in-out infinite}
+  .oreja.o2{animation-delay:-2.9s}
+  @keyframes orejaTic{0%,88%,100%{transform:rotate(0deg)}92%{transform:rotate(-6deg)}95%{transform:rotate(4deg)}}
+
+  /* PARPADEO irregular con blink-blink (kit de la casa) */
+  .ojo{transform-box:fill-box;transform-origin:50% 50%;animation:rhBlink 5.8s linear infinite}
+  @keyframes rhBlink{
+    0%,37%,41%,75%,79%,83%,87%,100%{transform:scaleY(1)}
+    39%{transform:scaleY(.1)}
+    77%{transform:scaleY(.1)}
+    81%{transform:scaleY(.14)}
+  }
+  /* MIRADA mansa con double-take ocasional */
+  .pupila{transform-box:fill-box;animation:rhMirada 8.3s ease-in-out infinite}
+  @keyframes rhMirada{
+    0%,22%,50%,62%,78%,100%{transform:translate(0,0)}
+    26%,36%{transform:translate(-4px,1px)}
+    40%{transform:translate(3.5px,0)}
+    43%,46%{transform:translate(-3px,1px)}
+    66%,74%{transform:translate(3px,-2.5px)}
+  }
+  :host([data-estado="hablar"]) .pupila,
+  :host([data-estado="pacto"]) .pupila{animation:none;transform:translate(0,1.5px)}
+  :host([data-estado="sembrar"]) .pupila{animation:none;transform:translate(2px,-4px)}
+  :host([data-estado="amenaza"]) .pupila{animation:none;transform:translate(0,3px)}
+
+  /* AROS de los anteojos: el halo crema RESPIRA despacio (biopunk medido) */
+  .aroHalo{transform-box:fill-box;transform-origin:50% 50%;animation:aroRespira 4.2s ease-in-out infinite alternate}
+  .aroHalo.a2{animation-delay:-2.1s}
+  @keyframes aroRespira{from{opacity:.2;transform:scale(.94)}to{opacity:.5;transform:scale(1.08)}}
+  :host([data-estado="amenaza"]) .aroHalo{animation:none;opacity:.08}
+  :host([data-estado="pacto"]) .aroHalo{animation-duration:2.2s}
+
+  /* pecho: la marca crema late apenas; en el pacto se ENCIENDE */
+  #pechoMarca{transform-box:fill-box;transform-origin:50% 30%}
+  :host([data-estado="pacto"]) #pechoMarca{animation:pechoLate 2.4s ease-in-out infinite alternate}
+  @keyframes pechoLate{
+    from{filter:drop-shadow(0 0 6px rgba(240,221,178,.25))}
+    to  {filter:drop-shadow(0 0 22px rgba(240,221,178,.75))}
+  }
+
+  /* BRAZOS — mangueras con hombro de pivote */
+  .brazo{transform-box:fill-box;transition:transform .7s cubic-bezier(.34,1.56,.64,1)}
+  #brazoDer{transform-origin:8% 6%}
+  #brazoIzq{transform-origin:92% 6%}
+  :host([data-estado="idle"]) #brazoDer{animation:brazoIdleD 3.6s ease-in-out infinite alternate}
+  :host([data-estado="idle"]) #brazoIzq{animation:brazoIdleI 4.1s ease-in-out infinite alternate}
+  @keyframes brazoIdleD{from{transform:rotate(-4deg)}to{transform:rotate(5deg)}}
+  @keyframes brazoIdleI{from{transform:rotate(4deg)}to{transform:rotate(-5deg)}}
+
+  /* =========================================================
+     MARCHA DE PERFIL (#osoLado) — el oso CAMINA, no patina
+     =========================================================
+     Antes el rig se desplazaba por el valle en estado idle (que
+     solo mece los brazos): el oso se deslizaba. Acá vive el
+     estado `camina`, y va en PERFIL desde el principio — un
+     ciclo de patas no se lee de frente (lección cara del jaguar).
+
+     NO es el ciclo del felino. El oso es PLANTÍGRADO y anda en
+     SECUENCIA LATERAL (Hildebrand): los apoyos caen en orden
+     trasera-cerca → delantera-cerca → trasera-lejos →
+     delantera-lejos, a un cuarto de ciclo cada uno, así que las
+     dos patas de un MISMO LADO van seguidas. El jaguar hace lo
+     contrario: lleva las DIAGONALES casi juntas. De ahí el
+     balanceo lateral del oso (#osoLadoRol, UNA vez por ciclo) —
+     la firma que lo separa del andar felino. La planta se mantiene casi paralela al
+     suelo con una contra-rotación del pie: si el pie girara con
+     la pata, caminaría de puntillas y dejaría de ser un oso.
+     Cadencia 1.25s: lenta y pesada (el felino iba a 1.05s). */
+  #osoLado{display:none}
+  :host([data-estado="camina"]) #osoLado{display:block}
+  :host([data-estado="camina"]) #peso{display:none}
+  /* espejo según el rumbo (el host pone data-dir): dibujado mirando DER */
+  #osoLado{transform-box:fill-box;transform-origin:50% 50%}
+  :host([data-dir="izq"]) #osoLado{transform:scaleX(-1)}
+
+  /* las cuatro patas: péndulo desde su pivote (hombro/cadera). La fase de
+     cada una viaja en --fase, así el pie hereda el mismo compás sin repetir
+     reglas. Orden de apoyos (secuencia lateral, cuartos de ciclo):
+     trasera-cerca 0 → delantera-cerca 25% → trasera-lejos 50% →
+     delantera-lejos 75%. */
+  .pataOsoLado{transform-box:fill-box;transform-origin:50% 5%}
+  :host([data-estado="camina"]) .pataOsoLado{animation:pasoOso 1.25s ease-in-out var(--fase,0s) infinite}
+  @keyframes pasoOso{
+    0%,100%{transform:rotate(12deg)}    /* atrás: la planta empuja */
+    50%    {transform:rotate(-13deg)}   /* al frente: la pata vuela */
+  }
+  /* el PIE contra-rota: la planta llega plana al suelo (plantígrado) y se
+     despega por el talón. Es lo que separa a un oso de un bailarín. */
+  .pieOso{transform-box:fill-box;transform-origin:62% 18%}
+  :host([data-estado="camina"]) .pieOso{animation:pieOso 1.25s ease-in-out var(--fase,0s) infinite}
+  @keyframes pieOso{
+    0%,100%{transform:rotate(-9deg) translateY(0)}    /* talón levantándose */
+    30%    {transform:rotate(2deg) translateY(-5px)}  /* en vuelo, plana */
+    50%    {transform:rotate(9deg) translateY(0)}     /* aterriza de talón */
+    75%    {transform:rotate(-2deg)}                  /* rueda a la planta */
+  }
+  /* BALANCEO LATERAL — la firma del oso: el cuerpo rola de lado a lado UNA
+     vez por ciclo (el felino no hace esto). Sutil: es peso, no borrachera. */
+  #osoLadoRol{transform-box:fill-box;transform-origin:50% 88%}
+  :host([data-estado="camina"]) #osoLadoRol{animation:rolOso 1.25s ease-in-out infinite}
+  @keyframes rolOso{
+    0%,100%{transform:rotate(1.5deg) translateX(3px)}
+    50%    {transform:rotate(-1.5deg) translateX(-3px)}
+  }
+  /* el TRONCO: bóveda del paso (2 botes por ciclo), con la mole aplastándose
+     apenas al cargar el peso */
+  #troncoOsoLado{transform-box:fill-box;transform-origin:50% 70%}
+  :host([data-estado="camina"]) #troncoOsoLado{animation:troncoOsoBob .625s ease-in-out infinite}
+  @keyframes troncoOsoBob{
+    0%,100%{transform:translateY(3px) scale(1.008,.992)}
+    50%    {transform:translateY(-4px) scale(.996,1.006)}
+  }
+  /* la ESCÁPULA que rueda: el hombro del plantígrado se marca al cargar */
+  #hombroOsoLado{transform-box:fill-box;transform-origin:50% 100%}
+  :host([data-estado="camina"]) #hombroOsoLado{animation:hombroOsoRueda .625s ease-in-out infinite}
+  @keyframes hombroOsoRueda{
+    0%,100%{transform:translateY(0) scaleY(1)}
+    50%    {transform:translateY(-4px) scaleY(1.1)}
+  }
+  /* la CABEZA cabecea al paso (contratiempo del tronco): el oso camina
+     oliendo, con la testa baja */
+  #cabezaOsoLado{transform-box:fill-box;transform-origin:14% 76%}
+  :host([data-estado="camina"]) #cabezaOsoLado{animation:cabezaOsoBob .625s ease-in-out -.16s infinite}
+  @keyframes cabezaOsoBob{
+    0%,100%{transform:translateY(-2px) rotate(-1deg)}
+    50%    {transform:translateY(3px) rotate(1.2deg)}
+  }
+  /* …y el OLFATEO periódico (ciclo largo, fuera del compás del paso): el oso
+     vive por la nariz — alza la testa, husmea el aire y suelta vaho de
+     páramo. Es su gesto, no el gruñido del felino. */
+  #cabezaOsoOlfa{transform-box:fill-box;transform-origin:10% 80%}
+  :host([data-estado="camina"]) #cabezaOsoOlfa{animation:olfateaOso 7.4s ease-in-out infinite}
+  @keyframes olfateaOso{
+    0%,58%,92%,100%{transform:translateY(0) rotate(0deg)}
+    66%,84%        {transform:translateY(-13px) rotate(-7deg)}  /* alza y husmea */
+  }
+  #trufaOsoLado{transform-box:fill-box;transform-origin:50% 50%}
+  :host([data-estado="camina"]) #trufaOsoLado{animation:trufaOso 7.4s ease-in-out infinite}
+  @keyframes trufaOso{
+    0%,60%,90%,100%{transform:scale(1,1)}
+    66%,78%        {transform:scale(1.14,.86)}   /* la nariz se arruga */
+    72%,84%        {transform:scale(.94,1.12)}
+  }
+  #fauceOsoLado{transform-box:fill-box;transform-origin:6% 20%}
+  :host([data-estado="camina"]) #fauceOsoLado{animation:fauceOso 7.4s ease-in-out infinite}
+  @keyframes fauceOso{
+    0%,60%,90%,100%{transform:rotate(0deg)}
+    68%,82%        {transform:rotate(9deg)}      /* resopla, no gruñe */
+  }
+  #vahoOsoLado{opacity:0;transform-box:fill-box;transform-origin:0% 60%}
+  :host([data-estado="camina"]) #vahoOsoLado{animation:vahoOso 7.4s ease-in-out infinite}
+  @keyframes vahoOso{
+    0%,64%,100%{opacity:0;transform:translate(0,0) scale(.6)}
+    72%        {opacity:.75;transform:translate(10px,-6px) scale(1)}
+    88%        {opacity:0;transform:translate(30px,-18px) scale(1.5)}
+  }
+  #orejaOsoLado{transform-box:fill-box;transform-origin:50% 90%}
+  :host([data-estado="camina"]) #orejaOsoLado{animation:orejaOsoTic 6.4s ease-in-out infinite}
+  @keyframes orejaOsoTic{0%,86%,100%{transform:rotate(0deg)}90%{transform:rotate(-7deg)}94%{transform:rotate(5deg)}}
+  /* el aura late al andar (mismo aliento del guardián) */
+  #auraLadoOso{transform-box:fill-box;transform-origin:50% 50%}
+  :host([data-estado="camina"]) #auraLadoOso{animation:auraLadoOso 5.6s ease-in-out infinite alternate}
+  @keyframes auraLadoOso{from{opacity:.7;transform:scale(.97)}to{opacity:1;transform:scale(1.04)}}
+
+  /* accesibilidad: en calma la marcha se detiene en fotograma digno */
+  @media (prefers-reduced-motion:reduce){
+    #osoLadoRol,#troncoOsoLado,#hombroOsoLado,#cabezaOsoLado,#cabezaOsoOlfa,
+    #trufaOsoLado,#fauceOsoLado,#vahoOsoLado,#orejaOsoLado,#auraLadoOso,
+    .pataOsoLado,.pieOso{animation:none!important}
+  }
+
+  /* ——— HABLAR: gesticula con la garra, mira a cámara ——— */
+  :host([data-estado="hablar"]) #brazoDer{animation:gesticula 1.3s ease-in-out infinite alternate}
+  @keyframes gesticula{
+    from{transform:rotate(-24deg)}
+    to  {transform:rotate(-72deg)}
+  }
+  :host([data-estado="hablar"]) #brazoIzq{transform:rotate(16deg)}
+
+  /* boca: mandíbula de goma al hablar */
+  #boca{transform-box:fill-box;transform-origin:50% 30%}
+  :host([data-estado="hablar"]) #boca,
+  :host([data-estado="niebla"]) #boca,
+  :host([data-estado="amenaza"]) #boca,
+  :host([data-estado="pacto"]) #boca{animation:habla .2s steps(2,end) infinite alternate}
+  @keyframes habla{
+    from{transform:scaleY(.55)}
+    to  {transform:scaleY(1.35)}
+  }
+  :host([data-estado="sembrar"]) #boca{animation:mastica .55s ease-in-out infinite alternate}
+  @keyframes mastica{
+    from{transform:scaleY(.5) scaleX(.9)}
+    to  {transform:scaleY(1.1) scaleX(1.05)}
+  }
+
+  /* ——— LA NIEBLA: señala su bosque ——— */
+  :host([data-estado="niebla"]) #brazoDer{transform:rotate(-104deg) scale(1.08)}
+  :host([data-estado="niebla"]) #brazoIzq{transform:rotate(22deg)}
+  :host([data-estado="niebla"]) #manoAbiertaDer{display:none}
+  :host([data-estado="niebla"]) #manoPuntaDer{display:block}
+  #manoPuntaDer{display:none}
+  :host([data-estado="niebla"]) #oso{transform:rotate(-2.5deg)}
+  :host([data-estado="niebla"]) .niebla{animation-duration:9s}
+
+  /* ——— EL SEMBRADOR: alcanza el fruto, mastica, y el monte retoña ——— */
+  :host([data-estado="sembrar"]) #oso{transform:rotate(4deg)}
+  :host([data-estado="sembrar"]) #brazoDer{transform:rotate(-152deg) scale(1.05)}
+  :host([data-estado="sembrar"]) #brazoIzq{transform:rotate(10deg)}
+  .semilla{opacity:0}
+  :host([data-estado="sembrar"]) .semilla{opacity:1;animation:semillaCae 1.9s ease-in
+ infinite}
+  .semilla.s2{animation-delay:.6s}
+  .semilla.s3{animation-delay:1.2s}
+  @keyframes semillaCae{
+    0%{transform:translate(0,0);opacity:0}
+    12%{opacity:.95}
+    80%{opacity:.9}
+    100%{transform:translate(26px,150px);opacity:0}
+  }
+  .brote{opacity:0;transform-box:fill-box;transform-origin:50% 100%;transform:scale(0)}
+  :host([data-estado="sembrar"]) .brote,
+  :host([data-estado="pacto"]) .brote{opacity:1;animation:broteCrece 1.1s cubic-bezier(.34,1.56,.64,1) forwards}
+  .brote.b2{animation-delay:.5s}
+  .brote.b3{animation-delay:1s}
+  .brote.b4{animation-delay:1.5s}
+  @keyframes broteCrece{
+    0%{transform:scale(0)}
+    70%{transform:scale(1.14)}
+    100%{transform:scale(1)}
+  }
+  :host([data-estado="pacto"]) .brote{filter:drop-shadow(0 0 8px rgba(125,217,168,.7))}
+  #frutoGlow{opacity:0;transform-box:fill-box;transform-origin:50% 50%}
+  :host([data-estado="sembrar"]) #frutoGlow{opacity:1;animation:pulsoFruto 1.3s ease-in-out infinite alternate}
+  @keyframes pulsoFruto{from{transform:scale(.9)}to{transform:scale(1.12)}}
+
+  /* ——— LA AMENAZA: el bosque raleado, el oso apagado ——— */
+  :host([data-estado="amenaza"]) #oso{filter:saturate(.68) brightness(.8)}
+  :host([data-estado="amenaza"]) #peso{animation-duration:7s}
+  :host([data-estado="amenaza"]) #brazoDer{transform:rotate(8deg)}
+  :host([data-estado="amenaza"]) #brazoIzq{transform:rotate(-8deg)}
+  #veloAmenaza{opacity:0;transition:opacity .9s ease}
+  :host([data-estado="amenaza"]) #veloAmenaza{opacity:.42}
+  #tocones{opacity:0;transition:opacity .9s ease}
+  :host([data-estado="amenaza"]) #tocones{opacity:1}
+  :host([data-estado="amenaza"]) #bosqueVivo{opacity:.35;transition:opacity .9s ease}
+  #bosqueVivo{transition:opacity .9s ease}
+  :host([data-estado="amenaza"]) .espora{opacity:.04 !important;animation:none}
+
+  /* ——— EL PACTO: brazos abiertos, el bosque encendido ——— */
+  :host([data-estado="pacto"]) #brazoDer{transform:rotate(-58deg)}
+  :host([data-estado="pacto"]) #brazoIzq{transform:rotate(58deg)}
+  :host([data-estado="pacto"]) .espora{animation-duration:2.6s}
+
+  /* esporas del bosque nublado — bioluminiscencia que flota lento */
+  .espora{transform-box:fill-box;transform-origin:50% 50%;animation:esporaFlota 5.4s ease-in-out infinite}
+  @keyframes esporaFlota{
+    0%,100%{opacity:.12;transform:translateY(0) scale(.75)}
+    50%{opacity:.75;transform:translateY(-26px) scale(1.1)}
+  }
+
+  /* estrellas, niebla, agua, helechos */
+  .estrella{transform-box:fill-box;transform-origin:50% 50%;animation:titilaEstrella 4.8s ease-in-out infinite}
+  @keyframes titilaEstrella{0%,100%{opacity:.3}50%{opacity:.9}}
+  :host([data-estado="amenaza"]) .estrella{opacity:.1;animation:none}
+  .niebla{animation:brisa 15s ease-in-out infinite alternate}
+  .niebla.n2{animation-duration:20s;animation-delay:-7s}
+  .niebla.n3{animation-duration:24s;animation-delay:-12s}
+  @keyframes brisa{from{transform:translateX(-46px)}to{transform:translateX(52px)}}
+  .helecho{transform-box:fill-box;transform-origin:50% 100%;animation:mece 5s ease-in-out infinite alternate}
+  .helecho.h2{animation-delay:-1.8s}
+  .helecho.h3{animation-delay:-3.1s}
+  @keyframes mece{from{transform:rotate(-1.8deg)}to{transform:rotate(2deg)}}
+  .barbaMusgo{transform-box:fill-box;transform-origin:50% 0%;animation:musgoSway 6.5s ease-in-out infinite alternate}
+  .barbaMusgo.m2{animation-delay:-2.4s}
+  @keyframes musgoSway{from{transform:rotate(-2deg)}to{transform:rotate(2.4deg)}}
+
+  @media (prefers-reduced-motion:reduce){
+    *{animation:none !important;transition:none !important}
+  }

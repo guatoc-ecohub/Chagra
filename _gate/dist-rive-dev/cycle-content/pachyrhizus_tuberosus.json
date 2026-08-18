@@ -1,0 +1,76 @@
+{
+  "species_slug": "pachyrhizus_tuberosus",
+  "scientific_name": "Pachyrhizus tuberosus (Lam.) Spreng.",
+  "common_names": [
+    "Jícama amazónica"
+  ],
+  "family": "Fabaceae",
+  "category": "tuberculos_raices",
+  "cultivable": true,
+  "conservation_status": "cultivo_comun",
+  "thermal_zones": [
+    "calido"
+  ],
+  "roles_in_guild": [
+    "crop",
+    "nitrogen_fixer"
+  ],
+  "antagonists": [],
+  "especies_nativas_sustitutas": [],
+  "propagation": {
+    "metodo_principal": "semilla",
+    "notas": "Leguminosa trepadora de raíz tuberosa amazónica, hermana de jícama mesoamericana pero adaptada a tierras bajas húmedas. Variedades 'ashipa' (Amazonía peruano-boliviana-brasileña) y 'chuin' (alto Ucayali). Semillas y vainas contienen rotenona y pterocarpina — TÓXICAS, no consumir. Solo la raíz tuberosa es comestible (cruda como fruta o cocida). Requiere tutorado (espaldera o tutor vivo de yuca/maíz). Despuntar inflorescencias para concentrar fotosintatos en raíz."
+  },
+  "requirements": {
+    "agua": "alto",
+    "altitud_msnm": {
+      "min_absoluto": 0,
+      "optimo_min": 100,
+      "optimo_max": 800,
+      "max_absoluto": 1200
+    },
+    "temperatura_c": {
+      "helada_letal": 8,
+      "optimo_min": 22,
+      "optimo_max": 30,
+      "max_tolerable": 35
+    },
+    "radiacion": "sol_pleno",
+    "drenaje_requerido": "bueno"
+  },
+  "valor_pedagogico": "La jícama amazónica o ashipa (Pachyrhizus tuberosus (Lam.) Spreng., familia Fabaceae subfamilia Faboideae) es la especie hermana amazónica de la jícama mesoamericana (P. erosus), una leguminosa trepadora vigorosa nativa de las tierras bajas tropicales sudamericanas — específicamente del piedemonte amazónico (cuenca alta del Amazonas en Perú-Ecuador-Colombia-Brasil-Bolivia) — domesticada por pueblos indígenas amazónicos hace al menos 4.000-5.000 años según evidencia arqueobotánica del sitio de Real Alto (Ecuador). En Colombia se cultiva tradicionalmente en chagras amazónicas del trapecio amazónico (Leticia, Puerto Nariño, La Pedrera), Putumayo (piedemonte amazónico, Mocoa, Puerto Asís, Puerto Leguízamo), Caquetá (Florencia, San Vicente del Caguán), Vaupés (Mitú), Guainía (Inírida) y Vichada (Cumaribo) entre 0 y 1.200 msnm en zona térmica cálida húmeda. Existen dos grandes complejos varietales tradicionales: 'ashipa' o 'yacuma' (Amazonía peruano-boliviana-brasileña, raíces piriformes de 1-3 kg con piel parda y pulpa blanca crocante dulce-acuosa), y 'chuin' o 'wayusa-jícama' (alto Ucayali, Loreto, raíces más alargadas y dulces). La raíz tuberosa fresca es rica en agua (85-90%), almidón soluble, azúcares simples (sacarosa, fructosa), oligofructanos prebióticos (inulina) y vitamina C, consumida cruda como fruta-hortaliza refrescante o cocida en sopas y guisos amazónicos. Lección viva de toxicidad selectiva amazónica: como su prima mesoamericana, esta especie enseña magistralmente la separación evolutiva de partes comestibles (raíz tuberosa) y partes tóxicas (semillas, vainas verdes, flores) que contienen rotenona (5-10% peso seco) y pterocarpina, isoflavonoides insecticidas naturales que pueblos amazónicos han usado milenariamente para macerados acuosos contra plagas de chagra (Aphis spp., Bemisia tabaci) e incluso para pesca tradicional (envenenamiento controlado de pozas con masa machacada de vainas — técnica del 'barbasco' compartida con otras especies como Lonchocarpus utilis). Manejo agroecológico: propagación por semilla pre-tratada con escarificación mecánica (frotar con lija) para romper latencia, siembra a 30-50 cm entre plantas con tutorado obligatorio (espaldera, tutor vivo de yuca alta o maíz), asocio tradicional amazónico en chagras de tumba-pudre con yuca brava, plátano, piña, copoazú, ají y achiote. Cosecha de raíz a 6-9 meses antes de floración para máximo desarrollo de tubérculo. Las flores deben removerse (despunte sistemático) para concentrar fotosintatos en raíz. Las semillas y vainas se manejan rotuladas como tóxicas, no se consumen jamás, pero se aprovechan en macerados insecticidas orgánicos. Especie pilar de soberanía alimentaria amazónica subutilizada urgente de rescatar antes de erosión genética por pérdida de chagras tradicionales. Fuentes Tier A: POWO Kew, GBIF Backbone Taxonomy, SINCHI Amazonía Colombiana, NRC 1989 Lost Crops of the Incas, Bernal 2015 Catálogo Plantas Colombia.",
+  "sources": [
+    {
+      "id": "powo-kew",
+      "title": "powo-kew",
+      "tier": "A",
+      "url": "https://powo.science.kew.org"
+    },
+    {
+      "id": "gbif-taxonomic-backbone",
+      "title": "gbif-taxonomic-backbone",
+      "tier": "A",
+      "url": "https://www.gbif.org/dataset/d7dddbf4-2cf0-4f39-9b2a-bb099caae36c"
+    },
+    {
+      "id": "sinchi-amazonia-colombiana",
+      "title": "sinchi-amazonia-colombiana",
+      "tier": "A",
+      "url": null
+    },
+    {
+      "id": "nrc-1989-cultivos-andinos",
+      "title": "nrc-1989-cultivos-andinos",
+      "tier": "A",
+      "url": null
+    },
+    {
+      "id": "bernal-2015-plantas-liquenes-colombia",
+      "title": "bernal-2015-plantas-liquenes-colombia",
+      "tier": "A",
+      "url": "http://catalogoplantasdecolombia.unal.edu.co"
+    }
+  ],
+  "_generated_by": "scripts/build-cycle-content-from-catalog.mjs",
+  "_generated_at": "2026-05-19T00:42:57.394Z"
+}

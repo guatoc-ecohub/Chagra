@@ -1,0 +1,62 @@
+{
+  "species_slug": "citrus_sinensis",
+  "scientific_name": "Citrus × sinensis (L.) Osbeck",
+  "common_names": [
+    "Naranja"
+  ],
+  "family": "Rutaceae",
+  "category": "frutales_perennes",
+  "cultivable": true,
+  "conservation_status": "cultivo_comun",
+  "thermal_zones": [
+    "calido",
+    "templado"
+  ],
+  "roles_in_guild": [
+    "crop"
+  ],
+  "antagonists": [],
+  "especies_nativas_sustitutas": [],
+  "propagation": null,
+  "requirements": {
+    "agua": "medio",
+    "altitud_msnm": {
+      "min_absoluto": 0,
+      "optimo_min": 400,
+      "optimo_max": 1800,
+      "max_absoluto": 2200
+    },
+    "temperatura_c": null,
+    "radiacion": null,
+    "drenaje_requerido": "excelente"
+  },
+  "valor_pedagogico": "La naranja dulce (Citrus × sinensis, Rutaceae) es híbrido cítrico originario del sudeste asiático, cultivado en Colombia desde el siglo XVI, hoy concentrado en el Eje cafetero (Quindío, Risaralda, Caldas), Santander, Antioquia, Tolima, Llanos. Variedades comerciales: Valencia tardía (mayoría exportación), Salustiana, Washington Navel, Pera, Tangelo Minneola (híbrido con mandarina). Árbol perenne 5-10 m, copa redondeada densa, flores aromáticas blancas (azahar), frutos esférico-oblongos amarillo-naranja en madurez con piel lisa-rugosa. Reproducción por injerto en patrones (mandarina Cleopatra, Carrizo citrange, lima Rangpur — cada patrón confiere resistencia distinta). Lección agroecológica de adaptación tropical: la naranja colombiana NO sigue el ciclo estacional europeo, fructifica 8-10 meses al año debido al clima tropical bimodal. Manejo: distancia 7x7 m, sombrío inicial con guamo o plátano, fertilización con cuidado en Zn y Mg (deficiencias comunes con síntomas visibles). Plagas críticas: HLB (Huanglongbing) o citrus greening — sin cura, manejo preventivo del vector Diaphorina citri obligatorio.",
+  "sources": [
+    {
+      "id": "powo-kew",
+      "title": "powo-kew",
+      "tier": "A",
+      "url": "https://powo.science.kew.org"
+    },
+    {
+      "id": "gbif-taxonomic-backbone",
+      "title": "gbif-taxonomic-backbone",
+      "tier": "A",
+      "url": "https://www.gbif.org/dataset/d7dddbf4-2cf0-4f39-9b2a-bb099caae36c"
+    },
+    {
+      "id": "agrosavia-manual-frutales-tropicales",
+      "title": "agrosavia-manual-frutales-tropicales",
+      "tier": "A",
+      "url": null
+    },
+    {
+      "id": "cenicafe-manual-cafetero-2013",
+      "title": "cenicafe-manual-cafetero-2013",
+      "tier": "A",
+      "url": "https://www.cenicafe.org/es/index.php/nuestras_publicaciones"
+    }
+  ],
+  "_generated_by": "scripts/build-cycle-content-from-catalog.mjs",
+  "_generated_at": "2026-05-19T00:42:57.406Z"
+}

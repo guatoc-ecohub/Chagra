@@ -1,0 +1,90 @@
+{
+  "species_slug": "hylocereus_undatus",
+  "scientific_name": "Hylocereus undatus (Haw.) Britton & Rose",
+  "common_names": [
+    "Pitaya blanca"
+  ],
+  "family": "Cactaceae",
+  "category": "frutales_perennes",
+  "cultivable": true,
+  "conservation_status": "cultivo_comun",
+  "thermal_zones": [
+    "calido",
+    "templado"
+  ],
+  "roles_in_guild": [
+    "crop",
+    "pollinator_attractor"
+  ],
+  "antagonists": [],
+  "especies_nativas_sustitutas": [],
+  "propagation": {
+    "methods": [
+      "esqueje",
+      "semilla"
+    ],
+    "best_method": "esqueje",
+    "protocol_resumen": "Esquejes de cladodio maduro de 30-40 cm cicatrizados 5-7 días a la sombra antes de plantar. Tutorado obligatorio sobre 'T' de concreto con tela polietileno o tutor vivo. Distancia 3x3 m o doble fila 2.5x1.5 m. Plena producción año 2-3.",
+    "tiempo_a_establecimiento_dias": 60,
+    "notas": "Polinización manual al amanecer para asegurar cuajado en cultivos comerciales (flores nocturnas, polinizadores naturales murciélagos y polillas). Fruto cáscara rojo-rosado con escamas verdes y pulpa blanca con semillas negras pequeñas (cultivar 'pitaya blanca' o 'pitaya roja' confusamente: rojo es la cáscara, blanco es la pulpa).",
+    "fuente": "AGROSAVIA Manual Frutales Tropicales; POWO Kew; ICA Resolución 3168"
+  },
+  "requirements": {
+    "agua": "medio",
+    "altitud_msnm": {
+      "min_absoluto": 0,
+      "optimo_min": 200,
+      "optimo_max": 1500,
+      "max_absoluto": 1800
+    },
+    "temperatura_c": {
+      "helada_letal": 0,
+      "optimo_min": 20,
+      "optimo_max": 30,
+      "max_tolerable": 38
+    },
+    "radiacion": "sol_pleno",
+    "drenaje_requerido": "excelente"
+  },
+  "valor_pedagogico": "La pitaya blanca o pitaya roja de cáscara (Hylocereus undatus (Haw.) Britton & Rose, Cactaceae subfamilia Cactoideae tribu Hylocereeae) es un cactus epífito-hemiepífito trepador perenne originario de Mesoamérica (sur de México, Belize, Guatemala, Honduras, Costa Rica) y naturalizado-cultivado pantropicalmente como frutal comercial de exportación, en Colombia cultivado entre 200 y 1.500 msnm en zonas térmicas cálidas-templadas-moderadas: Valle del Cauca (cinturón frutícola de Buga, Palmira, Tulúa), Tolima (Lérida, Líbano, Falan), Cundinamarca (Cáqueza, Fómeque, Ubaque, Quetame, La Mesa, Anolaima — junto con la pitahaya amarilla S. megalanthus), Boyacá (San Eduardo, Páez, Miraflores), Huila (Garzón, Pitalito), Santander (Lebrija, San Vicente de Chucurí), Antioquia (Suroeste, Urabá) y Magdalena Medio. Pertenece a la familia Cactaceae tribu Hylocereeae (igual tribu que la pitahaya amarilla colombiana Selenicereus megalanthus, ahora reclasificada como Selenicereus undatus en algunas taxonomías recientes — sinónimo Selenicereus undatus (Haw.) D.R.Hunt 2017), planta trepadora epífita-hemiepífita con tallos verdes triangulares-3-angulados de hasta 20 m con aréolas con espinas cortas amarillentas (1-4 mm), crecimiento trepador con raíces aéreas adventicias que se adhieren a árboles tutores o estructuras de tutorado (concreto/madera/tela polietileno), flores blanco-cremas gigantes (25-30 cm de diámetro) que abren una sola noche tropical y son polinizadas por murciélagos nectarívoros (Glossophaga soricina, Anoura geoffroyi) y polillas esfíngidas — en cultivos comerciales se realiza polinización manual al amanecer para asegurar cuajado, frutos baya elipsoidal con cáscara rojo-rosado-magenta brillante con escamas (brácteas) verde-anaranjadas grandes y pulpa blanca translúcida con semillas negras pequeñas masticables (sabor dulce-refrescante delicado, parecido a kiwi-pera-melón). Es lección viva extraordinaria de bioeconomía agroexportadora, polinización por murciélagos, cactáceas no espinosas trepadoras epífitas y cultivo intensivo bajo tutor que enseña a niñas y niños cómo Colombia produce dos pitayas distintas (la blanca H. undatus de cáscara roja y la amarilla S. megalanthus de cáscara amarilla, distintas en distribución, ciclo y mercado — Colombia es líder mundial de S. megalanthus y productora notable de H. undatus). Diferencia diagnóstica didáctica: H. undatus tallos triangulares con espinas más cortas, fruto cáscara roja con escamas verdes anchas, pulpa blanca; S. megalanthus tallos similares pero más delgados con espinas amarillas, fruto cáscara amarilla con brácteas cortas, pulpa blanca translúcida. Ambas comparten ciclo Hylocereeae epífito-trepador-tutorado, polinización por murciélagos y exportación de alto valor. Rica en betacianinas antioxidantes (en cultivares de pulpa roja), vitamina C, fibra, prebióticos (oligofructosa), efecto laxante suave. Producto bandera del programa 'Colombia, semilla de exportación' y mercados orgánicos certificados. Manejo agroecológico: propagación por esqueje de cladodio maduro de 30-40 cm (segmento cicatrizado 5-7 días a la sombra antes de siembra), tutorado obligatorio sobre 'T' de concreto con tela polietileno o sobre tutor vivo (matarratón Gliricidia sepium, leucaena, eritrina), distancia 3x3 m o doble fila 2.5x1.5 m, plena producción a partir del año 2-3 (más rápido que la pitahaya amarilla — H. undatus es de ciclo más corto), cosecha 30-40 días post-floración cuando cáscara cambia de verde a rojo-rosado intenso, polinización manual al amanecer del día siguiente a apertura floral, vida productiva 15-20 años. Función en chagra como frutal de alto valor agregado, atractora de murciélagos polinizadores nocturnos, cultivo de exportación sostenible, soporte vivo trepador en sistemas agroforestales tutorados. Fuentes Tier A: GBIF, POWO Kew, AGROSAVIA Manual Frutales Tropicales, SiB Colombia, ICA Resolución 3168, Bernal 2015.",
+  "sources": [
+    {
+      "id": "gbif-taxonomic-backbone",
+      "title": "gbif-taxonomic-backbone",
+      "tier": "A",
+      "url": "https://www.gbif.org/dataset/d7dddbf4-2cf0-4f39-9b2a-bb099caae36c"
+    },
+    {
+      "id": "powo-kew",
+      "title": "powo-kew",
+      "tier": "A",
+      "url": "https://powo.science.kew.org"
+    },
+    {
+      "id": "agrosavia-manual-frutales-tropicales",
+      "title": "agrosavia-manual-frutales-tropicales",
+      "tier": "A",
+      "url": null
+    },
+    {
+      "id": "sib-colombia",
+      "title": "sib-colombia",
+      "tier": "A",
+      "url": "https://sibcolombia.net"
+    },
+    {
+      "id": "ica-resolucion-3168-2015",
+      "title": "ica-resolucion-3168-2015",
+      "tier": "A",
+      "url": null
+    },
+    {
+      "id": "bernal-2015-plantas-liquenes-colombia",
+      "title": "bernal-2015-plantas-liquenes-colombia",
+      "tier": "A",
+      "url": "http://catalogoplantasdecolombia.unal.edu.co"
+    }
+  ],
+  "_generated_by": "scripts/build-cycle-content-from-catalog.mjs",
+  "_generated_at": "2026-05-19T00:42:57.392Z"
+}

@@ -1,0 +1,52 @@
+<defs>
+      <linearGradient id="gCielo" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0" stop-color="#0d2233"/>
+        <stop offset=".5" stop-color="#12333a"/>
+        <stop offset="1" stop-color="#081821"/>
+      </linearGradient>
+      <radialGradient id="gLuna" cx=".5" cy=".5" r=".5">
+        <stop offset="0" stop-color="#e8f0d8" stop-opacity=".9"/>
+        <stop offset=".4" stop-color="#e8dcbc" stop-opacity=".35"/>
+        <stop offset="1" stop-color="#e8dcbc" stop-opacity="0"/>
+      </radialGradient>
+      <linearGradient id="gElytra" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0" stop-color="#3d3427"/>
+        <stop offset=".55" stop-color="#2c2418"/>
+        <stop offset="1" stop-color="#1e1810"/>
+      </linearGradient>
+      <linearGradient id="gPronoto" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0" stop-color="#b87d3a"/>
+        <stop offset="1" stop-color="#8a5a2c"/>
+      </linearGradient>
+      <radialGradient id="gHalo" cx=".5" cy=".5" r=".5">
+        <stop offset="0" stop-color="#ffefb6" stop-opacity=".9"/>
+        <stop offset=".45" stop-color="#f2d276" stop-opacity=".38"/>
+        <stop offset="1" stop-color="#e8c25a" stop-opacity="0"/>
+      </radialGradient>
+      <radialGradient id="gLinterna" cx=".5" cy=".38" r=".65">
+        <stop offset="0" stop-color="#fff9e6"/>
+        <stop offset=".5" stop-color="#ffedb0"/>
+        <stop offset="1" stop-color="#f0cf72"/>
+      </radialGradient>
+      <radialGradient id="gAura" cx=".5" cy=".5" r=".5">
+        <stop offset="0" stop-color="#6a5426" stop-opacity=".5"/>
+        <stop offset="1" stop-color="#6a5426" stop-opacity="0"/>
+      </radialGradient>
+      <radialGradient id="gFrio" cx=".5" cy="0" r="1">
+        <stop offset="0" stop-color="#e6eeff" stop-opacity=".85"/>
+        <stop offset=".4" stop-color="#cfe0ff" stop-opacity=".35"/>
+        <stop offset="1" stop-color="#cfe0ff" stop-opacity="0"/>
+      </radialGradient>
+      <filter id="boil" x="-8%" y="-8%" width="116%" height="116%">
+        <feTurbulence id="boilTurb" type="fractalNoise" baseFrequency="0.02" numOctaves="1" seed="1" result="n"/>
+        <feDisplacementMap in="SourceGraphic" in2="n" scale="2.4"/>
+      </filter>
+      <filter id="blurAla"><feGaussianBlur stdDeviation="1.6"/></filter>
+      <filter id="grano">
+        <feTurbulence type="fractalNoise" baseFrequency=".9" numOctaves="2" result="g"/>
+        <feColorMatrix in="g" type="matrix" values="0 0 0 0 0.05 0 0 0 0 0.09 0 0 0 0 0.06 0 0 0 .05 0"/>
+      </filter>
+
+      <!-- fronda de helecho -->
+      <path id="fronda" d="M0,0 C -6,-40 -4,-92 0,-128 C 4,-92 6,-40 0,0 Z"/>
+    </defs>

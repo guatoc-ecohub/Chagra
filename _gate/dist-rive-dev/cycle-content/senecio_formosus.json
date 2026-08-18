@@ -1,0 +1,71 @@
+{
+  "species_slug": "senecio_formosus",
+  "scientific_name": "Senecio formosus Kunth",
+  "common_names": [
+    "Árnica de páramo"
+  ],
+  "family": "Asteraceae",
+  "category": "medicinales_alelopaticas",
+  "cultivable": false,
+  "conservation_status": "nativo_silvestre",
+  "thermal_zones": [
+    "paramo",
+    "frio"
+  ],
+  "roles_in_guild": [
+    "dynamic_accumulator",
+    "pollinator_attractor"
+  ],
+  "antagonists": [],
+  "especies_nativas_sustitutas": [],
+  "propagation": {
+    "metodo_principal": "semilla",
+    "notas": "Hierba perenne paramuna de la familia Asteraceae con capítulos amarillos vistosos, conocida tradicionalmente como 'árnica de páramo' por su uso etnobotánico ancestral análogo al de la árnica europea (Arnica montana). Roseta basal de hojas oblanceoladas pubescentes y tallos florales erectos de 30-80 cm. Floración abundante temporada seca cordillera oriental. Recolección silvestre permitida con responsabilidad — NO incluida en lista de especies con prohibición absoluta de aprovechamiento del MADS, pero protegida indirectamente por Ley 1930/2018 cuando crece dentro de páramos delimitados. Propagación por semilla en invernadero alta montaña."
+  },
+  "requirements": {
+    "agua": "medio",
+    "altitud_msnm": {
+      "min_absoluto": 2500,
+      "optimo_min": 3000,
+      "optimo_max": 3800,
+      "max_absoluto": 4200
+    },
+    "temperatura_c": {
+      "helada_letal": -10,
+      "optimo_min": 3,
+      "optimo_max": 12,
+      "max_tolerable": 18
+    },
+    "radiacion": "sol_pleno",
+    "drenaje_requerido": "bueno"
+  },
+  "valor_pedagogico": "La árnica de páramo (Senecio formosus Kunth, familia Asteraceae) es una hierba perenne paramuna emblemática de la medicina tradicional andina colombiana, conocida como 'árnica andina' o 'árnica paramuna' por su uso etnobotánico ancestral análogo al de la árnica europea (Arnica montana) — aunque taxonómicamente distinta (la verdadera Arnica es género hermano restringido al hemisferio norte). Es una roseta basal con hojas oblanceoladas pubescentes (10-20 cm largo) y tallos florales erectos de 30-80 cm que portan capítulos amarillos vistosos típicos de la familia Asteraceae con flores liguladas y flósculos centrales tubulares. La floración abundante (octubre-febrero, temporada seca de la cordillera oriental colombiana) atrae himenópteros, dípteros y aves nectarívoras paramunas (colibríes de altura como Eriocnemis vestita, Aglaeactis cupripennis, Pterophanes cyanopterus). En Colombia se distribuye ampliamente en los páramos y subpáramos de las tres cordilleras (Oriental: Sumapaz, Chingaza, Cocuy, Pisba, Santurbán; Central: Los Nevados, Las Hermosas; Occidental: Tatamá, Frontino, Paramillo) entre 2.500 y 4.200 msnm, con óptimo en 3.000-3.800 msnm en pajonales-frailejonales-matorrales paramunos. Lección viva de medicina tradicional andina y sustitución funcional intergenérica: la árnica de páramo es un ejemplo magistral de cómo el conocimiento etnobotánico campesino-indígena colombiano identificó una planta nativa con propiedades farmacológicas similares a la árnica europea de farmacopea oficial — los campesinos paramunos y muiscas-uwa-pijao-yanacona del altiplano cundiboyacense, Sumapaz, Cocuy, Tolima alto y Cauca alto usan tradicionalmente la infusión y maceración alcohólica de S. formosus para los mismos fines que la árnica europea: tratamiento tópico de golpes, contusiones, hematomas, dolores musculares, esguinces, inflamación articular y dolor reumático. La fitoquímica moderna ha confirmado parcialmente este uso al detectar en el género Senecio compuestos sesquiterpénicos (lactonas sesquiterpénicas, principalmente del tipo eremofilano), flavonoides (quercetina, kempferol), alcaloides pirrolizidínicos (PRECAUCIÓN: estos últimos son hepatotóxicos si se administran por vía oral en dosis altas o sostenidas, razón por la cual la árnica de páramo se usa EXCLUSIVAMENTE por vía tópica nunca interna), y aceites esenciales con actividad antiinflamatoria y antimicrobiana. ADVERTENCIA TOXICOLÓGICA: los alcaloides pirrolizidínicos del género Senecio son hepatotóxicos por vía oral; el uso tradicional correcto es EXCLUSIVAMENTE TÓPICO mediante maceración alcohólica para frotaciones externas, NUNCA infusión oral. Uso etnobotánico documentado (García-Barriga 1974 Flora Medicinal de Colombia, Bernal 2015): maceración alcohólica de capítulos florales en alcohol de 70-90° por 21 días, filtrado y aplicación tópica directa sobre el área afectada 3-4 veces/día. Uso prudencial: máximo 7-10 días continuos, evitar aplicación sobre heridas abiertas o piel lesionada, contraindicado embarazo y lactancia. Recolección silvestre paramuna con responsabilidad: solo capítulos florales en plena floración (octubre-febrero), nunca arrancar la planta completa, dejar mínimo 70% de los individuos del rodal sin recolectar para garantizar regeneración natural, NO recolectar dentro de Parques Nacionales Naturales ni Áreas Protegidas Regionales sin permiso de la autoridad ambiental competente. Protección indirecta: la Ley 1930/2018 protege los ecosistemas de páramo donde S. formosus habita, por lo que aunque la especie no está en la lista de especies amenazadas del MADS, su hábitat sí está jurídicamente protegido. Manejo agroecológico (cultivo restringido a finca de alta montaña fría >2.500 msnm): propagación por semilla recolectada de aquenios maduros, siembra en sustrato de turba de páramo + tierra de subpáramo + arena + MO en invernadero frío, germinación 20-45 días, trasplante a bolsa 3-4 meses, plantación definitiva 6-8 meses, asocio con otras medicinales paramunas (Hypericum juniperinum, Disterigma, Bartsia, Pernettya), uso doméstico exclusivo NO COMERCIAL. La árnica de páramo es ejemplo paradigmático de la riqueza farmacológica de la flora paramuna colombiana y de la necesidad de preservar conocimiento etnobotánico tradicional con responsabilidad toxicológica moderna. Fuentes Tier A: POWO Kew, GBIF Taxonomic Backbone, GBIF Colombia, Bernal 2015 Catálogo Plantas Colombia, García-Barriga 1974 Flora Medicinal de Colombia, JBB Jardín Botánico de Bogotá, Humboldt Flora de Páramos.",
+  "sources": [
+    {
+      "id": "powo-kew",
+      "title": "powo-kew",
+      "tier": "A",
+      "url": "https://powo.science.kew.org"
+    },
+    {
+      "id": "gbif-taxonomic-backbone",
+      "title": "gbif-taxonomic-backbone",
+      "tier": "A",
+      "url": "https://www.gbif.org/dataset/d7dddbf4-2cf0-4f39-9b2a-bb099caae36c"
+    },
+    {
+      "id": "gbif-colombia",
+      "title": "gbif-colombia",
+      "tier": "A",
+      "url": "https://www.gbif.org/country/CO"
+    },
+    {
+      "id": "bernal-2015-plantas-liquenes-colombia",
+      "title": "bernal-2015-plantas-liquenes-colombia",
+      "tier": "A",
+      "url": "http://catalogoplantasdecolombia.unal.edu.co"
+    }
+  ],
+  "_generated_by": "scripts/build-cycle-content-from-catalog.mjs",
+  "_generated_at": "2026-05-19T00:42:57.399Z"
+}
