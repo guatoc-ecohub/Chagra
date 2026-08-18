@@ -9,11 +9,20 @@
  * vector — el error de los 5 días) y la VIDA tiene que salir del mismo
  * sistema de Angelita/el jaguar (`useVidaIdle` + `useRitmoPropio` +
  * `useMiradaUsted` + visemas). La lámina es un retrato ¾ ERGUIDO: la
- * zarigüeya de pie, guante blanco con LÁPIZ en la mano alzada (lado
+ * zarigüeya de pie, PATA canela con garras y LÁPIZ en la mano alzada (lado
  * izquierdo de la lámina), BRÚJULA en la otra manito contra el pecho, COLA
  * PRENSIL desnuda enroscada en C al lado derecho, boca abierta sonriendo
- * con dientes. Los "extras" de la orden (guantes, lápiz+brújula, cola
- * prensil) NO se dibujan: ya están EN la lámina — aquí solo se ARTICULAN.
+ * con dientes. Los "extras" de la orden (lápiz+brújula, cola prensil) NO se
+ * dibujan: ya están EN la lámina — aquí solo se ARTICULAN.
+ *
+ * NOTA 2026-08-18 (`fix/zariguya-sin-guantes-v2`): las manos, que en la
+ * lámina original eran guantes blancos tipo Mickey, se REPINTARON en el
+ * propio PNG como patas reales (canela de los dedos traseros + dedos
+ * entintados + garras + muñeca peluda), con la HUELLA intacta: las
+ * primitivas de este archivo (la elipse se sigue llamando `guante`) y
+ * el INPAINT_PECHO siguen midiendo lo mismo. Gate: judge-vl control
+ * positivo sí→no + 0 blancos L>205 en ambas elipses
+ * (`_gate/zariguya-sin-guantes/`).
  *
  * CÓMO SE MIDIÓ (honestidad del método — el mismo de anatomia.js del
  * jaguar): sobre `zariguya.png` (481×444, confirmado con

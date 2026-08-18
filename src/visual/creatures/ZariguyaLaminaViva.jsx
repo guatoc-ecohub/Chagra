@@ -26,7 +26,7 @@ const JAW_DE_VISEMA = { V1: 0, V2: 0.42, V3: 1, V4: 0.36 };
 
 /**
  * ZariguyaLaminaViva — la LÁMINA aprobada de la zarigüeya (`zariguya.png`,
- * estilo grabado: erguida, guante blanco con lápiz en la mano alzada,
+ * estilo grabado: erguida, pata canela con garras y lápiz en la mano alzada,
  * brújula en la otra, cola prensil en C) recortada en capas por alfa y
  * montada sobre un rig con la VIDA de Angelita — hermana 1:1 de
  * `JaguarLaminaViva.jsx` (leer su docstring para el porqué del método).
@@ -55,7 +55,7 @@ const JAW_DE_VISEMA = { V1: 0, V2: 0.42, V3: 1, V4: 0.36 };
  *   · Al abrir MÁS la boca se destapa una franja sin píxeles: la tapa el
  *     interior de boca SINTÉTICO (`.zlv-bocaInterior`, único píxel no-PNG
  *     del dibujo — mismo trato que el jaguar).
- *   · Detrás del guante de la brújula hay pecho: el cuerpo lo rellena
+ *   · Detrás de la manito de la brújula hay pecho: el cuerpo lo rellena
  *     `capas.js` CLONANDO la lanilla del propio vientre (INPAINT_PECHO) —
  *     píxeles de la lámina, movidos.
  *   · Las patas NO se cortan (lección "3-4 patas" del jaguar): el caminar
