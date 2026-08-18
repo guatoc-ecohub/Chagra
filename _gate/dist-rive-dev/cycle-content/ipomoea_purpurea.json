@@ -1,0 +1,89 @@
+{
+  "species_slug": "ipomoea_purpurea",
+  "scientific_name": "Ipomoea purpurea (L.) Roth",
+  "common_names": [
+    "Campanilla morada"
+  ],
+  "family": "Convolvulaceae",
+  "category": "especies_invasoras",
+  "cultivable": false,
+  "conservation_status": "invasor",
+  "thermal_zones": [
+    "calido",
+    "templado",
+    "frio"
+  ],
+  "roles_in_guild": [
+    "invasive"
+  ],
+  "antagonists": [],
+  "especies_nativas_sustitutas": [
+    "mucuna_pruriens",
+    "passiflora_ligularis",
+    "passiflora_tripartita_mollissima",
+    "trifolium_repens",
+    "tropaeolum_majus"
+  ],
+  "propagation": {
+    "metodo_principal": "semilla",
+    "notas": "Especial cuidado con los fragmentos de tallo con nudos; enraízan fácilmente."
+  },
+  "requirements": {
+    "agua": "medio",
+    "altitud_msnm": {
+      "min_absoluto": 0,
+      "optimo_min": 1000,
+      "optimo_max": 2600,
+      "max_absoluto": 3000
+    },
+    "temperatura_c": {
+      "helada_letal": 0,
+      "optimo_min": 16,
+      "optimo_max": 24,
+      "max_tolerable": 32
+    },
+    "radiacion": "sol_pleno",
+    "drenaje_requerido": "bueno"
+  },
+  "valor_pedagogico": "La campana morada o campanilla (Ipomoea purpurea (L.) Roth) es una convolvulácea anual trepadora ampliamente naturalizada en Colombia, valorada como ornamental, cobertura de cercas y atrayente de polinizadores (abejas, abejorros, colibríes). Crece prácticamente en todas las zonas térmicas entre 0 y 2.800 msnm. Floración vistosa morada-azul-rosa según ecotipo, ciclo anual con autodispersión por semilla (potencial maleza moderada en cultivos densos; manejar bordes). Manejo agroecológico: cerca viva temporal, control biológico al final de ciclo (corte antes de semilla madura para reducir banco semillas), uso como cobertura suelo en pendientes. NO es invasora alto riesgo según IAvH Baptiste 2010 pero se considera naturalizada de manejo. Fuentes Tier A: Catálogo Plantas y Líquenes Colombia, IAvH, POWO Kew, GBIF Backbone Taxonomy, AGROSAVIA.",
+  "sources": [
+    {
+      "id": "powo-kew",
+      "title": "powo-kew",
+      "tier": "A",
+      "url": "https://powo.science.kew.org"
+    },
+    {
+      "id": "sib-colombia",
+      "title": "sib-colombia",
+      "tier": "A",
+      "url": "https://sibcolombia.net"
+    },
+    {
+      "id": "gbif-taxonomic-backbone",
+      "title": "gbif-taxonomic-backbone",
+      "tier": "A",
+      "url": "https://www.gbif.org/dataset/d7dddbf4-2cf0-4f39-9b2a-bb099caae36c"
+    },
+    {
+      "id": "calderon-saenz-2003-invasoras",
+      "title": "calderon-saenz-2003-invasoras",
+      "tier": "A",
+      "url": null
+    },
+    {
+      "id": "ica-resolucion-3168-2015",
+      "title": "ica-resolucion-3168-2015",
+      "tier": "A",
+      "url": null
+    },
+    {
+      "id": "agrosavia-forrajeras-2022",
+      "title": "agrosavia-forrajeras-2022",
+      "tier": "A",
+      "url": null
+    }
+  ],
+  "_generated_by": "scripts/build-cycle-content-from-catalog.mjs",
+  "_generated_at": "2026-05-19T00:42:57.361Z"
+}

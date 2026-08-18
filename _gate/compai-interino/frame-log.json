@@ -1,0 +1,114 @@
+[
+  {
+    "i": 1,
+    "file": "/home/kortux/Workspace/chagra/_gate/compai-interino/roam-f01.png",
+    "transform": "translate3d(-113.3px, 0px, 0px)",
+    "burbujaVisible": false,
+    "t": 1786832446681
+  },
+  {
+    "i": 2,
+    "file": "/home/kortux/Workspace/chagra/_gate/compai-interino/roam-f02.png",
+    "transform": "translate3d(-166px, 0px, 0px)",
+    "burbujaVisible": false,
+    "t": 1786832448238
+  },
+  {
+    "i": 3,
+    "file": "/home/kortux/Workspace/chagra/_gate/compai-interino/roam-f03.png",
+    "transform": "translate3d(-189.3px, 0px, 0px)",
+    "burbujaVisible": true,
+    "t": 1786832449804
+  },
+  {
+    "i": 4,
+    "file": "/home/kortux/Workspace/chagra/_gate/compai-interino/roam-f04.png",
+    "transform": "translate3d(-189.9px, 0px, 0px)",
+    "burbujaVisible": false,
+    "t": 1786832451367
+  },
+  {
+    "i": 5,
+    "file": "/home/kortux/Workspace/chagra/_gate/compai-interino/roam-f05.png",
+    "transform": "translate3d(-243.7px, 0px, 0px)",
+    "burbujaVisible": false,
+    "t": 1786832452954
+  },
+  {
+    "i": 6,
+    "file": "/home/kortux/Workspace/chagra/_gate/compai-interino/roam-f06.png",
+    "transform": "translate3d(-296.4px, 0px, 0px)",
+    "burbujaVisible": false,
+    "t": 1786832454501
+  },
+  {
+    "i": 7,
+    "file": "/home/kortux/Workspace/chagra/_gate/compai-interino/roam-f07.png",
+    "transform": "translate3d(-349.1px, 0px, 0px)",
+    "burbujaVisible": false,
+    "t": 1786832456184
+  },
+  {
+    "i": 8,
+    "file": "/home/kortux/Workspace/chagra/_gate/compai-interino/roam-f08.png",
+    "transform": "translate3d(-384px, 0px, 0px)",
+    "burbujaVisible": true,
+    "t": 1786832457834
+  },
+  {
+    "i": 9,
+    "file": "/home/kortux/Workspace/chagra/_gate/compai-interino/roam-f09.png",
+    "transform": "translate3d(-384px, 0px, 0px)",
+    "burbujaVisible": true,
+    "t": 1786832459455
+  },
+  {
+    "i": 10,
+    "file": "/home/kortux/Workspace/chagra/_gate/compai-interino/roam-f10.png",
+    "transform": "translate3d(-384px, 0px, 0px)",
+    "burbujaVisible": true,
+    "t": 1786832461082
+  },
+  {
+    "i": 11,
+    "file": "/home/kortux/Workspace/chagra/_gate/compai-interino/roam-f11.png",
+    "transform": "translate3d(-341.5px, 0px, 0px)",
+    "burbujaVisible": false,
+    "t": 1786832462674
+  },
+  {
+    "i": 12,
+    "file": "/home/kortux/Workspace/chagra/_gate/compai-interino/roam-f12.png",
+    "transform": "translate3d(-285.4px, 0px, 0px)",
+    "burbujaVisible": false,
+    "t": 1786832464315
+  },
+  {
+    "i": 13,
+    "file": "/home/kortux/Workspace/chagra/_gate/compai-interino/roam-f13.png",
+    "transform": "translate3d(-231px, 0px, 0px)",
+    "burbujaVisible": false,
+    "t": 1786832465915
+  },
+  {
+    "i": 14,
+    "file": "/home/kortux/Workspace/chagra/_gate/compai-interino/roam-f14.png",
+    "transform": "translate3d(-176.6px, 0px, 0px)",
+    "burbujaVisible": false,
+    "t": 1786832467524
+  },
+  {
+    "i": 15,
+    "file": "/home/kortux/Workspace/chagra/_gate/compai-interino/roam-f15.png",
+    "transform": "translate3d(-121.1px, 0px, 0px)",
+    "burbujaVisible": false,
+    "t": 1786832469145
+  },
+  {
+    "i": 16,
+    "file": "/home/kortux/Workspace/chagra/_gate/compai-interino/roam-f16.png",
+    "transform": "translate3d(-66.1px, 0px, 0px)",
+    "burbujaVisible": false,
+    "t": 1786832470763
+  }
+]

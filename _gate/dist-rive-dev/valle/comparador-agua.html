@@ -1,0 +1,382 @@
+<!doctype html>
+<html lang="es-CO">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Comparador — el agua (A vs B)</title>
+<link rel="icon" href="data:,">
+<!--
+  ✅ DECIDIDO (2026-08-07): GANÓ B = lib3d/fx/aguaParamo.js. A queda archivado
+  con banner en lib/agua.js (nunca borrado). Perf empatado a vsync 60 (px=2 y
+  px=4, GPU M6000, medidor validado con controles agua=0 idénticos); el
+  veredicto fue artístico: lámina glauca + espuma en encaje + chorrera con peso
+  (B) contra espuma saturada tipo leche + chorrera-spray + helechos paraguas
+  (A). Evidencia: _gate/agua-*.png · informe en Chagra-strategy/ops/.
+
+  Harness de DECISIÓN entre los dos módulos de agua (misma tarea despachada dos
+  veces la misma noche — precedente: comparador-arboles-frio.html):
+    A = lib/agua.js            (makeQuebrada / makeChorrera / makeHelechosRibera)
+    B = lib3d/fx/aguaParamo.js (crearQuebrada / crearChorrera)
+  MISMA escena, MISMA luz, MISMA cámara, MISMO medidor — el módulo entra por query.
+    ?mod=a|b
+    &vista=rasante    ★ LA QUEBRADA A RAS DE AGUA, mirando aguas arriba.
+                      El encuadre que decide la quebrada: ¿corren las normales?
+                      ¿rompe la espuma en las piedras? ¿se asoma el fondo?
+                      La cámara comparte XZ y dirección; su ALTURA se ancla a la
+                      lámina de CADA módulo (+1,15 m) porque cada contrato talla
+                      su cauce a distinta cota — a ras es a ras del agua de cada uno.
+    &vista=chorrera   ★ LA CHORRERA ENTERA desde la terraza baja (cámara fija
+                      idéntica para ambos): ¿lámina de agua cayendo o spray?
+    &vista=quebrada   la quebrada en 3/4: curso, piedras, estelas.
+    &vista=base       el impacto: pie, pozo/poza y su neblina.
+    &vista=panorama   todo junto.  &vista=ribera  la vegetación de orilla (A).
+    &vista=cenital    diagnóstico: ¿la lámina cubre el cauce?
+    &agua=0           control: el mismo terreno sin agua (aísla el costo en ms).
+    &bruma=0          apaga brumaVolumetrica en B (aísla el costo del agua sola).
+                      A trae su neblina PROPIA incrustada: no se puede apagar —
+                      eso mismo es el hallazgo del criterio 4.
+    &helechos=0       quita la ribera de A (para medir su agua sola).
+    &px=2             pixelRatio (2 = escritorio; 4 = prueba de techo de FILL).
+  Condición de render: la del VALLE VIVO (main.js): AgX, exposure 1,55.
+  Sombras APAGADAS en ambos a propósito: condición idéntica y neutra.
+  Geografía compartida (terraza alta -> escarpe 15 u -> terraza baja, curso
+  cursoX(z)): cada módulo la recibe por SU contrato — A con el canal tallado en
+  heightAt (como exige su harness), B excavando con profundidadEn (su contrato).
+-->
+<style>
+  html,body{margin:0;height:100%;background:#b7c8c4;overflow:hidden}
+  canvas{display:block}
+  #hud{position:fixed;left:10px;bottom:10px;z-index:5;font:12px/1.5 ui-monospace,monospace;
+    color:#14161a;background:rgba(255,255,255,.78);padding:6px 10px;border-radius:6px;
+    white-space:pre;pointer-events:none}
+  #hud.error{background:#a01f12;color:#fff}
+</style>
+<script type="importmap">
+{
+  "imports": {
+    "three": "./vendor/three.module.js",
+    "three/addons/": "./vendor/addons/"
+  }
+}
+</script>
+</head>
+<body>
+<div id="hud">cargando…</div>
+<script type="module">
+import * as THREE from 'three';
+import { makeQuebrada, makeChorrera, makeHelechosRibera } from './lib/agua.js';
+import { crearQuebrada, crearChorrera } from './lib3d/fx/aguaParamo.js';
+import { crearBrumaVolumetrica } from './lib3d/fx/brumaVolumetrica.js';
+
+const hud = document.getElementById('hud');
+window.addEventListener('error', (e) => {
+  hud.classList.add('error');
+  hud.textContent = 'ERROR: ' + (e.message || e.type);
+});
+window.addEventListener('unhandledrejection', (e) => {
+  hud.classList.add('error');
+  hud.textContent = 'RECHAZO: ' + e.reason;
+});
+
+const q = new URLSearchParams(location.search);
+const mod = (q.get('mod') || 'a').toLowerCase();
+const vista = q.get('vista') || 'rasante';
+const CON_AGUA = q.get('agua') !== '0';
+const CON_BRUMA = q.get('bruma') !== '0';
+const CON_HELECHOS = q.get('helechos') !== '0';
+
+// ── renderer: la MISMA factura del valle vivo, para ambos ────────────────────
+const renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: 'high-performance' });
+renderer.setPixelRatio(Math.max(0.5, +(q.get('px') ?? 2)));
+renderer.setSize(innerWidth, innerHeight);
+renderer.toneMapping = THREE.AgXToneMapping;      // main.js:98 — el valle manda
+renderer.toneMappingExposure = 1.55;
+renderer.shadowMap.enabled = false;               // neutro: ninguno con sombras
+document.body.appendChild(renderer.domElement);
+
+const escena = new THREE.Scene();
+const CIELO = new THREE.Color('#b7c8c4');
+escena.background = CIELO;
+escena.fog = new THREE.FogExp2(CIELO, 0.004);     // horizonte apenas; a <60 m no pesa
+const camara = new THREE.PerspectiveCamera(58, innerWidth / innerHeight, 0.1, 900);
+
+const solDir = new THREE.Vector3(0.44, 0.66, 0.38).normalize();
+const sol = new THREE.DirectionalLight(0xfff0d6, 2.2);
+sol.position.copy(solDir).multiplyScalar(80);
+escena.add(sol);
+escena.add(new THREE.HemisphereLight(0xcfdce4, 0x3d3a2c, 1.1));
+
+// ── GEOGRAFÍA COMPARTIDA (idéntica para A y B) ───────────────────────────────
+function hashT(x, z) { const h = Math.sin(x * 127.1 + z * 311.7) * 43758.5453; return h - Math.floor(h); }
+function vnoiseT(x, z) {
+  const xi = Math.floor(x), zi = Math.floor(z), xf = x - xi, zf = z - zi;
+  const u = xf * xf * (3 - 2 * xf), v = zf * zf * (3 - 2 * zf);
+  const a = hashT(xi, zi), b = hashT(xi + 1, zi), c = hashT(xi, zi + 1), d = hashT(xi + 1, zi + 1);
+  return a + (b - a) * u + (c - a) * v + (a - b - c + d) * u * v;
+}
+function fbmT(x, z, oct = 4) {
+  let s = 0, amp = 1, f = 1, n = 0;
+  for (let i = 0; i < oct; i++) { s += amp * vnoiseT(x * f, z * f); n += amp; amp *= 0.5; f *= 2.03; }
+  return s / n;
+}
+const suavT = (a, b, x) => { const t = Math.min(1, Math.max(0, (x - a) / (b - a))); return t * t * (3 - 2 * t); };
+
+const ALTO_ESCARPE = 15;
+const bordeEn = (x) => (vnoiseT(x * 0.06 + 3.3, 7.7) - 0.5) * 3.2;
+function cursoX(z) {
+  return 2 + Math.sin(z * 0.09 + 1.2) * 4.6 + Math.sin(z * 0.031 - 0.7) * 2.4;
+}
+function alturaEn(x, z) {
+  const zRel = z - bordeEn(x);
+  const alta = ALTO_ESCARPE + (-zRel - 2) * 0.14 + (fbmT(x * 0.03 - 5.5, z * 0.03 + 2.2) - 0.5) * 4.2;
+  const baja = 0 + (zRel - 2) * 0.045 + (fbmT(x * 0.04 + 17.0, z * 0.04 - 9.0) - 0.5) * 2.6;
+  const k = suavT(-1.2, 1.2, zRel);
+  const dq = Math.abs(x - cursoX(z));
+  const vaguada = -1.7 * (1 - suavT(1.5, 9, dq));
+  return alta * (1 - k) + baja * k + vaguada;
+}
+// el contrato de A: el CANAL lo talla el anfitrión en heightAt (su harness lo
+// hacía con 2,4 u); acá 1,7 u ajustado al ancho de lámina de este curso
+const canalA = (x, z) => 1.7 * (1 - suavT(0.9, 4.6, Math.abs(x - cursoX(z))));
+const heightAtA = (x, z) => alturaEn(x, z) - canalA(x, z);
+
+// waypoints IDÉNTICOS para ambos módulos
+const wpAlta = [];
+for (let z = -68; z <= -3.4; z += 5.2) wpAlta.push({ x: cursoX(z), z });
+const zLabio = bordeEn(cursoX(-2)) - 2.6;
+wpAlta.push({ x: cursoX(zLabio), z: zLabio });
+const labio = { x: cursoX(zLabio), z: zLabio };
+const labioBase = alturaEn(labio.x, zLabio);
+const zPie = bordeEn(labio.x) + 3.4;
+const pieBase = alturaEn(labio.x, zPie + 2.5);
+const wpBaja = [];
+for (let z = zPie + 3.2; z <= 72; z += 5.6) wpBaja.push({ x: cursoX(z), z });
+
+// ── EL AGUA, cada módulo por su contrato ─────────────────────────────────────
+const piezasTick = [];   // {tick(dt)}
+const piezasUpd = [];    // {update(tAbs)}
+let qA1 = null, qA2 = null, qB1 = null, qB2 = null, chB = null, bruma = null;
+
+if (CON_AGUA && mod === 'a') {
+  qA1 = makeQuebrada({
+    puntos: wpAlta, heightAt: heightAtA, ancho: 5.0, hondura: 0.9,
+    rocas: 16, seed: 31, sol: solDir, alza: 0.45, cielo: CIELO,
+  });
+  escena.add(qA1.group); piezasUpd.push(qA1);
+  qA2 = makeQuebrada({
+    puntos: wpBaja, heightAt: heightAtA, ancho: 5.8, hondura: 0.9,
+    rocas: 10, seed: 77, sol: solDir, alza: 0.45, cielo: CIELO,
+  });
+  escena.add(qA2.group); piezasUpd.push(qA2);
+  const chA = makeChorrera({
+    labio: { x: labio.x, y: heightAtA(labio.x, zLabio) + 0.2, z: zLabio },
+    pie: { x: labio.x, y: heightAtA(labio.x, zPie + 2.5) + 0.25, z: zPie },
+    heightAt: heightAtA, ancho: 2.3, cortes: [0, 1], seed: 3, sol: solDir,
+    poza: true, roce: 0.8,
+  });
+  escena.add(chA.group); piezasUpd.push(chA);
+  if (CON_HELECHOS) {
+    const he = makeHelechosRibera({ puntos: wpBaja, heightAt: heightAtA, n: 24, seed: 977, aparte: 6 });
+    escena.add(he.group);
+    piezasUpd.push(he);   // update(t) avanza el viento compartido de vientoMundos
+  }
+} else if (CON_AGUA && mod === 'b') {
+  qB1 = crearQuebrada(THREE, {
+    puntos: wpAlta, alturaEn, ancho: 2.5, hundir: 0.55,
+    piedras: 16, chispas: 80, seed: 31, solDir, muestras: 170,
+  });
+  escena.add(qB1.grupo); piezasTick.push(qB1);
+  qB2 = crearQuebrada(THREE, {
+    puntos: wpBaja, alturaEn, ancho: 2.9, hundir: 0.5,
+    piedras: 10, chispas: 40, seed: 77, solDir, muestras: 130,
+  });
+  escena.add(qB2.grupo); piezasTick.push(qB2);
+  const poolY = pieBase - 0.25;
+  const altoCaida = labioBase + 0.55 - (poolY - 0.06);
+  chB = crearChorrera(THREE, {
+    alto: altoCaida, ancho: 2.3, saltos: 1, deriva: altoCaida * 0.06,
+    pozo: 4.2, gotas: 26, calidad: 'alta', seed: 47, solDir,
+    caraEn: (t) => ({ x: 0, z: (1 - t) * 2.7 }),
+  });
+  chB.grupo.position.set(labio.x, poolY - 0.06, labio.z + 1.4);
+  escena.add(chB.grupo); piezasTick.push(chB);
+  if (CON_BRUMA) {
+    const anclas = chB.anclasBruma.map((a) => ({
+      x: chB.grupo.position.x + a.x,
+      y: chB.grupo.position.y + a.y - 1.2,
+      z: chB.grupo.position.z + a.z,
+    }));
+    bruma = crearBrumaVolumetrica(THREE, {
+      puntos: anclas, jirones: 30, haces: 0, seed: 47,
+      dispersion: 2.4, solDir, color: 0xe6efec, intensidad: 0.9,
+      cerca: [2, 6], lejos: [70, 120],
+    });
+    escena.add(bruma.grupo); piezasTick.push(bruma);
+  }
+}
+
+// ── EL SUELO del anfitrión (mismos colores; la zanja según el contrato) ──────
+function terrenoY(x, z) {
+  if (!CON_AGUA) return alturaEn(x, z);
+  if (mod === 'a') return heightAtA(x, z);
+  let y = alturaEn(x, z);
+  if (qB1) y -= qB1.profundidadEn(x, z);
+  if (qB2) y -= qB2.profundidadEn(x, z);
+  const d = Math.hypot(x - labio.x, z - (zPie + 2.4));
+  y -= 0.85 * (1 - suavT(3.0, 7.2, d));
+  return y;
+}
+function zanjaTinte(x, z) {
+  if (!CON_AGUA) return 0;
+  if (mod === 'a') return canalA(x, z);
+  return (qB1 ? qB1.profundidadEn(x, z) : 0) + (qB2 ? qB2.profundidadEn(x, z) : 0);
+}
+{
+  const LADO = 150, SEG = 300;
+  const geoSuelo = new THREE.PlaneGeometry(LADO, LADO, SEG, SEG);
+  geoSuelo.rotateX(-Math.PI / 2);
+  const Pp = geoSuelo.attributes.position;
+  const col = new Float32Array(Pp.count * 3);
+  const pajonal = new THREE.Color('#4d6b33');
+  const pajonalSeco = new THREE.Color('#6d7c40');
+  const musgo = new THREE.Color('#3c5a2c');
+  const roca = new THREE.Color('#6f6a5e');
+  const rocaMojada = new THREE.Color('#3d443f');
+  const orilla = new THREE.Color('#7a7263');
+  const c = new THREE.Color();
+  for (let i = 0; i < Pp.count; i++) {
+    const x = Pp.getX(i), z = Pp.getZ(i);
+    const y = terrenoY(x, z);
+    Pp.setY(i, y);
+    const pend = Math.min(1, Math.abs(terrenoY(x, z + 0.6) - y) / 2.2);
+    const pendK = suavT(0.3, 0.75, pend);
+    const n1 = fbmT(x * 0.12 + 3.1, z * 0.12 - 1.7);
+    c.copy(pajonal).lerp(pajonalSeco, suavT(0.45, 0.75, n1) * 0.65);
+    c.lerp(musgo, suavT(0.55, 0.8, fbmT(x * 0.05 - 8, z * 0.05 + 5)) * 0.5);
+    c.lerp(roca, pendK);
+    if (pendK > 0.05) {
+      const fEst = (y * 0.72 + fbmT(x * 0.23 + 6.1, z * 0.23) * 1.6) % 1;
+      const veta = fbmT(x * 0.6 + 2.2, y * 0.6 - 4.4);
+      c.multiplyScalar(1 - (suavT(0.62, 0.88, fEst) * 0.38 + suavT(0.6, 0.85, veta) * 0.18) * pendK);
+      c.lerp(orilla, suavT(0.15, 0.68, fEst) * (1 - suavT(0.62, 0.88, fEst)) * 0.35 * pendK);
+      c.lerp(musgo, suavT(0.52, 0.82, fbmT(x * 0.32 + 9.9, y * 0.27 - 3.3)) * 0.42 * pendK);
+    }
+    c.lerp(orilla, suavT(0.1, 0.42, zanjaTinte(x, z)) * 0.6);
+    const dHilo = Math.abs(x - cursoX(z));
+    c.lerp(rocaMojada, pendK * suavT(6, 1.5, dHilo) * 0.7);
+    const g = 0.84 + fbmT(x * 0.9, z * 0.9, 2) * 0.34;
+    col[i * 3] = c.r * g; col[i * 3 + 1] = c.g * g; col[i * 3 + 2] = c.b * g;
+  }
+  geoSuelo.setAttribute('color', new THREE.BufferAttribute(col, 3));
+  geoSuelo.computeVertexNormals();
+  const suelo = new THREE.Mesh(geoSuelo, new THREE.MeshStandardMaterial({
+    vertexColors: true, roughness: 0.97, metalness: 0,
+  }));
+  suelo.name = 'suelo-comparador';
+  escena.add(suelo);
+}
+
+// ── cota de la lámina de CADA módulo (para el encuadre rasante) ──────────────
+function tDeZ(curva, zTarget) {
+  let best = 0, bd = 1e9;
+  for (let i = 0; i <= 200; i++) {
+    const p = curva.getPoint(i / 200);
+    const d = Math.abs(p.z - zTarget);
+    if (d < bd) { bd = d; best = i / 200; }
+  }
+  return best;
+}
+function aguaYen(zC) {
+  if (mod === 'a' && qA1) return qA1.superficieY(tDeZ(qA1.curve, zC));
+  return alturaEn(cursoX(zC), zC) - 0.11;   // lámina de B: alturaEn − hundir + alza de su fórmula
+}
+
+// ── ENCUADRES (misma XZ y mirada para ambos) ─────────────────────────────────
+const VISTAS = {
+  rasante: () => {
+    const zC = -20;
+    const pos = new THREE.Vector3(cursoX(zC + 9) + 1.1, aguaYen(zC + 9) + 1.15, zC + 9);
+    const mira = new THREE.Vector3(cursoX(zC - 16), aguaYen(zC - 16) + 0.1, zC - 16);
+    return { pos, mira };
+  },
+  quebrada: () => {
+    const zC = -26;
+    const pos = new THREE.Vector3(cursoX(zC) + 7.5, alturaEn(cursoX(zC) + 7.5, zC + 12) + 4.6, zC + 12);
+    const mira = new THREE.Vector3(cursoX(zC - 10), alturaEn(cursoX(zC - 10), zC - 10) - 0.6, zC - 10);
+    return { pos, mira };
+  },
+  chorrera: () => {
+    const pos = new THREE.Vector3(labio.x + 6, alturaEn(labio.x + 6, labio.z + 26) + 3.6, labio.z + 26);
+    const mira = new THREE.Vector3(labio.x, pieBase + (labioBase - pieBase) * 0.52, labio.z + 1);
+    return { pos, mira };
+  },
+  base: () => {
+    const pos = new THREE.Vector3(labio.x - 6.5, pieBase + 3.4, labio.z + 16);
+    const mira = new THREE.Vector3(labio.x + 0.3, pieBase + 2.6, labio.z + 1.4);
+    return { pos, mira };
+  },
+  panorama: () => {
+    const pos = new THREE.Vector3(labio.x + 24, alturaEn(labio.x + 24, labio.z + 34) + 12, labio.z + 34);
+    const mira = new THREE.Vector3(labio.x - 2, pieBase + ALTO_ESCARPE * 0.45, labio.z - 6);
+    return { pos, mira };
+  },
+  ribera: () => {
+    const pos = new THREE.Vector3(cursoX(34) + 2, alturaEn(cursoX(34) + 2, 40) + 3.2, 40);
+    const mira = new THREE.Vector3(cursoX(18) + 7, alturaEn(cursoX(18) + 7, 18) + 2.5, 18);
+    return { pos, mira };
+  },
+  cenital: () => {
+    const zC = -22;
+    const pos = new THREE.Vector3(cursoX(zC), alturaEn(cursoX(zC), zC) + 26, zC);
+    const mira = new THREE.Vector3(cursoX(zC - 1), alturaEn(cursoX(zC - 1), zC - 1), zC - 1);
+    return { pos, mira };
+  },
+};
+const V = (VISTAS[vista] ?? VISTAS.rasante)();
+camara.position.copy(V.pos);
+camara.lookAt(V.mira);
+
+// ── loop + MEDIDOR (el mismo para ambos: ms EMA, FPS, tris, calls) ───────────
+const reloj = new THREE.Clock();
+let ema = 0, frames = 0, fpsT0 = performance.now(), fpsN = 0, fps = 0;
+function ciclo() {
+  requestAnimationFrame(ciclo);
+  const dt = Math.min(0.05, reloj.getDelta());
+  for (const p of piezasTick) p.tick(dt);
+  for (const p of piezasUpd) p.update(reloj.elapsedTime);
+
+  const t0 = performance.now();
+  renderer.info.reset();
+  renderer.render(escena, camara);
+  const ms = performance.now() - t0;
+  ema = ema ? ema * 0.93 + ms * 0.07 : ms;
+  frames++; fpsN++;
+  const ahora = performance.now();
+  if (ahora - fpsT0 > 500) { fps = (fpsN * 1000) / (ahora - fpsT0); fpsT0 = ahora; fpsN = 0; }
+  if (frames % 12 === 0) {
+    const inf = renderer.info.render;
+    hud.textContent =
+      `mod ${mod.toUpperCase()} · ${vista} · agua=${CON_AGUA ? 'ON' : 'OFF'}`
+      + `${mod === 'b' ? ` · bruma=${bruma ? 'ON' : 'OFF'}` : ''}`
+      + `${mod === 'a' ? ` · helechos=${CON_HELECHOS ? 'ON' : 'OFF'}` : ''}\n`
+      + `tris ${inf.triangles.toLocaleString('es-CO')} · calls ${inf.calls}`
+      + ` · ms/frame ${ema.toFixed(2)} · FPS ${fps.toFixed(1)}\n`
+      + `reloj ${reloj.elapsedTime.toFixed(1)} s · px ${renderer.getPixelRatio()}`;
+    window.__gate = {
+      mod, vista, agua: CON_AGUA, bruma: !!bruma,
+      ms: +ema.toFixed(2), fps: +fps.toFixed(1), tris: inf.triangles, calls: inf.calls,
+      reloj: +reloj.elapsedTime.toFixed(2),
+    };
+  }
+}
+ciclo();
+
+window.__DBG = { escena, renderer, camara, qA1, qA2, qB1, qB2, chB, bruma, THREE };
+addEventListener('resize', () => {
+  camara.aspect = innerWidth / innerHeight;
+  camara.updateProjectionMatrix();
+  renderer.setSize(innerWidth, innerHeight);
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,75 @@
+{
+  "species_slug": "nasturtium_officinale",
+  "scientific_name": "Nasturtium officinale W.T.Aiton",
+  "common_names": [
+    "Berro de agua"
+  ],
+  "family": "Brassicaceae",
+  "category": "hortalizas_hoja",
+  "cultivable": true,
+  "conservation_status": "naturalizada",
+  "thermal_zones": [
+    "templado",
+    "frio"
+  ],
+  "roles_in_guild": [
+    "crop",
+    "ground_cover"
+  ],
+  "antagonists": [],
+  "especies_nativas_sustitutas": [],
+  "propagation": null,
+  "requirements": {
+    "agua": null,
+    "altitud_msnm": {
+      "min_absoluto": 1500,
+      "optimo_min": 2000,
+      "optimo_max": 2800,
+      "max_absoluto": 3200
+    },
+    "temperatura_c": null,
+    "radiacion": null,
+    "drenaje_requerido": null
+  },
+  "valor_pedagogico": "El berro de agua o cresón (Nasturtium officinale W.T.Aiton, Brassicaceae) es una hortaliza de hoja acuática-semiacuática perenne (15-40 cm altura) originaria de Europa, Asia occidental y el norte de África, ampliamente naturalizada en los andes colombianos entre 2.000 y 2.800 msnm en quebradas frías y aguas corrientes limpias de Cundinamarca (Sabana de Bogotá, Tabio, Tenjo, La Calera), Boyacá (Tunja, Villa de Leyva), Antioquia (Oriente antioqueño), Nariño (Pasto, Ipiales), Tolima (Cajamarca) y Cauca. Pertenece a la familia Brassicaceae (igual que rúgula, rábano, mostaza, repollo, brócoli y col) y al género Nasturtium (no confundir con Tropaeolum, la 'capuchina' a la que también se llama nasturtium en inglés). Hojas pinnadas con folíolos ovales-redondeados verde brillante (3-7 folíolos por hoja), tallos huecos suculentos que enraízan en cada nodo permitiendo propagación clonal explosiva en aguas oxigenadas, flores blancas pequeñas en racimos terminales (4 pétalos en cruz característica de Brassicaceae), silícuas alargadas con semillas en dos hileras. Es lección viva de soberanía alimentaria acuática y de aguas limpias que enseña a niñas y niños cómo una hortaliza solo crece donde el agua está sana — el berro es bioindicador de aguas no contaminadas por coliformes ni metales pesados. Hortaliza de hoja con sabor picante característico (compuestos glucosinolatos sulfurados como gluconasturtina, antioxidante, hepatoprotector y antiinflamatorio), altísima densidad nutricional (vitamina K, C, A, calcio, hierro, ranqueada #1 en el índice de densidad nutricional ANDI del CDC), tradicionalmente consumida en ensaladas frescas, sopas frías, jugos verdes y como guarnición. Cuidado sanitario: cosechar solo de aguas conocidas no contaminadas (riesgo de Fasciola hepatica en zonas ganaderas); en cultivo doméstico usar agua de lluvia o de pozo limpio en canales hidropónicos rasos. Manejo agroecológico: propagación por esqueje de tallo enraizado directo (más rápido) o semilla (germinación 7-10 días a 15-20°C, fototropo positivo), siembra en canales hidropónicos con agua corriente o lechos húmedos con riego constante, cosecha continua a partir de 4-6 semanas pellizcando ápices (estimula ramificación), distancia 15-25 cm, ciclo de cosecha 4-8 meses por planta antes de bolting. Función en chagra como hortaliza de hoja acuática complementaria, cobertura de cuerpos de agua artificiales, bioindicadora de calidad de agua de riego. Fuentes Tier A: GBIF, POWO Kew, Bernal 2015, IAvH Flora Alto Andina, JBB Plantas Medicinales, Pamplona-Roger 2006.",
+  "sources": [
+    {
+      "id": "gbif-taxonomic-backbone",
+      "title": "gbif-taxonomic-backbone",
+      "tier": "A",
+      "url": "https://www.gbif.org/dataset/d7dddbf4-2cf0-4f39-9b2a-bb099caae36c"
+    },
+    {
+      "id": "powo-kew",
+      "title": "powo-kew",
+      "tier": "A",
+      "url": "https://powo.science.kew.org"
+    },
+    {
+      "id": "bernal-2015-plantas-liquenes-colombia",
+      "title": "bernal-2015-plantas-liquenes-colombia",
+      "tier": "A",
+      "url": "http://catalogoplantasdecolombia.unal.edu.co"
+    },
+    {
+      "id": "humboldt-flora-alto-andina",
+      "title": "humboldt-flora-alto-andina",
+      "tier": "A",
+      "url": null
+    },
+    {
+      "id": "jbb-plantas-medicinales",
+      "title": "jbb-plantas-medicinales",
+      "tier": "A",
+      "url": null
+    },
+    {
+      "id": "pamplona-roger-2006-plantas-medicinales",
+      "title": "pamplona-roger-2006-plantas-medicinales",
+      "tier": "B",
+      "url": null
+    }
+  ],
+  "_generated_by": "scripts/build-cycle-content-from-catalog.mjs",
+  "_generated_at": "2026-05-19T00:42:57.384Z"
+}

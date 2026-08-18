@@ -1,0 +1,70 @@
+{
+  "species_slug": "pyrus_communis_anjou",
+  "scientific_name": "Pyrus communis L. cv. Anjou",
+  "common_names": [
+    "Pera Anjou"
+  ],
+  "family": "Rosaceae",
+  "category": "frutales_perennes",
+  "cultivable": true,
+  "conservation_status": "cultivo_comun",
+  "thermal_zones": [
+    "frio"
+  ],
+  "roles_in_guild": [
+    "crop",
+    "pollinator_attractor"
+  ],
+  "antagonists": [],
+  "especies_nativas_sustitutas": [],
+  "propagation": {
+    "metodo_principal": "injerto",
+    "notas": "Injerto sobre patrón Pyrus communis franco o membrillero (Cydonia oblonga) que enaniza el árbol y precoza la entrada en producción; requiere ≥400 h frío <7°C."
+  },
+  "requirements": {
+    "agua": "medio",
+    "altitud_msnm": {
+      "min_absoluto": 1800,
+      "optimo_min": 2200,
+      "optimo_max": 2700,
+      "max_absoluto": 3000
+    },
+    "temperatura_c": {
+      "helada_letal": -7,
+      "optimo_min": 10,
+      "optimo_max": 18,
+      "max_tolerable": 24
+    },
+    "radiacion": "sol_pleno",
+    "drenaje_requerido": "bueno"
+  },
+  "valor_pedagogico": "La pera Anjou (Pyrus communis L. cv. Anjou, Rosaceae) es un frutal templado caducifolio europeo tradicionalmente cultivado en el altiplano cundiboyacense desde la época colonial. Crece entre 2.200 y 2.700 msnm en zona térmica fría con acumulación de horas frío suficientes (≥400 h <7°C), presente en Cundinamarca (Sopó, Chía, Subachoque, Tenjo, Cogua, Zipaquirá, Ubaté), Boyacá (Paipa, Tibasosa, Duitama, Sogamoso, Nobsa, Tunja), Nariño (Pasto, Ipiales) y altiplano antioqueño (Santa Rosa de Osos, Belmira, La Unión). Árbol de 5-10 m de altura, copa piramidal-elongada, hábito más erecto que el manzano. Flores blancas en corimbo agrupado que abren antes que las hojas, fuerte atractivo para Apis mellifera y polinizadores nativos. Frutos en pomo piriforme característico (8-12 cm), piel verde-amarillenta con chapa rosa-asalmonada al sol, pulpa blanco-cremosa jugosa muy dulce-perfumada (13-15° Brix) que madura post-cosecha (climatérico). Lección viva de patrimonio frutícola colonial andino: enseña a niñas y niños que los huertos campesinos de la Sabana llevan más de tres siglos integrando perales europeos al paisaje productivo, formando parte de la identidad cundiboyacense. Manejo agroecológico: poda de formación en eje central modificado, distancia 4×5 m (500 árboles/ha), aclareo de frutos manual para tamaño comercial, fertilización con compost + bocashi + biol, control de Erwinia amylovora (fuego bacteriano) con cobre + poda sanitaria estricta, manejo de Psylla pyri con caldo sulfocálcico + parasitoides nativos. Asocios: tagasaste como cortavientos N-fijador, fresa Monterrey como cobertura, manzano sabanero para polinización cruzada (autoincompatible). Fuentes Tier A: POWO Kew, GBIF Backbone Taxonomy, AGROSAVIA Manual Frutales Tropicales, ICA Resolución 3168/2015.",
+  "sources": [
+    {
+      "id": "powo-kew",
+      "title": "powo-kew",
+      "tier": "A",
+      "url": "https://powo.science.kew.org"
+    },
+    {
+      "id": "gbif-taxonomic-backbone",
+      "title": "gbif-taxonomic-backbone",
+      "tier": "A",
+      "url": "https://www.gbif.org/dataset/d7dddbf4-2cf0-4f39-9b2a-bb099caae36c"
+    },
+    {
+      "id": "agrosavia-manual-frutales-tropicales",
+      "title": "agrosavia-manual-frutales-tropicales",
+      "tier": "A",
+      "url": null
+    },
+    {
+      "id": "ica-resolucion-3168-2015",
+      "title": "ica-resolucion-3168-2015",
+      "tier": "A",
+      "url": null
+    }
+  ],
+  "_generated_by": "scripts/build-cycle-content-from-catalog.mjs",
+  "_generated_at": "2026-05-19T00:42:57.386Z"
+}

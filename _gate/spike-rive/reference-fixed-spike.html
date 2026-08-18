@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="es"><head><meta charset="utf-8"><title>Rive spike FIXED (constructor stateMachines)</title>
+<style>
+  body{margin:0;background:#10201a;color:#cfe;font-family:system-ui,sans-serif}
+  h1{font-size:16px;padding:10px 16px;margin:0}
+  .wrap{display:flex;gap:16px;padding:16px;align-items:flex-start}
+  .box{border:1px solid #2a5;padding:8px}
+  canvas{background:#06120d;display:block}
+  #status{padding:8px 16px;font-size:13px;white-space:pre-wrap;max-width:900px}
+  button{margin:8px 16px;padding:8px 12px;font-size:14px}
+</style></head>
+<body>
+  <h1>Rive spike FIXED — jaguar/vehiculo en dos superficies (fix: stateMachines en el constructor)</h1>
+  <div id="status">boot…</div>
+  <div class="wrap">
+    <div class="box"><div>RIVE SOURCE (2D canvas)</div><canvas id="riveCanvas" width="640" height="360"></canvas></div>
+    <div class="box"><div>THREE PLANE (CanvasTexture del canvas de Rive)</div><canvas id="threeCanvas" width="640" height="360"></canvas></div>
+  </div>
+  <button id="toggleBtn">Setear primer number/boolean</button>
+  <script type="module">
+    import * as THREE from 'three';
+    import { Rive, RuntimeLoader, StateMachineInputType } from '@rive-app/canvas';
+    const RIVE_WASM_URL = '/vendor/rive/rive.wasm';
+    const RIVE_ASSET_URL = '/vendor/rive/spike-vehicles.riv';
+    RuntimeLoader.setWasmUrl(RIVE_WASM_URL);
+    RuntimeLoader.setWasmFallbackUrl(null);
+    const LABELS = { [StateMachineInputType.Number]: 'number', [StateMachineInputType.Boolean]: 'boolean', [StateMachineInputType.Trigger]: 'trigger' };
+    const statusEl = document.getElementById('status');
+    const riveCanvas = document.getElementById('riveCanvas');
+    const threeCanvas = document.getElementById('threeCanvas');
+
+    // three.js plane textured with the Rive source canvas
+    const renderer = new THREE.WebGLRenderer({ canvas: threeCanvas, alpha: true, antialias: true });
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+    const scene = new THREE.Scene();
+    const camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0.1, 10); camera.position.z = 2;
+    const texture = new THREE.CanvasTexture(riveCanvas); texture.colorSpace = THREE.SRGBColorSpace;
+    scene.add(new THREE.Mesh(new THREE.PlaneGeometry(2, 2), new THREE.MeshBasicMaterial({ map: texture, transparent: true })));
+    (function render(){ texture.needsUpdate = true; renderer.render(scene, camera); requestAnimationFrame(render); })();
+
+    // FIX: pass stateMachines to the constructor so the SM is instantiated during load.
+    // vehicles.riv's state machine is "bumpy" (read from stateMachineNames in a prior probe).
+    let riveRef = null, machineRef = null;
+    const rive = new Rive({
+      canvas: riveCanvas, src: RIVE_ASSET_URL, autoplay: true, enableRiveAssetCDN: false,
+      stateMachines: 'bumpy',
+      onLoad: () => {
+        console.log('FIXED_ONLOAD');
+        rive.resizeDrawingSurfaceToCanvas();
+        const mn = rive.stateMachineNames[0];
+        const inputs = rive.stateMachineInputs(mn) || [];
+        console.log('FIXED_INPUTS mn=' + mn + ' count=' + inputs.length + ' ' + inputs.map(i=>i.name+':'+(LABELS[i.type]||i.type)+'='+i.value).join(','));
+        riveRef = rive; machineRef = mn;
+        window.__RIVE_SPIKE__ = { rive, machineName: mn, inputs, wasmUrl: RIVE_WASM_URL, assetUrl: RIVE_ASSET_URL };
+        statusEl.textContent = 'LOADED machine=' + mn + '\ninputs: ' + inputs.map(i=>i.name+' ('+(LABELS[i.type]||i.type)+'='+i.value+')').join(', ');
+      },
+      onLoadError: (e) => { console.log('FIXED_LOADERR ' + (e?.message||e)); statusEl.textContent = 'LOAD ERROR: ' + (e?.message||e); },
+    });
+
+    document.getElementById('toggleBtn').addEventListener('click', () => {
+      if (!riveRef || !machineRef) return;
+      const list = riveRef.stateMachineInputs(machineRef) || [];
+      const w = list.find(i => i.type === StateMachineInputType.Number || i.type === StateMachineInputType.Boolean);
+      if (!w) { statusEl.textContent += '\n(no number/boolean input)'; return; }
+      w.value = w.type === StateMachineInputType.Boolean ? !w.value : (Number(w.value) === 0 ? 1 : 0);
+      statusEl.textContent += '\nSET ' + w.name + ' = ' + w.value;
+      console.log('FIXED_SET ' + w.name + '=' + w.value);
+    });
+  </script>
+</body></html>

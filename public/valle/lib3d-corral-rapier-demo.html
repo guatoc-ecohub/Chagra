@@ -1,0 +1,501 @@
+<!doctype html>
+<html lang="es-CO">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Corral — física Rapier (lib3d-23)</title>
+<style>
+  :root {
+    color-scheme: light;
+  }
+  html, body {
+    margin: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    background: linear-gradient(180deg, #bfe3f5 0%, #eaf6e0 60%, #dcefc9 100%);
+    font-family: "Trebuchet MS", "Segoe UI", sans-serif;
+  }
+  #c {
+    display: block;
+    width: 100vw;
+    height: 100vh;
+    touch-action: none;
+  }
+  #overlay {
+    position: fixed;
+    top: 16px;
+    left: 16px;
+    max-width: min(50vw, 420px);
+    padding: 12px 14px;
+    border-radius: 14px;
+    background: rgba(255, 252, 246, 0.72);
+    color: #3d3a31;
+    backdrop-filter: blur(10px);
+    box-shadow: 0 12px 34px rgba(64, 54, 39, 0.16);
+    pointer-events: none;
+    z-index: 10;
+  }
+  #overlay h1 {
+    margin: 0 0 4px;
+    font-size: 1rem;
+    line-height: 1.2;
+    letter-spacing: 0.01em;
+  }
+  #overlay p {
+    margin: 0;
+    font-size: 0.84rem;
+    line-height: 1.35;
+    color: #5a5346;
+  }
+  #overlay .err {
+    margin-top: 8px;
+    padding-top: 8px;
+    border-top: 1px solid rgba(180, 40, 40, 0.3);
+    color: #7a1f1f;
+    font-weight: 700;
+    font-size: 0.82rem;
+    white-space: pre-wrap;
+    word-break: break-word;
+  }
+  #stats {
+    margin-top: 8px;
+    padding-top: 8px;
+    border-top: 1px solid rgba(90, 83, 70, 0.18);
+    font-size: 0.82rem;
+    color: #5a5346;
+  }
+</style>
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+    "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/",
+    "@dimforge/rapier3d-compat": "https://cdn.jsdelivr.net/npm/@dimforge/rapier3d-compat@0.13.1/+esm"
+  }
+}
+</script>
+</head>
+<body>
+<div id="overlay">
+  <h1>Corral — física Rapier (lib3d-23)</h1>
+  <p>Cerdos se empujan · gallinas colisionan cerca</p>
+  <div id="stats">Cargando física…</div>
+</div>
+<canvas id="c"></canvas>
+<script type="module">
+  async function boot() {
+    const statsEl = document.getElementById('stats');
+    const overlayEl = document.getElementById('overlay');
+
+    function fatal(label, error) {
+      console.error(label, error);
+      const msg = document.createElement('div');
+      msg.className = 'err';
+      msg.textContent = `Error (${label}): ${error && error.message ? error.message : String(error)}`;
+      overlayEl.appendChild(msg);
+      if (statsEl) statsEl.textContent = 'Física detenida — ver error arriba.';
+    }
+
+    let THREE;
+    let OrbitControls;
+    let RAPIER;
+
+    try {
+      THREE = await import('three');
+    } catch (error) {
+      fatal('cargar three', error);
+      return;
+    }
+
+    try {
+      ({ OrbitControls } = await import('three/addons/controls/OrbitControls.js'));
+    } catch (error) {
+      fatal('cargar OrbitControls', error);
+      return;
+    }
+
+    try {
+      RAPIER = await import('@dimforge/rapier3d-compat');
+      await RAPIER.init();
+    } catch (error) {
+      fatal('cargar/iniciar Rapier', error);
+      return;
+    }
+
+    try {
+      runDemo(THREE, OrbitControls, RAPIER, statsEl);
+    } catch (error) {
+      fatal('runDemo', error);
+    }
+  }
+
+  function runDemo(THREE, OrbitControls, RAPIER, statsEl) {
+    const canvas = document.getElementById('c');
+    const _tFijo = new URLSearchParams(location.search).get('t');
+    const TIEMPO_FIJO = _tFijo === null || Number.isNaN(Number(_tFijo)) ? null : Number(_tFijo);
+
+    // ---------- Escena ----------
+    const scene = new THREE.Scene();
+    scene.background = new THREE.Color(0xcdeaf7);
+    scene.fog = new THREE.Fog(0xcdeaf7, 14, 40);
+
+    const camera = new THREE.PerspectiveCamera(45, innerWidth / innerHeight, 0.1, 100);
+    camera.position.set(9, 7, 10);
+    camera.lookAt(0, 0.5, 0);
+
+    const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: false });
+    renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+    renderer.setSize(innerWidth, innerHeight, false);
+    renderer.outputColorSpace = THREE.SRGBColorSpace;
+    renderer.toneMapping = THREE.ACESFilmicToneMapping;
+    renderer.toneMappingExposure = 1.05;
+    renderer.shadowMap.enabled = true;
+    renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+
+    const orbit = new OrbitControls(camera, canvas);
+    orbit.enableDamping = true;
+    orbit.dampingFactor = 0.08;
+    orbit.minDistance = 4;
+    orbit.maxDistance = 26;
+    orbit.maxPolarAngle = Math.PI * 0.49;
+    orbit.target.set(0, 0.6, 0);
+    orbit.update();
+
+    // ---------- Luces ----------
+    scene.add(new THREE.HemisphereLight(0xfaf6e8, 0x6b8a4f, 1.25));
+
+    const sun = new THREE.DirectionalLight(0xfff2d6, 2.4);
+    sun.position.set(-8, 12, 6);
+    sun.castShadow = true;
+    sun.shadow.mapSize.set(2048, 2048);
+    sun.shadow.camera.near = 1;
+    sun.shadow.camera.far = 34;
+    sun.shadow.camera.left = -14;
+    sun.shadow.camera.right = 14;
+    sun.shadow.camera.top = 14;
+    sun.shadow.camera.bottom = -14;
+    sun.shadow.bias = -0.0018;
+    sun.shadow.radius = 3;
+    scene.add(sun);
+
+    const fill = new THREE.DirectionalLight(0xcfe6ff, 0.55);
+    fill.position.set(6, 4, -6);
+    scene.add(fill);
+
+    // ---------- Física Rapier ----------
+    const gravity = { x: 0.0, y: -9.81, z: 0.0 };
+    const world = new RAPIER.World(gravity);
+    world.timestep = 1 / 60;
+
+    const CORRAL_HALF = 6.2; // medio-ancho interior del corral
+    const FENCE_HEIGHT = 1.1;
+    const POST_RADIUS = 0.09;
+    const RAIL_THICKNESS = 0.05;
+
+    // ---------- Piso del corral ----------
+    const floorMat = new THREE.MeshStandardMaterial({
+      color: 0x9c8354,
+      roughness: 1.0,
+      metalness: 0.0
+    });
+    const floorMesh = new THREE.Mesh(new THREE.PlaneGeometry(CORRAL_HALF * 2.3, CORRAL_HALF * 2.3, 1, 1), floorMat);
+    floorMesh.rotation.x = -Math.PI / 2;
+    floorMesh.receiveShadow = true;
+    scene.add(floorMesh);
+
+    // pasto ralo alrededor del piso de tierra (verde natural, no invasoras)
+    const grassMat = new THREE.MeshStandardMaterial({ color: 0x7fa354, roughness: 1.0 });
+    const grassMesh = new THREE.Mesh(new THREE.PlaneGeometry(CORRAL_HALF * 4, CORRAL_HALF * 4), grassMat);
+    grassMesh.rotation.x = -Math.PI / 2;
+    grassMesh.position.y = -0.02;
+    grassMesh.receiveShadow = true;
+    scene.add(grassMesh);
+
+    const floorBody = world.createRigidBody(RAPIER.RigidBodyDesc.fixed());
+    const floorCollider = RAPIER.ColliderDesc.cuboid(CORRAL_HALF, 0.1, CORRAL_HALF).setTranslation(0, -0.1, 0);
+    world.createCollider(floorCollider, floorBody);
+
+    // ---------- Cerca perimetral (postes + travesaños) ----------
+    const fenceGroup = new THREE.Group();
+    scene.add(fenceGroup);
+
+    const postMat = new THREE.MeshStandardMaterial({ color: 0x6b4a30, roughness: 0.95 });
+    const railMat = new THREE.MeshStandardMaterial({ color: 0x7d5738, roughness: 0.9 });
+
+    const postGeo = new THREE.CylinderGeometry(POST_RADIUS, POST_RADIUS, FENCE_HEIGHT, 8);
+    const POSTS_PER_SIDE = 6;
+
+    function addPost(x, z) {
+      const mesh = new THREE.Mesh(postGeo, postMat);
+      mesh.position.set(x, FENCE_HEIGHT / 2, z);
+      mesh.castShadow = true;
+      mesh.receiveShadow = true;
+      fenceGroup.add(mesh);
+    }
+
+    // colliders de cerca: 4 muros delgados fijos (invisibles para física, uno por lado)
+    function addFenceWall(cx, cz, halfX, halfZ) {
+      const body = world.createRigidBody(RAPIER.RigidBodyDesc.fixed().setTranslation(cx, FENCE_HEIGHT / 2, cz));
+      const collider = RAPIER.ColliderDesc.cuboid(halfX, FENCE_HEIGHT / 2, halfZ);
+      world.createCollider(collider, body);
+    }
+
+    const wallThickness = 0.08;
+    // norte / sur (a lo largo de X)
+    addFenceWall(0, -CORRAL_HALF, CORRAL_HALF, wallThickness);
+    addFenceWall(0, CORRAL_HALF, CORRAL_HALF, wallThickness);
+    // este / oeste (a lo largo de Z)
+    addFenceWall(-CORRAL_HALF, 0, wallThickness, CORRAL_HALF);
+    addFenceWall(CORRAL_HALF, 0, wallThickness, CORRAL_HALF);
+
+    // postes visuales a lo largo de cada lado
+    for (let i = 0; i <= POSTS_PER_SIDE; i++) {
+      const t = -CORRAL_HALF + (i / POSTS_PER_SIDE) * (CORRAL_HALF * 2);
+      addPost(t, -CORRAL_HALF);
+      addPost(t, CORRAL_HALF);
+      addPost(-CORRAL_HALF, t);
+      addPost(CORRAL_HALF, t);
+    }
+
+    // travesaños horizontales (2 por lado, decorativos)
+    const railLength = CORRAL_HALF * 2;
+    function addRailsAlongX(z) {
+      for (const y of [0.35, 0.75]) {
+        const geo = new THREE.BoxGeometry(railLength, RAIL_THICKNESS, RAIL_THICKNESS * 1.6);
+        const mesh = new THREE.Mesh(geo, railMat);
+        mesh.position.set(0, y, z);
+        mesh.castShadow = true;
+        fenceGroup.add(mesh);
+      }
+    }
+    function addRailsAlongZ(x) {
+      for (const y of [0.35, 0.75]) {
+        const geo = new THREE.BoxGeometry(RAIL_THICKNESS * 1.6, RAIL_THICKNESS, railLength);
+        const mesh = new THREE.Mesh(geo, railMat);
+        mesh.position.set(x, y, 0);
+        mesh.castShadow = true;
+        fenceGroup.add(mesh);
+      }
+    }
+    addRailsAlongX(-CORRAL_HALF);
+    addRailsAlongX(CORRAL_HALF);
+    addRailsAlongZ(-CORRAL_HALF);
+    addRailsAlongZ(CORRAL_HALF);
+
+    // ---------- Animales ----------
+    const animals = [];
+
+    function randRange(min, max) {
+      return min + Math.random() * (max - min);
+    }
+
+    // Cerdos: cuerpo cápsula ancha, rosado-tierra
+    const PIG_COUNT = 5;
+    const pigMat = new THREE.MeshStandardMaterial({ color: 0xd99a8a, roughness: 0.8 });
+    const pigEarMat = new THREE.MeshStandardMaterial({ color: 0xc07a6a, roughness: 0.85 });
+
+    for (let i = 0; i < PIG_COUNT; i++) {
+      const radius = 0.42;
+      const halfHeight = 0.28; // porción cilíndrica de la cápsula (eje Z acostado luego con rotación)
+
+      const group = new THREE.Group();
+
+      const bodyMesh = new THREE.Mesh(
+        new THREE.CapsuleGeometry(radius, halfHeight * 2, 6, 10),
+        pigMat
+      );
+      bodyMesh.rotation.z = Math.PI / 2; // cápsula acostada, cuerpo alargado en X
+      bodyMesh.castShadow = true;
+      bodyMesh.receiveShadow = true;
+      group.add(bodyMesh);
+
+      // orejas simples (decorativas, no físicas)
+      for (const side of [-1, 1]) {
+        const ear = new THREE.Mesh(new THREE.ConeGeometry(0.09, 0.16, 6), pigEarMat);
+        ear.position.set(radius * 0.85, 0.22, side * 0.22);
+        ear.rotation.z = side * 0.5;
+        ear.castShadow = true;
+        group.add(ear);
+      }
+
+      const snout = new THREE.Mesh(new THREE.CylinderGeometry(0.1, 0.11, 0.08, 10), pigEarMat);
+      snout.rotation.z = Math.PI / 2;
+      snout.position.set(radius + halfHeight + 0.02, 0, 0);
+      group.add(snout);
+
+      scene.add(group);
+
+      const x = randRange(-CORRAL_HALF * 0.55, CORRAL_HALF * 0.55);
+      const z = randRange(-CORRAL_HALF * 0.55, CORRAL_HALF * 0.55);
+      const y = radius + 0.05;
+
+      const rigidBodyDesc = RAPIER.RigidBodyDesc.dynamic()
+        .setTranslation(x, y, z)
+        .setLinearDamping(0.55)
+        .setAngularDamping(0.85)
+        .setCcdEnabled(true);
+      const body = world.createRigidBody(rigidBodyDesc);
+
+      // collider capsula: mitad-altura a lo largo del eje X del cuerpo local -> usamos capsule con eje Y por defecto
+      // y rotamos el rigid body 90 grados en Z para que la cápsula quede acostada, igual que el mesh.
+      body.setRotation({ x: 0, y: 0, z: Math.SQRT1_2, w: Math.SQRT1_2 }, true);
+
+      const colliderDesc = RAPIER.ColliderDesc.capsule(halfHeight, radius)
+        .setDensity(6.0)
+        .setFriction(0.7)
+        .setRestitution(0.15);
+      world.createCollider(colliderDesc, body);
+
+      animals.push({
+        kind: 'pig',
+        mesh: group,
+        body,
+        impulseStrength: randRange(0.9, 1.6),
+        nextImpulseAt: performance.now() + randRange(300, 2000)
+      });
+    }
+
+    // Gallinas: caja pequeña, blanco/marrón
+    const CHICKEN_COUNT = 6;
+    const chickenColors = [0xf4ede0, 0xf4ede0, 0xf4ede0, 0x9c6b3e, 0x9c6b3e, 0xe8dcc6];
+    const chickenCombMat = new THREE.MeshStandardMaterial({ color: 0xb5342a, roughness: 0.7 });
+
+    for (let i = 0; i < CHICKEN_COUNT; i++) {
+      const halfExtents = { x: 0.14, y: 0.16, z: 0.22 };
+      const bodyColor = chickenColors[i % chickenColors.length];
+      const chickenMat = new THREE.MeshStandardMaterial({ color: bodyColor, roughness: 0.75 });
+
+      const group = new THREE.Group();
+
+      const bodyMesh = new THREE.Mesh(
+        new THREE.BoxGeometry(halfExtents.x * 2, halfExtents.y * 2, halfExtents.z * 2),
+        chickenMat
+      );
+      bodyMesh.castShadow = true;
+      bodyMesh.receiveShadow = true;
+      group.add(bodyMesh);
+
+      const head = new THREE.Mesh(new THREE.SphereGeometry(0.08, 8, 8), chickenMat);
+      head.position.set(0, halfExtents.y * 0.9, halfExtents.z);
+      group.add(head);
+
+      const comb = new THREE.Mesh(new THREE.ConeGeometry(0.035, 0.07, 6), chickenCombMat);
+      comb.position.set(0, halfExtents.y * 0.9 + 0.09, halfExtents.z);
+      group.add(comb);
+
+      const beak = new THREE.Mesh(new THREE.ConeGeometry(0.03, 0.06, 6), chickenCombMat);
+      beak.rotation.x = Math.PI / 2;
+      beak.position.set(0, halfExtents.y * 0.85, halfExtents.z + 0.08);
+      group.add(beak);
+
+      scene.add(group);
+
+      const x = randRange(-CORRAL_HALF * 0.7, CORRAL_HALF * 0.7);
+      const z = randRange(-CORRAL_HALF * 0.7, CORRAL_HALF * 0.7);
+      const y = halfExtents.y + 0.05;
+
+      const rigidBodyDesc = RAPIER.RigidBodyDesc.dynamic()
+        .setTranslation(x, y, z)
+        .setLinearDamping(0.7)
+        .setAngularDamping(0.9)
+        .setCcdEnabled(true);
+      const body = world.createRigidBody(rigidBodyDesc);
+
+      const colliderDesc = RAPIER.ColliderDesc.cuboid(halfExtents.x, halfExtents.y, halfExtents.z)
+        .setDensity(2.0)
+        .setFriction(0.6)
+        .setRestitution(0.2);
+      world.createCollider(colliderDesc, body);
+
+      animals.push({
+        kind: 'chicken',
+        mesh: group,
+        body,
+        impulseStrength: randRange(0.12, 0.28),
+        nextImpulseAt: performance.now() + randRange(200, 1600)
+      });
+    }
+
+    // ---------- Impulsos periódicos (jostle) ----------
+    function applyRandomImpulse(animal, now) {
+      const dir = new THREE.Vector2(randRange(-1, 1), randRange(-1, 1)).normalize();
+      const strength = animal.impulseStrength * randRange(0.6, 1.3);
+      animal.body.applyImpulse(
+        { x: dir.x * strength, y: strength * 0.12, z: dir.y * strength },
+        true
+      );
+      const jitter = animal.kind === 'pig' ? randRange(1600, 2600) : randRange(900, 1900);
+      animal.nextImpulseAt = now + jitter;
+    }
+
+    function keepInsideCorral(animal) {
+      const t = animal.body.translation();
+      const margin = CORRAL_HALF - 0.5;
+      if (Math.abs(t.x) > margin || Math.abs(t.z) > margin) {
+        const towardCenter = new THREE.Vector2(-t.x, -t.z).normalize();
+        animal.body.applyImpulse(
+          { x: towardCenter.x * 0.6, y: 0, z: towardCenter.y * 0.6 },
+          true
+        );
+      }
+    }
+
+    // ---------- Loop ----------
+    const tmpQuat = new THREE.Quaternion();
+    let frameCount = 0;
+    let lastStatsUpdate = performance.now();
+    let lastFrame = performance.now();
+
+    function onResize() {
+      camera.aspect = innerWidth / innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(innerWidth, innerHeight, false);
+    }
+    addEventListener('resize', onResize);
+
+    function animate(now) {
+      requestAnimationFrame(animate);
+
+      const dt = Math.min(0.05, (now - lastFrame) / 1000);
+      lastFrame = now;
+
+      if (TIEMPO_FIJO === null) {
+        world.step();
+        for (const animal of animals) {
+          if (now >= animal.nextImpulseAt) {
+            applyRandomImpulse(animal, now);
+          }
+          keepInsideCorral(animal);
+        }
+      }
+
+      for (const animal of animals) {
+        const t = animal.body.translation();
+        const r = animal.body.rotation();
+        animal.mesh.position.set(t.x, t.y, t.z);
+        tmpQuat.set(r.x, r.y, r.z, r.w);
+        animal.mesh.quaternion.copy(tmpQuat);
+      }
+
+      orbit.update();
+      renderer.render(scene, camera);
+
+      frameCount++;
+      if (now - lastStatsUpdate > 500) {
+        const fps = Math.round((frameCount * 1000) / (now - lastStatsUpdate));
+        frameCount = 0;
+        lastStatsUpdate = now;
+        if (statsEl) {
+          statsEl.textContent = `Cerdos: ${PIG_COUNT} · Gallinas: ${CHICKEN_COUNT} · ${fps} fps`;
+        }
+      }
+    }
+
+    requestAnimationFrame(animate);
+  }
+
+  boot();
+</script>
+</body>
+</html>

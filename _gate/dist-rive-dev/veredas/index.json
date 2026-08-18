@@ -1,0 +1,45 @@
+{
+ "_meta": {
+  "fuente": "DANE CRVeredas (Nivel de Referencia de Veredas) via ESRI Colombia Datos Abiertos VEREDAS_2016",
+  "generado": "2026-07-09T13:08:24.852Z",
+  "total_municipios": 9
+ },
+ "municipios": {
+  "11001": {
+   "n": 66,
+   "municipio": "Bogotá, D.C."
+  },
+  "25126": {
+   "n": 4,
+   "municipio": "Cajicá"
+  },
+  "25178": {
+   "n": 24,
+   "municipio": "Chipaque"
+  },
+  "25181": {
+   "n": 35,
+   "municipio": "Choachí"
+  },
+  "25279": {
+   "n": 33,
+   "municipio": "Fómeque"
+  },
+  "25322": {
+   "n": 14,
+   "municipio": "Guasca"
+  },
+  "25377": {
+   "n": 30,
+   "municipio": "La Calera"
+  },
+  "25841": {
+   "n": 20,
+   "municipio": "Ubaque"
+  },
+  "25899": {
+   "n": 14,
+   "municipio": "Zipaquirá"
+  }
+ }
+}

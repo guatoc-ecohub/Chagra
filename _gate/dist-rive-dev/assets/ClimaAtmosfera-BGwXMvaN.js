@@ -1,0 +1,1 @@
+import{i as e}from"./rolldown-runtime-aKtaBQYM.js";import{t}from"./vendor-react-BPzue65w.js";import n from"./Mundo3DClima-RVp1C07E.js";var r=e(t(),1);function i({onBack:e}){return(0,r.jsx)(n,{onBack:e})}export{i as default};
