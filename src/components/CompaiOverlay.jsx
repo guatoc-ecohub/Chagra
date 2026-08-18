@@ -282,27 +282,23 @@ export default function CompaiOverlay({ currentView = 'dashboard' }) {
     setIsOpen(false);
   }, []);
 
-  // Un animal realista de lámina (jaguar, oso del bastón) NO cabe digno en un
-  // disco chico: se le da más tamaño para que se LEA. Los compai chicos
-  // (abeja, luciérnaga…) van en un tamaño intermedio, cómodo, sin disco.
-  const esRealista = avatarType === 'jaguar' || avatarType === 'oso-baston';
+  // Un felino/animal realista (jaguar) NO cabe digno en un disco chico: se le
+  // da más tamaño para que se LEA. Los compai chicos (abeja, luciérnaga…) van
+  // en un tamaño intermedio, cómodo, sin disco de color detrás.
+  const esRealista = avatarType === 'jaguar';
   const avatarSize = esRealista ? 112 : 84;
 
-  // Mientras deambula, el realista corre su marcha ('caminando': gait real en
-  // el jaguar; bob de paso en el oso — va plantado, sin gait por-pata); el
-  // resto conserva su estado (no tienen pose de marcha) y solo se espejan. Un
-  // estado conversacional (hablar/escuchar/pensar) siempre gana a la caminata.
+  // Mientras deambula, el jaguar corre su MARCHA real ('caminando'); el resto
+  // conserva su estado (no tienen pose de marcha) y solo se espejan. Un estado
+  // conversacional (hablar/escuchar/pensar) siempre gana a la caminata.
   const estadoAvatar = esRealista && caminando && compaiState === 'idle'
     ? 'caminando'
     : compaiState;
 
   // Los compai miran a la IZQUIERDA por defecto (la lámina del jaguar tiene la
-  // testa a la izquierda); al volver hacia la derecha se espejan. La lámina
-  // del oso del bastón mira a la DERECHA (testa ¾ a la derecha) → su mapeo va
-  // volteado, como anticipaba la nota del gate GPU. GATE GPU: si el sentido
-  // sale invertido para algún compai, es ajustar `miraDerecha`.
-  const miraDerecha = avatarType === 'oso-baston';
-  const espejo = (hacia === 'derecha') !== miraDerecha ? 'scaleX(-1)' : 'none';
+  // testa a la izquierda); al volver hacia la derecha se espejan. GATE GPU: si
+  // el sentido sale invertido para algún compai, es voltear este mapeo.
+  const espejo = hacia === 'derecha' ? 'scaleX(-1)' : 'none';
 
   return (
     <div
