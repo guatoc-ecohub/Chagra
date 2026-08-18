@@ -1,39 +1,27 @@
-import OsoBaston from '../visual/creatures/OsoBaston';
+import OsoBastonLaminaViva from '../visual/creatures/OsoBastonLaminaViva';
 
 /**
  * ChagraAgentAvatarOsoBaston — el oso del bastón (Tremarctos ornatus,
  * caminante de los Andes) como CARA del agente de Chagra, 5ta opción del
  * elenco.
  *
- * Cierra parte del ítem #8 del GAP compAI (2026-08-13): el oso del bastón ya
- * tenía cuerpo dibujado (`OsoBaston.jsx`, cruzó a la PWA el 2026-08-11) y ya
- * estaba marcado `enPWA:true` bajo el slug `oso-baston` en
- * `compai/nucleo/elenco.js` (#96) — pero ningún selector lo ofrecía. Este
- * adaptador es el que faltaba.
+ * Rama `feat/oso-lamina-viva` (2026-08-18): reemplaza el cuerpo vector
+ * (`OsoBaston.jsx`, rubber-hose dibujado a mano) por `OsoBastonLaminaViva` —
+ * la lámina real aprobada (`oso.png`: erguido sobre su roca, brazo en jarra,
+ * el bastón coronado de frailejón y orquídeas) recortada en capas por alfa y
+ * montada sobre el rig con la vida de Angelita. El MISMO trasplante que hizo
+ * el jaguar (`ChagraAgentAvatarJaguar` → `JaguarLaminaViva`, rama
+ * `feat/jaguar-lamina-sobre-esqueleto`). `OsoBaston.jsx` NO se borra (otros
+ * consumidores —compaiRegistry del mundo 3D, escenas— siguen usándolo).
  *
- * Adaptador puro (mismo contrato que ChagraAgentAvatarZariguya): traduce la
+ * Adaptador puro (mismo contrato que ChagraAgentAvatarJaguar): traduce la
  * API histórica del avatar del agente (state 'idle'|'thinking'|'speaking'|
- * 'listening', glow, withLabel, onClick/onDoubleClick) al vocabulario de VIDA
- * de `OsoBaston.jsx` (`visual/creatures/`). Cero lógica nueva de agente, cero
- * cambios en `visual/creatures/`.
- *
- *   - idle       → pose 'anda' (base, plantado en su trocha).
- *   - thinking   → pose 'anda' + `resopla=true`: el huff pesado con vaho —
- *                  su reacción-firma leída como "atento/calculando".
- *   - speaking   → pose 'celebra' (el bastón late en flor) + visema.
- *   - listening  → pose 'reposo': se posa atento.
+ * 'listening', glow, withLabel, onClick/onDoubleClick) al contrato de
+ * `OsoBastonLaminaViva`. `state` viaja directo como `estado` (la lámina viva
+ * entiende el vocabulario completo, incluido 'caminando' del overlay):
+ * escuchando PARA LAS OREJAS, hablando mueve la mandíbula con el visema,
+ * pensando mira arriba, e idle vive solo (florece/resopla/reposo).
  */
-const POSE_DE_STATE = {
-    idle: 'anda',
-    thinking: 'anda',
-    speaking: 'celebra',
-    listening: 'reposo',
-};
-
-const RESOPLA_DE_STATE = {
-    thinking: true,
-};
-
 const VISEMA_DE_STATE = {
     speaking: 'V2',
 };
@@ -48,14 +36,11 @@ export default function ChagraAgentAvatarOsoBaston({
     className = '',
     ariaLabel = 'Chagra IA',
 }) {
-    const pose = POSE_DE_STATE[state] || 'anda';
-    const resopla = !!RESOPLA_DE_STATE[state];
     const visema = VISEMA_DE_STATE[state] || null;
 
     const bicho = (
-        <OsoBaston
-            pose={pose}
-            resopla={resopla}
+        <OsoBastonLaminaViva
+            estado={state}
             visema={visema}
             size={size}
             title={ariaLabel}
