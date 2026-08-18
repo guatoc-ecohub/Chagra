@@ -7,6 +7,7 @@ import { hornearOso } from './osoLamina/capas.js';
 import { useVidaIdle, useRitmoPropio, useMiradaUsted } from './useVidaIdle.js';
 import { OSO_BASTON_SLUG } from './osoBastonIdentidad.js';
 import './osoLamina/osoLamina.css';
+import './creatures.css';
 
 /* Estados del contrato de avatar → forma canónica interna. El host escribe
    'idle'|'thinking'|'speaking'|'listening' (o 'caminando'); esto los
@@ -173,7 +174,14 @@ export default function OsoBastonLaminaViva({
 
   /** @param {number[]} punto  → "x% y%" para transform-origin. */
   const pctOf = (punto) => `${(punto[0] / ANCHO) * 100}% ${(punto[1] / ALTO) * 100}%`;
-  const cls = (c) => (animated ? c : undefined);
+  // El kit rubberhose aporta secondary motion a las capas ya recortadas. Cada
+  // wrapper recibe una sola animación para que no se pisen los transforms del
+  // rig de la lámina: el cuerpo respira con boil y la corona hace follow-through.
+  const cls = (...names) => {
+    if (!animated) return undefined;
+    const value = names.filter(Boolean).join(' ');
+    return value || undefined;
+  };
 
   const estiloRaiz = {
     display: 'inline-flex',
@@ -195,6 +203,8 @@ export default function OsoBastonLaminaViva({
       aria-label={title}
       data-creature={OSO_BASTON_SLUG}
       data-agt-estado={estado}
+      data-rh-estado={canon}
+      data-rh-kit="rubberhose"
       data-visema={visema || undefined}
       data-vida={animated && momento ? momento : undefined}
       data-tier={tier || undefined}
@@ -220,67 +230,77 @@ export default function OsoBastonLaminaViva({
             style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'contain', display: 'block' }}
           />
         )}
-        <div style={{ position: 'absolute', inset: 0, display: listo ? 'block' : 'none' }}>
-          {/* respira desde LOS APOYOS: el pecho hincha, los pies no se
-              despegan de la roca (transform-origin entre las dos plantas). */}
-          <div
-            className={cls('olv-cuerpoPivote')}
-            style={{ position: 'absolute', inset: 0, transformOrigin: pctOf(CUERPO_PIVOTE) }}
-          >
-            <div ref={cuerpoHostRef} className="olv-capa" />
+          <div style={{ position: 'absolute', inset: 0, display: listo ? 'block' : 'none' }}>
+            {/* respira desde LOS APOYOS: el pecho hincha, los pies no se
+                despegan de la roca (transform-origin entre las dos plantas). */}
+            <div
+              className={cls('olv-cuerpoPivote')}
+              style={{ position: 'absolute', inset: 0, transformOrigin: pctOf(CUERPO_PIVOTE) }}
+            >
+              <div
+                className={cls('olv-cuerpoRubber', 'rh-boil')}
+                style={{ position: 'absolute', inset: 0, transformBox: 'fill-box', transformOrigin: pctOf(CUERPO_PIVOTE) }}
+              >
+                <div ref={cuerpoHostRef} className="olv-capa" />
+              </div>
 
-            {/* LA CORONA del bastón — cabecea desde su base en el palo (el
-                respaldo del cuerpo tapa la costura). Late EN FLOR al florecer. */}
-            <div className={cls('olv-coronaPivote')} style={{ position: 'absolute', inset: 0, transformOrigin: pctOf(CORONA.pivote) }}>
-              <div ref={coronaHostRef} className="olv-capa" />
-            </div>
+              {/* LA CORONA del bastón — cabecea desde su base en el palo (el
+                  respaldo del cuerpo tapa la costura). Late EN FLOR al florecer. */}
+              <div className={cls('olv-coronaPivote')} style={{ position: 'absolute', inset: 0, transformOrigin: pctOf(CORONA.pivote) }}>
+                <div
+                  className={cls('olv-coronaRubber', 'rh-sway')}
+                  style={{ position: 'absolute', inset: 0, transformBox: 'fill-box', transformOrigin: pctOf(CORONA.pivote), animationDelay: '-0.7s' }}
+                >
+                  <div ref={coronaHostRef} className="olv-capa" />
+                </div>
+              </div>
 
-            {/* LA CABEZA — tres envoltorios anidados (gesto → mira → cabeceo)
-                que se COMPONEN sin pisarse, igual que el jaguar. */}
-            <div className={cls('olv-cabezaGesto')} style={{ position: 'absolute', inset: 0, transformOrigin: pctOf(CABEZA.pivote) }}>
-              <div className={cls('olv-cabezaMira')} style={{ position: 'absolute', inset: 0, transformOrigin: pctOf(CABEZA.pivote) }}>
-                <div className={cls('olv-cabezaPivote')} style={{ position: 'absolute', inset: 0, transformOrigin: pctOf(CABEZA.pivote) }}>
-                  <div ref={cabezaHostRef} className="olv-capa" />
+              {/* LA CABEZA — tres envoltorios anidados (gesto → mira → cabeceo)
+                  que se COMPONEN sin pisarse, igual que el jaguar. */}
+              <div className={cls('olv-cabezaGesto')} style={{ position: 'absolute', inset: 0, transformOrigin: pctOf(CABEZA.pivote) }}>
+                <div className={cls('olv-cabezaMira')} style={{ position: 'absolute', inset: 0, transformOrigin: pctOf(CABEZA.pivote) }}>
+                  <div className={cls('olv-cabezaPivote')} style={{ position: 'absolute', inset: 0, transformOrigin: pctOf(CABEZA.pivote) }}>
+                    <div ref={cabezaHostRef} className="olv-capa" />
 
-                  {/* INTERIOR DE BOCA SINTÉTICO (el único píxel no-lámina):
-                      detrás de la mandíbula, girado con la diagonal real de
-                      la sonrisa; se revela cuando la mandíbula baja. */}
-                  <div
-                    className={cls('olv-bocaInterior')}
-                    aria-hidden="true"
-                    style={{
-                      position: 'absolute',
-                      left: `${((BOCA.cx - BOCA.ancho / 2) / ANCHO) * 100}%`,
-                      top: `${(BOCA.cy / ALTO) * 100}%`,
-                      width: `${(BOCA.ancho / ANCHO) * 100}%`,
-                      height: `${((BOCA.ancho * 0.6) / ALTO) * 100}%`,
-                      transformOrigin: '50% 0%',
-                    }}
-                  />
+                    {/* INTERIOR DE BOCA SINTÉTICO (el único píxel no-lámina):
+                        detrás de la mandíbula, girado con la diagonal real de
+                        la sonrisa; se revela cuando la mandíbula baja. */}
+                    <div
+                      className={cls('olv-bocaInterior')}
+                      aria-hidden="true"
+                      style={{
+                        position: 'absolute',
+                        left: `${((BOCA.cx - BOCA.ancho / 2) / ANCHO) * 100}%`,
+                        top: `${(BOCA.cy / ALTO) * 100}%`,
+                        width: `${(BOCA.ancho / ANCHO) * 100}%`,
+                        height: `${((BOCA.ancho * 0.6) / ALTO) * 100}%`,
+                        transformOrigin: '50% 0%',
+                      }}
+                    />
 
-                  {/* MANDÍBULA-lámina: baja con el lip-sync. */}
-                  <div className={cls('olv-mandibulaPivote')} style={{ position: 'absolute', inset: 0, transformOrigin: pctOf(MANDIBULA.pivote) }}>
-                    <div ref={mandibulaHostRef} className="olv-capa" />
+                    {/* MANDÍBULA-lámina: baja con el lip-sync. */}
+                    <div className={cls('olv-mandibulaPivote')} style={{ position: 'absolute', inset: 0, transformOrigin: pctOf(MANDIBULA.pivote) }}>
+                      <div ref={mandibulaHostRef} className="olv-capa" />
+                    </div>
+
+                    {/* OREJAS-lámina: se paran al escuchar, se mecen en idle. */}
+                    <div className={cls('olv-orejaIzqPivote')} style={{ position: 'absolute', inset: 0, transformOrigin: pctOf(OREJA_IZQ.pivote) }}>
+                      <div ref={orejaIzqHostRef} className="olv-capa" />
+                    </div>
+                    <div className={cls('olv-orejaDerPivote')} style={{ position: 'absolute', inset: 0, transformOrigin: pctOf(OREJA_DER.pivote) }}>
+                      <div ref={orejaDerHostRef} className="olv-capa" />
+                    </div>
+
+                    {/* PÁRPADO: parpadeo real del único ojo en cuadro, con
+                        ritmo propio. El host se reposiciona en el ojo al montar. */}
+                    <div ref={parpadoHostRef} style={{ position: 'absolute' }} />
                   </div>
-
-                  {/* OREJAS-lámina: se paran al escuchar, se mecen en idle. */}
-                  <div className={cls('olv-orejaIzqPivote')} style={{ position: 'absolute', inset: 0, transformOrigin: pctOf(OREJA_IZQ.pivote) }}>
-                    <div ref={orejaIzqHostRef} className="olv-capa" />
-                  </div>
-                  <div className={cls('olv-orejaDerPivote')} style={{ position: 'absolute', inset: 0, transformOrigin: pctOf(OREJA_DER.pivote) }}>
-                    <div ref={orejaDerHostRef} className="olv-capa" />
-                  </div>
-
-                  {/* PÁRPADO: parpadeo real del único ojo en cuadro, con
-                      ritmo propio. El host se reposiciona en el ojo al montar. */}
-                  <div ref={parpadoHostRef} style={{ position: 'absolute' }} />
                 </div>
               </div>
             </div>
           </div>
         </div>
       </div>
-    </div>
   );
 
   // Paridad con los avatares hermanos: con handlers, botón real (teclado +

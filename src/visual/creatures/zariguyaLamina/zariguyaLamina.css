@@ -5,7 +5,8 @@
  * (por eso carga lápiz y brújula).
  *
  *   señal (hook/estado)                → qué pieza mueve, aquí
- *   --rh-blink-dur/-delay (ritmo)      → parpadeo REAL de los dos ojos juntos
+ *   --rh-blink-dur/-delay (ritmo)      → parpadeo REAL de los dos ojos juntos,
+ *                                        con cadencia ×1.3 para la zarigüeya
  *   data-rh-mira + --rh-mx/--rh-my     → la CABEZA gira siguiendo al usuario
  *   data-vida=husmea|tanatosis|reposo  → el idle-cerebro (vidaEstados.js:
  *                                        el repertorio que ya tenía la
@@ -15,8 +16,8 @@
  *   data-agt-estado=speaking + --zlv-jaw→ mandíbula que habla (lip-sync
  *                                        sobre la sonrisa YA abierta)
  *   data-agt-estado=thinking           → alza el LÁPIZ y escribe en el aire
- *   data-agt-estado=caminando          → bob de cuerpo/cabeza + cola viva
- *                                        (el andar se lee del roaming)
+ *   data-agt-estado=caminando          → bob de cuerpo/cabeza + peso de apoyo,
+ *                                        manos con follow-through y cola viva
  *
  * HONESTIDAD: el interior de boca (.zlv-bocaInterior) es SINTÉTICO (solo se
  * ve al abrir MÁS que la lámina). La mirada es GIRO DE CABEZA, no pupila
@@ -44,8 +45,14 @@
   display: block;
 }
 
-/* ═══ IDLE VIVO — alive-in-place: respira menudo (bicho chico), la testa
-   cabecea, la cola prensil se enrosca sola, las manitos se mecen apenas. */
+/* ═══ IDLE VIVO — respira menudo, la testa cabecea, la cola prensil se
+   enrosca sola, las manitos se mecen y el peso cambia de apoyo. */
+.zlv-pesoPivote { position: absolute; inset: 0; animation: zlv-peso 7.9s ease-in-out infinite; }
+@keyframes zlv-peso {
+  0%, 100% { transform: rotate(-0.6deg) translateX(-0.25%); }
+  50%      { transform: rotate(0.7deg) translateX(0.3%); }
+}
+
 .zlv-cuerpoPivote { position: absolute; inset: 0; animation: zlv-respira 3.1s ease-in-out infinite; }
 @keyframes zlv-respira {
   0%, 100% { transform: translateY(0) scale(1); }
@@ -84,13 +91,28 @@
   50%      { transform: rotate(1.3deg); }
 }
 
+/* Muñecas: microgestos independientes para que el lápiz y la brújula no se
+   lean como una sola pieza rígida. */
+.zlv-munecaLapizPivote { position: absolute; inset: 0; animation: zlv-muneca-lapiz 5.9s ease-in-out infinite; }
+@keyframes zlv-muneca-lapiz {
+  0%, 100% { transform: rotate(0deg); }
+  38%      { transform: rotate(-1.2deg); }
+  52%      { transform: rotate(0.5deg); }
+}
+.zlv-munecaBrujulaPivote { position: absolute; inset: 0; animation: zlv-muneca-brujula 6.7s ease-in-out infinite; }
+@keyframes zlv-muneca-brujula {
+  0%, 100% { transform: rotate(0deg); }
+  30%      { transform: rotate(1.4deg); }
+  44%      { transform: rotate(0.7deg); }
+}
+
 /* ═══ PARPADEO REAL con RITMO PROPIO — cadencia rh de la familia (un
    parpadeo suelto + un blink-blink doble por vuelta, cierres ~110ms). El
    párpado es un parche de piel que TAPA el ojo: scaleY(0)=abierto. */
 .zlv-parpado {
   position: absolute;
   transform-origin: 50% 0%;
-  animation: zlv-blink var(--rh-blink-dur, 5.6s) linear var(--rh-blink-delay, 0s) infinite;
+  animation: zlv-blink calc(var(--rh-blink-dur, 5.6s) * 1.3) linear var(--rh-blink-delay, 0s) infinite;
 }
 @keyframes zlv-blink {
   0%, 36%, 40%, 74%, 78%, 82%, 86%, 100% { transform: scaleY(0); }
@@ -167,8 +189,9 @@
   0%, 100% { transform: rotate(0deg) translateY(0); }
   50%      { transform: rotate(-2deg) translateY(-0.5%); }
 }
-[data-agt-estado='listening'] .zlv-parpado { animation-duration: calc(var(--rh-blink-dur, 5.2s) * 4.5); }
+[data-agt-estado='listening'] .zlv-parpado { animation-duration: calc(var(--rh-blink-dur, 5.2s) * 5.9); }
 [data-agt-estado='listening'] .zlv-brazoBrujulaPivote { animation: none; }
+[data-agt-estado='listening'] .zlv-munecaBrujulaPivote { animation: none; }
 
 /* ═══ PIENSA — alza el LÁPIZ y ESCRIBE en el aire (para eso lo carga: es la
    que anota), la testa apenas arriba. */
@@ -178,6 +201,14 @@
   50%      { transform: rotate(1.2deg) translateY(-1.2%); }
 }
 [data-agt-estado='thinking'] .zlv-brazoLapizPivote { animation: zlv-escribe 1.9s ease-in-out infinite; }
+[data-agt-estado='thinking'] .zlv-munecaLapizPivote { animation: zlv-muneca-escribe 1.9s ease-in-out infinite; }
+@keyframes zlv-muneca-escribe {
+  0%, 100% { transform: rotate(0deg); }
+  25%      { transform: rotate(-1.6deg); }
+  40%      { transform: rotate(0.8deg); }
+  55%      { transform: rotate(-1.2deg); }
+  70%      { transform: rotate(0.6deg); }
+}
 @keyframes zlv-escribe {
   0%, 100% { transform: rotate(0deg); }
   18%      { transform: rotate(-3.6deg); }   /* alza el lápiz */
@@ -204,8 +235,19 @@
 [data-agt-estado='caminando'] .zlv-brazoLapizPivote { animation: zlv-brazo-anda 0.56s ease-in-out infinite; }
 [data-agt-estado='caminando'] .zlv-brazoBrujulaPivote { animation: zlv-brazo-anda 0.56s ease-in-out -0.28s infinite; }
 @keyframes zlv-brazo-anda {
-  0%, 100% { transform: rotate(1.6deg); }
-  50%      { transform: rotate(-1.6deg); }
+  0%, 100% { transform: rotate(2.4deg); }
+  50%      { transform: rotate(-2.4deg); }
+}
+[data-agt-estado='caminando'] .zlv-pesoPivote { animation: zlv-anda-peso 1.12s ease-in-out infinite; }
+@keyframes zlv-anda-peso {
+  0%, 100% { transform: rotate(-1.3deg) translateX(-0.4%); }
+  50%      { transform: rotate(1.3deg) translateX(0.4%); }
+}
+[data-agt-estado='caminando'] .zlv-munecaLapizPivote { animation: zlv-muneca-anda 0.56s ease-in-out -0.14s infinite; }
+[data-agt-estado='caminando'] .zlv-munecaBrujulaPivote { animation: zlv-muneca-anda 0.56s ease-in-out -0.42s infinite; }
+@keyframes zlv-muneca-anda {
+  0%, 100% { transform: rotate(-1.8deg); }
+  50%      { transform: rotate(1.8deg); }
 }
 
 /* ═══ IDLE-CEREBRO (data-vida) — el repertorio de la zarigüeya. */
@@ -245,9 +287,15 @@
 }
 [data-vida='tanatosis'] .zlv-brazoLapizPivote,
 [data-vida='tanatosis'] .zlv-brazoBrujulaPivote { animation: zlv-brazo-caido 2.6s ease-in-out infinite; }
+[data-vida='tanatosis'] .zlv-munecaLapizPivote,
+[data-vida='tanatosis'] .zlv-munecaBrujulaPivote { animation: zlv-muneca-caida 2.6s ease-in-out infinite; }
 @keyframes zlv-brazo-caido {
   0%, 8%, 92%, 100% { transform: rotate(0deg); }
   30%, 70% { transform: rotate(5deg); }
+}
+@keyframes zlv-muneca-caida {
+  0%, 8%, 92%, 100% { transform: rotate(0deg); }
+  30%, 70% { transform: rotate(4deg); }
 }
 
 /* REPOSO — respira hondo, sacudón corto de testa al entrar (la firma
@@ -267,18 +315,22 @@
 
 /* ═══ GATES DE LA CASA ═══ */
 [data-tier='bajo'] .zlv-stage,
+[data-tier='bajo'] .zlv-pesoPivote,
 [data-tier='bajo'] .zlv-cuerpoPivote,
 [data-tier='bajo'] .zlv-cabezaPivote,
 [data-tier='bajo'] .zlv-colaPivote,
 [data-tier='bajo'] .zlv-orejaIzqPivote,
 [data-tier='bajo'] .zlv-orejaDerPivote,
 [data-tier='bajo'] .zlv-brazoLapizPivote,
-[data-tier='bajo'] .zlv-brazoBrujulaPivote { animation: none; }
+[data-tier='bajo'] .zlv-brazoBrujulaPivote,
+[data-tier='bajo'] .zlv-munecaLapizPivote,
+[data-tier='bajo'] .zlv-munecaBrujulaPivote { animation: none; }
 
 @media (prefers-reduced-motion: reduce) {
-  .zlv-stage, .zlv-cuerpoPivote, .zlv-cabezaGesto, .zlv-cabezaMira, .zlv-cabezaPivote,
+  .zlv-stage, .zlv-pesoPivote, .zlv-cuerpoPivote, .zlv-cabezaGesto, .zlv-cabezaMira, .zlv-cabezaPivote,
   .zlv-colaPivote, .zlv-orejaIzqPivote, .zlv-orejaDerPivote,
   .zlv-brazoLapizPivote, .zlv-brazoBrujulaPivote,
+  .zlv-munecaLapizPivote, .zlv-munecaBrujulaPivote,
   .zlv-mandibulaPivote, .zlv-bocaInterior, .zlv-parpado {
     animation: none !important;
     transition: none !important;

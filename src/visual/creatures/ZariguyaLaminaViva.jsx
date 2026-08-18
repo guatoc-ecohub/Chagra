@@ -24,6 +24,11 @@ const ESTADO_CANON = {
    lámina aprobada (que ya sonríe con la boca abierta — abrir es abrir MÁS). */
 const JAW_DE_VISEMA = { V1: 0, V2: 0.42, V3: 1, V4: 0.36 };
 
+/* Pivote del peso en el suelo, entre las dos patas. Es un hueso del rig, no
+   una pieza de la piel: permite que la zarigüeya cargue el peso de una pata a
+   la otra sin alterar su cara ni la lámina aprobada. */
+const PESO_PIVOTE = [230, 430];
+
 /**
  * ZariguyaLaminaViva — la LÁMINA aprobada de la zarigüeya (`zariguya.png`,
  * estilo grabado: erguida, guante blanco con lápiz en la mano alzada,
@@ -44,11 +49,13 @@ const JAW_DE_VISEMA = { V1: 0, V2: 0.42, V3: 1, V4: 0.36 };
  *     mandíbula; pensando alza el LÁPIZ y escribe en el aire (para eso
  *     carga lápiz); idle vive (respira, la cola prensil se enrosca sola).
  *
- * QUÉ SÍ ARTICULA: parpadeo real de los dos ojos juntos con ritmo propio;
- * mirada por giro de cabeza; orejas que se paran al escuchar; mandíbula con
- * lip-sync sobre la sonrisa abierta; el brazo del lápiz que escribe al
- * pensar; la manito de la brújula con micro-vaivén; la cola prensil que se
- * enrosca y mece; tanatosis (el gag: se hace la muerta un instante, ojos
+ * QUÉ SÍ ARTICULA: parpadeo real de los dos ojos juntos con ritmo propio,
+ * un poco más pausado que la familia; mirada por giro de cabeza; orejas que
+ * se paran al escuchar; mandíbula con lip-sync sobre la sonrisa abierta; el
+ * brazo del lápiz que escribe al pensar; la manito de la brújula con
+ * micro-vaivén; la cola prensil que se enrosca y mece; y el peso que cambia de
+ * apoyo con follow-through en las manos;
+ * tanatosis (el gag: se hace la muerta un instante, ojos
  * cerrados) y husmeo del idle-cerebro.
  *
  * HONESTIDAD (lo que el dibujo plano NO da — no se disfraza):
@@ -228,9 +235,13 @@ export default function ZariguyaLaminaViva({
         )}
         <div style={{ position: 'absolute', inset: 0, display: listo ? 'block' : 'none' }}>
           <div
-            className={cls('zlv-cuerpoPivote')}
-            style={{ position: 'absolute', inset: 0, transformOrigin: pctOf(CUERPO_PIVOTE) }}
+            className={cls('zlv-pesoPivote')}
+            style={{ position: 'absolute', inset: 0, transformOrigin: pctOf(PESO_PIVOTE) }}
           >
+            <div
+              className={cls('zlv-cuerpoPivote')}
+              style={{ position: 'absolute', inset: 0, transformOrigin: pctOf(CUERPO_PIVOTE) }}
+            >
             {/* LA COLA PRENSIL — detrás de todo: se enrosca sola en idle. */}
             <div className={cls('zlv-colaPivote')} style={{ position: 'absolute', inset: 0, transformOrigin: pctOf(COLA.pivote) }}>
               <div ref={colaHostRef} className="zlv-capa" />
@@ -241,12 +252,16 @@ export default function ZariguyaLaminaViva({
             {/* LA BRÚJULA en la manito contra el pecho — micro-vaivén; el
                 pecho detrás va inpaintado (capas.js), no se abre hueco. */}
             <div className={cls('zlv-brazoBrujulaPivote')} style={{ position: 'absolute', inset: 0, transformOrigin: pctOf(BRAZO_BRUJULA.pivote) }}>
-              <div ref={brazoBrujulaHostRef} className="zlv-capa" />
+              <div className={cls('zlv-munecaBrujulaPivote')} style={{ position: 'absolute', inset: 0, transformOrigin: pctOf([BRAZO_BRUJULA.guante.cx, BRAZO_BRUJULA.guante.cy]) }}>
+                <div ref={brazoBrujulaHostRef} className="zlv-capa" />
+              </div>
             </div>
 
             {/* EL LÁPIZ en la mano alzada — escribe en el aire al pensar. */}
             <div className={cls('zlv-brazoLapizPivote')} style={{ position: 'absolute', inset: 0, transformOrigin: pctOf(BRAZO_LAPIZ.pivote) }}>
-              <div ref={brazoLapizHostRef} className="zlv-capa" />
+              <div className={cls('zlv-munecaLapizPivote')} style={{ position: 'absolute', inset: 0, transformOrigin: pctOf([BRAZO_LAPIZ.guante.cx, BRAZO_LAPIZ.guante.cy]) }}>
+                <div ref={brazoLapizHostRef} className="zlv-capa" />
+              </div>
             </div>
 
             {/* LA CABEZA — tres envoltorios anidados (gesto → mira → idle),
@@ -291,6 +306,7 @@ export default function ZariguyaLaminaViva({
                   <div ref={parpado2HostRef} style={{ position: 'absolute' }} />
                 </div>
               </div>
+            </div>
             </div>
           </div>
         </div>
