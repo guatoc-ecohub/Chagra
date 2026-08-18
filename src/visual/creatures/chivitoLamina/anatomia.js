@@ -129,8 +129,12 @@ export const MANDIBULA = {
   pivote: [212, 244],
 };
 
-/** Centro de la boca para el interior sintético (se convierte a % del stage). */
-export const BOCA = { cx: 160, cy: 246, ancho: 92 };
+/** Centro de la boca para el interior sintético (se convierte a % del stage).
+ *  `alto` EXPLÍCITO (no el ancho*0.5 de la luciérnaga): el pico del chivito
+ *  baja poco (~10-16px desde la comisura) y un interior más alto asoma por
+ *  las bandas de fade del pico bajado y pinta rojo sobre la barba del cuerpo
+ *  — fuga encontrada POR el gate 2.5D (shot-habla-jaw) y cerrada aquí. */
+export const BOCA = { cx: 160, cy: 246, ancho: 92, alto: 26 };
 
 /**
  * MANO DEL LÁPIZ: la mano-garra clara (x≈20-72, y≈285-352) + el lápiz que

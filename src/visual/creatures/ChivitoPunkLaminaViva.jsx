@@ -267,7 +267,7 @@ export default function ChivitoPunkLaminaViva({
                       left: `${((BOCA.cx - BOCA.ancho / 2) / ANCHO) * 100}%`,
                       top: `${(BOCA.cy / ALTO) * 100}%`,
                       width: `${(BOCA.ancho / ANCHO) * 100}%`,
-                      height: `${((BOCA.ancho * 0.5) / ALTO) * 100}%`,
+                      height: `${(BOCA.alto / ALTO) * 100}%`,
                       transformOrigin: '50% 0%',
                     }}
                   />
