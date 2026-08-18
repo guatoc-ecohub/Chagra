@@ -2,7 +2,7 @@
  * JaguarCompaiEscena — LA COREOGRAFÍA DEL JAGUAR COMPAÑERO (avatarType 'jaguar').
  *
  * Molde: useEntradaAbeja/AbejaEscena vía ZariguyaCompaiEscena (la escena posee
- * la coreografía, la creature posee el cuerpo — que YA existía: Jaguar.jsx).
+ * la coreografía, la creature posee el cuerpo lámina-viva).
  * Pero el jaguar NO vuela y NO trota — es un FELINO, depredador ápice de
  * suelo, y su coreografía entera sale de esa verdad:
  *
@@ -13,7 +13,7 @@
  *     tiempo del cruce del host) y entra AGAZAPADO (data-acecha del cuerpo),
  *     lento y controlado — un felino jamás corre a su marca.
  *   · MARCHA DE PERFIL: cuando viaja lejos (foco nuevo) el cuerpo cede al rig
- *     lateral de Jaguar.jsx (pose 'camina': ciclo real de cuadrúpedo). Al
+ *     lateral de la lámina (pose 'camina': ciclo real de cuadrúpedo). Al
  *     llegar vuelve al frontal ('anda'). Histéresis para no parpadear de rig.
  *   · SE ECHA: sin foco, patrulla en óvalos AMPLIOS y lentos y cada tanto se
  *     echa un buen rato (perfil idle 'jaguar': percha larga, poder contenido).
@@ -35,7 +35,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { useFrame } from '@react-three/fiber';
 import { Html } from '@react-three/drei';
 import * as THREE from 'three';
-import { Jaguar } from '../../creatures/Jaguar.jsx';
+import JaguarLaminaViva from '../../creatures/JaguarLaminaViva.jsx';
 import { JAGUAR_PRESENCIA, JAGUAR_TINTA, JAGUAR_SLUG } from '../../creatures/jaguarIdentidad.js';
 import { idleDeCreature, IDLE_NEUTRO } from '../../creatures/creatureIdle.js';
 import { useLipSync } from '../../creatures/useLipSync.js';
@@ -244,14 +244,14 @@ const ACECHA_PULSO_MS = 900;
 
 /**
  * El jaguar ya montado en una escena: drop-in del contrato de AbejaEscena
- * (CompaiEscena le pasa las mismas props). Billboard `<Html>` con el cuerpo
- * `Jaguar` (rosetas de anillo roto = su firma, de serie); PULSA al narrar y
+ * (CompaiEscena le pasa las mismas props). Billboard `<Html>` con
+ * `JaguarLaminaViva`; PULSA al narrar y
  * REBOTA al toque con las clases genéricas del billboard (`.mundo-abeja*`), y
  * su reacción propia es ACECHAR un instante (los omóplatos suben).
  */
 export function JaguarCompaiEscena({
-  foco, entrando = true, animo = 'sereno', energia = 1, reducedMotion = false, piso = 0,
-  hablando = false, rebote = 0, mundoId = null, tier = 'alto', cruce = true,
+  foco, entrando = true, energia = 1, reducedMotion = false, piso = 0,
+  hablando = false, rebote = 0, tier = 'alto', cruce = true,
   estadoFinca = null, hayAlerta = false,
 }) {
   // La señal de SALIDA del host (compartida: la señal es del MUNDO, no de la
@@ -265,10 +265,7 @@ export function JaguarCompaiEscena({
     () => (estadoFinca ? reaccionDeFinca(estadoFinca, { hayAlerta }) : null),
     [estadoFinca, hayAlerta],
   );
-  const animoReal = reaccion?.animo ?? animo;
   const energiaReal = reaccion?.energia ?? energia;
-  const climaReal = estadoFinca?.clima ?? null;
-  const ensoReal = estadoFinca?.enso ?? 'neutro';
   // La hora del valle: para el jaguar la noche es JORNADA (el hook no lo
   // acurruca); aquí solo se lee una vez, determinista.
   const hora = useMemo(() => horaDeReloj(), []);
@@ -326,16 +323,10 @@ export function JaguarCompaiEscena({
                   para no pisar la transition del volteo de la cara. */}
               <div ref={idleRef} style={{ transformOrigin: 'center bottom' }} data-creature={JAGUAR_SLUG}>
                 <div ref={caraRef} className="mundo-abeja__cara">
-                  <Jaguar
+                  <JaguarLaminaViva
                     size={size}
-                    animo={animoReal}
-                    energia={energiaReal}
-                    pose={vivo && modo === 'marcha' ? 'camina' : 'anda'}
-                    acecha={vivo && (modo === 'acecho' || acechaPulso)}
-                    clima={climaReal}
-                    enso={ensoReal}
+                    estado={hablando ? 'speaking' : (vivo && modo === 'marcha' ? 'caminando' : (vivo && (modo === 'acecho' || acechaPulso) ? 'thinking' : 'idle'))}
                     visema={vivo ? visema : null}
-                    mundoId={mundoId}
                     animated={vivo}
                     tier={tier}
                   />

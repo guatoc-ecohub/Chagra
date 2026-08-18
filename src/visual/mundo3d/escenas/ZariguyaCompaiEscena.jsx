@@ -3,7 +3,7 @@
  * (avatarType 'zariguya').
  *
  * Molde: useEntradaAbeja/AbejaEscena (la escena posee la coreografía, la
- * creature posee el cuerpo — que YA existía: Zariguya.jsx, con las crías al
+ * creature posee el cuerpo lámina-viva, con las crías al
  * lomo). Pero la chucha NO vuela — es un marsupial NOCTURNO de piso, y su
  * coreografía entera sale de esa verdad:
  *
@@ -34,7 +34,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { useFrame } from '@react-three/fiber';
 import { Html } from '@react-three/drei';
 import * as THREE from 'three';
-import { Zariguya } from '../../creatures/Zariguya.jsx';
+import ZariguyaLaminaViva from '../../creatures/ZariguyaLaminaViva.jsx';
 import { ZARIGUYA_PRESENCIA, ZARIGUYA_TINTA, ZARIGUYA_SLUG } from '../../creatures/zariguyaIdentidad.js';
 import { idleDeCreature, IDLE_NEUTRO } from '../../creatures/creatureIdle.js';
 import { useLipSync } from '../../creatures/useLipSync.js';
@@ -233,14 +233,14 @@ const HUSMEA_DURA_MS = 1400;
 
 /**
  * La zarigüeya ya montada en una escena: drop-in del contrato de AbejaEscena
- * (CompaiEscena le pasa las mismas props). Billboard `<Html>` con el cuerpo
- * `Zariguya` (crías al lomo = su firma, de serie); PULSA al narrar y REBOTA
+ * (CompaiEscena le pasa las mismas props). Billboard `<Html>` con
+ * `ZariguyaLaminaViva` (crías al lomo = su firma, de serie); PULSA al narrar y REBOTA
  * al toque con las clases genéricas del billboard (`.mundo-abeja*`), y cada
  * tanto se detiene a HUSMEAR (su reacción propia).
  */
 export function ZariguyaCompaiEscena({
-  foco, entrando = true, animo = 'sereno', energia = 1, reducedMotion = false, piso = 0,
-  hablando = false, rebote = 0, mundoId = null, tier = 'alto', cruce = true,
+  foco, entrando = true, energia = 1, reducedMotion = false, piso = 0,
+  hablando = false, rebote = 0, tier = 'alto', cruce = true,
   estadoFinca = null, hayAlerta = false,
 }) {
   // La señal de SALIDA del host (compartida: la señal es del MUNDO, no de la
@@ -254,10 +254,7 @@ export function ZariguyaCompaiEscena({
     () => (estadoFinca ? reaccionDeFinca(estadoFinca, { hayAlerta }) : null),
     [estadoFinca, hayAlerta],
   );
-  const animoReal = reaccion?.animo ?? animo;
   const energiaReal = reaccion?.energia ?? energia;
-  const climaReal = estadoFinca?.clima ?? null;
-  const ensoReal = estadoFinca?.enso ?? 'neutro';
   // La hora del valle: para la zarigüeya la noche es JORNADA (el hook no la
   // acurruca); aquí solo se lee una vez, determinista.
   const hora = useMemo(() => horaDeReloj(), []);
@@ -329,15 +326,10 @@ export function ZariguyaCompaiEscena({
                   para no pisar la transition del volteo de la cara. */}
               <div ref={idleRef} style={{ transformOrigin: 'center bottom' }} data-creature={ZARIGUYA_SLUG}>
                 <div ref={caraRef} className="mundo-abeja__cara">
-                  <Zariguya
+                  <ZariguyaLaminaViva
                     size={size}
-                    animo={animoReal}
-                    energia={energiaReal}
-                    husmea={husmea && vivo}
-                    clima={climaReal}
-                    enso={ensoReal}
+                    estado={hablando ? 'speaking' : (husmea && vivo ? 'thinking' : 'idle')}
                     visema={vivo ? visema : null}
-                    mundoId={mundoId}
                     animated={vivo}
                     tier={tier}
                   />

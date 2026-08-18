@@ -3,8 +3,8 @@
  * (avatarType 'luciernaga').
  *
  * Molde: useEntradaAbeja/AbejaEscena (la escena posee la coreografía, la
- * creature posee el cuerpo — que YA existía: Luciernaga.jsx, con la linterna
- * de serie). SÍ vuela — pero NO como la abeja: es un cocuyo NOCTURNO cuya
+ * creature posee el cuerpo lámina-viva, con la linterna de serie). SÍ vuela,
+ * pero NO como la abeja: es un cocuyo NOCTURNO cuya
  * gracia es el PARPADEO, no el zumbido, y su coreografía entera sale de esa
  * verdad:
  *
@@ -36,7 +36,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { useFrame } from '@react-three/fiber';
 import { Html } from '@react-three/drei';
 import * as THREE from 'three';
-import { Luciernaga } from '../../creatures/Luciernaga.jsx';
+import LuciernagaLaminaViva from '../../creatures/LuciernagaLaminaViva.jsx';
 import { LUCIERNAGA_PRESENCIA, LUCIERNAGA_TINTA, LUCIERNAGA_SLUG } from '../../creatures/luciernagaIdentidad.js';
 import { idleDeCreature, IDLE_NEUTRO } from '../../creatures/creatureIdle.js';
 import { useLipSync } from '../../creatures/useLipSync.js';
@@ -256,14 +256,14 @@ const LEE_DURA_MS = 1700;
 
 /**
  * La luciérnaga ya montada en una escena: drop-in del contrato de AbejaEscena
- * (CompaiEscena le pasa las mismas props). Billboard `<Html>` con el cuerpo
- * `Luciernaga` (la linterna = su alma, de serie); PULSA al narrar y REBOTA al
+ * (CompaiEscena le pasa las mismas props). Billboard `<Html>` con
+ * `LuciernagaLaminaViva` (la linterna = su alma, de serie); PULSA al narrar y REBOTA al
  * toque con las clases genéricas del billboard (`.mundo-abeja*`), cada tanto
  * se detiene a LEER LA NOCHE (data-eco='leer'), y si la finca tiene alerta su
  * linterna titila 'degradado' — la bioindicadora diagnosticando de verdad.
  */
 export function LuciernagaCompaiEscena({
-  foco, entrando = true, animo = 'sereno', energia = 1, reducedMotion = false, piso = 0,
+  foco, entrando = true, energia = 1, reducedMotion = false, piso = 0,
   hablando = false, rebote = 0, tier = 'alto', cruce = true,
   estadoFinca = null, hayAlerta = false,
 }) {
@@ -278,10 +278,7 @@ export function LuciernagaCompaiEscena({
     () => (estadoFinca ? reaccionDeFinca(estadoFinca, { hayAlerta }) : null),
     [estadoFinca, hayAlerta],
   );
-  const animoReal = reaccion?.animo ?? animo;
   const energiaReal = reaccion?.energia ?? energia;
-  const climaReal = estadoFinca?.clima ?? null;
-  const ensoReal = estadoFinca?.enso ?? 'neutro';
   // La hora del valle: para la luciérnaga la noche es JORNADA (el hook no la
   // acurruca); aquí solo se lee una vez, determinista.
   const hora = useMemo(() => horaDeReloj(), []);
@@ -362,13 +359,10 @@ export function LuciernagaCompaiEscena({
                   imperativa por frame; propia para no pisar el volteo. */}
               <div ref={idleRef} style={{ transformOrigin: 'center center' }} data-creature={LUCIERNAGA_SLUG}>
                 <div ref={caraRef} className="mundo-abeja__cara">
-                  <Luciernaga
+                  <LuciernagaLaminaViva
                     size={size}
-                    animo={animoReal}
-                    energia={energiaReal}
+                    estado={hablando ? 'speaking' : (leyendo && vivo ? 'thinking' : 'idle')}
                     eco={eco}
-                    clima={climaReal}
-                    enso={ensoReal}
                     visema={vivo ? visema : null}
                     animated={vivo}
                     tier={tier}
