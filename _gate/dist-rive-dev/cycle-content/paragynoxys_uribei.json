@@ -1,0 +1,82 @@
+{
+  "species_slug": "paragynoxys_uribei",
+  "scientific_name": "Paragynoxys uribei Cuatrec.",
+  "common_names": [
+    "Paragyn de Uribe (Paragynoxys uribei)"
+  ],
+  "family": "Asteraceae",
+  "category": "arboles_sombra",
+  "cultivable": false,
+  "conservation_status": "endemica_colombia",
+  "thermal_zones": [
+    "paramo"
+  ],
+  "roles_in_guild": [
+    "nurse_plant",
+    "windbreak"
+  ],
+  "antagonists": [],
+  "especies_nativas_sustitutas": [],
+  "propagation": {
+    "metodo_principal": "semilla",
+    "notas": "Aquenios maduros recolectados en temporada seca. Germinación 30-60 días en vivero de altura con sustrato turba + arena 2:1. Trasplante a bolsa a los 4 meses, plantación definitiva >12 meses. Crecimiento moderado (~3-5 cm/año en altura). Endémico de Colombia, presencia en complejos paramunos de la Cordillera Oriental (Sumapaz, Chingaza, Iguaque). Protegido por Ley 1930/2018."
+  },
+  "requirements": {
+    "agua": "alto",
+    "altitud_msnm": {
+      "min_absoluto": 3000,
+      "optimo_min": 3200,
+      "optimo_max": 3700,
+      "max_absoluto": 4000
+    },
+    "temperatura_c": {
+      "helada_letal": -10,
+      "optimo_min": 4,
+      "optimo_max": 11,
+      "max_tolerable": 16
+    },
+    "radiacion": "sombra_parcial",
+    "drenaje_requerido": "bueno"
+  },
+  "valor_pedagogico": "El paragyn de Uribe (Paragynoxys uribei Cuatrec., familia Asteraceae) es un arbolito o arbusto arborescente del sub-páramo y bosque altoandino colombiano (3.000-4.000 msnm), nombrado por José Cuatrecasas en honor al sacerdote-botánico Lorenzo Uribe-Uribe S.J., pionero del estudio florístico colombiano y autor de la \"Flora de Colombia\". El género Paragynoxys (Asteraceae-Senecioneae, ~15 especies neotropicales) representa una de las pocas radiaciones de árboles compuestos arborescentes del páramo y bosque altoandino colombiano-venezolano-ecuatoriano. Tronco corto retorcido con corteza rugosa pardo-grisácea, ramas con cicatrices foliares prominentes (tipo \"candelabro\"). Hojas alternas grandes (10-20 cm largo) oval-lanceoladas, coriáceas, con haz verde-oscuro lustroso y envés tomentoso blanco-grisáceo que refracta radiación UV-B y reduce transpiración por viento andino. Inflorescencia en panícula terminal de capítulos amarillo-crema con flores liguladas y discoidales — patrón estructural de Senecioneae arborescentes. Distribución colombiana endémica: complejos paramunos de la Cordillera Oriental (Sumapaz-Cruz Verde-Chingaza-Iguaque-Pisba-Cocuy) y porciones altas del Macizo Colombiano (Las Hermosas, Sotará, Doña Juana), con poblaciones fragmentadas resultado del avance histórico de la frontera agropecuaria papera + ganadería bovina extensiva sobre el subpáramo. Servicio ecosistémico: componente estructural clave del ecotono bosque altoandino-páramo, junto con Drimys granadensis, Weinmannia tomentosa, Hesperomeles obtusifolia, Escallonia myrtilloides — su presencia indica buena conservación del cinturón altimontano y diversidad de hábitats para fauna endémica (Cinclodes albidiventris, Anisognathus igniventris). Amenazas: tala para construcción de cercas y leña, quema para apertura de potreros, expansión de papa pastusa sobre límite agronómico, fragmentación de hábitat, cambio climático con migración altitudinal ascendente que tiene techo geográfico en cumbres paramunas. Protección: Ley 1930/2018 (Páramos), Resolución 1912/2017 MADS-IAvH lista nacional especies amenazadas, jurisdicción CAR Cundinamarca/CORPOBOYACÁ/CORPORINOQUIA según subregión. Estado conservación: Vulnerable (VU) según Libro Rojo Plantas Colombia, con tendencia poblacional decreciente. Manejo agroecológico (solo restauración con autorización CAR): recolección de aquenios maduros temporada seca (julio-agosto cordillera oriental), germinación en vivero municipal con sustrato turba de páramo + arena gruesa 2:1, plantación intercalada con Weinmannia tomentosa, Drimys granadensis, Hesperomeles obtusifolia, Escallonia myrtilloides para restaurar matriz forestal del ecotono altoandino-páramo a densidades 400-800 ind/ha. Exclusión ganadera 5-7 años obligatoria. Monitoreo bianual. Fuentes Tier A: Bernal 2015 Catálogo Plantas y Líquenes Colombia, Humboldt Flora Alto-Andina, Libro Rojo Plantas Colombia, GBIF Taxonomic Backbone, POWO Kew, Ley 1930/2018.",
+  "sources": [
+    {
+      "id": "bernal-2015-plantas-liquenes-colombia",
+      "title": "bernal-2015-plantas-liquenes-colombia",
+      "tier": "A",
+      "url": "http://catalogoplantasdecolombia.unal.edu.co"
+    },
+    {
+      "id": "humboldt-flora-alto-andina",
+      "title": "humboldt-flora-alto-andina",
+      "tier": "A",
+      "url": null
+    },
+    {
+      "id": "libro-rojo-plantas-colombia",
+      "title": "libro-rojo-plantas-colombia",
+      "tier": "A",
+      "url": null
+    },
+    {
+      "id": "gbif-taxonomic-backbone",
+      "title": "gbif-taxonomic-backbone",
+      "tier": "A",
+      "url": "https://www.gbif.org/dataset/d7dddbf4-2cf0-4f39-9b2a-bb099caae36c"
+    },
+    {
+      "id": "powo-kew",
+      "title": "powo-kew",
+      "tier": "A",
+      "url": "https://powo.science.kew.org"
+    },
+    {
+      "id": "ley-1930-2018-paramos",
+      "title": "ley-1930-2018-paramos",
+      "tier": "A",
+      "url": null
+    }
+  ],
+  "_generated_by": "scripts/build-cycle-content-from-catalog.mjs",
+  "_generated_at": "2026-05-19T00:42:57.403Z"
+}

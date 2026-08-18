@@ -1,0 +1,84 @@
+{
+  "species_slug": "axonopus_compressus",
+  "scientific_name": "Axonopus compressus (Sw.) P.Beauv.",
+  "common_names": [
+    "Pasto carpet"
+  ],
+  "family": "Poaceae",
+  "category": "abonos_verdes_coberturas",
+  "cultivable": true,
+  "conservation_status": "nativo_silvestre",
+  "thermal_zones": [
+    "calido",
+    "templado"
+  ],
+  "roles_in_guild": [
+    "ground_cover",
+    "biomass_producer"
+  ],
+  "antagonists": [],
+  "especies_nativas_sustitutas": [],
+  "propagation": {
+    "methods": [
+      "semilla",
+      "estolon"
+    ],
+    "best_method": "estolon",
+    "protocol_resumen": "Propagación principal por estolones (semilla viable pero germinación lenta). 1-2 t/ha de material vegetativo o 4-8 kg/ha de semilla al inicio de lluvias. Establecimiento 70-100 días por crecimiento estolonífero.",
+    "tiempo_a_establecimiento_dias": 85,
+    "notas": "Nativa neotropical (incluye Colombia natural). Tolerancia notable a sombra parcial y alta humedad. Excelente cobertura permanente en sotobosque de cafetales, cacaotales y plantaciones de plátano/banano en piso medio.",
+    "fuente": "CIAT Tropical Forages; POWO Kew; Bernal 2015; GBIF; SIB Colombia"
+  },
+  "requirements": {
+    "agua": "alto",
+    "altitud_msnm": {
+      "min_absoluto": 0,
+      "optimo_min": 0,
+      "optimo_max": 1800,
+      "max_absoluto": 2200
+    },
+    "temperatura_c": {
+      "helada_letal": 2,
+      "optimo_min": 20,
+      "optimo_max": 28,
+      "max_tolerable": 35
+    },
+    "radiacion": "sombra_parcial",
+    "drenaje_requerido": "bueno_a_moderado"
+  },
+  "valor_pedagogico": "El pasto carpet o pasto alfombra (Axonopus compressus (Sw.) P.Beauv., Poaceae, subfamilia Panicoideae, tribu Paspaleae) es una gramínea forrajera nativa neotropical de gran importancia en sistemas silvopastoriles húmedos y como cobertura permanente en cultivos perennes de sombra (cafetales, cacaotales, plataneras, frutales tropicales), originaria de toda la América tropical desde México hasta Argentina y con presencia natural ampliamente documentada en Colombia por SIB Colombia y herbarios nacionales en regiones de bosque húmedo tropical, bosque premontano, bosque sub-andino y borde de bosque alto-andino entre 0 y 1.800 (excepcionalmente 2.200) msnm. Junto con Paspalum notatum (también nativo), es de las pocas gramíneas forrajeras de uso relevante en Colombia que son genuinamente americanas y no introducidas africanas — hecho de gran valor agroecológico para sistemas que priorizan la conservación de flora nativa y la reducción de naturalización de exóticas. En Colombia se distribuye naturalmente y se cultiva en el Pacífico húmedo (Chocó, Valle, Cauca, Nariño), Caribe húmedo (Magdalena, Atlántico, Bolívar bajo), Magdalena Medio (Antioquia, Santander), Amazonía (Caquetá, Putumayo, Amazonas), valles interandinos húmedos (Huila bajo, Valle del Cauca medio), piedemonte andino-amazónico, eje cafetero (Caldas, Quindío, Risaralda) y valles húmedos del piedemonte llanero, todos en zona térmica cálida y templada baja entre 0 y 1.800 msnm. Es gramínea perenne estolonífera rastrera alfombrante de bajo porte (10-30 cm de altura) con estolones cortos que enraízan en cada nudo, hojas linear-lanceoladas anchas verde-medio glabras o con pelos finos en los bordes, vaina foliar comprimida lateralmente (carácter diagnóstico del género Axonopus, \"axon-opus\" = \"eje en pie\"), inflorescencia en 2-4 racimos digitados al ápice del culmo (similar a Paspalum pero más delgados), espiguillas pequeñas en hilera única, semillas viables aunque la propagación principal es vegetativa por estolones. Su característica agronómica única entre forrajeras comerciales es la tolerancia notable a sombra parcial (50-70% de sombra) y a alta humedad relativa (>80% durante meses), atributos que la convierten en la mejor opción de cobertura permanente en sotobosques productivos: cafetales con sombra de Inga, Erythrina, Cordia, Albizia, Cedrela; cacaotales con sombra de Cordia alliodora, Erythrina, Gliricidia; plataneras y bananeras con sombra parcial; frutales tropicales bajo dosel parcial; sistemas silvopastoriles densamente arbolados. En ese rol, A. compressus mantiene cobertura del suelo, controla erosión en pendientes húmedas, suprime malezas heliófilas, capta y devuelve materia orgánica al suelo, y aporta forraje complementario al ganado en sistemas silvopastoriles que cosechan también frutos o aromáticas en estrato superior. Produce biomasa de 6-10 t MS/ha/año (modesta, inferior a brachiaria y kikuyo, en línea con paspalum), soporta carga animal de 1-2.5 UGG/ha en sistemas extensivos rotacionales con descanso de 30-45 días entre pastoreos y altura de entrada al pastoreo de 15-20 cm, valor nutricional medio (PC 8-11%, DIVMS 55-62%). Su productividad inferior a las gramíneas comerciales de sol pleno se compensa con: (1) carácter nativo (no requiere preocupación por naturalización agresiva), (2) tolerancia única a sombra parcial entre forrajeras comerciales, (3) excelente función ecosistémica como cobertura permanente en sistemas multi-estrato, (4) compatibilidad con sotobosque en restauración productiva. Es susceptible a salivazo (Aeneolamia spp.) menos que brachiaria, y a complejos foliares Bipolaris-Curvularia en humedad extrema sostenida. Manejo agroecológico: propagación principal por estolones cosechados de pradera madre (1-2 t/ha en surcos amplios al inicio de lluvias) o por semilla (4-8 kg/ha, germinación lenta), fertilización inicial mínima (sin requerimiento alto, especialmente bajo dosel arbóreo donde el ciclaje de nutrientes vía hojarasca aporta lo necesario), descanso post-establecimiento 80-110 días, asociación con leguminosas rastreras nativas (Desmodium spp., Centrosema brasilianum), sistemas silvopastoriles densamente arbolados con especies nativas del bosque tropical húmedo y premontano (Inga edulis, Erythrina poeppigiana, Cordia alliodora, Albizia spp., Cedrela odorata, Caryocar amygdaliferum), uso como cobertura permanente en cafetales (callejones entre cafetos), cacaotales (sotobosque productivo) y plataneras (cobertura entre matas) donde su carácter alfombrante y tolerancia a pisoteo permite manejo cotidiano sin daño. Es lección agroecológica fundamental: una gramínea forrajera nativa neotropical que demuestra cómo la flora americana tiene en su propio patrimonio botánico opciones productivas adaptadas a nichos específicos (sombra parcial, alta humedad) que las gramíneas africanas no llenan, y cómo los sistemas silvopastoriles multi-estrato con dosel arbóreo nativo + pasto carpet nativo + leguminosas nativas pueden producir alimento, fibra, madera, frutos y servicios ecosistémicos simultáneamente sin recurrir a exóticas naturalizadas. Fuentes Tier A: CIAT Tropical Forages Database, POWO Kew, GBIF Backbone Taxonomy, Bernal et al. 2015 Catálogo Plantas y Líquenes Colombia, SIB Colombia.",
+  "sources": [
+    {
+      "id": "powo-kew",
+      "title": "powo-kew",
+      "tier": "A",
+      "url": "https://powo.science.kew.org"
+    },
+    {
+      "id": "gbif-taxonomic-backbone",
+      "title": "gbif-taxonomic-backbone",
+      "tier": "A",
+      "url": "https://www.gbif.org/dataset/d7dddbf4-2cf0-4f39-9b2a-bb099caae36c"
+    },
+    {
+      "id": "bernal-2015-plantas-liquenes-colombia",
+      "title": "bernal-2015-plantas-liquenes-colombia",
+      "tier": "A",
+      "url": "http://catalogoplantasdecolombia.unal.edu.co"
+    },
+    {
+      "id": "sib-colombia",
+      "title": "sib-colombia",
+      "tier": "A",
+      "url": "https://sibcolombia.net"
+    },
+    {
+      "id": "agrosavia-forrajeras-2022",
+      "title": "agrosavia-forrajeras-2022",
+      "tier": "A",
+      "url": null
+    }
+  ],
+  "_generated_by": "scripts/build-cycle-content-from-catalog.mjs",
+  "_generated_at": "2026-05-19T00:42:57.389Z"
+}

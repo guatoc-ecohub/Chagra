@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Árboles del frío andino — harness de gate</title>
+<!--
+  Harness de gate para lib3d/flora/arbolesFrioAndino.js (tarea ARTE #23).
+  Vistas por query param:
+    ?vista=fila           las 5 especies en fila, cámara a 30 m (prueba de SILUETA)
+    ?vista=<especie>      3 seeds de una especie de cerca (encenillo|aliso|
+                          siete_cueros|gaque|mano_de_oso)  [&seed=N]
+    ?vista=bosque         rodal instanciado ~110 árboles + bruma volumétrica
+                          (lib3d/fx/brumaVolumetrica.js) — medición de FPS real
+  El viento corre siempre (tickVientoMundos). HUD con tris/draw calls.
+-->
+<style>
+  html, body { margin: 0; height: 100%; background: #b9cdd0; overflow: hidden; }
+  #hud {
+    position: fixed; left: 10px; top: 10px; z-index: 5;
+    font: 12px/1.5 monospace; color: #1c2a24; background: rgba(255,255,255,.72);
+    padding: 6px 10px; border-radius: 6px; white-space: pre;
+  }
+  #hud.error { background: #c0392b; color: #fff; }
+  .rotulo {
+    position: fixed; z-index: 4; transform: translate(-50%, 0);
+    font: 12px/1.3 system-ui, sans-serif; color: #24322b; text-align: center;
+    background: rgba(255,255,255,.66); padding: 2px 8px; border-radius: 5px;
+    pointer-events: none;
+  }
+  .rotulo i { font-size: 10px; color: #52645a; }
+  /* Banner de ARCHIVO — 2026-08-12. El módulo que esta página renderiza
+     (lib3d/flora/arbolesFrioAndino.js) PERDIÓ el A/B contra arbolesAltoandinos.js
+     en `c791085` y quedó archivado con banner. Pero el banner vive en el .js: lo lee
+     quien abre el archivo, no quien abre la página. Esta entrada está publicada
+     (HTTP 200, listada en el directorio) y renderiza al perdedor como si fuera el
+     arte vigente — es el mismo modo de falla del agua, del audio del páramo y del
+     campo de tierra. Rotularlo NO decide el frente: retargetear al ganador o cerrar
+     la página es decisión del operador (ver _gate/CENSO-PERDEDORES-ARCHIVADOS.md). */
+  #banner-archivado {
+    position: fixed; left: 0; right: 0; bottom: 0; z-index: 9;
+    font: 12px/1.45 system-ui, sans-serif; color: #fff;
+    background: rgba(120, 53, 15, .92); padding: 7px 12px; text-align: center;
+  }
+  #banner-archivado b { letter-spacing: .04em; }
+  #banner-archivado a { color: #ffd9a0; }
+</style>
+<script type="importmap">
+{
+  "imports": {
+    "three": "./vendor/three.module.js",
+    "three/addons/": "./vendor/addons/"
+  }
+}
+</script>
+</head>
+<body>
+<div id="hud">cargando…</div>
+<div id="banner-archivado">
+  <b>ARCHIVADO</b> — estos árboles son la propuesta <b>A</b>, que <b>perdió</b> el A/B del
+  2026-08-07. El arte vigente del bosque frío es <b>B</b>
+  (<code>lib3d/flora/arbolesAltoandinos.js</code>): se ve en
+  <a href="./bosque-altoandino/">bosque-altoandino</a>, y los dos lados juntos en
+  <a href="./comparador-arboles-frio.html">el comparador</a>.
+  Esta página se conserva como harness de medición del perdedor, no como arte vigente.
+</div>
+<script type="module">
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import {
+  crearArbolFrio, crearBosqueFrio, infoEspecies, ESPECIES_FRIO,
+} from './lib3d/flora/arbolesFrioAndino.js';
+import { tickVientoMundos } from './lib3d/flora/vientoMundos.js';
+import { crearBrumaVolumetrica } from './lib3d/fx/brumaVolumetrica.js';
+
+const hud = document.getElementById('hud');
+window.addEventListener('error', (e) => {
+  hud.classList.add('error');
+  hud.textContent = 'ERROR: ' + (e.message || e.type);
+});
+
+const q = new URLSearchParams(location.search);
+const vista = q.get('vista') || 'fila';
+const seedQ = Number(q.get('seed')) || 23;
+
+// ── escena base: luz fría de bosque de niebla ────────────────────────────────
+const escena = new THREE.Scene();
+const COLOR_CIELO = 0xc3d4d6;
+escena.background = new THREE.Color(COLOR_CIELO);
+escena.fog = new THREE.FogExp2(COLOR_CIELO, vista === 'bosque' ? 0.014 : 0.006);
+
+const renderer = new THREE.WebGLRenderer({ antialias: true });
+renderer.setSize(innerWidth, innerHeight);
+renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure = 1.05;
+document.body.appendChild(renderer.domElement);
+
+const camara = new THREE.PerspectiveCamera(48, innerWidth / innerHeight, 0.1, 400);
+const controles = new OrbitControls(camara, renderer.domElement);
+
+const hemi = new THREE.HemisphereLight(0xd6e4de, 0x3a4a35, 0.85);
+escena.add(hemi);
+const sol = new THREE.DirectionalLight(0xfff2dc, 1.7);
+sol.position.set(18, 26, 12);
+sol.castShadow = true;
+sol.shadow.mapSize.set(2048, 2048);
+const S = vista === 'bosque' ? 55 : 26;
+sol.shadow.camera.left = -S; sol.shadow.camera.right = S;
+sol.shadow.camera.top = S; sol.shadow.camera.bottom = -S;
+sol.shadow.camera.far = 110;
+sol.shadow.bias = -0.0006;
+escena.add(sol);
+
+// ── suelo: disco con moteo de vértice (nada de plancha plana) ────────────────
+function hashS(x, z) {
+  const h = Math.sin(x * 127.1 + z * 311.7) * 43758.5453;
+  return h - Math.floor(h);
+}
+{
+  const R = vista === 'bosque' ? 95 : 60;
+  const geo = new THREE.CircleGeometry(R, 64);
+  geo.rotateX(-Math.PI / 2);
+  const P = geo.attributes.position, n = P.count;
+  const col = new Float32Array(n * 3);
+  const cA = new THREE.Color(0x46583a), cB = new THREE.Color(0x39492f);
+  const tmp = new THREE.Color();
+  for (let i = 0; i < n; i++) {
+    const x = P.getX(i), z = P.getZ(i);
+    tmp.copy(cA).lerp(cB, hashS(x * 0.23, z * 0.23));
+    col[i * 3] = tmp.r; col[i * 3 + 1] = tmp.g; col[i * 3 + 2] = tmp.b;
+  }
+  geo.setAttribute('color', new THREE.BufferAttribute(col, 3));
+  const suelo = new THREE.Mesh(geo, new THREE.MeshStandardMaterial({
+    vertexColors: true, roughness: 1, metalness: 0,
+  }));
+  suelo.receiveShadow = true;
+  escena.add(suelo);
+}
+
+// ── vistas ───────────────────────────────────────────────────────────────────
+let bruma = null;
+const rotulos = [];   // { el, pos }
+const INFO = infoEspecies();
+
+function rotulo(texto, sub, pos) {
+  const el = document.createElement('div');
+  el.className = 'rotulo';
+  el.innerHTML = `${texto}<br><i>${sub}</i>`;
+  document.body.appendChild(el);
+  rotulos.push({ el, pos });
+}
+
+if (vista === 'fila') {
+  const sep = 7.5;
+  const x0 = -sep * (ESPECIES_FRIO.length - 1) / 2;
+  ESPECIES_FRIO.forEach((esp, i) => {
+    const arbol = crearArbolFrio(esp, { seed: seedQ + i * 101 });
+    arbol.position.x = x0 + i * sep;
+    escena.add(arbol);
+    rotulo(INFO[esp].nombre, INFO[esp].cientifico, new THREE.Vector3(arbol.position.x, -0.4, 1.5));
+  });
+  camara.position.set(0, 5.4, 30);          // la silueta se juzga a 30 m
+  controles.target.set(0, 4.2, 0);
+} else if (ESPECIES_FRIO.includes(vista)) {
+  [-6.5, 0, 6.5].forEach((x, i) => {
+    const arbol = crearArbolFrio(vista, { seed: seedQ + i * 37 });
+    arbol.position.x = x;
+    escena.add(arbol);
+  });
+  rotulo(INFO[vista].nombre, INFO[vista].cientifico, new THREE.Vector3(0, -0.4, 2.2));
+  camara.position.set(0, 4.6, 16.5);
+  controles.target.set(0, 3.6, 0);
+} else if (vista === 'bosque') {
+  const { grupo, puntos, conteo } = crearBosqueFrio({ n: 110, radio: 42, seed: seedQ, claro: 7 });
+  escena.add(grupo);
+  window.__bosque = { conteo, arboles: puntos.length };
+  bruma = crearBrumaVolumetrica(THREE, {
+    puntos: puntos.filter((_, i) => i % 2 === 0),
+    jirones: 90, haces: 8, seed: seedQ,
+    cerca: [4, 14], color: 0xd9e4dc, dispersion: 3.5, intensidad: 1,
+    solDir: sol.position.clone().normalize(),
+    lejos: [45, 85],
+  });
+  escena.add(bruma.grupo);
+  camara.position.set(2, 3.1, 46);           // a nivel de tronco: se ve el rodal
+  controles.target.set(0, 3.6, -10);         // en profundidad, no metido en copas
+} else {
+  hud.classList.add('error');
+  hud.textContent = 'vista desconocida: ' + vista;
+}
+controles.update();
+
+// ── loop: viento SIEMPRE (regla dura: los árboles se mueven) ─────────────────
+const reloj = new THREE.Clock();
+let fps = 0, marco = 0, tAcum = 0;
+function loop() {
+  requestAnimationFrame(loop);
+  const dt = reloj.getDelta();
+  const t = reloj.elapsedTime;
+  tickVientoMundos(t);
+  if (bruma) bruma.tick(dt);
+  controles.update();
+  renderer.render(escena, camara);
+  // rótulos proyectados
+  for (const r of rotulos) {
+    const v = r.pos.clone().project(camara);
+    r.el.style.left = `${(v.x * 0.5 + 0.5) * innerWidth}px`;
+    r.el.style.top = `${(-v.y * 0.5 + 0.5) * innerHeight}px`;
+    r.el.style.display = v.z < 1 ? 'block' : 'none';
+  }
+  // HUD 2×/s
+  marco++; tAcum += dt;
+  if (tAcum >= 0.5) {
+    fps = Math.round(marco / tAcum);
+    marco = 0; tAcum = 0;
+    const inf = renderer.info.render;
+    hud.textContent =
+      `vista: ${vista}\n${fps} FPS · ${inf.triangles.toLocaleString('es')} tris · ${inf.calls} calls`
+      + (window.__bosque ? `\nbosque: ${window.__bosque.arboles} árboles ${JSON.stringify(window.__bosque.conteo)}` : '');
+    window.__stats = { fps, tris: inf.triangles, calls: inf.calls, vista };
+  }
+}
+loop();
+
+addEventListener('resize', () => {
+  camara.aspect = innerWidth / innerHeight;
+  camara.updateProjectionMatrix();
+  renderer.setSize(innerWidth, innerHeight);
+});
+</script>
+</body>
+</html>

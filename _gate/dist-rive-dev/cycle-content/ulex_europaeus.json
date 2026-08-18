@@ -1,0 +1,83 @@
+{
+  "species_slug": "ulex_europaeus",
+  "scientific_name": "Ulex europaeus L.",
+  "common_names": [
+    "Retamo espinoso"
+  ],
+  "family": "Fabaceae",
+  "category": "especies_invasoras",
+  "cultivable": false,
+  "conservation_status": "invasor",
+  "thermal_zones": [
+    "templado",
+    "frio"
+  ],
+  "roles_in_guild": [
+    "invasive"
+  ],
+  "antagonists": [
+    "erythrina_edulis"
+  ],
+  "especies_nativas_sustitutas": [
+    "alnus_acuminata",
+    "escallonia_paniculata",
+    "miconia_squamulosa",
+    "sambucus_peruviana",
+    "weinmannia_tomentosa"
+  ],
+  "propagation": null,
+  "requirements": {
+    "agua": null,
+    "altitud_msnm": {
+      "min_absoluto": 2000,
+      "optimo_min": 2300,
+      "optimo_max": 3200,
+      "max_absoluto": 3500
+    },
+    "temperatura_c": null,
+    "radiacion": null,
+    "drenaje_requerido": null
+  },
+  "valor_pedagogico": "El retamo espinoso (Ulex europaeus) es arbusto leguminoso europeo introducido en cerros orientales de Bogotá hacia 1948 como ornamental y cerca. Hoy es la INVASORA MÁS DESTRUCTIVA del altiplano cundiboyacense (2400-3300 msnm), ocupando >30000 ha en Cundinamarca según IAvH. Acidifica suelo, fija nitrógeno excesivo que altera sucesión nativa, y es PIROFÍTICA: sus semillas requieren fuego para germinar, incrementando incendios forestales en cerros bogotanos. Cobertura: Cruz Verde, Cerros Orientales Bogotá, Verjón, Tibanica. Manejo: extracción mecánica con cepa completa + revegetación inmediata con nativas (encenillo, mortiño, romero de páramo) + monitoreo 5+ años para nuevos brotes desde banco semillas. Resolución 684/2018 MADS prioridad nacional. Cobertura periodística Mongabay 2024 documenta el avance hacia el complejo Cruz Verde-Sumapaz.",
+  "antagonists_markdown": "### Antagonistas (no asociar)\n\nEvite sembrar estas especies cerca; compiten o comparten plagas/patógenos:\n- erythrina_edulis — Chachafruto / Balú (Erythrina edulis Triana ex Micheli)",
+  "sources": [
+    {
+      "id": "ocampo-solorza-2017",
+      "title": "ocampo-solorza-2017",
+      "tier": "A",
+      "url": null
+    },
+    {
+      "id": "car-cundi-2019",
+      "title": "car-cundi-2019",
+      "tier": "A",
+      "url": null
+    },
+    {
+      "id": "res-684-2018-mads",
+      "title": "res-684-2018-mads",
+      "tier": "A",
+      "url": null
+    },
+    {
+      "id": "mongabay-retamo-2024",
+      "title": "mongabay-retamo-2024",
+      "tier": "B",
+      "url": "https://es.mongabay.com"
+    },
+    {
+      "id": "gbif-taxonomic-backbone",
+      "title": "gbif-taxonomic-backbone",
+      "tier": "A",
+      "url": "https://www.gbif.org/dataset/d7dddbf4-2cf0-4f39-9b2a-bb099caae36c"
+    },
+    {
+      "id": "powo-kew",
+      "title": "powo-kew",
+      "tier": "A",
+      "url": "https://powo.science.kew.org"
+    }
+  ],
+  "_generated_by": "scripts/build-cycle-content-from-catalog.mjs",
+  "_generated_at": "2026-05-19T00:42:57.367Z"
+}
