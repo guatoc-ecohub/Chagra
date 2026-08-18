@@ -84,6 +84,30 @@ function mascaraMano(x, y) {
 }
 
 /**
+ * El juego COMPLETO de máscaras con sus prioridades resueltas — una sola
+ * fuente de verdad para `hornearChivito`, el candado de tests
+ * (`__tests__/recomposicion.test.js`) y los medidores offline (mismo patrón
+ * que `zariguyaLamina/capas.js`): un medidor que reimplementa las fórmulas
+ * no ve los fixes de este módulo.
+ *
+ * Prioridad: cabeza > mandíbula > manoLapiz > cuerpo. `mCabezaFull` es la
+ * cabeza COMPLETA (incluye el mentón barbado): sirve para (a) excluir la
+ * cabeza de la mano y (b) el corte duro del cuerpo — así el cuerpo se borra
+ * bajo TODA la testa.
+ */
+export function mascaras() {
+  const hard = (m) => 1 - ss(0.93, 1.0, m);
+  const mCabezaFull = (x, y) => mascaraCabeza(x, y);
+  const mMandibula = (x, y) => mascaraMandibula(x, y) * mCabezaFull(x, y);
+  // La cabeza que se PINTA = testa completa (cresta incluida) menos la
+  // mandíbula (baja en bloque, el interior sintético respalda el hueco).
+  const mCabezaRender = (x, y) => mCabezaFull(x, y) * (1 - mMandibula(x, y));
+  const mManoLapiz = (x, y) => mascaraMano(x, y) * (1 - mCabezaFull(x, y));
+  const mCuerpo = (x, y) => hard(mCabezaFull(x, y)) * hard(mManoLapiz(x, y));
+  return { mCabezaFull, mMandibula, mCabezaRender, mManoLapiz, mCuerpo };
+}
+
+/**
  * Hornea las capas + los parches de párpado a partir de la imagen ya
  * cargada. Devuelve canvases del MISMO tamaño que el PNG (comparten
  * encuadre — cero cuentas de UV por capa).
@@ -115,18 +139,7 @@ export function hornearChivito(img, dims = {}) {
   }
   const sd = src.data;
 
-  // Prioridad: cabeza > mandíbula > manoLapiz > cuerpo. `mCabezaFull` es la
-  // cabeza COMPLETA (incluye el mentón barbado): sirve para (a) excluir la
-  // cabeza de la mano y (b) el corte duro del cuerpo — así el cuerpo se
-  // borra bajo TODA la testa.
-  const mCabezaFull = (x, y) => mascaraCabeza(x, y);
-  const mMandibula = (x, y) => mascaraMandibula(x, y) * mCabezaFull(x, y);
-  // La cabeza que se PINTA = testa completa (cresta incluida) menos la
-  // mandíbula (baja en bloque, el interior sintético respalda el hueco).
-  const mCabezaRender = (x, y) => mCabezaFull(x, y) * (1 - mMandibula(x, y));
-  const mMano = (x, y) => mascaraMano(x, y) * (1 - mCabezaFull(x, y));
-  const hard = (m) => 1 - ss(0.93, 1.0, m);
-  const mCuerpo = (x, y) => hard(mCabezaFull(x, y)) * hard(mMano(x, y));
+  const m = mascaras();
 
   const pintar = (mascara) => {
     const cv = lienzo(W, H);
@@ -152,10 +165,10 @@ export function hornearChivito(img, dims = {}) {
   return {
     W,
     H,
-    cuerpo: pintar(mCuerpo),
-    cabeza: pintar(mCabezaRender),
-    mandibula: pintar(mMandibula),
-    manoLapiz: pintar(mMano),
+    cuerpo: pintar(m.mCuerpo),
+    cabeza: pintar(m.mCabezaRender),
+    mandibula: pintar(m.mMandibula),
+    manoLapiz: pintar(m.mManoLapiz),
     parpado,
     parpado2,
   };
@@ -207,4 +220,4 @@ function parcheParpado(sd, W, H, ojo) {
   return { cv, x0, y0, w, h };
 }
 
-export default { hornearChivito, haySoporteCanvas };
+export default { hornearChivito, haySoporteCanvas, mascaras };
