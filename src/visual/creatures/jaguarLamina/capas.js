@@ -25,12 +25,20 @@
  * dio 0.035% de huecos — ésa es la garantía de registración de este ensamble.
  *
  * PARA EL GAIT, cada pata se PARTE en dos segmentos rígidos por la rodilla
- * medida (`partirPata`): banda horizontal con SOLAPE de respaldo (el inferior
- * sube 14px por encima del corte, el superior baja 10px por debajo) — al
- * flexionar la rodilla el solape mantiene la articulación cubierta sin abrir
- * fondo, el truco estándar del papel articulado (mismo espíritu que el
+ * medida (`factoresRodilla`): banda horizontal con SOLAPE de respaldo (el
+ * inferior sube 14px por encima del corte, el superior baja 10px por debajo)
+ * — al flexionar la rodilla el solape mantiene la articulación cubierta sin
+ * abrir fondo, el truco estándar del papel articulado (mismo espíritu que el
  * anti-hueco de las orejas). Ambos segmentos son la MISMA piel: en reposo el
  * compuesto es idéntico a la pieza entera.
+ *
+ * SECCIÓN PURA vs SECCIÓN CANVAS: toda la matemática de alfa (máscaras,
+ * partición de rodilla, alfa ideal de cada capa) vive en funciones PURAS
+ * exportadas (`mascaras`, `factoresRodilla`, `capasIdeales`) que no tocan el
+ * DOM: las consumen por igual `hornearJaguar` (que solo COLOREA esos alfas
+ * con los píxeles del PNG que corresponda) y el candado de recomposición de
+ * `__tests__` — sin fórmulas duplicadas que puedan divergir (la lección del
+ * verificador de la zarigüeya).
  *
  * Defensivo por diseño: sin `canvas.getContext('2d')` (jsdom sin el paquete
  * `canvas`, navegador exótico) `hornearJaguar()` devuelve null y el llamador
@@ -65,6 +73,8 @@ function lienzo(w, h) {
   c.height = Math.max(1, Math.round(h));
   return c;
 }
+
+/* ═══ SECCIÓN PURA — máscaras y alfas ideales (sin DOM) ═══════════════════ */
 
 /** Máscara de la cabeza: banda proyectada sobre la recta del cuello, MÁS un
  *  desvanecido por Y (la cabeza no sigue existiendo bajo la mandíbula real —
@@ -168,51 +178,110 @@ function mascaraMandibula(x, y) {
   return fx * fy;
 }
 
+/**
+ * El juego COMPLETO de máscaras con sus prioridades resueltas — una sola
+ * fuente de verdad para `capasIdeales` (y por lo tanto para el runtime y
+ * para el candado de recomposición de `__tests__`).
+ */
+export function mascaras() {
+  const mCabeza = (x, y) => mascaraCabeza(x, y);
+  const mOrejaIzq = (x, y) => mascaraOreja(x, y, OREJA_IZQ) * mCabeza(x, y);
+  const mOrejaDer = (x, y) => mascaraOreja(x, y, OREJA_DER) * mCabeza(x, y);
+  const mMandibula = (x, y) => mascaraMandibula(x, y) * mCabeza(x, y);
+  const mCabezaRender = (x, y) => mCabeza(x, y)
+    * (1 - mascaraOrejaSub(x, y, OREJA_IZQ)) * (1 - mascaraOrejaSub(x, y, OREJA_DER))
+    * (1 - mMandibula(x, y));
+  return {
+    mCabezaRender,
+    mOrejaIzq,
+    mOrejaDer,
+    mMandibula,
+    mPataNaranja: mascaraPataNaranja,
+    mCola: mascaraCola,
+  };
+}
+
 /** Solape de respaldo del corte de rodilla (px de lámina): el segmento
  *  inferior sube por encima del corte y el superior baja por debajo — al
  *  flexionar, la articulación queda siempre cubierta por piel propia. */
-const RODILLA_SOLAPE = { supHasta: 10, supFeather: 8, infDesde: 14, infFeather: 6 };
+export const RODILLA_SOLAPE = { supHasta: 10, supFeather: 8, infDesde: 14, infFeather: 6 };
+
+/** Factores de partición sup/inf de una pata en la Y dada (rodilla en
+ *  `corteY`): la banda de solape donde ambos son 1 es el anti-hueco. */
+export function factoresRodilla(y, corteY) {
+  const { supHasta, supFeather, infDesde, infFeather } = RODILLA_SOLAPE;
+  return {
+    fSup: 1 - ss(corteY + supHasta - supFeather, corteY + supHasta, y),
+    fInf: ss(corteY - infDesde, corteY - infDesde + infFeather, y),
+  };
+}
 
 /**
- * Parte los píxeles de una pata en segmento SUPERIOR (articulación→rodilla) e
- * INFERIOR (rodilla→pie, garra incluida) por una banda horizontal en la
- * rodilla medida, con el solape de respaldo. Ambos segmentos son la misma
- * piel: en reposo (rotaciones 0) el compuesto es idéntico a la pieza entera.
- * @param {Uint8ClampedArray} pd  RGBA de la pata (lienzo completo W×H)
+ * capasIdeales — el ALFA ideal (float, sin redondeo de canvas) de CADA capa
+ * del ensamble, a partir de los alfas de los 5 PNG. Es la verdad única que
+ * `hornearJaguar` pinta y que el candado de recomposición verifica.
+ *
+ * @param {{lamina:Float32Array, cuerpo:Float32Array, delLejana:Float32Array,
+ *   trasCercana:Float32Array, trasLejana:Float32Array}} fuentes  alfas 0..1
  * @param {number} W
  * @param {number} H
- * @param {number} corteY  la Y de la rodilla (rodillaCorte del rig)
- * @returns {{superior: HTMLCanvasElement, inferior: HTMLCanvasElement}}
+ * @returns {Object<string, {alfa: Float32Array, fuente: string}>}  por capa:
+ *   su alfa ideal y de QUÉ PNG salen sus colores.
  */
-function partirPata(pd, W, H, corteY) {
-  const sup = lienzo(W, H);
-  const inf = lienzo(W, H);
-  const gSup = sup.getContext('2d');
-  const gInf = inf.getContext('2d');
-  const imSup = gSup.createImageData(W, H);
-  const imInf = gInf.createImageData(W, H);
-  const { supHasta, supFeather, infDesde, infFeather } = RODILLA_SOLAPE;
-  for (let y = 0; y < H; y++) {
-    const fSup = 1 - ss(corteY + supHasta - supFeather, corteY + supHasta, y);
-    const fInf = ss(corteY - infDesde, corteY - infDesde + infFeather, y);
-    for (let x = 0; x < W; x++) {
-      const i = (y * W + x) * 4;
-      const a = pd[i + 3];
-      if (!a) continue;
-      if (fSup > 0) {
-        imSup.data[i] = pd[i]; imSup.data[i + 1] = pd[i + 1]; imSup.data[i + 2] = pd[i + 2];
-        imSup.data[i + 3] = a * fSup;
-      }
-      if (fInf > 0) {
-        imInf.data[i] = pd[i]; imInf.data[i + 1] = pd[i + 1]; imInf.data[i + 2] = pd[i + 2];
-        imInf.data[i + 3] = a * fInf;
+export function capasIdeales(fuentes, W, H) {
+  const m = mascaras();
+  const N = W * H;
+
+  const capaMascara = (mask) => {
+    const alfa = new Float32Array(N);
+    for (let y = 0; y < H; y++) {
+      for (let x = 0; x < W; x++) {
+        const p = y * W + x;
+        const a = fuentes.lamina[p];
+        if (a > 0) alfa[p] = a * clamp(mask(x, y), 0, 1);
       }
     }
+    return alfa;
+  };
+
+  const partir = (alfaBase, corteY) => {
+    const sup = new Float32Array(N);
+    const inf = new Float32Array(N);
+    for (let y = 0; y < H; y++) {
+      const { fSup, fInf } = factoresRodilla(y, corteY);
+      for (let x = 0; x < W; x++) {
+        const p = y * W + x;
+        const a = alfaBase[p];
+        if (!a) continue;
+        if (fSup > 0) sup[p] = a * fSup;
+        if (fInf > 0) inf[p] = a * fInf;
+      }
+    }
+    return { sup, inf };
+  };
+
+  const capas = {};
+  capas.cuerpo = { alfa: Float32Array.from(fuentes.cuerpo), fuente: 'cuerpo' };
+  for (const clave of ['delLejana', 'trasCercana', 'trasLejana']) {
+    const { sup, inf } = partir(fuentes[clave], RIG_MARCHA[clave].rodillaCorte);
+    capas[`${clave}-sup`] = { alfa: sup, fuente: clave };
+    capas[`${clave}-inf`] = { alfa: inf, fuente: clave };
   }
-  gSup.putImageData(imSup, 0, 0);
-  gInf.putImageData(imInf, 0, 0);
-  return { superior: sup, inferior: inf };
+  {
+    const naranja = capaMascara(m.mPataNaranja);
+    const { sup, inf } = partir(naranja, RIG_MARCHA.delCercana.rodillaCorte);
+    capas['delCercana-sup'] = { alfa: sup, fuente: 'lamina' };
+    capas['delCercana-inf'] = { alfa: inf, fuente: 'lamina' };
+  }
+  capas.cola = { alfa: capaMascara(m.mCola), fuente: 'lamina' };
+  capas.cabeza = { alfa: capaMascara(m.mCabezaRender), fuente: 'lamina' };
+  capas.orejaIzq = { alfa: capaMascara(m.mOrejaIzq), fuente: 'lamina' };
+  capas.orejaDer = { alfa: capaMascara(m.mOrejaDer), fuente: 'lamina' };
+  capas.mandibula = { alfa: capaMascara(m.mMandibula), fuente: 'lamina' };
+  return capas;
 }
+
+/* ═══ SECCIÓN CANVAS — colorear los alfas ideales con la piel real ════════ */
 
 /** Dibuja una imagen ya cargada en un lienzo W×H y devuelve sus píxeles.
  *  null si el canvas queda "tainted" (CORS) o la imagen no midió. */
@@ -225,6 +294,13 @@ function pixelesDe(img, W, H) {
   } catch {
     return null;
   }
+}
+
+/** El canal alfa 0..1 de un RGBA ya extraído. */
+function alfaDe(datos, N) {
+  const alfa = new Float32Array(N);
+  for (let p = 0; p < N; p++) alfa[p] = datos[p * 4 + 3] / 255;
+  return alfa;
 }
 
 /**
@@ -256,89 +332,58 @@ export function hornearJaguar(imagenes, dims = {}) {
     if (!imagenes[clave]) return null;
   }
 
-  const lamina = pixelesDe(imagenes.lamina, W, H);
-  if (!lamina) return null;
-  const sd = lamina.datos;
+  const N = W * H;
+  const rgbas = {};
+  const alfas = {};
+  for (const clave of ['lamina', 'cuerpo', 'delLejana', 'trasCercana', 'trasLejana']) {
+    const px = pixelesDe(imagenes[clave], W, H);
+    if (!px) return null;
+    rgbas[clave] = px.datos;
+    alfas[clave] = alfaDe(px.datos, N);
+  }
 
-  /* Recorta la lámina con una máscara → canvas nuevo (mismo método de
-     siempre: el color sale del PNG; aquí solo se decide el alfa). */
-  const pintar = (mascara) => {
+  const ideales = capasIdeales(alfas, W, H);
+
+  /* Colorea un alfa ideal con los píxeles del PNG fuente (el color SIEMPRE
+     sale de un PNG del set; aquí solo se aplica el alfa ya decidido). */
+  const pintarCapa = ({ alfa, fuente }) => {
+    const sd = rgbas[fuente];
     const cv = lienzo(W, H);
     const g = cv.getContext('2d');
     const im = g.createImageData(W, H);
     const d = im.data;
-    for (let y = 0; y < H; y++) {
-      for (let x = 0; x < W; x++) {
-        const i = (y * W + x) * 4;
-        const a = sd[i + 3];
-        if (!a) continue;
-        const m = mascara(x, y);
-        if (m <= 0.004) continue;
-        d[i] = sd[i]; d[i + 1] = sd[i + 1]; d[i + 2] = sd[i + 2];
-        d[i + 3] = a * m;
-      }
+    for (let p = 0; p < N; p++) {
+      const a = alfa[p];
+      if (a <= 0.004) continue;
+      const i = p * 4;
+      d[i] = sd[i]; d[i + 1] = sd[i + 1]; d[i + 2] = sd[i + 2];
+      d[i + 3] = a * 255;
     }
     g.putImageData(im, 0, 0);
     return cv;
   };
 
-  /* Ídem pero devolviendo los píxeles (para partir la pata naranja). */
-  const pintarDatos = (mascara) => {
-    const d = new Uint8ClampedArray(W * H * 4);
-    for (let y = 0; y < H; y++) {
-      for (let x = 0; x < W; x++) {
-        const i = (y * W + x) * 4;
-        const a = sd[i + 3];
-        if (!a) continue;
-        const m = mascara(x, y);
-        if (m <= 0.004) continue;
-        d[i] = sd[i]; d[i + 1] = sd[i + 1]; d[i + 2] = sd[i + 2];
-        d[i + 3] = a * m;
-      }
-    }
-    return d;
-  };
-
-  /* ── La cabeza y sus piezas de vida (idéntico al ensamble aprobado —
-     CARA INTACTA: el corte face-safe medido, jamás un rectángulo). ── */
-  const mCabeza = (x, y) => mascaraCabeza(x, y);
-  const mOrejaIzq = (x, y) => mascaraOreja(x, y, OREJA_IZQ) * mCabeza(x, y);
-  const mOrejaDer = (x, y) => mascaraOreja(x, y, OREJA_DER) * mCabeza(x, y);
-  const mMandibula = (x, y) => mascaraMandibula(x, y) * mCabeza(x, y);
-  const mCabezaRender = (x, y) => mCabeza(x, y)
-    * (1 - mascaraOrejaSub(x, y, OREJA_IZQ)) * (1 - mascaraOrejaSub(x, y, OREJA_DER))
-    * (1 - mMandibula(x, y));
-
-  /* ── Las 4 patas, cada una partida por su rodilla medida. ── */
   const patas = {};
-  for (const [clave, rig] of Object.entries(RIG_MARCHA)) {
-    let pd;
-    if (clave === 'delCercana') {
-      pd = pintarDatos(mascaraPataNaranja);
-    } else {
-      const png = pixelesDe(imagenes[clave], W, H);
-      if (!png) return null;
-      pd = png.datos;
-    }
-    patas[clave] = partirPata(pd, W, H, rig.rodillaCorte);
+  for (const clave of Object.keys(RIG_MARCHA)) {
+    patas[clave] = {
+      superior: pintarCapa(ideales[`${clave}-sup`]),
+      inferior: pintarCapa(ideales[`${clave}-inf`]),
+    };
   }
 
-  /* ── El cuerpo es el PNG inpainted tal cual (cero patas en la base). ── */
-  const cuerpoPx = pixelesDe(imagenes.cuerpo, W, H);
-  if (!cuerpoPx) return null;
-
+  const sd = rgbas.lamina;
   const parpado = parcheParpado(sd, W, H, OJO);
   const parpado2 = parcheParpado(sd, W, H, OJO_2);
 
   return {
     W,
     H,
-    cuerpo: cuerpoPx.cv,
-    cola: pintar(mascaraCola),
-    cabeza: pintar(mCabezaRender),
-    orejaIzq: pintar(mOrejaIzq),
-    orejaDer: pintar(mOrejaDer),
-    mandibula: pintar(mMandibula),
+    cuerpo: pintarCapa(ideales.cuerpo),
+    cola: pintarCapa(ideales.cola),
+    cabeza: pintarCapa(ideales.cabeza),
+    orejaIzq: pintarCapa(ideales.orejaIzq),
+    orejaDer: pintarCapa(ideales.orejaDer),
+    mandibula: pintarCapa(ideales.mandibula),
     patas,
     parpado,
     parpado2,
