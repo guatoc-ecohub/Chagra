@@ -216,6 +216,112 @@ export const MANDIBULA = {
  */
 export const BOCA = { cx: 87, cy: 152, ancho: 46 };
 
+/* ════════════════════════════════════════════════════════════════════════════
+ * RIG DE MARCHA (rama `feat/jaguar-lamina-caminando`, 2026-08-18).
+ *
+ * POR QUÉ AHORA SÍ HAY GAIT POR-PATA. El límite honesto documentado arriba
+ * (`PATAS_DEL`: "un dibujo plano de una sola pose no se deja separar las patas
+ * en un gait limpio") era del PLANO ÚNICO: cortar por color deja un filo
+ * compartido que fantasmea contorno doble al rotar cada mitad. Ese límite se
+ * levantó DIBUJANDO las patas como capas propias (set de arte 2.5D en
+ * `~/demos/3d/compai/rigs2d/jaguar/`, ver su NOTAS.md): cuerpo-inpaint SIN
+ * patas (los píxeles ocultos rellenados por clonado de la propia lámina) + 3
+ * patas con alfa propio y garras completadas. La CUARTA pata (delantera
+ * cercana, naranja) sí se sigue cortando de la lámina — su respaldo ya no es
+ * la otra mitad del envolvente sino la pata blanca PRE-CORTADA + el pecho
+ * inpainted, así el filo compartido que fantasmeaba ya no existe.
+ * ════════════════════════════════════════════════════════════════════════════ */
+
+/** Carpeta pública de las capas pre-cortadas del rig (mismo lienzo 705×394 que
+ *  la lámina — comparten registración, se apilan sin cuentas de UV). */
+export const CARPETA_RIG = '/compai/laminas/jaguar-rig/';
+export const CAPAS_RIG = {
+  cuerpo: 'cuerpo-inpaint.png',
+  delLejana: 'pata-del-lejana.png',
+  trasCercana: 'pata-tras-cercana.png',
+  trasLejana: 'pata-tras-lejana.png',
+};
+
+/**
+ * La recta que separa las dos patas delanteras dentro de `PATAS_DEL` (misma
+ * medición de `feat/jaguar-pulido`: cruce de color R-B fila a fila, x≈167..190
+ * entre y=225 y y=380). `u>0` = pata NARANJA (lado cercano del animal);
+ * `u<0` = pata blanca/vientre (lado lejano, que ahora es PNG pre-cortado).
+ *
+ * OJO — esto NO revive el corte-por-color que fantasmeaba "3-4 patas": aquí el
+ * corte solo EXTRae la pieza naranja de la lámina; la blanca nunca vuelve a
+ * cortarse de este envolvente (es `pata-del-lejana.png`, con su garra
+ * completada y su pliegue real de contorno). No queda ningún borde compartido
+ * entre dos mitades del mismo plano.
+ */
+export const CORTE_PATAS_DEL = {
+  px: 179, py: 310, nx: 0.99, ny: 0.1406, u0: -9, u1: 9,
+};
+
+/**
+ * ESQUELETO de las 4 patas: articulación (hombro/cadera) → rodilla → pie, en
+ * px de lámina. Articulaciones = pivotes MEDIDOS (anatomia/capas de las ramas
+ * previas + NOTAS.md del set de arte). Rodillas y pies = medidos sobre los
+ * PNG de cada pata con grilla de coordenadas (mismo método que el resto de
+ * este archivo; recortes 3× en `_gate/jaguar-gait/`, no versionados).
+ *
+ *   `lado` = hacia dónde apunta el VÉRTICE al doblar (signo del IK de 2
+ *   huesos): las delanteras doblan por el carpo con el vértice hacia
+ *   ADELANTE (−x, la garra cuelga detrás de la muñeca al levantar); las
+ *   traseras doblan por el corvejón con el vértice hacia ATRÁS (+x). Con
+ *   estos signos el IK sobre el pie de REPOSO reproduce la rodilla medida
+ *   (verificado numéricamente en marcha.test.js) → entrar/salir de la marcha
+ *   no da tirón.
+ *
+ *   `fase` = momento del CONTACTO del pie en el ciclo (0..1), secuencia
+ *   lateral de marcha felina: trasera cercana → delantera cercana → trasera
+ *   lejana → delantera lejana, a cuartos de ciclo.
+ *
+ *   `anclaje` = pisada neutra de MEDIO APOYO (bajo la articulación; la pose de
+ *   la lámina es un fotograma de zancada, no la neutra). En las delanteras la
+ *   Y del anclaje sube 3px sobre la pisada de reposo: la pata dibujada está
+ *   casi en extensión total y sin ese margen el IK recortaría el alcance en
+ *   los extremos de zancada.
+ *
+ *   `rodillaCorte` = dónde se parte el arte de la pata en segmento superior /
+ *   inferior (banda horizontal con solape de respaldo — ver capas.js).
+ */
+export const RIG_MARCHA = {
+  delLejana: {
+    articulacion: [160, 236], rodilla: [154, 332], pie: [155, 384],
+    lado: -1, fase: 0.75, lift: 14, anclaje: [160, 381], rodillaCorte: 332,
+  },
+  delCercana: {
+    articulacion: [208, 236], rodilla: [196, 335], pie: [193, 386],
+    lado: -1, fase: 0.25, lift: 14, anclaje: [208, 383], rodillaCorte: 335,
+  },
+  trasCercana: {
+    articulacion: [428, 240], rodilla: [448, 298], pie: [385, 357],
+    lado: 1, fase: 0, lift: 16, anclaje: [420, 357], rodillaCorte: 298,
+  },
+  trasLejana: {
+    articulacion: [522, 240], rodilla: [570, 315], pie: [540, 363],
+    lado: 1, fase: 0.5, lift: 14, anclaje: [520, 363], rodillaCorte: 315,
+  },
+};
+
+/**
+ * Parámetros del ciclo de marcha. `amplitud` = media zancada (px de lámina;
+ * el pie barre anclaje±amplitud). `duty` = fracción del ciclo con el pie
+ * APOYADO (0.62, marcha cuadrúpeda típica). `velocidadPxS` = velocidad de
+ * pantalla que asume el anclaje de pisada — DEBE coincidir con `PX_POR_SEG`
+ * de `useCompaiRoam.js` (34 px/s): el período del ciclo se deriva de ella
+ * (T = 2·amplitud·escala / (duty·v)) para que el pie apoyado quede CLAVADO
+ * en el suelo mientras el compai se desplaza — cero moonwalk. `bob` = vaivén
+ * vertical de la masa (2 por ciclo), en px de lámina.
+ */
+export const MARCHA = {
+  duty: 0.62,
+  amplitud: 30,
+  velocidadPxS: 34,
+  bob: 2.2,
+};
+
 export default {
   CARPETA_LAMINA,
   ARCHIVO_LAMINA,
@@ -232,4 +338,9 @@ export default {
   OREJA_DER,
   MANDIBULA,
   BOCA,
+  CARPETA_RIG,
+  CAPAS_RIG,
+  CORTE_PATAS_DEL,
+  RIG_MARCHA,
+  MARCHA,
 };
