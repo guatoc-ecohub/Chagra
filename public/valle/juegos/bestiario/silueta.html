@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="es-CO">
+<head>
+<meta charset="utf-8">
+<title>Auditoría de silueta · bestiario</title>
+<!-- HERRAMIENTA DE TALLER, no entra al atlas: renderiza las criaturas en negro
+     plano contra papel claro, vista ortográfica. Si la silueta no dice "oso" y
+     "jaguar" sin ningún detalle, el detalle no la va a salvar.
+     Uso: silueta.html            → oso + jaguar de perfil
+          silueta.html?vista=tres → tres cuartos
+          silueta.html?vista=frente -->
+<style>html,body{margin:0;height:100%;overflow:hidden;background:#ece4d2}canvas{display:block}</style>
+<script type="importmap">
+{
+  "imports": {
+    "three": "../../vendor/three.module.js",
+    "three/addons/": "../../vendor/addons/"
+  }
+}
+</script>
+</head>
+<body>
+<script type="module">
+import * as THREE from 'three';
+import { construirOso } from './criaturas/oso.js';
+import { construirJaguar } from './criaturas/jaguar.js';
+
+const vista = new URLSearchParams(location.search).get('vista') || 'lado';
+
+const renderer = new THREE.WebGLRenderer({ antialias: true });
+renderer.setSize(innerWidth, innerHeight);
+renderer.setPixelRatio(Math.min(devicePixelRatio || 1, 2));
+document.body.appendChild(renderer.domElement);
+
+const escena = new THREE.Scene();
+escena.background = new THREE.Color('#ece4d2');
+
+const negro = new THREE.MeshBasicMaterial({ color: 0x000000 });
+const SEP = 2.55;
+const bichos = [construirOso(), construirJaguar()];
+bichos.forEach((b, i) => {
+  b.grupo.traverse((o) => { if (o.isMesh) o.material = negro; });
+  const caja = new THREE.Box3().setFromObject(b.grupo);
+  const centro = caja.getCenter(new THREE.Vector3());
+  b.grupo.position.x += i * SEP - centro.x;
+  b.grupo.position.z -= centro.z;
+  escena.add(b.grupo);
+});
+
+const foco = new THREE.Vector3(SEP / 2, 0.48, 0);
+const anchoMundo = SEP + 2.3;
+const aspecto = innerWidth / innerHeight;
+const altoMundo = anchoMundo / aspecto;
+const cam = new THREE.OrthographicCamera(
+  -anchoMundo / 2, anchoMundo / 2, altoMundo / 2, -altoMundo / 2, 0.01, 60,
+);
+const dirCam = vista === 'frente' ? new THREE.Vector3(1, 0.04, 0)
+  : vista === 'tres' ? new THREE.Vector3(0.8, 0.32, 1) : new THREE.Vector3(0, 0.03, 1);
+cam.position.copy(foco).addScaledVector(dirCam.normalize(), 12);
+cam.lookAt(foco);
+
+// línea de piso, para leer los apoyos
+{
+  const g = new THREE.BufferGeometry().setFromPoints(
+    [new THREE.Vector3(-4, 0, 0.9), new THREE.Vector3(SEP + 4, 0, 0.9)],
+  );
+  escena.add(new THREE.Line(g, new THREE.LineBasicMaterial({ color: 0xb9a988 })));
+}
+
+renderer.render(escena, cam);
+</script>
+</body>
+</html>

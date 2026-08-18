@@ -1,0 +1,1 @@
+function e(e,t,n,r){return e.copy(t).project(n),{x:(e.x*.5+.5)*r.width,y:(.5-e.y*.5)*r.height,detras:e.z>1}}function t(e,t,n,r,i=8){return{x0:e-n/2-i,x1:e+n/2+i,y0:t-r/2-i,y1:t+r/2+i}}function n(e,t){return e.x0<t.x1&&e.x1>t.x0&&e.y0<t.y1&&e.y1>t.y0}export{t as n,n as r,e as t};

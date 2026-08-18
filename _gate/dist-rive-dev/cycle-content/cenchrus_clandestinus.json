@@ -1,0 +1,60 @@
+{
+  "species_slug": "cenchrus_clandestinus",
+  "scientific_name": "Cenchrus clandestinus (Hochst. ex Chiov.) Morrone",
+  "common_names": [
+    "Kikuyo"
+  ],
+  "family": "Poaceae",
+  "category": "especies_invasoras",
+  "cultivable": false,
+  "conservation_status": "invasor",
+  "thermal_zones": [
+    "frio"
+  ],
+  "roles_in_guild": [
+    "invasive",
+    "ground_cover"
+  ],
+  "antagonists": [],
+  "especies_nativas_sustitutas": [
+    "agrostis_foliata",
+    "calamagrostis_effusa",
+    "festuca_sp_paramo"
+  ],
+  "propagation": null,
+  "requirements": {
+    "agua": null,
+    "altitud_msnm": {
+      "min_absoluto": 1800,
+      "optimo_min": 2200,
+      "optimo_max": 3200,
+      "max_absoluto": 3600
+    },
+    "temperatura_c": null,
+    "radiacion": null,
+    "drenaje_requerido": null
+  },
+  "valor_pedagogico": "El kikuyo (Cenchrus clandestinus) es gramínea africana introducida en los Andes colombianos hacia 1928 como forraje. Hoy domina pasturas del altiplano cundiboyacense (2200-3200 msnm) desplazando flora nativa de subpáramo y bordes de páramo. Su rizoma agresivo coloniza suelos disturbados y compite con encenillos, frailejones jóvenes y otras nativas en zonas de restauración. Es la gramínea forrajera más sembrada en ganadería andina colombiana, pero ECOLÓGICAMENTE INVASORA en transición frío/páramo. Manejo agroecológico: rotación con leguminosas nativas, corte periódico antes de floración, evitar siembra en cotas >2800 msnm donde desplaza páramo. Citado por IAvH como naturalizada de alto riesgo en Andes.",
+  "sources": [
+    {
+      "id": "correa-pabon-carulla-2008",
+      "title": "correa-pabon-carulla-2008",
+      "tier": "A",
+      "url": null
+    },
+    {
+      "id": "agrosavia-forrajeras-2022",
+      "title": "agrosavia-forrajeras-2022",
+      "tier": "A",
+      "url": null
+    },
+    {
+      "id": "gbif-taxonomic-backbone",
+      "title": "gbif-taxonomic-backbone",
+      "tier": "A",
+      "url": "https://www.gbif.org/dataset/d7dddbf4-2cf0-4f39-9b2a-bb099caae36c"
+    }
+  ],
+  "_generated_by": "scripts/build-cycle-content-from-catalog.mjs",
+  "_generated_at": "2026-05-19T00:42:57.359Z"
+}

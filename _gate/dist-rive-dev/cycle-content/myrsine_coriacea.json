@@ -1,0 +1,85 @@
+{
+  "species_slug": "myrsine_coriacea",
+  "scientific_name": "Myrsine coriacea (Sw.) R.Br. ex Roem. & Schult.",
+  "common_names": [
+    "Cucharo"
+  ],
+  "family": "Primulaceae",
+  "category": "arboles_sombra",
+  "cultivable": true,
+  "conservation_status": "nativo_silvestre",
+  "thermal_zones": [
+    "templado",
+    "frio"
+  ],
+  "roles_in_guild": [
+    "biomass_producer",
+    "pollinator_attractor",
+    "nurse_plant"
+  ],
+  "antagonists": [],
+  "especies_nativas_sustitutas": [],
+  "propagation": {
+    "methods": [
+      "semilla"
+    ],
+    "best_method": "semilla",
+    "protocol_resumen": "Semillas pequeñas extraídas de drupas violáceo-negras, siembra superficial en sustrato fino. Germinación 50-70% a 30-60 días a media sombra. Vivero a sombra parcial. Plantación a los 8-12 meses (30-40 cm altura).",
+    "tiempo_a_establecimiento_dias": 90,
+    "notas": "Pionera-secundaria andina muy versátil entre 1500-2800 msnm. Frutos consumidos masivamente por aves del bosque andino. Madera blanca pálida usada como leña y carbón vegetal local. Cerca viva tradicional cundiboyacense.",
+    "fuente": "Bernal et al. 2015 Catálogo Plantas y Líquenes Colombia; POWO Kew Primulaceae; CAR Cundinamarca cercas vivas; Cenicafé sombrío altoandino"
+  },
+  "requirements": {
+    "agua": "medio",
+    "altitud_msnm": {
+      "min_absoluto": 1500,
+      "optimo_min": 1700,
+      "optimo_max": 2000,
+      "max_absoluto": 2800
+    },
+    "temperatura_c": {
+      "helada_letal": -2,
+      "optimo_min": 12,
+      "optimo_max": 20,
+      "max_tolerable": 25
+    },
+    "radiacion": "sol_pleno",
+    "drenaje_requerido": "bueno"
+  },
+  "valor_pedagogico": "El cucharo o espadero (Myrsine coriacea, Primulaceae) es uno de los árboles medianos más versátiles y ampliamente distribuidos en los bosques andinos templados-fríos colombianos entre 1.500 y 2.800 msnm, presente en toda la región Andina especialmente en Cundinamarca, Boyacá, Santanderes, Antioquia, Caldas, Quindío, Risaralda, Tolima, Huila, Cauca, Nariño y Valle del Cauca. Árbol perennifolio de 6-12 metros de altura con copa cónica-piramidal densa, fuste recto y corteza grisácea finamente fisurada; hojas alternas oblongo-lanceoladas coriáceas verde oscuro brillantes con ápice obtuso característico, agrupadas en los extremos de las ramas (aspecto que recuerda a las primaveras herbáceas Primulaceae —familia botánica a la que pertenece tras la revisión filogenética de APG IV que reubicó a las Myrsinaceae como subfamilia Myrsinoideae dentro de Primulaceae), flores pequeñas verdoso-blanquecinas en racimos cortos axilares atractoras de polinizadores nativos, drupas pequeñas globosas verdes que viran a violáceo-negruzcas al madurar muy buscadas por aves frugívoras del bosque andino (mirlas Turdus fuscater, tángaras Anisognathus, atrapamoscas Tyranniidae, eufonias Euphonia) que actúan como dispersores principales. Su mayor virtud agroecológica es la versatilidad: es pionera-secundaria con rápido establecimiento que coloniza áreas degradadas, taludes y bordes, tolera suelos pobres y ácidos, soporta heladas suaves hasta -2°C, rebrota vigorosamente desde el tocón al podarla, lo que la convierte en una de las especies más utilizadas en cercas vivas tradicionales del altiplano cundiboyacense (la 'cerca de cucharo' es paisaje cultural patrimonial campesino), en restauración ecológica andina entre 1.500 y 2.800 msnm, en sombrío diversificado de café-altura en zona cafetera alta de Caldas y Antioquia, y como productora rural de leña y carbón vegetal artesanal (la madera blanco-pálida es de combustión limpia y duradera). Sus frutos son recurso clave para la avifauna andina: producción casi continua durante el año, con picos estacionales que sostienen poblaciones de aves frugívoras incluso en épocas de escasez, lo que la convierte en especie focal para conservación de avifauna en paisajes rurales cafeteros y altoandinos. La conexión filogenética con la familia Primulaceae es lección de filogenia botánica moderna: hasta los años 2000 las myrsines eran familia propia (Myrsinaceae) tradicionalmente; los estudios de filogenia molecular (APG II, III, IV) demostraron su anidamiento dentro de Primulaceae, lo que cambió la clasificación taxonómica y pedagógica. Es lección de soberanía botánica andina: el cucharo es uno de los árboles más útiles, versátiles y rústicos del bosque andino colombiano, ejemplo de especie 'común y subvalorada' que merece revalorización en cercas vivas, restauración, sombrío y producción rural de leña-carbón, fortaleciendo paisajes culturales campesinos altoandinos y conservación de avifauna nativa. Fuentes Tier A: Bernal et al. 2015 Catálogo Plantas y Líquenes Colombia, POWO Kew Primulaceae (subfamilia Myrsinoideae), GBIF Backbone Taxonomy, CAR Cundinamarca cercas vivas tradicionales, Cenicafé manuales sombrío altoandino.",
+  "companions_markdown": "### Especies asociadas favorables\n\nEstas especies favorecen el cultivo cuando se siembran cerca:\n- alnus_acuminata — Aliso andino (Alnus acuminata Kunth)\n- cedrela_montana — Cedro de montaña (Cedrela montana Moritz ex Turcz.)\n- escallonia_pendula — Mortiño colgante (Escallonia pendula (Ruiz & Pav.) Pers.)\n- myrcianthes_leucoxyla — Arrayán de Bogotá (Myrcianthes leucoxyla (Ortega) McVaugh)",
+  "sources": [
+    {
+      "id": "bernal-2015-plantas-liquenes-colombia",
+      "title": "bernal-2015-plantas-liquenes-colombia",
+      "tier": "A",
+      "url": "http://catalogoplantasdecolombia.unal.edu.co"
+    },
+    {
+      "id": "powo-kew",
+      "title": "powo-kew",
+      "tier": "A",
+      "url": "https://powo.science.kew.org"
+    },
+    {
+      "id": "gbif-taxonomic-backbone",
+      "title": "gbif-taxonomic-backbone",
+      "tier": "A",
+      "url": "https://www.gbif.org/dataset/d7dddbf4-2cf0-4f39-9b2a-bb099caae36c"
+    },
+    {
+      "id": "car-cundi-2019",
+      "title": "car-cundi-2019",
+      "tier": "A",
+      "url": null
+    },
+    {
+      "id": "cenicafe-manual-cafetero-2013",
+      "title": "cenicafe-manual-cafetero-2013",
+      "tier": "A",
+      "url": "https://www.cenicafe.org/es/index.php/nuestras_publicaciones"
+    }
+  ],
+  "_generated_by": "scripts/build-cycle-content-from-catalog.mjs",
+  "_generated_at": "2026-05-19T00:42:57.405Z"
+}

@@ -1,0 +1,82 @@
+{
+  "species_slug": "agave_cocui",
+  "scientific_name": "Agave cocui Trel.",
+  "common_names": [
+    "Cocuy"
+  ],
+  "family": "Asparagaceae",
+  "category": "cercas_vivas",
+  "cultivable": true,
+  "conservation_status": "nativo_silvestre",
+  "thermal_zones": [
+    "calido",
+    "templado"
+  ],
+  "roles_in_guild": [
+    "living_fence",
+    "biomass_producer",
+    "pollinator_attractor"
+  ],
+  "antagonists": [],
+  "especies_nativas_sustitutas": [],
+  "propagation": null,
+  "requirements": {
+    "agua": null,
+    "altitud_msnm": {
+      "min_absoluto": 0,
+      "optimo_min": 100,
+      "optimo_max": 1500,
+      "max_absoluto": 2000
+    },
+    "temperatura_c": null,
+    "radiacion": null,
+    "drenaje_requerido": null
+  },
+  "valor_pedagogico": "El cocuy (Agave cocui Trel., Asparagaceae subfamilia Agavoideae) es una planta xerófita rosetada nativa caribeña-norandina (roseta de 1-2 m de diámetro y altura, hojas suculentas-fibrosas verde-grisáceas espinosas en margen y ápice, inflorescencia panícula erecta gigante de 4-8 m al final de vida hapaxántica) propia de zonas secas del norte de Colombia entre 100 y 1.500 msnm, especialmente en La Guajira, Cesar, Magdalena, norte de Santander (Cúcuta), enclaves secos del Patía-Cauca y el cañón del Chicamocha (Boyacá-Santander). Inflorescencia con flores amarillo-cremosas tubulares que atraen murciélagos nectarívoros (Leptonycteris curasoae, Glossophaga soricina), colibríes diurnos y polillas crepusculares en coevolución mutualista. Es lección viva de patrimonio biocultural caribeño-norandino y soberanía gastronómica indígena que enseña a niñas y niños cómo los pueblos Wayúu (La Guajira), Yukpa-Yuko (Serranía del Perijá) y comunidades campesinas binacionales Colombia-Venezuela han usado el cocuy de modo multipropósito durante siglos: las fibras de las hojas (tras desfibrado tradicional) producen cabuya gruesa para tejer mochilas, redes pesqueras, lazos y artesanías; el cogollo (piña central) fermentado tras hornearlo en hornos de tierra produce el legendario aguardiente artesanal 'cocuy de penca' (similar al mezcal mexicano, declarado patrimonio binacional Venezuela-Colombia con denominación de origen Pecaya); el dulce de mauche (jarabe concentrado del cogollo cocido) es endulzante tradicional; y la planta funciona como cerca viva espinosa eficaz contra ganado y como restauradora de suelos áridos degradados por sobrepastoreo. Reivindicado hoy por colectivos Wayúu y mestizos caribeños como cultivo patrimonial sostenible alternativo a monocultivos comerciales en zonas secas, con apoyo de etnobotánicos del Caribe y mercados de mezcales-aguardientes artesanales latinoamericanos. Manejo agroecológico: propagación por hijuelos basales (mejor método, trasplante directo) o semilla (germinación 30-90 días, más lento), vivero 8-12 meses, distancia 2-3 m monocultivo o 1-1.5 m en seto, ciclo productivo 8-15 años hasta floración (hapaxántico-muere tras florecer dejando hijuelos), cosecha de cogollo justo antes de la inflorescencia (manejo sostenible mantiene 2-3 hijuelos), función como cerca viva multipropósito fibrera-licorera-edulcorante-restauradora de zonas semiáridas caribeñas. Fuentes Tier A: GBIF, POWO Kew, Bernal 2015, Pérez Arbeláez 1947, SiB Colombia, IAvH Flora, JBB Plantas Medicinales.",
+  "sources": [
+    {
+      "id": "gbif-taxonomic-backbone",
+      "title": "gbif-taxonomic-backbone",
+      "tier": "A",
+      "url": "https://www.gbif.org/dataset/d7dddbf4-2cf0-4f39-9b2a-bb099caae36c"
+    },
+    {
+      "id": "powo-kew",
+      "title": "powo-kew",
+      "tier": "A",
+      "url": "https://powo.science.kew.org"
+    },
+    {
+      "id": "bernal-2015-plantas-liquenes-colombia",
+      "title": "bernal-2015-plantas-liquenes-colombia",
+      "tier": "A",
+      "url": "http://catalogoplantasdecolombia.unal.edu.co"
+    },
+    {
+      "id": "perez-arbelaez-1947-plantas-utiles",
+      "title": "perez-arbelaez-1947-plantas-utiles",
+      "tier": "A",
+      "url": null
+    },
+    {
+      "id": "sib-colombia",
+      "title": "sib-colombia",
+      "tier": "A",
+      "url": "https://sibcolombia.net"
+    },
+    {
+      "id": "humboldt-flora-alto-andina",
+      "title": "humboldt-flora-alto-andina",
+      "tier": "A",
+      "url": null
+    },
+    {
+      "id": "jbb-plantas-medicinales",
+      "title": "jbb-plantas-medicinales",
+      "tier": "A",
+      "url": null
+    }
+  ],
+  "_generated_by": "scripts/build-cycle-content-from-catalog.mjs",
+  "_generated_at": "2026-05-19T00:42:57.386Z"
+}

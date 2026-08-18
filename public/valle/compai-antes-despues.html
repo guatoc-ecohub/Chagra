@@ -1,0 +1,1012 @@
+<!doctype html>
+<html lang="es-CO">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>compAI — antes / después, con su comportamiento completo</title>
+<!-- sin esto el navegador pide /favicon.ico y el 404 ensucia el gate (cero page errors) -->
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ctext y='26' font-size='26'%3E%F0%9F%90%86%3C/text%3E%3C/svg%3E">
+<style>
+  :root{
+    --papel:#0b1418; --carta:#11242c; --carta2:#0d1c22; --linea:rgba(169,213,203,.22);
+    --tinta:#eaf4f1; --tenue:#a9c4bd; --oro:#ffc46a; --menta:#a9d5cb;
+    --verde:#57c98a; --ambar:#ffb545; --rojo:#ff6b6b;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;background:
+    radial-gradient(120% 70% at 50% 0%,#16323c 0%,#0b1418 58%,#070f12 100%);
+    color:var(--tinta);font-family:system-ui,-apple-system,"Segoe UI",sans-serif;
+    -webkit-font-smoothing:antialiased}
+  a{color:var(--oro)}
+  .env{max-width:1180px;margin:0 auto;padding:0 16px 96px}
+
+  /* ── cabecera ── */
+  header.top{padding:34px 0 8px}
+  header.top h1{margin:0 0 6px;font:650 clamp(1.5rem,4.2vw,2.3rem)/1.15 system-ui;letter-spacing:-.01em}
+  header.top .lema{margin:0 0 14px;font:italic 500 clamp(1rem,2.6vw,1.24rem)/1.4 Georgia,serif;color:var(--oro)}
+  header.top p{margin:0 0 10px;max-width:74ch;color:var(--tenue);font-size:.94rem;line-height:1.62}
+  .migas{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px;font-size:.74rem}
+  .migas code{background:rgba(169,213,203,.1);border:1px solid var(--linea);
+    border-radius:6px;padding:3px 8px;color:var(--menta);font-size:.72rem}
+
+  /* ── semáforo ── */
+  .sem{display:inline-flex;align-items:center;gap:6px;border-radius:999px;padding:3px 10px 3px 8px;
+    font:600 .7rem/1 system-ui;letter-spacing:.03em;text-transform:uppercase;white-space:nowrap}
+  .sem::before{content:'';width:8px;height:8px;border-radius:50%;background:currentColor;
+    box-shadow:0 0 8px currentColor}
+  .sem.v{color:var(--verde);background:rgba(87,201,138,.12);border:1px solid rgba(87,201,138,.35)}
+  .sem.a{color:var(--ambar);background:rgba(255,181,69,.12);border:1px solid rgba(255,181,69,.35)}
+  .sem.r{color:var(--rojo);background:rgba(255,107,107,.12);border:1px solid rgba(255,107,107,.35)}
+
+  h2.sec{margin:44px 0 6px;font:650 1.22rem/1.25 system-ui;letter-spacing:-.005em;
+    display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+  h2.sec small{font:500 .76rem/1.4 system-ui;color:var(--tenue);letter-spacing:0;text-transform:none}
+  .intro{margin:0 0 16px;max-width:78ch;color:var(--tenue);font-size:.88rem;line-height:1.62}
+
+  /* ── tarjetas y tablas ── */
+  .rej{display:grid;gap:12px}
+  .rej.c4{grid-template-columns:repeat(auto-fit,minmax(238px,1fr))}
+  .pata{background:linear-gradient(180deg,var(--carta),var(--carta2));border:1px solid var(--linea);
+    border-radius:14px;padding:13px 14px 14px}
+  .pata h3{margin:0 0 3px;font:650 .98rem/1.2 system-ui;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+  /* el rótulo del semáforo puede ser una frase: si no envuelve, se sale de la tarjeta */
+  .pata h3 .sem{white-space:normal;line-height:1.3;text-align:left}
+  .pata .q{margin:6px 0 8px;color:var(--tenue);font-size:.8rem;line-height:1.5}
+  .pata .ev{font:500 .71rem/1.5 ui-monospace,SFMono-Regular,Menlo,monospace;color:#8fb3ab;
+    border-top:1px dashed var(--linea);padding-top:7px;word-break:break-word}
+  .pata .ev b{color:var(--menta);font-weight:600}
+
+  table.mod{width:100%;border-collapse:collapse;font-size:.82rem}
+  table.mod th{text-align:left;font:600 .7rem/1.3 system-ui;letter-spacing:.05em;text-transform:uppercase;
+    color:var(--tenue);padding:8px 10px;border-bottom:1px solid var(--linea)}
+  table.mod td{padding:9px 10px;border-bottom:1px solid rgba(169,213,203,.09);vertical-align:top;line-height:1.5}
+  table.mod tr:hover td{background:rgba(169,213,203,.04)}
+  table.mod code{font:500 .76rem ui-monospace,Menlo,monospace;color:var(--menta)}
+  table.mod .quien{color:#8fb3ab;font:500 .73rem ui-monospace,Menlo,monospace}
+  .envuelve{overflow-x:auto;border:1px solid var(--linea);border-radius:14px;
+    background:linear-gradient(180deg,var(--carta),var(--carta2))}
+
+  /* ── medidor 30/70 ── */
+  .medidor{background:linear-gradient(180deg,var(--carta),var(--carta2));border:1px solid var(--linea);
+    border-radius:14px;padding:12px 14px}
+  .medidor .fila{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+  .barra{position:relative;flex:1 1 200px;min-width:170px;height:16px;border-radius:999px;
+    background:rgba(169,213,203,.1);border:1px solid var(--linea);overflow:hidden}
+  .barra .banda{position:absolute;top:0;bottom:0;left:22%;width:16%;background:rgba(87,201,138,.22);
+    border-left:1px solid rgba(87,201,138,.5);border-right:1px solid rgba(87,201,138,.5)}
+  .barra .lleno{position:absolute;top:0;bottom:0;left:0;width:0;background:linear-gradient(90deg,#3f8f6b,var(--verde));
+    transition:width .28s linear}
+  .barra .obj{position:absolute;top:-3px;bottom:-3px;left:30%;width:2px;background:var(--oro)}
+  .cifra{font:700 1.05rem/1 ui-monospace,Menlo,monospace;min-width:64px;text-align:right}
+  .medidor .pie{margin:8px 0 0;color:var(--tenue);font-size:.76rem;line-height:1.5}
+
+  /* ── personaje ── */
+  .bicho{margin:18px 0 0;background:linear-gradient(180deg,var(--carta),var(--carta2));
+    border:1px solid var(--linea);border-radius:18px;overflow:hidden}
+  .bicho > .cab{display:flex;align-items:center;gap:12px;flex-wrap:wrap;
+    padding:14px 16px;border-bottom:1px solid var(--linea);background:rgba(169,213,203,.045)}
+  .bicho > .cab .n{font:650 1.12rem/1.2 system-ui}
+  .bicho > .cab .g{color:var(--tenue);font-size:.82rem}
+  .bicho > .cab .slug{font:500 .72rem ui-monospace,Menlo,monospace;color:#8fb3ab;
+    background:rgba(169,213,203,.09);border:1px solid var(--linea);border-radius:6px;padding:2px 7px}
+  .bicho > .cab .der{margin-left:auto;display:flex;gap:7px;flex-wrap:wrap}
+
+  .paneles{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--linea)}
+  @media (max-width:820px){.paneles{grid-template-columns:1fr}}
+  .panel{background:var(--carta2);padding:12px 14px 14px;display:flex;flex-direction:column;gap:9px;min-width:0}
+  .panel > .t{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+  .panel > .t b{font:700 .72rem/1 system-ui;letter-spacing:.1em;text-transform:uppercase;color:var(--tenue)}
+  .panel .fecha{font:500 .69rem ui-monospace,Menlo,monospace;color:#7fa19a;margin-left:auto}
+  .lienzo{position:relative;width:100%;height:270px;border-radius:12px;overflow:hidden;
+    background:radial-gradient(120% 100% at 50% 12%,#1d3a44,#0a171c);
+    border:1px solid var(--linea);display:grid;place-items:center}
+  .lienzo.lam{background:radial-gradient(120% 100% at 50% 20%,#efe3c8,#d9c9a6)}
+  .rig{display:block;width:100%;height:100%;overflow:hidden}
+  .vacio{color:var(--tenue);font-size:.82rem;text-align:center;padding:18px;line-height:1.6;max-width:34ch}
+  .vacio b{display:block;color:var(--oro);font-size:.92rem;margin-bottom:5px}
+  .burbu{position:absolute;left:10px;right:10px;bottom:10px;background:rgba(11,20,24,.94);
+    border:1.5px solid var(--menta);border-radius:12px;border-bottom-left-radius:4px;
+    padding:8px 11px;font:500 .8rem/1.42 system-ui;opacity:0;transition:opacity .3s;pointer-events:none}
+  .burbu.on{opacity:1}
+  .burbu i{display:block;font:700 .61rem/1.3 system-ui;letter-spacing:.08em;text-transform:uppercase;
+    color:var(--oro);font-style:normal;margin-bottom:3px}
+
+  .estado{font:600 .72rem ui-monospace,Menlo,monospace;color:var(--menta);min-height:1.1em}
+  .estado em{color:var(--oro);font-style:normal}
+
+  /* ── controles ── */
+  .mandos{padding:12px 16px 16px;border-top:1px solid var(--linea);display:flex;flex-direction:column;gap:12px}
+  .grupo > .et{font:600 .68rem/1 system-ui;letter-spacing:.09em;text-transform:uppercase;color:var(--tenue);
+    display:flex;align-items:center;gap:8px;margin-bottom:7px}
+  .grupo > .et span{color:#7fa19a;font-weight:500;letter-spacing:.01em;text-transform:none;font-size:.72rem}
+  .bots{display:flex;flex-wrap:wrap;gap:6px}
+  button.g{background:rgba(169,213,203,.1);border:1px solid var(--linea);color:var(--tinta);
+    border-radius:999px;padding:6px 13px;font:600 .78rem system-ui;cursor:pointer;
+    transition:background .15s,border-color .15s,transform .12s}
+  button.g:hover{background:rgba(169,213,203,.2);border-color:var(--menta)}
+  button.g:active{transform:translateY(1px)}
+  button.g.on{background:var(--oro);border-color:var(--oro);color:#221604}
+  button.g.nuc{border-color:rgba(255,196,106,.5)}
+  button.g.nuc::after{content:'◆';margin-left:6px;color:var(--oro);font-size:.62rem;vertical-align:1px}
+  button.g.nar{opacity:.72;border-style:dashed}
+  button.g:disabled{opacity:.32;cursor:not-allowed}
+  .dial{display:flex;align-items:center;gap:11px;flex-wrap:wrap}
+  .dial input[type=range]{flex:1 1 220px;min-width:170px;accent-color:var(--oro)}
+  .dial .ext{font:600 .72rem system-ui;color:var(--tenue);white-space:nowrap}
+  .checks{display:flex;flex-wrap:wrap;gap:5px}
+  .chk{font:500 .7rem ui-monospace,Menlo,monospace;border-radius:6px;padding:3px 7px;border:1px solid var(--linea)}
+  .chk.si{color:var(--verde);border-color:rgba(87,201,138,.4);background:rgba(87,201,138,.1)}
+  .chk.no{color:#6f8b85;background:rgba(169,213,203,.05)}
+  .nota{margin:0;color:var(--tenue);font-size:.79rem;line-height:1.58;max-width:92ch}
+  .nota b{color:var(--tinta)}
+  .nota code{font:500 .76rem ui-monospace,Menlo,monospace;color:var(--menta)}
+
+  .caja{background:linear-gradient(180deg,var(--carta),var(--carta2));border:1px solid var(--linea);
+    border-radius:14px;padding:14px 16px;margin:12px 0}
+  .caja h3{margin:0 0 7px;font:650 .98rem/1.25 system-ui}
+  .caja p{margin:0 0 9px;color:var(--tenue);font-size:.85rem;line-height:1.62}
+  .caja p:last-child{margin-bottom:0}
+  .caja ul{margin:0 0 9px;padding-left:20px;color:var(--tenue);font-size:.85rem;line-height:1.62}
+  .caja li{margin-bottom:5px}
+  .caja b{color:var(--tinta)}
+  .caja code{font:500 .78rem ui-monospace,Menlo,monospace;color:var(--menta)}
+  .veredicto{border-left:3px solid var(--oro);padding-left:12px;margin:10px 0}
+  .veredicto b{color:var(--oro)}
+
+  /* ── repisa del selector ── */
+  .repisa{display:grid;grid-template-columns:repeat(auto-fit,minmax(132px,1fr));gap:10px;margin-top:6px}
+  .juguete{background:linear-gradient(180deg,rgba(23,51,62,.7),rgba(10,24,30,.7));
+    border:1.5px solid var(--linea);border-radius:14px;padding:8px 8px 10px;cursor:pointer;
+    display:flex;flex-direction:column;align-items:center;gap:5px;color:inherit;font:inherit;
+    transition:border-color .18s,transform .18s}
+  .juguete:hover{transform:translateY(-3px);border-color:rgba(255,196,106,.6)}
+  .juguete.sel{border-color:var(--oro);box-shadow:0 0 0 1px rgba(255,196,106,.35),0 12px 30px rgba(0,0,0,.5)}
+  .juguete .rig{height:104px}
+  .juguete b{font:600 .8rem system-ui}
+  .juguete span{font:500 .66rem system-ui;color:var(--tenue)}
+  footer{margin-top:44px;padding-top:16px;border-top:1px solid var(--linea);
+    color:#7fa19a;font-size:.76rem;line-height:1.6}
+</style>
+<!-- El arte de HOY (los 7 rigs del valle) y el arte NUEVO, cada uno en su archivo.
+     `guia-jaguar-lamina.js` NO pisa a `GUIAS_ARTE.jaguar`: se registra aparte en
+     `window.GUIA_JAGUAR_LAMINA`, así que esta página puede poner los dos lado a lado
+     sin decidir por el operador. -->
+<script src="./assets/guias-arte.js"></script>
+<script src="./assets/guia-jaguar-lamina.js"></script>
+</head>
+<body>
+<div class="env">
+
+<header class="top">
+  <h1>compAI — antes / después, con su comportamiento completo</h1>
+  <p class="lema">«El animal es real hasta que actúa.»</p>
+  <p>Uno a uno, los ocho del elenco. A la izquierda el compañero de hoy; a la derecha la versión
+  nueva, a medida que aterriza. Y debajo <b>lo que hace</b>, no una foto: cada pose que el rig
+  declara de verdad, disparable con un botón, más el ciclo de vida corriendo con la regla del
+  <b>30 % actuando / 70 % quieto</b> y su medidor al lado. Los pendientes salen como pendientes.</p>
+  <div class="migas">
+    <code>compai/elenco.js</code><code>compai/gestos.js</code><code>assets/guias-arte.js</code>
+    <code>assets/guia-jaguar-lamina.js</code><code>compai-ritmo.js</code>
+    <code>ops/referencias-norte-visual/README.md § EL RANGO</code>
+    <code>ops/SPEC-COMPORTAMIENTO-COMPAI-30-70.md</code>
+  </div>
+</header>
+
+<h2 class="sec">El medidor del 30/70 <small>el gate que no existía — «si sale 60 % cansa, si sale 5 % está muerto»</small></h2>
+<p class="intro">Suma de todos los personajes que estén corriendo su ciclo de vida en esta página.
+La banda verde es 22–38 %; la raya dorada, el 30 % exacto. Encienda «vida 30/70» en cualquier
+tarjeta y el número se mueve. <b>No es una animación del medidor: es tiempo real acumulado</b> en
+estado <em>actuando</em> contra tiempo en <em>quieto</em>.</p>
+<div class="medidor" id="medGlobal">
+  <div class="fila">
+    <span class="sem a" id="medSem">sin datos</span>
+    <div class="barra"><div class="banda"></div><div class="lleno" id="medLleno"></div><div class="obj"></div></div>
+    <span class="cifra" id="medPct">—</span>
+  </div>
+  <p class="pie" id="medPie">Ningún personaje está corriendo su ciclo todavía.</p>
+</div>
+
+<h2 class="sec">Las cuatro patas de la IA <small>escuchar · ver · oír · hablar — ¿cuál llega hasta el personaje?</small></h2>
+<p class="intro">La pregunta no es qué hay instalado, sino <b>qué llega punta a punta hasta el
+compañero en el valle</b>. Verde = se ve correr desde el navegador del valle. Ámbar = existe y
+está vivo, pero nada del valle lo llama. Rojo = falta el cable. Todo verificado hoy
+(<code>podman ps</code>, <code>systemctl</code>, <code>ss -tlnp</code>, <code>curl</code>) contra
+el código que de verdad hace la llamada.</p>
+<div class="rej c4" id="patas"></div>
+
+<h2 class="sec">El núcleo <code style="font:inherit">compai/</code>, módulo por módulo <small>verde = alguien lo llama · ámbar = existe y nadie lo llama · rojo = falta</small></h2>
+<p class="intro">El núcleo es ESM puro sin dependencias y se copia desde <code>chagra/</code> con
+<code>sync-compai-nucleo.mjs</code> — <b>el valle nunca es su fuente de verdad</b>. Lo que sigue
+es quién lo consume <b>de este lado</b>, con archivo y línea.</p>
+<div class="envuelve"><table class="mod" id="tablaMod"><thead><tr>
+  <th>módulo</th><th>qué hace</th><th>quién lo llama en el valle</th><th style="width:1%">estado</th>
+</tr></thead><tbody></tbody></table></div>
+
+<h2 class="sec">El elenco, uno a uno <small id="cuentaPares"></small></h2>
+<p class="intro">Cada tarjeta trae los dos extremos del <b>RANGO</b> (reposo digno ↔ actuando), los
+botones de todas sus poses reales, el ciclo 30/70 con medidor, y el conteo de
+<b>vida de base</b>: cuántas animaciones del rig corren en <em>todos</em> los estados. Ese número
+es lo que decide el 70 % — un personaje quieto que respira, parpadea y mueve la cola sigue
+importando; un poste esperando turno, no.</p>
+<div id="elenco"></div>
+
+<h2 class="sec">Angelita y el jaguar, sirviendo en los dos sitios <small>el ahorro medido: de 11 pilotos del Kart y 8 de compai, solo coinciden dos</small></h2>
+<div class="caja" id="kart"></div>
+
+<h2 class="sec">El selector <small>qué se reusa del Kart, qué no, y por qué</small></h2>
+<div class="caja" id="selDecision"></div>
+<div class="caja">
+  <h3>La repisa de compai — cómo queda</h3>
+  <p>El mismo <b>gesto</b> del selector del Kart (todo el elenco a la vista, el elegido grande y
+  vivo), pero sin una sola línea de <code>three</code>: aquí los juguetes ya son DOM y se animan
+  solos. Toque uno.</p>
+  <div class="repisa" id="repisa"></div>
+  <div class="lienzo" id="vitrina" style="height:320px;margin-top:12px"></div>
+  <p class="nota" id="vitrinaPie"></p>
+</div>
+
+<footer id="pie"></footer>
+</div>
+
+<script type="module">
+import { ELENCO, COMPANERO_DEFECTO } from './compai/elenco.js';
+import { MOMENTOS_IDLE } from './compai/gestos.js';
+import { comentarioDeMundo } from './compai/comentarista.js';
+import { datosDeMundo } from './compai/datosFinca.js';
+import { reaccionAlClima, UMBRAL_LLUVIA_MM } from './compai/climaVivo.js';
+import { susurroDeNoche } from './compai/susurroNocturno.js';
+import { preguntaDeAprendiz } from './compai/modoAprendiz.js';
+import { datoAgroecologicoReal } from './compai/agroecologia.js';
+import { crearRitmo, crearMedidor, OBJETIVO_ACTUANDO, BANDA_ACTUANDO } from './compai-ritmo.js';
+
+const $ = (s, r = document) => r.querySelector(s);
+const el = (t, c, h) => { const n = document.createElement(t); if (c) n.className = c; if (h != null) n.innerHTML = h; return n; };
+
+/* ═══════════════════════ 1. EL ARTE: antes y después ═══════════════════════ */
+
+const ANTES = window.GUIAS_ARTE || {};
+
+/* EL HUECO PARA LO QUE VAYA ATERRIZANDO. Una entrada por personaje; el día que
+   Fable entregue el oso, se agrega su línea y la tarjeta se llena sola. El arte
+   nuevo se registra en su PROPIO global y NUNCA pisa `GUIAS_ARTE`, así el
+   operador aprueba antes de que el valle lo adopte. */
+const DESPUES = {
+  jaguar: {
+    global: 'GUIA_JAGUAR_LAMINA',
+    nucleo: 'jaguar',
+    fecha: '2026-08-07 16:55',
+    quien: 'Fable · lámina de historia natural — segunda pasada',
+    lamina: true,
+    /* El reparto NO lo inventa esta página: está escrito en el encabezado del
+       propio rig («REPARTO DEL DIAL (los 9 estados)»). Se declara aquí porque
+       vive en un comentario del archivo, no en el objeto exportado. */
+    reparto: {
+      reposo: ['respira', 'mirausted', 'escucha', 'rastrea', 'estira', 'acicala'],
+      medio: ['guino'],
+      actuacion: ['examina', 'hablar'],
+    },
+    nota: '<b>Es el RANGO, no un estilo — la doctrina completa, resuelta.</b> Dos cuerpos sobre la '
+      + 'misma lámina: <code>#jagReal</code>, cuadrúpedo de anatomía real, rosetas con núcleo, '
+      + 'barras en el pecho, mirada ambarina — <b>el estado base, el que impone</b>; y '
+      + '<code>#jagActor</code>, la «Panthera cupheadiana» bípeda con pie-eyes, guantes de cuatro '
+      + 'dedos y la lupa del rastreador, que <b>solo sube en <code>examina</code> y '
+      + '<code>hablar</code></b> y se va cuando terminan. La transición es carácter y no un corte: '
+      + 'crossfade con squash-and-stretch por <code>transition</code>, así el <b>regreso</b> también '
+      + 'es fluido — que era la mitad que se rompe. Seis de sus nueve estados son el animal de '
+      + 'verdad, uno es el punto medio (<code>guino</code>: cuerpo real, cara cuphead) y dos son '
+      + 'actuación: <b>eso ya es el 30/70 dibujado en el reparto</b>. '
+      + 'Página de aprobación propia: <a href="./compai-jaguar.html">compai-jaguar.html</a>.',
+  },
+  // oso: { global: 'GUIA_OSO_LAMINA', nucleo: 'oso', … }   ← siguiente en aterrizar
+};
+
+/* Los que NO llevan par porque ya están aprobados tal cual. */
+const APROBADOS = {
+  guacamaya: 'El operador, 2026-08-07: «es la única que siempre me gustó, déjala así, no necesita '
+    + 'cambios». Sale del presupuesto de Fable. Aquí va como está, con su comportamiento completo.',
+};
+
+const GENTILICIO_EXTRA = {
+  maiz: 'la planta de maíz — y la única del elenco que NO tiene rig dibujado',
+};
+
+/* La zarigüeya y el jaguar tienen el id de su núcleo distinto del slug. */
+const NUCLEO_DE = { guacamaya: 'guaca' };
+
+/* ═══════════════════════ 2. POSES: leídas del rig, nunca de una tabla ══════ */
+
+/* Misma lista que `marco.js` y `portales.js`: una pose de narrativa sirve a una
+   escena, no al reposo. Un jaguar en `amenaza` esperando en la esquina asusta. */
+const NARRATIVAS = new Set(['amenaza', 'acecho', 'invocacion', 'degradado', 'niebla', 'pacto', 'hablar']);
+/* Poses que son ciclo de marcha: posar en ellas = caminar en el sitio. */
+const LOCOMOCION = new Set(['camina', 'dispersar', 'vuela']);
+/* Candidatas a REPOSO DIGNO, en orden de preferencia. */
+const REPOSO_CANON = ['respira', 'idle', 'sano', 'sana', 'posada', 'flota'];
+const NUCLEO_MOMENTOS = Object.keys(MOMENTOS_IDLE);
+const ELEGIBLES_NUCLEO = NUCLEO_MOMENTOS.filter((m) => MOMENTOS_IDLE[m].peso > 0);
+
+/** Las poses que el rig DE VERDAD tiene, leídas de su propio CSS (regex de marco.js). */
+function posesDelRig(arte) {
+  const vistas = new Set();
+  const re = /data-estado=["']([a-z]+)["']/g;
+  let m;
+  while ((m = re.exec(arte.css || '')) !== null) vistas.add(m[1]);
+  return [...vistas];
+}
+
+/**
+ * LA VIDA DE BASE — la mitad del 30/70 que nadie estaba midiendo.
+ * Cuenta declaraciones `animation:` que viven FUERA de cualquier regla
+ * `[data-estado=…]`: eso es lo que sigue corriendo cuando el personaje no hace
+ * nada. Si da 0, el 70 % es un poste y el personaje se muere entre gestos.
+ */
+function vidaDeBase(css) {
+  let base = 0, porEstado = 0;
+  const re = /([^{}]+)\{([^{}]*)\}/g;
+  let m;
+  while ((m = re.exec(css || '')) !== null) {
+    const sel = m[1];
+    if (/@keyframes|@media|@supports|@font-face/.test(sel)) continue;
+    const n = (m[2].match(/animation\s*:/g) || []).length;
+    if (!n) continue;
+    if (sel.includes('[data-estado')) porEstado += n; else base += n;
+  }
+  return { base, porEstado, keyframes: (css.match(/@keyframes/g) || []).length };
+}
+
+/** ¿el rig lee el dial como PARÁMETRO (`var(--rango)`) o hay que cambiarle de pose? */
+const leeElDial = (css) => /var\(\s*--rango/.test(css || '');
+
+/* ═══════════════════════ 3. MONTAJE DEL RIG ════════════════════════════════ */
+
+function encuadrar(root, nucleoId, M, intento = 0) {
+  let b = null;
+  try {
+    const n = root.getElementById(nucleoId) || root.querySelector('svg > g');
+    b = n && n.getBBox();
+  } catch (e) { b = null; }
+  if (b && b.width > 1 && b.height > 1) {
+    root.querySelector('svg').setAttribute('viewBox',
+      `${(b.x - M).toFixed(0)} ${(b.y - M).toFixed(0)} ${(b.width + 2 * M).toFixed(0)} ${(b.height + 2 * M).toFixed(0)}`);
+    return true;
+  }
+  /* getBBox() da 0×0 en el primer frame tras el innerHTML (medido en el
+     navegador, ver onboarding.js): se reintenta hasta que la caja es real. */
+  if (intento < 60) setTimeout(() => encuadrar(root, nucleoId, M, intento + 1), 60);
+  return false;
+}
+
+/**
+ * Monta un rig en shadow DOM — el mismo patrón que `marco.js` y `onboarding.js`,
+ * a propósito: si esta página lo dibujara distinto, no probaría nada del valle.
+ */
+function montarRig(host, arte, nucleoId, { margen = 45, completo = false } = {}) {
+  const root = host.shadowRoot || host.attachShadow({ mode: 'open' });
+  const lienzo = (completo && arte.lienzo) ? arte.lienzo : '0 0 900 1150';
+  root.innerHTML =
+    '<style>' + arte.css + ':host{display:block;overflow:hidden}'
+    + 'svg{width:100%!important;height:100%!important;max-width:none!important;'
+    + 'max-height:none!important;display:block;overflow:hidden}</style>'
+    + '<svg viewBox="' + lienzo + '" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg">'
+    + arte.defs + arte.svg + '</svg>';
+  if (!completo) encuadrar(root, nucleoId, margen);
+  /* la zarigüeya (y quien venga con `boilTurb`) hierve su contorno sola */
+  const turb = root.getElementById('boilTurb');
+  if (turb) { let s = 1; setInterval(() => { s = (s % 5) + 1; turb.setAttribute('seed', String(s)); }, 130); }
+  return root;
+}
+
+/* ═══════════════════════ 4. EL MEDIDOR GLOBAL ══════════════════════════════ */
+
+const medidores = new Set();
+const medLleno = $('#medLleno'), medPct = $('#medPct'), medSem = $('#medSem'), medPie = $('#medPie');
+
+function pintarGlobal() {
+  let a = 0, q = 0, vivos = 0;
+  for (const m of medidores) { const r = m.resumen(); a += r.actuandoS; q += r.quietoS; if (r.totalS > 0) vivos++; }
+  const total = a + q;
+  if (total < 6) {
+    medPct.textContent = total ? (100 * a / total).toFixed(0) + ' %' : '—';
+    medLleno.style.width = total ? (100 * a / total) + '%' : '0%';
+    medSem.className = 'sem a'; medSem.textContent = 'sin datos';
+    medPie.textContent = vivos
+      ? `Midiendo… ${total.toFixed(1)} s acumulados. Por debajo de 6 s un solo gesto sesga el número, así que no se reporta.`
+      : 'Ningún personaje está corriendo su ciclo todavía.';
+    return;
+  }
+  const pct = a / total;
+  medLleno.style.width = (100 * pct).toFixed(1) + '%';
+  medPct.textContent = (100 * pct).toFixed(1) + ' %';
+  const dentro = pct >= BANDA_ACTUANDO[0] && pct <= BANDA_ACTUANDO[1];
+  medSem.className = 'sem ' + (dentro ? 'v' : 'a');
+  medSem.textContent = dentro ? 'en banda' : (pct < BANDA_ACTUANDO[0] ? 'corto — se apaga' : 'largo — cansa');
+  medPie.textContent = `${vivos} personaje${vivos === 1 ? '' : 's'} corriendo · `
+    + `${a.toFixed(1)} s actuando · ${q.toFixed(1)} s quieto · ${total.toFixed(1)} s de sesión. `
+    + `Objetivo ${(100 * OBJETIVO_ACTUANDO).toFixed(0)} %, banda ${(100 * BANDA_ACTUANDO[0]).toFixed(0)}–${(100 * BANDA_ACTUANDO[1]).toFixed(0)} %.`;
+}
+
+/* Un solo reloj para toda la página: cada panel vivo se suscribe. */
+const tics = new Set();
+let ultimo = performance.now();
+function reloj(t) {
+  const dt = Math.min(0.25, (t - ultimo) / 1000);   // pestaña de fondo: no se acumulan minutos
+  ultimo = t;
+  if (!document.hidden) { for (const f of tics) f(dt); pintarGlobal(); }
+  requestAnimationFrame(reloj);
+}
+requestAnimationFrame(reloj);
+
+/* ═══════════════════════ 5. UN PANEL (antes o después) ═════════════════════ */
+
+function crearPanel(slug, etiqueta, arte, cfg) {
+  const p = el('div', 'panel');
+  const t = el('div', 't');
+  t.append(el('b', null, etiqueta));
+  const chip = el('span', 'sem ' + (cfg.sem || 'a'), cfg.semTxt || '');
+  t.append(chip);
+  if (cfg.fecha) t.append(el('span', 'fecha', cfg.fecha));
+  p.append(t);
+
+  const caja = el('div', 'lienzo' + (cfg.lamina ? ' lam' : ''));
+  p.append(caja);
+
+  if (!arte) {
+    caja.append(el('div', 'vacio', cfg.vacio || '<b>Pendiente</b>Todavía no hay versión nueva de este personaje.'));
+    p.append(el('div', 'estado', '—'));
+    return { nodo: p, vacio: true };
+  }
+
+  const host = el('div', 'rig');
+  caja.append(host);
+  const burbu = el('div', 'burbu');
+  caja.append(burbu);
+  const nucleoId = cfg.nucleo || NUCLEO_DE[slug] || slug;
+  const root = montarRig(host, arte, nucleoId, { completo: false });
+
+  const poses = posesDelRig(arte);
+  /* Si el rig DECLARA su reparto del dial (lo hace el jaguar nuevo, en su
+     encabezado), manda el suyo. Si no, se deriva — que es lo que hace hoy el
+     valle y por eso mete gestos de reposo en la bolsa de "actuando". */
+  const R = cfg.reparto;
+  const reposoTodos = R ? R.reposo.filter((p) => poses.includes(p))
+    : [REPOSO_CANON.find((r) => poses.includes(r))
+      || poses.find((x) => !NARRATIVAS.has(x) && !LOCOMOCION.has(x))].filter(Boolean);
+  const reposo = reposoTodos[0] || null;
+  const medio = R ? R.medio.filter((p) => poses.includes(p)) : [];
+  const actuando = R ? R.actuacion.filter((p) => poses.includes(p))
+    : poses.filter((x) => x !== reposo && !LOCOMOCION.has(x)
+      && !['amenaza', 'acecho', 'degradado', 'niebla', 'invocacion', 'pacto'].includes(x));
+  const narrativas = poses.filter((x) => NARRATIVAS.has(x) && x !== 'hablar' && !actuando.includes(x));
+  const vida = vidaDeBase(arte.css);
+
+  host.setAttribute('data-estado', reposo || poses[0] || 'idle');
+
+  const linea = el('div', 'estado');
+  p.append(linea);
+  const pintarLinea = (extra) => {
+    const e = host.getAttribute('data-estado') || '—';
+    linea.innerHTML = `data-estado=<em>${e}</em>` + (extra ? ' · ' + extra : '');
+  };
+  pintarLinea();
+
+  /* ── lámina completa ↔ el personaje ── */
+  if (arte.lienzo) {
+    const b = el('button', 'g', '🖼 ver la lámina entera');
+    let ent = false;
+    b.onclick = () => {
+      ent = !ent;
+      b.classList.toggle('on', ent);
+      b.textContent = ent ? '🔍 volver al personaje' : '🖼 ver la lámina entera';
+      const svg = root.querySelector('svg');
+      if (ent) svg.setAttribute('viewBox', arte.lienzo);
+      else encuadrar(root, nucleoId, 45);
+    };
+    const f = el('div', 'bots'); f.append(b); p.append(f);
+  }
+
+  return {
+    nodo: p, host, root, poses, reposo, reposoTodos, medio, actuando, narrativas, vida, arte, nucleoId,
+    declara: !!R,
+    pintarLinea,
+    poner(pose) { if (pose) { host.setAttribute('data-estado', pose); pintarLinea(); } },
+    decir(texto, quien) {
+      if (!texto) return;
+      burbu.innerHTML = `<i>${quien || 'compai'}</i>${texto}`;
+      burbu.classList.add('on');
+      clearTimeout(burbu._t);
+      burbu._t = setTimeout(() => burbu.classList.remove('on'),
+        Math.min(16000, Math.max(6000, texto.length * 78)));
+    },
+    dial(v) {
+      /* El dial se escribe SIEMPRE como parámetro CSS — es el contrato que el
+         arte nuevo tiene que leer. Y si el rig todavía no lo lee, se emula
+         cambiando de pose, que es lo único que hoy funciona. Las dos cosas a
+         la vez, y la tarjeta dice cuál está pasando. */
+      host.style.setProperty('--rango', String(v));
+      if (leeElDial(arte.css)) { pintarLinea(); return 'parámetro CSS'; }
+      const escoger = (lista, t) => lista[Math.min(lista.length - 1, Math.floor(t * lista.length))];
+      if (R) {
+        /* tres tramos, como los declara el rig: reposo · el punto medio · actuación */
+        if (v < 0.34) host.setAttribute('data-estado', escoger(reposoTodos, v / 0.34));
+        else if (v < 0.67 && medio.length) host.setAttribute('data-estado', medio[0]);
+        else if (actuando.length) host.setAttribute('data-estado', escoger(actuando, (v - 0.67) / 0.33));
+      } else if (v < 0.5) { if (reposo) host.setAttribute('data-estado', reposo); }
+      else if (actuando.length) host.setAttribute('data-estado', escoger(actuando, (v - 0.5) * 2));
+      pintarLinea();
+      return R ? 'por pose, reparto del rig' : 'emulado por pose';
+    },
+  };
+}
+
+/* ═══════════════════════ 6. UNA TARJETA DE PERSONAJE ═══════════════════════ */
+
+function crearTarjeta(slug, ficha) {
+  const arteA = ANTES[slug] || null;
+  const dcfg = DESPUES[slug];
+  const arteD = dcfg && window[dcfg.global] ? window[dcfg.global] : null;
+
+  const card = el('div', 'bicho');
+
+  /* ── cabecera ── */
+  const cab = el('div', 'cab');
+  cab.append(el('span', 'n', ficha.nombre));
+  cab.append(el('span', 'g', GENTILICIO_EXTRA[slug] || ficha.gentilicio));
+  cab.append(el('span', 'slug', slug));
+  const der = el('div', 'der');
+  der.append(el('span', 'sem ' + (arteA ? 'v' : 'r'), arteA ? 'en el valle' : 'sin rig'));
+  der.append(el('span', 'sem ' + (ficha.enPWA ? 'v' : 'a'), ficha.enPWA ? 'en la PWA' : 'solo 3D'));
+  if (APROBADOS[slug]) der.append(el('span', 'sem v', 'ya aprobada'));
+  else der.append(el('span', 'sem ' + (arteD ? 'v' : 'r'), arteD ? 'versión nueva' : 'sin versión nueva'));
+  cab.append(der);
+  card.append(cab);
+
+  /* ── los dos paneles ── */
+  const paneles = el('div', 'paneles');
+  const A = crearPanel(slug, 'Antes — hoy en el valle', arteA, {
+    sem: arteA ? 'v' : 'r',
+    semTxt: arteA ? 'vivo' : 'no existe',
+    vacio: '<b>No hay rig</b>El maíz está declarado en <code>compai/elenco.js</code> y marcado '
+      + '<code>enPWA:true</code>, pero <b>no tiene entrada en <code>assets/guias-arte.js</code></b>: '
+      + 'en el valle no se puede elegir ni se dibuja. Es el hueco más viejo del elenco.',
+  });
+  const D = APROBADOS[slug]
+    ? crearPanel(slug, 'Después', null, {
+      sem: 'v', semTxt: 'no aplica',
+      vacio: '<b>No lleva par</b>' + APROBADOS[slug],
+    })
+    : crearPanel(slug, 'Después — la versión nueva', arteD, {
+      sem: arteD ? 'v' : 'r',
+      semTxt: arteD ? 'aterrizó' : 'pendiente',
+      nucleo: dcfg && dcfg.nucleo,
+      lamina: dcfg && dcfg.lamina,
+      fecha: dcfg && dcfg.fecha,
+      reparto: dcfg && dcfg.reparto,
+      vacio: '<b>Pendiente</b>Todavía no hay versión nueva. El hueco está listo: cuando aterrice '
+        + 'su archivo <code>assets/guia-' + slug + '-lamina.js</code> con su global propio, '
+        + 'se agrega una línea a la tabla <code>DESPUES</code> y esta tarjeta se llena sola.',
+    });
+  paneles.append(A.nodo, D.nodo);
+  card.append(paneles);
+
+  /* ── mandos: se manejan los dos paneles a la vez cuando existen ── */
+  const mandos = el('div', 'mandos');
+  card.append(mandos);
+  const vivos = [A, D].filter((x) => !x.vacio);
+  if (!vivos.length) { mandos.append(el('p', 'nota', 'Sin rig no hay comportamiento que mostrar.')); return card; }
+
+  const conjunto = (fn) => vivos.forEach(fn);
+
+  /* — el dial del rango — */
+  const gDial = el('div', 'grupo');
+  const dialLee = vivos.some((v) => leeElDial(v.arte.css));
+  const dialDeclarado = vivos.some((v) => v.declara);
+  gDial.append(el('div', 'et', 'El rango <span>reposo digno ↔ actuando · '
+    + (dialLee ? 'el rig lo lee como <code>var(--rango)</code> — un parámetro de verdad'
+      : dialDeclarado
+        ? 'el rig <b>declara su reparto</b> (reposo · punto medio · actuación) y el dial recorre esos tramos'
+        : 'este rig no declara reparto: el dial se <b>emula cambiando de pose</b>, que es lo único que hoy funciona')
+    + '</span>'));
+  const dial = el('div', 'dial');
+  dial.append(el('span', 'ext', '🐆 reposo'));
+  const rango = el('input'); rango.type = 'range'; rango.min = 0; rango.max = 100; rango.value = 0;
+  dial.append(rango);
+  dial.append(el('span', 'ext', 'actuando 🎩'));
+  const dialTxt = el('span', 'ext'); dialTxt.style.color = 'var(--oro)'; dialTxt.textContent = '0 %';
+  dial.append(dialTxt);
+  gDial.append(dial);
+  mandos.append(gDial);
+  rango.oninput = () => {
+    const v = rango.value / 100;
+    let modo = '';
+    conjunto((x) => { modo = x.dial(v); });
+    dialTxt.textContent = rango.value + ' % · ' + modo;
+  };
+
+  /* — los botones de pose, en tres filas — */
+  const declara = vivos.some((v) => v.declara);
+  const filas = [
+    ['Reposo — el 70 %', [...new Set(vivos.flatMap((v) => v.reposoTodos))],
+      declara ? 'el <b>animal de verdad</b>: aquí se le ve casi siempre' : 'la pose en la que se le ve casi siempre'],
+    ['El punto medio del dial', [...new Set(vivos.flatMap((v) => v.medio))],
+      'cuerpo real, la cara hace el gesto puntual — el rango no es un interruptor'],
+    ['Actuando — el 30 %', [...new Set(vivos.flatMap((v) => v.actuando))], 'explica, husmea, saca un mensaje'],
+    ['Narrativa — a pedido de una escena', [...new Set(vivos.flatMap((v) => v.narrativas))], 'no entran al ciclo ocioso: un jaguar en <code>amenaza</code> esperando en la esquina asusta'],
+  ];
+  for (const [titulo, lista, ayuda] of filas) {
+    if (!lista.length) continue;
+    const g = el('div', 'grupo');
+    g.append(el('div', 'et', titulo + ' <span>' + ayuda + '</span>'));
+    const bots = el('div', 'bots');
+    for (const pose of lista) {
+      const esNuc = NUCLEO_MOMENTOS.includes(pose);
+      const b = el('button', 'g' + (esNuc ? ' nuc' : '') + (titulo.startsWith('Narrativa') ? ' nar' : ''), pose);
+      if (esNuc) b.title = 'está en el repertorio del núcleo (compai/gestos.js)';
+      b.onclick = () => conjunto((x) => { if (x.poses.includes(pose)) x.poner(pose); });
+      bots.append(b);
+    }
+    g.append(bots);
+    mandos.append(g);
+  }
+
+  /* — la voz: el mismo comentarista de la PWA — */
+  const gVoz = el('div', 'grupo');
+  gVoz.append(el('div', 'et', 'Lo que dice <span>del mismo <code>comentarista.js</code> que la PWA — sin inventario, cae a su rama honesta</span>'));
+  const bots = el('div', 'bots');
+  const hablar = (texto, quien) => {
+    conjunto((x) => { if (x.poses.includes('hablar')) x.poner('hablar'); x.decir(texto, quien); });
+    setTimeout(() => conjunto((x) => x.poner(x.reposo)), 2600);
+  };
+  const voces = [
+    ['💬 comenta el mundo', () => comentarioDeMundo('mis_matas', datosDeMundo('mis_matas', null)), 'comentarista.js'],
+    ['🌧 reacciona al clima', () => (reaccionAlClima({ forecast7d: [{}, { precip_mm: UMBRAL_LLUVIA_MM }] }) || {}).mensaje, 'climaVivo.js'],
+    ['🌙 susurro de noche', () => (susurroDeNoche({ fase: null, reaccionClima: null }) || {}).mensaje, 'susurroNocturno.js'],
+    ['🎓 pregunta de aprendiz', () => preguntaDeAprendiz({ mundo: 'mis_matas', datosMundo: {}, probabilidad: 1 }), 'modoAprendiz.js'],
+    ['🌱 dato agroecológico', () => datoAgroecologicoReal('maíz', {
+      nombre_cientifico: 'Zea mays', roles_in_guild: ['dynamic_accumulator'], thermal_zones: ['templado'],
+    }), 'agroecologia.js (nadie lo llama en el valle)'],
+  ];
+  for (const [rot, fn, quien] of voces) {
+    const b = el('button', 'g', rot);
+    b.onclick = () => {
+      let t = null;
+      try { t = fn(); } catch (e) { t = null; }
+      hablar(t || '(el módulo calla: sin datos reales no inventa nada — esa es su regla)', quien);
+    };
+    bots.append(b);
+  }
+  gVoz.append(bots);
+  mandos.append(gVoz);
+
+  /* — el ciclo 30/70 con su medidor — */
+  const gVida = el('div', 'grupo');
+  gVida.append(el('div', 'et', 'Vida 30/70 <span>el ciclo real: <code>compai-ritmo.js</code> sobre el azar del núcleo</span>'));
+  const fila = el('div', 'medidor');
+  fila.innerHTML = '<div class="fila">'
+    + '<button class="g" data-arr>▶ encender la vida</button>'
+    + '<div class="barra"><div class="banda"></div><div class="lleno"></div><div class="obj"></div></div>'
+    + '<span class="cifra">—</span></div><p class="pie"></p>';
+  gVida.append(fila);
+  mandos.append(gVida);
+
+  const btArr = fila.querySelector('[data-arr]');
+  const barra = fila.querySelector('.lleno');
+  const cifra = fila.querySelector('.cifra');
+  const pie = fila.querySelector('.pie');
+  const base = vivos[0].vida;
+  pie.innerHTML = `Vida de base: <b>${base.base}</b> animaciones corren en <b>todos</b> los estados`
+    + ` (${base.porEstado} más son propias de una pose, sobre ${base.keyframes} <code>@keyframes</code>).`
+    + (base.base === 0
+      ? ' <b style="color:var(--rojo)">Cero: entre gesto y gesto este rig es un poste.</b>'
+      : ' Entre gesto y gesto sigue respirando — el 70 % se sostiene solo.');
+
+  let ritmo = null, tic = null;
+  /* Un rig sin una sola pose (la zarigüeya) no puede actuar: se le deshabilita
+     el ciclo en vez de dejarlo sumar QUIETO puro al medidor global. Meterlo
+     mediría la limitación del rig y la reportaría como si fuera el ritmo — el
+     medidor estaría midiendo bien, al lado. */
+  if (![...new Set(vivos.flatMap((v) => v.actuando))].length) {
+    btArr.disabled = true;
+    btArr.textContent = '✕ no hay nada que actuar';
+    btArr.title = 'este rig no declara una sola pose: el ciclo 30/70 no le puede pedir nada';
+  }
+  btArr.onclick = () => {
+    if (ritmo) {
+      tics.delete(tic); medidores.delete(ritmo.medidor); ritmo = null;
+      btArr.classList.remove('on'); btArr.textContent = '▶ encender la vida';
+      conjunto((x) => x.poner(x.reposo));
+      pintarGlobal();
+      return;
+    }
+    const actuar = [...new Set(vivos.flatMap((v) => v.actuando))];
+    ritmo = crearRitmo({ actuando: actuar, quieto: vivos[0].reposo });
+    medidores.add(ritmo.medidor);
+    btArr.classList.add('on'); btArr.textContent = '⏸ apagar';
+    tic = (dt) => {
+      const cambio = ritmo.avanzar(dt);
+      /* En «quieto» cada panel vuelve a SU reposo — el de hoy y el nuevo no
+         tienen por qué llamarlo igual (`idle` contra `respira`), y mandarles
+         una pose que uno no declara lo dejaba clavado en el gesto anterior. */
+      if (cambio) conjunto((x) => {
+        if (cambio.estado === 'quieto') x.poner(x.reposo);
+        else if (x.poses.includes(cambio.pose)) x.poner(cambio.pose);
+        else x.poner(x.actuando[0] || x.reposo);
+      });
+      const r = ritmo.medidor.resumen();
+      const pct = r.totalS ? r.actuandoS / r.totalS : 0;
+      barra.style.width = (100 * pct).toFixed(1) + '%';
+      cifra.textContent = r.veredicto === 'sin datos' ? '…' : (100 * pct).toFixed(1) + ' %';
+      cifra.style.color = r.veredicto === 'en banda' ? 'var(--verde)'
+        : r.veredicto === 'sin datos' ? 'var(--tenue)' : 'var(--ambar)';
+    };
+    tics.add(tic);
+  };
+
+  /* — la cobertura del repertorio del núcleo — */
+  const gCob = el('div', 'grupo');
+  const todas = new Set(vivos.flatMap((v) => v.poses));
+  const cubre = ELEGIBLES_NUCLEO.filter((m) => todas.has(m));
+  gCob.append(el('div', 'et',
+    `Repertorio del núcleo <span>de los ${ELEGIBLES_NUCLEO.length} momentos de <code>compai/gestos.js</code>, este rig honra <b>${cubre.length}</b></span>`));
+  const cks = el('div', 'checks');
+  for (const m of ELEGIBLES_NUCLEO) cks.append(el('span', 'chk ' + (todas.has(m) ? 'si' : 'no'), (todas.has(m) ? '✓ ' : '· ') + m));
+  gCob.append(cks);
+  mandos.append(gCob);
+
+  /* — la nota del después — */
+  if (dcfg && arteD) {
+    const n = el('p', 'nota', `<b>${dcfg.quien} · ${dcfg.fecha}</b> — ${dcfg.nota}`);
+    mandos.append(n);
+  }
+  if (slug === 'zariguya') {
+    mandos.append(el('p', 'nota',
+      '<b>Caso aparte, y es el reverso exacto del 30/70:</b> su rig salió de otro generador '
+      + '(<code>build-canon-creature.mjs</code>) y <b>no declara una sola pose</b> — '
+      + `${base.base} animaciones de vida de base y <b>0</b> por estado. Está siempre viva y `
+      + '<b>nunca actúa</b>: 100 % quieto. Poner <code>data-estado</code> es inocuo, no cambia nada. '
+      + 'Es la única del elenco a la que el ciclo 30/70 no le puede pedir nada.'));
+  }
+  return card;
+}
+
+/* ═══════════════════════ 7. PINTAR EL ELENCO ═══════════════════════════════ */
+
+const cont = $('#elenco');
+/* Orden: el jaguar primero — «orden pedido: jaguar primero, y él lo aprueba
+   antes de seguir con el resto» (norte visual, 2026-08-07). */
+const ORDEN = ['jaguar', 'angelita', 'zariguya', 'luciernaga', 'oso', 'guacamaya', 'chivito', 'maiz'];
+let conPar = 0;
+for (const slug of ORDEN) {
+  const ficha = ELENCO[slug];
+  if (!ficha) continue;
+  if (ANTES[slug] && (DESPUES[slug] && window[DESPUES[slug].global])) conPar++;
+  cont.append(crearTarjeta(slug, ficha));
+}
+$('#cuentaPares').innerHTML = `${ORDEN.length} personajes · <b style="color:var(--oro)">${conPar}</b> `
+  + `con el par antes/después completo · 1 aprobada sin par (guacamaya) · `
+  + `${ORDEN.length - conPar - 1} pendientes`;
+
+/* ═══════════════════════ 8. LAS CUATRO PATAS ═══════════════════════════════ */
+
+const PATAS = [
+  {
+    n: '🗣 Hablar', sem: 'r', txt: 'TTS local vivo, sin un cable al valle',
+    q: 'La infraestructura está corriendo: <code>kokoro-tts.service</code> en :8088 responde '
+      + '<code>200</code> a <code>/health</code>, y <code>wyoming-piper</code> escucha en :10200. '
+      + 'Pero <b>nada del valle los llama</b>, y no podría: el proxy de <code>_server.py</code> '
+      + 'tiene una lista blanca de dos rutas, las dos de ollama. El compañero habla en burbuja de '
+      + 'texto, no con voz.',
+    ev: 'vivo: <b>kokoro-tts.service</b> :8088 · <b>wyoming-piper</b> :10200 · '
+      + 'cable: <b>ninguno</b> · lo único que suena en el valle es <code>speechSynthesis</code> '
+      + 'del navegador, y solo en <code>paramo-vivo-lecciones.js</code> — no es compai',
+  },
+  {
+    n: '👂 Oír / escuchar', sem: 'r', txt: 'tres Whisper vivos, cero micrófono',
+    q: '<code>wyoming-whisper</code> (:10300), <code>whisper-http</code> (:10301, '
+      + '<code>/docs</code> da 200) y <code>whisper-openai</code> (:10302) llevan 14 h arriba. '
+      + 'En todo <code>~/demos/3d</code> <b>no hay una sola llamada</b> a ninguno, ni un '
+      + '<code>SpeechRecognition</code>. Al compañero no se le puede hablar.',
+    ev: 'vivo: <b>3 contenedores</b> whisper · cable: <b>ninguno</b> · '
+      + 'el único <code>getUserMedia</code> del valle es la <b>cámara</b> de <code>foto.js</code>, '
+      + 'con <code>audio:false</code>',
+  },
+  {
+    n: '👁 Ver', sem: 'v', txt: 'punta a punta',
+    q: 'La única pata completa. <code>compai/foto.js</code> abre la cámara, arma un JPEG y lo manda '
+      + 'a <code>/api/ollama/api/generate</code>; <code>_server.py</code> lo reenvía a ollama en '
+      + ':11434 y el modelo <code>qwen3-vl:4b</code> está descargado. El compañero contesta con '
+      + '<code>decir()</code>, que es su misma burbuja.',
+    ev: 'llama: <b>portales.js:522</b> <code>montarBotonFoto(decir)</code> · '
+      + 'proxy: <b>_server.py:108</b> lista blanca · modelo <b>qwen3-vl:4b</b> presente en ollama',
+  },
+  {
+    n: '🧠 Saber', sem: 'a', txt: 'sabe de mundos, no de especies',
+    q: 'Lo que sabe hoy sale de tres módulos puros y honestos: <code>comentarista.js</code>, '
+      + '<code>datosFinca.js</code>, <code>climaVivo.js</code>. Sin inventario real caen a su rama '
+      + 'honesta, que es lo correcto. Lo que <b>no</b> llega: <code>agroecologia.js</code> '
+      + '(construido, <b>nadie lo importa</b>) y el grafo AGE <code>chagra_kg</code> — el navegador '
+      + 'no tiene ruta hasta él, el proxy solo deja pasar ollama.',
+    ev: 'verde: <b>comentarista · datosFinca · climaVivo · susurroNocturno · modoAprendiz</b> · '
+      + 'ámbar: <b>agroecologia.js</b> (0 importadores) · rojo: <b>grafo AGE → compai</b> (sin ruta)',
+  },
+];
+const patasEl = $('#patas');
+for (const p of PATAS) {
+  const c = el('div', 'pata');
+  c.append(el('h3', null, p.n + ' <span class="sem ' + p.sem + '">' + p.txt + '</span>'));
+  c.append(el('p', 'q', p.q));
+  c.append(el('div', 'ev', p.ev));
+  patasEl.append(c);
+}
+
+/* ═══════════════════════ 9. LA TABLA DE MÓDULOS ════════════════════════════ */
+
+const MODULOS = [
+  ['gestos.js', 'El azar de la casa: repertorio ponderado de 14 momentos + <code>elegirSinRepetir</code>, que nunca repite el anterior.',
+    'marco.js:389 · portales.js:33 · paramo.js:39 · paseo.js:52', 'a',
+    '<b>Solo se usa el azar.</b> Los 14 <code>MOMENTOS_IDLE</code> y <code>duracionDeMomento</code> '
+    + 'no los llama nadie en el valle: a <code>elegirSinRepetir</code> se le pasan las poses del '
+    + 'rig, no el repertorio del núcleo. Por eso ningún rig de hoy honra un solo momento.'],
+  ['comentarista.js', 'Los 8 comentaristas de mundo y su regla de callar honesto.',
+    'marco.js:408 · portales.js:37', 'v', ''],
+  ['datosFinca.js', 'El contrato de datos: de los assets crudos a <code>{cultivos,especies,total}</code>.',
+    'marco.js:409 · portales.js:38', 'v',
+    'En el valle no hay IndexedDB de la finca (otro origen), así que entra con <code>null</code> '
+    + 'y el comentarista cae a su rama honesta. Correcto: no se inventa un inventario que este lado no ve.'],
+  ['elenco.js', 'La llave canónica única del compañero y la migración de las dos viejas.',
+    'onboarding.js:18 (<code>escribirCompanero</code>)', 'a',
+    '<b>Se escribe pero no se lee.</b> <code>portales.js:634</code> lee '
+    + '<code>localStorage.guatoc.guia</code> a mano en vez de <code>leerCompanero()</code>: la '
+    + 'precedencia canónica y la migración de slugs jubilados (<code>colibri</code>→angelita) '
+    + 'no corren de este lado.'],
+  ['climaVivo.js', 'Helada, lluvia y sequía sobre el pronóstico de 7 días → mensaje y gesto.',
+    'clima.js:740 <code>reaccionAlClima(...)</code> → <code>compai.decir</code>', 'v', ''],
+  ['susurroNocturno.js', 'Lo que dice de noche, con su rama honesta cuando no hay fase lunar.',
+    'noche.js:428 <code>susurroDeNoche(...)</code> → <code>compai.decir</code>', 'v',
+    '<code>mensajeSaberLunarCampesino</code> es opt-in y nadie lo llama — a propósito, según el propio módulo.'],
+  ['modoAprendiz.js', 'Cada tanto pregunta en vez de afirmar: provoca observación.',
+    'portales.js:542 <code>preguntaDeAprendiz(...)</code>', 'v', ''],
+  ['foto.js', 'La cámara: el campesino le muestra una mata y el compai la mira con qwen3-vl.',
+    'portales.js:522 <code>montarBotonFoto(decir)</code>', 'v',
+    'Es la única pata de IA que llega punta a punta. Verificado: ollama vivo en :11434 con <code>qwen3-vl:4b</code>.'],
+  ['agroecologia.js', 'El dato agroecológico REAL de la especie: rol en el gremio, zona térmica, helada letal.',
+    '<b>nadie</b>', 'r',
+    '<b>Construido y sin cablear.</b> Cero importadores en todo <code>~/demos/3d</code>. '
+    + 'Necesita una especie resuelta del catálogo, y el valle no tiene ese resolvedor — es el mismo '
+    + 'patrón de los cinco módulos de lib3d que hoy aparecieron sin cable.'],
+  ['compai-ritmo.js', 'El 30/70: alterna quieto ↔ actuando con la pausa CALCULADA desde el objetivo, y el medidor.',
+    'esta página', 'a',
+    '<b>Nuevo hoy.</b> Es código del valle que consume el núcleo (no va dentro de <code>compai/</code>: '
+    + 'el valle nunca es su fuente de verdad). Medido en el valle vivo, 120 s con el jaguar: '
+    + '<b>31,6 % con un gesto en curso</b>… pero <b>14,5 de esos 38 s son la pose <code>idle</code></b>, '
+    + 'porque <code>gestoAlAzar</code> mete el propio reposo del rig en la bolsa de gestos. '
+    + 'Descontándolo, el actuar real es <b>19,6 %</b> — que es donde cae la cuenta seca del '
+    + 'planificador de hoy (<code>proxGesto = 7 + rnd·9</code> con gestos de 2,2–4 s ⇒ 21,3 %). '
+    + '<b>El medidor medía bien, al lado:</b> contaba «hay un gesto» y no «está actuando».'],
+];
+const tb = $('#tablaMod tbody');
+for (const [mod, que, quien, sem, nota] of MODULOS) {
+  const tr = el('tr');
+  tr.append(el('td', null, '<code>' + mod + '</code>'));
+  tr.append(el('td', null, que + (nota ? '<div style="margin-top:6px;color:var(--tenue);font-size:.78rem;line-height:1.5">' + nota + '</div>' : '')));
+  tr.append(el('td', 'quien', quien));
+  tr.append(el('td', null, '<span class="sem ' + sem + '">' + (sem === 'v' ? 'corre' : sem === 'a' ? 'a medias' : 'sin cablear') + '</span>'));
+  tb.append(tr);
+}
+
+/* ═══════════════════════ 10. KART ══════════════════════════════════════════ */
+
+$('#kart').innerHTML = `
+  <h3>La intersección son dos, y esos dos rinden el doble</h3>
+  <p>Medido contra <code>juegos/chagra-kart/js/pilotos.js</code>: de los <b>11 pilotos</b> del Kart
+  (angelita · jaguar · dante · oliver · crisopa · avispita · mariquita · momificador · murciélago ·
+  morpho · beauveria) y los <b>8 de compai</b>, coinciden <b>angelita y jaguar. Nada más.</b></p>
+  <p>Por eso el reemplazo 1:1 no va: los pilotos tienen <b>poderes derivados del grafo</b> —la
+  mariquita come pulgón, la Beauveria coloniza al insecto— y el maíz y el chivito no controlan
+  plagas. Y Dante y Oliver son los perros de la casa; no salen.</p>
+  <div class="veredicto"><b>Lo que sí se unifica es el lenguaje visual, no el reparto.</b>
+  Y ahí está el ahorro concreto: <b>angelita y jaguar se dibujan una sola vez</b> y sirven en los
+  dos sitios. Si además el rango se resuelve como un parámetro —la lección del chivito: sus dos
+  láminas son el mismo dibujo con la cresta cambiada— cada personaje rinde el doble otra vez.</div>
+  <p class="nota" style="margin-top:10px">Los pilotos del Kart son <b>mallas de <code>three</code></b>
+  (<code>modelos/pilotos-manejando.js</code>), no rigs SVG: no se pueden poner al lado en esta
+  página sin arrastrar el motor entero, y el selector del Kart ya los muestra. Lo que aquí se puede
+  comprobar es lo que decide el ahorro: que <b>el mismo lenguaje</b> —reposo digno ↔ actuando
+  caricatura, contorno entintado, paleta de lámina— aplica a los dos. La tarjeta del jaguar de
+  arriba es esa prueba.</p>`;
+
+/* ═══════════════════════ 11. SELECTOR: decisión y repisa ═══════════════════ */
+
+$('#selDecision').innerHTML = `
+  <h3>Se reusa el <b>gesto</b>, no el módulo — y la razón es medible</h3>
+  <p><code>juegos/chagra-kart/js/selector3d.js</code> es excelente y su ingeniería completa existe
+  para resolver <b>un problema que compai no tiene</b>. Lo dice su propio encabezado: los 8
+  vehículos suman 1024 mallas y los 11 pilotos 548 — <b>1572 draw calls</b> si se pintaran vivos,
+  encima de los 1266 de la pista. Por eso hornea cada juguete a un render target de 256² y muestra
+  un quad: la repisa baja a ~40 draw calls y solo el elegido va vivo.</p>
+  <ul>
+    <li><b>El elenco de compai cuesta 0 draw calls.</b> No son mallas: son <b>rigs SVG en shadow
+    DOM</b> (<code>assets/guias-arte.js</code>). El navegador los compone como cualquier DOM,
+    fuera del presupuesto de WebGL. El problema que <code>selector3d.js</code> resuelve, aquí no
+    existe.</li>
+    <li><b>Hornearlos a textura sería una regresión.</b> Un impostor es una foto: mataría
+    exactamente lo que el operador pidió ver —el personaje moviéndose en el selector— y con él el
+    «en 2D también se mueve» del spec. Los ocho pueden estar vivos <b>a la vez</b>, que es más de
+    lo que el Kart puede permitirse.</li>
+    <li><b>Generalizar el módulo tampoco paga.</b> Su API pide <code>THREE</code>, una escena, una
+    cámara de fov 24 y modelos con <code>construirModeloVehiculo</code>. De la abstracción común
+    quedarían la grilla y el resaltado del elegido: dos docenas de líneas de CSS.</li>
+  </ul>
+  <div class="veredicto"><b>Decisión:</b> se copia el <b>gesto</b> del selector del Kart —repisa con
+  todo el elenco a la vista, el elegido grande y girando en su vitrina, tirón con peso al elegir— y
+  se implementa sobre el montaje de rig que el valle <b>ya tiene y ya probó</b>
+  (<code>onboarding.js</code>: shadow DOM + encaje por <code>getBBox</code> con reintento, porque
+  en el primer frame la caja mide 0×0). Cero <code>three</code>, cero draw calls, y los ocho vivos.</div>
+  <p class="nota">En el valle, además, la repisa va <b>perezosa</b>: el <code>#guiaSel</code> de
+  <code>portales.js</code> es una píldora en la esquina y monta los rigs <b>solo cuando se abre</b>.
+  Ocho rigs animándose siempre encima del 3D sería pagar por algo que se mira dos segundos.</p>`;
+
+const repisa = $('#repisa'), vitrina = $('#vitrina'), vitPie = $('#vitrinaPie');
+let elegido = null;
+function ponerEnVitrina(slug) {
+  elegido = slug;
+  repisa.querySelectorAll('.juguete').forEach((j) => j.classList.toggle('sel', j.dataset.id === slug));
+  vitrina.innerHTML = '';
+  const arte = ANTES[slug];
+  if (!arte) {
+    vitrina.append(el('div', 'vacio', '<b>' + ELENCO[slug].nombre + '</b>No tiene rig todavía.'));
+    vitPie.innerHTML = '';
+    return;
+  }
+  const host = el('div', 'rig');
+  vitrina.append(host);
+  /* margen ancho: la vitrina es apaisada y el encaje ajusta por ALTO, así que
+     con poco margen el juguete se come la caja y se lee recortado */
+  montarRig(host, arte, NUCLEO_DE[slug] || slug, { margen: 130 });
+  const poses = posesDelRig(arte);
+  const reposo = REPOSO_CANON.find((r) => poses.includes(r)) || poses[0];
+  host.setAttribute('data-estado', reposo || 'idle');
+  /* el tirón con peso al entrar, prestado del selector del Kart (easeOutBack) */
+  host.animate([{ transform: 'scale(.86)', opacity: 0 }, { transform: 'scale(1.04)', offset: .7 }, { transform: 'scale(1)', opacity: 1 }],
+    { duration: 420, easing: 'cubic-bezier(.2,.9,.3,1.2)' });
+  vitPie.innerHTML = `<b>${ELENCO[slug].nombre}</b> — ${ELENCO[slug].gentilicio}. `
+    + `Poses reales del rig: ${poses.length ? '<code>' + poses.join('</code> <code>') + '</code>' : '<b>ninguna</b> (se anima sola)'}. `
+    + `Vida de base: <b>${vidaDeBase(arte.css).base}</b> animaciones en todos los estados.`;
+}
+for (const slug of ORDEN) {
+  const f = ELENCO[slug];
+  if (!f) continue;
+  const b = el('button', 'juguete');
+  b.type = 'button'; b.dataset.id = slug;
+  b.innerHTML = '<div class="rig"></div><b>' + f.nombre + '</b><span>' + (ANTES[slug] ? 'rig vivo' : 'sin rig') + '</span>';
+  repisa.append(b);
+  const arte = ANTES[slug];
+  if (arte) {
+    const h = b.querySelector('.rig');
+    montarRig(h, arte, NUCLEO_DE[slug] || slug, { margen: 40 });
+    const poses = posesDelRig(arte);
+    h.setAttribute('data-estado', REPOSO_CANON.find((r) => poses.includes(r)) || poses[0] || 'idle');
+  } else {
+    b.querySelector('.rig').innerHTML = '<div style="display:grid;place-items:center;height:100%;font-size:2rem;opacity:.35">🌽</div>';
+  }
+  b.onclick = () => ponerEnVitrina(slug);
+}
+ponerEnVitrina(COMPANERO_DEFECTO && ANTES[COMPANERO_DEFECTO] ? COMPANERO_DEFECTO : 'jaguar');
+
+/* ═══════════════════════ 12. PIE ═══════════════════════════════════════════ */
+$('#pie').innerHTML = 'Página de integración — <code>~/demos/3d/compai-antes-despues.html</code>. '
+  + 'Todo lo que se ve arriba se lee <b>del código que corre en el valle</b>: las poses salen del '
+  + 'CSS de cada rig, el azar es <code>compai/gestos.js</code>, la voz es <code>comentarista.js</code>. '
+  + 'Nada está transcrito a mano — si el arte cambia, esta página cambia con él.';
+
+/* hook del gate: la sonda no adivina, pregunta. */
+window.__compaiPagina = {
+  personajes: ORDEN.length,
+  conPar,
+  rigs: Object.keys(ANTES).length,
+  despues: Object.keys(DESPUES).filter((k) => window[DESPUES[k].global]),
+  medidor: () => { let a = 0, q = 0; for (const m of medidores) { const r = m.resumen(); a += r.actuandoS; q += r.quietoS; } return { a, q, pct: (a + q) ? a / (a + q) : 0 }; },
+  encender: () => document.querySelectorAll('[data-arr]').forEach((b) => { if (!b.classList.contains('on')) b.click(); }),
+};
+</script>
+</body>
+</html>

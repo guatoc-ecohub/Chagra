@@ -1,0 +1,190 @@
+<!doctype html>
+<html lang="es-CO">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0d1710">
+<title>Bestiario Vivo · los animales de la chagra</title>
+<meta name="description" content="Atlas 3D de los siete compañeros de la chagra: la criatura gira, y cada punto sobre su anatomía cuenta para qué le sirve esa parte.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='8' fill='%231d3524'/><path d='M6 21c4.5-7 15.5-7 20 0' fill='none' stroke='%23e8d4a6' stroke-width='3' stroke-linecap='round'/><circle cx='11' cy='13' r='2.4' fill='%23e8d4a6'/><circle cx='21' cy='13' r='2.4' fill='%23e8d4a6'/></svg>">
+<style>
+  :root{
+    --papel:#f2e7cd;
+    --papel2:#e2d3b2;
+    --tinta:#241809;
+    --hoja:#2f6b3a;
+    --hoja2:#8fbe63;
+    --oro:#e0b45c;
+    --fondo:#0d1710;
+    --borde:rgba(242,231,205,.16);
+    --sombra:0 12px 34px rgba(0,0,0,.42);
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;height:100%;overflow:hidden;background:var(--fondo);color:var(--papel);
+    font-family:ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;-webkit-font-smoothing:antialiased}
+  body{touch-action:none;overscroll-behavior:none;-webkit-user-select:none;user-select:none}
+  h1,h2{font-family:Georgia,"Iowan Old Style","Times New Roman",serif;font-weight:400}
+
+  #escena{position:fixed;inset:0;display:block;width:100%;height:100%;touch-action:none}
+  #puntos{position:fixed;inset:0;pointer-events:none;z-index:3}
+
+  #cabecera{
+    position:fixed;left:14px;top:14px;z-index:5;max-width:min(58vw,420px);
+    background:linear-gradient(180deg,rgba(13,23,16,.86),rgba(20,32,22,.66));
+    border:1px solid var(--borde);border-radius:14px;padding:11px 15px 12px;
+    box-shadow:var(--sombra);backdrop-filter:blur(9px)
+  }
+  #cabecera .kicker{font-size:10.5px;letter-spacing:.20em;text-transform:uppercase;color:var(--hoja2);opacity:.9}
+  #cabecera h1{margin:3px 0 1px;font-size:clamp(20px,3.4vw,29px);line-height:1.08}
+  #cabecera .cien{font-style:italic;font-size:13.5px;opacity:.74;font-family:Georgia,serif}
+  #cabecera .apodo{margin-top:6px;font-size:12.5px;color:var(--oro);opacity:.95}
+
+  #columna{
+    position:fixed;right:14px;top:14px;z-index:5;width:min(35vw,362px);
+    display:flex;flex-direction:column;gap:9px;max-height:calc(100vh - 120px);overflow:auto;
+    scrollbar-width:thin;padding-right:2px
+  }
+  .tarjeta{
+    background:linear-gradient(180deg,rgba(13,23,16,.88),rgba(20,32,22,.72));
+    border:1px solid var(--borde);border-radius:14px;padding:12px 14px 13px;
+    box-shadow:var(--sombra);backdrop-filter:blur(9px)
+  }
+  .tarjeta h2{margin:0 0 6px;font-size:15px}
+  .tarjeta p{margin:0;font-size:13.4px;line-height:1.52;opacity:.93}
+  .tarjeta .dato{display:flex;gap:8px;font-size:12.2px;line-height:1.5;margin-top:7px;opacity:.86}
+  .tarjeta .dato b{flex:0 0 62px;font-weight:600;color:var(--hoja2);opacity:.95}
+  #detalle{border-color:rgba(224,180,92,.42);background:linear-gradient(180deg,rgba(38,28,12,.90),rgba(24,22,14,.76))}
+  #detalle .num{
+    display:inline-flex;align-items:center;justify-content:center;width:21px;height:21px;border-radius:50%;
+    background:var(--oro);color:#231704;font-size:12px;font-weight:700;margin-right:8px;vertical-align:-4px
+  }
+  #detalle h2{color:var(--oro)}
+  #detalle.vacio{display:none}
+  #detalle .cerrar{
+    float:right;appearance:none;background:none;border:0;color:var(--papel);opacity:.55;
+    font-size:17px;line-height:1;cursor:pointer;padding:0 2px;margin:-2px -2px 0 0
+  }
+  #detalle .cerrar:hover{opacity:1}
+
+  .hs{
+    position:absolute;left:0;top:0;appearance:none;background:none;border:0;padding:0;margin:0;
+    pointer-events:auto;cursor:pointer;display:flex;align-items:center;gap:7px;
+    transition:opacity .18s ease;font:inherit;color:var(--papel);white-space:nowrap
+  }
+  .hs .anillo{
+    position:relative;width:25px;height:25px;border-radius:50%;flex:0 0 25px;
+    border:1.6px solid rgba(242,231,205,.92);background:rgba(20,32,22,.52);
+    display:flex;align-items:center;justify-content:center;
+    font-size:12px;font-weight:700;color:var(--papel);
+    box-shadow:0 0 0 3px rgba(13,23,16,.35),0 2px 8px rgba(0,0,0,.45);
+    transition:transform .18s cubic-bezier(.34,1.4,.5,1),background .18s ease,border-color .18s ease
+  }
+  .hs .rotulo{
+    font-size:12px;padding:3px 8px;border-radius:999px;
+    background:rgba(13,23,16,.72);border:1px solid var(--borde);
+    opacity:0;transform:translateX(-5px);transition:opacity .18s ease,transform .18s ease
+  }
+  .hs:hover .anillo,.hs.activo .anillo{transform:scale(1.18);background:var(--oro);border-color:#fff3d4;color:#231704}
+  .hs:hover .rotulo,.hs.activo .rotulo{opacity:1;transform:translateX(0)}
+  .hs.oculto{opacity:0;pointer-events:none}
+  #puntos.apagado .hs{display:none}
+  .regla{
+    position:absolute;left:0;top:0;transform:translate(-50%,-50%);
+    font-size:11px;letter-spacing:.09em;color:rgba(242,231,205,.72);
+    background:rgba(13,23,16,.5);padding:2px 7px;border-radius:999px;white-space:nowrap
+  }
+
+  #especies{
+    position:fixed;left:0;right:0;bottom:0;z-index:6;display:flex;gap:7px;
+    padding:9px 12px calc(9px + env(safe-area-inset-bottom));overflow-x:auto;
+    background:linear-gradient(0deg,rgba(9,15,11,.94),rgba(9,15,11,.30) 78%,transparent);
+    scrollbar-width:none
+  }
+  #especies::-webkit-scrollbar{display:none}
+  .chip{
+    appearance:none;flex:0 0 auto;cursor:pointer;font:inherit;font-size:12.5px;
+    padding:7px 13px;border-radius:999px;border:1px solid var(--borde);
+    background:rgba(24,38,26,.72);color:var(--papel);white-space:nowrap;
+    transition:background .16s ease,border-color .16s ease,transform .12s ease
+  }
+  .chip:hover{background:rgba(38,60,40,.86)}
+  .chip:active{transform:translateY(1px)}
+  .chip.sel{background:var(--papel);color:#20160a;border-color:var(--papel);font-weight:600}
+  .chip[disabled]{opacity:.42;cursor:default;border-style:dashed}
+  .chip[disabled]:hover{background:rgba(24,38,26,.72)}
+  .chip .pend{font-size:10px;opacity:.8;margin-left:5px;letter-spacing:.06em;text-transform:uppercase}
+
+  #mandos{position:fixed;left:14px;bottom:60px;z-index:6;display:flex;gap:7px;flex-wrap:wrap;max-width:calc(100vw - 28px)}
+  .mando{
+    appearance:none;cursor:pointer;font:inherit;font-size:12px;padding:6px 11px;border-radius:999px;
+    border:1px solid var(--borde);background:rgba(16,26,18,.76);color:var(--papel);backdrop-filter:blur(6px)
+  }
+  .mando:hover{background:rgba(32,52,34,.86)}
+  .mando.on{background:var(--hoja);border-color:var(--hoja2)}
+  #pista{
+    position:fixed;right:14px;bottom:60px;z-index:6;font-size:11.5px;opacity:.55;
+    text-align:right;max-width:44vw;line-height:1.5;pointer-events:none
+  }
+  #velo{
+    position:fixed;inset:0;z-index:9;display:flex;align-items:center;justify-content:center;
+    background:rgba(9,15,11,.90);font-family:Georgia,serif;font-size:15px;letter-spacing:.05em;
+    color:var(--papel2);transition:opacity .3s ease
+  }
+  #velo.se-va{opacity:0;pointer-events:none}
+
+  @media (max-width:820px){
+    #columna{right:0;left:0;top:auto;bottom:52px;width:auto;padding:0 12px;max-height:44vh;flex-direction:column-reverse}
+    #cabecera{max-width:calc(100vw - 28px)}
+    #mandos{bottom:auto;top:118px;left:14px}
+    #pista{display:none}
+  }
+</style>
+<script type="importmap">
+{
+  "imports": {
+    "three": "../../vendor/three.module.js",
+    "three/addons/": "../../vendor/addons/",
+    "three-mesh-bvh": "../../lib3d/geom/three-mesh-bvh.js"
+  }
+}
+</script>
+</head>
+<body>
+<canvas id="escena"></canvas>
+<div id="puntos"></div>
+
+<header id="cabecera">
+  <div class="kicker">Bestiario vivo · atlas de la chagra</div>
+  <h1 id="nombre">—</h1>
+  <div class="cien" id="cientifico">—</div>
+  <div class="apodo" id="apodo"></div>
+</header>
+
+<div id="columna">
+  <section class="tarjeta" id="ficha">
+    <h2>Su oficio</h2>
+    <p id="rol">—</p>
+    <div class="dato"><b>Tamaño</b><span id="tamano">—</span></div>
+    <div class="dato" id="filaEstado"><b>Riesgo</b><span id="estado">—</span></div>
+    <div class="dato"><b>Dónde</b><span id="donde">—</span></div>
+  </section>
+  <section class="tarjeta vacio" id="detalle">
+    <button class="cerrar" id="cerrarDetalle" aria-label="Cerrar">×</button>
+    <h2><span class="num" id="detalleNum">1</span><span id="detalleTitulo">—</span></h2>
+    <p id="detalleTexto">—</p>
+  </section>
+</div>
+
+<div id="mandos">
+  <button class="mando" id="btnGirar" type="button">Girar solo</button>
+  <button class="mando on" id="btnPuntos" type="button">Puntos</button>
+  <button class="mando" id="btnEncuadre" type="button">Reencuadrar</button>
+</div>
+<div id="pista">arrastra para girar · rueda o pellizco para acercar<br>toca un punto sobre el animal</div>
+
+<nav id="especies" aria-label="Los siete compañeros"></nav>
+<div id="velo">armando la criatura…</div>
+
+<script type="module" src="./visor.js"></script>
+</body>
+</html>

@@ -1,0 +1,187 @@
+<!doctype html>
+<html lang="es-CO">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#b6d1b3">
+<title>PÁRAMO VIVO</title>
+<style>
+  :root{
+    --ink:#e8f0da;
+    --ink-dim:#bfd0b5;
+    --paper:rgba(14,20,15,.66);
+    --paper-strong:rgba(247,241,222,.94);
+    --edge:rgba(255,255,255,.12);
+    --leaf:#86b55a;
+    --leaf2:#c3d395;
+    --soil:#4c5a39;
+    --soil2:#5f7346;
+    --warm:#f6d98c;
+  }
+  html,body{margin:0;height:100%;overflow:hidden;background:#0e1711;color:var(--ink);font-family:Georgia,"Times New Roman",serif}
+  body{touch-action:none;overscroll-behavior:none}
+  #app{
+    position:fixed;inset:0;overflow:hidden;
+    background:
+      radial-gradient(1200px 800px at 50% 12%, rgba(255,243,197,.18), transparent 52%),
+      radial-gradient(900px 520px at 50% 100%, rgba(103,146,82,.24), transparent 58%),
+      linear-gradient(180deg,#24392b 0%,#36523e 32%,#9ab38f 68%,#d8dfcf 100%);
+  }
+  canvas#game{
+    position:absolute;inset:0;width:100%;height:100%;display:block;
+    touch-action:none
+  }
+  #hud{
+    position:absolute;left:12px;top:12px;z-index:8;
+    max-width:min(92vw,440px);
+    background:linear-gradient(180deg,rgba(16,24,18,.82),rgba(12,16,13,.64));
+    border:1px solid rgba(255,255,255,.12);
+    border-radius:18px;padding:11px 13px 12px;
+    box-shadow:0 12px 32px rgba(0,0,0,.26);
+    backdrop-filter:blur(9px)
+  }
+  #brand{
+    display:flex;align-items:center;gap:10px;
+    letter-spacing:.1em;text-transform:uppercase;font-size:11px;color:var(--warm)
+  }
+  #brand .dot{
+    width:10px;height:10px;border-radius:50%;
+    background:radial-gradient(circle at 35% 35%, #fff5dd 0 18%, #d8b64f 26% 46%, #61471d 58% 100%);
+    box-shadow:0 0 16px rgba(248,212,111,.38)
+  }
+  #title{
+    margin:8px 0 4px;font-size:clamp(24px,5vw,46px);line-height:.94;font-style:italic;
+    letter-spacing:.01em;text-wrap:balance
+  }
+  #lead{
+    margin:0;font-size:14px;line-height:1.45;color:var(--ink-dim)
+  }
+  #chips{display:flex;flex-wrap:wrap;gap:7px;margin-top:10px}
+  .chip{
+    display:inline-flex;align-items:center;gap:6px;
+    border-radius:999px;padding:5px 9px;
+    background:rgba(255,255,255,.06);
+    border:1px solid rgba(255,255,255,.08);
+    color:#f4eecf;font-size:12px;line-height:1
+  }
+  .chip b{color:#fff3ca}
+  #perf{
+    position:absolute;right:12px;top:12px;z-index:8;
+    padding:8px 10px;border-radius:12px;
+    background:rgba(10,16,12,.66);border:1px solid rgba(255,255,255,.1);
+    color:#eff8e9;font:12px/1.25 monospace;white-space:pre;pointer-events:none
+  }
+  #detail{
+    position:absolute;right:12px;bottom:12px;z-index:8;
+    width:min(36vw,420px);min-width:280px;
+    background:linear-gradient(180deg,rgba(247,241,222,.95),rgba(232,223,195,.9));
+    color:#3a2717;border:2px solid rgba(68,43,22,.2);
+    border-radius:18px;padding:12px 13px 12px;
+    box-shadow:0 16px 34px rgba(0,0,0,.22)
+  }
+  #detail .kicker{
+    text-transform:uppercase;letter-spacing:.1em;font-size:11px;color:#785f31
+  }
+  #detail h2{
+    margin:6px 0 4px;font-size:18px;line-height:1.08;font-style:italic;color:#533219
+  }
+  #detail p{
+    margin:0;font-size:13px;line-height:1.45;color:#4b3421
+  }
+  #detail .tiny{
+    margin-top:8px;font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:#7a6446
+  }
+  #controls{
+    position:absolute;left:0;right:0;bottom:12px;z-index:9;
+    display:flex;justify-content:space-between;align-items:flex-end;gap:12px;
+    padding:0 12px;pointer-events:none
+  }
+  .pad{display:flex;gap:10px;pointer-events:auto}
+  .btn{
+    appearance:none;-webkit-appearance:none;
+    width:62px;height:62px;border-radius:18px;
+    border:1px solid rgba(255,244,214,.72);
+    background:linear-gradient(180deg,rgba(55,39,22,.9),rgba(19,13,8,.9));
+    color:#fff4d2;font-size:24px;font-weight:700;
+    box-shadow:0 10px 18px rgba(0,0,0,.24);
+    user-select:none;-webkit-user-select:none;touch-action:none
+  }
+  .btn:active,.btn.down{transform:translateY(2px) scale(.98)}
+  #goBtn{
+    width:130px;font-size:13px;letter-spacing:.06em;text-transform:uppercase
+  }
+  #goBtn strong{display:block;font-size:22px;line-height:1}
+  #hint{
+    position:absolute;left:50%;top:14px;transform:translateX(-50%);
+    z-index:9;padding:7px 12px;border-radius:999px;
+    background:rgba(240,235,214,.96);color:#3a2617;
+    border:2px solid rgba(48,31,18,.9);
+    box-shadow:0 10px 20px rgba(0,0,0,.2);
+    font-size:13px;opacity:0;transition:opacity .2s ease,transform .2s ease;
+    pointer-events:none
+  }
+  #hint.show{opacity:1;transform:translateX(-50%) translateY(0)}
+  #intro{
+    position:absolute;left:12px;bottom:92px;z-index:8;max-width:min(44vw,420px);
+    background:rgba(16,24,18,.52);border:1px solid rgba(255,255,255,.1);
+    border-radius:16px;padding:10px 12px;
+    box-shadow:0 10px 24px rgba(0,0,0,.2);backdrop-filter:blur(8px)
+  }
+  #intro strong{color:#fff1bf}
+  #intro p{margin:0;font-size:13px;line-height:1.45;color:#d4e1cf}
+  @media (max-width:760px){
+    #hud{max-width:calc(100vw - 24px)}
+    #detail{left:12px;right:12px;bottom:104px;width:auto;min-width:0}
+    #intro{left:12px;right:12px;bottom:92px;max-width:none}
+    .btn{width:58px;height:58px;border-radius:16px}
+    #goBtn{width:116px}
+  }
+</style>
+<script type="importmap">
+{
+  "imports": {
+    "three": "../../vendor/three.module.js",
+    "three/addons/": "../../vendor/addons/"
+  }
+}
+</script>
+</head>
+<body>
+<div id="app">
+  <canvas id="game"></canvas>
+  <div id="hud">
+    <div id="brand"><span class="dot"></span>Páramo vivo · juego #12</div>
+    <h1 id="title">PÁRAMO VIVO</h1>
+    <p id="lead">Camina despacio entre frailejones, rocas y fauna de altura. Toca un ser vivo para leer su ciencia. No hay puntaje: solo observación, paciencia y asombro.</p>
+    <div id="chips">
+      <span class="chip"><b>WASD</b> caminar</span>
+      <span class="chip"><b>Arrastre</b> mirar</span>
+      <span class="chip"><b>Espacio</b> tocar</span>
+    </div>
+  </div>
+  <div id="perf">FPS --</div>
+  <div id="detail">
+    <div class="kicker">Observación</div>
+    <h2 id="detailTitle">Acérquese a un frailejón o a un animal</h2>
+    <p id="detailBody">Cada punto del paisaje cuenta algo real. Toque un objeto para fijarlo y leer su ficha. El páramo domina el verde, pero el suelo nunca es una cobija uniforme.</p>
+    <div class="tiny" id="detailTiny">Firewatch + lámina de Humboldt</div>
+  </div>
+  <div id="hint" role="status" aria-live="polite"></div>
+  <div id="intro">
+    <p><strong>Consejo:</strong> mire el horizonte, luego acerque la cámara a una planta. El páramo responde lento. Si toca un frailejón verá por qué retiene agua: hojas muertas pegadas al tallo, roseta apical, crecimiento de alrededor de 1 cm por año.</p>
+  </div>
+  <div id="controls" aria-label="Controles">
+    <div class="pad">
+      <button class="btn" id="leftBtn" aria-label="Girar a la izquierda">◀</button>
+      <button class="btn" id="rightBtn" aria-label="Girar a la derecha">▶</button>
+    </div>
+    <div class="pad">
+      <button class="btn" id="fwdBtn" aria-label="Avanzar">▲</button>
+      <button class="btn" id="backBtn" aria-label="Retroceder">▼</button>
+      <button class="btn" id="goBtn" aria-label="Tocar objeto"><span>Tocar</span><strong>●</strong></button>
+    </div>
+  </div>
+</div>
+<script type="module" src="./main.js"></script>
+</body>
+</html>

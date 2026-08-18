@@ -1,0 +1,204 @@
+<!doctype html>
+<html lang="es-CO">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Índice de mundos (dev) — Chagra 3D</title>
+<style>
+  :root{
+    --bg:#0a0a0f; --fg:#e8e8f0; --card:#141826; --border:#232a3d; --border-hover:#3a4560;
+    --muted:rgba(232,232,240,.62); --accent:#8fd18f;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;min-height:100%;background:var(--bg);color:var(--fg);
+    font-family:system-ui,-apple-system,"Segoe UI",sans-serif}
+  body{padding:28px 16px 56px}
+  main{max-width:920px;margin:0 auto}
+  header{text-align:center;margin-bottom:36px}
+  h1{font-size:1.9rem;margin:0 0 8px;letter-spacing:.01em}
+  header p{opacity:.72;line-height:1.55;font-size:.98rem;max-width:560px;margin:0 auto}
+  h2{font-size:1.05rem;margin:0 0 14px;display:flex;align-items:center;gap:8px;font-weight:600}
+  h2 .ent{font-size:.78rem;font-weight:400;opacity:.55}
+  section{margin-bottom:34px}
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:12px}
+  .grid.principales{grid-template-columns:repeat(auto-fill,minmax(150px,1fr))}
+  a.card,span.card{display:block;padding:15px 16px;border-radius:14px;text-decoration:none;
+    color:#fff;background:var(--card);border:1px solid var(--border);transition:transform .15s,border-color .15s}
+  a.card:hover{transform:translateY(-2px);border-color:var(--border-hover)}
+  .card strong{display:block;font-size:.98rem;margin-bottom:3px;line-height:1.25}
+  .card span.desc{display:block;opacity:.62;font-size:.8rem}
+  span.card{opacity:.45;cursor:not-allowed}
+  span.card strong::after{content:" 🚧";opacity:.8}
+  span.card .desc{color:#e2a26b}
+  .badge-piso{display:inline-block;font-size:.68rem;padding:1px 7px;border-radius:999px;
+    background:rgba(143,209,143,.12);color:var(--accent);margin-top:6px}
+  footer{margin-top:40px;text-align:center;opacity:.4;font-size:.75rem;line-height:1.6}
+  footer a{color:var(--muted)}
+  .back{display:inline-block;margin-bottom:18px;color:var(--muted);text-decoration:none;font-size:.85rem}
+  .back:hover{color:var(--fg)}
+  .devnote{max-width:560px;margin:8px auto 0;font-size:.78rem;opacity:.5}
+</style>
+</head>
+<body>
+<main>
+  <a class="back" href="/">← Volver al valle</a>
+  <header>
+    <h1>Índice de mundos</h1>
+    <p>Ruta de desarrollo/utilidad — entrada directa a un mundo por su piso térmico, sin pasar
+       por el valle. La puerta real del sitio es <a href="/" style="color:var(--accent)">el valle
+       de Guatoc</a>: ahí cada mundo principal es un LUGAR del paisaje con su mojón, y el domo
+       abre la ventana de los nueve.</p>
+    <p class="devnote">Los nueve principales abren ahora su <strong>marco</strong>: el mundo 3D
+       + su Ent + el compañero + las pantallas 2D de ese mundo. Los que no tienen escena propia
+       entran igual y lo dicen — nunca se ocultan.</p>
+    <p class="devnote">Orden por piso térmico (<code>mundosPorPisoTermico.js</code>): cálido →
+       templado → frío → páramo.</p>
+  </header>
+
+  <section>
+    <h2>Lo principal</h2>
+    <div class="grid principales">
+      <a class="card" href="/animales/">
+        <strong>Los animales</strong>
+        <span class="desc">El corral, junto a la casa — el mundo 3D está roto, el marco lo dice y ofrece el gallinero</span>
+      </a>
+      <a class="card" href="/plantas/">
+        <strong>Las plantas</strong>
+        <span class="desc">Los bancales de la huerta — sin mundo propio; el marco lleva al invernadero</span>
+      </a>
+      <a class="card" href="/el-tiempo/">
+        <strong>El tiempo</strong>
+        <span class="desc">El alto despejado, desde donde se lee el cielo</span>
+      </a>
+      <a class="card" href="/vender/">
+        <strong>Vender</strong>
+        <span class="desc">Aguas abajo, por donde se sale del valle</span>
+      </a>
+      <a class="card" href="/finca/">
+        <strong>Toda mi finca</strong>
+        <span class="desc">El alto sobre la casa — sin vista completa sin sesión; el marco lleva al valle 2D</span>
+      </a>
+      <a class="card" href="/bosque/">
+        <strong>Bosque de tres estratos</strong>
+        <span class="desc">La ladera del flanco izquierdo · Ent: el aliso</span>
+      </a>
+      <a class="card" href="/paramo/">
+        <strong>El páramo</strong>
+        <span class="desc">La meseta, +586 m sobre la casa · Ent: la queñua</span>
+      </a>
+      <a class="card" href="/agua/">
+        <strong>El agua</strong>
+        <span class="desc">La quebrada — el mundo 3D está roto, el marco lo dice y ofrece el nacedero</span>
+      </a>
+      <a class="card" href="/abono/">
+        <strong>El abono</strong>
+        <span class="desc">Pegado al corral: el estiércol alimenta la compostera · Ent: el aliso</span>
+      </a>
+    </div>
+  </section>
+
+  <section>
+    <h2>Piso cálido <span class="ent">🌳 guardián: la ceiba</span></h2>
+    <div class="grid">
+      <a class="card" href="/mundo-botica-cana-3d/">
+        <strong>Botica de caña</strong>
+        <span class="desc">Trapiche, hornilla, panela</span>
+      </a>
+      <a class="card" href="/jaguar-monte-3d/">
+        <strong>Jaguar de monte</strong>
+        <span class="desc">El guardián del bosque bajo</span>
+      </a>
+    </div>
+  </section>
+
+  <section>
+    <h2>Piso templado <span class="ent">🌳 guardián: el roble</span></h2>
+    <div class="grid">
+      <a class="card" href="/cafetal-vivo-3d/">
+        <strong>Cafetal vivo</strong>
+        <span class="desc">Guacamaya, mariposas, cerezas</span>
+      </a>
+      <a class="card" href="/aguacatal-vivo-3d/">
+        <strong>Aguacatal vivo</strong>
+        <span class="desc">Camellones y casa de finca</span>
+      </a>
+      <a class="card" href="/mundo-abejas-3d/">
+        <strong>Las abejas</strong>
+        <span class="desc">Colmenar con apicultor</span>
+      </a>
+      <a class="card" href="/mundo-gallinero-3d/">
+        <strong>El gallinero</strong>
+        <span class="desc">Rotación de parcelas</span>
+      </a>
+      <a class="card" href="/casa-adentro/">
+        <strong>Casa adentro</strong>
+        <span class="desc">La cocina campesina, el fogón</span>
+      </a>
+      <a class="card" href="/valle-noche-3d/">
+        <strong>El valle de noche</strong>
+        <span class="desc">Casa, luna, luciérnaga</span>
+      </a>
+    </div>
+  </section>
+
+  <section>
+    <h2>Piso frío <span class="ent">🌳 guardián: el aliso</span></h2>
+    <div class="grid">
+      <a class="card" href="/papa-viva-3d/">
+        <strong>Papa viva</strong>
+        <span class="desc">Cosecha criolla</span>
+      </a>
+      <a class="card" href="/invernadero-vivo-3d/">
+        <strong>Invernadero vivo</strong>
+        <span class="desc">Túnel de guadua</span>
+      </a>
+      <a class="card" href="/lecheria-viva-3d/">
+        <strong>Lechería viva</strong>
+        <span class="desc">Potrero, quesera, biodigestor</span>
+      </a>
+    </div>
+  </section>
+
+  <section>
+    <h2>Páramo <span class="ent">🌳 guardián: la queñua</span></h2>
+    <div class="grid">
+      <a class="card" href="/paramo-definitivo/">
+        <strong>Páramo definitivo</strong>
+        <span class="desc">Frailejones en niebla</span>
+      </a>
+    </div>
+  </section>
+
+  <section>
+    <h2>General y vitrinas</h2>
+    <div class="grid">
+      <a class="card" href="/micorrizas-3d/">
+        <strong>Micorrizas</strong>
+        <span class="desc">El internet del bosque</span>
+      </a>
+      <a class="card" href="/cara-prod/">
+        <strong>Abrir la tranquera</strong>
+        <span class="desc">La puerta de entrada</span>
+      </a>
+      <a class="card" href="/vitrina-3d/">
+        <strong>Vitrina 3D</strong>
+        <span class="desc">Galería rubber-hose</span>
+      </a>
+      <a class="card" href="/vitrina-infra/">
+        <strong>Vitrina de infraestructura</strong>
+        <span class="desc">Catálogo por familias</span>
+      </a>
+      <a class="card" href="/infraestructura-3d/">
+        <strong>Infraestructura</strong>
+        <span class="desc">Medidas y materiales</span>
+      </a>
+    </div>
+  </section>
+
+  <footer>
+    guatoc.co · sitio público, sin datos reales de personas ni fincas ·
+    índice ordenado por piso térmico (<code>mundosPorPisoTermico.js</code>)
+  </footer>
+</main>
+</body>
+</html>
