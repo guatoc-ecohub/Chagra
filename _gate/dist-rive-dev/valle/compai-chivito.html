@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<link rel="icon" href="data:,">
+<title>El Chivito del compAI — el rango en un parámetro · Valle de Guatoc</title>
+<!--
+  Página de APROBACIÓN del chivito 2D del compAI (2026-08-07).
+
+  LA TESIS QUE ESTA PÁGINA DEMUESTRA (o refuta): el rango reposo↔actuando
+  no necesita dos dibujos como el jaguar — es UN PARÁMETRO CONTINUO.
+  `--rango: 0` es el animal posado y digno; `--rango: 1` es el actor
+  rubber-hose en vuelo; y TODO punto intermedio es una pose legible,
+  porque la cresta, las alas, la postura, las patitas, el flote y los
+  brazos son funciones calc() del mismo número.
+
+  La sección EL BARRIDO monta el mismo rig cinco veces con el dial
+  clavado en 0 · ¼ · ½ · ¾ · 1: esa franja ES la evidencia de la tesis.
+  El deslizador mueve el dial en vivo.
+
+  El montaje replica a `marco.js` A PROPÓSITO: shadow DOM, poses leídas
+  del propio CSS del rig (posesDelRig), scheduler con elegirSinRepetir de
+  `compai/gestos.js`, y el recorte de esquina por getBBox de `#chivito`.
+  Si esta página anda, el contrato del valle anda.
+-->
+<style>
+  :root{
+    --tinta:#2c2318;
+    --papel:#e7dcbc;
+    --pared:#242a21;
+    --oro:#d9b83e;
+    --crema:#f2e8cd;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html,body{height:100%}
+  body{
+    font-family:Georgia,'Times New Roman',serif;
+    background:
+      radial-gradient(1200px 700px at 50% 30%, #303829 0%, var(--pared) 60%, #181c15 100%);
+    color:var(--crema);
+    min-height:100vh;
+    display:flex;flex-direction:column;align-items:center;
+    overflow-x:hidden;
+  }
+  header{text-align:center;padding:18px 16px 6px}
+  header h1{font-size:clamp(20px,3.2vw,32px);font-style:italic;letter-spacing:1px;color:#f2e8cd}
+  header p{margin-top:4px;font-size:clamp(11px,1.5vw,14px);letter-spacing:3px;text-transform:uppercase;color:#b8b294}
+  header p em{text-transform:none;letter-spacing:.5px;color:#d8c294}
+
+  /* la lámina cuelga de la pared, grande */
+  #salon{position:relative;width:min(96vw,1500px);margin:10px auto 6px}
+  #lamina{
+    display:block;width:100%;aspect-ratio:1680/960;
+    background:var(--papel);
+    border:10px solid #3a2c18;
+    outline:2px solid #171008;
+    box-shadow:0 24px 60px rgba(0,0,0,.55), inset 0 0 0 1px #8a7452;
+    border-radius:2px;
+  }
+
+  /* la vista de ESQUINA: el mismo rig recortado a #chivito, como en marco.js */
+  #esquina{
+    position:absolute;right:14px;bottom:14px;width:clamp(110px,14vw,190px);aspect-ratio:3/4;
+    background:rgba(231,220,188,.92);
+    border:3px solid var(--tinta);border-radius:14px;
+    box-shadow:0 10px 26px rgba(0,0,0,.5);
+    overflow:hidden;
+  }
+  #esquina figcaption{
+    position:absolute;left:0;right:0;bottom:0;text-align:center;
+    font-size:10px;letter-spacing:1.5px;text-transform:uppercase;
+    color:#3c2c14;background:rgba(242,232,205,.9);padding:3px 2px;
+  }
+
+  /* la burbuja del hablar */
+  #burbuja{
+    position:absolute;left:50%;top:16%;transform:translateX(-50%) translateY(10px) scale(.92);
+    max-width:min(420px,70%);z-index:6;
+    background:#fffaf0;border:3px solid var(--tinta);border-radius:18px;
+    padding:12px 18px;font-size:clamp(13px,1.7vw,17px);line-height:1.45;font-style:italic;
+    color:#241a10;box-shadow:4px 5px 0 rgba(44,35,24,.3);
+    opacity:0;transform-origin:50% 120%;
+    transition:opacity .35s ease,transform .35s cubic-bezier(.34,1.56,.64,1);
+    pointer-events:none;
+  }
+  #burbuja.visible{opacity:1;transform:translateX(-50%) translateY(0) scale(1)}
+  #burbuja::after{
+    content:'';position:absolute;left:50%;bottom:-13px;width:20px;height:20px;margin-left:-10px;
+    background:#fffaf0;border-right:3px solid var(--tinta);border-bottom:3px solid var(--tinta);
+    transform:rotate(45deg) skew(10deg,10deg);
+  }
+
+  /* consola de poses: el dial hecho botones */
+  #consola{
+    width:min(96vw,1500px);margin:8px auto 4px;
+    display:flex;gap:14px;flex-wrap:wrap;justify-content:center;align-items:stretch;
+  }
+  .banda{
+    background:rgba(242,232,205,.06);border:1px solid rgba(216,194,148,.28);
+    border-radius:14px;padding:10px 14px 12px;min-width:200px;
+  }
+  .banda h2{
+    font-size:11px;letter-spacing:3px;text-transform:uppercase;font-weight:normal;
+    color:#b8b294;text-align:center;margin-bottom:8px;
+  }
+  .banda .fila{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;align-items:center}
+  button.pose{
+    font-family:inherit;font-size:clamp(12px,1.5vw,15px);font-style:italic;
+    padding:8px 16px;border-radius:99px;cursor:pointer;
+    background:#f2e8cd;color:#2c2318;border:2px solid #2c2318;
+    box-shadow:0 3px 0 #2c2318;transition:transform .12s ease,box-shadow .12s ease;
+  }
+  button.pose:hover{transform:translateY(-2px);box-shadow:0 5px 0 #2c2318}
+  button.pose:active{transform:translateY(1px);box-shadow:0 1px 0 #2c2318}
+  button.pose.on{background:var(--oro);font-weight:bold}
+  .banda.actua button.pose{background:#f6e2a8}
+  .banda.actua button.pose.on{background:var(--oro)}
+  .banda.auto button.pose{background:#cfd8b4}
+  .banda.auto button.pose.on{background:#9ec27e;font-weight:bold}
+
+  /* EL DIAL EN VIVO */
+  .banda.dial{min-width:280px}
+  #dial{width:200px;accent-color:var(--oro);cursor:pointer}
+  #dialVal{font-size:14px;color:#d8c294;min-width:44px;display:inline-block;text-align:center}
+
+  #estadoHud{
+    text-align:center;margin:0 0 10px;font-size:13px;letter-spacing:2px;
+    text-transform:uppercase;color:#8a8a6c;
+  }
+  #estadoHud b{color:#d8c294;letter-spacing:3px}
+
+  /* ═══ EL BARRIDO: la tesis en una franja — 5 pasos del mismo dibujo ═══ */
+  #tesis{width:min(96vw,1500px);margin:4px auto 26px;text-align:center}
+  #tesis h2{
+    font-size:12px;letter-spacing:4px;text-transform:uppercase;font-weight:normal;
+    color:#b8b294;margin-bottom:8px;
+  }
+  #barrido{
+    display:flex;gap:10px;justify-content:center;align-items:stretch;
+    background:rgba(242,232,205,.06);border:1px solid rgba(216,194,148,.28);
+    border-radius:14px;padding:12px;
+  }
+  .paso{flex:1;max-width:220px;min-width:120px}
+  .pasoRig{
+    width:100%;aspect-ratio:3/4;display:block;
+    background:rgba(231,220,188,.92);
+    border:3px solid var(--tinta);border-radius:12px;overflow:hidden;
+  }
+  .paso figcaption{
+    margin-top:5px;font-size:11px;letter-spacing:2px;color:#b8b294;
+  }
+  .paso figcaption b{color:#d8c294}
+
+  @media (max-width:720px){
+    #esquina{display:none}
+    .paso{min-width:96px}
+  }
+</style>
+</head>
+<body>
+<header>
+  <h1>El Chivito del compAI — el rango en un parámetro</h1>
+  <p>reposo digno ↔ actuando caricatura: <em>un solo número, el mismo dibujo</em></p>
+</header>
+
+<div id="salon">
+  <div id="lamina"></div>
+  <figure id="esquina">
+    <div id="esquinaRig" style="width:100%;height:100%"></div>
+    <figcaption>así viaja de compañero</figcaption>
+  </figure>
+  <div id="burbuja"></div>
+</div>
+
+<div id="consola">
+  <div class="banda real">
+    <h2>El animal — reposo digno</h2>
+    <div class="fila" id="filaReal"></div>
+  </div>
+  <div class="banda actua">
+    <h2>Cuando actúa</h2>
+    <div class="fila" id="filaActua"></div>
+  </div>
+  <div class="banda dial">
+    <h2>El dial, a mano</h2>
+    <div class="fila">
+      <input id="dial" type="range" min="0" max="100" value="0">
+      <span id="dialVal">—</span>
+      <button class="pose" id="btSoltar">soltar</button>
+    </div>
+  </div>
+  <div class="banda auto">
+    <h2>Su vida propia</h2>
+    <div class="fila"><button class="pose" id="btAuto">azar del núcleo</button></div>
+  </div>
+</div>
+<p id="estadoHud">pose: <b id="poseActual">—</b></p>
+
+<section id="tesis">
+  <h2>El barrido — cinco puntos del mismo dial, el mismo dibujo</h2>
+  <div id="barrido"></div>
+</section>
+
+<script src="./assets/guia-chivito-lamina.js"></script>
+<script type="module">
+  /* ── EL MISMO MONTAJE QUE marco.js — si esto anda, el valle anda ── */
+  const arte = window.GUIA_CHIVITO_LAMINA;
+  const $ = (s) => document.querySelector(s);
+
+  /* Las poses las declara el PROPIO rig en su CSS: no hay tabla a mano
+     (misma regla y mismo regex que posesDelRig en marco.js). */
+  function posesDelRig(a) {
+    const vistas = new Set(); const re = /data-estado=["']([a-z]+)["']/g;
+    let m; while ((m = re.exec(a.css || '')) !== null) vistas.add(m[1]);
+    return [...vistas];
+  }
+  const POSES_NARRATIVAS = new Set(['amenaza', 'acecho', 'invocacion', 'degradado', 'niebla', 'pacto', 'hablar']);
+  /* En ESTA lámina, además, las del tramo alto del dial van en su banda. */
+  const POSES_ACTUACION = new Set(['guino', 'liba', 'hablar']);
+
+  const disponibles = posesDelRig(arte);
+  const reposo = disponibles.filter((p) => !POSES_NARRATIVAS.has(p));
+
+  function montar(host, recortarA) {
+    const root = host.shadowRoot || host.attachShadow({ mode: 'open' });
+    root.innerHTML =
+      '<style>' + arte.css + ':host{display:block;overflow:hidden}'
+      + 'svg{width:100%;height:100%;display:block}</style>'
+      + '<svg viewBox="' + (arte.lienzo || '0 0 1680 960') + '" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg">'
+      + '<defs>' + arte.defs + '</defs>' + arte.svg + '</svg>';
+    if (recortarA) encuadrar(root, recortarA, 45);
+    return host;
+  }
+  /* clon fiel de encuadrar() de marco.js: getBBox con reintento */
+  function encuadrar(root, nucleoId, m, intento) {
+    let b = null;
+    try {
+      const n = root.getElementById(nucleoId) || root.querySelector('svg > g');
+      b = n && n.getBBox();
+    } catch (e) { b = null; }
+    if (b && b.width > 1 && b.height > 1) {
+      root.querySelector('svg').setAttribute('viewBox',
+        (b.x - m).toFixed(0) + ' ' + (b.y - m).toFixed(0) + ' ' +
+        (b.width + 2 * m).toFixed(0) + ' ' + (b.height + 2 * m).toFixed(0));
+      return;
+    }
+    if ((intento || 0) < 20) setTimeout(() => encuadrar(root, nucleoId, m, (intento || 0) + 1), 60);
+  }
+
+  const lamina = montar($('#lamina'), null);
+  const esquina = montar($('#esquinaRig'), 'chivito');
+
+  /* ═══ EL BARRIDO: cinco montajes del MISMO rig con el dial clavado.
+     El estilo inline --rango le gana a cualquier :host([data-estado]) —
+     por eso estos cinco no necesitan pose: son puntos puros del parámetro. */
+  const PASOS = [0, 0.25, 0.5, 0.75, 1];
+  for (const t of PASOS) {
+    const fig = document.createElement('figure');
+    fig.className = 'paso';
+    const rig = document.createElement('div');
+    rig.className = 'pasoRig';
+    rig.style.setProperty('--rango', String(t));
+    fig.appendChild(rig);
+    const cap = document.createElement('figcaption');
+    cap.innerHTML = '--rango: <b>' + t + '</b>';
+    fig.appendChild(cap);
+    $('#barrido').appendChild(fig);
+    montar(rig, 'chivito');
+  }
+
+  /* ── el dial por poses ── */
+  const burbuja = $('#burbuja');
+  let ocultarBurbuja = null;
+  const LINEAS = [
+    'Ese es nuestro pacto: si usted cuida el frailejón, me cuida a mí, cuida a mis polluelos… y cuida el agua que baja del páramo.',
+    'Fíjese en mi barba y en mi cresta: solo las tenemos los chivitos. Y la cresta le cuenta mi ánimo entero.',
+    'Cuando libo las flores del frailejón lo polinizo: él me da néctar y yo lo ayudo a florecer. Así trabajamos juntos.',
+  ];
+  let linea = 0;
+  function decir(texto) {
+    burbuja.textContent = texto;
+    burbuja.classList.add('visible');
+    if (ocultarBurbuja) clearTimeout(ocultarBurbuja);
+    ocultarBurbuja = setTimeout(() => burbuja.classList.remove('visible'), Math.min(16000, Math.max(7000, texto.length * 86 + 1200)));
+  }
+
+  const HOSTS = [$('#lamina'), $('#esquinaRig')];
+  let auto = false;
+  let autoTimer = null;
+  function ponerPose(p, desdeAuto) {
+    if (!desdeAuto) pararAuto();
+    for (const host of HOSTS) {
+      host.style.removeProperty('--rango');   /* la pose recupera el dial */
+      host.setAttribute('data-estado', p);
+    }
+    $('#dial').value = '0'; $('#dialVal').textContent = '—';
+    $('#poseActual').textContent = p + (POSES_ACTUACION.has(p) ? ' · actúa' : ' · animal');
+    document.querySelectorAll('button.pose[data-p]').forEach((b) => b.classList.toggle('on', b.dataset.p === p));
+    if (p === 'hablar') decir(LINEAS[(linea++) % LINEAS.length]);
+    else burbuja.classList.remove('visible');
+  }
+
+  /* el dial A MANO: estilo inline sobre los dos rigs grandes */
+  function ponerRango(t) {
+    for (const host of HOSTS) host.style.setProperty('--rango', String(t));
+    $('#dialVal').textContent = t.toFixed(2);
+    $('#poseActual').textContent = 'dial ' + t.toFixed(2);
+  }
+  function soltarRango() {
+    for (const host of HOSTS) host.style.removeProperty('--rango');
+    $('#dialVal').textContent = '—';
+  }
+  $('#dial').addEventListener('input', (e) => { pararAuto(); ponerRango(e.target.value / 100); });
+  $('#btSoltar').addEventListener('click', () => { soltarRango(); ponerPose('respira'); });
+
+  /* botones desde el repertorio REAL del rig, nunca de una lista a mano */
+  for (const p of disponibles) {
+    const bt = document.createElement('button');
+    bt.type = 'button'; bt.className = 'pose'; bt.dataset.p = p; bt.textContent = p;
+    bt.addEventListener('click', () => ponerPose(p));
+    (POSES_ACTUACION.has(p) ? $('#filaActua') : $('#filaReal')).appendChild(bt);
+  }
+
+  /* ── SU VIDA PROPIA: el azar del núcleo, igual que en marco.js ──
+     elegirSinRepetir viene de compai/gestos.js — EL MISMO módulo ESM sin
+     dependencias que usa la PWA. Eso es lo que esta página certifica. */
+  const { elegirSinRepetir } = await import('./compai/gestos.js');
+  let previa = reposo[0] || 'respira';
+  function pararAuto() {
+    auto = false; if (autoTimer) clearTimeout(autoTimer);
+    $('#btAuto').classList.remove('on');
+  }
+  function tickAuto() {
+    if (!auto) return;
+    if (document.hidden) { autoTimer = setTimeout(tickAuto, 4000); return; }
+    previa = elegirSinRepetir(reposo, previa) || previa;
+    ponerPose(previa, true);
+    autoTimer = setTimeout(tickAuto, 4200 + Math.random() * 5200);
+  }
+  $('#btAuto').addEventListener('click', () => {
+    if (auto) { pararAuto(); return; }
+    auto = true; $('#btAuto').classList.add('on'); tickAuto();
+  });
+
+  /* arranque: el animal digno, y a los 2 s su vida propia */
+  ponerPose(reposo[0] || 'respira');
+  setTimeout(() => { if (!auto) { auto = true; $('#btAuto').classList.add('on'); tickAuto(); } }, 2400);
+
+  /* gancho para la sonda del gate */
+  window.__chivitoPoses = {
+    disponibles,
+    reposo,
+    poner: (p) => ponerPose(p),
+    rango: (t) => ponerRango(t),
+    soltar: () => soltarRango(),
+  };
+</script>
+</body>
+</html>

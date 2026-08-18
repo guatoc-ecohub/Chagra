@@ -1,0 +1,65 @@
+{
+  "species_slug": "fragaria_vesca",
+  "scientific_name": "Fragaria vesca L.",
+  "common_names": [
+    "Fresa silvestre andina"
+  ],
+  "family": "Rosaceae",
+  "category": "frutales_perennes",
+  "cultivable": true,
+  "conservation_status": "nativo_silvestre",
+  "thermal_zones": [
+    "frio",
+    "templado"
+  ],
+  "roles_in_guild": [
+    "crop",
+    "ground_cover"
+  ],
+  "antagonists": [],
+  "especies_nativas_sustitutas": [],
+  "propagation": {
+    "metodo_principal": "estolon",
+    "notas": "Se reproduce vegetativamente por estolones; tambien por semilla pero con menor tasa de exito. Variantes andinas adaptadas a mayor altitud que la europea."
+  },
+  "requirements": {
+    "agua": "medio",
+    "altitud_msnm": {
+      "min_absoluto": 1800,
+      "optimo_min": 2500,
+      "optimo_max": 3300,
+      "max_absoluto": 3700
+    },
+    "temperatura_c": {
+      "helada_letal": -8,
+      "optimo_min": 8,
+      "optimo_max": 18,
+      "max_tolerable": 24
+    },
+    "radiacion": "sombra_parcial",
+    "drenaje_requerido": "bueno"
+  },
+  "valor_pedagogico": "El fruto escondido: la fresa silvestre crece a ras del suelo en los bordes del bosque andino, ensenando que los mejores alimentos a veces estan donde menos se espera. Su estolon es leccion de reproduccion asexual.",
+  "sources": [
+    {
+      "id": "powo-kew",
+      "title": "powo-kew",
+      "tier": "A",
+      "url": "https://powo.science.kew.org"
+    },
+    {
+      "id": "gbif-colombia",
+      "title": "gbif-colombia",
+      "tier": "A",
+      "url": "https://www.gbif.org/country/CO"
+    },
+    {
+      "id": "humboldt-flora-alto-andina",
+      "title": "humboldt-flora-alto-andina",
+      "tier": "A",
+      "url": null
+    }
+  ],
+  "_generated_by": "scripts/build-cycle-content-from-catalog.mjs",
+  "_generated_at": "2026-05-19T00:42:57.370Z"
+}
