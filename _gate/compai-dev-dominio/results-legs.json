@@ -1,0 +1,29 @@
+{
+  "shots": [
+    {
+      "p": "/home/kortux/Workspace/chagra/_gate/compai-dev-dominio/marcha-limpia-00_agt-caminando_tx-431.png",
+      "agt": "caminando",
+      "tx": -431
+    },
+    {
+      "p": "/home/kortux/Workspace/chagra/_gate/compai-dev-dominio/marcha-limpia-01_agt-caminando_tx-421.png",
+      "agt": "caminando",
+      "tx": -421
+    },
+    {
+      "p": "/home/kortux/Workspace/chagra/_gate/compai-dev-dominio/marcha-limpia-02_agt-caminando_tx-410.png",
+      "agt": "caminando",
+      "tx": -410
+    },
+    {
+      "p": "/home/kortux/Workspace/chagra/_gate/compai-dev-dominio/marcha-limpia-03_agt-caminando_tx-400.png",
+      "agt": "caminando",
+      "tx": -400
+    },
+    {
+      "p": "/home/kortux/Workspace/chagra/_gate/compai-dev-dominio/marcha-limpia-04_agt-caminando_tx-391.png",
+      "agt": "caminando",
+      "tx": -391
+    }
+  ]
+}

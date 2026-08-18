@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Milpa tres hermanas — harness de gate</title>
+<!--
+  Harness de gate para lib3d/flora/milpaTresHermanas.js (tarea ARTE #28).
+  Patrón calcado de cafetal-sombra.html (mismo HUD, misma cámara controlable,
+  mismo terreno y sol para que la vara de hectáreas sea comparable).
+  Vistas por query param:
+    ?vista=suelo     (default) DENTRO de la milpa a altura de persona (1,62 m):
+                     se juzgan las paredes de maíz, el fríjol en las cañas y la
+                     calabaza cubriendo el suelo — no vista de dron.
+    ?vista=frijol    UNA mata de cerca: el fríjol TREPANDO la caña — se tiene
+                     que leer que la guía es el maíz (hélice + trifoliadas).
+    ?vista=calabaza  la hoja de calabaza en primer plano: la cobertura del suelo.
+    ?vista=perf&lado=N   lote de N×N m, cámara a ras — barrido de hectáreas
+                     (misma vara que cafetal-perf: lado 800 = 64 ha).
+  El viento corre siempre. HUD con FPS/tris/calls; window.__stats para shot3d.
+-->
+<style>
+  html, body { margin: 0; height: 100%; background: #cfd8b8; overflow: hidden; }
+  #hud {
+    position: fixed; left: 10px; top: 10px; z-index: 5;
+    font: 12px/1.5 monospace; color: #2a2416; background: rgba(255,252,240,.75);
+    padding: 6px 10px; border-radius: 6px; white-space: pre;
+  }
+  #hud.error { background: #c0392b; color: #fff; }
+</style>
+<script type="importmap">
+{
+  "imports": {
+    "three": "./vendor/three.module.js",
+    "three/addons/": "./vendor/addons/"
+  }
+}
+</script>
+</head>
+<body>
+<div id="hud">cargando…</div>
+<script type="module">
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import {
+  crearMilpa, crearMataMilpa, crearCalabaza, configurarSolMilpa,
+  FICHA_MILPA, PALETA_MILPA,
+} from './lib3d/flora/milpaTresHermanas.js';
+import { tickVientoMundos } from './lib3d/flora/vientoMundos.js';
+
+const hud = document.getElementById('hud');
+window.addEventListener('error', (e) => {
+  hud.classList.add('error');
+  hud.textContent = 'ERROR: ' + (e.message || e.type);
+});
+
+const q = new URLSearchParams(location.search);
+const vista = q.get('vista') || 'suelo';
+const seedQ = Number(q.get('seed')) || 28;
+const lado = Number(q.get('lado')) || 80;
+// ?hud=0 → capturas limpias para juicio ciego: el juez lee píxeles, no letras
+if (q.get('hud') === '0') hud.style.display = 'none';
+
+// ── escena: mediodía templado, cielo cálido con niebla suave (misma vara) ────
+// (suelo 0.007→0.0085: el juez señaló CERO perspectiva aérea — el fondo era el
+// mismo verde del frente, solo más oscuro)
+const COLOR_CIELO = 0xdfe6c6;
+const NIEBLA_DENS = vista === 'perf' ? 0.010 : 0.0085;
+const escena = new THREE.Scene();
+escena.background = new THREE.Color(COLOR_CIELO);
+escena.fog = new THREE.FogExp2(COLOR_CIELO, NIEBLA_DENS);
+
+// V2-B4 DEL JUICIO (3ª pasada): "cielo quemado plano en las tres tomas — es un
+// clear color, no un cielo". Domo gradiente: horizonte cálido = COLOR_CIELO
+// (así el fundido con la niebla sigue siendo continuo) que sube a un azul
+// suave de mediodía, con halo cálido leve hacia el sol. Barato: 1 draw call.
+{
+  const mSky = new THREE.ShaderMaterial({
+    side: THREE.BackSide, depthWrite: false, fog: false,
+    uniforms: {
+      cHor: { value: new THREE.Color(COLOR_CIELO) },
+      cCen: { value: new THREE.Color('#a9c8e0') },
+      cSol: { value: new THREE.Color('#fdf3d3') },
+      dSol: { value: new THREE.Vector3(26, 42, 14).normalize() },
+    },
+    vertexShader: /* glsl */`
+      varying vec3 vDir;
+      void main() {
+        vDir = normalize(position);
+        gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+      }`,
+    fragmentShader: /* glsl */`
+      uniform vec3 cHor, cCen, cSol, dSol;
+      varying vec3 vDir;
+      void main() {
+        vec3 d = normalize(vDir);
+        float t = clamp(d.y, 0.0, 1.0);
+        vec3 c = mix(cHor, cCen, pow(t, 0.58));
+        float halo = pow(max(dot(d, dSol), 0.0), 14.0);
+        c = mix(c, cSol, halo * 0.5);
+        gl_FragColor = vec4(c, 1.0);
+        #include <colorspace_fragment>
+      }`,
+  });
+  const sky = new THREE.Mesh(new THREE.SphereGeometry(430, 32, 18), mSky);
+  sky.name = 'cielo-gradiente';
+  escena.add(sky);
+}
+
+const renderer = new THREE.WebGLRenderer({ antialias: true });
+renderer.setSize(innerWidth, innerHeight);
+renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure = 1.1;
+document.body.appendChild(renderer.domElement);
+
+const camara = new THREE.PerspectiveCamera(52, innerWidth / innerHeight, 0.1, 500);
+const controles = new OrbitControls(camara, renderer.domElement);
+
+// luz: sol alto y cálido — la sombra rota del maíz sobre la hoja de calabaza
+// abajo ES la historia de la milpa (shadowMap activo, dice el módulo)
+//
+// B1 DEL JUICIO CIEGO (2026-08-07): la banda negra. Con hemi 0.75 y piso
+// 0x4a4630 la cara en sombra de una hoja caía a rgb(3,20,1) contra rgb(88,136,42)
+// al sol — ratio 10:1 con pérdida total de croma; el 19% de la toma desde el
+// suelo quedaba bajo el 10% de luminancia. El fríjol estaba MODELADO y APAGADO.
+// Arreglo en tres partes, sin tocar un vértice:
+//  · hemisférica con REBOTE DE TIERRA real: el suelo de una milpa a mediodía
+//    devuelve mucha luz cálida al envés de las hojas (piso 0x8a7d52, no carbón)
+//  · sol 2.0 → 1.75 (la cara al sol ya estaba bien; el problema era la sombra)
+//  · relleno direccional frío-verdoso desde el lado contrario, SIN sombra
+const hemi = new THREE.HemisphereLight(0xf5eeda, 0x8a7d52, 1.15);
+escena.add(hemi);
+const sol = new THREE.DirectionalLight(0xfff0d0, 1.75);
+sol.position.set(26, 42, 14);
+sol.castShadow = true;
+sol.shadow.mapSize.set(4096, 4096);
+const S = vista === 'perf' ? 90 : 55;
+sol.shadow.camera.left = -S; sol.shadow.camera.right = S;
+sol.shadow.camera.top = S; sol.shadow.camera.bottom = -S;
+sol.shadow.camera.far = 160;
+// B2: la línea negra dura pegada a la guía era acné/peter-panning del shadow
+// map sobre geometría delgada; normalBias lo despega sin desprender la sombra
+sol.shadow.bias = -0.0003;
+sol.shadow.normalBias = 0.02;
+escena.add(sol);
+const relleno = new THREE.DirectionalLight(0xcfe0aa, 0.4);
+relleno.position.set(-30, 22, -26);
+escena.add(relleno);
+
+// V4 DEL JUICIO — bloqueante confirmado del eje 2: "el envés negro del maíz se
+// come el tercio izquierdo de milpa-desde-suelo.png; no es una hoja oscura, es
+// una mancha NEGRA con facetas duras que lee cartón quemado plegado o un
+// agujero en la imagen". Y peor: como el viento mece esa hoja, la mancha puede
+// caer en CUALQUIER parte de cualquier captura desde el suelo.
+// La escena tiene que decirle al módulo DÓNDE está el sol: sin eso la lámina
+// no puede saber cuándo está a contraluz y solo le queda un piso emisivo
+// plano, que es exactamente lo que se fue a negro en la v4.
+configurarSolMilpa({ direccion: sol.position, color: sol.color, fuerza: 1.0 });
+
+// ── la ladera: pendiente suave hacia -Z + ruido (los surcos van a nivel) ─────
+// idéntica a la del cafetal para que el barrido de hectáreas sea comparable
+function hashS(x, z) {
+  const h = Math.sin(x * 127.1 + z * 311.7) * 43758.5453;
+  return h - Math.floor(h);
+}
+function vnoiseS(x, z) {
+  const xi = Math.floor(x), zi = Math.floor(z), xf = x - xi, zf = z - zi;
+  const u = xf * xf * (3 - 2 * xf), v = zf * zf * (3 - 2 * zf);
+  const a = hashS(xi, zi), b = hashS(xi + 1, zi), c = hashS(xi, zi + 1), d = hashS(xi + 1, zi + 1);
+  return a + (b - a) * u + (c - a) * v + (a - b - c + d) * u * v;
+}
+const alturaEn = (x, z) => -z * 0.085 + vnoiseS(x * 0.04, z * 0.04) * 1.6;
+const plano = vista === 'frijol' || vista === 'calabaza';
+const alturaVista = plano ? () => 0 : alturaEn;   // las vitrinas de cerca, a piso llano
+
+{
+  const L = vista === 'perf' ? Math.max(lado * 1.3, 160) : 150;
+  const geo = new THREE.PlaneGeometry(L, L, 96, 96);
+  geo.rotateX(-Math.PI / 2);
+  const P = geo.attributes.position, n = P.count;
+  const col = new Float32Array(n * 3);
+  // suelo de milpa: tierra fértil que la calabaza está cubriendo
+  const cA = new THREE.Color(PALETA_MILPA.tierra);
+  const cB = new THREE.Color(PALETA_MILPA.tierraClara);
+  const cC = new THREE.Color('#46351f');
+  const tmp = new THREE.Color();
+  // A12 del juicio: el suelo era un plano liso. Dos octavas de mancha + terrones
+  // oscuros + vetas claras de tierra seca — sigue barato (color por vértice).
+  for (let i = 0; i < n; i++) {
+    const x = P.getX(i), z = P.getZ(i);
+    P.setY(i, alturaVista(x, z));
+    const m = hashS(x * 0.31, z * 0.31);
+    tmp.copy(cA).lerp(cB, vnoiseS(x * 0.2, z * 0.2) * 0.75 + vnoiseS(x * 1.6 + 7, z * 1.6) * 0.35);
+    if (m > 0.8) tmp.lerp(cC, 0.5);
+    if (m < 0.07) tmp.lerp(cB, 0.6);
+    if (vnoiseS(x * 0.9 + 31, z * 0.9) > 0.78) tmp.lerp(cC, 0.35);
+    col[i * 3] = tmp.r; col[i * 3 + 1] = tmp.g; col[i * 3 + 2] = tmp.b;
+  }
+  geo.setAttribute('color', new THREE.BufferAttribute(col, 3));
+  geo.computeVertexNormals();
+  const matSuelo = new THREE.MeshStandardMaterial({
+    vertexColors: true, roughness: 1, metalness: 0,
+  });
+  // V4 DEL JUICIO: "el suelo es un lavado café PLANO sin grano, sin piedra, sin
+  // hojarasca — ~40% del cuadro en la toma de calabaza, lee cartón
+  // desenfocado". El color por vértice no podía arreglarlo: la malla tiene un
+  // vértice cada 1,56 m y el grano de una tierra vive en el centímetro.
+  // Se resuelve en el FRAGMENTO, que es donde vive esa escala: tres octavas de
+  // grano + terrones oscuros + hojarasca seca. Un material, cero texturas.
+  // Efecto lateral que importa para la MASA: con el suelo con grano y más
+  // oscuro, los huecos entre láminas dejan de ser losas planas de cartón.
+  matSuelo.onBeforeCompile = (sh) => {
+    sh.vertexShader = sh.vertexShader
+      .replace('#include <common>', '#include <common>\nvarying vec3 vSueloW;')
+      .replace('#include <begin_vertex>',
+        '#include <begin_vertex>\nvSueloW = (modelMatrix * vec4(transformed, 1.0)).xyz;');
+    sh.fragmentShader = sh.fragmentShader
+      .replace('#include <common>', `#include <common>
+        varying vec3 vSueloW;
+        float hS(vec2 p){ return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
+        float vnS(vec2 p){
+          vec2 i = floor(p), f = fract(p); f = f * f * (3.0 - 2.0 * f);
+          return mix(mix(hS(i), hS(i + vec2(1,0)), f.x),
+                     mix(hS(i + vec2(0,1)), hS(i + vec2(1,1)), f.x), f.y);
+        }`)
+      .replace('#include <color_fragment>', `#include <color_fragment>
+        {
+          vec2 q = vSueloW.xz;
+          // antialias analítico: en rasante, una octava cuyo periodo cae bajo
+          // la huella del píxel no da grano, da RAYAS de moaré (se vieron en la
+          // primera prueba v5, el suelo lejano leía a veta de madera). fwidth
+          // da esa huella y cada octava se apaga cuando ya no la resuelve.
+          float fw = max(fwidth(q.x), fwidth(q.y)) + 1e-5;
+          float a1 = smoothstep(0.060, 0.016, fw);
+          float a2 = smoothstep(0.170, 0.045, fw);
+          float grano = 0.5 + (vnS(q * 41.0) - 0.5) * 0.50 * a1
+                            + (vnS(q * 15.0) - 0.5) * 0.32 * a2
+                            + (vnS(q * 4.7) - 0.5) * 0.18;
+          float terron = smoothstep(0.60, 0.94, vnS(q * 8.0 + 13.0));
+          float paja   = smoothstep(0.78, 0.98, vnS(q * 27.0 + 71.0)) * a1;
+          diffuseColor.rgb *= 0.66 + 0.60 * grano;
+          diffuseColor.rgb = mix(diffuseColor.rgb, diffuseColor.rgb * vec3(0.50,0.44,0.38), terron * 0.72);
+          diffuseColor.rgb = mix(diffuseColor.rgb, vec3(0.235,0.190,0.098), paja * 0.55);
+        }`);
+  };
+  const suelo = new THREE.Mesh(geo, matSuelo);
+  suelo.receiveShadow = true;
+  escena.add(suelo);
+}
+
+// ── vistas ───────────────────────────────────────────────────────────────────
+let milpa = null;
+
+if (vista === 'frijol') {
+  // EL FRÍJOL TREPANDO LA CAÑA, de cerca: una mata héroe al frente y dos
+  // atrás para profundidad. Se tiene que leer la hélice abrazando la caña.
+  const mata = crearMataMilpa({ seed: seedQ });
+  mata.position.set(0, 0, 0);
+  escena.add(mata);
+  [[-1.6, -1.9], [1.5, -2.3]].forEach(([x, z], i) => {
+    const otra = crearMataMilpa({ seed: seedQ + 41 + i * 37 });
+    otra.position.set(x, 0, z);
+    escena.add(otra);
+  });
+  const cal = crearCalabaza({ seed: seedQ + 7 });
+  cal.position.set(0.9, 0, 1.1);
+  escena.add(cal);
+  // az 4.6: el juez de la 2ª pasada señaló que la hélice se leía en la caña
+  // SECUNDARIA — "el encuadre vende peor de lo que el modelo da". Desde este
+  // azimut los pases del cordón cruzan de frente la caña héroe.
+  // v5 — d 1.15→0.95 y ojo 0.95→1.15 (target 0.85→1.05): con la trifoliada por
+  // fin construida hay un segundo rasgo que probar en la misma toma, y a 1,15 m
+  // de distancia y altura de rodilla las hojas-cinta del maíz tapaban TODAS las
+  // trifoliadas. Subir el ojo a 1,15 m mete el estrato de nudos del fríjol en
+  // cuadro sin perder el abrazo (la hélice sigue cruzando de frente).
+  const azQ = Number(q.get('az')) || 4.6;      // azimut de cámara (rad)
+  const dQ = Number(q.get('d')) || 0.95;        // distancia
+  const hQ = Number(q.get('h')) || 1.15;        // altura de ojo
+  const tQ = Number(q.get('t')) || 1.05;        // altura del target
+  camara.position.set(Math.cos(azQ) * dQ, hQ, Math.sin(azQ) * dQ);
+  controles.target.set(0, tQ, 0);
+} else if (vista === 'calabaza') {
+  // LA HOJA DE CALABAZA en primer plano: la cobertura del suelo. Cámara baja,
+  // dos matas de maíz detrás dan contexto (y su sombra rota sobre las hojas).
+  // escenografía (V2-B2): las matas ROTAN para que al menos una ahuyama (que
+  // cuelga del final de la guía 0 de cada mata) caiga EN CUADRO con la cámara
+  // canónica — el fruto existía y quedaba de espaldas a la cámara.
+  // rc0..rc2 por query param para re-encuadrar sin tocar código.
+  // rc0 5.1 (4ª pasada): con la hoja v4 cordada el 3.1 de la 3ª dejaba el
+  // primer plano pelado y la plomería expuesta; a 5.1 la hoja héroe queda
+  // centro-frente mostrando escote + pecíolo al borde + lóbulos, con la
+  // ahuyama asomando detrás — la toma prueba exactamente lo que se juzga
+  const rotsCal = [
+    Number(q.get('rc0') ?? 5.1), Number(q.get('rc1') ?? 2.1), Number(q.get('rc2') ?? 0),
+  ];
+  // &solo=c0|c1|c2|m0|m1|m2 (debug): muestra SOLO esa pieza — para atribuir
+  // una intersección/astilla a su dueño sin adivinar (probe de la 4ª pasada)
+  const solo = q.get('solo');
+  // 4ª pasada: las hojas de una mata ATRAVESABAN las ahuyamas de la vecina
+  // (probe solo=c1: los frutos solos estaban limpios; la astilla era de c0).
+  // Se encadenan los frutos ya sembrados como frutosAjenos de la siguiente,
+  // en orden 1→2→0 para que la mata de primer plano (c0, la de las guías más
+  // largas) quede protegida contra los DOS juegos de frutos.
+  const posCal = [[0, 0], [-1.1, 0.7], [0.9, -0.8]];
+  const frutosMundo = [];
+  for (const i of [1, 2, 0]) {
+    const [x, z] = posCal[i];
+    const ry = rotsCal[i] || 0;
+    const c = Math.cos(ry), s = Math.sin(ry);
+    const ajenos = frutosMundo.map((f) => {
+      const dx = f.x - x, dz = f.z - z;                 // mundo → local (des-rotar por −ry)
+      return { x: dx * c - dz * s, z: dx * s + dz * c, R: f.R };
+    });
+    const cal = crearCalabaza({ seed: seedQ + i * 53, frutosAjenos: ajenos });
+    cal.position.set(x, 0, z);
+    cal.rotation.y = ry;
+    if (solo != null) cal.visible = solo === 'c' + i;
+    escena.add(cal);
+    for (const f of cal.userData.frutos || []) {        // local → mundo
+      frutosMundo.push({ x: x + f.x * c + f.z * s, z: z - f.x * s + f.z * c, R: f.R });
+    }
+  }
+  // la mata en +X queda del lado del sol: su sombra ROTA cae sobre las hojas
+  // (esa es la historia de la milpa, dice el propio módulo)
+  [[2.4, 0.5], [-1.3, -2.2], [1.2, -2.6]].forEach(([x, z], i) => {
+    const mata = crearMataMilpa({ seed: seedQ + 11 + i * 29 });
+    mata.position.set(x, 0, z);
+    if (solo != null) mata.visible = solo === 'm' + i;
+    escena.add(mata);
+  });
+  // cámara parametrizable (mismo contrato que vista=frijol) para poder
+  // verificar fruto/pedúnculo/zarcillos sin tocar el encuadre canónico
+  const cxC = Number(q.get('cx')) || 0.95;
+  const cyC = Number(q.get('h')) || 0.52;
+  const czC = Number(q.get('cz')) || 1.05;
+  camara.position.set(cxC, cyC, czC);
+  controles.target.set(
+    Number(q.get('tx')) || -0.3,
+    Number(q.get('ty')) || 0.15,
+    Number(q.get('tz')) || -0.4);
+} else if (vista === 'perf' && q.get('sin') === '1') {
+  // baseline: suelo + luces sin milpa (para aislar el costo del módulo)
+  camara.position.set(28.5, 1.9, 2.3);
+  controles.target.set(-20, 1.55, 0.6);
+} else {
+  const half = (vista === 'perf' ? lado : 80) / 2;
+  milpa = crearMilpa({
+    area: { x0: -half, x1: half, z0: -half, z1: half },
+    alturaEn, seed: seedQ,
+    libre: (() => true),
+    niebla: { color: COLOR_CIELO, densidad: NIEBLA_DENS, fuerza: 0.9 },
+    corte: vista === 'perf' ? 150 : 170,
+    // en la vitrina desde el suelo el TAPIZ manda (V2-B1); el barrido de perf
+    // conserva 2.6 para que la vara de hectáreas siga comparable entre pasadas.
+    // v8.2 PROBÓ 1.9 y se revirtió: +301 calabazas héroe = +1M tris en cuadro
+    // (el héroe trae la sotocapa del cierre v7) y el anillo no lo puede pagar
+    // — los tiles de 10 m delante de la cámara no salen del anillo ni a
+    // R11,5. El hueco se cierra por ESCALA (módulo): misma área foliar,
+    // menos matas.
+    calabazaCada: vista === 'perf' ? 2.6 : 2.1,
+    // v8 — el 2º bejuco por mata se paga con CULLING, no con presupuesto que
+    // no hay: a radioDetalle 14 la escena quedó en 13,2M tris y 30-32 FPS
+    // (el blob v7 congelado del juicio dio 56 FPS con 11,5M bajo la misma GPU
+    // en el mismo minuto: el techo era el vsync, no había margen). Anillo
+    // héroe 14→12,5 m SOLO en la vitrina (tris ∝ R² → ~10,5M): los fades del
+    // manto escalan con radioDetalle por diseño. El barrido perf conserva 14.
+    radioDetalle: vista === 'perf' ? 14 : 12.5,
+  });
+  escena.add(milpa.grupo);
+  window.__milpa = milpa.conteo;
+  // desde el SUELO, altura de persona (1,62 m), por la calle entre surcos:
+  // paredes de maíz a los lados, calabaza cubriendo abajo — no vista de dron
+  // canon 3ª pasada: calle de cz=3.9 (más abierta que la de 1.7) y la mirada
+  // PICA al suelo (target CERCA y BAJO, tx=18/ty=0.3, no en el horizonte):
+  // la única toma que puede probar el SISTEMA de tres cultivos tiene que
+  // mostrar el tapiz de calabaza además de la pared de maíz (V2-B1: "esto es
+  // un maizal, no una milpa"). Altura de persona intacta: 1.62 m.
+  const cxQ = Number(q.get('cx')) || 25;
+  const czQ = Number(q.get('cz')) || 3.9;
+  const tzQ = Number(q.get('tz')) || 3.9;
+  const hQ = Number(q.get('h')) || 1.62;    // B6: para perf, poder sacar la cámara de dentro de una hoja
+  const txQ = Number(q.get('tx')) || 18;
+  const tyQ = Number(q.get('ty')) || 0.3;
+  camara.position.set(cxQ, alturaEn(cxQ, czQ) + hQ, czQ);
+  controles.target.set(txQ, alturaEn(txQ, tzQ) + tyQ, tzQ);
+}
+controles.update();
+
+// ── loop ─────────────────────────────────────────────────────────────────────
+const reloj = new THREE.Clock();
+let fps = 0, marco = 0, tAcum = 0;
+function loop() {
+  requestAnimationFrame(loop);
+  const dt = reloj.getDelta();
+  tickVientoMundos(reloj.elapsedTime);
+  if (milpa) milpa.actualizar(camara);
+  controles.update();
+  renderer.render(escena, camara);
+  marco++; tAcum += dt;
+  if (tAcum >= 0.5) {
+    fps = Math.round(marco / tAcum);
+    marco = 0; tAcum = 0;
+    const inf = renderer.info.render;
+    hud.textContent =
+      `vista: ${vista}\n${fps} FPS · ${inf.triangles.toLocaleString('es')} tris · ${inf.calls} calls`
+      + (milpa ? `\n${JSON.stringify({ ...window.__milpa, tilesVivos: milpa.stats().tilesVivos })}` : '')
+      + `\n${FICHA_MILPA.maiz.cientifico} + ${FICHA_MILPA.frijol.cientifico} + ${FICHA_MILPA.calabaza.cientifico}`;
+    window.__stats = { fps, tris: inf.triangles, calls: inf.calls, vista };
+  }
+}
+loop();
+
+// Contrato de gate: la escena y el arranque quedan observables sin cambiar el
+// render. El reloj de viento ya lo publica vientoMundos.js por frame.
+window.__scene = escena;
+window.__ARRANQUE_OK = true;
+
+addEventListener('resize', () => {
+  camara.aspect = innerWidth / innerHeight;
+  camara.updateProjectionMatrix();
+  renderer.setSize(innerWidth, innerHeight);
+});
+</script>
+</body>
+</html>

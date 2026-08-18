@@ -1,0 +1,98 @@
+{
+  "species_slug": "gaiadendron_punctatum",
+  "scientific_name": "Gaiadendron punctatum (Ruiz & Pav.) G. Don",
+  "common_names": [
+    "Chuque"
+  ],
+  "family": "Loranthaceae",
+  "category": "arboles_sombra",
+  "cultivable": false,
+  "conservation_status": "nativo_silvestre",
+  "thermal_zones": [
+    "frio"
+  ],
+  "roles_in_guild": [
+    "pollinator_attractor",
+    "biomass_producer"
+  ],
+  "antagonists": [
+    "eucalyptus_globulus",
+    "pinus_patula"
+  ],
+  "especies_nativas_sustitutas": [],
+  "propagation": {
+    "methods": [
+      "semilla"
+    ],
+    "best_method": "semilla",
+    "protocol_resumen": "Propagación por semilla fresca de bayas amarillo-anaranjadas (dispersión ornitócora — aves alto-andinas dispersan en sus heces sobre raíces de otras plantas). Germinación 30-60 días en sustrato turba-arena CON RAÍCES DE PLANTA HOSPEDANTE disponibles (encenillo, mortiño, raque, frailejón pueden funcionar como hospedante facultativo). Trasplante 6-8 meses. Plantación 18-24 meses. NO se establece sin presencia de raíces hospedantes en el suelo. Crecimiento lento 30-50 cm/año.",
+    "tiempo_a_establecimiento_dias": 600,
+    "notas": "Especie HEMIPARÁSITA FACULTATIVA TERRESTRE — único árbol-muérdago colombiano que parasita raíces de otras plantas vía haustorios subterráneos, NO es epífita como los muérdagos arbóreos Loranthaceae típicos (Aetanthus, Tristerix, Phthirusa). Caso botánico raro y didáctico."
+  },
+  "requirements": {
+    "agua": "medio",
+    "altitud_msnm": {
+      "min_absoluto": 2200,
+      "optimo_min": 2500,
+      "optimo_max": 3200,
+      "max_absoluto": 3500
+    },
+    "temperatura_c": {
+      "helada_letal": -8,
+      "optimo_min": 6,
+      "optimo_max": 14,
+      "max_tolerable": 20
+    },
+    "radiacion": "sol_pleno",
+    "drenaje_requerido": "bueno"
+  },
+  "valor_pedagogico": "Gaiadendron punctatum (Ruiz & Pav.) G. Don (chuque, sietelechos, gaiadendron — familia Loranthaceae) es un árbol-arbusto perennifolio (3-8 m altura) HEMIPARÁSITO FACULTATIVO TERRESTRE — el ÚNICO árbol-muérdago colombiano que parasita raíces de otras plantas vía HAUSTORIOS SUBTERRÁNEOS, no es epífita como los muérdagos arbóreos típicos de Loranthaceae (Aetanthus, Tristerix, Phthirusa) que viven sobre las ramas. Distribución amplia: Andes desde Costa Rica hasta Bolivia (Colombia, Ecuador, Perú, Venezuela, Bolivia, Costa Rica, Panamá). En Colombia se encuentra en Cundinamarca, Boyacá, Antioquia, Nariño, Cauca y Santander entre 2200 y 3500 msnm en piso térmico FRÍO de bosque alto andino y subpáramo. Sus FLORES TUBULARES AMARILLO-ANARANJADAS VISTOSAS (4-5 cm de largo) son polinizadas por COLIBRÍES alto-andinos (Pterophanes cyanopterus, Eriocnemis vestita, Heliangelus exortis, Coeligena bonapartei) — coevolución colibrí-flor de neta importancia ecológica en la red de polinizadores del subpáramo. Sus BAYAS AMARILLO-ANARANJADAS son dispersadas por aves frugívoras alto-andinas que defecan las semillas pegajosas sobre raíces de otras plantas — donde germinan y se enchufan al sistema radicular del hospedante mediante haustorios. Lección viva sobre HEMIPARASITISMO TERRESTRE ÚNICO, COEVOLUCIÓN COLIBRÍ-FLOR ANDINA y RESTAURACIÓN DE NICHOS BIOLÓGICOS RAROS: el chuque es uno de los ejemplos más extraordinarios de la flora colombiana — combina hemiparasitismo terrestre (caso evolutivo raro en Loranthaceae, familia mayormente epífita), polinización ornitófila especializada con colibríes alto-andinos y dispersión ornitócora con aves frugívoras. Su presencia es BIOINDICADORA de un bosque alto andino con red trófica intacta: necesita simultáneamente plantas hospedantes (encenillo, mortiño, queñoa), colibríes polinizadores Y aves dispersoras — la pérdida de cualquiera de los tres rompe su ciclo reproductivo. En restauración avanzada de Cruz Verde-Sumapaz, Chingaza e Iguaque, el chuque se planta SOLO en sitios con hospedantes ya establecidos (no en restauración primaria de pasturas degradadas) y en densidades bajas 30-80 ind/ha (es especie rara, no dominante en el ecosistema natural). Etnobotánica: el nombre 'sietelechos' aludía en la tradición campesina muisca-andina al látex blanquecino que aparece al cortar la corteza (mito popular de 'siete lechosas') — usado en cocimientos tópicos para heridas. Manejo agroecológico: propagación por semilla fresca con hospedantes presentes; trasplante 6-8 meses; plantación 18-24 meses; crecimiento 30-50 cm/año; inoculación con sustrato de bosque nativo; restauración tardía con encenillo, mortiño y queñoa como hospedantes facultativos; densidades 30-80 ind/ha. Fuentes Tier A: POWO Kew, GBIF Backbone Taxonomy, GBIF Colombia, Humboldt Flora Alto-Andina, Libro Rojo Plantas Colombia, Bernal 2015 Catálogo Plantas Líquenes Colombia, Humboldt 2016 Frailejones.",
+  "companions_markdown": "### Especies asociadas favorables\n\nEstas especies favorecen el cultivo cuando se siembran cerca:\n- hesperomeles_goudotiana — Esmeralda chiquita (Hesperomeles goudotiana (Decne.) Killip)\n- polylepis_quadrijuga — Coloradito, queñoa de páramo Cruz Verde (Polylepis quadrijuga Bitter)\n- weinmannia_tomentosa — Encenillo (Weinmannia tomentosa L. f.)",
+  "antagonists_markdown": "### Antagonistas (no asociar)\n\nEvite sembrar estas especies cerca; compiten o comparten plagas/patógenos:\n- eucalyptus_globulus — Eucalipto blanco (Eucalyptus globulus Labill.)\n- pinus_patula — Pino pátula (Pinus patula Schiede ex Schltdl. & Cham.)",
+  "sources": [
+    {
+      "id": "powo-kew",
+      "title": "powo-kew",
+      "tier": "A",
+      "url": "https://powo.science.kew.org"
+    },
+    {
+      "id": "gbif-taxonomic-backbone",
+      "title": "gbif-taxonomic-backbone",
+      "tier": "A",
+      "url": "https://www.gbif.org/dataset/d7dddbf4-2cf0-4f39-9b2a-bb099caae36c"
+    },
+    {
+      "id": "gbif-colombia",
+      "title": "gbif-colombia",
+      "tier": "A",
+      "url": "https://www.gbif.org/country/CO"
+    },
+    {
+      "id": "humboldt-flora-alto-andina",
+      "title": "humboldt-flora-alto-andina",
+      "tier": "A",
+      "url": null
+    },
+    {
+      "id": "libro-rojo-plantas-colombia",
+      "title": "libro-rojo-plantas-colombia",
+      "tier": "A",
+      "url": null
+    },
+    {
+      "id": "bernal-2015-plantas-liquenes-colombia",
+      "title": "bernal-2015-plantas-liquenes-colombia",
+      "tier": "A",
+      "url": "http://catalogoplantasdecolombia.unal.edu.co"
+    },
+    {
+      "id": "humboldt-2016-frailejones",
+      "title": "humboldt-2016-frailejones",
+      "tier": "A",
+      "url": "https://www.humboldt.org.co"
+    }
+  ],
+  "_generated_by": "scripts/build-cycle-content-from-catalog.mjs",
+  "_generated_at": "2026-05-19T00:42:57.403Z"
+}

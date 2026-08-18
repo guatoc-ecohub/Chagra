@@ -1,0 +1,216 @@
+<!doctype html>
+<html lang="es-CO">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Cámara de bienvenida — banco de pruebas del vuelo de entrada</title>
+<!--
+  BANCO DE PRUEBAS DE LA CÁMARA DE BIENVENIDA (2026-08-07)
+  ═══════════════════════════════════════════════════════════════════════════
+  Para qué sirve: el vuelo de entrada de 11 s pasa cerca de la cara de La
+  Chorrera y ahí las copas de `cliff.js` se leen como POLIEDROS con las caras
+  contables (viola «follaje = MASA»). Este banco congela los puntos de ese
+  vuelo y pone el medidor al lado, para iterar sin volver a armar andamio.
+
+  Tres cosas que NO son obvias y por las que existe esta página:
+
+  1. EL VALLE VIVO ES `index.html` → `main.js` → `cliff.js`.
+     `impostores-valle.html` → `main-impostores.js` → `cliff-impostores.js` es
+     OTRO build: el de los impostores, REVERTIDO en `d681f6c` porque dejaba la
+     ladera semipelada. Medir ahí y concluir sobre el valle vivo es medir al
+     lado. Este banco carga el VIVO.
+
+  2. SIN SALTARSE EL ONBOARDING NO HAY VUELO. Con el onboarding sin resolver,
+     `main.js` deja `introStart = null` («telón quieto») y la cámara se congela
+     en el punto 0. Por eso acá se pre-siembra localStorage ANTES de crear el
+     iframe: mismo origen, así que basta con escribirlo desde el padre.
+
+  3. EL MEDIDOR DE DRAW CALLS SE LEE MAL SI SE LEE SUELTO. El minimapa hace su
+     propio `render()` de último y resetea `renderer.info`; un rAF que lea
+     después ve `calls = 1`. Medido. Acá se apaga `info.autoReset` y se toma el
+     PICO del frame antes de resetear a mano.
+
+  4. LOS GUÍAS SE ROBAN LA CÁMARA. `paseo.js` se lleva el encuadre a los 10 s de
+     quietud, y `controls.enabled = false` NO lo frena — lo frena su propio
+     predicado `libre()`, que exige `!camMode`. Por eso el iframe se carga
+     SIEMPRE con `?cam=aoe`: apaga el paseo, salta el vuelo de 11 s y suelta la
+     cámara al instante. La escena es la misma; `cam` sólo elige el encuadre
+     inicial. (Costó una pasada: el primer intento posaba bien y a los 10 s se
+     encontraba mirando el corral.)
+
+  Presets = puntos REALES muestreados del vuelo (posición + cuaternión), no
+  encuadres inventados. Se aplican con `__ctl.enabled = false` para que el
+  bucle de `main.js` no los pise.
+-->
+<style>
+  :root{--tinta:#e9ecf2;--fondo:#0b0d12;--panel:rgba(12,15,22,.86);--borde:rgba(255,255,255,.14);--ok:#7fd88a;--mal:#ff8f6b;--tibio:#ffd479}
+  html,body{margin:0;height:100%;background:var(--fondo);color:var(--tinta);font-family:system-ui,-apple-system,"Segoe UI",sans-serif;overflow:hidden}
+  #marco{position:fixed;inset:0;border:0;width:100%;height:100%;display:block}
+  #panel{position:fixed;left:12px;top:12px;z-index:20;background:var(--panel);border:1px solid var(--borde);
+    border-radius:10px;padding:10px 12px;backdrop-filter:blur(8px);max-width:min(92vw,430px);
+    box-shadow:0 8px 30px rgba(0,0,0,.5);font-size:.8rem;line-height:1.45}
+  #panel h1{margin:0 0 6px;font-size:.85rem;letter-spacing:.02em;font-weight:650}
+  #panel p{margin:0 0 8px;opacity:.72;font-size:.72rem;line-height:1.4}
+  .fila{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:8px}
+  button{font:inherit;font-size:.72rem;padding:5px 9px;border-radius:999px;cursor:pointer;
+    background:rgba(255,255,255,.07);color:var(--tinta);border:1px solid var(--borde);transition:background .15s}
+  button:hover{background:rgba(255,255,255,.16)}
+  button.act{background:var(--tibio);color:#1a1408;border-color:transparent;font-weight:600}
+  button.ctrl{border-color:rgba(127,216,138,.5)}
+  #medidor{font-family:ui-monospace,"JetBrains Mono",monospace;font-size:.72rem;line-height:1.55;
+    border-top:1px solid var(--borde);padding-top:8px;white-space:pre}
+  .val{color:var(--tibio)}
+  #nota{margin-top:8px;font-size:.68rem;opacity:.6;border-top:1px solid var(--borde);padding-top:7px}
+  #plegar{position:absolute;right:8px;top:8px;padding:2px 8px;font-size:.7rem}
+  #panel.mini p,#panel.mini .fila,#panel.mini #nota{display:none}
+</style>
+</head>
+<body>
+
+<iframe id="marco" title="Valle de Guatoc"></iframe>
+
+<div id="panel">
+  <button id="plegar" title="plegar/desplegar">–</button>
+  <h1>Cámara de bienvenida · banco de pruebas</h1>
+  <p>Puntos reales del vuelo de entrada de <b>main.js</b> (el valle VIVO, con <code>cliff.js</code>).
+  Los tres primeros son el tramo denunciado: las copas se leen como poliedros y se les cuentan las caras.
+  Los dos marcados en verde son el <b>control</b>: la misma geometría a la distancia para la que fue diseñada.</p>
+
+  <div class="fila" id="botones"></div>
+
+  <div id="medidor">esperando al valle…</div>
+  <div id="nota">
+    FPS = fotogramas contados dentro del iframe durante 1 s.
+    Ruido medido en este valle: ±16 FPS entre tomas seguidas — <b>una diferencia menor a eso no es señal</b>.
+    Vara de la casa: el cafetal sostiene 60 FPS hasta 64 ha.
+  </div>
+</div>
+
+<script>
+// ── 1. saltarse el onboarding ANTES de que el iframe cargue ────────────────
+// (mismo origen: el localStorage que escribe el padre es el que lee el hijo)
+try {
+  localStorage.setItem('guatoc.guia', 'jaguar');
+  localStorage.setItem('guatoc.onboarding.v1', '1');
+} catch (e) { /* modo privado: el vuelo se queda en el punto 0, se avisa abajo */ }
+
+// ── 2. los puntos del vuelo, muestreados del valle vivo ────────────────────
+// pos + quat tal cual los tenía la cámara en ese instante del vuelo.
+const PRESETS = [
+  { id:'b1', txt:'1 · telón alto',        pos:[807.937,1153.271,527.777], quat:[-0.269078, 0.234425, 0.067703,0.931696] },
+  { id:'b2', txt:'2 · bajando',           pos:[572.044, 719.050,244.541], quat:[-0.212938, 0.211221, 0.047205,0.952793] },
+  { id:'b3', txt:'3 · ⚠ el cuadro malo',  pos:[281.330, 350.828,-205.384],quat:[-0.149934, 0.167948, 0.025854,0.973984] },
+  { id:'b4', txt:'4 · paso de Chorrera',  pos:[ 20.182, 197.090,-605.519],quat:[-0.133918,-0.002226,-0.000301,0.990990] },
+  { id:'ctl-aoe', txt:'CONTROL · panorámica (cam=aoe)', ctrl:true,
+    pos:[-19.834, 892.730, 734.210], quat:[-0.284015, 0, 0, 0.958820] },
+  { id:'ctl-suelo', txt:'CONTROL · a ras de suelo (cam=guatoc)', ctrl:true, url:'./index.html?cam=guatoc' },
+];
+
+const marco = document.getElementById('marco');
+const medidor = document.getElementById('medidor');
+const cont = document.getElementById('botones');
+// `?p=<id>` elige el preset desde la URL — necesario para que `shot3d` pueda
+// capturar un preset concreto sin clickear (el gate corre sin manos).
+let activo = new URLSearchParams(location.search).get('p') || 'b3';
+if (!PRESETS.some((p) => p.id === activo)) activo = 'b3';
+
+for (const p of PRESETS) {
+  const b = document.createElement('button');
+  b.textContent = p.txt;
+  b.className = (p.ctrl ? 'ctrl ' : '') + (p.id === activo ? 'act' : '');
+  b.onclick = () => aplicar(p.id);
+  b.dataset.id = p.id;
+  cont.appendChild(b);
+}
+
+function preset(id) { return PRESETS.find((p) => p.id === id); }
+
+// `?cam=aoe` es el portador de TODOS los presets del vuelo: apaga el paseo de
+// los guías y entrega la cámara sin esperar los 11 s. Ver la nota 4 de arriba.
+const BASE = './index.html?cam=aoe';
+
+function aplicar(id) {
+  activo = id;
+  for (const b of cont.children) b.classList.toggle('act', b.dataset.id === id);
+  const p = preset(id);
+  // los presets con URL propia recargan el iframe; los demás se posan encima
+  // del estado ya cargado, que es MUCHO más rápido para iterar.
+  const destino = p.url || BASE;
+  if (marco.dataset.url !== destino) { marco.dataset.url = destino; marco.src = destino; }
+  else posar();
+}
+
+// ── 3. posar la cámara ─────────────────────────────────────────────────────
+// Se apaga `controls.enabled`: el bucle de main.js sólo mueve la cámara en la
+// rama `else if (controls.enabled)`, así que con eso apagado el encuadre queda
+// clavado y no hay que pelear con el rAF del hijo.
+function posar() {
+  const w = marco.contentWindow;
+  const p = preset(activo);
+  if (!w || !w.__cam || !p || p.url) return false;
+  if (w.__ctl) w.__ctl.enabled = false;
+  w.__cam.position.set(p.pos[0], p.pos[1], p.pos[2]);
+  w.__cam.quaternion.set(p.quat[0], p.quat[1], p.quat[2], p.quat[3]);
+  w.__cam.updateMatrixWorld(true);
+  return true;
+}
+
+// ── 4. el medidor ──────────────────────────────────────────────────────────
+// draw calls: `info.autoReset = false` + pico del frame + reset a mano.
+// Si se lee suelto, el render del minimapa (que va de último) deja calls=1.
+let armado = false, frames = 0, t0 = 0, fps = 0, calls = 0, tris = 0, vueloListo = false;
+
+function armar() {
+  const w = marco.contentWindow;
+  if (!w || !w.__r) return false;
+  w.__r.info.autoReset = false;
+  t0 = performance.now(); frames = 0;
+  const tick = () => {
+    if (marco.contentWindow !== w) return;      // el iframe se recargó: este bucle muere
+    const i = w.__r.info.render;
+    if (i.calls > 0) { calls = i.calls; tris = i.triangles; }
+    w.__r.info.reset();
+    frames++;
+    const dt = performance.now() - t0;
+    if (dt >= 1000) { fps = +(frames / (dt / 1000)).toFixed(1); frames = 0; t0 = performance.now(); }
+    w.requestAnimationFrame(tick);
+  };
+  w.requestAnimationFrame(tick);
+  return true;
+}
+
+function pintar() {
+  const w = marco.contentWindow;
+  const c = w && w.__cam;
+  const p = preset(activo);
+  const pr = (w && w.__pr) ? w.__pr() : null;
+  medidor.innerHTML =
+    `FPS        <span class="val">${fps || '—'}</span>${p && p.ctrl ? '   (control)' : ''}\n` +
+    `draw calls <span class="val">${calls || '—'}</span>\n` +
+    `triángulos <span class="val">${tris ? (tris / 1e6).toFixed(2) + ' M' : '—'}</span>\n` +
+    `pixelRatio <span class="val">${pr ? pr.pr.toFixed(2) : '—'}</span>\n` +
+    `cámara     <span class="val">${c ? [c.position.x, c.position.y, c.position.z].map((n) => n.toFixed(0)).join(', ') : '—'}</span>\n` +
+    `preset     <span class="val">${p ? p.txt : '—'}</span>`;
+}
+
+setInterval(() => {
+  if (!armado) armado = armar();
+  // se re-posa hasta que agarre (el módulo del valle puede no estar listo aún)
+  if (armado && !vueloListo && preset(activo) && !preset(activo).url) vueloListo = posar();
+  pintar();
+}, 500);
+
+marco.addEventListener('load', () => {
+  armado = false; vueloListo = false; fps = 0; calls = 0; tris = 0;
+});
+
+document.getElementById('plegar').onclick = (e) => {
+  const pn = document.getElementById('panel');
+  pn.classList.toggle('mini');
+  e.target.textContent = pn.classList.contains('mini') ? '+' : '–';
+};
+
+aplicar(activo);
+</script>
+</body>
+</html>

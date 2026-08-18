@@ -1,0 +1,16 @@
+{
+  "wrap": "zariguyaWrap",
+  "pielKart": {
+    "cuerpo": { "fill": "#8a8073" },
+    "cuerpo2": { "fill": "#c9bda4" },
+    "cabeza": { "fill": "#f3e8d2" },
+    "detalle": { "fill": "#5d554b" },
+    "extras": {
+      "lomo": { "fill": "#6b6257" },
+      "rosaPiel": { "fill": "#e9a3bb" },
+      "trufa": { "fill": "#e8879b" },
+      "cria": { "fill": "#9a9083" },
+      "pabellon": { "fill": "#3b322b" }
+    }
+  }
+}

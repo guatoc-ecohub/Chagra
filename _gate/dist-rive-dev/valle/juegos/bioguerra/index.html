@@ -1,0 +1,285 @@
+<!doctype html>
+<html lang="es-CO">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#123a22">
+<title>BIOGUERRA: Defensa de la Chagra</title>
+<style>
+  :root{
+    --bg0:#0a1d11;
+    --bg1:#12321c;
+    --bg2:#1e4a27;
+    --bg3:#6c8f3d;
+    --ink:#f4ecd7;
+    --ink-dim:#d6e1bf;
+    --soil:#5b3d26;
+    --soil2:#7c5a35;
+    --leaf:#2f6b35;
+    --leaf2:#4f8c45;
+    --leaf3:#87b85c;
+    --warn:#f2c85b;
+    --danger:#e06b53;
+    --panel:rgba(8,16,10,.74);
+    --panel2:rgba(21,33,18,.84);
+    --line:rgba(255,255,255,.09);
+  }
+  html,body{margin:0;height:100%;overflow:hidden;background:#06120a;color:var(--ink);font-family:Georgia,"Times New Roman",serif}
+  body{touch-action:none;overscroll-behavior:none}
+  #app{
+    position:fixed;inset:0;overflow:hidden;
+    background:
+      radial-gradient(1200px 760px at 50% 18%, rgba(233,223,164,.15), transparent 50%),
+      radial-gradient(900px 540px at 18% 0%, rgba(91,150,72,.12), transparent 45%),
+      linear-gradient(180deg,var(--bg0) 0%,var(--bg1) 26%,var(--bg2) 58%,var(--bg3) 100%);
+  }
+  canvas#game{position:absolute;inset:0;width:100%;height:100%;display:block;touch-action:none}
+  canvas#graph{
+    position:absolute;right:12px;top:12px;z-index:4;
+    width:min(34vw,360px);height:min(34vw,360px);
+    max-width:360px;max-height:360px;
+    border-radius:18px;
+    background:linear-gradient(180deg,rgba(12,20,13,.84),rgba(9,16,11,.72));
+    border:1px solid rgba(255,255,255,.1);
+    box-shadow:0 12px 26px rgba(0,0,0,.22);
+    backdrop-filter:blur(8px);
+  }
+  #hud{
+    position:absolute;left:12px;top:12px;z-index:5;max-width:min(46vw,420px);
+    background:linear-gradient(180deg,rgba(8,16,10,.84),rgba(21,33,18,.72));
+    border:1px solid rgba(255,255,255,.1);
+    border-radius:18px;padding:12px 14px 13px;
+    box-shadow:0 12px 26px rgba(0,0,0,.24);
+    backdrop-filter:blur(8px)
+  }
+  #brand{
+    display:flex;align-items:center;gap:9px;text-transform:uppercase;
+    font-size:11px;letter-spacing:.12em;color:#f5df9f
+  }
+  #brand .dot{
+    width:11px;height:11px;border-radius:50%;
+    background:radial-gradient(circle at 35% 35%, #fff0b6 0 18%, #d9a63a 24% 45%, #593516 56% 100%);
+    box-shadow:0 0 16px rgba(240,198,91,.38)
+  }
+  #title{
+    margin:8px 0 6px;font-size:clamp(24px,4.6vw,50px);line-height:.95;
+    font-style:italic;text-wrap:balance;color:#fff5d4
+  }
+  #subtitle{margin:0;color:var(--ink-dim);font-size:14px;line-height:1.45}
+  #stats{
+    display:flex;gap:8px;flex-wrap:wrap;margin-top:10px
+  }
+  .chip{
+    display:inline-flex;align-items:center;gap:6px;
+    padding:6px 10px;border-radius:999px;
+    background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.08);
+    color:#f8edd0;font-size:12px;line-height:1
+  }
+  .chip b{color:#fff4c4}
+  #threatCard{
+    position:absolute;left:12px;top:calc(var(--hud-bottom, 144px) + 10px);z-index:5;max-width:min(40vw,420px);
+    background:linear-gradient(180deg,rgba(245,236,212,.94),rgba(226,213,178,.88));
+    color:#352116;border:2px solid rgba(48,30,17,.26);
+    border-radius:18px;padding:12px 14px 11px;
+    box-shadow:0 14px 30px rgba(0,0,0,.22)
+  }
+  #threatCard .kicker{
+    margin:0;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:#7a5c2f
+  }
+  #threatCard h2{
+    margin:6px 0 4px;font-size:20px;line-height:1.05;color:#4f301d
+  }
+  #threatCard p{margin:6px 0 0;font-size:13px;line-height:1.45;color:#4e3523}
+  #threatCard strong{color:#301b10}
+  #dock{
+    position:absolute;left:12px;right:12px;bottom:12px;z-index:6;
+    display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px;align-items:end
+  }
+  #deck{
+    position:relative;z-index:6;
+    display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px;min-width:0;
+    /* Las filas DEBEN medirse por contenido: con `auto` Chromium resolvía las 5
+       filas a 84px clavados (el piso de .card{min-height}) e ignoraba el alto real
+       de la tarjeta, así que la fila del "Costo · plaga" se pintaba 10-14px por
+       fuera del borde de su propia tarjeta, encima de la fila de abajo. */
+    grid-auto-rows:max-content
+  }
+  /* .card es un <button>. Con `display:flex` Chromium NO propaga el alto de los
+     hijos a la contribución intrínseca del botón, así que la pista del grid nunca
+     crecía y el contenido desbordaba (scrollHeight 93-97 vs clientHeight 82) con
+     overflow:visible => texto pintado sobre la tarjeta vecina. Medido a 390x844 el
+     2026-08-06: desborde +14.2px en las tarjetas cuyo badge o nombre va a 2 líneas
+     (Beauveria bassiana, Cephalonomia stephanoderis, Lecanicillium lecanii);
+     las de 1 línea daban -0.8px y por eso el defecto parecía no existir.
+     En flujo de bloque el botón sí reporta su alto y la pista crece. `gap` no
+     aplica en flujo de bloque => el separado de 5px se reconstruye con margin. */
+  .card{
+    appearance:none;-webkit-appearance:none;
+    text-align:left;border-radius:16px;padding:10px 10px 9px;
+    border:1px solid rgba(255,255,255,.12);
+    background:linear-gradient(180deg,rgba(14,24,15,.92),rgba(27,42,23,.84));
+    color:#f4ecd7;box-shadow:0 10px 18px rgba(0,0,0,.22);
+    min-height:84px;cursor:pointer;user-select:none;-webkit-user-select:none;
+    touch-action:none;display:block;height:auto
+  }
+  .card>*+*{margin-top:5px}
+  .card .name{font-size:13px;font-weight:700;line-height:1.15}
+  .card .sci{font-size:11px;color:#cfe0b7;line-height:1.15}
+  .card .meta{font-size:11px;color:#f0d58d;line-height:1.15;display:flex;justify-content:space-between;gap:8px}
+  .card.selected{outline:2px solid rgba(241,201,89,.75);box-shadow:0 0 0 2px rgba(241,201,89,.12),0 10px 18px rgba(0,0,0,.22)}
+  .card.locked{opacity:.45}
+  .card .tag{
+    /* `align-self` era lo que lo hacía shrink-wrap en flex; en bloque lo hace
+       `inline-block`, que además evita que la píldora se estire a todo el ancho. */
+    align-self:flex-start;display:inline-block;
+    font-size:10px;letter-spacing:.08em;text-transform:uppercase;
+    padding:3px 7px;border-radius:999px;background:rgba(255,255,255,.08);color:#fff0c2
+  }
+  #controls{
+    position:relative;z-index:6;display:flex;gap:8px;align-items:stretch;justify-content:flex-end;
+    flex-direction:column
+  }
+  .btn{
+    appearance:none;border:1px solid rgba(255,247,225,.76);
+    background:linear-gradient(180deg,rgba(37,58,31,.92),rgba(16,25,16,.96));
+    color:#fff5d5;border-radius:16px;min-width:64px;height:56px;padding:0 14px;
+    font:700 13px Georgia,serif;box-shadow:0 10px 18px rgba(0,0,0,.22);
+    touch-action:none;user-select:none;-webkit-user-select:none
+  }
+  .btn.primary{background:linear-gradient(180deg,#f3ca5b,#d79b26);color:#271706;border-color:#2d1d0d}
+  .btn:active,.btn.down{transform:translateY(1px) scale(.99)}
+  #toast{
+    position:absolute;left:50%;top:calc(var(--hud-bottom, 144px) + 12px);transform:translateX(-50%) translateY(-8px);
+    z-index:7;background:rgba(245,236,212,.98);color:#332012;border:2px solid rgba(52,31,17,.9);
+    border-radius:999px;padding:8px 14px;font-size:14px;box-shadow:0 10px 22px rgba(0,0,0,.24);
+    opacity:0;transition:opacity .2s ease,transform .2s ease
+  }
+  #toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+  #intro,#end{
+    position:absolute;inset:12px 12px auto 12px;z-index:20;display:flex;justify-content:center;
+    background:none;
+    transition:opacity .45s ease, transform .45s ease
+  }
+  #intro.hidden,#end.hidden{opacity:0;pointer-events:none;transform:translateY(-8px)}
+  .modal{
+    width:min(100%,620px);padding:20px 18px 16px;border-radius:24px;
+    background:linear-gradient(180deg,rgba(248,240,220,.98),rgba(228,214,185,.94));
+    color:#2e1d11;border:2px solid rgba(37,23,13,.92);box-shadow:0 22px 54px rgba(0,0,0,.38);
+    text-align:center
+  }
+  .modal .eyebrow{margin:0 0 8px;font-size:12px;letter-spacing:.12em;text-transform:uppercase;opacity:.72}
+  .modal h1{margin:0 0 8px;font-size:clamp(30px,5vw,54px);line-height:.98;font-style:italic}
+  .modal p{margin:8px 0 0;font-size:15px;line-height:1.5}
+  .modal .sub{font-size:12px;letter-spacing:.08em;text-transform:uppercase;opacity:.7}
+  .modal .actions{margin-top:14px;display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+  .modal .actions button{
+    appearance:none;border:1px solid rgba(40,26,13,.9);
+    background:linear-gradient(180deg,#f1c65f,#d59223);color:#281608;
+    border-radius:999px;padding:12px 16px;font:800 14px Georgia,serif;cursor:pointer
+  }
+  .modal .actions button.secondary{background:linear-gradient(180deg,#fbf4e5,#d8c8a8)}
+  #cursor{
+    position:absolute;z-index:3;pointer-events:none;
+    border:2px solid rgba(255,241,184,.92);
+    box-shadow:0 0 0 2px rgba(10,16,10,.3),0 0 18px rgba(241,201,89,.28);
+    border-radius:14px;transform:translateZ(0)
+  }
+  @media (max-width: 900px){
+    #hud{max-width:calc(100vw - 24px);top:10px}
+    #graph{right:10px;top:10px;width:min(36vw,200px);height:min(36vw,200px)}
+    #threatCard{
+      top:calc(var(--hud-bottom, 144px) + 10px);left:10px;right:10px;max-width:none
+    }
+    #dock{
+      left:10px;right:10px;bottom:10px;
+      grid-template-columns:1fr;
+      grid-template-rows:minmax(0,1fr) auto;
+      height:min(44vh,360px);
+      max-height:min(44vh,360px)
+    }
+    #controls{
+      grid-row:2;
+      flex-direction:row;
+      justify-content:stretch
+    }
+    #controls .btn{flex:1 1 0}
+    #deck{
+      grid-row:1;
+      grid-template-columns:repeat(2,minmax(0,1fr));
+      overflow-y:auto;
+      overflow-x:hidden;
+      padding-right:2px;
+      min-height:0;
+      height:100%;
+      align-self:stretch
+    }
+    .btn{min-width:0;height:52px;padding:0 12px}
+    .modal{padding:16px 14px 14px}
+    .modal p{font-size:14px}
+    .modal h1{font-size:clamp(26px,7vw,42px)}
+    #toast{
+      top:auto;
+      bottom:calc(min(44vh,360px) + 22px)
+    }
+  }
+</style>
+</head>
+<body>
+<div id="app">
+  <canvas id="game"></canvas>
+  <canvas id="graph" width="360" height="360" aria-label="Grafo agroecológico"></canvas>
+  <div id="cursor"></div>
+  <div id="hud">
+    <div id="brand"><span class="dot"></span>BIOGUERRA: DEFENSA DE LA CHAGRA</div>
+    <h1 id="title">Monitorear antes de tratar</h1>
+    <p id="subtitle">Tower defense agroecológico con fase de monitoreo: detectar la plaga a tiempo baja el costo; tarde, la respuesta se vuelve cara.</p>
+    <div id="stats">
+      <span class="chip">Oleada <b id="waveText">1/5</b></span>
+      <span class="chip">Salud <b id="healthText">20</b></span>
+      <span class="chip">Crédito <b id="moneyText">0</b></span>
+      <span class="chip">FPS <b id="fpsText">60</b></span>
+      <span class="chip">Estado <b id="phaseText">Monitoreo</b></span>
+    </div>
+  </div>
+  <div id="threatCard">
+    <p class="kicker">Fase de monitoreo</p>
+    <h2 id="threatName">Plaga en observación</h2>
+    <p id="threatSci">Aún no identificada. Inspecciona antes de que la oleada entre al cultivo.</p>
+    <p id="threatNote">Presiona <strong>M</strong> o el botón <strong>Monitorear</strong> para revelar el nombre y abaratar la defensa correcta.</p>
+  </div>
+  <div id="dock">
+    <div id="deck"></div>
+    <div id="controls">
+      <button class="btn primary" id="monitorBtn" type="button">Monitorear</button>
+      <button class="btn" id="nextBtn" type="button">Siguiente</button>
+      <button class="btn" id="restartBtn" type="button">Reiniciar</button>
+    </div>
+  </div>
+  <div id="toast" role="status" aria-live="polite"></div>
+  <div id="intro">
+    <div class="modal">
+      <p class="eyebrow">Juego #6 · Fusión con #18 Semáforo de la Plaga</p>
+      <h1>BIOGUERRA: Defensa de la Chagra</h1>
+      <p>Coloca fauna benéfica y agentes de control reales para frenar plagas del cafetal. Antes de cada oleada entra una fase de monitoreo: si detectas a tiempo, la respuesta cuesta menos; si llegas tarde, el tratamiento se encarece.</p>
+      <p class="sub">Teclado: flechas, números, espacio, M, Enter · Táctil: toca una carta y luego una celda</p>
+      <div class="actions">
+        <button id="startBtn" type="button">Entrar a la chagra</button>
+      </div>
+    </div>
+  </div>
+  <div id="end" class="hidden">
+    <div class="modal">
+      <p class="eyebrow" id="endEyebrow">Manejo integrado completo</p>
+      <h1 id="endTitle">Oleadas contenidas</h1>
+      <p id="endBody">La chagra resistió. Las conexiones del grafo se fueron cerrando a medida que se reconocían las plagas y se aplicaba la respuesta correcta.</p>
+      <p class="sub" id="endStats">Eficacia · Monitoreo · Cosecha protegida</p>
+      <div class="actions">
+        <button id="playAgainBtn" type="button">Jugar otra vez</button>
+        <button id="closeEndBtn" class="secondary" type="button">Ver tablero</button>
+      </div>
+    </div>
+  </div>
+</div>
+<script type="module" src="./main.js"></script>
+</body>
+</html>
