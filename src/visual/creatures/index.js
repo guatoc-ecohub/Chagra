@@ -255,11 +255,10 @@ import Colibri from './Colibri.jsx';
 /* OsoAndino y OsoAnteojos NO se importan acá a propósito: están archivados y
    fuera del registro CREATURES. Solo entra el guardián. */
 import OsoGuardian from './OsoGuardian.jsx';
-import OsoBaston from './OsoBaston.jsx';
 import RanaAndina from './RanaAndina.jsx';
 import Perezoso from './Perezoso.jsx';
 import Ardilla from './Ardilla.jsx';
-import Jaguar from './Jaguar.jsx';
+import JaguarLaminaViva from './JaguarLaminaViva.jsx';
 import Morrocoy from './Morrocoy.jsx';
 import Danta from './Danta.jsx';
 import Condor from './Condor.jsx';
@@ -272,8 +271,10 @@ import Crisopa from './Crisopa.jsx';
 import Trichogramma from './Trichogramma.jsx';
 import Sirfido from './Sirfido.jsx';
 import Gallina from './Gallina.jsx';
-import Zariguya from './Zariguya.jsx';
-import Luciernaga from './Luciernaga.jsx';
+import ZariguyaLaminaViva from './ZariguyaLaminaViva.jsx';
+import LuciernagaLaminaViva from './LuciernagaLaminaViva.jsx';
+import OsoBastonLaminaViva from './OsoBastonLaminaViva.jsx';
+import ChivitoPunkLaminaViva from './ChivitoPunkLaminaViva.jsx';
 import MaizCompai from './MaizCompai.jsx';
 import EntFrailejon from './EntFrailejon.jsx';
 
@@ -291,11 +292,11 @@ export const CREATURES = {
   'oso-guardian': { Component: OsoGuardian, nombre: 'Oso de anteojos', cientifico: 'Tremarctos ornatus' },
   // La dirección CAMINANTE del mismo oso (la referencia Cuphead aprobada):
   // erguido, botas y guantes, y el bastón florecido — el dispersor de semillas.
-  'oso-baston': { Component: OsoBaston, nombre: 'Oso del bastón', cientifico: 'Tremarctos ornatus' },
+  'oso-baston': { Component: OsoBastonLaminaViva, nombre: 'Oso del bastón', cientifico: 'Tremarctos ornatus' },
   'rana-andina': { Component: RanaAndina, nombre: 'Rana arlequín andina', cientifico: 'Atelopus spp.' },
   perezoso: { Component: Perezoso, nombre: 'Perezoso de tres dedos', cientifico: 'Bradypus variegatus' },
   ardilla: { Component: Ardilla, nombre: 'Ardilla de cola roja', cientifico: 'Notosciurus granatensis' },
-  jaguar: { Component: Jaguar, nombre: 'Jaguar', cientifico: 'Panthera onca' },
+  jaguar: { Component: JaguarLaminaViva, nombre: 'Jaguar', cientifico: 'Panthera onca' },
   morrocoy: { Component: Morrocoy, nombre: 'Morrocoy de patas rojas', cientifico: 'Chelonoidis carbonarius' },
   /* BORUGO ARCHIVADO (operador, 2026-07-18): dibujo rechazado por feo — fuera
      del registro para que NADA data-driven lo surfacee (avatar-selector, fauna
@@ -316,10 +317,11 @@ export const CREATURES = {
   gallina: { Component: Gallina, nombre: 'Gallina criolla', cientifico: 'Gallus gallus domesticus' },
   // El marsupial nocturno de la finca (la que sale de noche a limpiar la
   // huerta — con las crías al lomo).
-  zariguya: { Component: Zariguya, nombre: 'Zarigüeya (chucha)', cientifico: 'Didelphis marsupialis' },
+  zariguya: { Component: ZariguyaLaminaViva, nombre: 'Zarigüeya (chucha)', cientifico: 'Didelphis marsupialis' },
   // El escarabajo bioluminiscente de la finca (la guía que lee la noche — su
   // linterna es un medidor vivo del cambio climático).
-  luciernaga: { Component: Luciernaga, nombre: 'Luciérnaga (cocuyo)', cientifico: 'Lampyridae' },
+  luciernaga: { Component: LuciernagaLaminaViva, nombre: 'Luciérnaga (cocuyo)', cientifico: 'Lampyridae' },
+  'chivito-punk': { Component: ChivitoPunkLaminaViva, nombre: 'Chivito de páramo', cientifico: 'Oxypogon guerinii' },
   // La mata madre de la milpa (flora compañera, como el Ent): el avatar-planta
   // arraigado que se mece, alimenta y corona en espiga.
   maiz: { Component: MaizCompai, nombre: 'Planta de maíz', cientifico: 'Zea mays' },
