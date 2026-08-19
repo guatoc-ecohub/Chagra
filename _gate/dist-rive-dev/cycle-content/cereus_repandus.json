@@ -1,0 +1,97 @@
+{
+  "species_slug": "cereus_repandus",
+  "scientific_name": "Cereus repandus (L.) Mill.",
+  "common_names": [
+    "Cardón guajiro"
+  ],
+  "family": "Cactaceae",
+  "category": "cercas_vivas",
+  "cultivable": true,
+  "conservation_status": "nativo_silvestre",
+  "thermal_zones": [
+    "calido"
+  ],
+  "roles_in_guild": [
+    "living_fence",
+    "pollinator_attractor",
+    "windbreak",
+    "biomass_producer"
+  ],
+  "antagonists": [],
+  "especies_nativas_sustitutas": [],
+  "propagation": {
+    "methods": [
+      "esqueje",
+      "semilla"
+    ],
+    "best_method": "esqueje",
+    "protocol_resumen": "Esquejes de tallo columnar de 30-50 cm cicatrizados a la sombra 15-21 días antes de enterrar 10-15 cm en suelo arenoso muy drenado. Sin riego primera semana. Establecimiento 60-90 días. Semilla viable pero crecimiento muy lento (3-5 años para altura 1 m).",
+    "tiempo_a_establecimiento_dias": 75,
+    "notas": "CITES Apéndice II como toda la familia Cactaceae — requiere permiso ICA-MADS para movilización comercial. Endemismo regional norandino-caribeño (norte de Suramérica: La Guajira colombo-venezolana, Antillas Holandesas).",
+    "fuente": "POWO Kew; Bernal 2015; CITES Apéndice II Cactaceae; Pérez Arbeláez 1947"
+  },
+  "requirements": {
+    "agua": "bajo",
+    "altitud_msnm": {
+      "min_absoluto": 0,
+      "optimo_min": 0,
+      "optimo_max": 600,
+      "max_absoluto": 1200
+    },
+    "temperatura_c": {
+      "helada_letal": 5,
+      "optimo_min": 22,
+      "optimo_max": 34,
+      "max_tolerable": 42
+    },
+    "radiacion": "sol_pleno",
+    "drenaje_requerido": "excelente"
+  },
+  "valor_pedagogico": "El cardón guajiro (Cereus repandus (L.) Mill., Cactaceae subfamilia Cactoideae, sinónimo histórico Cereus peruvianus auct. non (L.) Mill.) es un cactus columnar arborescente nativo emblemático de las zonas áridas del norte de Colombia y Venezuela, endémico regional del bioma Bosque Seco Tropical-Subxerófilo de La Guajira-Caribe-Antillas Holandesas (Curazao, Aruba, Bonaire), distribuido en Colombia entre 0 y 600 msnm en La Guajira (Alta y Media Guajira — Riohacha, Maicao, Uribia, Manaure, Punta Gallinas, Cabo de la Vela, Macuira — corazón del territorio Wayúu), Magdalena (Santa Marta, Ciénaga Grande zonas secas), norte de Cesar y zonas muy secas de Bolívar, con poblaciones disjuntas hasta el norte del Cañón del Chicamocha (Santander). Catalogado en CITES Apéndice II como toda la familia Cactaceae — requiere permiso ICA-MADS para movilización comercial y aprovechamiento sostenible. Pertenece a la familia Cactaceae subfamilia Cactoideae tribu Cereeae, planta arborescente columnar de 6-12 m de altura con tallos cilíndricos suculentos verde-grisáceos de 10-15 cm de diámetro con 8-10 costillas con aréolas blanco-lanosas y espinas amarillas-marrones cortas (1-3 cm), ramificación candelabriforme característica en la parte alta, flores grandes blanco-cremas (15-20 cm) que abren una sola noche polinizadas por murciélagos nectarívoros endémicos del Caribe colombiano (Leptonycteris curasoae — en peligro UICN — y Glossophaga soricina), frutos baya esférica rojo-rosada con pulpa blanca-rosada dulce y semillas pequeñas negras comestibles (consumidas tradicionalmente por los Wayúu fresca o como dulce-conserva 'arepa de yosú'). Es lección viva extraordinaria de patrimonio biocultural Wayúu, endemismo norandino-caribeño, conservación CITES de cactáceas, fragilidad del bosque seco tropical (uno de los biomas más amenazados de Colombia con <8% de cobertura original) y coevolución mutualista planta-murciélago que enseña a niñas y niños la integridad de los ecosistemas xerofíticos colombianos. Los Wayúu llaman 'yosú' o 'yosush' al cardón y 'cadushi' a una preparación tradicional con sus tallos pelados-fermentados; las espinas se usaron históricamente como agujas para tejido de mochilas Wayúu; los tallos secos vacíos sirven como vigas de techos en construcciones tradicionales rancho-bajareque guajiro; las cercas vivas de cardón son barreras infranqueables tradicionales contra ganado caprino-ovino. Manejo agroecológico: propagación por esquejes de tallo columnar de 30-50 cm cicatrizados 15-21 días a la sombra antes de enterrar 10-15 cm en suelo arenoso muy drenado sin riego primera semana, o por semilla viable pero crecimiento muy lento (3-5 años para 1 m), distancia 1-2 m en cerca o 4-5 m disperso, tolera sequía extrema y salinidad moderada, suelos pobres pedregosos arenosos calcáreos, prácticamente sin manejo durante 50-100+ años de vida, asocio xerofítico con Opuntia, Stenocereus, Pereskia guamacho, agaves, prosopis (trupillo) y leguminosas espinosas del bosque seco tropical caribeño. NO movilizar fuera de su rango natural sin permiso CITES-ICA. Función en chagra como cerca viva monumental de zona muy seca, atractor de murciélagos polinizadores nocturnos en peligro, restaurador de bosque seco tropical Caribe, patrimonio biocultural Wayúu, sin agroquímicos. Fuentes Tier A: GBIF, POWO Kew, Bernal 2015, Pérez Arbeláez 1947, SiB Colombia, Libro Rojo Plantas Colombia, CITES Apéndice II Cactaceae / ICA Resolución 3168.",
+  "sources": [
+    {
+      "id": "gbif-taxonomic-backbone",
+      "title": "gbif-taxonomic-backbone",
+      "tier": "A",
+      "url": "https://www.gbif.org/dataset/d7dddbf4-2cf0-4f39-9b2a-bb099caae36c"
+    },
+    {
+      "id": "powo-kew",
+      "title": "powo-kew",
+      "tier": "A",
+      "url": "https://powo.science.kew.org"
+    },
+    {
+      "id": "bernal-2015-plantas-liquenes-colombia",
+      "title": "bernal-2015-plantas-liquenes-colombia",
+      "tier": "A",
+      "url": "http://catalogoplantasdecolombia.unal.edu.co"
+    },
+    {
+      "id": "perez-arbelaez-1947-plantas-utiles",
+      "title": "perez-arbelaez-1947-plantas-utiles",
+      "tier": "A",
+      "url": null
+    },
+    {
+      "id": "sib-colombia",
+      "title": "sib-colombia",
+      "tier": "A",
+      "url": "https://sibcolombia.net"
+    },
+    {
+      "id": "libro-rojo-plantas-colombia",
+      "title": "libro-rojo-plantas-colombia",
+      "tier": "A",
+      "url": null
+    },
+    {
+      "id": "ica-resolucion-3168-2015",
+      "title": "ica-resolucion-3168-2015",
+      "tier": "A",
+      "url": null
+    }
+  ],
+  "_generated_by": "scripts/build-cycle-content-from-catalog.mjs",
+  "_generated_at": "2026-05-19T00:42:57.392Z"
+}

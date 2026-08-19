@@ -1,0 +1,552 @@
+<g id="jaguarWrap">
+
+      <!-- MANDALA de geometría sagrada (detrás del felino): dos anillos que
+           giran en sentidos opuestos — rayos escalonados, círculos punteados,
+           rombos. Casi invisible en reposo; florece en la invocación. -->
+      <g transform="translate(0,10)"><g id="mandala">
+        <circle cx="0" cy="0" r="300" fill="url(#gVioleta)"/>
+        <g id="mandalaGiro1" fill="none" stroke="#ffcf58">
+          <circle cx="0" cy="0" r="282" stroke-width="2.5" stroke-dasharray="4 14" opacity=".85"/>
+          <circle cx="0" cy="0" r="252" stroke-width="1.6" opacity=".5"/>
+          <g fill="#ffcf58" stroke="none" opacity=".9">
+            <use href="#rayoMandala"/><use href="#rayoMandala" transform="rotate(45)"/>
+            <use href="#rayoMandala" transform="rotate(90)"/><use href="#rayoMandala" transform="rotate(135)"/>
+            <use href="#rayoMandala" transform="rotate(180)"/><use href="#rayoMandala" transform="rotate(225)"/>
+            <use href="#rayoMandala" transform="rotate(270)"/><use href="#rayoMandala" transform="rotate(315)"/>
+          </g>
+        </g>
+        <g id="mandalaGiro2" fill="none" stroke="#a86ae8">
+          <circle cx="0" cy="0" r="228" stroke-width="2.2" stroke-dasharray="26 10 8 10" opacity=".8"/>
+          <circle cx="0" cy="0" r="204" stroke-width="1.4" stroke-dasharray="2 9" opacity=".6"/>
+          <g fill="#c9a0f2" stroke="none" opacity=".85">
+            <use href="#romboMandala" transform="rotate(22.5) translate(0,-216)"/>
+            <use href="#romboMandala" transform="rotate(67.5) translate(0,-216)"/>
+            <use href="#romboMandala" transform="rotate(112.5) translate(0,-216)"/>
+            <use href="#romboMandala" transform="rotate(157.5) translate(0,-216)"/>
+            <use href="#romboMandala" transform="rotate(202.5) translate(0,-216)"/>
+            <use href="#romboMandala" transform="rotate(247.5) translate(0,-216)"/>
+            <use href="#romboMandala" transform="rotate(292.5) translate(0,-216)"/>
+            <use href="#romboMandala" transform="rotate(337.5) translate(0,-216)"/>
+          </g>
+        </g>
+      </g></g>
+
+      <!-- CONSTELACIÓN de la invocación: estrellas alrededor del felino,
+           líneas punteadas que fluyen conectándolas y PARTÍCULAS que
+           convergen al materializarse / se dispersan al desvanecerse. -->
+      <g id="constelacionInvoca">
+        <g fill="none" stroke="#ffefb0" stroke-width="2.4" opacity=".85">
+          <path class="lineaConstela" d="M-320,-228 L-360,48 L-252,264"/>
+          <path class="lineaConstela" d="M322,-238 L366,38 L266,276" style="animation-delay:-.9s"/>
+          <path class="lineaConstela" d="M-168,-318 L0,-362 L178,-324" style="animation-delay:-1.7s"/>
+          <path class="lineaConstela" d="M-252,264 L0,354 L266,276" style="animation-delay:-.4s"/>
+          <path class="lineaConstela" d="M-320,-228 L-168,-318" style="animation-delay:-2.1s"/>
+          <path class="lineaConstela" d="M322,-238 L178,-324" style="animation-delay:-1.3s"/>
+        </g>
+        <g fill="#fff9d8">
+          <use class="estrellaInvoca" href="#estrella4" transform="translate(-320,-228) scale(2.2)"/>
+          <use class="estrellaInvoca" href="#estrella4" transform="translate(322,-238) scale(2.4)" style="animation-delay:-.6s"/>
+          <use class="estrellaInvoca" href="#estrella4" transform="translate(-360,48) scale(1.8)" style="animation-delay:-1.2s"/>
+          <use class="estrellaInvoca" href="#estrella4" transform="translate(366,38) scale(2)" style="animation-delay:-1.8s"/>
+          <use class="estrellaInvoca" href="#estrella4" transform="translate(-252,264) scale(1.7)" style="animation-delay:-2.3s"/>
+          <use class="estrellaInvoca" href="#estrella4" transform="translate(266,276) scale(1.8)" style="animation-delay:-.3s"/>
+          <use class="estrellaInvoca" href="#estrella4" transform="translate(-168,-318) scale(1.9)" style="animation-delay:-1.5s"/>
+          <use class="estrellaInvoca" href="#estrella4" transform="translate(178,-324) scale(2.1)" style="animation-delay:-.9s"/>
+          <use class="estrellaInvoca" href="#estrella4" transform="translate(0,-362) scale(2.6)" style="animation-delay:-2s"/>
+          <use class="estrellaInvoca" href="#estrella4" transform="translate(0,354) scale(1.8)" style="animation-delay:-1.1s"/>
+        </g>
+        <!-- partículas (vector --dx/--dy = de dónde vienen / a dónde vuelven) -->
+        <g fill="#ffd662">
+          <circle class="particula" cx="-60" cy="-80" r="5" style="--dx:-180px;--dy:-140px"/>
+          <circle class="particula" cx="55" cy="-95" r="4.4" style="--dx:190px;--dy:-150px;animation-delay:.2s"/>
+          <circle class="particula" cx="-85" cy="30" r="4.8" style="--dx:-210px;--dy:60px;animation-delay:.1s"/>
+          <circle class="particula" cx="88" cy="45" r="4.2" style="--dx:215px;--dy:90px;animation-delay:.3s"/>
+          <circle class="particula" cx="-40" cy="140" r="4" style="--dx:-130px;--dy:200px;animation-delay:.15s"/>
+          <circle class="particula" cx="48" cy="150" r="4.5" style="--dx:150px;--dy:195px;animation-delay:.25s"/>
+          <circle class="particula" cx="0" cy="-150" r="5.2" style="--dx:10px;--dy:-230px;animation-delay:.05s"/>
+          <circle class="particula" cx="-15" cy="80" r="3.6" style="--dx:-60px;--dy:235px;animation-delay:.35s"/>
+          <circle class="particula" cx="20" cy="-30" r="3.4" style="--dx:120px;--dy:-215px;animation-delay:.4s"/>
+          <circle class="particula" cx="-70" cy="-160" r="4" style="--dx:-170px;--dy:-215px;animation-delay:.3s"/>
+        </g>
+      </g>
+
+      <g id="jaguar" filter="url(#boil)">
+        <g class="flota">
+         <g id="anticRig">
+          <g id="cuerpoRig">
+
+            <!-- AURA MÍSTICA del jaguar-espíritu: halo violeta exterior + halo
+                 dorado interior que LATEN (espíritu guardián, no solo gato) -->
+            <g id="auraMistica">
+              <ellipse cx="0" cy="40" rx="200" ry="230" fill="url(#gVioleta)"/>
+              <ellipse cx="0" cy="55" rx="155" ry="185" fill="url(#gAura)"/>
+            </g>
+            <!-- sombra de suelo (peso) -->
+            <ellipse cx="0" cy="210" rx="120" ry="20" fill="#1c3016" opacity=".38" filter="url(#blurSuave)"/>
+
+            <!-- COLA de felino sentado: NACE DE LA GRUPA (base de la columna,
+                 costado bajo-trasero del tronco), sale por el lado derecho y
+                 se curva al frente, DESCANSANDO junto a la zarpa con la punta
+                 apenas levantada. Patrón real de Panthera onca: MANCHAS en la
+                 base que hacia la punta se cierran en ANILLOS negros sólidos
+                 + punta negra (cola anillada, jamás rayas de tigre). -->
+            <g id="colaRig">
+              <g id="colaPunta">
+                <!-- contorno de tinta -->
+                <path d="M92,150 C 150,168 178,200 172,222 C 190,234 216,224 228,198 C 236,182 234,168 226,158"
+                      fill="none" stroke="#241407" stroke-width="30" stroke-linecap="round"/>
+                <!-- pelaje -->
+                <path d="M92,150 C 150,168 178,200 172,222 C 190,234 216,224 228,198 C 236,182 234,168 226,158"
+                      fill="none" stroke="url(#gCola)" stroke-width="24" stroke-linecap="round"/>
+                <!-- MANCHAS sólidas del tramo cercano a la grupa -->
+                <g fill="#1c1207" opacity=".8">
+                  <circle cx="124" cy="172" r="4.6"/>
+                  <circle cx="150" cy="190" r="4.2"/>
+                  <circle cx="168" cy="212" r="4"/>
+                </g>
+                <!-- ANILLOS negros del tramo final (bandas que cierran) -->
+                <path d="M186,228 C 202,228 216,218 225,199 C 231,186 231,172 226,161"
+                      fill="none" stroke="#1c1207" stroke-width="24.5" stroke-linecap="butt"
+                      stroke-dasharray="9 13" stroke-dashoffset="-4"/>
+                <!-- punta negra -->
+                <circle cx="227" cy="159" r="13.5" fill="#1c1207"/>
+              </g>
+            </g>
+
+            <!-- patas traseras sentadas (muslos gruesos, planta crema) — cada
+                 lado en SU grupo para que la marcha (estado camina) pueda
+                 alternarlas en diagonal con las delanteras -->
+            <g id="pataTrasIzq" class="pataTras">
+              <path d="M-96,120 C -128,148 -132,186 -104,206 C -78,214 -50,206 -44,182 C -52,150 -64,128 -96,120 Z"
+                    stroke="#241407" stroke-width="4" fill="url(#gPelaje)"/>
+              <ellipse cx="-90" cy="206" rx="34" ry="20" fill="#f6ecd2" stroke="#241407" stroke-width="4"/>
+              <path d="M-102,196 L-102,214 M-90,198 L-90,216 M-78,196 L-78,214"
+                    stroke="#8a6a2e" stroke-width="2.4" opacity=".6"/>
+            </g>
+            <g id="pataTrasDer" class="pataTras">
+              <path d="M96,120 C 128,148 132,186 104,206 C 78,214 50,206 44,182 C 52,150 64,128 96,120 Z"
+                    stroke="#241407" stroke-width="4" fill="url(#gPelaje)"/>
+              <ellipse cx="90" cy="206" rx="34" ry="20" fill="#f6ecd2" stroke="#241407" stroke-width="4"/>
+              <path d="M102,196 L102,214 M90,198 L90,216 M78,196 L78,214"
+                    stroke="#8a6a2e" stroke-width="2.4" opacity=".6"/>
+            </g>
+
+            <!-- TRONCO robusto y musculoso, pelaje leonado con gradiente de
+                 volumen. MÁS ANCHO que alto: el jaguar real es bajo, macizo y
+                 de centro de gravedad hundido (anti-leopardo). -->
+            <ellipse cx="0" cy="70" rx="118" ry="112" fill="url(#gPelaje)" stroke="#241407" stroke-width="5"/>
+
+            <!-- vientre/pecho crema -->
+            <path d="M0,-24 C 52,-10 66,60 52,130 C 36,178 -36,178 -52,130 C -66,60 -52,-10 0,-24 Z"
+                  fill="#f6ecd2" opacity=".92"/>
+            <!-- mechones del pecho -->
+            <path d="M-24,-18 L-16,-6 L-8,-20 L0,-6 L8,-20 L16,-6 L24,-18"
+                  fill="none" stroke="#f6ecd2" stroke-width="6" stroke-linecap="round" opacity=".9"/>
+
+            <!-- definición muscular sutil -->
+            <g fill="none" stroke="#241407" stroke-width="2.2" opacity=".18" stroke-linecap="round">
+              <path d="M-92,52 C -84,98 -66,128 -44,142"/>
+              <path d="M92,52 C 84,98 66,128 44,142"/>
+              <path d="M-20,-6 C -6,4 6,4 20,-6"/>
+            </g>
+
+            <!-- ROSETAS del cuerpo (anillos rotos + puntos internos, por zonas) -->
+            <g>
+              <!-- costados: las grandes -->
+              <use href="#roseta" transform="translate(-70,34) scale(1.35) rotate(15)"/>
+              <use href="#roseta" transform="translate(70,26) scale(1.35) rotate(250)"/>
+              <!-- ancas -->
+              <use href="#roseta" transform="translate(-78,92) scale(1.12) rotate(130)"/>
+              <use href="#roseta" transform="translate(78,96) scale(1.12) rotate(40)"/>
+              <!-- vuelta baja del costado -->
+              <use href="#roseta" transform="translate(-60,144) scale(.95) rotate(320)"/>
+              <use href="#roseta" transform="translate(62,148) scale(.95) rotate(205)"/>
+              <!-- hombros/lomo alto -->
+              <use href="#roseta" transform="translate(-40,-14) scale(.95) rotate(85)"/>
+              <use href="#roseta" transform="translate(42,-12) scale(.95) rotate(300)"/>
+            </g>
+            <!-- manchas SÓLIDAS del vientre claro (zona ventral no lleva rosetas) -->
+            <g fill="#1c1207" opacity=".62">
+              <circle cx="-22" cy="46" r="4"/><circle cx="16" cy="30" r="3.4"/>
+              <circle cx="-8" cy="86" r="4.2"/><circle cx="26" cy="98" r="3.2"/>
+              <circle cx="-30" cy="118" r="3.6"/><circle cx="8" cy="140" r="3"/>
+            </g>
+
+            <!-- CONSTELACIÓN DE LA PIEL: estrellas que titilan al BORDE de las
+                 rosetas (el jaguar-espíritu lleva el cielo nocturno encima; el
+                 centro queda para los puntos negros, la firma de la especie) -->
+            <g fill="#fff3c4">
+              <use class="estrellaPiel" href="#estrella4" transform="translate(-52,22) scale(.55)"/>
+              <use class="estrellaPiel" href="#estrella4" transform="translate(56,14) scale(.6)" style="animation-delay:-1.2s"/>
+              <use class="estrellaPiel" href="#estrella4" transform="translate(-62,110) scale(.45)" style="animation-delay:-2.4s"/>
+              <use class="estrellaPiel" href="#estrella4" transform="translate(64,116) scale(.5)" style="animation-delay:-3.1s"/>
+              <use class="estrellaPiel" href="#estrella4" transform="translate(-26,-26) scale(.4)" style="animation-delay:-1.8s"/>
+              <use class="estrellaPiel" href="#estrella4" transform="translate(30,-24) scale(.42)" style="animation-delay:-.6s"/>
+            </g>
+
+            <!-- HOMBROS del acecho (omóplatos que suben) -->
+            <g id="hombrosRig">
+              <path d="M-78,-2 Q-52,-58 -22,-18 Z" fill="#b87226" stroke="#241407" stroke-width="4" stroke-linejoin="round"/>
+              <path d="M78,-2 Q52,-58 22,-18 Z" fill="#b87226" stroke="#241407" stroke-width="4" stroke-linejoin="round"/>
+            </g>
+
+            <!-- GLIFOS rituales de los hombros: espirales abiertas en cobre
+                 (ornamento geométrico propio, nunca arma) — apenas insinuados
+                 en reposo, se encienden y laten en la invocación -->
+            <g class="glifo" fill="none" stroke="#b56a1e" stroke-width="3.4" stroke-linecap="round">
+              <path transform="translate(-52,-22) scale(7)" d="M0,0 C0.3,-0.3 0.75,-0.15 0.85,0.35 C0.95,0.95 0.35,1.4 -0.4,1.15 C-1.35,0.85 -1.6,-0.35 -0.95,-1.15 C-0.2,-2.05 1.3,-1.95 2.05,-0.95"/>
+              <path transform="translate(52,-22) scale(-7,7)" d="M0,0 C0.3,-0.3 0.75,-0.15 0.85,0.35 C0.95,0.95 0.35,1.4 -0.4,1.15 C-1.35,0.85 -1.6,-0.35 -0.95,-1.15 C-0.2,-2.05 1.3,-1.95 2.05,-0.95"/>
+            </g>
+
+            <!-- BRAZOS (patas delanteras que gesticulan con la garra). Doble trazo:
+                 tinta gruesa + pelaje encima. Zarpa crema grande. -->
+            <g transform="translate(-56,0)"><g id="brazoIzq" class="brazo">
+              <path d="M0,0 C -18,50 -22,120 -16,178" stroke="#241407" stroke-width="46" fill="none" stroke-linecap="round"/>
+              <path d="M0,0 C -18,50 -22,120 -16,178" stroke="url(#gPelaje)" stroke-width="38" fill="none" stroke-linecap="round"/>
+              <!-- puntos de la pata (patrón que se simplifica) -->
+              <g fill="#1c1207" opacity=".55"><circle cx="-14" cy="60" r="4"/><circle cx="-18" cy="104" r="3.4"/></g>
+              <ellipse cx="-16" cy="188" rx="34" ry="22" fill="#f6ecd2" stroke="#241407" stroke-width="4"/>
+              <g stroke="#8a6a2e" stroke-width="2.4" opacity=".6"><path d="M-30,182 L-30,202 M-16,184 L-16,204 M-2,182 L-2,202"/></g>
+            </g></g>
+            <g transform="translate(56,0)"><g id="brazoDer" class="brazo">
+              <path d="M0,0 C 18,50 22,120 16,178" stroke="#241407" stroke-width="46" fill="none" stroke-linecap="round"/>
+              <path d="M0,0 C 18,50 22,120 16,178" stroke="url(#gPelaje)" stroke-width="38" fill="none" stroke-linecap="round"/>
+              <g fill="#1c1207" opacity=".55"><circle cx="14" cy="60" r="4"/><circle cx="18" cy="104" r="3.4"/></g>
+              <ellipse cx="16" cy="188" rx="34" ry="22" fill="#f6ecd2" stroke="#241407" stroke-width="4"/>
+              <g stroke="#8a6a2e" stroke-width="2.4" opacity=".6"><path d="M2,182 L2,202 M16,184 L16,204 M30,182 L30,202"/></g>
+            </g></g>
+
+            <!-- ================= CABEZA MACIZA ================= -->
+            <g id="cabezaRig">
+
+              <!-- OREJAS redondas de felino (detrás del cráneo) -->
+              <g transform="translate(-62,-150)"><g id="orejaIzq" class="oreja">
+                <circle cx="0" cy="0" r="30" fill="url(#gPelaje)" stroke="#241407" stroke-width="5"/>
+                <circle cx="0" cy="4" r="15" fill="#7c3f14"/>
+                <!-- mancha blanca dorsal (ocelo) — rasgo real del jaguar -->
+                <circle cx="-6" cy="-14" r="7" fill="#1c1207"/>
+              </g></g>
+              <g transform="translate(62,-150)"><g id="orejaDer" class="oreja">
+                <circle cx="0" cy="0" r="30" fill="url(#gPelaje)" stroke="#241407" stroke-width="5"/>
+                <circle cx="0" cy="4" r="15" fill="#7c3f14"/>
+                <circle cx="6" cy="-14" r="7" fill="#1c1207"/>
+              </g></g>
+
+              <!-- carrilleras / mejillas anchas (las jowls del jaguar) -->
+              <g>
+                <ellipse cx="-88" cy="-62" rx="38" ry="45" fill="#b87226" stroke="#241407" stroke-width="5"/>
+                <ellipse cx="88" cy="-62" rx="38" ry="45" fill="#b87226" stroke="#241407" stroke-width="5"/>
+              </g>
+
+              <!-- cráneo ancho (más ancho que alto — la mordida más potente de
+                   los felinos americanos vive en esta testa) -->
+              <ellipse cx="0" cy="-94" rx="106" ry="86" fill="url(#gPelaje)" stroke="#241407" stroke-width="5"/>
+
+              <!-- CABEZA: predominan PUNTOS SÓLIDOS pequeños (regla real de la
+                   especie: la roseta con punto vive en lomo y flancos, la cara
+                   lleva moteado simple) — y despeja la zona de los ojos -->
+              <g fill="#1c1207" opacity=".68">
+                <!-- frente/corona -->
+                <circle cx="-16" cy="-160" r="4.6"/><circle cx="16" cy="-160" r="4.6"/><circle cx="0" cy="-167" r="4"/>
+                <circle cx="-38" cy="-146" r="3.8"/><circle cx="38" cy="-146" r="3.8"/>
+                <circle cx="-56" cy="-130" r="3.2"/><circle cx="56" cy="-130" r="3.2"/>
+                <circle cx="0" cy="-146" r="3.4"/>
+                <!-- sienes -->
+                <circle cx="-78" cy="-108" r="3.4"/><circle cx="78" cy="-108" r="3.4"/>
+                <circle cx="-88" cy="-90" r="2.8"/><circle cx="88" cy="-90" r="2.8"/>
+                <!-- carrilleras -->
+                <circle cx="-100" cy="-70" r="3"/><circle cx="100" cy="-70" r="3"/>
+                <circle cx="-94" cy="-52" r="2.6"/><circle cx="94" cy="-52" r="2.6"/>
+              </g>
+
+              <!-- hocico claro ancho -->
+              <path d="M-40,-70 C -22,-52 22,-52 40,-70 C 42,-30 24,-8 0,-6 C -24,-8 -42,-30 -40,-70 Z"
+                    fill="#f6ecd2" opacity=".96" stroke="#c9b487" stroke-width="1.5"/>
+
+              <!-- CEJAS fieras: gruesas, en diagonal firme hacia el entrecejo
+                   (autoridad serena — el ceño del depredador tope, no rabia) -->
+              <g id="cejas" stroke="#241407" stroke-width="8.5" stroke-linecap="round" fill="none">
+                <path d="M-70,-137 C -56,-134 -40,-127 -24,-117"/>
+                <path d="M70,-137 C 56,-134 40,-127 24,-117"/>
+              </g>
+
+              <!-- OJOS almendrados ámbar, INCLINADOS (esquina externa alta:
+                   la geometría del depredador). Párpado firme permanente que
+                   entorna la mirada + sombra Ghibli en el iris (profundidad). -->
+              <g transform="rotate(9 -34 -102)"><g class="ojo">
+                <ellipse cx="-34" cy="-102" rx="27" ry="21" fill="#f8f0d8"/>
+                <circle cx="-34" cy="-101" r="18.5" fill="url(#gOjo)"/>
+                <!-- sombra del párpado sobre el iris (alma Ghibli) -->
+                <path d="M-51,-107 A 18.5,18.5 0 0 1 -17,-107" fill="none"
+                      stroke="#8a5510" stroke-width="6" opacity=".45"/>
+                <g class="pupila">
+                  <ellipse cx="-34" cy="-101" rx="4.8" ry="15" fill="#1c1207"/>
+                  <circle cx="-31.5" cy="-107" r="2.9" fill="#ffffff"/>
+                  <circle cx="-36.5" cy="-94" r="1.7" fill="#ffffff" opacity=".75"/>
+                </g>
+                <ellipse cx="-34" cy="-102" rx="27" ry="21" fill="none" stroke="#241407" stroke-width="4.5"/>
+                <!-- párpado superior (firme en reposo; baja más en acecho/amenaza) -->
+                <path class="parpado" d="M-63,-102 A 27,21 0 0 1 -5,-102 L -5,-128 L -63,-128 Z" fill="#b87226"/>
+              </g></g>
+              <g transform="rotate(-9 34 -102)"><g class="ojo">
+                <ellipse cx="34" cy="-102" rx="27" ry="21" fill="#f8f0d8"/>
+                <circle cx="34" cy="-101" r="18.5" fill="url(#gOjo)"/>
+                <path d="M17,-107 A 18.5,18.5 0 0 1 51,-107" fill="none"
+                      stroke="#8a5510" stroke-width="6" opacity=".45"/>
+                <g class="pupila">
+                  <ellipse cx="34" cy="-101" rx="4.8" ry="15" fill="#1c1207"/>
+                  <circle cx="36.5" cy="-107" r="2.9" fill="#ffffff"/>
+                  <circle cx="31.5" cy="-94" r="1.7" fill="#ffffff" opacity=".75"/>
+                </g>
+                <ellipse cx="34" cy="-102" rx="27" ry="21" fill="none" stroke="#241407" stroke-width="4.5"/>
+                <path class="parpado" d="M5,-102 A 27,21 0 0 1 63,-102 L 63,-128 L 5,-128 Z" fill="#b87226"/>
+              </g></g>
+
+              <!-- BRILLO INTERIOR de los ojos (el tapetum del felino nocturno:
+                   el ojo que devuelve la luz) — un halo dorado que respira -->
+              <g filter="url(#blurSuave)">
+                <circle class="ojoBrillo" cx="-34" cy="-100" r="24" fill="#ffd662" opacity=".35"/>
+                <circle class="ojoBrillo" cx="34" cy="-100" r="24" fill="#ffd662" opacity=".35" style="animation-delay:-1.4s"/>
+              </g>
+
+              <!-- MARCAS RITUALES apenas insinuadas: tres puntos de pintura
+                   cobre bajo cada ojo (pintura facial ritual, sutil) -->
+              <g fill="#b56a1e" opacity=".55">
+                <circle cx="-58" cy="-72" r="3.2"/><circle cx="-48" cy="-66" r="2.6"/><circle cx="-68" cy="-64" r="2.4"/>
+                <circle cx="58" cy="-72" r="3.2"/><circle cx="48" cy="-66" r="2.6"/><circle cx="68" cy="-64" r="2.4"/>
+              </g>
+
+              <!-- calidez sutil en las mejillas (apenas un rubor adulto) -->
+              <ellipse cx="-58" cy="-52" rx="14" ry="8" fill="#e08a6a" opacity=".22"/>
+              <ellipse cx="58" cy="-52" rx="14" ry="8" fill="#e08a6a" opacity=".22"/>
+
+              <!-- trufa / nariz GRANDE (morro prominente del jaguar real) -->
+              <path d="M-20,-61 Q 0,-66 20,-61 Q 15,-44 0,-40 Q -15,-44 -20,-61 Z"
+                    fill="#7a3b34" stroke="#241407" stroke-width="2.8" stroke-linejoin="round"/>
+              <path d="M-8,-56 Q 0,-59 8,-56" fill="none" stroke="#a15a50" stroke-width="2.4" stroke-linecap="round" opacity=".8"/>
+              <path d="M0,-40 L0,-30" stroke="#241407" stroke-width="3.2" stroke-linecap="round"/>
+
+              <!-- colmillos (asoman en acecho/amenaza — imponente, no gore) -->
+              <g id="colmillos">
+                <path d="M-11,-28 L-5,-28 L-8,-14 Z" fill="#fbf6e6" stroke="#241407" stroke-width="1"/>
+                <path d="M11,-28 L5,-28 L8,-14 Z" fill="#fbf6e6" stroke="#241407" stroke-width="1"/>
+              </g>
+
+              <!-- BOCA firme: las comisuras se recogen HACIA ARRIBA, hacia las
+                   carrilleras (mandíbula asentada, ni sonrisa ni tristeza) -->
+              <g id="boca">
+                <path d="M0,-30 C -13,-28 -24,-28 -33,-33 M0,-30 C 13,-28 24,-28 33,-33"
+                      stroke="#241407" stroke-width="4.5" fill="none" stroke-linecap="round"/>
+                <g id="fauces">
+                  <path d="M-13,-26 C -7,-19 7,-19 13,-26 C 8,-13 -8,-13 -13,-26 Z" fill="#7a2e28"/>
+                  <ellipse cx="0" cy="-20" rx="5" ry="2.6" fill="#c9615a"/>
+                </g>
+                <!-- mentón asentado (fuerza de mandíbula) -->
+                <path d="M-9,-9 C -3,-5 3,-5 9,-9" stroke="#241407" stroke-width="3"
+                      fill="none" stroke-linecap="round" opacity=".4"/>
+              </g>
+
+              <!-- motas de vibrisas + VIBRISAS (bigotes finos) -->
+              <g fill="#241407" opacity=".5">
+                <circle cx="-26" cy="-40" r="2.4"/><circle cx="-20" cy="-34" r="2"/><circle cx="-32" cy="-33" r="1.8"/>
+                <circle cx="26" cy="-40" r="2.4"/><circle cx="20" cy="-34" r="2"/><circle cx="32" cy="-33" r="1.8"/>
+              </g>
+              <g fill="none" stroke="#f6ecd2" stroke-width="3" stroke-linecap="round" opacity=".9">
+                <path d="M-34,-40 C -66,-39 -92,-44 -116,-54"/>
+                <path d="M-34,-33 C -64,-30 -88,-29 -110,-33"/>
+                <path d="M-32,-26 C -58,-21 -80,-19 -100,-21"/>
+                <path d="M34,-40 C 66,-39 92,-44 116,-54"/>
+                <path d="M34,-33 C 64,-30 88,-29 110,-33"/>
+                <path d="M32,-26 C 58,-21 80,-19 100,-21"/>
+              </g>
+
+            </g><!-- /cabezaRig -->
+
+          </g><!-- /cuerpoRig -->
+         </g><!-- /anticRig -->
+        </g><!-- /flota -->
+
+        <!-- ============ JAGUAR DE PERFIL (#jaguarLado) — LA MARCHA ============
+             Solo visible en estado camina (CSS). Dibujado mirando a la DERECHA;
+             el host lo espeja con data-dir="izq". Mismo lenguaje del frontal:
+             gradiente gPelaje, rosetas anillo-roto con puntos internos (la
+             firma), vientre crema, tinta gorda rubber-hose, y la capa mística
+             (aura, estrellas del pelaje, glifo, bruma, motas). -->
+        <g id="jaguarLado">
+          <!-- aura mística que late -->
+          <g id="auraLadoMistica" style="transform-box:fill-box;transform-origin:50% 50%;animation:auraLate 5.6s ease-in-out infinite">
+            <ellipse cx="0" cy="60" rx="235" ry="175" fill="url(#gVioleta)"/>
+            <ellipse cx="0" cy="75" rx="185" ry="135" fill="url(#gAura)"/>
+          </g>
+          <!-- sombra de suelo (peso) -->
+          <ellipse cx="5" cy="212" rx="180" ry="17" fill="#1c3016" opacity=".38" filter="url(#blurSuave)"/>
+
+          <g id="troncoLado">
+            <!-- COLA alzada de contrapeso: nace en la grupa, sube en S.
+                 Manchas en la base → anillos cerrados → punta negra. -->
+            <g id="colaLado">
+              <g id="colaLadoPunta">
+                <path d="M-128,50 C -172,66 -204,62 -226,38 C -238,24 -238,4 -228,-8"
+                      fill="none" stroke="#241407" stroke-width="24" stroke-linecap="round"/>
+                <path d="M-128,50 C -172,66 -204,62 -226,38 C -238,24 -238,4 -228,-8"
+                      fill="none" stroke="url(#gCola)" stroke-width="18.5" stroke-linecap="round"/>
+                <g fill="#1c1207" opacity=".8">
+                  <circle cx="-156" cy="58" r="4.6"/>
+                  <circle cx="-178" cy="58" r="4.2"/>
+                </g>
+                <path d="M-214,50 C -228,38 -236,20 -232,0"
+                      fill="none" stroke="#1c1207" stroke-width="19.5" stroke-linecap="butt"
+                      stroke-dasharray="7.5 11" stroke-dashoffset="-3"/>
+                <circle cx="-228" cy="-10" r="11.5" fill="#1c1207"/>
+              </g>
+            </g>
+
+            <!-- patas del lado de ALLÁ (más hondas, pelaje en sombra) -->
+            <g id="pataLadoDelLejos" class="pataLado">
+              <path d="M68,108 C 72,140 70,168 66,190" fill="none" stroke="#241407" stroke-width="30" stroke-linecap="round"/>
+              <path d="M68,108 C 72,140 70,168 66,190" fill="none" stroke="#a8661d" stroke-width="23.5" stroke-linecap="round"/>
+              <ellipse cx="66" cy="196" rx="23" ry="13" fill="#dcc9a2" stroke="#241407" stroke-width="3.5"/>
+            </g>
+            <g id="pataLadoTrasLejos" class="pataLado">
+              <path d="M-108,108 C -114,140 -112,168 -106,190" fill="none" stroke="#241407" stroke-width="32" stroke-linecap="round"/>
+              <path d="M-108,108 C -114,140 -112,168 -106,190" fill="none" stroke="#a8661d" stroke-width="25.5" stroke-linecap="round"/>
+              <ellipse cx="-106" cy="196" rx="24" ry="13" fill="#dcc9a2" stroke="#241407" stroke-width="3.5"/>
+            </g>
+
+            <!-- TRONCO alargado de perfil: bajo, macizo, centro de gravedad
+                 hundido (anti-leopardo) -->
+            <ellipse cx="-8" cy="84" rx="138" ry="77" fill="url(#gPelaje)" stroke="#241407" stroke-width="5"/>
+            <!-- vientre crema -->
+            <ellipse cx="-10" cy="132" rx="110" ry="26" fill="#f6ecd2" opacity=".88"/>
+            <!-- definición muscular: anca y pecho -->
+            <g fill="none" stroke="#241407" stroke-width="2.2" opacity=".18" stroke-linecap="round">
+              <path d="M-96,52 C -120,84 -118,120 -96,142"/>
+              <path d="M96,60 C 112,88 110,118 92,138"/>
+            </g>
+            <!-- ROSETAS del flanco (anillo roto + puntos internos, la firma) -->
+            <g>
+              <use href="#roseta" transform="translate(-96,52) scale(1.12) rotate(130)"/>
+              <use href="#roseta" transform="translate(-28,40) scale(1.3) rotate(15)"/>
+              <use href="#roseta" transform="translate(44,50) scale(1.14) rotate(250)"/>
+              <use href="#roseta" transform="translate(-118,108) scale(.82) rotate(320)"/>
+              <use href="#roseta" transform="translate(-58,104) scale(.98) rotate(40)"/>
+              <use href="#roseta" transform="translate(14,102) scale(.9) rotate(205)"/>
+              <use href="#roseta" transform="translate(82,98) scale(.78) rotate(85)"/>
+              <use href="#roseta" transform="translate(108,40) scale(.72) rotate(300)"/>
+            </g>
+            <!-- CONSTELACIÓN del pelaje: estrellas al borde de las manchas -->
+            <g fill="#fff3c4">
+              <use class="estrellaPiel" href="#estrella4" transform="translate(-44,50) scale(.5)"/>
+              <use class="estrellaPiel" href="#estrella4" transform="translate(28,38) scale(.55)" style="animation-delay:-1.2s"/>
+              <use class="estrellaPiel" href="#estrella4" transform="translate(-98,80) scale(.42)" style="animation-delay:-2.4s"/>
+              <use class="estrellaPiel" href="#estrella4" transform="translate(52,80) scale(.46)" style="animation-delay:-3.1s"/>
+            </g>
+            <!-- GLIFO ritual del hombro (se insinúa, como en el frontal) -->
+            <g class="glifo" fill="none" stroke="#b56a1e" stroke-width="3" stroke-linecap="round">
+              <path transform="translate(52,52) scale(5.5)" d="M0,0 C0.3,-0.3 0.75,-0.15 0.85,0.35 C0.95,0.95 0.35,1.4 -0.4,1.15 C-1.35,0.85 -1.6,-0.35 -0.95,-1.15 C-0.2,-2.05 1.3,-1.95 2.05,-0.95"/>
+            </g>
+            <!-- OMÓPLATO que rueda al andar (la seña del jaguar) -->
+            <g id="hombroLado">
+              <path d="M34,26 Q 76,-12 116,30 Q 76,12 34,26 Z" fill="#b87226" stroke="#241407" stroke-width="4" stroke-linejoin="round"/>
+            </g>
+
+            <!-- patas del lado de ACÁ -->
+            <g id="pataLadoTrasCerca" class="pataLado">
+              <path d="M-74,112 C -70,144 -72,172 -76,192" fill="none" stroke="#241407" stroke-width="35" stroke-linecap="round"/>
+              <path d="M-74,112 C -70,144 -72,172 -76,192" fill="none" stroke="url(#gPelaje)" stroke-width="28.5" stroke-linecap="round"/>
+              <g fill="#1c1207" opacity=".55">
+                <circle cx="-71" cy="140" r="3.6"/><circle cx="-74" cy="166" r="3"/>
+              </g>
+              <ellipse cx="-76" cy="197" rx="26" ry="14" fill="#f6ecd2" stroke="#241407" stroke-width="4"/>
+              <path d="M-86,190 L-86,204 M-76,192 L-76,206 M-66,190 L-66,204" stroke="#8a6a2e" stroke-width="2.2" opacity=".6"/>
+            </g>
+            <g id="pataLadoDelCerca" class="pataLado">
+              <path d="M96,112 C 102,144 100,172 96,192" fill="none" stroke="#241407" stroke-width="34" stroke-linecap="round"/>
+              <path d="M96,112 C 102,144 100,172 96,192" fill="none" stroke="url(#gPelaje)" stroke-width="27.5" stroke-linecap="round"/>
+              <g fill="#1c1207" opacity=".55">
+                <circle cx="100" cy="140" r="3.6"/><circle cx="98" cy="166" r="3"/>
+              </g>
+              <ellipse cx="96" cy="197" rx="26" ry="14" fill="#f6ecd2" stroke="#241407" stroke-width="4"/>
+              <path d="M86,190 L86,204 M96,192 L96,206 M106,190 L106,204" stroke="#8a6a2e" stroke-width="2.2" opacity=".6"/>
+            </g>
+
+            <!-- CUELLO/PECHO — la masa que une la testa baja con el tronco
+                 (sin esto la cabeza flota). El cráneo tapa la costura. -->
+            <path d="M48,14 C 92,-20 158,-22 182,14 C 194,38 184,66 152,78 C 112,92 66,76 48,44 Z"
+                  fill="url(#gPelaje)" stroke="#241407" stroke-width="5" stroke-linejoin="round"/>
+
+            <!-- CABEZA de perfil (wrapper del gruñido + bob del paso).
+                 PORTE DE DEPREDADOR: la testa va BAJA, a la altura del hombro,
+                 SOLAPADA al pecho (cero hueco de cuello) — cráneo grande y
+                 redondo, morro CORTO y macizo (el jaguar tiene la cabeza más
+                 robusta de los felinos americanos), mandíbula recogida. -->
+            <g id="cabezaLadoGrune">
+              <g id="cabezaLado">
+                <!-- oreja redonda (detrás del cráneo) con ocelo blanco -->
+                <circle cx="138" cy="-34" r="22" fill="url(#gPelaje)" stroke="#241407" stroke-width="4.5"/>
+                <circle cx="138" cy="-32" r="10.5" fill="#7c3f14"/>
+                <circle cx="133" cy="-43" r="5" fill="#1c1207"/>
+                <!-- GRUÑIDO: garganta roja + colmillos (visibles solo al gruñir,
+                     detrás del morro/mandíbula) -->
+                <g id="gruneFx">
+                  <path d="M208,28 C 230,22 250,24 260,20 C 258,42 238,54 212,48 Z" fill="#7e1d14"/>
+                  <path d="M244,24 L250,44 L234,30 Z" fill="#fff6e0" stroke="#241407" stroke-width="1.2"/>
+                  <path d="M220,28 L224,42 L212,32 Z" fill="#fff6e0" stroke="#241407" stroke-width="1"/>
+                </g>
+                <!-- MANDÍBULA (pivota al gruñir; cerrada queda recogida bajo el morro) -->
+                <g id="fauceLado">
+                  <path d="M216,38 C 232,43 246,41 254,33 C 252,45 240,50 222,46 C 216,43 214,41 216,38 Z"
+                        fill="#dcc49c" stroke="#241407" stroke-width="3.2" stroke-linejoin="round"/>
+                  <path d="M246,34 L240,46 L233,36 Z" fill="#fff6e0" stroke="#241407" stroke-width="1"/>
+                </g>
+                <!-- CRÁNEO grande, solapado al pecho (sin cuello flaco) -->
+                <ellipse cx="172" cy="0" rx="58" ry="51" fill="url(#gPelaje)" stroke="#241407" stroke-width="5"/>
+                <!-- MORRO corto y macizo -->
+                <ellipse cx="234" cy="18" rx="31" ry="24" fill="url(#gPelaje)" stroke="#241407" stroke-width="4"/>
+                <!-- labio superior claro, pequeño e integrado al morro -->
+                <path d="M226,16 C 242,10 257,14 261,20 C 257,29 242,32 228,29 Z" fill="#f0ddb8" opacity=".85"/>
+                <g fill="#1c1207" opacity=".5">
+                  <circle cx="238" cy="18" r="1.8"/><circle cx="246" cy="21" r="1.5"/><circle cx="234" cy="24" r="1.5"/>
+                </g>
+                <!-- vibrisas -->
+                <g fill="none" stroke="#f6ecd0" stroke-width="2.3" stroke-linecap="round" opacity=".65">
+                  <path d="M244,16 C 262,10 278,10 290,4"/>
+                  <path d="M245,21 C 263,18 279,20 292,16"/>
+                  <path d="M243,26 C 259,27 273,32 285,32"/>
+                </g>
+                <!-- trufa -->
+                <path d="M252,4 C 262,2 269,8 268,14 C 267,20 258,23 251,20 Z" fill="#6b3a34" stroke="#241407" stroke-width="1.4"/>
+                <!-- rosetas/puntos de la cara (patrón real: puntos sólidos) -->
+                <use href="#rosetaCara" transform="translate(152,18) scale(.8) rotate(25)"/>
+                <g fill="#1c1207" opacity=".6">
+                  <circle cx="166" cy="-28" r="2.8"/><circle cx="184" cy="-22" r="2.3"/>
+                  <circle cx="150" cy="-6" r="2.5"/><circle cx="204" cy="-14" r="2"/>
+                </g>
+                <!-- CEJA fiera + OJO ámbar de perfil (pupila vertical) -->
+                <path d="M185,-24 L209,-18" stroke="#241407" stroke-width="3.4" stroke-linecap="round" fill="none"/>
+                <g class="ojo">
+                  <ellipse cx="200" cy="-6" rx="10.2" ry="10.8" fill="#fffbe8" stroke="#241407" stroke-width="1.8"/>
+                  <circle cx="201" cy="-5" r="6.6" fill="#ee9d14"/>
+                  <circle cx="201.5" cy="-4.5" r="3.1" fill="#1c1207"/>
+                  <circle cx="204" cy="-8" r="1.7" fill="#fff"/>
+                </g>
+                <!-- brillo del ojo (tapetum místico) -->
+                <circle class="ojoBrillo" cx="201" cy="-5" r="7.5" fill="#ffcf58" opacity=".4" filter="url(#blurSuave)"/>
+                <!-- estrella de la frente -->
+                <g fill="#fff3c4">
+                  <use class="estrellaPiel" href="#estrella4" transform="translate(158,-22) scale(.42)" style="animation-delay:-1.8s"/>
+                </g>
+              </g>
+            </g>
+          </g><!-- /troncoLado -->
+
+          <!-- BRUMA etérea a los pies + motas del espíritu -->
+          <ellipse cx="0" cy="206" rx="185" ry="20" fill="#b9a0e0" opacity=".09" filter="url(#blurSuave)"/>
+          <g fill="#ffe9a8">
+            <circle class="mota" cx="-160" cy="30" r="4.5"/>
+            <circle class="mota" cx="150" cy="-40" r="3.8" style="animation-delay:-2.4s"/>
+            <circle class="mota" cx="-60" cy="-70" r="3.4" style="animation-delay:-4.1s"/>
+          </g>
+        </g><!-- /jaguarLado -->
+      </g><!-- /jaguar -->
+    </g>

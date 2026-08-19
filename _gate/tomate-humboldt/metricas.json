@@ -1,0 +1,30 @@
+{
+  "ab_antes": {
+    "total": 203271,
+    "verde": 30530,
+    "rojo": 1977,
+    "pctVerde": "15.0",
+    "pctRojo": "0.97"
+  },
+  "ab_despues": {
+    "total": 208920,
+    "verde": 39764,
+    "rojo": 1003,
+    "pctVerde": "19.0",
+    "pctRojo": "0.48"
+  },
+  "tunel1500": {
+    "total": 540439,
+    "verde": 281295,
+    "rojo": 1931,
+    "pctVerde": "52.0",
+    "pctRojo": "0.36"
+  },
+  "campo10000": {
+    "total": 1011994,
+    "verde": 349475,
+    "rojo": 7595,
+    "pctVerde": "34.5",
+    "pctRojo": "0.75"
+  }
+}

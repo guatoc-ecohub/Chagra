@@ -1,0 +1,115 @@
+<defs>
+      <linearGradient id="gCielo" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0" stop-color="#5fc3e6"/>
+        <stop offset=".5" stop-color="#8ad4c2"/>
+        <stop offset="1" stop-color="#d7e4a2"/>
+      </linearGradient>
+      <radialGradient id="gSol" cx=".5" cy=".5" r=".5">
+        <stop offset="0" stop-color="#fff6d8" stop-opacity=".9"/>
+        <stop offset="1" stop-color="#fff6d8" stop-opacity="0"/>
+      </radialGradient>
+      <!-- escarlata rico con luz y sombra -->
+      <linearGradient id="gEscarlata" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0" stop-color="#ff5a3c"/>
+        <stop offset=".5" stop-color="#e02420"/>
+        <stop offset="1" stop-color="#9e1216"/>
+      </linearGradient>
+      <linearGradient id="gCabeza" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0" stop-color="#ff5f44"/>
+        <stop offset="1" stop-color="#cf1f1e"/>
+      </linearGradient>
+      <linearGradient id="gColaRoja" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0" stop-color="#f24a30"/>
+        <stop offset=".65" stop-color="#d0221e"/>
+        <stop offset="1" stop-color="#a8151a"/>
+      </linearGradient>
+      <linearGradient id="gAmarillo" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0" stop-color="#ffd23a"/>
+        <stop offset="1" stop-color="#eda714"/>
+      </linearGradient>
+      <linearGradient id="gVerde" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0" stop-color="#3fae57"/>
+        <stop offset="1" stop-color="#1f7a38"/>
+      </linearGradient>
+      <linearGradient id="gAzulAla" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0" stop-color="#4a7ee8"/>
+        <stop offset="1" stop-color="#26489e"/>
+      </linearGradient>
+      <linearGradient id="gDosel" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0" stop-color="#2f9b52"/>
+        <stop offset="1" stop-color="#176b38"/>
+      </linearGradient>
+      <linearGradient id="gPicoAlto" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0" stop-color="#5c5c66"/>
+        <stop offset="1" stop-color="#33333b"/>
+      </linearGradient>
+      <filter id="boil" x="-8%" y="-8%" width="116%" height="116%">
+        <feTurbulence id="boilTurb" type="fractalNoise" baseFrequency="0.02" numOctaves="1" seed="1" result="n"/>
+        <feDisplacementMap in="SourceGraphic" in2="n" scale="2.4"/>
+      </filter>
+      <filter id="blurAla"><feGaussianBlur stdDeviation="1.8"/></filter>
+      <filter id="grano">
+        <feTurbulence type="fractalNoise" baseFrequency=".9" numOctaves="2" result="g"/>
+        <feColorMatrix in="g" type="matrix" values="0 0 0 0 0.12 0 0 0 0 0.09 0 0 0 0 0.05 0 0 0 .045 0"/>
+      </filter>
+
+      <!-- pluma de ala (rémige): gota alargada con raquis -->
+      <g id="plumaAla">
+        <path d="M0,0 C -8,18 -10,54 -5,86 C -2,98 4,98 7,86 C 12,54 9,18 5,0 Z"/>
+        <path d="M1,10 C 0,38 0,66 1,88" stroke-width="1.6" fill="none" opacity=".45" stroke="#1a0f08"/>
+      </g>
+      <!-- pluma de cola larguísima y fluida -->
+      <path id="plumaCola" d="M0,0 C -11,64 -13,160 -5,248 C -2,272 6,272 9,248 C 16,160 12,64 7,0 Z"/>
+      <!-- hoja de dosel -->
+      <path id="hojaTropi" d="M0,0 C -30,-14 -56,-8 -78,10 C -54,26 -24,22 0,8 C -8,20 -6,40 2,54 C 14,36 12,10 0,0 Z"/>
+      <!-- ave de fondo (silueta simple, biodiversidad) -->
+      <g id="aveSilueta">
+        <ellipse cx="0" cy="0" rx="7" ry="4"/>
+        <g class="aleteoBg"><path d="M-2,-1 C -18,-14 -30,-14 -40,-6 C -28,-2 -14,-2 -3,1 Z"/></g>
+        <g class="aleteoBg"><path d="M2,-1 C 18,-14 30,-14 40,-6 C 28,-2 14,-2 3,1 Z"/></g>
+      </g>
+      <!-- fruto colgante -->
+      <g id="frutoRacimo">
+        <path d="M0,0 C -2,10 -2,16 0,20 C 2,16 2,10 0,0 Z" fill="#7a4a1e"/>
+        <circle cx="0" cy="24" r="7"/>
+        <circle cx="-6" cy="34" r="6"/>
+        <circle cx="6" cy="35" r="6"/>
+        <circle cx="0" cy="44" r="6.5"/>
+      </g>
+
+      <!-- ALA COMPLETA (izquierda; la derecha la espeja el grupo padre).
+           Hombro en (0,0). Bandera real del Ara macao de arriba hacia abajo:
+           coberteras escarlata → banda AMARILLA → filo VERDE → rémiges AZULES. -->
+      <g id="alaBandera">
+        <!-- rémiges AZULES (las plumas largas de vuelo) -->
+        <g stroke="#16244e" stroke-width="3">
+          <g transform="translate(-42,56) rotate(18)"><use href="#plumaAla" fill="url(#gAzulAla)"/></g>
+          <g transform="translate(-28,66) rotate(10)"><use href="#plumaAla" fill="url(#gAzulAla)"/></g>
+          <g transform="translate(-14,72) rotate(3)"><use href="#plumaAla" fill="url(#gAzulAla)"/></g>
+          <g transform="translate(-1,74) rotate(-4) scale(.94)"><use href="#plumaAla" fill="url(#gAzulAla)"/></g>
+        </g>
+        <!-- coberteras mayores VERDES (filo de transición) -->
+        <g stroke="#12451f" stroke-width="2.6">
+          <g transform="translate(-37,50) rotate(16) scale(.62)"><use href="#plumaAla" fill="url(#gVerde)"/></g>
+          <g transform="translate(-23,58) rotate(7) scale(.62)"><use href="#plumaAla" fill="url(#gVerde)"/></g>
+          <g transform="translate(-9,62) rotate(-1) scale(.6)"><use href="#plumaAla" fill="url(#gVerde)"/></g>
+        </g>
+        <!-- coberteras medias AMARILLAS (la banda dorada) -->
+        <g stroke="#8f5f06" stroke-width="2.6">
+          <g transform="translate(-40,30) rotate(17) scale(.56)"><use href="#plumaAla" fill="url(#gAmarillo)"/></g>
+          <g transform="translate(-25,39) rotate(8) scale(.58)"><use href="#plumaAla" fill="url(#gAmarillo)"/></g>
+          <g transform="translate(-10,44) rotate(0) scale(.56)"><use href="#plumaAla" fill="url(#gAmarillo)"/></g>
+          <g transform="translate(3,45) rotate(-7) scale(.48)"><use href="#plumaAla" fill="url(#gAmarillo)"/></g>
+        </g>
+        <!-- hombro ESCARLATA (coberteras menores) que nace del cuerpo -->
+        <path d="M8,-20 C -30,-16 -56,8 -60,44 C -62,62 -52,72 -34,70 C -8,66 10,54 14,36 C 18,16 16,-8 8,-20 Z"
+              fill="url(#gEscarlata)" stroke="#2a140b" stroke-width="4" stroke-linejoin="round"/>
+        <!-- luz del hombro + escamitas de pluma -->
+        <path d="M-4,-10 C -28,-4 -46,14 -50,38" stroke="#ff8a66" stroke-width="4.5" fill="none" opacity=".6" stroke-linecap="round"/>
+        <g stroke="#a8151a" stroke-width="2" fill="none" opacity=".55" stroke-linecap="round">
+          <path d="M-34,34 C -28,40 -20,42 -12,42"/>
+          <path d="M-40,20 C -34,26 -26,29 -18,29"/>
+          <path d="M-26,50 C -20,55 -12,57 -4,56"/>
+        </g>
+      </g>
+    </defs>

@@ -1,0 +1,75 @@
+<defs>
+      <linearGradient id="gCielo" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0" stop-color="#e6eec2"/>
+        <stop offset=".5" stop-color="#a6ca7c"/>
+        <stop offset="1" stop-color="#4f7a40"/>
+      </linearGradient>
+      <radialGradient id="gSol" cx=".5" cy=".5" r=".5">
+        <stop offset="0" stop-color="#fdf7d2" stop-opacity=".9"/>
+        <stop offset=".5" stop-color="#f0e8b0" stop-opacity=".3"/>
+        <stop offset="1" stop-color="#f0e8b0" stop-opacity="0"/>
+      </radialGradient>
+      <radialGradient id="gPelaje" cx="42%" cy="28%" r="86%">
+        <stop offset="0" stop-color="#e8a852"/>
+        <stop offset=".55" stop-color="#c97f28"/>
+        <stop offset="1" stop-color="#9c6018"/>
+      </radialGradient>
+      <linearGradient id="gCola" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0" stop-color="#d98f36"/>
+        <stop offset="1" stop-color="#a86a22"/>
+      </linearGradient>
+      <radialGradient id="gOjo" cx=".5" cy=".38" r=".62">
+        <stop offset="0" stop-color="#ffd662"/>
+        <stop offset=".5" stop-color="#ee9d14"/>
+        <stop offset="1" stop-color="#b86a0e"/>
+      </radialGradient>
+      <radialGradient id="gAura" cx=".5" cy=".5" r=".5">
+        <stop offset="0" stop-color="#efaf4e" stop-opacity=".4"/>
+        <stop offset="1" stop-color="#efaf4e" stop-opacity="0"/>
+      </radialGradient>
+      <filter id="boil" x="-8%" y="-8%" width="116%" height="116%">
+        <feTurbulence id="boilTurb" type="fractalNoise" baseFrequency="0.018" numOctaves="1" seed="1" result="n"/>
+        <feDisplacementMap in="SourceGraphic" in2="n" scale="2.2"/>
+      </filter>
+      <filter id="blurSuave"><feGaussianBlur stdDeviation="3"/></filter>
+      <filter id="grano">
+        <feTurbulence type="fractalNoise" baseFrequency=".9" numOctaves="2" result="g"/>
+        <feColorMatrix in="g" type="matrix" values="0 0 0 0 0.12 0 0 0 0 0.14 0 0 0 0 0.06 0 0 0 .05 0"/>
+      </filter>
+
+      <!-- ROSETA de Panthera onca: anillo ROTO negro + campo ocre + PUNTOS negros
+           adentro (la regla de oro anti-leopardo). Reutilizada con <use>+scale+rotate. -->
+      <g id="roseta">
+        <ellipse cx="0" cy="0" rx="12.5" ry="10.5" fill="#a8741a" opacity=".9"/>
+        <ellipse cx="0" cy="0" rx="18.5" ry="15.5" fill="none" stroke="#1c1207"
+                 stroke-width="7" stroke-dasharray="20 8 16 9 13 7" stroke-linecap="round"/>
+        <circle cx="-4" cy="2.5" r="3.6" fill="#1c1207"/>
+        <circle cx="5" cy="-3" r="2.9" fill="#1c1207"/>
+      </g>
+      <!-- roseta pequeña de la cara: un solo punto interno -->
+      <g id="rosetaCara">
+        <ellipse cx="0" cy="0" rx="7" ry="6" fill="#a8741a" opacity=".85"/>
+        <ellipse cx="0" cy="0" rx="10.5" ry="9" fill="none" stroke="#1c1207"
+                 stroke-width="4" stroke-dasharray="11 5 9 5 7 4" stroke-linecap="round"/>
+        <circle cx="0" cy="0" r="2.4" fill="#1c1207"/>
+      </g>
+
+      <!-- estrella de 4 puntas (sparkle de constelación) -->
+      <path id="estrella4" d="M0,-10 L2.6,-2.6 L10,0 L2.6,2.6 L0,10 L-2.6,2.6 L-10,0 L-2.6,-2.6 Z"/>
+      <!-- rayo escalonado del mandala (geometría propia, dibujada para este
+           personaje: escalón andino genérico, no cita ningún diseño real) -->
+      <g id="rayoMandala">
+        <path d="M0,-292 L10,-274 L5,-274 L5,-262 L-5,-262 L-5,-274 L-10,-274 Z"/>
+      </g>
+      <!-- rombo del anillo medio -->
+      <path id="romboMandala" d="M0,-12 L7,0 L0,12 L-7,0 Z"/>
+      <radialGradient id="gVioleta" cx=".5" cy=".5" r=".5">
+        <stop offset="0" stop-color="#a86ae8" stop-opacity=".45"/>
+        <stop offset="1" stop-color="#a86ae8" stop-opacity="0"/>
+      </radialGradient>
+
+      <!-- fronda de helecho / hoja de selva -->
+      <path id="fronda" d="M0,0 C -14,-46 -10,-104 0,-140 C 10,-104 14,-46 0,0 Z"/>
+      <!-- hoja ancha tipo monstera -->
+      <path id="hojaAncha" d="M0,0 C -70,-14 -104,-70 -96,-140 C -60,-120 -20,-90 0,-40 C 20,-90 60,-120 96,-140 C 104,-70 70,-14 0,0 Z"/>
+    </defs>

@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Cafetal bajo sombra — harness de gate</title>
+<!--
+  Harness de gate para lib3d/flora/cafetalSombra.js (tarea ARTE #26).
+  Vistas por query param:
+    ?vista=sombra    (default) DENTRO del cafetal a nivel de ojo: se juzgan los
+                     DOS estratos (dosel de guamo arriba, cafetal abajo) y la
+                     luz en parches sobre el suelo.
+    ?vista=cafeto    3 seeds de la mata de cerca: candelabro + glomérulos rojos.
+    ?vista=guamo     3 seeds del guamo: paraguas ralo + guamas colgantes.
+    ?vista=luz       cámara baja mirando el suelo: los parches de sol filtrado.
+    ?vista=perf&lado=N   lote de N×N m, cámara a ras — barrido de hectáreas.
+  El viento corre siempre. HUD con FPS/tris/calls; window.__stats para shot3d.
+-->
+<style>
+  html, body { margin: 0; height: 100%; background: #cfd8b8; overflow: hidden; }
+  #hud {
+    position: fixed; left: 10px; top: 10px; z-index: 5;
+    font: 12px/1.5 monospace; color: #2a2416; background: rgba(255,252,240,.75);
+    padding: 6px 10px; border-radius: 6px; white-space: pre;
+  }
+  #hud.error { background: #c0392b; color: #fff; }
+</style>
+<script type="importmap">
+{
+  "imports": {
+    "three": "./vendor/three.module.js",
+    "three/addons/": "./vendor/addons/"
+  }
+}
+</script>
+</head>
+<body>
+<div id="hud">cargando…</div>
+<script type="module">
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import {
+  crearCafetalSombra, crearCafeto, crearGuamo, FICHA_CAFETAL, PALETA_CAFETAL,
+} from './lib3d/flora/cafetalSombra.js';
+import { tickVientoMundos } from './lib3d/flora/vientoMundos.js';
+
+const hud = document.getElementById('hud');
+window.addEventListener('error', (e) => {
+  hud.classList.add('error');
+  hud.textContent = 'ERROR: ' + (e.message || e.type);
+});
+
+const q = new URLSearchParams(location.search);
+const vista = q.get('vista') || 'sombra';
+const seedQ = Number(q.get('seed')) || 26;
+const solRasante = q.get('sol') === 'rasante';
+const depthEnabled = q.get('depth') !== '0';
+const lado = Number(q.get('lado')) || 80;
+
+// ── escena: mediodía templado, cielo cálido con niebla suave ─────────────────
+const COLOR_CIELO = 0xdfe6c6;
+const NIEBLA_DENS = vista === 'perf' ? 0.010 : 0.007;
+const escena = new THREE.Scene();
+escena.background = new THREE.Color(COLOR_CIELO);
+escena.fog = new THREE.FogExp2(COLOR_CIELO, NIEBLA_DENS);
+
+const renderer = new THREE.WebGLRenderer({ antialias: true });
+renderer.setSize(innerWidth, innerHeight);
+renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure = 1.1;
+document.body.appendChild(renderer.domElement);
+
+const camara = new THREE.PerspectiveCamera(52, innerWidth / innerHeight, 0.1, 500);
+const controles = new OrbitControls(camara, renderer.domElement);
+
+// luz: sol alto y cálido — el que hace los parches al colarse por el dosel
+const hemi = new THREE.HemisphereLight(0xf2ead2, 0x4a4630, 0.75);
+escena.add(hemi);
+const sol = new THREE.DirectionalLight(0xfff0d0, 2.0);
+sol.position.set(solRasante ? 32 : 26, solRasante ? 8 : 42, solRasante ? 18 : 14);
+sol.castShadow = true;
+sol.shadow.mapSize.set(4096, 4096);
+const S = vista === 'perf' ? 90 : 55;
+sol.shadow.camera.left = -S; sol.shadow.camera.right = S;
+sol.shadow.camera.top = S; sol.shadow.camera.bottom = -S;
+sol.shadow.camera.far = 160;
+sol.shadow.bias = -0.0005;
+escena.add(sol);
+
+// ── la ladera: pendiente suave hacia -Z + ruido (los surcos van a nivel) ─────
+function hashS(x, z) {
+  const h = Math.sin(x * 127.1 + z * 311.7) * 43758.5453;
+  return h - Math.floor(h);
+}
+function vnoiseS(x, z) {
+  const xi = Math.floor(x), zi = Math.floor(z), xf = x - xi, zf = z - zi;
+  const u = xf * xf * (3 - 2 * xf), v = zf * zf * (3 - 2 * zf);
+  const a = hashS(xi, zi), b = hashS(xi + 1, zi), c = hashS(xi, zi + 1), d = hashS(xi + 1, zi + 1);
+  return a + (b - a) * u + (c - a) * v + (a - b - c + d) * u * v;
+}
+const alturaEn = (x, z) => -z * 0.085 + vnoiseS(x * 0.04, z * 0.04) * 1.6;
+
+{
+  const L = vista === 'perf' ? Math.max(lado * 1.3, 160) : 150;
+  const geo = new THREE.PlaneGeometry(L, L, 96, 96);
+  geo.rotateX(-Math.PI / 2);
+  const P = geo.attributes.position, n = P.count;
+  const col = new Float32Array(n * 3);
+  // suelo de cafetal: tierra + HOJARASCA del guamo (el abono que se ve)
+  const cA = new THREE.Color(PALETA_CAFETAL.hojarasca);
+  const cB = new THREE.Color(PALETA_CAFETAL.hojarascaSombra);
+  const cC = new THREE.Color('#7d6844');
+  const tmp = new THREE.Color();
+  for (let i = 0; i < n; i++) {
+    const x = P.getX(i), z = P.getZ(i);
+    P.setY(i, alturaEn(x, z));
+    const m = hashS(x * 0.31, z * 0.31);
+    tmp.copy(cA).lerp(cB, vnoiseS(x * 0.2, z * 0.2));
+    if (m > 0.8) tmp.lerp(cC, 0.5);
+    col[i * 3] = tmp.r; col[i * 3 + 1] = tmp.g; col[i * 3 + 2] = tmp.b;
+  }
+  geo.setAttribute('color', new THREE.BufferAttribute(col, 3));
+  geo.computeVertexNormals();
+  const suelo = new THREE.Mesh(geo, new THREE.MeshStandardMaterial({
+    vertexColors: true, roughness: 1, metalness: 0,
+  }));
+  suelo.receiveShadow = true;
+  escena.add(suelo);
+}
+
+// ── vistas ───────────────────────────────────────────────────────────────────
+let cafetal = null;
+
+if (vista === 'cafeto') {
+  [-2.4, 0, 2.4].forEach((x, i) => {
+    const mata = crearCafeto({ seed: seedQ + i * 37 });
+    mata.position.set(x, alturaEn(x, 6), 6);
+    escena.add(mata);
+  });
+  camara.position.set(0, 1.55, 10.4);
+  controles.target.set(0, 1.0, 6);
+} else if (vista === 'guamo') {
+  [-11, 0, 11].forEach((x, i) => {
+    const arbol = crearGuamo({ seed: seedQ + i * 53 });
+    arbol.position.set(x, alturaEn(x, 0), 0);
+    escena.add(arbol);
+  });
+  camara.position.set(0, 6.5, 30);
+  controles.target.set(0, 6.5, 0);
+} else if (vista === 'perf' && q.get('sin') === '1') {
+  // baseline: suelo + luces sin cafetal (para aislar el costo del módulo)
+  camara.position.set(28.5, 2.15, 2.3);
+  controles.target.set(-20, 3.0, 0.6);
+} else {
+  const half = (vista === 'perf' ? lado : 80) / 2;
+  cafetal = crearCafetalSombra({
+    area: { x0: -half, x1: half, z0: -half, z1: half },
+    alturaEn, seed: seedQ,
+    niebla: { color: COLOR_CIELO, densidad: NIEBLA_DENS, fuerza: 0.9 },
+    corte: vista === 'perf' ? 150 : 170,
+  });
+  escena.add(cafetal.grupo);
+  window.__cafetal = cafetal.conteo;
+  window.__scene = escena;
+  window.__shadowAudit = () => {
+    const out = [];
+    escena.traverse((o) => {
+      if (!o.isMesh || !o.castShadow) return;
+      out.push({ name: o.name, castShadow: o.castShadow, customDepthMaterial: Boolean(o.customDepthMaterial), viento: Boolean(o.material?.userData?.__vientoMundo) });
+    });
+    return out;
+  };
+  if (!depthEnabled) escena.traverse((o) => {
+    if (o.isMesh && o.castShadow) delete o.customDepthMaterial;
+  });
+  if (vista === 'luz') {
+    camara.position.set(3, 2.6, 9);
+    controles.target.set(-5, -0.3, -7);      // mirando el suelo entre surcos
+  } else {
+    // por la CALLE del cafetal, a nivel de ojo: dos estratos y suelo en el
+    // mismo encuadre (los surcos corren a lo largo de X = curva de nivel)
+    camara.position.set(28.5, 2.15, 2.3);
+    controles.target.set(-20, 3.0, 0.6);
+  }
+}
+controles.update();
+
+// ── loop ─────────────────────────────────────────────────────────────────────
+const reloj = new THREE.Clock();
+let fps = 0, marco = 0, tAcum = 0;
+function loop() {
+  requestAnimationFrame(loop);
+  const dt = reloj.getDelta();
+  tickVientoMundos(reloj.elapsedTime);
+  if (cafetal) cafetal.actualizar(camara);
+  controles.update();
+  renderer.render(escena, camara);
+  marco++; tAcum += dt;
+  if (tAcum >= 0.5) {
+    fps = Math.round(marco / tAcum);
+    marco = 0; tAcum = 0;
+    const inf = renderer.info.render;
+    hud.textContent =
+      `vista: ${vista}\n${fps} FPS · ${inf.triangles.toLocaleString('es')} tris · ${inf.calls} calls`
+      + (cafetal ? `\n${JSON.stringify(cafetal.stats ? { ...window.__cafetal, tilesVivos: cafetal.stats().tilesCafeVivos } : window.__cafetal)}` : '')
+      + `\n${FICHA_CAFETAL.cafeto.cientifico} bajo ${FICHA_CAFETAL.guamo.cientifico}`;
+    window.__stats = { fps, tris: inf.triangles, calls: inf.calls, vista };
+  }
+}
+loop();
+
+addEventListener('resize', () => {
+  camara.aspect = innerWidth / innerHeight;
+  camara.updateProjectionMatrix();
+  renderer.setSize(innerWidth, innerHeight);
+});
+</script>
+</body>
+</html>

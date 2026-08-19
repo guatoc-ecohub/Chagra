@@ -1,0 +1,139 @@
+<!doctype html>
+<html lang="es-CO">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Valle de Guatoc — 3D</title>
+<!-- sin esto el navegador pide /favicon.ico y el 404 es el único error de
+     consola que el gate del valle venía arrastrando (verificado contra master) -->
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ctext y='26' font-size='26'%3E%F0%9F%8F%94%3C/text%3E%3C/svg%3E">
+<style>
+  html,body{margin:0;height:100%;overflow:hidden;background:#0a0a0f;font-family:system-ui,-apple-system,sans-serif}
+  #c{display:block;width:100vw;height:100vh;touch-action:none}
+  /* ⚠️ el HUD se salía por debajo de la barra «Mover lo mío» y quedaba CORTADO
+     a media frase (auditoría 2026-07-26). Ahora tiene ancho máximo, se ajusta
+     en dos líneas y sube por encima de la barra. */
+  #hud{position:fixed;left:16px;bottom:52px;max-width:min(38vw,420px);color:#fff;opacity:.72;
+    font-size:.76rem;line-height:1.35;text-shadow:0 1px 4px #000;pointer-events:none;letter-spacing:.01em}
+  #hud.avisoOculto{visibility:hidden}
+  @media (max-width:700px){#hud{max-width:60vw;bottom:60px;font-size:.7rem}}
+  /* El valle se juega como el kart: el retrato no intenta encajar el paisaje
+     en vertical. Conserva el estado y devuelve el control al girar. */
+  #orientationGate{position:fixed;inset:0;z-index:70;display:none;place-items:center;
+    box-sizing:border-box;padding:24px;background:rgba(8,20,26,.97);color:#eef8f4;
+    text-align:center;font-family:system-ui,-apple-system,sans-serif}
+  #orientationGate.show{display:grid}
+  #orientationGate .card{box-sizing:border-box;width:min(88vw,430px);padding:28px 22px;border:1.5px solid rgba(169,213,203,.6);
+    border-radius:24px;background:linear-gradient(180deg,rgba(23,51,62,.98),rgba(10,24,30,.98));
+    box-shadow:0 20px 60px rgba(0,0,0,.5)}
+  #orientationGate .phone{display:block;margin-bottom:12px;font-size:54px;line-height:1;transform:rotate(90deg)}
+  #orientationGate h2{margin:0 0 8px;font-size:clamp(25px,5vw,38px);font-weight:650}
+  #orientationGate p{margin:0;line-height:1.45;font-size:15px;opacity:.88}
+  body.valleRetrato #c,body.valleRetrato #hud,body.valleRetrato #guiaV,
+  body.valleRetrato #guiaSel,body.valleRetrato #toastV,body.valleRetrato #guiaDice{visibility:hidden}
+  body.valleRetrato > *:not(#orientationGate):not(#load){visibility:hidden}
+  #load{position:fixed;inset:0;display:grid;place-items:center;color:#e8e8f0;background:radial-gradient(circle at 50% 40%,#1a1e28,#0a0a0f);transition:opacity .7s;z-index:10;font-size:1rem;letter-spacing:.04em}
+</style>
+<script type="importmap">
+{
+  "imports": {
+    "three": "./vendor/three.module.js",
+    "three/addons/": "./vendor/addons/"
+  }
+}
+</script>
+</head>
+<body>
+<div id="load">Cargando el valle de Guatoc…</div>
+<script>
+  window.__reportarFalloArranque = (error) => {
+    const mensaje = String(error?.message || error || 'fallo de arranque');
+    window.__ARRANQUE_FALLO = mensaje;
+    document.body.dataset.estado = 'error';
+    const l = document.getElementById('load');
+    if (l) { l.style.opacity = 1; l.textContent = 'ERROR: ' + mensaje; }
+  };
+  addEventListener('error', (e) => {
+    window.__reportarFalloArranque(e.message + ' @ ' + (e.filename || '').split('/').pop() + ':' + e.lineno);
+  });
+</script>
+<canvas id="c"></canvas>
+<script src="./assets/guias-arte.js"></script>
+<!-- ── EL ARTE NUEVO DEL compAI, cargado pero NO adoptado ──────────────────
+     `guia-jaguar-lamina.js` se registra en su propio `window.GUIA_JAGUAR_LAMINA`
+     y NO pisa `GUIAS_ARTE.jaguar`: el operador aprueba antes de que el valle lo
+     adopte («orden pedido: jaguar primero, y él lo aprueba antes de seguir»).
+     Con `?arte=lamina` se ve adoptado en el valle vivo, sin comprometer a nadie;
+     la comparación completa vive en `/compai-antes-despues.html`.
+     El día que se apruebe, esto pasa a ser incondicional: una línea. -->
+<script src="./assets/guia-jaguar-lamina.js"></script>
+<script>{
+  const q = new URLSearchParams(location.search);
+  if (q.get('arte') === 'lamina' && window.GUIAS_ARTE && window.GUIA_JAGUAR_LAMINA) {
+    window.GUIAS_ARTE.jaguar = window.GUIA_JAGUAR_LAMINA;
+  }
+}</script>
+<div id="hud">Toque un mundo para entrar · arrastre para mirar · rueda para acercar.</div>
+<script>{ const q = new URLSearchParams(location.search); if (q.get('cam') || q.get('leccion')) document.getElementById('hud').style.display = 'none'; }</script>
+<div id="orientationGate" role="status" aria-live="polite" aria-label="Valle pausado por orientación">
+  <div class="card">
+    <span class="phone" aria-hidden="true">↻</span>
+    <h2>Gire el teléfono</h2>
+    <p>El valle corre solo en horizontal. Está pausado y vuelve donde lo dejaste.</p>
+  </div>
+</div>
+<script>
+  // Fullscreen necesita un gesto real en la mayoría de navegadores móviles.
+  // Se intenta al entrar y se reintenta en el primer toque, como en Chagra Kart.
+  (() => {
+    const gate = document.getElementById('orientationGate');
+    const estado = { retrato: false, fullscreenIntentado: false };
+    const esRetrato = () => {
+      const media = typeof matchMedia === 'function' && matchMedia('(orientation: portrait)').matches;
+      const tipo = typeof screen !== 'undefined' && screen.orientation?.type;
+      return !!(media || (typeof tipo === 'string' && tipo.includes('portrait')) || innerHeight > innerWidth);
+    };
+    const actualizar = () => {
+      const retrato = esRetrato();
+      estado.retrato = retrato;
+      window.__vallePausado = retrato;
+      gate?.classList.toggle('show', retrato);
+      document.body.classList.toggle('valleRetrato', retrato);
+    };
+    async function pantallaCompleta() {
+      if (estado.fullscreenIntentado || document.fullscreenElement) return !!document.fullscreenElement;
+      const pedir = document.documentElement?.requestFullscreen;
+      if (!pedir) { estado.fullscreenIntentado = true; return false; }
+      try {
+        try { await pedir.call(document.documentElement, { navigationUI: 'hide' }); }
+        catch { await pedir.call(document.documentElement); }
+      } catch { return false; }
+      estado.fullscreenIntentado = !!document.fullscreenElement;
+      try { await screen.orientation?.lock?.('landscape'); } catch { /* no permitido fuera de fullscreen */ }
+      return !!document.fullscreenElement;
+    }
+    addEventListener('pointerdown', () => { pantallaCompleta(); }, { passive: true });
+    addEventListener('fullscreenchange', () => {
+      if (document.fullscreenElement) Promise.resolve(screen.orientation?.lock?.('landscape')).catch(() => {});
+      actualizar();
+    });
+    addEventListener('resize', actualizar);
+    addEventListener('orientationchange', actualizar);
+    screen.orientation?.addEventListener?.('change', actualizar);
+    matchMedia?.('(orientation: portrait)')?.addEventListener?.('change', actualizar);
+    // El intento automático puede ser rechazado por política; el gesto queda
+    // cableado arriba y concede fullscreen cuando el navegador lo permite.
+    pantallaCompleta();
+    actualizar();
+    window.__valleOrientacion = estado;
+  })();
+</script>
+<!-- el onboarding arranca ANTES que el valle: se ve mientras baja el DEM -->
+<script type="module" src="./onboarding.js"></script>
+<script type="module">
+  import('./main.js').catch((e) => {
+    window.__reportarFalloArranque('IMPORT ERROR: ' + (e && (e.message || e)));
+  });
+</script>
+</body>
+</html>
