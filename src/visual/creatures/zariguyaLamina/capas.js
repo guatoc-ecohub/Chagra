@@ -122,6 +122,80 @@ function mascaraDisco(x, y, { cx, cy, r, rFade }) {
   return 1 - ss(r, r + rFade, Math.hypot(x - cx, y - cy));
 }
 
+/* Cirugía de las manos: la lámina trae guantes claros, pero las dos capas
+ * de brazo deben leer como patas de zarigüeya. El cambio vive en los píxeles
+ * de estas elipses, conserva el alfa de la lámina y deja intactos los útiles. */
+const MANO_LAPIZ = { cx: 58, cy: 175, rx: 42, ry: 41 };
+const MANO_BRUJULA = { cx: 151, cy: 263, rx: 36, ry: 36 };
+
+function distanciaSegmento(x, y, ax, ay, bx, by) {
+  const dx = bx - ax;
+  const dy = by - ay;
+  const t = clamp(((x - ax) * dx + (y - ay) * dy) / (dx * dx + dy * dy), 0, 1);
+  return Math.hypot(x - (ax + t * dx), y - (ay + t * dy));
+}
+
+function dentroElipse(x, y, { cx, cy, rx, ry }) {
+  return Math.hypot((x - cx) / rx, (y - cy) / ry) <= 1;
+}
+
+function esUtil(x, y) {
+  return distanciaSegmento(x, y, 84, 132, 58, 153) < 8
+    || distanciaSegmento(x, y, 33, 178, 6, 195) < 8;
+}
+
+function esBrujula(x, y) {
+  return Math.hypot(x - 112, y - 262) < 34;
+}
+
+function enPata(x, y) {
+  return dentroElipse(x, y, MANO_LAPIZ) && !esUtil(x, y)
+    || dentroElipse(x, y, MANO_BRUJULA) && !esBrujula(x, y);
+}
+
+function pintaGarra(d, src, W, H, x0, y0, x1, y1, ancho) {
+  const dx = x1 - x0;
+  const dy = y1 - y0;
+  const len = Math.hypot(dx, dy);
+  for (let y = Math.floor(Math.min(y0, y1) - ancho); y <= Math.ceil(Math.max(y0, y1) + ancho); y++) {
+    for (let x = Math.floor(Math.min(x0, x1) - ancho); x <= Math.ceil(Math.max(x0, x1) + ancho); x++) {
+      const t = clamp(((x - x0) * dx + (y - y0) * dy) / (len * len), 0, 1);
+      const w = ancho * (1 - t) * 0.5;
+      const px = x0 + t * dx;
+      const py = y0 + t * dy;
+      if (Math.hypot(x - px, y - py) > w || !enPata(x, y) || x < 0 || x >= W || y < 0 || y >= H) continue;
+      const i = (y * W + x) * 4;
+      if (i < 0 || i + 3 >= src.length || !src[i + 3]) continue;
+      d[i] = 46; d[i + 1] = 33; d[i + 2] = 24;
+    }
+  }
+}
+
+function pielDePatas(src, W, H) {
+  const d = new Uint8ClampedArray(src);
+  for (let y = 0; y < H; y++) {
+    for (let x = 0; x < W; x++) {
+      if (!enPata(x, y)) continue;
+      const i = (y * W + x) * 4;
+      if (!src[i + 3]) continue;
+      const luz = 0.299 * src[i] + 0.587 * src[i + 1] + 0.114 * src[i + 2];
+      const t = ss(105, 220, luz);
+      if (!t) continue;
+      d[i] = src[i] * (1 - t) + (54 + src[i] * 0.28) * t;
+      d[i + 1] = src[i + 1] * (1 - t) + (42 + src[i + 1] * 0.25) * t;
+      d[i + 2] = src[i + 2] * (1 - t) + (31 + src[i + 2] * 0.22) * t;
+    }
+  }
+  const garras = [
+    [26, 158, 18.5, 164.5, 4], [24, 173, 17, 179.5, 3.8],
+    [33, 186, 25.5, 192, 3.8], [50, 172, 46.5, 179.5, 3.4],
+    [124, 281, 119, 289, 4], [135, 286, 130.5, 294.5, 4],
+    [147, 288, 143.5, 296, 3.8], [158, 285, 156, 293, 3.6],
+  ];
+  for (const garra of garras) pintaGarra(d, src, W, H, ...garra);
+  return d;
+}
+
 /** Brazo del lápiz = lápiz ∪ guante ∪ antebrazo (máximo de las tres). */
 export function mascaraBrazoLapiz(x, y) {
   return Math.max(
@@ -214,10 +288,11 @@ export function hornearZariguya(img, dims = {}) {
     return null; // canvas "tainted" (CORS) o getImageData no implementado.
   }
   const sd = src.data;
+  const sdPatas = pielDePatas(sd, W, H);
 
   const m = mascaras();
 
-  const pintar = (mascara) => {
+  const pintar = (mascara, pixeles = sdPatas) => {
     const cv = lienzo(W, H);
     const g = cv.getContext('2d');
     const im = g.createImageData(W, H);
@@ -225,9 +300,9 @@ export function hornearZariguya(img, dims = {}) {
     for (let y = 0; y < H; y++) {
       for (let x = 0; x < W; x++) {
         const i = (y * W + x) * 4;
-        const a = sd[i + 3];
+        const a = pixeles[i + 3];
         if (!a) { d[i + 3] = 0; continue; }
-        d[i] = sd[i]; d[i + 1] = sd[i + 1]; d[i + 2] = sd[i + 2];
+        d[i] = pixeles[i]; d[i + 1] = pixeles[i + 1]; d[i + 2] = pixeles[i + 2];
         d[i + 3] = a * mascara(x, y);
       }
     }
