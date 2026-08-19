@@ -153,7 +153,15 @@ export default function ZariguyaLaminaViva({
         cv.style.width = '100%';
         cv.style.height = '100%';
         cv.style.display = 'block';
-        if (!animated) cv.style.animation = 'none';
+        if (!animated) {
+          // Fotograma digno = ojos ABIERTOS: sin la animación de parpadeo el
+          // transform por defecto es scaleY(1) (párpado TAPANDO el ojo, por
+          // la polaridad invertida del parche) — hay que retraerlo explícito.
+          // (Misma política que prefers-reduced-motion en el CSS y que los
+          // hermanos jaguar/chivito/luciérnaga.)
+          cv.style.animation = 'none';
+          cv.style.transform = 'scaleY(0)';
+        }
         const h = host.current;
         if (h) {
           h.style.position = 'absolute';
