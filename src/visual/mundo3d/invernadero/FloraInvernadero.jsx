@@ -4,10 +4,11 @@
  * Consume `invernadero.geom.js`: cada familia es UN InstancedMesh de una
  * geometría fusionada (una draw-call por familia) — mismo contrato tier-safe
  * que `FloraCafetal`. El BROTE lleva color POR INSTANCIA (las etapas de la
- * germinación en un solo InstancedMesh). El TOMATE es la LÁMINA Humboldt de
- * `tomateHumboldt.js`: masa ilustrada con los racimos pintados en la propia
- * lámina — la maduración de abajo hacia arriba vive en el atlas, no en una
- * familia de esferas.
+ * germinación en un solo InstancedMesh). TODO CULTIVO es una LÁMINA Humboldt
+ * (motor `laminaMasa.js`): tomate de `tomateHumboldt.js`, pimentón y lechuga
+ * de `hortalizasHumboldt.js` — masa ilustrada; en el tomate los racimos van
+ * pintados en la propia lámina (la maduración de abajo hacia arriba vive en
+ * el atlas, no en una familia de esferas).
  *
  * En 'alto' los BROTES RESPIRAN: una onda mínima de escala recorre las
  * bandejas (la plántula tierna que se mece con el aire tibio del túnel).
@@ -26,16 +27,26 @@ import {
   distribucionInvernadero,
   geomBandeja,
   geomBrote,
-  geomHortaliza,
   geomBolsa,
 } from './invernadero.geom.js';
 import {
   animarVaiven,
-  atlasTomateHumboldt,
-  geomLaminaCruzada,
-  materialLaminaTomate,
-  variantesDeItems,
-} from './tomateHumboldt.js';
+  crearAtlasLamina,
+  geomLaminaCruzadaDe,
+  materialLamina,
+  variantesDeItemsEn,
+} from './laminaMasa.js';
+import { LAMINA_TOMATE } from './tomateHumboldt.js';
+import { LAMINA_PIMENTON, LAMINA_LECHUGA } from './hortalizasHumboldt.js';
+
+/* La lámina de cada especie del catálogo (`ESPECIES_INVERNADERO`). Toda
+   especie del invernadero tiene su lámina Humboldt: aquí no queda ningún
+   arquetipo facetado al que se le cuenten las caras. */
+const LAMINAS = Object.freeze({
+  tomate: LAMINA_TOMATE,
+  pimenton: LAMINA_PIMENTON,
+  lechuga: LAMINA_LECHUGA,
+});
 
 /* Un banco de matas de UNA familia: una geometría, un material, N instancias.
    (Mismo patrón que `Especie` de FloraCafetal — el molde de la casa.) */
@@ -77,16 +88,24 @@ function Especie({ geo, mat, items, castShadow = false }) {
   );
 }
 
-/* La MASA del tomate Humboldt: cada mata son 3 quads cruzados que muestran
+/* La MASA de un cultivo Humboldt: cada mata son quads cruzados que muestran
    una variante de la lámina naturalista pintada a CanvasTexture — follaje
-   como masa ilustrada, racimos PINTADOS madurando de abajo hacia arriba.
-   Un InstancedMesh, un material, una textura: 10.000 matas = 1 draw call.
-   La variante del atlas va por instancia en `aTile` (ancho negativo=espejo). */
-function MasaTomateHumboldt({ items, vaiven }) {
+   como masa ilustrada; en el tomate los racimos van PINTADOS madurando de
+   abajo hacia arriba. Un InstancedMesh, un material, una textura: 10.000
+   matas = 1 draw call. La variante va por instancia en `aTile` (ancho
+   negativo = espejo). `escalaExtra` deja sembrar la misma lámina en camas
+   secundarias sin re-pintar atlas (la mata de la cama es más joven). */
+function MasaLamina({ lamina, items, vaiven, escalaExtra = 1 }) {
   const ref = useRef(null);
-  const atlas = useMemo(() => atlasTomateHumboldt(20260818), []);
-  const geo = useMemo(() => geomLaminaCruzada(3), []);
-  const mat = useMemo(() => materialLaminaTomate(atlas), [atlas]);
+  const atlas = useMemo(
+    () => crearAtlasLamina(lamina.layout, lamina.pintarTile, lamina.semillaAtlas),
+    [lamina],
+  );
+  const geo = useMemo(
+    () => geomLaminaCruzadaDe(lamina.ancho, lamina.alto, lamina.planos, lamina.desfase),
+    [lamina],
+  );
+  const mat = useMemo(() => materialLamina(atlas, lamina.alto), [atlas, lamina.alto]);
 
   useLayoutEffect(
     () => () => {
@@ -111,7 +130,7 @@ function MasaTomateHumboldt({ items, vaiven }) {
       p.set(it.pos[0], it.pos[1], it.pos[2]);
       e.set(0, it.rotY, 0);
       q.setFromEuler(e);
-      s.setScalar(it.escala);
+      s.setScalar(it.escala * escalaExtra);
       m.compose(p, q, s);
       mesh.setMatrixAt(i, m);
       col.setRGB(it.tint[0], it.tint[1], it.tint[2]);
@@ -119,8 +138,14 @@ function MasaTomateHumboldt({ items, vaiven }) {
     }
     mesh.instanceMatrix.needsUpdate = true;
     if (mesh.instanceColor) mesh.instanceColor.needsUpdate = true;
-    geo.setAttribute('aTile', new THREE.InstancedBufferAttribute(variantesDeItems(items.length), 4));
-  }, [items, geo]);
+    geo.setAttribute(
+      'aTile',
+      new THREE.InstancedBufferAttribute(
+        variantesDeItemsEn(lamina.layout, items.length, lamina.semillaVariantes),
+        4,
+      ),
+    );
+  }, [items, geo, lamina, escalaExtra]);
 
   useFrame(({ clock }) => {
     animarVaiven(ref.current, clock.elapsedTime, vaiven);
@@ -204,21 +229,20 @@ export default function FloraInvernadero({
   const cultivo = useMemo(() => normalizarCultivo({ especie, cantidad, layout }), [especie, cantidad, layout]);
   const conteos = useMemo(() => invernaderoDeTier(tier, cultivo), [tier, cultivo]);
 
-  // El tomate ya no es geometría facetada: es la LÁMINA Humboldt instanciada.
-  // Sus racimos van pintados en la propia lámina, así que tampoco lleva la
-  // familia de frutos-esfera (era el último rastro lowpoly de la mata).
-  const esLamina = cultivo.especieInfo.geometria === 'tomate';
+  // NINGÚN cultivo es geometría facetada: cada especie siembra su LÁMINA
+  // Humboldt instanciada. En el tomate los racimos van pintados en la propia
+  // lámina, así que tampoco lleva la familia de frutos-esfera (era el último
+  // rastro lowpoly de la mata).
+  const lamina = LAMINAS[cultivo.especie] || LAMINA_TOMATE;
 
   // Geometrías unitarias (una vez por montaje).
   const geos = useMemo(
     () => ({
       bandeja: geomBandeja(),
       brote: geomBrote(),
-      cultivo: esLamina ? null : geomHortaliza(9),
-      hortaliza: geomHortaliza(9),
       bolsa: geomBolsa(11),
     }),
-    [esLamina],
+    [],
   );
 
   // Material único con vertexColors (el color viene horneado por familia; el
@@ -242,7 +266,6 @@ export default function FloraInvernadero({
     [geos, mat],
   );
 
-  const sombra = perfil.sombras;
   const respiran = tier === 'alto' && !reducedMotion;
 
   return (
@@ -254,17 +277,18 @@ export default function FloraInvernadero({
       {/* El repique: las bolsas negras con su plántula ya firme. */}
       <Especie geo={geos.bolsa} mat={mat} items={dist.bolsa} />
 
-      {/* El cultivo principal. Tomate = la lámina Humboldt en masa (racimos
-          pintados madurando de abajo hacia arriba); otras especies siguen en
-          su geometría de hortaliza mientras les llega su propia lámina. */}
-      {esLamina ? (
-        <MasaTomateHumboldt items={dist.cultivo} vaiven={respiran} />
-      ) : (
-        <Especie geo={geos.cultivo} mat={mat} items={dist.cultivo} castShadow={sombra} />
-      )}
+      {/* El cultivo principal: la lámina Humboldt de la especie sembrada,
+          en masa instanciada (tomate, pimentón o lechuga). */}
+      <MasaLamina lamina={lamina} items={dist.cultivo} vaiven={respiran} />
 
-      {/* La hortaliza de la cama derecha + la era de endurecimiento afuera. */}
-      <Especie geo={geos.hortaliza} mat={mat} items={dist.hortaliza} />
+      {/* La cama derecha + la era de endurecimiento: pimentón de lámina,
+          más joven que el cultivo principal (escala reducida). */}
+      <MasaLamina
+        lamina={LAMINA_PIMENTON}
+        items={dist.hortaliza}
+        vaiven={respiran}
+        escalaExtra={0.72}
+      />
     </group>
   );
 }

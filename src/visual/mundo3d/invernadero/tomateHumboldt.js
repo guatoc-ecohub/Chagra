@@ -20,9 +20,21 @@
  * items `{pos, rotY, escala, tint}` de `posicionesCultivo`. Nada de aquí
  * toca `normalizarCultivo` ni la distribución.
  */
-import * as THREE from 'three';
 import { rng } from '../bosque/entQuenua.geom.js';
 import { VERDES, TIERRAS } from '../paleta/paletaMadre.js';
+import {
+  hex2rgb,
+  mixRGB,
+  css,
+  mixHex,
+  tileDeVarianteEn,
+  crearAtlasLamina,
+  geomLaminaCruzadaDe,
+  materialLamina,
+  variantesDeItemsEn,
+} from './laminaMasa.js';
+
+export { animarVaiven } from './laminaMasa.js';
 
 /* ── el atlas: 4×2 tiles de 512×1024 (la mata es más alta que ancha) ────── */
 export const ATLAS_COLS = 4;
@@ -57,32 +69,17 @@ const TINTA = {
   sustrato: TIERRAS.turba,
 };
 
-const hex2rgb = (h) => {
-  const n = parseInt(h.slice(1), 16);
-  return [(n >> 16) & 255, (n >> 8) & 255, n & 255];
-};
-const mixRGB = (a, b, t) => a.map((v, i) => v + (b[i] - v) * t);
-const css = (c, alfa = 1) =>
-  `rgba(${c[0] | 0},${c[1] | 0},${c[2] | 0},${alfa})`;
-const mixHex = (a, b, t) => mixRGB(hex2rgb(a), hex2rgb(b), t);
+/* La retícula del atlas, en el contrato del motor `laminaMasa`. */
+export const LAYOUT_TOMATE = Object.freeze({
+  cols: ATLAS_COLS,
+  filas: ATLAS_FILAS,
+  tileW: ATLAS_TILE_W,
+  tileH: ATLAS_TILE_H,
+});
 
 /* ── aTile: el rectángulo UV de una variante (puro, testeable) ──────────── */
-/* margen en texels: el gutter que evita que el mipmap sangre al tile vecino */
 export function tileDeVariante(v, margen = 6) {
-  const i = ((v % VARIANTES) + VARIANTES) % VARIANTES;
-  const base = i % (ATLAS_COLS * ATLAS_FILAS);
-  const espejo = i >= ATLAS_COLS * ATLAS_FILAS;
-  const col = base % ATLAS_COLS;
-  const fila = (base / ATLAS_COLS) | 0;
-  const aw = ATLAS_COLS * ATLAS_TILE_W;
-  const ah = ATLAS_FILAS * ATLAS_TILE_H;
-  const u0 = (col * ATLAS_TILE_W + margen) / aw;
-  const v0 = (fila * ATLAS_TILE_H + margen) / ah;
-  const w = (ATLAS_TILE_W - margen * 2) / aw;
-  const h = (ATLAS_TILE_H - margen * 2) / ah;
-  // v de three crece hacia arriba; el canvas pinta hacia abajo → invertir fila
-  const vv = 1 - v0 - h;
-  return espejo ? [u0 + w, vv, -w, h] : [u0, vv, w, h];
+  return tileDeVarianteEn(LAYOUT_TOMATE, v, margen);
 }
 
 /* ═══════════════════ EL PINTOR DE LA LÁMINA ═══════════════════ */
@@ -477,144 +474,33 @@ function pintarTomatera(ctx, ox, oy, seed) {
 
 /* ── el atlas completo: 8 tomateras hermanas, ninguna igual a otra ──────── */
 export function atlasTomateHumboldt(seed = 20260818) {
-  const cv = document.createElement('canvas');
-  cv.width = ATLAS_COLS * ATLAS_TILE_W;
-  cv.height = ATLAS_FILAS * ATLAS_TILE_H;
-  const ctx = cv.getContext('2d');
-  for (let v = 0; v < ATLAS_COLS * ATLAS_FILAS; v++) {
-    const col = v % ATLAS_COLS;
-    const fila = (v / ATLAS_COLS) | 0;
-    pintarTomatera(ctx, col * ATLAS_TILE_W, fila * ATLAS_TILE_H, seed + v * 977);
-  }
-  // DILATACIÓN: sangrar el color de la mata hacia los texels transparentes.
-  // Sin esto el mipmap mezcla los bordes con negro-transparente y el campo
-  // lejano se ve orlado de oscuro (medido en el harness de envolvente).
-  // El anillo dilatado queda a alfa 0.30 — POR DEBAJO del alphaTest (0.42):
-  // aporta color al promedio del mip sin engordar la silueta (la lección
-  // "exceso de silueta = el dual del déficit" aplica también aquí).
-  const anillo = document.createElement('canvas');
-  anillo.width = cv.width;
-  anillo.height = cv.height;
-  const actx = anillo.getContext('2d');
-  for (const [dx, dy] of [[-2, 0], [2, 0], [0, -2], [0, 2], [-2, -2], [2, 2], [-2, 2], [2, -2], [-4, 0], [4, 0], [0, 4], [0, -4]]) {
-    actx.drawImage(cv, dx, dy);
-  }
-  ctx.save();
-  ctx.globalCompositeOperation = 'destination-over';
-  ctx.globalAlpha = 0.3;
-  ctx.drawImage(anillo, 0, 0);
-  ctx.restore();
-  const tex = new THREE.CanvasTexture(cv);
-  tex.colorSpace = THREE.SRGBColorSpace;
-  tex.magFilter = THREE.LinearFilter;
-  tex.minFilter = THREE.LinearMipmapLinearFilter;
-  tex.anisotropy = 4;
-  return tex;
+  return crearAtlasLamina(LAYOUT_TOMATE, pintarTomatera, seed);
 }
 
 /* ── la geometría: 3 quads cruzados (0°/60°/120°), base en y=0 ──────────── */
 export function geomLaminaCruzada(planos = 3) {
-  const pos = [];
-  const uv = [];
-  const idx = [];
-  for (let k = 0; k < planos; k++) {
-    const a = (k / planos) * Math.PI;
-    const dx = Math.cos(a) * (LAMINA_ANCHO / 2);
-    const dz = Math.sin(a) * (LAMINA_ANCHO / 2);
-    const b = pos.length / 3;
-    pos.push(-dx, 0, -dz, dx, 0, dz, dx, LAMINA_ALTO, dz, -dx, LAMINA_ALTO, -dz);
-    uv.push(0, 0, 1, 0, 1, 1, 0, 1);
-    idx.push(b, b + 1, b + 2, b, b + 2, b + 3);
-  }
-  const geo = new THREE.BufferGeometry();
-  geo.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3));
-  geo.setAttribute('uv', new THREE.Float32BufferAttribute(uv, 2));
-  // normales todas hacia ARRIBA: la masa recibe la luz del túnel pareja,
-  // sin que un plano del cruce caiga a negro por darle la espalda al sol
-  const nrm = new Float32Array(pos.length);
-  for (let i = 0; i < nrm.length; i += 3) nrm[i + 1] = 1;
-  geo.setAttribute('normal', new THREE.BufferAttribute(nrm, 3));
-  geo.setIndex(idx);
-  return geo;
+  return geomLaminaCruzadaDe(LAMINA_ANCHO, LAMINA_ALTO, planos);
 }
 
-/* ── el material: Lambert mate de lámina + tile por instancia + vaivén ────
- * Los uniforms del vaivén viven en `material.userData.uniformes`: el
- * componente los anima alcanzándolos por el ref del mesh en `useFrame`
- * (el camino que las reglas react-hooks permiten para mutar por frame). */
+/* ── el material de la lámina (motor genérico, alto del tomate) ─────────── */
 export function materialLaminaTomate(atlas) {
-  const u = { uTiempo: { value: 0 }, uVaiven: { value: 0 } };
-  const mat = new THREE.MeshLambertMaterial({
-    map: atlas,
-    alphaTest: 0.42,
-    side: THREE.DoubleSide,
-  });
-  mat.userData.uniformes = u;
-  mat.onBeforeCompile = (shader) => {
-    shader.uniforms.uTiempo = u.uTiempo;
-    shader.uniforms.uVaiven = u.uVaiven;
-    shader.vertexShader = shader.vertexShader
-      .replace(
-        '#include <common>',
-        [
-          '#include <common>',
-          'attribute vec4 aTile;',
-          'uniform float uTiempo;',
-          'uniform float uVaiven;',
-          'varying vec3 vArribaView;',
-        ].join('\n'),
-      )
-      .replace(
-        '#include <uv_vertex>',
-        ['#include <uv_vertex>', 'vMapUv = aTile.xy + vMapUv * aTile.zw;'].join('\n'),
-      )
-      .replace(
-        '#include <begin_vertex>',
-        [
-          '#include <begin_vertex>',
-          // el aire tibio del túnel: vaivén mínimo, pivotado en la base,
-          // con fase por posición de la instancia (nunca en fila)
-          'float faseMata = instanceMatrix[3].x * 1.7 + instanceMatrix[3].z * 2.3;',
-          `float alturaMata = clamp(position.y / ${LAMINA_ALTO.toFixed(2)}, 0.0, 1.0);`,
-          'transformed.x += uVaiven * alturaMata * alturaMata * 0.03 * sin(uTiempo * 1.35 + faseMata);',
-          // el "arriba" del mundo en espacio de vista, para el fragmento
-          'vArribaView = normalize(normalMatrix * vec3(0.0, 1.0, 0.0));',
-        ].join('\n'),
-      );
-    // La lámina se ilumina como MASA: normal hacia arriba en TODO fragmento.
-    // Sin esto, DoubleSide voltea la normal en la cara trasera del quad y
-    // media plantación cae a negro (medido en el harness de envolvente).
-    shader.fragmentShader = shader.fragmentShader
-      .replace(
-        '#include <common>',
-        ['#include <common>', 'varying vec3 vArribaView;'].join('\n'),
-      )
-      .replace(
-        '#include <normal_fragment_begin>',
-        ['#include <normal_fragment_begin>', 'normal = normalize(vArribaView);'].join('\n'),
-      );
-  };
-  return mat;
-}
-
-/* ── animar el vaivén: mutación por frame fuera del componente ──────────── */
-export function animarVaiven(mesh, tiempo, vaiven) {
-  const u = mesh?.material?.userData?.uniformes;
-  if (!u) return;
-  u.uVaiven.value = vaiven ? 1 : 0;
-  if (vaiven) u.uTiempo.value = tiempo;
+  return materialLamina(atlas, LAMINA_ALTO);
 }
 
 /* ── variante determinista por índice de instancia (puro, testeable) ────── */
 export function variantesDeItems(n, semilla = 4021) {
-  const rn = rng(semilla);
-  const out = new Float32Array(n * 4);
-  for (let i = 0; i < n; i++) {
-    const t = tileDeVariante((rn() * VARIANTES) | 0);
-    out[i * 4] = t[0];
-    out[i * 4 + 1] = t[1];
-    out[i * 4 + 2] = t[2];
-    out[i * 4 + 3] = t[3];
-  }
-  return out;
+  return variantesDeItemsEn(LAYOUT_TOMATE, n, semilla);
 }
+
+/* ── la LÁMINA completa, en el contrato del motor (para FloraInvernadero) ── */
+export const LAMINA_TOMATE = Object.freeze({
+  id: 'tomate',
+  layout: LAYOUT_TOMATE,
+  ancho: LAMINA_ANCHO,
+  alto: LAMINA_ALTO,
+  planos: 3,
+  desfase: 0,
+  pintarTile: pintarTomatera,
+  semillaAtlas: 20260818,
+  semillaVariantes: 4021,
+});
