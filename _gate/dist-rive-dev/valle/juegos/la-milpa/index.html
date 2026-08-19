@@ -1,0 +1,170 @@
+<!doctype html>
+<html lang="es-CO">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<meta name="theme-color" content="#12301a">
+<title>La Milpa · puzzle de la chagra</title>
+<style>
+:root{
+  --ink:#2a1c10;--paper:#f7efd2;--leaf:#3f7a33;--leaf2:#5f9c46;--leaf3:#8fc65d;
+  --soil:#6f4e2e;--soil2:#8a653c;--sun:#f6d67a;--cherry:#c8432f;--wood:#7a5230;
+}
+html,body{margin:0;height:100%;overflow:hidden;background:#0e1c10;color:var(--paper);
+  font-family:Georgia,"Times New Roman",serif;-webkit-tap-highlight-color:transparent}
+body{touch-action:none;overscroll-behavior:none}
+#app{position:fixed;inset:0;overflow:hidden;background:linear-gradient(180deg,#12301a,#2c4d2c)}
+canvas#game{position:absolute;inset:0;width:100%;height:100%;display:block;touch-action:none}
+#hud{
+  position:absolute;top:0;left:0;right:0;z-index:5;display:flex;align-items:center;gap:10px;
+  padding:8px 10px calc(8px + env(safe-area-inset-top));
+  background:linear-gradient(180deg,rgba(18,30,17,.88),rgba(18,30,17,.55));
+  border-bottom:1px solid rgba(247,239,210,.14);backdrop-filter:blur(6px);font-size:14px;
+}
+.hud-group{display:flex;align-items:center;gap:8px;min-width:0}
+#scoreBox{flex:1;min-width:0}
+#scoreLabel{font-size:10px;letter-spacing:.14em;text-transform:uppercase;opacity:.72}
+#score{font-size:24px;font-weight:700;line-height:1;color:#fff4c9;font-variant-numeric:tabular-nums}
+.chip{
+  display:inline-flex;align-items:center;gap:5px;padding:4px 9px;border-radius:999px;white-space:nowrap;
+  background:rgba(255,255,255,.07);border:1px solid rgba(247,239,210,.14);font-size:12px
+}
+.chip b{font-size:14px;color:#fff4c9}
+#comboChip{display:none;border-color:var(--sun);background:linear-gradient(180deg,rgba(246,214,122,.22),rgba(246,214,122,.08));color:#ffe9a8}
+#comboChip.show{display:inline-flex;animation:pulseC .5s ease}
+@keyframes pulseC{50%{transform:scale(1.12)}}
+button.chipBtn{
+  appearance:none;-webkit-appearance:none;cursor:pointer;border:1px solid rgba(247,239,210,.18);
+  background:rgba(255,255,255,.06);color:var(--paper);border-radius:999px;padding:5px 10px;
+  font:inherit;font-size:14px;line-height:1
+}
+button.chipBtn:active{transform:translateY(1px);background:rgba(255,255,255,.12)}
+#message{
+  position:absolute;left:50%;top:62px;transform:translateX(-50%) translateY(-6px);z-index:6;
+  background:rgba(247,239,210,.97);color:#2d1c0f;border:2px solid #2c1c0d;border-radius:999px;
+  padding:7px 14px;font-size:14px;font-style:italic;text-align:center;max-width:88vw;
+  box-shadow:0 8px 20px rgba(0,0,0,.2);opacity:0;transition:opacity .2s ease,transform .2s ease;pointer-events:none
+}
+#message.show{opacity:1;transform:translateX(-50%) translateY(0)}
+#controls{
+  position:absolute;left:0;right:0;bottom:0;z-index:6;display:flex;justify-content:space-between;
+  align-items:flex-end;padding:8px 12px calc(10px + env(safe-area-inset-bottom));gap:12px;pointer-events:none
+}
+.pad{display:flex;gap:10px;pointer-events:auto}
+.btn{
+  width:62px;height:62px;border-radius:18px;border:2px solid rgba(247,239,210,.75);
+  background:linear-gradient(180deg,rgba(52,34,18,.85),rgba(24,15,7,.9));
+  color:#fff6da;font-size:26px;font-weight:700;display:grid;place-items:center;
+  touch-action:none;user-select:none;-webkit-user-select:none;box-shadow:0 10px 18px rgba(0,0,0,.25)
+}
+.btn:active,.btn.down{transform:translateY(2px) scale(.97);background:linear-gradient(180deg,rgba(90,58,26,.9),rgba(30,19,8,.95))}
+.btn:disabled{opacity:.4}
+#dropBtn{width:74px}
+.overlay{
+  position:absolute;inset:0;z-index:10;display:grid;place-items:center;padding:16px;
+  background:radial-gradient(1200px 900px at 50% 30%,rgba(255,247,217,.08),transparent 60%),rgba(9,16,10,.82);
+  transition:opacity .4s ease;backdrop-filter:blur(4px)
+}
+.overlay.hidden{opacity:0;pointer-events:none}
+.card{
+  width:min(92vw,560px);max-height:88vh;overflow:auto;padding:22px 20px;border-radius:24px;
+  background:linear-gradient(180deg,rgba(247,239,210,.98),rgba(232,218,190,.93));color:var(--ink);
+  border:2px solid rgba(42,28,16,.85);box-shadow:0 24px 60px rgba(0,0,0,.4);text-align:center
+}
+.card h1{margin:0 0 6px;font-size:clamp(30px,6vw,52px);line-height:1;font-style:italic}
+.card h2{margin:0 0 6px;font-size:clamp(24px,5vw,36px);line-height:1.1;font-style:italic;color:var(--leaf)}
+.card p{margin:8px 0;font-size:15px;line-height:1.5}
+.card .sub{font-size:11px;letter-spacing:.1em;text-transform:uppercase;opacity:.7;margin:2px 0 6px}
+.hint{font-size:12px;opacity:.75;font-style:italic;margin-top:6px}
+.bigBtn{
+  margin-top:14px;padding:13px 22px;border-radius:999px;border:2px solid var(--ink);cursor:pointer;
+  background:linear-gradient(180deg,#f6d67a,#d9a63e);color:var(--ink);font-weight:800;font-family:inherit;
+  font-size:16px;box-shadow:0 8px 0 rgba(42,28,16,.28)
+}
+.bigBtn:active{transform:translateY(2px);box-shadow:0 6px 0 rgba(42,28,16,.28)}
+.bigBtn.green{background:linear-gradient(180deg,#8fc65d,#5f9c46)}
+.sisters{display:grid;gap:8px;margin:12px 0 2px;text-align:left}
+.sister{display:flex;gap:10px;align-items:center;background:rgba(255,255,255,.5);border:1px solid rgba(42,28,16,.18);border-radius:14px;padding:8px 10px}
+.sisterIcon{width:56px;height:56px;flex:0 0 auto;border-radius:10px;background:#6f4e2e}
+.sister strong{display:block;font-size:14px;color:var(--leaf)}
+.sister span{font-size:13px;line-height:1.4;display:block}
+.statRow{display:flex;justify-content:center;gap:14px;flex-wrap:wrap;margin:10px 0}
+.statBox{background:rgba(255,255,255,.5);border-radius:14px;padding:8px 14px;min-width:88px}
+.statBox .v{font-size:22px;font-weight:800;color:var(--leaf)}
+.statBox .k{font-size:10px;letter-spacing:.1em;text-transform:uppercase;opacity:.7}
+@media(max-width:520px){
+  .btn{width:56px;height:56px;font-size:24px}
+  #dropBtn{width:66px}
+  .card{padding:16px 14px}
+}
+</style>
+</head>
+<body>
+<div id="app">
+  <canvas id="game"></canvas>
+  <div id="hud">
+    <div class="hud-group" id="scoreBox">
+      <div>
+        <div id="scoreLabel">Cosecha</div>
+        <div id="score">0</div>
+      </div>
+    </div>
+    <div class="hud-group">
+      <span class="chip">Nivel <b id="level">1</b></span>
+      <span class="chip" id="comboChip">MILPA <b id="combo">x2</b></span>
+    </div>
+    <div class="hud-group">
+      <span class="chip">Récord <b id="best">0</b></span>
+      <button class="chipBtn" id="muteBtn" aria-label="Silenciar">♪</button>
+    </div>
+  </div>
+  <div id="message"></div>
+  <div id="controls" aria-label="Controles táctiles">
+    <div class="pad">
+      <button class="btn" id="leftBtn" aria-label="Mover a la izquierda">◀</button>
+      <button class="btn" id="rightBtn" aria-label="Mover a la derecha">▶</button>
+    </div>
+    <div class="pad">
+      <button class="btn" id="rotBtn" aria-label="Rotar">⟳</button>
+      <button class="btn" id="dropBtn" aria-label="Soltar">⤓</button>
+    </div>
+  </div>
+
+  <div class="overlay" id="intro">
+    <div class="card">
+      <div class="sub">Un juego de la chagra</div>
+      <h1>La Milpa</h1>
+      <p>Van cayendo parcelas con semillas. Planta <b>juntas</b> las que se ayudan y cosecha puntos. <b style="color:#c8432f">Cuidado:</b> algunas no se llevan bien y la parcela se marchita.</p>
+      <p>Maíz, fríjol y calabaza juntos son <b>la milpa</b>: las tres hermanas. ¡Armarla da el mejor premio!</p>
+      <div class="hint">Flechas + espacio · o botones en pantalla</div>
+      <div class="hint" id="bestIntro"></div>
+      <button class="bigBtn" id="startBtn">¡A sembrar!</button>
+    </div>
+  </div>
+
+  <div class="overlay hidden" id="milpaModal">
+    <div class="card">
+      <h2>¡La milpa completa!</h2>
+      <p>Maíz + fríjol + calabaza se ayudan entre sí. Cada una tiene su trabajo:</p>
+      <div class="sisters" id="milpaRoles"></div>
+      <button class="bigBtn green" id="milpaOk">¡Qué bien, sigan creciendo!</button>
+    </div>
+  </div>
+
+  <div class="overlay hidden" id="gameover">
+    <div class="card">
+      <h2>¡Se llenó la chagra!</h2>
+      <p>La milpa dio su cosecha. ¿Sembramos otra vez?</p>
+      <div class="statRow">
+        <div class="statBox"><div class="v" id="finalScore">0</div><div class="k">Puntaje</div></div>
+        <div class="statBox"><div class="v" id="finalPlanted">0</div><div class="k">Parcelas</div></div>
+        <div class="statBox"><div class="v" id="finalMilpas">0</div><div class="k">Milpas</div></div>
+      </div>
+      <p id="newRecord" class="sub" style="display:none;color:#c06a28">¡Nuevo récord!</p>
+      <button class="bigBtn" id="againBtn">Sembrar otra vez</button>
+    </div>
+  </div>
+</div>
+<script type="module" src="./js/game.js"></script>
+</body>
+</html>

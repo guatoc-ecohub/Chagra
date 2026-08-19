@@ -1,0 +1,82 @@
+{
+  "species_slug": "myrsine_andina",
+  "scientific_name": "Myrsine andina (Mez) Pipoly",
+  "common_names": [
+    "Cucharo andino (Myrsine andina)"
+  ],
+  "family": "Primulaceae",
+  "category": "arboles_sombra",
+  "cultivable": false,
+  "conservation_status": "nativo_silvestre",
+  "thermal_zones": [
+    "paramo"
+  ],
+  "roles_in_guild": [
+    "nurse_plant",
+    "pollinator_attractor"
+  ],
+  "antagonists": [],
+  "especies_nativas_sustitutas": [],
+  "propagation": {
+    "metodo_principal": "semilla",
+    "notas": "Drupas dispersadas por aves frugívoras. Semillas escarificadas + estratificación fría 30 días. Germinación 60-100 días. Trasplante bolsa 6 meses. Plantación >15 meses. Crecimiento lento-moderado (~6-10 cm/año). Aplica Ley 1930/2018 en páramo delimitado."
+  },
+  "requirements": {
+    "agua": "medio",
+    "altitud_msnm": {
+      "min_absoluto": 2900,
+      "optimo_min": 3000,
+      "optimo_max": 3600,
+      "max_absoluto": 3900
+    },
+    "temperatura_c": {
+      "helada_letal": -8,
+      "optimo_min": 5,
+      "optimo_max": 12,
+      "max_tolerable": 18
+    },
+    "radiacion": "sombra_parcial",
+    "drenaje_requerido": "bueno"
+  },
+  "valor_pedagogico": "El cucharo andino (Myrsine andina (Mez) Pipoly, familia Primulaceae sensu APG IV, antes Myrsinaceae) es un arbolito o arbusto arborescente del bosque altoandino superior y sub-páramo colombiano (2.900-3.900 msnm), pariente cercano de Myrsine dependens con la que comparte hábito, función ecológica y servicios ecosistémicos pero se diferencia por morfología foliar más esbelta y distribución biogeográfica complementaria. La especie fue descrita originalmente por Carl Mez en Pflanzenreich (1902) en el género Rapanea y transferida a Myrsine por John Pipoly en revisiones taxonómicas recientes (1992) que devolvieron a Myrsine las especies neotropicales antes segregadas en Rapanea. Arbolito 3-7 m altura con tronco corto retorcido y corteza pardo-grisácea fisurada. Hojas alternas oblongo-lanceoladas (5-11 cm) coriáceas con haz verde-oscuro lustroso y envés glandular punteado (puntos translúcidos visibles a contraluz — rasgo diagnóstico de la subfamilia Myrsinoideae), margen entero levemente revoluto. Inflorescencias axilares fasciculadas con flores diminutas blanco-verdosas a rojizas, especie dioica con polinización entomófila por himenópteros pequeños y sírfidos andinos. Fruto drupa pequeña globosa (3-5 mm) negro-morada a la madurez, dispersión por aves paramunas frugívoras (Turdus fuscater, Buthraupis, Pipraeidea, Anisognathus igniventris). Distribución colombiana: cordilleras Central y Oriental en franja altoandina superior y sub-páramo (2.900-3.900 msnm); abundante en bordes de bosque altoandino, claros y bosquetes paramunos. Presencia documentada en complejos paramunos Sumapaz, Chingaza, Iguaque, Pisba, Cocuy, Las Hermosas. Servicio ecosistémico estratégico: recurso frugívoro para aves paramunas en temporada de fructificación, nurse plant para regeneración de especies de bosque altoandino, estructura forestal del ecotono altoandino-páramo, secuestro de carbono. Amenazas: tala para leña y madera (madera blanda blanca-rosada históricamente usada para cucharas y utensilios artesanales rurales — origen del nombre vernáculo común para varias especies de Myrsine), fragmentación por expansión papera y ganadera, quema para apertura de potreros veredales. Protección legal Colombia: Ley 1930/2018 cuando crece en páramo delimitado, regulación CAR + Decreto 1076/2015 régimen forestal en bosque altoandino fuera de delimitación paramuna. Estado conservación: Preocupación Menor (LC) actualmente pero con tendencia decreciente regional. Manejo agroecológico (restauración ecológica con autorización CAR/Corporación): recolección drupas maduras, escarificación + estratificación fría, germinación en vivero con sustrato turba + arena 2:1, plantación intercalada con Weinmannia tomentosa, Drimys granadensis, Clethra kalbreyeri, Vallea stipularis en densidades 400-700 ind/ha para restauración de bosquetes altoandinos paramunos. Especie multiservicio: frugivoría aviar + nurse plant + estructura forestal. Fuentes Tier A: POWO Kew, GBIF Taxonomic Backbone, Bernal 2015 Catálogo Plantas y Líquenes Colombia, Humboldt Flora Alto-Andina, Libro Rojo Plantas Colombia, Ley 1930/2018.",
+  "sources": [
+    {
+      "id": "powo-kew",
+      "title": "powo-kew",
+      "tier": "A",
+      "url": "https://powo.science.kew.org"
+    },
+    {
+      "id": "gbif-taxonomic-backbone",
+      "title": "gbif-taxonomic-backbone",
+      "tier": "A",
+      "url": "https://www.gbif.org/dataset/d7dddbf4-2cf0-4f39-9b2a-bb099caae36c"
+    },
+    {
+      "id": "bernal-2015-plantas-liquenes-colombia",
+      "title": "bernal-2015-plantas-liquenes-colombia",
+      "tier": "A",
+      "url": "http://catalogoplantasdecolombia.unal.edu.co"
+    },
+    {
+      "id": "humboldt-flora-alto-andina",
+      "title": "humboldt-flora-alto-andina",
+      "tier": "A",
+      "url": null
+    },
+    {
+      "id": "libro-rojo-plantas-colombia",
+      "title": "libro-rojo-plantas-colombia",
+      "tier": "A",
+      "url": null
+    },
+    {
+      "id": "ley-1930-2018-paramos",
+      "title": "ley-1930-2018-paramos",
+      "tier": "A",
+      "url": null
+    }
+  ],
+  "_generated_by": "scripts/build-cycle-content-from-catalog.mjs",
+  "_generated_at": "2026-05-19T00:42:57.404Z"
+}

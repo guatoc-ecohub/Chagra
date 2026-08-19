@@ -1,0 +1,83 @@
+{
+  "species_slug": "crotalaria_juncea",
+  "scientific_name": "Crotalaria juncea L.",
+  "common_names": [
+    "Sunn hemp"
+  ],
+  "family": "Fabaceae",
+  "category": "abonos_verdes_coberturas",
+  "cultivable": true,
+  "conservation_status": "naturalizada",
+  "thermal_zones": [
+    "calido",
+    "templado"
+  ],
+  "roles_in_guild": [
+    "nitrogen_fixer",
+    "biomass_producer",
+    "ground_cover",
+    "pollinator_attractor"
+  ],
+  "antagonists": [],
+  "especies_nativas_sustitutas": [],
+  "propagation": null,
+  "requirements": {
+    "agua": null,
+    "altitud_msnm": {
+      "min_absoluto": 0,
+      "optimo_min": 100,
+      "optimo_max": 1800,
+      "max_absoluto": 2200
+    },
+    "temperatura_c": null,
+    "radiacion": null,
+    "drenaje_requerido": null
+  },
+  "valor_pedagogico": "La crotalaria o sunn hemp (Crotalaria juncea L., Fabaceae) es una leguminosa herbácea-subarbustiva anual de rápido crecimiento (1.5-3 m altura, ocasionalmente hasta 4 m) originaria del subcontinente indio, ampliamente naturalizada y adoptada por la agroecología tropical mundial e introducida en Colombia para usos como abono verde y fibra, presente en tierras cálidas y templadas entre 0 y 1.800 msnm en Caribe, valle del Cauca-Magdalena, Tolima-Huila, valles interandinos y zona cafetera. Hojas simples lanceoladas-estrechas alternas (5-12 cm), inflorescencias racimos terminales erectos con flores papilionáceas amarillas brillantes grandes (2-3 cm) muy atractivas para abejas melíferas, abejorros nativos (Bombus, Trigona, Melipona) y mariposas, frutos en legumbres infladas cilíndricas (3-5 cm) características de Crotalaria (de ahí el nombre del género 'crotalum' = sonajero, por las semillas que suenan dentro al madurar). Es lección viva de agroecología tropical y soberanía edáfica que enseña a niñas y niños el potencial transformador de los abonos verdes leguminosos en sistemas tropicales para regenerar suelos degradados sin insumos químicos: la crotalaria juncea es uno de los abonos verdes leguminosos más eficientes del trópico mundial documentado por FAO Ecocrop, Embrapa, IITA y Agrosavia, capaz de fijar 120-300 kg N/ha en un solo ciclo de 90-120 días (récord entre leguminosas anuales tropicales) gracias a su robusta simbiosis con Rhizobium específicos, produce 8-15 toneladas de biomasa fresca por hectárea (4-6 t materia seca) en 3-4 meses, suprime malezas agresivas por sombreado denso y alelopatía suave, controla nematodos parásitos del suelo (Meloidogyne incognita, Pratylenchus) por su acción antagonista de raíces, mejora estructura del suelo con su sistema radicular pivotante de penetración profunda (1-1.5 m) que rompe compactaciones y recicla nutrientes del subsuelo, y produce fibra de corteza de calidad fina usada históricamente en cordelería marina, papel, redes de pesca y textil grueso. Adoptada en Colombia por Agrosavia (Tibaitatá) y movimientos agroecológicos en transición a la agricultura regenerativa como cobertura de pre-siembra en algodón, caña, café joven, hortalizas comerciales y restauración de suelos compactados. Manejo agroecológico: propagación por semilla escarificada con agua tibia 12h (germinación 5-10 días, alta tasa), siembra directa al voleo o en surcos al inicio de lluvias, densidad 30-50 kg semilla/ha, incorporación al suelo a la floración (60-90 días después de siembra, momento de pico N foliar) por corte y volcado superficial o picado con guadaña, dejar 15-30 días en descomposición antes de siembra del cultivo principal, función como abono verde-cobertura-fijadora-fibrera de ciclo corto en rotaciones tropicales agroecológicas. Fuentes Tier A: GBIF, POWO Kew, FAO Ecocrop, Agrosavia Tibaitatá, Agrosavia Leguminosas Andinas, Agrosavia Forrajeras 2022, JBB Plantas Medicinales.",
+  "sources": [
+    {
+      "id": "gbif-taxonomic-backbone",
+      "title": "gbif-taxonomic-backbone",
+      "tier": "A",
+      "url": "https://www.gbif.org/dataset/d7dddbf4-2cf0-4f39-9b2a-bb099caae36c"
+    },
+    {
+      "id": "powo-kew",
+      "title": "powo-kew",
+      "tier": "A",
+      "url": "https://powo.science.kew.org"
+    },
+    {
+      "id": "fao-ecocrop",
+      "title": "fao-ecocrop",
+      "tier": "A",
+      "url": "https://gaez.fao.org/pages/ecocrop"
+    },
+    {
+      "id": "agrosavia-tibaitata",
+      "title": "agrosavia-tibaitata",
+      "tier": "A",
+      "url": "https://www.agrosavia.co/investigacion/centros-de-investigacion/tibaitat%C3%A1"
+    },
+    {
+      "id": "agrosavia-leguminosas-andinas",
+      "title": "agrosavia-leguminosas-andinas",
+      "tier": "A",
+      "url": null
+    },
+    {
+      "id": "agrosavia-forrajeras-2022",
+      "title": "agrosavia-forrajeras-2022",
+      "tier": "A",
+      "url": null
+    },
+    {
+      "id": "jbb-plantas-medicinales",
+      "title": "jbb-plantas-medicinales",
+      "tier": "A",
+      "url": null
+    }
+  ],
+  "_generated_by": "scripts/build-cycle-content-from-catalog.mjs",
+  "_generated_at": "2026-05-19T00:42:57.386Z"
+}

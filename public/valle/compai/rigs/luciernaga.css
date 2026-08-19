@@ -1,0 +1,373 @@
+
+  :root{
+    --tinta:#171009;
+    --crema:#f4ead2;
+    --verdelint:#fadf86;
+    --coral:#cf5d4a;
+    --nocturno:#0c1c24;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html,body{height:100%}
+  body{
+    font-family:Georgia,'Times New Roman',serif;
+    background:linear-gradient(180deg,#0c1c26 0%,#122c30 52%,#08161a 100%);
+    color:var(--crema);
+    overflow-x:hidden;
+    min-height:100vh;
+  }
+  #lienzo{position:relative;max-width:940px;margin:0 auto;min-height:100vh}
+  #escena{display:block;width:100%;height:auto}
+
+  header{position:absolute;top:16px;left:0;right:0;text-align:center;z-index:5;pointer-events:none}
+  header h1{
+    font-size:clamp(26px,4.6vw,44px);font-style:italic;font-weight:700;
+    color:#eaf4d5;letter-spacing:.5px;
+    text-shadow:0 0 18px rgba(150,220,90,.35),0 2px 0 rgba(0,0,0,.4);
+  }
+  header p{
+    margin-top:4px;font-size:clamp(12px,1.8vw,16px);letter-spacing:3px;
+    text-transform:uppercase;color:#9dbf88;
+  }
+  header p em{font-style:italic;text-transform:none;letter-spacing:1px;color:#c6e0a4}
+
+  #burbuja{
+    position:absolute;left:5%;top:15%;max-width:340px;z-index:6;
+    background:var(--crema);border:3px solid var(--tinta);border-radius:18px;
+    padding:14px 18px;font-size:clamp(14px,2vw,18px);line-height:1.45;font-style:italic;
+    color:#241a10;
+    box-shadow:0 0 24px rgba(150,220,90,.22),4px 5px 0 rgba(0,0,0,.35);
+    opacity:0;transform:translateY(10px) scale(.92);transform-origin:40% 110%;
+    transition:opacity .35s ease,transform .35s cubic-bezier(.34,1.56,.64,1);
+    pointer-events:none;
+  }
+  #burbuja.visible{opacity:1;transform:translateY(0) scale(1)}
+  #burbuja::after{
+    content:'';position:absolute;left:56px;bottom:-14px;width:22px;height:22px;
+    background:var(--crema);border-right:3px solid var(--tinta);border-bottom:3px solid var(--tinta);
+    transform:rotate(45deg) skew(12deg,12deg);
+  }
+
+  /* medidor bioindicador */
+  #medidor{
+    position:absolute;top:14px;right:14px;z-index:6;width:190px;
+    background:rgba(9,20,24,.72);border:1.5px solid rgba(150,220,90,.4);
+    border-radius:12px;padding:9px 11px;pointer-events:none;
+    box-shadow:0 2px 12px rgba(0,0,0,.4);
+    font-family:'Trebuchet MS',system-ui,sans-serif;
+  }
+  #medidor .m-tit{font-size:9.5px;letter-spacing:2px;text-transform:uppercase;color:#9dbf88}
+  #medidor .m-riel{
+    margin:6px 0 5px;height:9px;border-radius:99px;overflow:hidden;
+    background:rgba(255,255,255,.09);border:1px solid rgba(255,255,255,.12);
+  }
+  #medidorFill{
+    height:100%;width:60%;border-radius:99px;
+    background:linear-gradient(90deg,#e8c25a,#ffe694);
+    transition:width .9s cubic-bezier(.5,.05,.25,1),background .6s ease;
+  }
+  #medidorLectura{font-size:12px;font-style:italic;color:#e7f2d3}
+  #medidorLectura b{font-style:normal;letter-spacing:.5px}
+
+  :host([data-estado="sano"]) #medidorFill{width:92%;background:linear-gradient(90deg,#d8ae4e,#ffe694)}
+  :host([data-estado="degradado"]) #medidorFill{width:17%;background:linear-gradient(90deg,#b53a2a,#e08a3a);animation:barraTitila 1.6s steps(1) infinite}
+  :host([data-estado="pacto"]) #medidorFill{width:74%;background:linear-gradient(90deg,#d8ae4e,#fadf86)}
+  :host([data-estado="leer"]) #medidorFill{width:66%}
+  :host([data-estado="hablar"]) #medidorFill{width:60%}
+  @keyframes barraTitila{0%{opacity:1}40%{opacity:.35}55%{opacity:1}70%{opacity:.45}100%{opacity:.9}}
+
+  #controles{
+    position:absolute;bottom:14px;left:0;right:0;z-index:7;
+    display:flex;gap:8px;justify-content:center;flex-wrap:wrap;padding:0 10px;
+  }
+  #controles button{
+    font-family:inherit;font-size:clamp(11px,1.6vw,14px);font-style:italic;
+    padding:8px 14px;border-radius:999px;cursor:pointer;
+    background:var(--crema);color:var(--tinta);border:2.5px solid var(--tinta);
+    box-shadow:0 3px 0 rgba(0,0,0,.45);
+    transition:transform .12s ease;
+  }
+  #controles button:hover{transform:translateY(-2px)}
+  #controles button.activo{background:#2b4a1c;color:#fff6da;border-color:#7fbf3c}
+
+  #placa{
+    position:absolute;bottom:62px;right:12px;z-index:5;
+    font-size:clamp(10px,1.4vw,13px);letter-spacing:2px;color:#89ad72;
+    text-transform:uppercase;pointer-events:none;text-shadow:0 1px 3px rgba(0,0,0,.6);
+  }
+
+  /* =========================================================
+     LUCIÉRNAGA — rig rubber-hose (escarabajo Lampyridae)
+     ========================================================= */
+  #luciernagaWrap{transition:transform 1.7s cubic-bezier(.45,.05,.25,1)}
+  #luciernaga{transform-box:fill-box;transform-origin:50% 50%;transition:transform 1.2s ease,filter .8s ease}
+
+  .flota{transform-box:fill-box;animation:bob 2.6s ease-in-out infinite alternate}
+  @keyframes bob{
+    from{transform:translateY(-13px) rotate(-1.3deg)}
+    to  {transform:translateY( 13px) rotate( 1.5deg)}
+  }
+  /* BOIL — idle vivo: squash-&-stretch que RESPIRA a ~12fps (portado del kit
+     rubber-hose de las criaturas: la abeja lo estrena). */
+  #cuerpoRig{transform-box:fill-box;transform-origin:50% 100%;animation:rhBoil 1.5s steps(18,end) infinite}
+  @keyframes rhBoil{
+    0%  {transform:translateY(0) scale(1,1)}
+    22% {transform:translateY(-1px) scale(.985,1.03)}   /* stretch (anticipa) */
+    50% {transform:translateY(1.4px) scale(1.03,.97)}   /* squash */
+    72% {transform:translateY(-.5px) scale(.994,1.012)} /* overshoot */
+    100%{transform:translateY(0) scale(1,1)}
+  }
+  :host([data-estado="degradado"]) #cuerpoRig{animation-duration:3.4s}
+  /* CELEBRA (bosque sano) — brinca de alegría: anticipa, SALTA con stretch y
+     aterriza con overshoot elástico (rh-g-celebra escalado). */
+  :host([data-estado="sano"]) #cuerpoRig{animation:rhCelebra 1.2s cubic-bezier(.34,1.56,.64,1) infinite}
+  @keyframes rhCelebra{
+    0%  {transform:translateY(0) scale(1,1)}
+    16% {transform:translateY(4px) scale(1.06,.9)}    /* anticipa (squash) */
+    42% {transform:translateY(-12px) scale(.9,1.13)}  /* ¡SALTA! (stretch) */
+    62% {transform:translateY(2px) scale(1.08,.9)}    /* aterriza (overshoot) */
+    80% {transform:translateY(-2px) scale(.98,1.04)}  /* rebote elástico */
+    100%{transform:translateY(0) scale(1,1)}
+  }
+
+  /* alas membranosas — abanico borroso bajo los élitros */
+  .alaMemb{transform-box:fill-box}
+  #alaIzq{transform-origin:100% 60%;animation:aleteoIzq .085s linear infinite alternate}
+  #alaDer{transform-origin:0% 60%;animation:aleteoDer .085s linear infinite alternate}
+  @keyframes aleteoIzq{
+    from{transform:rotate(-11deg) scaleY(.94)}
+    to  {transform:rotate( 16deg) scaleY(1.06)}
+  }
+  @keyframes aleteoDer{
+    from{transform:rotate(11deg) scaleY(.94)}
+    to  {transform:rotate(-16deg) scaleY(1.06)}
+  }
+
+  /* antenas filiformes con follow-through (vivas, como los bombillos de la abeja) */
+  .antena{transform-box:fill-box;transform-origin:50% 100%}
+  #antenaIzq{animation:antenaSway 1.9s ease-in-out infinite alternate}
+  #antenaDer{animation:antenaSway 2.2s ease-in-out .25s infinite alternate}
+  @keyframes antenaSway{
+    from{transform:rotate(-12deg)}
+    to  {transform:rotate(13deg)}
+  }
+  /* el bulbo del extremo arrastra (secondary motion) */
+  .antenaBulbo{transform-box:fill-box;transform-origin:50% 100%;animation:bulboLag 1.9s ease-in-out .12s infinite alternate}
+  @keyframes bulboLag{from{transform:translate(1.5px,0) scale(.94)}to{transform:translate(-1.5px,0) scale(1.06)}}
+
+  /* RUBOR — las chapetas se encienden un momento (calidez andina, período largo). */
+  .cachete{transform-box:fill-box;transform-origin:50% 50%;animation:rhRubor 12.7s ease-in-out infinite}
+  @keyframes rhRubor{0%,62%,78%,100%{opacity:.5}68%,72%{opacity:.82}}
+
+  /* Parpadeo natural: una pausa larga, un cierre limpio y un segundo cierre
+     ocasional. Cada ojo tiene una fase distinta para quitar el efecto de
+     interruptor mecánico sin cambiar la expresión de la cara. */
+  .ojo{transform-box:fill-box;transform-origin:50% 50%;animation:luciBlink 6.8s ease-in-out infinite}
+  .ojoDer{animation-duration:7.6s;animation-delay:-1.15s}
+  @keyframes luciBlink{
+    0%,61%,100%{transform:scaleY(1)}
+    62.2%{transform:scaleY(.16)}
+    63.4%{transform:scaleY(.72)}
+    64.5%{transform:scaleY(1)}
+    88%,91%{transform:scaleY(1)}
+    89.3%{transform:scaleY(.12)}
+    90.2%{transform:scaleY(1)}
+  }
+  /* MIRADA con DOUBLE-TAKE (Miss Minutes): reojo, vistazo seco al otro lado y
+     vuelta; y arriba curiosa. Período co-primo con parpadeo/antics. */
+  .pupila{transform-box:fill-box;animation:rhMirada 7.9s ease-in-out infinite}
+  @keyframes rhMirada{
+    0%,20%,47%,58%,76%,100%{transform:translate(0,0)}
+    23%,34%{transform:translate(-4px,1px)}      /* de reojo (sospecha) */
+    38%{transform:translate(3.5px,0)}           /* double-take: ¡al otro lado! */
+    41%,44%{transform:translate(-3.5px,1px)}    /* …no, sí era allá */
+    61%,71%{transform:translate(3.2px,-3px)}    /* arriba: ¿y eso qué fue? */
+  }
+  :host([data-estado="hablar"]) .pupila,
+  :host([data-estado="pacto"]) .pupila{animation:none;transform:translate(0,1px)}
+  :host([data-estado="leer"]) .pupila{animation:none;transform:translate(0,-4px)}
+
+  .brazo{transform-box:fill-box;transition:transform .6s cubic-bezier(.34,1.56,.64,1)}
+  #brazoDer{transform-origin:8% 20%}
+  #brazoIzq{transform-origin:92% 20%}
+
+  /* ===== CAPAS DE VIDA co-primas (al estilo de la abeja angelita) =====
+     tres relojes que nunca caen en el mismo compás (2.6 / 6.3 / 9.7 s) =
+     idle impredecible y vivo, con anticipación + overshoot Miss Minutes. */
+  /* ANTIC — el arrebato Miss-Minutes: casi todo el ciclo es identidad y de
+     pronto ANTICIPA (squash) y da la VUELTA DE CAMPANA completa (360°) con
+     overshoot y asentada. Cadencia exacta del kit (la firma de la abeja). */
+  #anticRig{transform-box:fill-box;transform-origin:50% 50%;animation:rhAntic 9.7s ease-in-out infinite}
+  @keyframes rhAntic{
+    0%,55%{transform:rotate(0deg) scale(1,1)}
+    58%,60%{transform:rotate(-11deg) scale(.93,1.09)}  /* anticipación + hold */
+    67%{transform:rotate(338deg) scale(1.08,.92)}      /* ¡la vuelta! (smear squash) */
+    71%{transform:rotate(367deg) scale(.97,1.04)}      /* overshoot elástico */
+    75%,100%{transform:rotate(360deg) scale(1,1)}
+  }
+  /* TRAVIESO — micro-antics de otro período: saltito de lado con wobble, el
+     WIGGLE de caderas (su firma) y un brinquito curioso. */
+  #traviesoRig{transform-box:fill-box;transform-origin:50% 55%;animation:rhTravieso 6.3s ease-in-out infinite}
+  @keyframes rhTravieso{
+    0%,29%,46%,56%,72%,90%,100%{transform:translate(0,0) rotate(0deg)}
+    32%{transform:translate(-4.5px,-2px) rotate(-5deg)}   /* saltito de lado */
+    36%{transform:translate(-4.5px,-1.6px) rotate(4deg)}  /* wobble (double-take) */
+    41%{transform:translate(1.6px,.8px) rotate(-2deg)}    /* rebote de vuelta */
+    59%{transform:translate(1px,0) rotate(3.5deg)}        /* wiggle: menea… */
+    63%{transform:translate(-1px,0) rotate(-3.5deg)}      /* …para acá… */
+    67%{transform:translate(.6px,0) rotate(2deg)}         /* …y asienta contenta */
+    79%{transform:translate(0,-4px) rotate(4deg)}         /* brinquito curioso */
+    84%{transform:translate(0,1.2px) rotate(-2deg)}
+  }
+  /* Los antics solo corren en reposo/hablar: durante los mensajes de medición
+     (leer/sano/degradado/pacto) se apagan para que el gesto lea limpio — igual
+     que la abeja apaga la vuelta de campana cuando está posando. */
+  :host([data-estado="leer"]) #anticRig, :host([data-estado="sano"]) #anticRig,
+  :host([data-estado="degradado"]) #anticRig, :host([data-estado="pacto"]) #anticRig,
+  :host([data-estado="hablar"]) #anticRig,
+  :host([data-estado="leer"]) #traviesoRig, :host([data-estado="sano"]) #traviesoRig,
+  :host([data-estado="degradado"]) #traviesoRig, :host([data-estado="pacto"]) #traviesoRig{animation:none;transform:none}
+
+  /* ladeo de cabeza (la cabeza y el pronoto se inclinan sobre el cuerpo) */
+  #testaRig{transform-box:fill-box;transform-origin:50% 90%;animation:cabezaLadeo 4.6s ease-in-out infinite}
+  @keyframes cabezaLadeo{0%,100%{transform:rotate(-2.6deg)}50%{transform:rotate(2.6deg)}}
+  :host([data-estado="hablar"]) #testaRig{animation:cabezaHabla 2.2s ease-in-out infinite}
+  @keyframes cabezaHabla{0%,100%{transform:rotate(-3.4deg) translateY(0)}50%{transform:rotate(3.4deg) translateY(-3px)}}
+  :host([data-estado="leer"]) #testaRig{animation:none;transform:rotate(0deg) translateY(-3px)}
+  :host([data-estado="degradado"]) #testaRig{animation:cabezaTriste 5s ease-in-out infinite}
+  @keyframes cabezaTriste{0%,100%{transform:rotate(-1deg) translateY(3px)}50%{transform:rotate(1deg) translateY(5px)}}
+
+  /* idle: brazos con vaivén suave (vivos aunque no gesticule) */
+  :host([data-estado="idle"]) #brazoDer{animation:brazoIdleD 3.1s ease-in-out infinite alternate}
+  :host([data-estado="idle"]) #brazoIzq{animation:brazoIdleI 3.5s ease-in-out infinite alternate}
+  @keyframes brazoIdleD{from{transform:rotate(-7deg)}to{transform:rotate(9deg)}}
+  @keyframes brazoIdleI{from{transform:rotate(7deg)}to{transform:rotate(-9deg)}}
+
+  /* asombro/alegría cuando el bosque está sano: brazos en V */
+  :host([data-estado="sano"]) #brazoDer{animation:none;transform:rotate(-44deg) scale(1.05)}
+  :host([data-estado="sano"]) #brazoIzq{animation:none;transform:rotate(44deg) scale(1.05)}
+
+  /* Microgesto de reposo: el cuerpo se acomoda después de respirar, con un
+     pequeño asentamiento que no comparte compás con la cabeza. */
+  #luciernaga{animation:luciAcomoda 5.9s ease-in-out infinite}
+  @keyframes luciAcomoda{
+    0%,100%{transform:translateY(0) scale(1,1)}
+    46%{transform:translateY(-1px) scale(.992,1.012)}
+    54%{transform:translateY(.5px) scale(1.008,.995)}
+  }
+
+
+  /* boca al hablar */
+  #boca{transform-box:fill-box;transform-origin:50% 40%}
+  :host([data-estado="hablar"]) #boca,
+  :host([data-estado="leer"]) #boca,
+  :host([data-estado="sano"]) #boca,
+  :host([data-estado="degradado"]) #boca,
+  :host([data-estado="pacto"]) #boca{animation:habla .19s steps(2,end) infinite alternate}
+  @keyframes habla{
+    from{transform:scaleY(.6)}
+    to  {transform:scaleY(1.25)}
+  }
+
+  :host([data-estado="hablar"]) #brazoDer{animation:gesticula 1.1s ease-in-out infinite alternate}
+  @keyframes gesticula{
+    from{transform:rotate(-14deg)}
+    to  {transform:rotate(-48deg)}
+  }
+  :host([data-estado="hablar"]) #brazoIzq{transform:rotate(18deg)}
+
+  /* leer la noche — se yergue, mira arriba, antenas atentas, brazo alza el farol de lectura */
+  :host([data-estado="leer"]) #luciernaga{transform:rotate(-4deg)}
+  :host([data-estado="leer"]) #brazoDer{transform:rotate(-52deg) scale(1.06)}
+  :host([data-estado="leer"]) #brazoIzq{transform:rotate(14deg)}
+  :host([data-estado="leer"]) .antena{animation-duration:.9s}
+
+  /* pacto — brazos abiertos, invita */
+  :host([data-estado="pacto"]) #brazoDer{transform:rotate(-34deg)}
+  :host([data-estado="pacto"]) #brazoIzq{transform:rotate(34deg)}
+
+  /* degradado — se apaga, se encoge y se entristece */
+  :host([data-estado="degradado"]) #luciernaga{filter:saturate(.72) brightness(.82)}
+  :host([data-estado="degradado"]) .flota{animation-duration:3.6s}
+  :host([data-estado="degradado"]) #brazoDer{transform:rotate(6deg)}
+  :host([data-estado="degradado"]) #brazoIzq{transform:rotate(-6deg)}
+  :host([data-estado="sano"]) #luciernaga{filter:brightness(1.06)}
+
+  /* =========== LA LINTERNA — medidor vivo ============ */
+  #linternaHalo{transform-box:fill-box;transform-origin:50% 50%}
+  #linternaCore{transform-box:fill-box;transform-origin:50% 50%;filter:drop-shadow(0 0 14px #cfff5a)}
+
+  /* estado base / idle / hablar / leer — pulso vivo medio */
+  #linternaHalo{animation:latido 2.6s ease-in-out infinite}
+  #linternaCore{animation:brillaSuave 2.6s ease-in-out infinite}
+  @keyframes latido{0%,100%{transform:scale(.9);opacity:.5}50%{transform:scale(1.08);opacity:.82}}
+  @keyframes brillaSuave{
+    0%,100%{filter:drop-shadow(0 0 10px #bfe84a) brightness(.98)}
+    50%{filter:drop-shadow(0 0 22px #ffedb0) brightness(1.14)}
+  }
+  :host([data-estado="leer"]) #linternaHalo{animation-duration:1.9s}
+  :host([data-estado="leer"]) #linternaCore{animation-duration:1.9s}
+
+  /* BOSQUE SANO — brilla fuerte, parejo, halo grande */
+  :host([data-estado="sano"]) #linternaHalo{animation:latidoFuerte 1.6s ease-in-out infinite}
+  :host([data-estado="sano"]) #linternaCore{animation:brillaFuerte 1.6s ease-in-out infinite}
+  @keyframes latidoFuerte{0%,100%{transform:scale(1.2);opacity:.9}50%{transform:scale(1.5);opacity:1}}
+  @keyframes brillaFuerte{
+    0%,100%{filter:drop-shadow(0 0 28px #ffedb0) brightness(1.25)}
+    50%{filter:drop-shadow(0 0 52px #fff3c8) brightness(1.5)}
+  }
+
+  /* BAJO AMENAZA — se apaga, titila débil y errático */
+  :host([data-estado="degradado"]) #linternaHalo{animation:titilaHalo 1.7s steps(1,end) infinite}
+  :host([data-estado="degradado"]) #linternaCore{animation:titilaCore 1.7s steps(1,end) infinite}
+  @keyframes titilaHalo{
+    0%{opacity:.26;transform:scale(.6)}10%{opacity:.05;transform:scale(.5)}
+    22%{opacity:.2;transform:scale(.62)}34%{opacity:.04}
+    48%{opacity:.18;transform:scale(.58)}62%{opacity:.03}
+    76%{opacity:.22;transform:scale(.6)}88%{opacity:.05}100%{opacity:.16;transform:scale(.55)}
+  }
+  @keyframes titilaCore{
+    0%{filter:drop-shadow(0 0 7px #dcb457) brightness(.72)}10%{filter:drop-shadow(0 0 1px #5a6a26) brightness(.4)}
+    22%{filter:drop-shadow(0 0 6px #dcb457) brightness(.66)}34%{filter:drop-shadow(0 0 1px #4d5a22) brightness(.36)}
+    48%{filter:drop-shadow(0 0 5px #8fb038) brightness(.6)}62%{filter:drop-shadow(0 0 1px #4d5a22) brightness(.34)}
+    76%{filter:drop-shadow(0 0 6px #dcb457) brightness(.64)}88%{filter:drop-shadow(0 0 1px #5a6a26) brightness(.4)}100%{filter:drop-shadow(0 0 4px #7f9a30) brightness(.55)}
+  }
+
+  /* EL PACTO — recupera, cálida y esperanzada */
+  :host([data-estado="pacto"]) #linternaHalo{animation:latidoFuerte 2.2s ease-in-out infinite}
+  :host([data-estado="pacto"]) #linternaCore{animation:brillaFuerte 2.2s ease-in-out infinite}
+
+  /* enjambre de fondo (otras luciérnagas) */
+  .chispa{transform-box:fill-box;transform-origin:50% 50%;animation:chispea 3.4s ease-in-out infinite}
+  @keyframes chispea{0%,100%{opacity:.12;transform:scale(.7)}50%{opacity:.85;transform:scale(1.15)}}
+  :host([data-estado="sano"]) .chispa{animation-duration:2.1s}
+  :host([data-estado="degradado"]) .chispa{animation:none;opacity:.05}
+  :host([data-estado="pacto"]) .chispa{animation-duration:2.6s}
+
+  /* luz artificial (contaminación lumínica) — solo en amenaza */
+  #luzArtificial{opacity:0;transition:opacity .9s ease}
+  :host([data-estado="degradado"]) #luzArtificial{opacity:1;animation:lamparaParpadea 4s steps(1) infinite}
+  @keyframes lamparaParpadea{0%,96%{opacity:1}97%{opacity:.72}98%{opacity:1}}
+
+  /* velo de la noche degradada */
+  #veloNoche{opacity:0;transition:opacity .9s ease}
+  :host([data-estado="degradado"]) #veloNoche{opacity:.45}
+  :host([data-estado="sano"]) #veloNoche{opacity:0}
+
+  /* estrellas y niebla */
+  .estrella{transform-box:fill-box;transform-origin:50% 50%;animation:titilaEstrella 4.5s ease-in-out infinite}
+  @keyframes titilaEstrella{0%,100%{opacity:.35}50%{opacity:.95}}
+  :host([data-estado="degradado"]) .estrella{opacity:.12;animation:none}
+  .niebla{animation:brisa 16s ease-in-out infinite alternate}
+  .niebla.n2{animation-duration:21s;animation-delay:-7s}
+  .niebla.n3{animation-duration:25s;animation-delay:-13s}
+  @keyframes brisa{from{transform:translateX(-48px)}to{transform:translateX(54px)}}
+  .agua{animation:brillaAgua 5.5s ease-in-out infinite alternate}
+  @keyframes brillaAgua{from{opacity:.4}to{opacity:.8}}
+  .helecho{transform-box:fill-box;transform-origin:50% 100%;animation:mece 5s ease-in-out infinite alternate}
+  .helecho.h2{animation-delay:-1.8s}
+  .helecho.h3{animation-delay:-3.1s}
+  @keyframes mece{from{transform:rotate(-1.8deg)}to{transform:rotate(2deg)}}
+
+  @media (prefers-reduced-motion:reduce){
+    *{animation:none !important;transition:none !important}
+  }

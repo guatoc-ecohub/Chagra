@@ -1,0 +1,92 @@
+{
+  "species_slug": "juncus_effusus",
+  "scientific_name": "Juncus effusus L.",
+  "common_names": [
+    "Junco común"
+  ],
+  "family": "Juncaceae",
+  "category": "ornamentales_nativas",
+  "cultivable": true,
+  "conservation_status": "nativo_silvestre",
+  "thermal_zones": [
+    "templado",
+    "frio"
+  ],
+  "roles_in_guild": [
+    "biomass_producer",
+    "ground_cover",
+    "dynamic_accumulator"
+  ],
+  "antagonists": [],
+  "especies_nativas_sustitutas": [],
+  "propagation": {
+    "methods": [
+      "division_mata",
+      "semilla",
+      "rizoma"
+    ],
+    "best_method": "division_mata",
+    "protocol_resumen": "División de macolla cada 2-3 años a inicio de primavera (febrero-marzo en Sabana de Bogotá). Separar macollas hijas con al menos 5-8 culmos y porción de rizoma. Plantar a 30-50 cm de distancia en suelo saturado o bajo lámina de agua 5-15 cm. Establecimiento en 60-90 días. Semillas diminutas viables, germinan en sustrato saturado con luz.",
+    "tiempo_a_establecimiento_dias": 75,
+    "notas": "Macrófita emergente cosmopolita-nativa de humedales fríos andinos colombianos entre 1.500 y 3.600 msnm: páramos de Sumapaz, Chingaza, Cruz Verde, Iguaque, Belmira; humedales Sabana de Bogotá; laguna de Tota; lagunas altoandinas Boyacá-Cundinamarca-Nariño-Cauca. Uso tradicional para artesanía (esteras, canastos finos), filtración biológica en humedales artificiales fríos, bioindicador de calidad de suelo saturado.",
+    "fuente": "IAvH Flora Alto Andina; Bernal 2015; POWO Kew; GBIF Colombia"
+  },
+  "requirements": {
+    "agua": "pantanoso",
+    "altitud_msnm": {
+      "min_absoluto": 1500,
+      "optimo_min": 2000,
+      "optimo_max": 3000,
+      "max_absoluto": 3600
+    },
+    "temperatura_c": {
+      "helada_letal": -5,
+      "optimo_min": 10,
+      "optimo_max": 22,
+      "max_tolerable": 28
+    },
+    "radiacion": "sol_pleno",
+    "drenaje_requerido": "pantanoso"
+  },
+  "valor_pedagogico": "El junco común o junco esparcido (Juncus effusus L., Juncaceae) es la macrófita emergente más representativa de los humedales fríos altoandinos colombianos y una lección viva de adaptación a suelos saturados, soberanía artesanal andina y fitorremediación biológica en climas fríos donde Typha (enea) ya no prospera. Cosmopolita-nativa en humedales templados-fríos de todos los continentes, en Colombia se distribuye en humedales y suelos saturados entre 1.500 y 3.600 msnm en zonas térmicas templada y fría: humedales fríos de la Sabana de Bogotá (Jaboque, Juan Amarillo, Tibanica, Córdoba, La Conejera, Torca-Guaymaral, El Burro, Capellanía — donde forma parches densos mezclados con Typha en bordes y zonas inundables), páramos y subpáramos del corredor cordillera Oriental (Sumapaz, Chingaza, Cruz Verde, Iguaque, Belmira, Pisba, Cocuy — donde es macrófita dominante de turberas y humedales de páramo entre 3.000-3.600 msnm), humedales y lagunas altoandinas de Boyacá-Cundinamarca (Tota, Iguaque, Siecha, Buitrera, Tausa), lagunas altoandinas de Nariño-Cauca-Tolima-Caldas (Cumbal, Cocha, Magdalena en Páramo de las Papas, Otún, El Plumón), valles fríos de Antioquia-Caldas-Quindío-Risaralda (Oriente antioqueño, Valle de San Nicolás, Eje Cafetero alto), y bordes de quebradas y manantiales fríos en piedemontes andinos. Pertenece a la familia Juncaceae (familia hermana de Cyperaceae 'papiros' y Poaceae 'gramíneas', orden Poales) y se reconoce por su porte cespitoso formando macollas densas de 60-130 cm de altura, sus culmos cilíndricos verde oscuro brillante huecos por dentro con médula esponjosa blanca (característica diagnóstica visible al cortar transversalmente el culmo — la médula seca era usada tradicionalmente como mecha de velas en el siglo XIX en Europa, 'rushlight'), sin hojas evidentes (las hojas están reducidas a vainas basales rojizo-marrones envainando la base del culmo), y por sus inflorescencias laterales discretas de 3-10 cm aparentando salir del culmo a un tercio del extremo aunque en realidad son terminales con una bráctea de envoltura que continúa la apariencia del culmo (característica diagnóstica de la especie). Diferenciar de otros Juncus colombianos (J. arcticus, J. tenuis, J. bufonius, J. ramboi) por la médula continua, la inflorescencia lateral aparente y la altura mayor. Su importancia ecológica y cultural es central: como macrófita dominante de humedales fríos andinos estabiliza suelos saturados de turberas, regula el flujo hídrico subsuperficial de páramos (los humedales de páramo son el principal sistema de captación, regulación y entrega de agua a las cabeceras de cuencas hidrográficas colombianas que abastecen las grandes ciudades — Bogotá, Tunja, Sogamoso, Manizales, Pereira, Pasto, Popayán, San Gil, Bucaramanga), forma hábitat para anfibios altoandinos (rana sabanera Dendropsophus molitor, salamandra Bolitoglossa adspersa, rana de cristal andina), invertebrados de humedal frío (libélulas, chinches acuáticas, anfípodos) y aves de humedal altoandinas (tingua bogotana Rallus semiplumbeus endémica de Bogotá en peligro, tingua de pico verde, focha andina, becasinas, agachadizas migratorias); culturalmente fue planta artesanal importante en el altiplano cundiboyacense (esteras finas, canastos, asientos — tradiciones que persisten en municipios artesanales de Boyacá-Cundinamarca y Nariño); modernamente es la macrófita estrella en sistemas de humedales artificiales subsuperficiales (HAS) fríos altoandinos para tratamiento de aguas residuales en municipios rurales de páramo donde Typha (enea) ya no prospera por el frío extremo (>2.800 msnm) — es la macrófita estrella en HAS de páramo, acumula N-amoniacal, P-soluble, K y metales pesados leves en raíces fibrosas densas y rizomas con eficiencia comparable a Typha en sistemas adaptados a clima frío. Manejo agroecológico ornamental-restauración-HAS: propagación por división de macolla cada 2-3 años a inicio de primavera (febrero-marzo en Sabana de Bogotá, marzo-abril en páramos altos), separar macollas hijas con al menos 5-8 culmos y porción de rizoma, plantar a 30-50 cm de distancia en suelo saturado o bajo lámina de agua 5-15 cm, establecimiento en 60-90 días; cosecha de culmos para artesanía cada 4-6 meses cortando a 10 cm del suelo (la planta rebrota); para HAS construido densidad de siembra 6-9 macollas/m². Es lección extraordinaria de adaptación a humedales fríos andinos, conservación de páramos (sistemas estratégicos protegidos por Ley 1930 de 2018), soberanía artesanal andina y tecnología apropiada para tratamiento de aguas residuales en municipios fríos colombianos. Fuentes Tier A: IAvH Humboldt — Flora Alto Andina, POWO Kew, GBIF Colombia, Bernal 2015, JBB Plantas Medicinales.",
+  "sources": [
+    {
+      "id": "humboldt-flora-alto-andina",
+      "title": "humboldt-flora-alto-andina",
+      "tier": "A",
+      "url": null
+    },
+    {
+      "id": "powo-kew",
+      "title": "powo-kew",
+      "tier": "A",
+      "url": "https://powo.science.kew.org"
+    },
+    {
+      "id": "gbif-colombia",
+      "title": "gbif-colombia",
+      "tier": "A",
+      "url": "https://www.gbif.org/country/CO"
+    },
+    {
+      "id": "gbif-taxonomic-backbone",
+      "title": "gbif-taxonomic-backbone",
+      "tier": "A",
+      "url": "https://www.gbif.org/dataset/d7dddbf4-2cf0-4f39-9b2a-bb099caae36c"
+    },
+    {
+      "id": "bernal-2015-plantas-liquenes-colombia",
+      "title": "bernal-2015-plantas-liquenes-colombia",
+      "tier": "A",
+      "url": "http://catalogoplantasdecolombia.unal.edu.co"
+    },
+    {
+      "id": "ley-1930-2018-paramos",
+      "title": "ley-1930-2018-paramos",
+      "tier": "A",
+      "url": null
+    }
+  ],
+  "_generated_by": "scripts/build-cycle-content-from-catalog.mjs",
+  "_generated_at": "2026-05-19T00:42:57.392Z"
+}
