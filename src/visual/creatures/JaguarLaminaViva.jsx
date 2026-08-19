@@ -193,7 +193,14 @@ export default function JaguarLaminaViva({
         cv.style.width = '100%';
         cv.style.height = '100%';
         cv.style.display = 'block';
-        if (!animated) cv.style.animation = 'none';
+        /* animated=false = fotograma digno: sin la animación, el párpado queda
+           en su transform por defecto, que aquí es TAPANDO el ojo (polaridad
+           invertida del parche — scaleY(1)=cerrado). Retraerlo explícito deja
+           los ojos ABIERTOS, igual que hace reduced-motion vía CSS. */
+        if (!animated) {
+          cv.style.animation = 'none';
+          cv.style.transform = 'scaleY(0)';
+        }
         const h = host.current;
         if (h) {
           h.style.position = 'absolute';

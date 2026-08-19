@@ -256,6 +256,16 @@ export const CAPAS_RIG = {
  */
 export const CORTE_PATAS_DEL = {
   px: 179, py: 310, nx: 0.99, ny: 0.1406, u0: -9, u1: 9,
+  /* A nivel de ZARPA la recta de columnas atraviesa los DEDOS de la pata
+   * naranja (sus dedos alcanzan x≈168, medido en la grilla del refino
+   * arte-patas 2026-08-18): con la recta sola, la pieza blanca se llevaba
+   * una copia feathered de los arcos de dedos naranjas —la "garra fantasma"
+   * que colgaba bajo la zarpa blanca al caminar— y la naranja perdía su
+   * punta por el feather. Bajo `zarpa.y0..y1` el corte se DOBLA a una
+   * frontera vertical en el canal de sombra entre las dos zarpas (x≈163),
+   * con feather corto: la naranja se queda con su bloque de dedos COMPLETO
+   * y la blanca termina limpia en su talón repintado (ver el PNG). */
+  zarpa: { y0: 348, y1: 360, x: 163, u0: -5, u1: 5 },
 };
 
 /**
@@ -277,11 +287,16 @@ export const CORTE_PATAS_DEL = {
  *   lateral de marcha felina: trasera cercana → delantera cercana → trasera
  *   lejana → delantera lejana, a cuartos de ciclo.
  *
- *   `anclaje` = pisada neutra de MEDIO APOYO (bajo la articulación; la pose de
- *   la lámina es un fotograma de zancada, no la neutra). En las delanteras la
- *   Y del anclaje sube 3px sobre la pisada de reposo: la pata dibujada está
- *   casi en extensión total y sin ese margen el IK recortaría el alcance en
- *   los extremos de zancada. En la trasera lejana el X del anclaje queda 12px
+ *   `anclaje` = pisada neutra de MEDIO APOYO. En las DELANTERAS el anclaje es
+ *   (casi) el pie dibujado: la pata está a un soplo de la extensión total
+ *   (d reposo ≈ L1+L2), así que correr el objetivo apenas 3px (arriba o
+ *   atrás) doblaba el carpo −20°..−29° durante TODO el apoyo — la zarpa
+ *   colgaba plegada mientras cargaba peso, el "caminar rarísimo" (refino
+ *   arte-patas 2026-08-18). Con el anclaje en el pie, el apoyo pasa por el
+ *   reposo (flexión ≤9°, como las traseras) y el sobre-alcance en los
+ *   extremos de zancada lo absorbe la proyección del IK (≤3.5px de acorte,
+ *   un touch-down suave — medido en la simulación del ciclo, sin clamp de
+ *   dMin en apoyo). En la trasera lejana el X del anclaje queda 12px
  *   ADELANTE del pie de reposo (no 20): re-centrar su barrido hacia el reposo
  *   acota la rotación del muslo y la cápsula sintética no asoma por detrás de
  *   la grupa (refino 2026-08-18, ver abajo).
@@ -295,9 +310,10 @@ export const CORTE_PATAS_DEL = {
  *   lo convierte en un piso de distancia articulación→pie (`dMin`): si el
  *   objetivo del vuelo queda más cerca, el pie se proyecta sobre la misma
  *   recta (el carpo delantero llegaba a −59° y la zarpa se enroscaba contra
- *   la pata blanca leyéndose rota; con 36° dobla claro sin enroscarse). En
- *   APOYO el tope NUNCA muerde (verificado en marcha.test.js): la pisada
- *   clavada no se toca.
+ *   la pata blanca leyéndose rota; 36° la tapó a medias; con 28° el vuelo
+ *   pliega el carpo con la discreción felina de las traseras, refino
+ *   arte-patas 2026-08-18). En APOYO el tope NUNCA muerde (verificado en
+ *   marcha.test.js): la pisada clavada no se toca.
  *   PIVOTES traseros ARRIBA (240 → 226/228): la cabeza del fémur vive DENTRO
  *   del cuerpo, no en el borde del corte. Con el pivote en el borde, el arte
  *   del muslo barría con brazo de palanca largo: la cápsula sintética del
@@ -313,13 +329,13 @@ export const CORTE_PATAS_DEL = {
 export const RIG_MARCHA = {
   delLejana: {
     articulacion: [160, 236], rodilla: [154, 332], pie: [155, 384],
-    lado: -1, fase: 0.75, lift: 14, anclaje: [160, 381], rodillaCorte: 332,
-    plieMax: 36,
+    lado: -1, fase: 0.75, lift: 11, anclaje: [159, 384], rodillaCorte: 332,
+    plieMax: 28,
   },
   delCercana: {
     articulacion: [208, 236], rodilla: [196, 335], pie: [193, 386],
-    lado: -1, fase: 0.25, lift: 14, anclaje: [208, 383], rodillaCorte: 335,
-    plieMax: 36,
+    lado: -1, fase: 0.25, lift: 11, anclaje: [197, 386], rodillaCorte: 335,
+    plieMax: 28,
   },
   trasCercana: {
     articulacion: [428, 226], rodilla: [448, 298], pie: [385, 357],

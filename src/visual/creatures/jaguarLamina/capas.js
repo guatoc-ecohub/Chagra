@@ -90,11 +90,19 @@ function mascaraApendice(x, y, { box, joint }) {
 /** Pata delantera cercana (naranja): envolvente × lado u>0 del corte medido.
  *  El respaldo detrás del filo ya no es la otra mitad del plano (eso
  *  fantasmeaba "3-4 patas") sino la pata blanca PRE-CORTADA + el pecho
- *  inpainted — ver el docstring de `CORTE_PATAS_DEL` en anatomia.js. */
+ *  inpainted — ver el docstring de `CORTE_PATAS_DEL` en anatomia.js.
+ *  A nivel de zarpa (`CORTE_PATAS_DEL.zarpa`) el corte se dobla a la
+ *  frontera vertical del canal de sombra: la recta de columnas atravesaba
+ *  los dedos naranjas y le amputaba la punta a esta pieza por el feather
+ *  (refino arte-patas 2026-08-18). */
 function mascaraPataNaranja(x, y) {
   const c = CORTE_PATAS_DEL;
   const u = c.nx * (x - c.px) + c.ny * (y - c.py);
-  return mascaraApendice(x, y, PATAS_DEL) * ss(c.u0, c.u1, u) * (1 - mascaraCabeza(x, y));
+  const mRecta = ss(c.u0, c.u1, u);
+  const z = c.zarpa;
+  const mZarpa = ss(z.u0, z.u1, x - z.x);
+  const m = lerp(mRecta, mZarpa, ss(z.y0, z.y1, y));
+  return mascaraApendice(x, y, PATAS_DEL) * m * (1 - mascaraCabeza(x, y));
 }
 
 /* ── Geometría de la ventana del muslo trasero lejano + borde de cola.
