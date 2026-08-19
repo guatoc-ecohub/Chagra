@@ -3,19 +3,22 @@
  * no trae Canvas2D real, así que estas pruebas cubren lo que SÍ es
  * observable sin GPU/browser: la detección de soporte, la degradación
  * defensiva (nunca truena) y que las constantes de anatomía tengan la forma
- * que `capas.js` espera — incluidos los CANDADOS de las fugas que se
- * encontraron y cerraron en la revisión offline (`_gate/luciernaga-lamina/`,
- * no versionado): la punta de la antena derecha fuera de caja, la mano sin
- * techo que reclamaba la antena, y la linterna mordiendo la bota. La
- * verificación píxel a píxel (recomposición aditiva 0.000% de huecos) se
- * hizo offline con `sharp` — ver el informe de la rama.
+ * que `capas.js` espera — incluidos los CANDADOS del corte C4:
+ *   · NO EXISTE pieza de cabeza (regla dura: no se corta cuello/cabeza —
+ *     la testa viaja fusionada al cuerpo).
+ *   · Las ALAS existen con techo/fondo/interior/pivote válidos.
+ *   · Las fugas cerradas de rondas anteriores siguen cerradas (punta de
+ *     antena, techo de la mano, linterna vs bota).
+ * La verificación píxel a píxel (0 huecos / 0 déficit / 0 exceso + giro de
+ * alas sin cracks) vive en recomposicion.test.js, que importa las MISMAS
+ * fórmulas (`mascaras()`, `extenderRespaldo`).
  */
 import { describe, it, expect } from 'vitest';
-import { hornearLuciernaga, haySoporteCanvas } from '../capas.js';
-import {
-  ANCHO, ALTO, CABEZA, OJO, OJO_2, MANDIBULA, BOCA,
-  ANTENA_IZQ, ANTENA_DER, MANO_LAPIZ,
-  LINTERNA, PIERNA_IZQ, PIERNA_DER, CUERPO_PIVOTE,
+import { hornearLuciernaga, haySoporteCanvas, mascaras } from '../capas.js';
+import anatomia, {
+  ANCHO, ALTO, OJO, OJO_2, MANDIBULA, BOCA,
+  ANTENA_IZQ, ANTENA_DER, ALA_IZQ, ALA_DER, CUADERNO_GUANTE,
+  MANO_LAPIZ, LINTERNA, PIERNA_IZQ, PIERNA_DER, CUERPO_PIVOTE,
 } from '../anatomia.js';
 
 describe('haySoporteCanvas', () => {
@@ -39,24 +42,34 @@ describe('hornearLuciernaga — degradación defensiva', () => {
   });
 });
 
+describe('corte C4 — el cuello/cabeza NO se corta (regla dura del operador)', () => {
+  it('la anatomía no exporta pieza de cabeza ni banda de cuello', () => {
+    expect(anatomia.CABEZA).toBeUndefined();
+  });
+
+  it('mascaras() trae el juego C4 (cuerpo completo + alas) y NINGUNA máscara de cabeza', () => {
+    const m = mascaras();
+    for (const clave of ['mCuerpo', 'mAlaIzq', 'mAlaDer', 'mMandibula', 'mAntenaIzq', 'mAntenaDer', 'mManoLapiz', 'mLinterna']) {
+      expect(typeof m[clave], clave).toBe('function');
+    }
+    expect(m.mCabezaRender).toBeUndefined();
+    expect(m.mCabezaFull).toBeUndefined();
+  });
+
+  it('la CARA vive en el cuerpo: en el centro de los dos ojos mCuerpo == 1 (sin corte que la cruce)', () => {
+    const m = mascaras();
+    for (const ojo of [OJO, OJO_2]) {
+      expect(m.mCuerpo(ojo.cx, ojo.cy)).toBeGreaterThanOrEqual(0.999);
+    }
+    // y en la banda del cuello que el corte viejo cortaba (y≈200-218):
+    expect(m.mCuerpo(186, 208)).toBeGreaterThanOrEqual(0.999);
+  });
+});
+
 describe('anatomia.js — forma de las constantes que capas.js consume', () => {
   it('ANCHO/ALTO coinciden con luciernaga.png (367x507, header PNG verificado)', () => {
     expect(ANCHO).toBe(367);
     expect(ALTO).toBe(507);
-  });
-
-  it('CABEZA: banda de cuello válida + caja de testa + pivote — la cara viaja ENTERA en la pieza', () => {
-    expect(CABEZA.cuello.y1).toBeGreaterThan(CABEZA.cuello.y0);
-    expect(CABEZA.box.x1).toBeGreaterThan(CABEZA.box.x0);
-    expect(CABEZA.pivote).toHaveLength(2);
-    // los dos ojos y la boca caen DENTRO de la caja de la cabeza y ARRIBA del
-    // cuello: si esto se rompe, algún corte cruzó la cara (regla dura).
-    for (const ojo of [OJO, OJO_2]) {
-      expect(ojo.cx).toBeGreaterThan(CABEZA.box.x0);
-      expect(ojo.cx).toBeLessThan(CABEZA.box.x1);
-      expect(ojo.cy).toBeLessThan(CABEZA.cuello.y0);
-    }
-    expect(BOCA.cy).toBeLessThan(CABEZA.cuello.y0);
   });
 
   it('OJO y OJO_2 son puntos distintos dentro del canvas (parpadeo real de DOS ojos, no guiño)', () => {
@@ -70,7 +83,7 @@ describe('anatomia.js — forma de las constantes que capas.js consume', () => {
     expect(OJO.cx).not.toBeCloseTo(OJO_2.cx, 0);
   });
 
-  it('la mandíbula abre ENTRE el labio (bajo la sonrisa) y el fin del mentón — la sonrisa queda en la cabeza', () => {
+  it('la mandíbula abre ENTRE el labio (bajo la sonrisa) y el fin del mentón — la sonrisa queda en el cuerpo', () => {
     expect(MANDIBULA.labio.y1).toBeGreaterThan(MANDIBULA.labio.y0);
     expect(MANDIBULA.menton.y1).toBeGreaterThan(MANDIBULA.menton.y0);
     expect(MANDIBULA.menton.y0).toBeGreaterThan(MANDIBULA.labio.y1);
@@ -97,6 +110,48 @@ describe('anatomia.js — forma de las constantes que capas.js consume', () => {
     expect(ANTENA_DER.box.x1).toBeGreaterThanOrEqual(360);
   });
 
+  it('las DOS alas: banda techo→fondo válida, contorno interior dentro del lienzo, pivote en la raíz', () => {
+    for (const ala of [ALA_IZQ, ALA_DER]) {
+      expect(ala.techo.y1).toBeGreaterThan(ala.techo.y0);
+      expect(ala.fondo.y1).toBeGreaterThan(ala.fondo.y0);
+      expect(ala.fondo.y0).toBeGreaterThan(ala.techo.y1);
+      let yPrev = -1;
+      for (const [y, x] of ala.interior) {
+        expect(y).toBeGreaterThan(yPrev);          // polilínea ordenada en y
+        yPrev = y;
+        expect(x).toBeGreaterThan(0);
+        expect(x).toBeLessThan(ANCHO);
+      }
+      expect(ala.pivote).toHaveLength(2);
+      // la raíz del ala vive arriba, en la banda del techo (giro de aleteo,
+      // nunca traslación): pivote a ±10px de la banda.
+      expect(ala.pivote[1]).toBeGreaterThanOrEqual(ala.techo.y0 - 10);
+      expect(ala.pivote[1]).toBeLessThanOrEqual(ala.fondo.y0);
+    }
+    // flancos opuestos: todo el interior del ala izquierda queda a la
+    // izquierda del interior del ala derecha.
+    const maxIzq = Math.max(...ALA_IZQ.interior.map(([, x]) => x));
+    const minDer = Math.min(...ALA_DER.interior.map(([, x]) => x));
+    expect(maxIzq).toBeLessThan(minDer);
+    // el borde de ataque del ala izquierda (frontera con guante/brazo)
+    // existe y decrece en x al bajar (el frente se abre hacia afuera).
+    let xPrev = Infinity;
+    for (const [, x] of ALA_IZQ.borde) {
+      expect(x).toBeLessThan(xPrev);
+      xPrev = x;
+    }
+  });
+
+  it('CUADERNO_GUANTE (oclusor que se queda en el cuerpo): quad de 4 esquinas dentro del lienzo', () => {
+    expect(CUADERNO_GUANTE.quad).toHaveLength(4);
+    for (const [x, y] of CUADERNO_GUANTE.quad) {
+      expect(x).toBeGreaterThan(0);
+      expect(x).toBeLessThan(ANCHO);
+      expect(y).toBeGreaterThan(0);
+      expect(y).toBeLessThan(ALTO);
+    }
+  });
+
   it('MANO_LAPIZ: techo + muñeca acotan la pieza (candados de las fugas cerradas)', () => {
     // CANDADO: sin `techo`, la caja reclamaba el arco de la antena izquierda
     // que pasa por arriba (píxel duplicado que rotaría con la mano).
@@ -109,6 +164,12 @@ describe('anatomia.js — forma de las constantes que capas.js consume', () => {
     // el pivote (la muñeca) cae dentro de la caja, en la banda de la muñeca.
     expect(MANO_LAPIZ.pivote[0]).toBeGreaterThanOrEqual(MANO_LAPIZ.box.x0);
     expect(MANO_LAPIZ.pivote[0]).toBeLessThanOrEqual(MANO_LAPIZ.box.x1);
+    // CANDADO C4: el filo del élitro NO viaja con la mano — la máscara de la
+    // mano es ~0 sobre el borde de ataque del ala (x=120, y=235: élitro).
+    const m = mascaras();
+    expect(m.mManoLapiz(120, 235)).toBeLessThan(0.05);
+    // …y el tarso con el lápiz sigue entero en la pieza.
+    expect(m.mManoLapiz(48, 226)).toBeGreaterThan(0.95);
   });
 
   it('LINTERNA: elipse dentro del canvas; las bandas de pierna llegan hasta el puño de la bota', () => {
@@ -125,7 +186,7 @@ describe('anatomia.js — forma de las constantes que capas.js consume', () => {
   });
 
   it('los pivotes son puntos [x,y] dentro del lienzo', () => {
-    for (const piv of [CABEZA.pivote, MANDIBULA.pivote, ANTENA_IZQ.pivote, ANTENA_DER.pivote, MANO_LAPIZ.pivote, CUERPO_PIVOTE]) {
+    for (const piv of [MANDIBULA.pivote, ANTENA_IZQ.pivote, ANTENA_DER.pivote, ALA_IZQ.pivote, ALA_DER.pivote, MANO_LAPIZ.pivote, CUERPO_PIVOTE]) {
       const [x, y] = piv;
       expect(x).toBeGreaterThanOrEqual(0);
       expect(x).toBeLessThanOrEqual(ANCHO);

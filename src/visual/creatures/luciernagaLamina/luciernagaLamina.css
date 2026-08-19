@@ -1,39 +1,39 @@
 /* luciernagaLamina.css — LA VIDA DE ANGELITA sobre la piel de la lámina de
- * la luciérnaga científica. Puerto del sistema del jaguar lámina-viva
- * (jaguarLamina.css) a la anatomía y el CARÁCTER de la luciérnaga:
+ * la luciérnaga científica, corte C4 (cuerpo COMPLETO con cabeza — no hay
+ * cabeza-pieza; la cara vive por parches y la mirada es inclinación sutil
+ * del cuerpo entero):
  *
  *   señal (hook/estado)                → qué pieza mueve, aquí
  *   --rh-blink-dur/-delay (ritmo)      → parpadeo REAL de los dos ojos juntos,
  *                                        cada instancia a su aire (cadencia rh)
- *   data-rh-mira + --rh-mx/--rh-my     → la CABEZA gira siguiendo al usuario
+ *   data-rh-mira + --rh-mx/--rh-my     → el CUERPO ENTERO se inclina sutil
+ *                                        hacia el usuario (llv-cuerpoMira)
  *   data-vida=destella|lee|reposo      → el idle-cerebro (vidaEstados.js):
- *                                        fogonazo de linterna / leer la noche /
- *                                        reposo con sacudón
- *   data-agt-estado=listening          → ANTENAS PERK (se paran) + ladea testa
+ *                                        fogonazo + aleteo / leer la noche /
+ *                                        reposo con respiración honda
+ *   data-agt-estado=listening          → ANTENAS PERK (se paran), alas quietas
  *   data-agt-estado=speaking + --llv-jaw → mandíbula que habla (lip-sync)
- *   data-agt-estado=thinking           → mira arriba, antenas curiosas,
+ *   data-agt-estado=thinking           → antenas curiosas, aleteo lento,
  *                                        linterna leyendo
- *   data-agt-estado=caminando          → bob saltarín (el andar se lee del
- *                                        roaming, como el jaguar)
+ *   data-agt-estado=caminando          → bob saltarín + aleteo al paso
  *   data-eco=leer|degradado|sano|pacto → LA LINTERNA COMO BIOINDICADOR (la
- *                                        firma científica de Luciernaga.jsx,
- *                                        conservada sobre la lámina)
+ *                                        firma científica de Luciernaga.jsx)
  *
- * LA LINTERNA NUNCA SE MUEVE: late por FILTRO (brillo + halo drop-shadow con
- * los colores de su propia paleta, ver luciernagaIdentidad.js) — así el
- * latido no arrastra las piernas que la cruzan por delante ni abre huecos.
- * Las PIERNAS/botas son estáticas (plantadas al piso; detrás de ellas no hay
- * píxeles — límite honesto documentado en anatomia.js).
+ * LAS ALAS (élitros) aletean por GIRO CHICO desde la raíz — máximo ±2.5°,
+ * el rango que la prueba de giro offline verificó SIN cracks (el respaldo
+ * de viaje horneado en capas.js cubre hasta ahí; no subir la amplitud sin
+ * volver a correr el medidor). LA LINTERNA NUNCA SE MUEVE: late por FILTRO
+ * (brillo + halo drop-shadow con los colores de su propia paleta, ver
+ * luciernagaIdentidad.js). Las PIERNAS/botas son estáticas (plantadas;
+ * detrás no hay píxeles — límite honesto documentado en anatomia.js).
  *
  * HONESTIDAD: el interior de boca (`.llv-bocaInterior`) es SINTÉTICO (la
- * lámina sonríe con la boca cerrada). Es lo único que no sale del PNG. La
- * mirada es GIRO DE CABEZA, no pupila suelta (recortar la pupila obligaría a
- * repintar el iris que destapa — prohibido).
+ * lámina sonríe con la boca cerrada). La mirada es INCLINACIÓN DE CUERPO,
+ * no pupila suelta ni cabeza cortada (regla dura: no se corta cuello).
  *
  * Gates de la casa: reduced-motion congela todo en fotograma digno (párpado
- * oculto, boca cerrada, linterna quieta); `data-tier='bajo'` corta lo
- * continuo pero DEJA LATIENDO la linterna (su señal es su alma — la misma
- * decisión de Luciernaga.jsx para gama baja). */
+ * oculto, boca cerrada, linterna y alas quietas); `data-tier='bajo'` corta
+ * lo continuo pero DEJA LATIENDO la linterna (su señal es su alma). */
 
 .llv-stage {
   position: relative;
@@ -55,24 +55,29 @@
 }
 
 /* ═══ IDLE VIVO (por defecto) — alive-in-place ═══════════════════════════════
-   Respira, la testa cabecea suave, las antenas se mecen con follow-through,
-   la mano del lápiz se mece apenas, la linterna late. */
+   Respira, los élitros se mecen apenas (períodos co-primos con la
+   respiración para que el idle no se lea como metrónomo), las antenas se
+   mecen con follow-through, la mano del lápiz se mece apenas, la linterna
+   late. */
 .llv-cuerpoPivote { position: absolute; inset: 0; animation: llv-respira 3.6s ease-in-out infinite; }
 @keyframes llv-respira {
   0%, 100% { transform: translateY(0) scale(1); }
   50%      { transform: translateY(-0.4%) scale(1.012); }
 }
 
-.llv-cabezaGesto { position: absolute; inset: 0; }
-.llv-cabezaMira  { position: absolute; inset: 0; transition: transform 0.5s cubic-bezier(0.2, 0.7, 0.3, 1); }
-.llv-cabezaPivote { position: absolute; inset: 0; animation: llv-cabeza-idle 3.6s ease-in-out infinite; }
-@keyframes llv-cabeza-idle {
-  0%, 100% { transform: translateY(0) rotate(0deg); }
-  50%      { transform: translateY(0.5%) rotate(0.5deg); }
+/* alas — mecido chico y desfasado (la izquierda abre −, la derecha +). */
+.llv-alaIzqPivote { position: absolute; inset: 0; animation: llv-alaIzq-sway 3.9s ease-in-out infinite; }
+.llv-alaDerPivote { position: absolute; inset: 0; animation: llv-alaDer-sway 3.9s ease-in-out -1.6s infinite; }
+@keyframes llv-alaIzq-sway {
+  0%, 100% { transform: rotate(0deg); }
+  50%      { transform: rotate(-1.4deg); }
+}
+@keyframes llv-alaDer-sway {
+  0%, 100% { transform: rotate(0deg); }
+  50%      { transform: rotate(1.4deg); }
 }
 
-/* antenas — mecido de follow-through, fases distintas (períodos co-primos
-   con la respiración para que el idle no se lea como metrónomo). */
+/* antenas — mecido de follow-through, fases distintas. */
 .llv-antenaIzqPivote { position: absolute; inset: 0; animation: llv-antena-sway 3.1s ease-in-out infinite; }
 .llv-antenaDerPivote { position: absolute; inset: 0; animation: llv-antena-sway 3.1s ease-in-out -1.2s infinite; }
 @keyframes llv-antena-sway {
@@ -114,11 +119,14 @@
   80% { transform: scaleY(1); }
 }
 
-/* ═══ LA MIRADA — la cabeza sigue al usuario (useMiradaUsted) ════════════════ */
-[data-rh-mira='usted'] .llv-cabezaMira {
+/* ═══ LA MIRADA — el cuerpo entero se inclina sutil (useMiradaUsted) ═════════
+   Sin cabeza-pieza (no se corta cuello), la mirada es un translate chico de
+   TODO el bicho: --llv-mira-k va a la mitad del factor del corte viejo. */
+.llv-cuerpoMira { position: absolute; inset: 0; transition: transform 0.5s cubic-bezier(0.2, 0.7, 0.3, 1); }
+[data-rh-mira='usted'] .llv-cuerpoMira {
   transform: translate(
-    calc(var(--rh-mx, 0px) * var(--llv-mira-k, 4)),
-    calc(var(--rh-my, 0px) * var(--llv-mira-k, 4))
+    calc(var(--rh-mx, 0px) * var(--llv-mira-k, 2)),
+    calc(var(--rh-my, 0px) * var(--llv-mira-k, 2))
   );
 }
 
@@ -159,11 +167,12 @@
 }
 [data-agt-estado='speaking'] .llv-linterna { animation: llv-latido 1.1s ease-in-out infinite; }
 
-/* ═══ ESCUCHA (listening) — PARA LAS ANTENAS + ladea la testa ════════════════
+/* ═══ ESCUCHA (listening) — PARA LAS ANTENAS, alas quietas ═══════════════════
    El perk es solo GIRO desde la base (nada de levantar: levantar destaparía
    fondo bajo la base — el respaldo base-keep de capas.js cubre el giro).
    Las antenas se ENDEREZAN hacia arriba (la izquierda gira +, la derecha −)
-   y tiemblan atentas; parpadea menos (atención). */
+   y tiemblan atentas; parpadea menos (atención); los élitros se recogen
+   quietos (atención de cuerpo entero). */
 [data-agt-estado='listening'] .llv-antenaIzqPivote { animation: llv-antenaIzq-perk 2.8s ease-in-out infinite; }
 [data-agt-estado='listening'] .llv-antenaDerPivote { animation: llv-antenaDer-perk 2.8s ease-in-out infinite; }
 @keyframes llv-antenaIzq-perk {
@@ -178,31 +187,25 @@
   55%       { transform: rotate(-9deg); }
   75%       { transform: rotate(-7deg); }
 }
-[data-agt-estado='listening'] .llv-cabezaGesto { animation: llv-escucha-cabeza 4s ease-in-out infinite; }
-@keyframes llv-escucha-cabeza {
-  0%, 100% { transform: rotate(0deg) translateY(0); }
-  50%      { transform: rotate(-2deg) translateY(-0.5%); }
-}
+[data-agt-estado='listening'] .llv-alaIzqPivote,
+[data-agt-estado='listening'] .llv-alaDerPivote { animation: none; }
 [data-agt-estado='listening'] .llv-parpado { animation-duration: calc(var(--rh-blink-dur, 5.2s) * 4.5); }
 [data-agt-estado='listening'] .llv-linterna { animation: llv-latido 5s ease-in-out infinite; }
 
-/* ═══ PIENSA (thinking) — mira arriba, antenas curiosas, linterna leyendo ════ */
-[data-agt-estado='thinking'] .llv-cabezaGesto { animation: llv-piensa-cabeza 4.6s ease-in-out infinite; }
-@keyframes llv-piensa-cabeza {
-  0%, 100% { transform: rotate(0deg) translateY(0); }
-  50%      { transform: rotate(-1.4deg) translateY(-1.2%); }
-}
+/* ═══ PIENSA (thinking) — antenas curiosas, aleteo lento, linterna leyendo ═══ */
 [data-agt-estado='thinking'] .llv-antenaIzqPivote { animation: llv-antena-curiosa-izq 4.6s ease-in-out infinite; }
 [data-agt-estado='thinking'] .llv-antenaDerPivote { animation: llv-antena-curiosa-der 4.6s ease-in-out infinite; }
 @keyframes llv-antena-curiosa-izq { 0%, 100% { transform: rotate(0deg); } 50% { transform: rotate(4deg); } }
 @keyframes llv-antena-curiosa-der { 0%, 100% { transform: rotate(0deg); } 50% { transform: rotate(4deg); } }
+[data-agt-estado='thinking'] .llv-alaIzqPivote { animation: llv-alaIzq-sway 5.4s ease-in-out infinite; }
+[data-agt-estado='thinking'] .llv-alaDerPivote { animation: llv-alaDer-sway 5.4s ease-in-out -2.2s infinite; }
 [data-agt-estado='thinking'] .llv-linterna { animation: llv-lee-luz 1.6s ease-in-out infinite; }
 @keyframes llv-lee-luz {
   0%, 100% { filter: brightness(1); }
   50%      { filter: brightness(1.16) drop-shadow(0 0 8px rgba(230, 255, 122, 0.45)); }
 }
 
-/* ═══ CAMINA (caminando) — bob saltarín; el andar se lee del roaming ═════════
+/* ═══ CAMINA (caminando) — bob saltarín + aleteo al paso ═════════════════════
    (Mismo criterio honesto del jaguar: un dibujo plano de una sola pose no da
    un gait por-pierna sin fantasma; las piernas están plantadas y quietas.) */
 [data-agt-estado='caminando'] .llv-cuerpoPivote { animation: llv-cuerpoBob 0.55s ease-in-out infinite; }
@@ -210,18 +213,23 @@
   0%, 100% { transform: translateY(1.6%) rotate(0.4deg); }
   50%      { transform: translateY(-2.2%) rotate(-0.4deg); }
 }
-[data-agt-estado='caminando'] .llv-cabezaPivote { animation: llv-cabezaBob 0.55s ease-in-out -0.12s infinite; }
-@keyframes llv-cabezaBob {
-  0%, 100% { transform: translateY(-1.6%) rotate(-0.5deg); }
-  50%      { transform: translateY(2%) rotate(0.5deg); }
+[data-agt-estado='caminando'] .llv-alaIzqPivote { animation: llv-alaIzq-aleteo 0.55s ease-in-out infinite; }
+[data-agt-estado='caminando'] .llv-alaDerPivote { animation: llv-alaDer-aleteo 0.55s ease-in-out infinite; }
+@keyframes llv-alaIzq-aleteo {
+  0%, 100% { transform: rotate(-0.4deg); }
+  50%      { transform: rotate(-2.4deg); }
+}
+@keyframes llv-alaDer-aleteo {
+  0%, 100% { transform: rotate(0.4deg); }
+  50%      { transform: rotate(2.4deg); }
 }
 [data-agt-estado='caminando'] .llv-antenaIzqPivote { animation: llv-antena-sway 0.55s ease-in-out infinite; }
 [data-agt-estado='caminando'] .llv-antenaDerPivote { animation: llv-antena-sway 0.55s ease-in-out -0.27s infinite; }
 
 /* ═══ IDLE-CEREBRO (data-vida) — los gestos de la luciérnaga (vidaEstados.js:
    destella 2×1.3s · lee 3.2s · reposo 4.4s). Solo en idle. ══════════════════ */
-/* DESTELLA — el fogonazo de la linterna (su firma): flash franco + el cuerpo
-   se yergue un pelín con el pulso. */
+/* DESTELLA — el fogonazo de la linterna (su firma): flash franco + aleteo
+   vivo con el pulso (la luciérnaga habla con luz y alas). */
 [data-vida='destella'] .llv-linterna { animation: llv-destello 1.3s ease-in-out infinite; }
 @keyframes llv-destello {
   0%, 100% { filter: brightness(1); }
@@ -232,16 +240,15 @@
   0%, 100% { transform: translateY(0) scale(1); }
   45%      { transform: translateY(-0.7%) scale(1.015); }
 }
+[data-vida='destella'] .llv-alaIzqPivote { animation: llv-alaIzq-aleteo 0.65s ease-in-out infinite; }
+[data-vida='destella'] .llv-alaDerPivote { animation: llv-alaDer-aleteo 0.65s ease-in-out infinite; }
 
-/* LEE LA NOCHE — se yergue, antenas atentas hacia arriba, la cabeza se
-   inclina hacia el cuaderno (abajo-derecha), la linterna pulsa leyendo. */
-[data-vida='lee'] .llv-cabezaGesto { animation: llv-lee-cabeza 3.2s ease-in-out infinite; }
-@keyframes llv-lee-cabeza {
-  0%, 100% { transform: rotate(0deg) translateY(0); }
-  35%, 75% { transform: rotate(2.2deg) translateY(0.8%); }
-}
+/* LEE LA NOCHE — antenas atentas hacia arriba, alas quietas (concentrada),
+   la linterna pulsa leyendo, la mano apunta en el aire con el lápiz. */
 [data-vida='lee'] .llv-antenaIzqPivote { animation: llv-antenaIzq-perk 3.2s ease-in-out infinite; }
 [data-vida='lee'] .llv-antenaDerPivote { animation: llv-antenaDer-perk 3.2s ease-in-out infinite; }
+[data-vida='lee'] .llv-alaIzqPivote,
+[data-vida='lee'] .llv-alaDerPivote { animation: none; }
 [data-vida='lee'] .llv-linterna { animation: llv-lee-luz 1.6s ease-in-out infinite; }
 [data-vida='lee'] .llv-manoPivote { animation: llv-escribe 0.8s ease-in-out infinite; }
 @keyframes llv-escribe {
@@ -249,20 +256,14 @@
   50%      { transform: rotate(-4deg); }   /* apunta en el aire con el lápiz */
 }
 
-/* REPOSO — respira hondo y da un sacudón de cabeza al entrar (la firma
-   "me sacudo" de Angelita adaptada). 8.8s = 2× el dur del momento. */
+/* REPOSO — respira hondo; las alas acompañan la respiración, lentas. */
 [data-vida='reposo'] .llv-cuerpoPivote { animation: llv-reposo-cuerpo 4.4s ease-in-out infinite; }
 @keyframes llv-reposo-cuerpo {
   0%, 100% { transform: translateY(0) scale(1); }
   50%      { transform: translateY(0.7%) scale(1.018); }
 }
-[data-vida='reposo'] .llv-cabezaGesto { animation: llv-reposo-cabeza 8.8s ease-in-out infinite; }
-@keyframes llv-reposo-cabeza {
-  0%, 12%, 100% { transform: rotate(0deg); }
-  3%  { transform: rotate(-2.4deg); }
-  6%  { transform: rotate(2.4deg); }
-  9%  { transform: rotate(-1deg); }
-}
+[data-vida='reposo'] .llv-alaIzqPivote { animation: llv-alaIzq-sway 4.4s ease-in-out infinite; }
+[data-vida='reposo'] .llv-alaDerPivote { animation: llv-alaDer-sway 4.4s ease-in-out -1.8s infinite; }
 
 /* ═══ ECO — LA LINTERNA COMO BIOINDICADOR (la firma de Luciernaga.jsx) ═══════
    El host puede escribir data-eco para diagnosticar con la luz: 'leer' pulsa
@@ -288,19 +289,21 @@
    (la misma decisión de tier bajo en Luciernaga.jsx). */
 [data-tier='bajo'] .llv-stage,
 [data-tier='bajo'] .llv-cuerpoPivote,
-[data-tier='bajo'] .llv-cabezaPivote,
+[data-tier='bajo'] .llv-alaIzqPivote,
+[data-tier='bajo'] .llv-alaDerPivote,
 [data-tier='bajo'] .llv-antenaIzqPivote,
 [data-tier='bajo'] .llv-antenaDerPivote,
 [data-tier='bajo'] .llv-manoPivote { animation: none; }
 
 @media (prefers-reduced-motion: reduce) {
-  .llv-stage, .llv-cuerpoPivote, .llv-cabezaGesto, .llv-cabezaMira, .llv-cabezaPivote,
+  .llv-stage, .llv-cuerpoPivote, .llv-cuerpoMira,
+  .llv-alaIzqPivote, .llv-alaDerPivote,
   .llv-antenaIzqPivote, .llv-antenaDerPivote, .llv-manoPivote, .llv-linterna,
   .llv-mandibulaPivote, .llv-bocaInterior, .llv-parpado {
     animation: none !important;
     transition: none !important;
   }
-  .llv-cabezaMira, .llv-mandibulaPivote { transform: none !important; }
+  .llv-cuerpoMira, .llv-mandibulaPivote { transform: none !important; }
   .llv-bocaInterior { transform: scaleY(0) !important; }  /* boca cerrada, digna */
   .llv-parpado { visibility: hidden !important; }          /* ojos abiertos, quietos */
   .llv-linterna { filter: none !important; }               /* la luz de la lámina, quieta */

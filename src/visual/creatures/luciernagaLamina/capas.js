@@ -1,31 +1,39 @@
 /**
- * luciernagaLamina/capas — hornea `luciernaga.png` en capas por ALFA
- * (cuerpo + cabeza + mandíbula + 2 antenas + manoLapiz + linterna) más los
- * dos parches de párpado. Puerto directo del motor del jaguar
- * (`jaguarLamina/capas.js`, aprobado por el operador) a la anatomía de la
- * luciérnaga — mismas fórmulas, mismas garantías.
+ * luciernagaLamina/capas — hornea `luciernaga.png` en capas por ALFA para el
+ * rig 2.5D (corte C4): cuerpo COMPLETO (con cabeza — no se corta cuello) +
+ * alaIzq/alaDer (élitros) + 2 antenas + manoLapiz + linterna + mandíbula,
+ * más los dos parches de párpado. Motor del jaguar (`jaguarLamina/capas.js`,
+ * aprobado por el operador) con las lecciones de la ronda de costuras.
  *
- * EL MÉTODO (idéntico en espíritu a piloto-lamina.js — ver el docstring
- * largo del jaguar si hace falta el porqué completo):
- *   - Todo el color sale del PNG. Aquí solo se decide, píxel a píxel, QUÉ
- *     ALFA le toca a cada capa — cero dibujo nuevo.
+ * EL MÉTODO:
+ *   - Todo el color sale del PNG (única excepción aprobada: la cirugía de
+ *     tarsos, que repinta las manoplas claras como tarsos de insecto con la
+ *     huella intacta — `pielDeTarsos`). Aquí solo se decide, píxel a píxel,
+ *     QUÉ ALFA le toca a cada capa — cero dibujo nuevo.
  *   - Cada pieza "de encima" se DESVANECE en el borde de su corte
- *     (`smoothstep`). El CUERPO de abajo NO se desvanece: se borra con
- *     corte duro SOLO donde una pieza de encima ya es ≥93% opaca — el
- *     detalle que evita la banda translúcida.
- *   - ORDEN DE PRIORIDAD para que dos piezas nunca se disputen el mismo
- *     píxel: antenas > cabeza > mandíbula > manoLapiz > linterna > cuerpo.
- *     (Las antenas van sobre la cabeza con el patrón ANTI-HUECO de las
- *     orejas del jaguar: la pieza usa la máscara completa, de la cabeza se
- *     resta solo la parte alta — la base queda de respaldo en las dos.)
- *   - La LINTERNA excluye las franjas de pierna que la cruzan por delante
- *     (las piernas se quedan en el cuerpo): es una capa que LATE por
- *     filtro, no una pieza que se mueva — ver anatomia.js.
+ *     (`smoothstep`). Las capas de ABAJO NO se desvanecen: se borran con
+ *     corte duro SOLO donde la pieza de encima ya es ~opaca (≥99,6%) — el
+ *     `hard` que cerró las costuras (una resta blanda (1−m) deja un anillo
+ *     translúcido PERMANENTE; con `hard` la capa de abajo conserva el píxel
+ *     completo de respaldo y la pieza pinta encima: en reposo el compuesto
+ *     es idéntico a la lámina, al articular el respaldo queda detrás).
+ *   - ORDEN Z (de atrás a adelante): alas < cuerpo < linterna < manoLapiz <
+ *     antenas < interiorBoca < mandíbula < párpados. Las ALAS van DETRÁS:
+ *     emergen de las hombreras y se meten bajo el tórax/cuaderno, así su
+ *     giro se esconde solo.
+ *   - RESPALDO DE VIAJE de las alas (`extenderRespaldo`): la textura del
+ *     ala se extiende por dilatación unos px hacia los píxeles de silueta
+ *     que la ocluyen (armadura, farol, cuaderno, brazo). Oculto en reposo
+ *     (el cuerpo pinta encima), emerge CON el ala al girar: el flanco no
+ *     abre fondo ni hacia afuera (el respaldo sale de abajo) ni hacia
+ *     adentro (el ala se mete bajo el cuerpo). Es el cuerpo-inpaint de este
+ *     corte, viajando con la pieza móvil.
+ *   - La LINTERNA excluye las franjas de pierna que la cruzan por delante:
+ *     LATE por filtro, no se mueve — ver anatomia.js.
  *   - El párpado es un parche de LA PROPIA lámina (la piel de la frente
  *     encima de cada ojo) recortado a elipse y alfa-recortado con la
  *     silueta real en el punto de destino — parpadeo real, nunca un
- *     párpado dibujado. Dos parches (uno por ojo) que comparten cadencia:
- *     parpadeo de verdad, no un guiño.
+ *     párpado dibujado. Dos parches que comparten cadencia.
  *
  * Defensivo por diseño: si `canvas.getContext('2d')` no está disponible
  * (jsdom sin el paquete `canvas`, navegador exótico) `hornearLuciernaga()`
@@ -35,8 +43,9 @@
  * @module visual/creatures/luciernagaLamina/capas
  */
 import {
-  CABEZA, OJO, OJO_2, MANDIBULA,
+  OJO, OJO_2, MANDIBULA,
   ANTENA_IZQ, ANTENA_DER, MANO_LAPIZ,
+  ALA_IZQ, ALA_DER, CUADERNO_GUANTE,
   LINTERNA, PIERNA_IZQ, PIERNA_DER,
 } from './anatomia.js';
 
@@ -65,9 +74,16 @@ function fxCaja(x, { x0, x1, xFade }) {
   return ss(x0, x0 + xFade, x) * (1 - ss(x1 - xFade, x1, x));
 }
 
-/** Cabeza: caja en X de la testa × desvanecido en la banda del cuello. */
-export function mascaraCabeza(x, y) {
-  return fxCaja(x, CABEZA.box) * (1 - ss(CABEZA.cuello.y0, CABEZA.cuello.y1, y));
+/** Interpola x sobre una polilínea de puntos [y, x] (clavada en los extremos). */
+function interpY(pts, y) {
+  if (y <= pts[0][0]) return pts[0][1];
+  for (let i = 1; i < pts.length; i++) {
+    if (y <= pts[i][0]) {
+      const t = (y - pts[i - 1][0]) / (pts[i][0] - pts[i - 1][0]);
+      return pts[i - 1][1] + (pts[i][1] - pts[i - 1][1]) * t;
+    }
+  }
+  return pts[pts.length - 1][1];
 }
 
 /** Antena: caja en X × desvanecido hacia la BASE (opaca arriba — la punta
@@ -76,25 +92,33 @@ function mascaraAntena(x, y, antena) {
   return fxCaja(x, antena.box) * (1 - ss(antena.base.y0, antena.base.y1, y));
 }
 
-/** Antena para RESTARLA de la cabeza: se corta más ARRIBA (`baseSub`) —
- *  deja la base también en la cabeza, de respaldo anti-hueco al girar. */
+/** Antena para RESTARLA del cuerpo: se corta más ARRIBA (`baseSub`) —
+ *  deja la base también en el cuerpo, de respaldo anti-hueco al girar. */
 function mascaraAntenaSub(x, y, antena) {
   return fxCaja(x, antena.box) * (1 - ss(antena.baseSub.y0, antena.baseSub.y1, y));
 }
 
 /** Mandíbula: caja en X × opaca ENTRE el labio (arriba) y el fin del
- *  mentón (abajo). La sonrisa queda arriba, en la cabeza. */
+ *  mentón (abajo). La sonrisa queda arriba, en el cuerpo (cara intacta). */
 function mascaraMandibula(x, y) {
   const { box, labio, menton } = MANDIBULA;
   return fxCaja(x, box) * ss(labio.y0, labio.y1, y) * (1 - ss(menton.y0, menton.y1, y));
 }
 
-/** Mano del lápiz: caja en X × techo (arriba pasa la antena izquierda — la
- *  pieza solo existe debajo de y≈180) × desvanecido en la MUÑECA. */
+/** Frente del ala izquierda a la altura `y` (bajo y≈292 el brazo terminó y
+ *  el frente es la propia silueta: sin cota). */
+const xFrenteAlaIzq = (y) => (y < 292 ? interpY(ALA_IZQ.borde, y) : -60);
+
+/** Mano del lápiz: caja en X × techo (arriba pasa la antena izquierda) ×
+ *  desvanecido en la MUÑECA × exclusión del borde de ataque del élitro
+ *  (ese filo es píxel del ALA — el corte anterior lo arrastraba al
+ *  gesticular). */
 function mascaraMano(x, y) {
+  const xF = xFrenteAlaIzq(y);
   return fxCaja(x, MANO_LAPIZ.box)
     * ss(MANO_LAPIZ.techo.y0, MANO_LAPIZ.techo.y1, y)
-    * (1 - ss(MANO_LAPIZ.muneca.y0, MANO_LAPIZ.muneca.y1, y));
+    * (1 - ss(MANO_LAPIZ.muneca.y0, MANO_LAPIZ.muneca.y1, y))
+    * (1 - ss(xF - 8, xF - 1, x));
 }
 
 /** Banda de pierna: distancia al segmento cadera→bota con borde suave.
@@ -115,10 +139,48 @@ function mascaraLinterna(x, y) {
   return elipse * (1 - bandaPierna(x, y, PIERNA_IZQ)) * (1 - bandaPierna(x, y, PIERNA_DER));
 }
 
-/* Cirugía de las dos manos: la lámina trae manoplas claras, pero en un
- * insecto los extremos de las patas deben leer como tarsos articulados.
- * Las elipses solo acotan los píxeles de las manos; los útiles quedan fuera
- * mediante sus ejes y el alfa original se conserva en cada capa. */
+/** Ala izquierda: banda en Y (techo bajo la hombrera → punta) × a la
+ *  IZQUIERDA del contorno interior × a la DERECHA del frente (guante/brazo
+ *  quedan fuera). La silueta externa la pone el alfa del PNG. */
+function mascaraAlaIzq(x, y) {
+  const A = ALA_IZQ;
+  const banda = ss(A.techo.y0, A.techo.y1, y) * (1 - ss(A.fondo.y0, A.fondo.y1, y));
+  if (banda <= 0) return 0;
+  const xInt = interpY(A.interior, y);
+  const xF = xFrenteAlaIzq(y);
+  return banda * (1 - ss(xInt - 3, xInt + 3, x)) * ss(xF - 5, xF + 2, x);
+}
+
+/** Cuaderno + guante que lo sujeta: oclusor del ala derecha que SE QUEDA en
+ *  el cuerpo (quad de 4 semiplanos con feather + elipse del guante). */
+function mascaraCuadernoGuante(x, y) {
+  const q = CUADERNO_GUANTE.quad;
+  let quad = 1;
+  for (let i = 0; i < 4 && quad > 0; i++) {
+    const [ax, ay] = q[i];
+    const [bx, by] = q[(i + 1) % 4];
+    const d = ((bx - ax) * (y - ay) - (by - ay) * (x - ax)) / Math.hypot(bx - ax, by - ay);
+    quad *= ss(-3, 3, d);
+  }
+  const guante = 1 - ss(0.9, 1.06,
+    Math.hypot((x - TARSO_CUADERNO.cx) / TARSO_CUADERNO.rx, (y - TARSO_CUADERNO.cy) / TARSO_CUADERNO.ry));
+  return Math.max(quad, guante);
+}
+
+/** Ala derecha: banda en Y × a la DERECHA del contorno interior × fuera del
+ *  cuaderno/guante. La silueta externa la pone el alfa del PNG. */
+function mascaraAlaDer(x, y) {
+  const A = ALA_DER;
+  const banda = ss(A.techo.y0, A.techo.y1, y) * (1 - ss(A.fondo.y0, A.fondo.y1, y));
+  if (banda <= 0) return 0;
+  const xInt = interpY(A.interior, y);
+  return banda * ss(xInt - 3, xInt + 3, x) * (1 - mascaraCuadernoGuante(x, y));
+}
+
+/* Cirugía de los dos tarsos (aprobada): la lámina trae manoplas claras, pero
+ * en un insecto los extremos de las patas deben leer como tarsos
+ * articulados. Las elipses solo acotan los píxeles de las manos; los útiles
+ * quedan fuera mediante sus ejes y el alfa original se conserva. */
 const TARSO_LAPIZ = { cx: 44, cy: 230, rx: 43, ry: 40 };
 const TARSO_CUADERNO = { cx: 280, cy: 355, rx: 40, ry: 34 };
 
@@ -165,7 +227,7 @@ function pintaGarra(d, src, W, H, x0, y0, x1, y1, ancho) {
   }
 }
 
-function pielDeTarsos(src, W, H) {
+export function pielDeTarsos(src, W, H) {
   const d = new Uint8ClampedArray(src);
   for (let y = 0; y < H; y++) {
     for (let x = 0; x < W; x++) {
@@ -192,6 +254,86 @@ function pielDeTarsos(src, W, H) {
 }
 
 /**
+ * El juego COMPLETO de máscaras con sus prioridades resueltas — una sola
+ * fuente de verdad para `hornearLuciernaga`, el candado de tests y los
+ * medidores offline (el medidor importa ESTAS fórmulas, no una copia que no
+ * vería un fix).
+ *
+ * Prioridad de encima hacia abajo: párpados/mandíbula/antenas/mano/linterna
+ * > cuerpo > alas. El CUERPO no se corta al cuello: la testa (con toda la
+ * cara menos el mentón-pieza) viaja fusionada — regla dura del corte C4.
+ */
+export function mascaras() {
+  // Corte DURO para restar una pieza de la capa de ABAJO: la capa conserva
+  // el píxel COMPLETO hasta que la pieza de encima es ~opaca (umbral 0,996;
+  // con un umbral menor, en la banda del desvanecido ambas capas quedan
+  // semiopacas y el compuesto over pierde alfa — banda pálida visible).
+  // Regla de la casa: resta sobre capa de ABAJO → dura; VENTANA sobre capa
+  // de ENCIMA (p. ej. las piernas en la linterna) → suave.
+  const hard = (m) => 1 - ss(0.996, 1, m);
+  const mAlaIzq = (x, y) => mascaraAlaIzq(x, y);
+  const mAlaDer = (x, y) => mascaraAlaDer(x, y);
+  const mAntenaIzq = (x, y) => mascaraAntena(x, y, ANTENA_IZQ);
+  const mAntenaDer = (x, y) => mascaraAntena(x, y, ANTENA_DER);
+  const mMandibula = (x, y) => mascaraMandibula(x, y);
+  const mManoLapiz = (x, y) => mascaraMano(x, y);
+  const mLinterna = (x, y) => mascaraLinterna(x, y);
+  // El cuerpo (CON cabeza) = todo menos: las alas visibles (viven detrás —
+  // si el cuerpo las pintara, taparía el aleteo con una copia quieta), las
+  // antenas por su parte ALTA (`baseSub`: la base queda de respaldo), la
+  // mandíbula, la mano y la linterna donde son ~opacas. Todas las restas
+  // son duras: bajo cada banda de desvanecido el cuerpo conserva el píxel
+  // completo de respaldo.
+  const mCuerpo = (x, y) => hard(mAlaIzq(x, y)) * hard(mAlaDer(x, y))
+    * hard(mascaraAntenaSub(x, y, ANTENA_IZQ)) * hard(mascaraAntenaSub(x, y, ANTENA_DER))
+    * hard(mMandibula(x, y)) * hard(mManoLapiz(x, y)) * hard(mLinterna(x, y));
+  return {
+    mCuerpo, mAlaIzq, mAlaDer, mMandibula,
+    mAntenaIzq, mAntenaDer, mManoLapiz, mLinterna,
+  };
+}
+
+/**
+ * RESPALDO DE VIAJE: dilata la textura ya pintada de una capa hacia los
+ * píxeles de silueta sólida adyacentes que NO son suyos (los que la ocluyen:
+ * armadura, farol, cuaderno, brazo). El respaldo queda OCULTO en reposo (la
+ * capa de encima conserva allí su píxel completo) y emerge con la pieza al
+ * girar — el flanco nunca abre fondo. `pasos` acota la extensión en px y
+ * debe superar el desplazamiento máximo del giro (±2,5° a ~210px de la raíz
+ * ≈ 9px; 14 deja margen).
+ *
+ * Pura sobre buffers (sin canvas): el medidor offline ejercita ESTA función.
+ * @param {Uint8ClampedArray} d    capa RGBA ya pintada (se muta)
+ * @param {Uint8ClampedArray|Buffer} sd  lámina RGBA (fuente de silueta)
+ * @param {number} W @param {number} H @param {number} [pasos]
+ */
+export function extenderRespaldo(d, sd, W, H, pasos = 14) {
+  for (let k = 0; k < pasos; k++) {
+    const nuevos = [];
+    for (let y = 1; y < H - 1; y++) {
+      for (let x = 1; x < W - 1; x++) {
+        const i = (y * W + x) * 4;
+        if (d[i + 3] >= 200) continue;     // ya es sólido (textura o respaldo)
+        if (sd[i + 3] < 200) continue;     // fuera de silueta sólida: jamás
+        for (const j of [i - 4, i + 4, i - W * 4, i + W * 4]) {
+          if (d[j + 3] >= 200) { nuevos.push([i, j]); break; }
+        }
+      }
+    }
+    if (!nuevos.length) return;
+    for (const [i, j] of nuevos) {
+      // la banda de desvanecido del borde (alfa parcial) también se
+      // solidifica — sin esto el crecimiento nunca cruza el propio fade de
+      // la pieza y el respaldo no llega al flanco. Su color ya es el bueno;
+      // a los píxeles vacíos se les clona el del vecino.
+      if (!d[i + 3]) { d[i] = d[j]; d[i + 1] = d[j + 1]; d[i + 2] = d[j + 2]; }
+      // clavado a la silueta original: el respaldo nunca la excede
+      d[i + 3] = sd[i + 3];
+    }
+  }
+}
+
+/**
  * Hornea las capas + los parches de párpado a partir de la imagen ya
  * cargada. Devuelve canvases del MISMO tamaño que el PNG (comparten
  * encuadre — cero cuentas de UV por capa).
@@ -199,9 +341,11 @@ function pielDeTarsos(src, W, H) {
  * @param {{ancho?: number, altoPx?: number}} [dims]  fallback si `img` aún
  *   no cargó (naturalWidth/Height en 0) — blinda contra un `onload` que
  *   dispara antes de tiempo.
- * @returns {{W:number,H:number,cuerpo:HTMLCanvasElement,cabeza:HTMLCanvasElement,
- *   mandibula:HTMLCanvasElement,antenaIzq:HTMLCanvasElement,antenaDer:HTMLCanvasElement,
- *   manoLapiz:HTMLCanvasElement,linterna:HTMLCanvasElement,
+ * @returns {{W:number,H:number,cuerpo:HTMLCanvasElement,
+ *   alaIzq:HTMLCanvasElement,alaDer:HTMLCanvasElement,
+ *   mandibula:HTMLCanvasElement,antenaIzq:HTMLCanvasElement,
+ *   antenaDer:HTMLCanvasElement,manoLapiz:HTMLCanvasElement,
+ *   linterna:HTMLCanvasElement,
  *   parpado:{cv:HTMLCanvasElement,x0:number,y0:number,w:number,h:number},
  *   parpado2:{cv:HTMLCanvasElement,x0:number,y0:number,w:number,h:number}}|null}
  */
@@ -225,44 +369,38 @@ export function hornearLuciernaga(img, dims = {}) {
   const sd = src.data;
   const sdTarsos = pielDeTarsos(sd, W, H);
 
-  // Prioridad: antenas > cabeza > mandíbula > manoLapiz > linterna > cuerpo.
-  // `mCabezaFull` es la cabeza COMPLETA (incluye mentón y las bases de
-  // antena): sirve para (a) excluir la cabeza de la mano y (b) el corte
-  // duro del cuerpo — así el cuerpo se borra bajo TODA la testa.
-  const mCabezaFull = (x, y) => mascaraCabeza(x, y);
-  const mAntIzq = (x, y) => mascaraAntena(x, y, ANTENA_IZQ);
-  const mAntDer = (x, y) => mascaraAntena(x, y, ANTENA_DER);
-  const mMandibula = (x, y) => mascaraMandibula(x, y) * mCabezaFull(x, y);
-  // La cabeza que se PINTA = testa completa menos lo que vive aparte. Las
-  // antenas se restan por su parte ALTA (`baseSub`): la base queda TAMBIÉN
-  // en la cabeza (anti-hueco al girar); la mandíbula se resta entera (baja
-  // en bloque, el interior sintético respalda el hueco).
-  const mCabezaRender = (x, y) => mCabezaFull(x, y)
-    * (1 - mascaraAntenaSub(x, y, ANTENA_IZQ)) * (1 - mascaraAntenaSub(x, y, ANTENA_DER))
-    * (1 - mMandibula(x, y));
-  const mMano = (x, y) => mascaraMano(x, y) * (1 - mCabezaFull(x, y));
-  const mLinterna = (x, y) => mascaraLinterna(x, y);
-  const hard = (m) => 1 - ss(0.93, 1.0, m);
-  const mCuerpo = (x, y) => hard(mCabezaFull(x, y)) * hard(mAntIzq(x, y))
-    * hard(mAntDer(x, y)) * hard(mMano(x, y)) * hard(mLinterna(x, y));
+  const m = mascaras();
 
-  const pintar = (mascara, pixeles = sdTarsos) => {
-    const cv = lienzo(W, H);
-    const g = cv.getContext('2d');
-    const im = g.createImageData(W, H);
-    const d = im.data;
+  const pintarBuf = (mascara) => {
+    const d = new Uint8ClampedArray(W * H * 4);
     for (let y = 0; y < H; y++) {
       for (let x = 0; x < W; x++) {
         const i = (y * W + x) * 4;
-        const a = pixeles[i + 3];
-        if (!a) { d[i + 3] = 0; continue; }
-        d[i] = pixeles[i]; d[i + 1] = pixeles[i + 1]; d[i + 2] = pixeles[i + 2];
-        d[i + 3] = a * mascara(x, y);
+        const a = sdTarsos[i + 3];
+        if (!a) continue;
+        const ma = a * mascara(x, y);
+        if (ma < 0.5) continue;
+        d[i] = sdTarsos[i]; d[i + 1] = sdTarsos[i + 1]; d[i + 2] = sdTarsos[i + 2];
+        d[i + 3] = ma;
       }
     }
+    return d;
+  };
+  const aCanvas = (d) => {
+    const cv = lienzo(W, H);
+    const g = cv.getContext('2d');
+    const im = g.createImageData(W, H);
+    im.data.set(d);
     g.putImageData(im, 0, 0);
     return cv;
   };
+  const pintar = (mascara) => aCanvas(pintarBuf(mascara));
+
+  // Las alas llevan respaldo de viaje (ver extenderRespaldo).
+  const alaIzqBuf = pintarBuf(m.mAlaIzq);
+  const alaDerBuf = pintarBuf(m.mAlaDer);
+  extenderRespaldo(alaIzqBuf, sd, W, H);
+  extenderRespaldo(alaDerBuf, sd, W, H);
 
   const parpado = parcheParpado(sd, W, H, OJO);
   const parpado2 = parcheParpado(sd, W, H, OJO_2);
@@ -270,13 +408,14 @@ export function hornearLuciernaga(img, dims = {}) {
   return {
     W,
     H,
-    cuerpo: pintar(mCuerpo),
-    cabeza: pintar(mCabezaRender),
-    mandibula: pintar(mMandibula),
-    antenaIzq: pintar(mAntIzq),
-    antenaDer: pintar(mAntDer),
-    manoLapiz: pintar(mMano),
-    linterna: pintar(mLinterna),
+    cuerpo: pintar(m.mCuerpo),
+    alaIzq: aCanvas(alaIzqBuf),
+    alaDer: aCanvas(alaDerBuf),
+    mandibula: pintar(m.mMandibula),
+    antenaIzq: pintar(m.mAntenaIzq),
+    antenaDer: pintar(m.mAntenaDer),
+    manoLapiz: pintar(m.mManoLapiz),
+    linterna: pintar(m.mLinterna),
     parpado,
     parpado2,
   };

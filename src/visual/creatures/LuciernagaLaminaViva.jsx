@@ -1,8 +1,8 @@
 import { useEffect, useRef, useState } from 'react';
 import {
   CARPETA_LAMINA, ARCHIVO_LAMINA, ANCHO, ALTO,
-  CABEZA, MANDIBULA, BOCA, ANTENA_IZQ, ANTENA_DER,
-  MANO_LAPIZ, CUERPO_PIVOTE,
+  MANDIBULA, BOCA, ANTENA_IZQ, ANTENA_DER,
+  ALA_IZQ, ALA_DER, MANO_LAPIZ, CUERPO_PIVOTE,
 } from './luciernagaLamina/anatomia.js';
 import { hornearLuciernaga } from './luciernagaLamina/capas.js';
 import { useVidaIdle, useRitmoPropio, useMiradaUsted } from './useVidaIdle.js';
@@ -29,47 +29,53 @@ const JAW_DE_VISEMA = { V1: 0, V2: 0.42, V3: 1, V4: 0.36 };
 
 /**
  * LuciernagaLaminaViva — la LÁMINA aprobada de la luciérnaga científica
- * (`luciernaga.png`: guantes, botas, cuaderno abrazado, lápiz alzado y la
- * linterna encendida) recortada en capas por alfa y montada sobre el MISMO
- * sistema de vida del jaguar lámina-viva y de Angelita.
+ * (`luciernaga.png`: botas, cuaderno abrazado, lápiz alzado, élitros
+ * desplegados y la linterna encendida) recortada en capas por alfa (corte
+ * C4) y montada sobre el MISMO sistema de vida del jaguar lámina-viva y de
+ * Angelita.
  *
- * DE DÓNDE SALE CADA COSA (reúso, no reinvento):
- *   · La PIEL y el corte por alfa: `luciernagaLamina/capas.js` + `anatomia.js`
- *     (puerto del motor del jaguar, aprobado por el operador — cara intacta,
- *     cero dibujo nuevo).
- *   · La VIDA: los MISMOS hooks que usan Angelita, los 8 bichos rubber-hose
- *     y el jaguar (`useVidaIdle.js`):
- *       - `useRitmoPropio()`  → cada instancia parpadea a SU aire (vars
- *         --rh-blink-dur/-delay; sin esto todas parpadean como metrónomo).
- *       - `useVidaIdle('luciernaga', …)` → el idle-cerebro con el repertorio
- *         que YA tenía `Luciernaga.jsx` (vidaEstados.js: destella/lee/reposo)
- *         — EXISTE aunque nadie le hable. Viaja como `data-vida`.
- *       - `useMiradaUsted(raíz, …)` → la cabeza SIGUE su puntero/dedo cuando
- *         anda cerca (data-rh-mira + vars --rh-mx/--rh-my) y lo suelta a ~2s.
- *       - `visema` (prop, el host corre `useLipSync` y lo pasa) → mueve el
- *         mentón al hablar.
- *   · El ESTADO conversacional actúa con el cuerpo por CSS
- *     (luciernagaLamina.css): escuchando PARA LAS ANTENAS e inclina la testa;
- *     hablando mueve el mentón y despierta la linterna; pensando mira arriba
- *     con la luz leyendo; idle vive (destella/lee/reposo).
- *   · `eco` conserva la firma científica de `Luciernaga.jsx`: la linterna
- *     como BIOINDICADOR (data-eco='leer'|'degradado'|'sano'|'pacto').
+ * EL CORTE (luciernagaLamina/anatomia.js + capas.js — corte C4):
+ *   · CUERPO COMPLETO CON CABEZA: no se corta cuello ni cabeza (regla dura
+ *     del operador). Si ninguna pieza carga, la capa cuerpo sola ya es el
+ *     bicho entero digno. La costura de cuello no existe porque el corte
+ *     no existe.
+ *   · ALAS (alaIzq/alaDer): los élitros como piezas DETRÁS del cuerpo, con
+ *     respaldo de viaje horneado — aletean sin abrir fondo.
+ *   · CARA por parches: párpados (parpadeo real) + mandíbula (lip-sync) +
+ *     interior sintético. La mirada ya no gira una cabeza-pieza: es una
+ *     inclinación sutil de TODO el cuerpo (llv-cuerpoMira).
+ *   · antenas / manoLapiz / linterna: igual que el corte aprobado.
  *
- * QUÉ SÍ ARTICULA (verificable en el gate 2.5D DOM): parpadeo real de los dos
- * ojos juntos con ritmo propio; mirada que sigue al usuario (giro de cabeza);
- * antenas que se paran al escuchar y se mecen en idle; mentón que baja con el
- * lip-sync; la mano del lápiz que gesticula (escribe/saluda); la linterna que
- * late/destella/lee POR FILTRO (nunca se mueve); respiración.
+ * LA VIDA: los MISMOS hooks que usan Angelita, los bichos rubber-hose y el
+ * jaguar (`useVidaIdle.js`):
+ *   - `useRitmoPropio()`  → cada instancia parpadea a SU aire.
+ *   - `useVidaIdle('luciernaga', …)` → el idle-cerebro (vidaEstados.js:
+ *     destella/lee/reposo) — EXISTE aunque nadie le hable. Viaja como
+ *     `data-vida`.
+ *   - `useMiradaUsted(raíz, …)` → se inclina sutil hacia su puntero/dedo
+ *     cuando anda cerca (data-rh-mira + vars --rh-mx/--rh-my).
+ *   - `visema` (prop, el host corre `useLipSync` y lo pasa) → mueve el
+ *     mentón al hablar.
+ * El ESTADO conversacional actúa por CSS (luciernagaLamina.css): escuchando
+ * PARA LAS ANTENAS; hablando mueve el mentón y despierta la linterna;
+ * pensando aletea curioso con la luz leyendo; idle vive (destella/lee/
+ * reposo). `eco` conserva la firma científica: la linterna como
+ * BIOINDICADOR (data-eco='leer'|'degradado'|'sano'|'pacto').
+ *
+ * QUÉ SÍ ARTICULA (verificable en el gate 2.5D DOM): parpadeo real de los
+ * dos ojos juntos con ritmo propio; ALETEO chico de los élitros (giro desde
+ * la raíz, respaldado — jamás abre fondo); antenas que se paran al escuchar
+ * y se mecen en idle; mentón que baja con el lip-sync; la mano del lápiz
+ * que gesticula; la linterna que late/destella/lee POR FILTRO (nunca se
+ * mueve); respiración; inclinación sutil hacia el usuario.
  *
  * HONESTIDAD (lo que el dibujo plano NO da — no se disfraza):
- *   · BOCA ABIERTA: la lámina sonríe con la boca cerrada. Al bajar el
- *     mentón-pieza se abre un hueco sin fauces detrás; lo tapa un INTERIOR
- *     SINTÉTICO (`.llv-bocaInterior`, el ÚNICO píxel que no sale del PNG).
- *   · PUPILA: recortarla y moverla obligaría a repintar el ojo que destapa
- *     (prohibido) — la mirada es giro de cabeza.
- *   · PIERNAS/CUADERNO: las piernas están plantadas (detrás no hay píxeles) y
- *     el brazo del cuaderno va abrazado al pecho — se mueven CON el cuerpo,
- *     nunca por su cuenta. Límites documentados en `anatomia.js`.
+ *   · BOCA ABIERTA: interior sintético (`.llv-bocaInterior`, el único píxel
+ *     que no sale del PNG junto a la cirugía de tarsos aprobada).
+ *   · PUPILA: recortarla obligaría a repintar el ojo que destapa
+ *     (prohibido) — la mirada es inclinación de cuerpo.
+ *   · PIERNAS/CUADERNO: plantadas / abrazado al pecho — se mueven CON el
+ *     cuerpo. Límites documentados en `anatomia.js`.
  *
  * DEGRADACIÓN: mientras la imagen carga, o si el navegador no hornea canvas
  * 2D (jsdom de los tests), se muestra la lámina PLANA — nunca un hueco.
@@ -107,9 +113,10 @@ export default function LuciernagaLaminaViva({
 }) {
   const raizRef = useRef(null);
   const cuerpoHostRef = useRef(null);
+  const alaIzqHostRef = useRef(null);
+  const alaDerHostRef = useRef(null);
   const linternaHostRef = useRef(null);
   const manoHostRef = useRef(null);
-  const cabezaHostRef = useRef(null);
   const antenaIzqHostRef = useRef(null);
   const antenaDerHostRef = useRef(null);
   const mandibulaHostRef = useRef(null);
@@ -144,10 +151,13 @@ export default function LuciernagaLaminaViva({
         cv.style.display = 'block';
         host.current?.replaceChildren(cv);
       };
+      // Orden Z real: las ALAS van en hosts que el JSX pone ANTES (detrás)
+      // del cuerpo; el respaldo de viaje ya viene horneado en cada ala.
+      montar(capas.alaIzq, alaIzqHostRef);
+      montar(capas.alaDer, alaDerHostRef);
       montar(capas.cuerpo, cuerpoHostRef);
       montar(capas.linterna, linternaHostRef);
       montar(capas.manoLapiz, manoHostRef);
-      montar(capas.cabeza, cabezaHostRef);
       montar(capas.antenaIzq, antenaIzqHostRef);
       montar(capas.antenaDer, antenaDerHostRef);
       montar(capas.mandibula, mandibulaHostRef);
@@ -209,7 +219,7 @@ export default function LuciernagaLaminaViva({
     justifyContent: 'center',
     width: size,
     height: size,
-    '--llv-mira-k': (size / 12).toFixed(2),
+    '--llv-mira-k': (size / 24).toFixed(2),
     '--llv-jaw': String(jaw),
     ...ritmoPropio,
     ...style,
@@ -253,61 +263,64 @@ export default function LuciernagaLaminaViva({
             className={cls('llv-cuerpoPivote')}
             style={{ position: 'absolute', inset: 0, transformOrigin: pctOf(CUERPO_PIVOTE) }}
           >
-            <div ref={cuerpoHostRef} className="llv-capa" />
-
-            {/* LA LINTERNA — capa que LATE por filtro (llv-linterna), jamás
-                se mueve: las piernas que la cruzan viven en el cuerpo. */}
-            <div ref={linternaHostRef} className={cls('llv-linterna') || 'llv-capa'} style={{ position: 'absolute', inset: 0 }} />
-
-            {/* LA MANO DEL LÁPIZ — gesticula desde la muñeca. */}
-            <div className={cls('llv-manoPivote')} style={{ position: 'absolute', inset: 0, transformOrigin: pctOf(MANO_LAPIZ.pivote) }}>
-              <div ref={manoHostRef} className="llv-capa" />
-            </div>
-
-            {/* LA CABEZA — tres envoltorios anidados: gesto (idle-cerebro/
-                estado) → mira (giro hacia el usuario) → bob. Se COMPONEN sin
-                pisarse (cada uno su transform). Las antenas van DENTRO (giran
-                con la testa) y DEBAJO de la cabeza-render (la base se esconde
-                tras la frente). */}
-            <div className={cls('llv-cabezaGesto')} style={{ position: 'absolute', inset: 0, transformOrigin: pctOf(CABEZA.pivote) }}>
-              <div className={cls('llv-cabezaMira')} style={{ position: 'absolute', inset: 0, transformOrigin: pctOf(CABEZA.pivote) }}>
-                <div className={cls('llv-cabezaPivote')} style={{ position: 'absolute', inset: 0, transformOrigin: pctOf(CABEZA.pivote) }}>
-                  {/* ANTENAS-lámina: se paran al escuchar, se mecen en idle. */}
-                  <div className={cls('llv-antenaIzqPivote')} style={{ position: 'absolute', inset: 0, transformOrigin: pctOf(ANTENA_IZQ.pivote) }}>
-                    <div ref={antenaIzqHostRef} className="llv-capa" />
-                  </div>
-                  <div className={cls('llv-antenaDerPivote')} style={{ position: 'absolute', inset: 0, transformOrigin: pctOf(ANTENA_DER.pivote) }}>
-                    <div ref={antenaDerHostRef} className="llv-capa" />
-                  </div>
-
-                  <div ref={cabezaHostRef} className="llv-capa" />
-
-                  {/* INTERIOR DE BOCA SINTÉTICO (el único píxel no-lámina):
-                      detrás del mentón, se revela cuando éste baja. */}
-                  <div
-                    className={cls('llv-bocaInterior')}
-                    aria-hidden="true"
-                    style={{
-                      position: 'absolute',
-                      left: `${((BOCA.cx - BOCA.ancho / 2) / ANCHO) * 100}%`,
-                      top: `${(BOCA.cy / ALTO) * 100}%`,
-                      width: `${(BOCA.ancho / ANCHO) * 100}%`,
-                      height: `${((BOCA.ancho * 0.5) / ALTO) * 100}%`,
-                      transformOrigin: '50% 0%',
-                    }}
-                  />
-
-                  {/* MENTÓN-lámina: baja con el lip-sync (la sonrisa se abre). */}
-                  <div className={cls('llv-mandibulaPivote')} style={{ position: 'absolute', inset: 0, transformOrigin: pctOf(MANDIBULA.pivote) }}>
-                    <div ref={mandibulaHostRef} className="llv-capa" />
-                  </div>
-
-                  {/* PÁRPADOS: parpadeo real con ritmo propio; los dos ojos
-                      cierran juntos. El host se reposiciona en el ojo al montar. */}
-                  <div ref={parpadoHostRef} style={{ position: 'absolute' }} />
-                  <div ref={parpado2HostRef} style={{ position: 'absolute' }} />
-                </div>
+            {/* LA MIRADA — inclinación sutil de TODO el bicho hacia el
+                usuario (ya no hay cabeza-pieza que girar: no se corta). */}
+            <div className={cls('llv-cuerpoMira')} style={{ position: 'absolute', inset: 0, transformOrigin: pctOf(CUERPO_PIVOTE) }}>
+              {/* LAS ALAS — DETRÁS del cuerpo (élitros que emergen de las
+                  hombreras). Giro chico desde la raíz; el respaldo de viaje
+                  horneado garantiza que el aleteo no abre fondo. */}
+              <div className={cls('llv-alaIzqPivote')} style={{ position: 'absolute', inset: 0, transformOrigin: pctOf(ALA_IZQ.pivote) }}>
+                <div ref={alaIzqHostRef} className="llv-capa" />
               </div>
+              <div className={cls('llv-alaDerPivote')} style={{ position: 'absolute', inset: 0, transformOrigin: pctOf(ALA_DER.pivote) }}>
+                <div ref={alaDerHostRef} className="llv-capa" />
+              </div>
+
+              {/* EL CUERPO COMPLETO (con cabeza y cara — regla dura). */}
+              <div ref={cuerpoHostRef} className="llv-capa" />
+
+              {/* LA LINTERNA — capa que LATE por filtro (llv-linterna), jamás
+                  se mueve: las piernas que la cruzan viven en el cuerpo. */}
+              <div ref={linternaHostRef} className={cls('llv-linterna') || 'llv-capa'} style={{ position: 'absolute', inset: 0 }} />
+
+              {/* LA MANO DEL LÁPIZ — gesticula desde la muñeca. */}
+              <div className={cls('llv-manoPivote')} style={{ position: 'absolute', inset: 0, transformOrigin: pctOf(MANO_LAPIZ.pivote) }}>
+                <div ref={manoHostRef} className="llv-capa" />
+              </div>
+
+              {/* ANTENAS-lámina: se paran al escuchar, se mecen en idle. Van
+                  ENCIMA del cuerpo (la base queda de respaldo en la frente). */}
+              <div className={cls('llv-antenaIzqPivote')} style={{ position: 'absolute', inset: 0, transformOrigin: pctOf(ANTENA_IZQ.pivote) }}>
+                <div ref={antenaIzqHostRef} className="llv-capa" />
+              </div>
+              <div className={cls('llv-antenaDerPivote')} style={{ position: 'absolute', inset: 0, transformOrigin: pctOf(ANTENA_DER.pivote) }}>
+                <div ref={antenaDerHostRef} className="llv-capa" />
+              </div>
+
+              {/* INTERIOR DE BOCA SINTÉTICO (el único píxel no-lámina):
+                  detrás del mentón, se revela cuando éste baja. */}
+              <div
+                className={cls('llv-bocaInterior')}
+                aria-hidden="true"
+                style={{
+                  position: 'absolute',
+                  left: `${((BOCA.cx - BOCA.ancho / 2) / ANCHO) * 100}%`,
+                  top: `${(BOCA.cy / ALTO) * 100}%`,
+                  width: `${(BOCA.ancho / ANCHO) * 100}%`,
+                  height: `${((BOCA.ancho * 0.5) / ALTO) * 100}%`,
+                  transformOrigin: '50% 0%',
+                }}
+              />
+
+              {/* MENTÓN-lámina: baja con el lip-sync (la sonrisa se abre). */}
+              <div className={cls('llv-mandibulaPivote')} style={{ position: 'absolute', inset: 0, transformOrigin: pctOf(MANDIBULA.pivote) }}>
+                <div ref={mandibulaHostRef} className="llv-capa" />
+              </div>
+
+              {/* PÁRPADOS: parpadeo real con ritmo propio; los dos ojos
+                  cierran juntos. El host se reposiciona en el ojo al montar. */}
+              <div ref={parpadoHostRef} style={{ position: 'absolute' }} />
+              <div ref={parpado2HostRef} style={{ position: 'absolute' }} />
             </div>
           </div>
         </div>
