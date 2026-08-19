@@ -1,0 +1,75 @@
+{
+  "species_slug": "solanum_betaceum_morado",
+  "scientific_name": "Solanum betaceum Cav. (cultivar morado-antocianínico)",
+  "common_names": [
+    "Tomate de árbol morado"
+  ],
+  "family": "Solanaceae",
+  "category": "frutales_perennes",
+  "cultivable": true,
+  "conservation_status": "cultivo_comun",
+  "thermal_zones": [
+    "templado",
+    "frio"
+  ],
+  "roles_in_guild": [
+    "crop",
+    "pollinator_attractor"
+  ],
+  "antagonists": [],
+  "especies_nativas_sustitutas": [],
+  "propagation": null,
+  "requirements": {
+    "agua": null,
+    "altitud_msnm": {
+      "min_absoluto": 1500,
+      "optimo_min": 1800,
+      "optimo_max": 2500,
+      "max_absoluto": 2800
+    },
+    "temperatura_c": null,
+    "radiacion": null,
+    "drenaje_requerido": null
+  },
+  "valor_pedagogico": "El tomate de árbol morado (Solanum betaceum Cav., cultivar morado-antocianínico, Solanaceae) es la variedad o forma cromática morada-pigmentada del tomate de árbol andino (registrado en este catálogo como `solanum_betaceum` para el cultivar dominante rojo-púrpura y `solanum_betaceum_naranja` para el cultivar amarillo), nativa de los Andes (Colombia, Ecuador, Perú, Bolivia) y cultivada en Colombia entre 1.800 y 2.500 msnm en clima templado-frío con presencia en cultivos especializados y huertos campesinos de Antioquia (Oriente — La Unión, La Ceja, Sonsón), Cundinamarca (Sabana de Bogotá, Subachoque, Tausa, Pacho), Boyacá (Garagoa, Tenza, Sutatenza), Caldas (Manizales rural, Villamaría), Nariño (Pasto, Yacuanquer) y zonas de mejoramiento participativo del germoplasma del banco genético de AGROSAVIA en La Selva (Rionegro, Antioquia). Misma familia Solanaceae, mismo género Solanum sección Cyphomandra. Morfología idéntica al cultivar rojo-púrpura (arbolito perenne semileñoso 2-4 m, hojas acorazonadas pubescentes, flores rosa-blancas, vida productiva 4-8 años), pero fruto baya ovoide (5-10 cm) con piel lisa morado-oscuro-casi-negro brillante con manchas longitudinales más claras, pulpa anaranjada-amarilla profunda con semillas pardas envueltas en gel morado-violeta intenso (antocianinas concentradas en la cáscara y en el gel que rodea las semillas) — perfil bioquímico distintivo: alto contenido de antocianinas (delfinidina-3-glucósido, cianidina-3-rutinósido, peonidina-3-glucósido) con capacidad antioxidante 2-3 veces superior al cultivar rojo, perfil aromático ligeramente más complejo, sabor agridulce más intenso. Es lección viva de bioquímica de pigmentos vegetales, agrobiodiversidad funcional y nutracéutica andina que enseña a niñas y niños cómo el color morado de una fruta NO es estético sino quimiprotector — las antocianinas son antioxidantes potentes producidos por la planta para protegerse de la radiación UV del altiplano, y al consumir el fruto morado las personas heredan esa protección antioxidante (capacidad ORAC 4.000-8.000 µmol TE/100 g vs 1.500-3.000 del cultivar rojo). Producto emergente de exportación de superfrutas andinas; consumido fresco, en jugos pulpa-leche, postres, sorbetes pigmentados, salsas dulces y formulaciones funcionales (suplementos antioxidantes naturales). Manejo agroecológico: propagación por semilla seleccionada de plantas madre con pigmentación intensa (estable — el morado se hereda) o por injerto sobre patrón resistente a Phytophthora cinnamomi y nematodos, distancia 3x3 m, tutoreo en estaca, fertilización balanceada con micorrizas, plena producción a partir de año 2, manejo integrado de antracnosis, mildew velloso, virus del tomate de árbol y mosca de la fruta. Función en chagra como frutal andino de pigmento antociánico, cultivo de alto valor nutracéutico, diversificación cromática del germoplasma de Solanum betaceum y oportunidad de exportación de superfrutas funcionales. Fuentes Tier A: GBIF, POWO Kew, AGROSAVIA Sol Andina, Bernal 2015, NRC 1989 Cultivos Andinos, SiB Colombia.",
+  "sources": [
+    {
+      "id": "gbif-taxonomic-backbone",
+      "title": "gbif-taxonomic-backbone",
+      "tier": "A",
+      "url": "https://www.gbif.org/dataset/d7dddbf4-2cf0-4f39-9b2a-bb099caae36c"
+    },
+    {
+      "id": "powo-kew",
+      "title": "powo-kew",
+      "tier": "A",
+      "url": "https://powo.science.kew.org"
+    },
+    {
+      "id": "agrosavia-sol-andina",
+      "title": "agrosavia-sol-andina",
+      "tier": "A",
+      "url": "https://www.agrosavia.co"
+    },
+    {
+      "id": "bernal-2015-plantas-liquenes-colombia",
+      "title": "bernal-2015-plantas-liquenes-colombia",
+      "tier": "A",
+      "url": "http://catalogoplantasdecolombia.unal.edu.co"
+    },
+    {
+      "id": "nrc-1989-cultivos-andinos",
+      "title": "nrc-1989-cultivos-andinos",
+      "tier": "A",
+      "url": null
+    },
+    {
+      "id": "sib-colombia",
+      "title": "sib-colombia",
+      "tier": "A",
+      "url": "https://sibcolombia.net"
+    }
+  ],
+  "_generated_by": "scripts/build-cycle-content-from-catalog.mjs",
+  "_generated_at": "2026-05-19T00:42:57.384Z"
+}

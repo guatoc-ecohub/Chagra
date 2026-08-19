@@ -1,0 +1,174 @@
+{
+  "timestamp": "2026-08-16T02:14:41.896Z",
+  "url": "http://localhost:5177/dev-rive-fixed.html",
+  "gpu": {
+    "version": "WebGL 2.0 (OpenGL ES 3.0 Chromium)",
+    "renderer": "ANGLE (NVIDIA Corporation, Quadro M6000/PCIe/SSE2, OpenGL 4.5.0)",
+    "vendor": "Google Inc. (NVIDIA Corporation)"
+  },
+  "rive": {
+    "machineName": "bumpy",
+    "wasmUrl": "/vendor/rive/rive.wasm",
+    "assetUrl": "/vendor/rive/spike-vehicles.riv",
+    "inputs": [
+      {
+        "name": "bump",
+        "type": 58
+      }
+    ]
+  },
+  "pixelCheck": {
+    "source": {
+      "nonZeroPx": 2304,
+      "totalPx": 2304
+    },
+    "plane": {
+      "nonZeroPx": 0,
+      "totalPx": 2304
+    }
+  },
+  "mutation": {
+    "before": null,
+    "after": null,
+    "changed": false
+  },
+  "network": {
+    "total": 20,
+    "nonLocal": [
+      {
+        "url": "http://localhost:5177/dev-rive-fixed.html",
+        "host": "(x)",
+        "resourceType": "document"
+      },
+      {
+        "url": "http://localhost:5177/@vite/client",
+        "host": "(x)",
+        "resourceType": "script"
+      },
+      {
+        "url": "http://localhost:5177/dev-rive-fixed.html?html-proxy&index=0.js",
+        "host": "(x)",
+        "resourceType": "script"
+      },
+      {
+        "url": "http://localhost:5177/@react-refresh",
+        "host": "(x)",
+        "resourceType": "script"
+      },
+      {
+        "url": "http://localhost:5177/node_modules/.vite/deps/three.js?v=430a9d29",
+        "host": "(x)",
+        "resourceType": "script"
+      },
+      {
+        "url": "http://localhost:5177/node_modules/.vite/deps/@rive-app_canvas.js?v=430a9d29",
+        "host": "(x)",
+        "resourceType": "script"
+      },
+      {
+        "url": "http://localhost:5177/node_modules/vite/dist/client/env.mjs",
+        "host": "(x)",
+        "resourceType": "script"
+      },
+      {
+        "url": "http://localhost:5177/node_modules/.vite/deps/three.module-Cu7KUY6f.js?v=430a9d29",
+        "host": "(x)",
+        "resourceType": "script"
+      },
+      {
+        "url": "http://localhost:5177/node_modules/.vite/deps/chunk-B4lejLz5.js?v=430a9d29",
+        "host": "(x)",
+        "resourceType": "script"
+      },
+      {
+        "url": "http://localhost:5177/dev-rive-fixed.html",
+        "host": "(x)",
+        "resourceType": "document"
+      },
+      {
+        "url": "http://localhost:5177/@vite/client",
+        "host": "(x)",
+        "resourceType": "script"
+      },
+      {
+        "url": "http://localhost:5177/dev-rive-fixed.html?html-proxy&index=0.js",
+        "host": "(x)",
+        "resourceType": "script"
+      },
+      {
+        "url": "http://localhost:5177/@react-refresh",
+        "host": "(x)",
+        "resourceType": "script"
+      },
+      {
+        "url": "http://localhost:5177/node_modules/vite/dist/client/env.mjs",
+        "host": "(x)",
+        "resourceType": "script"
+      },
+      {
+        "url": "http://localhost:5177/node_modules/.vite/deps/three.js?v=430a9d29",
+        "host": "(x)",
+        "resourceType": "script"
+      },
+      {
+        "url": "http://localhost:5177/node_modules/.vite/deps/@rive-app_canvas.js?v=430a9d29",
+        "host": "(x)",
+        "resourceType": "script"
+      },
+      {
+        "url": "http://localhost:5177/node_modules/.vite/deps/three.module-Cu7KUY6f.js?v=430a9d29",
+        "host": "(x)",
+        "resourceType": "script"
+      },
+      {
+        "url": "http://localhost:5177/node_modules/.vite/deps/chunk-B4lejLz5.js?v=430a9d29",
+        "host": "(x)",
+        "resourceType": "script"
+      },
+      {
+        "url": "http://localhost:5177/vendor/rive/rive.wasm",
+        "host": "(x)",
+        "resourceType": "fetch"
+      },
+      {
+        "url": "http://localhost:5177/vendor/rive/spike-vehicles.riv",
+        "host": "(x)",
+        "resourceType": "fetch"
+      }
+    ],
+    "suspicious": [],
+    "riveRelated": [
+      {
+        "url": "http://localhost:5177/dev-rive-fixed.html"
+      },
+      {
+        "url": "http://localhost:5177/dev-rive-fixed.html?html-proxy&index=0.js"
+      },
+      {
+        "url": "http://localhost:5177/node_modules/.vite/deps/@rive-app_canvas.js?v=430a9d29"
+      },
+      {
+        "url": "http://localhost:5177/dev-rive-fixed.html"
+      },
+      {
+        "url": "http://localhost:5177/dev-rive-fixed.html?html-proxy&index=0.js"
+      },
+      {
+        "url": "http://localhost:5177/node_modules/.vite/deps/@rive-app_canvas.js?v=430a9d29"
+      },
+      {
+        "url": "http://localhost:5177/vendor/rive/rive.wasm"
+      },
+      {
+        "url": "http://localhost:5177/vendor/rive/spike-vehicles.riv"
+      }
+    ]
+  },
+  "requestFailures": [],
+  "consoleErrors": [
+    {
+      "type": "error",
+      "text": "Failed to load resource: the server responded with a status of 404 (Not Found)"
+    }
+  ]
+}

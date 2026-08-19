@@ -1,0 +1,6 @@
+GATE zariguya sin guantes — 2026-08-18
+juez: judge-vl qwen3-vl:8b · pregunta: ¿las manos del animal son guantes blancos de dibujo animado?
+control positivo render ANTES: sí
+render DESPUÉS (completo): no
+mano lápiz 4x: no · mano brújula 4x: no
+métrica dura blancos L>205 en elipses de mano: [547,1062] → [0,0]

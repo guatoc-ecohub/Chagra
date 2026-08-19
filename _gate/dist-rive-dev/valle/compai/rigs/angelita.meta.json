@@ -1,0 +1,9 @@
+{
+  "wrap": "angelitaWrap",
+  "pielKart": {
+    "cuerpo": { "grad": "gAbdomen", "stop": 0 },
+    "cuerpo2": { "grad": "gAbdomen", "stop": 2 },
+    "cabeza": { "grad": "gCara", "stop": 0 },
+    "detalle": { "grad": "gThoraxFur", "stop": 0 }
+  }
+}

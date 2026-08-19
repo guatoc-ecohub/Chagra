@@ -1,0 +1,84 @@
+{
+  "species_slug": "buddleja_americana",
+  "scientific_name": "Buddleja americana L.",
+  "common_names": [
+    "Buddleja arborea / Salvion"
+  ],
+  "family": "Scrophulariaceae",
+  "category": "cercas_vivas",
+  "cultivable": true,
+  "conservation_status": "nativo_silvestre",
+  "thermal_zones": [
+    "templado",
+    "frio"
+  ],
+  "roles_in_guild": [
+    "living_fence",
+    "pollinator_attractor",
+    "nurse_plant"
+  ],
+  "antagonists": [],
+  "especies_nativas_sustitutas": [],
+  "propagation": {
+    "methods": [
+      "semilla",
+      "esqueje"
+    ],
+    "best_method": "esqueje",
+    "protocol_resumen": "Esquejes de ramas semimaduras de 20-30cm, enraizar en sustrato humedo. Se propaga facilmente por estaca. Atrae mariposas y colibries durante la floracion.",
+    "notas": "Arbusto o arbolito nativo de los Andes, de crecimiento rapido. Flores lilas en paniculos muy aromaticas. Uso medicinal tradicional como antiinflamatorio y cicatrizante.",
+    "fuente": "Perez Arbelaez 1947; Instituto Humboldt flora alto andina"
+  },
+  "requirements": {
+    "agua": "medio",
+    "altitud_msnm": {
+      "min_absoluto": 1200,
+      "optimo_min": 1800,
+      "optimo_max": 2800,
+      "max_absoluto": 3200
+    },
+    "temperatura_c": {
+      "helada_letal": -4,
+      "optimo_min": 12,
+      "optimo_max": 20,
+      "max_tolerable": 26
+    },
+    "radiacion": "sol_pleno",
+    "drenaje_requerido": "bueno"
+  },
+  "valor_pedagogico": "Arbusto o arbolito nativo de los Andes neotropicales (Buddleja americana, Scrophulariaceae) llamado salvion o matico por el campesinado andino. Sus flores lilas aromaticas en paniculos atraen mariposas, colibries y abejas nativas durante toda la floracion, sosteniendo la polinizacion de la chagra entera. Sus hojas se usan en infusion tradicional como antiinflamatorio y cicatrizante de heridas. Enseña la doble funcion de una cerca viva nativa: refugio de polinizadores y botiquin campesino de alta montaña.",
+  "sources": [
+    {
+      "id": "perez-arbelaez-1947-plantas-utiles",
+      "title": "perez-arbelaez-1947-plantas-utiles",
+      "tier": "A",
+      "url": null
+    },
+    {
+      "id": "humboldt-flora-alto-andina",
+      "title": "humboldt-flora-alto-andina",
+      "tier": "A",
+      "url": null
+    },
+    {
+      "id": "gbif-taxonomic-backbone",
+      "title": "gbif-taxonomic-backbone",
+      "tier": "A",
+      "url": "https://www.gbif.org/dataset/d7dddbf4-2cf0-4f39-9b2a-bb099caae36c"
+    },
+    {
+      "id": "powo-kew",
+      "title": "powo-kew",
+      "tier": "A",
+      "url": "https://powo.science.kew.org"
+    },
+    {
+      "id": "jbb-plantas-medicinales",
+      "title": "jbb-plantas-medicinales",
+      "tier": "A",
+      "url": null
+    }
+  ],
+  "_generated_by": "scripts/build-cycle-content-from-catalog.mjs",
+  "_generated_at": "2026-05-19T00:42:57.377Z"
+}
