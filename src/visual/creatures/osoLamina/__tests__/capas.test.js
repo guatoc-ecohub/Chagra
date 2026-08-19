@@ -126,9 +126,18 @@ describe('anatomia.js — forma de las constantes que capas.js consume', () => {
   });
 
   it('el BASTÓN entero NO se separa (la zarpa lo empuña — la lección de las patas del jaguar): no hay constante BASTON', async () => {
-    const anatomia = await import('../anatomia.js');
+    // Esta prueba AFIRMA UNA AUSENCIA, y por construcción el tipo del módulo
+    // no puede nombrar `BASTON`: no existe, y que no exista ES el invariante.
+    // Por eso tsc marcaba TS2339 sobre la aserción misma — el defecto estaba
+    // en cómo se pregunta, no en el sujeto. Se lee como diccionario para poder
+    // preguntar por una clave que el tipo no declara; NO es `any`: el valor
+    // sigue siendo `unknown`, así que nada más se relaja.
+    const anatomia = /** @type {Record<string, unknown>} */ (
+      /** @type {unknown} */ (await import('../anatomia.js'))
+    );
     expect(anatomia.BASTON).toBeUndefined();
-    expect(anatomia.default.BASTON).toBeUndefined();
+    const porDefecto = /** @type {Record<string, unknown>} */ (anatomia.default);
+    expect(porDefecto.BASTON).toBeUndefined();
   });
 
   it('los pivotes de cabeza/cuerpo/corona son puntos [x,y] dentro del lienzo', () => {
