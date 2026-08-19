@@ -115,6 +115,82 @@ function mascaraLinterna(x, y) {
   return elipse * (1 - bandaPierna(x, y, PIERNA_IZQ)) * (1 - bandaPierna(x, y, PIERNA_DER));
 }
 
+/* Cirugía de las dos manos: la lámina trae manoplas claras, pero en un
+ * insecto los extremos de las patas deben leer como tarsos articulados.
+ * Las elipses solo acotan los píxeles de las manos; los útiles quedan fuera
+ * mediante sus ejes y el alfa original se conserva en cada capa. */
+const TARSO_LAPIZ = { cx: 44, cy: 230, rx: 43, ry: 40 };
+const TARSO_CUADERNO = { cx: 280, cy: 355, rx: 40, ry: 34 };
+
+function distanciaSegmento(x, y, ax, ay, bx, by) {
+  const dx = bx - ax;
+  const dy = by - ay;
+  const t = clamp(((x - ax) * dx + (y - ay) * dy) / (dx * dx + dy * dy), 0, 1);
+  return Math.hypot(x - (ax + t * dx), y - (ay + t * dy));
+}
+
+function dentroElipse(x, y, { cx, cy, rx, ry }) {
+  return Math.hypot((x - cx) / rx, (y - cy) / ry) <= 1;
+}
+
+function esLapiz(x, y, r, g, b) {
+  return distanciaSegmento(x, y, 4, 262, 82, 195) < 7
+    && r - b > 50 && g - b > 30;
+}
+
+function esPagina(x, y, r, g, b) {
+  return x >= 200 && x < 258 && y < 350 && r - b > 28 && g - b > 10;
+}
+
+function enTarso(x, y) {
+  return dentroElipse(x, y, TARSO_LAPIZ) || dentroElipse(x, y, TARSO_CUADERNO);
+}
+
+function pintaGarra(d, src, W, H, x0, y0, x1, y1, ancho) {
+  const dx = x1 - x0;
+  const dy = y1 - y0;
+  const len = Math.hypot(dx, dy);
+  for (let y = Math.floor(Math.min(y0, y1) - ancho); y <= Math.ceil(Math.max(y0, y1) + ancho); y++) {
+    for (let x = Math.floor(Math.min(x0, x1) - ancho); x <= Math.ceil(Math.max(x0, x1) + ancho); x++) {
+      const t = clamp(((x - x0) * dx + (y - y0) * dy) / (len * len), 0, 1);
+      const w = ancho * (1 - t) * 0.5;
+      const px = x0 + t * dx;
+      const py = y0 + t * dy;
+      if (Math.hypot(x - px, y - py) > w || !enTarso(x, y) || x < 0 || x >= W || y < 0 || y >= H) continue;
+      const i = (y * W + x) * 4;
+      if (i < 0 || i + 3 >= src.length || !src[i + 3]
+        || esLapiz(x, y, src[i], src[i + 1], src[i + 2])) continue;
+      d[i] = 37; d[i + 1] = 29; d[i + 2] = 24;
+    }
+  }
+}
+
+function pielDeTarsos(src, W, H) {
+  const d = new Uint8ClampedArray(src);
+  for (let y = 0; y < H; y++) {
+    for (let x = 0; x < W; x++) {
+      if (!enTarso(x, y)) continue;
+      const i = (y * W + x) * 4;
+      if (!src[i + 3] || esPagina(x, y, src[i], src[i + 1], src[i + 2])
+        || esLapiz(x, y, src[i], src[i + 1], src[i + 2])) continue;
+      const luz = 0.299 * src[i] + 0.587 * src[i + 1] + 0.114 * src[i + 2];
+      const t = ss(105, 220, luz);
+      if (!t) continue;
+      d[i] = src[i] * (1 - t) + (50 + src[i] * 0.18) * t;
+      d[i + 1] = src[i + 1] * (1 - t) + (36 + src[i + 1] * 0.14) * t;
+      d[i + 2] = src[i + 2] * (1 - t) + (25 + src[i + 2] * 0.10) * t;
+    }
+  }
+  const garras = [
+    [57, 218, 43, 209, 4], [58, 229, 41, 220, 3.8],
+    [59, 241, 43, 239, 3.6], [52, 250, 42, 255, 3.2],
+    [278, 349, 263, 342, 3.6], [285, 355, 268, 351, 3.4],
+    [287, 363, 271, 365, 3.4], [281, 370, 269, 375, 3.1],
+  ];
+  for (const garra of garras) pintaGarra(d, src, W, H, ...garra);
+  return d;
+}
+
 /**
  * Hornea las capas + los parches de párpado a partir de la imagen ya
  * cargada. Devuelve canvases del MISMO tamaño que el PNG (comparten
@@ -147,6 +223,7 @@ export function hornearLuciernaga(img, dims = {}) {
     return null;
   }
   const sd = src.data;
+  const sdTarsos = pielDeTarsos(sd, W, H);
 
   // Prioridad: antenas > cabeza > mandíbula > manoLapiz > linterna > cuerpo.
   // `mCabezaFull` es la cabeza COMPLETA (incluye mentón y las bases de
@@ -169,7 +246,7 @@ export function hornearLuciernaga(img, dims = {}) {
   const mCuerpo = (x, y) => hard(mCabezaFull(x, y)) * hard(mAntIzq(x, y))
     * hard(mAntDer(x, y)) * hard(mMano(x, y)) * hard(mLinterna(x, y));
 
-  const pintar = (mascara) => {
+  const pintar = (mascara, pixeles = sdTarsos) => {
     const cv = lienzo(W, H);
     const g = cv.getContext('2d');
     const im = g.createImageData(W, H);
@@ -177,9 +254,9 @@ export function hornearLuciernaga(img, dims = {}) {
     for (let y = 0; y < H; y++) {
       for (let x = 0; x < W; x++) {
         const i = (y * W + x) * 4;
-        const a = sd[i + 3];
+        const a = pixeles[i + 3];
         if (!a) { d[i + 3] = 0; continue; }
-        d[i] = sd[i]; d[i + 1] = sd[i + 1]; d[i + 2] = sd[i + 2];
+        d[i] = pixeles[i]; d[i + 1] = pixeles[i + 1]; d[i + 2] = pixeles[i + 2];
         d[i + 3] = a * mascara(x, y);
       }
     }
