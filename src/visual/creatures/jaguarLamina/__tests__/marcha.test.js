@@ -183,4 +183,21 @@ describe('poseMarcha — el ciclo cuadrúpedo completo', () => {
       }
     }
   });
+
+  it('las delanteras despegan sin quedar pegadas al tope de carpo', () => {
+    for (let i = 0; i < 400; i++) {
+      const ciclo = i / 400;
+      const bob = MARCHA.bob * Math.sin(4 * Math.PI * ciclo);
+      for (const pata of [PATAS.delLejana, PATAS.delCercana]) {
+        const fase = (ciclo + 1 - pata.fase) % 1;
+        const objetivo = pieEnCiclo(pata, fase);
+        if (objetivo.apoyo) continue;
+        const d = Math.hypot(
+          objetivo.x - pata.articulacion[0],
+          objetivo.y - bob - pata.articulacion[1],
+        );
+        expect(d).toBeGreaterThan(pata.dMin + 0.1);
+      }
+    }
+  });
 });

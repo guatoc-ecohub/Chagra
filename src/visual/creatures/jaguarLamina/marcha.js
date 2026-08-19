@@ -34,6 +34,14 @@ const clamp = (v, a, b) => (v < a ? a : v > b ? b : v);
 const ssuave = (t) => { const u = clamp(t, 0, 1); return u * u * (3 - 2 * u); };
 const largo = (a, b) => Math.hypot(b[0] - a[0], b[1] - a[1]);
 
+/* Las delanteras están casi extendidas en la lámina de reposo. Un arco de
+ * vuelo tan alto como el de las traseras las mete por debajo del piso de
+ * flexión y deja el carpo clavado en su tope durante demasiados fotogramas.
+ * En un paso felino lento el pie delantero despega poco y vuelve a buscar el
+ * suelo pronto; el desplazamiento longitudinal sigue siendo el del foot-plant
+ * compartido, así que esto no cambia la sincronía con el avance del cuerpo. */
+const LEVANTE_DELANTERAS = 2;
+
 /** Rig derivado: largos de hueso, ángulos de reposo y piso de distancia del
  *  tope de flexión (`plieMax` → `dMin`, ley del coseno sobre el ángulo
  *  interior de reposo) por pata — una sola vez. */
@@ -49,7 +57,8 @@ export const PATAS = Object.fromEntries(
     ));
     const thMin = thReposo - (rig.plieMax || 60) / GRADOS;
     const dMin = Math.sqrt(Math.max(0, L1 * L1 + L2 * L2 - 2 * L1 * L2 * Math.cos(thMin)));
-    return [clave, { ...rig, clave, L1, L2, a1Reposo, a2Reposo, dMin }];
+    const lift = clave.startsWith('del') ? LEVANTE_DELANTERAS : rig.lift;
+    return [clave, { ...rig, clave, L1, L2, a1Reposo, a2Reposo, dMin, lift }];
   }),
 );
 
