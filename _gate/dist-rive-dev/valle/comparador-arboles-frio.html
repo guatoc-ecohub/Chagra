@@ -1,0 +1,201 @@
+<!doctype html>
+<html lang="es-CO">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Comparador — árboles del frío (A vs B)</title>
+<!--
+  Harness de DECISIÓN entre los dos módulos de árboles del frío andino:
+    A = lib3d/flora/arbolesFrioAndino.js   (crearArbolFrio / crearBosqueFrio)
+    B = lib3d/flora/arbolesAltoandinos.js  (crearArbolAltoandino / crearBosqueAltoandino)
+  MISMA escena, MISMA luz, MISMA cámara, MISMO medidor — el módulo entra por query.
+    ?mod=a|b
+    &vista=fila     5 especies en arco a EXACTAMENTE 30 m de la cámara (silueta).
+                    Sin rótulos a propósito: la silueta se juzga tapando el nombre.
+    &vista=cerca    una especie a ~9 m (¿el follaje es MASA o se cuentan hojas?)
+                    [&especie=encenillo|aliso|siete_cueros|gaque|mano_de_oso]
+    &vista=bosque   rodal con n objetivo (&n=110) — misma huella de terreno y
+                    mismo encuadre para ambos módulos; FPS lo mide shot3d afuera.
+                    [&bruma=1 añade brumaVolumetrica con anclas idénticas]
+  Sombras APAGADAS en ambos a propósito: condición idéntica y neutra.
+-->
+<style>
+  html,body{margin:0;height:100%;background:#b9cdd0;overflow:hidden}
+  canvas{display:block}
+  #hud{position:fixed;left:10px;top:10px;z-index:5;font:12px/1.5 ui-monospace,monospace;
+    color:#1c2a24;background:rgba(255,255,255,.72);padding:6px 10px;border-radius:6px;
+    white-space:pre;pointer-events:none}
+  #hud.error{background:#c0392b;color:#fff}
+</style>
+<script type="importmap">
+{
+  "imports": {
+    "three": "./vendor/three.module.js",
+    "three/addons/": "./vendor/addons/"
+  }
+}
+</script>
+</head>
+<body>
+<div id="hud">cargando…</div>
+<script type="module">
+import * as THREE from 'three';
+import { crearArbolFrio, crearBosqueFrio } from './lib3d/flora/arbolesFrioAndino.js';
+import { crearArbolAltoandino, crearBosqueAltoandino } from './lib3d/flora/arbolesAltoandinos.js';
+import { tickVientoMundos } from './lib3d/flora/vientoMundos.js';
+import { crearBrumaVolumetrica } from './lib3d/fx/brumaVolumetrica.js';
+
+const hud = document.getElementById('hud');
+window.addEventListener('error', (e) => {
+  hud.classList.add('error');
+  hud.textContent = 'ERROR: ' + (e.message || e.type);
+});
+
+const q = new URLSearchParams(location.search);
+const mod = (q.get('mod') || 'a').toLowerCase();
+const vista = q.get('vista') || 'fila';
+const nObj = parseInt(q.get('n') || '110', 10);
+const conBruma = q.get('bruma') === '1';
+const espQ = q.get('especie') || 'encenillo';
+const _tFijo = q.get('t');
+const TIEMPO_FIJO = _tFijo === null || Number.isNaN(Number(_tFijo)) ? null : Number(_tFijo);
+const SEED = 23;
+
+// mismo orden izquierda→derecha en ambos módulos (los nombres difieren en una clave)
+const ORDEN = [
+  ['encenillo', 'encenillo'],
+  ['aliso', 'aliso'],
+  ['siete_cueros', 'sietecueros'],
+  ['gaque', 'gaque'],
+  ['mano_de_oso', 'mano_de_oso'],
+];
+const claveB = (a) => (ORDEN.find(([ka]) => ka === a) || [a, a])[1];
+
+function arbol(especie, seed) {
+  if (mod === 'a') return crearArbolFrio(especie, { seed });
+  return crearArbolAltoandino(claveB(especie), { seed }).grupo;
+}
+
+// ── escena idéntica para ambos ───────────────────────────────────────────────
+const escena = new THREE.Scene();
+const AIRE = new THREE.Color(0xc0d1d3);
+escena.background = AIRE;
+escena.fog = new THREE.FogExp2(AIRE, vista === 'bosque' ? 0.011 : 0.005);
+
+const renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: 'high-performance' });
+renderer.setSize(innerWidth, innerHeight);
+renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+renderer.shadowMap.enabled = false;          // neutro: ninguno con sombras
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure = 1.05;
+document.body.appendChild(renderer.domElement);
+
+const camara = new THREE.PerspectiveCamera(48, innerWidth / innerHeight, 0.1, 700);
+
+escena.add(new THREE.HemisphereLight(0xd6e3dc, 0x2e3626, 1.0));
+const sol = new THREE.DirectionalLight(0xfff2d8, 1.6);
+sol.position.set(34, 50, 40);
+escena.add(sol);
+
+// suelo neutro con ruido de vértice (igual para ambos)
+const hashS = (x, z) => { const h = Math.sin(x * 127.1 + z * 311.7) * 43758.5453; return h - Math.floor(h); };
+{
+  const R = vista === 'bosque' ? Math.max(120, 46 * Math.sqrt(nObj / 110) * 1.4) : 80;
+  const geo = new THREE.CircleGeometry(R, 64); geo.rotateX(-Math.PI / 2);
+  const P = geo.attributes.position, col = new Float32Array(P.count * 3);
+  const cA = new THREE.Color(0x46583a), cB = new THREE.Color(0x39492f), t = new THREE.Color();
+  for (let i = 0; i < P.count; i++) {
+    t.copy(cA).lerp(cB, hashS(P.getX(i) * 0.23, P.getZ(i) * 0.23));
+    col[i * 3] = t.r; col[i * 3 + 1] = t.g; col[i * 3 + 2] = t.b;
+  }
+  geo.setAttribute('color', new THREE.BufferAttribute(col, 3));
+  escena.add(new THREE.Mesh(geo, new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 1 })));
+}
+
+// ── vistas ───────────────────────────────────────────────────────────────────
+let mundo = null;   // bosque B: necesita actualizar(camara)
+let bruma = null;
+let arbolesReales = '?';
+
+if (vista === 'fila') {
+  // arco a EXACTAMENTE 30 m: cada especie a la misma distancia de la cámara
+  const D = 30, paso = 14 * Math.PI / 180;
+  ORDEN.forEach(([espA], i) => {
+    const a = (i - 2) * paso;
+    const g = arbol(espA, SEED + i * 101);
+    g.position.set(Math.sin(a) * D, 0, -Math.cos(a) * D);
+    escena.add(g);
+  });
+  camara.position.set(0, 6, 0);
+  camara.lookAt(0, 6, -30);
+  arbolesReales = 5;
+} else if (vista === 'cerca') {
+  const g = arbol(espQ, SEED);
+  escena.add(g);
+  camara.position.set(0, 6.5, 9);
+  camara.lookAt(0, 7.5, 0);
+  arbolesReales = 1;
+} else if (vista === 'bosque') {
+  // misma huella: círculo de radio Ra (A) ≙ cuadrado de área equivalente (B)
+  const Ra = 42 * Math.sqrt(nObj / 110);
+  if (mod === 'a') {
+    const r = crearBosqueFrio({ n: nObj, radio: Ra, seed: SEED, claro: 7 });
+    escena.add(r.grupo);
+    arbolesReales = r.puntos.length;
+    window.__anclas = r.puntos;
+  } else {
+    // huella IDÉNTICA a la de A: círculo de radio Ra con claro central de 7 m
+    const area = { x0: -Ra, x1: Ra, z0: -Ra, z1: Ra };
+    const libre = (x, z) => { const d = x * x + z * z; return d <= Ra * Ra && d >= 49; };
+    const dens = (nObj * 100) / (4 * Ra * Ra);   // objetivo n sobre el área muestreada
+    const r = crearBosqueAltoandino({ area, libre, densidad: dens, seed: SEED });
+    escena.add(r.grupo);
+    mundo = r;
+    arbolesReales = r.stats().arboles;
+  }
+  if (conBruma) {
+    // anclas idénticas para ambos: rejilla determinista dentro de la huella
+    const puntos = [];
+    for (let i = 0; i < 60; i++) {
+      const a = i * 2.39996, rr = Ra * Math.sqrt((i + 0.5) / 60);
+      puntos.push({ x: Math.cos(a) * rr, y: 0, z: Math.sin(a) * rr });
+    }
+    bruma = crearBrumaVolumetrica(THREE, {
+      puntos, jirones: 90, haces: 8, seed: SEED,
+      cerca: [4, 14], color: 0xd9e4dc, dispersion: 3.5, intensidad: 1,
+      solDir: sol.position.clone().normalize(), lejos: [45, 85],
+    });
+    escena.add(bruma.grupo);
+  }
+  camara.position.set(2, 3.4, Ra + 5);
+  camara.lookAt(0, 5, -Ra * 0.25);
+} else {
+  hud.classList.add('error');
+  hud.textContent = 'vista desconocida: ' + vista;
+}
+
+// ── loop + HUD (mismo medidor para ambos) ────────────────────────────────────
+const reloj = new THREE.Clock();
+let acumulado = 0;
+function frame() {
+  requestAnimationFrame(frame);
+  const dt = reloj.getDelta();
+  const t = TIEMPO_FIJO !== null ? TIEMPO_FIJO : reloj.elapsedTime;
+  tickVientoMundos(t);
+  if (mundo) mundo.actualizar(camara);
+  if (bruma) bruma.tick(TIEMPO_FIJO !== null ? 0 : dt);
+  renderer.render(escena, camara);
+  acumulado += dt;
+  if (acumulado > 0.5) {
+    acumulado = 0;
+    const inf = renderer.info.render;
+    window.__stats = { mod, vista, arboles: arbolesReales, tris: inf.triangles, calls: inf.calls };
+    hud.textContent = `mod ${mod.toUpperCase()} · ${vista}`
+      + `\nárboles ${arbolesReales}`
+      + `\ntris ${inf.triangles.toLocaleString('es-CO')} · calls ${inf.calls}`;
+  }
+}
+frame();
+</script>
+</body>
+</html>
