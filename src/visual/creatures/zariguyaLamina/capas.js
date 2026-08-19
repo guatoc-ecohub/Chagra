@@ -98,7 +98,18 @@ export function mascaraMandibula(x, y) {
 
 /** Cápsula: distancia al segmento (ax,ay)→(bx,by), con fade radial y
  *  opcionalmente axial (t0..t1 sobre el eje — el fin que se funde con el
- *  cuerpo, como la articulación de las patas del jaguar). */
+ *  cuerpo, como la articulación de las patas del jaguar).
+ *
+ *  `t0`/`t1` son OPCIONALES de verdad: el lápiz y el guante flotan sobre
+ *  fondo transparente y no necesitan fundirse con nada (`BRAZO_LAPIZ.lapiz`
+ *  no los trae), mientras que los antebrazos sí. El cuerpo de la función ya
+ *  lo contempla (`if (t0 !== undefined)`), pero al desestructurar sin tipo
+ *  tsc los infería REQUERIDOS y marcaba la llamada de la línea 128.
+ *
+ * @param {number} x
+ * @param {number} y
+ * @param {{ax:number, ay:number, bx:number, by:number, r:number, rFade:number, t0?:number, t1?:number}} capsula
+ */
 function mascaraCapsula(x, y, { ax, ay, bx, by, r, rFade, t0, t1 }) {
   const dx = bx - ax;
   const dy = by - ay;
