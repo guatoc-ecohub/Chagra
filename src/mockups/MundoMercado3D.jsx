@@ -119,7 +119,8 @@ function Canasto({ position, producto, cantidad }) {
   );
 }
 
-function Puesto({ position, color, producto, cantidad }) {
+function Puesto({ position, producto, cantidad }) {
+  const item = PRODUCTOS[producto];
   return (
     <group position={position}>
       {[-1.15, 1.15].flatMap((x) => [-0.65, 0.65].map((z) => (
@@ -130,7 +131,7 @@ function Puesto({ position, color, producto, cantidad }) {
       )))}
       <mesh position={[0, 2.35, 0]} rotation={[0, 0, 0.03]}>
         <boxGeometry args={[2.8, 0.08, 1.75]} />
-        <Material color={color} />
+        <Material color={item.color} />
       </mesh>
       <mesh position={[0, 0.72, 0]}>
         <boxGeometry args={[2.45, 0.12, 1.3]} />
@@ -212,9 +213,9 @@ function Escena({ tier, reducedMotion }) {
         <Material color="#e2b341" basic />
       </mesh>
       <Finca />
-      <Puesto position={[-2.3, 0, 0]} color="#bd5038" producto={0} cantidad={cantidad} />
-      <Puesto position={[1.05, 0, -0.35]} color="#e5b946" producto={1} cantidad={cantidad} />
-      {tier === 'alto' ? <Puesto position={[4.1, 0, -1.2]} color="#4f8162" producto={2} cantidad={cantidad} /> : null}
+      <Puesto position={[-2.3, 0, 0]} producto={0} cantidad={cantidad} />
+      <Puesto position={[1.05, 0, -0.35]} producto={1} cantidad={cantidad} />
+      {tier === 'alto' ? <Puesto position={[4.1, 0, -1.2]} producto={2} cantidad={cantidad} /> : null}
       <Canasto position={[3.2, 0, 2.05]} producto={3} cantidad={cantidad} />
       <Balanza />
       <Personas tier={tier} />

@@ -85,7 +85,9 @@ export default function Mercado({ onBack }) {
             <span>Volver</span>
           </button>
         )}
-        <span className="mrc-marca">mercado.chagra.bio</span>
+        <a className="mrc-marca" href="/mercado-ronda2/" aria-label="Ir al inicio del mercado">
+          mercado.chagra.bio
+        </a>
       </header>
 
       {/* ── HERO: la promesa de procedencia + la montaña con caras ────────── */}

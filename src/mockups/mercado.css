@@ -55,6 +55,12 @@
   font-size: 0.72rem;
   letter-spacing: 0.02em;
   color: var(--mrc-tinta-2);
+  text-decoration: none;
+}
+.mrc-marca:hover,
+.mrc-marca:focus-visible {
+  color: var(--mrc-tinta);
+  text-decoration: underline;
 }
 .mrc-back {
   display: inline-flex;

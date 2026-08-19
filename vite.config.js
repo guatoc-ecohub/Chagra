@@ -81,6 +81,7 @@ export default defineConfig({
       input: {
         main: resolve(import.meta.dirname, 'index.html'),
         mercado: resolve(import.meta.dirname, 'mercado.html'),
+        mercadoRonda2: resolve(import.meta.dirname, 'mercado-ronda2/index.html'),
       },
       output: {
         manualChunks(id) {
