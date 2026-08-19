@@ -24,6 +24,11 @@
  * bioluminiscente, material aditivo y vida (los pulsos que corren).
  */
 import * as THREE from 'three';
+import {
+  ruidoFbm,
+  pintarPorVertice,
+  fusionarSeguro,
+} from '../bosque/sombreadoVegetal.js';
 
 /* PRNG determinista (mismo suelo en cada carga; nada de Math.random). */
 export function rng(seed) {
@@ -56,6 +61,7 @@ export const PALETA = {
   agua: new THREE.Color('#8fd4ff'), // pulso: agua (→ mata)
   carbono: new THREE.Color('#8ef06a'), // pulso: carbono/azúcar (mata → hongo)
   tallo: new THREE.Color('#5f8a3a'), // tallitos sobre la superficie
+  piedra: new THREE.Color('#565060'), // piedra del perfil (gris frío, nunca roba el ojo)
 };
 
 /* Volumen del suelo (metros-escena). La superficie está en y=0; abajo es
@@ -74,14 +80,17 @@ export const PARAMS_TIER = {
   alto: {
     nodosLibres: 22, pulsos: 130, tubK: 20, tubM: 6, radioHilo: 0.016,
     motas: 90, conEnt: true, entTier: 'alto', vecinos: 2, radialRaiz: 7,
+    pelusaPorHilo: 5, mantoPorPunta: 16, pelosPorRaiz: 22, segEntorno: 30, piedras: 9,
   },
   medio: {
     nodosLibres: 14, pulsos: 54, tubK: 12, tubM: 5, radioHilo: 0.015,
     motas: 40, conEnt: true, entTier: 'medio', vecinos: 2, radialRaiz: 6,
+    pelusaPorHilo: 3, mantoPorPunta: 10, pelosPorRaiz: 13, segEntorno: 18, piedras: 6,
   },
   bajo: {
     nodosLibres: 8, pulsos: 0, tubK: 8, tubM: 4, radioHilo: 0.014,
     motas: 0, conEnt: false, entTier: 'bajo', vecinos: 1, radialRaiz: 5,
+    pelusaPorHilo: 2, mantoPorPunta: 6, pelosPorRaiz: 8, segEntorno: 10, piedras: 4,
   },
 };
 
@@ -475,4 +484,455 @@ export function tallosSuperficie() {
     alto: p.id === 'maiz' ? 1.15 : p.id === 'frijol' ? 0.8 : 0.5,
     ahuyama: p.id === 'ahuyama',
   }));
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+ * PASADA DE ARTE «SUELO VIVO» — mirada Humboldt: MASA, no low-poly.
+ *
+ * Lo que sigue existe porque la escena original tenía tres mentiras visuales
+ * que la vitrina del Ent (corteSuelo.geom, tercera pasada) ya había aprendido
+ * a no decir:
+ *
+ *   1. El suelo era un PLANO de color plano — y "suelo vivo" no puede ser la
+ *      única cosa muerta del cuadro. Ahora es un entorno horneado por vértice
+ *      (grano fbm, oscuridad LOCAL en grietas, humus arriba → mineral frío
+ *      abajo, piedras medio enterradas) y —la receta que resolvió la banda
+ *      oscura de la vitrina— la RED LE HORNEA SU LUZ: la tierra se enciende
+ *      cerca de los filamentos y se queda oscura en los huecos.
+ *   2. Las hifas eran hilos contables. El micelio real es VELLO: por eso la
+ *      pelusa (ramillas finas que exploran) y el MANTO que forra cada punta
+ *      de raíz — la vaina hifal, que es literalmente la lección ("el hongo
+ *      forra la raíz"). Van como LineSegments aditivos: cientos de filamentos
+ *      en un draw-call.
+ *   3. Las raíces bajaban peladas. Una raíz viva está cubierta de PELOS
+ *      RADICALES; sin ellos el tubo se lee a plástico.
+ *
+ * Todo determinista (rng con semilla), puro three-core, testeable headless.
+ * ════════════════════════════════════════════════════════════════════════ */
+
+/*
+ * MUESTRAS DE LUZ de la red: puntos a lo largo de cada hilo con la fuerza con
+ * que alumbran la tierra vecina (los puentes alumbran más: son la lección).
+ * Es el insumo de `entornoSuelo` — la misma receta de `muestrasDeLuz` de la
+ * vitrina del Ent, aplicada al acuario completo.
+ */
+export function muestrasDeRed(hilos) {
+  const out = [];
+  const p = new THREE.Vector3();
+  for (const h of hilos) {
+    const curva = curvaHilo(h);
+    const n = h.puente ? 7 : 4;
+    const fuerza = h.puente ? 1 : 0.55;
+    for (let i = 0; i <= n; i++) {
+      curva.getPoint(i / n, p);
+      out.push({ x: p.x, y: p.y, z: p.z, fuerza });
+    }
+  }
+  return out;
+}
+
+/* Arma una BufferGeometry de líneas (position + color) desde arrays planos. */
+function geoLineas(pts, cols) {
+  const geo = new THREE.BufferGeometry();
+  geo.setAttribute('position', new THREE.BufferAttribute(new Float32Array(pts), 3));
+  geo.setAttribute('color', new THREE.BufferAttribute(new Float32Array(cols), 3));
+  return geo;
+}
+
+/*
+ * LA PELUSA DE LA RED — el micelio como masa, no como diagrama.
+ *
+ * Dos pelambres en una sola geometría de LineSegments (aditiva, un draw-call):
+ *   · el VELLO de cada hifa: ramillas finas que salen del hilo a explorar la
+ *     tierra, con el brillo cayendo a negro en la punta (en aditivo, negro =
+ *     invisible: el filamento se DESVANECE en vez de cortarse);
+ *   · el MANTO hifal: en cada punta de raíz, un rizo denso de filamentos que
+ *     ENVUELVE el arbúsculo — el hongo forrando la raíz, que es la frase
+ *     central de la simbiosis hecha geometría.
+ */
+export function pelusaDeRed(hilos, puntasRaiz, { porHilo = 4, manto = 12 } = {}, seed = 97) {
+  const r = rng(seed);
+  const pts = [];
+  const cols = [];
+  const c0 = new THREE.Color();
+  const c1 = new THREE.Color();
+  const c2 = new THREE.Color();
+  const base = new THREE.Vector3();
+  const mid = new THREE.Vector3();
+  const tip = new THREE.Vector3();
+  const d = new THREE.Vector3();
+  const seg = (a, b, ca, cb) => {
+    pts.push(a.x, a.y, a.z, b.x, b.y, b.z);
+    cols.push(ca.r, ca.g, ca.b, cb.r, cb.g, cb.b);
+  };
+
+  for (const h of hilos) {
+    const curva = curvaHilo(h);
+    const nRam = Math.max(0, Math.round(porHilo * (h.puente ? 1.5 : 1)));
+    for (let k = 0; k < nRam; k++) {
+      curva.getPoint(0.12 + r() * 0.76, base);
+      d.set(r() - 0.5, r() - 0.62, r() - 0.5).normalize(); // leve sesgo a bajar
+      const len = 0.09 + r() * 0.17;
+      mid.copy(base).addScaledVector(d, len * 0.5);
+      mid.y -= len * 0.16;
+      mid.x += (r() - 0.5) * len * 0.3;
+      tip.copy(base).addScaledVector(d, len);
+      tip.y -= len * 0.34;
+      c0.copy(h.color).multiplyScalar(0.5);
+      c1.copy(h.color).multiplyScalar(0.24);
+      c2.copy(h.color).multiplyScalar(0.05);
+      seg(base, mid, c0, c1);
+      seg(mid, tip, c1, c2);
+    }
+  }
+
+  for (const p of puntasRaiz) {
+    for (let k = 0; k < manto; k++) {
+      const az = r() * Math.PI * 2;
+      const el = (r() - 0.35) * Math.PI * 0.9;
+      d.set(Math.cos(az) * Math.cos(el), Math.sin(el), Math.sin(az) * Math.cos(el) * 0.7).normalize();
+      base.copy(p.pos).addScaledVector(d, 0.015 + r() * 0.02);
+      const len = 0.05 + r() * 0.1;
+      mid.copy(base).addScaledVector(d, len * 0.5);
+      // el rizo: la hifa envuelve la punta, no dispara recto
+      mid.x += Math.cos(az + Math.PI / 2) * len * 0.35;
+      mid.z += Math.sin(az + Math.PI / 2) * len * 0.35;
+      tip.copy(base).addScaledVector(d, len * 0.85);
+      tip.x += Math.cos(az + Math.PI / 2) * len * 0.6;
+      tip.z += Math.sin(az + Math.PI / 2) * len * 0.6;
+      c0.copy(PALETA.micelio).lerp(PALETA.arbusculo, 0.35).multiplyScalar(0.5);
+      c1.copy(PALETA.micelio).multiplyScalar(0.3);
+      c2.copy(PALETA.micelioTenue).multiplyScalar(0.08);
+      seg(base, mid, c0, c1);
+      seg(mid, tip, c1, c2);
+    }
+  }
+
+  return geoLineas(pts, cols);
+}
+
+/*
+ * PELOS RADICALES: la borra fina que cubre el tramo bajo de cada raíz. Van con
+ * blending NORMAL (la raíz es materia, no luz): pelitos cortos, radiales al
+ * tubo, con leve caída, del pardo de la raíz a la puntita clara que busca.
+ */
+export function pelosRadicales(raizCurvas, { porRaiz = 14 } = {}, seed = 101) {
+  const r = rng(seed);
+  const pts = [];
+  const cols = [];
+  const p = new THREE.Vector3();
+  const t = new THREE.Vector3();
+  const ay = new THREE.Vector3();
+  const d = new THREE.Vector3();
+  const a = new THREE.Vector3();
+  const b = new THREE.Vector3();
+  const c0 = new THREE.Color();
+  const c1 = new THREE.Color();
+  for (const { curva, r0, arbol } of raizCurvas) {
+    const n = Math.max(2, Math.round(porRaiz * (arbol ? 1.35 : 1)));
+    for (let k = 0; k < n; k++) {
+      const u = 0.3 + r() * 0.68;
+      curva.getPoint(u, p);
+      curva.getTangent(u, t);
+      if (Math.abs(t.y) < 0.9) ay.set(0, 1, 0); else ay.set(1, 0, 0);
+      d.crossVectors(t, ay).normalize();
+      d.applyAxisAngle(t, r() * Math.PI * 2);
+      d.y -= 0.35;
+      d.normalize();
+      const len = 0.04 + r() * 0.07 + r0 * 0.6;
+      a.copy(p).addScaledVector(d, r0 * 0.7 * (1 - u * 0.6));
+      b.copy(a).addScaledVector(d, len);
+      c0.copy(PALETA.raiz).multiplyScalar(0.55);
+      c1.copy(PALETA.raizPunta).multiplyScalar(0.85);
+      pts.push(a.x, a.y, a.z, b.x, b.y, b.z);
+      cols.push(c0.r, c0.g, c0.b, c1.r, c1.g, c1.b);
+    }
+  }
+  return geoLineas(pts, cols);
+}
+
+/*
+ * EL ENTORNO DEL SUELO — la tierra con INFORMACIÓN, no un color plano.
+ *
+ * Tres piezas fundidas en UNA malla (un draw-call, normales preservadas para
+ * que el relieve no salga facetado):
+ *   · la PARED del fondo: relieve fbm, humus cálido arriba → mineral frío en
+ *     la hondura, grietas de oscuridad LOCAL, y la luz de la RED horneada
+ *     encima (cerca del filamento la tierra se enciende; en los huecos, no);
+ *   · el TECHO: la cara de abajo de la capa superficial, colgando en bultos
+ *     (humus, raicillas), con el sol filtrándose apenas hacia el frente;
+ *   · PIEDRAS medio enterradas en la pared: deformadas una a una con fbm y
+ *     pintadas con su panza en penumbra — masa, nunca el icosaedro literal.
+ */
+export function entornoSuelo({ luces = [], seg = 18, piedras = 6 } = {}, seed = 91) {
+  const r = rng(seed);
+  const brillo = PALETA.micelio;
+  const RADIO_LUZ = 1.6;
+  const aplicarGlow = (c, x, y, z, fuerzaMax) => {
+    if (!luces.length) return;
+    let max = 0;
+    for (let i = 0; i < luces.length; i++) {
+      const l = luces[i];
+      const dx = x - l.x;
+      const dy = y - l.y;
+      const dz = z - l.z;
+      const dist = Math.sqrt(dx * dx + dy * dy + dz * dz);
+      const cae = (1 - Math.min(1, dist / RADIO_LUZ)) * l.fuerza;
+      if (cae > max) max = cae;
+    }
+    if (max > 0) c.lerp(brillo, max * max * fuerzaMax);
+  };
+
+  /* la PARED del fondo, con relieve */
+  const anchoP = SUELO.ancho + 6;
+  const altoP = SUELO.hondo + 3.4;
+  const zPared = SUELO.zAtras - 0.55;
+  const pared = new THREE.PlaneGeometry(anchoP, altoP, Math.round(seg * 1.5), seg);
+  pared.translate(0, -altoP / 2 + 2.1, 0);
+  const pp = pared.attributes.position;
+  for (let i = 0; i < pp.count; i++) {
+    const x = pp.getX(i);
+    const y = pp.getY(i);
+    const n = ruidoFbm(x * 0.9 + 7, y * 0.9, 3.1);
+    const n2 = ruidoFbm(x * 2.7 + 31, y * 2.7, 9.7);
+    pp.setZ(i, pp.getZ(i) + (n - 0.5) * 0.5 + (n2 - 0.5) * 0.18);
+  }
+  pared.computeVertexNormals();
+  pared.translate(0, 0, zPared);
+  /*
+   * Los HORIZONTES del perfil, la lección de la vitrina del Ent trasladada al
+   * acuario: humus → zona de raíces → banda micorrízica → roca madre. La
+   * primera versión pintaba la pared con la tierra-fondo (#120c09, casi negro)
+   * y contra la niebla negra la pared entera DESAPARECÍA: el «suelo vivo» se
+   * seguía leyendo como vacío y las piedras quedaban flotando en la nada. Los
+   * horizontes van en penumbra (nunca compiten con la red aditiva) pero se
+   * LEEN; la banda micorrízica sigue siendo la más oscura A PROPÓSITO — es el
+   * fondo contra el que resalta el bioluminiscente, contraste local y no
+   * global. La onda fbm evita horizontes a nivel de albañil.
+   */
+  const HORIZONTES_PARED = [
+    { hasta: -0.55, color: new THREE.Color('#4a3325') }, // humus
+    { hasta: -1.75, color: new THREE.Color('#63492f') }, // zona de raíces
+    { hasta: -3.7, color: new THREE.Color('#3a2c20') }, // banda micorrízica
+    { hasta: -Infinity, color: new THREE.Color('#4d4a55') }, // hacia la roca madre
+  ];
+  const colorHorizontePared = (y) => {
+    for (const h of HORIZONTES_PARED) if (y > h.hasta) return h.color;
+    return HORIZONTES_PARED[HORIZONTES_PARED.length - 1].color;
+  };
+  const fibra = new THREE.Color('#6b4a2a');
+  const arriba = new THREE.Color('#0d1410');
+  pintarPorVertice(pared, (x, y, z, i, c) => {
+    const n = ruidoFbm(x * 2.2 + 13, y * 2.2, z * 2.2);
+    if (y > 0.05) {
+      // por encima de la línea de tierra: la penumbra del mundo de arriba
+      c.copy(PALETA.tierra).lerp(arriba, Math.min(1, (y - 0.05) / 1.6));
+      c.multiplyScalar(0.75 + n * 0.3);
+      return c;
+    }
+    const onda = (ruidoFbm(x * 0.42 + 21, 0, z * 0.42) - 0.5) * 0.5;
+    c.copy(colorHorizontePared(y + onda));
+    // penumbra con grano: la oscuridad fuerte es LOCAL (grieta), no global.
+    // El rango se calibró con la pared en rojo puro (test empírico): por
+    // debajo de ~0.8 la tierra parda cae bajo el umbral visible contra la
+    // niebla negra y el perfil entero desaparece.
+    c.multiplyScalar(0.85 + n * 0.85);
+    if (n > 0.72) c.lerp(fibra, (n - 0.72) * 1.1);
+    // compensación de niebla: el pie de la pared queda más lejos de la cámara
+    // y la niebla se lo comía a negro — se le devuelve lo que la niebla quita
+    c.multiplyScalar(1 + 0.4 * Math.min(1, Math.max(0, (-y - 2.6) / 3.2)));
+    // viñeteo: lejos del centro, la tierra cae en sombra y el ojo va a la red
+    c.multiplyScalar(1 - 0.35 * Math.min(1, Math.max(0, (Math.abs(x) - 3.4) / 3)));
+    aplicarGlow(c, x, y, z, 0.55);
+    return c;
+  });
+
+  /* el TECHO: la capa superficial vista desde abajo, colgando en bultos */
+  const profT = SUELO.z0 - SUELO.zAtras + 1.3;
+  const techo = new THREE.PlaneGeometry(
+    SUELO.ancho + 3, profT,
+    Math.round(seg * 1.4), Math.max(4, Math.round(seg * 0.4)),
+  );
+  techo.rotateX(Math.PI / 2); // queda en XZ mirando hacia abajo (−y)
+  techo.translate(0, 0, SUELO.zAtras + (SUELO.z0 - SUELO.zAtras) / 2 - 0.25);
+  const tp = techo.attributes.position;
+  for (let i = 0; i < tp.count; i++) {
+    const x = tp.getX(i);
+    const z = tp.getZ(i);
+    const n = ruidoFbm(x * 1.7 + 3, 0.5, z * 1.7);
+    tp.setY(i, tp.getY(i) - 0.02 - n * 0.16);
+  }
+  techo.computeVertexNormals();
+  const humusTecho = PALETA.tierraAlta.clone().lerp(new THREE.Color('#4a3325'), 0.5);
+  const solTecho = new THREE.Color('#3d2c17');
+  const frioTecho = new THREE.Color('#233a32');
+  pintarPorVertice(techo, (x, y, z, i, c) => {
+    const n = ruidoFbm(x * 3.1 + 23, y * 3.1, z * 3.1);
+    c.copy(humusTecho).multiplyScalar(1.0 + n * 0.7);
+    // hacia el frente (z0) el sol de arriba se filtra apenas
+    const sol = Math.max(0, (z - SUELO.zAtras) / (SUELO.z0 - SUELO.zAtras));
+    c.lerp(solTecho, Math.min(1, sol) * 0.45);
+    // el bulto que cuelga atrapa la luz fría del subsuelo
+    c.lerp(frioTecho, Math.min(0.35, Math.max(0, -y - 0.08) * 1.6));
+    aplicarGlow(c, x, y, z, 0.4);
+    return c;
+  });
+
+  /* PIEDRAS medio enterradas en la pared (cada una deformada con su semilla) */
+  const partes = [pared, techo];
+  const v = new THREE.Vector3();
+  for (let i = 0; i < piedras; i++) {
+    const radio = 0.16 + r() * 0.26;
+    const g = new THREE.IcosahedronGeometry(radio, 1);
+    const gp = g.attributes.position;
+    const sem = r() * 40;
+    for (let k = 0; k < gp.count; k++) {
+      v.fromBufferAttribute(gp, k);
+      const n = ruidoFbm(v.x * 3.4 + sem, v.y * 3.4, v.z * 3.4) - 0.5;
+      v.multiplyScalar(1 + n * 0.5);
+      gp.setXYZ(k, v.x, v.y, v.z);
+    }
+    g.computeVertexNormals();
+    // confinadas a la franja donde la pared se LEE: una piedra sobre fondo
+    // negro no es una piedra enterrada, es un grumo flotando
+    const x = (r() - 0.5) * (SUELO.ancho + 2);
+    const y = -0.7 - r() * 2.5;
+    const zC = zPared + 0.2 + radio * 0.35;
+    g.translate(x, y, zC);
+    pintarPorVertice(g, (px, py, pz, k2, c) => {
+      const n = ruidoFbm(px * 4.2 + 17, py * 4.2, pz * 4.2);
+      c.copy(PALETA.piedra).multiplyScalar(0.75 + n * 0.7);
+      // la panza que mira al fondo queda en penumbra (media enterrada)
+      c.multiplyScalar(0.7 + 0.3 * Math.min(1, Math.max(0, (pz - zPared) / radio)));
+      aplicarGlow(c, px, py, pz, 0.5);
+      return c;
+    });
+    partes.push(g);
+  }
+
+  return fusionarSeguro(partes, 'entorno-suelo-vivo', { preservarNormales: true });
+}
+
+/* Una hoja de maíz: lámina arqueada con canal central, filo ondulado y punta
+   afinada. Nace en +y; se orienta al colocarla. */
+function hojaMaiz(largo, ancho, arco, semilla) {
+  const g = new THREE.PlaneGeometry(ancho, largo, 2, 8);
+  const gp = g.attributes.position;
+  for (let i = 0; i < gp.count; i++) {
+    const x = gp.getX(i);
+    const y = gp.getY(i);
+    const t = y / largo + 0.5; // 0 base → 1 punta
+    const filo = Math.sin(t * Math.PI * 3 + semilla) * 0.008 * t;
+    const canal = (1 - Math.abs(x) / (ancho / 2)) * 0.018;
+    gp.setXYZ(i, (x + filo) * (1 - t * 0.75), y, t * t * arco + canal * (1 - t));
+  }
+  g.computeVertexNormals();
+  return g;
+}
+
+/* Una hoja redonda (fríjol/ahuyama): disco lobulado, abombado, de borde caído. */
+function hojaRedonda(radio, lobulos, domo, semilla) {
+  const g = new THREE.CircleGeometry(radio, 16);
+  const gp = g.attributes.position;
+  for (let i = 0; i < gp.count; i++) {
+    let x = gp.getX(i);
+    let y = gp.getY(i);
+    const rad = Math.sqrt(x * x + y * y);
+    if (rad > 1e-6) {
+      const ang = Math.atan2(y, x);
+      const lob = 1 + (lobulos ? Math.sin(ang * lobulos + semilla) * 0.13 : 0);
+      const esc = lob * (1 + (ruidoFbm(Math.cos(ang) * 2 + semilla, Math.sin(ang) * 2, 0.5) - 0.5) * 0.18);
+      x *= esc;
+      y *= esc;
+    }
+    const t = Math.min(1, rad / radio);
+    gp.setXYZ(i, x, y, -(t * t) * domo);
+  }
+  g.computeVertexNormals();
+  return g;
+}
+
+/* Coloca una geometría: la escala, la orienta (+y hacia `dir`, con giro) y la
+   traslada. Versión local de `apuntar` (evita ampliar la superficie pública
+   del taller por una necesidad de este módulo). */
+function plantar(g, pos, dir, giro = 0) {
+  const d = new THREE.Vector3(dir[0], dir[1], dir[2]).normalize();
+  const q = new THREE.Quaternion().setFromUnitVectors(new THREE.Vector3(0, 1, 0), d);
+  if (giro) q.multiply(new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0, 1, 0), giro));
+  const m = new THREE.Matrix4().compose(
+    new THREE.Vector3(pos[0], pos[1], pos[2]), q, new THREE.Vector3(1, 1, 1),
+  );
+  g.applyMatrix4(m);
+  return g;
+}
+
+/*
+ * LAS HOJAS de la superficie — reemplazan los conos facetados (`flatShading`)
+ * de la versión anterior, que eran exactamente la estética prohibida. Cada
+ * planta recibe su hoja de verdad: el maíz sus láminas arqueadas, el fríjol
+ * sus foliolos redondos, la ahuyama sus hojas anchas lobuladas a ras de
+ * tierra. Una sola malla fundida, gradiente horneado (penumbra en la base →
+ * sol en la punta, vena central más oscura).
+ */
+export function hojasSuperficie(seed = 103) {
+  const r = rng(seed);
+  const partes = [];
+  const sol = new THREE.Color('#d8e07a');
+  for (const t of tallosSuperficie()) {
+    const cBase = new THREE.Color(t.tinte).multiplyScalar(0.62);
+    const cSol = new THREE.Color(t.tinte).lerp(sol, 0.42);
+    const pintarHojaLarga = (g, largo, ancho) => pintarPorVertice(g, (x, y, z, i, c) => {
+      const u = y / largo + 0.5;
+      c.copy(cBase).lerp(cSol, u * 0.75);
+      const n = ruidoFbm(x * 9 + seed, y * 9, z * 9);
+      c.multiplyScalar(0.8 + n * 0.35);
+      if (Math.abs(x) < ancho * 0.09) c.multiplyScalar(0.82); // la vena central
+      return c;
+    });
+    const pintarHojaRedonda = (g, radio) => pintarPorVertice(g, (x, y, z, i, c) => {
+      const rad = Math.min(1, Math.sqrt(x * x + y * y + z * z) / (radio * 1.15));
+      c.copy(cSol).lerp(cBase, rad * 0.85); // nervaduras claras al centro
+      const n = ruidoFbm(x * 7 + seed * 2, y * 7, z * 7);
+      c.multiplyScalar(0.82 + n * 0.3);
+      return c;
+    });
+    if (t.id === 'maiz') {
+      for (let k = 0; k < 4; k++) {
+        const largo = 0.42 + r() * 0.22;
+        const ancho = 0.075;
+        const g = hojaMaiz(largo, ancho, 0.2 + r() * 0.12, r() * 9);
+        pintarHojaLarga(g, largo, ancho);
+        const az = k * 2.4 + r() * 0.5;
+        const lean = 0.55 + r() * 0.45;
+        plantar(
+          g,
+          [t.x + Math.cos(az) * 0.05, 0.28 + (k / 4) * t.alto * 0.62 + r() * 0.06, t.z + Math.sin(az) * 0.05],
+          [Math.cos(az) * Math.sin(lean), Math.cos(lean), Math.sin(az) * Math.sin(lean)],
+          r() * Math.PI,
+        );
+        partes.push(g);
+      }
+    } else if (t.ahuyama) {
+      for (let k = 0; k < 2; k++) {
+        const radio = 0.19 + r() * 0.06;
+        const g = hojaRedonda(radio, 5, 0.06, r() * 9);
+        pintarHojaRedonda(g, radio);
+        g.rotateX(-Math.PI / 2 + (r() - 0.5) * 0.5);
+        g.rotateY(r() * Math.PI * 2);
+        g.translate(t.x + (r() - 0.5) * 0.42, 0.1 + r() * 0.12, t.z + (r() - 0.5) * 0.3);
+        partes.push(g);
+      }
+    } else {
+      for (let k = 0; k < 3; k++) {
+        const radio = 0.08 + r() * 0.025;
+        const g = hojaRedonda(radio, 0, 0.035, r() * 9);
+        pintarHojaRedonda(g, radio);
+        g.rotateX(-Math.PI / 2 + (r() - 0.5) * 0.7);
+        g.rotateY(r() * Math.PI * 2);
+        g.translate(t.x + (r() - 0.5) * 0.2, 0.25 + k * 0.2 + r() * 0.06, t.z + (r() - 0.5) * 0.16);
+        partes.push(g);
+      }
+    }
+  }
+  return fusionarSeguro(partes, 'hojas-superficie', { preservarNormales: true });
 }
