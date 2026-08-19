@@ -99,7 +99,7 @@ const SUELTA_MIRADA_MS = 1900;
  * quieto ~2s lo suelta. DOM directo vía ref (React no administra estos
  * attrs): cero re-renders por mover el mouse.
  *
- * @param {{ current: Element|null }} ref  el nodo raíz del bicho (svg o g).
+ * @param {{ current: HTMLElement|null }} ref  el nodo raíz del bicho (div, svg o g).
  * @param {boolean} activo  gate ya resuelto (vivo && tier !== 'bajo').
  */
 export function useMiradaUsted(ref, activo) {
