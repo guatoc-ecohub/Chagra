@@ -55,7 +55,11 @@ export function Zariguya({
   title = 'Zarigüeya (chucha)',
   /* Pose de VIDA (idle-life), species-agnostic (gestos rh-g-* de creatures.css):
      'anda' (base) | 'celebra' | 'reposo' | 'señala'. Solo corren viva
-     (animated); con animated=false o reduced-motion queda en fotograma digno. */
+     (animated); con animated=false o reduced-motion queda en fotograma digno.
+     ── 'camina' (MARCHA): el host la pide cuando la chucha SE DESPLAZA. Ciclo
+     de paso bípedo real (zari-* en creatures.css): las patas traseras alternan
+     desde la cadera, el cuerpo boya 2 veces por ciclo, la cola barre de
+     contrapeso y las crías se mecen con el vaivén — nada de translateX falso. */
   pose = 'anda',
   animo = 'sereno',
   energia = 1,
@@ -239,10 +243,14 @@ export function Zariguya({
       </g>
 
       {/* patas traseras PLANTÍGRADAS (apoya toda la planta: no anda de puntas),
-          con el pie claro y el halux separado. Sostienen el cuerpo erguido. */}
-      <Miembro d="M-4.6,10.2 C-5.4,11.9 -5.6,13.0 -5.2,13.8" ancho={3.2}
+          con el pie claro y el halux separado. Sostienen el cuerpo erguido.
+          Grupos nombrados (zari-pierna-*): en pose 'camina' alternan el paso
+          desde la cadera — mismo contrato que las piernas del oso del bastón. */}
+      <Miembro clase="zari-pierna-i" origen="top center"
+        d="M-4.6,10.2 C-5.4,11.9 -5.6,13.0 -5.2,13.8" ancho={3.2}
         punta={[-5.2, 14.1]} puntaR={2.0} pie sway={vivo} delay={-0.8} glove={P.mitones} />
-      <Miembro d="M0.6,10.8 C1.2,12.4 1.3,13.4 0.9,14.0" ancho={3.0}
+      <Miembro clase="zari-pierna-d" origen="top center"
+        d="M0.6,10.8 C1.2,12.4 1.3,13.4 0.9,14.0" ancho={3.0}
         punta={[0.9, 14.3]} puntaR={1.9} pie sway={vivo} delay={-1.1} glove={P.mitones} />
 
       {/* ── TRONCO EN PERA INCLINADA (masa DIAGONAL — el contraste con el

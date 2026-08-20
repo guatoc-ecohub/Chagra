@@ -41,7 +41,12 @@ export function AbejaAngelita({
      `creatures.css` (keyframes rh-celebra / rh-reposo / rh-senala) y solo se
      activan cuando la creature está viva (animated); con animated=false o
      reduced-motion la abeja queda en fotograma digno (bracitos colgando,
-     sonriendo). Solo cambia CSS por data-pose: consumidores viejos no notan nada. */
+     sonriendo). Solo cambia CSS por data-pose: consumidores viejos no notan nada.
+     ── 'camina' (MARCHA): el host la pide cuando la angelita SE DESPLAZA a pie.
+     Las patitas alternan el paso desde la cadera, el cuerpo boya 2 veces por
+     ciclo a ras de suelo y los bracitos acompañan en contratiempo; las alitas
+     bajan a un temblor corto (caminar volando sería patinar en el aire).
+     Ciclo ang-* en creatures.css — nada de translateX falso. */
   pose = 'vuela',
   /* ── REACTIVIDAD AL ESTADO REAL DE LA FINCA (auditoría §5b) ────────────────
      El repertorio de reacción que la escena deriva de la finca (reaccionFinca).
@@ -259,9 +264,13 @@ export function AbejaAngelita({
       <ellipse className={wing} style={alaStyle2} cx="-0.4" cy="-5.2"
         rx="6.6" ry="2.7" fill={ABEJA_PALETA.alaTulClara} opacity="0.44" stroke="rgba(42,26,12,0.28)" strokeWidth="0.45" />
 
-      {/* patitas manguera con pie crema (detrás del tronco, se mecen suave) */}
-      <Miembro d="M-2.6,4.4 C-3.2,6.6 -3.4,8 -3.0,9.2" ancho={1.9} punta={[-3.0, 9.4]} puntaR={1.3} pie sway={vivo} delay={-0.6} />
-      <Miembro d="M1.8,4.7 C1.4,6.8 1.3,8.2 1.8,9.4" ancho={1.9} punta={[1.8, 9.6]} puntaR={1.3} pie sway={vivo} delay={-0.95} />
+      {/* patitas manguera con pie crema (detrás del tronco, se mecen suave).
+          Nombradas (ang-pierna-*): en pose 'camina' alternan el paso desde la
+          cadera — mismo contrato que las piernas del oso del bastón. */}
+      <Miembro clase="ang-pierna-i" origen="top center"
+        d="M-2.6,4.4 C-3.2,6.6 -3.4,8 -3.0,9.2" ancho={1.9} punta={[-3.0, 9.4]} puntaR={1.3} pie sway={vivo} delay={-0.6} />
+      <Miembro clase="ang-pierna-d" origen="top center"
+        d="M1.8,4.7 C1.4,6.8 1.3,8.2 1.8,9.4" ancho={1.9} punta={[1.8, 9.6]} puntaR={1.3} pie sway={vivo} delay={-0.95} />
 
       {/* ABDOMEN ámbar PÁLIDO, esbelto y LISO: SIN las tres barras verticales
           oscuras (esas eran la firma de la Apis europea). Remata redondo — SIN

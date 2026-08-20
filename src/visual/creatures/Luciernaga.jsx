@@ -50,7 +50,12 @@ export function Luciernaga({
   animated = true,
   title = 'Luciérnaga (cocuyo)',
   /* Pose de VIDA (idle-life), species-agnostic (gestos rh-g-* de creatures.css):
-     'vuela' (base, flota) | 'celebra' | 'reposo' | 'señala'. */
+     'vuela' (base, flota) | 'celebra' | 'reposo' | 'señala'.
+     ── 'camina' (MARCHA): el host la pide cuando el cocuyo SE DESPLAZA a pie.
+     ATERRIZA (el flote del vuelo cede a un bob de suelo) y las seis patas
+     ciclan en TRÍPODE alternado de insecto — tras-izq+media-der+brazo-izq
+     contra tras-der+media-izq+brazo-der (luci-* en creatures.css). Las alas
+     bajan a un temblor leve: caminar volando sería moonwalk en el aire. */
   pose = 'vuela',
   animo = 'sereno',
   energia = 1,
@@ -174,16 +179,27 @@ export function Luciernaga({
         </g>
       </g>
 
-      {/* PATAS (6 en total con las delanteras): traseras + medias, con sus puntas */}
+      {/* PATAS (6 en total con las delanteras): traseras + medias. Cada una en
+          su GRUPO nombrado con el pivote en la inserción al cuerpo (fill-box):
+          en pose 'camina' alternan en trípode de insecto; el resto del tiempo
+          quedan exactamente como estaban (mismo trazo, misma punta). */}
       <g stroke={P.tinta} strokeWidth="8.5" strokeLinecap="round" fill="none" aria-hidden="true">
-        <path d="M-26,102 C -50,118 -64,142 -62,164" />
-        <path d="M26,102 C 50,118 64,142 62,164" />
-        <path d="M-52,56 C -86,66 -110,72 -124,64" />
-        <path d="M52,56 C 86,66 110,72 124,64" />
-      </g>
-      <g fill={P.tinta} aria-hidden="true">
-        <circle cx="-62" cy="166" r="4.2" /><circle cx="62" cy="166" r="4.2" />
-        <circle cx="-125" cy="64" r="4.2" /><circle cx="125" cy="64" r="4.2" />
+        <g className="luci-pata luci-pata-ti" style={{ transformBox: 'fill-box', transformOrigin: 'right top' }}>
+          <path d="M-26,102 C -50,118 -64,142 -62,164" />
+          <circle cx="-62" cy="166" r="4.2" fill={P.tinta} stroke="none" />
+        </g>
+        <g className="luci-pata luci-pata-td" style={{ transformBox: 'fill-box', transformOrigin: 'left top' }}>
+          <path d="M26,102 C 50,118 64,142 62,164" />
+          <circle cx="62" cy="166" r="4.2" fill={P.tinta} stroke="none" />
+        </g>
+        <g className="luci-pata luci-pata-mi" style={{ transformBox: 'fill-box', transformOrigin: 'right top' }}>
+          <path d="M-52,56 C -86,66 -110,72 -124,64" />
+          <circle cx="-125" cy="64" r="4.2" fill={P.tinta} stroke="none" />
+        </g>
+        <g className="luci-pata luci-pata-md" style={{ transformBox: 'fill-box', transformOrigin: 'left top' }}>
+          <path d="M52,56 C 86,66 110,72 124,64" />
+          <circle cx="125" cy="64" r="4.2" fill={P.tinta} stroke="none" />
+        </g>
       </g>
 
       {/* ÉLITROS (alas endurecidas): cuerpo MACIZO y compacto de altura fría. */}

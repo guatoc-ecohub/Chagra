@@ -96,3 +96,5 @@ chagra-anthropic-judge-key
 # 280+ archivos vanilla (three r160, su propio importmap). Se re-sincroniza en
 # cada build; commitearlo lo dejaría stale y duplicaría el peso del repo.
 /public/valle/
+dist-comparador
+.vite-comparador

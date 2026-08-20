@@ -70,7 +70,75 @@ const ESTADO_DE_STATE = {
   thinking: 'idle',
   speaking: 'hablar',
   listening: 'idle',
+  caminando: 'camina',
 };
+
+/* ── MARCHA (estado 'camina') ────────────────────────────────────────────────
+   El rig F24 de la guacamaya NO trae patas (vive flotando) — para caminar se
+   le prestan dos PATAS MANGUERA del lenguaje de la casa (tubo de tinta + pie
+   crema), dibujadas DETRÁS del cuerpo y ocultas fuera de 'camina': la piel
+   aprobada no se toca. En 'camina' el flote cede a un bob de suelo y el
+   cuerpo hace el BAMBOLEO de loro (roll lateral en contratiempo del paso)
+   mientras las patas alternan desde la cadera — ciclo real por hueso, sin
+   translateX ni espejos. Keyframes con prefijo gcp- (únicos en light DOM). */
+const TINTA_RIG = '#2a140b';
+const PIE_CREMA = '#e8dcc0';
+const CSS_MARCHA = `
+svg[data-creature='guacamaya'] .gcp-marcha { opacity: 0; }
+svg[data-creature='guacamaya'][data-estado='camina'] .gcp-marcha { opacity: 1; transition: opacity .25s; }
+svg[data-creature='guacamaya'][data-estado='camina'] .flota {
+  animation: gcp-suelo-bob 1.1s ease-in-out infinite;
+}
+@keyframes gcp-suelo-bob {
+  0%, 100% { transform: translateY(14px) rotate(-2.4deg); }
+  25%      { transform: translateY(6px) rotate(0deg); }
+  50%      { transform: translateY(14px) rotate(2.4deg); }
+  75%      { transform: translateY(6px) rotate(0deg); }
+}
+.gcp-pata { transform-box: fill-box; }
+.gcp-pata-i { transform-origin: top center; }
+.gcp-pata-d { transform-origin: top center; }
+svg[data-creature='guacamaya'][data-estado='camina'] .gcp-pata-i {
+  animation: gcp-paso-i 1.1s ease-in-out infinite;
+}
+svg[data-creature='guacamaya'][data-estado='camina'] .gcp-pata-d {
+  animation: gcp-paso-d 1.1s ease-in-out infinite;
+}
+@keyframes gcp-paso-i {
+  0%, 100% { transform: rotate(19deg); }
+  50%      { transform: rotate(-19deg); }
+}
+@keyframes gcp-paso-d {
+  0%, 100% { transform: rotate(-19deg); }
+  50%      { transform: rotate(19deg); }
+}
+@media (prefers-reduced-motion: reduce) {
+  svg[data-creature='guacamaya'][data-estado='camina'] .flota,
+  svg[data-creature='guacamaya'][data-estado='camina'] .gcp-pata-i,
+  svg[data-creature='guacamaya'][data-estado='camina'] .gcp-pata-d { animation: none; }
+}
+`;
+
+/* Dos patas manguera de loro: nacen bajo la panza, a los lados del abanico de
+   la cola (que nace en y≈132 al centro), y bajan al suelo del encuadre. */
+function PatasMarcha() {
+  return (
+    <g className="gcp-marcha" aria-hidden="true">
+      <g className="gcp-pata gcp-pata-i">
+        <path d="M-52,160 C -58,205 -60,245 -56,278" fill="none"
+          stroke={TINTA_RIG} strokeWidth="22" strokeLinecap="round" />
+        <ellipse cx="-58" cy="285" rx="27" ry="14" fill={PIE_CREMA}
+          stroke={TINTA_RIG} strokeWidth="6" />
+      </g>
+      <g className="gcp-pata gcp-pata-d">
+        <path d="M52,160 C 58,205 60,245 56,278" fill="none"
+          stroke={TINTA_RIG} strokeWidth="22" strokeLinecap="round" />
+        <ellipse cx="58" cy="285" rx="27" ry="14" fill={PIE_CREMA}
+          stroke={TINTA_RIG} strokeWidth="6" />
+      </g>
+    </g>
+  );
+}
 
 /**
  * GuacamayaCompai — cuerpo 2.5D del compañero elegible. Mismas props base
@@ -107,8 +175,13 @@ export function GuacamayaCompai({
     >
       <title>{title}</title>
       {css && <style>{css}</style>}
+      <style>{CSS_MARCHA}</style>
       {/* rig reusado del valle (F24), no redibujado — ver nota de arriba */}
       <g dangerouslySetInnerHTML={{ __html: marcado }} />
+      {/* patas de la marcha DESPUÉS del rig: capa correcta de loro (patas
+          delante de la cola larga) — y el contrato del test del rig ("el
+          primer <g> es el marcado inlineado") queda intacto */}
+      <PatasMarcha />
     </svg>
   );
 }
