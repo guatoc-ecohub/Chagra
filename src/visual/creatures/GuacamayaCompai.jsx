@@ -88,29 +88,40 @@ svg[data-creature='guacamaya'] .gcp-marcha { opacity: 0; }
 svg[data-creature='guacamaya'][data-estado='camina'] .gcp-marcha { opacity: 1; transition: opacity .25s; }
 svg[data-creature='guacamaya'][data-estado='camina'] .flota {
   animation: gcp-suelo-bob 1.1s ease-in-out infinite;
+  transform-box: fill-box;
+  transform-origin: center bottom;
 }
+/* El BAMBOLEO de loro al compás COMPLETO: dos botes por ciclo con el roll
+   ALTERNADO sobre la pata de apoyo — el waddle ES la lectura del loro que
+   camina; el ±2.4° simétrico anterior no alcanzaba a leerse a 300px. */
 @keyframes gcp-suelo-bob {
-  0%, 100% { transform: translateY(14px) rotate(-2.4deg); }
-  25%      { transform: translateY(6px) rotate(0deg); }
-  50%      { transform: translateY(14px) rotate(2.4deg); }
-  75%      { transform: translateY(6px) rotate(0deg); }
+  0%   { transform: translateY(16px) rotate(4deg); }    /* impacto sobre el apoyo */
+  12%  { transform: translateY(24px) rotate(3.2deg); }  /* squash del peso */
+  32%  { transform: translateY(-10px) rotate(1.2deg); } /* pasa por encima */
+  50%  { transform: translateY(16px) rotate(-4deg); }   /* cambio de peso */
+  62%  { transform: translateY(24px) rotate(-3.2deg); }
+  82%  { transform: translateY(-10px) rotate(-1.2deg); }
+  100% { transform: translateY(16px) rotate(4deg); }
 }
 .gcp-pata { transform-box: fill-box; }
 .gcp-pata-i { transform-origin: top center; }
 .gcp-pata-d { transform-origin: top center; }
+/* UNA zancada real con fase de VUELO (la pata se LEVANTA del suelo); la
+   contraria corre el mismo ciclo a -T/2. El ±19° pendular anterior dejaba
+   los dos pies plantados — el gate de Cuphead lo leyó como «parado». */
 svg[data-creature='guacamaya'][data-estado='camina'] .gcp-pata-i {
-  animation: gcp-paso-i 1.1s ease-in-out infinite;
+  animation: gcp-zancada 1.1s ease-in-out infinite;
 }
 svg[data-creature='guacamaya'][data-estado='camina'] .gcp-pata-d {
-  animation: gcp-paso-d 1.1s ease-in-out infinite;
+  animation: gcp-zancada 1.1s ease-in-out -0.55s infinite;
 }
-@keyframes gcp-paso-i {
-  0%, 100% { transform: rotate(19deg); }
-  50%      { transform: rotate(-19deg); }
-}
-@keyframes gcp-paso-d {
-  0%, 100% { transform: rotate(-19deg); }
-  50%      { transform: rotate(19deg); }
+@keyframes gcp-zancada {
+  0%   { transform: translateY(0) rotate(-30deg); }     /* CONTACTO adelante */
+  45%  { transform: translateY(0) rotate(26deg); }      /* APOYO: empuja atrás */
+  60%  { transform: translateY(-30px) rotate(15deg); }  /* DESPEGUE */
+  78%  { transform: translateY(-52px) rotate(-20deg); } /* VUELO: pata alta */
+  94%  { transform: translateY(-14px) rotate(-33deg); } /* overshoot */
+  100% { transform: translateY(0) rotate(-30deg); }     /* PLANTA */
 }
 @media (prefers-reduced-motion: reduce) {
   svg[data-creature='guacamaya'][data-estado='camina'] .flota,

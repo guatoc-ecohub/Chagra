@@ -60,28 +60,40 @@ const CSS_MARCHA = `
 svg[data-creature='chivito-punk'] .chp-marcha { opacity: 0; }
 svg[data-creature='chivito-punk'][data-estado='camina'] .chp-marcha { opacity: 1; transition: opacity .25s; }
 svg[data-creature='chivito-punk'][data-estado='camina'] .flota {
-  animation: chp-suelo-bob 0.45s ease-in-out infinite;
+  animation: chp-suelo-bob 0.9s ease-in-out infinite;
+  transform-box: fill-box;
+  transform-origin: center bottom;
 }
+/* Cuerpo al compás COMPLETO del paso: dos botes con el ladeo ALTERNADO sobre
+   la patita de apoyo — peso que se desplaza, no un temblor simétrico. */
 @keyframes chp-suelo-bob {
-  0%, 100% { transform: translateY(9px); }
-  50%      { transform: translateY(0); }
+  0%   { transform: translateY(12px) rotate(2.8deg); }  /* impacto sobre el apoyo */
+  12%  { transform: translateY(16px) rotate(2.2deg); }  /* squash */
+  32%  { transform: translateY(-8px) rotate(0.8deg); }  /* pasa por encima */
+  50%  { transform: translateY(12px) rotate(-2.8deg); } /* cambio de peso */
+  62%  { transform: translateY(16px) rotate(-2.2deg); }
+  82%  { transform: translateY(-8px) rotate(-0.8deg); }
+  100% { transform: translateY(12px) rotate(2.8deg); }
 }
 .chp-pata { transform-box: fill-box; }
 .chp-pata-i { transform-origin: top center; }
 .chp-pata-d { transform-origin: top center; }
+/* UNA zancada real con fase de VUELO (el pie se LEVANTA del suelo); la pata
+   contraria corre el mismo ciclo a -T/2. El ±22° pendular anterior dejaba los
+   dos mitones plantados y el gate de Cuphead lo leyó como «parado». */
 svg[data-creature='chivito-punk'][data-estado='camina'] .chp-pata-i {
-  animation: chp-paso-i 0.9s ease-in-out infinite;
+  animation: chp-zancada 0.9s ease-in-out infinite;
 }
 svg[data-creature='chivito-punk'][data-estado='camina'] .chp-pata-d {
-  animation: chp-paso-d 0.9s ease-in-out infinite;
+  animation: chp-zancada 0.9s ease-in-out -0.45s infinite;
 }
-@keyframes chp-paso-i {
-  0%, 100% { transform: rotate(22deg); }
-  50%      { transform: rotate(-22deg); }
-}
-@keyframes chp-paso-d {
-  0%, 100% { transform: rotate(-22deg); }
-  50%      { transform: rotate(22deg); }
+@keyframes chp-zancada {
+  0%   { transform: translateY(0) rotate(-32deg); }     /* CONTACTO adelante */
+  45%  { transform: translateY(0) rotate(28deg); }      /* APOYO: empuja atrás */
+  60%  { transform: translateY(-18px) rotate(16deg); }  /* DESPEGUE */
+  78%  { transform: translateY(-30px) rotate(-22deg); } /* VUELO: patita alta */
+  94%  { transform: translateY(-8px) rotate(-35deg); }  /* overshoot */
+  100% { transform: translateY(0) rotate(-32deg); }     /* PLANTA */
 }
 @media (prefers-reduced-motion: reduce) {
   svg[data-creature='chivito-punk'][data-estado='camina'] .flota,

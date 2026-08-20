@@ -165,25 +165,33 @@
   transform-box: fill-box;
   transform-origin: center bottom;
 }
+/* Peso que se desplaza: dos botes por ciclo, ladeo ALTERNADO con la patita de
+   apoyo (ciclo completo) — a medio ciclo la silueta cambia de verdad. */
 @keyframes ang-camina-cuerpo {
-  0%, 100% { transform: translateY(0.9px) rotate(-1.3deg); }
-  25%      { transform: translateY(-0.5px) rotate(0deg); }
-  50%      { transform: translateY(0.9px) rotate(1.3deg); }
-  75%      { transform: translateY(-0.5px) rotate(0deg); }
+  0%   { transform: translateY(0.4px) rotate(3deg); }    /* impacto sobre el apoyo */
+  12%  { transform: translateY(0.8px) rotate(2.4deg); }  /* squash del peso */
+  32%  { transform: translateY(-1.4px) rotate(1deg); }   /* pasa por encima */
+  50%  { transform: translateY(0.4px) rotate(-3deg); }   /* cambio de peso */
+  62%  { transform: translateY(0.8px) rotate(-2.4deg); }
+  82%  { transform: translateY(-1.4px) rotate(-1deg); }
+  100% { transform: translateY(0.4px) rotate(3deg); }
 }
+/* UNA zancada real con fase de VUELO (la patita se LEVANTA del suelo); la
+   contraria corre el mismo ciclo a -T/2. El ±26° pendular anterior dejaba los
+   dos pies plantados — se leía quieta. */
 [data-creature='abeja-angelita'][data-pose='camina'] .ang-pierna-i {
-  animation: ang-paso-i 1s ease-in-out infinite;
+  animation: ang-zancada 1s ease-in-out infinite;
 }
 [data-creature='abeja-angelita'][data-pose='camina'] .ang-pierna-d {
-  animation: ang-paso-d 1s ease-in-out infinite;
+  animation: ang-zancada 1s ease-in-out -0.5s infinite;
 }
-@keyframes ang-paso-i {
-  0%, 100% { transform: rotate(26deg); }
-  50%      { transform: rotate(-26deg); }
-}
-@keyframes ang-paso-d {
-  0%, 100% { transform: rotate(-26deg); }
-  50%      { transform: rotate(26deg); }
+@keyframes ang-zancada {
+  0%   { transform: translateY(0) rotate(-32deg); }      /* CONTACTO adelante */
+  45%  { transform: translateY(0) rotate(28deg); }       /* APOYO: empuja atrás */
+  60%  { transform: translateY(-1px) rotate(16deg); }    /* DESPEGUE */
+  78%  { transform: translateY(-1.7px) rotate(-22deg); } /* VUELO: patita alta */
+  94%  { transform: translateY(-0.5px) rotate(-35deg); } /* overshoot */
+  100% { transform: translateY(0) rotate(-32deg); }      /* PLANTA */
 }
 [data-creature='abeja-angelita'][data-pose='camina'] .crt-brazo-l {
   animation: ang-brazo-camina 1s ease-in-out infinite;
@@ -192,8 +200,8 @@
   animation: ang-brazo-camina 1s ease-in-out -0.5s infinite;
 }
 @keyframes ang-brazo-camina {
-  0%, 100% { transform: rotate(-8deg); }
-  50%      { transform: rotate(10deg); }
+  0%, 100% { transform: rotate(-13deg); }
+  50%      { transform: rotate(15deg); }
 }
 /* la marcha manda: antic/travieso fuera mientras camina */
 [data-creature='abeja-angelita'][data-pose='camina'] .rh-antic,
@@ -1630,23 +1638,37 @@
 [data-creature='jaguar'][data-pose='camina'] .jaguar-lado-tl { animation: jaguar-paso-lado 1.05s ease-in-out -0.14s infinite; }
 [data-creature='jaguar'][data-pose='camina'] .jaguar-lado-tc { animation: jaguar-paso-lado 1.05s ease-in-out -0.52s infinite; }
 [data-creature='jaguar'][data-pose='camina'] .jaguar-lado-dl { animation: jaguar-paso-lado 1.05s ease-in-out -0.66s infinite; }
+/* ZANCADA con fase de VUELO (no péndulo): apoyo largo que empuja atrás con el
+   pie al piso (0→68%) y despegue→vuelo alto→plantado (68→100%) con la pata
+   LEVANTADA del suelo — en todo momento hay una garra en el aire, la seña que
+   pide el gate de Cuphead. Unidades del rig lateral (scale 0.08): 38px acá
+   son ~25px de pantalla a 300px de render. */
 @keyframes jaguar-paso-lado {
-  0%, 100% { transform: rotate(14deg); }  /* zancada atrás: el apoyo que empuja */
-  50%      { transform: rotate(-15deg); } /* al frente: el vuelo del paso */
+  0%   { transform: translateY(0) rotate(-24deg); }    /* CONTACTO: alcanza adelante */
+  68%  { transform: translateY(0) rotate(22deg); }     /* APOYO: empuja hasta atrás */
+  76%  { transform: translateY(-30px) rotate(10deg); } /* DESPEGUE: la garra se despega */
+  88%  { transform: translateY(-38px) rotate(-18deg); }/* VUELO: pata alta al frente */
+  100% { transform: translateY(0) rotate(-24deg); }    /* PLANTA de nuevo */
 }
 
+/* El tronco al compás COMPLETO del paso (1.05s): dos botes por ciclo pero con
+   el cabeceo ALTERNADO — el peso cae sobre el bípedo de apoyo que va rotando,
+   así el frame A y el frame B a medio ciclo nunca son la misma silueta. */
 .jaguar-lado-tronco { transform-box: fill-box; transform-origin: 50% 60%; }
-[data-creature='jaguar'][data-pose='camina'] .jaguar-lado-tronco { animation: jaguar-tronco-lado 0.525s ease-in-out infinite; }
+[data-creature='jaguar'][data-pose='camina'] .jaguar-lado-tronco { animation: jaguar-tronco-lado 1.05s ease-in-out infinite; }
 @keyframes jaguar-tronco-lado {
-  0%, 100% { transform: translateY(2.5px) rotate(0.5deg); }
-  50%      { transform: translateY(-3.5px) rotate(-0.3deg); }
+  0%   { transform: translateY(18px) rotate(1.6deg); }  /* impacto: la masa cae adelante */
+  25%  { transform: translateY(-26px) rotate(0.4deg); } /* bóveda: pasa por encima del apoyo */
+  50%  { transform: translateY(14px) rotate(-1.2deg); } /* impacto contrario */
+  75%  { transform: translateY(-26px) rotate(0.6deg); }
+  100% { transform: translateY(18px) rotate(1.6deg); }
 }
 
 .jaguar-lado-hombro { transform-box: fill-box; transform-origin: 50% 100%; }
 [data-creature='jaguar'][data-pose='camina'] .jaguar-lado-hombro { animation: jaguar-hombro-lado 0.525s ease-in-out infinite; }
 @keyframes jaguar-hombro-lado {
   0%, 100% { transform: translateY(0) scaleY(1); }
-  50%      { transform: translateY(-3px) scaleY(1.08); }
+  50%      { transform: translateY(-12px) scaleY(1.14); }
 }
 
 .jaguar-lado-cola { transform-box: fill-box; transform-origin: 97% 72%; }
@@ -1665,8 +1687,8 @@
 .jaguar-lado-cabeza { transform-box: fill-box; transform-origin: 20% 80%; }
 [data-creature='jaguar'][data-pose='camina'] .jaguar-lado-cabeza { animation: jaguar-cabeza-lado 0.525s ease-in-out -0.12s infinite; }
 @keyframes jaguar-cabeza-lado {
-  0%, 100% { transform: translateY(-1.5px) rotate(-0.7deg); }
-  50%      { transform: translateY(2px) rotate(0.7deg); }
+  0%, 100% { transform: translateY(-8px) rotate(-1.4deg); }
+  50%      { transform: translateY(9px) rotate(1.4deg); }
 }
 
 /* EL GRUÑIDO — ciclo largo co-primo con el paso (6.3s vs 1.05s) */
@@ -3059,25 +3081,33 @@
   transform-box: fill-box;
   transform-origin: center bottom;
 }
+/* Peso que se DESPLAZA: dos botes por ciclo pero el ladeo ALTERNA con la pata
+   de apoyo (ciclo completo, no medio) — a medio ciclo la silueta cambia. */
 @keyframes zari-camina-cuerpo {
-  0%, 100% { transform: translateY(0) rotate(-1.6deg); }
-  25%      { transform: translateY(-1.3px) rotate(0deg); }
-  50%      { transform: translateY(0) rotate(1.6deg); }
-  75%      { transform: translateY(-1.3px) rotate(0deg); }
+  0%   { transform: translateY(0.5px) rotate(3deg); }    /* impacto: cae sobre el apoyo */
+  12%  { transform: translateY(0.9px) rotate(2.4deg); }  /* squash del peso */
+  32%  { transform: translateY(-1.7px) rotate(1deg); }   /* pasa por encima */
+  50%  { transform: translateY(0.5px) rotate(-3deg); }   /* cambio de peso */
+  62%  { transform: translateY(0.9px) rotate(-2.4deg); }
+  82%  { transform: translateY(-1.7px) rotate(-1deg); }
+  100% { transform: translateY(0.5px) rotate(3deg); }
 }
+/* UNA sola zancada real (contacto→empuje→despegue→vuelo→planta) para las dos
+   piernas: la contraria corre el MISMO ciclo a contratiempo (-T/2). El vuelo
+   levanta el pie del suelo — sin eso el paso se leía como tijera en el sitio. */
 [data-creature='zariguya'][data-pose='camina'] .zari-pierna-i {
-  animation: zari-paso-i 1.15s ease-in-out infinite;
+  animation: zari-zancada 1.15s ease-in-out infinite;
 }
 [data-creature='zariguya'][data-pose='camina'] .zari-pierna-d {
-  animation: zari-paso-d 1.15s ease-in-out infinite;
+  animation: zari-zancada 1.15s ease-in-out -0.575s infinite;
 }
-@keyframes zari-paso-i {
-  0%, 100% { transform: rotate(24deg); }
-  50%      { transform: rotate(-24deg); }
-}
-@keyframes zari-paso-d {
-  0%, 100% { transform: rotate(-24deg); }
-  50%      { transform: rotate(24deg); }
+@keyframes zari-zancada {
+  0%   { transform: translateY(0) rotate(-30deg); }      /* CONTACTO adelante */
+  45%  { transform: translateY(0) rotate(26deg); }       /* APOYO: empuja atrás, pie al piso */
+  60%  { transform: translateY(-0.9px) rotate(16deg); }  /* DESPEGUE */
+  78%  { transform: translateY(-1.5px) rotate(-20deg); } /* VUELO: patita alta */
+  94%  { transform: translateY(-0.4px) rotate(-33deg); } /* alcanza con overshoot */
+  100% { transform: translateY(0) rotate(-30deg); }      /* PLANTA */
 }
 /* la cola prensil barre el compás entero — contrapeso, más amplio que el
    enroscado idle (que sigue vivo en las demás poses) */
@@ -3085,8 +3115,8 @@
   animation: zari-cola-camina 1.15s ease-in-out infinite;
 }
 @keyframes zari-cola-camina {
-  0%, 100% { transform: rotate(-4deg); }
-  50%      { transform: rotate(7deg); }
+  0%, 100% { transform: rotate(-7deg); }
+  50%      { transform: rotate(11deg); }
 }
 /* manitos en contratiempo del paso (follow-through del kit) */
 [data-creature='zariguya'][data-pose='camina'] .crt-brazo-l {
@@ -3096,8 +3126,8 @@
   animation: zari-brazo-camina 1.15s ease-in-out -0.575s infinite;
 }
 @keyframes zari-brazo-camina {
-  0%, 100% { transform: rotate(-7deg); }
-  50%      { transform: rotate(9deg); }
+  0%, 100% { transform: rotate(-13deg); }
+  50%      { transform: rotate(15deg); }
 }
 
 /* Los estados husmea y tanatosis PISAN el arrebato (antic/travieso): una
@@ -3233,42 +3263,48 @@
   transform-box: fill-box;
   transform-origin: center bottom;
 }
+/* Peso de MOLE que se desplaza: dos botes por ciclo con el ladeo ALTERNADO
+   sobre la bota de apoyo (ciclo completo) — el squash del impacto se ve. */
 @keyframes osb-camina-cuerpo {
-  0%, 100% { transform: translateY(0) rotate(-2.2deg); }
-  25%      { transform: translateY(-2.3px) rotate(0deg); }
-  50%      { transform: translateY(0) rotate(2.2deg); }
-  75%      { transform: translateY(-2.3px) rotate(0deg); }
+  0%   { transform: translateY(0.6px) rotate(3.6deg); }   /* impacto: cae sobre la bota */
+  12%  { transform: translateY(1.1px) rotate(2.8deg); }   /* squash plantígrado */
+  32%  { transform: translateY(-2.6px) rotate(1.2deg); }  /* bóveda del paso */
+  50%  { transform: translateY(0.6px) rotate(-3.6deg); }  /* cambio de peso */
+  62%  { transform: translateY(1.1px) rotate(-2.8deg); }
+  82%  { transform: translateY(-2.6px) rotate(-1.2deg); }
+  100% { transform: translateY(0.6px) rotate(3.6deg); }
 }
+/* La zancada REAL (contacto→empuje→despegue→VUELO→planta): la bota se LEVANTA
+   del suelo en el vuelo — el ±24° pendular anterior mantenía los dos pies
+   plantados y el gate de Cuphead lo leyó como «parado». La pierna contraria
+   corre el mismo ciclo a -T/2. */
 [data-creature='oso-baston'][data-pose='camina'] .osb-pierna-i {
-  animation: osb-paso-i 1.3s ease-in-out infinite;
+  animation: osb-zancada 1.3s ease-in-out infinite;
 }
 [data-creature='oso-baston'][data-pose='camina'] .osb-pierna-d {
-  animation: osb-paso-d 1.3s ease-in-out infinite;
+  animation: osb-zancada 1.3s ease-in-out -0.65s infinite;
 }
-/* ±24°: con las piernas cortas del plantígrado, ±11° se leía como tiritar en
-   el sitio y no como paso (veredicto del operador en el comparador vivo) —
-   la zancada tiene que LEERSE a 300px. */
-@keyframes osb-paso-i {
-  0%, 100% { transform: rotate(24deg); }
-  50%      { transform: rotate(-24deg); }
-}
-@keyframes osb-paso-d {
-  0%, 100% { transform: rotate(-24deg); }
-  50%      { transform: rotate(24deg); }
+@keyframes osb-zancada {
+  0%   { transform: translateY(0) rotate(-30deg); }      /* CONTACTO adelante */
+  45%  { transform: translateY(0) rotate(26deg); }       /* APOYO: empuja atrás */
+  60%  { transform: translateY(-1.6px) rotate(15deg); }  /* DESPEGUE de la bota */
+  78%  { transform: translateY(-2.7px) rotate(-20deg); } /* VUELO: bota alta */
+  94%  { transform: translateY(-0.8px) rotate(-33deg); } /* alcanza con overshoot */
+  100% { transform: translateY(0) rotate(-30deg); }      /* PLANTA */
 }
 [data-creature='oso-baston'][data-pose='camina'] .osb-baston {
   animation: osb-baston-camina 1.3s ease-in-out infinite;
 }
 @keyframes osb-baston-camina {
-  0%, 100% { transform: rotate(5deg); }
-  50%      { transform: rotate(-9deg); }
+  0%, 100% { transform: rotate(7deg); }
+  50%      { transform: rotate(-13deg); }
 }
 [data-creature='oso-baston'][data-pose='camina'] .crt-brazo-l {
   animation: osb-brazo-camina 1.3s ease-in-out infinite;
 }
 @keyframes osb-brazo-camina {
-  0%, 100% { transform: rotate(-8deg); }
-  50%      { transform: rotate(10deg); }
+  0%, 100% { transform: rotate(-13deg); }
+  50%      { transform: rotate(15deg); }
 }
 
 /* ── CELEBRA — el flourish del caminante, con AMPLITUD PROPIA: el grupo
@@ -3434,44 +3470,62 @@
    + brazo-izq contra tras-der + media-izq + brazo-der. Cada pata rota desde
    su inserción al cuerpo (grupos luci-pata-* del componente). Las alas bajan
    a un abanico perezoso: caminar volando sería moonwalk en el aire. */
+/* El bob de suelo al compás COMPLETO (0.95s) con el ladeo alternado del
+   trípode de apoyo — peso que se desplaza, no vibración simétrica. */
 [data-creature='luciernaga'][data-pose='camina'] .luci-flota {
-  animation: luci-suelo-bob 0.475s ease-in-out infinite;
+  animation: luci-suelo-bob 0.95s ease-in-out infinite;
+  transform-box: fill-box;
+  transform-origin: center bottom;
 }
 @keyframes luci-suelo-bob {
-  0%, 100% { transform: translateY(4px); }
-  50%      { transform: translateY(0); }
+  0%   { transform: translateY(6px) rotate(2deg); }     /* impacto del trípode A */
+  12%  { transform: translateY(9px) rotate(1.6deg); }   /* squash */
+  32%  { transform: translateY(-6px) rotate(0.6deg); }  /* pasa por encima */
+  50%  { transform: translateY(6px) rotate(-2deg); }    /* impacto del trípode B */
+  62%  { transform: translateY(9px) rotate(-1.6deg); }
+  82%  { transform: translateY(-6px) rotate(-0.6deg); }
+  100% { transform: translateY(6px) rotate(2deg); }
 }
 /* trípode A (fase 0): trasera izq + media der + bracito izq */
 [data-creature='luciernaga'][data-pose='camina'] .luci-pata-ti {
-  animation: luci-paso-i 0.95s ease-in-out infinite;
+  animation: luci-zancada-i 0.95s ease-in-out infinite;
 }
 [data-creature='luciernaga'][data-pose='camina'] .luci-pata-md {
-  animation: luci-paso-d 0.95s ease-in-out infinite;
+  animation: luci-zancada-d 0.95s ease-in-out infinite;
 }
 [data-creature='luciernaga'][data-pose='camina'] .crt-brazo-l {
   animation: luci-brazo-camina 0.95s ease-in-out infinite;
 }
 /* trípode B (contrafase): trasera der + media izq + bracito der */
 [data-creature='luciernaga'][data-pose='camina'] .luci-pata-td {
-  animation: luci-paso-d 0.95s ease-in-out -0.475s infinite;
+  animation: luci-zancada-d 0.95s ease-in-out -0.475s infinite;
 }
 [data-creature='luciernaga'][data-pose='camina'] .luci-pata-mi {
-  animation: luci-paso-i 0.95s ease-in-out -0.475s infinite;
+  animation: luci-zancada-i 0.95s ease-in-out -0.475s infinite;
 }
 [data-creature='luciernaga'][data-pose='camina'] .crt-brazo-r {
   animation: luci-brazo-camina 0.95s ease-in-out -0.475s infinite;
 }
-@keyframes luci-paso-i {
-  0%, 100% { transform: rotate(13deg); }
-  50%      { transform: rotate(-13deg); }
+/* Zancada de insecto con VUELO: la pata se despega en el recobro (translateY)
+   en vez de barrer pegada al piso. Dos keyframes espejo porque los pivotes
+   son opuestos (origin right/left top), mismo levante en ambos. */
+@keyframes luci-zancada-i {
+  0%   { transform: translateY(0) rotate(-24deg); }     /* CONTACTO */
+  45%  { transform: translateY(0) rotate(20deg); }      /* APOYO: empuja */
+  62%  { transform: translateY(-9px) rotate(10deg); }   /* DESPEGUE */
+  80%  { transform: translateY(-14px) rotate(-16deg); } /* VUELO: pata alta */
+  100% { transform: translateY(0) rotate(-24deg); }     /* PLANTA */
 }
-@keyframes luci-paso-d {
-  0%, 100% { transform: rotate(-13deg); }
-  50%      { transform: rotate(13deg); }
+@keyframes luci-zancada-d {
+  0%   { transform: translateY(0) rotate(24deg); }
+  45%  { transform: translateY(0) rotate(-20deg); }
+  62%  { transform: translateY(-9px) rotate(-10deg); }
+  80%  { transform: translateY(-14px) rotate(16deg); }
+  100% { transform: translateY(0) rotate(24deg); }
 }
 @keyframes luci-brazo-camina {
-  0%, 100% { transform: rotate(-9deg); }
-  50%      { transform: rotate(11deg); }
+  0%, 100% { transform: rotate(-14deg); }
+  50%      { transform: rotate(16deg); }
 }
 /* alas a medio gas mientras anda (siguen vivas, ya no cargan el peso) */
 [data-creature='luciernaga'][data-pose='camina'] .luci-ala-i,
