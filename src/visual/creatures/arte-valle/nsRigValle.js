@@ -81,3 +81,28 @@ export function extraerCssDelRig(cssCompleto, marcador) {
   const inicioComentario = cssCompleto.lastIndexOf('/*', idx);
   return cssCompleto.slice(inicioComentario === -1 ? idx : inicioComentario);
 }
+
+/**
+ * hostALigero — arregla el bug de LIGHT DOM de los rigs del valle.
+ *
+ * Los CSS originales (`guacamaya.css`, `chivitoPunk.css`…) fueron escritos
+ * para Shadow DOM: cada estado se selecciona con `:host([data-estado="X"])`,
+ * un pseudo-selector que solo existe DENTRO de un shadow tree — fuera de uno
+ * (como aquí, `creatures/` vive en LIGHT DOM a propósito, ver nota de
+ * `GuacamayaCompai.jsx`) `:host(...)` no matchea NADA. Resultado real: el
+ * idle AMBIENTE corre (no depende de `:host`) pero los 6-7 estados por
+ * `data-estado` quedan inertes — el rig nunca "actúa".
+ *
+ * En LIGHT DOM el `<svg data-estado="X">` raíz YA es un ancestro real del
+ * resto del marcado, así que `:host([data-estado="X"]) Y` puede reescribirse
+ * llanamente a `[data-estado="X"] Y` (mismo significado: "Y dentro de un
+ * elemento con ese atributo") — X ya venía siendo el propio contenido del
+ * paréntesis de `:host(...)`, así que basta con pelar el envoltorio.
+ *
+ * Pura, no toca clases/ids/colores — solo la sintaxis de `:host(...)`.
+ * @param {string} cssTexto
+ * @returns {string}
+ */
+export function hostALigero(cssTexto) {
+  return cssTexto.replace(/:host\(([^)]*)\)/g, '$1');
+}

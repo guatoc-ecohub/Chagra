@@ -12,6 +12,12 @@ import GuacamayaCompai from '../GuacamayaCompai.jsx';
  * contrato data-creature/role="img", el rig+defs quedaron inline (hay markup
  * real, no un placeholder vacío), y dos instancias simultáneas NO comparten
  * ids (el bug de cruce que motivó `nsRigValle.js`).
+ *
+ * 2026-08-21 ("guacamaya = compai de agente completo"): se agrega cobertura
+ * del vocabulario RICO (`estado`, reusando angelitaEstados.js), el `visema`
+ * REAL (ya no hardcode `state==='speaking'→'V2'`) y la ausencia de `:host`
+ * en el `<style>` renderizado (bug de Shadow DOM arreglado vía
+ * `hostALigero()`, ver nsRigValle.js).
  */
 describe('GuacamayaCompai', () => {
   test('renderiza el cuerpo real (data-creature=guacamaya, role=img)', () => {
@@ -36,8 +42,18 @@ describe('GuacamayaCompai', () => {
     expect(svg).toHaveAttribute('aria-label', 'Mi guacamaya');
   });
 
-  test('state="speaking" marca data-visema para lip-sync', () => {
+  // ANTES: `data-visema` salía de un HARDCODE (`state==='speaking'→'V2'`).
+  // AHORA (2026-08-21): `visema` es un prop REAL — GuacamayaCompai.jsx ya no
+  // adivina nada a partir de `state`; quien quiera un visema (el adaptador
+  // angosto `ChagraAgentAvatarGuacamaya.jsx`, o un host con `useLipSync`) lo
+  // manda explícito. Sin prop, sin visema — aunque `state==="speaking"`.
+  test('state="speaking" SIN prop visema ya no trae data-visema (dejó de ser hardcode)', () => {
     const { container } = render(<GuacamayaCompai state="speaking" />);
+    expect(container.querySelector('svg')).not.toHaveAttribute('data-visema');
+  });
+
+  test('con prop visema="V2" real, data-visema lo refleja (cualquiera sea el state)', () => {
+    const { container } = render(<GuacamayaCompai state="idle" visema="V2" />);
     expect(container.querySelector('svg')).toHaveAttribute('data-visema', 'V2');
   });
 
@@ -69,4 +85,75 @@ describe('GuacamayaCompai', () => {
     expect(style.textContent).not.toContain('#burbuja');
     expect(style.textContent).not.toContain('font-family:Georgia');
   });
+
+  // Bug de Shadow DOM (documentado en el propio componente): el CSS original
+  // usa `:host([data-estado="X"])`, que en LIGHT DOM no matchea nada — todo
+  // el repertorio por-estado (habla, señala, dispersa, sana, amenaza, pacto)
+  // quedaba inerte. `hostALigero()` lo arregla reescribiendo a `[data-estado="X"]`
+  // ANTES de inyectar el <style>.
+  test('el <style> renderizado ya NO contiene :host (bug de Shadow DOM arreglado)', () => {
+    const { container } = render(<GuacamayaCompai />);
+    const style = container.querySelector('svg style');
+    expect(style.textContent).not.toContain(':host');
+    // y las reglas por-estado SÍ quedan presentes, solo que como selector plano:
+    expect(style.textContent).toMatch(/\[data-estado="hablar"\]/);
+  });
+
+  describe('vocabulario rico (prop `estado`, reusa angelitaEstados.js)', () => {
+    test('sin prop `estado`, el data-estado sale del `state` angosto de siempre (retrocompat)', () => {
+      const { container } = render(<GuacamayaCompai state="speaking" />);
+      expect(container.querySelector('svg')).toHaveAttribute('data-estado', 'hablar');
+    });
+
+    test('estado="contenta" → data-estado="sana" (el más positivo del rig)', () => {
+      const { container } = render(<GuacamayaCompai estado="contenta" />);
+      expect(container.querySelector('svg')).toHaveAttribute('data-estado', 'sana');
+    });
+
+    test('estado="preocupada" → data-estado="amenaza" (alerta real)', () => {
+      const { container } = render(<GuacamayaCompai estado="preocupada" />);
+      expect(container.querySelector('svg')).toHaveAttribute('data-estado', 'amenaza');
+    });
+
+    test('estado="senala" → data-estado="senalar" (match directo)', () => {
+      const { container } = render(<GuacamayaCompai estado="senala" />);
+      expect(container.querySelector('svg')).toHaveAttribute('data-estado', 'senalar');
+    });
+
+    test('estado="respondiendo" → data-estado="hablar" (match directo)', () => {
+      const { container } = render(<GuacamayaCompai estado="respondiendo" />);
+      expect(container.querySelector('svg')).toHaveAttribute('data-estado', 'hablar');
+    });
+
+    test('estado="invita" → data-estado="pacto" (alas abiertas de bienvenida)', () => {
+      const { container } = render(<GuacamayaCompai estado="invita" />);
+      expect(container.querySelector('svg')).toHaveAttribute('data-estado', 'pacto');
+    });
+
+    test('estado="husmea" → data-estado="dispersar" (el más activo de los que quedan)', () => {
+      const { container } = render(<GuacamayaCompai estado="husmea" />);
+      expect(container.querySelector('svg')).toHaveAttribute('data-estado', 'dispersar');
+    });
+
+    test.each(['acompana', 'escuchando', 'pensando', 'no-se'])(
+      'estado="%s" → data-estado="idle" (el rig no tiene pose propia)',
+      (estado) => {
+        const { container } = render(<GuacamayaCompai estado={estado} />);
+        expect(container.querySelector('svg')).toHaveAttribute('data-estado', 'idle');
+      },
+    );
+
+    test('un estado desconocido no rompe: cae a acompana→idle (estadoCanonico)', () => {
+      const { container } = render(<GuacamayaCompai estado="algo-que-no-existe" />);
+      expect(container.querySelector('svg')).toHaveAttribute('data-estado', 'idle');
+    });
+
+    test('estado + visema conviven: ambos se estampan', () => {
+      const { container } = render(<GuacamayaCompai estado="respondiendo" visema="V3" />);
+      const svg = container.querySelector('svg');
+      expect(svg).toHaveAttribute('data-estado', 'hablar');
+      expect(svg).toHaveAttribute('data-visema', 'V3');
+    });
+  });
+
 });

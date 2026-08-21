@@ -154,6 +154,40 @@ describe('ChagraAgentAvatar — Angelita default: glow + double-click + migraci�
   });
 });
 
+describe('ChagraAgentAvatar — guacamaya promovida a "avatar rico" (2026-08-21)', () => {
+  afterEach(() => {
+    localStorage.clear();
+  });
+
+  test('type="guacamaya" con API rica (estado) NO se degrada por STATE_DE_ESTADO_RICO', () => {
+    localStorage.setItem('chagra:agent-avatar-type', 'guacamaya');
+    const { container } = render(<ChagraAgentAvatar estado="contenta" />);
+    const svg = container.querySelector('svg[data-creature="guacamaya"]');
+    expect(svg).toBeInTheDocument();
+    // Si se hubiera traducido a la baja (STATE_DE_ESTADO_RICO no mapea
+    // 'contenta'), habría caído a data-estado="idle" — la fidelidad se
+    // pierde justo ahí. El bypass nuevo debe llegar directo a 'sana'.
+    expect(svg).toHaveAttribute('data-estado', 'sana');
+  });
+
+  test('type="guacamaya" con API rica también recibe visema real', () => {
+    localStorage.setItem('chagra:agent-avatar-type', 'guacamaya');
+    const { container } = render(<ChagraAgentAvatar estado="respondiendo" visema="V3" />);
+    const svg = container.querySelector('svg[data-creature="guacamaya"]');
+    expect(svg).toHaveAttribute('data-estado', 'hablar');
+    expect(svg).toHaveAttribute('data-visema', 'V3');
+  });
+
+  test('type="guacamaya" con API angosta (state) sigue igual que antes', () => {
+    localStorage.setItem('chagra:agent-avatar-type', 'guacamaya');
+    const { container } = render(<ChagraAgentAvatar state="speaking" />);
+    const svg = container.querySelector('svg[data-creature="guacamaya"]');
+    expect(svg).toBeInTheDocument();
+    expect(svg).toHaveAttribute('data-estado', 'hablar');
+    expect(svg).toHaveAttribute('data-visema', 'V2');
+  });
+});
+
 describe('ChagraAgentAvatarMaiz — prefers-reduced-motion (task #6240)', () => {
   test('maíz tiene media query prefers-reduced-motion en CSS inline', () => {
     const { container } = render(<ChagraAgentAvatarMaiz state="idle" onClick={() => {}} onDoubleClick={() => {}} ariaLabel="test" />);
