@@ -1,4 +1,4 @@
-import ChivitoPunk from '../visual/creatures/ChivitoPunk';
+import ChivitoCompai from '../visual/creatures/ChivitoPunk';
 
 /**
  * ChagraAgentAvatarChivitoPunk — el chivito de páramo (Oxypogon guerinii)
@@ -8,13 +8,28 @@ import ChivitoPunk from '../visual/creatures/ChivitoPunk';
  *
  * Cierra el ítem #8 del GAP compAI: el chivito no tenía cuerpo en la PWA
  * (`ELENCO['chivito-punk'].enPWA` seguía `false`); ahora lo tiene reusando el
- * rig F24 del valle (`visual/creatures/ChivitoPunk.jsx`, ver ese archivo).
+ * rig F24 del valle (`visual/creatures/ChivitoCompai.jsx`, ver ese archivo).
  *
  * Adaptador puro (mismo contrato que los hermanos ChagraAgentAvatar*): traduce
  * la API histórica del avatar del agente (state 'idle'|'thinking'|'speaking'|
  * 'listening', glow, withLabel, onClick/onDoubleClick) al `state` que
- * `ChivitoPunk.jsx` ya entiende directo.
+ * `ChivitoCompai.jsx` ya entiende directo (no necesita traducción de pose —
+ * el rig reusado solo distingue idle/hablar por ahora, ver nota en ese
+ * archivo).
+ *
+ * VISEMA (2026-08-21, "chivito = compai de agente completo"):
+ * `ChivitoCompai.jsx` dejó de hardcodear `data-visema` a partir de `state`
+ * — ahora acepta un `visema` real (para el vocabulario rico, ver
+ * `ChagraAgentAvatar.jsx`). Este adaptador angosto sigue produciendo un
+ * visema razonable a partir de `state`, mismo patrón que
+ * `ChagraAgentAvatarOsoBaston.jsx`/`ChagraAgentAvatarLuciernaga.jsx`
+ * (`VISEMA_DE_STATE`): así el contrato observable narrow (state="speaking"
+ * → data-visema) no cambia para quien ya lo usaba.
  */
+const VISEMA_DE_STATE = {
+    speaking: 'V2',
+};
+
 export default function ChagraAgentAvatarChivitoPunk({
     state = 'idle',
     size = 48,
@@ -25,9 +40,11 @@ export default function ChagraAgentAvatarChivitoPunk({
     className = '',
     ariaLabel = 'Chagra IA',
 }) {
+    const visema = VISEMA_DE_STATE[state] || null;
     const bicho = (
-        <ChivitoPunk
+        <ChivitoCompai
             state={state}
+            visema={visema}
             size={size}
             title={ariaLabel}
             className={className}
