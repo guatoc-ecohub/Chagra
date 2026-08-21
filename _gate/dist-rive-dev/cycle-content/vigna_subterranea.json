@@ -1,0 +1,83 @@
+{
+  "species_slug": "vigna_subterranea",
+  "scientific_name": "Vigna subterranea (L.) Verdc.",
+  "common_names": [
+    "Maní bambara"
+  ],
+  "family": "Fabaceae",
+  "category": "granos_legumbres",
+  "cultivable": true,
+  "conservation_status": "cultivo_comun",
+  "thermal_zones": [
+    "calido"
+  ],
+  "roles_in_guild": [
+    "crop",
+    "nitrogen_fixer",
+    "ground_cover"
+  ],
+  "antagonists": [],
+  "especies_nativas_sustitutas": [],
+  "propagation": {
+    "methods": [
+      "semilla"
+    ],
+    "best_method": "semilla",
+    "protocol_resumen": "Siembra directa de semilla a 3-5 cm de profundidad, distancia 20-30 cm entre plantas x 50-60 cm entre surcos, densidad 30-50 kg/ha. Germinación 7-14 días. Ciclo 110-150 días. Tras la floración, el pedúnculo se geocarpa (enterrando el fruto en el suelo como el maní cacahuete), comportamiento extraordinario clavado-geocárpico subterráneo. Cosecha por arranque manual de planta completa.",
+    "tiempo_a_establecimiento_dias": 14,
+    "notas": "Leguminosa anual herbácea rastrera-postrada con frutos subterráneos geocárpicos — único caso entre las Vigna americanas adaptadas. Tolera sequías severas. Adaptada a sabanas tropicales arenosas degradadas. Cultivo emergente para Llanos Orientales colombianos.",
+    "fuente": "NRC 1996 Lost Crops Africa Vol III; FAO Ecocrop; AGROSAVIA forrajeras 2022"
+  },
+  "requirements": {
+    "agua": "bajo",
+    "altitud_msnm": {
+      "min_absoluto": 0,
+      "optimo_min": 100,
+      "optimo_max": 1200,
+      "max_absoluto": 1600
+    },
+    "temperatura_c": {
+      "helada_letal": 8,
+      "optimo_min": 24,
+      "optimo_max": 32,
+      "max_tolerable": 38
+    },
+    "radiacion": "sol_pleno",
+    "drenaje_requerido": "excelente"
+  },
+  "valor_pedagogico": "El maní bambara o fríjol bambara (Vigna subterranea (L.) Verdc., familia Fabaceae) es una leguminosa anual herbácea rastrera-postrada GEOCÁRPICA (frutos subterráneos clavados como el maní cacahuete Arachis hypogaea) originaria del África Occidental sudano-saheliana (cuenca del Níger — Burkina Faso, Mali, Nigeria, Camerún del norte) donde fue domesticada hace ~3000-5000 años por pueblos bantúes-mandé, sigue siendo cultivo de subsistencia femenino africano fundamental. Se introduce en Colombia en últimas décadas como cultivo emergente de adaptación a Llanos Orientales (Casanare, Meta, Vichada, Arauca), Caribe seco (La Guajira, Cesar, Magdalena) y zonas áridas de Boyacá-Cundinamarca-Santander entre 0 y 1.600 msnm en zonas térmicas cálidas secas-húmedas-sabaneras donde su tolerancia extraordinaria a sequía severa (sobrevive estiajes de 12-16 semanas en sabana), suelos arenosos pobres degradados (pH 5-7, Al sat hasta 40%, P bajo, salinidad moderada) y altas temperaturas (28-35°C) lo posicionan como cultivo estratégico de seguridad alimentaria climática en zonas marginales de la Orinoquia colombiana. Lección viva PEDAGÓGICAMENTE EXCELENTE de geocarpia (fenómeno extraordinario por el cual tras la fertilización de la flor el pedicelo curvo del fruto se elonga y empuja el ovario fertilizado hacia abajo enterrándolo en el suelo donde madura subterráneamente — clave la enseñanza didáctica para niñas y niños mostrando como la planta entierra sus frutos para protegerlos de fuego, sequía, herbivoría y cosecha por aves) — patrón evolutivo compartido únicamente con el maní cacahuete Arachis hypogaea (otra leguminosa geocárpica) y con Lathyrus amphicarpos. Planta herbácea de hábito postrado-rastrero formando rosetas densas (15-30 cm altura, expandiéndose 30-60 cm de diámetro), hojas trifoliadas con peciolos largos rosulados al cuello, flores pequeñas amarillas papilionadas autógamas-cleistógamas autopolinizantes (no requieren polinizadores — autopolinización obligada) que tras fertilización geocarpan-clavan al suelo, frutos legumbres subterráneas (1-2 cm largo) cremoso-marrón con 1-2 semillas redondeadas (cremas, marrones, rojas, negras según landrace africana) — proteína 17-25%, carbohidratos 50-65%, grasas 6-7%, considerada 'alimento completo' por su balance nutricional. Fijación N 50-100 kg/ha por simbiosis con Bradyrhizobium sp. específico bambara. Manejo agroecológico llanero: siembra directa de semilla pre-remojada 12-24h a 3-5 cm profundidad, distancia 20-30 cm x 50-60 cm, densidad 30-50 kg/ha, asocio tradicional con sorgo-mijo-mandioca-fonio en sabanas africanas (replicable con yuca-maíz-cachama en Llanos colombianos), no requiere fertilización N (autosuficiente por fijación), tolera Al saturación alta de Oxisoles llaneros sin encalado intensivo, cosecha por arranque manual de planta completa a los 110-150 días tras siembra, rendimientos 0.5-1.5 t/ha grano seco (limitado por cosecha manual subterránea trabajosa), beneficio doble como grano proteico + forraje hojoso para ganadería bovina llanera. Función en chagra/huerto escolar llanero/sabanero como leguminosa de adaptación climática extrema, fijador N en Oxisoles ácidos pobres, ground cover anti-erosión en arenales, cultivo emergente de soberanía alimentaria climática, lección viva de geocarpia. Fuentes Tier A: NRC 1996 Lost Crops Africa Vol III, FAO Ecocrop Vigna subterranea, AGROSAVIA Forrajeras 2022 evaluación llanera, POWO Kew, GBIF Backbone Taxonomy.",
+  "sources": [
+    {
+      "id": "gbif-taxonomic-backbone",
+      "title": "gbif-taxonomic-backbone",
+      "tier": "A",
+      "url": "https://www.gbif.org/dataset/d7dddbf4-2cf0-4f39-9b2a-bb099caae36c"
+    },
+    {
+      "id": "powo-kew",
+      "title": "powo-kew",
+      "tier": "A",
+      "url": "https://powo.science.kew.org"
+    },
+    {
+      "id": "nrc-1989-cultivos-andinos",
+      "title": "nrc-1989-cultivos-andinos",
+      "tier": "A",
+      "url": null
+    },
+    {
+      "id": "fao-ecocrop",
+      "title": "fao-ecocrop",
+      "tier": "A",
+      "url": "https://gaez.fao.org/pages/ecocrop"
+    },
+    {
+      "id": "agrosavia-forrajeras-2022",
+      "title": "agrosavia-forrajeras-2022",
+      "tier": "A",
+      "url": null
+    }
+  ],
+  "_generated_by": "scripts/build-cycle-content-from-catalog.mjs",
+  "_generated_at": "2026-05-19T00:42:57.397Z"
+}

@@ -1,0 +1,17 @@
+{
+  "wrap": "luciernagaWrap",
+  "pielKart": {
+    "cuerpo": { "grad": "gElytra", "stop": 1 },
+    "cuerpo2": { "fill": "#d8c489" },
+    "cabeza": { "fill": "#241c13" },
+    "detalle": { "fill": "#c79a52" },
+    "extras": {
+      "pronoto": { "grad": "gPronoto", "stop": 0 },
+      "manchaPronoto": { "fill": "#211a12" },
+      "linternaCuerpo": { "grad": "gLinterna", "stop": 0 },
+      "linternaBrillo": { "grad": "gLinterna", "stop": 1 },
+      "antena": { "fill": "#2a1c10" },
+      "alaMemb": { "fill": "#ecdfb2" }
+    }
+  }
+}

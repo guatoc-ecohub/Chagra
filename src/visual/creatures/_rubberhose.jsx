@@ -118,10 +118,14 @@ export function Sonrisa({ cx = 0, cy = 0, w = 3, prof = 1.4, ink = RH_INK }) {
  * @param {string} [props.origen='top center']  transform-origen (el hombro)
  * @param {string} [props.ink]
  * @param {string} [props.glove]
+ * @param {boolean} [props.sinGuante=false]  OPT-IN: true = SIN mitón/guante —
+ *   la manguera remata desnuda con un puntito de tinta muy sutil (la manita/
+ *   piecito de la angelita re-skin 2026-08-21). El default (false) conserva el
+ *   mitón crema de siempre: oso andino, colibrí y el resto no cambian.
  */
 export function Miembro({
   d, ancho = 2.3, punta = null, puntaR = 1.6, pie = false, sway = false, delay = 0,
-  clase, origen = 'top center', ink = RH_INK, glove = RH_GLOVE,
+  clase, origen = 'top center', ink = RH_INK, glove = RH_GLOVE, sinGuante = false,
 }) {
   const style = {
     transformBox: 'fill-box',
@@ -132,7 +136,16 @@ export function Miembro({
   return (
     <g className={clases} style={style}>
       <path d={d} stroke={ink} strokeWidth={ancho} fill="none" strokeLinecap="round" strokeLinejoin="round" />
-      {punta && (pie ? (
+      {punta && (sinGuante ? (
+        /* Remate DESNUDO (sin mitón): un puntito de tinta sutil que da masa de
+           manita/piecito sin dibujar guante — los gestos (celebra/señala)
+           conservan un remate legible en la punta de la manguera. */
+        <ellipse
+          cx={punta[0]} cy={punta[1]}
+          rx={puntaR * (pie ? 0.78 : 0.62)} ry={puntaR * (pie ? 0.5 : 0.62)}
+          fill={ink}
+        />
+      ) : pie ? (
         <ellipse cx={punta[0]} cy={punta[1]} rx={puntaR * 1.15} ry={puntaR * 0.72} fill={glove} stroke={ink} strokeWidth="0.7" />
       ) : (
         <circle cx={punta[0]} cy={punta[1]} r={puntaR} fill={glove} stroke={ink} strokeWidth="0.7" />

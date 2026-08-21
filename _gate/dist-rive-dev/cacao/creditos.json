@@ -1,0 +1,102 @@
+[
+  {
+    "slug": "mazorca",
+    "file": "mazorca.jpg",
+    "commonsTitle": "Cocoa pod.jpg",
+    "autor": "Pkraemer",
+    "licencia": "CC BY-SA 4.0",
+    "licenciaUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+    "fuenteUrl": "https://commons.wikimedia.org/wiki/File:Cocoa_pod.jpg",
+    "fuente": "Wikimedia Commons"
+  },
+  {
+    "slug": "agroforestal",
+    "file": "agroforestal.jpg",
+    "commonsTitle": "Shade Cacao Plantation, Ixcacao Mayan Chocolate, Belize.JPG",
+    "autor": "Mvfarrell",
+    "licencia": "CC BY-SA 4.0",
+    "licenciaUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+    "fuenteUrl": "https://commons.wikimedia.org/wiki/File:Shade_Cacao_Plantation,_Ixcacao_Mayan_Chocolate,_Belize.JPG",
+    "fuente": "Wikimedia Commons"
+  },
+  {
+    "slug": "flor",
+    "file": "flor.jpg",
+    "commonsTitle": "Cacao flowers at Cau chocolate village Bali.jpg",
+    "autor": "Vitaium",
+    "licencia": "CC BY-SA 4.0",
+    "licenciaUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+    "fuenteUrl": "https://commons.wikimedia.org/wiki/File:Cacao_flowers_at_Cau_chocolate_village_Bali.jpg",
+    "fuente": "Wikimedia Commons"
+  },
+  {
+    "slug": "injerto",
+    "file": "injerto.jpg",
+    "commonsTitle": "Cocoa farmer Jenny Kebu grafting a Cocoa seedling at Kebu farm, east of Honiara. (10687161116).jpg",
+    "autor": "Irene Scott/AusAID",
+    "licencia": "CC BY 2.0",
+    "licenciaUrl": "https://creativecommons.org/licenses/by/2.0",
+    "fuenteUrl": "https://commons.wikimedia.org/wiki/File:Cocoa_farmer_Jenny_Kebu_grafting_a_Cocoa_seedling_at_Kebu_farm,_east_of_Honiara._(10687161116).jpg",
+    "fuente": "Wikimedia Commons"
+  },
+  {
+    "slug": "mazorca-negra",
+    "file": "mazorca-negra.jpg",
+    "commonsTitle": "Cacao black pod rot 29064726523.jpg",
+    "autor": "Scot Nelson",
+    "licencia": "CC0",
+    "licenciaUrl": "http://creativecommons.org/publicdomain/zero/1.0/deed.en",
+    "fuenteUrl": "https://commons.wikimedia.org/wiki/File:Cacao_black_pod_rot_29064726523.jpg",
+    "fuente": "Wikimedia Commons"
+  },
+  {
+    "slug": "cosecha",
+    "file": "cosecha.jpg",
+    "commonsTitle": "Cocoa Pods and Seeds.jpg",
+    "autor": "Lolay",
+    "licencia": "CC BY 2.0",
+    "licenciaUrl": "https://creativecommons.org/licenses/by/2.0",
+    "fuenteUrl": "https://commons.wikimedia.org/wiki/File:Cocoa_Pods_and_Seeds.jpg",
+    "fuente": "Wikimedia Commons"
+  },
+  {
+    "slug": "fermentacion",
+    "file": "fermentacion.jpg",
+    "commonsTitle": "Fermentation of cacao seeds.jpg",
+    "autor": "Scot Nelson",
+    "licencia": "CC0",
+    "licenciaUrl": "http://creativecommons.org/publicdomain/zero/1.0/deed.en",
+    "fuenteUrl": "https://commons.wikimedia.org/wiki/File:Fermentation_of_cacao_seeds.jpg",
+    "fuente": "Wikimedia Commons"
+  },
+  {
+    "slug": "secado",
+    "file": "secado.jpg",
+    "commonsTitle": "Cocoa beans drying Mpenkro 2014 B002a.jpg",
+    "autor": "Francesco Veronesi (on Flickr)",
+    "licencia": "CC BY-SA 2.0",
+    "licenciaUrl": "https://creativecommons.org/licenses/by-sa/2.0",
+    "fuenteUrl": "https://commons.wikimedia.org/wiki/File:Cocoa_beans_drying_Mpenkro_2014_B002a.jpg",
+    "fuente": "Wikimedia Commons"
+  },
+  {
+    "slug": "monilia",
+    "file": "monilia.jpg",
+    "commonsTitle": "iNaturalist observation 58102409",
+    "autor": "Jake Rehage (unclecactus)",
+    "licencia": "CC0",
+    "licenciaUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+    "fuenteUrl": "https://www.inaturalist.org/observations/58102409",
+    "fuente": "iNaturalist"
+  },
+  {
+    "slug": "escoba-bruja",
+    "file": "escoba-bruja.jpg",
+    "commonsTitle": "iNaturalist observation 333723904",
+    "autor": "Denis Zabin (deniszabin)",
+    "licencia": "CC BY 4.0",
+    "licenciaUrl": "https://creativecommons.org/licenses/by/4.0/",
+    "fuenteUrl": "https://www.inaturalist.org/observations/333723904",
+    "fuente": "iNaturalist"
+  }
+]

@@ -1,0 +1,71 @@
+{
+  "species_slug": "raphanus_sativus_sativus",
+  "scientific_name": "Raphanus sativus L. var. sativus",
+  "common_names": [
+    "Rabano rojo"
+  ],
+  "family": "Brassicaceae",
+  "category": "tuberculos_raices",
+  "cultivable": true,
+  "conservation_status": "cultivo_comun",
+  "thermal_zones": [
+    "templado",
+    "frio"
+  ],
+  "roles_in_guild": [
+    "crop",
+    "pest_repellent"
+  ],
+  "antagonists": [],
+  "especies_nativas_sustitutas": [],
+  "propagation": {
+    "metodo_principal": "semilla",
+    "notas": "Variedad de raiz roja de ciclo ultra rapido (25-35 dias). Siembra directa escalonada cada 10-15 dias para cosecha continua."
+  },
+  "requirements": {
+    "agua": "medio",
+    "altitud_msnm": {
+      "min_absoluto": 800,
+      "optimo_min": 1500,
+      "optimo_max": 2800,
+      "max_absoluto": 3000
+    },
+    "temperatura_c": {
+      "helada_letal": -3,
+      "optimo_min": 10,
+      "optimo_max": 20,
+      "max_tolerable": 28
+    },
+    "radiacion": "sol_pleno",
+    "drenaje_requerido": "excelente"
+  },
+  "valor_pedagogico": "Variedad de rabano de raiz roja (Raphanus sativus var. sativus, Brassicaceae) con el ciclo mas corto del huerto: 25-35 dias de semilla a cosecha. Su color rojo intenso indica antocianinas y su sabor picante viene de glucosinolatos que ahuyentan insectos del suelo. Ideal para enseñar a niños germinacion, crecimiento y cosecha en menos de un mes escolar, y para siembras escalonadas cada 10-15 dias que dan cosecha continua. Cultivo puente en rotaciones que rompe ciclos de plagas en parcelas hortelanas andinas.",
+  "sources": [
+    {
+      "id": "powo-kew",
+      "title": "powo-kew",
+      "tier": "A",
+      "url": "https://powo.science.kew.org"
+    },
+    {
+      "id": "gbif-taxonomic-backbone",
+      "title": "gbif-taxonomic-backbone",
+      "tier": "A",
+      "url": "https://www.gbif.org/dataset/d7dddbf4-2cf0-4f39-9b2a-bb099caae36c"
+    },
+    {
+      "id": "ica-resolucion-3168-2015",
+      "title": "ica-resolucion-3168-2015",
+      "tier": "A",
+      "url": null
+    },
+    {
+      "id": "fao-ecocrop",
+      "title": "fao-ecocrop",
+      "tier": "A",
+      "url": "https://gaez.fao.org/pages/ecocrop"
+    }
+  ],
+  "_generated_by": "scripts/build-cycle-content-from-catalog.mjs",
+  "_generated_at": "2026-05-19T00:42:57.376Z"
+}

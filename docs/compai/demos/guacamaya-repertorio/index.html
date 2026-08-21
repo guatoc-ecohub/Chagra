@@ -1,0 +1,1119 @@
+<!DOCTYPE html>
+<html lang="es-CO">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>La Guacamaya · repertorio completo (arte congelado)</title>
+<!--
+  guacamaya-repertorio — DEMO de los comportamientos AGREGADOS (2026-08-21)
+  sobre el rig A2 aprobado por el operador el 2026-08-07 ("es la única que
+  siempre me gustó, déjala así, no necesita cambios"). Parte de la copia EXACTA
+  de `guacamaya.guatoc.co` (~/demos/guacamaya-guia/index.html) — el arte, los
+  gradientes, los <path>, el idle/hablar/gestos/estados de siempre NO SE
+  TOCARON un solo carácter. Lo nuevo son wrappers <g> + CSS + JS alrededor:
+
+    · MÍSTICO aparece/desaparece — mismo mecanismo de
+      src/visual/creatures/RevelacionMistica.jsx (mask-image wipe + scan-line),
+      portado a SVG (ver .rev-mistica-g* / guacaMistico()).
+    · ENTRADA / SALIDA épica — mismo lenguaje de
+      src/visual/agente/AngelitaEntrada.jsx / AngelitaSalida.jsx (asoma→crece
+      con overshoot + aro de energía / despide→encoge), moviendo el RIG
+      COMPLETO por transform, nunca redibujando (ver .guaca-entrada* /
+      guacaEntra() / guacaSale()).
+
+  Por defecto la página corre el REPERTORIO completo en bucle (idle → hablar →
+  místico desaparece/aparece → salida épica → entrada épica → repite). Las
+  lecciones/botones/tour de siempre (Posarse/Buenos días/.../El pacto) SIGUEN
+  intactos — ?modo=tour vuelve a ese tour simple, ?e=N fuerza un estado fijo.
+-->
+<style>
+  :root{
+    --tinta:#2a140b;
+    --crema:#fbf1d8;
+    --escarlata:#e02420;
+    --amarillo:#ffc61e;
+    --azul:#2f61c4;
+    --selva:#1c6b3a;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html,body{height:100%}
+  body{
+    font-family:Georgia,'Times New Roman',serif;
+    background:linear-gradient(180deg,#63c7e6 0%,#8fd6c4 40%,#dfe7a8 72%,#c8d68e 100%);
+    color:var(--tinta);
+    overflow-x:hidden;
+    min-height:100vh;
+  }
+  #lienzo{position:relative;max-width:940px;margin:0 auto;min-height:100vh}
+  #escena{display:block;width:100%;height:auto}
+
+  header{position:absolute;top:16px;left:0;right:0;text-align:center;z-index:5;pointer-events:none}
+  header h1{
+    font-size:clamp(26px,4.6vw,44px);font-style:italic;font-weight:700;
+    color:#7a1d13;letter-spacing:.5px;
+    text-shadow:0 2px 0 rgba(255,255,255,.55),0 0 20px rgba(243,192,36,.35);
+  }
+  header p{
+    margin-top:4px;font-size:clamp(12px,1.8vw,16px);letter-spacing:3px;
+    text-transform:uppercase;color:#2c6b46;
+  }
+  header p em{font-style:italic;text-transform:none;letter-spacing:1px;color:#1c6b3a}
+
+  #burbuja{
+    position:absolute;left:5%;top:15%;max-width:344px;z-index:6;
+    background:var(--crema);border:3px solid var(--tinta);border-radius:18px;
+    padding:14px 18px;font-size:clamp(14px,2vw,18px);line-height:1.45;font-style:italic;
+    color:#2a140b;
+    box-shadow:0 0 24px rgba(243,192,36,.28),4px 5px 0 rgba(42,20,11,.3);
+    opacity:0;transform:translateY(10px) scale(.92);transform-origin:40% 110%;
+    transition:opacity .35s ease,transform .35s cubic-bezier(.34,1.56,.64,1);
+    pointer-events:none;
+  }
+  #burbuja.visible{opacity:1;transform:translateY(0) scale(1)}
+  #burbuja::after{
+    content:'';position:absolute;left:56px;bottom:-14px;width:22px;height:22px;
+    background:var(--crema);border-right:3px solid var(--tinta);border-bottom:3px solid var(--tinta);
+    transform:rotate(45deg) skew(12deg,12deg);
+  }
+
+  /* medidor — riqueza de especies (biodiversidad) */
+  #medidor{
+    position:absolute;top:14px;right:14px;z-index:6;width:194px;
+    background:rgba(24,68,44,.72);border:1.5px solid rgba(243,192,36,.5);
+    border-radius:12px;padding:9px 11px;pointer-events:none;
+    box-shadow:0 2px 12px rgba(0,0,0,.3);
+    font-family:'Trebuchet MS',system-ui,sans-serif;
+  }
+  #medidor .m-tit{font-size:9.5px;letter-spacing:2px;text-transform:uppercase;color:#bfe6a0}
+  #medidor .m-riel{
+    margin:6px 0 5px;height:9px;border-radius:99px;overflow:hidden;
+    background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.16);
+  }
+  #medidorFill{
+    height:100%;width:60%;border-radius:99px;
+    background:linear-gradient(90deg,#e02420,#ffc61e 45%,#2fa04a 70%,#2f61c4);
+    transition:width .9s cubic-bezier(.5,.05,.25,1),filter .6s ease;
+  }
+  #medidorLectura{font-size:12px;font-style:italic;color:#f2f6d9}
+  #medidorLectura b{font-style:normal;letter-spacing:.5px}
+
+  body[data-estado="sana"] #medidorFill{width:94%}
+  body[data-estado="dispersar"] #medidorFill{width:82%}
+  body[data-estado="amenaza"] #medidorFill{width:14%;filter:saturate(.4) brightness(.8);animation:barraTitila 1.6s steps(1) infinite}
+  body[data-estado="pacto"] #medidorFill{width:78%}
+  body[data-estado="hablar"] #medidorFill{width:62%}
+  @keyframes barraTitila{0%{opacity:1}45%{opacity:.4}60%{opacity:1}75%{opacity:.5}100%{opacity:.9}}
+
+  #controles{
+    position:absolute;bottom:14px;left:0;right:0;z-index:7;
+    display:flex;gap:8px;justify-content:center;flex-wrap:wrap;padding:0 10px;
+  }
+  #controles button{
+    font-family:inherit;font-size:clamp(11px,1.6vw,14px);font-style:italic;
+    padding:8px 14px;border-radius:999px;cursor:pointer;
+    background:var(--crema);color:var(--tinta);border:2.5px solid var(--tinta);
+    box-shadow:0 3px 0 rgba(42,20,11,.4);
+    transition:transform .12s ease;
+  }
+  #controles button:hover{transform:translateY(-2px)}
+  #controles button.activo{background:#7a1d13;color:#fbe9c0;border-color:#5a140c}
+
+  #placa{
+    position:absolute;bottom:62px;right:12px;z-index:5;
+    font-size:clamp(10px,1.4vw,13px);letter-spacing:2px;color:#2c6b46;
+    text-transform:uppercase;pointer-events:none;text-shadow:0 1px 2px rgba(255,255,255,.4);
+  }
+
+  /* =========================================================
+     GUACAMAYA — rig rubber-hose (Ara macao, guacamaya bandera)
+     Anatomía: las ALAS nacen de los HOMBROS del cuerpo (nunca
+     de la cabeza). La cabeza lleva solo cara blanca + ojos +
+     pico curvo. La bandera amarillo→verde→azul vive en las
+     coberteras y rémiges del ala.
+     ========================================================= */
+  #guacaWrap{transition:transform 1.7s cubic-bezier(.45,.05,.25,1)}
+  #guaca{transform-box:fill-box;transform-origin:50% 40%;transition:transform 1.2s ease,filter .8s ease}
+
+  .flota{transform-box:fill-box;animation:bob 2.5s ease-in-out infinite alternate}
+  @keyframes bob{
+    from{transform:translateY(-13px) rotate(-1.2deg)}
+    to  {transform:translateY( 13px) rotate( 1.4deg)}
+  }
+  /* BOIL — idle vivo: squash-&-stretch que respira ~12fps (kit rubber-hose) */
+  #cuerpoRig{transform-box:fill-box;transform-origin:50% 62%;animation:rhBoil 1.6s steps(18,end) infinite}
+  @keyframes rhBoil{
+    0%  {transform:translateY(0) scale(1,1)}
+    22% {transform:translateY(-1px) scale(.988,1.024)}
+    50% {transform:translateY(1.4px) scale(1.024,.976)}
+    72% {transform:translateY(-.5px) scale(.995,1.01)}
+    100%{transform:translateY(0) scale(1,1)}
+  }
+  body[data-estado="amenaza"] #cuerpoRig{animation-duration:3.4s}
+  body[data-estado="sana"] #cuerpoRig{animation:rhCelebra 1.2s cubic-bezier(.34,1.56,.64,1) infinite}
+  @keyframes rhCelebra{
+    0%  {transform:translateY(0) scale(1,1)}
+    16% {transform:translateY(4px) scale(1.05,.9)}
+    42% {transform:translateY(-13px) scale(.9,1.13)}
+    62% {transform:translateY(2px) scale(1.07,.9)}
+    80% {transform:translateY(-2px) scale(.98,1.04)}
+    100%{transform:translateY(0) scale(1,1)}
+  }
+
+  /* ===== capas de vida co-primas (idle impredecible, Miss Minutes) ===== */
+  #anticRig{transform-box:fill-box;transform-origin:50% 45%;animation:rhAntic 9.7s ease-in-out infinite}
+  @keyframes rhAntic{
+    0%,54%{transform:translateY(0) rotate(0deg) scale(1,1)}
+    57%,59%{transform:translateY(3px) rotate(-3deg) scale(.95,1.06)}
+    66%{transform:translateY(-20px) rotate(2deg) scale(1.05,.95)}
+    71%{transform:translateY(3px) rotate(-1deg) scale(1.04,.94)}
+    77%{transform:translateY(-2px) scale(.99,1.02)}
+    82%,100%{transform:translateY(0) rotate(0deg) scale(1,1)}
+  }
+  #traviesoRig{transform-box:fill-box;transform-origin:50% 34%;animation:rhTravieso 6.3s ease-in-out infinite}
+  @keyframes rhTravieso{
+    0%,28%,46%,58%,74%,90%,100%{transform:translate(0,0) rotate(0deg)}
+    32%{transform:translate(-4px,-1.5px) rotate(-4deg)}
+    37%{transform:translate(-3.5px,-1px) rotate(4deg)}
+    42%{transform:translate(1.4px,.6px) rotate(-2deg)}
+    60%{transform:translate(1px,0) rotate(3.5deg)}
+    64%{transform:translate(-1px,0) rotate(-3.5deg)}
+    68%{transform:translate(.6px,0) rotate(2deg)}
+    79%{transform:translate(0,-3px) rotate(3deg)}
+    84%{transform:translate(0,1px) rotate(-2deg)}
+  }
+  body[data-estado="hablar"] #anticRig, body[data-estado="senalar"] #anticRig,
+  body[data-estado="dispersar"] #anticRig, body[data-estado="sana"] #anticRig,
+  body[data-estado="amenaza"] #anticRig, body[data-estado="pacto"] #anticRig,
+  body[data-estado="hablar"] #traviesoRig, body[data-estado="senalar"] #traviesoRig,
+  body[data-estado="dispersar"] #traviesoRig, body[data-estado="sana"] #traviesoRig,
+  body[data-estado="amenaza"] #traviesoRig, body[data-estado="pacto"] #traviesoRig{animation:none;transform:none}
+
+  /* ===== CABEZA — ladea, asiente, se acicala ===== */
+  #cabezaRig{transform-box:fill-box;transform-origin:50% 92%;animation:cabezaLadeo 4.6s ease-in-out infinite}
+  @keyframes cabezaLadeo{0%,100%{transform:rotate(-3deg)}50%{transform:rotate(3deg)}}
+  /* idle: cada tanto baja el pico al hombro y se acicala (gesto de loro) */
+  body[data-estado="idle"] #cabezaRig{animation:cabezaAcicala 11.3s ease-in-out infinite}
+  @keyframes cabezaAcicala{
+    0%,68%,100%{transform:rotate(-3deg)}
+    30%{transform:rotate(3deg)}
+    72%{transform:rotate(-4deg)}
+    77%{transform:rotate(26deg) translate(6px,8px)}
+    85%{transform:rotate(23deg) translate(6px,8px)}
+    90%{transform:rotate(-3deg)}
+  }
+  /* HABLAR: asiente Y ladea — conversa de verdad */
+  body[data-estado="hablar"] #cabezaRig{animation:cabezaHabla 2.8s ease-in-out infinite}
+  @keyframes cabezaHabla{
+    0%,100%{transform:rotate(-2deg)}
+    12%{transform:rotate(-6deg) translateY(-2px)}
+    24%{transform:rotate(3deg) translateY(1px)}
+    38%{transform:rotate(7deg) translateY(-1px)}
+    52%{transform:rotate(-3deg) translateY(-3px)}
+    66%{transform:rotate(4deg) translateY(0)}
+    80%{transform:rotate(-6deg) translateY(-2px)}
+  }
+  body[data-estado="pacto"] #cabezaRig,
+  body[data-estado="sana"] #cabezaRig{animation:cabezaHabla 3.4s ease-in-out infinite}
+  body[data-estado="dispersar"] #cabezaRig{animation:cabezaHabla 2.2s ease-in-out infinite}
+  body[data-estado="senalar"] #cabezaRig{animation:none;transform:rotate(-7deg)}
+  body[data-estado="amenaza"] #cabezaRig{animation:cabezaTriste 5s ease-in-out infinite}
+  @keyframes cabezaTriste{0%,100%{transform:rotate(-1deg) translateY(5px)}50%{transform:rotate(1deg) translateY(7px)}}
+
+  /* PICO — la mandíbula baja la mueve el LIP-SYNC por JS (silabeo del texto).
+     Transición corta para suavizar el chachareo. */
+  #picoBajo{transform-box:fill-box;transform-origin:50% 4%;transition:transform .07s ease-out}
+
+  .ojo{transform-box:fill-box;transform-origin:50% 50%;animation:rhBlink 5.4s linear infinite}
+  @keyframes rhBlink{
+    0%,36%,40%,74%,78%,82%,86%,100%{transform:scaleY(1)}
+    38%{transform:scaleY(.12)}
+    76%{transform:scaleY(.1)}
+    80%{transform:scaleY(.14)}
+  }
+  .pupila{transform-box:fill-box;animation:rhMirada 7.9s ease-in-out infinite}
+  @keyframes rhMirada{
+    0%,20%,47%,58%,76%,100%{transform:translate(0,0)}
+    23%,34%{transform:translate(-3.4px,1px)}
+    38%{transform:translate(3px,0)}
+    41%,44%{transform:translate(-3px,1px)}
+    61%,71%{transform:translate(2.8px,-3px)}
+  }
+  body[data-estado="hablar"] .pupila,
+  body[data-estado="pacto"] .pupila,
+  body[data-estado="sana"] .pupila{animation:none;transform:translate(0,1px)}
+  body[data-estado="senalar"] .pupila{animation:none;transform:translate(3.5px,1px)}
+
+  /* ===== ALAS — nacen del HOMBRO del cuerpo y gesticulan como brazos.
+     Rotación positiva = el ala se abre hacia afuera (la derecha va en un
+     grupo espejado, así los mismos grados leen simétrico). ===== */
+  .ala{transform-box:fill-box;transform-origin:80% 8%;transition:transform .6s cubic-bezier(.34,1.56,.64,1)}
+
+  /* idle: plegadas al costado, con respiración leve */
+  body[data-estado="idle"] #alaIzq{animation:alaIdle 3.4s ease-in-out infinite alternate}
+  body[data-estado="idle"] #alaDer{animation:alaIdle 3.8s ease-in-out -1.2s infinite alternate}
+  @keyframes alaIdle{from{transform:rotate(1deg)}to{transform:rotate(7deg)}}
+
+  /* hablar: el ala derecha GESTICULA (sube, marca, vuelve), la izquierda acompaña */
+  body[data-estado="hablar"] #alaDer{animation:gesticula 2.3s ease-in-out infinite}
+  @keyframes gesticula{
+    0%,100%{transform:rotate(22deg)}
+    18%{transform:rotate(74deg)}      /* alza el ala: ¡mírela! */
+    34%{transform:rotate(58deg)}      /* marca la frase */
+    46%{transform:rotate(70deg)}
+    64%{transform:rotate(30deg)}      /* baja */
+    80%{transform:rotate(48deg)}      /* otro apunte */
+  }
+  body[data-estado="hablar"] #alaIzq{transform:rotate(12deg)}
+
+  /* señalar: ala derecha extendida hacia el bosque */
+  body[data-estado="senalar"] #alaDer{transform:rotate(96deg) scale(1.04)}
+  body[data-estado="senalar"] #alaIzq{transform:rotate(8deg)}
+
+  /* dispersar: ALETEA amplio, suelta semillas */
+  body[data-estado="dispersar"] #alaIzq{animation:aleteo .2s ease-in-out infinite alternate}
+  body[data-estado="dispersar"] #alaDer{animation:aleteo .2s ease-in-out -.1s infinite alternate}
+  @keyframes aleteo{from{transform:rotate(22deg)}to{transform:rotate(88deg)}}
+  .fantasmaAla{opacity:0;transition:opacity .5s ease}
+  body[data-estado="dispersar"] .fantasmaAla{opacity:1}
+  .semilla{opacity:0;transform-box:fill-box}
+  body[data-estado="dispersar"] .semilla{opacity:1;animation:semillaCae 2s ease-in infinite}
+  .semilla.s2{animation-delay:.66s}
+  .semilla.s3{animation-delay:1.33s}
+  @keyframes semillaCae{
+    0%{transform:translate(0,0) rotate(0deg);opacity:0}
+    12%{opacity:1}
+    100%{transform:translate(-30px,150px) rotate(180deg);opacity:0}
+  }
+
+  /* sana: alas abiertas en V — exhibe toda la bandera */
+  body[data-estado="sana"] #alaIzq{transform:rotate(78deg) scale(1.05)}
+  body[data-estado="sana"] #alaDer{transform:rotate(78deg) scale(1.05)}
+
+  /* pacto: alas semi-abiertas, invita */
+  body[data-estado="pacto"] #alaIzq{transform:rotate(44deg)}
+  body[data-estado="pacto"] #alaDer{transform:rotate(44deg)}
+
+  /* amenaza: alas caídas pegadas al cuerpo, se apaga; aparece la jaula */
+  body[data-estado="amenaza"] #guaca{filter:saturate(.55) brightness(.8);transform:translateY(10px) scale(.97)}
+  body[data-estado="amenaza"] .flota{animation-duration:3.8s}
+  body[data-estado="amenaza"] #alaIzq{transform:rotate(-5deg)}
+  body[data-estado="amenaza"] #alaDer{transform:rotate(-5deg)}
+  body[data-estado="sana"] #guaca{filter:saturate(1.1) brightness(1.06)}
+  #jaula{opacity:0;transition:opacity .8s ease}
+  body[data-estado="amenaza"] #jaula{opacity:.92}
+
+  /* COLA larguísima — capas con inercia escalonada (secondary motion) */
+  .colaCapa{transform-box:fill-box;transform-origin:50% 2%}
+  #colaCentro{animation:colaSway 2.9s ease-in-out infinite alternate}
+  #colaMedia{animation:colaSway 2.9s ease-in-out .16s infinite alternate}
+  #colaExterna{animation:colaSway 2.9s ease-in-out .3s infinite alternate}
+  @keyframes colaSway{from{transform:rotate(-3deg)}to{transform:rotate(3.6deg)}}
+  body[data-estado="dispersar"] .colaCapa{animation-duration:1s}
+
+  /* fondo vivo */
+  .nube{animation:brisa 20s ease-in-out infinite alternate}
+  .nube.n2{animation-duration:27s;animation-delay:-9s}
+  @keyframes brisa{from{transform:translateX(-40px)}to{transform:translateX(46px)}}
+  .hojaDosel{transform-box:fill-box;transform-origin:50% 100%;animation:mece 5s ease-in-out infinite alternate}
+  .hojaDosel.h2{animation-delay:-1.7s}
+  .hojaDosel.h3{animation-delay:-3.2s}
+  @keyframes mece{from{transform:rotate(-2deg)}to{transform:rotate(2.4deg)}}
+  .aveFondo{transform-box:fill-box;animation:cruza 16s linear infinite}
+  .aveFondo.a2{animation-duration:22s;animation-delay:-6s}
+  .aveFondo.a3{animation-duration:19s;animation-delay:-12s}
+  @keyframes cruza{
+    0%{transform:translateX(-80px) translateY(0)}
+    50%{transform:translateX(440px) translateY(-16px)}
+    100%{transform:translateX(960px) translateY(0)}
+  }
+  .aleteoBg{transform-box:fill-box;transform-origin:50% 50%;animation:aleteaBg .5s ease-in-out infinite alternate}
+  @keyframes aleteaBg{from{transform:scaleY(.55)}to{transform:scaleY(1)}}
+  body[data-estado="amenaza"] .aveFondo{animation:none;opacity:.12}
+  body[data-estado="sana"] .aveFondo{animation-duration:11s}
+  .fruto{transform-box:fill-box;transform-origin:50% 0%;animation:cuelga 4s ease-in-out infinite alternate}
+  .fruto.f2{animation-delay:-1.5s}
+  .fruto.f3{animation-delay:-2.8s}
+  @keyframes cuelga{from{transform:rotate(-4deg)}to{transform:rotate(4deg)}}
+
+  /* ═════════════════════════════════════════════════════════════════════
+     COMPORTAMIENTOS NUEVOS (2026-08-21) — arte del rig arriba INTACTO, cero
+     paths tocados. Todo lo de aquí abajo son WRAPPERS <g> nuevos que ENVUELVEN
+     a #guaca/#jaula (que siguen exactamente como estaban) y sus propios
+     keyframes — nunca una animación existente, nunca un color/gradiente.
+
+     1) APARECE/DESAPARECE MÍSTICO — mismo MECANISMO de
+        `src/visual/creatures/RevelacionMistica.jsx` (+ revelacionMistica.css)
+        de la PWA: barrido con `mask-image` (franja opaca/transparente más
+        ancha que el elemento, animando `mask-position`) + una barra de luz
+        que cruza sincronizada. La técnica original envuelve un <span> HTML
+        con `children`; aquí el "children" es SVG (el grupo del ave), así que
+        el scan-line se porta como <rect> con filtro de glow en vez de
+        box-shadow de un ::before (los pseudo-elementos no maquetan igual
+        dentro de <svg>) — mismo lenguaje visual, mecánica SVG-nativa.
+     2) ENTRADA/SALIDA ÉPICA — mismo LENGUAJE de
+        `src/visual/agente/AngelitaEntrada.jsx`/`AngelitaSalida.jsx` +
+        `angelita-missminutes.css` (secciones 4 y 5): asoma pequeñita (pop
+        elástico) → anticipa y CRECE con overshoot (aro de energía que
+        revienta) / al revés, se despide contenta → ENCOGE con overshoot
+        invertido (aro que implota). Los % de keyframe y duraciones
+        (900ms asoma, 1300ms crece/encoge) son los MISMOS que la abeja — se
+        mueve el RIG COMPLETO (grupo `.guaca-entrada__escala`), nunca se
+        redibuja una sola pluma.
+     Ambos se aplican en capas NUEVAS entre `#guacaWrap` (posición, JS ya
+     existente) y `#guaca`/`#jaula` (arte congelado) — ver el SVG más abajo. */
+
+  /* ── 1) MÍSTICO — mask wipe + scan (calco de rev-mistica*, en SVG) ── */
+  .rev-mistica-g__mask{ }
+  .rev-mistica-g[data-activo] .rev-mistica-g__mask{
+    -webkit-mask-repeat:no-repeat; mask-repeat:no-repeat;
+    -webkit-mask-image:linear-gradient(100deg,#000 0%,#000 46%,transparent 54%,transparent 100%);
+    mask-image:linear-gradient(100deg,#000 0%,#000 46%,transparent 54%,transparent 100%);
+    -webkit-mask-size:260% 100%; mask-size:260% 100%;
+  }
+  .rev-mistica-g[data-activo="aparece"] .rev-mistica-g__mask{
+    -webkit-mask-position:100% 0; mask-position:100% 0;
+    animation:revg-mask-aparece var(--revg-dur,900ms) cubic-bezier(.4,0,.2,1) forwards;
+  }
+  .rev-mistica-g[data-activo="desaparece"] .rev-mistica-g__mask{
+    -webkit-mask-position:0% 0; mask-position:0% 0;
+    animation:revg-mask-desaparece var(--revg-dur,900ms) cubic-bezier(.4,0,.2,1) forwards;
+  }
+  @keyframes revg-mask-aparece{from{-webkit-mask-position:100% 0;mask-position:100% 0}to{-webkit-mask-position:0% 0;mask-position:0% 0}}
+  @keyframes revg-mask-desaparece{from{-webkit-mask-position:0% 0;mask-position:0% 0}to{-webkit-mask-position:100% 0;mask-position:100% 0}}
+  .rev-mistica-g--oculto{opacity:0}
+
+  .rev-mistica-g__scan{opacity:0;fill:#ffd66a;filter:url(#brilloEscaner);transform:translateX(-230px)}
+  .rev-mistica-g[data-activo="aparece"] .rev-mistica-g__scan{
+    animation:revg-scan-aparece var(--revg-dur,900ms) cubic-bezier(.4,0,.2,1) both;
+  }
+  .rev-mistica-g[data-activo="desaparece"] .rev-mistica-g__scan{
+    animation:revg-scan-desaparece var(--revg-dur,900ms) cubic-bezier(.4,0,.2,1) both;
+  }
+  @keyframes revg-scan-aparece{
+    0%{transform:translateX(-230px);opacity:0} 10%{opacity:1} 85%{opacity:1}
+    100%{transform:translateX(230px);opacity:0}
+  }
+  @keyframes revg-scan-desaparece{
+    0%{transform:translateX(230px);opacity:0} 10%{opacity:1} 85%{opacity:1}
+    100%{transform:translateX(-230px);opacity:0}
+  }
+  /* gama baja: sin scan-line ni mask — fade simple (mismo criterio del original) */
+  [data-tier="bajo"] .rev-mistica-g__scan{display:none}
+  [data-tier="bajo"] .rev-mistica-g[data-activo] .rev-mistica-g__mask{
+    -webkit-mask-image:none; mask-image:none; animation:none;
+  }
+  [data-tier="bajo"] .rev-mistica-g[data-activo="aparece"] .rev-mistica-g__mask{opacity:0;animation:revg-fade-in var(--revg-dur,900ms) ease-out forwards}
+  [data-tier="bajo"] .rev-mistica-g[data-activo="desaparece"] .rev-mistica-g__mask{opacity:1;animation:revg-fade-out var(--revg-dur,900ms) ease-in forwards}
+  @keyframes revg-fade-in{from{opacity:0}to{opacity:1}}
+  @keyframes revg-fade-out{from{opacity:1}to{opacity:0}}
+
+  /* ── 2) ENTRADA/SALIDA ÉPICA (calco de ang-asoma/ang-crece/ang-despide/ang-encoge) ── */
+  .guaca-entrada__escala{transform-box:fill-box;transform-origin:50% 78%}
+  /* 'lista' = default: el ave se ve exactamente como hoy — cero cambio para
+     el tour/botones existentes, que nunca tocan esta clase. */
+  .guaca-entrada--lista .guaca-entrada__escala{transform:none}
+  .guaca-entrada--fuera .guaca-entrada__escala{transform:scale(.1);opacity:0}
+  .guaca-entrada--espera .guaca-entrada__escala{transform:scale(.36);opacity:0}
+
+  .guaca-entrada--asoma .guaca-entrada__escala{animation:guaca-asoma .9s cubic-bezier(.3,1.4,.5,1) both}
+  @keyframes guaca-asoma{
+    0%{transform:scale(.1);opacity:0} 18%{opacity:1}
+    62%{transform:scale(.44)} 82%{transform:scale(.33)} 100%{transform:scale(.36);opacity:1}
+  }
+  .guaca-entrada--crece .guaca-entrada__escala{animation:guaca-crece 1.3s cubic-bezier(.3,.9,.35,1) both}
+  @keyframes guaca-crece{
+    0%{transform:scale(.36)}
+    16%{transform:scale(.42,.28) translateY(3%)}
+    30%{transform:scale(.3,.5) translateY(-1%)}
+    58%{transform:scale(1.14,1.22) translateY(-2%)}
+    74%{transform:scale(.94,.9) translateY(.5%)}
+    88%{transform:scale(1.04,1.05)}
+    100%{transform:none}
+  }
+  .guaca-entrada--despide .guaca-entrada__escala{animation:guaca-despide .9s cubic-bezier(.34,1.56,.64,1) both}
+  @keyframes guaca-despide{
+    0%,100%{transform:scale(1)} 30%{transform:scale(1.1,.94)}
+    55%{transform:scale(.95,1.08)} 78%{transform:scale(1.03,.99)}
+  }
+  .guaca-entrada--encoge .guaca-entrada__escala{animation:guaca-encoge 1.3s cubic-bezier(.35,0,.3,.9) both}
+  @keyframes guaca-encoge{
+    0%{transform:scale(1);opacity:1}
+    12%{transform:scale(1.04,1.05)}
+    26%{transform:scale(.94,.9) translateY(.5%)}
+    42%{transform:scale(1.14,1.22) translateY(-2%)}
+    70%{transform:scale(.3,.5) translateY(-1%)}
+    84%{transform:scale(.42,.28) translateY(3%)}
+    100%{transform:scale(.1);opacity:0}
+  }
+
+  /* Aro de energía — revienta al llegar (entrada) / implota al irse (salida).
+     <circle> propio: transform-box:fill-box escala sobre SU PROPIO centro. */
+  .guaca-entrada__aro{
+    transform-box:fill-box; transform-origin:50% 50%;
+    fill:none; stroke:rgba(255,181,79,.9); stroke-width:5px;
+    opacity:0; transform:scale(.4);
+  }
+  .guaca-entrada--crece .guaca-entrada__aro{animation:guaca-aro .85s .55s cubic-bezier(.2,.7,.3,1) forwards}
+  @keyframes guaca-aro{0%{transform:scale(.4);opacity:.9}100%{transform:scale(1.5);opacity:0}}
+  .guaca-entrada--encoge .guaca-entrada__aro{
+    transform:scale(1.5);
+    animation:guaca-aro-cierre .85s .1s cubic-bezier(.4,0,.5,1) forwards;
+  }
+  @keyframes guaca-aro-cierre{0%{transform:scale(1.5);opacity:0}60%{transform:scale(.4);opacity:.9}100%{transform:scale(.15);opacity:0}}
+
+  /* insignia de fase — solo para que quien mire la captura sepa qué comportamiento corre */
+  #faseActual{
+    position:absolute;left:50%;bottom:64px;transform:translateX(-50%);z-index:8;
+    font:italic 600 clamp(11px,1.6vw,14px)/1 Georgia,serif;letter-spacing:1px;
+    color:#fbf1d8;background:rgba(42,20,11,.62);border:1.5px solid rgba(255,196,30,.55);
+    border-radius:999px;padding:6px 16px;pointer-events:none;
+    text-shadow:0 1px 2px rgba(0,0,0,.4);
+  }
+
+  @media (prefers-reduced-motion:reduce){
+    *{animation:none !important;transition:none !important}
+    /* cinturón — el JS ya salta directo al fotograma final (ver guacaMistico/
+       guacaEntra/guacaSale), esto es la red de seguridad si algo se escapa */
+    .guaca-entrada--espera .guaca-entrada__escala,
+    .guaca-entrada--asoma .guaca-entrada__escala,
+    .guaca-entrada--crece .guaca-entrada__escala,
+    .guaca-entrada--despide .guaca-entrada__escala{transform:none;opacity:1}
+    .rev-mistica-g__mask{-webkit-mask-image:none !important;mask-image:none !important;opacity:1}
+    .rev-mistica-g__scan{opacity:0 !important}
+  }
+</style>
+</head>
+<body data-estado="idle">
+<div id="lienzo">
+  <header>
+    <h1>La Guacamaya</h1>
+    <p>La bandera del bosque · <em>Ara macao</em></p>
+  </header>
+
+  <div id="burbuja"><span id="burbujaTexto"></span></div>
+
+  <div id="medidor">
+    <div class="m-tit">Biodiversidad · riqueza de aves</div>
+    <div class="m-riel"><div id="medidorFill"></div></div>
+    <div id="medidorLectura"><b>En reposo</b></div>
+  </div>
+
+  <svg id="escena" viewBox="0 0 900 1150" xmlns="http://www.w3.org/2000/svg" aria-label="La guacamaya bandera, guía de la biodiversidad del bosque cálido colombiano, posada entre el dosel colorido">
+    <defs>
+      <linearGradient id="gCielo" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0" stop-color="#5fc3e6"/>
+        <stop offset=".5" stop-color="#8ad4c2"/>
+        <stop offset="1" stop-color="#d7e4a2"/>
+      </linearGradient>
+      <radialGradient id="gSol" cx=".5" cy=".5" r=".5">
+        <stop offset="0" stop-color="#fff6d8" stop-opacity=".9"/>
+        <stop offset="1" stop-color="#fff6d8" stop-opacity="0"/>
+      </radialGradient>
+      <!-- escarlata rico con luz y sombra -->
+      <linearGradient id="gEscarlata" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0" stop-color="#ff5a3c"/>
+        <stop offset=".5" stop-color="#e02420"/>
+        <stop offset="1" stop-color="#9e1216"/>
+      </linearGradient>
+      <linearGradient id="gCabeza" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0" stop-color="#ff5f44"/>
+        <stop offset="1" stop-color="#cf1f1e"/>
+      </linearGradient>
+      <linearGradient id="gColaRoja" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0" stop-color="#f24a30"/>
+        <stop offset=".65" stop-color="#d0221e"/>
+        <stop offset="1" stop-color="#a8151a"/>
+      </linearGradient>
+      <linearGradient id="gAmarillo" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0" stop-color="#ffd23a"/>
+        <stop offset="1" stop-color="#eda714"/>
+      </linearGradient>
+      <linearGradient id="gVerde" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0" stop-color="#3fae57"/>
+        <stop offset="1" stop-color="#1f7a38"/>
+      </linearGradient>
+      <linearGradient id="gAzulAla" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0" stop-color="#4a7ee8"/>
+        <stop offset="1" stop-color="#26489e"/>
+      </linearGradient>
+      <linearGradient id="gDosel" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0" stop-color="#2f9b52"/>
+        <stop offset="1" stop-color="#176b38"/>
+      </linearGradient>
+      <linearGradient id="gPicoAlto" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0" stop-color="#5c5c66"/>
+        <stop offset="1" stop-color="#33333b"/>
+      </linearGradient>
+      <filter id="boil" x="-8%" y="-8%" width="116%" height="116%">
+        <feTurbulence id="boilTurb" type="fractalNoise" baseFrequency="0.02" numOctaves="1" seed="1" result="n"/>
+        <feDisplacementMap in="SourceGraphic" in2="n" scale="2.4"/>
+      </filter>
+      <filter id="blurAla"><feGaussianBlur stdDeviation="1.8"/></filter>
+      <!-- glow del scan-line místico (nuevo, comportamiento — ver CSS .rev-mistica-g__scan) -->
+      <filter id="brilloEscaner" x="-200%" y="-40%" width="500%" height="180%">
+        <feGaussianBlur stdDeviation="6" result="b"/>
+        <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+      </filter>
+      <filter id="grano">
+        <feTurbulence type="fractalNoise" baseFrequency=".9" numOctaves="2" result="g"/>
+        <feColorMatrix in="g" type="matrix" values="0 0 0 0 0.12 0 0 0 0 0.09 0 0 0 0 0.05 0 0 0 .045 0"/>
+      </filter>
+
+      <!-- pluma de ala (rémige): gota alargada con raquis -->
+      <g id="plumaAla">
+        <path d="M0,0 C -8,18 -10,54 -5,86 C -2,98 4,98 7,86 C 12,54 9,18 5,0 Z"/>
+        <path d="M1,10 C 0,38 0,66 1,88" stroke-width="1.6" fill="none" opacity=".45" stroke="#1a0f08"/>
+      </g>
+      <!-- pluma de cola larguísima y fluida -->
+      <path id="plumaCola" d="M0,0 C -11,64 -13,160 -5,248 C -2,272 6,272 9,248 C 16,160 12,64 7,0 Z"/>
+      <!-- hoja de dosel -->
+      <path id="hojaTropi" d="M0,0 C -30,-14 -56,-8 -78,10 C -54,26 -24,22 0,8 C -8,20 -6,40 2,54 C 14,36 12,10 0,0 Z"/>
+      <!-- ave de fondo (silueta simple, biodiversidad) -->
+      <g id="aveSilueta">
+        <ellipse cx="0" cy="0" rx="7" ry="4"/>
+        <g class="aleteoBg"><path d="M-2,-1 C -18,-14 -30,-14 -40,-6 C -28,-2 -14,-2 -3,1 Z"/></g>
+        <g class="aleteoBg"><path d="M2,-1 C 18,-14 30,-14 40,-6 C 28,-2 14,-2 3,1 Z"/></g>
+      </g>
+      <!-- fruto colgante -->
+      <g id="frutoRacimo">
+        <path d="M0,0 C -2,10 -2,16 0,20 C 2,16 2,10 0,0 Z" fill="#7a4a1e"/>
+        <circle cx="0" cy="24" r="7"/>
+        <circle cx="-6" cy="34" r="6"/>
+        <circle cx="6" cy="35" r="6"/>
+        <circle cx="0" cy="44" r="6.5"/>
+      </g>
+
+      <!-- ALA COMPLETA (izquierda; la derecha la espeja el grupo padre).
+           Hombro en (0,0). Bandera real del Ara macao de arriba hacia abajo:
+           coberteras escarlata → banda AMARILLA → filo VERDE → rémiges AZULES. -->
+      <g id="alaBandera">
+        <!-- rémiges AZULES (las plumas largas de vuelo) -->
+        <g stroke="#16244e" stroke-width="3">
+          <g transform="translate(-42,56) rotate(18)"><use href="#plumaAla" fill="url(#gAzulAla)"/></g>
+          <g transform="translate(-28,66) rotate(10)"><use href="#plumaAla" fill="url(#gAzulAla)"/></g>
+          <g transform="translate(-14,72) rotate(3)"><use href="#plumaAla" fill="url(#gAzulAla)"/></g>
+          <g transform="translate(-1,74) rotate(-4) scale(.94)"><use href="#plumaAla" fill="url(#gAzulAla)"/></g>
+        </g>
+        <!-- coberteras mayores VERDES (filo de transición) -->
+        <g stroke="#12451f" stroke-width="2.6">
+          <g transform="translate(-37,50) rotate(16) scale(.62)"><use href="#plumaAla" fill="url(#gVerde)"/></g>
+          <g transform="translate(-23,58) rotate(7) scale(.62)"><use href="#plumaAla" fill="url(#gVerde)"/></g>
+          <g transform="translate(-9,62) rotate(-1) scale(.6)"><use href="#plumaAla" fill="url(#gVerde)"/></g>
+        </g>
+        <!-- coberteras medias AMARILLAS (la banda dorada) -->
+        <g stroke="#8f5f06" stroke-width="2.6">
+          <g transform="translate(-40,30) rotate(17) scale(.56)"><use href="#plumaAla" fill="url(#gAmarillo)"/></g>
+          <g transform="translate(-25,39) rotate(8) scale(.58)"><use href="#plumaAla" fill="url(#gAmarillo)"/></g>
+          <g transform="translate(-10,44) rotate(0) scale(.56)"><use href="#plumaAla" fill="url(#gAmarillo)"/></g>
+          <g transform="translate(3,45) rotate(-7) scale(.48)"><use href="#plumaAla" fill="url(#gAmarillo)"/></g>
+        </g>
+        <!-- hombro ESCARLATA (coberteras menores) que nace del cuerpo -->
+        <path d="M8,-20 C -30,-16 -56,8 -60,44 C -62,62 -52,72 -34,70 C -8,66 10,54 14,36 C 18,16 16,-8 8,-20 Z"
+              fill="url(#gEscarlata)" stroke="#2a140b" stroke-width="4" stroke-linejoin="round"/>
+        <!-- luz del hombro + escamitas de pluma -->
+        <path d="M-4,-10 C -28,-4 -46,14 -50,38" stroke="#ff8a66" stroke-width="4.5" fill="none" opacity=".6" stroke-linecap="round"/>
+        <g stroke="#a8151a" stroke-width="2" fill="none" opacity=".55" stroke-linecap="round">
+          <path d="M-34,34 C -28,40 -20,42 -12,42"/>
+          <path d="M-40,20 C -34,26 -26,29 -18,29"/>
+          <path d="M-26,50 C -20,55 -12,57 -4,56"/>
+        </g>
+      </g>
+    </defs>
+
+    <!-- ================= FONDO — bosque cálido colorido ================= -->
+    <rect width="900" height="1150" fill="url(#gCielo)"/>
+    <circle cx="230" cy="180" r="200" fill="url(#gSol)"/>
+
+    <g fill="#ffffff" opacity=".5">
+      <ellipse class="nube" cx="640" cy="150" rx="120" ry="30"/>
+      <ellipse class="nube n2" cx="300" cy="240" rx="90" ry="22"/>
+    </g>
+
+    <!-- aves de fondo cruzando (diversidad de especies) -->
+    <g fill="#2c5a3e" opacity=".55">
+      <g class="aveFondo" transform="translate(0,210)"><use href="#aveSilueta"/></g>
+      <g class="aveFondo a2" transform="translate(0,300) scale(.8)"><use href="#aveSilueta"/></g>
+      <g class="aveFondo a3" transform="translate(0,150) scale(1.15)"><use href="#aveSilueta"/></g>
+    </g>
+    <g class="aveFondo a2" transform="translate(0,360) scale(.9)"><g fill="#e6a52c"><use href="#aveSilueta"/></g></g>
+    <g class="aveFondo a3" transform="translate(0,120) scale(.7)"><g fill="#3f7ad6"><use href="#aveSilueta"/></g></g>
+
+    <path d="M0,540 C 150,470 340,505 480,540 C 620,575 760,548 900,510 L900,760 L0,760 Z" fill="#3f8f66" opacity=".5"/>
+
+    <path d="M0,980 C 220,952 460,972 660,958 C 780,950 850,955 900,952 L900,1150 L0,1150 Z" fill="#2c7a48"/>
+    <path d="M0,1035 C 260,1010 560,1034 900,1006 L900,1150 L0,1150 Z" fill="#1f6039"/>
+
+    <!-- rama-percha con frutos y dosel -->
+    <g>
+      <path d="M120,860 C 340,812 560,824 820,806 C 860,804 880,812 895,826 L895,896 C 700,884 420,900 150,930 C 128,932 118,890 120,860 Z" fill="#6b4423"/>
+      <path d="M150,872 C 380,834 600,844 860,830" stroke="#8a5c33" stroke-width="7" fill="none" stroke-linecap="round" opacity=".7"/>
+
+      <g fill="url(#gDosel)" stroke="#125230" stroke-width="3">
+        <g transform="translate(150,470) scale(1.5)"><use href="#hojaTropi" class="hojaDosel"/></g>
+        <g transform="translate(250,430) scale(1.7) rotate(20)"><use href="#hojaTropi" class="hojaDosel h2"/></g>
+        <g transform="translate(90,540) scale(1.3) rotate(-24)"><use href="#hojaTropi" class="hojaDosel h3"/></g>
+        <g transform="translate(760,470) scale(1.6) rotate(-14)"><use href="#hojaTropi" class="hojaDosel h2"/></g>
+        <g transform="translate(840,540) scale(1.4) rotate(18)"><use href="#hojaTropi" class="hojaDosel"/></g>
+        <g transform="translate(690,430) scale(1.5) rotate(28)"><use href="#hojaTropi" class="hojaDosel h3"/></g>
+      </g>
+
+      <g stroke="#5a3818" stroke-width="4">
+        <g transform="translate(210,806)" fill="#e8632a"><use href="#frutoRacimo" class="fruto"/></g>
+        <g transform="translate(700,802)" fill="#c73a7a"><use href="#frutoRacimo" class="fruto f2"/></g>
+        <g transform="translate(560,812) scale(.85)" fill="#e6a52c"><use href="#frutoRacimo" class="fruto f3"/></g>
+      </g>
+    </g>
+
+    <g fill="#eafbe4">
+      <ellipse class="nube" cx="250" cy="1000" rx="280" ry="34" opacity=".2"/>
+      <ellipse class="nube n2" cx="650" cy="1040" rx="300" ry="38" opacity=".16"/>
+    </g>
+
+    <!-- ================= LA GUACAMAYA ================= -->
+    <!-- Comportamientos nuevos (2026-08-21): #guacaWrap sigue siendo SOLO
+         posición (translate por JS, como siempre). Entre #guacaWrap y el arte
+         congelado (#guaca/#jaula, INTACTOS) se intercalan wrappers nuevos:
+         guacaEntrada (envolvente entrada/salida — mueve TODO el rig, nunca
+         redibuja) → guacaMistico (envolvente aparece/desaparece místico). -->
+    <g id="guacaWrap">
+     <g id="guacaEntrada" class="guaca-entrada guaca-entrada--lista">
+      <g class="guaca-entrada__escala">
+       <g id="guacaMistico" class="rev-mistica-g">
+        <g class="rev-mistica-g__mask">
+      <g id="guaca" filter="url(#boil)">
+        <g class="flota">
+         <g id="anticRig"><g id="traviesoRig">
+          <g id="cuerpoRig">
+
+            <!-- ============ COLA MUY LARGA Y FLUIDA (bajo el cuerpo) ============ -->
+            <g transform="translate(0,132)">
+              <!-- par externo (rojo profundo) -->
+              <g id="colaExterna" class="colaCapa">
+                <g stroke="#2a140b" stroke-width="4">
+                  <g transform="rotate(13)"><use href="#plumaCola" fill="#a8151a" transform="scale(.62)"/></g>
+                  <g transform="rotate(-13)"><use href="#plumaCola" fill="#a8151a" transform="scale(.62)"/></g>
+                </g>
+              </g>
+              <!-- par medio (escarlata) -->
+              <g id="colaMedia" class="colaCapa">
+                <g stroke="#2a140b" stroke-width="4">
+                  <g transform="rotate(6.5)"><use href="#plumaCola" fill="url(#gColaRoja)" transform="scale(.84)"/></g>
+                  <g transform="rotate(-6.5)"><use href="#plumaCola" fill="url(#gColaRoja)" transform="scale(.84)"/></g>
+                </g>
+              </g>
+              <!-- pluma central larguísima, escarlata con punta AZUL -->
+              <g id="colaCentro" class="colaCapa">
+                <g transform="scale(1.06)">
+                  <use href="#plumaCola" fill="url(#gColaRoja)" stroke="#2a140b" stroke-width="4.5"/>
+                  <!-- punta azul (Ara macao) -->
+                  <path d="M-8,196 C -9,232 -5,258 2,266 C 9,258 13,232 12,196 C 8,203 -4,203 -8,196 Z"
+                        fill="url(#gAzulAla)" stroke="#16244e" stroke-width="3"/>
+                  <!-- raquis -->
+                  <path d="M2,24 C 1,110 1,190 2,252" stroke="#7c0e12" stroke-width="2.2" fill="none" opacity=".7"/>
+                </g>
+              </g>
+            </g>
+
+            <!-- ============ ALAS — NACEN DE LOS HOMBROS DEL CUERPO ============ -->
+            <!-- ala izquierda: hombro en (-52,10) del torso -->
+            <g transform="translate(-52,10)">
+              <g class="fantasmaAla"><path d="M-8,4 C -64,-8 -118,14 -150,72 C -106,90 -50,66 -6,30 Z" fill="#e02420" fill-opacity=".28" filter="url(#blurAla)"/></g>
+              <g id="alaIzq" class="ala"><use href="#alaBandera"/></g>
+            </g>
+            <!-- ala derecha: hombro en (52,10), espejo exacto -->
+            <g transform="translate(52,10) scale(-1,1)">
+              <g class="fantasmaAla"><path d="M-8,4 C -64,-8 -118,14 -150,72 C -106,90 -50,66 -6,30 Z" fill="#e02420" fill-opacity=".28" filter="url(#blurAla)"/></g>
+              <g id="alaDer" class="ala"><use href="#alaBandera"/></g>
+            </g>
+
+            <!-- patitas grises zigodáctilas -->
+            <g stroke="#4a4a52" stroke-width="7" fill="none" stroke-linecap="round">
+              <path d="M-20,146 C -24,162 -22,172 -13,176 M-20,146 C -30,160 -36,168 -42,168"/>
+              <path d="M20,146 C 24,162 22,172 13,176 M20,146 C 30,160 36,168 42,168"/>
+            </g>
+
+            <!-- ============ CUERPO — torso escarlata elegante (gota) ============ -->
+            <path d="M0,-30 C 36,-24 56,12 55,62 C 54,112 30,150 0,156 C -30,150 -54,112 -55,62 C -56,12 -36,-24 0,-30 Z"
+                  fill="url(#gEscarlata)" stroke="#2a140b" stroke-width="4.5"/>
+            <!-- pecho con luz -->
+            <path d="M-26,-6 C -38,22 -38,62 -26,92 C -12,74 -8,26 -14,-8 Z" fill="#ff7a52" opacity=".5"/>
+            <!-- escamitas de plumón del pecho -->
+            <g stroke="#a8151a" stroke-width="2" fill="none" opacity=".5" stroke-linecap="round">
+              <path d="M-16,58 C -10,64 -2,66 6,64"/>
+              <path d="M-8,84 C -2,90 6,92 14,90"/>
+              <path d="M-20,108 C -14,114 -6,116 2,114"/>
+              <path d="M4,34 C 10,40 18,42 26,40"/>
+            </g>
+
+            <!-- ============ CABEZA — SOLO cara blanca + ojos + pico ============ -->
+            <g id="cabezaRig">
+              <!-- cabeza escarlata -->
+              <circle cx="0" cy="-64" r="56" fill="url(#gCabeza)" stroke="#2a140b" stroke-width="4.5"/>
+              <!-- luz de la corona -->
+              <path d="M-36,-96 C -18,-108 18,-108 36,-96 C 20,-104 -20,-104 -36,-96 Z" fill="#ff8a66" opacity=".7"/>
+
+              <!-- CARA BLANCA desnuda (la firma) -->
+              <path d="M-50,-72 C -55,-38 -32,-16 0,-16 C 32,-16 55,-38 50,-72 C 30,-88 -30,-88 -50,-72 Z"
+                    fill="#f6f0e4" stroke="#e2d8c6" stroke-width="2"/>
+              <!-- líneas finas concéntricas de plumitas rojas (patrón real) -->
+              <g stroke="#e02420" stroke-width="1.7" opacity=".7" fill="none" stroke-linecap="round">
+                <path d="M-43,-70 C -32,-68 -20,-68 -10,-71"/>
+                <path d="M-45,-58 C -32,-56 -18,-56 -6,-59"/>
+                <path d="M-43,-45 C -30,-43 -17,-43 -5,-46"/>
+                <path d="M-38,-32 C -27,-31 -16,-32 -8,-35"/>
+                <path d="M43,-70 C 32,-68 20,-68 10,-71"/>
+                <path d="M45,-58 C 32,-56 18,-56 6,-59"/>
+                <path d="M43,-45 C 30,-43 17,-43 5,-46"/>
+                <path d="M38,-32 C 27,-31 16,-32 8,-35"/>
+              </g>
+              <!-- rubor (las guacamayas de verdad se sonrojan) -->
+              <ellipse cx="-36" cy="-36" rx="8" ry="5.5" fill="#f0a08a" opacity=".4"/>
+              <ellipse cx="36" cy="-36" rx="8" ry="5.5" fill="#f0a08a" opacity=".4"/>
+
+              <!-- OJOS grandes y carismáticos -->
+              <g class="ojo">
+                <circle cx="-25" cy="-62" r="16.5" fill="#fdfbf2"/>
+                <circle cx="-25" cy="-62" r="16.5" fill="none" stroke="#2a140b" stroke-width="3"/>
+                <g class="pupila">
+                  <circle cx="-23" cy="-60" r="9.5" fill="#d89422"/>
+                  <circle cx="-23" cy="-60" r="5.2" fill="#1a0f08"/>
+                  <circle cx="-20" cy="-64" r="3" fill="#ffffff"/>
+                  <circle cx="-27" cy="-56" r="1.4" fill="#ffffff" opacity=".8"/>
+                </g>
+              </g>
+              <g class="ojo">
+                <circle cx="25" cy="-62" r="16.5" fill="#fdfbf2"/>
+                <circle cx="25" cy="-62" r="16.5" fill="none" stroke="#2a140b" stroke-width="3"/>
+                <g class="pupila">
+                  <circle cx="27" cy="-60" r="9.5" fill="#d89422"/>
+                  <circle cx="27" cy="-60" r="5.2" fill="#1a0f08"/>
+                  <circle cx="30" cy="-64" r="3" fill="#ffffff"/>
+                  <circle cx="23" cy="-56" r="1.4" fill="#ffffff" opacity=".8"/>
+                </g>
+              </g>
+
+              <!-- ============ PICO curvo GRANDE gris oscuro ============ -->
+              <g id="pico" transform="translate(0,-26)">
+                <!-- mandíbula inferior (LIP-SYNC por JS) + lengua -->
+                <g id="picoBajo">
+                  <path d="M-19,4 C -10,13 10,13 19,4 C 15,24 7,36 0,40 C -7,36 -15,24 -19,4 Z"
+                        fill="#26262c" stroke="#141418" stroke-width="3.4" stroke-linejoin="round"/>
+                  <ellipse cx="0" cy="14" rx="7.5" ry="4.5" fill="#8a3028"/>
+                </g>
+                <!-- maxila superior grande y ganchuda -->
+                <path d="M-29,-8 C -29,-30 -14,-42 0,-42 C 14,-42 29,-30 29,-8
+                         C 29,8 19,24 6,36 C 2,40 -2,40 -4,35 C -8,28 -7,20 -5,13
+                         C -16,12 -26,4 -29,-8 Z"
+                      fill="url(#gPicoAlto)" stroke="#141418" stroke-width="4" stroke-linejoin="round"/>
+                <!-- culmen con luz -->
+                <path d="M-2,-38 C 10,-36 21,-26 24,-10 C 17,-24 7,-32 -2,-34 Z" fill="#8a8a96" opacity=".85"/>
+                <!-- narinas -->
+                <ellipse cx="-13" cy="-27" rx="2.8" ry="2.2" fill="#f6f0e4"/>
+                <ellipse cx="13" cy="-27" rx="2.8" ry="2.2" fill="#f6f0e4"/>
+              </g>
+            </g><!-- /cabezaRig -->
+
+          </g><!-- /cuerpoRig -->
+         </g></g><!-- /travieso /antic -->
+
+          <!-- semillas que caen (dispersar) -->
+          <g fill="#5a3818" stroke="#2a140b" stroke-width="2">
+            <ellipse class="semilla"    cx="46" cy="120" rx="6" ry="8"/>
+            <ellipse class="semilla s2" cx="76" cy="90"  rx="5" ry="7"/>
+            <ellipse class="semilla s3" cx="24" cy="142" rx="5.5" ry="7.5"/>
+          </g>
+
+        </g><!-- /flota -->
+      </g><!-- /guaca -->
+
+      <!-- JAULA (amenaza: tráfico de fauna) -->
+      <g id="jaula" stroke="#3a2c1c" stroke-width="7" opacity="0">
+        <rect x="-170" y="-280" width="340" height="580" rx="14" fill="none"/>
+        <line x1="-113" y1="-280" x2="-113" y2="300"/>
+        <line x1="-56" y1="-280" x2="-56" y2="300"/>
+        <line x1="0" y1="-280" x2="0" y2="300"/>
+        <line x1="56" y1="-280" x2="56" y2="300"/>
+        <line x1="113" y1="-280" x2="113" y2="300"/>
+        <path d="M-170,-280 C -70,-322 70,-322 170,-280" fill="none"/>
+      </g>
+        </g><!-- /rev-mistica-g__mask -->
+        <!-- scan-line del místico (nuevo, comportamiento — ver revg-scan-* en CSS) -->
+        <rect class="rev-mistica-g__scan" x="-3" y="-150" width="6" height="430" rx="3"/>
+       </g><!-- /rev-mistica-g -->
+      </g><!-- /guaca-entrada__escala -->
+      <!-- aro de energía de entrada/salida (nuevo — ver guaca-aro* en CSS) -->
+      <circle class="guaca-entrada__aro" cx="0" cy="60" r="175"/>
+     </g><!-- /guacaEntrada -->
+    </g><!-- /guacaWrap -->
+
+    <rect width="900" height="1150" filter="url(#grano)" opacity=".7" pointer-events="none"/>
+  </svg>
+
+  <div id="placa">Bosque cálido tropical · 0 – 1.000 msnm</div>
+  <div id="faseActual"></div>
+
+  <div id="controles">
+    <button data-leccion="0">Posarse</button>
+    <button data-leccion="1">Buenos días</button>
+    <button data-leccion="2">La diversidad</button>
+    <button data-leccion="3">Sembrar volando</button>
+    <button data-leccion="4">Bajo amenaza</button>
+    <button data-leccion="5">El pacto</button>
+  </div>
+</div>
+
+<script>
+(function(){
+  'use strict';
+  var body = document.body;
+  var wrap = document.getElementById('guacaWrap');
+  var burbuja = document.getElementById('burbuja');
+  var burbujaTexto = document.getElementById('burbujaTexto');
+  var lectura = document.getElementById('medidorLectura');
+  var pico = document.getElementById('picoBajo');
+  var botones = Array.prototype.slice.call(document.querySelectorAll('#controles button'));
+
+  /* line-boil: semilla nueva a ~8 fps */
+  var turb = document.getElementById('boilTurb');
+  var semilla = 1;
+  setInterval(function(){
+    semilla = (semilla % 5) + 1;
+    turb.setAttribute('seed', String(semilla));
+  }, 130);
+
+  /* ============ LIP-SYNC — el pico chachara con las sílabas ============
+     Cada letra que aparece en la burbuja abre la mandíbula según el sonido:
+     vocal abierta = pico abierto, i/u = medio, m/b/p = cerrado (bilabiales),
+     consonante = entreabierto, pausa = cerrado. Loro parlanchín de verdad. */
+  function boca(a){
+    if(pico) pico.style.transform = 'translateY(' + (a*8).toFixed(1) + 'px) scaleY(' + (0.9 + a*0.3).toFixed(2) + ')';
+  }
+  function aperturaDe(ch){
+    ch = ch.toLowerCase();
+    if('aáeéoó'.indexOf(ch) >= 0) return 1;
+    if('iíuú'.indexOf(ch) >= 0) return .6;
+    if('mbp'.indexOf(ch) >= 0) return 0;
+    if(' .,;:¡!¿?…'.indexOf(ch) >= 0) return .08;
+    return .42;
+  }
+
+  /* Gancho para VOZ REAL (Web Speech API) — apagado por defecto.
+     Actívelo desde consola u otro script con: window.GUACA_VOZ = true */
+  function hablaVoz(texto){
+    if(!window.GUACA_VOZ || !texto || !('speechSynthesis' in window)) return;
+    try{
+      var u = new SpeechSynthesisUtterance(texto);
+      u.lang = 'es-CO'; u.pitch = 1.6; u.rate = 1.05;
+      speechSynthesis.cancel();
+      speechSynthesis.speak(u);
+    }catch(e){/* sin voz disponible: el lip-sync visual sigue solo */}
+  }
+
+  var LECCIONES = [
+    { estado:'idle', x:450, y:520, lectura:'En reposo',
+      texto:'' },
+    { estado:'hablar', x:440, y:520, lectura:'Saludando',
+      texto:'¡Buenos días, buenos días! Soy una guacamaya bandera, del género Ara. Mírela bien: soy roja como candela, con las alas amarillas, verdes y azules, la cara blanca y una cola larguísima. Somos los loros más grandes y coloridos del bosque cálido.' },
+    { estado:'senalar', x:430, y:514, lectura:'Bosque diverso',
+      texto:'Voltee a ver: aquí no vivo sola. En este bosque caben tángaras, tucanes, colibríes, carpinteros… cientos de aves de todos los colores. Colombia es el país con más aves del planeta, y cada una cumple su oficio. Eso es la biodiversidad.' },
+    { estado:'dispersar', x:470, y:485, lectura:'Sembradora',
+      texto:'Yo como frutos grandes con mi pico fuerte, vuelo lejos y voy soltando las semillas por todo el monte. Así siembro árboles sin darme cuenta: soy jardinera del bosque. Sin nosotras, muchos árboles grandes no tendrían quién los reparta.' },
+    { estado:'amenaza', x:440, y:520, lectura:'Amenazada',
+      texto:'Pero me sacan del bosque para venderme como mascota, y tumban los árboles donde anido. Encerrada pierdo el color y el canto. El tráfico de fauna y la tala nos están borrando del cielo, una guacamaya a la vez.' },
+    { estado:'pacto', x:445, y:518, lectura:'El pacto',
+      texto:'El pacto es sencillo: no me compre, déjeme libre y cuide los árboles grandes donde vivo. Si usted protege el bosque, yo lo lleno de color y de semillas… y volveremos a pintar el cielo entre todas.' }
+  ];
+
+  var escritor = null;
+  function escribe(texto){
+    clearInterval(escritor);
+    if(!texto){ burbuja.classList.remove('visible'); burbujaTexto.textContent=''; boca(0); return; }
+    burbuja.classList.add('visible');
+    burbujaTexto.textContent = '';
+    var i = 0;
+    escritor = setInterval(function(){
+      i += 1;
+      burbujaTexto.textContent = texto.slice(0, i);
+      boca(aperturaDe(texto.charAt(i-1)));        /* lip-sync con la sílaba */
+      if(i >= texto.length){ clearInterval(escritor); boca(0); }
+    }, 30);
+  }
+
+  wrap.style.transform = 'translate(450px,520px)';
+  var entradaEl = document.getElementById('guacaEntrada');
+  var misticoEl = document.getElementById('guacaMistico');
+  function mueve(n){
+    var L = LECCIONES[n];
+    body.setAttribute('data-estado', L.estado);
+    wrap.style.transform = 'translate(' + L.x + 'px,' + L.y + 'px)';
+    escribe(L.texto);
+    hablaVoz(L.texto);
+    lectura.innerHTML = '<b>' + L.lectura + '</b>';
+    botones.forEach(function(b){ b.classList.toggle('activo', +b.dataset.leccion === n); });
+    /* las lecciones de siempre SIEMPRE la muestran completa — si el
+       repertorio nuevo la había dejado a mitad de una entrada/salida/mística,
+       este es el reset a 'se ve tal cual siempre se vio' (NO rompas). */
+    entradaEl.setAttribute('class', 'guaca-entrada guaca-entrada--lista');
+    misticoEl.removeAttribute('data-activo');
+    misticoEl.classList.remove('rev-mistica-g--oculto');
+  }
+
+  var tour = null, paso = 0;
+  var ORDEN = [1,2,3,4,5];
+  function arrancaTour(){
+    clearInterval(tour);
+    tour = setInterval(function(){
+      paso = (paso + 1) % ORDEN.length;
+      mueve(ORDEN[paso]);
+    }, 9000);
+  }
+
+  /* ══════════════════════════════════════════════════════════════════════
+     COMPORTAMIENTOS NUEVOS (2026-08-21) — mismo CONTRATO de
+     RevelacionMistica.jsx / AngelitaEntrada.jsx / AngelitaSalida.jsx de la
+     PWA (src/visual/creatures|agente/*), portado a vanilla JS: este rig del
+     valle no corre React. reduced-motion salta YA al fotograma final;
+     duraciones calcadas de las mismas constantes que sus keyframes CSS
+     (900ms asoma/despide, 1300ms crece/encoge); cada uno avisa onFin UNA
+     sola vez, igual que `onFin`/`onLista`/`onSalio` de los originales. */
+  function prefiereQuietud(){
+    return typeof window.matchMedia === 'function'
+      && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  }
+  var TIER = (location.search.match(/[?&]tier=(alto|medio|bajo)/) || [0,'alto'])[1];
+  body.setAttribute('data-tier', TIER);
+
+  /* MÍSTICO — aparece/desaparece con barrido (mask-image + scan), calco de
+     RevelacionMistica.jsx. activo: 'aparece' | 'desaparece'. */
+  var DUR_MISTICO = 900;
+  function guacaMistico(activo, onFin){
+    if(prefiereQuietud()){
+      misticoEl.removeAttribute('data-activo');
+      misticoEl.classList.toggle('rev-mistica-g--oculto', activo === 'desaparece');
+      if(onFin) onFin();
+      return;
+    }
+    misticoEl.style.setProperty('--revg-dur', DUR_MISTICO + 'ms');
+    misticoEl.classList.remove('rev-mistica-g--oculto');
+    misticoEl.setAttribute('data-activo', activo);
+    setTimeout(function(){ if(onFin) onFin(); }, DUR_MISTICO);
+  }
+
+  /* ENTRADA ÉPICA — asoma pequeñita → anticipa y CRECE con overshoot + aro
+     de energía que revienta (calco de ang-asoma/ang-crece). Mueve el RIG
+     COMPLETO por transform de .guaca-entrada__escala — nunca redibuja. */
+  var DUR_ASOMA = 900, DUR_CRECE = 1300;
+  function guacaEntra(onLista){
+    if(prefiereQuietud()){
+      entradaEl.setAttribute('class', 'guaca-entrada guaca-entrada--lista');
+      body.setAttribute('data-estado', 'idle');
+      if(onLista) onLista();
+      return;
+    }
+    body.setAttribute('data-estado', 'idle');
+    entradaEl.setAttribute('class', 'guaca-entrada guaca-entrada--asoma');
+    setTimeout(function(){
+      entradaEl.setAttribute('class', 'guaca-entrada guaca-entrada--crece');
+      /* el brinco de 'sana' (rhCelebra) YA EXISTE en el rig — se reusa para
+         el estirón, igual que AngelitaEntrada reusa 'contenta': no se
+         inventa un estado nuevo para un solo momento. */
+      body.setAttribute('data-estado', 'sana');
+      setTimeout(function(){
+        entradaEl.setAttribute('class', 'guaca-entrada guaca-entrada--lista');
+        body.setAttribute('data-estado', 'idle');
+        if(onLista) onLista();
+      }, DUR_CRECE);
+    }, DUR_ASOMA);
+  }
+
+  /* SALIDA ÉPICA — se despide contenta → ENCOGE con overshoot invertido +
+     aro que implota (calco de ang-despide/ang-encoge). Espejo exacto de
+     guacaEntra, mismo lenguaje leído en reversa. */
+  var DUR_DESPIDE = 900, DUR_ENCOGE = 1300;
+  function guacaSale(onSalio){
+    if(prefiereQuietud()){
+      entradaEl.setAttribute('class', 'guaca-entrada guaca-entrada--fuera');
+      if(onSalio) onSalio();
+      return;
+    }
+    entradaEl.setAttribute('class', 'guaca-entrada guaca-entrada--despide');
+    body.setAttribute('data-estado', 'sana');
+    setTimeout(function(){
+      entradaEl.setAttribute('class', 'guaca-entrada guaca-entrada--encoge');
+      setTimeout(function(){
+        entradaEl.setAttribute('class', 'guaca-entrada guaca-entrada--fuera');
+        if(onSalio) onSalio();
+      }, DUR_ENCOGE);
+    }, DUR_DESPIDE);
+  }
+
+  /* ── EL REPERTORIO — TODOS los comportamientos en bucle, para la captura
+     GPU-headed. No pisa nada de arriba: idle/hablar siguen siendo el rig tal
+     cual, mística/entrada/salida son las capas nuevas. */
+  var faseEl = document.getElementById('faseActual');
+  function fase(txt){ if(faseEl) faseEl.textContent = txt; }
+  var TEXTO_HABLA = '¡Buenos días! Soy la guacamaya bandera, Ara macao — la más colorida del bosque cálido colombiano.';
+
+  var PASOS = [
+    { fase:'idle · respira, parpadea, se acicala', lectura:'En reposo', espera:2200,
+      run:function(next){ body.setAttribute('data-estado','idle'); escribe(''); next(); } },
+    { fase:'hablar · burbuja + lip-sync', lectura:'Saludando', espera:5400,
+      run:function(next){ body.setAttribute('data-estado','hablar'); escribe(TEXTO_HABLA); hablaVoz(TEXTO_HABLA); next(); } },
+    { fase:'idle', lectura:'En reposo', espera:900,
+      run:function(next){ escribe(''); body.setAttribute('data-estado','idle'); next(); } },
+    { fase:'místico · desaparece (barrido + destello)', lectura:'Se desvanece', espera:700,
+      run:function(next){ guacaMistico('desaparece', next); } },
+    { fase:'místico · aparece (barrido + destello)', lectura:'Se revela', espera:1400,
+      run:function(next){ guacaMistico('aparece', next); } },
+    { fase:'salida épica · se despide y encoge', lectura:'Se marcha', espera:700,
+      run:function(next){ guacaSale(next); } },
+    { fase:'entrada épica · asoma y crece con overshoot', lectura:'¡Llegó!', espera:2000,
+      run:function(next){ guacaEntra(next); } },
+  ];
+
+  var repertorioTimer = null;
+  function pausaRepertorio(){ clearTimeout(repertorioTimer); }
+  function corre(i){
+    if(i >= PASOS.length) i = 0;
+    var p = PASOS[i];
+    fase(p.fase);
+    lectura.innerHTML = '<b>' + p.lectura + '</b>';
+    p.run(function(){
+      repertorioTimer = setTimeout(function(){ corre(i + 1); }, p.espera || 0);
+    });
+  }
+  function repertorioLoop(){ pausaRepertorio(); corre(0); }
+
+  botones.forEach(function(b){
+    b.addEventListener('click', function(){
+      clearInterval(tour);
+      pausaRepertorio();
+      fase('');
+      mueve(+b.dataset.leccion);
+      clearTimeout(arrancaTour._t);
+      var modoTour = location.search.indexOf('modo=tour') >= 0;
+      arrancaTour._t = setTimeout(function(){ (modoTour ? arrancaTour : repertorioLoop)(); }, 22000);
+    });
+  });
+
+  /* ?e=N fuerza un estado fijo (verificación visual, como siempre).
+     ?modo=tour vuelve al tour simple de siempre (solo estados, sin los
+     comportamientos nuevos) — por si hiciera falta comparar A/B.
+     Por defecto: el REPERTORIO completo, en bucle. */
+  var forzado = location.search.match(/[?&]e=(\d)/);
+  if(forzado){
+    mueve(+forzado[1]);
+  } else if(location.search.indexOf('modo=tour') >= 0){
+    mueve(0);
+    /* guardado en arrancaTour._t: si el visitante toca un botón en este
+       primer respiro, el click de arriba lo cancela — nunca le pisa la
+       lección elegida a mano (mismo cuidado que ya tenía el ciclo de 22s). */
+    arrancaTour._t = setTimeout(function(){ paso = 0; mueve(ORDEN[0]); arrancaTour(); }, 2600);
+  } else {
+    mueve(0);
+    arrancaTour._t = setTimeout(repertorioLoop, 1200);
+  }
+})();
+</script>
+</body>
+</html>

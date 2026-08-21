@@ -1,0 +1,153 @@
+<!doctype html>
+<html lang="es-CO">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#18321f">
+<title>Bestiario Vivo</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='8' fill='%231d3524'/><path d='M7 20c4-6 14-6 18 0' fill='none' stroke='%23d5e6bf' stroke-width='3' stroke-linecap='round'/><circle cx='11' cy='12' r='2' fill='%23d5e6bf'/><circle cx='21' cy='12' r='2' fill='%23d5e6bf'/></svg>">
+<style>
+  :root{
+    --bg0:#102216;
+    --bg1:#1a3420;
+    --bg2:#31502b;
+    --bg3:#9db86f;
+    --paper:#f1ead7;
+    --ink:#1f2318;
+    --muted:#728165;
+    --line:rgba(255,255,255,.14);
+    --panel:rgba(12,22,14,.72);
+    --panel-soft:rgba(248,243,228,.88);
+    --accent:#d7ef9c;
+    --accent2:#f2c56b;
+    --shadow:rgba(0,0,0,.32);
+  }
+  html,body{margin:0;height:100%;overflow:hidden;background:
+    radial-gradient(circle at 18% 12%, rgba(214,247,164,.18), transparent 28%),
+    radial-gradient(circle at 82% 16%, rgba(255,212,128,.12), transparent 26%),
+    linear-gradient(180deg,var(--bg0),var(--bg1) 34%,var(--bg2) 72%,#203520 100%);
+    color:var(--paper);font-family:Georgia,"Times New Roman",serif}
+  body{touch-action:none;-webkit-user-select:none;user-select:none;overscroll-behavior:none}
+  canvas#scene{position:absolute;inset:0;width:100%;height:100%;display:block}
+  #fx{
+    position:absolute;inset:0;pointer-events:none;
+    background:
+      radial-gradient(circle at 50% 20%, rgba(255,255,255,.08), transparent 26%),
+      radial-gradient(circle at 15% 90%, rgba(208,255,170,.10), transparent 30%),
+      radial-gradient(circle at 85% 85%, rgba(255,246,200,.07), transparent 28%);
+    mix-blend-mode:screen;
+  }
+  #ui{position:absolute;inset:0;pointer-events:none;display:grid;grid-template-columns:minmax(260px,360px) 1fr minmax(250px,340px);grid-template-rows:auto 1fr auto;gap:14px;padding:14px}
+  .panel{
+    pointer-events:auto;border:1px solid var(--line);border-radius:22px;
+    background:linear-gradient(180deg,rgba(8,18,10,.80),rgba(11,23,13,.62));
+    box-shadow:0 20px 45px var(--shadow), inset 0 1px 0 rgba(255,255,255,.03);
+    backdrop-filter:blur(10px)
+  }
+  #masthead{grid-column:1 / span 2;grid-row:1;padding:16px 18px;display:flex;gap:14px;align-items:flex-end}
+  #masthead h1{margin:0;font-size:clamp(32px,4.5vw,56px);line-height:.92;letter-spacing:-.03em}
+  #masthead .tag{margin:0;color:#dce8ba;font-size:12px;letter-spacing:.16em;text-transform:uppercase}
+  #masthead .copy{margin:0;color:#edf3dc;font-size:14px;line-height:1.4;max-width:54ch}
+  #speciesPanel{grid-column:1;grid-row:2 / span 2;padding:14px;display:flex;flex-direction:column;gap:10px}
+  #speciesPanel h2,#detail h2{margin:0;font-size:14px;letter-spacing:.16em;text-transform:uppercase;color:#dbe8b7}
+  .speciesList{display:grid;gap:8px;overflow:auto;padding-right:2px}
+  .speciesBtn{
+    display:grid;gap:4px;text-align:left;border:1px solid rgba(255,255,255,.09);border-radius:16px;
+    padding:10px 11px;background:rgba(255,255,255,.04);color:var(--paper);cursor:pointer
+  }
+  .speciesBtn strong{font-size:16px}
+  .speciesBtn span{font-size:12px;color:#d7e1c7}
+  .speciesBtn small{font-size:11px;color:#a8b69a;letter-spacing:.04em}
+  .speciesBtn.active{background:linear-gradient(180deg,rgba(220,246,159,.18),rgba(255,255,255,.05));border-color:rgba(220,246,159,.34)}
+  .speciesBtn.pending{opacity:.72}
+  .speciesBtn.pending strong::after{content:" · pendiente";font-size:12px;color:#f6d37f}
+  #viewport{grid-column:2;grid-row:2 / span 2;position:relative;min-height:0}
+  #detail{grid-column:3;grid-row:1 / span 2;padding:14px;display:flex;flex-direction:column;gap:10px}
+  #detail .name{font-size:clamp(22px,2.8vw,36px);line-height:.95;margin:0}
+  #detail .latin{margin:0;color:#c9d6b3;font-size:13px;font-style:italic}
+  #detail .role{margin:0;color:#e9f3ce;font-size:14px;line-height:1.45}
+  #detail .desc{margin:0;color:#f7f3e6;font-size:14px;line-height:1.55}
+  #pointCard{
+    margin-top:auto;padding:12px 12px 14px;border-radius:18px;
+    background:var(--panel-soft);color:var(--ink);border:1px solid rgba(30,40,25,.12);
+    box-shadow:0 14px 24px rgba(0,0,0,.18)
+  }
+  #pointCard .pt-title{margin:0 0 4px;font-size:18px}
+  #pointCard .pt-body{margin:0;font-size:14px;line-height:1.5}
+  #hint{
+    grid-column:2;grid-row:3;align-self:end;justify-self:start;
+    padding:10px 14px;border-radius:999px;background:rgba(12,20,13,.74);
+    border:1px solid rgba(255,255,255,.09);color:#f6f5df;font-size:13px;
+    box-shadow:0 10px 20px rgba(0,0,0,.16)
+  }
+  #hint b{color:#dff0a5}
+  #badge{
+    grid-column:3;grid-row:3;align-self:end;justify-self:end;
+    padding:10px 12px;border-radius:999px;background:rgba(242,197,107,.14);
+    border:1px solid rgba(242,197,107,.28);color:#fff2d2;font-size:12px;letter-spacing:.08em;text-transform:uppercase
+  }
+  #loading{
+    position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
+    padding:12px 16px;border-radius:999px;background:rgba(9,14,10,.74);
+    border:1px solid rgba(255,255,255,.1);color:#f0f4de;font-size:14px;pointer-events:none;z-index:4
+  }
+  #loading.hidden{opacity:0;transition:opacity .45s}
+  @media (max-width: 980px){
+    #ui{grid-template-columns:1fr;grid-template-rows:auto auto 1fr auto auto;padding:10px}
+    #masthead{grid-column:1;grid-row:1}
+    #speciesPanel{grid-column:1;grid-row:2}
+    #viewport{grid-column:1;grid-row:3;min-height:44vh}
+    #detail{grid-column:1;grid-row:4}
+    #hint{grid-column:1;grid-row:5;justify-self:stretch}
+    #badge{grid-column:1;grid-row:5;justify-self:end;display:none}
+  }
+</style>
+<script type="importmap">
+{
+  "imports": {
+    "three": "../../vendor/three.module.js"
+  }
+}
+</script>
+</head>
+<body>
+<div id="fx"></div>
+
+<div id="ui">
+  <section id="masthead" class="panel">
+    <div>
+      <p class="tag">Atlas vivo · fauna de Chagra</p>
+      <h1>Bestiario Vivo</h1>
+    </div>
+    <p class="copy">Modo de taller apagado por defecto. Para abrir el atlas explícitamente, agrega <code>?atlas=1</code>; el modo de depuración usa además <code>&amp;debug=1</code>.</p>
+  </section>
+
+  <aside id="speciesPanel" class="panel">
+    <h2>Compañeros</h2>
+    <div class="speciesList" id="speciesList"></div>
+  </aside>
+
+  <main id="viewport" class="panel">
+    <canvas id="scene"></canvas>
+    <div id="loading">Atlas apagado · agrega ?atlas=1 para abrirlo</div>
+  </main>
+
+  <aside id="detail" class="panel">
+    <h2>Detalle</h2>
+    <p class="name" id="animalName">Oso andino</p>
+    <p class="latin" id="animalLatin">Tremarctos ornatus</p>
+    <p class="role" id="animalRole"></p>
+    <p class="desc" id="animalDesc"></p>
+    <div id="pointCard">
+      <p class="pt-title" id="pointTitle">Toca un punto</p>
+      <p class="pt-body" id="pointBody">Los puntos aparecen sobre la anatomía y se ocultan cuando quedan detrás del cuerpo.</p>
+    </div>
+  </aside>
+
+  <div id="hint">Arrastra para rotar · rueda para zoom · toca una marca para leer su función</div>
+  <div id="badge">Ocl. BVH · puntos tocables</div>
+</div>
+
+<script type="module" src="./main.js"></script>
+</body>
+</html>

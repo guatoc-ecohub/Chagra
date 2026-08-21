@@ -1,0 +1,71 @@
+<defs>
+      <linearGradient id="gCielo" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0" stop-color="#142438"/>
+        <stop offset=".5" stop-color="#173a3c"/>
+        <stop offset="1" stop-color="#0b1c22"/>
+      </linearGradient>
+      <radialGradient id="gLuna" cx=".5" cy=".5" r=".5">
+        <stop offset="0" stop-color="#eaf2da" stop-opacity=".9"/>
+        <stop offset=".4" stop-color="#cfe0c8" stop-opacity=".32"/>
+        <stop offset="1" stop-color="#cfe0c8" stop-opacity="0"/>
+      </radialGradient>
+      <!-- pelaje azabache azulado: luz de luna arriba-izquierda → sombra ventral -->
+      <radialGradient id="gPelaje" cx=".38" cy=".22" r=".95">
+        <stop offset="0" stop-color="#4f4a40"/>
+        <stop offset=".5" stop-color="#2f2b24"/>
+        <stop offset="1" stop-color="#1a1611"/>
+      </radialGradient>
+      <linearGradient id="gHocico" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0" stop-color="#f2e6c4"/>
+        <stop offset="1" stop-color="#d6b88a"/>
+      </linearGradient>
+      <linearGradient id="gPecho" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0" stop-color="#f2e3c0"/>
+        <stop offset="1" stop-color="#d9bd8d"/>
+      </linearGradient>
+      <radialGradient id="gAroHalo" cx=".5" cy=".5" r=".5">
+        <stop offset="0" stop-color="#f6e8c4" stop-opacity=".85"/>
+        <stop offset="1" stop-color="#f6e8c4" stop-opacity="0"/>
+      </radialGradient>
+      <radialGradient id="gAura" cx=".5" cy=".5" r=".5">
+        <stop offset="0" stop-color="#2c5446" stop-opacity=".5"/>
+        <stop offset="1" stop-color="#2c5446" stop-opacity="0"/>
+      </radialGradient>
+      <radialGradient id="gSombraPie" cx=".5" cy=".5" r=".5">
+        <stop offset="0" stop-color="#040a10" stop-opacity=".6"/>
+        <stop offset="1" stop-color="#040a10" stop-opacity="0"/>
+      </radialGradient>
+      <filter id="boil" x="-8%" y="-8%" width="116%" height="116%">
+        <feTurbulence id="boilTurb" type="fractalNoise" baseFrequency="0.018" numOctaves="1" seed="1" result="n"/>
+        <feDisplacementMap in="SourceGraphic" in2="n" scale="2.6"/>
+      </filter>
+      <filter id="blurSuave"><feGaussianBlur stdDeviation="2"/></filter>
+      <filter id="grano">
+        <feTurbulence type="fractalNoise" baseFrequency=".9" numOctaves="2" result="g"/>
+        <feColorMatrix in="g" type="matrix" values="0 0 0 0 0.05 0 0 0 0 0.09 0 0 0 0 0.07 0 0 0 .05 0"/>
+      </filter>
+
+      <!-- fronda de helecho -->
+      <path id="fronda" d="M0,0 C -6,-40 -4,-92 0,-128 C 4,-92 6,-40 0,0 Z"/>
+      <!-- bromelia epífita: roseta de hojas + espiga rosada -->
+      <g id="bromelia">
+        <path d="M0,0 C -16,-4 -24,-14 -24,-24 C -14,-20 -6,-12 0,0 Z" fill="#27584a"/>
+        <path d="M0,0 C 16,-4 24,-14 24,-24 C 14,-20 6,-12 0,0 Z" fill="#27584a"/>
+        <path d="M0,0 C -10,-8 -14,-20 -10,-30 C -4,-22 -2,-12 0,0 Z" fill="#2f6b57"/>
+        <path d="M0,0 C 10,-8 14,-20 10,-30 C 4,-22 2,-12 0,0 Z" fill="#3a7a62"/>
+        <path d="M0,0 C -3,-14 -2,-26 0,-34 C 2,-26 3,-14 0,0 Z" fill="#c25f74"/>
+        <circle cx="0" cy="-33" r="2.6" fill="#e08a9c"/>
+      </g>
+      <!-- brote que germina -->
+      <g id="broteForma">
+        <path d="M0,0 C 0,-10 -1,-20 0,-28" stroke="#5da878" stroke-width="4" fill="none" stroke-linecap="round"/>
+        <path d="M0,-26 C -12,-30 -18,-40 -16,-50 C -6,-44 -2,-36 0,-26 Z" fill="#7dd9a8"/>
+        <path d="M0,-26 C 12,-30 18,-40 16,-50 C 6,-44 2,-36 0,-26 Z" fill="#5fbf8c"/>
+      </g>
+      <!-- fruto de aguacatillo -->
+      <g id="fruto">
+        <path d="M0,-8 C 0,-14 2,-16 4,-18" stroke="#3a4a30" stroke-width="2.4" fill="none"/>
+        <ellipse cx="0" cy="0" rx="7" ry="9.5" fill="#35543a" stroke="#22361f" stroke-width="1.6"/>
+        <ellipse cx="-2.2" cy="-2.6" rx="2.2" ry="3" fill="#4d7250" opacity=".8"/>
+      </g>
+    </defs>

@@ -1,0 +1,324 @@
+<!doctype html>
+<html lang="es-CO">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0d1410">
+<title>Chagra Kart · Descenso del páramo</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><circle cx='16' cy='16' r='14' fill='%23124e3a'/><text x='16' y='22' font-size='16' text-anchor='middle' fill='%23ffd23f'>C</text></svg>">
+<style>
+  :root{
+    --paper:#f2ecd7;
+    --ink:#211b12;
+    --rojo:#c0392b;
+    --crema:#f2e2b0;
+    --hoja:#2e6b38;
+    --hud:rgba(16,22,18,.78);
+  }
+  html,body{margin:0;height:100%;overflow:hidden;background:#0b120e;color:var(--paper);font-family:Georgia,"Times New Roman",serif}
+  body{touch-action:none;overscroll-behavior:none;-webkit-user-select:none;user-select:none}
+  canvas#game{position:absolute;inset:0;width:100%;height:100%;display:block;touch-action:none}
+
+  /* ── HUD ────────────────────────────────────────────────────────────────── */
+  #hud{position:absolute;inset:0;pointer-events:none;z-index:5}
+  #vel{
+    position:absolute;right:14px;bottom:12px;text-align:right;
+    text-shadow:0 2px 6px rgba(0,0,0,.55)
+  }
+  #vel .kmh{font-size:clamp(34px,7vw,64px);line-height:1;font-weight:700;color:#fff}
+  #vel .lab{font-size:11px;letter-spacing:.14em;text-transform:uppercase;opacity:.85}
+  #vuelta{
+    position:absolute;left:14px;top:12px;padding:6px 12px;border-radius:12px;
+    background:var(--hud);border:1px solid rgba(255,248,226,.18);font-size:14px;
+    backdrop-filter:blur(6px)
+  }
+  #vuelta strong{color:#fff2c9}
+  #minimapa{
+    position:absolute;right:12px;top:12px;border-radius:12px;background:var(--hud);
+    border:1px solid rgba(255,248,226,.18);padding:4px;backdrop-filter:blur(6px)
+  }
+  canvas#mapa{display:block;border-radius:8px}
+  #drift{
+    position:absolute;left:14px;bottom:16px;width:min(46vw,220px);
+    background:var(--hud);border:1px solid rgba(255,248,226,.18);border-radius:12px;
+    padding:8px 10px;backdrop-filter:blur(6px);opacity:.55;transition:opacity .15s
+  }
+  #drift.on{opacity:1;border-color:rgba(255,242,201,.5)}
+  #drift .row{display:flex;justify-content:space-between;align-items:center;font-size:12px;letter-spacing:.05em}
+  #drift-bar{height:7px;border-radius:999px;background:rgba(255,255,255,.12);margin-top:5px;overflow:hidden}
+  #drift-fill{height:100%;width:0%;border-radius:999px;background:#c9d6c4;transition:width .06s linear}
+  #turbo{
+    position:absolute;left:50%;top:22%;transform:translateX(-50%);
+    font-size:clamp(22px,4.5vw,38px);font-weight:800;letter-spacing:.12em;
+    opacity:0;transition:opacity .12s;text-shadow:0 2px 10px rgba(0,0,0,.6)
+  }
+  #msg{
+    position:absolute;left:50%;top:38%;transform:translateX(-50%);z-index:6;
+    background:rgba(246,230,190,.96);color:#2d1c0f;border:2px solid #2c1c0d;border-radius:999px;
+    padding:8px 14px;font-size:15px;font-style:italic;box-shadow:0 8px 20px rgba(0,0,0,.22);
+    opacity:0;transition:opacity .22s ease
+  }
+  #msg.show{opacity:1}
+  #crono{position:absolute;left:50%;top:8px;transform:translateX(-50%);font-size:18px;color:#fff2c9;text-shadow:0 2px 6px rgba(0,0,0,.6)}
+
+  /* El circuito se juega en apaisado. Este velo no rota el juego ni intenta
+     encajar una carrera vertical: conserva el estado y devuelve el control
+     cuando el teléfono vuelve a landscape. */
+  #orientationGate{
+    position:fixed;inset:0;z-index:50;display:none;place-items:center;padding:24px;
+    box-sizing:border-box;background:rgba(8,16,11,.96);color:#fff5d4;text-align:center;
+  }
+  #orientationGate.show{display:grid}
+  #orientationGate .card{width:min(88vw,430px);padding:28px 22px;border:2px solid rgba(255,242,201,.45);border-radius:26px;background:linear-gradient(180deg,rgba(31,73,48,.98),rgba(14,35,25,.98));box-shadow:0 20px 60px rgba(0,0,0,.45)}
+  #orientationGate .phone{font-size:54px;line-height:1;display:block;margin-bottom:12px;transform:rotate(90deg)}
+  #orientationGate h2{margin:0 0 8px;font-size:clamp(25px,5vw,38px);font-style:italic}
+  #orientationGate p{margin:0;line-height:1.45;font-size:15px;opacity:.88}
+
+  /* ── controles táctiles ─────────────────────────────────────────────────── */
+  #controls{
+    position:absolute;left:0;right:0;bottom:10px;z-index:6;display:none;
+    justify-content:space-between;align-items:flex-end;padding:0 12px;gap:12px;pointer-events:none
+  }
+  #controls.visible{display:flex}
+  .pad{display:flex;gap:10px;pointer-events:auto}
+  .btn{
+    width:66px;height:66px;border-radius:18px;border:2px solid rgba(255,248,226,.6);
+    background:linear-gradient(180deg,rgba(44,28,14,.78),rgba(20,13,6,.84));
+    color:#fff6da;font-size:24px;font-weight:700;box-shadow:0 10px 18px rgba(0,0,0,.26);
+    display:grid;place-items:center;touch-action:none;pointer-events:auto
+  }
+  .btn:active,.btn.down{transform:translateY(2px) scale(.97);background:linear-gradient(180deg,rgba(74,48,22,.9),rgba(28,18,8,.95))}
+  #driftBtn{background:linear-gradient(180deg,rgba(122,40,22,.82),rgba(52,14,8,.86));color:#ffd9c9}
+  #powerBtn{background:linear-gradient(180deg,rgba(33,74,44,.88),rgba(17,38,23,.92));color:#dff5c9}
+  #muteBtn{
+    position:absolute;left:12px;top:54px;bottom:auto;z-index:7;width:44px;height:44px;border-radius:999px;
+    background:var(--hud);border:1px solid rgba(255,248,226,.2);color:#fff;font-size:18px;cursor:pointer;
+    display:grid;place-items:center
+  }
+  #tiltBtn{
+    position:absolute;right:12px;top:128px;z-index:7;display:none;align-items:center;justify-content:center;
+    min-width:132px;height:40px;padding:0 14px;border-radius:999px;border:1px solid rgba(255,248,226,.22);
+    background:var(--hud);color:#fff;font-size:13px;letter-spacing:.04em;cursor:pointer;box-shadow:0 8px 20px rgba(0,0,0,.22)
+  }
+
+  /* ── intro ──────────────────────────────────────────────────────────────── */
+  #intro{position:absolute;inset:0;z-index:10;display:grid;place-items:center;background:rgba(9,13,10,.86);backdrop-filter:blur(4px)}
+  #intro.hidden{opacity:0;pointer-events:none;transition:opacity .5s}
+  #introCard{
+    width:min(92vw,560px);padding:26px 22px;border-radius:26px;text-align:center;
+    background:linear-gradient(180deg,rgba(245,233,207,.98),rgba(226,210,182,.94));
+    color:#281a0d;border:2px solid rgba(40,26,13,.9);box-shadow:0 22px 55px rgba(0,0,0,.4)
+  }
+  #introCard h1{margin:0 0 4px;font-size:clamp(30px,6vw,52px);line-height:1;font-style:italic;color:#8c2b1e}
+  #introCard .sub{font-size:12px;letter-spacing:.1em;text-transform:uppercase;opacity:.7}
+  #introCard p{margin:10px 0 0;font-size:14px;line-height:1.5}
+  #chips{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-top:16px}
+  .chip{
+    border:2px solid rgba(40,26,13,.35);border-radius:14px;padding:10px 12px;cursor:pointer;
+    background:rgba(255,255,255,.35);text-align:left;transition:border-color .12s,background .12s
+  }
+  .chip.selected{border-color:#8c2b1e;background:rgba(242,226,176,.75);box-shadow:0 0 0 2px rgba(140,43,30,.35)}
+  .chip .t{font-weight:700;font-size:14px}
+  .chip .d{font-size:12px;opacity:.72;margin-top:2px}
+  .chip .stats{font-size:11px;margin-top:5px;display:flex;gap:8px;flex-wrap:wrap}
+  .chip .stats b{color:#7a2d1c}
+  .panelSel{
+    display:grid;gap:8px;margin-top:12px;padding-top:12px;
+    border-top:1px solid rgba(40,26,13,.18)
+  }
+  .panelSel .labSel{
+    font-size:12px;letter-spacing:.1em;text-transform:uppercase;opacity:.68
+  }
+  #startBtn{
+    margin-top:18px;padding:13px 20px;border-radius:999px;border:2px solid #281a0d;
+    background:linear-gradient(180deg,#c0392b,#8c2b1e);color:#fff;font-weight:800;
+    box-shadow:0 8px 0 rgba(40,26,13,.35);cursor:pointer;font-family:inherit;font-size:16px
+  }
+  #startBtn:active{transform:translateY(3px);box-shadow:0 5px 0 rgba(40,26,13,.35)}
+  #netPanel{margin-top:14px;padding-top:14px;border-top:1px solid rgba(40,26,13,.18);display:grid;gap:10px}
+  #netOpenBtn,#createRoomBtn,#joinRoomBtn,#readyBtn,#hostStartBtn,#netBackBtn{
+    width:100%;padding:11px 14px;border-radius:999px;border:2px solid #281a0d;
+    font:700 15px/1 Georgia,"Times New Roman",serif;cursor:pointer
+  }
+  #netOpenBtn,#createRoomBtn,#joinRoomBtn,#hostStartBtn{background:linear-gradient(180deg,#214f38,#133025);color:#fff6d7}
+  #netOpenBtn:disabled{cursor:not-allowed;background:#6f6b5d;color:#f2ead5;box-shadow:none;opacity:.9}
+  #netNota{margin:0;font-size:12px;line-height:1.45;opacity:.75}
+  #readyBtn{background:linear-gradient(180deg,#c0392b,#8c2b1e);color:#fff}
+  #netBackBtn{background:rgba(255,255,255,.28);color:#281a0d}
+  #netSetup{display:none;gap:10px}
+  #netSetup.show{display:grid}
+  #netRow{display:grid;grid-template-columns:1fr;gap:8px}
+  #joinCodeInput{
+    width:100%;box-sizing:border-box;padding:12px 14px;border-radius:18px;border:2px solid rgba(40,26,13,.35);
+    background:rgba(255,255,255,.5);color:#281a0d;font:800 22px/1.2 "Arial Black",Arial,sans-serif;
+    letter-spacing:.24em;text-transform:uppercase;text-align:center
+  }
+  #roomCard{
+    display:none;gap:10px;padding:14px;border-radius:20px;background:rgba(255,255,255,.3);
+    border:1px solid rgba(40,26,13,.18)
+  }
+  #roomCard.show{display:grid}
+  #roomCode{
+    font:900 clamp(42px,10vw,82px)/1 "Arial Black",Arial,sans-serif;letter-spacing:.22em;text-align:center;
+    color:#8c2b1e;text-shadow:0 2px 0 rgba(255,255,255,.4),0 8px 18px rgba(0,0,0,.12)
+  }
+  #roomStatus,#roomMembers{font-size:13px;line-height:1.35;text-align:center}
+  #roomStatus strong,#roomMembers strong{color:#8c2b1e}
+  #roomActions{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+  #roomHint{font-size:12px;line-height:1.4;opacity:.76;text-align:center}
+
+  /* ── resultado ──────────────────────────────────────────────────────────── */
+  #result{position:absolute;inset:0;z-index:11;display:none;place-items:center;background:rgba(8,12,9,.86)}
+  #result.show{display:grid}
+  #resultCard{
+    width:min(90vw,420px);padding:26px 22px;border-radius:26px;text-align:center;
+    background:linear-gradient(180deg,rgba(245,233,207,.98),rgba(226,210,182,.94));
+    color:#281a0d;border:2px solid rgba(40,26,13,.9);box-shadow:0 22px 55px rgba(0,0,0,.4)
+  }
+  #resultCard h2{margin:0 0 6px;font-size:32px;font-style:italic}
+  #resultCard .row{display:flex;justify-content:space-between;margin:6px 0;font-size:15px}
+  #resultCard .row b{color:#7a2d1c}
+  #againBtn{
+    margin-top:16px;padding:12px 18px;border-radius:999px;border:2px solid #281a0d;
+    background:linear-gradient(180deg,#c0392b,#8c2b1e);color:#fff;font-weight:800;cursor:pointer;
+    font-family:inherit;font-size:15px;box-shadow:0 7px 0 rgba(40,26,13,.3)
+  }
+  #againBtn:active{transform:translateY(3px);box-shadow:0 4px 0 rgba(40,26,13,.3)}
+
+  @media (max-width:760px){
+    #minimapa{padding:3px}
+    .btn{width:62px;height:62px}
+    #muteBtn{
+      display:grid;left:12px;right:auto;top:54px;bottom:auto
+    }
+    #tiltBtn{
+      display:grid;top:128px;right:12px
+    }
+    #controls{
+      bottom:calc(10px + env(safe-area-inset-bottom, 0px))
+    }
+  }
+  @media (min-width:761px){ #controls{display:none} }
+
+  /* Movimiento reducido: sin transiciones ni animaciones de interfaz. Las
+     transiciones de entrada (fade del intro, mensajes, HUD) saltan al estado
+     final; la partida sigue intacta. */
+  @media (prefers-reduced-motion: reduce){
+    *{animation:none!important;transition:none!important}
+  }
+</style>
+<script type="importmap">
+{
+  "imports": {
+    "three": "../../vendor/three.module.js",
+    "three/addons/": "../../vendor/addons/"
+  }
+}
+</script>
+</head>
+<body>
+<canvas id="game"></canvas>
+
+<div id="hud">
+  <div id="vuelta">Vuelta <strong data-vuelta>1/3</strong></div>
+  <div id="crono" data-crono>0.0</div>
+  <div id="minimapa"><canvas id="mapa" data-mapa width="132" height="132"></canvas></div>
+  <div id="turbo" data-turbo></div>
+  <div id="vel">
+    <div class="lab">km/h</div>
+    <div class="kmh" data-vel>0</div>
+  </div>
+  <div id="drift" data-drift-bar>
+    <div class="row"><span>Derrape</span><span data-drift-nivel></span></div>
+    <div id="drift-bar"><div id="drift-fill" data-drift-fill></div></div>
+  </div>
+  <div id="msg" data-msg></div>
+</div>
+
+<div id="orientationGate" role="status" aria-live="polite" aria-label="Juego pausado por orientación">
+  <div class="card">
+    <span class="phone" aria-hidden="true">↻</span>
+    <h2>Gira el teléfono para seguir jugando</h2>
+    <p>Chagra Kart corre solo en horizontal. Tu carrera está pausada y vuelve exactamente donde la dejaste.</p>
+  </div>
+</div>
+
+<div id="controls" aria-label="Controles táctiles">
+  <div class="pad">
+    <button class="btn" id="leftBtn" aria-label="Izquierda">◀</button>
+    <button class="btn" id="rightBtn" aria-label="Derecha">▶</button>
+  </div>
+  <div class="pad">
+    <button class="btn" id="driftBtn" aria-label="Derrapar">≋</button>
+    <button class="btn" id="jumpBtn" aria-label="Saltar">⤒</button>
+    <button class="btn" id="powerBtn" aria-label="Poder">✦</button>
+  </div>
+</div>
+
+<button id="muteBtn" aria-label="Silenciar">🔊</button>
+<button id="tiltBtn" aria-label="Usar inclinación">Usar inclinación</button>
+
+<div id="intro">
+  <div id="introCard">
+    <div class="sub">Circuito · Descenso del páramo</div>
+    <h1>Chagra Kart</h1>
+    <p>Sube y baja el Sumapaz en la chiva de la familia. <strong>Derrapa</strong> (mantén <b>Espacio</b> o <b>≋</b>) en las curvas para cargar <em>mini-turbo</em>, salta los desniveles con <b>Shift</b> o <b>⤒</b> y no te dejes vencer por el bosque de niebla. 3 vueltas, Lakitu vigila.</p>
+    <div class="sub" style="margin-top:14px">Elige vehículo</div>
+    <div id="chips"></div>
+    <div class="panelSel">
+    <div class="labSel">Elige piloto</div>
+    <div id="pilots"></div>
+    <div class="labSel" id="seedCounter">Semillas nativas: 0</div>
+  </div>
+  <div id="netPanel">
+  <button id="netOpenBtn" type="button" aria-describedby="netNota">Jugar en red: 2 karts</button>
+    <p id="netNota">Crea una sala, comparte el código y entren los dos desde la misma Wi‑Fi o VPN. El solitario sigue disponible.</p>
+    <div id="netSetup">
+      <div id="netRow">
+        <button id="createRoomBtn" type="button">Crear carrera</button>
+        <input id="joinCodeInput" type="text" maxlength="4" inputmode="latin" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="MULA">
+        <button id="joinRoomBtn" type="button">Entrar al código</button>
+        <button id="netBackBtn" type="button">Volver al solitario</button>
+      </div>
+      <div id="roomCard">
+        <div id="roomCode">----</div>
+        <div id="roomStatus">Sala lista.</div>
+        <div id="roomMembers">Esperando conexión.</div>
+        <div id="roomActions">
+          <button id="readyBtn" type="button">Listo</button>
+          <button id="hostStartBtn" type="button">Empezar</button>
+        </div>
+        <div id="roomHint">El código se lee grande. El juego sigue solo si el relevo está apagado.</div>
+      </div>
+    </div>
+  </div>
+    <button id="startBtn">Arrancar la chiva ▶</button>
+    <p class="sub" style="margin-top:12px">Flechas / WASD para conducir</p>
+  </div>
+</div>
+
+<div id="result">
+  <div id="resultCard">
+    <h2>¡Llegaste!</h2>
+    <div class="row"><span>Tiempo total</span><b data-r-total>—</b></div>
+    <div class="row"><span>Mejor vuelta</span><b data-r-lap>—</b></div>
+    <div class="row"><span>Velocidad máx</span><b data-r-vmax>—</b></div>
+    <button id="againBtn">Otra vuelta</button>
+  </div>
+</div>
+
+<script>
+  // La URL pública usa `sala`; el cliente histórico usa `room`. Normalizar
+  // antes de cargar el módulo permite enlaces directos sin duplicar lógica.
+  (() => {
+    const params = new URLSearchParams(location.search);
+    const sala = params.get('sala');
+    if (sala && !params.has('room')) {
+      params.set('room', sala);
+      history.replaceState(null, '', `${location.pathname}?${params}${location.hash}`);
+    }
+  })();
+</script>
+<script type="module" src="js/main.js"></script>
+</body>
+</html>

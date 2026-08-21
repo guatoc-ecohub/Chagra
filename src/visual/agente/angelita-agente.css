@@ -808,11 +808,15 @@
    del valle y los demás bichos del kit no cambian. */
 
 /* Ojos GRANDES: cada ojo crece alrededor de su propio centro (el contorno
-   engorda con él: más goma). El dardeo/parpadeo animan otros nodos — componen. */
+   engorda con él: más goma). El dardeo/parpadeo animan otros nodos — componen.
+   Re-skin 2026-08-21: el dibujo BASE ya trae los ojos más grandes (r 2.1/1.6,
+   AbejaAngelita) — la escala baja de 1.09 a 1.05 para que ojo × escala siga
+   cubierto por los lentes de GafasSol (el techo duro de la geometría); el
+   exceso residual queda tinta-sobre-tinta, invisible. */
 [data-agente='angelita'] .rh-blink > g {
   transform-box: fill-box;
   transform-origin: center;
-  transform: scale(1.09);
+  transform: scale(1.05);
 }
 /* IRIS ÁMBAR: un anillo del dorado del cuerpo (#ffb54f — abejaIdentidad)
    alrededor de la pupila de tinta. Ojo de goma, ahora con sol adentro. */

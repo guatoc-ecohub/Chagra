@@ -1,0 +1,156 @@
+/* ═══════════════════════════════════════════════════════════════════════════
+   REVELACIÓN MÍSTICA (.rev-mistica) — aparecer/desaparecer con un barrido
+   de luz, genérico para cualquier compai (RevelacionMistica.jsx).
+   ───────────────────────────────────────────────────────────────────────────
+   Técnica inspirada en el skill `build-wireframe-scan-reveal` de MengTo/Skills
+   (MIT) — adaptación 2D propia con CSS mask, no se copió código fuente.
+
+   El "wipe reveal" estándar de CSS: `mask-image` con un degradado duro
+   (opaco 0–46% / transparente 54–100%) puesto a ~260% del ancho del elemento
+   (`mask-size`), animando `mask-position` de un extremo al otro. En un
+   extremo el elemento cae ENTERO en la franja opaca (visible); en el otro,
+   ENTERO en la transparente (oculto). El borde entre ambas franjas BARRE el
+   elemento al moverse — el efecto de revelar/disolver. Una barra de SCAN con
+   glow (`.rev-mistica__scan`, box-shadow) viaja con el MISMO timing para que
+   se lea como luz de verdad, no una cortina lisa.
+
+   Solo transform/opacity/mask (GPU, gama baja). Gates de la casa al final:
+   [data-tier='bajo'] cambia el barrido por un fade simple sin scan-line
+   (mismo criterio que AbejaTransicion con tier bajo); reduced-motion lo
+   congela (el componente además ya salta el estado en JS — esto es cinturón).
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.rev-mistica {
+  position: relative;
+  display: inline-flex;
+}
+.rev-mistica--oculto {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.rev-mistica__mask {
+  display: inline-flex;
+}
+
+/* El mask-image SOLO se instancia cuando hay un barrido en curso
+   ([data-activo] presente) — con activo=null (children tal cual) no hay
+   ningún costo de mask, ni riesgo de artefactos de renderizado. */
+.rev-mistica[data-activo] .rev-mistica__mask {
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-image: linear-gradient(100deg, #000 0%, #000 46%, transparent 54%, transparent 100%);
+  mask-image: linear-gradient(100deg, #000 0%, #000 46%, transparent 54%, transparent 100%);
+  -webkit-mask-size: 260% 100%;
+  mask-size: 260% 100%;
+}
+/* aparece: de oculto (100%, ventana en la franja transparente) a visible
+   (0%, ventana en la franja opaca) — el borde barre de derecha a izquierda. */
+.rev-mistica[data-activo='aparece'] .rev-mistica__mask {
+  -webkit-mask-position: 100% 0;
+  mask-position: 100% 0;
+  animation: rev-mask-aparece var(--rev-dur, 900ms) cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+/* desaparece: el reverso — de visible a oculto. */
+.rev-mistica[data-activo='desaparece'] .rev-mistica__mask {
+  -webkit-mask-position: 0% 0;
+  mask-position: 0% 0;
+  animation: rev-mask-desaparece var(--rev-dur, 900ms) cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+@keyframes rev-mask-aparece {
+  from { -webkit-mask-position: 100% 0; mask-position: 100% 0; }
+  to   { -webkit-mask-position: 0% 0;   mask-position: 0% 0; }
+}
+@keyframes rev-mask-desaparece {
+  from { -webkit-mask-position: 0% 0;   mask-position: 0% 0; }
+  to   { -webkit-mask-position: 100% 0; mask-position: 100% 0; }
+}
+
+/* La BARRA DE SCAN — un hilo de luz con glow que cruza el elemento en el
+   MISMO sentido y timing que el barrido del mask. `.rev-mistica__scan` mide
+   100% del wrapper (inset:0) y se traslada con `transform` (GPU); el hilo
+   real es un ::before angosto en su borde izquierdo, así translateX(100%)
+   cruza EXACTO el ancho del wrapper sin depender de píxeles fijos. */
+.rev-mistica__scan {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0;
+  will-change: transform, opacity;
+}
+.rev-mistica__scan::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 3px;
+  border-radius: 2px;
+  background: var(--rev-color, #ffd66a);
+  box-shadow:
+    0 0 8px 2px var(--rev-color, #ffd66a),
+    0 0 18px 4px var(--rev-color, #ffd66a);
+}
+.rev-mistica[data-activo='aparece'] .rev-mistica__scan {
+  animation: rev-scan-aparece var(--rev-dur, 900ms) cubic-bezier(0.4, 0, 0.2, 1) both;
+}
+.rev-mistica[data-activo='desaparece'] .rev-mistica__scan {
+  animation: rev-scan-desaparece var(--rev-dur, 900ms) cubic-bezier(0.4, 0, 0.2, 1) both;
+}
+@keyframes rev-scan-aparece {
+  0% { transform: translateX(-2%); opacity: 0; }
+  10% { opacity: 1; }
+  85% { opacity: 1; }
+  100% { transform: translateX(102%); opacity: 0; }
+}
+@keyframes rev-scan-desaparece {
+  0% { transform: translateX(102%); opacity: 0; }
+  10% { opacity: 1; }
+  85% { opacity: 1; }
+  100% { transform: translateX(-2%); opacity: 0; }
+}
+
+/* ═══ GATES DE LA CASA ═══════════════════════════════════════════════════════ */
+
+/* Tier bajo: nada de scan-line (el componente ya no la monta en el DOM) y el
+   barrido de mask se cambia por un fade simple de opacidad — menos capas
+   animando a la vez, mismo criterio que AbejaTransicion con tier bajo. */
+[data-tier='bajo'].rev-mistica[data-activo] .rev-mistica__mask {
+  -webkit-mask-image: none;
+  mask-image: none;
+  animation: none;
+}
+[data-tier='bajo'].rev-mistica[data-activo='aparece'] .rev-mistica__mask {
+  opacity: 0;
+  animation: rev-fade-aparece var(--rev-dur, 900ms) ease-out forwards;
+}
+[data-tier='bajo'].rev-mistica[data-activo='desaparece'] .rev-mistica__mask {
+  opacity: 1;
+  animation: rev-fade-desaparece var(--rev-dur, 900ms) ease-in forwards;
+}
+@keyframes rev-fade-aparece {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes rev-fade-desaparece {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+
+/* Reduced-motion: cinturón — el componente ya salta al estado final en JS
+   (sin instanciar la animación), esto es la red de seguridad si algún host
+   se equivoca y deja `activo` corriendo igual. */
+@media (prefers-reduced-motion: reduce) {
+  .rev-mistica__mask,
+  .rev-mistica__scan {
+    animation: none !important;
+  }
+  .rev-mistica__mask {
+    -webkit-mask-image: none !important;
+    mask-image: none !important;
+    opacity: 1;
+  }
+  .rev-mistica__scan {
+    opacity: 0 !important;
+  }
+}

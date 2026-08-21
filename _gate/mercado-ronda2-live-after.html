@@ -1,0 +1,154 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="icon" type="image/png" sizes="192x192" href="/icon-192.png" />
+    <link rel="icon" type="image/png" sizes="512x512" href="/icon-512.png" />
+    <link rel="manifest" href="/manifest.json" />
+    <meta name="theme-color" content="#0f172a" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+
+    <!-- Content-Security-Policy (Task 112, corregido tras incidente prod #1631).
+         CRITICO: script-src DEBE incluir 'wasm-unsafe-eval'; sin eso el navegador
+         bloquea WebAssembly -> sqlite-wasm (capa de datos) no carga -> app muerta
+         (Failed to fetch, todo en 0). worker-src para el service worker de la PWA.
+         Regresion cubierta por el smoke en tests/offline.spec.js (WebAssembly.compile). -->
+    <meta http-equiv="Content-Security-Policy" content="
+      default-src 'self';
+      script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval' https:;
+      style-src 'self' 'unsafe-inline' https:;
+      img-src 'self' data: blob: https:;
+      connect-src 'self' https: wss:;
+      font-src 'self' data:;
+      media-src 'self' blob:;
+      worker-src 'self' blob:;
+      object-src 'none';
+      base-uri 'self';
+      form-action 'self';
+    " />
+
+    <!-- iOS PWA install — Safari iOS NO usa manifest.json para "Añadir a
+         pantalla de inicio". Requiere meta tags Apple-specific + un
+         apple-touch-icon PNG (NO SVG) de 180×180 mínimo. Sin esto,
+         "Añadir a pantalla de inicio" instala un shortcut que abre en
+         Safari (no standalone) y sin ícono real. Detectado en field
+         test 2026-04-30 con Lili. -->
+    <!-- Fuentes self-host del home "Finca Viva" (mockup F2): Baloo 2 (display) +
+         Nunito (cuerpo). Self-host porque la CSP sólo permite font-src 'self'
+         (offline-first, sin Google Fonts por red). El @font-face vive en
+         finca-viva-hero.css; estos preload aceleran el primer paint del hero. -->
+    <link rel="preload" href="/fonts/baloo2-latin.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="/fonts/nunito-latin.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="apple-touch-icon" href="/icon-180.png" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="Chagra" />
+
+    <title>Chagra</title>
+
+
+    <!-- Pre-React loader inline (issue #121): evita flash blanco al
+         arrancar PWA fría antes de que React + Suspense pinten el
+         ChagraGrowLoader. Sale del DOM cuando React monta el root. -->
+    <style>
+      html, body { background: #020617; margin: 0; }
+      #pre-loader {
+        position: fixed; inset: 0;
+        display: flex; flex-direction: column;
+        align-items: center; justify-content: center;
+        background: #020617;
+        color: #34d399;
+        font-family: system-ui, -apple-system, sans-serif;
+        z-index: 9999;
+        transition: opacity 200ms ease-out;
+      }
+      #pre-loader .pl-emoji {
+        font-size: 48px; line-height: 1;
+        animation: pl-grow 1.6s ease-in-out infinite;
+      }
+      #pre-loader .pl-text {
+        margin-top: 14px;
+        font-size: 12px;
+        font-weight: 700;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+        color: #6ee7b7;
+        opacity: 0.85;
+      }
+      @keyframes pl-grow {
+        0%, 100% { transform: scale(0.85); opacity: 0.7; }
+        50%      { transform: scale(1.05); opacity: 1; }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        #pre-loader .pl-emoji { animation: none; }
+      }
+    </style>
+    <script type="module" crossorigin src="/assets/main-CfAfS9Io.js"></script>
+    <link rel="modulepreload" crossorigin href="/assets/rolldown-runtime-aKtaBQYM.js">
+    <link rel="modulepreload" crossorigin href="/assets/vendor-icons-B6So74Dy.js">
+    <link rel="modulepreload" crossorigin href="/assets/vendor-react-C4h1Pm-L.js">
+    <link rel="modulepreload" crossorigin href="/assets/transformacion-ka8ieWPW.js">
+    <link rel="modulepreload" crossorigin href="/assets/preload-helper-zJ_50EbN.js">
+    <link rel="modulepreload" crossorigin href="/assets/id-1ap7d9X6.js">
+    <link rel="modulepreload" crossorigin href="/assets/dbCore-UdodrkfO.js">
+    <link rel="modulepreload" crossorigin href="/assets/vendor-state-Cyo8FpDU.js">
+    <link rel="modulepreload" crossorigin href="/assets/tenantContext-CARcf6MA.js">
+    <link rel="modulepreload" crossorigin href="/assets/apiService-B2hu3-eQ.js">
+    <link rel="modulepreload" crossorigin href="/assets/outputGuards-CWRyuhGT.js">
+    <link rel="modulepreload" crossorigin href="/assets/sidecarClient-CQJlocdy.js">
+    <link rel="modulepreload" crossorigin href="/assets/ragRetriever-Cr5iWuTA.js">
+    <link rel="modulepreload" crossorigin href="/assets/logCache-DbbvAKvx.js">
+    <link rel="modulepreload" crossorigin href="/assets/gpuTelemetryService-BlKeGyYS.js">
+    <link rel="modulepreload" crossorigin href="/assets/ollamaStream-BHrwczxT.js">
+    <link rel="modulepreload" crossorigin href="/assets/pilotTelemetryService-B9O3M5VL.js">
+    <link rel="modulepreload" crossorigin href="/assets/syncManager-Cq7qqLXR.js">
+    <link rel="modulepreload" crossorigin href="/assets/themeIcon-CA3vfF5l.js">
+    <link rel="modulepreload" crossorigin href="/assets/messages-Cf9_fGU2.js">
+    <link rel="modulepreload" crossorigin href="/assets/userProfileService-DhQOgixw.js">
+    <link rel="modulepreload" crossorigin href="/assets/ensoService-o1mVRrYi.js">
+    <link rel="modulepreload" crossorigin href="/assets/climaService-B5UnHGUt.js">
+    <link rel="modulepreload" crossorigin href="/assets/assetCache-Dc_hObzh.js">
+    <link rel="modulepreload" crossorigin href="/assets/payloadService-BdP4lgIs.js">
+    <link rel="modulepreload" crossorigin href="/assets/useLogStore-DMMMyc84.js">
+    <link rel="modulepreload" crossorigin href="/assets/useAssetStore-BuHhZRUl.js">
+    <link rel="modulepreload" crossorigin href="/assets/fincaActiveStore-CtR5JM23.js">
+    <link rel="modulepreload" crossorigin href="/assets/regionalismsService-DKwje-Ye.js">
+    <link rel="modulepreload" crossorigin href="/assets/ensoContext-x9rgwf8o.js">
+    <link rel="modulepreload" crossorigin href="/assets/agentService-DVKyez-r.js">
+    <link rel="modulepreload" crossorigin href="/assets/notificationsService-92ojKpsw.js">
+    <link rel="modulepreload" crossorigin href="/assets/useAlertStore-BhHVkmPb.js">
+    <link rel="modulepreload" crossorigin href="/assets/AbejaAngelita-ChgA0yTs.js">
+    <link rel="stylesheet" crossorigin href="/assets/transformacion-DuJXR17R.css">
+    <link rel="stylesheet" crossorigin href="/assets/AbejaAngelita-BoKFPAeQ.css">
+    <link rel="stylesheet" crossorigin href="/assets/main-CkbniWMT.css">
+  </head>
+  <body>
+    <div id="pre-loader" aria-label="Cargando Chagra">
+      <span class="pl-emoji" aria-hidden="true">🌱</span>
+      <span class="pl-text">Chagra</span>
+    </div>
+    <div id="root"></div>
+    <script>
+      // Quita el pre-loader cuando React monta su primer render.
+      (function () {
+        var root = document.getElementById('root');
+        var loader = document.getElementById('pre-loader');
+        if (!root || !loader) return;
+        var done = function () {
+          loader.style.opacity = '0';
+          setTimeout(function () { loader.remove(); }, 220);
+        };
+        var obs = new MutationObserver(function () {
+          if (root.children.length > 0) {
+            obs.disconnect();
+            done();
+          }
+        });
+        obs.observe(root, { childList: true });
+        setTimeout(function () { obs.disconnect(); done(); }, 5000);
+      })();
+    </script>
+  </body>
+</html>
