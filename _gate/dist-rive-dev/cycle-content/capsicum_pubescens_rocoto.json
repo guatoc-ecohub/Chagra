@@ -1,0 +1,77 @@
+{
+  "species_slug": "capsicum_pubescens_rocoto",
+  "scientific_name": "Capsicum pubescens Ruiz & Pav.",
+  "common_names": [
+    "Rocoto"
+  ],
+  "family": "Solanaceae",
+  "category": "hortalizas_fruto_flor",
+  "cultivable": true,
+  "conservation_status": "cultivo_comun",
+  "thermal_zones": [
+    "frio",
+    "templado"
+  ],
+  "roles_in_guild": [
+    "crop",
+    "pollinator_attractor"
+  ],
+  "antagonists": [],
+  "especies_nativas_sustitutas": [],
+  "propagation": {
+    "metodo_principal": "semilla",
+    "notas": "Germinación lenta 15-30 días a 18-22°C. Planta perenne arbustiva 2-3 m. Trasplante a las 10-12 semanas. Distancia 1-1.2 m. Primera cosecha 8-12 meses, productiva 3-5 años. Único Capsicum con semillas negras (carácter diagnóstico) y flores moradas."
+  },
+  "requirements": {
+    "agua": "medio",
+    "altitud_msnm": {
+      "min_absoluto": 1200,
+      "optimo_min": 1800,
+      "optimo_max": 3200,
+      "max_absoluto": 3500
+    },
+    "temperatura_c": {
+      "helada_letal": -2,
+      "optimo_min": 12,
+      "optimo_max": 22,
+      "max_tolerable": 28
+    },
+    "radiacion": "sol_pleno",
+    "drenaje_requerido": "bueno"
+  },
+  "valor_pedagogico": "El rocoto (Capsicum pubescens Ruiz & Pav., Solanaceae) es el único ají adaptado al clima frío de los Andes altos, una especie única en el género Capsicum por su rusticidad a altitudes superiores a 2.000 msnm donde otras especies de ají no prosperan, originaria del altiplano boliviano-peruano y cultivada ancestralmente desde la época precolombina en los Andes ecuatoriano-colombianos: en Colombia se cultiva en Nariño (Pasto, Ipiales, Cumbal), Cauca (Popayán, Silvia, Páez), Boyacá (Tunja, Garagoa, Sogamoso), Cundinamarca (Sabana, Tenjo, Cota) entre 1.200 y 3.500 msnm en zonas térmicas frías y templadas frías. Pertenece a la familia Solanaceae y al género Capsicum sección Pubescens, taxonómicamente más basal y evolutivamente más antigua que las otras especies del género. Tiene tres caracteres diagnósticos únicos en Capsicum: 1) semillas negras (todas las demás especies tienen semillas blanco-amarillas), 2) flores violeta-moradas con corola estrellada (las demás tienen flores blancas o crema), 3) hojas y tallos pubescentes (con pelos visibles, de allí el epíteto 'pubescens'). El fruto es globoso a piriforme (4-7 cm), color rojo-naranja a amarillo cuando maduro, picor alto a muy alto (30.000-100.000 SHU equivalente a habanero suave), pulpa carnosa más gruesa que otros ajíes (semejante a pimentón), sabor frutal con sutil amargor herbal, excelente para rellenar (rocoto relleno boliviano-peruano), salsas crudas (ají de rocoto) y conservas. Planta arbustiva-arborescente perenne de 2-3 m de altura que puede vivir 5-10 años produciendo en clima andino — característica única en el género que la convierte en cultivo permanente patio-huerto-shamba andino. Es lección extraordinaria de adaptación evolutiva al frío y de cómo los pueblos andinos seleccionaron una especie diferente a las del trópico para resolver el problema cultural de tener ají en clima frío: el rocoto demuestra que la biodiversidad agrícola no es uniformidad sino especialización ecológica, y enseña a niñas y niños que el clima frío también tiene su propio picante nativo. Manejo agroecológico: propagación por semilla (germinación lenta 15-30 días a 18-22°C, requiere paciencia), trasplante a las 10-12 semanas, distancia 1-1.2 m (planta grande), tutorado obligatorio (arbusto pesado), poda de formación al 2do año, riego regular sin exceso, primera cosecha 8-12 meses, productiva 3-5 años, sensible a heladas intensas (-2°C letal). Función en chagra andina como ají perenne patrimonial de clima frío, condimento patio y cosecha continua. Fuentes Tier A: GBIF Backbone Taxonomy, POWO Kew, Bernal 2015, Pérez-Arbeláez 1947, AGROSAVIA Tibaitatá.",
+  "sources": [
+    {
+      "id": "gbif-taxonomic-backbone",
+      "title": "gbif-taxonomic-backbone",
+      "tier": "A",
+      "url": "https://www.gbif.org/dataset/d7dddbf4-2cf0-4f39-9b2a-bb099caae36c"
+    },
+    {
+      "id": "powo-kew",
+      "title": "powo-kew",
+      "tier": "A",
+      "url": "https://powo.science.kew.org"
+    },
+    {
+      "id": "bernal-2015-plantas-liquenes-colombia",
+      "title": "bernal-2015-plantas-liquenes-colombia",
+      "tier": "A",
+      "url": "http://catalogoplantasdecolombia.unal.edu.co"
+    },
+    {
+      "id": "perez-arbelaez-1947-plantas-utiles",
+      "title": "perez-arbelaez-1947-plantas-utiles",
+      "tier": "A",
+      "url": null
+    },
+    {
+      "id": "agrosavia-tibaitata",
+      "title": "agrosavia-tibaitata",
+      "tier": "A",
+      "url": "https://www.agrosavia.co/investigacion/centros-de-investigacion/tibaitat%C3%A1"
+    }
+  ],
+  "_generated_by": "scripts/build-cycle-content-from-catalog.mjs",
+  "_generated_at": "2026-05-19T00:42:57.393Z"
+}

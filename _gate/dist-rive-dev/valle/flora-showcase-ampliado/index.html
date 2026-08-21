@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Chagra · Árboles vivos — ampliación de paleta</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { width: 100%; height: 100%; overflow: hidden; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background: linear-gradient(#bcdce8 0%, #d6e9d6 55%, #cbe0c4 100%);
+  }
+  #c { position: fixed; inset: 0; display: block; }
+  #labels { position: fixed; inset: 0; pointer-events: none; overflow: hidden; }
+  .lab {
+    position: absolute; transform: translate(-50%, 0);
+    text-align: center; white-space: nowrap;
+    text-shadow: 0 1px 2px rgba(255,255,255,.85), 0 0 6px rgba(255,255,255,.6);
+  }
+  .lab .comun { font-weight: 700; font-size: 13px; color: #23401f; letter-spacing: .1px; }
+  .lab .sci { font-style: italic; font-size: 10.5px; color: #4a5a44; }
+  .lab .meta { margin-top: 2px; }
+  .lab .chip {
+    display: inline-block; font-size: 9px; font-weight: 700; color: #fff;
+    padding: 1px 6px; border-radius: 8px; letter-spacing: .3px; margin: 0 1px;
+  }
+  .p-calido   { background: #d98a3d; }
+  .p-templado { background: #4f9450; }
+  .p-frio     { background: #3b78a8; }
+  .a-arbol     { background: #5b7a3a; }
+  .a-arbusto   { background: #7a6a2a; }
+  .a-rastrera  { background: #9a5a7a; }
+  .a-trepadora { background: #6a4fae; }
+  .c-externo   { background: #b0562a; }
+  #head {
+    position: fixed; top: 0; left: 0; right: 0; padding: 14px 20px 22px;
+    background: linear-gradient(rgba(255,255,255,.6), rgba(255,255,255,0));
+    pointer-events: none;
+  }
+  #head h1 { font-size: 17px; color: #1f3a1c; font-weight: 800; letter-spacing: .2px; }
+  #head p  { font-size: 12px; color: #3d5238; margin-top: 3px; }
+  #err {
+    position: fixed; left: 12px; bottom: 12px; max-width: 60ch;
+    font: 12px/1.4 ui-monospace, monospace; color: #7a1616;
+    background: rgba(255,240,240,.92); padding: 8px 10px; border-radius: 6px;
+    display: none; white-space: pre-wrap; z-index: 5;
+  }
+</style>
+<script type="importmap">
+{
+  "imports": {
+    "three": "../vendor/three.module.js",
+    "three/addons/": "../vendor/addons/"
+  }
+}
+</script>
+</head>
+<body>
+<div id="head">
+  <h1>Chagra · Árboles vivos — ampliación de paleta</h1>
+  <p id="sub">cargando…</p>
+</div>
+<canvas id="c"></canvas>
+<div id="labels"></div>
+<div id="err"></div>
+<script type="module">
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { Tree } from '../flora/ez-tree/tree.js';
+import TreeOptions from '../flora/ez-tree/options.js';
+import {
+  ESPECIES_EZTREE_AMPLIADO, ORDEN_AMPLIADO, PRIORIDAD_OPERADOR_16, crearPlantaAmpliada,
+} from '../flora/especies-eztree-ampliado.js';
+
+const errBox = document.getElementById('err');
+function showErr(msg) { errBox.style.display = 'block'; errBox.textContent += msg + '\n'; }
+addEventListener('error', (e) => showErr('ERROR: ' + e.message + ' @ ' + (e.filename || '').split('/').pop() + ':' + e.lineno));
+addEventListener('unhandledrejection', (e) => showErr('PROMISE: ' + (e.reason && e.reason.message ? e.reason.message : e.reason)));
+
+// ── base map (especies-eztree.js) — import tolerante (otro proceso lo edita) ──
+let baseMap = {}, crearPlantaBase = null;
+try {
+  const base = await import('../flora/especies-eztree.js');
+  baseMap = base.ESPECIES_EZTREE || {};
+  crearPlantaBase = base.crearPlanta || null;
+} catch (e) { showErr('base especies-eztree.js no cargó: ' + e.message); }
+
+const params = new URLSearchParams(location.search);
+const especieUnica = params.get('especie');
+const modo16 = params.get('set') === '16';
+
+const arqLabel = { arbol: 'árbol', hierba: 'rastrera', roseta: 'roseta', pajonal: 'pajonal', trepadora: 'trepadora' };
+const arqChip = { arbol: 'a-arbol', hierba: 'a-rastrera', roseta: 'a-rastrera', pajonal: 'a-rastrera', trepadora: 'a-trepadora' };
+
+// resuelve una clave contra el mapa ampliado o el base
+function resolver(clave) {
+  if (ESPECIES_EZTREE_AMPLIADO[clave]) {
+    const d = ESPECIES_EZTREE_AMPLIADO[clave];
+    return { meta: d, fuente: 'ampliado', make: () => crearPlantaAmpliada(clave, { Tree, TreeOptions }) };
+  }
+  if (baseMap[clave] && crearPlantaBase) {
+    const d = baseMap[clave];
+    return { meta: d, fuente: 'base', make: () => crearPlantaBase(clave, { Tree, TreeOptions }) };
+  }
+  return null;
+}
+
+const canvas = document.getElementById('c');
+const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
+renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+renderer.setSize(innerWidth, innerHeight);
+renderer.outputColorSpace = THREE.SRGBColorSpace;
+
+const scene = new THREE.Scene();
+scene.fog = new THREE.Fog(0xc9e0cf, 60, 160);
+
+const camera = new THREE.PerspectiveCamera(46, innerWidth / innerHeight, 0.05, 600);
+
+scene.add(new THREE.HemisphereLight(0xeaf3ea, 0x6e7a55, 1.05));
+const sun = new THREE.DirectionalLight(0xfff0d8, 1.15); sun.position.set(18, 30, 14); scene.add(sun);
+const fill = new THREE.DirectionalLight(0xbcd0e0, 0.35); fill.position.set(-14, 10, -10); scene.add(fill);
+
+const ground = new THREE.Mesh(new THREE.PlaneGeometry(600, 600), new THREE.MeshStandardMaterial({ color: 0x8bab6a, roughness: 1, metalness: 0 }));
+ground.rotation.x = -Math.PI / 2; ground.position.y = -0.02; scene.add(ground);
+
+const controls = new OrbitControls(camera, renderer.domElement);
+controls.enableDamping = true;
+
+const labelsRoot = document.getElementById('labels');
+const labelEntries = [];
+const tmp = new THREE.Vector3();
+
+const pisoClass = (p) => { const f = p.split('-')[0]; return f === 'calido' ? 'p-calido' : (f === 'frio' || f === 'paramo') ? 'p-frio' : 'p-templado'; };
+const pisoLabel = (p) => p.replace('-', ' · ');
+
+// altura de despliegue según porte — rango COMPRIMIDO para que la rastrera/
+// arbusto se lean junto a los árboles sin inflar la fresa a tamaño de roble.
+function targetH(h) { return h < 0.4 ? 1.2 : (h < 1.7 ? 2.6 : 3.4); }
+
+// enmarca la caja de contenido (sin el piso) desde una dirección 3/4 elevada
+function encuadrar(box, elevGrado) {
+  const size = new THREE.Vector3(); box.getSize(size);
+  const center = new THREE.Vector3(); box.getCenter(center);
+  const aspect = innerWidth / innerHeight;
+  const vHalf = THREE.MathUtils.degToRad(camera.fov / 2);
+  const hHalf = Math.atan(Math.tan(vHalf) * aspect);
+  const fitH = (size.y * 0.5 + size.z * 0.42) / Math.tan(vHalf);
+  const fitW = (size.x * 0.5) / Math.tan(hHalf);
+  const dist = Math.max(fitH, fitW) * 1.18 + 3;
+  const e = THREE.MathUtils.degToRad(elevGrado);
+  const dir = new THREE.Vector3(0, Math.sin(e), Math.cos(e)).normalize();
+  camera.position.copy(center).addScaledVector(dir, dist);
+  controls.target.copy(center);
+}
+
+function buildSpecimen(clave) {
+  const r = resolver(clave);
+  if (!r) { showErr('sin resolver: ' + clave); return null; }
+  let obj;
+  try { obj = r.make(); } catch (e) { showErr('gen "' + clave + '": ' + e.message); return null; }
+  const box = new THREE.Box3().setFromObject(obj);
+  const size = new THREE.Vector3(); box.getSize(size);
+  const h = Math.max(size.y, 0.001);
+  const s = targetH(h) / h;
+  obj.scale.setScalar(s);
+  const center = new THREE.Vector3(); box.getCenter(center);
+  obj.position.x = -center.x * s; obj.position.z = -center.z * s; obj.position.y = -box.min.y * s;
+  return { obj, meta: r.meta, fuente: r.fuente, displayH: targetH(h), realH: h };
+}
+
+function makeLabel(meta, fuente, extra) {
+  const el = document.createElement('div');
+  el.className = 'lab';
+  const arq = meta.arquetipo || 'arbol';
+  let html = '<div class="comun">' + meta.nombreComun + '</div>' +
+             '<div class="sci">' + meta.nombreCientifico + '</div>' +
+             '<div class="meta"><span class="chip ' + pisoClass(meta.pisoTermico) + '">' + pisoLabel(meta.pisoTermico) + '</span>' +
+             '<span class="chip ' + (arqChip[arq] || 'a-arbol') + '">' + (arqLabel[arq] || arq) + '</span>';
+  if (extra && meta.catalogo === 'externo-real') html += '<span class="chip c-externo">no en catálogo</span>';
+  html += '</div>';
+  el.innerHTML = html;
+  labelsRoot.appendChild(el);
+  return el;
+}
+
+// ══════════════════════════════════════════════════════════════════════
+let sub = '';
+if (especieUnica) {
+  // ── modo AUDITORÍA: una sola especie, close-up (para audit-plantas.sh) ──
+  const sp = buildSpecimen(especieUnica);
+  if (sp) {
+    scene.add(sp.obj);
+    const el = makeLabel(sp.meta, sp.fuente, true);
+    labelEntries.push({ el, anchor: new THREE.Vector3(0, -0.15, 1.1) });
+    const H = sp.displayH;
+    const vHalf = THREE.MathUtils.degToRad(camera.fov / 2);
+    const dist = (H * 0.72) / Math.tan(vHalf) + H * 0.4;
+    camera.position.set(dist * 0.28, H * 0.62, dist);
+    controls.target.set(0, H * 0.46, 0);
+    sub = sp.meta.nombreComun + ' · ' + sp.meta.nombreCientifico + '  ·  arquetipo: ' + (arqLabel[sp.meta.arquetipo || 'arbol']) + '  ·  altura real ≈ ' + sp.realH.toFixed(1) + ' u';
+  }
+} else {
+  // ── modo REJILLA: set 16 prioridad, o toda la ampliación ──
+  const clavesRaw = (modo16 ? PRIORIDAD_OPERADOR_16 : ORDEN_AMPLIADO).filter((k) => resolver(k));
+  const COLS = 6;
+  const CELL_X = 6.4, CELL_Z = 5.8;
+  // construir todos primero, ordenar por altura DESC (altos al fondo, bajos al
+  // frente) — capas naturales de jardín, sin que el árbol tape al arbusto.
+  const specs = clavesRaw.map((clave) => ({ clave, sp: buildSpecimen(clave) })).filter((x) => x.sp);
+  specs.sort((a, b) => b.sp.displayH - a.sp.displayH);
+  const rows = Math.ceil(specs.length / COLS);
+  let built = 0;
+  const contentBox = new THREE.Box3();
+  specs.forEach(({ sp }, i) => {
+    const col = i % COLS, row = Math.floor(i / COLS);
+    const gx = (col - (COLS - 1) / 2) * CELL_X;
+    const gz = (row - (rows - 1) / 2) * CELL_Z;
+    const holder = new THREE.Group(); holder.position.set(gx, 0, gz); holder.add(sp.obj); scene.add(holder);
+    contentBox.expandByObject(holder);
+    const el = makeLabel(sp.meta, sp.fuente, true);
+    labelEntries.push({ el, anchor: new THREE.Vector3(gx, -0.1, gz + 0.7) });
+    built++;
+  });
+  // reservar margen de suelo ADELANTE (para que la fila frontal no quede pegada
+  // al borde inferior) y un poco atrás; incluir el pie (y=0).
+  contentBox.expandByPoint(new THREE.Vector3(0, 0, contentBox.max.z + 2.5));
+  contentBox.expandByPoint(new THREE.Vector3(0, 0, contentBox.min.z - 1.5));
+  encuadrar(contentBox, 38);
+  sub = built + ' especies' + (modo16 ? ' de la lista prioridad del operador (16)' : ' del catálogo Chagra — ampliación de paleta') +
+        ', cada una a su generador (árbol ez-tree · arbusto · rastrera · trepadora), etiquetadas por nombre real';
+}
+controls.update();
+document.getElementById('sub').textContent = sub;
+
+function updateLabels() {
+  const w = innerWidth, hh = innerHeight;
+  for (const { el, anchor } of labelEntries) {
+    tmp.copy(anchor).project(camera);
+    if (tmp.z > 1) { el.style.display = 'none'; continue; }
+    el.style.display = '';
+    el.style.left = (tmp.x * 0.5 + 0.5) * w + 'px';
+    el.style.top = (-tmp.y * 0.5 + 0.5) * hh + 'px';
+  }
+}
+
+addEventListener('resize', () => {
+  camera.aspect = innerWidth / innerHeight; camera.updateProjectionMatrix();
+  renderer.setSize(innerWidth, innerHeight);
+});
+
+let frames = 0;
+function tick() {
+  controls.update();
+  renderer.render(scene, camera);
+  updateLabels();
+  if (++frames === 3) window.__valleReady = true;
+  requestAnimationFrame(tick);
+}
+tick();
+</script>
+</body>
+</html>

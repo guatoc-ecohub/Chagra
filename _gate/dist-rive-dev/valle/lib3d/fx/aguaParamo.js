@@ -1,0 +1,1192 @@
+// ── aguaParamo.js — la quebrada y la chorrera del piso frío ──────────────────
+//
+// Agua clara y fría de montaña que SE LEE como agua: lo que la vende no es la
+// transparencia sino el MOVIMIENTO y la RUPTURA — normales que se desplazan
+// aguas abajo, espuma donde rompe contra las piedras, y el reflejo del cielo
+// cortado por la corriente. Un plano azul translúcido nunca se lee como agua.
+//
+// Dos piezas, un módulo:
+//   · QUEBRADA (crearQuebrada): corriente de montaña sobre lecho de piedra,
+//     poco profunda, con el fondo VISIBLE (cantos rodados pintados en el lecho
+//     opaco bajo una lámina transparente), piedras emergentes que rompen la
+//     corriente y ESPUMA horneada por vértice donde el agua choca (piedras,
+//     rápidos, orillas) — el shader la anima, la geometría sabe dónde va.
+//   · CHORRERA (crearChorrera): la caída. REGLA DE LA CASA: la chorrera se
+//     DIBUJA, no se simula — cero física de fluidos. Es el enfoque volumétrico
+//     del agua aprobada del valle (waterfalls.js, el veredicto del operador),
+//     portado a pieza reusable: columnas con PANZA (sección en arco, normales
+//     reales), shader de estrías/hebras que caen, bordes deshilachados, pie
+//     que revienta blanco, sombra de contacto contra la roca y cortina de
+//     gotas con peso. El pozo al pie late en anillos.
+//   · RIBERA (crearHelechosRibera): los helechos arborescentes de la orilla.
+//     FOLLAJE = MASA (regla dura): copa-mata de FollajeMasa (núcleo esculpido
+//     + cards texturizados) que respira con el reloj compartido de
+//     vientoMundos. Vino de la entrada publicada de la quebrada al portarla
+//     del módulo archivado (2026-08-11).
+//
+// La BRUMA del pie NO vive aquí: crearChorrera devuelve `anclasBruma` (puntos
+// al nivel del impacto) para pasárselos a crearBrumaVolumetrica (fx/
+// brumaVolumetrica.js) — un solo módulo de niebla en la casa.
+//
+// Doctrina de presupuesto (la escena corre a 60 FPS):
+//   · El agua es barata en triángulos y cara en FILL: superficies angostas,
+//     alpha sin depthWrite sobre el pase opaco, sin sorting por frame.
+//   · Draw calls fusionados: quebrada = lecho + piedras + lámina + chispas
+//     (4). Chorrera = (sombra + cuerpo + corazón [+ velo]) × salto + gotas +
+//     pozo.
+//   · Un reloj por instancia: tick(dt) escribe UN uniform compartido por
+//     referencia entre todos los materiales de la pieza.
+//
+// PORTABLE entre mundos (valle / kart): recibe THREE como primer argumento y
+// la geografía del que llama (curso XZ + alturaEn para la quebrada; alto y
+// perfil de cara para la chorrera) — no conoce terrenos ni pistas.
+// Determinista por seed: el gate visual compara.
+//
+// Lámina naturalista ilustrada, no fotorrealismo: agua fría de páramo,
+// verde-gris clara — el color hondo apenas insinúa; el blanco de la espuma es
+// LO MÁS BLANCO del cuadro.
+
+import {
+  texturaFollaje, materialFollaje, materialNucleo,
+  geometriaNucleoMasa, geometriaCardsMasa,
+} from '../flora/FollajeMasa.js';
+import { aplicarVientoMundo, tickVientoMundos } from '../flora/vientoMundos.js';
+
+// ── PRNG determinista (misma agua cada carga) ────────────────────────────────
+function prngAgua(semilla) {
+  let a = semilla >>> 0;
+  return () => {
+    a |= 0; a = (a + 0x6d2b79f5) | 0;
+    let t = Math.imul(a ^ (a >>> 15), 1 | a);
+    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
+
+// ruido barato CPU (hornear máscaras y lecho; el espíritu del de la casa)
+function hashA(x, z) {
+  const h = Math.sin(x * 127.1 + z * 311.7) * 43758.5453;
+  return h - Math.floor(h);
+}
+function vnoiseA(x, z) {
+  const xi = Math.floor(x), zi = Math.floor(z), xf = x - xi, zf = z - zi;
+  const u = xf * xf * (3 - 2 * xf), v = zf * zf * (3 - 2 * zf);
+  const a = hashA(xi, zi), b = hashA(xi + 1, zi), c = hashA(xi, zi + 1), d = hashA(xi + 1, zi + 1);
+  return a + (b - a) * u + (c - a) * v + (a - b - c + d) * u * v;
+}
+const clamp01 = (v) => Math.min(1, Math.max(0, v));
+const suav = (a, b, x) => {
+  const t = clamp01((x - a) / (b - a));
+  return t * t * (3 - 2 * t);
+};
+
+// GLSL compartido: mismo hash/noise del agua del valle
+const NOISE_GLSL = /* glsl */ `
+  float hashG(vec2 p){ return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
+  float noiseG(vec2 p){
+    vec2 i = floor(p), f = fract(p);
+    f = f * f * (3.0 - 2.0 * f);
+    return mix(mix(hashG(i), hashG(i + vec2(1,0)), f.x),
+               mix(hashG(i + vec2(0,1)), hashG(i + vec2(1,1)), f.x), f.y);
+  }
+`;
+
+// paleta canónica del agua fría altoandina (acento sobre mundo verde)
+export const PALETA_AGUA = Object.freeze({
+  lamina: 0x9fc4bb,   // lámina clara verde-gris (agua de páramo, no piscina)
+  honda: 0x33635c,    // el tinte de las pozas
+  espuma: 0xf4f6f0,   // lo más blanco del cuadro (el del agua del valle)
+  cielo: 0xdce8e6,    // reflejo del cielo frío nublado
+  velo: 0xe8efe9,     // cuerpo de la caída
+  corazon: 0xf4f6f0,  // corazón denso de la caída
+  lechoBase: 0x81796a, // arena-piedra del lecho (claro: se ve BAJO el agua)
+  lechoPiedra: 0xa39a89, // canto rodado claro
+  lechoMusgo: 0x55673c,  // verde de alga/musgo en piedra sumergida
+  roca: 0x6f6a5e,     // la piedra emergente (la misma del valle)
+});
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   LA QUEBRADA
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/**
+ * Corriente de montaña sobre lecho de piedra, poco profunda y transparente.
+ *
+ * @param {object} THREE  el módulo three del mundo que llama
+ * @param {object} opts
+ *   puntos    {Array<{x,z}>}  waypoints XZ del curso, de aguas arriba a
+ *                             aguas abajo (mínimo 2). El que llama sabe por
+ *                             dónde baja su agua.
+ *   alturaEn  {(x,z)=>y}      terreno del anfitrión: el cauce se drapea.
+ *   ancho     {number}   ancho medio de la lámina (def 2.4)
+ *   hundir    {number}   cuánto se talla el lecho bajo el terreno (def 0.5)
+ *   piedras   {number}   piedras emergentes (def 14; 0 = ninguna)
+ *   chispas   {number}   motas de espuma viajera (def 70; 0 = ninguna)
+ *   seed      {number}   semilla determinista (def 31)
+ *   solDir    {Vector3}  dirección hacia el sol (def frío del páramo)
+ *   muestras  {number}   segmentos a lo largo (def 160)
+ *   colores   {object}   overrides de PALETA_AGUA
+ * @returns {{ grupo, tick, contarTriangulos, curva, enCurso, profundidadEn }}
+ *   tick(dt) 1×/frame · curva {CatmullRomCurve3 del eje} · enCurso(t01) →
+ *   {pos, tangente} para que el anfitrión ancle cosas al agua.
+ *   profundidadEn(x, z): la ZANJA que el anfitrión debe restarle a su terreno
+ *   a lo largo del curso — el lecho y la lámina viven BAJO alturaEn; sin esa
+ *   excavación el suelo del mundo tapa el agua (visto en el gate: quebrada
+ *   invisible bajo el pajonal). El anfitrión construye su suelo con
+ *   `alturaEn(x,z) - quebrada.profundidadEn(x,z)`.
+ */
+export function crearQuebrada(THREE, opts = {}) {
+  const P = { ...PALETA_AGUA, ...(opts.colores ?? {}) };
+  const puntosXZ = opts.puntos ?? [];
+  if (puntosXZ.length < 2) throw new Error('crearQuebrada: se necesitan >= 2 puntos del curso');
+  const alturaEn = opts.alturaEn ?? (() => 0);
+  const ANCHO = opts.ancho ?? 2.4;
+  const HUNDIR = opts.hundir ?? 0.5;
+  const N = Math.max(24, Math.round(opts.muestras ?? 160));
+  const seed = opts.seed ?? 31;
+  const rn = prngAgua(seed * 7919 + 11);
+  const solDir = (opts.solDir ? opts.solDir.clone() : new THREE.Vector3(0.44, 0.66, 0.38)).normalize();
+
+  const grupo = new THREE.Group();
+  grupo.name = 'quebrada';
+  const uniforms = { uTiempo: { value: 1.7 } };
+
+  // ── el eje del curso, drapeado al terreno ──────────────────────────────────
+  const curva = new THREE.CatmullRomCurve3(
+    puntosXZ.map(({ x, z }) => new THREE.Vector3(x, alturaEn(x, z), z)),
+    false, 'catmullrom', 0.32,
+  );
+  // muestreo: centro + perpendicular XZ + rapidez por pendiente local.
+  // CADA vértice se drapea en su propio (x,z) — la curva suavizada se aparta
+  // de la polilínea y si la Y solo se interpola, la cinta se entierra.
+  const eje = [];
+  {
+    const p = new THREE.Vector3(), tg = new THREE.Vector3();
+    let largo = 0;
+    for (let i = 0; i <= N; i++) {
+      const t = i / N;
+      curva.getPointAt(t, p);
+      curva.getTangentAt(t, tg);
+      const nx = -tg.z, nz = tg.x;
+      const L = Math.hypot(nx, nz) || 1;
+      if (i > 0) largo += p.distanceTo(eje[i - 1].p);
+      // el ancho respira a lo largo (angosturas y ensanches, nunca tubo)
+      const w = ANCHO * (0.72 + 0.5 * vnoiseA(t * 7.3 + seed, 3.1));
+      eje.push({ p: p.clone(), nx: nx / L, nz: nz / L, w, v: largo, t });
+    }
+    // rapidez = pendiente local suavizada (los rápidos corren y espuman más;
+    // con ganancia alta TODO el curso saturaba a rápido y la lámina era jabón)
+    for (let i = 0; i <= N; i++) {
+      const a = eje[Math.max(0, i - 2)], b = eje[Math.min(N, i + 2)];
+      const dy = a.p.y - b.p.y, dl = Math.max(0.001, b.v - a.v);
+      eje[i].rapidez = clamp01((dy / dl) * 3.2);
+    }
+    for (let k = 0; k < 3; k++) {
+      for (let i = 1; i < N; i++) {
+        eje[i].rapidez = (eje[i - 1].rapidez + eje[i].rapidez * 2 + eje[i + 1].rapidez) / 4;
+      }
+    }
+  }
+  const alturaLecho = (i, u) => {
+    const s = eje[i];
+    const ax = s.p.x + s.nx * s.w * u, az = s.p.z + s.nz * s.w * u;
+    // perfil en artesa: hondo al centro, playo en las orillas
+    const artesa = Math.cos(u * Math.PI * 0.5);
+    return alturaEn(ax, az) - HUNDIR * (0.3 + 0.7 * artesa * artesa);
+  };
+
+  // ── EL LECHO: cinta opaca más ancha que el agua, cantos rodados PINTADOS ───
+  // (el fondo visible es la mitad de la transparencia: si no hay nada que ver
+  // debajo, el alfa solo lee como vidrio; 13 columnas: con 9 el canto pintado
+  // se licuaba en gradiente)
+  const NW_L = 13;
+  let lecho;
+  {
+    const nv = (N + 1) * NW_L;
+    const pos = new Float32Array(nv * 3);
+    const col = new Float32Array(nv * 3);
+    const idx = [];
+    const cBase = new THREE.Color(P.lechoBase);
+    const cPied = new THREE.Color(P.lechoPiedra);
+    const cMusgo = new THREE.Color(P.lechoMusgo);
+    const cHonda = new THREE.Color(P.honda);
+    const c = new THREE.Color();
+    let vi = 0;
+    for (let i = 0; i <= N; i++) {
+      const s = eje[i];
+      for (let j = 0; j < NW_L; j++) {
+        const u = (j / (NW_L - 1)) * 2 - 1; // -1..1
+        const uu = u * 1.35; // el lecho asoma fuera del agua: la orilla pedregosa
+        const ax = s.p.x + s.nx * s.w * uu, az = s.p.z + s.nz * s.w * uu;
+        const dentro = Math.abs(uu) <= 1.02;
+        const y = dentro
+          ? alturaLecho(i, uu)
+          : alturaEn(ax, az) - HUNDIR * 0.12; // la orilla casi al ras
+        pos[vi * 3] = ax; pos[vi * 3 + 1] = y; pos[vi * 3 + 2] = az;
+        // cantos rodados: manchas ovaladas a dos escalas (celdas de ruido con
+        // umbral) + junta oscura entre piedra y piedra + musgo en las quietas
+        const g1 = vnoiseA(ax * 1.5 + seed * 3.1, az * 1.5 - seed);
+        const g2 = vnoiseA(ax * 3.4 - 7.7, az * 3.4 + 2.2);
+        const piedra = suav(0.5, 0.64, g1 * 0.62 + g2 * 0.38);
+        c.copy(cBase).lerp(cPied, piedra);
+        c.multiplyScalar(1 - suav(0.44, 0.52, g1) * (1 - piedra) * 0.3); // junta
+        const musgo = suav(0.58, 0.78, vnoiseA(ax * 1.1 + 9.4, az * 1.1 + 4.4)) *
+          (1 - s.rapidez * 0.8) * (dentro ? 1 : 0.35);
+        c.lerp(cMusgo, musgo * 0.55);
+        // el fondo se ENFRÍA apenas hacia el centro (el agua le roba color,
+        // pero el canto debe seguir LEYÉNDOSE: fondo visible = agua clara)
+        const artesa = Math.cos(Math.min(1, Math.abs(uu)) * Math.PI * 0.5);
+        if (dentro) c.lerp(cHonda, artesa * artesa * 0.2);
+        const grano = 0.86 + vnoiseA(ax * 7.7, az * 7.7) * 0.28;
+        col[vi * 3] = c.r * grano; col[vi * 3 + 1] = c.g * grano; col[vi * 3 + 2] = c.b * grano;
+        vi++;
+      }
+      if (i > 0) {
+        const b = i * NW_L, a = b - NW_L;
+        // winding CCW visto desde ARRIBA (normal +Y): al revés, FrontSide
+        // culleaba la cinta y el lecho era invisible (mismo bug ya documentado
+        // en el espejo de agua del mundo del agua)
+        for (let j = 0; j < NW_L - 1; j++) idx.push(a + j, a + j + 1, b + j, a + j + 1, b + j + 1, b + j);
+      }
+    }
+    const geo = new THREE.BufferGeometry();
+    geo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+    geo.setAttribute('color', new THREE.BufferAttribute(col, 3));
+    geo.setIndex(idx);
+    geo.computeVertexNormals();
+    lecho = new THREE.Mesh(geo, new THREE.MeshStandardMaterial({
+      vertexColors: true, roughness: 0.96, metalness: 0,
+    }));
+    lecho.name = 'quebrada-lecho';
+    lecho.receiveShadow = true;
+    grupo.add(lecho);
+  }
+
+  // ── PIEDRAS EMERGENTES: rompen la corriente y fabrican espuma ──────────────
+  const piedras = [];
+  const nPiedras = Math.max(0, Math.round(opts.piedras ?? 14));
+  if (nPiedras > 0) {
+    const geo = new THREE.IcosahedronGeometry(1, 1);
+    { // canto rodado: achatado + abollado determinista, luz cenital horneada
+      const pp = geo.attributes.position;
+      const cc = new Float32Array(pp.count * 3);
+      for (let i = 0; i < pp.count; i++) {
+        const vx = pp.getX(i), vy = pp.getY(i), vz = pp.getZ(i);
+        const r = 1 + (vnoiseA(vx * 2.1 + 5, vz * 2.1 - 3) - 0.5) * 0.34;
+        pp.setXYZ(i, vx * r, vy * 0.62 * r, vz * r);
+        const k = 0.66 + 0.5 * clamp01(vy * 0.9 + 0.4);
+        cc[i * 3] = cc[i * 3 + 1] = cc[i * 3 + 2] = k;
+      }
+      geo.setAttribute('color', new THREE.BufferAttribute(cc, 3));
+      geo.computeVertexNormals();
+    }
+    const inst = new THREE.InstancedMesh(
+      geo,
+      new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 0.94, metalness: 0, flatShading: true }),
+      nPiedras,
+    );
+    inst.name = 'quebrada-piedras';
+    const m4 = new THREE.Matrix4(), q = new THREE.Quaternion(), v = new THREE.Vector3();
+    const esc = new THREE.Vector3(), col = new THREE.Color();
+    const cRoca = new THREE.Color(P.roca);
+    for (let i = 0; i < nPiedras; i++) {
+      // más piedras en los tramos rápidos (ahí es donde el agua rompe)
+      let iSeg = 4 + Math.floor(rn() * (N - 8));
+      for (let k = 0; k < 3; k++) {
+        const cand = 4 + Math.floor(rn() * (N - 8));
+        if (eje[cand].rapidez > eje[iSeg].rapidez) iSeg = cand;
+      }
+      const s = eje[iSeg];
+      const u = (rn() * 2 - 1) * 0.62;
+      const sc = 0.16 + rn() * 0.24 + s.rapidez * 0.1;
+      const px = s.p.x + s.nx * s.w * u, pz = s.p.z + s.nz * s.w * u;
+      // medio hundida: la piedra ROMPE la lámina, no posa sobre ella
+      const py = alturaLecho(iSeg, u) + sc * 0.18 + HUNDIR * 0.3;
+      q.setFromAxisAngle(v.set(0, 1, 0), rn() * Math.PI * 2);
+      m4.compose(v.set(px, py, pz), q, esc.set(sc, sc * (0.8 + rn() * 0.5), sc));
+      inst.setMatrixAt(i, m4);
+      // mojada abajo se ve más oscura; la cara seca guarda el tono del valle
+      col.copy(cRoca).offsetHSL((rn() - 0.5) * 0.03, 0, (rn() - 0.5) * 0.12 - 0.04);
+      inst.setColorAt(i, col);
+      // radio de estela generoso: se hornea en vértices y con radio corto la
+      // espuma caía entre vértice y vértice (piedra sin su collar blanco)
+      piedras.push({ x: px, z: pz, r: sc * 2.7, seg: iSeg });
+    }
+    inst.instanceMatrix.needsUpdate = true;
+    inst.castShadow = true;
+    grupo.add(inst);
+  }
+
+  // ── LA LÁMINA: la superficie que se lee como agua ──────────────────────────
+  // attributes: uv (u=orilla→orilla 0..1, v=metros aguas abajo), aAguaQ =
+  // (profundidad 0..1, rapidez 0..1, espuma 0..1). La espuma se HORNEA aquí
+  // (piedras + rápidos + orillas); el shader solo la anima.
+  const NW = 7;
+  {
+    const nv = (N + 1) * NW;
+    const pos = new Float32Array(nv * 3);
+    const uv = new Float32Array(nv * 2);
+    const info = new Float32Array(nv * 3);
+    const idx = [];
+    let vi = 0;
+    for (let i = 0; i <= N; i++) {
+      const s = eje[i];
+      for (let j = 0; j < NW; j++) {
+        const u01 = j / (NW - 1);
+        const u = u01 * 2 - 1;
+        const ax = s.p.x + s.nx * s.w * u, az = s.p.z + s.nz * s.w * u;
+        // la lámina flota sobre el lecho: honda al centro, a ras en la orilla
+        const artesa = Math.cos(u * Math.PI * 0.5);
+        const prof = clamp01(artesa * artesa * (0.55 + 0.45 * (1 - s.rapidez)));
+        const y = alturaLecho(i, u) + HUNDIR * (0.26 + 0.62 * artesa * artesa) * 0.9;
+        pos[vi * 3] = ax; pos[vi * 3 + 1] = y; pos[vi * 3 + 2] = az;
+        uv[vi * 2] = u01; uv[vi * 2 + 1] = s.v;
+        // espuma horneada: orillas (lengüeta fina) + rápidos + halo de piedra
+        let esp = suav(0.78, 0.99, Math.abs(u)) * 0.32 + s.rapidez * s.rapidez * 0.5;
+        for (const pd of piedras) {
+          const d = Math.hypot(ax - pd.x, az - pd.z);
+          // la estela: delante de la piedra poco, DETRÁS (aguas abajo) larga
+          const detras = pd.seg <= i ? 1 : 0.35;
+          esp += suav(1, 0.25, d / pd.r) * 0.9 * detras;
+        }
+        info[vi * 3] = prof;
+        info[vi * 3 + 1] = s.rapidez;
+        info[vi * 3 + 2] = clamp01(esp);
+        vi++;
+      }
+      if (i > 0) {
+        const b = i * NW, a = b - NW;
+        // mismo winding CCW desde arriba que el lecho (ver nota de allá)
+        for (let j = 0; j < NW - 1; j++) idx.push(a + j, a + j + 1, b + j, a + j + 1, b + j + 1, b + j);
+      }
+    }
+    const geo = new THREE.BufferGeometry();
+    geo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+    geo.setAttribute('uv', new THREE.BufferAttribute(uv, 2));
+    geo.setAttribute('aAguaQ', new THREE.BufferAttribute(info, 3));
+    geo.setIndex(idx);
+    geo.computeVertexNormals();
+
+    const mat = new THREE.ShaderMaterial({
+      uniforms: THREE.UniformsUtils.merge([
+        THREE.UniformsLib.fog,
+        {
+          uAgua: { value: new THREE.Color(P.lamina) },
+          uHondo: { value: new THREE.Color(P.honda) },
+          uCielo: { value: new THREE.Color(P.cielo) },
+          uEspumaC: { value: new THREE.Color(P.espuma) },
+          uSol: { value: solDir.clone() },
+        },
+      ]),
+      vertexShader: /* glsl */ `
+        uniform float uTiempo;
+        attribute vec3 aAguaQ;
+        varying vec2 vUv;
+        varying vec3 vInfo;
+        varying vec3 vW;
+        varying vec3 vNg;
+        #include <fog_pars_vertex>
+        void main() {
+          vUv = uv; vInfo = aAguaQ;
+          vNg = normalize(mat3(modelMatrix) * normal);
+          vec3 p = position;
+          // rizo geométrico chico: la silueta rasante también se mueve
+          float riz = sin(uv.y * 2.6 - uTiempo * (1.4 + aAguaQ.y * 2.2) + uv.x * 5.0)
+                    + 0.6 * sin(uv.y * 5.1 - uTiempo * (2.3 + aAguaQ.y * 3.1) + 2.1);
+          p.y += riz * 0.028 * (0.5 + aAguaQ.y);
+          vec4 wp = modelMatrix * vec4(p, 1.0);
+          vW = wp.xyz;
+          vec4 mvPosition = viewMatrix * wp;
+          gl_Position = projectionMatrix * mvPosition;
+          #include <fog_vertex>
+        }
+      `,
+      fragmentShader: /* glsl */ `
+        uniform float uTiempo;
+        uniform vec3 uAgua, uHondo, uCielo, uEspumaC, uSol;
+        varying vec2 vUv;
+        varying vec3 vInfo;
+        varying vec3 vW;
+        varying vec3 vNg;
+        #include <fog_pars_fragment>
+        ${NOISE_GLSL}
+        // la corriente: el campo se ADVECTA aguas abajo a dos velocidades
+        // co-primas — el agua nunca repite el mismo cuadro
+        float campo(vec2 q, float t) {
+          float a = noiseG(vec2(q.x * 3.4, q.y * 0.62 - t * 1.15));
+          float b = noiseG(vec2(q.x * 7.1 + 4.7, q.y * 1.55 - t * 2.55));
+          return a * 0.62 + b * 0.38;
+        }
+        void main() {
+          float rap = vInfo.y;
+          vec2 q = vec2(vUv.x * 2.0, vUv.y);
+          float vel = 0.65 + rap * 1.5;      // los rápidos corren más
+          float t = uTiempo * vel;
+          float h = campo(q, t);
+          // normal por diferencias finitas: EL movimiento que vende el agua
+          float e = 0.05;
+          float gx = campo(q + vec2(e, 0.0), t) - h;
+          float gy = campo(q + vec2(0.0, e), t) - h;
+          float k = 2.1 + rap * 2.6;
+          vec3 N = normalize(vNg + vec3(-gx * k, 0.0, -gy * k));
+          vec3 V = normalize(cameraPosition - vW);
+          vec3 L = normalize(uSol);
+          // fresnel: a plomo se ve el FONDO, rasante espeja el cielo…
+          float fres = pow(1.0 - max(dot(N, V), 0.0), 3.0);
+          // …y la corriente CORTA el espejo (el reflejo roto, no lámina lisa)
+          float corte = smoothstep(0.30, 0.72, h);
+          vec3 cuerpo = mix(uAgua, uHondo, vInfo.x * (0.32 + 0.35 * (1.0 - corte)));
+          vec3 col = mix(cuerpo, uCielo * (0.86 + 0.30 * corte), clamp(0.18 + fres * (0.55 + 0.5 * corte), 0.0, 0.9));
+          // el sol chispea en las caras que la corriente inclina
+          vec3 Hv = normalize(L + V);
+          float spec = pow(max(dot(N, Hv), 0.0), 88.0);
+          float glint = smoothstep(0.70, 0.94, h) * spec;
+          // espuma: máscara horneada × trama rápida — rompe DONDE debe romper
+          // (piedras, rápidos, orillas), en encaje deshilachado, no en manchones
+          float m = vInfo.z;
+          float trama = campo(q * vec2(3.1, 3.6) + 13.1, t * 2.1);
+          float esp = smoothstep(1.04 - m * 0.72, 1.22 - m * 0.72, trama + m * 0.30);
+          esp *= 0.45 + 0.55 * noiseG(vec2(q.x * 11.0, q.y * 4.6 - t * 3.4));
+          col = mix(col, uEspumaC, clamp(esp * 1.15, 0.0, 1.0));
+          col += vec3(1.22, 1.18, 1.05) * (spec * 0.55 + glint * 1.1);
+          // transparencia: el fondo VISIBLE a plomo, cuerpo en lo hondo,
+          // espejo rasante, y la espuma tapa
+          float alfa = mix(0.38 + vInfo.x * 0.28, 0.9, fres);
+          alfa = max(alfa, esp * 0.95);
+          gl_FragColor = vec4(col, alfa);
+          #include <fog_fragment>
+        }
+      `,
+      transparent: true,
+      depthWrite: false,
+      fog: true,
+    });
+    mat.uniforms.uTiempo = uniforms.uTiempo;
+    const lamina = new THREE.Mesh(geo, mat);
+    lamina.name = 'quebrada-lamina';
+    lamina.renderOrder = 20;
+    grupo.add(lamina);
+  }
+
+  // ── CHISPAS: motas de espuma que VIAJAN aguas abajo (un draw call) ─────────
+  const nChispas = Math.max(0, Math.round(opts.chispas ?? 70));
+  if (nChispas > 0) {
+    const geo = new THREE.InstancedBufferGeometry();
+    const quad = new THREE.PlaneGeometry(1, 1);
+    geo.index = quad.index;
+    geo.setAttribute('position', quad.attributes.position);
+    geo.setAttribute('uv', quad.attributes.uv);
+    const aIni = new Float32Array(nChispas * 3);
+    const aDir = new Float32Array(nChispas * 3);
+    const aSem = new Float32Array(nChispas * 4); // fase, velocidad, largo, tamaño
+    for (let i = 0; i < nChispas; i++) {
+      // nacen en tramos con espuma (rápidos y piedras) y recorren su segmento
+      let iSeg = 2 + Math.floor(rn() * (N - 10));
+      for (let k = 0; k < 2; k++) {
+        const cand = 2 + Math.floor(rn() * (N - 10));
+        if (eje[cand].rapidez > eje[iSeg].rapidez) iSeg = cand;
+      }
+      const s = eje[iSeg], s2 = eje[Math.min(N, iSeg + 6)];
+      const u = (rn() * 2 - 1) * 0.7;
+      // pegadas a la lámina: espuma que viaja EN el agua, no burbujas al aire
+      const y0 = alturaLecho(iSeg, u) + HUNDIR * 0.58;
+      aIni.set([s.p.x + s.nx * s.w * u, y0, s.p.z + s.nz * s.w * u], i * 3);
+      const dx = s2.p.x - s.p.x, dy = Math.min(0, s2.p.y - s.p.y), dz = s2.p.z - s.p.z;
+      aDir.set([dx, dy, dz], i * 3);
+      aSem.set([rn(), 0.16 + rn() * 0.22 + s.rapidez * 0.2, 1, 0.035 + rn() * 0.05], i * 4);
+    }
+    geo.setAttribute('aIni', new THREE.InstancedBufferAttribute(aIni, 3));
+    geo.setAttribute('aDir', new THREE.InstancedBufferAttribute(aDir, 3));
+    geo.setAttribute('aSem', new THREE.InstancedBufferAttribute(aSem, 4));
+    geo.instanceCount = nChispas;
+    const mat = new THREE.ShaderMaterial({
+      uniforms: { uTiempo: uniforms.uTiempo },
+      vertexShader: /* glsl */ `
+        uniform float uTiempo;
+        attribute vec3 aIni;
+        attribute vec3 aDir;
+        attribute vec4 aSem;
+        varying vec2 vPc;
+        varying float vO;
+        void main() {
+          float k = fract(aSem.x + uTiempo * aSem.y);
+          vec3 c = aIni + aDir * k;
+          vO = sin(k * 3.14159) * 0.85;
+          vPc = position.xy;
+          vec4 mv = modelViewMatrix * vec4(c, 1.0);
+          mv.xy += position.xy * aSem.w;
+          gl_Position = projectionMatrix * mv;
+        }
+      `,
+      fragmentShader: /* glsl */ `
+        varying vec2 vPc;
+        varying float vO;
+        void main() {
+          float d = length(vPc) * 2.0;
+          float a = (1.0 - smoothstep(0.45, 1.0, d)) * vO * 0.7;
+          if (a < 0.01) discard;
+          gl_FragColor = vec4(0.97, 0.99, 0.97, a);
+        }
+      `,
+      transparent: true,
+      depthWrite: false,
+    });
+    const chispas = new THREE.Mesh(geo, mat);
+    chispas.name = 'quebrada-chispas';
+    chispas.frustumCulled = false;
+    chispas.renderOrder = 21;
+    grupo.add(chispas);
+  }
+
+  function tick(dt) { uniforms.uTiempo.value += dt; }
+  function contarTriangulos() {
+    return N * (NW_L - 1) * 2 + N * (NW - 1) * 2 + nPiedras * 80 + nChispas * 2;
+  }
+  function enCurso(t01) {
+    const p = new THREE.Vector3(), tg = new THREE.Vector3();
+    curva.getPointAt(clamp01(t01), p);
+    curva.getTangentAt(clamp01(t01), tg);
+    return { pos: p, tangente: tg };
+  }
+  // la zanja del anfitrión: apenas más honda que el lecho (el lecho del
+  // módulo queda flotando unos cm SOBRE el suelo excavado: ni z-fight ni luz
+  // colándose), emplumada hacia las orillas para que el barranco sea suave
+  function profundidadEn(x, z) {
+    let mejor = 0, d2m = Infinity;
+    for (let i = 0; i <= N; i += 2) {
+      const s = eje[i];
+      const dx = x - s.p.x, dz = z - s.p.z;
+      const d2 = dx * dx + dz * dz;
+      if (d2 < d2m) { d2m = d2; mejor = i; }
+    }
+    for (let i = Math.max(0, mejor - 1); i <= Math.min(N, mejor + 1); i++) {
+      const s = eje[i];
+      const dx = x - s.p.x, dz = z - s.p.z;
+      const d2 = dx * dx + dz * dz;
+      if (d2 < d2m) { d2m = d2; mejor = i; }
+    }
+    const s = eje[mejor];
+    const d = Math.sqrt(d2m);
+    if (d > s.w * 1.75) return 0;
+    const u = Math.min(1, d / Math.max(0.001, s.w));
+    const artesa = Math.cos(u * Math.PI * 0.5);
+    const zanja = HUNDIR * (0.3 + 0.7 * artesa * artesa) * 1.12 + 0.08;
+    return zanja * (1 - suav(s.w * 1.02, s.w * 1.7, d));
+  }
+  return { grupo, tick, contarTriangulos, curva, enCurso, profundidadEn };
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   LA CHORRERA — se DIBUJA, no se simula (regla de la casa: cero física)
+   Porta el agua volumétrica aprobada del valle (waterfalls.js): columna con
+   panza, estrías que caen, hebras con vanos, pie que revienta, sombra de
+   contacto, cortina de gotas. Aquí vive como pieza reusable con su pozo.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+const CAIDA_VERT = /* glsl */ `
+  attribute float aT;
+  varying vec2 vUv;
+  varying float vT;
+  varying vec3 vN;
+  varying vec3 vW;
+  #include <fog_pars_vertex>
+  void main() {
+    vUv = uv; vT = aT;
+    vN = normalize(mat3(modelMatrix) * normal);
+    vec4 wp = modelMatrix * vec4(position, 1.0);
+    vW = wp.xyz;
+    vec4 mvPosition = viewMatrix * wp;
+    gl_Position = projectionMatrix * mvPosition;
+    #include <fog_vertex>
+  }
+`;
+// el shader del agua BUENA del valle: estrías 2 octavas, bordes deshilachados,
+// hebras con vanos, pie roto en lenguas, luz difusa+spec+fresnel de cuerpo
+const CAIDA_FRAG = /* glsl */ `
+  uniform float uTiempo;
+  uniform vec3 uTint;
+  uniform vec3 uAguaC;
+  uniform float uBright;
+  uniform float uAlpha;
+  uniform float uFadeTop;
+  uniform float uFadePie;
+  uniform vec3 uSol;
+  varying vec2 vUv;
+  varying float vT;
+  varying vec3 vN;
+  varying vec3 vW;
+  #include <fog_pars_fragment>
+  ${NOISE_GLSL}
+  void main() {
+    // ESTRÍAS, no puntos: el campo varía rápido a lo ANCHO y lento a lo LARGO
+    // (celda vertical ~2.5:1). Con celdas cuadradas (y*16/34 del original) el
+    // ruido se leía como COLUMNA DE PUNTITOS, no como hebras que caen.
+    float n1 = noiseG(vec2(vUv.x * 9.0, vUv.y * 3.2 - uTiempo * 1.35));
+    float n2 = noiseG(vec2(vUv.x * 22.0 + 7.0, vUv.y * 8.0 - uTiempo * 2.3));
+    float streak = n1 * 0.6 + n2 * 0.4;
+    // NÚCLEO SÓLIDO: la lámina es cuerpo continuo al centro; el deshilache es
+    // asunto de los bordes (una caída hecha solo de hilos lee como polvo)
+    float core = smoothstep(0.40, 0.22, abs(vUv.x - 0.5));
+    float lat = smoothstep(0.0, 0.20, vUv.x) * smoothstep(1.0, 0.80, vUv.x);
+    lat = pow(lat, 0.5);
+    float fray = noiseG(vec2(vUv.x * 18.0, vUv.y * 14.0 - uTiempo * 2.6));
+    lat *= mix(0.60 + 0.40 * fray, 1.0, core);
+    float a = lat * (0.80 + smoothstep(0.30, 0.72, streak) * 0.28);
+    a += smoothstep(0.62, 0.92, streak) * lat * 0.40;
+    float strands = noiseG(vec2(vUv.x * 5.5 + 3.0, vUv.y * 2.2 - uTiempo * 0.25));
+    float vanos = 0.55 + 0.45 * smoothstep(0.15, 0.58, strands + streak * 0.35);
+    a *= mix(vanos, 1.0, core * 0.9);
+    // los fades de tope/pie son POR SALTO: solo el labio nace de cero y solo
+    // el último pie se deshace (en el pozo); entre saltos el chorro NO se corta
+    a *= mix(1.0, smoothstep(0.0, 0.09, vT), uFadeTop);
+    float impact = smoothstep(0.80, 1.0, vT);
+    a = min(1.0, a + impact * lat * 0.35);
+    float footN = noiseG(vec2(vUv.x * 12.0, uTiempo * 0.7));
+    a *= 1.0 - smoothstep(0.955 - footN * 0.05, 0.995 - footN * 0.03, vT) * uFadePie;
+    a *= 0.86 + 0.14 * noiseG(vec2(3.0, vUv.y * 2.6 + 0.4));
+
+    vec3 N = normalize(vN);
+    vec3 V = normalize(cameraPosition - vW);
+    vec3 L = normalize(uSol);
+    float dif = 0.55 + 0.58 * max(dot(N, L), 0.0);
+    vec3 Hv = normalize(L + V);
+    float spec = pow(max(dot(N, Hv), 0.0), 42.0);
+    float fres = pow(1.0 - max(dot(N, V), 0.0), 2.6);
+    float glint = smoothstep(0.72, 0.94, n2) * spec;
+    a = min(1.0, a + fres * 0.22 * lat);
+    float foamK = clamp(smoothstep(0.45, 0.85, streak) * 0.62 + impact * 0.55 + fres * 0.30, 0.0, 1.0);
+    // cuerpo VIDRIOSO verde-gris entre estría y estría: el agua con peso tiene
+    // color de agua; el blanco queda para la espuma (lo más blanco del cuadro)
+    vec3 body = mix(uAguaC * (0.82 + streak * 0.24),
+                    uTint * (0.70 + streak * 0.30),
+                    smoothstep(0.25, 0.85, streak));
+    vec3 foam = vec3(1.06, 1.05, 1.00) * uBright;
+    vec3 col = mix(body, foam, foamK) * dif
+             + vec3(1.25, 1.18, 1.02) * (spec * 0.85 + glint * 1.5)
+             + vec3(0.55, 0.62, 0.72) * fres * 0.35;
+    col *= 1.0 + impact * 0.22;
+    gl_FragColor = vec4(col, min(a, 1.0) * 0.97 * uAlpha);
+    #include <fog_fragment>
+  }
+`;
+// sombra de contacto: velo oscuro pegado a la roca DETRÁS del agua — separa
+// el cuerpo de la pared (hay un objeto DELANTE, no pintado)
+const SOMBRA_VERT = /* glsl */ `
+  varying vec2 vUv;
+  void main() { vUv = uv; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }
+`;
+const SOMBRA_FRAG = /* glsl */ `
+  varying vec2 vUv;
+  void main() {
+    float lat = smoothstep(0.0, 0.34, vUv.x) * smoothstep(1.0, 0.66, vUv.x);
+    float v = smoothstep(0.0, 0.12, vUv.y) * smoothstep(1.0, 0.94, vUv.y);
+    gl_FragColor = vec4(0.02, 0.045, 0.045, lat * v * 0.58);
+  }
+`;
+// gotas: streaks con peso cayendo delante del velo
+const GOTA_VERT = /* glsl */ `
+  uniform float uTiempo;
+  attribute vec3 aOff;
+  attribute vec4 aSem;
+  varying vec2 vPc;
+  varying float vO;
+  void main() {
+    float k = fract(aSem.x + uTiempo * aSem.y);
+    vec3 c = aOff;
+    c.y -= k * aSem.z;
+    vO = (1.0 - k * 0.7) * smoothstep(0.0, 0.12, k);
+    vPc = position.xy;
+    vec4 mv = modelViewMatrix * vec4(c, 1.0);
+    mv.xy += position.xy * vec2(aSem.w * 0.16, aSem.w * (1.1 + k * 0.9));
+    gl_Position = projectionMatrix * mv;
+  }
+`;
+const GOTA_FRAG = /* glsl */ `
+  varying vec2 vPc;
+  varying float vO;
+  void main() {
+    float lat = pow(max(1.0 - abs(vPc.x) * 2.0, 0.0), 2.2);
+    float v = smoothstep(-0.5, -0.28, vPc.y) * smoothstep(0.5, 0.05, vPc.y);
+    gl_FragColor = vec4(1.02, 1.02, 0.99, lat * v * vO * 0.6);
+  }
+`;
+// el pozo: agua batida donde golpea la caída, ondas que se DESHACEN hacia la
+// orilla (rotas por ruido: nada de anillos de tiro al blanco)
+const POZO_FRAG = /* glsl */ `
+  uniform float uTiempo;
+  uniform vec3 uAgua, uHondo, uEspumaC;
+  varying vec2 vUv;
+  #include <fog_pars_fragment>
+  ${NOISE_GLSL}
+  void main() {
+    vec2 c = vUv - vec2(0.5, 0.68); // el impacto vive del lado de la pared
+    float d = length(c) * 2.0;
+    vec2 cb = vUv - 0.5;
+    float db = length(cb) * 2.0;
+    float borde = 1.0 - smoothstep(0.58, 0.98, db + (noiseG(cb * 7.0 + 3.1) - 0.5) * 0.34);
+    if (borde < 0.01) discard;
+    // ondas radiales ROTAS: la fase se tuerce con ruido y la cresta se gana
+    // por umbral — lenguas concéntricas irregulares, no dona
+    float tor = (noiseG(c * 5.5 + 7.7) - 0.5) * 1.7;
+    float ani = sin(d * 11.0 - uTiempo * 2.6 + tor * 3.5);
+    float cresta = smoothstep(0.55, 0.95, ani) * (1.0 - smoothstep(0.2, 1.05, d));
+    // el hervor del impacto: espuma batida, viva — ancho y con cuerpo (el
+    // pozo tímido dejaba la caída terminando en la nada)
+    float bat = noiseG(vec2(c.x * 6.0 + uTiempo * 0.55, c.y * 6.0 - uTiempo * 0.4));
+    float espC = smoothstep(0.72, 0.14, d) * (0.55 + 0.45 * bat);
+    vec3 cuerpo = mix(uAgua, uHondo, smoothstep(0.2, 0.8, d) * 0.6);
+    float esp = clamp(espC + cresta * 0.55, 0.0, 1.0);
+    vec3 col = mix(cuerpo, uEspumaC, esp);
+    float alfa = borde * (0.62 + esp * 0.38);
+    gl_FragColor = vec4(col, alfa);
+    #include <fog_fragment>
+  }
+`;
+
+/**
+ * La caída de agua, dibujada (sin física). Cae del origen local (0, alto, 0)
+ * al pozo en y=0; el anfitrión posiciona y rota el grupo contra su pared.
+ *
+ * @param {object} THREE  el módulo three del mundo que llama
+ * @param {object} opts
+ *   alto      {number}   altura total de la caída (def 22)
+ *   ancho     {number}   ancho del velo en el labio (def 2.2)
+ *   saltos    {number}   escalones (def 2): cada uno golpea repisa y deriva
+ *   deriva    {number}   corrimiento lateral total del hilo (def alto*0.14)
+ *   caraEn    {(t)=>{x,z}} perfil de la pared anfitriona en t 0(pie)..1(labio),
+ *                        offsets locales; def: pared casi a plomo con panza.
+ *   pozo      {number}   radio del pozo (def ancho*2.6; 0 = sin pozo)
+ *   gotas     {number}   streaks de la cortina (def 26; 0 = ninguna)
+ *   calidad   {'alta'|'media'|'baja'}  (def 'alta': velo trasero extra)
+ *   seed      {number}   (def 47)
+ *   solDir    {Vector3}  dirección hacia el sol
+ *   colores   {object}   overrides de PALETA_AGUA
+ * @returns {{ grupo, tick, contarTriangulos, anclasBruma }}
+ *   anclasBruma: puntos LOCALES al grupo (repisas y pie) listos para
+ *   crearBrumaVolumetrica — la neblina del impacto es de ese módulo.
+ */
+export function crearChorrera(THREE, opts = {}) {
+  const P = { ...PALETA_AGUA, ...(opts.colores ?? {}) };
+  const ALTO = opts.alto ?? 22;
+  const ANCHO = opts.ancho ?? 2.2;
+  const SALTOS = Math.max(1, Math.round(opts.saltos ?? 2));
+  const DERIVA = opts.deriva ?? ALTO * 0.14;
+  const CAL = opts.calidad ?? 'alta';
+  const seed = opts.seed ?? 47;
+  const rn = prngAgua(seed * 6271 + 5);
+  const solDir = (opts.solDir ? opts.solDir.clone() : new THREE.Vector3(0.44, 0.66, 0.38)).normalize();
+  const caraEn = opts.caraEn ?? ((t) => ({
+    // pared por defecto: casi a plomo, panza leve a media altura, pie que se
+    // derrama hacia adelante (la caída se despega del muro al final)
+    x: 0,
+    z: Math.sin(t * Math.PI) * ALTO * 0.02 + (1 - t) * ALTO * 0.045,
+  }));
+
+  const grupo = new THREE.Group();
+  grupo.name = 'chorrera';
+  const uniforms = { uTiempo: { value: 1.7 } };
+  const anclasBruma = [];
+
+  // ── la ruta del hilo: t 1(labio) → 0(pie), deriva por salto ────────────────
+  const cortes = [];
+  for (let s = 0; s <= SALTOS; s++) cortes.push(1 - s / SALTOS);
+  const derivaEn = (t) => -DERIVA * (1 - t) + Math.sin(t * 9.1 + seed) * ANCHO * 0.07;
+
+  // camino de una caída: cuelga A PLOMO (running max en z), respira en anchura
+  function rutaCaida(tTop, tBot, anchos, SEGS) {
+    const muestras = [];
+    for (let i = 0; i <= SEGS; i++) {
+      const t = tTop - ((tTop - tBot) * i) / SEGS;
+      const c = caraEn(t);
+      muestras.push({ x: c.x + derivaEn(t), y: ALTO * t, z: c.z, t });
+    }
+    for (let i = 1; i <= SEGS; i++) muestras[i].z = Math.max(muestras[i].z, muestras[i - 1].z - 0.03);
+    for (let k = 0; k < 5; k++) {
+      for (let i = 1; i < SEGS; i++) {
+        muestras[i].z = (muestras[i - 1].z + muestras[i].z * 2 + muestras[i + 1].z) / 4;
+      }
+    }
+    const w = [];
+    for (let i = 0; i <= SEGS; i++) {
+      const k = i / SEGS;
+      const crece = 1 + k * 0.55 + Math.pow(k, 6) * anchos.abanico;
+      // respira APENAS: con la amplitud del valle (0.56×1.4) una caída corta
+      // se leía como globo con panza — acá el velo ondula, no se hincha
+      const respira = 0.86 + 0.28 * (Math.sin(muestras[i].y * 0.9 + seed) * 0.5 + 0.5) *
+        (Math.sin(muestras[i].y * 0.37 + seed * 2) * 0.5 + 0.5);
+      w.push(anchos.base * crece * respira);
+    }
+    for (let k = 0; k < 4; k++) for (let i = 1; i < SEGS; i++) w[i] = (w[i - 1] + w[i] * 2 + w[i + 1]) / 4;
+    const xo = muestras.map((s) => (Math.sin(s.y * 0.6 + seed) + Math.sin(s.y * 1.23 + seed * 2) * 0.5) * ANCHO * 0.05);
+    return { muestras, w, xo };
+  }
+
+  // caída volumétrica: grid con sección en ARCO (panza hacia la cámara) —
+  // normales reales, el shader la modela como cuerpo redondo
+  function construirCaida(tTop, tBot, anchos, tinte) {
+    const SEGS = CAL === 'baja' ? 48 : 84;
+    const NW = 8;
+    const { muestras, w, xo } = rutaCaida(tTop, tBot, anchos, SEGS);
+    const prof = anchos.prof ?? 0.34;
+    const posArr = [], uvArr = [], tArr = [], idx = [];
+    for (let i = 0; i <= SEGS; i++) {
+      const s = muestras[i];
+      const k = i / SEGS;
+      const panza = Math.min(w[i] * prof, ANCHO * 0.75) * (0.72 + 0.28 * Math.sin(k * Math.PI));
+      for (let j = 0; j < NW; j++) {
+        const u = j / (NW - 1);
+        const arco = Math.pow(Math.sin(u * Math.PI), 0.8);
+        posArr.push(s.x + xo[i] + (u - 0.5) * w[i], s.y, s.z + 0.05 + panza * arco);
+        uvArr.push(u, k * anchos.vTiles);
+        tArr.push(k);
+      }
+      if (i > 0) {
+        const b = i * NW, a = b - NW;
+        for (let j = 0; j < NW - 1; j++) idx.push(a + j, b + j, a + j + 1, a + j + 1, b + j, b + j + 1);
+      }
+    }
+    const geo = new THREE.BufferGeometry();
+    geo.setAttribute('position', new THREE.Float32BufferAttribute(posArr, 3));
+    geo.setAttribute('uv', new THREE.Float32BufferAttribute(uvArr, 2));
+    geo.setAttribute('aT', new THREE.Float32BufferAttribute(tArr, 1));
+    geo.setIndex(idx);
+    geo.computeVertexNormals();
+    const mat = new THREE.ShaderMaterial({
+      vertexShader: CAIDA_VERT,
+      fragmentShader: CAIDA_FRAG,
+      uniforms: THREE.UniformsUtils.merge([
+        THREE.UniformsLib.fog,
+        {
+          uTint: { value: new THREE.Color(tinte) },
+          uAguaC: { value: new THREE.Color(P.lamina) },
+          uBright: { value: anchos.brillo ?? 1.14 },
+          uAlpha: { value: anchos.alphaK ?? 1.0 },
+          uFadeTop: { value: anchos.fadeTop ?? 1 },
+          uFadePie: { value: anchos.fadePie ?? 0.9 },
+          uSol: { value: solDir.clone() },
+        },
+      ]),
+      transparent: true,
+      depthWrite: false,
+      side: THREE.DoubleSide,
+      fog: true,
+    });
+    mat.uniforms.uTiempo = uniforms.uTiempo;
+    const mesh = new THREE.Mesh(geo, mat);
+    mesh.renderOrder = 23;
+    mesh.frustumCulled = false;
+    return mesh;
+  }
+
+  function construirSombra(tTop, tBot, anchos) {
+    const SEGS = 40;
+    const { muestras, w, xo } = rutaCaida(tTop, tBot, anchos, SEGS);
+    const posArr = [], uvArr = [], idx = [];
+    for (let i = 0; i <= SEGS; i++) {
+      const s = muestras[i];
+      const ancho = w[i] * 1.75;
+      posArr.push(s.x + xo[i] - ancho / 2, s.y, s.z - 0.06, s.x + xo[i] + ancho / 2, s.y, s.z - 0.06);
+      uvArr.push(0, i / SEGS, 1, i / SEGS);
+      if (i > 0) { const b = i * 2; idx.push(b - 2, b - 1, b, b - 1, b + 1, b); }
+    }
+    const geo = new THREE.BufferGeometry();
+    geo.setAttribute('position', new THREE.Float32BufferAttribute(posArr, 3));
+    geo.setAttribute('uv', new THREE.Float32BufferAttribute(uvArr, 2));
+    geo.setIndex(idx);
+    const mesh = new THREE.Mesh(geo, new THREE.ShaderMaterial({
+      vertexShader: SOMBRA_VERT, fragmentShader: SOMBRA_FRAG,
+      transparent: true, depthWrite: false,
+    }));
+    mesh.renderOrder = 22;
+    mesh.frustumCulled = false;
+    return mesh;
+  }
+
+  // ── los saltos: sombra + cuerpo + corazón (+ velo trasero en alta) ─────────
+  for (let s = 0; s < SALTOS; s++) {
+    const ultimo = s === SALTOS - 1;
+    // SOLAPE entre saltos: el tope arranca POR ENCIMA del corte y el pie sigue
+    // POR DEBAJO (antes había un vano real de ~0.01·ALTO entre segmento y
+    // segmento, y con los fades el chorro se leía CORTADO por la mitad)
+    const tA = Math.min(1, cortes[s] + (s === 0 ? 0 : 0.010));
+    const tB = cortes[s + 1] - (ultimo ? 0 : 0.008);
+    // labio fino que se abre al caer; con varios saltos, el del medio es el
+    // velo ancho y brillante (la gramática de la caída real)
+    const segW = ANCHO * (SALTOS < 3 ? 1 : s === Math.floor(SALTOS / 2) ? 1.2 : 0.85);
+    const vT = 2.4 + (tA - tB) * ALTO * 0.16;
+    // pie intermedio a MEDIO fade: 0 dejaba la última fila del grid barriendo
+    // la repisa plana con un borde inferior recto y duro (faldón de lámpara);
+    // 1 (el original) cortaba el chorro — el solape de abajo cubre el resto
+    const fades = { fadeTop: s === 0 ? 1 : 0, fadePie: ultimo ? 0.8 : 0.45 };
+    grupo.add(construirSombra(tA, tB, { base: segW, abanico: ultimo ? 0.5 : 0.35 }));
+    grupo.add(construirCaida(tA, tB, {
+      base: segW, abanico: ultimo ? 0.5 : 0.35, vTiles: vT, prof: 0.3,
+      brillo: SALTOS >= 3 && s === Math.floor(SALTOS / 2) ? 1.3 : 1.14, ...fades,
+    }, P.velo));
+    if (CAL === 'alta') {
+      const velo = construirCaida(Math.min(1, tA - 0.004), tB, {
+        base: segW * 1.5, abanico: ultimo ? 0.72 : 0.5, vTiles: vT * 0.8,
+        prof: 0.16, brillo: 0.9, alphaK: 0.8, ...fades,
+      }, 0xd6dcd6);
+      velo.position.z -= ANCHO * 0.1;
+      velo.renderOrder = 22;
+      grupo.add(velo);
+    }
+    grupo.add(construirCaida(Math.min(1, tA - 0.006), tB, {
+      base: segW * 0.44, abanico: 0.6, vTiles: vT * 1.25, prof: 0.55, brillo: 1.3,
+      ...fades,
+    }, P.corazon));
+    // anclas para la bruma del anfitrión: cada impacto la genera
+    const cB = caraEn(tB);
+    anclasBruma.push({
+      x: cB.x + derivaEn(tB), y: ALTO * tB + (ultimo ? 0.35 : 0.6), z: cB.z + 0.5,
+      radio: ultimo ? segW * 2.6 : segW * 1.1,
+    });
+  }
+
+  // ── la cortina de gotas: mechones con peso delante del velo ────────────────
+  const nGotas = Math.max(0, Math.round(opts.gotas ?? 26));
+  if (nGotas > 0) {
+    const geo = new THREE.InstancedBufferGeometry();
+    const quad = new THREE.PlaneGeometry(1, 1);
+    geo.index = quad.index;
+    geo.setAttribute('position', quad.attributes.position);
+    geo.setAttribute('uv', quad.attributes.uv);
+    const off = new Float32Array(nGotas * 3);
+    const sem = new Float32Array(nGotas * 4);
+    for (let i = 0; i < nGotas; i++) {
+      // reparto entre los saltos: sueltas a media caída y sobre el impacto
+      const s = Math.floor(rn() * SALTOS);
+      const tM = cortes[s] - (cortes[s] - cortes[s + 1]) * (0.3 + rn() * 0.6);
+      const c = caraEn(tM);
+      const largo = (cortes[s] - cortes[s + 1]) * ALTO * (0.5 + rn() * 0.4);
+      off.set([
+        c.x + derivaEn(tM) + (rn() - 0.5) * ANCHO * 1.3,
+        ALTO * tM + rn() * 1.2,
+        c.z + 0.3 + rn() * 0.5,
+      ], i * 3);
+      sem.set([rn(), 0.22 + rn() * 0.25, largo, 0.3 + rn() * 0.5], i * 4);
+    }
+    geo.setAttribute('aOff', new THREE.InstancedBufferAttribute(off, 3));
+    geo.setAttribute('aSem', new THREE.InstancedBufferAttribute(sem, 4));
+    geo.instanceCount = nGotas;
+    const mat = new THREE.ShaderMaterial({
+      vertexShader: GOTA_VERT, fragmentShader: GOTA_FRAG,
+      uniforms: { uTiempo: uniforms.uTiempo },
+      transparent: true, depthWrite: false,
+    });
+    const gotas = new THREE.Mesh(geo, mat);
+    gotas.name = 'chorrera-gotas';
+    gotas.frustumCulled = false;
+    gotas.renderOrder = 24;
+    grupo.add(gotas);
+  }
+
+  // ── el pozo: donde la caída muere batiendo anillos ─────────────────────────
+  const RPOZO = opts.pozo ?? ANCHO * 2.6;
+  if (RPOZO > 0) {
+    const cPie = caraEn(0);
+    const geo = new THREE.PlaneGeometry(RPOZO * 2, RPOZO * 2, 1, 1);
+    geo.rotateX(-Math.PI / 2);
+    const mat = new THREE.ShaderMaterial({
+      vertexShader: /* glsl */ `
+        varying vec2 vUv;
+        #include <fog_pars_vertex>
+        void main() {
+          vUv = uv;
+          vec4 mvPosition = modelViewMatrix * vec4(position, 1.0);
+          gl_Position = projectionMatrix * mvPosition;
+          #include <fog_vertex>
+        }
+      `,
+      fragmentShader: POZO_FRAG,
+      uniforms: THREE.UniformsUtils.merge([
+        THREE.UniformsLib.fog,
+        {
+          uAgua: { value: new THREE.Color(P.lamina) },
+          uHondo: { value: new THREE.Color(P.honda) },
+          uEspumaC: { value: new THREE.Color(P.espuma) },
+        },
+      ]),
+      transparent: true,
+      depthWrite: false,
+      fog: true,
+    });
+    mat.uniforms.uTiempo = uniforms.uTiempo;
+    const pozo = new THREE.Mesh(geo, mat);
+    pozo.name = 'chorrera-pozo';
+    // centrado apenas delante del pie: el impacto (uv 0.68) cae bajo el velo
+    pozo.position.set(cPie.x + derivaEn(0), 0.06, cPie.z + RPOZO * 0.38);
+    pozo.renderOrder = 21;
+    grupo.add(pozo);
+  }
+
+  function tick(dt) { uniforms.uTiempo.value += dt; }
+  function contarTriangulos() {
+    const porCaida = (CAL === 'baja' ? 48 : 84) * 7 * 2;
+    const capas = CAL === 'alta' ? 3 : 2;
+    return SALTOS * (porCaida * capas + 40 * 2) + nGotas * 2 + 2;
+  }
+  return { grupo, tick, contarTriangulos, anclasBruma };
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   LA RIBERA — helechos arborescentes de orilla
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/**
+ * Helechos arborescentes ribereños (la firma de la ribera del bosque de
+ * niebla, DR-chorrera) — verde-dominante, instanciados, deterministas.
+ * FOLLAJE = MASA (regla dura): cada planta es tronco esbelto + copa-mata de
+ * frondes que nacen del ápice, se arquean por su peso y se superponen en
+ * volumen. La copa se arma con FollajeMasa (núcleo esculpido + cards
+ * texturizados, pocos draw calls por variante, imposible contar hojas).
+ *
+ * @param {object} THREE  el módulo three del mundo que llama
+ * @param {object} opts
+ *   puntos    {Array<{x,z}>}  el curso de la quebrada (mismos waypoints)
+ *   alturaEn  {(x,z)=>y}      terreno del anfitrión: las plantas se drapean
+ *   n         {number}   plantas (def 36)
+ *   seed      {number}   semilla determinista (def 977)
+ *   aparte    {number}   distancia mínima al eje del cauce (def 5)
+ * @returns {{ grupo, update }}
+ *   update(t) con t ABSOLUTO (clock.getElapsedTime()): avanza el reloj
+ *   COMPARTIDO de vientoMundos — las copas respiran. Si el mundo anfitrión ya
+ *   llama tickVientoMundos en su loop, no hace falta llamar update además.
+ */
+export function crearHelechosRibera(THREE, opts = {}) {
+  const puntos = opts.puntos ?? [];
+  if (puntos.length < 2) throw new Error('crearHelechosRibera: se necesitan >= 2 puntos del curso');
+  const alturaEn = opts.alturaEn ?? (() => 0);
+  const n = opts.n ?? 36;
+  const seed = opts.seed ?? 977;
+  const aparte = opts.aparte ?? 5;
+
+  const grupo = new THREE.Group();
+  grupo.name = 'helechos-ribera';
+  const curve = new THREE.CatmullRomCurve3(
+    puntos.map((p) => new THREE.Vector3(p.x, 0, p.z)), false, 'centripetal', 0.5);
+  const rng = prngAgua(seed);
+
+  // ── VARIANTES de copa: 3 formas deterministas por seed. Las plantas de una
+  // variante COMPARTEN geometría y se instancian → pocos draw calls, y aunque
+  // se acerque la cámara no se pueden contar hojas (la textura va en canvas).
+  const VARIANTES = 3;
+  const pal = { oscuro: '#2f5c2c', medio: '#4a8a3a', claro: '#9cc45f' };
+  const texOpts = { oscuro: '#3a6b33', medio: '#4f8f3e', claro: '#8fc26a', hojas: 430, alargue: 3.1 };
+  const cO = new THREE.Color(pal.oscuro), cM = new THREE.Color(pal.medio), cC = new THREE.Color(pal.claro);
+  const tmpc = new THREE.Color();
+  const copas = [];
+  for (let v = 0; v < VARIANTES; v++) {
+    const rv = prngAgua(seed * 131 + v * 977 + 17);
+    const jit = (k) => 1 + (rv() - 0.5) * k;
+    // FRONDES RADIALES como cuentas a lo largo de rayos: cada fronde sube
+    // desde el centro y CUELGA por su peso — el cuelgo es la firma del helecho
+    // (una copa sin cuelgo se lee como capas horizontales, no como mata).
+    const esferas = [];
+    const NF = 8;
+    for (let k = 0; k < NF; k++) {
+      const a = (k / NF) * Math.PI * 2 + rv() * 0.45;
+      const ca = Math.cos(a), sa = Math.sin(a);
+      const R = 0.76 + rv() * 0.26;   // largo de la fronde (determinista)
+      const BEADS = 4;
+      for (let b = 0; b < BEADS; b++) {
+        const f = (b + 0.5) / BEADS;             // 0 centro → 1 punta
+        const rr = R * f;
+        // perfil de arco por peso propio: sube hasta ~f=0,2 y CUELGA fuerte
+        const y = 0.70 + 0.10 * Math.sin(f * Math.PI * 1.15) - 0.66 * Math.pow(f, 1.4);
+        esferas.push({
+          c: [ca * rr * jit(0.14), y * jit(0.08), sa * rr * jit(0.14)],
+          r: (0.18 - 0.05 * f) * jit(0.2),
+          esc: [1.15, 1, 1.15],
+        });
+      }
+    }
+    // ápice claro: los croziers (frondes nuevas enrolladas) — tuft visible
+    // aunque la copa esté lejos (la palma no lo tiene: es su mejor firma)
+    esferas.push({ c: [0, 0.84, 0], r: 0.15, esc: [1, 1.3, 1] });
+    esferas.push({ c: [0.13, 0.87, 0.07], r: 0.11, esc: [1, 1.25, 1] });
+    esferas.push({ c: [-0.11, 0.86, -0.10], r: 0.11, esc: [1, 1.25, 1] });
+    esferas.push({ c: [0.05, 0.89, -0.11], r: 0.09, esc: [1, 1.2, 1] });
+    // gradiente por altura: sombra abajo (puntas colgando), luz clara arriba
+    const yB = 0.14, yT = 0.92;
+    const gradiente = (x, y, z) => {
+      const t = THREE.MathUtils.clamp((y - yB) / (yT - yB), 0, 1);
+      if (t < 0.5) tmpc.copy(cO).lerp(cM, t * 2);
+      else tmpc.copy(cM).lerp(cC, (t - 0.5) * 2);
+      return tmpc;
+    };
+    const nucleo = geometriaNucleoMasa(THREE, esferas, {
+      seed: v * 31 + 5, gradiente, tonoSombra: '#1c351a',
+      rugosidad: 0.35, encoger: 0.93, sombra: 0.58,
+    });
+    const cards = geometriaCardsMasa(THREE, esferas, {
+      seed: v * 31 + 6, gradiente,
+      cobertura: 1.15, tamCard: 0.24, modulacion: 0.45, maxCards: 650, minCards: 12,
+    });
+    // la copa se sube al ápice del tronco (tronco unitario: 0..1)
+    nucleo.translate(0, 0.55, 0);
+    cards.translate(0, 0.55, 0);
+    const tex = texturaFollaje(THREE, { seed: v * 31 + 7, ...texOpts });
+    const matNuc = materialNucleo(THREE, { brillo: 0.12, tono: pal.medio });
+    const matCards = materialFollaje(THREE, tex, { brillo: 0.22 });
+    // viento COMPARTIDO: la copa respira, el tronco no (piso arriba de él)
+    aplicarVientoMundo(matCards, { amplitud: 0.10, piso: 0.68, velocidad: 1.0 });
+    aplicarVientoMundo(matNuc, { amplitud: 0.06, piso: 0.68, velocidad: 1.0 });
+    copas.push({ nucleo, cards, matNuc, matCards });
+  }
+
+  // ── tronco esbelto compartido: un InstancedMesh para todas las plantas ──
+  const trGeo = new THREE.CylinderGeometry(0.05, 0.09, 1, 6);
+  trGeo.translate(0, 0.5, 0);
+  const trMat = new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.95, flatShading: true });
+  const troncos = new THREE.InstancedMesh(trGeo, trMat, n);
+  const m4 = new THREE.Matrix4(), q = new THREE.Quaternion(), cc = new THREE.Color();
+  const up = new THREE.Vector3(0, 1, 0), ej = new THREE.Vector3();
+  const tan = new THREE.Vector3(), side = new THREE.Vector3();
+  const puestos = [];
+  for (let i = 0; i < n; i++) {
+    const t = 0.12 + rng() * 0.84;      // el pie de la chorrera queda LIBRE
+    const c = curve.getPoint(t);
+    curve.getTangent(t, tan);
+    side.set(-tan.z, 0, tan.x).normalize();
+    const lado = rng() < 0.5 ? -1 : 1;
+    const d = aparte + rng() * aparte * 1.6;
+    const x = c.x + side.x * lado * d, z = c.z + side.z * lado * d;
+    const h = 3.2 + rng() * 3.4;
+    puestos.push({ x, y: alturaEn(x, z) - 0.3, z, h, rot: rng() * Math.PI * 2 });
+    // tronco con carácter: leve inclinación hacia un eje (2-5°)
+    ej.set(rng() - 0.5, 1, rng() - 0.5).normalize();
+    q.setFromAxisAngle(up, rng() * Math.PI * 2);
+    q.multiply(new THREE.Quaternion().setFromAxisAngle(ej, 0.02 + rng() * 0.03));
+    m4.compose(new THREE.Vector3(x, puestos[i].y, z), q, new THREE.Vector3(h, h, h));
+    troncos.setMatrixAt(i, m4);
+    cc.set(0x5a4632).offsetHSL((rng() - 0.5) * 0.03, 0, (rng() - 0.5) * 0.1);
+    troncos.setColorAt(i, cc);
+  }
+  troncos.instanceMatrix.needsUpdate = true;
+  if (troncos.instanceColor) troncos.instanceColor.needsUpdate = true;
+  grupo.add(troncos);
+
+  // ── copas instanciadas por variante (cada parte en un InstancedMesh) ──
+  for (let v = 0; v < VARIANTES; v++) {
+    const zona = copas[v];
+    const lista = [];
+    for (let i = v; i < n; i += VARIANTES) lista.push(puestos[i]);
+    const imNuc = new THREE.InstancedMesh(zona.nucleo, zona.matNuc, lista.length);
+    const imCar = new THREE.InstancedMesh(zona.cards, zona.matCards, lista.length);
+    for (let j = 0; j < lista.length; j++) {
+      const p = lista[j];
+      q.setFromAxisAngle(up, p.rot);
+      m4.compose(new THREE.Vector3(p.x, p.y, p.z), q, new THREE.Vector3(p.h, p.h, p.h));
+      imNuc.setMatrixAt(j, m4);
+      imCar.setMatrixAt(j, m4);
+    }
+    imNuc.instanceMatrix.needsUpdate = true;
+    imCar.instanceMatrix.needsUpdate = true;
+    grupo.add(imNuc); grupo.add(imCar);
+  }
+
+  function update(t) { tickVientoMundos(t); }
+  return { grupo, update };
+}

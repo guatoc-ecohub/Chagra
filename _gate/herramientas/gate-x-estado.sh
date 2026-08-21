@@ -1,0 +1,1 @@
+/home/kortux/Workspace/Chagra-strategy/ops/instrumentos-gate-2026-08-17/gate-x-estado.sh

@@ -1,0 +1,96 @@
+{
+  "species_slug": "lantana_camara",
+  "scientific_name": "Lantana camara L.",
+  "common_names": [
+    "Camaroncillo"
+  ],
+  "family": "Verbenaceae",
+  "category": "especies_invasoras",
+  "cultivable": false,
+  "conservation_status": "invasor",
+  "thermal_zones": [
+    "calido",
+    "templado",
+    "frio"
+  ],
+  "roles_in_guild": [
+    "invasive",
+    "pollinator_attractor"
+  ],
+  "antagonists": [],
+  "especies_nativas_sustitutas": [
+    "buddleja_americana",
+    "dodonaea_viscosa",
+    "hesperomeles_goudotiana",
+    "miconia_squamulosa",
+    "viburnum_triphyllum"
+  ],
+  "propagation": {
+    "metodo_principal": "semilla",
+    "notas": "Requiere remoción completa de raíz; los frutos son tóxicos para el ganado."
+  },
+  "requirements": {
+    "agua": "medio",
+    "altitud_msnm": {
+      "min_absoluto": 0,
+      "optimo_min": 1200,
+      "optimo_max": 2400,
+      "max_absoluto": 2800
+    },
+    "temperatura_c": {
+      "helada_letal": -2,
+      "optimo_min": 15,
+      "optimo_max": 25,
+      "max_tolerable": 35
+    },
+    "radiacion": "sol_pleno",
+    "drenaje_requerido": "bueno"
+  },
+  "valor_pedagogico": "El camaroncillo (Lantana camara L.) es una especie arbustiva invasora presente en Colombia desde 0 hasta 2800 msnm, con óptimo entre 1200-2400 msnm en zonas térmicas cálidas, templadas y frías de departamentos como Cundinamarca, Valle del Cauca, Magdalena y Meta. Su manejo agronómico en contextos de control requiere remoción completa de raíces superficiales, control manual antes de floración para evitar dispersión de semillas por aves, y monitoreo de rebrotes después de quemas. Las asociaciones con otras especies son generalmente negativas por su capacidad de competir agresivamente por luz y nutrientes. Sus principales plagas en Colombia incluyen lepidópteros defoliadores y áfidos, pero su toxicidad para ganado (frutos y hojas contienen metabolitos secundarios) limita su uso en sistemas productivos. En el contexto cultural andino, comunidades campesinas la reconocen como 'hoja de pago' o indicador de disturbio antrópico, usándola tradicionalmente en barreras vivas para delimitar potreros aunque con precaución por su expansión rápida. Según la taxonomía de GBIF Backbone Taxonomy y Plants of the World Online (POWO), su nombre científico válido y distribución global está documentada, mientras que la Resolución ICA 3168 de 2015 regula su manejo en el territorio nacional.",
+  "sources": [
+    {
+      "id": "gbif-taxonomic-backbone",
+      "title": "gbif-taxonomic-backbone",
+      "tier": "A",
+      "url": "https://www.gbif.org/dataset/d7dddbf4-2cf0-4f39-9b2a-bb099caae36c"
+    },
+    {
+      "id": "powo-kew",
+      "title": "powo-kew",
+      "tier": "A",
+      "url": "https://powo.science.kew.org"
+    },
+    {
+      "id": "ica-resolucion-3168-2015",
+      "title": "ica-resolucion-3168-2015",
+      "tier": "A",
+      "url": null
+    },
+    {
+      "id": "issg-uicn-invasoras",
+      "title": "issg-uicn-invasoras",
+      "tier": "A",
+      "url": "http://www.iucngisd.org"
+    },
+    {
+      "id": "res-684-2018-mads",
+      "title": "res-684-2018-mads",
+      "tier": "A",
+      "url": null
+    },
+    {
+      "id": "humboldt-invasoras-andes",
+      "title": "humboldt-invasoras-andes",
+      "tier": "A",
+      "url": null
+    },
+    {
+      "id": "calderon-saenz-2003-invasoras",
+      "title": "calderon-saenz-2003-invasoras",
+      "tier": "A",
+      "url": null
+    }
+  ],
+  "_generated_by": "scripts/build-cycle-content-from-catalog.mjs",
+  "_generated_at": "2026-05-19T00:42:57.362Z"
+}

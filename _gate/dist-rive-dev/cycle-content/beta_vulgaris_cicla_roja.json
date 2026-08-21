@@ -1,0 +1,77 @@
+{
+  "species_slug": "beta_vulgaris_cicla_roja",
+  "scientific_name": "Beta vulgaris var. cicla L.",
+  "common_names": [
+    "Acelga roja"
+  ],
+  "family": "Amaranthaceae",
+  "category": "hortalizas_hoja",
+  "cultivable": true,
+  "conservation_status": "cultivo_comun",
+  "thermal_zones": [
+    "frio",
+    "templado"
+  ],
+  "roles_in_guild": [
+    "crop",
+    "biomass_producer"
+  ],
+  "antagonists": [],
+  "especies_nativas_sustitutas": [],
+  "propagation": {
+    "metodo_principal": "semilla",
+    "notas": "La pigmentación roja indica alta presencia de betalaínas; deliciosa tanto cruda (joven) como cocida."
+  },
+  "requirements": {
+    "agua": "medio",
+    "altitud_msnm": {
+      "min_absoluto": 800,
+      "optimo_min": 1500,
+      "optimo_max": 2800,
+      "max_absoluto": 3200
+    },
+    "temperatura_c": {
+      "helada_letal": -4,
+      "optimo_min": 12,
+      "optimo_max": 18,
+      "max_tolerable": 26
+    },
+    "radiacion": "sol_pleno",
+    "drenaje_requerido": "bueno"
+  },
+  "valor_pedagogico": "La acelga roja (Beta vulgaris var. cicla L.) es una hoja nutritiva cultivada en zonas frías y templadas de Colombia, especialmente en Cundinamarca (valle de Bogotá, Sabana), Boyacá (altiplano) y Nariño (corredor andino), entre 1500-2800 msnm. Su manejo agronómico incluye propagación por semilla en almácigo, trasplante a surcos con densidad de 20-25 cm entre plantas, ciclo de 90-120 días para cosecha continua de hojas externas, y asociaciones beneficiosas con espinaca, lechuga y cebolla. Plagas relevantes: pulgones (Myzus persicae), minerador de hoja (Liriomyza spp.) y alternaria (Alternaria alternata). Culturalmente, las variedades de hoja roja fueron valoradas en la gastronomía muisca por su contenido de betalaínas (pigmentos antioxidants), y hoy integran huertas urbanas y sistemas de producción orgánica en el altiplano cundiboyacense. Fuente: agrosavia-sol-andina.",
+  "sources": [
+    {
+      "id": "gbif-taxonomic-backbone",
+      "title": "gbif-taxonomic-backbone",
+      "tier": "A",
+      "url": "https://www.gbif.org/dataset/d7dddbf4-2cf0-4f39-9b2a-bb099caae36c"
+    },
+    {
+      "id": "powo-kew",
+      "title": "powo-kew",
+      "tier": "A",
+      "url": "https://powo.science.kew.org"
+    },
+    {
+      "id": "agrosavia-sol-andina",
+      "title": "agrosavia-sol-andina",
+      "tier": "A",
+      "url": "https://www.agrosavia.co"
+    },
+    {
+      "id": "ica-resolucion-3168-2015",
+      "title": "ica-resolucion-3168-2015",
+      "tier": "A",
+      "url": null
+    },
+    {
+      "id": "restrepo-1996-abc-agricultura-organica",
+      "title": "restrepo-1996-abc-agricultura-organica",
+      "tier": "B",
+      "url": null
+    }
+  ],
+  "_generated_by": "scripts/build-cycle-content-from-catalog.mjs",
+  "_generated_at": "2026-05-19T00:42:57.357Z"
+}

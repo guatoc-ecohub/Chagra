@@ -1,0 +1,96 @@
+{
+  "species_slug": "kalanchoe_pinnata",
+  "scientific_name": "Kalanchoe pinnata (Lam.) Pers.",
+  "common_names": [
+    "Siempreviva"
+  ],
+  "family": "Crassulaceae",
+  "category": "medicinales_alelopaticas",
+  "cultivable": true,
+  "conservation_status": "naturalizada",
+  "thermal_zones": [
+    "calido",
+    "templado"
+  ],
+  "roles_in_guild": [
+    "crop",
+    "ground_cover",
+    "pollinator_attractor"
+  ],
+  "antagonists": [],
+  "especies_nativas_sustitutas": [],
+  "propagation": {
+    "methods": [
+      "esqueje"
+    ],
+    "best_method": "esqueje",
+    "protocol_resumen": "PROPAGACIÓN FOLIAR MILAGROSA: cada hoja madura desprendida emite plantulas (propágulos) en cada hendidura del margen serrado-crenado — apomixis foliar verdadera. Basta dejar una hoja sobre suelo apenas humedecido o incluso pegada con cinta en una pared y a los 7-21 días emite 5-15 plantulas en miniatura con raíces y hojas listas para autopropagación. Establecimiento 7-21 días — la más rápida y mágica del catálogo.",
+    "tiempo_a_establecimiento_dias": 14,
+    "notas": "PEDAGÓGICAMENTE EXCELENTE PARA HUERTAS ESCOLARES: apomixis foliar visible — la lección de reproducción asexual vegetativa más impactante para niñas y niños. Cada hoja se vuelve madre de docenas de hijos en semanas, sin semilla, sin floración. Goethe la estudió y nombró 'Goethe-Pflanze' por su capacidad regenerativa.",
+    "fuente": "POWO Kew; Pamplona-Roger 2006; JBB Plantas Medicinales; Pérez Arbeláez 1947"
+  },
+  "requirements": {
+    "agua": "medio",
+    "altitud_msnm": {
+      "min_absoluto": 0,
+      "optimo_min": 200,
+      "optimo_max": 2200,
+      "max_absoluto": 2600
+    },
+    "temperatura_c": {
+      "helada_letal": 3,
+      "optimo_min": 16,
+      "optimo_max": 28,
+      "max_tolerable": 36
+    },
+    "radiacion": "sombra_parcial",
+    "drenaje_requerido": "bueno"
+  },
+  "valor_pedagogico": "La siempreviva u hoja del aire (Kalanchoe pinnata (Lam.) Pers., Crassulaceae, sinónimo Bryophyllum pinnatum (Lam.) Oken — algunos autores la ubican aún en género Bryophyllum) es una planta suculenta perenne originaria de Madagascar y África Oriental tropical, ampliamente naturalizada pantropicalmente (incluida Colombia desde hace siglos) entre 0 y 2.200 msnm en zonas térmicas cálidas-templadas-moderadas en casi todo el país: Antioquia (Medellín, Suroeste cafetero, Oriente, Bajo Cauca), Valle del Cauca (cinturón frutícola y zonas urbanas), Cundinamarca (Sabana templada — La Mesa, Anolaima, Anapoima, Fusagasugá), Boyacá templada (Moniquirá, Santana, Chitaraque), Caldas, Risaralda, Quindío (Eje Cafetero), Tolima, Huila, Santander (Bucaramanga, San Gil, Barichara, Lebrija), Norte de Santander, Magdalena (Santa Marta), Atlántico (Barranquilla), Bolívar (Cartagena), Cesar (Valledupar), La Guajira (sur), Córdoba, Sucre, Chocó (Quibdó), Cauca, Nariño y zonas urbanas en general. Es lección viva PEDAGÓGICAMENTE EXCELENTE — entre las plantas más mágicas del catálogo de huerta escolar — de reproducción asexual vegetativa por apomixis foliar (también llamada reproducción foliar plantular o yemas foliares marginales), un fenómeno biológico extraordinario que enseña a niñas y niños cómo una sola hoja desprendida de Kalanchoe pinnata produce espontáneamente 5-15 plantulas en miniatura (propágulos foliares) en cada hendidura del margen serrado-crenado de la hoja — sin necesidad de semilla, sin floración, sin polinización, sin riego intensivo, en apenas 7-21 días — basta dejar una hoja sobre tierra apenas humedecida (o incluso pegada con cinta a una pared con humedad ambiental) para que emita docenas de hijos perfectos clonales con sus propias raíces y hojas listas para autopropagarse y formar nuevas plantas adultas en pocos meses. Goethe la estudió obsesivamente durante sus investigaciones de metamorfosis vegetal y la nombró 'Goethe-Pflanze' (planta de Goethe) en honor a esa capacidad regenerativa que parecía contradecir las leyes biológicas conocidas en su época (siglo XVIII-XIX) — fenómeno hoy entendido como meristemos epifilos pre-formados en el primordio foliar que se activan tras desconexión del flujo de auxinas-citokininas de la planta madre. Pertenece a la familia Crassulaceae (igual familia que Crassula ovata jade, sedum, echeveria), planta perenne arbustiva-herbácea de 0.6-1.8 m de altura con tallos suculentos huecos rojizo-verdosos, hojas suculentas opuestas decusadas pinnadas en las plantas adultas (3-5 folíolos elípticos crenado-aserrados) o simples ovalado-crenadas en plantas juveniles (3-15 cm largo x 2-8 cm ancho) verde-jade brillantes a veces con bordes rojizos en exposición sol, inflorescencia panícula terminal péndula vistosa con flores tubulares colgantes péndulas anaranjado-rojizo-purpúreas (2-5 cm largo) polinizadas por colibríes (Trochilidae — colibríes esmeralda, pico-de-hoz, ermitaños neotropicales) y polillas crepusculares, frutos folículos con muchas semillas pequeñas (rara vez forma fruto en Colombia — predomina reproducción foliar asexual). Patrón fotosintético CAM. Uso medicinal tradicional pantropical bien documentado: hojas frescas trituradas como cataplasma cicatrizante de heridas-quemaduras-úlceras cutáneas, jugo de hojas como antiinflamatorio-antitusivo-diurético-antilitiásico (uso popular muy difundido en Colombia, Caribe, Centroamérica, Brasil, África, India — 'leaf of life'), estudios fitoquímicos identifican bufadienólidos (cardenólidos similares a digitálicos — precaución cardíaca en dosis altas), flavonoides, esteroles, ácidos orgánicos. Considerada planta ritual-protectora en tradiciones afrocaribeñas-yorubas santería ('yerba bruja' protectora del hogar). Manejo agroecológico: PROPAGACIÓN PRÁCTICAMENTE GRATUITA E ILIMITADA — basta dejar una hoja madura desprendida sobre sustrato apenas humedecido (tierra + arena 1:1) o incluso colgada en una bolsa plástica transparente con poca humedad ambiental y a los 7-21 días emite plantulas marginales listas para trasplantar individualmente, distancia 30-50 cm en cobertura, sombra parcial a sol parcial filtrado (no sol pleno tropical), riego moderado-escaso, suelos bien drenados, tolera sequía moderada, asocio con menta, hierbabuena, hierbabuena, cilantro, ajenjo, ruda en huertos medicinales caseros. Función en chagra/huerto escolar como medicinal tradicional cosmopolita de soberanía alimentaria, planta PEDAGÓGICAMENTE EXCELENTE para enseñar reproducción asexual vegetativa por apomixis foliar a niñas y niños (la lección biológica más impactante y visual de toda la huerta — un solo experimento simple con una hoja sobre tierra muestra la magia de la propagación clonal), cobertura del suelo medicinal, atractora de colibríes y polillas, ornamental tropical. Fuentes Tier A: GBIF, POWO Kew, Pamplona-Roger 2006 Plantas Medicinales, JBB Plantas Medicinales Cundinamarca-Boyacá, Pérez Arbeláez 1947, SiB Colombia, Bernal 2015.",
+  "sources": [
+    {
+      "id": "gbif-taxonomic-backbone",
+      "title": "gbif-taxonomic-backbone",
+      "tier": "A",
+      "url": "https://www.gbif.org/dataset/d7dddbf4-2cf0-4f39-9b2a-bb099caae36c"
+    },
+    {
+      "id": "powo-kew",
+      "title": "powo-kew",
+      "tier": "A",
+      "url": "https://powo.science.kew.org"
+    },
+    {
+      "id": "pamplona-roger-2006-plantas-medicinales",
+      "title": "pamplona-roger-2006-plantas-medicinales",
+      "tier": "B",
+      "url": null
+    },
+    {
+      "id": "jbb-plantas-medicinales",
+      "title": "jbb-plantas-medicinales",
+      "tier": "A",
+      "url": null
+    },
+    {
+      "id": "perez-arbelaez-1947-plantas-utiles",
+      "title": "perez-arbelaez-1947-plantas-utiles",
+      "tier": "A",
+      "url": null
+    },
+    {
+      "id": "sib-colombia",
+      "title": "sib-colombia",
+      "tier": "A",
+      "url": "https://sibcolombia.net"
+    },
+    {
+      "id": "bernal-2015-plantas-liquenes-colombia",
+      "title": "bernal-2015-plantas-liquenes-colombia",
+      "tier": "A",
+      "url": "http://catalogoplantasdecolombia.unal.edu.co"
+    }
+  ],
+  "_generated_by": "scripts/build-cycle-content-from-catalog.mjs",
+  "_generated_at": "2026-05-19T00:42:57.393Z"
+}

@@ -19,8 +19,11 @@ import { auraDeBicho } from './transformacion.js';
    del cuerpo, remate redondo sin aguijón.
    Elevada al lenguaje RUBBER-HOSE PLENO (Cuphead + Miss Minutes de Loki):
    contorno grueso que respira, ojos de goma con pupila grande y brillo, cachetes
-   campesinos, bracitos/patitas de manguera con mitones, antenas con bombillo que
-   hacen follow-through, y squash-&-stretch en el idle (boil ~12fps). El DIBUJO
+   campesinos, bracitos/patitas de manguera SIN guantes (re-skin aprobado
+   2026-08-21: remate de tinta sutil, no mitón), antenas con bombillo que
+   hacen follow-through, y squash-&-stretch en el idle (boil ~12fps).
+   La CARA sigue la referencia aprobada (ref-abeja.png, Cuphead/Miss Minutes):
+   ojos más grandes y redondos con buen catchlight + sonrisa más ancha y cálida. El DIBUJO
    compone el KIT reutilizable `_rubberhose.jsx` (que el oso andino y el colibrí
    heredan); la CADENCIA vive en `creatures.css` (clases `rh-*`, gate RM + tier).
    La IDENTIDAD (paleta + proporciones) vive en `abejaIdentidad.js`: la MISMA
@@ -236,9 +239,10 @@ export function AbejaAngelita({
       <ellipse className={wing} style={alaStyle2} cx="-0.4" cy="-5.2"
         rx="6.6" ry="2.7" fill={ABEJA_PALETA.alaTulClara} opacity="0.44" stroke="rgba(42,26,12,0.28)" strokeWidth="0.45" />
 
-      {/* patitas manguera con pie crema (detrás del tronco, se mecen suave) */}
-      <Miembro d="M-2.6,4.4 C-3.2,6.6 -3.4,8 -3.0,9.2" ancho={1.9} punta={[-3.0, 9.4]} puntaR={1.3} pie sway={vivo} delay={-0.6} />
-      <Miembro d="M1.8,4.7 C1.4,6.8 1.3,8.2 1.8,9.4" ancho={1.9} punta={[1.8, 9.6]} puntaR={1.3} pie sway={vivo} delay={-0.95} />
+      {/* patitas manguera SIN mitón (re-skin 2026-08-21): remate de tinta
+          sutil, detrás del tronco, se mecen suave */}
+      <Miembro d="M-2.6,4.4 C-3.2,6.6 -3.4,8 -3.0,9.2" ancho={1.9} punta={[-3.0, 9.4]} puntaR={1.3} pie sinGuante sway={vivo} delay={-0.6} />
+      <Miembro d="M1.8,4.7 C1.4,6.8 1.3,8.2 1.8,9.4" ancho={1.9} punta={[1.8, 9.6]} puntaR={1.3} pie sinGuante sway={vivo} delay={-0.95} />
 
       {/* ABDOMEN ámbar PÁLIDO, esbelto y LISO: SIN las tres barras verticales
           oscuras (esas eran la firma de la Apis europea). Remata redondo — SIN
@@ -259,15 +263,16 @@ export function AbejaAngelita({
       <ellipse cx="5.0" cy="-0.4" rx="3.5" ry="4.4" fill={ABEJA_PALETA.torax}
         stroke={RH_INK} strokeWidth="1.2" />
 
-      {/* bracitos manguera con mitón crema (delante del tronco, follow-through).
+      {/* bracitos manguera SIN mitón (re-skin 2026-08-21: la referencia traía
+          guantes por DEFECTO — acá el remate es tinta sutil, manita desnuda).
           Marcados (crt-brazo-l/r) y con pivote en el HOMBRO para que los gestos
           celebra/señala los alcen desde el hombro, no desde el centro del bbox:
           el hombro izquierdo cae arriba-derecha de su bbox ('right top'); el
           derecho, arriba-izquierda ('left top'). */}
       <Miembro clase="crt-brazo-l" origen="right top"
-        d="M-6.2,1.4 C-8.2,2.4 -9.0,4.1 -8.4,5.9" ancho={2.1} punta={[-8.5, 6.2]} puntaR={1.55} sway={vivo} delay={-0.15} />
+        d="M-6.2,1.4 C-8.2,2.4 -9.0,4.1 -8.4,5.9" ancho={2.1} punta={[-8.5, 6.2]} puntaR={1.55} sinGuante sway={vivo} delay={-0.15} />
       <Miembro clase="crt-brazo-r" origen="left top"
-        d="M5.4,3.0 C6.9,4.2 7.5,5.9 7.0,7.5" ancho={2.2} punta={[7.0, 7.8]} puntaR={1.6} sway={vivo} delay={-0.45} />
+        d="M5.4,3.0 C6.9,4.2 7.5,5.9 7.0,7.5" ancho={2.2} punta={[7.0, 7.8]} puntaR={1.6} sinGuante sway={vivo} delay={-0.45} />
 
       {/* cabeza OSCURA (casi negra) con contorno — la mitad oscura del meliponino */}
       <circle cx="8.6" cy="-1.0" r={ABEJA_PROPORCION.cabezaR} fill={ABEJA_PALETA.testa} stroke={RH_INK} strokeWidth="1.2" />
@@ -275,14 +280,22 @@ export function AbejaAngelita({
           y, a la vez, el fondo sobre el que la carita (ojos/boca/cejas del agente)
           sigue leyéndose pese a la cabeza oscura. Va bajo ojos/cachetes/boca. */}
       <ellipse cx="9.4" cy="-0.2" rx="3.2" ry="3.4" fill={ABEJA_PALETA.cara} opacity="0.95" />
-      {/* chapetas campesinas + sonrisa + ojos de goma (parpadean juntos) */}
-      <Cachetes puntos={[{ cx: 10.4, cy: 0.7, r: 1.15 }, { cx: 6.9, cy: 0.3, r: 0.85 }]} vivo={vivo} />
+      {/* chapetas campesinas + sonrisa + ojos de goma (parpadean juntos).
+          CARA re-skin 2026-08-21 (referencia ref-abeja.png, Cuphead/Miss
+          Minutes): ojos más grandes y redondos (r 2.1/1.6 — el TECHO que las
+          gafas de sol pueden cubrir sin que el aro del ojo se asome tras el
+          lente; los centros NO se mueven: gafas, cejas y CSS de mirada cuelgan
+          de ahí) + sonrisa más ancha y cálida (w 3.6) que remata en los
+          cachetes. BocaVisema recibe LOS MISMOS w/prof que la sonrisa para que
+          el lip-sync no salte al arrancar; prof queda en 1.2 porque más
+          profundidad saca la lengüita del visema V3 por fuera del mentón. */}
+      <Cachetes puntos={[{ cx: 10.4, cy: 0.7, r: 1.25 }, { cx: 6.9, cy: 0.3, r: 0.95 }]} vivo={vivo} />
       {/* Boca: lip-sync si hay visema; si no, la sonrisa de goma de siempre. */}
       {visema
-        ? <BocaVisema cx={8.9} cy={1.4} w={2.8} prof={1.1} visema={visema} />
-        : <Sonrisa cx={8.9} cy={1.4} w={2.8} prof={1.1} />}
+        ? <BocaVisema cx={8.9} cy={1.4} w={3.6} prof={1.2} visema={visema} />
+        : <Sonrisa cx={8.9} cy={1.4} w={3.6} prof={1.2} />}
       <OjosRubber
-        ojos={[{ cx: 10.1, cy: -1.9, r: 1.95 }, { cx: 7.4, cy: -2.2, r: 1.45 }]}
+        ojos={[{ cx: 10.1, cy: -1.9, r: 2.1 }, { cx: 7.4, cy: -2.2, r: 1.6 }]}
         mirar={[0.3, 0.34]}
         parpadea={vivo}
       />
