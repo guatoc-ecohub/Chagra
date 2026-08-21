@@ -1261,9 +1261,17 @@ export default function App() {
     isAuthenticated().then((isAuth) => {
       if (!isAuth) {
         setSinSesion(true);
-        // La raíz sin sesión aterriza en el valle 3D (tema de entrada). El
-        // login sigue accesible con #login o el botón volver del valle.
-        navigate(hash === 'login' ? 'login' : 'valle3d');
+        // GATE DE LOGIN PARA ANÓNIMOS (hotfix regresión chagra.app,
+        // 2026-08-21): sin token la raíz debe aterrizar en la pantalla de
+        // LOGIN (estado final), no en el valle 3D — chagra.app estaba
+        // sirviendo el valle3d (EntradaValle3D) SIN pedir sesión a nadie.
+        // Offline-first se preserva: esta rama SOLO corre para quien NO
+        // tiene token; el usuario ya autenticado (rama `isAuth` abajo) sigue
+        // entrando al dashboard y funcionando offline como siempre — su
+        // token cacheado lo saca de aquí. Las rutas públicas
+        // (onboarding-piloto, mockups, callback OAuth) ya se resolvieron
+        // ANTES de este check.
+        navigate('login');
         return;
       }
       const targetView = HASH_VIEW_ROUTES[hash] || 'dashboard';
