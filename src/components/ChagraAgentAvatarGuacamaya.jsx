@@ -17,7 +17,20 @@ import GuacamayaCompai from '../visual/creatures/GuacamayaCompai';
  * `GuacamayaCompai.jsx` ya entiende directo (no necesita traducción de pose —
  * el rig reusado solo distingue idle/hablar por ahora, ver nota en ese
  * archivo).
+ *
+ * VISEMA (2026-08-21, "guacamaya = compai de agente completo"):
+ * `GuacamayaCompai.jsx` dejó de hardcodear `data-visema` a partir de `state`
+ * — ahora acepta un `visema` real (para el vocabulario rico, ver
+ * `ChagraAgentAvatar.jsx`). Este adaptador angosto sigue produciendo un
+ * visema razonable a partir de `state`, mismo patrón que
+ * `ChagraAgentAvatarOsoBaston.jsx`/`ChagraAgentAvatarLuciernaga.jsx`
+ * (`VISEMA_DE_STATE`): así el contrato observable narrow (state="speaking"
+ * → data-visema) no cambia para quien ya lo usaba.
  */
+const VISEMA_DE_STATE = {
+    speaking: 'V2',
+};
+
 export default function ChagraAgentAvatarGuacamaya({
     state = 'idle',
     size = 48,
@@ -28,9 +41,11 @@ export default function ChagraAgentAvatarGuacamaya({
     className = '',
     ariaLabel = 'Chagra IA',
 }) {
+    const visema = VISEMA_DE_STATE[state] || null;
     const bicho = (
         <GuacamayaCompai
             state={state}
+            visema={visema}
             size={size}
             title={ariaLabel}
             className={className}

@@ -4,6 +4,7 @@ import {
   namespaceSvg,
   namespaceCss,
   extraerCssDelRig,
+  hostALigero,
 } from '../nsRigValle.js';
 
 describe('idsDeclaradosEnSvg', () => {
@@ -70,5 +71,30 @@ describe('extraerCssDelRig', () => {
 
   it('devuelve cadena vacía si el marcador no aparece (safety net)', () => {
     expect(extraerCssDelRig('body{margin:0}', 'NO EXISTE')).toBe('');
+  });
+});
+
+describe('hostALigero', () => {
+  it('convierte :host([data-estado="hablar"]) en [data-estado="hablar"]', () => {
+    const out = hostALigero(':host([data-estado="hablar"]) #medidorFill{width:62%}');
+    expect(out).toBe('[data-estado="hablar"] #medidorFill{width:62%}');
+  });
+
+  it('reescribe varias apariciones y deja el resto del CSS intacto', () => {
+    const css = [
+      ':host([data-estado="sana"]) #medidorFill{width:94%}',
+      '.flota{animation:bob 1s}',
+      ':host([data-estado="amenaza"]) #cuerpoRig{animation-duration:3.4s}',
+    ].join('\n');
+    const out = hostALigero(css);
+    expect(out).not.toContain(':host');
+    expect(out).toContain('[data-estado="sana"] #medidorFill{width:94%}');
+    expect(out).toContain('.flota{animation:bob 1s}');
+    expect(out).toContain('[data-estado="amenaza"] #cuerpoRig{animation-duration:3.4s}');
+  });
+
+  it('sin :host en el texto, lo devuelve sin cambios', () => {
+    const css = '.pupila{transform-box:fill-box}';
+    expect(hostALigero(css)).toBe(css);
   });
 });
