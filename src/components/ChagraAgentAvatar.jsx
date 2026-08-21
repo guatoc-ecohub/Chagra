@@ -6,6 +6,7 @@ import ChagraAgentAvatarLuciernaga from './ChagraAgentAvatarLuciernaga';
 import ChagraAgentAvatarGuacamaya from './ChagraAgentAvatarGuacamaya';
 import ChagraAgentAvatarChivitoPunk from './ChagraAgentAvatarChivitoPunk';
 import Angelita from '../visual/agente/Angelita';
+import GuacamayaCompai from '../visual/creatures/GuacamayaCompai';
 import useCompaiElegido from '../visual/mundo3d/escenas/useCompaiElegido.js';
 
 /**
@@ -53,6 +54,17 @@ import useCompaiElegido from '../visual/mundo3d/escenas/useCompaiElegido.js';
  * `Guacamaya.jsx` — ese ya existía como billboard decorativo de
  * FaunaCalido.jsx), no se redibujaron a mano. Los 7: angelita, jaguar,
  * oso-baston, zariguya, luciernaga, chivito-punk, guacamaya.
+ *
+ * GUACAMAYA PROMOVIDA A "AVATAR RICO" (2026-08-21, "guacamaya = compai de
+ * agente completo"): hasta hoy, `type==='guacamaya'` con la API rica caía en
+ * `ComponenteAngosto` (traducción a la baja vía `STATE_DE_ESTADO_RICO`,
+ * perdiendo 6 de los 10 estados) — solo Angelita bypaseaba esa traducción.
+ * `GuacamayaCompai.jsx` ahora entiende el vocabulario rico de verdad (`estado`
+ * + `visema`, ver ese archivo), así que se le da el MISMO bypass que ya tenía
+ * Angelita: `estado`/`visema`/`confianza`/etc. le llegan directo, sin pasar
+ * por `STATE_DE_ESTADO_RICO`. El resto del elenco (jaguar/oso-baston/
+ * zariguya/luciernaga/chivito-punk) sigue traduciéndose a la baja hasta que
+ * reciban la misma migración.
  */
 const STATE_DE_ESTADO_RICO = {
     acompana: 'idle',
@@ -77,9 +89,14 @@ export default function ChagraAgentAvatar({ estado = undefined, ...props }) {
     const ComponenteAngosto = AVATAR_ANGOSTO[type];
 
     if (estado !== undefined) {
-        // Call-site "rico": solo Angelita entiende el vocabulario completo;
-        // maíz/zarigüeya reciben la traducción angosta (idle/thinking/
-        // speaking/listening).
+        // Call-site "rico": Angelita y guacamaya entienden el vocabulario
+        // completo (bypasean la traducción angosta); el resto del elenco
+        // recibe la traducción a la baja (idle/thinking/speaking/listening).
+        // `visema`/`confianza`/etc. ya viajan dentro de `...props` — no hace
+        // falta desestructurarlos aparte (mismo camino que usa Angelita).
+        if (type === 'guacamaya') {
+            return <GuacamayaCompai estado={estado} {...props} />;
+        }
         if (ComponenteAngosto) {
             return <ComponenteAngosto state={STATE_DE_ESTADO_RICO[estado] || 'idle'} {...props} />;
         }
