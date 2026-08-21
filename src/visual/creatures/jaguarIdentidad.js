@@ -58,6 +58,15 @@ export const JAGUAR_PALETA = {
   mota: '#ece1ff',          // motas de luz que flotan lento
   marcaEspiritu: '#c9a4ff', // las rosetas gemelas que BRILLAN en la revelación
   cobre: '#e0a24a',         // glifos de ornamento geométrico (acento cobre)
+  /* ── Piel Humboldt (la lámina ilustrada de lujo, siempre en VECTOR) ────────
+     Tonos de PINTURA para el volumen painterly: no reemplazan cuerpo/luz/
+     sombra (que siguen siendo la base del gradiente), los acompañan como masas
+     de sombreado y luces altas — la ilustración naturalista sobre la goma. */
+  lomo: '#b57d2e',          // el oro hondo de la franja dorsal (lomo al sol bajo)
+  umbra: '#7c4a15',         // sombra de pintura (masas blandas, no tinta de contorno)
+  brillo: '#f4d391',        // luz alta del pelaje (cresta del lomo, pómulo, anca)
+  garra: '#e9dcbd',         // garras marfil de las zarpas
+  lejos: '#9c6124',         // pelaje del lado de ALLÁ (patas lejanas en penumbra)
 };
 
 export const JAGUAR_PROPORCION = {

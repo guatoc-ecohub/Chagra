@@ -1727,6 +1727,26 @@
 [data-tier='bajo'] .jaguar-lado-fauce, [data-tier='bajo'] .jaguar-lado-grunefx,
 [data-tier='bajo'] .jaguar-lado-aura { animation: none; }
 
+/* ═══ LA TESTA QUE SIGUE AL USUARIO (mirausted) — el jaguar VECTORIAL gira la
+   cabeza entera, no solo las pupilas (el mismo patrón cabezaMira que estrenaron
+   las láminas, aquí sobre el rig de vector: como el cuello es DIBUJO CONTINUO,
+   la testa se desplaza y el pelaje se estira sin costura — jamás se decapita).
+   Wrapper ADITIVO alrededor de .jaguar-cabeza: el acecho (que anima
+   .jaguar-cabeza por dentro) queda intacto y ambos componen. useMiradaUsted ya
+   respeta tier bajo y reduced-motion (no marca data-rh-mira); el transition
+   de vuelta vive aquí para que suelte la mirada con la misma suavidad. */
+.jaguar-cabeza-mira {
+  transform-box: fill-box;
+  transform-origin: 50% 94%;
+  transition: transform 0.32s cubic-bezier(0.33, 1, 0.68, 1);
+}
+[data-rh-mira='usted'] .jaguar-cabeza-mira {
+  transform: translate(
+    calc(var(--rh-mx, 0px) * 1.7),
+    calc(var(--rh-my, 0px) * 1.15)
+  );
+}
+
 
 /* ═══════════════════════════════════════════════════════════════════════════
    MORROCOY — el CARÁCTER del galápago: ANCESTRAL, LENTO, SABIO y PACIENTE (el
