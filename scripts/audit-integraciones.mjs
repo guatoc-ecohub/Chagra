@@ -14,6 +14,16 @@
  *    "TRAMPA REPO PRIVADO" abajo) Endpoints del sidecar agro-mcp
  *    (`chagra-pro/modules/agro-mcp/sidecar/src/server.ts`): ¿los llama
  *    alguien en `src/`?
+ * 3. Componentes bajo `src/mockups/` y `src/visual/` (extensión 2026-07-21,
+ *    D-5 de la reingeniería del pipeline): ¿son ALCANZABLES por import
+ *    estático desde el entry point real de la app (`src/App.jsx`)? Este es
+ *    el gate del patrón "se construye, pasa el build, pero nunca se
+ *    renderiza / nunca entra al bundle / nunca se importa" — casos reales
+ *    que lo motivaron: `PerrosValle.jsx` existía y no se veía en ninguna
+ *    ruta; mockups nuevos que quedaron fuera del bundle de producción. Se
+ *    hace con un mini-resolver de imports (BFS desde App.jsx, ver
+ *    `buildReachableSet`) — NO un bundler real, así que comparte el mismo
+ *    LÍMITE CONOCIDO de abajo (imports dinámicos por variable no se ven).
  *
  * Cualquier capacidad SIN consumidor y SIN entrada en el allowlist
  * (`ops/integraciones-no-consumidas.json`) hace fallar el script (exit 1).
@@ -51,6 +61,11 @@
  *   - llamadas indirectas vía un wrapper genérico si el string del
  *     endpoint no aparece literal (ej. `callTool(name)` con `name` armado
  *     en runtime en vez de la ruta completa).
+ * La auditoría de componentes huérfanos (§3) comparte esta misma limitación:
+ * `buildReachableSet` resuelve especificadores de import LITERALES (string
+ * fijo tras `from`/`import(`), no rutas armadas con template strings
+ * (`import(\`./x/${var}.jsx\`)`) — si aparece un caso así, cae en el mismo
+ * hueco documentado, no en uno nuevo.
  * Si un caso legítimo cae en alguno de estos huecos, la respuesta NO es
  * afinar el regex hasta la perfección (ruido = la gente lo silencia) sino
  * declararlo en el allowlist con la razón "false positive conocido: <por
@@ -191,6 +206,116 @@ if (chagraProAvailable) {
   warn('Esto es esperado en CI del repo público. Para la auditoría completa, correr con chagra-pro clonado al lado (o CHAGRA_PRO_PATH=<ruta>).');
 }
 
+// -----------------------------------------------------------------------
+// 3) Componentes huérfanos bajo src/mockups/ y src/visual/ (D-5, 2026-07-21)
+// -----------------------------------------------------------------------
+// Entry point real de la app (ver src/App.jsx: rutas hash `#/mockups/<slug>`
+// resueltas vía `lazy(() => import('./mockups/<Componente>'))` antes del
+// check de sesión). Si un .jsx nuevo bajo estos dos directorios no es
+// alcanzable desde acá por ninguna cadena de imports estáticos, quedó
+// "construido pero no cableado" — el mismo patrón de `PerrosValle.jsx`.
+const ENTRY_POINT = 'src/App.jsx';
+const ORPHAN_SCAN_DIRS = ['src/mockups', 'src/visual'];
+// Extensiones que el resolver intenta al completar un especificador relativo
+// sin extensión (orden = prioridad). Incluye no-JS (css/json/assets) porque
+// un archivo reachable puede importar un `./Foo.css` — no lo contamos como
+// "componente" en el reporte (eso lo filtra COMPONENT_EXTS abajo) pero sí
+// necesita resolverse para que el BFS no se detenga ahí.
+const RESOLVABLE_EXTS = ['.jsx', '.js', '.mjs', '.ts', '.tsx', '.css', '.json', '.svg', '.png'];
+// Lo que este audit trata como "componente" reportable (los .js/.ts de estos
+// dos directorios suelen ser datos/config — arquetipos.js, mundoData.js — no
+// "algo que debería verse en una ruta"; no se auditan como huérfanos).
+const COMPONENT_EXTS = new Set(['.jsx', '.tsx']);
+
+function resolveWithExts(basePath) {
+  if (existsSync(basePath) && statSync(basePath).isFile()) return basePath;
+  for (const ext of RESOLVABLE_EXTS) {
+    if (existsSync(basePath + ext)) return basePath + ext;
+  }
+  for (const ext of RESOLVABLE_EXTS) {
+    const idx = join(basePath, 'index' + ext);
+    if (existsSync(idx)) return idx;
+  }
+  return null;
+}
+
+// Resuelve un especificador de import tal como aparece en el código fuente.
+// Soporta relativos (`./x`, `../x`) y el alias `@/` (`jsconfig.json` →
+// `src/*`, usado en un puñado de archivos aunque no está en vite.config.js
+// como alias de build real — igual se resuelve para no perder esos casos).
+// Paquetes de node_modules (sin `.` ni `@/` al inicio) se ignoran: no son
+// auditables ni relevantes para "¿esto vive en una ruta viva?".
+function resolveSpecifier(fromFile, spec) {
+  if (spec.startsWith('@/')) return resolveWithExts(join(SRC_DIR, spec.slice(2)));
+  if (spec.startsWith('.')) return resolveWithExts(resolve(dirname(fromFile), spec));
+  return null;
+}
+
+// Extrae especificadores de import de un archivo fuente. A propósito NO es
+// un parser AST (mismo criterio "barato, regex, documentado" que el resto
+// del script) — cubre `import ... from '...'`, `export ... from '...'`,
+// `import('...')` (incluye el caso `lazy(() => import('...'))`) e
+// `import '...'` (side-effect, ej. una hoja de estilos).
+const SPEC_PATTERNS = [
+  /\bfrom\s*['"`]([^'"`]+)['"`]/g,
+  /\bimport\s*\(\s*['"`]([^'"`]+)['"`]\s*\)/g,
+  /^\s*import\s*['"`]([^'"`]+)['"`]/gm,
+];
+
+function extractSpecifiers(content) {
+  const specs = new Set();
+  for (const re of SPEC_PATTERNS) {
+    re.lastIndex = 0;
+    let m;
+    while ((m = re.exec(content)) !== null) specs.add(m[1]);
+  }
+  return specs;
+}
+
+// BFS desde el entry point siguiendo imports estáticos resolubles. El
+// resultado es el conjunto de archivos que un bundler real incluiría en el
+// grafo de módulos alcanzable desde App.jsx (con la salvedad de imports
+// dinámicos por variable — ver LÍMITE CONOCIDO en el header).
+function buildReachableSet(entryFile) {
+  const visited = new Set();
+  const queue = [entryFile];
+  while (queue.length) {
+    const file = queue.shift();
+    if (visited.has(file)) continue;
+    visited.add(file);
+    let content;
+    try { content = readFileSync(file, 'utf8'); } catch { continue; }
+    for (const spec of extractSpecifiers(content)) {
+      const resolved = resolveSpecifier(file, spec);
+      if (resolved && !visited.has(resolved)) queue.push(resolved);
+    }
+  }
+  return visited;
+}
+
+const entryAbs = resolve(ROOT, ENTRY_POINT);
+const entryAvailable = existsSync(entryAbs);
+const reachableSet = entryAvailable ? buildReachableSet(entryAbs) : new Set();
+
+function auditOrphanComponents() {
+  if (!entryAvailable) {
+    warn(`entry point ${ENTRY_POINT} no existe — se salta la auditoría de componentes huérfanos.`);
+    return [];
+  }
+  const results = [];
+  for (const dir of ORPHAN_SCAN_DIRS) {
+    const absDir = resolve(ROOT, dir);
+    for (const f of walk(absDir, COMPONENT_EXTS)) {
+      if (f.includes('__tests__')) continue;
+      if (/\.(test|spec|stories)\.[jt]sx?$/.test(f)) continue;
+      results.push({ id: f.slice(ROOT.length + 1), file: f, status: reachableSet.has(f) ? 'consumed' : 'orphan' });
+    }
+  }
+  return results;
+}
+
+const orphanResults = auditOrphanComponents();
+
 // -----------------------------
 // Allowlist
 // -----------------------------
@@ -221,6 +346,11 @@ for (const e of allowlist.sidecar_endpoints || []) {
   validateAllowlistEntry(e, e.endpoint || '(sin endpoint)');
   allowedEndpoints.set(e.endpoint, e);
 }
+const allowedOrphanIds = new Map();
+for (const e of allowlist.orphan_components || []) {
+  validateAllowlistEntry(e, e.id || '(sin id)');
+  allowedOrphanIds.set(e.id, e);
+}
 
 // -----------------------------
 // Reporte + veredicto
@@ -229,6 +359,7 @@ console.log('Chagra — auditor de integraciones no consumidas');
 console.log(`  targets same-repo:     ${SAME_REPO_TARGETS.length}`);
 console.log(`  chagra-pro disponible: ${chagraProAvailable ? SERVER_TS : 'no'}`);
 console.log(`  endpoints auditados:   ${sidecarResults.length}${chagraProAvailable ? '' : ' (saltado)'}`);
+console.log(`  componentes auditados (mockups+visual): ${orphanResults.length}${entryAvailable ? '' : ' (saltado)'}`);
 console.log('');
 
 const failures = [];
@@ -248,6 +379,19 @@ for (const r of sidecarResults) {
   if (allow) { skippedAllowlisted.push(r.endpoint); warn(`endpoint SIN consumidor pero allowlisted: ${r.endpoint} — ${allow.reason} (${allow.date})`); continue; }
   failures.push(`[sidecar] ${r.endpoint} — SIN consumidor en src/ y SIN entrada en allowlist`);
 }
+
+// Reporte de §3 resumido (no un `ok()` por archivo — con ~250 componentes
+// bajo mockups+visual eso solo agrega ruido al log de CI): se cuenta, y solo
+// se imprime línea por línea lo que NO está limpio (huérfano u orphan
+// allowlisted), igual que el resto del script hace con sus fallas.
+let orphanConsumedCount = 0;
+for (const r of orphanResults) {
+  if (r.status === 'consumed') { orphanConsumedCount++; continue; }
+  const allow = allowedOrphanIds.get(r.id);
+  if (allow) { skippedAllowlisted.push(r.id); warn(`componente SIN ruta viva pero allowlisted: ${r.id} — ${allow.reason} (${allow.date})`); continue; }
+  failures.push(`[orphan] ${r.id} — construido pero NO alcanzable desde ${ENTRY_POINT} (ninguna ruta viva lo importa) y SIN entrada en allowlist`);
+}
+if (orphanResults.length > 0) ok(`componentes cableados en mockups/visual: ${orphanConsumedCount}/${orphanResults.length}`);
 
 console.log('');
 if (failures.length === 0) {
