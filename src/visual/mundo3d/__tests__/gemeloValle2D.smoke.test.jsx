@@ -125,4 +125,57 @@ describe('GemeloValle2D — el gemelo 2D de primera clase del valle', () => {
     fireEvent.click(getByRole('button', { name: new RegExp(`Viajar al mundo ${suelo.titulo}`) }));
     expect(onHotspot).toHaveBeenCalledWith('mundo', { mundoId: 'suelo' });
   });
+
+  describe('responsividad a orientación (portrait/landscape)', () => {
+    test('el lienzo mantiene aspect-ratio correcto y se escala en cualquier contenedor', () => {
+      const { container } = render(<GemeloValle2D clima="soleado" onEntrar={vi.fn()} onAlerta={vi.fn()} />);
+      const lienzo = container.querySelector('.gemelo-valle__lienzo');
+      expect(lienzo).toBeInTheDocument();
+
+      // Verificar que el SVG existe y tiene el viewBox correcto (480×360 = landscape base)
+      const svg = container.querySelector('.gemelo-valle__svg');
+      expect(svg).toHaveAttribute('viewBox', '0 0 480 360');
+      expect(svg).toHaveAttribute('preserveAspectRatio', 'xMidYMid meet');
+    });
+
+    test('todos los hotspots quedan dentro del lienzo sin importar el tamaño del contenedor', () => {
+      // Simular diferentes tamaños de contenedor (portrait y landscape)
+      const containerSizes = [
+        { width: 390, height: 844 },  // iPhone portrait
+        { width: 844, height: 390 },  // iPhone landscape
+        { width: 428, height: 926 },  // iPhone Pro Max portrait
+        { width: 926, height: 428 },  // iPhone Pro Max landscape
+      ];
+
+      containerSizes.forEach(({ width, height }) => {
+        const { container: testContainer } = render(
+          <div style={{ width, height, position: 'relative', overflow: 'hidden' }}>
+            <GemeloValle2D clima="soleado" onEntrar={vi.fn()} onAlerta={vi.fn()} />
+          </div>
+        );
+
+        const botones = testContainer.querySelectorAll('.gv-poi');
+        expect(botones.length).toBeGreaterThan(0);
+
+        botones.forEach((boton) => {
+          const left = parseFloat(boton.style.left);
+          const top = parseFloat(boton.style.top);
+
+          // Los valores deben estar entre 8 y 92 (por el clampPct)
+          expect(left).toBeGreaterThanOrEqual(8);
+          expect(left).toBeLessThanOrEqual(92);
+          expect(top).toBeGreaterThanOrEqual(8);
+          expect(top).toBeLessThanOrEqual(92);
+        });
+      });
+    });
+
+    test('el SVG se renderiza correctamente y mantiene viewBox', () => {
+      const { container } = render(<GemeloValle2D clima="soleado" onEntrar={vi.fn()} onAlerta={vi.fn()} />);
+      const svg = container.querySelector('.gemelo-valle__svg');
+      expect(svg).toBeInTheDocument();
+      expect(svg).toHaveAttribute('viewBox', '0 0 480 360');
+      expect(svg).toHaveAttribute('preserveAspectRatio', 'xMidYMid meet');
+    });
+  });
 });
