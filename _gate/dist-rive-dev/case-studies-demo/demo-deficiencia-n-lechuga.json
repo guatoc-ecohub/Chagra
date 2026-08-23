@@ -1,0 +1,143 @@
+{
+  "id": "demo-deficiencia-n-lechuga-guatoc-2026-05-10",
+  "title": "Deficiencia de nitrógeno en lechuga crespa — Guatoc cama 2 · 2026-05",
+  "finca_slug": "guatoc",
+  "zone_freetext": "huerto exterior cama 2 (lechugas)",
+  "subject": {
+    "species_ids": ["lactuca_sativa_crispa_verde"],
+    "count_total": 40,
+    "count_affected": 28
+  },
+  "problem": {
+    "name_freetext": "Clorosis general progresiva (amarillamiento hojas viejas), crecimiento lento, hojas pequeñas",
+    "pest_id": null,
+    "severity": "medium",
+    "detected_at": "2026-05-10T07:00:00-05:00"
+  },
+  "state": "monitoring",
+  "state_history": [
+    { "state": "open", "at": "2026-05-10T07:00:00-05:00", "notes": "Operador nota clorosis generalizada en 70% de la cama" },
+    { "state": "in_treatment", "at": "2026-05-10T14:00:00-05:00", "notes": "Aplicación de bocashi como abono de superficie + biol al riego" },
+    { "state": "monitoring", "at": "2026-05-15T09:00:00-05:00", "notes": "Recuperación visible: nuevas hojas verde intenso, hojas viejas se mantienen amarillas pero ya no se extiende" }
+  ],
+  "treatments_applied": [
+    {
+      "biopreparado_id": "bocashi",
+      "applied_at": "2026-05-10T14:00:00-05:00",
+      "dose": "200 g de bocashi seco distribuido en superficie de cama (5 g/planta), incorporado superficial con rastrillo",
+      "notes": "Bocashi madurado 30 días, hecho con gallinaza + ceniza + melaza + tierra de monte. Aporte de N orgánico + microbiología. RAG sugerido por agente Chagra."
+    },
+    {
+      "biopreparado_id": "biol_anaerobico",
+      "applied_at": "2026-05-10T14:30:00-05:00",
+      "dose": "1 L de biol diluido 1:10 en agua de riego, aplicado en todo el lote",
+      "notes": "Biol filtrado, dilución estándar para hortalizas. Refuerzo de N asimilable rápido + fitohormonas."
+    },
+    {
+      "biopreparado_id": "biol_anaerobico",
+      "applied_at": "2026-05-13T08:00:00-05:00",
+      "dose": "1 L biol diluido 1:10 (segunda aplicación)",
+      "notes": "Refuerzo a los 3 días según protocolo manejo orgánico cundiboyacense."
+    }
+  ],
+  "event_log_ids": [],
+  "photo_asset_ids": [],
+  "outcome": {
+    "closed_at": null,
+    "final_count_affected": null,
+    "lessons_learned": "Diagnóstico diferencial clave: deficiencia de N empieza por hojas viejas (móvil), deficiencia de Fe por hojas nuevas (inmóvil). Bocashi + biol resuelve N en 4-5 días sin químicos. Hojas viejas no recuperan color (daño permanente) pero crecimiento se reanuda."
+  },
+  "visibility": "public",
+  "validation": {
+    "status": "certified",
+    "validator_name": "Ing. Diana Pérez Caicedo",
+    "validator_credentials": "Ing. Agrónoma UNAL Palmira · Reg. ICA AG-2018-3421",
+    "validated_at": "2026-05-16T15:30:00-05:00",
+    "notes": "Diagnóstico correcto: clorosis distal en hojas viejas es típico de N. Tratamiento bocashi + biol apropiado. Recomendaría análisis de suelo cada 6 meses para no llegar a déficit visible."
+  },
+  "timeline": [
+    {
+      "id": "tl-n-001",
+      "event_type": "observation",
+      "date": "2026-05-10T07:00:00-05:00",
+      "description": "Cama 2 (40 lechugas crespas) muestra amarillamiento generalizado en 28 plantas. Hojas viejas (basales) más afectadas, hojas nuevas (centro) verdes pero pequeñas. Crecimiento estancado las últimas 2 semanas.",
+      "photo_url": "/placeholder-species.svg",
+      "actor": "Operador campo"
+    },
+    {
+      "id": "tl-n-002",
+      "event_type": "diagnosis",
+      "date": "2026-05-10T07:30:00-05:00",
+      "description": "Agente Chagra identifica patrón: clorosis empieza en hojas viejas → N (móvil) se traslada hacia tejidos jóvenes cuando escasea. Descarta Fe (afectaría hojas nuevas). Sugiere bocashi de superficie + biol al riego.",
+      "actor": "Agente Chagra IA"
+    },
+    {
+      "id": "tl-n-003",
+      "event_type": "intervention",
+      "date": "2026-05-10T14:00:00-05:00",
+      "description": "Aplicación de bocashi en superficie: 200 g distribuidos en la cama, ~5 g por planta. Incorporación superficial con rastrillo. Riego ligero post-aplicación.",
+      "actor": "Operador campo"
+    },
+    {
+      "id": "tl-n-004",
+      "event_type": "intervention",
+      "date": "2026-05-10T14:30:00-05:00",
+      "description": "Aplicación foliar de biol diluido 1:10 + riego al lote. 1 L total de biol concentrado.",
+      "actor": "Operador campo"
+    },
+    {
+      "id": "tl-n-005",
+      "event_type": "observation",
+      "date": "2026-05-12T09:00:00-05:00",
+      "description": "48h: hojas viejas siguen amarillas (no recuperan color, daño permanente). PERO hojas nuevas centrales verde más intenso y crecimiento visible. Buena señal: la planta retomó la fotosíntesis.",
+      "actor": "Operador campo"
+    },
+    {
+      "id": "tl-n-006",
+      "event_type": "intervention",
+      "date": "2026-05-13T08:00:00-05:00",
+      "description": "Refuerzo: segunda aplicación de biol diluido 1:10 al riego, según protocolo recomendado.",
+      "actor": "Operador campo"
+    },
+    {
+      "id": "tl-n-007",
+      "event_type": "result",
+      "date": "2026-05-15T09:00:00-05:00",
+      "description": "5 días post-tratamiento: crecimiento reanudado claramente visible. Hojas nuevas verde oscuro. Brotes centrales rondan 8 cm. Cosecha estimada en 12-15 días. Caso bajo monitoreo cerrado preventivo en 10 días.",
+      "actor": "Operador campo"
+    }
+  ],
+  "recommendations": [
+    {
+      "id": "rec-n-001",
+      "text": "Cuando empieza la clorosis: PRIMERO observar en qué hojas inicia. Hojas viejas → N o Mg. Hojas nuevas → Fe, Ca, S o Zn. El patrón guía el diagnóstico antes de cualquier análisis.",
+      "suggested_by": "Agente Chagra (RAG: Manual nutrición vegetal UNAL + IICA)",
+      "validation_required": true,
+      "validated_by": "Ing. Diana Pérez Caicedo",
+      "validated_at": "2026-05-16T15:30:00-05:00"
+    },
+    {
+      "id": "rec-n-002",
+      "text": "Bocashi de superficie + biol al riego es la combinación más rápida para N orgánico: bocashi aporta nutrición + microbiología, biol da N asimilable rápido. Repetir biol cada 3-4 días hasta ver brotes verdes.",
+      "suggested_by": "Agente Chagra (RAG: AGROSAVIA bocashi 2018 + Vandermeer cycle)",
+      "validation_required": true,
+      "validated_by": "Ing. Diana Pérez Caicedo",
+      "validated_at": "2026-05-16T15:30:00-05:00"
+    },
+    {
+      "id": "rec-n-003",
+      "text": "PREVENCIÓN: incorporar 100 g/m² de bocashi al preparar cama, antes de trasplantar. Análisis de suelo cada 6 meses ayuda a no llegar al déficit visible (cuando llega es porque la planta ya perdió 30-40% de potencial).",
+      "suggested_by": "Ing. Diana Pérez Caicedo (validación profesional)",
+      "validation_required": false
+    },
+    {
+      "id": "rec-n-004",
+      "text": "Lechuga es muy demandante de N en fase de roseta. Sembrar después de leguminosa (fríjol, arveja) reduce necesidad de aporte externo: la rotación es agroecología pura.",
+      "suggested_by": "Operador campo (lección)",
+      "validation_required": false
+    }
+  ],
+  "created_at": "2026-05-10T07:00:00-05:00",
+  "created_by_did": null,
+  "updated_at": "2026-05-16T15:30:00-05:00"
+}

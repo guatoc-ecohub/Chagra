@@ -1,0 +1,133 @@
+{
+  "detector": "bright-ridge-hough-v1",
+  "results": [
+    {
+      "image": "/tmp/lv-gate/ab/control-costura.png",
+      "dimensions": "1120x1120",
+      "backgroundRgb": [
+        233,
+        228,
+        214
+      ],
+      "alphaCoveragePercent": 100,
+      "subjectPixels": 216066,
+      "ridgeCandidatePixels": 97503,
+      "ridgeCandidatePercentOfSubject": 45.1264891283219,
+      "threshold": {
+        "ridgeResidualLuma": 22,
+        "minimumLuminance": 88,
+        "alertScore": 0.18
+      },
+      "line": {
+        "score": 0.9226653175435511,
+        "angleDegrees": 74,
+        "rho": -311,
+        "supportPixels": 259,
+        "longestRunPixels": 259,
+        "lineSpanPixels": 259.8856762475866,
+        "lineCoveragePercent": 99.65920543972464,
+        "meanRidgeResidual": 94.45972454409802,
+        "meanLineLuminance": 236.4335142857144,
+        "meanLineChroma": 55.93436293436294,
+        "appearanceScore": 0.9258204633204633
+      },
+      "verdict": "SEAM_SIGNAL_HIGH"
+    },
+    {
+      "image": "/tmp/lv-gate/ab/antes-fijo.png",
+      "dimensions": "1120x1120",
+      "backgroundRgb": [
+        233,
+        228,
+        214
+      ],
+      "alphaCoveragePercent": 100,
+      "subjectPixels": 214579,
+      "ridgeCandidatePixels": 97116,
+      "ridgeCandidatePercentOfSubject": 45.258855712814395,
+      "threshold": {
+        "ridgeResidualLuma": 22,
+        "minimumLuminance": 88,
+        "alertScore": 0.18
+      },
+      "line": {
+        "score": 0.5314995466189357,
+        "angleDegrees": 54,
+        "rho": 159,
+        "supportPixels": 108,
+        "longestRunPixels": 108,
+        "lineSpanPixels": 129.61846358359742,
+        "lineCoveragePercent": 83.32146286423571,
+        "meanRidgeResidual": 82.50501120532,
+        "meanLineLuminance": 159.73938333333336,
+        "meanLineChroma": 61.601851851851855,
+        "appearanceScore": 0.7087670229230972
+      },
+      "verdict": "SEAM_SIGNAL_HIGH"
+    },
+    {
+      "image": "/tmp/lv-gate/ab/despues-fijo.png",
+      "dimensions": "1120x1120",
+      "backgroundRgb": [
+        233,
+        228,
+        214
+      ],
+      "alphaCoveragePercent": 100,
+      "subjectPixels": 214656,
+      "ridgeCandidatePixels": 96881,
+      "ridgeCandidatePercentOfSubject": 45.13314326177698,
+      "threshold": {
+        "ridgeResidualLuma": 22,
+        "minimumLuminance": 88,
+        "alertScore": 0.18
+      },
+      "line": {
+        "score": 0.5303637160315745,
+        "angleDegrees": 54,
+        "rho": 159,
+        "supportPixels": 108,
+        "longestRunPixels": 108,
+        "lineSpanPixels": 129.61846358359742,
+        "lineCoveragePercent": 83.32146286423571,
+        "meanRidgeResidual": 82.73058725286413,
+        "meanLineLuminance": 159.69363333333337,
+        "meanLineChroma": 61.68518518518518,
+        "appearanceScore": 0.7072523663837452
+      },
+      "verdict": "SEAM_SIGNAL_HIGH"
+    },
+    {
+      "image": "/home/kortux/Workspace/chagra/dist/compai/laminas/jaguar-natural.png",
+      "dimensions": "705x394",
+      "backgroundRgb": [
+        0,
+        0,
+        0
+      ],
+      "alphaCoveragePercent": 48.42639593908629,
+      "subjectPixels": 123067,
+      "ridgeCandidatePixels": 68319,
+      "ridgeCandidatePercentOfSubject": 55.51366328910269,
+      "threshold": {
+        "ridgeResidualLuma": 22,
+        "minimumLuminance": 88,
+        "alertScore": 0.18
+      },
+      "line": {
+        "score": 0.6931742011726865,
+        "angleDegrees": 40,
+        "rho": 63,
+        "supportPixels": 202,
+        "longestRunPixels": 187,
+        "lineSpanPixels": 269.77345620139977,
+        "lineCoveragePercent": 69.31742011726865,
+        "meanRidgeResidual": 103.81504516790409,
+        "meanLineLuminance": 173.61507623762387,
+        "meanLineChroma": 48.93564356435643,
+        "appearanceScore": 1
+      },
+      "verdict": "SEAM_SIGNAL_HIGH"
+    }
+  ]
+}

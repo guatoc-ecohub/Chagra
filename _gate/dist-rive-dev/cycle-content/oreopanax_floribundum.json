@@ -1,0 +1,79 @@
+{
+  "species_slug": "oreopanax_floribundum",
+  "scientific_name": "Oreopanax floribundum Decne. & Planch.",
+  "common_names": [
+    "Mano de oso"
+  ],
+  "family": "Araliaceae",
+  "category": "arboles_sombra",
+  "cultivable": true,
+  "conservation_status": "nativo_silvestre",
+  "thermal_zones": [
+    "templado",
+    "frio"
+  ],
+  "roles_in_guild": [
+    "biomass_producer",
+    "pollinator_attractor",
+    "nurse_plant"
+  ],
+  "antagonists": [],
+  "especies_nativas_sustitutas": [],
+  "propagation": {
+    "methods": [
+      "semilla"
+    ],
+    "best_method": "semilla",
+    "protocol_resumen": "Semillas pequeñas extraídas de drupas maduras violáceo-negras. Siembra superficial en sustrato fino orgánico bajo sombra 60-70%. Germinación 40-60% a 30-60 días. Vivero a sombra parcial. Plantación a los 10-14 meses (30-40 cm altura) bajo dosel forestal parcial.",
+    "tiempo_a_establecimiento_dias": 120,
+    "notas": "Especie del bosque andino premontano-montano bajo. Hojas grandes palmatilobadas decorativas. Floración blanca-verdosa en panículas muy atractora de polinizadores. Frutos consumidos por avifauna y mamíferos pequeños (osos andinos).",
+    "fuente": "Bernal et al. 2015 Catálogo Plantas y Líquenes Colombia; POWO Kew Araliaceae Andes; Cuevas-Reyes 2010 Oreopanax Colombia"
+  },
+  "requirements": {
+    "agua": "medio",
+    "altitud_msnm": {
+      "min_absoluto": 1500,
+      "optimo_min": 1700,
+      "optimo_max": 2000,
+      "max_absoluto": 2500
+    },
+    "temperatura_c": {
+      "helada_letal": -1,
+      "optimo_min": 13,
+      "optimo_max": 20,
+      "max_tolerable": 25
+    },
+    "radiacion": "sombra_parcial",
+    "drenaje_requerido": "bueno"
+  },
+  "valor_pedagogico": "El mano de oso o cariseco (Oreopanax floribundum, Araliaceae) es uno de los árboles emblemáticos del bosque andino premontano-montano bajo colombiano entre 1.500 y 2.500 msnm, distribuido en la región Andina especialmente en Cundinamarca, Boyacá, Santanderes, Antioquia, Caldas, Quindío, Risaralda, Tolima, Huila, Cauca, Nariño y Valle del Cauca. Árbol perennifolio de 8-15 metros de altura con copa irregular abierta, fuste corto y corteza grisácea con cicatrices foliares conspicuas; sus hojas son grandes palmatilobadas con 5-9 lóbulos digitados que recuerdan la forma de una mano abierta o una garra de oso (de ahí los nombres vernáculos 'mano de oso' y 'pata de gallina'), verde oscuro lustrosas en haz y pálidas en envés, con pecíolos largos característicos; flores pequeñas blanco-verdosas en panículas terminales densas muy atractoras de abejas Apis y Meliponini, sírfidos, escarabajos polinizadores y otros himenópteros nativos, frutos drupas violáceo-negruzcas dispuestas en racimos consumidas y dispersadas por aves frugívoras del bosque andino (tucanes Andigena, mirlas Turdus, tángaras Tangara) y por mamíferos arborícolas incluido históricamente el oso andino o oso de anteojos (Tremarctos ornatus) —de hecho el nombre vernáculo 'mano de oso' alude tanto a la forma de las hojas como a las huellas similares que deja el oso andino en la corteza al trepar para alimentarse de los frutos. La familia Araliaceae es un linaje botánico con representantes notables como el ginseng (Panax ginseng) asiático y el guayabo de pava (Schefflera) tropical, y en Colombia incluye más de 30 especies del género Oreopanax distribuidas en los Andes y bosques de niebla. Su mayor virtud agroecológica es la combinación de ornamentalidad patrimonial (las hojas palmatilobadas son uno de los rasgos botánicos más reconocibles del bosque andino colombiano, presente en patrimonio cultural campesino y en jardinería urbana de altiplano), atracción masiva de polinizadores nativos en floración, hospedaje de avifauna frugívora y mamíferos asociados al bosque andino (incluido el oso de anteojos, ícono de conservación), y aporte de biomasa hojarasca al suelo. Como sombrío parcial diversificado del café en zona cafetera de altura (1.500-2.000 msnm) en Caldas, Quindío y Antioquia aporta servicios ecosistémicos complementarios a otros árboles del dosel andino. Es lección de biogeografía andina y conservación: el mano de oso es indicador de bosque andino premontano-montano bajo en estado de conservación medio a bueno, su presencia en cafetales y huertos patrimoniales rurales contribuye a la conectividad ecológica para fauna y al sostenimiento de polinizadores nativos. Fuentes Tier A: Bernal et al. 2015 Catálogo Plantas y Líquenes Colombia, POWO Kew Araliaceae, GBIF Backbone Taxonomy, Cuevas-Reyes 2010 Oreopanax Colombia, Cenicafé manuales sombrío diversificado.",
+  "companions_markdown": "### Especies asociadas favorables\n\nEstas especies favorecen el cultivo cuando se siembran cerca:\n- alnus_acuminata — Aliso andino (Alnus acuminata Kunth)\n- cedrela_montana — Cedro de montaña (Cedrela montana Moritz ex Turcz.)\n- clethra_revoluta — Laurel iguá (Clethra revoluta (Ruiz & Pav.) Spreng.)\n- coffea_arabica — Café caturra / Castillo / Cenicafé 1 (Coffea arabica L.)",
+  "sources": [
+    {
+      "id": "bernal-2015-plantas-liquenes-colombia",
+      "title": "bernal-2015-plantas-liquenes-colombia",
+      "tier": "A",
+      "url": "http://catalogoplantasdecolombia.unal.edu.co"
+    },
+    {
+      "id": "powo-kew",
+      "title": "powo-kew",
+      "tier": "A",
+      "url": "https://powo.science.kew.org"
+    },
+    {
+      "id": "gbif-taxonomic-backbone",
+      "title": "gbif-taxonomic-backbone",
+      "tier": "A",
+      "url": "https://www.gbif.org/dataset/d7dddbf4-2cf0-4f39-9b2a-bb099caae36c"
+    },
+    {
+      "id": "cenicafe-manual-cafetero-2013",
+      "title": "cenicafe-manual-cafetero-2013",
+      "tier": "A",
+      "url": "https://www.cenicafe.org/es/index.php/nuestras_publicaciones"
+    }
+  ],
+  "_generated_by": "scripts/build-cycle-content-from-catalog.mjs",
+  "_generated_at": "2026-05-19T00:42:57.405Z"
+}

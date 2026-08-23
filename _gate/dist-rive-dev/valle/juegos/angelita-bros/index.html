@@ -1,0 +1,143 @@
+<!doctype html>
+<html lang="es-CO">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0d1b10">
+<title>Súper Angelita Bros</title>
+<style>
+  :root{
+    --ink:#281a0d;
+    --paper:#f5e9cf;
+    --leaf:#2a6b38;
+    --leaf2:#4d8e43;
+    --leaf3:#8fc65d;
+    --soil:#69492d;
+    --soil2:#8a6744;
+    --sky:#b8dceb;
+    --sun:#f7e5ab;
+    --hud:rgba(19,27,16,.72);
+  }
+  html,body{margin:0;height:100%;overflow:hidden;background:#0b120d;color:var(--paper);font-family:Georgia,"Times New Roman",serif}
+  body{touch-action:none;overscroll-behavior:none}
+  #app{position:fixed;inset:0;overflow:hidden;background:
+    radial-gradient(1200px 800px at 50% 20%, rgba(255,245,205,.18), transparent 55%),
+    linear-gradient(180deg,#8dc9dc 0%,#cce7cb 38%,#a6d18b 72%,#6f8e50 100%)}
+  canvas#game{position:absolute;inset:0;width:100%;height:100%;display:block;touch-action:none}
+  #labels{position:absolute;inset:0;pointer-events:none;z-index:4}
+  #hud{
+    position:absolute;left:12px;top:12px;z-index:5;max-width:min(92vw,420px);
+    background:linear-gradient(180deg,rgba(11,18,13,.84),rgba(21,31,20,.68));
+    border:1px solid rgba(255,248,226,.16);border-radius:16px;padding:10px 12px 11px;
+    box-shadow:0 10px 28px rgba(0,0,0,.22);backdrop-filter:blur(8px);
+    line-height:1.35;font-size:14px;letter-spacing:.01em
+  }
+  #hud strong{color:#fff2c9}
+  #hud .row{display:flex;gap:10px;flex-wrap:wrap}
+  #hud .chip{display:inline-flex;align-items:center;gap:6px;padding:4px 8px;border-radius:999px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.08)}
+  #hud button.chip{
+    appearance:none;-webkit-appearance:none;cursor:pointer;font:inherit;color:#fff2c9;
+    box-shadow:none;line-height:1.2
+  }
+  #hud button.chip:hover{background:rgba(255,255,255,.1)}
+  #hud button.chip:active{transform:translateY(1px)}
+  #hud .tiny{font-size:12px;opacity:.88}
+  #message{
+    position:absolute;left:50%;top:14px;transform:translateX(-50%);z-index:6;
+    background:rgba(246,230,190,.96);color:#2d1c0f;border:2px solid #2c1c0d;border-radius:999px;
+    padding:8px 14px;font-size:14px;font-style:italic;box-shadow:0 8px 20px rgba(0,0,0,.18);
+    opacity:0;transition:opacity .22s ease,transform .22s ease
+  }
+  #message.show{opacity:1;transform:translateX(-50%) translateY(0)}
+  #controls{
+    position:absolute;left:0;right:0;bottom:10px;z-index:6;
+    display:flex;justify-content:space-between;align-items:flex-end;padding:0 12px;gap:12px;
+    pointer-events:none
+  }
+  .pad{display:flex;gap:10px;pointer-events:auto}
+  .btn{
+    width:64px;height:64px;border-radius:18px;border:2px solid rgba(255,248,226,.72);
+    background:linear-gradient(180deg,rgba(44,28,14,.8),rgba(20,13,6,.84));
+    color:#fff6da;font-size:26px;font-weight:700;box-shadow:0 10px 18px rgba(0,0,0,.24);
+    display:grid;place-items:center;touch-action:none;user-select:none;-webkit-user-select:none
+  }
+  .btn:active,.btn.down{transform:translateY(2px) scale(.98);background:linear-gradient(180deg,rgba(74,48,22,.92),rgba(28,18,8,.96))}
+  #jumpBtn{width:88px}
+  #intro{
+    position:absolute;inset:0;z-index:10;display:grid;place-items:center;
+    background:
+      radial-gradient(circle at 50% 50%, rgba(255,247,217,.96) 0 11%, rgba(47,36,16,.92) 12% 15%, rgba(8,10,8,.92) 16% 21%, rgba(0,0,0,.2) 22% 24%, rgba(0,0,0,.0) 25%),
+      radial-gradient(circle at 50% 50%, rgba(18,21,18,.92) 0 28%, rgba(8,11,8,.96) 29% 100%);
+    transition:opacity .55s ease, transform .55s ease;
+  }
+  #intro.hidden{opacity:0;pointer-events:none;transform:scale(1.02)}
+  #introCard{
+    width:min(90vw,520px);padding:22px 20px 20px;border-radius:24px;
+    background:linear-gradient(180deg,rgba(245,233,207,.98),rgba(230,215,188,.92));
+    color:#281a0d;border:2px solid rgba(40,26,13,.88);box-shadow:0 20px 50px rgba(0,0,0,.35);
+    text-align:center
+  }
+  #introCard h1{margin:0 0 8px;font-size:clamp(28px,5vw,48px);line-height:1;font-style:italic}
+  #introCard p{margin:6px 0 0;font-size:15px;line-height:1.45}
+  #introCard .sub{font-size:12px;letter-spacing:.08em;text-transform:uppercase;opacity:.72}
+  #startBtn{
+    margin-top:14px;padding:12px 18px;border-radius:999px;border:2px solid #281a0d;
+    background:linear-gradient(180deg,#f0c45b,#c99228);color:#261706;font-weight:800;
+    box-shadow:0 8px 0 rgba(40,26,13,.3);cursor:pointer;font-family:inherit;font-size:15px
+  }
+  #startBtn:active{transform:translateY(2px);box-shadow:0 6px 0 rgba(40,26,13,.3)}
+  #startBtn.secondary{background:linear-gradient(180deg,#f7f1df,#d2c29c)}
+  #loading{
+    position:absolute;left:12px;bottom:12px;z-index:5;padding:8px 12px;border-radius:999px;
+    background:rgba(14,19,14,.62);color:#e9f0dc;font-size:12px;border:1px solid rgba(255,255,255,.12)
+  }
+  @media (max-width: 760px){
+    #hud{max-width:calc(100vw - 24px);font-size:13px}
+    .btn{width:60px;height:60px}
+    #jumpBtn{width:82px}
+  }
+
+  /* Movimiento reducido: las transiciones de interfaz saltan al estado final.
+     Las sacudidas y partículas ya las apaga game.js con la misma preferencia. */
+  @media (prefers-reduced-motion: reduce){
+    *{animation:none!important;transition:none!important}
+  }
+</style>
+<script type="importmap">
+{
+  "imports": {
+    "three": "../../vendor/three.module.js",
+    "three/addons/": "../../vendor/addons/"
+  }
+}
+</script>
+</head>
+<body>
+<div id="app">
+  <canvas id="game"></canvas>
+  <div id="labels"></div>
+  <div id="hud"></div>
+  <div id="message"></div>
+  <div id="controls" aria-label="Controles táctiles">
+    <div class="pad">
+      <button class="btn" id="leftBtn" aria-label="Mover a la izquierda">◀</button>
+      <button class="btn" id="rightBtn" aria-label="Mover a la derecha">▶</button>
+    </div>
+    <div class="pad">
+      <button class="btn" id="jumpBtn" aria-label="Saltar">⤒</button>
+    </div>
+  </div>
+  <div id="loading">Cargando cafetal…</div>
+  <div id="intro">
+    <div id="introCard">
+      <div class="sub">Mundo 1 · cafetal cálido</div>
+      <h1>Súper Angelita Bros</h1>
+      <p>Corre, salta y planea con Angelita. Derriba la broca con salto limpio, recoge semillas nativas y activa <strong>Beauveria bassiana</strong> como biocontrol.</p>
+      <p class="sub">Flechas o botones · espacio para saltar y planear · toque para empezar</p>
+      <button id="startBtn">Entrar al cafetal</button>
+    </div>
+  </div>
+</div>
+<script type="module" src="./game.js"></script>
+</body>
+</html>

@@ -1,0 +1,117 @@
+{
+  "diag": {
+    "totalJaguares": 2,
+    "todos": [
+      {
+        "agt": "thinking",
+        "vida": null,
+        "inBubble": false
+      },
+      {
+        "agt": "caminando",
+        "vida": null,
+        "inBubble": true
+      }
+    ],
+    "overlayJaguar": {
+      "agt": "caminando",
+      "vida": null,
+      "inBubble": true
+    },
+    "overlayEsElPrimero": false
+  },
+  "walkCrops": [
+    {
+      "p": "/home/kortux/Workspace/chagra/_gate/compai-dev-dominio/marcha-crop-00_tx-65.png",
+      "tx": -65,
+      "delta": -3
+    },
+    {
+      "p": "/home/kortux/Workspace/chagra/_gate/compai-dev-dominio/marcha-crop-01_tx-72.png",
+      "tx": -72,
+      "delta": -8
+    },
+    {
+      "p": "/home/kortux/Workspace/chagra/_gate/compai-dev-dominio/marcha-crop-02_tx-80.png",
+      "tx": -80,
+      "delta": -8
+    },
+    {
+      "p": "/home/kortux/Workspace/chagra/_gate/compai-dev-dominio/marcha-crop-03_tx-87.png",
+      "tx": -87,
+      "delta": -7
+    },
+    {
+      "p": "/home/kortux/Workspace/chagra/_gate/compai-dev-dominio/marcha-crop-04_tx-93.png",
+      "tx": -93,
+      "delta": -6
+    },
+    {
+      "p": "/home/kortux/Workspace/chagra/_gate/compai-dev-dominio/marcha-crop-05_tx-119.png",
+      "tx": -119,
+      "delta": -25
+    }
+  ],
+  "badResponses": [
+    {
+      "url": "https://chagra-dev.guatoc.co/pro-modules/gremios-receta-pro/index.js",
+      "status": 200,
+      "ct": "text/html"
+    },
+    {
+      "url": "https://chagra-dev.guatoc.co/pro-modules/voice-entity-extractor-pro/index.js",
+      "status": 200,
+      "ct": "text/html"
+    },
+    {
+      "url": "https://chagra-dev.guatoc.co/pro-modules/avatar-espiritu-pro/index.js",
+      "status": 200,
+      "ct": "text/html"
+    },
+    {
+      "url": "https://chagra-dev.guatoc.co/radial-gradient(120%%2095%%20at%2050%%2012%,%20",
+      "status": 400,
+      "ct": "text/html"
+    },
+    {
+      "url": "https://chagra-dev.guatoc.co/assets/radial-gradient(120%%2095%%20at%2050%%2012%,%20",
+      "status": 400,
+      "ct": "text/html"
+    },
+    {
+      "url": "https://chagra-dev.guatoc.co/assets/radial-gradient(120%%2095%%20at%2050%%2012%,%20",
+      "status": 400,
+      "ct": "text/html"
+    },
+    {
+      "url": "https://chagra-dev.guatoc.co/pro-modules/gremios-receta-pro/index.js",
+      "status": 200,
+      "ct": "text/html"
+    },
+    {
+      "url": "https://chagra-dev.guatoc.co/pro-modules/voice-entity-extractor-pro/index.js",
+      "status": 200,
+      "ct": "text/html"
+    },
+    {
+      "url": "https://chagra-dev.guatoc.co/assets/radial-gradient(120%%2095%%20at%2050%%2012%,%20",
+      "status": 400,
+      "ct": "text/html"
+    },
+    {
+      "url": "https://chagra-dev.guatoc.co/pro-modules/avatar-espiritu-pro/index.js",
+      "status": 200,
+      "ct": "text/html"
+    },
+    {
+      "url": "https://chagra-dev.guatoc.co/assets/radial-gradient(120%%2095%%20at%2050%%2012%,%20",
+      "status": 400,
+      "ct": "text/html"
+    },
+    {
+      "url": "https://chagra-dev.guatoc.co/radial-gradient(120%%2095%%20at%2050%%2012%,%20",
+      "status": 400,
+      "ct": "text/html"
+    }
+  ]
+}

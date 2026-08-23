@@ -1,0 +1,77 @@
+{
+  "species_slug": "psidium_guajava_manzana",
+  "scientific_name": "Psidium guajava 'Manzana'",
+  "common_names": [
+    "Guayaba manzana"
+  ],
+  "family": "Myrtaceae",
+  "category": "frutales_perennes",
+  "cultivable": true,
+  "conservation_status": "cultivo_comun",
+  "thermal_zones": [
+    "calido",
+    "templado"
+  ],
+  "roles_in_guild": [
+    "crop",
+    "pollinator_attractor"
+  ],
+  "antagonists": [],
+  "especies_nativas_sustitutas": [],
+  "propagation": {
+    "metodo_principal": "injerto",
+    "notas": "Variedad seleccionada por su menor contenido de semillas y mayor tamaño; muy rústica pero sensible a las heladas directas del páramo."
+  },
+  "requirements": {
+    "agua": "medio",
+    "altitud_msnm": {
+      "min_absoluto": 0,
+      "optimo_min": 1200,
+      "optimo_max": 2000,
+      "max_absoluto": 2400
+    },
+    "temperatura_c": {
+      "helada_letal": 0,
+      "optimo_min": 18,
+      "optimo_max": 25,
+      "max_tolerable": 35
+    },
+    "radiacion": "sol_pleno",
+    "drenaje_requerido": "bueno_a_moderado"
+  },
+  "valor_pedagogico": "La guayaba manzana (Psidium guajava L. variedad manzana) es una mirtácea perenne nativa de los Andes y muy adaptada a sistemas agroecológicos colombianos en transición de zona templada a frío bajo. Se cultiva en Santander, Boyacá, Cundinamarca, Tolima y Huila entre 1.000 y 2.000 msnm en zona térmica templada. La variedad manzana se caracteriza por fruto blanco crocante con menor número de semillas, ciclo a primera cosecha de 2-3 años, vida productiva 15-25 años y rendimientos 25-40 t/ha. Soporta períodos de sequía moderados y tolera suelos francos a francoarcillosos con pH 4.5-7.0. Manejo agroecológico: poda formación copa baja, fertilización orgánica compost + roca fosfórica, control de mosca de la fruta (Anastrepha spp.) con trampas McPhail y biopreparados. Fuentes Tier A: AGROSAVIA Manual Frutales Tropicales, ICA Resolución 3168/2015, POWO Kew, GBIF Backbone, Bernal et al. Catálogo Plantas y Líquenes de Colombia.",
+  "sources": [
+    {
+      "id": "fao-ecocrop",
+      "title": "fao-ecocrop",
+      "tier": "A",
+      "url": "https://gaez.fao.org/pages/ecocrop"
+    },
+    {
+      "id": "gbif-taxonomic-backbone",
+      "title": "gbif-taxonomic-backbone",
+      "tier": "A",
+      "url": "https://www.gbif.org/dataset/d7dddbf4-2cf0-4f39-9b2a-bb099caae36c"
+    },
+    {
+      "id": "restrepo-1996-abc-agricultura-organica",
+      "title": "restrepo-1996-abc-agricultura-organica",
+      "tier": "B",
+      "url": null
+    },
+    {
+      "id": "powo-kew",
+      "title": "powo-kew",
+      "tier": "A",
+      "url": "https://powo.science.kew.org"
+    },
+    {
+      "id": "agrosavia-manual-frutales-tropicales",
+      "title": "agrosavia-manual-frutales-tropicales",
+      "tier": "A",
+      "url": null
+    }
+  ],
+  "_generated_by": "scripts/build-cycle-content-from-catalog.mjs",
+  "_generated_at": "2026-05-19T00:42:57.364Z"
+}
