@@ -12,6 +12,13 @@ import useCompaiElegido from '../visual/mundo3d/escenas/useCompaiElegido.js';
 import useCompaiRoam from '../hooks/useCompaiRoam.js';
 import { AVATAR_NOMBRE, DEFAULT_AVATAR_TYPE } from '../hooks/useAgentAvatarType.js';
 
+/* Compai lámina-viva con POSE DE MARCHA propia: al deambular reciben
+   `estado='caminando'` en vez de solo espejarse (los demás no tienen ciclo de
+   andar y quedarían tiesos). El jaguar cruzó primero; la zarigüeya se suma con
+   su bamboleo plantígrado (fix "María Antonieta"). El oso/chivito se agregan
+   cuando su marcha lámina quede afinada. */
+const CON_MARCHA = new Set(['jaguar', 'zariguya']);
+
 /**
  * CompaiOverlay — el compai elegido, minimizable y contextual en todas las rutas 2D.
  *
@@ -29,7 +36,8 @@ import { AVATAR_NOMBRE, DEFAULT_AVATAR_TYPE } from '../hooks/useAgentAvatarType.
  *   - Toque en el compai → abre panel (toggle); mientras el panel está abierto
  *     el compai vuelve a casa y se queda quieto (no se corre bajo la guía).
  *   - El compai camina de un lado a otro con cadencia lenta y se espeja hacia
- *     donde anda; el jaguar corre su marcha real ('caminando') al desplazarse.
+ *     donde anda; los que tienen marcha propia (jaguar, zarigüeya — ver
+ *     CON_MARCHA) corren su pose real 'caminando' al desplazarse.
  *   - El hint cambia según la ruta actual (mapa ruta→hint, extensible)
  *   - Botón "Escuchar" usa TTS (kokoro, fail-silent si no hay saldo)
  *   - Respeta preferencias del usuario (avatar seleccionado en AvatarSelector)
@@ -288,10 +296,13 @@ export default function CompaiOverlay({ currentView = 'dashboard' }) {
   const esRealista = avatarType === 'jaguar';
   const avatarSize = esRealista ? 112 : 84;
 
-  // Mientras deambula, el jaguar corre su MARCHA real ('caminando'); el resto
-  // conserva su estado (no tienen pose de marcha) y solo se espejan. Un estado
-  // conversacional (hablar/escuchar/pensar) siempre gana a la caminata.
-  const estadoAvatar = esRealista && caminando && compaiState === 'idle'
+  // Mientras deambula, los compai lámina-viva con MARCHA real corren su pose
+  // 'caminando' al desplazarse (el jaguar y ahora la zarigüeya —bamboleo
+  // plantígrado, ya no la "María Antonieta" tiesa que solo se espejaba—). El
+  // resto conserva su estado (no tienen pose de marcha) y solo se espejan. Un
+  // estado conversacional (hablar/escuchar/pensar) siempre gana a la caminata.
+  const tieneMarcha = CON_MARCHA.has(avatarType);
+  const estadoAvatar = tieneMarcha && caminando && compaiState === 'idle'
     ? 'caminando'
     : compaiState;
 

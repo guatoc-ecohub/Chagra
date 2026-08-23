@@ -1,43 +1,29 @@
-import Zariguya from '../visual/creatures/Zariguya';
+import ZariguyaLaminaViva from '../visual/creatures/ZariguyaLaminaViva';
 
 /**
- * ChagraAgentAvatarZariguya — la zarigüeya (crías al lomo) como CARA del
- * agente de Chagra, 3ra opción junto a Angelita y el maíz (operador
- * 2026-07-25, tras el merge de `art(creatures): la zarigüeya entra al elenco
- * — con las crías al lomo (#2783)`).
+ * ChagraAgentAvatarZariguya — la zarigüeya (chucha / fara / runcho, Didelphis)
+ * como CARA del agente de Chagra, 3ra opción junto a Angelita y el resto del
+ * elenco (operador 2026-07-25).
  *
- * Adaptador puro (mismo contrato que ChagraAgentAvatarAngelita/Maiz): traduce
- * la API histórica del avatar del agente (state 'idle'|'thinking'|'speaking'|
- * 'listening', glow, withLabel, onClick/onDoubleClick) al vocabulario de VIDA
- * de `Zariguya.jsx` (`visual/creatures/`) — el registro rubber-hose CÁLIDO
- * del elenco canónico. OJO: existe otra zarigüeya en
- * `dashboard/CriaturasNocturnas.jsx`, biopunk oscuro/neón — esa NO se usa acá
- * (mezclar registros es un error de diseño ya señalado). Cero lógica nueva de
- * agente, cero cambios en `visual/creatures/` (solo lectura/import, igual que
- * el resto de adaptadores de este archivo con Angelita).
+ * CARA = LA LÁMINA VIVA (supersede el PR #2984). El operador aprobó la lámina
+ * recortada por alfa (`ZariguyaLaminaViva`, PR #2984) sobre el auto-trazado
+ * vtracer —"cuando se integraban las láminas recortadas al menos se veían muy
+ * bien integradas"— pero el rig quedó TIESO: al deambular se veía como una
+ * "María Antonieta" (la cargaban, no andaba). Esta versión conserva EXACTA la
+ * piel de la lámina y arregla el MOVIMIENTO: al caminar bambolea plantígrado
+ * de verdad (rock de peso pie-a-pie + bob + cadera; ver `ZariguyaLaminaViva`
+ * / `zariguyaLamina.css`), y en idle late un BOIL menudo para no quedar como
+ * un témpano. El vector `Zariguya.jsx` se conserva intacto (valle 3D + kart +
+ * sus tests) — ESTE adaptador ya no lo usa.
  *
- * La zarigüeya no tiene vocabulario conversacional propio (es una criatura de
- * VIDA — pose/husmea/tanatosis — no un chat-avatar como Angelita): el mapeo
- * es de mejor esfuerzo:
- *   - idle       → pose 'anda' (base, viva pero sin urgencia).
- *   - thinking   → pose 'anda' + `husmea=true`: su reacción-firma (la cuña
- *                  del hocico se alza y tantea) leída como "buscando/pensando".
- *   - speaking   → pose 'celebra' (la más expresiva) + visema del lip-sync
- *                  sobre su sonrisa.
- *   - listening  → pose 'reposo': se posa erguida y atenta.
+ * Adaptador puro (mismo contrato que ChagraAgentAvatarJaguar/OsoBaston): la
+ * API histórica del avatar del agente (`state` 'idle'|'thinking'|'speaking'|
+ * 'listening' — o 'caminando' cuando deambula, que el overlay pasa; glow,
+ * withLabel, onClick/onDoubleClick) viaja a `ZariguyaLaminaViva` como `estado`
+ * (crudo, para paridad de API/accesibilidad y para que el rig decida el
+ * comportamiento). `speaking` además arma el visema del lip-sync sobre su
+ * sonrisa abierta.
  */
-const POSE_DE_STATE = {
-    idle: 'anda',
-    thinking: 'anda',
-    speaking: 'celebra',
-    listening: 'reposo',
-};
-
-const HUSMEA_DE_STATE = {
-    thinking: true,
-};
-
-// eslint-disable-next-line chagra-i18n/no-hardcoded-spanish
 const VISEMA_DE_STATE = {
     speaking: 'V2',
 };
@@ -52,14 +38,11 @@ export default function ChagraAgentAvatarZariguya({
     className = '',
     ariaLabel = 'Chagra IA',
 }) {
-    const pose = POSE_DE_STATE[state] || 'anda';
-    const husmea = !!HUSMEA_DE_STATE[state];
     const visema = VISEMA_DE_STATE[state] || null;
 
     const bicho = (
-        <Zariguya
-            pose={pose}
-            husmea={husmea}
+        <ZariguyaLaminaViva
+            estado={state}
             visema={visema}
             size={size}
             title={ariaLabel}

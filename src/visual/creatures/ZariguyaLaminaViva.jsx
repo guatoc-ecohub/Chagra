@@ -58,8 +58,14 @@ const JAW_DE_VISEMA = { V1: 0, V2: 0.42, V3: 1, V4: 0.36 };
  *   · Detrás del guante de la brújula hay pecho: el cuerpo lo rellena
  *     `capas.js` CLONANDO la lanilla del propio vientre (INPAINT_PECHO) —
  *     píxeles de la lámina, movidos.
- *   · Las patas NO se cortan (lección "3-4 patas" del jaguar): el caminar
- *     se lee del desplazamiento del host + bob del cuerpo + la cola.
+ *   · Las patas traseras NO se cortan como pieza (lección "3-4 patas" del
+ *     jaguar): en vez de fingir un péndulo por-pata, al CAMINAR el cuerpo
+ *     BAMBOLEA plantígrado sobre los apoyos (rock de peso pie-a-pie + bob +
+ *     cadera; `.zlv-cuerpoVida`) y las dos manitos-pata bombean en oposición
+ *     — la alternancia se LEE del peso que rueda, no de patas fantasma. En
+ *     idle ese mismo nodo late un BOIL menudo para que la lámina no quede
+ *     como un témpano (María Antonieta) — el hermano del `.crt-body` del
+ *     vector rubber-hose que "sí camina".
  *
  * DEGRADACIÓN: mientras carga la imagen o sin Canvas2D (jsdom) se muestra
  * la lámina PLANA — nunca un hueco.
@@ -227,6 +233,14 @@ export default function ZariguyaLaminaViva({
           />
         )}
         <div style={{ position: 'absolute', inset: 0, display: listo ? 'block' : 'none' }}>
+          {/* VIDA DE CUERPO (nunca un témpano) — envoltorio hermano del
+              `.crt-body` rubber-hose del vector: en idle late un BOIL menudo
+              (squash/stretch ~12fps) para que la lámina no quede clavada; al
+              CAMINAR corre el BAMBOLEO plantígrado (rock de peso pie-a-pie +
+              bob + squash) desde los apoyos. Envuelve al pivote de respiro
+              para que ambas capas COMPONGAN sin pisarse (mismo truco que la
+              cabeza anidada). El origen (pies) lo pone el CSS. */}
+          <div className={cls('zlv-cuerpoVida')} style={{ position: 'absolute', inset: 0 }}>
           <div
             className={cls('zlv-cuerpoPivote')}
             style={{ position: 'absolute', inset: 0, transformOrigin: pctOf(CUERPO_PIVOTE) }}
@@ -292,6 +306,7 @@ export default function ZariguyaLaminaViva({
                 </div>
               </div>
             </div>
+          </div>
           </div>
         </div>
       </div>
