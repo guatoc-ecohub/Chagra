@@ -44,7 +44,9 @@ import useCicloDia from '../useCicloDia.js';
 import { presetDeHora } from '../cielosHoraData.js';
 import { perfilDeTier } from '../deviceTier.js';
 import CapaVivaMundo from '../CapaVivaMundo.jsx';
-
+/* HUD de FPS conmutable (dev/campo): lee el instrumento de usePerformanceMonitor
+   y lo muestra. DOM, fuera del <Canvas>. Apagado por defecto (return null). */
+import HudRendimiento from '../HudRendimiento.jsx';
 /* El bloom sutil de la hora dorada: chunk LAZY con gate ESTRICTO
    `tier === 'alto' && !reducedMotion` — medio y bajo NI LO DESCARGAN
    (el import dinámico solo dispara cuando el elemento llega a renderizarse). */
@@ -291,6 +293,7 @@ export default function EscenaBase3D({
   const frugal = tierInicial === 'bajo';
   const dpr = presupuestoInicial.dpr;
   return (
+    <>
     <Canvas
       className={`mundo-canvas${listo ? ' mundo-canvas--listo' : ''}`}
       dpr={dpr}
@@ -326,5 +329,7 @@ export default function EscenaBase3D({
         </Contenido>
       </Suspense>
     </Canvas>
+    <HudRendimiento />
+    </>
   );
 }
