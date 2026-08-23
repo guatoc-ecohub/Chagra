@@ -6,8 +6,17 @@
    ?fondo=magenta  → fondo #f0f (verificar que el calco no trae fondo horneado)
    ?quieto=1       → congela toda animación (capturas deterministas). */
 import { createRoot } from 'react-dom/client';
+import { useEffect, useState } from 'react';
 import ZariguyaTrazado from './src/visual/creatures/ZariguyaTrazado.jsx';
-import { ZT_REGIONES, ZT_PIVOTES } from './src/visual/creatures/zariguyaTrazado/pielTrazado.js';
+import { ZT_REGIONES, ZT_PIVOTES, BIGOTES_LIMPIOS } from './src/visual/creatures/zariguyaTrazado/pielTrazado.js';
+import * as calcoMod from './src/visual/creatures/zariguyaTrazado/calcoTrazado.js';
+
+/* El "crudo" de control = calco depurado (con su clip de aire limpio) +
+   bigotes limpios — lo mismo que el rig pinta en reposo, sin huesos. */
+const CLIP_AIRE = calcoMod.AIRE_LIMPIO_D
+  ? `<clipPath id="crudoAire"><path clip-rule="evenodd" d="${calcoMod.AIRE_LIMPIO_D}"/></clipPath>`
+  : '';
+const CALCO_COMPLETO = `${CLIP_AIRE}<g${CLIP_AIRE ? ' clip-path="url(#crudoAire)"' : ''}>${calcoMod.CALCO_TRAZADO}</g>${BIGOTES_LIMPIOS}`;
 
 const q = new URLSearchParams(location.search);
 const vista = q.get('vista') || 'todo';
@@ -94,6 +103,26 @@ function Regiones() {
   );
 }
 
+/* Debug de la extracción de bigotes: el calco completo + los candidatos de
+   extraer-bigotes.mjs (zt-bigotes-debug.json) pintados en ROJO encima. */
+function BigotesDebug() {
+  const [cand, setCand] = useState(null);
+  useEffect(() => {
+    fetch('/zt-bigotes-debug.json').then((r) => r.json()).then(setCand).catch(() => setCand([]));
+  }, []);
+  if (!cand) return <p>cargando…</p>;
+  const rojos = cand.map((c) => `<path fill="#f00" d="${c.d}"/>`).join('');
+  const markup = `<svg viewBox="0 0 481 444" width="962" height="888">${CALCO_COMPLETO}${rojos}</svg>`;
+  return <div dangerouslySetInnerHTML={{ __html: markup }} />;
+}
+
+/* CRUDO: el calco COMPLETO sin rig ni clips — control del diff de reposo:
+   el rig quieto debe dar píxel-idéntico a esto (todo diff = artefacto). */
+function Crudo() {
+  const markup = `<svg class="zariguyaHuesos" viewBox="-30 -25 545 500" preserveAspectRatio="xMidYMid meet" width="480" height="480">${CALCO_COMPLETO}</svg>`;
+  return <div style={{ width: 480, height: 480, lineHeight: 0 }} dangerouslySetInnerHTML={{ __html: markup }} />;
+}
+
 function App() {
   const bloques = {
     lamina: (
@@ -152,6 +181,16 @@ function App() {
     regiones: (
       <Caja titulo="REGIONES de clip + pivotes sobre la lámina (depurar cortes)">
         <Regiones />
+      </Caja>
+    ),
+    bigotes: (
+      <Caja titulo="BIGOTES — candidatos de extracción en ROJO (2x)">
+        <BigotesDebug />
+      </Caja>
+    ),
+    crudo: (
+      <Caja titulo="CRUDO — calco completo sin rig (control diff reposo)">
+        <Crudo />
       </Caja>
     ),
   };
