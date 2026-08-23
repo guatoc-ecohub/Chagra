@@ -162,6 +162,10 @@ export default function GuacamayaViva({ onBack }) {
                   estado={estado}
                   size={grande ? 260 : 148}
                   visema={estado === 'respondiendo' ? visema : null}
+                  /* algún CSS global vuelve block el svg de creatures: sin este
+                     margin el cuerpo queda pegado a la izquierda en la tarjeta
+                     agrandada (?estado=…) — visto en captura GPU 2026-08-23 */
+                  style={{ margin: '0 auto' }}
                 />
                 {/* no-se: quietud + texto EXPLÍCITO, nunca solo el uno o el
                     otro (feedback del operador — mismo contrato que Angelita). */}
@@ -185,7 +189,7 @@ export default function GuacamayaViva({ onBack }) {
               textAlign: 'center',
             }}
           >
-            <GuacamayaCompai estado="senala" direccion="izquierda" size={148} />
+            <GuacamayaCompai estado="senala" direccion="izquierda" size={148} style={{ margin: '0 auto' }} />
             <figcaption style={{ fontSize: 13 }}>
               <strong>Espejo</strong>
               <div style={{ fontSize: 11.5, opacity: 0.7, marginTop: 2 }}>direccion=izquierda: señala al otro lado</div>
