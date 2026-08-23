@@ -282,16 +282,22 @@ export default function CompaiOverlay({ currentView = 'dashboard' }) {
     setIsOpen(false);
   }, []);
 
+  // Caminantes: avatares que tienen pose de marcha (caminando) y deben
+  // recibirla cuando deambulan. Los voladores (angelita, guacamaya, luciérnaga)
+  // respetan su locomoción aérea y solo se espejan.
+  const CAMINANTES = new Set(['jaguar', 'zariguya', 'oso-baston', 'chivito-punk']);
+  const esCaminante = CAMINANTES.has(avatarType);
+
   // Un felino/animal realista (jaguar) NO cabe digno en un disco chico: se le
   // da más tamaño para que se LEA. Los compai chicos (abeja, luciérnaga…) van
   // en un tamaño intermedio, cómodo, sin disco de color detrás.
   const esRealista = avatarType === 'jaguar';
   const avatarSize = esRealista ? 112 : 84;
 
-  // Mientras deambula, el jaguar corre su MARCHA real ('caminando'); el resto
-  // conserva su estado (no tienen pose de marcha) y solo se espejan. Un estado
+  // Mientras deambula, los caminantes corren su MARCHA real ('caminando');
+  // los voladores conservan su estado y solo se espejan. Un estado
   // conversacional (hablar/escuchar/pensar) siempre gana a la caminata.
-  const estadoAvatar = esRealista && caminando && compaiState === 'idle'
+  const estadoAvatar = esCaminante && caminando && compaiState === 'idle'
     ? 'caminando'
     : compaiState;
 
