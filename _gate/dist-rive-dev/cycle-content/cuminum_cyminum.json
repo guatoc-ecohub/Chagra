@@ -1,0 +1,77 @@
+{
+  "species_slug": "cuminum_cyminum",
+  "scientific_name": "Cuminum cyminum L.",
+  "common_names": [
+    "Comino criollo"
+  ],
+  "family": "Apiaceae",
+  "category": "medicinales_alelopaticas",
+  "cultivable": true,
+  "conservation_status": "cultivo_comun",
+  "thermal_zones": [
+    "calido",
+    "templado"
+  ],
+  "roles_in_guild": [
+    "crop",
+    "pest_repellent"
+  ],
+  "antagonists": [],
+  "especies_nativas_sustitutas": [],
+  "propagation": {
+    "metodo_principal": "semilla",
+    "notas": "Siembra directa en surcos. Cultivo anual de ciclo corto. Las semillas se usan como condimento esencial en la cocina colombiana (sancocho, frijol, arroz)."
+  },
+  "requirements": {
+    "agua": "bajo",
+    "altitud_msnm": {
+      "min_absoluto": 0,
+      "optimo_min": 300,
+      "optimo_max": 1500,
+      "max_absoluto": 2000
+    },
+    "temperatura_c": {
+      "helada_letal": -2,
+      "optimo_min": 15,
+      "optimo_max": 25,
+      "max_tolerable": 30
+    },
+    "radiacion": "sol_pleno",
+    "drenaje_requerido": "excelente"
+  },
+  "valor_pedagogico": "El comino (Cuminum cyminum L., familia Apiaceae) es una umbelífera herbácea anual de ciclo corto (3-4 meses) originaria del Mediterráneo oriental y suroeste asiático, introducida en Colombia desde el período colonial y conservada en huertas familiares como condimento esencial de la cocina tradicional (sancocho, frijol, arroz, lomo, hogao costeño y carnes adobadas). Su fruto (aquenio comúnmente llamado semilla) concentra 2-5% aceite esencial rico en cuminaldehído, p-cimeno, β-pineno y γ-terpineno, responsables de su aroma cálido y propiedades carminativas, digestivas y antimicrobianas documentadas. Se adapta a zonas cálidas a templadas secas: Boyacá, Cundinamarca seca, Santander, Norte de Santander y enclaves áridos del Caribe entre 300 y 1.500 msnm con sol pleno y baja humedad relativa. Lección viva: el comino enseña cómo las plantas concentran aceites esenciales en las semillas como estrategia de defensa química y dispersión, fundamento del condimento en la cocina tradicional colombiana mestiza, y la importancia de los aromas como portadores de identidad cultural en la gastronomía campesina. Manejo agroecológico: siembra directa en surcos al final de la temporada de lluvias, bajo requerimiento hídrico (cultivo de secano tras establecimiento), aislamiento de otras apiáceas para evitar hibridación, asocio compatible con maíz y cilantro, cosecha cuando las umbelas tornan amarillo-pardo, secado a la sombra para preservar aceites volátiles. Fuentes Tier A: POWO Kew, GBIF Backbone Taxonomy, FAO EcoCrop, JBB Plantas Medicinales, Pérez Arbeláez 1947 Plantas Útiles.",
+  "sources": [
+    {
+      "id": "perez-arbelaez-1947-plantas-utiles",
+      "title": "perez-arbelaez-1947-plantas-utiles",
+      "tier": "A",
+      "url": null
+    },
+    {
+      "id": "gbif-taxonomic-backbone",
+      "title": "gbif-taxonomic-backbone",
+      "tier": "A",
+      "url": "https://www.gbif.org/dataset/d7dddbf4-2cf0-4f39-9b2a-bb099caae36c"
+    },
+    {
+      "id": "powo-kew",
+      "title": "powo-kew",
+      "tier": "A",
+      "url": "https://powo.science.kew.org"
+    },
+    {
+      "id": "fao-ecocrop",
+      "title": "fao-ecocrop",
+      "tier": "A",
+      "url": "https://gaez.fao.org/pages/ecocrop"
+    },
+    {
+      "id": "jbb-plantas-medicinales",
+      "title": "jbb-plantas-medicinales",
+      "tier": "A",
+      "url": null
+    }
+  ],
+  "_generated_by": "scripts/build-cycle-content-from-catalog.mjs",
+  "_generated_at": "2026-05-19T00:42:57.379Z"
+}

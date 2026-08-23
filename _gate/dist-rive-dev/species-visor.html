@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#101711" />
+    <title>Visor de especie | Chagra</title>
+    <script type="module" crossorigin src="/assets/speciesViewer-BxUdLsSF.js"></script>
+    <link rel="modulepreload" crossorigin href="/assets/modulepreload-polyfill-Dezn_h7o.js">
+    <link rel="stylesheet" crossorigin href="/assets/speciesViewer-BIIDGWra.css">
+  </head>
+  <body>
+    <main class="field-guide-shell">
+      <header class="topbar">
+        <a class="wordmark" href="/" aria-label="Volver a Chagra">CHAGRA<span>/</span>FIELD GUIDE</a>
+        <div class="topbar-meta">
+          <span class="status-dot" aria-hidden="true"></span>
+          <span>PROTOTIPO DE PUENTE 2D ↔ 3D</span>
+          <span class="seed-readout" id="seed-readout">SEMILLA 20260807</span>
+        </div>
+      </header>
+
+      <section class="intro-strip" aria-labelledby="page-title">
+        <div>
+          <p class="kicker">Atlas vivo · tres fichas del grafo AGE</p>
+          <h1 id="page-title">Mirá la especie desde su propia silueta.</h1>
+        </div>
+        <p class="intro-copy">Anclas 2D se pegan a la superficie procedural, se proyectan como botones reales y se esconden cuando la geometría las ocluye.</p>
+      </section>
+
+      <section class="viewer-layout">
+        <aside class="species-rail" aria-label="Biblioteca de especies">
+          <div class="rail-heading">
+            <span class="eyebrow">01 / ESPECIES</span>
+            <span class="count">03</span>
+          </div>
+          <div id="species-list" class="species-list"></div>
+          <div class="rail-note">
+            <span class="note-mark">✳</span>
+            <p>La lámina queda disponible aunque el modelo 3D no exista. El visor no inventa un asset.</p>
+          </div>
+        </aside>
+
+        <section class="stage-column" aria-label="Visor 3D">
+          <div class="stage-toolbar">
+            <div class="toolbar-group" role="group" aria-label="Distancia de observación">
+              <span class="toolbar-label">DISTANCIA</span>
+              <button class="tool-button is-active" type="button" data-distance="medium">Plano medio</button>
+              <button class="tool-button" type="button" data-distance="close">Cerca</button>
+              <button class="tool-button" type="button" data-distance="wide">Amplia</button>
+            </div>
+            <div class="toolbar-group" role="group" aria-label="Controles del visor">
+              <button class="tool-button" id="toggle-rotation" type="button" aria-pressed="true">Auto giro</button>
+              <button class="tool-button" id="toggle-poster" type="button" aria-pressed="false">Ver lámina</button>
+            </div>
+          </div>
+          <div class="stage-wrap" id="stage-wrap">
+            <div class="stage-grid" aria-hidden="true"></div>
+            <canvas id="species-canvas" aria-label="Modelo procedural de la especie seleccionada"></canvas>
+            <div class="hotspot-layer" id="hotspot-layer" aria-label="Puntos de observación"></div>
+            <div class="poster-fallback" id="poster-fallback" hidden>
+              <img id="poster-image" alt="" />
+              <div class="poster-caption"><span>LÁMINA 2D</span><strong id="poster-reason">Vista disponible sin modelo 3D</strong></div>
+            </div>
+            <div class="stage-caption"><span id="stage-mode">PLACEHOLDER PROCEDURAL</span><span>THREE.JS R160</span></div>
+            <div class="stage-coordinates" aria-hidden="true"><span>y +</span><span>x 0</span><span>z −</span></div>
+          </div>
+          <div class="stage-footer">
+            <span><i class="legend-dot legend-dot--coral"></i> punto de lectura</span>
+            <span><i class="legend-dot legend-dot--blue"></i> ancla posterior</span>
+            <span id="occlusion-readout">OCLUSIÓN: comprobando</span>
+          </div>
+        </section>
+
+        <aside class="specimen-card" id="specimen-card" aria-live="polite">
+          <div class="card-topline"><span class="eyebrow">02 / FICHA</span><span id="species-zone">TEMP / CÁLIDO</span></div>
+          <div class="species-heading">
+            <p class="card-role" id="species-role">Cultivo de fruto</p>
+            <h2 id="species-name">Tomate chonto</h2>
+            <p class="scientific" id="species-scientific">Solanum lycopersicum L.</p>
+          </div>
+          <div class="selected-hotspot" id="hotspot-card" hidden>
+            <span class="selected-hotspot-label">LECTURA ABIERTA</span>
+            <strong id="hotspot-name">Fruto</strong>
+            <p id="hotspot-note">Punto de cosecha y semilla</p>
+          </div>
+          <dl class="facts-grid" id="facts-grid"></dl>
+          <div class="model-data">
+            <span class="eyebrow">DATOS DE PRESENTACIÓN</span>
+            <code id="model-data-readout">modelPivot [0, 0.25, 0]</code>
+            <code id="model-profile-readout">modelProfile: fruiting-herb</code>
+          </div>
+          <div class="card-source"><span>FUENTE</span><span>AGE / catálogo OSS · lámina local</span></div>
+        </aside>
+      </section>
+    </main>
+  </body>
+</html>

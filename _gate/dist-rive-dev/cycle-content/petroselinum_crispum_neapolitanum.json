@@ -1,0 +1,66 @@
+{
+  "species_slug": "petroselinum_crispum_neapolitanum",
+  "scientific_name": "Petroselinum crispum var. neapolitanum Danert",
+  "common_names": [
+    "Perejil liso"
+  ],
+  "family": "Apiaceae",
+  "category": "hortalizas_hoja",
+  "cultivable": true,
+  "conservation_status": "cultivo_comun",
+  "thermal_zones": [
+    "frio",
+    "templado",
+    "calido"
+  ],
+  "roles_in_guild": [
+    "crop",
+    "pollinator_attractor"
+  ],
+  "antagonists": [],
+  "especies_nativas_sustitutas": [],
+  "propagation": {
+    "metodo_principal": "semilla",
+    "notes": "Más vigoroso y resistente al calor que la variedad crespa; germinación lenta."
+  },
+  "requirements": {
+    "agua": "medio",
+    "altitud_msnm": {
+      "min_absoluto": 0,
+      "optimo_min": 1500,
+      "optimo_max": 2800,
+      "max_absoluto": 3200
+    },
+    "temperatura_c": {
+      "helada_letal": -5,
+      "optimo_min": 10,
+      "optimo_max": 20,
+      "max_tolerable": 30
+    },
+    "radiacion": "sol_pleno",
+    "drenaje_requerido": "bueno_a_moderado"
+  },
+  "valor_pedagogico": "El perejil liso (Petroselinum crispum (Mill.) Nyman ex A.W.Hill var. neapolitanum, también llamado perejil italiano) es una umbelífera bienal cultivada como anual para uso aromático culinario, con hojas planas más fragantes que la variedad crespa. En Colombia se cultiva en Sabana de Bogotá, Boyacá altiplano y Antioquia entre 2.000 y 2.900 msnm en zona térmica fría. Ciclo 70-90 días a primera cosecha; permite múltiples cortes (4-6) en 5-6 meses. Semilla con germinación lenta (15-25 días), pre-tratamiento con agua tibia 12h acelera. Manejo agroecológico: bandejas plug 200 cavidades para almácigo, asocio con tomate y zanahoria (familias distintas), fertilización con biol foliar mensual, control de áfidos con purín de ortiga. Fuentes Tier A: AGROSAVIA, ICA Resolución 3168/2015, POWO Kew, GBIF Backbone Taxonomy.",
+  "sources": [
+    {
+      "id": "gbif-taxonomic-backbone",
+      "title": "gbif-taxonomic-backbone",
+      "tier": "A",
+      "url": "https://www.gbif.org/dataset/d7dddbf4-2cf0-4f39-9b2a-bb099caae36c"
+    },
+    {
+      "id": "ica-resolucion-3168-2015",
+      "title": "ica-resolucion-3168-2015",
+      "tier": "A",
+      "url": null
+    },
+    {
+      "id": "powo-kew",
+      "title": "powo-kew",
+      "tier": "A",
+      "url": "https://powo.science.kew.org"
+    }
+  ],
+  "_generated_by": "scripts/build-cycle-content-from-catalog.mjs",
+  "_generated_at": "2026-05-19T00:42:57.364Z"
+}

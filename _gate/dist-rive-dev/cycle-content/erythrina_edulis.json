@@ -1,0 +1,77 @@
+{
+  "species_slug": "erythrina_edulis",
+  "scientific_name": "Erythrina edulis Triana ex Micheli",
+  "common_names": [
+    "Chachafruto / Balú"
+  ],
+  "family": "Fabaceae",
+  "category": "frutales_perennes",
+  "cultivable": true,
+  "conservation_status": "cultivo_comun",
+  "thermal_zones": [
+    "templado",
+    "frio"
+  ],
+  "roles_in_guild": [
+    "crop",
+    "nitrogen_fixer",
+    "nurse_plant",
+    "biomass_producer"
+  ],
+  "antagonists": [
+    "ulex_europaeus"
+  ],
+  "especies_nativas_sustitutas": [],
+  "propagation": {
+    "metodo_principal": "semilla",
+    "notas": "Germina rápidamente; el esqueje se usa principalmente para cercas vivas."
+  },
+  "requirements": {
+    "agua": "alto",
+    "altitud_msnm": {
+      "min_absoluto": 1200,
+      "optimo_min": 1600,
+      "optimo_max": 2400,
+      "max_absoluto": 2700
+    },
+    "temperatura_c": {
+      "helada_letal": -1,
+      "optimo_min": 14,
+      "optimo_max": 22,
+      "max_tolerable": 28
+    },
+    "radiacion": "sol_pleno",
+    "drenaje_requerido": "bueno"
+  },
+  "valor_pedagogico": "El chachafruto (Erythrina edulis) se distribuye en los departamentos andinos de Colombia como Cundinamarca, Boyacá, Antioquia y Nariño entre 1200 y 2700 msnm en zonas térmicas templadas y frías. Su manejo agronómico incluye propagación por semilla con germinación rápida y uso de esquejes para cercas vivas, ciclo productivo de 8-12 meses, asociaciones beneficiosas con café y aliso que mejoran la fertilidad del suelo mediante fijación de nitrógeno, y requiere monitoreo de plagas como brotes de Scolytidae y Cerotoma spp. mediante biopreparados andinos. En el contexto campesino andino, sus semillas se utilizan tradicionalmente en preparaciones culinarias como source de proteína vegetal, aprovechando su alto contenido de lisina y triptófano, tal como documenta el Instituto Colombiano Agropecuario (ICA) en la Resolución 3168/2015 que establece normas para la producción y comercialización de especies forrajeras y alimenticias.",
+  "companions_markdown": "### Especies asociadas favorables\n\nEstas especies favorecen el cultivo cuando se siembran cerca:\n- alnus_acuminata — Aliso andino (Alnus acuminata Kunth)\n- coffea_arabica — Café caturra / Castillo / Cenicafé 1 (Coffea arabica L.)",
+  "antagonists_markdown": "### Antagonistas (no asociar)\n\nEvite sembrar estas especies cerca; compiten o comparten plagas/patógenos:\n- ulex_europaeus — Retamo espinoso (Ulex europaeus L.)",
+  "sources": [
+    {
+      "id": "gbif-taxonomic-backbone",
+      "title": "gbif-taxonomic-backbone",
+      "tier": "A",
+      "url": "https://www.gbif.org/dataset/d7dddbf4-2cf0-4f39-9b2a-bb099caae36c"
+    },
+    {
+      "id": "powo-kew",
+      "title": "powo-kew",
+      "tier": "A",
+      "url": "https://powo.science.kew.org"
+    },
+    {
+      "id": "agrosavia-manual-chachafruto-2015",
+      "title": "agrosavia-manual-chachafruto-2015",
+      "tier": "A",
+      "url": null
+    },
+    {
+      "id": "ica-resolucion-3168-2015",
+      "title": "ica-resolucion-3168-2015",
+      "tier": "A",
+      "url": null
+    }
+  ],
+  "_generated_by": "scripts/build-cycle-content-from-catalog.mjs",
+  "_generated_at": "2026-05-19T00:42:57.360Z"
+}

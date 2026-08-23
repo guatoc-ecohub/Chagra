@@ -41,8 +41,19 @@
  *      sentido="volver" …/>` en el mismo instante — el overlay brota de ese
  *      mismo punto ~100 ms después: empalme de capas. La señal se auto-resetea
  *      al montar la siguiente escena (no hay que limpiarla a mano).
+ *
+ * ── GENERALIZACIÓN A OTROS BICHOS (props `criatura` / `size`) ───────────────
+ * La coreografía CSS (`.abeja-cruce*`, creatures.css ~525-633) es genérica —
+ * anticipación, barrel roll, atrape — nada de ella asume que el dibujo sea
+ * una abeja. `criatura` (nodo o función `(props) => ReactNode`) deja que
+ * CUALQUIER bicho del roster (Jaguar, OsoAndino…) reuse este mismo cruce sin
+ * duplicar el componente; default = sigue siendo `<AbejaAngelita>` (retro-
+ * compatible con los 2 consumidores actuales, que no pasan la prop). `size`
+ * agranda el bicho en TODO el recorrido (default subido de 76 a 88 — pedido
+ * del operador; las keyframes ya escalan por `scale()` sobre este tamaño
+ * base, así que no hace falta tocar ni un valor de creatures.css).
  */
-import { createElement, useEffect, useRef } from 'react';
+import { useEffect, useRef } from 'react';
 import { AbejaAngelita } from './AbejaAngelita.jsx';
 import './creatures.css';
 
@@ -79,11 +90,12 @@ export function AlMontarEscena({ onMonta }) {
 
 export default function AbejaTransicion({
   sentido = 'entrar', // 'entrar' (2D se clava al mundo) | 'volver' (brota del mundo)
-  Cuerpo = AbejaAngelita,
   animo = 'sereno',
   energia = 1,
   tier = 'alto',
   reducedMotion = false,
+  size = 88, // tamaño base del bicho (px) — sube uniformemente por todo el cruce
+  criatura, // nodo o (props) => ReactNode: reemplaza a AbejaAngelita (default abajo)
   onFin,
 }) {
   const finRef = useRef(onFin);
@@ -111,12 +123,20 @@ export default function AbejaTransicion({
 
   if (reducedMotion) return null;
 
+  // Props que AbejaAngelita recibe hoy — mismas para `criatura` cuando es
+  // función, así cualquier bicho del roster puede leer size/animo/energia/tier
+  // sin que este componente sepa nada de su forma interna.
+  const propsBicho = { size, animo, energia, animated: true, tier };
+  const bicho = typeof criatura === 'function'
+    ? criatura(propsBicho)
+    : (criatura ?? <AbejaAngelita {...propsBicho} />);
+
   return (
     <div className={`abeja-cruce abeja-cruce--${sentido}`} data-tier={tier} aria-hidden="true">
       <div className="abeja-cruce__pos">
         <div className="abeja-cruce__vuelo">
           <div className="abeja-cruce__giro">
-            {createElement(Cuerpo, { size: 76, animo, energia, animated: true, tier })}
+            {bicho}
           </div>
         </div>
         {sentido === 'entrar' && <span className="abeja-cruce__puff" />}

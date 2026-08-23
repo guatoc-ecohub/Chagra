@@ -1,0 +1,74 @@
+{
+  "species_slug": "solanum_muricatum",
+  "scientific_name": "Solanum muricatum Aiton",
+  "common_names": [
+    "Pepino dulce"
+  ],
+  "family": "Solanaceae",
+  "category": "hortalizas_fruto_flor",
+  "cultivable": true,
+  "conservation_status": "cultivo_comun",
+  "thermal_zones": [
+    "templado",
+    "frio"
+  ],
+  "roles_in_guild": [
+    "crop"
+  ],
+  "antagonists": [],
+  "especies_nativas_sustitutas": [],
+  "propagation": null,
+  "requirements": {
+    "agua": null,
+    "altitud_msnm": {
+      "min_absoluto": 1500,
+      "optimo_min": 2000,
+      "optimo_max": 2800,
+      "max_absoluto": 3100
+    },
+    "temperatura_c": null,
+    "radiacion": null,
+    "drenaje_requerido": null
+  },
+  "valor_pedagogico": "El pepino dulce o pepino andino (Solanum muricatum Aiton, Solanaceae) es una hortaliza-frutal subutilizada perenne herbácea de 60-100 cm de altura nativa de los Andes (Colombia, Ecuador, Perú, Bolivia — sin progenitor silvestre conocido, lo que indica largo proceso de domesticación pre-incaica > 2.500 años), cultivada en Colombia entre 2.000 y 2.800 msnm en clima templado-frío en Boyacá (Tunja, Paipa, Sogamoso, Tibasosa), Cundinamarca (Sabana de Bogotá, Tenjo, Cota, Chía, Cajicá), Nariño (Pasto, Ipiales, Yacuanquer), Antioquia (Oriente antioqueño, Sonsón, Abejorral), Caldas (Manizales rural) y Santander (Páramo de Berlín). Pertenece a la familia Solanaceae (igual que tomate, papa, ají, lulo, tomate de árbol, uchuva) y al género Solanum sección Petota próximo a la papa. Tallos suculentos semileñosos en la base, hojas alternas simples o pinnadas ovado-lanceoladas verde grisáceas, flores azul-violetas a blancas con estrías púrpuras (estructura solanácea típica de 5 pétalos fusionados con anteras amarillas cónicas), fruto baya ovoide-piriforme amarillo-crema con estrías o jaspes púrpura-violetas características, pulpa blanca-amarilla acuosa-jugosa de sabor dulce-suave-aromático combinando melón con pepino (140-300 g por fruto). Es lección viva de biodiversidad andina subutilizada y soberanía alimentaria que enseña a niñas y niños cómo Colombia tiene un pepino dulce nativo que NO necesita riego intensivo ni invernadero como el pepino europeo (Cucumis sativus), y cómo los pueblos muiscas, pastos y chibchas pre-colombinos seleccionaron por generaciones esta solanácea — pero hoy es 'olvidada' porque no figura en supermercados. Bajo en calorías, alto en agua, vitamina C, β-caroteno (variedades pigmentadas) y minerales; consumido fresco, en ensaladas, jugos, postres y mermeladas. Variedades colombianas reportadas: 'Pasto morado', 'Soatá criollo'. Manejo agroecológico: propagación principalmente por esqueje semileñoso (más rápido y conserva clon — selección de plantas madre productivas) o semilla (germinación 14-21 días a 18-22°C), distancia 80x80 cm o 100x50 cm, tutorado o conducción rastrera, ciclo productivo 6-8 meses hasta primera cosecha, productivo 2-3 años antes de renovación, cosecha escalonada cuando fruto desarrolla color amarillo-crema con vetas púrpuras. Función en chagra como hortaliza-frutal nativa, cultivo de rescate del germoplasma andino, diversificación productiva familiar. Fuentes Tier A: GBIF, POWO Kew, NRC 1989 Cultivos Andinos, AGROSAVIA Sol Andina, Bernal 2015, SiB Colombia.",
+  "sources": [
+    {
+      "id": "gbif-taxonomic-backbone",
+      "title": "gbif-taxonomic-backbone",
+      "tier": "A",
+      "url": "https://www.gbif.org/dataset/d7dddbf4-2cf0-4f39-9b2a-bb099caae36c"
+    },
+    {
+      "id": "powo-kew",
+      "title": "powo-kew",
+      "tier": "A",
+      "url": "https://powo.science.kew.org"
+    },
+    {
+      "id": "nrc-1989-cultivos-andinos",
+      "title": "nrc-1989-cultivos-andinos",
+      "tier": "A",
+      "url": null
+    },
+    {
+      "id": "agrosavia-sol-andina",
+      "title": "agrosavia-sol-andina",
+      "tier": "A",
+      "url": "https://www.agrosavia.co"
+    },
+    {
+      "id": "bernal-2015-plantas-liquenes-colombia",
+      "title": "bernal-2015-plantas-liquenes-colombia",
+      "tier": "A",
+      "url": "http://catalogoplantasdecolombia.unal.edu.co"
+    },
+    {
+      "id": "sib-colombia",
+      "title": "sib-colombia",
+      "tier": "A",
+      "url": "https://sibcolombia.net"
+    }
+  ],
+  "_generated_by": "scripts/build-cycle-content-from-catalog.mjs",
+  "_generated_at": "2026-05-19T00:42:57.384Z"
+}
