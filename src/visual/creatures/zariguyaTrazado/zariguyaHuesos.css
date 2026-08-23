@@ -1,0 +1,422 @@
+/* ═══════════════════════════════════════════════════════════════════════════
+   zariguyaHuesos.css — LA CADENCIA de la zarigüeya de huesos (piel realista
+   de la lámina, movimiento rubber-hose). Spec 70/30 del operador:
+
+     · data-modo="normal"  (70%): la zarigüeya BONITA y digna — quieta o de
+       ronda nocturna con vida sutil (respira, la cola prensil ondula, orejas,
+       parpadeo irregular, giro sereno de cabeza). Rubber-hose SUAVE.
+     · data-modo="actuando" (30%): los momentos expresivos Miss-Minutes — masa
+       que flota, squash&stretch fuerte, la VUELTA de campana, double-take,
+       la COLA QUE SE ENROSCA en espiral, aura ROSA DE LUNA. MISMO esqueleto,
+       curvas canónicas a fondo.
+
+   CURVAS CANÓNICAS (rubberhoseSpec.RH_EASE — no se inventan otras):
+     anticipación  cubic-bezier(.34,-.2,.64,1)
+     impulso       cubic-bezier(.4,0,1,1)
+     squash        cubic-bezier(.4,0,.2,1)
+     overshoot     cubic-bezier(.34,1.56,.64,1)
+   RELOJES CO-PRIMOS (RH_PERIODOS re-tempo zarigüeya — nocturna atareada,
+     menuda y RÁPIDA): respira 2.9 · cola 3.7 · orejas 4.3/3.3 · blink 5.6 ·
+     ladeo 5.2 · giro 7.9 · antic 9.7 — nunca el mismo compás.
+   MARCHA: BÍPEDA erguida (la firma `postura-erguida`: masa VERTICAL — ella
+     NO trota pegada al suelo como el gurre): pasitos menudos 0.8s/ciclo,
+     piernas a contrafase, bracitos que contrapesan sin soltar lápiz ni
+     brújula, cola prensil de balancín y CABEZA NIVELADA.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.zariguyaHuesos{
+  --zh-paso: .8s;     /* ciclo completo de marcha (pasitos menudos) */
+  --zh-fase: 0s;      /* desfase de coro (el host lo pisa si hay varias) */
+  --zh-jaw: 0;        /* apertura de mandíbula 0..1 (visema / habla) */
+  display: block;
+  overflow: visible;
+}
+/* el svg llena su host (el wrapper React o cualquier caja del kart) */
+div.zariguyaHuesos > svg{ width: 100%; height: 100%; display: block; overflow: visible; }
+
+/* Todo hueso transforma en el espacio del viewBox: los pivotes inline
+   (style="transform-origin:Xpx Ypx") son píxeles de la lámina 481×444. */
+.zariguyaHuesos .zh-hueso,
+.zariguyaHuesos .zh-masa,
+.zariguyaHuesos .zh-antic,
+.zariguyaHuesos .zh-pj,
+.zariguyaHuesos .zh-parpado,
+.zariguyaHuesos .zh-pupila,
+.zariguyaHuesos .zh-bigotes,
+.zariguyaHuesos .zh-sombraSuelo,
+.zariguyaHuesos .zh-aura{ transform-box: view-box; }
+
+/* line-boil canónico: SUAVE en normal (el grabado respira apenas),
+   a compás pleno en actuando. Seeds por SMIL dentro del SVG: autocontenido. */
+.zariguyaHuesos .zh-pj{ filter: url(#zhBoilSuave); }
+.zariguyaHuesos[data-modo="actuando"] .zh-pj{ filter: url(#zhBoil); }
+
+/* ════════════════ VIDA BASE (todos los estados, ambos modos) ═════════════ */
+
+/* respiración: menuda y algo rápida (bicho chico y nocturno), digna */
+.zariguyaHuesos .zh-cuerpo{
+  animation: zhRespira 2.9s ease-in-out var(--zh-fase) infinite;
+}
+@keyframes zhRespira{
+  0%,100%{ transform: translateY(0) scale(1,1); }
+  55%{ transform: translateY(-1.4px) scale(1.008,1.016); }
+}
+
+/* LA COLA PRENSIL nunca está muerta: ondula con follow-through encadenado
+   (3 huesos, punta retardada) — es SU firma de vida en el 70% */
+.zariguyaHuesos .zh-colaBase{ animation: zhColaOndula 3.7s ease-in-out var(--zh-fase) infinite alternate; }
+.zariguyaHuesos .zh-colaMedia{ animation: zhColaOndulaMedia 3.7s ease-in-out calc(var(--zh-fase) - .2s) infinite alternate; }
+.zariguyaHuesos .zh-colaPunta{ animation: zhColaOndulaPunta 3.7s ease-in-out calc(var(--zh-fase) - .42s) infinite alternate; }
+@keyframes zhColaOndula{ from{ transform: rotate(-2.5deg);} to{ transform: rotate(3deg);} }
+@keyframes zhColaOndulaMedia{ from{ transform: rotate(-4deg);} to{ transform: rotate(5deg);} }
+@keyframes zhColaOndulaPunta{ from{ transform: rotate(-8deg);} to{ transform: rotate(10deg);} }
+
+/* orejas grandes: se mecen con períodos casi-primos entre sí */
+.zariguyaHuesos .zh-orejaI{ animation: zhOreja 4.3s ease-in-out var(--zh-fase) infinite alternate; }
+.zariguyaHuesos .zh-orejaD{ animation: zhOreja 3.3s ease-in-out calc(var(--zh-fase) - .3s) infinite alternate; }
+@keyframes zhOreja{ from{ transform: rotate(-3deg);} to{ transform: rotate(3deg);} }
+
+/* parpadeo IRREGULAR canónico (suelto + doble golpe) — el párpado es una
+   CUBIERTA con bisagra arriba: en reposo scaleY(.12), al cerrar tapa el ojo */
+.zariguyaHuesos .zh-parpado{
+  transform: scaleY(.12);
+  animation: zhBlink 5.6s linear var(--zh-fase) infinite;
+}
+@keyframes zhBlink{
+  0%,36%,40%,74%,78%,82%,86%,100%{ transform: scaleY(.12); }
+  38%{ transform: scaleY(1); }
+  76%{ transform: scaleY(1); }
+  80%{ transform: scaleY(.88); }
+}
+
+/* EL GIRO DE CABEZA (la prueba anti-decapitación): reloj 7.9s — alza la
+   testa curiosa hacia usted, con anticipación y overshoot, y vuelve */
+.zariguyaHuesos .zh-cabezaGiro{
+  animation: zhGiroSereno 7.9s cubic-bezier(.34,1.56,.64,1) var(--zh-fase) infinite;
+}
+@keyframes zhGiroSereno{
+  0%,16%,52%,100%{ transform: rotate(0); }
+  20%{ transform: rotate(2.6deg); }            /* anticipación: recoge */
+  27%,42%{ transform: rotate(-10deg); }        /* alza la testa y MIRA */
+  47%{ transform: rotate(1.8deg); }            /* overshoot al volver */
+}
+/* …y el cuello acompaña con retardo (follow-through, no bloque rígido) */
+.zariguyaHuesos .zh-cuello{
+  animation: zhCuelloVida 7.9s ease-in-out calc(var(--zh-fase) + .09s) infinite;
+}
+@keyframes zhCuelloVida{
+  0%,16%,54%,100%{ transform: rotate(0); }
+  21%{ transform: rotate(1deg); }
+  28%,42%{ transform: rotate(-3.2deg); }
+  48%{ transform: rotate(.6deg); }
+}
+/* el ladeo curioso del hueso cabeza (reloj propio, husmeadora) */
+.zariguyaHuesos .zh-cabeza{
+  animation: zhLadeo 5.2s ease-in-out var(--zh-fase) infinite;
+}
+@keyframes zhLadeo{
+  0%,100%{ transform: rotate(-1.8deg); }
+  50%{ transform: rotate(2deg); }
+}
+
+/* mandíbula: la maneja el visema (var --zh-jaw) con charnela real (140,116);
+   el mentón vive a la DERECHA del pivote → abrir = rotar horario */
+.zariguyaHuesos .zh-mandibula{
+  transform: rotate(calc(var(--zh-jaw) * 12deg)) translateY(calc(var(--zh-jaw) * 4px));
+  transition: transform .12s cubic-bezier(.4,0,.2,1);
+}
+
+/* ═════════════════════ ESTADOS del contrato de avatar ════════════════════ */
+
+/* ESCUCHANDO: las orejas GRANDES son su antena — se enderezan y orientan */
+.zariguyaHuesos[data-agt-estado="listening"] .zh-orejaI,
+.zariguyaHuesos[data-agt-estado="listening"] .zh-orejaD{
+  animation: none;
+  transition: transform .5s cubic-bezier(.34,1.56,.64,1);
+}
+.zariguyaHuesos[data-agt-estado="listening"] .zh-orejaI{ transform: rotate(10deg) scale(1.06); }
+.zariguyaHuesos[data-agt-estado="listening"] .zh-orejaD{ transform: rotate(-9deg) scale(1.06); }
+.zariguyaHuesos[data-agt-estado="listening"] .zh-cabezaGiro{
+  animation: none;
+  transform: rotate(-6deg);
+  transition: transform .6s cubic-bezier(.34,1.56,.64,1);
+}
+
+/* PENSANDO: mirada arriba + testa alzada + EL LÁPIZ ESCRIBE EN EL AIRE
+   (su gesto propio: la exploradora anota) */
+.zariguyaHuesos[data-agt-estado="thinking"] .zh-pupila{ transform: translateY(-2.4px); transition: transform .4s ease; }
+.zariguyaHuesos[data-agt-estado="thinking"] .zh-cabezaGiro{
+  animation: none;
+  transform: rotate(-7deg);
+  transition: transform .7s cubic-bezier(.34,1.56,.64,1);
+}
+.zariguyaHuesos[data-agt-estado="thinking"] .zh-brazoLapizAnte{
+  animation: zhEscribeAnte 1.1s ease-in-out infinite;
+}
+.zariguyaHuesos[data-agt-estado="thinking"] .zh-manoLapiz{
+  animation: zhEscribe .55s ease-in-out infinite alternate;
+}
+@keyframes zhEscribeAnte{
+  0%,100%{ transform: rotate(-2deg); }
+  50%{ transform: rotate(3deg); }
+}
+@keyframes zhEscribe{
+  from{ transform: rotate(-4deg) translateY(0); }
+  to{ transform: rotate(5deg) translateY(-1.5px); }
+}
+
+/* HABLANDO sin visema: bocanadas propias (si hay visema, manda --zh-jaw) */
+.zariguyaHuesos[data-agt-estado="speaking"]:not([data-visema]) .zh-mandibula{
+  animation: zhHablaAuto .22s steps(2,end) infinite alternate;
+}
+@keyframes zhHablaAuto{
+  from{ transform: rotate(2deg) translateY(1px); }
+  to{ transform: rotate(6.5deg) translateY(3px); }
+}
+
+/* VIDA IDLE-CEREBRO (useVidaIdle 'zariguya'): husmea / tanatosis / reposo */
+/* HUSMEA (vive por la nariz): alza la cuña y TANTEA a lado y lado, las
+   vibrisas tiemblan y las orejas se enderezan — 3× ciclos de 1.05s */
+.zariguyaHuesos[data-vida="husmea"] .zh-cabezaGiro{
+  animation: zhHusmea 1.05s ease-in-out infinite;
+}
+@keyframes zhHusmea{
+  0%,100%{ transform: rotate(-8deg) translateY(-2px); }
+  30%{ transform: rotate(-12deg) translateY(-3.5px); }
+  65%{ transform: rotate(-5deg) translateY(-2px); }
+}
+.zariguyaHuesos[data-vida="husmea"] .zh-bigotes{
+  animation: zhVibrisas .28s linear infinite alternate;
+}
+@keyframes zhVibrisas{
+  from{ transform: rotate(-2deg); }
+  to{ transform: rotate(2.5deg); }
+}
+.zariguyaHuesos[data-vida="husmea"] .zh-orejaI{ animation: none; transform: rotate(8deg); transition: transform .4s cubic-bezier(.34,1.56,.64,1); }
+.zariguyaHuesos[data-vida="husmea"] .zh-orejaD{ animation: none; transform: rotate(-7deg); transition: transform .4s cubic-bezier(.34,1.56,.64,1); }
+
+/* TANATOSIS (hacerse la muerta — el gag más suyo, rarísimo y por eso
+   gracioso): anticipa, SE DESPLOMA de lado, sostiene… y la cola se sigue
+   enroscando sola porque no está muerta ni por asomo */
+.zariguyaHuesos[data-vida="tanatosis"] .zh-antic{
+  animation: zhDesmayo 2.6s cubic-bezier(.4,0,.2,1) both;
+}
+@keyframes zhDesmayo{
+  0%{ transform: rotate(0) translateY(0); }
+  10%{ transform: rotate(4deg) translateY(-4px); }       /* anticipa: se yergue */
+  22%{ transform: rotate(-70deg) translate(-24px,52px) scale(1.06,.9); } /* ¡FLOP! */
+  26%{ transform: rotate(-76deg) translate(-26px,58px) scale(.98,1.03); }
+  30%,68%{ transform: rotate(-74deg) translate(-25px,56px); } /* “muerta” */
+  80%{ transform: rotate(6deg) translateY(-3px); }       /* resucita con impulso */
+  88%{ transform: rotate(-2deg) translateY(0); }         /* overshoot */
+  100%{ transform: rotate(0) translateY(0); }
+}
+.zariguyaHuesos[data-vida="tanatosis"] .zh-colaPunta{
+  animation: zhColaViva .65s ease-in-out infinite alternate; /* la delata */
+}
+@keyframes zhColaViva{
+  from{ transform: rotate(-16deg); }
+  to{ transform: rotate(14deg); }
+}
+.zariguyaHuesos[data-vida="tanatosis"] .zh-parpado{ animation: none; transform: scaleY(1); }
+
+/* REPOSO: respira más hondo y lento, testa baja un pelo */
+.zariguyaHuesos[data-vida="reposo"] .zh-cuerpo{
+  animation: zhReposa 4.4s ease-in-out infinite;
+}
+@keyframes zhReposa{
+  0%,100%{ transform: translateY(0) scale(1,1); }
+  50%{ transform: translateY(1.8px) scale(1.014,.988); }
+}
+.zariguyaHuesos[data-vida="reposo"] .zh-cabezaGiro{
+  animation: none; transform: rotate(3deg);
+  transition: transform 1s ease;
+}
+
+/* ═══════════ CAMINA — la ronda nocturna BÍPEDA, por hueso ════════════════ */
+
+/* piernas a CONTRAFASE (bípeda): péndulo desde la cadera */
+.zariguyaHuesos[data-agt-estado="caminando"] .zh-piernaCerca{ animation: zhPaso var(--zh-paso) ease-in-out var(--zh-fase) infinite; }
+.zariguyaHuesos[data-agt-estado="caminando"] .zh-piernaLejos{ animation: zhPaso var(--zh-paso) ease-in-out calc(var(--zh-fase) - var(--zh-paso) / 2) infinite; }
+@keyframes zhPaso{
+  0%,100%{ transform: rotate(13deg); }     /* apoyo que empuja atrás */
+  50%{ transform: rotate(-14deg); }        /* vuelo: va por el pasito */
+}
+/* la rodilla PLIEGA durante el vuelo (lo que el raster jamás pudo) */
+.zariguyaHuesos[data-agt-estado="caminando"] .zh-piernaCercaBaja{ animation: zhPasoBaja var(--zh-paso) ease-in-out var(--zh-fase) infinite; }
+.zariguyaHuesos[data-agt-estado="caminando"] .zh-piernaLejosBaja{ animation: zhPasoBaja var(--zh-paso) ease-in-out calc(var(--zh-fase) - var(--zh-paso) / 2) infinite; }
+@keyframes zhPasoBaja{
+  0%,100%{ transform: rotate(5deg); }
+  30%{ transform: rotate(1deg); }
+  55%{ transform: rotate(-19deg); }        /* vuelo: pliega */
+  80%{ transform: rotate(-2deg); }
+}
+/* y el pie de deditos arrastra con inercia (drag de extremo) */
+.zariguyaHuesos[data-agt-estado="caminando"] .zh-piernaCercaPie{ animation: zhPie var(--zh-paso) ease-in-out var(--zh-fase) infinite; }
+.zariguyaHuesos[data-agt-estado="caminando"] .zh-piernaLejosPie{ animation: zhPie var(--zh-paso) ease-in-out calc(var(--zh-fase) - var(--zh-paso) / 2) infinite; }
+@keyframes zhPie{
+  0%,100%{ transform: rotate(3deg); }
+  35%{ transform: rotate(9deg); }          /* despega: el pie cuelga */
+  55%{ transform: rotate(-9deg); }         /* vuelo: se recoge */
+  75%{ transform: rotate(-1deg); }         /* aterriza plano */
+}
+/* tronco: dos botecitos por ciclo, con squash sutil al pisar */
+.zariguyaHuesos[data-agt-estado="caminando"] .zh-cuerpo{
+  animation: zhTroncoBob calc(var(--zh-paso) / 2) ease-in-out var(--zh-fase) infinite;
+}
+@keyframes zhTroncoBob{
+  0%,100%{ transform: translateY(2px) rotate(.5deg) scale(1.005,.995); }
+  50%{ transform: translateY(-2.8px) rotate(-.4deg) scale(.996,1.006); }
+}
+/* CABEZA NIVELADA: contra-ondula el bote (no pierde el horizonte) */
+.zariguyaHuesos[data-agt-estado="caminando"] .zh-cabeza{
+  animation: zhCabezaNivel calc(var(--zh-paso) / 2) ease-in-out calc(var(--zh-fase) - .08s) infinite;
+}
+@keyframes zhCabezaNivel{
+  0%,100%{ transform: translateY(-1.8px) rotate(-.6deg); }
+  50%{ transform: translateY(2.2px) rotate(.6deg); }
+}
+/* el cuello amortigua a contratiempo */
+.zariguyaHuesos[data-agt-estado="caminando"] .zh-cuello{
+  animation: zhCuelloMarcha calc(var(--zh-paso) / 2) ease-in-out calc(var(--zh-fase) - .04s) infinite;
+}
+@keyframes zhCuelloMarcha{
+  0%,100%{ transform: rotate(.8deg); }
+  50%{ transform: rotate(-.8deg); }
+}
+/* bracitos que CONTRAPESAN sin soltar lápiz ni brújula (amplitud chica) */
+.zariguyaHuesos[data-agt-estado="caminando"] .zh-brazoLapiz{
+  animation: zhBrazoMarcha var(--zh-paso) ease-in-out calc(var(--zh-fase) - var(--zh-paso) / 2) infinite;
+}
+.zariguyaHuesos[data-agt-estado="caminando"] .zh-brazoBrujula{
+  animation: zhBrazoMarchaB var(--zh-paso) ease-in-out var(--zh-fase) infinite;
+}
+@keyframes zhBrazoMarcha{
+  0%,100%{ transform: rotate(3.5deg); }
+  50%{ transform: rotate(-3deg); }
+}
+@keyframes zhBrazoMarchaB{
+  0%,100%{ transform: rotate(-5deg); }
+  50%{ transform: rotate(4.5deg); }
+}
+/* en marcha el giro periódico se apaga… pero cada tanto MIRA A CÁMARA sin
+   dejar de andar (reloj largo 6.3s) */
+.zariguyaHuesos[data-agt-estado="caminando"] .zh-cabezaGiro{
+  animation: zhMiraAnda 6.3s ease-in-out var(--zh-fase) infinite;
+}
+@keyframes zhMiraAnda{
+  0%,58%,94%,100%{ transform: rotate(0); }
+  62%{ transform: rotate(2deg); }              /* anticipa */
+  68%,86%{ transform: rotate(-9deg); }         /* mira a usted, andando */
+  90%{ transform: rotate(1.4deg); }            /* overshoot al frente */
+}
+/* la cola prensil hace de BALANCÍN, ondeando más suelta */
+.zariguyaHuesos[data-agt-estado="caminando"] .zh-colaBase{ animation: zhColaMarcha 1.6s ease-in-out var(--zh-fase) infinite alternate; }
+.zariguyaHuesos[data-agt-estado="caminando"] .zh-colaMedia{ animation: zhColaOndulaMedia 1.6s ease-in-out calc(var(--zh-fase) - .18s) infinite alternate; }
+.zariguyaHuesos[data-agt-estado="caminando"] .zh-colaPunta{ animation: zhColaOndulaPunta 1.6s ease-in-out calc(var(--zh-fase) - .34s) infinite alternate; }
+@keyframes zhColaMarcha{ from{ transform: rotate(-5deg);} to{ transform: rotate(4deg);} }
+/* la sombra respira con el bote (contacto que pesa) */
+.zariguyaHuesos[data-agt-estado="caminando"] .zh-sombraSuelo{
+  animation: zhSombraPaso calc(var(--zh-paso) / 2) ease-in-out var(--zh-fase) infinite;
+}
+@keyframes zhSombraPaso{
+  0%,100%{ transform: scale(1.02,1.06); opacity: 1; }
+  50%{ transform: scale(.97,.94); opacity: .82; }
+}
+
+/* ═══════════ MODO ACTUANDO (30%) — Miss Minutes con pelo de guardia ══════ */
+
+/* la MASA flota (nocturna liviana: 3.4s, 5px, .6deg) */
+.zariguyaHuesos[data-modo="actuando"] .zh-masa{
+  transform-origin: 235px 300px;
+  animation: zhMasa 3.4s ease-in-out var(--zh-fase) infinite;
+}
+@keyframes zhMasa{
+  0%,100%{ transform: translateY(-5px) rotate(-.6deg); }
+  60%{ transform: translateY(5px) rotate(.6deg); }
+}
+/* squash&stretch FUERTE escalonado ~12fps (volumen intacto) */
+.zariguyaHuesos[data-modo="actuando"]:not([data-agt-estado="caminando"]) .zh-cuerpo{
+  animation: zhBoilFuerte 2.6s steps(18,end) var(--zh-fase) infinite;
+}
+@keyframes zhBoilFuerte{
+  0%,100%{ transform: translateY(0) scale(1,1); }
+  22%{ transform: translateY(-2px) scale(.98,1.034); }   /* stretch (anticipa) */
+  50%{ transform: translateY(2.4px) scale(1.034,.964); } /* squash */
+  72%{ transform: translateY(-.8px) scale(.994,1.012); } /* overshoot */
+}
+/* LA VUELTA de campana Miss-Minutes (reloj antic 9.7s): anticipa, gira
+   ENTERA con smear, overshoot elástico y aterriza digna */
+.zariguyaHuesos[data-modo="actuando"]:not([data-agt-estado="caminando"]) .zh-antic{
+  animation: zhAnticVuelta 9.7s ease-in-out var(--zh-fase) infinite;
+}
+@keyframes zhAnticVuelta{
+  0%,50%{ transform: rotate(0) scale(1,1) translateY(0); }
+  54%{ transform: rotate(4deg) scale(.96,1.05) translateY(2px); }     /* micro-antic */
+  57%,59%{ transform: rotate(9deg) scale(.9,1.1) translateY(7px); }   /* se carga y SOSTIENE */
+  66%{ transform: rotate(-338deg) scale(1.18,.85) translateY(-14px); }/* ¡LA VUELTA! (smear) */
+  70%{ transform: rotate(-369deg) scale(.95,1.06) translateY(2px); }  /* overshoot */
+  75%,100%{ transform: rotate(-360deg) scale(1,1) translateY(0); }    /* aterriza digna */
+}
+/* double-take Miss-Minutes de la testa (reloj mirada 7.9s, con smear) */
+.zariguyaHuesos[data-modo="actuando"]:not([data-agt-estado="listening"]):not([data-agt-estado="thinking"]) .zh-cabezaGiro{
+  animation: zhDoubleTake 7.9s ease-in-out var(--zh-fase) infinite;
+}
+@keyframes zhDoubleTake{
+  0%,18%,48%,100%{ transform: rotate(0) scale(1,1); }
+  21%{ transform: rotate(3deg) scale(.98,1.02); }        /* micro-anticipación */
+  24%,32%{ transform: rotate(-13deg); }                  /* mira allá */
+  35%{ transform: rotate(10deg) scale(1.14,.9); }        /* ¡smear al otro lado! */
+  37%,41%{ transform: rotate(7deg); }                    /* …¿y eso qué fue? */
+  44%{ transform: rotate(-11deg); }                      /* no: sí era allá */
+}
+/* LA COLA SE ENROSCA (el gesto prensil, exagerado): la espiral se aprieta
+   con elástico y se suelta — punta a fondo, media acompaña */
+.zariguyaHuesos[data-modo="actuando"] .zh-colaBase{
+  animation: zhColaEnroscaBase 2.1s cubic-bezier(.34,1.56,.64,1) var(--zh-fase) infinite alternate;
+}
+.zariguyaHuesos[data-modo="actuando"] .zh-colaMedia{
+  animation: zhColaEnroscaMedia 2.1s cubic-bezier(.34,1.56,.64,1) calc(var(--zh-fase) - .14s) infinite alternate;
+}
+.zariguyaHuesos[data-modo="actuando"] .zh-colaPunta{
+  animation: zhColaEnrosca 2.1s cubic-bezier(.34,1.56,.64,1) calc(var(--zh-fase) - .26s) infinite alternate;
+}
+@keyframes zhColaEnroscaBase{ from{ transform: rotate(3deg);} to{ transform: rotate(-7deg);} }
+@keyframes zhColaEnroscaMedia{ from{ transform: rotate(6deg);} to{ transform: rotate(-16deg);} }
+@keyframes zhColaEnrosca{ from{ transform: rotate(10deg);} to{ transform: rotate(-38deg);} }
+/* aura ROSA DE LUNA + el brillo nocturno de los ojos */
+.zariguyaHuesos .zh-aura{ opacity: 0; transition: opacity .8s ease; }
+.zariguyaHuesos[data-modo="actuando"] .zh-aura{ opacity: 1; animation: zhAuraLate 5.6s ease-in-out var(--zh-fase) infinite; }
+@keyframes zhAuraLate{
+  0%,100%{ opacity: .45; transform: scale(.96); }
+  50%{ opacity: .85; transform: scale(1.04); }
+}
+.zariguyaHuesos .zh-ojoHalo{ opacity: .4; }
+.zariguyaHuesos[data-modo="actuando"] .zh-ojoHalo{ animation: zhOjoLuna 1.9s ease-in-out var(--zh-fase) infinite; }
+@keyframes zhOjoLuna{
+  0%,100%{ opacity: .4; }
+  50%{ opacity: .95; }
+}
+/* actuando+caminando: trotecito exagerado (sin vuelta: anda limpio) */
+.zariguyaHuesos[data-modo="actuando"][data-agt-estado="caminando"] .zh-cuerpo{
+  animation: zhTroncoBobFuerte calc(var(--zh-paso) / 2) ease-in-out var(--zh-fase) infinite;
+}
+@keyframes zhTroncoBobFuerte{
+  0%,100%{ transform: translateY(3.5px) rotate(.8deg) scale(1.014,.983); }
+  50%{ transform: translateY(-5px) rotate(-.6deg) scale(.988,1.016); }
+}
+
+/* ═══════════════════════ GATES OBLIGATORIOS ══════════════════════════════ */
+
+/* tier bajo: fuera lo continuo (filtros/loops); quedan estados reactivos */
+.zariguyaHuesos[data-tier="bajo"] .zh-pj{ filter: none; }
+.zariguyaHuesos[data-tier="bajo"] *{ animation: none !important; }
+
+/* animated=false (data-quieto): fotograma digno, quieto del todo */
+.zariguyaHuesos[data-quieto] *{ animation: none !important; transition: none !important; }
+.zariguyaHuesos[data-quieto] .zh-pj{ filter: none; }
+
+@media (prefers-reduced-motion: reduce){
+  .zariguyaHuesos *{ animation: none !important; transition: none !important; }
+  .zariguyaHuesos .zh-pj{ filter: none; }
+}
