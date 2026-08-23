@@ -603,7 +603,7 @@ export function OsoBaston({
             puño de garras en la cadera. La musculatura de la lámina, no fideo. */}
         <g className={vivo ? 'crt-brazo-l rh-sway' : 'crt-brazo-l'}
           style={{ transformBox: 'fill-box', transformOrigin: 'top right', animationDelay: '-0.3s' }}>
-          <path d="M -5.0,-7.6 C -9.4,-8.1 -12.4,-6.3 -13.0,-3.6 C -13.5,-1.2 -12.6,1.2 -11.0,2.9 C -10.2,3.7 -9.3,4.35 -8.4,4.75 C -7.1,5.3 -6.2,4.6 -6.5,3.6 C -8.2,2.7 -9.4,1.2 -9.5,-0.6 C -9.6,-2.4 -8.9,-4.0 -7.4,-5.0 C -6.6,-5.45 -5.8,-5.6 -5.0,-5.5 Z"
+          <path d="M -5.0,-7.6 C -9.4,-8.1 -12.4,-6.3 -13.0,-3.6 C -13.5,-1.2 -12.6,1.2 -11.0,2.9 C -10.2,3.7 -9.3,4.35 -8.4,4.75 C -7.9,5.0 -7.55,4.55 -7.75,4.05 C -8.15,3.6 -8.85,2.8 -9.4,-0.45 C -9.6,-2.3 -8.9,-3.95 -7.4,-4.95 C -6.6,-5.45 -5.8,-5.6 -5.0,-5.5 Z"
             fill={`url(#${masa})`} stroke={INK} strokeWidth="1.0" strokeLinejoin="round" />
           {/* la luz del deltoides y el bíceps (painterly) */}
           <g aria-hidden="true" filter={`url(#${pincel})`}>
