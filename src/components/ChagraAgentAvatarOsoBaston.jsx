@@ -13,7 +13,7 @@ import OsoBaston from '../visual/creatures/OsoBaston';
  *
  * Adaptador puro (mismo contrato que ChagraAgentAvatarZariguya): traduce la
  * API histórica del avatar del agente (state 'idle'|'thinking'|'speaking'|
- * 'listening', glow, withLabel, onClick/onDoubleClick) al vocabulario de VIDA
+ * 'listening'|'caminando', glow, withLabel, onClick/onDoubleClick) al vocabulario de VIDA
  * de `OsoBaston.jsx` (`visual/creatures/`). Cero lógica nueva de agente, cero
  * cambios en `visual/creatures/`.
  *
@@ -22,12 +22,14 @@ import OsoBaston from '../visual/creatures/OsoBaston';
  *                  su reacción-firma leída como "atento/calculando".
  *   - speaking   → pose 'celebra' (el bastón late en flor) + visema.
  *   - listening  → pose 'reposo': se posa atento.
+ *   - caminando  → pose 'camina': su marcha al deambular.
  */
 const POSE_DE_STATE = {
     idle: 'anda',
     thinking: 'anda',
     speaking: 'celebra',
     listening: 'reposo',
+    caminando: 'camina',
 };
 
 const RESOPLA_DE_STATE = {

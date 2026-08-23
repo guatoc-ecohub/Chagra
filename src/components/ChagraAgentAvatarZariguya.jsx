@@ -8,7 +8,7 @@ import Zariguya from '../visual/creatures/Zariguya';
  *
  * Adaptador puro (mismo contrato que ChagraAgentAvatarAngelita/Maiz): traduce
  * la API histórica del avatar del agente (state 'idle'|'thinking'|'speaking'|
- * 'listening', glow, withLabel, onClick/onDoubleClick) al vocabulario de VIDA
+ * 'listening'|'caminando', glow, withLabel, onClick/onDoubleClick) al vocabulario de VIDA
  * de `Zariguya.jsx` (`visual/creatures/`) — el registro rubber-hose CÁLIDO
  * del elenco canónico. OJO: existe otra zarigüeya en
  * `dashboard/CriaturasNocturnas.jsx`, biopunk oscuro/neón — esa NO se usa acá
@@ -25,19 +25,20 @@ import Zariguya from '../visual/creatures/Zariguya';
  *   - speaking   → pose 'celebra' (la más expresiva) + visema del lip-sync
  *                  sobre su sonrisa.
  *   - listening  → pose 'reposo': se posa erguida y atenta.
+ *   - caminando  → pose 'anda': su marcha al deambular.
  */
 const POSE_DE_STATE = {
     idle: 'anda',
     thinking: 'anda',
     speaking: 'celebra',
     listening: 'reposo',
+    caminando: 'anda',
 };
 
 const HUSMEA_DE_STATE = {
     thinking: true,
 };
 
-// eslint-disable-next-line chagra-i18n/no-hardcoded-spanish
 const VISEMA_DE_STATE = {
     speaking: 'V2',
 };
