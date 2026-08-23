@@ -11,6 +11,8 @@ node_modules
 dist
 dist-prod
 dist-ssr
+dist-oso-gate
+.vite-oso-gate
 *.local
 
 # Editor directories and files

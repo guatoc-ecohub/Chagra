@@ -62,7 +62,7 @@ describe('1. LA FIRMA ES DE FORMA — el caminante del bastón florecido', () =>
     expect(OSO_BASTON_FIRMA.rasgos.every((r) => r.forma === true)).toBe(true);
     const ids = OSO_BASTON_FIRMA.rasgos.map((r) => r.id);
     expect(ids).toContain('baston-florecido');
-    expect(ids).toContain('caminante-botas');
+    expect(ids).toContain('zarpas-plantigradas');
     expect(ids).toContain('anteojos-asimetricos');
     expect(ids).toContain('luna-pecho');
   });
@@ -143,5 +143,42 @@ describe('6. LIP-SYNC — el visema viaja a la cara', () => {
   it("visema='V3' abre la boca (garganta) y viaja como data-visema", () => {
     const { container } = render(<OsoBaston tier="medio" visema="V3" />);
     expect(container.querySelector('svg').getAttribute('data-visema')).toBe('V3');
+  });
+});
+
+describe('7. 70/30 — la piel-lámina sobre huesos y el modo (spec compai)', () => {
+  it('quieto o caminando el oso es NORMAL (el 70%: digno, sin volteretas)', () => {
+    const { container } = render(<OsoBaston tier="medio" />);
+    expect(container.querySelector('svg').getAttribute('data-modo')).toBe('normal');
+    const { container: c2 } = render(<OsoBaston tier="medio" pose="camina" />);
+    expect(c2.querySelector('svg').getAttribute('data-modo')).toBe('normal');
+  });
+
+  it('hablar o florecer lo vuelve ACTUANDO solo (el 30%: Miss Minutes)', () => {
+    const { container } = render(<OsoBaston tier="medio" visema="V2" />);
+    expect(container.querySelector('svg').getAttribute('data-modo')).toBe('actuando');
+    const { container: c2 } = render(<OsoBaston tier="medio" florece />);
+    expect(c2.querySelector('svg').getAttribute('data-modo')).toBe('actuando');
+  });
+
+  it('la prop modo MANDA sobre el automático (el host dirige)', () => {
+    const { container } = render(<OsoBaston tier="medio" visema="V2" modo="normal" />);
+    expect(container.querySelector('svg').getAttribute('data-modo')).toBe('normal');
+    const { container: c2 } = render(<OsoBaston tier="medio" modo="actuando" />);
+    expect(c2.querySelector('svg').getAttribute('data-modo')).toBe('actuando');
+  });
+
+  it('el esqueleto está completo: columna, cuello-gola, cabeza-mira, cabeza y hocico', () => {
+    const { container } = render(<OsoBaston tier="medio" />);
+    expect(container.querySelector('.osb-columna')).toBeTruthy();
+    expect(container.querySelector('.osb-cuello')).toBeTruthy();
+    expect(container.querySelector('.osb-cabeza-mira')).toBeTruthy();
+    expect(container.querySelector('.osb-cabeza')).toBeTruthy();
+    expect(container.querySelector('.osb-hocico')).toBeTruthy();
+  });
+
+  it('con animated=false no viaja modo (fotograma digno, sin relojes)', () => {
+    const { container } = render(<OsoBaston animated={false} />);
+    expect(container.querySelector('svg').getAttribute('data-modo')).toBeNull();
   });
 });
