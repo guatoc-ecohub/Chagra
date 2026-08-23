@@ -395,7 +395,7 @@ const PECHO = `
       pecho (por delante). El tronco pinta su casquete en la base; el cuello
       pinta el casquete del ATLAS bajo el cráneo (el fix de la decapitación) ── */
 const CUELLO = `
-  <path d="M126,58 C 168,48 216,50 248,66 C 258,94 258,150 252,196 C 248,228 240,252 228,262 C 212,270 192,262 176,242 C 148,214 126,170 116,124 C 112,100 114,74 126,58 Z"
+  <path d="M126,58 C 168,48 216,50 248,58 C 258,94 258,150 252,196 C 248,228 240,252 228,262 C 212,270 192,262 176,242 C 148,214 126,170 116,124 C 112,100 114,74 126,58 Z"
     fill="url(#jhCuelloGrad)"/>
   <!-- contorno SOLO en las siluetas externas (nuca y garganta): el borde que
        cruza el hombro va sin stroke para fundirse con el tronco -->
