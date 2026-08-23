@@ -152,9 +152,19 @@ const casqueteCalco = (region, banda) =>
   `<g clip-path="url(#jt-r-${region})"><g clip-path="url(#jtSilueta)">` +
   `<g clip-path="url(#jt-b-${banda})"><use href="#jtCalco-${region}" filter="url(#${FILTRO_BANDA[banda]})"/></g></g></g>`;
 
-/* Bandas de juntura (elipses generosas centradas en el corte). */
+/* Bandas de juntura (elipses generosas centradas en el corte).
+   🔴 atlas NO es elipse: es un TRAZO DE NUCA. La elipse subía hasta y≈16 y
+   al girar la cabeza a −18° el casquete pintaba una ALETA borrosa parada
+   donde lo correcto es cielo (la silueta del cráneo se movió — gate de giros
+   2026-08-23, gradiente 14.33 vs 23-25 del pelaje). El borde superior de la
+   banda DIBUJA la nuca flexionada: arranca donde muere la nuca estática del
+   cuello (~153,45) y cae en curva hasta el borde del cráneo rotado al
+   extremo −18° (~108,82) — encima cielo, debajo el casquete sigue tapando
+   la juntura (recortarlo todo abría la cuña blanca; un corte recto dejaba
+   arista). El resto del contorno es generoso: lo comen los clips de región
+   y silueta. */
 const BANDAS = `
-  <clipPath id="jt-b-atlas"><ellipse cx="170" cy="136" rx="56" ry="120" transform="rotate(4 170 136)"/></clipPath>
+  <clipPath id="jt-b-atlas"><path d="M153,45 C142,46 132,44 124,43 C118,42 114,41 112,40 L106,60 L106,140 L118,220 L150,266 L232,266 L232,140 L216,58 L186,37 Z"/></clipPath>
   <clipPath id="jt-b-cruz"><ellipse cx="247" cy="152" rx="42" ry="115" transform="rotate(6 247 152)"/></clipPath>
   <clipPath id="jt-b-colaMedia"><circle cx="553" cy="157" r="28"/></clipPath>
   <clipPath id="jt-b-colaPunta"><ellipse cx="676" cy="258" rx="40" ry="19" transform="rotate(20 676 258)"/></clipPath>`;
@@ -193,7 +203,7 @@ const DEFS = `<defs>
     <stop offset="1" stop-color="${P.ojoBrillo}" stop-opacity="0"/>
   </radialGradient>
   <filter id="jhBlur"><feGaussianBlur stdDeviation="4"/></filter>
-  <filter id="jtBorrosoAtlas" filterUnits="userSpaceOnUse" x="106" y="8" width="132" height="256"><feGaussianBlur stdDeviation="1.8"/></filter>
+  <filter id="jtBorrosoAtlas" filterUnits="userSpaceOnUse" x="106" y="8" width="132" height="256"><feGaussianBlur stdDeviation="0.9"/></filter>
   <filter id="jtBorrosoCruz" filterUnits="userSpaceOnUse" x="197" y="29" width="108" height="246"><feGaussianBlur stdDeviation="1.8"/></filter>
   <filter id="jtBorrosoColaMedia" filterUnits="userSpaceOnUse" x="521" y="125" width="64" height="64"><feGaussianBlur stdDeviation="1.8"/></filter>
   <filter id="jtBorrosoColaPunta" filterUnits="userSpaceOnUse" x="630" y="233" width="94" height="52"><feGaussianBlur stdDeviation="1.8"/></filter>
