@@ -14,8 +14,9 @@
  * Este es el oso DE DÍA y DE CAMINO: erguido, plantígrado de zarpas desnudas
  * con garras (la piel definitiva es SU LÁMINA — `laminas/oso.png` — vuelta
  * vector; las botas/guantes de la primera versión eran cartoon y se
- * retiraron), sonrisa confiada con dientes, y su BASTÓN FLORECIDO más alto
- * que él.
+ * retiraron), el SMIRK CERRADO de medio lado — digno y fiero, jamás sonrisota
+ * (la hilera de dientes pareja se leía boba; el operador la retiró) — y su
+ * BASTÓN FLORECIDO más alto que él.
  *
  * ── EL BASTÓN ES SU ECOLOGÍA HECHA EMBLEMA ───────────────────────────────────
  * El oso andino es el GRAN DISPERSOR DE SEMILLAS del bosque altoandino y el
@@ -115,7 +116,7 @@ export const OSO_BASTON_PALETA = {
   hocicoSombra: '#a8966f',  // sombra del morro
   trufa: '#75594e',         // la trufa café-rosada de la lámina (medido: #725e57)
   trufaOscura: '#463129',   // narinas y borde de la trufa
-  dientes: '#f4efe2',       // la sonrisa confiada muestra dientes (la lámina)
+  dientes: '#f4efe2',       // dientes SOLO al hablar (visemas); el gesto base es smirk cerrado
   oreja: '#242320',         // pabellón interno de la oreja redonda
   pecho: '#ece6d4',         // la V RASGADA blanca del pecho (el babero real)
   pechoSombra: '#c4bba2',   // penumbra de la V (que no sea sticker)

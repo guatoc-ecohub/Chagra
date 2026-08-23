@@ -58,17 +58,17 @@ const VIEWBOX = '-17 -22 34 42';
    dorsal que baja, la panza amable y la cadera que recoge. El borde es liso;
    los mechones de pelo van como trazos encima (patrón del jaguar piloto). */
 const SILUETA_TRONCO =
-  'M -3.8,-7.2 '
-  + 'C -6.6,-7.0 -8.6,-6.1 -9.3,-4.5 '   // trapecio en PENDIENTE → hombro ancho
-  + 'C -9.9,-3.0 -9.5,-1.5 -8.6,-0.4 '   // el deltoides recoge al pecho
-  + 'C -8.3,1.4 -7.8,3.0 -7.0,4.4 '      // el flanco RECOGE en V (top-heavy)
-  + 'C -6.2,6.2 -4.7,7.5 -2.6,8.0 '      // cadera corta y alta (piernas largas)
-  + 'C -0.9,8.35 0.9,8.35 2.6,8.0 '
-  + 'C 4.7,7.5 6.2,6.2 7.0,4.4 '
-  + 'C 7.8,3.0 8.3,1.4 8.6,-0.4 '
-  + 'C 9.5,-1.5 9.9,-3.0 9.3,-4.5 '
-  + 'C 8.6,-6.1 6.6,-7.0 3.8,-7.2 '
-  + 'C 1.3,-7.5 -1.3,-7.5 -3.8,-7.2 Z';  // el cuello nace aquí (lo tapa la gola)
+  'M -3.9,-7.9 '
+  + 'C -7.0,-7.7 -9.4,-6.7 -10.2,-4.9 '  // trapecio ALTO y ANCHO (la mole arriba)
+  + 'C -10.8,-3.3 -10.4,-1.7 -9.2,-0.7 ' // deltoides/pectoral macizos
+  + 'C -8.6,1.0 -7.7,2.6 -6.6,4.0 '      // el flanco RECOGE FUERTE en V
+  + 'C -5.7,5.8 -4.3,7.1 -2.4,7.6 '      // cadera CORTA y recogida (sin globo)
+  + 'C -0.85,7.95 0.85,7.95 2.4,7.6 '
+  + 'C 4.3,7.1 5.7,5.8 6.6,4.0 '
+  + 'C 7.7,2.6 8.6,1.0 9.2,-0.7 '
+  + 'C 10.4,-1.7 10.8,-3.3 10.2,-4.9 '
+  + 'C 9.4,-6.7 7.0,-7.7 3.9,-7.9 '
+  + 'C 1.35,-8.15 -1.35,-8.15 -3.9,-7.9 Z'; // el cuello nace aquí (lo tapa la gola)
 
 /* LA V RASGADA del pecho — el babero pectoral de ESTE individuo tal como lo
    trae la lámina: dos relámpagos crema que caen del cuello y se parten en
@@ -190,18 +190,11 @@ function ZarpaMano({ cx, cy, r = 1.9, rot = 0, garrasAbajo = true, P, INK }) {
    siendo el de la casa (.rh-blink escala el grupo) y el dardeo de la pupila
    el de siempre (.rh-mirada) — vida intacta, cara real. */
 const OJO_IZQ_ALMENDRA =
-  'M -3.5,-13.0 C -3.0,-13.7 -1.85,-13.75 -1.25,-12.95 '
-  + 'C -1.15,-12.4 -1.6,-11.9 -2.35,-11.85 C -3.05,-11.85 -3.45,-12.4 -3.5,-13.0 Z';
+  'M -3.55,-13.15 C -3.0,-13.5 -1.9,-13.45 -1.2,-12.7 '
+  + 'C -1.15,-12.3 -1.6,-11.9 -2.35,-11.88 C -3.1,-11.9 -3.5,-12.5 -3.55,-13.15 Z';
 const OJO_DER_ALMENDRA =
-  'M 3.5,-12.9 C 3.0,-13.6 1.85,-13.65 1.25,-12.85 '
-  + 'C 1.15,-12.3 1.6,-11.8 2.35,-11.75 C 3.05,-11.75 3.45,-12.3 3.5,-12.9 Z';
-
-/* La BOCA de la lámina: el smirk ancho con su hilera de dientes. El hueco de
-   la boca (entre labio superior e inferior) se usa como CLIP para que los
-   dientes cuelguen del labio sin salirse jamás de la comisura. */
-const BOCA_HUECO =
-  'M -2.55,-9.3 C -1.4,-8.3 0.6,-8.05 2.6,-9.5 '
-  + 'C 2.2,-8.35 0.9,-7.5 -0.5,-7.55 C -1.6,-7.6 -2.35,-8.35 -2.55,-9.3 Z';
+  'M 3.55,-13.05 C 3.0,-13.4 1.9,-13.35 1.2,-12.6 '
+  + 'C 1.15,-12.2 1.6,-11.8 2.35,-11.78 C 3.1,-11.8 3.5,-12.4 3.55,-13.05 Z';
 
 /* El POLEN que flota de la corona (delays/duraciones propios: vida, no
    metrónomo). Coordenadas alrededor de la corona del bastón. */
@@ -235,8 +228,8 @@ export function OsoBaston({
      Sin clima (avatares, catálogo) = neutro digno. */
   clima = null,
   enso = 'neutro',
-  /* Lip-sync transversal (useLipSync → 'V1'..'V4'). Sin visema = la sonrisa
-     confiada de la lámina (con sus dientes). */
+  /* Lip-sync transversal (useLipSync → 'V1'..'V4'). Sin visema = el smirk
+     cerrado de medio lado de la lámina (dientes solo al hablar). */
   visema = null,
   /* FLORECE (opt-in): su gesto-firma — el bastón late EN FLOR (halo verde,
      corola con overshoot, polen acelerado). La ecología del dispersor de
@@ -275,7 +268,6 @@ export function OsoBaston({
   const trufaG = `osb-trufa-${uid}`;
   const ojoIClip = `osb-ojo-i-${uid}`;
   const ojoDClip = `osb-ojo-d-${uid}`;
-  const bocaClip = `osb-boca-${uid}`;
   const vivo = animated;
 
   // ═══ VIDA PROPIA (idle-cerebro + ritmo propio + mirada — vara Angelita v2).
@@ -321,24 +313,24 @@ export function OsoBaston({
           panza en penumbra) — el volumen vertical de la mole erguida. */}
       <linearGradient id={dorso} x1="0" y1="0" x2="0" y2="1">
         <stop offset="0%" stopColor={P.cuerpoLuz} />
-        <stop offset="34%" stopColor={P.cuerpo} />
-        <stop offset="82%" stopColor={P.cuerpoSombra} />
-        <stop offset="100%" stopColor={P.cuerpoSombra} />
+        <stop offset="30%" stopColor={P.cuerpo} />
+        <stop offset="72%" stopColor={P.cuerpoSombra} />
+        <stop offset="100%" stopColor="#181613" />
       </linearGradient>
       {/* CRÁNEO: la luz entra por la frente (arriba-adelante), la quijada queda
           en penumbra — el modelado de la testa de la lámina. */}
       <radialGradient id={craneo} cx="50%" cy="26%" r="88%">
         <stop offset="0%" stopColor={P.cuerpoLuz} />
-        <stop offset="52%" stopColor={P.cuerpo} />
-        <stop offset="100%" stopColor={P.cuerpoSombra} />
+        <stop offset="48%" stopColor={P.cuerpo} />
+        <stop offset="100%" stopColor="#1b1915" />
       </radialGradient>
       {/* MASAS musculares (deltoides, muslos): radial con la luz al tercio
           alto — MISMOS valores del tronco (un solo pelaje, no piezas claras
           pegadas a un cuerpo oscuro). */}
       <radialGradient id={masa} cx="42%" cy="28%" r="82%">
-        <stop offset="0%" stopColor="#4a463d" />
+        <stop offset="0%" stopColor="#514c41" />
         <stop offset="55%" stopColor={P.cuerpo} />
-        <stop offset="100%" stopColor={P.cuerpoSombra} />
+        <stop offset="100%" stopColor="#1d1b16" />
       </radialGradient>
       {/* GRANO DE PELAJE — feTurbulence compuesto DENTRO de la silueta (operator
           "in" contra SourceGraphic): pelo corto denso SIN feDisplacementMap (el
@@ -372,10 +364,9 @@ export function OsoBaston({
         <stop offset="55%" stopColor={P.trufa} />
         <stop offset="100%" stopColor={P.trufaOscura} />
       </radialGradient>
-      {/* clips de los ojos-almendra y del hueco de la boca (cara REAL) */}
+      {/* clips de los ojos-almendra (cara REAL) */}
       <clipPath id={ojoIClip}><path d={OJO_IZQ_ALMENDRA} /></clipPath>
       <clipPath id={ojoDClip}><path d={OJO_DER_ALMENDRA} /></clipPath>
-      <clipPath id={bocaClip}><path d={BOCA_HUECO} /></clipPath>
       {lineBoil && <LineBoilFilter id={boil} animated={vivo} />}
     </defs>
   );
@@ -393,43 +384,29 @@ export function OsoBaston({
     <PropEnMano mundoId={mundoId} x={-11.6} y={5.2} escala={0.74} ink={INK} animated={vivo} />
   ) : null;
 
-  // BOCA: lip-sync si narra; si no, LA SONRISA CONFIADA DE LA LÁMINA — el
-  // smirk amplio con su banda de dientes y la comisura marcada.
+  // BOCA: lip-sync si narra; si no, EL SMIRK CERRADO de la lámina — el gesto
+  // contenido y fiero de medio lado (dientes solo al hablar: el oso digno no
+  // anda enseñando la dentadura; la sonrisota abierta se leía boba).
   const boca = visema
     ? <BocaVisema cx={0} cy={-8.9} w={3.6} prof={1.15} visema={visema} ink={INK} />
     : (
       <g>
-        {/* el HUECO de la boca: el smirk abierto de la lámina (más alto a la
-            derecha — la chulería amable del caminante) */}
-        <path d={BOCA_HUECO} fill="#2a1512" stroke={INK} strokeWidth="0.35" strokeLinejoin="round" />
-        {/* la HILERA de dientes colgada del labio superior (clip: jamás se
-            sale de la comisura) — la sonrisa REAL de la lámina */}
-        <g clipPath={`url(#${bocaClip})`} aria-hidden="true">
-          <path d="M -2.6,-9.4 C -1.4,-8.35 0.6,-8.1 2.7,-9.6 L 2.7,-8.7 C 1.0,-7.8 -1.3,-7.95 -2.6,-8.7 Z"
-            fill={P.dientes} />
-          <g stroke="#c9bfa8" strokeWidth="0.13" fill="none">
-            <path d="M -1.9,-8.95 L -1.87,-8.6" />
-            <path d="M -1.15,-8.6 L -1.12,-8.25" />
-            <path d="M -0.35,-8.45 L -0.32,-8.1" />
-            <path d="M 0.5,-8.45 L 0.53,-8.12" />
-            <path d="M 1.35,-8.6 L 1.4,-8.3" />
-            <path d="M 2.05,-8.95 L 2.1,-8.65" />
-          </g>
-          {/* la sombra que el labio superior tira sobre los dientes */}
-          <path d="M -2.6,-9.4 C -1.4,-8.35 0.6,-8.1 2.7,-9.6 L 2.7,-9.25 C 1.0,-8.35 -1.3,-8.55 -2.6,-9.1 Z"
-            fill={INK} opacity="0.18" />
-        </g>
-        {/* labio superior: la línea del smirk */}
-        <path d="M -2.7,-9.25 C -1.4,-8.2 0.7,-7.95 2.75,-9.55" fill="none" stroke={INK}
-          strokeWidth="0.48" strokeLinecap="round" />
-        {/* comisura derecha enroscada + pliegue izquierdo (el gesto confiado) */}
-        <path d="M 2.75,-9.55 C 3.1,-9.65 3.3,-9.95 3.3,-10.3" fill="none" stroke={INK}
-          strokeWidth="0.4" strokeLinecap="round" aria-hidden="true" />
-        <path d="M -2.7,-9.25 C -2.95,-9.3 -3.15,-9.5 -3.2,-9.75" fill="none" stroke={INK}
-          strokeWidth="0.36" strokeLinecap="round" aria-hidden="true" />
-        {/* labio inferior con su luz */}
-        <path d="M -1.7,-7.45 C -0.5,-7.05 0.8,-7.15 1.95,-7.8" fill="none"
+        {/* la línea del smirk: cae grave a la izquierda y BARRE hacia arriba
+            a la comisura derecha (medio lado, no sonrisa simétrica) */}
+        <path d="M -2.55,-8.25 C -1.3,-7.88 0.3,-7.9 1.55,-8.5 C 2.2,-8.82 2.72,-9.3 3.0,-9.9"
+          fill="none" stroke={INK} strokeWidth="0.62" strokeLinecap="round" />
+        {/* la comisura derecha ENROSCADA (el gancho del smirk de la lámina) */}
+        <path d="M 3.0,-9.9 C 3.25,-10.15 3.38,-10.45 3.34,-10.75" fill="none" stroke={INK}
+          strokeWidth="0.46" strokeLinecap="round" aria-hidden="true" />
+        {/* el pliegue del cachete que EMPUJA la comisura (volumen, no tinta) */}
+        <path d="M 2.55,-8.2 C 3.15,-8.65 3.55,-9.35 3.62,-10.1" fill="none"
           stroke={P.hocicoSombra} strokeWidth="0.34" strokeLinecap="round" opacity="0.8" aria-hidden="true" />
+        {/* el extremo izquierdo cae SERIO (el gesto contenido, jamás sonrisota) */}
+        <path d="M -2.55,-8.25 C -2.9,-8.18 -3.15,-8.26 -3.35,-8.46" fill="none" stroke={INK}
+          strokeWidth="0.48" strokeLinecap="round" aria-hidden="true" />
+        {/* la sombra del labio inferior bajo el smirk (el mentón con volumen) */}
+        <path d="M -1.5,-7.55 C -0.4,-7.25 0.9,-7.35 1.9,-7.95" fill="none"
+          stroke={P.hocicoSombra} strokeWidth="0.36" strokeLinecap="round" opacity="0.75" aria-hidden="true" />
       </g>
     );
 
@@ -529,26 +506,26 @@ export function OsoBaston({
           pies anchos plantados hacia afuera. En 'camina' alternan el paso. */}
       <g aria-hidden="true">
         <g className="osb-pierna-i" style={{ transformBox: 'fill-box', transformOrigin: 'top center' }}>
-          <path d="M -1.4,6.4 C -4.9,6.6 -6.6,8.4 -6.5,10.6 C -6.4,12.6 -5.5,14.2 -4.3,14.9 C -3.1,15.4 -2.0,15.0 -1.6,14.1 C -1.1,11.6 -1.1,8.9 -1.4,6.4 Z"
+          <path d="M -1.4,6.0 C -5.2,6.2 -7.0,8.1 -6.9,10.4 C -6.8,12.5 -5.8,14.2 -4.5,14.95 C -3.2,15.45 -2.05,15.05 -1.65,14.1 C -1.15,11.5 -1.15,8.5 -1.4,6.0 Z"
             fill={`url(#${masa})`} stroke={INK} strokeWidth="0.95" strokeLinejoin="round" />
           {/* la luz del muslo + la sombra de la canilla (pierna con volumen) */}
-          <ellipse cx="-4.6" cy="8.6" rx="1.5" ry="1.9" fill={P.cuerpoLuz} opacity="0.35"
-            transform="rotate(18 -4.6 8.6)" filter={`url(#${pincel})`} aria-hidden="true" />
-          <path d="M -5.6,11.8 C -5.4,13.0 -4.9,13.9 -4.1,14.4" fill="none" stroke={P.umbra}
-            strokeWidth="0.8" strokeLinecap="round" opacity="0.5" filter={`url(#${pincel})`} aria-hidden="true" />
+          <ellipse cx="-4.9" cy="8.3" rx="1.6" ry="2.0" fill={P.cuerpoLuz} opacity="0.4"
+            transform="rotate(18 -4.9 8.3)" filter={`url(#${pincel})`} aria-hidden="true" />
+          <path d="M -5.9,11.6 C -5.7,12.9 -5.2,13.9 -4.3,14.5" fill="none" stroke={P.umbra}
+            strokeWidth="0.85" strokeLinecap="round" opacity="0.55" filter={`url(#${pincel})`} aria-hidden="true" />
           {/* el mechón del muslo (pelo, no recorte) */}
-          <path d="M -6.45,9.4 l -0.55,0.4 0.5,0.45 -0.55,0.42" fill="none"
+          <path d="M -6.85,9.2 l -0.55,0.4 0.5,0.45 -0.55,0.42" fill="none"
             stroke={P.cuerpoSombra} strokeWidth="0.35" strokeLinecap="round" opacity="0.7" />
           <ZarpaPie s={-1} P={P} INK={INK} />
         </g>
         <g className="osb-pierna-d" style={{ transformBox: 'fill-box', transformOrigin: 'top center' }}>
-          <path d="M 1.4,6.4 C 4.9,6.6 6.6,8.4 6.5,10.6 C 6.4,12.6 5.5,14.2 4.3,14.9 C 3.1,15.4 2.0,15.0 1.6,14.1 C 1.1,11.6 1.1,8.9 1.4,6.4 Z"
+          <path d="M 1.4,6.0 C 5.2,6.2 7.0,8.1 6.9,10.4 C 6.8,12.5 5.8,14.2 4.5,14.95 C 3.2,15.45 2.05,15.05 1.65,14.1 C 1.15,11.5 1.15,8.5 1.4,6.0 Z"
             fill={`url(#${masa})`} stroke={INK} strokeWidth="0.95" strokeLinejoin="round" />
-          <ellipse cx="4.6" cy="8.6" rx="1.5" ry="1.9" fill={P.cuerpoLuz} opacity="0.35"
-            transform="rotate(-18 4.6 8.6)" filter={`url(#${pincel})`} aria-hidden="true" />
-          <path d="M 5.6,11.8 C 5.4,13.0 4.9,13.9 4.1,14.4" fill="none" stroke={P.umbra}
-            strokeWidth="0.8" strokeLinecap="round" opacity="0.5" filter={`url(#${pincel})`} aria-hidden="true" />
-          <path d="M 6.45,9.4 l 0.55,0.4 -0.5,0.45 0.55,0.42" fill="none"
+          <ellipse cx="4.9" cy="8.3" rx="1.6" ry="2.0" fill={P.cuerpoLuz} opacity="0.4"
+            transform="rotate(-18 4.9 8.3)" filter={`url(#${pincel})`} aria-hidden="true" />
+          <path d="M 5.9,11.6 C 5.7,12.9 5.2,13.9 4.3,14.5" fill="none" stroke={P.umbra}
+            strokeWidth="0.85" strokeLinecap="round" opacity="0.55" filter={`url(#${pincel})`} aria-hidden="true" />
+          <path d="M 6.85,9.2 l 0.55,0.4 -0.5,0.45 0.55,0.42" fill="none"
             stroke={P.cuerpoSombra} strokeWidth="0.35" strokeLinecap="round" opacity="0.7" />
           <ZarpaPie s={1} P={P} INK={INK} />
         </g>
@@ -567,35 +544,49 @@ export function OsoBaston({
         {/* SOMBREADO PAINTERLY — masas blandas de pincel como la aguada de la
             lámina: pectorales con su luz, penumbra de flancos y bajo-panza. */}
         <g aria-hidden="true" filter={`url(#${pincel})`}>
-          <ellipse cx="-3.5" cy="-3.6" rx="2.9" ry="2.0" fill={P.cuerpoLuz} opacity="0.5" />
-          <ellipse cx="3.5" cy="-3.6" rx="2.9" ry="2.0" fill={P.cuerpoLuz} opacity="0.5" />
-          <ellipse cx="-6.0" cy="-4.9" rx="2.2" ry="1.4" fill={P.brillo} opacity="0.35"
-            transform="rotate(-18 -6.0 -4.9)" />
-          <ellipse cx="6.0" cy="-4.9" rx="2.2" ry="1.4" fill={P.brillo} opacity="0.35"
-            transform="rotate(18 6.0 -4.9)" />
-          <ellipse cx="0" cy="3.4" rx="5.2" ry="3.6" fill={P.cuerpoLuz} opacity="0.22" />
-          <path d="M -8.5,-0.3 C -8.6,2.2 -8.0,4.6 -6.5,6.6 C -7.8,4.8 -8.4,2.0 -8.5,-0.3 Z"
-            fill={P.umbra} opacity="0.5" />
-          <path d="M 8.5,-0.3 C 8.6,2.2 8.0,4.6 6.5,6.6 C 7.8,4.8 8.4,2.0 8.5,-0.3 Z"
-            fill={P.umbra} opacity="0.5" />
-          <ellipse cx="0" cy="7.3" rx="4.6" ry="1.2" fill={P.umbra} opacity="0.4" />
+          {/* pectorales ALTOS encendidos (la coraza del top-heavy) */}
+          <ellipse cx="-3.7" cy="-4.1" rx="3.1" ry="2.1" fill={P.cuerpoLuz} opacity="0.55" />
+          <ellipse cx="3.7" cy="-4.1" rx="3.1" ry="2.1" fill={P.cuerpoLuz} opacity="0.55" />
+          {/* crestas de hombro que AGARRAN el sol (contraste painterly) */}
+          <ellipse cx="-6.9" cy="-5.4" rx="2.3" ry="1.4" fill={P.brillo} opacity="0.45"
+            transform="rotate(-18 -6.9 -5.4)" />
+          <ellipse cx="6.9" cy="-5.4" rx="2.3" ry="1.4" fill={P.brillo} opacity="0.45"
+            transform="rotate(18 6.9 -5.4)" />
+          {/* la panza recoge la luz APENAS (penumbra: ya no globo claro) */}
+          <ellipse cx="0" cy="3.0" rx="4.2" ry="2.8" fill={P.cuerpoLuz} opacity="0.14" />
+          {/* umbra honda de los flancos (la vuelta del cilindro, más oscura) */}
+          <path d="M -9.1,-0.6 C -8.7,1.6 -7.9,3.6 -6.3,5.6 C -7.5,3.7 -8.5,1.5 -9.1,-0.6 Z"
+            fill={P.umbra} opacity="0.6" />
+          <path d="M 9.1,-0.6 C 8.7,1.6 7.9,3.6 6.3,5.6 C 7.5,3.7 8.5,1.5 9.1,-0.6 Z"
+            fill={P.umbra} opacity="0.6" />
+          <ellipse cx="0" cy="6.9" rx="4.3" ry="1.3" fill={P.umbra} opacity="0.5" />
         </g>
         {/* DEFINICIÓN MUSCULAR de la lámina — tinta a baja opacidad que sugiere
             (pectorales, el surco central, la panza) sin delinear. */}
-        <g aria-hidden="true" fill="none" stroke={INK} strokeWidth="0.5" opacity="0.3" strokeLinecap="round">
-          <path d="M -5.6,-2.4 C -3.9,-1.2 -1.8,-1.0 -0.2,-1.8" />
-          <path d="M 5.6,-2.4 C 3.9,-1.2 1.8,-1.0 0.2,-1.8" />
-          <path d="M 0,-0.9 C -0.15,0.5 -0.15,1.8 0,3.0" strokeWidth="0.4" />
-          <path d="M -4.4,2.9 C -2.9,5.0 -1.0,6.0 1.2,5.8" strokeWidth="0.42" opacity="0.55" />
+        <g aria-hidden="true" fill="none" stroke={INK} strokeWidth="0.5" opacity="0.32" strokeLinecap="round">
+          <path d="M -6.3,-3.0 C -4.4,-1.6 -2.0,-1.4 -0.2,-2.2" />
+          <path d="M 6.3,-3.0 C 4.4,-1.6 2.0,-1.4 0.2,-2.2" />
+          <path d="M 0,-1.4 C -0.15,0.2 -0.15,1.5 0,2.7" strokeWidth="0.4" />
+          <path d="M -4.0,2.7 C -2.6,4.6 -0.8,5.5 1.2,5.3" strokeWidth="0.42" opacity="0.55" />
+        </g>
+        {/* PELAJE A PINCEL: trazos cortos de luz sobre hombros y pecho (la
+            textura de pelo de la lámina, no relleno plano) */}
+        <g aria-hidden="true" fill="none" stroke={P.brillo} strokeWidth="0.28" strokeLinecap="round" opacity="0.5">
+          <path d="M -8.2,-5.5 l 0.85,-0.3" />
+          <path d="M -7.0,-6.1 l 0.8,-0.25" />
+          <path d="M 8.2,-5.5 l -0.85,-0.3" />
+          <path d="M 7.0,-6.1 l -0.8,-0.25" />
+          <path d="M -4.6,-5.9 l 0.7,-0.2" />
+          <path d="M 4.6,-5.9 l -0.7,-0.2" />
         </g>
         {/* mechones del flanco (el borde es pelo) */}
         <g aria-hidden="true" fill="none" stroke={P.cuerpoSombra} strokeWidth="0.34" strokeLinecap="round" opacity="0.6">
-          <path d="M -8.45,0.9 l -0.5,0.45 0.48,0.5 -0.5,0.45" />
-          <path d="M 8.45,0.9 l 0.5,0.45 -0.48,0.5 0.5,0.45" />
-          <path d="M -6.9,5.0 l -0.5,0.4 0.45,0.48" />
-          <path d="M 6.9,5.0 l 0.5,0.4 -0.45,0.48" />
-          <path d="M -9.5,-3.6 l -0.5,0.4 0.45,0.48" />
-          <path d="M 9.5,-3.6 l 0.5,0.4 -0.45,0.48" />
+          <path d="M -8.55,0.6 l -0.5,0.45 0.48,0.5 -0.5,0.45" />
+          <path d="M 8.55,0.6 l 0.5,0.45 -0.48,0.5 0.5,0.45" />
+          <path d="M -6.3,4.8 l -0.5,0.4 0.45,0.48" />
+          <path d="M 6.3,4.8 l 0.5,0.4 -0.45,0.48" />
+          <path d="M -10.45,-3.8 l -0.5,0.4 0.45,0.48" />
+          <path d="M 10.45,-3.8 l 0.5,0.4 -0.45,0.48" />
         </g>
 
         {/* ═══ LA V RASGADA del pecho (el babero de la lámina, con sus rayos) */}
@@ -612,26 +603,26 @@ export function OsoBaston({
             puño de garras en la cadera. La musculatura de la lámina, no fideo. */}
         <g className={vivo ? 'crt-brazo-l rh-sway' : 'crt-brazo-l'}
           style={{ transformBox: 'fill-box', transformOrigin: 'top right', animationDelay: '-0.3s' }}>
-          <path d="M -4.8,-7.0 C -8.6,-7.5 -11.4,-5.8 -12.0,-3.3 C -12.5,-1.1 -11.7,1.2 -10.2,2.9 C -9.4,3.7 -8.6,4.3 -7.8,4.7 C -6.6,5.2 -5.7,4.5 -6.0,3.5 C -7.6,2.6 -8.7,1.2 -8.8,-0.5 C -8.9,-2.2 -8.2,-3.8 -6.8,-4.7 C -6.1,-5.15 -5.4,-5.3 -4.7,-5.2 Z"
+          <path d="M -5.0,-7.6 C -9.4,-8.1 -12.4,-6.3 -13.0,-3.6 C -13.5,-1.2 -12.6,1.2 -11.0,2.9 C -10.2,3.7 -9.3,4.35 -8.4,4.75 C -7.1,5.3 -6.2,4.6 -6.5,3.6 C -8.2,2.7 -9.4,1.2 -9.5,-0.6 C -9.6,-2.4 -8.9,-4.0 -7.4,-5.0 C -6.6,-5.45 -5.8,-5.6 -5.0,-5.5 Z"
             fill={`url(#${masa})`} stroke={INK} strokeWidth="1.0" strokeLinejoin="round" />
           {/* la luz del deltoides y el bíceps (painterly) */}
           <g aria-hidden="true" filter={`url(#${pincel})`}>
-            <ellipse cx="-9.0" cy="-4.6" rx="1.9" ry="1.25" fill={P.cuerpoLuz} opacity="0.6"
-              transform="rotate(-24 -9.0 -4.6)" />
-            <path d="M -11.3,-2.6 C -11.5,-0.9 -11.1,0.8 -10.3,2.0" fill="none"
-              stroke={P.umbra} strokeWidth="0.9" opacity="0.5" strokeLinecap="round" />
+            <ellipse cx="-9.9" cy="-5.1" rx="2.1" ry="1.35" fill={P.cuerpoLuz} opacity="0.65"
+              transform="rotate(-24 -9.9 -5.1)" />
+            <path d="M -12.3,-2.8 C -12.5,-1.0 -12.0,0.9 -11.1,2.1" fill="none"
+              stroke={P.umbra} strokeWidth="0.95" opacity="0.55" strokeLinecap="round" />
           </g>
           {/* mechón del codo */}
-          <path d="M -11.7,-0.9 l -0.55,0.42 0.5,0.48 -0.55,0.45" fill="none"
+          <path d="M -12.7,-1.0 l -0.55,0.42 0.5,0.48 -0.55,0.45" fill="none"
             stroke={P.cuerpoSombra} strokeWidth="0.36" strokeLinecap="round" opacity="0.7" aria-hidden="true" />
           {/* RIM-LIGHT del brazo — el filo de luz que esculpe deltoides y
               bíceps en la lámina (borde externo, no delinea: esculpe) */}
-          <path d="M -6.2,-6.6 C -9.2,-6.7 -11.0,-5.2 -11.4,-3.2" fill="none"
-            stroke={P.brillo} strokeWidth="0.5" strokeLinecap="round" opacity="0.5" aria-hidden="true" />
+          <path d="M -6.5,-7.2 C -9.9,-7.3 -11.9,-5.6 -12.4,-3.5" fill="none"
+            stroke={P.brillo} strokeWidth="0.55" strokeLinecap="round" opacity="0.6" aria-hidden="true" />
           {/* EL PUÑO en jarra, garras hacia abajo (la chulería amable) — BIEN
               afuera de la silueta: que el codo respire (gap del brazo en jarra
               de la lámina) y el puño no se funda con la panza */}
-          <ZarpaMano cx={-7.9} cy={5.0} r={2.3} rot={-14} P={P} INK={INK} />
+          <ZarpaMano cx={-8.5} cy={5.1} r={2.45} rot={-14} P={P} INK={INK} />
         </g>
 
         {/* ═══ HUESO-CUELLO: la GOLA continua — el pelaje denso que cose la
@@ -681,11 +672,12 @@ export function OsoBaston({
                 la CASCADA de la carrillera. Los ojos viven en PARCHES OSCUROS
                 dentro del antifaz (la lámina los trae así). */}
             <g aria-hidden="true">
-              {/* ceja-llama izquierda (barre alta) */}
-              <path d="M -5.1,-13.9 C -4.2,-15.3 -2.4,-15.8 -1.0,-15.2 C -1.2,-14.6 -1.8,-14.2 -2.5,-14.1 L -2.1,-13.7 C -3.2,-13.3 -4.4,-13.4 -5.1,-13.9 Z"
+              {/* ceja-llama izquierda: barre alta AFUERA y PICA hacia el
+                  entrecejo (la llama fruncida de la lámina, no arco tierno) */}
+              <path d="M -5.2,-14.0 C -4.4,-15.4 -2.6,-15.75 -1.0,-14.75 C -1.25,-14.25 -1.85,-13.95 -2.5,-13.95 L -2.1,-13.55 C -3.2,-13.2 -4.45,-13.4 -5.2,-14.0 Z"
                 fill={P.anteojo} />
               {/* ceja-llama derecha (un pelo más baja: asimetría) */}
-              <path d="M 5.1,-13.7 C 4.2,-15.1 2.4,-15.6 1.0,-15.0 C 1.2,-14.4 1.8,-14.05 2.5,-13.95 L 2.1,-13.55 C 3.2,-13.15 4.4,-13.25 5.1,-13.7 Z"
+              <path d="M 5.2,-13.85 C 4.4,-15.25 2.6,-15.6 1.0,-14.6 C 1.25,-14.1 1.85,-13.8 2.5,-13.8 L 2.1,-13.4 C 3.2,-13.05 4.45,-13.25 5.2,-13.85 Z"
                 fill={P.anteojo} />
               {/* aro izquierdo: CIERRA — baja de la ceja por fuera del ojo al hocico
                   (ANCHO: en la lámina el crema pesa tanto como la máscara) */}
@@ -711,15 +703,26 @@ export function OsoBaston({
             <g aria-hidden="true" filter={`url(#${pincel})`}>
               <path d="M -4.6,-15.8 C -2.8,-16.6 2.8,-16.6 4.6,-15.8 C 2.6,-16.3 -2.6,-16.3 -4.6,-15.8 Z"
                 fill={P.brillo} opacity="0.35" />
+              {/* la sombra del ARCO SUPERCILIAR: hunde las cuencas bajo el ceño
+                  (la mirada de la lámina es honda, no plana) */}
+              <ellipse cx="-2.4" cy="-13.3" rx="1.7" ry="0.6" fill={P.umbra} opacity="0.4"
+                transform="rotate(-11 -2.4 -13.3)" />
+              <ellipse cx="2.4" cy="-13.2" rx="1.7" ry="0.6" fill={P.umbra} opacity="0.4"
+                transform="rotate(11 2.4 -13.2)" />
               <ellipse cx="0" cy="-7.0" rx="3.0" ry="0.85" fill={P.umbra} opacity="0.3" />
             </g>
 
-            {/* CEJAS FIERAS de tinta SOBRE el antifaz (extremo interno bajo:
-                el gesto confiado-fiero de la lámina, nunca villano). Grupo
+            {/* CEJAS FIERAS de tinta SOBRE el antifaz: DIAGONALES GRUESAS que
+                caen al entrecejo (el ceño imponente de la lámina — digno,
+                nunca villano) + el surco fruncido entre ambas. Grupo
                 .oso-cejas: se fruncen al resoplar (CSS familiar). */}
-            <g className="oso-cejas" stroke={P.ceja} strokeWidth="0.58" strokeLinecap="round" fill="none">
-              <path d="M -4.3,-14.35 C -3.2,-14.8 -2.1,-14.75 -1.3,-14.2" />
-              <path d="M 4.3,-14.15 C 3.2,-14.6 2.1,-14.55 1.3,-14.05" />
+            <g className="oso-cejas" stroke={P.ceja} strokeWidth="0.85" strokeLinecap="round" fill="none">
+              <path d="M -4.6,-14.55 C -3.5,-14.7 -2.4,-14.3 -1.35,-13.5" />
+              <path d="M 4.6,-14.35 C 3.5,-14.5 2.4,-14.1 1.35,-13.35" />
+              <g strokeWidth="0.26" opacity="0.55" aria-hidden="true">
+                <path d="M -0.5,-13.4 C -0.56,-13.85 -0.5,-14.25 -0.34,-14.55" />
+                <path d="M 0.5,-13.3 C 0.56,-13.75 0.5,-14.15 0.34,-14.45" />
+              </g>
             </g>
 
             {/* OJOS REALES de la lámina: almendra con párpado pesado, iris
@@ -732,34 +735,35 @@ export function OsoBaston({
                 <path d={OJO_IZQ_ALMENDRA} fill={P.esclera} />
                 <g clipPath={`url(#${ojoIClip})`}>
                   <g className={vivo ? 'rh-mirada' : undefined}>
-                    <circle cx="-2.15" cy="-12.6" r="0.8" fill={P.iris} />
-                    <circle cx="-2.1" cy="-12.55" r="0.42" fill={P.pupila} />
-                    <circle cx="-2.4" cy="-12.9" r="0.15" fill="#f6efe0" opacity="0.9" />
+                    <circle cx="-2.05" cy="-12.72" r="0.8" fill={P.iris} />
+                    <circle cx="-2.0" cy="-12.68" r="0.44" fill={P.pupila} />
+                    <circle cx="-2.28" cy="-12.95" r="0.12" fill="#f6efe0" opacity="0.9" />
                   </g>
-                  {/* la sombra que el párpado pesado tira sobre el ojo */}
-                  <path d="M -3.6,-13.1 C -3.05,-13.8 -1.85,-13.85 -1.15,-13.0 L -1.15,-12.6 C -1.9,-13.45 -3.05,-13.4 -3.6,-12.75 Z"
-                    fill={P.parpado} opacity="0.5" aria-hidden="true" />
+                  {/* la sombra que el párpado pesado tira sobre el ojo (honda:
+                      el ojo entornado de la lámina, no el ojo abierto tierno) */}
+                  <path d="M -3.65,-13.2 C -3.05,-13.6 -1.85,-13.55 -1.1,-12.75 L -1.1,-12.3 C -1.9,-13.05 -3.05,-13.1 -3.65,-12.75 Z"
+                    fill={P.parpado} opacity="0.6" aria-hidden="true" />
                 </g>
-                {/* la línea del párpado (el peso del ojo real) */}
-                <path d="M -3.5,-13.0 C -3.0,-13.7 -1.85,-13.75 -1.25,-12.95" fill="none"
-                  stroke={P.parpado} strokeWidth="0.42" strokeLinecap="round" />
-                <path d="M -3.3,-12.3 C -2.85,-11.95 -2.3,-11.85 -1.6,-12.0" fill="none"
+                {/* la línea del párpado (el peso ANGULADO del ojo fiero) */}
+                <path d="M -3.55,-13.15 C -3.0,-13.5 -1.9,-13.45 -1.2,-12.7" fill="none"
+                  stroke={P.parpado} strokeWidth="0.5" strokeLinecap="round" />
+                <path d="M -3.35,-12.4 C -2.9,-12.0 -2.3,-11.9 -1.55,-12.02" fill="none"
                   stroke={P.parpado} strokeWidth="0.22" strokeLinecap="round" opacity="0.6" aria-hidden="true" />
               </g>
               <g>
                 <path d={OJO_DER_ALMENDRA} fill={P.esclera} />
                 <g clipPath={`url(#${ojoDClip})`}>
                   <g className={vivo ? 'rh-mirada' : undefined}>
-                    <circle cx="2.15" cy="-12.5" r="0.8" fill={P.iris} />
-                    <circle cx="2.2" cy="-12.45" r="0.42" fill={P.pupila} />
-                    <circle cx="1.9" cy="-12.8" r="0.15" fill="#f6efe0" opacity="0.9" />
+                    <circle cx="2.05" cy="-12.62" r="0.8" fill={P.iris} />
+                    <circle cx="2.1" cy="-12.58" r="0.44" fill={P.pupila} />
+                    <circle cx="1.82" cy="-12.85" r="0.12" fill="#f6efe0" opacity="0.9" />
                   </g>
-                  <path d="M 3.6,-13.0 C 3.05,-13.7 1.85,-13.75 1.15,-12.9 L 1.15,-12.5 C 1.9,-13.35 3.05,-13.3 3.6,-12.65 Z"
-                    fill={P.parpado} opacity="0.5" aria-hidden="true" />
+                  <path d="M 3.65,-13.1 C 3.05,-13.5 1.85,-13.45 1.1,-12.65 L 1.1,-12.2 C 1.9,-12.95 3.05,-13.0 3.65,-12.65 Z"
+                    fill={P.parpado} opacity="0.6" aria-hidden="true" />
                 </g>
-                <path d="M 3.5,-12.9 C 3.0,-13.6 1.85,-13.65 1.25,-12.85" fill="none"
-                  stroke={P.parpado} strokeWidth="0.42" strokeLinecap="round" />
-                <path d="M 3.3,-12.2 C 2.85,-11.85 2.3,-11.75 1.6,-11.9" fill="none"
+                <path d="M 3.55,-13.05 C 3.0,-13.4 1.9,-13.35 1.2,-12.6" fill="none"
+                  stroke={P.parpado} strokeWidth="0.5" strokeLinecap="round" />
+                <path d="M 3.35,-12.3 C 2.9,-11.9 2.3,-11.8 1.55,-11.92" fill="none"
                   stroke={P.parpado} strokeWidth="0.22" strokeLinecap="round" opacity="0.6" aria-hidden="true" />
               </g>
             </g>
@@ -770,7 +774,7 @@ export function OsoBaston({
             <g className="osb-hocico" style={{ transformBox: 'fill-box', transformOrigin: 'center top' }}>
               {/* la banda clara del morro que sube al entrecejo (la lámina):
                   GRANDE y ANCHA — el hocico manda en la mitad baja de la cara */}
-              <path d="M -2.9,-11.4 C -3.7,-9.3 -2.9,-7.2 0,-6.85 C 2.9,-7.2 3.7,-9.3 2.9,-11.4 C 1.9,-12.4 -1.9,-12.4 -2.9,-11.4 Z"
+              <path d="M -2.9,-11.4 C -3.75,-9.2 -3.0,-6.9 0,-6.45 C 3.0,-6.9 3.75,-9.2 2.9,-11.4 C 1.9,-12.4 -1.9,-12.4 -2.9,-11.4 Z"
                 fill={P.hocico} stroke={INK} strokeWidth="0.55" strokeLinejoin="round" />
               {/* el puente crema que conecta con el entrecejo */}
               <path d="M -1.0,-11.75 C -0.35,-12.05 0.35,-12.05 1.0,-11.75 C 0.55,-11.3 -0.55,-11.3 -1.0,-11.75 Z"
@@ -786,10 +790,13 @@ export function OsoBaston({
               {/* filtrum (el surco del labio, de la trufa al labio superior) */}
               <path d="M 0,-9.35 L 0,-8.6" stroke={INK} strokeWidth="0.3" strokeLinecap="round" opacity="0.8" aria-hidden="true" />
               {boca}
-              {/* BARBA de mechones crema bajo el mentón (la lámina): tapa la
-                  costura de tinta cráneo→gola y cae hacia el pecho */}
-              <path d="M -2.1,-7.0 C -1.3,-6.3 1.3,-6.3 2.1,-7.0 L 1.35,-6.35 L 0.65,-6.9 L 0,-6.25 L -0.65,-6.9 L -1.35,-6.35 Z"
-                fill={P.antifazSombra} opacity="0.9" aria-hidden="true" />
+              {/* la QUIJADA: media luna suave bajo el mentón (tapa la costura
+                  de tinta cráneo→gola SIN el zigzag-collar de la v. anterior) */}
+              <path d="M -1.95,-6.85 C -1.0,-6.05 1.0,-6.05 1.95,-6.85 C 1.0,-6.3 -1.0,-6.3 -1.95,-6.85 Z"
+                fill={P.antifazSombra} opacity="0.8" aria-hidden="true" />
+              {/* el pliegue del mentón (el gesto contenido aprieta la quijada) */}
+              <path d="M -0.85,-6.95 C -0.28,-6.75 0.28,-6.75 0.85,-6.95" fill="none"
+                stroke={P.hocicoSombra} strokeWidth="0.3" strokeLinecap="round" opacity="0.7" aria-hidden="true" />
             </g>
           </g>{/* /escala de lámina */}
           </g>
@@ -798,21 +805,21 @@ export function OsoBaston({
         {/* ═══ HUESO-BRAZO DERECHO: hombro→brazo macizo→ZARPA que EMPUÑA el
             bastón (garras sobre el palo). En 'celebra' alza el cayado entero. */}
         <g className="crt-brazo-r" style={{ transformBox: 'fill-box', transformOrigin: 'top left' }}>
-          <path d="M 4.8,-7.0 C 8.2,-7.4 10.6,-6.1 11.3,-4.2 C 11.8,-3.0 11.8,-2.0 11.5,-1.2 C 10.6,-0.7 9.6,-1.0 9.3,-1.9 C 9.0,-3.1 8.1,-4.1 6.7,-4.6 C 6.0,-4.9 5.3,-5.0 4.6,-4.9 Z"
+          <path d="M 5.0,-7.6 C 8.9,-8.05 11.7,-6.5 12.4,-4.5 C 12.9,-3.2 12.9,-2.1 12.5,-1.2 C 11.5,-0.7 10.4,-1.0 10.1,-1.9 C 9.8,-3.2 8.8,-4.3 7.3,-4.8 C 6.6,-5.1 5.8,-5.2 5.0,-5.1 Z"
             fill={`url(#${masa})`} stroke={INK} strokeWidth="1.0" strokeLinejoin="round" />
-          <ellipse cx="8.2" cy="-5.0" rx="1.8" ry="1.1" fill={P.cuerpoLuz} opacity="0.55"
-            transform="rotate(24 8.2 -5.0)" filter={`url(#${pincel})`} aria-hidden="true" />
+          <ellipse cx="8.9" cy="-5.4" rx="2.0" ry="1.2" fill={P.cuerpoLuz} opacity="0.6"
+            transform="rotate(24 8.9 -5.4)" filter={`url(#${pincel})`} aria-hidden="true" />
           {/* rim-light del hombro del bastón */}
-          <path d="M 6.2,-6.6 C 8.6,-6.6 10.2,-5.5 10.8,-3.9" fill="none"
-            stroke={P.brillo} strokeWidth="0.5" strokeLinecap="round" opacity="0.5" aria-hidden="true" />
+          <path d="M 6.4,-7.2 C 9.2,-7.2 11.2,-6.0 11.9,-4.2" fill="none"
+            stroke={P.brillo} strokeWidth="0.55" strokeLinecap="round" opacity="0.6" aria-hidden="true" />
           {baston}
           {/* LA ZARPA QUE EMPUÑA, encima del palo: puño con garras que agarran */}
-          <ZarpaMano cx={10.75} cy={-1.7} r={2.15} rot={4} garrasAbajo={false} P={P} INK={INK} />
+          <ZarpaMano cx={11.0} cy={-1.65} r={2.3} rot={4} garrasAbajo={false} P={P} INK={INK} />
           {/* los dedos que cierran SOBRE el palo (la tinta los lee) */}
           <g aria-hidden="true" fill="none" stroke={INK} strokeWidth="0.35" strokeLinecap="round" opacity="0.65">
-            <path d="M 9.9,-2.3 C 10.6,-2.5 11.3,-2.5 11.8,-2.2" />
-            <path d="M 9.9,-1.6 C 10.6,-1.8 11.3,-1.8 11.8,-1.5" />
-            <path d="M 10.0,-0.9 C 10.6,-1.1 11.2,-1.1 11.7,-0.85" />
+            <path d="M 10.1,-2.3 C 10.8,-2.5 11.5,-2.5 12.0,-2.2" />
+            <path d="M 10.1,-1.6 C 10.8,-1.8 11.5,-1.8 12.0,-1.5" />
+            <path d="M 10.2,-0.9 C 10.8,-1.1 11.4,-1.1 11.9,-0.85" />
           </g>
         </g>
 
