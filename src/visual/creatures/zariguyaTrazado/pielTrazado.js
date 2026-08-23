@@ -35,10 +35,12 @@
 import { RH_LINE_BOIL } from '../rubberhoseSpec.js';
 import { CALCO_TRAZADO, AIRE_LIMPIO_D } from './calcoTrazado.js';
 
-/* Dos islas de tinta del calco compuesto quedan dentro de la región de la
-   cabeza aunque pertenecen al brazo. Se excluyen en el mismo clip even-odd,
-   antes de que la cabeza pueda llevarlas consigo al girar. */
-const AIRE_LIMPIO_SIN_ISLAS_D = `${AIRE_LIMPIO_D}M58 98h40v24H58ZM58 126h44v48H58Z`;
+/* NOTA (islas del brazo): un intento previo excluía del clip GLOBAL dos
+   rects (x58-102, y98-174) para que la cabeza no arrastrara tinta del brazo
+   al girar — pero el clip global también se la quitaba al PROPIO brazo:
+   amputaba la punta del lápiz y pelaje de la garra en REPOSO (verificado a
+   ojo, diff crudo-vs-rig). El fix de raíz está en ZT_REGIONES.cabeza: el
+   bolsillo ya no reclama la zona de la garra ni el aire con pelos. */
 
 /* ── PIVOTES (px del espacio 481×444 de la lámina) ──────────────────────────
    Fuente: zariguyaLamina/anatomia.js (medidos sobre la lámina con grilla y
@@ -83,15 +85,27 @@ export const ZT_REGIONES = Object.freeze({
     [274, -8], [316, -8], [316, 110], [306, 118], [294, 126], [280, 132],
     [264, 136], [250, 136], [246, 130], [246, 80], [236, 80], [236, 106],
     [212, 106], [212, 84], [144, 84], [144, 128], [140, 134], [134, 150],
-    [126, 168], [116, 182], [106, 187], [97, 180], [93, 168], [92, 152],
-    [84, 149], [72, 143], [67, 133], [74, 124], [85, 118], [91, 110],
+    [126, 168], [116, 182], [112, 168], [108, 150], [100, 136], [92, 126],
+    [85, 118], [91, 110],
     [92, 88], [94, 56],
   ],
+  /* ↑ El bolsillo izquierdo se RECORTÓ a la mejilla real: antes reclamaba la
+     zona de la garra/lápiz (x 67-97, y 124-152) y el aire con pelos sueltos
+     (x 93-116, y 150-187) — al girar, la cabeza se llevaba copias de esa
+     tinta (motas flotantes). La tinta del brazo es del brazo. */
+  /* CUELLO con LÓBULO izquierdo (fix "correa"): la banda de pelaje achurado
+     que baja de la mejilla al hombro (x 96-160, y 124-210) era TIERRA DE
+     NADIE — ninguna región la reclamaba: en reposo quedaba un hueco pálido y
+     el dedo que sí reclama `cabeza` flotaba encima como una correa de gorro.
+     El lóbulo la reclama entera; donde solapa con `cabeza`/`brazoLapiz` es
+     respaldo doble-pintado (patrón oreja/baseSub): pelaje bajo pelaje. */
   cuello: [
     [144, 126], [246, 126], [246, 128], [250, 134], [264, 134], [280, 130],
     [294, 124], [306, 116], [316, 108], [316, 120], [300, 134], [286, 146],
     [272, 158], [256, 168], [238, 176], [218, 180], [196, 178], [176, 172],
-    [160, 162], [150, 148], [142, 136],
+    [160, 162], [154, 178], [146, 196], [138, 210], [124, 202], [112, 194],
+    [104, 184], [100, 168], [100, 148], [104, 132], [112, 126], [122, 124],
+    [138, 124],
   ],
   mandibula: [
     [144, 82], [212, 82], [212, 104], [236, 104], [236, 78], [246, 78],
@@ -178,12 +192,16 @@ const banda = (pts, a, b) => {
 };
 
 export const ZT_BANDAS = Object.freeze({
-  /* Bordes estático-vs-estático del cuello y la cabeza: 2px por lado. */
+  /* bCabeza: 3px lado cuello + 40px lado CABEZA. El respaldo del giro de
+     cabeza es CALCO REAL (casqueteCalco), no color plano: 40px cubre el
+     reveal del stress −18° (~36px en el extremo lejano de la costura). La
+     elipse gris que hacía este papel ERA el "gorro" — eliminada. */
   bCabeza: banda([[144, 127], [246, 127], [252, 134], [264, 134], [280, 130],
-    [294, 124], [306, 116], [316, 109]], 2, 2),
+    [294, 124], [306, 116], [316, 109]], 3, 40),
+  /* bCuello: 3px lado tronco + 12px lado cuello (±3.2° revela ≤6px). */
   bCuello: banda([[142, 136], [150, 148], [160, 162], [176, 172], [196, 178],
     [218, 180], [238, 176], [256, 168], [272, 158], [286, 146], [300, 134],
-    [316, 120]], 2, 2),
+    [316, 120]], 3, 12),
   bBrujula: banda([[132, 216], [152, 214], [168, 210], [186, 204], [204, 200],
     [216, 204], [220, 214], [214, 226], [202, 234], [196, 244], [192, 280],
     [178, 294], [158, 302]], 7, 7),
@@ -201,9 +219,11 @@ export const ZT_BANDAS = Object.freeze({
   /* Respaldo estrecho del borde inferior del hocico. La cabeza gira alrededor
      de (202,126); a +14° deja libre esta cuña antes de que el cuello pueda
      cubrirla. El calco se vuelve a pintar encima del relleno para conservar
-     la tinta donde existe, y el relleno solo ocupa sus huecos transparentes. */
-  bHocico: [[105, 100], [250, 100], [250, 132], [220, 136], [190, 132],
-    [160, 130], [140, 136], [120, 132], [105, 120]],
+     la tinta donde existe. OJO: el polígono NO baja de la costura y=126 —
+     por debajo ni cabeza ni mandíbula repintan y el crema quedaba como una
+     barra visible cruzando la boca EN REPOSO (verificado); bajo la costura
+     el respaldo es el lóbulo del cuello (pelaje real). */
+  bHocico: [[105, 100], [250, 100], [250, 126], [105, 126]],
 });
 
 const P = Object.freeze({
@@ -240,16 +260,16 @@ const usoCalco = (region) => `<use href="#ztCalco" clip-path="url(#zt-r-${region
 /** Casquete/respaldo anti-costura: pintado en el PADRE justo antes del hijo,
     recortado a la región ESTÁTICA del hijo → invisible en reposo, tapa la
     franja que el hijo desocupa al rotar. */
-const casquete = (region, forma) => `<g clip-path="url(#zt-r-${region})">${forma}</g>`;
+const casquete = (region, forma) => `<g class="zt-casquete zt-casquete-${region}" clip-path="url(#zt-r-${region})">${forma}</g>`;
 
 /** Casquete de CALCO: el propio trazado, restringido a la región estática
     del hueso y a su banda dilatada. En reposo queda bajo el píxel original;
     al moverse, la franja revelada sigue siendo dibujo REAL. */
 const casqueteCalco = (region, nombre) =>
-  `<g clip-path="url(#zt-b-${nombre})"><use href="#ztCalco" clip-path="url(#zt-r-${region})"/></g>`;
+  `<g class="zt-casqueteCalco zt-casqueteCalco-${region}" clip-path="url(#zt-b-${nombre})"><use href="#ztCalco" clip-path="url(#zt-r-${region})"/></g>`;
 
 const casqueteCalcoRelleno = (region, nombre, relleno) =>
-  `<g clip-path="url(#zt-b-${nombre})">${relleno}<use href="#ztCalco" clip-path="url(#zt-r-${region})"/></g>`;
+  `<g class="zt-casqueteRelleno zt-casqueteRelleno-${region}" clip-path="url(#zt-b-${nombre})">${relleno}<use href="#ztCalco" clip-path="url(#zt-r-${region})"/></g>`;
 
 const elipse = (cx, cy, rx, ry, fill, rot = 0) =>
   `<ellipse cx="${cx}" cy="${cy}" rx="${rx}" ry="${ry}" fill="${fill}"${rot ? ` transform="rotate(${rot} ${cx} ${cy})"` : ''}/>`;
@@ -258,15 +278,9 @@ const disco = (cx, cy, r, fill) => `<circle cx="${cx}" cy="${cy}" r="${r}" fill=
 /* ─────────────────────────────── defs ────────────────────────────────────── */
 
 const DEFS = `<defs>
-  <clipPath id="ztAireLimpio"><path clip-rule="evenodd" fill-rule="evenodd" d="${AIRE_LIMPIO_SIN_ISLAS_D}"/></clipPath>
+  <clipPath id="ztAireLimpio"><path clip-rule="evenodd" d="${AIRE_LIMPIO_D}"/></clipPath>
   <g id="ztCalco" clip-path="url(#ztAireLimpio)">${CALCO_TRAZADO}</g>
   ${CLIPS}
-  <linearGradient id="ztCuello" x1="215" y1="140" x2="228" y2="215" gradientUnits="userSpaceOnUse">
-    <stop offset="0" stop-color="#4e4337"/>
-    <stop offset=".45" stop-color="#6b5f50"/>
-    <stop offset=".78" stop-color="#b7a88c"/>
-    <stop offset="1" stop-color="#eadfc9"/>
-  </linearGradient>
   <radialGradient id="ztAura" cx=".5" cy=".5" r=".5">
     <stop offset="0" stop-color="${P.luna}" stop-opacity=".34"/>
     <stop offset=".7" stop-color="${P.rocio}" stop-opacity=".12"/>
@@ -397,11 +411,9 @@ ${DEFS}
           ${casqueteCalco('manoLapiz', 'bMuneca')}
           <g class="zh-hueso zh-brazoLapizAnte zh-manoLapiz"${origin('munecaLapiz')}>${usoCalco('manoLapiz')}</g>
         </g>
-        ${casquete('cuello', elipse(218, 158, 46, 18, 'url(#ztCuello)', -8))}
         ${casqueteCalco('cuello', 'bCuello')}
         <g class="zh-hueso zh-cuello"${origin('cuello')}>
           ${usoCalco('cuello')}
-          ${casquete('cabeza', elipse(212, 124, 60, 22, 'url(#ztCuello)', -7))}
           ${casqueteCalco('cabeza', 'bCabeza')}
           ${casqueteCalcoRelleno('cabeza', 'bHocico', `<path d="${dPoly(ZT_BANDAS.bHocico)}" fill="${P.pecho}"/>`)}
           <g class="zh-hueso zh-cabezaGiro"${origin('cabeza')}>

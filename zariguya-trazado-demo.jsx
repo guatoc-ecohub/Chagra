@@ -21,6 +21,32 @@ const CALCO_COMPLETO = `${CLIP_AIRE}<g${CLIP_AIRE ? ' clip-path="url(#crudoAire)
 const q = new URLSearchParams(location.search);
 const vista = q.get('vista') || 'todo';
 if (q.get('fondo') === 'magenta') document.body.classList.add('magenta');
+/* ?sin=casquete,casqueteCalco,fauces… → apaga capas del rig por clase, para
+   atribuir a ojo qué capa pinta un defecto (diagnóstico, no producto). */
+if (q.get('sin')) {
+  const s = document.createElement('style');
+  s.textContent = q.get('sin').split(',')
+    .map((c) => c.trim())
+    .map((c) => `.${c.startsWith('zh-') ? c : `zt-${c}`}{display:none !important}`)
+    .join('\n');
+  document.head.appendChild(s);
+}
+/* ?sonda=x,y (px de página) → overlay con el stack de elementsFromPoint en
+   ese punto + una cruz roja marcándolo (atribuir a ojo qué capa pinta ahí). */
+if (q.get('sonda')) {
+  const [sx, sy] = q.get('sonda').split(',').map(Number);
+  setTimeout(() => {
+    const pila = document.elementsFromPoint(sx, sy)
+      .map((el) => `${el.tagName}${el.getAttribute('class') ? `.${el.getAttribute('class').split(' ').join('.')}` : ''}${el.getAttribute('fill') ? `[fill=${el.getAttribute('fill')}]` : ''}${el.getAttribute('href') ? `[${el.getAttribute('href')}]` : ''}${el.getAttribute('clip-path') ? `[clip=${el.getAttribute('clip-path')}]` : ''}${el.getAttribute('d') ? `[d=${el.getAttribute('d').slice(0, 40)}…]` : ''}`);
+    const caja = document.createElement('pre');
+    caja.style.cssText = 'position:fixed;right:8px;top:8px;max-width:560px;background:#000;color:#0f0;font:11px monospace;padding:8px;z-index:99;white-space:pre-wrap;word-break:break-all';
+    caja.textContent = `sonda @ ${sx},${sy}\n${pila.join('\n')}`;
+    document.body.appendChild(caja);
+    const cruz = document.createElement('div');
+    cruz.style.cssText = `position:fixed;left:${sx - 6}px;top:${sy - 6}px;width:12px;height:12px;border:2px solid #f00;border-radius:50%;z-index:98;pointer-events:none`;
+    document.body.appendChild(cruz);
+  }, 1200);
+}
 if (q.get('quieto')) {
   const s = document.createElement('style');
   s.textContent = '*{animation:none !important;transition:none !important}';

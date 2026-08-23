@@ -254,7 +254,15 @@ const { esAire, esProfundo, esBorde, alfa } = await cargarOraculos();
 const fuente = readFileSync(ARCHIVO, 'utf8');
 const mCalco = fuente.match(/export const CALCO_TRAZADO = `([\s\S]*?)`;/);
 if (!mCalco) throw new Error('no encontré CALCO_TRAZADO');
-const paths = mCalco[1].match(/<path[^>]*\/>/g) || [];
+/* Calco receta-buena: viene envuelto en <defs><clipPath id="ztSilueta">…
+   </defs><g clip-path=…>paths</g>. El condenador SOLO mira los paths del
+   dibujo — los del clipPath de silueta ni se tocan (mutilarlos abriría
+   huecos en el recorte del papel). */
+const mEnv = mCalco[1].match(/^([\s\S]*?<g[^>]*>)([\s\S]*)(<\/g>)$/);
+const [envPrefijo, cuerpoCalco, envSufijo] = mEnv
+  ? [mEnv[1], mEnv[2], mEnv[3]]
+  : ['', mCalco[1], ''];
+const paths = cuerpoCalco.match(/<path[^>]*\/>/g) || [];
 console.log(`${paths.length} paths en el calco`);
 
 const condenados = []; // debug
@@ -316,7 +324,7 @@ if (modo === '--analizar') {
   writeFileSync(debug, JSON.stringify(condenados, null, 1));
   console.log(`debug → ${debug} (arnés: ?vista=bigotes pinta lo condenado en rojo)`);
 } else if (modo === '--hornear') {
-  const interior = nuevosPaths.join('');
+  const interior = envPrefijo + nuevosPaths.join('') + envSufijo;
   const cabecera = fuente.slice(0, fuente.indexOf('export const CALCO_TRAZADO'));
   const cola = `/* Clip EVENODD "aire limpio" (paso 5, ver extraer-bigotes.mjs): rect total
    + rects-scanline del aire de las megazonas de bigotes. Aplicado UNA vez a
