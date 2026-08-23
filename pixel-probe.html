@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="es">
+<head><meta charset="utf-8"><title>pixel-probe calco</title>
+<style>body{font:13px monospace;background:#fff;color:#000;margin:8px} pre{font-size:13px;line-height:1.35}</style>
+</head>
+<body>
+<pre id="out">midiendo…</pre>
+<script>
+const img = new Image();
+img.src = '/calco-debug.svg';
+img.onload = () => {
+  const W = 481, H = 444;
+  const cv = document.createElement('canvas');
+  cv.width = W; cv.height = H;
+  const cx = cv.getContext('2d', { willReadFrequently: true });
+  cx.drawImage(img, 0, 0, W, H);
+  const d = cx.getImageData(0, 0, W, H).data;
+  const at = (x, y) => { const i = (y * W + x) * 4; return [d[i], d[i + 1], d[i + 2], d[i + 3]]; };
+  const opaque = (x, y) => at(x, y)[3] > 60;
+
+  // bbox de un predicado de color
+  function bbox(pred, x0 = 0, y0 = 0, x1 = W, y1 = H) {
+    let mnx = 1e9, mny = 1e9, mxx = -1, mxy = -1, n = 0;
+    for (let y = y0; y < y1; y++) for (let x = x0; x < x1; x++) {
+      const [r, g, b, a] = at(x, y);
+      if (a > 60 && pred(r, g, b)) { n++; if (x < mnx) mnx = x; if (x > mxx) mxx = x; if (y < mny) mny = y; if (y > mxy) mxy = y; }
+    }
+    return n ? `(${mnx},${mny})-(${mxx},${mxy}) n=${n}` : 'VACIO';
+  }
+  // fila de silueta: primer/último x opaco en una y
+  function fila(y) {
+    let a = -1, b = -1;
+    for (let x = 0; x < W; x++) if (opaque(x, y)) { if (a < 0) a = x; b = x; }
+    return `y=${y}: x ${a}..${b}`;
+  }
+  // columna: primer/último y opaco en una x
+  function col(x) {
+    let a = -1, b = -1;
+    for (let y = 0; y < H; y++) if (opaque(x, y)) { if (a < 0) a = y; b = y; }
+    return `x=${x}: y ${a}..${b}`;
+  }
+  // tramos opacos de una fila (para tubos de cola: lista de segmentos)
+  function tramos(y, xmin = 0, xmax = W) {
+    const s = []; let ini = -1;
+    for (let x = xmin; x < xmax; x++) {
+      if (opaque(x, y)) { if (ini < 0) ini = x; }
+      else if (ini >= 0) { s.push(`${ini}-${x - 1}`); ini = -1; }
+    }
+    if (ini >= 0) s.push(`${ini}-${xmax - 1}`);
+    return `y=${y} x∈[${xmin},${xmax}]: ` + (s.join(' | ') || 'nada');
+  }
+  function tramosCol(x, ymin = 0, ymax = H) {
+    const s = []; let ini = -1;
+    for (let y = ymin; y < ymax; y++) {
+      if (opaque(x, y)) { if (ini < 0) ini = y; }
+      else if (ini >= 0) { s.push(`${ini}-${y - 1}`); ini = -1; }
+    }
+    if (ini >= 0) s.push(`${ini}-${ymax - 1}`);
+    return `x=${x} y∈[${ymin},${ymax}]: ` + (s.join(' | ') || 'nada');
+  }
+
+  function tramosPred(y, pred, xmin = 0, xmax = W) {
+    const s = []; let ini = -1;
+    for (let x = xmin; x < xmax; x++) {
+      const [r, g, b, a] = at(x, y);
+      const ok = a > 60 && pred(r, g, b);
+      if (ok) { if (ini < 0) ini = x; }
+      else if (ini >= 0) { s.push(`${ini}-${x - 1}`); ini = -1; }
+    }
+    if (ini >= 0) s.push(`${ini}-${xmax - 1}`);
+    return `y=${y}: ` + (s.join(' | ') || 'nada');
+  }
+  const L = [];
+  const diente = (r, g, b) => r > 225 && g > 215 && b > 190;
+  const oscuro = (r, g, b) => r < 75 && g < 62 && b < 58;
+  const rosa = (r, g, b) => r > 185 && g > 110 && g < 185 && b > 115 && b < 195;
+  L.push('== DIENTES zona AMPLIA (x 100-300, y 40-180) ==');
+  L.push(bbox(diente, 100, 40, 300, 180));
+  L.push('== DIENTES tramos color por fila ==');
+  [70, 78, 86, 94, 102, 110, 118, 126, 134].forEach(y => L.push(tramosPred(y, diente, 100, 300)));
+  L.push('== TRUFA rosa zona amplia (x 150-300, y 30-160) ==');
+  L.push(bbox(rosa, 150, 30, 300, 160));
+  L.push('== rosa tramos ==');
+  [60, 70, 80, 90, 100, 110].forEach(y => L.push(tramosPred(y, rosa, 150, 300)));
+  L.push('== OSCURO (ojos/mascara) tramos por fila ==');
+  [40, 50, 60, 70, 80, 90, 100].forEach(y => L.push(tramosPred(y, oscuro, 100, 300)));
+  L.push('== ARO BRUJULA (laton 140-200/95-150/25-90) zona amplia ==');
+  L.push(bbox((r, g, b) => r > 140 && r < 200 && g > 95 && g < 150 && b > 25 && b < 90, 70, 180, 230, 340));
+  L.push('== aro tramos filas ==');
+  [220, 235, 250, 265, 280, 295].forEach(y => L.push(tramosPred(y, (r, g, b) => r > 140 && r < 200 && g > 95 && g < 150 && b > 25 && b < 90, 70, 240)));
+  document.getElementById('out').textContent = L.join('\n');
+  document.title = 'probe-LISTO';
+};
+img.onerror = () => { document.getElementById('out').textContent = 'ERROR cargando calco'; };
+</script>
+</body>
+</html>
