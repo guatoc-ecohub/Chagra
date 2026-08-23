@@ -360,6 +360,9 @@ const CriaturasNocturnasMockup = lazy(() => import('./mockups/CriaturasNocturnas
 // Angelita al máximo: la entrada teatral (gafas + crecimiento) y el repertorio
 // completo de estados del agente, uno al lado del otro.
 const AngelitaVivaMockup = lazy(() => import('./mockups/AngelitaViva'));
+// La guacamaya al máximo (espejo de AngelitaViva para la 7ma del elenco):
+// entrada teatral, repertorio de los 10 estados sobre el rig F24 y salida épica.
+const GuacamayaVivaMockup = lazy(() => import('./mockups/GuacamayaViva'));
 // 3D: la BOTICA campesina (canteros de medicinales y aromáticas: ruda,
 // caléndula, hierbabuena, sábila, limoncillo, ortiga, manzanilla) + la CAÑA
 // PANELERA (cañal, trapiche de buey, hornilla con paila y gaveras). Didáctico:
@@ -852,6 +855,7 @@ const MOCKUP_HASH_ROUTES = {
   'mockups/cara-prod': 'mockup_cara_prod',
   'mockups/criaturas-nocturnas': 'mockup_criaturas_nocturnas',
   'mockups/angelita-viva': 'mockup_angelita_viva',
+  'mockups/guacamaya-viva': 'mockup_guacamaya_viva',
   'mockups/mundo-polinizadores-3d': 'mockup_mundo_polinizadores_3d',
   'mockups/mundo-botica-cana-3d': 'mockup_mundo_botica_cana_3d',
   'mockups/mundo-frutales-3d': 'mockup_mundo_frutales_3d',
@@ -2629,6 +2633,17 @@ export default function App() {
           <ErrorBoundary>
             <ErrorFallback moduleName="Angelita, la compañera viva">
               <AngelitaVivaMockup onBack={() => navigate('dashboard')} />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
+      case 'mockup_guacamaya_viva':
+        // La guacamaya al máximo (#/mockups/guacamaya-viva): entrada teatral,
+        // los 10 estados del agente sobre el rig F24 (con gaze-follow y
+        // espejo) y la salida épica. ?estado=<nombre> agranda uno.
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="La Guacamaya, la compañera viva">
+              <GuacamayaVivaMockup onBack={() => navigate('dashboard')} />
             </ErrorFallback>
           </ErrorBoundary>
         );

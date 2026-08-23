@@ -22,6 +22,19 @@ const MAPA_2D = {
   valle2d: GemeloValleEscena,
 };
 
+/**
+ * Todas las props son opcionales en runtime (cada arquetipo 2D trae sus
+ * defaults); solo `escena` decide qué se monta — sin match, no renderiza.
+ * @param {Object} props
+ * @param {string} [props.escena]  clave de MAPA_2D ('mirror'|'infografia'|'ficha'|'lamina'|'valle2d').
+ * @param {Object} [props.entrada]  manifiesto del mundo (params/hotspots/titulo…).
+ * @param {string} [props.motivo]  por qué se degradó a 2D (solo 'mirror').
+ * @param {string[]} [props.tinte]  paleta [fuerte, suave] del mundo.
+ * @param {boolean} [props.reducedMotion]
+ * @param {Function} [props.onHotspot]
+ * @param {string} [props.animo]
+ * @param {number} [props.energia]
+ */
 export default function Mundo2D({
   escena, entrada, motivo, tinte, reducedMotion, onHotspot, animo, energia,
 }) {

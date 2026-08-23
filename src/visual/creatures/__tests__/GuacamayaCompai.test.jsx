@@ -212,3 +212,65 @@ describe('GuacamayaCompai', () => {
       expect(style.textContent).toContain('[data-guaca-mira="usted"]');
     });
   });
+
+  describe('contrato de paridad con Angelita (direccion/animated/idleCerebro)', () => {
+    test('direccion="izquierda" voltea el dibujo completo (scaleX(-1), como Angelita)', () => {
+      const { container } = render(<GuacamayaCompai estado="senala" direccion="izquierda" />);
+      const svg = /** @type {SVGSVGElement} */ (container.querySelector('svg[data-creature="guacamaya"]'));
+      expect(svg.style.transform).toBe('scaleX(-1)');
+    });
+
+    test('direccion por defecto (derecha) NO voltea ni ensucia el style', () => {
+      const { container } = render(<GuacamayaCompai estado="senala" />);
+      const svg = /** @type {SVGSVGElement} */ (container.querySelector('svg[data-creature="guacamaya"]'));
+      expect(svg.style.transform).toBe('');
+    });
+
+    test('direccion="izquierda" respeta el style que mande el host (se fusionan)', () => {
+      const { container } = render(
+        <GuacamayaCompai direccion="izquierda" style={{ opacity: 0.5 }} />,
+      );
+      const svg = /** @type {SVGSVGElement} */ (container.querySelector('svg[data-creature="guacamaya"]'));
+      expect(svg.style.transform).toBe('scaleX(-1)');
+      expect(svg.style.opacity).toBe('0.5');
+    });
+
+    test('animated=false marca el fotograma digno (data-guaca-vivo="0") y apaga el idle', () => {
+      const { container } = render(<GuacamayaCompai estado="acompana" animated={false} />);
+      const svg = container.querySelector('svg[data-creature="guacamaya"]');
+      expect(svg).toHaveAttribute('data-guaca-vivo', '0');
+      // sin vida no hay idle-cerebro corriendo (data-guaca-idle ausente)
+      expect(svg).not.toHaveAttribute('data-guaca-idle');
+    });
+
+    test('animated=true (default) marca data-guaca-vivo="1"', () => {
+      const { container } = render(<GuacamayaCompai estado="acompana" />);
+      const svg = container.querySelector('svg[data-creature="guacamaya"]');
+      expect(svg).toHaveAttribute('data-guaca-vivo', '1');
+    });
+
+    test('el <style> trae la regla de quietud scoped a data-guaca-vivo="0"', () => {
+      const { container } = render(<GuacamayaCompai />);
+      const style = container.querySelector('svg style');
+      expect(style.textContent).toContain('[data-guaca-vivo="0"]');
+    });
+
+    test('idleCerebro=false apaga SOLO el reloj de micro-gestos (la pausa "quieta" de la entrada)', () => {
+      const { container } = render(<GuacamayaCompai estado="acompana" idleCerebro={false} />);
+      const svg = container.querySelector('svg[data-creature="guacamaya"]');
+      expect(svg).not.toHaveAttribute('data-guaca-idle');
+      // pero sigue viva (el boil base es CSS, no lo toca este gate)
+      expect(svg).toHaveAttribute('data-guaca-vivo', '1');
+    });
+
+    test('las props del contrato NO se fugan como atributos DOM inválidos', () => {
+      const { container } = render(
+        <GuacamayaCompai estado="acompana" direccion="izquierda" animated idleCerebro={false} />,
+      );
+      const svg = container.querySelector('svg[data-creature="guacamaya"]');
+      expect(svg).not.toHaveAttribute('direccion');
+      expect(svg).not.toHaveAttribute('animated');
+      expect(svg).not.toHaveAttribute('idleCerebro');
+      expect(svg).not.toHaveAttribute('idlecerebro');
+    });
+  });

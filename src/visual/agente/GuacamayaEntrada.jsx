@@ -61,7 +61,9 @@ function prefiereQuietud() {
  * @param {string} [props.tier]  'bajo' apaga decoración del número (el show
  *   sigue: es feedback de llegada, no decoración).
  * @param {() => void} [props.onLista]  el show terminó: ya es la asistente.
- *   El resto de props (enso, energia, visema, …) pasan a <GuacamayaCompai>.
+ * @param {string} [props.className]  clases extra en el wrapper del teatro.
+ * @param {string|null} [props.visema]  'V1'..'V4' de useLipSync — passthrough.
+ *   El resto de props (enso, energia, …) pasan igual a <GuacamayaCompai>.
  */
 export function GuacamayaEntrada({
   activa = true,

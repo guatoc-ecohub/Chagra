@@ -41,6 +41,9 @@ function prefiereQuietud() {
  * @param {boolean} [props.animated=true]
  * @param {string} [props.tier]  'bajo' apaga decoración.
  * @param {() => void} [props.onSalio]  el show terminó: ya se fue.
+ * @param {string} [props.className]  clases extra en el wrapper.
+ * @param {string|null} [props.visema]  'V1'..'V4' de useLipSync — passthrough
+ *   a <GuacamayaCompai> (el resto de props extra viajan igual).
  */
 export function GuacamayaSalida({
   activa = true,

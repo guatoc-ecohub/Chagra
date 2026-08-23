@@ -104,7 +104,16 @@ const CSS_GAZE_FOLLOW = `
 [data-guaca-mira="usted"] .pupila{animation:none;transform:translate(var(--guaca-mx,0),var(--guaca-my,0))}
 `;
 
-const CSS_RIG = hostALigero(extraerCssDelRig(cssCompleto, MARCADOR_CSS)) + CSS_VISEMA_PICO + CSS_GAZE_FOLLOW;
+/* FOTOGRAMA DIGNO (animated=false) — mismo contrato que Angelita.jsx: el host
+   pide quietud total (p.ej. la pausa "quieta" de la entrada teatral congela el
+   número, o un listado con muchas instancias). El rig verbatim ya congela por
+   prefers-reduced-motion (su @media al final); esta regla NUEVA del wrapper da
+   el mismo freno vía prop, scoped al svg que declare data-guaca-vivo="0". */
+const CSS_QUIETO = `
+[data-guaca-vivo="0"] *{animation:none!important;transition:none!important}
+`;
+
+const CSS_RIG = hostALigero(extraerCssDelRig(cssCompleto, MARCADOR_CSS)) + CSS_VISEMA_PICO + CSS_GAZE_FOLLOW + CSS_QUIETO;
 const MARCADO_CRUDO = `${defsSvg}\n${rigSvg}`;
 const IDS = idsDeclaradosEnSvg(MARCADO_CRUDO);
 
@@ -203,6 +212,15 @@ const SUELTA_MIRADA_MS = 1900;
  *
  * El idle-cerebro (micro-gestos sin repetir) SOLO corre cuando se usa la API
  * rica (`estado` presente) — no cambia el comportamiento narrow existente.
+ *
+ * Contrato de PARIDAD con Angelita.jsx (mismos nombres, misma semántica):
+ *   - `direccion` 'derecha'|'izquierda' — hacia dónde mira/señala (izquierda =
+ *     espejo del dibujo completo, scaleX(-1); el gaze-follow voltea su x).
+ *     AngelitaGuia ya la manda — antes caía como atributo DOM inválido.
+ *   - `animated` false = fotograma digno: congela las animaciones del rig
+ *     (data-guaca-vivo="0" + CSS_QUIETO) y apaga idle-cerebro y gaze-follow.
+ *   - `idleCerebro` false apaga SOLO el reloj de micro-gestos (la pausa
+ *     "quieta" de GuacamayaEntrada: viva de boil base, sin fisgonear).
  */
 export function GuacamayaCompai({
   state = 'idle',
@@ -210,11 +228,15 @@ export function GuacamayaCompai({
   visema = null,
   tier = undefined,
   size = 64,
+  direccion = 'derecha',
+  animated = true,
+  idleCerebro = true,
   className = '',
   style = undefined,
   title = GUACAMAYA_NOMBRE,
   ...rest
 }) {
+  const vivo = animated;
   const sufijo = useId().replace(/[:]/g, '');
   const marcado = useMemo(() => namespaceSvg(MARCADO_CRUDO, IDS, sufijo), [sufijo]);
   const css = useMemo(() => namespaceCss(CSS_RIG, IDS, sufijo), [sufijo]);
@@ -233,7 +255,8 @@ export function GuacamayaCompai({
      todavía no está cableada, el scheduler ya corre y ya se puede consumir.
      Gates: solo con `estado` (API rica), `acompana`/idle, `tier!=='bajo'`,
      `prefiereQuietud()`. */
-  const idleActivo = estado !== undefined
+  const idleActivo = vivo && idleCerebro
+    && estado !== undefined
     && estadoCanonico(estado) === 'acompana'
     && tier !== 'bajo';
   const [momento, setMomento] = useState('flota');
@@ -272,7 +295,7 @@ export function GuacamayaCompai({
   const svgRef = useRef(null);
   const estadoParaGaze = estado || undefined;
   const estadoCanonicoParaGaze = estadoCanonico(estadoParaGaze);
-  const sigueUsted = tier !== 'bajo' && estadosQueLoMiran().has(estadoCanonicoParaGaze);
+  const sigueUsted = vivo && tier !== 'bajo' && estadosQueLoMiran().has(estadoCanonicoParaGaze);
   useEffect(() => {
     const svg = svgRef.current;
     if (!sigueUsted || !svg || prefiereQuietud()) return undefined;
@@ -280,6 +303,7 @@ export function GuacamayaCompai({
     let soltar = 0;
     let px = 0;
     let py = 0;
+    const signo = direccion === 'izquierda' ? -1 : 1; // el espejo voltea la x
     const liberar = () => svg.removeAttribute('data-guaca-mira');
     const mirar = () => {
       raf = 0;
@@ -293,7 +317,7 @@ export function GuacamayaCompai({
       if (Math.hypot(dx, dy) > RADIO_DE_ATENCION) { liberar(); return; }
       // Deflexión de pupila en unidades del viewBox (misma amplitud ~0.55 del
       // dardeo natural del rig); saturada a ~150px — más lejos ya es "mirar hacia allá".
-      const mx = Math.max(-1, Math.min(1, dx / 150)) * 0.65;
+      const mx = signo * Math.max(-1, Math.min(1, dx / 150)) * 0.65;
       const my = Math.max(-1, Math.min(1, dy / 150)) * 0.5;
       svg.style.setProperty('--guaca-mx', `${mx.toFixed(3)}px`);
       svg.style.setProperty('--guaca-my', `${my.toFixed(3)}px`);
@@ -317,7 +341,11 @@ export function GuacamayaCompai({
       svg.style.removeProperty('--guaca-mx');
       svg.style.removeProperty('--guaca-my');
     };
-  }, [sigueUsted]);
+  }, [sigueUsted, direccion]);
+
+  // El espejo voltea el dibujo COMPLETO (misma técnica que Angelita.jsx L598).
+  const espejo = direccion === 'izquierda' ? { transform: 'scaleX(-1)' } : null;
+  const estilo = espejo || style ? { ...espejo, ...style } : undefined;
 
   return (
     <svg
@@ -326,12 +354,13 @@ export function GuacamayaCompai({
       width={size}
       height={size}
       className={className}
-      style={style}
+      style={estilo}
       role="img"
       aria-label={title}
       data-creature={GUACAMAYA_SLUG}
       data-estado={dataEstado}
       data-visema={visema || undefined}
+      data-guaca-vivo={vivo ? '1' : '0'}
       data-guaca-idle={idleActivo ? momento : undefined}
       data-tier={tier || undefined}
       {...rest}
