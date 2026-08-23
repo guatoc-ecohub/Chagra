@@ -184,6 +184,86 @@
   50%      { transform: translateY(2%) rotate(0.5deg); }
 }
 
+/* ═══ LOS SEIS ESTADOS DE LA BASE DE ANGELITA — Chivito Punk (70% sereno /
+   30% actuando). Completan el repertorio conversacional para que el chivito
+   sea >= la base de Angelita. El mood punk es una CAPA DE ACTUACIÓN (headbang,
+   apuntar con el lápiz) que aparece en los estados expresivos; la base es
+   serena. Actúan con testa (cresta entera), cuerpo y la mano del lápiz. ══════ */
+
+/* CONTENTA — un headbang alegre y corto con pogo (la actuación punk en clave
+   feliz). Más brillante y breve que el rockea del idle. */
+[data-agt-estado='contenta'] .clv-cabezaGesto { animation: clv-contenta-cabeza 0.6s ease-in-out infinite; }
+@keyframes clv-contenta-cabeza {
+  0%, 100% { transform: rotate(2deg) translateY(-1%); }
+  50%      { transform: rotate(-2.4deg) translateY(1.2%); }
+}
+[data-agt-estado='contenta'] .clv-cuerpoPivote { animation: clv-contenta-pogo 0.6s ease-in-out infinite; }
+@keyframes clv-contenta-pogo {
+  0%, 100% { transform: translateY(0) scale(1); }
+  50%      { transform: translateY(-1.2%) scale(1.015); }
+}
+
+/* PREOCUPADA — baja la cresta y se encoge, con un temblorcito tenso (el punk
+   desinflado, serio). */
+[data-agt-estado='preocupada'] .clv-cabezaGesto { animation: clv-preocupa-cabeza 2.8s ease-in-out infinite; }
+@keyframes clv-preocupa-cabeza {
+  0%, 100% { transform: rotate(0.8deg) translateY(1.2%); }
+  50%      { transform: rotate(-0.8deg) translateY(1.4%); }
+}
+[data-agt-estado='preocupada'] .clv-cuerpoPivote { animation: clv-preocupa-cuerpo 2.8s ease-in-out infinite; }
+@keyframes clv-preocupa-cuerpo {
+  0%, 100% { transform: translateY(0.6%) scale(0.99); }
+  50%      { transform: translateY(0.8%) scale(0.986); }
+}
+[data-agt-estado='preocupada'] .clv-manoPivote { animation: none; }
+
+/* NO-SE — ladeo de pájaro de lado a lado ("no sé"), la mano encoge un poco. */
+[data-agt-estado='no-se'] .clv-cabezaGesto { animation: clv-nose-cabeza 2.2s ease-in-out infinite; }
+@keyframes clv-nose-cabeza {
+  0%, 100% { transform: rotate(0deg); }
+  25%      { transform: rotate(-4.5deg) translateY(0.4%); }
+  75%      { transform: rotate(4.5deg) translateY(0.4%); }
+}
+[data-agt-estado='no-se'] .clv-manoPivote { animation: clv-nose-mano 2.2s ease-in-out infinite; }
+@keyframes clv-nose-mano {
+  0%, 100% { transform: rotate(0deg); }
+  50%      { transform: rotate(-2deg); }
+}
+
+/* SENALA — extiende el lápiz señalando el punto y mira hacia allá (el
+   escribano de páramo apuntando). */
+[data-agt-estado='senala'] .clv-manoPivote { animation: clv-senala-mano 2.4s ease-in-out infinite; }
+@keyframes clv-senala-mano {
+  0%, 100%  { transform: rotate(0deg); }
+  40%, 72%  { transform: rotate(-8deg); }
+}
+[data-agt-estado='senala'] .clv-cabezaGesto { animation: clv-senala-cabeza 2.4s ease-in-out infinite; }
+@keyframes clv-senala-cabeza {
+  0%, 100%  { transform: rotate(0deg) translateY(0); }
+  40%, 72%  { transform: rotate(2.4deg) translateY(0.8%); }
+}
+
+/* INVITA — llama con la mano del lápiz ("venga") y cabecea hacia usted. */
+[data-agt-estado='invita'] .clv-manoPivote { animation: clv-invita-mano 0.9s ease-in-out infinite; }
+@keyframes clv-invita-mano {
+  0%, 100% { transform: rotate(0deg); }
+  50%      { transform: rotate(-6deg); }
+}
+[data-agt-estado='invita'] .clv-cabezaGesto { animation: clv-invita-cabeza 1.8s ease-in-out infinite; }
+@keyframes clv-invita-cabeza {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  40%      { transform: translateY(-1%) rotate(1.6deg); }
+  70%      { transform: translateY(0.4%) rotate(0.4deg); }
+}
+
+/* HUSMEA — picotea el rastro como pájaro (cabeza abajo y arriba). */
+[data-agt-estado='husmea'] .clv-cabezaGesto { animation: clv-husmea-cabeza 1.6s ease-in-out infinite; }
+@keyframes clv-husmea-cabeza {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  35%      { transform: translateY(3%) rotate(0.6deg); }
+  55%      { transform: translateY(2.6%) rotate(-0.6deg); }
+}
+
 /* ═══ IDLE-CEREBRO (data-vida) — los gestos del chivito (vidaEstados.js:
    rockea 4×0.65s · apunta 4×0.8s · reposo 4.4s). Solo en idle. ═══════════════ */
 /* ROCKEA — el headbang punk: la testa (con TODA la cresta encima) azota al

@@ -6,20 +6,16 @@ import {
 import { hornearOso } from './osoLamina/capas.js';
 import { useVidaIdle, useRitmoPropio, useMiradaUsted } from './useVidaIdle.js';
 import { OSO_BASTON_SLUG } from './osoBastonIdentidad.js';
+import { canonEstadoLamina } from './behaviors/estadosLaminaViva.js';
 import './osoLamina/osoLamina.css';
 
-/* Estados del contrato de avatar → forma canónica interna. El host escribe
-   'idle'|'thinking'|'speaking'|'listening' (o 'caminando'); esto los
-   normaliza para decidir el COMPORTAMIENTO (el atributo data-agt-estado
-   viaja crudo, para paridad de API/accesibilidad y para que los tests y el
-   host lo lean tal cual). Mismo mapa que JaguarLaminaViva. */
-const ESTADO_CANON = {
-  idle: 'idle', reposo: 'idle', acompana: 'idle',
-  thinking: 'thinking', pensando: 'thinking',
-  speaking: 'speaking', respondiendo: 'speaking', hablando: 'speaking',
-  listening: 'listening', escuchando: 'listening',
-  caminando: 'caminando', walking: 'caminando', anda: 'caminando',
-};
+/* Estados del contrato de avatar -> forma canónica interna. El vocabulario
+   (los cuatro históricos + los seis de la base de Angelita: contenta/
+   preocupada/no-se/senala/invita/husmea + caminando, con alias) vive en
+   `behaviors/estadosLaminaViva.js`, compartido con el jaguar y el chivito.
+   `canonEstadoLamina` decide el COMPORTAMIENTO (gate del idle-cerebro); el
+   atributo data-agt-estado sigue viajando CRUDO (paridad de API/accesibilidad,
+   los tests lo leen tal cual). El CSS del rig usa las llaves canónicas. */
 
 /* Nivel de apertura de la mandíbula por visema (0..1) — alimenta el lip-sync.
    V1 (cerrada) = 0 → se ve EXACTO como la lámina aprobada (sonrisa cerrada). */
@@ -101,7 +97,7 @@ export default function OsoBastonLaminaViva({
   const parpadoHostRef = useRef(null);
   const [listo, setListo] = useState(false);
 
-  const canon = ESTADO_CANON[estado] || 'idle';
+  const canon = canonEstadoLamina(estado);
   const enIdle = canon === 'idle';
 
   // ═══ LA VIDA (los MISMOS hooks de Angelita/el jaguar) ═════════════════════

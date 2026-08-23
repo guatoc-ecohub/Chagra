@@ -237,6 +237,92 @@
 }
 [data-agt-estado='caminando'] .jlv-colaPivote { animation: jlv-cola 1.8s ease-in-out infinite alternate; }
 
+/* ═══ LOS SEIS ESTADOS DE LA BASE DE ANGELITA — Taita Jaguar (digno,
+   guardián sabio). Completan el repertorio conversacional para que el jaguar
+   sea >= la base de Angelita (contenta/preocupada/no-se/senala/invita/husmea).
+   Cada uno ACTÚA con la anatomía del felino: testa, orejas y cola; el poder es
+   CONTENIDO, los tiempos lentos. Actúan sobre la capa -Gesto y los accesorios,
+   así que respiran encima de la vida de base sin pisarla. ═══════════════════ */
+
+/* CONTENTA — orgullo tranquilo: alza la testa despacio, orejas al frente, la
+   cola ondea más ancha y contenta. Nunca un brinco: es un taita. */
+[data-agt-estado='contenta'] .jlv-cabezaGesto { animation: jlv-contenta-cabeza 2.6s ease-in-out infinite; }
+@keyframes jlv-contenta-cabeza {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  45%      { transform: translateY(-2%) rotate(-1.6deg); }
+}
+[data-agt-estado='contenta'] .jlv-colaPivote { animation: jlv-contenta-cola 1.2s ease-in-out infinite alternate; }
+@keyframes jlv-contenta-cola {
+  0%   { transform: rotate(-7deg); }
+  100% { transform: rotate(7deg); }
+}
+[data-agt-estado='contenta'] .jlv-orejaIzqPivote { animation: jlv-orejaIzq-perk 2.6s ease-in-out infinite; }
+[data-agt-estado='contenta'] .jlv-orejaDerPivote { animation: jlv-orejaDer-perk 2.6s ease-in-out infinite; }
+
+/* PREOCUPADA — en guardia: orejas atrás, testa baja escaneando tensa, cuerpo
+   agazapado, la cola con un latigazo bajo y nervioso. */
+[data-agt-estado='preocupada'] .jlv-cabezaGesto { animation: jlv-preocupa-cabeza 3.4s ease-in-out infinite; }
+@keyframes jlv-preocupa-cabeza {
+  0%, 100% { transform: translateY(1.4%) rotate(1.6deg); }
+  50%      { transform: translateY(1.8%) rotate(-1.6deg); }
+}
+[data-agt-estado='preocupada'] .jlv-cuerpoPivote { animation: jlv-preocupa-cuerpo 3.4s ease-in-out infinite; }
+@keyframes jlv-preocupa-cuerpo {
+  0%, 100% { transform: translateY(1%) scaleY(0.985); }
+  50%      { transform: translateY(1.4%) scaleY(0.978); }
+}
+[data-agt-estado='preocupada'] .jlv-orejaIzqPivote { animation: jlv-oreja-atras-izq 3.4s ease-in-out infinite; }
+[data-agt-estado='preocupada'] .jlv-orejaDerPivote { animation: jlv-oreja-atras-der 3.4s ease-in-out infinite; }
+[data-agt-estado='preocupada'] .jlv-colaPivote { animation: jlv-preocupa-cola 2.2s ease-in-out infinite; }
+@keyframes jlv-preocupa-cola {
+  0%, 100% { transform: rotate(-3deg); }
+  50%      { transform: rotate(3deg); }
+}
+
+/* NO-SE — niega con la cabeza, medido y digno (no un aspaviento). */
+[data-agt-estado='no-se'] .jlv-cabezaGesto { animation: jlv-nose-cabeza 2.4s ease-in-out infinite; }
+@keyframes jlv-nose-cabeza {
+  0%, 100% { transform: rotate(0deg); }
+  25%      { transform: rotate(-4deg) translateY(0.4%); }
+  75%      { transform: rotate(4deg) translateY(0.4%); }
+}
+
+/* SENALA — se inclina y dirige la testa al punto, orejas al frente, sostiene
+   la mirada donde apunta. */
+[data-agt-estado='senala'] .jlv-cuerpoPivote { animation: jlv-senala-cuerpo 3s ease-in-out infinite; }
+@keyframes jlv-senala-cuerpo {
+  0%, 100%  { transform: translateY(0) rotate(0deg); }
+  45%, 70%  { transform: translateY(0.6%) rotate(-1.6deg); }
+}
+[data-agt-estado='senala'] .jlv-cabezaGesto { animation: jlv-senala-cabeza 3s ease-in-out infinite; }
+@keyframes jlv-senala-cabeza {
+  0%, 100%  { transform: translateY(0) rotate(0deg); }
+  45%, 70%  { transform: translateY(1.6%) rotate(-3deg); }
+}
+[data-agt-estado='senala'] .jlv-orejaIzqPivote { animation: jlv-orejaIzq-perk 3s ease-in-out infinite; }
+[data-agt-estado='senala'] .jlv-orejaDerPivote { animation: jlv-orejaDer-perk 3s ease-in-out infinite; }
+
+/* INVITA — cabecea "venga" hacia usted, la cola amistosa. */
+[data-agt-estado='invita'] .jlv-cabezaGesto { animation: jlv-invita-cabeza 1.9s ease-in-out infinite; }
+@keyframes jlv-invita-cabeza {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  40%      { transform: translateY(-1.4%) rotate(2deg); }
+  70%      { transform: translateY(0.6%) rotate(0.6deg); }
+}
+[data-agt-estado='invita'] .jlv-colaPivote { animation: jlv-contenta-cola 1s ease-in-out infinite alternate; }
+
+/* HUSMEA — rastrea: baja la testa al terreno y escanea despacio, orejas al
+   frente (el felino leyendo el rastro de la finca). */
+[data-agt-estado='husmea'] .jlv-cabezaGesto { animation: jlv-husmea-cabeza 3.2s ease-in-out infinite; }
+@keyframes jlv-husmea-cabeza {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  30%      { transform: translateY(2.6%) rotate(-2deg); }
+  55%      { transform: translateY(2.8%) rotate(1.6deg); }
+  80%      { transform: translateY(2.4%) rotate(-1deg); }
+}
+[data-agt-estado='husmea'] .jlv-orejaIzqPivote { animation: jlv-orejaIzq-perk 3.2s ease-in-out infinite; }
+[data-agt-estado='husmea'] .jlv-orejaDerPivote { animation: jlv-orejaDer-perk 3.2s ease-in-out infinite; }
+
 /* ═══ IDLE-CEREBRO (data-vida) — los gestos del jaguar (vidaEstados.js) ══════
    Solo en idle (el JS apaga el cerebro en los demás estados). */
 /* ACECHO — la testa BAJA, el cuerpo se agazapa, las orejas al frente

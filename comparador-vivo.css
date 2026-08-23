@@ -1,0 +1,52 @@
+/* Página de integración compai-antes-despues (3d.guatoc.co) — estilos de la
+   PÁGINA, no de las criaturas (cada rig trae los suyos). Reconstruidos del
+   deploy vivo 2026-08-19 (compai-antes-despues-DaKes1fU.css) para que el
+   entry sea reproducible desde el repo y no un artefacto huérfano. */
+:root {
+  --papel: #0b1418; --carta: #11242c; --carta2: #0d1c22; --linea: #a9d5cb38;
+  --tinta: #eaf4f1; --tenue: #a9c4bd; --oro: #ffc46a; --menta: #a9d5cb;
+  --verde: #57c98a; --ambar: #ffb545; --rojo: #ff6b6b;
+}
+* { box-sizing: border-box; }
+html, body {
+  color: var(--tinta);
+  -webkit-font-smoothing: antialiased;
+  background: radial-gradient(120% 70% at 50% 0, #16323c 0%, #0b1418 58%, #070f12 100%);
+  min-height: 100vh;
+  margin: 0;
+  font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+}
+a { color: var(--oro); }
+.env { max-width: 1180px; margin: 0 auto; padding: 0 16px 96px; }
+header.top { padding: 34px 0 8px; }
+header.top h1 { letter-spacing: -0.01em; margin: 0 0 6px; font: 650 clamp(1.5rem, 4.2vw, 2.3rem)/1.15 system-ui; }
+header.top .lema { color: var(--oro); margin: 0 0 14px; font: italic 500 clamp(1rem, 2.6vw, 1.24rem)/1.4 Georgia, serif; }
+header.top p { max-width: 78ch; color: var(--tenue); margin: 0 0 10px; font-size: 0.94rem; line-height: 1.62; }
+.migas { flex-wrap: wrap; gap: 8px; margin-top: 14px; font-size: 0.74rem; display: flex; }
+.migas code { border: 1px solid var(--linea); color: var(--menta); background: #a9d5cb1a; border-radius: 6px; padding: 3px 8px; font-size: 0.72rem; }
+.dial { border: 1px solid var(--linea); background: linear-gradient(180deg, var(--carta), var(--carta2)); border-radius: 14px; max-width: 78ch; margin: 18px 0 6px; padding: 12px 14px; }
+.dial b { color: var(--menta); }
+.dial .b30 { color: var(--oro); }
+.dial .b70 { color: var(--verde); }
+section.par { border-top: 1px solid var(--linea); margin: 30px 0 8px; padding-top: 18px; }
+section.par > h3 { flex-wrap: wrap; align-items: center; gap: 9px; margin: 0 0 12px; font: 650 1.12rem/1.2 system-ui; display: flex; }
+section.par > h3 code { color: var(--menta); border: 1px solid var(--linea); background: #a9d5cb1a; border-radius: 6px; padding: 2px 7px; font: 500 0.74rem ui-monospace, Menlo, monospace; }
+.dos { grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 12px; display: grid; }
+.panel { border: 1px solid var(--linea); background: radial-gradient(120% 90% at 50% 25%, #1b3944 0%, #0e2129 70%); border-radius: 14px; position: relative; overflow: hidden; }
+.panel .etq { z-index: 3; letter-spacing: 0.05em; text-transform: uppercase; border: 1px solid var(--linea); color: var(--tenue); -webkit-backdrop-filter: blur(2px); backdrop-filter: blur(2px); background: #0b1418b8; border-radius: 999px; padding: 4px 9px; font: 600 0.66rem/1 system-ui; position: absolute; top: 9px; left: 9px; }
+.panel .etq.v { color: var(--verde); border-color: #57c98a66; }
+.lienzo { place-items: center; height: 340px; padding: 14px; display: grid; }
+.lienzo > * { max-width: 100%; max-height: 100%; }
+.err { color: var(--rojo); text-align: center; padding: 14px; font: 500 0.8rem/1.5 ui-monospace, Menlo, monospace; }
+.ctrl { flex-wrap: wrap; gap: 16px; margin-top: 12px; display: flex; }
+.ctrl .grupo { flex-wrap: wrap; align-items: center; gap: 6px; display: flex; }
+.ctrl .grupo b { color: var(--tenue); letter-spacing: 0.04em; text-transform: uppercase; margin-right: 2px; font: 600 0.68rem/1 system-ui; }
+.ctrl button { color: var(--menta); cursor: pointer; border: 1px solid var(--linea); background: #a9d5cb14; border-radius: 8px; padding: 7px 11px; font: 600 0.78rem/1 ui-monospace, Menlo, monospace; transition: background 0.15s, border-color 0.15s, color 0.15s; }
+.ctrl button:hover { background: #a9d5cb29; }
+.ctrl button.on { border-color: var(--oro); color: var(--oro); background: #ffc46a29; }
+.ctrl .grupo.mom button.on { border-color: var(--verde); color: var(--verde); background: #57c98a29; }
+p.linea { color: #8fb3ab; margin: 9px 0 2px; font: 500 0.74rem/1.5 ui-monospace, Menlo, monospace; }
+p.linea em { color: var(--oro); font-style: normal; }
+p.linea span { color: var(--tenue); font-family: system-ui; }
+footer { border-top: 1px solid var(--linea); color: var(--tenue); margin-top: 40px; padding-top: 18px; font-size: 0.8rem; line-height: 1.6; }
+footer code { color: var(--menta); }

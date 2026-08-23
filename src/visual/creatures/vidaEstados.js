@@ -128,6 +128,25 @@ export const VIDA_REPERTORIO = {
       reposo: { dur: 4400, peso: 1 }, // 1× rh-g-reposo — bicho menudo, descansa poco
     },
   },
+  /* Chivito Punk (ave de páramo, escribano-punk). FALTABA su fila: sin ella
+     `useVidaIdle('chivito-punk')` devolvía null y el chivito NUNCA disparaba
+     su idle — respiraba y parpadeaba, pero jamás rockeaba ni apuntaba, aunque
+     `chivitoLamina.css` ya declaraba los tres gestos (data-vida rockea/apunta/
+     reposo). El slug es 'chivito-punk' (CHIVITO_SLUG), no 'chivito'.
+     EL 70/30 (spec del comparador — 70% sereno / 30% actuando) vive en el
+     PESO: reposo (sereno, respira+sacude) domina; apunta (el escribano de
+     páramo) es la actuación tranquila; rockea (el headbang punk) es puntual.
+     reposo 2.4 vs actuación (apunta 1.1 + rockea 0.7 = 1.8) ≈ 57/43 en tirada,
+     y como el `descanso` (identidad serena, sin gesto) ocupa la mayoría del
+     reloj de pared, el sereno vivido se lleva de largo el 70%. */
+  'chivito-punk': {
+    descanso: [3400, 7600], // el 70% del reloj: quieto pero vivo (respira, parpadea)
+    momentos: {
+      reposo: { dur: 8800, peso: 2.4 }, // 2× clv-reposo-cuerpo 4.4s / 1× clv-reposo-cabeza 8.8s — el sereno
+      apunta: { dur: 3200, peso: 1.1 }, // 4× clv-apunta-mano 0.8s / 1× clv-apunta-cabeza 3.2s — el escribano
+      rockea: { dur: 2600, peso: 0.7 }, // 4× clv-rockea 0.65s — el headbang punk, PUNTUAL (la actuación)
+    },
+  },
   dalmata: {
     descanso: [2600, 6400], // perro joven: gesticula seguido, casi no se aquieta
     momentos: {

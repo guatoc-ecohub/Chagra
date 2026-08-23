@@ -6,22 +6,21 @@ import {
 } from './jaguarLamina/anatomia.js';
 import { hornearJaguar } from './jaguarLamina/capas.js';
 import { useVidaIdle, useRitmoPropio, useMiradaUsted } from './useVidaIdle.js';
+import { canonEstadoLamina } from './behaviors/estadosLaminaViva.js';
 import './jaguarLamina/jaguarLamina.css';
 
 const JAGUAR_SLUG = 'jaguar';
 
-/* Estados del contrato de avatar → forma canónica interna. El host escribe
-   'idle'|'thinking'|'speaking'|'listening' (o 'caminando' para andar); esto
-   los normaliza para decidir el COMPORTAMIENTO (el atributo data-agt-estado
-   viaja crudo, para paridad de API/accesibilidad y para que los tests y el
-   host lo lean tal cual). */
-const ESTADO_CANON = {
-  idle: 'idle', reposo: 'idle', acompana: 'idle',
-  thinking: 'thinking', pensando: 'thinking',
-  speaking: 'speaking', respondiendo: 'speaking', hablando: 'speaking',
-  listening: 'listening', escuchando: 'listening',
-  caminando: 'caminando', walking: 'caminando', anda: 'caminando',
-};
+/* Estados del contrato de avatar -> forma canónica interna. El vocabulario ya
+   NO vive aquí: se centralizó en `behaviors/estadosLaminaViva.js` (la vara de
+   `angelitaEstados.js`), que suma a los cuatro históricos (idle/thinking/
+   speaking/listening) los seis que faltaban de la base de Angelita
+   (contenta/preocupada/no-se/senala/invita/husmea) más caminando, con sus
+   alias. `canonEstadoLamina` decide el COMPORTAMIENTO (gate del idle-cerebro);
+   el atributo data-agt-estado sigue viajando CRUDO, para paridad de API/
+   accesibilidad y para que los tests y el host lo lean tal cual. El CSS del
+   rig ([data-agt-estado='...']) usa las llaves canónicas, que el host/el
+   comparador ya pasan directo. */
 
 /* Nivel de apertura de la mandíbula por visema (0..1) — alimenta el lip-sync:
    la mandíbula-lámina baja y el interior sintético se revela en ese grado.
@@ -118,7 +117,7 @@ export default function JaguarLaminaViva({
   const parpado2HostRef = useRef(null);
   const [listo, setListo] = useState(false);
 
-  const canon = ESTADO_CANON[estado] || 'idle';
+  const canon = canonEstadoLamina(estado);
   const enIdle = canon === 'idle';
 
   // ═══ LA VIDA (los MISMOS hooks de Angelita/los 8 bichos) ══════════════════

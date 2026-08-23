@@ -194,6 +194,93 @@
 }
 [data-agt-estado='caminando'] .olv-coronaPivote { animation: olv-corona 1.6s ease-in-out infinite alternate; }
 
+/* ═══ LOS SEIS ESTADOS DE LA BASE DE ANGELITA — Oso Protector (protector,
+   cálido). Completan el repertorio conversacional para que el oso sea >= la
+   base de Angelita. Actúan con el plantígrado: cuerpo, testa, orejas y la
+   corona-bastón florecida. El andar es pausado y el gesto entrañable. ═══════ */
+
+/* CONTENTA — se bambolea alegre de lado a lado, la corona florece de contento,
+   la testa acompaña. */
+[data-agt-estado='contenta'] .olv-cuerpoPivote { animation: olv-contenta-cuerpo 1.5s ease-in-out infinite; }
+@keyframes olv-contenta-cuerpo {
+  0%, 100% { transform: rotate(-1.4deg) translateY(0); }
+  50%      { transform: rotate(1.4deg) translateY(-0.6%); }
+}
+[data-agt-estado='contenta'] .olv-coronaPivote { animation: olv-florece 1.7s ease-in-out infinite; }
+[data-agt-estado='contenta'] .olv-cabezaGesto { animation: olv-contenta-cabeza 1.5s ease-in-out infinite; }
+@keyframes olv-contenta-cabeza {
+  0%, 100% { transform: rotate(1deg) translateY(-0.4%); }
+  50%      { transform: rotate(-1deg) translateY(0); }
+}
+
+/* PREOCUPADA — se pone PROTECTOR: se yergue un poco (pecho arriba), la testa
+   alta vigilando, orejas alerta. El oso que cuida. */
+[data-agt-estado='preocupada'] .olv-cuerpoPivote { animation: olv-preocupa-cuerpo 3.2s ease-in-out infinite; }
+@keyframes olv-preocupa-cuerpo {
+  0%, 100% { transform: translateY(-1.2%) scaleY(1.02); }
+  50%      { transform: translateY(-1.6%) scaleY(1.028); }
+}
+[data-agt-estado='preocupada'] .olv-cabezaGesto { animation: olv-preocupa-cabeza 3.2s ease-in-out infinite; }
+@keyframes olv-preocupa-cabeza {
+  0%, 100% { transform: translateY(-1%) rotate(-2deg); }
+  50%      { transform: translateY(-1.2%) rotate(2deg); }
+}
+[data-agt-estado='preocupada'] .olv-orejaIzqPivote { animation: olv-orejaIzq-perk 2.8s ease-in-out infinite; }
+[data-agt-estado='preocupada'] .olv-orejaDerPivote { animation: olv-orejaDer-perk 2.8s ease-in-out infinite; }
+
+/* NO-SE — un encogimiento de hombros grande y cálido: la testa se ladea y el
+   cuerpo sube los hombros (pulso de escala), despacio. */
+[data-agt-estado='no-se'] .olv-cabezaGesto { animation: olv-nose-cabeza 2.6s ease-in-out infinite; }
+@keyframes olv-nose-cabeza {
+  0%, 100% { transform: rotate(0deg); }
+  25%      { transform: rotate(-3.4deg) translateY(0.4%); }
+  75%      { transform: rotate(3.4deg) translateY(0.4%); }
+}
+[data-agt-estado='no-se'] .olv-cuerpoPivote { animation: olv-nose-cuerpo 2.6s ease-in-out infinite; }
+@keyframes olv-nose-cuerpo {
+  0%, 100%  { transform: scale(1); }
+  25%, 75%  { transform: scale(1.015, 1.025); }
+}
+
+/* SENALA — extiende el bastón florecido hacia el punto, la testa lo sigue y el
+   cuerpo se inclina en esa dirección. */
+[data-agt-estado='senala'] .olv-coronaPivote { animation: olv-senala-corona 3s ease-in-out infinite; }
+@keyframes olv-senala-corona {
+  0%, 100%  { transform: rotate(-1.6deg); }
+  45%, 70%  { transform: rotate(-7deg) translateX(1%); }
+}
+[data-agt-estado='senala'] .olv-cabezaGesto { animation: olv-senala-cabeza 3s ease-in-out infinite; }
+@keyframes olv-senala-cabeza {
+  0%, 100%  { transform: translateY(0) rotate(0deg); }
+  45%, 70%  { transform: translateY(0.6%) rotate(-2.6deg); }
+}
+[data-agt-estado='senala'] .olv-cuerpoPivote { animation: olv-senala-cuerpo 3s ease-in-out infinite; }
+@keyframes olv-senala-cuerpo {
+  0%, 100%  { transform: rotate(0deg); }
+  45%, 70%  { transform: rotate(-1.2deg); }
+}
+
+/* INVITA — cabecea "venga" hacia usted, el cuerpo se inclina acogedor, la
+   corona mece amistosa. */
+[data-agt-estado='invita'] .olv-cabezaGesto { animation: olv-invita-cabeza 1.9s ease-in-out infinite; }
+@keyframes olv-invita-cabeza {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  40%      { transform: translateY(-1.2%) rotate(2deg); }
+  70%      { transform: translateY(0.6%) rotate(0.6deg); }
+}
+[data-agt-estado='invita'] .olv-coronaPivote { animation: olv-corona 1.6s ease-in-out infinite alternate; }
+
+/* HUSMEA — baja el hocico y respira hondo olfateando, orejas al frente. */
+[data-agt-estado='husmea'] .olv-cabezaGesto { animation: olv-husmea-cabeza 3.2s ease-in-out infinite; }
+@keyframes olv-husmea-cabeza {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  30%      { transform: translateY(2.2%) rotate(-1.6deg); }
+  60%      { transform: translateY(2.4%) rotate(1.4deg); }
+}
+[data-agt-estado='husmea'] .olv-cuerpoPivote { animation: olv-resopla 1.5s ease-in-out infinite; }
+[data-agt-estado='husmea'] .olv-orejaIzqPivote { animation: olv-orejaIzq-perk 3.2s ease-in-out infinite; }
+[data-agt-estado='husmea'] .olv-orejaDerPivote { animation: olv-orejaDer-perk 3.2s ease-in-out infinite; }
+
 /* ═══ IDLE-CEREBRO (data-vida) — el repertorio del caminante (vidaEstados.js
    'oso-baston': florece / resopla / reposo). Solo en idle. */
 /* FLORECE — su gesto-firma: la corona LATE EN FLOR (cabeceo más vivo + pulso
