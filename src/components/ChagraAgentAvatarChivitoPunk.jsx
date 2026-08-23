@@ -1,20 +1,42 @@
-import ChivitoPunk from '../visual/creatures/ChivitoPunk';
+import ChivitoPunkLaminaViva from '../visual/creatures/ChivitoPunkLaminaViva';
 
 /**
- * ChagraAgentAvatarChivitoPunk — el chivito de páramo (Oxypogon guerinii)
- * como CARA del agente de Chagra, 6ta opción del elenco unificado
+ * ChagraAgentAvatarChivitoPunk — el chivito de páramo punk (Oxypogon
+ * guerinii) como CARA del agente de Chagra, 6ta opción del elenco unificado
  * (2026-08-14). Slug canónico `chivito-punk` (colapso `chivito`→`chivito-punk`
  * ya resuelto en `compai/nucleo/elenco.js`, #96 — un solo pájaro, no dos).
  *
- * Cierra el ítem #8 del GAP compAI: el chivito no tenía cuerpo en la PWA
- * (`ELENCO['chivito-punk'].enPWA` seguía `false`); ahora lo tiene reusando el
- * rig F24 del valle (`visual/creatures/ChivitoPunk.jsx`, ver ese archivo).
+ * RENDER CANÓNICO = LA LÁMINA-VIVA (2026-08-23). El cuerpo que se dibuja ahora
+ * es `ChivitoPunkLaminaViva.jsx` (`visual/creatures/`): la lámina aprobada
+ * (`chivito-punk.png` — cresta mohawk de puntas moradas, barba-gorguera verde,
+ * pañoleta, lápiz alzado y libreta) recortada en capas por alfa y montada
+ * sobre el MISMO sistema de vida del jaguar lámina-viva / la luciérnaga /
+ * Angelita (`useVidaIdle`/`useRitmoPropio`/`useMiradaUsted`). Con esto el
+ * MOOD punk (headbang `rockea` / `apunta` con el lápiz / `reposo`, del
+ * repertorio `chivito-punk` en `vidaEstados.js`) al fin se VE en el selector —
+ * antes este wrapper renderizaba el rig F24 vector (`ChivitoPunk.jsx`), que no
+ * tiene ese idle-cerebro. Reemplaza al vector como cara del agente siguiendo
+ * el MISMO patrón con que el jaguar, el oso del bastón y la zarigüeya trazada
+ * cruzaron a la PWA (adaptador puro, cero lógica nueva de agente).
  *
- * Adaptador puro (mismo contrato que los hermanos ChagraAgentAvatar*): traduce
- * la API histórica del avatar del agente (state 'idle'|'thinking'|'speaking'|
- * 'listening', glow, withLabel, onClick/onDoubleClick) al `state` que
- * `ChivitoPunk.jsx` ya entiende directo.
+ * `ChivitoPunk.jsx` (rig F24 vector) NO se borra: es el cuerpo 2.5D reusado
+ * del valle (vía `arte-valle/chivito.rig.svg`) y conserva su test propio
+ * (`ChivitoPunk.test.jsx`) verde sin tocarlo.
+ *
+ * Adaptador puro (mismo contrato que ChagraAgentAvatarJaguar): traduce la API
+ * histórica del avatar del agente (state 'idle'|'thinking'|'speaking'|
+ * 'listening', glow, withLabel, onClick/onDoubleClick) al contrato de
+ * `ChivitoPunkLaminaViva` — que ya habla ese MISMO vocabulario por su prop
+ * `estado` (OJO: `estado`, no `state`; el vector viejo usaba `state`). El
+ * idle-cerebro del mood se activa solo con los defaults de la lámina
+ * (`animated=true`, `tier` sin fijar → `activoVida` en idle): por eso el
+ * wrapper NO fuerza `animated`/`tier`, para no apagar el repertorio. El
+ * `visema` del lip-sync viaja igual que al resto del elenco.
  */
+const VISEMA_DE_STATE = {
+    speaking: 'V2',
+};
+
 export default function ChagraAgentAvatarChivitoPunk({
     state = 'idle',
     size = 48,
@@ -25,9 +47,12 @@ export default function ChagraAgentAvatarChivitoPunk({
     className = '',
     ariaLabel = 'Chagra IA',
 }) {
+    const visema = VISEMA_DE_STATE[state] || null;
+
     const bicho = (
-        <ChivitoPunk
-            state={state}
+        <ChivitoPunkLaminaViva
+            estado={state}
+            visema={visema}
             size={size}
             title={ariaLabel}
             className={className}
@@ -45,7 +70,9 @@ export default function ChagraAgentAvatarChivitoPunk({
     ) : bicho;
 
     // Paridad con los avatares hermanos: con handlers, botón real (teclado +
-    // lector de pantalla); sin handlers, solo el dibujo.
+    // lector de pantalla); sin handlers, solo el dibujo. (No se pasan
+    // onClick/onDoubleClick a la lámina — el botón lo pone este wrapper, para
+    // no anidar dos botones.)
     if (onClick || onDoubleClick) {
         return (
             <button

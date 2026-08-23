@@ -34,7 +34,7 @@ const CASOS = [
     { Component: ChagraAgentAvatarOsoBaston, nombre: 'Oso del bastón', slug: 'oso-baston', raiz: raizSvg },
     { Component: ChagraAgentAvatarLuciernaga, nombre: 'Luciérnaga', slug: 'luciernaga', raiz: raizSvg },
     { Component: ChagraAgentAvatarGuacamaya, nombre: 'Guacamaya', slug: 'guacamaya', raiz: raizSvg },
-    { Component: ChagraAgentAvatarChivitoPunk, nombre: 'Chivito', slug: 'chivito-punk', raiz: raizSvg },
+    { Component: ChagraAgentAvatarChivitoPunk, nombre: 'Chivito', slug: 'chivito-punk', raiz: raizDiv },
 ];
 
 // for...of en vez de describe.each: con describe.each, el linter no rastrea
