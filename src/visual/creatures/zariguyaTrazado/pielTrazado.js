@@ -35,6 +35,11 @@
 import { RH_LINE_BOIL } from '../rubberhoseSpec.js';
 import { CALCO_TRAZADO, AIRE_LIMPIO_D } from './calcoTrazado.js';
 
+/* Dos islas de tinta del calco compuesto quedan dentro de la región de la
+   cabeza aunque pertenecen al brazo. Se excluyen en el mismo clip even-odd,
+   antes de que la cabeza pueda llevarlas consigo al girar. */
+const AIRE_LIMPIO_SIN_ISLAS_D = `${AIRE_LIMPIO_D}M58 98h40v24H58ZM58 126h44v48H58Z`;
+
 /* ── PIVOTES (px del espacio 481×444 de la lámina) ──────────────────────────
    Fuente: zariguyaLamina/anatomia.js (medidos sobre la lámina con grilla y
    lupas) + los de cadena fina de zariguyaHuesos/pielHuesos.js donde
@@ -193,6 +198,12 @@ export const ZT_BANDAS = Object.freeze({
   bColaBase: banda([[330, 316], [330, 348], [330, 380]], 6, 6),
   bColaMedia: banda([[442, 334], [432, 350], [430, 364], [430, 380]], 5, 5),
   bColaPunta: banda([[486, 262], [452, 262], [440, 264], [434, 272]], 5, 5),
+  /* Respaldo estrecho del borde inferior del hocico. La cabeza gira alrededor
+     de (202,126); a +14° deja libre esta cuña antes de que el cuello pueda
+     cubrirla. El calco se vuelve a pintar encima del relleno para conservar
+     la tinta donde existe, y el relleno solo ocupa sus huecos transparentes. */
+  bHocico: [[105, 100], [250, 100], [250, 132], [220, 136], [190, 132],
+    [160, 130], [140, 136], [120, 132], [105, 120]],
 });
 
 const P = Object.freeze({
@@ -237,6 +248,9 @@ const casquete = (region, forma) => `<g clip-path="url(#zt-r-${region})">${forma
 const casqueteCalco = (region, nombre) =>
   `<g clip-path="url(#zt-b-${nombre})"><use href="#ztCalco" clip-path="url(#zt-r-${region})"/></g>`;
 
+const casqueteCalcoRelleno = (region, nombre, relleno) =>
+  `<g clip-path="url(#zt-b-${nombre})">${relleno}<use href="#ztCalco" clip-path="url(#zt-r-${region})"/></g>`;
+
 const elipse = (cx, cy, rx, ry, fill, rot = 0) =>
   `<ellipse cx="${cx}" cy="${cy}" rx="${rx}" ry="${ry}" fill="${fill}"${rot ? ` transform="rotate(${rot} ${cx} ${cy})"` : ''}/>`;
 const disco = (cx, cy, r, fill) => `<circle cx="${cx}" cy="${cy}" r="${r}" fill="${fill}"/>`;
@@ -244,7 +258,7 @@ const disco = (cx, cy, r, fill) => `<circle cx="${cx}" cy="${cy}" r="${r}" fill=
 /* ─────────────────────────────── defs ────────────────────────────────────── */
 
 const DEFS = `<defs>
-  <clipPath id="ztAireLimpio"><path clip-rule="evenodd" d="${AIRE_LIMPIO_D}"/></clipPath>
+  <clipPath id="ztAireLimpio"><path clip-rule="evenodd" fill-rule="evenodd" d="${AIRE_LIMPIO_SIN_ISLAS_D}"/></clipPath>
   <g id="ztCalco" clip-path="url(#ztAireLimpio)">${CALCO_TRAZADO}</g>
   ${CLIPS}
   <linearGradient id="ztCuello" x1="215" y1="140" x2="228" y2="215" gradientUnits="userSpaceOnUse">
@@ -389,6 +403,7 @@ ${DEFS}
           ${usoCalco('cuello')}
           ${casquete('cabeza', elipse(212, 124, 60, 22, 'url(#ztCuello)', -7))}
           ${casqueteCalco('cabeza', 'bCabeza')}
+          ${casqueteCalcoRelleno('cabeza', 'bHocico', `<path d="${dPoly(ZT_BANDAS.bHocico)}" fill="${P.pecho}"/>`)}
           <g class="zh-hueso zh-cabezaGiro"${origin('cabeza')}>
             <g class="zh-hueso zh-cabeza"${origin('cabeza')}>
               ${CABEZA}
