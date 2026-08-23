@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import {
   CARPETA_LAMINA, ARCHIVO_LAMINA, ANCHO, ALTO,
-  CABEZA, MANDIBULA, BOCA, MANO_LAPIZ, CUERPO_PIVOTE,
+  CABEZA, CRESTA, MANDIBULA, BOCA, MANO_LAPIZ, ALA_IZQ, CUERPO_PIVOTE,
 } from './chivitoLamina/anatomia.js';
 import { hornearChivito } from './chivitoLamina/capas.js';
 import { useVidaIdle, useRitmoPropio, useMiradaUsted } from './useVidaIdle.js';
@@ -55,8 +55,16 @@ const JAW_DE_VISEMA = { V1: 0, V2: 0.42, V3: 1, V4: 0.36 };
  * QUÉ SÍ ARTICULA (verificable en el gate 2.5D DOM): parpadeo real de los
  * dos ojos juntos con ritmo propio; mirada que sigue al usuario (giro de
  * cabeza); pico inferior que baja con el lip-sync; la mano del lápiz que
- * gesticula (apunta/escribe/saluda); headbang punk con la cresta entera;
- * respiración.
+ * gesticula (apunta/escribe/saluda); el ALA IZQUIERDA plegada que se mece
+ * y aletea (corte C5, con respaldo de viaje horneado); headbang punk con
+ * la cresta encima; respiración.
+ *
+ * CRESTA SWAPPABLE (corte C5): la cresta punk es PIEZA PROPIA dentro del
+ * pivote de cabeza — el headbang sigue azotando testa+cresta juntas, pero
+ * C6 (chivito-normal) puede reemplazarla: `crestaSrc` acepta un PNG del
+ * MISMO encuadre (397×654) del que se hornea la pieza cresta (la verde),
+ * y `conCresta=false` la oculta (la cabeza conserva la franja del cráneo
+ * de respaldo — sin hueco). El estado viaja como `data-cresta`.
  *
  * HONESTIDAD (lo que el dibujo plano NO da — no se disfraza):
  *   · PICO ABIERTO: la lámina tiene el pico cerrado. Al bajar el pico-pieza
@@ -64,11 +72,13 @@ const JAW_DE_VISEMA = { V1: 0, V2: 0.42, V3: 1, V4: 0.36 };
  *     (`.clv-bocaInterior`, el ÚNICO píxel que no sale del PNG).
  *   · PUPILA: recortarla y moverla obligaría a repintar el ojo que destapa
  *     (prohibido) — la mirada es giro de cabeza.
- *   · CRESTA: no es pieza aparte (regla dura: no se recorta de la cabeza ni
- *     se aplana) — azota porque el headbang mueve la testa completa.
- *   · PATAS/LIBRETA/COLA: plantadas / abrazada / base oculta tras la
- *     libreta — se mueven CON el cuerpo, nunca por su cuenta. Límites
- *     documentados en `anatomia.js`.
+ *   · CRESTA: pieza swappable pero RÍGIDA con la testa (no se aplana ni
+ *     ondea por su cuenta): las púas azotan porque el headbang mueve la
+ *     cabeza completa; el arranque de púas sobre la frente queda EN la cara
+ *     (repintarla está prohibido — el swap cambia las púas, no la frente).
+ *   · PATAS/LIBRETA+ALA DERECHA/COLA: plantadas / abrazando la libreta /
+ *     base oculta tras la libreta — se mueven CON el cuerpo, nunca por su
+ *     cuenta. Límites documentados en `anatomia.js`.
  *
  * DEGRADACIÓN: mientras la imagen carga, o si el navegador no hornea canvas
  * 2D (jsdom de los tests), se muestra la lámina PLANA — nunca un hueco.

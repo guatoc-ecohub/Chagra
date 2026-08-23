@@ -30,13 +30,33 @@
  *
  * LAS PIEZAS RECORTADAS (más el cuerpo, que es el resto):
  *   - cabeza: banda de desvanecido en el CUELLO (y274→296) × caja en X del
- *     ancho de la testa CON LA CRESTA COMPLETA (x82..322 cubre desde la
- *     púa izquierda x≈97 hasta el rizo derecho x≈310). La CARA VA ENTERA
- *     EN LA PIEZA — ojos, pico superior, mejillas Y LA CRESTA PUNK quedan
- *     intactos (regla dura de la orden: la cresta es la firma del
- *     personaje, NO se recorta de la cabeza ni se aplana — se mueve CON la
- *     testa: el headbang es de cabeza entera). El único corte dentro de la
- *     cabeza es la mandíbula (DEBAJO de la línea de la boca).
+ *     ancho de la testa CON EL DOMINIO DE LA CRESTA (x82..322 cubre desde
+ *     la púa izquierda x≈97 hasta el rizo derecho x≈310). La CARA VA ENTERA
+ *     EN LA PIEZA — ojos, pico superior y mejillas quedan intactos. Cortes
+ *     dentro de la cabeza: la mandíbula (DEBAJO de la línea de la boca) y,
+ *     desde el corte C5 (orden consolidada 2026-08-18), la CRESTA por su
+ *     parte alta (ver CRESTA — sigue siendo HIJA del pivote de cabeza: el
+ *     headbang azota testa Y cresta juntas, jamás un recorte aplanado).
+ *   - cresta (C5, swappable): las púas mohawk POR ENCIMA de la línea del
+ *     cráneo (banda `base` y150→184). A la cabeza solo se le resta la parte
+ *     ALTA (`baseSub` y124→150): la franja del cráneo queda EN la cabeza de
+ *     respaldo (patrón oreja-jaguar, anti-hueco), la pieza la tapa en
+ *     reposo → compuesto idéntico. El arranque de las púas centrales sobre
+ *     la FRENTE (y>184, entre los ojos) es plumaje de la cara y queda en la
+ *     cabeza: el swap cambia las PÚAS, no la frente (repintar la cara está
+ *     prohibido). Contrato C6 (chivito-normal): la cresta de reemplazo llega
+ *     como PNG del MISMO encuadre (397×654) vía `hornearChivito(...,
+ *     {imgCresta})` y debe cubrir la banda del respaldo (y≈124..184).
+ *   - alaIzq (C5): el ala PLEGADA del flanco izquierdo (del espectador) —
+ *     la masa de plumas de vuelo bajo la muñeca del lápiz, punta abajo en
+ *     ≈(70,448). Techo y352→376 (arranca BAJO la banda inclinada de la
+ *     muñeca — la mano es pieza de ENCIMA y se le resta dura), contorno
+ *     INTERIOR de tinta contra el vientre/pañoleta por polilínea
+ *     (116,352)→(70,448) (medido en `zoom-ala-contorno`, el mismo método de
+ *     polilínea del élitro de la luciérnaga: el borde dibujado existe, una
+ *     caja no lo sigue), y desvanecido de PUNTA y436→458. Lleva RESPALDO DE
+ *     VIAJE horneado (`extenderRespaldo`): su textura se dilata bajo la mano
+ *     y el flanco que la ocluyen — al mecerse no abre fondo.
  *   - mandibula: el pico INFERIOR + el mentón, DEBAJO de la línea de la
  *     boca (la comisura en ≈(213,240), la punta en ≈(110,246) — la línea
  *     entera queda en la cabeza). Al hablar baja/rota desde la comisura
@@ -58,9 +78,11 @@
  *   - PATAS (izq x≈150-215, der x≈250-330, y≈540-651): plantadas al piso,
  *     detrás de ellas no hay nada. ESTÁTICAS, como las botas de la
  *     luciérnaga y el gait plano del jaguar.
- *   - LIBRETA + su ala (x≈235-335, y≈355-500): abrazada contra el flanco —
- *     cualquier movimiento independiente abriría un hueco sin respaldo. Se
- *     mueve CON el cuerpo (respiración), como el cuaderno de la luciérnaga.
+ *   - LIBRETA + el ala DERECHA que la abraza (x≈235-335, y≈355-500): el ala
+ *     derecha SUJETA la libreta — moverla por su cuenta despegaría la
+ *     libreta o abriría un hueco sin respaldo sobre ella. Se mueve CON el
+ *     cuerpo (respiración), como el cuaderno de la luciérnaga. (La
+ *     izquierda, plegada y libre, SÍ es pieza — ver ALA_IZQ.)
  *   - COLA (x≈250-394, y≈430-600): su base nace OCULTA tras la libreta y
  *     el flanco, y las plumas cruzan la región de la pata derecha — no hay
  *     borde de alfa limpio donde anclar un giro sin disputar píxeles con
@@ -95,6 +117,29 @@ export const CABEZA = {
   cuello: { y0: 274, y1: 296 },
   box: { x0: 82, x1: 322, xFade: 8 },
   pivote: [205, 268],
+};
+
+/**
+ * CRESTA punk (corte C5 — pieza SWAPPABLE): las púas mohawk por encima de
+ * la línea del cráneo. Medida en `zoom-cresta-base` (grilla 4×): las púas
+ * son individuales y separables por encima de y≈150; entre y≈150 y y≈184
+ * sus raíces se funden con el casquete verde del cráneo y las cejas (el ojo
+ * derecho arranca en y≈184 — la banda `base` remata EXACTO ahí para no
+ * rozar el ojo). `baseSub` corta más ARRIBA: la franja y124..150 del cráneo
+ * queda TAMBIÉN en la cabeza como respaldo anti-hueco (patrón oreja-jaguar:
+ * la pieza, opaca ahí, la tapa en reposo → compuesto idéntico; al swapear o
+ * cabecear no se abre fondo). El invariante que evita la banda pálida:
+ * `baseSub.y1 <= base.y0` — donde la cabeza está desvanecida, la pieza
+ * cresta es ~opaca, nunca dos fades apilados.
+ * El `pivote` es la raíz central sobre el cráneo. La pieza vive DENTRO del
+ * pivote de cabeza (el headbang mueve testa+cresta juntas); su propio
+ * pivote existe para C6 y micro-gestos futuros, hoy va rígida.
+ */
+export const CRESTA = {
+  box: { x0: 88, x1: 318, xFade: 8 },
+  base: { y0: 150, y1: 184 },
+  baseSub: { y0: 124, y1: 150 },
+  pivote: [205, 166],
 };
 
 /**
@@ -165,6 +210,33 @@ export const MANO_LAPIZ = {
 };
 
 /**
+ * ALA IZQUIERDA (corte C5): el ala PLEGADA del flanco izquierdo del
+ * espectador — la masa de plumas de vuelo que cuelga bajo la muñeca del
+ * lápiz, con la punta en ≈(70,448). Medida en `zoom-ala-contorno` (4×):
+ *   - `techo` (y352→376): el ala arranca BAJO la banda inclinada de la
+ *     muñeca (MANO_LAPIZ.muneca.y0=346); la mano es pieza de ENCIMA y se le
+ *     resta DURA — bajo su desvanecido el ala conserva el píxel completo de
+ *     respaldo, y el candado del tajado del lápiz queda intacto (la caja
+ *     del ala arranca en x=40, lejos del puntazo x≈5-15).
+ *   - `interior`: polilínea [y,x] del contorno de TINTA contra el
+ *     vientre/pañoleta — (116,352)→(106,385)→(96,410)→(84,430)→(70,448).
+ *     El mismo método del élitro de la luciérnaga: el borde dibujado
+ *     existe, una caja recta no puede seguirlo. Feather ±4px.
+ *   - `punta` (y436→458): desvanecido sobre los remates escalonados de las
+ *     plumas. La silueta EXTERNA (izquierda) la pone el alfa del PNG.
+ * El `pivote` es la raíz del ala en el hombro/muñeca: el gesto es un
+ * mecido/aleteo chico de punta (±3° ≈ 5-7px), cubierto por el RESPALDO DE
+ * VIAJE (`extenderRespaldo`, pasos=14) y el cuerpo-inpaint de abajo.
+ */
+export const ALA_IZQ = {
+  box: { x0: 40, x1: 128, xFade: 6 },
+  techo: { y0: 352, y1: 376 },
+  interior: [[352, 116], [385, 106], [410, 96], [430, 84], [448, 70]],
+  punta: { y0: 436, y1: 458 },
+  pivote: [97, 360],
+};
+
+/**
  * Pivote del CUERPO para la respiración (`clv-respira`): el centro de masa
  * del torso emplumado, entre los hombros (~y330) y la cadera (~y530).
  */
@@ -176,10 +248,12 @@ export default {
   ANCHO,
   ALTO,
   CABEZA,
+  CRESTA,
   OJO,
   OJO_2,
   MANDIBULA,
   BOCA,
   MANO_LAPIZ,
+  ALA_IZQ,
   CUERPO_PIVOTE,
 };
