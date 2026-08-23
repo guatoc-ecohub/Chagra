@@ -1,0 +1,26 @@
+/* osoTrazadoRig.css — SOLO el arnés del experimento trazado: tamaño del SVG
+ * dentro de la raíz y el freno data-quieto (fotograma digno determinista).
+ * TODA la cadencia vive en `osoLamina/osoLamina.css` (clases olv-*, las
+ * MISMAS de la lámina viva) — aquí no hay ni un keyframe nuevo. */
+
+.osoTrazado > svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+/* CALIBRACIÓN de la mandíbula a ESTA piel (no reinventa cadencia: mismo var
+   --olv-jaw, misma animación de habla de osoLamina.css): el creciente del
+   trazado es más chico que la pieza de la lámina viva — al 3.4% original el
+   mentón caía sobre la V del pecho a visema pleno. 2.2%/2° lo contiene. */
+.osoTrazado .olv-mandibulaPivote {
+  transform: translateY(calc(var(--olv-jaw, 0) * 2.2%)) rotate(calc(var(--olv-jaw, 0) * 2deg));
+}
+
+/* animated=false: fotograma digno — congela cadencia y transiciones. Los
+   párpados quedan en su scaleY(0) inline (ojos abiertos, como la lámina). */
+.osoTrazado[data-quieto],
+.osoTrazado[data-quieto] * {
+  animation: none !important;
+  transition: none !important;
+}

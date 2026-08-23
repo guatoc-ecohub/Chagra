@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <title>Oso AUTO-TRAZADO riggeado — gate visual</title>
+  <style>
+    body{ margin:0; background:#efe7d4; font:13px/1.4 system-ui, sans-serif; color:#2a1a0c; }
+    body.magenta{ background:#f0f; }
+    .fila{ display:flex; flex-wrap:wrap; gap:8px; padding:10px; align-items:flex-start; }
+    .caja{ background:#f7f1e2; border:1px solid #d8c9a6; border-radius:8px; padding:6px 10px 10px; }
+    body.magenta .caja{ background:transparent; border-color:#a0a; }
+    .caja h3{ margin:2px 0 4px; font-size:13px; font-weight:600; }
+    .lienzo{ width:520px; }
+    .ref img{ width:520px; display:block; }
+    /* pines de STRESS anti-decapitación: congelan el giro en su extremo */
+    .pin-giro .olv-cabezaGesto{ animation:none !important; transform:rotate(-18deg) !important; }
+    .pin-giro .olv-cabezaMira, .pin-giro .olv-cabezaPivote{ animation:none !important; transform:none !important; }
+    .pin-giro2 .olv-cabezaGesto{ animation:none !important; transform:rotate(18deg) !important; }
+    .pin-giro2 .olv-cabezaMira, .pin-giro2 .olv-cabezaPivote{ animation:none !important; transform:none !important; }
+    /* pin de MIRADA al extremo (el translate más grande del rig) */
+    .pin-mira .olv-cabezaMira{ transition:none !important; }
+    /* pin de OREJAS en pleno perk (el extremo del corte de orejas) */
+    .pin-perk .olv-orejaIzqPivote{ animation:none !important; transform:rotate(-9deg) !important; }
+    .pin-perk .olv-orejaDerPivote{ animation:none !important; transform:rotate(9deg) !important; }
+    /* pin de CORONA al extremo del florecer */
+    .pin-corona .olv-coronaPivote{ animation:none !important; transform:rotate(2deg) scale(1.045) !important; }
+    /* CALCO: la lámina debajo, el rig encima al 55% — para calzar siluetas.
+       viewBox -20 -30 655 690 → con W=655px la lámina (615×630) va en 20,30. */
+    .calco{ position:relative; width:655px; height:690px; }
+    .calco img{ position:absolute; left:20px; top:30px; width:615px; height:630px; }
+    .calco > div{ position:absolute; inset:0; opacity:.55; }
+    .calco .osoTrazado *{ animation:none !important; }
+    /* CONTROL de costuras: rig quieto SOBRE el calco plano, blend difference —
+       el fondo queda negro y CUALQUIER desviación del rig (costura, casquete
+       asomado, borde) se enciende. El instrumento mide al rig, no al tracer. */
+    .control{ position:relative; width:655px; height:690px; background:#000; }
+    .control > *{ position:absolute; inset:0; }
+    .control .capaB{ mix-blend-mode:difference; }
+    .control .osoTrazado *{ animation:none !important; transition:none !important; }
+    /* REGIONES: la lámina + los polígonos de clip encima (depurar cortes) */
+    .regiones{ position:relative; width:655px; height:690px; }
+    .regiones img{ position:absolute; left:20px; top:30px; width:615px; height:630px; opacity:.75; }
+    .regiones svg{ position:absolute; inset:0; width:100%; height:100%; }
+  </style>
+</head>
+<body>
+  <header style="padding:6px 12px 0;font-weight:600">Oso del bastón — AUTO-TRAZADO riggeado (gate visual del experimento; rama fable/oso-trazado-riggeado)</header>
+  <div id="root"></div>
+  <footer style="padding:0 12px 8px;opacity:.7">Lámina: /compai/laminas/oso.png · esqueleto/cadencia: osoLamina.css (olv-*) · calco: vtracer receta trazar-lamina.sh</footer>
+  <script type="module" src="/oso-trazado-demo.jsx"></script>
+</body>
+</html>
