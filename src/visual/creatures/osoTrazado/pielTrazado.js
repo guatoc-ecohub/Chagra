@@ -213,6 +213,37 @@ const BANDA_CUELLO = dPoly([
   [290, 187], [276, 186], [262, 174], [252, 160],
 ]);
 
+/* ── PARCHE HOMBRO +18° (mismo método que la banda atlas del jaguar,
+      79a649d0a): a +18° la mejilla despega y abre un canal de PÁGINA
+      (x241-266, y72-143 en coordenadas de lámina verdaderas, medido con
+      probe r4) entre la pared estática del cachete y el borde girado de
+      la cabeza: la astilla.
+
+      NOTA DE MARCO: las primeras dos pasadas (r4v1/r4v2) diseñaron el
+      parche con coordenadas leídas de capturas normalizadas SIN corregir
+      el descentrado horizontal de preserveAspectRatio (12.2px de pantalla
+      = 17.5 unidades de lámina): el parche quedaba ~17 unidades a la
+      derecha del seam real. v3 se diseña contra mapas de envolvente
+      corregidos: tinta de cabeza en reposo ∧ −18°.
+
+      DISCIPLINA DE ENVOLVENTE (mapas −18°): canal diagonal de cielo
+      x248-263 × y80-95 y bolsillo x250-259 × y126-134 quedan SIN pintar
+      (pintarlos produce flap oscuro sobre el hombro a −18°; r4v1 midió
+      240 px nuevoOscuro). El resto del seam sí tiene tinta en las tres
+      poses y se cubre: lóbulo superior corto (hasta x250), cintura en
+      x246 durante el canal, lóbulo medio hasta x262 (y99-124), y lóbulo
+      bajo hasta x262 rodeando el bolsillo. Lo que queda descubierto del
+      seam (~200px en los conflictos) es irreducible con casquete estático:
+      ahí la página está expuesta a +18° Y a −18° a la vez. En reposo todo
+      el parche queda tapado (⊂ tinta de reposo, el hueso pinta encima). */
+const PARCHE_HOMBRO_MAS18 = dPoly([
+  [240, 146], [239, 126], [239, 106], [238, 88], [239, 77],
+  [242, 72], [248, 71], [250, 75], [250, 80], [247, 84],
+  [244, 91], [244, 96], [246, 100], [254, 102], [260, 105],
+  [262, 112], [259, 119], [254, 124], [256, 130], [259, 134],
+  [261, 138], [258, 142],
+]);
+
 /* ─────────────────────────────── defs ────────────────────────────────────── */
 
 const DEFS = `<defs>
@@ -300,7 +331,7 @@ export const OSO_TRAZADO_INTERIOR = `${DEFS}
     ${usoCalco('cuerpo')}
     ${casquete('corona', `<rect x="518" y="200" width="66" height="36" fill="${P.palo}"/>`)}
     <g class="olv-coronaPivote"${origin('corona')}>${usoCalco('corona')}</g>
-    ${casquete('cabeza', `<path d="${BANDA_CUELLO}" fill="${P.cuello}"/>`)}
+    ${casquete('cabeza', `<path d="${BANDA_CUELLO}" fill="${P.cuello}"/><path d="${PARCHE_HOMBRO_MAS18}" fill="${P.cuello}"/>`)}
     <g class="olv-cabezaGesto"${origin('cabeza')}>
       <g class="olv-cabezaMira"${origin('cabeza')}>
         <g class="olv-cabezaPivote"${origin('cabeza')}>
