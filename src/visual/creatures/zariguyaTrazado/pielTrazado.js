@@ -33,7 +33,7 @@
  */
 
 import { RH_LINE_BOIL } from '../rubberhoseSpec.js';
-import { CALCO_TRAZADO } from './calcoTrazado.js';
+import { CALCO_TRAZADO, AIRE_LIMPIO_D } from './calcoTrazado.js';
 
 /* ── PIVOTES (px del espacio 481×444 de la lámina) ──────────────────────────
    Fuente: zariguyaLamina/anatomia.js (medidos sobre la lámina con grilla y
@@ -152,6 +152,49 @@ export const ZT_REGIONES = Object.freeze({
   ],
 });
 
+/* ── BANDAS ANTI-COSTURA (px de lámina) ─────────────────────────────────────
+   La rayita nace del ANTIALIAS: donde dos clips estáticos se tocan, ambos
+   bordes quedan semitransparentes y el fondo sangra. El casquete usa el
+   propio calco y dilata 2px el borde compartido, de modo que el antialias
+   funde fur con fur sin introducir una textura nueva. Los casquetes de color
+   se conservan DEBAJO para el movimiento profundo (van primero). */
+const banda = (pts, a, b) => {
+  const n = pts.length;
+  const normales = pts.map((p, i) => {
+    const p0 = pts[Math.max(0, i - 1)];
+    const p1 = pts[Math.min(n - 1, i + 1)];
+    const dx = p1[0] - p0[0]; const dy = p1[1] - p0[1];
+    const L = Math.hypot(dx, dy) || 1;
+    return [-dy / L, dx / L];
+  });
+  const ladoA = pts.map((p, i) => [p[0] + normales[i][0] * a, p[1] + normales[i][1] * a]);
+  const ladoB = pts.map((p, i) => [p[0] - normales[i][0] * b, p[1] - normales[i][1] * b]).reverse();
+  return [...ladoA, ...ladoB].map(([x, y]) => [+x.toFixed(1), +y.toFixed(1)]);
+};
+
+export const ZT_BANDAS = Object.freeze({
+  /* Bordes estático-vs-estático del cuello y la cabeza: 2px por lado. */
+  bCabeza: banda([[144, 127], [246, 127], [252, 134], [264, 134], [280, 130],
+    [294, 124], [306, 116], [316, 109]], 2, 2),
+  bCuello: banda([[142, 136], [150, 148], [160, 162], [176, 172], [196, 178],
+    [218, 180], [238, 176], [256, 168], [272, 158], [286, 146], [300, 134],
+    [316, 120]], 2, 2),
+  bBrujula: banda([[132, 216], [152, 214], [168, 210], [186, 204], [204, 200],
+    [216, 204], [220, 214], [214, 226], [202, 234], [196, 244], [192, 280],
+    [178, 294], [158, 302]], 7, 7),
+  bLapiz: banda([[102, 182], [112, 192], [126, 200], [140, 208], [154, 214],
+    [166, 222], [172, 232], [168, 244], [156, 250], [140, 246], [124, 238],
+    [108, 230]], 6, 6),
+  bMuneca: banda([[99, 170], [97, 186], [92, 200], [82, 212], [68, 220],
+    [52, 222], [34, 220], [16, 214]], 5, 5),
+  bCadera: banda([[338, 344], [320, 326], [294, 322], [268, 328], [252, 342],
+    [244, 362]], 8, 8),
+  bRodilla: banda([[256, 392], [296, 388], [336, 384]], 7, 7),
+  bColaBase: banda([[330, 316], [330, 348], [330, 380]], 6, 6),
+  bColaMedia: banda([[442, 334], [432, 350], [430, 364], [430, 380]], 5, 5),
+  bColaPunta: banda([[486, 262], [452, 262], [440, 264], [434, 272]], 5, 5),
+});
+
 const P = Object.freeze({
   pelaje: '#6b5f52',
   penumbra: '#3f342a',
@@ -176,6 +219,8 @@ const dPoly = (pts) => `M${pts.map(([x, y]) => `${x},${y}`).join(' L')} Z`;
 
 const CLIPS = Object.entries(ZT_REGIONES)
   .map(([n, pts]) => `<clipPath id="zt-r-${n}"><path d="${dPoly(pts)}"/></clipPath>`)
+  .concat(Object.entries(ZT_BANDAS)
+    .map(([n, pts]) => `<clipPath id="zt-b-${n}"><path d="${dPoly(pts)}"/></clipPath>`))
   .join('\n  ');
 
 /** Un hueso: <use> del calco recortado a su región. */
@@ -186,6 +231,12 @@ const usoCalco = (region) => `<use href="#ztCalco" clip-path="url(#zt-r-${region
     franja que el hijo desocupa al rotar. */
 const casquete = (region, forma) => `<g clip-path="url(#zt-r-${region})">${forma}</g>`;
 
+/** Casquete de CALCO: el propio trazado, restringido a la región estática
+    del hueso y a su banda dilatada. En reposo queda bajo el píxel original;
+    al moverse, la franja revelada sigue siendo dibujo REAL. */
+const casqueteCalco = (region, nombre) =>
+  `<g clip-path="url(#zt-b-${nombre})"><use href="#ztCalco" clip-path="url(#zt-r-${region})"/></g>`;
+
 const elipse = (cx, cy, rx, ry, fill, rot = 0) =>
   `<ellipse cx="${cx}" cy="${cy}" rx="${rx}" ry="${ry}" fill="${fill}"${rot ? ` transform="rotate(${rot} ${cx} ${cy})"` : ''}/>`;
 const disco = (cx, cy, r, fill) => `<circle cx="${cx}" cy="${cy}" r="${r}" fill="${fill}"/>`;
@@ -193,7 +244,8 @@ const disco = (cx, cy, r, fill) => `<circle cx="${cx}" cy="${cy}" r="${r}" fill=
 /* ─────────────────────────────── defs ────────────────────────────────────── */
 
 const DEFS = `<defs>
-  <g id="ztCalco">${CALCO_TRAZADO}</g>
+  <clipPath id="ztAireLimpio"><path clip-rule="evenodd" d="${AIRE_LIMPIO_D}"/></clipPath>
+  <g id="ztCalco" clip-path="url(#ztAireLimpio)">${CALCO_TRAZADO}</g>
   ${CLIPS}
   <linearGradient id="ztCuello" x1="215" y1="140" x2="228" y2="215" gradientUnits="userSpaceOnUse">
     <stop offset="0" stop-color="#4e4337"/>
@@ -248,6 +300,29 @@ const HALOS = `
   <circle class="zh-ojoHalo" style="opacity:0" cx="156" cy="74" r="17" fill="url(#ztOjoHalo)"/>
   <circle class="zh-ojoHalo" style="opacity:0" cx="246" cy="72" r="15" fill="url(#ztOjoHalo)"/>`;
 
+/* ── BIGOTES LIMPIOS: strokes redibujados sobre la geometría MEDIDA de la
+   lámina (grilla 20px + canal alfa). Los bigotes originales eran líneas de
+   1.5-2.5px — más finas que la resolución del vtracer: el calco los traía
+   como cadenas de motitas y tacos gruesos, y encima CRUZABAN los cortes de
+   región (se partían al girar). extraer-bigotes.mjs depuró esa tinta del
+   calco; aquí se reponen ENTEROS, sin clip, hijos del hueso de la cabeza:
+   giran con ella como unidad. Es el único dibujo nuevo junto a FAUCES. ── */
+const BIGOTE_TINTA = '#2b241a';
+const bigote = (d, w = 1.6) =>
+  `<path d="${d}" fill="none" stroke="${BIGOTE_TINTA}" stroke-width="${w}" stroke-linecap="round" opacity=".92"/>`;
+export const BIGOTES_LIMPIOS = `<g class="zt-bigotes">
+  ${bigote('M246,88 C258,78 268,64 274,52', 1.4)}
+  ${bigote('M245,93 C268,86 290,81 307,78')}
+  ${bigote('M244,100 C268,99 288,100 303,102')}
+  ${bigote('M244,106 C264,110 281,114 295,119')}
+  ${bigote('M245,110 C272,128 300,155 320,182', 1.4)}
+  ${bigote('M126,84 C114,90 103,96 92,102', 1.4)}
+  ${bigote('M129,97 C116,104 104,111 94,117')}
+  ${bigote('M130,110 C118,117 108,123 99,130')}
+  ${bigote('M130,122 C122,136 117,151 113,167')}
+  ${bigote('M132,130 C126,145 122,158 119,174', 1.4)}
+</g>`;
+
 /* ─────────────────────── LA CABEZA (con sus satélites) ───────────────────── */
 
 const CABEZA = `
@@ -256,6 +331,7 @@ const CABEZA = `
   <g class="zh-hueso zh-mandibula"${origin('mandibula')}>${usoCalco('mandibula')}</g>
   <g class="zh-hueso zh-orejaI"${origin('orejaI')}>${usoCalco('orejaI')}</g>
   <g class="zh-hueso zh-orejaD"${origin('orejaD')}>${usoCalco('orejaD')}</g>
+  ${BIGOTES_LIMPIOS}
   <g class="zh-ojoGrupo">${HALOS}${PARPADOS}</g>`;
 
 /* ─────────────────────────── EL SVG COMPLETO ─────────────────────────────── */
@@ -275,34 +351,44 @@ ${DEFS}
       <g class="zh-hueso zh-cuerpo"${origin('columna')}>
         <g class="zh-hueso zh-piernaLejos"${origin('piernaLejos')}>${usoCalco('piernaLejos')}</g>
         ${casquete('colaBase', disco(H.colaBase[0], H.colaBase[1], 12, P.cola))}
+        ${casqueteCalco('colaBase', 'bColaBase')}
         <g class="zh-hueso zh-colaBase"${origin('colaBase')}>
           ${usoCalco('colaBase')}
           ${casquete('colaMedia', disco(H.colaMedia[0], H.colaMedia[1], 11, P.cola))}
+          ${casqueteCalco('colaMedia', 'bColaMedia')}
           <g class="zh-hueso zh-colaMedia"${origin('colaMedia')}>
             ${usoCalco('colaMedia')}
             ${casquete('colaPunta', disco(H.colaPunta[0], H.colaPunta[1], 8, P.colaLuz))}
+            ${casqueteCalco('colaPunta', 'bColaPunta')}
             <g class="zh-hueso zh-colaPunta"${origin('colaPunta')}>${usoCalco('colaPunta')}</g>
           </g>
         </g>
         ${usoCalco('troncoCuerpo')}
         ${casquete('piernaCerca', elipse(298, 344, 38, 46, P.penumbra))}
+        ${casqueteCalco('piernaCerca', 'bCadera')}
         <g class="zh-hueso zh-piernaCerca"${origin('piernaCerca')}>
           ${usoCalco('piernaCerca')}
           ${casquete('piernaCercaBaja', disco(H.rodillaCerca[0], H.rodillaCerca[1], 13, P.rodilla))}
+          ${casqueteCalco('piernaCercaBaja', 'bRodilla')}
           <g class="zh-hueso zh-piernaCercaBaja"${origin('rodillaCerca')}>${usoCalco('piernaCercaBaja')}</g>
         </g>
         ${casquete('brazoBrujula', elipse(204, 212, 13, 10, P.hombro) + elipse(178, 262, 18, 22, P.pecho))}
+        ${casqueteCalco('brazoBrujula', 'bBrujula')}
         <g class="zh-hueso zh-brazoBrujula"${origin('brazoBrujula')}>${usoCalco('brazoBrujula')}</g>
         ${casquete('brazoLapiz', elipse(150, 214, 16, 12, P.hombro))}
+        ${casqueteCalco('brazoLapiz', 'bLapiz')}
         <g class="zh-hueso zh-brazoLapiz"${origin('brazoLapiz')}>
           ${usoCalco('brazoLapiz')}
           ${casquete('manoLapiz', disco(H.munecaLapiz[0], H.munecaLapiz[1], 10, P.pelaje))}
+          ${casqueteCalco('manoLapiz', 'bMuneca')}
           <g class="zh-hueso zh-brazoLapizAnte zh-manoLapiz"${origin('munecaLapiz')}>${usoCalco('manoLapiz')}</g>
         </g>
         ${casquete('cuello', elipse(218, 158, 46, 18, 'url(#ztCuello)', -8))}
+        ${casqueteCalco('cuello', 'bCuello')}
         <g class="zh-hueso zh-cuello"${origin('cuello')}>
           ${usoCalco('cuello')}
           ${casquete('cabeza', elipse(212, 124, 60, 22, 'url(#ztCuello)', -7))}
+          ${casqueteCalco('cabeza', 'bCabeza')}
           <g class="zh-hueso zh-cabezaGiro"${origin('cabeza')}>
             <g class="zh-hueso zh-cabeza"${origin('cabeza')}>
               ${CABEZA}
