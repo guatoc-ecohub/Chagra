@@ -43,6 +43,12 @@ export const ABEJA_PALETA = {
   torax: '#3d2c19',       // tórax oscuro (un pelo más cálido que la cabeza)
   cara: '#ffe3ad',        // máscara facial clara (clípeo amarillo real de la angelita)
   hiloChumbe: '#c98a3e',  // tergite tenue del abdomen (línea suave, ya NO banda)
+  bandaClara: '#fce3a9',  // bandas CLARAS de los tergitos: segmentos pálidos sobre
+                          // el ámbar (la angelita real; lo vetado son las barras
+                          // OSCURAS de la Apis, nunca lo claro)
+  franjaTorax: '#e8b45a', // franja dorada del costado del mesosoma — la marca
+                          // amarilla lateral del tórax negro, firma de campo
+                          // de T. angustula (Nates-Parra; iNaturalist)
   alaTul: '#cfeeff',      // ala grande de tul (hialina)
   alaTulClara: '#eafff8', // ala chica, más pálida
   lengua: '#c9524e',      // probóscide (sed / libar)
