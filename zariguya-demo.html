@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <title>Zarigüeya de huesos — gate visual</title>
+  <style>
+    body{ margin:0; background:#efe7d4; font:13px/1.4 system-ui, sans-serif; color:#2a1a0c; }
+    .fila{ display:flex; flex-wrap:wrap; gap:8px; padding:10px; align-items:flex-start; }
+    .caja{ background:#f7f1e2; border:1px solid #d8c9a6; border-radius:8px; padding:6px 10px 10px; }
+    .caja h3{ margin:2px 0 4px; font-size:13px; font-weight:600; }
+    .lienzo{ width:480px; }
+    .ref img{ width:480px; display:block; }
+    /* pines de STRESS anti-decapitación: congelan el giro en su extremo */
+    .pin-giro .zh-cabezaGiro{ animation:none !important; transform:rotate(-18deg) !important; }
+    .pin-giro .zh-cabeza{ animation:none !important; }
+    .pin-giro2 .zh-cabezaGiro{ animation:none !important; transform:rotate(14deg) !important; }
+    .pin-giro2 .zh-cabeza{ animation:none !important; }
+    /* pin de STRESS de la cola prensil: la espiral apretada al extremo */
+    .pin-cola .zh-colaBase{ animation:none !important; transform:rotate(-7deg) !important; }
+    .pin-cola .zh-colaMedia{ animation:none !important; transform:rotate(-16deg) !important; }
+    .pin-cola .zh-colaPunta{ animation:none !important; transform:rotate(-38deg) !important; }
+    /* CALCO: la lámina debajo, el vector encima al 55% — para calzar siluetas.
+       El viewBox del svg es -30 -25 545 500 → con W=545px, la lámina (481×444)
+       va en left:30px top:25px. */
+    .calco{ position:relative; width:545px; height:500px; }
+    .calco img{ position:absolute; left:30px; top:25px; width:481px; height:444px; }
+    .calco > div{ position:absolute; inset:0; opacity:.55; }
+    .calco .zariguyaHuesos *{ animation:none !important; }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+  <script type="module" src="/zariguya-demo.jsx"></script>
+</body>
+</html>
