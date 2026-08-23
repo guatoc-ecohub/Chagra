@@ -1,0 +1,29 @@
+/*
+ * valleFpsHud — estilos del HUD de FPS dev-only. Píldora fija esquina inferior
+ * derecha, no captura punteros (pointer-events:none) para no estorbar el 3D.
+ * Colores robados del rating de ThreeUI PreviewFpsMeter (good/watch/slow).
+ */
+.valle-fps-hud {
+  position: fixed;
+  right: 8px;
+  bottom: 8px;
+  z-index: 2147483000;
+  font: 600 12px/1.2 ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+  padding: 4px 8px;
+  border-radius: 6px;
+  color: #fff;
+  background: rgba(0, 0, 0, 0.72);
+  pointer-events: none;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.valle-fps-hud[data-rating="good"] { color: #7cffb2; }
+.valle-fps-hud[data-rating="watch"] { color: #ffd466; }
+.valle-fps-hud[data-rating="slow"] { color: #ff6b6b; }
+.valle-fps-hud[data-rating="pending"] { color: #aab; }
+
+.valle-fps-hud__lentos {
+  opacity: 0.85;
+  font-weight: 400;
+}

@@ -10,6 +10,7 @@ import './styles/clima-atmosfera.css'
 import './styles/sello-confianza.css'
 import './styles/panel-procedencia.css'
 import App from './App.jsx'
+import ValleFpsHud from './visual/mundo3d/kit/ValleFpsHud.jsx'
 import { ErrorBoundary } from './components/ErrorBoundary'
 import { ModoCampoProvider } from './hooks/ModoCampoContext'
 import { syncManager } from './services/syncManager'
@@ -120,6 +121,7 @@ if (!canonicalRedirect.redirected) {
       <ErrorBoundary>
         <ModoCampoProvider>
           <App />
+          <ValleFpsHud />
         </ModoCampoProvider>
       </ErrorBoundary>
     </StrictMode>,
