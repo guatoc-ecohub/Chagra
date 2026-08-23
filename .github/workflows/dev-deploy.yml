@@ -76,14 +76,10 @@ jobs:
           # para que dev = corpus-por-turno + deep-research + todos los guards =
           # build de referencia contra la que prod se iguala en la promoción.
           VITE_DEEP_RESEARCH_ENABLED: "true"
-          # AVATAR-ESPIRITU / módulos Pro: mismo valor y patrón que deploy.yml
-          # (prod). Sin esta variable, loadProModules.js ni intenta el import
-          # dinámico y en dev #/espiritu caía SIEMPRE al fallback "no
-          # disponible en su plan" aunque los bundles Pro estuvieran servidos.
-          # Los bundles viven montados en el docroot bajo /pro-modules/ (FUERA
-          # del repo público — anti-leak OSS/Pro); si el path no resuelve, el
-          # import falla en silencio y la UI degrada a build puro OSS.
-          VITE_PRO_MODULES_PATH: "/pro-modules"
+          # Los bundles Pro no están servidos en dev. Sin esta variable,
+          # loadProModules.js degrada al build OSS y no genera requests a
+          # /pro-modules/<modulo>/index.js, que el SPA fallback respondería
+          # como text/html.
 
       - if: env.SKIP_DEPLOY != '1'
         name: Deploy to dev
