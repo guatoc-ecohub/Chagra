@@ -17,6 +17,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent, cleanup } from '@testing-library/react';
 import ClimaBoletinScreen from './ClimaBoletinScreen.jsx';
 import { setEnsoPhase, clearEnsoPhase } from '../../services/ensoService.js';
+import { fetchAgroMeteo } from '../../services/agroMeteoService.js';
 
 // Perfil andino (Boyacá) → región 'andina' para la lectura regional.
 vi.mock('../../services/userProfileService', async (importActual) => {
@@ -123,6 +124,60 @@ describe('La página del tiempo — El Niño remite y prepara', () => {
     gotoElNino();
     expect(screen.getByTestId('clima-elnino-2027')).toBeInTheDocument();
     expect(screen.getAllByTestId('slot-grounded-pendiente').length).toBeGreaterThanOrEqual(1);
+  });
+});
+
+describe('La página del tiempo — El Niño mes a mes + ventana de siembra MTA', () => {
+  it('renderiza el timeline ENSO con las 4 fases y el resumen de alivio', () => {
+    render(<ClimaBoletinScreen onBack={() => {}} />);
+    gotoElNino();
+    expect(screen.getByTestId('clima-enso-timeline')).toBeInTheDocument();
+    expect(screen.getByTestId('enso-cal-fortalecimiento')).toBeInTheDocument();
+    expect(screen.getByTestId('enso-cal-pico')).toBeInTheDocument();
+    expect(screen.getByTestId('enso-cal-persistencia')).toBeInTheDocument();
+    expect(screen.getByTestId('enso-cal-transicion')).toBeInTheDocument();
+    // "Cuándo se alivia" + enlace al pronóstico ENSO EN VIVO (no snapshot).
+    expect(screen.getByTestId('clima-enso-alivio')).toHaveTextContent(/alivia/i);
+    const live = screen.getByTestId('clima-enso-live-link');
+    expect(live).toHaveAttribute('target', '_blank');
+    expect(live.getAttribute('href')).toMatch(/^https?:\/\/.*noaa/i);
+  });
+
+  it('la transición a Neutral se marca como dato en camino (no inventa cifra)', () => {
+    render(<ClimaBoletinScreen onBack={() => {}} />);
+    gotoElNino();
+    const trans = screen.getByTestId('enso-cal-transicion');
+    // grounded_pendiente en la fila de transición (probFoto null).
+    expect(trans.querySelector('[data-testid="slot-grounded-pendiente"]')).not.toBeNull();
+  });
+
+  it('la ventana de siembra MTA deflecta honesto y enlaza al boletín en vivo', () => {
+    render(<ClimaBoletinScreen onBack={() => {}} />);
+    gotoElNino();
+    expect(screen.getByTestId('clima-mta-ventana')).toBeInTheDocument();
+    // No inventa la fecha: remite al boletín (deflección honesta).
+    expect(screen.getByTestId('clima-mta-ventana-pendiente')).toHaveTextContent(/no la inventa|boletín/i);
+    const link = screen.getByTestId('clima-mta-ventana-live');
+    expect(link).toHaveAttribute('target', '_blank');
+    expect(link.getAttribute('href')).toMatch(/^https?:\/\//i);
+  });
+});
+
+describe('La página del tiempo — 7–16 días remite a la fuente oficial', () => {
+  it('con pronóstico, el Open-Meteo enlaza al BSA del IDEAM en vivo', async () => {
+    // Con días de pronóstico, la pestaña 7–16 muestra el contraste con la fuente
+    // oficial (BSA IDEAM, link vivo). La red se resuelve con daily mockeado.
+    const daily = Array.from({ length: 7 }, (_, i) => ({
+      date: `2026-08-${String(24 + i).padStart(2, '0')}`,
+      temp_max: 20, temp_min: 9, precip_mm: 1, precip_prob: 30,
+      viento_max: 10, sol_horas: 6, rh_mean: 70,
+    }));
+    vi.mocked(fetchAgroMeteo).mockResolvedValueOnce({ daily });
+    render(<ClimaBoletinScreen onBack={() => {}} location={{ lat: 5.5, lng: -73.4, municipio: 'Villa de Leyva' }} />);
+    fireEvent.click(screen.getByTestId('horizonte-tab-semana'));
+    const bsa = await screen.findByTestId('clima-bsa-link');
+    expect(bsa).toHaveAttribute('target', '_blank');
+    expect(bsa.getAttribute('href')).toMatch(/ideam\.gov\.co.*bsa/i);
   });
 });
 
