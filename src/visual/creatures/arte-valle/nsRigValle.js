@@ -81,3 +81,8 @@ export function extraerCssDelRig(cssCompleto, marcador) {
   const inicioComentario = cssCompleto.lastIndexOf('/*', idx);
   return cssCompleto.slice(inicioComentario === -1 ? idx : inicioComentario);
 }
+
+/** Adapta los selectores del rig web-component a su montaje en light DOM. */
+export function hostALigero(cssTexto) {
+  return cssTexto.replace(/:host\(([^)]*)\)/g, '$1');
+}

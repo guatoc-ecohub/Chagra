@@ -37,6 +37,13 @@ section.par > h3 code { color: var(--menta); border: 1px solid var(--linea); bac
 .panel .etq.v { color: var(--verde); border-color: #57c98a66; }
 .lienzo { place-items: center; height: 340px; padding: 14px; display: grid; }
 .lienzo > * { max-width: 100%; max-height: 100%; }
+.guaca-dialogo { position: relative; display: grid; place-items: center; }
+.guaca-dialogo-burbuja {
+  position: absolute; z-index: 4; top: 2%; left: 50%; width: min(300px, 86vw);
+  transform: translateX(-50%); padding: 9px 12px; border: 1px solid #ffc46a99;
+  border-radius: 12px; color: #24150b; background: #fff4d9eF;
+  box-shadow: 0 8px 22px #0005; font: 600 .75rem/1.35 system-ui, sans-serif;
+}
 .err { color: var(--rojo); text-align: center; padding: 14px; font: 500 0.8rem/1.5 ui-monospace, Menlo, monospace; }
 .ctrl { flex-wrap: wrap; gap: 16px; margin-top: 12px; display: flex; }
 .ctrl .grupo { flex-wrap: wrap; align-items: center; gap: 6px; display: flex; }

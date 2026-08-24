@@ -42,15 +42,32 @@
  * balanceo de cola) sí corre porque no depende de `:host`. PRIMERA PASADA
  * (ítem #8 del GAP compAI, 2026-08-14) — ver nota en `guacamayaIdentidad.js`.
  */
-import { useId, useMemo } from 'react';
+import { useEffect, useId, useMemo, useState } from 'react';
 import rigSvg from './arte-valle/guacamaya.rig.svg?raw';
 import defsSvg from './arte-valle/guacamaya.defs.svg?raw';
 import cssCompleto from './arte-valle/guacamayaCssTexto.js';
-import { idsDeclaradosEnSvg, namespaceSvg, namespaceCss, extraerCssDelRig } from './arte-valle/nsRigValle.js';
+import {
+  idsDeclaradosEnSvg,
+  namespaceSvg,
+  namespaceCss,
+  extraerCssDelRig,
+  hostALigero,
+} from './arte-valle/nsRigValle.js';
 import { GUACAMAYA_SLUG, GUACAMAYA_NOMBRE } from './guacamayaIdentidad.js';
+import { estadoCanonico, elegirMomentoIdle, duracionDeMomento } from '../agente/angelitaEstados.js';
 
 const MARCADOR_CSS = 'GUACAMAYA — rig rubber-hose';
-const CSS_RIG = extraerCssDelRig(cssCompleto, MARCADOR_CSS);
+const CSS_RIG = hostALigero(extraerCssDelRig(cssCompleto, MARCADOR_CSS)) + `
+[data-visema="V1"] #picoBajo{transform:translateY(0) scaleY(.9)}
+[data-visema="V2"] #picoBajo{transform:translateY(3px) scaleY(1.08)}
+[data-visema="V4"] #picoBajo{transform:translateY(6px) scaleY(1.18)}
+[data-visema="V3"] #picoBajo{transform:translateY(10px) scaleY(1.28)}
+svg[data-creature="guacamaya"][data-vida="enjaulada"] #jaula{opacity:.92}
+svg[data-creature="guacamaya"][data-vida="enjaulada"] #guaca{filter:saturate(.55) brightness(.8);transform:translateY(10px) scale(.97)}
+svg[data-creature="guacamaya"][data-vida="enjaulada"] .flota{animation-duration:3.8s}
+svg[data-creature="guacamaya"][data-vida="enjaulada"] #alaIzq,
+svg[data-creature="guacamaya"][data-vida="enjaulada"] #alaDer{transform:rotate(-5deg)}
+`;
 const MARCADO_CRUDO = `${defsSvg}\n${rigSvg}`;
 const IDS = idsDeclaradosEnSvg(MARCADO_CRUDO);
 
@@ -70,75 +87,22 @@ const ESTADO_DE_STATE = {
   thinking: 'idle',
   speaking: 'hablar',
   listening: 'idle',
-  caminando: 'camina',
+  /* El control compartido puede decir "caminando", pero esta especie vuela:
+     reutiliza la actuación "dispersar" del showcase (aleteo + semillas). */
+  caminando: 'dispersar',
+  volando: 'dispersar',
 };
 
-/* ── MARCHA (estado 'camina') ────────────────────────────────────────────────
-   El rig F24 de la guacamaya NO trae patas (vive flotando) — para caminar se
-   le prestan dos PATAS MANGUERA del lenguaje de la casa (tubo de tinta + pie
-   crema), dibujadas DETRÁS del cuerpo y ocultas fuera de 'camina': la piel
-   aprobada no se toca. En 'camina' el flote cede a un bob de suelo y el
-   cuerpo hace el BAMBOLEO de loro (roll lateral en contratiempo del paso)
-   mientras las patas alternan desde la cadera — ciclo real por hueso, sin
-   translateX ni espejos. Keyframes con prefijo gcp- (únicos en light DOM). */
-const TINTA_RIG = '#2a140b';
-const PIE_CREMA = '#e8dcc0';
-const CSS_MARCHA = `
-svg[data-creature='guacamaya'] .gcp-marcha { opacity: 0; }
-svg[data-creature='guacamaya'][data-estado='camina'] .gcp-marcha { opacity: 1; transition: opacity .25s; }
-svg[data-creature='guacamaya'][data-estado='camina'] .flota {
-  animation: gcp-suelo-bob 1.1s ease-in-out infinite;
-}
-@keyframes gcp-suelo-bob {
-  0%, 100% { transform: translateY(14px) rotate(-2.4deg); }
-  25%      { transform: translateY(6px) rotate(0deg); }
-  50%      { transform: translateY(14px) rotate(2.4deg); }
-  75%      { transform: translateY(6px) rotate(0deg); }
-}
-.gcp-pata { transform-box: fill-box; }
-.gcp-pata-i { transform-origin: top center; }
-.gcp-pata-d { transform-origin: top center; }
-svg[data-creature='guacamaya'][data-estado='camina'] .gcp-pata-i {
-  animation: gcp-paso-i 1.1s ease-in-out infinite;
-}
-svg[data-creature='guacamaya'][data-estado='camina'] .gcp-pata-d {
-  animation: gcp-paso-d 1.1s ease-in-out infinite;
-}
-@keyframes gcp-paso-i {
-  0%, 100% { transform: rotate(19deg); }
-  50%      { transform: rotate(-19deg); }
-}
-@keyframes gcp-paso-d {
-  0%, 100% { transform: rotate(-19deg); }
-  50%      { transform: rotate(19deg); }
-}
-@media (prefers-reduced-motion: reduce) {
-  svg[data-creature='guacamaya'][data-estado='camina'] .flota,
-  svg[data-creature='guacamaya'][data-estado='camina'] .gcp-pata-i,
-  svg[data-creature='guacamaya'][data-estado='camina'] .gcp-pata-d { animation: none; }
-}
-`;
+const ESTADO_RIG_DE_ESTADO_AGENTE = {
+  acompana: 'idle', escuchando: 'idle', pensando: 'idle', respondiendo: 'hablar',
+  contenta: 'sana', preocupada: 'amenaza', 'no-se': 'idle', senala: 'senalar',
+  invita: 'pacto', husmea: 'dispersar',
+};
+const VISEMAS_HABLA = ['V2', 'V3', 'V1', 'V4'];
 
-/* Dos patas manguera de loro: nacen bajo la panza, a los lados del abanico de
-   la cola (que nace en y≈132 al centro), y bajan al suelo del encuadre. */
-function PatasMarcha() {
-  return (
-    <g className="gcp-marcha" aria-hidden="true">
-      <g className="gcp-pata gcp-pata-i">
-        <path d="M-52,160 C -58,205 -60,245 -56,278" fill="none"
-          stroke={TINTA_RIG} strokeWidth="22" strokeLinecap="round" />
-        <ellipse cx="-58" cy="285" rx="27" ry="14" fill={PIE_CREMA}
-          stroke={TINTA_RIG} strokeWidth="6" />
-      </g>
-      <g className="gcp-pata gcp-pata-d">
-        <path d="M52,160 C 58,205 60,245 56,278" fill="none"
-          stroke={TINTA_RIG} strokeWidth="22" strokeLinecap="round" />
-        <ellipse cx="58" cy="285" rx="27" ry="14" fill={PIE_CREMA}
-          stroke={TINTA_RIG} strokeWidth="6" />
-      </g>
-    </g>
-  );
-}
+/* Texto de la lección viva del showcase: el comparador conserva el diálogo
+   aprobado y solo añade la presentación del globo en su propia tarjeta. */
+export const DIALOGO_GUACAMAYA = '¡Buenos días! Soy una guacamaya bandera. Vuelo lejos y voy soltando semillas por todo el monte: soy jardinera del bosque.';
 
 /**
  * GuacamayaCompai — cuerpo 2.5D del compañero elegible. Mismas props base
@@ -148,6 +112,8 @@ function PatasMarcha() {
  */
 export function GuacamayaCompai({
   state = 'idle',
+  estado = undefined,
+  visema = null,
   size = 64,
   className = '',
   style = undefined,
@@ -157,7 +123,48 @@ export function GuacamayaCompai({
   const sufijo = useId().replace(/[:]/g, '');
   const marcado = useMemo(() => namespaceSvg(MARCADO_CRUDO, IDS, sufijo), [sufijo]);
   const css = useMemo(() => namespaceCss(CSS_RIG, IDS, sufijo), [sufijo]);
-  const estado = ESTADO_DE_STATE[state] || 'idle';
+  const dataEstado = estado !== undefined
+    ? (ESTADO_RIG_DE_ESTADO_AGENTE[estadoCanonico(estado)] || 'idle')
+    : (ESTADO_DE_STATE[state] || 'idle');
+  const idleActivo = estado === undefined && (state === 'idle' || state === 'thinking');
+  const hablando = dataEstado === 'hablar';
+  const [visemaAutomatico, setVisemaAutomatico] = useState('V2');
+  const [enjaulada, setEnjaulada] = useState(false);
+  const [momento, setMomento] = useState('flota');
+
+  useEffect(() => {
+    if (!hablando) { setVisemaAutomatico('V1'); return undefined; }
+    let n = 0;
+    const timer = window.setInterval(() => {
+      n = (n + 1) % VISEMAS_HABLA.length;
+      setVisemaAutomatico(VISEMAS_HABLA[n]);
+    }, 170);
+    return () => window.clearInterval(timer);
+  }, [hablando]);
+
+  useEffect(() => {
+    if (!idleActivo || typeof window === 'undefined'
+      || window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) return undefined;
+    let timer = 0;
+    let ultimoGesto = null;
+    let primerFlota = true;
+    const programar = (nombre) => {
+      setMomento(nombre);
+      /* Primera aparición siempre libre; después ~15% de los ratos ociosos. */
+      setEnjaulada(nombre === 'flota' && !primerFlota && Math.random() < 0.15);
+      primerFlota = false;
+      timer = window.setTimeout(() => {
+        if (nombre === 'flota') {
+          ultimoGesto = elegirMomentoIdle(ultimoGesto);
+          programar(ultimoGesto);
+        } else {
+          programar('flota');
+        }
+      }, duracionDeMomento(nombre));
+    };
+    timer = window.setTimeout(() => programar('flota'), 0);
+    return () => window.clearTimeout(timer);
+  }, [idleActivo]);
 
   return (
     <svg
@@ -169,19 +176,16 @@ export function GuacamayaCompai({
       role="img"
       aria-label={title}
       data-creature={GUACAMAYA_SLUG}
-      data-estado={estado}
-      data-visema={state === 'speaking' ? 'V2' : undefined}
+      data-estado={dataEstado}
+      data-visema={visema || (hablando ? visemaAutomatico : undefined)}
+      data-vida={enjaulada ? 'enjaulada' : undefined}
+      data-guaca-idle={idleActivo ? momento : undefined}
       {...rest}
     >
       <title>{title}</title>
       {css && <style>{css}</style>}
-      <style>{CSS_MARCHA}</style>
       {/* rig reusado del valle (F24), no redibujado — ver nota de arriba */}
       <g dangerouslySetInnerHTML={{ __html: marcado }} />
-      {/* patas de la marcha DESPUÉS del rig: capa correcta de loro (patas
-          delante de la cola larga) — y el contrato del test del rig ("el
-          primer <g> es el marcado inlineado") queda intacto */}
-      <PatasMarcha />
     </svg>
   );
 }

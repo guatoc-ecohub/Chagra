@@ -32,11 +32,22 @@ import { Luciernaga } from './src/visual/creatures/Luciernaga.jsx';
 import { OsoBaston } from './src/visual/creatures/OsoBaston.jsx';
 import { ChivitoPunk } from './src/visual/creatures/ChivitoPunk.jsx';
 import { AbejaAngelita } from './src/visual/creatures/AbejaAngelita.jsx';
-import { GuacamayaCompai } from './src/visual/creatures/GuacamayaCompai.jsx';
+import { DIALOGO_GUACAMAYA, GuacamayaCompai } from './src/visual/creatures/GuacamayaCompai.jsx';
 
 import './comparador-vivo.css';
 
 const ESTADOS = ['idle', 'thinking', 'speaking', 'listening', 'caminando'];
+
+function GuacamayaConDialog({ state = 'idle', ...props }) {
+  return (
+    <div className="guaca-dialogo">
+      <GuacamayaCompai state={state} {...props} />
+      {state === 'speaking' && (
+        <div className="guaca-dialogo-burbuja" role="status">{DIALOGO_GUACAMAYA}</div>
+      )}
+    </div>
+  );
+}
 
 /* Una entrada por personaje. `Vieja` es el rubber-hose que corre hoy en la
    PWA; `Nueva` la lámina viva aprobada (si existe). `viejaProps(estado)`
@@ -87,10 +98,10 @@ const ELENCO = [
   },
   {
     slug: 'guacamaya', nombre: 'Guacamaya', emoji: '🦜',
-    Nueva: null, Vieja: GuacamayaCompai,
+    Nueva: null, Vieja: GuacamayaConDialog,
     viejaProps: (e) => ({ size: 300, state: e }),
     momentos: [],
-    nota: 'Aprobada tal cual (sin par de lámina) — y también camina: bamboleo de loro con patas manguera en ciclo, cola larga de contrapeso.',
+    nota: 'Rig completo del showcase: vuelo/flote, actuación, visemas y diálogo; «volando» conserva vuelo, nunca añade marcha.',
   },
 ];
 
@@ -144,7 +155,9 @@ function Tarjeta({ c }) {
         <div className="grupo">
           <b>estado</b>
           {ESTADOS.map((e) => (
-            <button key={e} className={estado === e && !vida ? 'on' : ''} onClick={() => ponerEstado(e)}>{e}</button>
+            <button key={e} className={estado === e && !vida ? 'on' : ''} onClick={() => ponerEstado(e)}>
+              {c.slug === 'guacamaya' && e === 'caminando' ? 'volando' : e}
+            </button>
           ))}
         </div>
         {c.momentos.length > 0 && (
@@ -157,7 +170,7 @@ function Tarjeta({ c }) {
         )}
       </div>
       <p className="linea">
-        data-agt-estado=<em>{estado}</em>
+        data-agt-estado=<em>{c.slug === 'guacamaya' && estado === 'caminando' ? 'volando' : estado}</em>
         {vida ? <> · data-vida=<em>{vida}</em></> : null}
         {' · '}<span>{c.nota}</span>
       </p>
@@ -194,14 +207,13 @@ function Pagina() {
     <div className="env">
       <header className="top">
         <h1>compAI — antes / después, con su comportamiento completo</h1>
-        <p className="lema">La lámina dejó de ser un cuadro: ahora respira, parpadea, cambia el peso de pata y camina — y en «caminando» camina TODO el elenco.</p>
+        <p className="lema">La lámina dejó de ser un cuadro: respira, parpadea, actúa y habla; cada especie conserva su locomoción.</p>
         <p>
           A la izquierda, el compai <b>rubber-hose</b> anterior. A la derecha, la <b>lámina viva</b> aprobada:
           el mismo componente React que corre en el valle, vivo, con su vida 30/70 y —en el jaguar— la marcha
           cuadrúpeda real por hueso. Los botones cambian el <code>estado</code> conversacional; los «momentos
-          idle» fuerzan, uno a uno, los micro-gestos que el propio CSS del rig declara. En <code>caminando</code> cada
-          rubber-hose mueve las patas en ciclo de marcha real (rotación por cadera + bob del cuerpo, CSS puro) —
-          nunca un <code>translateX</code> falso ni un espejo.
+          idle» fuerzan, uno a uno, los micro-gestos que el propio CSS del rig declara. La guacamaya reutiliza
+          el vuelo del showcase y nunca entra en una marcha terrestre.
         </p>
         <div className="migas">
           <code>src/visual/creatures/*LaminaViva.jsx</code>
