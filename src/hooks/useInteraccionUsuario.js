@@ -7,7 +7,7 @@ import { useEffect, useRef, useState } from 'react';
  * `interactuando=true` mientras haya habido actividad reciente; vuelve a
  * `false` tras `quietMs` de quietud. Es la base de la política dura del compai
  * (POLITICA-COMPAI-COMPORTAMIENTO-2D-3D.md):
- *   - R2 "se quita al interactuar": el compai se atenúa cuando interactuando=true.
+ *   - R2 "se quita al interactuar": el compai se oculta cuando interactuando=true.
  *   - R3 "enseña en idle": el compai enseña cuando interactuando=false.
  *
  * Al MONTAR arranca en `false` (el usuario acaba de llegar a la pantalla y aún
@@ -34,7 +34,7 @@ export default function useInteraccionUsuario(quietMs = 3500) {
       timerRef.current = setTimeout(marcarQuieto, quietMs);
     };
 
-    const eventos = ['pointerdown', 'pointermove', 'wheel', 'touchstart', 'touchmove', 'keydown', 'scroll'];
+    const eventos = ['mouseover', 'pointerdown', 'pointermove', 'wheel', 'touchstart', 'touchmove', 'keydown', 'scroll'];
     const opts = { passive: true, capture: true };
     eventos.forEach((ev) => window.addEventListener(ev, marcarActivo, opts));
 

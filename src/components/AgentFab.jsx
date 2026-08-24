@@ -23,6 +23,7 @@ import useTtsAmplitude, { visemaFromAmplitude } from '../hooks/useTtsAmplitude.j
 import useInteraccionUsuario from '../hooks/useInteraccionUsuario.js';
 import useAgentAvatarType, { AVATAR_NOMBRE, DEFAULT_AVATAR_TYPE } from '../hooks/useAgentAvatarType.js';
 import { getHintForRuta } from '../config/compaiHints.js';
+import BurbujaAngelita from '../visual/agente/BurbujaAngelita.jsx';
 import AgentFabMenu from './AgentFabMenu';
 import './agent-fab-skin.css';
 
@@ -191,7 +192,7 @@ export default function AgentFab({ onNavigate, pantalla = null }) {
   //        tapan el centro. Reemplaza al CompaiOverlay que deambulaba y tapaba
   //        tarjetas (unificación 2026-08-23).
   //   R2 — Se quita al interactuar: cuando el usuario USA la pantalla
-  //        (interactuando), el compai se ATENÚA/encoge; reaparece en idle.
+  //        (interactuando), el compai se OCULTA; reaparece en idle.
   //   R3 — Enseña en idle: en reposo muestra el hint contextual de la ruta
   //        (folded desde CompaiOverlay), UNA vez por entrada y respetando
   //        silencio / "hoy no" / ocupado (anti-molestia del store).
@@ -199,13 +200,16 @@ export default function AgentFab({ onNavigate, pantalla = null }) {
   //   R5 — Notificaciones adaptadas: el mensaje REAL (clima vivo / susurro /
   //        agroecología / respuesta lista) se pinta como burbuja de AVISO en
   //        prod 2D (antes solo un glow). El texto ADAPTADO ya lo alimentan los
-  //        hooks de arriba; aquí se hace VISIBLE. (Falta portar la burbuja rica
-  //        con estados de ánimo del valle — ver TODO abajo.)
+  //        hooks de arriba; aquí se hace VISIBLE con la burbuja rica del valle.
   const [avatarType] = useAgentAvatarType();
   const nombreCompai = AVATAR_NOMBRE[avatarType] || AVATAR_NOMBRE[DEFAULT_AVATAR_TYPE];
   const hint = useMemo(() => getHintForRuta(pantalla, nombreCompai), [pantalla, nombreCompai]);
 
   const interactuando = useInteraccionUsuario();
+  const estadoAngelita = useAngelitaStore((s) => s.estado);
+  const visualEstadoAngelita = useAngelitaStore((s) => s.visualEstado);
+  const mensajeAngelita = useAngelitaStore((s) => s.mensaje);
+  const tipoAngelita = useAngelitaStore((s) => s.tipo);
   const hoyNoActivoFn = useAngelitaStore((s) => s.hoyNoActivo);
   const hoyNo = typeof hoyNoActivoFn === 'function' ? hoyNoActivoFn() : false;
 
@@ -229,9 +233,14 @@ export default function AgentFab({ onNavigate, pantalla = null }) {
     setHintConsumido(false);
   }
 
-  // Aviso ADAPTADO (R5): hay una respuesta/observación real esperando y no está
-  // silenciado. Prioridad sobre la enseñanza (una cosa a la vez).
-  const mostrarAviso = responseReady && !!lastAssistantMessage && !silenciado && !menuAbierto;
+  // Aviso ADAPTADO (R5): la decisión viva del compai lleva su mensaje, tipo y
+  // ánimo. Las respuestas del chat siguen siendo el fallback para no romper el
+  // camino existente de AgentScreen → AgentFab.
+  const mensajeAviso = estadoAngelita !== 'calma' && mensajeAngelita
+    ? mensajeAngelita
+    : lastAssistantMessage;
+  const tipoAviso = estadoAngelita !== 'calma' && tipoAngelita ? tipoAngelita : 'informativa';
+  const mostrarAviso = responseReady && !!mensajeAviso && !silenciado && !menuAbierto;
 
   // Enseñanza (R3): reposo, sin aviso, sin silencio/"hoy no"/ocupado, sin
   // menú/panel, no descartada ni ya consumida esta entrada.
@@ -240,9 +249,9 @@ export default function AgentFab({ onNavigate, pantalla = null }) {
   const mostrarEnsenanza = ensenanzaPermitida && !interactuando && !hintDescartado && !hintConsumido;
   if (mostrarEnsenanza && !hintArrancado) setHintArrancado(true);
 
-  // R2: atenuar/encoger cuando el usuario interactúa con la PANTALLA (no con el
-  // FAB mismo, ni tapando un aviso importante). Al quedar idle, se restablece.
-  const atenuado = interactuando && !hover && !pressed && !menuAbierto && !panelAbierto
+  // R2: ocultar cuando el usuario interactúa con la PANTALLA (no con el FAB
+  // mismo, ni tapando un aviso importante). Al quedar idle, reaparece.
+  const oculto = interactuando && !hover && !pressed && !menuAbierto && !panelAbierto
     && !mostrarAviso && !silenciado;
 
   const abrirPanel = useCallback(() => {
@@ -256,6 +265,7 @@ export default function AgentFab({ onNavigate, pantalla = null }) {
   }, [registrarSenalMolestia]);
   const descartarAviso = useCallback(() => {
     setResponseReady(false);
+    if (useAngelitaStore.getState().estado !== 'calma') useAngelitaStore.getState().reposar();
     registrarSenalMolestia('cerrarTipSinLeer');
   }, [setResponseReady, registrarSenalMolestia]);
   const leerEnVoz = useCallback((titulo, descripcion) => {
@@ -265,14 +275,17 @@ export default function AgentFab({ onNavigate, pantalla = null }) {
 
   // Contenido del panel "Ver": el aviso real si lo hay, si no el hint de la ruta.
   const contenidoPanel = mostrarAviso
-    ? { titulo: `${nombreCompai}: un aviso para usted`, descripcion: lastAssistantMessage }
+    ? { titulo: `${nombreCompai}: un aviso para usted`, descripcion: mensajeAviso }
     : hint;
 
-  // Estado de Angelita: el tacto manda sobre el aviso, y el aviso sobre el idle.
+  // Estado del compai: el tacto manda; luego el ánimo rico del store; luego
+  // la respuesta del chat y, al final, el idle.
   const estado = pressed
     ? 'contenta'
     : hover
       ? 'escuchando'
+      : estadoAngelita !== 'calma'
+        ? visualEstadoAngelita
       : responseReady
         ? 'invita'
         : 'acompana';
@@ -383,6 +396,7 @@ export default function AgentFab({ onNavigate, pantalla = null }) {
        para el teclado y el lector de pantalla). El puesto no se movió ni un
        píxel: las mismas coordenadas de siempre. */
     <div
+      aria-hidden={oculto}
       style={{
         position: 'fixed',
         bottom: 'max(90px, calc(env(safe-area-inset-bottom) + 90px))',
@@ -391,6 +405,9 @@ export default function AgentFab({ onNavigate, pantalla = null }) {
         height: 84,
         zIndex: 40,
         pointerEvents: 'none', // sólo los hijos reciben toque: el hueco no tapa nada
+        visibility: oculto ? 'hidden' : 'visible',
+        opacity: oculto ? 0 : 1,
+        transition: 'opacity .12s ease, visibility 0s linear .12s',
       }}
     >
       <button
@@ -444,21 +461,16 @@ export default function AgentFab({ onNavigate, pantalla = null }) {
           pointerEvents: 'auto',
           // En silencio se atenúa y se desatura: el personaje SE VE apagado, no
           // desaparece. Que se note que está ahí, callado porque usted lo pidió.
-          // R2 "se quita al interactuar": mientras el usuario usa la pantalla
-          // (atenuado), baja opacidad y se encoge a un mínimo no-intrusivo;
-          // vuelve al 100 % en idle.
+          // R2 "se quita al interactuar": la ocultación vive en el envoltorio
+          // para sacar de la pantalla al compai completo y no solo encogerlo.
           filter: silenciado
             ? 'drop-shadow(0 3px 6px rgba(10, 15, 26, 0.35)) grayscale(0.72) opacity(0.55)'
-            : atenuado
-              ? 'drop-shadow(0 3px 6px rgba(10, 15, 26, 0.35)) opacity(0.32)'
-              : 'drop-shadow(0 3px 6px rgba(10, 15, 26, 0.45))',
+            : 'drop-shadow(0 3px 6px rgba(10, 15, 26, 0.45))',
           transform: pressed
             ? 'scale(0.94)'
             : hover
               ? 'scale(1.08)'
-              : atenuado
-                ? 'scale(0.68)'
-                : 'scale(1)',
+              : 'scale(1)',
           transition: 'transform .22s cubic-bezier(.34,1.56,.64,1), filter .28s ease, opacity .28s ease',
         }}
       >
@@ -515,9 +527,9 @@ export default function AgentFab({ onNavigate, pantalla = null }) {
         <span aria-hidden="true">{silenciado ? '🔕' : '🔔'}</span>
       </button>
 
-      {/* R5 — BURBUJA DE AVISO (mensaje ADAPTADO): clima vivo / susurro /
-          agroecología / respuesta lista, hecho VISIBLE en prod 2D (antes solo
-          un glow). Anclada ARRIBA del FAB, descartable → no tapa el centro (R1). */}
+      {/* R5 — BURBUJA RICA DE AVISO (mensaje ADAPTADO + tipo + ánimo): clima
+          vivo / susurro / agroecología / respuesta lista, visible en prod 2D.
+          Anclada ARRIBA del FAB, descartable → no tapa el centro (R1). */}
       {mostrarAviso && (
         <div style={burbujaWrapStyle} data-testid="compai-fab-aviso">
           <div style={burbujaCardStyle}>
@@ -525,9 +537,13 @@ export default function AgentFab({ onNavigate, pantalla = null }) {
               type="button"
               onClick={abrirPanel}
               style={burbujaBotonStyle}
-              aria-label={`Aviso de su compañero: ${lastAssistantMessage}. Tocar para ver o escuchar.`}
+              aria-label={`Aviso de su compañero: ${mensajeAviso}. Tocar para ver o escuchar.`}
             >
-              <span style={burbujaTextoStyle}>{lastAssistantMessage}</span>
+              <BurbujaAngelita
+                mensaje={mensajeAviso}
+                tipo={tipoAviso}
+                className="compai-fab-burbuja-rica"
+              />
             </button>
             <button
               type="button"
