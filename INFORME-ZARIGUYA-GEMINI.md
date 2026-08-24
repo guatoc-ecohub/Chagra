@@ -109,9 +109,106 @@ certifica nada.
   gate visual en la app real (no solo la vitrina).
 - **Chagra Kart** (piloto) y **valle 3D**: pendientes; ahí entran las
   `pata-1..3` y el walk-cycle ×7 del set.
-- **Las crías al lomo** — la firma de identidad de la zarigüeya
-  (`ZARIGUYA_FIRMA`) — NO están en la hero del set; `zariguya-crias.png`
-  existe aprobada para integrarlas (¿badge/pose aparte?). Decisión de
-  dirección pendiente del operador.
+- ~~**Las crías al lomo** — decisión de dirección pendiente del operador.~~
+  RESUELTO 2026-08-24: pose especial, NO hero — ver el follow-up abajo.
 - Poses faltantes del contrato: saludar/señalar, hablando boca abierta,
   perfil idle, dormida (autorizado generar por Pixel).
+
+---
+
+# Follow-up — crías al lomo como POSE ESPECIAL (2026-08-24, mismo día)
+
+Decisión NUEVA del operador: las crías (la firma de identidad de la
+zarigüeya) **NO van en la hero** — la hero queda la investigadora sola. Las
+crías aparecen SOLO como pose especial / momento ocasional. Commit aditivo
+en la misma rama.
+
+## Qué se hizo
+
+1. **Asset**: `SET-LIMPIO/zariguya-crias.png` (943×725 RGBA, madre + 5 crías,
+   aprobada) → `public/compai/laminas/zariguya-gemini-crias.png`, re-escalada
+   a 800×615 y cuantizada a paleta indexada como el resto del set (sharp
+   `palette:true` q90: 1027→246 KB; q80 solo ahorraba 11 KB; delta medio vs
+   resize sin paleta: 1.33/canal). Es el PNG más pesado del set — 6 animales
+   de grabado denso, más entropía que cualquier otra lámina.
+2. **Momento de vida `crias`** (`vidaEstados.js`, repertorio zariguya):
+   `dur 5200 ms, peso 0.5` — MÁS raro que husmea (2.5) y reposo (1), del
+   orden de la tanatosis (0.6). El mismo mecanismo del gag firma: idle-cerebro
+   → momento ocasional → pose plena. En la lámina VIEJA y el vector el
+   momento pasa en silencio (data-vida sin regla CSS = identidad serena
+   ~5 s) — documentado en el comentario del repertorio; NO se tocaron esos
+   archivos.
+3. **Pose plena `crias`** (`anatomia.POSES` + `poseDeseada` en el JSX): entra
+   SOLO en idle, por el momento natural o por `vidaForzada='crias'` — ese es
+   el canal del momento POSITIVO: al celebrar, el host la fuerza (misma
+   mecánica que la vitrina usa para tanatosis/reposo). Hero, idle base y las
+   demás poses: sin cambios. Nota: el estado rico 'contenta' del FAB hoy se
+   traduce a la baja a 'speaking' ANTES de llegar a este avatar
+   (`STATE_DE_ESTADO_RICO`, ChagraAgentAvatar.jsx) — cablear contenta→crias
+   de punta a punta exige la migración de vocabulario rico ya anotada allí
+   para todo el elenco angosto; fuera del alcance de este commit.
+4. **Micro-vida CSS** (`zgl-crias-carga`, 4.2 s): respira más hondo que la
+   cute y se mece ±0.35° — la carga se nota. Cambio de pose = el crossfade de
+   240 ms de la casa.
+5. **Verificación**: vitest de los specs tocados (capas 14 tests, todos
+   verdes, incluye uno nuevo del contrato data-vida/honestidad-de-pose;
+   `vidaEstados.test.js` 9/10 — el rojo es PREEXISTENTE, verificado con
+   stash: el registro CREATURES creció a 19 bichos y el test aún espera 8,
+   nada que ver con este cambio), eslint --max-warnings=0, `vite build` OK,
+   gate visual chromium headless (vite :5199 + shot-vitrina.mjs, ahora 9
+   celdas × 2 fondos, viewport 2290).
+
+## Evidencia cruda (mirar, no creer)
+
+`ops/informes/capturas/zariguya-gemini-2026-08-24/`:
+
+| Captura | Qué mirar |
+|---|---|
+| `vitrina-9-estados-2-fondos.png` | los 9 estados en oscuro Y claro — las 8 poses previas INTACTAS + crías |
+| `pose-crias-fondo-oscuro-x4.png` / `-claro-x4.png` | la celda crías a dsf=4 en ambos fondos (halos) |
+| `lupa-crias-cabeza.png` | borde de testa/hocico de la madre contra fondo oscuro |
+| `lupa-crias-lomo.png` | las 5 crías: caras, manitas, bordes entre cuerpos |
+| `lupa-crias-cola.png` | el rulo de cola de ESTA pose (≠ pieza de rig de la hero) |
+| `lupa-crias-piso.png` | garras y línea de piso (anclaje 50% 100%) |
+
+Probe DOM del gate: celda 7 = `estado:idle, modo:pose, pose:crias,
+vida:crias`; las otras 8 celdas con su modo/pose de siempre (JSON en la
+salida de shot-vitrina.mjs).
+
+## Autocrítica — defectos nombrados (no "listo")
+
+1. **Salto de escala idle→crias**: la lámina crias (800×615) contenida en el
+   stage de la hero (aspecto 481:444) rinde 220×169 px — la MADRE queda
+   ~19% más chica que en la hero (~165 vs ~203 px de figura). Es la misma
+   clase de defecto que ver-lupa (~14%); en cuatro patas la figura es
+   naturalmente más baja que erguida, pero el cruce SE NOTA como
+   encogimiento, no solo como cambio de postura.
+2. **Doble exposición en el crossfade** (~240 ms): heredada de todos los
+   cambios de pose; con crias es MÁS visible porque el dibujo trae 6 caras
+   — en el cruce hay un instante de "11 zarigüeyas". No capturada en foto
+   fija; se ve en vivo.
+3. **La cola de la pose ≠ la cola de rig de la hero**: otro rulo, otro
+   grosor (compárese `lupa-crias-cola.png` con `lupa-cola-rig-costura.png`).
+   Entre poses el espectador tolera el cambio (encuadre distinto), pero es
+   una discontinuidad real de silueta.
+4. **246 KB**: el PNG más pesado del set (3× la hero). Se precarga al montar
+   junto a las otras 7 poses — en red lenta el primer momento crias puede
+   quedarse en la lámina-rig (gate de honestidad, sin media pose), y son
+   ~250 KB más de transferencia para un momento que pesa 0.5.
+5. **Sin captura del momento NATURAL**: el gate fuerza `vidaForzada='crias'`;
+   el disparo por idle-cerebro (peso 0.5, descanso 3-7.2 s) se verificó por
+   herencia del mecanismo (tanatosis usa el mismo camino) y por el test del
+   contrato, NO por observación de minutos de idle real. El gate en vivo del
+   operador manda.
+6. **'contenta' NO llega**: el momento positivo real del FAB (tap →
+   'contenta') hoy muere en la traducción angosta (→'speaking'). Hasta la
+   migración de vocabulario rico, las crías solo salen por idle-cerebro o
+   por un host que pase `vidaForzada` — el "celebra con crías" de punta a
+   punta queda PENDIENTE, no entregado.
+7. **En la lámina vieja el momento es un hueco de conducta**: ~5 s de
+   identidad quieta cuando el idle-cerebro sortea 'crias' en
+   `CREATURES.zariguya` (fauna del valle, aún en la lámina de guantes). Peso
+   0.5 = raro, y "quedarse quieta" es digno, pero es un no-op real hasta
+   migrar esa superficie al carril Gemini.
+8. **404 de favicon en la consola del gate**: `/favicon.ico` — la vitrina no
+   declara favicon (preexistente, cosmético, no es asset de la lámina).
