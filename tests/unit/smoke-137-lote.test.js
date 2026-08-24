@@ -21,14 +21,13 @@ describe('Smoke 117-131 — agent contracts', () => {
 });
 
 describe('Smoke 117-131 — componentes reparados', () => {
-  it('130-131: PlanEditor, OnboardingHero, TaskScreen importan sin error', async () => {
-    const [pe, oh, ts] = await Promise.all([
+  // OnboardingHero archivado/reemplazado por OnboardingCondensado (#2685); se retira del smoke.
+  it('130-131: PlanEditor, TaskScreen importan sin error', async () => {
+    const [pe, ts] = await Promise.all([
       import('../../src/components/PlanEditor.jsx'),
-      import('../../src/components/OnboardingHero.jsx'),
       import('../../src/components/TaskScreen.jsx'),
     ]);
     expect(typeof pe.default).toBe('function');
-    expect(typeof oh.default).toBe('function');
     expect(typeof ts.default).toBe('function');
   });
 });
