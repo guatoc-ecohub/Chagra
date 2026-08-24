@@ -20,7 +20,6 @@ import {
 import { buildCropSuggestions } from '../../data/cropSuggestions';
 import { syncManager } from '../../services/syncManager';
 import BotonAnarquiaGlyph from './BotonAnarquiaGlyph';
-import ChagraAgentAvatar from '../ChagraAgentAvatar';
 import { lunarPhase, solarTimes, moonPathD } from '../../utils/skyEphemeris';
 import { resolveClimaLocation, getCachedClimaSnapshot } from '../../services/climaService';
 import {
@@ -1694,15 +1693,6 @@ export default function AgentHero({ onNavigate }) {
                     <div className="agentport-horizon" />
                 </div>
 
-                {/* — EL COMPAI ELEGIDO — Angelita la abeja por defecto, o el
-                     maíz si el usuario lo escogió (fix 2026-07-25: antes
-                     Angelita SIEMPRE, ignorando la elección). Vuela/crece en
-                     bio-punk y nature ("solo abejita", operador 2026-07-18:
-                     el colibrí jubiló). En minimalista se oculta vía CSS: el
-                     demo limpio no lleva fauna. — */}
-                <div className="agentport-hummer">
-                    <ChagraAgentAvatar estado="acompana" size={68} title="Chagra IA" ariaLabel="Chagra IA" />
-                </div>
             </div>
 
             {/* ===================== TOGGLE Campesino/Experto ===================== */}

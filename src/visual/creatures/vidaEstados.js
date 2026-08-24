@@ -117,14 +117,6 @@ export const VIDA_REPERTORIO = {
     momentos: {
       husmea: { dur: 3150, peso: 2.5 }, // 3× zari-hocico-husmea 1.05s — vive por la nariz
       tanatosis: { dur: 2600, peso: 0.6 }, // 1× zari-desmayo 2.6s — rarísimo, y por eso gracioso
-      reposo: { dur: 4400, peso: 1 }, // 1× rh-g-reposo — con tres crías encima, poco
-      // La FIRMA de identidad como MOMENTO, no como hero (orden del operador
-      // 2026-08-24: la hero queda investigadora SIN crías): cada tanto se
-      // voltea y se le ven las 5 crías al lomo. Tan ocasional como la
-      // tanatosis — un regalo, no un fondo. Hoy solo la lámina GEMINI trae la
-      // pose (`zariguya-gemini-crias.png`); en la lámina vieja y el vector el
-      // momento pasa en silencio (data-vida sin regla CSS = identidad serena).
-      crias: { dur: 5200, peso: 0.5 },
     },
   },
   luciernaga: {
