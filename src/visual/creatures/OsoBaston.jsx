@@ -367,6 +367,12 @@ export function OsoBaston({
         </g>
       </g>
 
+      {/* ═══ LA COLUMNA — hueso del tronco (marcha rica): la mole entera
+          (pelaje+luna+brazos+cabeza) se inclina SOLA sobre la pelvis con drag
+          del paso, sin arrastrar las piernas. Wrapper ADITIVO sobre el repaint
+          aprobado — no toca el dibujo; el interior conserva su sangría. */}
+      <g className="osb-columna" style={{ transformBox: 'fill-box', transformOrigin: 'center bottom' }}>
+
       {/* ═══ LA MOLE ERGUIDA — pelaje con volumen y el contorno de la familia. */}
       <path d={SILUETA_ERGUIDA} fill={`url(#${pelaje})`} stroke={INK} strokeWidth="1.3"
         strokeLinejoin="round" />
@@ -437,8 +443,10 @@ export function OsoBaston({
           fill="none" strokeLinecap="round" opacity="0.6" aria-hidden="true" />
       </g>
 
-      {/* ═══ CABEZA Cuphead del caminante (ojos de goma, sonrisa amplia) */}
-      <g>
+      {/* ═══ CABEZA Cuphead del caminante (ojos de goma, sonrisa amplia).
+          Hueso `.osb-cabeza` (marcha): asienta el NOD de cada apoyo del paso;
+          pivote bajo, en la unión con la golilla — el dibujo no cambia. */}
+      <g className="osb-cabeza" style={{ transformBox: 'fill-box', transformOrigin: '50% 88%' }}>
         {/* orejas redondas sobre el cráneo */}
         <g aria-hidden="true">
           <circle cx="-3.3" cy="-15.9" r={PR.orejaR} fill={P.cuerpo} stroke={INK} strokeWidth="1.0" />
@@ -525,6 +533,8 @@ export function OsoBaston({
           <path d="M 10.0,-0.9 C 10.6,-1.1 11.2,-1.1 11.7,-0.85" />
         </g>
       </g>
+
+      </g>{/* /osb-columna */}
 
       {/* Prop del mundo en la mano libre. */}
       {propMundo}
