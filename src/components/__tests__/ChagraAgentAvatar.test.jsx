@@ -146,6 +146,25 @@ describe('ChagraAgentAvatar — Angelita default: glow + double-click + migraci�
     ).toBeInTheDocument();
   });
 
+  test('la API rica también pasa por el adaptador canónico de Angelita', () => {
+    const { container } = render(
+      <ChagraAgentAvatar
+        estado="respondiendo"
+        visema="V4"
+        tier="bajo"
+        animated={false}
+        lineBoil
+        gafas
+      />,
+    );
+    const agente = container.querySelector('svg.agt-angelita');
+    expect(agente).toHaveAttribute('data-agt-estado', 'respondiendo');
+    expect(agente).toHaveAttribute('data-agt-visema', 'V4');
+    expect(agente).toHaveAttribute('data-tier', 'bajo');
+    expect(container.querySelector('[data-lineboil="1"]')).toBeInTheDocument();
+    expect(container.querySelector('[data-gafas="1"]')).toBeInTheDocument();
+  });
+
   test('glow + state coexisten sin conflicto', () => {
     const { container } = render(<ChagraAgentAvatar state="speaking" glow />);
     const svg = container.querySelector('svg.agt-angelita');

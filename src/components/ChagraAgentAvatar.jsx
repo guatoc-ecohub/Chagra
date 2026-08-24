@@ -5,7 +5,6 @@ import ChagraAgentAvatarOsoBaston from './ChagraAgentAvatarOsoBaston';
 import ChagraAgentAvatarLuciernaga from './ChagraAgentAvatarLuciernaga';
 import ChagraAgentAvatarGuacamaya from './ChagraAgentAvatarGuacamaya';
 import ChagraAgentAvatarChivitoPunk from './ChagraAgentAvatarChivitoPunk';
-import Angelita from '../visual/agente/Angelita';
 import GuacamayaCompai from '../visual/creatures/GuacamayaCompai';
 import useCompaiElegido from '../visual/mundo3d/escenas/useCompaiElegido.js';
 
@@ -100,7 +99,10 @@ export default function ChagraAgentAvatar({ estado = undefined, ...props }) {
         if (ComponenteAngosto) {
             return <ComponenteAngosto state={STATE_DE_ESTADO_RICO[estado] || 'idle'} {...props} />;
         }
-        return <Angelita estado={estado} {...props} />;
+        // Angelita pasa por el mismo adaptador que el selector y la galería.
+        // Así no existe un segundo call-site que pueda perder props del cuerpo
+        // canónico (rubber-hose, lip-sync o reduced-motion).
+        return <ChagraAgentAvatarAngelita estado={estado} {...props} />;
     }
 
     if (ComponenteAngosto) return <ComponenteAngosto {...props} />;
