@@ -79,3 +79,24 @@ for (const { Component, nombre, slug, raiz } of CASOS) {
         });
     });
 }
+
+// La MARCHA del oso musculoso (2026-08-24, feat/oso-musculoso-agente): el
+// CompaiOverlay emite state='caminando' al deambular (CON_MARCHA) y el
+// adaptador del oso lo traduce a la pose 'camina' de la piel-lámina.
+describe('ChagraAgentAvatarOsoBaston — marcha', () => {
+    test("state='caminando' activa la pose 'camina' del cuerpo", () => {
+        const { container } = render(<ChagraAgentAvatarOsoBaston state="caminando" />);
+        const nodo = raizSvg(container, 'oso-baston');
+        expect(nodo).toBeInTheDocument();
+        expect(nodo).toHaveAttribute('data-pose', 'camina');
+    });
+
+    test('los 4 estados clásicos conservan su pose (regresión del adaptador)', () => {
+        const esperado = { idle: 'anda', thinking: 'anda', speaking: 'celebra', listening: 'reposo' };
+        for (const [state, pose] of Object.entries(esperado)) {
+            const { container, unmount } = render(<ChagraAgentAvatarOsoBaston state={state} />);
+            expect(raizSvg(container, 'oso-baston')).toHaveAttribute('data-pose', pose);
+            unmount();
+        }
+    });
+});
