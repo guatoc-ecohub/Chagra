@@ -44,6 +44,9 @@ import useCicloDia from '../useCicloDia.js';
 import { presetDeHora } from '../cielosHoraData.js';
 import { perfilDeTier } from '../deviceTier.js';
 import CapaVivaMundo from '../CapaVivaMundo.jsx';
+/* HUD de FPS conmutable (dev/campo): lee el instrumento de usePerformanceMonitor
+   y lo muestra. DOM, fuera del <Canvas>. Apagado por defecto (return null). */
+import HudRendimiento from '../HudRendimiento.jsx';
 /* Álgebra pura de anti-colisión de etiquetas 3D→pantalla (proyección + cajas
    AABB), la MISMA que ya generaliza `RotulosLugares` (Valle3D.jsx) para el kit
    `EtiquetasMundo` — se reusa aquí en vez de duplicarla una tercera vez; solo
@@ -396,6 +399,7 @@ export default function EscenaBase3D({
   const frugal = tierInicial === 'bajo';
   const dpr = presupuestoInicial.dpr;
   return (
+    <>
     <Canvas
       className={`mundo-canvas${listo ? ' mundo-canvas--listo' : ''}`}
       dpr={dpr}
@@ -431,5 +435,7 @@ export default function EscenaBase3D({
         </Contenido>
       </Suspense>
     </Canvas>
+    <HudRendimiento />
+    </>
   );
 }
