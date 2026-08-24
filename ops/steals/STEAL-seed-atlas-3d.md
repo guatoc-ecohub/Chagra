@@ -1,7 +1,7 @@
 # Robo-report: seed atlas 3D
 
 Fecha: 2026-08-24
-Origen revisado: `/home/kortux/.claude/jobs/6b23183e/tmp/robo-seed/seed`
+Origen revisado: clon local proporcionado por el operador
 Destino: Chagra, dimensión de especies y educación
 
 ## Qué hace `seed`
