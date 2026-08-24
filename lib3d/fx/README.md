@@ -1,56 +1,55 @@
-# Toon shading para el valle
+# Nubes volumétricas
 
-`toonShading.js` concentra el acabado cel-shaded de los meshes 3D en un
-módulo sin React y sin dependencia de una escena específica. Incluye:
+Efecto 3D reusable para horizontes de valle y páramo. No carga texturas ni
+depende de React: usa una nube de puntos con billboards procedurales suaves,
+por lo que la capa completa se mantiene en un draw call. La siembra es
+determinista y la animación no asigna objetos por frame.
 
-- `MeshToonMaterial` con un `DataTexture` de bandas discretas y filtro nearest.
-- Rim light dependiente de cámara, inyectado en el fragment shader del material.
-- Contorno opcional por shell de back-face, sin necesitar un postprocesado global.
-
-## Aplicarlo a una malla del valle
-
-El material necesita una luz de escena normal, por ejemplo una
-`DirectionalLight`, porque el mapa define cómo se cuantiza la iluminación que
-recibe la malla:
+## Uso
 
 ```js
-import { Mesh } from 'three';
 import {
-  createGradientMap,
-  createToonMaterial,
-  createToonOutline,
-} from './fx/toonShading.js';
+  crearNieblaDeAltura,
+  crearNubesVolumetricas,
+} from './lib3d/fx/nubesVolumetricas.js';
 
-const sueloValle = new Mesh(geometriaDelValle, createToonMaterial({
-  color: 0xc98291,
-  // De sombra a luz: cada valor es una banda, no un color interpolado.
-  gradientMap: createGradientMap([0.16, 0.38, 0.68, 1]),
-  rim: {
-    color: 0xffd8e3,
-    strength: 0.34,
-    power: 2.8,
-  },
-}));
-
-createToonOutline(sueloValle, {
-  color: 0x321d2c,
-  thickness: 0.035,
+const nubes = crearNubesVolumetricas({
+  count: 20,
+  area: { x: [-24, 24], z: [-34, 6] },
+  alturaBase: 8,
+  viento: { x: 0.65, z: 0.1 },
+  seed: 2026,
 });
-scene.add(sueloValle);
+scene.add(nubes.group);
+
+// En el loop de render del host:
+nubes.update(deltaSeconds);
+
+const bruma = crearNieblaDeAltura({
+  alturaBase: 1.5,
+  alturaMax: 9,
+  densidad: 0.4,
+  color: '#a9c3c4',
+});
+const retirarBruma = bruma.applyTo(terrainMaterial);
 ```
 
-Si se usa el mapa por defecto de `createToonMaterial`, no hace falta crear
-`gradientMap` manualmente. El outline se añade como hijo del mesh y comparte su
-geometría, por lo que sigue sus transformaciones y no crea una segunda copia
-de los vértices. Libere ambos materiales y el mapa cuando se destruya la
-escena:
+`applyTo` funciona con materiales built-in de Three que usen los chunks
+estándar (`MeshStandardMaterial`, `MeshLambertMaterial`, etc.). Devuelve una
+función de limpieza para retirar el parche antes de descartar un material.
+Los uniforms se comparten por referencia, así que `bruma.setDensity(0)`
+permite atenuar la capa sin recompilar el material.
 
-```js
-sueloValle.children.find((child) => child.userData.toonOutline)?.material.dispose();
-sueloValle.material.gradientMap?.dispose();
-sueloValle.material.dispose();
-```
+## Presupuesto y ajuste
 
-Para React Three Fiber, cree el material en `useMemo` y páselo con
-`material={material}`. El helper de outline debe ejecutarse una sola vez por
-mesh, por ejemplo en un `useEffect` de montaje.
+- `count` controla el número de billboards, con `18` como valor inicial.
+- `alturaBase` y `alturaMax` deben rodear la franja de niebla del horizonte.
+- `densidad`, `opacidad` y `tamano` aceptan valores entre `0` y `1` donde
+  corresponde; `tamano` está expresado en unidades de mundo.
+- `frustumCulled` queda desactivado porque el viento mueve los billboards.
+  Mantenga `area` acotada al horizonte visible.
+- Para equipos modestos, reduzca `count` a `8` o `12` y actualice el módulo
+  solo con el `frameloop` de la escena anfitriona.
+
+El módulo no modifica Assets, Logs ni estado persistido. Es una capa visual
+derivada que el consumidor puede montar, actualizar y liberar.
