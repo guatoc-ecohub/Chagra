@@ -148,10 +148,12 @@ async function getJson(path, query, timeoutMs) {
 }
 
 /**
- * Wrapper interno: POST con timeout + headers + degrade-to-null.
- * No exportado — el contrato público son planNlu y callTool.
+ * Wrapper POST con timeout + headers + degrade-to-null (offline/timeout/non-2xx → null).
+ * Exportado como primitivo compartido para servicios de feature que hablan con el
+ * mismo sidecar (p.ej. redService.js / RED de trueque). Mantiene el mismo auth-retry,
+ * tier header y degradación graceful que el resto del cliente.
  */
-async function postJson(path, body, timeoutMs) {
+export async function postJson(path, body, timeoutMs) {
   if (!isSidecarEnabled()) return null;
   if (typeof navigator !== 'undefined' && navigator.onLine === false) {
     console.debug('[sidecar] offline — skip', path);
@@ -393,24 +395,15 @@ const ALLOWED_TOOLS = new Set([
   'get_cultivos_viables',
   'get_diseno_finca',
   'get_dosis_biopreparado',
-  // ── Reconciliación allow-list · Fase 3 (SSOT 2026-07-29). main las exponía
-  //    (39 tools), dev no (35) → el NLU las ruteaba y el cliente las rechazaba
-  //    con `not_allowed` → el turno degradaba a RAG SIN grounding en silencio.
-  //    Las 4 son read-only del grafo AGE / dataset institucional local, con args
-  //    que el NLU SÍ rellena desde una frase. VERIFICADAS EN VIVO (200):
-  //  - get_folk_sintoma: mapea un nombre folk de síntoma/enfermedad al grafo
-  //    (args `sintoma`/`cultivo`). Muy ruteada por el NLU. found:false → pide
-  //    foto/descripción, NUNCA inventa a qué plaga corresponde.
-  //  - get_aporte_nutricional: aporte nutricional (ICBF TCAC) por especie
-  //    (arg `species_id_or_name`). found:false si no documentado.
-  //  - get_canales_comercializacion: canales de comercialización por especie
-  //    (arg `species_id_or_name`).
-  //  - get_practicas_agua: prácticas de manejo del agua (arg `accion`:
-  //    conservacion|captacion|tratamiento|riesgo).
-  'get_folk_sintoma',
-  'get_aporte_nutricional',
-  'get_canales_comercializacion',
-  'get_practicas_agua',
+  // ── Reconciliación 41→46 (fix grounding P0, 2026-07-25): el sidecar/NLU creció
+  //    a 46 tools; estas 4 quedaron ruteables por el NLU pero fuera del whitelist
+  //    → el cliente las rechazaba con not_allowed y el turno degradaba a RAG SIN
+  //    grounding EN SILENCIO. Son read-only del grafo/catálogo con args que el NLU
+  //    SÍ rellena desde una frase de chat (mismo patrón que las ya expuestas):
+  'get_aporte_nutricional', //      aporte nutricional (energía/proteína) por alimento
+  'get_canales_comercializacion', // dónde vender + régimen INVIMA/MADR por cultivo
+  'get_folk_sintoma', //            síntoma campesino → patógeno (muy ruteada por el NLU)
+  'get_practicas_agua', //          prácticas de agua + IRCA rural + protección de cauces
   // FASE 2 (deferidas, NO exponer aún):
   //  - get_grado_dia: requiere `fecha_siembra` (ISO YYYY-MM-DD, sin default) que
   //    el NLU no puede sintetizar con fiabilidad desde una frase libre de chat.
@@ -692,6 +685,9 @@ export async function pisoTermicoGuard(userMessage, opts = {}) {
  * modelo respondió "no tengo información" sin repetir el nombre del veneno.
  * FAIL-SAFE: null ante error/timeout → no-op, el turno sigue sin romperse.
  *
+ * (preservado de la rama fable/luciernaga-capas-c4 en la reconciliación
+ * del PR #2969 — main no lo tenía y AgentScreen lo consume)
+ *
  * @param {string} userMessage
  * @returns {Promise<null | {
  *   has_toxic_mention: boolean,
@@ -972,10 +968,10 @@ export async function judgeVision(speciesId, imageB64) {
 /**
  * Gate ASÍNCRONO del juez de visión (#328). El juez local tarda ~16-23s
  * (minicpm-v:8b en CPU, fuera de la VRAM del agente) y el sync `/judge-vision`
- * lo aborta el propio cliente a TOOL_TIMEOUT_MS=5s → veredicto siempre null
- * (gate muerto). Este par desacopla: `judgeVisionAsync` ENCOLA (202 en ~11ms)
- * y devuelve `{request_id}`; `judgeVisionResult` recoge el veredicto luego
- * (poll). Así el diagnóstico NO se bloquea esperando al juez.
+ * lo aborta el propio cliente a TOOL_TIMEOUT_MS=5s → veredicto siempre null.
+ * Este par desacopla: `judgeVisionAsync` ENCOLA (202 en ~11ms) y devuelve
+ * `{request_id}`; `judgeVisionResult` recoge el veredicto luego (poll). Así el
+ * diagnóstico NO se bloquea esperando al juez.
  *
  * @param {string} speciesId @param {string} imageB64
  * @returns {Promise<null | {request_id: string}>}
@@ -995,11 +991,7 @@ export async function judgeVisionAsync(speciesId, imageB64) {
 }
 
 /**
- * Recoge el veredicto async por `request_id` (poll del gate #328). El sidecar
- * devuelve `{status:'pending'}` mientras el juez CPU no termina, `{status:'done',
- * plausible, confidence, motivo}` cuando resuelve, o `{status:'error', reason}`.
- * Pasa el body crudo del sidecar tal cual (el consumidor decide por `status`).
- *
+ * Recoge el veredicto async por `request_id`.
  * @param {string} requestId
  * @returns {Promise<null | {status:'done', plausible:boolean|null, confidence:number|null, motivo:string} | {status:'pending'} | {status:'error', reason?:string}>}
  */

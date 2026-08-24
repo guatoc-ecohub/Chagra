@@ -137,7 +137,7 @@ const SALUDOS = {
 /**
  * Saludo contextual de Angelita para una pantalla dada.
  *
- * @param {string|null|undefined} pantalla — currentView del shell (ruta #sin-barra).
+ * @param {unknown} pantalla - currentView del shell (ruta #sin-barra).
  * @returns {string|null} el saludo en usted, o null si la pantalla no tiene
  *   saludo propio (el greeting de siempre sigue mandando).
  */

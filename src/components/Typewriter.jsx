@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import './typewriter.css';
 
 /**
@@ -32,15 +32,15 @@ import './typewriter.css';
  *    el texto (cambiar `texto` reinicia la escritura).
  *
  * API:
- *   @param {string}   texto        — lo que se escribe. Cambiarlo reinicia.
- *   @param {number}   [velocidadMs=26]  — ms por grafema (base del ritmo).
- *   @param {number}   [retardoMs=140]   — espera antes de la primera letra.
- *   @param {boolean}  [cursor=true]     — mostrar el cursor que parpadea.
- *   @param {boolean}  [animado=true]    — false = texto completo de una vez
+ *   @param {string}   texto        - lo que se escribe. Cambiarlo reinicia.
+ *   @param {number}   [velocidadMs=26]  - ms por grafema (base del ritmo).
+ *   @param {number}   [retardoMs=140]   - espera antes de la primera letra.
+ *   @param {boolean}  [cursor=true]     - mostrar el cursor que parpadea.
+ *   @param {boolean}  [animado=true]    - false = texto completo de una vez
  *                                         (además del respeto automático a
  *                                         prefers-reduced-motion).
- *   @param {Function} [onTerminado]     — callback al terminar de escribir.
- *   @param {string}   [className]       — clases extra para el contenedor.
+ *   @param {Function} [onTerminado]     - callback al terminar de escribir.
+ *   @param {string}   [className]       - clases extra para el contenedor.
  */
 
 /** Pausa extra (multiplicador de velocidadMs) tras signos de puntuación. */
@@ -97,21 +97,40 @@ export default function Typewriter({
   );
   const [terminado, setTerminado] = useState(sinAnimar);
   const onTerminadoRef = useRef(onTerminado);
-  onTerminadoRef.current = onTerminado;
+
+  // Reinicio limpio al cambiar el texto: patrón de AJUSTE EN RENDER (React
+  // recomienda corregir aquí el estado que depende de una prop, no en un
+  // effect — así no hay frame intermedio mostrando texto viejo ni cascada
+  // de renders). (reconciliación PR #2969: compliance react-hooks)
+  const [prevTexto, setPrevTexto] = useState(textoStr);
+  if (prevTexto !== textoStr) {
+    setPrevTexto(textoStr);
+    if (sinAnimar) {
+      setVisibles(segmentarGrafemas(textoStr).length);
+      setTerminado(true);
+    } else {
+      setVisibles(0);
+      setTerminado(false);
+    }
+  }
 
   useEffect(() => {
-    const grafemas = segmentarGrafemas(textoStr);
+    onTerminadoRef.current = onTerminado;
+  }, [onTerminado]);
+
+  const grafemas = useMemo(() => segmentarGrafemas(textoStr), [textoStr]);
+  // Estado derivado: sin animación (o texto vacío) la tinta va completa y
+  // terminado es true sin necesidad de setState dentro del effect.
+  const visiblesEfectivos = sinAnimar || grafemas.length === 0 ? grafemas.length : visibles;
+  const terminadoEfectivo = sinAnimar || grafemas.length === 0 || terminado;
+
+  useEffect(() => {
     if (sinAnimar || grafemas.length === 0) {
-      setVisibles(grafemas.length);
-      setTerminado(true);
       if (grafemas.length > 0 && typeof onTerminadoRef.current === 'function') {
         onTerminadoRef.current();
       }
       return undefined;
     }
-    // Reinicio limpio al cambiar el texto.
-    setVisibles(0);
-    setTerminado(false);
     let vivo = true;
     let timer = null;
     let i = 0;
@@ -134,14 +153,13 @@ export default function Typewriter({
       vivo = false;
       if (timer) clearTimeout(timer);
     };
-  }, [textoStr, velocidadMs, retardoMs, sinAnimar]);
+  }, [textoStr, velocidadMs, retardoMs, sinAnimar, grafemas]);
 
-  const grafemas = segmentarGrafemas(textoStr);
-  const tinta = grafemas.slice(0, visibles).join('');
+  const tinta = grafemas.slice(0, visiblesEfectivos).join('');
   const mostrarCursor = cursor && !sinAnimar;
 
   return (
-    <span className={`tw ${terminado ? 'tw--terminado' : ''} ${className}`.trim()}>
+    <span className={`tw ${terminadoEfectivo ? 'tw--terminado' : ''} ${className}`.trim()}>
       {/* El molde: texto completo invisible que fija el tamaño desde el
           primer frame — la caja no crece letra a letra. */}
       <span className="tw__molde" aria-hidden="true">

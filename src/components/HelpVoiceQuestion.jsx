@@ -98,14 +98,22 @@ export default function HelpVoiceQuestion({ speciesSlug = null }) {
     hardLimitMs,
   } = useVoiceRecorder();
 
-  useEffect(() => {
-    const ctrl = new AbortController();
+  // Reset del corpus al cambiar de especie: patrón de AJUSTE EN RENDER (el
+  // estado que depende de una prop se corrige antes de pintar, sin cascada
+  // de renders desde un effect). (reconciliación PR #2969: compliance
+  // react-hooks/set-state-in-effect)
+  const [prevSlug, setPrevSlug] = useState(speciesSlug);
+  if (prevSlug !== speciesSlug) {
+    setPrevSlug(speciesSlug);
     setCorpus(null);
     setCorpusError(null);
+  }
+
+  useEffect(() => {
+    const ctrl = new AbortController();
 
     if (!speciesSlug || speciesSlug === 'null' || speciesSlug === 'undefined') {
-      setCorpus(null);
-      return;
+      return undefined;
     }
 
     fetch(`${import.meta.env.BASE_URL}cycle-content/${speciesSlug}.json`, { signal: ctrl.signal })
@@ -155,7 +163,7 @@ Formato: párrafo breve (máximo unas 8 oraciones). Sin listas largas salvo que 
       full = await streamOllama(
         OLLAMA_CHAT_URL,
         {
-          model: ENV.NLU_MODEL || 'gemma4:e2b',
+          model: ENV.NLU_MODEL || 'qwen3.5:4b',
           messages: [
             { role: 'system', content: system },
             { role: 'user', content: userMsg },

@@ -212,6 +212,11 @@ const RestauracionTiempo3DMockup = lazy(() => import('./mockups/RestauracionTiem
 // de guamos y nogales, y la casa-beneficiadero en la bruma. Device-tiering
 // real. Ruta #/mockups/cafetal-vivo-3d, sin auth.
 const CafetalVivo3DMockup = lazy(() => import('./mockups/CafetalVivo3D'));
+// 3D: el MUNDO BOSQUE VIVO y su guardián, el Ent de la queñua (colorado,
+// Polylepis) — mallas three reales (tronco retorcido con rostro tallado, copa
+// instanciada), device-tiering real. Ruta #/mockups/bosque-vivo-3d, sin auth.
+// (portado de main en la reconciliación del PR #2969)
+const BosqueVivo3DMockup = lazy(() => import('./mockups/BosqueVivo3D'));
 // 3D: el MUNDO DEL AGUACATE — el árbol GRANDE, que es todo el punto: el Hass
 // adulto le dobla la altura a la casa y le hace techo a uno. Fruto rugoso en
 // racimos flojos del pedúnculo, panícula con abejas, el envés que platea con
@@ -344,6 +349,10 @@ const TresEntsGradiente3DMockup = lazy(() => import('./mockups/TresEntsGradiente
 // el frailejonal de todas las edades se asoma al filo y la quebrada se despeña
 // al valle.
 const ParamoHumboldt3DMockup = lazy(() => import('./mockups/ParamoHumboldt3D'));
+// 3D: el PÁRAMO altoandino — el ecosistema de la niebla (frailejones, musgo,
+// quenuas, aves) y el NACIMIENTO del agua. Didáctico: la fábrica de agua.
+// (portado de main en la reconciliación del PR #2969)
+const MundoParamo3DMockup = lazy(() => import('./mockups/MundoParamo3D'));
 const CamaraDirectorDemoMockup = lazy(() => import('./mockups/CamaraDirectorDemo'));
 const MomentoVentaMercado3DMockup = lazy(() => import('./mockups/MomentoVentaMercado3D'));
 const ArtesaniaAndinaDemoMockup = lazy(() => import('./mockups/ArtesaniaAndinaDemo'));
@@ -353,6 +362,9 @@ const CatalogoInfraDemoMockup = lazy(() => import('./mockups/CatalogoInfraDemo')
 const MundoAbejas3DMockup = lazy(() => import('./mockups/MundoAbejas3D'));
 const MundoGallinero3DMockup = lazy(() => import('./mockups/MundoGallinero3D'));
 const MundoMercado3DMockup = lazy(() => import('./mockups/MundoMercado3D'));
+// El SUELO calibre Switch: terreno fbm con color por zona, sendero, detalle
+// al ras. ?vista=aerea|cerca|sendero. (portado de main en el PR #2969)
+const SueloDemo3DMockup = lazy(() => import('./mockups/SueloDemo3D'));
 // La CARA 3D-first de prod.chagra.app: entrada-tranquera con el valle vivo de
 // fondo → velo dorado del cruce → el valle como HOME (EntradaValle3D).
 const CaraProd3DMockup = lazy(() => import('./mockups/CaraProd3D'));
@@ -843,6 +855,9 @@ const MOCKUP_HASH_ROUTES = {
   'mockups/camara-director': 'mockup_camara_director',
   'mockups/momento-venta-mercado-3d': 'mockup_momento_venta_mercado_3d',
   'mockups/artesania-andina': 'mockup_artesania_andina',
+  'mockups/bosque-vivo-3d': 'mockup_bosque_vivo_3d',
+  'mockups/mundo-paramo-3d': 'mockup_mundo_paramo_3d',
+  'mockups/suelo-demo-3d': 'mockup_suelo_demo_3d',
   'mockups/showcase-artesania': 'mockup_showcase_artesania',
   'mockups/efectos-funcionales': 'mockup_efectos_funcionales',
   'mockups/catalogo-infra': 'mockup_catalogo_infra',
@@ -1752,7 +1767,13 @@ export default function App() {
         return (
           <ErrorBoundary>
             <ErrorFallback moduleName="El valle de mi finca (3D)">
-              <EntradaValle3DMockup onBack={() => navigate('dashboard')} />
+              <EntradaValle3DMockup
+                onBack={() => navigate('dashboard')}
+                // @ts-ignore navigate signature
+                onNavigate={navigate}
+                // @ts-ignore initialMundoId not in strict type
+                initialMundoId={currentViewData?.mundo}
+              />
             </ErrorFallback>
           </ErrorBoundary>
         );
@@ -2582,6 +2603,42 @@ export default function App() {
           <ErrorBoundary>
             <ErrorFallback moduleName="Artesanía andina">
               <ArtesaniaAndinaDemoMockup />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
+      case 'mockup_bosque_vivo_3d':
+        // Vitrina pública del MUNDO BOSQUE VIVO: el Ent de la queñua (colorado,
+        // Polylepis) en 3D REAL — tronco retorcido con corteza rojiza y rostro
+        // tallado, copa de hojitas instanciadas, meciéndose en la niebla del
+        // páramo. Device-tiering real; en equipo humilde muestra la ficha del
+        // guardián. Ruta #/mockups/bosque-vivo-3d, sin auth.
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="El bosque vivo">
+              <BosqueVivo3DMockup />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
+      case 'mockup_mundo_paramo_3d':
+        // El páramo altoandino: el ecosistema de la niebla en hora dorada —
+        // frailejones (Espeletia), cojines de musgo, pajonal, quenuas con la
+        // niebla enganchada, aves de páramo y el NACIMIENTO del agua. Didáctico
+        // sobre conservación: el páramo como fábrica de agua (botón «cómo nace
+        // el agua»). Ruta #/mockups/mundo-paramo-3d, sin auth.
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="El páramo altoandino">
+              <MundoParamo3DMockup />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
+      case 'mockup_suelo_demo_3d':
+        // El SUELO calibre Switch (#/mockups/suelo-demo-3d): terreno fbm con
+        // color por zona, sendero, detalle al ras. ?vista=aerea|cerca|sendero.
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="El suelo del páramo">
+              <SueloDemo3DMockup />
             </ErrorFallback>
           </ErrorBoundary>
         );

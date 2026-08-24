@@ -888,7 +888,7 @@ describe('guardHallucinatedContact', () => {
     expect(out.modified).toBe(true);
     expect(out.reason).toMatch(/contacto_institucional_hallucinado/);
     expect(out.text).toMatch(/canal oficial de la entidad/i);
-    expect(out.text).toMatch(/ica\.gov\.co/i);
+    expect(out.text).toContain('ica.gov.co');
     expect(out.text).not.toMatch(/601-3323700/);
   });
 
