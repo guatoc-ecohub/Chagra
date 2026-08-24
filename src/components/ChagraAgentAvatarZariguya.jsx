@@ -35,6 +35,7 @@ const VISEMA_DE_STATE = {
 
 export default function ChagraAgentAvatarZariguya({
     state = 'idle',
+    estado = undefined,
     size = 48,
     withLabel = false,
     onClick = undefined,
@@ -42,14 +43,21 @@ export default function ChagraAgentAvatarZariguya({
     glow = false,
     className = '',
     ariaLabel = 'Chagra IA',
+    visema = null,
+    animated = true,
+    tier = undefined,
+    direccion = 'derecha',
 }) {
-    const visema = VISEMA_DE_STATE[state] || null;
+    const visemaEfectivo = visema == null ? (VISEMA_DE_STATE[state] || null) : visema;
 
     const bicho = (
         <ZariguyaGeminiLaminaViva
-            estado={state}
-            visema={visema}
+            estado={estado || state}
+            visema={visemaEfectivo}
             size={size}
+            animated={animated}
+            tier={tier}
+            direccion={direccion}
             title={ariaLabel}
             className={className}
             style={glow ? { filter: 'drop-shadow(0 0 10px rgba(255,158,203,0.65))' } : undefined}
