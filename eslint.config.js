@@ -2,7 +2,6 @@ import js from '@eslint/js'
 import globals from 'globals'
 import reactHooks from 'eslint-plugin-react-hooks'
 import reactRefresh from 'eslint-plugin-react-refresh'
-import { defineConfig, globalIgnores } from 'eslint/config'
 
 // ---------------------------------------------------------------------------
 // Plugin i18n — regla "no-hardcoded-spanish" (soft enforcement, warn)
@@ -69,25 +68,19 @@ const vitestGlobals = {
   vi: 'readonly',
 }
 
-export default defineConfig([
-  globalIgnores([
-    'dist',
-    'dist-prod',
-    // Modo campo (#2088): librerías de terceros vendoreadas TAL CUAL (UMD
-    // minificado de @tensorflow/tfjs-core|layers|data|backend-wasm y
-    // @tensorflow-models/speech-commands, ver scripts/wake-word/vendor-libs.mjs).
-    // NO son código propio — lintearlas tira cientos de falsos + (exports/
-    // require UMD, vars de una letra minificadas, etc.).
-    'public/vendor/**',
-    // Valle 3D vanilla (ADR marco de entrada, ver ValleMarcoScreen.jsx):
-    // `public/valle/**` es un árbol SINCRONIZADO COMPLETO desde el repo
-    // vanilla del valle (scripts/sync-valle.mjs, three r160, su propio
-    // importmap), no código autoría de este repo — mismo criterio que
-    // public/vendor/** de arriba. Lintear con las reglas de este repo (React
-    // hooks, i18n, etc.) sobre cientos de archivos vanilla no aporta y se
-    // re-generaría en cada re-sync.
-    'public/valle/**',
-  ]),
+export default [
+  {
+    ignores: [
+      'dist',
+      'dist-prod',
+      // Modo campo (#2088): librerías de terceros vendoreadas TAL CUAL (UMD
+      // minificado de @tensorflow/tfjs-core|layers|data|backend-wasm y
+      // @tensorflow-models/speech-commands, ver scripts/wake-word/vendor-libs.mjs).
+      // NO son código propio — lintearlas tira cientos de falsos + (exports/
+      // require UMD, vars de una letra minificadas, etc.).
+      'public/vendor/**',
+    ],
+  },
   {
     // Configs Node (playwright/vite/etc.) — requieren globals.node.
     files: ['*.config.{js,mjs,ts}', 'playwright.config.js', 'vite.config.js'],
@@ -102,7 +95,6 @@ export default defineConfig([
     languageOptions: {
       globals: {
         ...globals.browser,
-        ...globals.node, // Add Node.js globals for process.env, etc.
         ...vitestGlobals,
       },
       parserOptions: {
@@ -112,16 +104,14 @@ export default defineConfig([
       },
     },
   },
+  js.configs.recommended,
+  reactHooks.configs.flat.recommended,
+  reactRefresh.configs.vite,
   {
     files: ['**/*.{js,jsx}'],
     plugins: {
       'chagra-i18n': i18nPlugin,
     },
-    extends: [
-      js.configs.recommended,
-      reactHooks.configs.flat.recommended,
-      reactRefresh.configs.vite,
-    ],
     languageOptions: {
       ecmaVersion: 2020,
       globals: globals.browser,
@@ -159,4 +149,4 @@ export default defineConfig([
     files: ['**/*.test.{js,jsx}', '**/*.spec.{js,jsx}'],
     rules: { 'chagra-i18n/no-hardcoded-spanish': 'off' },
   },
-])
+]
