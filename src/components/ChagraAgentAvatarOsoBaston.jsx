@@ -22,12 +22,16 @@ import OsoBaston from '../visual/creatures/OsoBaston';
  *                  su reacción-firma leída como "atento/calculando".
  *   - speaking   → pose 'celebra' (el bastón late en flor) + visema.
  *   - listening  → pose 'reposo': se posa atento.
+ *   - caminando  → pose 'camina': el ciclo de ANDAR plantígrado con bastón
+ *                  (la marcha viva de la piel-lámina) — lo emite
+ *                  CompaiOverlay cuando el compai deambula (useCompaiRoam).
  */
 const POSE_DE_STATE = {
     idle: 'anda',
     thinking: 'anda',
     speaking: 'celebra',
     listening: 'reposo',
+    caminando: 'camina',
 };
 
 const RESOPLA_DE_STATE = {
