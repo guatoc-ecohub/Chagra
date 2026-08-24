@@ -5,12 +5,11 @@ import { CreatureFilters } from './_filters.jsx';
 import { OjosRubber, Cachetes, Sonrisa, BocaVisema, Miembro, AntenaRubber, RH_INK } from './_rubberhose.jsx';
 import { GafasSol, CejasRubber } from './AngelitaGafas.jsx';
 import { ABEJA_PALETA, ABEJA_PROPORCION } from './abejaIdentidad.js';
-import { cuerpoDeClima, PERFIL_ABEJA, ropaDeClimaBicho } from './creatureClimaCuerpo.js';
+import { aplicarComportamientos, PERFIL_ABEJA, auraDeBicho } from './comportamientos/index.js';
 import { AccesoriosClima } from './AccesoriosClima.jsx';
 import { LineBoilFilter } from './LineBoilFilter.jsx';
 import { PropEnMano } from './PropEnMano.jsx';
 import { AuraPoder } from './AuraPoder.jsx';
-import { auraDeBicho } from './transformacion.js';
 
 /* Abejita, la abeja angelita — Tetragonisca angustula (meliponino nativo de
    Choachí, SIN aguijón, NO Apis). Cabeza y tórax OSCUROS (casi negros) +
@@ -134,25 +133,48 @@ export function AbejaAngelita({
   ...rest
 }) {
   const uid = useId().replace(/[^a-zA-Z0-9]/g, '');
+  const comportamiento = aplicarComportamientos('abeja-angelita', {
+    idle: { animated, activo: animated, tier },
+    clima: { estado: clima, enso, tier, perfil: PERFIL_ABEJA, vestuario, tempC },
+    lipsync: { visema },
+    gestos: {
+      pose, animo, energia, mojada, sed, comiendo, polen, gafas, cejas,
+      mundoId, poder, lineBoil,
+    },
+  });
+  const vivo = comportamiento.rubberhose.animado;
+  const poseAplicada = comportamiento.gestos.pose.pose;
+  const animoAplicado = comportamiento.gestos.animo;
+  const energiaAplicada = comportamiento.gestos.energia;
+  const mojadaAplicada = comportamiento.gestos.mojada;
+  const sedAplicada = comportamiento.gestos.sed;
+  const comiendoAplicada = comportamiento.gestos.comiendo;
+  const polenAplicado = comportamiento.gestos.polen;
+  const gafasAplicadas = comportamiento.gestos.gafas;
+  const cejasAplicadas = comportamiento.gestos.cejas;
+  const mundoIdAplicado = comportamiento.gestos.mundoId;
+  const poderAplicado = comportamiento.gestos.poder;
+  const lineBoilAplicado = comportamiento.gestos.lineBoil;
+  const visemaAplicada = comportamiento.lipsync.visema;
+  const cuerpoClima = comportamiento.clima;
+  const ropa = comportamiento.clima.ropa;
   const glow = `crt-glow-${uid}`;
   const blur = `crt-blur-${uid}`;
   const boil = `crt-boil-${uid}`;
-  const wing = animated ? 'crt-wing' : undefined;
-  const vivo = animated;
+  const wing = vivo ? 'crt-wing' : undefined;
   // El aura respira con la energía real de la finca (matas vivas + agua).
   // Ceñida (2026-08-23): antes 0.2+0.3·e con r 5.4+1.2·e y, encima del glow
   // global del cuerpo, la niebla ámbar era lo PRIMERO que se leía a tamaño
   // chico. Un anillo de calor discreto conserva la conducta (respira con la
   // energía) sin ahogar la silueta de tinta.
-  const auraOp = Math.max(0.12, Math.min(0.32, 0.14 + 0.18 * (energia ?? 1)));
-  const auraR = 5.0 + 0.9 * (energia ?? 1);
+  const auraOp = Math.max(0.12, Math.min(0.32, 0.14 + 0.18 * energiaAplicada));
+  const auraR = 5.0 + 0.9 * energiaAplicada;
 
   // ── EL CLIMA REAL en el cuerpo (creatureClimaCuerpo, perfil abeja). Determinista,
   //    una vez por render: tinte + opacidad al contorno; el aleteo se acelera
   //    (dorada) o pesa (lluvia) escalando la duración base de `.crt-wing` (0.15s).
   //    Sin clima → neutro: filtro/opacidad nulos, aleteo base. RM: como `wing` va
   //    solo con `animated`, la duración cuelga de nodos ya quietos (inocua).
-  const cuerpoClima = cuerpoDeClima(clima, { enso: /** @type {any} */ (enso), tier, perfil: PERFIL_ABEJA });
   // Solo estampamos duración inline cuando el clima REALMENTE cambia el aleteo
   // (≠1): así un clima neutro NO pisa los overrides de pose ('celebra'/'reposo').
   const wingDur = (wing && cuerpoClima.velocidadAlas !== 1)
@@ -178,13 +200,11 @@ export function AbejaAngelita({
 
   // Vestuario por clima+hora (opt-in). Perfil abeja: neutro, suda al sol de día,
   // ruana de noche. Sin vestuario o sin clima → nada (comportamiento histórico).
-  const ropa = (vestuario && clima) ? ropaDeClimaBicho('abeja-angelita', clima, { tempC }) : null;
-
   const defs = (
     <defs>
       <CreatureFilters glow={glow} blur={blur} />
       {/* Line-boil (contorno que hierve) — solo se instancia si se pide. */}
-      {lineBoil && <LineBoilFilter id={boil} animated={vivo} />}
+      {lineBoilAplicado && <LineBoilFilter id={boil} animated={vivo} />}
     </defs>
   );
   // Probóscide (lengüita): sale con SED (jadeo) o al COMER (libar). Cuelga de la
@@ -192,7 +212,7 @@ export function AbejaAngelita({
   // El <g> EXTERNO posiciona (attr transform); el INTERNO (.crt-lengua) anima —
   // si el CSS animara el mismo nodo del translate, lo pisaría (CSS transform
   // gana sobre el atributo) y la lengüita saltaría al centro del cuerpo.
-  const lengua = (sed || comiendo) ? (
+  const lengua = (sedAplicada || comiendoAplicada) ? (
     <g transform="translate(9.6 2.4)">
       <g className="crt-lengua">
         <path d="M0,0 C-0.4,2.6 0.4,4.4 0,6.2" stroke={ABEJA_PALETA.lengua} strokeWidth="1.1"
@@ -203,7 +223,7 @@ export function AbejaAngelita({
   ) : null;
   // Gotas de lluvia que escurren del cuerpo/alas cuando está MOJADA. Rubber-hose:
   // caen con un rebotico. CSS (crt-gota) las anima; RM las deja colgando.
-  const gotas = mojada ? (
+  const gotas = mojadaAplicada ? (
     <g className="crt-gotas" fill={ABEJA_PALETA.gota} opacity="0.9">
       <path className="crt-gota" d="M-6,4 q-1.1,1.8 0,3.2 q1.1,-1.4 0,-3.2 Z" />
       <path className="crt-gota" style={{ animationDelay: '-0.5s' }} d="M2,5.2 q-1,1.7 0,3 q1,-1.3 0,-3 Z" />
@@ -213,7 +233,7 @@ export function AbejaAngelita({
   // Puff de POLEN: motas ámbar que flotan y se disuelven alrededor del cuerpo —
   // Angelita cargada de polen (la LOCA de flor en flor). CSS (crt-polen-mota) las
   // sube con deriva; con animated=false / RM quedan colgando dignas. Opt-in.
-  const polenEl = polen ? (
+  const polenEl = polenAplicado ? (
     <g className="crt-polen" fill={ABEJA_PALETA.cuerpo} aria-hidden="true">
       <circle className={vivo ? 'crt-polen-mota' : undefined} cx="-9" cy="5.5" r="0.85" />
       <circle className={vivo ? 'crt-polen-mota' : undefined} style={{ animationDelay: '-0.8s' }} cx="6.5" cy="7.2" r="0.6" />
@@ -226,8 +246,8 @@ export function AbejaAngelita({
   // derecha). El punta del brazo izquierdo cae en ~(-8.5, 6.2); posamos el prop
   // ahí, chico (los dibujos son ~12u de alto; la abeja ~11u). Sin mundoId o
   // mundo sin prop → PropEnMano devuelve null (manos libres, nunca rompe).
-  const propMundo = mundoId ? (
-    <PropEnMano mundoId={mundoId} x={-9.4} y={7.6} escala={0.6} ink={RH_INK} animated={vivo} />
+  const propMundo = mundoIdAplicado ? (
+    <PropEnMano mundoId={mundoIdAplicado} x={-9.4} y={7.6} escala={0.6} ink={RH_INK} animated={vivo} />
   ) : null;
 
   // ── CUERPO rubber-hose. Orden de atrás→adelante: aura, alas, patitas, tronco
@@ -436,8 +456,8 @@ export function AbejaAngelita({
             Envuelta en `.crt-boca` (pivote centrado) para que los GESTOS del
             agente la agarren por CSS (el bostezo la abre en grande). */}
         <g className="crt-boca" style={{ transformBox: 'fill-box', transformOrigin: 'center' }}>
-          {visema
-            ? <BocaVisema cx={8.9} cy={1.4} w={3.6} prof={1.2} visema={visema} />
+          {visemaAplicada
+            ? <BocaVisema cx={8.9} cy={1.4} w={3.6} prof={1.2} visema={visemaAplicada} />
             : <Sonrisa cx={8.9} cy={1.4} w={3.6} prof={1.2} />}
         </g>
         {/* OJO COMPUESTO cálido (iter2 2026-08-23, anatomía dura): una abeja
@@ -459,7 +479,7 @@ export function AbejaAngelita({
         />
         {/* cejas expresivas (opt-in): el rasgo que actúa alegría/atención/foco.
             CLARAS sobre la testa oscura (2026-08-23): en tinta no se veían. */}
-        {cejas && <CejasRubber estilo={cejas} color={ABEJA_PALETA.cara} />}
+        {cejasAplicadas && <CejasRubber estilo={cejasAplicadas} color={ABEJA_PALETA.cara} />}
         {/* antenas GENICULADAS que se mecen (secondary motion). Iter2
             2026-08-23: la antena real de abeja tiene CODO (escapo + flagelo
             quebrado), no un arco de caña — el trazo ahora dobla a mitad de
@@ -470,7 +490,7 @@ export function AbejaAngelita({
         <AntenaRubber d="M9.7,-4.6 C10.1,-5.9 10.3,-6.8 10.0,-7.4 C10.6,-8.3 10.8,-9.5 10.5,-10.3" bulbo={[10.5, -10.5]} bulboR={0.7} sway={vivo} delay={-0.3} />
         {/* gafas de sol (opt-in): por ENCIMA de ojos y cejas — con 'poniendose'
             caen desde arriba con overshoot y el destello barre el lente */}
-        {gafas && <GafasSol puesta={gafas === 'poniendose' ? 'poniendose' : 'puesta'} animated={vivo} />}
+        {gafasAplicadas && <GafasSol puesta={gafasAplicadas === 'poniendose' ? 'poniendose' : 'puesta'} animated={vivo} />}
       </g>
 
       {/* Sombrero + sudor por clima+hora — solo con vestuario=true. La ruana
@@ -504,7 +524,7 @@ export function AbejaAngelita({
   // El line-boil (contorno que hierve) envuelve TODO el dibujo cuando se pide:
   // el feDisplacementMap desplaza el trazo entero (Cuphead). Grupo aparte para
   // no colisionar con el glow del `.crt-body` (dos filtros, nodos distintos).
-  const cuerpoVivo = lineBoil ? <g filter={`url(#${boil})`}>{conAntics}</g> : conAntics;
+  const cuerpoVivo = lineBoilAplicado ? <g filter={`url(#${boil})`}>{conAntics}</g> : conAntics;
 
   // data-estado agrupa la reacción para el CSS (brillo mojado, jadeo, mordisco).
   // data-pose SOLO cuando está viva: así los gestos (celebra/reposo/señala) no
@@ -512,28 +532,28 @@ export function AbejaAngelita({
   // colgando, sonriendo). RM lo apaga además por dentro del CSS.
   const estadoAttrs = {
     'data-creature': 'abeja-angelita',
-    'data-pose': vivo ? pose : undefined,
-    'data-animo': animo,
+    'data-pose': vivo ? poseAplicada : undefined,
+    'data-animo': animoAplicado,
     'data-tier': tier || undefined,
-    'data-mojada': mojada ? '1' : undefined,
-    'data-sed': sed ? '1' : undefined,
-    'data-comiendo': comiendo ? '1' : undefined,
-    'data-visema': visema || undefined,
+    'data-mojada': mojadaAplicada ? '1' : undefined,
+    'data-sed': sedAplicada ? '1' : undefined,
+    'data-comiendo': comiendoAplicada ? '1' : undefined,
+    'data-visema': visemaAplicada || undefined,
     'data-ruana': ropa?.ruana ? '1' : undefined,
     'data-sombrero': ropa?.sombrero ? '1' : undefined,
     'data-sudor': ropa?.sudor ? '1' : undefined,
-    'data-lineboil': lineBoil ? '1' : undefined,
-    'data-polen': polen ? '1' : undefined,
-    'data-prop': mundoId || undefined,
-    'data-gafas': gafas ? (gafas === 'poniendose' && vivo ? 'poniendose' : '1') : undefined,
-    'data-cejas': cejas || undefined,
+    'data-lineboil': lineBoilAplicado ? '1' : undefined,
+    'data-polen': polenAplicado ? '1' : undefined,
+    'data-prop': mundoIdAplicado || undefined,
+    'data-gafas': gafasAplicadas ? (gafasAplicadas === 'poniendose' && vivo ? 'poniendose' : '1') : undefined,
+    'data-cejas': cejasAplicadas || undefined,
   };
 
   if (inline) {
     // En modo inline el power-up lo pone el host DOM (::before/mix-blend no
     // aplican a SVG); acá solo marcamos data-poder por si el host lo consulta.
     return (
-      <g className={className} style={estiloClima} data-poder={poder ? '1' : undefined} {...estadoAttrs}>
+      <g className={className} style={estiloClima} data-poder={poderAplicado ? '1' : undefined} {...estadoAttrs}>
         {defs}
         {cuerpoVivo}
       </g>
@@ -550,7 +570,7 @@ export function AbejaAngelita({
   // MODO PODER (standalone): la envolvemos en su aura DORADA de 4 capas
   // (transformacion.css: glow radial + boost + ingravidez + corrientes). El
   // wrapper DOM es lo único que puede llevar ::before/mix-blend/corrientes.
-  if (poder) {
+  if (poderAplicado) {
     return (
       <span
         className="is-powered-up abeja-poder"
