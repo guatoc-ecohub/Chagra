@@ -55,6 +55,17 @@ export const ABEJA_PALETA = {
   alaTulClara: '#ebf6ef', // ala chica, más pálida
   lengua: '#c9524e',      // probóscide (sed / libar)
   gota: '#bfe6ff',        // gotas de lluvia cuando está mojada
+  ojo: '#40260f',         // globo del OJO COMPUESTO: miel muy oscura (iter2
+                          // 2026-08-23 — una abeja no tiene esclerótica blanca;
+                          // el ojo real de la angelita es una masa oscura
+                          // lateral, cálida, jamás blanco de caricatura)
+  ojoIris: '#e8b45a',     // anillo de la pseudopupila: el MISMO dorado de la
+                          // franja del mesosoma — la calidez de mascota vive
+                          // en un destello congruente con su firma de campo
+  ocelo: '#c98a3e',       // los 3 ocelos ámbar de la coronilla (triángulo
+                          // entre las antenas — anatomía real del meliponino)
+  pelusa: '#6b4b28',      // pilosidad del mesosoma: el mismo tono de la luz
+                          // de lomo — pelitos, no púas
 };
 
 /* Silueta canónica en unidades del viewBox del SVG ('-15 -15 32 30'). */

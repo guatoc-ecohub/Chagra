@@ -34,13 +34,28 @@ export const RH_CHEEK = RH_SPEC_CHAPETA;
  * contorno grueso, pupila GRANDE y brillo (catchlight). Un mismo grupo parpadea
  * (`rh-blink`) para que los dos ojos cierren sincronizados.
  *
+ * Opt-in ANATOMÍA HONESTA (iter2 2026-08-23, default = el ojo de siempre):
+ *   `esclera` tiñe el globo (un insecto de ojo COMPUESTO no tiene blanco de
+ *   ojo — Angelita pasa su miel oscura); `iris` enciende un anillo cálido
+ *   alrededor de la pupila (la "pseudopupila" que en el ojo compuesto real se
+ *   ve como punto cálido que sigue al observador — acá es también la calidez
+ *   de mascota); `tornasol` pinta el barrido de luz corneal de las láminas
+ *   naturalistas. Los tres son opcionales: oso, colibrí y el resto de la
+ *   familia siguen renderizando EXACTO igual sin tocar una línea.
+ *
  * @param {Object} props
  * @param {Array<{cx:number,cy:number,r:number}>} [props.ojos]
  * @param {[number,number]} [props.mirar=[0.32,0.34]]
  * @param {boolean} [props.parpadea=true]
  * @param {string} [props.ink=RH_INK]
+ * @param {string} [props.esclera=RH_SPEC_HUESO]  fill del globo ocular
+ * @param {string|null} [props.iris=null]  anillo cálido bajo la pupila (opt-in)
+ * @param {boolean} [props.tornasol=false]  brillo corneal superior (opt-in)
  */
-export function OjosRubber({ ojos = [], mirar = [0.32, 0.34], parpadea = true, ink = RH_INK }) {
+export function OjosRubber({
+  ojos = [], mirar = [0.32, 0.34], parpadea = true, ink = RH_INK,
+  esclera = RH_SPEC_HUESO, iris = null, tornasol = false,
+}) {
   const [mx, my] = mirar;
   return (
     <g className={parpadea ? 'rh-blink' : undefined} style={{ transformBox: 'fill-box', transformOrigin: 'center' }}>
@@ -50,13 +65,32 @@ export function OjosRubber({ ojos = [], mirar = [0.32, 0.34], parpadea = true, i
         const py = o.cy + my * o.r;
         return (
           <g key={i}>
-            <circle cx={o.cx} cy={o.cy} r={o.r} fill={RH_SPEC_HUESO} stroke={ink} strokeWidth={o.r * 0.42} />
+            <circle cx={o.cx} cy={o.cy} r={o.r} fill={esclera} stroke={ink} strokeWidth={o.r * 0.42} />
+            {/* tornasol: el barrido de luz sobre la córnea (ojo compuesto de
+                lámina naturalista) — vive en el GLOBO, no sigue a la mirada */}
+            {tornasol && (
+              <path
+                d={`M${o.cx - o.r * 0.62},${o.cy - o.r * 0.16} Q${o.cx - o.r * 0.08},${o.cy - o.r * 0.8} ${o.cx + o.r * 0.55},${o.cy - o.r * 0.3}`}
+                stroke={RH_SPEC_HUESO} strokeWidth={o.r * 0.13} fill="none"
+                strokeLinecap="round" opacity="0.3"
+              />
+            )}
             {/* pupila + catchlight en su grupo `rh-mirada`: cuando la criatura
                 está viva, las pupilas se van de reojo y miran arriba curiosas
                 (período co-primo con el parpadeo — nunca el mismo compás).
                 Ambos ojos comparten la clase → dardean sincronizados. */}
             <g className={parpadea ? 'rh-mirada' : undefined}>
-              <circle cx={px} cy={py} r={pr} fill={RH_SPEC_PUPILA} />
+              {iris ? (
+                /* modo ojo compuesto: anillo cálido (pseudopupila) + pupila
+                   adentro — el conjunto ocupa el MISMO radio pr de siempre,
+                   así el dart de la mirada jamás se sale del globo */
+                <>
+                  <circle cx={px} cy={py} r={pr} fill={iris} opacity="0.9" />
+                  <circle cx={px} cy={py} r={pr * 0.72} fill={RH_SPEC_PUPILA} />
+                </>
+              ) : (
+                <circle cx={px} cy={py} r={pr} fill={RH_SPEC_PUPILA} />
+              )}
               {/* catchlight arriba-izquierda: la chispa de vida del ojo */}
               <circle cx={px - pr * 0.4} cy={py - pr * 0.5} r={pr * 0.42} fill={RH_SPEC_CHISPA} />
             </g>

@@ -134,6 +134,22 @@ function Gate() {
         <Celda label="polen"><AbejaAngelita size={140} polen /></Celda>
       </section>
 
+      <section id="patas">
+        <Titulo>Anatomía — 6 patas (pares delantero · medio · trasero)</Titulo>
+        <Celda label="cuenta de patas — quieta 420px (fotograma digno)">
+          <AbejaAngelita size={420} animated={false} />
+        </Celda>
+        <Celda label="lupa: delanteras + medias"><Lupa cx={4.5} cy={6} units={14} animated={false} /></Celda>
+        <Celda label="lupa: traseras bajo el abdomen"><Lupa cx={-6} cy={6.5} units={14} animated={false} /></Celda>
+      </section>
+
+      <section id="ojos">
+        <Titulo>Anatomía — ojo compuesto (oscuro · tornasol · pseudopupila dorada)</Titulo>
+        <Celda label="lupa ojos + ocelos + antenas"><Lupa cx={8.9} cy={-3.5} units={11} animated={false} /></Celda>
+        <Celda label="cara viva 300px"><AbejaAngelita size={300} /></Celda>
+        <Celda label="gafas siguen cubriendo"><Lupa cx={8.9} cy={-2} units={9} animated={false} gafas /></Celda>
+      </section>
+
       <section id="alpha">
         <Titulo>Alpha limpio (nada horneado)</Titulo>
         <Celda label="ajedrez 200px" bg="transparent">

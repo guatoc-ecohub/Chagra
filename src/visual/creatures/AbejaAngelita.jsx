@@ -30,7 +30,13 @@ import { auraDeBicho } from './transformacion.js';
    compone el KIT reutilizable `_rubberhose.jsx` (que el oso andino y el colibrí
    heredan); la CADENCIA vive en `creatures.css` (clases `rh-*`, gate RM + tier).
    La IDENTIDAD (paleta + proporciones) vive en `abejaIdentidad.js`: la MISMA
-   fuente que dimensiona/tiñe su presencia 3D (useEntradaAbeja) — una sola abeja. */
+   fuente que dimensiona/tiñe su presencia 3D (useEntradaAbeja) — una sola abeja.
+   ITER2 (2026-08-23) — EL NORTE: actuación de caricatura rubber-hose PERO
+   apariencia anclada en lo real (lámina naturalista): SEIS patas en tres pares
+   (antes 4), ojo COMPUESTO oscuro con pseudopupila dorada (antes esclerótica
+   blanca de caricatura), antenas geniculadas con codo (antes arcos con globo),
+   3 ocelos ámbar en la coronilla y pilosidad del mesosoma. El rig (clases,
+   cadencia, estados, gestos) queda intacto: todo fue cirugía de piel. */
 const VIEWBOX = '-15 -15 32 30';
 
 
@@ -298,9 +304,22 @@ export function AbejaAngelita({
       </g>
 
       {/* patitas manguera SIN mitón (re-skin 2026-08-21): remate de tinta
-          sutil, detrás del tronco, se mecen suave */}
-      <Miembro d="M-2.6,4.4 C-3.2,6.6 -3.4,8 -3.0,9.2" ancho={1.9} punta={[-3.0, 9.4]} puntaR={1.3} pie sinGuante sway={vivo} delay={-0.6} />
-      <Miembro d="M1.8,4.7 C1.4,6.8 1.3,8.2 1.8,9.4" ancho={1.9} punta={[1.8, 9.6]} puntaR={1.3} pie sinGuante sway={vivo} delay={-0.95} />
+          sutil, detrás del tronco, se mecen suave.
+          SEIS PATAS (iter2 2026-08-23, anatomía dura): una abeja tiene 6 y el
+          dibujo traía 4 (2 bracitos + 2 patitas). Ahora el conteo es honesto y
+          se lee por PARES, como en la lámina: delantero (bracito-r + su par
+          lejano acá atrás), medio (patita cercana + patita lejana) y trasero
+          (bracito-l, que barre bajo el abdomen, + su par lejano). Las del lado
+          LEJANO viven en este slot (detrás del tronco) y van un pelo más
+          delgadas — profundidad sin cambiar la tinta. El rig no cambia: mismo
+          slot de pintado, mismo rh-sway con delays co-primos. */}
+      {/* pata delantera LEJANA (par del bracito-r) */}
+      <Miembro d="M5.6,3.4 C6.2,5.4 6.5,7.0 6.2,8.4" ancho={1.6} punta={[6.2, 8.6]} puntaR={1.1} pie sinGuante sway={vivo} delay={-1.35} />
+      {/* pata media LEJANA */}
+      <Miembro d="M1.8,4.2 C1.4,6.4 1.3,7.9 1.8,9.3" ancho={1.6} punta={[1.8, 9.5]} puntaR={1.1} pie sinGuante sway={vivo} delay={-0.95} />
+      {/* pata trasera LEJANA (par del bracito-l): barre hacia atrás bajo el
+          abdomen, como la trasera real del meliponino */}
+      <Miembro d="M-1.8,4.2 C-2.9,6.0 -3.9,7.5 -5.0,8.6" ancho={1.7} punta={[-5.2, 8.8]} puntaR={1.2} pie sinGuante sway={vivo} delay={-0.6} />
 
       {/* ABDOMEN ámbar PÁLIDO y esbelto: SIN las tres barras verticales
           OSCURAS (esas eran la firma de la Apis europea). Remata redondo — SIN
@@ -335,12 +354,29 @@ export function AbejaAngelita({
           iluminación, un solo arco pintado, nada de gradientes) */}
       <path d="M3.0,-2.9 A2.8,3.7 0 0 1 4.5,-3.9" stroke="#6b4b28"
         strokeWidth="0.85" fill="none" strokeLinecap="round" opacity="0.6" />
+      {/* PILOSIDAD del mesosoma (iter2 2026-08-23): el comentario de arriba
+          decía "peludo" pero nunca se dibujó. Cinco pelitos cortos sobre el
+          lomo — la felpa del tórax del meliponino real (lámina naturalista),
+          no púas: trazos finos del tono de la luz, respiran con el boil. */}
+      <g stroke={ABEJA_PALETA.pelusa} strokeWidth="0.3" fill="none"
+        strokeLinecap="round" opacity="0.6" aria-hidden="true">
+        <path d="M2.9,-3.6 q-0.5,-0.4 -0.7,-0.9" />
+        <path d="M3.6,-4.25 q-0.4,-0.5 -0.5,-1.0" />
+        <path d="M4.5,-4.7 q-0.2,-0.55 -0.2,-1.05" />
+        <path d="M5.4,-4.75 q0.05,-0.6 -0.05,-1.05" />
+        <path d="M6.2,-4.5 q0.25,-0.5 0.2,-0.95" />
+      </g>
       {/* franja DORADA lateral del mesosoma — la marca amarilla en el costado
           del tórax negro, la firma de campo con la que se reconoce a la
           angelita real. Un solo trazo curvo sobre el flanco visible.
           (2026-08-23: un pelo más ancha y firme — a tamaño de UI desaparecía) */}
       <path d="M2.7,-2.9 Q1.9,-0.4 2.7,2.2" stroke={ABEJA_PALETA.franjaTorax}
         strokeWidth="1.3" fill="none" strokeLinecap="round" opacity="0.95" />
+
+      {/* pata media CERCANA (iter2 2026-08-23): la sexta pata del conteo
+          honesto — cuelga del arranque del tronco, delante del cuerpo como
+          los bracitos pero SIN clase de gesto (no actúa, solo camina/cuelga). */}
+      <Miembro d="M3.4,3.4 C3.0,5.6 2.8,7.2 3.2,8.8" ancho={1.7} punta={[3.2, 9.0]} puntaR={1.2} pie sinGuante sway={vivo} delay={-1.7} />
 
       {/* bracitos manguera SIN mitón (re-skin 2026-08-21: la referencia traía
           guantes por DEFECTO — acá el remate es tinta sutil, manita desnuda).
@@ -367,6 +403,15 @@ export function AbejaAngelita({
             la testa sigue oscura; esto es luz, no pigmento) */}
         <path d="M5.6,-3.0 A3.6,3.6 0 0 1 7.4,-4.4" stroke="#6b4b28"
           strokeWidth="0.85" fill="none" strokeLinecap="round" opacity="0.6" />
+        {/* OCELOS (iter2 2026-08-23): los 3 ojitos simples ámbar en triángulo
+            sobre la coronilla, entre las antenas — anatomía real de abeja que
+            además le da a la frente oscura un acento de vida. Puntos quietos:
+            no parpadean ni miran (los ocelos reales no forman imagen). */}
+        <g fill={ABEJA_PALETA.ocelo} opacity="0.85" aria-hidden="true">
+          <circle cx="8.0" cy="-4.65" r="0.26" />
+          <circle cx="8.7" cy="-4.95" r="0.3" />
+          <circle cx="9.4" cy="-4.6" r="0.26" />
+        </g>
         {/* MÁSCARA FACIAL clara: la marca amarilla del clípeo de la angelita real —
             y, a la vez, el fondo sobre el que la carita (ojos/boca/cejas del agente)
             sigue leyéndose pese a la cabeza oscura. Va bajo ojos/cachetes/boca.
@@ -395,17 +440,34 @@ export function AbejaAngelita({
             ? <BocaVisema cx={8.9} cy={1.4} w={3.6} prof={1.2} visema={visema} />
             : <Sonrisa cx={8.9} cy={1.4} w={3.6} prof={1.2} />}
         </g>
+        {/* OJO COMPUESTO cálido (iter2 2026-08-23, anatomía dura): una abeja
+            NO tiene esclerótica blanca — el ojo real de la angelita es una
+            masa OSCURA lateral. El globo pasa a miel muy oscura (esclera),
+            la mirada vive en la pseudopupila: anillo dorado (el MISMO oro de
+            la franja del mesosoma) + pupila + catchlight — de lejos ojo de
+            abeja de lámina, de cerca la chispa de mascota. `tornasol` pone el
+            barrido de luz corneal del ojo compuesto. Centros y radios NO se
+            mueven (gafas, cejas y CSS de mirada cuelgan de ahí); parpadeo y
+            dart (rh-blink / rh-mirada) intactos. */}
         <OjosRubber
           ojos={[{ cx: 10.1, cy: -1.9, r: 2.1 }, { cx: 7.4, cy: -2.2, r: 1.6 }]}
           mirar={[0.3, 0.34]}
           parpadea={vivo}
+          esclera={ABEJA_PALETA.ojo}
+          iris={ABEJA_PALETA.ojoIris}
+          tornasol
         />
         {/* cejas expresivas (opt-in): el rasgo que actúa alegría/atención/foco.
             CLARAS sobre la testa oscura (2026-08-23): en tinta no se veían. */}
         {cejas && <CejasRubber estilo={cejas} color={ABEJA_PALETA.cara} />}
-        {/* antenas con bombillo que se mecen (secondary motion) */}
-        <AntenaRubber d="M7.7,-4.7 C6.7,-7.3 7.0,-9.3 8.3,-10.1" bulbo={[8.3, -10.3]} sway={vivo} delay={0} />
-        <AntenaRubber d="M9.7,-4.6 C11.0,-6.7 11.3,-8.7 10.5,-10.3" bulbo={[10.5, -10.5]} sway={vivo} delay={-0.3} />
+        {/* antenas GENICULADAS que se mecen (secondary motion). Iter2
+            2026-08-23: la antena real de abeja tiene CODO (escapo + flagelo
+            quebrado), no un arco de caña — el trazo ahora dobla a mitad de
+            camino y el bombillo baja de globo (1.15) a yema (0.7): remate de
+            masa rubber-hose, ya no globo de caricatura. Los EXTREMOS no se
+            mueven (misma silueta de conjunto, mismo sway/delays). */}
+        <AntenaRubber d="M7.7,-4.7 C7.3,-6.1 7.0,-7.0 6.4,-7.4 C7.1,-8.2 7.8,-9.3 8.3,-10.1" bulbo={[8.3, -10.3]} bulboR={0.7} sway={vivo} delay={0} />
+        <AntenaRubber d="M9.7,-4.6 C10.1,-5.9 10.3,-6.8 10.0,-7.4 C10.6,-8.3 10.8,-9.5 10.5,-10.3" bulbo={[10.5, -10.5]} bulboR={0.7} sway={vivo} delay={-0.3} />
         {/* gafas de sol (opt-in): por ENCIMA de ojos y cejas — con 'poniendose'
             caen desde arriba con overshoot y el destello barre el lente */}
         {gafas && <GafasSol puesta={gafas === 'poniendose' ? 'poniendose' : 'puesta'} animated={vivo} />}
