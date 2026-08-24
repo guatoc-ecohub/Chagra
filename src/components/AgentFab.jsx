@@ -1,5 +1,6 @@
-import React, { useState, useCallback, useEffect, useRef } from 'react';
-import Angelita from '../visual/agente/Angelita';
+import React, { useState, useCallback, useEffect, useRef, useMemo } from 'react';
+import { Volume2 } from 'lucide-react';
+import ChagraAgentAvatar from './ChagraAgentAvatar';
 import useAgentNotificationStore from '../store/useAgentNotificationStore';
 import usePrefsStore from '../store/usePrefsStore';
 import { isSpeaking, stop, replayLast, isKokoroAvailable, speakSentences } from '../services/ttsService';
@@ -19,6 +20,9 @@ import { useCompaiClimaVivo } from '../hooks/useCompaiClimaVivo';
 import { useCompaiSusurroNocturno } from '../hooks/useCompaiSusurroNocturno';
 import { useCompaiAgroecologiaReal } from '../hooks/useCompaiAgroecologiaReal';
 import useTtsAmplitude, { visemaFromAmplitude } from '../hooks/useTtsAmplitude.js';
+import useInteraccionUsuario from '../hooks/useInteraccionUsuario.js';
+import useAgentAvatarType, { AVATAR_NOMBRE, DEFAULT_AVATAR_TYPE } from '../hooks/useAgentAvatarType.js';
+import { getHintForRuta } from '../config/compaiHints.js';
 import AgentFabMenu from './AgentFabMenu';
 import './agent-fab-skin.css';
 
@@ -180,6 +184,90 @@ export default function AgentFab({ onNavigate, pantalla = null }) {
     onMensaje: (mensaje) => { setLastMessage(mensaje); setResponseReady(true); },
   });
 
+  // ── POLÍTICA DURA DEL COMPAI (POLITICA-COMPAI-COMPORTAMIENTO-2D-3D.md) ─────
+  //   R1 — Nunca estorba: este FAB está ANCLADO por construcción (position:
+  //        fixed abajo-derecha); jamás flota en el medio. Sus burbujas (aviso /
+  //        enseñanza) crecen HACIA ARRIBA desde el ancla y son descartables — no
+  //        tapan el centro. Reemplaza al CompaiOverlay que deambulaba y tapaba
+  //        tarjetas (unificación 2026-08-23).
+  //   R2 — Se quita al interactuar: cuando el usuario USA la pantalla
+  //        (interactuando), el compai se ATENÚA/encoge; reaparece en idle.
+  //   R3 — Enseña en idle: en reposo muestra el hint contextual de la ruta
+  //        (folded desde CompaiOverlay), UNA vez por entrada y respetando
+  //        silencio / "hoy no" / ocupado (anti-molestia del store).
+  //   R4 — Al tocarlo: menú Ver / Escuchar / Callar (+ Hablar / foto).
+  //   R5 — Notificaciones adaptadas: el mensaje REAL (clima vivo / susurro /
+  //        agroecología / respuesta lista) se pinta como burbuja de AVISO en
+  //        prod 2D (antes solo un glow). El texto ADAPTADO ya lo alimentan los
+  //        hooks de arriba; aquí se hace VISIBLE. (Falta portar la burbuja rica
+  //        con estados de ánimo del valle — ver TODO abajo.)
+  const [avatarType] = useAgentAvatarType();
+  const nombreCompai = AVATAR_NOMBRE[avatarType] || AVATAR_NOMBRE[DEFAULT_AVATAR_TYPE];
+  const hint = useMemo(() => getHintForRuta(pantalla, nombreCompai), [pantalla, nombreCompai]);
+
+  const interactuando = useInteraccionUsuario();
+  const hoyNoActivoFn = useAngelitaStore((s) => s.hoyNoActivo);
+  const hoyNo = typeof hoyNoActivoFn === 'function' ? hoyNoActivoFn() : false;
+
+  // Panel "Ver" (R4): lectura del mensaje/hint en detalle.
+  const [panelAbierto, setPanelAbierto] = useState(false);
+  // La enseñanza (R3) se descarta con la ✕ y se re-arma al cambiar de pantalla.
+  const [hintDescartado, setHintDescartado] = useState(false);
+  // "Una vez por entrada" (auditoría de mensajes 2026-08-23): al primer idle
+  // elegible arranca un reloj; tras la ventana de enseñanza se CONSUME y no
+  // reaparece esta entrada (nada de spam cada 2–5 s como el roam anterior). Se
+  // reinicia al cambiar de ruta — patrón derivado en render, sin setState en
+  // effect (react-hooks/set-state-in-effect).
+  const [hintArrancado, setHintArrancado] = useState(false);
+  const [hintConsumido, setHintConsumido] = useState(false);
+  const [lastPantalla, setLastPantalla] = useState(pantalla);
+  if (lastPantalla !== pantalla) {
+    setLastPantalla(pantalla);
+    setPanelAbierto(false);
+    setHintDescartado(false);
+    setHintArrancado(false);
+    setHintConsumido(false);
+  }
+
+  // Aviso ADAPTADO (R5): hay una respuesta/observación real esperando y no está
+  // silenciado. Prioridad sobre la enseñanza (una cosa a la vez).
+  const mostrarAviso = responseReady && !!lastAssistantMessage && !silenciado && !menuAbierto;
+
+  // Enseñanza (R3): reposo, sin aviso, sin silencio/"hoy no"/ocupado, sin
+  // menú/panel, no descartada ni ya consumida esta entrada.
+  const ensenanzaPermitida = !mostrarAviso && !silenciado && !hoyNo && !estaOcupado()
+    && pantalla != null && !menuAbierto && !panelAbierto;
+  const mostrarEnsenanza = ensenanzaPermitida && !interactuando && !hintDescartado && !hintConsumido;
+  if (mostrarEnsenanza && !hintArrancado) setHintArrancado(true);
+
+  // R2: atenuar/encoger cuando el usuario interactúa con la PANTALLA (no con el
+  // FAB mismo, ni tapando un aviso importante). Al quedar idle, se restablece.
+  const atenuado = interactuando && !hover && !pressed && !menuAbierto && !panelAbierto
+    && !mostrarAviso && !silenciado;
+
+  const abrirPanel = useCallback(() => {
+    setPanelAbierto(true);
+    registrarSenalMolestia('abrirTip');
+  }, [registrarSenalMolestia]);
+  const cerrarPanel = useCallback(() => setPanelAbierto(false), []);
+  const descartarEnsenanza = useCallback(() => {
+    setHintDescartado(true);
+    registrarSenalMolestia('cerrarTipSinLeer');
+  }, [registrarSenalMolestia]);
+  const descartarAviso = useCallback(() => {
+    setResponseReady(false);
+    registrarSenalMolestia('cerrarTipSinLeer');
+  }, [setResponseReady, registrarSenalMolestia]);
+  const leerEnVoz = useCallback((titulo, descripcion) => {
+    speakSentences(`${titulo}. ${descripcion}`).catch(() => { /* degrada a solo texto */ });
+    registrarSenalMolestia('escuchar');
+  }, [registrarSenalMolestia]);
+
+  // Contenido del panel "Ver": el aviso real si lo hay, si no el hint de la ruta.
+  const contenidoPanel = mostrarAviso
+    ? { titulo: `${nombreCompai}: un aviso para usted`, descripcion: lastAssistantMessage }
+    : hint;
+
   // Estado de Angelita: el tacto manda sobre el aviso, y el aviso sobre el idle.
   const estado = pressed
     ? 'contenta'
@@ -188,6 +276,14 @@ export default function AgentFab({ onNavigate, pantalla = null }) {
       : responseReady
         ? 'invita'
         : 'acompana';
+
+  // Ventana de enseñanza: se consume ~8 s tras el primer idle elegible → el hint
+  // enseña UNA vez por entrada (auditoría de mensajes: sin spam por parada).
+  useEffect(() => {
+    if (!hintArrancado || hintConsumido) return undefined;
+    const t = setTimeout(() => setHintConsumido(true), 8000);
+    return () => clearTimeout(t);
+  }, [hintArrancado, hintConsumido]);
 
   const handleEnter = () => setHover(true);
   const handleLeave = () => { setHover(false); setPressed(false); soltarPulsacionLarga(); };
@@ -215,6 +311,13 @@ export default function AgentFab({ onNavigate, pantalla = null }) {
     setMenuAbierto(false);
     activarEscucha({ fuente: 'compai_menu' });
     registrarSenalMolestia('hablarle');
+  }, [registrarSenalMolestia]);
+
+  /** Menú → "Ver" (R4): abre el panel con el mensaje/hint para LEERLO. */
+  const handleMenuVer = useCallback(() => {
+    setMenuAbierto(false);
+    setPanelAbierto(true);
+    registrarSenalMolestia('abrirTip');
   }, [registrarSenalMolestia]);
 
   /** Menú → "Escuchar": lectura breve del contexto actual por Kokoro. */
@@ -341,11 +444,22 @@ export default function AgentFab({ onNavigate, pantalla = null }) {
           pointerEvents: 'auto',
           // En silencio se atenúa y se desatura: el personaje SE VE apagado, no
           // desaparece. Que se note que está ahí, callado porque usted lo pidió.
+          // R2 "se quita al interactuar": mientras el usuario usa la pantalla
+          // (atenuado), baja opacidad y se encoge a un mínimo no-intrusivo;
+          // vuelve al 100 % en idle.
           filter: silenciado
             ? 'drop-shadow(0 3px 6px rgba(10, 15, 26, 0.35)) grayscale(0.72) opacity(0.55)'
-            : 'drop-shadow(0 3px 6px rgba(10, 15, 26, 0.45))',
-          transform: pressed ? 'scale(0.94)' : hover ? 'scale(1.08)' : 'scale(1)',
-          transition: 'transform .18s cubic-bezier(.34,1.56,.64,1), filter .25s ease',
+            : atenuado
+              ? 'drop-shadow(0 3px 6px rgba(10, 15, 26, 0.35)) opacity(0.32)'
+              : 'drop-shadow(0 3px 6px rgba(10, 15, 26, 0.45))',
+          transform: pressed
+            ? 'scale(0.94)'
+            : hover
+              ? 'scale(1.08)'
+              : atenuado
+                ? 'scale(0.68)'
+                : 'scale(1)',
+          transition: 'transform .22s cubic-bezier(.34,1.56,.64,1), filter .28s ease, opacity .28s ease',
         }}
       >
         {/* pointer-events:none — CRÍTICO: el click debe caer en el BOTÓN, nunca
@@ -401,10 +515,100 @@ export default function AgentFab({ onNavigate, pantalla = null }) {
         <span aria-hidden="true">{silenciado ? '🔕' : '🔔'}</span>
       </button>
 
-      {/* MENÚ DEL TOQUE CORTO (#66/#70): "Hablar" / "Enviar foto" / "Que se
-          quede callado hoy". Se ancla al mismo puesto que el personaje. */}
+      {/* R5 — BURBUJA DE AVISO (mensaje ADAPTADO): clima vivo / susurro /
+          agroecología / respuesta lista, hecho VISIBLE en prod 2D (antes solo
+          un glow). Anclada ARRIBA del FAB, descartable → no tapa el centro (R1). */}
+      {mostrarAviso && (
+        <div style={burbujaWrapStyle} data-testid="compai-fab-aviso">
+          <div style={burbujaCardStyle}>
+            <button
+              type="button"
+              onClick={abrirPanel}
+              style={burbujaBotonStyle}
+              aria-label={`Aviso de su compañero: ${lastAssistantMessage}. Tocar para ver o escuchar.`}
+            >
+              <span style={burbujaTextoStyle}>{lastAssistantMessage}</span>
+            </button>
+            <button
+              type="button"
+              onClick={descartarAviso}
+              style={burbujaCerrarStyle}
+              aria-label="Descartar este aviso"
+              title="Descartar"
+            >
+              <span aria-hidden="true">×</span>
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* R3 — BURBUJA DE ENSEÑANZA (idle): explica QUÉ hay en esta pantalla, una
+          vez por entrada, descartable. Es el hint que se plegó del CompaiOverlay. */}
+      {mostrarEnsenanza && (
+        <div style={burbujaWrapStyle} data-testid="compai-fab-hint">
+          <div style={burbujaCardStyle}>
+            <button
+              type="button"
+              onClick={abrirPanel}
+              style={burbujaBotonStyle}
+              aria-label={`${hint.titulo}. ${hint.descripcion}. Tocar para ampliar o escuchar.`}
+            >
+              <span style={burbujaTituloStyle}>{hint.titulo}</span>
+              <span style={burbujaTextoStyle}>{hint.descripcion}</span>
+            </button>
+            <button
+              type="button"
+              onClick={descartarEnsenanza}
+              style={burbujaCerrarStyle}
+              aria-label="Ocultar esta ayuda por ahora"
+              title="Ocultar"
+            >
+              <span aria-hidden="true">×</span>
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* R4 — PANEL "Ver": leer el mensaje/hint en detalle + Escuchar. Se abre
+          desde el menú (opción "Ver") o tocando una burbuja. */}
+      {panelAbierto && (
+        <div
+          style={panelStyle}
+          data-testid="compai-fab-panel"
+          role="dialog"
+          aria-label={contenidoPanel.titulo}
+        >
+          <div style={panelHeaderStyle}>
+            <h2 style={panelTituloStyle}>{contenidoPanel.titulo}</h2>
+            <button
+              type="button"
+              onClick={cerrarPanel}
+              style={panelCerrarStyle}
+              aria-label="Cerrar"
+              title="Cerrar"
+            >
+              <span aria-hidden="true">×</span>
+            </button>
+          </div>
+          <p style={panelTextoStyle}>{contenidoPanel.descripcion}</p>
+          <button
+            type="button"
+            onClick={() => leerEnVoz(contenidoPanel.titulo, contenidoPanel.descripcion)}
+            style={panelEscucharStyle}
+            aria-label="Escuchar esta guía en voz alta"
+          >
+            <Volume2 size={16} aria-hidden="true" />
+            <span>Escuchar</span>
+          </button>
+        </div>
+      )}
+
+      {/* MENÚ DEL TOQUE CORTO (#66/#70): "Ver" / "Escuchar" / "Hablar" /
+          "Enviar foto" / "Ver fotos" / "Que se quede callado hoy". Se ancla al
+          mismo puesto que el personaje. */}
       <AgentFabMenu
         abierto={menuAbierto}
+        onVer={handleMenuVer}
         onEscuchar={handleMenuEscuchar}
         onHablar={handleMenuHablar}
         onFoto={handleMenuFoto}
@@ -415,3 +619,138 @@ export default function AgentFab({ onNavigate, pantalla = null }) {
     </div>
   );
 }
+
+// ── Estilos de las burbujas de aviso/enseñanza y del panel "Ver" ────────────
+// Ancladas al puesto del FAB; crecen HACIA ARRIBA (bottom:100%) para no tapar
+// el centro (R1). `maxWidth` las mantiene dentro del viewport en móvil.
+const burbujaWrapStyle = {
+  position: 'absolute',
+  bottom: '100%',
+  right: 0,
+  marginBottom: 12,
+  width: 244,
+  maxWidth: 'calc(100vw - 28px)',
+  pointerEvents: 'auto',
+  zIndex: 41,
+};
+const burbujaCardStyle = {
+  position: 'relative',
+  background: 'rgb(15 23 42 / 0.96)',
+  border: '1px solid rgb(51 65 85 / 0.8)',
+  borderRadius: 16,
+  borderBottomRightRadius: 4,
+  padding: '10px 30px 10px 12px',
+  boxShadow: '0 10px 28px rgb(0 0 0 / 0.45)',
+  backdropFilter: 'blur(4px)',
+};
+const burbujaBotonStyle = {
+  display: 'block',
+  width: '100%',
+  textAlign: 'left',
+  background: 'transparent',
+  border: 'none',
+  padding: 0,
+  cursor: 'pointer',
+};
+const burbujaTituloStyle = {
+  display: 'block',
+  fontSize: 13,
+  fontWeight: 700,
+  color: '#f1f5f9',
+  lineHeight: 1.3,
+};
+const burbujaTextoStyle = {
+  display: '-webkit-box',
+  WebkitBoxOrient: 'vertical',
+  WebkitLineClamp: 4,
+  overflow: 'hidden',
+  marginTop: 2,
+  fontSize: 12,
+  color: '#cbd5e1',
+  lineHeight: 1.4,
+};
+const burbujaCerrarStyle = {
+  position: 'absolute',
+  top: 4,
+  right: 4,
+  width: 24,
+  height: 24,
+  borderRadius: '50%',
+  border: 'none',
+  background: 'transparent',
+  color: '#94a3b8',
+  fontSize: 17,
+  lineHeight: 1,
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  cursor: 'pointer',
+  padding: 0,
+};
+const panelStyle = {
+  position: 'absolute',
+  bottom: '100%',
+  right: 0,
+  marginBottom: 12,
+  width: 300,
+  maxWidth: 'calc(100vw - 28px)',
+  pointerEvents: 'auto',
+  zIndex: 42,
+  background: 'rgb(15 23 42 / 0.97)',
+  border: '1px solid rgb(51 65 85 / 0.8)',
+  borderRadius: 16,
+  padding: 14,
+  boxShadow: '0 12px 30px rgb(0 0 0 / 0.5)',
+  backdropFilter: 'blur(4px)',
+};
+const panelHeaderStyle = {
+  display: 'flex',
+  alignItems: 'flex-start',
+  justifyContent: 'space-between',
+  gap: 12,
+  marginBottom: 8,
+};
+const panelTituloStyle = {
+  fontSize: 15,
+  fontWeight: 700,
+  color: '#f1f5f9',
+  lineHeight: 1.3,
+  margin: 0,
+};
+const panelTextoStyle = {
+  fontSize: 13,
+  color: '#cbd5e1',
+  lineHeight: 1.5,
+  margin: '0 0 12px',
+};
+const panelCerrarStyle = {
+  flexShrink: 0,
+  width: 26,
+  height: 26,
+  borderRadius: 8,
+  border: 'none',
+  background: 'transparent',
+  color: '#94a3b8',
+  fontSize: 18,
+  lineHeight: 1,
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  cursor: 'pointer',
+  padding: 0,
+};
+const panelEscucharStyle = {
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  gap: 8,
+  width: '100%',
+  padding: '9px 12px',
+  borderRadius: 10,
+  border: 'none',
+  background: '#059669',
+  color: '#fff',
+  fontSize: 14,
+  fontWeight: 700,
+  cursor: 'pointer',
+};
