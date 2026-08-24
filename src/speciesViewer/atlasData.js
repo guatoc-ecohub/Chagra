@@ -121,6 +121,198 @@ const ATLAS = {
       { prompt: '¿Qué condición necesita especialmente la raíz del aguacate?', options: ['Suelo aireado', 'Encharcamiento permanente', 'Oscuridad total'], answer: 0, explanation: 'La raíz del aguacate necesita oxígeno; un suelo encharcado durante mucho tiempo reduce su funcionamiento.' },
     ],
   },
+  phaseolus_vulgaris: {
+    kind: 'bean',
+    title: 'Frijol',
+    scientific: 'Phaseolus vulgaris',
+    stageData: {
+      ...COMMON_STAGES,
+      semilla: { ...COMMON_STAGES.semilla, text: 'El frijol es una dicotiledónea: sus dos cotiledones guardan la reserva que sostiene al embrión.' },
+      brote: { ...COMMON_STAGES.brote, text: 'La radícula sale primero y el hipocótilo eleva los dos cotiledones antes de desplegar las hojas verdaderas.' },
+      planta: { ...COMMON_STAGES.planta, text: 'Las hojas trifoliadas producen azúcares y la vaina protege las semillas que se cosechan.' },
+    },
+    markers: {
+      semilla: [
+        { id: 'cubierta', label: 'Cubierta', note: 'Observe la testa que protege el embrión y regula la entrada de agua.', position: [-0.2, 0.02, 0.28] },
+        { id: 'cotiledones', label: 'Cotiledones', note: 'Identifique los dos cotiledones que almacenan alimento para la germinación.', position: [0.08, 0.04, 0.3] },
+        { id: 'embrion', label: 'Embrión', note: 'Ubique el embrión entre los cotiledones: de allí salen la raíz y el tallo.', position: [0.24, 0.16, 0.25] },
+      ],
+      brote: [
+        { id: 'radicula', label: 'Radícula', note: 'Observe la primera raíz, que ancla la plántula y busca agua.', position: [0, -0.42, 0.12] },
+        { id: 'cotiledones', label: 'Cotiledones', note: 'Reconozca las dos hojas embrionarias que entregan reservas al brote.', position: [-0.27, 0.2, 0.16] },
+        { id: 'plumula', label: 'Plúmula', note: 'Siga la yema embrionaria que formará el tallo y las hojas verdaderas.', position: [0.08, 0.42, 0.18] },
+      ],
+      planta: [
+        { id: 'vaina', label: 'Vaina', note: 'Identifique la vaina, fruto que contiene las semillas del frijol.', position: [0.32, 0.14, 0.18] },
+        { id: 'hoja-trifoliada', label: 'Hoja trifoliada', note: 'Observe los tres foliolos que capturan luz y fabrican azúcares.', position: [-0.35, 0.42, 0.1] },
+        { id: 'tallo', label: 'Tallo', note: 'Siga el tallo que sostiene las hojas y conduce agua y azúcares.', position: [0, 0.22, 0.28] },
+        { id: 'raiz', label: 'Raíz', note: 'Ubique la raíz que ancla la planta y absorbe agua y minerales.', position: [0, -0.42, 0.14] },
+      ],
+    },
+    quiz: [
+      { prompt: '¿Qué estructura del frijol guarda la reserva de la semilla?', options: ['Los cotiledones', 'La vaina', 'La raíz'], answer: 0, explanation: 'Los dos cotiledones del frijol almacenan reservas y alimentan al embrión durante la germinación.' },
+    ],
+  },
+  solanum_tuberosum: {
+    kind: 'potato',
+    title: 'Papa',
+    scientific: 'Solanum tuberosum',
+    stageData: {
+      ...COMMON_STAGES,
+      semilla: { ...COMMON_STAGES.semilla, text: 'La semilla botánica de papa contiene una cubierta, un embrión pequeño y tejido de reserva.' },
+      brote: { ...COMMON_STAGES.brote, text: 'La radícula inicia la raíz y la plúmula forma el tallo joven antes de que aparezcan las hojas.' },
+      planta: { ...COMMON_STAGES.planta, text: 'La planta forma hojas sobre el suelo y tubérculos, que son tallos subterráneos de reserva.' },
+    },
+    markers: {
+      semilla: [
+        { id: 'cubierta', label: 'Cubierta', note: 'Observe la cubierta que protege el embrión de la semilla botánica.', position: [-0.2, 0.02, 0.28] },
+        { id: 'endospermo', label: 'Endospermo', note: 'Identifique el tejido de reserva que alimenta al embrión al germinar.', position: [0.08, 0.02, 0.3] },
+        { id: 'embrion', label: 'Embrión', note: 'Ubique el embrión que dará origen a la raíz y al brote.', position: [0.2, 0.16, 0.25] },
+      ],
+      brote: [
+        { id: 'radicula', label: 'Radícula', note: 'Observe la primera raíz, que fija la plántula y absorbe agua.', position: [0, -0.42, 0.12] },
+        { id: 'cotiledones', label: 'Cotiledones', note: 'Reconozca las hojas embrionarias que acompañan la salida del brote.', position: [-0.25, 0.2, 0.16] },
+        { id: 'plumula', label: 'Plúmula', note: 'Siga la yema embrionaria que formará el tallo y las primeras hojas.', position: [0.08, 0.42, 0.18] },
+      ],
+      planta: [
+        { id: 'tuberculo', label: 'Tubérculo', note: 'Identifique el tubérculo como un tallo subterráneo que almacena almidón.', position: [0.28, -0.18, 0.18] },
+        { id: 'hoja', label: 'Hoja', note: 'Observe la hoja compuesta que captura luz y produce azúcares.', position: [-0.35, 0.42, 0.1] },
+        { id: 'tallo', label: 'Tallo', note: 'Siga el tallo que sostiene las hojas y conecta con los tubérculos.', position: [0, 0.22, 0.28] },
+        { id: 'raiz', label: 'Raíz', note: 'Ubique las raíces que absorben agua y minerales del suelo.', position: [0, -0.42, 0.14] },
+      ],
+    },
+    quiz: [
+      { prompt: '¿Qué es botánicamente el tubérculo de papa?', options: ['Un tallo subterráneo', 'Una raíz reservante', 'Una hoja engrosada'], answer: 0, explanation: 'El tubérculo de papa es un tallo subterráneo de reserva; sus ojos son yemas.' },
+    ],
+  },
+  manihot_esculenta: {
+    kind: 'cassava',
+    title: 'Yuca',
+    scientific: 'Manihot esculenta',
+    stageData: {
+      ...COMMON_STAGES,
+      semilla: { ...COMMON_STAGES.semilla, text: 'La semilla de yuca es dicotiledónea y contiene una cubierta, dos cotiledones y un embrión.' },
+      brote: { ...COMMON_STAGES.brote, text: 'La radícula forma la raíz inicial y la plúmula levanta el tallo joven con sus primeras hojas.' },
+      planta: { ...COMMON_STAGES.planta, text: 'La yuca produce hojas palmadas y engrosa algunas raíces verdaderas para guardar almidón.' },
+    },
+    markers: {
+      semilla: [
+        { id: 'cubierta', label: 'Cubierta', note: 'Observe la cubierta que protege el embrión y la reserva de la semilla.', position: [-0.2, 0.02, 0.28] },
+        { id: 'cotiledones', label: 'Cotiledones', note: 'Identifique los dos cotiledones que nutren el embrión durante la germinación.', position: [0.08, 0.04, 0.3] },
+        { id: 'embrion', label: 'Embrión', note: 'Ubique el embrión que formará la radícula y la plúmula.', position: [0.22, 0.16, 0.25] },
+      ],
+      brote: [
+        { id: 'radicula', label: 'Radícula', note: 'Observe la raíz inicial que ancla la plántula y busca humedad.', position: [0, -0.42, 0.12] },
+        { id: 'cotiledones', label: 'Cotiledones', note: 'Reconozca las hojas embrionarias que sostienen los primeros días del brote.', position: [-0.26, 0.2, 0.16] },
+        { id: 'plumula', label: 'Plúmula', note: 'Siga la yema embrionaria que dará lugar al tallo y las hojas.', position: [0.08, 0.42, 0.18] },
+      ],
+      planta: [
+        { id: 'raiz-reservante', label: 'Raíz reservante', note: 'Identifique la raíz verdadera que engrosa y almacena almidón para la cosecha.', position: [0.28, -0.22, 0.18] },
+        { id: 'hoja-palmada', label: 'Hoja palmada', note: 'Observe los lóbulos de la hoja que capturan luz para formar biomasa.', position: [-0.35, 0.42, 0.1] },
+        { id: 'tallo', label: 'Tallo', note: 'Siga el tallo ramificado que sostiene las hojas y conecta con las raíces.', position: [0, 0.22, 0.28] },
+        { id: 'raiz-fibrosa', label: 'Raíz fibrosa', note: 'Ubique las raíces finas que absorben agua y minerales del suelo.', position: [0, -0.42, 0.14] },
+      ],
+    },
+    quiz: [
+      { prompt: '¿Qué órgano de la yuca almacena principalmente el almidón?', options: ['La raíz reservante', 'La hoja palmada', 'La semilla'], answer: 0, explanation: 'La yuca engrosa raíces verdaderas y allí acumula gran parte del almidón de la cosecha.' },
+    ],
+  },
+  musa: {
+    kind: 'plantain',
+    title: 'Plátano',
+    scientific: 'Musa',
+    stageData: {
+      ...COMMON_STAGES,
+      semilla: { ...COMMON_STAGES.semilla, text: 'En las especies de Musa con semilla, la cubierta encierra un embrión pequeño y un endospermo de reserva.' },
+      brote: { ...COMMON_STAGES.brote, text: 'La radícula emerge primero y la plúmula despliega las primeras hojas de esta monocotiledónea.' },
+      planta: { ...COMMON_STAGES.planta, text: 'Las vainas foliares forman un pseudotallo y la planta desarrolla un racimo de frutos.' },
+    },
+    markers: {
+      semilla: [
+        { id: 'cubierta', label: 'Cubierta', note: 'Observe la cubierta dura que protege el embrión de la semilla de Musa.', position: [-0.2, 0.02, 0.28] },
+        { id: 'endospermo', label: 'Endospermo', note: 'Identifique la reserva que alimenta al embrión durante la germinación.', position: [0.08, 0.02, 0.3] },
+        { id: 'embrion', label: 'Embrión', note: 'Ubique el embrión monocotiledóneo que dará origen a raíz y brote.', position: [0.22, 0.16, 0.25] },
+      ],
+      brote: [
+        { id: 'radicula', label: 'Radícula', note: 'Observe la primera raíz que fija la plántula y absorbe agua.', position: [0, -0.42, 0.12] },
+        { id: 'plumula', label: 'Plúmula', note: 'Siga el punto de crecimiento que produce el tallo corto y las hojas.', position: [0, 0.42, 0.18] },
+        { id: 'primera-hoja', label: 'Primera hoja', note: 'Identifique la hoja joven que comienza a captar luz para el brote.', position: [0.28, 0.46, 0.12] },
+      ],
+      planta: [
+        { id: 'racimo', label: 'Racimo', note: 'Identifique el racimo que reúne los frutos cosechables del plátano.', position: [0.3, 0.14, 0.18] },
+        { id: 'hoja', label: 'Hoja', note: 'Observe la gran lámina foliar que captura luz y mueve agua por la planta.', position: [-0.35, 0.42, 0.1] },
+        { id: 'pseudotallo', label: 'Pseudotallo', note: 'Reconozca las vainas de hojas apretadas que forman el pseudotallo.', position: [0, 0.22, 0.28] },
+        { id: 'raiz', label: 'Raíz', note: 'Ubique las raíces fasciculadas que anclan la planta en el suelo.', position: [0, -0.42, 0.14] },
+      ],
+    },
+    quiz: [
+      { prompt: '¿Qué estructura forma el pseudotallo del plátano?', options: ['Vainas foliares superpuestas', 'Tubérculos', 'Raíces reservantes'], answer: 0, explanation: 'El pseudotallo se forma con las vainas de las hojas enrolladas; no es un tronco leñoso.' },
+    ],
+  },
+  coffea_arabica: {
+    kind: 'coffee',
+    title: 'Café',
+    scientific: 'Coffea arabica',
+    stageData: {
+      ...COMMON_STAGES,
+      semilla: { ...COMMON_STAGES.semilla, text: 'El grano de café es una semilla con cubierta, endospermo de reserva y un embrión pequeño.' },
+      brote: { ...COMMON_STAGES.brote, text: 'La radícula abre camino y los cotiledones se liberan antes de que aparezcan las primeras hojas.' },
+      planta: { ...COMMON_STAGES.planta, text: 'El cafeto sostiene hojas brillantes y frutos rojos que contienen los granos de la cosecha.' },
+    },
+    markers: {
+      semilla: [
+        { id: 'cubierta', label: 'Cubierta', note: 'Observe la cubierta que protege el grano y el embrión del café.', position: [-0.2, 0.02, 0.28] },
+        { id: 'endospermo', label: 'Endospermo', note: 'Identifique el endospermo, reserva que sostiene la germinación del cafeto.', position: [0.08, 0.02, 0.3] },
+        { id: 'embrion', label: 'Embrión', note: 'Ubique el embrión pequeño que formará la raíz y el tallo joven.', position: [0.22, 0.16, 0.25] },
+      ],
+      brote: [
+        { id: 'radicula', label: 'Radícula', note: 'Observe la primera raíz, que ancla el brote y busca agua.', position: [0, -0.42, 0.12] },
+        { id: 'cotiledones', label: 'Cotiledones', note: 'Reconozca los cotiledones que acompañan la salida de la plántula.', position: [-0.26, 0.2, 0.16] },
+        { id: 'plumula', label: 'Plúmula', note: 'Siga la yema embrionaria que forma el tallo y las primeras hojas.', position: [0.08, 0.42, 0.18] },
+      ],
+      planta: [
+        { id: 'grano-cafe', label: 'Grano', note: 'Identifique el grano como la semilla que se encuentra dentro del fruto del café.', position: [0.3, 0.14, 0.18] },
+        { id: 'hoja', label: 'Hoja', note: 'Observe la hoja brillante que captura luz y produce azúcares.', position: [-0.35, 0.42, 0.1] },
+        { id: 'tallo', label: 'Tallo', note: 'Siga el tallo que sostiene la copa y conduce agua y azúcares.', position: [0, 0.22, 0.28] },
+        { id: 'raiz', label: 'Raíz', note: 'Ubique la raíz que ancla el cafeto y absorbe agua y minerales.', position: [0, -0.42, 0.14] },
+      ],
+    },
+    quiz: [
+      { prompt: '¿Dónde está el grano que se tuesta para preparar café?', options: ['Dentro del fruto', 'En la raíz', 'En la hoja'], answer: 0, explanation: 'El grano de café es la semilla que se encuentra dentro del fruto o cereza del cafeto.' },
+    ],
+  },
+  theobroma_cacao: {
+    kind: 'cacao',
+    title: 'Cacao',
+    scientific: 'Theobroma cacao',
+    stageData: {
+      ...COMMON_STAGES,
+      semilla: { ...COMMON_STAGES.semilla, text: 'La semilla de cacao tiene cubierta, dos cotiledones carnosos y un embrión que inicia la germinación.' },
+      brote: { ...COMMON_STAGES.brote, text: 'La radícula emerge primero y la plúmula levanta el tallo joven con sus primeras hojas.' },
+      planta: { ...COMMON_STAGES.planta, text: 'El árbol forma flores y mazorcas sobre el tronco y las ramas, con granos rodeados de pulpa.' },
+    },
+    markers: {
+      semilla: [
+        { id: 'cubierta', label: 'Cubierta', note: 'Observe la cubierta que protege el embrión y los cotiledones del cacao.', position: [-0.2, 0.02, 0.28] },
+        { id: 'cotiledones', label: 'Cotiledones', note: 'Identifique los dos cotiledones que guardan reservas para el brote.', position: [0.08, 0.04, 0.3] },
+        { id: 'embrion', label: 'Embrión', note: 'Ubique el embrión entre los cotiledones, origen de la raíz y el tallo.', position: [0.22, 0.16, 0.25] },
+      ],
+      brote: [
+        { id: 'radicula', label: 'Radícula', note: 'Observe la primera raíz, que ancla la plántula y absorbe agua.', position: [0, -0.42, 0.12] },
+        { id: 'cotiledones', label: 'Cotiledones', note: 'Reconozca los cotiledones que alimentan al brote mientras despliega hojas.', position: [-0.26, 0.2, 0.16] },
+        { id: 'plumula', label: 'Plúmula', note: 'Siga la yema embrionaria que formará el tallo y las hojas verdaderas.', position: [0.08, 0.42, 0.18] },
+      ],
+      planta: [
+        { id: 'mazorca', label: 'Mazorca', note: 'Identifique la mazorca, fruto que contiene las semillas rodeadas de pulpa.', position: [0.3, 0.14, 0.18] },
+        { id: 'grano-cacao', label: 'Grano', note: 'Observe el grano como la semilla que se fermenta y seca para la cosecha.', position: [0.18, 0.02, 0.28] },
+        { id: 'hoja', label: 'Hoja', note: 'Observe la hoja que captura luz y fabrica azúcares para el árbol.', position: [-0.35, 0.42, 0.1] },
+        { id: 'tronco', label: 'Tronco', note: 'Siga el tronco, donde el cacao puede formar flores y mazorcas.', position: [0, 0.22, 0.28] },
+      ],
+    },
+    quiz: [
+      { prompt: '¿Qué contiene la mazorca de cacao?', options: ['Granos rodeados de pulpa', 'Tubérculos', 'Raíces reservantes'], answer: 0, explanation: 'La mazorca es el fruto del cacao y contiene numerosas semillas, conocidas como granos, rodeadas de pulpa.' },
+    ],
+  },
 };
 
 export function getAtlasRecord(speciesId) {
