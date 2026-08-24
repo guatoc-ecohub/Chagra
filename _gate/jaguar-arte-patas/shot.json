@@ -1,0 +1,18 @@
+{
+ "ok": true,
+ "bytes": 461526,
+ "dom": {
+  "root": true,
+  "hijos": 1,
+  "nodos": 60,
+  "imgs": 0,
+  "imgsCargadas": 0,
+  "svgs": 0,
+  "alto": 560
+ },
+ "pageErrors": [],
+ "consoleErrors": [
+  "Failed to load resource: the server responded with a status of 404 (Not Found)"
+ ],
+ "reqFailures": []
+}
