@@ -1,0 +1,99 @@
+{
+  "maquinaSola": true,
+  "styles": {
+    "root": {
+      "opacity": "1",
+      "fillOpacity": "1",
+      "strokeOpacity": "1",
+      "mixBlendMode": "normal",
+      "filter": "none",
+      "isolation": "auto",
+      "fill": "rgb(0, 0, 0)",
+      "stroke": "none",
+      "transform": "none"
+    },
+    "body": {
+      "opacity": "1",
+      "fillOpacity": "1",
+      "strokeOpacity": "1",
+      "mixBlendMode": "normal",
+      "filter": "url(\"#crt-glow-r0\")",
+      "isolation": "auto",
+      "fill": "rgb(0, 0, 0)",
+      "stroke": "none",
+      "transform": "none"
+    },
+    "leftArm": {
+      "opacity": "1",
+      "fillOpacity": "1",
+      "strokeOpacity": "1",
+      "mixBlendMode": "normal",
+      "filter": "none",
+      "isolation": "auto",
+      "fill": "rgb(0, 0, 0)",
+      "stroke": "none",
+      "transform": "none"
+    },
+    "leftArmPath": {
+      "opacity": "1",
+      "fillOpacity": "1",
+      "strokeOpacity": "1",
+      "mixBlendMode": "normal",
+      "filter": "none",
+      "isolation": "auto",
+      "fill": "url(\"#osb-masa-r0\")",
+      "stroke": "rgb(42, 26, 12)",
+      "transform": "none"
+    },
+    "rightArm": {
+      "opacity": "1",
+      "fillOpacity": "1",
+      "strokeOpacity": "1",
+      "mixBlendMode": "normal",
+      "filter": "none",
+      "isolation": "auto",
+      "fill": "rgb(0, 0, 0)",
+      "stroke": "none",
+      "transform": "none"
+    },
+    "leftArmAttr": {
+      "class": "crt-brazo-l",
+      "style": "transform-box: fill-box; transform-origin: right top; animation-delay: -0.3s;",
+      "filter": null,
+      "pathFill": "url(#osb-masa-r0)",
+      "pathStroke": "#2a1a0c",
+      "pathD": "M -4.8,-7.0 C -8.6,-7.5 -11.4,-5.8 -12.0,-3.3 C -12.5,-1.1 -11.7,1.2 -10.2,2.9 C -9.4,3.7 -8.6,4.3 -7.8,4.7 C -6.6,5.2 -5.7,4.5 -6.0,3.5 C -7.6,2.6 -8.7,1.2 -8.8,-0.5 C -8.9,-2.2 -8.2,-3.8 -6.8,-4.7 C -6.1,-5.15 -5.4,-5.3 -4.7,-5.2 Z"
+    },
+    "svgRect": {
+      "x": 360,
+      "y": 488,
+      "width": 520,
+      "height": 520,
+      "top": 488,
+      "right": 880,
+      "bottom": 1008,
+      "left": 360
+    }
+  },
+  "samplePoint": {
+    "x": 482,
+    "y": 711
+  },
+  "pixels": {
+    "normal": [
+      98,
+      93,
+      81
+    ],
+    "solidRed": [
+      99,
+      95,
+      83
+    ],
+    "solidBlue": [
+      99,
+      95,
+      83
+    ]
+  }
+}
