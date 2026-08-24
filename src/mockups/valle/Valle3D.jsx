@@ -29,6 +29,7 @@ import {
   Html, Float, Stars, OrbitControls, Detailed, Instances, Instance,
 } from '@react-three/drei';
 import * as THREE from 'three';
+import { pegarAlTerreno } from '../../../lib3d/locomocion/snakey.js';
 import { perfilDeTier } from '../../visual/mundo3d/deviceTier.js';
 import CamaraDirector from '../../visual/mundo3d/escenas/CamaraDirector.jsx';
 import DirectorValle from './DirectorValle.jsx';
@@ -209,7 +210,7 @@ function alturaTerreno(x, z) {
  * @param {import('three').Camera|null|undefined} camera
  * @returns {string[]}
  */
-export function lugaresVisiblesEnFrustum(mundos, camera) {
+function lugaresVisiblesEnFrustum(mundos, camera) {
   if (!Array.isArray(mundos) || !camera) return [];
   const projection = new THREE.Matrix4().multiplyMatrices(
     camera.projectionMatrix,
@@ -1496,7 +1497,7 @@ function CriaturaSvg({ tipo, size, animated }) {
   return <Lombriz size={size} animated={animated} />;
 }
 
-function CriaturasValle({ reducedMotion, cupo, tier }) {
+function CriaturasValle({ reducedMotion, cupo, tier, alturaDe = alturaTerreno }) {
   const rendimiento = useTierPerformance({ tier, reducedMotion });
   const cupoVivo = Math.min(
     cupo ?? rendimiento.presupuesto.maxCriaturasAmbientales,
@@ -1508,7 +1509,7 @@ function CriaturasValle({ reducedMotion, cupo, tier }) {
   return (
     <group>
       {CRIATURAS_VALLE.slice(0, cupoVivo).map((c, i) => {
-        const y = alturaTerreno(c.x, c.z) + c.dy;
+        const y = alturaDe(c.x, c.z) + c.dy;
         return (
           <group key={i} position={[c.x, y, c.z]}>
             <Html center distanceFactor={c.factor} zIndexRange={[8, 0]} pointerEvents="none">
@@ -1584,8 +1585,15 @@ function ProxyLandmark({ tipo, tinte }) {
       píxeles + foco/proximidad + anti-colisión). En perfil frugal el detalle
       completo SOLO se dibuja de cerca (<Detailed>): la panorámica de arranque
       —el peor momento— queda en siluetas baratas. ── */
-function MundoLugar({ mundo, reducedMotion, perfil, onEntrar = null }) {
-  const y = alturaTerreno(mundo.pos[0], mundo.pos[2]);
+function MundoLugar({ mundo, reducedMotion, perfil, onEntrar = null, alturaDe = alturaTerreno }) {
+  const grounded = useMemo(() => {
+    const object = { position: new THREE.Vector3(mundo.pos[0], 0, mundo.pos[2]) };
+    return pegarAlTerreno(object, alturaDe, { alignToNormal: false });
+  }, [alturaDe, mundo.pos]);
+  const orientation = useMemo(
+    () => new THREE.Quaternion().setFromUnitVectors(new THREE.Vector3(0, 1, 0), grounded.normal),
+    [grounded.normal],
+  );
   const detalle = mundo.tipo === 'veleta' ? (
     <Veleta color={mundo.tinte[0]} reducedMotion={reducedMotion} />
   ) : (
@@ -1599,7 +1607,8 @@ function MundoLugar({ mundo, reducedMotion, perfil, onEntrar = null }) {
   );
   return (
     <group
-      position={[mundo.pos[0], y, mundo.pos[2]]}
+      position={grounded.position}
+      quaternion={orientation}
       scale={mundo.escala}
       onClick={
         onEntrar
@@ -1672,7 +1681,7 @@ function clamp1D(v, mitad, total) {
   return Math.min(Math.max(v, lo), hi);
 }
 
-function RotulosLugares({ mundos, focoId, onEntrar, occluders, controls = null, kReposo = 1 }) {
+function RotulosLugares({ mundos, focoId, onEntrar, occluders, controls = null, kReposo = 1, alturaDe = alturaTerreno }) {
   const botones = useRef({});
   const tapados = useRef({});
   const plena = useRef(null);
@@ -1690,19 +1699,19 @@ function RotulosLugares({ mundos, focoId, onEntrar, occluders, controls = null, 
         m,
         pos: new THREE.Vector3(
           m.pos[0],
-          alturaTerreno(m.pos[0], m.pos[2]) + 1.7 * (m.escala || 1),
+          alturaDe(m.pos[0], m.pos[2]) + 1.7 * (m.escala || 1),
           m.pos[2],
         ),
       })),
-    [mundos],
+    [mundos, alturaDe],
   );
 
   // La alerta del día (el faro) siempre se reserva su espacio en pantalla.
   const anclaAlerta = useMemo(() => {
     const a = MUNDO_DIR_BY_ID[COSA_DEL_DIA.anclaMundo];
     if (!a) return null;
-    return new THREE.Vector3(a.pos[0], alturaTerreno(a.pos[0], a.pos[2]) + 2.7, a.pos[2]);
-  }, []);
+    return new THREE.Vector3(a.pos[0], alturaDe(a.pos[0], a.pos[2]) + 2.7, a.pos[2]);
+  }, [alturaDe]);
 
   useFrame(({ camera, size }) => {
     // ~12 pasadas/s alcanzan para rótulos; corre en el PRIMER frame (importa
@@ -3054,6 +3063,7 @@ function Escena({ clima, focoId, animo, energia, onEntrar, onAlerta, onCasa = nu
           mundo={m}
           reducedMotion={reducedMotion}
           perfil={perfil}
+          alturaDe={alturaTerreno}
           onEntrar={portada ? null : onEntrar}
         />
       ))}
@@ -3083,10 +3093,16 @@ function Escena({ clima, focoId, animo, energia, onEntrar, onAlerta, onCasa = nu
           occluders={occluders}
           controls={controls}
           kReposo={poseReposo.k}
+          alturaDe={alturaTerreno}
         />
       )}
 
-      <CriaturasValle reducedMotion={reducedMotion} cupo={perfil.criaturas} tier={tier} />
+      <CriaturasValle
+        reducedMotion={reducedMotion}
+        cupo={perfil.criaturas}
+        tier={tier}
+        alturaDe={alturaTerreno}
+      />
       {!portada && (
         <Beacon onAlerta={onAlerta} reducedMotion={reducedMotion} conLuz={perfil.luzBeacon} />
       )}
