@@ -1,0 +1,30 @@
+{
+  "pantalla": "VIVA",
+  "maquinaSola": false,
+  "chromiumAntes": 9,
+  "fps": 59.74,
+  "path": "_gate/capturas-a1/visor-medium-seed-20260807-final.png",
+  "state": {
+    "mode": "PLACEHOLDER PROCEDURAL",
+    "occlusion": "OCLUSIÓN: 1 oculto · 1/10 frames",
+    "hotspots": [
+      {
+        "id": "fruto",
+        "hidden": "false",
+        "tabIndex": 0
+      },
+      {
+        "id": "hoja",
+        "hidden": "false",
+        "tabIndex": 0
+      },
+      {
+        "id": "tallo",
+        "hidden": "true",
+        "tabIndex": -1
+      }
+    ],
+    "startup": null
+  },
+  "pageErrors": []
+}

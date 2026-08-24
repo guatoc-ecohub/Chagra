@@ -1,0 +1,59 @@
+{
+  "pantalla": "VIVA",
+  "maquinaSola": false,
+  "chromiumAntes": 9,
+  "fps": 60.28,
+  "shots": [
+    "_gate/capturas-a1/visor-medium-seed-20260807.png",
+    "_gate/capturas-a1/visor-close-seed-20260807.png",
+    "_gate/capturas-a1/visor-wide-seed-20260807.png",
+    "_gate/capturas-a1/visor-maiz-seed-20260807.png",
+    "_gate/capturas-a1/visor-poster-maiz-seed-20260807.png",
+    "_gate/capturas-a1/visor-medium-seed-20260808.png"
+  ],
+  "first": {
+    "mode": "LÁMINA 2D / FALLBACK",
+    "occlusion": "OCLUSIÓN: 1 oculto · 1/10 frames",
+    "hotspots": [
+      {
+        "id": "mazorca",
+        "hidden": "false",
+        "tabIndex": 0
+      },
+      {
+        "id": "lamina",
+        "hidden": "false",
+        "tabIndex": 0
+      },
+      {
+        "id": "envés",
+        "hidden": "true",
+        "tabIndex": -1
+      }
+    ],
+    "errors": null
+  },
+  "second": {
+    "mode": "PLACEHOLDER PROCEDURAL",
+    "occlusion": "OCLUSIÓN: 1 oculto · 1/10 frames",
+    "hotspots": [
+      {
+        "id": "fruto",
+        "hidden": "false",
+        "tabIndex": 0
+      },
+      {
+        "id": "hoja",
+        "hidden": "false",
+        "tabIndex": 0
+      },
+      {
+        "id": "tallo",
+        "hidden": "true",
+        "tabIndex": -1
+      }
+    ],
+    "errors": null
+  },
+  "pageErrors": []
+}
