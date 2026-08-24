@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { lazy, Suspense } from 'react';
 import {
   Leaf,
   Sprout,
@@ -21,6 +21,8 @@ import {
 import PisoTermicoBand from './PisoTermicoBand.jsx';
 import { PHASES } from '../CicloVivo/cicloVivoData.js';
 import PedagogicalText from '../common/PedagogicalText.jsx';
+
+const SpeciesAtlas = lazy(() => import('./SpeciesAtlas.jsx'));
 
 /**
  * SpeciesFicha — ficha visual de REFERENCIA de una especie del Directorio.
@@ -92,6 +94,11 @@ export default function SpeciesFicha({ ficha, onSelectSpecies }) {
 
       {/* CLAVE DE UN VISTAZO — clima y ciclo escaneables al sol */}
       <GlanceStrip pisoTermico={pisoTermico} fenologia={fenologia} />
+
+      {/* ATLAS EDUCATIVO — modelo WebGL + estados + quiz, integrado en la ficha */}
+      <Suspense fallback={<AtlasLoading />}>
+        <SpeciesAtlas speciesId={ficha.id} commonName={comun} />
+      </Suspense>
 
       {/* PISO TÉRMICO / ALTITUD */}
       <Section icon={Mountain} title="Piso térmico y clima" accent="amber">
@@ -200,6 +207,14 @@ export default function SpeciesFicha({ ficha, onSelectSpecies }) {
       {/* PROCEDENCIA — la costura: de dónde sale cada dato */}
       <Procedencia fuentes={fuentes} />
     </article>
+  );
+}
+
+function AtlasLoading() {
+  return (
+    <div className="mx-4 mt-5 rounded-xl border border-slate-800 bg-slate-900/60 p-4 text-sm text-slate-400" role="status">
+      Preparando la lámina educativa…
+    </div>
   );
 }
 
