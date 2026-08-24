@@ -166,6 +166,15 @@ export {
   ZARIGUYA_FIRMA, ZARIGUYA_PALETA, ZARIGUYA_PRESENCIA, ZARIGUYA_PROPORCION,
   ZARIGUYA_SLUG, ZARIGUYA_TINTA, PERFIL_ZARIGUYA,
 } from './zariguyaIdentidad.js';
+/* LA ZARIGÜEYA GEMINI (2026-08-24, `feat/zariguya-gemini-integra`) — el SET
+   estilo grabado/tinta aprobado por el operador (2026-08-23) hecho lámina
+   viva: la hero naturalista (lápiz+brújula, patas reales) horneada en capas
+   + cola de rig del despiece + las poses plenas del set (escucha ×4,
+   ver-lupa, cute, muerta) según el estado del agente. Es la cara ACTUAL del
+   AGENTE (`ChagraAgentAvatarZariguya`); `CREATURES.zariguya` (fauna del
+   valle/selector de criaturas) sigue en `ZariguyaLaminaViva` hasta que esa
+   superficie se migre — trabajo aparte, mismo set. */
+export { default as ZariguyaGeminiLaminaViva } from './ZariguyaGeminiLaminaViva.jsx';
 /* LA LUCIÉRNAGA (cocuyo) — el ESCARABAJO bioluminiscente de la finca: la GUÍA
    nocturna, científica y BIOINDICADORA (la misma familia de personaje-guía que
    la abeja Angelita). Su LINTERNA es un medidor vivo del cambio climático (prop

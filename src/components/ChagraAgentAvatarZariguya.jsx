@@ -1,43 +1,31 @@
-import Zariguya from '../visual/creatures/Zariguya';
+import ZariguyaGeminiLaminaViva from '../visual/creatures/ZariguyaGeminiLaminaViva';
 
 /**
- * ChagraAgentAvatarZariguya — la zarigüeya (crías al lomo) como CARA del
- * agente de Chagra, 3ra opción junto a Angelita y el maíz (operador
- * 2026-07-25, tras el merge de `art(creatures): la zarigüeya entra al elenco
- * — con las crías al lomo (#2783)`).
+ * ChagraAgentAvatarZariguya — la zarigüeya como CARA del agente de Chagra,
+ * 3ra opción junto a Angelita y el maíz (operador 2026-07-25).
  *
- * Adaptador puro (mismo contrato que ChagraAgentAvatarAngelita/Maiz): traduce
- * la API histórica del avatar del agente (state 'idle'|'thinking'|'speaking'|
- * 'listening', glow, withLabel, onClick/onDoubleClick) al vocabulario de VIDA
- * de `Zariguya.jsx` (`visual/creatures/`) — el registro rubber-hose CÁLIDO
- * del elenco canónico. OJO: existe otra zarigüeya en
- * `dashboard/CriaturasNocturnas.jsx`, biopunk oscuro/neón — esa NO se usa acá
- * (mezclar registros es un error de diseño ya señalado). Cero lógica nueva de
- * agente, cero cambios en `visual/creatures/` (solo lectura/import, igual que
- * el resto de adaptadores de este archivo con Angelita).
+ * DESDE `feat/zariguya-gemini-integra` (2026-08-24) el cuerpo es
+ * `ZariguyaGeminiLaminaViva`: el SET GEMINI estilo grabado/tinta aprobado por
+ * el operador (2026-08-23) — la hero naturalista (lápiz+brújula) horneada en
+ * capas lámina-viva + las poses plenas del set (escucha ×4, ver-lupa, cute,
+ * muerta) según el estado. REEMPLAZA aquí al vector rubber-hose
+ * `Zariguya.jsx` (rechazado en revisión visual: cuerpo gris plano, cola
+ * pelada); el vector sigue vivo en `visual/creatures/` para sus otros
+ * consumidores (fauna del valle, selector de criaturas).
  *
- * La zarigüeya no tiene vocabulario conversacional propio (es una criatura de
- * VIDA — pose/husmea/tanatosis — no un chat-avatar como Angelita): el mapeo
- * es de mejor esfuerzo:
- *   - idle       → pose 'anda' (base, viva pero sin urgencia).
- *   - thinking   → pose 'anda' + `husmea=true`: su reacción-firma (la cuña
- *                  del hocico se alza y tantea) leída como "buscando/pensando".
- *   - speaking   → pose 'celebra' (la más expresiva) + visema del lip-sync
- *                  sobre su sonrisa.
- *   - listening  → pose 'reposo': se posa erguida y atenta.
+ * Adaptador puro (mismo contrato que ChagraAgentAvatarAngelita/Maiz/Jaguar):
+ * traduce la API histórica del avatar del agente (state 'idle'|'thinking'|
+ * 'speaking'|'listening', glow, withLabel, onClick/onDoubleClick) al
+ * contrato de la lámina viva — que entiende esos estados de forma nativa:
+ *   - idle      → lámina-rig articulada (respira, parpadea, husmea; sus
+ *                 momentos de vida traen el gag de tanatosis y el reposo
+ *                 de frente, poses reales del set).
+ *   - thinking  → pose ver-lupa (la investigadora repasa el documento).
+ *   - speaking  → lámina-rig + lip-sync de mandíbula (visema estático V2 si
+ *                 el host no corre useLipSync — igual que Angelita).
+ *   - listening → ciclo de escucha del set (la oreja crece 02→03→04; en
+ *                 avatar chico, el close-up 01).
  */
-const POSE_DE_STATE = {
-    idle: 'anda',
-    thinking: 'anda',
-    speaking: 'celebra',
-    listening: 'reposo',
-};
-
-const HUSMEA_DE_STATE = {
-    thinking: true,
-};
-
-// eslint-disable-next-line chagra-i18n/no-hardcoded-spanish
 const VISEMA_DE_STATE = {
     speaking: 'V2',
 };
@@ -52,14 +40,11 @@ export default function ChagraAgentAvatarZariguya({
     className = '',
     ariaLabel = 'Chagra IA',
 }) {
-    const pose = POSE_DE_STATE[state] || 'anda';
-    const husmea = !!HUSMEA_DE_STATE[state];
     const visema = VISEMA_DE_STATE[state] || null;
 
     const bicho = (
-        <Zariguya
-            pose={pose}
-            husmea={husmea}
+        <ZariguyaGeminiLaminaViva
+            estado={state}
             visema={visema}
             size={size}
             title={ariaLabel}
