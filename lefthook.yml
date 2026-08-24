@@ -22,7 +22,7 @@ pre-commit:
       tags: security
       glob: "*.{md,js,jsx,ts,tsx,json,yaml,yml}"
       run: |
-        files="{staged_files}"
+        files=$(printf '%s\n' {staged_files})
         [ -z "$files" ] && exit 0
         # Filtra archivos de reglas + docs que legítimamente discuten los
         # patterns como texto de normativa.
@@ -40,7 +40,7 @@ pre-commit:
       tags: security
       glob: "*.{md,js,jsx,ts,tsx,json,yaml,yml}"
       run: |
-        files="{staged_files}"
+        files=$(printf '%s\n' {staged_files})
         [ -z "$files" ] && exit 0
         # Filtra archivos de reglas + docs que legítimamente discuten los
         # patterns como texto de normativa, y public/valle/ (árbol vanilla
@@ -78,7 +78,7 @@ pre-commit:
       tags: security
       glob: "src/**/*.{js,jsx,ts,tsx}"
       run: |
-        files="{staged_files}"
+        files=$(printf '%s\n' {staged_files})
         [ -z "$files" ] && exit 0
         hits=$(echo "$files" | xargs grep -lnE "from ['\"](@guatoc/chagra-pro|@chagra/pro-|\.\./chagra-pro|chagra-pro/)" 2>/dev/null || true)
         if [ -n "$hits" ]; then
@@ -96,7 +96,7 @@ pre-commit:
       tags: i18n
       glob: "src/**/*.{js,jsx,ts,tsx,json}"
       run: |
-        files="{staged_files}"
+        files=$(printf '%s\n' {staged_files})
         [ -z "$files" ] && exit 0
         # Excluye el filtro (contiene patrones), tests, y datos de nombres
         # propios (locations DANE) que dan falsos positivos por substring.
