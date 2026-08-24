@@ -935,6 +935,14 @@ const HASH_VIEW_ROUTES = {
   suelo: 'suelo',
   agua: 'agua',
   'manejo-agua': 'agua',
+  // Página del Tiempo agroclima ("El clima que viene"): antes solo era
+  // alcanzable por el menú de la finca (mundosFinca.js) — sin deep-link. Se
+  // agregan tokens de hash para poder abrirla directo por URL (#tiempo).
+  'clima-boletin': 'clima_boletin',
+  tiempo: 'clima_boletin',
+  'el-tiempo': 'clima_boletin',
+  'pagina-del-tiempo': 'clima_boletin',
+  'el-clima-que-viene': 'clima_boletin',
   aromaticas: 'aromaticas',
   'aromaticas-condimentarias': 'aromaticas',
   condimentarias: 'aromaticas',
