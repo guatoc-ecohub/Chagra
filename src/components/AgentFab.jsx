@@ -249,10 +249,14 @@ export default function AgentFab({ onNavigate, pantalla = null }) {
   const mostrarEnsenanza = ensenanzaPermitida && !interactuando && !hintDescartado && !hintConsumido;
   if (mostrarEnsenanza && !hintArrancado) setHintArrancado(true);
 
-  // R2: ocultar cuando el usuario interactúa con la PANTALLA (no con el FAB
-  // mismo, ni tapando un aviso importante). Al quedar idle, reaparece.
-  const oculto = interactuando && !hover && !pressed && !menuAbierto && !panelAbierto
-    && !mostrarAviso && !silenciado;
+  // POLÍTICA COMPAI v2 (operador 2026-08-24): el compai es VISIBLE 100% del
+  // tiempo, NUNCA desaparece. La ocultación anterior (`oculto = interactuando
+  // && !hover` → visibility:hidden) hacía justo lo contrario y era el bug de
+  // "al onmouseover desaparece / ahora no sale ninguno". Al interactuar el
+  // usuario, el compai vuelve a su posición natural (por ahora su puesto), NO
+  // se oculta. `interactuando` sigue gobernando SOLO la enseñanza (R3), no la
+  // visibilidad. Ver feedback_compai_politica_v2_visible_roam_natural.
+  const oculto = false;
 
   const abrirPanel = useCallback(() => {
     setPanelAbierto(true);
@@ -514,7 +518,10 @@ export default function AgentFab({ onNavigate, pantalla = null }) {
           color: '#fff',
           fontSize: 14,
           lineHeight: 1,
-          display: 'flex',
+          // v2 (operador): el ícono se ve SOLO cuando toco/hover el compai (o
+          // el menú está abierto), o si está silenciado (para poder reactivarlo)
+          // — no tapa la cara en reposo. Ver feedback_compai_politica_v2.
+          display: (hover || pressed || menuAbierto || silenciado) ? 'flex' : 'none',
           alignItems: 'center',
           justifyContent: 'center',
           cursor: 'pointer',
