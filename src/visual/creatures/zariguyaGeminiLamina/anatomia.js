@@ -116,6 +116,13 @@ export const COLA = {
 /** Pivote del cuerpo para respirar/bob (centro de masa del tronco). */
 export const CUERPO_PIVOTE = [235, 300];
 
+/** Origen del BAMBOLEO PLANTÍGRADO al andar (`.zgl-cuerpoVida`): los APOYOS
+ *  — el punto entre los pies desde donde el peso rueda pie-a-pie. Herencia
+ *  medida del waddle auditado de la hermana (`feat/zariguya-lamina-camina`,
+ *  que lo fijaba como transform-origin 50% 90% en CSS): mismo encuadre
+ *  481×444 → 50% de ANCHO, 90% de ALTO, en px de lámina. */
+export const CUERPO_VIDA_PIVOTE = [240.5, 399.6];
+
 /* ════════════════════════════════════════════════════════════════════════════
  * LO NUEVO DEL SET GEMINI: la pieza de rig de la cola y las poses plenas.
  * ════════════════════════════════════════════════════════════════════════════ */
@@ -222,6 +229,7 @@ export default {
   INPAINT_PECHO,
   COLA,
   CUERPO_PIVOTE,
+  CUERPO_VIDA_PIVOTE,
   PARTE_COLA,
   POSES,
   ESCUCHA_CICLO,

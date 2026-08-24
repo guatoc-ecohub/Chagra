@@ -16,8 +16,18 @@ import { hornearZariguyaGemini, haySoporteCanvas, mascaras } from '../capas.js';
 import {
   ANCHO, ALTO, CABEZA, OJO, OJO_2, OREJA_IZQ, OREJA_DER,
   MANDIBULA, BRAZO_LAPIZ, BRAZO_BRUJULA, COLA, CUERPO_PIVOTE,
-  PARTE_COLA, POSES, ESCUCHA_CICLO, UMBRAL_CLOSEUP,
+  CUERPO_VIDA_PIVOTE, PARTE_COLA, POSES, ESCUCHA_CICLO, UMBRAL_CLOSEUP,
 } from '../anatomia.js';
+import { readFileSync } from 'node:fs';
+import { resolve } from 'node:path';
+import process from 'node:process';
+
+// El CSS crudo se lee por fs (el pipeline de vitest deja los .css en vacío;
+// import.meta.url en jsdom no es file:). Ruta desde la raíz del repo (cwd
+// de vitest, fijada por vite.config).
+const cssCrudo = readFileSync(
+  resolve(process.cwd(), 'src/visual/creatures/zariguyaGeminiLamina/zariguyaGeminiLamina.css'), 'utf8',
+);
 import ZariguyaGeminiLaminaViva from '../../ZariguyaGeminiLaminaViva.jsx';
 
 describe('haySoporteCanvas', () => {
@@ -48,7 +58,7 @@ describe('anatomia.js — forma de las constantes heredadas (mismo encuadre que 
 
   it('los pivotes son puntos [x,y] dentro del lienzo', () => {
     for (const piv of [CABEZA.pivote, OREJA_IZQ.pivote, OREJA_DER.pivote, MANDIBULA.pivote,
-      BRAZO_LAPIZ.pivote, BRAZO_BRUJULA.pivote, COLA.pivote, CUERPO_PIVOTE]) {
+      BRAZO_LAPIZ.pivote, BRAZO_BRUJULA.pivote, COLA.pivote, CUERPO_PIVOTE, CUERPO_VIDA_PIVOTE]) {
       const [x, y] = piv;
       expect(x).toBeGreaterThanOrEqual(0);
       expect(x).toBeLessThanOrEqual(ANCHO);
@@ -99,6 +109,30 @@ describe('anatomia.js — los locks NUEVOS del set Gemini', () => {
     for (const k of ESCUCHA_CICLO) expect(POSES[k]).toBeDefined();
     expect(UMBRAL_CLOSEUP).toBeGreaterThan(0);
   });
+
+  it('CUERPO_VIDA_PIVOTE (origen del waddle) = los apoyos: 50% de ANCHO, 90% de ALTO (herencia hermana)', () => {
+    expect(CUERPO_VIDA_PIVOTE[0]).toBeCloseTo(ANCHO * 0.5, 1);
+    expect(CUERPO_VIDA_PIVOTE[1]).toBeCloseTo(ALTO * 0.9, 1);
+  });
+});
+
+describe('zariguyaGeminiLamina.css — lock del waddle portado (zlv-→zgl-)', () => {
+  it('caminando dispara waddle (rock de peso) + hipShift (cadera) y el bob plano ya no existe', () => {
+    expect(cssCrudo).toMatch(/\[data-agt-estado='caminando'\] \.zgl-cuerpoVida \{ animation: zgl-waddle 0\.52s/);
+    expect(cssCrudo).toMatch(/\[data-agt-estado='caminando'\] \.zgl-cuerpoPivote \{ animation: zgl-hipShift 1\.04s/);
+    expect(cssCrudo).not.toMatch(/zgl-cuerpoBob/); // "María Antonieta", enterrada
+  });
+
+  it('manitos-pata en OPOSICIÓN (desfase de medio paso) y cola de contrapeso al período de 2 pasos', () => {
+    expect(cssCrudo).toMatch(/zgl-paw-anda 0\.52s ease-in-out infinite/);
+    expect(cssCrudo).toMatch(/zgl-paw-anda 0\.52s ease-in-out -0\.26s infinite/);
+    expect(cssCrudo).toMatch(/zgl-colaRig-anda 1\.04s/);
+  });
+
+  it('gates de la casa cubren el nodo nuevo (tier bajo + reduced-motion)', () => {
+    expect(cssCrudo).toMatch(/\[data-tier='bajo'\] \.zgl-cuerpoVida,/);
+    expect(cssCrudo).toMatch(/\.zgl-stage, \.zgl-cuerpoVida, \.zgl-cuerpoPivote,/);
+  });
 });
 
 describe('ZariguyaGeminiLaminaViva — contrato observable (jsdom = degradación)', () => {
@@ -133,6 +167,21 @@ describe('ZariguyaGeminiLaminaViva — contrato observable (jsdom = degradación
     expect(raiz.getAttribute('data-modo')).toBe('lamina'); // nunca media pose
     // …y el PNG de la pose está montado en el plano de poses, precargando.
     expect(container.querySelector('img[data-pose-key="crias"]')).toBeTruthy();
+  });
+
+  it('acepta "caminando" y cuelga el nodo del waddle (.zgl-cuerpoVida envolviendo al pivote)', () => {
+    const { container } = render(<ZariguyaGeminiLaminaViva estado="caminando" size={220} />);
+    const raiz = container.querySelector('div[data-creature="zariguya"]');
+    expect(raiz.getAttribute('data-agt-estado')).toBe('caminando');
+    const vida = container.querySelector('.zgl-cuerpoVida');
+    expect(vida).toBeTruthy();
+    // COMPONEN: el pivote de respiro/cadera vive DENTRO del nodo de waddle.
+    expect(vida.querySelector('.zgl-cuerpoPivote')).toBeTruthy();
+  });
+
+  it('animated=false = fotograma digno: la clase de waddle no se cuelga', () => {
+    const { container } = render(<ZariguyaGeminiLaminaViva estado="caminando" animated={false} />);
+    expect(container.querySelector('.zgl-cuerpoVida')).toBeNull();
   });
 
   it('con handlers expone botón real (teclado + lector de pantalla)', () => {
