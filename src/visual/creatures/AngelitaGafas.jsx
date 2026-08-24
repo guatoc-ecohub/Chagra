@@ -108,17 +108,24 @@ const CEJAS_D = {
  * Cejas expresivas. Opt-in: sin `estilo` (o desconocido) no dibuja nada — las
  * caras existentes no cambian. La vida ('vivas', flash al hablar) es del CSS.
  *
+ * `color` (2026-08-23): las cejas viven SOBRE la testa oscura del meliponino
+ * y en tinta eran invisibles (tinta sobre casi-negro = cero contraste — el
+ * estado expresivo no se leía). El default sigue siendo la tinta de la casa
+ * (por si otro bicho de cara clara las hereda); Angelita pasa su tono claro
+ * de clípeo, el recurso clásico del cartoon de pelaje oscuro: ceja clara.
+ *
  * @param {Object} props
  * @param {'alegres'|'altas'|'vivas'|'fruncidas'|null} [props.estilo]
  * @param {string} [props.ink=RH_INK]
+ * @param {string} [props.color]  trazo de la ceja (default: la tinta `ink`)
  */
-export function CejasRubber({ estilo = null, ink = RH_INK }) {
+export function CejasRubber({ estilo = null, ink = RH_INK, color = undefined }) {
   const par = estilo ? CEJAS_D[estilo] : null;
   if (!par) return null;
   return (
     <g
       className="rh-cejas"
-      stroke={ink} strokeWidth="0.85" fill="none" strokeLinecap="round"
+      stroke={color || ink} strokeWidth="0.85" fill="none" strokeLinecap="round"
       style={{ transformBox: 'fill-box', transformOrigin: 'center bottom' }}
       aria-hidden="true"
     >

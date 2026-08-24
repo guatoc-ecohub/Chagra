@@ -134,8 +134,12 @@ export function AbejaAngelita({
   const wing = animated ? 'crt-wing' : undefined;
   const vivo = animated;
   // El aura respira con la energía real de la finca (matas vivas + agua).
-  const auraOp = Math.max(0.16, Math.min(0.5, 0.2 + 0.3 * (energia ?? 1)));
-  const auraR = 5.4 + 1.2 * (energia ?? 1);
+  // Ceñida (2026-08-23): antes 0.2+0.3·e con r 5.4+1.2·e y, encima del glow
+  // global del cuerpo, la niebla ámbar era lo PRIMERO que se leía a tamaño
+  // chico. Un anillo de calor discreto conserva la conducta (respira con la
+  // energía) sin ahogar la silueta de tinta.
+  const auraOp = Math.max(0.12, Math.min(0.32, 0.14 + 0.18 * (energia ?? 1)));
+  const auraR = 5.0 + 0.9 * (energia ?? 1);
 
   // ── EL CLIMA REAL en el cuerpo (creatureClimaCuerpo, perfil abeja). Determinista,
   //    una vez por render: tinte + opacidad al contorno; el aleteo se acelera
@@ -229,8 +233,13 @@ export function AbejaAngelita({
   //    vuelta de campana Miss-Minutes con anticipación y overshoot). Tres capas
   //    de transform que nunca caen en el mismo compás = idle impredecible, vivo.
   //    El CSS los apaga con RM, tier bajo, estados reactivos y ánimo bajito.
+  //    CONGRUENCIA (2026-08-23): el cuerpo ya NO lleva el filtro glow global
+  //    (feGaussianBlur+feMerge duplicaba TODO el dibujo borroso debajo —
+  //    incluidas patitas oscuras — y la silueta de tinta se ahogaba en niebla
+  //    ámbar; además era un blur raster de la figura entera por frame sobre un
+  //    nodo que boilea a ~12fps). El calor vive en UNA sola fuente: el aura.
   const body = (
-    <g className={`crt-body${vivo ? ' rh-boil' : ''}`} filter={`url(#${glow})`}>
+    <g className={`crt-body${vivo ? ' rh-boil' : ''}`}>
       {/* aura viva */}
       <circle r={auraR} fill={ABEJA_PALETA.cuerpo} opacity={auraOp} filter={`url(#${blur})`} />
 
@@ -257,13 +266,36 @@ export function AbejaAngelita({
         />
       )}
 
-      {/* alitas de tul con contorno + smear (crt-wingbeat ya lleva el estirón).
-          La duración del aleteo la modula el clima real (wingDur): dorada rápida,
-          lluvia pesada. celebra/reposo (data-pose) mandan por especificidad CSS. */}
-      <ellipse className={wing} style={alaStyle} cx="-3.4" cy="-6" rx="8.8" ry="3.3" fill={ABEJA_PALETA.alaTul}
-        opacity="0.55" stroke="rgba(42,26,12,0.32)" strokeWidth="0.45" />
-      <ellipse className={wing} style={alaStyle2} cx="-0.4" cy="-5.2"
-        rx="6.6" ry="2.7" fill={ABEJA_PALETA.alaTulClara} opacity="0.44" stroke="rgba(42,26,12,0.28)" strokeWidth="0.45" />
+      {/* ALITAS DE TUL con FORMA DE ALA (congruencia 2026-08-23): antes eran
+          dos elipses pálidas casi sin trazo, flotando sobre el lomo — se leían
+          como una almohada/halo, no como alas, y a tamaño chico desaparecían.
+          Ahora son dos alas de verdad ENRAIZADAS en el tórax (de donde salen
+          las alas del meliponino) que barren hacia atrás REBASANDO el abdomen
+          ("alitas que le sobran del cuerpo"), con contorno de la MISMA familia
+          de tinta (más suave que el cuerpo: siguen siendo tul) y 1-2 venas
+          apenas insinuadas (honestidad de ala hialina, no decoración).
+          El rig NO cambia: mismo slot de pintado, misma clase `crt-wing` en
+          cada ala (smear del aleteo, tempo por clima vía alaStyle) y el
+          motion-blur de alas rápidas se hereda igual. El <g> agrupa ala+venas
+          para que aleteen como una sola pieza (fill-box, pivote abajo). */}
+      <g className={wing} style={alaStyle}>
+        <path
+          d="M4.6,-3.4 C3.4,-6.4 -1.6,-9.2 -6.8,-9.4 C-10.6,-9.5 -13.1,-8.2 -12.9,-6.7 C-12.7,-5.3 -9.9,-4.6 -6.4,-4.2 C-2.6,-3.8 2.2,-3.2 4.6,-3.4 Z"
+          fill={ABEJA_PALETA.alaTul} fillOpacity="0.62"
+          stroke="rgba(42,26,12,0.6)" strokeWidth="0.7" strokeLinejoin="round" />
+        <path d="M3.6,-3.9 C0.2,-6.6 -4.2,-8.0 -9.8,-8.2" fill="none"
+          stroke="rgba(42,26,12,0.28)" strokeWidth="0.32" strokeLinecap="round" />
+        <path d="M3.6,-3.8 C0.4,-5.4 -4.4,-6.2 -10.6,-6.4" fill="none"
+          stroke="rgba(42,26,12,0.24)" strokeWidth="0.3" strokeLinecap="round" />
+      </g>
+      <g className={wing} style={alaStyle2}>
+        <path
+          d="M3.9,-2.8 C3.0,-5.2 -0.4,-7.0 -4.4,-7.1 C-7.3,-7.2 -9.2,-6.2 -9.0,-5.0 C-8.8,-3.9 -6.6,-3.4 -3.9,-3.1 C-1.2,-2.8 2.0,-2.5 3.9,-2.8 Z"
+          fill={ABEJA_PALETA.alaTulClara} fillOpacity="0.5"
+          stroke="rgba(42,26,12,0.5)" strokeWidth="0.6" strokeLinejoin="round" />
+        <path d="M3.0,-3.2 C0.4,-5.0 -3.0,-5.9 -7.6,-5.9" fill="none"
+          stroke="rgba(42,26,12,0.24)" strokeWidth="0.3" strokeLinecap="round" />
+      </g>
 
       {/* patitas manguera SIN mitón (re-skin 2026-08-21): remate de tinta
           sutil, detrás del tronco, se mecen suave */}
@@ -274,9 +306,11 @@ export function AbejaAngelita({
           OSCURAS (esas eran la firma de la Apis europea). Remata redondo — SIN
           aguijón. Va a la izquierda, dejándole el lado derecho al tórax; su
           contorno respira con el boil. */}
+      {/* (congruencia 2026-08-23: fuera el drop-shadow inline — duplicaba el
+          calor del aura como niebla pegada al contorno Y era un filtro raster
+          por frame sobre el nodo que boilea; la línea de tinta vuelve a mandar) */}
       <ellipse cx="-2.0" cy="0.2" rx="8.1" ry="4.5"
-        fill={ABEJA_PALETA.cuerpo} stroke={RH_INK} strokeWidth="1.3"
-        style={{ filter: `drop-shadow(0 0 6px ${ABEJA_PALETA.cuerpoGlow})` }} />
+        fill={ABEJA_PALETA.cuerpo} stroke={RH_INK} strokeWidth="1.3" />
       {/* brillo suave de volumen (el lomo del abdomen) — nunca una barra Apis */}
       <ellipse cx="-3.2" cy="-1.9" rx="3.9" ry="1.5" fill={ABEJA_PALETA.cabeza} opacity="0.26" />
       {/* tergite del remate, APENAS insinuado (línea suave que sigue la curva) */}
@@ -295,11 +329,18 @@ export function AbejaAngelita({
           Apis (que lo tiene claro). Sobre el arranque del abdomen, bajo la cabeza. */}
       <ellipse cx="5.0" cy="-0.4" rx="3.5" ry="4.4" fill={ABEJA_PALETA.torax}
         stroke={RH_INK} strokeWidth="1.2" />
+      {/* luz de lomo del tórax: el MISMO sol arriba-izquierda que ya baña el
+          abdomen (brillo) y los ojos (catchlight) — antes el tórax era la
+          única masa sin luz y se leía como mancha plana (congruencia de
+          iluminación, un solo arco pintado, nada de gradientes) */}
+      <path d="M3.0,-2.9 A2.8,3.7 0 0 1 4.5,-3.9" stroke="#6b4b28"
+        strokeWidth="0.85" fill="none" strokeLinecap="round" opacity="0.6" />
       {/* franja DORADA lateral del mesosoma — la marca amarilla en el costado
           del tórax negro, la firma de campo con la que se reconoce a la
-          angelita real. Un solo trazo curvo sobre el flanco visible. */}
+          angelita real. Un solo trazo curvo sobre el flanco visible.
+          (2026-08-23: un pelo más ancha y firme — a tamaño de UI desaparecía) */}
       <path d="M2.7,-2.9 Q1.9,-0.4 2.7,2.2" stroke={ABEJA_PALETA.franjaTorax}
-        strokeWidth="1.05" fill="none" strokeLinecap="round" opacity="0.85" />
+        strokeWidth="1.3" fill="none" strokeLinecap="round" opacity="0.95" />
 
       {/* bracitos manguera SIN mitón (re-skin 2026-08-21: la referencia traía
           guantes por DEFECTO — acá el remate es tinta sutil, manita desnuda).
@@ -321,10 +362,21 @@ export function AbejaAngelita({
       <g className="crt-cabeza">
         {/* cabeza OSCURA (casi negra) con contorno — la mitad oscura del meliponino */}
         <circle cx="8.6" cy="-1.0" r={ABEJA_PROPORCION.cabezaR} fill={ABEJA_PALETA.testa} stroke={RH_INK} strokeWidth="1.2" />
+        {/* luz de coronilla: el mismo arco de sol arriba-izquierda que el tórax —
+            rompe el "casco" vacío de la frente sin aclarar la cabeza (Humboldt:
+            la testa sigue oscura; esto es luz, no pigmento) */}
+        <path d="M5.6,-3.0 A3.6,3.6 0 0 1 7.4,-4.4" stroke="#6b4b28"
+          strokeWidth="0.85" fill="none" strokeLinecap="round" opacity="0.6" />
         {/* MÁSCARA FACIAL clara: la marca amarilla del clípeo de la angelita real —
             y, a la vez, el fondo sobre el que la carita (ojos/boca/cejas del agente)
-            sigue leyéndose pese a la cabeza oscura. Va bajo ojos/cachetes/boca. */}
-        <ellipse cx="9.4" cy="-0.2" rx="3.2" ry="3.4" fill={ABEJA_PALETA.cara} opacity="0.95" />
+            sigue leyéndose pese a la cabeza oscura. Va bajo ojos/cachetes/boca.
+            (2026-08-23: sube y crece un pelo — antes el aro de tinta de los ojos
+            se PERDÍA contra la testa oscura y la carita quedaba apretada abajo;
+            con la máscara respaldando los dos ojos, la línea del ojo siempre
+            pisa fondo claro y la cara se lee a cualquier tamaño. El margen
+            oscuro alrededor se conserva: la cabeza sigue siendo la mitad
+            oscura del bicho.) */}
+        <ellipse cx="9.3" cy="-0.7" rx="3.4" ry="3.85" fill={ABEJA_PALETA.cara} opacity="0.95" />
         {/* chapetas campesinas + sonrisa + ojos de goma (parpadean juntos).
             CARA re-skin 2026-08-21 (referencia ref-abeja.png, Cuphead/Miss
             Minutes): ojos más grandes y redondos (r 2.1/1.6 — el TECHO que las
@@ -348,8 +400,9 @@ export function AbejaAngelita({
           mirar={[0.3, 0.34]}
           parpadea={vivo}
         />
-        {/* cejas expresivas (opt-in): el rasgo que actúa alegría/atención/foco */}
-        {cejas && <CejasRubber estilo={cejas} />}
+        {/* cejas expresivas (opt-in): el rasgo que actúa alegría/atención/foco.
+            CLARAS sobre la testa oscura (2026-08-23): en tinta no se veían. */}
+        {cejas && <CejasRubber estilo={cejas} color={ABEJA_PALETA.cara} />}
         {/* antenas con bombillo que se mecen (secondary motion) */}
         <AntenaRubber d="M7.7,-4.7 C6.7,-7.3 7.0,-9.3 8.3,-10.1" bulbo={[8.3, -10.3]} sway={vivo} delay={0} />
         <AntenaRubber d="M9.7,-4.6 C11.0,-6.7 11.3,-8.7 10.5,-10.3" bulbo={[10.5, -10.5]} sway={vivo} delay={-0.3} />

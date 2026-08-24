@@ -49,8 +49,10 @@ export const ABEJA_PALETA = {
   franjaTorax: '#e8b45a', // franja dorada del costado del mesosoma — la marca
                           // amarilla lateral del tórax negro, firma de campo
                           // de T. angustula (Nates-Parra; iNaturalist)
-  alaTul: '#cfeeff',      // ala grande de tul (hialina)
-  alaTulClara: '#eafff8', // ala chica, más pálida
+  alaTul: '#d8ecea',      // ala grande de tul (hialina — vidrio neutro apenas
+                          // verdoso; el azul-bebé anterior enfriaba el dibujo
+                          // contra la paleta tierra/ámbar, 2026-08-23)
+  alaTulClara: '#ebf6ef', // ala chica, más pálida
   lengua: '#c9524e',      // probóscide (sed / libar)
   gota: '#bfe6ff',        // gotas de lluvia cuando está mojada
 };

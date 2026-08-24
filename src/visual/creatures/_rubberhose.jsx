@@ -145,12 +145,16 @@ export function Miembro({
     <g className={clases} style={style}>
       <path d={d} stroke={ink} strokeWidth={ancho} fill="none" strokeLinecap="round" strokeLinejoin="round" />
       {punta && (sinGuante ? (
-        /* Remate DESNUDO (sin mitón): un puntito de tinta sutil que da masa de
-           manita/piecito sin dibujar guante — los gestos (celebra/señala)
-           conservan un remate legible en la punta de la manguera. */
+        /* Remate DESNUDO (sin mitón): masa de tinta en la punta que da manita/
+           piecito sin dibujar guante — los gestos (celebra/señala) conservan
+           un remate legible en la punta de la manguera. (2026-08-23: la punta
+           creció — con 0.62·puntaR quedaba MÁS chica que el grosor del tubo y
+           era invisible: la manguera se leía como palito que termina en nada.
+           Rubber-hose = el miembro remata SIEMPRE en una masa; sigue siendo
+           tinta desnuda, el guante no vuelve.) */
         <ellipse
           cx={punta[0]} cy={punta[1]}
-          rx={puntaR * (pie ? 0.78 : 0.62)} ry={puntaR * (pie ? 0.5 : 0.62)}
+          rx={puntaR * (pie ? 0.95 : 0.92)} ry={puntaR * (pie ? 0.6 : 0.92)}
           fill={ink}
         />
       ) : pie ? (
