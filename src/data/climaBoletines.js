@@ -124,11 +124,11 @@ export const REGLA_INSIGNIA = Object.freeze({
 export const BOLETINES_IDEAM = Object.freeze([
   {
     id: 'agrometeorologico',
-    nombre: 'Boletín Agrometeorológico',
+    nombre: 'Boletín Semanal para el Sector Agrícola (BSA)',
     frecuencia: 'semanal',
-    para: 'El tiempo de los próximos 7 días por departamento: para decidir labores, riego y qué día no llueve.',
+    para: 'El pronóstico de lluvia de la semana por departamento: para decidir labores, riego y qué día no llueve. Sale los lunes.',
     emisor: 'IDEAM',
-    url: 'https://www.pronosticosyalertas.gov.co',
+    url: 'http://www.ideam.gov.co/web/sala-de-prensa/boletin-semanal-para-el-sector-agricola-bsa',
   },
   {
     id: 'agroclimatico',
@@ -136,15 +136,15 @@ export const BOLETINES_IDEAM = Object.freeze([
     frecuencia: 'mensual',
     para: 'Predicción del trimestre que viene con recomendaciones por cultivo. Lo hace la Mesa Técnica Agroclimática (MADR + FAO + IDEAM).',
     emisor: 'IDEAM · MADR · FAO',
-    url: 'https://www.pronosticosyalertas.gov.co',
+    url: 'http://www.ideam.gov.co/web/tiempo-y-clima/boletin-agroclimatico-nacional',
   },
   {
     id: 'enso',
-    nombre: 'Boletín de seguimiento del ciclo ENSO',
+    nombre: 'Predicción climática · seguimiento ENSO',
     frecuencia: 'mensual',
-    para: 'La fase oficial El Niño / La Niña / Neutral vigente. Es la fuente de verdad de "qué viene".',
+    para: 'La fase oficial El Niño / La Niña / Neutral vigente y el pronóstico del mes. Es la fuente de verdad de "qué viene".',
     emisor: 'IDEAM',
-    url: 'https://www.ideam.gov.co',
+    url: 'http://www.ideam.gov.co/web/tiempo-y-clima/prediccion-climatica',
   },
 ]);
 
@@ -203,3 +203,182 @@ export const PROBABILIDAD_TRANSICION = Object.freeze({
   valor: null,
   fuentePrevista: 'IDEAM / NOAA CPC — boletín ENSO vigente (las probabilidades caducan)',
 });
+
+/* ── FUENTES EN VIVO (mirror de fuentes-vivas.json / dr-clima-refresh.sh) ──
+ *
+ * URLs oficiales de SECCIÓN: cada una LISTA el boletín vigente de su tipo, así
+ * que enlazar aquí = enlazar a lo ÚLTIMO EN VIVO, no a un snapshot. Es el espejo
+ * en la app de `Chagra-strategy/ops/deepresearch/clima-latest/fuentes-vivas.json`,
+ * que el timer `dr-clima-refresh.sh` (systemd-user, semanal) mantiene fresco.
+ * NO son deep-links a un PDF fechado a propósito: un PDF caduca, la sección no.
+ *
+ * Verificadas contra el cross-check DR 2026-08-23 (2026-08-23-MTA-andina-
+ * ventana-siembra.md, reconciliación §1: "las URLs de IDEAM y UPRA son correctas
+ * y relevantes"). NOAA ONI ya venía verificada HTTP 200 en institutionalSources.
+ */
+export const FUENTES_VIVAS = Object.freeze({
+  actualizado: '2026-08-23',
+  ideam_prediccion_climatica: 'http://www.ideam.gov.co/web/tiempo-y-clima/prediccion-climatica',
+  ideam_agroclimatico_nacional: 'http://www.ideam.gov.co/web/tiempo-y-clima/boletin-agroclimatico-nacional',
+  ideam_enandes_andina: 'http://www.ideam.gov.co/web/tiempo-y-clima/boletines-agroclimaticos-enandes',
+  ideam_bsa_semanal: 'http://www.ideam.gov.co/web/sala-de-prensa/boletin-semanal-para-el-sector-agricola-bsa',
+  mta_region_andina: 'https://www.minagricultura.gov.co/Paginas/Mesas-Tecnicas-Agroclimaticas.aspx',
+  agronet_agroclima: 'https://www.agronet.gov.co/agroclima/Paginas',
+  upra_boletines: 'https://upra.gov.co/web/guest/boletines-agroclimaticos',
+  // NOAA CPC ENSO Diagnostic Discussion (mensual) y tabla ONI. Servidor estático
+  // (no JS-SPA): verificadas HTTP 200 el 2026-08-23. La discusión mensual es el
+  // "mes a mes" ENSO oficial; ONI_v5.php ya venía verificada en institutionalSources.
+  noaa_enso_disc: 'https://www.cpc.ncep.noaa.gov/products/analysis_monitoring/enso_advisory/ensodisc.shtml',
+  noaa_oni: 'https://www.cpc.ncep.noaa.gov/products/analysis_monitoring/ensostuff/ONI_v5.php',
+  ciifen: 'https://www.ciifen.org',
+});
+
+/* ── PESTAÑA EL NIÑO · TIMELINE MES A MES 2026–2027 ─────────────────────────
+ *
+ * ¿Qué es DURABLE y qué CADUCA aquí? La FORMA del calendario (fortalecimiento →
+ * pico → persistencia → alivio → transición a Neutral) es conocimiento que
+ * cambia a escala de meses y está CITADO del cross-check DR (NOAA CPC + IDEAM +
+ * CIIFEN, 2026-08-23-enso-mes-a-mes-2026-2027.md). Las PROBABILIDADES exactas
+ * (%) son coyunturales: son la FOTO de ese cross-check (campo `probFoto` con su
+ * `boletinFecha`), NO un feed en vivo — el número vigente cambia cada mes y se
+ * lee del boletín ENSO oficial (banner + deep-link a NOAA/IDEAM). Mismo contrato
+ * que precioReferencia.js con SIPSA: cifra fechada y citada, nunca "vigente ahora".
+ *
+ * La `accionCultivo` NO sale del pronóstico coyuntural sino del conocimiento
+ * agronómico durable del piso frío andino (ensoContext.REGION_IMPACTS.andina +
+ * ACCIONES_ENSO): qué hacer en papa/arveja-haba/pastos según la intensidad de la
+ * fase. Es lo accionable y no caduca con el número.
+ *
+ * Cruce de carriles del DR (reconciliado): El Niño ACTIVO y fortaleciéndose en
+ * ago-2026 (Niño 3.4 ~+1.2 a +1.4 °C); PICO entre oct-2026 y feb-2027, centrado
+ * en nov–dic; ~97% de persistir en el trimestre ene–mar 2027; debilitamiento
+ * desde feb–mar; transición a NEUTRAL hacia abr–jun 2027 (sin La Niña inmediata
+ * confirmada en las fuentes). El carril objetor (GLM) advierte que IDEAM/CIIFEN
+ * no publican un mes-a-mes propio distinto del consenso NOAA — por eso la fuente
+ * de cada fila es el consenso NOAA CPC, no una cifra atribuida a IDEAM que no
+ * existe.
+ */
+export const ENSO_CALENDARIO_2026_27 = Object.freeze([
+  {
+    id: 'fortalecimiento',
+    periodo: 'Ago – Sep 2026',
+    titulo: 'Fortaleciéndose',
+    fase: 'nino',
+    narrativa:
+      'El Niño ya está activo y ganando fuerza: el Pacífico ecuatorial sigue caliente (índice Niño 3.4 por encima de +1,2 °C). Aún no aprieta lo más fuerte, pero conviene prepararse desde ya.',
+    probFoto: { texto: '100% de persistir en sep–nov, con alta chance de "muy fuerte"', boletinFecha: '2026-08-23', fuente: 'NOAA CPC' },
+    accionCultivo:
+      'Papa y hortaliza del altiplano: empiece a reservar agua y deje listo el riego nocturno anti-helada. Elija variedades precoces para la siembra de segunda.',
+  },
+  {
+    id: 'pico',
+    periodo: 'Oct – Dic 2026',
+    titulo: 'El pico',
+    fase: 'nino',
+    narrativa:
+      'Aquí El Niño llega o roza su punto más fuerte: menos lluvia, más calor de día y —la paradoja del altiplano frío— cielo despejado de noche que dispara las HELADAS de madrugada.',
+    probFoto: { texto: '~95% de un Niño "muy fuerte" en oct–dic; ~69% de que sea de nivel histórico', boletinFecha: '2026-08-23', fuente: 'NOAA CPC' },
+    accionCultivo:
+      'Papa: máximo riesgo de helada y de sequía. Riegue de madrugada para romper la helada, ponga mulch y no arriesgue siembras tardías sensibles. Pastos: guarde forraje y baje la carga animal.',
+  },
+  {
+    id: 'persistencia',
+    periodo: 'Ene – Mar 2027',
+    titulo: 'Se sostiene fuerte',
+    fase: 'nino',
+    narrativa:
+      'El pico se mantiene alto y solo hacia feb–mar empieza a ceder despacio. El Niño sigue mandando: siga seco y con heladas en piso frío.',
+    probFoto: { texto: '~97% de que El Niño continúe en ene–mar (ya iniciando el declive)', boletinFecha: '2026-08-23', fuente: 'NOAA CPC · IRI' },
+    accionCultivo:
+      'Planee la siembra de la PRIMERA temporada (arranca ~marzo) con material precoz; no adelante por costumbre: espere a que se estabilicen las primeras lluvias.',
+  },
+  {
+    id: 'transicion',
+    periodo: 'Abr – Jun 2027',
+    titulo: 'Se alivia',
+    fase: 'neutral',
+    narrativa:
+      'Pasado el invierno del norte, El Niño se debilita y el clima tiende a NORMALIZARSE (fase Neutral). Las fuentes no confirman un salto inmediato a La Niña: quedaría en Neutral por ahora.',
+    probFoto: null, // sin cifra dura de transición en el DR → grounded_pendiente
+    accionCultivo:
+      'Vuelva al ritmo bimodal normal del altiplano, pero con el ojo en el boletín: si tras el alivio el IDEAM abre vigilancia de La Niña, prepare drenaje para exceso de agua.',
+  },
+]);
+
+/**
+ * Resumen "cuándo se alivia" para el encabezado de la pestaña El Niño. Todo
+ * durable y citado del cross-check DR; las cifras son la foto 2026-08-23, la
+ * vigente se lee del boletín en vivo.
+ */
+export const ENSO_TRANSICION = Object.freeze({
+  pico: 'nov – dic 2026',
+  aliviaDesde: 'feb – mar 2027',
+  transicionNeutral: 'abr – jun 2027',
+  laNinaConfirmada: false,
+  fuente: 'NOAA CPC · IDEAM · CIIFEN (cross-check DR 2026-08-23)',
+  boletinFecha: '2026-08-23',
+});
+
+/* ── PESTAÑA EL NIÑO · VENTANA DE SIEMBRA (Boletín MTA región Andina) ────────
+ *
+ * REGLA DURA (deflección honesta, patrón SIPSA/precioReferencia): el cross-check
+ * DR (2026-08-23-MTA-andina-ventana-siembra.md) es EXPLÍCITO en que NO existe una
+ * recomendación de siembra específica y vigente publicada para agosto de 2026 en
+ * el altiplano cundiboyacense — el boletín territorial de Cundinamarca más
+ * reciente hallado es de OCT-2025, y el mes-a-mes se deriva del Boletín
+ * Agroclimático Nacional / BSA. Por eso la ventana VIGENTE es grounded_pendiente:
+ * se lee del boletín MTA región Andina EN VIVO (deep-link), NO se inventa aquí.
+ *
+ * Lo DURABLE y citado que sí mostramos: quién emite el boletín, cada cuánto sale,
+ * qué productos existen (con sus fechas), el régimen bimodal del altiplano y el
+ * matiz ENSO (bajo El Niño la segunda temporada de lluvias puede llegar más tarde
+ * o más floja — ensoContext.andina). El número/fecha exacta de siembra vive en la
+ * fuente, no aquí.
+ */
+export const MTA_VENTANA_SIEMBRA = Object.freeze({
+  zona: 'Altiplano cundiboyacense (clima frío, bimodal andino)',
+  emisor: 'MADR · UPRA · IDEAM · FAO · Gobernación de Cundinamarca',
+  cadencia: 'Boletín agroclimático mensual + Boletín Semanal para el Sector Agrícola (BSA) del IDEAM, los lunes.',
+  // Marco DURABLE del régimen bimodal (aprox.): sirve para orientar, no reemplaza
+  // la fecha del boletín. El altiplano tiene dos temporadas de lluvia y se siembra
+  // al arrancar cada una.
+  regimenBimodal:
+    'El altiplano tiene dos temporadas de lluvia: la primera hacia marzo–mayo y la segunda hacia septiembre–noviembre. La siembra suele arrancar al comienzo de cada una.',
+  matizEnso:
+    'Con El Niño fortaleciéndose, la segunda temporada (sep–nov) puede llegar más tarde o más floja: conviene sembrar precoz y reservar agua.',
+  // La ventana VIGENTE NO se hardcodea: se lee del boletín en vivo.
+  ventanaVigente: Object.freeze({
+    estado: ESTADO_GROUNDED_PENDIENTE,
+    valor: null,
+    fuentePrevista: 'Boletín MTA región Andina / Agronet · IDEAM ENANDES (se lee del boletín vigente)',
+  }),
+  // Productos oficiales existentes con su última fecha conocida (cross-check DR).
+  productos: Object.freeze([
+    { nombre: 'Boletín Agroclimático Nacional (No. 136)', ultima: 'may–jul 2026', url: 'http://www.ideam.gov.co/web/tiempo-y-clima/boletin-agroclimatico-nacional' },
+    { nombre: 'Boletín de Predicción Climática', ultima: 'publicado 10-ago-2026', url: 'http://www.ideam.gov.co/web/tiempo-y-clima/prediccion-climatica' },
+    { nombre: 'Boletín Semanal para el Sector Agrícola (BSA)', ultima: 'semanal (lunes)', url: 'http://www.ideam.gov.co/web/sala-de-prensa/boletin-semanal-para-el-sector-agricola-bsa' },
+    { nombre: 'Boletín Agroclimático ENANDES · región Andina', ultima: 'últ. hallado sep-2025', url: 'http://www.ideam.gov.co/web/tiempo-y-clima/boletines-agroclimaticos-enandes' },
+    { nombre: 'Boletín Territorial Agroclimático de Cundinamarca', ultima: 'últ. hallado oct-2025', url: 'https://www.agronet.gov.co/agroclima/Paginas' },
+  ]),
+  urlVivo: 'https://www.minagricultura.gov.co/Paginas/Mesas-Tecnicas-Agroclimaticas.aspx',
+  fuente: 'MADR-FAO-IDEAM · UPRA (cross-check DR 2026-08-23)',
+});
+
+/**
+ * Elige el período del calendario ENSO vigente según la fecha (para resaltar el
+ * "ahora" en el timeline). Devuelve el `id` del período o null si la fecha cae
+ * fuera del rango cubierto (ago-2026 → jun-2027). Puro y determinístico.
+ *
+ * @param {Date} [date=new Date()]
+ * @returns {string|null}
+ */
+export function faseCalendarioActual(date = new Date()) {
+  const d = date instanceof Date && !Number.isNaN(date.getTime()) ? date : new Date();
+  const ym = d.getFullYear() * 12 + d.getMonth(); // meses absolutos
+  const M = (y, m) => y * 12 + (m - 1); // m: 1-12
+  if (ym >= M(2026, 8) && ym <= M(2026, 9)) return 'fortalecimiento';
+  if (ym >= M(2026, 10) && ym <= M(2026, 12)) return 'pico';
+  if (ym >= M(2027, 1) && ym <= M(2027, 3)) return 'persistencia';
+  if (ym >= M(2027, 4) && ym <= M(2027, 6)) return 'transicion';
+  return null;
+}
