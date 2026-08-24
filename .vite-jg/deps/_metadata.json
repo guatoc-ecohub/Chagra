@@ -1,0 +1,248 @@
+{
+  "hash": "3353b30c",
+  "configHash": "79206538",
+  "lockfileHash": "d07ac5c9",
+  "browserHash": "238f71da",
+  "optimized": {
+    "@dnd-kit/core": {
+      "src": "../../../../node_modules/@dnd-kit/core/dist/core.esm.js",
+      "file": "@dnd-kit_core.js",
+      "fileHash": "d1a60403",
+      "needsInterop": false
+    },
+    "@dnd-kit/sortable": {
+      "src": "../../../../node_modules/@dnd-kit/sortable/dist/sortable.esm.js",
+      "file": "@dnd-kit_sortable.js",
+      "fileHash": "5f095bef",
+      "needsInterop": false
+    },
+    "@dnd-kit/utilities": {
+      "src": "../../../../node_modules/@dnd-kit/utilities/dist/utilities.esm.js",
+      "file": "@dnd-kit_utilities.js",
+      "fileHash": "1ca0fe94",
+      "needsInterop": false
+    },
+    "@react-three/drei": {
+      "src": "../../../../node_modules/@react-three/drei/index.js",
+      "file": "@react-three_drei.js",
+      "fileHash": "90b75052",
+      "needsInterop": false
+    },
+    "@react-three/fiber": {
+      "src": "../../../../node_modules/@react-three/fiber/dist/react-three-fiber.esm.js",
+      "file": "@react-three_fiber.js",
+      "fileHash": "30f4b4a5",
+      "needsInterop": false
+    },
+    "@sqlite.org/sqlite-wasm": {
+      "src": "../../../../node_modules/@sqlite.org/sqlite-wasm/dist/index.mjs",
+      "file": "@sqlite__org_sqlite-wasm.js",
+      "fileHash": "3790d725",
+      "needsInterop": false
+    },
+    "dompurify": {
+      "src": "../../../../node_modules/dompurify/dist/purify.es.mjs",
+      "file": "dompurify.js",
+      "fileHash": "12d731a1",
+      "needsInterop": false
+    },
+    "jspdf": {
+      "src": "../../../../node_modules/jspdf/dist/jspdf.es.min.js",
+      "file": "jspdf.js",
+      "fileHash": "ddaa2296",
+      "needsInterop": false
+    },
+    "leaflet": {
+      "src": "../../../../node_modules/leaflet/dist/leaflet-src.js",
+      "file": "leaflet.js",
+      "fileHash": "7bde5576",
+      "needsInterop": true
+    },
+    "localforage": {
+      "src": "../../../../node_modules/localforage/dist/localforage.js",
+      "file": "localforage.js",
+      "fileHash": "2f8822d7",
+      "needsInterop": true
+    },
+    "lucide-react": {
+      "src": "../../../../node_modules/lucide-react/dist/esm/lucide-react.js",
+      "file": "lucide-react.js",
+      "fileHash": "c7393286",
+      "needsInterop": false
+    },
+    "maath/easing": {
+      "src": "../../../../node_modules/maath/easing/dist/maath-easing.esm.js",
+      "file": "maath_easing.js",
+      "fileHash": "024266f4",
+      "needsInterop": false
+    },
+    "react-dom": {
+      "src": "../../../../node_modules/react-dom/index.js",
+      "file": "react-dom.js",
+      "fileHash": "dd74f2a5",
+      "needsInterop": true
+    },
+    "react-dom/client": {
+      "src": "../../../../node_modules/react-dom/client.js",
+      "file": "react-dom_client.js",
+      "fileHash": "cfb5e6df",
+      "needsInterop": true
+    },
+    "react-leaflet": {
+      "src": "../../../../node_modules/react-leaflet/lib/index.js",
+      "file": "react-leaflet.js",
+      "fileHash": "9c045680",
+      "needsInterop": false
+    },
+    "react-virtuoso": {
+      "src": "../../../../node_modules/react-virtuoso/dist/index.mjs",
+      "file": "react-virtuoso.js",
+      "fileHash": "72bace47",
+      "needsInterop": false
+    },
+    "react": {
+      "src": "../../../../node_modules/react/index.js",
+      "file": "react.js",
+      "fileHash": "3a92c037",
+      "needsInterop": true
+    },
+    "react/jsx-dev-runtime": {
+      "src": "../../../../node_modules/react/jsx-dev-runtime.js",
+      "file": "react_jsx-dev-runtime.js",
+      "fileHash": "e29b10a7",
+      "needsInterop": true
+    },
+    "react/jsx-runtime": {
+      "src": "../../../../node_modules/react/jsx-runtime.js",
+      "file": "react_jsx-runtime.js",
+      "fileHash": "68af5838",
+      "needsInterop": true
+    },
+    "three": {
+      "src": "../../../../node_modules/three/build/three.module.js",
+      "file": "three.js",
+      "fileHash": "1227e28f",
+      "needsInterop": false
+    },
+    "three/addons/lines/LineMaterial.js": {
+      "src": "../../../../node_modules/three/examples/jsm/lines/LineMaterial.js",
+      "file": "three_addons_lines_LineMaterial__js.js",
+      "fileHash": "128f7b95",
+      "needsInterop": false
+    },
+    "three/addons/lines/LineSegments2.js": {
+      "src": "../../../../node_modules/three/examples/jsm/lines/LineSegments2.js",
+      "file": "three_addons_lines_LineSegments2__js.js",
+      "fileHash": "e7ccccf2",
+      "needsInterop": false
+    },
+    "three/addons/lines/LineSegmentsGeometry.js": {
+      "src": "../../../../node_modules/three/examples/jsm/lines/LineSegmentsGeometry.js",
+      "file": "three_addons_lines_LineSegmentsGeometry__js.js",
+      "fileHash": "21a82b7f",
+      "needsInterop": false
+    },
+    "three/addons/postprocessing/EffectComposer.js": {
+      "src": "../../../../node_modules/three/examples/jsm/postprocessing/EffectComposer.js",
+      "file": "three_addons_postprocessing_EffectComposer__js.js",
+      "fileHash": "8004986b",
+      "needsInterop": false
+    },
+    "three/addons/postprocessing/OutputPass.js": {
+      "src": "../../../../node_modules/three/examples/jsm/postprocessing/OutputPass.js",
+      "file": "three_addons_postprocessing_OutputPass__js.js",
+      "fileHash": "b7454d89",
+      "needsInterop": false
+    },
+    "three/addons/postprocessing/RenderPass.js": {
+      "src": "../../../../node_modules/three/examples/jsm/postprocessing/RenderPass.js",
+      "file": "three_addons_postprocessing_RenderPass__js.js",
+      "fileHash": "3fdf0eb7",
+      "needsInterop": false
+    },
+    "three/addons/postprocessing/UnrealBloomPass.js": {
+      "src": "../../../../node_modules/three/examples/jsm/postprocessing/UnrealBloomPass.js",
+      "file": "three_addons_postprocessing_UnrealBloomPass__js.js",
+      "fileHash": "a9fdd5e8",
+      "needsInterop": false
+    },
+    "three/addons/utils/BufferGeometryUtils.js": {
+      "src": "../../../../node_modules/three/examples/jsm/utils/BufferGeometryUtils.js",
+      "file": "three_addons_utils_BufferGeometryUtils__js.js",
+      "fileHash": "e017030d",
+      "needsInterop": false
+    },
+    "ulid": {
+      "src": "../../../../node_modules/ulid/dist/browser/index.js",
+      "file": "ulid.js",
+      "fileHash": "875e78e5",
+      "needsInterop": false
+    },
+    "zustand": {
+      "src": "../../../../node_modules/zustand/esm/index.mjs",
+      "file": "zustand.js",
+      "fileHash": "9688df76",
+      "needsInterop": false
+    },
+    "zustand/middleware": {
+      "src": "../../../../node_modules/zustand/esm/middleware.mjs",
+      "file": "zustand_middleware.js",
+      "fileHash": "6141045f",
+      "needsInterop": false
+    }
+  },
+  "chunks": {
+    "CopyShader-BAbLwad3": {
+      "file": "CopyShader-BAbLwad3.js",
+      "isDynamicEntry": false
+    },
+    "Pass-BjRCcVlr": {
+      "file": "Pass-BjRCcVlr.js",
+      "isDynamicEntry": false
+    },
+    "chunk-B4lejLz5": {
+      "file": "chunk-B4lejLz5.js",
+      "isDynamicEntry": false
+    },
+    "core.esm-DxnIXuhj": {
+      "file": "core.esm-DxnIXuhj.js",
+      "isDynamicEntry": false
+    },
+    "easing-0f4db1c0.esm-C_hu14sR": {
+      "file": "easing-0f4db1c0.esm-C_hu14sR.js",
+      "isDynamicEntry": false
+    },
+    "html2canvas-BnWetK75": {
+      "file": "html2canvas-BnWetK75.js",
+      "isDynamicEntry": true
+    },
+    "index.es-L-51JkEg": {
+      "file": "index.es-L-51JkEg.js",
+      "isDynamicEntry": true
+    },
+    "react-three-fiber.esm-CEcvseMw": {
+      "file": "react-three-fiber.esm-CEcvseMw.js",
+      "isDynamicEntry": false
+    },
+    "scheduler-DNC2Wo1_": {
+      "file": "scheduler-DNC2Wo1_.js",
+      "isDynamicEntry": false
+    },
+    "three.module-BXH_KMZs": {
+      "file": "three.module-BXH_KMZs.js",
+      "isDynamicEntry": false
+    },
+    "typeof-CPIP5wxm": {
+      "file": "typeof-CPIP5wxm.js",
+      "isDynamicEntry": false
+    },
+    "vanilla-CtMbKjf7": {
+      "file": "vanilla-CtMbKjf7.js",
+      "isDynamicEntry": false
+    },
+    "vision_bundle-C6aeyYtT": {
+      "file": "vision_bundle-C6aeyYtT.js",
+      "isDynamicEntry": true
+    }
+  }
+}
