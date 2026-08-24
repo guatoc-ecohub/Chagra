@@ -222,7 +222,7 @@ export const FUENTES_VIVAS = Object.freeze({
   ideam_agroclimatico_nacional: 'http://www.ideam.gov.co/web/tiempo-y-clima/boletin-agroclimatico-nacional',
   ideam_enandes_andina: 'http://www.ideam.gov.co/web/tiempo-y-clima/boletines-agroclimaticos-enandes',
   ideam_bsa_semanal: 'http://www.ideam.gov.co/web/sala-de-prensa/boletin-semanal-para-el-sector-agricola-bsa',
-  mta_region_andina: 'https://www.minagricultura.gov.co/Paginas/Mesas-Tecnicas-Agroclimaticas.aspx',
+  mta_region_andina: 'https://ccafs.cgiar.org/es/boletin-agroclimatico-local',
   agronet_agroclima: 'https://www.agronet.gov.co/agroclima/Paginas',
   upra_boletines: 'https://upra.gov.co/web/guest/boletines-agroclimaticos',
   // NOAA CPC ENSO Diagnostic Discussion (mensual) y tabla ONI. Servidor estático
@@ -360,7 +360,7 @@ export const MTA_VENTANA_SIEMBRA = Object.freeze({
     { nombre: 'Boletín Agroclimático ENANDES · región Andina', ultima: 'últ. hallado sep-2025', url: 'http://www.ideam.gov.co/web/tiempo-y-clima/boletines-agroclimaticos-enandes' },
     { nombre: 'Boletín Territorial Agroclimático de Cundinamarca', ultima: 'últ. hallado oct-2025', url: 'https://www.agronet.gov.co/agroclima/Paginas' },
   ]),
-  urlVivo: 'https://www.minagricultura.gov.co/Paginas/Mesas-Tecnicas-Agroclimaticas.aspx',
+  urlVivo: 'https://ccafs.cgiar.org/es/boletin-agroclimatico-local',
   fuente: 'MADR-FAO-IDEAM · UPRA (cross-check DR 2026-08-23)',
 });
 
