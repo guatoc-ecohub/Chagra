@@ -634,6 +634,13 @@ const DirectorioEspeciesScreen = lazy(() => import('./components/DirectorioEspec
 const HoyEnFincaScreen = lazy(() => import('./components/hoy/HoyEnFincaScreen'));
 const MiFincaEvolucionScreen = lazy(() => import('./components/hoy/MiFincaEvolucionScreen'));
 const MiFincaVivaScreen = lazy(() => import('./components/juego/MiFincaVivaScreen'));
+// LA SALA DE JUEGOS (hub de 9 juegos). El banner "La sala de juegos"
+// (SalaJuegosBanner, montado en AprenderConAgente) navegaba a 'juegos', pero
+// este shell (App.jsx) no importaba HubJuegos ni tenía case 'juegos' → el clic
+// caía en "Vista no disponible" y el hub quedaba inalcanzable por UI (auditoría
+// de clic 2D 2026-08-23 #1). En prod (ProdChagraApp) 'juegos' YA estaba
+// registrado; esto lo empareja en el shell clásico.
+const HubJuegos = lazy(() => import('./components/juego/HubJuegos'));
 const DefensoresFincaScreen = lazy(() => import('./components/juego/DefensoresFincaScreen'));
 const MilpaSimulator = lazy(() => import('./components/juego/MilpaSimulator'));
 const DoomFincaScreen = lazy(() => import('./components/juego/DoomFincaScreen'));
@@ -883,6 +890,13 @@ const HASH_VIEW_ROUTES = {
   glaciar: 'glaciar',
   'glaciar-historial': 'glaciar_historial',
   fermentos: 'fermentos',
+  // Salidas de MundoCasaAdentro (la casa por dentro): sus accesos por defecto
+  // escriben #vitrina_maestra y #diorama_fermentos. En prod resuelven a sus
+  // paths; aquí (App.jsx) se mapean a la vitrina maestra y a los fermentos para
+  // que la "ventana de los mundos" y el "rincón de los fermentos" no caigan en
+  // el early-return del router (auditoría de clic 2D 2026-08-23 #4).
+  vitrina_maestra: 'mockup_vitrina_maestra',
+  diorama_fermentos: 'fermentos',
   cromatografia: 'cromatografia',
   germinacion: 'germinacion',
   'ciclo-nutrientes': 'ciclo_nutrientes',
@@ -917,6 +931,11 @@ const HASH_VIEW_ROUTES = {
   'mundo-subsuelo': 'subsuelo',
   // Juegos promovidos de URL-only / huérfanos a ruta de primera clase
   // (audit juegos 2026-07-16): Odyssey (túnel 2D↔3D) y el comparador mono/poli.
+  // La SALA DE JUEGOS: deep-link directo al hub de 9 juegos (auditoría de clic
+  // 2D 2026-08-23 #1). Antes no había token → #juegos no abría nada.
+  juegos: 'juegos',
+  'sala-juegos': 'juegos',
+  'hub-juegos': 'juegos',
   'finca-odyssey': 'finca_odyssey',
   'mi-finca-odyssey': 'finca_odyssey',
   'mono-vs-poli': 'mono_vs_poli',
@@ -2964,6 +2983,48 @@ export default function App() {
                 onHome={() => navigate('dashboard')}
                 onNavigate={navigate}
               />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
+      case 'juegos':
+      case 'sala_juegos':
+      case 'hub_juegos':
+        // LA SALA DE JUEGOS — el hub de 9 juegos, alcanzable desde el banner de
+        // Aprender (SalaJuegosBanner) y por deep-link #juegos. Antes no existía
+        // case → "Vista no disponible" (auditoría de clic 2D #1). onNavigate
+        // enruta cada cartel a su juego; onBack vuelve al portal Aprender que lo
+        // aloja.
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="La sala de juegos">
+              <HubJuegos
+                onBack={() => navigate('aprende')}
+                onNavigate={navigate}
+              />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
+      case 'metal_slug_campo':
+        // Cartel del hub de juegos (hubJuegosData view 'metal_slug_campo'). En
+        // prod es ruta propia; en este shell solo existía como
+        // 'mockup_metal_slug_campo' → el cartel del hub caía en "Vista no
+        // disponible". Se enruta al mismo mockup para que ningún cartel muera.
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="Metal Slug del campo">
+              <MetalSlugCampoMockup onBack={() => navigate('juegos')} />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
+      case 'monte_vuelve':
+        // Cartel del hub de juegos (hubJuegosData view 'monte_vuelve'). En prod
+        // es alias de la restauración 3D (RestauracionEnElTiempo); en este shell
+        // vive como el mockup restauracion-tiempo-3d. Sin este case el cartel
+        // caía en "Vista no disponible".
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="El monte que vuelve">
+              <RestauracionTiempo3DMockup />
             </ErrorFallback>
           </ErrorBoundary>
         );

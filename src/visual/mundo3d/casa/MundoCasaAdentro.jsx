@@ -115,12 +115,18 @@ const TEMA_PANEL = {
 };
 
 /* Los destinos por defecto (rutas hash de prod); un host con router propio
-   pasa sus callbacks y estos no corren. */
+   pasa sus callbacks y estos no corren.
+   Tokens SIN barra inicial: el router de prod (ProdChagraApp.parseHash) parte el
+   hash por '/', así que `#/vitrina_maestra` se leía como vista vacía y rebotaba
+   al valle (auditoría de clic 2D 2026-08-23 #4). `#vitrina_maestra` y
+   `#diorama_fermentos` SÍ están registrados en el manifiesto de prod y ambos
+   resuelven; App.jsx normaliza con o sin barra, así que este cambio no lo
+   afecta. */
 const irAPortales = () => {
-  window.location.hash = '#/vitrina_maestra';
+  window.location.hash = '#vitrina_maestra';
 };
 const irAFermentos = () => {
-  window.location.hash = '#/diorama_fermentos';
+  window.location.hash = '#diorama_fermentos';
 };
 
 /**
