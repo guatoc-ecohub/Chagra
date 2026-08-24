@@ -10,6 +10,8 @@
  */
 import { MUNDOS_VALLE, indexarMundosValle, COSA_DEL_DIA, CLIMAS } from './valleData';
 import { AbejaAngelita } from '../../visual/creatures/AbejaAngelita.jsx';
+import useAngelitaStore from '../../store/useAngelitaStore';
+import BurbujaAngelita from '../../visual/agente/BurbujaAngelita';
 
 /* Proyección isométrica plana de las coordenadas del valle a la lámina SVG. */
 function iso(x, z) {
@@ -79,6 +81,12 @@ export default function Valle2DFallback({
   const foco = focoId ? indexarMundosValle(lugares)[focoId] : null;
   const camPos = foco ? pct(foco.pos[0], foco.pos[2]) : { left: 50, top: 50 };
   const abejaPos = foco ? pct(foco.pos[0], foco.pos[2]) : { left: 52, top: 46 };
+
+  // BURBUJA RICA DE ANGELITA (task #b5-r5-burbuja): reutilizamos el mismo
+  // componente de burbuja que vive en el valle 3D, con estados de ánimo
+  // adaptados (clima/susurro/agro) — el mensaje se ve como burbuja, no solo glow.
+  const mensajeAngelita = useAngelitaStore((s) => s.mensaje);
+  const tipoAngelita = useAngelitaStore((s) => s.tipo);
 
   return (
     <div className="valle2d" data-clima={clima} data-entrando={foco ? 'si' : 'no'}>
@@ -177,6 +185,29 @@ export default function Valle2DFallback({
             aria-hidden="true"
           >
             <AbejaAngelita size={foco ? 40 : 46} animo={animo} energia={energia} animated={!reducedMotion} />
+            {/* BURBUJA RICA DE ANGELITA (task #b5-r5-burbuja): cuando Angelita tiene
+                algo que decir, se muestra como burbuja con estados de ánimo del
+                valle, no solo como glow. Se posiciona cerca de la abeja y respeta
+                los mismos estilos que en el valle 3D (BurbujaAngelita autocontenida). */}
+            {mensajeAngelita && (
+              <div
+                className="valle2d__burbuja-angelita"
+                style={{
+                  position: 'absolute',
+                  top: '-60px', // Sobre la abeja
+                  left: '50%',
+                  transform: 'translateX(-50%)',
+                  zIndex: 10,
+                  pointerEvents: 'none',
+                }}
+              >
+                <BurbujaAngelita
+                  mensaje={mensajeAngelita}
+                  tipo={tipoAngelita || 'informativa'}
+                  animado={!reducedMotion}
+                />
+              </div>
+            )}
           </div>
         </div>
       </div>
