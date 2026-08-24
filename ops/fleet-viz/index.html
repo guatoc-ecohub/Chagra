@@ -1,0 +1,232 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#07110f" />
+    <title>NOC / flota</title>
+    <style>
+      :root {
+        color-scheme: dark;
+        --ink: #dcebe2;
+        --muted: #779287;
+        --line: rgba(184, 230, 198, 0.14);
+        --panel: rgba(11, 27, 23, 0.88);
+        --panel-strong: rgba(16, 37, 31, 0.95);
+        --green: #96efad;
+        --cyan: #87d9da;
+        --amber: #f0bd69;
+        --red: #f07f74;
+        --shadow: 0 24px 70px rgba(0, 0, 0, 0.28);
+      }
+
+      * { box-sizing: border-box; }
+      body {
+        min-height: 100vh;
+        margin: 0;
+        color: var(--ink);
+        background:
+          radial-gradient(circle at 83% 5%, rgba(58, 126, 109, 0.18), transparent 31rem),
+          radial-gradient(circle at 7% 92%, rgba(31, 98, 96, 0.13), transparent 28rem),
+          #07110f;
+        font-family: "IBM Plex Mono", "SFMono-Regular", Consolas, monospace;
+      }
+      body::before {
+        position: fixed;
+        inset: 0;
+        pointer-events: none;
+        content: "";
+        opacity: 0.23;
+        background-image: linear-gradient(rgba(173, 235, 195, 0.025) 1px, transparent 1px), linear-gradient(90deg, rgba(173, 235, 195, 0.025) 1px, transparent 1px);
+        background-size: 32px 32px;
+        mask-image: linear-gradient(to bottom, black, transparent 92%);
+      }
+      main { width: min(1500px, calc(100% - 40px)); margin: 0 auto; padding: 34px 0 46px; position: relative; }
+      header { display: flex; align-items: end; justify-content: space-between; gap: 22px; margin-bottom: 26px; }
+      .eyebrow { color: var(--green); font-size: 11px; letter-spacing: .18em; text-transform: uppercase; }
+      h1 { margin: 9px 0 0; font-family: Georgia, serif; font-size: clamp(35px, 5vw, 62px); letter-spacing: -.055em; line-height: .94; font-weight: 500; }
+      .lede { max-width: 530px; margin: 11px 0 0; color: var(--muted); font-size: 12px; line-height: 1.7; }
+      .vpn-badge { display: flex; align-items: center; gap: 10px; align-self: start; padding: 10px 13px; border: 1px solid rgba(150, 239, 173, .3); border-radius: 999px; color: var(--green); font-size: 11px; white-space: nowrap; background: rgba(150, 239, 173, .06); }
+      .pulse { width: 7px; height: 7px; border-radius: 50%; background: var(--green); box-shadow: 0 0 0 5px rgba(150, 239, 173, .1), 0 0 18px var(--green); animation: pulse 2.4s infinite; }
+      @keyframes pulse { 50% { opacity: .45; box-shadow: 0 0 0 9px rgba(150, 239, 173, .02), 0 0 6px var(--green); } }
+
+      .dashboard { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(420px, .75fr); gap: 18px; }
+      .panel { min-width: 0; border: 1px solid var(--line); border-radius: 20px; background: linear-gradient(145deg, rgba(18, 43, 34, .95), var(--panel)); box-shadow: var(--shadow); overflow: hidden; animation: rise .7s both; }
+      .panel:nth-child(2) { animation-delay: .08s; }
+      @keyframes rise { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+      .panel-head { display: flex; align-items: start; justify-content: space-between; gap: 16px; padding: 22px 24px 15px; border-bottom: 1px solid var(--line); }
+      .panel-kicker { color: var(--cyan); font-size: 10px; letter-spacing: .16em; text-transform: uppercase; }
+      h2 { margin: 7px 0 0; font-family: Georgia, serif; font-size: 25px; font-weight: 500; letter-spacing: -.04em; }
+      .panel-note { color: var(--muted); font-size: 10px; line-height: 1.5; text-align: right; }
+      .panel-body { padding: 18px 24px 23px; }
+      .graph-wrap { position: relative; min-height: 355px; border: 1px solid rgba(135, 217, 218, .14); border-radius: 14px; overflow: hidden; background: radial-gradient(circle at 50% 48%, rgba(32, 91, 80, .26), transparent 57%), #081613; }
+      .graph-wrap::after { position: absolute; inset: 0; content: ""; pointer-events: none; box-shadow: inset 0 0 60px rgba(4, 12, 10, .72); }
+      svg { display: block; width: 100%; height: 355px; }
+      .edge { fill: none; stroke: rgba(135, 217, 218, .3); stroke-width: 1.5; stroke-dasharray: 5 8; animation: dash 13s linear infinite; }
+      @keyframes dash { to { stroke-dashoffset: -130; } }
+      .node circle { stroke-width: 1.5; filter: drop-shadow(0 0 9px currentColor); }
+      .node.root circle { fill: rgba(150, 239, 173, .13); stroke: var(--green); }
+      .node.main circle { fill: rgba(135, 217, 218, .11); stroke: var(--cyan); }
+      .node.sub circle { fill: rgba(240, 189, 105, .1); stroke: var(--amber); }
+      .node.tool circle { fill: rgba(135, 217, 218, .08); stroke: var(--cyan); }
+      .node.queue circle { fill: rgba(240, 127, 116, .1); stroke: var(--red); }
+      .node text { fill: var(--ink); font: 11px "IBM Plex Mono", monospace; text-anchor: middle; }
+      .node .tiny { fill: var(--muted); font-size: 9px; }
+      .graph-legend { display: flex; flex-wrap: wrap; gap: 16px; margin-top: 14px; color: var(--muted); font-size: 10px; }
+      .legend-item { display: inline-flex; align-items: center; gap: 6px; }
+      .legend-dot { width: 7px; height: 7px; border-radius: 50%; }
+      .green { background: var(--green); } .blue { background: var(--cyan); } .gold { background: var(--amber); } .coral { background: var(--red); }
+      .stat-strip { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 14px; }
+      .mini-stat { padding: 11px 12px; border: 1px solid var(--line); border-radius: 10px; background: rgba(4, 15, 12, .28); }
+      .mini-stat b { display: block; margin-bottom: 5px; color: var(--ink); font-size: 17px; font-weight: 400; }
+      .mini-stat span { color: var(--muted); font-size: 9px; text-transform: uppercase; letter-spacing: .09em; }
+
+      .ledger-summary { display: grid; grid-template-columns: repeat(3, 1fr); gap: 9px; }
+      .metric { min-height: 80px; padding: 13px; border-radius: 12px; background: var(--panel-strong); border: 1px solid var(--line); }
+      .metric-value { display: block; color: var(--green); font-family: Georgia, serif; font-size: 25px; }
+      .metric-label { display: block; margin-top: 5px; color: var(--muted); font-size: 9px; text-transform: uppercase; letter-spacing: .08em; }
+      .section-label { display: flex; align-items: center; justify-content: space-between; margin: 24px 0 10px; color: var(--muted); font-size: 10px; letter-spacing: .14em; text-transform: uppercase; }
+      .section-label span:last-child { color: rgba(220, 235, 226, .45); letter-spacing: 0; text-transform: none; }
+      .quota-list, .lane-list { display: grid; gap: 8px; }
+      .quota-row, .lane-row { padding: 12px; border: 1px solid var(--line); border-radius: 11px; background: rgba(4, 15, 12, .25); }
+      .row-top { display: flex; align-items: center; justify-content: space-between; gap: 10px; font-size: 11px; }
+      .row-top strong { font-weight: 500; }
+      .row-detail { margin-top: 8px; color: var(--muted); font-size: 9px; line-height: 1.5; }
+      .bar { height: 4px; margin-top: 9px; border-radius: 99px; background: rgba(220, 235, 226, .1); overflow: hidden; }
+      .bar i { display: block; height: 100%; border-radius: inherit; background: var(--green); }
+      .unmeasured { color: var(--amber); }
+      .lane-row { display: grid; grid-template-columns: minmax(82px, .65fr) 1fr auto; align-items: center; gap: 10px; }
+      .lane-name { color: var(--cyan); font-size: 11px; }
+      .lane-facts { color: var(--muted); font-size: 9px; line-height: 1.6; }
+      .health { padding: 4px 6px; border: 1px solid rgba(150, 239, 173, .25); border-radius: 5px; color: var(--green); font-size: 9px; }
+      .health.warn { border-color: rgba(240, 189, 105, .35); color: var(--amber); }
+      .footer { display: flex; justify-content: space-between; gap: 16px; margin-top: 17px; color: var(--muted); font-size: 10px; }
+      .footer code { color: var(--cyan); }
+      .error { color: var(--amber); font-size: 11px; }
+      @media (max-width: 960px) { .dashboard { grid-template-columns: 1fr; } }
+      @media (max-width: 560px) { main { width: min(100% - 24px, 1500px); padding-top: 22px; } header { align-items: start; flex-direction: column; } .panel-head, .panel-body { padding-left: 16px; padding-right: 16px; } .ledger-summary { grid-template-columns: 1fr 1fr; } .ledger-summary .metric:last-child { grid-column: span 2; } .lane-row { grid-template-columns: 1fr auto; } .lane-facts { grid-column: 1 / -1; grid-row: 2; } }
+    </style>
+  </head>
+  <body>
+    <main>
+      <header>
+        <div>
+          <div class="eyebrow">NOC / FLOTA / observatorio local</div>
+          <h1>La flota,<br /><em>en órbita.</em></h1>
+          <p class="lede">Una vista de operación para seguir el pulso de Claude Code y el estado agregado de los carriles de inferencia.</p>
+        </div>
+        <div class="vpn-badge"><i class="pulse"></i> TAILSCALE ONLY · 100.117.193.102</div>
+      </header>
+
+      <section class="dashboard" aria-label="Visualización de flota">
+        <article class="panel" aria-labelledby="zoe-title">
+          <div class="panel-head">
+            <div><div class="panel-kicker">01 / sesión Claude Code</div><h2 id="zoe-title">Zoetrope pulse</h2></div>
+            <div class="panel-note" id="zoe-status">leyendo zoe…</div>
+          </div>
+          <div class="panel-body">
+            <div class="graph-wrap">
+              <svg viewBox="0 0 720 355" role="img" aria-label="Grafo de agentes, subagentes y herramientas">
+                <path class="edge" d="M126 177 C184 177 196 110 270 110" />
+                <path class="edge" d="M126 177 C184 177 196 245 270 245" />
+                <path class="edge" d="M342 110 C430 110 455 77 548 77" />
+                <path class="edge" d="M342 245 C430 245 455 278 548 278" />
+                <g class="node root" transform="translate(100 177)"><circle r="27"></circle><text y="-3">ZOË</text><text class="tiny" y="12">live view</text></g>
+                <g class="node main" transform="translate(306 110)"><circle r="37"></circle><text y="-4">MAIN</text><text class="tiny" y="12">agent</text></g>
+                <g class="node sub" transform="translate(306 245)"><circle r="37"></circle><text y="-4">SUB</text><text class="tiny" y="12" id="svg-sub">agents</text></g>
+                <g class="node tool" transform="translate(590 77)"><circle r="37"></circle><text y="-4">TOOLS</text><text class="tiny" y="12" id="svg-tools">stream</text></g>
+                <g class="node queue" transform="translate(590 278)"><circle r="37"></circle><text y="-4">QUEUE</text><text class="tiny" y="12" id="svg-queue">idle</text></g>
+              </svg>
+            </div>
+            <div class="graph-legend" aria-label="Leyenda del grafo">
+              <span class="legend-item"><i class="legend-dot green"></i> runtime</span>
+              <span class="legend-item"><i class="legend-dot blue"></i> agente / tools</span>
+              <span class="legend-item"><i class="legend-dot gold"></i> subagentes</span>
+              <span class="legend-item"><i class="legend-dot coral"></i> cola</span>
+            </div>
+            <div class="stat-strip">
+              <div class="mini-stat"><b id="z-agents">0</b><span>agentes</span></div>
+              <div class="mini-stat"><b id="z-tools">0</b><span>tool calls</span></div>
+              <div class="mini-stat"><b id="z-edits">0</b><span>ediciones</span></div>
+            </div>
+          </div>
+        </article>
+
+        <article class="panel" aria-labelledby="ledger-title">
+          <div class="panel-head">
+            <div><div class="panel-kicker">02 / salud económica</div><h2 id="ledger-title">Fleet ledger</h2></div>
+            <div class="panel-note" id="ledger-status">leyendo ledger…</div>
+          </div>
+          <div class="panel-body">
+            <div class="ledger-summary">
+              <div class="metric"><span class="metric-value" id="l-runs">0</span><span class="metric-label">corridas</span></div>
+              <div class="metric"><span class="metric-value" id="l-ok">0%</span><span class="metric-label">salud global</span></div>
+              <div class="metric"><span class="metric-value" id="l-spend">$0</span><span class="metric-label">gasto real</span></div>
+            </div>
+            <div class="section-label"><span>Cuotas y saldos</span><span>lectura local</span></div>
+            <div class="quota-list" id="quotas"><div class="error">Esperando primera lectura…</div></div>
+            <div class="section-label"><span>Carriles activos</span><span>runs / fallas / tiempo</span></div>
+            <div class="lane-list" id="lanes"><div class="error">Esperando primera lectura…</div></div>
+            <div class="footer"><span>refresh automático: 20 s</span><code id="last-refresh">--:--:--</code></div>
+          </div>
+        </article>
+      </section>
+    </main>
+    <script>
+      const $ = (id) => document.getElementById(id);
+      const esc = (value) => String(value ?? "");
+      const clock = () => new Intl.DateTimeFormat("es-CO", { hour: "2-digit", minute: "2-digit", second: "2-digit" }).format(new Date());
+      const fetchJson = (url) => fetch(url, { cache: "no-store" }).then((response) => { if (!response.ok) throw new Error("http"); return response.json(); });
+
+      function renderZoe(data) {
+        const m = data.metrics || {};
+        $("z-agents").textContent = m.agents ?? 0;
+        $("z-tools").textContent = m.tool_calls ?? 0;
+        $("z-edits").textContent = m.file_edits ?? 0;
+        $("svg-sub").textContent = `${m.subagents ?? 0} nodes`;
+        $("svg-tools").textContent = `${m.tool_calls ?? 0} calls`;
+        $("svg-queue").textContent = `${m.queued ?? 0} queued`;
+        $("zoe-status").textContent = data.available ? (data.live ? "live · zoe inspect" : "última sesión · zoe inspect") : "sin sesión disponible";
+      }
+
+      function renderLedger(data) {
+        const s = data.summary || {};
+        const runs = Number(s.runs || 0);
+        const ok = runs ? Math.round(Number(s.ok || 0) / runs * 100) : 0;
+        $("l-runs").textContent = runs.toLocaleString("es-CO");
+        $("l-ok").textContent = `${ok}%`;
+        $("l-spend").textContent = `$${Number(s.spend_usd || 0).toFixed(2)}`;
+        $("ledger-status").textContent = data.available ? `actualizado ${clock()}` : (data.error || "ledger no disponible");
+        const quotas = $("quotas");
+        quotas.replaceChildren();
+        (data.quotas || []).forEach((quota) => {
+          const row = document.createElement("div"); row.className = "quota-row";
+          const top = document.createElement("div"); top.className = "row-top";
+          const name = document.createElement("strong"); name.textContent = quota.name;
+          const value = document.createElement("span"); value.className = quota.measured ? "" : "unmeasured"; value.textContent = quota.measured ? `${quota.used}% usado` : "no medida";
+          top.append(name, value); row.append(top);
+          if (quota.measured) { const bar = document.createElement("div"); bar.className = "bar"; const fill = document.createElement("i"); fill.style.width = `${Math.min(100, quota.used)}%`; bar.append(fill); row.append(bar); }
+          const detail = document.createElement("div"); detail.className = "row-detail"; detail.textContent = quota.detail || ""; row.append(detail); quotas.append(row);
+        });
+        if (!quotas.children.length) quotas.innerHTML = '<div class="error">Sin datos de cuotas</div>';
+        const lanes = $("lanes"); lanes.replaceChildren();
+        (data.lanes || []).forEach((lane) => {
+          const row = document.createElement("div"); row.className = "lane-row";
+          const name = document.createElement("div"); name.className = "lane-name"; name.textContent = lane.name;
+          const facts = document.createElement("div"); facts.className = "lane-facts"; facts.textContent = `${lane.runs} runs · ${lane.failures} fallas · ${lane.hours.toFixed(1)} h`;
+          const health = document.createElement("span"); const rate = lane.runs ? lane.failures / lane.runs : 0; health.className = rate > .1 ? "health warn" : "health"; health.textContent = rate > .1 ? "vigilar" : "estable";
+          row.append(name, facts, health); lanes.append(row);
+        });
+        if (!lanes.children.length) lanes.innerHTML = '<div class="error">Sin carriles allowlisted en la lectura</div>';
+      }
+
+      async function refresh() {
+        try { renderZoe(await fetchJson("/api/zoe")); } catch (_) { $("zoe-status").textContent = "endpoint no disponible"; }
+        try { renderLedger(await fetchJson("/api/ledger")); } catch (_) { $("ledger-status").textContent = "endpoint no disponible"; }
+        $("last-refresh").textContent = clock();
+      }
+      refresh();
+      window.setInterval(refresh, 20000);
+    </script>
+  </body>
+</html>

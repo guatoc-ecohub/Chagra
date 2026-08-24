@@ -1,0 +1,16 @@
+[Unit]
+Description=Chagra fleet NOC view on Tailscale
+After=network-online.target tailscaled.service
+Wants=network-online.target
+
+[Service]
+Type=simple
+WorkingDirectory=%h/Workspace/chagra/ops/fleet-viz
+ExecStart=/usr/bin/env python3 %h/Workspace/chagra/ops/fleet-viz/server.py
+Environment=FLEET_VIZ_BIND=100.117.193.102
+Environment=FLEET_VIZ_PORT=8891
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=default.target
