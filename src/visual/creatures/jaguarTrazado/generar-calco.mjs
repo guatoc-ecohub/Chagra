@@ -1,0 +1,136 @@
+#!/usr/bin/env node
+/*
+ * generar-calco (jaguar) — hornea el AUTO-TRAZADO de la lámina en un módulo
+ * JS plano, PARTIDO POR REGIÓN DE HUESO (la optimización que salvó el
+ * framerate: con un solo <g id="jtCalco"> global, cada uno de los 13 <use>
+ * re-renderizaba los 6102 paths → ~80k paths por cuadro → 7 FPS; partido,
+ * cada hueso referencia SOLO los paths que intersectan su región).
+ *
+ * Pipeline (documentado para reproducir el calco desde cero):
+ *   1. bash scripts/trazar-lamina.sh \
+ *        public/valle/compai/laminas/jaguar-natural.png jaguar-trace.svg
+ *      → receta clavada 2026-08-22: aplanar sobre papel + vtracer stacked
+ *        spline cp8 speckle2 gs8 + clipPath vectorial del canal alfa
+ *        (evenodd). 6102 paths: el grabado del pelaje intacto.
+ *   2. npx svgo --multipass -p 2 jaguar-trace.svg -o jaguar-trace.min.svg
+ *      → ~700 KB, translates horneados: TODO queda en el espacio absoluto
+ *        705×394 de la lámina (el mismo de jaguarLamina/anatomia.js y de los
+ *        pivotes de jaguarHuesos/pielHuesos.js).
+ *   3. node generar-calco.mjs jaguar-trace.min.svg
+ *      → escribe ./calcoTrazado.js: CALCO_SILUETA_DEFS (el clip del alfa,
+ *        renombrado de "a" a "jtSilueta" — anti-colisión entre compais) +
+ *        CALCO_POR_REGION (paths por región de regiones.js, bbox del path
+ *        contra bbox del polígono; el clip exacto lo pone pielTrazado).
+ *
+ * El REPARTO es conservador (bbox vs bbox): un path que roza dos regiones
+ * vive en ambas (el clip exacto de cada hueso corta lo que sobra). El orden
+ * de apilado original se conserva dentro de cada región.
+ */
+/* global process, console -- script Node de build (fuera del glob eslint de lefthook) */
+import { readFileSync, writeFileSync } from 'node:fs';
+import { dirname, join } from 'node:path';
+import { fileURLToPath } from 'node:url';
+import { JT_REGIONES } from './regiones.js';
+
+const entrada = process.argv[2];
+if (!entrada) {
+  console.error('uso: node generar-calco.mjs <trace.min.svg>');
+  process.exit(1);
+}
+const svg = readFileSync(entrada, 'utf8');
+const m = svg.match(/<svg[^>]*>([\s\S]*)<\/svg>/);
+if (!m) throw new Error('no encontré el <svg> raíz');
+let interior = m[1].trim();
+interior = interior
+  .replaceAll('clipPath id="a"', 'clipPath id="jtSilueta"')
+  .replaceAll('clip-path="url(#a)"', 'clip-path="url(#jtSilueta)"');
+if (/[`\\]|\$\{/.test(interior)) throw new Error('el trazado trae caracteres que romperían el template literal');
+
+// ── separar defs (silueta) del cuerpo ──────────────────────────────────────
+const defsM = interior.match(/<defs>[\s\S]*?<\/defs>/);
+if (!defsM) throw new Error('no encontré <defs> (el clip de silueta)');
+const siluetaDefs = defsM[0];
+const cuerpo = interior.replace(defsM[0], '');
+
+// ── paths del cuerpo, en orden de apilado ──────────────────────────────────
+const paths = cuerpo.match(/<path[^>]*\/>/g) || [];
+if (paths.length < 100) throw new Error(`solo ${paths.length} paths — algo anda mal`);
+
+/** bbox conservador de un `d` con comandos relativos/absolutos: interpreta
+    el cursor y acumula todos los puntos (controles incluidos — conservador,
+    exactamente lo que un reparto por bbox necesita). */
+function bboxDeD(d) {
+  const tokens = d.match(/[a-zA-Z]|-?\d*\.?\d+(?:e-?\d+)?/g) || [];
+  let i = 0; let cmd = ''; let x = 0; let y = 0; let sx = 0; let sy = 0;
+  let mnx = 1e9; let mny = 1e9; let mxx = -1e9; let mxy = -1e9;
+  const punto = (px, py) => {
+    if (px < mnx) mnx = px; if (px > mxx) mxx = px;
+    if (py < mny) mny = py; if (py > mxy) mxy = py;
+  };
+  const num = () => parseFloat(tokens[i++]);
+  while (i < tokens.length) {
+    const t = tokens[i];
+    if (/[a-zA-Z]/.test(t)) { cmd = t; i++; if (cmd === 'z' || cmd === 'Z') { x = sx; y = sy; continue; } }
+    switch (cmd) {
+      case 'M': x = num(); y = num(); sx = x; sy = y; punto(x, y); cmd = 'L'; break;
+      case 'm': x += num(); y += num(); sx = x; sy = y; punto(x, y); cmd = 'l'; break;
+      case 'L': x = num(); y = num(); punto(x, y); break;
+      case 'l': x += num(); y += num(); punto(x, y); break;
+      case 'H': x = num(); punto(x, y); break;
+      case 'h': x += num(); punto(x, y); break;
+      case 'V': y = num(); punto(x, y); break;
+      case 'v': y += num(); punto(x, y); break;
+      case 'C': punto(num(), num()); punto(num(), num()); x = num(); y = num(); punto(x, y); break;
+      case 'c': punto(x + num(), y + num()); punto(x + num(), y + num()); x += num(); y += num(); punto(x, y); break;
+      case 'S': case 'Q': punto(num(), num()); x = num(); y = num(); punto(x, y); break;
+      case 's': case 'q': punto(x + num(), y + num()); x += num(); y += num(); punto(x, y); break;
+      case 'T': x = num(); y = num(); punto(x, y); break;
+      case 't': x += num(); y += num(); punto(x, y); break;
+      case 'A': i += 5; x = num(); y = num(); punto(x, y); break;
+      case 'a': i += 5; x += num(); y += num(); punto(x, y); break;
+      default: i++; break;
+    }
+  }
+  return [mnx, mny, mxx, mxy];
+}
+
+const MARGEN = 6;
+const cajasRegion = Object.fromEntries(Object.entries(JT_REGIONES).map(([n, pts]) => {
+  const xs = pts.map((p) => p[0]); const ys = pts.map((p) => p[1]);
+  return [n, [Math.min(...xs) - MARGEN, Math.min(...ys) - MARGEN, Math.max(...xs) + MARGEN, Math.max(...ys) + MARGEN]];
+}));
+
+const porRegion = Object.fromEntries(Object.keys(JT_REGIONES).map((n) => [n, []]));
+let repartidos = 0;
+for (const p of paths) {
+  const d = p.match(/ d="([^"]+)"/)[1];
+  const [x0, y0, x1, y1] = bboxDeD(d);
+  for (const [n, [rx0, ry0, rx1, ry1]] of Object.entries(cajasRegion)) {
+    if (x1 >= rx0 && x0 <= rx1 && y1 >= ry0 && y0 <= ry1) { porRegion[n].push(p); repartidos++; }
+  }
+}
+
+const cuerposRegion = Object.entries(porRegion)
+  .map(([n, ps]) => `  ${JSON.stringify(n)}: \`${ps.join('')}\`,`)
+  .join('\n');
+const resumen = Object.entries(porRegion).map(([n, ps]) => `${n}:${ps.length}`).join(' · ');
+
+const salida = `/*
+ * calcoTrazado — EL CALCO: la lámina \`jaguar-natural.png\` AUTO-TRAZADA a
+ * vector, PARTIDA POR REGIÓN DE HUESO. GENERADO por generar-calco.mjs (ver
+ * ahí el pipeline y el porqué del reparto) — NO editar a mano: regenerar.
+ * ${paths.length} paths de origen en el espacio 705×394 de la lámina; reparto
+ * conservador por bbox (un path fronterizo vive en las regiones que roza; el
+ * clip exacto de cada hueso corta el resto). Cero dibujo nuevo.
+ */
+export const CALCO_SILUETA_DEFS = \`${siluetaDefs}\`;
+export const CALCO_POR_REGION = Object.freeze({
+${cuerposRegion}
+});
+export const CALCO_N_PATHS = ${paths.length};
+export default CALCO_POR_REGION;
+`;
+const destino = join(dirname(fileURLToPath(import.meta.url)), 'calcoTrazado.js');
+writeFileSync(destino, salida);
+console.log(`calcoTrazado.js escrito: ${paths.length} paths → ${repartidos} asignaciones (${(salida.length / 1024).toFixed(0)} KiB)`);
+console.log(resumen);
