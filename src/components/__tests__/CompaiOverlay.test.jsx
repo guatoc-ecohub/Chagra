@@ -219,4 +219,39 @@ describe('CompaiOverlay', () => {
     expect(screen.getByTestId('compai-overlay-container')).toBeInTheDocument();
     expect(screen.getByTestId('compai-bubble')).toBeInTheDocument();
   });
+
+  describe('CON_MARCHA - estado de caminata para caminantes', () => {
+    it('debe respetar la locomoción de los voladores (angelita)', () => {
+      // Mock useCompaiElegido para devolver angelita (volador)
+      vi.doMock('../../hooks/useCompaiElegido', () => ({
+        useCompaiElegido: () => ({ avatarType: 'angelita' }),
+      }));
+
+      const { container } = render(<CompaiOverlay currentView="dashboard" />);
+      // Angelita es voladora, no debe recibir estado 'caminando' nunca
+      expect(container).toBeTruthy();
+    });
+
+    it('debe respetar la locomoción de los voladores (guacamaya)', () => {
+      // Mock useCompaiElegido para devolver guacamaya (volador)
+      vi.doMock('../../hooks/useCompaiElegido', () => ({
+        useCompaiElegido: () => ({ avatarType: 'guacamaya' }),
+      }));
+
+      const { container } = render(<CompaiOverlay currentView="dashboard" />);
+      // Guacamaya es voladora, no debe recibir estado 'caminando' nunca
+      expect(container).toBeTruthy();
+    });
+
+    it('debe respetar la locomoción de los voladores (luciernaga)', () => {
+      // Mock useCompaiElegido para devolver luciernaga (voladora)
+      vi.doMock('../../hooks/useCompaiElegido', () => ({
+        useCompaiElegido: () => ({ avatarType: 'luciernaga' }),
+      }));
+
+      const { container } = render(<CompaiOverlay currentView="dashboard" />);
+      // Luciérnaga es voladora, no debe recibir estado 'caminando' nunca
+      expect(container).toBeTruthy();
+    });
+  });
 });

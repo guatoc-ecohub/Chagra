@@ -3,7 +3,7 @@ import ChivitoPunk from '../visual/creatures/ChivitoPunk';
 /**
  * ChagraAgentAvatarChivitoPunk — el chivito de páramo (Oxypogon guerinii)
  * como CARA del agente de Chagra, 6ta opción del elenco unificado
- * (2026-08-14). Slug canónico `chivito-punk` (colapso `chivito`→`chivito-punk`
+ * (2026-08-14). Slug canónico `chivito-punk` (colapso `chivito`→`chivito-punk'
  * ya resuelto en `compai/nucleo/elenco.js`, #96 — un solo pájaro, no dos).
  *
  * Cierra el ítem #8 del GAP compAI: el chivito no tenía cuerpo en la PWA
@@ -12,7 +12,7 @@ import ChivitoPunk from '../visual/creatures/ChivitoPunk';
  *
  * Adaptador puro (mismo contrato que los hermanos ChagraAgentAvatar*): traduce
  * la API histórica del avatar del agente (state 'idle'|'thinking'|'speaking'|
- * 'listening', glow, withLabel, onClick/onDoubleClick) al `state` que
+ * 'listening'|'caminando', glow, withLabel, onClick/onDoubleClick) al `state` que
  * `ChivitoPunk.jsx` ya entiende directo.
  */
 export default function ChagraAgentAvatarChivitoPunk({

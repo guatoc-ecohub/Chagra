@@ -41,6 +41,7 @@ const ESTADO_DE_STATE = {
   thinking: 'idle',
   speaking: 'hablar',
   listening: 'idle',
+  caminando: 'idle',
 };
 
 /**
