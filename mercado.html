@@ -4,20 +4,19 @@
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-    <meta name="theme-color" content="#0f172a" />
-    <title>Mercado Chagra — mercado campesino de procedencia</title>
+    <meta name="theme-color" content="#f5f0e7" />
+    <title>Mercado federado Chagra</title>
     <meta
       name="description"
-      content="Mercado campesino honesto: cada producto ubicado en la montaña por su altitud y piso térmico, con la cara de quien lo sembró, su finca y su vereda. Galería de muestra."
+      content="Mercado federado: productos publicados por nodos de origen, con sus datos y procedencia visibles."
     />
-    <!-- Página estática de galería (datos de muestra, sin auth, sin sqlite-wasm
-         ni service worker): CSP mínima, no necesita 'wasm-unsafe-eval'. -->
+    <!-- Página pública del mercado federado, sin auth, sqlite-wasm ni service worker. -->
     <meta
       http-equiv="Content-Security-Policy"
-      content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; object-src 'none'; base-uri 'self'"
+      content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' https://milpa-test.milpachoachi.co data: blob:; font-src 'self' data:; object-src 'none'; base-uri 'self'"
     />
     <style>
-      html, body { background: #020617; margin: 0; }
+      html, body { background: #f5f0e7; margin: 0; }
     </style>
   </head>
   <body>
