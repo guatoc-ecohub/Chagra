@@ -30,6 +30,7 @@ import useAgentNotificationStore from '../../store/useAgentNotificationStore';
 
 beforeEach(() => {
   useAngelitaStore.setState({ silenciado: false, hoyNoFecha: null });
+  useAngelitaStore.setState({ estado: 'calma', visualEstado: 'acompana', mensaje: null, tipo: null });
   useAgentNotificationStore.setState({ responseReady: false, lastAssistantMessage: null });
 });
 afterEach(cleanup);
@@ -59,13 +60,21 @@ describe('AgentFab — R3 enseña en idle', () => {
   });
 });
 
-describe('AgentFab — R2 se atenúa al interactuar con la pantalla', () => {
-  it('un pointermove global encoge el FAB; en idle está al 100 %', () => {
+describe('AgentFab — R2 se oculta al interactuar con la pantalla', () => {
+  it('un mouseover global oculta el compai; en idle está visible', () => {
     render(<AgentFab onNavigate={() => {}} pantalla="mapa" />);
     const fab = screen.getByRole('button', { name: /Chagra IA/i });
-    expect(fab.style.transform).toBe('scale(1)');
-    act(() => { window.dispatchEvent(new Event('pointermove')); });
-    expect(fab.style.transform).toBe('scale(0.68)');
+    expect(fab.parentElement.style.visibility).toBe('visible');
+    act(() => { window.dispatchEvent(new Event('mouseover')); });
+    expect(fab.parentElement.style.visibility).toBe('hidden');
+    expect(fab.parentElement.style.pointerEvents).toBe('none');
+  });
+
+  it('un touchstart en el área oculta el compai completo', () => {
+    render(<AgentFab onNavigate={() => {}} pantalla="mapa" />);
+    const fab = screen.getByRole('button', { name: /Chagra IA/i });
+    act(() => { window.dispatchEvent(new Event('touchstart')); });
+    expect(fab.parentElement.style.visibility).toBe('hidden');
   });
 });
 
@@ -87,8 +96,24 @@ describe('AgentFab — R5 aviso adaptado visible en prod 2D', () => {
     });
     render(<AgentFab onNavigate={() => {}} pantalla="mapa" />);
     expect(screen.getByTestId('compai-fab-aviso')).toBeInTheDocument();
-    expect(screen.getByText('En su zona se espera lluvia mañana en la tarde.')).toBeInTheDocument();
+    expect(screen.getAllByText('En su zona se espera lluvia mañana en la tarde.').length).toBeGreaterThan(0);
     // El aviso manda: no se pinta además la enseñanza (una cosa a la vez).
     expect(screen.queryByTestId('compai-fab-hint')).toBeNull();
+  });
+
+  it('cablea la burbuja rica con tipo y ánimo del compai', () => {
+    useAngelitaStore.setState({
+      estado: 'aviso',
+      visualEstado: 'preocupada',
+      mensaje: 'Revise la helada de esta noche.',
+      tipo: 'alerta',
+    });
+    useAgentNotificationStore.setState({
+      responseReady: true,
+      lastAssistantMessage: 'Revise la helada de esta noche.',
+    });
+    const { container } = render(<AgentFab onNavigate={() => {}} pantalla="mapa" />);
+    expect(container.querySelector('.angelita-burbuja--alerta')).toBeInTheDocument();
+    expect(container.querySelector('[data-agt-estado="preocupada"]')).toBeInTheDocument();
   });
 });
