@@ -1,1 +1,0 @@
-var e={LOCATION_ID:``,FARM_NAME:`Finca Principal`,ALTITUD_MSNM:null,MUNICIPIO:null,THERMAL_ZONES:``.split(`,`).map(e=>e.trim()).filter(Boolean),LATITUDE:4.526,LONGITUDE:-73.922};export{e as t};
