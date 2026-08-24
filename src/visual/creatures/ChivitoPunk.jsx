@@ -23,11 +23,11 @@ import { useId, useMemo } from 'react';
 import rigSvg from './arte-valle/chivito.rig.svg?raw';
 import defsSvg from './arte-valle/chivito.defs.svg?raw';
 import cssCompleto from './arte-valle/chivitoCssTexto.js';
-import { idsDeclaradosEnSvg, namespaceSvg, namespaceCss, extraerCssDelRig } from './arte-valle/nsRigValle.js';
+import { idsDeclaradosEnSvg, namespaceSvg, namespaceCss, extraerCssDelRig, hostALigero } from './arte-valle/nsRigValle.js';
 import { CHIVITO_SLUG, CHIVITO_NOMBRE } from './chivitoIdentidad.js';
 
 const MARCADOR_CSS = 'CHIVITO — rig rubber-hose';
-const CSS_RIG = extraerCssDelRig(cssCompleto, MARCADOR_CSS);
+const CSS_RIG = hostALigero(extraerCssDelRig(cssCompleto, MARCADOR_CSS));
 const MARCADO_CRUDO = `${defsSvg}\n${rigSvg}`;
 const IDS = idsDeclaradosEnSvg(MARCADO_CRUDO);
 
