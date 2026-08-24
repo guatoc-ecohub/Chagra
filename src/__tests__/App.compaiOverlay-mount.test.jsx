@@ -1,18 +1,18 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
 
-// Test de RUTA: CompaiOverlay (src/components/CompaiOverlay.jsx) estaba
-// construido y testeado (CompaiOverlay.test.jsx) pero NUNCA se montaba desde
-// App.jsx (hallazgo 2026-08-14, unificación compAI). Verifica el WIRING:
-// aparece en una ruta 2D-app del manifiesto (rutasProdChagraApp.js) y NO en
-// una ruta 3D — ahí el compai ya vive dentro de la escena (regla "UNA SOLA
-// ABEJA #2341").
+// Unificación compai 2026-08-23: `CompaiOverlay` (el segundo compai que
+// deambulaba por la franja inferior) se RETIRÓ de la PWA 2D. En cada ruta 2D
+// montaba una abejita idéntica a la del AgentFab → dos compai por pantalla
+// (AUDITORIA-ABEJITAS-DUPLICADAS-2D-2026-08-23.md). Este test blinda la
+// de-duplicación: el overlay global (`compai-bubble`) YA NO se monta desde
+// App.jsx, ni en 2D ni en 3D. El hint por ruta vive ahora plegado dentro del
+// AgentFab (enseñanza en idle) — cubierto por los tests de AgentFab.
 //
-// Los efectos pesados de boot se mockean para que App arranque limpio en
-// jsdom (mismo criterio que App.compost-route.test.jsx). DashboardLive y
-// EntradaValle3D se stubean livianos: este test cubre el WIRING de la
-// ruta→overlay, no el render interno de esas pantallas (cubierto por sus
-// propios tests).
+// Los efectos pesados de boot se mockean para que App arranque limpio en jsdom
+// (mismo criterio que App.compost-route.test.jsx). DashboardLive y MundoSubsuelo
+// se stubean livianos: este test cubre el WIRING (ausencia del overlay global),
+// no el render interno de esas pantallas.
 
 vi.mock('../services/authService', () => ({
   isAuthenticated: () => Promise.resolve(true),
@@ -34,17 +34,13 @@ vi.mock('../db/farmProcessCache', () => ({ listFarmProcesses: () => Promise.reso
 vi.mock('../components/dashboard/DashboardLive', () => ({
   default: () => <div data-testid="dashboard-stub">dashboard stub</div>,
 }));
-// 'subsuelo' (categoria '3D' en rutasProdChagraApp.js) monta MundoSubsuelo,
-// sin gates extra de preferencia/device-tier (a diferencia de 'valle3d', que
-// pasa por ValleMarcoScreen con más ceremonia de arranque) — ruta 3D simple
-// y estable para probar el WIRING del overlay.
 vi.mock('../components/juego/MundoSubsuelo', () => ({
   default: () => <div data-testid="subsuelo-stub">subsuelo stub</div>,
 }));
 
 import App from '../App';
 
-describe('App — CompaiOverlay se monta según categoria del manifiesto', () => {
+describe('App — CompaiOverlay YA NO se monta globalmente (unificación 2026-08-23)', () => {
   beforeEach(() => {
     localStorage.clear();
   });
@@ -53,30 +49,28 @@ describe('App — CompaiOverlay se monta según categoria del manifiesto', () =>
     vi.clearAllMocks();
   });
 
-  it('#dashboard (categoria 2D-app) monta la burbuja de CompaiOverlay', async () => {
+  it('#dashboard (2D-app): NO monta el overlay deambulante — un solo compai por pantalla', async () => {
     window.location.hash = '#dashboard';
     render(<App />);
     await waitFor(
       () => expect(screen.getByTestId('dashboard-stub')).toBeTruthy(),
       { timeout: 4000 },
     );
-    await waitFor(
-      () => expect(screen.getByTestId('compai-bubble')).toBeTruthy(),
-      { timeout: 4000 },
-    );
+    // Da tiempo a que un montaje indebido (si lo hubiera) aparezca antes de
+    // afirmar la ausencia.
+    await new Promise((resolve) => { setTimeout(resolve, 60); });
+    expect(screen.queryByTestId('compai-bubble')).toBeNull();
+    expect(screen.queryByTestId('compai-overlay-container')).toBeNull();
   });
 
-  it('#subsuelo (categoria 3D) NO monta CompaiOverlay — el compai ya vive en la escena', async () => {
+  it('#subsuelo (3D): tampoco monta CompaiOverlay — el compai vive en la escena', async () => {
     window.location.hash = '#subsuelo';
     render(<App />);
     await waitFor(
       () => expect(screen.getByTestId('subsuelo-stub')).toBeTruthy(),
       { timeout: 4000 },
     );
-    // Da tiempo a que un montaje indebido (si lo hubiera) aparezca antes de
-    // afirmar la ausencia.
-    await new Promise((resolve) => { setTimeout(resolve, 50); });
+    await new Promise((resolve) => { setTimeout(resolve, 60); });
     expect(screen.queryByTestId('compai-bubble')).toBeNull();
   });
-
 });

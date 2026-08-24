@@ -216,7 +216,10 @@ function HorizonteHoy({ agrometeo, loading, anom, cultivos, sinFicha, faseFamily
                     <IndiceTile icon={Waves} label="ETo (referencia)" valor={Number.isFinite(today?.eto_mm) ? today.eto_mm : null} unidad="mm" accent="emerald"
                         sub="agua que se evapora hoy">
                         <FuenteDato>Estimado por Chagra · Open-Meteo (FAO-56)</FuenteDato>
-                        <QueEsEsto titulo="¿Qué es la ETo?" compai="abejita" testid="que-es-eto">
+                        {/* compai NO-abeja (unificación 2026-08-23): antes "abejita",
+                            que hacía eco de la Angelita canónica del FAB → dos abejas.
+                            Borugo (cava y guarda agua) encaja con la ETo. */}
+                        <QueEsEsto titulo="¿Qué es la ETo?" compai="borugo" testid="que-es-eto">
                             Es cuánta agua se sube al cielo en un día de sol y viento, evaporándose del suelo y las plantas.
                             Entre más sol y más viento, más "sed" tiene el aire. Sirve para saber cuánta agua reponerle a
                             los cultivos.

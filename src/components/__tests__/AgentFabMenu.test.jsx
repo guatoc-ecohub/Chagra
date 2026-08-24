@@ -44,6 +44,39 @@ describe('AgentFabMenu', () => {
     expect(screen.getByRole('menuitem', { name: /Que se quede callado hoy/i })).toBeInTheDocument();
   });
 
+  it('muestra "Ver" (R4) sólo cuando el FAB pasa onVer, y lo invoca', () => {
+    const onVer = vi.fn();
+    render(
+      <AgentFabMenu
+        abierto
+        onVer={onVer}
+        onEscuchar={() => {}}
+        onHablar={() => {}}
+        onFoto={() => {}}
+        onFotos={() => {}}
+        onHoyNo={() => {}}
+        onCerrar={() => {}}
+      />,
+    );
+    fireEvent.click(screen.getByRole('menuitem', { name: /^Ver$/i }));
+    expect(onVer).toHaveBeenCalledTimes(1);
+  });
+
+  it('sin onVer no aparece la opción "Ver" (no rompe otros usos)', () => {
+    render(
+      <AgentFabMenu
+        abierto
+        onEscuchar={() => {}}
+        onHablar={() => {}}
+        onFoto={() => {}}
+        onFotos={() => {}}
+        onHoyNo={() => {}}
+        onCerrar={() => {}}
+      />,
+    );
+    expect(screen.queryByRole('menuitem', { name: /^Ver$/i })).not.toBeInTheDocument();
+  });
+
   it('"Hablar" llama a onHablar', () => {
     const onHablar = vi.fn();
     render(
