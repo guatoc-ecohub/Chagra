@@ -1,0 +1,75 @@
+{
+  "erroresPagina": [],
+  "resumen": [
+    {
+      "slug": "jaguar",
+      "animacionesEsperadas": "CORREN TODAS",
+      "pataTestigo": "SE MUEVE (pose distinta en A y B)",
+      "diffAB": {
+        "distintos": 30040,
+        "total": 533136,
+        "pct": 5.63
+      }
+    },
+    {
+      "slug": "zariguya",
+      "animacionesEsperadas": "CORREN TODAS",
+      "pataTestigo": "SE MUEVE (pose distinta en A y B)",
+      "diffAB": {
+        "distintos": 43536,
+        "total": 533136,
+        "pct": 8.17
+      }
+    },
+    {
+      "slug": "luciernaga",
+      "animacionesEsperadas": "CORREN TODAS",
+      "pataTestigo": "SE MUEVE (pose distinta en A y B)",
+      "diffAB": {
+        "distintos": 27018,
+        "total": 533136,
+        "pct": 5.07
+      }
+    },
+    {
+      "slug": "oso",
+      "animacionesEsperadas": "CORREN TODAS",
+      "pataTestigo": "SE MUEVE (pose distinta en A y B)",
+      "diffAB": {
+        "distintos": 35750,
+        "total": 534285,
+        "pct": 6.69
+      }
+    },
+    {
+      "slug": "chivito",
+      "animacionesEsperadas": "CORREN TODAS",
+      "pataTestigo": "SE MUEVE (pose distinta en A y B)",
+      "diffAB": {
+        "distintos": 34383,
+        "total": 533136,
+        "pct": 6.45
+      }
+    },
+    {
+      "slug": "angelita",
+      "animacionesEsperadas": "CORREN TODAS",
+      "pataTestigo": "SE MUEVE (pose distinta en A y B)",
+      "diffAB": {
+        "distintos": 14677,
+        "total": 533136,
+        "pct": 2.75
+      }
+    },
+    {
+      "slug": "guacamaya",
+      "animacionesEsperadas": "CORREN TODAS",
+      "pataTestigo": "SE MUEVE (pose distinta en A y B)",
+      "diffAB": {
+        "distintos": 6769,
+        "total": 533136,
+        "pct": 1.27
+      }
+    }
+  ]
+}
