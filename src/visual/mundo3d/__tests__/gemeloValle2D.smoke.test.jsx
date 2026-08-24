@@ -158,8 +158,9 @@ describe('GemeloValle2D — el gemelo 2D de primera clase del valle', () => {
         expect(botones.length).toBeGreaterThan(0);
 
         botones.forEach((boton) => {
-          const left = parseFloat(boton.style.left);
-          const top = parseFloat(boton.style.top);
+          const elemento = /** @type {HTMLElement} */ (boton);
+          const left = parseFloat(elemento.style.left);
+          const top = parseFloat(elemento.style.top);
 
           // Los valores deben estar entre 8 y 92 (por el clampPct)
           expect(left).toBeGreaterThanOrEqual(8);
