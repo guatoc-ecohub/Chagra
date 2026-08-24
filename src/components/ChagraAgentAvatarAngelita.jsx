@@ -31,6 +31,7 @@ const ESTADO_DE_STATE = {
 
 export default function ChagraAgentAvatarAngelita({
     state = 'idle',
+    estado = undefined,
     size = 48,
     withLabel = false,
     onClick = undefined,
@@ -43,16 +44,48 @@ export default function ChagraAgentAvatarAngelita({
     // modo científico (0..1 o 'alta'|'media'|'baja' → anillo de certeza).
     visema = null,
     confianza = null,
+    // Props del cuerpo canónico. El adaptador histórico no debe descartar
+    // estos controles: selector, FAB, chat y galería tienen que ver la misma
+    // Angelita viva, incluidos rubber-hose, lip-sync y reduced-motion.
+    direccion = 'derecha',
+    animated = true,
+    tier = undefined,
+    clima = null,
+    enso = 'neutro',
+    animo = undefined,
+    energia = 1,
+    mundoId = null,
+    lineBoil = false,
+    idleCerebro = true,
+    gafas = false,
+    cejas = undefined,
+    title = undefined,
+    ...rest
 }) {
-    const estado = ESTADO_DE_STATE[state] || 'acompana';
+    // `estado` es el contrato rico de Angelita; `state` conserva compatibilidad
+    // con los call-sites históricos del avatar.
+    const estadoCanonico = estado || ESTADO_DE_STATE[state] || 'acompana';
     const abeja = (
         <Angelita
-            estado={estado}
+            estado={estadoCanonico}
             size={size}
+            direccion={direccion}
+            animated={animated}
             visema={visema}
             confianza={confianza}
+            tier={tier}
+            clima={clima}
+            enso={enso}
+            animo={animo}
+            energia={energia}
+            mundoId={mundoId}
+            lineBoil={lineBoil}
+            idleCerebro={idleCerebro}
+            gafas={gafas}
+            cejas={cejas}
             className={`${glow ? 'agt-avatar-glow ' : ''}${className}`.trim() || undefined}
-            title={ariaLabel}
+            title={title || ariaLabel}
+            {...rest}
         />
     );
 
