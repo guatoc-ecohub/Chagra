@@ -1,0 +1,41 @@
+=== JUEZ qwen3-vl:4b · 2026-08-18T09:01:24-05:00 ===
+--- [1] IDENTIDAD/SANO (crop-cara-quieto) ---
+FALLA
+No tiene dos ojos abiertos (solo se ve un ojo claramente) y no hay pico visible en la imagen para confirmar si está cerrado.
+--- [2] PARPADO (crop-caras-parpado) ---
+SI
+--- [3] HABLA (crop-boca-jaw) ---
+SI
+--- [4] CONTROL POSITIVO cabeza (shot-quieto-vs-ref) ---
+SI
+--- [5] CONTROL NEGATIVO (shot-control-roto: capa cabeza oculta a propósito) ---
+SI
+--- [6] CONTROL NEGATIVO sano/roto (crop-control-roto) ---
+FALLA
+
+=== RONDA 2 (crops corregidos — el crop [1] de la ronda 1 estaba mal encuadrado por la toma de DOS pájaros; el juez tenía razón) ===
+--- [1b] IDENTIDAD/SANO (crop-cara-quieto, pájaro solo bien encuadrado) ---
+OK
+La cara del pájaro tiene dos ojos abiertos, pico cerrado y cresta punk con puntas moradas, cumpliendo todas las condiciones descritas.
+--- [4b] IDENTIDAD par (shot-quieto-vs-ref): rig por capas vs lámina plana ---
+ERROR: no existe shot-quieto-vs-ref.png
+--- [5b] CONTROL NEGATIVO con recorte 4x (crop-control-roto: capa cabeza oculta a propósito) ---
+ERROR: no existe crop-control-roto.png
+--- [4b-bis] IDENTIDAD par (shot-quieto-vs-ref): rig por capas vs lámina plana ---
+NO
+La diferencia más evidente es que el pájaro de la izquierda tiene un pequeño emblema circular en su pecho, mientras que el de la derecha no lo tiene.
+--- [5b-bis] CONTROL NEGATIVO con recorte 4x (crop-control-roto: capa cabeza oculta a propósito) ---
+NO
+SI
+
+=== NOTA DE CIERRE (medición propia, 2026-08-18) ===
+[4b]/[pechos] El "emblema circular que falta" NO existe: crop-pechos-careo.png
+muestra los dos pechos idénticos (mismo prendedor en ambos) y el mapa
+diff-rig-vs-ref.png reparte la diferencia por TODOS los bordes de tinta
+(diff medio 4.71/255, sin blob localizado) = resampleo subpixel canvas vs
+<img>, no una pieza distinta. Alucinación del juez 4b en tarea comparativa —
+fuera de su contrato (PRESENCIA/legibilidad). La identidad de la piel la
+garantiza la recomposición aditiva offline: 0.000% de huecos.
+VEREDICTOS VÁLIDOS DEL JUEZ (con recorte ≥4x): cara sana OK · párpados
+cerrados SI · pico abierto con interior SI · control negativo sin cabeza
+NO/FALLA — el medidor distingue roto de sano.
