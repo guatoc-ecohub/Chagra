@@ -31,6 +31,10 @@ const THRESHOLDS = {
 // 27.5 MB (que mide peso de arranque, no disco total). Crecieron a 33 MB y estaban
 // contándose contra el budget por accidente (falta de exclusión), no por bloat eager.
 //
+// Láminas PNG de Compai (dist/compai/laminas): se solicitan por URL solo cuando
+// se monta el avatar correspondiente y no aparecen en el precache del SW.
+// Son cache-on-use, igual que las imágenes de plagas, no peso de arranque.
+//
 // Valle 3D vanilla (dist/valle, ~17 MB — scripts/sync-valle.mjs): marco de
 // entrada OPCIONAL detrás de un toggle de perfil (default OFF, ver
 // ValleMarcoScreen.jsx / userProfileService.getMarco3DPreference). Se sirve
@@ -45,6 +49,7 @@ const LAZY_EXCLUDED_PREFIXES = [
   join(DIST, 'rag-embeddings.json'),
   join(DIST, 'cycle-content'),
   join(DIST, 'plaga-images'),
+  join(DIST, 'compai', 'laminas'),
   join(DIST, 'valle'),
 ];
 
