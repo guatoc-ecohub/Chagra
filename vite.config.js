@@ -123,6 +123,7 @@ export default defineConfig({
         main: resolve(import.meta.dirname, 'index.html'),
         mercado: resolve(import.meta.dirname, 'mercado.html'),
         speciesViewer: resolve(import.meta.dirname, 'species-visor.html'),
+        riggedPreview: resolve(import.meta.dirname, 'rigged-preview.html'),
       },
       output: {
         manualChunks(id) {
