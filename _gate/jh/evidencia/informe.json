@@ -1,0 +1,31 @@
+{
+  "camina": {
+    "faltan": [],
+    "tA": "matrix(0.990602, -0.136779, 0.136779, 0.990602, 0, 0)",
+    "tB": "matrix(0.9892, 0.146572, -0.146572, 0.9892, 0, -30.449)",
+    "testigoSeMueve": true,
+    "diffAB": {
+      "distintos": 26250,
+      "total": 332100,
+      "pct": 7.9
+    }
+  },
+  "cabeza": {
+    "transformBase": "none",
+    "transformMira": "matrix(1, 0, 0, 1, 0.935, -0.23)",
+    "testaSeMueve": true,
+    "diffBaseMira": {
+      "distintos": 73472,
+      "total": 332100,
+      "pct": 22.12
+    }
+  },
+  "cuphead": {
+    "diffBoil": {
+      "distintos": 68937,
+      "total": 332100,
+      "pct": 20.76
+    }
+  },
+  "errores": []
+}
