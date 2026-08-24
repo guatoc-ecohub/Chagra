@@ -90,6 +90,26 @@ describe('ttsService — preferencias de voz Kokoro (task #124)', () => {
         expect(getPreferredVoice()).toBe(voice.id);
       }
     });
+
+    it('ef_dora está en KOKORO_VOICES (control negativo: si se elimina, este test falla)', () => {
+      // FIX 2026-07-10: en Kokoro el primer prefijo es el IDIOMA, no el "género inglés".
+      // e[mf]_ = ESPAÑOL, por lo que ef_dora (e = español, f = femenino) ES una voz
+      // válida en español. Fue removida el 2026-07-09 por confusión con "English",
+      // pero se reincorporó el 2026-07-10 tras descubrir que en Kokoro:
+      //   - pm_ = Portugués
+      //   - if_ = Italiano
+      //   - e[mf]_ = ESPAÑOL
+      // Ref: ops/DR-VOZ-TTS-2026-07-10.md, commit 3d5cc2a72 (#2304)
+      const doraInVoices = KOKORO_VOICES.some(v => v.id === 'ef_dora');
+      expect(doraInVoices).toBe(true);
+
+      // Verificación adicional: si ef_dora está en KOKORO_VOICES, debe ser seleccionable
+      if (doraInVoices) {
+        localStorage.setItem('chagra:tts:voice', 'ef_dora');
+        expect(getPreferredVoice()).toBe('ef_dora');
+        expect(setPreferredVoice('ef_dora')).toBe(true);
+      }
+    });
   });
 
   describe('setPreferredVoice', () => {
@@ -176,20 +196,30 @@ describe('ttsService — preferencias de voz Kokoro (task #124)', () => {
       expect(body.voice).toBe('ef_dora');
     });
 
-    it('coerciona ef_dora (no servible) a la default santa: dora NUNCA viaja al server', async () => {
+    it('ef_dora es voz española válida y servible: viaja al servidor tal cual', async () => {
+      // FIX 2026-07-10: en Kokoro el primer prefijo es el IDIOMA, no el "género inglés".
+      // e[mf]_ = ESPAÑOL, por lo que ef_dora (e = español, f = femenino) ES una voz
+      // válida en español. Fue removida el 2026-07-09 por confusión con "English",
+      // pero se reincorporó el 2026-07-10 tras descubrir que en Kokoro:
+      //   - pm_ = Portugués
+      //   - if_ = Italiano
+      //   - e[mf]_ = ESPAÑOL
+      // Ref: ops/DR-VOZ-TTS-2026-07-10.md, commit 3d5cc2a72 (#2304)
+      setPreferredVoice('ef_dora');
       await speakKokoro('Hola', { voice: 'ef_dora' });
       const [, init] = fetchMock.mock.calls[0];
       const body = JSON.parse(init.body);
-      expect(body.voice).toBe('em_alex');
+      expect(body.voice).toBe('ef_dora'); // dora viaja al servidor sin coerción
     });
 
-    it('coerciona voces inglesas inexistentes (ef_aoede/ef_kore) a santa, no a dora', async () => {
+    it('coerciona voces inglesas inexistentes (ef_aoede/ef_kore) a santa (DEFAULT_KOKORO_VOICE)', async () => {
+      // Las voces ef_aoede y ef_kore no están en KOKORO_VOICES, por lo que se
+      // coaccionan a la voz por defecto (em_santa) mediante toServableVoice().
       await speakKokoro('Hola', { voice: 'ef_aoede' });
       await speakKokoro('Hola', { voice: 'ef_kore' });
       for (const call of fetchMock.mock.calls) {
         const body = JSON.parse(call[1].body);
-        expect(body.voice).toBe('em_alex');
-        expect(body.voice).not.toBe('ef_dora');
+        expect(body.voice).toBe(DEFAULT_KOKORO_VOICE); // em_santa
       }
     });
   });
