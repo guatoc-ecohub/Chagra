@@ -19,17 +19,29 @@ import {
 } from '../vidaEstados.js';
 import { CREATURES } from '../index.js';
 
-/* Los 8 con vida propia: todos los personajes del registro menos la abeja
-   (su cerebro v2 vive en el agente — es la vara), la microfauna decorativa
-   y el Ent (árbol-maestro, otro compás). */
-const CON_VIDA = Object.keys(CREATURES).filter(
-  (s) => !['abeja-angelita', 'lombriz', 'mariposa', 'escarabajo', 'ent-frailejon'].includes(s),
-);
+/* Los personajes con VIDA PROPIA rubber-hose = los que consumen useVidaIdle.
+   Se descuentan del registro CREATURES los que NO gesticulan idle (verificado:
+   ninguno importa useVidaIdle):
+   - abeja-angelita: su cerebro v2 vive en el agente (es la vara), no aquí;
+   - microfauna decorativa: lombriz, mariposa, escarabajo, crisopa, trichogramma,
+     sirfido (ambiente, sin idle-cerebro);
+   - fauna de ambiente / granja: condor, danta, gallina (pobladores del valle);
+   - plantas / árbol-maestro: maiz, ent-frailejon (otro compás). */
+const SIN_VIDA = [
+  'abeja-angelita', 'lombriz', 'mariposa', 'escarabajo', 'ent-frailejon',
+  'condor', 'danta', 'gallina', 'crisopa', 'trichogramma', 'sirfido', 'maiz',
+];
+const CON_VIDA = Object.keys(CREATURES).filter((s) => !SIN_VIDA.includes(s));
 
-describe('1. El repertorio cubre exacto a los 8 bichos', () => {
-  it('cada bicho del registro (menos abeja/microfauna/Ent) tiene repertorio', () => {
-    expect(Object.keys(VIDA_REPERTORIO).sort()).toEqual(CON_VIDA.sort());
-    expect(CON_VIDA).toHaveLength(8);
+/* `borugo` tiene vida pero vive SOLO en el valle 3D — NO está en el registro
+   PWA CREATURES (su componente queda en disco, ver index.js). El repertorio lo
+   cubre; el registro no. Se descuenta al comparar contra CREATURES. */
+const REP_REGISTRADOS = Object.keys(VIDA_REPERTORIO).filter((s) => s !== 'borugo');
+
+describe('1. El repertorio cubre exacto a los bichos con vida del registro', () => {
+  it('cada bicho rubber-hose del registro (los que usan useVidaIdle) tiene repertorio', () => {
+    expect(REP_REGISTRADOS.sort()).toEqual(CON_VIDA.sort());
+    expect(CON_VIDA).toHaveLength(13);
   });
 
   it('cada repertorio trae descanso [min,max] y ≥2 gestos con peso > 0', () => {
