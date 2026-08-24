@@ -5,6 +5,45 @@ la superficie 2D del AGENTE. El operador juzga con las capturas crudas de
 `ops/informes/capturas/zariguya-gemini-2026-08-24/` — este informe NO
 certifica nada.
 
+## Follow-up de comportamiento: fixes 3a, 5, 2 y 1
+
+Esta pasada no redibuja arte y no toca el roam global, `CompaiOverlay` ni la
+política del FAB fijo.
+
+- **Fix 3a, lip-sync real:** se reutilizó el contrato de
+  `ChagraAgentAvatarAngelita.jsx`. `ChagraAgentAvatarZariguya` ahora recibe y
+  reenvía `visema`, `estado`, `animated`, `tier` y `direccion`. El visema del
+  host gana; `VISEMA_DE_STATE[state]` solo queda como fallback cuando el prop
+  es nulo. `ZariguyaGeminiLaminaViva` sigue siendo quien convierte visema a
+  mandíbula.
+- **Fix 5, idle con sentido:** en la entrada `zariguya` de
+  `vidaEstados.js` quedan `husmea` como dominante y `tanatosis` como gag raro.
+  Se retiraron `reposo` y `crias` del selector natural, por lo que no se
+  activa el swap de cuerpo `reposo` a `cute` ni aparece `crias` por azar.
+  `vidaForzada="crias"` continúa disponible para el host.
+- **Fix 2, fondo oscuro:** se conservó el `filter` del FAB y se le añadió un
+  doble `drop-shadow`: rim claro por tema más sombra de tinta. El token
+  `--chagra-fab-rim` vive en `agent-fab-skin.css`.
+- **Fix 1, una sola presencia:** se retiró el avatar estático de
+  `AgentHero` y `FincaVivaHero`; `AgentFab` ya incluye `dashboard` y solo se
+  excluye en carga, login, onboarding y mockup.
+
+### Verificación cruda de esta pasada
+
+- Tests tocados: **5 archivos, 68 tests, 0 fallos**.
+- Build: **`✓ built in 12.48s`**.
+- Lint acotado a los seis archivos JS tocados con `--max-warnings=0`:
+  **exit 0, sin salida de reglas**. El lint completo del repositorio agotó
+  memoria primero con 4 GB y luego con 8 GB, sin llegar a reportar reglas.
+- `vidaEstados.test.js` completo conserva un rojo preexistente de roster:
+  espera claves antiguas frente a las 13 claves actuales de `CREATURES`; el
+  diff de este follow-up no cambia claves del repertorio.
+- Captura Chromium headless GPU: **no generada en este entorno**. Salida
+  cruda del intento Playwright: `libglib-2.0.so.0: cannot open shared object
+  file`; con Chromium Nix y Playwright: `SIGTRAP`; headed: `no X server`.
+  No se usan capturas anteriores como evidencia de esta pasada y no se
+  certifica el render visual.
+
 ## Qué se hizo
 
 1. **Assets servibles** (`public/compai/laminas/zariguya-gemini-*.png`, 9
