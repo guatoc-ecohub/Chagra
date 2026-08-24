@@ -12,15 +12,21 @@ import { PropEnMano } from './PropEnMano.jsx';
 import { AuraPoder } from './AuraPoder.jsx';
 import { auraDeBicho } from './transformacion.js';
 
-/* Abeja angelita — Tetragonisca angustula (meliponino nativo SIN aguijón, NO
-   Apis). Cabeza y tórax OSCUROS (casi negros) + abdomen ámbar PÁLIDO y LISO,
-   sin bandas: las tres barras oscuras eran la firma de la Apis europea, la que
-   saquea las colmenas de angelita. Cuerpo esbelto, alitas de tul que le sobran
-   del cuerpo, remate redondo sin aguijón.
+/* Abejita, la abeja angelita — Tetragonisca angustula (meliponino nativo de
+   Choachí, SIN aguijón, NO Apis). Cabeza y tórax OSCUROS (casi negros) +
+   abdomen ámbar PÁLIDO con bandas CLARAS apenas insinuadas (tergitos pálidos
+   de la angelita real) y la franja dorada lateral del mesosoma — su firma de
+   campo. Lo vetado siguen siendo las tres barras OSCURAS: esas son la firma de
+   la Apis europea, la que saquea las colmenas de angelita. Cuerpo esbelto,
+   alitas de tul que le sobran del cuerpo, remate redondo sin aguijón.
    Elevada al lenguaje RUBBER-HOSE PLENO (Cuphead + Miss Minutes de Loki):
    contorno grueso que respira, ojos de goma con pupila grande y brillo, cachetes
-   campesinos, bracitos/patitas de manguera con mitones, antenas con bombillo que
-   hacen follow-through, y squash-&-stretch en el idle (boil ~12fps). El DIBUJO
+   campesinos, bracitos/patitas de manguera SIN guantes (re-skin aprobado
+   2026-08-21: remate de tinta sutil, no mitón), antenas con bombillo que
+   hacen follow-through, y squash-&-stretch en el idle (boil ~12fps).
+   La CARA sigue la referencia aprobada (ref-abeja.png, Cuphead/Miss Minutes):
+   ojos más grandes y redondos con buen catchlight + sonrisa más ancha y
+   cálida, sobre la máscara facial clara del clípeo meliponino. El DIBUJO
    compone el KIT reutilizable `_rubberhose.jsx` (que el oso andino y el colibrí
    heredan); la CADENCIA vive en `creatures.css` (clases `rh-*`, gate RM + tier).
    La IDENTIDAD (paleta + proporciones) vive en `abejaIdentidad.js`: la MISMA
@@ -113,7 +119,7 @@ export function AbejaAngelita({
      'poniendose' (reproduce UNA vez la caída teatral: baja girada, rebasa,
      rebota y asienta — su entrada de día soleado). La cadencia vive en
      angelita-missminutes.css gateada por data-gafas; RM = puestas quietas. */
-  gafas = false,
+  gafas = /** @type {boolean|'poniendose'} */ (false),
   /* ── CEJAS EXPRESIVAS (AngelitaGafas.CejasRubber) ──────────────────────────
      OPT-IN: null (default: la carita de siempre) | 'alegres' | 'altas' |
      'vivas' (con eyebrow-flash al hablar) | 'fruncidas' (concentrada). El
@@ -259,38 +265,52 @@ export function AbejaAngelita({
       <ellipse className={wing} style={alaStyle2} cx="-0.4" cy="-5.2"
         rx="6.6" ry="2.7" fill={ABEJA_PALETA.alaTulClara} opacity="0.44" stroke="rgba(42,26,12,0.28)" strokeWidth="0.45" />
 
-      {/* patitas manguera con pie crema (detrás del tronco, se mecen suave) */}
-      <Miembro d="M-2.6,4.4 C-3.2,6.6 -3.4,8 -3.0,9.2" ancho={1.9} punta={[-3.0, 9.4]} puntaR={1.3} pie sway={vivo} delay={-0.6} />
-      <Miembro d="M1.8,4.7 C1.4,6.8 1.3,8.2 1.8,9.4" ancho={1.9} punta={[1.8, 9.6]} puntaR={1.3} pie sway={vivo} delay={-0.95} />
+      {/* patitas manguera SIN mitón (re-skin 2026-08-21): remate de tinta
+          sutil, detrás del tronco, se mecen suave */}
+      <Miembro d="M-2.6,4.4 C-3.2,6.6 -3.4,8 -3.0,9.2" ancho={1.9} punta={[-3.0, 9.4]} puntaR={1.3} pie sinGuante sway={vivo} delay={-0.6} />
+      <Miembro d="M1.8,4.7 C1.4,6.8 1.3,8.2 1.8,9.4" ancho={1.9} punta={[1.8, 9.6]} puntaR={1.3} pie sinGuante sway={vivo} delay={-0.95} />
 
-      {/* ABDOMEN ámbar PÁLIDO, esbelto y LISO: SIN las tres barras verticales
-          oscuras (esas eran la firma de la Apis europea). Remata redondo — SIN
+      {/* ABDOMEN ámbar PÁLIDO y esbelto: SIN las tres barras verticales
+          OSCURAS (esas eran la firma de la Apis europea). Remata redondo — SIN
           aguijón. Va a la izquierda, dejándole el lado derecho al tórax; su
           contorno respira con el boil. */}
       <ellipse cx="-2.0" cy="0.2" rx="8.1" ry="4.5"
         fill={ABEJA_PALETA.cuerpo} stroke={RH_INK} strokeWidth="1.3"
         style={{ filter: `drop-shadow(0 0 6px ${ABEJA_PALETA.cuerpoGlow})` }} />
-      {/* brillo suave de volumen (el lomo del abdomen) — NUNCA una banda */}
+      {/* brillo suave de volumen (el lomo del abdomen) — nunca una barra Apis */}
       <ellipse cx="-3.2" cy="-1.9" rx="3.9" ry="1.5" fill={ABEJA_PALETA.cabeza} opacity="0.26" />
-      {/* tergite APENAS insinuado (una línea suave que sigue la curva), el
-          detalle de segmento del meliponino, jamás una banda de color */}
+      {/* tergite del remate, APENAS insinuado (línea suave que sigue la curva) */}
       <path d="M-7.2,-2.1 Q-7.9,0.2 -7.2,2.3" stroke={ABEJA_PALETA.hiloChumbe}
         strokeWidth="0.5" fill="none" strokeLinecap="round" opacity="0.45" />
+      {/* bandas CLARAS de los tergitos (T. angustula real): dos arcos PÁLIDOS
+          que marchan hacia el tórax siguiendo la curva del abdomen — luz, no
+          pigmento. Sutiles a propósito: segmentación de meliponino, jamás las
+          barras oscuras de la Apis. Respiran con el boil como todo el cuerpo. */}
+      <path d="M-4.9,-3.1 Q-5.7,0.2 -4.9,3.5" stroke={ABEJA_PALETA.bandaClara}
+        strokeWidth="0.85" fill="none" strokeLinecap="round" opacity="0.55" />
+      <path d="M-1.7,-3.6 Q-2.5,0.2 -1.7,4.0" stroke={ABEJA_PALETA.bandaClara}
+        strokeWidth="0.85" fill="none" strokeLinecap="round" opacity="0.5" />
       {/* TÓRAX oscuro y redondo (peludo): junto con la cabeza forma la mitad
           OSCURA del cuerpo — la estructura de valores INVERTIDA respecto a la
           Apis (que lo tiene claro). Sobre el arranque del abdomen, bajo la cabeza. */}
       <ellipse cx="5.0" cy="-0.4" rx="3.5" ry="4.4" fill={ABEJA_PALETA.torax}
         stroke={RH_INK} strokeWidth="1.2" />
+      {/* franja DORADA lateral del mesosoma — la marca amarilla en el costado
+          del tórax negro, la firma de campo con la que se reconoce a la
+          angelita real. Un solo trazo curvo sobre el flanco visible. */}
+      <path d="M2.7,-2.9 Q1.9,-0.4 2.7,2.2" stroke={ABEJA_PALETA.franjaTorax}
+        strokeWidth="1.05" fill="none" strokeLinecap="round" opacity="0.85" />
 
-      {/* bracitos manguera con mitón crema (delante del tronco, follow-through).
+      {/* bracitos manguera SIN mitón (re-skin 2026-08-21: la referencia traía
+          guantes por DEFECTO — acá el remate es tinta sutil, manita desnuda).
           Marcados (crt-brazo-l/r) y con pivote en el HOMBRO para que los gestos
           celebra/señala los alcen desde el hombro, no desde el centro del bbox:
           el hombro izquierdo cae arriba-derecha de su bbox ('right top'); el
           derecho, arriba-izquierda ('left top'). */}
       <Miembro clase="crt-brazo-l" origen="right top"
-        d="M-6.2,1.4 C-8.2,2.4 -9.0,4.1 -8.4,5.9" ancho={2.1} punta={[-8.5, 6.2]} puntaR={1.55} sway={vivo} delay={-0.15} />
+        d="M-6.2,1.4 C-8.2,2.4 -9.0,4.1 -8.4,5.9" ancho={2.1} punta={[-8.5, 6.2]} puntaR={1.55} sinGuante sway={vivo} delay={-0.15} />
       <Miembro clase="crt-brazo-r" origen="left top"
-        d="M5.4,3.0 C6.9,4.2 7.5,5.9 7.0,7.5" ancho={2.2} punta={[7.0, 7.8]} puntaR={1.6} sway={vivo} delay={-0.45} />
+        d="M5.4,3.0 C6.9,4.2 7.5,5.9 7.0,7.5" ancho={2.2} punta={[7.0, 7.8]} puntaR={1.6} sinGuante sway={vivo} delay={-0.45} />
 
       {/* CABEZA — agrupada aparte (crt-cabeza) SOLO para que el agente pueda
           negarla de lado a lado ("no sé", angelita-agente.css) sin mover el
@@ -305,18 +325,26 @@ export function AbejaAngelita({
             y, a la vez, el fondo sobre el que la carita (ojos/boca/cejas del agente)
             sigue leyéndose pese a la cabeza oscura. Va bajo ojos/cachetes/boca. */}
         <ellipse cx="9.4" cy="-0.2" rx="3.2" ry="3.4" fill={ABEJA_PALETA.cara} opacity="0.95" />
-        {/* chapetas campesinas + sonrisa + ojos de goma (parpadean juntos) */}
-        <Cachetes puntos={[{ cx: 10.4, cy: 0.7, r: 1.15 }, { cx: 6.9, cy: 0.3, r: 0.85 }]} vivo={vivo} />
+        {/* chapetas campesinas + sonrisa + ojos de goma (parpadean juntos).
+            CARA re-skin 2026-08-21 (referencia ref-abeja.png, Cuphead/Miss
+            Minutes): ojos más grandes y redondos (r 2.1/1.6 — el TECHO que las
+            gafas de sol pueden cubrir sin que el aro del ojo se asome tras el
+            lente; los centros NO se mueven: gafas, cejas y CSS de mirada
+            cuelgan de ahí) + sonrisa más ancha y cálida (w 3.6) que remata en
+            los cachetes. BocaVisema recibe LOS MISMOS w/prof que la sonrisa
+            para que el lip-sync no salte al arrancar; prof queda en 1.2 porque
+            más profundidad saca la lengüita del visema V3 fuera del mentón. */}
+        <Cachetes puntos={[{ cx: 10.4, cy: 0.7, r: 1.25 }, { cx: 6.9, cy: 0.3, r: 0.95 }]} vivo={vivo} />
         {/* Boca: lip-sync si hay visema; si no, la sonrisa de goma de siempre.
             Envuelta en `.crt-boca` (pivote centrado) para que los GESTOS del
             agente la agarren por CSS (el bostezo la abre en grande). */}
         <g className="crt-boca" style={{ transformBox: 'fill-box', transformOrigin: 'center' }}>
           {visema
-            ? <BocaVisema cx={8.9} cy={1.4} w={2.8} prof={1.1} visema={visema} />
-            : <Sonrisa cx={8.9} cy={1.4} w={2.8} prof={1.1} />}
+            ? <BocaVisema cx={8.9} cy={1.4} w={3.6} prof={1.2} visema={visema} />
+            : <Sonrisa cx={8.9} cy={1.4} w={3.6} prof={1.2} />}
         </g>
         <OjosRubber
-          ojos={[{ cx: 10.1, cy: -1.9, r: 1.95 }, { cx: 7.4, cy: -2.2, r: 1.45 }]}
+          ojos={[{ cx: 10.1, cy: -1.9, r: 2.1 }, { cx: 7.4, cy: -2.2, r: 1.6 }]}
           mirar={[0.3, 0.34]}
           parpadea={vivo}
         />
