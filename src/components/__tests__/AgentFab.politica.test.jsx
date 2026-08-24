@@ -60,21 +60,25 @@ describe('AgentFab — R3 enseña en idle', () => {
   });
 });
 
-describe('AgentFab — R2 se oculta al interactuar con la pantalla', () => {
-  it('un mouseover global oculta el compai; en idle está visible', () => {
+describe('AgentFab — política v2: visible 100%, NUNCA se oculta al interactuar', () => {
+  // Corrección del operador 2026-08-24 (feedback_compai_politica_v2_visible_roam_natural):
+  // el compai es VISIBLE 100% del tiempo. La ocultación anterior
+  // (`oculto = interactuando && !hover` → visibility:hidden) era el bug de
+  // "al onmouseover desaparece / ahora no sale ninguno". Al interactuar el
+  // usuario, el compai vuelve a su posición natural, NO desaparece.
+  it('un mouseover global NO oculta el compai (visible 100%)', () => {
     render(<AgentFab onNavigate={() => {}} pantalla="mapa" />);
     const fab = screen.getByRole('button', { name: /Chagra IA/i });
     expect(fab.parentElement.style.visibility).toBe('visible');
     act(() => { window.dispatchEvent(new Event('mouseover')); });
-    expect(fab.parentElement.style.visibility).toBe('hidden');
-    expect(fab.parentElement.style.pointerEvents).toBe('none');
+    expect(fab.parentElement.style.visibility).toBe('visible');
   });
 
-  it('un touchstart en el área oculta el compai completo', () => {
+  it('un touchstart en la pantalla NO oculta el compai (sigue presente)', () => {
     render(<AgentFab onNavigate={() => {}} pantalla="mapa" />);
     const fab = screen.getByRole('button', { name: /Chagra IA/i });
     act(() => { window.dispatchEvent(new Event('touchstart')); });
-    expect(fab.parentElement.style.visibility).toBe('hidden');
+    expect(fab.parentElement.style.visibility).toBe('visible');
   });
 });
 

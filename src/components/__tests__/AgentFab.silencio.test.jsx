@@ -25,8 +25,11 @@ afterEach(() => {
 });
 
 describe('AgentFab — interruptor de silencio manual (#101/#103)', () => {
-  it('el botón visible alterna silenciado en el store', () => {
+  it('el botón (visible al tocar el compai) alterna silenciado en el store', () => {
     render(<AgentFab onNavigate={() => {}} />);
+    // Política v2 (operador 2026-08-24): el ícono de silencio se ve SOLO al
+    // tocar/hover el compai — no tapa la cara en reposo. Hay que revelarlo.
+    fireEvent.mouseEnter(screen.getByRole('button', { name: /Chagra IA/i }));
     const boton = screen.getByRole('button', { name: /Que su compañero se quede callado/i });
     expect(boton).toHaveAttribute('aria-pressed', 'false');
 
@@ -38,6 +41,14 @@ describe('AgentFab — interruptor de silencio manual (#101/#103)', () => {
 
     fireEvent.click(botonActivo);
     expect(useAngelitaStore.getState().silenciado).toBe(false);
+  });
+
+  it('en reposo (sin hover, sin silenciar) el ícono NO se ve — no tapa la cara (v2)', () => {
+    render(<AgentFab onNavigate={() => {}} />);
+    // Sin tocar el compai, el botón de silencio queda display:none → inaccesible.
+    expect(
+      screen.queryByRole('button', { name: /Que su compañero se quede callado/i })
+    ).toBeNull();
   });
 });
 
