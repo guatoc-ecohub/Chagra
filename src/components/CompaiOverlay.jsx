@@ -45,6 +45,11 @@ import { getHintForRuta } from '../config/compaiHints.js';
  * el resto de la aplicación. El selector vive en onboarding y Perfil.
  */
 
+/* Compai con MARCHA real: al deambular corren su ciclo de andar ('caminando')
+   en vez de quedarse en idle espejado. El jaguar (rig de perfil #jaguarLado)
+   y el oso del bastón (pose 'camina' de la piel-lámina musculosa). */
+const CON_MARCHA = new Set(['jaguar', 'oso-baston']);
+
 /**
  * Escucha el texto en voz alta (TTS kokoro, fail-silent).
  */
@@ -117,10 +122,13 @@ export default function CompaiOverlay({ currentView = 'dashboard' }) {
   const esRealista = avatarType === 'jaguar';
   const avatarSize = esRealista ? 112 : 84;
 
-  // Mientras deambula, el jaguar corre su MARCHA real ('caminando'); el resto
-  // conserva su estado (no tienen pose de marcha) y solo se espejan. Un estado
+  // Mientras deambula, los compai CON MARCHA real corren su ciclo de andar
+  // ('caminando'): el jaguar (JaguarLaminaViva) y el oso del bastón (la
+  // marcha plantígrada de la piel-lámina musculosa). El resto conserva su
+  // estado (no tienen pose de marcha) y solo se espejan. Un estado
   // conversacional (hablar/escuchar/pensar) siempre gana a la caminata.
-  const estadoAvatar = esRealista && caminando && compaiState === 'idle'
+  const conMarcha = CON_MARCHA.has(avatarType);
+  const estadoAvatar = conMarcha && caminando && compaiState === 'idle'
     ? 'caminando'
     : compaiState;
 
