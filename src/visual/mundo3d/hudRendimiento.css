@@ -1,0 +1,54 @@
+/*
+ * hudRendimiento.css — chip de FPS del valle. Presentación adaptada de
+ * PreviewFpsMeter (MengTo/threeui, MIT): mono, translúcido, color por
+ * calificación. Anclado a la esquina superior derecha del viewport para no
+ * pelear con los hotspots (que viven abajo) ni con Angelita.
+ */
+.hud-rendimiento {
+  position: fixed;
+  top: max(8px, env(safe-area-inset-top));
+  right: max(8px, env(safe-area-inset-right));
+  z-index: 60;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 1px;
+  padding: 4px 7px;
+  border: 0.5px solid rgba(255, 255, 255, 0.14);
+  border-radius: 6px;
+  background: rgba(9, 10, 12, 0.62);
+  color: rgba(255, 255, 255, 0.82);
+  font: normal 11px/1.15 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  letter-spacing: 0.02em;
+  text-align: right;
+  pointer-events: none;
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+}
+
+.hud-rendimiento__fps {
+  font-size: 13px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.hud-rendimiento__meta {
+  font-size: 9px;
+  opacity: 0.72;
+}
+
+.hud-rendimiento[data-rating='bueno'] .hud-rendimiento__fps {
+  color: #8fe3a0;
+}
+
+.hud-rendimiento[data-rating='atento'] .hud-rendimiento__fps {
+  color: #f2d98f;
+}
+
+.hud-rendimiento[data-rating='lento'] .hud-rendimiento__fps {
+  color: #ff9c92;
+}
+
+.hud-rendimiento[data-rating='pausa'] .hud-rendimiento__fps {
+  color: rgba(255, 255, 255, 0.5);
+}
