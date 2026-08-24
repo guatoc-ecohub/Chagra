@@ -97,7 +97,11 @@ export default function SpeciesFicha({ ficha, onSelectSpecies }) {
 
       {/* ATLAS EDUCATIVO — modelo WebGL + estados + quiz, integrado en la ficha */}
       <Suspense fallback={<AtlasLoading />}>
-        <SpeciesAtlas speciesId={ficha.id} commonName={comun} />
+        <SpeciesAtlas
+          speciesId={ficha.id}
+          commonName={comun}
+          imageUrl={imagen?.thumbUrl || imagen?.url || null}
+        />
       </Suspense>
 
       {/* PISO TÉRMICO / ALTITUD */}

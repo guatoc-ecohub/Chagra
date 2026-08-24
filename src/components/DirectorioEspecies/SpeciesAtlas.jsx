@@ -3,6 +3,7 @@ import { Canvas } from '@react-three/fiber';
 import { Html, OrbitControls } from '@react-three/drei';
 import * as THREE from 'three';
 import { Rotate3D, CircleHelp, Check, X, Eye, Sprout } from 'lucide-react';
+import ImagenRelieve3D from './ImagenRelieve3D.jsx';
 import {
   ATLAS_STAGES,
   getAtlasRecord,
@@ -19,7 +20,7 @@ import './species-atlas.css';
  * procedural de bajo coste, suficiente para enseñar relaciones anatómicas sin
  * añadir GLB sin licencia ni cambiar el renderer del valle.
  */
-export default function SpeciesAtlas({ speciesId, commonName }) {
+export default function SpeciesAtlas({ speciesId, commonName, imageUrl = null }) {
   const record = getAtlasRecord(speciesId);
   const openSpecies = useSpeciesAtlasStore((state) => state.openSpecies);
 
@@ -38,10 +39,10 @@ export default function SpeciesAtlas({ speciesId, commonName }) {
     );
   }
 
-  return <AtlasContent record={record} commonName={commonName} />;
+  return <AtlasContent record={record} commonName={commonName} imageUrl={imageUrl} />;
 }
 
-function AtlasContent({ record, commonName }) {
+function AtlasContent({ record, commonName, imageUrl }) {
   const stageId = useSpeciesAtlasStore((state) => state.stageId);
   const selectedMarker = useSpeciesAtlasStore((state) => state.selectedMarker);
   const mode = useSpeciesAtlasStore((state) => state.mode);
@@ -101,6 +102,7 @@ function AtlasContent({ record, commonName }) {
         <AtlasCanvas
           record={record}
           stageId={stageId}
+          imageUrl={imageUrl}
           markers={markers}
           mode={mode}
           targetMarker={targetMarker}
@@ -227,7 +229,7 @@ function AtlasHeading({ commonName }) {
   );
 }
 
-function AtlasCanvas({ record, stageId, markers, mode, targetMarker, onMarker }) {
+function AtlasCanvas({ record, stageId, imageUrl, markers, mode, targetMarker, onMarker }) {
   const specimenRef = useRef();
   const isIdentify = mode === 'identify';
 
@@ -248,6 +250,7 @@ function AtlasCanvas({ record, stageId, markers, mode, targetMarker, onMarker })
         <ambientLight intensity={1.9} color="#dce9c4" />
         <directionalLight position={[-3, 4, 4]} intensity={3.4} color="#fff1c5" />
         <directionalLight position={[3, 1, -2]} intensity={1.1} color="#8fc8b7" />
+        {imageUrl && <ImagenRelieve3D src={imageUrl} />}
         <Specimen record={record} stageId={stageId} specimenRef={specimenRef} />
         {markers.map((marker, index) => (
           <AtlasMarker
@@ -262,7 +265,9 @@ function AtlasCanvas({ record, stageId, markers, mode, targetMarker, onMarker })
         ))}
         <OrbitControls enablePan={false} enableZoom autoRotate={false} minDistance={2.2} maxDistance={5.2} makeDefault />
       </Canvas>
-      <span className="species-atlas__canvas-note">WebGL · modelo didáctico · sin datos de finca</span>
+      <span className="species-atlas__canvas-note">
+        WebGL · modelo didáctico{imageUrl ? ' · relieve visual de la foto' : ''} · sin datos de finca
+      </span>
     </div>
   );
 }

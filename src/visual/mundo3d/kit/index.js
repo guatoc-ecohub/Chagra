@@ -46,6 +46,7 @@ export {
 
 /* ── Terreno (heightfield con color por vértice) ────────────────────────────── */
 export { construirTerreno } from './terreno.js';
+export { crearGeometriaRelieveImagen, luminanciaPixel } from './relieveImagen.js';
 
 /* ── Atmósfera del mundo (hora viva del valle, lista para cualquier Canvas) ──── */
 export { atmosferaDeFamilia, useAtmosferaMundo } from './atmosfera.js';
