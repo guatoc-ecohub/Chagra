@@ -1,0 +1,14 @@
+[Unit]
+Description=Refresco de clima después de la publicación diaria de fuentes
+
+[Timer]
+# SIPSA publica normalmente entre el mediodía y media tarde COT. IDEAM y
+# NOAA ya están disponibles antes de esta ventana. El wrapper omite festivos
+# colombianos; Persistent recupera una ejecución perdida por desconexión.
+OnCalendar=Mon..Fri *-*-* 16:30:00 America/Bogota
+Persistent=true
+RandomizedDelaySec=900
+Unit=dr-clima-refresh.service
+
+[Install]
+WantedBy=timers.target
