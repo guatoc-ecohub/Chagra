@@ -15,8 +15,11 @@
  *   data-agt-estado=speaking + --zlv-jaw→ mandíbula que habla (lip-sync
  *                                        sobre la sonrisa YA abierta)
  *   data-agt-estado=thinking           → alza el LÁPIZ y escribe en el aire
- *   data-agt-estado=caminando          → bob de cuerpo/cabeza + cola viva
- *                                        (el andar se lee del roaming)
+ *   (idle, siempre)                    → BOIL de cuerpo (`.zlv-cuerpoVida`):
+ *                                        squash/stretch menudo — nunca témpano
+ *   data-agt-estado=caminando          → BAMBOLEO plantígrado: rock de peso
+ *                                        pie-a-pie + bob + cadera + manitos-pata
+ *                                        en oposición + cola/testa de contrapeso
  *
  * HONESTIDAD: el interior de boca (.zlv-bocaInterior) es SINTÉTICO (solo se
  * ve al abrir MÁS que la lámina). La mirada es GIRO DE CABEZA, no pupila
@@ -42,6 +45,26 @@
   width: 100%;
   height: 100%;
   display: block;
+}
+
+/* ═══ VIDA DE CUERPO — el hermano del `.crt-body` rubber-hose del vector: la
+   lámina NUNCA queda como un témpano. En idle late un BOIL menudo (squash/
+   stretch escalonado ~12fps, anticipación+overshoot) plantado en los APOYOS
+   (origen abajo). Al CAMINAR este mismo nodo corre el bamboleo plantígrado
+   (ver más abajo). Envuelve al `.zlv-cuerpoPivote` (respiro/gestos) para que
+   las dos capas COMPONGAN sin pisar su `transform` — como la cabeza anidada. */
+.zlv-cuerpoVida {
+  position: absolute;
+  inset: 0;
+  transform-origin: 50% 90%;
+  animation: zlv-boil 1.7s steps(20, end) infinite;
+}
+@keyframes zlv-boil {
+  0%   { transform: translateY(0) scale(1, 1); }
+  22%  { transform: translateY(-0.15%) scale(0.994, 1.008); }  /* stretch (anticipa) */
+  50%  { transform: translateY(0.25%) scale(1.01, 0.99); }     /* squash */
+  72%  { transform: translateY(-0.08%) scale(0.998, 1.003); }  /* overshoot */
+  100% { transform: translateY(0) scale(1, 1); }
 }
 
 /* ═══ IDLE VIVO — alive-in-place: respira menudo (bicho chico), la testa
@@ -187,25 +210,54 @@
   74%      { transform: rotate(-3.2deg); }
 }
 
-/* ═══ CAMINA — el andar se lee del DESPLAZAMIENTO del host (roaming): aquí
-   solo bob de cuerpo/cabeza, cola de contrapeso más viva y manitos al
-   compás. Las patas no existen como pieza (no hay péndulo que fantasmee). */
-[data-agt-estado='caminando'] .zlv-cuerpoPivote { animation: zlv-cuerpoBob 0.56s ease-in-out infinite; }
-@keyframes zlv-cuerpoBob {
-  0%, 100% { transform: translateY(1.8%) rotate(0.5deg); }
-  50%      { transform: translateY(-2.2%) rotate(-0.4deg); }
+/* ═══ CAMINA — antes esto era un témpano bamboleándose 2% (María Antonieta:
+   la cargaban, no andaba). Ahora es un BAMBOLEO PLANTÍGRADO de verdad: el
+   marsupial erguido reparte el peso PIE A PIE. El `.zlv-cuerpoVida` (origen en
+   los apoyos) hace el rock lateral de peso + el bob vertical + squash del
+   apoyo; el pivote de masa aporta el vaivén de cadera; las dos manitos-pata
+   bombean en OPOSICIÓN (el swing de brazos del andar); la cola prensil hace
+   de contrapeso y la testa cabecea con retardo (follow-through). Las patas
+   traseras no son pieza (lección "3-4 patas"): su alternancia se LEE del rock
+   de peso del cuerpo sobre los apoyos — honesto, sin péndulo fantasma. Un
+   ciclo (0→100%) = DOS pasos (apoyo izq → apoyo der). */
+[data-agt-estado='caminando'] .zlv-cuerpoVida { animation: zlv-waddle 0.52s ease-in-out infinite; }
+@keyframes zlv-waddle {
+  0%   { transform: translateY(1.8%) rotate(-2.4deg) scale(1.01, 0.985); }  /* apoyo IZQ: baja, pesa, rueda a la izq */
+  25%  { transform: translateY(-1.8%) rotate(0deg) scale(0.994, 1.012); }   /* paso: sube, estira */
+  50%  { transform: translateY(1.8%) rotate(2.4deg) scale(1.01, 0.985); }   /* apoyo DER: baja, pesa, rueda a la der */
+  75%  { transform: translateY(-1.8%) rotate(0deg) scale(0.994, 1.012); }   /* paso */
+  100% { transform: translateY(1.8%) rotate(-2.4deg) scale(1.01, 0.985); }
 }
-[data-agt-estado='caminando'] .zlv-cabezaPivote { animation: zlv-cabezaBob 0.56s ease-in-out -0.13s infinite; }
+/* vaivén de CADERA — translación lateral en el período de DOS pasos (1.04s),
+   desfasada del rock para que el peso ruede y no solo se incline. */
+[data-agt-estado='caminando'] .zlv-cuerpoPivote { animation: zlv-hipShift 1.04s ease-in-out infinite; }
+@keyframes zlv-hipShift {
+  0%, 100% { transform: translateX(-1.1%); }
+  50%      { transform: translateX(1.1%); }
+}
+/* la testa cabecea con RETARDO de un cuarto de paso (follow-through). */
+[data-agt-estado='caminando'] .zlv-cabezaPivote { animation: zlv-cabezaBob 0.52s ease-in-out -0.13s infinite; }
 @keyframes zlv-cabezaBob {
-  0%, 100% { transform: translateY(-1.6%) rotate(-0.5deg); }
-  50%      { transform: translateY(2%) rotate(0.5deg); }
+  0%, 100% { transform: translateY(-1.5%) rotate(-1deg); }
+  50%      { transform: translateY(2%) rotate(1deg); }
 }
-[data-agt-estado='caminando'] .zlv-colaPivote { animation: zlv-cola 1.6s ease-in-out infinite alternate; }
-[data-agt-estado='caminando'] .zlv-brazoLapizPivote { animation: zlv-brazo-anda 0.56s ease-in-out infinite; }
-[data-agt-estado='caminando'] .zlv-brazoBrujulaPivote { animation: zlv-brazo-anda 0.56s ease-in-out -0.28s infinite; }
-@keyframes zlv-brazo-anda {
-  0%, 100% { transform: rotate(1.6deg); }
-  50%      { transform: rotate(-1.6deg); }
+/* cola prensil de CONTRAPESO — barre una vez por ciclo completo (2 pasos). */
+[data-agt-estado='caminando'] .zlv-colaPivote { animation: zlv-cola-anda 1.04s ease-in-out infinite; }
+@keyframes zlv-cola-anda {
+  0%, 100% { transform: rotate(-4deg) scale(1); }
+  50%      { transform: rotate(5.5deg) scale(1.02); }
+}
+/* manitos-pata con vaivén en OPOSICIÓN — el swing de brazos del andar. SOLO
+   giro CORTO clavado en el hombro (nada de translate: las piezas se funden con
+   el pecho por su banda de fade; sacarlas del hombro DESTAPA el fade/fondo —
+   la costura blanca que midió el gate 04). El desfase -0.26s = medio paso: una
+   va mientras la otra vuelve. La alternancia FUERTE la carga el rock de peso
+   del cuerpo; esto es el acento de brazos, no el motor. */
+[data-agt-estado='caminando'] .zlv-brazoLapizPivote { animation: zlv-paw-anda 0.52s ease-in-out infinite; }
+[data-agt-estado='caminando'] .zlv-brazoBrujulaPivote { animation: zlv-paw-anda 0.52s ease-in-out -0.26s infinite; }
+@keyframes zlv-paw-anda {
+  0%, 100% { transform: rotate(-1.8deg); }
+  50%      { transform: rotate(1.8deg); }
 }
 
 /* ═══ IDLE-CEREBRO (data-vida) — el repertorio de la zarigüeya. */
@@ -267,6 +319,7 @@
 
 /* ═══ GATES DE LA CASA ═══ */
 [data-tier='bajo'] .zlv-stage,
+[data-tier='bajo'] .zlv-cuerpoVida,
 [data-tier='bajo'] .zlv-cuerpoPivote,
 [data-tier='bajo'] .zlv-cabezaPivote,
 [data-tier='bajo'] .zlv-colaPivote,
@@ -276,7 +329,7 @@
 [data-tier='bajo'] .zlv-brazoBrujulaPivote { animation: none; }
 
 @media (prefers-reduced-motion: reduce) {
-  .zlv-stage, .zlv-cuerpoPivote, .zlv-cabezaGesto, .zlv-cabezaMira, .zlv-cabezaPivote,
+  .zlv-stage, .zlv-cuerpoVida, .zlv-cuerpoPivote, .zlv-cabezaGesto, .zlv-cabezaMira, .zlv-cabezaPivote,
   .zlv-colaPivote, .zlv-orejaIzqPivote, .zlv-orejaDerPivote,
   .zlv-brazoLapizPivote, .zlv-brazoBrujulaPivote,
   .zlv-mandibulaPivote, .zlv-bocaInterior, .zlv-parpado {
