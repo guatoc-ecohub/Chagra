@@ -4,6 +4,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import '../creatures/angelita-missminutes.css';
 import { Angelita } from './Angelita.jsx';
+import { MotasMisticas } from './AngelitaSalida.jsx';
 
 /*
  * AngelitaEntrada — LA ENTRADA TEATRAL de la compañera de Chagra.
@@ -168,6 +169,7 @@ export function AngelitaEntrada({
       style={{ width: size, height: size }}
       data-sol={soleado ? '1' : undefined}
     >
+      <MotasMisticas />
       <span className="ang-entrada__escala">
         <Angelita
           estado={estado}

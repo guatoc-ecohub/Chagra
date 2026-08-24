@@ -1,4 +1,5 @@
 import Angelita from '../visual/agente/Angelita';
+import { useAngelitaPresencia, esPasivo } from '../visual/agente/useAngelitaPresencia';
 
 /**
  * ChagraAgentAvatarAngelita — Angelita (la abeja angelita, Tetragonisca
@@ -60,14 +61,25 @@ export default function ChagraAgentAvatarAngelita({
     gafas = false,
     cejas = undefined,
     title = undefined,
+    // Presencia (pedido operador 2026-08-24): con reaccionaPresencia, Angelita
+    // se mueve a su estado natural (idle vivo 'acompana') cuando la persona
+    // hace mouse over o toca la pantalla — sin pisar un estado activo real.
+    reaccionaPresencia = false,
     ...rest
 }) {
     // `estado` es el contrato rico de Angelita; `state` conserva compatibilidad
     // con los call-sites históricos del avatar.
     const estadoCanonico = estado || ESTADO_DE_STATE[state] || 'acompana';
+    const { despierta, handlers: handlersPresencia } = useAngelitaPresencia({
+        activo: reaccionaPresencia,
+    });
+    // La presencia solo despierta cuando está en un estado pasivo: no interrumpe
+    // 'pensando'/'respondiendo'/'preocupada' porque la persona mueva el mouse.
+    const despiertaNatural = despierta && esPasivo(estadoCanonico);
+    const estadoEfectivo = despiertaNatural ? 'acompana' : estadoCanonico;
     const abeja = (
         <Angelita
-            estado={estadoCanonico}
+            estado={estadoEfectivo}
             size={size}
             direccion={direccion}
             animated={animated}
@@ -80,7 +92,7 @@ export default function ChagraAgentAvatarAngelita({
             energia={energia}
             mundoId={mundoId}
             lineBoil={lineBoil}
-            idleCerebro={idleCerebro}
+            idleCerebro={idleCerebro || despiertaNatural}
             gafas={gafas}
             cejas={cejas}
             className={`${glow ? 'agt-avatar-glow ' : ''}${className}`.trim() || undefined}
@@ -109,6 +121,7 @@ export default function ChagraAgentAvatarAngelita({
                 aria-label={ariaLabel}
                 title={ariaLabel}
                 style={{ background: 'none', border: 'none', padding: 0, cursor: 'pointer', lineHeight: 0 }}
+                {...handlersPresencia}
             >
                 {contenido}
             </button>
