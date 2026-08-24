@@ -23,7 +23,6 @@ import { useTheme, resolveAutoTheme } from '../../hooks/useTheme';
 import { iconForTheme } from './themeIcon';
 import { colibriRealActivo } from '../../config/colibriFlag';
 import { BarbuditoIlustrado, BarbuditoRealLoop } from '../colibri/Barbudito';
-import ChagraAgentAvatar from '../ChagraAgentAvatar';
 // Campana de notificaciones en el header F2 (regresión 2026-07-04): con la flag
 // F2 ON el TopBar legacy (que la montaba) NO se renderiza, así que el home se
 // quedó sin campana. `variant="f2"` es la misma píldora redonda que ya usa
@@ -618,20 +617,12 @@ export default function FincaVivaHero({ onNavigate, onOpenAgent, onGestionar, on
                     )
                   )}
 
-                  {/* fauna sobre la escena. ANGELITA (la abeja agente) vuela
-                      SIEMPRE — es la guía, no ganado; acompaña también la
-                      finca recién empezada ("solo abejita", operador
-                      2026-07-18: el colibrí jubiló del rol de insignia del
-                      agente). La mariposa y la abeja emoji (fauna que
-                      prospera) sólo aparecen cuando la finca está poblada.
-                      Con una ESCENA VIVA de tema activa NO se superpone
-                      fauna: cada escena trae la suya. */}
+                  {/* Fauna decorativa sobre la escena. El compai único vive en
+                      el FAB global, no se duplica dentro del home. */}
                   {!escenaVivaActiva && (
                   <div className="fvh-bichos" aria-hidden="true">
-                    {/* Con la flag VITE_COLIBRI ON (dev) = modo A/B TEMPORAL
-                        de barbuditos de páramo (fauna decorativa, no el
-                        agente). Con la flag OFF (prod), ANGELITA volando —
-                        idle vivo 'acompana' con su cerebro de micro-gestos. */}
+                    {/* Con la flag VITE_COLIBRI ON (dev) = modo A/B temporal
+                        de barbuditos de páramo, fauna decorativa. */}
                     {COLIBRI_REAL ? (
                       <>
                         <span className="fvh-bicho fvh-colibri-ab fvh-colibri-ab-izq" style={{ left: '4%', top: '12%' }}>
@@ -643,11 +634,7 @@ export default function FincaVivaHero({ onNavigate, onOpenAgent, onGestionar, on
                           <span className="fvh-ab-tag">real</span>
                         </span>
                       </>
-                    ) : (
-                      <span className="fvh-bicho fvh-colibri-vuela" style={{ left: '60%', top: '14%' }}>
-                        <ChagraAgentAvatar estado="acompana" size={72} title="Chagra IA" ariaLabel="Chagra IA" />
-                      </span>
-                    )}
+                    ) : null}
                     {poblada && (
                       <>
                         <span className="fvh-bicho" style={{ left: '16%', top: '18%', animationDelay: '.1s' }}>🦋</span>

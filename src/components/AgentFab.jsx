@@ -468,8 +468,8 @@ export default function AgentFab({ onNavigate, pantalla = null }) {
           // R2 "se quita al interactuar": la ocultación vive en el envoltorio
           // para sacar de la pantalla al compai completo y no solo encogerlo.
           filter: silenciado
-            ? 'drop-shadow(0 3px 6px rgba(10, 15, 26, 0.35)) grayscale(0.72) opacity(0.55)'
-            : 'drop-shadow(0 3px 6px rgba(10, 15, 26, 0.45))',
+            ? 'drop-shadow(0 0 3px var(--chagra-fab-rim, rgba(255, 255, 255, 0.72))) drop-shadow(0 3px 6px rgba(10, 15, 26, 0.35)) grayscale(0.72) opacity(0.55)'
+            : 'drop-shadow(0 0 3px var(--chagra-fab-rim, rgba(255, 255, 255, 0.72))) drop-shadow(0 3px 6px rgba(10, 15, 26, 0.45))',
           transform: pressed
             ? 'scale(0.94)'
             : hover

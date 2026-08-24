@@ -23,6 +23,18 @@
    Español de Colombia (tú/usted), sin voseo. Offline-first (CSS puro).
    ========================================================================== */
 
+/* Separación de la tinta del avatar: clara en la piel oscura y sutil en las
+   pieles claras. El componente consume este token desde su filter inline. */
+.chagra-fab {
+  --chagra-fab-rim: rgba(255, 255, 255, 0.72);
+}
+
+[data-theme="nature"] .chagra-fab,
+[data-theme="minimalista"] .chagra-fab,
+[data-theme="verde-vivo"] .chagra-fab {
+  --chagra-fab-rim: rgb(var(--t-bg-rgb, 255 255 255) / 0.88);
+}
+
 /* Plinto + borde del FAB por el acento del tema. El plinto es un radial sutil
    de la superficie del tema; el borde, el acento. */
 .fvh-skin.chagra-fab {
