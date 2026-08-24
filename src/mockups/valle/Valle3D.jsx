@@ -122,6 +122,7 @@ import { CriaturaNocturnaAvatar } from '../../components/dashboard/CriaturasNoct
 import SombrasContacto from './SombrasContacto.jsx';
 import EntsDelValle from './EntsDelValle.jsx';
 import './rotulosValle3D.css';
+import { chipEnRadioMovil, seleccionarIdsPlenos } from './rotulosValle3D.js';
 import {
   MUNDOS_VALLE,
   COSA_DEL_DIA,
@@ -209,7 +210,7 @@ function alturaTerreno(x, z) {
  * @param {import('three').Camera|null|undefined} camera
  * @returns {string[]}
  */
-export function lugaresVisiblesEnFrustum(mundos, camera) {
+function lugaresVisiblesEnFrustum(mundos, camera) {
   if (!Array.isArray(mundos) || !camera) return [];
   const projection = new THREE.Matrix4().multiplyMatrices(
     camera.projectionMatrix,
@@ -1752,9 +1753,15 @@ function RotulosLugares({ mundos, focoId, onEntrar, occluders, controls = null, 
       candidata = previa && cercana && cercana.dc > previa.dc * 0.8 ? previa.id : (cercana?.id ?? null);
     }
     plena.current = candidata;
+    const idsPlenos = seleccionarIdsPlenos({
+      puntos: pts,
+      banda: enBanda,
+      candidata,
+    });
 
     // Anti-colisión: la alerta primero, la plena después, los puntos por
-    // cercanía al centro; quien pisa un espacio ya tomado, cede.
+    // cercanía al centro; quien pisa un espacio ya tomado, cede. La lista de
+    // nombres completos ya viene limitada por banda, incluso si sobra espacio.
     const MARGEN = 8;
     const tomados = [];
     const rectoDe = (x, y, w, h) => ({
@@ -1768,34 +1775,40 @@ function RotulosLugares({ mundos, focoId, onEntrar, occluders, controls = null, 
       const a = enPantalla(anclaAlerta);
       if (!a.detras) tomados.push(rectoDe(a.x, a.y, 64 + COSA_DEL_DIA.titulo.length * 9, 52));
     }
-    const orden = [...pts].sort((a, b) =>
-      a.id === candidata ? -1 : b.id === candidata ? 1 : a.dc - b.dc,
-    );
+    const orden = [...pts].sort((a, b) => {
+      const aPlena = idsPlenos.has(a.id);
+      const bPlena = idsPlenos.has(b.id);
+      if (aPlena !== bPlena) return aPlena ? -1 : 1;
+      return a.dc - b.dc;
+    });
     for (const p of orden) {
       let modo = 'oculto';
       if (p.elegible) {
-        const esPlena = p.id === candidata;
+        const esPlena = idsPlenos.has(p.id);
+        const puedeMostrarChip = chipEnRadioMovil({
+          dc: p.dc,
+          ancho: size.width,
+          esFoco: p.id === focoId,
+        });
         if (enBanda === 'lejos') {
-          /* ESTRATÉGICA (lejos): el mapa AoE — cada rótulo que quepa muestra
-             su nombre completo; el que no cabe cae a punto-chip, luego cede.
-             La finca entera se entiende de un vistazo. */
-          const rp = rectoDe(p.x, p.y, 76 + p.titulo.length * 9, 48);
-          if (!pisa(rp)) {
-            tomados.push(rp);
+          /* ESTRATÉGICA (lejos): solo el portal más cercano al centro conserva
+             nombre. Los demás pasan por chip y, en móvil, por el radio central. */
+          const r = esPlena
+            ? rectoDe(p.x, p.y, 76 + p.titulo.length * 9, 48)
+            : rectoDe(p.x, p.y, 44, 44);
+          if (esPlena && !pisa(r)) {
+            tomados.push(r);
             modo = 'plena';
-          } else {
-            const rq = rectoDe(p.x, p.y, 44, 44);
-            if (!pisa(rq)) {
-              tomados.push(rq);
-              modo = 'punto';
-            }
+          } else if (!esPlena && puedeMostrarChip && !pisa(r)) {
+            tomados.push(r);
+            modo = 'punto';
           }
         } else if (enBanda === 'cerca' && p.id !== focoId) {
           /* DETALLE (cerca): mandan las texturas, los bichos y las matas —
              solo el lugar apuntado conserva un punto-chip (sigue tocable);
              el resto descansa. El mundo activo (focoId) cae al caso de abajo
              y conserva su nombre completo mientras se entra. */
-          if (esPlena) {
+          if (esPlena && puedeMostrarChip) {
             const rq = rectoDe(p.x, p.y, 44, 44);
             if (!pisa(rq)) {
               tomados.push(rq);
@@ -1808,7 +1821,7 @@ function RotulosLugares({ mundos, focoId, onEntrar, occluders, controls = null, 
           const r = esPlena
             ? rectoDe(p.x, p.y, 76 + p.titulo.length * 9, 48)
             : rectoDe(p.x, p.y, 44, 44);
-          if (!pisa(r)) {
+          if (!pisa(r) && (esPlena || puedeMostrarChip)) {
             tomados.push(r);
             modo = esPlena ? 'plena' : 'punto';
           }
@@ -1886,6 +1899,7 @@ function Beacon({ onAlerta, reducedMotion, conLuz = true }) {
   const luz = useRef(null);
   const halo = useRef(null);
   const boton = useRef(null);
+  const [enfocado, setEnfocado] = useState(false);
   useFrame((state) => {
     if (!reducedMotion) {
       const p = (Math.sin(state.clock.elapsedTime * 1.6) + 1) / 2;
@@ -1906,8 +1920,9 @@ function Beacon({ onAlerta, reducedMotion, conLuz = true }) {
       const sx = (_proj.x * 0.5 + 0.5) * state.size.width;
       const sy = (0.5 - _proj.y * 0.5) * state.size.height;
       const BORDE = 10;
-      const ancho = 64 + COSA_DEL_DIA.titulo.length * 9;
-      const alto = 52;
+      const expandido = boton.current.dataset.expandido === '1';
+      const ancho = expandido ? 64 + COSA_DEL_DIA.titulo.length * 9 : 48;
+      const alto = expandido ? 52 : 48;
       const cx = clamp1D(sx, ancho / 2 + BORDE, state.size.width);
       const cy = clamp1D(sy, alto / 2 + BORDE, state.size.height);
       const dx = cx - sx;
@@ -1941,6 +1956,13 @@ function Beacon({ onAlerta, reducedMotion, conLuz = true }) {
           ref={boton}
           type="button"
           className="valle-alerta v3d-alerta"
+          data-expandido={enfocado ? '1' : '0'}
+          onFocus={() => setEnfocado(true)}
+          onBlur={() => setEnfocado(false)}
+          onPointerEnter={() => setEnfocado(true)}
+          onPointerLeave={(e) => {
+            if (e.currentTarget !== document.activeElement) setEnfocado(false);
+          }}
           onClick={(e) => {
             e.stopPropagation();
             onAlerta();
