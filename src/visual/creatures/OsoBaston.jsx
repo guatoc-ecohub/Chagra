@@ -154,6 +154,7 @@ export function OsoBaston({
   const blur = `crt-blur-${uid}`;
   const boil = `crt-boil-${uid}`;
   const pelaje = `osb-pelaje-${uid}`;
+  const panzaLuz = `osb-panza-${uid}`;
   const lunaGrad = `osb-luna-${uid}`;
   const botaGrad = `osb-bota-${uid}`;
   const haloVerde = `osb-halo-verde-${uid}`;
@@ -185,11 +186,20 @@ export function OsoBaston({
     <defs>
       <CreatureFilters glow={glow} blur={blur} />
       {/* PELAJE CON VOLUMEN: sol andino arriba-izquierda → tierra tostada →
-          sombra ventral cálida. Viste mole y cráneo. */}
-      <radialGradient id={pelaje} cx="38%" cy="24%" r="90%">
+          sombra ventral cálida. Viste mole y cráneo. La luz llega más lejos
+          (46%, no 52%) para que el medio pardo domine sobre la sombra: el
+          repaint anti-blob (el cuerpo viejo se hundía en la tinta). */}
+      <radialGradient id={pelaje} cx="36%" cy="22%" r="92%">
         <stop offset="0%" stopColor={P.cuerpoLuz} />
-        <stop offset="52%" stopColor={P.cuerpo} />
+        <stop offset="46%" stopColor={P.cuerpo} />
         <stop offset="100%" stopColor={P.cuerpoSombra} />
+      </radialGradient>
+      {/* LUZ DE PANZA: el plano de luz que abomba la barriga (radial suave,
+          sin filtro: barato). Da la esfera que el gradiente global no alcanza. */}
+      <radialGradient id={panzaLuz}>
+        <stop offset="0%" stopColor={P.cuerpoLuz} stopOpacity="0.5" />
+        <stop offset="60%" stopColor={P.cuerpoLuz} stopOpacity="0.22" />
+        <stop offset="100%" stopColor={P.cuerpoLuz} stopOpacity="0" />
       </radialGradient>
       {/* LA LUNA del pecho con cuerpo propio (no un sticker plano). */}
       <radialGradient id={lunaGrad} cx="30%" cy="35%" r="90%">
@@ -361,6 +371,22 @@ export function OsoBaston({
       <path d={SILUETA_ERGUIDA} fill={`url(#${pelaje})`} stroke={INK} strokeWidth="1.3"
         strokeLinejoin="round" />
 
+      {/* RIM-LIGHT — el contraluz que da FORMA a la mole (repaint anti-blob):
+          sol pleno en el hombro izquierdo, filo tenue que rescata la joroba y
+          la cadera derechas de la sombra, y el plano de luz que abomba la
+          panza. Sutil: modela pelaje, no dibuja neón. */}
+      <g aria-hidden="true">
+        <ellipse cx="-1.6" cy="2.6" rx="4.4" ry="4.8" fill={`url(#${panzaLuz})`} />
+        <g fill="none" strokeLinecap="round" stroke={P.cuerpoRim}>
+          <path d="M -4.8,-6.6 C -6.1,-5.5 -6.7,-3.5 -6.8,-1.6"
+            strokeWidth="0.75" opacity="0.6" />
+          <path d="M 5.0,-6.7 C 6.2,-5.6 6.7,-3.7 6.8,-1.9"
+            strokeWidth="0.6" opacity="0.42" />
+          <path d="M 7.0,2.6 C 6.9,4.6 6.0,6.6 4.4,7.9"
+            strokeWidth="0.55" opacity="0.35" />
+        </g>
+      </g>
+
       {/* RAYADO DE GRABADO (la mirada Humboldt): trazos cortos de buril a
           contraluz en flanco y grupa. Sugiere plancha ilustrada, no delinea. */}
       <g aria-hidden="true" fill="none" strokeLinecap="round">
@@ -401,9 +427,10 @@ export function OsoBaston({
         style={{ transformBox: 'fill-box', transformOrigin: 'top right', animationDelay: '-0.3s' }}>
         <path d="M -4.9,-4.8 C -9.6,-4.9 -11.6,-1.6 -10.3,1.2 C -9.6,2.7 -8.6,3.9 -7.5,4.6"
           stroke={INK} strokeWidth="2.4" fill="none" strokeLinecap="round" />
-        {/* el filo de luz del canto externo (separa el tubo del cuerpo) */}
-        <path d="M -5.2,-5.7 C -9.4,-5.8 -11.3,-2.8 -10.4,0.2" stroke={P.cuerpoLuz}
-          strokeWidth="0.45" fill="none" strokeLinecap="round" opacity="0.55" aria-hidden="true" />
+        {/* el filo de luz del canto externo (separa el tubo del cuerpo;
+            repaint: en rim y más presente — el tubo era negro puro) */}
+        <path d="M -5.2,-5.7 C -9.4,-5.8 -11.3,-2.8 -10.4,0.2" stroke={P.cuerpoRim}
+          strokeWidth="0.55" fill="none" strokeLinecap="round" opacity="0.7" aria-hidden="true" />
         <circle cx="-7.2" cy="4.9" r="1.85" fill={RH_GLOVE} stroke={INK} strokeWidth="0.7" />
         {/* nudillos del guante en jarra */}
         <path d="M -8.2,4.2 C -8.4,4.7 -8.3,5.3 -7.9,5.7" stroke={INK} strokeWidth="0.35"
@@ -422,24 +449,43 @@ export function OsoBaston({
         {/* cráneo ancho de hocico corto */}
         <ellipse cx="0" cy="-12.1" rx={PR.cabezaRx} ry={PR.cabezaRy}
           fill={`url(#${pelaje})`} stroke={INK} strokeWidth="1.2" />
+        {/* contraluz del cráneo en DOS arcos laterales pegados al contorno
+            (repaint: que la cabeza no se funda con el fondo oscuro). Laterales
+            a propósito: la frente queda limpia para las cejas. */}
+        <g fill="none" stroke={P.cuerpoRim} strokeWidth="0.55" strokeLinecap="round"
+          opacity="0.5" aria-hidden="true">
+          <path d="M -4.35,-13.1 C -4.15,-14.0 -3.7,-14.75 -3.05,-15.25" />
+          <path d="M 3.05,-15.2 C 3.7,-14.7 4.15,-13.95 4.35,-13.05" />
+        </g>
 
         {/* ═══ LOS ANTEOJOS crema — ASIMÉTRICOS como el animal real: el
             izquierdo cierra completo; el derecho abre por abajo y DERRAMA su
-            lágrima hacia el hocico. */}
+            lágrima hacia el hocico. Repaint 2026-08-24: aros MÁS GRUESOS
+            (0.7→1.05) y un pelo más amplios para que la marca diagnóstica de
+            la especie lea a 64 px (antes desaparecía en el pelaje). El ojo se
+            dibuja ENCIMA y tapa el canto interno: el anillo queda por fuera. */}
         <g aria-hidden="true" fill="none" strokeLinecap="round">
-          <ellipse cx="-2.0" cy="-12.75" rx={PR.anteojoR * 1.19} ry={PR.anteojoR * 1.32}
-            transform="rotate(-7 -2.0 -12.75)" stroke={P.anteojo} strokeWidth="0.7" />
-          <ellipse cx="2.0" cy="-12.75" rx={PR.anteojoR * 1.19} ry={PR.anteojoR * 1.32}
-            transform="rotate(7 2.0 -12.75)" stroke={P.anteojo} strokeWidth="0.7"
-            strokeDasharray="8.6 2.6" strokeDashoffset="-9.4" />
-          <path d="M 3.25,-11.4 C 3.75,-10.3 3.5,-9.3 2.7,-8.6"
-            stroke={P.anteojo} strokeWidth="0.6" opacity="0.9" />
+          <ellipse cx="-2.0" cy="-12.75" rx={PR.anteojoR * 1.26} ry={PR.anteojoR * 1.38}
+            transform="rotate(-7 -2.0 -12.75)" stroke={P.anteojo} strokeWidth="1.05" />
+          <ellipse cx="2.0" cy="-12.75" rx={PR.anteojoR * 1.26} ry={PR.anteojoR * 1.38}
+            transform="rotate(7 2.0 -12.75)" stroke={P.anteojo} strokeWidth="1.05"
+            strokeDasharray="9.2 2.7" strokeDashoffset="-10.0" />
+          <path d="M 3.4,-11.3 C 3.9,-10.2 3.65,-9.2 2.8,-8.55"
+            stroke={P.anteojo} strokeWidth="0.85" opacity="0.92" />
         </g>
 
-        {/* CEJAS de goma: la izquierda ALZADA (travieso noble de la referencia) */}
-        <g className="oso-cejas" stroke={P.ceja} strokeWidth="0.75" strokeLinecap="round" fill="none" opacity="0.9">
-          <path d="M -3.2,-14.85 C -2.5,-15.5 -1.5,-15.45 -0.9,-15.0" />
-          <path d="M 0.9,-14.75 C 1.5,-15.05 2.5,-15.05 3.1,-14.7" />
+        {/* CEJAS de goma: la izquierda ALZADA (travieso noble de la referencia).
+            Un pelo más arriba que antes: despegadas del aro engrosado (crema
+            sobre crema las borraría) y con sombra fina debajo para leer. */}
+        <g className="oso-cejas" strokeLinecap="round" fill="none">
+          <g stroke={INK} strokeWidth="1.25" opacity="0.6">
+            <path d="M -3.2,-15.4 C -2.5,-16.05 -1.5,-16.0 -0.9,-15.55" />
+            <path d="M 0.9,-15.3 C 1.5,-15.6 2.5,-15.6 3.1,-15.25" />
+          </g>
+          <g stroke={P.ceja} strokeWidth="0.75" opacity="0.9">
+            <path d="M -3.2,-15.4 C -2.5,-16.05 -1.5,-16.0 -0.9,-15.55" />
+            <path d="M 0.9,-15.3 C 1.5,-15.6 2.5,-15.6 3.1,-15.25" />
+          </g>
         </g>
 
         {/* OJOS Cuphead del kit (catchlight, parpadeo, la mirada que reconoce) */}
