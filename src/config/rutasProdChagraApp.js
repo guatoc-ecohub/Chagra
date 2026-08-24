@@ -201,6 +201,24 @@ export const NUCLEO_3D = [
     categoria: '3D',
   },
 
+  // ── La casa por dentro (fix del operador 2026-07-16/07-18) ─────
+  // Tocar la puerta iluminada de la casa en el valle mete ADENTRO en 3D
+  // (fogón, fermentos y la ventana de los mundos). El cableo wire3DNav emite
+  // `casa → casa_adentro`, pero el manifiesto de prod NUNCA registró la ruta
+  // ni el componente en el LAZY_MAP → el hash `#casa_adentro` caía al fallback
+  // `valle3d` y la puerta REBOTABA al mismo valle (auditoría de clic Valle3D
+  // 2026-08-23 #1). Aquí se completa la intención del operador registrando el
+  // interior. (Alternativa descartada: revertir wire3DNav a `casa:
+  // 'vitrina_maestra'` — reintroduciría el bug que el operador ya reportó de
+  // "saltar directo a la vitrina 2D".)
+  {
+    path: 'casa_adentro',
+    alias: ['mundo_casa_adentro', 'casa-adentro'],
+    componente: 'MundoCasaAdentro',
+    importLazy: 'src/visual/mundo3d/casa/MundoCasaAdentro.jsx',
+    categoria: '3D',
+  },
+
   // ── Mundo 3D genérico (mountea cualquier mundoId de mundoData.js) ─
   {
     path: 'mundo',

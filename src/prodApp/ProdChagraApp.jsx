@@ -71,6 +71,10 @@ const LAZY_MAP = {
   MundoEntBosque: lazy(() => import('../visual/mundo3d/bosque/MundoEntBosque.jsx')),
   MontanaMundosCampesino: lazy(() => import('../mockups/MontanaMundosCampesino.jsx')),
   VitrinaMaestraMundos: lazy(() => import('../mockups/VitrinaMaestraMundos.jsx')),
+  // La casa por dentro: la puerta de la casa en el valle 3D metía a
+  // `casa_adentro`, que no estaba en el manifiesto ni aquí → rebotaba al valle
+  // (auditoría de clic Valle3D 2026-08-23 #1). Registrado en NUCLEO_3D.
+  MundoCasaAdentro: lazy(() => import('../visual/mundo3d/casa/MundoCasaAdentro.jsx')),
   MundoScreen: lazy(() => import('../components/MundoScreen.jsx')),
   MundoAbejas3D: lazy(() => import('../mockups/MundoAbejas3D.jsx')),
   MundoGallinero3D: lazy(() => import('../mockups/MundoGallinero3D.jsx')),
@@ -278,6 +282,10 @@ const VISTAS_SIN_SALIDA = new Set([
   'diorama_lecheria',
   'diorama_vergel_frutal',
   'subsuelo', 'mundo3d_micorrizas',
+  // La casa por dentro monta con onSalir=undefined (el shell pasa onBack, que
+  // MundoCasaAdentro no consume) → sin su botón "← El valle" propio. Sin esta
+  // entrada quedaría como trampa: el 🏠 del shell es su única salida al valle.
+  'casa_adentro', 'mundo_casa_adentro', 'casa-adentro',
   'camara_director', 'artesania_andina', 'efectos_funcionales',
   'catalogo_infra', 'colocar_infra', 'gemelos_2d',
   'aliados_finca', 'momento_venta',
