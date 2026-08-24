@@ -7,7 +7,7 @@
  *     (.zgl-colaRig): cola COMPLETA dibujada aparte → enroscado con amplitud
  *     real, imposible para el recorte rígido.
  *  2. LAS POSES PLENAS (.zgl-poses): láminas completas del set (cute /
- *     ver-lupa / muerta / escucha ×4) que entran por CROSSFADE cuando el
+ *     ver-lupa / muerta / crías / escucha ×4) que entran por CROSSFADE cuando el
  *     estado lo pide (data-modo='pose' en la raíz). Cada pose activa lleva
  *     data-activa y su micro-vida propia (respirar, leer, "hacerse la
  *     muerta" respirando a escondidas).
@@ -18,6 +18,8 @@
  *   data-vida=husmea                   → husmeo en la lámina-rig
  *   data-vida=tanatosis                → POSE muerta (el gag firma del set)
  *   data-vida=reposo                   → POSE cute (se voltea de frente)
+ *   data-vida=crias                    → POSE crías al lomo (la firma de
+ *                                        identidad — momento ocasional)
  *   data-agt-estado=listening          → POSE escucha (ciclo 02→03→04, o el
  *                                        close-up 01 en avatar chico)
  *   data-agt-estado=thinking           → POSE ver-lupa (lee con la lupa)
@@ -189,6 +191,16 @@
 @keyframes zgl-cute-respira {
   0%, 100% { transform: scale(1); }
   50%      { transform: scale(1.012); }
+}
+
+/* CRÍAS AL LOMO (momento 'crias'): la firma de identidad — madre en cuatro
+   patas con las 5 crías montadas. Respira más hondo que la cute (carga
+   encima) y se mece apenas: las crías van a caballo, no pegadas. */
+[data-pose='crias'] .zgl-pose[data-activa='si'] { animation: zgl-crias-carga 4.2s ease-in-out infinite; transform-origin: 50% 100%; }
+@keyframes zgl-crias-carga {
+  0%, 100% { transform: scale(1) rotate(0deg); }
+  45%      { transform: scale(1.016) rotate(-0.35deg); }
+  75%      { transform: scale(1.008) rotate(0.25deg); }
 }
 
 /* MUERTA (tanatosis): tendida, lengua afuera… y RESPIRANDO a escondidas —

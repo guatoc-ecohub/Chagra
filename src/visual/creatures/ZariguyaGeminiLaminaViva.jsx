@@ -46,8 +46,11 @@ const JAW_DE_VISEMA = { V1: 0, V2: 0.42, V3: 1, V4: 0.36 };
  *       - POSES PLENAS por crossfade: `listening` → ciclo escucha 02→03→04
  *         (o el close-up 01 en avatar chico); `thinking` → ver-lupa;
  *         idle/'tanatosis' → MUERTA (el gag firma, lengua afuera);
- *         idle/'reposo' → de-frente cute. Ninguna pose se inventa: todas
- *         son láminas del set aprobado.
+ *         idle/'reposo' → de-frente cute; idle/'crias' → LAS CRÍAS AL LOMO
+ *         (la firma de identidad como momento OCASIONAL — orden del
+ *         operador 2026-08-24: NO en la hero; el host puede forzarla en
+ *         momentos positivos vía `vidaForzada='crias'`). Ninguna pose se
+ *         inventa: todas son láminas del set aprobado.
  *
  * QUÉ SÍ ARTICULA (en la lámina-rig): parpadeo real de ambos ojos con ritmo
  * propio; mirada por giro de cabeza; orejas que se mecen; mandíbula con
@@ -81,9 +84,10 @@ const JAW_DE_VISEMA = { V1: 0, V2: 0.42, V3: 1, V4: 0.36 };
  *   corre y lo pasa) — abre la mandíbula al hablar.
  * @param {string} [props.tier]  'bajo' apaga el idle-cerebro y la mirada.
  * @param {string|null} [props.vidaForzada]  fuerza un momento de vida
- *   ('husmea'|'tanatosis'|'reposo') por encima del idle-cerebro — para la
- *   vitrina de verificación y para gags a demanda del host (solo pesa en
- *   idle, igual que el momento natural).
+ *   ('husmea'|'tanatosis'|'reposo'|'crias') por encima del idle-cerebro —
+ *   para la vitrina de verificación y para gags a demanda del host (solo
+ *   pesa en idle, igual que el momento natural). 'crias' es el canal del
+ *   momento POSITIVO: al celebrar, el host la fuerza y aparecen las crías.
  * @param {(e: React.MouseEvent) => void} [props.onClick]
  * @param {(e: React.MouseEvent) => void} [props.onDoubleClick]
  */
@@ -125,8 +129,8 @@ export default function ZariguyaGeminiLaminaViva({
   // ═══ LA VIDA (los MISMOS hooks de Angelita/el jaguar) ═════════════════════
   const ritmoPropio = useRitmoPropio();
   const activoVida = animated && tier !== 'bajo';
-  // Idle-cerebro (husmea/tanatosis/reposo) — SOLO en idle. Aquí husmea vive
-  // en la lámina-rig; tanatosis y reposo se vuelven POSES PLENAS del set.
+  // Idle-cerebro (husmea/tanatosis/reposo/crias) — SOLO en idle. Aquí husmea
+  // vive en la lámina-rig; tanatosis, reposo y crias son POSES PLENAS del set.
   const momentoNatural = useVidaIdle(ZARIGUYA_SLUG, activoVida && enIdle && !vidaForzada);
   // La vida forzada (vitrina/gag a demanda) pesa SOLO en idle, como la natural.
   const momento = enIdle && vidaForzada ? vidaForzada : momentoNatural;
@@ -227,6 +231,7 @@ export default function ZariguyaGeminiLaminaViva({
     if (canon === 'idle') {
       if (momento === 'tanatosis') return 'muerta';
       if (momento === 'reposo') return 'cute';
+      if (momento === 'crias') return 'crias';
     }
     return null;
   })();
