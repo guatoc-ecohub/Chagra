@@ -1,0 +1,58 @@
+Tu cwd es /tmp/cx-idea46-oraculo — es un worktree git del repo chagra, rama codex/idea46-oraculo-territorio, basada en origin/dev.
+Trabajá SOLO dentro de demos/oraculo-territorio/ (creála). No toques ningún otro archivo del repo.
+
+ORDEN DE TRABAJO (importante): escribí PRIMERO oraculo.mjs y selfcheck.mjs, y commiteá temprano.
+Recién después refiná. Dos despachos anteriores de esta misma idea entregaron un directorio VACÍO:
+no repitas eso — el archivo en disco vale más que la exploración.
+NO salgas del cwd: no leas ~/.local/bin, ~/.config, ni nada fuera de este worktree.
+
+# BRIEF codex — idea-46 · Oráculo de territorio unificado (herramienta LOCAL pura)
+
+Construí una **librería Node.js pura (ESM `.mjs`)** en el cwd actual (`demos/oraculo-territorio/`).
+NO red, NO npm install, NO dependencias externas, NO acceso a infra. Todo matemática pura, offline, determinista.
+
+## Qué es
+Un "oráculo de territorio" que unifica coordenadas geográficas con descriptores de zona, para dar
+contexto de lugar a la app Chagra (multi-finca, GPS-aware). Puro cómputo geoespacial.
+
+## API (archivo `oraculo.mjs`, exporta funciones puras)
+1. `encodePlusCode(lat, lng, codeLength=10)` → string — implementá **Open Location Code (Plus Codes)**
+   desde cero (algoritmo público de Google, base-20 alfabeto `23456789CFGHJMPQRVWX`). Sin librerías.
+2. `decodePlusCode(code)` → `{ latCenter, lngCenter, latLo, lngLo, latHi, lngHi }`.
+3. `haversine(a, b)` → metros — distancia gran-círculo entre `{lat,lng}`.
+4. `bearing(a, b)` → grados 0–360 — rumbo inicial de a→b.
+5. `pointInPolygon(point, ring)` → bool — ray-casting puro sobre un anillo `[[lng,lat],...]`.
+6. `zonaDe(point, geojson)` → `{ zonaId, nombre } | null` — recorre features Polygon de un GeoJSON
+   (pasado como argumento, NUNCA hardcodeado) y devuelve la primera zona que contiene el punto.
+7. `oraculo(point, { geojson, referencias })` → objeto unificado:
+   `{ plusCode, zona, referencias: [{ id, nombre, distanciaM, rumbo }] ordenadas por distancia }`.
+   `referencias` = lista de puntos de interés `{id,nombre,lat,lng}` pasada como argumento.
+
+## Datos (leak-safe — REGLA DURA)
+- **NO hardcodees coordenadas reales de Guatoc ni de ninguna finca privada.** Todas las coordenadas
+  van como ARGUMENTO/fixture genérico. Usá coords de DEMO obviamente ficticias (p.ej. plaza pública,
+  o los vectores de prueba OFICIALES del spec OLC que son públicos: `20.375,2.775 → 7FG49Q00+`, etc.).
+- Fixture GeoJSON de demo con 2–3 zonas rectangulares ficticias (`zona-alta`, `zona-media`, `zona-baja`).
+- **NO leas** `~/.config/claude-inbox/`, NO PARD/Julieta/custodia, ningún archivo fuera del cwd.
+
+## Entregables en el cwd
+- `oraculo.mjs` (la librería, funciones puras exportadas).
+- `fixtures.mjs` (GeoJSON demo + referencias demo, todo ficticio).
+- `selfcheck.mjs` — aserciones DURAS: (a) round-trip `decode(encode(lat,lng))` cae dentro de la celda;
+  (b) al menos un vector OLC oficial encodea al código esperado; (c) haversine de un par conocido
+  (~orden de magnitud correcto); (d) `zonaDe` clasifica bien puntos dentro/fuera. Imprime `OK` y
+  `process.exit(0)` si todo pasa; `process.exit(1)` con el fallo si algo rompe.
+- `demo.mjs` — corre `oraculo()` sobre un punto demo e imprime el objeto unificado legible.
+- `README.md` — honesto: "geo determinista puro, sin IA, sin red; coords de demo ficticias".
+
+## Gate de aceptación (lo verifico EN DISCO next tick)
+`node selfcheck.mjs` → exit 0. `node demo.mjs` → imprime el objeto sin error.
+NO git, NO commit, NO push, NO red. Solo escribí archivos en el cwd.
+
+## Cierre (reemplaza el 'NO git' del brief de arriba)
+Cuando selfcheck.mjs dé exit 0 y demo.mjs corra limpio:
+1. git add demos/oraculo-territorio && git commit (conventional commits, en español, scope oraculo)
+2. git push -u origin codex/idea46-oraculo-territorio
+3. gh pr create --base dev --draft --fill, y en el cuerpo PEGÁ LA SALIDA REAL de 'node selfcheck.mjs'
+   y 'node demo.mjs'. No declares verde nada que no hayas corrido.
+Nada de push --force, nada de reset --hard, nada contra main.
