@@ -354,6 +354,24 @@ let lastSpoken = null;
 let lastSpokenOptions = null;
 
 // ──────────────────────────────────────────────────────────────────────────
+// Piper (compai fase 2 — voz local) — backend TTS alternativo
+// ──────────────────────────────────────────────────────────────────────────
+// El compai habla con TTS 100% local. El contrato de red es el mismo que
+// kokoro (POST texto → blob de audio), servido por nginx en el servidor
+// (`/api/piper/tts` proxia al contenedor wyoming-piper en 127.0.0.1:10200).
+// El cliente nunca toca la IP del contenedor: same-origin como todo lo demás.
+// `auto` usa piper cuando su health responde y kokoro si no — la voz nunca
+// se rompe por un proxy ausente.
+export const PIPER_TTS_ENDPOINT = '/api/piper/tts';
+export const PIPER_HEALTH_ENDPOINT = '/api/piper/health';
+export const TTS_BACKENDS = Object.freeze(['auto', 'piper', 'kokoro']);
+
+/** Estado cacheado del health de piper (null = sin medir aún). */
+let piperAvailable = null;
+
+const STORAGE_KEY_BACKEND = 'chagra:tts:backend';
+
+// ──────────────────────────────────────────────────────────────────────────
 // Estado observable de reproducción (TIER 2 #5 — voz punta-a-punta)
 // ──────────────────────────────────────────────────────────────────────────
 // El campesino que casi no lee necesita VER cuándo Chagra está hablando
@@ -413,6 +431,42 @@ export function isAudioPlaying() {
  */
 export function getActiveAudio() {
   return currentKokoroAudio;
+}
+
+// ──────────────────────────────────────────────────────────────────────────
+// Burbuja sincronizada (compai fase 2) — la frase que está SONANDO
+// ──────────────────────────────────────────────────────────────────────────
+// La UI del compai muestra una burbuja de texto que sigue la voz frase por
+// frase. speakSentences publica cada frase justo antes de que su audio
+// arranque y limpia la burbuja al terminar la cadena (o al stop()).
+let currentSentence = null;
+const sentenceListeners = new Set();
+
+function notifySentence(value) {
+  if (currentSentence === value) return;
+  currentSentence = value;
+  for (const cb of sentenceListeners) {
+    try { cb(value); } catch (_) { /* listener roto no tumba el TTS */ }
+  }
+}
+
+/**
+ * Suscripción a la frase en curso de la cadena de speakSentences.
+ * Se dispara con la frase antes de que suene (no con el fin de cada una) y
+ * con `null` cuando la cadena termina o se cancela con stop().
+ *
+ * @param {(frase: string|null) => void} cb
+ * @returns {() => void} unsubscribe
+ */
+export function onSentenceChange(cb) {
+  if (typeof cb !== 'function') return () => {};
+  sentenceListeners.add(cb);
+  return () => sentenceListeners.delete(cb);
+}
+
+/** La frase que está sonando ahora (o null si no hay cadena activa). */
+export function getCurrentSentence() {
+  return currentSentence;
 }
 
 // ──────────────────────────────────────────────────────────────────────────
@@ -531,6 +585,39 @@ async function fetchKokoroBlob(cleanText, voice, format, lang, signal) {
 }
 
 /**
+ * POST a /api/piper/tts con reintentos + backoff, mismo contrato que kokoro
+ * (texto → blob de audio). El proxy del servidor resuelve la voz por su
+ * configuración; `voice` se envía solo si el caller la conoce (nombres de
+ * modelo del contenedor piper, p.ej. `es_MX-claude-high`). Lanza el último
+ * error si agota los reintentos, o AbortError si el signal se abortó.
+ */
+async function fetchPiperBlob(cleanText, voice, format, signal) {
+  let lastErr = null;
+  const body = { text: cleanText, format: format || 'wav' };
+  if (voice) body.voice = voice;
+  for (let attempt = 0; attempt <= KOKORO_MAX_RETRIES; attempt++) {
+    if (signal?.aborted) throw new DOMException('Aborted', 'AbortError');
+    try {
+      const res = await fetch(PIPER_TTS_ENDPOINT, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body),
+        signal,
+      });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      return await res.blob();
+    } catch (e) {
+      if (e?.name === 'AbortError') throw e;
+      lastErr = e;
+      if (attempt < KOKORO_MAX_RETRIES) {
+        await new Promise((r) => setTimeout(r, KOKORO_RETRY_BASE_MS * (attempt + 1)));
+      }
+    }
+  }
+  throw lastErr || new Error('piper TTS falló');
+}
+
+/**
  * Fallback CONSISTENTE cuando kokoro falla definitivamente.
  *
  * Por defecto: SILENCIO (return null) — no cambiamos a la voz robótica del
@@ -547,18 +634,22 @@ function browserFallback(text, options) {
 }
 
 /**
- * Sintetiza una sola frase con Kokoro y devuelve un blob URL listo para Audio.
- * Internamente reusa fetchKokoroBlob (con reintentos).
+ * Sintetiza una sola frase con el backend indicado y devuelve un blob URL
+ * listo para Audio. Internamente reusa fetchKokoroBlob / fetchPiperBlob
+ * (ambos con reintentos).
  *
  * Lanza si agota reintentos; devuelve null si la frase está vacía. El caller
  * (speakSentences) captura el error y decide (por defecto, silencio).
  *
+ * @param {'piper'|'kokoro'} backend — motor que sintetiza la frase.
  * @returns {Promise<string|null>} blob URL o null si frase vacía.
  */
-async function synthesizeSentence(sentence, voice, format, lang, signal) {
+async function synthesizeSentence(sentence, voice, format, lang, signal, backend = 'kokoro') {
   const clean = sanitizeForTTS(sentence);
   if (!clean || clean.length === 0) return null;
-  const blob = await fetchKokoroBlob(clean, voice, format, lang, signal);
+  const blob = backend === 'piper'
+    ? await fetchPiperBlob(clean, voice, format, signal)
+    : await fetchKokoroBlob(clean, voice, format, lang, signal);
   return URL.createObjectURL(blob);
 }
 
@@ -615,9 +706,9 @@ function playSentenceBlob(url, rate) {
  * a "esperar la primera frase" (típicamente <2s).
  *
  * Fallbacks:
- *   - Si Kokoro falla en alguna frase, fallback a speak() Web Speech
+ *   - Si Kokoro/Piper falla en alguna frase, fallback a speak() Web Speech
  *     para esa frase específica (no aborta toda la cadena).
- *   - Si Kokoro falla en LA PRIMERA frase, fallback completo a
+ *   - Si Kokoro/Piper falla en LA PRIMERA frase, fallback completo a
  *     speakKokoro/speak con texto entero (preserva behavior viejo).
  *   - stop() cancela toda la cadena vía AbortController.
  *
@@ -626,8 +717,10 @@ function playSentenceBlob(url, rate) {
  *   - voice (string): id Kokoro voice, default getPreferredVoice().
  *   - format (string): default 'opus'.
  *   - lang (string): default 'es'.
+ *   - backend (string): override 'auto'|'piper'|'kokoro'. Por defecto
+ *     `resolverBackend()` (piper si responde, kokoro si no).
  * @returns {Promise<boolean>} true si al menos una frase se reprodujo
- *   con éxito (Kokoro o Web Speech fallback), false si todo falló.
+ *   con éxito (Kokoro/Piper o Web Speech fallback), false si todo falló.
  */
 export async function speakSentences(text, options = {}) {
   // DR-LANG-1: guarda defensiva anti-voseo. Idempotente; no afecta texto
@@ -645,6 +738,9 @@ export async function speakSentences(text, options = {}) {
   // suena por el fallback silencioso del servidor (orden operador 2026-07-09).
   const servableVoice = toServableVoice(voice);
 
+  // Motor de la cadena: 'auto' resuelve piper cuando su health responde.
+  const backend = await resolverBackend(options.backend);
+
   stop();
   sentenceQueueCancelled = false;
   sentenceQueueController = new AbortController();
@@ -658,10 +754,12 @@ export async function speakSentences(text, options = {}) {
   const sentences = splitIntoSentences(text);
   if (sentences.length === 0) return false;
 
-  // Si solo hay 1 frase corta, no vale la pena el pipeline — usar
-  // speakKokoro directo (que también hace fallback Web Speech internamente).
+  // Si solo hay 1 frase corta, no vale la pena el pipeline — usar el speak
+  // del backend directo (que también hace fallback al otro motor).
   if (sentences.length === 1 && sentences[0].length < MIN_SENTENCE_CHARS * 2) {
-    const r = await speakKokoro(text, options);
+    const r = backend === 'piper'
+      ? await speakPiper(text, options)
+      : await speakKokoro(text, options);
     return r !== null;
   }
 
@@ -672,7 +770,7 @@ export async function speakSentences(text, options = {}) {
   const prefetch = (idx) => {
     if (idx >= sentences.length || sentenceQueueCancelled) return null;
     return synthesizeSentence(
-      sentences[idx], servableVoice, format, lang, sentenceQueueController.signal
+      sentences[idx], servableVoice, format, lang, sentenceQueueController.signal, backend
     ).catch((e) => {
       if (e?.name !== 'AbortError') {
         console.warn('[TTS streaming] sentence prefetch failed:', e.message);
@@ -687,10 +785,12 @@ export async function speakSentences(text, options = {}) {
     prefetched = null;
   }
 
-  // Si la primera frase falla en Kokoro, fallback total al texto entero
-  // por speakKokoro (que internamente cae a Web Speech). Preserva UX vieja.
+  // Si la primera frase falla en el backend elegido, fallback total al texto
+  // entero por speakKokoro (que internamente cae a Web Speech). Preserva UX
+  // vieja y mantiene la voz viva aunque piper esté caído.
   if (!prefetched && !sentenceQueueCancelled) {
     const r = await speakKokoro(text, options);
+    if (r === null) notifySentence(null);
     return r !== null;
   }
 
@@ -707,6 +807,9 @@ export async function speakSentences(text, options = {}) {
       const next = i + 1 < sentences.length ? prefetch(i + 1) : null;
       if (prefetched) {
         try {
+          // Burbuja sincronizada: la frase que arranca a sonar es la que se
+          // muestra. El null lo emite el finally (fin de cadena) o stop().
+          notifySentence(sentences[i]);
           await playSentenceBlob(prefetched, rate);
           firstFrameSucceeded = true;
         } catch (e) {
@@ -725,6 +828,7 @@ export async function speakSentences(text, options = {}) {
     if (sentenceQueueController === myController) {
       sentenceQueueController = null;
       notifySpeaking(false);
+      notifySentence(null);
     }
   }
   return firstFrameSucceeded;
@@ -866,6 +970,7 @@ export function stop() {
     currentKokoroUrl = null;
   }
   notifySpeaking(false);
+  notifySentence(null);
 }
 
 export function pause() {
@@ -901,6 +1006,154 @@ export async function isKokoroAvailable() {
   return kokoroAvailable;
 }
 
+// ──────────────────────────────────────────────────────────────────────────
+// Política de backend TTS (compai fase 2)
+// ──────────────────────────────────────────────────────────────────────────
+// Dos motores 100% locales: kokoro (el histórico del PWA) y piper (el del
+// compai). `resolverBackend` decide cuál suena: 'piper' y 'kokoro' fuerzan,
+// 'auto' mide el health de piper y cae a kokoro si el proxy no responde —
+// la voz nunca se pierde por un backend ausente.
+
+/**
+ * Lee la preferencia de backend persistida ('auto' por defecto).
+ * @returns {'auto'|'piper'|'kokoro'}
+ */
+export function getTtsBackend() {
+  try {
+    if (typeof localStorage === 'undefined') return 'auto';
+    const stored = localStorage.getItem(STORAGE_KEY_BACKEND);
+    return TTS_BACKENDS.includes(stored) ? stored : 'auto';
+  } catch (_) {
+    return 'auto';
+  }
+}
+
+/**
+ * Persiste la preferencia de backend TTS. Devuelve true si guardó.
+ * @param {'auto'|'piper'|'kokoro'} backend
+ */
+export function setTtsBackend(backend) {
+  if (!TTS_BACKENDS.includes(backend)) return false;
+  try {
+    if (typeof localStorage === 'undefined') return false;
+    localStorage.setItem(STORAGE_KEY_BACKEND, backend);
+    return true;
+  } catch (_) {
+    return false;
+  }
+}
+
+/**
+ * Health de piper, cacheado hasta que cambie (una sola sonda por sesión).
+ * Nunca lanza: sin proxy ni contenedor → false, y 'auto' cae a kokoro.
+ */
+export async function isPiperAvailable() {
+  if (piperAvailable !== null) return piperAvailable;
+  try {
+    const res = await fetch(PIPER_HEALTH_ENDPOINT, { method: 'GET', signal: AbortSignal.timeout(3000) });
+    piperAvailable = res.ok;
+  } catch {
+    piperAvailable = false;
+  }
+  return piperAvailable;
+}
+
+/**
+ * Resuelve el motor que va a sonar para una llamada.
+ *
+ * @param {'auto'|'piper'|'kokoro'} [pedido] — override puntual de la
+ *   preferencia persistida. Default: `getTtsBackend()`.
+ * @returns {Promise<'piper'|'kokoro'>} — nunca 'auto' a la salida.
+ */
+export async function resolverBackend(pedido) {
+  const eleccion = pedido || getTtsBackend();
+  if (eleccion === 'piper') {
+    try { return (await isPiperAvailable()) ? 'piper' : 'kokoro'; } catch { return 'kokoro'; }
+  }
+  if (eleccion === 'kokoro') return 'kokoro';
+  try { return (await isPiperAvailable()) ? 'piper' : 'kokoro'; } catch { return 'kokoro'; }
+}
+
+/**
+ * Habla un texto completo con piper. Mismo contrato que speakKokoro: guarda
+ * voseo, limpia markdown, reintenta ante blips y, si piper falla tras
+ * reintentos, cae a speakKokoro (nunca a la voz robótica del navegador).
+ *
+ * @param {string} text
+ * @param {Object} [options]
+ * @param {string} [options.voice] — nombre de modelo piper del contenedor
+ *   (p.ej. `es_MX-claude-high`). Si no se pasa, el proxy usa su default.
+ * @param {string} [options.format] — formato de audio del proxy (default 'wav').
+ * @param {number} [options.rate]
+ * @returns {Promise<HTMLAudioElement|null>}
+ */
+export async function speakPiper(text, options = {}) {
+  const {
+    voice = null,
+    format = 'wav',
+    rate = getPreferredRate(),
+  } = options;
+
+  stop();
+
+  // DR-LANG-1: guarda defensiva anti-voseo. Idempotente.
+  text = applyVoseoGuard(text);
+
+  const cleanText = sanitizeForTTS(text);
+
+  // Burbuja sincronizada: cualquier speak publica su texto como frase en
+  // curso (la limpia stop()/onended). Cubre el path directo, no solo la
+  // cadena de speakSentences.
+  notifySentence(text);
+
+  // Task #122: guardar el texto original (no sanitizado) para replayLast().
+  if (typeof text === 'string' && text.trim().length > 0) {
+    lastSpoken = text;
+    lastSpokenOptions = { ...options };
+  }
+
+  try {
+    const blob = await fetchPiperBlob(cleanText, voice, format, null);
+    const url = URL.createObjectURL(blob);
+    const audio = new Audio(url);
+    audio.playbackRate = clampRate(rate);
+
+    currentKokoroUrl = url;
+    currentKokoroAudio = audio;
+
+    audio.onended = () => {
+      if (currentKokoroUrl === url) {
+        URL.revokeObjectURL(currentKokoroUrl);
+        currentKokoroAudio = null;
+        currentKokoroUrl = null;
+      }
+      notifySpeaking(false);
+      notifySentence(null);
+    };
+    audio.onerror = () => {
+      notifySpeaking(false);
+      notifySentence(null);
+    };
+
+    await audio.play();
+    notifySpeaking(true);
+    return audio;
+  } catch (e) {
+    if (e?.name === 'AbortError') {
+      // stop() del operador: no es un fallo, no hacer fallback.
+      notifySpeaking(false);
+      notifySentence(null);
+      return null;
+    }
+    // Piper falló tras reintentos: cae a kokoro (la voz natural que el PWA
+    // ya conocía), nunca a la voz robótica del navegador.
+    console.warn('[TTS] Piper falló tras reintentos, cae a Kokoro:', e?.message || e);
+    notifySpeaking(false);
+    notifySentence(null);
+    return speakKokoro(text, options);
+  }
+}
+
 export async function speakKokoro(text, options = {}) {
   // Task #124: si el caller NO pasa `voice` explícito, usar la voz
   // preferida del operador desde localStorage (fallback a DEFAULT_KOKORO_VOICE
@@ -924,6 +1177,10 @@ export async function speakKokoro(text, options = {}) {
   // **negrita**, "guion item" para viñetas, etc. (operador 2026-05-23,
   // task #125: "como peye no?").
   const cleanText = sanitizeForTTS(text);
+
+  // Burbuja sincronizada (compai fase 2): el texto que arranca a sonar es el
+  // que la UI muestra; lo limpia stop()/onended.
+  notifySentence(text);
 
   // Task #122: guardar el texto original (no sanitizado) para replayLast()
   // — replayLast vuelve a llamar speakKokoro que re-sanitiza idempotente.
@@ -951,8 +1208,12 @@ export async function speakKokoro(text, options = {}) {
         currentKokoroUrl = null;
       }
       notifySpeaking(false);
+      notifySentence(null);
     };
-    audio.onerror = () => notifySpeaking(false);
+    audio.onerror = () => {
+      notifySpeaking(false);
+      notifySentence(null);
+    };
 
     await audio.play();
     notifySpeaking(true);
@@ -1115,9 +1376,15 @@ if (typeof window !== 'undefined') {
       // window no tiene tipada la prop de test → cast puntual (irreducible).
       /** @type {any} */ (window).__ttsE2E = {
         speakKokoro,
+        speakPiper,
         speakSentences,
         getBrowserVoiceFallback,
         setBrowserVoiceFallback,
+        resolverBackend,
+        getTtsBackend,
+        setTtsBackend,
+        isPiperAvailable,
+        onSentenceChange,
       };
     }
   } catch (_) {
@@ -1125,9 +1392,16 @@ if (typeof window !== 'undefined') {
   }
 }
 
+/** Hooks de test (nunca en producción): resetear cachés de módulo. */
+export const __TEST__ = {
+  resetPiperHealthCache() { piperAvailable = null; },
+  resetKokoroHealthCache() { kokoroAvailable = null; },
+};
+
 export default {
   speak,
   speakKokoro,
+  speakPiper,
   speakXTTS,
   speakSentences,
   splitIntoSentences,
@@ -1138,11 +1412,21 @@ export default {
   isPaused,
   isSupported,
   isKokoroAvailable,
+  // Compai fase 2: backend TTS local (piper) y política de selección.
+  isPiperAvailable,
+  resolverBackend,
+  getTtsBackend,
+  setTtsBackend,
+  PIPER_TTS_ENDPOINT,
+  PIPER_HEALTH_ENDPOINT,
   // TIER 2 #5: estado observable de reproducción para la UI "hablando".
   onSpeakingChange,
   isAudioPlaying,
   // Lip-sync 2D: el <audio> activo para colgar un AnalyserNode encima.
   getActiveAudio,
+  // Burbuja sincronizada (compai fase 2): la frase que está sonando.
+  onSentenceChange,
+  getCurrentSentence,
   getVoices,
   getSpanishVoice,
   replayLast,
