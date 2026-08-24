@@ -250,6 +250,20 @@ export {
   RH_EASE, RH_LINE_BOIL, RH_PERIODOS, RH_REGISTRO, esRubberhose,
 } from './rubberhoseSpec.js';
 
+/* API composable de comportamiento: una criatura nueva puede reutilizar
+   gestos, clima, idle, lip-sync, política y transición sin importar cada
+   primitivo por separado. */
+export {
+  aplicarComportamientos,
+  aplicarGesto,
+  celebrar,
+  reposar,
+  senalar,
+  respirar,
+  resolverPoliticaR1R5,
+  configurarTransicion,
+} from './comportamientos/index.js';
+
 import AbejaAngelita from './AbejaAngelita.jsx';
 import Colibri from './Colibri.jsx';
 /* OsoAndino y OsoAnteojos NO se importan acá a propósito: están archivados y
