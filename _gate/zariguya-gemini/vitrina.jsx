@@ -14,6 +14,7 @@ const CASOS = [
   { rotulo: 'thinking (ver-lupa)', props: { estado: 'thinking', size: 220 } },
   { rotulo: 'tanatosis (muerta)', props: { estado: 'idle', vidaForzada: 'tanatosis', size: 220 } },
   { rotulo: 'reposo (cute)', props: { estado: 'idle', vidaForzada: 'reposo', size: 220 } },
+  { rotulo: 'crías al lomo (momento)', props: { estado: 'idle', vidaForzada: 'crias', size: 220 } },
   { rotulo: 'listening 80px (close-up)', props: { estado: 'listening', size: 80 } },
   { rotulo: 'caminando', props: { estado: 'caminando', size: 220 } },
 ];

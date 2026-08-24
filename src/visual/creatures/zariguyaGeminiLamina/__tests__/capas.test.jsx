@@ -84,8 +84,8 @@ describe('anatomia.js — los locks NUEVOS del set Gemini', () => {
     expect(Math.abs(px - COLA.cut.px)).toBeLessThan(30);
   });
 
-  it('POSES: el manifiesto trae las 7 láminas del set con dimensiones reales', () => {
-    const claves = ['cute', 'verlupa', 'muerta', 'escucha-01', 'escucha-02', 'escucha-03', 'escucha-04'];
+  it('POSES: el manifiesto trae las 8 láminas del set con dimensiones reales', () => {
+    const claves = ['cute', 'verlupa', 'muerta', 'crias', 'escucha-01', 'escucha-02', 'escucha-03', 'escucha-04'];
     expect(Object.keys(POSES).sort()).toEqual(claves.sort());
     for (const k of claves) {
       expect(POSES[k].archivo).toMatch(/^zariguya-gemini-/);
@@ -119,6 +119,20 @@ describe('ZariguyaGeminiLaminaViva — contrato observable (jsdom = degradación
     // …y la hero plana está montada de respaldo.
     const plana = container.querySelector(`img[src="/compai/laminas/zariguya-gemini-hero.png"]`);
     expect(plana).toBeTruthy();
+  });
+
+  it("vidaForzada='crias' viaja como data-vida en idle SIN romper la honestidad de pose", () => {
+    // La firma de identidad como momento especial (operador 2026-08-24): en
+    // jsdom el PNG jamás carga, así que la pose NO entra (modo lamina) pero
+    // el momento sí queda declarado — el host y el CSS lo leen de data-vida.
+    const { container } = render(
+      <ZariguyaGeminiLaminaViva estado="idle" vidaForzada="crias" size={220} />,
+    );
+    const raiz = container.querySelector('div[data-creature="zariguya"]');
+    expect(raiz.getAttribute('data-vida')).toBe('crias');
+    expect(raiz.getAttribute('data-modo')).toBe('lamina'); // nunca media pose
+    // …y el PNG de la pose está montado en el plano de poses, precargando.
+    expect(container.querySelector('img[data-pose-key="crias"]')).toBeTruthy();
   });
 
   it('con handlers expone botón real (teclado + lector de pantalla)', () => {
