@@ -42,7 +42,7 @@ import SyncProgressIndicator from './components/common/SyncProgressIndicator';
 import useOllamaWarmStore from './store/useOllamaWarmStore';
 import { syncAgentTelemetry } from './services/agentTelemetrySync';
 import { syncUsageTelemetry } from './services/usageTelemetrySync';
-import useThemeBackgroundStore, { getBackgroundSrc } from './store/useThemeBackgroundStore';
+import useThemeBackgroundStore, { getBackgroundSrc, esGradiente } from './store/useThemeBackgroundStore';
 import useAlertStore from './store/useAlertStore';
 // PERF-1 (medido 2026-07): `cropAlertEngine.js` → `farmProcessCache.js` →
 // `catalogDB.js` (~217KB + WASM sqlite). Un import ESTÁTICO aquí lo metía en
@@ -1649,10 +1649,20 @@ export default function App() {
   const selectedBackground = useThemeBackgroundStore((s) => s.selected);
   useEffect(() => {
     const src = getBackgroundSrc(selectedBackground);
-    // Precargar solo el full elegido para que el cambio sea inmediato.
-    const img = new Image();
-    img.src = src;
-    document.body.style.setProperty('--app-bg-image', `url('${src}')`);
+    // Los fondos del catálogo pueden ser GRADIENTES CSS (no rutas de foto,
+    // ver useThemeBackgroundStore): un gradiente NO se precarga con
+    // new Image() (el navegador lo pedía como URL → 404 en consola en TODAS
+    // las pantallas, y tumbaba el gate visual) ni se envuelve en url('…')
+    // (variable CSS inválida). Se usa tal cual, como hacen los demás
+    // consumidores (esGradiente).
+    if (esGradiente(src)) {
+      document.body.style.setProperty('--app-bg-image', src);
+    } else {
+      // Precargar solo el full elegido para que el cambio sea inmediato.
+      const img = new Image();
+      img.src = src;
+      document.body.style.setProperty('--app-bg-image', `url('${src}')`);
+    }
     // La foto de biodiversidad elegida debe VERSE en bio-punk en todas las
     // pantallas, incluso cuando coincide con el default (operador 2026-06-09:
     // "no se ve la imagen de fondo en biopunk que es donde se debe ver").
