@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import {
   CARPETA_LAMINA, ARCHIVO_LAMINA, ANCHO, ALTO,
   CABEZA, OREJA_IZQ, OREJA_DER, MANDIBULA, BOCA,
-  BRAZO_LAPIZ, BRAZO_BRUJULA, CUERPO_PIVOTE,
+  BRAZO_LAPIZ, BRAZO_BRUJULA, CUERPO_PIVOTE, CUERPO_VIDA_PIVOTE,
   PARTE_COLA, POSES, ESCUCHA_CICLO, ESCUCHA_PASO_MS, UMBRAL_CLOSEUP,
 } from './zariguyaGeminiLamina/anatomia.js';
 import { hornearZariguyaGemini } from './zariguyaGeminiLamina/capas.js';
@@ -55,7 +55,11 @@ const JAW_DE_VISEMA = { V1: 0, V2: 0.42, V3: 1, V4: 0.36 };
  * QUÉ SÍ ARTICULA (en la lámina-rig): parpadeo real de ambos ojos con ritmo
  * propio; mirada por giro de cabeza; orejas que se mecen; mandíbula con
  * lip-sync sobre la sonrisa abierta; el lápiz que gesticula; la cola de rig
- * que SE ENROSCA de verdad; husmeo del idle-cerebro.
+ * que SE ENROSCA de verdad; husmeo del idle-cerebro; y al CAMINAR el
+ * BAMBOLEO plantígrado portado de la hermana (`.zgl-cuerpoVida`: rock de
+ * peso pie-a-pie + cadera + manitos en oposición + cola de contrapeso —
+ * las patas traseras no son pieza: la alternancia se LEE del peso que
+ * rueda, lección "3-4 patas" del jaguar).
  *
  * HONESTIDAD (lo que el material NO da — no se disfraza):
  *   · Los cambios de pose son CROSSFADE entre dibujos (no interpolación de
@@ -308,6 +312,16 @@ export default function ZariguyaGeminiLaminaViva({
 
         {/* ═══ PLANO 1: la LÁMINA-RIG articulada (hero horneada). ═══ */}
         <div className="zgl-lamina" style={{ display: listo ? 'block' : 'none' }}>
+          {/* VIDA DE CUERPO al andar — hermano del `.zlv-cuerpoVida` del
+              waddle auditado: al CAMINAR corre el BAMBOLEO plantígrado
+              (rock de peso pie-a-pie + bob + squash) plantado en los APOYOS
+              (anatomia.CUERPO_VIDA_PIVOTE). Envuelve al pivote de respiro/
+              cadera para que ambas capas COMPONGAN sin pisarse (mismo truco
+              que la cabeza anidada). En idle no anima (CSS). */}
+          <div
+            className={cls('zgl-cuerpoVida')}
+            style={{ position: 'absolute', inset: 0, transformOrigin: pctOf(CUERPO_VIDA_PIVOTE) }}
+          >
           <div
             className={cls('zgl-cuerpoPivote')}
             style={{ position: 'absolute', inset: 0, transformOrigin: pctOf(CUERPO_PIVOTE) }}
@@ -389,6 +403,7 @@ export default function ZariguyaGeminiLaminaViva({
                 </div>
               </div>
             </div>
+          </div>
           </div>
         </div>
 
