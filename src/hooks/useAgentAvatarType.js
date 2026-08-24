@@ -47,7 +47,7 @@ export const DEFAULT_AVATAR_TYPE = 'angelita';
 // en WelcomeStatsHero, ChatBubble, AgentHero, InsightProactivoCard, etc.) —
 // este mapa es SOLO para los pocos textos que sí necesitan el nombre propio.
 export const AVATAR_NOMBRE = {
-    angelita: 'Angelita',
+    angelita: 'Abejita',
     zariguya: 'su zarigüeya',
     jaguar: 'el jaguar',
     'oso-baston': 'el oso de anteojos',

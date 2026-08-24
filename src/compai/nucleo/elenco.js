@@ -32,7 +32,7 @@ export const TAMANO_CANONICO = 14.2;
  * cruce (ítem #8 del listado). Un slug fuera de esta tabla no se acepta.
  */
 export const ELENCO = {
-  angelita: { nombre: 'Angelita', gentilicio: 'la abeja de la casa', enPWA: true },
+  angelita: { nombre: 'Abejita', gentilicio: 'la abeja de la casa', enPWA: true },
   // El MAÍZ se retiró del selector el 2026-08-14 (unificación compAI a los 7
   // canónicos: angelita/jaguar/oso/zariguya/luciernaga/chivito-punk/guacamaya
   // — decisión del operador). Ya NO es una entrada del elenco: quien lo tenga
