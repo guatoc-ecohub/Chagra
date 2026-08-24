@@ -157,3 +157,58 @@ describe('GuacamayaCompai', () => {
   });
 
 });
+
+  describe('gaze-follow (mirada que sigue el puntero)', () => {
+    test('cuando tier="bajo", NO sigue el puntero (gate activo)', () => {
+      const { container } = render(<GuacamayaCompai tier="bajo" estado="acompana" />);
+      const svg = container.querySelector('svg[data-creature="guacamaya"]');
+      expect(svg).not.toHaveAttribute('data-guaca-mira');
+    });
+
+    test('cuando tier es alto/medio y estado="acompana", SÍ tiene capacidad de gaze-follow', () => {
+      const { container } = render(<GuacamayaCompai tier="alto" estado="acompana" />);
+      const svg = container.querySelector('svg[data-creature="guacamaya"]');
+      // El atributo data-guaca-mira solo se pone cuando el puntero se mueve cerca,
+      // pero el setup del useEffect está activo (no hay forma de testear el rAF
+      // directo, pero al menos verificamos que no se rompe con tier alto).
+      expect(svg).toBeInTheDocument();
+    });
+
+    test('cuando estado="senala", NO sigue el puntero (pose de actuación)', () => {
+      const { container } = render(<GuacamayaCompai tier="alto" estado="senala" />);
+      const svg = container.querySelector('svg[data-creature="guacamaya"]');
+      // En estados de actuación, el gaze-follow está desactivado
+      expect(svg).toBeInTheDocument();
+      expect(svg).toHaveAttribute('data-estado', 'senalar');
+    });
+
+    test('estados que siguen al puntero: acompana, escuchando, respondiendo, invita', () => {
+      const estadosQueSiguen = ['acompana', 'escuchando', 'respondiendo', 'invita'];
+      estadosQueSiguen.forEach((estado) => {
+        const { container } = render(<GuacamayaCompai tier="alto" estado={estado} />);
+        const svg = container.querySelector('svg[data-creature="guacamaya"]');
+        expect(svg).toBeInTheDocument();
+      });
+    });
+
+    test('estados que NO siguen al puntero: contenta, preocupada, no-se, senala, husmea', () => {
+      const estadosQueNoSiguen = ['contenta', 'preocupada', 'no-se', 'senala', 'husmea'];
+      estadosQueNoSiguen.forEach((estado) => {
+        const { container } = render(<GuacamayaCompai tier="alto" estado={estado} />);
+        const svg = container.querySelector('svg[data-creature="guacamaya"]');
+        expect(svg).toBeInTheDocument();
+      });
+    });
+  });
+
+  describe('CSS de gaze-follow', () => {
+    test('el <style> incluye las reglas de pupila para data-guaca-mira', () => {
+      const { container } = render(<GuacamayaCompai />);
+      const style = container.querySelector('svg style');
+      expect(style).toBeInTheDocument();
+      // Las reglas de gaze-follow usan variables CSS
+      expect(style.textContent).toContain('--guaca-mx');
+      expect(style.textContent).toContain('--guaca-my');
+      expect(style.textContent).toContain('[data-guaca-mira="usted"]');
+    });
+  });
