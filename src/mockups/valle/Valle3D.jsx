@@ -29,6 +29,9 @@ import {
   Html, Float, Stars, OrbitControls, Detailed, Instances, Instance,
 } from '@react-three/drei';
 import * as THREE from 'three';
+import { pegarAlTerreno } from '../../../lib3d/locomocion/snakey.js';
+import { crearSuperficieErosionada } from '../../../lib3d/terrain/superficie.js';
+import { crearClimaVolumetrico } from '../../../lib3d/terrain/clima.js';
 import { perfilDeTier } from '../../visual/mundo3d/deviceTier.js';
 import CamaraDirector from '../../visual/mundo3d/escenas/CamaraDirector.jsx';
 import DirectorValle from './DirectorValle.jsx';
@@ -279,7 +282,7 @@ function colorSueloEnZ(z, alto, nocturno, out) {
       según el piso térmico de cada franja (páramo frío arriba → tierra caliente
       abajo). El color sale de PISOS_TERMICOS: franjas de altitud legibles, con
       la cresta apenas más clara para dar relieve. ── */
-function Terreno({ nocturno, innerRef, perfil }) {
+function Terreno({ nocturno, innerRef, perfil, superficie }) {
   const seg = perfil.segmentosTerreno;
   const geo = useMemo(() => {
     const g = new THREE.PlaneGeometry(34, 34, seg, seg);
@@ -290,7 +293,7 @@ function Terreno({ nocturno, innerRef, perfil }) {
     for (let i = 0; i < pos.count; i++) {
       const x = pos.getX(i);
       const z = pos.getZ(i);
-      const y = alturaTerreno(x, z);
+      const y = superficie.heightAt(x, z);
       pos.setY(i, y);
       const subida = THREE.MathUtils.smoothstep(-z, -8, 11) * 5.4;
       const alto = THREE.MathUtils.clamp((y - subida + 0.3) / 0.6, 0, 1);
@@ -302,7 +305,7 @@ function Terreno({ nocturno, innerRef, perfil }) {
     g.setAttribute('color', new THREE.BufferAttribute(colores, 3));
     g.computeVertexNormals();
     return g;
-  }, [nocturno, seg]);
+  }, [nocturno, seg, superficie]);
   return (
     <mesh ref={innerRef} geometry={geo} receiveShadow={perfil.sombras}>
       {perfil.materialRico ? (
@@ -394,7 +397,7 @@ function Cordillera({ color, innerRef, perfil }) {
       LO QUE MÁS BRILLA del suelo (el reflejo de la luna sobre el agua, la
       firma del día-por-noche): emissive tenue que además guía el ojo ladera
       abajo — el agua se vuelve el sendero luminoso del valle dormido. ── */
-function Quebrada({ color, viva, perfil, nocturno = false }) {
+function Quebrada({ color, viva, perfil, nocturno = false, alturaDe = alturaTerreno }) {
   const ref = useRef(null);
   useFrame((state) => {
     // `ref` apunta al material (no al mesh): animar su opacidad directamente.
@@ -413,12 +416,12 @@ function Quebrada({ color, viva, perfil, nocturno = false }) {
       [1.6, 1.8],
       [2.6, 5.4],
       [3.6, 8],
-    ].map(([x, z]) => new THREE.Vector3(x, alturaTerreno(x, z) + 0.06, z));
+    ].map(([x, z]) => new THREE.Vector3(x, alturaDe(x, z) + 0.06, z));
     const curve = new THREE.CatmullRomCurve3(pts);
     // Frugal: menos anillos/segmentos — la cinta se lee igual desde lejos.
     const g = new THREE.TubeGeometry(curve, rico ? 80 : 48, 0.34, rico ? 7 : 5, false);
     return g;
-  }, [rico]);
+  }, [alturaDe, rico]);
   return (
     <mesh geometry={geo}>
       {rico ? (
@@ -1246,13 +1249,13 @@ function LandmarkGeom({ tipo, tinte, reducedMotion, q = 1, forma = null }) {
       pieza. No confundir con <VegetacionInstanciada/> (abajo): esa es la
       silueta SIMPLIFICADA de los tiers frugales (unidades genéricas +
       color por instancia); esta conserva el detalle geométrico pleno. ── */
-function MatasFieles({ nocturno }) {
+function MatasFieles({ nocturno, alturaDe = alturaTerreno }) {
   const matas = useMemo(
     () => VEGETACION_PISOS.map((v) => {
       const [x, z] = v.pos;
-      return { x, y: alturaTerreno(x, z), z, tipo: v.tipo };
+      return { x, y: alturaDe(x, z), z, tipo: v.tipo };
     }),
-    [],
+    [alturaDe],
   );
   const frailejones = useMemo(() => matas.filter((m) => m.tipo === 'frailejon'), [matas]);
   const papas = useMemo(() => matas.filter((m) => m.tipo === 'papa'), [matas]);
@@ -1372,14 +1375,14 @@ const SILUETAS_MATA = {
   },
 };
 
-function VegetacionInstanciada({ nocturno, cada }) {
+function VegetacionInstanciada({ nocturno, cada, alturaDe = alturaTerreno }) {
   const matas = useMemo(
     () =>
       VEGETACION_PISOS.filter((_, i) => i % cada === 0).map((v) => {
         const [x, z] = v.pos;
-        return { x, y: alturaTerreno(x, z), z, sil: SILUETAS_MATA[v.tipo] || SILUETAS_MATA.platano };
+        return { x, y: alturaDe(x, z), z, sil: SILUETAS_MATA[v.tipo] || SILUETAS_MATA.platano };
       }),
-    [cada],
+    [alturaDe, cada],
   );
   const troncos = matas.filter((m) => m.sil.tronco);
   const conos = matas.filter((m) => m.sil.copa.forma === 'cono');
@@ -1438,11 +1441,11 @@ function VegetacionInstanciada({ nocturno, cada }) {
    dibujan con siluetas simplificadas (3 draw calls); en 'alto' conservan su
    detalle pleno pero YA INSTANCIADO por pieza (<MatasFieles/>, PERF-VALLE-
    INSTANCING 2026-07-23): mismo render, de ~39 draw calls sueltos a 7. */
-function VegetacionPisos({ nocturno, perfil }) {
+function VegetacionPisos({ nocturno, perfil, alturaDe = alturaTerreno }) {
   if (perfil.matasInstanciadas) {
-    return <VegetacionInstanciada nocturno={nocturno} cada={perfil.matasCada} />;
+    return <VegetacionInstanciada nocturno={nocturno} cada={perfil.matasCada} alturaDe={alturaDe} />;
   }
-  return <MatasFieles nocturno={nocturno} />;
+  return <MatasFieles nocturno={nocturno} alturaDe={alturaDe} />;
 }
 
 function Veleta({ color, reducedMotion = false }) {
@@ -1498,7 +1501,7 @@ function CriaturaSvg({ tipo, size, animated }) {
   return <Lombriz size={size} animated={animated} />;
 }
 
-function CriaturasValle({ reducedMotion, cupo, tier }) {
+function CriaturasValle({ reducedMotion, cupo, tier, alturaDe = alturaTerreno }) {
   const rendimiento = useTierPerformance({ tier, reducedMotion });
   const cupoVivo = Math.min(
     cupo ?? rendimiento.presupuesto.maxCriaturasAmbientales,
@@ -1510,7 +1513,7 @@ function CriaturasValle({ reducedMotion, cupo, tier }) {
   return (
     <group>
       {CRIATURAS_VALLE.slice(0, cupoVivo).map((c, i) => {
-        const y = alturaTerreno(c.x, c.z) + c.dy;
+        const y = alturaDe(c.x, c.z) + c.dy;
         return (
           <group key={i} position={[c.x, y, c.z]}>
             <Html center distanceFactor={c.factor} zIndexRange={[8, 0]} pointerEvents="none">
@@ -1586,8 +1589,15 @@ function ProxyLandmark({ tipo, tinte }) {
       píxeles + foco/proximidad + anti-colisión). En perfil frugal el detalle
       completo SOLO se dibuja de cerca (<Detailed>): la panorámica de arranque
       —el peor momento— queda en siluetas baratas. ── */
-function MundoLugar({ mundo, reducedMotion, perfil, onEntrar = null }) {
-  const y = alturaTerreno(mundo.pos[0], mundo.pos[2]);
+function MundoLugar({ mundo, reducedMotion, perfil, onEntrar = null, alturaDe = alturaTerreno }) {
+  const grounded = useMemo(() => {
+    const object = { position: new THREE.Vector3(mundo.pos[0], 0, mundo.pos[2]) };
+    return pegarAlTerreno(object, alturaDe, { alignToNormal: false });
+  }, [alturaDe, mundo.pos]);
+  const orientation = useMemo(
+    () => new THREE.Quaternion().setFromUnitVectors(new THREE.Vector3(0, 1, 0), grounded.normal),
+    [grounded.normal],
+  );
   const detalle = mundo.tipo === 'veleta' ? (
     <Veleta color={mundo.tinte[0]} reducedMotion={reducedMotion} />
   ) : (
@@ -1601,7 +1611,8 @@ function MundoLugar({ mundo, reducedMotion, perfil, onEntrar = null }) {
   );
   return (
     <group
-      position={[mundo.pos[0], y, mundo.pos[2]]}
+      position={grounded.position}
+      quaternion={orientation}
       scale={mundo.escala}
       onClick={
         onEntrar
@@ -1674,7 +1685,7 @@ function clamp1D(v, mitad, total) {
   return Math.min(Math.max(v, lo), hi);
 }
 
-function RotulosLugares({ mundos, focoId, onEntrar, occluders, controls = null, kReposo = 1 }) {
+function RotulosLugares({ mundos, focoId, onEntrar, occluders, controls = null, kReposo = 1, alturaDe = alturaTerreno }) {
   const botones = useRef({});
   const tapados = useRef({});
   const plena = useRef(null);
@@ -1692,19 +1703,19 @@ function RotulosLugares({ mundos, focoId, onEntrar, occluders, controls = null, 
         m,
         pos: new THREE.Vector3(
           m.pos[0],
-          alturaTerreno(m.pos[0], m.pos[2]) + 1.7 * (m.escala || 1),
+          alturaDe(m.pos[0], m.pos[2]) + 1.7 * (m.escala || 1),
           m.pos[2],
         ),
       })),
-    [mundos],
+    [mundos, alturaDe],
   );
 
   // La alerta del día (el faro) siempre se reserva su espacio en pantalla.
   const anclaAlerta = useMemo(() => {
     const a = MUNDO_DIR_BY_ID[COSA_DEL_DIA.anclaMundo];
     if (!a) return null;
-    return new THREE.Vector3(a.pos[0], alturaTerreno(a.pos[0], a.pos[2]) + 2.7, a.pos[2]);
-  }, []);
+    return new THREE.Vector3(a.pos[0], alturaDe(a.pos[0], a.pos[2]) + 2.7, a.pos[2]);
+  }, [alturaDe]);
 
   useFrame(({ camera, size }) => {
     // ~12 pasadas/s alcanzan para rótulos; corre en el PRIMER frame (importa
@@ -2688,6 +2699,10 @@ function amortiguarAtmosfera(actual, objetivo, k) {
 
 function AtmosferaValle({ c, perfil, reducedMotion }) {
   const objetivo = useMemo(() => estadoAtmosfera(c), [c]);
+  const climaRuntime = useMemo(() => crearClimaVolumetrico({
+    estadoInicial: c.lluviaViva ? 'rain' : c.nieblaLejos <= 20 ? 'fog' : 'fair',
+    seed: 20260824,
+  }), [c]);
   // La piel del primer montaje: alimenta los valores declarativos del JSX (que
   // nunca deben cambiar tras montar) — un re-render no pisa la animación.
   const [ini] = useState(() => c);
@@ -2699,11 +2714,11 @@ function AtmosferaValle({ c, perfil, reducedMotion }) {
   const ambRef = useRef(null);
   const solRef = useRef(null);
 
-  const pintar = (e) => {
+  const pintar = (e, weather = climaRuntime.env) => {
     if (fondoRef.current) fondoRef.current.copy(e.fondo);
     if (fogRef.current) {
       fogRef.current.color.copy(e.niebla);
-      fogRef.current.far = e.nieblaLejos;
+      fogRef.current.far = e.nieblaLejos * (1 - weather.fogDensity * 0.18);
     }
     if (hemiRef.current) {
       hemiRef.current.intensity = e.intensidad * 0.55;
@@ -2715,7 +2730,7 @@ function AtmosferaValle({ c, perfil, reducedMotion }) {
       ambRef.current.color.copy(e.luz);
     }
     if (solRef.current) {
-      solRef.current.intensity = e.intensidad;
+      solRef.current.intensity = e.intensidad * weather.sunAttenuation;
       solRef.current.color.copy(e.luz);
       solRef.current.position.copy(e.solPos);
     }
@@ -2725,15 +2740,16 @@ function AtmosferaValle({ c, perfil, reducedMotion }) {
   useEffect(() => {
     if (!reducedMotion) return;
     amortiguarAtmosfera(actual, objetivo, 1);
-    pintar(actual);
+    pintar(actual, climaRuntime.tick(0));
   });
 
   // Transición viva: amortiguación exponencial estable en dt variable.
   useFrame((_, dt) => {
     if (reducedMotion) return;
     const k = 1 - Math.exp((-3 / TRANSICION.duracion) * Math.min(dt, 0.1));
+    const weather = climaRuntime.tick(dt);
     amortiguarAtmosfera(actual, objetivo, k);
-    pintar(actual);
+    pintar(actual, weather);
   });
 
   return (
@@ -2890,6 +2906,13 @@ function Escena({ clima, focoId, animo, energia, onEntrar, onAlerta, onCasa = nu
   const poseReposo = pose || { position: CAMARA_VALLE.position, fov: CAMARA_VALLE.fov, k: 1, mira: MIRA_VALLE };
   const miraReposo = poseReposo.mira || MIRA_VALLE;
   const controls = useRef(null);
+  const superficie = useMemo(() => crearSuperficieErosionada({
+    resolution: perfil.segmentosTerreno,
+    sampleBase: alturaTerreno,
+    seed: 20260824 + (tier === 'alto' ? 3 : tier === 'medio' ? 2 : 1),
+    droplets: tier === 'alto' ? 900 : tier === 'medio' ? 450 : 160,
+  }), [perfil.segmentosTerreno, tier]);
+  const altura = superficie.heightAt;
   /* La cámara de director (FASE 4, flag `camaraDirector`) se monta DESPUÉS de
      CamaraViajera y gana por orden de frame durante su barrido. `avatarRef`
      recibe la posición viva de Angelita (Vector3 estable) para el follow. */
@@ -2906,9 +2929,9 @@ function Escena({ clima, focoId, animo, energia, onEntrar, onAlerta, onCasa = nu
     // regla de tercios) — la mira de reposo es ASPECTO-CONSCIENTE: en vertical
     // baja y avanza hacia la finca (CamaraViajera le suma 0.6 en y).
     if (!m) return new THREE.Vector3(miraReposo[0], miraReposo[1] - 0.6, miraReposo[2]);
-    const y = alturaTerreno(m.pos[0], m.pos[2]);
+    const y = altura(m.pos[0], m.pos[2]);
     return new THREE.Vector3(m.pos[0], y, m.pos[2]);
-  }, [focoId, miraReposo]);
+  }, [altura, focoId, miraReposo]);
   const autoOrbit = !reducedMotion && !focoId;
   const entrando = !!focoId;
   const nocturno = clima === 'noche';
@@ -2931,7 +2954,7 @@ function Escena({ clima, focoId, animo, energia, onEntrar, onAlerta, onCasa = nu
           cuando el valle exponga el piso. Rescatado del huérfano 2026-08-01. */}
       <EntsDelValle
         pisoTermico={null}
-        alturaDe={alturaTerreno}
+        alturaDe={altura}
         tier={/** @type {'alto'|'medio'|'bajo'} */ (tier)}
         reducedMotion={reducedMotion}
       />
@@ -2963,32 +2986,33 @@ function Escena({ clima, focoId, animo, energia, onEntrar, onAlerta, onCasa = nu
       {/* La LUNA: la autora de la luz nocturna. Verla ancla el contraluz. */}
       {nocturno && <LunaValle reducedMotion={reducedMotion} />}
 
-      <Terreno nocturno={nocturno} innerRef={terrenoRef} perfil={perfil} />
+      <Terreno nocturno={nocturno} innerRef={terrenoRef} perfil={perfil} superficie={superficie} />
       {/* AoE: detalle de suelo (pasto corto/flores/piedras) + surcos de cultivo — mata el verde vacío */}
-      <DetalleSueloValle alturaDe={alturaTerreno} tier={tier} reducedMotion={reducedMotion} nocturno={nocturno} />
+      <DetalleSueloValle alturaDe={altura} tier={tier} reducedMotion={reducedMotion} nocturno={nocturno} />
       <Cordillera color={nocturno ? '#48598a' : c.niebla} innerRef={cordilleraRef} perfil={perfil} />
       {/* AGUA VIVA: el hilo que baja del páramo + las acequias que se ramifican
           a las eras, el semillero y la huerta, con sus compuertas y pozas. */}
-      <AguaVivaValle alturaDe={alturaTerreno} tier={tier} reducedMotion={reducedMotion} nocturno={nocturno} caudal={c.lluviaViva ? 1 : 0.85} />
+      <AguaVivaValle alturaDe={altura} tier={tier} reducedMotion={reducedMotion} nocturno={nocturno} caudal={c.lluviaViva ? 1 : 0.85} />
       <Quebrada
         color={nocturno ? '#7fb3d9' : '#5fb2c9'}
         viva={c.lluviaViva}
         perfil={perfil}
         nocturno={nocturno}
+        alturaDe={altura}
       />
-      <VegetacionPisos nocturno={nocturno} perfil={perfil} />
+      <VegetacionPisos nocturno={nocturno} perfil={perfil} alturaDe={altura} />
       {/* AoE: bosque denso 3x + detalle de suelo/surcos + campesinos en faena + hato en movimiento */}
-      <BosqueDensoValle alturaDe={alturaTerreno} tier={tier} reducedMotion={reducedMotion} nocturno={nocturno} />
+      <BosqueDensoValle alturaDe={altura} tier={tier} reducedMotion={reducedMotion} nocturno={nocturno} />
       {/* CLIMA VIVO: la lluvia que cae de verdad, la niebla que rueda por la
           ladera y la ESCARCHA de la helada — el clima real escrito en el suelo. */}
       {c.lluviaViva && (
-        <LluviaValle alturaDe={alturaTerreno} tier={tier} reducedMotion={reducedMotion} nocturno={nocturno} />
+        <LluviaValle alturaDe={altura} tier={tier} reducedMotion={reducedMotion} nocturno={nocturno} />
       )}
       {clima === 'niebla' && (
-        <NieblaLadera alturaDe={alturaTerreno} tier={tier} reducedMotion={reducedMotion} />
+        <NieblaLadera alturaDe={altura} tier={tier} reducedMotion={reducedMotion} />
       )}
       {clima === 'amanecer' && (
-        <NieblaLadera modo="amanecer" intensidad={0.55} alturaDe={alturaTerreno} tier={tier} reducedMotion={reducedMotion} />
+        <NieblaLadera modo="amanecer" intensidad={0.55} alturaDe={altura} tier={tier} reducedMotion={reducedMotion} />
       )}
       {/* EL MAR DE NUBES: el colchón de niebla de radiación posado en la
           tierra baja del frente — la finca amanece FLOTANDO sobre él. Deriva
@@ -2999,25 +3023,25 @@ function Escena({ clima, focoId, animo, energia, onEntrar, onAlerta, onCasa = nu
           intensidad={0.5}
           velocidad={0.45}
           banda={BANDA_MAR_NUBES}
-          alturaDe={alturaTerreno}
+          alturaDe={altura}
           tier={tier}
           reducedMotion={reducedMotion}
           semilla={43}
         />
       )}
       {hayAlerta && COSA_DEL_DIA.tono === 'helada' && (clima === 'noche' || clima === 'amanecer' || clima === 'helada') && (
-        <HeladaValle alturaDe={alturaTerreno} tier={tier} reducedMotion={reducedMotion} />
+        <HeladaValle alturaDe={altura} tier={tier} reducedMotion={reducedMotion} />
       )}
-      <CafetalDensoValle alturaDe={alturaTerreno} tier={tier} nocturno={nocturno} zona={[{ cx: 5.2, cz: 1.6, rx: 2.6, rz: 2.2 }]} />
-      <ParamoDensoValle alturaDe={alturaTerreno} tier={tier} nocturno={nocturno} />
+      <CafetalDensoValle alturaDe={altura} tier={tier} nocturno={nocturno} zona={[{ cx: 5.2, cz: 1.6, rx: 2.6, rz: 2.2 }]} />
+      <ParamoDensoValle alturaDe={altura} tier={tier} nocturno={nocturno} />
       {/* La LADERA ALTA poblada: terrazas de clima frío en policultivo (papa,
           haba, cubio, arracacha + barbecho), cerca de piedra, camino y abrigo. */}
-      <LaderaAltaValle alturaDe={alturaTerreno} tier={tier} nocturno={nocturno} reducedMotion={reducedMotion} />
-      {!portada && <CampesinosValle alturaDe={alturaTerreno} tier={tier} reducedMotion={reducedMotion} />}
-      {!portada && <HatoMovil alturaDe={alturaTerreno} tier={tier === 'alto' ? 10 : tier === 'bajo' ? 4 : 7} radio={4.8} reducedMotion={reducedMotion} />}
+      <LaderaAltaValle alturaDe={altura} tier={tier} nocturno={nocturno} reducedMotion={reducedMotion} />
+      {!portada && <CampesinosValle alturaDe={altura} tier={tier} reducedMotion={reducedMotion} />}
+      {!portada && <HatoMovil alturaDe={altura} tier={tier === 'alto' ? 10 : tier === 'bajo' ? 4 : 7} radio={4.8} reducedMotion={reducedMotion} />}
       {/* LOGÍSTICA VISIBLE (alma Settlers): la mula acarrea estiércol→pila,
           compost→eras y cosecha→casa por los senderos, y las pilas crecen. */}
-      {!portada && <ArrieriaValle alturaDe={alturaTerreno} tier={tier} reducedMotion={reducedMotion} />}
+      {!portada && <ArrieriaValle alturaDe={altura} tier={tier} reducedMotion={reducedMotion} />}
 
       {/* LA DIRECCIÓN DEL CUADRO: la casa donde descansa el ojo (su puerta
           iluminada es la vía SECUNDARIA a la ventana de los mundos), los
@@ -3026,28 +3050,28 @@ function Escena({ clima, focoId, animo, energia, onEntrar, onAlerta, onCasa = nu
           miniatura, no espejos), los pórticos humildes de lo secundario, la
           vista del páramo con su Ent, y los patios bajo cada lugar. */}
       <CasaCampesina
-        alturaDe={alturaTerreno}
+        alturaDe={altura}
         perfil={perfil}
         nocturno={nocturno}
         practicas={practicas}
         reducedMotion={reducedMotion}
         onPuerta={portada ? null : onCasa}
       />
-      <SenderosValle alturaDe={alturaTerreno} perfil={perfil} />
+      <SenderosValle alturaDe={altura} perfil={perfil} />
       {/* JERARQUÍA DE PORTALES (regla del operador): los 6 grandes son
           PAISAJES vivos — cada arco enmarca la viñeta 3D de su mundo (cero
           discos-espejo); los toris de madera quedan SOLO para los lugares
           secundarios de menos uso. */}
       <VentanasVivas
         mundos={mundos}
-        alturaDe={alturaTerreno}
+        alturaDe={altura}
         nocturno={nocturno}
         practicas={practicas}
         reducedMotion={reducedMotion}
         perfil={perfil}
         onEntrar={portada ? null : onEntrar}
       />
-      <PorticosSecundarios mundos={mundos} alturaDe={alturaTerreno} />
+      <PorticosSecundarios mundos={mundos} alturaDe={altura} />
       {/* EL ACCESO AL PÁRAMO — el Ent-queñua+frailejones del filo (VistaParamoEnt)
           se ARCHIVÓ 2026-07-18 (pedido del operador): se veía amontonado en la
           vista del valle. Ver src/mockups/valle/_archivo/vistaParamo.archivado.jsx.
@@ -3063,12 +3087,12 @@ function Escena({ clima, focoId, animo, energia, onEntrar, onAlerta, onCasa = nu
           hitos y las matas dejan de flotar. De noche se atenúa, no se va. */}
       <SombrasContacto
         mundos={mundos}
-        alturaDe={alturaTerreno}
+        alturaDe={altura}
         nocturno={nocturno}
         franja={clima}
       />
       {!portada && (
-        <PatiosLugares mundos={mundos} alturaDe={alturaTerreno} nocturno={nocturno} />
+        <PatiosLugares mundos={mundos} alturaDe={altura} nocturno={nocturno} />
       )}
 
       {mundos.map((m) => (
@@ -3077,6 +3101,7 @@ function Escena({ clima, focoId, animo, energia, onEntrar, onAlerta, onCasa = nu
           mundo={m}
           reducedMotion={reducedMotion}
           perfil={perfil}
+          alturaDe={altura}
           onEntrar={portada ? null : onEntrar}
         />
       ))}
@@ -3087,13 +3112,13 @@ function Escena({ clima, focoId, animo, energia, onEntrar, onAlerta, onCasa = nu
           (el operador no debería necesitar GPU rica para conocer al oso);
           la franja horaria decide quién está afuera. */}
       <VecinosDelValle
-        alturaDe={alturaTerreno}
+        alturaDe={altura}
         reducedMotion={reducedMotion}
         franja={clima}
       />
       {/* EL OSO NEGRO del monte (biopunk, decisión del operador): el mayor
           de los vecinos de tierra, visible en el borde del bosque. */}
-      <OsoNegroDelMonte alturaDe={alturaTerreno} />
+      <OsoNegroDelMonte alturaDe={altura} />
       {/* MODO PORTADA (la cara de prod.chagra.app): el valle es ATMÓSFERA de
           la entrada — sin rótulos que compitan con el formulario ni faro que
           pida un toque que aún no puede darse. La vida (criaturas, Angelita,
@@ -3106,10 +3131,16 @@ function Escena({ clima, focoId, animo, energia, onEntrar, onAlerta, onCasa = nu
           occluders={occluders}
           controls={controls}
           kReposo={poseReposo.k}
+          alturaDe={altura}
         />
       )}
 
-      <CriaturasValle reducedMotion={reducedMotion} cupo={perfil.criaturas} tier={tier} />
+      <CriaturasValle
+        reducedMotion={reducedMotion}
+        cupo={perfil.criaturas}
+        tier={tier}
+        alturaDe={altura}
+      />
       {!portada && (
         <Beacon onAlerta={onAlerta} reducedMotion={reducedMotion} conLuz={perfil.luzBeacon} />
       )}

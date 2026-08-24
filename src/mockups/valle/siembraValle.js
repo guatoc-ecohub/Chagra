@@ -14,6 +14,29 @@
  * SOLO cálculo (sin JSX): el InstancedMesh compartido vive en BancoValle.jsx.
  */
 import * as THREE from 'three';
+import { sembrarAloLargo } from '../../../lib3d/vfx/siembraGesto.js';
+
+/* Adaptador del gesto al contrato de items que ya consume el valle. */
+export function sembrarGestoEnValle(curve, alturaDe, opts = {}) {
+  const items = [];
+  sembrarAloLargo(curve, {
+    espaciado: opts.espaciado ?? 0.6,
+    maxPuntos: opts.maxPuntos ?? 200,
+    jitter: opts.jitter ?? 0,
+    seed: opts.seed ?? 1,
+    onPunto: (point, tangent) => {
+      const y = (alturaDe ? alturaDe(point.x, point.z) : point.y) + (opts.altura ?? 0.02);
+      items.push({
+        pos: [point.x, y, point.z],
+        rotY: Math.atan2(tangent.x, tangent.z),
+        escala: opts.escala ?? 0.42,
+        lejos: false,
+        tint: [1, 1, 1],
+      });
+    },
+  });
+  return items;
+}
 
 /* RNG determinista (mulberry32): misma siembra en cada carga. */
 export function rngDe(semilla) {
