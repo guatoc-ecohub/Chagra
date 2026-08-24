@@ -3120,20 +3120,60 @@
   animation: oso-cejas-frunce 0.9s ease-in-out infinite;
 }
 
-/* ── CAMINA — el ciclo de ANDAR CON BASTÓN (pose del host: kart, mundos,
-   travesías). Paso PESADO de plantígrado a 1.3s: el cuerpo boya y se ladea,
-   las piernas alternan del origen de cadera, el bastón planta y levanta a
-   contratiempo y el brazo en jarra acompaña. */
+/* ── CAMINA — el ciclo de ANDAR PLANTÍGRADO CON BASTÓN (pose del host: kart,
+   mundos, travesías). Paso PESADO a 1.3s con el lenguaje `pisa` del rig
+   unificado (~/demos/guias-rig): se ALZA (stretch) → ¡PISA! (squash contra el
+   suelo) → overshoot que asienta — dos apoyos por ciclo. Las piernas alternan
+   de la cadera, la COLUMNA acompaña con drag (hueso propio), la CABEZA
+   asienta cada apoyo, el bastón planta a contratiempo. */
 [data-creature='oso-baston'][data-pose='camina'] .crt-body {
   animation: osb-camina-cuerpo 1.3s ease-in-out infinite;
   transform-box: fill-box;
   transform-origin: center bottom;
 }
 @keyframes osb-camina-cuerpo {
-  0%, 100% { transform: translateY(0) rotate(-1.3deg); }
-  25%      { transform: translateY(-1.5px) rotate(0deg); }
-  50%      { transform: translateY(0) rotate(1.3deg); }
-  75%      { transform: translateY(-1.5px) rotate(0deg); }
+  0%   { transform: translateY(0) rotate(-1.2deg) scale(1, 1); }
+  16%  { transform: translateY(-1.1px) rotate(-0.4deg) scale(0.985, 1.015); }
+  29%  { transform: translateY(0.45px) rotate(0.6deg) scale(1.04, 0.96); }
+  38%  { transform: translateY(-0.3px) rotate(0.9deg) scale(0.995, 1.005); }
+  50%  { transform: translateY(0) rotate(1.2deg) scale(1, 1); }
+  66%  { transform: translateY(-1.1px) rotate(0.4deg) scale(0.985, 1.015); }
+  79%  { transform: translateY(0.45px) rotate(-0.6deg) scale(1.04, 0.96); }
+  88%  { transform: translateY(-0.3px) rotate(-0.9deg) scale(0.995, 1.005); }
+  100% { transform: translateY(0) rotate(-1.2deg) scale(1, 1); }
+}
+/* la MARCHA ACTUADA (30%): mismo ciclo con toda la goma — squash gordo al
+   pisar y bote alto (Miss Minutes andando). */
+[data-creature='oso-baston'][data-pose='camina'][data-modo='actuando'] .crt-body {
+  animation-name: osb-camina-cuerpo-actuado;
+}
+@keyframes osb-camina-cuerpo-actuado {
+  0%   { transform: translateY(0) rotate(-2.4deg) scale(1, 1); }
+  16%  { transform: translateY(-1.9px) rotate(-0.8deg) scale(0.955, 1.05); }
+  29%  { transform: translateY(0.85px) rotate(1.2deg) scale(1.09, 0.9); }
+  38%  { transform: translateY(-0.55px) rotate(1.8deg) scale(0.985, 1.015); }
+  50%  { transform: translateY(0) rotate(2.4deg) scale(1, 1); }
+  66%  { transform: translateY(-1.9px) rotate(0.8deg) scale(0.955, 1.05); }
+  79%  { transform: translateY(0.85px) rotate(-1.2deg) scale(1.09, 0.9); }
+  88%  { transform: translateY(-0.55px) rotate(-1.8deg) scale(0.985, 1.015); }
+  100% { transform: translateY(0) rotate(-2.4deg) scale(1, 1); }
+}
+/* la COLUMNA acompaña el paso con DRAG (retardo corto = follow-through del
+   torso sobre la cadera — el hueso columna existe para esto). */
+[data-creature='oso-baston'][data-pose='camina'] .osb-columna {
+  animation: osb-columna-lean 1.3s ease-in-out -0.16s infinite;
+}
+@keyframes osb-columna-lean {
+  0%, 100% { transform: rotate(0.9deg); }
+  50%      { transform: rotate(-0.9deg); }
+}
+/* la CABEZA ASIENTA cada apoyo (nod del paso — medio ciclo por pierna) */
+[data-creature='oso-baston'][data-pose='camina'] .osb-cabeza {
+  animation: osb-nod-paso 0.65s ease-in-out infinite;
+}
+@keyframes osb-nod-paso {
+  0%, 100% { transform: translateY(0) rotate(-0.6deg); }
+  45%      { transform: translateY(0.35px) rotate(0.8deg); }
 }
 [data-creature='oso-baston'][data-pose='camina'] .osb-pierna-i {
   animation: osb-paso-i 1.3s ease-in-out infinite;
@@ -3213,6 +3253,115 @@
   [data-creature='oso-baston'][data-pose='celebra'] .crt-brazo-r { animation: none !important; }
   /* Fotograma digno del florecer: el halo se queda encendido y quieto. */
   [data-creature='oso-baston'][data-florece='1'] .osb-halo { opacity: 0.45; }
+}
+
+/* ═══ LA PIEL-LÁMINA SOBRE HUESOS (piel definitiva 2026-08-22) ═══════════════
+   La lámina `oso.png` revectorizada sobre el esqueleto: cabeza que MIRA sobre
+   el cuello-gola continuo, hocico-hueso que husmea, y el 70/30 del spec
+   compai — data-modo='normal' (el oso digno de la lámina) | 'actuando'
+   (rubber-hose Miss Minutes con las curvas canónicas de rubberhoseSpec). */
+
+/* LA TESTA QUE SIGUE AL USUARIO (mirausted) — patrón cabezaMira del jaguar
+   vectorial aprobado: la GOLA (.osb-cuello) es DIBUJO CONTINUO bajo el cráneo
+   con solape ≥2.2 unidades, así que la testa se desplaza/gira y el pelaje del
+   cuello respalda el movimiento — JAMÁS se decapita. Wrapper ADITIVO
+   alrededor de .osb-cabeza: nod del paso, take actuado y mirada COMPONEN. */
+.osb-cabeza-mira {
+  transform-box: fill-box;
+  transform-origin: 50% 92%;
+  transition: transform 0.32s cubic-bezier(0.33, 1, 0.68, 1);
+}
+[data-rh-mira='usted'] .osb-cabeza-mira {
+  transform: translate(calc(var(--rh-mx, 0px) * 1.6), calc(var(--rh-my, 0px) * 1.1));
+}
+/* con trigonometría CSS, además del desplazamiento la testa ROTA sobre el
+   cuello (atan2 sobre la deflexión) — el giro de verdad, cero costura. */
+@supports (transform: rotate(atan2(1px, 1px))) {
+  [data-rh-mira='usted'] .osb-cabeza-mira {
+    transform: translate(calc(var(--rh-mx, 0px) * 1.6), calc(var(--rh-my, 0px) * 1.1))
+      rotate(atan2(var(--rh-mx, 0px), 16px));
+  }
+}
+
+/* EL HOCICO-HUESO HUSMEA — el gesto de oso de verdad: cada tanto la trufa
+   tantea el aire (reloj co-primo 7.9s; gate por data-pose = solo vivo). */
+[data-creature='oso-baston'][data-pose] .osb-hocico {
+  animation: osb-husmea 7.9s ease-in-out infinite;
+}
+@keyframes osb-husmea {
+  0%, 84%, 100% { transform: translateY(0) rotate(0deg); }
+  88%  { transform: translateY(-0.18px) rotate(-1.6deg); }
+  92%  { transform: translateY(0.1px) rotate(1.3deg); }
+  96%  { transform: translateY(-0.08px) rotate(-0.5deg); }
+}
+
+/* ═══ 70/30 (spec compai) — data-modo. La PIEL nunca cambia; cambian las
+   CURVAS sobre los huesos. ─────────────────────────────────────────────────
+   NORMAL (el 70%): el oso BONITO de la lámina — digno. Sin volteretas ni
+   micro-antics (Miss Minutes descansa); la respiración es masa que respira. */
+[data-creature='oso-baston'][data-modo='normal'] .rh-antic,
+[data-creature='oso-baston'][data-modo='normal'] .rh-travieso { animation: none; }
+[data-creature='oso-baston'][data-modo='normal'] .rh-boil {
+  animation-name: osb-respira-digno;
+  animation-duration: 4.6s;
+}
+@keyframes osb-respira-digno {
+  0%, 100% { transform: translateY(0) scale(1, 1); }
+  50%      { transform: translateY(0.06px) scale(1.01, 0.988); }
+}
+
+/* ACTUANDO (el 30%): rubber-hose Miss Minutes — anticipación, squash&stretch
+   y overshoot EXAGERADOS sobre los huesos (curvas canónicas del spec). Corre
+   cuando habla/piensa/florece/celebra o cuando el host fuerza modo='actuando'. */
+[data-creature='oso-baston'][data-modo='actuando'] .rh-boil {
+  animation-name: osb-boil-actuado;
+  animation-duration: 1.5s;
+  animation-timing-function: cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+@keyframes osb-boil-actuado {
+  0%, 100% { transform: translateY(0) scale(1, 1); }
+  28%      { transform: translateY(0.5px) scale(1.05, 0.94); }
+  62%      { transform: translateY(-0.55px) scale(0.965, 1.045); }
+}
+/* el TAKE de cabeza (anticipación → golpe → overshoot → asienta), reloj 6.3s */
+[data-creature='oso-baston'][data-modo='actuando'] .osb-cabeza {
+  animation: osb-take-cabeza 6.3s cubic-bezier(0.34, 1.56, 0.64, 1) infinite;
+}
+@keyframes osb-take-cabeza {
+  0%, 54%, 100% { transform: translateY(0) rotate(0deg); }
+  58%  { transform: translateY(0.3px) rotate(2.4deg); }
+  64%  { transform: translateY(-0.5px) rotate(-6.5deg); }
+  72%  { transform: translateY(0.1px) rotate(1.8deg); }
+  80%  { transform: translateY(0) rotate(-0.6deg); }
+}
+/* el brazo en jarra GESTICULA (suelta la cadera, apunta, vuelve) */
+[data-creature='oso-baston'][data-modo='actuando'] .crt-brazo-l {
+  animation: osb-gesticula-jarra 5.6s ease-in-out infinite;
+}
+@keyframes osb-gesticula-jarra {
+  0%, 60%, 100% { transform: rotate(0deg); }
+  68%  { transform: rotate(-7deg); }
+  76%  { transform: rotate(4deg); }
+  84%  { transform: rotate(-1.5deg); }
+}
+/* actuando + pose camina: la marcha exagerada ya la pisa
+   osb-camina-cuerpo-actuado (ver el bloque CAMINA arriba). */
+
+/* gates de los huesos nuevos: tier bajo = fotograma digno */
+[data-tier='bajo'][data-creature='oso-baston'] .osb-hocico,
+[data-tier='bajo'][data-creature='oso-baston'] .osb-cabeza,
+[data-tier='bajo'][data-creature='oso-baston'] .osb-columna,
+[data-tier='bajo'][data-creature='oso-baston'] .crt-brazo-l { animation: none; }
+
+@media (prefers-reduced-motion: reduce) {
+  [data-creature='oso-baston'] .osb-hocico,
+  [data-creature='oso-baston'] .osb-cabeza,
+  [data-creature='oso-baston'] .osb-columna,
+  [data-creature='oso-baston'][data-modo='actuando'] .rh-boil,
+  [data-creature='oso-baston'][data-modo='actuando'] .crt-brazo-l,
+  [data-creature='oso-baston'][data-pose='camina'] .osb-cabeza,
+  [data-creature='oso-baston'][data-pose='camina'] .osb-columna { animation: none !important; }
+  .osb-cabeza-mira { transition: none; transform: none !important; }
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
