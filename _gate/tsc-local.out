@@ -1,0 +1,1186 @@
+src/compai/nucleo/__tests__/datosFinca.test.js(166,29): error TS2345: Argument of type 'string' is not assignable to parameter of type 'any[]'.
+src/compai/nucleo/__tests__/datosFinca.test.js(185,32): error TS2345: Argument of type 'string' is not assignable to parameter of type 'any[]'.
+src/compai/nucleo/__tests__/datosFinca.test.js(186,26): error TS2345: Argument of type 'string' is not assignable to parameter of type 'any[]'.
+src/compai/nucleo/__tests__/elenco.test.js(46,26): error TS2345: Argument of type 'StorageFalso' is not assignable to parameter of type 'Storage'.
+  Type 'StorageFalso' is missing the following properties from type 'Storage': length, clear, key, removeItem
+src/compai/nucleo/__tests__/elenco.test.js(51,26): error TS2345: Argument of type 'StorageFalso' is not assignable to parameter of type 'Storage'.
+  Type 'StorageFalso' is missing the following properties from type 'Storage': length, clear, key, removeItem
+src/compai/nucleo/__tests__/elenco.test.js(56,26): error TS2345: Argument of type 'StorageFalso' is not assignable to parameter of type 'Storage'.
+  Type 'StorageFalso' is missing the following properties from type 'Storage': length, clear, key, removeItem
+src/compai/nucleo/__tests__/elenco.test.js(62,26): error TS2345: Argument of type 'StorageFalso' is not assignable to parameter of type 'Storage'.
+  Type 'StorageFalso' is missing the following properties from type 'Storage': length, clear, key, removeItem
+src/compai/nucleo/__tests__/elenco.test.js(66,26): error TS2345: Argument of type 'StorageFalso' is not assignable to parameter of type 'Storage'.
+  Type 'StorageFalso' is missing the following properties from type 'Storage': length, clear, key, removeItem
+src/compai/nucleo/__tests__/elenco.test.js(67,26): error TS2345: Argument of type 'StorageFalso' is not assignable to parameter of type 'Storage'.
+  Type 'StorageFalso' is missing the following properties from type 'Storage': length, clear, key, removeItem
+src/compai/nucleo/__tests__/elenco.test.js(76,26): error TS2345: Argument of type 'StorageFalso' is not assignable to parameter of type 'Storage'.
+  Type 'StorageFalso' is missing the following properties from type 'Storage': length, clear, key, removeItem
+src/compai/nucleo/__tests__/elenco.test.js(86,26): error TS2345: Argument of type 'StorageFalso' is not assignable to parameter of type 'Storage'.
+  Type 'StorageFalso' is missing the following properties from type 'Storage': length, clear, key, removeItem
+src/compai/nucleo/__tests__/elenco.test.js(90,32): error TS2345: Argument of type 'StorageRoto' is not assignable to parameter of type 'Storage'.
+  Type 'StorageRoto' is missing the following properties from type 'Storage': length, clear, key, removeItem
+src/compai/nucleo/__tests__/elenco.test.js(91,26): error TS2345: Argument of type 'StorageRoto' is not assignable to parameter of type 'Storage'.
+  Type 'StorageRoto' is missing the following properties from type 'Storage': length, clear, key, removeItem
+src/compai/nucleo/__tests__/elenco.test.js(98,43): error TS2345: Argument of type 'StorageFalso' is not assignable to parameter of type 'Storage'.
+  Type 'StorageFalso' is missing the following properties from type 'Storage': length, clear, key, removeItem
+src/compai/nucleo/__tests__/elenco.test.js(107,41): error TS2345: Argument of type 'StorageFalso' is not assignable to parameter of type 'Storage'.
+  Type 'StorageFalso' is missing the following properties from type 'Storage': length, clear, key, removeItem
+src/compai/nucleo/__tests__/elenco.test.js(113,56): error TS2345: Argument of type 'StorageFalso' is not assignable to parameter of type 'Storage'.
+  Type 'StorageFalso' is missing the following properties from type 'Storage': length, clear, key, removeItem
+src/compai/nucleo/__tests__/elenco.test.js(119,46): error TS2345: Argument of type 'StorageRoto' is not assignable to parameter of type 'Storage'.
+  Type 'StorageRoto' is missing the following properties from type 'Storage': length, clear, key, removeItem
+src/compai/nucleo/__tests__/elenco.test.js(121,40): error TS2345: Argument of type 'StorageRoto' is not assignable to parameter of type 'Storage'.
+  Type 'StorageRoto' is missing the following properties from type 'Storage': length, clear, key, removeItem
+src/compai/nucleo/__tests__/susurroNocturno.test.js(53,7): error TS2739: Type '{ tipo: "helada"; mensaje: string; severidad: "alta"; }' is missing the following properties from type 'ReaccionClima': estado, gesto
+src/compai/nucleo/comentarista.js(131,28): error TS1127: Invalid character.
+src/compai/nucleo/datosFinca.js(103,44): error TS1127: Invalid character.
+src/compai/nucleo/datosFinca.js(104,46): error TS1127: Invalid character.
+src/compai/nucleo/datosFinca.js(105,46): error TS1127: Invalid character.
+src/compai/nucleo/datosFinca.js(161,28): error TS1127: Invalid character.
+src/compai/nucleo/datosFinca.js(167,38): error TS2339: Property 'cultivos' does not exist on type '{}'.
+src/compai/nucleo/datosFinca.js(167,54): error TS2339: Property 'cultivos' does not exist on type '{}'.
+src/compai/nucleo/datosFinca.js(168,38): error TS2339: Property 'especies' does not exist on type '{}'.
+src/compai/nucleo/datosFinca.js(168,54): error TS2339: Property 'especies' does not exist on type '{}'.
+src/compai/nucleo/datosFinca.js(175,44): error TS2339: Property 'total' does not exist on type '{}'.
+src/compai/nucleo/elenco.js(77,31): error TS1127: Invalid character.
+src/compai/nucleo/gestos.js(76,34): error TS1127: Invalid character.
+src/compai/nucleo/gestos.js(77,33): error TS1127: Invalid character.
+src/compai/nucleo/gestos.js(83,6): error TS2349: This expression is not callable.
+  Not all constituents of type '{ <S extends string>(predicate: (value: string, index: number, array: string[]) => value is S, thisArg?: any): S[]; (predicate: (value: string, index: number, array: string[]) => unknown, thisArg?: any): string[]; } | { ...; }' are callable.
+    Type '{ peso: number; }' has no call signatures.
+src/compai/nucleo/gestos.js(108,27): error TS2345: Argument of type '{}' is not assignable to parameter of type 'string[] | { [x: string]: { peso: number; }; }'.
+src/compai/nucleo/modoAprendiz.js(87,39): error TS1127: Invalid character.
+src/compai/nucleo/modoAprendiz.js(88,39): error TS1127: Invalid character.
+src/compai/nucleo/modoAprendiz.js(89,41): error TS1127: Invalid character.
+src/compai/nucleo/modoAprendiz.js(92,36): error TS2741: Property 'mundo' is missing in type '{}' but required in type '{ mundo: string; datosMundo?: any; rand?: () => number; probabilidad?: number; }'.
+src/compai/nucleo/susurroNocturno.js(71,47): error TS1127: Invalid character.
+src/compai/nucleo/susurroNocturno.js(72,76): error TS1127: Invalid character.
+src/components/AgentDemoExample.jsx(117,16): error TS2741: Property 'estado' is missing in type '{ state: string; size: number; ariaLabel: string; }' but required in type '{ [x: string]: any; estado: any; }'.
+src/components/AgentDemoExample.jsx(135,16): error TS2741: Property 'estado' is missing in type '{ state: string; size: number; ariaLabel: string; }' but required in type '{ [x: string]: any; estado: any; }'.
+src/components/AgentScreen/AgentScreen.jsx(3686,10): error TS2741: Property 'estado' is missing in type '{ state: string; size: number; onDoubleClick: () => Promise<void>; ariaLabel: string; className: string; }' but required in type '{ [x: string]: any; estado: any; }'.
+src/components/AgentScreen/AgentScreen.jsx(4188,16): error TS2741: Property 'estado' is missing in type '{ size: number; state: string; ariaLabel: string; }' but required in type '{ [x: string]: any; estado: any; }'.
+src/components/AgentScreen/ChatBubble.jsx(478,14): error TS2741: Property 'estado' is missing in type '{ state: string; size: number; ariaLabel: string; }' but required in type '{ [x: string]: any; estado: any; }'.
+src/components/AgentScreen/ChatHistory.jsx(131,12): error TS2741: Property 'estado' is missing in type '{ state: string; size: number; className: string; }' but required in type '{ [x: string]: any; estado: any; }'.
+src/components/AgentScreen/ChatHistory.jsx(282,16): error TS2741: Property 'estado' is missing in type '{ state: string; size: number; ariaLabel: string; }' but required in type '{ [x: string]: any; estado: any; }'.
+src/components/Aprende/InsightProactivoCard.jsx(75,14): error TS2741: Property 'estado' is missing in type '{ state: string; size: number; ariaLabel: string; }' but required in type '{ [x: string]: any; estado: any; }'.
+src/components/BienvenidaFinca.jsx(265,16): error TS2741: Property 'estado' is missing in type '{ size: number; state: string; ariaLabel: string; }' but required in type '{ [x: string]: any; estado: any; }'.
+src/components/ChagraAgentAvatarZariguya.jsx(60,10): error TS2741: Property 'tier' is missing in type '{ pose: any; husmea: boolean; visema: any; size: number; title: string; className: string; style: { filter: string; }; }' but required in type '{ [x: string]: any; size?: number; className?: string; inline?: boolean; animated?: boolean; title?: string; pose?: string; animo?: string; energia?: number; clima?: any; enso?: string; visema?: any; crias?: number; ... 5 more ...; mundoId?: any; }'.
+src/components/ErrorBoundaryRuta.jsx(16,34): error TS1127: Invalid character.
+src/components/ErrorBoundaryRuta.jsx(17,45): error TS1127: Invalid character.
+src/components/ErrorBoundaryRuta.jsx(18,41): error TS1127: Invalid character.
+src/components/LoginScreen.jsx(202,14): error TS2741: Property 'estado' is missing in type '{ state: string; size: number; ariaLabel: string; }' but required in type '{ [x: string]: any; estado: any; }'.
+src/components/OnboardingCondensado.jsx(678,18): error TS2741: Property 'estado' is missing in type '{ size: number; state: string; ariaLabel: string; }' but required in type '{ [x: string]: any; estado: any; }'.
+src/components/OnboardingCondensado.jsx(1170,14): error TS2741: Property 'estado' is missing in type '{ size: number; state: string; ariaLabel: string; }' but required in type '{ [x: string]: any; estado: any; }'.
+src/components/Typewriter.jsx(36,42): error TS1127: Invalid character.
+src/components/Typewriter.jsx(37,42): error TS1127: Invalid character.
+src/components/Typewriter.jsx(38,42): error TS1127: Invalid character.
+src/components/Typewriter.jsx(39,42): error TS1127: Invalid character.
+src/components/Typewriter.jsx(42,42): error TS1127: Invalid character.
+src/components/Typewriter.jsx(43,42): error TS1127: Invalid character.
+src/components/WelcomeStatsHero.jsx(276,8): error TS2741: Property 'estado' is missing in type '{ state: string; size: number; ariaLabel: string; }' but required in type '{ [x: string]: any; estado: any; }'.
+src/components/__tests__/ChagraAgentAvatar.test.jsx(25,35): error TS2741: Property 'estado' is missing in type '{ state: string; }' but required in type '{ [x: string]: any; estado: any; }'.
+src/components/__tests__/ChagraAgentAvatar.test.jsx(32,35): error TS2741: Property 'estado' is missing in type '{ state: string; glow: true; }' but required in type '{ [x: string]: any; estado: any; }'.
+src/components/__tests__/ChagraAgentAvatar.test.jsx(40,35): error TS2741: Property 'estado' is missing in type '{ state: string; }' but required in type '{ [x: string]: any; estado: any; }'.
+src/components/__tests__/ChagraAgentAvatar.test.jsx(46,35): error TS2741: Property 'estado' is missing in type '{ state: string; }' but required in type '{ [x: string]: any; estado: any; }'.
+src/components/__tests__/ChagraAgentAvatar.test.jsx(51,35): error TS2741: Property 'estado' is missing in type '{ state: string; }' but required in type '{ [x: string]: any; estado: any; }'.
+src/components/__tests__/ChagraAgentAvatar.test.jsx(58,13): error TS2741: Property 'estado' is missing in type '{ state: string; onDoubleClick: Mock<Procedure>; }' but required in type '{ [x: string]: any; estado: any; }'.
+src/components/__tests__/ChagraAgentAvatar.test.jsx(68,13): error TS2741: Property 'estado' is missing in type '{ state: string; onClick: Mock<Procedure>; onDoubleClick: Mock<Procedure>; }' but required in type '{ [x: string]: any; estado: any; }'.
+src/components/__tests__/ChagraAgentAvatar.test.jsx(78,8): error TS2741: Property 'estado' is missing in type '{ state: string; onDoubleClick: () => void; ariaLabel: string; }' but required in type '{ [x: string]: any; estado: any; }'.
+src/components/__tests__/ChagraAgentAvatar.test.jsx(91,8): error TS2741: Property 'estado' is missing in type '{ state: string; onDoubleClick: () => void; ariaLabel: string; }' but required in type '{ [x: string]: any; estado: any; }'.
+src/components/__tests__/ChagraAgentAvatar.test.jsx(102,45): error TS2741: Property 'estado' is missing in type '{ state: string; }' but required in type '{ [x: string]: any; estado: any; }'.
+src/components/__tests__/ChagraAgentAvatar.test.jsx(106,15): error TS2741: Property 'estado' is missing in type '{ state: string; }' but required in type '{ [x: string]: any; estado: any; }'.
+src/components/__tests__/ChagraAgentAvatar.test.jsx(110,15): error TS2741: Property 'estado' is missing in type '{ state: string; }' but required in type '{ [x: string]: any; estado: any; }'.
+src/components/__tests__/ChagraAgentAvatar.test.jsx(114,15): error TS2741: Property 'estado' is missing in type '{ state: string; }' but required in type '{ [x: string]: any; estado: any; }'.
+src/components/__tests__/ChagraAgentAvatar.test.jsx(121,35): error TS2741: Property 'estado' is missing in type '{ state: string; glow: true; }' but required in type '{ [x: string]: any; estado: any; }'.
+src/components/agent/ColibriTransition.jsx(116,10): error TS2304: Cannot find name 'Angelita'.
+src/components/cafe/LaminaCafeto.jsx(91,27): error TS2322: Type 'string' is not assignable to type '"end" | "start" | "inherit" | "middle"'.
+src/components/cafe/LaminaCafeto.jsx(95,34): error TS2322: Type 'string' is not assignable to type '"end" | "start" | "inherit" | "middle"'.
+src/components/cafe/LaminaCafeto.jsx(202,8): error TS2741: Property 'nota' is missing in type '{ texto: string; tx: string; ty: string; guia: { d: string; px: number; py: number; }; }' but required in type '{ tx: any; ty: any; anchor?: string; texto: any; nota: any; guia: any; }'.
+src/components/dashboard/AgentHero.jsx(1740,26): error TS2741: Property 'estado' is missing in type '{ size: number; state: string; ariaLabel: string; }' but required in type '{ [x: string]: any; estado: any; }'.
+src/components/dashboard/AgentHero.jsx(2107,32): error TS2741: Property 'estado' is missing in type '{ size: number; state: string; ariaLabel: string; }' but required in type '{ [x: string]: any; estado: any; }'.
+src/components/hoy/HoyEnFincaScreen.jsx(215,23): error TS2339: Property 'volviendo' does not exist on type '{ fase: "pantalla" | "cerca" | "puesto" | "volviendo"; enPuesto: boolean; paseando: boolean; paradasActivas: ParadaGuia[]; abortarPaseo: () => void; }'.
+src/components/milpa/LaminaMaiz.jsx(46,9): error TS2322: Type 'string' is not assignable to type '"end" | "start" | "inherit" | "middle"'.
+src/components/milpa/LaminaMaiz.jsx(59,11): error TS2322: Type 'string' is not assignable to type '"end" | "start" | "inherit" | "middle"'.
+src/hooks/__tests__/useCompaiPaseo.test.jsx(54,42): error TS2353: Object literal may only specify known properties, and 'anillo' does not exist in type 'ParadaGuia'.
+src/hooks/__tests__/useCompaiPaseo.test.jsx(55,42): error TS2353: Object literal may only specify known properties, and 'anillo' does not exist in type 'ParadaGuia'.
+src/hooks/__tests__/useCompaiPaseo.test.jsx(68,42): error TS2353: Object literal may only specify known properties, and 'anillo' does not exist in type 'ParadaGuia'.
+src/hooks/__tests__/useCompaiPaseo.test.jsx(69,42): error TS2353: Object literal may only specify known properties, and 'anillo' does not exist in type 'ParadaGuia'.
+src/hooks/__tests__/useCompaiPaseo.test.jsx(86,67): error TS2353: Object literal may only specify known properties, and 'anillo' does not exist in type 'ParadaGuia'.
+src/hooks/__tests__/useCompaiPaseo.test.jsx(96,67): error TS2353: Object literal may only specify known properties, and 'anillo' does not exist in type 'ParadaGuia'.
+src/hooks/__tests__/useCompaiPaseo.test.jsx(112,67): error TS2353: Object literal may only specify known properties, and 'anillo' does not exist in type 'ParadaGuia'.
+src/hooks/__tests__/useCompaiPaseo.test.jsx(132,67): error TS2353: Object literal may only specify known properties, and 'anillo' does not exist in type 'ParadaGuia'.
+src/hooks/__tests__/useCompaiPaseo.test.jsx(147,67): error TS2353: Object literal may only specify known properties, and 'anillo' does not exist in type 'ParadaGuia'.
+src/hooks/__tests__/useCompaiPaseo.test.jsx(177,67): error TS2353: Object literal may only specify known properties, and 'anillo' does not exist in type 'ParadaGuia'.
+src/hooks/useAngelitaGuia.js(97,41): error TS1127: Invalid character.
+src/hooks/useAngelitaGuia.js(98,41): error TS1127: Invalid character.
+src/hooks/useAngelitaGuia.js(99,58): error TS1127: Invalid character.
+src/hooks/useAngelitaGuia.js(143,40): error TS1127: Invalid character.
+src/hooks/useAngelitaGuia.js(144,43): error TS1127: Invalid character.
+src/hooks/useAngelitaGuia.js(145,45): error TS1127: Invalid character.
+src/hooks/useAngelitaGuia.js(151,44): error TS1127: Invalid character.
+src/hooks/useAngelitaGuia.js(155,48): error TS1127: Invalid character.
+src/hooks/useAngelitaGuia.js(157,44): error TS1127: Invalid character.
+src/hooks/useBusquedaUnificada.js(32,46): error TS2307: Cannot find module '../../config/taxonomy.js' or its corresponding type declarations.
+src/hooks/useBusquedaUnificada.js(47,38): error TS2307: Cannot find module '../../visual/mundo3d/mundoData.js' or its corresponding type declarations.
+src/hooks/useBusquedaUnificada.js(58,46): error TS2307: Cannot find module '../../data/biopreparadosCatalog.js' or its corresponding type declarations.
+src/hooks/useBusquedaUnificada.js(84,49): error TS2353: Object literal may only specify known properties, and 'query' does not exist in type '{ resultados: Resultado[]; buscar: (q: string) => void; abierto: boolean; toggle: () => void; }'.
+src/hooks/useCompaiPaseo.js(60,44): error TS1127: Invalid character.
+src/hooks/useCompaiPaseo.js(62,45): error TS1127: Invalid character.
+src/hooks/useCompaiPaseo.js(183,5): error TS2322: Type 'string' is not assignable to type '"pantalla" | "cerca" | "puesto" | "volviendo"'.
+src/hooks/useInventarioCompai.js(63,28): error TS1127: Invalid character.
+src/hooks/useT.js(11,25): error TS2307: Cannot find module '../../config/messages.js' or its corresponding type declarations.
+src/hooks/useT.js(27,45): error TS1127: Invalid character.
+src/mockups/AngelitaViva.jsx(193,52): error TS2322: Type '{ estado: string; size: number; gafas: true; }' is not assignable to type 'IntrinsicAttributes & { estado?: string; confianza?: string | number; direccion?: "derecha" | "izquierda"; size?: number; className?: string; animated?: boolean; visema?: string; ... 8 more ...; title?: string; }'.
+  Property 'gafas' does not exist on type 'IntrinsicAttributes & { estado?: string; confianza?: string | number; direccion?: "derecha" | "izquierda"; size?: number; className?: string; animated?: boolean; visema?: string; ... 8 more ...; title?: string; }'.
+src/mockups/DiaEnFinca.jsx(259,58): error TS2339: Property 'tomate' does not exist on type '{}'.
+src/mockups/DiaEnFinca.jsx(260,58): error TS2339: Property 'tanque' does not exist on type '{}'.
+src/mockups/HojaPruebaValle.jsx(122,8): error TS2739: Type '{ tipo: string; args: number[]; pos: number[]; mat: any; }' is missing the following properties from type '{ tipo: any; args: any; pos: any; rot: any; mat: any; casco: any; matCasco: any; g: any; radio?: number; }': rot, casco, matCasco, g
+src/mockups/HojaPruebaValle.jsx(123,8): error TS2739: Type '{ tipo: string; args: number[]; pos: number[]; mat: any; }' is missing the following properties from type '{ tipo: any; args: any; pos: any; rot: any; mat: any; casco: any; matCasco: any; g: any; radio?: number; }': rot, casco, matCasco, g
+src/mockups/HojaPruebaValle.jsx(124,8): error TS2739: Type '{ tipo: string; args: number[]; pos: number[]; mat: any; }' is missing the following properties from type '{ tipo: any; args: any; pos: any; rot: any; mat: any; casco: any; matCasco: any; g: any; radio?: number; }': rot, casco, matCasco, g
+src/mockups/HojaPruebaValle.jsx(125,8): error TS2739: Type '{ tipo: string; args: number[]; pos: number[]; mat: any; }' is missing the following properties from type '{ tipo: any; args: any; pos: any; rot: any; mat: any; casco: any; matCasco: any; g: any; radio?: number; }': rot, casco, matCasco, g
+src/mockups/HojaPruebaValle.jsx(150,25): error TS2322: Type 'number[]' is not assignable to type 'number | Vector3 | [x: number, y: number, z?: number] | readonly [x: number, y: number, z?: number] | Readonly<Vector3>'.
+  Type 'number[]' is not assignable to type 'Vector3 | [x: number, y: number, z?: number] | readonly [x: number, y: number, z?: number] | Readonly<Vector3>'.
+    Type 'number[]' is not assignable to type '[x: number, y: number, z?: number]'.
+      Target requires 2 element(s) but source may have fewer.
+src/mockups/HojaPruebaValle.jsx(154,8): error TS2739: Type '{ tipo: string; args: number[]; pos: number[]; rot: number[]; mat: any; }' is missing the following properties from type '{ tipo: any; args: any; pos: any; rot: any; mat: any; casco: any; matCasco: any; g: any; radio?: number; }': casco, matCasco, g
+src/mockups/HojaPruebaValle.jsx(155,8): error TS2739: Type '{ tipo: string; args: number[]; pos: number[]; rot: number[]; mat: any; }' is missing the following properties from type '{ tipo: any; args: any; pos: any; rot: any; mat: any; casco: any; matCasco: any; g: any; radio?: number; }': casco, matCasco, g
+src/mockups/HojaPruebaValle.jsx(162,8): error TS2739: Type '{ tipo: string; args: number[]; pos: number[]; rot: number[]; mat: any; }' is missing the following properties from type '{ tipo: any; args: any; pos: any; rot: any; mat: any; casco: any; matCasco: any; g: any; radio?: number; }': casco, matCasco, g
+src/mockups/HojaPruebaValle.jsx(171,8): error TS2739: Type '{ tipo: string; args: number[]; pos: number[]; rot: number[]; mat: any; }' is missing the following properties from type '{ tipo: any; args: any; pos: any; rot: any; mat: any; casco: any; matCasco: any; g: any; radio?: number; }': casco, matCasco, g
+src/mockups/HojaPruebaValle.jsx(172,8): error TS2739: Type '{ tipo: string; args: number[]; pos: number[]; rot: number[]; mat: any; }' is missing the following properties from type '{ tipo: any; args: any; pos: any; rot: any; mat: any; casco: any; matCasco: any; g: any; radio?: number; }': casco, matCasco, g
+src/mockups/HojaPruebaValle.jsx(181,8): error TS2739: Type '{ tipo: string; args: number[]; pos: number[]; mat: any; }' is missing the following properties from type '{ tipo: any; args: any; pos: any; rot: any; mat: any; casco: any; matCasco: any; g: any; radio?: number; }': rot, casco, matCasco, g
+src/mockups/HojaPruebaValle.jsx(182,8): error TS2739: Type '{ tipo: string; args: number[]; pos: number[]; mat: any; }' is missing the following properties from type '{ tipo: any; args: any; pos: any; rot: any; mat: any; casco: any; matCasco: any; g: any; radio?: number; }': rot, casco, matCasco, g
+src/mockups/HojaPruebaValle.jsx(183,8): error TS2739: Type '{ tipo: string; args: number[]; pos: number[]; mat: any; }' is missing the following properties from type '{ tipo: any; args: any; pos: any; rot: any; mat: any; casco: any; matCasco: any; g: any; radio?: number; }': rot, casco, matCasco, g
+src/mockups/HojaPruebaValle.jsx(184,8): error TS2739: Type '{ tipo: string; args: number[]; pos: number[]; mat: any; }' is missing the following properties from type '{ tipo: any; args: any; pos: any; rot: any; mat: any; casco: any; matCasco: any; g: any; radio?: number; }': rot, casco, matCasco, g
+src/mockups/HojaPruebaValle.jsx(189,10): error TS2739: Type '{ tipo: string; args: number[]; pos: number[]; mat: any; }' is missing the following properties from type '{ tipo: any; args: any; pos: any; rot: any; mat: any; casco: any; matCasco: any; g: any; radio?: number; }': rot, casco, matCasco, g
+src/mockups/HojaPruebaValle.jsx(190,10): error TS2739: Type '{ tipo: string; args: number[]; pos: number[]; mat: any; }' is missing the following properties from type '{ tipo: any; args: any; pos: any; rot: any; mat: any; casco: any; matCasco: any; g: any; radio?: number; }': rot, casco, matCasco, g
+src/mockups/HojaPruebaValle.jsx(192,10): error TS2739: Type '{ tipo: string; args: number[]; pos: number[]; rot: number[]; mat: any; }' is missing the following properties from type '{ tipo: any; args: any; pos: any; rot: any; mat: any; casco: any; matCasco: any; g: any; radio?: number; }': casco, matCasco, g
+src/mockups/HojaPruebaValle.jsx(200,10): error TS2739: Type '{ tipo: string; args: number[]; pos: number[]; rot: number[]; mat: any; }' is missing the following properties from type '{ tipo: any; args: any; pos: any; rot: any; mat: any; casco: any; matCasco: any; g: any; radio?: number; }': casco, matCasco, g
+src/mockups/HojaPruebaValle.jsx(201,10): error TS2739: Type '{ tipo: string; args: number[]; pos: number[]; rot: number[]; mat: any; }' is missing the following properties from type '{ tipo: any; args: any; pos: any; rot: any; mat: any; casco: any; matCasco: any; g: any; radio?: number; }': casco, matCasco, g
+src/mockups/HojaPruebaValle.jsx(202,10): error TS2739: Type '{ tipo: string; args: number[]; pos: number[]; mat: any; }' is missing the following properties from type '{ tipo: any; args: any; pos: any; rot: any; mat: any; casco: any; matCasco: any; g: any; radio?: number; }': rot, casco, matCasco, g
+src/mockups/HojaPruebaValle.jsx(204,10): error TS2739: Type '{ tipo: string; args: number[]; pos: number[]; mat: any; }' is missing the following properties from type '{ tipo: any; args: any; pos: any; rot: any; mat: any; casco: any; matCasco: any; g: any; radio?: number; }': rot, casco, matCasco, g
+src/mockups/HojaPruebaValle.jsx(205,10): error TS2739: Type '{ tipo: string; args: number[]; pos: number[]; mat: any; }' is missing the following properties from type '{ tipo: any; args: any; pos: any; rot: any; mat: any; casco: any; matCasco: any; g: any; radio?: number; }': rot, casco, matCasco, g
+src/mockups/HojaPruebaValle.jsx(209,8): error TS2739: Type '{ tipo: string; args: number[]; pos: number[]; rot: number[]; mat: any; }' is missing the following properties from type '{ tipo: any; args: any; pos: any; rot: any; mat: any; casco: any; matCasco: any; g: any; radio?: number; }': casco, matCasco, g
+src/mockups/HojaPruebaValle.jsx(214,10): error TS2741: Property 'rot' is missing in type '{ casco: boolean; matCasco: any; g: number; tipo: string; args: number[]; pos: number[]; mat: any; radio: number; }' but required in type '{ tipo: any; args: any; pos: any; rot: any; mat: any; casco: any; matCasco: any; g: any; radio?: number; }'.
+src/mockups/HojaPruebaValle.jsx(215,10): error TS2741: Property 'rot' is missing in type '{ casco: boolean; matCasco: any; g: number; tipo: string; args: number[]; pos: number[]; mat: any; radio: number; }' but required in type '{ tipo: any; args: any; pos: any; rot: any; mat: any; casco: any; matCasco: any; g: any; radio?: number; }'.
+src/mockups/HojaPruebaValle.jsx(216,10): error TS2739: Type '{ tipo: string; args: number[]; pos: number[]; rot: number[]; mat: any; radio: number; }' is missing the following properties from type '{ tipo: any; args: any; pos: any; rot: any; mat: any; casco: any; matCasco: any; g: any; radio?: number; }': casco, matCasco, g
+src/mockups/HojaPruebaValle.jsx(217,10): error TS2741: Property 'rot' is missing in type '{ casco: boolean; matCasco: any; g: number; tipo: string; args: number[]; pos: number[]; mat: any; radio: number; }' but required in type '{ tipo: any; args: any; pos: any; rot: any; mat: any; casco: any; matCasco: any; g: any; radio?: number; }'.
+src/mockups/HojaPruebaValle.jsx(218,10): error TS2741: Property 'rot' is missing in type '{ casco: boolean; matCasco: any; g: number; tipo: string; args: number[]; pos: number[]; mat: any; radio: number; }' but required in type '{ tipo: any; args: any; pos: any; rot: any; mat: any; casco: any; matCasco: any; g: any; radio?: number; }'.
+src/mockups/HojaPruebaValle.jsx(219,10): error TS2741: Property 'rot' is missing in type '{ casco: boolean; matCasco: any; g: number; tipo: string; args: number[]; pos: number[]; mat: any; radio: number; }' but required in type '{ tipo: any; args: any; pos: any; rot: any; mat: any; casco: any; matCasco: any; g: any; radio?: number; }'.
+src/mockups/HojaPruebaValle.jsx(225,10): error TS2741: Property 'rot' is missing in type '{ casco: boolean; matCasco: any; g: number; tipo: string; args: number[]; pos: number[]; mat: any; radio: number; }' but required in type '{ tipo: any; args: any; pos: any; rot: any; mat: any; casco: any; matCasco: any; g: any; radio?: number; }'.
+src/mockups/HojaPruebaValle.jsx(226,10): error TS2741: Property 'rot' is missing in type '{ casco: boolean; matCasco: any; g: number; tipo: string; args: number[]; pos: number[]; mat: any; radio: number; }' but required in type '{ tipo: any; args: any; pos: any; rot: any; mat: any; casco: any; matCasco: any; g: any; radio?: number; }'.
+src/mockups/HojaPruebaValle.jsx(227,10): error TS2741: Property 'rot' is missing in type '{ casco: boolean; matCasco: any; g: number; tipo: string; args: number[]; pos: number[]; mat: any; radio: number; }' but required in type '{ tipo: any; args: any; pos: any; rot: any; mat: any; casco: any; matCasco: any; g: any; radio?: number; }'.
+src/mockups/HojaPruebaValle.jsx(230,10): error TS2741: Property 'rot' is missing in type '{ casco: boolean; matCasco: any; g: number; tipo: string; args: number[]; pos: number[]; mat: any; radio: number; }' but required in type '{ tipo: any; args: any; pos: any; rot: any; mat: any; casco: any; matCasco: any; g: any; radio?: number; }'.
+src/mockups/HojaPruebaValle.jsx(231,10): error TS2741: Property 'rot' is missing in type '{ casco: boolean; matCasco: any; g: number; tipo: string; args: number[]; pos: number[]; mat: any; radio: number; }' but required in type '{ tipo: any; args: any; pos: any; rot: any; mat: any; casco: any; matCasco: any; g: any; radio?: number; }'.
+src/mockups/HojaPruebaValle.jsx(232,10): error TS2741: Property 'rot' is missing in type '{ casco: boolean; matCasco: any; g: number; tipo: string; args: number[]; pos: number[]; mat: any; radio: number; }' but required in type '{ tipo: any; args: any; pos: any; rot: any; mat: any; casco: any; matCasco: any; g: any; radio?: number; }'.
+src/mockups/HojaPruebaValle.jsx(233,10): error TS2741: Property 'rot' is missing in type '{ casco: boolean; matCasco: any; g: number; tipo: string; args: number[]; pos: number[]; mat: any; radio: number; }' but required in type '{ tipo: any; args: any; pos: any; rot: any; mat: any; casco: any; matCasco: any; g: any; radio?: number; }'.
+src/mockups/HojaPruebaValle.jsx(239,10): error TS2741: Property 'rot' is missing in type '{ casco: boolean; matCasco: any; g: number; tipo: string; args: number[]; pos: number[]; mat: any; radio: number; }' but required in type '{ tipo: any; args: any; pos: any; rot: any; mat: any; casco: any; matCasco: any; g: any; radio?: number; }'.
+src/mockups/HojaPruebaValle.jsx(240,10): error TS2741: Property 'rot' is missing in type '{ casco: boolean; matCasco: any; g: number; tipo: string; args: number[]; pos: number[]; mat: any; radio: number; }' but required in type '{ tipo: any; args: any; pos: any; rot: any; mat: any; casco: any; matCasco: any; g: any; radio?: number; }'.
+src/mockups/HojaPruebaValle.jsx(241,10): error TS2741: Property 'rot' is missing in type '{ casco: boolean; matCasco: any; g: number; tipo: string; args: number[]; pos: number[]; mat: any; radio: number; }' but required in type '{ tipo: any; args: any; pos: any; rot: any; mat: any; casco: any; matCasco: any; g: any; radio?: number; }'.
+src/mockups/HojaPruebaValle.jsx(242,10): error TS2741: Property 'rot' is missing in type '{ casco: boolean; matCasco: any; g: number; tipo: string; args: number[]; pos: number[]; mat: any; radio: number; }' but required in type '{ tipo: any; args: any; pos: any; rot: any; mat: any; casco: any; matCasco: any; g: any; radio?: number; }'.
+src/mockups/HojaPruebaValle.jsx(243,10): error TS2741: Property 'rot' is missing in type '{ casco: boolean; matCasco: any; g: number; tipo: string; args: number[]; pos: number[]; mat: any; radio: number; }' but required in type '{ tipo: any; args: any; pos: any; rot: any; mat: any; casco: any; matCasco: any; g: any; radio?: number; }'.
+src/mockups/HojaPruebaValle.jsx(244,10): error TS2741: Property 'rot' is missing in type '{ casco: boolean; matCasco: any; g: number; tipo: string; args: number[]; pos: number[]; mat: any; radio: number; }' but required in type '{ tipo: any; args: any; pos: any; rot: any; mat: any; casco: any; matCasco: any; g: any; radio?: number; }'.
+src/mockups/HojaPruebaValle.jsx(245,10): error TS2741: Property 'rot' is missing in type '{ casco: boolean; matCasco: any; g: number; tipo: string; args: number[]; pos: number[]; mat: any; radio: number; }' but required in type '{ tipo: any; args: any; pos: any; rot: any; mat: any; casco: any; matCasco: any; g: any; radio?: number; }'.
+src/mockups/HojaPruebaValle.jsx(247,10): error TS2739: Type '{ tipo: string; args: number[]; pos: number[]; mat: any; }' is missing the following properties from type '{ tipo: any; args: any; pos: any; rot: any; mat: any; casco: any; matCasco: any; g: any; radio?: number; }': rot, casco, matCasco, g
+src/mockups/HojaPruebaValle.jsx(255,10): error TS2739: Type '{ tipo: string; args: number[]; pos: number[]; mat: any; }' is missing the following properties from type '{ tipo: any; args: any; pos: any; rot: any; mat: any; casco: any; matCasco: any; g: any; radio?: number; }': rot, casco, matCasco, g
+src/mockups/HojaPruebaValle.jsx(298,80): error TS2345: Argument of type 'string' is not assignable to parameter of type '"cultivo" | "agua" | "pasto" | "madera" | "piel" | "corteza" | "roca" | "piedra" | "camino" | "encalado" | "follajeCerca" | "follajeLejos" | "tierraLabrada" | "teja" | "zocalo" | "carpinteria"'.
+src/mockups/HojaPruebaValle.jsx(340,19): error TS2322: Type 'number[]' is not assignable to type 'number | Vector3 | [x: number, y: number, z?: number] | readonly [x: number, y: number, z?: number] | Readonly<Vector3>'.
+  Type 'number[]' is not assignable to type 'Vector3 | [x: number, y: number, z?: number] | readonly [x: number, y: number, z?: number] | Readonly<Vector3>'.
+    Type 'number[]' is not assignable to type '[x: number, y: number, z?: number]'.
+      Target requires 2 element(s) but source may have fewer.
+src/mockups/MundoAbejas3D.jsx(494,31): error TS2322: Type 'number[]' is not assignable to type 'number | Vector3 | [x: number, y: number, z?: number] | readonly [x: number, y: number, z?: number] | Readonly<Vector3>'.
+  Type 'number[]' is not assignable to type 'Vector3 | [x: number, y: number, z?: number] | readonly [x: number, y: number, z?: number] | Readonly<Vector3>'.
+    Type 'number[]' is not assignable to type '[x: number, y: number, z?: number]'.
+      Target requires 2 element(s) but source may have fewer.
+src/mockups/MundoAgua3D.jsx(1117,9): error TS2322: Type 'number[]' is not assignable to type '[number, number]'.
+  Target requires 2 element(s) but source may have fewer.
+src/mockups/MundoBoticaCana3D.jsx(205,25): error TS2322: Type 'number[]' is not assignable to type 'number | Vector3 | [x: number, y: number, z?: number] | readonly [x: number, y: number, z?: number] | Readonly<Vector3>'.
+  Type 'number[]' is not assignable to type 'Vector3 | [x: number, y: number, z?: number] | readonly [x: number, y: number, z?: number] | Readonly<Vector3>'.
+    Type 'number[]' is not assignable to type '[x: number, y: number, z?: number]'.
+      Target requires 2 element(s) but source may have fewer.
+src/mockups/MundoBoticaCana3D.jsx(575,15): error TS2322: Type 'number[]' is not assignable to type 'number'.
+src/mockups/MundoBoticaCana3D.jsx(893,12): error TS2739: Type '{ pos: number[]; texto: string; }' is missing the following properties from type '{ pos: any; texto: any; paso: any; activo: any; }': paso, activo
+src/mockups/MundoBoticaCana3D.jsx(894,12): error TS2739: Type '{ pos: number[]; texto: string; }' is missing the following properties from type '{ pos: any; texto: any; paso: any; activo: any; }': paso, activo
+src/mockups/MundoBoticaCana3D.jsx(895,12): error TS2739: Type '{ pos: number[]; texto: string; }' is missing the following properties from type '{ pos: any; texto: any; paso: any; activo: any; }': paso, activo
+src/mockups/MundoBoticaCana3D.jsx(896,12): error TS2739: Type '{ pos: number[]; texto: string; }' is missing the following properties from type '{ pos: any; texto: any; paso: any; activo: any; }': paso, activo
+src/mockups/MundoBoticaCana3D.jsx(897,12): error TS2739: Type '{ pos: number[]; texto: string; }' is missing the following properties from type '{ pos: any; texto: any; paso: any; activo: any; }': paso, activo
+src/mockups/MundoBoticaCana3D.jsx(898,12): error TS2739: Type '{ pos: number[]; texto: string; }' is missing the following properties from type '{ pos: any; texto: any; paso: any; activo: any; }': paso, activo
+src/mockups/MundoBoticaCana3D.jsx(899,12): error TS2739: Type '{ pos: number[]; texto: string; }' is missing the following properties from type '{ pos: any; texto: any; paso: any; activo: any; }': paso, activo
+src/mockups/MundoBoticaCana3D.jsx(1244,12): error TS2322: Type 'number[]' is not assignable to type 'number | Vector3 | [x: number, y: number, z?: number] | readonly [x: number, y: number, z?: number] | Readonly<Vector3>'.
+  Type 'number[]' is not assignable to type 'Vector3 | [x: number, y: number, z?: number] | readonly [x: number, y: number, z?: number] | Readonly<Vector3>'.
+    Type 'number[]' is not assignable to type '[x: number, y: number, z?: number]'.
+      Target requires 2 element(s) but source may have fewer.
+src/mockups/MundoBoticaCana3D.jsx(1600,12): error TS2322: Type 'number[]' is not assignable to type 'number | Vector3 | [x: number, y: number, z?: number] | readonly [x: number, y: number, z?: number] | Readonly<Vector3>'.
+  Type 'number[]' is not assignable to type 'Vector3 | [x: number, y: number, z?: number] | readonly [x: number, y: number, z?: number] | Readonly<Vector3>'.
+    Type 'number[]' is not assignable to type '[x: number, y: number, z?: number]'.
+      Target requires 2 element(s) but source may have fewer.
+src/mockups/MundoBoticaCana3D.jsx(2390,11): error TS2322: Type '{ position: number[]; fov: number; }' is not assignable to type 'CameraProps'.
+  Type '{ position: number[]; fov: number; }' is not assignable to type 'Partial<Mutable<Overwrite<Partial<Overwrite<Camera, MathProps<Camera> & ReactProps<Camera> & Partial<EventHandlers>>>, Omit<...>>> & Mutable<...> & Mutable<...>> & { ...; }'.
+    Type '{ position: number[]; fov: number; }' is not assignable to type 'Partial<Mutable<Overwrite<Partial<Overwrite<Camera, MathProps<Camera> & ReactProps<Camera> & Partial<EventHandlers>>>, Omit<...>>> & Mutable<...> & Mutable<...>>'.
+      Types of property 'position' are incompatible.
+        Type 'number[]' is not assignable to type 'number | Vector3 | [x: number, y: number, z?: number] | readonly [x: number, y: number, z?: number] | Readonly<Vector3>'.
+          Type 'number[]' is not assignable to type 'Vector3 | [x: number, y: number, z?: number] | readonly [x: number, y: number, z?: number] | Readonly<Vector3>'.
+            Type 'number[]' is not assignable to type '[x: number, y: number, z?: number]'.
+              Target requires 2 element(s) but source may have fewer.
+src/mockups/MundoBoticaCana3D.jsx(2402,13): error TS2322: Type 'number[]' is not assignable to type 'number | Vector3 | MutableOrReadonlyParameters<(x: number, y: number, z?: number) => Vector3>'.
+  Type 'number[]' is not assignable to type 'Vector3 | [x: number, y: number, z?: number] | readonly [x: number, y: number, z?: number]'.
+    Type 'number[]' is not assignable to type '[x: number, y: number, z?: number]'.
+      Target requires 2 element(s) but source may have fewer.
+src/mockups/MundoFrutales3D.jsx(208,25): error TS2322: Type 'number[]' is not assignable to type 'number | Vector3 | [x: number, y: number, z?: number] | readonly [x: number, y: number, z?: number] | Readonly<Vector3>'.
+  Type 'number[]' is not assignable to type 'Vector3 | [x: number, y: number, z?: number] | readonly [x: number, y: number, z?: number] | Readonly<Vector3>'.
+    Type 'number[]' is not assignable to type '[x: number, y: number, z?: number]'.
+      Target requires 2 element(s) but source may have fewer.
+src/mockups/MundoFrutales3D.jsx(473,24): error TS2322: Type 'number[]' is not assignable to type 'number | Vector3 | [x: number, y: number, z?: number] | readonly [x: number, y: number, z?: number] | Readonly<Vector3>'.
+  Type 'number[]' is not assignable to type 'Vector3 | [x: number, y: number, z?: number] | readonly [x: number, y: number, z?: number] | Readonly<Vector3>'.
+    Type 'number[]' is not assignable to type '[x: number, y: number, z?: number]'.
+      Target requires 2 element(s) but source may have fewer.
+src/mockups/MundoLecheria3D.jsx(192,25): error TS2322: Type 'number[]' is not assignable to type 'number | Vector3 | [x: number, y: number, z?: number] | readonly [x: number, y: number, z?: number] | Readonly<Vector3>'.
+  Type 'number[]' is not assignable to type 'Vector3 | [x: number, y: number, z?: number] | readonly [x: number, y: number, z?: number] | Readonly<Vector3>'.
+    Type 'number[]' is not assignable to type '[x: number, y: number, z?: number]'.
+      Target requires 2 element(s) but source may have fewer.
+src/mockups/MundoLecheria3D.jsx(531,12): error TS2741: Property 'paso' is missing in type '{ pos: number[]; texto: string; }' but required in type '{ pos: any; texto: any; paso: any; }'.
+src/mockups/MundoLecheria3D.jsx(532,12): error TS2741: Property 'paso' is missing in type '{ pos: number[]; texto: string; }' but required in type '{ pos: any; texto: any; paso: any; }'.
+src/mockups/MundoLecheria3D.jsx(606,12): error TS2322: Type 'number[]' is not assignable to type 'number | Vector3 | [x: number, y: number, z?: number] | readonly [x: number, y: number, z?: number] | Readonly<Vector3>'.
+  Type 'number[]' is not assignable to type 'Vector3 | [x: number, y: number, z?: number] | readonly [x: number, y: number, z?: number] | Readonly<Vector3>'.
+    Type 'number[]' is not assignable to type '[x: number, y: number, z?: number]'.
+      Target requires 2 element(s) but source may have fewer.
+src/mockups/MundoLecheria3D.jsx(735,12): error TS2322: Type 'number[]' is not assignable to type 'number | Vector3 | [x: number, y: number, z?: number] | readonly [x: number, y: number, z?: number] | Readonly<Vector3>'.
+  Type 'number[]' is not assignable to type 'Vector3 | [x: number, y: number, z?: number] | readonly [x: number, y: number, z?: number] | Readonly<Vector3>'.
+    Type 'number[]' is not assignable to type '[x: number, y: number, z?: number]'.
+      Target requires 2 element(s) but source may have fewer.
+src/mockups/MundoLecheria3D.jsx(934,12): error TS2741: Property 'paso' is missing in type '{ pos: number[]; texto: string; }' but required in type '{ pos: any; texto: any; paso: any; }'.
+src/mockups/MundoLeguminosas3D.jsx(208,25): error TS2322: Type 'number[]' is not assignable to type 'number | Vector3 | [x: number, y: number, z?: number] | readonly [x: number, y: number, z?: number] | Readonly<Vector3>'.
+  Type 'number[]' is not assignable to type 'Vector3 | [x: number, y: number, z?: number] | readonly [x: number, y: number, z?: number] | Readonly<Vector3>'.
+    Type 'number[]' is not assignable to type '[x: number, y: number, z?: number]'.
+      Target requires 2 element(s) but source may have fewer.
+src/mockups/MundoLeguminosas3D.jsx(600,24): error TS2322: Type 'number[]' is not assignable to type 'number | Vector3 | [x: number, y: number, z?: number] | readonly [x: number, y: number, z?: number] | Readonly<Vector3>'.
+  Type 'number[]' is not assignable to type 'Vector3 | [x: number, y: number, z?: number] | readonly [x: number, y: number, z?: number] | Readonly<Vector3>'.
+    Type 'number[]' is not assignable to type '[x: number, y: number, z?: number]'.
+      Target requires 2 element(s) but source may have fewer.
+src/mockups/MundoLeguminosas3D.jsx(610,24): error TS2322: Type 'number[]' is not assignable to type 'number | Vector3 | [x: number, y: number, z?: number] | readonly [x: number, y: number, z?: number] | Readonly<Vector3>'.
+  Type 'number[]' is not assignable to type 'Vector3 | [x: number, y: number, z?: number] | readonly [x: number, y: number, z?: number] | Readonly<Vector3>'.
+    Type 'number[]' is not assignable to type '[x: number, y: number, z?: number]'.
+      Target requires 2 element(s) but source may have fewer.
+src/mockups/MundoLeguminosas3D.jsx(623,25): error TS2322: Type 'number[]' is not assignable to type 'number | Vector3 | [x: number, y: number, z?: number] | readonly [x: number, y: number, z?: number] | Readonly<Vector3>'.
+  Type 'number[]' is not assignable to type 'Vector3 | [x: number, y: number, z?: number] | readonly [x: number, y: number, z?: number] | Readonly<Vector3>'.
+    Type 'number[]' is not assignable to type '[x: number, y: number, z?: number]'.
+      Target requires 2 element(s) but source may have fewer.
+src/mockups/MundoLeguminosas3D.jsx(1119,10): error TS2322: Type '{ reducedMotion: any; tipo: string; rol: string; base: number[]; size: number; fase: number; title: string; key: number; }' is not assignable to type '{ tipo: "colibri" | "mariposa" | "lombriz" | "escarabajo"; base: [number, number, number]; size?: number; rol?: "controlador" | "polinizador" | "descomponedor"; patron?: "polinizar" | "patrulla" | "reptar" | "revoloteo"; fase?: number; df?: number; title?: string; reducedMotion?: boolean; }'.
+  Types of property 'tipo' are incompatible.
+    Type 'string' is not assignable to type '"colibri" | "mariposa" | "lombriz" | "escarabajo"'.
+src/mockups/MundoMicrofauna3D.jsx(216,12): error TS2322: Type 'number[]' is not assignable to type 'number | Vector3 | [x: number, y: number, z?: number] | readonly [x: number, y: number, z?: number] | Readonly<Vector3>'.
+  Type 'number[]' is not assignable to type 'Vector3 | [x: number, y: number, z?: number] | readonly [x: number, y: number, z?: number] | Readonly<Vector3>'.
+    Type 'number[]' is not assignable to type '[x: number, y: number, z?: number]'.
+      Target requires 2 element(s) but source may have fewer.
+src/mockups/MundoMicrofauna3D.jsx(289,30): error TS2322: Type 'number[]' is not assignable to type 'number | Vector3 | [x: number, y: number, z?: number] | readonly [x: number, y: number, z?: number] | Readonly<Vector3>'.
+  Type 'number[]' is not assignable to type 'Vector3 | [x: number, y: number, z?: number] | readonly [x: number, y: number, z?: number] | Readonly<Vector3>'.
+    Type 'number[]' is not assignable to type '[x: number, y: number, z?: number]'.
+      Target requires 2 element(s) but source may have fewer.
+src/mockups/MundoMicrofauna3D.jsx(289,46): error TS2322: Type 'number[]' is not assignable to type 'number | Euler | [x: number, y: number, z: number, order?: EulerOrder] | readonly [x: number, y: number, z: number, order?: EulerOrder] | Readonly<Euler>'.
+  Type 'number[]' is not assignable to type '[x: number, y: number, z: number, order?: EulerOrder]'.
+    Target requires 3 element(s) but source may have fewer.
+src/mockups/MundoMicrofauna3D.jsx(296,30): error TS2322: Type 'number[]' is not assignable to type 'number | Vector3 | [x: number, y: number, z?: number] | readonly [x: number, y: number, z?: number] | Readonly<Vector3>'.
+  Type 'number[]' is not assignable to type 'Vector3 | [x: number, y: number, z?: number] | readonly [x: number, y: number, z?: number] | Readonly<Vector3>'.
+    Type 'number[]' is not assignable to type '[x: number, y: number, z?: number]'.
+      Target requires 2 element(s) but source may have fewer.
+src/mockups/MundoMicrofauna3D.jsx(328,23): error TS2322: Type 'number[]' is not assignable to type 'number | Vector3 | [x: number, y: number, z?: number] | readonly [x: number, y: number, z?: number] | Readonly<Vector3>'.
+  Type 'number[]' is not assignable to type 'Vector3 | [x: number, y: number, z?: number] | readonly [x: number, y: number, z?: number] | Readonly<Vector3>'.
+    Type 'number[]' is not assignable to type '[x: number, y: number, z?: number]'.
+      Target requires 2 element(s) but source may have fewer.
+src/mockups/MundoMicrofauna3D.jsx(328,38): error TS2322: Type 'number[]' is not assignable to type 'number | Vector3 | [x: number, y: number, z?: number] | readonly [x: number, y: number, z?: number] | Readonly<Vector3>'.
+  Type 'number[]' is not assignable to type 'Vector3 | [x: number, y: number, z?: number] | readonly [x: number, y: number, z?: number] | Readonly<Vector3>'.
+    Type 'number[]' is not assignable to type '[x: number, y: number, z?: number]'.
+      Target requires 2 element(s) but source may have fewer.
+src/mockups/MundoMicrofauna3D.jsx(745,31): error TS2322: Type 'number[]' is not assignable to type 'number | Vector3 | [x: number, y: number, z?: number] | readonly [x: number, y: number, z?: number] | Readonly<Vector3>'.
+  Type 'number[]' is not assignable to type 'Vector3 | [x: number, y: number, z?: number] | readonly [x: number, y: number, z?: number] | Readonly<Vector3>'.
+    Type 'number[]' is not assignable to type '[x: number, y: number, z?: number]'.
+      Target requires 2 element(s) but source may have fewer.
+src/mockups/MundoPiscicultura3D.jsx(766,18): error TS2322: Type '{ reducedMotion: any; }' is not assignable to type 'IntrinsicAttributes'.
+  Property 'reducedMotion' does not exist on type 'IntrinsicAttributes'.
+src/mockups/MundoPolinizadores3D.jsx(112,19): error TS2322: Type 'string' is not assignable to type '"noche" | "dia"'.
+src/mockups/MundoSanidad3D.jsx(197,25): error TS2322: Type 'number[]' is not assignable to type 'number | Vector3 | [x: number, y: number, z?: number] | readonly [x: number, y: number, z?: number] | Readonly<Vector3>'.
+  Type 'number[]' is not assignable to type 'Vector3 | [x: number, y: number, z?: number] | readonly [x: number, y: number, z?: number] | Readonly<Vector3>'.
+    Type 'number[]' is not assignable to type '[x: number, y: number, z?: number]'.
+      Target requires 2 element(s) but source may have fewer.
+src/mockups/MundoSanidad3D.jsx(375,10): error TS2741: Property 'children' is missing in type '{ w: number; h: number; color: string; }' but required in type '{ w?: number; h?: number; color: any; children: any; }'.
+src/mockups/MundoSanidad3D.jsx(404,12): error TS2741: Property 'paso' is missing in type '{ pos: number[]; texto: string; }' but required in type '{ pos: any; texto: any; paso: any; }'.
+src/mockups/MundoSanidad3D.jsx(405,12): error TS2741: Property 'paso' is missing in type '{ pos: number[]; texto: string; }' but required in type '{ pos: any; texto: any; paso: any; }'.
+src/mockups/MundoSanidad3D.jsx(427,22): error TS2322: Type 'number[]' is not assignable to type 'number | Vector3 | [x: number, y: number, z?: number] | readonly [x: number, y: number, z?: number] | Readonly<Vector3>'.
+  Type 'number[]' is not assignable to type 'Vector3 | [x: number, y: number, z?: number] | readonly [x: number, y: number, z?: number] | Readonly<Vector3>'.
+    Type 'number[]' is not assignable to type '[x: number, y: number, z?: number]'.
+      Target requires 2 element(s) but source may have fewer.
+src/mockups/MundoSanidad3D.jsx(470,35): error TS2322: Type 'string | number | boolean' is not assignable to type 'number'.
+  Type 'string' is not assignable to type 'number'.
+src/mockups/MundoSanidad3D.jsx(470,41): error TS2322: Type 'string | number | boolean' is not assignable to type 'number'.
+  Type 'string' is not assignable to type 'number'.
+src/mockups/MundoSanidad3D.jsx(473,34): error TS2322: Type 'string | number | boolean' is not assignable to type 'string | number | Color | [r: number, g: number, b: number] | [color: ColorRepresentation] | Readonly<Color> | readonly [r: number, g: number, b: number] | readonly [color: ...]'.
+  Type 'boolean' is not assignable to type 'string | number | Color | [r: number, g: number, b: number] | [color: ColorRepresentation] | Readonly<Color> | readonly [r: number, g: number, b: number] | readonly [color: ...]'.
+src/mockups/MundoSanidad3D.jsx(573,12): error TS2741: Property 'paso' is missing in type '{ pos: number[]; texto: string; }' but required in type '{ pos: any; texto: any; paso: any; }'.
+src/mockups/MundoSanidad3D.jsx(574,12): error TS2741: Property 'paso' is missing in type '{ pos: number[]; texto: string; }' but required in type '{ pos: any; texto: any; paso: any; }'.
+src/mockups/MundoSanidad3D.jsx(575,12): error TS2741: Property 'paso' is missing in type '{ pos: number[]; texto: string; }' but required in type '{ pos: any; texto: any; paso: any; }'.
+src/mockups/MundoSanidad3D.jsx(576,12): error TS2741: Property 'paso' is missing in type '{ pos: number[]; texto: string; }' but required in type '{ pos: any; texto: any; paso: any; }'.
+src/mockups/MundoSanidad3D.jsx(652,12): error TS2741: Property 'paso' is missing in type '{ pos: number[]; texto: string; }' but required in type '{ pos: any; texto: any; paso: any; }'.
+src/mockups/MundoSanidad3D.jsx(653,12): error TS2741: Property 'paso' is missing in type '{ pos: number[]; texto: string; }' but required in type '{ pos: any; texto: any; paso: any; }'.
+src/mockups/MundoSanidad3D.jsx(827,12): error TS2741: Property 'paso' is missing in type '{ pos: number[]; texto: string; }' but required in type '{ pos: any; texto: any; paso: any; }'.
+src/mockups/MundoSanidad3D.jsx(828,12): error TS2741: Property 'paso' is missing in type '{ pos: number[]; texto: string; }' but required in type '{ pos: any; texto: any; paso: any; }'.
+src/mockups/MundoSanidad3D.jsx(829,12): error TS2741: Property 'paso' is missing in type '{ pos: number[]; texto: string; }' but required in type '{ pos: any; texto: any; paso: any; }'.
+src/mockups/MundoSanidad3D.jsx(843,23): error TS2322: Type 'number[]' is not assignable to type 'number | Vector3 | [x: number, y: number, z?: number] | readonly [x: number, y: number, z?: number] | Readonly<Vector3>'.
+  Type 'number[]' is not assignable to type 'Vector3 | [x: number, y: number, z?: number] | readonly [x: number, y: number, z?: number] | Readonly<Vector3>'.
+    Type 'number[]' is not assignable to type '[x: number, y: number, z?: number]'.
+      Target requires 2 element(s) but source may have fewer.
+src/mockups/MundoSanidad3D.jsx(953,23): error TS2322: Type 'number[]' is not assignable to type 'number | Vector3 | [x: number, y: number, z?: number] | readonly [x: number, y: number, z?: number] | Readonly<Vector3>'.
+  Type 'number[]' is not assignable to type 'Vector3 | [x: number, y: number, z?: number] | readonly [x: number, y: number, z?: number] | Readonly<Vector3>'.
+    Type 'number[]' is not assignable to type '[x: number, y: number, z?: number]'.
+      Target requires 2 element(s) but source may have fewer.
+src/mockups/MundoSanidad3D.jsx(1020,14): error TS2741: Property 'className' is missing in type '{ size: number; animated: boolean; title: string; }' but required in type '{ [x: string]: any; size?: number; className: any; inline?: boolean; animated?: boolean; tier?: string; look?: number[]; mostrarRol?: boolean; title?: string; }'.
+src/mockups/MundoSanidad3D.jsx(1027,12): error TS2741: Property 'paso' is missing in type '{ pos: number[]; texto: string; }' but required in type '{ pos: any; texto: any; paso: any; }'.
+src/mockups/MundoSanidad3D.jsx(1028,12): error TS2741: Property 'paso' is missing in type '{ pos: number[]; texto: string; }' but required in type '{ pos: any; texto: any; paso: any; }'.
+src/mockups/MundoSanidad3D.jsx(1029,12): error TS2741: Property 'paso' is missing in type '{ pos: number[]; texto: string; }' but required in type '{ pos: any; texto: any; paso: any; }'.
+src/mockups/MundoSueloVivo3D.jsx(613,32): error TS2322: Type 'any[]' is not assignable to type 'number | Vector3 | [x: number, y: number, z?: number] | readonly [x: number, y: number, z?: number] | Readonly<Vector3>'.
+  Type 'any[]' is not assignable to type 'Vector3 | [x: number, y: number, z?: number] | readonly [x: number, y: number, z?: number] | Readonly<Vector3>'.
+    Type 'any[]' is not assignable to type '[x: number, y: number, z?: number]'.
+      Target requires 2 element(s) but source may have fewer.
+src/mockups/MundoSueloVivo3D.jsx(613,49): error TS2322: Type 'number[]' is not assignable to type 'Quaternion | [x: number, y: number, z: number, w: number] | readonly [x: number, y: number, z: number, w: number] | Readonly<Quaternion>'.
+  Type 'number[]' is not assignable to type '[x: number, y: number, z: number, w: number]'.
+    Target requires 4 element(s) but source may have fewer.
+src/mockups/MundoVergelFrutal3D.jsx(201,25): error TS2322: Type 'number[]' is not assignable to type 'number | Vector3 | [x: number, y: number, z?: number] | readonly [x: number, y: number, z?: number] | Readonly<Vector3>'.
+  Type 'number[]' is not assignable to type 'Vector3 | [x: number, y: number, z?: number] | readonly [x: number, y: number, z?: number] | Readonly<Vector3>'.
+    Type 'number[]' is not assignable to type '[x: number, y: number, z?: number]'.
+      Target requires 2 element(s) but source may have fewer.
+src/mockups/MundoVergelFrutal3D.jsx(260,11): error TS2322: Type 'number[]' is not assignable to type 'number | Vector3 | [x: number, y: number, z?: number] | readonly [x: number, y: number, z?: number] | Readonly<Vector3>'.
+  Type 'number[]' is not assignable to type 'Vector3 | [x: number, y: number, z?: number] | readonly [x: number, y: number, z?: number] | Readonly<Vector3>'.
+    Type 'number[]' is not assignable to type '[x: number, y: number, z?: number]'.
+      Target requires 2 element(s) but source may have fewer.
+src/mockups/MundoVergelFrutal3D.jsx(840,12): error TS2741: Property 'paso' is missing in type '{ pos: number[]; texto: string; }' but required in type '{ pos: any; texto: any; paso: any; }'.
+src/mockups/MundoVergelFrutal3D.jsx(841,12): error TS2741: Property 'paso' is missing in type '{ pos: number[]; texto: string; }' but required in type '{ pos: any; texto: any; paso: any; }'.
+src/mockups/MundoVergelFrutal3D.jsx(842,12): error TS2741: Property 'paso' is missing in type '{ pos: number[]; texto: string; }' but required in type '{ pos: any; texto: any; paso: any; }'.
+src/mockups/MundoVergelFrutal3D.jsx(843,12): error TS2741: Property 'paso' is missing in type '{ pos: number[]; texto: string; }' but required in type '{ pos: any; texto: any; paso: any; }'.
+src/mockups/MundoVergelFrutal3D.jsx(844,12): error TS2741: Property 'paso' is missing in type '{ pos: number[]; texto: string; }' but required in type '{ pos: any; texto: any; paso: any; }'.
+src/mockups/MundoVergelFrutal3D.jsx(845,12): error TS2741: Property 'paso' is missing in type '{ pos: number[]; texto: string; }' but required in type '{ pos: any; texto: any; paso: any; }'.
+src/mockups/MundoVergelFrutal3D.jsx(846,12): error TS2741: Property 'paso' is missing in type '{ pos: number[]; texto: string; }' but required in type '{ pos: any; texto: any; paso: any; }'.
+src/mockups/MundoVergelFrutal3D.jsx(847,12): error TS2741: Property 'paso' is missing in type '{ pos: number[]; texto: string; }' but required in type '{ pos: any; texto: any; paso: any; }'.
+src/mockups/MundoVergelFrutal3D.jsx(848,12): error TS2741: Property 'paso' is missing in type '{ pos: number[]; texto: string; }' but required in type '{ pos: any; texto: any; paso: any; }'.
+src/mockups/MundoVergelFrutal3D.jsx(849,12): error TS2741: Property 'paso' is missing in type '{ pos: number[]; texto: string; }' but required in type '{ pos: any; texto: any; paso: any; }'.
+src/mockups/MundoVergelFrutal3D.jsx(850,12): error TS2741: Property 'paso' is missing in type '{ pos: number[]; texto: string; }' but required in type '{ pos: any; texto: any; paso: any; }'.
+src/mockups/ParamoHumboldt3D.jsx(225,11): error TS2339: Property 'fov' does not exist on type 'Camera'.
+  Property 'fov' does not exist on type 'OrthographicCamera & { manual?: boolean; }'.
+src/mockups/ParamoHumboldt3D.jsx(252,22): error TS2339: Property 'fov' does not exist on type 'Camera'.
+  Property 'fov' does not exist on type 'OrthographicCamera & { manual?: boolean; }'.
+src/mockups/ParamoHumboldt3D.jsx(253,11): error TS2339: Property 'fov' does not exist on type 'Camera'.
+  Property 'fov' does not exist on type 'OrthographicCamera & { manual?: boolean; }'.
+src/mockups/ParamoHumboldt3D.jsx(253,37): error TS2339: Property 'fov' does not exist on type 'Camera'.
+  Property 'fov' does not exist on type 'OrthographicCamera & { manual?: boolean; }'.
+src/mockups/TransicionesOdysseyDemo.jsx(108,57): error TS2345: Argument of type 'string' is not assignable to parameter of type 'SetStateAction<"bajo" | "alto" | "medio">'.
+src/mockups/TresEntsGradiente3D.jsx(245,11): error TS2339: Property 'fov' does not exist on type 'Camera'.
+  Property 'fov' does not exist on type 'OrthographicCamera & { manual?: boolean; }'.
+src/mockups/TresEntsGradiente3D.jsx(255,22): error TS2339: Property 'fov' does not exist on type 'Camera'.
+  Property 'fov' does not exist on type 'OrthographicCamera & { manual?: boolean; }'.
+src/mockups/TresEntsGradiente3D.jsx(256,11): error TS2339: Property 'fov' does not exist on type 'Camera'.
+  Property 'fov' does not exist on type 'OrthographicCamera & { manual?: boolean; }'.
+src/mockups/TresEntsGradiente3D.jsx(256,37): error TS2339: Property 'fov' does not exist on type 'Camera'.
+  Property 'fov' does not exist on type 'OrthographicCamera & { manual?: boolean; }'.
+src/mockups/TresEntsGradiente3D.jsx(430,11): error TS2322: Type '{ tier: "bajo" | "alto" | "medio"; perfil: any; reducedMotion: boolean; foco: string; pisosVisibles: string[]; }' is not assignable to type 'IntrinsicAttributes & { tier: "bajo" | "alto" | "medio"; perfil: { materialRico?: boolean; flatShading?: boolean; sombras?: boolean; }; reducedMotion?: boolean; foco?: string; }'.
+  Property 'pisosVisibles' does not exist on type 'IntrinsicAttributes & { tier: "bajo" | "alto" | "medio"; perfil: { materialRico?: boolean; flatShading?: boolean; sombras?: boolean; }; reducedMotion?: boolean; foco?: string; }'.
+src/mockups/ValleLluvia3D.jsx(804,12): error TS2741: Property 'sub' is missing in type '{ pos: number[]; texto: string; distancia: number; }' but required in type '{ pos: any; texto: any; sub: any; distancia?: number; }'.
+src/mockups/ValleLluvia3D.jsx(805,12): error TS2741: Property 'sub' is missing in type '{ pos: number[]; texto: string; distancia: number; }' but required in type '{ pos: any; texto: any; sub: any; distancia?: number; }'.
+src/mockups/ValleLluvia3D.jsx(806,12): error TS2741: Property 'sub' is missing in type '{ pos: number[]; texto: string; distancia: number; }' but required in type '{ pos: any; texto: any; sub: any; distancia?: number; }'.
+src/mockups/ValleLluvia3D.jsx(807,12): error TS2741: Property 'sub' is missing in type '{ pos: number[]; texto: string; distancia: number; }' but required in type '{ pos: any; texto: any; sub: any; distancia?: number; }'.
+src/mockups/ValleNoche3D.jsx(338,49): error TS2322: Type 'number[]' is not assignable to type 'number | Vector3 | [x: number, y: number, z?: number] | readonly [x: number, y: number, z?: number] | Readonly<Vector3>'.
+  Type 'number[]' is not assignable to type 'Vector3 | [x: number, y: number, z?: number] | readonly [x: number, y: number, z?: number] | Readonly<Vector3>'.
+    Type 'number[]' is not assignable to type '[x: number, y: number, z?: number]'.
+      Target requires 2 element(s) but source may have fewer.
+src/mockups/ValleNoche3D.jsx(373,7): error TS2322: Type 'string | number' is not assignable to type 'number'.
+  Type 'string' is not assignable to type 'number'.
+src/mockups/ValleNoche3D.jsx(373,19): error TS2322: Type 'string | number' is not assignable to type 'number'.
+  Type 'string' is not assignable to type 'number'.
+src/mockups/ValleNoche3D.jsx(373,35): error TS2322: Type 'string | number' is not assignable to type 'number'.
+  Type 'string' is not assignable to type 'number'.
+src/mockups/__tests__/mundoBoticaCana3D.test.jsx(19,23): error TS2339: Property 'setMatrixAt' does not exist on type 'HTMLUnknownElement'.
+src/mockups/__tests__/mundoBoticaCana3D.test.jsx(20,11): error TS2339: Property 'setMatrixAt' does not exist on type 'HTMLUnknownElement'.
+src/mockups/__tests__/mundoBoticaCana3D.test.jsx(21,11): error TS2339: Property 'setColorAt' does not exist on type 'HTMLUnknownElement'.
+src/mockups/__tests__/mundoGallinero3D.test.jsx(64,13): error TS2741: Property 'onBack' is missing in type '{}' but required in type '{ onBack: any; }'.
+src/mockups/__tests__/mundoGallinero3D.test.jsx(85,37): error TS2741: Property 'onBack' is missing in type '{}' but required in type '{ onBack: any; }'.
+src/mockups/__tests__/mundoGallinero3D.test.jsx(107,37): error TS2741: Property 'onBack' is missing in type '{}' but required in type '{ onBack: any; }'.
+src/mockups/__tests__/mundoGallinero3D.test.jsx(124,37): error TS2741: Property 'onBack' is missing in type '{}' but required in type '{ onBack: any; }'.
+src/mockups/__tests__/mundoGallinero3D.test.jsx(140,16): error TS2740: Type '{ elapsedTime: number; }' is missing the following properties from type 'Clock': autoStart, startTime, oldTime, running, and 4 more.
+src/mockups/__tests__/mundoParamoMicrofauna.nav.test.jsx(23,27): error TS2307: Cannot find module '../MundoParamo3D.jsx' or its corresponding type declarations.
+src/mockups/__tests__/muralesFichas2D.test.jsx(19,75): error TS2339: Property 'dataset' does not exist on type 'Element'.
+src/mockups/__tests__/muralesFichas2D.test.jsx(21,82): error TS2339: Property 'dataset' does not exist on type 'Element'.
+src/mockups/_archivo/BosqueVivo3D-legacy.jsx(18,40): error TS2307: Cannot find module '../visual/mundo3d/deviceTier.js' or its corresponding type declarations.
+src/mockups/_archivo/BosqueVivo3D-legacy.jsx(21,42): error TS2307: Cannot find module '../visual/mundo3d/bosque/MundoEntBosque.jsx' or its corresponding type declarations.
+src/mockups/_archivo/BosqueVivo3D.jsx(34,42): error TS2307: Cannot find module '../visual/mundo3d/bosque/MundoEntBosque.jsx' or its corresponding type declarations.
+src/mockups/_archivo/CasaAdentro3D.jsx(18,40): error TS2307: Cannot find module '../visual/mundo3d/deviceTier.js' or its corresponding type declarations.
+src/mockups/_archivo/CasaAdentro3D.jsx(21,44): error TS2307: Cannot find module '../visual/mundo3d/casa/MundoCasaAdentro.jsx' or its corresponding type declarations.
+src/mockups/_archivo/MundoParamo3D.jsx(2399,12): error TS2741: Property 'title' is missing in type '{ size: number; animated: boolean; pose: string; }' but required in type '{ [x: string]: any; size?: number; className?: string; animated?: boolean; pose?: string; title: any; }'.
+src/mockups/_archivo/SueloDemo3D-legacy.jsx(21,54): error TS2307: Cannot find module '../visual/mundo3d/deviceTier.js' or its corresponding type declarations.
+src/mockups/_archivo/SueloDemo3D-legacy.jsx(22,68): error TS2307: Cannot find module '../visual/mundo3d/terreno/sueloRico.geom.js' or its corresponding type declarations.
+src/mockups/_archivo/SueloDemo3D-legacy.jsx(23,39): error TS2307: Cannot find module '../visual/mundo3d/terreno/SueloRico.jsx' or its corresponding type declarations.
+src/mockups/_archivo/SueloDemo3D-legacy.jsx(24,31): error TS2307: Cannot find module '../visual/mundo3d/vitrina/miradorAndino.geom.js' or its corresponding type declarations.
+src/mockups/_archivo/SueloDemo3D-legacy.jsx(25,46): error TS2307: Cannot find module '../visual/mundo3d/bosque/floraParamo.geom.js' or its corresponding type declarations.
+src/mockups/_archivo/SueloDemo3D.jsx(175,60): error TS2322: Type '{ suelo: SueloRico; tier: any; anclas: { x: number; z: number; radio: number; }[]; segmentos: number; }' is not assignable to type 'IntrinsicAttributes & { suelo: SueloRico; tier?: "bajo" | "alto" | "medio"; anclas?: { x: number; z: number; radio: number; }[]; }'.
+  Property 'segmentos' does not exist on type 'IntrinsicAttributes & { suelo: SueloRico; tier?: "bajo" | "alto" | "medio"; anclas?: { x: number; z: number; radio: number; }[]; }'.
+src/mockups/metalslug/DuoPerros.jsx(33,7): error TS2322: Type 'string' is not assignable to type 'number'.
+src/mockups/metalslug/DuoPerros.jsx(55,9): error TS2322: Type 'string' is not assignable to type 'number'.
+src/mockups/metalslug/DuoPerros.jsx(179,8): error TS2741: Property 'tier' is missing in type '{ size: number; animated: boolean; vida: false; aulla: true; title: string; }' but required in type '{ [x: string]: any; size?: number; className?: string; inline?: boolean; animated?: boolean; title?: string; pose?: string; animo?: string; energia?: number; clima?: any; enso?: string; visema?: any; vestuario?: boolean; ... 7 more ...; mundoId?: any; }'.
+src/mockups/metalslug/DuoPerros.jsx(180,8): error TS2741: Property 'tier' is missing in type '{ size: number; animated: boolean; vida: false; menea: true; pose: string; title: string; }' but required in type '{ [x: string]: any; size?: number; className?: string; inline?: boolean; animated?: boolean; title?: string; pose?: string; animo?: string; energia?: number; clima?: any; enso?: string; visema?: any; vestuario?: boolean; ... 7 more ...; mundoId?: any; }'.
+src/mockups/valle/AuditoriaValle.jsx(24,12): error TS2339: Property '__VALLE_AUDITORIA__' does not exist on type 'Window & typeof globalThis'.
+src/mockups/valle/AuditoriaValle.jsx(26,21): error TS2339: Property '__VALLE_AUDITORIA__' does not exist on type 'Window & typeof globalThis'.
+src/mockups/valle/HatoMovil.jsx(484,18): error TS2554: Expected 0 arguments, but got 2.
+src/mockups/valle/HatoMovil.jsx(577,29): error TS2554: Expected 0 arguments, but got 2.
+src/mockups/valle/HatoMovil.jsx(730,30): error TS2554: Expected 0 arguments, but got 2.
+src/mockups/valle/HatoMovil.jsx(873,20): error TS2554: Expected 0 arguments, but got 2.
+src/mockups/valle/HatoMovil.jsx(923,20): error TS2554: Expected 0 arguments, but got 2.
+src/mockups/valle/Valle3D.jsx(2793,57): error TS2322: Type 'string' is not assignable to type '"bajo" | "alto" | "medio"'.
+src/mockups/valle/Valle3D.jsx(2830,47): error TS2322: Type 'string' is not assignable to type '"bajo" | "alto" | "medio"'.
+src/mockups/valle/Valle3D.jsx(2839,50): error TS2322: Type 'string' is not assignable to type '"bajo" | "alto" | "medio"'.
+src/mockups/valle/Valle3D.jsx(2843,47): error TS2322: Type 'string' is not assignable to type '"bajo" | "alto" | "medio"'.
+src/mockups/valle/Valle3D.jsx(2846,48): error TS2322: Type 'string' is not assignable to type '"bajo" | "alto" | "medio"'.
+src/mockups/valle/Valle3D.jsx(2849,82): error TS2322: Type 'string' is not assignable to type '"bajo" | "alto" | "medio"'.
+src/mockups/valle/Valle3D.jsx(2861,11): error TS2322: Type 'string' is not assignable to type '"bajo" | "alto" | "medio"'.
+src/mockups/valle/Valle3D.jsx(2867,47): error TS2322: Type 'string' is not assignable to type '"bajo" | "alto" | "medio"'.
+src/mockups/valle/Valle3D.jsx(2869,51): error TS2322: Type 'string' is not assignable to type '"bajo" | "alto" | "medio"'.
+src/mockups/valle/Valle3D.jsx(2870,50): error TS2322: Type 'string' is not assignable to type '"bajo" | "alto" | "medio"'.
+src/mockups/valle/Valle3D.jsx(2873,49): error TS2322: Type 'string' is not assignable to type '"bajo" | "alto" | "medio"'.
+src/mockups/valle/Valle3D.jsx(2874,62): error TS2322: Type 'string' is not assignable to type '"bajo" | "alto" | "medio"'.
+src/mockups/valle/Valle3D.jsx(2878,60): error TS2322: Type 'string' is not assignable to type '"bajo" | "alto" | "medio"'.
+src/mockups/valle/Valle3D.jsx(2903,9): error TS2322: Type '{ mundos: any[]; alturaDe: (x: any, z: any) => number; nocturno: boolean; practicas: number; reducedMotion: any; perfil: any; onEntrar: any; }' is not assignable to type 'IntrinsicAttributes & { mundos: any; alturaDe: any; nocturno?: boolean; reducedMotion?: boolean; perfil?: any; onEntrar?: any; }'.
+  Property 'practicas' does not exist on type 'IntrinsicAttributes & { mundos: any; alturaDe: any; nocturno?: boolean; reducedMotion?: boolean; perfil?: any; onEntrar?: any; }'.
+src/mockups/valle/Valle3D.jsx(3092,59): error TS2322: Type 'string' is not assignable to type '"bajo" | "alto" | "medio"'.
+src/mockups/valle/__tests__/valleDinamico.compat.test.js(44,43): error TS2345: Argument of type 'Readonly<{ ubicacion: Readonly<{ lat: any; lon: any; altitudMsnm: any; municipio: any; departamento: any; vereda: any; fuente: "demo"; }>; pisoTermico: any; escala: "finca"; invernadero: any; cultiva: readonly any[]; animales: readonly any[]; agua: any; mundosActivos: readonly any[]; declarado: Readonly<...>; }>' is not assignable to parameter of type 'PerfilFinca'.
+  Types of property 'cultiva' are incompatible.
+    The type 'readonly any[]' is 'readonly' and cannot be assigned to the mutable type 'string[]'.
+src/mockups/valle/__tests__/valleDinamico.compat.test.js(49,41): error TS2345: Argument of type 'Readonly<{ ubicacion: Readonly<{ lat: any; lon: any; altitudMsnm: any; municipio: any; departamento: any; vereda: any; fuente: "demo"; }>; pisoTermico: any; escala: "finca"; invernadero: any; cultiva: readonly any[]; animales: readonly any[]; agua: any; mundosActivos: readonly any[]; declarado: Readonly<...>; }>' is not assignable to parameter of type 'PerfilFinca'.
+  Types of property 'cultiva' are incompatible.
+    The type 'readonly any[]' is 'readonly' and cannot be assigned to the mutable type 'string[]'.
+src/mockups/valle/__tests__/valleDinamico.compat.test.js(56,36): error TS2345: Argument of type 'string | number | { escala?: undefined; } | { escala: string; }' is not assignable to parameter of type 'PerfilFinca'.
+  Type 'string' is not assignable to type 'PerfilFinca'.
+src/mockups/valle/__tests__/valleDinamico.compat.test.js(66,43): error TS2345: Argument of type 'Readonly<{ ubicacion: Readonly<{ lat: any; lon: any; altitudMsnm: any; municipio: any; departamento: any; vereda: any; fuente: "demo"; }>; pisoTermico: any; escala: "finca"; invernadero: any; cultiva: readonly any[]; animales: readonly any[]; agua: any; mundosActivos: readonly any[]; declarado: Readonly<...>; }>' is not assignable to parameter of type 'PerfilFinca'.
+  Types of property 'cultiva' are incompatible.
+    The type 'readonly any[]' is 'readonly' and cannot be assigned to the mutable type 'string[]'.
+src/mockups/valle/animales.jsx(110,7): error TS2322: Type 'any[]' is not assignable to type 'number | Vector3 | [x: number, y: number, z?: number] | readonly [x: number, y: number, z?: number] | Readonly<Vector3>'.
+  Type 'any[]' is not assignable to type 'Vector3 | [x: number, y: number, z?: number] | readonly [x: number, y: number, z?: number] | Readonly<Vector3>'.
+    Type 'any[]' is not assignable to type '[x: number, y: number, z?: number]'.
+      Target requires 2 element(s) but source may have fewer.
+src/mockups/vitrina3d/__tests__/VitrinaInfraestructura.test.jsx(35,35): error TS2741: Property 'onBack' is missing in type '{}' but required in type '{ onBack: any; }'.
+src/services/__tests__/angelitaInteligencia.test.js(106,28): error TS2345: Argument of type 'number' is not assignable to parameter of type 'string'.
+src/services/__tests__/angelitaVariedadTelemetria.test.js(37,29): error TS2345: Argument of type '"lo-que-sea"' is not assignable to parameter of type '"base" | "llm" | "plantilla"'.
+src/services/__tests__/compaiOcupado.test.js(76,33): error TS2345: Argument of type '{ tagName: string; }' is not assignable to parameter of type '{ tagName: any; tipo: any; editable?: boolean; }'.
+  Property 'tipo' is missing in type '{ tagName: string; }' but required in type '{ tagName: any; tipo: any; editable?: boolean; }'.
+src/services/__tests__/compaiOcupado.test.js(77,24): error TS2345: Argument of type '{ activeElement: any; }' is not assignable to parameter of type 'Document'.
+  Type '{ activeElement: any; }' is missing the following properties from type 'Document': URL, activeViewTransition, alinkColor, all, and 263 more.
+src/services/__tests__/compaiOcupado.test.js(83,24): error TS2345: Argument of type '{ activeElement: any; }' is not assignable to parameter of type 'Document'.
+  Type '{ activeElement: any; }' is missing the following properties from type 'Document': URL, activeViewTransition, alinkColor, all, and 263 more.
+src/services/__tests__/compaiOcupado.test.js(83,40): error TS2345: Argument of type '{ tagName: string; }' is not assignable to parameter of type '{ tagName: any; tipo: any; editable?: boolean; }'.
+  Property 'tipo' is missing in type '{ tagName: string; }' but required in type '{ tagName: any; tipo: any; editable?: boolean; }'.
+src/services/__tests__/compaiOcupado.test.js(84,24): error TS2345: Argument of type '{ activeElement: any; }' is not assignable to parameter of type 'Document'.
+  Type '{ activeElement: any; }' is missing the following properties from type 'Document': URL, activeViewTransition, alinkColor, all, and 263 more.
+src/services/__tests__/compaiOcupado.test.js(88,24): error TS2345: Argument of type '{ activeElement: any; }' is not assignable to parameter of type 'Document'.
+  Type '{ activeElement: any; }' is missing the following properties from type 'Document': URL, activeViewTransition, alinkColor, all, and 263 more.
+src/services/__tests__/compaiOcupado.test.js(88,40): error TS2345: Argument of type '{ tagName: string; }' is not assignable to parameter of type '{ tagName: any; tipo: any; editable?: boolean; }'.
+  Property 'tipo' is missing in type '{ tagName: string; }' but required in type '{ tagName: any; tipo: any; editable?: boolean; }'.
+src/services/__tests__/compaiOcupado.test.js(92,24): error TS2345: Argument of type '{ activeElement: any; }' is not assignable to parameter of type 'Document'.
+  Type '{ activeElement: any; }' is missing the following properties from type 'Document': URL, activeViewTransition, alinkColor, all, and 263 more.
+src/services/__tests__/compaiOcupado.test.js(92,40): error TS2345: Argument of type '{ tagName: string; }' is not assignable to parameter of type '{ tagName: any; tipo: any; editable?: boolean; }'.
+  Property 'tipo' is missing in type '{ tagName: string; }' but required in type '{ tagName: any; tipo: any; editable?: boolean; }'.
+src/services/__tests__/compaiOcupado.test.js(96,24): error TS2345: Argument of type '{ activeElement: any; }' is not assignable to parameter of type 'Document'.
+  Type '{ activeElement: any; }' is missing the following properties from type 'Document': URL, activeViewTransition, alinkColor, all, and 263 more.
+src/services/__tests__/compaiOcupado.test.js(96,40): error TS2345: Argument of type '{ tagName: string; editable: true; }' is not assignable to parameter of type '{ tagName: any; tipo: any; editable?: boolean; }'.
+  Property 'tipo' is missing in type '{ tagName: string; editable: true; }' but required in type '{ tagName: any; tipo: any; editable?: boolean; }'.
+src/services/__tests__/compaiOcupado.test.js(100,24): error TS2345: Argument of type '{ activeElement: any; }' is not assignable to parameter of type 'Document'.
+  Type '{ activeElement: any; }' is missing the following properties from type 'Document': URL, activeViewTransition, alinkColor, all, and 263 more.
+src/services/__tests__/compaiOcupado.test.js(101,24): error TS2345: Argument of type '{ activeElement: any; }' is not assignable to parameter of type 'Document'.
+  Type '{ activeElement: any; }' is missing the following properties from type 'Document': URL, activeViewTransition, alinkColor, all, and 263 more.
+src/services/__tests__/compaiOcupado.test.js(102,24): error TS2345: Argument of type '{ activeElement: any; }' is not assignable to parameter of type 'Document'.
+  Type '{ activeElement: any; }' is missing the following properties from type 'Document': URL, activeViewTransition, alinkColor, all, and 263 more.
+src/services/__tests__/compaiOcupado.test.js(106,24): error TS2345: Argument of type '{ activeElement: any; }' is not assignable to parameter of type 'Document'.
+  Type '{ activeElement: any; }' is missing the following properties from type 'Document': URL, activeViewTransition, alinkColor, all, and 263 more.
+src/services/__tests__/compaiOcupado.test.js(107,24): error TS2345: Argument of type '{ activeElement: any; }' is not assignable to parameter of type 'Document'.
+  Type '{ activeElement: any; }' is missing the following properties from type 'Document': URL, activeViewTransition, alinkColor, all, and 263 more.
+src/services/__tests__/compaiOcupado.test.js(107,40): error TS2345: Argument of type '{ tagName: string; }' is not assignable to parameter of type '{ tagName: any; tipo: any; editable?: boolean; }'.
+  Property 'tipo' is missing in type '{ tagName: string; }' but required in type '{ tagName: any; tipo: any; editable?: boolean; }'.
+src/services/__tests__/compaiOcupado.test.js(108,24): error TS2345: Argument of type '{ activeElement: any; }' is not assignable to parameter of type 'Document'.
+  Type '{ activeElement: any; }' is missing the following properties from type 'Document': URL, activeViewTransition, alinkColor, all, and 263 more.
+src/services/__tests__/compaiOcupado.test.js(108,40): error TS2345: Argument of type '{ tagName: string; }' is not assignable to parameter of type '{ tagName: any; tipo: any; editable?: boolean; }'.
+  Property 'tipo' is missing in type '{ tagName: string; }' but required in type '{ tagName: any; tipo: any; editable?: boolean; }'.
+src/services/__tests__/compaiParadasPorPantalla.test.js(49,7): error TS2741: Property 'ref' is missing in type '{ id: string; texto: string; }' but required in type 'ParadaGuia'.
+src/services/__tests__/compaiParadasPorPantalla.test.js(67,30): error TS2339: Property 'anillo' does not exist on type 'ParadaGuia'.
+src/services/__tests__/compaiParadasPorPantalla.test.js(74,42): error TS2353: Object literal may only specify known properties, and 'anillo' does not exist in type 'ParadaGuia'.
+src/services/__tests__/compaiParadasPorPantalla.test.js(75,42): error TS2353: Object literal may only specify known properties, and 'anillo' does not exist in type 'ParadaGuia'.
+src/services/__tests__/compaiParadasPorPantalla.test.js(83,63): error TS2353: Object literal may only specify known properties, and 'anillo' does not exist in type 'ParadaGuia'.
+src/services/__tests__/compaiParadasPorPantalla.test.js(84,30): error TS2339: Property 'anillo' does not exist on type 'ParadaGuia'.
+src/services/__tests__/corpusRetriever.test.js(67,25): error TS2345: Argument of type 'BodyInit' is not assignable to parameter of type 'string'.
+  Type 'ArrayBuffer' is not assignable to type 'string'.
+src/services/__tests__/modoCampoOffline.test.js(21,17): error TS2339: Property '_setPending' does not exist on type 'SyncManager'.
+src/services/__tests__/modoCampoOffline.test.js(22,37): error TS2339: Property 'getPendingCount' does not exist on type 'SyncManager'.
+src/services/__tests__/modoCampoOffline.test.js(28,17): error TS2339: Property '_setPending' does not exist on type 'SyncManager'.
+src/services/__tests__/modoCampoOffline.test.js(29,37): error TS2339: Property 'getPendingCount' does not exist on type 'SyncManager'.
+src/services/__tests__/modoCampoOffline.test.js(35,17): error TS2339: Property '_setPending' does not exist on type 'SyncManager'.
+src/services/__tests__/modoCampoOffline.test.js(37,37): error TS2339: Property 'getPendingCount' does not exist on type 'SyncManager'.
+src/services/__tests__/saludoPantalla.test.js(37,29): error TS2345: Argument of type 'number' is not assignable to parameter of type 'string'.
+src/services/__tests__/segundaOpinionFoto.test.js(72,35): error TS2345: Argument of type '{}' is not assignable to parameter of type '{ hallazgo: string; queMirar?: string; confianza?: "alta" | "media" | "baja"; }'.
+  Property 'hallazgo' is missing in type '{}' but required in type '{ hallazgo: string; queMirar?: string; confianza?: "alta" | "media" | "baja"; }'.
+src/services/__tests__/segundaOpinionFoto.test.js(143,5): error TS2722: Cannot invoke an object which is possibly 'undefined'.
+src/services/angelitaInteligencia.js(371,38): error TS1127: Invalid character.
+src/services/angelitaInteligencia.js(372,33): error TS1127: Invalid character.
+src/services/angelitaInteligencia.js(373,36): error TS1127: Invalid character.
+src/services/angelitaInteligencia.js(379,28): error TS2741: Property 'estado' is missing in type '{}' but required in type '{ estado: string; severidad?: "alta" | "media" | "baja"; ahoraMs?: number; ultimaMs?: number; ocupado?: boolean; silenciado?: boolean; molestia?: number; }'.
+src/services/angelitaInteligencia.js(475,58): error TS1127: Invalid character.
+src/services/angelitaInteligencia.js(476,45): error TS1127: Invalid character.
+src/services/angelitaInteligencia.js(479,37): error TS1127: Invalid character.
+src/services/angelitaInteligencia.js(480,37): error TS1127: Invalid character.
+src/services/angelitaInteligencia.js(482,46): error TS1127: Invalid character.
+src/services/angelitaVariedad.js(194,34): error TS2339: Property 'map' does not exist on type 'string | string[]'.
+  Property 'map' does not exist on type 'string'.
+src/services/angelitaVariedad.js(204,27): error TS1127: Invalid character.
+src/services/angelitaVariedad.js(370,27): error TS1127: Invalid character.
+src/services/angelitaVariedad.js(372,59): error TS1127: Invalid character.
+src/services/compaiOcupado.js(47,28): error TS1127: Invalid character.
+src/services/compaiOcupado.js(54,10): error TS2339: Property 'isContentEditable' does not exist on type 'Element'.
+src/services/compaiParadasPorPantalla.js(56,58): error TS2339: Property 'anillo' does not exist on type 'ParadaGuia'.
+src/services/compaiParadasPorPantalla.js(56,70): error TS2339: Property 'anillo' does not exist on type 'ParadaGuia'.
+src/services/compaiParadasPorPantalla.js(73,48): error TS2339: Property 'anillo' does not exist on type 'ParadaGuia'.
+src/services/compaiParadasPorPantalla.js(78,48): error TS2339: Property 'anillo' does not exist on type 'ParadaGuia'.
+src/services/compaiPaseoPlanificador.js(116,48): error TS1127: Invalid character.
+src/services/compaiPaseoPlanificador.js(120,48): error TS1127: Invalid character.
+src/services/llmRouter.js(180,5): error TS2353: Object literal may only specify known properties, and '_paso' does not exist in type 'ModelRoute'.
+src/services/perfilFincaService.js(192,46): error TS2322: Type '{ ubicacion: Readonly<{ lat: any; lon: any; altitudMsnm: any; municipio: any; departamento: any; vereda: any; fuente: "demo"; }>; pisoTermico: any; escala: "finca"; invernadero: any; cultiva: readonly any[]; animales: readonly any[]; agua: any; mundosActivos: readonly any[]; declarado: Readonly<...>; }' is not assignable to type 'PerfilFinca'.
+  Types of property 'cultiva' are incompatible.
+    The type 'readonly any[]' is 'readonly' and cannot be assigned to the mutable type 'string[]'.
+src/services/perfilFincaService.js(265,5): error TS2322: Type 'string' is not assignable to type '"lluvia" | "quebrada" | "tanque" | "acueducto"'.
+src/services/perfilFincaService.js(287,5): error TS2322: Type '{ ubicacion: Readonly<{ lat: any; lon: any; altitudMsnm: any; municipio: any; departamento: any; vereda: any; fuente: "demo"; }>; pisoTermico: any; escala: "finca"; invernadero: any; cultiva: readonly any[]; animales: readonly any[]; agua: any; mundosActivos: readonly any[]; declarado: Readonly<...>; }' is not assignable to type 'PerfilFinca'.
+  Types of property 'cultiva' are incompatible.
+    The type 'readonly any[]' is 'readonly' and cannot be assigned to the mutable type 'string[]'.
+src/services/segundaOpinionFoto.js(104,33): error TS1127: Invalid character.
+src/services/segundaOpinionFoto.js(108,40): error TS2741: Property 'hallazgo' is missing in type '{}' but required in type '{ hallazgo: string; queMirar?: string; confianza?: "alta" | "media" | "baja"; }'.
+src/services/segundaOpinionFoto.js(131,27): error TS1127: Invalid character.
+src/services/segundaOpinionFoto.js(173,45): error TS1127: Invalid character.
+src/services/segundaOpinionFoto.js(174,34): error TS1127: Invalid character.
+src/services/segundaOpinionFoto.js(176,32): error TS1127: Invalid character.
+src/services/segundaOpinionFoto.js(179,43): error TS2739: Type '{}' is missing the following properties from type '{ primeraLectura: string; mirarDeNuevo: Function; avisar: Function; canal?: "voz" | "texto"; extraer?: Function; guardas?: any; }': primeraLectura, mirarDeNuevo, avisar
+src/store/useAngelitaStore.js(177,34): error TS1127: Invalid character.
+src/store/usePerfilFincaStore.js(54,3): error TS2322: Type 'PerfilFinca | { ubicacion: Readonly<{ lat: any; lon: any; altitudMsnm: any; municipio: any; departamento: any; vereda: any; fuente: "demo"; }>; pisoTermico: any; escala: "finca"; ... 5 more ...; declarado: Readonly<...>; }' is not assignable to type 'PerfilFinca'.
+  Type '{ ubicacion: Readonly<{ lat: any; lon: any; altitudMsnm: any; municipio: any; departamento: any; vereda: any; fuente: "demo"; }>; pisoTermico: any; escala: "finca"; invernadero: any; cultiva: readonly any[]; animales: readonly any[]; agua: any; mundosActivos: readonly any[]; declarado: Readonly<...>; }' is not assignable to type 'PerfilFinca'.
+    Types of property 'cultiva' are incompatible.
+      The type 'readonly any[]' is 'readonly' and cannot be assigned to the mutable type 'string[]'.
+src/utils/atajosTeclado.js(45,18): error TS2339: Property 'tagName' does not exist on type 'EventTarget'.
+src/utils/atajosTeclado.js(45,50): error TS2339: Property 'tagName' does not exist on type 'EventTarget'.
+src/visual/agente/Angelita.jsx(267,3): error TS2339: Property 'gafas' does not exist on type '{ estado?: string; confianza?: string | number; direccion?: "derecha" | "izquierda"; size?: number; className?: string; animated?: boolean; visema?: string; tier?: string; clima?: any; enso?: string; animo?: string; ... 4 more ...; title?: string; }'.
+src/visual/agente/Angelita.jsx(270,3): error TS2339: Property 'cejas' does not exist on type '{ estado?: string; confianza?: string | number; direccion?: "derecha" | "izquierda"; size?: number; className?: string; animated?: boolean; visema?: string; tier?: string; clima?: any; enso?: string; animo?: string; ... 4 more ...; title?: string; }'.
+src/visual/agente/AngelitaEntrada.jsx(98,3): error TS2339: Property 'className' does not exist on type '{ activa?: boolean; clima?: string; conGafas?: boolean; retrasoMs?: number; estadoFinal?: string; size?: number; animated?: boolean; tier?: string; onLista?: () => void; }'.
+src/visual/agente/AngelitaEntrada.jsx(178,11): error TS2322: Type '{ estado: string; size: number; animated: boolean; tier: string; idleCerebro: boolean; gafas: string | boolean; lineBoil: boolean; clima: string; }' is not assignable to type 'IntrinsicAttributes & { estado?: string; confianza?: string | number; direccion?: "derecha" | "izquierda"; size?: number; className?: string; animated?: boolean; visema?: string; ... 8 more ...; title?: string; }'.
+  Property 'gafas' does not exist on type 'IntrinsicAttributes & { estado?: string; confianza?: string | number; direccion?: "derecha" | "izquierda"; size?: number; className?: string; animated?: boolean; visema?: string; ... 8 more ...; title?: string; }'.
+src/visual/agente/BurbujaAngelita.jsx(37,33): error TS1127: Invalid character.
+src/visual/agente/BurbujaAngelita.jsx(38,42): error TS1127: Invalid character.
+src/visual/agente/BurbujaAngelita.jsx(40,43): error TS1127: Invalid character.
+src/visual/agente/BurbujaAngelita.jsx(41,38): error TS1127: Invalid character.
+src/visual/agente/BurbujaAngelita.jsx(42,50): error TS1127: Invalid character.
+src/visual/creatures/AbejaAngelita.jsx(330,37): error TS2367: This comparison appears to be unintentional because the types 'boolean' and 'string' have no overlap.
+src/visual/creatures/AbejaAngelita.jsx(385,28): error TS2367: This comparison appears to be unintentional because the types 'boolean' and 'string' have no overlap.
+src/visual/creatures/Jaguar.jsx(497,8): error TS2741: Property 'clase' is missing in type '{ d: string; ancho: number; punta: number[]; puntaR: number; pelaje: string; sway: boolean; delay: number; }' but required in type '{ d: any; ancho: any; punta: any; puntaR: any; pelaje: any; clase: any; origen?: string; sway?: boolean; delay?: number; }'.
+src/visual/creatures/Jaguar.jsx(498,8): error TS2741: Property 'clase' is missing in type '{ d: string; ancho: number; punta: number[]; puntaR: number; pelaje: string; sway: boolean; delay: number; }' but required in type '{ d: any; ancho: any; punta: any; puntaR: any; pelaje: any; clase: any; origen?: string; sway?: boolean; delay?: number; }'.
+src/visual/creatures/LineBoilFilter.jsx(40,3): error TS4104: The type 'readonly number[]' is 'readonly' and cannot be assigned to the mutable type 'number[]'.
+src/visual/creatures/MomentoGuardianes.jsx(122,12): error TS2741: Property 'onFin' is missing in type '{ key: string; perro: string; sentido: string; delayMs: number; x: any; y: any; tier: string; reducedMotion: boolean; }' but required in type '{ perro?: string; sentido?: string; delayMs?: number; x?: string; y?: string; tier?: string; reducedMotion?: boolean; onFin: any; }'.
+src/visual/creatures/__tests__/OsoBaston.render.test.jsx(85,35): error TS2741: Property 'tier' is missing in type '{ animated: false; }' but required in type '{ [x: string]: any; size?: number; className?: string; inline?: boolean; animated?: boolean; title?: string; pose?: string; animo?: string; energia?: number; clima?: any; enso?: string; visema?: any; florece?: boolean; ... 5 more ...; mundoId?: any; }'.
+src/visual/creatures/escenaGuardianes.js(146,78): error TS2339: Property 'onFase' does not exist on type '{ activa?: boolean; reducedMotion?: boolean; }'.
+src/visual/creatures/escenaGuardianes.js(146,86): error TS2339: Property 'onFin' does not exist on type '{ activa?: boolean; reducedMotion?: boolean; }'.
+src/visual/creatures/escenaGuardianes.js(174,7): error TS2322: Type 'Timeout' is not assignable to type 'number'.
+src/visual/creatures/useVidaIdle.js(126,12): error TS2339: Property 'style' does not exist on type 'Element'.
+src/visual/creatures/useVidaIdle.js(127,12): error TS2339: Property 'style' does not exist on type 'Element'.
+src/visual/creatures/useVidaIdle.js(145,12): error TS2339: Property 'style' does not exist on type 'Element'.
+src/visual/creatures/useVidaIdle.js(146,12): error TS2339: Property 'style' does not exist on type 'Element'.
+src/visual/diferencial/LaminaDiferencial.jsx(90,8): error TS2345: Argument of type '{ lobulos: number; rugosidad: number; cx: number; cy: number; r: any; semilla: any; }' is not assignable to parameter of type 'number'.
+src/visual/diferencial/LaminaDiferencial.jsx(177,23): error TS2345: Argument of type '{ cx: number; cy: number; r: number; semilla: number; lobulos: number; rugosidad: number; }' is not assignable to parameter of type 'number'.
+src/visual/diferencial/LaminaDiferencial.jsx(326,45): error TS2339: Property 'className' does not exist on type '{}'.
+src/visual/diferencial/LaminaDiferencial.jsx(385,11): error TS2322: Type '{ mordidas: string[]; ventanas: string[]; encima: Element; }' is not assignable to type 'IntrinsicAttributes & { mordidas?: string[]; children?: ReactNode; encima?: ReactNode; cara?: "haz" | "enves"; tinteLamina?: string; }'.
+  Property 'ventanas' does not exist on type 'IntrinsicAttributes & { mordidas?: string[]; children?: ReactNode; encima?: ReactNode; cara?: "haz" | "enves"; tinteLamina?: string; }'.
+src/visual/diferencial/LaminaDiferencial.jsx(430,9): error TS2322: Type '{ x: number; y: number; color: string; lineas: (string | { fuerte: string; resto: string; })[]; }' is not assignable to type 'IntrinsicAttributes & (string | { fuerte: string; resto: string; })[]'.
+  Property 'x' does not exist on type 'IntrinsicAttributes & (string | { fuerte: string; resto: string; })[]'.
+src/visual/diferencial/LaminaDiferencial.jsx(436,9): error TS2322: Type '{ x: number; y: number; color: string; lineas: (string | { fuerte: string; resto: string; })[]; }' is not assignable to type 'IntrinsicAttributes & (string | { fuerte: string; resto: string; })[]'.
+  Property 'x' does not exist on type 'IntrinsicAttributes & (string | { fuerte: string; resto: string; })[]'.
+src/visual/diferencial/LaminaDiferencial.jsx(442,9): error TS2322: Type '{ x: number; y: number; color: string; lineas: (string | { fuerte: string; resto: string; })[]; }' is not assignable to type 'IntrinsicAttributes & (string | { fuerte: string; resto: string; })[]'.
+  Property 'x' does not exist on type 'IntrinsicAttributes & (string | { fuerte: string; resto: string; })[]'.
+src/visual/diferencial/LaminaDiferencial.jsx(482,9): error TS2322: Type '{ x: number; y: number; color: string; lineas: (string | { fuerte: string; resto: string; })[]; }' is not assignable to type 'IntrinsicAttributes & (string | { fuerte: string; resto: string; })[]'.
+  Property 'x' does not exist on type 'IntrinsicAttributes & (string | { fuerte: string; resto: string; })[]'.
+src/visual/diferencial/LaminaDiferencial.jsx(488,9): error TS2322: Type '{ x: number; y: number; color: string; lineas: (string | { fuerte: string; resto: string; })[]; }' is not assignable to type 'IntrinsicAttributes & (string | { fuerte: string; resto: string; })[]'.
+  Property 'x' does not exist on type 'IntrinsicAttributes & (string | { fuerte: string; resto: string; })[]'.
+src/visual/diferencial/LaminaDiferencial.jsx(494,9): error TS2322: Type '{ x: number; y: number; color: string; lineas: (string | { fuerte: string; resto: string; })[]; }' is not assignable to type 'IntrinsicAttributes & (string | { fuerte: string; resto: string; })[]'.
+  Property 'x' does not exist on type 'IntrinsicAttributes & (string | { fuerte: string; resto: string; })[]'.
+src/visual/diferencial/LaminaDiferencial.jsx(503,58): error TS2322: Type '{ children: Element; tinteLamina: string; conBrillo: boolean; }' is not assignable to type 'IntrinsicAttributes & { mordidas?: string[]; children?: ReactNode; encima?: ReactNode; cara?: "haz" | "enves"; tinteLamina?: string; }'.
+  Property 'conBrillo' does not exist on type 'IntrinsicAttributes & { mordidas?: string[]; children?: ReactNode; encima?: ReactNode; cara?: "haz" | "enves"; tinteLamina?: string; }'.
+src/visual/diferencial/LaminaDiferencial.jsx(523,9): error TS2322: Type '{ x: number; y: number; color: string; lineas: (string | { fuerte: string; resto: string; })[]; }' is not assignable to type 'IntrinsicAttributes & (string | { fuerte: string; resto: string; })[]'.
+  Property 'x' does not exist on type 'IntrinsicAttributes & (string | { fuerte: string; resto: string; })[]'.
+src/visual/diferencial/LaminaDiferencial.jsx(529,9): error TS2322: Type '{ x: number; y: number; color: string; lineas: (string | { fuerte: string; resto: string; })[]; }' is not assignable to type 'IntrinsicAttributes & (string | { fuerte: string; resto: string; })[]'.
+  Property 'x' does not exist on type 'IntrinsicAttributes & (string | { fuerte: string; resto: string; })[]'.
+src/visual/diferencial/LaminaDiferencial.jsx(535,9): error TS2322: Type '{ x: number; y: number; color: string; lineas: (string | { fuerte: string; resto: string; })[]; }' is not assignable to type 'IntrinsicAttributes & (string | { fuerte: string; resto: string; })[]'.
+  Property 'x' does not exist on type 'IntrinsicAttributes & (string | { fuerte: string; resto: string; })[]'.
+src/visual/diferencial/LaminaDuda.jsx(142,38): error TS2339: Property 'className' does not exist on type '{}'.
+src/visual/diferencial/LaminaDuda.jsx(180,56): error TS2322: Type '{ children: Element; tinteLamina: string; conBrillo: boolean; }' is not assignable to type 'IntrinsicAttributes & { mordidas?: string[]; children?: ReactNode; encima?: ReactNode; cara?: "haz" | "enves"; tinteLamina?: string; }'.
+  Property 'conBrillo' does not exist on type 'IntrinsicAttributes & { mordidas?: string[]; children?: ReactNode; encima?: ReactNode; cara?: "haz" | "enves"; tinteLamina?: string; }'.
+src/visual/diferencial/LaminaDuda.jsx(185,56): error TS2322: Type '{ children: Element; tinteLamina: string; conBrillo: boolean; }' is not assignable to type 'IntrinsicAttributes & { mordidas?: string[]; children?: ReactNode; encima?: ReactNode; cara?: "haz" | "enves"; tinteLamina?: string; }'.
+  Property 'conBrillo' does not exist on type 'IntrinsicAttributes & { mordidas?: string[]; children?: ReactNode; encima?: ReactNode; cara?: "haz" | "enves"; tinteLamina?: string; }'.
+src/visual/diferencial/LaminaLlave.jsx(53,21): error TS2345: Argument of type '{ cx: number; cy: number; r: number; semilla: number; lobulos: number; rugosidad: number; }' is not assignable to parameter of type 'number'.
+src/visual/diferencial/LaminaLlave.jsx(54,20): error TS2345: Argument of type '{ cx: number; cy: number; r: number; semilla: number; lobulos: number; rugosidad: number; }' is not assignable to parameter of type 'number'.
+src/visual/diferencial/LaminaLlave.jsx(56,19): error TS2345: Argument of type '{ cx: number; cy: number; r: number; semilla: number; lobulos: number; rugosidad: number; }' is not assignable to parameter of type 'number'.
+src/visual/diferencial/LaminaLlave.jsx(75,14): error TS2322: Type '{ x: number; y: number; rot: number; escala: number; tinte: string; venaVerde: boolean; }' is not assignable to type 'string'.
+src/visual/diferencial/LaminaLlave.jsx(76,14): error TS2322: Type '{ x: number; y: number; rot: number; escala: number; tinte: string; venaVerde: boolean; }' is not assignable to type 'string'.
+src/visual/diferencial/LaminaLlave.jsx(86,39): error TS2339: Property 'className' does not exist on type '{}'.
+src/visual/diferencial/LaminaLlave.jsx(132,58): error TS2322: Type '{ children: Element; tinteLamina: string; conBrillo: boolean; }' is not assignable to type 'IntrinsicAttributes & { mordidas?: string[]; children?: ReactNode; encima?: ReactNode; cara?: "haz" | "enves"; tinteLamina?: string; }'.
+  Property 'conBrillo' does not exist on type 'IntrinsicAttributes & { mordidas?: string[]; children?: ReactNode; encima?: ReactNode; cara?: "haz" | "enves"; tinteLamina?: string; }'.
+src/visual/diferencial/LaminaLlave.jsx(152,9): error TS2322: Type '{ x: number; y: number; color: string; tam: number; interlinea: number; lineas: (string | { fuerte: string; resto: string; })[]; }' is not assignable to type 'IntrinsicAttributes & (string | { fuerte: string; resto: string; })[]'.
+  Property 'x' does not exist on type 'IntrinsicAttributes & (string | { fuerte: string; resto: string; })[]'.
+src/visual/diferencial/LaminaLlave.jsx(163,9): error TS2322: Type '{ x: number; y: number; color: string; tam: number; interlinea: number; lineas: string[]; }' is not assignable to type 'IntrinsicAttributes & (string | { fuerte: string; resto: string; })[]'.
+  Property 'x' does not exist on type 'IntrinsicAttributes & (string | { fuerte: string; resto: string; })[]'.
+src/visual/diferencial/LaminaLlave.jsx(175,9): error TS2322: Type '{ x: number; y: number; color: string; tam: number; interlinea: number; lineas: string[]; }' is not assignable to type 'IntrinsicAttributes & (string | { fuerte: string; resto: string; })[]'.
+  Property 'x' does not exist on type 'IntrinsicAttributes & (string | { fuerte: string; resto: string; })[]'.
+src/visual/diferencial/LaminaLlave.jsx(203,21): error TS2345: Argument of type '{ cx: number; cy: number; r: number; semilla: number; lobulos: number; rugosidad: number; }' is not assignable to parameter of type 'number'.
+src/visual/diferencial/LaminaLlave.jsx(213,9): error TS2322: Type '{ x: number; y: number; color: string; tam: number; interlinea: number; lineas: (string | { fuerte: string; resto: string; })[]; }' is not assignable to type 'IntrinsicAttributes & (string | { fuerte: string; resto: string; })[]'.
+  Property 'x' does not exist on type 'IntrinsicAttributes & (string | { fuerte: string; resto: string; })[]'.
+src/visual/diferencial/LaminaLlave.jsx(225,9): error TS2322: Type '{ x: number; y: number; color: string; tam: number; interlinea: number; lineas: (string | { fuerte: string; resto: string; })[]; }' is not assignable to type 'IntrinsicAttributes & (string | { fuerte: string; resto: string; })[]'.
+  Property 'x' does not exist on type 'IntrinsicAttributes & (string | { fuerte: string; resto: string; })[]'.
+src/visual/diferencial/LaminaLlave.jsx(267,9): error TS2322: Type '{ x: number; y: number; color: string; tam: number; interlinea: number; lineas: (string | { fuerte: string; resto: string; })[]; }' is not assignable to type 'IntrinsicAttributes & (string | { fuerte: string; resto: string; })[]'.
+  Property 'x' does not exist on type 'IntrinsicAttributes & (string | { fuerte: string; resto: string; })[]'.
+src/visual/diferencial/LaminaLlave.jsx(279,9): error TS2322: Type '{ x: number; y: number; color: string; tam: number; interlinea: number; lineas: (string | { fuerte: string; resto: string; })[]; }' is not assignable to type 'IntrinsicAttributes & (string | { fuerte: string; resto: string; })[]'.
+  Property 'x' does not exist on type 'IntrinsicAttributes & (string | { fuerte: string; resto: string; })[]'.
+src/visual/diferencial/formasHoja.js(257,22): error TS2463: A binding pattern parameter cannot be optional in an implementation signature.
+src/visual/diferencial/formasHoja.js(257,24): error TS2339: Property 'cx' does not exist on type 'Number'.
+src/visual/diferencial/formasHoja.js(257,28): error TS2339: Property 'cy' does not exist on type 'Number'.
+src/visual/diferencial/formasHoja.js(257,32): error TS2339: Property 'r' does not exist on type 'Number'.
+src/visual/diferencial/formasHoja.js(257,35): error TS2339: Property 'semilla' does not exist on type 'Number'.
+src/visual/diferencial/formasHoja.js(257,44): error TS2339: Property 'lobulos' does not exist on type 'Number'.
+src/visual/diferencial/formasHoja.js(257,57): error TS2339: Property 'rugosidad' does not exist on type 'Number'.
+src/visual/diferencial/formasHoja.js(257,75): error TS2339: Property 'alargue' does not exist on type 'Number'.
+src/visual/diferencial/formasHoja.js(257,88): error TS2339: Property 'rot' does not exist on type 'Number'.
+src/visual/diferencial/formasHoja.js(335,15): error TS2345: Argument of type '{ cx: any; cy: any; r: any; semilla: any; lobulos: number; rugosidad: number; }' is not assignable to parameter of type 'number'.
+src/visual/diferencial/motivosDano.jsx(48,3): error TS2339: Property 'ventanas' does not exist on type '{ mordidas?: string[]; children?: ReactNode; encima?: ReactNode; cara?: "haz" | "enves"; tinteLamina?: string; }'.
+src/visual/diferencial/motivosDano.jsx(53,3): error TS2339: Property 'conBrillo' does not exist on type '{ mordidas?: string[]; children?: ReactNode; encima?: ReactNode; cara?: "haz" | "enves"; tinteLamina?: string; }'.
+src/visual/diferencial/motivosDano.jsx(132,23): error TS2345: Argument of type '{ cx: number; cy: number; r: number; semilla: number; lobulos: number; rugosidad: number; alargue: number; }' is not assignable to parameter of type 'number'.
+src/visual/diferencial/motivosDano.jsx(221,21): error TS2345: Argument of type '{ cx: any; cy: any; r: number; semilla: any; lobulos: number; rugosidad: number; alargue: any; }' is not assignable to parameter of type 'number'.
+src/visual/diferencial/motivosDano.jsx(241,23): error TS2345: Argument of type '{ cx: any; cy: any; r: number; semilla: any; lobulos: number; rugosidad: number; alargue: any; }' is not assignable to parameter of type 'number'.
+src/visual/diferencial/motivosDano.jsx(287,23): error TS2345: Argument of type '{ cx: any; cy: any; r: number; semilla: any; lobulos: number; rugosidad: number; alargue: any; }' is not assignable to parameter of type 'number'.
+src/visual/diferencial/motivosDano.jsx(291,23): error TS2345: Argument of type '{ cx: any; cy: any; r: number; semilla: any; lobulos: number; rugosidad: number; alargue: any; }' is not assignable to parameter of type 'number'.
+src/visual/diferencial/motivosDano.jsx(297,23): error TS2345: Argument of type '{ cx: any; cy: any; r: number; semilla: any; lobulos: number; rugosidad: number; alargue: any; }' is not assignable to parameter of type 'number'.
+src/visual/diferencial/motivosDano.jsx(330,17): error TS2345: Argument of type '{ cx: any; cy: any; r: number; semilla: number; lobulos: number; rugosidad: number; }' is not assignable to parameter of type 'number'.
+src/visual/diferencial/motivosDano.jsx(337,17): error TS2345: Argument of type '{ cx: any; cy: any; r: any; semilla: number; lobulos: number; rugosidad: number; }' is not assignable to parameter of type 'number'.
+src/visual/diferencial/motivosDano.jsx(344,17): error TS2345: Argument of type '{ cx: number; cy: number; r: number; semilla: number; lobulos: number; rugosidad: number; }' is not assignable to parameter of type 'number'.
+src/visual/diferencial/motivosDano.jsx(370,17): error TS2345: Argument of type '{ cx: any; cy: any; r: number; semilla: number; lobulos: number; rugosidad: number; }' is not assignable to parameter of type 'number'.
+src/visual/diferencial/motivosDano.jsx(376,17): error TS2345: Argument of type '{ cx: any; cy: any; r: any; semilla: number; lobulos: number; rugosidad: number; }' is not assignable to parameter of type 'number'.
+src/visual/diferencial/motivosDano.jsx(385,19): error TS2345: Argument of type '{ cx: any; cy: any; r: number; semilla: number; lobulos: number; rugosidad: number; }' is not assignable to parameter of type 'number'.
+src/visual/diferencial/motivosDano.jsx(607,22): error TS8032: Qualified name 'props.venaVerde' is not allowed without a leading '@param {object} props'.
+src/visual/diferencial/motivosDano.jsx(609,28): error TS2339: Property 'x' does not exist on type 'String'.
+src/visual/diferencial/motivosDano.jsx(609,31): error TS2339: Property 'y' does not exist on type 'String'.
+src/visual/diferencial/motivosDano.jsx(609,34): error TS2339: Property 'rot' does not exist on type 'String'.
+src/visual/diferencial/motivosDano.jsx(609,43): error TS2339: Property 'escala' does not exist on type 'String'.
+src/visual/diferencial/motivosDano.jsx(609,58): error TS2339: Property 'tinte' does not exist on type 'String'.
+src/visual/diferencial/motivosDano.jsx(609,65): error TS2339: Property 'venaVerde' does not exist on type 'String'.
+src/visual/diferencial/motivosDano.jsx(671,26): error TS2339: Property 'x' does not exist on type '(string | { fuerte: string; resto: string; })[]'.
+src/visual/diferencial/motivosDano.jsx(671,29): error TS2339: Property 'y' does not exist on type '(string | { fuerte: string; resto: string; })[]'.
+src/visual/diferencial/motivosDano.jsx(671,32): error TS2339: Property 'color' does not exist on type '(string | { fuerte: string; resto: string; })[]'.
+src/visual/diferencial/motivosDano.jsx(671,39): error TS2339: Property 'lineas' does not exist on type '(string | { fuerte: string; resto: string; })[]'.
+src/visual/diferencial/motivosDano.jsx(671,47): error TS2339: Property 'tam' does not exist on type '(string | { fuerte: string; resto: string; })[]'.
+src/visual/diferencial/motivosDano.jsx(671,58): error TS2339: Property 'interlinea' does not exist on type '(string | { fuerte: string; resto: string; })[]'.
+src/visual/laminas/botanicas/LaminaBotanica.jsx(210,10): error TS2741: Property 'nota' is missing in type '{ x: any; y: any; ancho: any; titulo: string; }' but required in type '{ x: any; y: any; ancho: any; titulo: any; nota: any; }'.
+src/visual/laminas/botanicas/LaminaBotanica.jsx(281,28): error TS8032: Qualified name 'props.numero' is not allowed without a leading '@param {object} props'.
+src/visual/laminas/botanicas/LaminaBotanica.jsx(282,21): error TS8032: Qualified name 'props.className' is not allowed without a leading '@param {object} props'.
+src/visual/laminas/botanicas/LaminaBotanica.jsx(413,10): error TS2741: Property 'nota' is missing in type '{ x: number; y: number; n: string; titulo: string; }' but required in type '{ x: any; y: any; n: any; titulo: any; nota: any; }'.
+src/visual/laminas/botanicas/LaminaBotanica.jsx(422,10): error TS2741: Property 'nota' is missing in type '{ x: number; y: number; n: string; titulo: string; }' but required in type '{ x: any; y: any; n: any; titulo: any; nota: any; }'.
+src/visual/laminas/botanicas/especies/index.js(69,11): error TS2339: Property 'sinDato' does not exist on type '{ id: string; nombre: string; cientifico: string; autoridad: string; familia: string; regionales: string[]; notaNombre: string; piso: string; altitud: number[]; altitudOptima: number[]; climaNota: string; ... 9 more ...; enfermedades: ({ ...; } | ... 1 more ... | { ...; })[]; } | ... 19 more ... | { ...; }'.
+  Property 'sinDato' does not exist on type '{ id: string; nombre: string; cientifico: string; autoridad: string; familia: string; regionales: string[]; notaNombre: string; piso: string; altitud: number[]; altitudOptima: number[]; climaNota: string; ... 9 more ...; enfermedades: ({ ...; } | ... 1 more ... | { ...; })[]; }'.
+src/visual/laminas/botanicas/geometria/hoja.js(334,20): error TS8024: JSDoc '@param' tag has name 'tipo', but there is no parameter with that name.
+src/visual/laminas/botanicas/pintores/PintaHabito.jsx(36,7): error TS2353: Object literal may only specify known properties, and 'lobulos' does not exist in type '{ forma: string; borde: string; nervadura: string; len: number; ancho: number; rng: Function; }'.
+src/visual/laminas/botanicas/pintores/PintaHabito.jsx(57,21): error TS8032: Qualified name 'props.altoPx' is not allowed without a leading '@param {object} props'.
+src/visual/laminas/botanicas/pintores/PintaHabito.jsx(58,22): error TS8032: Qualified name 'props.escala' is not allowed without a leading '@param {object} props'.
+src/visual/laminas/botanicas/pintores/PintaHabito.jsx(133,12): error TS2322: Type '{ stroke: string; strokeWidth: number; strokeLinejoin: string; d: any; fill: string; }' is not assignable to type 'SVGProps<SVGPathElement>'.
+  Types of property 'strokeLinejoin' are incompatible.
+    Type 'string' is not assignable to type '"round" | "inherit" | "miter" | "bevel"'.
+src/visual/laminas/botanicas/pintores/organos.jsx(146,20): error TS8032: Qualified name 'props.semilla' is not allowed without a leading '@param {object} props'.
+src/visual/laminas/botanicas/pintores/organos.jsx(147,21): error TS8032: Qualified name 'props.len' is not allowed without a leading '@param {object} props'.
+src/visual/laminas/botanicas/pintores/organos.jsx(148,28): error TS8032: Qualified name 'props.cara' is not allowed without a leading '@param {object} props'.
+src/visual/laminas/botanicas/pintores/organos.jsx(149,21): error TS8032: Qualified name 'props.piso' is not allowed without a leading '@param {object} props'.
+src/visual/laminas/botanicas/pintores/organos.jsx(150,21): error TS8032: Qualified name 'props.sintoma' is not allowed without a leading '@param {object} props'.
+src/visual/laminas/botanicas/pintores/organos.jsx(151,21): error TS8032: Qualified name 'props.etapa' is not allowed without a leading '@param {object} props'.
+src/visual/laminas/botanicas/pintores/organos.jsx(333,14): error TS2322: Type '{ strokeWidth: string; stroke: string; strokeLinejoin: string; key: any; rx: number; ry: any; transform: string; fill: string; opacity: string; }' is not assignable to type 'SVGProps<SVGEllipseElement>'.
+  Types of property 'strokeLinejoin' are incompatible.
+    Type 'string' is not assignable to type '"round" | "inherit" | "miter" | "bevel"'.
+src/visual/laminas/botanicas/pintores/organos.jsx(335,12): error TS2322: Type '{ stroke: string; strokeWidth: number; strokeLinejoin: string; d: any; fill: any; }' is not assignable to type 'SVGProps<SVGPathElement>'.
+  Types of property 'strokeLinejoin' are incompatible.
+    Type 'string' is not assignable to type '"round" | "inherit" | "miter" | "bevel"'.
+src/visual/laminas/botanicas/pintores/organos.jsx(351,12): error TS2322: Type '{ strokeWidth: string; stroke: string; strokeLinejoin: string; d: any; fill: string; }' is not assignable to type 'SVGProps<SVGPathElement>'.
+  Types of property 'strokeLinejoin' are incompatible.
+    Type 'string' is not assignable to type '"round" | "inherit" | "miter" | "bevel"'.
+src/visual/laminas/botanicas/pintores/organos.jsx(352,12): error TS2322: Type '{ strokeWidth: string; stroke: string; strokeLinejoin: string; d: any; fill: any; opacity: string; }' is not assignable to type 'SVGProps<SVGPathElement>'.
+  Types of property 'strokeLinejoin' are incompatible.
+    Type 'string' is not assignable to type '"round" | "inherit" | "miter" | "bevel"'.
+src/visual/laminas/botanicas/pintores/organos.jsx(353,12): error TS2322: Type '{ strokeWidth: string; stroke: string; strokeLinejoin: string; d: any; fill: any; }' is not assignable to type 'SVGProps<SVGPathElement>'.
+  Types of property 'strokeLinejoin' are incompatible.
+    Type 'string' is not assignable to type '"round" | "inherit" | "miter" | "bevel"'.
+src/visual/laminas/botanicas/pintores/organos.jsx(355,12): error TS2322: Type '{ stroke: string; strokeWidth: number; strokeLinejoin: string; d: any; fill: any; }' is not assignable to type 'SVGProps<SVGPathElement>'.
+  Types of property 'strokeLinejoin' are incompatible.
+    Type 'string' is not assignable to type '"round" | "inherit" | "miter" | "bevel"'.
+src/visual/laminas/botanicas/pintores/organos.jsx(366,14): error TS2322: Type '{ strokeWidth: string; stroke: string; strokeLinejoin: string; key: any; rx: any; ry: any; cy: any; transform: string; fill: any; }' is not assignable to type 'SVGProps<SVGEllipseElement>'.
+  Types of property 'strokeLinejoin' are incompatible.
+    Type 'string' is not assignable to type '"round" | "inherit" | "miter" | "bevel"'.
+src/visual/laminas/botanicas/pintores/organos.jsx(381,25): error TS2322: Type '{ strokeWidth: string; stroke: string; strokeLinejoin: string; cy: number; rx: any; ry: number; fill: any; }' is not assignable to type 'SVGProps<SVGEllipseElement>'.
+  Types of property 'strokeLinejoin' are incompatible.
+    Type 'string' is not assignable to type '"round" | "inherit" | "miter" | "bevel"'.
+src/visual/laminas/botanicas/pintores/organos.jsx(396,14): error TS2322: Type '{ strokeWidth: string; stroke: string; strokeLinejoin: string; key: any; rx: any; ry: any; cy: any; transform: string; fill: any; }' is not assignable to type 'SVGProps<SVGEllipseElement>'.
+  Types of property 'strokeLinejoin' are incompatible.
+    Type 'string' is not assignable to type '"round" | "inherit" | "miter" | "bevel"'.
+src/visual/laminas/botanicas/pintores/organos.jsx(412,14): error TS2322: Type '{ strokeWidth: string; stroke: string; strokeLinejoin: string; d: any; fill: any; }' is not assignable to type 'SVGProps<SVGPathElement>'.
+  Types of property 'strokeLinejoin' are incompatible.
+    Type 'string' is not assignable to type '"round" | "inherit" | "miter" | "bevel"'.
+src/visual/laminas/botanicas/pintores/organos.jsx(416,14): error TS2322: Type '{ strokeWidth: string; stroke: string; strokeLinejoin: string; d: any; fill: any; }' is not assignable to type 'SVGProps<SVGPathElement>'.
+  Types of property 'strokeLinejoin' are incompatible.
+    Type 'string' is not assignable to type '"round" | "inherit" | "miter" | "bevel"'.
+src/visual/laminas/botanicas/pintores/organos.jsx(419,14): error TS2322: Type '{ strokeWidth: string; stroke: string; strokeLinejoin: string; cy: any; rx: any; ry: any; fill: string; }' is not assignable to type 'SVGProps<SVGEllipseElement>'.
+  Types of property 'strokeLinejoin' are incompatible.
+    Type 'string' is not assignable to type '"round" | "inherit" | "miter" | "bevel"'.
+src/visual/laminas/botanicas/pintores/organos.jsx(466,12): error TS2322: Type '{ stroke: string; strokeWidth: number; strokeLinejoin: string; d: any; fill: any; }' is not assignable to type 'SVGProps<SVGPathElement>'.
+  Types of property 'strokeLinejoin' are incompatible.
+    Type 'string' is not assignable to type '"round" | "inherit" | "miter" | "bevel"'.
+src/visual/laminas/botanicas/pintores/organos.jsx(525,12): error TS2322: Type '{ stroke: string; strokeWidth: number; strokeLinejoin: string; d: any; fill: any; }' is not assignable to type 'SVGProps<SVGPathElement>'.
+  Types of property 'strokeLinejoin' are incompatible.
+    Type 'string' is not assignable to type '"round" | "inherit" | "miter" | "bevel"'.
+src/visual/laminas/botanicas/pintores/organos.jsx(549,12): error TS2322: Type '{ stroke: string; strokeWidth: number; strokeLinejoin: string; d: any; fill: any; }' is not assignable to type 'SVGProps<SVGPathElement>'.
+  Types of property 'strokeLinejoin' are incompatible.
+    Type 'string' is not assignable to type '"round" | "inherit" | "miter" | "bevel"'.
+src/visual/laminas/botanicas/pintores/organos.jsx(561,12): error TS2322: Type '{ stroke: string; strokeWidth: number; strokeLinejoin: string; d: any; fill: any; }' is not assignable to type 'SVGProps<SVGPathElement>'.
+  Types of property 'strokeLinejoin' are incompatible.
+    Type 'string' is not assignable to type '"round" | "inherit" | "miter" | "bevel"'.
+src/visual/laminas/botanicas/pintores/organos.jsx(577,12): error TS2322: Type '{ stroke: string; strokeWidth: number; strokeLinejoin: string; d: any; fill: any; }' is not assignable to type 'SVGProps<SVGPathElement>'.
+  Types of property 'strokeLinejoin' are incompatible.
+    Type 'string' is not assignable to type '"round" | "inherit" | "miter" | "bevel"'.
+src/visual/laminas/botanicas/pintores/organos.jsx(596,12): error TS2322: Type '{ stroke: string; strokeWidth: number; strokeLinejoin: string; d: any; fill: any; }' is not assignable to type 'SVGProps<SVGPathElement>'.
+  Types of property 'strokeLinejoin' are incompatible.
+    Type 'string' is not assignable to type '"round" | "inherit" | "miter" | "bevel"'.
+src/visual/laminas/botanicas/pintores/organos.jsx(598,12): error TS2322: Type '{ strokeWidth: string; stroke: string; strokeLinejoin: string; d: any; fill: string; }' is not assignable to type 'SVGProps<SVGPathElement>'.
+  Types of property 'strokeLinejoin' are incompatible.
+    Type 'string' is not assignable to type '"round" | "inherit" | "miter" | "bevel"'.
+src/visual/laminas/botanicas/pintores/organos.jsx(608,12): error TS2322: Type '{ stroke: string; strokeWidth: number; strokeLinejoin: string; d: any; fill: any; }' is not assignable to type 'SVGProps<SVGPathElement>'.
+  Types of property 'strokeLinejoin' are incompatible.
+    Type 'string' is not assignable to type '"round" | "inherit" | "miter" | "bevel"'.
+src/visual/laminas/botanicas/pintores/organos.jsx(624,12): error TS2322: Type '{ stroke: string; strokeWidth: number; strokeLinejoin: string; d: any; fill: string; }' is not assignable to type 'SVGProps<SVGPathElement>'.
+  Types of property 'strokeLinejoin' are incompatible.
+    Type 'string' is not assignable to type '"round" | "inherit" | "miter" | "bevel"'.
+src/visual/laminas/botanicas/pintores/organos.jsx(645,12): error TS2322: Type '{ stroke: string; strokeWidth: number; strokeLinejoin: string; d: any; fill: any; }' is not assignable to type 'SVGProps<SVGPathElement>'.
+  Types of property 'strokeLinejoin' are incompatible.
+    Type 'string' is not assignable to type '"round" | "inherit" | "miter" | "bevel"'.
+src/visual/laminas/botanicas/pintores/organos.jsx(659,12): error TS2322: Type '{ stroke: string; strokeWidth: number; strokeLinejoin: string; d: any; fill: any; }' is not assignable to type 'SVGProps<SVGPathElement>'.
+  Types of property 'strokeLinejoin' are incompatible.
+    Type 'string' is not assignable to type '"round" | "inherit" | "miter" | "bevel"'.
+src/visual/laminas/botanicas/pintores/organos.jsx(664,14): error TS2322: Type '{ strokeWidth: string; stroke: string; strokeLinejoin: string; d: any; fill: any; }' is not assignable to type 'SVGProps<SVGPathElement>'.
+  Types of property 'strokeLinejoin' are incompatible.
+    Type 'string' is not assignable to type '"round" | "inherit" | "miter" | "bevel"'.
+src/visual/laminas/botanicas/pintores/organos.jsx(689,12): error TS2322: Type '{ stroke: string; strokeWidth: number; strokeLinejoin: string; x: any; y: any; width: any; height: any; fill: any; }' is not assignable to type 'SVGProps<SVGRectElement>'.
+  Types of property 'strokeLinejoin' are incompatible.
+    Type 'string' is not assignable to type '"round" | "inherit" | "miter" | "bevel"'.
+src/visual/laminas/botanicas/pintores/organos.jsx(697,14): error TS2322: Type '{ stroke: string; strokeWidth: number; strokeLinejoin: string; r: any; fill: any; }' is not assignable to type 'SVGProps<SVGCircleElement>'.
+  Types of property 'strokeLinejoin' are incompatible.
+    Type 'string' is not assignable to type '"round" | "inherit" | "miter" | "bevel"'.
+src/visual/laminas/botanicas/pintores/organos.jsx(708,12): error TS2322: Type '{ stroke: string; strokeWidth: number; strokeLinejoin: string; d: any; fill: any; }' is not assignable to type 'SVGProps<SVGPathElement>'.
+  Types of property 'strokeLinejoin' are incompatible.
+    Type 'string' is not assignable to type '"round" | "inherit" | "miter" | "bevel"'.
+src/visual/laminas/botanicas/pintores/organos.jsx(709,12): error TS2322: Type '{ strokeWidth: string; stroke: string; strokeLinejoin: string; d: any; fill: string; }' is not assignable to type 'SVGProps<SVGPathElement>'.
+  Types of property 'strokeLinejoin' are incompatible.
+    Type 'string' is not assignable to type '"round" | "inherit" | "miter" | "bevel"'.
+src/visual/laminas/botanicas/pintores/organos.jsx(716,12): error TS2322: Type '{ stroke: string; strokeWidth: number; strokeLinejoin: string; d: any; fill: any; }' is not assignable to type 'SVGProps<SVGPathElement>'.
+  Types of property 'strokeLinejoin' are incompatible.
+    Type 'string' is not assignable to type '"round" | "inherit" | "miter" | "bevel"'.
+src/visual/laminas/botanicas/pintores/organos.jsx(732,12): error TS2322: Type '{ stroke: string; strokeWidth: number; strokeLinejoin: string; d: any; fill: string; opacity: string; }' is not assignable to type 'SVGProps<SVGPathElement>'.
+  Types of property 'strokeLinejoin' are incompatible.
+    Type 'string' is not assignable to type '"round" | "inherit" | "miter" | "bevel"'.
+src/visual/laminas/botanicas/pintores/tipografia.jsx(42,7): error TS2322: Type 'string' is not assignable to type '"end" | "start" | "inherit" | "middle"'.
+src/visual/laminas/botanicas/pintores/tipografia.jsx(57,22): error TS8032: Qualified name 'props.hasta' is not allowed without a leading '@param {object} props'.
+src/visual/laminas/botanicas/pintores/tipografia.jsx(58,25): error TS8032: Qualified name 'props.lado' is not allowed without a leading '@param {object} props'.
+src/visual/laminas/botanicas/pintores/tipografia.jsx(60,26): error TS2339: Property 'desde' does not exist on type 'number[]'.
+src/visual/laminas/botanicas/pintores/tipografia.jsx(60,33): error TS2339: Property 'hasta' does not exist on type 'number[]'.
+src/visual/laminas/botanicas/pintores/tipografia.jsx(60,40): error TS2339: Property 'texto' does not exist on type 'number[]'.
+src/visual/laminas/botanicas/pintores/tipografia.jsx(60,47): error TS2339: Property 'nota' does not exist on type 'number[]'.
+src/visual/laminas/botanicas/pintores/tipografia.jsx(60,53): error TS2339: Property 'lado' does not exist on type 'number[]'.
+src/visual/laminas/botanicas/pintores/tipografia.jsx(60,67): error TS2339: Property 'tam' does not exist on type 'number[]'.
+src/visual/laminas/botanicas/pintores/tipografia.jsx(106,77): error TS2322: Type 'string' is not assignable to type '"end" | "start" | "inherit" | "middle"'.
+src/visual/mundo3d/Mundo.jsx(211,13): error TS2322: Type '{ mundoId: any; params: any; hotspots: any; entrada: any; tinte: string[]; tier: "bajo" | "alto" | "medio"; reducedMotion: boolean; onHotspot: any; onSalir: any; animo: string; energia: number; estadoFinca: any; hayAlerta: boolean; hablando: boolean; focoId: any; focoToken: number; }' is not assignable to type 'IntrinsicAttributes'.
+  Property 'mundoId' does not exist on type 'IntrinsicAttributes'.
+src/visual/mundo3d/VistaGlobalSierra.jsx(551,8): error TS2739: Type '{ activa: any; pisoDestino: any; tier: "bajo" | "alto" | "medio"; reducedMotion: boolean; onMitad: () => void; onFin: () => void; }' is missing the following properties from type '{ activa?: boolean; direccion?: string; pisoDestino?: string; tier?: string; reducedMotion?: boolean; onMitad: any; onFin: any; camaraRef?: any; caidaCamara?: number; colorA: any; colorB: any; etiqueta: any; }': colorA, colorB, etiqueta
+src/visual/mundo3d/__tests__/bosqueRealismo.test.js(86,39): error TS2554: Expected 0-1 arguments, but got 2.
+src/visual/mundo3d/__tests__/bosqueRealismo.test.js(92,39): error TS2554: Expected 0-1 arguments, but got 2.
+src/visual/mundo3d/__tests__/canaTrapiche.geom.test.js(69,56): error TS2322: Type 'string' is not assignable to type '"cerca" | "lejos"'.
+src/visual/mundo3d/__tests__/canaTrapiche.geom.test.js(178,74): error TS2322: Type 'string' is not assignable to type '"cerca" | "lejos"'.
+src/visual/mundo3d/__tests__/canaTrapiche.geom.test.js(314,53): error TS2322: Type 'string' is not assignable to type '"seco" | "humedo" | "secando"'.
+src/visual/mundo3d/__tests__/gemeloValle2D.smoke.test.jsx(102,9): error TS2739: Type '{ anclaMundo: string; titulo: string; detalle: string; }' is missing the following properties from type '{ anclaMundo: string; tono: string; titulo: string; detalle: string; vozTexto: string; accion: { etiqueta: string; view: string; }; }': tono, vozTexto, accion
+src/visual/mundo3d/__tests__/gemeloValle2D.smoke.test.jsx(111,31): error TS2339: Property 'style' does not exist on type 'Element'.
+src/visual/mundo3d/__tests__/gemeloValle2D.smoke.test.jsx(112,31): error TS2339: Property 'style' does not exist on type 'Element'.
+src/visual/mundo3d/__tests__/gemeloValle2D.smoke.test.jsx(113,31): error TS2339: Property 'style' does not exist on type 'Element'.
+src/visual/mundo3d/__tests__/gemeloValle2D.smoke.test.jsx(114,31): error TS2339: Property 'style' does not exist on type 'Element'.
+src/visual/mundo3d/__tests__/gemeloValle2D.smoke.test.jsx(121,8): error TS2739: Type '{ escena: string; entrada: { alertaView: string; }; onHotspot: Mock<Procedure>; }' is missing the following properties from type '{ escena: any; entrada: any; motivo: any; tinte: any; reducedMotion: any; onHotspot: any; animo: any; energia: any; }': motivo, tinte, reducedMotion, animo, energia
+src/visual/mundo3d/__tests__/hiloVidaVista.test.jsx(93,8): error TS2741: Property 'onIrA' is missing in type '{ cielo: string; lugar: string; pendientes: { tema: string; view: string; }[]; }' but required in type '{ cielo: any; animo?: string; energia?: number; lugar: any; pendientes: any; onIrA: any; reducedMotion?: boolean; className?: string; }'.
+src/visual/mundo3d/__tests__/usePerformanceMonitor.test.js(139,14): error TS2339: Property 'presupuesto' does not exist on type 'Calidad3D'.
+src/visual/mundo3d/__tests__/usePerformanceMonitor.test.js(152,26): error TS2339: Property 'presupuesto' does not exist on type 'Calidad3D'.
+src/visual/mundo3d/agua/chorreraReal.jsx(971,15): error TS2339: Property 'geometry' does not exist on type 'Object3D<Object3DEventMap>'.
+src/visual/mundo3d/agua/chorreraReal.jsx(971,27): error TS2339: Property 'geometry' does not exist on type 'Object3D<Object3DEventMap>'.
+src/visual/mundo3d/agua/chorreraReal.jsx(972,15): error TS2339: Property 'material' does not exist on type 'Object3D<Object3DEventMap>'.
+src/visual/mundo3d/agua/chorreraReal.jsx(972,27): error TS2339: Property 'material' does not exist on type 'Object3D<Object3DEventMap>'.
+src/visual/mundo3d/agua/piezasAgua.jsx(473,26): error TS2322: Type 'number[]' is not assignable to type 'number | Vector3 | [x: number, y: number, z?: number] | readonly [x: number, y: number, z?: number] | Readonly<Vector3>'.
+  Type 'number[]' is not assignable to type 'Vector3 | [x: number, y: number, z?: number] | readonly [x: number, y: number, z?: number] | Readonly<Vector3>'.
+    Type 'number[]' is not assignable to type '[x: number, y: number, z?: number]'.
+      Target requires 2 element(s) but source may have fewer.
+src/visual/mundo3d/aguacatal/EscenaAguacatalVivo.jsx(193,12): error TS2322: Type 'number[]' is not assignable to type 'number | Vector3 | [x: number, y: number, z?: number] | readonly [x: number, y: number, z?: number] | Readonly<Vector3>'.
+  Type 'number[]' is not assignable to type 'Vector3 | [x: number, y: number, z?: number] | readonly [x: number, y: number, z?: number] | Readonly<Vector3>'.
+    Type 'number[]' is not assignable to type '[x: number, y: number, z?: number]'.
+      Target requires 2 element(s) but source may have fewer.
+src/visual/mundo3d/artesania/ArtesaniaKit.jsx(102,12): error TS2322: Type 'number[]' is not assignable to type 'number | Vector3 | [x: number, y: number, z?: number] | readonly [x: number, y: number, z?: number] | Readonly<Vector3>'.
+  Type 'number[]' is not assignable to type 'Vector3 | [x: number, y: number, z?: number] | readonly [x: number, y: number, z?: number] | Readonly<Vector3>'.
+    Type 'number[]' is not assignable to type '[x: number, y: number, z?: number]'.
+      Target requires 2 element(s) but source may have fewer.
+src/visual/mundo3d/artesania/ArtesaniaKit.jsx(102,32): error TS2322: Type 'number[]' is not assignable to type 'number | Euler | [x: number, y: number, z: number, order?: EulerOrder] | readonly [x: number, y: number, z: number, order?: EulerOrder] | Readonly<Euler>'.
+  Type 'number[]' is not assignable to type '[x: number, y: number, z: number, order?: EulerOrder]'.
+    Target requires 3 element(s) but source may have fewer.
+src/visual/mundo3d/artesania/ArtesaniaKit.jsx(161,11): error TS2322: Type 'number[]' is not assignable to type 'number | Euler | [x: number, y: number, z: number, order?: EulerOrder] | readonly [x: number, y: number, z: number, order?: EulerOrder] | Readonly<Euler>'.
+  Type 'number[]' is not assignable to type '[x: number, y: number, z: number, order?: EulerOrder]'.
+    Target requires 3 element(s) but source may have fewer.
+src/visual/mundo3d/artesania/geometriasArtesania.js(137,30): error TS1127: Invalid character.
+src/visual/mundo3d/artesania/geometriasArtesania.js(191,3): error TS2339: Property 'radio' does not exist on type '{ alto?: number; seed?: number; segmentos?: number; }'.
+src/visual/mundo3d/artesania/geometriasArtesania.js(195,29): error TS2345: Argument of type 'string' is not assignable to parameter of type '"terraza" | "vasija" | "mojon" | "telar" | "totem"'.
+src/visual/mundo3d/artesania/materialesArtesania.js(50,49): error TS1127: Invalid character.
+src/visual/mundo3d/artesania/materialesArtesania.js(51,28): error TS1127: Invalid character.
+src/visual/mundo3d/artesania/materialesArtesania.js(52,51): error TS1127: Invalid character.
+src/visual/mundo3d/artesania/tramaAndina.js(161,12): error TS2322: Type 'number[][]' is not assignable to type '[number, number][]'.
+  Type 'number[]' is not assignable to type '[number, number]'.
+    Target requires 2 element(s) but source may have fewer.
+src/visual/mundo3d/atmosfera/clima/LluviaValle.jsx(360,3): error TS2322: Type 'number[]' is not assignable to type '[number, number, number]'.
+  Target requires 3 element(s) but source may have fewer.
+src/visual/mundo3d/atmosfera/clima/LluviaValle.jsx(364,3): error TS2322: Type 'number[][]' is not assignable to type '[number, number][]'.
+  Type 'number[]' is not assignable to type '[number, number]'.
+    Target requires 2 element(s) but source may have fewer.
+src/visual/mundo3d/atmosfera/clima/NieblaLadera.jsx(219,3): error TS2322: Type '{ x: number[]; z: number[]; }' is not assignable to type '{ x: [number, number]; z: [number, number]; }'.
+  Types of property 'x' are incompatible.
+    Type 'number[]' is not assignable to type '[number, number]'.
+      Target requires 2 element(s) but source may have fewer.
+src/visual/mundo3d/atmosfera/clima/NieblaLadera.jsx(220,3): error TS2322: Type 'number[][]' is not assignable to type '[number, number][]'.
+  Type 'number[]' is not assignable to type '[number, number]'.
+    Target requires 2 element(s) but source may have fewer.
+src/visual/mundo3d/beneficos/EscenaBeneficos.jsx(100,29): error TS2345: Argument of type '{ x: number; y: number; z: number; }' is not assignable to parameter of type 'Vector3'.
+  Type '{ x: number; y: number; z: number; }' is missing the following properties from type 'Vector3': isVector3, set, setScalar, setX, and 71 more.
+src/visual/mundo3d/beneficos/EscenaBeneficos.jsx(438,13): error TS2322: Type 'number[]' is not assignable to type 'number | Vector3 | [x: number, y: number, z?: number] | readonly [x: number, y: number, z?: number] | Readonly<Vector3>'.
+  Type 'number[]' is not assignable to type 'Vector3 | [x: number, y: number, z?: number] | readonly [x: number, y: number, z?: number] | Readonly<Vector3>'.
+    Type 'number[]' is not assignable to type '[x: number, y: number, z?: number]'.
+      Target requires 2 element(s) but source may have fewer.
+src/visual/mundo3d/beneficos/EscenaBeneficos.jsx(449,8): error TS2741: Property 't' is missing in type '{ geo: any; mat: any; sitios: any[]; cuantos: number; anim: (s: any, i: any, t: any) => { dx: number; dy: number; dz: number; giro: number; esc: number; }; reducedMotion: any; }' but required in type '{ geo: any; mat: any; sitios: any; cuantos: any; anim: any; reducedMotion: any; t: any; }'.
+src/visual/mundo3d/beneficos/EscenaBeneficos.jsx(460,10): error TS2741: Property 't' is missing in type '{ key: string; geo: any; mat: any; sitios: any; cuantos: number; anim: (s: any, i: any, t: any) => { dx: number; dy: number; dz: number; giro: number; esc: number; }; reducedMotion: any; }' but required in type '{ geo: any; mat: any; sitios: any; cuantos: any; anim: any; reducedMotion: any; t: any; }'.
+src/visual/mundo3d/bosque/BosqueTresEstratos.jsx(211,3): error TS2339: Property 'extension' does not exist on type '{ tier: "bajo" | "alto" | "medio"; perfil: { materialRico?: boolean; flatShading?: boolean; sombras?: boolean; }; reducedMotion?: boolean; destacado?: string; entProtagonista?: string; entVecino?: string; }'.
+src/visual/mundo3d/bosque/BosqueTresEstratos.jsx(212,3): error TS2339: Property 'seed' does not exist on type '{ tier: "bajo" | "alto" | "medio"; perfil: { materialRico?: boolean; flatShading?: boolean; sombras?: boolean; }; reducedMotion?: boolean; destacado?: string; entProtagonista?: string; entVecino?: string; }'.
+src/visual/mundo3d/bosque/BosqueTresEstratos.jsx(242,7): error TS2339: Property 'color' does not exist on type 'Material<MaterialEventMap>'.
+src/visual/mundo3d/bosque/BosqueTresEstratos.jsx(279,25): error TS2322: Type 'string' is not assignable to type '"ceiba" | "aliso" | "roble" | "quenua"'.
+src/visual/mundo3d/bosque/BosqueTresEstratos.jsx(292,25): error TS2322: Type 'string' is not assignable to type '"ceiba" | "aliso" | "roble" | "quenua"'.
+src/visual/mundo3d/bosque/EntGradiente.jsx(438,18): error TS2339: Property 'color' does not exist on type 'Material<MaterialEventMap>'.
+src/visual/mundo3d/bosque/EntGradiente.jsx(443,18): error TS2339: Property 'color' does not exist on type 'Material<MaterialEventMap>'.
+src/visual/mundo3d/bosque/EntGradiente.jsx(448,18): error TS2339: Property 'color' does not exist on type 'Material<MaterialEventMap>'.
+src/visual/mundo3d/bosque/EscenaEntMaestro.jsx(515,62): error TS2322: Type '{ tier: any; reducedMotion: any; excluir: (pos: number[]) => boolean; }' is not assignable to type 'IntrinsicAttributes & { tier?: "bajo" | "alto" | "medio"; reducedMotion?: boolean; alturaDe?: (x: number, z: number) => number; bioma?: "bosque" | "paramo"; }'.
+  Property 'excluir' does not exist on type 'IntrinsicAttributes & { tier?: "bajo" | "alto" | "medio"; reducedMotion?: boolean; alturaDe?: (x: number, z: number) => number; bioma?: "bosque" | "paramo"; }'.
+src/visual/mundo3d/bosque/EscenaTresEnts.jsx(548,3): error TS2339: Property 'pisosVisibles' does not exist on type '{ tier: "bajo" | "alto" | "medio"; perfil: { materialRico?: boolean; flatShading?: boolean; sombras?: boolean; }; reducedMotion?: boolean; foco?: string; }'.
+src/visual/mundo3d/bosque/EscenaTresEnts.jsx(755,7): error TS2339: Property 'color' does not exist on type 'Material<MaterialEventMap>'.
+src/visual/mundo3d/bosque/__tests__/pisosBosqueGradiente.test.js(49,31): error TS2345: Argument of type 'number' is not assignable to parameter of type 'string'.
+src/visual/mundo3d/bosque/bosqueTakeA.geom.js(300,7): error TS2322: Type 'number[]' is not assignable to type '[number, number, number]'.
+  Target requires 3 element(s) but source may have fewer.
+src/visual/mundo3d/bosque/entsGradiente.geom.js(753,7): error TS2322: Type 'any[]' is not assignable to type '[number, number, number]'.
+  Target requires 3 element(s) but source may have fewer.
+src/visual/mundo3d/bosque/entsGradiente.geom.js(1100,19): error TS2345: Argument of type 'BufferGeometry<NormalBufferAttributes, BufferGeometryEventMap>' is not assignable to parameter of type 'TubeGeometry'.
+  Type 'BufferGeometry<NormalBufferAttributes, BufferGeometryEventMap>' is missing the following properties from type 'TubeGeometry': parameters, tangents, normals, binormals
+src/visual/mundo3d/bosque/estratosAltoandinos.geom.js(606,28): error TS2345: Argument of type '{ centro: number[]; radio: number; yMin: number; yMax: number; ao: number; manchas: number; }' is not assignable to parameter of type '{ centro: any; radio: any; yMin: any; yMax: any; ao?: number; manchas?: number; tinte: any; }'.
+  Property 'tinte' is missing in type '{ centro: number[]; radio: number; yMin: number; yMax: number; ao: number; manchas: number; }' but required in type '{ centro: any; radio: any; yMin: any; yMax: any; ao?: number; manchas?: number; tinte: any; }'.
+src/visual/mundo3d/bosque/estratosAltoandinos.geom.js(696,28): error TS2345: Argument of type '{ centro: number[]; radio: number; yMin: number; yMax: number; ao: number; manchas: number; }' is not assignable to parameter of type '{ centro: any; radio: any; yMin: any; yMax: any; ao?: number; manchas?: number; tinte: any; }'.
+  Property 'tinte' is missing in type '{ centro: number[]; radio: number; yMin: number; yMax: number; ao: number; manchas: number; }' but required in type '{ centro: any; radio: any; yMin: any; yMax: any; ao?: number; manchas?: number; tinte: any; }'.
+src/visual/mundo3d/bosque/estratosAltoandinos.geom.js(790,28): error TS2345: Argument of type '{ centro: number[]; radio: number; yMin: number; yMax: number; ao: number; manchas: number; }' is not assignable to parameter of type '{ centro: any; radio: any; yMin: any; yMax: any; ao?: number; manchas?: number; tinte: any; }'.
+  Property 'tinte' is missing in type '{ centro: number[]; radio: number; yMin: number; yMax: number; ao: number; manchas: number; }' but required in type '{ centro: any; radio: any; yMin: any; yMax: any; ao?: number; manchas?: number; tinte: any; }'.
+src/visual/mundo3d/bosque/estratosAltoandinos.geom.js(937,35): error TS2345: Argument of type '{ centro: number[]; radio: number; yMin: number; yMax: number; ao: number; manchas: number; }' is not assignable to parameter of type '{ centro: any; radio: any; yMin: any; yMax: any; ao?: number; manchas?: number; tinte: any; }'.
+  Property 'tinte' is missing in type '{ centro: number[]; radio: number; yMin: number; yMax: number; ao: number; manchas: number; }' but required in type '{ centro: any; radio: any; yMin: any; yMax: any; ao?: number; manchas?: number; tinte: any; }'.
+src/visual/mundo3d/bosque/estratosAltoandinos.geom.js(1072,33): error TS2345: Argument of type '{ centro: number[]; radio: number; yMin: number; yMax: number; ao: number; manchas: number; }' is not assignable to parameter of type '{ centro: any; radio: any; yMin: any; yMax: any; ao?: number; manchas?: number; tinte: any; }'.
+  Property 'tinte' is missing in type '{ centro: number[]; radio: number; yMin: number; yMax: number; ao: number; manchas: number; }' but required in type '{ centro: any; radio: any; yMin: any; yMax: any; ao?: number; manchas?: number; tinte: any; }'.
+src/visual/mundo3d/bosque/estratosAltoandinos.geom.js(1157,33): error TS2345: Argument of type '{ centro: number[]; radio: number; yMin: number; yMax: number; ao: number; manchas: number; }' is not assignable to parameter of type '{ centro: any; radio: any; yMin: any; yMax: any; ao?: number; manchas?: number; tinte: any; }'.
+  Property 'tinte' is missing in type '{ centro: number[]; radio: number; yMin: number; yMax: number; ao: number; manchas: number; }' but required in type '{ centro: any; radio: any; yMin: any; yMax: any; ao?: number; manchas?: number; tinte: any; }'.
+src/visual/mundo3d/bosque/estratosAltoandinos.geom.js(1215,30): error TS2345: Argument of type '{ centro: number[]; radio: number; yMin: number; yMax: number; ao: number; manchas: number; }' is not assignable to parameter of type '{ centro: any; radio: any; yMin: any; yMax: any; ao?: number; manchas?: number; tinte: any; }'.
+  Property 'tinte' is missing in type '{ centro: number[]; radio: number; yMin: number; yMax: number; ao: number; manchas: number; }' but required in type '{ centro: any; radio: any; yMin: any; yMax: any; ao?: number; manchas?: number; tinte: any; }'.
+src/visual/mundo3d/bosque/estratosAltoandinos.geom.js(1251,28): error TS2345: Argument of type '{ centro: number[]; radio: number; yMin: number; yMax: number; ao: number; manchas: number; }' is not assignable to parameter of type '{ centro: any; radio: any; yMin: any; yMax: any; ao?: number; manchas?: number; tinte: any; }'.
+  Property 'tinte' is missing in type '{ centro: number[]; radio: number; yMin: number; yMax: number; ao: number; manchas: number; }' but required in type '{ centro: any; radio: any; yMin: any; yMax: any; ao?: number; manchas?: number; tinte: any; }'.
+src/visual/mundo3d/bosque/floraParamo.geom.js(627,12): error TS2345: Argument of type '{ c: number[]; radio: number; }[]' is not assignable to parameter of type '{ c: [number, number, number]; radio: number; }[]'.
+  Type '{ c: number[]; radio: number; }' is not assignable to type '{ c: [number, number, number]; radio: number; }'.
+    Types of property 'c' are incompatible.
+      Type 'number[]' is not assignable to type '[number, number, number]'.
+        Target requires 3 element(s) but source may have fewer.
+src/visual/mundo3d/bosque/floraParamo.geom.js(702,12): error TS2345: Argument of type '{ c: number[]; radio: number; }[]' is not assignable to parameter of type '{ c: [number, number, number]; radio: number; }[]'.
+  Type '{ c: number[]; radio: number; }' is not assignable to type '{ c: [number, number, number]; radio: number; }'.
+    Types of property 'c' are incompatible.
+      Type 'number[]' is not assignable to type '[number, number, number]'.
+        Target requires 3 element(s) but source may have fewer.
+src/visual/mundo3d/bosque/floraParamo.geom.js(764,12): error TS2345: Argument of type '{ c: number[]; radio: number; }[]' is not assignable to parameter of type '{ c: [number, number, number]; radio: number; }[]'.
+  Type '{ c: number[]; radio: number; }' is not assignable to type '{ c: [number, number, number]; radio: number; }'.
+    Types of property 'c' are incompatible.
+      Type 'number[]' is not assignable to type '[number, number, number]'.
+        Target requires 3 element(s) but source may have fewer.
+src/visual/mundo3d/bosque/floraParamo.geom.js(804,12): error TS2345: Argument of type '{ c: number[]; radio: number; }[]' is not assignable to parameter of type '{ c: [number, number, number]; radio: number; }[]'.
+  Type '{ c: number[]; radio: number; }' is not assignable to type '{ c: [number, number, number]; radio: number; }'.
+    Types of property 'c' are incompatible.
+      Type 'number[]' is not assignable to type '[number, number, number]'.
+        Target requires 3 element(s) but source may have fewer.
+src/visual/mundo3d/bosque/floraParamo.geom.js(837,12): error TS2345: Argument of type '{ c: number[]; radio: number; }[]' is not assignable to parameter of type '{ c: [number, number, number]; radio: number; }[]'.
+  Type '{ c: number[]; radio: number; }' is not assignable to type '{ c: [number, number, number]; radio: number; }'.
+    Types of property 'c' are incompatible.
+      Type 'number[]' is not assignable to type '[number, number, number]'.
+        Target requires 3 element(s) but source may have fewer.
+src/visual/mundo3d/bosque/gradienteAndino.geom.js(355,14): error TS2345: Argument of type 'string' is not assignable to parameter of type 'number'.
+src/visual/mundo3d/bosque/gradienteAndino.geom.js(459,19): error TS2367: This comparison appears to be unintentional because the types 'number' and 'string' have no overlap.
+src/visual/mundo3d/casa/EscenaCasaAdentro.jsx(135,10): error TS2339: Property 'haz' does not exist on type '{ x: number; z: number; largo: number; ancho: number; op: number; }'.
+src/visual/mundo3d/casa/EscenaCasaAdentro.jsx(247,13): error TS2322: Type 'number[]' is not assignable to type 'number | Vector3 | [x: number, y: number, z?: number] | readonly [x: number, y: number, z?: number] | Readonly<Vector3>'.
+  Type 'number[]' is not assignable to type 'Vector3 | [x: number, y: number, z?: number] | readonly [x: number, y: number, z?: number] | Readonly<Vector3>'.
+    Type 'number[]' is not assignable to type '[x: number, y: number, z?: number]'.
+      Target requires 2 element(s) but source may have fewer.
+src/visual/mundo3d/casa/EscenaCasaAdentro.jsx(500,24): error TS2322: Type 'number[]' is not assignable to type 'number | Vector3 | [x: number, y: number, z?: number] | readonly [x: number, y: number, z?: number] | Readonly<Vector3>'.
+  Type 'number[]' is not assignable to type 'Vector3 | [x: number, y: number, z?: number] | readonly [x: number, y: number, z?: number] | Readonly<Vector3>'.
+    Type 'number[]' is not assignable to type '[x: number, y: number, z?: number]'.
+      Target requires 2 element(s) but source may have fewer.
+src/visual/mundo3d/casa/EscenaCasaAdentro.jsx(616,9): error TS2322: Type '{ skyColor: string; groundColor: string; intensity: number; }' is not assignable to type 'Mutable<Overwrite<Partial<Overwrite<HemisphereLight, MathProps<HemisphereLight> & ReactProps<HemisphereLight> & Partial<EventHandlers>>>, Omit<...>>>'.
+  Property 'skyColor' does not exist on type 'Mutable<Overwrite<Partial<Overwrite<HemisphereLight, MathProps<HemisphereLight> & ReactProps<HemisphereLight> & Partial<EventHandlers>>>, Omit<...>>>'.
+src/visual/mundo3d/casa/EscenaCasaAdentro.jsx(627,9): error TS2322: Type 'number[]' is not assignable to type 'number | Vector3 | [x: number, y: number, z?: number] | readonly [x: number, y: number, z?: number] | Readonly<Vector3>'.
+  Type 'number[]' is not assignable to type 'Vector3 | [x: number, y: number, z?: number] | readonly [x: number, y: number, z?: number] | Readonly<Vector3>'.
+    Type 'number[]' is not assignable to type '[x: number, y: number, z?: number]'.
+      Target requires 2 element(s) but source may have fewer.
+src/visual/mundo3d/casa/EscenaCasaAdentro.jsx(644,13): error TS2322: Type 'number[]' is not assignable to type 'number | Vector3 | [x: number, y: number, z?: number] | readonly [x: number, y: number, z?: number] | Readonly<Vector3>'.
+  Type 'number[]' is not assignable to type 'Vector3 | [x: number, y: number, z?: number] | readonly [x: number, y: number, z?: number] | Readonly<Vector3>'.
+    Type 'number[]' is not assignable to type '[x: number, y: number, z?: number]'.
+      Target requires 2 element(s) but source may have fewer.
+src/visual/mundo3d/casa/EscenaCasaAdentro.jsx(774,16): error TS2322: Type 'number[]' is not assignable to type 'number | Vector3 | [x: number, y: number, z?: number] | readonly [x: number, y: number, z?: number] | Readonly<Vector3>'.
+  Type 'number[]' is not assignable to type 'Vector3 | [x: number, y: number, z?: number] | readonly [x: number, y: number, z?: number] | Readonly<Vector3>'.
+    Type 'number[]' is not assignable to type '[x: number, y: number, z?: number]'.
+      Target requires 2 element(s) but source may have fewer.
+src/visual/mundo3d/casa/casaAdentro.geom.js(328,70): error TS2345: Argument of type 'string | number' is not assignable to parameter of type 'number'.
+  Type 'string' is not assignable to type 'number'.
+src/visual/mundo3d/casa/casaAdentro.geom.js(329,64): error TS2345: Argument of type 'string | number' is not assignable to parameter of type 'number'.
+  Type 'string' is not assignable to type 'number'.
+src/visual/mundo3d/casa/casaAdentro.geom.js(330,94): error TS2345: Argument of type 'string | number' is not assignable to parameter of type 'number'.
+  Type 'string' is not assignable to type 'number'.
+src/visual/mundo3d/escenas/EscenaBase3D.jsx(206,64): error TS2322: Type 'string' is not assignable to type '"bajo" | "alto" | "medio"'.
+src/visual/mundo3d/escenas/EscenaBase3D.jsx(391,59): error TS2322: Type 'string' is not assignable to type '"bajo" | "alto" | "medio"'.
+src/visual/mundo3d/escenas/EscenaCafe.jsx(130,23): error TS2322: Type 'number[]' is not assignable to type 'number | Vector3 | [x: number, y: number, z?: number] | readonly [x: number, y: number, z?: number] | Readonly<Vector3>'.
+  Type 'number[]' is not assignable to type 'Vector3 | [x: number, y: number, z?: number] | readonly [x: number, y: number, z?: number] | Readonly<Vector3>'.
+    Type 'number[]' is not assignable to type '[x: number, y: number, z?: number]'.
+      Target requires 2 element(s) but source may have fewer.
+src/visual/mundo3d/escenas/EscenaCafe.jsx(253,25): error TS2322: Type 'number[]' is not assignable to type 'number | Vector3 | [x: number, y: number, z?: number] | readonly [x: number, y: number, z?: number] | Readonly<Vector3>'.
+  Type 'number[]' is not assignable to type 'Vector3 | [x: number, y: number, z?: number] | readonly [x: number, y: number, z?: number] | Readonly<Vector3>'.
+    Type 'number[]' is not assignable to type '[x: number, y: number, z?: number]'.
+      Target requires 2 element(s) but source may have fewer.
+src/visual/mundo3d/escenas/EscenaCafe.jsx(254,28): error TS2322: Type 'number[]' is not assignable to type '[width?: number, height?: number, widthSegments?: number, heightSegments?: number] | readonly [width?: number, height?: number, widthSegments?: number, heightSegments?: number]'.
+  Type 'number[]' is not assignable to type '[width?: number, height?: number, widthSegments?: number, heightSegments?: number]'.
+    Target allows only 4 element(s) but source may have more.
+src/visual/mundo3d/escenas/EscenaMercado.jsx(338,29): error TS2322: Type 'any[]' is not assignable to type 'number | Vector3 | [x: number, y: number, z?: number] | readonly [x: number, y: number, z?: number] | Readonly<Vector3>'.
+  Type 'any[]' is not assignable to type 'Vector3 | [x: number, y: number, z?: number] | readonly [x: number, y: number, z?: number] | Readonly<Vector3>'.
+    Type 'any[]' is not assignable to type '[x: number, y: number, z?: number]'.
+      Target requires 2 element(s) but source may have fewer.
+src/visual/mundo3d/escenas/EscenaMercado.jsx(510,37): error TS2554: Expected 0 arguments, but got 1.
+src/visual/mundo3d/escenas/FaunaCalido.jsx(128,12): error TS2741: Property 'tier' is missing in type '{ size: number; animated: boolean; title: string; }' but required in type '{ [x: string]: any; size?: number; className?: string; inline?: boolean; animated?: boolean; title?: string; pose?: string; animo?: string; energia?: number; clima?: any; enso?: string; visema?: any; vestuario?: boolean; ... 7 more ...; mundoId?: any; }'.
+src/visual/mundo3d/estiercol/Biocompostera.jsx(239,52): error TS2322: Type 'number[]' is not assignable to type 'number | Vector3 | [x: number, y: number, z?: number] | readonly [x: number, y: number, z?: number] | Readonly<Vector3>'.
+  Type 'number[]' is not assignable to type 'Vector3 | [x: number, y: number, z?: number] | readonly [x: number, y: number, z?: number] | Readonly<Vector3>'.
+    Type 'number[]' is not assignable to type '[x: number, y: number, z?: number]'.
+      Target requires 2 element(s) but source may have fewer.
+src/visual/mundo3d/estiercol/Biocompostera.jsx(240,24): error TS2322: Type 'number[]' is not assignable to type '[width?: number, height?: number, depth?: number, widthSegments?: number, heightSegments?: number, depthSegments?: number] | readonly [width?: number, height?: number, depth?: number, widthSegments?: number, heightSegments?: number, depthSegments?: number]'.
+  Type 'number[]' is not assignable to type '[width?: number, height?: number, depth?: number, widthSegments?: number, heightSegments?: number, depthSegments?: number]'.
+    Target allows only 6 element(s) but source may have more.
+src/visual/mundo3d/estiercol/Biocompostera.jsx(389,29): error TS2322: Type 'number[]' is not assignable to type '[radiusTop?: number, radiusBottom?: number, height?: number, radialSegments?: number, heightSegments?: number, openEnded?: boolean, thetaStart?: number, thetaLength?: number] | readonly [radiusTop?: number, radiusBottom?: number, height?: number, radialSegments?: number, heightSegments?: number, openEnded?: boolean,...'.
+  Type 'number[]' is not assignable to type '[radiusTop?: number, radiusBottom?: number, height?: number, radialSegments?: number, heightSegments?: number, openEnded?: boolean, thetaStart?: number, thetaLength?: number]'.
+    Target allows only 8 element(s) but source may have more.
+src/visual/mundo3d/estiercol/Biodigestor.jsx(158,24): error TS2322: Type 'number[]' is not assignable to type 'number | Vector3 | [x: number, y: number, z?: number] | readonly [x: number, y: number, z?: number] | Readonly<Vector3>'.
+  Type 'number[]' is not assignable to type 'Vector3 | [x: number, y: number, z?: number] | readonly [x: number, y: number, z?: number] | Readonly<Vector3>'.
+    Type 'number[]' is not assignable to type '[x: number, y: number, z?: number]'.
+      Target requires 2 element(s) but source may have fewer.
+src/visual/mundo3d/estiercol/Biodigestor.jsx(191,12): error TS2322: Type 'number[]' is not assignable to type 'number | Vector3 | [x: number, y: number, z?: number] | readonly [x: number, y: number, z?: number] | Readonly<Vector3>'.
+  Type 'number[]' is not assignable to type 'Vector3 | [x: number, y: number, z?: number] | readonly [x: number, y: number, z?: number] | Readonly<Vector3>'.
+    Type 'number[]' is not assignable to type '[x: number, y: number, z?: number]'.
+      Target requires 2 element(s) but source may have fewer.
+src/visual/mundo3d/estiercol/Biodigestor.jsx(308,31): error TS2339: Property 'key' does not exist on type '{ geo: BufferGeometry<NormalBufferAttributes, BufferGeometryEventMap>; y: number; }'.
+src/visual/mundo3d/estiercol/Biodigestor.jsx(314,61): error TS2322: Type 'number[]' is not assignable to type 'number | Vector3 | [x: number, y: number, z?: number] | readonly [x: number, y: number, z?: number] | Readonly<Vector3>'.
+  Type 'number[]' is not assignable to type 'Vector3 | [x: number, y: number, z?: number] | readonly [x: number, y: number, z?: number] | Readonly<Vector3>'.
+    Type 'number[]' is not assignable to type '[x: number, y: number, z?: number]'.
+      Target requires 2 element(s) but source may have fewer.
+src/visual/mundo3d/estiercol/Biodigestor.jsx(314,78): error TS2322: Type 'number[]' is not assignable to type 'number | Euler | [x: number, y: number, z: number, order?: EulerOrder] | readonly [x: number, y: number, z: number, order?: EulerOrder] | Readonly<Euler>'.
+  Type 'number[]' is not assignable to type '[x: number, y: number, z: number, order?: EulerOrder]'.
+    Target requires 3 element(s) but source may have fewer.
+src/visual/mundo3d/estiercol/Biodigestor.jsx(359,14): error TS2322: Type 'number[]' is not assignable to type 'number | Vector3 | [x: number, y: number, z?: number] | readonly [x: number, y: number, z?: number] | Readonly<Vector3>'.
+  Type 'number[]' is not assignable to type 'Vector3 | [x: number, y: number, z?: number] | readonly [x: number, y: number, z?: number] | Readonly<Vector3>'.
+    Type 'number[]' is not assignable to type '[x: number, y: number, z?: number]'.
+      Target requires 2 element(s) but source may have fewer.
+src/visual/mundo3d/estiercol/EscenaEstiercol.jsx(65,13): error TS2322: Type 'any[]' is not assignable to type 'number | Vector3 | [x: number, y: number, z?: number] | readonly [x: number, y: number, z?: number] | Readonly<Vector3>'.
+  Type 'any[]' is not assignable to type 'Vector3 | [x: number, y: number, z?: number] | readonly [x: number, y: number, z?: number] | Readonly<Vector3>'.
+    Type 'any[]' is not assignable to type '[x: number, y: number, z?: number]'.
+      Target requires 2 element(s) but source may have fewer.
+src/visual/mundo3d/estiercol/EscenaEstiercol.jsx(77,11): error TS2322: Type 'any[]' is not assignable to type 'number | Vector3 | [x: number, y: number, z?: number] | readonly [x: number, y: number, z?: number] | Readonly<Vector3>'.
+  Type 'any[]' is not assignable to type 'Vector3 | [x: number, y: number, z?: number] | readonly [x: number, y: number, z?: number] | Readonly<Vector3>'.
+    Type 'any[]' is not assignable to type '[x: number, y: number, z?: number]'.
+      Target requires 2 element(s) but source may have fewer.
+src/visual/mundo3d/estiercol/EscenaEstiercol.jsx(192,37): error TS2345: Argument of type 'string' is not assignable to parameter of type 'SetStateAction<"frio" | "calido">'.
+src/visual/mundo3d/fauna/ColibriGuardian.jsx(277,16): error TS2339: Property 'color' does not exist on type 'Material<MaterialEventMap>'.
+src/visual/mundo3d/fauna/ColibriGuardian.jsx(280,20): error TS2339: Property 'emissive' does not exist on type 'Material<MaterialEventMap>'.
+src/visual/mundo3d/fauna/ColibriGuardian.jsx(281,18): error TS2339: Property 'emissive' does not exist on type 'Material<MaterialEventMap>'.
+src/visual/mundo3d/fauna/EscenaFaunaEmblematica.jsx(276,17): error TS2322: Type 'number[]' is not assignable to type 'number | Vector3 | [x: number, y: number, z?: number] | readonly [x: number, y: number, z?: number] | Readonly<Vector3>'.
+  Type 'number[]' is not assignable to type 'Vector3 | [x: number, y: number, z?: number] | readonly [x: number, y: number, z?: number] | Readonly<Vector3>'.
+    Type 'number[]' is not assignable to type '[x: number, y: number, z?: number]'.
+      Target requires 2 element(s) but source may have fewer.
+src/visual/mundo3d/fauna/EscenaFaunaEmblematica.jsx(313,13): error TS2322: Type 'number[]' is not assignable to type '[number, number, number]'.
+  Target requires 3 element(s) but source may have fewer.
+src/visual/mundo3d/fauna/EscenaFaunaEmblematica.jsx(325,11): error TS2322: Type 'number[]' is not assignable to type 'number | Vector3 | MutableOrReadonlyParameters<(x: number, y: number, z?: number) => Vector3>'.
+  Type 'number[]' is not assignable to type 'Vector3 | [x: number, y: number, z?: number] | readonly [x: number, y: number, z?: number]'.
+    Type 'number[]' is not assignable to type '[x: number, y: number, z?: number]'.
+      Target requires 2 element(s) but source may have fewer.
+src/visual/mundo3d/fauna/RanaArlequin.jsx(143,86): error TS2339: Property 'arranque' does not exist on type '{ ficha: any; perfil: any; camino?: Vector3[]; quieto?: boolean; }'.
+src/visual/mundo3d/fauna/marcha.js(449,15): error TS2339: Property '_largos' does not exist on type 'Vector3[]'.
+src/visual/mundo3d/fauna/marcha.js(460,30): error TS2339: Property '_total' does not exist on type 'Vector3[]'.
+src/visual/mundo3d/fauna/marcha.js(461,26): error TS2339: Property '_total' does not exist on type 'Vector3[]'.
+src/visual/mundo3d/fauna/marcha.js(463,21): error TS2339: Property '_largos' does not exist on type 'Vector3[]'.
+src/visual/mundo3d/fauna/marcha.js(464,17): error TS2339: Property '_largos' does not exist on type 'Vector3[]'.
+src/visual/mundo3d/fauna/marcha.js(469,20): error TS2339: Property '_largos' does not exist on type 'Vector3[]'.
+src/visual/mundo3d/frutales/EscenaFrutalesVivo.jsx(321,32): error TS2322: Type 'number[]' is not assignable to type 'number | Vector3 | [x: number, y: number, z?: number] | readonly [x: number, y: number, z?: number] | Readonly<Vector3>'.
+  Type 'number[]' is not assignable to type 'Vector3 | [x: number, y: number, z?: number] | readonly [x: number, y: number, z?: number] | Readonly<Vector3>'.
+    Type 'number[]' is not assignable to type '[x: number, y: number, z?: number]'.
+      Target requires 2 element(s) but source may have fewer.
+src/visual/mundo3d/frutales/EscenaFrutalesVivo.jsx(321,49): error TS2322: Type 'number[]' is not assignable to type 'number | Vector3 | [x: number, y: number, z?: number] | readonly [x: number, y: number, z?: number] | Readonly<Vector3>'.
+  Type 'number[]' is not assignable to type 'Vector3 | [x: number, y: number, z?: number] | readonly [x: number, y: number, z?: number] | Readonly<Vector3>'.
+    Type 'number[]' is not assignable to type '[x: number, y: number, z?: number]'.
+      Target requires 2 element(s) but source may have fewer.
+src/visual/mundo3d/grafo/AristasGrafo.jsx(257,35): error TS2339: Property 'resolution' does not exist on type 'LineBasicMaterial | LineMaterial'.
+  Property 'resolution' does not exist on type 'LineBasicMaterial'.
+src/visual/mundo3d/grafo/NavegadorGrafo.jsx(95,15): error TS2339: Property 'target' does not exist on type 'EventDispatcher<{}>'.
+src/visual/mundo3d/grafo/NavegadorGrafo.jsx(99,57): error TS2339: Property 'target' does not exist on type 'EventDispatcher<{}>'.
+src/visual/mundo3d/grafo/NavegadorGrafo.jsx(102,33): error TS2339: Property 'target' does not exist on type 'EventDispatcher<{}>'.
+src/visual/mundo3d/grafo/NavegadorGrafo.jsx(103,15): error TS2339: Property 'update' does not exist on type 'EventDispatcher<{}>'.
+src/visual/mundo3d/grafo/grafoLayout.js(198,61): error TS2353: Object literal may only specify known properties, and 'yMin' does not exist in type '{ posiciones: Map<string, [number, number, number]>; bandas: any[]; alto: number; radioMax: number; }'.
+src/visual/mundo3d/invernadero/invernadero.geom.js(528,15): error TS2322: Type 'string | number' is not assignable to type 'number'.
+  Type 'string' is not assignable to type 'number'.
+src/visual/mundo3d/invernadero/invernadero.geom.js(528,25): error TS2322: Type 'string | number' is not assignable to type 'number'.
+  Type 'string' is not assignable to type 'number'.
+src/visual/mundo3d/lecheria/GanadoLechero.jsx(144,25): error TS2322: Type 'number[]' is not assignable to type 'number | Vector3 | [x: number, y: number, z?: number] | readonly [x: number, y: number, z?: number] | Readonly<Vector3>'.
+  Type 'number[]' is not assignable to type 'Vector3 | [x: number, y: number, z?: number] | readonly [x: number, y: number, z?: number] | Readonly<Vector3>'.
+    Type 'number[]' is not assignable to type '[x: number, y: number, z?: number]'.
+      Target requires 2 element(s) but source may have fewer.
+src/visual/mundo3d/paleta/LuzMadre.jsx(102,9): error TS2322: Type 'number[]' is not assignable to type 'number | Vector3 | [x: number, y: number, z?: number] | readonly [x: number, y: number, z?: number] | Readonly<Vector3>'.
+  Type 'number[]' is not assignable to type 'Vector3 | [x: number, y: number, z?: number] | readonly [x: number, y: number, z?: number] | Readonly<Vector3>'.
+    Type 'number[]' is not assignable to type '[x: number, y: number, z?: number]'.
+      Target requires 2 element(s) but source may have fewer.
+src/visual/mundo3d/paramo/EscenaNacederoParamo.jsx(144,57): error TS2322: Type 'number[]' is not assignable to type 'number | Vector3 | [x: number, y: number, z?: number] | readonly [x: number, y: number, z?: number] | Readonly<Vector3>'.
+  Type 'number[]' is not assignable to type 'Vector3 | [x: number, y: number, z?: number] | readonly [x: number, y: number, z?: number] | Readonly<Vector3>'.
+    Type 'number[]' is not assignable to type '[x: number, y: number, z?: number]'.
+      Target requires 2 element(s) but source may have fewer.
+src/visual/mundo3d/paramo/EscenaNacederoParamo.jsx(280,9): error TS2322: Type '{ suelo: { alturaDe: (x: any, z: any) => number; pendienteDe: (x: any, z: any, e?: number) => number; senderoCerca: () => { d: number; y: number; }; mesetaDe: (x: any, z: any) => number; distHueco: (x: any, z: any) => number; ... 7 more ...; opts: { ...; }; }; ... 4 more ...; detalle: { ...; }; }' is not assignable to type 'IntrinsicAttributes & { suelo: SueloRico; tier?: "bajo" | "alto" | "medio"; anclas?: { x: number; z: number; radio: number; }[]; }'.
+  Property 'segmentos' does not exist on type 'IntrinsicAttributes & { suelo: SueloRico; tier?: "bajo" | "alto" | "medio"; anclas?: { x: number; z: number; radio: number; }[]; }'.
+src/visual/mundo3d/piscicultura/__tests__/pecesPiscicultura.geom.test.js(29,33): error TS2345: Argument of type 'string' is not assignable to parameter of type '"trucha" | "mojarra" | "cachama" | "bocachico"'.
+src/visual/mundo3d/piscicultura/pecesPiscicultura.geom.js(275,3): error TS2322: Type '{ centro: number[]; radio: number[]; y: number; fase: number; vel: number; escala: number; }[]' is not assignable to type '{ orbita: number; radio: [number, number]; centro: [number, number]; y: number; fase: number; vel: number; escala: number; }[]'.
+  Property 'orbita' is missing in type '{ centro: number[]; radio: number[]; y: number; fase: number; vel: number; escala: number; }' but required in type '{ orbita: number; radio: [number, number]; centro: [number, number]; y: number; fase: number; vel: number; escala: number; }'.
+src/visual/mundo3d/polinizadores/EscenaPolinizadores.jsx(123,28): error TS2322: Type 'number[]' is not assignable to type 'number | Vector3 | [x: number, y: number, z?: number] | readonly [x: number, y: number, z?: number] | Readonly<Vector3>'.
+  Type 'number[]' is not assignable to type 'Vector3 | [x: number, y: number, z?: number] | readonly [x: number, y: number, z?: number] | Readonly<Vector3>'.
+    Type 'number[]' is not assignable to type '[x: number, y: number, z?: number]'.
+      Target requires 2 element(s) but source may have fewer.
+src/visual/mundo3d/polinizadores/Meliponario.jsx(183,9): error TS2322: Type 'number[]' is not assignable to type 'number | Vector3 | [x: number, y: number, z?: number] | readonly [x: number, y: number, z?: number] | Readonly<Vector3>'.
+  Type 'number[]' is not assignable to type 'Vector3 | [x: number, y: number, z?: number] | readonly [x: number, y: number, z?: number] | Readonly<Vector3>'.
+    Type 'number[]' is not assignable to type '[x: number, y: number, z?: number]'.
+      Target requires 2 element(s) but source may have fewer.
+src/visual/mundo3d/polinizadores/Meliponario.jsx(214,47): error TS2322: Type 'number[]' is not assignable to type 'number | Vector3 | [x: number, y: number, z?: number] | readonly [x: number, y: number, z?: number] | Readonly<Vector3>'.
+  Type 'number[]' is not assignable to type 'Vector3 | [x: number, y: number, z?: number] | readonly [x: number, y: number, z?: number] | Readonly<Vector3>'.
+    Type 'number[]' is not assignable to type '[x: number, y: number, z?: number]'.
+      Target requires 2 element(s) but source may have fewer.
+src/visual/mundo3d/polinizadores/Meliponario.jsx(226,14): error TS2322: Type 'number[]' is not assignable to type 'number | Vector3 | [x: number, y: number, z?: number] | readonly [x: number, y: number, z?: number] | Readonly<Vector3>'.
+  Type 'number[]' is not assignable to type 'Vector3 | [x: number, y: number, z?: number] | readonly [x: number, y: number, z?: number] | Readonly<Vector3>'.
+    Type 'number[]' is not assignable to type '[x: number, y: number, z?: number]'.
+      Target requires 2 element(s) but source may have fewer.
+src/visual/mundo3d/polinizadores/floresSindrome.geom.js(52,39): error TS1127: Invalid character.
+src/visual/mundo3d/quinua/FloraQuinua.jsx(118,71): error TS2339: Property 'dispose' does not exist on type 'BufferGeometry<NormalBufferAttributes, BufferGeometryEventMap> | BufferGeometry<NormalBufferAttributes, BufferGeometryEventMap>[]'.
+  Property 'dispose' does not exist on type 'BufferGeometry<NormalBufferAttributes, BufferGeometryEventMap>[]'.
+src/visual/mundo3d/semillas/EscenaBancoSemillas.jsx(270,12): error TS2322: Type 'number[]' is not assignable to type 'number | Vector3 | [x: number, y: number, z?: number] | readonly [x: number, y: number, z?: number] | Readonly<Vector3>'.
+  Type 'number[]' is not assignable to type 'Vector3 | [x: number, y: number, z?: number] | readonly [x: number, y: number, z?: number] | Readonly<Vector3>'.
+    Type 'number[]' is not assignable to type '[x: number, y: number, z?: number]'.
+      Target requires 2 element(s) but source may have fewer.
+src/visual/mundo3d/semillas/EscenaBancoSemillas.jsx(307,12): error TS2322: Type 'number[]' is not assignable to type 'number | Vector3 | [x: number, y: number, z?: number] | readonly [x: number, y: number, z?: number] | Readonly<Vector3>'.
+  Type 'number[]' is not assignable to type 'Vector3 | [x: number, y: number, z?: number] | readonly [x: number, y: number, z?: number] | Readonly<Vector3>'.
+    Type 'number[]' is not assignable to type '[x: number, y: number, z?: number]'.
+      Target requires 2 element(s) but source may have fewer.
+src/visual/mundo3d/semillas/EscenaBancoSemillas.jsx(563,14): error TS2322: Type 'number[]' is not assignable to type 'number | Vector3 | [x: number, y: number, z?: number] | readonly [x: number, y: number, z?: number] | Readonly<Vector3>'.
+  Type 'number[]' is not assignable to type 'Vector3 | [x: number, y: number, z?: number] | readonly [x: number, y: number, z?: number] | Readonly<Vector3>'.
+    Type 'number[]' is not assignable to type '[x: number, y: number, z?: number]'.
+      Target requires 2 element(s) but source may have fewer.
+src/visual/mundo3d/semillas/EscenaBancoSemillas.jsx(731,9): error TS2322: Type 'number | number[]' is not assignable to type 'Dpr'.
+  Type 'number[]' is not assignable to type 'Dpr'.
+    Type 'number[]' is not assignable to type '[min: number, max: number]'.
+      Target requires 2 element(s) but source may have fewer.
+src/visual/mundo3d/semillas/bancoSemillas.geom.js(151,37): error TS2304: Cannot find name 'x'.
+src/visual/mundo3d/semillas/bancoSemillas.geom.js(151,39): error TS2304: Cannot find name 'y'.
+src/visual/mundo3d/semillas/bancoSemillas.geom.js(151,41): error TS2304: Cannot find name 'z'.
+src/visual/mundo3d/semillas/bancoSemillas.geom.js(178,3): error TS2322: Type '{ variedad: any; pos: number[]; alto: number; radio: number; rotY: number; }[]' is not assignable to type '{ variedad: any; pos: [x, y, z]; alto: number; radio: number; rotY: number; }[]'.
+  Type '{ variedad: any; pos: number[]; alto: number; radio: number; rotY: number; }' is not assignable to type '{ variedad: any; pos: [x, y, z]; alto: number; radio: number; rotY: number; }'.
+    Types of property 'pos' are incompatible.
+      Type 'number[]' is not assignable to type '[x, y, z]'.
+        Target requires 3 element(s) but source may have fewer.
+src/visual/mundo3d/semillas/bancoSemillas.geom.js(248,20): error TS2345: Argument of type 'number[]' is not assignable to parameter of type '[number, number, number]'.
+  Target requires 3 element(s) but source may have fewer.
+src/visual/mundo3d/semillas/bancoSemillas.geom.js(253,20): error TS2345: Argument of type 'number[]' is not assignable to parameter of type '[number, number, number]'.
+  Target requires 3 element(s) but source may have fewer.
+src/visual/mundo3d/semillas/bancoSemillas.geom.js(254,20): error TS2345: Argument of type 'number[]' is not assignable to parameter of type '[number, number, number]'.
+  Target requires 3 element(s) but source may have fewer.
+src/visual/mundo3d/sierra/GaleriaSierraArboles.jsx(303,48): error TS2322: Type 'number[]' is not assignable to type 'number | Vector3 | [x: number, y: number, z?: number] | readonly [x: number, y: number, z?: number] | Readonly<Vector3>'.
+  Type 'number[]' is not assignable to type 'Vector3 | [x: number, y: number, z?: number] | readonly [x: number, y: number, z?: number] | Readonly<Vector3>'.
+    Type 'number[]' is not assignable to type '[x: number, y: number, z?: number]'.
+      Target requires 2 element(s) but source may have fewer.
+src/visual/mundo3d/sierra/GaleriaSierraArboles.jsx(658,18): error TS2322: Type 'any[]' is not assignable to type 'number | Vector3 | [x: number, y: number, z?: number] | readonly [x: number, y: number, z?: number] | Readonly<Vector3>'.
+  Type 'any[]' is not assignable to type 'Vector3 | [x: number, y: number, z?: number] | readonly [x: number, y: number, z?: number] | Readonly<Vector3>'.
+    Type 'any[]' is not assignable to type '[x: number, y: number, z?: number]'.
+      Target requires 2 element(s) but source may have fewer.
+src/visual/mundo3d/sierra/GaleriaSierraArboles.jsx(661,18): error TS2322: Type 'any[]' is not assignable to type 'number | Vector3 | [x: number, y: number, z?: number] | readonly [x: number, y: number, z?: number] | Readonly<Vector3>'.
+  Type 'any[]' is not assignable to type 'Vector3 | [x: number, y: number, z?: number] | readonly [x: number, y: number, z?: number] | Readonly<Vector3>'.
+    Type 'any[]' is not assignable to type '[x: number, y: number, z?: number]'.
+      Target requires 2 element(s) but source may have fewer.
+src/visual/mundo3d/sierra/GaleriaSierraArboles.jsx(677,26): error TS2322: Type 'any[]' is not assignable to type 'number | Vector3 | [x: number, y: number, z?: number] | readonly [x: number, y: number, z?: number] | Readonly<Vector3>'.
+  Type 'any[]' is not assignable to type 'Vector3 | [x: number, y: number, z?: number] | readonly [x: number, y: number, z?: number] | Readonly<Vector3>'.
+    Type 'any[]' is not assignable to type '[x: number, y: number, z?: number]'.
+      Target requires 2 element(s) but source may have fewer.
+src/visual/mundo3d/sierra/GaleriaSierraArboles.jsx(692,18): error TS2322: Type 'any[]' is not assignable to type 'number | Vector3 | [x: number, y: number, z?: number] | readonly [x: number, y: number, z?: number] | Readonly<Vector3>'.
+  Type 'any[]' is not assignable to type 'Vector3 | [x: number, y: number, z?: number] | readonly [x: number, y: number, z?: number] | Readonly<Vector3>'.
+    Type 'any[]' is not assignable to type '[x: number, y: number, z?: number]'.
+      Target requires 2 element(s) but source may have fewer.
+src/visual/mundo3d/sierra/GaleriaSierraArboles.jsx(695,18): error TS2322: Type 'any[]' is not assignable to type 'number | Vector3 | [x: number, y: number, z?: number] | readonly [x: number, y: number, z?: number] | Readonly<Vector3>'.
+  Type 'any[]' is not assignable to type 'Vector3 | [x: number, y: number, z?: number] | readonly [x: number, y: number, z?: number] | Readonly<Vector3>'.
+    Type 'any[]' is not assignable to type '[x: number, y: number, z?: number]'.
+      Target requires 2 element(s) but source may have fewer.
+src/visual/mundo3d/sierra/GaleriaSierraArboles.jsx(707,16): error TS2322: Type 'any[]' is not assignable to type 'number | Vector3 | [x: number, y: number, z?: number] | readonly [x: number, y: number, z?: number] | Readonly<Vector3>'.
+  Type 'any[]' is not assignable to type 'Vector3 | [x: number, y: number, z?: number] | readonly [x: number, y: number, z?: number] | Readonly<Vector3>'.
+    Type 'any[]' is not assignable to type '[x: number, y: number, z?: number]'.
+      Target requires 2 element(s) but source may have fewer.
+src/visual/mundo3d/sierra/GaleriaSierraArboles.jsx(719,16): error TS2322: Type 'any[]' is not assignable to type 'number | Vector3 | [x: number, y: number, z?: number] | readonly [x: number, y: number, z?: number] | Readonly<Vector3>'.
+  Type 'any[]' is not assignable to type 'Vector3 | [x: number, y: number, z?: number] | readonly [x: number, y: number, z?: number] | Readonly<Vector3>'.
+    Type 'any[]' is not assignable to type '[x: number, y: number, z?: number]'.
+      Target requires 2 element(s) but source may have fewer.
+src/visual/mundo3d/sierra/GaleriaSierraArboles.jsx(781,9): error TS2322: Type 'string' is not assignable to type '"ceiba" | "roble" | "quenua" | "guayacan"'.
+src/visual/mundo3d/sierra/SierraCorteVertical.jsx(451,9): error TS2322: Type '{ tipo: any; escala: number; reducedMotion: any; semilla: any; blobs: number; flat: boolean; }' is not assignable to type 'IntrinsicAttributes & { tipo?: "ceiba" | "roble" | "quenua" | "guayacan"; tier?: "bajo" | "alto" | "medio"; variante?: number; escala?: number; position?: [number, number, number]; rotation?: [...]; reducedMotion?: boolean; semilla?: number; }'.
+  Property 'blobs' does not exist on type 'IntrinsicAttributes & { tipo?: "ceiba" | "roble" | "quenua" | "guayacan"; tier?: "bajo" | "alto" | "medio"; variante?: number; escala?: number; position?: [number, number, number]; rotation?: [...]; reducedMotion?: boolean; semilla?: number; }'.
+src/visual/mundo3d/sierra/sierraBiodiversa.geom.js(170,3): error TS2322: Type '{}' is not assignable to type 'Record<string, { pos: number[]; rotY: number; escala: number; tint: number[]; }[]>'.
+  Index signature for type 'string' is missing in type '{}'.
+src/visual/mundo3d/terreno/SueloRico.jsx(132,57): error TS1003: Identifier expected.
+src/visual/mundo3d/terreno/SueloRico.jsx(132,59): error TS1127: Invalid character.
+src/visual/mundo3d/terreno/SueloRico.jsx(138,72): error TS2339: Property 'detalle' does not exist on type '{ suelo: SueloRico; tier?: "bajo" | "alto" | "medio"; anclas?: { x: number; z: number; radio: number; }[]; }'.
+src/visual/mundo3d/terreno/SueloRico.jsx(138,81): error TS2339: Property 'rMaxDetalle' does not exist on type '{ suelo: SueloRico; tier?: "bajo" | "alto" | "medio"; anclas?: { x: number; z: number; radio: number; }[]; }'.
+src/visual/mundo3d/terreno/SueloRico.jsx(138,94): error TS2339: Property 'segmentos' does not exist on type '{ suelo: SueloRico; tier?: "bajo" | "alto" | "medio"; anclas?: { x: number; z: number; radio: number; }[]; }'.
+src/visual/mundo3d/terreno/__tests__/sueloRico.geom.test.js(32,5): error TS2322: Type '{ puntos: number[][]; ancho: number; }' is not assignable to type '{ puntos: [number, number][]; ancho: number; }'.
+  Types of property 'puntos' are incompatible.
+    Type 'number[][]' is not assignable to type '[number, number][]'.
+      Type 'number[]' is not assignable to type '[number, number]'.
+        Target requires 2 element(s) but source may have fewer.
+src/visual/mundo3d/terreno/sueloRico.geom.js(171,29): error TS1127: Invalid character.
+src/visual/mundo3d/terreno/sueloRico.geom.js(173,34): error TS1127: Invalid character.
+src/visual/mundo3d/terreno/sueloRico.geom.js(174,31): error TS1127: Invalid character.
+src/visual/mundo3d/terreno/sueloRico.geom.js(175,63): error TS1127: Invalid character.
+src/visual/mundo3d/terreno/sueloRico.geom.js(176,72): error TS1127: Invalid character.
+src/visual/mundo3d/terreno/sueloRico.geom.js(177,77): error TS1127: Invalid character.
+src/visual/mundo3d/terreno/sueloRico.geom.js(524,27): error TS1127: Invalid character.
+src/visual/mundo3d/terreno/sueloRico.geom.js(573,28): error TS1003: Identifier expected.
+src/visual/mundo3d/terreno/sueloRico.geom.js(573,28): error TS8024: JSDoc '@param' tag has name '', but there is no parameter with that name.
+src/visual/mundo3d/terreno/sueloRico.geom.js(573,34): error TS1127: Invalid character.
+src/visual/mundo3d/usePerformanceMonitor.jsx(135,5): error TS2322: Type 'string' is not assignable to type '"bajo" | "alto" | "medio"'.
+src/visual/mundo3d/usePerformanceMonitor.jsx(255,3): error TS2322: Type 'Readonly<{ tier: string; techo: any; factor: number; fallback: boolean; fps: number; nivel: "bajo" | "alto" | "medio"; presupuesto: any; dpr: number; escalaParticulas: number; }>' is not assignable to type 'Calidad3D'.
+  Types of property 'tier' are incompatible.
+    Type 'string' is not assignable to type '"bajo" | "alto" | "medio"'.
+src/visual/mundo3d/usePerformanceMonitor.jsx(313,20): error TS2345: Argument of type 'string' is not assignable to parameter of type '"bajo" | "alto" | "medio"'.
+src/visual/mundo3d/usePerformanceMonitor.jsx(321,18): error TS2345: Argument of type 'string' is not assignable to parameter of type '"bajo" | "alto" | "medio"'.
+src/visual/mundo3d/usePerformanceMonitor.jsx(328,18): error TS2345: Argument of type 'string' is not assignable to parameter of type '"bajo" | "alto" | "medio"'.
+src/visual/mundo3d/usePerformanceMonitor.jsx(379,30): error TS2339: Property 'presupuesto' does not exist on type 'Calidad3D'.
