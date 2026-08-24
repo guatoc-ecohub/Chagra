@@ -20,6 +20,8 @@ import {
 import {
     LECTURA_ENSO, ACCIONES_ENSO, REGLA_INSIGNIA, BOLETINES_IDEAM,
     MTA_INFO, MTA_POR_REGION, FENALCE_INFO,
+    ENSO_CALENDARIO_2026_27, ENSO_TRANSICION, MTA_VENTANA_SIEMBRA,
+    FUENTES_VIVAS, ESTADO_GROUNDED_PENDIENTE, faseCalendarioActual,
 } from '../../data/climaBoletines';
 import './clima.css';
 
@@ -364,6 +366,17 @@ function HorizonteSemana({ agrometeo, alertas }) {
                         </div>
                         <FuenteDato>Open-Meteo · probabilidad de lluvia bajo cada día</FuenteDato>
                     </div>
+
+                    {/* Contraste con la fuente oficial: BSA del IDEAM (semanal, lunes) */}
+                    <a href={FUENTES_VIVAS.ideam_bsa_semanal} target="_blank" rel="noopener noreferrer" data-testid="clima-bsa-link"
+                        className="flex gap-3 rounded-2xl border border-slate-700/60 bg-slate-900/50 p-3.5 active:bg-slate-800/60 transition-colors">
+                        <span aria-hidden="true" className="shrink-0 w-9 h-9 rounded-xl bg-sky-500/15 grid place-items-center"><Radio size={18} className="text-sky-300" /></span>
+                        <span className="flex-1 min-w-0">
+                            <span className="block text-sm font-bold text-slate-100 leading-tight">Contraste con el IDEAM oficial</span>
+                            <span className="block text-xs leading-snug text-slate-300 mt-0.5">Este pronóstico es de Open-Meteo. El oficial por departamento sale los lunes en el Boletín Semanal para el Sector Agrícola (BSA).</span>
+                        </span>
+                        <ExternalLink size={16} className="shrink-0 text-slate-500 mt-0.5" aria-hidden="true" />
+                    </a>
                 </>
             )}
         </section>
@@ -381,6 +394,134 @@ const CHECKLIST_ELNINO = [
     { emoji: '🐄', t: 'Ajustar carga animal y forraje', d: 'Guarde forraje y baje la carga: el pasto crece menos en seca.' },
 ];
 /* eslint-enable chagra-i18n/no-hardcoded-spanish */
+
+/* Timeline ENSO mes a mes 2026–27 (durable + citado; % = foto fechada, la
+   vigente se lee del boletín vivo). Resalta el período actual por fecha. */
+const CAL_ACENTO = {
+    nino: { dot: 'bg-amber-400', text: 'text-amber-200', border: 'border-amber-500/40' },
+    neutral: { dot: 'bg-emerald-400', text: 'text-emerald-200', border: 'border-emerald-600/40' },
+};
+
+function EnsoTimeline() {
+    const ahora = faseCalendarioActual();
+    return (
+        <div className="rounded-2xl border border-slate-700/60 bg-slate-900/40 p-4" data-testid="clima-enso-timeline">
+            <p className="flex items-center gap-2 text-sm font-black text-slate-100 uppercase tracking-wide">
+                <CalendarClock size={15} aria-hidden="true" /> El Niño, mes a mes
+            </p>
+            <p className="mt-1 text-[11px] leading-snug text-slate-500">
+                Las probabilidades son la foto del boletín del {ENSO_TRANSICION.boletinFecha} —{' '}
+                <SlotPendiente>la vigente se lee del boletín en vivo</SlotPendiente>. La acción por cultivo es del manejo del piso frío andino.
+            </p>
+
+            <ol className="mt-3 space-y-3">
+                {ENSO_CALENDARIO_2026_27.map((p) => {
+                    const ac = CAL_ACENTO[p.fase] || CAL_ACENTO.nino;
+                    const esAhora = p.id === ahora;
+                    return (
+                        <li key={p.id} data-testid={`enso-cal-${p.id}`}
+                            className={`relative rounded-2xl border p-3 pl-4 ${esAhora ? `${ac.border} bg-slate-900/70 ring-1 ring-inset ring-amber-500/20` : 'border-slate-700/50 bg-slate-900/40'}`}>
+                            <span aria-hidden="true" className={`absolute left-1.5 top-4 h-2 w-2 rounded-full ${ac.dot}`} />
+                            <div className="flex items-center gap-2 flex-wrap">
+                                <span className={`text-[11px] font-black uppercase tracking-wide ${ac.text}`}>{p.periodo}</span>
+                                <span className="text-sm font-bold text-slate-100">· {p.titulo}</span>
+                                {esAhora && <span data-testid="enso-cal-ahora" className="rounded-full bg-amber-500/20 px-2 py-0.5 text-[10px] font-black uppercase text-amber-200">Ahora</span>}
+                            </div>
+                            <p className="mt-1 text-sm leading-relaxed text-slate-200">{p.narrativa}</p>
+
+                            {/* Probabilidad: foto fechada citada, o grounded_pendiente si el DR no da cifra dura */}
+                            <p className="mt-1.5 text-[11px] leading-snug text-slate-400 flex items-start gap-1.5">
+                                <Waves size={12} className="shrink-0 mt-0.5 text-sky-300" aria-hidden="true" />
+                                {p.probFoto ? (
+                                    <span>{p.probFoto.texto} <span className="text-slate-500">· {p.probFoto.fuente}, foto {p.probFoto.boletinFecha}</span></span>
+                                ) : (
+                                    <span className="flex items-center gap-1.5">Probabilidad de transición: <SlotPendiente>se lee del boletín vigente</SlotPendiente></span>
+                                )}
+                            </p>
+
+                            {/* Acción por cultivo (piso frío andino) */}
+                            <p className="mt-1.5 flex items-start gap-1.5 text-xs leading-snug text-emerald-200/90">
+                                <Sprout size={13} className="shrink-0 mt-0.5 text-emerald-300" aria-hidden="true" />
+                                <span>{p.accionCultivo}</span>
+                            </p>
+                        </li>
+                    );
+                })}
+            </ol>
+
+            {/* Cuándo se alivia + fuente viva */}
+            <div className="mt-3 rounded-2xl border border-slate-700/50 bg-slate-950/40 p-3" data-testid="clima-enso-alivio">
+                <p className="text-sm leading-relaxed text-slate-200">
+                    <b className="text-amber-200">Pico:</b> {ENSO_TRANSICION.pico}. <b className="text-emerald-200">Se alivia:</b> desde {ENSO_TRANSICION.aliviaDesde},
+                    con transición a Neutral hacia {ENSO_TRANSICION.transicionNeutral}. {ENSO_TRANSICION.laNinaConfirmada ? '' : 'No hay La Niña inmediata confirmada.'}
+                </p>
+                <FuenteDato>{ENSO_TRANSICION.fuente}</FuenteDato>
+                <a href={FUENTES_VIVAS.noaa_enso_disc} target="_blank" rel="noopener noreferrer" data-testid="clima-enso-live-link"
+                    className="mt-2 inline-flex items-center gap-1.5 text-[11px] font-bold text-sky-300 active:text-sky-200">
+                    <ExternalLink size={12} aria-hidden="true" /> Ver el pronóstico ENSO vigente (NOAA CPC / IDEAM)
+                </a>
+            </div>
+        </div>
+    );
+}
+
+/* Ventana de siembra MTA región Andina: deflección honesta (patrón SIPSA) — la
+   ventana vigente se lee del boletín en vivo, no se inventa. */
+function MtaVentanaSiembra() {
+    const v = MTA_VENTANA_SIEMBRA;
+    const pendiente = v.ventanaVigente?.estado === ESTADO_GROUNDED_PENDIENTE;
+    return (
+        <div className="rounded-2xl border border-emerald-700/40 bg-emerald-950/20 p-4" data-testid="clima-mta-ventana">
+            <p className="flex items-center gap-2 text-sm font-black text-emerald-200 uppercase tracking-wide">
+                <Sprout size={15} aria-hidden="true" /> Ventana de siembra · región Andina
+            </p>
+            <p className="mt-1 text-[11px] text-slate-400">{v.zona}</p>
+
+            <p className="mt-2 text-sm leading-relaxed text-slate-200">{v.regimenBimodal}</p>
+            <p className="mt-1.5 flex items-start gap-1.5 text-sm leading-relaxed text-amber-200/90">
+                <Sparkles size={13} className="shrink-0 mt-0.5 text-amber-300" aria-hidden="true" />
+                <span>{v.matizEnso}</span>
+            </p>
+
+            {/* Deflección honesta: la ventana vigente NO se inventa */}
+            {pendiente && (
+                <div className="mt-2.5 flex items-start gap-2 rounded-2xl border border-amber-500/25 bg-amber-500/5 p-2.5" data-testid="clima-mta-ventana-pendiente">
+                    <Hourglass size={14} className="shrink-0 mt-0.5 text-amber-300" aria-hidden="true" />
+                    <p className="text-xs leading-snug text-slate-300">
+                        La fecha exacta de siembra vigente para su zona la fija el <b className="text-slate-100">Boletín MTA región Andina</b>. Chagra no la inventa: se lee del boletín en vivo.
+                    </p>
+                </div>
+            )}
+
+            {/* Enlace al boletín MTA EN VIVO */}
+            <a href={v.urlVivo} target="_blank" rel="noopener noreferrer" data-testid="clima-mta-ventana-live"
+                className="mt-2.5 flex items-center gap-2 rounded-xl border border-emerald-600/40 bg-emerald-500/10 px-3 py-2.5 text-sm font-bold text-emerald-200 active:bg-emerald-500/20">
+                <BookOpenText size={15} aria-hidden="true" /> Abrir el Boletín MTA región Andina (en vivo)
+                <ExternalLink size={14} className="ml-auto shrink-0" aria-hidden="true" />
+            </a>
+
+            {/* Productos oficiales existentes con su última fecha (trazabilidad) */}
+            <details className="mt-2.5 group">
+                <summary className="cursor-pointer list-none text-[11px] font-bold text-slate-400 flex items-center gap-1.5">
+                    <BookOpenText size={12} aria-hidden="true" /> Los boletines de la zona y cuándo salieron
+                </summary>
+                <ul className="mt-2 space-y-1.5" data-testid="clima-mta-productos">
+                    {v.productos.map((prod) => (
+                        <li key={prod.nombre}>
+                            <a href={prod.url} target="_blank" rel="noopener noreferrer"
+                                className="flex items-center gap-1.5 text-[11px] leading-snug text-slate-300 active:text-slate-100">
+                                <ExternalLink size={11} className="shrink-0 text-slate-500" aria-hidden="true" />
+                                <span><span className="text-slate-200">{prod.nombre}</span> — {prod.ultima}</span>
+                            </a>
+                        </li>
+                    ))}
+                </ul>
+            </details>
+
+            <p className="mt-2 text-[10px] text-slate-500">Fuente: {v.emisor} · {v.cadencia}</p>
+        </div>
+    );
+}
 
 function HorizonteEstacional({ faseFamily, faseLabel, source, regionLine, mtaRegional, onNavigate }) {
     const lectura = LECTURA_ENSO[faseFamily] || LECTURA_ENSO.neutral;
@@ -404,8 +545,9 @@ function HorizonteEstacional({ faseFamily, faseLabel, source, regionLine, mtaReg
                     <Sparkles size={15} aria-hidden="true" /> El Niño que viene · dic 2026 – ene 2027
                 </p>
                 <p className="mt-2 text-sm leading-relaxed text-slate-200">
-                    El IDEAM y la NOAA proyectan un <b>El Niño fuerte</b> para el fin de año: menos lluvia, más calor y más
-                    riesgo de incendio. La probabilidad exacta cambia cada mes —{' '}
+                    El IDEAM y la NOAA proyectan el <b>pico entre {ENSO_TRANSICION.pico}</b>, con alivio desde{' '}
+                    <b>{ENSO_TRANSICION.aliviaDesde}</b> y vuelta a Neutral hacia {ENSO_TRANSICION.transicionNeutral}: menos lluvia,
+                    más calor y más riesgo de incendio hasta entonces. La probabilidad exacta cambia cada mes —{' '}
                     <SlotPendiente>se lee del boletín ENSO vigente</SlotPendiente>. Prepárese desde ya.
                 </p>
                 <div className="mt-2 flex gap-2.5 rounded-2xl border border-amber-500/20 bg-slate-900/60 p-3">
@@ -418,6 +560,9 @@ function HorizonteEstacional({ faseFamily, faseLabel, source, regionLine, mtaReg
                     </p>
                 </div>
             </div>
+
+            {/* Timeline ENSO mes a mes (durable + citado; % foto fechada) */}
+            <EnsoTimeline />
 
             {/* Lectura regional */}
             {regionLine && (
@@ -483,6 +628,9 @@ function HorizonteEstacional({ faseFamily, faseLabel, source, regionLine, mtaReg
                     </p>
                 )}
             </div>
+
+            {/* Ventana de siembra MTA región Andina (deflección honesta + link vivo) */}
+            <MtaVentanaSiembra />
 
             {/* Fenalce */}
             <a href={FENALCE_INFO.url} target="_blank" rel="noopener noreferrer" data-testid="clima-fenalce"
