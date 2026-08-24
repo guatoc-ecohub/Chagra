@@ -99,7 +99,7 @@ describe('GemeloValle2D — el gemelo 2D de primera clase del valle', () => {
     const { container } = render(
       <GemeloValle2D
         mundos={[...MUNDOS_VALLE, ...mundos]}
-        alerta={{ anclaMundo: 'abono_fuera', titulo: 'Alerta', detalle: '' }}
+        alerta={{ ...COSA_DEL_DIA, anclaMundo: 'abono_fuera', titulo: 'Alerta', detalle: '' }}
         onEntrar={vi.fn()}
         onAlerta={vi.fn()}
       />,
@@ -108,10 +108,11 @@ describe('GemeloValle2D — el gemelo 2D de primera clase del valle', () => {
     const botones = container.querySelectorAll('.gv-poi, .gv-alerta');
     expect(botones).toHaveLength(MUNDOS_VALLE.length + mundos.length + 1);
     botones.forEach((boton) => {
-      expect(parseFloat(boton.style.left)).toBeGreaterThanOrEqual(0);
-      expect(parseFloat(boton.style.left)).toBeLessThanOrEqual(100);
-      expect(parseFloat(boton.style.top)).toBeGreaterThanOrEqual(0);
-      expect(parseFloat(boton.style.top)).toBeLessThanOrEqual(100);
+      const el = /** @type {HTMLElement} */ (boton);
+      expect(parseFloat(el.style.left)).toBeGreaterThanOrEqual(0);
+      expect(parseFloat(el.style.left)).toBeLessThanOrEqual(100);
+      expect(parseFloat(el.style.top)).toBeGreaterThanOrEqual(0);
+      expect(parseFloat(el.style.top)).toBeLessThanOrEqual(100);
     });
   });
 
@@ -158,8 +159,9 @@ describe('GemeloValle2D — el gemelo 2D de primera clase del valle', () => {
         expect(botones.length).toBeGreaterThan(0);
 
         botones.forEach((boton) => {
-          const left = parseFloat(boton.style.left);
-          const top = parseFloat(boton.style.top);
+          const el = /** @type {HTMLElement} */ (boton);
+          const left = parseFloat(el.style.left);
+          const top = parseFloat(el.style.top);
 
           // Los valores deben estar entre 8 y 92 (por el clampPct)
           expect(left).toBeGreaterThanOrEqual(8);
