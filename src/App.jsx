@@ -93,6 +93,8 @@ const VisualLib = lazy(() => import('./mockups/VisualLib'));
 // MOCKUP_HASH_ROUTES ANTES del check de auth. Chunks perezosos.
 // 3D: "El valle de mi finca" (R3F/WebGL2, degrada a SVG sin WebGL).
 const EntradaValle3DMockup = lazy(() => import('./mockups/EntradaValle3D'));
+// Ruta `valle3d`: puente al Valle canónico vanilla, sin duplicar su escena en R3F.
+const Lib3D = lazy(() => import('./components/Lib3D'));
 // 3D: "El mundo del agua" — monta <Mundo mundoId="agua"> del framework
 // (src/visual/mundo3d) con device-tiering real. El 3D va perezoso (vendor-three).
 const Mundo3DAguaMockup = lazy(() => import('./mockups/Mundo3DAgua'));
@@ -3803,23 +3805,13 @@ export default function App() {
           </ErrorBoundary>
         );
       case 'valle3d':
-        // EL VALLE 3D DESDE EL HOME (FASE 0 del plan game-dev): la MISMA
-        // EntradaValle3D de la vitrina (#/mockups/entrada-3d) montada como
-        // vista REAL de la app, con `onNavigate`: las puertas de los mundos
-        // abren las pantallas de verdad (regla de oro: re-rutear, nunca
-        // reimplementar). Se llega por la banda de MundosDeMiFinca, gated por
-        // el flag de prefs `valle3d` (default OFF, Perfil) + device-tier;
-        // adentro el tiering decide 3D pleno/frugal o el valle 2D digno.
+        // EL VALLE 3D DESDE EL HOME: una sola implementación canónica vanilla
+        // vive en 3d.guatoc.co. El puente evita duplicarla en R3F dentro de la
+        // PWA; los juegos siguen siendo rutas propias del Valle.
         return (
           <ErrorBoundary>
-            <ErrorFallback moduleName="El valle de su finca (3D)">
-              <EntradaValle3DMockup
-                onBack={() => navigate(sinSesion ? 'login' : 'dashboard')}
-                // @ts-ignore navigate signature
-                onNavigate={navigate}
-                // @ts-ignore initialMundoId not in strict type
-                initialMundoId={currentViewData?.mundo}
-              />
+            <ErrorFallback moduleName="El valle canónico (3D)">
+              <Lib3D onBack={() => navigate(sinSesion ? 'login' : 'dashboard')} />
             </ErrorFallback>
           </ErrorBoundary>
         );

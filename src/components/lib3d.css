@@ -1,0 +1,49 @@
+.lib3d {
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+  background: #0a0a0f;
+}
+
+.lib3d__frame {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border: 0;
+}
+
+.lib3d__loading {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  color: #e8e8f0;
+  background: radial-gradient(circle at 50% 40%, #1a1e28, #0a0a0f);
+  font: 1rem system-ui, sans-serif;
+  pointer-events: none;
+}
+
+.lib3d__back {
+  position: absolute;
+  top: max(1rem, env(safe-area-inset-top));
+  left: max(1rem, env(safe-area-inset-left));
+  z-index: 1;
+  min-height: 44px;
+  padding: 0.4rem 0.7rem;
+  border: 0;
+  border-radius: 999px;
+  color: #fff;
+  background: rgb(0 0 0 / 0.42);
+  font: 600 0.95rem system-ui, sans-serif;
+  cursor: pointer;
+  backdrop-filter: blur(4px);
+}
+
+.lib3d__back:hover {
+  background: rgb(0 0 0 / 0.62);
+}
+
+.lib3d__back:focus-visible {
+  outline: 3px solid #f7d98b;
+  outline-offset: 3px;
+}
