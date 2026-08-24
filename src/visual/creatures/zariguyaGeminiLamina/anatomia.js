@@ -172,6 +172,11 @@ export const PARTE_COLA = {
  *   verlupa → thinking: lupa + documento (la investigadora trabajando).
  *   muerta  → idle/momento 'tanatosis': el gag firma ("playing possum",
  *             lengua afuera). Va ACOSTADA — el anclaje al piso la tiende.
+ *   crias   → idle/momento 'crias': la FIRMA de identidad (madre en cuatro
+ *             patas, 5 crías al lomo). Orden del operador 2026-08-24: las
+ *             crías NO van en la hero (queda la investigadora sola) — son
+ *             POSE ESPECIAL, tan ocasional como la tanatosis, y disparable
+ *             a demanda por el host (vidaForzada) en momentos positivos.
  *   escucha → listening: 02→03→04 (cuerpo entero, misma escala de figura,
  *             la oreja crece — medido: alturas de contenido 444/452/434).
  *             `escucha-01` es un CLOSE-UP de cabeza+mano (otro encuadre):
@@ -183,6 +188,7 @@ export const POSES = {
   cute: { archivo: 'zariguya-gemini-cute.png', W: 434, H: 700 },
   verlupa: { archivo: 'zariguya-gemini-verlupa.png', W: 800, H: 588 },
   muerta: { archivo: 'zariguya-gemini-muerta.png', W: 800, H: 390 },
+  crias: { archivo: 'zariguya-gemini-crias.png', W: 800, H: 615 },
   'escucha-01': { archivo: 'zariguya-gemini-escucha-01.png', W: 444, H: 419 },
   'escucha-02': { archivo: 'zariguya-gemini-escucha-02.png', W: 438, H: 456 },
   'escucha-03': { archivo: 'zariguya-gemini-escucha-03.png', W: 439, H: 464 },

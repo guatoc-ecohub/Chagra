@@ -8,7 +8,7 @@ import ZariguyaGeminiLaminaViva from '../visual/creatures/ZariguyaGeminiLaminaVi
  * `ZariguyaGeminiLaminaViva`: el SET GEMINI estilo grabado/tinta aprobado por
  * el operador (2026-08-23) — la hero naturalista (lápiz+brújula) horneada en
  * capas lámina-viva + las poses plenas del set (escucha ×4, ver-lupa, cute,
- * muerta) según el estado. REEMPLAZA aquí al vector rubber-hose
+ * muerta, crías al lomo) según el estado. REEMPLAZA aquí al vector rubber-hose
  * `Zariguya.jsx` (rechazado en revisión visual: cuerpo gris plano, cola
  * pelada); el vector sigue vivo en `visual/creatures/` para sus otros
  * consumidores (fauna del valle, selector de criaturas).
@@ -18,8 +18,11 @@ import ZariguyaGeminiLaminaViva from '../visual/creatures/ZariguyaGeminiLaminaVi
  * 'speaking'|'listening', glow, withLabel, onClick/onDoubleClick) al
  * contrato de la lámina viva — que entiende esos estados de forma nativa:
  *   - idle      → lámina-rig articulada (respira, parpadea, husmea; sus
- *                 momentos de vida traen el gag de tanatosis y el reposo
- *                 de frente, poses reales del set).
+ *                 momentos de vida traen el gag de tanatosis, el reposo
+ *                 de frente y — muy de vez en cuando — las CRÍAS AL LOMO
+ *                 (la firma de identidad como momento especial, no como
+ *                 hero: orden del operador 2026-08-24), poses reales del
+ *                 set).
  *   - thinking  → pose ver-lupa (la investigadora repasa el documento).
  *   - speaking  → lámina-rig + lip-sync de mandíbula (visema estático V2 si
  *                 el host no corre useLipSync — igual que Angelita).

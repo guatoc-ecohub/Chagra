@@ -25,7 +25,7 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
     executablePath: resolveChromium(), headless: true,
     args: ['--no-sandbox', '--disable-dev-shm-usage'],
   });
-  const ctx = await browser.newContext({ viewport: { width: 2050, height: 700 }, deviceScaleFactor: 2 });
+  const ctx = await browser.newContext({ viewport: { width: 2290, height: 700 }, deviceScaleFactor: 2 });
   const page = await ctx.newPage();
   const consola = [];
   page.on('console', (m) => consola.push(`${m.type()}: ${m.text()}`));
@@ -38,6 +38,6 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
   // Diagnóstico crudo: estado de cada raíz.
   const estados = await page.evaluate(() => Array.from(document.querySelectorAll('[data-creature="zariguya"]'))
     .map((n) => ({ estado: n.dataset.agtEstado, modo: n.dataset.modo, pose: n.dataset.pose || null, vida: n.dataset.vida || null })));
-  console.log(JSON.stringify({ estados: estados.slice(0, 8), consola: consola.slice(0, 20) }, null, 1));
+  console.log(JSON.stringify({ estados: estados.slice(0, 9), consola: consola.slice(0, 20) }, null, 1));
   await browser.close();
 })();
