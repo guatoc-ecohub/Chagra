@@ -25,10 +25,12 @@
  *   - Toda mata fusionada pasa por `fusionarSeguro` (el merge que TRUENA en vez
  *     de devolver null y dejar la especie invisible).
  *
- * RENDIMIENTO: los árboles, las piedras y las matas van instanciados (3 draw
- * calls para todo el monte); Lambert flatShading sin shadow-map; presupuestos
- * por `perfilDeTier`. `reducedMotion` congela el felino y pasa el frameloop a
- * demanda. Autocontenida: cero CDN, cero imágenes externas.
+ * RENDIMIENTO: el monte va instanciado por bancos (nogal, cedro, helecho,
+ * piedra — un draw call por banco); los árboles son los del dosel andino con
+ * copa-masa (follaje = MASA, nunca poliedros contables) y se mecen; material y
+ * presupuestos por `perfilDeTier`/`calidadDosel`. `reducedMotion` congela el
+ * felino y el mecido y pasa el frameloop a demanda. Autocontenida: cero CDN,
+ * cero imágenes externas.
  *
  * Español de Colombia, en "usted".
  */
