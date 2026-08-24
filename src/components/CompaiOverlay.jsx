@@ -11,6 +11,7 @@ import ChagraAgentAvatar from './ChagraAgentAvatar';
 import useCompaiElegido from '../visual/mundo3d/escenas/useCompaiElegido.js';
 import useCompaiRoam from '../hooks/useCompaiRoam.js';
 import { AVATAR_NOMBRE, DEFAULT_AVATAR_TYPE } from '../hooks/useAgentAvatarType.js';
+import { CON_MARCHA } from './compaiMarcha.js';
 
 /**
  * CompaiOverlay — el compai elegido, minimizable y contextual en todas las rutas 2D.
@@ -29,7 +30,7 @@ import { AVATAR_NOMBRE, DEFAULT_AVATAR_TYPE } from '../hooks/useAgentAvatarType.
  *   - Toque en el compai → abre panel (toggle); mientras el panel está abierto
  *     el compai vuelve a casa y se queda quieto (no se corre bajo la guía).
  *   - El compai camina de un lado a otro con cadencia lenta y se espeja hacia
- *     donde anda; el jaguar corre su marcha real ('caminando') al desplazarse.
+ *     donde anda; el compai elegido recibe 'caminando' al desplazarse.
  *   - El hint cambia según la ruta actual (mapa ruta→hint, extensible)
  *   - Botón "Escuchar" usa TTS (kokoro, fail-silent si no hay saldo)
  *   - Respeta preferencias del usuario (avatar seleccionado en AvatarSelector)
@@ -282,11 +283,7 @@ export default function CompaiOverlay({ currentView = 'dashboard' }) {
     setIsOpen(false);
   }, []);
 
-  // Caminantes: avatares que tienen pose de marcha (caminando) y deben
-  // recibirla cuando deambulan. Los voladores (angelita, guacamaya, luciérnaga)
-  // respetan su locomoción aérea y solo se espejan.
-  const CAMINANTES = new Set(['jaguar', 'zariguya', 'oso-baston', 'chivito-punk']);
-  const esCaminante = CAMINANTES.has(avatarType);
+  const esCaminante = CON_MARCHA.has(avatarType);
 
   // Un felino/animal realista (jaguar) NO cabe digno en un disco chico: se le
   // da más tamaño para que se LEA. Los compai chicos (abeja, luciérnaga…) van
@@ -294,8 +291,7 @@ export default function CompaiOverlay({ currentView = 'dashboard' }) {
   const esRealista = avatarType === 'jaguar';
   const avatarSize = esRealista ? 112 : 84;
 
-  // Mientras deambula, los caminantes corren su MARCHA real ('caminando');
-  // los voladores conservan su estado y solo se espejan. Un estado
+  // Mientras deambula, el compai recibe su estado de MARCHA. Un estado
   // conversacional (hablar/escuchar/pensar) siempre gana a la caminata.
   const estadoAvatar = esCaminante && caminando && compaiState === 'idle'
     ? 'caminando'

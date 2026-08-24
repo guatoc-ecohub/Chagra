@@ -27,6 +27,7 @@ const POSE_DE_STATE = {
     thinking: 'vuela',
     speaking: 'celebra',
     listening: 'reposo',
+    caminando: 'vuela',
 };
 
 const ECO_DE_STATE = {

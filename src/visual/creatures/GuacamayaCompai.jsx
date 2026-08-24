@@ -112,6 +112,7 @@ const ESTADO_DE_STATE = {
   thinking: 'idle',
   speaking: 'hablar',
   listening: 'idle',
+  caminando: 'idle',
 };
 
 /* Vocabulario RICO (angelitaEstados.js, los mismos 10 que entiende Angelita)

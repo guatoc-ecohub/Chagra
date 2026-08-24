@@ -27,6 +27,7 @@ const ESTADO_DE_STATE = {
     // eslint-disable-next-line chagra-i18n/no-hardcoded-spanish
     speaking: 'respondiendo',
     listening: 'escuchando',
+    caminando: 'acompana',
 };
 
 export default function ChagraAgentAvatarAngelita({

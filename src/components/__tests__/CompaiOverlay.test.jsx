@@ -1,6 +1,28 @@
+import React from 'react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import CompaiOverlay from '../CompaiOverlay.jsx';
+
+const compaiTestState = vi.hoisted(() => ({ avatarType: 'angelita', caminando: true }));
+
+vi.mock('../ChagraAgentAvatar.jsx', () => ({
+  default: ({ state }) => React.createElement('span', {
+    'data-testid': 'compai-avatar-state',
+    'data-state': state,
+  }),
+}));
+
+vi.mock('../../hooks/useCompaiRoam.js', () => ({
+  default: () => ({
+    caminando: compaiTestState.caminando,
+    hacia: 'izquierda',
+    parada: 0,
+  }),
+}));
+
+vi.mock('../../visual/mundo3d/escenas/useCompaiElegido.js', () => ({
+  default: () => ({ avatarType: compaiTestState.avatarType }),
+}));
 
 /**
  * Tests de CompaiOverlay — componente global del compai minimizable.
@@ -16,6 +38,32 @@ import CompaiOverlay from '../CompaiOverlay.jsx';
 describe('CompaiOverlay', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    compaiTestState.avatarType = 'angelita';
+    compaiTestState.caminando = true;
+  });
+
+  it.each([
+    'angelita',
+    'jaguar',
+    'oso-baston',
+    'zariguya',
+    'luciernaga',
+    'chivito-punk',
+    'guacamaya',
+  ])('envía CON_MARCHA a %s mientras deambula', (avatarType) => {
+    compaiTestState.avatarType = avatarType;
+
+    render(<CompaiOverlay currentView="dashboard" />);
+
+    expect(screen.getByTestId('compai-avatar-state')).toHaveAttribute('data-state', 'caminando');
+  });
+
+  it('mantiene el estado conversacional por encima de CON_MARCHA', () => {
+    render(<CompaiOverlay currentView="dashboard" />);
+    fireEvent.click(screen.getByTestId('compai-bubble'));
+    fireEvent.click(screen.getByTestId('compai-listen-btn'));
+
+    expect(screen.getByTestId('compai-avatar-state')).toHaveAttribute('data-state', 'speaking');
   });
 
   it('debe montarse sin errores', () => {
