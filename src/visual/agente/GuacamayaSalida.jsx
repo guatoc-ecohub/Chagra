@@ -105,6 +105,7 @@ export function GuacamayaSalida({
         size={size}
         animated={animated}
         tier={tier}
+        luces="realza"
         {...rest}
       />
     </span>
