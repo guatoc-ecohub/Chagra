@@ -42,19 +42,39 @@ export const AVATAR_TYPES = ['angelita', 'zariguya', 'jaguar', 'oso-baston', 'lu
 export const DEFAULT_AVATAR_TYPE = 'angelita';
 
 // Nombre propio para copy que necesita NOMBRAR al compAI elegido (ej. "hábletele
-// a X", el rótulo visible de la transición home→conversación). Los ariaLabel
-// genéricos de los avatares siguen diciendo "Chagra IA" (convención ya usada
-// en WelcomeStatsHero, ChatBubble, AgentHero, InsightProactivoCard, etc.) —
-// este mapa es SOLO para los pocos textos que sí necesitan el nombre propio.
+// a X", el rótulo visible de la transición home→conversación, y el SALUDO en
+// primera persona "Soy X, de Chagra" del AgentScreen). Los ariaLabel genéricos
+// de los avatares siguen diciendo "Chagra IA" (convención ya usada en
+// WelcomeStatsHero, ChatBubble, AgentHero, InsightProactivoCard, etc.) — este
+// mapa es SOLO para los pocos textos que sí necesitan el nombre propio.
+//
+// Convención UNIFICADA: artículo + nombre ('el jaguar' / 'la luciérnaga'), salvo
+// Angelita que es nombre propio. La zarigüeya usaba el posesivo 'su zarigüeya'
+// (bien en 2ª persona, pero rompía la 1ª — "Soy su zarigüeya" suena raro y era
+// el único posesivo del mapa); se unifica a 'la zarigüeya' para que el saludo
+// coherente funcione con TODO el elenco sin excepciones.
 export const AVATAR_NOMBRE = {
     angelita: 'Angelita',
-    zariguya: 'su zarigüeya',
+    zariguya: 'la zarigüeya',
     jaguar: 'el jaguar',
     'oso-baston': 'el oso de anteojos',
     luciernaga: 'la luciérnaga',
     'chivito-punk': 'el chivito',
     guacamaya: 'la guacamaya',
 };
+
+/**
+ * Adjetivo con concordancia de género para el copy del saludo ("su asistente
+ * agroecológic{a|o}"). Se deriva del artículo del nombre en AVATAR_NOMBRE: 'el …'
+ * → masculino; 'la …' y el nombre propio 'Angelita' → femenino. Así se adapta
+ * solo al agregar un compAI nuevo, sin un mapa de género paralelo que mantener.
+ * @param {string} type — avatarType (clave de AVATAR_NOMBRE).
+ * @returns {'agroecológico'|'agroecológica'}
+ */
+export function adjetivoAgroecologico(type) {
+    const nombre = AVATAR_NOMBRE[type] || AVATAR_NOMBRE[DEFAULT_AVATAR_TYPE];
+    return /^el\s/i.test(nombre) ? 'agroecológico' : 'agroecológica';
+}
 
 // Slugs históricos guardados en localStorage de instalaciones viejas:
 // ambos colibríes migran a Angelita sin que el usuario haga nada.
