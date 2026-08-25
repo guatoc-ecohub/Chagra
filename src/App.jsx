@@ -1701,6 +1701,21 @@ export default function App() {
       if (currentView === 'login' || currentView === 'loading' || currentView === 'oauth-callback') {
         return;
       }
+      // OFFLINE-FIRST + POLÍTICA COMPAI v2 (operador 2026-08-24,
+      // feedback_compai_politica_v2_visible_roam_natural): si el navegador está
+      // OFFLINE, un fallo contra farmOS NO prueba que el token esté muerto — es
+      // la red la que no está. Expulsar a #login aquí (logout + navigate) sacaba
+      // al usuario del dashboard y con él DESAPARECÍA el compai (AgentFab),
+      // violando "el compai es visible 100% del tiempo". Estando offline nos
+      // QUEDAMOS en la vista actual con datos cacheados: el compai sigue
+      // flotando y solo su capacidad de CHATEAR queda gated (AgentOfflineGuard)
+      // cuando el usuario intenta conversar. Al recuperar conexión, el siguiente
+      // request revalida el token y, si de verdad venció, este mismo handler
+      // —ya online— hará el re-login limpio. Espeja el guard offline-first de
+      // getAccessToken (authService: solo expira si navigator.onLine !== false).
+      if (typeof navigator !== 'undefined' && navigator.onLine === false) {
+        return;
+      }
       logoutUser().catch(() => { /* tokens podrían persistir; getAccessToken igual da null */ });
       showToast('Sesión vencida. Vuelve a entrar.', true);
       navigate('login');
