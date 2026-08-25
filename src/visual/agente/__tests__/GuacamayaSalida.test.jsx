@@ -28,8 +28,8 @@ describe('GuacamayaSalida', () => {
     const wrapper = container.querySelector('.guaca-salida');
     expect(wrapper).toHaveStyle({ width: '128px', height: '128px' });
     const guacamaya = container.querySelector('[data-creature="guacamaya"]');
-    expect(guacamaya).toHaveAttribute('width', '128');
-    expect(guacamaya).toHaveAttribute('height', '128');
+    expect(guacamaya).toHaveAttribute('width', '147'); // round(128 * 1.15), FACTOR_TAMANO
+    expect(guacamaya).toHaveAttribute('height', '147');
   });
 
   test('con animated=false o reduced-motion, salta directo a completo', () => {

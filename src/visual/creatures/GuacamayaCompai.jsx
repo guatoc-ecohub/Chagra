@@ -62,6 +62,7 @@ import { useEffect, useId, useMemo, useState } from 'react';
 import rigSvg from './arte-valle/guacamaya.rig.svg?raw';
 import defsSvg from './arte-valle/guacamaya.defs.svg?raw';
 import cssCompleto from './arte-valle/guacamayaCssTexto.js';
+import './guacamaya-luces.css';
 import {
   idsDeclaradosEnSvg,
   namespaceSvg,
@@ -102,6 +103,29 @@ const IDS = idsDeclaradosEnSvg(MARCADO_CRUDO);
    de sobra que recortar el ave. Pendiente afinar contra una captura
    GPU-headed real (ver nota del operador en el reporte de esta tarea). */
 const VIEWBOX = '-460 -460 920 920';
+
+/* +15% de presencia (pedido del operador, 2026-08-24): la guacamaya se dibuja
+   un 15% más grande que su `size` nominal — SOLO ella (esta constante vive en
+   su propio componente, no toca al resto del elenco). Se aplica al width/height
+   del <svg>, así que escala el ave Y su capa de luces por igual, en cualquier
+   call-site (selector, entrada/salida, adaptador angosto). */
+const FACTOR_TAMANO = 1.15;
+
+/* LUCES MÍSTICAS — coordenadas de la estela, en unidades del VIEWBOX. Cada
+   mota nace dentro de un `<g transform="rotate(ang)">` y su CSS la dispara con
+   translateX de `r0`→`r1` a lo largo de ese ángulo (ver guacamaya-luces.css).
+   Ángulos/tiempos desparejos a propósito: la estela respira, no pulsa a compás.
+   El abanico se sesga hacia atrás/abajo del ave (la luz que suelta al avanzar),
+   sin cubrir la cara. Radios ≤ 430 para no salir del viewBox (el <svg> recorta). */
+const MOTAS_LUZ = [
+  { ang: -28, r0: 90, r1: 300, dur: 3.2, d: 0, r: 23 },
+  { ang: 18, r0: 120, r1: 340, dur: 3.9, d: 380, r: 18 },
+  { ang: 62, r0: 100, r1: 320, dur: 3.4, d: 760, r: 26 },
+  { ang: 116, r0: 130, r1: 360, dur: 4.2, d: 240, r: 20 },
+  { ang: 158, r0: 95, r1: 300, dur: 3.6, d: 900, r: 24 },
+  { ang: 205, r0: 120, r1: 330, dur: 4.0, d: 520, r: 18 },
+  { ang: 246, r0: 110, r1: 350, dur: 3.5, d: 1100, r: 22 },
+];
 
 /* Vocabulario angosto del avatar (idle/thinking/speaking/listening) → el
    `data-estado` que el rig original espera (idle/hablar/senalar/…). Se deja
@@ -176,6 +200,16 @@ function prefiereQuietud() {
  *
  * El idle-cerebro (micro-gestos sin repetir) SOLO corre cuando se usa la API
  * rica (`estado` presente) — no cambia el comportamiento narrow existente.
+ *
+ * LUCES MÍSTICAS (2026-08-24): capa de VFX ADITIVA (aura espectral + estela de
+ * motas) que acompaña a la guacamaya, montada DETRÁS del rig para no tocar su
+ * cuerpo/colores aprobados. `luces`: 'auto' (por defecto, on al volar/roam) ·
+ * 'realza' (más brío, la usan entrada/salida) · 'off'. Se apaga sola en
+ * `tier==='bajo'` (no se monta) y en reduced-motion (CSS). Ver
+ * `guacamaya-luces.css`.
+ *
+ * TAMAÑO: se dibuja un +15% sobre el `size` nominal (FACTOR_TAMANO) — SOLO la
+ * guacamaya. El width/height del <svg> es `round(size * 1.15)`.
  */
 export function GuacamayaCompai({
   state = 'idle',
@@ -183,6 +217,7 @@ export function GuacamayaCompai({
   visema = null,
   tier = undefined,
   size = 64,
+  luces = 'auto',
   className = '',
   style = undefined,
   title = GUACAMAYA_NOMBRE,
@@ -191,6 +226,13 @@ export function GuacamayaCompai({
   const sufijo = useId().replace(/[:]/g, '');
   const marcado = useMemo(() => namespaceSvg(MARCADO_CRUDO, IDS, sufijo), [sufijo]);
   const css = useMemo(() => namespaceCss(CSS_RIG, IDS, sufijo), [sufijo]);
+  const lado = Math.round(size * FACTOR_TAMANO);
+
+  /* Capa de luces místicas (ADITIVA, detrás del rig — ver render). Se monta
+     salvo que se pida `luces='off'` o el tier sea bajo (gama baja: la capa es
+     blend + animación continua). reduced-motion la apaga vía CSS. `realza`
+     (entrada/salida) la enciende igual que `auto`, pero con más brío. */
+  const lucesActivas = luces !== 'off' && tier !== 'bajo';
   const dataEstado = estado !== undefined
     ? (ESTADO_RIG_DE_ESTADO_AGENTE[estadoCanonico(estado)] || 'idle')
     : (ESTADO_DE_STATE[state] || 'idle');
@@ -234,8 +276,8 @@ export function GuacamayaCompai({
   return (
     <svg
       viewBox={VIEWBOX}
-      width={size}
-      height={size}
+      width={lado}
+      height={lado}
       className={className}
       style={style}
       role="img"
@@ -244,13 +286,66 @@ export function GuacamayaCompai({
       data-estado={dataEstado}
       data-visema={visema || undefined}
       data-guaca-idle={idleActivo ? momento : undefined}
+      data-guaca-luces={lucesActivas ? (luces === 'realza' ? 'realza' : 'auto') : undefined}
       data-tier={tier || undefined}
       {...rest}
     >
       <title>{title}</title>
       {css && <style>{css}</style>}
-      {/* rig reusado del valle (F24), no redibujado — ver nota de arriba */}
-      <g dangerouslySetInnerHTML={{ __html: marcado }} />
+      {/* ═══ LUCES MÍSTICAS — capa de VFX ADITIVA, DETRÁS del rig ═══════════
+          Va antes del rig (z-detrás) para que el cuerpo/colores APROBADOS del
+          ave queden intactos por encima; las motas emanan desde atrás y se
+          abren (la estela). Gradientes con id namespaceado por instancia
+          (sufijo de useId) → sin colisión entre varias guacamayas a la vez.
+          La coreografía y los gates (tier/reduced-motion) viven en
+          guacamaya-luces.css. */}
+      {lucesActivas && (
+        <>
+          <defs>
+            <radialGradient id={`guacaAura-${sufijo}`} cx="50%" cy="50%" r="50%">
+              <stop offset="0%" stopColor="rgba(255, 244, 210, 0.55)" />
+              <stop offset="40%" stopColor="rgba(255, 206, 120, 0.30)" />
+              <stop offset="66%" stopColor="rgba(190, 158, 255, 0.20)" />
+              <stop offset="100%" stopColor="rgba(150, 214, 255, 0)" />
+            </radialGradient>
+            <radialGradient id={`guacaMota-${sufijo}`} cx="50%" cy="50%" r="50%">
+              <stop offset="0%" stopColor="rgba(255, 250, 224, 0.98)" />
+              <stop offset="55%" stopColor="rgba(214, 190, 255, 0.55)" />
+              <stop offset="100%" stopColor="rgba(190, 158, 255, 0)" />
+            </radialGradient>
+          </defs>
+          <g className="guaca-luces" aria-hidden="true">
+            <circle
+              className="guaca-aura"
+              cx="0"
+              cy="-10"
+              r="410"
+              fill={`url(#guacaAura-${sufijo})`}
+            />
+            {MOTAS_LUZ.map((m, i) => (
+              <g key={i} transform={`rotate(${m.ang})`}>
+                <circle
+                  className="guaca-luz"
+                  cx="0"
+                  cy="0"
+                  r={m.r}
+                  fill={`url(#guacaMota-${sufijo})`}
+                  style={{
+                    '--r0': `${m.r0}px`,
+                    '--r1': `${m.r1}px`,
+                    '--dur': `${m.dur}s`,
+                    '--d': `${m.d}ms`,
+                  }}
+                />
+              </g>
+            ))}
+          </g>
+        </>
+      )}
+      {/* rig reusado del valle (F24), no redibujado — ver nota de arriba.
+          `guaca-rig` marca el wrapper (NO el arte) para distinguirlo de la
+          capa de luces al inspeccionar/testear. */}
+      <g className="guaca-rig" dangerouslySetInnerHTML={{ __html: marcado }} />
     </svg>
   );
 }
