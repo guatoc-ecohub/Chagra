@@ -300,7 +300,15 @@ import Crisopa from './Crisopa.jsx';
 import Trichogramma from './Trichogramma.jsx';
 import Sirfido from './Sirfido.jsx';
 import Gallina from './Gallina.jsx';
-import ZariguyaLaminaViva from './ZariguyaLaminaViva.jsx';
+/* LA ZARIGÜEYA DEL ELENCO = ZariguyaTrazado (decisión operador 2026-08-25,
+   DEFINITIVA): la lámina AUTO-TRAZADA a tinta sobre el esqueleto de huesos
+   (clip-regiones, método aprobado del jaguar) reemplaza a `ZariguyaLaminaViva`
+   y al SET GEMINI. Drop-in like-for-like: mismo <div data-creature="zariguya"
+   role="img">, cadencia propia (zariguyaTrazado/zariguyaHuesos.css) y CUERPO
+   ENTERO en todos los estados (cero salto a close-up de cabeza). TAMAÑO
+   conservado (ZARIGUYA_PRESENCIA sin cambios). `ZariguyaLaminaViva.jsx` y
+   `ZariguyaGeminiLaminaViva.jsx` NO se borran (huérfanos, por historia). */
+import ZariguyaTrazado from './ZariguyaTrazado.jsx';
 import LuciernagaLaminaViva from './LuciernagaLaminaViva.jsx';
 import OsoBastonLaminaViva from './OsoBastonLaminaViva.jsx';
 import ChivitoPunkLaminaViva from './ChivitoPunkLaminaViva.jsx';
@@ -346,7 +354,7 @@ export const CREATURES = {
   gallina: { Component: Gallina, nombre: 'Gallina criolla', cientifico: 'Gallus gallus domesticus' },
   // El marsupial nocturno de la finca (la que sale de noche a limpiar la
   // huerta — con las crías al lomo).
-  zariguya: { Component: ZariguyaLaminaViva, nombre: 'Zarigüeya (chucha)', cientifico: 'Didelphis marsupialis' },
+  zariguya: { Component: ZariguyaTrazado, nombre: 'Zarigüeya (chucha)', cientifico: 'Didelphis marsupialis' },
   // El escarabajo bioluminiscente de la finca (la guía que lee la noche — su
   // linterna es un medidor vivo del cambio climático).
   luciernaga: { Component: LuciernagaLaminaViva, nombre: 'Luciérnaga (cocuyo)', cientifico: 'Lampyridae' },
