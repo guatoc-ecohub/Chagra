@@ -23,6 +23,9 @@
  *     hace florecer (su reacción-firma).
  *   · DIURNO: de noche ACAMPA — el perfil idle 'oso-baston' lo acurruca junto
  *     al cayado (aquí SÍ se pasa la hora tal cual, al revés de la zarigüeya).
+ *   · VIRAJE MÍSTICO (operador 2026-08-24): al cambiar de sentido NO gira —
+ *     el oso-espíritu se DESVANECE y REAPARECE (parpadeo espectral de
+ *     opacidad 1→0→1), igual que el jaguar-compai. Reemplaza el scaleX(-1).
  *   · SALIDA: se va caminando por donde vino, a su paso (un caminante no
  *     corre), y se apaga en CRUCE_SUELTA_MS (el reloj del overlay del host).
  *
@@ -105,6 +108,13 @@ export function useCaminataOsoBaston(foco, {
   const ultimoTf = useRef('');
   const ultimaPose = useRef('anda');
   const prevX = useRef(foco.x);
+  // VIRAJE MÍSTICO (operador 2026-08-24): el oso-espíritu NO gira — al
+  // cambiar de sentido horizontal se DESVANECE y REAPARECE (parpadeo
+  // espectral de opacidad sobre caraRef), en vez de espejarse con scaleX.
+  // Mismo lenguaje que el jaguar-compai. Refs → cero re-render por frame.
+  const signoCara = useRef(0);      // sentido horizontal (-1|1); 0 = aún sin fijar
+  const apagoEn = useRef(null);     // t del inicio del parpadeo; null = presente
+  const ultimaOpCara = useRef('');  // cache del write de opacidad
   const aparecioRef = useRef(false);
   // Fase de entrada: 'oculta' (pre-ancla) → 'caminata' (llega) → 'no'.
   const fase = useRef(cruce && !reducedMotion ? 'oculta' : 'no');
@@ -141,7 +151,8 @@ export function useCaminataOsoBaston(foco, {
       ponModo('marcha');
       _dest.set(foco.x - ENTRA_DESDE_X * 1.6, piso + PERCHA.y, foco.z + 0.35);
       ref.current.position.lerp(_dest, 0.09);
-      if (caraRef.current) caraRef.current.style.transform = 'scaleX(-1)'; // mira por donde se va
+      // NO gira al salir: se retira y se disuelve por visibilidad (ponVis) —
+      // el volteo por scaleX se retiró con el viraje místico.
       state.invalidate();
       return;
     }
@@ -218,11 +229,29 @@ export function useCaminataOsoBaston(foco, {
       if (onLlega) onLlega(true);
     }
 
-    // VOLTEO: mira hacia donde camina.
+    // VIRAJE MÍSTICO (operador 2026-08-24): el oso-espíritu NO gira — al
+    // invertir el sentido horizontal se DESVANECE y REAPARECE (parpadeo
+    // espectral de opacidad ~0.55s: 1 → 0 → 1), en vez de espejarse con
+    // scaleX. Solo opacity (GPU); el paso del caminante (lerp hacia el foco)
+    // reencara el rumbo mientras está invisible.
     if (caraRef.current) {
-      const vx = ref.current.position.x - prevX.current;
-      if (Math.abs(vx) > 0.0015) caraRef.current.style.transform = `scaleX(${vx < 0 ? -1 : 1})`;
+      const dx = ref.current.position.x - prevX.current;
+      if (Math.abs(dx) > 0.0015) {
+        const signo = dx < 0 ? -1 : 1;
+        if (signoCara.current !== 0 && signo !== signoCara.current && !reducedMotion && apagoEn.current === null) {
+          apagoEn.current = t; // dispara el teletransporte espectral
+        }
+        signoCara.current = signo;
+      }
       prevX.current = ref.current.position.x;
+      let op = 1;
+      if (apagoEn.current !== null) {
+        const k = (t - apagoEn.current) / 0.55;
+        if (k >= 1) apagoEn.current = null;
+        else op = Math.abs(Math.cos(k * Math.PI)); // baja a 0 a mitad y vuelve
+      }
+      const ops = op.toFixed(2);
+      if (ops !== ultimaOpCara.current) { caraRef.current.style.opacity = ops; ultimaOpCara.current = ops; }
     }
 
     // El gesto del frame (vaivén del paso + idle de personalidad) — un solo
