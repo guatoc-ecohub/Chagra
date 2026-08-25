@@ -26,13 +26,9 @@
  *     Nunca acecha a la cámara: el rumbo del acecho es el mismo de su paso.
  *
  *  3. AL VIRAR — DOS LENGUAJES. La lámina está dibujada mirando a un lado.
- *     · CLÁSICO (aparicion=false): se ESPEJA con `scaleX(-1)` suavizado
- *       (proyectando la velocidad al eje derecha de la cámara) — compat.
- *     · MÍSTICO (aparicion=true, el jaguar-compai): NO gira — se DESVANECE y
- *       REAPARECE (teletransporte espectral, solo opacity). En el instante
- *       invisible da un paso adelante en su nuevo rumbo y se materializa ya
- *       encarado hacia allá. Decisión del operador: el jaguar aparece/
- *       desaparece místicamente en vez de dar la vuelta.
+ *     · MÍSTICO: NO gira — se DESVANECE y REAPARECE (teletransporte
+ *       espectral, solo opacity). En el instante invisible da un paso adelante
+ *       en su nuevo rumbo y se materializa ya encarado hacia allá.
  *
  *  4. SOMBRA DE CONTACTO PEGADA. Una mancha cálida bajo las zarpas que lo ancla
  *     al piso (+1 draw call, opcional por `suelo`). La sombra del jaguar casi no
@@ -62,7 +58,7 @@ const _right = new Vector3();
 const ESTILO_JAGUAR = {
   filter: 'drop-shadow(0 3px 4px rgba(28, 20, 11, 0.34))',
   pointerEvents: 'none',
-  willChange: 'transform',
+  willChange: 'opacity',
 };
 
 /* Velocidades en unidades de mundo por segundo. El jaguar real camina con paso
@@ -83,9 +79,8 @@ const V_ACECHA = 0.24;
  * @param {number} [props.factor=9] distanceFactor del <Html> (escala en mundo).
  * @param {boolean} [props.animated=true] false = quieto y digno (tier bajo / RM).
  * @param {string}  [props.tier]   device-tier ('bajo' poda acecho + sombra).
- * @param {boolean} [props.aparicion=false] MODO MÍSTICO: en vez de espejarse al
- *   virar, el jaguar-espíritu se DESVANECE y REAPARECE (teletransporte
- *   espectral). false = modo clásico (espejo scaleX, compat).
+ * @param {boolean} [props.aparicion=true] compatibilidad histórica. El modo
+ *   del jaguar es siempre místico.
  */
 export default function JaguarBillboard({
   centro = [0, 0, 0],
@@ -96,7 +91,6 @@ export default function JaguarBillboard({
   factor = 9,
   animated = true,
   tier,
-  aparicion = false,
 }) {
   const grupo = useRef(/** @type {any} */ (null));
   const capa = useRef(/** @type {HTMLDivElement|null} */ (null));
@@ -131,11 +125,10 @@ export default function JaguarBillboard({
       rumbo: azar(0, Math.PI * 2),
       x: inicio.x, z: inicio.z,
       px: inicio.x, pz: inicio.z,
-      esp: 1, espT: 1,        // espejo (scaleX) suavizado — SOLO en modo clásico
       signo: undefined,       // rumbo proyectado a pantalla (-1|1): detecta el viraje
       fadeOp: 1, fadeT: 1, teleport: false, lastOp: '', // teletransporte espectral
       proxAcecho: azar(26, 55),
-      lastTf: '', dataAnda: true,
+      dataAnda: true,
       init: false,
     };
   }
@@ -190,12 +183,8 @@ export default function JaguarBillboard({
     /* ── VIRAJE: rumbo proyectado a pantalla ────────────────────────────────
        El trazado está dibujado mirando a un lado. Al cambiar de rumbo hay dos
        lenguajes según el modo:
-        · CLÁSICO (aparicion=false): se ESPEJA con scaleX suavizado (un felino
-          gira el cuerpo, no parpadea de lado) — compat con consumidores viejos.
-        · MÍSTICO (aparicion=true): el jaguar-espíritu NO gira — se DESVANECE y
-          REAPARECE (teletransporte espectral). El viraje dispara un ciclo de
-          opacidad; en el instante invisible da un paso adelante en su nuevo
-          rumbo y se vuelve a materializar, ya encarado hacia allá. */
+        · MÍSTICO: el jaguar-espíritu NO gira — se DESVANECE y REAPARECE
+          (teletransporte espectral). */
     if (!s.init) { s.px = s.x; s.pz = s.z; s.init = true; }
     const vx = (s.x - s.px) / dt;
     const vz = (s.z - s.pz) / dt;
@@ -208,36 +197,23 @@ export default function JaguarBillboard({
         const signo = proy < 0 ? -1 : 1;
         if (s.signo !== undefined && signo !== s.signo) vira = true;
         s.signo = signo;
-        s.espT = signo;
       }
     }
 
     const capaEl = capa.current;
-    if (aparicion) {
-      // MÍSTICO: el viraje agenda el teletransporte (si no hay uno en curso).
-      if (vira && !s.teleport && s.fadeT === 1) { s.teleport = true; s.fadeT = 0; }
-      // lerp de opacidad (materializarse/disolverse — solo opacity, GPU).
-      s.fadeOp += clamp(s.fadeT - s.fadeOp, -dt * 2.6, dt * 2.6);
-      if (s.teleport && s.fadeOp < 0.06) {
-        // instante invisible: reaparece un paso adelante, ya en su nuevo rumbo.
-        s.x += Math.cos(s.rumbo) * 0.55;
-        s.z += Math.sin(s.rumbo) * 0.55;
-        s.teleport = false;
-        s.fadeT = 1;
-      }
-      if (capaEl) {
-        const op = s.fadeOp.toFixed(2);
-        if (op !== s.lastOp) { capaEl.style.opacity = op; s.lastOp = op; }
-        // el modo místico jamás espeja: deja el transform limpio (una vez).
-        if (s.lastTf !== 'none') { capaEl.style.transform = 'none'; s.lastTf = 'none'; }
-      }
-    } else {
-      // CLÁSICO: espejo suavizado (un felino gira el cuerpo, no parpadea de lado).
-      s.esp += clamp(s.espT - s.esp, -dt * 4, dt * 4);
-      if (capaEl) {
-        const tf = `scaleX(${s.esp.toFixed(2)})`;
-        if (tf !== s.lastTf) { capaEl.style.transform = tf; s.lastTf = tf; }
-      }
+    // El viraje siempre usa el lenguaje místico. El cuerpo no gira: se
+    // disuelve, da un paso y reaparece con el nuevo rumbo.
+    if (vira && !s.teleport && s.fadeT === 1) { s.teleport = true; s.fadeT = 0; }
+    s.fadeOp += clamp(s.fadeT - s.fadeOp, -dt * 2.6, dt * 2.6);
+    if (s.teleport && s.fadeOp < 0.06) {
+      s.x += Math.cos(s.rumbo) * 0.55;
+      s.z += Math.sin(s.rumbo) * 0.55;
+      s.teleport = false;
+      s.fadeT = 1;
+    }
+    if (capaEl) {
+      const op = s.fadeOp.toFixed(2);
+      if (op !== s.lastOp) { capaEl.style.opacity = op; s.lastOp = op; }
     }
 
     // ¿se está DESPLAZANDO? → marcha de perfil; ¿parado a observar? → frontal.
@@ -252,7 +228,7 @@ export default function JaguarBillboard({
       sombra.current.position.set(s.x, yDe(s.x, s.z) + 0.04, s.z);
       // En modo místico la sombra se DISUELVE con el felino (si no, quedaría una
       // mancha flotando sobre el suelo mientras el espíritu está invisible).
-      if (aparicion && sombra.current.material) {
+      if (sombra.current.material) {
         sombra.current.material.opacity = 0.3 * s.fadeOp;
       }
     }
@@ -268,7 +244,7 @@ export default function JaguarBillboard({
             {/* SKIN definitiva del jaguar (operador 2026-08-24): JaguarTrazado,
                 la lámina auto-trazada a tinta. Su marcha de perfil ('caminando')
                 y su idle vivo viven en jaguarHuesos.css. El teletransporte
-                espectral (aparicion) lo maneja el useFrame de arriba sobre la
+                espectral lo maneja el useFrame de arriba sobre la
                 opacidad de ESTE nodo — el skin no necesita saberlo. */}
             <JaguarTrazado
               size={px}

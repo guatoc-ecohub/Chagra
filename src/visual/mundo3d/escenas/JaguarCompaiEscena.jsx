@@ -102,7 +102,7 @@ export function useAndanzaJaguar(foco, {
   const prevX = useRef(foco.x);
   // VIRAJE MÍSTICO (operador 2026-08-24): el jaguar-espíritu NO gira — al
   // cambiar de sentido horizontal se DESVANECE y REAPARECE (parpadeo espectral
-  // de opacidad sobre caraRef), en vez de espejarse con scaleX. Refs → cero
+  // de opacidad sobre caraRef), en vez de girar. Refs → cero
   // re-render por frame.
   const signoCara = useRef(0);      // sentido horizontal (-1|1); 0 = aún sin fijar
   const apagoEn = useRef(null);     // t del inicio del parpadeo; null = presente
@@ -214,7 +214,7 @@ export function useAndanzaJaguar(foco, {
 
     // VIRAJE MÍSTICO: el jaguar-espíritu NO gira — al invertir el sentido
     // horizontal se DESVANECE y REAPARECE (parpadeo espectral de opacidad,
-    // ~0.55s: 1 → 0 → 1), en vez de espejarse con scaleX. Solo opacity (GPU).
+    // ~0.55s: 1 → 0 → 1), en vez de girar. Solo opacity (GPU).
     if (caraRef.current) {
       const dx = ref.current.position.x - prevX.current;
       if (Math.abs(dx) > 0.0015) {
@@ -339,7 +339,7 @@ export function JaguarCompaiEscena({
           >
             <div ref={reboteRef} className="mundo-abeja__rebote">
               {/* Capa del gesto (hombros + idle) — imperativa por frame; propia
-                  para no pisar la transition del volteo de la cara. */}
+                  para no pisar la aparición mística de la cara. */}
               <div ref={idleRef} style={{ transformOrigin: 'center bottom' }} data-creature={JAGUAR_SLUG}>
                 <div ref={caraRef} className="mundo-abeja__cara">
                   <JaguarTrazado

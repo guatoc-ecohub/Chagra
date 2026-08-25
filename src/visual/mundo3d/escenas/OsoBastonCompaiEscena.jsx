@@ -25,7 +25,7 @@
  *     al cayado (aquí SÍ se pasa la hora tal cual, al revés de la zarigüeya).
  *   · VIRAJE MÍSTICO (operador 2026-08-24): al cambiar de sentido NO gira —
  *     el oso-espíritu se DESVANECE y REAPARECE (parpadeo espectral de
- *     opacidad 1→0→1), igual que el jaguar-compai. Reemplaza el scaleX(-1).
+ *     opacidad 1→0→1), igual que el jaguar-compai. Reemplaza el giro.
  *   · SALIDA: se va caminando por donde vino, a su paso (un caminante no
  *     corre), y se apaga en CRUCE_SUELTA_MS (el reloj del overlay del host).
  *
@@ -110,7 +110,7 @@ export function useCaminataOsoBaston(foco, {
   const prevX = useRef(foco.x);
   // VIRAJE MÍSTICO (operador 2026-08-24): el oso-espíritu NO gira — al
   // cambiar de sentido horizontal se DESVANECE y REAPARECE (parpadeo
-  // espectral de opacidad sobre caraRef), en vez de espejarse con scaleX.
+  // espectral de opacidad sobre caraRef), en vez de girar.
   // Mismo lenguaje que el jaguar-compai. Refs → cero re-render por frame.
   const signoCara = useRef(0);      // sentido horizontal (-1|1); 0 = aún sin fijar
   const apagoEn = useRef(null);     // t del inicio del parpadeo; null = presente
@@ -152,7 +152,7 @@ export function useCaminataOsoBaston(foco, {
       _dest.set(foco.x - ENTRA_DESDE_X * 1.6, piso + PERCHA.y, foco.z + 0.35);
       ref.current.position.lerp(_dest, 0.09);
       // NO gira al salir: se retira y se disuelve por visibilidad (ponVis) —
-      // el volteo por scaleX se retiró con el viraje místico.
+      // el giro se retiró con el viraje místico.
       state.invalidate();
       return;
     }
@@ -231,8 +231,8 @@ export function useCaminataOsoBaston(foco, {
 
     // VIRAJE MÍSTICO (operador 2026-08-24): el oso-espíritu NO gira — al
     // invertir el sentido horizontal se DESVANECE y REAPARECE (parpadeo
-    // espectral de opacidad ~0.55s: 1 → 0 → 1), en vez de espejarse con
-    // scaleX. Solo opacity (GPU); el paso del caminante (lerp hacia el foco)
+    // espectral de opacidad ~0.55s: 1 → 0 → 1), en vez de girar. Solo opacity
+    // (GPU); el paso del caminante (lerp hacia el foco)
     // reencara el rumbo mientras está invisible.
     if (caraRef.current) {
       const dx = ref.current.position.x - prevX.current;
@@ -370,7 +370,7 @@ export function OsoBastonCompaiEscena({
           >
             <div ref={reboteRef} className="mundo-abeja__rebote">
               {/* Capa del gesto (vaivén del paso + idle) — imperativa por
-                  frame; propia para no pisar el volteo de la cara. */}
+                  frame; propia para no pisar la aparición mística de la cara. */}
               <div ref={idleRef} style={{ transformOrigin: 'center bottom' }} data-creature={OSO_BASTON_SLUG}>
                 <div ref={caraRef} className="mundo-abeja__cara">
                   <OsoBaston

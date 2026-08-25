@@ -472,10 +472,20 @@ export default function ProdChagraApp() {
   // Las rutas 3D son públicas; lo que pide sesión es la finca del campesino.
   if (!auth && !RUTAS.has(currentView) && currentView !== 'valle3d'
       && currentView !== 'login' && currentView !== 'oauth-callback') {
-    return <Suspense fallback={<ChagraGrowLoader />}><LoginScreen onLoginSuccess={handleLoginSuccess} onSave={() => {}} /></Suspense>;
+    return (
+      <Suspense fallback={<ChagraGrowLoader />}>
+        <LoginScreen onLoginSuccess={handleLoginSuccess} onSave={() => {}} />
+        <AgentFab onNavigate={navigate} pantalla="login" />
+      </Suspense>
+    );
   }
   if (currentView === 'login') {
-    return <Suspense fallback={<ChagraGrowLoader />}><LoginScreen onLoginSuccess={handleLoginSuccess} onSave={() => {}} /></Suspense>;
+    return (
+      <Suspense fallback={<ChagraGrowLoader />}>
+        <LoginScreen onLoginSuccess={handleLoginSuccess} onSave={() => {}} />
+        <AgentFab onNavigate={navigate} pantalla="login" />
+      </Suspense>
+    );
   }
   if (currentView === 'oauth-callback') {
     return <Suspense fallback={<ChagraGrowLoader />}><OAuthCallback onSuccess={() => navigate('valle3d')} onError={() => navigate('login')} /></Suspense>;
@@ -581,11 +591,8 @@ export default function ProdChagraApp() {
           (una sola abeja — feedback del operador 2026-07-16: "se ven 3
           abejitas") y la barra "Pregúntele a su finca…" abre el agente. */}
       {!esHome
-        && currentView !== 'loading'
         && currentView !== 'agente'
         && currentView !== 'voz'
-        && !currentView.startsWith('mockup_')
-        && !currentView.startsWith('onboarding')
         && (
         <AgentFab onNavigate={navigate} pantalla={currentView} />
       )}

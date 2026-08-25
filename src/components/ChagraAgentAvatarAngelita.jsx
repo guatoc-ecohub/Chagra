@@ -64,7 +64,7 @@ export default function ChagraAgentAvatarAngelita({
     // Presencia (pedido operador 2026-08-24): con reaccionaPresencia, Angelita
     // se mueve a su estado natural (idle vivo 'acompana') cuando la persona
     // hace mouse over o toca la pantalla — sin pisar un estado activo real.
-    reaccionaPresencia = false,
+    reaccionaPresencia = true,
     ...rest
 }) {
     // `estado` es el contrato rico de Angelita; `state` conserva compatibilidad

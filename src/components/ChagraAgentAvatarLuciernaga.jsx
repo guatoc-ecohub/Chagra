@@ -1,4 +1,5 @@
 import { Luciernaga } from '../visual/creatures/Luciernaga';
+import { useAngelitaPresencia, esPasivo } from '../visual/agente/useAngelitaPresencia';
 
 /**
  * ChagraAgentAvatarLuciernaga — la luciérnaga (cocuyo, Lampyridae) como CARA
@@ -46,10 +47,13 @@ export default function ChagraAgentAvatarLuciernaga({
     glow = false,
     className = '',
     ariaLabel = 'Chagra IA',
+    reaccionaPresencia = true,
 }) {
-    const pose = POSE_DE_STATE[state] || 'vuela';
-    const eco = ECO_DE_STATE[state] || null;
-    const visema = VISEMA_DE_STATE[state] || null;
+    const { despierta, handlers: handlersPresencia } = useAngelitaPresencia({ activo: reaccionaPresencia });
+    const estadoEfectivo = despierta && esPasivo(state) ? 'idle' : state;
+    const pose = POSE_DE_STATE[estadoEfectivo] || 'vuela';
+    const eco = ECO_DE_STATE[estadoEfectivo] || null;
+    const visema = VISEMA_DE_STATE[estadoEfectivo] || null;
 
     const bicho = (
         <Luciernaga
@@ -84,6 +88,7 @@ export default function ChagraAgentAvatarLuciernaga({
                 aria-label={ariaLabel}
                 title={ariaLabel}
                 style={{ background: 'none', border: 'none', padding: 0, cursor: 'pointer', lineHeight: 0 }}
+                {...handlersPresencia}
             >
                 {contenido}
             </button>

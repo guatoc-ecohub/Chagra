@@ -1,27 +1,21 @@
-import ZariguyaTrazado from '../visual/creatures/ZariguyaTrazado';
+import ZariguyaGeminiLaminaViva from '../visual/creatures/ZariguyaGeminiLaminaViva';
 import { useAngelitaPresencia, esPasivo } from '../visual/agente/useAngelitaPresencia';
 
 /**
  * ChagraAgentAvatarZariguya — la zarigüeya como CARA del agente de Chagra,
  * 3ra opción junto a Angelita y el maíz (operador 2026-07-25).
  *
- * Rama `feat/zariguya-trazado-nivel-jaguar` (2026-08-25): el cuerpo pasa a
- * `ZariguyaTrazado` — la lámina AUTO-TRAZADA a tinta (vectorizada con la
- * receta vtracer/trazar-lamina.sh, método Humboldt+Cuphead aprobado)
- * articulada por CLIP-REGIONES sobre el ESQUELETO DE HUESOS. REEMPLAZA aquí
- * al SET GEMINI (`ZariguyaGeminiLaminaViva`, rechazado en revisión visual —
- * y con el bug de saltar a un primer-plano de SOLO la cabeza en algunos
- * estados). El trazado renderiza SIEMPRE el cuerpo entero (un solo SVG con
- * clip-regiones): cero salto a close-up, coherente en todos los estados.
- * `ZariguyaGeminiLaminaViva` NO se borra (queda huérfano en `visual/
- * creatures/`, por historia); solo el agente deja de usarlo.
+ * Arte aprobado por el SSOT: `ZariguyaGeminiLaminaViva`, la lámina raster
+ * Gemini con poses completas, crías y articulación de vida. El comportamiento
+ * común decide cuándo se mueve y aparece, nunca cambia este arte por una piel
+ * alternativa.
  *
  * Adaptador puro (mismo contrato que ChagraAgentAvatarJaguar/OsoBaston):
  * traduce la API histórica del avatar del agente (state 'idle'|'thinking'|
  * 'speaking'|'listening'|'caminando', glow, withLabel, onClick/onDoubleClick)
- * al contrato de `ZariguyaTrazado`, que ya canoniza esos estados (y sus
+ * al contrato de `ZariguyaGeminiLaminaViva`, que ya canoniza esos estados y sus
  * sinónimos) en `ESTADO_CANON` y les da pose/cadencia propia en
- * `zariguyaTrazado/zariguyaHuesos.css`. `state` viaja como `estado` y queda
+ * `zariguyaGeminiLamina/`. `state` viaja como `estado` y queda
  * expuesto en `data-agt-estado` (paridad de API / accesibilidad).
  *
  * PRESENCIA (pedido operador 2026-08-24, transversal al elenco — mismo
@@ -53,7 +47,7 @@ export default function ChagraAgentAvatarZariguya({
     // reaccionaPresencia la zarigüeya DESPIERTA a su idle vivo al detectar
     // presencia, sin pisar una actuación conversacional real. Mismo contrato
     // que ChagraAgentAvatarAngelita/Jaguar.
-    reaccionaPresencia = false,
+    reaccionaPresencia = true,
 }) {
     const { despierta, handlers: handlersPresencia } = useAngelitaPresencia({
         activo: reaccionaPresencia,
@@ -66,7 +60,7 @@ export default function ChagraAgentAvatarZariguya({
     const visema = VISEMA_DE_STATE[estadoEfectivo] || null;
 
     const bicho = (
-        <ZariguyaTrazado
+        <ZariguyaGeminiLaminaViva
             estado={estadoEfectivo}
             visema={visema}
             size={size}

@@ -62,17 +62,16 @@ describe('compaiRegistry.resolverCompai', () => {
     for (const tipo of ['guacamaya', 'chivito-punk']) {
       const c = resolverCompai(tipo);
       expect(c.avatarType).toBe(tipo);
-      expect(c.pendienteFable, `${tipo} debería seguir pendienteFable`).toBe(true);
-      expect(c.EscenaComponent).toBeNull();
-      expect(c.esFallback).toBe(true);
+      expect(c.pendienteFable, `${tipo} no debería quedar pendiente`).toBe(false);
+      expect(typeof c.EscenaComponent).toBe('function');
+      expect(c.esFallback).toBe(false);
       expect(c.especie).toBe(tipo);
-      // Cae a la presencia de la abeja (regla del fallback) — no lanza.
-      expect(c.presencia).toBe(ABEJA_PRESENCIA);
+      expect(c.presencia).not.toBe(ABEJA_PRESENCIA);
     }
   });
 
-  it('los cinco compañeros con escena propia son DISTINTOS entre sí (ni presencia ni escena repetida)', () => {
-    const tipos = ['angelita', 'zariguya', 'jaguar', 'oso-baston', 'luciernaga'];
+  it('los siete compañeros con escena propia son DISTINTOS entre sí', () => {
+    const tipos = ['angelita', 'zariguya', 'jaguar', 'oso-baston', 'luciernaga', 'guacamaya', 'chivito-punk'];
     const presencias = new Set(tipos.map((t) => resolverCompai(t).presencia));
     expect(presencias.size, 'dos tipos comparten la MISMA presencia (recoloreo)').toBe(tipos.length);
     const escenas = tipos.map((t) => resolverCompai(t).EscenaComponent).filter(Boolean);

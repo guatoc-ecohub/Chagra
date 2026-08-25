@@ -22,17 +22,16 @@ import { getHintForRuta } from '../config/compaiHints.js';
  * visible en todas las rutas 2D (Home, Perfil, Catálogo, Mapa, etc.).
  *
  * Estados:
- *   - Minimizado (por defecto): el compai a fondo TRANSPARENTE (sin disco de
- *     color detrás — un felino realista se veía aplastado en el círculo verde),
- *     con tamaño legible y sombra suave, que DEAMBULA por la franja inferior
- *     (~30% del ancho) para leerse vivo (useCompaiRoam).
+ *   - Minimizado (por defecto): el compai a fondo TRANSPARENTE, con tamaño
+ *     legible y sombra suave, que recorre la pantalla actual y conserva la
+ *     posición elegida (useCompaiRoam).
  *   - Expandido: panel con guía contextual, botón de voz.
  *
  * Comportamiento:
  *   - Toque en el compai → abre panel (toggle); mientras el panel está abierto
  *     el compai vuelve a casa y se queda quieto (no se corre bajo la guía).
- *   - El compai camina de un lado a otro con cadencia lenta y se espeja hacia
- *     donde anda; el jaguar corre su marcha real ('caminando') al desplazarse.
+ *   - El compai se desplaza según su especie y cambia de punto con aparición
+ *     mística, sin girar ni espejarse.
  *   - El hint cambia según la ruta actual (mapa ruta→hint, extensible)
  *   - Botón "Escuchar" usa TTS (kokoro, fail-silent si no hay saldo)
  *   - Respeta preferencias del usuario (avatar seleccionado en AvatarSelector)
@@ -46,7 +45,7 @@ import { getHintForRuta } from '../config/compaiHints.js';
  */
 
 /* Compai con MARCHA real: al deambular corren su ciclo de andar ('caminando')
-   en vez de quedarse en idle espejado. El jaguar (rig de perfil #jaguarLado),
+   en vez de quedarse en idle. El jaguar (rig de perfil #jaguarLado),
    el oso del bastón (pose 'camina' de la piel-lámina musculosa) y la zarigüeya
    (marcha bípeda de la piel AUTO-TRAZADA sobre huesos, zariguyaHuesos.css). */
 const CON_MARCHA = new Set(['jaguar', 'oso-baston', 'zariguya']);
@@ -70,13 +69,18 @@ export default function CompaiOverlay({ currentView = 'dashboard' }) {
   const [compaiState, setCompaiState] = useState('idle'); // idle, thinking, speaking, listening
   const [lastView, setLastView] = useState(currentView);
 
-  // El compai DEAMBULA por la franja inferior (~30% del ancho): se pausa (y
-  // vuelve a casa) mientras el panel está abierto para que no se corra bajo la
-  // guía. El regreso es la misma caminata (nunca un salto). Ver useCompaiRoam.
+  // El compai recorre la pantalla actual y conserva la posición elegida por la
+  // persona. Ver useCompaiRoam.
   // `parada` se incrementa cada vez que LLEGA a un punto de su paseo — con eso
   // hacemos el "moverse-para-explicar" (ver la burbuja de parada más abajo).
   const roamRef = useRef(null);
-  const { caminando, hacia, parada } = useCompaiRoam(roamRef, { pausado: isOpen });
+  const { caminando, parada, handlers: comportamientoHandlers } = useCompaiRoam(roamRef, {
+    pausado: false,
+    especie: avatarType,
+    soloX: false,
+    superficie: currentView,
+    contentAware: true,
+  });
 
   // El mensaje contextual de la pantalla actual (capa BASE: qué es esta
   // pantalla). El compai lo muestra al parar y al abrir el panel.
@@ -124,30 +128,34 @@ export default function CompaiOverlay({ currentView = 'dashboard' }) {
   const avatarSize = esRealista ? 112 : 84;
 
   // Mientras deambula, los compai CON MARCHA real corren su ciclo de andar
-  // ('caminando'): el jaguar (JaguarTrazado, la lámina auto-trazada — su marcha
+  // ('caminando'): el jaguar (JaguarTrazado, la lámina auto-trazada, su marcha
   // de perfil vive en jaguarHuesos.css) y el oso del bastón (la marcha
   // plantígrada de la piel-lámina musculosa). El resto conserva su
-  // estado (no tienen pose de marcha) y solo se espejan. Un estado
+  // estado natural. Un estado
   // conversacional (hablar/escuchar/pensar) siempre gana a la caminata.
   const conMarcha = CON_MARCHA.has(avatarType);
   const estadoAvatar = conMarcha && caminando && compaiState === 'idle'
     ? 'caminando'
     : compaiState;
 
-  // Los compai miran a la IZQUIERDA por defecto (la lámina del jaguar tiene la
-  // testa a la izquierda); al volver hacia la derecha se espejan. GATE GPU: si
-  // el sentido sale invertido para algún compai, es voltear este mapeo.
-  const espejo = hacia === 'derecha' ? 'scaleX(-1)' : 'none';
-
   return (
     <div
       className="fixed bottom-4 right-4 z-40 pointer-events-none"
       data-testid="compai-overlay-container"
     >
-      {/* El compai que deambula (roamRef desplaza SOLO este nodo por la franja;
-          el panel queda anclado a la esquina). La burbuja de parada viaja
+      {/* El compai que deambula (roamRef desplaza SOLO este nodo;
+          el panel queda anclado a la posición del compai). La burbuja de parada viaja
           DENTRO de este nodo → se queda pegada al compai donde se detuvo. */}
-      <div ref={roamRef} className="will-change-transform relative">
+      <div
+        ref={roamRef}
+        className="will-change-transform relative"
+        onPointerEnter={comportamientoHandlers.onPointerEnter}
+        onPointerLeave={comportamientoHandlers.onPointerLeave}
+        onPointerDown={comportamientoHandlers.onPointerDown}
+        onPointerMove={comportamientoHandlers.onPointerMove}
+        onPointerUp={comportamientoHandlers.onPointerUp}
+        onPointerCancel={comportamientoHandlers.onPointerCancel}
+      >
         {/* Burbuja de PARADA: al detenerse en su paseo, el compai "enuncia por
             mensaje" qué hay en esta pantalla (el hint de la ruta). Toque = abre
             el panel para leer más / escuchar. Solo cuando no está abierto el
@@ -179,18 +187,12 @@ export default function CompaiOverlay({ currentView = 'dashboard' }) {
           aria-expanded={isOpen}
           data-testid="compai-bubble"
         >
-          <span
-            className="inline-flex"
-            style={{
-              transform: espejo,
-              transition: 'transform 0.35s ease',
-              filter: 'drop-shadow(0 6px 9px rgba(0, 0, 0, 0.34))',
-            }}
-          >
+          <span className="inline-flex" style={{ filter: 'drop-shadow(0 6px 9px rgba(0, 0, 0, 0.34))' }}>
             <ChagraAgentAvatar
               size={avatarSize}
               state={estadoAvatar}
               ariaLabel={`${nombreCompai}, asistente de Chagra`}
+              reaccionaPresencia
             />
           </span>
         </button>

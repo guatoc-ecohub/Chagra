@@ -1,4 +1,5 @@
 import ChivitoPunk from '../visual/creatures/ChivitoPunk';
+import { useAngelitaPresencia, esPasivo } from '../visual/agente/useAngelitaPresencia';
 
 /**
  * ChagraAgentAvatarChivitoPunk — el chivito de páramo (Oxypogon guerinii)
@@ -24,10 +25,13 @@ export default function ChagraAgentAvatarChivitoPunk({
     glow = false,
     className = '',
     ariaLabel = 'Chagra IA',
+    reaccionaPresencia = true,
 }) {
+    const { despierta, handlers: handlersPresencia } = useAngelitaPresencia({ activo: reaccionaPresencia });
+    const estadoEfectivo = despierta && esPasivo(state) ? 'idle' : state;
     const bicho = (
         <ChivitoPunk
-            state={state}
+            state={estadoEfectivo}
             size={size}
             title={ariaLabel}
             className={className}
@@ -55,6 +59,7 @@ export default function ChagraAgentAvatarChivitoPunk({
                 aria-label={ariaLabel}
                 title={ariaLabel}
                 style={{ background: 'none', border: 'none', padding: 0, cursor: 'pointer', lineHeight: 0 }}
+                {...handlersPresencia}
             >
                 {contenido}
             </button>

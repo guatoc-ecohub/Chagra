@@ -4,9 +4,8 @@
  *
  * Molde: useEntradaAbeja/AbejaEscena (la escena posee la coreografía, la
  * creature posee el cuerpo). SKIN DEFINITIVA (operador 2026-08-25):
- * `ZariguyaTrazado` — la lámina AUTO-TRAZADA a tinta sobre el esqueleto de
- * huesos (clip-regiones), la misma técnica del jaguar. REEMPLAZA al vector
- * rubber-hose `Zariguya.jsx` en el valle. Pero la chucha NO vuela — es un
+ * `ZariguyaGeminiLaminaViva` — la lámina raster Gemini aprobada, con sus
+ * poses completas y vida propia. Pero la chucha NO vuela — es un
  * marsupial NOCTURNO de piso, y su coreografía entera sale de esa verdad:
  *
  *   · CAMINA: se desplaza PEGADA AL SUELO con trote de pasos cortos (bob de
@@ -19,11 +18,11 @@
  *     a un tronco — la cola prensil y las manitas son para eso.
  *   · RONDA: sin foco activo, MERODEA por el piso en óvalos irregulares
  *     (ondas co-primas, lentas). El HUSMEO ya no lo orquesta la escena: vive
- *     en el idle-cerebro del propio trazado (data-vida husmea/tanatosis/
+ *     en el idle-cerebro de la propia lámina (data-vida husmea/tanatosis/
  *     reposo, ver vidaEstados.js), su reacción-firma nativa.
  *   · VIRAJE MÍSTICO (operador 2026-08-25): al cambiar de sentido NO gira —
  *     la zarigüeya-espíritu se DESVANECE y REAPARECE (parpadeo espectral de
- *     opacidad 1→0→1), igual que el jaguar/oso-compai. Reemplaza el scaleX(-1).
+ *     opacidad 1→0→1), igual que el jaguar/oso-compai. Reemplaza el giro.
  *   · NOCTURNA: la noche es SU jornada — de noche no se acurruca como los
  *     demás: sigue trabajando (por eso NO se le pasa hora='noche' al idle).
  *   · SALIDA: sale CORRIENDO por donde vino y se apaga en CRUCE_SUELTA_MS
@@ -40,7 +39,7 @@ import { useEffect, useMemo, useRef } from 'react';
 import { useFrame } from '@react-three/fiber';
 import { Html } from '@react-three/drei';
 import * as THREE from 'three';
-import ZariguyaTrazado from '../../creatures/ZariguyaTrazado.jsx';
+import ZariguyaGeminiLaminaViva from '../../creatures/ZariguyaGeminiLaminaViva.jsx';
 import { ZARIGUYA_PRESENCIA, ZARIGUYA_TINTA, ZARIGUYA_SLUG } from '../../creatures/zariguyaIdentidad.js';
 import { idleDeCreature, IDLE_NEUTRO } from '../../creatures/creatureIdle.js';
 import { useLipSync } from '../../creatures/useLipSync.js';
@@ -105,7 +104,7 @@ export function useAndanzaZariguya(foco, {
   const prevX = useRef(foco.x);
   // VIRAJE MÍSTICO (operador 2026-08-25): la zarigüeya-espíritu NO gira — al
   // cambiar de sentido horizontal se DESVANECE y REAPARECE (parpadeo espectral
-  // de opacidad sobre caraRef), en vez de espejarse con scaleX. Refs → cero
+  // de opacidad sobre caraRef), en vez de girar. Refs → cero
   // re-render por frame.
   const signoCara = useRef(0);      // sentido horizontal (-1|1); 0 = aún sin fijar
   const apagoEn = useRef(null);     // t del inicio del parpadeo; null = presente
@@ -140,7 +139,7 @@ export function useAndanzaZariguya(foco, {
       _dest.set(foco.x - ENTRA_DESDE_X * 1.6, piso + PERCHA.y, foco.z + 0.35);
       ref.current.position.lerp(_dest, 0.22);
       // NO gira al salir: se retira y se disuelve por visibilidad (ponVis) —
-      // el volteo por scaleX se retiró con el viraje místico.
+      // el giro se retiró con el viraje místico.
       state.invalidate();
       return;
     }
@@ -206,8 +205,8 @@ export function useAndanzaZariguya(foco, {
 
     // VIRAJE MÍSTICO (operador 2026-08-25): la zarigüeya-espíritu NO gira — al
     // invertir el sentido horizontal se DESVANECE y REAPARECE (parpadeo
-    // espectral de opacidad ~0.55s: 1 → 0 → 1), en vez de espejarse con
-    // scaleX. Solo opacity (GPU); el trote (lerp hacia el foco) reencara el
+    // espectral de opacidad ~0.55s: 1 → 0 → 1), en vez de girar.
+    // Solo opacity (GPU); el trote (lerp hacia el foco) reencara el
     // rumbo mientras está invisible. Mismo lenguaje que el jaguar/oso-compai.
     if (caraRef.current) {
       const dx = ref.current.position.x - prevX.current;
@@ -259,10 +258,10 @@ export function useAndanzaZariguya(foco, {
 /**
  * La zarigüeya ya montada en una escena: drop-in del contrato de AbejaEscena
  * (CompaiEscena le pasa las mismas props). Billboard `<Html>` con la SKIN
- * definitiva `ZariguyaTrazado` (lámina auto-trazada a tinta sobre huesos,
+ * definitiva `ZariguyaGeminiLaminaViva` (lámina raster aprobada,
  * operador 2026-08-25); PULSA al narrar y REBOTA al toque con las clases
  * genéricas del billboard (`.mundo-abeja*`). Su husmeo/tanatosis/reposo corren
- * en el idle-cerebro del propio trazado. VIRAJE MÍSTICO: no gira — se
+ * en el idle-cerebro de la propia lámina. VIRAJE MÍSTICO: no gira — se
  * desvanece y reaparece.
  */
 export function ZariguyaCompaiEscena({
@@ -309,11 +308,11 @@ export function ZariguyaCompaiEscena({
   const vivo = !reducedMotion;
   // LIP-SYNC: la chucha "habla" cuando el agente narra (única boca del mundo).
   const { visema } = useLipSync({ activo: vivo });
-  // Estado del skin trazado: narra → 'speaking'; parado/idle → 'idle' (su
+  // Estado del skin Gemini: narra → 'speaking'; parado/idle → 'idle' (su
   // idle-cerebro 70/30 husmea/tanatosis/reposo corre solo). El trote se lee en
   // el waddle del idleRef + el desplazamiento del billboard, no en un
   // walk-cycle interno (así la marcha no se duplica con el bamboleo del molde).
-  const estadoTrazado = hablando && vivo ? 'speaking' : 'idle';
+  const estadoGemini = hablando && vivo ? 'speaking' : 'idle';
   const cruceVivo = cruce && !reducedMotion;
   return (
     <>
@@ -334,12 +333,12 @@ export function ZariguyaCompaiEscena({
           >
             <div ref={reboteRef} className="mundo-abeja__rebote">
               {/* Capa del gesto (waddle + idle) — imperativa por frame; propia
-                  para no pisar la transition del volteo de la cara. */}
+                  para no pisar la aparición mística de la cara. */}
               <div ref={idleRef} style={{ transformOrigin: 'center bottom' }} data-creature={ZARIGUYA_SLUG}>
                 <div ref={caraRef} className="mundo-abeja__cara">
-                  <ZariguyaTrazado
+                  <ZariguyaGeminiLaminaViva
                     size={size}
-                    estado={estadoTrazado}
+                    estado={estadoGemini}
                     visema={vivo ? visema : null}
                     animated={vivo}
                     tier={tier}

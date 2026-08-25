@@ -4406,14 +4406,11 @@ export default function App() {
           decisión del operador: lo quería fuera. La entrada por voz sigue
           disponible dentro del agente / compositor; este era solo el FAB
           global. */}
-      {/* AgentFab (el compai elegido, "respuesta lista") en todas las pantallas
-          salvo carga, login, onboarding y mockup. Incluye el home/dashboard;
-          los héroes del home ya no montan una segunda copia. En onboarding
-          (tarea #16) el FAB se encimaba
-          sobre el CTA "Explorar con finca de ejemplo" del footer y la usuaria
-          nueva aún no conoce al agente, ruido en su primer flujo. */}
+      {/* AgentFab: el único compai 2D del shell. Su presencia es constante en
+          todas las vistas que ya tienen shell, también durante interacción y
+          offline. La entrada mística es la única que puede desvanecerlo. */}
       <Suspense fallback={null}>
-        {currentView !== 'loading' && currentView !== 'login' && !currentView.startsWith('mockup_') && currentView !== 'onboarding-perfil' && currentView !== 'onboarding-perfil-clasico' && <AgentFab onNavigate={navigate} pantalla={currentView} />}
+        {currentView !== 'loading' && <AgentFab onNavigate={navigate} pantalla={currentView} />}
       </Suspense>
       {/* Escucha manos libres (operador 2026-07-05, caso guantes/manos
           embarradas). Abre el widget "Chagra está escuchando" que navega o

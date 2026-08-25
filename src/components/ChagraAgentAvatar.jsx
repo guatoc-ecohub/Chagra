@@ -5,7 +5,6 @@ import ChagraAgentAvatarOsoBaston from './ChagraAgentAvatarOsoBaston';
 import ChagraAgentAvatarLuciernaga from './ChagraAgentAvatarLuciernaga';
 import ChagraAgentAvatarGuacamaya from './ChagraAgentAvatarGuacamaya';
 import ChagraAgentAvatarChivitoPunk from './ChagraAgentAvatarChivitoPunk';
-import GuacamayaCompai from '../visual/creatures/GuacamayaCompai';
 import useCompaiElegido from '../visual/mundo3d/escenas/useCompaiElegido.js';
 
 /**
@@ -94,7 +93,7 @@ export default function ChagraAgentAvatar({ estado = undefined, ...props }) {
         // `visema`/`confianza`/etc. ya viajan dentro de `...props` — no hace
         // falta desestructurarlos aparte (mismo camino que usa Angelita).
         if (type === 'guacamaya') {
-            return <GuacamayaCompai estado={estado} {...props} />;
+            return <ChagraAgentAvatarGuacamaya estado={estado} {...props} />;
         }
         if (ComponenteAngosto) {
             return <ComponenteAngosto state={STATE_DE_ESTADO_RICO[estado] || 'idle'} {...props} />;

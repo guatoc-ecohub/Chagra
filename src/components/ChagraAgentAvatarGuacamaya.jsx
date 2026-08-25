@@ -1,4 +1,5 @@
 import GuacamayaCompai from '../visual/creatures/GuacamayaCompai';
+import { useAngelitaPresencia, esPasivo } from '../visual/agente/useAngelitaPresencia';
 
 /**
  * ChagraAgentAvatarGuacamaya — la guacamaya bandera (Ara macao) como CARA del
@@ -33,6 +34,7 @@ const VISEMA_DE_STATE = {
 
 export default function ChagraAgentAvatarGuacamaya({
     state = 'idle',
+    estado = undefined,
     size = 48,
     withLabel = false,
     onClick = undefined,
@@ -40,11 +42,16 @@ export default function ChagraAgentAvatarGuacamaya({
     glow = false,
     className = '',
     ariaLabel = 'Chagra IA',
+    reaccionaPresencia = true,
 }) {
-    const visema = VISEMA_DE_STATE[state] || null;
+    const { despierta, handlers: handlersPresencia } = useAngelitaPresencia({ activo: reaccionaPresencia });
+    const estadoBase = estado || state;
+    const estadoEfectivo = despierta && esPasivo(estadoBase) ? 'idle' : estadoBase;
+    const visema = VISEMA_DE_STATE[estadoEfectivo] || null;
     const bicho = (
         <GuacamayaCompai
-            state={state}
+            state={estadoEfectivo}
+            estado={despierta && esPasivo(estadoBase) ? undefined : estado}
             visema={visema}
             size={size}
             title={ariaLabel}
@@ -73,6 +80,7 @@ export default function ChagraAgentAvatarGuacamaya({
                 aria-label={ariaLabel}
                 title={ariaLabel}
                 style={{ background: 'none', border: 'none', padding: 0, cursor: 'pointer', lineHeight: 0 }}
+                {...handlersPresencia}
             >
                 {contenido}
             </button>
