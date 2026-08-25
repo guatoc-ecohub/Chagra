@@ -87,10 +87,13 @@ export const ZT_REGIONES = Object.freeze({
     [92, 88], [94, 56],
   ],
   cuello: [
+    /* el faldón inferior-izquierdo baja a y≈215: el ruff colgante de la
+       mejilla de la lámina Gemini vive ahí y debe MOVERSE con el cuello
+       (el vtracer lo perdía y el hueco no se veía). */
     [144, 126], [246, 126], [246, 128], [250, 134], [264, 134], [280, 130],
     [294, 124], [306, 116], [316, 108], [316, 120], [300, 134], [286, 146],
-    [272, 158], [256, 168], [238, 176], [218, 180], [196, 178], [176, 172],
-    [160, 162], [150, 148], [142, 136],
+    [272, 158], [256, 168], [238, 176], [218, 180], [196, 184], [184, 212],
+    [174, 198], [156, 188], [138, 180], [124, 168], [118, 152], [126, 138], [136, 128],
   ],
   mandibula: [
     [144, 82], [212, 82], [212, 104], [236, 104], [236, 78], [246, 78],
@@ -99,9 +102,13 @@ export const ZT_REGIONES = Object.freeze({
   orejaI: [[94, -6], [166, -6], [166, 54], [94, 54]],
   orejaD: [[214, -6], [276, -6], [276, 50], [214, 50]],
   brazoLapiz: [
+    /* techo = CRESTA superior del brazo Gemini (costura compartida con el
+       faldón del cuello): el pelo alto del brazo (y≈150-200) es del BRAZO.
+       El vtracer dejaba ese pelo vacío y el techo viejo (y≈170-208) no
+       dolía; con la lámina real dolía (banda sin dueño). */
     [0, 206], [0, 180], [8, 162], [18, 146], [30, 134], [44, 126],
-    [58, 122], [72, 122], [84, 128], [92, 140], [97, 154], [99, 170],
-    [102, 182], [112, 192], [126, 200], [140, 208], [154, 214], [166, 222],
+    [58, 122], [72, 122], [84, 128], [92, 140], [100, 148], [120, 162],
+    [140, 176], [158, 188], [174, 200], [184, 214], [188, 228],
     [172, 232], [168, 244], [156, 250], [140, 246], [124, 238], [108, 230],
     [92, 226], [76, 226], [58, 226], [40, 224], [20, 218],
   ],
@@ -112,7 +119,7 @@ export const ZT_REGIONES = Object.freeze({
     [16, 214],
   ],
   brazoBrujula: [
-    [84, 262], [86, 242], [96, 228], [112, 220], [132, 216], [152, 214],
+    [78, 264], [80, 238], [92, 224], [112, 218], [132, 216], [152, 214],
     [168, 210], [186, 204], [204, 200], [216, 204], [220, 214], [214, 226],
     [202, 234], [196, 244], [198, 262], [192, 280], [178, 294], [158, 302],
     [136, 300], [114, 292], [96, 280],
@@ -250,16 +257,16 @@ const FAUCES = casquete('mandibula',
    canónica los cierra con el blink irregular. Ojos MEDIDOS de la lámina:
    (184,76) r20 y (242,73) r20 (anatomia.OJO / OJO_2). ── */
 const PARPADOS = `
-  <path class="zh-parpado" style="transform-origin:175px 64px"
-    d="M161,68 C 167,60 183,60 189,68 C 191,75 190,84 185,89 C 178,93 171,92 166,86 C 161,79 160,73 161,68 Z" fill="${P.parpado}"/>
-  <path class="zh-parpado" style="transform-origin:241px 55px"
-    d="M228,59 C 233,51 249,51 254,59 C 256,66 255,75 251,80 C 245,84 236,83 232,77 C 228,70 227,64 228,59 Z" fill="${P.parpado}"/>`;
+  <path class="zh-parpado" style="transform-origin:175px 62px"
+    d="M152,70 C 160,60 190,60 197,70 C 199,79 198,91 191,98 C 181,103 166,102 158,95 C 152,88 150,78 152,70 Z" fill="${P.parpado}"/>
+  <path class="zh-parpado" style="transform-origin:246px 52px"
+    d="M227,60 C 234,50 258,50 264,60 C 266,70 265,84 258,92 C 249,98 236,97 230,89 C 225,80 224,68 227,60 Z" fill="${P.parpado}"/>`;
 
 /* halos nocturnos: apagados en reposo (opacity:0 inline — que la lámina sea
    la lámina); el modo actuando los enciende desde la CSS canónica. */
 const HALOS = `
-  <circle class="zh-ojoHalo" style="opacity:0" cx="175" cy="78" r="16" fill="url(#ztOjoHalo)"/>
-  <circle class="zh-ojoHalo" style="opacity:0" cx="241" cy="70" r="15" fill="url(#ztOjoHalo)"/>`;
+  <circle class="zh-ojoHalo" style="opacity:0" cx="176" cy="80" r="18" fill="url(#ztOjoHalo)"/>
+  <circle class="zh-ojoHalo" style="opacity:0" cx="245" cy="74" r="18" fill="url(#ztOjoHalo)"/>`;
 
 /* ─────────────────────── LA CABEZA (con sus satélites) ───────────────────── */
 
@@ -287,13 +294,13 @@ ${DEFS}
       <ellipse class="zh-sombraSuelo" cx="245" cy="438" rx="150" ry="11" fill="${P.sombraSuelo}" filter="url(#ztBlur)"/>
       <g class="zh-hueso zh-cuerpo"${origin('columna')}>
         <g class="zh-hueso zh-piernaLejos"${origin('piernaLejos')}>${usoCalco('piernaLejos')}</g>
-        ${casquete('colaBase', disco(H.colaBase[0], H.colaBase[1], 12, P.cola))}
+        ${casquete('colaBase', disco(H.colaBase[0] - 4, H.colaBase[1] + 4, 12, P.cola))}
         <g class="zh-hueso zh-colaBase"${origin('colaBase')}>
           ${usoCalco('colaBase')}
-          ${casquete('colaMedia', disco(H.colaMedia[0], H.colaMedia[1], 11, P.cola))}
+          ${casquete('colaMedia', disco(H.colaMedia[0] + 2, H.colaMedia[1] + 8, 11, P.cola))}
           <g class="zh-hueso zh-colaMedia"${origin('colaMedia')}>
             ${usoCalco('colaMedia')}
-            ${casquete('colaPunta', disco(H.colaPunta[0], H.colaPunta[1], 8, '#cfa48e'))}
+            ${casquete('colaPunta', disco(H.colaPunta[0] + 6, H.colaPunta[1], 8, '#cfa48e'))}
             <g class="zh-hueso zh-colaPunta"${origin('colaPunta')}>${usoCalco('colaPunta')}</g>
           </g>
         </g>
