@@ -1,70 +1,50 @@
 #!/usr/bin/env node
 /*
- * generar-calco — hornea el AUTO-TRAZADO de la lámina en un módulo JS plano.
+ * generar-calco — hornea la LÁMINA GEMINI ELEGIDA como calco RASTER.
  *
- * FUENTE (operador 2026-08-25): la lámina APROBADA es
- * `public/compai/laminas/zariguya-gemini-hero.png` — el hero Gemini SIN
- * GUANTES (la `zariguya.png` original traía los guantes blancos que el
- * operador ya había descartado; ver fix/zariguya-sin-guantes-*). Ambas viven
- * en el MISMO espacio 481×444 y comparten pose pixel-alineada, así que las
- * clip-regiones/pivotes hechos a mano de pielTrazado.js siguen calzando.
+ * HISTORIA (por qué raster). La lámina aprobada por el operador es
+ * `public/compai/laminas/zariguya-gemini-hero.png` (el set Gemini, muchas
+ * iteraciones — ver el resto del set en esa carpeta). El intento de
+ * VECTORIZARLA (vtracer, 3 versiones) fue RECHAZADO: la posterización
+ * convertía la coronilla texturada en un "gorro" sólido y engordaba
+ * bigotes/contornos. Un redibujo a mano (2026-08-25) también fue RECHAZADO:
+ * abandonaba la identidad elegida (RULINGS 2026-08-25: NUNCA regenerar una
+ * identidad aprobada).
  *
- * LÍNEA FINA (operador 2026-08-25): el trazo directo a 481 salía PESADO
- * (bigotes/contornos toscos). Se traza a 2× (962×888) y luego pielTrazado.js
- * escala el <g id="ztCalco"> por 0.5 → el grosor de cada línea queda a la
- * mitad y el detalle sub-píxel del 2× sobrevive. filter_speckle sube a 10
- * para NO explotar el conteo de paths (el calco se clona por hueso, así que
- * O(paths×huesos): ~1581 paths se mantiene bajo el techo de rendimiento).
+ * CIRUGÍA definitiva: el calco es la lámina MISMA — el PNG embebido como
+ * <image> data-URI dentro de <g id="ztCalco">. Los clip-path del rig
+ * recortan raster igual que vectores, así que las clip-regiones/pivotes de
+ * pielTrazado.js siguen calzando (mismo espacio 481×444) y la piel es
+ * PIXEL-IDÉNTICA a la que el operador eligió: cero gorro, cero engorde,
+ * cero reinvención. 82 KB de PNG ≈ 110 KB de base64 (el calco vtracer
+ * pesaba 660 KB) y UN solo elemento clonado por hueso.
  *
- * Pipeline (documentado para reproducir el calco desde cero):
- *   1. magick public/compai/laminas/zariguya-gemini-hero.png \
- *        -filter Lanczos -resize 200% hero-2x.png            (→ 962×888)
- *   2. nix run nixpkgs#vtracer -- --input hero-2x.png \
- *        --output zariguya-trace.svg --mode spline \
- *        --color_precision 6 --filter_speckle 10
- *      → paths apilados (stacking): conserva el grabado del pelo, fino.
- *   3. npx svgo --multipass -p 2 zariguya-trace.svg -o zariguya-trace.min.svg
- *      → ~660 KB, ~1581 paths, los translate() horneados; TODO queda en el
- *        espacio 2× (962×888). pielTrazado.js lo escala 0.5 → 481×444, el
- *        mismo de las clip-regiones/pivotes hechos a mano.
- *   4. node generar-calco.mjs zariguya-trace.min.svg
- *      → escribe ./calcoTrazado.js con el markup interior (sin <svg> raíz).
- *
- * El módulo generado exporta UN string: los <path> del trazado, listos para
- * meterse UNA vez en <defs> como <g id="ztCalco"> y clonarse por hueso con
- * <use href="#ztCalco" clip-path="…"> (ver pielTrazado.js).
+ * Uso: node generar-calco.mjs   → escribe ./calcoTrazado.js
  */
-/* global process, console -- script Node de build (fuera del glob eslint de lefthook) */
+/* global console -- script Node de build (fuera del glob eslint de lefthook) */
 import { readFileSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-const entrada = process.argv[2];
-if (!entrada) {
-  console.error('uso: node generar-calco.mjs <trace.min.svg>');
-  process.exit(1);
-}
-const svg = readFileSync(entrada, 'utf8');
-const m = svg.match(/<svg[^>]*>([\s\S]*)<\/svg>/);
-if (!m) throw new Error('no encontré el <svg> raíz');
-const interior = m[1].trim();
-if (/[`\\]|\$\{/.test(interior)) throw new Error('el trazado trae caracteres que romperían el template literal');
-const nPaths = (interior.match(/<path/g) || []).length;
+const AQUI = dirname(fileURLToPath(import.meta.url));
+const HERO = join(AQUI, '../../../../public/compai/laminas/zariguya-gemini-hero.png');
+
+const png = readFileSync(HERO);
+const b64 = png.toString('base64');
+const interior = `<image href="data:image/png;base64,${b64}" x="0" y="0" width="481" height="444" preserveAspectRatio="none"/>`;
 
 const salida = `/*
- * calcoTrazado — EL CALCO: la lámina \`zariguya-gemini-hero.png\` (el hero
- * Gemini SIN GUANTES, aprobado por el operador 2026-08-25) AUTO-TRAZADA a
- * vector A 2× para línea fina. GENERADO por generar-calco.mjs (ver ahí el
- * pipeline magick+vtracer+svgo exacto) — NO editar a mano: regenerar.
- * ${nPaths} paths en el espacio 2× (962×888); pielTrazado.js los escala 0.5
- * → 481×444 (el de las clip-regiones/pivotes de zariguyaLamina/anatomia.js),
- * lo que adelgaza el trazo a la mitad. Cero dibujo nuevo: cada path es la
- * lámina aprobada, vectorizada.
+ * calcoTrazado — EL CALCO: la lámina Gemini ELEGIDA por el operador
+ * (\`zariguya-gemini-hero.png\`, 481×444) embebida TAL CUAL como raster.
+ * GENERADO por generar-calco.mjs — NO editar a mano: regenerar.
+ *
+ * Sin vtracer y sin redibujo (ambos rechazados): los píxeles aprobados,
+ * articulados por las clip-regiones/pivotes de pielTrazado.js en el mismo
+ * espacio 481×444. Ver generar-calco.mjs para la historia completa.
  */
 export const CALCO_TRAZADO = \`${interior}\`;
-export const CALCO_N_PATHS = ${nPaths};
+export const CALCO_N_PATHS = 1;
 export default CALCO_TRAZADO;
 `;
-const destino = join(dirname(fileURLToPath(import.meta.url)), 'calcoTrazado.js');
-writeFileSync(destino, salida);
-console.log(`calcoTrazado.js escrito: ${nPaths} paths, ${(salida.length / 1024).toFixed(0)} KiB`);
+writeFileSync(join(AQUI, 'calcoTrazado.js'), salida);
+console.log(`calcoTrazado.js escrito: lámina Gemini raster, ${Math.round(salida.length / 1024)} KB`);
