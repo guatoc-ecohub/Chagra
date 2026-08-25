@@ -9,6 +9,11 @@
  * (el host mantiene el anclaje vertical `bottom-*`): así nunca sube a tapar la
  * cámara ni el contenido, solo recorre la franja baja segura.
  *
+ * MODO MÍSTICO (jaguar-compai): en vez de espejarse con scaleX(-1) al virar,
+ * el compai se DESVANECE y REAPARECE (teletransporte espectral). El jaguar
+ * aparece/desaparece místicamente, nunca da la vuelta. Esto se controla con la
+ * opción `misterio=true`.
+ *
  * REÚSO vs NUEVO: el "cerebro" de paseo que ya existía (`useCompaiPaseo` +
  * `compaiPaseoPlanificador`) decide CUÁNDO comentar una parada (semántica de
  * anillos/presupuesto), no MUEVE el cuerpo por el DOM — nunca hubo un roam
@@ -31,6 +36,7 @@
  *   · `pausado=true` (panel abierto, compai ocupado…) → camina de vuelta a
  *     casa y se queda ahí hasta que se reanude — la animación de regreso es la
  *     MISMA caminata, nunca un salto seco.
+ *   · `misterio=true` → activa el modo místico (teletransporte en viraje).
  *   · pestaña oculta → el navegador congela el rAF (cero costo en background);
  *     al volver, el `dt` se acota para que no pegue un brinco acumulado.
  *
@@ -38,12 +44,14 @@
  * @param {Object} [opciones]
  * @param {boolean} [opciones.activo=true]
  * @param {boolean} [opciones.pausado=false]  fuerza el regreso a casa.
+ * @param {boolean} [opciones.misterio=false]  activa teletransporte en viraje.
  * @param {number} [opciones.fraccionAncho=0.3]  franja recorrible (0..1 del ancho).
- * @returns {{ caminando: boolean, hacia: 'izquierda'|'derecha', parada: number }}
+ * @returns {{ caminando: boolean, hacia: 'izquierda'|'derecha', parada: number, opacity: number }}
  *   `parada` es un contador que se INCREMENTA cada vez que el compai LLEGA a un
  *   punto de su paseo y se detiene a descansar (no cuando vuelve a casa por
  *   `pausado`). Sirve para el "moverse-para-explicar": el host muestra el
  *   mensaje contextual de la pantalla en cada parada (ver CompaiOverlay).
+ *   `opacity` es la opacidad actual (0..1) para el modo místico.
  */
 import { useEffect, useRef, useState } from 'react';
 
@@ -68,7 +76,7 @@ function prefiereQuietud() {
 }
 
 export default function useCompaiRoam(ref, opciones = {}) {
-  const { activo = true, pausado = false, fraccionAncho = 0.3 } = opciones;
+  const { activo = true, pausado = false, misterio = false, fraccionAncho = 0.3 } = opciones;
 
   const [caminando, setCaminando] = useState(false);
   const [hacia, setHacia] = useState(/** @type {'izquierda'|'derecha'} */ ('izquierda'));
@@ -77,6 +85,8 @@ export default function useCompaiRoam(ref, opciones = {}) {
   // del effect; solo se sube a estado (discreto) cuando cambia.
   const [parada, setParada] = useState(0);
   const paradasRef = useRef(0);
+  // Opacidad para el modo místico (teletransporte).
+  const [opacity, setOpacity] = useState(1);
 
   // Espejos vivos leídos DENTRO del rAF (el efecto del loop no se recrea al
   // togglear `pausado`: lo consulta por ref en cada frame → reacción inmediata).
@@ -90,6 +100,7 @@ export default function useCompaiRoam(ref, opciones = {}) {
     if (!activo || !el || prefiereQuietud()
       || typeof window === 'undefined' || typeof window.requestAnimationFrame !== 'function') {
       if (el) el.style.transform = '';
+      if (el) el.style.opacity = '';
       return undefined;
     }
 
@@ -100,6 +111,9 @@ export default function useCompaiRoam(ref, opciones = {}) {
     let fase = /** @type {'reposo'|'camina'} */ ('reposo');
     let reposoHasta = 0;   // timestamp (ms) en que termina la pausa
     let ultimoTs = 0;      // para el dt
+    let opacidad = 1;      // opacidad actual (modo místico)
+    let opacidadTarget = 1; // opacidad objetivo (1 = visible, 0 = invisible)
+    let ultimaDireccion = /** @type {'izquierda'|'derecha'|null} */ (null);
 
     const distancia = () => {
       const w = (window.innerWidth || 0);
@@ -108,6 +122,9 @@ export default function useCompaiRoam(ref, opciones = {}) {
 
     const pintar = () => {
       el.style.transform = x ? `translate3d(${x.toFixed(1)}px, 0, 0)` : '';
+      if (misterio) {
+        el.style.opacity = opacidad.toFixed(2);
+      }
     };
 
     const marcarCaminando = (v) => {
@@ -120,6 +137,12 @@ export default function useCompaiRoam(ref, opciones = {}) {
       if (haciaRef.current !== v) {
         haciaRef.current = v;
         setHacia(v);
+      }
+    };
+    const marcarOpacidad = (v) => {
+      if (opacidad !== v) {
+        opacidad = v;
+        setOpacity(v);
       }
     };
 
@@ -159,7 +182,9 @@ export default function useCompaiRoam(ref, opciones = {}) {
 
       if (fase === 'camina') {
         const delta = objetivo - x;
+        const nuevaDireccion = delta < 0 ? 'izquierda' : 'derecha';
         const paso = PX_POR_SEG * dt;
+
         if (Math.abs(delta) <= paso) {
           x = objetivo;
           marcarCaminando(false);
@@ -176,10 +201,37 @@ export default function useCompaiRoam(ref, opciones = {}) {
             marcarHacia('izquierda');
           }
         } else {
-          marcarHacia(delta < 0 ? 'izquierda' : 'derecha');
-          x += Math.sign(delta) * paso;
+          // Antes de marcar la nueva dirección, verificar si hay viraje en modo místico
+          if (misterio && ultimaDireccion !== null && nuevaDireccion !== ultimaDireccion) {
+            // VIRAJE DETECTADO: iniciar teletransporte
+            opacidadTarget = 0; // desvanecer
+          }
+
+          marcarHacia(nuevaDireccion);
+          ultimaDireccion = nuevaDireccion;
+
+          // En modo místico, si estamos invisibles (opacidad baja), avanzar un paso extra
+          if (misterio && opacidad < 0.1) {
+            // INSTANTE INVISIBLE: dar un paso adelante y reaparecer
+            x += Math.sign(delta) * paso * 2; // paso doble para el teletransporte
+            opacidadTarget = 1; // volver a materializarse
+          } else {
+            x += Math.sign(delta) * paso;
+          }
           marcarCaminando(true);
         }
+
+        // Lerp de opacidad para el teletransporte
+        if (misterio) {
+          const velocidadFade = 3.5; // velocidad de desvanecimiento
+          if (opacidad < opacidadTarget) {
+            opacidad = Math.min(1, opacidad + velocidadFade * dt);
+          } else if (opacidad > opacidadTarget) {
+            opacidad = Math.max(0, opacidad - velocidadFade * dt);
+          }
+          marcarOpacidad(opacidad);
+        }
+
         pintar();
       }
     };
@@ -193,8 +245,9 @@ export default function useCompaiRoam(ref, opciones = {}) {
       if (rafId) window.cancelAnimationFrame(rafId);
       caminandoRef.current = false;
       el.style.transform = '';
+      if (misterio) el.style.opacity = '';
     };
-  }, [activo, ref, fraccionAncho]);
+  }, [activo, ref, fraccionAncho, misterio]);
 
-  return { caminando, hacia, parada };
+  return { caminando, hacia, parada, opacity };
 }

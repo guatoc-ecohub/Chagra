@@ -76,7 +76,8 @@ export default function CompaiOverlay({ currentView = 'dashboard' }) {
   // `parada` se incrementa cada vez que LLEGA a un punto de su paseo — con eso
   // hacemos el "moverse-para-explicar" (ver la burbuja de parada más abajo).
   const roamRef = useRef(null);
-  const { caminando, hacia, parada } = useCompaiRoam(roamRef, { pausado: isOpen });
+  const misterio = avatarType === 'jaguar'; // el jaguar usa teletransporte, no espejo
+  const { caminando, hacia, parada, opacity } = useCompaiRoam(roamRef, { pausado: isOpen, misterio });
 
   // El mensaje contextual de la pantalla actual (capa BASE: qué es esta
   // pantalla). El compai lo muestra al parar y al abrir el panel.
@@ -137,7 +138,11 @@ export default function CompaiOverlay({ currentView = 'dashboard' }) {
   // Los compai miran a la IZQUIERDA por defecto (la lámina del jaguar tiene la
   // testa a la izquierda); al volver hacia la derecha se espejan. GATE GPU: si
   // el sentido sale invertido para algún compai, es voltear este mapeo.
-  const espejo = hacia === 'derecha' ? 'scaleX(-1)' : 'none';
+  //
+  // MODO MÍSTICO (jaguar): el compai NO se espeja — usa teletransporte (opacity)
+  // en lugar de scaleX(-1). El espejo solo se aplica para compai no-místicos.
+  const espejo = (hacia === 'derecha' && !misterio) ? 'scaleX(-1)' : 'none';
+  const opacidadEstilo = misterio ? opacity : 1;
 
   return (
     <div
@@ -183,7 +188,8 @@ export default function CompaiOverlay({ currentView = 'dashboard' }) {
             className="inline-flex"
             style={{
               transform: espejo,
-              transition: 'transform 0.35s ease',
+              opacity: opacidadEstilo,
+              transition: misterio ? 'opacity 0.2s ease' : 'transform 0.35s ease, opacity 0.2s ease',
               filter: 'drop-shadow(0 6px 9px rgba(0, 0, 0, 0.34))',
             }}
           >
