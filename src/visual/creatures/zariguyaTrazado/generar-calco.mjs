@@ -9,17 +9,25 @@
  * en el MISMO espacio 481×444 y comparten pose pixel-alineada, así que las
  * clip-regiones/pivotes hechos a mano de pielTrazado.js siguen calzando.
  *
+ * LÍNEA FINA (operador 2026-08-25): el trazo directo a 481 salía PESADO
+ * (bigotes/contornos toscos). Se traza a 2× (962×888) y luego pielTrazado.js
+ * escala el <g id="ztCalco"> por 0.5 → el grosor de cada línea queda a la
+ * mitad y el detalle sub-píxel del 2× sobrevive. filter_speckle sube a 10
+ * para NO explotar el conteo de paths (el calco se clona por hueso, así que
+ * O(paths×huesos): ~1581 paths se mantiene bajo el techo de rendimiento).
+ *
  * Pipeline (documentado para reproducir el calco desde cero):
- *   1. nix run nixpkgs#vtracer -- \
- *        --input public/compai/laminas/zariguya-gemini-hero.png \
- *        --output zariguya-trace.svg --mode spline --color_precision 8 \
- *        --filter_speckle 4
- *      → paths apilados (stacking): conserva el grabado del pelo.
- *   2. npx svgo --multipass -p 2 zariguya-trace.svg -o zariguya-trace.min.svg
- *      → ~318 KB, ~1911 paths, los translate() horneados en las coordenadas:
- *        TODO queda en el espacio absoluto 481×444 de la lámina (el mismo de
- *        los pivotes de zariguyaLamina/anatomia.js).
- *   3. node generar-calco.mjs zariguya-trace.min.svg
+ *   1. magick public/compai/laminas/zariguya-gemini-hero.png \
+ *        -filter Lanczos -resize 200% hero-2x.png            (→ 962×888)
+ *   2. nix run nixpkgs#vtracer -- --input hero-2x.png \
+ *        --output zariguya-trace.svg --mode spline \
+ *        --color_precision 6 --filter_speckle 10
+ *      → paths apilados (stacking): conserva el grabado del pelo, fino.
+ *   3. npx svgo --multipass -p 2 zariguya-trace.svg -o zariguya-trace.min.svg
+ *      → ~660 KB, ~1581 paths, los translate() horneados; TODO queda en el
+ *        espacio 2× (962×888). pielTrazado.js lo escala 0.5 → 481×444, el
+ *        mismo de las clip-regiones/pivotes hechos a mano.
+ *   4. node generar-calco.mjs zariguya-trace.min.svg
  *      → escribe ./calcoTrazado.js con el markup interior (sin <svg> raíz).
  *
  * El módulo generado exporta UN string: los <path> del trazado, listos para
@@ -46,11 +54,12 @@ const nPaths = (interior.match(/<path/g) || []).length;
 const salida = `/*
  * calcoTrazado — EL CALCO: la lámina \`zariguya-gemini-hero.png\` (el hero
  * Gemini SIN GUANTES, aprobado por el operador 2026-08-25) AUTO-TRAZADA a
- * vector. GENERADO por generar-calco.mjs (ver ahí el pipeline vtracer+svgo
- * exacto) — NO editar a mano: regenerar. ${nPaths} paths en el espacio
- * 481×444 de la lámina (mismo espacio que los pivotes de
- * zariguyaLamina/anatomia.js). Cero dibujo nuevo: cada path es la lámina
- * aprobada, vectorizada.
+ * vector A 2× para línea fina. GENERADO por generar-calco.mjs (ver ahí el
+ * pipeline magick+vtracer+svgo exacto) — NO editar a mano: regenerar.
+ * ${nPaths} paths en el espacio 2× (962×888); pielTrazado.js los escala 0.5
+ * → 481×444 (el de las clip-regiones/pivotes de zariguyaLamina/anatomia.js),
+ * lo que adelgaza el trazo a la mitad. Cero dibujo nuevo: cada path es la
+ * lámina aprobada, vectorizada.
  */
 export const CALCO_TRAZADO = \`${interior}\`;
 export const CALCO_N_PATHS = ${nPaths};

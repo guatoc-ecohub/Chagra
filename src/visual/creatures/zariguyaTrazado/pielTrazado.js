@@ -193,7 +193,13 @@ const disco = (cx, cy, r, fill) => `<circle cx="${cx}" cy="${cy}" r="${r}" fill=
 /* ─────────────────────────────── defs ────────────────────────────────────── */
 
 const DEFS = `<defs>
-  <g id="ztCalco">${CALCO_TRAZADO}</g>
+  <!-- El calco se trazó a 2× (962×888) para lograr LÍNEAS FINAS: al escalarlo
+       0.5 aquí, el grosor de cada trazo (bigotes/contornos) se reduce a la
+       mitad y el detalle sub-píxel del 2× sobrevive. Todo el resto de la piel
+       (clip-regiones, pivotes, casquetes) vive en el espacio 481×444 nativo:
+       la escala SÓLO afecta al contenido de ztCalco, así que los <use…clip>
+       de cada hueso siguen calzando exactos. -->
+  <g id="ztCalco" transform="scale(0.5)">${CALCO_TRAZADO}</g>
   ${CLIPS}
   <linearGradient id="ztCuello" x1="215" y1="140" x2="228" y2="215" gradientUnits="userSpaceOnUse">
     <stop offset="0" stop-color="#4e4337"/>
@@ -211,17 +217,22 @@ const DEFS = `<defs>
     <stop offset="1" stop-color="${P.rocio}" stop-opacity="0"/>
   </radialGradient>
   <filter id="ztBlur"><feGaussianBlur stdDeviation="4"/></filter>
+  <!-- BOIL suavizado para el calco FINO (operador 2026-08-25): el trazo ahora
+       es ~0.5px (2× escalado); el displacement de la spec (1.5 suave / 4.5
+       actuando) lo emborronaría hasta engrosar los bigotes. Se baja a 0.9/2.2
+       —conserva el temblor rubber-hose, protege la línea fina—. Local a la
+       zarigüeya; RH_LINE_BOIL (spec compartida) NO se toca. -->
   <filter id="zhBoilSuave" x="-6%" y="-6%" width="112%" height="112%">
     <feTurbulence type="turbulence" baseFrequency="${RH_LINE_BOIL.baseFrequency}" numOctaves="1" seed="${RH_LINE_BOIL.seeds[0]}" result="t">
       <animate attributeName="seed" values="${RH_LINE_BOIL.seeds.join(';')}" dur="${RH_LINE_BOIL.dur}" repeatCount="indefinite" calcMode="discrete"/>
     </feTurbulence>
-    <feDisplacementMap in="SourceGraphic" in2="t" scale="1.5"/>
+    <feDisplacementMap in="SourceGraphic" in2="t" scale="0.9"/>
   </filter>
   <filter id="zhBoil" x="-8%" y="-8%" width="116%" height="116%">
     <feTurbulence type="turbulence" baseFrequency="${RH_LINE_BOIL.baseFrequency}" numOctaves="1" seed="${RH_LINE_BOIL.seeds[0]}" result="t">
       <animate attributeName="seed" values="${RH_LINE_BOIL.seeds.join(';')}" dur="${RH_LINE_BOIL.dur}" repeatCount="indefinite" calcMode="discrete"/>
     </feTurbulence>
-    <feDisplacementMap in="SourceGraphic" in2="t" scale="${RH_LINE_BOIL.scale}"/>
+    <feDisplacementMap in="SourceGraphic" in2="t" scale="2.2"/>
   </filter>
 </defs>`;
 
