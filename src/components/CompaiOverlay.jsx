@@ -47,9 +47,10 @@ import { getHintForRuta } from '../config/compaiHints.js';
 
 /* Compai con MARCHA real: al deambular corren su ciclo de andar ('caminando')
    en vez de quedarse en idle espejado. El jaguar (rig de perfil #jaguarLado),
-   el oso del bastón (pose 'camina' de la piel-lámina musculosa) y la zarigüeya
-   (marcha bípeda de la piel AUTO-TRAZADA sobre huesos, zariguyaHuesos.css). */
-const CON_MARCHA = new Set(['jaguar', 'oso-baston', 'zariguya']);
+   el oso del bastón (pose 'camina' de la piel-lámina musculosa), la zarigüeya
+   (marcha bípeda de la piel AUTO-TRAZADA sobre huesos, zariguyaHuesos.css) y
+   la luciérnaga (rubber-hose con pose 'vuela'). */
+const CON_MARCHA = new Set(['jaguar', 'oso-baston', 'zariguya', 'luciernaga']);
 
 /**
  * Escucha el texto en voz alta (TTS kokoro, fail-silent).
