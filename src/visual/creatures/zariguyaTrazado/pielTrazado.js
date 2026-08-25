@@ -1,0 +1,338 @@
+/*
+ * pielTrazado — EXPERIMENTO "AUTO-TRAZADO RIGGEADO": la lámina de la
+ * zarigüeya vectorizada AUTOMÁTICAMENTE (vtracer, ver generar-calco.mjs) y
+ * montada sobre el MISMO esqueleto de huesos de `zariguyaHuesos/` — la
+ * técnica que puede reemplazar el redibujo a mano en todos los compais.
+ *
+ * NOTA 2026-08-25: el calco ya NO es vtracer — el operador rechazó 3 veces
+ * el auto-trazado (gorro en la coronilla, bordes gruesos). Hoy el calco es
+ * la LÁMINA DE TINTA FINA dibujada a plumilla (generar-tinta.mjs), nativa
+ * 481×444 y pixel-alineada al hero, así que TODO lo de abajo sigue válido:
+ * el esqueleto se pone ENCIMA sin tocar un solo path del calco:
+ *
+ *   1. El calco entra UNA vez en <defs> como <g id="ztCalco">.
+ *   2. Cada hueso es <g class="zh-hueso …" style="transform-origin:PIVOTE">
+ *      con un <use href="#ztCalco" clip-path="url(#zt-r-…)"> — la región
+ *      anatómica de ESE hueso, medida en el mismo espacio 481×444 de la
+ *      lámina (pivotes/cortes de zariguyaLamina/anatomia.js, refinados a
+ *      ojo con la vista ?vista=regiones del arnés).
+ *   3. ANTI-COSTURA (la regla de la casa, adaptada al calco): todo casquete
+ *      o respaldo se pinta ANTES del hueso hijo y se RECORTA A LA REGIÓN
+ *      ESTÁTICA del hijo. En reposo queda 100% oculto bajo los píxeles
+ *      opacos del trazado (cero color inventado visible = cero pérdida de
+ *      fidelidad); al rotar el hijo, la franja que éste desocupa revela el
+ *      casquete — nunca un hueco a la página.
+ *
+ * La CADENCIA es la misma `zariguyaHuesos.css` canónica (copiada intacta de
+ * la rama fable/zariguya-huesos): relojes co-primos, marcha bípeda, 70/30
+ * Miss Minutes. Este módulo solo reproduce la JERARQUÍA y las CLASES que esa
+ * CSS espera. Los ids `zhBoilSuave`/`zhBoil` se conservan porque la CSS los
+ * referencia por url(#…).
+ *
+ * REGLA DE ORO: módulo PLANO — solo datos/strings (cero react, cero three),
+ * igual que pielHuesos.js: lo consumen React, HTML plano y el valle 3D.
+ */
+
+import { RH_LINE_BOIL } from '../rubberhoseSpec.js';
+import { CALCO_TRAZADO } from './calcoTrazado.js';
+
+/* ── PIVOTES (px del espacio 481×444 de la lámina) ──────────────────────────
+   Fuente: zariguyaLamina/anatomia.js (medidos sobre la lámina con grilla y
+   lupas) + los de cadena fina de zariguyaHuesos/pielHuesos.js donde
+   anatomia no articula (rodilla, cola en 3 tramos). */
+export const ZT_PIVOTES = Object.freeze({
+  columna: [245, 290],      // centro de masa del tronco erguido (MEDIDO)
+  cuello: [215, 155],       // base del cuello sobre el pecho
+  cabeza: [202, 126],       // atlas: donde el cráneo articula (borde 128/110)
+  mandibula: [148, 70],     // comisura-bisagra ALTA izquierda (la sonrisa sube)
+  orejaI: [130, 48],
+  orejaD: [245, 44],
+  brazoLapiz: [150, 210],   // hombro del brazo alzado (funde al pecho ahí)
+  munecaLapiz: [98, 182],   // muñeca: el antebrazo entra a la manita
+  brazoBrujula: [200, 212], // hombro/codo del brazo de la brújula
+  piernaCerca: [300, 328],  // cadera del muslazo
+  rodillaCerca: [314, 384], // rodilla (el quiebre muslo/canilla medido)
+  piernaLejos: [196, 358],  // cadera oculta de la pata lejana
+  colaBase: [360, 348],     // raíz: la cola nace en la grupa (336-355)
+  colaMedia: [436, 350],    // corte base/media sobre el arco de abajo
+  colaPunta: [456, 262],    // corte media/punta donde arranca la columna
+});
+
+/* ── LAS REGIONES DE CLIP (polígonos, px de lámina) ─────────────────────────
+   Cortes por los cauces documentados: la recta del cuello (140,206)→(300,154)
+   de CABEZA.cuello; el canal medido bigotes/lápiz (x 84-93); el corte de
+   cola x≈352; las cajas de orejas con la banda de RESPALDO doble-pintada
+   (anatomia.baseSub: la base de la oreja vive en cabeza Y en oreja — al
+   girar ±3° la oreja resbala sobre su propia copia, sin hueco).
+   Donde el borde pasa por AIRE la región es generosa a propósito: recortar
+   aire es gratis; solo los bordes que CRUZAN píxeles se afinan. */
+export const ZT_REGIONES = Object.freeze({
+  /* MEDIDO por píxeles (pixel-probe.html sobre el propio calco):
+     boca x 149-231 y 64-108 (comisura alta izq ≈ (149,68), colmillo superior
+     218-231/86-104), ojos ≈ (156,74)/(246,72), mejilla-bigotes hasta y≈188,
+     manita+lápiz (0-99, 122-222), brújula+manita (88-200, 225-300), espalda
+     alta hasta (300,~100), grupa a x≈364, pata lejana (144-227, 370-412),
+     pie cercano (273-343, 385-441), cola: gancho y 228-264 · columna
+     x 446-480 y 262-337 · arco y 343-368. */
+  cabeza: [
+    /* pared derecha por AIRE (374,-8→164): cubre los bigotes derechos de la
+       lámina de tinta (tips hasta x≈360,y≈134) sin tocar un píxel del tronco
+       (el lomo a y≤160 nunca pasa de x≈332). */
+    [96, 28], [164, 28], [164, -8], [216, -8], [216, 26], [274, 26],
+    [274, -8], [374, -8], [374, 164], [332, 122], [316, 110], [306, 118], [294, 126], [280, 132],
+    [264, 136], [250, 136], [246, 130], [246, 80], [236, 80], [236, 106],
+    [212, 106], [212, 84], [144, 84], [144, 128], [140, 134], [134, 150],
+    [126, 168], [116, 182], [106, 187], [97, 180], [93, 168], [92, 152],
+    [84, 149], [72, 143], [67, 133], [74, 124], [85, 118], [91, 110],
+    [92, 88], [94, 56],
+  ],
+  cuello: [
+    /* el faldón inferior-izquierdo baja a y≈215: el ruff colgante de la
+       mejilla de la lámina Gemini vive ahí y debe MOVERSE con el cuello
+       (el vtracer lo perdía y el hueco no se veía). */
+    [144, 126], [246, 126], [246, 128], [250, 134], [264, 134], [280, 130],
+    [294, 124], [306, 116], [316, 108], [316, 120], [300, 134], [286, 146],
+    [272, 158], [256, 168], [238, 176], [218, 180], [196, 184], [184, 212],
+    [174, 198], [156, 188], [138, 180], [124, 168], [118, 152], [126, 138], [136, 128],
+  ],
+  mandibula: [
+    [144, 82], [212, 82], [212, 104], [236, 104], [236, 78], [246, 78],
+    [246, 128], [144, 128],
+  ],
+  orejaI: [[94, -6], [166, -6], [166, 54], [94, 54]],
+  orejaD: [[214, -6], [276, -6], [276, 50], [214, 50]],
+  brazoLapiz: [
+    /* techo = CRESTA superior del brazo Gemini (costura compartida con el
+       faldón del cuello): el pelo alto del brazo (y≈150-200) es del BRAZO.
+       El vtracer dejaba ese pelo vacío y el techo viejo (y≈170-208) no
+       dolía; con la lámina real dolía (banda sin dueño). */
+    [0, 206], [0, 180], [8, 162], [18, 146], [30, 134], [44, 126],
+    [58, 122], [72, 122], [84, 128], [92, 140], [100, 148], [120, 162],
+    [140, 176], [158, 188], [174, 200], [184, 214], [188, 228],
+    [172, 232], [168, 244], [156, 250], [140, 246], [124, 238], [108, 230],
+    [92, 226], [76, 226], [58, 226], [40, 224], [20, 218],
+  ],
+  manoLapiz: [
+    [0, 206], [0, 180], [8, 162], [18, 146], [30, 134], [44, 126],
+    [58, 122], [72, 122], [84, 128], [92, 140], [97, 154], [99, 170],
+    [97, 186], [92, 200], [82, 212], [68, 220], [52, 222], [34, 220],
+    [16, 214],
+  ],
+  brazoBrujula: [
+    [78, 264], [80, 238], [92, 224], [112, 218], [132, 216], [152, 214],
+    [168, 210], [186, 204], [204, 200], [216, 204], [220, 214], [214, 226],
+    [202, 234], [196, 244], [198, 262], [192, 280], [178, 294], [158, 302],
+    [136, 300], [114, 292], [96, 280],
+  ],
+  piernaCerca: [
+    [248, 316], [266, 302], [292, 296], [318, 298], [334, 310], [338, 322],
+    [338, 384], [344, 394], [344, 438], [316, 446], [276, 444], [258, 432],
+    [248, 404], [242, 360],
+  ],
+  piernaCercaBaja: [
+    [258, 390], [336, 384], [342, 396], [342, 441], [300, 448], [266, 444],
+    [254, 430], [252, 406],
+  ],
+  piernaLejos: [[136, 348], [232, 348], [232, 418], [136, 418]],
+  colaBase: [
+    [330, 320], [396, 320], [396, 336], [440, 336], [430, 352], [430, 378],
+    [330, 378],
+  ],
+  colaMedia: [
+    [440, 262], [486, 262], [486, 380], [430, 378], [430, 352], [440, 336],
+  ],
+  colaPunta: [
+    [382, 218], [486, 218], [486, 262], [440, 262], [440, 268], [410, 284],
+    [388, 278], [382, 250],
+  ],
+  /* El tronco. Borde ALTO = borde bajo del cuello (exacto). Envuelve al
+     brazo de la brújula con bordes compartidos; retiene copia-respaldo bajo
+     el antebrazo del lápiz (ahí el brazo va sobre pecho, no sobre aire).
+     NO excluye cola/pata lejana (van DETRÁS: solape = respaldo natural). */
+  troncoCuerpo: [
+    [142, 134], [150, 146], [160, 160], [176, 170], [196, 176], [218, 178],
+    [238, 174], [256, 166], [272, 156], [286, 144], [300, 132], [316, 118],
+    [330, 160], [342, 190], [350, 220], [356, 246], [360, 276], [362, 300],
+    [366, 316], [358, 328], [350, 340], [344, 354], [338, 370],
+    [338, 344], [320, 326], [294, 322], [268, 328], [252, 342], [244, 362],
+    [236, 366], [222, 370], [204, 370], [186, 364], [172, 352],
+    [162, 336], [158, 316], [160, 296], [158, 302], [178, 294], [192, 280],
+    [198, 262], [196, 244], [202, 234], [214, 226], [220, 214], [216, 204],
+    [204, 200], [186, 204], [168, 210], [152, 214], [132, 216], [138, 204],
+    [140, 190], [141, 176], [142, 160],
+  ],
+});
+
+const P = Object.freeze({
+  pelaje: '#6b5f52',
+  penumbra: '#3f342a',
+  rodilla: '#4a3d2f',
+  hombro: '#5d4f3e',
+  pecho: '#e3d7bd',
+  cola: '#c9a091',
+  colaLuz: '#dcb6a4',
+  parpado: '#4f3f2d',
+  fauces: '#42130e',
+  lengua: '#c05548',
+  luna: '#ff9ecb',
+  rocio: '#ffd9ec',
+  sombraSuelo: 'rgba(40,28,16,0.35)',
+});
+
+/* ─────────────────────────── helpers de string ───────────────────────────── */
+
+const H = ZT_PIVOTES;
+const origin = (n) => ` style="transform-origin:${H[n][0]}px ${H[n][1]}px"`;
+const dPoly = (pts) => `M${pts.map(([x, y]) => `${x},${y}`).join(' L')} Z`;
+
+const CLIPS = Object.entries(ZT_REGIONES)
+  .map(([n, pts]) => `<clipPath id="zt-r-${n}"><path d="${dPoly(pts)}"/></clipPath>`)
+  .join('\n  ');
+
+/** Un hueso: <use> del calco recortado a su región. */
+const usoCalco = (region) => `<use href="#ztCalco" clip-path="url(#zt-r-${region})"/>`;
+
+/** Casquete/respaldo anti-costura: pintado en el PADRE justo antes del hijo,
+    recortado a la región ESTÁTICA del hijo → invisible en reposo, tapa la
+    franja que el hijo desocupa al rotar. */
+const casquete = (region, forma) => `<g clip-path="url(#zt-r-${region})">${forma}</g>`;
+
+const elipse = (cx, cy, rx, ry, fill, rot = 0) =>
+  `<ellipse cx="${cx}" cy="${cy}" rx="${rx}" ry="${ry}" fill="${fill}"${rot ? ` transform="rotate(${rot} ${cx} ${cy})"` : ''}/>`;
+const disco = (cx, cy, r, fill) => `<circle cx="${cx}" cy="${cy}" r="${r}" fill="${fill}"/>`;
+
+/* ─────────────────────────────── defs ────────────────────────────────────── */
+
+const DEFS = `<defs>
+  <!-- CALCO NATIVO 481×444: la lámina de TINTA FINA dibujada a plumilla
+       (generar-tinta.mjs, sin vtracer) nace con línea de ~0.5-1px — ya no
+       hay 2× ni escala. Mismo espacio que clip-regiones/pivotes/casquetes:
+       los <use…clip> calzan directo. -->
+  <g id="ztCalco">${CALCO_TRAZADO}</g>
+  ${CLIPS}
+  <linearGradient id="ztCuello" x1="215" y1="140" x2="228" y2="215" gradientUnits="userSpaceOnUse">
+    <stop offset="0" stop-color="#4e4337"/>
+    <stop offset=".45" stop-color="#6b5f50"/>
+    <stop offset=".78" stop-color="#b7a88c"/>
+    <stop offset="1" stop-color="#eadfc9"/>
+  </linearGradient>
+  <radialGradient id="ztAura" cx=".5" cy=".5" r=".5">
+    <stop offset="0" stop-color="${P.luna}" stop-opacity=".34"/>
+    <stop offset=".7" stop-color="${P.rocio}" stop-opacity=".12"/>
+    <stop offset="1" stop-color="${P.luna}" stop-opacity="0"/>
+  </radialGradient>
+  <radialGradient id="ztOjoHalo" cx=".5" cy=".5" r=".5">
+    <stop offset="0" stop-color="${P.rocio}" stop-opacity=".8"/>
+    <stop offset="1" stop-color="${P.rocio}" stop-opacity="0"/>
+  </radialGradient>
+  <filter id="ztBlur"><feGaussianBlur stdDeviation="4"/></filter>
+  <!-- BOIL suavizado para el calco FINO (operador 2026-08-25): el trazo ahora
+       es ~0.5px (2× escalado); el displacement de la spec (1.5 suave / 4.5
+       actuando) lo emborronaría hasta engrosar los bigotes. Se baja a 0.9/2.2
+       —conserva el temblor rubber-hose, protege la línea fina—. Local a la
+       zarigüeya; RH_LINE_BOIL (spec compartida) NO se toca. -->
+  <filter id="zhBoilSuave" x="-6%" y="-6%" width="112%" height="112%">
+    <feTurbulence type="turbulence" baseFrequency="${RH_LINE_BOIL.baseFrequency}" numOctaves="1" seed="${RH_LINE_BOIL.seeds[0]}" result="t">
+      <animate attributeName="seed" values="${RH_LINE_BOIL.seeds.join(';')}" dur="${RH_LINE_BOIL.dur}" repeatCount="indefinite" calcMode="discrete"/>
+    </feTurbulence>
+    <feDisplacementMap in="SourceGraphic" in2="t" scale="0.9"/>
+  </filter>
+  <filter id="zhBoil" x="-8%" y="-8%" width="116%" height="116%">
+    <feTurbulence type="turbulence" baseFrequency="${RH_LINE_BOIL.baseFrequency}" numOctaves="1" seed="${RH_LINE_BOIL.seeds[0]}" result="t">
+      <animate attributeName="seed" values="${RH_LINE_BOIL.seeds.join(';')}" dur="${RH_LINE_BOIL.dur}" repeatCount="indefinite" calcMode="discrete"/>
+    </feTurbulence>
+    <feDisplacementMap in="SourceGraphic" in2="t" scale="2.2"/>
+  </filter>
+</defs>`;
+
+/* ── FAUCES: interior hondo + lengua DETRÁS de la mandíbula, recortadas a la
+   región estática de la mandíbula (en reposo = tapadas exactas por el mentón
+   del calco; al abrir la charnela se revela boca, no hueco). Es el único
+   dibujo nuevo del módulo, y vive siempre detrás del trazado. ── */
+const FAUCES = casquete('mandibula',
+  `<rect x="142" y="80" width="94" height="50" fill="${P.fauces}"/>` +
+  `<path d="M172,100 C 188,112 210,114 228,105 C 224,118 208,124 192,122 C 180,120 174,111 172,100 Z" fill="${P.lengua}"/>`);
+
+/* ── PÁRPADOS: bisagra arriba, scaleY(.12) en reposo (una pestañita), la CSS
+   canónica los cierra con el blink irregular. Ojos MEDIDOS de la lámina:
+   (184,76) r20 y (242,73) r20 (anatomia.OJO / OJO_2). ── */
+const PARPADOS = `
+  <path class="zh-parpado" style="transform-origin:175px 62px"
+    d="M152,70 C 160,60 190,60 197,70 C 199,79 198,91 191,98 C 181,103 166,102 158,95 C 152,88 150,78 152,70 Z" fill="${P.parpado}"/>
+  <path class="zh-parpado" style="transform-origin:246px 52px"
+    d="M227,60 C 234,50 258,50 264,60 C 266,70 265,84 258,92 C 249,98 236,97 230,89 C 225,80 224,68 227,60 Z" fill="${P.parpado}"/>`;
+
+/* halos nocturnos: apagados en reposo (opacity:0 inline — que la lámina sea
+   la lámina); el modo actuando los enciende desde la CSS canónica. */
+const HALOS = `
+  <circle class="zh-ojoHalo" style="opacity:0" cx="176" cy="80" r="18" fill="url(#ztOjoHalo)"/>
+  <circle class="zh-ojoHalo" style="opacity:0" cx="245" cy="74" r="18" fill="url(#ztOjoHalo)"/>`;
+
+/* ─────────────────────── LA CABEZA (con sus satélites) ───────────────────── */
+
+const CABEZA = `
+  ${usoCalco('cabeza')}
+  ${FAUCES}
+  <g class="zh-hueso zh-mandibula"${origin('mandibula')}>${usoCalco('mandibula')}</g>
+  <g class="zh-hueso zh-orejaI"${origin('orejaI')}>${usoCalco('orejaI')}</g>
+  <g class="zh-hueso zh-orejaD"${origin('orejaD')}>${usoCalco('orejaD')}</g>
+  <g class="zh-ojoGrupo">${HALOS}${PARPADOS}</g>`;
+
+/* ─────────────────────────── EL SVG COMPLETO ─────────────────────────────── */
+
+/**
+ * El markup del experimento. Mismo contrato que ZARIGUYA_HUESOS_SVG: el host
+ * pone data-agt-estado / data-modo / data-vida / --zh-jaw en la raíz y la
+ * CSS canónica (`zariguyaHuesos.css`) pone la cadencia.
+ */
+export const ZARIGUYA_TRAZADO_SVG = `<svg class="zariguyaHuesos" viewBox="-30 -25 545 500" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Zarigüeya">
+${DEFS}
+<g class="zh-pj">
+  <ellipse class="zh-aura" cx="240" cy="230" rx="290" ry="265" fill="url(#ztAura)"/>
+  <g class="zh-masa">
+    <g class="zh-antic"${origin('columna')}>
+      <ellipse class="zh-sombraSuelo" cx="245" cy="438" rx="150" ry="11" fill="${P.sombraSuelo}" filter="url(#ztBlur)"/>
+      <g class="zh-hueso zh-cuerpo"${origin('columna')}>
+        <g class="zh-hueso zh-piernaLejos"${origin('piernaLejos')}>${usoCalco('piernaLejos')}</g>
+        ${casquete('colaBase', disco(H.colaBase[0] - 4, H.colaBase[1] + 4, 12, P.cola))}
+        <g class="zh-hueso zh-colaBase"${origin('colaBase')}>
+          ${usoCalco('colaBase')}
+          ${casquete('colaMedia', disco(H.colaMedia[0] + 2, H.colaMedia[1] + 8, 11, P.cola))}
+          <g class="zh-hueso zh-colaMedia"${origin('colaMedia')}>
+            ${usoCalco('colaMedia')}
+            ${casquete('colaPunta', disco(H.colaPunta[0] + 6, H.colaPunta[1], 8, '#cfa48e'))}
+            <g class="zh-hueso zh-colaPunta"${origin('colaPunta')}>${usoCalco('colaPunta')}</g>
+          </g>
+        </g>
+        ${usoCalco('troncoCuerpo')}
+        ${casquete('piernaCerca', elipse(298, 344, 38, 46, P.penumbra))}
+        <g class="zh-hueso zh-piernaCerca"${origin('piernaCerca')}>
+          ${usoCalco('piernaCerca')}
+          ${casquete('piernaCercaBaja', disco(H.rodillaCerca[0], H.rodillaCerca[1], 13, P.rodilla))}
+          <g class="zh-hueso zh-piernaCercaBaja"${origin('rodillaCerca')}>${usoCalco('piernaCercaBaja')}</g>
+        </g>
+        ${casquete('brazoBrujula', elipse(204, 212, 13, 10, P.hombro) + elipse(178, 262, 18, 22, P.pecho))}
+        <g class="zh-hueso zh-brazoBrujula"${origin('brazoBrujula')}>${usoCalco('brazoBrujula')}</g>
+        ${casquete('brazoLapiz', elipse(150, 214, 16, 12, P.hombro))}
+        <g class="zh-hueso zh-brazoLapiz"${origin('brazoLapiz')}>
+          ${usoCalco('brazoLapiz')}
+          ${casquete('manoLapiz', disco(H.munecaLapiz[0], H.munecaLapiz[1], 10, P.pelaje))}
+          <g class="zh-hueso zh-brazoLapizAnte zh-manoLapiz"${origin('munecaLapiz')}>${usoCalco('manoLapiz')}</g>
+        </g>
+        ${casquete('cuello', elipse(218, 158, 46, 18, 'url(#ztCuello)', -8))}
+        <g class="zh-hueso zh-cuello"${origin('cuello')}>
+          ${usoCalco('cuello')}
+          ${casquete('cabeza', elipse(212, 124, 60, 22, 'url(#ztCuello)', -7))}
+          <g class="zh-hueso zh-cabezaGiro"${origin('cabeza')}>
+            <g class="zh-hueso zh-cabeza"${origin('cabeza')}>
+              ${CABEZA}
+            </g>
+          </g>
+        </g>
+      </g>
+    </g>
+  </g>
+</g>
+</svg>`;
+
+export default ZARIGUYA_TRAZADO_SVG;
