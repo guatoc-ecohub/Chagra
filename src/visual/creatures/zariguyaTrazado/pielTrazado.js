@@ -4,10 +4,11 @@
  * montada sobre el MISMO esqueleto de huesos de `zariguyaHuesos/` — la
  * técnica que puede reemplazar el redibujo a mano en todos los compais.
  *
- * POR QUÉ. Redibujar la lámina a mano en SVG pierde la belleza. El
- * auto-trazado conserva el grabado (1911 paths tras svgo, el pelo de
- * plumilla intacto), pero sale PLANO: un solo dibujo sin articulaciones.
- * Aquí se le pone el esqueleto ENCIMA sin tocar un solo path del calco:
+ * NOTA 2026-08-25: el calco ya NO es vtracer — el operador rechazó 3 veces
+ * el auto-trazado (gorro en la coronilla, bordes gruesos). Hoy el calco es
+ * la LÁMINA DE TINTA FINA dibujada a plumilla (generar-tinta.mjs), nativa
+ * 481×444 y pixel-alineada al hero, así que TODO lo de abajo sigue válido:
+ * el esqueleto se pone ENCIMA sin tocar un solo path del calco:
  *
  *   1. El calco entra UNA vez en <defs> como <g id="ztCalco">.
  *   2. Cada hueso es <g class="zh-hueso …" style="transform-origin:PIVOTE">
@@ -74,8 +75,11 @@ export const ZT_REGIONES = Object.freeze({
      pie cercano (273-343, 385-441), cola: gancho y 228-264 · columna
      x 446-480 y 262-337 · arco y 343-368. */
   cabeza: [
+    /* pared derecha por AIRE (374,-8→164): cubre los bigotes derechos de la
+       lámina de tinta (tips hasta x≈360,y≈134) sin tocar un píxel del tronco
+       (el lomo a y≤160 nunca pasa de x≈332). */
     [96, 28], [164, 28], [164, -8], [216, -8], [216, 26], [274, 26],
-    [274, -8], [316, -8], [316, 110], [306, 118], [294, 126], [280, 132],
+    [274, -8], [374, -8], [374, 164], [332, 122], [316, 110], [306, 118], [294, 126], [280, 132],
     [264, 136], [250, 136], [246, 130], [246, 80], [236, 80], [236, 106],
     [212, 106], [212, 84], [144, 84], [144, 128], [140, 134], [134, 150],
     [126, 168], [116, 182], [106, 187], [97, 180], [93, 168], [92, 152],
@@ -193,13 +197,11 @@ const disco = (cx, cy, r, fill) => `<circle cx="${cx}" cy="${cy}" r="${r}" fill=
 /* ─────────────────────────────── defs ────────────────────────────────────── */
 
 const DEFS = `<defs>
-  <!-- El calco se trazó a 2× (962×888) para lograr LÍNEAS FINAS: al escalarlo
-       0.5 aquí, el grosor de cada trazo (bigotes/contornos) se reduce a la
-       mitad y el detalle sub-píxel del 2× sobrevive. Todo el resto de la piel
-       (clip-regiones, pivotes, casquetes) vive en el espacio 481×444 nativo:
-       la escala SÓLO afecta al contenido de ztCalco, así que los <use…clip>
-       de cada hueso siguen calzando exactos. -->
-  <g id="ztCalco" transform="scale(0.5)">${CALCO_TRAZADO}</g>
+  <!-- CALCO NATIVO 481×444: la lámina de TINTA FINA dibujada a plumilla
+       (generar-tinta.mjs, sin vtracer) nace con línea de ~0.5-1px — ya no
+       hay 2× ni escala. Mismo espacio que clip-regiones/pivotes/casquetes:
+       los <use…clip> calzan directo. -->
+  <g id="ztCalco">${CALCO_TRAZADO}</g>
   ${CLIPS}
   <linearGradient id="ztCuello" x1="215" y1="140" x2="228" y2="215" gradientUnits="userSpaceOnUse">
     <stop offset="0" stop-color="#4e4337"/>
@@ -248,16 +250,16 @@ const FAUCES = casquete('mandibula',
    canónica los cierra con el blink irregular. Ojos MEDIDOS de la lámina:
    (184,76) r20 y (242,73) r20 (anatomia.OJO / OJO_2). ── */
 const PARPADOS = `
-  <path class="zh-parpado" style="transform-origin:156px 61px"
-    d="M143,63 C 149,56 164,56 169,64 C 171,71 170,80 165,85 C 158,89 149,88 145,82 C 141,75 141,68 143,63 Z" fill="${P.parpado}"/>
-  <path class="zh-parpado" style="transform-origin:246px 60px"
-    d="M234,62 C 239,55 253,55 258,63 C 260,69 259,78 255,83 C 249,87 240,86 236,80 C 233,73 233,66 234,62 Z" fill="${P.parpado}"/>`;
+  <path class="zh-parpado" style="transform-origin:175px 64px"
+    d="M161,68 C 167,60 183,60 189,68 C 191,75 190,84 185,89 C 178,93 171,92 166,86 C 161,79 160,73 161,68 Z" fill="${P.parpado}"/>
+  <path class="zh-parpado" style="transform-origin:241px 55px"
+    d="M228,59 C 233,51 249,51 254,59 C 256,66 255,75 251,80 C 245,84 236,83 232,77 C 228,70 227,64 228,59 Z" fill="${P.parpado}"/>`;
 
 /* halos nocturnos: apagados en reposo (opacity:0 inline — que la lámina sea
    la lámina); el modo actuando los enciende desde la CSS canónica. */
 const HALOS = `
-  <circle class="zh-ojoHalo" style="opacity:0" cx="156" cy="74" r="17" fill="url(#ztOjoHalo)"/>
-  <circle class="zh-ojoHalo" style="opacity:0" cx="246" cy="72" r="15" fill="url(#ztOjoHalo)"/>`;
+  <circle class="zh-ojoHalo" style="opacity:0" cx="175" cy="78" r="16" fill="url(#ztOjoHalo)"/>
+  <circle class="zh-ojoHalo" style="opacity:0" cx="241" cy="70" r="15" fill="url(#ztOjoHalo)"/>`;
 
 /* ─────────────────────── LA CABEZA (con sus satélites) ───────────────────── */
 
@@ -291,7 +293,7 @@ ${DEFS}
           ${casquete('colaMedia', disco(H.colaMedia[0], H.colaMedia[1], 11, P.cola))}
           <g class="zh-hueso zh-colaMedia"${origin('colaMedia')}>
             ${usoCalco('colaMedia')}
-            ${casquete('colaPunta', disco(H.colaPunta[0], H.colaPunta[1], 8, P.colaLuz))}
+            ${casquete('colaPunta', disco(H.colaPunta[0], H.colaPunta[1], 8, '#cfa48e'))}
             <g class="zh-hueso zh-colaPunta"${origin('colaPunta')}>${usoCalco('colaPunta')}</g>
           </g>
         </g>
