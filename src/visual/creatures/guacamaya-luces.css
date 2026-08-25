@@ -1,0 +1,85 @@
+/* ─── LUCES MÍSTICAS DE LA GUACAMAYA — estela de luz que acompaña su vuelo ────
+ *
+ * CAPA DE VFX PURAMENTE ADITIVA. Vive DETRÁS del rig de la guacamaya
+ * (`GuacamayaCompai.jsx` la monta como un `<g class="guaca-luces">` antes del
+ * `<g class="guaca-rig">`), así que NUNCA toca el cuerpo/colores del ave — que
+ * ya está aprobada. Solo AÑADE: un aura espectral suave + motas de luz que
+ * emanan desde detrás del ave y se van abriendo (la estela que deja al volar/
+ * roam). En entrada/salida se REALZA (`[data-guaca-luces='realza']`).
+ *
+ * Paleta deliberadamente ETÉREA, no chillona, y DISTINTA de la pluma del ave
+ * (rojo/azul/amarillo saturados): oro cálido al núcleo → violeta espectral →
+ * cian, la misma familia que el aura mística de Angelita
+ * (`angelita-missminutes.css`, sección 5) para que el elenco se sienta uno.
+ *
+ * REGLAS DE LA CASA (igual que creatures.css / angelita-missminutes.css):
+ *   · Solo transform/opacity (GPU, gama baja) + mix-blend-mode screen (luz).
+ *   · [data-tier='bajo'] apaga la capa (raster/blend caro en gama baja).
+ *   · prefers-reduced-motion la apaga por completo (es movimiento decorativo).
+ * Los gradientes viven inline en el SVG (id namespaceado por instancia con
+ * useId), no aquí — este archivo es SOLO la coreografía. */
+
+.guaca-luces {
+  pointer-events: none;
+  mix-blend-mode: screen; /* la capa es LUZ: se suma, no tapa */
+}
+
+/* ═══ EL AURA ESPECTRAL — halo suave que respira detrás del ave ═══════════════ */
+.guaca-aura {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: guaca-aura-pulso 4.6s ease-in-out infinite;
+  will-change: transform, opacity;
+}
+@keyframes guaca-aura-pulso {
+  0%, 100% { transform: scale(0.92); opacity: 0.38; }
+  50%      { transform: scale(1.06); opacity: 0.66; }
+}
+
+/* ═══ LAS MOTAS — la estela: emanan desde detrás del ave y se abren ═══════════
+   Cada mota vive dentro de un <g transform="rotate(--ang)"> (el abanico), así
+   que su translateX corre a lo largo de ese ángulo → sale disparada hacia
+   afuera en su dirección. --r0/--r1: radio de arranque/final; --dur/--d:
+   duración y retraso (los siembra el JS por mota, desparejos = vida). */
+.guaca-luz {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation-name: guaca-estela;
+  animation-duration: var(--dur, 3.4s);
+  animation-delay: var(--d, 0ms);
+  animation-timing-function: ease-out;
+  animation-iteration-count: infinite;
+  will-change: transform, opacity;
+}
+@keyframes guaca-estela {
+  0%   { opacity: 0;    transform: translateX(var(--r0, 110px)) scale(0.55); }
+  22%  { opacity: 0.95; }
+  100% { opacity: 0;    transform: translateX(var(--r1, 320px)) translateY(26px) scale(0.32); }
+}
+
+/* ═══ REALZA — entrada/salida: el aura late más marcada y la estela corre más,
+   PERO sigue etérea (nada de brightness que lave el cuerpo aprobado del ave —
+   el brío lo da el propio pulso, no un flash). ═══════════════════════════════ */
+[data-guaca-luces='realza'] .guaca-aura {
+  animation-name: guaca-aura-realza;
+  animation-duration: 2.8s;
+}
+[data-guaca-luces='realza'] .guaca-luz {
+  animation-duration: calc(var(--dur, 3.4s) * 0.62);
+}
+@keyframes guaca-aura-realza {
+  0%, 100% { transform: scale(0.94); opacity: 0.44; }
+  50%      { transform: scale(1.05); opacity: 0.72; }
+}
+
+/* ═══ GATES DE LA CASA ════════════════════════════════════════════════════════ */
+/* Tier bajo: fuera la capa (blend/animación continua = caro en gama baja).
+   El JS además no la monta cuando tier==='bajo'; esto es el cinturón por si un
+   ancestro estampa data-tier sobre una instancia ya montada. */
+[data-tier='bajo'] .guaca-luces { display: none; }
+
+/* Reduced-motion: la estela es puro movimiento decorativo → se apaga entera
+   (mismo criterio que el místico de Angelita en gama reducida). */
+@media (prefers-reduced-motion: reduce) {
+  .guaca-luces { display: none; }
+}

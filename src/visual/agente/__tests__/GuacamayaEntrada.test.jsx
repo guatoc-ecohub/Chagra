@@ -23,13 +23,15 @@ describe('GuacamayaEntrada', () => {
     expect(guacamaya).toBeInTheDocument();
   });
 
-  test('pasa size correctamente a GuacamayaCompai', () => {
+  test('pasa size correctamente a GuacamayaCompai (+15% en el <svg>)', () => {
     const { container } = render(<GuacamayaEntrada activa={false} size={128} />);
     const wrapper = container.querySelector('.ang-entrada');
+    // el wrapper del teatro reserva el `size` nominal…
     expect(wrapper).toHaveStyle({ width: '128px', height: '128px' });
+    // …y la guacamaya se dibuja +15% sobre ese size (FACTOR_TAMANO, solo ella).
     const guacamaya = container.querySelector('[data-creature="guacamaya"]');
-    expect(guacamaya).toHaveAttribute('width', '128');
-    expect(guacamaya).toHaveAttribute('height', '128');
+    expect(guacamaya).toHaveAttribute('width', '147'); // round(128 * 1.15)
+    expect(guacamaya).toHaveAttribute('height', '147');
   });
 
   test('con animated=false o reduced-motion, salta directo a lista', () => {

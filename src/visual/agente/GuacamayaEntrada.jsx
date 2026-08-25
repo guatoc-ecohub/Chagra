@@ -134,6 +134,7 @@ export function GuacamayaEntrada({
           animated={animated}
           tier={tier}
           idleCerebro={idleCerebro}
+          luces="realza"
           {...rest}
         />
       </span>

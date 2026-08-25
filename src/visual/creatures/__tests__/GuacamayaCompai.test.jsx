@@ -29,17 +29,28 @@ describe('GuacamayaCompai', () => {
 
   test('trae el rig del valle inlineado (marcado real, no vacío)', () => {
     const { container } = render(<GuacamayaCompai state="idle" />);
-    const g = container.querySelector('svg[data-creature="guacamaya"] > g');
+    // `g.guaca-rig` = el wrapper del rig (la capa de luces místicas es otro
+    // `<g class="guaca-luces">` que ahora va ANTES, ver bloque de luces abajo).
+    const g = container.querySelector('svg[data-creature="guacamaya"] > g.guaca-rig');
     expect(g.innerHTML.length).toBeGreaterThan(500);
     expect(g.innerHTML).toContain('guacaWrap');
   });
 
-  test('respeta el tamaño (size) y el título accesible', () => {
+  // +15% de presencia (SOLO la guacamaya, FACTOR_TAMANO): el <svg> se dibuja a
+  // round(size * 1.15). Con size=40 → 46; el título accesible no cambia.
+  test('se dibuja +15% sobre el size nominal, y respeta el título accesible', () => {
     const { container } = render(<GuacamayaCompai size={40} title="Mi guacamaya" />);
     const svg = container.querySelector('svg');
-    expect(svg).toHaveAttribute('width', '40');
-    expect(svg).toHaveAttribute('height', '40');
+    expect(svg).toHaveAttribute('width', '46'); // round(40 * 1.15)
+    expect(svg).toHaveAttribute('height', '46');
     expect(svg).toHaveAttribute('aria-label', 'Mi guacamaya');
+  });
+
+  test('el +15% escala con el size pedido (64 → 74, 96 → 110)', () => {
+    const { container: c64 } = render(<GuacamayaCompai size={64} />);
+    expect(c64.querySelector('svg')).toHaveAttribute('width', '74'); // round(64 * 1.15)
+    const { container: c96 } = render(<GuacamayaCompai size={96} />);
+    expect(c96.querySelector('svg')).toHaveAttribute('width', '110'); // round(96 * 1.15)
   });
 
   // ANTES: `data-visema` salía de un HARDCODE (`state==='speaking'→'V2'`).
@@ -153,6 +164,61 @@ describe('GuacamayaCompai', () => {
       const svg = container.querySelector('svg');
       expect(svg).toHaveAttribute('data-estado', 'hablar');
       expect(svg).toHaveAttribute('data-visema', 'V3');
+    });
+  });
+
+  // ═══ LUCES MÍSTICAS — capa de VFX ADITIVA (aura + estela) ═══════════════════
+  // Contrato: se monta DETRÁS del rig (no toca el arte), tiene aura + N motas,
+  // gradientes con id namespaceado por instancia, y se apaga con `luces='off'`
+  // o `tier='bajo'`. La coreografía/gates de movimiento viven en el CSS.
+  describe('luces místicas (capa aditiva, no toca el arte del ave)', () => {
+    test('por defecto (luces="auto") monta la capa DETRÁS del rig, con aura y motas', () => {
+      const { container } = render(<GuacamayaCompai state="idle" />);
+      const svg = container.querySelector('svg[data-creature="guacamaya"]');
+      const hijos = [...svg.children].filter((n) => n.tagName.toLowerCase() === 'g');
+      // el primer <g> es la capa de luces; el rig queda por encima (después).
+      expect(hijos[0]).toHaveClass('guaca-luces');
+      expect(hijos[hijos.length - 1]).toHaveClass('guaca-rig');
+      const luces = svg.querySelector('g.guaca-luces');
+      expect(luces.querySelector('circle.guaca-aura')).toBeInTheDocument();
+      expect(luces.querySelectorAll('circle.guaca-luz').length).toBeGreaterThanOrEqual(5);
+      expect(svg).toHaveAttribute('data-guaca-luces', 'auto');
+    });
+
+    test('el rig (arte aprobado) queda INTACTO y por encima de las luces', () => {
+      const { container } = render(<GuacamayaCompai state="idle" />);
+      const rig = container.querySelector('svg > g.guaca-rig');
+      expect(rig.innerHTML).toContain('guacaWrap'); // el rig del valle, sin tocar
+    });
+
+    test('luces="off" no monta la capa', () => {
+      const { container } = render(<GuacamayaCompai luces="off" />);
+      expect(container.querySelector('g.guaca-luces')).not.toBeInTheDocument();
+      expect(container.querySelector('svg')).not.toHaveAttribute('data-guaca-luces');
+    });
+
+    test('tier="bajo" apaga la capa (gate de la casa: no se monta)', () => {
+      const { container } = render(<GuacamayaCompai tier="bajo" />);
+      expect(container.querySelector('g.guaca-luces')).not.toBeInTheDocument();
+      expect(container.querySelector('svg')).not.toHaveAttribute('data-guaca-luces');
+    });
+
+    test('luces="realza" (entrada/salida) marca data-guaca-luces="realza"', () => {
+      const { container } = render(<GuacamayaCompai luces="realza" />);
+      expect(container.querySelector('svg')).toHaveAttribute('data-guaca-luces', 'realza');
+      expect(container.querySelector('g.guaca-luces')).toBeInTheDocument();
+    });
+
+    test('dos instancias NO comparten los ids de los gradientes de luz', () => {
+      const { container } = render(
+        <div>
+          <GuacamayaCompai />
+          <GuacamayaCompai />
+        </div>,
+      );
+      const grads = [...container.querySelectorAll('radialGradient[id^="guacaAura-"]')];
+      expect(grads.length).toBe(2);
+      expect(grads[0].id).not.toBe(grads[1].id);
     });
   });
 
