@@ -281,7 +281,13 @@ import OsoGuardian from './OsoGuardian.jsx';
 import RanaAndina from './RanaAndina.jsx';
 import Perezoso from './Perezoso.jsx';
 import Ardilla from './Ardilla.jsx';
-import JaguarLaminaViva from './JaguarLaminaViva.jsx';
+/* EL JAGUAR DEL ELENCO = JaguarTrazado (decisión operador 2026-08-24,
+   DEFINITIVA): la lámina AUTO-TRAZADA a tinta sobre el esqueleto de huesos
+   reemplaza a `JaguarLaminaViva` (la PNG recortada en capas, rechazada — el
+   pecho raster no aguanta el corte). Drop-in like-for-like: mismo <div
+   data-creature="jaguar" role="img">, misma cadencia (jaguarHuesos.css).
+   `JaguarLaminaViva.jsx` NO se borra (huérfano GATED, por historia). */
+import JaguarTrazado from './JaguarTrazado.jsx';
 import Morrocoy from './Morrocoy.jsx';
 import Danta from './Danta.jsx';
 import Condor from './Condor.jsx';
@@ -319,7 +325,7 @@ export const CREATURES = {
   'rana-andina': { Component: RanaAndina, nombre: 'Rana arlequín andina', cientifico: 'Atelopus spp.' },
   perezoso: { Component: Perezoso, nombre: 'Perezoso de tres dedos', cientifico: 'Bradypus variegatus' },
   ardilla: { Component: Ardilla, nombre: 'Ardilla de cola roja', cientifico: 'Notosciurus granatensis' },
-  jaguar: { Component: JaguarLaminaViva, nombre: 'Jaguar', cientifico: 'Panthera onca' },
+  jaguar: { Component: JaguarTrazado, nombre: 'Jaguar', cientifico: 'Panthera onca' },
   morrocoy: { Component: Morrocoy, nombre: 'Morrocoy de patas rojas', cientifico: 'Chelonoidis carbonarius' },
   /* BORUGO ARCHIVADO (operador, 2026-07-18): dibujo rechazado por feo — fuera
      del registro para que NADA data-driven lo surfacee (avatar-selector, fauna

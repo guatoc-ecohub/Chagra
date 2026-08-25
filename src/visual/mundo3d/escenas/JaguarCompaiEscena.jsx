@@ -35,7 +35,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { useFrame } from '@react-three/fiber';
 import { Html } from '@react-three/drei';
 import * as THREE from 'three';
-import { Jaguar } from '../../creatures/Jaguar.jsx';
+import JaguarTrazado from '../../creatures/JaguarTrazado.jsx';
 import { JAGUAR_PRESENCIA, JAGUAR_TINTA, JAGUAR_SLUG } from '../../creatures/jaguarIdentidad.js';
 import { idleDeCreature, IDLE_NEUTRO } from '../../creatures/creatureIdle.js';
 import { useLipSync } from '../../creatures/useLipSync.js';
@@ -100,6 +100,13 @@ export function useAndanzaJaguar(foco, {
   const ultimoTf = useRef('');
   const ultimaPose = useRef('anda');
   const prevX = useRef(foco.x);
+  // VIRAJE MÍSTICO (operador 2026-08-24): el jaguar-espíritu NO gira — al
+  // cambiar de sentido horizontal se DESVANECE y REAPARECE (parpadeo espectral
+  // de opacidad sobre caraRef), en vez de espejarse con scaleX. Refs → cero
+  // re-render por frame.
+  const signoCara = useRef(0);      // sentido horizontal (-1|1); 0 = aún sin fijar
+  const apagoEn = useRef(null);     // t del inicio del parpadeo; null = presente
+  const ultimaOpCara = useRef('');  // cache del write de opacidad
   const aparecioRef = useRef(false);
   // Fase de entrada: 'oculta' (pre-ancla) → 'acecho' (entra agazapado) → 'no'.
   const fase = useRef(cruce && !reducedMotion ? 'oculta' : 'no');
@@ -137,7 +144,7 @@ export function useAndanzaJaguar(foco, {
       ponModo('marcha');
       _dest.set(foco.x - ENTRA_DESDE_X * 1.6, piso + PERCHA.y, foco.z + 0.35);
       ref.current.position.lerp(_dest, 0.12);
-      if (caraRef.current) caraRef.current.style.transform = 'scaleX(-1)'; // mira por donde se va
+      // NO gira al salir: se retira y se disuelve por visibilidad (ponVis).
       state.invalidate();
       return;
     }
@@ -205,11 +212,27 @@ export function useAndanzaJaguar(foco, {
       haptics.tap();
     }
 
-    // VOLTEO: mira hacia donde camina (el rig lateral avanza hacia +x).
+    // VIRAJE MÍSTICO: el jaguar-espíritu NO gira — al invertir el sentido
+    // horizontal se DESVANECE y REAPARECE (parpadeo espectral de opacidad,
+    // ~0.55s: 1 → 0 → 1), en vez de espejarse con scaleX. Solo opacity (GPU).
     if (caraRef.current) {
-      const vx = ref.current.position.x - prevX.current;
-      if (Math.abs(vx) > 0.0015) caraRef.current.style.transform = `scaleX(${vx < 0 ? -1 : 1})`;
+      const dx = ref.current.position.x - prevX.current;
+      if (Math.abs(dx) > 0.0015) {
+        const signo = dx < 0 ? -1 : 1;
+        if (signoCara.current !== 0 && signo !== signoCara.current && !reducedMotion && apagoEn.current === null) {
+          apagoEn.current = t; // dispara el teletransporte espectral
+        }
+        signoCara.current = signo;
+      }
       prevX.current = ref.current.position.x;
+      let op = 1;
+      if (apagoEn.current !== null) {
+        const k = (t - apagoEn.current) / 0.55;
+        if (k >= 1) apagoEn.current = null;
+        else op = Math.abs(Math.cos(k * Math.PI)); // baja a 0 a mitad y vuelve
+      }
+      const ops = op.toFixed(2);
+      if (ops !== ultimaOpCara.current) { caraRef.current.style.opacity = ops; ultimaOpCara.current = ops; }
     }
 
     // El gesto del frame (hombros que ruedan + idle de personalidad) — un
@@ -239,19 +262,16 @@ export function useAndanzaJaguar(foco, {
   return { ref, caraRef, sombraRef, visRef, idleRef, aparecioRef, modo };
 }
 
-/* La reacción-firma dura un instante: atención depredadora, no aspaviento. */
-const ACECHA_PULSO_MS = 900;
-
 /**
  * El jaguar ya montado en una escena: drop-in del contrato de AbejaEscena
- * (CompaiEscena le pasa las mismas props). Billboard `<Html>` con el cuerpo
- * `Jaguar` (rosetas de anillo roto = su firma, de serie); PULSA al narrar y
- * REBOTA al toque con las clases genéricas del billboard (`.mundo-abeja*`), y
- * su reacción propia es ACECHAR un instante (los omóplatos suben).
+ * (CompaiEscena le pasa las mismas props). Billboard `<Html>` con la SKIN
+ * definitiva `JaguarTrazado` (lámina auto-trazada a tinta, operador 2026-08-24);
+ * PULSA al narrar y REBOTA al toque con las clases genéricas del billboard
+ * (`.mundo-abeja*`). VIRAJE MÍSTICO: no gira — se desvanece y reaparece.
  */
 export function JaguarCompaiEscena({
-  foco, entrando = true, animo = 'sereno', energia = 1, reducedMotion = false, piso = 0,
-  hablando = false, rebote = 0, mundoId = null, tier = 'alto', cruce = true,
+  foco, entrando = true, energia = 1, reducedMotion = false, piso = 0,
+  hablando = false, rebote = 0, tier = 'alto', cruce = true,
   estadoFinca = null, hayAlerta = false,
 }) {
   // La señal de SALIDA del host (compartida: la señal es del MUNDO, no de la
@@ -265,10 +285,7 @@ export function JaguarCompaiEscena({
     () => (estadoFinca ? reaccionDeFinca(estadoFinca, { hayAlerta }) : null),
     [estadoFinca, hayAlerta],
   );
-  const animoReal = reaccion?.animo ?? animo;
   const energiaReal = reaccion?.energia ?? energia;
-  const climaReal = estadoFinca?.clima ?? null;
-  const ensoReal = estadoFinca?.enso ?? 'neutro';
   // La hora del valle: para el jaguar la noche es JORNADA (el hook no lo
   // acurruca); aquí solo se lee una vez, determinista.
   const hora = useMemo(() => horaDeReloj(), []);
@@ -278,31 +295,30 @@ export function JaguarCompaiEscena({
     cruce: cruce && !reducedMotion, saliendo, hora, tier,
   });
 
-  // Microrrebote del toque (mismo patrón de reflow que AbejaEscena) + su
-  // reacción-firma: al toque ACECHA un instante (data-acecha del cuerpo:
-  // omóplatos arriba, mirada afilada). Estado discreto y breve — un
-  // re-render por toque, jamás por frame.
+  // Microrrebote del toque (mismo patrón de reflow que AbejaEscena): el
+  // billboard REBOTA con la clase genérica `.mundo-abeja__rebote`. Un reflow
+  // por toque, jamás por frame. (La reacción-acecho del cuerpo rubber-hose no
+  // aplica al skin trazado — su expresividad vive en su propia cadencia CSS.)
   const reboteRef = useRef(null);
-  const [acechaPulso, setAcechaPulso] = useState(false);
-  const acechoTimer = useRef(null);
   useEffect(() => {
     if (reducedMotion || rebote === 0 || !reboteRef.current) return undefined;
     const el = reboteRef.current;
     el.removeAttribute('data-rebote');
     void el.offsetWidth; // fuerza reflow → reinicia el keyframe
     el.setAttribute('data-rebote', '1');
-    setAcechaPulso(true);
-    clearTimeout(acechoTimer.current);
-    acechoTimer.current = setTimeout(() => setAcechaPulso(false), ACECHA_PULSO_MS);
     const t = setTimeout(() => el.removeAttribute('data-rebote'), 640);
     return () => clearTimeout(t);
   }, [rebote, reducedMotion]);
-  useEffect(() => () => clearTimeout(acechoTimer.current), []);
 
   const size = JAGUAR_PRESENCIA.billboardBase + Math.round(energiaReal * JAGUAR_PRESENCIA.billboardPorEnergia);
   const vivo = !reducedMotion;
   // LIP-SYNC: el felino "habla" cuando el agente narra (única boca del mundo).
   const { visema } = useLipSync({ activo: vivo });
+  // Estado del skin trazado: narra → 'speaking'; viaja de perfil → 'caminando';
+  // parado/idle → 'idle' (su idle-cerebro 70/30 acecha/ruge/reposo corre solo).
+  const estadoTrazado = hablando && vivo
+    ? 'speaking'
+    : (vivo && modo === 'marcha' ? 'caminando' : 'idle');
   const cruceVivo = cruce && !reducedMotion;
   return (
     <>
@@ -326,18 +342,13 @@ export function JaguarCompaiEscena({
                   para no pisar la transition del volteo de la cara. */}
               <div ref={idleRef} style={{ transformOrigin: 'center bottom' }} data-creature={JAGUAR_SLUG}>
                 <div ref={caraRef} className="mundo-abeja__cara">
-                  <Jaguar
+                  <JaguarTrazado
                     size={size}
-                    animo={animoReal}
-                    energia={energiaReal}
-                    pose={vivo && modo === 'marcha' ? 'camina' : 'anda'}
-                    acecha={vivo && (modo === 'acecho' || acechaPulso)}
-                    clima={climaReal}
-                    enso={ensoReal}
+                    estado={estadoTrazado}
                     visema={vivo ? visema : null}
-                    mundoId={mundoId}
                     animated={vivo}
                     tier={tier}
+                    title="Jaguar"
                   />
                 </div>
               </div>

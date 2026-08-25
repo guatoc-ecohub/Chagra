@@ -2,10 +2,10 @@
  * JaguarBillboard — EL JAGUAR VIVO EN CUALQUIER ESCENA 3D DE SUELO.
  *
  * Hermano de tierra del `CondorBillboard`: el jaguar entra a un mundo 3D como
- * billboard `<Html>` del SVG rubber-hose de la casa (`creatures/Jaguar.jsx`) —
- * el SVG dibujado le gana a cualquier low-poly, decisión de arte del operador.
- * REUTILIZABLE: cualquier escena con `<Canvas>` lo monta (el claro, el bosque,
- * la vitrina del monte).
+ * billboard `<Html>` de la lámina AUTO-TRAZADA a tinta (`creatures/JaguarTrazado`
+ * — skin definitiva, operador 2026-08-24; el dibujo le gana a cualquier
+ * low-poly). REUTILIZABLE: cualquier escena con `<Canvas>` lo monta (el claro,
+ * el bosque, la vitrina del monte).
  *
  * LO QUE HACE DISTINTO A UN FELINO DE UN PÁJARO — y la razón de que esto no sea
  * una copia del cóndor con la Y pegada al suelo:
@@ -25,10 +25,14 @@
  *                     sube los omóplatos, baja la testa). Raro, con cooldown.
  *     Nunca acecha a la cámara: el rumbo del acecho es el mismo de su paso.
  *
- *  3. SE ESPEJA SEGÚN EL RUMBO. El SVG está dibujado de frente; al caminar hacia
- *     la izquierda de la pantalla se voltea con `scaleX(-1)` (proyectando la
- *     velocidad al eje derecha de la cámara). Sin eso el felino camina de lado
- *     como una calcomanía.
+ *  3. AL VIRAR — DOS LENGUAJES. La lámina está dibujada mirando a un lado.
+ *     · CLÁSICO (aparicion=false): se ESPEJA con `scaleX(-1)` suavizado
+ *       (proyectando la velocidad al eje derecha de la cámara) — compat.
+ *     · MÍSTICO (aparicion=true, el jaguar-compai): NO gira — se DESVANECE y
+ *       REAPARECE (teletransporte espectral, solo opacity). En el instante
+ *       invisible da un paso adelante en su nuevo rumbo y se materializa ya
+ *       encarado hacia allá. Decisión del operador: el jaguar aparece/
+ *       desaparece místicamente en vez de dar la vuelta.
  *
  *  4. SOMBRA DE CONTACTO PEGADA. Una mancha cálida bajo las zarpas que lo ancla
  *     al piso (+1 draw call, opcional por `suelo`). La sombra del jaguar casi no
@@ -47,7 +51,7 @@ import { useMemo, useRef, useState } from 'react';
 import { useFrame } from '@react-three/fiber';
 import { Html } from '@react-three/drei';
 import { Vector3 } from 'three';
-import { Jaguar } from '../../creatures/Jaguar.jsx';
+import JaguarTrazado from '../../creatures/JaguarTrazado.jsx';
 
 const azar = (a, b) => a + Math.random() * (b - a);
 const clamp = (v, a, b) => (v < a ? a : v > b ? b : v);
@@ -79,9 +83,9 @@ const V_ACECHA = 0.24;
  * @param {number} [props.factor=9] distanceFactor del <Html> (escala en mundo).
  * @param {boolean} [props.animated=true] false = quieto y digno (tier bajo / RM).
  * @param {string}  [props.tier]   device-tier ('bajo' poda acecho + sombra).
- * @param {Object|string|null} [props.clima=null] clima vivo de la escena (se pasa
- *   al SVG: el pelaje lustroso que escurre agua).
- * @param {boolean} [props.aparicion=false] entrada espectral del SVG (opt-in).
+ * @param {boolean} [props.aparicion=false] MODO MÍSTICO: en vez de espejarse al
+ *   virar, el jaguar-espíritu se DESVANECE y REAPARECE (teletransporte
+ *   espectral). false = modo clásico (espejo scaleX, compat).
  */
 export default function JaguarBillboard({
   centro = [0, 0, 0],
@@ -92,18 +96,11 @@ export default function JaguarBillboard({
   factor = 9,
   animated = true,
   tier,
-  clima = null,
   aparicion = false,
 }) {
   const grupo = useRef(/** @type {any} */ (null));
   const capa = useRef(/** @type {HTMLDivElement|null} */ (null));
   const sombra = useRef(/** @type {any} */ (null));
-  /* El ACECHO sí va por estado de React: las fases cambian cada varios SEGUNDOS
-     (no por frame), así que un re-render por cambio de fase es gratis — y a
-     cambio el SVG recibe el prop `acecha` de verdad, que es lo que sube los
-     omóplatos y baja la testa. Un data-attr en el wrapper no lo lograría: el
-     CSS de creatures lee `[data-acecha]` en la RAÍZ del SVG, no en el padre. */
-  const [acechando, setAcechando] = useState(false);
   /* La MARCHA va por estado por la misma razón: cambia cada varios segundos.
      Mientras el felino SE DESPLAZA (fases anda/acecha) el SVG recibe
      pose='camina' — el rig de PERFIL con ciclo de patas real (sin esto el
@@ -134,9 +131,11 @@ export default function JaguarBillboard({
       rumbo: azar(0, Math.PI * 2),
       x: inicio.x, z: inicio.z,
       px: inicio.x, pz: inicio.z,
-      esp: 1, espT: 1,        // espejo (scaleX) suavizado
+      esp: 1, espT: 1,        // espejo (scaleX) suavizado — SOLO en modo clásico
+      signo: undefined,       // rumbo proyectado a pantalla (-1|1): detecta el viraje
+      fadeOp: 1, fadeT: 1, teleport: false, lastOp: '', // teletransporte espectral
       proxAcecho: azar(26, 55),
-      lastTf: '', dataAcecha: false, dataAnda: true,
+      lastTf: '', dataAnda: true,
       init: false,
     };
   }
@@ -188,30 +187,60 @@ export default function JaguarBillboard({
     const y = yDe(s.x, s.z) + alto;
     g.position.set(s.x, y, s.z);
 
-    /* ── ESPEJO según el rumbo proyectado a pantalla ───────────────────────── */
+    /* ── VIRAJE: rumbo proyectado a pantalla ────────────────────────────────
+       El trazado está dibujado mirando a un lado. Al cambiar de rumbo hay dos
+       lenguajes según el modo:
+        · CLÁSICO (aparicion=false): se ESPEJA con scaleX suavizado (un felino
+          gira el cuerpo, no parpadea de lado) — compat con consumidores viejos.
+        · MÍSTICO (aparicion=true): el jaguar-espíritu NO gira — se DESVANECE y
+          REAPARECE (teletransporte espectral). El viraje dispara un ciclo de
+          opacidad; en el instante invisible da un paso adelante en su nuevo
+          rumbo y se vuelve a materializar, ya encarado hacia allá. */
     if (!s.init) { s.px = s.x; s.pz = s.z; s.init = true; }
     const vx = (s.x - s.px) / dt;
     const vz = (s.z - s.pz) / dt;
     s.px = s.x; s.pz = s.z;
+    let vira = false;
     if (Math.hypot(vx, vz) > 0.03) {
       _right.setFromMatrixColumn(camera.matrixWorld, 0);
       const proy = vx * _right.x + vz * _right.z;
-      if (Math.abs(proy) > 0.02) s.espT = proy < 0 ? -1 : 1;
+      if (Math.abs(proy) > 0.02) {
+        const signo = proy < 0 ? -1 : 1;
+        if (s.signo !== undefined && signo !== s.signo) vira = true;
+        s.signo = signo;
+        s.espT = signo;
+      }
     }
-    // el volteo se suaviza (un felino gira el cuerpo, no parpadea de lado)
-    s.esp += clamp(s.espT - s.esp, -dt * 4, dt * 4);
 
     const capaEl = capa.current;
-    if (capaEl) {
-      const tf = `scaleX(${s.esp.toFixed(2)})`;
-      if (tf !== s.lastTf) { capaEl.style.transform = tf; s.lastTf = tf; }
+    if (aparicion) {
+      // MÍSTICO: el viraje agenda el teletransporte (si no hay uno en curso).
+      if (vira && !s.teleport && s.fadeT === 1) { s.teleport = true; s.fadeT = 0; }
+      // lerp de opacidad (materializarse/disolverse — solo opacity, GPU).
+      s.fadeOp += clamp(s.fadeT - s.fadeOp, -dt * 2.6, dt * 2.6);
+      if (s.teleport && s.fadeOp < 0.06) {
+        // instante invisible: reaparece un paso adelante, ya en su nuevo rumbo.
+        s.x += Math.cos(s.rumbo) * 0.55;
+        s.z += Math.sin(s.rumbo) * 0.55;
+        s.teleport = false;
+        s.fadeT = 1;
+      }
+      if (capaEl) {
+        const op = s.fadeOp.toFixed(2);
+        if (op !== s.lastOp) { capaEl.style.opacity = op; s.lastOp = op; }
+        // el modo místico jamás espeja: deja el transform limpio (una vez).
+        if (s.lastTf !== 'none') { capaEl.style.transform = 'none'; s.lastTf = 'none'; }
+      }
+    } else {
+      // CLÁSICO: espejo suavizado (un felino gira el cuerpo, no parpadea de lado).
+      s.esp += clamp(s.espT - s.esp, -dt * 4, dt * 4);
+      if (capaEl) {
+        const tf = `scaleX(${s.esp.toFixed(2)})`;
+        if (tf !== s.lastTf) { capaEl.style.transform = tf; s.lastTf = tf; }
+      }
     }
-    const enAcecho = s.fase === 'acecha';
-    if (enAcecho !== s.dataAcecha) {
-      s.dataAcecha = enAcecho;
-      setAcechando(enAcecho);
-    }
-    // ¿se está DESPLAZANDO? → marcha de perfil; ¿parado a observar? → frontal
+
+    // ¿se está DESPLAZANDO? → marcha de perfil; ¿parado a observar? → frontal.
     const enMarcha = s.fase !== 'observa';
     if (enMarcha !== s.dataAnda) {
       s.dataAnda = enMarcha;
@@ -221,6 +250,11 @@ export default function JaguarBillboard({
     /* ── SOMBRA DE CONTACTO pegada a las zarpas ────────────────────────────── */
     if (sombra.current) {
       sombra.current.position.set(s.x, yDe(s.x, s.z) + 0.04, s.z);
+      // En modo místico la sombra se DISUELVE con el felino (si no, quedaría una
+      // mancha flotando sobre el suelo mientras el espíritu está invisible).
+      if (aparicion && sombra.current.material) {
+        sombra.current.material.opacity = 0.3 * s.fadeOp;
+      }
     }
   });
 
@@ -231,14 +265,16 @@ export default function JaguarBillboard({
       <group ref={grupo} position={[inicio.x, inicio.y, inicio.z]}>
         <Html center distanceFactor={factor} zIndexRange={[14, 0]} pointerEvents="none">
           <div ref={capa} aria-hidden="true" data-vecino="jaguar" style={ESTILO_JAGUAR}>
-            <Jaguar
+            {/* SKIN definitiva del jaguar (operador 2026-08-24): JaguarTrazado,
+                la lámina auto-trazada a tinta. Su marcha de perfil ('caminando')
+                y su idle vivo viven en jaguarHuesos.css. El teletransporte
+                espectral (aparicion) lo maneja el useFrame de arriba sobre la
+                opacidad de ESTE nodo — el skin no necesita saberlo. */}
+            <JaguarTrazado
               size={px}
-              pose={andando && animated ? 'camina' : 'anda'}
+              estado={andando && animated ? 'caminando' : 'idle'}
               animated={animated}
               tier={tier}
-              clima={clima}
-              aparicion={aparicion}
-              acecha={acechando}
               title="Jaguar"
             />
           </div>

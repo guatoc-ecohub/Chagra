@@ -123,8 +123,9 @@ export default function CompaiOverlay({ currentView = 'dashboard' }) {
   const avatarSize = esRealista ? 112 : 84;
 
   // Mientras deambula, los compai CON MARCHA real corren su ciclo de andar
-  // ('caminando'): el jaguar (JaguarLaminaViva) y el oso del bastón (la
-  // marcha plantígrada de la piel-lámina musculosa). El resto conserva su
+  // ('caminando'): el jaguar (JaguarTrazado, la lámina auto-trazada — su marcha
+  // de perfil vive en jaguarHuesos.css) y el oso del bastón (la marcha
+  // plantígrada de la piel-lámina musculosa). El resto conserva su
   // estado (no tienen pose de marcha) y solo se espejan. Un estado
   // conversacional (hablar/escuchar/pensar) siempre gana a la caminata.
   const conMarcha = CON_MARCHA.has(avatarType);
