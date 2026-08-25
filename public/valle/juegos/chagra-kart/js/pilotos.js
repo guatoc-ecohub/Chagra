@@ -33,6 +33,8 @@ export const PILOTOS = [
     cientifico: '',
     desbloqueado: true,
     costoSemillas: 0,
+    // El encargo aprueba el piloto visual, pero no define un poder nuevo.
+    // Se deja explícito para no inventar una mecánica que el encargo no pidió.
     poder: 'Poder pendiente',
     resumen: 'Piloto compai aprobado en lámina 2.5D.',
     color: 0x34322d,
@@ -45,6 +47,7 @@ export const PILOTOS = [
     cientifico: '',
     desbloqueado: true,
     costoSemillas: 0,
+    // El encargo aprueba el piloto visual, pero no define un poder nuevo.
     poder: 'Poder pendiente',
     resumen: 'Piloto compai aprobado en lámina 2.5D.',
     color: 0x3b302b,
@@ -110,18 +113,6 @@ export const PILOTOS = [
     color: 0x4a4438,
     estilo: 'chivito',
   },
-  {
-    id: 'guacamaya',
-    nombre: 'La Guacamaya',
-    especie: 'guacamaya bandera',
-    cientifico: 'Ara macao',
-    desbloqueado: true,
-    costoSemillas: 0,
-    poder: 'Poder pendiente',
-    resumen: 'Piloto compai aprobado en lamina 2.5D.',
-    color: 0xd6422f,
-    estilo: 'guacamaya',
-  },
 ];
 
 export const ITEMS = [
@@ -179,11 +170,15 @@ export const ITEMS = [
 export const PILOTO_POR_ID = Object.fromEntries(PILOTOS.map((p) => [p.id, p]));
 export const ITEM_POR_ID = Object.fromEntries(ITEMS.map((i) => [i.id, i]));
 
-export const PILOTOS_CASA = [
-  'angelita', 'jaguar', 'oso', 'zariguya', 'dante', 'oliver',
-  'luciernaga', 'chivito-punk', 'chivito', 'guacamaya',
-];
+// Roster cerrado del Kart: los siete compai 2.5D canónicos y los dos perros
+// de la casa. Esta lista también sirve como frontera para datos antiguos o
+// remotos, antes de construir cualquier piloto.
+export const PILOTOS_CASA = ['angelita', 'jaguar', 'oso', 'zariguya', 'dante', 'oliver', 'luciernaga', 'chivito-punk', 'chivito'];
 
+// El onboarding puede entregar el slug del compañero (`avatarType`) y no
+// todos los compañeros del valle tienen todavía un piloto modelado en Kart.
+// Los pilotos conservan su identidad y su poder por ID, sin convertir un
+// compañero desconocido en otra especie por accidente.
 export const PILOTO_POR_COMPAI = Object.freeze({
   angelita: 'angelita',
   jaguar: 'jaguar',
@@ -193,7 +188,6 @@ export const PILOTO_POR_COMPAI = Object.freeze({
   zariguya: 'zariguya',
   luciernaga: 'luciernaga',
   oliver: 'oliver',
-  guacamaya: 'guacamaya',
 });
 
 export function pilotoDesdeCompai(compaiId) {

@@ -3,9 +3,11 @@
  * (avatarType 'zariguya').
  *
  * Molde: useEntradaAbeja/AbejaEscena (la escena posee la coreografía, la
- * creature posee el cuerpo — que YA existía: Zariguya.jsx, con las crías al
- * lomo). Pero la chucha NO vuela — es un marsupial NOCTURNO de piso, y su
- * coreografía entera sale de esa verdad:
+ * creature posee el cuerpo). SKIN DEFINITIVA (operador 2026-08-25):
+ * `ZariguyaTrazado` — la lámina AUTO-TRAZADA a tinta sobre el esqueleto de
+ * huesos (clip-regiones), la misma técnica del jaguar. REEMPLAZA al vector
+ * rubber-hose `Zariguya.jsx` en el valle. Pero la chucha NO vuela — es un
+ * marsupial NOCTURNO de piso, y su coreografía entera sale de esa verdad:
  *
  *   · CAMINA: se desplaza PEGADA AL SUELO con trote de pasos cortos (bob de
  *     paso + bamboleo de cadera — el waddle del marsupial), jamás la deriva
@@ -16,8 +18,12 @@
  *   · SE ENCARAMA: si el foco está en alto (hotspot elevado), sube a él como
  *     a un tronco — la cola prensil y las manitas son para eso.
  *   · RONDA: sin foco activo, MERODEA por el piso en óvalos irregulares
- *     (ondas co-primas, lentas) y se detiene a HUSMEAR cada tanto (el cuerpo
- *     ya trae esa reacción-firma: data-husmea).
+ *     (ondas co-primas, lentas). El HUSMEO ya no lo orquesta la escena: vive
+ *     en el idle-cerebro del propio trazado (data-vida husmea/tanatosis/
+ *     reposo, ver vidaEstados.js), su reacción-firma nativa.
+ *   · VIRAJE MÍSTICO (operador 2026-08-25): al cambiar de sentido NO gira —
+ *     la zarigüeya-espíritu se DESVANECE y REAPARECE (parpadeo espectral de
+ *     opacidad 1→0→1), igual que el jaguar/oso-compai. Reemplaza el scaleX(-1).
  *   · NOCTURNA: la noche es SU jornada — de noche no se acurruca como los
  *     demás: sigue trabajando (por eso NO se le pasa hora='noche' al idle).
  *   · SALIDA: sale CORRIENDO por donde vino y se apaga en CRUCE_SUELTA_MS
@@ -30,11 +36,11 @@
    coreografía + su componente de escena) se importa SIEMPRE perezoso dentro de
    un <Canvas> vía CompaiEscena/EscenaBase3D; no es hot-reload-sensible. Van
    juntos a propósito (mismo contrato que useEntradaAbeja). */
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef } from 'react';
 import { useFrame } from '@react-three/fiber';
 import { Html } from '@react-three/drei';
 import * as THREE from 'three';
-import { Zariguya } from '../../creatures/Zariguya.jsx';
+import ZariguyaTrazado from '../../creatures/ZariguyaTrazado.jsx';
 import { ZARIGUYA_PRESENCIA, ZARIGUYA_TINTA, ZARIGUYA_SLUG } from '../../creatures/zariguyaIdentidad.js';
 import { idleDeCreature, IDLE_NEUTRO } from '../../creatures/creatureIdle.js';
 import { useLipSync } from '../../creatures/useLipSync.js';
@@ -97,6 +103,13 @@ export function useAndanzaZariguya(foco, {
   const ultimoTf = useRef('');
   const ultimaPose = useRef('anda');
   const prevX = useRef(foco.x);
+  // VIRAJE MÍSTICO (operador 2026-08-25): la zarigüeya-espíritu NO gira — al
+  // cambiar de sentido horizontal se DESVANECE y REAPARECE (parpadeo espectral
+  // de opacidad sobre caraRef), en vez de espejarse con scaleX. Refs → cero
+  // re-render por frame.
+  const signoCara = useRef(0);      // sentido horizontal (-1|1); 0 = aún sin fijar
+  const apagoEn = useRef(null);     // t del inicio del parpadeo; null = presente
+  const ultimaOpCara = useRef('');  // cache del write de opacidad
   const aparecioRef = useRef(false);
   // Fase de entrada: 'oculta' (pre-ancla) → 'trote' (llega) → 'no'.
   const fase = useRef(cruce && !reducedMotion ? 'oculta' : 'no');
@@ -126,7 +139,8 @@ export function useAndanzaZariguya(foco, {
       if (t - salioEn.current >= CRUCE_SUELTA_S) { ponVis(false); return; }
       _dest.set(foco.x - ENTRA_DESDE_X * 1.6, piso + PERCHA.y, foco.z + 0.35);
       ref.current.position.lerp(_dest, 0.22);
-      if (caraRef.current) caraRef.current.style.transform = 'scaleX(-1)'; // mira por donde huye
+      // NO gira al salir: se retira y se disuelve por visibilidad (ponVis) —
+      // el volteo por scaleX se retiró con el viraje místico.
       state.invalidate();
       return;
     }
@@ -190,11 +204,29 @@ export function useAndanzaZariguya(foco, {
       haptics.tap();
     }
 
-    // VOLTEO: mira hacia donde camina (el hocico vive en +x del dibujo).
+    // VIRAJE MÍSTICO (operador 2026-08-25): la zarigüeya-espíritu NO gira — al
+    // invertir el sentido horizontal se DESVANECE y REAPARECE (parpadeo
+    // espectral de opacidad ~0.55s: 1 → 0 → 1), en vez de espejarse con
+    // scaleX. Solo opacity (GPU); el trote (lerp hacia el foco) reencara el
+    // rumbo mientras está invisible. Mismo lenguaje que el jaguar/oso-compai.
     if (caraRef.current) {
-      const vx = ref.current.position.x - prevX.current;
-      if (Math.abs(vx) > 0.0015) caraRef.current.style.transform = `scaleX(${vx < 0 ? -1 : 1})`;
+      const dx = ref.current.position.x - prevX.current;
+      if (Math.abs(dx) > 0.0015) {
+        const signo = dx < 0 ? -1 : 1;
+        if (signoCara.current !== 0 && signo !== signoCara.current && !reducedMotion && apagoEn.current === null) {
+          apagoEn.current = t; // dispara el teletransporte espectral
+        }
+        signoCara.current = signo;
+      }
       prevX.current = ref.current.position.x;
+      let op = 1;
+      if (apagoEn.current !== null) {
+        const k = (t - apagoEn.current) / 0.55;
+        if (k >= 1) apagoEn.current = null;
+        else op = Math.abs(Math.cos(k * Math.PI)); // baja a 0 a mitad y vuelve
+      }
+      const ops = op.toFixed(2);
+      if (ops !== ultimaOpCara.current) { caraRef.current.style.opacity = ops; ultimaOpCara.current = ops; }
     }
 
     // El gesto del frame (waddle del trote + idle de personalidad) — un solo
@@ -224,23 +256,18 @@ export function useAndanzaZariguya(foco, {
   return { ref, caraRef, sombraRef, visRef, idleRef, aparecioRef };
 }
 
-/* Ritmo del HUSMEO escénico: cada tanto se para a leer el aire (la
-   reacción-firma del cuerpo, data-husmea). Períodos con jitter para que
-   nunca sea de reloj. */
-const HUSMEA_CADA_MS = 8600;
-const HUSMEA_JITTER_MS = 2800;
-const HUSMEA_DURA_MS = 1400;
-
 /**
  * La zarigüeya ya montada en una escena: drop-in del contrato de AbejaEscena
- * (CompaiEscena le pasa las mismas props). Billboard `<Html>` con el cuerpo
- * `Zariguya` (crías al lomo = su firma, de serie); PULSA al narrar y REBOTA
- * al toque con las clases genéricas del billboard (`.mundo-abeja*`), y cada
- * tanto se detiene a HUSMEAR (su reacción propia).
+ * (CompaiEscena le pasa las mismas props). Billboard `<Html>` con la SKIN
+ * definitiva `ZariguyaTrazado` (lámina auto-trazada a tinta sobre huesos,
+ * operador 2026-08-25); PULSA al narrar y REBOTA al toque con las clases
+ * genéricas del billboard (`.mundo-abeja*`). Su husmeo/tanatosis/reposo corren
+ * en el idle-cerebro del propio trazado. VIRAJE MÍSTICO: no gira — se
+ * desvanece y reaparece.
  */
 export function ZariguyaCompaiEscena({
-  foco, entrando = true, animo = 'sereno', energia = 1, reducedMotion = false, piso = 0,
-  hablando = false, rebote = 0, mundoId = null, tier = 'alto', cruce = true,
+  foco, entrando = true, energia = 1, reducedMotion = false, piso = 0,
+  hablando = false, rebote = 0, tier = 'alto', cruce = true,
   estadoFinca = null, hayAlerta = false,
 }) {
   // La señal de SALIDA del host (compartida: la señal es del MUNDO, no de la
@@ -254,10 +281,7 @@ export function ZariguyaCompaiEscena({
     () => (estadoFinca ? reaccionDeFinca(estadoFinca, { hayAlerta }) : null),
     [estadoFinca, hayAlerta],
   );
-  const animoReal = reaccion?.animo ?? animo;
   const energiaReal = reaccion?.energia ?? energia;
-  const climaReal = estadoFinca?.clima ?? null;
-  const ensoReal = estadoFinca?.enso ?? 'neutro';
   // La hora del valle: para la zarigüeya la noche es JORNADA (el hook no la
   // acurruca); aquí solo se lee una vez, determinista.
   const hora = useMemo(() => horaDeReloj(), []);
@@ -267,7 +291,9 @@ export function ZariguyaCompaiEscena({
     cruce: cruce && !reducedMotion, saliendo, hora, tier,
   });
 
-  // Microrrebote del toque (mismo patrón de reflow que AbejaEscena).
+  // Microrrebote del toque (mismo patrón de reflow que AbejaEscena): el
+  // billboard REBOTA con la clase genérica `.mundo-abeja__rebote`. Un reflow
+  // por toque, jamás por frame.
   const reboteRef = useRef(null);
   useEffect(() => {
     if (reducedMotion || rebote === 0 || !reboteRef.current) return undefined;
@@ -279,33 +305,15 @@ export function ZariguyaCompaiEscena({
     return () => clearTimeout(t);
   }, [rebote, reducedMotion]);
 
-  // EL HUSMEO: cada ~8.6s (con jitter) se detiene a leer el aire un momento.
-  // Estado discreto (un re-render cada tanto, jamás por frame). Gate RM.
-  const [husmea, setHusmea] = useState(false);
-  useEffect(() => {
-    if (reducedMotion) return undefined;
-    let vivo = true;
-    let timer;
-    const ciclo = () => {
-      if (!vivo) return;
-      timer = setTimeout(() => {
-        if (!vivo) return;
-        setHusmea(true);
-        timer = setTimeout(() => {
-          if (!vivo) return;
-          setHusmea(false);
-          ciclo();
-        }, HUSMEA_DURA_MS);
-      }, HUSMEA_CADA_MS + Math.random() * HUSMEA_JITTER_MS);
-    };
-    ciclo();
-    return () => { vivo = false; clearTimeout(timer); };
-  }, [reducedMotion]);
-
   const size = ZARIGUYA_PRESENCIA.billboardBase + Math.round(energiaReal * ZARIGUYA_PRESENCIA.billboardPorEnergia);
   const vivo = !reducedMotion;
   // LIP-SYNC: la chucha "habla" cuando el agente narra (única boca del mundo).
   const { visema } = useLipSync({ activo: vivo });
+  // Estado del skin trazado: narra → 'speaking'; parado/idle → 'idle' (su
+  // idle-cerebro 70/30 husmea/tanatosis/reposo corre solo). El trote se lee en
+  // el waddle del idleRef + el desplazamiento del billboard, no en un
+  // walk-cycle interno (así la marcha no se duplica con el bamboleo del molde).
+  const estadoTrazado = hablando && vivo ? 'speaking' : 'idle';
   const cruceVivo = cruce && !reducedMotion;
   return (
     <>
@@ -329,17 +337,13 @@ export function ZariguyaCompaiEscena({
                   para no pisar la transition del volteo de la cara. */}
               <div ref={idleRef} style={{ transformOrigin: 'center bottom' }} data-creature={ZARIGUYA_SLUG}>
                 <div ref={caraRef} className="mundo-abeja__cara">
-                  <Zariguya
+                  <ZariguyaTrazado
                     size={size}
-                    animo={animoReal}
-                    energia={energiaReal}
-                    husmea={husmea && vivo}
-                    clima={climaReal}
-                    enso={ensoReal}
+                    estado={estadoTrazado}
                     visema={vivo ? visema : null}
-                    mundoId={mundoId}
                     animated={vivo}
                     tier={tier}
+                    title="Zarigüeya (chucha)"
                   />
                 </div>
               </div>

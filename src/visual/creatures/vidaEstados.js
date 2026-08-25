@@ -117,6 +117,7 @@ export const VIDA_REPERTORIO = {
     momentos: {
       husmea: { dur: 3150, peso: 2.5 }, // 3× zari-hocico-husmea 1.05s — vive por la nariz
       tanatosis: { dur: 2600, peso: 0.6 }, // 1× zari-desmayo 2.6s — rarísimo, y por eso gracioso
+      reposo: { dur: 4400, peso: 1 }, // 1× rh-g-reposo — el idle-cerebro de la piel trazada
     },
   },
   luciernaga: {
