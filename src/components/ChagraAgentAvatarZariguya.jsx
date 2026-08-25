@@ -1,33 +1,35 @@
-import ZariguyaGeminiLaminaViva from '../visual/creatures/ZariguyaGeminiLaminaViva';
+import ZariguyaTrazado from '../visual/creatures/ZariguyaTrazado';
+import { useAngelitaPresencia, esPasivo } from '../visual/agente/useAngelitaPresencia';
 
 /**
  * ChagraAgentAvatarZariguya — la zarigüeya como CARA del agente de Chagra,
  * 3ra opción junto a Angelita y el maíz (operador 2026-07-25).
  *
- * DESDE `feat/zariguya-gemini-integra` (2026-08-24) el cuerpo es
- * `ZariguyaGeminiLaminaViva`: el SET GEMINI estilo grabado/tinta aprobado por
- * el operador (2026-08-23) — la hero naturalista (lápiz+brújula) horneada en
- * capas lámina-viva + las poses plenas del set (escucha ×4, ver-lupa, cute,
- * muerta, crías al lomo) según el estado. REEMPLAZA aquí al vector rubber-hose
- * `Zariguya.jsx` (rechazado en revisión visual: cuerpo gris plano, cola
- * pelada); el vector sigue vivo en `visual/creatures/` para sus otros
- * consumidores (fauna del valle, selector de criaturas).
+ * Rama `feat/zariguya-trazado-nivel-jaguar` (2026-08-25): el cuerpo pasa a
+ * `ZariguyaTrazado` — la lámina AUTO-TRAZADA a tinta (vectorizada con la
+ * receta vtracer/trazar-lamina.sh, método Humboldt+Cuphead aprobado)
+ * articulada por CLIP-REGIONES sobre el ESQUELETO DE HUESOS. REEMPLAZA aquí
+ * al SET GEMINI (`ZariguyaGeminiLaminaViva`, rechazado en revisión visual —
+ * y con el bug de saltar a un primer-plano de SOLO la cabeza en algunos
+ * estados). El trazado renderiza SIEMPRE el cuerpo entero (un solo SVG con
+ * clip-regiones): cero salto a close-up, coherente en todos los estados.
+ * `ZariguyaGeminiLaminaViva` NO se borra (queda huérfano en `visual/
+ * creatures/`, por historia); solo el agente deja de usarlo.
  *
- * Adaptador puro (mismo contrato que ChagraAgentAvatarAngelita/Maiz/Jaguar):
+ * Adaptador puro (mismo contrato que ChagraAgentAvatarJaguar/OsoBaston):
  * traduce la API histórica del avatar del agente (state 'idle'|'thinking'|
- * 'speaking'|'listening', glow, withLabel, onClick/onDoubleClick) al
- * contrato de la lámina viva — que entiende esos estados de forma nativa:
- *   - idle      → lámina-rig articulada (respira, parpadea, husmea; sus
- *                 momentos de vida traen el gag de tanatosis, el reposo
- *                 de frente y — muy de vez en cuando — las CRÍAS AL LOMO
- *                 (la firma de identidad como momento especial, no como
- *                 hero: orden del operador 2026-08-24), poses reales del
- *                 set).
- *   - thinking  → pose ver-lupa (la investigadora repasa el documento).
- *   - speaking  → lámina-rig + lip-sync de mandíbula (visema estático V2 si
- *                 el host no corre useLipSync — igual que Angelita).
- *   - listening → ciclo de escucha del set (la oreja crece 02→03→04; en
- *                 avatar chico, el close-up 01).
+ * 'speaking'|'listening'|'caminando', glow, withLabel, onClick/onDoubleClick)
+ * al contrato de `ZariguyaTrazado`, que ya canoniza esos estados (y sus
+ * sinónimos) en `ESTADO_CANON` y les da pose/cadencia propia en
+ * `zariguyaTrazado/zariguyaHuesos.css`. `state` viaja como `estado` y queda
+ * expuesto en `data-agt-estado` (paridad de API / accesibilidad).
+ *
+ * PRESENCIA (pedido operador 2026-08-24, transversal al elenco — mismo
+ * contrato que ChagraAgentAvatarJaguar/Angelita): con `reaccionaPresencia` la
+ * chucha DESPIERTA a su estado natural (idle vivo: su idle-cerebro husmea/
+ * tanatosis/reposo) cuando la persona hace mouse over o toca la pantalla, SIN
+ * pisar un estado activo real (thinking/speaking/listening/caminando).
+ * ADITIVA: `reaccionaPresencia=false` (el default) deja el adaptador idéntico.
  */
 const VISEMA_DE_STATE = {
     speaking: 'V2',
@@ -35,7 +37,6 @@ const VISEMA_DE_STATE = {
 
 export default function ChagraAgentAvatarZariguya({
     state = 'idle',
-    estado = undefined,
     size = 48,
     withLabel = false,
     onClick = undefined,
@@ -43,21 +44,34 @@ export default function ChagraAgentAvatarZariguya({
     glow = false,
     className = '',
     ariaLabel = 'Chagra IA',
-    visema = null,
+    // Paridad con el cuerpo canónico (mismos controles que el adaptador del
+    // jaguar): la chucha honra reduced-motion (animated) y la gama baja
+    // (tier), y no debe descartarlos donde el host los cablee.
     animated = true,
     tier = undefined,
-    direccion = 'derecha',
+    // Presencia (pedido operador 2026-08-24, transversal al elenco): con
+    // reaccionaPresencia la zarigüeya DESPIERTA a su idle vivo al detectar
+    // presencia, sin pisar una actuación conversacional real. Mismo contrato
+    // que ChagraAgentAvatarAngelita/Jaguar.
+    reaccionaPresencia = false,
 }) {
-    const visemaEfectivo = visema == null ? (VISEMA_DE_STATE[state] || null) : visema;
+    const { despierta, handlers: handlersPresencia } = useAngelitaPresencia({
+        activo: reaccionaPresencia,
+    });
+    // La presencia solo despierta cuando el estado es pasivo (idle): jamás
+    // interrumpe una actuación conversacional ni la caminata. La zarigüeya ya
+    // vive en idle (idle-cerebro), así que despertar = garantizar su idle.
+    const despiertaNatural = despierta && esPasivo(state);
+    const estadoEfectivo = despiertaNatural ? 'idle' : state;
+    const visema = VISEMA_DE_STATE[estadoEfectivo] || null;
 
     const bicho = (
-        <ZariguyaGeminiLaminaViva
-            estado={estado || state}
-            visema={visemaEfectivo}
+        <ZariguyaTrazado
+            estado={estadoEfectivo}
+            visema={visema}
             size={size}
             animated={animated}
             tier={tier}
-            direccion={direccion}
             title={ariaLabel}
             className={className}
             style={glow ? { filter: 'drop-shadow(0 0 10px rgba(255,158,203,0.65))' } : undefined}
@@ -74,7 +88,9 @@ export default function ChagraAgentAvatarZariguya({
     ) : bicho;
 
     // Paridad con los avatares hermanos: con handlers, botón real (teclado +
-    // lector de pantalla); sin handlers, solo el dibujo.
+    // lector de pantalla) que además capta la presencia por hover directo;
+    // sin handlers, solo el dibujo (la presencia sigue viva por los listeners
+    // de ventana de useAngelitaPresencia).
     if (onClick || onDoubleClick) {
         return (
             <button
@@ -84,6 +100,7 @@ export default function ChagraAgentAvatarZariguya({
                 aria-label={ariaLabel}
                 title={ariaLabel}
                 style={{ background: 'none', border: 'none', padding: 0, cursor: 'pointer', lineHeight: 0 }}
+                {...handlersPresencia}
             >
                 {contenido}
             </button>
