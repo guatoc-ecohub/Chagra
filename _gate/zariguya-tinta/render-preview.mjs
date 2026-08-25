@@ -1,0 +1,13 @@
+/* eslint-disable no-undef -- arnés de gate (node), no código de la app */
+import sharp from 'sharp';
+const IN = '_gate/zariguya-tinta/preview.svg';
+const OUT = '/home/kortux/.claude/jobs/6b23183e/tmp';
+await sharp(IN, { density: 144 }).flatten({ background: '#f2ecdd' }).png().toFile(`${OUT}/tinta-full.png`);
+const meta = await sharp(`${OUT}/tinta-full.png`).metadata();
+const sc = meta.width / 481;
+const crop = (name, x, y, w, h) => sharp(`${OUT}/tinta-full.png`).extract({ left: Math.round(x*sc), top: Math.round(y*sc), width: Math.round(w*sc), height: Math.round(h*sc) }).resize(Math.round(w*sc*1.6)).png().toFile(`${OUT}/tinta-lupa-${name}.png`);
+await crop('cabeza', 80, 0, 230, 200);
+await crop('cuerpo', 150, 130, 250, 260);
+await crop('cola-pies', 240, 210, 241, 234);
+await crop('mano-brujula', 0, 100, 220, 220);
+console.log('renders OK', meta.width, meta.height);
