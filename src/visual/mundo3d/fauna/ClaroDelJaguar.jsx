@@ -263,7 +263,9 @@ function Claro({ tier, reducedMotion }) {
       <Sembrado geo={geoMata} n={nMata} semilla={53} escala={[0.6, 1.35]} />
       <Sembrado geo={geoPiedra} n={rico ? 26 : 12} semilla={91} escala={[0.14, 0.4]} sobreSuelo={0.4} />
 
-      {/* EL FELINO: el SVG de la casa, pisando el terreno del claro. */}
+      {/* EL FELINO: la lámina trazada (JaguarTrazado), pisando el terreno del
+          claro. MODO MÍSTICO (aparicion): en vez de girar al virar, el
+          jaguar-espíritu se DESVANECE y REAPARECE — decisión del operador. */}
       <JaguarBillboard
         centro={[0, 0, 1]}
         radio={3.8}
@@ -272,6 +274,7 @@ function Claro({ tier, reducedMotion }) {
         px={168}
         factor={5.4}
         animated={!reducedMotion}
+        aparicion={!reducedMotion}
         tier={tier}
       />
     </>

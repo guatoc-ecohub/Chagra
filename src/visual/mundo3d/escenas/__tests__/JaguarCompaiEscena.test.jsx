@@ -1,8 +1,13 @@
 /**
  * JaguarCompaiEscena.test.jsx — el JAGUAR compañero dentro de un mundo 3D.
  * Lo que este test certifica (el sujeto tiene nombre): el avatar 'jaguar'
- * monta EL CUERPO DEL JAGUAR (no la abeja recoloreada) sobre el billboard
- * genérico del compañero, y su presencia es DE SUELO — camina, jamás vuela.
+ * monta EL CUERPO DEL JAGUAR sobre el billboard genérico del compañero, y su
+ * presencia es DE SUELO — camina, jamás vuela.
+ *
+ * SKIN definitiva = JaguarTrazado (lámina auto-trazada a tinta, operador
+ * 2026-08-24): renderiza un <div data-creature="jaguar"> (dangerouslySetInnerHTML
+ * del SVG trazado), NO un <svg data-creature> como el cuerpo rubber-hose viejo.
+ * Por eso el contrato se comprueba sobre el div `.jaguarTrazado`.
  */
 import React from 'react';
 import { describe, it, expect, afterEach, vi } from 'vitest';
@@ -30,10 +35,11 @@ afterEach(cleanup);
 const foco = new THREE.Vector3(0, 0, 0);
 
 describe('JaguarCompaiEscena — el jaguar deja de ser la abeja', () => {
-  it('monta el CUERPO del jaguar (svg data-creature="jaguar"), no el de Angelita', () => {
+  it('monta el CUERPO del jaguar (skin trazada, div data-creature="jaguar"), no el de Angelita', () => {
     const { container } = render(<JaguarCompaiEscena foco={foco} reducedMotion />);
-    expect(container.querySelector('svg[data-creature="jaguar"]')).toBeTruthy();
-    expect(container.querySelector('svg[data-creature="abeja-angelita"]')).toBeNull();
+    // La SKIN definitiva es JaguarTrazado → <div .jaguarTrazado data-creature>.
+    expect(container.querySelector('.jaguarTrazado[data-creature="jaguar"]')).toBeTruthy();
+    expect(container.querySelector('[data-creature="abeja-angelita"]')).toBeNull();
     // La capa del gesto queda rotulada con su especie (la captura del gate
     // puede nombrar al sujeto).
     expect(container.querySelector('div[data-creature="jaguar"]')).toBeTruthy();
@@ -72,7 +78,7 @@ describe('JaguarCompaiEscena — el jaguar deja de ser la abeja', () => {
     const { container } = render(<JaguarCompaiEscena foco={foco} reducedMotion />);
     const billboard = container.querySelector('.mundo-abeja');
     expect(billboard.getAttribute('style') || '').not.toMatch(/visibility:\s*hidden/);
-    // Y el cuerpo queda quieto pero digno (animated=false).
-    expect(container.querySelector('svg[data-creature="jaguar"]')).toBeTruthy();
+    // Y el cuerpo (skin trazada) queda quieto pero digno (animated=false).
+    expect(container.querySelector('.jaguarTrazado[data-creature="jaguar"]')).toBeTruthy();
   });
 });

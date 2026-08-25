@@ -103,10 +103,12 @@ const REGISTRO = {
   // El JAGUAR compañero (fable F26): felino DE SUELO — entra acechando desde
   // el borde, camina pesado y silencioso (rodar de hombros, cero bob), viaja
   // con la marcha de perfil del cuerpo, patrulla en óvalos amplios y se echa.
-  // Jamás vuela, jamás trota. Su PortalComponent (cuerpo 2D del portal) sigue
-  // pendiente — F26 solo cubrió la presencia 3D — así que el portal cruza
-  // con el cuerpo de Angelita hasta que exista (regla del fallback, ver
-  // cuerpoPortalDe en CompaiTransicion.jsx).
+  // Jamás vuela, jamás trota. SKIN = JaguarTrazado (lámina auto-trazada a
+  // tinta, operador 2026-08-24) y VIRAJE MÍSTICO: no gira — se desvanece y
+  // reaparece (ver JaguarCompaiEscena.jsx). Su PortalComponent (cuerpo 2D del
+  // portal) sigue pendiente — F26 solo cubrió la presencia 3D — así que el
+  // portal cruza con el cuerpo de Angelita hasta que exista (regla del
+  // fallback, ver cuerpoPortalDe en CompaiTransicion.jsx).
   jaguar: { EscenaComponent: JaguarCompaiEscena, PortalComponent: null, presencia: JAGUAR_PRESENCIA, especie: 'jaguar', pendienteFable: false },
   // El OSO DEL BASTÓN compañero (fable F26): caminante de trocha — llega a
   // pie, anda erguido y LENTO, se detiene a apoyarse en el cayado, y al

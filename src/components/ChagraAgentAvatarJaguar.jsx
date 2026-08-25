@@ -1,4 +1,5 @@
 import JaguarTrazado from '../visual/creatures/JaguarTrazado';
+import { useAngelitaPresencia, esPasivo } from '../visual/agente/useAngelitaPresencia';
 
 /**
  * ChagraAgentAvatarJaguar — el jaguar (Panthera onca) como CARA del agente de
@@ -36,14 +37,35 @@ export default function ChagraAgentAvatarJaguar({
     glow = false,
     className = '',
     ariaLabel = 'Chagra IA',
+    // Paridad con el cuerpo canónico (mismos controles que el adaptador de
+    // Angelita): el felino honra reduced-motion (animated) y la gama baja
+    // (tier), y no debe descartarlos donde el host los cablea.
+    animated = true,
+    tier = undefined,
+    // Presencia (pedido operador 2026-08-24, transversal al elenco): con
+    // reaccionaPresencia el jaguar DESPIERTA a su estado natural (idle vivo:
+    // useVidaIdle 70/30 — acecha/ruge/reposo) cuando la persona hace mouse
+    // over o toca la pantalla, sin pisar un estado activo real (thinking/
+    // speaking/listening). Mismo contrato que ChagraAgentAvatarAngelita.
+    reaccionaPresencia = false,
 }) {
-    const visema = VISEMA_DE_STATE[state] || null;
+    const { despierta, handlers: handlersPresencia } = useAngelitaPresencia({
+        activo: reaccionaPresencia,
+    });
+    // La presencia solo despierta cuando el estado es pasivo (idle): jamás
+    // interrumpe una actuación conversacional. El jaguar ya está vivo en idle
+    // (idle-cerebro), así que despertar = garantizar animated ON + su idle.
+    const despiertaNatural = despierta && esPasivo(state);
+    const estadoEfectivo = despiertaNatural ? 'idle' : state;
+    const visema = VISEMA_DE_STATE[estadoEfectivo] || null;
 
     const bicho = (
         <JaguarTrazado
-            estado={state}
+            estado={estadoEfectivo}
             visema={visema}
             size={size}
+            animated={animated}
+            tier={tier}
             title={ariaLabel}
             className={className}
             style={glow ? { filter: 'drop-shadow(0 0 10px rgba(168,85,247,0.65))' } : undefined}
@@ -71,6 +93,7 @@ export default function ChagraAgentAvatarJaguar({
                 aria-label={ariaLabel}
                 title={ariaLabel}
                 style={{ background: 'none', border: 'none', padding: 0, cursor: 'pointer', lineHeight: 0 }}
+                {...handlersPresencia}
             >
                 {contenido}
             </button>
