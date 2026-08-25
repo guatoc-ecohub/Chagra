@@ -100,6 +100,9 @@ export function useDerivaLuciernaga(foco, {
   const ultimaOp = useRef('');
   const ultimaPose = useRef('vuela');
   const prevX = useRef(foco.x);
+  const signoCara = useRef(0);
+  const apagoEn = useRef(null);
+  const ultimaOpCara = useRef('');
   const aparecioRef = useRef(false);
   // Fase de entrada: 'oculta' (pre-ancla) → 'enciende' (parpadea) → 'no'.
   const fase = useRef(cruce && !reducedMotion ? 'oculta' : 'no');
@@ -211,11 +214,29 @@ export function useDerivaLuciernaga(foco, {
       haptics.tap();
     }
 
-    // VOLTEO: mira hacia donde deriva (suave — deriva, no dardea).
+    // VIRAJE MÍSTICO: no gira para mirar hacia donde deriva. Se desvanece y
+    // reaparece con el nuevo rumbo.
     if (caraRef.current) {
       const vx = ref.current.position.x - prevX.current;
-      if (Math.abs(vx) > 0.001) caraRef.current.style.transform = `scaleX(${vx < 0 ? -1 : 1})`;
+      if (Math.abs(vx) > 0.001) {
+        const signo = vx < 0 ? -1 : 1;
+        if (signoCara.current && signo !== signoCara.current && !reducedMotion && apagoEn.current === null) {
+          apagoEn.current = t;
+        }
+        signoCara.current = signo;
+      }
       prevX.current = ref.current.position.x;
+      let op = 1;
+      if (apagoEn.current !== null) {
+        const k = (t - apagoEn.current) / 0.55;
+        op = k < 1 ? Math.abs(Math.cos(k * Math.PI)) : 1;
+        if (k >= 1) apagoEn.current = null;
+      }
+      const ops = op.toFixed(2);
+      if (ops !== ultimaOpCara.current) {
+        ultimaOpCara.current = ops;
+        caraRef.current.style.opacity = ops;
+      }
     }
 
     // El gesto del frame (ladeo de deriva + idle de personalidad) — un solo
@@ -359,7 +380,7 @@ export function LuciernagaCompaiEscena({
           >
             <div ref={reboteRef} className="mundo-abeja__rebote">
               {/* Capa del gesto (ladeo + idle + BRILLO en opacidad) —
-                  imperativa por frame; propia para no pisar el volteo. */}
+                  imperativa por frame; propia para no pisar la aparición mística. */}
               <div ref={idleRef} style={{ transformOrigin: 'center center' }} data-creature={LUCIERNAGA_SLUG}>
                 <div ref={caraRef} className="mundo-abeja__cara">
                   <Luciernaga

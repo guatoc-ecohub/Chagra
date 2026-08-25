@@ -5,8 +5,8 @@
  * herede toda escena-mundo (§4.4). Aquí está: extraída del `CompaneroAbeja` del
  * valle (Valle3D), generalizada para cualquier arquetipo. La ESCENA solo le pasa
  * el `foco` (posición del hotspot activo o el centro del diorama); el hook mueve
- * a Angelita con `lerp` hacia él, la hace flotar según su energía, y la voltea a
- * mirar hacia donde viaja. El CUERPO siempre es `<AbejaAngelita>` (la creature
+ * a Angelita con `lerp` hacia él, la hace flotar según su energía y usa una
+ * aparición mística al cambiar de rumbo. El CUERPO siempre es `<AbejaAngelita>` (la creature
  * de la librería): la escena POSEE la coreografía, la creature POSEE el cuerpo.
  *
  * Vive dentro de escenas/ (chunk perezoso `vendor-three`): importa @react-three
@@ -87,7 +87,7 @@ function puntoDeCruce(camera, foco, out) {
 
 /**
  * Devuelve `{ ref, caraRef, sombraRef, visRef }` para colgar del `<group>` de
- * la abeja, de su cara (para el volteo), de su sombra de contacto (el blob que
+ * la abeja, de su cara (para la aparición mística), de su sombra de contacto (el blob que
  * la sigue por el piso — auditoría 3D: la abeja no debe volar "a la deriva") y
  * del billboard DOM (la visibilidad del cruce). Corre `useFrame` (debe usarse
  * DENTRO de un `<Canvas>`).
@@ -126,7 +126,7 @@ export function useEntradaAbeja(foco, {
   const sombraRef = useRef(null);
   const visRef = useRef(null);
   // ── PERSONALIDAD IDLE (creatureIdle.js): la capa DOM que recibe el squash &
-  //    stretch/giros (idleRef, hermana del volteo para no pelear con su
+  //    stretch/gestos (idleRef, hermana de la aparición para no pelear con su
   //    transition CSS), el reloj de llegada (dispara la CELEBRACIÓN), y cachés
   //    imperativos (string del transform + pose discreta + nodo del svg) para
   //    escribir al DOM SOLO cuando algo cambió.
@@ -140,6 +140,9 @@ export function useEntradaAbeja(foco, {
   const fase = useRef(cruce && !reducedMotion ? 'oculta' : 'no');
   const salioEn = useRef(null); // reloj del inicio de la salida
   const prevX = useRef(foco.x);
+  const signoCara = useRef(0);
+  const apagoEn = useRef(null);
+  const ultimaOpCara = useRef('');
   // Visibilidad del billboard DOM + su sombra (el <Html> de drei es un portal:
   // no hereda `group.visible`, así que se apaga a mano por estilo).
   // `aparecioRef` (BUG-COMPAI-ENTRADA, 2026-07-26): una vez que la abeja
@@ -261,12 +264,32 @@ export function useEntradaAbeja(foco, {
       llegoEn.current = t; // arranca la CELEBRACIÓN idle (giro alegre + overshoot)
       haptics.abeja();
     }
+    // El compai no gira para cambiar de rumbo. Se desvanece y reaparece con
+    // el nuevo paso, el mismo lenguaje místico de todas las especies.
     if (caraRef.current) {
       const vx = ref.current.position.x - prevX.current;
-      if (Math.abs(vx) > 0.0015) caraRef.current.style.transform = `scaleX(${vx < 0 ? -1 : 1})`;
+      if (Math.abs(vx) > 0.0015) {
+        const signo = vx < 0 ? -1 : 1;
+        if (signoCara.current && signo !== signoCara.current && !reducedMotion && apagoEn.current === null) {
+          apagoEn.current = state.clock.elapsedTime;
+        }
+        signoCara.current = signo;
+      }
       prevX.current = ref.current.position.x;
+      let op = 1;
+      if (apagoEn.current !== null) {
+        const transcurrido = state.clock.elapsedTime - apagoEn.current;
+        const k = transcurrido / 0.52;
+        op = k < 1 ? Math.abs(Math.cos(k * Math.PI)) : 1;
+        if (k >= 1) apagoEn.current = null;
+      }
+      const ops = op.toFixed(2);
+      if (ops !== ultimaOpCara.current) {
+        ultimaOpCara.current = ops;
+        caraRef.current.style.opacity = ops;
+      }
     }
-    // El idle se ESCRIBE al DOM en su propia capa (no pisa el volteo ni su
+    // El idle se ESCRIBE al DOM en su propia capa (no pisa la aparición ni su
     // transition): un solo style-write, cacheado por string — sin animación
     // activa la cadena no cambia y el DOM no se toca. La pose discreta viaja
     // como data-pose al svg del cuerpo ('celebra'/'reposo' tienen CSS propio).
@@ -301,7 +324,7 @@ export function useEntradaAbeja(foco, {
  * dentro de un mundo (la del footer se oculta): por eso REFLEJA EL HABLA —pulsa
  * cuando el agente narra (`hablando`)— y da un microrrebote al tocar un hotspot
  * (`rebote`, un contador que sube por toque). Tres transformaciones en tres capas
- * DOM que no se pisan: pulso (raíz), rebote (medio), volteo scaleX (cara, que el
+ * DOM que no se pisan: pulso (raíz), rebote (medio), aparición mística (cara, que el
  * useFrame maneja imperativo). Cualquier arquetipo la coloca con
  * `<AbejaEscena foco=… animo=… energia=… hablando=… rebote=… reducedMotion=… />`.
  */
@@ -423,13 +446,10 @@ export function AbejaEscena({
             data-comiendo={comiendo && vivo ? '1' : undefined}
           >
             <div ref={reboteRef} className="mundo-abeja__rebote">
-              {/* Cuarta capa de gesto: el IDLE (squash&stretch, vueltas de
+              {/* Cuarta capa de gesto: el IDLE (squash&stretch, gestos de
                   campana, celebración) — imperativa por frame desde el hook.
-                  Propia para no pisar la transition del volteo de la cara;
-                  transform-origin default (center) = gira sobre sí misma.
-                  Lleva data-creature para que el hook le cuelgue data-pose
-                  ('celebra'/'reposo', CSS de creatures.css por descendencia)
-                  SIN tocar el svg, que React re-renderiza a su aire. */}
+                  Propia para no pisar la aparición mística de la cara.
+                  data-creature → el hook le cuelga data-pose (CSS de creatures). */}
               <div ref={idleRef} className="mundo-abeja__idle" data-creature="abeja-angelita">
                 <div ref={caraRef} className="mundo-abeja__cara">
                   <AbejaAngelita

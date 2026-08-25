@@ -147,4 +147,29 @@ describe('useCompaiRoam', () => {
     expect(el.style.transform).toBe('');
     expect(result.current.caminando).toBe(false);
   });
+
+  it('arrastra el compai y persiste la posición elegida', () => {
+    instalarRafManual();
+    const el = document.createElement('div');
+    const ref = { current: el };
+    const { result } = renderHook(() => useCompaiRoam(ref, {
+      activo: false,
+      soloX: false,
+      superficie: 'drag-test',
+    }));
+
+    act(() => result.current.handlers.onPointerDown({
+      target: el, pointerId: 7, clientX: 100, clientY: 100,
+    }));
+    act(() => result.current.handlers.onPointerMove({
+      pointerId: 7, clientX: 60, clientY: 60,
+    }));
+    act(() => result.current.handlers.onPointerUp({ pointerId: 7 }));
+
+    expect(el.style.transform).toBe('translate3d(-40.0px, -40.0px, 0)');
+    expect(JSON.parse(window.localStorage.getItem('chagra:compai:posicion:angelita:drag-test'))).toEqual({
+      x: -40,
+      y: -40,
+    });
+  });
 });

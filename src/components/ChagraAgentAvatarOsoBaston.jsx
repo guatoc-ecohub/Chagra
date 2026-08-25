@@ -72,7 +72,7 @@ export default function ChagraAgentAvatarOsoBaston({
     // reaccionaPresencia el oso DESPIERTA a su estado natural (idle vivo) al
     // detectar presencia, sin pisar una actuación conversacional real. Mismo
     // contrato que ChagraAgentAvatarAngelita/Jaguar.
-    reaccionaPresencia = false,
+    reaccionaPresencia = true,
 }) {
     const { despierta, handlers: handlersPresencia } = useAngelitaPresencia({
         activo: reaccionaPresencia,

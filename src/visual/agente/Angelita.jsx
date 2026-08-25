@@ -226,8 +226,8 @@ function Zetitas() {
  * @param {Object} props
  * @param {string} [props.estado='acompana']  estado conversacional (o sinónimo).
  * @param {number|string|null} [props.confianza=null]  0..1 o 'alta'|'media'|'baja'.
- * @param {'derecha'|'izquierda'} [props.direccion='derecha']  hacia dónde mira/
- *   señala/invita (izquierda = espejo del dibujo completo).
+ * @param {'derecha'|'izquierda'} [props.direccion='derecha']  compatibilidad
+ *   de API para la guía. La presencia nunca voltea el arte.
  * @param {number} [props.size=96]
  * @param {string} [props.className]
  * @param {boolean} [props.animated=true]  false = fotograma digno.
@@ -324,7 +324,7 @@ export function Angelita({
     let soltar = 0;
     let px = 0;
     let py = 0;
-    const signo = direccion === 'izquierda' ? -1 : 1; // el espejo voltea la x
+    const signo = 1;
     const liberar = () => svg.removeAttribute('data-agt-mira');
     const mirar = () => {
       raf = 0;
@@ -360,7 +360,7 @@ export function Angelita({
       svg.style.removeProperty('--agt-mx');
       svg.style.removeProperty('--agt-my');
     };
-  }, [sigueUsted, direccion]);
+  }, [sigueUsted]);
 
   // El estado tiñe el ánimo del cuerpo base (aura/antics) salvo que el host
   // mande el suyo: contenta brilla 'pleno', preocupada se pone 'atento'.
@@ -591,12 +591,9 @@ export function Angelita({
      estado) → cuerpo (abeja + señales de cara, UN wrapper que los estados
      mueven junto) → aire (burbuja, ondas, chispas, signos, la mota).
      `.agt-vuelo` va con key=estado: al cambiar de estado se REMONTA y su
-     animación de entrada (anticipación → overshoot → asienta) vuelve a correr
-     — la transición fluye en vez de saltar. direccion 'izquierda' espeja TODO
-     el dibujo (señala/invita hacia el otro lado); el ritmo propio de parpadeo
-     viaja como CSS vars. */
-  const espejo = direccion === 'izquierda' ? { transform: 'scaleX(-1)' } : null;
-  const estilo = { ...ritmoPropio, ...espejo };
+     animación de entrada vuelve a correr. La transición conserva el arte sin
+     voltear; el ritmo propio de parpadeo viaja como CSS vars. */
+  const estilo = { ...ritmoPropio };
   return (
     <svg
       ref={svgRef}
@@ -609,6 +606,7 @@ export function Angelita({
       aria-label={aria}
       data-agente="angelita"
       data-agt-estado={e}
+      data-agt-direccion={direccion}
       data-agt-vivo={vivo ? '1' : undefined}
       /* El visema del TTS también en el root: el CSS acopla las ondas de miel
          al movimiento real de la boquita (V1 = silencio). Solo se estampa si

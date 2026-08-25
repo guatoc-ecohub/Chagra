@@ -25,6 +25,7 @@ import useAgentAvatarType, { AVATAR_NOMBRE, DEFAULT_AVATAR_TYPE } from '../hooks
 import { getHintForRuta } from '../config/compaiHints.js';
 import BurbujaAngelita from '../visual/agente/BurbujaAngelita.jsx';
 import AgentFabMenu from './AgentFabMenu';
+import useComportamientoCompai from '../hooks/useComportamientoCompai.js';
 import './agent-fab-skin.css';
 
 /**
@@ -75,6 +76,7 @@ import './agent-fab-skin.css';
  * ahora el largo Y la opción del menú.
  */
 export default function AgentFab({ onNavigate, pantalla = null }) {
+  const compaiRef = useRef(null);
   const [hover, setHover] = useState(false);
   const [pressed, setPressed] = useState(false);
   const [menuAbierto, setMenuAbierto] = useState(false);
@@ -203,6 +205,11 @@ export default function AgentFab({ onNavigate, pantalla = null }) {
   //        hooks de arriba; aquí se hace VISIBLE con la burbuja rica del valle.
   const [avatarType] = useAgentAvatarType();
   const nombreCompai = AVATAR_NOMBRE[avatarType] || AVATAR_NOMBRE[DEFAULT_AVATAR_TYPE];
+  const comportamiento = useComportamientoCompai(compaiRef, {
+    especie: avatarType,
+    superficie: pantalla || 'global',
+    contentAware: true,
+  });
   const hint = useMemo(() => getHintForRuta(pantalla, nombreCompai), [pantalla, nombreCompai]);
 
   const interactuando = useInteraccionUsuario();
@@ -400,6 +407,14 @@ export default function AgentFab({ onNavigate, pantalla = null }) {
        para el teclado y el lector de pantalla). El puesto no se movió ni un
        píxel: las mismas coordenadas de siempre. */
     <div
+      ref={compaiRef}
+      data-compai-surface={pantalla || 'global'}
+      onPointerEnter={comportamiento.handlers.onPointerEnter}
+      onPointerLeave={comportamiento.handlers.onPointerLeave}
+      onPointerDown={comportamiento.handlers.onPointerDown}
+      onPointerMove={comportamiento.handlers.onPointerMove}
+      onPointerUp={comportamiento.handlers.onPointerUp}
+      onPointerCancel={comportamiento.handlers.onPointerCancel}
       aria-hidden={oculto}
       style={{
         position: 'fixed',
@@ -409,9 +424,8 @@ export default function AgentFab({ onNavigate, pantalla = null }) {
         height: 84,
         zIndex: 40,
         pointerEvents: 'none', // sólo los hijos reciben toque: el hueco no tapa nada
-        visibility: oculto ? 'hidden' : 'visible',
-        opacity: oculto ? 0 : 1,
-        transition: 'opacity .12s ease, visibility 0s linear .12s',
+        visibility: 'visible',
+        opacity: 1,
       }}
     >
       <button
@@ -491,7 +505,9 @@ export default function AgentFab({ onNavigate, pantalla = null }) {
             visema={visemaFromAmplitude(ttsLevel)}
             direccion="izquierda"
             className={responseReady ? 'agt-avatar-glow' : undefined}
-            title="Angelita, la asistente de Chagra"
+            title="Chagra IA"
+            ariaLabel="Chagra IA"
+            reaccionaPresencia
           />
         </span>
       </button>
@@ -502,6 +518,7 @@ export default function AgentFab({ onNavigate, pantalla = null }) {
           `aria-pressed` para que un lector de pantalla diga si está activo. */}
       <button
         type="button"
+        data-compai-no-drag="true"
         onClick={(e) => { e.stopPropagation(); alternarSilencio(); }}
         aria-pressed={silenciado}
         aria-label={silenciado ? 'Volver a oír a Angelita' : 'Que Angelita se quede callada'}
@@ -518,10 +535,8 @@ export default function AgentFab({ onNavigate, pantalla = null }) {
           color: '#fff',
           fontSize: 14,
           lineHeight: 1,
-          // v2 (operador): el ícono se ve SOLO cuando toco/hover el compai (o
-          // el menú está abierto), o si está silenciado (para poder reactivarlo)
-          // — no tapa la cara en reposo. Ver feedback_compai_politica_v2.
-          display: (hover || pressed || menuAbierto || silenciado) ? 'flex' : 'none',
+          // El ícono aparece por clic/toque, nunca por hover en reposo.
+          display: (comportamiento.notificacionVisible || pressed || menuAbierto) ? 'flex' : 'none',
           alignItems: 'center',
           justifyContent: 'center',
           cursor: 'pointer',

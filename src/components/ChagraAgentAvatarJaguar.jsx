@@ -47,7 +47,7 @@ export default function ChagraAgentAvatarJaguar({
     // useVidaIdle 70/30 — acecha/ruge/reposo) cuando la persona hace mouse
     // over o toca la pantalla, sin pisar un estado activo real (thinking/
     // speaking/listening). Mismo contrato que ChagraAgentAvatarAngelita.
-    reaccionaPresencia = false,
+    reaccionaPresencia = true,
 }) {
     const { despierta, handlers: handlersPresencia } = useAngelitaPresencia({
         activo: reaccionaPresencia,

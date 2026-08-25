@@ -41,6 +41,9 @@ import { ZariguyaCompaiEscena } from './ZariguyaCompaiEscena.jsx';
 import { JaguarCompaiEscena } from './JaguarCompaiEscena.jsx';
 import { OsoBastonCompaiEscena } from './OsoBastonCompaiEscena.jsx';
 import { LuciernagaCompaiEscena } from './LuciernagaCompaiEscena.jsx';
+import { GuacamayaCompaiEscena, ChivitoCompaiEscena } from './AvesCompaiEscena.jsx';
+import { GUACAMAYA_PRESENCIA } from '../../creatures/guacamayaIdentidad.js';
+import { CHIVITO_PRESENCIA } from '../../creatures/chivitoIdentidad.js';
 import { AVATAR_TYPES, DEFAULT_AVATAR_TYPE } from '../../../hooks/useAgentAvatarType.js';
 
 /**
@@ -123,15 +126,10 @@ const REGISTRO = {
   // detiene a leer la noche y con alerta de finca titila 'degradado'.
   // PortalComponent pendiente, mismo criterio que el jaguar.
   luciernaga: { EscenaComponent: LuciernagaCompaiEscena, PortalComponent: null, presencia: LUCIERNAGA_PRESENCIA, especie: 'luciernaga', pendienteFable: false },
-  // La GUACAMAYA y el CHIVITO DE PÁRAMO (roster-7, 2026-08-14): ya tienen
-  // cuerpo 2.5D en la PWA (GuacamayaCompai.jsx/ChivitoPunk.jsx, reusan el rig F24
-  // del valle) pero TODAVÍA no tienen coreografía 3D propia — quedan
-  // `pendienteFable:true` y caen a Angelita en el mundo 3D (regla del
-  // fallback, igual que jaguar/oso-baston/luciernaga antes de F26). Cuando
-  // alguien las coreografíe, sus PRESENCIA de placeholder ya están sembradas
-  // en `guacamayaIdentidad.js`/`chivitoIdentidad.js` (visual/creatures/).
-  guacamaya: { EscenaComponent: null, PortalComponent: null, presencia: null, especie: 'guacamaya', pendienteFable: true },
-  'chivito-punk': { EscenaComponent: null, PortalComponent: null, presencia: null, especie: 'chivito-punk', pendienteFable: true },
+  // Las aves usan sus rigs F24 aprobados en 2D y 3D. La coreografía es
+  // compartida, pero cada entrada conserva su arte y su escala de presencia.
+  guacamaya: { EscenaComponent: GuacamayaCompaiEscena, PortalComponent: null, presencia: GUACAMAYA_PRESENCIA, especie: 'guacamaya', pendienteFable: false },
+  'chivito-punk': { EscenaComponent: ChivitoCompaiEscena, PortalComponent: null, presencia: CHIVITO_PRESENCIA, especie: 'chivito-punk', pendienteFable: false },
 };
 
 /**
