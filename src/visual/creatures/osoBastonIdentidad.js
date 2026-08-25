@@ -188,8 +188,11 @@ export const OSO_BASTON_FLORA = Object.freeze({
  * contacto con peso real (nada de flotar).
  */
 export const OSO_BASTON_PRESENCIA = {
-  billboardBase: 62,
-  billboardPorEnergia: 10,
+  /* TAMAÑO +5% (operador 2026-08-24): el caminante se lee un pelo más grande
+     en el valle 3D. base 62→65 y por-energía 10→11 (≈+5% sobre el rango
+     62..72 → 65..76). El ARTE (OsoBaston.jsx) no cambia: solo su px en escena. */
+  billboardBase: 65,
+  billboardPorEnergia: 11,
   distancia: 6,
   /* Su marca en escena (llega a pie) y a ras de suelo. */
   percha: { x: 0.5, y: 0.62, z: 0.65 },
