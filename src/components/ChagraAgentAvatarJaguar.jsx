@@ -1,27 +1,27 @@
-import JaguarLaminaViva from '../visual/creatures/JaguarLaminaViva';
+import JaguarTrazado from '../visual/creatures/JaguarTrazado';
 
 /**
  * ChagraAgentAvatarJaguar — el jaguar (Panthera onca) como CARA del agente de
  * Chagra, 4ta opción del elenco (junto a Angelita, maíz y zarigüeya).
  *
- * Rama `feat/jaguar-lamina-sobre-esqueleto` (2026-08-14): reemplaza el
- * cuerpo vector (`Jaguar.jsx`, rubber-hose dibujado a mano) por
- * `JaguarLaminaViva` — la lámina Humboldt REAL (`jaguar-natural.png`)
- * recortada en capas y montada sobre las transformaciones REALES del rig
- * `~/demos/3d/compai/rigs/jaguar.rig.svg`+`jaguar.css`. Ver el docstring de
- * `JaguarLaminaViva.jsx` para el detalle de la fusión piel+esqueleto y lo
- * que quedó fuera de alcance. `Jaguar.jsx` NO se borra (otros consumidores
- * —p.ej. paisaje del miedo del valle— pueden seguir usándolo).
+ * Rama `feat/jaguar-trazado-agente` (2026-08-24): reemplaza la foto-lámina
+ * (`JaguarLaminaViva`, la PNG recortada en capas — rechazada por el operador:
+ * el pecho raster no aguanta el corte) por `JaguarTrazado` — la lámina
+ * AUTO-TRAZADA a tinta (vectorizada con la receta trazar-lamina.sh, método
+ * Humboldt+Cuphead aprobado) articulada por clip-regiones sobre el ESQUELETO
+ * DE HUESOS de `JaguarHuesos`. Con ese rig el jaguar por fin CAMINA de
+ * verdad (ciclo de cuadrúpedo en secuencia lateral, rodilla y zarpa
+ * incluidas) y la cabeza gira sobre el atlas sin decapitarse.
+ * `JaguarLaminaViva` NO se borra (otros consumidores pueden seguir usándolo);
+ * solo el agente deja de usarlo.
  *
  * Adaptador puro (mismo contrato que ChagraAgentAvatarZariguya): traduce la
  * API histórica del avatar del agente (state 'idle'|'thinking'|'speaking'|
- * 'listening', glow, withLabel, onClick/onDoubleClick) al contrato de
- * `JaguarLaminaViva`. El rig de perfil (`#jaguarLado` en jaguar.css) NO
- * tiene variantes por estado — solo define la pose de marcha — así que acá
- * `state` viaja como `data-agt-estado` (paridad de API / accesibilidad) sin
- * cambiar la pose: inventar una reacción por estado sería agregar un
- * transform que no existe en el rig real, y el SPEC de esta rama es ceñirse
- * a los que SÍ existen.
+ * 'listening'|'caminando', glow, withLabel, onClick/onDoubleClick) al
+ * contrato de `JaguarTrazado`, que ya canoniza esos cinco estados (y sus
+ * sinónimos) en `ESTADO_CANON` y les da pose/cadencia propia en
+ * `jaguarHuesos.css`. `state` viaja como `estado` y queda expuesto en
+ * `data-agt-estado` (paridad de API / accesibilidad).
  */
 const VISEMA_DE_STATE = {
     speaking: 'V2',
@@ -40,7 +40,7 @@ export default function ChagraAgentAvatarJaguar({
     const visema = VISEMA_DE_STATE[state] || null;
 
     const bicho = (
-        <JaguarLaminaViva
+        <JaguarTrazado
             estado={state}
             visema={visema}
             size={size}
@@ -60,7 +60,8 @@ export default function ChagraAgentAvatarJaguar({
     ) : bicho;
 
     // Paridad con los avatares hermanos: con handlers, botón real (teclado +
-    // lector de pantalla); sin handlers, solo el dibujo.
+    // lector de pantalla) que envuelve TODO el contenido (dibujo + rótulo);
+    // sin handlers, solo el dibujo.
     if (onClick || onDoubleClick) {
         return (
             <button

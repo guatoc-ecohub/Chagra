@@ -1,0 +1,354 @@
+/* ═══════════════════════════════════════════════════════════════════════════
+   jaguarHuesos.css — LA CADENCIA del jaguar de huesos (piel realista de la
+   lámina, movimiento rubber-hose). Spec 70/30 del operador:
+
+     · data-modo="normal"  (70%): el jaguar BONITO y digno — camina/está quieto
+       con vida sutil (respira, cola, orejas, parpadeo irregular, giro sereno
+       de cabeza). La cadencia rubber-hose entra SUAVE.
+     · data-modo="actuando" (30%): los momentos expresivos Miss-Minutes — masa
+       que flota, squash&stretch fuerte, la VUELTA de campana, double-take,
+       aura espectral. MISMO esqueleto, curvas canónicas a fondo.
+
+   CURVAS CANÓNICAS (rubberhoseSpec.RH_EASE — no se inventan otras):
+     anticipación  cubic-bezier(.34,-.2,.64,1)
+     impulso       cubic-bezier(.4,0,1,1)
+     squash        cubic-bezier(.4,0,.2,1)
+     overshoot     cubic-bezier(.34,1.56,.64,1)
+   RELOJES CO-PRIMOS (RH_PERIODOS re-tempo jaguar): respira 3.4 · cola 3.1 ·
+     orejas 4.3/3.7 · blink 5.6 · giro 7.9 · antic 9.7 — nunca el mismo compás.
+   MARCHA: la probada del rig de perfil (pasoLado): ciclo 1.05s, secuencia
+     lateral (delCerca 0 · trasLejos −.14 · trasCerca −.52 · delLejos −.66),
+     tronco a 2 botes/ciclo y CABEZA NIVELADA (estabilización felina).
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.jaguarHuesos{
+  --jh-paso: 1.05s;   /* ciclo completo de marcha (pasoLado probado) */
+  --jh-fase: 0s;      /* desfase de coro (el host lo pisa si hay varios) */
+  --jh-jaw: 0;        /* apertura de mandíbula 0..1 (visema / rugido) */
+  display: block;
+  overflow: visible;
+}
+/* el svg llena su host (el wrapper React o cualquier caja del kart) */
+div.jaguarHuesos > svg{ width: 100%; height: 100%; display: block; overflow: visible; }
+
+/* GOTCHA RESUELTO: el <svg> interno también es .jaguarHuesos, y la regla base
+   de arriba re-declararía las vars en él TAPANDO las del wrapper (la mandíbula
+   del visema se quedaba en 0 y todas las fases en 0s). Un raíz anidado HEREDA
+   las vars de su host en vez de re-declararlas. */
+.jaguarHuesos .jaguarHuesos{ --jh-paso: inherit; --jh-fase: inherit; --jh-jaw: inherit; }
+
+/* Todo hueso transforma en el espacio del viewBox: los pivotes inline
+   (style="transform-origin:Xpx Ypx") son píxeles de la lámina 705×394. */
+.jaguarHuesos .jh-hueso,
+.jaguarHuesos .jh-masa,
+.jaguarHuesos .jh-antic,
+.jaguarHuesos .jh-pj,
+.jaguarHuesos .jh-parpado,
+.jaguarHuesos .jh-pupila,
+.jaguarHuesos .jh-sombraSuelo,
+.jaguarHuesos .jh-aura{ transform-box: view-box; }
+
+/* line-boil canónico: SUAVE en normal (el grabado respira apenas),
+   a compás pleno en actuando. El filtro anima sus seeds por SMIL (0.4s/3
+   seeds ≈ 10fps) dentro del propio SVG — autocontenido. */
+.jaguarHuesos .jh-pj{ filter: url(#jhBoilSuave); }
+.jaguarHuesos[data-modo="actuando"] .jh-pj{ filter: url(#jhBoil); }
+
+/* ════════════════ VIDA BASE (todos los estados, ambos modos) ═════════════ */
+
+/* respiración: el tronco se hincha apenas — digno, nada de goma en normal */
+.jaguarHuesos .jh-cuerpo{
+  animation: jhRespira 3.4s ease-in-out var(--jh-fase) infinite;
+}
+@keyframes jhRespira{
+  0%,100%{ transform: translateY(0) scale(1,1); }
+  55%{ transform: translateY(-1.6px) scale(1.006,1.014); }
+}
+
+/* cola pesada con punta retardada (follow-through encadenado, 3 huesos) */
+.jaguarHuesos .jh-colaBase{ animation: jhColaSway 3.1s ease-in-out var(--jh-fase) infinite alternate; }
+.jaguarHuesos .jh-colaMedia{ animation: jhColaSwayMedia 3.1s ease-in-out calc(var(--jh-fase) - .16s) infinite alternate; }
+.jaguarHuesos .jh-colaPunta{ animation: jhColaSwayPunta 3.1s ease-in-out calc(var(--jh-fase) - .32s) infinite alternate; }
+@keyframes jhColaSway{ from{ transform: rotate(-3.5deg);} to{ transform: rotate(4.5deg);} }
+@keyframes jhColaSwayMedia{ from{ transform: rotate(-3deg);} to{ transform: rotate(4deg);} }
+@keyframes jhColaSwayPunta{ from{ transform: rotate(-5deg);} to{ transform: rotate(6deg);} }
+
+/* orejas: se mecen con períodos casi-primos entre sí */
+.jaguarHuesos .jh-orejaI{ animation: jhOreja 4.3s ease-in-out var(--jh-fase) infinite alternate; }
+.jaguarHuesos .jh-orejaD{ animation: jhOreja 3.7s ease-in-out calc(var(--jh-fase) - .3s) infinite alternate; }
+@keyframes jhOreja{ from{ transform: rotate(-2.5deg);} to{ transform: rotate(2.5deg);} }
+
+/* parpadeo IRREGULAR canónico (suelto + doble golpe) — el párpado es una
+   CUBIERTA con bisagra arriba: en reposo scaleY(.14) (una ceja fina), al
+   cerrar baja a scaleY(1) y tapa el ojo. */
+.jaguarHuesos .jh-parpado{
+  transform: scaleY(.14);
+  animation: jhBlink 5.6s linear var(--jh-fase) infinite;
+}
+@keyframes jhBlink{
+  0%,36%,40%,74%,78%,82%,86%,100%{ transform: scaleY(.14); }
+  38%{ transform: scaleY(1); }
+  76%{ transform: scaleY(1); }
+  80%{ transform: scaleY(.9); }
+}
+
+/* EL GIRO DE CABEZA (la prueba anti-decapitación): reloj 7.9s — alza la testa
+   y mira, con anticipación y overshoot canónicos, y vuelve. Va en el
+   envoltorio cabezaGiro para componer con el ladeo/nivel del hueso cabeza. */
+.jaguarHuesos .jh-cabezaGiro{
+  animation: jhGiroSereno 7.9s cubic-bezier(.34,1.56,.64,1) var(--jh-fase) infinite;
+}
+@keyframes jhGiroSereno{
+  0%,16%,52%,100%{ transform: rotate(0); }
+  20%{ transform: rotate(2.4deg); }            /* anticipación: recoge */
+  27%,42%{ transform: rotate(-11deg); }        /* alza la testa y MIRA */
+  47%{ transform: rotate(1.8deg); }            /* overshoot al volver */
+}
+/* …y el cuello lo acompaña con retardo (follow-through, no bloque rígido) */
+.jaguarHuesos .jh-cuello{
+  animation: jhCuelloVida 7.9s ease-in-out calc(var(--jh-fase) + .09s) infinite;
+}
+@keyframes jhCuelloVida{
+  0%,16%,54%,100%{ transform: rotate(0); }
+  21%{ transform: rotate(1deg); }
+  28%,42%{ transform: rotate(-3.4deg); }
+  48%{ transform: rotate(.6deg); }
+}
+/* el ladeo curioso del hueso cabeza (reloj propio, amplitud felina) */
+.jaguarHuesos .jh-cabeza{
+  animation: jhLadeo 5.2s ease-in-out var(--jh-fase) infinite;
+}
+@keyframes jhLadeo{
+  0%,100%{ transform: rotate(-1.6deg); }
+  50%{ transform: rotate(1.8deg); }
+}
+
+/* mandíbula: la maneja el visema (var --jh-jaw del host) con charnela real */
+.jaguarHuesos .jh-mandibula{
+  transform: translateY(calc(var(--jh-jaw) * 19px)) rotate(calc(var(--jh-jaw) * 9deg));
+  transition: transform .12s cubic-bezier(.4,0,.2,1);
+}
+
+/* ═════════════════════ ESTADOS del contrato de avatar ════════════════════ */
+
+/* ESCUCHANDO: para las orejas (transición con overshoot — goma, no switch) */
+.jaguarHuesos[data-agt-estado="listening"] .jh-orejaI,
+.jaguarHuesos[data-agt-estado="listening"] .jh-orejaD{
+  animation: none;
+  transition: transform .5s cubic-bezier(.34,1.56,.64,1);
+}
+.jaguarHuesos[data-agt-estado="listening"] .jh-orejaI{ transform: rotate(9deg) scale(1.05); }
+.jaguarHuesos[data-agt-estado="listening"] .jh-orejaD{ transform: rotate(-8deg) scale(1.05); }
+.jaguarHuesos[data-agt-estado="listening"] .jh-cabezaGiro{
+  animation: none;
+  transform: rotate(-5deg);
+  transition: transform .6s cubic-bezier(.34,1.56,.64,1);
+}
+
+/* PENSANDO: mirada arriba + testa alzada + la punta de la cola marca el hilo */
+.jaguarHuesos[data-agt-estado="thinking"] .jh-pupila{ transform: translateY(-2.6px); transition: transform .4s ease; }
+.jaguarHuesos[data-agt-estado="thinking"] .jh-cabezaGiro{
+  animation: none;
+  transform: rotate(-7deg);
+  transition: transform .7s cubic-bezier(.34,1.56,.64,1);
+}
+.jaguarHuesos[data-agt-estado="thinking"] .jh-colaPunta{ animation: jhColaPiensa 1.3s ease-in-out infinite alternate; }
+@keyframes jhColaPiensa{ from{ transform: rotate(-7deg);} to{ transform: rotate(8deg);} }
+
+/* HABLANDO sin visema: bocanadas propias (si hay visema, manda --jh-jaw) */
+.jaguarHuesos[data-agt-estado="speaking"]:not([data-visema]) .jh-mandibula{
+  animation: jhHablaAuto .22s steps(2,end) infinite alternate;
+}
+@keyframes jhHablaAuto{
+  from{ transform: translateY(3px) rotate(1.6deg); }
+  to{ transform: translateY(9px) rotate(5deg); }
+}
+
+/* VIDA IDLE-CEREBRO (useVidaIdle): acecha / ruge — repertorio propio */
+.jaguarHuesos[data-vida="acecha"] .jh-cuerpo{
+  animation: none;
+  transform: translateY(7px) scale(1.012,.962);
+  transition: transform .8s cubic-bezier(.34,-.2,.64,1); /* anticipación: se carga */
+}
+.jaguarHuesos[data-vida="acecha"] .jh-cabezaGiro{
+  animation: none; transform: rotate(6deg);
+  transition: transform .8s cubic-bezier(.34,-.2,.64,1);
+}
+.jaguarHuesos[data-vida="acecha"] .jh-orejaI{ animation: none; transform: rotate(-14deg); transition: transform .5s ease; }
+.jaguarHuesos[data-vida="acecha"] .jh-orejaD{ animation: none; transform: rotate(13deg); transition: transform .5s ease; }
+.jaguarHuesos[data-vida="acecha"] .jh-colaBase{ animation: jhColaLash 1.1s ease-in-out infinite alternate; }
+.jaguarHuesos[data-vida="ruge"] .jh-cabezaGiro{
+  animation: none; transform: rotate(-13deg);
+  transition: transform .45s cubic-bezier(.34,1.56,.64,1);
+}
+@keyframes jhColaLash{ from{ transform: rotate(-7deg);} to{ transform: rotate(8deg);} }
+
+/* ═══════════════ CAMINA — la marcha probada, ahora POR PATA ══════════════ */
+
+/* péndulo de pata (pasoLado del rig de perfil): ±14° desde hombro/cadera,
+   secuencia LATERAL de cuadrúpedo real (diagonales casi juntas) */
+.jaguarHuesos[data-agt-estado="caminando"] .jh-pataDelCerca{ animation: jhPaso var(--jh-paso) ease-in-out var(--jh-fase) infinite; }
+.jaguarHuesos[data-agt-estado="caminando"] .jh-pataTrasLejos{ animation: jhPaso var(--jh-paso) ease-in-out calc(var(--jh-fase) - .14s) infinite; }
+.jaguarHuesos[data-agt-estado="caminando"] .jh-pataTrasCerca{ animation: jhPaso var(--jh-paso) ease-in-out calc(var(--jh-fase) - .52s) infinite; }
+.jaguarHuesos[data-agt-estado="caminando"] .jh-pataDelLejos{ animation: jhPaso var(--jh-paso) ease-in-out calc(var(--jh-fase) - .66s) infinite; }
+@keyframes jhPaso{
+  0%,100%{ transform: rotate(13.5deg); }   /* apoyo que empuja atrás */
+  50%{ transform: rotate(-14.5deg); }      /* vuelo: va por el paso */
+}
+/* la rodilla/codo PLIEGA durante el vuelo (lo que el raster jamás pudo) */
+.jaguarHuesos[data-agt-estado="caminando"] .jh-pataDelCercaBajo{ animation: jhPasoBajo var(--jh-paso) ease-in-out var(--jh-fase) infinite; }
+.jaguarHuesos[data-agt-estado="caminando"] .jh-pataTrasLejosBajo{ animation: jhPasoBajo var(--jh-paso) ease-in-out calc(var(--jh-fase) - .14s) infinite; }
+.jaguarHuesos[data-agt-estado="caminando"] .jh-pataTrasCercaBajo{ animation: jhPasoBajo var(--jh-paso) ease-in-out calc(var(--jh-fase) - .52s) infinite; }
+.jaguarHuesos[data-agt-estado="caminando"] .jh-pataDelLejosBajo{ animation: jhPasoBajo var(--jh-paso) ease-in-out calc(var(--jh-fase) - .66s) infinite; }
+@keyframes jhPasoBajo{
+  0%,100%{ transform: rotate(6deg); }      /* apoyo: casi recta */
+  30%{ transform: rotate(1deg); }
+  55%{ transform: rotate(-21deg); }        /* vuelo: pliega la rodilla */
+  80%{ transform: rotate(-3deg); }
+}
+/* y la zarpa arrastra con inercia (drag de extremo) */
+.jaguarHuesos[data-agt-estado="caminando"] .jh-pataDelCercaZarpa{ animation: jhZarpa var(--jh-paso) ease-in-out var(--jh-fase) infinite; }
+.jaguarHuesos[data-agt-estado="caminando"] .jh-pataTrasLejosZarpa{ animation: jhZarpa var(--jh-paso) ease-in-out calc(var(--jh-fase) - .14s) infinite; }
+.jaguarHuesos[data-agt-estado="caminando"] .jh-pataTrasCercaZarpa{ animation: jhZarpa var(--jh-paso) ease-in-out calc(var(--jh-fase) - .52s) infinite; }
+.jaguarHuesos[data-agt-estado="caminando"] .jh-pataDelLejosZarpa{ animation: jhZarpa var(--jh-paso) ease-in-out calc(var(--jh-fase) - .66s) infinite; }
+@keyframes jhZarpa{
+  0%,100%{ transform: rotate(3deg); }
+  35%{ transform: rotate(9deg); }          /* despega: la zarpa cuelga */
+  55%{ transform: rotate(-10deg); }        /* vuelo: se recoge */
+  75%{ transform: rotate(-2deg); }         /* aterriza plana */
+}
+/* tronco: bóveda del paso (2 botes por ciclo) — pisa con squash sutil */
+.jaguarHuesos[data-agt-estado="caminando"] .jh-cuerpo{
+  animation: jhTroncoBob calc(var(--jh-paso) / 2) ease-in-out var(--jh-fase) infinite;
+}
+@keyframes jhTroncoBob{
+  0%,100%{ transform: translateY(2.4px) rotate(.4deg) scale(1.004,.996); }
+  50%{ transform: translateY(-3.2px) rotate(-.3deg) scale(.997,1.005); }
+}
+/* CABEZA NIVELADA: contra-ondula el bob (el depredador no pierde horizonte) */
+.jaguarHuesos[data-agt-estado="caminando"] .jh-cabeza{
+  animation: jhCabezaNivel calc(var(--jh-paso) / 2) ease-in-out calc(var(--jh-fase) - .1s) infinite;
+}
+@keyframes jhCabezaNivel{
+  0%,100%{ transform: translateY(-2.2px) rotate(-.6deg); }
+  50%{ transform: translateY(2.6px) rotate(.6deg); }
+}
+/* el cuello amortigua a contratiempo */
+.jaguarHuesos[data-agt-estado="caminando"] .jh-cuello{
+  animation: jhCuelloMarcha calc(var(--jh-paso) / 2) ease-in-out calc(var(--jh-fase) - .05s) infinite;
+}
+@keyframes jhCuelloMarcha{
+  0%,100%{ transform: rotate(.8deg); }
+  50%{ transform: rotate(-.8deg); }
+}
+/* en marcha el giro periódico se apaga: el gesto tiene que leer limpio…
+   …pero cada tanto MIRA A CÁMARA sin dejar de andar (reloj largo 6.3s) */
+.jaguarHuesos[data-agt-estado="caminando"] .jh-cabezaGiro{
+  animation: jhMiraAnda 6.3s ease-in-out var(--jh-fase) infinite;
+}
+@keyframes jhMiraAnda{
+  0%,58%,94%,100%{ transform: rotate(0); }
+  62%{ transform: rotate(2deg); }              /* anticipa */
+  68%,86%{ transform: rotate(-10deg); }        /* mira a usted, andando */
+  90%{ transform: rotate(1.4deg); }            /* overshoot al frente */
+}
+/* cola ALZADA de contrapeso, ondeando con la marcha */
+.jaguarHuesos[data-agt-estado="caminando"] .jh-colaBase{ animation: jhColaMarcha 1.8s ease-in-out var(--jh-fase) infinite alternate; }
+.jaguarHuesos[data-agt-estado="caminando"] .jh-colaMedia{ animation: jhColaMarchaMedia 1.8s ease-in-out calc(var(--jh-fase) - .2s) infinite alternate; }
+.jaguarHuesos[data-agt-estado="caminando"] .jh-colaPunta{ animation: jhColaSwayPunta 1.8s ease-in-out calc(var(--jh-fase) - .38s) infinite alternate; }
+@keyframes jhColaMarcha{ from{ transform: rotate(-9deg);} to{ transform: rotate(-1deg);} }
+@keyframes jhColaMarchaMedia{ from{ transform: rotate(-5deg);} to{ transform: rotate(3deg);} }
+/* la sombra respira con el bote (contacto que pesa) */
+.jaguarHuesos[data-agt-estado="caminando"] .jh-sombraSuelo{
+  animation: jhSombraPaso calc(var(--jh-paso) / 2) ease-in-out var(--jh-fase) infinite;
+}
+@keyframes jhSombraPaso{
+  0%,100%{ transform: scale(1.02,1.06); opacity: 1; }
+  50%{ transform: scale(.97,.94); opacity: .82; }
+}
+
+/* ═══════════ MODO ACTUANDO (30%) — Miss Minutes con pelaje ═══════════════ */
+
+/* la MASA flota (rigMasa re-tempo jaguar: 3.4s, 5px, .5deg) */
+.jaguarHuesos[data-modo="actuando"] .jh-masa{
+  transform-origin: 352px 150px;
+  animation: jhMasa 3.4s ease-in-out var(--jh-fase) infinite;
+}
+@keyframes jhMasa{
+  0%,100%{ transform: translateY(-5px) rotate(-.5deg); }
+  60%{ transform: translateY(5px) rotate(.5deg); }
+}
+/* squash&stretch FUERTE escalonado ~12fps (dibujado a mano, volumen intacto) */
+.jaguarHuesos[data-modo="actuando"]:not([data-agt-estado="caminando"]) .jh-cuerpo{
+  animation: jhBoilFuerte 2.6s steps(18,end) var(--jh-fase) infinite;
+}
+@keyframes jhBoilFuerte{
+  0%,100%{ transform: translateY(0) scale(1,1); }
+  22%{ transform: translateY(-2px) scale(.982,1.03); }   /* stretch (anticipa) */
+  50%{ transform: translateY(2.6px) scale(1.03,.968); }  /* squash */
+  72%{ transform: translateY(-.8px) scale(.994,1.012); } /* overshoot */
+}
+/* LA VUELTA DE CAMPANA Miss-Minutes (reloj antic 9.7s): anticipa, gira
+   ENTERO con smear, overshoot elástico y aterriza digno */
+.jaguarHuesos[data-modo="actuando"]:not([data-agt-estado="caminando"]) .jh-antic{
+  animation: jhAnticVuelta 9.7s ease-in-out var(--jh-fase) infinite;
+}
+@keyframes jhAnticVuelta{
+  0%,50%{ transform: rotate(0) scale(1,1) translateY(0); }
+  54%{ transform: rotate(4deg) scale(.96,1.05) translateY(2px); }     /* micro-antic */
+  57%,59%{ transform: rotate(9deg) scale(.9,1.1) translateY(7px); }   /* se carga y SOSTIENE */
+  66%{ transform: rotate(-338deg) scale(1.18,.85) translateY(-14px); }/* ¡LA VUELTA! (smear) */
+  70%{ transform: rotate(-369deg) scale(.95,1.06) translateY(2px); }  /* overshoot */
+  75%,100%{ transform: rotate(-360deg) scale(1,1) translateY(0); }    /* aterriza digno */
+}
+/* double-take Miss-Minutes de la testa (reloj mirada 7.9s, con smear) */
+.jaguarHuesos[data-modo="actuando"]:not([data-agt-estado="listening"]):not([data-agt-estado="thinking"]) .jh-cabezaGiro{
+  animation: jhDoubleTake 7.9s ease-in-out var(--jh-fase) infinite;
+}
+@keyframes jhDoubleTake{
+  0%,18%,48%,100%{ transform: rotate(0) scale(1,1); }
+  21%{ transform: rotate(3deg) scale(.98,1.02); }        /* micro-anticipación */
+  24%,32%{ transform: rotate(-14deg); }                  /* mira allá */
+  35%{ transform: rotate(11deg) scale(1.14,.9); }        /* ¡smear al otro lado! */
+  37%,41%{ transform: rotate(8deg); }                    /* …¿y eso qué fue? */
+  44%{ transform: rotate(-12deg); }                      /* no: sí era allá */
+}
+/* cola látigo + aura espectral + ojos que arden */
+.jaguarHuesos[data-modo="actuando"] .jh-colaBase{ animation: jhColaLash 1.1s ease-in-out var(--jh-fase) infinite alternate; }
+.jaguarHuesos[data-modo="actuando"] .jh-colaMedia{ animation: jhColaLash 1.1s ease-in-out calc(var(--jh-fase) - .12s) infinite alternate; }
+.jaguarHuesos[data-modo="actuando"] .jh-colaPunta{ animation: jhColaSwayPunta 1.1s ease-in-out calc(var(--jh-fase) - .22s) infinite alternate; }
+.jaguarHuesos .jh-aura{ opacity: 0; transition: opacity .8s ease; }
+.jaguarHuesos[data-modo="actuando"] .jh-aura{ opacity: 1; animation: jhAuraLate 5.6s ease-in-out var(--jh-fase) infinite; }
+@keyframes jhAuraLate{
+  0%,100%{ opacity: .45; transform: scale(.96); }
+  50%{ opacity: .85; transform: scale(1.04); }
+}
+.jaguarHuesos .jh-ojoHalo{ opacity: .75; }
+.jaguarHuesos[data-modo="actuando"] .jh-ojoHalo{ animation: jhOjoArde 1.9s ease-in-out var(--jh-fase) infinite; }
+@keyframes jhOjoArde{
+  0%,100%{ opacity: .5; }
+  50%{ opacity: 1; }
+}
+/* actuando+caminando: prowl con hombro exagerado (sin vuelta: anda limpio) */
+.jaguarHuesos[data-modo="actuando"][data-agt-estado="caminando"] .jh-cuerpo{
+  animation: jhTroncoBobFuerte calc(var(--jh-paso) / 2) ease-in-out var(--jh-fase) infinite;
+}
+@keyframes jhTroncoBobFuerte{
+  0%,100%{ transform: translateY(4px) rotate(.7deg) scale(1.012,.985); }
+  50%{ transform: translateY(-5.5px) rotate(-.5deg) scale(.99,1.014); }
+}
+
+/* ═══════════════════════ GATES OBLIGATORIOS ══════════════════════════════ */
+
+/* tier bajo: fuera lo continuo (filtros/loops); quedan los estados reactivos */
+.jaguarHuesos[data-tier="bajo"] .jh-pj{ filter: none; }
+.jaguarHuesos[data-tier="bajo"] *{ animation: none !important; }
+
+/* animated=false (data-quieto): fotograma digno, quieto del todo */
+.jaguarHuesos[data-quieto] *{ animation: none !important; transition: none !important; }
+.jaguarHuesos[data-quieto] .jh-pj{ filter: none; }
+
+@media (prefers-reduced-motion: reduce){
+  .jaguarHuesos *{ animation: none !important; transition: none !important; }
+  .jaguarHuesos .jh-pj{ filter: none; }
+}
