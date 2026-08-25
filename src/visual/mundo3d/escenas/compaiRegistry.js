@@ -113,6 +113,9 @@ const REGISTRO = {
   // El OSO DEL BASTÓN compañero (fable F26): caminante de trocha — llega a
   // pie, anda erguido y LENTO, se detiene a apoyarse en el cayado, y al
   // llegar a su marca el bastón FLORECE (su ecología hecha celebración).
+  // SKIN CONSERVADA = OsoBaston (la lámina musculosa aprobada; el arte no
+  // cambia) y VIRAJE MÍSTICO: no gira — se desvanece y reaparece (mismo
+  // lenguaje que el jaguar, ver OsoBastonCompaiEscena.jsx).
   // PortalComponent pendiente, mismo criterio que el jaguar.
   'oso-baston': { EscenaComponent: OsoBastonCompaiEscena, PortalComponent: null, presencia: OSO_BASTON_PRESENCIA, especie: 'oso-baston', pendienteFable: false },
   // La LUCIÉRNAGA compañera (fable F26): sí vuela, pero NO como la abeja —
