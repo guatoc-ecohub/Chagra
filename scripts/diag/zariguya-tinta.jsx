@@ -131,6 +131,31 @@ function Diag() {
           </Congelada>
         </Fig>
       </div>
+
+      {/* ═══ FASE 2 — POSES PLENAS, una lámina a la vez con gate ═══
+          Viñetas CLAVADAS con poseForzada (determinista: el ciclo React de
+          escucha no depende del reloj de captura); el "vivo" al lado muestra
+          el ciclo real. El bloque 1:1 (545×500 = viewBox) da el frame para
+          el lado-a-lado del juez contra la lámina Gemini cruda. */}
+      <h3 style={{ margin: '4px 8px' }}>FASE 2 · escucha (listening) — ciclo 02→03→04→03</h3>
+      <div style={{ display: 'flex' }} data-gate="escucha-1a1">
+        <div style={{ width: 545, height: 500, overflow: 'hidden' }}>
+          <ZariguyaTrazado estado="listening" poseForzada="escucha-03" modo="normal" animated={false} size={545} style={{ width: 545, height: 500 }} />
+        </div>
+      </div>
+      <div style={FILA} data-gate="escucha-fila">
+        {['escucha-02', 'escucha-03', 'escucha-04'].map((p) => (
+          <Fig key={p} nombre={`viñeta ${p}`}>
+            <ZariguyaTrazado estado="listening" poseForzada={p} modo="normal" animated={false} size={300} />
+          </Fig>
+        ))}
+        <Fig nombre="listening VIVO (ciclo real)">
+          <ZariguyaTrazado estado="listening" modo="normal" size={300} />
+        </Fig>
+        <Fig nombre="chico 100px → close-up 01">
+          <ZariguyaTrazado estado="listening" modo="normal" size={100} />
+        </Fig>
+      </div>
     </div>
   );
 }

@@ -1,0 +1,43 @@
+REGISTRO CRUDO — zarigüeya tinta FASE 2 (poses Gemini por estado) · 2026-08-26
+
+JUEZ PRIMARIO: app Gemini del Pixel (cuenta con plan, sin cuota) vía
+/tmp/juez-pixel2.sh (la UI de la app cambió: ahora vive en
+googlequicksearchbox/…voice.robin; gemini-pixel.sh viejo no encuentra los
+labels — flujo re-mapeado: Add attachments → Files → DocumentsUI carpeta
+gemini-gate → tarjeta; respuesta en resource-id assistant_robin_text).
+gemini-vision.sh (API gemini-3-flash-preview) quedó SIN CUOTA (20/día,
+RESOURCE_EXHAUSTED) tras los 2 controles del arranque.
+
+CONTROLES DEL INSTRUMENTO (canal Pixel, antes de confiar):
+ · Idéntico (lámina|lámina, 05-CONTROL-identico-escucha.png):
+   "identicas SI · diferencias NINGUNA · color SI · personaje SI" — PASÓ.
+ · Negativo (FINAL/37-CONTROL-NEG.png, render viejo con 6 defectos):
+   cazó los 6 exactos (ceja sobre ojo, mancha mejilla, codo, talón,
+   discos rosa cola, sombra suelo) + color NO-coincide — PASÓ.
+(La API gemini-3-flash-preview pasó los mismos 2 controles antes de agotarse.)
+
+── GATE LÁMINA 1 · ESCUCHA (listening) ──
+Comparador alineado por contenido (13-JUEZ-escucha03-alineado.png:
+render | lámina, ambos trim a contenido y ancla sur — el primer comparador
+04- tenía la lámina 15 px más abajo por error de composición MÍO y el juez
+lo leyó como "recorte de silueta"; alineado, desaparece):
+ 1. misma-pose: SI
+ 2. parches/manchas/cortes que la lámina NO tiene: NO
+ 3. color-coincide: SI
+ 4. mismo-personaje: SI
+ 5. silueta-superior-cortada: SI "EN AMBAS imágenes" → verificado al 4×
+    (14-*.png): el corte recto del tope de la oreja y el bloquecito gris
+    junto a la cabeza están EN LA LÁMINA ORIGINAL Gemini (de fábrica).
+    El render los reproduce fiel — no son defectos del trazado.
+ 6. diferencias: NINGUNA ("visualmente idénticas en color, trazo, detalles")
+
+NÚMEROS:
+ · bbox contenido: render 409×434 · lámina escalada 410×434 (Δ≤1px) —
+   misma escala de figura, sin recorte.
+ · pixel-diff alineado (fuzz 5%): 1 178 px de 184 800 = 0.64% (ruido de
+   re-muestreo del navegador; 12r.png vs 12l.png).
+ · CICLO VIVO probado: dos capturas GPU-headed espaciadas ⇒ la región del
+   "listening VIVO" cambió 10.2% de píxeles (07-vivo-t1-t2.png: frame
+   mano-a-oreja vs frame oreja-gigante 04) — el ciclo 02→03→04→03 corre.
+ · close-up escucha-01 activo a 100px (< UMBRAL_CLOSEUP=120) — misma raíz
+   data-creature (cero swap de nodo; el test integral lo fija).
