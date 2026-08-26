@@ -35,6 +35,7 @@
 
 import { RH_LINE_BOIL } from '../rubberhoseSpec.js';
 import { CALCO_TRAZADO } from './calcoTrazado.js';
+import { POSES_TRAZADO_CAPA } from './posesTrazado.js';
 
 /* ── PIVOTES (px del espacio 481×444 de la lámina) ──────────────────────────
    Fuente: zariguyaLamina/anatomia.js (medidos sobre la lámina con grilla y
@@ -455,6 +456,7 @@ ${DEFS}
     </g>
   </g>
 </g>
+${POSES_TRAZADO_CAPA}
 </svg>`;
 
 export default ZARIGUYA_TRAZADO_SVG;
