@@ -68,3 +68,18 @@ NÚMEROS: bbox contenido 475×228 vs 474×228 (Δ1px); pixel-diff alineado
 La firma vive en VIDA_REPERTORIO.zariguya.tanatosis (ya existía — es el
 nombre técnico de "se-hace-la-muerta"; anotado en vidaEstados.js). El gag
 respira a escondidas (ztFinge 2.2s) y también es forzable (vidaForzada).
+
+── GATE LÁMINA 4 · CUTE (contenta) + CRÍAS AL LOMO (vida forzada) ──
+CUTE (43-JUEZ-cute-alineado.png, izquierda render | derecha lámina):
+ pose SI · parches nuevos NO · color SI · personaje SI · diferencias
+ NINGUNA ("idénticas píxel a píxel").
+ Números: bbox 269×436 vs 269×438 (Δ2px por fuzz del trim; diffmap
+ 44- uniforme de textura = corrimiento de 2px del comparador, sin
+ parches); pixel-diff alineado 2.97% (fuzz 5%).
+CRÍAS (46-JUEZ-crias-alineado.png, arriba render | abajo lámina):
+ pose SI · mismas-crías SI · parches nuevos NO · color SI · personaje SI
+ · diferencias NINGUNA. Números: bbox 473×363 vs 473×362 (Δ1px);
+ pixel-diff alineado 3.77% (fuzz 5%; corrimiento 1px del trim).
+'crias' NO entra al azar del idle: canal vidaForzada del host (orden
+operador 2026-08-24 — pose especial en momentos positivos), igual que la
+hermana Gemini.
