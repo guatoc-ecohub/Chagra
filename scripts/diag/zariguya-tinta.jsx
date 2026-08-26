@@ -156,6 +156,16 @@ function Diag() {
           <ZariguyaTrazado estado="listening" modo="normal" size={100} />
         </Fig>
       </div>
+
+      <h3 style={{ margin: '4px 8px' }}>FASE 2 · ver-lupa (thinking)</h3>
+      <div style={{ display: 'flex' }} data-gate="verlupa-1a1">
+        <div style={{ width: 545, height: 500, overflow: 'hidden' }}>
+          <ZariguyaTrazado estado="thinking" modo="normal" animated={false} size={545} style={{ width: 545, height: 500 }} />
+        </div>
+        <Fig nombre="thinking VIVO (lee)">
+          <ZariguyaTrazado estado="thinking" modo="normal" size={340} />
+        </Fig>
+      </div>
     </div>
   );
 }
