@@ -39,6 +39,9 @@ import EscenaBase3D from './EscenaBase3D.jsx';
 import { Fauna } from './FaunaEscena.jsx';
 import { faunaDeMundo } from '../faunaFuncional.js';
 import { ATMOSFERA, CIELOS, PALETA } from '../atmosferaMadre.js';
+import LluviaValle from '../atmosfera/clima/LluviaValle.jsx';
+import NieblaLadera from '../atmosfera/clima/NieblaLadera.jsx';
+import HeladaValle from '../atmosfera/clima/HeladaValle.jsx';
 
 /* Radio de la BÓVEDA. Tiene que ENCERRAR a la cámara siempre: la pose de
    reposo queda a ~9 del origen y el orbit permite alejarse hasta zoom*2.6
@@ -555,7 +558,7 @@ function SenalLadera({ cima = 3.5, reducedMotion }) {
    (la "oscilación"), muestra en qué fase va (tres puntos), qué significa pa' la
    finca (voz de Angelita) y el ONI real por si el técnico mira. Discreto y
    contemplativo: ámbar cálido de "prepárese", jamás rojo de alarma. */
-function RotuloEnso({ idx, fase, onGirar }) {
+function RotuloEnso({ idx, fase, onGirar, lecturaDisponible = true }) {
   // En la franja del cielo, arriba-izquierda de la montaña y apartado del chip
   // de «Cuándo llueve»: a y=5.05 el encuadre viejo lo cortaba contra el borde
   // alto del marco y a y baja pisaba el hotspot.
@@ -567,7 +570,9 @@ function RotuloEnso({ idx, fase, onGirar }) {
           className={`mundo-rotulo mundo-enso mundo-enso--${fase.id}`}
           onPointerDown={(e) => e.stopPropagation()}
           onClick={(e) => { e.stopPropagation(); onGirar(); }}
-          aria-label={`El ciclo del cielo, hoy ${fase.nombre}. ${fase.lee} ${fase.consejo} Toque para leer la siguiente fase.`}
+          aria-label={lecturaDisponible
+            ? `El ciclo del cielo, hoy ${fase.nombre}. ${fase.lee} ${fase.consejo} Toque para leer la siguiente fase.`
+            : `ENSO sin lectura. Explore las tres fases como guía. Toque para leer la siguiente fase.`}
         >
           <span className="mundo-enso__rueda" aria-hidden="true">
             {FASES_ENSO.map((f, i) => (
@@ -575,10 +580,10 @@ function RotuloEnso({ idx, fase, onGirar }) {
             ))}
           </span>
           <span className="mundo-enso__txt">
-            <span className="mundo-enso__titulo">{fase.nombre}</span>
-            <span className="mundo-enso__lee">{fase.lee}</span>
-            <span className="mundo-enso__consejo">{fase.consejo}</span>
-            <span className="mundo-enso__oni">{fase.oni} · gire el ciclo</span>
+            <span className="mundo-enso__titulo">{lecturaDisponible ? fase.nombre : 'ENSO sin lectura'}</span>
+            <span className="mundo-enso__lee">{lecturaDisponible ? fase.lee : 'Señal pendiente'}</span>
+            <span className="mundo-enso__consejo">{lecturaDisponible ? fase.consejo : 'Explore las tres fases como guía'}</span>
+            <span className="mundo-enso__oni">{lecturaDisponible ? fase.oni : 'ONI sin dato'} · gire el ciclo</span>
           </span>
         </button>
       </Html>
@@ -589,10 +594,10 @@ function RotuloEnso({ idx, fase, onGirar }) {
 /* Reúne la capa: guarda la fase (arranca en la del dato) y monta velo + señal +
    rótulo. El estado vive AQUÍ para que el velo del cielo y el rótulo giren juntos
    con un solo toque. La densidad de la escarcha baja en gama media (device-tier). */
-function CapaEnso({ params, tier = 'alto', cima = 3.5, reducedMotion }) {
+function CapaEnso({ climaLive, tier = 'alto', cima = 3.5, reducedMotion }) {
   const inicio = Math.max(
     0,
-    FASES_ENSO.findIndex((f) => f.id === (params?.enso?.fase ?? 'neutral')),
+    FASES_ENSO.findIndex((f) => f.id === (climaLive?.ensoFamily || 'neutral')),
   );
   const [idx, setIdx] = useState(inicio);
   const fase = FASES_ENSO[idx];
@@ -602,14 +607,19 @@ function CapaEnso({ params, tier = 'alto', cima = 3.5, reducedMotion }) {
       <VeloEnso velo={fase.velo} />
       {fase.id === 'nino' && <SenalHelada densidad={densidad} reducedMotion={reducedMotion} />}
       {fase.id === 'nina' && <SenalLadera cima={cima} reducedMotion={reducedMotion} />}
-      <RotuloEnso idx={idx} fase={fase} onGirar={() => setIdx((v) => (v + 1) % FASES_ENSO.length)} />
+      <RotuloEnso
+        idx={idx}
+        fase={fase}
+        lecturaDisponible={climaLive?.tieneEnso}
+        onGirar={() => setIdx((v) => (v + 1) % FASES_ENSO.length)}
+      />
     </group>
   );
 }
 
-function Diorama({ params, reducedMotion, tier, fauna }) {
+function Diorama({ params, climaLive, reducedMotion, tier, fauna }) {
   const hora = params?.hora ?? 0.62;
-  const temporada = params?.temporada ?? 'lluvia';
+  const temporada = climaLive?.lluvia ? 'lluvia' : 'seca';
   const niebla = params?.niebla ?? 0.6;
   const pisos = params?.pisos || PISOS_DEF;
   /** @type {{nieve?:number, retroceso?:number}} */
@@ -640,7 +650,7 @@ function Diorama({ params, reducedMotion, tier, fauna }) {
 
         {/* la OSCILACIÓN del año (ENSO) sobre el compás bimodal: velo del cielo +
             señal de la fase + rótulo-ciclo tocable con la voz de Angelita */}
-        <CapaEnso params={params} tier={tier} cima={cima} reducedMotion={reducedMotion} />
+        <CapaEnso climaLive={climaLive} tier={tier} cima={cima} reducedMotion={reducedMotion} />
 
         {/* el cielo con su temporada: nubes siempre; aguacero solo en lluvia.
             Van DETRÁS de la montaña (z negativo): a la profundidad vieja
@@ -648,11 +658,38 @@ function Diorama({ params, reducedMotion, tier, fauna }) {
             lente tapando medio cuadro; atrás leen como nubes DEL cielo. */}
         <Nube base={[-2.6, 3.7, -2.6]} escala={1.15} gris={temporada === 'lluvia'} reducedMotion={reducedMotion} />
         <Nube base={[2.4, 4.4, -3.1]} escala={0.9} gris={false} reducedMotion={reducedMotion} />
-        {temporada === 'lluvia' && (
-          <>
-            <Nube base={[0.2, 4.7, -2.9]} escala={1.0} gris reducedMotion={reducedMotion} />
-            <Lluvia base={[-2.6, 3.4, -2.6]} reducedMotion={reducedMotion} />
-          </>
+        {climaLive?.lluvia && (
+          <Nube base={[0.2, 4.7, -2.9]} escala={1.0} gris reducedMotion={reducedMotion} />
+        )}
+
+        {/* Fenómenos vivos: cada capa llega del climaService y respeta el tier
+            adaptativo del andamiaje. Sin snapshot, no se simula ningún evento. */}
+        {climaLive?.lluvia && (
+          <LluviaValle
+            intensidad={climaLive.lluviaMm == null ? 0.62 : Math.min(1, Math.max(0.25, climaLive.lluviaMm / 18))}
+            tier={tier}
+            reducedMotion={reducedMotion}
+            area={[14, 8, 13]}
+            viento={climaLive.viento == null ? 0.35 : Math.min(1.2, climaLive.viento / 30)}
+            nocturno={climaLive.luz === 'noche'}
+          />
+        )}
+        {climaLive?.niebla && (
+          <NieblaLadera
+            intensidad={climaLive.nubosidad == null ? 0.7 : Math.min(1, Math.max(0.35, climaLive.nubosidad / 100))}
+            tier={tier}
+            modo={climaLive.luz === 'amanecer' ? 'amanecer' : 'ladera'}
+            nocturno={climaLive.luz === 'noche'}
+            reducedMotion={reducedMotion}
+          />
+        )}
+        {climaLive?.helada && (
+          <HeladaValle
+            intensidad={0.82}
+            tier={tier}
+            reducedMotion={reducedMotion}
+            luzFria={climaLive.luz === 'noche' ? 0.7 : 0.35}
+          />
         )}
 
         {esDia && <Fauna items={fauna} reducedMotion={reducedMotion} />}
@@ -697,7 +734,7 @@ export default function EscenaBoveda(props) {
       piso={DY - 0.04}
       entrada={{ ...props.entrada, zoom: props.entrada?.zoom ?? 7.5, centro: [0, 0.55, 0] }}
     >
-      <Diorama params={props.params} reducedMotion={props.reducedMotion} tier={props.tier} fauna={faunaDeMundo(props.mundoId, { tier: props.tier })} />
+      <Diorama params={props.params} climaLive={props.climaLive} reducedMotion={props.reducedMotion} tier={props.tier} fauna={faunaDeMundo(props.mundoId, { tier: props.tier })} />
     </EscenaBase3D>
   );
 }
