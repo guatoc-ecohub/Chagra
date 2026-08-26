@@ -424,6 +424,39 @@ div.zariguyaHuesos > svg{ width: 100%; height: 100%; display: block; overflow: v
   50%{ transform: translateY(-5px) rotate(-.6deg) scale(.988,1.016); }
 }
 
+/* ═══ FASE 2 — POSES PLENAS del set Gemini (viñetas por crossfade) ═════════
+   El JSX decide la pose y la publica como data-pose en la raíz — SOLO con el
+   PNG ya cargado (honestidad: nunca media pose; sin lámina servida degrada a
+   la FASE 1, el rig hero). Aquí viven el fundido y la micro-vida de cada
+   viñeta (port 1:1 de zariguyaGeminiLamina.css, zgl-→zt-). El cambio de pose
+   es CROSSFADE entre dibujos, como viñetas — honesto, no interpolación. */
+.zariguyaHuesos .zt-pose{
+  opacity: 0;
+  transition: opacity .24s ease;
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
+  pointer-events: none;
+}
+/* la lámina-rig entera se apaga mientras una pose plena está al frente
+   (mismo trato que [data-modo='pose'] .zgl-lamina en la hermana) */
+.zariguyaHuesos .zh-masa{ transition: opacity .24s ease; }
+.zariguyaHuesos[data-pose] .zh-masa{ opacity: 0; }
+
+/* ESCUCHA (listening): el ciclo 02→03→04→03 lo lleva el JSX (crossfade de
+   arriba); el close-up 01 (avatar chico) ladea apenas. */
+.zariguyaHuesos[data-pose="escucha-01"] .zt-pose-escucha-01,
+.zariguyaHuesos[data-pose="escucha-02"] .zt-pose-escucha-02,
+.zariguyaHuesos[data-pose="escucha-03"] .zt-pose-escucha-03,
+.zariguyaHuesos[data-pose="escucha-04"] .zt-pose-escucha-04{ opacity: 1; }
+.zariguyaHuesos[data-pose="escucha-01"] .zt-pose-escucha-01{
+  animation: ztEscuchaCloseup 2.8s ease-in-out infinite;
+  transform-origin: 50% 80%;
+}
+@keyframes ztEscuchaCloseup{
+  0%,100%{ transform: rotate(0deg); }
+  55%{ transform: rotate(-1.6deg); }
+}
+
 /* ═══════════════════════ GATES OBLIGATORIOS ══════════════════════════════ */
 
 /* tier bajo: fuera lo continuo (filtros/loops); quedan estados reactivos */
