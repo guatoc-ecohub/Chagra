@@ -24,6 +24,7 @@
 import { useEffect, useRef } from 'react';
 import { createRoot } from 'react-dom/client';
 import ZariguyaTrazado from '../../src/visual/creatures/ZariguyaTrazado.jsx';
+import ChagraAgentAvatarZariguya from '../../src/components/ChagraAgentAvatarZariguya.jsx';
 
 /* Congela TODAS las animaciones CSS del bloque EXACTAMENTE en el instante
    `enS`. No basta pausar con delay negativo: las animaciones ya corrieron ε
@@ -188,6 +189,25 @@ function Diag() {
         <Fig nombre="contenta VIVA (respira)">
           <ZariguyaTrazado estado="contenta" modo="normal" size={300} />
         </Fig>
+      </div>
+
+      {/* CONGRUENCIA: el adaptador REAL del avatar 2D del agente (repunteado
+          a ZariguyaTrazado) — misma piel que selector y valle. `speaking`
+          debe quedarse en el rig con mandíbula (lip-sync), SIN pose. */}
+      <h3 style={{ margin: '4px 8px' }}>FASE 2 · congruencia — ChagraAgentAvatarZariguya (avatar 2D real)</h3>
+      <div style={FILA} data-gate="avatar-2d">
+        {['idle', 'listening', 'thinking', 'speaking', 'caminando', 'contenta'].map((s) => (
+          <Fig key={s} nombre={`FAB 48px · ${s}`}>
+            <ChagraAgentAvatarZariguya state={s} size={48} reaccionaPresencia={false} />
+          </Fig>
+        ))}
+      </div>
+      <div style={FILA} data-gate="avatar-2d-grande">
+        {['listening', 'thinking', 'speaking', 'contenta'].map((s) => (
+          <Fig key={`g-${s}`} nombre={`180px · ${s}`}>
+            <ChagraAgentAvatarZariguya state={s} size={180} reaccionaPresencia={false} />
+          </Fig>
+        ))}
       </div>
     </div>
   );

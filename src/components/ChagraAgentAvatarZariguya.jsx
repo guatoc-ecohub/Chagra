@@ -1,21 +1,24 @@
-import ZariguyaGeminiLaminaViva from '../visual/creatures/ZariguyaGeminiLaminaViva';
+import ZariguyaTrazado from '../visual/creatures/ZariguyaTrazado';
 import { useAngelitaPresencia, esPasivo } from '../visual/agente/useAngelitaPresencia';
 
 /**
  * ChagraAgentAvatarZariguya — la zarigüeya como CARA del agente de Chagra,
  * 3ra opción junto a Angelita y el maíz (operador 2026-07-25).
  *
- * Arte aprobado por el SSOT: `ZariguyaGeminiLaminaViva`, la lámina raster
- * Gemini con poses completas, crías y articulación de vida. El comportamiento
- * común decide cuándo se mueve y aparece, nunca cambia este arte por una piel
- * alternativa.
+ * Arte aprobado por el SSOT: `ZariguyaTrazado` (FASE 1 2026-08-26, la lámina
+ * Gemini hero calcada raster sobre el esqueleto de clip-regiones — la MISMA
+ * zarigüeya del elenco `CREATURES.zariguya`, del selector y del valle) MÁS
+ * las poses plenas del set por estado (FASE 2: escucha ×4, ver-lupa, muerta,
+ * cute, crías — cada una SU lámina Gemini con gate de juez visión). El
+ * comportamiento común decide cuándo se mueve y aparece, nunca cambia este
+ * arte por una piel alternativa.
  *
  * Adaptador puro (mismo contrato que ChagraAgentAvatarJaguar/OsoBaston):
  * traduce la API histórica del avatar del agente (state 'idle'|'thinking'|
  * 'speaking'|'listening'|'caminando', glow, withLabel, onClick/onDoubleClick)
- * al contrato de `ZariguyaGeminiLaminaViva`, que ya canoniza esos estados y sus
- * sinónimos) en `ESTADO_CANON` y les da pose/cadencia propia en
- * `zariguyaGeminiLamina/`. `state` viaja como `estado` y queda
+ * al contrato de `ZariguyaTrazado`, que ya canoniza esos estados y sus
+ * sinónimos en `ESTADO_CANON` y les da pose/cadencia propia en
+ * `zariguyaTrazado/`. `state` viaja como `estado` y queda
  * expuesto en `data-agt-estado` (paridad de API / accesibilidad).
  *
  * PRESENCIA (pedido operador 2026-08-24, transversal al elenco — mismo
@@ -60,7 +63,7 @@ export default function ChagraAgentAvatarZariguya({
     const visema = VISEMA_DE_STATE[estadoEfectivo] || null;
 
     const bicho = (
-        <ZariguyaGeminiLaminaViva
+        <ZariguyaTrazado
             estado={estadoEfectivo}
             visema={visema}
             size={size}
