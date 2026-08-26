@@ -41,3 +41,19 @@ NÚMEROS:
    mano-a-oreja vs frame oreja-gigante 04) — el ciclo 02→03→04→03 corre.
  · close-up escucha-01 activo a 100px (< UMBRAL_CLOSEUP=120) — misma raíz
    data-creature (cero swap de nodo; el test integral lo fija).
+
+── GATE LÁMINA 2 · VER-LUPA (thinking) ──
+Comparador alineado por contenido (23-JUEZ-verlupa-alineado.png).
+Veredicto juez (Pixel, calibrado):
+ 1. misma-pose: SI
+ 2. parches que la lámina NO tiene: SI — "parche gris oscuro en el lomo,
+    justo detrás del cuello" → VERIFICADO al 3× (24-cmp-lomo-3x.png): el
+    parche está EN AMBAS mitades, mismo punto del lomo = artefacto DE
+    FÁBRICA de la lámina Gemini (como el bloquecito gris de escucha).
+    El diffmap (24-diffmap.png) NO lo marca: es idéntico en ambas.
+ 3. color-coincide: SI
+ 4. mismo-personaje: SI
+ 5. diferencias: "patas recortadas más abajo" → 1 px de redondeo del trim
+    del comparador (render 475×347 vs lámina 475×348).
+NÚMEROS: bbox contenido 475×347 vs 475×348 (Δ1px, misma escala);
+pixel-diff alineado (fuzz 5%): 637 px de 168 960 = 0.38%.
