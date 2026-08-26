@@ -457,6 +457,17 @@ div.zariguyaHuesos > svg{ width: 100%; height: 100%; display: block; overflow: v
   55%{ transform: rotate(-1.6deg); }
 }
 
+/* VER-LUPA (thinking): lee — barrido lento de quien repasa el documento. */
+.zariguyaHuesos[data-pose="verlupa"] .zt-pose-verlupa{
+  opacity: 1;
+  animation: ztLee 4.6s ease-in-out infinite;
+}
+@keyframes ztLee{
+  0%,100%{ transform: rotate(0deg) translateX(0); }
+  35%{ transform: rotate(-0.8deg) translateX(-0.6%); }
+  70%{ transform: rotate(0.5deg) translateX(0.5%); }
+}
+
 /* ═══════════════════════ GATES OBLIGATORIOS ══════════════════════════════ */
 
 /* tier bajo: fuera lo continuo (filtros/loops); quedan estados reactivos */
