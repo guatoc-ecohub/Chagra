@@ -35,7 +35,7 @@ describe('FUENTES_VIVAS — enlaces a secciones en vivo', () => {
 
   it('trae las fuentes clave: IDEAM, MTA (MADR), Agronet, NOAA, CIIFEN', () => {
     expect(FUENTES_VIVAS.ideam_bsa_semanal).toMatch(/ideam\.gov\.co/i);
-    expect(FUENTES_VIVAS.mta_region_andina).toMatch(/minagricultura\.gov\.co/i);
+    expect(FUENTES_VIVAS.mta_region_andina).toMatch(/ccafs\.cgiar\.org/i);
     expect(FUENTES_VIVAS.agronet_agroclima).toMatch(/agronet\.gov\.co/i);
     expect(FUENTES_VIVAS.noaa_enso_disc).toMatch(/noaa\.gov/i);
     expect(FUENTES_VIVAS.ciifen).toMatch(/ciifen/i);

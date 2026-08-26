@@ -49,6 +49,7 @@ export function puedeEntrarAlMundo(mundoId) {
  */
 export function useNavegacionMundos({ reducedMotion = false, pisoUsuario = null } = {}) {
   const [estado, setEstado] = useState({ fase: 'valle', mundoId: null });
+  const catalogoPisos = useMemo(() => mundosPorPisoTermico(pisoUsuario), [pisoUsuario]);
   // El mundo que aún no abre su puerta (para el aviso "pronto" del host).
   const [pronto, setPronto] = useState(null);
   const prontoTimer = useRef(null);
@@ -118,5 +119,6 @@ export function useNavegacionMundos({ reducedMotion = false, pisoUsuario = null 
     volverAlValle,
     completarViaje,
     puedeEntrar: puedeEntrarAlMundo,
+    catalogoPisos,
   };
 }

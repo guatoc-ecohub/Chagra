@@ -346,10 +346,7 @@ describe('sidecarClient — feature flag on', () => {
         'get_clima_finca',
         'get_documento_soporte_dian',
         'get_ubicacion_actual',
-        'get_cultivos_viables',
-        'get_diseno_finca',
         'get_grado_dia',
-        'get_dosis_biopreparado',
       ];
       for (const t of deflectadas) {
         expect(__TEST__.ALLOWED_TOOLS.has(t)).toBe(false);

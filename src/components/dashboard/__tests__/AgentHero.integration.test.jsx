@@ -207,10 +207,9 @@ describe('AgentHero — integración post-pulido (task #TEST-int)', () => {
       expect(openBtn).toBeTruthy();
       expect(openBtn.querySelectorAll('[data-testid="avatar"]').length).toBe(0);
 
-      // El compai elegido vive una sola vez en la escena.
-      const sceneHummer = container.querySelector('.agentport-hummer');
-      expect(sceneHummer).toBeTruthy();
-      expect(sceneHummer.querySelectorAll('[data-testid="avatar"]').length).toBe(1);
+      // La escena del hero ya no monta un compai adicional: el protagonista
+      // ambiental anterior fue retirado para no duplicar la presencia global.
+      expect(container.querySelector('.agentport-hummer')).toBeNull();
     });
   });
 

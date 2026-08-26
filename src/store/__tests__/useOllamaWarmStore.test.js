@@ -41,6 +41,13 @@ const waitForFetchCalls = async (count) => {
   expect(fetch).toHaveBeenCalledTimes(count);
 };
 
+const waitForStatus = async (status) => {
+  for (let i = 0; i < 50 && useOllamaWarmStore.getState().status !== status; i++) {
+    await new Promise((resolve) => setTimeout(resolve, 0));
+  }
+  expect(useOllamaWarmStore.getState().status).toBe(status);
+};
+
 describe('useOllamaWarmStore — NN4 pre-warm Ollama al login', () => {
   beforeEach(() => {
     // Reset siempre antes de cada test: el store es singleton entre tests.
@@ -130,7 +137,7 @@ describe('useOllamaWarmStore — NN4 pre-warm Ollama al login', () => {
     // Resolvemos el fetch y flusheamos el microtask queue.
     resolveFetch?.();
     // Resolvemos el fetch y flusheamos el microtask queue.
-    await new Promise((r) => setTimeout(r, 0));
+    await waitForStatus('warm');
 
     s = useOllamaWarmStore.getState();
     expect(s.status).toBe('warm');
@@ -144,7 +151,7 @@ describe('useOllamaWarmStore — NN4 pre-warm Ollama al login', () => {
     useOllamaWarmStore.getState().startWarmup();
     expect(useOllamaWarmStore.getState().status).toBe('warming');
 
-    await new Promise((r) => setTimeout(r, 0));
+    await waitForStatus('failed');
 
     const s = useOllamaWarmStore.getState();
     expect(s.status).toBe('failed');
@@ -155,9 +162,7 @@ describe('useOllamaWarmStore — NN4 pre-warm Ollama al login', () => {
     vi.mocked(fetch).mockResolvedValueOnce(/** @type {Response} */ ({ ok: false, status: 500 }));
 
     useOllamaWarmStore.getState().startWarmup();
-    await new Promise((r) => setTimeout(r, 0));
-
-    expect(useOllamaWarmStore.getState().status).toBe('failed');
+    await waitForStatus('failed');
   });
 
   it('idempotencia: llamar startWarmup en estado warming NO dispara segundo fetch', async () => {
@@ -174,8 +179,7 @@ describe('useOllamaWarmStore — NN4 pre-warm Ollama al login', () => {
   it('idempotencia: llamar startWarmup en estado warm NO dispara segundo fetch', async () => {
     vi.mocked(fetch).mockResolvedValueOnce(/** @type {Response} */ ({ ok: true, status: 200 }));
     useOllamaWarmStore.getState().startWarmup();
-    await new Promise((r) => setTimeout(r, 0));
-    expect(useOllamaWarmStore.getState().status).toBe('warm');
+    await waitForStatus('warm');
     expect(fetch).toHaveBeenCalledTimes(1);
 
     useOllamaWarmStore.getState().startWarmup();
@@ -185,16 +189,14 @@ describe('useOllamaWarmStore — NN4 pre-warm Ollama al login', () => {
   it('desde estado failed sí permite re-intentar startWarmup', async () => {
     vi.mocked(fetch).mockRejectedValueOnce(new Error('first fail'));
     useOllamaWarmStore.getState().startWarmup();
-    await new Promise((r) => setTimeout(r, 0));
-    expect(useOllamaWarmStore.getState().status).toBe('failed');
+    await waitForStatus('failed');
     expect(fetch).toHaveBeenCalledTimes(1);
 
     // Segundo intento desde 'failed' debe disparar un nuevo fetch.
     vi.mocked(fetch).mockResolvedValueOnce(/** @type {Response} */ ({ ok: true, status: 200 }));
     useOllamaWarmStore.getState().startWarmup();
     await waitForFetchCalls(2);
-    await new Promise((r) => setTimeout(r, 0));
-    expect(useOllamaWarmStore.getState().status).toBe('warm');
+    await waitForStatus('warm');
   });
 
   it('resetWarmup vuelve al estado inicial limpio', () => {
