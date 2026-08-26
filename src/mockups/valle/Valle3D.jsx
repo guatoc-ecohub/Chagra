@@ -85,6 +85,7 @@ import LaderaAltaValle from './LaderaAltaValle.jsx';
 import ArrieriaValle from './ArrieriaValle.jsx';
 import AguaVivaValle from './AguaVivaValle.jsx';
 import DetalleSueloValle from './DetalleSueloValle.jsx';
+import PastoVivoValle from './PastoVivoValle.jsx';
 import { CampesinosValle } from './CampesinosValle.jsx';
 import HatoMovil from './HatoMovil.jsx';
 /* Árboles POR ESPECIE (no genéricos): las mismas mallas del bosque altoandino
@@ -2989,6 +2990,10 @@ function Escena({ clima, focoId, animo, energia, onEntrar, onAlerta, onCasa = nu
       <Terreno nocturno={nocturno} innerRef={terrenoRef} perfil={perfil} superficie={superficie} />
       {/* AoE: detalle de suelo (pasto corto/flores/piedras) + surcos de cultivo — mata el verde vacío */}
       <DetalleSueloValle alturaDe={altura} tier={tier} reducedMotion={reducedMotion} nocturno={nocturno} />
+      {/* Pasto alto instanciado: raíz fija al relieve, viento solo en la copa,
+          color en parches y presupuesto por tier. Complementa el detalle corto
+          sin tocar caminos, casa ni cauce. */}
+      <PastoVivoValle alturaDe={altura} tier={tier} reducedMotion={reducedMotion} nocturno={nocturno} />
       <Cordillera color={nocturno ? '#48598a' : c.niebla} innerRef={cordilleraRef} perfil={perfil} />
       {/* AGUA VIVA: el hilo que baja del páramo + las acequias que se ramifican
           a las eras, el semillero y la huerta, con sus compuertas y pozas. */}
