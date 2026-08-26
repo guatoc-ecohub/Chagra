@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="es-CO">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Valle de Guatoc — entrada orgánica (impostor archivado)</title>
+<style>
+  html,body{margin:0;height:100%;overflow:hidden;background:#0a0a0f;font-family:system-ui,-apple-system,sans-serif}
+  #c{display:block;width:100vw;height:100vh;touch-action:none}
+  /* ⚠️ el HUD se salía por debajo de la barra «Mover lo mío» y quedaba CORTADO
+     a media frase (auditoría 2026-07-26). Ahora tiene ancho máximo, se ajusta
+     en dos líneas y sube por encima de la barra. */
+  #hud{position:fixed;left:16px;bottom:52px;max-width:min(38vw,420px);color:#fff;opacity:.72;
+    font-size:.76rem;line-height:1.35;text-shadow:0 1px 4px #000;pointer-events:none;letter-spacing:.01em}
+  @media (max-width:700px){#hud{max-width:60vw;bottom:60px;font-size:.7rem}}
+  #load{position:fixed;inset:0;display:grid;place-items:center;color:#e8e8f0;background:radial-gradient(circle at 50% 40%,#1a1e28,#0a0a0f);transition:opacity .7s;z-index:10;font-size:1rem;letter-spacing:.04em}
+  #archive{position:fixed;top:12px;left:50%;transform:translateX(-50%);z-index:12;padding:7px 13px;border:1px solid rgba(255,196,106,.55);border-radius:999px;background:rgba(35,24,12,.78);color:#ffe5b3;font-size:.72rem;letter-spacing:.02em;text-align:center;pointer-events:none;box-shadow:0 5px 18px rgba(0,0,0,.25)}
+</style>
+<script type="importmap">
+{
+  "imports": {
+    "three": "./vendor/three.module.js",
+    "three/addons/": "./vendor/addons/"
+  }
+}
+</script>
+</head>
+<body>
+<div id="load">Cargando el valle de Guatoc…</div>
+<div id="archive">Versión anterior del valle · la entrada vigente usa la ladera orgánica</div>
+<script>
+  window.__reportarFalloArranque = (error) => {
+    const mensaje = String(error?.message || error || 'fallo de arranque');
+    window.__ARRANQUE_FALLO = mensaje;
+    document.body.dataset.estado = 'error';
+    const l = document.getElementById('load');
+    if (l) { l.style.opacity = 1; l.textContent = 'ERROR: ' + mensaje; }
+  };
+if (new URLSearchParams(location.search).get('imp') === '1') {
+  const el = document.createElement('div');
+  el.id = 'impDebug';
+  el.style.cssText = 'position:fixed;left:8px;top:8px;z-index:99;color:#9f9;font:11px/1.4 monospace;background:rgba(0,0,0,.65);padding:4px 6px;pointer-events:none;white-space:pre';
+  document.body.appendChild(el);
+  el.textContent = 'IMPOSTOR: aún no';
+  const poll = () => {
+    const s = window.__impostorCliff;
+    if (s) {
+      const c = s.counts();
+      const vs = (s.group.children || []).map((m) => m.visible ? m.isInstancedMesh ? 'on(' + m.count + ')' : 'on' : 'off').join('/');
+      let geo = 'geo=?';
+      try {
+        const far = s.group.children[2];
+        const arr = far.instanceMatrix.array;
+        let nan = 0, zmin = 1e9, zmax = -1e9;
+        const read = (i) => {
+          const k = i * 16;
+          const x = arr[k + 12], y = arr[k + 13], z = arr[k + 14];
+          if (!Number.isFinite(x + y + z)) nan++;
+          if (Number.isFinite(z)) { if (z < zmin) zmin = z; if (z > zmax) zmax = z; }
+          return x.toFixed(1) + ',' + y.toFixed(1) + ',' + z.toFixed(1);
+        };
+        geo = 'p0=' + read(0) + ' p5k=' + read(5000) + ' p17k=' + read(16999) + ' z[' + zmin.toFixed(0) + ',' + zmax.toFixed(0) + '] nan=' + nan;
+      } catch (e) { geo = 'geo=ERR:' + e.message; }
+      el.textContent = 'IMPOSTOR total=' + c.total + ' near=' + c.near + ' med=' + c.med + ' far=' + c.far + ' vis=' + vs + '\n' + geo;
+    }
+    requestAnimationFrame(poll);
+  };
+  requestAnimationFrame(poll);
+}
+</script>
+<script>
+  addEventListener('error', (e) => {
+    window.__reportarFalloArranque(e.message + ' @ ' + (e.filename || '').split('/').pop() + ':' + e.lineno);
+  });
+</script>
+<canvas id="c"></canvas>
+<script src="./assets/guias-arte.js"></script>
+<div id="hud">Valle de Guatoc — toda la finca de un vistazo.<br>Toque un mundo para entrar · arrastre para desplazarse · rueda para acercar · acérquese al domo y tóquelo para la ventana de los nueve.</div>
+<script>{ const q = new URLSearchParams(location.search); if (q.get('cam') || q.get('leccion')) document.getElementById('hud').style.display = 'none'; }</script>
+<!-- el onboarding arranca ANTES que el valle: se ve mientras baja el DEM -->
+<script type="module" src="./onboarding.js"></script>
+<script type="module">
+  import('./main-impostores.js').catch((e) => {
+    window.__reportarFalloArranque('IMPORT ERROR: ' + (e && (e.message || e)));
+  });
+</script>
+</body>
+</html>
