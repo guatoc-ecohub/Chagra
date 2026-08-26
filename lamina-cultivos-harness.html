@@ -1,0 +1,45 @@
+<!doctype html>
+<!-- Harness de arte: la lámina de CUALQUIER cultivo del invernadero, PLANA,
+     sin 3D (doctrina: primero la lámina plana, después la escena).
+     Uso: ?especie=tomate|pimenton|lechuga  (default tomate).
+     No entra al build: es herramienta de gate. -->
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <title>Láminas del invernadero — harness plano</title>
+    <style>
+      body { margin: 0; background: #d8d2c0; }
+      #zoom { image-rendering: auto; }
+    </style>
+  </head>
+  <body>
+    <script type="module">
+      import { crearAtlasLamina } from './src/visual/mundo3d/invernadero/laminaMasa.js';
+      import { LAMINA_TOMATE } from './src/visual/mundo3d/invernadero/tomateHumboldt.js';
+      import { LAMINA_PIMENTON, LAMINA_LECHUGA } from './src/visual/mundo3d/invernadero/hortalizasHumboldt.js';
+
+      const LAMINAS = { tomate: LAMINA_TOMATE, pimenton: LAMINA_PIMENTON, lechuga: LAMINA_LECHUGA };
+      const especie = new URLSearchParams(location.search).get('especie') || 'tomate';
+      const lamina = LAMINAS[especie] || LAMINA_TOMATE;
+
+      const tex = crearAtlasLamina(lamina.layout, lamina.pintarTile, lamina.semillaAtlas);
+      const atlas = tex.image;
+      // vista 1: el atlas entero a media escala
+      const medio = document.createElement('canvas');
+      medio.width = atlas.width / 2;
+      medio.height = atlas.height / 2;
+      medio.getContext('2d').drawImage(atlas, 0, 0, medio.width, medio.height);
+      document.body.appendChild(medio);
+      // vista 2: el primer tile a tamaño natural (el detalle de plancha)
+      const zoom = document.createElement('canvas');
+      zoom.id = 'zoom';
+      zoom.width = lamina.layout.tileW;
+      zoom.height = lamina.layout.tileH;
+      zoom
+        .getContext('2d')
+        .drawImage(atlas, 0, 0, lamina.layout.tileW, lamina.layout.tileH, 0, 0, lamina.layout.tileW, lamina.layout.tileH);
+      document.body.appendChild(zoom);
+      window.__laminaLista = true;
+    </script>
+  </body>
+</html>
