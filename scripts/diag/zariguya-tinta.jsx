@@ -176,6 +176,19 @@ function Diag() {
           <ZariguyaTrazado estado="idle" vidaForzada="tanatosis" modo="normal" size={340} />
         </Fig>
       </div>
+
+      <h3 style={{ margin: '4px 8px' }}>FASE 2 · contenta (cute) + crías al lomo (vida forzada)</h3>
+      <div style={{ display: 'flex' }} data-gate="contenta-1a1">
+        <div style={{ width: 545, height: 500, overflow: 'hidden' }}>
+          <ZariguyaTrazado estado="contenta" modo="normal" animated={false} size={545} style={{ width: 545, height: 500 }} />
+        </div>
+        <div style={{ width: 545, height: 500, overflow: 'hidden' }}>
+          <ZariguyaTrazado estado="idle" vidaForzada="crias" modo="normal" animated={false} size={545} style={{ width: 545, height: 500 }} />
+        </div>
+        <Fig nombre="contenta VIVA (respira)">
+          <ZariguyaTrazado estado="contenta" modo="normal" size={300} />
+        </Fig>
+      </div>
     </div>
   );
 }
