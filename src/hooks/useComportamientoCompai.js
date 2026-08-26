@@ -1,12 +1,27 @@
 import { useEffect, useRef, useState } from 'react';
 
 /**
- * Motor transversal de presencia del compai.
+ * Motor transversal de PRESENCIA del compai (FAB 2D).
  *
- * El arte solamente pinta el cuerpo. Esta pieza decide la presencia común:
- * una posición persistente, movimiento por la pantalla, pausa natural,
- * reacción al puntero y aparición mística al cambiar de rumbo. Los hosts
- * pueden escoger el verbo visual de la especie sin duplicar esta máquina.
+ * El arte solo pinta el cuerpo; esta pieza decide la presencia común: el compai
+ * DESCANSA en su puesto (posición natural / donde el usuario lo dejó) y, cada
+ * tanto, hace una EXCURSIÓN corta y ACOTADA para "explicar la pantalla",
+ * regresando SIEMPRE a su puesto.
+ *
+ * Reglas duras (operador 2026-08-26, ronda ajustes home-2d):
+ *   · 70% del tiempo QUIETO en su puesto; 30% en excursión que REGRESA.
+ *   · La excursión es ACOTADA (radio corto junto al puesto) y JAMÁS sale del
+ *     viewport → nada de deambular por toda la pantalla ni salirse (bug previo:
+ *     el roam barría el viewport completo y la razón estaba invertida —70% se
+ *     movía—, por eso "se salía / se movía incongruente").
+ *   · El ARRASTRE lo dueña el host con useCompaiDraggable (bottom/right,
+ *     persistente): ese es el ÚNICO sistema de arrastre. Aquí el `transform`
+ *     descansa SIEMPRE en {0,0} = el puesto, y la excursión es un offset
+ *     transitorio. Al arrastrar (`pausado`) la excursión cede y vuelve a {0,0}
+ *     para no pelear con el arrastre → el compai se queda DONDE lo dejaron.
+ *
+ * Ver feedback_compai_politica_v2_visible_roam_natural /
+ * feedback_compai_comportamiento_ssot_definitivo.
  */
 
 export const COMPAI_MOVIMIENTO = Object.freeze({
@@ -19,42 +34,24 @@ export const COMPAI_MOVIMIENTO = Object.freeze({
   'chivito-punk': 'vuela',
 });
 
-const POSICION_PREFIX = 'chagra:compai:posicion:';
-const VELOCIDAD = 90;
+// 70% quieto / 30% en excursión (operador 2026-08-26). La pausa en el puesto se
+// calcula para que, sobre el ciclo completo, el compai quede quieto ~70%.
+export const COMPAI_QUIETO_RATIO = 0.7;
+
+const VELOCIDAD = 78;             // px/s del desplazamiento
+const RADIO_X = 180;              // alcance máx. de la excursión a la IZQUIERDA del puesto
+const RADIO_Y = 160;              // alcance máx. de la excursión ARRIBA del puesto
+const EXCURSION_DWELL_MS = 900;   // dwell breve en el punto de la excursión ("explicando")
+const PAUSA_MS = 3000;            // dwell base cuando está pausado/arrastrado
+const ARRANQUE_MS = 1200;         // reposo inicial antes de la primera excursión
 const FADE_MS = 520;
-const PAUSA_MS = 3000;
-const ARRANQUE_MS = 900;
 const DT_MAX = 0.05;
-export const COMPAI_MOVIMIENTO_RATIO = 0.7;
 
 function puedeAnimar() {
   return typeof window !== 'undefined'
     && typeof window.requestAnimationFrame === 'function'
     && !(typeof window.matchMedia === 'function'
       && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
-}
-
-function leerPosicion(clave) {
-  try {
-    const valor = JSON.parse(window.localStorage?.getItem(clave) || 'null');
-    if (valor && Number.isFinite(valor.x) && Number.isFinite(valor.y)) {
-      return { x: valor.x, y: valor.y };
-    }
-  } catch {
-    // Private mode, storage disabled or malformed old data: start naturally.
-  }
-  return { x: 0, y: 0 };
-}
-
-function guardarPosicion(clave, posicion) {
-  try {
-    window.localStorage?.setItem(clave, JSON.stringify({
-      x: Math.round(posicion.x),
-      y: Math.round(posicion.y),
-    }));
-  } catch {
-    // Storage is an enhancement. Presence must keep working offline/private.
-  }
 }
 
 function escribirTransform(el, posicion) {
@@ -73,20 +70,25 @@ function obtenerTamano(el) {
   };
 }
 
+// Límites de la EXCURSIÓN: una caja corta arriba-izquierda del puesto (la
+// esquina inferior derecha). Nunca a la derecha ni por debajo del puesto
+// (maxX/maxY = 0) y acotada por RADIO_* sin salirse del viewport.
 function obtenerLimites(el, soloX) {
   const { width, height } = obtenerTamano(el);
   const viewportWidth = window.innerWidth || 360;
   const viewportHeight = window.innerHeight || 640;
-  const maxX = Math.max(0, viewportWidth - width - 8);
-  const maxY = Math.max(0, viewportHeight - height - 8);
+  const espacioX = Math.max(0, viewportWidth - width - 8);
+  const espacioY = Math.max(0, viewportHeight - height - 8);
   return {
-    minX: -maxX,
-    maxX: 8,
-    minY: soloX ? 0 : -maxY,
-    maxY: soloX ? 0 : 8,
+    minX: -Math.min(RADIO_X, espacioX),
+    maxX: 0,
+    minY: soloX ? 0 : -Math.min(RADIO_Y, espacioY),
+    maxY: 0,
   };
 }
 
+// Anclas reales de la pantalla, CLAMPEADAS a la caja de la excursión: el compai
+// gesticula HACIA el contenido sin volar al otro extremo de la pantalla.
 function puntosDeContenido(el, limites, x, y) {
   if (typeof document === 'undefined') return [];
   const nodos = Array.from(document.querySelectorAll(
@@ -123,10 +125,10 @@ function siguienteDestino({ el, limites, soloX, contentAware, x, y }) {
  * @param {object} [opciones]
  * @param {string} [opciones.especie='angelita'] especie del compai
  * @param {boolean} [opciones.activo=true]
- * @param {boolean} [opciones.pausado=false]
+ * @param {boolean} [opciones.pausado=false] p.ej. mientras el host lo arrastra
  * @param {boolean} [opciones.soloX=false] compatibilidad con el roam antiguo
  * @param {boolean} [opciones.contentAware=true] busca anclas reales de la pantalla
- * @param {string} [opciones.superficie='global'] clave persistente de superficie
+ * @param {string} [opciones.superficie='global'] etiqueta de superficie (informativa)
  */
 export default function useComportamientoCompai(ref, opciones = {}) {
   const {
@@ -135,7 +137,9 @@ export default function useComportamientoCompai(ref, opciones = {}) {
     pausado = false,
     soloX = false,
     contentAware = true,
-    superficie = 'global',
+    // `superficie` se conserva en la firma por compatibilidad con los hosts;
+    // la posición persistente (dónde vive el compai) la dueña useCompaiDraggable.
+    superficie: _superficie = 'global',
   } = opciones;
   const [moviendo, setMoviendo] = useState(false);
   const [direccion, setDireccion] = useState('izquierda');
@@ -145,21 +149,21 @@ export default function useComportamientoCompai(ref, opciones = {}) {
   const estadoRef = useRef({ moviendo: false, direccion: 'izquierda' });
   const posicionRef = useRef({ x: 0, y: 0 });
   const pausadoRef = useRef(pausado);
-  const storageKey = `${POSICION_PREFIX}${especie}:${superficie}`;
 
   useEffect(() => {
     pausadoRef.current = pausado;
   }, [pausado]);
 
+  // El `transform` descansa SIEMPRE en el puesto ({0,0}); el puesto real
+  // (bottom/right, persistente) lo dueña useCompaiDraggable en el host.
   useEffect(() => {
     const el = ref.current;
     if (!el) return undefined;
-    const posicion = leerPosicion(storageKey);
-    posicionRef.current = posicion;
-    if (activo && puedeAnimar()) escribirTransform(el, posicion);
+    posicionRef.current = { x: 0, y: 0 };
+    if (activo && puedeAnimar()) escribirTransform(el, posicionRef.current);
     else el.style.transform = '';
-    return () => guardarPosicion(storageKey, posicionRef.current);
-  }, [activo, ref, storageKey]);
+    return () => { if (el) el.style.transform = ''; };
+  }, [activo, ref]);
 
   useEffect(() => {
     const el = ref.current;
@@ -172,7 +176,7 @@ export default function useComportamientoCompai(ref, opciones = {}) {
     let ultimoTs = 0;
     let fase = 'pausa';
     let faseHasta = (performance.now?.() || Date.now()) + ARRANQUE_MS;
-    let movimientoInicio = 0;
+    let roamInicio = 0;
     let destino = { ...posicionRef.current };
     let opacidad = 1;
     let fadeInicio = null;
@@ -199,22 +203,30 @@ export default function useComportamientoCompai(ref, opciones = {}) {
       const dt = Math.min((ts - ultimoTs) / 1000, DT_MAX);
       ultimoTs = ts;
       const limites = obtenerLimites(el, soloX);
+      const actual = posicionRef.current;
+      const enPuesto = Math.abs(actual.x) < 1 && Math.abs(actual.y) < 1;
 
-      if (fase === 'pausa' && ts >= faseHasta && !pausadoRef.current) {
-        destino = siguienteDestino({
-          el, limites, soloX, contentAware,
-          x: posicionRef.current.x, y: posicionRef.current.y,
-        });
-        fase = 'movimiento';
-        movimientoInicio = ts;
-      }
       if (pausadoRef.current) {
+        // Arrastrándolo: la excursión cede y el transform vuelve al puesto para
+        // no pelear con useCompaiDraggable (que mueve bottom/right).
         destino = { x: 0, y: 0 };
         fase = 'movimiento';
-        if (!movimientoInicio) movimientoInicio = ts;
+        roamInicio = 0;
+      } else if (fase === 'pausa' && ts >= faseHasta) {
+        if (enPuesto) {
+          // 30%: salir a una excursión corta, acotada, junto al puesto.
+          destino = siguienteDestino({
+            el, limites, soloX, contentAware,
+            x: actual.x, y: actual.y,
+          });
+          roamInicio = ts;
+        } else {
+          // Regresar SIEMPRE al puesto ({0,0}).
+          destino = { x: 0, y: 0 };
+        }
+        fase = 'movimiento';
       }
 
-      const actual = posicionRef.current;
       const dx = destino.x - actual.x;
       const dy = destino.y - actual.y;
       const distancia = Math.hypot(dx, dy);
@@ -223,15 +235,23 @@ export default function useComportamientoCompai(ref, opciones = {}) {
           actual.x = destino.x;
           actual.y = destino.y;
           fase = 'pausa';
-          const movimientoMs = movimientoInicio ? Math.max(1, ts - movimientoInicio) : PAUSA_MS;
-          const pausaMs = pausadoRef.current || (limites.maxX - limites.minX < 24)
-            ? PAUSA_MS
-            : movimientoMs * ((1 - COMPAI_MOVIMIENTO_RATIO) / COMPAI_MOVIMIENTO_RATIO);
+          const llegoAlPuesto = Math.abs(destino.x) < 1 && Math.abs(destino.y) < 1;
+          let pausaMs;
+          if (pausadoRef.current) {
+            pausaMs = PAUSA_MS;
+          } else if (llegoAlPuesto) {
+            // 70% quieto: la pausa en el puesto es proporcional a lo que duró la
+            // excursión (ida + dwell + vuelta) → quieto/(quieto+roam) ≈ 0.7.
+            const roamMs = roamInicio ? Math.max(1, ts - roamInicio) : PAUSA_MS;
+            pausaMs = roamMs * (COMPAI_QUIETO_RATIO / (1 - COMPAI_QUIETO_RATIO));
+            roamInicio = 0;
+          } else {
+            // Dwell breve en la excursión ("explicando"); luego regresa.
+            pausaMs = EXCURSION_DWELL_MS;
+          }
           faseHasta = ts + pausaMs;
-          movimientoInicio = 0;
           marcar('moviendo', false, setMoviendo);
-          if (!pausadoRef.current) setParada((n) => n + 1);
-          guardarPosicion(storageKey, actual);
+          if (!pausadoRef.current && !llegoAlPuesto) setParada((n) => n + 1);
         } else {
           const step = Math.min(VELOCIDAD * dt, distancia);
           actual.x += (dx / distancia) * step;
@@ -260,70 +280,21 @@ export default function useComportamientoCompai(ref, opciones = {}) {
     return () => {
       cancelado = true;
       window.cancelAnimationFrame(rafId);
-      guardarPosicion(storageKey, posicionRef.current);
-      el.style.opacity = '';
+      if (el) el.style.opacity = '';
     };
-  }, [activo, contentAware, especie, ref, soloX, storageKey]);
+  }, [activo, contentAware, soloX, ref]);
 
-  const dragRef = useRef(null);
-  const draggedRef = useRef(false);
+  // Presencia y notificación al toque. El ARRASTRE NO vive aquí (lo dueña
+  // useCompaiDraggable en el host): así no hay dos sistemas de arrastre peleando.
   const handlers = {
-    onPointerEnter: () => {
-      setPresencia(true);
-    },
-    onPointerLeave: () => {
-      setPresencia(false);
-    },
+    onPointerEnter: () => setPresencia(true),
+    onPointerLeave: () => setPresencia(false),
     onPointerDown: (event) => {
       if (event.target?.closest?.('[data-compai-no-drag]')) return;
-      const el = ref.current;
-      if (el) {
-        const limites = obtenerLimites(el, soloX);
-        dragRef.current = {
-          pointerId: event.pointerId,
-          startX: event.clientX,
-          startY: event.clientY,
-          posicion: { ...posicionRef.current },
-          limites,
-        };
-        draggedRef.current = false;
-        el.setPointerCapture?.(event.pointerId);
-      }
       setPresencia(true);
       setNotificacionVisible(true);
     },
-    onPointerMove: (event) => {
-      const drag = dragRef.current;
-      if (!drag || drag.pointerId !== event.pointerId) return;
-      const dx = event.clientX - drag.startX;
-      const dy = event.clientY - drag.startY;
-      if (Math.hypot(dx, dy) > 5) draggedRef.current = true;
-      const posicion = posicionRef.current;
-      posicion.x = Math.max(drag.limites.minX, Math.min(drag.limites.maxX, drag.posicion.x + dx));
-      posicion.y = Math.max(drag.limites.minY, Math.min(drag.limites.maxY, drag.posicion.y + dy));
-      escribirTransform(ref.current, posicion);
-    },
-    onPointerUp: (event) => {
-      const drag = dragRef.current;
-      if (!drag || drag.pointerId !== event.pointerId) return;
-      ref.current?.releasePointerCapture?.(event.pointerId);
-      guardarPosicion(storageKey, posicionRef.current);
-      dragRef.current = null;
-    },
-    onPointerCancel: (event) => {
-      const drag = dragRef.current;
-      if (!drag || drag.pointerId !== event.pointerId) return;
-      ref.current?.releasePointerCapture?.(event.pointerId);
-      guardarPosicion(storageKey, posicionRef.current);
-      dragRef.current = null;
-    },
-    onClick: () => {
-      if (draggedRef.current) {
-        draggedRef.current = false;
-        return;
-      }
-      setNotificacionVisible(true);
-    },
+    onClick: () => setNotificacionVisible(true),
   };
 
   return {

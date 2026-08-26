@@ -214,10 +214,15 @@ export default function AgentFab({ onNavigate, pantalla = null }) {
   //        hooks de arriba; aquí se hace VISIBLE con la burbuja rica del valle.
   const [avatarType] = useAgentAvatarType();
   const nombreCompai = AVATAR_NOMBRE[avatarType] || AVATAR_NOMBRE[DEFAULT_AVATAR_TYPE];
+  // El ARRASTRE lo dueña useCompaiDraggable (bottom/right, persistente). Mientras
+  // se arrastra, la excursión del compai cede (`pausado`) y vuelve a su puesto —
+  // así NO hay dos sistemas de posición peleando y el compai se queda DONDE lo
+  // dejaron. Ver feedback_compai_politica_v2_visible_roam_natural.
   const comportamiento = useComportamientoCompai(compaiRef, {
     especie: avatarType,
     superficie: pantalla || 'global',
     contentAware: true,
+    pausado: isDragging,
   });
   const hint = useMemo(() => getHintForRuta(pantalla, nombreCompai), [pantalla, nombreCompai]);
 
@@ -422,9 +427,6 @@ export default function AgentFab({ onNavigate, pantalla = null }) {
       onPointerEnter={comportamiento.handlers.onPointerEnter}
       onPointerLeave={comportamiento.handlers.onPointerLeave}
       onPointerDown={comportamiento.handlers.onPointerDown}
-      onPointerMove={comportamiento.handlers.onPointerMove}
-      onPointerUp={comportamiento.handlers.onPointerUp}
-      onPointerCancel={comportamiento.handlers.onPointerCancel}
       onMouseDown={dragHandlers.onMouseDown}
       onTouchStart={dragHandlers.onTouchStart}
       aria-hidden={oculto}
