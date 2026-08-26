@@ -48,3 +48,25 @@
 .fvh-skin.chagra-fab.is-ready {
   border-color: rgb(var(--c-amber-400, 251 191 36) / 0.8) !important;
 }
+
+/* ============================================================================
+   Menú compacto del FAB (R4, `ops/COMPAI-MENU-DISENO-2026-08-25.md` §1.2) —
+   hover/focus de los ítems del menú. Sin scope de tema a propósito (el menú
+   vive fuera de `.fvh-skin`, en TODOS los perfiles/temas): el gesto es
+   transversal, solo la piel del plinto del FAB está gateada.
+   ========================================================================== */
+.agt-fab-menu-item:hover,
+.agt-fab-menu-item:focus-visible {
+  background: rgb(var(--t-accent-rgb, 16 185 129) / 0.18);
+  outline: none;
+}
+.agt-fab-menu-item:focus-visible {
+  box-shadow: 0 0 0 2px rgb(var(--t-accent-rgb, 16 185 129) / 0.6);
+}
+.agt-fab-menu-item:active {
+  background: rgb(var(--t-accent-rgb, 16 185 129) / 0.28);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .agt-fab-menu-item { transition: none !important; }
+}

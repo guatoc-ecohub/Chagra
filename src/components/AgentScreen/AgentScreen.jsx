@@ -651,6 +651,20 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  // R4 (`ops/COMPAI-MENU-DISENO-2026-08-25.md` §1.2): la opción "Enviar una
+  // foto" del menú compacto del FAB (`AgentFab.jsx` → `AgentFabMenu`) llega
+  // con `initialContext.autoOpenCamera` y dispara la MISMA cámara oculta que
+  // ya usa el botón de foto del compositor (`cameraInputAgentRef`) — cero
+  // input nuevo, cero pipeline nuevo. Un tick de espera para que el input
+  // oculto ya esté montado; de un solo uso, igual que el resto de
+  // `initialContext`.
+  useEffect(() => {
+    if (!initialContext?.autoOpenCamera) return undefined;
+    const t = setTimeout(() => { cameraInputAgentRef.current?.click(); }, 150);
+    return () => clearTimeout(t);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   // Bug 2026-05-18: health check del LLM al mount. Si /api/ollama/api/tags
   // no responde en 5s, marcamos llmHealthy=false y avisamos al operador
   // antes que intente submit (evita stuck-pensando frente a backend caído).
