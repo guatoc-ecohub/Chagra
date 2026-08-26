@@ -479,6 +479,28 @@ div.zariguyaHuesos > svg{ width: 100%; height: 100%; display: block; overflow: v
   50%{ transform: scaleY(1.015); }
 }
 
+/* CUTE (contenta): quieta de frente, respiración menuda. */
+.zariguyaHuesos[data-pose="cute"] .zt-pose-cute{
+  opacity: 1;
+  animation: ztCuteRespira 3.4s ease-in-out infinite;
+}
+@keyframes ztCuteRespira{
+  0%,100%{ transform: scale(1); }
+  50%{ transform: scale(1.012); }
+}
+
+/* CRÍAS AL LOMO (vida 'crias', forzada por el host): la firma de identidad.
+   Respira más hondo que la cute (carga encima) y se mece apenas. */
+.zariguyaHuesos[data-pose="crias"] .zt-pose-crias{
+  opacity: 1;
+  animation: ztCriasCarga 4.2s ease-in-out infinite;
+}
+@keyframes ztCriasCarga{
+  0%,100%{ transform: scale(1) rotate(0deg); }
+  45%{ transform: scale(1.016) rotate(-0.35deg); }
+  75%{ transform: scale(1.008) rotate(0.25deg); }
+}
+
 /* ═══════════════════════ GATES OBLIGATORIOS ══════════════════════════════ */
 
 /* tier bajo: fuera lo continuo (filtros/loops); quedan estados reactivos */
