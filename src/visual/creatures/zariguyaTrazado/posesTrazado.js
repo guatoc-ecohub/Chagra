@@ -50,6 +50,7 @@ import {
 export const POSES_TRAZADO_KEYS = Object.freeze([
   'escucha-01', 'escucha-02', 'escucha-03', 'escucha-04', // gate escucha
   'verlupa', // gate ver-lupa (thinking)
+  'muerta', // gate se-hace-la-muerta (vida tanatosis, la firma de la especie)
 ]);
 
 /** Ruta pública del PNG de una pose (la misma que consume la hermana). */
