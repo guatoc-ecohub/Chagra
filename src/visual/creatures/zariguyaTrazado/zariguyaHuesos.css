@@ -268,13 +268,17 @@ div.zariguyaHuesos > svg{ width: 100%; height: 100%; display: block; overflow: v
   0%,100%{ transform: translateY(2px) rotate(.5deg) scale(1.005,.995); }
   50%{ transform: translateY(-2.8px) rotate(-.4deg) scale(.996,1.006); }
 }
-/* CABEZA NIVELADA: contra-ondula el bote (no pierde el horizonte) */
+/* CABEZA NIVELADA: contra-ondula el bote (no pierde el horizonte).
+   Bob SUAVE (fase 1 2026-08-26, fix kipá): la traslación grande (±2px)
+   descolgaba la silueta de la coronilla de su casquete y asomaba el parche
+   — el nivelado se lee sobre todo en la contra-rotación; la traslación
+   queda bajo el radio del blur del casquete (1.1px). */
+@keyframes zhCabezaNivel{
+  0%,100%{ transform: translateY(-.8px) rotate(-.6deg); }
+  50%{ transform: translateY(1px) rotate(.6deg); }
+}
 .zariguyaHuesos[data-agt-estado="caminando"] .zh-cabeza{
   animation: zhCabezaNivel calc(var(--zh-paso) / 2) ease-in-out calc(var(--zh-fase) - .08s) infinite;
-}
-@keyframes zhCabezaNivel{
-  0%,100%{ transform: translateY(-1.8px) rotate(-.6deg); }
-  50%{ transform: translateY(2.2px) rotate(.6deg); }
 }
 /* el cuello amortigua a contratiempo */
 .zariguyaHuesos[data-agt-estado="caminando"] .zh-cuello{

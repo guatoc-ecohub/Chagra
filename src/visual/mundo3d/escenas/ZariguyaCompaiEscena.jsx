@@ -36,7 +36,7 @@
    coreografía + su componente de escena) se importa SIEMPRE perezoso dentro de
    un <Canvas> vía CompaiEscena/EscenaBase3D; no es hot-reload-sensible. Van
    juntos a propósito (mismo contrato que useEntradaAbeja). */
-import { useEffect, useMemo, useRef } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useFrame } from '@react-three/fiber';
 import { Html } from '@react-three/drei';
 import * as THREE from 'three';
@@ -63,6 +63,15 @@ const TROTE_EMPUJE = 2.4;   // refuerzo del lerp durante la llegada
 const ENTRA_DESDE_X = 2.4;  // desde qué borde llega (offset del foco)
 const PASO_FREQ = 7.3;      // frecuencia del trote (pasos cortos de marsupial)
 const ENCARAME_UMBRAL = 0.35; // foco más alto que esto sobre el piso → se encarama
+/* Histéresis del modo marcha (patrón feat/jaguar-camina-dev): lejos del
+   destino el SKIN corre su walk-cycle real ('caminando': las patas
+   ARTICULAN, spec zariguya-camina 2026-08-26); cerca vuelve al idle. Umbral
+   más corto que el felino: la chucha es menuda y se planta rápido. */
+const MARCHA_LEJOS = 0.5;
+const MARCHA_CERCA = 0.2;
+/* Con el walk-cycle del skin activo el bamboleo 3D BAJA (no se duplica la
+   marcha: el bob/waddle grande era el sustituto cuando la piel no caminaba). */
+const WADDLE_MARCHA = 0.4;
 
 const clamp01 = (v) => (v < 0 ? 0 : v > 1 ? 1 : v);
 
@@ -113,6 +122,14 @@ export function useAndanzaZariguya(foco, {
   const aparecioRef = useRef(false);
   // Fase de entrada: 'oculta' (pre-ancla) → 'trote' (llega) → 'no'.
   const fase = useRef(cruce && !reducedMotion ? 'oculta' : 'no');
+  // Modo discreto del cuerpo (estado React, cambia poco — patrón jaguar):
+  // 'marcha' = el skin corre su walk-cycle real; 'quieto' = idle-cerebro.
+  // Entra TROTANDO: con cruce nace ya en marcha.
+  const [modo, setModo] = useState(cruce && !reducedMotion ? 'marcha' : 'quieto');
+  const modoRef = useRef(modo);
+  const ponModo = (m) => {
+    if (modoRef.current !== m) { modoRef.current = m; setModo(m); }
+  };
   const ponVis = (visible) => {
     if (visible) aparecioRef.current = true;
     if (visRef.current) visRef.current.style.visibility = visible ? '' : 'hidden';
@@ -137,6 +154,7 @@ export function useAndanzaZariguya(foco, {
       if (fase.current === 'oculta') { ponVis(false); return; } // salió antes de entrar
       if (salioEn.current === null) salioEn.current = t;
       if (t - salioEn.current >= CRUCE_SUELTA_S) { ponVis(false); return; }
+      ponModo('marcha'); // sale CORRIENDO: el walk-cycle acompaña la huida
       _dest.set(foco.x - ENTRA_DESDE_X * 1.6, piso + PERCHA.y, foco.z + 0.35);
       ref.current.position.lerp(_dest, 0.22);
       // NO gira al salir: se retira y se disuelve por visibilidad (ponVis) —
@@ -190,9 +208,19 @@ export function useAndanzaZariguya(foco, {
     // ── EL TROTE: qué tanto se está moviendo decide el paso (bob + waddle).
     const dist = ref.current.position.distanceTo(_dest);
     const moviendo = reducedMotion ? 0 : clamp01(dist * 2.5) * (1 - quieta);
-    const pasoBob = Math.abs(Math.sin(t * PASO_FREQ)) * 0.035 * moviendo * brio;
-    const waddle = Math.sin(t * PASO_FREQ) * 3.2 * moviendo;
+    // En 'marcha' el walk-cycle del SKIN pone el paso (patas que articulan,
+    // tronco-bob propio): el bamboleo 3D baja a acento — no se duplica.
+    const factorWaddle = modoRef.current === 'marcha' ? WADDLE_MARCHA : 1;
+    const pasoBob = Math.abs(Math.sin(t * PASO_FREQ)) * 0.035 * moviendo * brio * factorWaddle;
+    const waddle = Math.sin(t * PASO_FREQ) * 3.2 * moviendo * factorWaddle;
     _dest.y += pasoBob;
+    // El MODO del cuerpo, con histéresis (patrón jaguar-camina): lejos →
+    // walk-cycle real del skin; cerca → se planta y el idle-cerebro retoma.
+    // La entrada conserva su trote hasta que la fase termina.
+    if (fase.current === 'no') {
+      if (dist > MARCHA_LEJOS) ponModo('marcha');
+      else if (dist < MARCHA_CERCA) ponModo('quieto');
+    }
     // Lerp terrestre: más lento que el vuelo de la abeja; al encaramarse sube
     // con calma (trepa, no salta).
     ref.current.position.lerp(_dest, (encarama ? 0.028 : 0.038) * brio * empuje);
@@ -253,7 +281,7 @@ export function useAndanzaZariguya(foco, {
     // frameloop='demand': trote/merodeo/idle piden el próximo frame.
     if (idle.activo || moviendo > 0 || fase.current !== 'no') state.invalidate();
   });
-  return { ref, caraRef, sombraRef, visRef, idleRef, aparecioRef };
+  return { ref, caraRef, sombraRef, visRef, idleRef, aparecioRef, modo };
 }
 
 /**
@@ -286,7 +314,7 @@ export function ZariguyaCompaiEscena({
   // acurruca); aquí solo se lee una vez, determinista.
   const hora = useMemo(() => horaDeReloj(), []);
 
-  const { ref, caraRef, sombraRef, visRef, idleRef, aparecioRef } = useAndanzaZariguya(foco, {
+  const { ref, caraRef, sombraRef, visRef, idleRef, aparecioRef, modo } = useAndanzaZariguya(foco, {
     entrando, energia: energiaReal, reducedMotion, piso,
     cruce: cruce && !reducedMotion, saliendo, hora, tier,
   });
@@ -309,11 +337,14 @@ export function ZariguyaCompaiEscena({
   const vivo = !reducedMotion;
   // LIP-SYNC: la chucha "habla" cuando el agente narra (única boca del mundo).
   const { visema } = useLipSync({ activo: vivo });
-  // Estado del skin trazado: narra → 'speaking'; parado/idle → 'idle' (su
-  // idle-cerebro 70/30 husmea/tanatosis/reposo corre solo). El trote se lee en
-  // el waddle del idleRef + el desplazamiento del billboard, no en un
-  // walk-cycle interno (así la marcha no se duplica con el bamboleo del molde).
-  const estadoTrazado = hablando && vivo ? 'speaking' : 'idle';
+  // Estado del skin trazado: narra → 'speaking'; viaja → 'caminando' (spec
+  // zariguya-camina 2026-08-26: las patas ARTICULAN — el walk-cycle real del
+  // trazado, patrón jaguar-camina); parada → 'idle' (su idle-cerebro 70/30
+  // husmea/escucha/rasca/tanatosis/dormita/reposo corre solo). El waddle 3D
+  // baja a acento durante la marcha para no duplicar el paso.
+  const estadoTrazado = hablando && vivo
+    ? 'speaking'
+    : (vivo && modo === 'marcha' ? 'caminando' : 'idle');
   const cruceVivo = cruce && !reducedMotion;
   return (
     <>

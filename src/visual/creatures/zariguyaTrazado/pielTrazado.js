@@ -52,6 +52,9 @@ export const ZT_PIVOTES = Object.freeze({
   piernaCerca: [300, 328],  // cadera del muslazo
   rodillaCerca: [314, 384], // rodilla (el quiebre muslo/canilla medido)
   piernaLejos: [196, 358],  // cadera oculta de la pata lejana
+  tobilloLejos: [201, 383], // tobillo lejano (MEDIDO crop 4×: el quiebre
+                            // canilla/pie ≈ (195-205, 377-388)) — marcha
+                            // articulada de la pata lejana (fase 1, 08-26)
   colaBase: [360, 348],     // raíz: la cola nace en la grupa (336-355)
   colaMedia: [436, 350],    // corte base/media sobre el arco de abajo
   colaPunta: [456, 262],    // corte media/punta donde arranca la columna
@@ -123,6 +126,14 @@ export const ZT_REGIONES = Object.freeze({
     [254, 430], [252, 406],
   ],
   piernaLejos: [[136, 348], [232, 348], [232, 418], [136, 418]],
+  /* El PIE lejano (marcha fase 1, 2026-08-26): segmento bajo de la pata
+     lejana para que la marcha ARTICULE también ese lado (cadera + tobillo)
+     — la CSS de marcha ya traía la regla .zh-piernaLejosBaja esperando este
+     hueso. Caja generosa sobre aire (el pie vive en el borde de la
+     silueta); el único borde que CRUZA píxeles es el corte del tobillo
+     (y=371, x 185-215), respaldado por su disco-casquete (regla de la casa,
+     idéntico al de la rodilla cercana). */
+  piernaLejosBaja: [[130, 371], [216, 371], [216, 422], [130, 422]],
   colaBase: [
     [330, 320], [396, 320], [396, 336], [440, 336], [430, 352], [430, 378],
     [330, 378],
@@ -192,7 +203,12 @@ const casquete = (region, forma) => `<g class="zh-casquete zh-casquete-${region}
     (misma región, sin rotación extra) desenfocado: la franja revelada es
     pelaje fuera de foco, nunca un color/óvalo ajeno. Técnica calcada de
     jaguarTrazado/pielTrazado.js casqueteCalco (mismo bug, mismo fix ahí). */
-const FILTRO_CASQUETE = { cuello: 'ztBorrosoCuello', cabeza: 'ztBorrosoCabeza', manoLapiz: 'ztBorrosoManoLapiz' };
+const FILTRO_CASQUETE = {
+  cuello: 'ztBorrosoCuello',
+  cabeza: 'ztBorrosoCabeza',
+  manoLapiz: 'ztBorrosoManoLapiz',
+  brazoBrujula: 'ztBorrosoBrujula',
+};
 const casqueteCalco = (region) =>
   `<g class="zh-casquete zh-casquete-${region}" clip-path="url(#zt-r-${region})"><use href="#ztCalco" filter="url(#${FILTRO_CASQUETE[region]})"/></g>`;
 
@@ -239,7 +255,17 @@ const DEFS = `<defs>
        abajo) — la franja revelada es TEXTURA de pelaje fuera de foco, nunca
        un color inventado. Cajas acotadas a la juntura (no todo el calco). -->
   <filter id="ztBorrosoCuello" filterUnits="userSpaceOnUse" x="122" y="88" width="214" height="112"><feGaussianBlur stdDeviation="1.4"/></filter>
-  <filter id="ztBorrosoCabeza" filterUnits="userSpaceOnUse" x="47" y="-28" width="289" height="235"><feGaussianBlur stdDeviation="1.1"/></filter>
+  <!-- FIX KIPÁ EN MARCHA (fase 1, 2026-08-26 — el gate del walk la mostró):
+       la caja de este casquete cubría TAMBIÉN la coronilla/orejas (y=-28…):
+       en idle el delta cabeza-vs-casquete es ~2px y el blur lo esconde, pero
+       en marcha (bob de cabeza + mirada zhMiraAnda) la copia borrosa asomaba
+       por ENCIMA de la silueta = parche plano entre las orejas (la kipá,
+       otra vez). La coronilla es BORDE DE SILUETA: lo que la cabeza desocupa
+       ahí es AIRE y no necesita respaldo — respaldo solo lo necesitan los
+       bordes que CRUZAN píxeles (mejilla/mandíbula/nuca). Se ACOTA la caja a
+       la JUNTURA (y≥56; el techo de la caja aprobada era el sobrante): el
+       mismo casquete aprobado, recortado a donde SÍ trabaja. -->
+  <filter id="ztBorrosoCabeza" filterUnits="userSpaceOnUse" x="47" y="56" width="289" height="151"><feGaussianBlur stdDeviation="1.1"/></filter>
   <!-- CASQUETE manoLapiz (2do "gorro" del calco 2026-08-25, mismo bug que
        cuello/cabeza): el respaldo de la muñeca-con-lápiz era un DISCO de
        color plano (P.pelaje) — se leía como un parche/gorro liso encima del
@@ -247,6 +273,16 @@ const DEFS = `<defs>
        disco asomaba del contorno fino del calco). Misma cura: copia BORROSA
        del propio calco, acotada a la caja de la juntura. -->
   <filter id="ztBorrosoManoLapiz" filterUnits="userSpaceOnUse" x="-15" y="105" width="130" height="135"><feGaussianBlur stdDeviation="1.2"/></filter>
+  <!-- CASQUETE brazoBrujula (fase 1 marcha, 2026-08-26 — el gate del walk lo
+       mostró): en la marcha el brazo de la brújula CONTRAPESA (±5°,
+       zhBrazoMarchaB) y su clip duro desocupa una MEDIA LUNA de página sobre
+       la panza (el gotcha del pecho documentado en jaguarTrazado). Los
+       respaldos de elipse (hombro/pecho) solo cubrían dos manchas. Misma
+       cura que la casa ya aprobó para manoLapiz (disco → casqueteCalco):
+       copia BORROSA del propio calco acotada a la caja de la juntura — la
+       franja revelada es pelaje fuera de foco, nunca color inventado ni
+       página. -->
+  <filter id="ztBorrosoBrujula" filterUnits="userSpaceOnUse" x="78" y="194" width="148" height="114"><feGaussianBlur stdDeviation="1.2"/></filter>
   <!-- BOIL suavizado para el calco FINO (operador 2026-08-25): el trazo ahora
        es ~0.5px (2× escalado); el displacement de la spec (1.5 suave / 4.5
        actuando) lo emborronaría hasta engrosar los bigotes. Se baja a 0.9/2.2
@@ -314,7 +350,11 @@ ${DEFS}
     <g class="zh-antic"${origin('columna')}>
       <ellipse class="zh-sombraSuelo" cx="245" cy="438" rx="150" ry="11" fill="${P.sombraSuelo}" filter="url(#ztBlur)"/>
       <g class="zh-hueso zh-cuerpo"${origin('columna')}>
-        <g class="zh-hueso zh-piernaLejos"${origin('piernaLejos')}>${usoCalco('piernaLejos')}</g>
+        <g class="zh-hueso zh-piernaLejos"${origin('piernaLejos')}>
+          ${usoCalco('piernaLejos')}
+          ${casquete('piernaLejosBaja', disco(H.tobilloLejos[0], H.tobilloLejos[1], 12, P.rodilla))}
+          <g class="zh-hueso zh-piernaLejosBaja"${origin('tobilloLejos')}>${usoCalco('piernaLejosBaja')}</g>
+        </g>
         ${casquete('colaBase', disco(H.colaBase[0], H.colaBase[1], 12, P.cola))}
         <g class="zh-hueso zh-colaBase"${origin('colaBase')}>
           ${usoCalco('colaBase')}
@@ -332,7 +372,7 @@ ${DEFS}
           ${casquete('piernaCercaBaja', disco(H.rodillaCerca[0], H.rodillaCerca[1], 13, P.rodilla))}
           <g class="zh-hueso zh-piernaCercaBaja"${origin('rodillaCerca')}>${usoCalco('piernaCercaBaja')}</g>
         </g>
-        ${casquete('brazoBrujula', elipse(204, 212, 13, 10, P.hombro) + elipse(178, 262, 18, 22, P.pecho))}
+        ${casqueteCalco('brazoBrujula')}
         <g class="zh-hueso zh-brazoBrujula"${origin('brazoBrujula')}>${usoCalco('brazoBrujula')}</g>
         ${casquete('brazoLapiz', elipse(150, 214, 16, 12, P.hombro))}
         <g class="zh-hueso zh-brazoLapiz"${origin('brazoLapiz')}>
