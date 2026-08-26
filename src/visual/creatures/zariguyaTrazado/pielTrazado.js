@@ -184,7 +184,17 @@ const usoCalco = (region) => `<use href="#ztCalco" clip-path="url(#zt-r-${region
 /** Casquete/respaldo anti-costura: pintado en el PADRE justo antes del hijo,
     recortado a la región ESTÁTICA del hijo → invisible en reposo, tapa la
     franja que el hijo desocupa al rotar. */
-const casquete = (region, forma) => `<g clip-path="url(#zt-r-${region})">${forma}</g>`;
+const casquete = (region, forma) => `<g class="zh-casquete zh-casquete-${region}" clip-path="url(#zt-r-${region})">${forma}</g>`;
+
+/** Casquete TEXTURADO (fix "gorro en la coronilla" 2026-08-25, ver DEFS):
+    para las junturas GRANDES cuello/cabeza el respaldo de color plano se
+    veía como parche — en vez de forma inventada, reutiliza el propio calco
+    (misma región, sin rotación extra) desenfocado: la franja revelada es
+    pelaje fuera de foco, nunca un color/óvalo ajeno. Técnica calcada de
+    jaguarTrazado/pielTrazado.js casqueteCalco (mismo bug, mismo fix ahí). */
+const FILTRO_CASQUETE = { cuello: 'ztBorrosoCuello', cabeza: 'ztBorrosoCabeza', manoLapiz: 'ztBorrosoManoLapiz' };
+const casqueteCalco = (region) =>
+  `<g class="zh-casquete zh-casquete-${region}" clip-path="url(#zt-r-${region})"><use href="#ztCalco" filter="url(#${FILTRO_CASQUETE[region]})"/></g>`;
 
 const elipse = (cx, cy, rx, ry, fill, rot = 0) =>
   `<ellipse cx="${cx}" cy="${cy}" rx="${rx}" ry="${ry}" fill="${fill}"${rot ? ` transform="rotate(${rot} ${cx} ${cy})"` : ''}/>`;
@@ -217,6 +227,26 @@ const DEFS = `<defs>
     <stop offset="1" stop-color="${P.rocio}" stop-opacity="0"/>
   </radialGradient>
   <filter id="ztBlur"><feGaussianBlur stdDeviation="4"/></filter>
+  <!-- CASQUETES cuello/cabeza (fix "gorro en la coronilla" 2026-08-25): el
+       casquete anti-costura de esta juntura era un ÓVALO de color PLANO
+       (gradiente ztCuello) — a la escala de uso se leía como un gorro/parche
+       liso pegado a la mejilla en CUANTO el cuello o la cabeza rotaban (el
+       óvalo, fijo en el espacio del cuello, queda expuesto donde el calco
+       —que SÍ rota con cabezaGiro/cabeza— se corre). Ya asomaba hasta en
+       reposo: el óvalo es más grande que la tinta fina del trazado en esa
+       zona. Mismo diagnóstico y misma cura que jaguarTrazado (gate de giros
+       2026-08-23): swap a copia BORROSA del propio calco (casqueteCalco más
+       abajo) — la franja revelada es TEXTURA de pelaje fuera de foco, nunca
+       un color inventado. Cajas acotadas a la juntura (no todo el calco). -->
+  <filter id="ztBorrosoCuello" filterUnits="userSpaceOnUse" x="122" y="88" width="214" height="112"><feGaussianBlur stdDeviation="1.4"/></filter>
+  <filter id="ztBorrosoCabeza" filterUnits="userSpaceOnUse" x="47" y="-28" width="289" height="235"><feGaussianBlur stdDeviation="1.1"/></filter>
+  <!-- CASQUETE manoLapiz (2do "gorro" del calco 2026-08-25, mismo bug que
+       cuello/cabeza): el respaldo de la muñeca-con-lápiz era un DISCO de
+       color plano (P.pelaje) — se leía como un parche/gorro liso encima del
+       brazo del lápiz apenas la mano se movía (o hasta en reposo, si el
+       disco asomaba del contorno fino del calco). Misma cura: copia BORROSA
+       del propio calco, acotada a la caja de la juntura. -->
+  <filter id="ztBorrosoManoLapiz" filterUnits="userSpaceOnUse" x="-15" y="105" width="130" height="135"><feGaussianBlur stdDeviation="1.2"/></filter>
   <!-- BOIL suavizado para el calco FINO (operador 2026-08-25): el trazo ahora
        es ~0.5px (2× escalado); el displacement de la spec (1.5 suave / 4.5
        actuando) lo emborronaría hasta engrosar los bigotes. Se baja a 0.9/2.2
@@ -307,13 +337,13 @@ ${DEFS}
         ${casquete('brazoLapiz', elipse(150, 214, 16, 12, P.hombro))}
         <g class="zh-hueso zh-brazoLapiz"${origin('brazoLapiz')}>
           ${usoCalco('brazoLapiz')}
-          ${casquete('manoLapiz', disco(H.munecaLapiz[0], H.munecaLapiz[1], 10, P.pelaje))}
+          ${casqueteCalco('manoLapiz')}
           <g class="zh-hueso zh-brazoLapizAnte zh-manoLapiz"${origin('munecaLapiz')}>${usoCalco('manoLapiz')}</g>
         </g>
-        ${casquete('cuello', elipse(218, 158, 46, 18, 'url(#ztCuello)', -8))}
+        ${casqueteCalco('cuello')}
         <g class="zh-hueso zh-cuello"${origin('cuello')}>
           ${usoCalco('cuello')}
-          ${casquete('cabeza', elipse(212, 124, 60, 22, 'url(#ztCuello)', -7))}
+          ${casqueteCalco('cabeza')}
           <g class="zh-hueso zh-cabezaGiro"${origin('cabeza')}>
             <g class="zh-hueso zh-cabeza"${origin('cabeza')}>
               ${CABEZA}
