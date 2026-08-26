@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <title>Control de canvas detenido</title>
+  <style>
+    html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#050505}
+    #fondo{position:absolute;inset:0;width:100%;height:100%;display:block}
+    #escena{position:fixed;inset:0;width:100%;height:100%;border:0;display:block;background:#000}
+  </style>
+</head>
+<body>
+  <canvas id="fondo"></canvas>
+  <iframe id="escena" title="escena fullscreen negra detenida" src="/iframe-muerto-canvas-marco.html"></iframe>
+  <script>
+    const fondo = document.getElementById('fondo');
+    fondo.width = innerWidth;
+    fondo.height = innerHeight;
+    const gl = fondo.getContext('webgl2') || fondo.getContext('webgl');
+    if (gl) { gl.clearColor(0, 0, 0, 1); gl.clear(gl.COLOR_BUFFER_BIT); }
+  </script>
+</body>
+</html>

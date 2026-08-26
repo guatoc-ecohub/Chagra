@@ -11,6 +11,8 @@
 export { Angelita, default } from './Angelita.jsx';
 export { AngelitaEntrada, esDiaSoleado } from './AngelitaEntrada.jsx';
 export { AngelitaGuia } from './AngelitaGuia.jsx';
+export { default as AngelitaAvisoGlobal } from './AngelitaAvisoGlobal.jsx';
+export { duracionAviso } from './duracionAviso.js';
 export { useAngelitaGuia, calcularPuestoGuia } from '../../hooks/useAngelitaGuia.js';
 export {
   ESTADOS_ANGELITA,

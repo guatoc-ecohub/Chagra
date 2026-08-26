@@ -15,6 +15,8 @@
 
 /* Rango del eje de altitud del mockup (metros s. n. m.). Encima de la montaña
    dibujada; las fincas caen dentro de este rango. */
+import { getSipsaMercado } from './sipsaSnapshot.js';
+
 export const ALTITUD_MIN = 1400;
 export const ALTITUD_MAX = 3200;
 
@@ -35,8 +37,10 @@ export function pisoDeAltitud(altitud) {
 }
 
 /*
- * Catálogo de muestra. Cada producto trae su finca (procedencia), precio en
- * pesos colombianos, sellos de confianza y la trazabilidad de la cosecha.
+ * PRODUCTOS_FALLBACK — catálogo de MUESTRA (8 productos, fincas ficticias).
+ * Ya NO es la fuente en vivo del mercado: es la red de seguridad si
+ * `cargarProductos()` no logra hablar con el API real (ver más abajo). Se
+ * mantiene con la misma forma para que el mercado nunca quede en blanco.
  *
  * - `ilustracion`: clave del dibujo SVG propio (ProductoIlustracion).
  * - `rostro`: semilla del avatar del productor (Rostro) — cara ilustrada, no
@@ -53,7 +57,7 @@ export function pisoDeAltitud(altitud) {
  * Dos fincas tienen MÁS de un producto (El Rocío, Los Helechos): así el
  * detalle puede mostrar "también de esta finca" y el pin de la cinta agrupa.
  */
-export const PRODUCTOS = [
+export const PRODUCTOS_FALLBACK = [
   {
     id: 'tomate-chonto',
     nombre: 'Tomate chonto',
@@ -307,7 +311,7 @@ export const PRODUCTOS = [
  * lleva `productoId`: el primer producto de esa finca, para que el pin de la
  * CintaAltitud sepa qué historia abrir.
  */
-export function fincasUnicas(productos = PRODUCTOS) {
+export function fincasUnicas(productos = PRODUCTOS_FALLBACK) {
   const porNombre = new Map();
   for (const p of productos) {
     if (!porNombre.has(p.finca.nombre)) {
@@ -332,4 +336,177 @@ export function pesos(valor) {
   const entero = Math.round(valor);
   const conMiles = String(entero).replace(/\B(?=(\d{3})+(?!\d))/g, '.');
   return `$ ${conMiles}`;
+}
+
+/*
+ * ══════════════════════════════════════════════════════════════════════════
+ * CATÁLOGO REAL — reconciliación con milpa.guatoc.co / milpa-api.guatoc.co.
+ *
+ * El mercado de la montaña dejó de ser SOLO galería: consume el mismo API
+ * federado que ya usa milpa.guatoc.co (screens/data.js: `foto: fotos[0]?.url
+ * || null` + fallback a la ilustración cuando no hay foto — mismo patrón,
+ * reutilizado aquí, no reinventado). Fuente real: postgres `milpa`/`milpa_test`
+ * (columna `producto.fotos` jsonb), servida por `milpa-api.guatoc.co`.
+ *
+ * Fotos reales servidas desde `milpa.guatoc.co/fotos/<uuid>.webp` (el API
+ * solo trae la ruta relativa; el host de fotos es distinto al del API).
+ * ══════════════════════════════════════════════════════════════════════════
+ */
+const API_URL = 'https://milpa-api.guatoc.co/api/productos';
+const FOTOS_BASE = 'https://milpa.guatoc.co';
+
+/* Placeholder HONESTO cuando un producto no trae finca/altitud del todo (ni
+   propia ni heredada de un hermano de su mismo mercado): no se inventa una
+   finca ni una altitud de mentiras, se rotula como pendiente. */
+const FINCA_POR_CONFIRMAR = { nombre: 'Finca por confirmar', vereda: 'por confirmar', productor: 'la finca', rostro: undefined };
+
+/* `procedencia` completa y usable (finca + altitud numérica) o null. */
+function procedenciaUtil(api) {
+  const proc = api && api.procedencia;
+  const tieneAltitud = !!(proc && proc.medido && typeof proc.medido.altitud_msnm === 'number');
+  return proc && proc.finca && tieneAltitud ? proc : null;
+}
+
+/*
+ * Mapa NOMBRE → clave de ProductoIlustracion, para cuando el API no trae
+ * `imagenes.ilustracion` (pasa hoy con varios de `milpa`). Es un mapeo de
+ * TEXTO A TEXTO (nombre del producto → clave del dibujo que le corresponde),
+ * no una cifra ni un dato de finca: no choca con la regla de no-inventar.
+ * Clave normalizada igual que `fold()` de sipsaSnapshot.js. Cubre el
+ * catálogo visible hoy; lo que no está acá cae al dibujo genérico de tomate
+ * (ProductoIlustracion.DIBUJOS.tomate), nunca rompe.
+ */
+const ILUSTRACION_POR_NOMBRE = {
+  apio: 'apio',
+  brocoli: 'brocoli',
+  calabaza: 'calabaza',
+  cebolla: 'cebolla',
+  'cebolla roja': 'cebolla_roja',
+  'cebolla verde': 'cebolla_verde',
+  coliflor: 'coliflor',
+  coriandro: 'cilantro', // mismo cultivo que cilantro (Coriandrum sativum), sinónimo regional
+  espinaca: 'espinaca',
+  hinojo: 'hinojo',
+  lechuga: 'lechuga',
+  'lechuga roja': 'lechuga_roja',
+  papa: 'papa',
+  perejil: 'perejil',
+  remolacha: 'remolacha',
+  repollo: 'repollo',
+  rucula: 'rucula',
+  trebol: 'trebol',
+  kale: 'kale',
+  'kale (col rizada)': 'kale',
+  'esparragos verdes': 'esparrago',
+  esparragos: 'esparrago',
+  'acelgas de colores': 'acelga',
+  acelgas: 'acelga',
+  'aromaticas frescas': 'aromatica',
+  aromaticas: 'aromatica',
+};
+
+function ilustracionPorNombre(nombre) {
+  const key = (nombre || '')
+    .toString()
+    .trim()
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[̀-ͯ]/g, '');
+  return ILUSTRACION_POR_NOMBRE[key] || null;
+}
+
+/*
+ * Convierte un producto tal como lo entrega `milpa-api.guatoc.co` al shape que
+ * consume Mercado.jsx. Cuando el API no trae procedencia para un producto
+ * puntual (pasa hoy con varios de `milpa`: Cebolla, Lechuga, Rúcula…), hereda
+ * la finca de OTRO producto del MISMO mercado federado que sí la traiga — casi
+ * todos los mercados son mono-productor (una sola finca), así que heredar es
+ * preciso, no un invento. Solo si NINGÚN producto del mercado tiene finca
+ * cargada cae al placeholder `FINCA_POR_CONFIRMAR`.
+ */
+export function normalizarProducto(api, todos) {
+  const propia = procedenciaUtil(api);
+  const heredada = propia
+    ? null
+    : (() => {
+        const hermano = (todos || []).find((o) => o !== api && o.mercado === api.mercado && procedenciaUtil(o));
+        return hermano ? procedenciaUtil(hermano) : null;
+      })();
+  const proc = propia || heredada;
+  const fincaApi = proc && proc.finca;
+  const medido = proc && proc.medido;
+  const declarado = (api.procedencia && api.procedencia.declarado) || {};
+
+  const fotos = (api.imagenes && Array.isArray(api.imagenes.fotos)) ? api.imagenes.fotos : [];
+  const rutaFoto = fotos[0] && fotos[0].url;
+
+  const unidad = api.unidad_venta || api.precio_por || 'unidad';
+  const sinPrecioPropio = !api.precio_cop;
+  // Decisión del operador (2026-08-25): la referencia SIPSA se cablea en TODO
+  // producto que chagra.sipsa_precios cubra, sin bloquear por unidad (kg y
+  // libra tienen conversión física exacta ×1/×0.5 — ver sipsaSnapshot.js).
+  // NUNCA se inventa: si SIPSA no cubre el producto o la unidad es
+  // 'atado'/'unidad' (sin equivalencia física a kg), sipsa queda null.
+  const sipsa = getSipsaMercado(api.nombre, unidad);
+  // Dos modos, para no confundir "lo que puso la finca" con "lo que dice
+  // SIPSA" (regla dura del marketplace, ver precioReferencia.js):
+  //   - sinPrecioPropio: la finca no cargó precio → SIPSA se muestra COMO el
+  //     precio (badge pegado al número — el número SÍ es la cita SIPSA).
+  //   - con precio propio: el precio de la finca manda; SIPSA se agrega como
+  //     línea de referencia APARTE, nunca reemplaza ni se confunde con lo
+  //     que la finca declaró.
+  const precioRef = !sipsa
+    ? null
+    : sinPrecioPropio
+      ? { modo: 'precio', fecha: sipsa.fecha, plazas: sipsa.plazas }
+      : { modo: 'cita', precio: sipsa.precio, unidad: sipsa.unidad, fecha: sipsa.fecha, plazas: sipsa.plazas };
+
+  return {
+    id: api.slug || String(api.id),
+    nombre: api.nombre,
+    variedad: api.variedad || '',
+    ilustracion: (api.imagenes && api.imagenes.ilustracion) || ilustracionPorNombre(api.nombre),
+    // Foto real si el producto la tiene (fotos_apta/curada); si no, `null` y
+    // el render cae a <ProductoIlustracion> — el mismo fallback honesto que
+    // ya documenta screens/ilustraciones.js de milpa.guatoc.co.
+    foto: rutaFoto ? (/^https?:\/\//.test(rutaFoto) ? rutaFoto : `${FOTOS_BASE}${rutaFoto}`) : null,
+    precio: sinPrecioPropio ? (sipsa ? sipsa.precio : 0) : api.precio_cop,
+    precioRef,
+    unidad,
+    finca: fincaApi
+      ? {
+          nombre: fincaApi.nombre,
+          vereda: fincaApi.vereda || 'por confirmar',
+          altitud: medido.altitud_msnm,
+          distanciaKm: medido.distancia_km != null ? Math.round(medido.distancia_km) : 0,
+          productor: fincaApi.productor || 'la finca',
+          rostro: fincaApi.rostro,
+        }
+      : { ...FINCA_POR_CONFIRMAR, altitud: ALTITUD_MIN, distanciaKm: 0 },
+    sellos: declarado.sellos || [],
+    practicas: declarado.practicas || [],
+    historia: (declarado.historia && declarado.historia.trim()) || '',
+    trazabilidad: declarado.trazabilidad || [],
+    mataAMesa: (declarado.mata_a_mesa && declarado.mata_a_mesa.trim()) || '',
+  };
+}
+
+/*
+ * Carga el catálogo real del mercado federado. Si el fetch falla (red, CORS,
+ * API caída) o devuelve vacío, se queda con `PRODUCTOS_FALLBACK` — la galería
+ * de muestra — para que el mercado NUNCA quede en blanco.
+ */
+export async function cargarProductos() {
+  try {
+    const r = await fetch(API_URL, { headers: { Accept: 'application/json' } });
+    if (!r.ok) throw new Error(`API mercado respondió ${r.status}`);
+    const payload = await r.json();
+    const productos = Array.isArray(payload.productos) ? payload.productos : [];
+    if (!productos.length) return PRODUCTOS_FALLBACK;
+    return productos.map((p) => normalizarProducto(p, productos));
+  } catch (error) {
+    // eslint-disable-next-line no-console -- visibilidad real del fallback en consola
+    console.warn('[mercado] no se pudo cargar el catálogo real, usando datos de muestra:', error);
+    return PRODUCTOS_FALLBACK;
+  }
 }

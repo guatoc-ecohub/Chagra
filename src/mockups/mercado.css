@@ -364,7 +364,9 @@
   background: var(--card-piso, #2f5233);
   opacity: 0.13;
 }
-.mrc-card__foto > svg { position: relative; z-index: 1; }
+.mrc-card__foto > svg,
+.mrc-card__foto > img { position: relative; z-index: 1; }
+.mrc-card__foto > img { width: 100%; height: 100%; object-fit: cover; }
 .mrc-card__bicho {
   position: absolute;
   right: 10px;
@@ -399,11 +401,34 @@
   font-family: var(--mrc-mono);
   display: flex;
   align-items: baseline;
-  gap: 2px;
+  flex-wrap: wrap;
+  gap: 2px 8px;
 }
 .mrc-precio__val { font-size: 1.16rem; font-weight: 700; color: var(--mrc-tinta); letter-spacing: -0.01em; }
 .mrc-precio__uni { font-size: 0.74rem; color: var(--mrc-tinta-2); }
 .mrc-precio--g .mrc-precio__val { font-size: 1.3rem; }
+/* precio tomado de SIPSA (no lo puso la finca): rotulado, nunca silencioso */
+.mrc-precio__ref {
+  font-family: var(--mrc-sans);
+  font-size: 0.66rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: var(--mrc-sello, #8a4318);
+  background: rgba(193, 144, 47, 0.14);
+  border-radius: 999px;
+  padding: 1px 7px;
+}
+/* sin precio propio NI referencia SIPSA convertible: honesto, no "$ 0" */
+.mrc-precio__pendiente { font-family: var(--mrc-sans); font-size: 0.86rem; font-style: italic; color: var(--mrc-tinta-2); }
+/* envoltorio del precio + su cita SIPSA aparte (cuando la finca SÍ puso precio) */
+.mrc-precio-bloque { display: flex; flex-direction: column; gap: 2px; }
+.mrc-precio__cita {
+  margin: 0;
+  font-family: var(--mrc-sans);
+  font-size: 0.68rem;
+  color: var(--mrc-sello, #8a4318);
+  opacity: 0.85;
+}
 
 /* bloque de procedencia */
 .mrc-proc {
@@ -660,7 +685,9 @@
   opacity: 0.08;
 }
 .mrc-hoja__producto > svg,
+.mrc-hoja__producto > img,
 .mrc-hoja__producto > div { position: relative; z-index: 1; }
+.mrc-hoja__producto > img { width: 92px; height: 92px; border-radius: 10px; object-fit: cover; flex-shrink: 0; }
 .mrc-hoja__prodnombre {
   margin: 0;
   font-family: var(--mrc-serif);
@@ -808,6 +835,7 @@
   text-align: center;
 }
 .mrc-tambien__card:hover { background: rgba(255, 255, 255, 0.7); }
+.mrc-tambien__card > img { width: 54px; height: 54px; border-radius: 10px; object-fit: cover; }
 .mrc-tambien__nombre {
   font-family: var(--mrc-serif);
   font-size: 0.88rem;
