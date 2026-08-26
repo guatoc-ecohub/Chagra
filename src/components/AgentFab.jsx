@@ -382,7 +382,6 @@ export default function AgentFab({ onNavigate, pantalla = null }) {
   const estadoVisual = comportamiento.moviendo && comportamiento.movimientoNatural === 'camina'
     ? 'caminando'
     : estado;
-
   const handleEnter = () => setHover(true);
   const handleLeave = () => { setHover(false); setPressed(false); soltarPulsacionLarga(); };
   const handleDown = () => { setPressed(true); iniciarPulsacionLarga(); };
@@ -449,7 +448,6 @@ export default function AgentFab({ onNavigate, pantalla = null }) {
     setMenuAbierto(false);
     silenciar(!silenciado);
   }, [silenciar, silenciado]);
-
   const handleToggleSusurroNocturno = useCallback(() => {
     setSusurroNocturnoTts(!usePrefsStore.getState().susurroNocturnoTts);
   }, [setSusurroNocturnoTts]);
