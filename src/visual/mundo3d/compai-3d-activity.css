@@ -1,0 +1,19 @@
+/* P6: la cámara tiene prioridad visual durante el gesto. El billboard vuelve
+   al terminar el idle definido por useCompai3DActivity. */
+html[data-compai-3d-interaction='active'] .mundo-abeja,
+html[data-compai-3d-interaction='active'] .valle-abeja,
+html[data-compai-3d-interaction='active'] .vv-abeja,
+html[data-compai-3d-interaction='active'] .vcalma-abeja {
+  opacity: 0 !important;
+  pointer-events: none !important;
+  transition: opacity 160ms ease-out;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html[data-compai-3d-interaction='active'] .mundo-abeja,
+  html[data-compai-3d-interaction='active'] .valle-abeja,
+  html[data-compai-3d-interaction='active'] .vv-abeja,
+  html[data-compai-3d-interaction='active'] .vcalma-abeja {
+    transition: none;
+  }
+}

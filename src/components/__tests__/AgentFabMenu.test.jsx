@@ -128,6 +128,27 @@ describe('AgentFabMenu', () => {
     expect(onHoyNo).toHaveBeenCalledTimes(1);
   });
 
+  it('ofrece un opt-in claro para la voz nocturna', () => {
+    const onToggle = vi.fn();
+    render(
+      <AgentFabMenu
+        abierto
+        onEscuchar={() => {}}
+        onHablar={() => {}}
+        onFoto={() => {}}
+        onFotos={() => {}}
+        onHoyNo={() => {}}
+        onToggleSusurroNocturno={onToggle}
+        susurroNocturnoTts={false}
+        onCerrar={() => {}}
+      />,
+    );
+    const item = screen.getByRole('menuitem', { name: 'Activar voz nocturna' });
+    expect(item).toHaveAttribute('aria-pressed', 'false');
+    fireEvent.click(item);
+    expect(onToggle).toHaveBeenCalledTimes(1);
+  });
+
   it('Escape llama a onCerrar', () => {
     const onCerrar = vi.fn();
     render(

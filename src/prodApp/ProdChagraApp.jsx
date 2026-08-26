@@ -14,6 +14,7 @@ import {
   NUCLEO_APP,
   PENDIENTE_DECISION,
   EXCLUIDO,
+  esRuta3D,
 } from '../config/rutasProdChagraApp.js';
 // Rutas dinámicas 'seguimiento_<key>' (reforestación/silvopastoreo/páramo/
 // cerdos): el shell viejo las parseaba en el switch; sin esto, las tarjetas de
@@ -593,6 +594,7 @@ export default function ProdChagraApp() {
       {!esHome
         && currentView !== 'agente'
         && currentView !== 'voz'
+        && !esRuta3D(currentView)
         && (
         <AgentFab onNavigate={navigate} pantalla={currentView} />
       )}

@@ -364,6 +364,21 @@ describe('resolverComportamiento — arbitraje', () => {
     expect(d.interrumpe).toBe(true);
   });
 
+  it('P4 adapta el husmeo con perfil y registro de la finca', () => {
+    const d = resolverComportamiento({
+      ahoraMs: ahora,
+      mundo: 'mis_matas',
+      perfil: { pisoTermico: 'templado', escala: 'finca', agua: 'lluvia', municipio: 'dato privado' },
+      registro: { cultivos: [{ name: 'Café', count: 12 }] },
+      rand: () => 1,
+    });
+    expect(d.estado).toBe('husmea');
+    expect(d.mensaje).toMatch(/café/i);
+    expect(d.mensaje).toMatch(/12/);
+    expect(d.mensaje).toMatch(/templado/i);
+    expect(d.mensaje).not.toMatch(/dato privado/i);
+  });
+
   it('#110 modo aprendiz: con rand bajo, el husmeo pregunta en vez de comentar', () => {
     const d = resolverComportamiento({
       ahoraMs: ahora,

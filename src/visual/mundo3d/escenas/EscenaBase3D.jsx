@@ -52,6 +52,8 @@ import HudRendimiento from '../HudRendimiento.jsx';
    `EtiquetasMundo` — se reusa aquí en vez de duplicarla una tercera vez; solo
    la POLÍTICA de foco (abajo) es propia de los hotspots. */
 import { proyectarAPantalla, rectanguloDe, seSolapan } from '../kit/etiquetasAntiColision.js';
+import useCompai3DActivity from '../../../hooks/useCompai3DActivity.js';
+import '../compai-3d-activity.css';
 
 /* El bloom sutil de la hora dorada: chunk LAZY con gate ESTRICTO
    `tier === 'alto' && !reducedMotion` — medio y bajo NI LO DESCARGAN
@@ -398,8 +400,9 @@ export default function EscenaBase3D({
      (DPR/antialias) y, en el perfil mínimo, la niebla y las alfombras. */
   const frugal = tierInicial === 'bajo';
   const dpr = presupuestoInicial.dpr;
+  const activityHandlers = useCompai3DActivity();
   return (
-    <>
+    <div className="compai-3d-surface" {...activityHandlers} style={{ width: '100%', height: '100%', position: 'relative' }}>
     <Canvas
       className={`mundo-canvas${listo ? ' mundo-canvas--listo' : ''}`}
       dpr={dpr}
@@ -436,6 +439,6 @@ export default function EscenaBase3D({
       </Suspense>
     </Canvas>
     <HudRendimiento />
-    </>
+    </div>
   );
 }

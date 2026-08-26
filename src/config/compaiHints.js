@@ -184,3 +184,62 @@ export function getHintForRuta(ruta, nombreCompai = 'Angelita') {
 
   return hintDefault;
 }
+
+// P3: el hint es una enseñanza de entrada, no una animación de fondo. Se
+// guarda únicamente la llave de ruta y un contador corto en sessionStorage:
+// nunca contiene datos de la finca ni identificación de la persona.
+const HINT_SESSION_KEY = 'chagra:compai:hints-session:v1';
+export const MAX_HINTS_POR_SESION = 3;
+let ledgerDeRespaldo = { rutas: new Set(), total: 0 };
+
+function leerLedgerDeSesion() {
+  try {
+    const raw = sessionStorage.getItem(HINT_SESSION_KEY);
+    const parsed = raw ? JSON.parse(raw) : null;
+    const ledger = {
+      rutas: new Set(Array.isArray(parsed?.rutas) ? parsed.rutas : []),
+      total: Number.isFinite(parsed?.total) ? parsed.total : 0,
+    };
+    ledgerDeRespaldo = ledger;
+    return ledger;
+  } catch (_) {
+    return {
+      rutas: new Set(ledgerDeRespaldo.rutas),
+      total: ledgerDeRespaldo.total,
+    };
+  }
+}
+
+function guardarLedgerDeSesion(ledger) {
+  ledgerDeRespaldo = {
+    rutas: new Set(ledger.rutas),
+    total: ledger.total,
+  };
+  try {
+    sessionStorage.setItem(HINT_SESSION_KEY, JSON.stringify({
+      rutas: [...ledger.rutas],
+      total: ledger.total,
+    }));
+  } catch (_) {
+    // sessionStorage puede estar bloqueado en navegación privada. La política
+    // sigue funcionando durante el montaje actual gracias al estado local.
+  }
+}
+
+/** P3: una ruta no vuelve a enseñar su hint en la misma sesión. */
+export function puedeMostrarHintEnSesion(llave) {
+  if (!llave) return false;
+  const ledger = leerLedgerDeSesion();
+  return ledger.total < MAX_HINTS_POR_SESION && !ledger.rutas.has(llave);
+}
+
+/** Registra un hint justo cuando ya obtuvo permiso del store y va a pintarse. */
+export function registrarHintEnSesion(llave) {
+  if (!llave) return false;
+  const ledger = leerLedgerDeSesion();
+  if (ledger.total >= MAX_HINTS_POR_SESION || ledger.rutas.has(llave)) return false;
+  ledger.rutas.add(llave);
+  ledger.total += 1;
+  guardarLedgerDeSesion(ledger);
+  return true;
+}

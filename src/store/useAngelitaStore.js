@@ -2,6 +2,7 @@ import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 import {
   resolverComportamiento,
+  debeHablar,
   llaveDeDecision,
   estadoVisualDeComportamiento,
   aplicarSenalMolestia,
@@ -257,6 +258,34 @@ const useAngelitaStore = create(
        */
       registrarSenalMolestia: (senal) => {
         set((s) => ({ molestia: aplicarSenalMolestia(s.molestia, senal) }));
+      },
+
+      /**
+       * P3: autorización de un hint de entrada usando la misma cadencia que
+       * los husmeos. No cambia el mensaje actual ni crea un Asset derivado.
+       */
+      puedeMostrarHint: (mundo, { ocupado = false, ahoraMs = Date.now() } = {}) => {
+        if (!mundo) return false;
+        const state = get();
+        return debeHablar({
+          estado: 'husmea',
+          ahoraMs,
+          ultimaMs: state.ultimaHablaPorLlave[`husmea:${mundo}`] ?? null,
+          ocupado,
+          silenciado: state.silenciado || state.hoyNoActivo(),
+          molestia: state.molestia,
+        });
+      },
+
+      /** P3: marca el instante en que el hint sí se mostró al usuario. */
+      registrarHintMostrado: (mundo, ahoraMs = Date.now()) => {
+        if (!mundo) return;
+        set((state) => ({
+          ultimaHablaPorLlave: {
+            ...state.ultimaHablaPorLlave,
+            [`husmea:${mundo}`]: ahoraMs,
+          },
+        }));
       },
     }),
     {

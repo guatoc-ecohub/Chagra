@@ -145,6 +145,7 @@ export default function useCompaiDraggable({ enabled = true, storageKey = STORAG
   const handleTouchStart = useCallback((e) => {
     if (e.target.closest('[data-compai-no-drag="true"]')) return;
     const touch = e.touches[0];
+    if (!touch) return;
     handleDragStart(touch.clientX, touch.clientY);
   }, [handleDragStart]);
 
@@ -152,6 +153,7 @@ export default function useCompaiDraggable({ enabled = true, storageKey = STORAG
     if (!isDragging) return;
     e.preventDefault();
     const touch = e.touches[0];
+    if (!touch) return;
     handleDragMove(touch.clientX, touch.clientY);
   }, [isDragging, handleDragMove]);
 

@@ -25,7 +25,7 @@ import { Mic, Camera, MoonStar, Volume2, Images, Eye } from 'lucide-react';
  * Español de Colombia (usted), sin voseo. Reduced-motion: sin transiciones
  * con `prefers-reduced-motion` (transform/opacity a secas, ya son baratas).
  */
-export default function AgentFabMenu({ abierto, onVer, onEscuchar, onHablar, onFoto, onFotos, onHoyNo, onCerrar }) {
+export default function AgentFabMenu({ abierto, onVer, onEscuchar, onHablar, onFoto, onFotos, onHoyNo, onToggleSusurroNocturno, susurroNocturnoTts = false, onCerrar }) {
   const menuRef = useRef(null);
   const primerBotonRef = useRef(null);
 
@@ -142,6 +142,19 @@ export default function AgentFabMenu({ abierto, onVer, onEscuchar, onHablar, onF
           <MoonStar size={18} strokeWidth={2} aria-hidden="true" />
           <span>Que se quede callado hoy</span>
         </button>
+        {onToggleSusurroNocturno && (
+          <button
+            type="button"
+            role="menuitem"
+            onClick={onToggleSusurroNocturno}
+            className="agt-fab-menu-item"
+            style={itemStyle}
+            aria-pressed={susurroNocturnoTts}
+          >
+            <MoonStar size={18} strokeWidth={2} aria-hidden="true" />
+            <span>{susurroNocturnoTts ? 'Voz nocturna: activada' : 'Activar voz nocturna'}</span>
+          </button>
+        )}
       </div>
     </>
   );

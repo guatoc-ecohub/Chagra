@@ -22,6 +22,7 @@ import { PRIMARY_WORKER_NAME } from './config/workerConfig';
 import { tieneAccesoGlaciarActual, esOperadorActual } from './config/glaciarAccess';
 import { getProfile, getMarco3DPreference } from './services/userProfileService';
 import { parseSeguimientoView } from './config/seguimientoProcesos';
+import { esRuta3D } from './config/rutasProdChagraApp.js';
 // NOTA (unificación compai 2026-08-23): el manifiesto de rutas se usaba SOLO
 // para decidir dónde montar CompaiOverlay. Al retirar ese segundo compai de la
 // PWA 2D (un solo compai por pantalla = el AgentFab canónico), `getMapaNucleo`
@@ -4416,7 +4417,7 @@ export default function App() {
           todas las vistas que ya tienen shell, también durante interacción y
           offline. La entrada mística es la única que puede desvanecerlo. */}
       <Suspense fallback={null}>
-        {currentView !== 'loading' && <AgentFab onNavigate={navigate} pantalla={currentView} />}
+        {currentView !== 'loading' && !esRuta3D(currentView) && !currentView.startsWith('mockup_') && <AgentFab onNavigate={navigate} pantalla={currentView} />}
       </Suspense>
       {/* Escucha manos libres (operador 2026-07-05, caso guantes/manos
           embarradas). Abre el widget "Chagra está escuchando" que navega o
