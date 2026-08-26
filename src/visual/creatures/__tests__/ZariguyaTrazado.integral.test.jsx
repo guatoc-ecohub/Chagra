@@ -56,6 +56,17 @@ describe('ZariguyaTrazado — contrato de skin', () => {
     expect(container.querySelector('[data-creature="zariguya"]')).toHaveAttribute('data-agt-estado', 'caminando');
   });
 
+  it('FASE 1 no renderiza raster de pose ni atributos de swap', () => {
+    const { container } = render(<ZariguyaTrazado estado="thinking" />);
+    const raiz = container.querySelector('[data-creature="zariguya"]');
+    expect(raiz).not.toHaveAttribute('data-pose');
+    expect(raiz.querySelectorAll('[data-pose]')).toHaveLength(0);
+    expect(raiz.querySelectorAll('.zt-pose')).toHaveLength(0);
+    // El único raster permitido en FASE 1 es el calco base de la piel trazada.
+    expect(raiz.querySelectorAll('#ztCalco image')).toHaveLength(1);
+    expect(raiz.querySelectorAll('image')).toHaveLength(1);
+  });
+
   it('visema viaja como data-visema; sin visema, ausente', () => {
     const { container: con } = render(<ZariguyaTrazado visema="V2" />);
     expect(con.querySelector('[data-creature="zariguya"]')).toHaveAttribute('data-visema', 'V2');

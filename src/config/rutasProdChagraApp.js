@@ -1344,6 +1344,15 @@ export const PENDIENTE_DECISION = [
 // ──────────────────────────────────────────────────────────────────
 
 /**
+ * ¿La ruta pertenece a una vista categorizada como 3D, incluyendo aliases?
+ * El shell usa esta frontera para no duplicar el compai de escena con el FAB.
+ */
+export function esRuta3D(path) {
+  if (typeof path !== 'string' || !path) return false;
+  return NUCLEO_3D.some((r) => r.path === path || r.alias?.includes(path));
+}
+
+/**
  * Devuelve el mapa completo de rutas del núcleo (3D + app) indexado por path.
  * @returns {Map<string, {path:string, componente:string, importLazy:string|null, categoria:string}>}
  */

@@ -87,6 +87,8 @@ import AguaVivaValle from './AguaVivaValle.jsx';
 import DetalleSueloValle from './DetalleSueloValle.jsx';
 import PastoVivoValle from './PastoVivoValle.jsx';
 import { CampesinosValle } from './CampesinosValle.jsx';
+import useCompai3DActivity from '../../hooks/useCompai3DActivity.js';
+import '../../visual/mundo3d/compai-3d-activity.css';
 import HatoMovil from './HatoMovil.jsx';
 /* Árboles POR ESPECIE (no genéricos): las mismas mallas del bosque altoandino
    (roble, aliso, gaque) que ya viven en floraParamo — cada árbol se distingue. */
@@ -3274,6 +3276,7 @@ export default function Valle3D({
      instancian lo repetido. El default 'alto' preserva a los hosts viejos. */
   const perfil = useMemo(() => perfilDeTier(tierInicial), [tierInicial]);
   const presupuesto = useMemo(() => presupuestoDeTier(tierInicial), [tierInicial]);
+  const activityHandlers = useCompai3DActivity();
   /* La pose de reposo según el ASPECTO del equipo (una vez por montaje: girar
      el teléfono re-monta rutas enteras en la práctica; no vale un resize
      listener que mueva la cámara bajo los dedos del usuario). */
@@ -3287,6 +3290,7 @@ export default function Valle3D({
     [],
   );
   return (
+    <div className="compai-3d-surface" {...activityHandlers} style={{ width: '100%', height: '100%', position: 'relative' }}>
     <Canvas
       key={glKey}
       className={`valle-canvas${listo ? ' valle-canvas--listo' : ''}`}
@@ -3340,5 +3344,6 @@ export default function Valle3D({
         />
       </Suspense>
     </Canvas>
+    </div>
   );
 }

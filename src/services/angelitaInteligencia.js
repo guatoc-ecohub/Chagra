@@ -218,6 +218,7 @@ export function mundoDePantalla(pantalla) {
    NO lo ve (lo cazaron los tests del store). */
 import { comentarioDeMundo, COMENTARISTA_MUNDO } from '../compai/nucleo/comentarista.js';
 import { preguntaDeAprendiz } from '../compai/nucleo/modoAprendiz.js';
+import { datosAdaptadosDeFinca } from '../compai/nucleo/datosFinca.js';
 
 export { comentarioDeMundo, COMENTARISTA_MUNDO };
 export { preguntaDeAprendiz };
@@ -496,6 +497,8 @@ export function resolverComportamiento(ctx = {}) {
     ultimoLutoId = null,
     mundo = null,
     datosMundo = {},
+    perfil = null,
+    registro = null,
     ahoraMs = Date.now(),
     ultimaHablaPorLlave = {},
     ocupado = false,
@@ -503,6 +506,10 @@ export function resolverComportamiento(ctx = {}) {
     molestia = 0,
     rand = Math.random,
   } = ctx;
+
+  const datosMundoAdaptados = mundo
+    ? datosAdaptadosDeFinca(mundo, datosMundo, perfil, registro)
+    : datosMundo;
 
   /** @type {Array<{estado:string, prioridad:number, severidad:any, mensaje:string, prompt:string|null, logroId:string|null}>} */
   const candidatos = [];
@@ -551,8 +558,8 @@ export function resolverComportamiento(ctx = {}) {
   // propio: sigue siendo un 'husmea' normal, así que respeta el MISMO
   // cooldown por mundo y la MISMA cadencia adaptativa de siempre.
   if (mundo) {
-    const pregunta = preguntaDeAprendiz({ mundo, datosMundo, rand });
-    const comentario = pregunta || comentarioDeMundo(mundo, datosMundo);
+    const pregunta = preguntaDeAprendiz({ mundo, datosMundo: datosMundoAdaptados, rand });
+    const comentario = pregunta || comentarioDeMundo(mundo, datosMundoAdaptados);
     if (comentario) {
       candidatos.push({
         estado: 'husmea',

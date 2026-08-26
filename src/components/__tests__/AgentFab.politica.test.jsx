@@ -29,7 +29,9 @@ import useAngelitaStore from '../../store/useAngelitaStore';
 import useAgentNotificationStore from '../../store/useAgentNotificationStore';
 
 beforeEach(() => {
+  sessionStorage.clear();
   useAngelitaStore.setState({ silenciado: false, hoyNoFecha: null });
+  useAngelitaStore.setState({ ultimaHablaPorLlave: {}, molestia: 0 });
   useAngelitaStore.setState({ estado: 'calma', visualEstado: 'acompana', mensaje: null, tipo: null });
   useAgentNotificationStore.setState({ responseReady: false, lastAssistantMessage: null });
 });

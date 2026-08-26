@@ -39,6 +39,14 @@ function nombreLimpio(name) {
   return String(name || '').replace(/\s*#\d+\s*$/, '').trim().toLowerCase();
 }
 
+function contextoFinca(datos) {
+  const perfil = datos?.perfil || {};
+  const partes = [];
+  if (perfil.pisoTermico) partes.push(`en piso térmico ${perfil.pisoTermico}`);
+  if (perfil.escala) partes.push(`a escala ${perfil.escala}`);
+  return partes.length ? `, ${partes.join(' y ')}` : '';
+}
+
 /* Cada mundo sabe comentar CON los datos que tenga, y sabe callar honesto
    cuando no los tiene. `datos` es lo que el shell alcanzó a reunir localmente;
    ningún builder inventa cifras — sólo lee lo que le pasan. */
@@ -54,8 +62,8 @@ export const COMENTARISTA_MUNDO = {
       const agro = typeof datos.agro === 'string' && datos.agro.trim() ? datos.agro.trim() : null;
       const cola = agro ? ` Y ojo: ${nombre} ${agro}.` : '';
       return n > 1
-        ? `De sus matas, la que más tiene es ${nombre} — ${n} registradas. ¿Le hacemos seguimiento?${cola}`
-        : `Tiene ${nombre} registrado en su finca. ¿Le echamos un ojo a cómo va?${cola}`;
+        ? `De sus matas, la que más tiene es ${nombre}, con ${n} registradas${contextoFinca(datos)}. ¿Le hacemos seguimiento?${cola}`
+        : `Tiene ${nombre} registrado en su finca${contextoFinca(datos)}. ¿Le echamos un ojo a cómo va?${cola}`;
     }
     return 'Todavía no me ha contado qué tiene sembrado. Cuando registre sus matas, le sigo el rastro a cada una.';
   },
@@ -86,7 +94,7 @@ export const COMENTARISTA_MUNDO = {
         return `Por temporada, ${String(desc).toLowerCase()}. El clima del día en su finca manda; ¿le ayudo a leerlo?`;
       }
     }
-    return 'No tengo el parte del clima a la mano ahora. Cuando haya señal se lo traigo — y el cielo de su finca siempre manda.';
+    return 'No tengo el parte del clima a la mano ahora. Cuando haya señal se lo traigo, y el cielo de su finca siempre manda.';
   },
 
   vender(datos = {}) {

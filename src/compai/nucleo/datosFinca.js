@@ -185,4 +185,46 @@ export function datosDeMundo(mundo, inventario = null, extra = {}) {
   }
 }
 
-export default { inventarioCompai, datosDeMundo, agruparPorNombre, ultimaCosecha };
+/**
+ * Reduce el perfil a contexto agronómico útil para el mensaje. Ubicación,
+ * nombres de personas y cualquier dato identificable quedan fuera del
+ * contrato del compAI.
+ */
+export function perfilFincaParaCompai(perfil = null) {
+  if (!perfil || typeof perfil !== 'object') return {};
+  return {
+    pisoTermico: typeof perfil.pisoTermico === 'string' ? perfil.pisoTermico : null,
+    escala: typeof perfil.escala === 'string' ? perfil.escala : null,
+    agua: typeof perfil.agua === 'string' ? perfil.agua : null,
+    cultiva: Array.isArray(perfil.cultiva)
+      ? perfil.cultiva.filter((item) => typeof item === 'string').slice(0, 12)
+      : [],
+  };
+}
+
+/** Combina datos del mundo con perfil y registro local, sin persistirlos. */
+export function datosAdaptadosDeFinca(mundo, datosMundo = {}, perfil = null, registro = null) {
+  const base = { ...(datosMundo || {}) };
+  const inv = registro && typeof registro === 'object' ? registro : {};
+  if ((!Array.isArray(base.cultivos) || base.cultivos.length === 0) && Array.isArray(inv.cultivos)) {
+    base.cultivos = inv.cultivos;
+  }
+  if ((!Array.isArray(base.especies) || base.especies.length === 0) && Array.isArray(inv.especies)) {
+    base.especies = inv.especies;
+  }
+  if ((!Number.isFinite(base.total) || base.total <= 0) && Number.isFinite(inv.total)) {
+    base.total = inv.total;
+  }
+  base.perfil = perfilFincaParaCompai(perfil);
+  base.mundo = mundo;
+  return base;
+}
+
+export default {
+  inventarioCompai,
+  datosDeMundo,
+  datosAdaptadosDeFinca,
+  perfilFincaParaCompai,
+  agruparPorNombre,
+  ultimaCosecha,
+};

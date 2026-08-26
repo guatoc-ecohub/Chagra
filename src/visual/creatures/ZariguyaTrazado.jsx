@@ -1,9 +1,6 @@
 import { useEffect, useId, useMemo, useRef, useState } from 'react';
 import { ZARIGUYA_TRAZADO_SVG } from './zariguyaTrazado/pielTrazado.js';
-import {
-  POSES_TRAZADO_KEYS, srcDePose, ESCUCHA_CICLO, ESCUCHA_PASO_MS, UMBRAL_CLOSEUP,
-} from './zariguyaTrazado/posesTrazado.js';
-import { useVidaIdle, useMiradaUsted, prefiereQuietud } from './useVidaIdle.js';
+import { useVidaIdle, useMiradaUsted } from './useVidaIdle.js';
 import './zariguyaTrazado/zariguyaHuesos.css';
 
 const ZARIGUYA_SLUG = 'zariguya';
@@ -38,12 +35,11 @@ const TRAMO_ACTUANDO = 0.3;
  * @param {Object} props — idénticas a ZariguyaHuesos:
  *   estado, modo ('auto'|'normal'|'actuando'), size, animated, className,
  *   style, title, visema ('V1'..'V4'), tier ('bajo' apaga vida), onClick,
- *   onDoubleClick. FASE 2 suma (paridad con ZariguyaGeminiLaminaViva):
- *   vidaForzada ('husmea'|'tanatosis'|'reposo'|'crias') — fuerza un momento
+ *   onDoubleClick. La FASE 1 mantiene únicamente el rig de huesos; las
+ *   poses de FASE 2 quedan fuera del render hasta que exista su versión ósea.
+ *   vidaForzada ('husmea'|'tanatosis'|'reposo'|'crias') fuerza un momento
  *   de vida por encima del idle-cerebro (vitrina / gag a demanda del host;
- *   solo pesa en idle, igual que el momento natural);
- *   poseForzada (clave de POSES_TRAZADO_KEYS) — clava una viñeta exacta
- *   (arnés de gate / vitrina; sigue exigiendo el PNG cargado).
+ *   solo pesa en idle, igual que el momento natural).
  */
 export default function ZariguyaTrazado({
   estado = 'idle',
@@ -56,7 +52,7 @@ export default function ZariguyaTrazado({
   visema = null,
   tier = undefined,
   vidaForzada = null,
-  poseForzada = null,
+  poseForzada: _poseForzada,
   onClick = undefined,
   onDoubleClick = undefined,
   ...rest
@@ -65,7 +61,6 @@ export default function ZariguyaTrazado({
   const canon = ESTADO_CANON[estado] || 'idle';
   const enIdle = canon === 'idle';
   const activoVida = animated && tier !== 'bajo';
-  const sizeChico = size < UMBRAL_CLOSEUP;
 
   // Fase propia por instancia (hash del useId — puro y estable por render).
   const uid = useId();
@@ -80,50 +75,6 @@ export default function ZariguyaTrazado({
   const momentoNatural = useVidaIdle(ZARIGUYA_SLUG, activoVida && enIdle && !vidaForzada);
   const momento = enIdle && vidaForzada ? vidaForzada : momentoNatural;
   useMiradaUsted(raizRef, activoVida && canon !== 'speaking');
-
-  // ═══ POSES PLENAS (FASE 2) — precarga honesta: una pose solo entra
-  // COMPLETA; sin PNG servido, el trazado degrada a la FASE 1 (rig hero). ═══
-  const [cargadas, setCargadas] = useState({});
-  useEffect(() => {
-    let vivo = true;
-    for (const k of POSES_TRAZADO_KEYS) {
-      const img = new Image();
-      img.decoding = 'async';
-      img.onload = () => {
-        if (vivo) setCargadas((c) => (c[k] ? c : { ...c, [k]: true }));
-      };
-      img.src = srcDePose(k);
-    }
-    return () => { vivo = false; };
-  }, []);
-
-  // El ciclo de escucha aprobado (02→03→04→03, vaivén de atención). El tick
-  // NO se resetea al salir: re-entrar a media vuelta es tan válido como en 02.
-  const [tickEscucha, setTickEscucha] = useState(0);
-  useEffect(() => {
-    if (canon !== 'listening' || !animated || sizeChico || prefiereQuietud()) return undefined;
-    const id = setInterval(() => setTickEscucha((t) => t + 1), ESCUCHA_PASO_MS);
-    return () => clearInterval(id);
-  }, [canon, animated, sizeChico]);
-
-  // Qué viñeta pide el estado (null = la lámina-rig articulada de FASE 1).
-  // Cada mapa entra al repertorio UNA lámina a la vez con gate (spec FASE 2):
-  // una pose fuera de POSES_TRAZADO_KEYS aún no existe para el trazado.
-  const poseDeseada = poseForzada || (() => {
-    if (canon === 'listening') {
-      return sizeChico ? 'escucha-01' : ESCUCHA_CICLO[tickEscucha % ESCUCHA_CICLO.length];
-    }
-    if (canon === 'thinking') return 'verlupa';
-    if (canon === 'contenta') return 'cute';
-    if (enIdle) {
-      if (momento === 'tanatosis') return 'muerta'; // la firma "se-hace-la-muerta"
-      if (momento === 'crias') return 'crias';
-    }
-    return null;
-  })();
-  const pose = poseDeseada && POSES_TRAZADO_KEYS.includes(poseDeseada) && cargadas[poseDeseada]
-    ? poseDeseada
-    : null;
 
   // El reloj 70/30 del modo auto.
   const [actuaAuto, setActuaAuto] = useState(false);
@@ -171,7 +122,6 @@ export default function ZariguyaTrazado({
       data-creature={ZARIGUYA_SLUG}
       data-agt-estado={estado}
       data-modo={animated ? modoVigente : 'normal'}
-      data-pose={pose || undefined}
       data-visema={visema || undefined}
       data-vida={animated && momento ? momento : undefined}
       data-tier={tier || undefined}

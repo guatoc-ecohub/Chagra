@@ -15,6 +15,7 @@ import useAlertStore from '../store/useAlertStore';
 import useLogStore from '../store/useLogStore';
 import { notificacionesInteligentes } from '../services/angelitaInteligencia';
 import { estaOcupado } from '../services/compaiOcupado.js';
+import useIdleDetection from '../hooks/useIdleDetection.js';
 import { activarEscucha } from '../services/escuchaService';
 import { useCompaiClimaVivo } from '../hooks/useCompaiClimaVivo';
 import { useCompaiSusurroNocturno } from '../hooks/useCompaiSusurroNocturno';
@@ -22,12 +23,21 @@ import { useCompaiAgroecologiaReal } from '../hooks/useCompaiAgroecologiaReal';
 import useTtsAmplitude, { visemaFromAmplitude } from '../hooks/useTtsAmplitude.js';
 import useInteraccionUsuario from '../hooks/useInteraccionUsuario.js';
 import useAgentAvatarType, { AVATAR_NOMBRE, DEFAULT_AVATAR_TYPE } from '../hooks/useAgentAvatarType.js';
-import { getHintForRuta } from '../config/compaiHints.js';
+import { getHintForRuta, puedeMostrarHintEnSesion, registrarHintEnSesion } from '../config/compaiHints.js';
+import { mundoDePantalla } from '../services/angelitaInteligencia';
+import useInventarioCompai from '../hooks/useInventarioCompai';
+import usePerfilFincaStore from '../store/usePerfilFincaStore';
+import { datosDeMundo } from '../compai/nucleo/datosFinca.js';
 import BurbujaAngelita from '../visual/agente/BurbujaAngelita.jsx';
 import AgentFabMenu from './AgentFabMenu';
 import useComportamientoCompai from '../hooks/useComportamientoCompai.js';
 import useCompaiDraggable from '../hooks/useCompaiDraggable';
 import './agent-fab-skin.css';
+
+function prefersReducedMotion() {
+  return typeof window !== 'undefined' && typeof window.matchMedia === 'function'
+    && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+}
 
 /**
  * AgentFab — el compAI elegido por el usuario, vivo, presente en TODA pantalla.
@@ -80,6 +90,7 @@ export default function AgentFab({ onNavigate, pantalla = null }) {
   const [hover, setHover] = useState(false);
   const [pressed, setPressed] = useState(false);
   const [menuAbierto, setMenuAbierto] = useState(false);
+  const [panelAbierto, setPanelAbierto] = useState(false);
   const { level: ttsLevel } = useTtsAmplitude();
 
   // Hook de arrastre y persistencia de posición
@@ -137,6 +148,8 @@ export default function AgentFab({ onNavigate, pantalla = null }) {
   const setLastMessage = useAgentNotificationStore((s) => s.setLastMessage);
   const ttsEnabled = usePrefsStore((s) => s.ttsEnabled);
   const setTtsEnabled = usePrefsStore((s) => s.setTtsEnabled);
+  const susurroNocturnoTts = usePrefsStore((s) => s.susurroNocturnoTts);
+  const setSusurroNocturnoTts = usePrefsStore((s) => s.setSusurroNocturnoTts);
   const activeAlerts = useAlertStore((s) => s.activeAlerts);
 
   // ── EL CEREBRO, CABLEADO (auditoría 2026-07-18): notificacionesInteligentes
@@ -168,6 +181,13 @@ export default function AgentFab({ onNavigate, pantalla = null }) {
     return () => { vivo = false; };
   }, [activeAlerts, setLastMessage, setResponseReady]);
 
+  // R2: durante la actividad el FAB se atenúa, pero permanece visible y
+  // operable. La ocupación explícita cubre grabación, carga de foto y otros
+  // estados que la detección global de eventos no puede inferir.
+  const idleGlobal = useIdleDetection(2500);
+  const usandoContenido = !idleGlobal || estaOcupado();
+  const atenuado = usandoContenido && !hover && !pressed && !menuAbierto && !panelAbierto;
+
   // #111 "Vive el clima real": reacciona al MISMO snapshot de clima que ya
   // consume el husmeo (climaService, cero red aquí) — pre-lluvia avisa/se
   // emociona, helada se abriga, sequía pide agua. Pasa por la misma
@@ -184,7 +204,9 @@ export default function AgentFab({ onNavigate, pantalla = null }) {
     onSusurro: (mensaje, { rate }) => {
       setLastMessage(mensaje);
       setResponseReady(true);
-      if (ttsEnabled) speakSentences(mensaje, { rate }).catch(() => { /* degrada a solo texto */ });
+      if (ttsEnabled && susurroNocturnoTts) {
+        speakSentences(mensaje, { rate }).catch(() => { /* degrada a solo texto */ });
+      }
     },
   });
 
@@ -225,6 +247,10 @@ export default function AgentFab({ onNavigate, pantalla = null }) {
     pausado: isDragging,
   });
   const hint = useMemo(() => getHintForRuta(pantalla, nombreCompai), [pantalla, nombreCompai]);
+  const mundoActual = useMemo(() => mundoDePantalla(pantalla), [pantalla]);
+  const hintMundo = useMemo(() => mundoActual || pantalla, [mundoActual, pantalla]);
+  const inventarioCompai = useInventarioCompai();
+  const perfilFinca = usePerfilFincaStore((s) => s.perfil);
 
   const interactuando = useInteraccionUsuario();
   const estadoAngelita = useAngelitaStore((s) => s.estado);
@@ -232,17 +258,16 @@ export default function AgentFab({ onNavigate, pantalla = null }) {
   const mensajeAngelita = useAngelitaStore((s) => s.mensaje);
   const tipoAngelita = useAngelitaStore((s) => s.tipo);
   const hoyNoActivoFn = useAngelitaStore((s) => s.hoyNoActivo);
+  const puedeMostrarHintStore = useAngelitaStore((s) => s.puedeMostrarHint);
+  const registrarHintMostrado = useAngelitaStore((s) => s.registrarHintMostrado);
   const hoyNo = typeof hoyNoActivoFn === 'function' ? hoyNoActivoFn() : false;
 
   // Panel "Ver" (R4): lectura del mensaje/hint en detalle.
-  const [panelAbierto, setPanelAbierto] = useState(false);
   // La enseñanza (R3) se descarta con la ✕ y se re-arma al cambiar de pantalla.
   const [hintDescartado, setHintDescartado] = useState(false);
-  // "Una vez por entrada" (auditoría de mensajes 2026-08-23): al primer idle
-  // elegible arranca un reloj; tras la ventana de enseñanza se CONSUME y no
-  // reaparece esta entrada (nada de spam cada 2–5 s como el roam anterior). Se
-  // reinicia al cambiar de ruta — patrón derivado en render, sin setState en
-  // effect (react-hooks/set-state-in-effect).
+  // "Una vez por entrada" (auditoría de mensajes 2026-08-23): se arma sólo
+  // cuando aparece el primer idle elegible. La autorización cruza el cooldown
+  // del store y un tope efímero de sesión, sin un timer que vuelva a disparar.
   const [hintArrancado, setHintArrancado] = useState(false);
   const [hintConsumido, setHintConsumido] = useState(false);
   const [lastPantalla, setLastPantalla] = useState(pantalla);
@@ -261,14 +286,49 @@ export default function AgentFab({ onNavigate, pantalla = null }) {
     ? mensajeAngelita
     : lastAssistantMessage;
   const tipoAviso = estadoAngelita !== 'calma' && tipoAngelita ? tipoAngelita : 'informativa';
-  const mostrarAviso = responseReady && !!mensajeAviso && !silenciado && !menuAbierto;
+  const hayAviso = responseReady && !!mensajeAviso && !silenciado;
+  const mostrarAviso = hayAviso && !menuAbierto;
 
   // Enseñanza (R3): reposo, sin aviso, sin silencio/"hoy no"/ocupado, sin
   // menú/panel, no descartada ni ya consumida esta entrada.
-  const ensenanzaPermitida = !mostrarAviso && !silenciado && !hoyNo && !estaOcupado()
+  const ensenanzaBase = !mostrarAviso && !silenciado && !hoyNo && !estaOcupado()
     && pantalla != null && !menuAbierto && !panelAbierto;
-  const mostrarEnsenanza = ensenanzaPermitida && !interactuando && !hintDescartado && !hintConsumido;
-  if (mostrarEnsenanza && !hintArrancado) setHintArrancado(true);
+  const hintCadenciaPermitida = Boolean(
+    hintMundo && puedeMostrarHintStore(hintMundo, { ocupado: estaOcupado() }),
+  );
+  const hintSesionPermitida = puedeMostrarHintEnSesion(hintMundo);
+  // Igual que la transición de ruta que ya existía arriba, esta pequeña
+  // transición síncrona evita un efecto/timer que pueda rearmar el hint. El
+  // guardado en sesión y el cooldown se ejecutan sólo al pasar de pendiente a
+  // arrancado, nunca durante un loop.
+  if (ensenanzaBase && !interactuando && !hintArrancado && !hintConsumido) {
+    if (hintCadenciaPermitida && hintSesionPermitida && registrarHintEnSesion(hintMundo)) {
+      registrarHintMostrado(hintMundo);
+      setHintArrancado(true);
+    } else {
+      setHintConsumido(true);
+    }
+  }
+  if (interactuando && hintArrancado && !hintConsumido) setHintConsumido(true);
+  const mostrarEnsenanza = ensenanzaBase && hintArrancado && !interactuando && !hintDescartado && !hintConsumido;
+
+  // P4: una entrada de mundo en 2D usa el mismo cerebro/cooldown que 3D,
+  // pero le entrega el perfil y el registro local ya normalizados.
+  useEffect(() => {
+    if (!mundoActual || !pantalla || estaOcupado()) return;
+    const datosMundo = datosDeMundo(mundoActual, inventarioCompai);
+    const decision = useAngelitaStore.getState().evaluar({
+      mundo: mundoActual,
+      datosMundo,
+      perfil: perfilFinca,
+      registro: inventarioCompai,
+      ocupado: false,
+    });
+    if (decision.interrumpe) {
+      setLastMessage(decision.mensaje);
+      setResponseReady(true);
+    }
+  }, [mundoActual, pantalla, inventarioCompai, perfilFinca, setLastMessage, setResponseReady]);
 
   // POLÍTICA COMPAI v2 (operador 2026-08-24): el compai es VISIBLE 100% del
   // tiempo, NUNCA desaparece. La ocultación anterior (`oculto = interactuando
@@ -299,9 +359,13 @@ export default function AgentFab({ onNavigate, pantalla = null }) {
   }, [registrarSenalMolestia]);
 
   // Contenido del panel "Ver": el aviso real si lo hay, si no el hint de la ruta.
-  const contenidoPanel = mostrarAviso
-    ? { titulo: `${nombreCompai}: un aviso para usted`, descripcion: mensajeAviso }
-    : hint;
+  const contenidoPanel = useMemo(() => (
+    mensajeAngelita
+      ? { titulo: `${nombreCompai}: un aviso para usted`, descripcion: mensajeAngelita }
+      : lastAssistantMessage
+        ? { titulo: `${nombreCompai}: un aviso para usted`, descripcion: lastAssistantMessage }
+        : hint
+  ), [hint, lastAssistantMessage, mensajeAngelita, nombreCompai]);
 
   // Estado del compai: el tacto manda; luego el ánimo rico del store; luego
   // la respuesta del chat y, al final, el idle.
@@ -315,13 +379,9 @@ export default function AgentFab({ onNavigate, pantalla = null }) {
         ? 'invita'
         : 'acompana';
 
-  // Ventana de enseñanza: se consume ~8 s tras el primer idle elegible → el hint
-  // enseña UNA vez por entrada (auditoría de mensajes: sin spam por parada).
-  useEffect(() => {
-    if (!hintArrancado || hintConsumido) return undefined;
-    const t = setTimeout(() => setHintConsumido(true), 8000);
-    return () => clearTimeout(t);
-  }, [hintArrancado, hintConsumido]);
+  const estadoVisual = comportamiento.moviendo && comportamiento.movimientoNatural === 'camina'
+    ? 'caminando'
+    : estado;
 
   const handleEnter = () => setHover(true);
   const handleLeave = () => { setHover(false); setPressed(false); soltarPulsacionLarga(); };
@@ -344,13 +404,6 @@ export default function AgentFab({ onNavigate, pantalla = null }) {
     setMenuAbierto(true);
   };
 
-  /** Menú → "Hablar": activa el micrófono, igual que el gesto largo. */
-  const handleMenuHablar = useCallback(() => {
-    setMenuAbierto(false);
-    activarEscucha({ fuente: 'compai_menu' });
-    registrarSenalMolestia('hablarle');
-  }, [registrarSenalMolestia]);
-
   /** Menú → "Ver" (R4): abre el panel con el mensaje/hint para LEERLO. */
   const handleMenuVer = useCallback(() => {
     setMenuAbierto(false);
@@ -358,14 +411,19 @@ export default function AgentFab({ onNavigate, pantalla = null }) {
     registrarSenalMolestia('abrirTip');
   }, [registrarSenalMolestia]);
 
-  /** Menú → "Escuchar": lectura breve del contexto actual por Kokoro. */
+  /** Menú → "Escuchar": lee exactamente lo que muestra "Ver". */
   const handleMenuEscuchar = useCallback(() => {
     setMenuAbierto(false);
-    const lugar = pantalla ? pantalla.replaceAll('_', ' ') : 'esta pantalla';
-    speakSentences(`Estoy en ${lugar}. Puede preguntarme por texto, hablarme o enviarme una foto de su finca.`)
-      .catch(() => {});
+    speakSentences(`${contenidoPanel.titulo}. ${contenidoPanel.descripcion}`).catch(() => {});
     registrarSenalMolestia('escuchar');
-  }, [pantalla, registrarSenalMolestia]);
+  }, [contenidoPanel, registrarSenalMolestia]);
+
+  /** Menú → "Hablar": activa el micrófono, igual que el gesto largo. */
+  const handleMenuHablar = useCallback(() => {
+    setMenuAbierto(false);
+    activarEscucha({ fuente: 'compai_menu' });
+    registrarSenalMolestia('hablarle');
+  }, [registrarSenalMolestia]);
 
   /** Menú → "Enviar foto": abre el agente con la cámara ya disparada. */
   const handleMenuFoto = useCallback(() => {
@@ -385,6 +443,16 @@ export default function AgentFab({ onNavigate, pantalla = null }) {
     setMenuAbierto(false);
     marcarHoyNo();
   }, [marcarHoyNo]);
+
+  /** Menú → "Callar hoy" / "🔔 Reactivar": un solo toggle persistente. */
+  const handleAlternarSilencio = useCallback(() => {
+    setMenuAbierto(false);
+    silenciar(!silenciado);
+  }, [silenciar, silenciado]);
+
+  const handleToggleSusurroNocturno = useCallback(() => {
+    setSusurroNocturnoTts(!usePrefsStore.getState().susurroNocturnoTts);
+  }, [setSusurroNocturnoTts]);
 
   /** El menú se cerró SIN elegir nada: cuenta como señal de molestia — el
    *  usuario lo abrió y lo cerró sin usarlo (#102/#106). */
@@ -413,6 +481,8 @@ export default function AgentFab({ onNavigate, pantalla = null }) {
     }
   }, [ttsEnabled, lastAssistantMessage, setTtsEnabled]);
 
+  const reducedMotion = prefersReducedMotion();
+
   return (
     /* El puesto (costado inferior derecho, SPEC) lo fija ahora este envoltorio,
        no el botón: así el interruptor de silencio puede ser un botón HERMANO
@@ -439,7 +509,10 @@ export default function AgentFab({ onNavigate, pantalla = null }) {
         zIndex: 40,
         pointerEvents: 'none', // sólo los hijos reciben toque: el hueco no tapa nada
         visibility: 'visible',
-        opacity: 1,
+        // En 2D el compai permanece presente, pero cede contraste al contenido
+        // mientras la persona lo está usando. En 3D el shell lo desmonta y la
+        // escena aplica el mismo principio al compañero espacial.
+        opacity: interactuando ? 0.46 : 1,
         cursor: isDragging ? 'grabbing' : 'grab',
         transition: isDragging ? 'none' : 'bottom 0.3s ease, right 0.3s ease',
         userSelect: 'none',
@@ -455,6 +528,7 @@ export default function AgentFab({ onNavigate, pantalla = null }) {
               ? 'Chagra IA tiene respuesta nueva'
               : 'Chagra IA, su compañero de Chagra'
         }
+        aria-describedby="compai-longpress-affordance"
         title={
           silenciado
             ? 'Su compañero está en silencio: no le avisa nada hasta que usted lo vuelva a prender. Tocar para abrir el menú igual'
@@ -501,12 +575,17 @@ export default function AgentFab({ onNavigate, pantalla = null }) {
           filter: silenciado
             ? 'drop-shadow(0 0 3px var(--chagra-fab-rim, rgba(255, 255, 255, 0.72))) drop-shadow(0 3px 6px rgba(10, 15, 26, 0.35)) grayscale(0.72) opacity(0.55)'
             : 'drop-shadow(0 0 3px var(--chagra-fab-rim, rgba(255, 255, 255, 0.72))) drop-shadow(0 3px 6px rgba(10, 15, 26, 0.45))',
+          opacity: atenuado ? 0.5 : 1,
           transform: pressed
             ? 'scale(0.94)'
             : hover
               ? 'scale(1.08)'
-              : 'scale(1)',
-          transition: 'transform .22s cubic-bezier(.34,1.56,.64,1), filter .28s ease, opacity .28s ease',
+              : atenuado
+                ? 'scale(0.82)'
+                : 'scale(1)',
+          transition: reducedMotion
+            ? 'none'
+            : 'transform .22s cubic-bezier(.34,1.56,.64,1), filter .28s ease, opacity .28s ease',
         }}
       >
         {/* pointer-events:none — CRÍTICO: el click debe caer en el BOTÓN, nunca
@@ -521,7 +600,7 @@ export default function AgentFab({ onNavigate, pantalla = null }) {
         <span style={{ pointerEvents: 'none', display: 'flex' }} aria-hidden="true">
           <ChagraAgentAvatar
             // eslint-disable-next-line chagra-i18n/no-hardcoded-spanish -- estado visual canónico del agente
-            estado={ttsLevel > 0.035 ? 'respondiendo' : estado}
+            estado={ttsLevel > 0.035 ? 'respondiendo' : estadoVisual}
             size={82}
             visema={visemaFromAmplitude(ttsLevel)}
             direccion="izquierda"
@@ -532,6 +611,17 @@ export default function AgentFab({ onNavigate, pantalla = null }) {
           />
         </span>
       </button>
+
+      {/* P7: la acción de voz no depende del doble toque. En superficies
+          táctiles la pista queda visible y nombra el gesto real del FAB. */}
+      <span
+        id="compai-longpress-affordance"
+        className="compai-fab-longpress-affordance"
+        data-testid="compai-longpress-affordance"
+        aria-hidden="true"
+      >
+        Mantenga presionado para hablar
+      </span>
 
       {/* EL INTERRUPTOR VISIBLE. Pegado al personaje, no enterrado en ajustes:
           cuando molesta, molesta AHORA. 30 px de diana táctil, contraste
@@ -557,7 +647,7 @@ export default function AgentFab({ onNavigate, pantalla = null }) {
           fontSize: 14,
           lineHeight: 1,
           // El ícono aparece por clic/toque, nunca por hover en reposo.
-          display: (comportamiento.notificacionVisible || pressed || menuAbierto) ? 'flex' : 'none',
+          display: (comportamiento.notificacionVisible || hover || pressed || menuAbierto) ? 'flex' : 'none',
           alignItems: 'center',
           justifyContent: 'center',
           cursor: 'pointer',
@@ -570,9 +660,8 @@ export default function AgentFab({ onNavigate, pantalla = null }) {
         <span aria-hidden="true">{silenciado ? '🔕' : '🔔'}</span>
       </button>
 
-      {/* R5 — BURBUJA RICA DE AVISO (mensaje ADAPTADO + tipo + ánimo): clima
-          vivo / susurro / agroecología / respuesta lista, visible en prod 2D.
-          Anclada ARRIBA del FAB, descartable → no tapa el centro (R1). */}
+      {/* R5: el aviso adaptado lleva el mensaje, el tipo y el ánimo del
+          compai. Una respuesta lista manda sobre la enseñanza contextual. */}
       {mostrarAviso && (
         <div style={burbujaWrapStyle} data-testid="compai-fab-aviso">
           <div style={burbujaCardStyle}>
@@ -662,9 +751,8 @@ export default function AgentFab({ onNavigate, pantalla = null }) {
         </div>
       )}
 
-      {/* MENÚ DEL TOQUE CORTO (#66/#70): "Ver" / "Escuchar" / "Hablar" /
-          "Enviar foto" / "Ver fotos" / "Que se quede callado hoy". Se ancla al
-          mismo puesto que el personaje. */}
+      {/* MENÚ COMPACTO R4: "Ver" / "Escuchar" / "Enviar una foto" / "Callar".
+          Se ancla al mismo puesto que el personaje. */}
       <AgentFabMenu
         abierto={menuAbierto}
         onVer={handleMenuVer}
@@ -673,6 +761,10 @@ export default function AgentFab({ onNavigate, pantalla = null }) {
         onFoto={handleMenuFoto}
         onFotos={handleMenuFotos}
         onHoyNo={handleMenuHoyNo}
+        silenciado={silenciado}
+        onAlternarSilencio={handleAlternarSilencio}
+        onToggleSusurroNocturno={handleToggleSusurroNocturno}
+        susurroNocturnoTts={susurroNocturnoTts}
         onCerrar={handleMenuCerrar}
       />
     </div>

@@ -177,6 +177,7 @@ export default function useComportamientoCompai(ref, opciones = {}) {
     let fase = 'pausa';
     let faseHasta = (performance.now?.() || Date.now()) + ARRANQUE_MS;
     let roamInicio = 0;
+    let esExcursion = false;
     let destino = { ...posicionRef.current };
     let opacidad = 1;
     let fadeInicio = null;
@@ -219,10 +220,12 @@ export default function useComportamientoCompai(ref, opciones = {}) {
             el, limites, soloX, contentAware,
             x: actual.x, y: actual.y,
           });
+          esExcursion = true;
           roamInicio = ts;
         } else {
           // Regresar SIEMPRE al puesto ({0,0}).
           destino = { x: 0, y: 0 };
+          esExcursion = false;
         }
         fase = 'movimiento';
       }
@@ -236,6 +239,7 @@ export default function useComportamientoCompai(ref, opciones = {}) {
           actual.y = destino.y;
           fase = 'pausa';
           const llegoAlPuesto = Math.abs(destino.x) < 1 && Math.abs(destino.y) < 1;
+          const completoExcursion = esExcursion;
           let pausaMs;
           if (pausadoRef.current) {
             pausaMs = PAUSA_MS;
@@ -251,7 +255,10 @@ export default function useComportamientoCompai(ref, opciones = {}) {
           }
           faseHasta = ts + pausaMs;
           marcar('moviendo', false, setMoviendo);
-          if (!pausadoRef.current && !llegoAlPuesto) setParada((n) => n + 1);
+          if (!pausadoRef.current && (completoExcursion || !llegoAlPuesto)) {
+            setParada((n) => n + 1);
+          }
+          esExcursion = false;
         } else {
           const step = Math.min(VELOCIDAD * dt, distancia);
           actual.x += (dx / distancia) * step;

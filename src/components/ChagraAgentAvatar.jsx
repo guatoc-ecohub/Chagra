@@ -71,6 +71,7 @@ const STATE_DE_ESTADO_RICO = {
     respondiendo: 'speaking',
     contenta: 'speaking',
     invita: 'speaking',
+    caminando: 'caminando',
 };
 
 const AVATAR_ANGOSTO = {

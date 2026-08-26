@@ -76,6 +76,32 @@
   background: rgb(var(--t-accent-rgb, 16 185 129) / 0.28);
 }
 
+/* P7: el gesto de voz se descubre en la primera mirada sobre una pantalla
+   táctil. En escritorio el title/aria-label siguen siendo suficientes y no se
+   añade una etiqueta flotante que compita con la interfaz. */
+.compai-fab-longpress-affordance {
+  display: none;
+  position: absolute;
+  right: -58px;
+  bottom: -28px;
+  width: max-content;
+  max-width: min(220px, calc(100vw - 28px));
+  padding: 5px 9px;
+  border: 1px solid rgb(var(--t-accent-rgb, 16 185 129) / 0.5);
+  border-radius: 999px;
+  background: rgb(var(--c-surface-card, 15 23 42) / 0.94);
+  color: rgb(var(--c-text-primary, 241 245 249));
+  font: 600 11px/1.25 system-ui, sans-serif;
+  text-align: center;
+  box-shadow: 0 4px 12px rgb(var(--scrim-bg, 0 0 0) / 0.35);
+  pointer-events: none;
+  z-index: 43;
+}
+
+@media (pointer: coarse), (max-width: 640px) {
+  .compai-fab-longpress-affordance { display: block; }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .agt-fab-menu-item { transition: none !important; }
 }
