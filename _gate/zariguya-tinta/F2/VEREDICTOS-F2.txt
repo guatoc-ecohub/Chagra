@@ -57,3 +57,14 @@ Veredicto juez (Pixel, calibrado):
     del comparador (render 475×347 vs lámina 475×348).
 NÚMEROS: bbox contenido 475×347 vs 475×348 (Δ1px, misma escala);
 pixel-diff alineado (fuzz 5%): 637 px de 168 960 = 0.38%.
+
+── GATE LÁMINA 3 · MUERTA (vida tanatosis = firma "se-hace-la-muerta") ──
+Comparador alineado apilado (33-JUEZ-muerta-alineado.png: arriba render,
+abajo lámina). Veredicto juez (Pixel, calibrado):
+ 1. misma-pose: SI · 2. parches nuevos: NO · 3. color: SI ·
+ 4. personaje: SI · 5. diferencias: NINGUNA
+NÚMEROS: bbox contenido 475×228 vs 474×228 (Δ1px); pixel-diff alineado
+(fuzz 5%): 437 px de 112 288 = 0.39%.
+La firma vive en VIDA_REPERTORIO.zariguya.tanatosis (ya existía — es el
+nombre técnico de "se-hace-la-muerta"; anotado en vidaEstados.js). El gag
+respira a escondidas (ztFinge 2.2s) y también es forzable (vidaForzada).
