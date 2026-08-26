@@ -468,6 +468,17 @@ div.zariguyaHuesos > svg{ width: 100%; height: 100%; display: block; overflow: v
   70%{ transform: rotate(0.5deg) translateX(0.5%); }
 }
 
+/* MUERTA (vida tanatosis — la firma "se-hace-la-muerta"): tendida, lengua
+   afuera… y RESPIRANDO a escondidas — que se le note es el chiste. */
+.zariguyaHuesos[data-pose="muerta"] .zt-pose-muerta{
+  opacity: 1;
+  animation: ztFinge 2.2s ease-in-out infinite;
+}
+@keyframes ztFinge{
+  0%,100%{ transform: scaleY(1); }
+  50%{ transform: scaleY(1.015); }
+}
+
 /* ═══════════════════════ GATES OBLIGATORIOS ══════════════════════════════ */
 
 /* tier bajo: fuera lo continuo (filtros/loops); quedan estados reactivos */

@@ -116,6 +116,9 @@ export const VIDA_REPERTORIO = {
     descanso: [3000, 7200], // nocturna atareada: se para a oler cada nada
     momentos: {
       husmea: { dur: 3150, peso: 2.5 }, // 3× zari-hocico-husmea 1.05s — vive por la nariz
+      /* tanatosis ES la firma "se-hace-la-muerta" del brief (playing possum,
+         exclusiva de la especie). En el trazado FASE 2 el momento muestra la
+         lámina Gemini `muerta` como pose plena (posesTrazado.js). */
       tanatosis: { dur: 2600, peso: 0.6 }, // 1× zari-desmayo 2.6s — rarísimo, y por eso gracioso
       reposo: { dur: 4400, peso: 1 }, // 1× rh-g-reposo — el idle-cerebro de la piel trazada
     },
