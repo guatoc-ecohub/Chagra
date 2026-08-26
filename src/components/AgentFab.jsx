@@ -26,6 +26,7 @@ import { getHintForRuta } from '../config/compaiHints.js';
 import BurbujaAngelita from '../visual/agente/BurbujaAngelita.jsx';
 import AgentFabMenu from './AgentFabMenu';
 import useComportamientoCompai from '../hooks/useComportamientoCompai.js';
+import useCompaiDraggable from '../hooks/useCompaiDraggable';
 import './agent-fab-skin.css';
 
 /**
@@ -76,11 +77,19 @@ import './agent-fab-skin.css';
  * ahora el largo Y la opción del menú.
  */
 export default function AgentFab({ onNavigate, pantalla = null }) {
-  const compaiRef = useRef(null);
   const [hover, setHover] = useState(false);
   const [pressed, setPressed] = useState(false);
   const [menuAbierto, setMenuAbierto] = useState(false);
   const { level: ttsLevel } = useTtsAmplitude();
+
+  // Hook de arrastre y persistencia de posición
+  const {
+    compaiRef,
+    position: _savedPosition,
+    isDragging,
+    positionStyle,
+    dragHandlers,
+  } = useCompaiDraggable({ enabled: true });
 
   /* ── EL INTERRUPTOR MANUAL (auditoría 2026-07-26, ítems #101 y #103) ──────
      `silenciar()` — silencio INDEFINIDO, hasta que el usuario lo vuelva a
@@ -404,28 +413,34 @@ export default function AgentFab({ onNavigate, pantalla = null }) {
        no el botón: así el interruptor de silencio puede ser un botón HERMANO
        de verdad — enfocable, con su propio nombre accesible — en vez de un
        `<button>` anidado (HTML inválido) o un `div` con `onClick` (invisible
-       para el teclado y el lector de pantalla). El puesto no se movió ni un
-       píxel: las mismas coordenadas de siempre. */
+       para el teclado y el lector de pantalla). El puesto ahora es ARRASTRABLE
+       y PERSISTENTE (useCompaiDraggable). */
     <div
       ref={compaiRef}
       data-compai-surface={pantalla || 'global'}
+      data-compai-draggable="true"
       onPointerEnter={comportamiento.handlers.onPointerEnter}
       onPointerLeave={comportamiento.handlers.onPointerLeave}
       onPointerDown={comportamiento.handlers.onPointerDown}
       onPointerMove={comportamiento.handlers.onPointerMove}
       onPointerUp={comportamiento.handlers.onPointerUp}
       onPointerCancel={comportamiento.handlers.onPointerCancel}
+      onMouseDown={dragHandlers.onMouseDown}
+      onTouchStart={dragHandlers.onTouchStart}
       aria-hidden={oculto}
       style={{
         position: 'fixed',
-        bottom: 'max(90px, calc(env(safe-area-inset-bottom) + 90px))',
-        right: 14,
+        bottom: positionStyle.bottom,
+        right: positionStyle.right,
         width: 84,
         height: 84,
         zIndex: 40,
         pointerEvents: 'none', // sólo los hijos reciben toque: el hueco no tapa nada
         visibility: 'visible',
         opacity: 1,
+        cursor: isDragging ? 'grabbing' : 'grab',
+        transition: isDragging ? 'none' : 'bottom 0.3s ease, right 0.3s ease',
+        userSelect: 'none',
       }}
     >
       <button
