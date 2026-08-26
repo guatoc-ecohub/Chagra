@@ -77,6 +77,8 @@ function extractAssetPaths(componentName) {
     laminaDir = 'luciernagaLamina';
   } else if (componentName === 'ZariguyaLaminaViva') {
     laminaDir = 'zariguyaLamina';
+  } else if (componentName === 'ZariguyaGeminiLaminaViva') {
+    laminaDir = 'zariguyaGeminiLamina';
   } else {
     // Fallback: intenta derivar automáticamente
     // Quita 'LaminaViva' y convierte la primera letra a minúscula
