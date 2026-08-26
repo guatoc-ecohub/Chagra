@@ -147,7 +147,7 @@ const casquete = (region, forma) =>
     FANTASMA de la corona/orejas donde la cabeza desocupa su PROPIA silueta
     (ahí lo correcto es vacío: la silueta se movió). El clip de silueta va
     POR FUERA del blur para que el borde no sangre un halo. */
-const FILTRO_BANDA = { atlas: 'jtBorrosoAtlas', cruz: 'jtBorrosoCruz', colaMedia: 'jtBorrosoColaMedia', colaPunta: 'jtBorrosoColaPunta' };
+const FILTRO_BANDA = { atlas: 'jtBorrosoAtlas', cruz: 'jtBorrosoCruz', hombro: 'jtBorrosoHombro', colaMedia: 'jtBorrosoColaMedia', colaPunta: 'jtBorrosoColaPunta' };
 const casqueteCalco = (region, banda) =>
   `<g clip-path="url(#jt-r-${region})"><g clip-path="url(#jtSilueta)">` +
   `<g clip-path="url(#jt-b-${banda})"><use href="#jtCalco-${region}" filter="url(#${FILTRO_BANDA[banda]})"/></g></g></g>`;
@@ -166,6 +166,7 @@ const casqueteCalco = (region, banda) =>
 const BANDAS = `
   <clipPath id="jt-b-atlas"><path d="M153,45 C142,46 132,44 124,43 C118,42 114,41 112,40 L106,60 L106,140 L118,220 L150,266 L232,266 L232,140 L216,58 L186,37 Z"/></clipPath>
   <clipPath id="jt-b-cruz"><ellipse cx="247" cy="152" rx="42" ry="115" transform="rotate(6 247 152)"/></clipPath>
+  <clipPath id="jt-b-hombro"><ellipse cx="222" cy="248" rx="46" ry="36" transform="rotate(-6 222 248)"/></clipPath>
   <clipPath id="jt-b-colaMedia"><circle cx="553" cy="157" r="28"/></clipPath>
   <clipPath id="jt-b-colaPunta"><ellipse cx="676" cy="258" rx="40" ry="19" transform="rotate(20 676 258)"/></clipPath>`;
 
@@ -205,6 +206,7 @@ const DEFS = `<defs>
   <filter id="jhBlur"><feGaussianBlur stdDeviation="4"/></filter>
   <filter id="jtBorrosoAtlas" filterUnits="userSpaceOnUse" x="106" y="8" width="132" height="256"><feGaussianBlur stdDeviation="0.9"/></filter>
   <filter id="jtBorrosoCruz" filterUnits="userSpaceOnUse" x="197" y="29" width="108" height="246"><feGaussianBlur stdDeviation="1.8"/></filter>
+  <filter id="jtBorrosoHombro" filterUnits="userSpaceOnUse" x="174" y="208" width="98" height="80"><feGaussianBlur stdDeviation="1.4"/></filter>
   <filter id="jtBorrosoColaMedia" filterUnits="userSpaceOnUse" x="521" y="125" width="64" height="64"><feGaussianBlur stdDeviation="1.8"/></filter>
   <filter id="jtBorrosoColaPunta" filterUnits="userSpaceOnUse" x="630" y="233" width="94" height="52"><feGaussianBlur stdDeviation="1.8"/></filter>
   <filter id="jhBoilSuave" x="-6%" y="-6%" width="112%" height="112%">
@@ -336,7 +338,7 @@ ${DEFS}
         ${usoCalco('troncoCuerpo')}
         ${casquete('pataTrasCercaAlto', elipse(524, 254, 46, 36, P.musloCerca))}
         ${pata('TrasCerca')}
-        ${casquete('pataDelCercaAlto', elipse(222, 252, 36, 30, P.hombroCerca))}
+        ${casqueteCalco('pataDelCercaAlto', 'hombro')}
         ${pata('DelCerca')}
         ${casqueteCalco('cuello', 'cruz')}
         <g class="jh-hueso jh-cuello"${origin('cuello')}>
