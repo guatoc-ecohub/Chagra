@@ -40,6 +40,11 @@ import useAlertStore from './store/useAlertStore';
 // comentario abajo donde se removió el render).
 // import FieldFeedback from './components/FieldFeedback';
 const AgentFab = lazy(() => import('./components/AgentFab'));
+// P5 (auditoría compai 2026-08-23 + diseño 2026-08-25): la burbuja que pinta
+// useAngelitaStore.mensaje — hasta ahora solo vivía en el mockup del valle y
+// en AngelitaGuia. Sin esto, el FAB solo BRILLA (glow) y el mensaje adaptado
+// (clima/susurro/agro/celebra/luto) nunca se lee en prod 2D.
+const AngelitaAvisoGlobal = lazy(() => import('./visual/agente/AngelitaAvisoGlobal'));
 // EscuchaFab (el FAB de tap "barbudito de páramo") DESHABILITADO por decisión
 // del operador 2026-07-07: modo campo = WAKE-WORD SOLO ("hola chagra"). El
 // único FAB visible es el colibrí (AgentFab). El overlay SÍ se importa: lo abre
@@ -3922,6 +3927,10 @@ export default function App() {
           no conoce al agente — ruido en su primer flujo. */}
       <Suspense fallback={null}>
         {currentView !== 'loading' && currentView !== 'login' && currentView !== 'oauth-callback' && !currentView.startsWith('mockup_') && currentView !== 'voz' && currentView !== 'agente' && currentView !== 'dashboard' && currentView !== 'onboarding-perfil' && currentView !== 'onboarding-perfil-clasico' && <AgentFab onNavigate={navigate} pantalla={currentView} />}
+        {/* P5 — junto al AgentFab, mismas pantallas: sin el FAB visible el
+            aviso queda huérfano. Portado del mockup Valle3D (BurbujaAngelita),
+            cero canal paralelo — solo refleja useAngelitaStore. */}
+        {currentView !== 'loading' && currentView !== 'login' && currentView !== 'oauth-callback' && !currentView.startsWith('mockup_') && currentView !== 'voz' && currentView !== 'agente' && currentView !== 'dashboard' && currentView !== 'onboarding-perfil' && currentView !== 'onboarding-perfil-clasico' && <AngelitaAvisoGlobal />}
       </Suspense>
       {/* Escucha manos libres (operador 2026-07-05, caso guantes/manos
           embarradas). Abre el widget "Chagra está escuchando" que navega o

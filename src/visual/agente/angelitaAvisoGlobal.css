@@ -1,0 +1,55 @@
+/* ── <AngelitaAvisoGlobal> — la burbuja de Angelita EN PRODUCCIÓN 2D, junto al
+      AgentFab. Autocontenido (mismo criterio que angelita-guia.css): cualquier
+      pantalla que monte el FAB ya sabe verse. Ancla FIJA arriba del FAB (nunca
+      tapa el botón, nunca invade el contenido) — mismo cálculo de
+      bottom/safe-area que AgentFab.jsx, + su alto (84px) + un respiro (14px). */
+
+.angelita-aviso-global {
+  position: fixed;
+  right: 14px;
+  bottom: calc(max(90px, calc(env(safe-area-inset-bottom) + 90px)) + 98px);
+  z-index: 41; /* justo encima del FAB (40), debajo de AngelitaGuia (60) y el toast (100) */
+  display: flex;
+  align-items: flex-start;
+  justify-content: flex-end; /* pegado al borde derecho — donde vuela el FAB */
+  gap: 6px;
+  max-width: min(94vw, 400px);
+  pointer-events: none; /* solo la burbuja y el cierre adentro capturan toque */
+}
+.angelita-aviso-global > * {
+  pointer-events: auto;
+}
+
+.angelita-aviso-global__burbuja {
+  max-width: 100%;
+}
+
+.angelita-aviso-global__cerrar {
+  flex: 0 0 auto;
+  width: 28px;
+  height: 28px;
+  margin-top: 2px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  border: 1.5px solid rgba(255, 255, 255, 0.3);
+  background: rgba(10, 10, 10, 0.55);
+  color: #fdf9ea;
+  font: 700 1rem/1 var(--df-sans, system-ui, sans-serif);
+  cursor: pointer;
+  backdrop-filter: blur(6px);
+}
+.angelita-aviso-global__cerrar:focus-visible {
+  outline: 3px solid #ffb700;
+  outline-offset: 2px;
+}
+
+@media (max-width: 480px) {
+  /* En móvil el FAB queda más cerca del borde: la burbuja se corre a la
+     izquierda de su cierre en vez de crecer hacia afuera de la pantalla. */
+  .angelita-aviso-global {
+    left: 10px;
+    right: 10px;
+    max-width: none;
+  }
+}
