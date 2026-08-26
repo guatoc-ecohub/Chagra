@@ -17,6 +17,7 @@ import useThemeBackgroundStore, {
   DEFAULT_BACKGROUND_SRC,
   getBackgroundById,
   getBackgroundSrc,
+  esGradiente,
 } from '../useThemeBackgroundStore';
 
 describe('useThemeBackgroundStore', () => {
@@ -92,5 +93,50 @@ describe('useThemeBackgroundStore', () => {
     expect(getBackgroundSrc('valle-calido')).toContain('gradient(');
     expect(getBackgroundSrc('paramo-frio')).toContain('gradient(');
     expect(getBackgroundSrc('noche-andina')).toContain('gradient(');
+  });
+
+  describe('esGradiente', () => {
+    it('detecta radial-gradient correctamente', () => {
+      expect(esGradiente('radial-gradient(120% 95% at 50% 12%, #3a4a24 0%, #263318 45%, #141d0d 100%)')).toBe(true);
+    });
+
+    it('detecta linear-gradient correctamente', () => {
+      expect(esGradiente('linear-gradient(165deg, #1a2530 0%, #26343c 45%, #33454a 100%)')).toBe(true);
+    });
+
+    it('detecta conic-gradient correctamente', () => {
+      expect(esGradiente('conic-gradient(from 0deg, red, yellow, green)')).toBe(true);
+    });
+
+    it('detecta variantes con prefijo vendor (-webkit-gradient, etc.)', () => {
+      expect(esGradiente('-webkit-linear-gradient(top, blue, red)')).toBe(true);
+      expect(esGradiente('-moz-radial-gradient(circle, white, black)')).toBe(true);
+    });
+
+    it('rechaza rutas de imagen normales', () => {
+      expect(esGradiente('/images/foto.jpg')).toBe(false);
+      expect(esGradiente('https://example.com/bg.png')).toBe(false);
+      expect(esGradiente('/biodiversidad-bg.jpg')).toBe(false);
+    });
+
+    it('rechaza strings vacíos o undefined', () => {
+      expect(esGradiente('')).toBe(false);
+      expect(esGradiente(null)).toBe(false);
+      expect(esGradiente(undefined)).toBe(false);
+      expect(esGradiente(123)).toBe(false);
+      expect(esGradiente({})).toBe(false);
+    });
+
+    it('es case-insensitive para gradient', () => {
+      expect(esGradiente('RADIAL-GRADIENT(...)')).toBe(true);
+      expect(esGradiente('Linear-Gradient(...)')).toBe(true);
+      expect(esGradiente('linear-gradient(...)')).toBe(true);
+    });
+
+    it('coincide con los gradientes reales del catálogo', () => {
+      expect(esGradiente(getBackgroundSrc('valle-calido'))).toBe(true);
+      expect(esGradiente(getBackgroundSrc('paramo-frio'))).toBe(true);
+      expect(esGradiente(getBackgroundSrc('noche-andina'))).toBe(true);
+    });
   });
 });

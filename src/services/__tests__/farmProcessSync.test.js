@@ -11,8 +11,35 @@ import {
   EVENT_TO_FARMOS_LOG,
   buildLogName,
   buildFarmOSLogPayload,
-  enqueueFarmProcessEvent,
 } from '../farmProcessSync';
+
+// Mock del syncManager para los tests que necesitan enqueueFarmProcessEvent
+const mockSyncManager = {
+  saveTransaction: vi.fn(),
+};
+
+// Mocks de farmProcessCache y dbCore
+const mockFarmProcessCache = {
+  getFarmProcess: vi.fn(),
+};
+
+const mockDbCore = {
+  openDB: vi.fn(),
+  STORES: { FARM_PROCESS_EVENTS: 'farm_process_events', FARM_PROCESSES: 'farm_processes' },
+};
+
+vi.mock('../syncManager', () => ({
+  syncManager: mockSyncManager,
+}));
+
+vi.mock('../../db/farmProcessCache', () => ({
+  getFarmProcess: (...args) => mockFarmProcessCache.getFarmProcess(...args),
+}));
+
+vi.mock('../db/dbCore', () => ({
+  openDB: (...args) => mockDbCore.openDB(...args),
+  STORES: mockDbCore.STORES,
+}));
 
 const makeProcess = (overrides = {}) => ({
   process_id: 'proc-001',
@@ -195,28 +222,24 @@ describe('enqueueFarmProcessEvent — cola via syncManager', () => {
   });
 
   it('NO aplica para photo_attached', async () => {
+    // Importar dinámicamente para usar el mock
+    const { enqueueFarmProcessEvent } = await import('../farmProcessSync');
     const evt = makeEvent('proc-001', 'photo_attached');
     const result = await enqueueFarmProcessEvent(evt);
     expect(result).toBeNull();
   });
 
   it('sowing_confirmed encola via syncManager.saveTransaction', async () => {
-    const mockSaveTx = vi.fn().mockResolvedValue({ id: 42, timestamp: Date.now() });
+    mockSyncManager.saveTransaction.mockResolvedValue({ id: 42, timestamp: Date.now() });
 
-    vi.doMock('../syncManager', () => ({
-      default: {
-        saveTransaction: mockSaveTx,
-      },
-    }));
-
-    const { enqueueFarmProcessEvent: enq } = await import('../farmProcessSync');
+    const { enqueueFarmProcessEvent } = await import('../farmProcessSync');
     const evt = makeEvent('proc-001', 'sowing_confirmed');
     const proc = makeProcess();
 
-    const result = await enq(evt, proc, 'asset-plant-456');
+    const result = await enqueueFarmProcessEvent(evt, proc, 'asset-plant-456');
 
-    expect(mockSaveTx).toHaveBeenCalledTimes(1);
-    const call = mockSaveTx.mock.calls[0][0];
+    expect(mockSyncManager.saveTransaction).toHaveBeenCalledTimes(1);
+    const call = mockSyncManager.saveTransaction.mock.calls[0][0];
     expect(call.type).toBe('seeding');
     expect(call.endpoint).toBe('/api/log/seeding');
     expect(call.payload.data.type).toBe('log--seeding');
@@ -225,85 +248,63 @@ describe('enqueueFarmProcessEvent — cola via syncManager', () => {
   });
 
   it('fallo del syncManager no lanza (degrada limpio)', async () => {
-    vi.doMock('../syncManager', () => ({
-      default: {
-        saveTransaction: vi.fn().mockRejectedValue(new Error('IDB caída')),
-      },
-    }));
+    mockSyncManager.saveTransaction.mockRejectedValue(new Error('IDB caída'));
 
-    const { enqueueFarmProcessEvent: enq } = await import('../farmProcessSync');
+    const { enqueueFarmProcessEvent } = await import('../farmProcessSync');
     const evt = makeEvent('proc-001', 'harvest_confirmed');
-    const result = await enq(evt, makeProcess());
+    const result = await enqueueFarmProcessEvent(evt, makeProcess());
 
     // No lanza, retorna null
     expect(result).toBeNull();
   });
 
   it('payload incluye idempotency_key del evento original', async () => {
-    const mockSaveTx = vi.fn().mockResolvedValue({ id: 99 });
+    mockSyncManager.saveTransaction.mockResolvedValue({ id: 99 });
 
-    vi.doMock('../syncManager', () => ({
-      default: { saveTransaction: mockSaveTx },
-    }));
-
-    const { enqueueFarmProcessEvent: enq } = await import('../farmProcessSync');
+    const { enqueueFarmProcessEvent } = await import('../farmProcessSync');
     const evt = makeEvent('proc-001', 'observation', {
       idempotency_key: 'idem-abc-123',
     });
 
-    await enq(evt, makeProcess());
+    await enqueueFarmProcessEvent(evt, makeProcess());
 
-    const payload = mockSaveTx.mock.calls[0][0].payload;
+    const payload = mockSyncManager.saveTransaction.mock.calls[0][0].payload;
     expect(payload.data.attributes.notes.value).toContain('idem-abc-123');
   });
 
   it('busca el proceso en IDB si no se pasa process (recordFarmEvent pattern)', async () => {
-    const mockSaveTx = vi.fn().mockResolvedValue({ id: 77 });
-    const mockGetProcess = vi.fn().mockResolvedValue(makeProcess({
+    mockFarmProcessCache.getFarmProcess.mockResolvedValue(makeProcess({
       subject_label: 'Papa',
       current_stage: 'vegetative',
     }));
 
-    vi.doMock('../../db/farmProcessCache', () => ({
-      getFarmProcess: mockGetProcess,
-    }));
+    mockSyncManager.saveTransaction.mockResolvedValue({ id: 77 });
 
-    vi.doMock('../syncManager', () => ({
-      default: { saveTransaction: mockSaveTx },
-    }));
-
-    const { enqueueFarmProcessEvent: enq } = await import('../farmProcessSync');
+    const { enqueueFarmProcessEvent } = await import('../farmProcessSync');
     const evt = makeEvent('proc-002', 'observation');
 
     // Sin proceso → lo busca en IDB
-    await enq(evt, null);
+    await enqueueFarmProcessEvent(evt, null);
 
-    expect(mockGetProcess).toHaveBeenCalledWith('proc-002');
-    const payload = mockSaveTx.mock.calls[0][0].payload;
+    expect(mockFarmProcessCache.getFarmProcess).toHaveBeenCalledWith('proc-002');
+    const payload = mockSyncManager.saveTransaction.mock.calls[0][0].payload;
     expect(payload.data.attributes.notes.value).toContain('Papa');
   });
 
   it('si la IDB falla al buscar proceso, igual encola con datos del evento', async () => {
-    const mockSaveTx = vi.fn().mockResolvedValue({ id: 78 });
+    mockSyncManager.saveTransaction.mockResolvedValue({ id: 78 });
+    mockFarmProcessCache.getFarmProcess.mockRejectedValue(new Error('IDB error'));
 
-    vi.doMock('../../db/farmProcessCache', () => ({
-      getFarmProcess: vi.fn().mockRejectedValue(new Error('IDB error')),
-    }));
-
-    vi.doMock('../syncManager', () => ({
-      default: { saveTransaction: mockSaveTx },
-    }));
-
-    const { enqueueFarmProcessEvent: enq } = await import('../farmProcessSync');
+    const { enqueueFarmProcessEvent } = await import('../farmProcessSync');
     const evt = makeEvent('proc-003', 'stage_transition', {
       payload: { from_stage: 'vegetative', to_stage: 'flowering' },
     });
 
-    await enq(evt, null);
+    await enqueueFarmProcessEvent(evt, null);
 
     // Se encoló igual (con lo que trae el evento)
-    expect(mockSaveTx).toHaveBeenCalledTimes(1);
-    const payload = mockSaveTx.mock.calls[0][0].payload;
+    expect(mockSyncManager.saveTransaction).toHaveBeenCalledTimes(1);
+    const payload = mockSyncManager.saveTransaction.mock.calls[0][0].payload;
     expect(payload.data.attributes.notes.value).toContain('vegetative → flowering');
   });
 });
@@ -315,33 +316,26 @@ describe('WIRE — farmEventService dispara farmProcessSync', () => {
 
   it('recordFarmEvent dispara enqueueFarmProcessEvent al completar la tx (fire-and-forget)', async () => {
     // Mock IDB + syncManager
-    const mockSyncSave = vi.fn().mockResolvedValue({ id: 99 });
+    mockSyncManager.saveTransaction.mockResolvedValue({ id: 99 });
 
-    vi.doMock('../db/dbCore', () => ({
-      openDB: vi.fn().mockResolvedValue({
-        transaction: () => ({
-          objectStore: () => ({
-            index: () => ({
-              get: () => ({ result: null, onsuccess: null, onerror: null }),
-            }),
-            get: () => ({
-              result: makeProcessForDB(),
-              onsuccess: null,
-              onerror: null,
-            }),
-            add: vi.fn(),
-            put: vi.fn(),
+    mockDbCore.openDB.mockResolvedValue({
+      transaction: () => ({
+        objectStore: () => ({
+          index: () => ({
+            get: () => ({ result: null, onsuccess: null, onerror: null }),
           }),
-          oncomplete: null,
-          onerror: null,
+          get: () => ({
+            result: makeProcessForDB(),
+            onsuccess: null,
+            onerror: null,
+          }),
+          add: vi.fn(),
+          put: vi.fn(),
         }),
+        oncomplete: null,
+        onerror: null,
       }),
-      STORES: { FARM_PROCESS_EVENTS: 'farm_process_events', FARM_PROCESSES: 'farm_processes' },
-    }));
-
-    vi.doMock('../syncManager', () => ({
-      default: { saveTransaction: mockSyncSave },
-    }));
+    });
 
     // El test verifica que al llamar recordFarmEvent, el sync se dispara
     // como fire-and-forget. No probamos la IDB real — verificamos
@@ -354,8 +348,8 @@ describe('WIRE — farmEventService dispara farmProcessSync', () => {
 
     await enqueueFarmProcessEvent(evt, makeProcess({ subject_label: 'Café' }));
 
-    expect(mockSyncSave).toHaveBeenCalledTimes(1);
-    const call = mockSyncSave.mock.calls[0][0];
+    expect(mockSyncManager.saveTransaction).toHaveBeenCalledTimes(1);
+    const call = mockSyncManager.saveTransaction.mock.calls[0][0];
     expect(call.type).toBe('observation');
     expect(call.endpoint).toBe('/api/log/observation');
   });

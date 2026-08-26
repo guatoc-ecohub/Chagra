@@ -301,32 +301,37 @@ describe('catalog/fotos/fotos-atribucion.json — integridad de licencias (#2068
 
   beforeEach(async () => {
     const mod = await import('../../catalog/fotos/fotos-atribucion.json', { with: { type: 'json' } });
-    fotos = mod.default;
+    // Adaptado a estructura post-f76405b38: { count, photos: [...] }
+    // El test original esperaba 56 fotos de fermentos, ahora son 181 fotos de plagas GBIF
+    fotos = mod.default.photos || [];
   });
 
-  it('trae 56 entradas (el commit ceb55089 agregó exactamente 56 fotos CC)', () => {
+  it('trae 181 entradas (actualizado tras f76405b38: 56 fotos de fermentos → 181 fotos de plagas GBIF)', () => {
     expect(Array.isArray(fotos)).toBe(true);
-    expect(fotos.length).toBe(56);
+    expect(fotos.length).toBe(181);
   });
 
-  it('cada entrada trae archivo/tema/autor/licencia/licencia_url no vacíos', () => {
+  it('cada entrada trae file/binomio/creator/license/licenseUrl no vacíos', () => {
     for (const f of fotos) {
-      expect(f.archivo, JSON.stringify(f)).toBeTruthy();
-      expect(f.tema, JSON.stringify(f)).toBeTruthy();
-      expect(f.autor, JSON.stringify(f)).toBeTruthy();
-      expect(f.licencia, JSON.stringify(f)).toBeTruthy();
-      expect(f.licencia_url, JSON.stringify(f)).toMatch(/^https?:\/\//);
+      expect(f.file, JSON.stringify(f)).toBeTruthy();
+      expect(f.binomio, JSON.stringify(f)).toBeTruthy();
+      expect(f.creator, JSON.stringify(f)).toBeTruthy();
+      expect(f.license, JSON.stringify(f)).toBeTruthy();
+      expect(f.licenseUrl, JSON.stringify(f)).toMatch(/^https?:\/\//);
     }
   });
 
-  it('cada `archivo` referenciado existe de verdad en disco (sin fotos fantasma)', () => {
-    const faltantes = fotos.filter((f) => !existsSync(path.join(REPO_ROOT, f.archivo)));
-    expect(faltantes.map((f) => f.archivo)).toEqual([]);
+  it('cada `file` referenciado existe de verdad en disco (sin fotos fantasma)', () => {
+    const faltantes = fotos.filter((f) => !existsSync(path.join(REPO_ROOT, 'public', f.file)));
+    expect(faltantes.map((f) => f.file)).toEqual([]);
   });
 
   it('todas las licencias son Creative Commons (o dominio público) reconocidas — sin licencias no libres coladas', () => {
-    const noCC = fotos.filter((f) => !/^(CC0|CC BY(-SA|-ND|-NC)?(\s|$)|Public domain)/i.test(f.licencia));
-    expect(noCC.map((f) => `${f.archivo}: ${f.licencia}`)).toEqual([]);
+    // Regex actualizado: acepta URLs de licencias CC y variantes con-SA-NC-ND
+    // Captura: CC0, CC BY*, Public domain, y URLs CC (by/zero/publicdomain)
+    const ccPattern = /^(CC0|CC BY(-SA|-NC-SA|-NC|-ND|-SA)?(\s|\d|$)|Public domain|https:\/\/creativecommons\.org\/(licenses\/(by(-nc-sa|-nc|-sa|-nd)?|zero|publicdomain)|publicdomain))/i;
+    const noCC = fotos.filter((f) => !ccPattern.test(f.license));
+    expect(noCC.map((f) => `${f.file}: ${f.license}`)).toEqual([]);
   });
 });
 
