@@ -1,7 +1,8 @@
 #!/usr/bin/env node
+/* global process, window, Response, URL, indexedDB, console, document */
 /*
  * shot3d — captura una ruta 3D del dev server con chromium del sistema + swiftshader.
- * Uso: node shot3d.mjs <ruta> <salida.png> [--wait ms] [--click selector] [--w px] [--h px]
+ * Uso: node shot3d.mjs <ruta> <salida.png> [--headed] [--wait ms] [--click selector] [--w px] [--h px]
  */
 import { chromium } from 'playwright';
 import { execSync } from 'node:child_process';
@@ -18,10 +19,15 @@ const click = getFlag('click', null);
 const W = Number(getFlag('w', 1280));
 const H = Number(getFlag('h', 900));
 const base = getFlag('base', 'http://127.0.0.1:5173');
+const headed = args.includes('--headed');
+const authRetry = args.includes('--auth');
+const offline = args.includes('--offline');
+const mockApi = args.includes('--mock-api');
 
 const chromiumPath = execSync('which chromium', { encoding: 'utf8' }).trim();
 
 const browser = await chromium.launch({
+  headless: !headed,
   executablePath: chromiumPath,
   args: [
     '--no-sandbox',
@@ -39,7 +45,28 @@ const ctx = await browser.newContext({
   deviceScaleFactor: Number(getFlag('dsf', 1)),
   locale: 'es-CO',
 });
+if (offline) await ctx.setOffline(true);
 const page = await ctx.newPage();
+if (mockApi) {
+  await page.addInitScript(() => {
+    const realFetch = window.fetch.bind(window);
+    window.fetch = (input, init) => {
+      const url = typeof input === 'string' ? input : input?.url || '';
+      if (url.includes('/api/') || url.includes('/oauth/')) {
+        return Promise.resolve(new Response('{}', { status: 200, headers: { 'Content-Type': 'application/json' } }));
+      }
+      return realFetch(input, init);
+    };
+  });
+  await page.route('**/*', async (route) => {
+    const url = new URL(route.request().url());
+    if (['xhr', 'fetch'].includes(route.request().resourceType()) || url.pathname.startsWith('/api/') || url.pathname.startsWith('/oauth/')) {
+      await route.fulfill({ status: 200, contentType: 'application/json', body: '{}' });
+      return;
+    }
+    await route.continue();
+  });
+}
 const errores = [];
 page.on('pageerror', (e) => errores.push(`[pageerror] ${e.message}`));
 page.on('console', (m) => {
@@ -69,14 +96,53 @@ await page.addInitScript(() => {
       };
       req.onerror = () => res(undefined);
     });
-  // fire-and-forget: corre antes del primer script de la app
-  sembrar('localforage', 'keyvaluepairs');
-  sembrar('Chagra', 'syncQueue');
+  // Playwright espera esta promesa antes del primer script de la app. Sin
+  // esperar las escrituras, el guard de auth podía leer null y mandar la
+  // captura a login aunque el token de diagnóstico ya estuviera en vuelo.
+  return Promise.all([
+    sembrar('localforage', 'keyvaluepairs'),
+    sembrar('Chagra', 'syncQueue'),
+  ]);
 });
 
 const shell = getFlag('shell', '/index-prod.html');
 await page.goto(`${base}${shell}#${ruta}`, { waitUntil: 'domcontentloaded', timeout: 60000 });
 await page.waitForTimeout(wait);
+
+// Fallback para apps que arrancan su guard de sesión antes de que un init
+// script termine la transacción IndexedDB. Es opt-in para no alterar capturas
+// públicas: escribe únicamente un token sintético en el contexto temporal.
+if (authRetry) {
+  await page.evaluate(() => new Promise((resolve) => {
+    const request = indexedDB.open('Chagra');
+    request.onsuccess = () => {
+      const db = request.result;
+      const storeName = db.objectStoreNames.contains('syncQueue') ? 'syncQueue' : 'keyvaluepairs';
+      const tx = db.transaction(storeName, 'readwrite');
+      const store = tx.objectStore(storeName);
+      store.put('shot3d-token-diagnostico', 'farmos_access_token');
+      store.put(Date.now() + 86400000, 'farmos_token_expiry');
+      tx.oncomplete = () => { db.close(); resolve(); };
+      tx.onerror = () => { db.close(); resolve(); };
+    };
+    request.onerror = () => resolve();
+  }));
+  const authCheck = await page.evaluate(() => new Promise((resolve) => {
+    const request = indexedDB.open('Chagra');
+    request.onsuccess = () => {
+      const db = request.result;
+      const storeName = db.objectStoreNames.contains('syncQueue') ? 'syncQueue' : 'keyvaluepairs';
+      const tx = db.transaction(storeName);
+      const requestToken = tx.objectStore(storeName).get('farmos_access_token');
+      tx.oncomplete = () => { db.close(); resolve(requestToken.result || null); };
+      tx.onerror = () => { db.close(); resolve(null); };
+    };
+    request.onerror = () => resolve(null);
+  }));
+  console.log(`[shot3d] auth retry token=${authCheck ? 'presente' : 'ausente'}`);
+  await page.goto(`${base}${shell}#${ruta}`, { waitUntil: 'domcontentloaded', timeout: 60000 });
+  await page.waitForTimeout(wait);
+}
 
 if (click) {
   try {

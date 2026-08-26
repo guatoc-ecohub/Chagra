@@ -628,6 +628,7 @@ const prefetchHomeChunks = () => {
 };
 const TopBar = lazy(() => prefetchTopBar());
 const DashboardLive = lazy(() => prefetchDashboardLive());
+const CampesinoHome = lazy(() => import('./components/dashboard/CampesinoHome'));
 const AprenderConAgente = lazy(() => import('./components/Aprende/AprenderConAgente'));
 const CursoChagra = lazy(() => import('./components/curso/CursoChagra'));
 const DirectorioEspeciesScreen = lazy(() => import('./components/DirectorioEspecies/DirectorioEspeciesScreen'));
@@ -666,6 +667,7 @@ const EspirituProScreen = lazy(() => import('./components/EspirituProScreen'));
 const GestionUsuariosScreen = lazy(() => import('./components/GestionUsuariosScreen'));
 import HomeRegionalGreeting from './components/HomeRegionalGreeting';
 import { fincaVivaHomePerfilActivo } from './config/fincaVivaHomeFlag';
+import { campesinoHomeActivo } from './config/campesinoHomeFlag';
 import { esExtensionistaActual } from './config/extensionistaAccess';
 import { can as roleCan } from './services/roleService';
 
@@ -1152,11 +1154,16 @@ function DashboardLiveView({ onNavigate, onLogout }) {
   // flag ON lo retiramos: una sola barra, un solo home cohesivo. Con la flag OFF
   // (default, prod) todo queda intacto.
   const fincaViva = fincaVivaHomePerfilActivo();
+  const campesinoHome = campesinoHomeActivo();
   useEffect(() => {
     hydrate().then(() => {
       if (navigator.onLine) syncFromServer(fetchFromFarmOS);
     });
   }, [hydrate, syncFromServer]);
+
+  if (campesinoHome) {
+    return <CampesinoHome onNavigate={onNavigate} onLogout={onLogout} />;
+  }
 
   if (fincaViva) {
     // F2: el hero (FincaVivaHero, dentro de DashboardLive) gobierna el fondo, la
@@ -1235,6 +1242,7 @@ export default function App() {
   // Solo activos post-login (no en loading ni login para no atrapar shift+?
   // accidental al escribir password).
   const [currentView, setCurrentView] = useState('loading');
+  const campesinoHome = campesinoHomeActivo();
   // Landing 3D público: la raíz sin sesión monta el valle 3D como "tema" de
   // entrada. `sinSesion` recuerda que no hay auth para que el botón volver del
   // valle mande a login (y no al dashboard vacío).
@@ -4366,7 +4374,7 @@ export default function App() {
       {/* Transición Angelita home→conversación (~2s). Encima de todo (z alto);
           la conversación monta detrás y queda limpia al terminar. */}
       <ColibriTransition active={colibriTransition} onDone={() => setColibriTransition(false)} />
-      <NetworkStatusBar />
+      {!(currentView === 'dashboard' && campesinoHome) && <NetworkStatusBar />}
       {/* Banners de instalación PWA: NO en las vistas pre-auth (login /
           loading / oauth-callback). En el login son un overlay `fixed`
           z-50 que se encimaba sobre el formulario —en desktop tapaba e
@@ -4390,7 +4398,7 @@ export default function App() {
       {currentView !== 'loading' && currentView !== 'login' && currentView !== 'oauth-callback' && !currentView.startsWith('mockup_') && <DataLossBanner />}
       {/* #315 — banner crítico global: surfacea alertas graves (helada, sensor
           crítico) sin abrir la campana. Imposible de ignorar. */}
-      {currentView !== 'loading' && currentView !== 'login' && currentView !== 'oauth-callback' && !currentView.startsWith('mockup_') && <CriticalAlertBanner onNavigate={navigate} />}
+      {!(currentView === 'dashboard' && campesinoHome) && currentView !== 'loading' && currentView !== 'login' && currentView !== 'oauth-callback' && !currentView.startsWith('mockup_') && <CriticalAlertBanner onNavigate={navigate} />}
       {/* Entrada de pantalla: el swap de vista era SECO (desmonta/monta sin
           transición). El wrapper con key remonta en cada cambio de vista y
           dispara un fade corto (motion.css .anim-screen-enter — solo opacidad,
@@ -4416,7 +4424,7 @@ export default function App() {
           todas las vistas que ya tienen shell, también durante interacción y
           offline. La entrada mística es la única que puede desvanecerlo. */}
       <Suspense fallback={null}>
-        {currentView !== 'loading' && <AgentFab onNavigate={navigate} pantalla={currentView} />}
+        {currentView !== 'loading' && !(currentView === 'dashboard' && campesinoHome) && <AgentFab onNavigate={navigate} pantalla={currentView} />}
       </Suspense>
       {/* Escucha manos libres (operador 2026-07-05, caso guantes/manos
           embarradas). Abre el widget "Chagra está escuchando" que navega o
@@ -4437,7 +4445,7 @@ export default function App() {
           segunda abejita idéntica a la del AgentFab en cada ruta 2D. Un solo
           compai por pantalla = el AgentFab canónico; su hint por ruta se plegó
           dentro del FAB (enseñanza en idle, política R3). */}
-      {currentView === 'dashboard' && <PendingTasksWidget onEdit={(task) => navigate('edit_task', { task })} />}
+      {currentView === 'dashboard' && !campesinoHome && <PendingTasksWidget onEdit={(task) => navigate('edit_task', { task })} />}
       {currentView !== 'loading' && currentView !== 'login' && currentView !== 'oauth-callback' && !currentView.startsWith('mockup_') && <SyncProgressIndicator />}
       {/* Badge persistente "N pendientes de sincronizar" (rescate #2668).
           Mismo guard de vista que SyncProgressIndicator: no en pre-auth. */}

@@ -1,0 +1,90 @@
+@font-face { font-family: 'Campesino Display'; src: url('/fonts/baloo2-latin.woff2') format('woff2'); font-weight: 400 800; font-display: swap; }
+@font-face { font-family: 'Campesino Body'; src: url('/fonts/nunito-latin.woff2') format('woff2'); font-weight: 400 800; font-display: swap; }
+
+.campesino-home {
+  --ch-bg: #f4f1e7;
+  --ch-ink: #243226;
+  --ch-muted: #586657;
+  --ch-green: #27623a;
+  --ch-green-deep: #17472d;
+  --ch-lime: #d7ed9b;
+  --ch-orange: #b94d25;
+  min-height: 100dvh;
+  background: var(--ch-bg);
+  color: var(--ch-ink);
+  font-family: 'Campesino Body', 'Nunito', sans-serif;
+  -webkit-tap-highlight-color: transparent;
+}
+.campesino-home__topbar, .campesino-home__content { width: min(100% - 32px, 1120px); margin-inline: auto; }
+.campesino-home__topbar { min-height: 76px; display: flex; align-items: center; justify-content: space-between; gap: 18px; }
+.campesino-home__brand { display: flex; align-items: center; gap: 10px; color: var(--ch-green-deep); letter-spacing: .13em; font-size: .9rem; }
+.campesino-home__brand span { display: grid; place-items: center; width: 32px; height: 32px; border-radius: 50%; background: var(--ch-orange); color: #fff8e9; font-size: 1.1rem; }
+.campesino-home__top-actions { display: flex; align-items: center; gap: 8px; }
+.campesino-signal { display: inline-flex; align-items: center; gap: 6px; min-height: 44px; padding: 0 10px; border-radius: 999px; font-size: .78rem; font-weight: 800; }
+.campesino-signal.is-online { color: var(--ch-green); background: #e0edcf; }
+.campesino-signal.is-offline { color: #7e421c; background: #fae4cb; }
+.campesino-icon-button, .campesino-profile { display: grid; place-items: center; min-width: 44px; min-height: 44px; border: 1px solid #c9d0bc; border-radius: 50%; background: #fffdf6; color: var(--ch-green-deep); cursor: pointer; }
+.campesino-profile { font-size: 1.15rem; }
+.campesino-home__content { padding-bottom: 64px; }
+.campesino-home__context { display: flex; align-items: end; justify-content: space-between; gap: 24px; padding: 26px 0 12px; }
+.campesino-kicker { margin: 0 0 6px; color: var(--ch-green); font-size: .75rem; font-weight: 900; letter-spacing: .13em; }
+.campesino-home h1, .campesino-home h2 { font-family: 'Campesino Display', Georgia, serif; letter-spacing: -.015em; }
+.campesino-home h1 { max-width: 620px; margin: 0; font-size: clamp(2.3rem, 6vw, 4.2rem); line-height: .98; }
+.campesino-location { display: flex; align-items: center; gap: 7px; margin: 12px 0 0; color: var(--ch-muted); font-size: 1rem; font-weight: 700; }
+.campesino-date { color: var(--ch-muted); font-size: .84rem; font-weight: 800; text-transform: capitalize; }
+.campesino-compai { margin: 12px 0 14px auto; width: min(100%, 680px); padding: 12px 14px; border-radius: 20px; background: var(--ch-green-deep); color: #f7f6e9; box-shadow: 0 12px 28px rgb(24 61 39 / .18); }
+.campesino-compai__message .angelita-burbuja { max-width: 100%; min-width: 0; border: 0; padding: 0; background: transparent; box-shadow: none; color: inherit; font-size: 1.08rem; }
+.campesino-compai__message .angelita-burbuja__icono { background: rgb(215 237 155 / .18); }
+.campesino-compai__actions { display: flex; align-items: center; gap: 8px; margin-top: 10px; }
+.campesino-compai__actions button { min-height: 44px; display: inline-flex; align-items: center; gap: 6px; padding: 0 12px; border: 1px solid rgb(255 255 255 / .25); border-radius: 999px; background: transparent; color: #fff; font: inherit; font-size: .82rem; font-weight: 800; cursor: pointer; }
+.campesino-compai__actions button:last-child { margin-left: auto; width: 44px; padding: 0; justify-content: center; }
+.campesino-home__finca-visual { position: relative; height: 270px; overflow: hidden; border-radius: 26px; margin: 8px 0 18px; background: #173d32; box-shadow: 0 16px 34px rgb(30 61 38 / .18); }
+.campesino-home__finca-visual .fvh { min-height: 540px; height: 540px; border-radius: 26px; }
+.campesino-home__finca-visual .fvh-topbar, .campesino-home__finca-visual .fvh-qa, .campesino-home__finca-visual .fvh-aside, .campesino-home__finca-visual .fvh-portales-tit, .campesino-home__finca-visual .fvh-portales, .campesino-home__finca-visual .fvh-fill, .campesino-home__finca-visual .fvh-umbral, .campesino-home__finca-visual .fvh-resto { display: none !important; }
+.campesino-home__finca-visual .fvh-main { display: block; height: 540px; }
+.campesino-home__finca-visual .fvh-escena-wrap { height: 540px; }
+.campesino-home__finca-visual .fvh-colibri-globo { display: none; }
+.campesino-agent { position: relative; margin: 0 0 18px; padding: 18px; border: 1px solid #c7d2b7; border-radius: 24px; background: #fffdf6; box-shadow: 0 10px 24px rgb(49 76 42 / .08); }
+.campesino-agent__file { position: absolute; width: 1px; height: 1px; opacity: 0; pointer-events: none; }
+.campesino-agent__voice-row { display: flex; align-items: center; gap: 14px; }
+.campesino-agent__mic { flex: 0 0 auto; width: 76px; height: 76px; display: grid; place-items: center; border: 0; border-radius: 22px; background: var(--ch-orange); color: #fff; cursor: pointer; box-shadow: 0 8px 0 #8e381d; }
+.campesino-agent__mic:active { transform: translateY(3px); box-shadow: 0 5px 0 #8e381d; }
+.campesino-agent__mic.is-recording { background: var(--ch-green-deep); box-shadow: 0 8px 0 #0d2d1d; }
+.campesino-agent__voice-copy { min-width: 0; flex: 1; }
+.campesino-agent__voice-copy h2 { margin: 0; font-size: clamp(1.6rem, 4vw, 2.35rem); line-height: 1; }
+.campesino-agent__voice-copy p:last-child { margin: 7px 0 0; color: var(--ch-muted); font-size: .92rem; line-height: 1.3; }
+.campesino-agent__photo { min-width: 64px; min-height: 64px; display: grid; place-items: center; gap: 2px; border: 1px solid #c5cfb9; border-radius: 18px; background: #f0f4e9; color: var(--ch-green-deep); font: inherit; font-size: .8rem; font-weight: 900; cursor: pointer; }
+.campesino-agent__attachment { display: flex; justify-content: space-between; align-items: center; margin-top: 12px; padding: 10px 12px; border-radius: 12px; background: #e9f2d7; color: var(--ch-green-deep); font-size: .85rem; font-weight: 800; }
+.campesino-agent__attachment button { border: 0; background: transparent; color: inherit; cursor: pointer; }
+.campesino-agent__error { margin: 10px 0 0; color: #9d2e1e; font-size: .82rem; font-weight: 800; }
+.campesino-agent__tools { margin-top: 16px; }
+.campesino-agent__hand { display: inline-flex; align-items: center; gap: 8px; min-height: 44px; padding: 0 10px; border: 0; background: transparent; color: var(--ch-green); font: inherit; font-size: .86rem; font-weight: 900; cursor: pointer; }
+.campesino-agent__hand .baf-fab { width: 34px; height: 34px; }
+.campesino-agent__chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+.campesino-agent__chips button { min-height: 44px; display: inline-flex; align-items: center; gap: 6px; padding: 0 12px; border: 1px solid #c9d5bb; border-radius: 999px; background: #f4f6ec; color: var(--ch-green-deep); font: inherit; font-size: .82rem; font-weight: 900; cursor: pointer; }
+.campesino-agent__menu { min-height: 370px; margin-top: 10px; overflow: hidden; border-radius: 18px; background: #102b26; }
+.campesino-agent__menu .arm-root { min-height: 370px; }
+.campesino-day-action { display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 14px; margin: 0 0 18px; padding: 18px; border: 1px solid #d1b58c; border-radius: 22px; background: #fff7e5; }
+.campesino-day-action.is-alerta { border-color: #e3a57d; background: #fff0e7; }
+.campesino-day-action.is-calm { border-color: #bed09b; background: #f1f7e4; }
+.campesino-day-action__icon { display: grid; place-items: center; width: 48px; height: 48px; border-radius: 16px; background: #f4d18e; font-size: 1.25rem; }
+.campesino-day-action.is-alerta .campesino-day-action__icon { background: #f8c3a5; }
+.campesino-day-action.is-calm .campesino-day-action__icon { background: #d7ed9b; color: var(--ch-green-deep); }
+.campesino-day-action h2 { margin: 0; font-size: 1.45rem; line-height: 1.05; }
+.campesino-day-action p:last-child { margin: 6px 0 0; color: #59604d; font-size: .92rem; line-height: 1.35; }
+.campesino-inline-action { min-height: 44px; display: inline-flex; align-items: center; gap: 3px; border: 0; background: transparent; color: var(--ch-green-deep); font: inherit; font-weight: 900; cursor: pointer; }
+.campesino-home__day, .campesino-home__actions { margin-top: 28px; }
+.campesino-section-heading { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 12px; }
+.campesino-section-heading h2 { margin: 0; font-size: clamp(1.65rem, 4vw, 2.3rem); line-height: 1; }
+.campesino-section-heading > span { font-size: 2rem; }
+.campesino-home__day > .campesino-section-heading + [data-testid="estado-del-dia"] { background: #173d32; border-color: #28634c; }
+.campesino-home__day [data-testid="estado-del-dia"] { overflow: hidden; }
+.campesino-action-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+.campesino-action-tile { min-height: 104px; display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 10px; padding: 14px; border: 1px solid #cbd7bd; border-radius: 18px; background: #fffdf6; color: var(--ch-ink); text-align: left; font: inherit; font-size: .95rem; font-weight: 900; cursor: pointer; }
+.campesino-action-tile:hover, .campesino-action-tile:focus-visible { border-color: var(--ch-green); background: #f4f7e9; }
+.campesino-action-tile__icon { font-size: 1.75rem; }
+.campesino-secondary { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 26px; }
+.campesino-secondary button { min-height: 44px; display: inline-flex; align-items: center; gap: 6px; padding: 0 12px; border: 1px solid #bdcbb4; border-radius: 999px; background: transparent; color: var(--ch-green-deep); font: inherit; font-size: .82rem; font-weight: 900; cursor: pointer; }
+.campesino-home button:focus-visible { outline: 3px solid #de7d2a; outline-offset: 3px; }
+@media (min-width: 720px) { .campesino-home__context { padding-top: 42px; } .campesino-home__finca-visual { height: 330px; } .campesino-home__finca-visual .fvh, .campesino-home__finca-visual .fvh-main, .campesino-home__finca-visual .fvh-escena-wrap { height: 640px; } .campesino-action-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); } .campesino-agent__voice-row { gap: 18px; } }
+@media (prefers-reduced-motion: reduce) { .campesino-home *, .campesino-home *::before, .campesino-home *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; } }

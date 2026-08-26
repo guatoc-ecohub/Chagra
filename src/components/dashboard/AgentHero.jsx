@@ -19,6 +19,7 @@ import {
 } from '../../services/userProfileService';
 import { buildCropSuggestions } from '../../data/cropSuggestions';
 import { syncManager } from '../../services/syncManager';
+import { selectChipDefs } from '../../services/profileChipSelector';
 import BotonAnarquiaGlyph from './BotonAnarquiaGlyph';
 import { lunarPhase, solarTimes, moonPathD } from '../../utils/skyEphemeris';
 import { resolveClimaLocation, getCachedClimaSnapshot } from '../../services/climaService';
@@ -265,7 +266,7 @@ function prefersReducedMotion() {
 // tests.
 export const SEND_TRANSITION_MS = 520;
 
-export default function AgentHero({ onNavigate }) {
+export default function AgentHero({ onNavigate, variant = 'default', featuredIds = null }) {
     const [text, setText] = useState('');
     // Adjunto en staging (SIEMPRE una foto). B2 (2026-06-02): el agente solo
     // "ve" imágenes vía visión, así que el compositor solo acepta fotos.
@@ -686,6 +687,93 @@ export default function AgentHero({ onNavigate }) {
     const canSend = !busy && (text.trim().length > 0 || Boolean(attachment));
     const recSeconds = Math.floor((durationMs || 0) / 1000);
     const expertoActive = nivel === 'detallado';
+    const campesinoChips = variant === 'campesino'
+        ? selectChipDefs(profile).slice(0, 4)
+        : [];
+
+    /* eslint-disable chagra-i18n/no-hardcoded-spanish -- Copy campesino añadido a un componente legacy, pendiente de migración i18n ADR-050. */
+    if (variant === 'campesino') {
+        return (
+            <section className="campesino-agent" aria-label="Registrar en la finca" data-testid="campesino-agent">
+                <input
+                    ref={cameraInputRef}
+                    className="campesino-agent__file"
+                    type="file"
+                    accept="image/*"
+                    capture="environment"
+                    aria-label="Tomar una foto de la finca"
+                    onChange={handlePhotoPick}
+                />
+                <div className="campesino-agent__voice-row">
+                    <button
+                        type="button"
+                        className={`campesino-agent__mic ${isRecording ? 'is-recording' : ''}`}
+                        onClick={handleMic}
+                        disabled={busy}
+                        aria-label={isRecording ? 'Terminar registro por voz' : 'Cuénteme qué pasó'}
+                        data-testid="campesino-voice-cta"
+                    >
+                        {isRecording ? <Square size={30} fill="currentColor" aria-hidden="true" /> : <Mic size={32} aria-hidden="true" />}
+                    </button>
+                    <div className="campesino-agent__voice-copy">
+                        <p className="campesino-agent__eyebrow">REGISTRO DE CAMPO</p>
+                        <h2>{isRecording ? `Le escucho · ${recSeconds}s` : 'Cuénteme qué pasó'}</h2>
+                        <p>{isRecording ? 'Cuando termine, su registro queda guardado para sincronizar.' : 'Siembra, cosecha, labor o algo raro en una mata.'}</p>
+                    </div>
+                    <button
+                        type="button"
+                        className="campesino-agent__photo"
+                        onClick={() => cameraInputRef.current?.click()}
+                        disabled={busy}
+                        aria-label="Agregar una foto de la finca"
+                        data-testid="campesino-photo-cta"
+                    >
+                        <Camera size={24} aria-hidden="true" />
+                        <span>Foto</span>
+                    </button>
+                </div>
+                {attachment && (
+                    <div className="campesino-agent__attachment" role="status">
+                        <span>Foto lista para enviar</span>
+                        <button type="button" onClick={clearAttachment} aria-label="Quitar foto">
+                            <X size={18} aria-hidden="true" />
+                        </button>
+                    </div>
+                )}
+                {recorderError && <p className="campesino-agent__error" role="alert">No pude abrir el micrófono. Puede registrar por escrito en la siguiente pantalla.</p>}
+                {pickError && <p className="campesino-agent__error" role="alert">{pickError}</p>}
+
+                <div className="campesino-agent__tools">
+                    <button
+                        ref={aButtonRef}
+                        type="button"
+                        className="campesino-agent__hand"
+                        onClick={toggleMenu}
+                        aria-expanded={menuOpen && !menuClosing}
+                        aria-controls="campesino-agent-menu"
+                        data-testid="campesino-hand-toggle"
+                    >
+                        <BotonAnarquiaGlyph size={24} aria-hidden="true" />
+                        <span>Más formas de ayudarme</span>
+                    </button>
+                    <div className="campesino-agent__chips" aria-label="Preguntas rápidas">
+                        {campesinoChips.map((chip) => (
+                            <button key={chip.intent} type="button" onClick={() => pickCapability(chip)}>
+                                <span aria-hidden="true">{chip.icon}</span>
+                                <span>{chip.label}</span>
+                            </button>
+                        ))}
+                    </div>
+                </div>
+                {menuOpen && (
+                    <div id="campesino-agent-menu" className={`campesino-agent__menu ${menuClosing ? 'is-closing' : ''}`}>
+                        <AgentRedMenu onPick={pickCapability} disabled={busy} anchorRef={aButtonRef} featuredIds={featuredIds} />
+                    </div>
+                )}
+            </section>
+        );
+    }
+    /* eslint-enable chagra-i18n/no-hardcoded-spanish */
 
     return (
         <section

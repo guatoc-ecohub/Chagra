@@ -403,7 +403,7 @@ const CSS = `
 
 /* ══════════════ componente ══════════════ */
 
-export default function AgentRedMenu({ onPick, disabled = false, anchorRef = null }) {
+export default function AgentRedMenu({ onPick, disabled = false, anchorRef = null, featuredIds = null }) {
   const rootRef = useRef(null);
   const engineRef = useRef(null);
   const toastTimerRef = useRef(null);
@@ -422,6 +422,13 @@ export default function AgentRedMenu({ onPick, disabled = false, anchorRef = nul
   useEffect(() => () => clearTimeout(toastTimerRef.current), []);
 
   const treeMode = themeKind === 'nature';
+  const ring = useMemo(() => {
+    if (!Array.isArray(featuredIds) || featuredIds.length === 0) return RING;
+    const allowed = new Set(featuredIds);
+    return [
+      ...RING.filter((item) => item.kind !== 'cap' || allowed.has(item.cap.id)),
+    ];
+  }, [featuredIds]);
 
   /* Estado real de cada capacidad: live (pleno), soon (por lanzar),
      down (dependencia rota, ej. sidecar caido). Deterministico,
@@ -463,7 +470,7 @@ export default function AgentRedMenu({ onPick, disabled = false, anchorRef = nul
     const hintEl = root.querySelector('[data-arm="hint"]');
 
     /* estado de simulación por grupo/hoja (paths SVG creados acá). */
-    const sim = RING.map((g, i) => {
+    const sim = ring.map((g, i) => {
       const el = root.querySelector(`[data-arm-group="${i}"]`);
       return {
         i,
@@ -950,7 +957,7 @@ export default function AgentRedMenu({ onPick, disabled = false, anchorRef = nul
       });
       engineRef.current = null;
     };
-  }, [treeMode, anchorRef, capabilityHealth]);
+  }, [treeMode, anchorRef, capabilityHealth, ring]);
 
   function showToast(msg) {
     setToastMsg(msg);
@@ -960,7 +967,7 @@ export default function AgentRedMenu({ onPick, disabled = false, anchorRef = nul
 
   function handleGroupTap(i, ev) {
     if (disabled) return;
-    const item = RING[i];
+    const item = ring[i];
     if (item?.kind === 'cap') {
       const capItem = /** @type {any} */ (item);
       if (ev?.currentTarget) bounce(ev.currentTarget);
@@ -1068,7 +1075,7 @@ export default function AgentRedMenu({ onPick, disabled = false, anchorRef = nul
       </div>
 
       <div className="arm-nodes">
-        {RING.map((item, i) => {
+        {ring.map((item, i) => {
           const isCap = item.kind === 'cap';
           const health = isCap ? (capabilityHealth.get(/** @type {any} */ (item).cap.id) || 'live') : 'live';
           const isDown = health === 'down';
@@ -1111,7 +1118,7 @@ export default function AgentRedMenu({ onPick, disabled = false, anchorRef = nul
           );
         })}
 
-        {RING.map((g, i) =>
+        {ring.map((g, i) =>
           g.leaves.map((cap, j) => {
             const health = capabilityHealth.get(cap.id) || 'live';
             const isSoon = health === 'soon';
@@ -1170,8 +1177,8 @@ export default function AgentRedMenu({ onPick, disabled = false, anchorRef = nul
 
       {focusedIdx != null && (
         <button type="button" className="arm-crumb" onClick={handleRootTap}>
-          ‹ <span>{RING[focusedIdx].icon}</span>
-          <span>{RING[focusedIdx].label}</span>
+          ‹ <span>{ring[focusedIdx].icon}</span>
+          <span>{ring[focusedIdx].label}</span>
         </button>
       )}
 
