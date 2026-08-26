@@ -1,7 +1,6 @@
 /**
- * AgentFabMenu.test.jsx — el menú flotante del TOQUE CORTO sobre el
- * personaje (#66/#70, 2026-07-30): "Hablar", "Enviar foto",
- * "Que se quede callado hoy" (#107).
+ * AgentFabMenu.test.jsx — el menú compacto del FAB (R4): Ver / Escuchar /
+ * Enviar una foto / Callar hoy·🔔 (un solo toggle).
  *
  * Español de Colombia (usted), sin voseo.
  */
@@ -11,135 +10,104 @@ import AgentFabMenu from '../AgentFabMenu';
 
 afterEach(cleanup);
 
+const noop = () => {};
+
 describe('AgentFabMenu', () => {
   it('no renderiza nada si abierto=false', () => {
     render(
       <AgentFabMenu
         abierto={false}
-        onEscuchar={() => {}}
-        onHablar={() => {}}
-        onFoto={() => {}}
-        onFotos={() => {}}
-        onHoyNo={() => {}}
-        onCerrar={() => {}}
+        onVer={noop}
+        onEscuchar={noop}
+        onFoto={noop}
+        onAlternarSilencio={noop}
+        onCerrar={noop}
       />,
     );
     expect(screen.queryByRole('menu')).not.toBeInTheDocument();
   });
 
-  it('muestra las tres opciones cuando abierto=true', () => {
+  it('muestra las cuatro opciones cuando abierto=true', () => {
     render(
       <AgentFabMenu
         abierto
-        onEscuchar={() => {}}
-        onHablar={() => {}}
-        onFoto={() => {}}
-        onFotos={() => {}}
-        onHoyNo={() => {}}
-        onCerrar={() => {}}
+        onVer={noop}
+        onEscuchar={noop}
+        onFoto={noop}
+        onAlternarSilencio={noop}
+        onCerrar={noop}
       />,
     );
-    expect(screen.getByRole('menuitem', { name: /Hablar/i })).toBeInTheDocument();
+    expect(screen.getByRole('menuitem', { name: /^Ver$/i })).toBeInTheDocument();
+    expect(screen.getByRole('menuitem', { name: /Escuchar/i })).toBeInTheDocument();
     expect(screen.getByRole('menuitem', { name: /Enviar una foto/i })).toBeInTheDocument();
-    expect(screen.getByRole('menuitem', { name: /Que se quede callado hoy/i })).toBeInTheDocument();
+    expect(screen.getByRole('menuitem', { name: /Que se quede callada hoy/i })).toBeInTheDocument();
   });
 
-  it('muestra "Ver" (R4) sólo cuando el FAB pasa onVer, y lo invoca', () => {
+  it('"Ver" llama a onVer', () => {
     const onVer = vi.fn();
     render(
-      <AgentFabMenu
-        abierto
-        onVer={onVer}
-        onEscuchar={() => {}}
-        onHablar={() => {}}
-        onFoto={() => {}}
-        onFotos={() => {}}
-        onHoyNo={() => {}}
-        onCerrar={() => {}}
-      />,
+      <AgentFabMenu abierto onVer={onVer} onEscuchar={noop} onFoto={noop} onAlternarSilencio={noop} onCerrar={noop} />,
     );
     fireEvent.click(screen.getByRole('menuitem', { name: /^Ver$/i }));
     expect(onVer).toHaveBeenCalledTimes(1);
   });
 
-  it('sin onVer no aparece la opción "Ver" (no rompe otros usos)', () => {
+  it('"Escuchar" llama a onEscuchar', () => {
+    const onEscuchar = vi.fn();
     render(
-      <AgentFabMenu
-        abierto
-        onEscuchar={() => {}}
-        onHablar={() => {}}
-        onFoto={() => {}}
-        onFotos={() => {}}
-        onHoyNo={() => {}}
-        onCerrar={() => {}}
-      />,
+      <AgentFabMenu abierto onVer={noop} onEscuchar={onEscuchar} onFoto={noop} onAlternarSilencio={noop} onCerrar={noop} />,
     );
-    expect(screen.queryByRole('menuitem', { name: /^Ver$/i })).not.toBeInTheDocument();
+    fireEvent.click(screen.getByRole('menuitem', { name: /Escuchar/i }));
+    expect(onEscuchar).toHaveBeenCalledTimes(1);
   });
 
-  it('"Hablar" llama a onHablar', () => {
-    const onHablar = vi.fn();
-    render(
-      <AgentFabMenu
-        abierto
-        onEscuchar={() => {}}
-        onHablar={onHablar}
-        onFoto={() => {}}
-        onFotos={() => {}}
-        onHoyNo={() => {}}
-        onCerrar={() => {}}
-      />,
-    );
-    fireEvent.click(screen.getByRole('menuitem', { name: /Hablar/i }));
-    expect(onHablar).toHaveBeenCalledTimes(1);
-  });
-
-  it('"Enviar foto" llama a onFoto', () => {
+  it('"Enviar una foto" llama a onFoto', () => {
     const onFoto = vi.fn();
     render(
-      <AgentFabMenu
-        abierto
-        onEscuchar={() => {}}
-        onHablar={() => {}}
-        onFoto={onFoto}
-        onFotos={() => {}}
-        onHoyNo={() => {}}
-        onCerrar={() => {}}
-      />,
+      <AgentFabMenu abierto onVer={noop} onEscuchar={noop} onFoto={onFoto} onAlternarSilencio={noop} onCerrar={noop} />,
     );
     fireEvent.click(screen.getByRole('menuitem', { name: /Enviar una foto/i }));
     expect(onFoto).toHaveBeenCalledTimes(1);
   });
 
-  it('"Que se quede callado hoy" llama a onHoyNo', () => {
-    const onHoyNo = vi.fn();
+  it('silenciado=false: ofrece "Que se quede callada hoy" y llama a onAlternarSilencio', () => {
+    const onAlternarSilencio = vi.fn();
     render(
       <AgentFabMenu
         abierto
-        onEscuchar={() => {}}
-        onHablar={() => {}}
-        onFoto={() => {}}
-        onFotos={() => {}}
-        onHoyNo={onHoyNo}
-        onCerrar={() => {}}
+        onVer={noop}
+        onEscuchar={noop}
+        onFoto={noop}
+        silenciado={false}
+        onAlternarSilencio={onAlternarSilencio}
+        onCerrar={noop}
       />,
     );
-    fireEvent.click(screen.getByRole('menuitem', { name: /Que se quede callado hoy/i }));
-    expect(onHoyNo).toHaveBeenCalledTimes(1);
+    fireEvent.click(screen.getByRole('menuitem', { name: /Que se quede callada hoy/i }));
+    expect(onAlternarSilencio).toHaveBeenCalledTimes(1);
+  });
+
+  it('silenciado=true: el MISMO ítem ofrece "Reactivar los avisos"', () => {
+    render(
+      <AgentFabMenu
+        abierto
+        onVer={noop}
+        onEscuchar={noop}
+        onFoto={noop}
+        silenciado
+        onAlternarSilencio={noop}
+        onCerrar={noop}
+      />,
+    );
+    expect(screen.getByRole('menuitem', { name: /Reactivar los avisos/i })).toBeInTheDocument();
+    expect(screen.queryByRole('menuitem', { name: /Que se quede callada hoy/i })).not.toBeInTheDocument();
   });
 
   it('Escape llama a onCerrar', () => {
     const onCerrar = vi.fn();
     render(
-      <AgentFabMenu
-        abierto
-        onEscuchar={() => {}}
-        onHablar={() => {}}
-        onFoto={() => {}}
-        onFotos={() => {}}
-        onHoyNo={() => {}}
-        onCerrar={onCerrar}
-      />,
+      <AgentFabMenu abierto onVer={noop} onEscuchar={noop} onFoto={noop} onAlternarSilencio={noop} onCerrar={onCerrar} />,
     );
     fireEvent.keyDown(document, { key: 'Escape' });
     expect(onCerrar).toHaveBeenCalledTimes(1);
@@ -148,20 +116,18 @@ describe('AgentFabMenu', () => {
   it('click en el backdrop (fuera del menú) llama a onCerrar', () => {
     const onCerrar = vi.fn();
     render(
-      <AgentFabMenu
-        abierto
-        onEscuchar={() => {}}
-        onHablar={() => {}}
-        onFoto={() => {}}
-        onFotos={() => {}}
-        onHoyNo={() => {}}
-        onCerrar={onCerrar}
-      />,
+      <AgentFabMenu abierto onVer={noop} onEscuchar={noop} onFoto={noop} onAlternarSilencio={noop} onCerrar={onCerrar} />,
     );
-    // El backdrop es el único elemento aria-hidden con position:fixed inset:0.
     const backdrop = document.querySelector('[aria-hidden="true"][style*="position: fixed"]');
     expect(backdrop).toBeTruthy();
     fireEvent.click(backdrop);
     expect(onCerrar).toHaveBeenCalledTimes(1);
+  });
+
+  it('el primer ítem ("Ver") recibe el foco al abrir', () => {
+    render(
+      <AgentFabMenu abierto onVer={noop} onEscuchar={noop} onFoto={noop} onAlternarSilencio={noop} onCerrar={noop} />,
+    );
+    expect(screen.getByRole('menuitem', { name: /^Ver$/i })).toHaveFocus();
   });
 });

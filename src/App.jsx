@@ -44,6 +44,7 @@ import useAlertStore from './store/useAlertStore';
 // comentario abajo donde se removió el render).
 // import FieldFeedback from './components/FieldFeedback';
 const AgentFab = lazy(() => import('./components/AgentFab'));
+const AngelitaAvisoGlobal = lazy(() => import('./visual/agente/AngelitaAvisoGlobal'));
 const CompaiFotosOverlay = lazy(() => import('./components/CompaiFotosOverlay'));
 // CompaiOverlay (segundo compai que deambulaba por la franja inferior) RETIRADO
 // de la PWA 2D el 2026-08-23 (unificación compai): en cada ruta 2D montaba una
@@ -4417,6 +4418,7 @@ export default function App() {
           offline. La entrada mística es la única que puede desvanecerlo. */}
       <Suspense fallback={null}>
         {currentView !== 'loading' && <AgentFab onNavigate={navigate} pantalla={currentView} />}
+        {currentView !== 'loading' && <AngelitaAvisoGlobal />}
       </Suspense>
       {/* Escucha manos libres (operador 2026-07-05, caso guantes/manos
           embarradas). Abre el widget "Chagra está escuchando" que navega o
