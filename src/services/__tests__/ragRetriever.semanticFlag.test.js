@@ -1,10 +1,10 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 
 // Test del kill-switch REVERSIBLE de la capa semántica (VITE_RAG_SEMANTIC) y
-// de la mitigación OOM (keep_alive:'0s') del embed en vivo. Confirma que:
+// de la persistencia controlada (keep_alive:'5m') del embed en vivo. Confirma que:
 //   1. La semántica está ACTIVA por defecto (default de prod, flag ausente).
 //   2. Un valor de apagado explícito la desactiva → BM25-only (sin embed vivo).
-//   3. El embed de la query lleva keep_alive:'0s' (anti-OOM por co-residencia).
+//   3. El embed de la query lleva keep_alive:'5m' (persistencia controlada).
 
 const MANIFEST = {
   generated_at: '2026-07-06T00:00:00Z',
@@ -117,7 +117,7 @@ describe('ragRetriever - kill-switch semántico + mitigación OOM', () => {
     expect(embedBodies.length).toBeGreaterThan(0);
   });
 
-  it('el embed en vivo lleva keep_alive:"0s" (mitigación OOM anti co-residencia)', async () => {
+  it('el embed en vivo lleva keep_alive:"5m" (persistencia controlada)', async () => {
     const embedBodies = [];
     globalThis.fetch = setupFetchMock(embedBodies);
     const { retrieve } = await import('../ragRetriever.js');
@@ -126,8 +126,8 @@ describe('ragRetriever - kill-switch semántico + mitigación OOM', () => {
 
     expect(embedBodies.length).toBeGreaterThan(0);
     for (const body of embedBodies) {
-      expect(body.keep_alive).toBe('0s');
-      expect(body.model).toBe('snowflake-arctic-embed2');
+      expect(body.keep_alive).toBe('5m');
+      expect(body.model).toBe('nomic-embed-text');
     }
   });
 

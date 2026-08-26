@@ -28,8 +28,9 @@ describe('AgentFab — interruptor de silencio manual (#101/#103)', () => {
   it('el botón (visible al tocar el compai) alterna silenciado en el store', () => {
     render(<AgentFab onNavigate={() => {}} />);
     // Política v2 (operador 2026-08-24): el ícono de silencio se ve SOLO al
-    // tocar/hover el compai — no tapa la cara en reposo. Hay que revelarlo.
-    fireEvent.mouseEnter(screen.getByRole('button', { name: /Chagra IA/i }));
+    // tocar el compai, no tapa la cara en reposo. MouseDown representa ese
+    // estado de interacción en jsdom.
+    fireEvent.mouseDown(screen.getByRole('button', { name: /Chagra IA/i }));
     const boton = screen.getByRole('button', { name: /Que su compañero se quede callado/i });
     expect(boton).toHaveAttribute('aria-pressed', 'false');
 
@@ -60,7 +61,7 @@ describe('AgentFab — gesto sobre el personaje (#66/#70)', () => {
     render(<AgentFab onNavigate={onNavigate} />);
     const personaje = screen.getByRole('button', { name: /Chagra IA/i });
 
-    fireEvent.touchStart(personaje);
+    fireEvent.touchStart(personaje, { touches: [{ clientX: 0, clientY: 0 }] });
     act(() => {
       vi.advanceTimersByTime(650);
     });
@@ -84,7 +85,7 @@ describe('AgentFab — gesto sobre el personaje (#66/#70)', () => {
     render(<AgentFab onNavigate={onNavigate} />);
     const personaje = screen.getByRole('button', { name: /Chagra IA/i });
 
-    fireEvent.touchStart(personaje);
+    fireEvent.touchStart(personaje, { touches: [{ clientX: 0, clientY: 0 }] });
     act(() => {
       vi.advanceTimersByTime(150);
     });
@@ -153,7 +154,7 @@ describe('AgentFab — cadencia adaptativa: señales de atención positiva (#102
     useAngelitaStore.setState({ molestia: 5 });
     render(<AgentFab onNavigate={() => {}} />);
     const personaje = screen.getByRole('button', { name: /Chagra IA/i });
-    fireEvent.touchStart(personaje);
+    fireEvent.touchStart(personaje, { touches: [{ clientX: 0, clientY: 0 }] });
     act(() => { vi.advanceTimersByTime(650); });
     expect(useAngelitaStore.getState().molestia).toBeLessThan(5);
   });
@@ -184,7 +185,7 @@ describe('AgentFab — unificación con EscuchaFab (#compai-mic-fab-unify)', () 
     render(<AgentFab onNavigate={() => {}} />);
     const personaje = screen.getByRole('button', { name: /Chagra IA/i });
 
-    fireEvent.touchStart(personaje);
+    fireEvent.touchStart(personaje, { touches: [{ clientX: 0, clientY: 0 }] });
     act(() => {
       vi.advanceTimersByTime(650);
     });
@@ -221,7 +222,7 @@ describe('AgentFab — unificación con EscuchaFab (#compai-mic-fab-unify)', () 
     const personaje = screen.getByRole('button', { name: /Chagra IA/i });
 
     // Test gesto largo
-    fireEvent.touchStart(personaje);
+    fireEvent.touchStart(personaje, { touches: [{ clientX: 0, clientY: 0 }] });
     act(() => { vi.advanceTimersByTime(650); });
     expect(onEscuchaGestoLargo).toHaveBeenCalledTimes(1);
 

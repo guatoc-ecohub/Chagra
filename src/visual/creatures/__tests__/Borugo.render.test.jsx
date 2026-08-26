@@ -45,8 +45,9 @@ describe('Borugo — contrato base intacto', () => {
   });
 
   it('está registrado como el binomio correcto (Cuniculus taczanowskii)', () => {
-    expect(CREATURES.borugo).toBeTruthy();
-    expect(CREATURES.borugo.cientifico).toBe('Cuniculus taczanowskii');
+    // Borugo quedó archivado por decisión visual y ya no se surfacea en el
+    // registro data-driven. El componente se conserva para poder rehacerlo.
+    expect(CREATURES.borugo).toBeUndefined();
   });
 });
 
