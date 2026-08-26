@@ -8,13 +8,16 @@
     <title>Mercado Chagra — mercado campesino de procedencia</title>
     <meta
       name="description"
-      content="Mercado campesino honesto: cada producto ubicado en la montaña por su altitud y piso térmico, con la cara de quien lo sembró, su finca y su vereda. Galería de muestra."
+      content="Mercado campesino honesto: cada producto ubicado en la montaña por su altitud y piso térmico, con la cara de quien lo sembró, su finca y su vereda."
     />
-    <!-- Página estática de galería (datos de muestra, sin auth, sin sqlite-wasm
-         ni service worker): CSP mínima, no necesita 'wasm-unsafe-eval'. -->
+    <!-- Página estática (sin auth, sin sqlite-wasm ni service worker): CSP
+         mínima, no necesita 'wasm-unsafe-eval'. Consume el catálogo real de
+         milpa-api.guatoc.co (connect-src) y sus fotos reales servidas desde
+         milpa.guatoc.co/fotos/*.webp (img-src); si el fetch falla, cae a la
+         galería de muestra (ver src/mockups/mercado/datos.js). -->
     <meta
       http-equiv="Content-Security-Policy"
-      content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; object-src 'none'; base-uri 'self'"
+      content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://milpa.guatoc.co; connect-src 'self' https://milpa-api.guatoc.co; font-src 'self' data:; object-src 'none'; base-uri 'self'"
     />
     <style>
       html, body { background: #020617; margin: 0; }

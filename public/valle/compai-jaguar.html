@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<link rel="icon" href="data:,">
+<title>El Jaguar del compAI — un rango, no un estilo · Valle de Guatoc</title>
+<!--
+  Página de APROBACIÓN del jaguar 2D del compAI (2026-08-07).
+
+  La doctrina que muestra, palabras del operador:
+    «Quiero que así se vea en el valle, que dé respeto y que realmente
+     parezca verdadero. […] Solo cuando actúa es cuando tiene la
+     expresión de la imagen de referencia.»
+
+  El personaje NO es un estilo: es un RANGO entre dos extremos —
+  el animal real que impone (estado base) y la expresión cuphead
+  que aparece solo en la actuación puntual.
+
+  El montaje replica a `marco.js` A PROPÓSITO: shadow DOM, poses leídas
+  del propio CSS del rig (posesDelRig), scheduler con elegirSinRepetir de
+  `compai/gestos.js`, y el recorte de esquina por getBBox de `#jaguar`.
+  Si esta página anda, el contrato del valle anda.
+-->
+<style>
+  :root{
+    --tinta:#241408;
+    --papel:#e9dab6;
+    --pared:#22271f;
+    --oro:#eda03a;
+    --crema:#f2e8cd;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html,body{height:100%}
+  body{
+    font-family:Georgia,'Times New Roman',serif;
+    background:
+      radial-gradient(1200px 700px at 50% 30%, #2e352a 0%, var(--pared) 60%, #171b15 100%);
+    color:var(--crema);
+    min-height:100vh;
+    display:flex;flex-direction:column;align-items:center;
+    overflow-x:hidden;
+  }
+  header{text-align:center;padding:18px 16px 6px}
+  header h1{font-size:clamp(20px,3.2vw,32px);font-style:italic;letter-spacing:1px;color:#f2e8cd}
+  header p{margin-top:4px;font-size:clamp(11px,1.5vw,14px);letter-spacing:3px;text-transform:uppercase;color:#b8b294}
+  header p em{text-transform:none;letter-spacing:.5px;color:#d8c294}
+
+  /* la lámina cuelga de la pared, grande */
+  #salon{position:relative;width:min(96vw,1500px);margin:10px auto 6px}
+  #lamina{
+    display:block;width:100%;aspect-ratio:1680/960;
+    background:var(--papel);
+    border:10px solid #3a2c18;
+    outline:2px solid #171008;
+    box-shadow:0 24px 60px rgba(0,0,0,.55), inset 0 0 0 1px #8a7452;
+    border-radius:2px;
+  }
+
+  /* la vista de ESQUINA: el mismo rig recortado a #jaguar, como en marco.js */
+  #esquina{
+    position:absolute;right:14px;bottom:14px;width:clamp(110px,14vw,190px);aspect-ratio:3/4;
+    background:rgba(233,218,182,.92);
+    border:3px solid var(--tinta);border-radius:14px;
+    box-shadow:0 10px 26px rgba(0,0,0,.5);
+    overflow:hidden;
+  }
+  #esquina figcaption{
+    position:absolute;left:0;right:0;bottom:0;text-align:center;
+    font-size:10px;letter-spacing:1.5px;text-transform:uppercase;
+    color:#3c2c14;background:rgba(242,232,205,.9);padding:3px 2px;
+  }
+
+  /* la burbuja del hablar */
+  #burbuja{
+    position:absolute;left:50%;top:16%;transform:translateX(-50%) translateY(10px) scale(.92);
+    max-width:min(420px,70%);z-index:6;
+    background:#fffaf0;border:3px solid var(--tinta);border-radius:18px;
+    padding:12px 18px;font-size:clamp(13px,1.7vw,17px);line-height:1.45;font-style:italic;
+    color:#241a10;box-shadow:4px 5px 0 rgba(36,20,8,.3);
+    opacity:0;transform-origin:50% 120%;
+    transition:opacity .35s ease,transform .35s cubic-bezier(.34,1.56,.64,1);
+    pointer-events:none;
+  }
+  #burbuja.visible{opacity:1;transform:translateX(-50%) translateY(0) scale(1)}
+  #burbuja::after{
+    content:'';position:absolute;left:50%;bottom:-13px;width:20px;height:20px;margin-left:-10px;
+    background:#fffaf0;border-right:3px solid var(--tinta);border-bottom:3px solid var(--tinta);
+    transform:rotate(45deg) skew(10deg,10deg);
+  }
+
+  /* consola de poses: el dial hecho botones */
+  #consola{
+    width:min(96vw,1500px);margin:8px auto 22px;
+    display:flex;gap:14px;flex-wrap:wrap;justify-content:center;align-items:stretch;
+  }
+  .banda{
+    background:rgba(242,232,205,.06);border:1px solid rgba(216,194,148,.28);
+    border-radius:14px;padding:10px 14px 12px;min-width:200px;
+  }
+  .banda h2{
+    font-size:11px;letter-spacing:3px;text-transform:uppercase;font-weight:normal;
+    color:#b8b294;text-align:center;margin-bottom:8px;
+  }
+  .banda .fila{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
+  button.pose{
+    font-family:inherit;font-size:clamp(12px,1.5vw,15px);font-style:italic;
+    padding:8px 16px;border-radius:99px;cursor:pointer;
+    background:#f2e8cd;color:#241408;border:2px solid #241408;
+    box-shadow:0 3px 0 #241408;transition:transform .12s ease,box-shadow .12s ease;
+  }
+  button.pose:hover{transform:translateY(-2px);box-shadow:0 5px 0 #241408}
+  button.pose:active{transform:translateY(1px);box-shadow:0 1px 0 #241408}
+  button.pose.on{background:var(--oro);font-weight:bold}
+  .banda.actua button.pose{background:#f6d9a8}
+  .banda.actua button.pose.on{background:var(--oro)}
+  .banda.auto button.pose{background:#cfd8b4}
+  .banda.auto button.pose.on{background:#9ec27e;font-weight:bold}
+
+  #estadoHud{
+    text-align:center;margin:0 0 26px;font-size:13px;letter-spacing:2px;
+    text-transform:uppercase;color:#8a8a6c;
+  }
+  #estadoHud b{color:#d8c294;letter-spacing:3px}
+
+  @media (max-width:720px){
+    #esquina{display:none}
+  }
+</style>
+</head>
+<body>
+<header>
+  <h1>El Jaguar del compAI — un rango, no un estilo</h1>
+  <p>estado base: el animal que impone · <em>solo cuando actúa, la expresión cuphead</em></p>
+</header>
+
+<div id="salon">
+  <div id="lamina"></div>
+  <figure id="esquina">
+    <div id="esquinaRig" style="width:100%;height:100%"></div>
+    <figcaption>así viaja de compañero</figcaption>
+  </figure>
+  <div id="burbuja"></div>
+</div>
+
+<div id="consola">
+  <div class="banda real">
+    <h2>El animal — reposo digno</h2>
+    <div class="fila" id="filaReal"></div>
+  </div>
+  <div class="banda actua">
+    <h2>Cuando actúa — cuphead puntual</h2>
+    <div class="fila" id="filaActua"></div>
+  </div>
+  <div class="banda auto">
+    <h2>Su vida propia</h2>
+    <div class="fila"><button class="pose" id="btAuto">azar del núcleo</button></div>
+  </div>
+</div>
+<p id="estadoHud">pose: <b id="poseActual">—</b></p>
+
+<script src="./assets/guia-jaguar-lamina.js"></script>
+<script type="module">
+  /* ── EL MISMO MONTAJE QUE marco.js — si esto anda, el valle anda ── */
+  const arte = window.GUIA_JAGUAR_LAMINA;
+  const $ = (s) => document.querySelector(s);
+
+  /* Las poses las declara el PROPIO rig en su CSS: no hay tabla a mano
+     (misma regla y mismo regex que posesDelRig en marco.js). */
+  function posesDelRig(a) {
+    const vistas = new Set(); const re = /data-estado=["']([a-z]+)["']/g;
+    let m; while ((m = re.exec(a.css || '')) !== null) vistas.add(m[1]);
+    return [...vistas];
+  }
+  const POSES_NARRATIVAS = new Set(['amenaza', 'acecho', 'invocacion', 'degradado', 'niebla', 'pacto', 'hablar']);
+  /* En ESTA lámina, además, las de actuación cuphead van en su propia banda. */
+  const POSES_ACTUACION = new Set(['examina', 'hablar', 'guino']);
+
+  const disponibles = posesDelRig(arte);
+  const reposo = disponibles.filter((p) => !POSES_NARRATIVAS.has(p));
+
+  function montar(host, recortarA) {
+    const root = host.shadowRoot || host.attachShadow({ mode: 'open' });
+    root.innerHTML =
+      '<style>' + arte.css + ':host{display:block;overflow:hidden}'
+      + 'svg{width:100%;height:100%;display:block}</style>'
+      + '<svg viewBox="' + (arte.lienzo || '0 0 1680 960') + '" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg">'
+      + '<defs>' + arte.defs + '</defs>' + arte.svg + '</svg>';
+    if (recortarA) encuadrar(root, recortarA, 45);
+    return host;
+  }
+  /* clon fiel de encuadrar() de marco.js: getBBox con reintento */
+  function encuadrar(root, nucleoId, m, intento) {
+    let b = null;
+    try {
+      const n = root.getElementById(nucleoId) || root.querySelector('svg > g');
+      b = n && n.getBBox();
+    } catch (e) { b = null; }
+    if (b && b.width > 1 && b.height > 1) {
+      root.querySelector('svg').setAttribute('viewBox',
+        (b.x - m).toFixed(0) + ' ' + (b.y - m).toFixed(0) + ' ' +
+        (b.width + 2 * m).toFixed(0) + ' ' + (b.height + 2 * m).toFixed(0));
+      return;
+    }
+    if ((intento || 0) < 20) setTimeout(() => encuadrar(root, nucleoId, m, (intento || 0) + 1), 60);
+  }
+
+  const lamina = montar($('#lamina'), null);
+  const esquina = montar($('#esquinaRig'), 'jaguar');
+
+  /* ── el dial ── */
+  const burbuja = $('#burbuja');
+  let ocultarBurbuja = null;
+  const LINEAS = [
+    'Yo soy el que cuenta el monte sin dejarse ver. Si mi huella está, el monte está entero.',
+    'Mire esta huella: redonda y sin uña. La garra la llevo guardada, como los buenos argumentos.',
+    'De noche veo dos veces la misma luz. Usted descanse, que del monte me encargo yo.',
+  ];
+  let linea = 0;
+  function decir(texto) {
+    burbuja.textContent = texto;
+    burbuja.classList.add('visible');
+    if (ocultarBurbuja) clearTimeout(ocultarBurbuja);
+    ocultarBurbuja = setTimeout(() => burbuja.classList.remove('visible'), Math.min(16000, Math.max(7000, texto.length * 86 + 1200)));
+  }
+
+  let auto = false;
+  let autoTimer = null;
+  function ponerPose(p, desdeAuto) {
+    if (!desdeAuto) pararAuto();
+    for (const host of [$('#lamina'), $('#esquinaRig')]) host.setAttribute('data-estado', p);
+    $('#poseActual').textContent = p + (POSES_ACTUACION.has(p) ? ' · actúa' : ' · animal');
+    document.querySelectorAll('button.pose[data-p]').forEach((b) => b.classList.toggle('on', b.dataset.p === p));
+    if (p === 'hablar') decir(LINEAS[(linea++) % LINEAS.length]);
+    else burbuja.classList.remove('visible');
+  }
+
+  /* botones desde el repertorio REAL del rig, nunca de una lista a mano */
+  for (const p of disponibles) {
+    const bt = document.createElement('button');
+    bt.type = 'button'; bt.className = 'pose'; bt.dataset.p = p; bt.textContent = p;
+    bt.addEventListener('click', () => ponerPose(p));
+    (POSES_ACTUACION.has(p) ? $('#filaActua') : $('#filaReal')).appendChild(bt);
+  }
+
+  /* ── SU VIDA PROPIA: el azar del núcleo, igual que en marco.js ──
+     elegirSinRepetir viene de compai/gestos.js — EL MISMO módulo ESM sin
+     dependencias que usa la PWA. Eso es lo que esta página certifica. */
+  const { elegirSinRepetir } = await import('./compai/gestos.js');
+  let previa = reposo[0] || 'respira';
+  function pararAuto() {
+    auto = false; if (autoTimer) clearTimeout(autoTimer);
+    $('#btAuto').classList.remove('on');
+  }
+  function tickAuto() {
+    if (!auto) return;
+    if (document.hidden) { autoTimer = setTimeout(tickAuto, 4000); return; }
+    previa = elegirSinRepetir(reposo, previa) || previa;
+    ponerPose(previa, true);
+    autoTimer = setTimeout(tickAuto, 4200 + Math.random() * 5200);
+  }
+  $('#btAuto').addEventListener('click', () => {
+    if (auto) { pararAuto(); return; }
+    auto = true; $('#btAuto').classList.add('on'); tickAuto();
+  });
+
+  /* arranque: el reposo que impone, y a los 2 s su vida propia */
+  ponerPose(reposo[0] || 'respira');
+  setTimeout(() => { if (!auto) { auto = true; $('#btAuto').classList.add('on'); tickAuto(); } }, 2400);
+
+  /* gancho para la sonda del gate */
+  window.__jaguarPoses = { disponibles, reposo, poner: (p) => ponerPose(p) };
+</script>
+</body>
+</html>

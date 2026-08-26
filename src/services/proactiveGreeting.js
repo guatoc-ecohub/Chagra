@@ -19,7 +19,9 @@
  *   - agentService.temporadaColombiana / pisoTermicoFromAltitud: idea contextual.
  *   - ensoContext.getEnsoOutlook: lectura regional ENSO cuando NO hay pendientes.
  *
- * Español colombiano (tú/usted, SIN voseo argentino).
+ * Español colombiano usted/sumercé — NUNCA tuteo ni voseo (unifica el registro
+ * con angelitaInteligencia.js: un compai con dos voces rompe confianza,
+ * `ops/COMPAI-MENU-DISENO-2026-08-25.md`).
  *
  * El builder es PURO y SÍNCRONO: recibe datos ya resueltos y devuelve un objeto
  * de saludo. El wrapper `resolveProactiveGreeting` (async) hidrata desde stores.
@@ -170,7 +172,7 @@ function buildPendingLead(items) {
   if (items.length === 1) {
     const a = items[0];
     const due = a.due ? ` (${a.due.toLowerCase()})` : '';
-    return `Ojo: ${a.title}${due}. Te lo dejo de primero para que no se pase.`;
+    return `Ojo: ${a.title}${due}. Se lo dejo de primero para que no se le pase.`;
   }
   const [a, b] = items;
   const aDue = a.due ? ` (${a.due.toLowerCase()})` : '';
@@ -198,7 +200,7 @@ function buildPendingLead(items) {
  * parte meteorológico, y siempre cede ante lo que el campesino ve en su finca.)
  */
 function marcoCalendario(temporada) {
-  return `el calendario marca ${temporada.nombre}, pero el clima real de tu finca manda`;
+  return `el calendario marca ${temporada.nombre}, pero el clima real de su finca manda`;
 }
 
 function buildIdeaLead({ cultivos = [], altitud = null, ensoOutlook = null, date = new Date() }) {
@@ -210,18 +212,18 @@ function buildIdeaLead({ cultivos = [], altitud = null, ensoOutlook = null, date
 
   if (topCultivo && topCultivo.name) {
     const nombre = String(topCultivo.name).replace(/\s*#\d+\s*$/, '').trim();
-    return `Todo tranquilo por ahora. Buena semana para echarle un ojo a tu ${nombre.toLowerCase()} — ${marcoCalendario(temporada)}. ¿Cómo viene el tiempo por allá? ¿Te armo un plan?`;
+    return `Todo tranquilo por ahora. Buena semana para echarle un ojo a su ${nombre.toLowerCase()} — ${marcoCalendario(temporada)}. ¿Cómo viene el tiempo por allá? ¿Le armo un plan?`;
   }
 
   if (piso) {
-    return `Todo tranquilo por ahora. Tu finca está en piso térmico ${piso} — ${marcoCalendario(temporada)}. Buen momento para planear qué sembrar; ¿te muestro especies que van bien en tu zona?`;
+    return `Todo tranquilo por ahora. Su finca está en piso térmico ${piso} — ${marcoCalendario(temporada)}. Buen momento para planear qué sembrar; ¿le muestro especies que van bien en su zona?`;
   }
 
   if (ensoOutlook && ensoOutlook.titulo) {
-    return `Todo tranquilo por ahora. ${ensoOutlook.titulo}: ${ensoOutlook.detalle} (${ensoOutlook.fuente}). ¿Quieres que ajustemos el calendario a eso?`;
+    return `Todo tranquilo por ahora. ${ensoOutlook.titulo}: ${ensoOutlook.detalle} (${ensoOutlook.fuente}). ¿Quiere que ajustemos el calendario a eso?`;
   }
 
-  return `Todo tranquilo por ahora — no hay nada urgente en tu finca. El calendario marca ${temporada.nombre}, pero el clima real manda; cuéntame qué tienes sembrado y cómo viene el tiempo, y te doy una mano con el plan.`;
+  return `Todo tranquilo por ahora — no hay nada urgente en su finca. El calendario marca ${temporada.nombre}, pero el clima real manda; cuénteme qué tiene sembrado y cómo viene el tiempo, y le doy una mano con el plan.`;
 }
 
 /**

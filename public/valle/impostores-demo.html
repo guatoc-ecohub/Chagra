@@ -1,0 +1,177 @@
+<!doctype html>
+<html lang="es-CO">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Impostores + LOD — follaje masivo (lib/impostor-lod.js)</title>
+<style>
+  html,body{margin:0;height:100%;overflow:hidden;background:#0b0f0c;font-family:system-ui,-apple-system,"Segoe UI",sans-serif}
+  #c{display:block;width:100vw;height:100vh;touch-action:none}
+  #hud{position:fixed;top:14px;left:14px;padding:10px 14px;border-radius:12px;
+    background:rgba(10,18,12,.55);color:#eaffef;font-size:13px;line-height:1.55;
+    backdrop-filter:blur(8px);z-index:10;min-width:216px;box-shadow:0 8px 24px rgba(0,0,0,.25)}
+  #hud .row{display:flex;justify-content:space-between;gap:18px}
+  #hud .k{opacity:.68}
+  #hud b{font-variant-numeric:tabular-nums}
+  #hud button{margin-top:9px;width:100%;padding:8px 0;border:0;border-radius:9px;cursor:pointer;
+    background:#3f6a3c;color:#eaffef;font-weight:700;font-size:13px}
+  #hud button:hover{background:#4c7d47}
+  #err{position:fixed;inset:auto 14px 14px auto;max-width:72vw;color:#ffd9d9;background:rgba(90,20,20,.78);
+    padding:8px 12px;border-radius:10px;font-size:12px;white-space:pre-wrap;z-index:20;display:none}
+</style>
+<script type="importmap">
+{
+  "imports": {
+    "three": "./vendor/three.module.js",
+    "three/addons/": "./vendor/addons/"
+  }
+}
+</script>
+</head>
+<body>
+<canvas id="c"></canvas>
+<div id="hud">
+  <div class="row"><span class="k">FPS</span><b id="fps">--</b></div>
+  <div class="row"><span class="k">Draw calls</span><b id="draws">--</b></div>
+  <div class="row"><span class="k">Instancias</span><b id="count">--</b></div>
+  <div class="row"><span class="k">Cerca / Media / Lejos</span><b id="levels">--</b></div>
+  <button id="btn-count">Cambiar a 5.000</button>
+</div>
+<div id="err"></div>
+<script type="module">
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { makeImpostorLOD } from './lib/impostor-lod.js';
+import { tickVientoMundos } from './lib3d/flora/vientoMundos.js';
+
+const err = document.getElementById('err');
+addEventListener('error', (e) => { err.style.display = 'block'; err.textContent = 'ERROR: ' + (e.message || e); });
+addEventListener('unhandledrejection', (e) => { err.style.display = 'block'; err.textContent = 'REJECT: ' + ((e.reason && e.reason.message) || e.reason); });
+const _tFijo = new URLSearchParams(location.search).get('t');
+const TIEMPO_FIJO = _tFijo === null || Number.isNaN(Number(_tFijo)) ? null : Number(_tFijo);
+
+// ── ruido determinista (misma forma que lib3d) ───────────────────────────────
+function hash2(x, y) { const h = Math.sin(x * 127.1 + y * 311.7) * 43758.5453; return h - Math.floor(h); }
+function vnoise(x, y) {
+  const xi = Math.floor(x), yi = Math.floor(y);
+  const xf = x - xi, yf = y - yi;
+  const u = xf * xf * (3 - 2 * xf), v = yf * yf * (3 - 2 * yf);
+  return hash2(xi, yi) * (1 - u) * (1 - v) + hash2(xi + 1, yi) * u * (1 - v) +
+    hash2(xi, yi + 1) * (1 - u) * v + hash2(xi + 1, yi + 1) * u * v;
+}
+function fbm(x, y, oct) {
+  let s = 0, amp = 1, f = 1, norm = 0;
+  for (let i = 0; i < oct; i++) { s += amp * vnoise(x * f, y * f); norm += amp; amp *= 0.5; f *= 2.03; }
+  return s / norm;
+}
+
+// ── ladera: cerro que sube con +z, con ruido grueso y fino ──────────────────
+function terreno(x, z) {
+  const base = 4 + (z + 70) * 0.32;
+  const n = fbm(x * 0.022 + 3.1, z * 0.022 + 1.7, 2);
+  const rr = fbm(x * 0.07 + 9.3, z * 0.07 + 4.1, 2) * 0.5 + 0.5;
+  return base + (n - 0.5) * 16 + (rr - 0.5) * 2.2;
+}
+
+// ── renderer / escena / cámara ───────────────────────────────────────────────
+const renderer = new THREE.WebGLRenderer({ canvas: document.getElementById('c'), antialias: true });
+renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.5));
+renderer.setSize(innerWidth, innerHeight);
+
+const scene = new THREE.Scene();
+const fogColor = 0xc9dbd0;
+scene.background = new THREE.Color(fogColor);
+scene.fog = new THREE.Fog(fogColor, 90, 400);
+
+const camera = new THREE.PerspectiveCamera(55, innerWidth / innerHeight, 0.1, 900);
+camera.position.set(0, 46, 125);
+
+const controls = new OrbitControls(camera, renderer.domElement);
+controls.target.set(0, 28, -15);
+controls.enableDamping = true;
+controls.update();
+
+// ── luces (sin sombras: presupuesto para el follaje) ────────────────────────
+scene.add(new THREE.HemisphereLight(0xcfe8d0, 0x2a3a24, 0.85));
+const sun = new THREE.DirectionalLight(0xfff2d8, 1.25);
+sun.position.set(80, 120, 40);
+scene.add(sun);
+
+// ── suelo de la ladera (mismo terreno que usan los árboles) ─────────────────
+function buildGround() {
+  const geo = new THREE.PlaneGeometry(400, 160, 100, 42);
+  geo.rotateX(-Math.PI / 2);
+  geo.translate(0, 0, 5);
+  const P = geo.attributes.position;
+  const n = P.count;
+  for (let i = 0; i < n; i++) P.setY(i, terreno(P.getX(i), P.getZ(i)));
+  geo.computeVertexNormals();
+  const col = new Float32Array(n * 3);
+  const cA = [0.13, 0.24, 0.11], cB = [0.37, 0.5, 0.24];
+  for (let i = 0; i < n; i++) {
+    const x = P.getX(i), z = P.getZ(i), h = P.getY(i);
+    const t = THREE.MathUtils.clamp((h - 2) / 56, 0, 1);
+    const parche = fbm(x * 0.05 + 5.1, z * 0.05 + 2.3, 2);
+    const k = t * 0.72 + 0.2 + (parche - 0.5) * 0.24;
+    const j = (fbm(x * 0.15 + 7.7, z * 0.15 + 4.1, 2) - 0.5) * 0.1;
+    col[i * 3] = Math.max(0, cA[0] + (cB[0] - cA[0]) * k + j);
+    col[i * 3 + 1] = Math.max(0, cA[1] + (cB[1] - cA[1]) * k + j);
+    col[i * 3 + 2] = Math.max(0, cA[2] + (cB[2] - cA[2]) * k + j);
+  }
+  geo.setAttribute('color', new THREE.BufferAttribute(col, 3));
+  const mat = new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 1, metalness: 0 });
+  scene.add(new THREE.Mesh(geo, mat));
+}
+buildGround();
+
+// ── sistema de impostores + LOD ──────────────────────────────────────────────
+const system = makeImpostorLOD({
+  count: 15740,
+  area: { x0: -185, x1: 185, z0: -55, z1: 75 },
+  alturaObjetivo: 11,
+  terreno,
+  paleta: { base: '#3a5c2a', claro: '#6f9140', oscuro: '#24391d', acento: '#c9b54a' },
+  fog: { near: 90, far: 400, color: fogColor },
+});
+scene.add(system.group);
+
+// ── bucle principal + contadores visibles ───────────────────────────────────
+const clock = new THREE.Clock();
+let frames = 0, fpsT = 0, fps = 0;
+let curCount = 15740;
+
+function tick() {
+  requestAnimationFrame(tick);
+  const dt = TIEMPO_FIJO !== null ? 0 : clock.getDelta();
+  tickVientoMundos(TIEMPO_FIJO !== null ? TIEMPO_FIJO : clock.elapsedTime);
+  controls.update();
+  system.update(camera, dt);
+  renderer.render(scene, camera);
+
+  frames++; fpsT += dt;
+  if (fpsT >= 0.5) {
+    fps = Math.round(frames / fpsT);
+    frames = 0; fpsT = 0;
+    document.getElementById('fps').textContent = fps;
+  }
+  document.getElementById('draws').textContent = renderer.info.render.calls;
+  const c = system.counts();
+  document.getElementById('count').textContent = c.total;
+  document.getElementById('levels').textContent = c.near + ' / ' + c.med + ' / ' + c.far;
+}
+tick();
+
+document.getElementById('btn-count').addEventListener('click', (e) => {
+  curCount = curCount === 15740 ? 5000 : 15740;
+  system.resize(curCount);
+  e.currentTarget.textContent = 'Cambiar a ' + (curCount === 15740 ? '5.000' : '15.740');
+});
+
+addEventListener('resize', () => {
+  camera.aspect = innerWidth / innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(innerWidth, innerHeight);
+});
+</script>
+</body>
+</html>

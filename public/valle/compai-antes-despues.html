@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="es-CO">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>compAI — antes / después, con su comportamiento completo</title>
+<!-- sin esto el navegador pide /favicon.ico y el 404 ensucia el gate (cero page errors) -->
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ctext y='26' font-size='26'%3E%F0%9F%90%86%3C/text%3E%3C/svg%3E">
+  <script type="module" crossorigin src="./compai-vivo-assets/comparador-vivo-CYSnA4qJ.js"></script>
+  <link rel="stylesheet" crossorigin href="./compai-vivo-assets/comparador-vivo-CuVTzBof.css">
+</head>
+<body>
+<div id="root"></div>
+<style>
+  /* ── La Zarigüeya viva: base de Angelita + sus gestos (lupa/oreja/muerta) ──
+     El compai zarigüeya se hace con cariño para la usuaria norte. El bicho es
+     UNA lámina transparente drop-in (limpia para valle 3D / 2D / Kart); las
+     hojas del piso son una capa de FONDO aparte, nunca pegadas a ella. */
+  .zc-vitrina {
+    max-width: 1180px; margin: 3rem auto 4rem;
+    padding: 2rem clamp(1rem, 4vw, 3rem); color: #f6ead2; background: #182b31;
+    border: 1px solid rgba(232, 193, 122, .35); border-radius: 1.25rem;
+    box-shadow: 0 1rem 3rem rgba(0, 0, 0, .18);
+  }
+  .zc-vitrina h2 { margin: 0 0 .4rem; color: #f4ca7d; font-size: clamp(1.3rem, 3vw, 1.8rem); }
+  .zc-vitrina .zc-intro { margin: 0 0 1.4rem; color: #d4dfd9; max-width: 62ch; line-height: 1.5; }
+  .zc-stage-wrap {
+    position: relative; border-radius: 1rem; overflow: hidden;
+    background: radial-gradient(120% 90% at 50% 6%, #26433f 0%, #16292f 58%, #0f1e1d 100%);
+  }
+  /* piso + hojas: FONDO estático, separado del compai que se mueve */
+  .zc-suelo {
+    position: absolute; inset: auto 0 0 0; height: 40%; z-index: 0; pointer-events: none;
+    background: linear-gradient(180deg, transparent, rgba(58,42,24,.42) 62%, rgba(34,24,14,.7));
+  }
+  .zc-hojas { position: absolute; inset: auto 0 -2% 0; height: 30%; z-index: 0; opacity: .42; pointer-events: none; }
+  .zc-host { position: relative; z-index: 1; width: 100%; height: clamp(340px, 48vw, 480px); }
+  .zc-botonera { display: flex; flex-wrap: wrap; gap: .5rem; margin-top: 1.1rem; }
+  .zc-btn {
+    appearance: none; cursor: pointer; font: 600 .9rem/1 system-ui, -apple-system, sans-serif;
+    color: #f6ead2; background: rgba(244, 202, 125, .1); border: 1px solid rgba(232, 193, 122, .45);
+    padding: .6rem .95rem; border-radius: 999px; transition: background .18s, transform .12s;
+  }
+  .zc-btn:hover { background: rgba(244, 202, 125, .22); }
+  .zc-btn:active { transform: translateY(1px); }
+  .zc-btn[aria-pressed="true"] { background: #f4ca7d; color: #22150a; border-color: #f4ca7d; }
+  .zc-nota { margin-top: 1rem; color: #9fb3ac; font-size: .82rem; line-height: 1.45; }
+  @media (prefers-reduced-motion: reduce) { .zc-btn { transition: none; } }
+</style>
+<section class="zc-vitrina" aria-labelledby="zc-title">
+  <h2 id="zc-title">La Zarigüeya y sus gestos</h2>
+  <p class="zc-intro">La misma base viva de Angelita (respira, mira alrededor, se asea) más
+    lo suyo: saca la <b>lupa</b> para ver, agranda la <b>oreja</b> para escuchar, y ~1 de cada 5
+    ratos se hace la <b>muerta</b> — y le explica, con cariño, por qué lo hace. Toque un gesto o
+    déjela en «Idle vivo».</p>
+  <div class="zc-stage-wrap">
+    <div class="zc-suelo"></div>
+    <svg class="zc-hojas" viewBox="0 0 600 120" preserveAspectRatio="xMidYMax slice" aria-hidden="true">
+      <g fill="#6b4e2a">
+        <path d="M60 96 q18-26 46-14 q-10 24-46 14z"/>
+        <path d="M180 104 q22-20 44-6 q-14 20-44 6z" opacity=".8"/>
+        <path d="M330 98 q-20-24-46-10 q12 24 46 10z"/>
+        <path d="M470 106 q24-18 46-4 q-16 20-46 4z" opacity=".85"/>
+        <path d="M540 92 q16-24 42-12 q-8 24-42 12z" opacity=".7"/>
+      </g>
+    </svg>
+    <div class="zc-host" id="zariguya-host"></div>
+  </div>
+  <div class="zc-botonera" role="group" aria-label="Gestos de la zarigüeya">
+    <button class="zc-btn" type="button" data-estado="acompana" aria-pressed="true">Idle vivo</button>
+    <button class="zc-btn" type="button" data-estado="ver">Ver (lupa)</button>
+    <button class="zc-btn" type="button" data-estado="escuchando">Escuchar (oreja)</button>
+    <button class="zc-btn" type="button" data-estado="muerta">Hacerse la muerta</button>
+  </div>
+  <p class="zc-nota">Asset transparente drop-in: la misma lámina limpia (sin hojas ni piso
+    horneados) va al valle 3D, al 2D y a Chagra Kart. La muerta es una POSE del mismo cuerpo
+    aprobado (como en <code>ZariguyaLaminaViva</code>), no otro dibujo.</p>
+</section>
+<script type="module">
+  import { montarZariguya } from './compai/zariguyaCompai.js';
+  const host = document.getElementById('zariguya-host');
+  const z = montarZariguya(host, { auto: true });
+  window.__zariguya = z; // gancho de gate/canario
+  const botones = Array.from(document.querySelectorAll('.zc-btn'));
+  botones.forEach((b) => b.addEventListener('click', () => {
+    botones.forEach((x) => x.setAttribute('aria-pressed', String(x === b)));
+    z.setEstado(b.dataset.estado);
+  }));
+</script>
+</body>
+</html>
