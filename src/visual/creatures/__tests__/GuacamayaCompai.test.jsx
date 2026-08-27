@@ -220,6 +220,22 @@ describe('GuacamayaCompai', () => {
       expect(grads.length).toBe(2);
       expect(grads[0].id).not.toBe(grads[1].id);
     });
+
+    // BUG FIX: la guacamaya es voladora, NO debe recibir estado 'caminando'.
+    // Si por error se le pasa state='caminando', debe tratarse como 'idle' (su
+    // estado base de vuelo/aleteo). Ver task #fix-guacamaya-vuela.
+    test('state="caminando" se trata como idle (la guacamaya vuela, no camina)', () => {
+      const { container } = render(<GuacamayaCompai state="caminando" />);
+      // El data-estado debe ser 'idle' (vuela), no 'caminando'
+      expect(container.querySelector('svg')).toHaveAttribute('data-estado', 'idle');
+    });
+
+    test('state="caminando" con prop visema mantiene el visema pero data-estado=idle', () => {
+      const { container } = render(<GuacamayaCompai state="caminando" visema="V2" />);
+      const svg = container.querySelector('svg');
+      expect(svg).toHaveAttribute('data-estado', 'idle');
+      expect(svg).toHaveAttribute('data-visema', 'V2');
+    });
   });
 
 });

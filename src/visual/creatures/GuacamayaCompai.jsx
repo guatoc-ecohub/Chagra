@@ -130,12 +130,17 @@ const MOTAS_LUZ = [
 /* Vocabulario angosto del avatar (idle/thinking/speaking/listening) → el
    `data-estado` que el rig original espera (idle/hablar/senalar/…). Se deja
    sembrado para cuando el rig corra en Shadow DOM y los `:host([data-estado])`
-   empiecen a aplicar de verdad. */
+   empiecen a aplicar de verdad.
+   BUG FIX #fix-guacamaya-vuela: la guacamaya es VOLADORA, NO camina.
+   Si por error se le pasa state='caminando', se trata explícitamente como
+   'idle' (su estado base de vuelo/aleteo). Esto excluye a la guacamaya del
+   estado caminando que reciben jaguar/oso-baston/zariguya en CompaiOverlay. */
 const ESTADO_DE_STATE = {
   idle: 'idle',
   thinking: 'idle',
   speaking: 'hablar',
   listening: 'idle',
+  caminando: 'idle', // La guacamaya VUELA, no camina
 };
 
 /* Vocabulario RICO (angelitaEstados.js, los mismos 10 que entiende Angelita)

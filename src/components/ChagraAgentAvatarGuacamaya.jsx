@@ -19,6 +19,11 @@ import { useAngelitaPresencia, esPasivo } from '../visual/agente/useAngelitaPres
  * el rig reusado solo distingue idle/hablar por ahora, ver nota en ese
  * archivo).
  *
+ * BUG FIX #fix-guacamaya-vuela: la guacamaya es VOLADORA, NO camina.
+ * Si por error se le pasa state='caminando', se traduce explícitamente a 'idle'.
+ * Esto excluye a la guacamaya del estado caminando que reciben jaguar/oso-baston/
+ * zariguya en CompaiOverlay (CON_MARCHA). La guacamaya solo debe VUELE.
+ *
  * VISEMA (2026-08-21, "guacamaya = compai de agente completo"):
  * `GuacamayaCompai.jsx` dejó de hardcodear `data-visema` a partir de `state`
  * — ahora acepta un `visema` real (para el vocabulario rico, ver
@@ -30,6 +35,12 @@ import { useAngelitaPresencia, esPasivo } from '../visual/agente/useAngelitaPres
  */
 const VISEMA_DE_STATE = {
     speaking: 'V2',
+};
+
+/* BUG FIX #fix-guacamaya-vuela: la guacamaya VUELA, no camina.
+   Si por error llega state='caminando', traducirlo a 'idle'. */
+const STATE_NORMALIZADO = {
+    caminando: 'idle', // La guacamaya es voladora, excluida de CON_MARCHA
 };
 
 export default function ChagraAgentAvatarGuacamaya({
@@ -46,7 +57,9 @@ export default function ChagraAgentAvatarGuacamaya({
     reaccionaPresencia = true,
 }) {
     const { despierta, handlers: handlersPresencia } = useAngelitaPresencia({ activo: reaccionaPresencia });
-    const estadoBase = estado || state;
+    // BUG FIX #fix-guacamaya-vuela: normalizar 'caminando' a 'idle' (la guacamaya vuela)
+    const stateNormalizado = STATE_NORMALIZADO[state] || state;
+    const estadoBase = estado || stateNormalizado;
     const estadoEfectivo = despierta && esPasivo(estadoBase) ? 'idle' : estadoBase;
     const visema = visemaProp || VISEMA_DE_STATE[estadoEfectivo] || null;
     const bicho = (
