@@ -379,6 +379,22 @@ const HALOS = `
   <circle class="zh-ojoHalo" style="opacity:0" cx="176" cy="80" r="18" fill="url(#ztOjoHalo)"/>
   <circle class="zh-ojoHalo" style="opacity:0" cx="245" cy="74" r="18" fill="url(#ztOjoHalo)"/>`;
 
+/* ── OJO CERCANO (izq. de la imagen, ancla halo 176,80) — LA cirugía de arte
+   aprobada (operador 2026-08-27): el raster Gemini hero dejó ESTE ojo con la
+   pupila oscura corrida en MEDIALUNA sobre mucho blanco de esclera → "ojo
+   picho": lee como ojo en blanco / desenfocado frente al ojo lejano (nítido,
+   con catchlight en espiral). MISMA idea que se probó para el lejano, pero
+   ADAPTADA a que este ojo es BLANCO-dominante: NADA de base gris translúcida
+   (sobre el blanco se lee como mancha), sólo una pupila redonda DEFINIDA que
+   funde el creciente en un disco + catchlight arriba-izquierda (misma luz que
+   el ojo lejano). SIN redibujar la lámina ni tocar el resto del arte. Coords
+   calco MEDIDAS con grilla GPU-headed (centro del ojo ≈184,76; la pupila funde
+   el creciente existente ≈187,79). Va DEBAJO de los párpados: el blink lo tapa
+   igual que al otro ojo. El ojo LEJANO se deja como está (ya lee vivo). ── */
+const OJO_CERCA_VIVO = `
+  <circle cx="186" cy="77.5" r="6.8" fill="#120c07" opacity="0.92"/>
+  <circle cx="182.6" cy="73.8" r="1.8" fill="#f7efdb" opacity="0.92"/>`;
+
 /* ─────────────────────── LA CABEZA (con sus satélites) ───────────────────── */
 
 const CABEZA = `
@@ -387,7 +403,7 @@ const CABEZA = `
   <g class="zh-hueso zh-mandibula"${origin('mandibula')}>${usoCalco('mandibula')}</g>
   <g class="zh-hueso zh-orejaI"${origin('orejaI')}>${usoCalco('orejaI')}</g>
   <g class="zh-hueso zh-orejaD"${origin('orejaD')}>${usoCalco('orejaD')}</g>
-  <g class="zh-ojoGrupo">${HALOS}${PARPADOS}</g>`;
+  <g class="zh-ojoGrupo">${HALOS}${OJO_CERCA_VIVO}${PARPADOS}</g>`;
 
 /* ─────────────────────────── EL SVG COMPLETO ─────────────────────────────── */
 
