@@ -478,6 +478,7 @@ function decisionCalma() {
  * @param {string|null} [ctx.ultimoLutoId] última pérdida ya lamentada (dedup, #109).
  * @param {string|null} [ctx.mundo] — mundo actual (para husmear).
  * @param {Object} [ctx.datosMundo] — datos reales del mundo (ver comentarioDeMundo).
+ * @param {Object} [ctx.perfil] — perfil del usuario (vocacion, rol, etc.) para ramificar copy.
  * @param {number} [ctx.ahoraMs]
  * @param {Object} [ctx.ultimaHablaPorLlave] — { [llaveCooldown]: ms } de la última vez.
  * @param {boolean} [ctx.ocupado]
@@ -496,6 +497,7 @@ export function resolverComportamiento(ctx = {}) {
     ultimoLutoId = null,
     mundo = null,
     datosMundo = {},
+    perfil = {},
     ahoraMs = Date.now(),
     ultimaHablaPorLlave = {},
     ocupado = false,
@@ -552,7 +554,7 @@ export function resolverComportamiento(ctx = {}) {
   // cooldown por mundo y la MISMA cadencia adaptativa de siempre.
   if (mundo) {
     const pregunta = preguntaDeAprendiz({ mundo, datosMundo, rand });
-    const comentario = pregunta || comentarioDeMundo(mundo, datosMundo);
+    const comentario = pregunta || comentarioDeMundo(mundo, datosMundo, perfil);
     if (comentario) {
       candidatos.push({
         estado: 'husmea',

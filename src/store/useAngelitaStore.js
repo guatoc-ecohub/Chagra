@@ -9,6 +9,7 @@ import {
 import { variarMensaje } from '../services/angelitaVariedad';
 import { tipoDeDecision } from '../visual/agente/angelitaAvisoTipos';
 import { LLAVE_COOLDOWNS, LLAVE_HEREDADA_ANGELITA, leerCooldowns, escribirCooldowns } from '../compai/nucleo/cooldowns.js';
+import { getProfile } from '../services/userProfileService';
 
 /**
  * useAngelitaStore — LA API EN VIVO del comportamiento de Angelita.
@@ -162,6 +163,7 @@ const useAngelitaStore = create(
        */
       evaluar: (ctx = {}) => {
         const { ultimaHablaPorLlave, ultimoLogroId, ultimoLutoId, silenciado, molestia } = get();
+        const perfil = getProfile();
         const decision = resolverComportamiento({
           ...ctx,
           ahoraMs: ctx.ahoraMs ?? Date.now(),
@@ -170,6 +172,7 @@ const useAngelitaStore = create(
           ultimoLutoId,
           silenciado: silenciado || get().hoyNoActivo(),
           molestia,
+          perfil,
         });
         get()._aplicar(decision, ctx.mundo ?? get().mundoActual);
         return decision;
