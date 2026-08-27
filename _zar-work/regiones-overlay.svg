@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="564" height="889" viewBox="-20 -20 604 929">
+<image href="zariguya-parada-alpha.png" x="0" y="0" width="564" height="889"/>
+<path d="M5,-15 L365,-15 L365,270 L5,270 Z" fill="#ff000055" stroke="#000" stroke-width="1.5"/>
+<path d="M10,-15 L140,-15 L140,95 L10,95 Z" fill="#00ff0088" stroke="#000" stroke-width="1.5"/>
+<path d="M225,-15 L360,-15 L360,95 L225,95 Z" fill="#0000ff88" stroke="#000" stroke-width="1.5"/>
+<path d="M130,195 L260,195 L260,270 L130,270 Z" fill="#ffff0099" stroke="#000" stroke-width="1.5"/>
+<path d="M60,220 L330,220 L330,330 L60,330 Z" fill="#ff00ff66" stroke="#000" stroke-width="1.5"/>
+<path d="M0,250 L400,250 L400,850 L0,850 Z" fill="#00ffff33" stroke="#000" stroke-width="1.5"/>
+<path d="M170,700 L290,700 L290,790 L170,790 Z" fill="#ff880088" stroke="#000" stroke-width="1.5"/>
+<path d="M260,720 L420,720 L420,820 L260,820 Z" fill="#88ff0088" stroke="#000" stroke-width="1.5"/>
+<path d="M390,740 L564,740 L564,889 L390,889 Z" fill="#8800ff88" stroke="#000" stroke-width="1.5"/>
+<circle cx="190" cy="480" r="5" fill="#fff" stroke="#000" stroke-width="1.5"/><text x="197" y="473" font-size="14" fill="#000" stroke="#fff" stroke-width="0.3">columna</text>
+<circle cx="190" cy="260" r="5" fill="#fff" stroke="#000" stroke-width="1.5"/><text x="197" y="253" font-size="14" fill="#000" stroke="#fff" stroke-width="0.3">cuello</text>
+<circle cx="190" cy="155" r="5" fill="#fff" stroke="#000" stroke-width="1.5"/><text x="197" y="148" font-size="14" fill="#000" stroke="#fff" stroke-width="0.3">cabeza</text>
+<circle cx="195" cy="235" r="5" fill="#fff" stroke="#000" stroke-width="1.5"/><text x="202" y="228" font-size="14" fill="#000" stroke="#fff" stroke-width="0.3">mandibula</text>
+<circle cx="75" cy="45" r="5" fill="#fff" stroke="#000" stroke-width="1.5"/><text x="82" y="38" font-size="14" fill="#000" stroke="#fff" stroke-width="0.3">orejaI</text>
+<circle cx="290" cy="45" r="5" fill="#fff" stroke="#000" stroke-width="1.5"/><text x="297" y="38" font-size="14" fill="#000" stroke="#fff" stroke-width="0.3">orejaD</text>
+<circle cx="225" cy="745" r="5" fill="#fff" stroke="#000" stroke-width="1.5"/><text x="232" y="738" font-size="14" fill="#000" stroke="#fff" stroke-width="0.3">colaBase</text>
+<circle cx="370" cy="760" r="5" fill="#fff" stroke="#000" stroke-width="1.5"/><text x="377" y="753" font-size="14" fill="#000" stroke="#fff" stroke-width="0.3">colaMedia</text>
+<circle cx="480" cy="780" r="5" fill="#fff" stroke="#000" stroke-width="1.5"/><text x="487" y="773" font-size="14" fill="#000" stroke="#fff" stroke-width="0.3">colaPunta</text>
+</svg>
