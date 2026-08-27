@@ -261,6 +261,45 @@
 .hcm-recado p { margin: 0; font-size: 17px; line-height: 1.45; font-weight: 700; }
 .hcm-recado b { color: var(--hcm-calido); }
 
+/* ── 4.5 COMPAI QUE CAMINA ── */
+.hcm-compai {
+  margin-top: 20px;
+  padding: 18px;
+  border-radius: 20px;
+  background: linear-gradient(165deg, rgba(163, 230, 53, 0.08), rgba(163, 230, 53, 0.03));
+  border: 2px solid rgba(163, 230, 53, 0.2);
+  text-align: center;
+}
+.hcm[data-modo='dia'] .hcm-compai {
+  background: linear-gradient(165deg, rgba(77, 124, 15, 0.06), rgba(77, 124, 15, 0.02));
+  border-color: rgba(77, 124, 15, 0.25);
+}
+.hcm-compai-kicker {
+  display: inline-block;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--hcm-vivo);
+  margin-bottom: 8px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: var(--hcm-vivo-tinta);
+}
+.hcm-compai-tit {
+  font-family: 'Baloo 2', 'Nunito', sans-serif;
+  font-size: 22px;
+  font-weight: 700;
+  margin: 0 0 8px;
+  color: var(--hcm-tinta);
+}
+.hcm-compai-copy {
+  font-size: 16px;
+  line-height: 1.4;
+  margin: 0;
+  color: var(--hcm-tinta-suave);
+}
+
 /* ── 5. PIE ── */
 .hcm-pie { display: flex; gap: 12px; margin-top: 20px; }
 .hcm-pie-btn {

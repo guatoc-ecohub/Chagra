@@ -23,12 +23,15 @@
  *   3. SEIS PUERTAS grandes de una-dos palabras (Mis matas / Mis animales /
  *      El tiempo / Vender / Aprender / Toda mi finca). Sin descripciones,
  *      sin chips: dibujo grande + palabra grande.
- *   4. El TIEMPO de hoy en palabras del campo, arriba, junto al saludo.
+ *   4. EL TIEMPO de hoy en palabras del campo, arriba, junto al saludo.
  *   5. UN solo recado en cristiano ("Mañana llueve — guarde el café").
  *   6. TODO se puede ESCUCHAR (🔊): pensado para baja alfabetización.
  *   7. Vista "pleno sol": variante clara de alto contraste para leer el
  *      teléfono a mediodía en el campo (el biopunk nocturno va bien de
  *      noche, pero de día al rayo del sol un fondo oscuro no se ve).
+ *   8. COMPAI QUE CAMINA: el compai (jaguar/oso-baston/zariguya) camina por
+ *      la pantalla con marcha real (CompaiOverlay, estado 'caminando'),
+ *      NO el avatar estático ChagraAgentAvatar 'acompana'.
  *
  * Técnica: CSS puro + emojis grandes (cero deps, cero fotos), targets
  * mínimos 88px, tipografía Baloo 2 / Nunito ya self-host. Los toques
@@ -37,6 +40,7 @@
  */
 
 import { useEffect, useMemo, useRef, useState } from 'react';
+import CompaiOverlay from '../components/CompaiOverlay';
 import './home-campesino.css';
 
 // ── Datos de muestra (los reales saldrían de perfil + clima + recordatorios) ──
@@ -199,6 +203,13 @@ export default function HomeCampesino({ onBack }) {
           <p><b>Recado de hoy:</b> {MUESTRA.recado}</p>
         </section>
 
+        {/* ── 4.5 COMPAI QUE CAMINA: el compai (jaguar/oso-baston/zariguya) con marcha real ── */}
+        <section className="hcm-compai" aria-label="Su compañero">
+          <span className="hcm-compai-kicker">SU COMPAÑERO</span>
+          <h2 className="hcm-compai-tit">Chagra está aquí</h2>
+          <p className="hcm-compai-copy">Hable, muestre una foto o pregunte por un cultivo.</p>
+        </section>
+
         {/* ── 5. AYUDA Y PERFIL, GRANDES Y AL FINAL ── */}
         <div className="hcm-pie">
           <button type="button" className="hcm-pie-btn" onClick={() => avisar('Aquí se abre la ayuda, con explicación paso a paso.')}>
@@ -212,6 +223,9 @@ export default function HomeCampesino({ onBack }) {
         <p className="hcm-marca">{MUESTRA.vereda} · 1.800 msnm</p>
         <p className="hcm-mocknota">MOCKUP · datos de muestra</p>
       </main>
+
+      {/* ── COMPAI OVERLAY: el compai camina por la pantalla con marcha real ── */}
+      <CompaiOverlay currentView="mockups-home-campesino" />
 
       {/* Aviso honesto del mockup */}
       {aviso && (
