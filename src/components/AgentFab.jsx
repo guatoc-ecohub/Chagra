@@ -25,6 +25,7 @@ import useAgentAvatarType, { AVATAR_NOMBRE, DEFAULT_AVATAR_TYPE } from '../hooks
 import { getHintForRuta } from '../config/compaiHints.js';
 import BurbujaAngelita from '../visual/agente/BurbujaAngelita.jsx';
 import AgentFabMenu from './AgentFabMenu';
+import BurbujaMaderaPeek from './BurbujaMaderaPeek';
 import useComportamientoCompai from '../hooks/useComportamientoCompai.js';
 import useCompaiDraggable from '../hooks/useCompaiDraggable';
 import './agent-fab-skin.css';
@@ -57,11 +58,12 @@ import './agent-fab-skin.css';
  *
  * ── EL GESTO DE INTERACCIÓN (#66/#70, 2026-07-30) ──────────────────────────
  * Toque corto y pulsación larga sobre el PERSONAJE se reparten así:
- *   - TOQUE CORTO  → abre un menú flotante junto al personaje: "Hablar",
- *     "Enviar foto" y "Que se quede callado hoy" (AgentFabMenu). Antes el
- *     toque corto navegaba derecho al agente — ahora esa es la opción
- *     "Hablar" dentro del menú (mismo destino, un paso más explícito).
- *   - MANTENER PRESIONADO (600 ms) → habla DIRECTO, sin menú: activa el
+ *   - TOQUE CORTO  → ASOMA el peek de madera (BurbujaMaderaPeek): una tabla
+ *     veteada con el ÚLTIMO aviso escrito a máquina y, encima, tres controles
+ *     claros: Ver / Escuchar / Callar. Es un vistazo, no navega pesado ni abre
+ *     el menú; "Más opciones" dentro del peek sí abre el menú compacto de
+ *     siempre (hablar, foto, callar-hoy).
+ *   - MANTENER PRESIONADO (1600 ms) → «Hola Chagra»: habla DIRECTO, sin menú: activa el
  *     micrófono (`activarEscucha`, el mismo trigger desacoplado que usa
  *     EscuchaFab) al soltar la vibración háptica. Walkie-talkie: se aprieta
  *     para hablar.
@@ -80,6 +82,7 @@ export default function AgentFab({ onNavigate, pantalla = null }) {
   const [hover, setHover] = useState(false);
   const [pressed, setPressed] = useState(false);
   const [menuAbierto, setMenuAbierto] = useState(false);
+  const [peekAbierto, setPeekAbierto] = useState(false);
   const { level: ttsLevel } = useTtsAmplitude();
 
   // Hook de arrastre y persistencia de posición
@@ -119,10 +122,13 @@ export default function AgentFab({ onNavigate, pantalla = null }) {
   const iniciarPulsacionLarga = useCallback(() => {
     fueLargo.current = false;
     if (timerLargo.current) clearTimeout(timerLargo.current);
+    // 1600 ms = «Hola Chagra» escuchando (decisión operador 2026-08-27): un
+    // pelín más largo que el toque para que asomar el peek no dispare la voz
+    // por error. El toque corto (< 1600 ms) asoma el peek; el largo, la escucha.
     timerLargo.current = setTimeout(() => {
       fueLargo.current = true;
       hablarDirecto();
-    }, 600);
+    }, 1600);
   }, [hablarDirecto]);
 
   const soltarPulsacionLarga = useCallback(() => {
@@ -207,7 +213,9 @@ export default function AgentFab({ onNavigate, pantalla = null }) {
   //   R3 — Enseña en idle: en reposo muestra el hint contextual de la ruta
   //        (folded desde CompaiOverlay), UNA vez por entrada y respetando
   //        silencio / "hoy no" / ocupado (anti-molestia del store).
-  //   R4 — Al tocarlo: menú Ver / Escuchar / Callar (+ Hablar / foto).
+  //   R4 — Al tocarlo: ASOMA el peek de madera (BurbujaMaderaPeek) con el
+  //        último aviso (typewriter) y Ver / Escuchar / Callar. "Más opciones"
+  //        abre el menú compacto de siempre.
   //   R5 — Notificaciones adaptadas: el mensaje REAL (clima vivo / susurro /
   //        agroecología / respuesta lista) se pinta como burbuja de AVISO en
   //        prod 2D (antes solo un glow). El texto ADAPTADO ya lo alimentan los
@@ -249,6 +257,7 @@ export default function AgentFab({ onNavigate, pantalla = null }) {
   if (lastPantalla !== pantalla) {
     setLastPantalla(pantalla);
     setPanelAbierto(false);
+    setPeekAbierto(false);
     setHintDescartado(false);
     setHintArrancado(false);
     setHintConsumido(false);
@@ -261,12 +270,12 @@ export default function AgentFab({ onNavigate, pantalla = null }) {
     ? mensajeAngelita
     : lastAssistantMessage;
   const tipoAviso = estadoAngelita !== 'calma' && tipoAngelita ? tipoAngelita : 'informativa';
-  const mostrarAviso = responseReady && !!mensajeAviso && !silenciado && !menuAbierto;
+  const mostrarAviso = responseReady && !!mensajeAviso && !silenciado && !menuAbierto && !peekAbierto;
 
   // Enseñanza (R3): reposo, sin aviso, sin silencio/"hoy no"/ocupado, sin
   // menú/panel, no descartada ni ya consumida esta entrada.
   const ensenanzaPermitida = !mostrarAviso && !silenciado && !hoyNo && !estaOcupado()
-    && pantalla != null && !menuAbierto && !panelAbierto;
+    && pantalla != null && !menuAbierto && !panelAbierto && !peekAbierto;
   const mostrarEnsenanza = ensenanzaPermitida && !interactuando && !hintDescartado && !hintConsumido;
   if (mostrarEnsenanza && !hintArrancado) setHintArrancado(true);
 
@@ -298,10 +307,15 @@ export default function AgentFab({ onNavigate, pantalla = null }) {
     registrarSenalMolestia('escuchar');
   }, [registrarSenalMolestia]);
 
-  // Contenido del panel "Ver": el aviso real si lo hay, si no el hint de la ruta.
-  const contenidoPanel = mostrarAviso
-    ? { titulo: `${nombreCompai}: un aviso para usted`, descripcion: mensajeAviso }
-    : hint;
+  // Contenido del panel "Ver" y del PEEK: el aviso vivo / último mensaje si lo
+  // hay, si no el hint de la ruta, y como último recurso una línea amable — así
+  // el peek nunca queda sin qué decir ni revienta al leer `.descripcion`.
+  const contenidoPanel = useMemo(() => {
+    if (mensajeAngelita) return { titulo: `${nombreCompai}: un aviso para usted`, descripcion: mensajeAngelita };
+    if (lastAssistantMessage) return { titulo: `${nombreCompai}: un aviso para usted`, descripcion: lastAssistantMessage };
+    if (hint) return hint;
+    return { titulo: nombreCompai, descripcion: 'Estoy con usted. Tóqueme cuando quiera algo.' };
+  }, [mensajeAngelita, lastAssistantMessage, hint, nombreCompai]);
 
   // Estado del compai: el tacto manda; luego el ánimo rico del store; luego
   // la respuesta del chat y, al final, el idle.
@@ -336,13 +350,46 @@ export default function AgentFab({ onNavigate, pantalla = null }) {
 
   const handleClick = () => {
     // Si la pulsación larga ya disparó "hablar directo", el dedo NO debe
-    // además abrir el menú: un solo gesto, una sola acción.
+    // además asomar el peek: un solo gesto, una sola acción.
     if (fueLargo.current) { fueLargo.current = false; return; }
     // Tocar el FAB con una respuesta esperándolo es "abrir el tip" (#102/
     // #106): atención positiva, el contador de molestia baja.
     if (responseReady) registrarSenalMolestia('abrirTip');
-    setMenuAbierto(true);
+    // TAP = PEEK (decisión operador 2026-08-27): asoma el último aviso con
+    // Ver / Escuchar / Callar. El menú compacto queda tras "Más opciones".
+    setPeekAbierto(true);
   };
+
+  /** Peek → "Ver": abre el panel de lectura con el mensaje completo. */
+  const handlePeekVer = useCallback(() => {
+    setPeekAbierto(false);
+    setPanelAbierto(true);
+    registrarSenalMolestia('abrirTip');
+  }, [registrarSenalMolestia]);
+
+  /** Peek → "Escuchar": lee EN VOZ el aviso REAL (contenidoPanel), no enlatado. */
+  const handlePeekEscuchar = useCallback(() => {
+    speakSentences(`${contenidoPanel.titulo}. ${contenidoPanel.descripcion}`).catch(() => {});
+    registrarSenalMolestia('escuchar');
+  }, [contenidoPanel, registrarSenalMolestia]);
+
+  /** Peek → "Callar": silencio indefinido (useAngelitaStore.silenciar()). */
+  const handlePeekCallar = useCallback(() => {
+    setPeekAbierto(false);
+    silenciar(true);
+  }, [silenciar]);
+
+  /** Peek → "Más opciones": abre el menú compacto de siempre. */
+  const handlePeekMas = useCallback(() => {
+    setPeekAbierto(false);
+    setMenuAbierto(true);
+  }, []);
+
+  /** El peek se cerró sin elegir nada: señal de molestia leve (abrió y cerró). */
+  const handlePeekCerrar = useCallback(() => {
+    setPeekAbierto(false);
+    registrarSenalMolestia('cerrarTipSinLeer');
+  }, [registrarSenalMolestia]);
 
   /** Menú → "Hablar": activa el micrófono, igual que el gesto largo. */
   const handleMenuHablar = useCallback(() => {
@@ -358,14 +405,13 @@ export default function AgentFab({ onNavigate, pantalla = null }) {
     registrarSenalMolestia('abrirTip');
   }, [registrarSenalMolestia]);
 
-  /** Menú → "Escuchar": lectura breve del contexto actual por Kokoro. */
+  /** Menú → "Escuchar": lee EN VOZ el aviso REAL (contenidoPanel), nunca una
+   *  frase enlatada distinta de lo que "Ver" muestra (decisión operador). */
   const handleMenuEscuchar = useCallback(() => {
     setMenuAbierto(false);
-    const lugar = pantalla ? pantalla.replaceAll('_', ' ') : 'esta pantalla';
-    speakSentences(`Estoy en ${lugar}. Puede preguntarme por texto, hablarme o enviarme una foto de su finca.`)
-      .catch(() => {});
+    speakSentences(`${contenidoPanel.titulo}. ${contenidoPanel.descripcion}`).catch(() => {});
     registrarSenalMolestia('escuchar');
-  }, [pantalla, registrarSenalMolestia]);
+  }, [contenidoPanel, registrarSenalMolestia]);
 
   /** Menú → "Enviar foto": abre el agente con la cámara ya disparada. */
   const handleMenuFoto = useCallback(() => {
@@ -658,7 +704,23 @@ export default function AgentFab({ onNavigate, pantalla = null }) {
         </div>
       )}
 
-      {/* MENÚ DEL TOQUE CORTO (#66/#70): "Ver" / "Escuchar" / "Hablar" /
+      {/* PEEK DEL TOQUE (decisión operador 2026-08-27): tabla de madera con el
+          último aviso (typewriter) + Ver / Escuchar / Callar. "Más opciones"
+          abre el menú compacto de abajo. */}
+      {peekAbierto && (
+        <BurbujaMaderaPeek
+          mensaje={contenidoPanel.descripcion}
+          nombre={nombreCompai}
+          silenciado={silenciado}
+          onVer={handlePeekVer}
+          onEscuchar={handlePeekEscuchar}
+          onCallar={handlePeekCallar}
+          onMas={handlePeekMas}
+          onCerrar={handlePeekCerrar}
+        />
+      )}
+
+      {/* MENÚ COMPACTO (tras "Más opciones" del peek): "Ver" / "Escuchar" / "Hablar" /
           "Enviar foto" / "Ver fotos" / "Que se quede callado hoy". Se ancla al
           mismo puesto que el personaje. */}
       <AgentFabMenu
