@@ -110,10 +110,11 @@ describe('profileChipSelector — selectChipIntentsForRole (núcleo puro)', () =
     const intents = selectChipIntentsForRole({ role: PROFILE_ROLES.campesino });
     expect(intents).toEqual([
       CHIP_INTENTS.siembro,
-      CHIP_INTENTS.calendario,
+      CHIP_INTENTS.asociaciones, // task #hc-menu-perfiles (2026-08-27)
       CHIP_INTENTS.plaga,
       CHIP_INTENTS.biopreparado,
       CHIP_INTENTS.clima,
+      CHIP_INTENTS.calendario,
       CHIP_INTENTS.precio,
     ]);
     // NO debe mostrar páramo a un campesino que no pidió restauración.
@@ -262,6 +263,48 @@ describe('profileChipSelector — selectChipDefs (objetos para el componente)', 
     for (const d of defs) {
       expect(CHIP_DEFS.some((c) => c.intent === d.intent)).toBe(true);
     }
+  });
+
+  // Tests task #hc-menu-perfiles (2026-08-27)
+  it('campesino tiene chip de asociaciones destacado', () => {
+    const intents = selectChipIntents({ rol: 'campesino' });
+    expect(intents).toContain(CHIP_INTENTS.asociaciones);
+    // Debe estar después de siembro pero antes de calendario (orden específico)
+    const siembroIdx = intents.indexOf(CHIP_INTENTS.siembro);
+    const asociacionesIdx = intents.indexOf(CHIP_INTENTS.asociaciones);
+    const calendarioIdx = intents.indexOf(CHIP_INTENTS.calendario);
+    expect(asociacionesIdx).toBeGreaterThan(siembroIdx);
+    expect(calendarioIdx).toBeGreaterThan(asociacionesIdx);
+  });
+
+  it('técnico tiene chips de variedades, fenología, polinización y fuente/DOI', () => {
+    const intents = selectChipIntents({ rol: 'tecnico' });
+    expect(intents).toContain(CHIP_INTENTS.variedades);
+    expect(intents).toContain(CHIP_INTENTS.fenologia);
+    expect(intents).toContain(CHIP_INTENTS.polinizacion);
+    expect(intents).toContain(CHIP_INTENTS.fuente_doi);
+  });
+
+  it('técnico tiene asociaciones de cultivos', () => {
+    const intents = selectChipIntents({ rol: 'tecnico' });
+    expect(intents).toContain(CHIP_INTENTS.asociaciones);
+  });
+
+  it('técnico tiene chips de cultivo base más los técnicos', () => {
+    const intents = selectChipIntents({ rol: 'tecnico' });
+    // Cultivo base
+    expect(intents).toContain(CHIP_INTENTS.siembro);
+    expect(intents).toContain(CHIP_INTENTS.plaga);
+    expect(intents).toContain(CHIP_INTENTS.biopreparado);
+    expect(intents).toContain(CHIP_INTENTS.clima);
+    expect(intents).toContain(CHIP_INTENTS.calendario);
+    // Técnicos
+    expect(intents).toContain(CHIP_INTENTS.variedades);
+    expect(intents).toContain(CHIP_INTENTS.fenologia);
+    expect(intents).toContain(CHIP_INTENTS.polinizacion);
+    expect(intents).toContain(CHIP_INTENTS.fuente_doi);
+    // Restauración
+    expect(intents).toContain(CHIP_INTENTS.restauracion);
   });
 });
 
