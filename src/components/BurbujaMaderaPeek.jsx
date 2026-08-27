@@ -29,15 +29,15 @@ import './burbuja-madera-peek.css';
  *
  * Español de Colombia (usted), sin voseo.
  *
- * @param {Object}   props
- * @param {string}   props.mensaje       — el último aviso a asomar.
- * @param {string}   [props.nombre]      — nombre del compai (para el rótulo sr).
- * @param {boolean}  [props.silenciado]  — si ya está en silencio (rótulo Callar).
- * @param {Function} props.onVer         — abrir el panel de lectura.
- * @param {Function} props.onEscuchar    — leer el aviso real en voz alta.
- * @param {Function} props.onCallar      — silenciar los avisos.
- * @param {Function} [props.onMas]       — abrir el menú de más acciones.
- * @param {Function} props.onCerrar      — descartar el asomo.
+ * @param {Object}     props
+ * @param {string}     props.mensaje       el último aviso a asomar.
+ * @param {string}     [props.nombre]      nombre del compai (para el rótulo sr).
+ * @param {boolean}    [props.silenciado]  si ya está en silencio (rótulo Callar).
+ * @param {() => void} props.onVer         abrir el panel de lectura.
+ * @param {() => void} props.onEscuchar    leer el aviso real en voz alta.
+ * @param {() => void} props.onCallar      silenciar los avisos.
+ * @param {() => void} [props.onMas]       abrir el menú de más acciones.
+ * @param {() => void} props.onCerrar      descartar el asomo.
  */
 export default function BurbujaMaderaPeek({
   mensaje,
