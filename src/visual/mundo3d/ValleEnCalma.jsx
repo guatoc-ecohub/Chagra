@@ -32,6 +32,7 @@
 import { lazy, Suspense } from 'react';
 import { permite3D } from './deviceTier.js';
 import ChagraAgentAvatar from '../../components/ChagraAgentAvatar.jsx';
+import useCompaiHold from '../../hooks/useCompaiHold.js';
 import './ValleEnCalma.css';
 
 const EscenaCalma3D = lazy(() => import('./escenas/EscenaCalma3D.jsx'));
@@ -122,11 +123,13 @@ export default function ValleEnCalma({
   className = '',
 }) {
   const con3D = permite3D(tier);
+  const compaiHoldHandlers = useCompaiHold();
   return (
     <section
       className={`vcalma${className ? ` ${className}` : ''}`}
       data-tier={tier}
       aria-label={mensaje}
+      {...compaiHoldHandlers}
     >
       <div className="vcalma__escena">
         {con3D ? (
