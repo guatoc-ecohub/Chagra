@@ -426,7 +426,9 @@ export const MUNDO = {
       // como ciclo (Niña→Neutro→Niño), no como amenaza. DIDÁCTICO: arranca en una
       // fase visible; el día que exista un `get_enso_status` real (índice ONI de
       // la región Niño 3.4) se cablea aquí la fase viva. Estados: 'nina'|'neutral'|'nino'.
-      enso: { fase: 'nino' },
+      // Sin snapshot ENSO no se elige una fase a mano. La escena arranca en
+      // neutral y, cuando climaService tiene señal viva, la sustituye.
+      enso: { fase: 'neutral' },
     },
     hotspots: [
       { id: 'hoy', pos: [2.7, 3.4, 0.6], emoji: '⛅', label: 'El tiempo hoy', view: 'hoy_finca' },

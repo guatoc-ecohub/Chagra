@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /*
  * shot3d — captura una ruta 3D del dev server con chromium del sistema + swiftshader.
- * Uso: node shot3d.mjs <ruta> <salida.png> [--wait ms] [--click selector] [--w px] [--h px]
+ * Uso: node shot3d.mjs <ruta> <salida.png> [--wait ms] [--click selector] [--w px] [--h px] [--no-auth]
  */
 import { chromium } from 'playwright';
 import { execSync } from 'node:child_process';
@@ -18,6 +18,7 @@ const click = getFlag('click', null);
 const W = Number(getFlag('w', 1280));
 const H = Number(getFlag('h', 900));
 const base = getFlag('base', 'http://127.0.0.1:5173');
+const noAuth = args.includes('--no-auth');
 
 const chromiumPath = execSync('which chromium', { encoding: 'utf8' }).trim();
 
@@ -45,6 +46,36 @@ page.on('pageerror', (e) => errores.push(`[pageerror] ${e.message}`));
 page.on('console', (m) => {
   if (m.type() === 'error') errores.push(`[console] ${m.text()}`);
 });
+
+if (!noAuth) {
+  // Sesión falsa para pasar el gate de login (isAuthenticated lee localforage:
+  // farmos_access_token + expiry futuro bastan, no hay red de por medio).
+  // localforage usa IndexedDB: default 'localforage/keyvaluepairs' y la app
+  // clásica 'Chagra/syncQueue' — se siembra en ambas antes de cargar la app.
+  await page.addInitScript(() => {
+    const sembrar = (db, store) =>
+      new Promise((res) => {
+        const req = indexedDB.open(db, 2);
+        req.onupgradeneeded = () => {
+          try { req.result.createObjectStore(store); } catch { /* ya existe */ }
+        };
+        req.onsuccess = () => {
+          try {
+            const tx = req.result.transaction(store, 'readwrite');
+            const st = tx.objectStore(store);
+            st.put('shot3d-token-diagnostico', 'farmos_access_token');
+            st.put(Date.now() + 86400000, 'farmos_token_expiry');
+            tx.oncomplete = () => res(undefined);
+            tx.onerror = () => res(undefined);
+          } catch { res(undefined); }
+        };
+        req.onerror = () => res(undefined);
+      });
+    // fire-and-forget: corre antes del primer script de la app
+    sembrar('localforage', 'keyvaluepairs');
+    sembrar('Chagra', 'syncQueue');
+  });
+}
 
 const shell = getFlag('shell', '/index-prod.html');
 await page.goto(`${base}${shell}#${ruta}`, { waitUntil: 'domcontentloaded', timeout: 60000 });

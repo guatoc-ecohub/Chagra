@@ -130,7 +130,7 @@ function MigaVolver({ onSalir, mundoId }) {
 function MundoInterno({
   mundoId, tier = 'alto', reducedMotion = false, onHotspot, onSalir, animo = 'sereno', energia = 1,
   hablando = false, focoId = null, focoToken = 0,
-  estadoFinca = undefined, hayAlerta = false, // undefined → la escena usa su MUESTRA
+  estadoFinca = undefined, climaLive = undefined, hayAlerta = false, // undefined → la escena usa su MUESTRA
 }) {
   /* CAÍDA DIGNA (BUG-UX-05 / SPEC-UX-05): si el chunk 3D no baja en
      CARGA_3D_TIMEOUT_MS, caemos al espejo 2D del mundo. `intento` fabrica un
@@ -232,6 +232,7 @@ function MundoInterno({
             energia={energia}
             estadoFinca={estadoReal}
             hayAlerta={hayAlerta}
+            climaLive={climaLive}
             hablando={hablando}
             focoId={focoId}
             focoToken={focoToken}
