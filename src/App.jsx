@@ -22,11 +22,13 @@ import { PRIMARY_WORKER_NAME } from './config/workerConfig';
 import { tieneAccesoGlaciarActual, esOperadorActual } from './config/glaciarAccess';
 import { getProfile, getMarco3DPreference } from './services/userProfileService';
 import { parseSeguimientoView } from './config/seguimientoProcesos';
+import { campesinoHomeAActivo } from './config/campesinoHomeAFlag';
 // NOTA (unificación compai 2026-08-23): el manifiesto de rutas se usaba SOLO
 // para decidir dónde montar CompaiOverlay. Al retirar ese segundo compai de la
 // PWA 2D (un solo compai por pantalla = el AgentFab canónico), `getMapaNucleo`
 // y `esRuta2DApp` dejaron de usarse aquí y se removieron.
 import NetworkStatusBar from './components/NetworkStatusBar';
+import CampesinoHomeA from './components/dashboard/CampesinoHomeA';
 import PendingTasksWidget from './components/PendingTasksWidget';
 import SyncProgressIndicator from './components/common/SyncProgressIndicator';
 import useOllamaWarmStore from './store/useOllamaWarmStore';
@@ -793,6 +795,7 @@ const MOCKUP_HASH_ROUTES = {
   'mockups/montana-mundos-campesino': 'mockup_montana_mundos_campesino',
   'mockups/entrada-campesina': 'mockup_entrada_campesina',
   'mockups/home-campesino': 'mockup_home_campesino',
+  'mockups/home-campesino-a': 'mockup_home_campesino_a',
   'mockups/boton-anarquia': 'mockup_boton_anarquia',
   'mockups/transicion-agente-plano': 'mockup_transicion_agente_plano',
   'mockups/avatar-biopunk': 'mockup_avatar_biopunk',
@@ -1152,11 +1155,20 @@ function DashboardLiveView({ onNavigate, onLogout }) {
   // flag ON lo retiramos: una sola barra, un solo home cohesivo. Con la flag OFF
   // (default, prod) todo queda intacto.
   const fincaViva = fincaVivaHomePerfilActivo();
+  const campesinoHomeA = campesinoHomeAActivo();
   useEffect(() => {
     hydrate().then(() => {
       if (navigator.onLine) syncFromServer(fetchFromFarmOS);
     });
   }, [hydrate, syncFromServer]);
+
+  if (campesinoHomeA) {
+    return (
+      <div className="relative h-[100dvh] w-full flex flex-col overflow-hidden">
+        <CampesinoHomeA onNavigate={onNavigate} />
+      </div>
+    );
+  }
 
   if (fincaViva) {
     // F2: el hero (FincaVivaHero, dentro de DashboardLive) gobierna el fondo, la
@@ -2182,6 +2194,14 @@ export default function App() {
           <ErrorBoundary>
             <ErrorFallback moduleName="Home campesino">
               <HomeCampesinoMockup onBack={() => navigate('dashboard')} />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
+      case 'mockup_home_campesino_a':
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="Home campesino versión A">
+              <CampesinoHomeA onNavigate={navigate} />
             </ErrorFallback>
           </ErrorBoundary>
         );
@@ -4366,7 +4386,7 @@ export default function App() {
       {/* Transición Angelita home→conversación (~2s). Encima de todo (z alto);
           la conversación monta detrás y queda limpia al terminar. */}
       <ColibriTransition active={colibriTransition} onDone={() => setColibriTransition(false)} />
-      <NetworkStatusBar />
+      {!currentView.startsWith('mockup_') && <NetworkStatusBar />}
       {/* Banners de instalación PWA: NO en las vistas pre-auth (login /
           loading / oauth-callback). En el login son un overlay `fixed`
           z-50 que se encimaba sobre el formulario —en desktop tapaba e
@@ -4416,7 +4436,10 @@ export default function App() {
           todas las vistas que ya tienen shell, también durante interacción y
           offline. La entrada mística es la única que puede desvanecerlo. */}
       <Suspense fallback={null}>
-        {currentView !== 'loading' && <AgentFab onNavigate={navigate} pantalla={currentView} />}
+        {currentView !== 'loading' && !currentView.startsWith('mockup_')
+          && !(currentView === 'dashboard' && campesinoHomeAActivo()) && (
+          <AgentFab onNavigate={navigate} pantalla={currentView} />
+        )}
       </Suspense>
       {/* Escucha manos libres (operador 2026-07-05, caso guantes/manos
           embarradas). Abre el widget "Chagra está escuchando" que navega o
