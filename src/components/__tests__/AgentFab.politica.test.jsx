@@ -82,11 +82,14 @@ describe('AgentFab — política v2: visible 100%, NUNCA se oculta al interactua
   });
 });
 
-describe('AgentFab — R4 menú "Ver" abre el panel de lectura', () => {
-  it('tocar el compai → "Ver" muestra el panel con el hint', () => {
+describe('AgentFab — R4 peek "Ver" abre el panel de lectura', () => {
+  it('tocar el compai asoma el peek y su "Ver" muestra el panel con el hint', () => {
     render(<AgentFab onNavigate={() => {}} pantalla="mapa" />);
+    // TAP = PEEK (decisión operador 2026-08-27): el toque asoma la burbuja de
+    // madera con el último aviso + Ver/Escuchar/Callar (no un menú).
     fireEvent.click(screen.getByRole('button', { name: /Chagra IA/i }));
-    fireEvent.click(screen.getByRole('menuitem', { name: /^Ver$/i }));
+    expect(screen.getByTestId('compai-fab-peek')).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: /Ver el mensaje completo/i }));
     expect(screen.getByTestId('compai-fab-panel')).toBeInTheDocument();
     expect(screen.getByText('Su finca en el mapa')).toBeInTheDocument();
   });
