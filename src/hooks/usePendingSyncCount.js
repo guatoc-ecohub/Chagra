@@ -12,13 +12,17 @@
  * rama — el contador quedaba siempre en el fallback manual de IDB. Corregido
  * para usar `getSyncStats()`, el método real ya probado en producción.
  */
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 
 /**
  * @returns {{ pending: number, refresh: () => void }}
  */
 export function usePendingSyncCount() {
   const [pending, setPending] = useState(0);
+  const mountedRef = useRef(false);
+  const setPendingIfMounted = useCallback((value) => {
+    if (mountedRef.current) setPending(value);
+  }, []);
 
   const refresh = useCallback(() => {
     // Leer del syncManager si está disponible, o de IndexedDB directo.
@@ -26,18 +30,19 @@ export function usePendingSyncCount() {
       import('../services/syncManager.js').then(({ syncManager }) => {
         if (syncManager?.getSyncStats) {
           syncManager.getSyncStats()
-            .then((stats) => setPending(stats?.pendingCount ?? 0))
-            .catch(() => _leerDeIDB().then(setPending).catch(() => setPending(0)));
+            .then((stats) => setPendingIfMounted(stats?.pendingCount ?? 0))
+            .catch(() => _leerDeIDB().then(setPendingIfMounted).catch(() => setPendingIfMounted(0)));
         } else {
-          _leerDeIDB().then(setPending).catch(() => setPending(0));
+          _leerDeIDB().then(setPendingIfMounted).catch(() => setPendingIfMounted(0));
         }
-      }).catch(() => setPending(0));
+      }).catch(() => setPendingIfMounted(0));
     } catch {
-      setPending(0);
+      setPendingIfMounted(0);
     }
-  }, []);
+  }, [setPendingIfMounted]);
 
   useEffect(() => {
+    mountedRef.current = true;
     // Lectura inicial inmediata al montar (mismo patrón ya establecido en
     // NetworkStatusBar.jsx: sin esto el badge queda desfasado hasta el
     // primer polling a los 30s).
@@ -51,6 +56,7 @@ export function usePendingSyncCount() {
     window.addEventListener('syncCompleted', refresh);
     window.addEventListener('syncError', refresh);
     return () => {
+      mountedRef.current = false;
       clearInterval(interval);
       window.removeEventListener('online', refresh);
       window.removeEventListener('syncComplete', refresh);
