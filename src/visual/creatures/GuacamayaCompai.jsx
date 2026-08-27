@@ -58,7 +58,7 @@
  * estado de `estadoCanonico`. Ver `ESTADO_RIG_DE_ESTADO_AGENTE` abajo para
  * el mapeo estado-agente → data-estado-del-rig y su porqué.
  */
-import { useEffect, useId, useMemo, useRef, useState } from 'react';
+import { useEffect, useId, useMemo, useState } from 'react';
 import rigSvg from './arte-valle/guacamaya.rig.svg?raw';
 import defsSvg from './arte-valle/guacamaya.defs.svg?raw';
 import cssCompleto from './arte-valle/guacamayaCssTexto.js';
@@ -93,19 +93,7 @@ const CSS_VISEMA_PICO = `
 [data-visema="V3"] #picoBajo{transform:rotate(14deg)}
 `;
 
-/* GAZE-FOLLOW (mirada que sigue el puntero) — paridad con Angelita/jaguar/
-   zarigüeya (`useMiradaUsted`): las pupilas de la guacamaya siguen el puntero/
-   dedo de usted cuando anda cerca (data-guaca-mira='usted', vars
-   --guaca-mx/--guaca-my puestas por rAF). El rig YA tiene `.pupila` con
-   `transform-box`/`rhMirada` (dardeo natural, ver guacamayaCssTexto.js); esta
-   regla NUEVA (no en el archivo verbatim) sobrescribe el dardeo cuando
-   `data-guaca-mira='usted'` para que las pupilas apunten al puntero. Se une a
-   la guacamaya de dev SIN tocar las luces místicas ni el arte aprobado. */
-const CSS_GAZE_FOLLOW = `
-[data-guaca-mira="usted"] .pupila{animation:none;transform:translate(var(--guaca-mx,0),var(--guaca-my,0))}
-`;
-
-const CSS_RIG = hostALigero(extraerCssDelRig(cssCompleto, MARCADOR_CSS)) + CSS_VISEMA_PICO + CSS_GAZE_FOLLOW;
+const CSS_RIG = hostALigero(extraerCssDelRig(cssCompleto, MARCADOR_CSS)) + CSS_VISEMA_PICO;
 const MARCADO_CRUDO = `${defsSvg}\n${rigSvg}`;
 const IDS = idsDeclaradosEnSvg(MARCADO_CRUDO);
 
@@ -184,28 +172,13 @@ const ESTADO_RIG_DE_ESTADO_AGENTE = {
 };
 
 /* ¿El usuario pidió quietud? Mismo criterio que Angelita.jsx: los sistemas
-   JS (aquí, el scheduler del idle-cerebro y el seguimiento de mirada) se
-   apagan igual que las animaciones CSS. */
+   JS (aquí, solo el scheduler del idle-cerebro) se apagan igual que las
+   animaciones CSS. */
 function prefiereQuietud() {
   return typeof window !== 'undefined'
     && typeof window.matchMedia === 'function'
     && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 }
-
-/* Estados en los que Guacamaya LO MIRA a usted si su puntero/dedo anda cerca.
-   Mismo criterio que Angelita: en acompana/escuchando/respondiendo/invita hay
-   atención visual activa; en estados de actuación (senala/husmea/contenta/
-   preocupada) la pose del rig cuenta la historia. */
-function estadosQueLoMiran() {
-  // eslint-disable-next-line chagra-i18n/no-hardcoded-spanish -- vocabulario técnico de estados del agente, no UI
-  return new Set(['acompana', 'escuchando', 'respondiendo', 'invita']);
-}
-
-/* Hasta dónde "se da cuenta" del puntero (px) y cuánto sostiene la mirada
-   después del último movimiento antes de soltarlo (ms). Calibrado al viewBox
-   de la guacamaya (-460 -460 920 920): el ave es más grande que Angelita. */
-const RADIO_DE_ATENCION = 440;
-const SUELTA_MIRADA_MS = 1900;
 
 /**
  * GuacamayaCompai — cuerpo 2.5D del compañero elegible. Mismas props base
@@ -251,7 +224,6 @@ export function GuacamayaCompai({
   ...rest
 }) {
   const sufijo = useId().replace(/[:]/g, '');
-  const svgRef = useRef(null);
   const marcado = useMemo(() => namespaceSvg(MARCADO_CRUDO, IDS, sufijo), [sufijo]);
   const css = useMemo(() => namespaceCss(CSS_RIG, IDS, sufijo), [sufijo]);
   const lado = Math.round(size * FACTOR_TAMANO);
@@ -301,62 +273,8 @@ export function GuacamayaCompai({
     return () => window.clearTimeout(timer);
   }, [idleActivo]);
 
-  /* ═══ MIRADA QUE SIGUE EL PUNTERO (gaze-follow) — paridad con Angelita/
-     jaguar/zarigüeya (`useMiradaUsted`), calibrada al viewBox de la guacamaya
-     (-460 -460 920 920). Las pupilas SIGUEN el puntero/dedo de usted cuando
-     anda cerca (data-guaca-mira='usted', vars --guaca-mx/--guaca-my puestas por
-     rAF) y lo sueltan a los ~2s para volver a su dardeo natural (rhMirada). DOM
-     directo vía ref (cero re-renders por mover el mouse). Se une SIN tocar las
-     luces místicas ni el arte aprobado. */
-  const estadoCanonicoParaGaze = estadoCanonico(estado || undefined);
-  const sigueUsted = tier !== 'bajo' && estadosQueLoMiran().has(estadoCanonicoParaGaze);
-  useEffect(() => {
-    const svg = svgRef.current;
-    if (!sigueUsted || !svg || prefiereQuietud()) return undefined;
-    let raf = 0;
-    let soltar = 0;
-    let px = 0;
-    let py = 0;
-    const liberar = () => svg.removeAttribute('data-guaca-mira');
-    const mirar = () => {
-      raf = 0;
-      const r = svg.getBoundingClientRect();
-      if (!r.width) return;
-      // La cabeza del ave vive en la parte superior del viewBox (~25% desde
-      // arriba), no centrada como la abeja.
-      const dx = px - (r.left + r.width / 2);
-      const dy = py - (r.top + r.height * 0.25);
-      if (Math.hypot(dx, dy) > RADIO_DE_ATENCION) { liberar(); return; }
-      // Deflexión de pupila en unidades del viewBox; satura a ~150px.
-      const mx = Math.max(-1, Math.min(1, dx / 150)) * 0.65;
-      const my = Math.max(-1, Math.min(1, dy / 150)) * 0.5;
-      svg.style.setProperty('--guaca-mx', `${mx.toFixed(3)}px`);
-      svg.style.setProperty('--guaca-my', `${my.toFixed(3)}px`);
-      svg.setAttribute('data-guaca-mira', 'usted');
-      window.clearTimeout(soltar);
-      soltar = window.setTimeout(liberar, SUELTA_MIRADA_MS);
-    };
-    const onMove = (ev) => {
-      px = ev.clientX;
-      py = ev.clientY;
-      if (!raf) raf = window.requestAnimationFrame(mirar);
-    };
-    window.addEventListener('pointermove', onMove, { passive: true });
-    window.addEventListener('pointerdown', onMove, { passive: true });
-    return () => {
-      window.removeEventListener('pointermove', onMove);
-      window.removeEventListener('pointerdown', onMove);
-      if (raf) window.cancelAnimationFrame(raf);
-      window.clearTimeout(soltar);
-      liberar();
-      svg.style.removeProperty('--guaca-mx');
-      svg.style.removeProperty('--guaca-my');
-    };
-  }, [sigueUsted]);
-
   return (
     <svg
-      ref={svgRef}
       viewBox={VIEWBOX}
       width={lado}
       height={lado}
