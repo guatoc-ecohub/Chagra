@@ -38,6 +38,7 @@ const LoginScreen = lazy(() => import('../components/LoginScreen.jsx'));
 // produccion no aparecia en ninguna de las 48 pantallas.
 const AgentFab = lazy(() => import('../components/AgentFab.jsx'));
 const OAuthCallback = lazy(() => import('../components/OAuthCallback.jsx'));
+const EscuchaOverlay = lazy(() => import('../components/escucha/EscuchaOverlay'));
 
 // ── Mapa de lazy components (generado del manifiesto) ─────────────
 // Cada entrada asocia un importLazy → React.lazy con el path exacto.
@@ -556,6 +557,7 @@ export default function ProdChagraApp() {
           🏠
         </button>
       )}
+      <EscuchaOverlay />
       {/* Toast del shell (onSave + CustomEvent 'chagraToast'). */}
       {toast && (
         <div
