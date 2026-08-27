@@ -26,13 +26,13 @@
 /* Separación de la tinta del avatar: clara en la piel oscura y sutil en las
    pieles claras. El componente consume este token desde su filter inline. */
 .chagra-fab {
-  --chagra-fab-rim: rgba(255, 255, 255, 0.72);
+  --chagra-fab-rim: rgba(255, 255, 255, 0.22);
 }
 
 [data-theme="nature"] .chagra-fab,
 [data-theme="minimalista"] .chagra-fab,
 [data-theme="verde-vivo"] .chagra-fab {
-  --chagra-fab-rim: rgb(var(--t-bg-rgb, 255 255 255) / 0.88);
+  --chagra-fab-rim: rgb(var(--t-bg-rgb, 255 255 255) / 0.30);
 }
 
 /* Plinto + borde del FAB por el acento del tema. El plinto es un radial sutil
