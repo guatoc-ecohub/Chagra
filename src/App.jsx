@@ -21,6 +21,7 @@ import { fetchFromFarmOS } from './services/apiService';
 import { PRIMARY_WORKER_NAME } from './config/workerConfig';
 import { tieneAccesoGlaciarActual, esOperadorActual } from './config/glaciarAccess';
 import { getProfile, getMarco3DPreference } from './services/userProfileService';
+import { homeCampesinoBActivo } from './config/homeCampesinoBFlag';
 import { parseSeguimientoView } from './config/seguimientoProcesos';
 // NOTA (unificación compai 2026-08-23): el manifiesto de rutas se usaba SOLO
 // para decidir dónde montar CompaiOverlay. Al retirar ese segundo compai de la
@@ -44,6 +45,7 @@ import useAlertStore from './store/useAlertStore';
 // comentario abajo donde se removió el render).
 // import FieldFeedback from './components/FieldFeedback';
 const AgentFab = lazy(() => import('./components/AgentFab'));
+const HomeCampesinoB = lazy(() => import('./components/dashboard/HomeCampesinoB'));
 const CompaiFotosOverlay = lazy(() => import('./components/CompaiFotosOverlay'));
 // CompaiOverlay (segundo compai que deambulaba por la franja inferior) RETIRADO
 // de la PWA 2D el 2026-08-23 (unificación compai): en cada ruta 2D montaba una
@@ -793,6 +795,7 @@ const MOCKUP_HASH_ROUTES = {
   'mockups/montana-mundos-campesino': 'mockup_montana_mundos_campesino',
   'mockups/entrada-campesina': 'mockup_entrada_campesina',
   'mockups/home-campesino': 'mockup_home_campesino',
+  'mockups/home-campesino-b': 'mockup_home_campesino_b',
   'mockups/boton-anarquia': 'mockup_boton_anarquia',
   'mockups/transicion-agente-plano': 'mockup_transicion_agente_plano',
   'mockups/avatar-biopunk': 'mockup_avatar_biopunk',
@@ -1157,6 +1160,16 @@ function DashboardLiveView({ onNavigate, onLogout }) {
       if (navigator.onLine) syncFromServer(fetchFromFarmOS);
     });
   }, [hydrate, syncFromServer]);
+
+  if (homeCampesinoBActivo()) {
+    return (
+      <div className="relative h-[100dvh] w-full flex flex-col overflow-hidden">
+        <Suspense fallback={<div className="h-full w-full bg-[#f7f0df]" />}>
+          <HomeCampesinoB onNavigate={onNavigate} onLogout={onLogout} />
+        </Suspense>
+      </div>
+    );
+  }
 
   if (fincaViva) {
     // F2: el hero (FincaVivaHero, dentro de DashboardLive) gobierna el fondo, la
@@ -1782,6 +1795,12 @@ export default function App() {
             <ErrorFallback moduleName="Librería visual">
               <VisualLib />
             </ErrorFallback>
+          </ErrorBoundary>
+        );
+      case 'mockup_home_campesino_b':
+        return (
+          <ErrorBoundary>
+            <HomeCampesinoB onNavigate={navigate} />
           </ErrorBoundary>
         );
       // ── Galería de mockups aspiracionales (#/mockups/*) ────────────────────
@@ -4366,7 +4385,7 @@ export default function App() {
       {/* Transición Angelita home→conversación (~2s). Encima de todo (z alto);
           la conversación monta detrás y queda limpia al terminar. */}
       <ColibriTransition active={colibriTransition} onDone={() => setColibriTransition(false)} />
-      <NetworkStatusBar />
+      {!isPreAuthView && !(currentView === 'dashboard' && homeCampesinoBActivo()) && <NetworkStatusBar />}
       {/* Banners de instalación PWA: NO en las vistas pre-auth (login /
           loading / oauth-callback). En el login son un overlay `fixed`
           z-50 que se encimaba sobre el formulario —en desktop tapaba e
@@ -4416,7 +4435,7 @@ export default function App() {
           todas las vistas que ya tienen shell, también durante interacción y
           offline. La entrada mística es la única que puede desvanecerlo. */}
       <Suspense fallback={null}>
-        {currentView !== 'loading' && <AgentFab onNavigate={navigate} pantalla={currentView} />}
+        {currentView !== 'loading' && !currentView.startsWith('mockup_') && !(currentView === 'dashboard' && homeCampesinoBActivo()) && <AgentFab onNavigate={navigate} pantalla={currentView} />}
       </Suspense>
       {/* Escucha manos libres (operador 2026-07-05, caso guantes/manos
           embarradas). Abre el widget "Chagra está escuchando" que navega o
