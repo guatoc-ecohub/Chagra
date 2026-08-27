@@ -59,6 +59,9 @@ export function derivarClima3D(snapshot, now = new Date()) {
   const atmos = deriveAtmosphere({ snapshot, now, location });
   const piso = pisoPorAltitud(numero(location?.elevation));
   const day = diaActual(snapshot);
+  const pronostico = Array.isArray(snapshot?.openmeteo?.forecast_7d)
+    ? snapshot.openmeteo.forecast_7d
+    : [];
   const current = snapshot?.openmeteo?.now || snapshot?.now || {};
   const enso = snapshot?.enso_status || null;
   const alertasTexto = textoAlertas(snapshot);
@@ -96,6 +99,7 @@ export function derivarClima3D(snapshot, now = new Date()) {
     temp: numero(current?.temp ?? current?.temperature),
     tempMin,
     tempMax: numero(day?.temp_max),
+    pronostico,
     humedad: numero(current?.rh),
     viento: numero(current?.viento ?? current?.wind),
     ensoFamily: familiaEnso(enso?.phase),
