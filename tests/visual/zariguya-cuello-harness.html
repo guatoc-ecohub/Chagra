@@ -1,0 +1,30 @@
+<!doctype html>
+<!--
+  zariguya-cuello-harness.html — Harness AISLADO, temporal, para reproducir
+  el bug "gorro en la coronilla al mover el cuello" de ZariguyaTrazado
+  (LANE Claude 2026-08-25). Monta ZariguyaTrazado sola, grande, y expone
+  sliders para forzar el angulo de zh-cuello / zh-cabezaGiro / zh-cabeza
+  a mano (sin esperar la animacion CSS) — asi se puede barrer TODO el
+  rango de rotacion y encontrar el frame exacto donde emerge el casquete.
+
+  Uso: npx vite tests/visual/zariguya-cuello-harness.html
+-->
+<html lang="es-CO">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Zarigüeya — diagnóstico cuello/gorro</title>
+    <style>
+      body { background: #1b1f17; color: #eee; font-family: system-ui, sans-serif; margin: 0; padding: 24px; }
+      #stage { width: 480px; height: 480px; background: #2a3020; border-radius: 12px; }
+      .row { margin: 10px 0; display: flex; align-items: center; gap: 10px; }
+      label { width: 140px; font-size: 13px; }
+      output { width: 50px; font-variant-numeric: tabular-nums; }
+      input[type=range] { width: 320px; }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="./zariguya-cuello-harness.jsx"></script>
+  </body>
+</html>
