@@ -1,0 +1,1121 @@
+diff --git a/src/components/ChagraAgentAvatar.jsx b/src/components/ChagraAgentAvatar.jsx
+index 786eec851..dce7717c8 100644
+--- a/src/components/ChagraAgentAvatar.jsx
++++ b/src/components/ChagraAgentAvatar.jsx
+@@ -88,14 +88,22 @@ export default function ChagraAgentAvatar({ estado = undefined, ...props }) {
+     const ComponenteAngosto = AVATAR_ANGOSTO[type];
+ 
+     if (estado !== undefined) {
+-        // Call-site "rico": Angelita y guacamaya entienden el vocabulario
+-        // completo (bypasean la traducción angosta); el resto del elenco
+-        // recibe la traducción a la baja (idle/thinking/speaking/listening).
+-        // `visema`/`confianza`/etc. ya viajan dentro de `...props` — no hace
+-        // falta desestructurarlos aparte (mismo camino que usa Angelita).
++        // Call-site "rico": Angelita, guacamaya y la ZARIGÜEYA entienden el
++        // vocabulario completo (bypasean la traducción angosta); el resto del
++        // elenco recibe la traducción a la baja (idle/thinking/speaking/
++        // listening). `visema`/`confianza`/etc. ya viajan dentro de
++        // `...props` — no hace falta desestructurarlos aparte (mismo camino
++        // que usa Angelita).
+         if (type === 'guacamaya') {
+             return <GuacamayaCompai estado={estado} {...props} />;
+         }
++        // ZARIGÜEYA PROMOVIDA A "AVATAR RICO" (2026-08-26, rama
++        // zariguya-camina — mismo bypass que ganó la guacamaya el 08-21):
++        // ZariguyaTrazado canoniza los 10 estados de angelitaEstados +
++        // 'muerta' (su firma) y consume el visema REAL del host (lip-sync).
++        if (type === 'zariguya') {
++            return <ChagraAgentAvatarZariguya estado={estado} {...props} />;
++        }
+         if (ComponenteAngosto) {
+             return <ComponenteAngosto state={STATE_DE_ESTADO_RICO[estado] || 'idle'} {...props} />;
+         }
+diff --git a/src/components/ChagraAgentAvatarZariguya.jsx b/src/components/ChagraAgentAvatarZariguya.jsx
+index ebaa61436..5d14cd42c 100644
+--- a/src/components/ChagraAgentAvatarZariguya.jsx
++++ b/src/components/ChagraAgentAvatarZariguya.jsx
+@@ -30,13 +30,23 @@ import { useAngelitaPresencia, esPasivo } from '../visual/agente/useAngelitaPres
+  * tanatosis/reposo) cuando la persona hace mouse over o toca la pantalla, SIN
+  * pisar un estado activo real (thinking/speaking/listening/caminando).
+  * ADITIVA: `reaccionaPresencia=false` (el default) deja el adaptador idéntico.
++ *
++ * API RICA + LIP-SYNC REAL (rama zariguya-camina 2026-08-26, lógica portada
++ * de `feat/zariguya-gemini-integra` — la piel NO): acepta `estado` (el
++ * vocabulario completo de angelitaEstados — contenta/preocupada/senala/
++ * invita/husmea/no-se… — que ZariguyaTrazado ya canoniza) y `visema` (el real
++ * de useLipSync/useTtsAmplitude). Si el host no manda visema, el habla cae al
++ * V2 estático de siempre — ningún call-site viejo cambia.
+  */
+ const VISEMA_DE_STATE = {
+     speaking: 'V2',
++    respondiendo: 'V2',
++    hablando: 'V2',
+ };
+ 
+ export default function ChagraAgentAvatarZariguya({
+     state = 'idle',
++    estado = undefined,
+     size = 48,
+     withLabel = false,
+     onClick = undefined,
+@@ -44,6 +54,9 @@ export default function ChagraAgentAvatarZariguya({
+     glow = false,
+     className = '',
+     ariaLabel = 'Chagra IA',
++    // Lip-sync REAL: 'V1'..'V4' de useLipSync/useTtsAmplitude. null = el
++    // adaptador deriva el estático por estado (compat con call-sites viejos).
++    visema = null,
+     // Paridad con el cuerpo canónico (mismos controles que el adaptador del
+     // jaguar): la chucha honra reduced-motion (animated) y la gama baja
+     // (tier), y no debe descartarlos donde el host los cablee.
+@@ -58,17 +71,21 @@ export default function ChagraAgentAvatarZariguya({
+     const { despierta, handlers: handlersPresencia } = useAngelitaPresencia({
+         activo: reaccionaPresencia,
+     });
+-    // La presencia solo despierta cuando el estado es pasivo (idle): jamás
+-    // interrumpe una actuación conversacional ni la caminata. La zarigüeya ya
+-    // vive en idle (idle-cerebro), así que despertar = garantizar su idle.
+-    const despiertaNatural = despierta && esPasivo(state);
+-    const estadoEfectivo = despiertaNatural ? 'idle' : state;
+-    const visema = VISEMA_DE_STATE[estadoEfectivo] || null;
++    // El vocabulario RICO (estado) gana sobre el angosto (state) — mismo
++    // contrato que GuacamayaCompai. La presencia solo despierta cuando el
++    // estado es pasivo (idle/acompana): jamás interrumpe una actuación
++    // conversacional ni la caminata.
++    const estadoHost = estado !== undefined ? estado : state;
++    const despiertaNatural = despierta && esPasivo(estadoHost);
++    const estadoEfectivo = despiertaNatural ? 'idle' : estadoHost;
++    const visemaEfectivo = visema == null
++        ? (VISEMA_DE_STATE[estadoEfectivo] || null)
++        : visema;
+ 
+     const bicho = (
+         <ZariguyaTrazado
+             estado={estadoEfectivo}
+-            visema={visema}
++            visema={visemaEfectivo}
+             size={size}
+             animated={animated}
+             tier={tier}
+diff --git a/src/components/__tests__/ChagraAgentAvatar.test.jsx b/src/components/__tests__/ChagraAgentAvatar.test.jsx
+index 203c36d37..ed14bcc8c 100644
+--- a/src/components/__tests__/ChagraAgentAvatar.test.jsx
++++ b/src/components/__tests__/ChagraAgentAvatar.test.jsx
+@@ -207,6 +207,38 @@ describe('ChagraAgentAvatar — guacamaya promovida a "avatar rico" (2026-08-21)
+   });
+ });
+ 
++describe('ChagraAgentAvatar — zarigüeya promovida a "avatar rico" (2026-08-26)', () => {
++  afterEach(() => {
++    localStorage.clear();
++  });
++
++  test('type="zariguya" con API rica (estado) NO se degrada por STATE_DE_ESTADO_RICO', () => {
++    localStorage.setItem('chagra:agent-avatar-type', 'zariguya');
++    const { container } = render(<ChagraAgentAvatar estado="contenta" />);
++    const raiz = container.querySelector('[data-creature="zariguya"]');
++    expect(raiz).toBeInTheDocument();
++    // Con la traducción a la baja, 'contenta' caía a 'speaking' y la chucha
++    // hablaba en vez de celebrar. El bypass la deja llegar entera.
++    expect(raiz).toHaveAttribute('data-canon', 'contenta');
++  });
++
++  test('type="zariguya" con API rica recibe el visema REAL (lip-sync)', () => {
++    localStorage.setItem('chagra:agent-avatar-type', 'zariguya');
++    const { container } = render(<ChagraAgentAvatar estado="respondiendo" visema="V3" />);
++    const raiz = container.querySelector('[data-creature="zariguya"]');
++    expect(raiz).toHaveAttribute('data-canon', 'speaking');
++    expect(raiz).toHaveAttribute('data-visema', 'V3');
++  });
++
++  test('type="zariguya" con API angosta (state) sigue igual que antes', () => {
++    localStorage.setItem('chagra:agent-avatar-type', 'zariguya');
++    const { container } = render(<ChagraAgentAvatar state="speaking" />);
++    const raiz = container.querySelector('[data-creature="zariguya"]');
++    expect(raiz).toBeInTheDocument();
++    expect(raiz).toHaveAttribute('data-visema', 'V2');
++  });
++});
++
+ describe('ChagraAgentAvatarMaiz — prefers-reduced-motion (task #6240)', () => {
+   test('maíz tiene media query prefers-reduced-motion en CSS inline', () => {
+     const { container } = render(<ChagraAgentAvatarMaiz state="idle" onClick={() => {}} onDoubleClick={() => {}} ariaLabel="test" />);
+diff --git a/src/visual/creatures/ZariguyaTrazado.jsx b/src/visual/creatures/ZariguyaTrazado.jsx
+index 081a580c3..7a94b3034 100644
+--- a/src/visual/creatures/ZariguyaTrazado.jsx
++++ b/src/visual/creatures/ZariguyaTrazado.jsx
+@@ -1,19 +1,52 @@
+ import { useEffect, useId, useMemo, useRef, useState } from 'react';
+ import { ZARIGUYA_TRAZADO_SVG } from './zariguyaTrazado/pielTrazado.js';
+ import { useVidaIdle, useMiradaUsted } from './useVidaIdle.js';
++import { CEJAS_DE_ESTADO } from '../agente/angelitaEstados.js';
+ import './zariguyaTrazado/zariguyaHuesos.css';
+ 
+ const ZARIGUYA_SLUG = 'zariguya';
+ 
+-/* Estados del contrato de avatar → forma canónica interna (mismo mapa que
+-   ZariguyaHuesos: el atributo data-agt-estado viaja crudo para paridad de
+-   API/accesibilidad; esto solo decide el comportamiento). */
++/* Estados del contrato de avatar → forma canónica interna. El atributo
++   data-agt-estado viaja crudo para paridad de API/accesibilidad; la CSS lee
++   data-canon (así el vocabulario RICO de Angelita — 'respondiendo',
++   'contenta'… — activa la misma cadencia que su sinónimo angosto).
++   VOCABULARIO RICO (spec zariguya-camina 2026-08-26, norte
++   angelitas.guatoc.co): la zarigüeya hereda los estados de ESTADOS_ANGELITA
++   que le caben + su firma exclusiva 'muerta' (tanatosis sostenida). */
+ const ESTADO_CANON = {
+   idle: 'idle', reposo: 'idle', acompana: 'idle',
+-  thinking: 'thinking', pensando: 'thinking',
+-  speaking: 'speaking', respondiendo: 'speaking', hablando: 'speaking',
+-  listening: 'listening', escuchando: 'listening',
++  thinking: 'thinking', pensando: 'thinking', buscando: 'thinking',
++  speaking: 'speaking', respondiendo: 'speaking', hablando: 'speaking', habla: 'speaking',
++  listening: 'listening', escuchando: 'listening', escucha: 'listening',
+   caminando: 'caminando', walking: 'caminando', anda: 'caminando',
++  contenta: 'contenta', celebra: 'contenta',
++  preocupada: 'preocupada', alerta: 'preocupada', aviso: 'preocupada',
++  'no-se': 'no-se', nose: 'no-se', duda: 'no-se',
++  senala: 'senala', 'señala': 'senala', guia: 'senala', 'guía': 'senala',
++  invita: 'invita', ven: 'invita',
++  husmea: 'husmea', husmeando: 'husmea', fisgonea: 'husmea',
++  muerta: 'muerta', tanatosis: 'muerta', 'se-hace-la-muerta': 'muerta',
++};
++
++/* Canon interno → estado Angelita (para heredar CEJAS_DE_ESTADO tal cual).
++   Extensión LOCAL mínima: en Angelita 'preocupada'/'no-se' traen null porque
++   su cuerpo dibuja SUS cejas; la zarigüeya no tiene unas dibujadas — aquí
++   esos dos estados sí actúan cejas propias ('preocupadas' — el único valor
++   que no existe en Angelita — y 'altas' para la duda honesta). */
++/* eslint-disable chagra-i18n/no-hardcoded-spanish -- vocabulario visual
++   canónico del agente (claves de angelitaEstados que viajan como data-*),
++   no copy de UI */
++const ANGELITA_DE_CANON = {
++  idle: 'acompana', listening: 'escuchando', thinking: 'pensando',
++  speaking: 'respondiendo', contenta: 'contenta', preocupada: 'preocupada',
++  'no-se': 'no-se', senala: 'senala', invita: 'invita', husmea: 'husmea',
++};
++/* eslint-enable chagra-i18n/no-hardcoded-spanish */
++const CEJAS_LOCAL = { preocupada: 'preocupadas', 'no-se': 'altas' };
++const cejasDeCanon = (canon) => {
++  const angelita = ANGELITA_DE_CANON[canon];
++  if (!angelita) return null;
++  return CEJAS_DE_ESTADO[angelita] ?? CEJAS_LOCAL[canon] ?? null;
+ };
+ 
+ /* Apertura de mandíbula por visema (0..1) — misma tabla que la lámina viva. */
+@@ -34,6 +67,13 @@ const TRAMO_ACTUANDO = 0.3;
+  *   estado, modo ('auto'|'normal'|'actuando'), size, animated, className,
+  *   style, title, visema ('V1'..'V4'), tier ('bajo' apaga vida), onClick,
+  *   onDoubleClick.
++ *
++ * `estado` acepta el vocabulario ANGOSTO (idle/thinking/speaking/listening/
++ * caminando) Y el RICO de Angelita (acompana/escuchando/pensando/respondiendo/
++ * contenta/preocupada/no-se/senala/invita/husmea) + la firma exclusiva
++ * 'muerta' (se-hace-la-muerta sostenida). El crudo viaja en data-agt-estado
++ * (paridad/accesibilidad); la CSS actúa sobre data-canon; las cejas heredadas
++ * de CEJAS_DE_ESTADO viajan en data-cejas (invisibles sin estado expresivo).
+  */
+ export default function ZariguyaTrazado({
+   estado = 'idle',
+@@ -53,6 +93,7 @@ export default function ZariguyaTrazado({
+   const canon = ESTADO_CANON[estado] || 'idle';
+   const enIdle = canon === 'idle';
+   const activoVida = animated && tier !== 'bajo';
++  const cejas = cejasDeCanon(canon);
+ 
+   // Fase propia por instancia (hash del useId — puro y estable por render).
+   const uid = useId();
+@@ -63,7 +104,9 @@ export default function ZariguyaTrazado({
+   }, [uid]);
+ 
+   const momento = useVidaIdle(ZARIGUYA_SLUG, activoVida && enIdle);
+-  useMiradaUsted(raizRef, activoVida && canon !== 'speaking');
++  // La mirada no sigue al usuario ni hablando (los visemas mandan la cara) ni
++  // haciéndose la muerta (una "muerta" que lo sigue con los ojos se delata).
++  useMiradaUsted(raizRef, activoVida && canon !== 'speaking' && canon !== 'muerta');
+ 
+   // El reloj 70/30 del modo auto.
+   const [actuaAuto, setActuaAuto] = useState(false);
+@@ -110,6 +153,8 @@ export default function ZariguyaTrazado({
+       aria-label={title}
+       data-creature={ZARIGUYA_SLUG}
+       data-agt-estado={estado}
++      data-canon={canon}
++      data-cejas={cejas || undefined}
+       data-modo={animated ? modoVigente : 'normal'}
+       data-visema={visema || undefined}
+       data-vida={animated && momento ? momento : undefined}
+diff --git a/src/visual/creatures/__tests__/ZariguyaTrazado.integral.test.jsx b/src/visual/creatures/__tests__/ZariguyaTrazado.integral.test.jsx
+index 0ae9de9fd..bb24e08ec 100644
+--- a/src/visual/creatures/__tests__/ZariguyaTrazado.integral.test.jsx
++++ b/src/visual/creatures/__tests__/ZariguyaTrazado.integral.test.jsx
+@@ -75,7 +75,10 @@ describe('ZariguyaTrazado — contrato de skin', () => {
+     // trazado es UN dibujo articulado por clip-regiones: el nodo raíz (y el
+     // markup del cuerpo) es el mismo en cada estado, nunca cambia a un nodo
+     // distinto de "solo cabeza".
+-    for (const estado of ['idle', 'thinking', 'speaking', 'listening', 'caminando']) {
++    for (const estado of [
++      'idle', 'thinking', 'speaking', 'listening', 'caminando',
++      'contenta', 'preocupada', 'no-se', 'senala', 'invita', 'husmea', 'muerta',
++    ]) {
+       const { container, unmount } = render(<ZariguyaTrazado estado={estado} />);
+       const raices = container.querySelectorAll('[data-creature="zariguya"]');
+       expect(raices.length).toBe(1); // un solo cuerpo, no un swap a close-up
+@@ -86,6 +89,77 @@ describe('ZariguyaTrazado — contrato de skin', () => {
+   });
+ });
+ 
++describe('ZariguyaTrazado — vocabulario RICO (spec zariguya-camina 2026-08-26)', () => {
++  it('canoniza el vocabulario de Angelita en data-canon (data-agt-estado sigue crudo)', () => {
++    const casos = [
++      ['respondiendo', 'speaking'],
++      ['escuchando', 'listening'],
++      ['pensando', 'thinking'],
++      ['acompana', 'idle'],
++      ['contenta', 'contenta'],
++      ['preocupada', 'preocupada'],
++      ['no-se', 'no-se'],
++      ['senala', 'senala'],
++      ['invita', 'invita'],
++      ['husmea', 'husmea'],
++    ];
++    for (const [rico, canon] of casos) {
++      const { container, unmount } = render(<ZariguyaTrazado estado={rico} />);
++      const raiz = container.querySelector('[data-creature="zariguya"]');
++      expect(raiz).toHaveAttribute('data-agt-estado', rico);
++      expect(raiz).toHaveAttribute('data-canon', canon);
++      unmount();
++    }
++  });
++
++  it("la FIRMA 'muerta' (se-hace-la-muerta) canoniza y sostiene", () => {
++    for (const alias of ['muerta', 'se-hace-la-muerta', 'tanatosis']) {
++      const { container, unmount } = render(<ZariguyaTrazado estado={alias} />);
++      expect(container.querySelector('[data-creature="zariguya"]')).toHaveAttribute('data-canon', 'muerta');
++      unmount();
++    }
++  });
++
++  it('CEJAS_DE_ESTADO heredadas: data-cejas por estado; en idle NO existen', () => {
++    const casos = [
++      ['idle', null],           // reposo = lámina aprobada intacta
++      ['caminando', null],
++      ['muerta', null],
++      ['escuchando', 'altas'],
++      ['respondiendo', 'vivas'],
++      ['contenta', 'alegres'],
++      ['senala', 'fruncidas'],
++      ['husmea', 'fruncidas'],
++      ['invita', 'altas'],
++      ['preocupada', 'preocupadas'], // extensión local (Angelita trae las suyas)
++      ['no-se', 'altas'],
++    ];
++    for (const [estado, cejas] of casos) {
++      const { container, unmount } = render(<ZariguyaTrazado estado={estado} />);
++      const raiz = container.querySelector('[data-creature="zariguya"]');
++      if (cejas === null) expect(raiz).not.toHaveAttribute('data-cejas');
++      else expect(raiz).toHaveAttribute('data-cejas', cejas);
++      unmount();
++    }
++  });
++
++  it('la piel trae los huesos de la MARCHA articulada y las cejas (markup)', () => {
++    const { container } = render(<ZariguyaTrazado />);
++    // pata lejana con tobillo (nuevo 2026-08-26): sin él la marcha era bob
++    expect(container.querySelector('.zh-piernaLejosBaja')).not.toBeNull();
++    expect(container.querySelector('#zt-r-piernaLejosBaja')).not.toBeNull();
++    // pata cercana con rodilla (ya existía) — la marcha ARTICULA ambas
++    expect(container.querySelector('.zh-piernaCercaBaja')).not.toBeNull();
++    // cejas: presentes en el markup e INVISIBLES por defecto (opacity 0
++    // inline — la lámina aprobada queda intacta en reposo)
++    const cejas = container.querySelectorAll('.zh-ceja');
++    expect(cejas.length).toBe(2);
++    for (const c of cejas) expect(c.getAttribute('style')).toContain('opacity:0');
++    // la cabeza sigue ANIDADA cuello→cabezaGiro→cabeza (anti-decapitación)
++    expect(container.querySelector('.zh-cuello .zh-cabezaGiro .zh-cabeza')).not.toBeNull();
++  });
++});
++
+ describe('ChagraAgentAvatarZariguya — el agente 2D usa la skin trazada', () => {
+   it('renderiza ZariguyaTrazado (div data-creature=zariguya, role=img)', () => {
+     const { container } = render(<ChagraAgentAvatarZariguya state="idle" />);
+@@ -99,6 +173,20 @@ describe('ChagraAgentAvatarZariguya — el agente 2D usa la skin trazada', () =>
+     expect(container.querySelector('[data-creature="zariguya"]')).toHaveAttribute('data-visema', 'V2');
+   });
+ 
++  it('el visema REAL del host (useLipSync/useTtsAmplitude) GANA sobre el estático', () => {
++    const { container } = render(<ChagraAgentAvatarZariguya estado="respondiendo" visema="V3" />);
++    const raiz = container.querySelector('[data-creature="zariguya"]');
++    expect(raiz).toHaveAttribute('data-visema', 'V3');
++    expect(raiz).toHaveAttribute('data-canon', 'speaking');
++  });
++
++  it("API rica: estado='contenta' llega al cuerpo sin traducirse a la baja", () => {
++    const { container } = render(<ChagraAgentAvatarZariguya estado="contenta" />);
++    const raiz = container.querySelector('[data-creature="zariguya"]');
++    expect(raiz).toHaveAttribute('data-canon', 'contenta');
++    expect(raiz).toHaveAttribute('data-cejas', 'alegres');
++  });
++
+   it('reaccionaPresencia es ADITIVA: sin handlers no fuerza un button', () => {
+     const { container } = render(<ChagraAgentAvatarZariguya state="idle" reaccionaPresencia />);
+     expect(container.querySelector('button')).toBeNull();
+diff --git a/src/visual/creatures/vidaEstados.js b/src/visual/creatures/vidaEstados.js
+index acdf38689..633ed2814 100644
+--- a/src/visual/creatures/vidaEstados.js
++++ b/src/visual/creatures/vidaEstados.js
+@@ -116,7 +116,10 @@ export const VIDA_REPERTORIO = {
+     descanso: [3000, 7200], // nocturna atareada: se para a oler cada nada
+     momentos: {
+       husmea: { dur: 3150, peso: 2.5 }, // 3× zari-hocico-husmea 1.05s — vive por la nariz
++      escucha: { dur: 3300, peso: 1.5 }, // 3× zhOrejaRadar 1.1s — se para a OÍR el monte
++      rasca: { dur: 3000, peso: 1.2 }, // 6× zhRasca .5s alternate — la manita al costado
+       tanatosis: { dur: 2600, peso: 0.6 }, // 1× zari-desmayo 2.6s — rarísimo, y por eso gracioso
++      dormita: { dur: 4400, peso: 0.6 }, // 1× zhReposa 4.4s — cabecea poco (nocturna en jornada)
+       reposo: { dur: 4400, peso: 1 }, // 1× rh-g-reposo — el idle-cerebro de la piel trazada
+     },
+   },
+diff --git a/src/visual/creatures/zariguyaTrazado/pielTrazado.js b/src/visual/creatures/zariguyaTrazado/pielTrazado.js
+index eb2b3728a..d18adaa49 100644
+--- a/src/visual/creatures/zariguyaTrazado/pielTrazado.js
++++ b/src/visual/creatures/zariguyaTrazado/pielTrazado.js
+@@ -52,6 +52,9 @@ export const ZT_PIVOTES = Object.freeze({
+   piernaCerca: [300, 328],  // cadera del muslazo
+   rodillaCerca: [314, 384], // rodilla (el quiebre muslo/canilla medido)
+   piernaLejos: [196, 358],  // cadera oculta de la pata lejana
++  tobilloLejos: [201, 383], // tobillo lejano: donde la canilla entra al pie
++                            // (MEDIDO 2026-08-26, crop 4× de la pata lejana:
++                            // el quiebre oscuro canilla/pie ≈ (195-205,377-388))
+   colaBase: [360, 348],     // raíz: la cola nace en la grupa (336-355)
+   colaMedia: [436, 350],    // corte base/media sobre el arco de abajo
+   colaPunta: [456, 262],    // corte media/punta donde arranca la columna
+@@ -123,6 +126,12 @@ export const ZT_REGIONES = Object.freeze({
+     [254, 430], [252, 406],
+   ],
+   piernaLejos: [[136, 348], [232, 348], [232, 418], [136, 418]],
++  /* El PIE lejano (marcha 2026-08-26): segmento bajo de la pata lejana para
++     que la marcha ARTICULE (cadera + tobillo) y no solo bambolee. Caja
++     generosa sobre aire (el pie vive en el borde de la silueta: vacar hacia
++     abajo es gratis); el único borde que CRUZA píxeles es el corte del
++     tobillo (y=371, x 185-215) — lo respalda el disco-casquete del tobillo. */
++  piernaLejosBaja: [[130, 371], [216, 371], [216, 422], [130, 422]],
+   colaBase: [
+     [330, 320], [396, 320], [396, 336], [440, 336], [430, 352], [430, 378],
+     [330, 378],
+@@ -181,18 +190,64 @@ const CLIPS = Object.entries(ZT_REGIONES)
+ /** Un hueso: <use> del calco recortado a su región. */
+ const usoCalco = (region) => `<use href="#ztCalco" clip-path="url(#zt-r-${region})"/>`;
+ 
++/* ── FADE DE ARTICULACIÓN (gotcha documentado en jaguarTrazado/pielTrazado:
++   "al balancearse en la marcha un clip duro parte las rayas del pecho en una
++   línea"): los huesos que BALANCEAN (patas de la marcha, brazo de la brújula
++   que ahora sube a la oreja/lupa) no entran por clip duro sino por MÁSCARA
++   cuya banda PROXIMAL (la juntura con el cuerpo) se desvanece — el pelaje se
++   FUNDE con el del padre pintado detrás, en reposo Y en pleno péndulo.
++   Máscaras ACOTADAS a la bbox de su región (misma regla del jaguar: sin el
++   acote cada máscara evalúa el calco entero y mata el framerate). ── */
++const FADE_BANDA = Object.freeze({
++  piernaCerca: [300, 334],     // muslo → se funde con grupa/vientre
++  piernaCercaBaja: [382, 402], // canilla/pie → se funde con el muslo
++  piernaLejos: [348, 370],     // pata lejana → se funde bajo el tronco
++  piernaLejosBaja: [369, 388], // pie lejano → se funde con su canilla
++  brazoBrujula: [204, 236],    // hombro → se funde con el pecho
++});
++const bboxDe = (pts, m = 6) => {
++  const xs = pts.map((p) => p[0]);
++  const ys = pts.map((p) => p[1]);
++  const x0 = Math.min(...xs) - m;
++  const y0 = Math.min(...ys) - m;
++  return { x: x0, y: y0, w: Math.max(...xs) + m - x0, h: Math.max(...ys) + m - y0 };
++};
++const GRADS_FADE = Object.entries(FADE_BANDA)
++  .map(([n, [a, b]]) => `<linearGradient id="ztFade-${n}" x1="0" y1="${a}" x2="0" y2="${b}" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#000"/><stop offset="1" stop-color="#fff"/></linearGradient>`)
++  .join('\n  ');
++const MASCARAS_FADE = Object.keys(FADE_BANDA)
++  .map((n) => {
++    const b = bboxDe(ZT_REGIONES[n]);
++    return `<mask id="zt-m-${n}" maskUnits="userSpaceOnUse" x="${b.x}" y="${b.y}" width="${b.w}" height="${b.h}"><path d="${dPoly(ZT_REGIONES[n])}" fill="url(#ztFade-${n})"/></mask>`;
++  })
++  .join('\n  ');
++
++/** Hueso que balancea: <use> del calco por MÁSCARA con fade proximal. */
++const usoCalcoFade = (region) => `<use href="#ztCalco" mask="url(#zt-m-${region})"/>`;
++
+ /** Casquete/respaldo anti-costura: pintado en el PADRE justo antes del hijo,
+     recortado a la región ESTÁTICA del hijo → invisible en reposo, tapa la
+     franja que el hijo desocupa al rotar. */
+ const casquete = (region, forma) => `<g class="zh-casquete zh-casquete-${region}" clip-path="url(#zt-r-${region})">${forma}</g>`;
+ 
++/** Casquete de un hueso CON FADE: entra por la misma máscara del hueso —
++    en la banda de fundido el respaldo también se desvanece (si quedara a
++    clip duro, el color del respaldo asomaría por la banda translúcida del
++    hueso y pintaría un parche justo en la juntura). */
++const casqueteFade = (region, forma) => `<g class="zh-casquete zh-casquete-${region}" mask="url(#zt-m-${region})">${forma}</g>`;
++
+ /** Casquete TEXTURADO (fix "gorro en la coronilla" 2026-08-25, ver DEFS):
+     para las junturas GRANDES cuello/cabeza el respaldo de color plano se
+     veía como parche — en vez de forma inventada, reutiliza el propio calco
+     (misma región, sin rotación extra) desenfocado: la franja revelada es
+     pelaje fuera de foco, nunca un color/óvalo ajeno. Técnica calcada de
+     jaguarTrazado/pielTrazado.js casqueteCalco (mismo bug, mismo fix ahí). */
+-const FILTRO_CASQUETE = { cuello: 'ztBorrosoCuello', cabeza: 'ztBorrosoCabeza', manoLapiz: 'ztBorrosoManoLapiz' };
++const FILTRO_CASQUETE = {
++  cuello: 'ztBorrosoCuello',
++  cabeza: 'ztBorrosoCabeza',
++  manoLapiz: 'ztBorrosoManoLapiz',
++  brazoBrujula: 'ztBorrosoBrujula',
++};
+ const casqueteCalco = (region) =>
+   `<g class="zh-casquete zh-casquete-${region}" clip-path="url(#zt-r-${region})"><use href="#ztCalco" filter="url(#${FILTRO_CASQUETE[region]})"/></g>`;
+ 
+@@ -211,6 +266,8 @@ const DEFS = `<defs>
+        de cada hueso siguen calzando exactos. -->
+   <g id="ztCalco" transform="scale(0.5)">${CALCO_TRAZADO}</g>
+   ${CLIPS}
++  ${GRADS_FADE}
++  ${MASCARAS_FADE}
+   <linearGradient id="ztCuello" x1="215" y1="140" x2="228" y2="215" gradientUnits="userSpaceOnUse">
+     <stop offset="0" stop-color="#4e4337"/>
+     <stop offset=".45" stop-color="#6b5f50"/>
+@@ -247,6 +304,16 @@ const DEFS = `<defs>
+        disco asomaba del contorno fino del calco). Misma cura: copia BORROSA
+        del propio calco, acotada a la caja de la juntura. -->
+   <filter id="ztBorrosoManoLapiz" filterUnits="userSpaceOnUse" x="-15" y="105" width="130" height="135"><feGaussianBlur stdDeviation="1.2"/></filter>
++  <!-- CASQUETE brazoBrujula (marcha/gestos 2026-08-26): el brazo de la
++       brújula ahora BALANCEA (marcha) y SUBE (mano a la oreja / ver-lupa),
++       y entra con FADE de articulación (gotcha del pecho de jaguarTrazado).
++       Pero el tronco NO pinta detrás de él (bordes compartidos, a diferencia
++       del jaguar cuyo calco por-región sí tiene vientre bajo la pata): sin
++       respaldo, la banda del fade y la franja que el brazo desocupa daban a
++       la PÁGINA (fantasma blanco en el pecho, A/B 2026-08-26). Misma cura de
++       la casa que cuello/cabeza/manoLapiz: copia BORROSA del propio calco,
++       acotada a la caja de la juntura. -->
++  <filter id="ztBorrosoBrujula" filterUnits="userSpaceOnUse" x="78" y="194" width="148" height="114"><feGaussianBlur stdDeviation="1.2"/></filter>
+   <!-- BOIL suavizado para el calco FINO (operador 2026-08-25): el trazo ahora
+        es ~0.5px (2× escalado); el displacement de la spec (1.5 suave / 4.5
+        actuando) lo emborronaría hasta engrosar los bigotes. Se baja a 0.9/2.2
+@@ -289,6 +356,25 @@ const HALOS = `
+   <circle class="zh-ojoHalo" style="opacity:0" cx="156" cy="74" r="17" fill="url(#ztOjoHalo)"/>
+   <circle class="zh-ojoHalo" style="opacity:0" cx="246" cy="72" r="15" fill="url(#ztOjoHalo)"/>`;
+ 
++/* ── CEJAS DE ESTADO (herencia Angelita, brief rig 2026-08-23 §"Además"):
++   CEJAS_DE_ESTADO actúa también en la zarigüeya. En REPOSO son INVISIBLES
++   (opacity:0 inline: la lámina aprobada queda intacta, identidad sagrada);
++   solo los estados expresivos las encienden desde la CSS (data-cejas).
++   Dibujo mínimo y species-propio: dos comas de tinta (el tono del párpado,
++   que YA es tinta sintética aprobada de este módulo) con un filo de crema
++   (P.pecho) para que se lean tanto sobre el antifaz oscuro como sobre la
++   franja clara de la frente. Ojos medidos (184,76)/(242,73): las cejas viven
++   justo encima, y giran/deslizan por CSS con bisagra en su centro. ── */
++const CEJAS = `
++  <g class="zh-cejaGrupo">
++    <path class="zh-ceja zh-cejaI" style="opacity:0;transform-origin:184px 50px"
++      d="M168,56 C 174,47 194,45 200,51 C 199,47 193,42 183,42 C 173,42 168,49 168,56 Z"
++      fill="${P.parpado}" stroke="${P.pecho}" stroke-width="1.1"/>
++    <path class="zh-ceja zh-cejaD" style="opacity:0;transform-origin:238px 45px"
++      d="M224,50 C 229,42 247,40 253,45 C 252,41 246,37 237,37 C 228,37 224,43 224,50 Z"
++      fill="${P.parpado}" stroke="${P.pecho}" stroke-width="1.1"/>
++  </g>`;
++
+ /* ─────────────────────── LA CABEZA (con sus satélites) ───────────────────── */
+ 
+ const CABEZA = `
+@@ -297,7 +383,7 @@ const CABEZA = `
+   <g class="zh-hueso zh-mandibula"${origin('mandibula')}>${usoCalco('mandibula')}</g>
+   <g class="zh-hueso zh-orejaI"${origin('orejaI')}>${usoCalco('orejaI')}</g>
+   <g class="zh-hueso zh-orejaD"${origin('orejaD')}>${usoCalco('orejaD')}</g>
+-  <g class="zh-ojoGrupo">${HALOS}${PARPADOS}</g>`;
++  <g class="zh-ojoGrupo">${HALOS}${PARPADOS}${CEJAS}</g>`;
+ 
+ /* ─────────────────────────── EL SVG COMPLETO ─────────────────────────────── */
+ 
+@@ -314,7 +400,11 @@ ${DEFS}
+     <g class="zh-antic"${origin('columna')}>
+       <ellipse class="zh-sombraSuelo" cx="245" cy="438" rx="150" ry="11" fill="${P.sombraSuelo}" filter="url(#ztBlur)"/>
+       <g class="zh-hueso zh-cuerpo"${origin('columna')}>
+-        <g class="zh-hueso zh-piernaLejos"${origin('piernaLejos')}>${usoCalco('piernaLejos')}</g>
++        <g class="zh-hueso zh-piernaLejos"${origin('piernaLejos')}>
++          ${usoCalcoFade('piernaLejos')}
++          ${casqueteFade('piernaLejosBaja', disco(H.tobilloLejos[0], H.tobilloLejos[1], 12, P.rodilla))}
++          <g class="zh-hueso zh-piernaLejosBaja"${origin('tobilloLejos')}>${usoCalcoFade('piernaLejosBaja')}</g>
++        </g>
+         ${casquete('colaBase', disco(H.colaBase[0], H.colaBase[1], 12, P.cola))}
+         <g class="zh-hueso zh-colaBase"${origin('colaBase')}>
+           ${usoCalco('colaBase')}
+@@ -326,14 +416,14 @@ ${DEFS}
+           </g>
+         </g>
+         ${usoCalco('troncoCuerpo')}
+-        ${casquete('piernaCerca', elipse(298, 344, 38, 46, P.penumbra))}
++        ${casqueteFade('piernaCerca', elipse(298, 344, 38, 46, P.penumbra))}
+         <g class="zh-hueso zh-piernaCerca"${origin('piernaCerca')}>
+-          ${usoCalco('piernaCerca')}
+-          ${casquete('piernaCercaBaja', disco(H.rodillaCerca[0], H.rodillaCerca[1], 13, P.rodilla))}
+-          <g class="zh-hueso zh-piernaCercaBaja"${origin('rodillaCerca')}>${usoCalco('piernaCercaBaja')}</g>
++          ${usoCalcoFade('piernaCerca')}
++          ${casqueteFade('piernaCercaBaja', disco(H.rodillaCerca[0], H.rodillaCerca[1], 13, P.rodilla))}
++          <g class="zh-hueso zh-piernaCercaBaja"${origin('rodillaCerca')}>${usoCalcoFade('piernaCercaBaja')}</g>
+         </g>
+-        ${casquete('brazoBrujula', elipse(204, 212, 13, 10, P.hombro) + elipse(178, 262, 18, 22, P.pecho))}
+-        <g class="zh-hueso zh-brazoBrujula"${origin('brazoBrujula')}>${usoCalco('brazoBrujula')}</g>
++        ${casqueteCalco('brazoBrujula')}
++        <g class="zh-hueso zh-brazoBrujula"${origin('brazoBrujula')}>${usoCalcoFade('brazoBrujula')}</g>
+         ${casquete('brazoLapiz', elipse(150, 214, 16, 12, P.hombro))}
+         <g class="zh-hueso zh-brazoLapiz"${origin('brazoLapiz')}>
+           ${usoCalco('brazoLapiz')}
+diff --git a/src/visual/creatures/zariguyaTrazado/zariguyaHuesos.css b/src/visual/creatures/zariguyaTrazado/zariguyaHuesos.css
+index 3edbeb4b6..140c04860 100644
+--- a/src/visual/creatures/zariguyaTrazado/zariguyaHuesos.css
++++ b/src/visual/creatures/zariguyaTrazado/zariguyaHuesos.css
+@@ -126,34 +126,50 @@ div.zariguyaHuesos > svg{ width: 100%; height: 100%; display: block; overflow: v
+   transition: transform .12s cubic-bezier(.4,0,.2,1);
+ }
+ 
+-/* ═════════════════════ ESTADOS del contrato de avatar ════════════════════ */
++/* ═════════════════════ ESTADOS del contrato de avatar ════════════════════
++   La CSS lee data-canon (el componente canoniza el vocabulario angosto Y el
++   rico de Angelita); data-agt-estado sigue viajando crudo para paridad. */
+ 
+-/* ESCUCHANDO: las orejas GRANDES son su antena — se enderezan y orientan */
+-.zariguyaHuesos[data-agt-estado="listening"] .zh-orejaI,
+-.zariguyaHuesos[data-agt-estado="listening"] .zh-orejaD{
++/* ESCUCHANDO (lámina escucha-oreja del set: MANO A LA OREJA): las orejas
++   GRANDES son su antena — se enderezan y orientan — y la manita de la
++   brújula SUBE hacia la mejilla/oreja (el gesto de la lámina, adaptado al
++   alcance real del brazo del rig: la charnela vive en el hombro). */
++.zariguyaHuesos[data-canon="listening"] .zh-orejaI,
++.zariguyaHuesos[data-canon="listening"] .zh-orejaD{
+   animation: none;
+   transition: transform .5s cubic-bezier(.34,1.56,.64,1);
+ }
+-.zariguyaHuesos[data-agt-estado="listening"] .zh-orejaI{ transform: rotate(10deg) scale(1.06); }
+-.zariguyaHuesos[data-agt-estado="listening"] .zh-orejaD{ transform: rotate(-9deg) scale(1.06); }
+-.zariguyaHuesos[data-agt-estado="listening"] .zh-cabezaGiro{
++.zariguyaHuesos[data-canon="listening"] .zh-orejaI{ transform: rotate(10deg) scale(1.06); }
++.zariguyaHuesos[data-canon="listening"] .zh-orejaD{ transform: rotate(-9deg) scale(1.06); }
++.zariguyaHuesos[data-canon="listening"] .zh-cabezaGiro{
+   animation: none;
+   transform: rotate(-6deg);
+   transition: transform .6s cubic-bezier(.34,1.56,.64,1);
+ }
++.zariguyaHuesos[data-canon="listening"] .zh-brazoBrujula{
++  animation: none;
++  transform: rotate(32deg);                /* mano arriba, hacia la mejilla */
++  transition: transform .6s cubic-bezier(.34,1.56,.64,1);
++}
+ 
+-/* PENSANDO: mirada arriba + testa alzada + EL LÁPIZ ESCRIBE EN EL AIRE
+-   (su gesto propio: la exploradora anota) */
+-.zariguyaHuesos[data-agt-estado="thinking"] .zh-pupila{ transform: translateY(-2.4px); transition: transform .4s ease; }
+-.zariguyaHuesos[data-agt-estado="thinking"] .zh-cabezaGiro{
++/* PENSANDO = VER-LUPA (lámina ver-lupa del set: la investigadora EXAMINA):
++   la brújula-lupa SUBE hacia la cara, la testa se INCLINA a mirarla de
++   cerca… y el lápiz sigue anotando en el aire (su gesto propio). */
++.zariguyaHuesos[data-canon="thinking"] .zh-pupila{ transform: translateY(-2.4px); transition: transform .4s ease; }
++.zariguyaHuesos[data-canon="thinking"] .zh-cabezaGiro{
++  animation: none;
++  transform: rotate(7deg) translateY(2px);  /* baja la testa hacia la lupa */
++  transition: transform .7s cubic-bezier(.34,1.56,.64,1);
++}
++.zariguyaHuesos[data-canon="thinking"] .zh-brazoBrujula{
+   animation: none;
+-  transform: rotate(-7deg);
++  transform: rotate(25deg);                /* la lupa al ojo */
+   transition: transform .7s cubic-bezier(.34,1.56,.64,1);
+ }
+-.zariguyaHuesos[data-agt-estado="thinking"] .zh-brazoLapizAnte{
++.zariguyaHuesos[data-canon="thinking"] .zh-brazoLapizAnte{
+   animation: zhEscribeAnte 1.1s ease-in-out infinite;
+ }
+-.zariguyaHuesos[data-agt-estado="thinking"] .zh-manoLapiz{
++.zariguyaHuesos[data-canon="thinking"] .zh-manoLapiz{
+   animation: zhEscribe .55s ease-in-out infinite alternate;
+ }
+ @keyframes zhEscribeAnte{
+@@ -166,7 +182,7 @@ div.zariguyaHuesos > svg{ width: 100%; height: 100%; display: block; overflow: v
+ }
+ 
+ /* HABLANDO sin visema: bocanadas propias (si hay visema, manda --zh-jaw) */
+-.zariguyaHuesos[data-agt-estado="speaking"]:not([data-visema]) .zh-mandibula{
++.zariguyaHuesos[data-canon="speaking"]:not([data-visema]) .zh-mandibula{
+   animation: zhHablaAuto .22s steps(2,end) infinite alternate;
+ }
+ @keyframes zhHablaAuto{
+@@ -174,6 +190,159 @@ div.zariguyaHuesos > svg{ width: 100%; height: 100%; display: block; overflow: v
+   to{ transform: rotate(6.5deg) translateY(3px); }
+ }
+ 
++/* ══════ ESTADOS RICOS heredados de Angelita (spec 2026-08-26, norte
++   angelitas.guatoc.co) — mismos nombres canónicos de ESTADOS_ANGELITA ══════ */
++
++/* CONTENTA: brinquitos de celebración (masa entera, aterriza con squash),
++   cola que se ENROSCA alegre, orejas paradas, cejas 'alegres' (data-cejas). */
++.zariguyaHuesos[data-canon="contenta"] .zh-antic{
++  animation: zhBrinco 1.1s cubic-bezier(.34,1.56,.64,1) var(--zh-fase) infinite;
++}
++@keyframes zhBrinco{
++  0%,100%{ transform: translateY(0) scale(1,1); }
++  18%{ transform: translateY(2.5px) scale(1.05,.94); }   /* carga */
++  42%{ transform: translateY(-9px) scale(.96,1.05); }    /* ¡hop! */
++  70%{ transform: translateY(0) scale(1.04,.95); }       /* aterriza (squash) */
++  82%{ transform: translateY(-1.5px) scale(.99,1.01); }  /* rebotico */
++}
++.zariguyaHuesos[data-canon="contenta"] .zh-colaBase{ animation: zhColaEnroscaBase 1.1s cubic-bezier(.34,1.56,.64,1) var(--zh-fase) infinite alternate; }
++.zariguyaHuesos[data-canon="contenta"] .zh-colaMedia{ animation: zhColaEnroscaMedia 1.1s cubic-bezier(.34,1.56,.64,1) calc(var(--zh-fase) - .1s) infinite alternate; }
++.zariguyaHuesos[data-canon="contenta"] .zh-colaPunta{ animation: zhColaEnrosca 1.1s cubic-bezier(.34,1.56,.64,1) calc(var(--zh-fase) - .18s) infinite alternate; }
++.zariguyaHuesos[data-canon="contenta"] .zh-orejaI{ animation: none; transform: rotate(8deg) scale(1.05); transition: transform .4s cubic-bezier(.34,1.56,.64,1); }
++.zariguyaHuesos[data-canon="contenta"] .zh-orejaD{ animation: none; transform: rotate(-7deg) scale(1.05); transition: transform .4s cubic-bezier(.34,1.56,.64,1); }
++.zariguyaHuesos[data-canon="contenta"] .zh-aura{ opacity: .7; }
++
++/* PREOCUPADA: se RECOGE — orejas gachas, testa baja entre los hombros, cola
++   al piso, y un temblorcito contenido (nada de aspavientos: alerta digna). */
++.zariguyaHuesos[data-canon="preocupada"] .zh-orejaI{ animation: none; transform: rotate(-11deg) scaleY(.94); transition: transform .5s ease; }
++.zariguyaHuesos[data-canon="preocupada"] .zh-orejaD{ animation: none; transform: rotate(12deg) scaleY(.94); transition: transform .5s ease; }
++.zariguyaHuesos[data-canon="preocupada"] .zh-cabezaGiro{
++  animation: none; transform: rotate(4deg) translateY(2.5px);
++  transition: transform .6s ease;
++}
++.zariguyaHuesos[data-canon="preocupada"] .zh-cuerpo{
++  animation: zhTiembla 1.3s ease-in-out var(--zh-fase) infinite;
++}
++@keyframes zhTiembla{
++  0%,100%{ transform: translateY(.6px) scale(.995,.992); }
++  30%{ transform: translateY(.2px) scale(.992,.996) rotate(.35deg); }
++  65%{ transform: translateY(.7px) scale(.996,.99) rotate(-.3deg); }
++}
++.zariguyaHuesos[data-canon="preocupada"] .zh-colaBase{ animation: none; transform: rotate(6deg); transition: transform .8s ease; }
++.zariguyaHuesos[data-canon="preocupada"] .zh-colaMedia{ animation: none; transform: rotate(8deg); transition: transform .8s ease; }
++.zariguyaHuesos[data-canon="preocupada"] .zh-colaPunta{ animation: none; transform: rotate(10deg); transition: transform .8s ease; }
++
++/* NO-SE (honesta): ladeo grande y lento de la testa con orejas asimétricas
++   — "no sé, de verdad" — y la punta de la cola dibuja la pregunta. */
++.zariguyaHuesos[data-canon="no-se"] .zh-cabezaGiro{
++  animation: zhNoSabe 3.4s ease-in-out infinite;
++}
++@keyframes zhNoSabe{
++  0%,100%{ transform: rotate(-7deg); }
++  50%{ transform: rotate(5deg); }
++}
++.zariguyaHuesos[data-canon="no-se"] .zh-orejaI{ animation: none; transform: rotate(9deg); transition: transform .5s ease; }
++.zariguyaHuesos[data-canon="no-se"] .zh-orejaD{ animation: none; transform: rotate(8deg) scaleY(.92); transition: transform .5s ease; }
++.zariguyaHuesos[data-canon="no-se"] .zh-colaPunta{ animation: none; transform: rotate(-24deg); transition: transform .9s cubic-bezier(.34,1.56,.64,1); }
++
++/* SENALA (guía): el brazo del LÁPIZ se alza y APUNTA (el lápiz es su índice),
++   la testa acompaña hacia donde señala, cejas 'fruncidas' de concentración. */
++.zariguyaHuesos[data-canon="senala"] .zh-brazoLapiz{
++  animation: none;
++  transform: rotate(14deg);                /* alzado, apuntando arriba-izq */
++  transition: transform .55s cubic-bezier(.34,1.56,.64,1);
++}
++.zariguyaHuesos[data-canon="senala"] .zh-brazoLapizAnte{
++  animation: none; transform: rotate(-8deg);
++  transition: transform .5s cubic-bezier(.34,1.56,.64,1);
++}
++.zariguyaHuesos[data-canon="senala"] .zh-cabezaGiro{
++  animation: none; transform: rotate(-4deg);
++  transition: transform .6s ease;
++}
++
++/* INVITA ("venga"): la manita de la brújula hace señas de acercarse —
++   vaivén corto y cordial — con un asentimiento suave de la testa. */
++.zariguyaHuesos[data-canon="invita"] .zh-brazoBrujula{
++  animation: zhVenga 1.3s ease-in-out infinite;
++}
++@keyframes zhVenga{
++  0%,100%{ transform: rotate(14deg); }
++  45%{ transform: rotate(26deg); }         /* recoge la manita: "venga" */
++}
++.zariguyaHuesos[data-canon="invita"] .zh-cabezaGiro{
++  animation: zhAsiente 2.6s ease-in-out infinite;
++}
++@keyframes zhAsiente{
++  0%,100%{ transform: rotate(0); }
++  30%{ transform: rotate(3deg) translateY(1.5px); }
++}
++
++/* HUSMEA como ESTADO del agente (además del momento de vida): mismo gesto
++   firma — vive por la nariz. */
++.zariguyaHuesos[data-canon="husmea"] .zh-cabezaGiro{
++  animation: zhHusmea 1.05s ease-in-out infinite;
++}
++.zariguyaHuesos[data-canon="husmea"] .zh-orejaI{ animation: none; transform: rotate(8deg); transition: transform .4s cubic-bezier(.34,1.56,.64,1); }
++.zariguyaHuesos[data-canon="husmea"] .zh-orejaD{ animation: none; transform: rotate(-7deg); transition: transform .4s cubic-bezier(.34,1.56,.64,1); }
++
++/* MUERTA (LA FIRMA exclusiva, sostenida como estado): anticipa, SE DESPLOMA
++   de lado y SE QUEDA — párpados cerrados, orejas sueltas — mientras la punta
++   de la cola la delata (sigue viva, faltaba más). El desplome reusa la
++   coreografía de la tanatosis de vida (zhDesmayo) pero AGUANTA la pose. */
++.zariguyaHuesos[data-canon="muerta"] .zh-antic{
++  animation: zhDesplomaQueda 1.6s cubic-bezier(.4,0,.2,1) forwards;
++}
++@keyframes zhDesplomaQueda{
++  0%{ transform: rotate(0) translateY(0); }
++  16%{ transform: rotate(4deg) translateY(-4px); }       /* anticipa: se yergue */
++  36%{ transform: rotate(-70deg) translate(-24px,52px) scale(1.06,.9); } /* ¡FLOP! */
++  46%{ transform: rotate(-76deg) translate(-26px,58px) scale(.98,1.03); }
++  100%{ transform: rotate(-74deg) translate(-25px,56px); } /* y ahí se queda */
++}
++.zariguyaHuesos[data-canon="muerta"] .zh-parpado{ animation: none; transform: scaleY(1); }
++.zariguyaHuesos[data-canon="muerta"] .zh-orejaI{ animation: none; transform: rotate(-9deg); transition: transform .9s ease .5s; }
++.zariguyaHuesos[data-canon="muerta"] .zh-orejaD{ animation: none; transform: rotate(10deg); transition: transform .9s ease .5s; }
++.zariguyaHuesos[data-canon="muerta"] .zh-cabezaGiro,
++.zariguyaHuesos[data-canon="muerta"] .zh-cuello{ animation: none; }
++.zariguyaHuesos[data-canon="muerta"] .zh-colaPunta{
++  animation: zhColaViva .65s ease-in-out infinite alternate; /* la delata */
++}
++/* la sombra vive DENTRO del grupo que se desploma (zh-antic): rotaría con el
++   cuerpo y quedaría parada como una cuchilla gris (visto en el gate
++   2026-08-26) — desplomada, la sombra elíptica de pie no aporta: fuera. */
++.zariguyaHuesos[data-canon="muerta"] .zh-sombraSuelo{
++  opacity: 0;
++  transition: opacity .5s ease;
++}
++
++/* ═════════ CEJAS DE ESTADO (herencia CEJAS_DE_ESTADO de Angelita) ════════
++   En reposo NO existen (opacity 0 inline en la piel: la lámina aprobada
++   queda intacta). data-cejas las enciende y les da el gesto. */
++.zariguyaHuesos .zh-ceja{ transition: opacity .35s ease, transform .35s cubic-bezier(.34,1.56,.64,1); }
++.zariguyaHuesos[data-cejas] .zh-ceja{ opacity: 1 !important; }
++/* altas (escuchando/invita/no-se): se levantan atentas */
++.zariguyaHuesos[data-cejas="altas"] .zh-cejaI{ transform: translateY(-3px); }
++.zariguyaHuesos[data-cejas="altas"] .zh-cejaD{ transform: translateY(-3px); }
++/* alegres (contenta): arqueadas felices */
++.zariguyaHuesos[data-cejas="alegres"] .zh-cejaI{ transform: translateY(-2.5px) rotate(-6deg) scaleY(1.15); }
++.zariguyaHuesos[data-cejas="alegres"] .zh-cejaD{ transform: translateY(-2.5px) rotate(6deg) scaleY(1.15); }
++/* fruncidas (senala/husmea): concentración, se juntan hacia adentro */
++.zariguyaHuesos[data-cejas="fruncidas"] .zh-cejaI{ transform: translateY(1px) rotate(9deg); }
++.zariguyaHuesos[data-cejas="fruncidas"] .zh-cejaD{ transform: translateY(1px) rotate(-9deg); }
++/* vivas (respondiendo): eyebrow-flash al compás del habla */
++.zariguyaHuesos[data-cejas="vivas"] .zh-cejaI{ animation: zhCejaViva 1.1s ease-in-out infinite; }
++.zariguyaHuesos[data-cejas="vivas"] .zh-cejaD{ animation: zhCejaViva 1.1s ease-in-out .12s infinite; }
++@keyframes zhCejaViva{
++  0%,100%{ transform: translateY(0); }
++  22%{ transform: translateY(-2.6px); }
++  40%{ transform: translateY(-.6px); }
++}
++/* preocupadas (extensión local: Angelita trae las suyas dibujadas): las
++   puntas de adentro SUBEN — el gesto universal de la angustia */
++.zariguyaHuesos[data-cejas="preocupadas"] .zh-cejaI{ transform: translateY(-1px) rotate(-13deg); }
++.zariguyaHuesos[data-cejas="preocupadas"] .zh-cejaD{ transform: translateY(-1px) rotate(13deg); }
++
+ /* VIDA IDLE-CEREBRO (useVidaIdle 'zariguya'): husmea / tanatosis / reposo */
+ /* HUSMEA (vive por la nariz): alza la cuña y TANTEA a lado y lado, las
+    vibrisas tiemblan y las orejas se enderezan — 3× ciclos de 1.05s */
+@@ -233,18 +402,62 @@ div.zariguyaHuesos > svg{ width: 100%; height: 100%; display: block; overflow: v
+   transition: transform 1s ease;
+ }
+ 
++/* ESCUCHA (vida, spec 2026-08-26): se para EN SECO a oír el monte — las
++   orejas-radar barren a compases distintos, la testa quieta y atenta.
++   Loop dominante 1.1s → dur 3300 (3×) en vidaEstados. */
++.zariguyaHuesos[data-vida="escucha"] .zh-orejaI{ animation: zhOrejaRadar 1.1s ease-in-out infinite; }
++.zariguyaHuesos[data-vida="escucha"] .zh-orejaD{ animation: zhOrejaRadar 1.1s ease-in-out .28s infinite; }
++@keyframes zhOrejaRadar{
++  0%,100%{ transform: rotate(-2deg); }
++  35%{ transform: rotate(11deg) scale(1.05); }  /* orienta la antena */
++  70%{ transform: rotate(-7deg); }              /* barre al otro lado */
++}
++.zariguyaHuesos[data-vida="escucha"] .zh-cabezaGiro{
++  animation: none; transform: rotate(-4deg);
++  transition: transform .5s cubic-bezier(.34,1.56,.64,1);
++}
++
++/* RASCA (vida, spec 2026-08-26): la manita de la brújula se va al costado y
++   RASCA rapidito mientras la testa mira lo que hace. Loop .5s alternate →
++   dur 3000 (6 medias) en vidaEstados: cierra en identidad. */
++.zariguyaHuesos[data-vida="rasca"] .zh-brazoBrujula{
++  animation: zhRasca .5s ease-in-out infinite alternate;
++}
++@keyframes zhRasca{
++  from{ transform: rotate(-5deg) translateY(1px); }
++  to{ transform: rotate(-15deg) translateY(2.5px); }
++}
++.zariguyaHuesos[data-vida="rasca"] .zh-cabezaGiro{
++  animation: none; transform: rotate(6deg);
++  transition: transform .5s ease;
++}
++
++/* DORMITA (vida, spec 2026-08-26): cabecea un rato — párpados cerrados,
++   testa vencida, respiración honda (zhReposa 4.4s → dur 4400, 1×). La
++   nocturna dormita POCO y de día: peso bajo en el repertorio. */
++.zariguyaHuesos[data-vida="dormita"] .zh-cuerpo{
++  animation: zhReposa 4.4s ease-in-out infinite;
++}
++.zariguyaHuesos[data-vida="dormita"] .zh-parpado{ animation: none; transform: scaleY(1); }
++.zariguyaHuesos[data-vida="dormita"] .zh-cabezaGiro{
++  animation: none; transform: rotate(5deg) translateY(3px);
++  transition: transform 1.1s ease;
++}
++.zariguyaHuesos[data-vida="dormita"] .zh-orejaI{ animation: none; transform: rotate(-6deg); transition: transform 1.1s ease; }
++.zariguyaHuesos[data-vida="dormita"] .zh-orejaD{ animation: none; transform: rotate(7deg); transition: transform 1.1s ease; }
++
+ /* ═══════════ CAMINA — la ronda nocturna BÍPEDA, por hueso ════════════════ */
+ 
+ /* piernas a CONTRAFASE (bípeda): péndulo desde la cadera */
+-.zariguyaHuesos[data-agt-estado="caminando"] .zh-piernaCerca{ animation: zhPaso var(--zh-paso) ease-in-out var(--zh-fase) infinite; }
+-.zariguyaHuesos[data-agt-estado="caminando"] .zh-piernaLejos{ animation: zhPaso var(--zh-paso) ease-in-out calc(var(--zh-fase) - var(--zh-paso) / 2) infinite; }
++.zariguyaHuesos[data-canon="caminando"] .zh-piernaCerca{ animation: zhPaso var(--zh-paso) ease-in-out var(--zh-fase) infinite; }
++.zariguyaHuesos[data-canon="caminando"] .zh-piernaLejos{ animation: zhPaso var(--zh-paso) ease-in-out calc(var(--zh-fase) - var(--zh-paso) / 2) infinite; }
+ @keyframes zhPaso{
+   0%,100%{ transform: rotate(13deg); }     /* apoyo que empuja atrás */
+   50%{ transform: rotate(-14deg); }        /* vuelo: va por el pasito */
+ }
+ /* la rodilla PLIEGA durante el vuelo (lo que el raster jamás pudo) */
+-.zariguyaHuesos[data-agt-estado="caminando"] .zh-piernaCercaBaja{ animation: zhPasoBaja var(--zh-paso) ease-in-out var(--zh-fase) infinite; }
+-.zariguyaHuesos[data-agt-estado="caminando"] .zh-piernaLejosBaja{ animation: zhPasoBaja var(--zh-paso) ease-in-out calc(var(--zh-fase) - var(--zh-paso) / 2) infinite; }
++.zariguyaHuesos[data-canon="caminando"] .zh-piernaCercaBaja{ animation: zhPasoBaja var(--zh-paso) ease-in-out var(--zh-fase) infinite; }
++.zariguyaHuesos[data-canon="caminando"] .zh-piernaLejosBaja{ animation: zhPasoBaja var(--zh-paso) ease-in-out calc(var(--zh-fase) - var(--zh-paso) / 2) infinite; }
+ @keyframes zhPasoBaja{
+   0%,100%{ transform: rotate(5deg); }
+   30%{ transform: rotate(1deg); }
+@@ -252,8 +465,8 @@ div.zariguyaHuesos > svg{ width: 100%; height: 100%; display: block; overflow: v
+   80%{ transform: rotate(-2deg); }
+ }
+ /* y el pie de deditos arrastra con inercia (drag de extremo) */
+-.zariguyaHuesos[data-agt-estado="caminando"] .zh-piernaCercaPie{ animation: zhPie var(--zh-paso) ease-in-out var(--zh-fase) infinite; }
+-.zariguyaHuesos[data-agt-estado="caminando"] .zh-piernaLejosPie{ animation: zhPie var(--zh-paso) ease-in-out calc(var(--zh-fase) - var(--zh-paso) / 2) infinite; }
++.zariguyaHuesos[data-canon="caminando"] .zh-piernaCercaPie{ animation: zhPie var(--zh-paso) ease-in-out var(--zh-fase) infinite; }
++.zariguyaHuesos[data-canon="caminando"] .zh-piernaLejosPie{ animation: zhPie var(--zh-paso) ease-in-out calc(var(--zh-fase) - var(--zh-paso) / 2) infinite; }
+ @keyframes zhPie{
+   0%,100%{ transform: rotate(3deg); }
+   35%{ transform: rotate(9deg); }          /* despega: el pie cuelga */
+@@ -261,7 +474,7 @@ div.zariguyaHuesos > svg{ width: 100%; height: 100%; display: block; overflow: v
+   75%{ transform: rotate(-1deg); }         /* aterriza plano */
+ }
+ /* tronco: dos botecitos por ciclo, con squash sutil al pisar */
+-.zariguyaHuesos[data-agt-estado="caminando"] .zh-cuerpo{
++.zariguyaHuesos[data-canon="caminando"] .zh-cuerpo{
+   animation: zhTroncoBob calc(var(--zh-paso) / 2) ease-in-out var(--zh-fase) infinite;
+ }
+ @keyframes zhTroncoBob{
+@@ -269,7 +482,7 @@ div.zariguyaHuesos > svg{ width: 100%; height: 100%; display: block; overflow: v
+   50%{ transform: translateY(-2.8px) rotate(-.4deg) scale(.996,1.006); }
+ }
+ /* CABEZA NIVELADA: contra-ondula el bote (no pierde el horizonte) */
+-.zariguyaHuesos[data-agt-estado="caminando"] .zh-cabeza{
++.zariguyaHuesos[data-canon="caminando"] .zh-cabeza{
+   animation: zhCabezaNivel calc(var(--zh-paso) / 2) ease-in-out calc(var(--zh-fase) - .08s) infinite;
+ }
+ @keyframes zhCabezaNivel{
+@@ -277,7 +490,7 @@ div.zariguyaHuesos > svg{ width: 100%; height: 100%; display: block; overflow: v
+   50%{ transform: translateY(2.2px) rotate(.6deg); }
+ }
+ /* el cuello amortigua a contratiempo */
+-.zariguyaHuesos[data-agt-estado="caminando"] .zh-cuello{
++.zariguyaHuesos[data-canon="caminando"] .zh-cuello{
+   animation: zhCuelloMarcha calc(var(--zh-paso) / 2) ease-in-out calc(var(--zh-fase) - .04s) infinite;
+ }
+ @keyframes zhCuelloMarcha{
+@@ -285,10 +498,10 @@ div.zariguyaHuesos > svg{ width: 100%; height: 100%; display: block; overflow: v
+   50%{ transform: rotate(-.8deg); }
+ }
+ /* bracitos que CONTRAPESAN sin soltar lápiz ni brújula (amplitud chica) */
+-.zariguyaHuesos[data-agt-estado="caminando"] .zh-brazoLapiz{
++.zariguyaHuesos[data-canon="caminando"] .zh-brazoLapiz{
+   animation: zhBrazoMarcha var(--zh-paso) ease-in-out calc(var(--zh-fase) - var(--zh-paso) / 2) infinite;
+ }
+-.zariguyaHuesos[data-agt-estado="caminando"] .zh-brazoBrujula{
++.zariguyaHuesos[data-canon="caminando"] .zh-brazoBrujula{
+   animation: zhBrazoMarchaB var(--zh-paso) ease-in-out var(--zh-fase) infinite;
+ }
+ @keyframes zhBrazoMarcha{
+@@ -301,7 +514,7 @@ div.zariguyaHuesos > svg{ width: 100%; height: 100%; display: block; overflow: v
+ }
+ /* en marcha el giro periódico se apaga… pero cada tanto MIRA A CÁMARA sin
+    dejar de andar (reloj largo 6.3s) */
+-.zariguyaHuesos[data-agt-estado="caminando"] .zh-cabezaGiro{
++.zariguyaHuesos[data-canon="caminando"] .zh-cabezaGiro{
+   animation: zhMiraAnda 6.3s ease-in-out var(--zh-fase) infinite;
+ }
+ @keyframes zhMiraAnda{
+@@ -311,12 +524,12 @@ div.zariguyaHuesos > svg{ width: 100%; height: 100%; display: block; overflow: v
+   90%{ transform: rotate(1.4deg); }            /* overshoot al frente */
+ }
+ /* la cola prensil hace de BALANCÍN, ondeando más suelta */
+-.zariguyaHuesos[data-agt-estado="caminando"] .zh-colaBase{ animation: zhColaMarcha 1.6s ease-in-out var(--zh-fase) infinite alternate; }
+-.zariguyaHuesos[data-agt-estado="caminando"] .zh-colaMedia{ animation: zhColaOndulaMedia 1.6s ease-in-out calc(var(--zh-fase) - .18s) infinite alternate; }
+-.zariguyaHuesos[data-agt-estado="caminando"] .zh-colaPunta{ animation: zhColaOndulaPunta 1.6s ease-in-out calc(var(--zh-fase) - .34s) infinite alternate; }
++.zariguyaHuesos[data-canon="caminando"] .zh-colaBase{ animation: zhColaMarcha 1.6s ease-in-out var(--zh-fase) infinite alternate; }
++.zariguyaHuesos[data-canon="caminando"] .zh-colaMedia{ animation: zhColaOndulaMedia 1.6s ease-in-out calc(var(--zh-fase) - .18s) infinite alternate; }
++.zariguyaHuesos[data-canon="caminando"] .zh-colaPunta{ animation: zhColaOndulaPunta 1.6s ease-in-out calc(var(--zh-fase) - .34s) infinite alternate; }
+ @keyframes zhColaMarcha{ from{ transform: rotate(-5deg);} to{ transform: rotate(4deg);} }
+ /* la sombra respira con el bote (contacto que pesa) */
+-.zariguyaHuesos[data-agt-estado="caminando"] .zh-sombraSuelo{
++.zariguyaHuesos[data-canon="caminando"] .zh-sombraSuelo{
+   animation: zhSombraPaso calc(var(--zh-paso) / 2) ease-in-out var(--zh-fase) infinite;
+ }
+ @keyframes zhSombraPaso{
+@@ -327,7 +540,7 @@ div.zariguyaHuesos > svg{ width: 100%; height: 100%; display: block; overflow: v
+ /* ═══════════ MODO ACTUANDO (30%) — Miss Minutes con pelo de guardia ══════ */
+ 
+ /* la MASA flota (nocturna liviana: 3.4s, 5px, .6deg) */
+-.zariguyaHuesos[data-modo="actuando"] .zh-masa{
++.zariguyaHuesos[data-modo="actuando"]:not(:is([data-canon="caminando"],[data-canon="muerta"],[data-canon="preocupada"],[data-canon="contenta"],[data-canon="no-se"],[data-canon="senala"],[data-canon="invita"])) .zh-masa{
+   transform-origin: 235px 300px;
+   animation: zhMasa 3.4s ease-in-out var(--zh-fase) infinite;
+ }
+@@ -336,7 +549,7 @@ div.zariguyaHuesos > svg{ width: 100%; height: 100%; display: block; overflow: v
+   60%{ transform: translateY(5px) rotate(.6deg); }
+ }
+ /* squash&stretch FUERTE escalonado ~12fps (volumen intacto) */
+-.zariguyaHuesos[data-modo="actuando"]:not([data-agt-estado="caminando"]) .zh-cuerpo{
++.zariguyaHuesos[data-modo="actuando"]:not(:is([data-canon="caminando"],[data-canon="muerta"],[data-canon="preocupada"],[data-canon="contenta"],[data-canon="no-se"],[data-canon="senala"],[data-canon="invita"])) .zh-cuerpo{
+   animation: zhBoilFuerte 2.6s steps(18,end) var(--zh-fase) infinite;
+ }
+ @keyframes zhBoilFuerte{
+@@ -347,7 +560,7 @@ div.zariguyaHuesos > svg{ width: 100%; height: 100%; display: block; overflow: v
+ }
+ /* LA VUELTA de campana Miss-Minutes (reloj antic 9.7s): anticipa, gira
+    ENTERA con smear, overshoot elástico y aterriza digna */
+-.zariguyaHuesos[data-modo="actuando"]:not([data-agt-estado="caminando"]) .zh-antic{
++.zariguyaHuesos[data-modo="actuando"]:not(:is([data-canon="caminando"],[data-canon="muerta"],[data-canon="preocupada"],[data-canon="contenta"],[data-canon="no-se"],[data-canon="senala"],[data-canon="invita"])) .zh-antic{
+   animation: zhAnticVuelta 9.7s ease-in-out var(--zh-fase) infinite;
+ }
+ @keyframes zhAnticVuelta{
+@@ -359,7 +572,7 @@ div.zariguyaHuesos > svg{ width: 100%; height: 100%; display: block; overflow: v
+   75%,100%{ transform: rotate(-360deg) scale(1,1) translateY(0); }    /* aterriza digna */
+ }
+ /* double-take Miss-Minutes de la testa (reloj mirada 7.9s, con smear) */
+-.zariguyaHuesos[data-modo="actuando"]:not([data-agt-estado="listening"]):not([data-agt-estado="thinking"]) .zh-cabezaGiro{
++.zariguyaHuesos[data-modo="actuando"]:not([data-canon="listening"]):not([data-canon="thinking"]):not([data-canon="husmea"]):not(:is([data-canon="caminando"],[data-canon="muerta"],[data-canon="preocupada"],[data-canon="contenta"],[data-canon="no-se"],[data-canon="senala"],[data-canon="invita"])) .zh-cabezaGiro{
+   animation: zhDoubleTake 7.9s ease-in-out var(--zh-fase) infinite;
+ }
+ @keyframes zhDoubleTake{
+@@ -372,13 +585,13 @@ div.zariguyaHuesos > svg{ width: 100%; height: 100%; display: block; overflow: v
+ }
+ /* LA COLA SE ENROSCA (el gesto prensil, exagerado): la espiral se aprieta
+    con elástico y se suelta — punta a fondo, media acompaña */
+-.zariguyaHuesos[data-modo="actuando"] .zh-colaBase{
++.zariguyaHuesos[data-modo="actuando"]:not(:is([data-canon="caminando"],[data-canon="muerta"],[data-canon="preocupada"],[data-canon="contenta"],[data-canon="no-se"],[data-canon="senala"],[data-canon="invita"])) .zh-colaBase{
+   animation: zhColaEnroscaBase 2.1s cubic-bezier(.34,1.56,.64,1) var(--zh-fase) infinite alternate;
+ }
+-.zariguyaHuesos[data-modo="actuando"] .zh-colaMedia{
++.zariguyaHuesos[data-modo="actuando"]:not(:is([data-canon="caminando"],[data-canon="muerta"],[data-canon="preocupada"],[data-canon="contenta"],[data-canon="no-se"],[data-canon="senala"],[data-canon="invita"])) .zh-colaMedia{
+   animation: zhColaEnroscaMedia 2.1s cubic-bezier(.34,1.56,.64,1) calc(var(--zh-fase) - .14s) infinite alternate;
+ }
+-.zariguyaHuesos[data-modo="actuando"] .zh-colaPunta{
++.zariguyaHuesos[data-modo="actuando"]:not(:is([data-canon="caminando"],[data-canon="muerta"],[data-canon="preocupada"],[data-canon="contenta"],[data-canon="no-se"],[data-canon="senala"],[data-canon="invita"])) .zh-colaPunta{
+   animation: zhColaEnrosca 2.1s cubic-bezier(.34,1.56,.64,1) calc(var(--zh-fase) - .26s) infinite alternate;
+ }
+ @keyframes zhColaEnroscaBase{ from{ transform: rotate(3deg);} to{ transform: rotate(-7deg);} }
+@@ -398,7 +611,7 @@ div.zariguyaHuesos > svg{ width: 100%; height: 100%; display: block; overflow: v
+   50%{ opacity: .95; }
+ }
+ /* actuando+caminando: trotecito exagerado (sin vuelta: anda limpio) */
+-.zariguyaHuesos[data-modo="actuando"][data-agt-estado="caminando"] .zh-cuerpo{
++.zariguyaHuesos[data-modo="actuando"][data-canon="caminando"] .zh-cuerpo{
+   animation: zhTroncoBobFuerte calc(var(--zh-paso) / 2) ease-in-out var(--zh-fase) infinite;
+ }
+ @keyframes zhTroncoBobFuerte{
+diff --git a/src/visual/mundo3d/escenas/ZariguyaCompaiEscena.jsx b/src/visual/mundo3d/escenas/ZariguyaCompaiEscena.jsx
+index aae913b08..2a71aff48 100644
+--- a/src/visual/mundo3d/escenas/ZariguyaCompaiEscena.jsx
++++ b/src/visual/mundo3d/escenas/ZariguyaCompaiEscena.jsx
+@@ -36,7 +36,7 @@
+    coreografía + su componente de escena) se importa SIEMPRE perezoso dentro de
+    un <Canvas> vía CompaiEscena/EscenaBase3D; no es hot-reload-sensible. Van
+    juntos a propósito (mismo contrato que useEntradaAbeja). */
+-import { useEffect, useMemo, useRef } from 'react';
++import { useEffect, useMemo, useRef, useState } from 'react';
+ import { useFrame } from '@react-three/fiber';
+ import { Html } from '@react-three/drei';
+ import * as THREE from 'three';
+@@ -63,6 +63,15 @@ const TROTE_EMPUJE = 2.4;   // refuerzo del lerp durante la llegada
+ const ENTRA_DESDE_X = 2.4;  // desde qué borde llega (offset del foco)
+ const PASO_FREQ = 7.3;      // frecuencia del trote (pasos cortos de marsupial)
+ const ENCARAME_UMBRAL = 0.35; // foco más alto que esto sobre el piso → se encarama
++/* Histéresis del modo marcha (patrón feat/jaguar-camina-dev): lejos del
++   destino el SKIN corre su walk-cycle real ('caminando': las patas
++   ARTICULAN, spec zariguya-camina 2026-08-26); cerca vuelve al idle. Umbral
++   más corto que el felino: la chucha es menuda y se planta rápido. */
++const MARCHA_LEJOS = 0.5;
++const MARCHA_CERCA = 0.2;
++/* Con el walk-cycle del skin activo el bamboleo 3D BAJA (no se duplica la
++   marcha: el bob/waddle grande era el sustituto cuando la piel no caminaba). */
++const WADDLE_MARCHA = 0.4;
+ 
+ const clamp01 = (v) => (v < 0 ? 0 : v > 1 ? 1 : v);
+ 
+@@ -113,6 +122,14 @@ export function useAndanzaZariguya(foco, {
+   const aparecioRef = useRef(false);
+   // Fase de entrada: 'oculta' (pre-ancla) → 'trote' (llega) → 'no'.
+   const fase = useRef(cruce && !reducedMotion ? 'oculta' : 'no');
++  // Modo discreto del cuerpo (estado React, cambia poco — patrón jaguar):
++  // 'marcha' = el skin corre su walk-cycle real; 'quieto' = idle-cerebro.
++  // Entra TROTANDO: con cruce nace ya en marcha.
++  const [modo, setModo] = useState(cruce && !reducedMotion ? 'marcha' : 'quieto');
++  const modoRef = useRef(modo);
++  const ponModo = (m) => {
++    if (modoRef.current !== m) { modoRef.current = m; setModo(m); }
++  };
+   const ponVis = (visible) => {
+     if (visible) aparecioRef.current = true;
+     if (visRef.current) visRef.current.style.visibility = visible ? '' : 'hidden';
+@@ -137,6 +154,7 @@ export function useAndanzaZariguya(foco, {
+       if (fase.current === 'oculta') { ponVis(false); return; } // salió antes de entrar
+       if (salioEn.current === null) salioEn.current = t;
+       if (t - salioEn.current >= CRUCE_SUELTA_S) { ponVis(false); return; }
++      ponModo('marcha'); // sale CORRIENDO: el walk-cycle acompaña la huida
+       _dest.set(foco.x - ENTRA_DESDE_X * 1.6, piso + PERCHA.y, foco.z + 0.35);
+       ref.current.position.lerp(_dest, 0.22);
+       // NO gira al salir: se retira y se disuelve por visibilidad (ponVis) —
+@@ -190,9 +208,19 @@ export function useAndanzaZariguya(foco, {
+     // ── EL TROTE: qué tanto se está moviendo decide el paso (bob + waddle).
+     const dist = ref.current.position.distanceTo(_dest);
+     const moviendo = reducedMotion ? 0 : clamp01(dist * 2.5) * (1 - quieta);
+-    const pasoBob = Math.abs(Math.sin(t * PASO_FREQ)) * 0.035 * moviendo * brio;
+-    const waddle = Math.sin(t * PASO_FREQ) * 3.2 * moviendo;
++    // En 'marcha' el walk-cycle del SKIN pone el paso (patas que articulan,
++    // tronco-bob propio): el bamboleo 3D baja a acento — no se duplica.
++    const factorWaddle = modoRef.current === 'marcha' ? WADDLE_MARCHA : 1;
++    const pasoBob = Math.abs(Math.sin(t * PASO_FREQ)) * 0.035 * moviendo * brio * factorWaddle;
++    const waddle = Math.sin(t * PASO_FREQ) * 3.2 * moviendo * factorWaddle;
+     _dest.y += pasoBob;
++    // El MODO del cuerpo, con histéresis (patrón jaguar-camina): lejos →
++    // walk-cycle real del skin; cerca → se planta y el idle-cerebro retoma.
++    // La entrada conserva su trote hasta que la fase termina.
++    if (fase.current === 'no') {
++      if (dist > MARCHA_LEJOS) ponModo('marcha');
++      else if (dist < MARCHA_CERCA) ponModo('quieto');
++    }
+     // Lerp terrestre: más lento que el vuelo de la abeja; al encaramarse sube
+     // con calma (trepa, no salta).
+     ref.current.position.lerp(_dest, (encarama ? 0.028 : 0.038) * brio * empuje);
+@@ -253,7 +281,7 @@ export function useAndanzaZariguya(foco, {
+     // frameloop='demand': trote/merodeo/idle piden el próximo frame.
+     if (idle.activo || moviendo > 0 || fase.current !== 'no') state.invalidate();
+   });
+-  return { ref, caraRef, sombraRef, visRef, idleRef, aparecioRef };
++  return { ref, caraRef, sombraRef, visRef, idleRef, aparecioRef, modo };
+ }
+ 
+ /**
+@@ -286,7 +314,7 @@ export function ZariguyaCompaiEscena({
+   // acurruca); aquí solo se lee una vez, determinista.
+   const hora = useMemo(() => horaDeReloj(), []);
+ 
+-  const { ref, caraRef, sombraRef, visRef, idleRef, aparecioRef } = useAndanzaZariguya(foco, {
++  const { ref, caraRef, sombraRef, visRef, idleRef, aparecioRef, modo } = useAndanzaZariguya(foco, {
+     entrando, energia: energiaReal, reducedMotion, piso,
+     cruce: cruce && !reducedMotion, saliendo, hora, tier,
+   });
+@@ -309,11 +337,14 @@ export function ZariguyaCompaiEscena({
+   const vivo = !reducedMotion;
+   // LIP-SYNC: la chucha "habla" cuando el agente narra (única boca del mundo).
+   const { visema } = useLipSync({ activo: vivo });
+-  // Estado del skin trazado: narra → 'speaking'; parado/idle → 'idle' (su
+-  // idle-cerebro 70/30 husmea/tanatosis/reposo corre solo). El trote se lee en
+-  // el waddle del idleRef + el desplazamiento del billboard, no en un
+-  // walk-cycle interno (así la marcha no se duplica con el bamboleo del molde).
+-  const estadoTrazado = hablando && vivo ? 'speaking' : 'idle';
++  // Estado del skin trazado: narra → 'speaking'; viaja → 'caminando' (spec
++  // zariguya-camina 2026-08-26: las patas ARTICULAN — el walk-cycle real del
++  // trazado, patrón jaguar-camina); parada → 'idle' (su idle-cerebro 70/30
++  // husmea/escucha/rasca/tanatosis/dormita/reposo corre solo). El waddle 3D
++  // baja a acento durante la marcha para no duplicar el paso.
++  const estadoTrazado = hablando && vivo
++    ? 'speaking'
++    : (vivo && modo === 'marcha' ? 'caminando' : 'idle');
+   const cruceVivo = cruce && !reducedMotion;
+   return (
+     <>
