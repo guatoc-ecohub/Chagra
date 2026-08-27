@@ -4,11 +4,10 @@
  * montada sobre el MISMO esqueleto de huesos de `zariguyaHuesos/` — la
  * técnica que puede reemplazar el redibujo a mano en todos los compais.
  *
- * NOTA 2026-08-25: el calco ya NO es vtracer — el operador rechazó 3 veces
- * el auto-trazado (gorro en la coronilla, bordes gruesos). Hoy el calco es
- * la LÁMINA DE TINTA FINA dibujada a plumilla (generar-tinta.mjs), nativa
- * 481×444 y pixel-alineada al hero, así que TODO lo de abajo sigue válido:
- * el esqueleto se pone ENCIMA sin tocar un solo path del calco:
+ * POR QUÉ. Redibujar la lámina a mano en SVG pierde la belleza. El
+ * auto-trazado conserva el grabado (1911 paths tras svgo, el pelo de
+ * plumilla intacto), pero sale PLANO: un solo dibujo sin articulaciones.
+ * Aquí se le pone el esqueleto ENCIMA sin tocar un solo path del calco:
  *
  *   1. El calco entra UNA vez en <defs> como <g id="ztCalco">.
  *   2. Cada hueso es <g class="zh-hueso …" style="transform-origin:PIVOTE">
@@ -75,11 +74,8 @@ export const ZT_REGIONES = Object.freeze({
      pie cercano (273-343, 385-441), cola: gancho y 228-264 · columna
      x 446-480 y 262-337 · arco y 343-368. */
   cabeza: [
-    /* pared derecha por AIRE (374,-8→164): cubre los bigotes derechos de la
-       lámina de tinta (tips hasta x≈360,y≈134) sin tocar un píxel del tronco
-       (el lomo a y≤160 nunca pasa de x≈332). */
     [96, 28], [164, 28], [164, -8], [216, -8], [216, 26], [274, 26],
-    [274, -8], [374, -8], [374, 164], [332, 122], [316, 110], [306, 118], [294, 126], [280, 132],
+    [274, -8], [316, -8], [316, 110], [306, 118], [294, 126], [280, 132],
     [264, 136], [250, 136], [246, 130], [246, 80], [236, 80], [236, 106],
     [212, 106], [212, 84], [144, 84], [144, 128], [140, 134], [134, 150],
     [126, 168], [116, 182], [106, 187], [97, 180], [93, 168], [92, 152],
@@ -87,13 +83,10 @@ export const ZT_REGIONES = Object.freeze({
     [92, 88], [94, 56],
   ],
   cuello: [
-    /* el faldón inferior-izquierdo baja a y≈215: el ruff colgante de la
-       mejilla de la lámina Gemini vive ahí y debe MOVERSE con el cuello
-       (el vtracer lo perdía y el hueco no se veía). */
     [144, 126], [246, 126], [246, 128], [250, 134], [264, 134], [280, 130],
     [294, 124], [306, 116], [316, 108], [316, 120], [300, 134], [286, 146],
-    [272, 158], [256, 168], [238, 176], [218, 180], [196, 184], [184, 212],
-    [174, 198], [156, 188], [138, 180], [124, 168], [118, 152], [126, 138], [136, 128],
+    [272, 158], [256, 168], [238, 176], [218, 180], [196, 178], [176, 172],
+    [160, 162], [150, 148], [142, 136],
   ],
   mandibula: [
     [144, 82], [212, 82], [212, 104], [236, 104], [236, 78], [246, 78],
@@ -102,13 +95,9 @@ export const ZT_REGIONES = Object.freeze({
   orejaI: [[94, -6], [166, -6], [166, 54], [94, 54]],
   orejaD: [[214, -6], [276, -6], [276, 50], [214, 50]],
   brazoLapiz: [
-    /* techo = CRESTA superior del brazo Gemini (costura compartida con el
-       faldón del cuello): el pelo alto del brazo (y≈150-200) es del BRAZO.
-       El vtracer dejaba ese pelo vacío y el techo viejo (y≈170-208) no
-       dolía; con la lámina real dolía (banda sin dueño). */
     [0, 206], [0, 180], [8, 162], [18, 146], [30, 134], [44, 126],
-    [58, 122], [72, 122], [84, 128], [92, 140], [100, 148], [120, 162],
-    [140, 176], [158, 188], [174, 200], [184, 214], [188, 228],
+    [58, 122], [72, 122], [84, 128], [92, 140], [97, 154], [99, 170],
+    [102, 182], [112, 192], [126, 200], [140, 208], [154, 214], [166, 222],
     [172, 232], [168, 244], [156, 250], [140, 246], [124, 238], [108, 230],
     [92, 226], [76, 226], [58, 226], [40, 224], [20, 218],
   ],
@@ -119,7 +108,7 @@ export const ZT_REGIONES = Object.freeze({
     [16, 214],
   ],
   brazoBrujula: [
-    [78, 264], [80, 238], [92, 224], [112, 218], [132, 216], [152, 214],
+    [84, 262], [86, 242], [96, 228], [112, 220], [132, 216], [152, 214],
     [168, 210], [186, 204], [204, 200], [216, 204], [220, 214], [214, 226],
     [202, 234], [196, 244], [198, 262], [192, 280], [178, 294], [158, 302],
     [136, 300], [114, 292], [96, 280],
@@ -195,7 +184,17 @@ const usoCalco = (region) => `<use href="#ztCalco" clip-path="url(#zt-r-${region
 /** Casquete/respaldo anti-costura: pintado en el PADRE justo antes del hijo,
     recortado a la región ESTÁTICA del hijo → invisible en reposo, tapa la
     franja que el hijo desocupa al rotar. */
-const casquete = (region, forma) => `<g clip-path="url(#zt-r-${region})">${forma}</g>`;
+const casquete = (region, forma) => `<g class="zh-casquete zh-casquete-${region}" clip-path="url(#zt-r-${region})">${forma}</g>`;
+
+/** Casquete TEXTURADO (fix "gorro en la coronilla" 2026-08-25, ver DEFS):
+    para las junturas GRANDES cuello/cabeza el respaldo de color plano se
+    veía como parche — en vez de forma inventada, reutiliza el propio calco
+    (misma región, sin rotación extra) desenfocado: la franja revelada es
+    pelaje fuera de foco, nunca un color/óvalo ajeno. Técnica calcada de
+    jaguarTrazado/pielTrazado.js casqueteCalco (mismo bug, mismo fix ahí). */
+const FILTRO_CASQUETE = { cuello: 'ztBorrosoCuello', cabeza: 'ztBorrosoCabeza', manoLapiz: 'ztBorrosoManoLapiz' };
+const casqueteCalco = (region) =>
+  `<g class="zh-casquete zh-casquete-${region}" clip-path="url(#zt-r-${region})"><use href="#ztCalco" filter="url(#${FILTRO_CASQUETE[region]})"/></g>`;
 
 const elipse = (cx, cy, rx, ry, fill, rot = 0) =>
   `<ellipse cx="${cx}" cy="${cy}" rx="${rx}" ry="${ry}" fill="${fill}"${rot ? ` transform="rotate(${rot} ${cx} ${cy})"` : ''}/>`;
@@ -204,11 +203,13 @@ const disco = (cx, cy, r, fill) => `<circle cx="${cx}" cy="${cy}" r="${r}" fill=
 /* ─────────────────────────────── defs ────────────────────────────────────── */
 
 const DEFS = `<defs>
-  <!-- CALCO NATIVO 481×444: la lámina de TINTA FINA dibujada a plumilla
-       (generar-tinta.mjs, sin vtracer) nace con línea de ~0.5-1px — ya no
-       hay 2× ni escala. Mismo espacio que clip-regiones/pivotes/casquetes:
-       los <use…clip> calzan directo. -->
-  <g id="ztCalco">${CALCO_TRAZADO}</g>
+  <!-- El calco se trazó a 2× (962×888) para lograr LÍNEAS FINAS: al escalarlo
+       0.5 aquí, el grosor de cada trazo (bigotes/contornos) se reduce a la
+       mitad y el detalle sub-píxel del 2× sobrevive. Todo el resto de la piel
+       (clip-regiones, pivotes, casquetes) vive en el espacio 481×444 nativo:
+       la escala SÓLO afecta al contenido de ztCalco, así que los <use…clip>
+       de cada hueso siguen calzando exactos. -->
+  <g id="ztCalco" transform="scale(0.5)">${CALCO_TRAZADO}</g>
   ${CLIPS}
   <linearGradient id="ztCuello" x1="215" y1="140" x2="228" y2="215" gradientUnits="userSpaceOnUse">
     <stop offset="0" stop-color="#4e4337"/>
@@ -226,6 +227,26 @@ const DEFS = `<defs>
     <stop offset="1" stop-color="${P.rocio}" stop-opacity="0"/>
   </radialGradient>
   <filter id="ztBlur"><feGaussianBlur stdDeviation="4"/></filter>
+  <!-- CASQUETES cuello/cabeza (fix "gorro en la coronilla" 2026-08-25): el
+       casquete anti-costura de esta juntura era un ÓVALO de color PLANO
+       (gradiente ztCuello) — a la escala de uso se leía como un gorro/parche
+       liso pegado a la mejilla en CUANTO el cuello o la cabeza rotaban (el
+       óvalo, fijo en el espacio del cuello, queda expuesto donde el calco
+       —que SÍ rota con cabezaGiro/cabeza— se corre). Ya asomaba hasta en
+       reposo: el óvalo es más grande que la tinta fina del trazado en esa
+       zona. Mismo diagnóstico y misma cura que jaguarTrazado (gate de giros
+       2026-08-23): swap a copia BORROSA del propio calco (casqueteCalco más
+       abajo) — la franja revelada es TEXTURA de pelaje fuera de foco, nunca
+       un color inventado. Cajas acotadas a la juntura (no todo el calco). -->
+  <filter id="ztBorrosoCuello" filterUnits="userSpaceOnUse" x="122" y="88" width="214" height="112"><feGaussianBlur stdDeviation="1.4"/></filter>
+  <filter id="ztBorrosoCabeza" filterUnits="userSpaceOnUse" x="47" y="-28" width="289" height="235"><feGaussianBlur stdDeviation="1.1"/></filter>
+  <!-- CASQUETE manoLapiz (2do "gorro" del calco 2026-08-25, mismo bug que
+       cuello/cabeza): el respaldo de la muñeca-con-lápiz era un DISCO de
+       color plano (P.pelaje) — se leía como un parche/gorro liso encima del
+       brazo del lápiz apenas la mano se movía (o hasta en reposo, si el
+       disco asomaba del contorno fino del calco). Misma cura: copia BORROSA
+       del propio calco, acotada a la caja de la juntura. -->
+  <filter id="ztBorrosoManoLapiz" filterUnits="userSpaceOnUse" x="-15" y="105" width="130" height="135"><feGaussianBlur stdDeviation="1.2"/></filter>
   <!-- BOIL suavizado para el calco FINO (operador 2026-08-25): el trazo ahora
        es ~0.5px (2× escalado); el displacement de la spec (1.5 suave / 4.5
        actuando) lo emborronaría hasta engrosar los bigotes. Se baja a 0.9/2.2
@@ -257,16 +278,16 @@ const FAUCES = casquete('mandibula',
    canónica los cierra con el blink irregular. Ojos MEDIDOS de la lámina:
    (184,76) r20 y (242,73) r20 (anatomia.OJO / OJO_2). ── */
 const PARPADOS = `
-  <path class="zh-parpado" style="transform-origin:175px 62px"
-    d="M152,70 C 160,60 190,60 197,70 C 199,79 198,91 191,98 C 181,103 166,102 158,95 C 152,88 150,78 152,70 Z" fill="${P.parpado}"/>
-  <path class="zh-parpado" style="transform-origin:246px 52px"
-    d="M227,60 C 234,50 258,50 264,60 C 266,70 265,84 258,92 C 249,98 236,97 230,89 C 225,80 224,68 227,60 Z" fill="${P.parpado}"/>`;
+  <path class="zh-parpado" style="transform-origin:156px 61px"
+    d="M143,63 C 149,56 164,56 169,64 C 171,71 170,80 165,85 C 158,89 149,88 145,82 C 141,75 141,68 143,63 Z" fill="${P.parpado}"/>
+  <path class="zh-parpado" style="transform-origin:246px 60px"
+    d="M234,62 C 239,55 253,55 258,63 C 260,69 259,78 255,83 C 249,87 240,86 236,80 C 233,73 233,66 234,62 Z" fill="${P.parpado}"/>`;
 
 /* halos nocturnos: apagados en reposo (opacity:0 inline — que la lámina sea
    la lámina); el modo actuando los enciende desde la CSS canónica. */
 const HALOS = `
-  <circle class="zh-ojoHalo" style="opacity:0" cx="176" cy="80" r="18" fill="url(#ztOjoHalo)"/>
-  <circle class="zh-ojoHalo" style="opacity:0" cx="245" cy="74" r="18" fill="url(#ztOjoHalo)"/>`;
+  <circle class="zh-ojoHalo" style="opacity:0" cx="156" cy="74" r="17" fill="url(#ztOjoHalo)"/>
+  <circle class="zh-ojoHalo" style="opacity:0" cx="246" cy="72" r="15" fill="url(#ztOjoHalo)"/>`;
 
 /* ─────────────────────── LA CABEZA (con sus satélites) ───────────────────── */
 
@@ -294,13 +315,13 @@ ${DEFS}
       <ellipse class="zh-sombraSuelo" cx="245" cy="438" rx="150" ry="11" fill="${P.sombraSuelo}" filter="url(#ztBlur)"/>
       <g class="zh-hueso zh-cuerpo"${origin('columna')}>
         <g class="zh-hueso zh-piernaLejos"${origin('piernaLejos')}>${usoCalco('piernaLejos')}</g>
-        ${casquete('colaBase', disco(H.colaBase[0] - 4, H.colaBase[1] + 4, 12, P.cola))}
+        ${casquete('colaBase', disco(H.colaBase[0], H.colaBase[1], 12, P.cola))}
         <g class="zh-hueso zh-colaBase"${origin('colaBase')}>
           ${usoCalco('colaBase')}
-          ${casquete('colaMedia', disco(H.colaMedia[0] + 2, H.colaMedia[1] + 8, 11, P.cola))}
+          ${casquete('colaMedia', disco(H.colaMedia[0], H.colaMedia[1], 11, P.cola))}
           <g class="zh-hueso zh-colaMedia"${origin('colaMedia')}>
             ${usoCalco('colaMedia')}
-            ${casquete('colaPunta', disco(H.colaPunta[0] + 6, H.colaPunta[1], 8, '#cfa48e'))}
+            ${casquete('colaPunta', disco(H.colaPunta[0], H.colaPunta[1], 8, P.colaLuz))}
             <g class="zh-hueso zh-colaPunta"${origin('colaPunta')}>${usoCalco('colaPunta')}</g>
           </g>
         </g>
@@ -316,13 +337,13 @@ ${DEFS}
         ${casquete('brazoLapiz', elipse(150, 214, 16, 12, P.hombro))}
         <g class="zh-hueso zh-brazoLapiz"${origin('brazoLapiz')}>
           ${usoCalco('brazoLapiz')}
-          ${casquete('manoLapiz', disco(H.munecaLapiz[0], H.munecaLapiz[1], 10, P.pelaje))}
+          ${casqueteCalco('manoLapiz')}
           <g class="zh-hueso zh-brazoLapizAnte zh-manoLapiz"${origin('munecaLapiz')}>${usoCalco('manoLapiz')}</g>
         </g>
-        ${casquete('cuello', elipse(218, 158, 46, 18, 'url(#ztCuello)', -8))}
+        ${casqueteCalco('cuello')}
         <g class="zh-hueso zh-cuello"${origin('cuello')}>
           ${usoCalco('cuello')}
-          ${casquete('cabeza', elipse(212, 124, 60, 22, 'url(#ztCuello)', -7))}
+          ${casqueteCalco('cabeza')}
           <g class="zh-hueso zh-cabezaGiro"${origin('cabeza')}>
             <g class="zh-hueso zh-cabeza"${origin('cabeza')}>
               ${CABEZA}
