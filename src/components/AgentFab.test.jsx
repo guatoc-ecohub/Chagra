@@ -87,12 +87,44 @@ describe('AgentFab con arrastre', () => {
   it('debería manejar localStorage lleno gracefulmente', () => {
     // Test de que el hook no rompe si localStorage falla
     const testPosition = { bottom: 200, right: 250 };
-    
+
     try {
       localStorage.setItem('compai-position', JSON.stringify(testPosition));
       expect(true).toBe(true);
     } catch (error) {
       expect(true).toBe(true); // Si falla, no debería romper la app
     }
+  });
+
+  describe('CSS --chagra-fab-rim opacidad reducida (fix halo blanco)', () => {
+    const fs = require('fs');
+    const path = require('path');
+
+    it('debería tener opacidad reducida en tema oscuro (0.22 no 0.72)', () => {
+      const cssPath = path.join(__dirname, 'agent-fab-skin.css');
+      const cssContent = fs.readFileSync(cssPath, 'utf-8');
+
+      // Verificar que la opacidad del tema oscuro sea 0.22
+      expect(cssContent).toMatch(/--chagra-fab-rim:\s*rgba\(255,\s*255,\s*255,\s*0\.22\)/);
+
+      // Verificar que NO tenga la opacidad anterior (0.72)
+      expect(cssContent).not.toMatch(/--chagra-fab-rim:\s*rgba\(255,\s*255,\s*255,\s*0\.72\)/);
+    });
+
+    it('debería tener opacidad reducida en temas claros (0.30 no 0.88)', () => {
+      const cssPath = path.join(__dirname, 'agent-fab-skin.css');
+      const cssContent = fs.readFileSync(cssPath, 'utf-8');
+
+      // Verificar que la opacidad de temas claros sea 0.30
+      expect(cssContent).toMatch(/\/\s*0\.30\)/);
+
+      // Verificar que NO tenga la opacidad anterior (0.88)
+      expect(cssContent).not.toMatch(/\/\s*0\.88\)/);
+    });
+
+    it('el archivo agent-fab-skin.css debería existir', () => {
+      const cssPath = path.join(__dirname, 'agent-fab-skin.css');
+      expect(fs.existsSync(cssPath)).toBe(true);
+    });
   });
 });
