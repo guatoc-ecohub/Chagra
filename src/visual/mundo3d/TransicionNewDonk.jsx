@@ -155,6 +155,7 @@ const CSS_TND = `
  * @param {string}  props.mundoId        mundo destino (tinte + título).
  * @param {string}  [props.animo]        ánimo de Angelita (estado real de la finca).
  * @param {number}  [props.energia]      energía de Angelita.
+ * @param {string}  [props.destinoLabel] texto accesible del destino.
  * @param {boolean} [props.reducedMotion] corte directo, sin dolly.
  * @param {() => void} [props.onMitad]   pantalla cubierta: intercambie la escena.
  * @param {() => void} [props.onFin]     mundo revelado: desmonte el overlay.
@@ -164,6 +165,7 @@ export default function TransicionNewDonk({
   animo = 'sereno',
   energia = 1,
   reducedMotion = false,
+  destinoLabel,
   onMitad,
   onFin,
 }) {
@@ -206,6 +208,7 @@ export default function TransicionNewDonk({
   }, [mundoId, reducedMotion]);
 
   const tinte = tinteDeMundo(mundoId);
+  const destino = destinoLabel || tituloDeMundo(mundoId);
   const estilo = {
     '--tnd-a': tinte[1], // el tono claro del mundo, al centro del destello
     '--tnd-b': tinte[0], // el tono profundo, hacia el borde
@@ -217,7 +220,7 @@ export default function TransicionNewDonk({
       <div className="tnd tnd--corte" style={estilo} role="status" aria-live="polite" data-testid="tnd">
         <style>{CSS_TND}</style>
         <p className="tnd__txt" style={{ opacity: 1, animation: 'none' }}>
-          {`Angelita lo lleva a ${tituloDeMundo(mundoId)}…`}
+          {`Angelita lo lleva a ${destino}…`}
         </p>
       </div>
     );
@@ -231,7 +234,7 @@ export default function TransicionNewDonk({
       <div className="tnd__abeja" aria-hidden="true">
         <AbejaAngelita size={76} animo={animo} energia={energia} animated />
       </div>
-      <p className="tnd__txt">{`Angelita lo lleva a ${tituloDeMundo(mundoId)}…`}</p>
+      <p className="tnd__txt">{`Angelita lo lleva a ${destino}…`}</p>
     </div>
   );
 }

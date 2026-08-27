@@ -52,11 +52,9 @@ import PanelVitalidadEspiritu from './PanelVitalidadEspiritu';
 import SceneFincaNature from './SceneFincaNature';
 import SceneHuertoVivo from './SceneHuertoVivo';
 import SceneTrazoMinimal from './SceneTrazoMinimal';
-// EL UMBRAL DEL VALLE + LAS PUERTAS COMO CARTAS (encargo FABLE_50 §A6,
-// "home máximo" 2026-07-16): la vista viva que ES la puerta cinematográfica
-// al valle 3D, y las puertas pintadas como cartas en la mano. Los destinos
-// siguen saliendo de buildPuertas (fuente única); solo cambió la piel.
-import UmbralValle from './UmbralValle';
+// LAS PUERTAS COMO CARTAS (encargo FABLE_50 §A6). La puerta al valle vive en
+// ValleHomeGateway: teaser liviano en loop + entrada New Donk al destino.
+import ValleHomeGateway from './ValleHomeGateway';
 import PortalesMano from './PortalesMano';
 import './scene-finca-organismo.css';
 import './scene-finca-nature.css';
@@ -768,12 +766,9 @@ export default function FincaVivaHero({ onNavigate, onOpenAgent, onGestionar, on
           </div>
         </main>
 
-        {/* ── EL UMBRAL DEL VALLE (encargo "home máximo" 2026-07-16) ──────────
-            La vista viva del valle andino a la hora real — y LA PUERTA GRANDE:
-            tocarla inunda la pantalla con el cielo de la franja y aterriza en
-            el valle 3D ('valle3d', existe en ambos shells). Solo con finca
-            propia: la RED institucional del extensionista no es un valle. */}
-        {tieneFincaPropia && <UmbralValle onNavigate={onNavigate} />}
+        {/* La puerta nueva reemplaza al UmbralValle archivado. El teaser no
+            carga el valle pesado; la entrada manual sí dispara New Donk. */}
+        {tieneFincaPropia && <ValleHomeGateway onNavigate={onNavigate} />}
 
         {/* ── LAS 6 PUERTAS como CARTAS EN LA MANO (usabilidad campesina #5 +
             FABLE_50 §A6). Antes: tarjetas planas con emoji. Ahora: viñetas de
