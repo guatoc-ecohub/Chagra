@@ -24,6 +24,16 @@ const THRESHOLDS = {
 // El agente responde sin RAG en >90% de sesiones; la búsqueda semántica y
 // las fichas de cultivo cargan su primer fetch cuando el usuario realmente
 // las necesita, no en el arranque. Excluidos del budget igual que TF.js.
+//
+// Fotos GBIF de plagas (#2471, 2026-07-30): plaga-images/ (~33MB) son las fotos
+// CC de licencia libre del daño/insecto (55 plagas). Se sirven on-demand como
+// binario local `/plaga-images/<id>.jpg` SOLO al abrir la ficha de una plaga
+// (plagaImageResolver.js) — NO están en ASSETS_TO_CACHE ni en ningún precache de
+// install de public/sw.js (0 refs en el sw.js construido). Cargarlas cuenta como
+// cache-on-use, no como peso de arranque. Sin esta exclusión el gate de arranque
+// mide 57MB (33MB de fotos de plagas + ~24MB reales) y rompía la required "Check
+// bundle sizes" en main desde el 2026-07-30 — baseline desactualizado, no bloat
+// eager. Excluidas igual que rag-embeddings/cycle-content.
 const LAZY_EXCLUDED_PREFIXES = [
   join(DIST, 'vendor', 'tfjs'),
   join(DIST, 'vendor', 'speech-commands'),
@@ -31,6 +41,7 @@ const LAZY_EXCLUDED_PREFIXES = [
   join(DIST, 'models', 'hola-chagra'),
   join(DIST, 'rag-embeddings.json'),
   join(DIST, 'cycle-content'),
+  join(DIST, 'plaga-images'),
 ];
 
 function formatSize(bytes) {
