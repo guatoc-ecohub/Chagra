@@ -379,19 +379,6 @@ const HALOS = `
   <circle class="zh-ojoHalo" style="opacity:0" cx="176" cy="80" r="18" fill="url(#ztOjoHalo)"/>
   <circle class="zh-ojoHalo" style="opacity:0" cx="245" cy="74" r="18" fill="url(#ztOjoHalo)"/>`;
 
-/* ── OJO DERECHO (lejano) — LA ÚNICA cirugía de arte permitida (operador
-   2026-08-27): el raster Gemini hero dejó el ojo lejano APAGADO (mancha
-   oscura sin pupila redonda ni brillo) frente al ojo cercano nítido con
-   catchlight — el "ojo derecho picho". Se le da la MISMA vida con un acento
-   PUNTUAL (pupila redonda definida + catchlight), SIN redibujar la lámina ni
-   tocar el resto del arte. Coords calco MEDIDAS con marcador GPU-headed
-   (ancla del halo lejano 245,74; centro visible del ojo ≈243,77). Va DEBAJO
-   de los párpados: el blink lo tapa igual que al ojo cercano. ── */
-const OJO_DER_VIVO = `
-  <circle cx="243.5" cy="77" r="6.2" fill="${P.antifaz || '#241a12'}" opacity="0.42"/>
-  <circle cx="243.5" cy="77.5" r="3.4" fill="#120c07" opacity="0.9"/>
-  <circle cx="240.8" cy="73.8" r="2.1" fill="#f7efdb" opacity="0.92"/>`;
-
 /* ─────────────────────── LA CABEZA (con sus satélites) ───────────────────── */
 
 const CABEZA = `
@@ -400,7 +387,7 @@ const CABEZA = `
   <g class="zh-hueso zh-mandibula"${origin('mandibula')}>${usoCalco('mandibula')}</g>
   <g class="zh-hueso zh-orejaI"${origin('orejaI')}>${usoCalco('orejaI')}</g>
   <g class="zh-hueso zh-orejaD"${origin('orejaD')}>${usoCalco('orejaD')}</g>
-  <g class="zh-ojoGrupo">${HALOS}${OJO_DER_VIVO}${PARPADOS}</g>`;
+  <g class="zh-ojoGrupo">${HALOS}${PARPADOS}</g>`;
 
 /* ─────────────────────────── EL SVG COMPLETO ─────────────────────────────── */
 
