@@ -70,6 +70,9 @@ import { ErrorFallback } from './components/common/ErrorFallback';
 // Lazy-loaded route components
 const LoginScreen = lazy(() => import('./components/LoginScreen'));
 const OAuthCallback = lazy(() => import('./components/OAuthCallback'));
+// Marco del valle 3D canónico, aislado en public/valle (Three r160). No se
+// descarga hasta que la persona cruza desde el home.
+const ValleMarcoScreen = lazy(() => import('./components/ValleMarcoScreen'));
 // Vitrina pública de la librería visual reutilizable (`src/visual/`). Ruta
 // #/mockups/visual-lib, resuelta ANTES del check de sesión (no requiere auth).
 const VisualLib = lazy(() => import('./mockups/VisualLib'));
@@ -3511,23 +3514,12 @@ export default function App() {
           </ErrorBoundary>
         );
       case 'valle3d':
-        // EL VALLE 3D DESDE EL HOME (FASE 0 del plan game-dev): la MISMA
-        // EntradaValle3D de la vitrina (#/mockups/entrada-3d) montada como
-        // vista REAL de la app, con `onNavigate`: las puertas de los mundos
-        // abren las pantallas de verdad (regla de oro: re-rutear, nunca
-        // reimplementar). Se llega por la banda de MundosDeMiFinca, gated por
-        // el flag de prefs `valle3d` (default OFF, Perfil) + device-tier;
-        // adentro el tiering decide 3D pleno/frugal o el valle 2D digno.
+        // Entrada REAL al marco canónico. La vitrina R3F queda aislada en
+        // `mockup_entrada_3d`; el HOME no debe abrir un segundo valle.
         return (
           <ErrorBoundary>
             <ErrorFallback moduleName="El valle de su finca (3D)">
-              <EntradaValle3DMockup
-                onBack={() => navigate(sinSesion ? 'login' : 'dashboard')}
-                // @ts-ignore navigate signature
-                onNavigate={navigate}
-                // @ts-ignore initialMundoId not in strict type
-                initialMundoId={currentViewData?.mundo}
-              />
+              <ValleMarcoScreen onExit={() => navigate(sinSesion ? 'login' : 'dashboard')} />
             </ErrorFallback>
           </ErrorBoundary>
         );
