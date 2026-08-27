@@ -1,0 +1,151 @@
+/* ── <BurbujaPizarraPeek> — el asomo del compai como PIZARRA DE COLEGIO
+      (BurbujaPizarraPeek.jsx). Superficie de pizarra verde-oscura, texto en
+      TIZA (blanco hueso), marco fino discreto. Chiquita: cabe arriba del FAB
+      SIN tapar la pantalla de Chagra (regla dura R1 2026-08-27). Crece HACIA
+      ARRIBA (bottom:100%) y ocupa poco: es AYUDA, no estorbo. */
+
+.burbuja-pizarra-peek {
+  --pizarra-fondo: #26332b;
+  --pizarra-alto: #2f3f35;
+  --pizarra-bajo: #1c261f;
+  --pizarra-marco: #3a2c1c;
+  --tiza: #f3efe4;
+  --tiza-tenue: rgba(243, 239, 228, 0.66);
+
+  position: absolute;
+  bottom: 100%;
+  right: 0;
+  margin-bottom: 10px;
+  width: 232px;
+  max-width: calc(100vw - 24px);
+  z-index: 42;
+  pointer-events: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  animation: burbuja-pizarra-in 0.24s ease both;
+}
+
+/* La pizarra: fondo verde-oscuro con un grano finísimo de tiza y un marco
+   delgado (madera fina). El texto de tiza va escrito a máquina encima. */
+.burbuja-pizarra-peek__tabla {
+  position: relative;
+  padding: 9px 26px 9px 11px;
+  border-radius: 8px;
+  color: var(--tiza);
+  background-color: var(--pizarra-fondo);
+  background-image:
+    radial-gradient(circle at 22% 18%, rgba(243, 239, 228, 0.05) 0%, transparent 42%),
+    linear-gradient(150deg, var(--pizarra-alto) 0%, var(--pizarra-fondo) 55%, var(--pizarra-bajo) 100%);
+  border: 3px solid var(--pizarra-marco);
+  box-shadow:
+    0 6px 16px rgba(12, 18, 14, 0.42),
+    inset 0 0 0 1px rgba(243, 239, 228, 0.06);
+}
+
+.burbuja-pizarra-peek__texto {
+  margin: 0;
+  font-size: 0.86rem;
+  font-weight: 500;
+  line-height: 1.35;
+  letter-spacing: 0.2px;
+  /* La tiza «respira» con un realce muy leve, como trazo de gis. */
+  text-shadow: 0 0 1px rgba(243, 239, 228, 0.35);
+}
+
+.burbuja-pizarra-peek__cerrar {
+  position: absolute;
+  top: 3px;
+  right: 3px;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: none;
+  background: transparent;
+  color: var(--tiza-tenue);
+  font-size: 14px;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  padding: 0;
+  transition: background 0.18s ease, color 0.18s ease;
+}
+.burbuja-pizarra-peek__cerrar:hover,
+.burbuja-pizarra-peek__cerrar:focus-visible {
+  background: rgba(243, 239, 228, 0.12);
+  color: var(--tiza);
+}
+
+/* Los tres controles: pastillas de contorno de tiza, discretas, bajo la pizarra. */
+.burbuja-pizarra-peek__controles {
+  display: flex;
+  gap: 4px;
+  padding: 0 1px;
+}
+
+.burbuja-pizarra-peek__control {
+  flex: 1 1 0;
+  min-width: 0;
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  min-height: 40px;
+  padding: 5px 3px;
+  border-radius: 8px;
+  white-space: nowrap;
+  border: 1.5px solid rgba(243, 239, 228, 0.4);
+  /* Fondo OPACO (pizarra) para que el texto de tiza se lea sobre CUALQUIER
+     pantalla de la app, no dependa del fondo de detrás. */
+  background: #2b382f;
+  color: var(--tiza);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.1px;
+  cursor: pointer;
+  transition: background 0.16s ease, border-color 0.16s ease, transform 0.14s ease;
+}
+.burbuja-pizarra-peek__control:hover {
+  background: #38473d;
+  border-color: rgba(243, 239, 228, 0.62);
+}
+/* Foco de teclado: outline de tiza, sin aclarar el fondo (el texto blanco debe
+   seguir legible; nunca un fondo claro que lo borre). */
+.burbuja-pizarra-peek__control:focus-visible {
+  background: #38473d;
+  border-color: rgba(243, 239, 228, 0.62);
+  outline: 2px solid rgba(243, 239, 228, 0.75);
+  outline-offset: 1px;
+}
+.burbuja-pizarra-peek__control:active {
+  transform: scale(0.97);
+}
+.burbuja-pizarra-peek__control--mas {
+  flex: 0 0 30px;
+}
+
+/* Sólo para lectores de pantalla: quién habla. */
+.burbuja-pizarra-peek__sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+@keyframes burbuja-pizarra-in {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .burbuja-pizarra-peek { animation: none; }
+  .burbuja-pizarra-peek__control { transition: none; }
+}
