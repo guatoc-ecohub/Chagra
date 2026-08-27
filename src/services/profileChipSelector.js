@@ -60,6 +60,14 @@ const GENERAL_CHIPS = Object.freeze([
   CHIP_INTENTS.precio,
 ]);
 
+/** Chips de consulta técnica (variedades, fenología, polinización, fuentes). */
+const TECHNICAL_CHIPS = Object.freeze([
+  CHIP_INTENTS.variedades,
+  CHIP_INTENTS.fenologia,
+  CHIP_INTENTS.polinizacion,
+  CHIP_INTENTS.fuente_doi,
+]);
+
 /** Chips de restauración ecológica. @type {readonly string[]} */
 const RESTAURACION_CHIPS = Object.freeze([
   CHIP_INTENTS.restauracion,
@@ -76,7 +84,12 @@ const RESTAURACION_CHIPS = Object.freeze([
  */
 const ROLE_BASE_CHIPS = Object.freeze({
   [PROFILE_ROLES.campesino]: Object.freeze([
-    ...CULTIVO_CHIPS,
+    CHIP_INTENTS.siembro,
+    CHIP_INTENTS.asociaciones, // destacado: policultivo es núcleo campesino.
+    CHIP_INTENTS.plaga,
+    CHIP_INTENTS.biopreparado,
+    CHIP_INTENTS.clima,
+    CHIP_INTENTS.calendario,
     ...GENERAL_CHIPS,
   ]),
   [PROFILE_ROLES.restaurador]: Object.freeze([
@@ -109,9 +122,11 @@ const ROLE_BASE_CHIPS = Object.freeze({
     ...GENERAL_CHIPS,
     CHIP_INTENTS.plaga,
   ]),
-  // Técnico/agrónomo: set amplio (sabe usar todo); orden = cultivo luego ecológico.
+  // Técnico/agrónomo: set amplio (sabe usar todo); orden = cultivo, técnico, ecológico.
   [PROFILE_ROLES.tecnico]: Object.freeze([
     ...CULTIVO_CHIPS,
+    CHIP_INTENTS.asociaciones,
+    ...TECHNICAL_CHIPS,
     ...GENERAL_CHIPS,
     ...RESTAURACION_CHIPS,
   ]),
