@@ -56,6 +56,10 @@ import SceneTrazoMinimal from './SceneTrazoMinimal';
 // a src/components/_archivado/. Las puertas como cartas (PortalesMano) siguen
 // como la vía a los mundos. Ver ops/ARCHIVO-HOME-2D-20260826.md.
 import PortalesMano from './PortalesMano';
+// LA PUERTA DEL VALLE: teaser con CUADROS REALES del valle en loop + entrada
+// New Donk. Reintroduce el acceso al valle 3D desde el home 2D (reemplazo del
+// UmbralValle archivado 2026-08-26).
+import ValleHomeGateway from './ValleHomeGateway';
 import './scene-finca-organismo.css';
 import './scene-finca-nature.css';
 import './scene-huerto-vivo.css';
@@ -725,6 +729,13 @@ export default function FincaVivaHero({ onNavigate, onOpenAgent, onGestionar, on
             a los mundos sigue por las puertas-cartas de abajo (PortalesMano) y
             MundosDeMiFinca. Componente en src/components/_archivado/.
             Ver ops/ARCHIVO-HOME-2D-20260826.md. */}
+
+        {/* LA PUERTA DEL VALLE (reintroducida 2026-08-27, decisión del
+            operador): ValleHomeGateway reemplaza al UmbralValle archivado —
+            teaser liviano con CUADROS REALES del valle en loop + entrada New
+            Donk al valle 3D. Solo con finca propia: la RED institucional del
+            extensionista no es un valle. */}
+        {tieneFincaPropia && <ValleHomeGateway onNavigate={onNavigate} />}
 
         {/* ── LAS 6 PUERTAS como CARTAS EN LA MANO (usabilidad campesina #5 +
             FABLE_50 §A6). Antes: tarjetas planas con emoji. Ahora: viñetas de

@@ -14,6 +14,7 @@ import { tieneAccesoGlaciarActual } from '../../config/glaciarAccess';
 import { WORLD_STAGES } from '../../services/fincaGameService';
 import { fincaVivaHomePerfilActivo } from '../../config/fincaVivaHomeFlag';
 import FincaWorldScene from '../juego/FincaWorldScene';
+import ValleHomeGateway from './ValleHomeGateway';
 import '../juego/juego-finca.css';
 
 /**
@@ -180,6 +181,12 @@ export default function MiFincaVivaHomeCard({ onNavigate }) {
             <p className="text-xs text-emerald-300/80 mt-2">{scene.resumen}</p>
           </>
         )}
+      </div>
+
+      {/* LA PUERTA DEL VALLE (compacta): teaser con CUADROS REALES del valle
+          + entrada New Donk al valle 3D. */}
+      <div className="px-4 pb-4">
+        <ValleHomeGateway onNavigate={onNavigate} compact />
       </div>
     </section>
   );
