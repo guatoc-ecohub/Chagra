@@ -269,8 +269,6 @@ export default function CirculoRotoMilpa({
   const disparado = useRef(false);
   const timers = useRef([]);
 
-  useEffect(() => () => timers.current.forEach(clearTimeout), []);
-
   useEffect(() => {
     if (!trigger || roto || disparado.current) return;
     disparado.current = true;
@@ -282,9 +280,21 @@ export default function CirculoRotoMilpa({
       window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
     const tRuptura = reduce ? 350 : CRM_RUPTURA_MS;
     const tAsentado = reduce ? 600 : CRM_ASENTADO_MS;
-    timers.current.push(setTimeout(() => setFase(reduce ? 'roto' : 'activa'), 0));
-    timers.current.push(setTimeout(() => onRupturaCompleta?.(), tRuptura));
-    timers.current.push(setTimeout(() => onAsentado?.(), tAsentado));
+    const timerIds = [
+      setTimeout(() => setFase(reduce ? 'roto' : 'activa'), 0),
+      setTimeout(() => onRupturaCompleta?.(), tRuptura),
+      setTimeout(() => onAsentado?.(), tAsentado),
+    ];
+    timers.current.push(...timerIds);
+
+    // React Strict Mode monta, desmonta y vuelve a montar los efectos en
+    // desarrollo. El cleanup debe cancelar SOLO esta ejecución y liberar el
+    // latch para que el segundo montaje reprograme la coreografía.
+    return () => {
+      timerIds.forEach(clearTimeout);
+      timers.current = timers.current.filter((id) => !timerIds.includes(id));
+      disparado.current = false;
+    };
   }, [trigger, roto, onRupturaCompleta, onAsentado]);
 
   const uid = useId().replace(/[^a-zA-Z0-9]/g, '');

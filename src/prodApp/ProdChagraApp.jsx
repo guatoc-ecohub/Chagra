@@ -476,7 +476,6 @@ export default function ProdChagraApp() {
     return (
       <Suspense fallback={<ChagraGrowLoader />}>
         <LoginScreen onLoginSuccess={handleLoginSuccess} onSave={() => {}} />
-        <AgentFab onNavigate={navigate} pantalla="login" />
       </Suspense>
     );
   }
@@ -484,7 +483,6 @@ export default function ProdChagraApp() {
     return (
       <Suspense fallback={<ChagraGrowLoader />}>
         <LoginScreen onLoginSuccess={handleLoginSuccess} onSave={() => {}} />
-        <AgentFab onNavigate={navigate} pantalla="login" />
       </Suspense>
     );
   }

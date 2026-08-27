@@ -77,10 +77,12 @@ describe('LoginScreen — render y accesibilidad', () => {
     expect(screen.getByTestId('legal-links')).toBeInTheDocument();
   });
 
-  it('monta el círculo roto de la milpa con una sola lámina de Angelita', () => {
+  it('monta el círculo de la milpa con una sola Angelita en la ranura', () => {
     const { container } = setup();
-    expect(screen.getByTestId('circulo-roto-milpa')).toHaveAttribute('data-fase', 'roto');
-    expect(container.querySelectorAll('[data-agt-estado]').length).toBe(1);
+    const circulo = screen.getByTestId('circulo-roto-milpa');
+    expect(circulo).toHaveAttribute('data-fase', 'quieta');
+    expect(circulo.querySelectorAll('[data-agente="angelita"]')).toHaveLength(1);
+    expect(container.querySelectorAll('[data-compai-draggable]')).toHaveLength(0);
   });
 
   it('el botón mostrar/ocultar contraseña alterna el tipo del campo (usted)', () => {

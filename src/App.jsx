@@ -4417,8 +4417,8 @@ export default function App() {
           todas las vistas que ya tienen shell, también durante interacción y
           offline. La entrada mística es la única que puede desvanecerlo. */}
       <Suspense fallback={null}>
-        {currentView !== 'loading' && <AgentFab onNavigate={navigate} pantalla={currentView} />}
-        {currentView !== 'loading' && <AngelitaAvisoGlobal />}
+        {currentView !== 'loading' && currentView !== 'login' && currentView !== 'oauth-callback' && <AgentFab onNavigate={navigate} pantalla={currentView} />}
+        {currentView !== 'loading' && currentView !== 'login' && currentView !== 'oauth-callback' && <AngelitaAvisoGlobal />}
       </Suspense>
       {/* Escucha manos libres (operador 2026-07-05, caso guantes/manos
           embarradas). Abre el widget "Chagra está escuchando" que navega o
