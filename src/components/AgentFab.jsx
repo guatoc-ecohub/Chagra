@@ -28,7 +28,6 @@ import { mundoDePantalla } from '../services/angelitaInteligencia';
 import useInventarioCompai from '../hooks/useInventarioCompai';
 import usePerfilFincaStore from '../store/usePerfilFincaStore';
 import { datosDeMundo } from '../compai/nucleo/datosFinca.js';
-import BurbujaAngelita from '../visual/agente/BurbujaAngelita.jsx';
 import AgentFabMenu from './AgentFabMenu';
 import useComportamientoCompai from '../hooks/useComportamientoCompai.js';
 import useCompaiDraggable from '../hooks/useCompaiDraggable';
@@ -231,9 +230,9 @@ export default function AgentFab({ onNavigate, pantalla = null }) {
   //        silencio / "hoy no" / ocupado (anti-molestia del store).
   //   R4 — Al tocarlo: menú Ver / Escuchar / Callar (+ Hablar / foto).
   //   R5 — Notificaciones adaptadas: el mensaje REAL (clima vivo / susurro /
-  //        agroecología / respuesta lista) se pinta como burbuja de AVISO en
-  //        prod 2D (antes solo un glow). El texto ADAPTADO ya lo alimentan los
-  //        hooks de arriba; aquí se hace VISIBLE con la burbuja rica del valle.
+  //        agroecología / respuesta lista) alimenta el aviso global y el glow
+  //        del FAB. El texto ADAPTADO ya lo alimentan los hooks de arriba; la
+  //        burbuja visible tiene una única SSOT en AngelitaAvisoGlobal.
   const [avatarType] = useAgentAvatarType();
   const nombreCompai = AVATAR_NOMBRE[avatarType] || AVATAR_NOMBRE[DEFAULT_AVATAR_TYPE];
   // El ARRASTRE lo dueña useCompaiDraggable (bottom/right, persistente). Mientras
@@ -256,7 +255,6 @@ export default function AgentFab({ onNavigate, pantalla = null }) {
   const estadoAngelita = useAngelitaStore((s) => s.estado);
   const visualEstadoAngelita = useAngelitaStore((s) => s.visualEstado);
   const mensajeAngelita = useAngelitaStore((s) => s.mensaje);
-  const tipoAngelita = useAngelitaStore((s) => s.tipo);
   const hoyNoActivoFn = useAngelitaStore((s) => s.hoyNoActivo);
   const puedeMostrarHintStore = useAngelitaStore((s) => s.puedeMostrarHint);
   const registrarHintMostrado = useAngelitaStore((s) => s.registrarHintMostrado);
@@ -280,12 +278,12 @@ export default function AgentFab({ onNavigate, pantalla = null }) {
   }
 
   // Aviso ADAPTADO (R5): la decisión viva del compai lleva su mensaje, tipo y
-  // ánimo. Las respuestas del chat siguen siendo el fallback para no romper el
-  // camino existente de AgentScreen → AgentFab.
+  // ánimo. AngelitaAvisoGlobal es la SSOT visual del aviso, así que AgentFab
+  // conserva este estado para el glow, el panel y la prioridad sobre el hint,
+  // pero no pinta una segunda burbuja.
   const mensajeAviso = estadoAngelita !== 'calma' && mensajeAngelita
     ? mensajeAngelita
     : lastAssistantMessage;
-  const tipoAviso = estadoAngelita !== 'calma' && tipoAngelita ? tipoAngelita : 'informativa';
   const hayAviso = responseReady && !!mensajeAviso && !silenciado;
   const mostrarAviso = hayAviso && !menuAbierto;
 
@@ -348,11 +346,6 @@ export default function AgentFab({ onNavigate, pantalla = null }) {
     setHintDescartado(true);
     registrarSenalMolestia('cerrarTipSinLeer');
   }, [registrarSenalMolestia]);
-  const descartarAviso = useCallback(() => {
-    setResponseReady(false);
-    if (useAngelitaStore.getState().estado !== 'calma') useAngelitaStore.getState().reposar();
-    registrarSenalMolestia('cerrarTipSinLeer');
-  }, [setResponseReady, registrarSenalMolestia]);
   const leerEnVoz = useCallback((titulo, descripcion) => {
     speakSentences(`${titulo}. ${descripcion}`).catch(() => { /* degrada a solo texto */ });
     registrarSenalMolestia('escuchar');
@@ -658,35 +651,8 @@ export default function AgentFab({ onNavigate, pantalla = null }) {
         <span aria-hidden="true">{silenciado ? '🔕' : '🔔'}</span>
       </button>
 
-      {/* R5: el aviso adaptado lleva el mensaje, el tipo y el ánimo del
-          compai. Una respuesta lista manda sobre la enseñanza contextual. */}
-      {mostrarAviso && (
-        <div style={burbujaWrapStyle} data-testid="compai-fab-aviso">
-          <div style={burbujaCardStyle}>
-            <button
-              type="button"
-              onClick={abrirPanel}
-              style={burbujaBotonStyle}
-              aria-label={`Aviso de su compañero: ${mensajeAviso}. Tocar para ver o escuchar.`}
-            >
-              <BurbujaAngelita
-                mensaje={mensajeAviso}
-                tipo={tipoAviso}
-                className="compai-fab-burbuja-rica"
-              />
-            </button>
-            <button
-              type="button"
-              onClick={descartarAviso}
-              style={burbujaCerrarStyle}
-              aria-label="Descartar este aviso"
-              title="Descartar"
-            >
-              <span aria-hidden="true">×</span>
-            </button>
-          </div>
-        </div>
-      )}
+      {/* R5: AngelitaAvisoGlobal pinta el único aviso. Este FAB conserva la
+          respuesta, el glow y el panel para no romper escuchar/responder. */}
 
       {/* R3 — BURBUJA DE ENSEÑANZA (idle): explica QUÉ hay en esta pantalla, una
           vez por entrada, descartable. Es el hint que se plegó del CompaiOverlay. */}

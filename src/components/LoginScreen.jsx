@@ -9,6 +9,7 @@ import ChagraGrowLoader from './ChagraGrowLoader';
 import ChagraAgentAvatar from './ChagraAgentAvatar';
 import LegalLinks from './LegalLinks';
 import WelcomeStatsHero from './WelcomeStatsHero';
+import { CirculoRotoMilpa } from '../visual/effects';
 import useOllamaWarmStore from '../store/useOllamaWarmStore';
 import { prewarmCorpus } from '../services/ragRetriever';
 import useThemeBackgroundStore, { getBackgroundSrc, esGradiente } from '../store/useThemeBackgroundStore';
@@ -157,6 +158,14 @@ export default function LoginScreen({ onLoginSuccess, onSave }) {
     }
   };
 
+  const laminaAngelita = (
+    <ChagraAgentAvatar
+      state="idle"
+      size={108}
+      ariaLabel="Chagra IA"
+    />
+  );
+
   return (
     <div className="login-screen relative min-h-[100dvh] w-full bg-slate-950 bg-biopunk-pattern flex flex-col items-center overflow-y-auto text-slate-100 px-5 sm:px-6 pt-[max(2rem,env(safe-area-inset-top))] pb-[max(2rem,env(safe-area-inset-bottom))]">
       {/* Capa 1 — Foto del páramo curado. Detrás de todo, con un gradiente de
@@ -194,17 +203,13 @@ export default function LoginScreen({ onLoginSuccess, onSave }) {
             reemplaza el ícono genérico anterior por el rostro de la marca.
             ───────────────────────────────────────────────────────────── */}
         <header className="flex flex-col items-center text-center gap-3 pt-2">
-          <div className="relative w-28 h-28 sm:w-32 sm:h-32 rounded-full bg-slate-900/70 backdrop-blur-sm ring-1 ring-muzo/40 shadow-neon-muzo flex items-center justify-center">
-            <span
-              aria-hidden="true"
-              className="absolute inset-0 rounded-full ring-1 ring-muzo/20 animate-pulse"
-            />
-            <ChagraAgentAvatar
-              state="idle"
-              size={108}
-              ariaLabel="Chagra IA"
-            />
-          </div>
+          <CirculoRotoMilpa
+            trigger
+            roto
+            className="relative w-28 h-28 sm:w-32 sm:h-32 rounded-full bg-slate-900/70 backdrop-blur-sm ring-1 ring-muzo/40 shadow-neon-muzo"
+          >
+            {laminaAngelita}
+          </CirculoRotoMilpa>
 
           <div>
             <h1 className="text-5xl font-black tracking-tight text-muzo drop-shadow-[0_0_18px_rgba(16,185,129,0.45)]">

@@ -5,7 +5,8 @@
  *   R3 — ENSEÑA en idle (hint contextual de la ruta, plegado del CompaiOverlay),
  *        respetando silencio.
  *   R4 — al tocarlo, el menú ofrece "Ver" (leer el mensaje/panel).
- *   R5 — el mensaje ADAPTADO (respuesta lista) se pinta como burbuja de AVISO.
+ *   R5 — el mensaje ADAPTADO (respuesta lista) queda a cargo de la burbuja
+ *        global, sin duplicarse dentro del FAB.
  *
  * Español de Colombia (usted), sin voseo.
  */
@@ -94,20 +95,19 @@ describe('AgentFab — R4 menú "Ver" abre el panel de lectura', () => {
   });
 });
 
-describe('AgentFab — R5 aviso adaptado visible en prod 2D', () => {
-  it('con respuesta real esperando, pinta el MENSAJE como burbuja de aviso (no solo glow)', () => {
+describe('AgentFab — R5 aviso adaptado delegado al global', () => {
+  it('con respuesta real esperando, no pinta una segunda burbuja de aviso', () => {
     useAgentNotificationStore.setState({
       responseReady: true,
       lastAssistantMessage: 'En su zona se espera lluvia mañana en la tarde.',
     });
     render(<AgentFab onNavigate={() => {}} pantalla="mapa" />);
-    expect(screen.getByTestId('compai-fab-aviso')).toBeInTheDocument();
-    expect(screen.getAllByText('En su zona se espera lluvia mañana en la tarde.').length).toBeGreaterThan(0);
+    expect(screen.queryByTestId('compai-fab-aviso')).toBeNull();
     // El aviso manda: no se pinta además la enseñanza (una cosa a la vez).
     expect(screen.queryByTestId('compai-fab-hint')).toBeNull();
   });
 
-  it('cablea la burbuja rica con tipo y ánimo del compai', () => {
+  it('conserva el ánimo visual del compai aunque la burbuja sea global', () => {
     useAngelitaStore.setState({
       estado: 'aviso',
       visualEstado: 'preocupada',
@@ -119,7 +119,8 @@ describe('AgentFab — R5 aviso adaptado visible en prod 2D', () => {
       lastAssistantMessage: 'Revise la helada de esta noche.',
     });
     const { container } = render(<AgentFab onNavigate={() => {}} pantalla="mapa" />);
-    expect(container.querySelector('.angelita-burbuja--alerta')).toBeInTheDocument();
+    expect(container.querySelector('.angelita-burbuja--alerta')).toBeNull();
     expect(container.querySelector('[data-agt-estado="preocupada"]')).toBeInTheDocument();
+    expect(screen.queryByTestId('compai-fab-hint')).toBeNull();
   });
 });

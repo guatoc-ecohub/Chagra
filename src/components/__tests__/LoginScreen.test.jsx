@@ -46,8 +46,8 @@ import { setCurrentOperator } from '../../services/operatorIdentityService';
 function setup() {
   const onLoginSuccess = vi.fn();
   const onSave = vi.fn();
-  render(<LoginScreen onLoginSuccess={onLoginSuccess} onSave={onSave} />);
-  return { onLoginSuccess, onSave };
+  const rendered = render(<LoginScreen onLoginSuccess={onLoginSuccess} onSave={onSave} />);
+  return { onLoginSuccess, onSave, ...rendered };
 }
 
 describe('LoginScreen — render y accesibilidad', () => {
@@ -75,6 +75,12 @@ describe('LoginScreen — render y accesibilidad', () => {
     expect(screen.getByText(/Software libre/i)).toBeInTheDocument();
     expect(screen.getByTestId('welcome-stats-hero')).toBeInTheDocument();
     expect(screen.getByTestId('legal-links')).toBeInTheDocument();
+  });
+
+  it('monta el círculo roto de la milpa con una sola lámina de Angelita', () => {
+    const { container } = setup();
+    expect(screen.getByTestId('circulo-roto-milpa')).toHaveAttribute('data-fase', 'roto');
+    expect(container.querySelectorAll('[data-agt-estado]').length).toBe(1);
   });
 
   it('el botón mostrar/ocultar contraseña alterna el tipo del campo (usted)', () => {
