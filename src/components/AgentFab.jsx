@@ -25,7 +25,7 @@ import useAgentAvatarType, { AVATAR_NOMBRE, DEFAULT_AVATAR_TYPE } from '../hooks
 import { getHintForRuta } from '../config/compaiHints.js';
 import BurbujaAngelita from '../visual/agente/BurbujaAngelita.jsx';
 import AgentFabMenu from './AgentFabMenu';
-import BurbujaMaderaPeek from './BurbujaMaderaPeek';
+import BurbujaPizarraPeek from './BurbujaPizarraPeek';
 import useComportamientoCompai from '../hooks/useComportamientoCompai.js';
 import useCompaiDraggable from '../hooks/useCompaiDraggable';
 import './agent-fab-skin.css';
@@ -58,11 +58,11 @@ import './agent-fab-skin.css';
  *
  * ── EL GESTO DE INTERACCIÓN (#66/#70, 2026-07-30) ──────────────────────────
  * Toque corto y pulsación larga sobre el PERSONAJE se reparten así:
- *   - TOQUE CORTO  → ASOMA el peek de madera (BurbujaMaderaPeek): una tabla
- *     veteada con el ÚLTIMO aviso escrito a máquina y, encima, tres controles
- *     claros: Ver / Escuchar / Callar. Es un vistazo, no navega pesado ni abre
- *     el menú; "Más opciones" dentro del peek sí abre el menú compacto de
- *     siempre (hablar, foto, callar-hoy).
+ *   - TOQUE CORTO  → ASOMA el peek de pizarra (BurbujaPizarraPeek): una pizarra
+ *     de colegio chiquita con el ÚLTIMO aviso escrito en tiza y, abajo, tres
+ *     controles claros: Ver / Escuchar / Callar. Es un vistazo compacto que NO
+ *     tapa la pantalla; "Más opciones" dentro del peek sí abre el menú compacto
+ *     de siempre (hablar, foto, callar-hoy).
  *   - MANTENER PRESIONADO (1600 ms) → «Hola Chagra»: habla DIRECTO, sin menú: activa el
  *     micrófono (`activarEscucha`, el mismo trigger desacoplado que usa
  *     EscuchaFab) al soltar la vibración háptica. Walkie-talkie: se aprieta
@@ -213,7 +213,7 @@ export default function AgentFab({ onNavigate, pantalla = null }) {
   //   R3 — Enseña en idle: en reposo muestra el hint contextual de la ruta
   //        (folded desde CompaiOverlay), UNA vez por entrada y respetando
   //        silencio / "hoy no" / ocupado (anti-molestia del store).
-  //   R4 — Al tocarlo: ASOMA el peek de madera (BurbujaMaderaPeek) con el
+  //   R4 — Al tocarlo: ASOMA el peek de pizarra (BurbujaPizarraPeek) con el
   //        último aviso (typewriter) y Ver / Escuchar / Callar. "Más opciones"
   //        abre el menú compacto de siempre.
   //   R5 — Notificaciones adaptadas: el mensaje REAL (clima vivo / susurro /
@@ -708,11 +708,11 @@ export default function AgentFab({ onNavigate, pantalla = null }) {
         </div>
       )}
 
-      {/* PEEK DEL TOQUE (decisión operador 2026-08-27): tabla de madera con el
-          último aviso (typewriter) + Ver / Escuchar / Callar. "Más opciones"
-          abre el menú compacto de abajo. */}
+      {/* PEEK DEL TOQUE (rediseño operador 2026-08-27): pizarra de colegio
+          compacta con el último aviso (typewriter) + Ver / Escuchar / Callar.
+          NO tapa la pantalla; "Más opciones" abre el menú compacto de abajo. */}
       {peekAbierto && (
-        <BurbujaMaderaPeek
+        <BurbujaPizarraPeek
           mensaje={contenidoPanel.descripcion}
           nombre={nombreCompai}
           silenciado={silenciado}
