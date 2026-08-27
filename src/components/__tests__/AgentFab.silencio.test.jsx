@@ -7,8 +7,8 @@
  * vive en el menú del toque corto (AgentFabMenu.test.jsx cubre ese camino).
  *
  * Actualizado 2026-08-27 (superficie del FAB, decisión del operador):
- *   - TAP = PEEK: el toque asoma la burbuja de madera con el último aviso +
- *     Ver / Escuchar / Callar (BurbujaMaderaPeek), ya NO un menú.
+ *   - TAP = PEEK: el toque asoma la pizarra con el último aviso +
+ *     Ver / Escuchar / Callar (BurbujaPizarraPeek), ya NO un menú.
  *   - El menú compacto de siempre (Hablar / Enviar foto / callar-hoy) queda un
  *     paso más adentro, tras "Más opciones" del peek.
  *   - LONG-PRESS = 1600 ms (antes 600) → «Hola Chagra» escuchando.
