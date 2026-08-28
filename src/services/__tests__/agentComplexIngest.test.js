@@ -10,7 +10,7 @@ const HOY = new Date('2026-08-28T12:00:00.000Z');
 
 describe('agentComplexIngest — Caso 1 multi-entidad', () => {
   it('descompone determinísticamente todas las operaciones sin llamar un LLM', () => {
-    const result = decomposeComplexIngest(CASO_1, { now: HOY });
+    const result = /** @type {any} */ (decomposeComplexIngest(CASO_1, { now: HOY }));
 
     expect(result).toMatchObject({ detected: true, requiresConfirmation: true });
     expect(result.operations.map((operation) => operation.kind)).toEqual([
@@ -62,7 +62,7 @@ describe('agentComplexIngest — Caso 1 multi-entidad', () => {
   });
 
   it('entrega las operaciones al executor existente en orden y solo tras confirmación', async () => {
-    const plan = decomposeComplexIngest(CASO_1, { now: HOY });
+    const plan = /** @type {any} */ (decomposeComplexIngest(CASO_1, { now: HOY }));
     const executor = vi.fn().mockResolvedValue({ status: 'executed', result: { success: true } });
 
     const execution = await executeComplexIngest(plan, {
@@ -77,7 +77,7 @@ describe('agentComplexIngest — Caso 1 multi-entidad', () => {
   });
 
   it('agenda la sugerencia agroecológica fuera de la ingesta confirmada', async () => {
-    const plan = decomposeComplexIngest(CASO_1, { now: HOY });
+    const plan = /** @type {any} */ (decomposeComplexIngest(CASO_1, { now: HOY }));
     const suggest = vi.fn().mockResolvedValue({ text: 'Manejo agroecológico listo.' });
 
     const suggestion = await scheduleAgroecologicalSuggestion(plan, suggest);

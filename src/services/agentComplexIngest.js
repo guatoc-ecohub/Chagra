@@ -160,7 +160,7 @@ export function decomposeComplexIngest(text, options = {}) {
  * confirmación y `executeAction` abre el modal para sus herramientas write.
  *
  * @param {ReturnType<typeof decomposeComplexIngest>} plan
- * @param {{operatorId:string, execute:(proposal:object, operatorId:string)=>Promise<object>}} options
+ * @param {{operatorId?:string, execute?:(proposal:object, operatorId:string)=>Promise<object>}} [options]
  */
 export async function executeComplexIngest(plan, { operatorId, execute } = {}) {
   if (!plan?.detected || !Array.isArray(plan.operations)) {
