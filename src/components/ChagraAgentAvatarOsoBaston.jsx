@@ -54,6 +54,8 @@ const VISEMA_DE_STATE = {
 
 export default function ChagraAgentAvatarOsoBaston({
     state = 'idle',
+    estado = undefined,
+    visema: visemaRecibido = null,
     size = 48,
     withLabel = false,
     onClick = undefined,
@@ -68,6 +70,9 @@ export default function ChagraAgentAvatarOsoBaston({
     animated = true,
     tier = undefined,
     vida = true,
+    'data-agt-estado': dataEstado = undefined,
+    'data-pose': dataPose = undefined,
+    'data-visema': dataVisema = undefined,
     // Presencia (pedido operador 2026-08-24, transversal al elenco): con
     // reaccionaPresencia el oso DESPIERTA a su estado natural (idle vivo) al
     // detectar presencia, sin pisar una actuación conversacional real. Mismo
@@ -80,11 +85,12 @@ export default function ChagraAgentAvatarOsoBaston({
     // La presencia solo despierta cuando el estado es pasivo (idle): jamás
     // interrumpe una actuación conversacional ni la caminata. Despertar =
     // garantizar el idle-cerebro (vida) encendido sobre su pose base 'anda'.
-    const despiertaNatural = despierta && esPasivo(state);
+    const estadoAgente = estado || state;
+    const despiertaNatural = despierta && esPasivo(estadoAgente);
     const estadoEfectivo = despiertaNatural ? 'idle' : state;
     const pose = POSE_DE_STATE[estadoEfectivo] || 'anda';
     const resopla = !!RESOPLA_DE_STATE[estadoEfectivo];
-    const visema = VISEMA_DE_STATE[estadoEfectivo] || null;
+    const visema = visemaRecibido ?? VISEMA_DE_STATE[estadoEfectivo] ?? null;
 
     const bicho = (
         <OsoBaston
@@ -98,6 +104,9 @@ export default function ChagraAgentAvatarOsoBaston({
             title={ariaLabel}
             className={className}
             style={glow ? { filter: 'drop-shadow(0 0 10px rgba(67,194,79,0.65))' } : undefined}
+            data-agt-estado={dataEstado || estadoAgente}
+            data-pose={dataPose || pose}
+            data-visema={dataVisema || visema || undefined}
         />
     );
 
