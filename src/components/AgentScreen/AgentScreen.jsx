@@ -31,6 +31,11 @@ import {
   shouldStartNewSession,
 } from '../../services/conversationMemory';
 import { retrieve } from '../../services/ragRetriever';
+// agentComplexIngest — descompositor determinista de registros multi-entidad.
+// Se consulta ANTES del pipeline sidecar/LLM: si el texto describe varias
+// acciones de campo, se ejecutan las operaciones confirmadas vía actionExecutor
+// (lote/siembra) y se agenda la sugerencia agroecológica en segundo plano.
+import { decomposeComplexIngest, executeComplexIngest, scheduleAgroecologicalSuggestion } from '../../services/agentComplexIngest';
 import { parseIntent, formatIntentDescription } from '../../services/agentIntentParser';
 import { streamOpenAI } from '../../services/openaiStream';
 import { buildLLMRequest, selectChatRoute } from '../../services/llmRouter';
@@ -2889,6 +2894,67 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
     );
   }, []);
 
+  // agentComplexIngest — descompositor determinista de registros multi-entidad.
+  // Se consulta ANTES de enrutar al pipeline sidecar/LLM (handleSubmit). Si el
+  // texto describe varias acciones de campo, muestra la confirmación de cada
+  // operación (gate del actionExecutor) y ejecuta la ingesta confirmada con un
+  // adaptador sobre `executeAction` (resuelve lote y siembra). La sugerencia
+  // agroecológica se agenda async, sin bloquear el cierre del turno. Devuelve
+  // true si el turno se manejó por esta ruta, false para el flujo normal.
+  const handleComplexIngest = async (text) => {
+    const plan = decomposeComplexIngest(text);
+    if (!plan || !plan.detected) return false;
+
+    const userMessage = { role: 'user', content: text, timestamp: Date.now() };
+    setMessages((prev) => [...prev, userMessage]);
+    try {
+      await addTurn(operatorId, { role: 'user', content: text });
+    } catch (e) {
+      console.warn('[ComplexIngest] addTurn user failed:', e?.message);
+    }
+    setActiveIntent(null);
+
+    // Agenda la sugerencia agroecológica en segundo plano. NO se espera: la
+    // ruta secundaria (grafo/LLM) nunca participa en la ejecución de registros.
+    scheduleAgroecologicalSuggestion(plan, (suggestion) => {
+      console.debug('[ComplexIngest] sugerencia agroecológica agendada:', suggestion);
+    });
+
+    try {
+      // Adaptador sobre actionExecutor: el gate humano se abre por cada
+      // operación (requiresConfirmation) y resuelve crear_lote / registrar_siembra.
+      const summary = await executeComplexIngest(plan, {
+        operatorId,
+        execute: (proposal, opId) => executeAction(proposal, opId),
+      });
+
+      const assistantMessage = {
+        role: 'assistant',
+        content: summary.status === 'executed'
+          ? `Listo, registré ${summary.executed} operaciones del surco. ${plan.followUpQuestion || ''}`
+          : summary.status === 'partial'
+            ? 'Registré parte de las operaciones. Faltó confirmar algunas. Cuéntame el resto cuando quieras.'
+            : 'No registré ninguna operación. Cuéntame de nuevo los detalles y confirmo antes de guardar.',
+        timestamp: Date.now(),
+      };
+      setMessages((prev) => [...prev, assistantMessage]);
+      try {
+        await addTurn(operatorId, { role: 'assistant', content: assistantMessage.content });
+      } catch (e) {
+        console.warn('[ComplexIngest] addTurn assistant failed:', e?.message);
+      }
+    } catch (e) {
+      console.warn('[ComplexIngest] execute failed:', e?.message);
+      const errMsg = {
+        role: 'assistant',
+        content: 'No pude registrar las operaciones. Intenta de nuevo.',
+        timestamp: Date.now(),
+      };
+      setMessages((prev) => [...prev, errMsg]);
+    }
+    return true;
+  };
+
   const handleSubmit = async (text, { fromVoice = false, suppressUserBubble = false, visionContext = null, forcedIntent = null } = {}) => {
     if (!text || !text.trim()) return;
     const trimmed = text.trim();
@@ -3115,6 +3181,14 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
           return;
         }
       }
+    }
+
+    // agentComplexIngest: descomponer el texto ANTES de enrutar al sidecar/LLM.
+    // Si detecta un registro multi-entidad (Caso 1), se muestran las
+    // operaciones a confirmar y se ejecutan sin pasar por el pipeline RAG/LLM.
+    // Si no, devuelve false y el turno sigue el flujo normal.
+    if (await handleComplexIngest(trimmed)) {
+      return;
     }
 
     const route = selectChatRoute(trimmed);
