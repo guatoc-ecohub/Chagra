@@ -1,0 +1,7 @@
+Tarea: el mercado solo tiene 8 fotos; el catálogo REAL tiene 40+. TRAER TODAS las fotos de http://milpa-test.milpachoachi.co/es/catalogo/ , convertirlas a WEBP, y cablearlas al mercado (una foto correcta por producto, sin faltantes, sin inventar).
+
+1. Descargá el catálogo: `curl -sL http://milpa-test.milpachoachi.co/es/catalogo/` (y las páginas de idioma/paginación si las hay). Parseá TODOS los productos: nombre + URL de su foto. Puede ser HTML server-render o un JSON/API detrás (revisá el network: buscá endpoints tipo /api/products, /es/catalogo?page=N). Si es SPA, buscá el JSON de datos.
+2. Descargá CADA foto (todas, 40+). Convertí a WEBP con calidad ~82 (`cwebp -q 82 in.png -o out.webp` o `magick in.jpg out.webp`). Guardalas en `chagra/public/mercado/fotos-webp/` con nombre = slug del producto.
+3. Cableá el mapeo producto→foto-webp en el mercado del PWA (`src/mockups/mercado/datos.js` / `ProductoIlustracion.jsx`) y/o el mercado desplegado, según cuál sea el canónico. TODOS los productos del catálogo con su foto webp. Cero productos inventados, cero precios inventados (respetá los datos del catálogo real).
+4. Verificá: build limpio + que cada producto renderiza SU foto webp (no ilustración fallback, no repetida, no basura). Dejá capturas en _gate/ para gate visual posterior (juez gemini-pixel — NO reportes "listo" del visual, eso lo gateo yo).
+5. Entregá en rama feature/worktree, NO mergees. Reportá: cuántos productos+fotos, dónde quedaron los webp, y las capturas. Cero PII.
