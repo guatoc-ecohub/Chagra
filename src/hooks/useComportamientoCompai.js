@@ -38,7 +38,7 @@ export const COMPAI_MOVIMIENTO = Object.freeze({
 // calcula para que, sobre el ciclo completo, el compai quede quieto ~70%.
 export const COMPAI_QUIETO_RATIO = 0.7;
 
-const VELOCIDAD = 78;             // px/s del desplazamiento
+const VELOCIDAD = 42;             // px/s — acoplado al arco del pie del paso (78 pateaba: cuerpo más rápido que el pie)
 const RADIO_X = 180;              // alcance máx. de la excursión a la IZQUIERDA del puesto
 const RADIO_Y = 160;              // alcance máx. de la excursión ARRIBA del puesto
 const EXCURSION_DWELL_MS = 900;   // dwell breve en el punto de la excursión ("explicando")

@@ -352,3 +352,7 @@ div.jaguarHuesos > svg{ width: 100%; height: 100%; display: block; overflow: vis
   .jaguarHuesos *{ animation: none !important; transition: none !important; }
   .jaguarHuesos .jh-pj{ filter: none; }
 }
+
+/* Bob de marcha: el cuerpo rebota sutil sincronizado al paso — mata la lectura de "glide/patín". */
+.jaguarHuesos[data-agt-estado="caminando"]{ animation: jhBob calc(var(--jh-paso) / 2) ease-in-out infinite; }
+@keyframes jhBob{ 0%,100%{ transform: translateY(0); } 50%{ transform: translateY(-2.5%); } }
