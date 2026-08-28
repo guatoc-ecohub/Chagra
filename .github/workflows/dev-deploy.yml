@@ -52,6 +52,13 @@ jobs:
           VITE_FARMOS_CLIENT_ID: farm
           VITE_USE_SIDECAR_AGRO_MCP: "true"
           VITE_FINCA_VIVA_HOME_PERFIL: "true"
+          # HomeCampesinoB (#3053): la bandera homeCampesinoBActivo() hace
+          # DEFAULT ON cuando VITE_HOME_CAMPESINO_B no está seteada, lo que
+          # convirtió la home campesina en el default post-login de
+          # chagra-dev.guatoc.co (regresión). dev debe conservar la home
+          # NORMAL del PWA; la home campesina B vive en campesino.guatoc.co
+          # (build aparte con VITE_HOME_CAMPESINO_B=true). Apagamos aquí.
+          VITE_HOME_CAMPESINO_B: "false"
           # Registro unificado (#23): puerta única "Registrar" (voz + manual) en
           # dev. OFF en prod (deploy.yml no la define) hasta el visto bueno.
           VITE_REGISTRO_UNIFICADO: "true"
