@@ -71,6 +71,11 @@ const PATH_HORIZONTE =
   'C39,5.7 41,3.6 43,3.6 C45,3.6 46,6.1 51,6.1 C59,6.6 63,4.6 71,5.1 ' +
   'L72.8,2.6 L74.6,5.6 C82,5 88,7 100,5.9 L100,10 Z';
 
+/**
+ * @param {{fase?: 'entrando'|'saliendo'|null, destino?: string, velo?: string,
+ *   tier?: 'alto'|'medio'|'bajo', reducedMotion?: boolean, letrero?: string,
+ *   onCubierto?: () => void, onFin?: () => void}} props
+ */
 export default function VeloOdyssey({
   fase = null,
   destino = 'valle',

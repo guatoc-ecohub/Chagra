@@ -52,18 +52,24 @@ export const LUZ_MADRE = {
  *                                 60% hacia la madre. Default: madre pura.
  * @param {object} [props.perfil]  perfilDeTier(tier); decide castShadow.
  * @param {number} [props.escala]  atenuador global (1 = receta tal cual).
+ * @param {[number, number, number]} [props.solPos] posición opcional del sol.
+ * @param {{left?: number, right?: number, top?: number, bottom?: number, far?: number}} [props.sombra]
+ *                                 límites opcionales de la cámara de sombras.
  */
 export default function LuzMadre({
   madre = ATMOSFERA,
   cielo = null,
   perfil = null,
   escala = 1,
+  solPos,
+  sombra,
 }) {
   /* La mezcla 60%-hacia-la-madre es la MISMA ley de EscenaBase3D (7 lerps,
      memoizados aquí): un consumidor standalone pinta IGUAL que el framework. */
   const c = useMemo(() => mezclarCielo(cielo, madre), [cielo, madre]);
   const k = (c.intensidad ?? 1) * escala;
   const sombras = !!(perfil && perfil.sombras);
+  const limitesSombra = sombra || {};
 
   return (
     <>
@@ -77,16 +83,16 @@ export default function LuzMadre({
         color={madre.luz}
       />
       <directionalLight
-        position={madre.solPos ?? LUZ_MADRE.solPos}
+        position={solPos ?? madre.solPos ?? LUZ_MADRE.solPos}
         intensity={(madre.sol ?? LUZ_MADRE.sol) * k}
         color={madre.luz}
         castShadow={sombras}
         shadow-mapSize={[1024, 1024]}
-        shadow-camera-far={30}
-        shadow-camera-left={-12}
-        shadow-camera-right={12}
-        shadow-camera-top={12}
-        shadow-camera-bottom={-12}
+        shadow-camera-far={limitesSombra.far ?? 30}
+        shadow-camera-left={limitesSombra.left ?? -12}
+        shadow-camera-right={limitesSombra.right ?? 12}
+        shadow-camera-top={limitesSombra.top ?? 12}
+        shadow-camera-bottom={limitesSombra.bottom ?? -12}
       />
       <directionalLight
         position={LUZ_MADRE.rellenoPos}

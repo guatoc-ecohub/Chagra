@@ -24,6 +24,9 @@
  */
 import { useCallback, useMemo, useRef, useState } from 'react';
 
+/**
+ * @param {{tier?: 'alto'|'medio'|'bajo', reducedMotion?: boolean, onSwap?: (destino: string|null) => void}} opciones
+ */
 export function useCruceMundo({ tier = 'medio', reducedMotion = false, onSwap } = {}) {
   const [estado, setEstado] = useState({ fase: 'quieto', destino: null });
   const swapRef = useRef(onSwap);
