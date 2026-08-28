@@ -13,9 +13,7 @@
 export const CONTACT_TYPE = Object.freeze({
   CAMPESINO: 'campesino',
   TECNICO: 'tecnico',
-  COMPRADOR: 'comprador',
-  VIVERO: 'vivero',
-  OTRO: 'otro',
+  PROVEEDOR: 'proveedor',
 });
 
 /**
@@ -24,9 +22,7 @@ export const CONTACT_TYPE = Object.freeze({
 export const CONTACT_TYPE_LABELS = Object.freeze({
   [CONTACT_TYPE.CAMPESINO]: 'Campesino',
   [CONTACT_TYPE.TECNICO]: 'Técnico',
-  [CONTACT_TYPE.COMPRADOR]: 'Comprador',
-  [CONTACT_TYPE.VIVERO]: 'Vivero',
-  [CONTACT_TYPE.OTRO]: 'Otro',
+  [CONTACT_TYPE.PROVEEDOR]: 'Proveedor',
 });
 
 /**
@@ -36,12 +32,11 @@ export const CONTACT_TYPE_LABELS = Object.freeze({
  */
 export const INTERACTION_TYPE = Object.freeze({
   VISITA: 'visita',
-  INTERCAMBIO_SEMILLA: 'intercambio_semilla',
-  VENTA: 'venta',
-  ASESORIA: 'asesoria',
   LLAMADA: 'llamada',
   MENSAJE: 'mensaje',
-  OTRO: 'otro',
+  INTERCAMBIO: 'intercambio',
+  VENTA: 'venta',
+  ASESORIA: 'asesoria',
 });
 
 /**
@@ -49,12 +44,11 @@ export const INTERACTION_TYPE = Object.freeze({
  */
 export const INTERACTION_TYPE_LABELS = Object.freeze({
   [INTERACTION_TYPE.VISITA]: 'Visita',
-  [INTERACTION_TYPE.INTERCAMBIO_SEMILLA]: 'Intercambio de Semilla',
-  [INTERACTION_TYPE.VENTA]: 'Venta',
-  [INTERACTION_TYPE.ASESORIA]: 'Asesoría',
   [INTERACTION_TYPE.LLAMADA]: 'Llamada',
   [INTERACTION_TYPE.MENSAJE]: 'Mensaje',
-  [INTERACTION_TYPE.OTRO]: 'Otro',
+  [INTERACTION_TYPE.INTERCAMBIO]: 'Intercambio',
+  [INTERACTION_TYPE.VENTA]: 'Venta',
+  [INTERACTION_TYPE.ASESORIA]: 'Asesoría',
 });
 
 /**
@@ -63,9 +57,8 @@ export const INTERACTION_TYPE_LABELS = Object.freeze({
  * @enum {string}
  */
 export const CONTACT_STATUS = Object.freeze({
-  ACTIVO: 'activo',
-  INACTIVO: 'inactivo',
-  ARCHIVADO: 'archivado',
+  ACTIVO: 'active',
+  ARCHIVADO: 'archived',
 });
 
 /**
@@ -73,33 +66,15 @@ export const CONTACT_STATUS = Object.freeze({
  */
 export const CONTACT_STATUS_CONFIG = Object.freeze({
   [CONTACT_STATUS.ACTIVO]: {
-    id: 'activo',
+    id: 'active',
     label: 'Activo',
     color: '#22c55e',
     textColor: '#064e3b',
   },
-  [CONTACT_STATUS.INACTIVO]: {
-    id: 'inactivo',
-    label: 'Inactivo',
-    color: '#f59e0b',
-    textColor: '#78350f',
-  },
   [CONTACT_STATUS.ARCHIVADO]: {
-    id: 'archivado',
+    id: 'archived',
     label: 'Archivado',
     color: '#64748b',
     textColor: '#ffffff',
   },
-});
-
-/**
- * Tipos de roles en la red campesina
- * @readonly
- * @enum {string}
- */
-export const NETWORK_ROLE = Object.freeze({
-  PRODUCTOR: 'productor',
-  COMPRADOR: 'comprador',
-  TECNICO: 'tecnico',
-  INTERMEDIARIO: 'intermediario',
 });

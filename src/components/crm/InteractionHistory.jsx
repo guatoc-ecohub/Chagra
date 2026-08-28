@@ -18,12 +18,11 @@ export const InteractionHistory = ({
   const getInteractionIcon = (type) => {
     const icons = {
       [INTERACTION_TYPE.VISITA]: '🚜',
-      [INTERACTION_TYPE.INTERCAMBIO_SEMILLA]: '🌱',
+      [INTERACTION_TYPE.INTERCAMBIO]: '🌱',
       [INTERACTION_TYPE.VENTA]: '💰',
       [INTERACTION_TYPE.ASESORIA]: '📋',
       [INTERACTION_TYPE.LLAMADA]: '📞',
       [INTERACTION_TYPE.MENSAJE]: '💬',
-      [INTERACTION_TYPE.OTRO]: '📌',
     };
     return icons[type] || '📌';
   };
@@ -102,7 +101,7 @@ export const InteractionHistory = ({
                             'Otro'}
                         </h3>
                         <p className="text-sm text-gray-500">
-                          {formatDate(interaction.timestamp)}
+                          {formatDate(interaction.timestamp || interaction.attributes?.timestamp)}
                         </p>
                       </div>
                       
@@ -115,7 +114,7 @@ export const InteractionHistory = ({
                               : 'bg-yellow-100 text-yellow-800'
                           }`}
                         >
-                          {interaction.attributes.status === 'done' ? '✓' : '⏳'}
+                          {interaction.attributes.status === 'done' ? 'Completada' : 'Pendiente'}
                         </span>
                       )}
                     </div>

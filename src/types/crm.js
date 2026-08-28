@@ -1,91 +1,58 @@
 /**
- * crm/types.js — Tipos para el CRM Agroecológico Mínimo
- * 
- * Extiende el modelo Asset-flat + Log del ADR-019 para soportar:
- * - Contactos/aliados (asset--contact)
- * - Interacciones (log--interaction)
- * 
- * El modelo respeta las reglas del ADR-019:
- * - Los contactos son assets planos (no anidados)
- * - Las interacciones son logs append-only (inmutables)
- * - No hay vistas derivadas almacenadas como campo de Asset
+ * Tipos del CRM agroecológico mínimo.
+ *
+ * No introduce recursos FarmOS nuevos: un contacto es un `asset--person`
+ * identificado por `attributes.crm_contact_type`, y una interacción es un
+ * `log--activity` identificado por `attributes.crm_interaction_type`.
+ * La vista de red se calcula a partir de esas dos colecciones y no se guarda.
  */
 
 /**
  * @typedef {Object} ContactAsset
- * Asset de tipo contacto/aliado para el CRM agroecológico.
- * Extiende el Asset base con atributos específicos de contactos.
- *
  * @property {string} id
- * @property {'asset--contact'} type
+ * @property {'asset--person'} type
  * @property {Object} attributes
  * @property {string} attributes.name
- * @property {'campesino'|'tecnico'|'comprador'|'vivero'|'otro'} attributes.contact_type
- * @property {'activo'|'inactivo'|'archivado'} [attributes.status]
- * @property {string} [attributes.phone]
- * @property {string} [attributes.email]
- * @property {string} [attributes.location]
- * @property {string} [attributes.vereda]
- * @property {string} [attributes.municipio]
- * @property {string} [attributes.notes]
- * @property {Object} [attributes.metadata]
- * @property {string[]} [attributes.metadata.cultivos]
- * @property {string[]} [attributes.metadata.especialidades]
- * @property {Object} [attributes.coordinates]
- * @property {number} [attributes.coordinates.lat]
- * @property {number} [attributes.coordinates.lng]
- * @property {number} [attributes.timestamp]
+ * @property {'campesino'|'tecnico'|'proveedor'} attributes.crm_contact_type
+ * @property {'active'|'archived'} attributes.status
+ * @property {string|null} [attributes.phone]
+ * @property {string|null} [attributes.email]
+ * @property {string|null} [attributes.vereda]
+ * @property {string|null} [attributes.municipio]
+ * @property {string|null} [attributes.notes]
+ * @property {number} attributes.timestamp Unix seconds
  * @property {Object} [relationships]
- * @property {Object} [relationships.owner]
  * @property {Object} [relationships.uid]
  * @property {boolean} [_pending]
- * @property {'no_network'|'no_token'|'sync_error'} [_pendingReason]
- * @property {number} [_createdAt]
  */
 
 /**
  * @typedef {Object} InteractionLog
- * Log de tipo interacción para el CRM agroecológico.
- * Extiende el Log base con atributos específicos de interacciones.
- *
  * @property {string} id
- * @property {'log--interaction'} type
+ * @property {'log--activity'} type
+ * @property {string} asset_id Contact asset id, denormalized for local queries
+ * @property {number} timestamp Unix seconds
  * @property {Object} attributes
- * @property {string} [attributes.name]
- * @property {number} attributes.timestamp
- * @property {'visita'|'intercambio_semilla'|'venta'|'asesoria'|'llamada'|'mensaje'|'otro'} attributes.interaction_type
- * @property {'pending'|'done'|'held'} [attributes.status]
- * @property {string} [attributes.notes]
- * @property {string} [attributes.result]
- * @property {Object} [attributes.details]
- * @property {Object} [attributes.details.intercambio]
- * @property {string} [attributes.details.intercambio.especie]
- * @property {number} [attributes.details.intercambio.cantidad]
- * @property {string} [attributes.details.intercambio.unidad]
- * @property {Object} [attributes.details.venta]
- * @property {string} [attributes.details.venta.producto]
- * @property {number} [attributes.details.venta.cantidad]
- * @property {string} [attributes.details.venta.unidad]
- * @property {number} [attributes.details.venta.valor]
- * @property {Object} [attributes.quantity]
- * @property {number|string} [attributes.quantity.value]
- * @property {string} [attributes.quantity.unit]
- * @property {Object} [relationships]
- * @property {Object} [relationships.contact]
- * @property {Object} [relationships.owner]
- * @property {Object} [relationships.uid]
+ * @property {string} attributes.name
+ * @property {'visita'|'llamada'|'mensaje'|'intercambio'|'venta'|'asesoria'} attributes.crm_interaction_type
+ * @property {'done'} attributes.status Historical interactions are completed facts
+ * @property {string|null} [attributes.notes]
+ * @property {string|null} [attributes.result]
+ * @property {Object} [attributes.details] Optional, interaction-specific data
+ * @property {Object} relationships
+ * @property {Object} relationships.asset
+ * @property {{id: string, type: 'asset--person'}} relationships.asset.data
  * @property {boolean} [_pending]
  */
 
 /**
- * @typedef {Object} ContactoConHistorial
- * Un contacto con su historial de interacciones materializado.
- * NO se persiste (ADR-019: esto es cache reconstruible desde logs).
- *
- * @property {ContactAsset} contacto
- * @property {InteractionLog[]} historial
+ * @typedef {Object} NetworkStats
+ * Derived, read-only projection. Never persist this shape in an Asset.
+ * @property {number} totalContactos
  * @property {number} totalInteracciones
- * @property {number} ultimaInteraccion
+ * @property {Record<string, number>} contactosPorTipo
+ * @property {Record<string, number>} interaccionesPorTipo
+ * @property {{id: string, name: string, count: number, type: string}[]} contactosMasActivos
  */
 
 export {};
