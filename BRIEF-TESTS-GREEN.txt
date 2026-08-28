@@ -1,0 +1,12 @@
+Tarea: dejar la suite vitest de dev 100% VERDE (baseline limpio para poder mergear con confianza).
+
+Contexto: origin/dev tiene al menos 1 test fallando PRE-EXISTENTE: `src/components/AgentScreen/__tests__/VoiceStatusStrip.test.jsx > phase=thinking muestra "Chagra está pensando"`. Falla porque el fix de coherencia (commit 8846c5149) hizo que el saludo/estado diga el NOMBRE del compai (ej "Soy EL OSO DE ANTEOJOS"), no "Chagra". El test quedó desactualizado. Puede haber más tests así.
+
+Qué hacer:
+1. Corré `npx vitest run` completo. Listá TODOS los archivos/tests que fallan.
+2. Para cada fallo: determiná si el test está desactualizado (el CÓDIGO es el correcto, ej. el nombre del compai) o si hay un bug real. Si es test desactualizado → actualizá el test para reflejar el comportamiento correcto actual. Si es bug real de producción → NO cambies el test para que pase; documentá el bug en un comentario y dejalo fallando (marcá con `it.fails` o `test.skip` con un TODO claro) — pero avisá cuáles son bugs reales.
+3. NO toques lógica de producción salvo que sea un bug trivial evidente. El objetivo es baseline verde por tests correctos, no por trampa.
+4. Corré `npx vitest run` de nuevo y confirmá 0 fallos (o solo los marcados como bug-real documentado).
+5. Commiteá en esta rama (fix/dev-tests-green-20260826) con mensaje conventional. NO mergees a dev. Reportá: lista de tests tocados + cuáles eran desactualizados vs bug-real.
+
+Trabajás en /home/kortux/Workspace/chagra-fix-tests (rama fix/dev-tests-green-20260826, base origin/dev). Cero PII.
