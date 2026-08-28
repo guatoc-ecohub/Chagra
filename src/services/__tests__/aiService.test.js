@@ -168,7 +168,21 @@ describe('aiService — analyzeFoliage integración RAG', () => {
 
     expect(streamOllamaMock).toHaveBeenCalledTimes(1);
     const [, body, , options] = streamOllamaMock.mock.calls[0];
-    expect(body.model).toBe(ENV.VISION_MODEL);
+    // analyzeFoliage rutea el diagnóstico foliar al modelo de VISIÓN que corre
+    // en prod (aiService.DIAGNOSIS_MODEL = 'qwen3-vl:8b'; memoria del operador:
+    // "qwen3-vl:8b visión"). Un diagnóstico de FOTO exige un modelo multimodal
+    // real — rutearlo al chat de texto sería el mis-route que rompe la visión.
+    // El test antes asertaba ENV.VISION_MODEL (qwen3.5:4b, era de la unificación
+    // agente+visión #2739); al portar las 6 features de main→dev (#2976,
+    // commit b8d09546a) el diagnóstico volvió deliberadamente a qwen3-vl:8b y
+    // este test quedó stale. NOTA para el operador (drift de SSOT, NO tocado
+    // desde aquí): aiService hardcodea el modelo en vez de leer ENV.VISION_MODEL
+    // (que default-ea a qwen3.5:4b en env.js) — el código refleja prod, el
+    // default de env.js es el stale; conviene reconciliarlos en código aparte.
+    expect(body.model).toBe('qwen3-vl:8b');
+    // Guarda dura anti-mis-route: el diagnóstico foliar NUNCA debe caer en el
+    // modelo de chat de TEXTO puro (ahí no vería la foto).
+    expect(body.model).not.toBe(ENV.CHAT_MODEL);
     expect(body.prompt).toContain('<CONTEXTO_CIENTÍFICO>');
     expect(body.prompt).toContain('Mycosphaerella fragariae');
     expect(body.prompt).toContain('caldo bordelés');

@@ -333,10 +333,19 @@ describe('sidecarClient — feature flag on', () => {
 
     it('reconciliación allow-list ↔ NLU (fix P0 2026-06-25): tools sin args ruteables quedan en DEFLECCIÓN HONESTA', async () => {
       // NO se exponen: exigen credenciales farmOS / coords de dispositivo / NIT
-      // DIAN, o un arg obligatorio que el NLU no conoce (altitud de finca, fecha
-      // de siembra, biopreparado_id). Si el planner rutea a una de ellas, el
-      // guard de AgentScreen inyecta deflección honesta en vez de degradar callado
-      // a RAG. Verificación: NO están en el allow-list (callTool las rechaza).
+      // DIAN, o un arg obligatorio que el NLU no conoce (fecha de siembra). Si el
+      // planner rutea a una de ellas, el guard de AgentScreen inyecta deflección
+      // honesta en vez de degradar callado a RAG. Verificación: NO están en el
+      // allow-list (callTool las rechaza).
+      //
+      // 2026-08-25 — actualizado tras las Fases 1/3 de reconciliación
+      // (sidecarClient.js, integ. #2139/#2740): get_cultivos_viables,
+      // get_diseno_finca y get_dosis_biopreparado se EXPUSIERON deliberadamente
+      // (son read-only del grafo AGE con args que el NLU SÍ rellena desde una
+      // frase: `altitud`, `biopreparado_id`), así que ya NO son deflectadas.
+      // get_grado_dia SÍ sigue diferida (requiere `fecha_siembra` que el NLU no
+      // puede sintetizar). El test seguía listando las 3 expuestas como
+      // deflectadas y por eso estaba rojo — se realinea con el código de prod.
       const { __TEST__ } = await importFresh();
       const deflectadas = [
         'add_planta_finca',
@@ -346,13 +355,14 @@ describe('sidecarClient — feature flag on', () => {
         'get_clima_finca',
         'get_documento_soporte_dian',
         'get_ubicacion_actual',
-        'get_cultivos_viables',
-        'get_diseno_finca',
-        'get_grado_dia',
-        'get_dosis_biopreparado',
+        'get_grado_dia', // Fase 2 diferida: exige fecha_siembra sin default.
       ];
       for (const t of deflectadas) {
         expect(__TEST__.ALLOWED_TOOLS.has(t)).toBe(false);
+      }
+      // Control positivo: las 3 reconciliadas SÍ están expuestas ahora.
+      for (const t of ['get_cultivos_viables', 'get_diseno_finca', 'get_dosis_biopreparado']) {
+        expect(__TEST__.ALLOWED_TOOLS.has(t)).toBe(true);
       }
     });
 
