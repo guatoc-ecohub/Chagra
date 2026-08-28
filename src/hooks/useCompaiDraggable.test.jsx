@@ -10,8 +10,8 @@ describe('useCompaiDraggable', () => {
     // Limpiar localStorage antes de cada test
     localStorage.clear();
     // Mock window.innerWidth y window.innerHeight
-    global.innerWidth = 1024;
-    global.innerHeight = 768;
+    globalThis.innerWidth = 1024;
+    globalThis.innerHeight = 768;
   });
 
   afterEach(() => {
