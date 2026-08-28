@@ -76,6 +76,18 @@ jobs:
           # para que dev = corpus-por-turno + deep-research + todos los guards =
           # build de referencia contra la que prod se iguala en la promoción.
           VITE_DEEP_RESEARCH_ENABLED: "true"
+          # --- Paridad con prod + piloto David/Cata (2026-08-28) ---
+          # MODO CAMPO (#2088): wake-word "hola chagra" (TF.js on-device, offline).
+          # ON en dev para probarlo en campo con voz real (criterio: PROBAR, no
+          # certificar; si no reconoce bien "hola chagra", se entrega APAGADO).
+          VITE_MODO_CAMPO: "true"
+          # Captura de conversaciones del agente para auditoria del piloto. A
+          # diferencia de prod-piloto (consent-off + PII completa), en dev EXIGIMOS
+          # consentimiento in-app y ANONIMIZAMOS (Habeas Data Ley 1581 — mas
+          # protector para los pilotos David/Cata; decision del operador 2026-08-28).
+          VITE_CAPTURE_CONVERSATIONS: "true"
+          VITE_CAPTURE_REQUIRE_CONSENT: "true"
+          VITE_CAPTURE_ANONYMIZE: "true"
           # Los bundles Pro no están servidos en dev. Sin esta variable,
           # loadProModules.js degrada al build OSS y no genera requests a
           # /pro-modules/<modulo>/index.js, que el SPA fallback respondería
