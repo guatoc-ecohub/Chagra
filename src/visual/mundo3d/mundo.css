@@ -209,7 +209,9 @@
 /* Tres capas para tres gestos que NO se pisan: la raíz PULSA al narrar, la capa
    media REBOTA al toque, la cara VOLTEA (scaleX imperativo por frame). */
 .mundo-abeja {
-  pointer-events: none;
+  pointer-events: auto;
+  touch-action: none;
+  cursor: pointer;
   /* ATENUADA en los mundos 3D a propósito: la Angelita del billboard cansaba
      la vista — "demasiado brillante, solo dorada". Bajamos saturación y brillo
      del billboard y suavizamos su sombra. NO toca la Angelita 2D del home ni los

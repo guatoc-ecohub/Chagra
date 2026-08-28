@@ -44,6 +44,7 @@ import useCicloDia from '../useCicloDia.js';
 import { presetDeHora } from '../cielosHoraData.js';
 import { perfilDeTier } from '../deviceTier.js';
 import CapaVivaMundo from '../CapaVivaMundo.jsx';
+import useCompaiHold from '../../../hooks/useCompaiHold.js';
 /* HUD de FPS conmutable (dev/campo): lee el instrumento de usePerformanceMonitor
    y lo muestra. DOM, fuera del <Canvas>. Apagado por defecto (return null). */
 import HudRendimiento from '../HudRendimiento.jsx';
@@ -389,6 +390,7 @@ export default function EscenaBase3D({
   estadoFinca = ESTADO_FINCA_MUESTRA, hayAlerta = false, children,
 }) {
   const [listo, setListo] = useState(false);
+  const compaiHoldHandlers = useCompaiHold();
   const zoom = entrada?.zoom ?? 6.5;
   const cam = camara || { position: [zoom * 0.55, zoom * 0.5, zoom], fov: 42 };
   const tierInicial = useMemo(() => detectarTierInicial({ tier, reducedMotion }), [tier, reducedMotion]);
@@ -402,6 +404,7 @@ export default function EscenaBase3D({
     <>
     <Canvas
       className={`mundo-canvas${listo ? ' mundo-canvas--listo' : ''}`}
+      {...compaiHoldHandlers}
       dpr={dpr}
       gl={{ antialias: tierInicial === 'alto', powerPreference: 'high-performance' }}
       camera={cam}

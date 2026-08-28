@@ -4483,7 +4483,7 @@ export default function App() {
           Para re-habilitar el tap: descomentar el import de EscuchaFab (arriba)
           y la línea del render de abajo. */}
       {/* {!['loading', 'login', 'oauth-callback', 'onboarding-perfil', 'ubicacion-detectada', 'dashboard', 'agente', 'voz', 'voz_planta', 'registro_voz'].includes(currentView) && <EscuchaFab />} */}
-      {currentView !== 'loading' && currentView !== 'login' && currentView !== 'oauth-callback' && !currentView.startsWith('mockup_') && <EscuchaOverlay />}
+      {currentView !== 'loading' && currentView !== 'login' && currentView !== 'oauth-callback' && <EscuchaOverlay />}
       {currentView !== 'loading' && currentView !== 'login' && currentView !== 'oauth-callback' && !currentView.startsWith('mockup_') && <CompaiFotosOverlay onNavigate={navigate} />}
       {/* CompaiOverlay retirado (unificación compai 2026-08-23): montaba una
           segunda abejita idéntica a la del AgentFab en cada ruta 2D. Un solo

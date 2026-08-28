@@ -37,6 +37,7 @@ const LoginScreen = lazy(() => import('../components/LoginScreen.jsx'));
 // El asistente existia, con idle-cerebro, ritmo propio, mirada y lip-sync — y en
 // produccion no aparecia en ninguna de las 48 pantallas.
 const AgentFab = lazy(() => import('../components/AgentFab.jsx'));
+const EscuchaOverlay = lazy(() => import('../components/escucha/EscuchaOverlay.jsx'));
 const OAuthCallback = lazy(() => import('../components/OAuthCallback.jsx'));
 
 // ── Mapa de lazy components (generado del manifiesto) ─────────────
@@ -592,6 +593,7 @@ export default function ProdChagraApp() {
         && (
         <AgentFab onNavigate={navigate} pantalla={currentView} />
       )}
+      <EscuchaOverlay />
       <NetworkStatusBar />
     </Suspense>
   );

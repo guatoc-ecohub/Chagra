@@ -28,6 +28,7 @@ import { lazy, Suspense, useEffect, useMemo, useRef, useState } from 'react';
 import { decidirTier, permite3D } from '../visual/mundo3d/deviceTier.js';
 import ChagraAgentAvatar from './ChagraAgentAvatar.jsx';
 import './ventanaValle3D.css';
+import useCompaiHold from '../hooks/useCompaiHold.js';
 
 const EscenaVentana = lazy(() => import('./VentanaValle3DEscena.jsx'));
 
@@ -151,6 +152,7 @@ export function VentanaValle3D({
   const tier = tierProp || decision.tier;
   const reducedMotion = rmProp ?? decision.reducedMotion;
   const con3D = permite3D(tier);
+  const compaiHoldHandlers = useCompaiHold();
 
   // La escena 3D NO se pide hasta que la ventana entra al viewport: el home
   // no descarga `vendor-three` por un widget que quedó bajo el fold.
@@ -181,6 +183,7 @@ export function VentanaValle3D({
       type="button"
       ref={hostRef}
       className={`vv${className ? ` ${className}` : ''}`}
+      {...compaiHoldHandlers}
       data-tier={tier}
       onClick={onEntrar}
       aria-label={`${titulo}. ${pista}`}
