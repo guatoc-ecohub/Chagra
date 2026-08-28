@@ -122,8 +122,10 @@
   position: absolute;
   top: 4px;
   right: 4px;
-  width: 19px;
-  height: 19px;
+  /* WCAG 2.5.8 (AA): diana táctil >=24px. 28px la cumple con margen sin
+     tapar el rótulo del tablero (la × visible sigue chica, el hit-area crece). */
+  width: 28px;
+  height: 28px;
   border-radius: 50%;
   border: none;
   background: transparent;

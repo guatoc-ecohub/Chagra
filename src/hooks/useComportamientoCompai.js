@@ -126,6 +126,7 @@ function siguienteDestino({ el, limites, soloX, contentAware, x, y }) {
  * @param {string} [opciones.especie='angelita'] especie del compai
  * @param {boolean} [opciones.activo=true]
  * @param {boolean} [opciones.pausado=false] p.ej. mientras el host lo arrastra
+ * @param {boolean} [opciones.congelado=false] overlay abierto → congela en sitio
  * @param {boolean} [opciones.soloX=false] compatibilidad con el roam antiguo
  * @param {boolean} [opciones.contentAware=true] busca anclas reales de la pantalla
  * @param {string} [opciones.superficie='global'] etiqueta de superficie (informativa)
@@ -138,6 +139,11 @@ export default function useComportamientoCompai(ref, opciones = {}) {
     especie = 'angelita',
     activo = true,
     pausado = false,
+    // `congelado`: un asomo/menú/panel está abierto → el compai se CONGELA
+    // EXACTAMENTE donde está (cero-mareo). Distinto de `pausado` (arrastre), que
+    // devuelve el transform al puesto {0,0} — eso ya sería desplazamiento y bajo
+    // el peek se vería como una deriva de hasta ~RADIO px. Ver AgentFab.
+    congelado = false,
     soloX = false,
     contentAware = true,
     // `superficie` se conserva en la firma por compatibilidad con los hosts;
@@ -152,6 +158,7 @@ export default function useComportamientoCompai(ref, opciones = {}) {
   const estadoRef = useRef({ moviendo: false, direccion: 'izquierda' });
   const posicionRef = useRef({ x: 0, y: 0 });
   const pausadoRef = useRef(pausado);
+  const congeladoRef = useRef(congelado);
 
   // Estado para arrastre manual (drag+persistencia histórica)
   const dragState = useRef({
@@ -165,6 +172,10 @@ export default function useComportamientoCompai(ref, opciones = {}) {
   useEffect(() => {
     pausadoRef.current = pausado;
   }, [pausado]);
+
+  useEffect(() => {
+    congeladoRef.current = congelado;
+  }, [congelado]);
 
   // El `transform` descansa SIEMPRE en el puesto ({0,0}); el puesto real
   // (bottom/right, persistente) lo dueña useCompaiDraggable en el host.
@@ -214,6 +225,15 @@ export default function useComportamientoCompai(ref, opciones = {}) {
       if (!ultimoTs) ultimoTs = ts;
       const dt = Math.min((ts - ultimoTs) / 1000, DT_MAX);
       ultimoTs = ts;
+      if (congeladoRef.current) {
+        // CONGELADO: hay un asomo/menú/panel abierto. El compai NO se mueve ni
+        // un pixel — ni excursión ni regreso al puesto — para que el peek no
+        // derive bajo la vista (anti-mareo, criterio drift < 3px). No repinta:
+        // el transform se queda donde estaba. Al cerrar el overlay, el roam
+        // retoma y regresa al puesto con normalidad.
+        marcar('moviendo', false, setMoviendo);
+        return;
+      }
       const limites = obtenerLimites(el, soloX);
       const actual = posicionRef.current;
       const enPuesto = Math.abs(actual.x) < 1 && Math.abs(actual.y) < 1;

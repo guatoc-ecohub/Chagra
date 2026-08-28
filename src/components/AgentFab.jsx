@@ -81,6 +81,9 @@ export default function AgentFab({ onNavigate, pantalla = null }) {
   const [pressed, setPressed] = useState(false);
   const [menuAbierto, setMenuAbierto] = useState(false);
   const [peekAbierto, setPeekAbierto] = useState(false);
+  // Panel "Ver" (R4): lectura del mensaje/hint en detalle. Declarado ACÁ ARRIBA
+  // (no más abajo) para que `pausado` del roam lo pueda leer sin caer en TDZ.
+  const [panelAbierto, setPanelAbierto] = useState(false);
   const { level: ttsLevel } = useTtsAmplitude();
 
   // Hook de arrastre y persistencia de posición
@@ -234,6 +237,13 @@ export default function AgentFab({ onNavigate, pantalla = null }) {
     superficie: pantalla || 'global',
     contentAware: true,
     pausado: isDragging,
+    // CERO-MAREO (auditoría 3-roles 2026-08-27): con un asomo/menú/panel abierto
+    // el compai se CONGELA donde está — el peek vive DENTRO de este mismo div, y
+    // sin esto la excursión del roam lo arrastraba 24-42px bajo la vista. Se usa
+    // `congelado` (freeze in-place) y NO `pausado`: `pausado` devuelve el
+    // transform al puesto {0,0}, que si el peek se abre a mitad de excursión es
+    // una deriva de varios segundos igual de mareante (medido). Ver el hook.
+    congelado: peekAbierto || menuAbierto || panelAbierto,
   });
   const hint = useMemo(() => getHintForRuta(pantalla, nombreCompai), [pantalla, nombreCompai]);
 
@@ -241,8 +251,6 @@ export default function AgentFab({ onNavigate, pantalla = null }) {
   const visualEstadoAngelita = useAngelitaStore((s) => s.visualEstado);
   const mensajeAngelita = useAngelitaStore((s) => s.mensaje);
 
-  // Panel "Ver" (R4): lectura del mensaje/hint en detalle.
-  const [panelAbierto, setPanelAbierto] = useState(false);
   const [lastPantalla, setLastPantalla] = useState(pantalla);
   if (lastPantalla !== pantalla) {
     setLastPantalla(pantalla);
