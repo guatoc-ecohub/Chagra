@@ -71,6 +71,9 @@ const STATE_DE_ESTADO_RICO = {
     respondiendo: 'speaking',
     contenta: 'speaking',
     invita: 'speaking',
+    // El motor de comportamiento emite este estado mientras el puesto DOM
+    // se desplaza. No degradarlo a idle o la piel pierde su marcha CSS.
+    caminando: 'caminando',
 };
 
 const AVATAR_ANGOSTO = {

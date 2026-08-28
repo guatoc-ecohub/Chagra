@@ -42,12 +42,13 @@ export default function ChagraAgentAvatarGuacamaya({
     glow = false,
     className = '',
     ariaLabel = 'Chagra IA',
+    visema: visemaProp = undefined,
     reaccionaPresencia = true,
 }) {
     const { despierta, handlers: handlersPresencia } = useAngelitaPresencia({ activo: reaccionaPresencia });
     const estadoBase = estado || state;
     const estadoEfectivo = despierta && esPasivo(estadoBase) ? 'idle' : estadoBase;
-    const visema = VISEMA_DE_STATE[estadoEfectivo] || null;
+    const visema = visemaProp || VISEMA_DE_STATE[estadoEfectivo] || null;
     const bicho = (
         <GuacamayaCompai
             state={estadoEfectivo}

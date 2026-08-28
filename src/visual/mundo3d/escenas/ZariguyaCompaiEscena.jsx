@@ -4,8 +4,8 @@
  *
  * Molde: useEntradaAbeja/AbejaEscena (la escena posee la coreografía, la
  * creature posee el cuerpo). SKIN DEFINITIVA (operador 2026-08-25):
- * `ZariguyaGeminiLaminaViva` — la lámina raster Gemini aprobada, con sus
- * poses completas y vida propia. Pero la chucha NO vuela — es un
+ * `ZariguyaTrazado` — el rig SVG de huesos aprobado, con sus regiones de
+ * patas articulables. Pero la chucha NO vuela — es un
  * marsupial NOCTURNO de piso, y su coreografía entera sale de esa verdad:
  *
  *   · CAMINA: se desplaza PEGADA AL SUELO con trote de pasos cortos (bob de
@@ -35,11 +35,11 @@
    coreografía + su componente de escena) se importa SIEMPRE perezoso dentro de
    un <Canvas> vía CompaiEscena/EscenaBase3D; no es hot-reload-sensible. Van
    juntos a propósito (mismo contrato que useEntradaAbeja). */
-import { useEffect, useMemo, useRef } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useFrame } from '@react-three/fiber';
 import { Html } from '@react-three/drei';
 import * as THREE from 'three';
-import ZariguyaGeminiLaminaViva from '../../creatures/ZariguyaGeminiLaminaViva.jsx';
+import ZariguyaTrazado from '../../creatures/ZariguyaTrazado.jsx';
 import { ZARIGUYA_PRESENCIA, ZARIGUYA_TINTA, ZARIGUYA_SLUG } from '../../creatures/zariguyaIdentidad.js';
 import { idleDeCreature, IDLE_NEUTRO } from '../../creatures/creatureIdle.js';
 import { useLipSync } from '../../creatures/useLipSync.js';
@@ -62,6 +62,8 @@ const TROTE_EMPUJE = 2.4;   // refuerzo del lerp durante la llegada
 const ENTRA_DESDE_X = 2.4;  // desde qué borde llega (offset del foco)
 const PASO_FREQ = 7.3;      // frecuencia del trote (pasos cortos de marsupial)
 const ENCARAME_UMBRAL = 0.35; // foco más alto que esto sobre el piso → se encarama
+const MARCHA_LEJOS = 0.28;
+const MARCHA_CERCA = 0.12;
 
 const clamp01 = (v) => (v < 0 ? 0 : v > 1 ? 1 : v);
 
@@ -112,6 +114,14 @@ export function useAndanzaZariguya(foco, {
   const aparecioRef = useRef(false);
   // Fase de entrada: 'oculta' (pre-ancla) → 'trote' (llega) → 'no'.
   const fase = useRef(cruce && !reducedMotion ? 'oculta' : 'no');
+  const [modo, setModo] = useState(cruce && !reducedMotion ? 'marcha' : 'quieto');
+  const modoRef = useRef(modo);
+  const ponModo = (siguiente) => {
+    if (modoRef.current !== siguiente) {
+      modoRef.current = siguiente;
+      setModo(siguiente);
+    }
+  };
   const ponVis = (visible) => {
     if (visible) aparecioRef.current = true;
     if (visRef.current) visRef.current.style.visibility = visible ? '' : 'hidden';
@@ -156,6 +166,7 @@ export function useAndanzaZariguya(foco, {
     }
     if (!aparecioRef.current) ponVis(true); // sin cruce (RM): aparece ya
     const empuje = fase.current === 'trote' ? TROTE_EMPUJE : 1;
+    if (fase.current === 'trote') ponModo('marcha');
 
     // ── PERSONALIDAD IDLE (creatureIdle, perfil 'zariguya'): pasos cortos,
     //    husmeos frecuentes, voltereta rara (lleva tres crías encima),
@@ -189,6 +200,10 @@ export function useAndanzaZariguya(foco, {
     // ── EL TROTE: qué tanto se está moviendo decide el paso (bob + waddle).
     const dist = ref.current.position.distanceTo(_dest);
     const moviendo = reducedMotion ? 0 : clamp01(dist * 2.5) * (1 - quieta);
+    if (fase.current === 'no') {
+      if (dist > MARCHA_LEJOS) ponModo('marcha');
+      else if (dist < MARCHA_CERCA) ponModo('quieto');
+    }
     const pasoBob = Math.abs(Math.sin(t * PASO_FREQ)) * 0.035 * moviendo * brio;
     const waddle = Math.sin(t * PASO_FREQ) * 3.2 * moviendo;
     _dest.y += pasoBob;
@@ -252,14 +267,14 @@ export function useAndanzaZariguya(foco, {
     // frameloop='demand': trote/merodeo/idle piden el próximo frame.
     if (idle.activo || moviendo > 0 || fase.current !== 'no') state.invalidate();
   });
-  return { ref, caraRef, sombraRef, visRef, idleRef, aparecioRef };
+  return { ref, caraRef, sombraRef, visRef, idleRef, aparecioRef, modo };
 }
 
 /**
  * La zarigüeya ya montada en una escena: drop-in del contrato de AbejaEscena
  * (CompaiEscena le pasa las mismas props). Billboard `<Html>` con la SKIN
- * definitiva `ZariguyaGeminiLaminaViva` (lámina raster aprobada,
- * operador 2026-08-25); PULSA al narrar y REBOTA al toque con las clases
+ * definitiva `ZariguyaTrazado` (piel de referencia montada sobre huesos);
+ * PULSA al narrar y REBOTA al toque con las clases
  * genéricas del billboard (`.mundo-abeja*`). Su husmeo/tanatosis/reposo corren
  * en el idle-cerebro de la propia lámina. VIRAJE MÍSTICO: no gira — se
  * desvanece y reaparece.
@@ -285,7 +300,7 @@ export function ZariguyaCompaiEscena({
   // acurruca); aquí solo se lee una vez, determinista.
   const hora = useMemo(() => horaDeReloj(), []);
 
-  const { ref, caraRef, sombraRef, visRef, idleRef, aparecioRef } = useAndanzaZariguya(foco, {
+  const { ref, caraRef, sombraRef, visRef, idleRef, aparecioRef, modo } = useAndanzaZariguya(foco, {
     entrando, energia: energiaReal, reducedMotion, piso,
     cruce: cruce && !reducedMotion, saliendo, hora, tier,
   });
@@ -308,11 +323,12 @@ export function ZariguyaCompaiEscena({
   const vivo = !reducedMotion;
   // LIP-SYNC: la chucha "habla" cuando el agente narra (única boca del mundo).
   const { visema } = useLipSync({ activo: vivo });
-  // Estado del skin Gemini: narra → 'speaking'; parado/idle → 'idle' (su
-  // idle-cerebro 70/30 husmea/tanatosis/reposo corre solo). El trote se lee en
-  // el waddle del idleRef + el desplazamiento del billboard, no en un
-  // walk-cycle interno (así la marcha no se duplica con el bamboleo del molde).
-  const estadoGemini = hablando && vivo ? 'speaking' : 'idle';
+  // El rig comparte el contrato con el jaguar: el desplazamiento decide
+  // `caminando`, y el CSS articula cada segmento de las patas. La conversación
+  // tiene prioridad sobre la marcha.
+  const estadoTrazado = hablando && vivo
+    ? 'speaking'
+    : (vivo && modo === 'marcha' ? 'caminando' : 'idle');
   const cruceVivo = cruce && !reducedMotion;
   return (
     <>
@@ -336,9 +352,9 @@ export function ZariguyaCompaiEscena({
                   para no pisar la aparición mística de la cara. */}
               <div ref={idleRef} style={{ transformOrigin: 'center bottom' }} data-creature={ZARIGUYA_SLUG}>
                 <div ref={caraRef} className="mundo-abeja__cara">
-                  <ZariguyaGeminiLaminaViva
+                  <ZariguyaTrazado
                     size={size}
-                    estado={estadoGemini}
+                    estado={estadoTrazado}
                     visema={vivo ? visema : null}
                     animated={vivo}
                     tier={tier}

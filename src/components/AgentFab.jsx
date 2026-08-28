@@ -291,7 +291,7 @@ export default function AgentFab({ onNavigate, pantalla = null }) {
 
   // Estado del compai: el tacto manda; luego el ánimo rico del store; luego
   // la respuesta del chat y, al final, el idle.
-  const estado = pressed
+  const estadoBase = pressed
     ? 'contenta'
     : hover
       ? 'escuchando'
@@ -300,6 +300,12 @@ export default function AgentFab({ onNavigate, pantalla = null }) {
       : responseReady
         ? 'invita'
         : 'acompana';
+  // El motor mueve el puesto DOM por su ref. La marcha debe viajar al cuerpo
+  // en el mismo momento, pero solo sobre el idle natural. Hablar, escuchar,
+  // pensar y la pulsación siempre tienen prioridad.
+  const estado = comportamiento.moviendo && estadoBase === 'acompana'
+    ? 'caminando'
+    : estadoBase;
 
   // Ventana de enseñanza: se consume ~8 s tras el primer idle elegible → el hint
   // enseña UNA vez por entrada (auditoría de mensajes: sin spam por parada).

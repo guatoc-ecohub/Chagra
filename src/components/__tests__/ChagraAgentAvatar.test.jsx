@@ -146,6 +146,20 @@ describe('ChagraAgentAvatar — Angelita default: glow + double-click + migraci�
     ).toBeInTheDocument();
   });
 
+  test('la API rica conserva caminando para las tres pieles articuladas', () => {
+    const casos = [
+      ['jaguar', '[data-creature="jaguar"]', 'data-agt-estado', 'caminando'],
+      ['oso-baston', '[data-pose="camina"]', 'data-pose', 'camina'],
+      ['zariguya', '[data-creature="zariguya"]', 'data-agt-estado', 'caminando'],
+    ];
+    for (const [tipo, selector, atributo, valor] of casos) {
+      localStorage.setItem('chagra:agent-avatar-type', tipo);
+      const { container, unmount } = render(<ChagraAgentAvatar estado="caminando" />);
+      expect(container.querySelector(selector)).toHaveAttribute(atributo, valor);
+      unmount();
+    }
+  });
+
   test('la API rica también pasa por el adaptador canónico de Angelita', () => {
     const { container } = render(
       <ChagraAgentAvatar
