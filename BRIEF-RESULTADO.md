@@ -2,54 +2,69 @@
 
 ## Estado
 
-P1 no se inició. El gate P0 encontró fallas existentes en módulos que la tarea necesita tocar, por lo que se detuvo el trabajo antes de modificar código.
+P0 y P1 quedaron implementados en la rama `feat/angelita-p1-species-param-20260828`. No se abrió PR, no se ejecutó captura GPU y no se tocó producción.
 
-## P0 ejecutado
+## P0.5: diagnóstico y correcciones
 
-Se instalaron las dependencias exactas del lockfile con `npm ci`, porque este worktree no tenía `node_modules` y el primer intento no pudo encontrar el binario local de Vitest.
+Las tres fallas eran bugs reales de código. No se cambió ningún test para esconder una regresión.
 
-Comando ejecutado después de preparar el entorno:
+1. `useCompaiDraggable.js`: el handler táctil asumía que siempre existía `touches[0]`. Ahora resuelve coordenadas desde `touches`, `changedTouches` o el evento de mouse, y degrada sin lanzar si el evento no trae coordenadas. Se añadieron pruebas para fallback de mouse y movimiento touch real.
+2. `ChagraAgentAvatarGuacamaya.jsx`: el adaptador descartaba el prop `visema` rico y lo reemplazaba por un valor derivado del `state` angosto. Ahora conserva el visema recibido y mantiene `V2` como fallback compatible para `state="speaking"`.
+3. `AgentFab.jsx`: el botón de silencio permanecía con `display:none` durante hover/foco. El test no estaba stale: la condición de visibilidad contradecía la política accesible documentada. Ahora se revela al acercarse, enfocar, tocar o abrir el menú y sigue oculto en reposo.
 
-```bash
-npm run test:unit -- src/hooks/__tests__/useAgentAvatarType.contract.test.jsx src/hooks/__tests__/useAgentAvatarType.test.jsx src/compai/nucleo/__tests__/elenco.test.js src/components/__tests__/ChagraAgentAvatar.test.jsx src/components/__tests__/ChagraAgentAvatarElencoUnificado.test.jsx src/components/__tests__/ChagraAgentAvatarOsoBaston.integral.test.jsx src/components/__tests__/AgentFab.silencio.test.jsx src/components/__tests__/AgentFab.temas-fase2.test.jsx src/components/__tests__/AgentFab.politica.test.jsx src/visual/agente/__tests__/AngelitaGuia.test.jsx src/visual/agente/__tests__/AngelitaNoSe.test.jsx src/visual/creatures/__tests__/creatureIdle.test.js src/visual/creatures/__tests__/GuacamayaCompai.test.jsx src/visual/creatures/__tests__/ChivitoPunk.test.jsx src/visual/mundo3d/escenas/__tests__/compaiRegistry.test.js src/visual/mundo3d/escenas/__tests__/JaguarCompaiEscena.test.jsx src/visual/mundo3d/escenas/__tests__/LuciernagaCompaiEscena.test.jsx src/visual/mundo3d/escenas/__tests__/OsoBastonCompaiEscena.test.jsx src/visual/agente/__tests__/GuacamayaEntrada.test.jsx src/visual/agente/__tests__/GuacamayaSalida.test.jsx
-```
-
-Resultado:
+P0 quedó verde:
 
 ```text
-Test Files  2 failed | 18 passed (20)
-Tests       2 failed | 234 passed (236)
-Errors      5 errors
-Exit code   1
+Test Files  21 passed (21)
+Tests       246 passed (246)
 ```
 
-Fallas de base:
+## P1
 
-1. `src/components/__tests__/ChagraAgentAvatar.test.jsx`
-   - Caso: `type="guacamaya" con API rica también recibe visema real`.
-   - Esperaba `data-visema="V3"`; el nodo no recibió el atributo.
+### #8 elenco de siete compai
 
-2. `src/components/__tests__/AgentFab.silencio.test.jsx`
-   - Caso: `el botón (visible al tocar el compai) alterna silenciado en el store`.
-   - No encontró el botón accesible `Que su compañero se quede callado` después del hover.
+La base `dev` ya contenía el roster canónico exacto en `AVATAR_TYPES` y `ELENCO.enPWA`. Se conservó el contrato y se verificó que los siete tipos coinciden: Angelita, jaguar, oso del bastón, zarigüeya, luciérnaga, chivito punk y guacamaya.
 
-3. Cinco excepciones no controladas originadas durante `AgentFab.silencio.test.jsx`:
-   - `src/hooks/useCompaiDraggable.js:148`
-   - `TypeError: Cannot read properties of undefined (reading 'clientX')`
-   - El handler intenta leer `e.touches[0].clientX` cuando no existe un toque.
+### #52 entrada al mundo por especie
 
-## Alcance P1
+`CompaiEscena` y `compaiRegistry` ya enrutan la elección del usuario a una escena propia para los siete. Se completó el enabler de entrada: `useEntradaCompai` recibe `especie` y `presencia`, mientras `useEntradaAbeja` queda como alias compatible y `AbejaEscena` como adaptador exclusivo de Angelita. La coreografía ya no fija el perfil idle ni la presencia espacial a la abeja.
 
-- #8 elenco de siete compai: no modificado.
-- #52 entrada al mundo por especie: no modificado.
-- #19 perfiles idle por especie: no modificado.
-- Diez estados, cara, voz, clima y guía: no modificado.
-- Patinaje y estado `caminando`: no modificado.
+### #19 idle por especie
 
-## Pendientes
+Los siete slugs canónicos tienen un perfil propio en `creatureIdle.js`. `chivito-punk` es ahora la llave canónica y `chivito` queda como alias compatible. La escena compartida de aves consume los perfiles de guacamaya y chivito para pose, squash/stretch y cadencia, sin redibujar sus rigs.
 
-Se necesita corregir o aceptar explícitamente las fallas de base anteriores y volver a ejecutar el P0. Solo con el gate verde debe retomarse P1.
+### Diez estados, cara, voz, clima y guía
 
-## GPU verify
+Se añadió un resolver puro de estado visual por especie. Los diez estados canónicos se conservan en `data-agt-estado`; cada rig recibe una `data-pose` compatible con su medio y el visema real llega por `data-visema`. Los adaptadores de jaguar, oso, zarigüeya, luciérnaga, chivito y guacamaya ya no degradan silenciosamente el estado rico a cuatro valores ni hardcodean la voz.
 
-No aplica todavía. No se hicieron cambios visuales ni se certificó comportamiento visual. Después de completar P1, el orquestador deberá ejecutar la verificación GPU-headed y el juez visual.
+### Patinaje
+
+`AgentFab` usa `comportamiento.caminando` únicamente cuando el agente está en idle. Conversación, alerta, respuesta e interacción mantienen prioridad. Jaguar, oso y zarigüeya reciben marcha terrestre; Angelita, luciérnaga, guacamaya y chivito reciben locomoción aérea. La dirección también sale del motor de comportamiento y dejó de estar fija a la izquierda.
+
+## Verificación
+
+Set final afectado:
+
+```text
+Test Files  25 passed (25)
+Tests       266 passed (266)
+```
+
+Además:
+
+- ESLint focal sobre todos los archivos fuente y tests modificados: verde, cero warnings.
+- `git diff --check`: verde.
+- `tsc:check` global: rojo por deuda de base extensa fuera del alcance. El filtro por archivos de esta rama se usó para corregir los errores introducidos por P1; permanecen dos errores previos de tipado en líneas no modificadas de `EscenaBase3D.jsx`.
+- No hay archivos eliminados.
+
+## GPU verify pendiente
+
+El orquestador debe validar con GPU headed:
+
+1. Entrada 2D a 3D con cada uno de los siete cuerpos, sin aparición de Angelita como sustituto.
+2. Cadencia idle diferenciada, especialmente guacamaya y chivito.
+3. Los diez estados en cada rig: cara, pose de guía, clima/alerta y lip-sync.
+4. Roaming sin patinaje: marcha visible de terrestres y desplazamiento aéreo de voladores.
+5. Arrastre de `AgentFab` con mouse y touch, más revelado accesible del botón de silencio.
+
+No se certifica resultado visual en este entorno sin display.
