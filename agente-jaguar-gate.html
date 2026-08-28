@@ -1,0 +1,22 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <title>Jaguar del AGENTE = trazado — gate visual</title>
+  <style>
+    body{ margin:0; font:13px/1.4 system-ui, sans-serif; color:#2a1a0c; background:#efe7d4; }
+    .fila{ display:flex; flex-wrap:wrap; gap:10px; padding:12px; align-items:flex-start; }
+    .caja{ background:#f7f1e2; border:1px solid #d8c9a6; border-radius:8px; padding:6px 10px 10px; }
+    .caja h3{ margin:2px 0 4px; font-size:13px; font-weight:600; }
+    .oscura{ background:#141d2b; border-color:#2c3a52; color:#c8d4e8; }
+    .lupa-pecho{ overflow:hidden; width:540px; height:540px; position:relative; }
+    .lupa-pecho > div{ position:absolute; transform-origin: 165px 250px; transform: scale(2.6); }
+    .lupa-cara{ overflow:hidden; width:330px; height:330px; position:relative; }
+    .lupa-cara > div{ position:absolute; transform-origin: 78px 242px; transform: scale(2.4); }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+  <script type="module" src="/agente-jaguar-gate.jsx"></script>
+</body>
+</html>
