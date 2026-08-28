@@ -150,6 +150,16 @@ describe('creatureIdle — genérica por especie (misma máquina, otro animal)',
     }
   });
 
+  it('los siete compai canónicos tienen perfil propio y no caen a la abeja', () => {
+    const roster = ['abeja-angelita', 'jaguar', 'oso-baston', 'zariguya', 'luciernaga', 'chivito-punk', 'guacamaya'];
+    for (const slug of roster) {
+      expect(IDLE_PERFILES[slug], `falta perfil idle de ${slug}`).toBeDefined();
+      if (slug !== 'abeja-angelita') {
+        expect(IDLE_PERFILES[slug]).not.toBe(IDLE_PERFILES['abeja-angelita']);
+      }
+    }
+  });
+
   it('el oso anda (poseBase de suelo) y su timeline NO calca la de la abeja', () => {
     const oso = idleDeCreature(3.3, { especie: 'oso-andino' });
     expect(oso.pose).toBe('anda');
