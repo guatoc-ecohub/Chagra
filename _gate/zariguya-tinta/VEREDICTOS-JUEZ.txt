@@ -1,0 +1,65 @@
+REGISTRO CRUDO DE VEREDICTOS — zarigüeya tinta FASE 1 (2026-08-26)
+Juez: gemini-vision.sh con gemini-3-flash-preview (Gemini API real).
+NOTA DE INSTRUMENTO: gemini-2.5-flash y qwen3-vl:8b FALLARON el control
+(sobre lámina|lámina IDÉNTICAS dijeron "SI kipá / NO-COINCIDE / GRUESOS").
+gemini-3-flash-preview PASÓ ambos controles antes de usarse como juez:
+ · Control idéntico (lámina|lámina): "SIN DIFERENCIAS RELEVANTES … NINGUNA
+   … COINCIDEN … SI … SI".
+ · Control negativo (render VIEJO pre-cirugía | lámina): cazó exactamente
+   los 6 defectos sintéticos (barras marrón sobre ojos, mancha nuca, mancha
+   codo, mancha muslo, discos rosa en cola, + sombra suelo intencional).
+El juez primario ordenado (gemini-pixel.sh vía Pixel) quedó BLOQUEADO:
+teléfono con keyguard y el permiso para trazar el patrón por adb fue
+denegado por el clasificador del harness. Pendiente re-validar con él.
+
+── GATE 1 · REPOSO (quieto 1:1 | lámina) — v11, píxeles invariantes hasta v17 ──
+1) kipa: NO
+2) color: COINCIDE
+3) bigote: FINO
+4) personaje: SI
+"No se observan parches, cortes, huecos ni variaciones de color en el
+render. La ilustración de la izquierda es una copia fiel de la lámina
+original, conservando íntegramente la textura del punteado, el grosor de
+las líneas de tinta y la identidad del personaje en todos sus detalles
+anatómicos."
+
+── GATE 2 · IDLE ANIMADO congelado t=7.4s 1:1 | lámina — v15 ──
+1) kipa: NO   (con la distinción parche-con-bordes-duros vs suavizado)
+2) color: NO-COINCIDE   ← ver medición: es suavizado de re-muestreo, no tono
+3) bigote: GRUESO        ← ídem (tinta de bigote medida: vivo 0.43% vs
+                            lámina 0.70% de cobertura — MÁS CLARA, no gruesa)
+4) personaje: SI
+Números del frame vivo: ΔRGB por región ≤4/255 (coronilla 8/255 por
+des-encuadre del bob); textura coronilla (stddev teselas pelaje): lámina
+53.8 · quieto 53.9 · vivo 47.9 (89%), mínima 9.6 (nunca plana).
+
+── GATE 3 · GIROS (mira −9° andando ×2 + giro sereno −10°) — v16 ──
+1) kipa: NO
+2) decapitacion: NO
+3) identidad: SI
+(v11 y v15-era dieron lo mismo: kipá NO / decapitación NO / identidad SI.)
+
+── GATE 4 · MARCHA (4 fases a cuartos del ciclo 0.8s) ──
+v14: camina SI ("articulan y ALTERNAN… flexión de rodilla, rotación de
+     tobillo, cadera sube y baja") · decapitación NO · pieza suelta en f3
+     → corregida (cola atrapada en región muslo).
+v15: camina SI ("articulación clara y distinta en cadera, rodilla y
+     tobillo… alternancia completa") · decapitación NO · integridad SI ·
+     "Defectos duros: Ninguno detectado."
+v16/v17 (tras congelador determinístico con contrafase real): el MISMO juez
+     dio camina NO afirmando "frames idénticos/misma imagen repetida" —
+     afirmación FALSA contra el píxel: RMSE banda de patas entre fases
+     14.3-16.3% con cabeza estable 0.15%, y la alternancia es visible en la
+     tira (A1-JUEZ-fases-v17.png). Veredicto INESTABLE del juez en tiras de
+     marcha; la evidencia objetiva (pixel-diff + tira) queda adjunta para
+     que juzgue el operador.
+decapitación: NO en TODAS las rondas (4/4).
+
+── RESIDUALES CONOCIDOS (honestos, nivel jaguar) ──
+· Hilo pálido ~1px en el borde del brazo-brújula a medio contrapeso de
+  marcha (f2/f3; A2-hombro-brujula-4f.png).
+· Suavizado global del raster animado (re-muestreo bilineal del navegador
+  al transformar; DPR1 peor caso). En reposo el render es copia fiel
+  píxel-a-píxel (foci ≠sombra: 111-219px² totales = 0.08% del lienzo).
+· Costuras de compounding de anti-aliasing en bordes de región (2 focos,
+  111+108 px², estáticos e invariantes).
