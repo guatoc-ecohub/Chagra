@@ -10,23 +10,24 @@
 import React from 'react';
 import { render, screen, cleanup } from '@testing-library/react';
 import '@testing-library/jest-dom';
-import { describe, test, expect, afterEach, vi } from 'vitest';
+import { describe, test, expect, afterEach } from 'vitest';
 
 import HomeCampesino from '../HomeCampesino.jsx';
 
-afterEach(cleanup());
+afterEach(() => cleanup());
 
 describe('HomeCampesino con compai que camina', () => {
   test('renderiza el layout completo con cielo, acciones y puertas', () => {
-    const { container } = render(<HomeCampesino />);
+    render(<HomeCampesino />);
     
-    // Verifica el cielo con saludo
-    expect(screen.getByText(/Buenos días/i)).toBeInTheDocument();
-    expect(screen.getByText(/Hoy: sol con nubes/i)).toBeInTheDocument();
+    // Verifica el contenido fijo, independiente de la hora del reloj
+    expect(screen.getByText(/María/i)).toBeInTheDocument();
+    expect(screen.getByText(/SU COMPAÑERO/i)).toBeInTheDocument();
+    expect(screen.getByText(/Chagra está aquí/i)).toBeInTheDocument();
     
     // Verifica las dos acciones grandes
-    expect(screen.getByText(/Pregunte/i)).toBeInTheDocument();
-    expect(screen.getByText(/Anote su día/i)).toBeInTheDocument();
+    expect(screen.getByTestId('hcm-preguntar')).toBeInTheDocument();
+    expect(screen.getByTestId('hcm-anotar')).toBeInTheDocument();
     
     // Verifica las seis puertas
     expect(screen.getByText(/Mis matas/i)).toBeInTheDocument();
@@ -51,7 +52,7 @@ describe('HomeCampesino con compai que camina', () => {
   });
 
   test('renderiza el recado del día y el footer', () => {
-    const { container } = render(<HomeCampesino />);
+    render(<HomeCampesino />);
     
     // Verifica el recado del día
     expect(screen.getByText(/Recado de hoy/i)).toBeInTheDocument();
