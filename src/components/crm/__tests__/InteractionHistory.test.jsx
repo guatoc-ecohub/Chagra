@@ -1,77 +1,42 @@
-/**
- * InteractionHistory.test.jsx — Tests del componente InteractionHistory
- */
-
-import { describe, it, expect } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import { InteractionHistory } from '../InteractionHistory.jsx';
 
+const interactions = [
+  { id: 'visit-1', timestamp: 1625097600, attributes: { crm_interaction_type: 'visita', status: 'done', notes: 'Visita de seguimiento al cultivo' } },
+  { id: 'sale-1', timestamp: 1625184000, attributes: { crm_interaction_type: 'venta', status: 'done', result: 'Entrega acordada', details: { venta: { producto: 'Café', cantidad: 5, unidad: 'kg', valor: 30000 } } } },
+];
+
 describe('InteractionHistory', () => {
-  const mockInteractions = [
-    {
-      id: '1',
-      type: 'log--interaction',
-      timestamp: 1625097600,
-      attributes: {
-        interaction_type: 'visita',
-        status: 'done',
-        notes: 'Visita de seguimiento al cultivo',
-      },
-    },
-    {
-      id: '2',
-      type: 'log--interaction',
-      timestamp: 1625184000,
-      attributes: {
-        interaction_type: 'intercambio_semilla',
-        status: 'done',
-        details: {
-          intercambio: {
-            especie: 'café',
-            cantidad: 5,
-            unidad: 'kg',
-          },
-        },
-      },
-    },
-  ];
+  it('renders interaction type, notes, details, result, status, and count', () => {
+    render(<InteractionHistory interactions={interactions} contactName="Juan Pérez" />);
 
-  it('debería renderizar el historial de interacciones', () => {
-    render(<InteractionHistory interactions={mockInteractions} />);
-    
-    expect(screen.getByText('Visita')).toBeDefined();
-    expect(screen.getByText('Intercambio de Semilla')).toBeDefined();
+    expect(screen.getByRole('heading', { name: 'Historial de Juan Pérez' })).toBeInTheDocument();
+    expect(screen.getByText('Visita')).toBeInTheDocument();
+    expect(screen.getByText('Venta')).toBeInTheDocument();
+    expect(screen.getByText('Visita de seguimiento al cultivo')).toBeInTheDocument();
+    expect(screen.getByText('Venta: 5 kg de Café por $30000')).toBeInTheDocument();
+    expect(screen.getByText('✅ Entrega acordada')).toBeInTheDocument();
+    expect(screen.getAllByText('Completada')).toHaveLength(2);
+    expect(screen.getByText('2 interacciones')).toBeInTheDocument();
   });
 
-  it('debería mostrar los detalles del intercambio', () => {
-    const { container } = render(
-      <InteractionHistory interactions={mockInteractions} />
-    );
-    
-    expect(container.textContent).toContain('Intercambio: 5 kg de café');
+  it('uses the timestamp nested in attributes when needed', () => {
+    render(<InteractionHistory interactions={[{ id: 'message-1', attributes: { timestamp: 1625097600, crm_interaction_type: 'mensaje', status: 'done' } }]} />);
+
+    expect(screen.queryByText('Fecha desconocida')).not.toBeInTheDocument();
   });
 
-  it('debería mostrar el estado de la interacción', () => {
-    const { container } = render(
-      <InteractionHistory interactions={mockInteractions} />
-    );
-    
-    expect(container.textContent).toContain('Completado');
-  });
+  it('calls the new-interaction callback and renders the empty state', async () => {
+    const user = userEvent.setup();
+    const onNewInteraction = vi.fn();
+    const { rerender } = render(<InteractionHistory interactions={interactions} onNewInteraction={onNewInteraction} />);
 
-  it('debería mostrar mensaje cuando no hay interacciones', () => {
-    render(<InteractionHistory interactions={[]} />);
-    
-    expect(
-      screen.getByText('No hay interacciones registradas')
-    ).toBeDefined();
-  });
+    await user.click(screen.getByRole('button', { name: /Nueva Interacción/i }));
+    expect(onNewInteraction).toHaveBeenCalledOnce();
 
-  it('debería mostrar el contador de interacciones', () => {
-    const { container } = render(
-      <InteractionHistory interactions={mockInteractions} />
-    );
-    
-    expect(container.textContent).toContain('2 interacciones');
+    rerender(<InteractionHistory interactions={[]} />);
+    expect(screen.getByText('No hay interacciones registradas')).toBeInTheDocument();
   });
 });

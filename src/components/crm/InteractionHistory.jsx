@@ -1,6 +1,6 @@
 /**
  * InteractionHistory.jsx — Historial de interacciones del CRM
- * 
+ *
  * Componente que muestra el historial de interacciones de un contacto,
  * ordenado cronológicamente (más reciente primero).
  */
@@ -10,20 +10,19 @@ import {
   INTERACTION_TYPE,
 } from '../../constants/crmConstants.js';
 
-export const InteractionHistory = ({ 
-  interactions = [], 
+export const InteractionHistory = ({
+  interactions = [],
   contactName = '',
   onNewInteraction = null,
 }) => {
   const getInteractionIcon = (type) => {
     const icons = {
       [INTERACTION_TYPE.VISITA]: '🚜',
-      [INTERACTION_TYPE.INTERCAMBIO_SEMILLA]: '🌱',
+      [INTERACTION_TYPE.INTERCAMBIO]: '🌱',
       [INTERACTION_TYPE.VENTA]: '💰',
       [INTERACTION_TYPE.ASESORIA]: '📋',
       [INTERACTION_TYPE.LLAMADA]: '📞',
       [INTERACTION_TYPE.MENSAJE]: '💬',
-      [INTERACTION_TYPE.OTRO]: '📌',
     };
     return icons[type] || '📌';
   };
@@ -40,19 +39,19 @@ export const InteractionHistory = ({
 
   const formatDetails = (interaction) => {
     const details = interaction.attributes?.details || {};
-    
+
     if (details.intercambio) {
       const { especie, cantidad, unidad } = details.intercambio;
       return `Intercambio: ${cantidad || 0} ${unidad || ''} de ${especie || 'especie desconocida'}`;
     }
-    
+
     if (details.venta) {
       const { producto, cantidad, unidad, valor } = details.venta;
       return `Venta: ${cantidad || 0} ${unidad || ''} de ${producto || ''}${
         valor ? ` por $${valor}` : ''
       }`;
     }
-    
+
     return null;
   };
 
@@ -81,9 +80,10 @@ export const InteractionHistory = ({
           </div>
         ) : (
           interactions.map((interaction) => {
-            const icon = getInteractionIcon(interaction.attributes?.interaction_type);
+            const interactionType = interaction.attributes?.crm_interaction_type;
+            const icon = getInteractionIcon(interactionType);
             const detailsText = formatDetails(interaction);
-            
+
             return (
               <div
                 key={interaction.id}
@@ -92,20 +92,19 @@ export const InteractionHistory = ({
                 <div className="flex items-start gap-3">
                   {/* Icono */}
                   <div className="text-2xl">{icon}</div>
-                  
+
                   {/* Contenido */}
                   <div className="flex-1">
                     <div className="flex justify-between items-start">
                       <div>
                         <h3 className="font-semibold">
-                          {INTERACTION_TYPE_LABELS[interaction.attributes?.interaction_type] ||
-                            'Otro'}
+                          {INTERACTION_TYPE_LABELS[interactionType] || 'Interacción'}
                         </h3>
                         <p className="text-sm text-gray-500">
-                          {formatDate(interaction.timestamp)}
+                          {formatDate(interaction.timestamp || interaction.attributes?.timestamp)}
                         </p>
                       </div>
-                      
+
                       {/* Estado */}
                       {interaction.attributes?.status && (
                         <span
@@ -115,7 +114,7 @@ export const InteractionHistory = ({
                               : 'bg-yellow-100 text-yellow-800'
                           }`}
                         >
-                          {interaction.attributes.status === 'done' ? '✓' : '⏳'}
+                          {interaction.attributes.status === 'done' ? 'Completada' : 'Pendiente'}
                         </span>
                       )}
                     </div>

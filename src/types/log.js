@@ -1,7 +1,7 @@
 /**
  * @typedef {Object} Log
  * @property {string} id
- * @property {'log--seeding'|'log--input'|'log--harvest'|'log--observation'|'log--maintenance'|'log--activity'|'log--task'|'log--interaction'} type
+ * @property {'log--seeding'|'log--input'|'log--harvest'|'log--observation'|'log--maintenance'|'log--activity'|'log--task'} type
  * @property {Object} attributes
  * @property {string} [attributes.name]
  * @property {number} attributes.timestamp
