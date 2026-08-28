@@ -186,7 +186,7 @@
 
 /* el wrapper del Html de drei no debe tapar el tap de la puerta */
 .vv-abeja-html {
-  pointer-events: none;
+  pointer-events: auto;
 }
 
 /* ── la repisa: el rótulo de la puerta ───────────────────────────────────── */
