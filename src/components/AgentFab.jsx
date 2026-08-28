@@ -554,8 +554,9 @@ export default function AgentFab({ onNavigate, pantalla = null }) {
           color: '#fff',
           fontSize: 14,
           lineHeight: 1,
-          // El ícono aparece por clic/toque, nunca por hover en reposo.
-          display: (comportamiento.notificacionVisible || pressed || menuAbierto) ? 'flex' : 'none',
+          // Se revela al acercarse, enfocar/tocar o abrir el menú. En reposo
+          // sigue oculto para no tapar la cara del compai.
+          display: (hover || comportamiento.notificacionVisible || pressed || menuAbierto) ? 'flex' : 'none',
           alignItems: 'center',
           justifyContent: 'center',
           cursor: 'pointer',
