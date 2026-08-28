@@ -81,13 +81,12 @@ jobs:
           # ON en dev para probarlo en campo con voz real (criterio: PROBAR, no
           # certificar; si no reconoce bien "hola chagra", se entrega APAGADO).
           VITE_MODO_CAMPO: "true"
-          # Captura de conversaciones del agente para auditoria del piloto. A
-          # diferencia de prod-piloto (consent-off + PII completa), en dev EXIGIMOS
-          # consentimiento in-app y ANONIMIZAMOS (Habeas Data Ley 1581 — mas
-          # protector para los pilotos David/Cata; decision del operador 2026-08-28).
+          # Captura de conversaciones del agente para auditoria del piloto, en
+          # MODO PILOTO (igual que prod): sin gate de consentimiento in-app, PII
+          # completa. Habeas Data Ley 1581: informar a los pilotos David/Cata FUERA
+          # de la app. Revertir REQUIRE_CONSENT a "true" al cerrar el piloto.
           VITE_CAPTURE_CONVERSATIONS: "true"
-          VITE_CAPTURE_REQUIRE_CONSENT: "true"
-          VITE_CAPTURE_ANONYMIZE: "true"
+          VITE_CAPTURE_REQUIRE_CONSENT: "false"
           # Los bundles Pro no están servidos en dev. Sin esta variable,
           # loadProModules.js degrada al build OSS y no genera requests a
           # /pro-modules/<modulo>/index.js, que el SPA fallback respondería
