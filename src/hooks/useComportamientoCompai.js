@@ -38,7 +38,7 @@ export const COMPAI_MOVIMIENTO = Object.freeze({
 // calcula para que, sobre el ciclo completo, el compai quede quieto ~70%.
 export const COMPAI_QUIETO_RATIO = 0.7;
 
-const VELOCIDAD = 42;             // px/s — acoplado al arco del pie del paso (78 pateaba: cuerpo más rápido que el pie)
+const VELOCIDAD_POR_PX = 0.22;    // px/s por px de avatarSize = velocidad del pie en el apoyo (medido: pata 167 lámina, swing 28°, paso 1.05s). Amarra el cuerpo al pie → NO patina.
 const RADIO_X = 180;              // alcance máx. de la excursión a la IZQUIERDA del puesto
 const RADIO_Y = 160;              // alcance máx. de la excursión ARRIBA del puesto
 const EXCURSION_DWELL_MS = 900;   // dwell breve en el punto de la excursión ("explicando")
@@ -131,6 +131,8 @@ function siguienteDestino({ el, limites, soloX, contentAware, x, y }) {
  * @param {string} [opciones.superficie='global'] etiqueta de superficie (informativa)
  */
 export default function useComportamientoCompai(ref, opciones = {}) {
+  const escalaAvatar = (opciones && opciones.escala) || 84;
+  const VELOCIDAD = VELOCIDAD_POR_PX * escalaAvatar; // px/s efectivo, igual al pie
   const {
     especie = 'angelita',
     activo = true,
