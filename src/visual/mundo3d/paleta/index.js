@@ -34,6 +34,7 @@ export {
   NIEBLAS,
   LUCES,
   ACENTOS,
+  CASA,
   NEUTROS,
 } from './paletaMadre.js';
 

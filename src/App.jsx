@@ -70,7 +70,6 @@ const EscuchaOverlay = lazy(() => import('./components/escucha/EscuchaOverlay'))
 // muestra justamente CUANDO no hay red. Si fuera lazy, el import() fallaría
 // offline sin cache → el usuario nunca vería la pantalla de offline.
 import AgentOfflineGuard from './components/AgentScreen/AgentOfflineGuard';
-const AgentOfflineGuard = lazy(() => import('./components/AgentScreen/AgentOfflineGuard'));
 // Transición home→conversación: el colibrí en video (~2s). Eager (debe
 // aparecer al instante al enviar desde el hero).
 import ColibriTransition from './components/agent/ColibriTransition';
@@ -309,12 +308,6 @@ const VentanaValleMockup = lazy(() => import('./components/VentanaValle3D'));
 const NewDonkMockup = lazy(() => import('./mockups/NewDonk2Den3D'));
 // Murales New Donk POR MUNDO: café, agua y semillero — cada uno su plano 2D propio.
 const MuralesNewDonkMockup = lazy(() => import('./mockups/MuralesNewDonk'));
-// La "ventana-puerta" al valle: viewport 3D vivo enmarcado para el home 2D.
-const VentanaValleMockup = lazy(() => import('./components/VentanaValle3D'));
-// New Donk: un plano 2D lado-a-lado embebido DENTRO del valle 3D (Mario Odyssey).
-const NewDonkMockup = lazy(() => import('./mockups/NewDonk2Den3D'));
-// Murales New Donk POR MUNDO: café, agua y semillero — cada uno su plano 2D propio.
-const MuralesNewDonkMockup = lazy(() => import('./mockups/MuralesNewDonk'));
 const VitrinaMaestraMockup = lazy(() => import('./mockups/VitrinaMaestraMundos'));
 const MundoFermentosMockup = lazy(() => import('./mockups/MundoFermentos3D'));
 const GemelosMundosMockup = lazy(() => import('./mockups/GemelosMundos2D'));
@@ -378,9 +371,6 @@ const MundoFrutales3DMockup = lazy(() => import('./mockups/MundoFrutales3D'));
 // maíz + fríjol + calabaza —, quinua en grupo con panojas de color, yucas
 // frondosas). Standalone tipo botica: no monta el sistema MUNDO ni EscenaBase3D.
 const MundoLeguminosas3DMockup = lazy(() => import('./mockups/MundoLeguminosas3D'));
-// Angelita al máximo: la entrada teatral (gafas + crecimiento) y el repertorio
-// completo de estados del agente, uno al lado del otro.
-const AngelitaVivaMockup = lazy(() => import('./mockups/AngelitaViva'));
 // La HOJA DE PERSONAJE DEL JAGUAR (Panthera onca): el retrato en grande donde
 // las rosetas se pueden juzgar, la lámina de la regla de oro (anillo roto +
 // puntos negros adentro) y el claro del monte en 3D donde el felino camina
@@ -795,15 +785,6 @@ const MOCKUP_HASH_ROUTES = {
   'mockups/frutales-vivo-3d': 'mockup_frutales_vivo_3d',
   'mockups/mundo-piscicultura-3d': 'mockup_mundo_piscicultura_3d',
   'mockups/lecheria-viva-3d': 'mockup_lecheria_viva_3d',
-  'mockups/microcuenca': 'mockup_microcuenca',
-  'casa_adentro': 'mundo_casa_adentro',
-  'mockups/casa-adentro': 'mundo_casa_adentro',
-  'mockups/ciclo-agua': 'mockup_microcuenca',
-  'mockups/invernadero-vivo-3d': 'mockup_invernadero_vivo_3d',
-  'mockups/cacao-vivo-3d': 'mockup_cacao_vivo_3d',
-  'mockups/papa-viva-3d': 'mockup_papa_viva_3d',
-  'mockups/mundo-piscicultura-3d': 'mockup_mundo_piscicultura_3d',
-  'mockups/lecheria-viva-3d': 'mockup_lecheria_viva_3d',
   'mockups/mundo3d-clima': 'mockup_mundo3d_clima',
   'mockups/voz-con-forma': 'mockup_voz_con_forma',
   'mockups/conversacion-voz': 'mockup_conversacion_voz',
@@ -853,9 +834,6 @@ const MOCKUP_HASH_ROUTES = {
   'mockups/ventana-valle': 'mockup_ventana_valle',
   'mockups/new-donk': 'mockup_new_donk',
   'mockups/murales-new-donk': 'mockup_murales_new_donk',
-  'mockups/ventana-valle': 'mockup_ventana_valle',
-  'mockups/new-donk': 'mockup_new_donk',
-  'mockups/murales-new-donk': 'mockup_murales_new_donk',
   'mockups/vitrina-maestra': 'mockup_vitrina_maestra',
   'mockups/mundo-fermentos-3d': 'mockup_mundo_fermentos_3d',
   'mockups/gemelos-2d': 'mockup_gemelos_2d',
@@ -884,7 +862,6 @@ const MOCKUP_HASH_ROUTES = {
   'mockups/mundo-frutales-3d': 'mockup_mundo_frutales_3d',
   'mockups/mundo-leguminosas-3d': 'mockup_mundo_leguminosas_3d',
   'mockups/hoja-prueba-valle': 'mockup_hoja_prueba_valle',
-  'mockups/angelita-viva': 'mockup_angelita_viva',
   'mockups/jaguar-monte-3d': 'mockup_jaguar_monte_3d',
   'mockups/frutales-andinos-3d': 'mockup_frutales_andinos_3d',
   'mockups/cana-trapiche-3d': 'mockup_cana_trapiche_3d',
@@ -1478,20 +1455,6 @@ export default function App() {
     isAuthenticated().then((isAuth) => {
       if (!isAuth) {
         setSinSesion(true);
-        // GATE DE LOGIN PARA ANÓNIMOS (hotfix regresión chagra.app,
-        // 2026-08-21): sin token la raíz debe aterrizar en la pantalla de
-        // LOGIN (estado final), no en el valle 3D — chagra.app estaba
-        // sirviendo el valle3d (EntradaValle3D) SIN pedir sesión a nadie.
-        // Offline-first se preserva: esta rama SOLO corre para quien NO
-        // tiene token; el usuario ya autenticado (rama `isAuth` abajo) sigue
-        // entrando al dashboard y funcionando offline como siempre — su
-        // token cacheado lo saca de aquí. Las rutas públicas
-        // (onboarding-piloto, mockups, callback OAuth) ya se resolvieron
-        // ANTES de este check.
-        navigate('login');
-        // La raíz sin sesión aterriza en el valle 3D (tema de entrada). El
-        // login sigue accesible con #login o el botón volver del valle.
-        navigate(hash === 'login' ? 'login' : 'valle3d');
         // GATE DE LOGIN PARA ANÓNIMOS (2026-08-02): sin token la raíz aterriza
         // en la pantalla de LOGIN (estado final), no en el valle 3D. chagra.app
         // debe pedir login. Offline-first se preserva: esta rama SOLO corre para
@@ -4081,18 +4044,6 @@ export default function App() {
         return (
           <ErrorBoundary>
             <ErrorFallback moduleName="El valle de su finca (3D)">
-              <EntradaValle3DMockup
-                onBack={() => navigate(sinSesion ? 'login' : 'dashboard')}
-                // @ts-ignore navigate signature
-                onNavigate={navigate}
-                // @ts-ignore initialMundoId not in strict type
-                initialMundoId={currentViewData?.mundo}
-              />
-              <EntradaValle3DMockup onBack={() => navigate(sinSesion ? 'login' : 'dashboard')} onNavigate={navigate} />
-                onNavigate={navigate}
-                // @ts-ignore initialMundoId not in strict type
-                initialMundoId={currentViewData?.mundo}
-              />
               <ValleMarcoScreen onExit={() => navigate(sinSesion ? 'login' : 'dashboard')} />
             </ErrorFallback>
           </ErrorBoundary>
@@ -4503,10 +4454,6 @@ export default function App() {
           todas las vistas que ya tienen shell, también durante interacción y
           offline. La entrada mística es la única que puede desvanecerlo. */}
       <Suspense fallback={null}>
-        {currentView !== 'loading' && currentView !== 'login' && currentView !== 'oauth-callback' && !currentView.startsWith('mockup_') && currentView !== 'voz' && currentView !== 'agente' && currentView !== 'dashboard' && currentView !== 'onboarding-perfil' && currentView !== 'onboarding-perfil-clasico' && <AgentFab onNavigate={navigate} pantalla={currentView} />}
-        {currentView !== 'loading' && currentView !== 'login' && currentView !== 'oauth-callback' && !currentView.startsWith('mockup_') && currentView !== 'voz' && currentView !== 'agente' && currentView !== 'dashboard' && currentView !== 'onboarding-perfil' && currentView !== 'onboarding-perfil-clasico' && <AgentFab onNavigate={navigate} />}
-        {currentView !== 'loading' && currentView !== 'login' && !currentView.startsWith('mockup_') && currentView !== 'onboarding-perfil' && currentView !== 'onboarding-perfil-clasico' && <AgentFab onNavigate={navigate} pantalla={currentView} />}
-        {currentView !== 'loading' && <AgentFab onNavigate={navigate} pantalla={currentView} />}
         {currentView !== 'loading' && !currentView.startsWith('mockup_') && !esHomeCampesinoB && <AgentFab onNavigate={navigate} pantalla={currentView} />}
       </Suspense>
       {/* Compai que CAMINA en la portada campesina B: un solo compai (el
