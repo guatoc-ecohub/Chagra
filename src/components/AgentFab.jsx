@@ -598,8 +598,9 @@ export default function AgentFab({ onNavigate, pantalla = null }) {
           color: '#fff',
           fontSize: 14,
           lineHeight: 1,
-          // El ícono aparece por clic/toque, nunca por hover en reposo.
-          display: (comportamiento.notificacionVisible || pressed || menuAbierto) ? 'flex' : 'none',
+          // Sólo queda oculto en reposo: se revela al acercarse, enfocar,
+          // tocar el personaje, abrir el menú o recibir una notificación.
+          display: (comportamiento.notificacionVisible || hover || pressed || menuAbierto) ? 'flex' : 'none',
           alignItems: 'center',
           justifyContent: 'center',
           cursor: 'pointer',

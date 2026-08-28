@@ -137,4 +137,32 @@ describe('useCompaiDraggable', () => {
 
     Storage.prototype.getItem = originalGetItem;
   });
+
+  it('usa changedTouches como respaldo y no falla cuando faltan coordenadas táctiles', () => {
+    const { result } = renderHook(() => useCompaiDraggable());
+    result.current.compaiRef.current = {
+      getBoundingClientRect: () => ({ bottom: 678, right: 1010 }),
+    };
+    const target = { closest: vi.fn(() => null) };
+
+    expect(() => {
+      act(() => {
+        result.current.dragHandlers.onTouchStart({
+          target,
+          touches: [],
+          changedTouches: [],
+        });
+      });
+    }).not.toThrow();
+    expect(result.current.isDragging).toBe(false);
+
+    act(() => {
+      result.current.dragHandlers.onTouchStart({
+        target,
+        touches: [],
+        changedTouches: [{ clientX: 900, clientY: 600 }],
+      });
+    });
+    expect(result.current.isDragging).toBe(true);
+  });
 });

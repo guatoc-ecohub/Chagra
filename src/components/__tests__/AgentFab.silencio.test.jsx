@@ -44,13 +44,13 @@ describe('AgentFab — interruptor de silencio manual (#101/#103)', () => {
     // tocar el compai, no tapa la cara en reposo. MouseDown representa ese
     // estado de interacción en jsdom.
     fireEvent.mouseDown(screen.getByRole('button', { name: /Chagra IA/i }));
-    const boton = screen.getByRole('button', { name: /Que su compañero se quede callado/i });
+    const boton = screen.getByRole('button', { name: /Que Angelita se quede callada/i });
     expect(boton).toHaveAttribute('aria-pressed', 'false');
 
     fireEvent.click(boton);
     expect(useAngelitaStore.getState().silenciado).toBe(true);
 
-    const botonActivo = screen.getByRole('button', { name: /Volver a oír a su compañero/i });
+    const botonActivo = screen.getByRole('button', { name: /Volver a oír a Angelita/i });
     expect(botonActivo).toHaveAttribute('aria-pressed', 'true');
 
     fireEvent.click(botonActivo);
@@ -63,6 +63,27 @@ describe('AgentFab — interruptor de silencio manual (#101/#103)', () => {
     expect(
       screen.queryByRole('button', { name: /Que su compañero se quede callado/i })
     ).toBeNull();
+  });
+
+  it('se revela al acercarse, enfocar, tocar o abrir el menú', () => {
+    render(<AgentFab onNavigate={() => {}} />);
+    const personaje = screen.getByRole('button', { name: /Chagra IA/i });
+    const botonSilencio = () => screen.getByRole('button', { name: /Que Angelita se quede callada/i });
+
+    fireEvent.mouseEnter(personaje);
+    expect(botonSilencio()).toBeInTheDocument();
+    fireEvent.mouseLeave(personaje);
+
+    fireEvent.focus(personaje);
+    expect(botonSilencio()).toBeInTheDocument();
+    fireEvent.blur(personaje);
+
+    fireEvent.touchStart(personaje, { touches: [{ clientX: 0, clientY: 0 }] });
+    expect(botonSilencio()).toBeInTheDocument();
+    fireEvent.touchEnd(personaje);
+
+    abrirMenu();
+    expect(botonSilencio()).toBeInTheDocument();
   });
 });
 
@@ -204,7 +225,7 @@ describe('AgentFab — cadencia adaptativa: señales de atención positiva (#102
     useAngelitaStore.setState({ molestia: 5 });
     useAgentNotificationStore.setState({ responseReady: true, lastAssistantMessage: 'hola' });
     render(<AgentFab onNavigate={() => {}} />);
-    fireEvent.click(screen.getByRole('button', { name: /Chagra IA tiene respuesta nueva/i }));
+    fireEvent.click(screen.getByRole('button', { name: /Angelita \(Chagra IA\) tiene respuesta nueva/i }));
     expect(useAngelitaStore.getState().molestia).toBeLessThan(5);
     useAgentNotificationStore.setState({ responseReady: false, lastAssistantMessage: null });
   });

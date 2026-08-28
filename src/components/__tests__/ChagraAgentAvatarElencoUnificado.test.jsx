@@ -100,3 +100,10 @@ describe('ChagraAgentAvatarOsoBaston — marcha', () => {
         }
     });
 });
+
+describe('ChagraAgentAvatarGuacamaya — visema rico', () => {
+    test('conserva el visema recibido aunque el state tenga fallback V2', () => {
+        const { container } = render(<ChagraAgentAvatarGuacamaya state="speaking" visema="V4" />);
+        expect(raizSvg(container, 'guacamaya')).toHaveAttribute('data-visema', 'V4');
+    });
+});
