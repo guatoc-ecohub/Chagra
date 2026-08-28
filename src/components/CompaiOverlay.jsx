@@ -75,6 +75,7 @@ export default function CompaiOverlay({ currentView = 'dashboard' }) {
   // hacemos el "moverse-para-explicar" (ver la burbuja de parada más abajo).
   const roamRef = useRef(null);
   const { caminando, parada, handlers: comportamientoHandlers } = useCompaiRoam(roamRef, {
+    escala: avatarSize,
     pausado: false,
     especie: avatarType,
     soloX: false,

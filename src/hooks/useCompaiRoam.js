@@ -15,5 +15,6 @@ export default function useCompaiRoam(ref, opciones = {}) {
     soloX: opciones.soloX ?? true,
     contentAware: opciones.contentAware ?? true,
     superficie: opciones.superficie || 'overlay',
+    escala: opciones.escala,
   });
 }
