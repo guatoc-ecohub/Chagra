@@ -316,12 +316,11 @@ function Contenido({
       })}
 
       {/* EL COMPAÑERO del mundo: según el avatar elegido (CompaiEscena resuelve
-          angelita/maíz/zarigüeya). Una sola por mundo (la del footer se oculta
+          el roster-7). Uno solo por mundo (el del footer se oculta
           dentro). `entrando` vive AHORA en si hay hotspot activo — con foco se
           posa junto a la puerta, sin foco RONDA (idle propio, ya no un fotograma
           clavado). `hablando` la hace pulsar cuando el agente narra; `rebote` es
-          el microrrebote del toque. Hoy maíz/zarigüeya caen a Angelita (fallback,
-          sin regresión) hasta que el Fable de compai (#5) les dé arte 3D. */}
+          el microrrebote del toque. */}
       <CompaiEscena
         foco={foco}
         entrando={!!activo}
