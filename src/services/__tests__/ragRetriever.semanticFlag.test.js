@@ -1,10 +1,21 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 
 // Test del kill-switch REVERSIBLE de la capa semántica (VITE_RAG_SEMANTIC) y
-// de la mitigación OOM (keep_alive:'0s') del embed en vivo. Confirma que:
+// del contrato del embed en vivo. Confirma que:
 //   1. La semántica está ACTIVA por defecto (default de prod, flag ausente).
 //   2. Un valor de apagado explícito la desactiva → BM25-only (sin embed vivo).
-//   3. El embed de la query lleva keep_alive:'0s' (anti-OOM por co-residencia).
+//   3. El embed de la query usa el modelo del corpus (nomic-embed-text) con el
+//      keep_alive configurado.
+//
+// 2026-08-25 — actualización tras la migración del embedder (PR #2717,
+// commit bc7436b7): el código pasó DELIBERADAMENTE de snowflake-arctic-embed2
+// (1.3GB en VRAM, keep_alive:'0s' anti-OOM por co-residencia con granite) a
+// nomic-embed-text (274-588MB, keep_alive:'5m'). Motivo documentado en
+// ragRetriever.embedQuery: nomic gana recall (+6pp@5) y es tan liviano que
+// convive en la M6000 (12GiB) sin desalojar al modelo de chat, así que se deja
+// residente para velocidad. El '0s'/arctic era el estado viejo; este test lo
+// seguía asertando y por eso estaba rojo — se actualiza a la realidad de prod.
+// (Si reaparece OOM por co-residencia, el propio código dice "revertir a '0s'".)
 
 const MANIFEST = {
   generated_at: '2026-07-06T00:00:00Z',
@@ -117,7 +128,7 @@ describe('ragRetriever - kill-switch semántico + mitigación OOM', () => {
     expect(embedBodies.length).toBeGreaterThan(0);
   });
 
-  it('el embed en vivo lleva keep_alive:"0s" (mitigación OOM anti co-residencia)', async () => {
+  it('el embed en vivo usa nomic-embed-text con keep_alive:"5m" (config post-migración #2717)', async () => {
     const embedBodies = [];
     globalThis.fetch = setupFetchMock(embedBodies);
     const { retrieve } = await import('../ragRetriever.js');
@@ -126,8 +137,16 @@ describe('ragRetriever - kill-switch semántico + mitigación OOM', () => {
 
     expect(embedBodies.length).toBeGreaterThan(0);
     for (const body of embedBodies) {
-      expect(body.keep_alive).toBe('0s');
-      expect(body.model).toBe('snowflake-arctic-embed2');
+      // INVARIANTE CRÍTICA: el modelo del embed en vivo DEBE coincidir con el
+      // que indexó public/rag-embeddings.json. Si divergen, cosineSimilarity()
+      // descarta todos los pares por dimensiones distintas y el híbrido cae a
+      // BM25-only EN SILENCIO. nomic-embed-text (768d) es el corpus actual.
+      expect(body.model).toBe('nomic-embed-text');
+      // keep_alive:'5m' es la decisión deliberada de #2717 (nomic ~588MB
+      // convive con el modelo de chat sin desalojarlo → residente para
+      // velocidad). El '0s' anterior era la mitigación anti-OOM de arctic
+      // (1.3GB), ya no necesaria. Revertir a '0s' si reaparece OOM.
+      expect(body.keep_alive).toBe('5m');
     }
   });
 

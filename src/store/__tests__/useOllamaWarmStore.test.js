@@ -41,6 +41,22 @@ const waitForFetchCalls = async (count) => {
   expect(fetch).toHaveBeenCalledTimes(count);
 };
 
+// 2026-08-25: desde PR #1669 el store NO llama `fetch` directo — usa
+// `fetchWithAuthRetry`, que agrega un hop async (`await getAccessToken()`)
+// ANTES del fetch y otro en el `.then` que fija el status. Por eso las
+// transiciones ya no asientan en un solo `setTimeout(0)`: hay que sondear el
+// status igual que `waitForFetchCalls` sondea las llamadas. Sin esto, dos
+// tests de idempotencia/reintento leían un estado a mitad de vuelo
+// ('warming' en vez de 'warm') y hasta un fetch bleed del test anterior cuyo
+// warmup aún no había asentado. El código del store es correcto; el timing
+// del test era lo obsoleto.
+const waitForStatus = async (status) => {
+  for (let i = 0; i < 20 && useOllamaWarmStore.getState().status !== status; i++) {
+    await new Promise((resolve) => setTimeout(resolve, 0));
+  }
+  expect(useOllamaWarmStore.getState().status).toBe(status);
+};
+
 describe('useOllamaWarmStore — NN4 pre-warm Ollama al login', () => {
   beforeEach(() => {
     // Reset siempre antes de cada test: el store es singleton entre tests.
@@ -174,8 +190,11 @@ describe('useOllamaWarmStore — NN4 pre-warm Ollama al login', () => {
   it('idempotencia: llamar startWarmup en estado warm NO dispara segundo fetch', async () => {
     vi.mocked(fetch).mockResolvedValueOnce(/** @type {Response} */ ({ ok: true, status: 200 }));
     useOllamaWarmStore.getState().startWarmup();
-    await new Promise((r) => setTimeout(r, 0));
-    expect(useOllamaWarmStore.getState().status).toBe('warm');
+    // Esperar a que el warmup asiente en 'warm' (fetchWithAuthRetry mete hops
+    // async extra que un solo setTimeout(0) no alcanzaba a drenar). Además, así
+    // el warmup termina DENTRO de este test y no sangra un fetch al siguiente.
+    await waitForFetchCalls(1);
+    await waitForStatus('warm');
     expect(fetch).toHaveBeenCalledTimes(1);
 
     useOllamaWarmStore.getState().startWarmup();
@@ -185,15 +204,14 @@ describe('useOllamaWarmStore — NN4 pre-warm Ollama al login', () => {
   it('desde estado failed sí permite re-intentar startWarmup', async () => {
     vi.mocked(fetch).mockRejectedValueOnce(new Error('first fail'));
     useOllamaWarmStore.getState().startWarmup();
-    await new Promise((r) => setTimeout(r, 0));
-    expect(useOllamaWarmStore.getState().status).toBe('failed');
+    await waitForStatus('failed');
     expect(fetch).toHaveBeenCalledTimes(1);
 
     // Segundo intento desde 'failed' debe disparar un nuevo fetch.
     vi.mocked(fetch).mockResolvedValueOnce(/** @type {Response} */ ({ ok: true, status: 200 }));
     useOllamaWarmStore.getState().startWarmup();
     await waitForFetchCalls(2);
-    await new Promise((r) => setTimeout(r, 0));
+    await waitForStatus('warm');
     expect(useOllamaWarmStore.getState().status).toBe('warm');
   });
 
