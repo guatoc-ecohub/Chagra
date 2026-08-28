@@ -1,0 +1,65 @@
+{
+  "_meta": {
+    "generated_at": "2026-08-26T15:29:37.419Z",
+    "catalog_path": "/home/kortux/Workspace/chagra-fable-zari-tinta/catalog/chagra-catalog-seed-v3.1.json",
+    "report_path": "/home/kortux/Workspace/chagra-fable-zari-tinta/catalog/gbif-audit-report.json",
+    "limit": 2,
+    "occurrences": true,
+    "totals": {
+      "catalog_species": 2,
+      "species_with_scientific_name": 2,
+      "audited": 2
+    },
+    "counts": {
+      "OK": 2,
+      "FUZZY": 0,
+      "NONE": 0,
+      "KINGDOM_MISMATCH": 0,
+      "NO_CO_OCCURRENCES": 2
+    }
+  },
+  "entries": [
+    {
+      "id": "sample",
+      "scientific_name": "Sample plantus L.",
+      "common_name": "Muestra",
+      "category": "medicinales_alelopaticas",
+      "family_botanica": "Fabaceae",
+      "classification": "OK",
+      "flags": [
+        "NO_CO_OCCURRENCES"
+      ],
+      "gbif": {
+        "usageKey": 123,
+        "matchType": "EXACT",
+        "confidence": 100,
+        "rank": "SPECIES",
+        "status": "ACCEPTED",
+        "kingdom": "Plantae",
+        "family": "Fabaceae"
+      },
+      "occurrence_count_co": 0
+    },
+    {
+      "id": "sample-2",
+      "scientific_name": "Another plantus L.",
+      "common_name": "Muestra",
+      "category": "medicinales_alelopaticas",
+      "family_botanica": "Fabaceae",
+      "classification": "OK",
+      "flags": [
+        "NO_CO_OCCURRENCES"
+      ],
+      "gbif": {
+        "usageKey": 123,
+        "matchType": "EXACT",
+        "confidence": 100,
+        "rank": "SPECIES",
+        "status": "ACCEPTED",
+        "kingdom": "Plantae",
+        "family": "Fabaceae"
+      },
+      "occurrence_count_co": 0
+    }
+  ]
+}
