@@ -78,6 +78,15 @@ export function isThreeDWorldHost(hostname) {
   return normalizeHostname(hostname) === '3d.guatoc.co';
 }
 
+export function isCampesinoHost(hostname) {
+  // campesino.guatoc.co = despliegue standalone de la HomeCampesinoB (preview
+  // pública campesina en su propio dominio propio, servida por microapp
+  // estática). Como prod.chagra.app / 3d.guatoc.co, NO debe rebotar al
+  // canónico chagra.app: si lo hiciera, el dominio serviría el PWA de prod en
+  // vez de la home campesina. Host EXACTO.
+  return normalizeHostname(hostname) === 'campesino.guatoc.co';
+}
+
 export function isAllowedHost(hostname) {
   return (
     isCanonicalHost(hostname) ||
@@ -85,7 +94,8 @@ export function isAllowedHost(hostname) {
     isPreviewHost(hostname) ||
     isProdAppHost(hostname) ||
     isStagingHost(hostname) ||
-    isThreeDWorldHost(hostname)
+    isThreeDWorldHost(hostname) ||
+    isCampesinoHost(hostname)
   );
 }
 

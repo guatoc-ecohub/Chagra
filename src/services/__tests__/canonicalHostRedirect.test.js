@@ -112,6 +112,11 @@ describe('canonicalHostRedirect', () => {
     expect(isAllowedHost('3d.guatoc.co')).toBe(true);
   });
 
+  it('permite campesino.guatoc.co (HomeCampesinoB standalone) sin redirigir', () => {
+    expect(isAllowedHost('campesino.guatoc.co')).toBe(true);
+  });
+
+
   it('NO permite otros subdominios de guatoc.co (host exacto, no wildcard)', () => {
     // chagra.guatoc.co es el dominio legado de produccion: debe seguir
     // rebotando a chagra.app, por eso 3d.guatoc.co se agrega como host
