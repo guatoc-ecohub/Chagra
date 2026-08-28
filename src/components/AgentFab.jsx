@@ -319,7 +319,7 @@ export default function AgentFab({ onNavigate, pantalla = null }) {
 
   // Estado del compai: el tacto manda; luego el ánimo rico del store; luego
   // la respuesta del chat y, al final, el idle.
-  const estado = pressed
+  const estadoBase = pressed
     ? 'contenta'
     : hover
       ? 'escuchando'
@@ -328,6 +328,12 @@ export default function AgentFab({ onNavigate, pantalla = null }) {
       : responseReady
         ? 'invita'
         : 'acompana';
+  // La locomoción solo pisa el idle. Una conversación, alerta o interacción
+  // conserva prioridad. El resolver por especie traduce `caminando` a marcha
+  // terrestre o vuelo, según el cuerpo elegido.
+  const estado = comportamiento.caminando && estadoBase === 'acompana'
+    ? 'caminando'
+    : estadoBase;
 
   // Ventana de enseñanza: se consume ~8 s tras el primer idle elegible → el hint
   // enseña UNA vez por entrada (auditoría de mensajes: sin spam por parada).
@@ -566,7 +572,7 @@ export default function AgentFab({ onNavigate, pantalla = null }) {
             estado={ttsLevel > 0.035 ? 'respondiendo' : estado}
             size={82}
             visema={visemaFromAmplitude(ttsLevel)}
-            direccion="izquierda"
+            direccion={comportamiento.direccion}
             className={responseReady ? 'agt-avatar-glow' : undefined}
             title="Chagra IA"
             ariaLabel="Chagra IA"
