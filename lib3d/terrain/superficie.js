@@ -18,6 +18,14 @@ function sampleGrid(grid, width, rows, bounds, x, z) {
 /**
  * Build one deterministic surface used by both terrain geometry and callers.
  * The returned function is stable for the lifetime of the scene.
+ * @param {{
+ *   resolution?: number,
+ *   bounds?: { x0: number, x1: number, z0: number, z1: number },
+ *   sampleBase?: (x: number, z: number) => number,
+ *   seed?: number,
+ *   droplets?: number,
+ *   strength?: number,
+ * }} options
  */
 export function crearSuperficieErosionada({
   resolution = 32,

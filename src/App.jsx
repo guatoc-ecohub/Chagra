@@ -2204,7 +2204,7 @@ export default function App() {
           <ErrorBoundary>
             <ErrorFallback moduleName="Home campesino B">
               <Suspense fallback={<div className="h-[100dvh] w-full bg-[#f7f0df]" />}>
-                <HomeCampesinoB onNavigate={navigate} />
+                <HomeCampesinoB onNavigate={navigate} onLogout={handleLogout} />
               </Suspense>
             </ErrorFallback>
           </ErrorBoundary>
