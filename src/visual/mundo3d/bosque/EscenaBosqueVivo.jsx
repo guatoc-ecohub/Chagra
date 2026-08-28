@@ -73,6 +73,15 @@ const ENT_PROTAGONISTA = MAPA_PISO_ENT[protagonistaDePiso(PISO_MUNDO)]; // 'quen
 const PISO_VECINO = vecinoDePiso(PISO_MUNDO); // 'frio'
 const ENT_VECINO = PISO_VECINO ? MAPA_PISO_ENT[PISO_VECINO] : null; // 'aliso'
 
+/* PRNG local para conservar el mismo queñual de fondo en cada montaje. */
+function rng(seed) {
+  let estado = (seed >>> 0) || 1;
+  return () => {
+    estado = (estado * 1664525 + 1013904223) >>> 0;
+    return estado / 0x100000000;
+  };
+}
+
 /* ── LA ATMÓSFERA DEL BOSQUE DE NIEBLA ─────────────────────────────────────
       Los presets del día salen de CIELOS_HORA (la misma familia del valle:
       el bosque amanece y anochece CON el valle) pero sesgados a bosque de
@@ -812,7 +821,7 @@ function Diorama({ tier, reducedMotion, pose }) {
   const [vuelo, setVuelo] = useState(() => !reducedMotion && tier !== 'bajo');
 
   // El queñual menor: siluetas al fondo y a los lados (nunca delante del Ent).
-  const quenual = useMemo(() => {
+  const _quenual = useMemo(() => {
     const n = tier === 'alto' ? 8 : tier === 'medio' ? 5 : 3;
     const r = rng(303);
     return Array.from({ length: n }, (_, i) => {

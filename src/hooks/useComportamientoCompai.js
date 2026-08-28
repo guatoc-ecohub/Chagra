@@ -129,6 +129,7 @@ function siguienteDestino({ el, limites, soloX, contentAware, x, y }) {
  * @param {boolean} [opciones.soloX=false] compatibilidad con el roam antiguo
  * @param {boolean} [opciones.contentAware=true] busca anclas reales de la pantalla
  * @param {string} [opciones.superficie='global'] etiqueta de superficie (informativa)
+ * @param {number} [opciones.escala=84] tamaño del avatar en píxeles
  */
 export default function useComportamientoCompai(ref, opciones = {}) {
   const escalaAvatar = (opciones && opciones.escala) || 84;
@@ -284,7 +285,7 @@ export default function useComportamientoCompai(ref, opciones = {}) {
       window.cancelAnimationFrame(rafId);
       if (el) el.style.opacity = '';
     };
-  }, [activo, contentAware, soloX, ref]);
+  }, [activo, contentAware, soloX, ref, VELOCIDAD]);
 
   // Presencia y notificación al toque. El ARRASTRE NO vive aquí (lo dueña
   // useCompaiDraggable en el host): así no hay dos sistemas de arrastre peleando.
