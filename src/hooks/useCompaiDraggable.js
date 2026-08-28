@@ -23,6 +23,16 @@ const NATURAL_POSITION = {
 const FAB_SIZE = 84;
 const MIN_PADDING = 14;
 
+function getEventCoordinates(event) {
+  const touch = event?.touches?.[0] ?? event?.changedTouches?.[0];
+  const clientX = touch?.clientX ?? event?.clientX;
+  const clientY = touch?.clientY ?? event?.clientY;
+
+  if (!Number.isFinite(clientX) || !Number.isFinite(clientY)) return null;
+
+  return { clientX, clientY };
+}
+
 export default function useCompaiDraggable({ enabled = true, storageKey = STORAGE_KEY } = {}) {
   // Cargar posición inicial desde localStorage
   const getInitialPosition = useCallback(() => {
@@ -126,14 +136,18 @@ export default function useCompaiDraggable({ enabled = true, storageKey = STORAG
     // Solo permitir arrastre en el botón principal, no en el interruptor de silencio
     if (e.target.closest('[data-compai-no-drag="true"]')) return;
     if (e.button !== 0) return; // Solo clic izquierdo
+    const coordinates = getEventCoordinates(e);
+    if (!coordinates) return;
     e.preventDefault();
-    handleDragStart(e.clientX, e.clientY);
+    handleDragStart(coordinates.clientX, coordinates.clientY);
   }, [handleDragStart]);
 
   const handleMouseMove = useCallback((e) => {
     if (!isDragging) return;
+    const coordinates = getEventCoordinates(e);
+    if (!coordinates) return;
     e.preventDefault();
-    handleDragMove(e.clientX, e.clientY);
+    handleDragMove(coordinates.clientX, coordinates.clientY);
   }, [isDragging, handleDragMove]);
 
   const handleMouseUp = useCallback(() => {
@@ -144,15 +158,17 @@ export default function useCompaiDraggable({ enabled = true, storageKey = STORAG
   // Manejadores táctiles
   const handleTouchStart = useCallback((e) => {
     if (e.target.closest('[data-compai-no-drag="true"]')) return;
-    const touch = e.touches[0];
-    handleDragStart(touch.clientX, touch.clientY);
+    const coordinates = getEventCoordinates(e);
+    if (!coordinates) return;
+    handleDragStart(coordinates.clientX, coordinates.clientY);
   }, [handleDragStart]);
 
   const handleTouchMove = useCallback((e) => {
     if (!isDragging) return;
+    const coordinates = getEventCoordinates(e);
+    if (!coordinates) return;
     e.preventDefault();
-    const touch = e.touches[0];
-    handleDragMove(touch.clientX, touch.clientY);
+    handleDragMove(coordinates.clientX, coordinates.clientY);
   }, [isDragging, handleDragMove]);
 
   const handleTouchEnd = useCallback(() => {
