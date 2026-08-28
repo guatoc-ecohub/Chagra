@@ -6,6 +6,7 @@ import ChagraAgentAvatarLuciernaga from './ChagraAgentAvatarLuciernaga';
 import ChagraAgentAvatarGuacamaya from './ChagraAgentAvatarGuacamaya';
 import ChagraAgentAvatarChivitoPunk from './ChagraAgentAvatarChivitoPunk';
 import useCompaiElegido from '../visual/mundo3d/escenas/useCompaiElegido.js';
+import { resolverEstadoVisualCompai } from '../visual/agente/compaiEstadoVisual.js';
 
 /**
  * ChagraAgentAvatar — wrapper que delega según preferencia del usuario
@@ -64,15 +65,6 @@ import useCompaiElegido from '../visual/mundo3d/escenas/useCompaiElegido.js';
  * zariguya/luciernaga/chivito-punk) sigue traduciéndose a la baja hasta que
  * reciban la misma migración.
  */
-const STATE_DE_ESTADO_RICO = {
-    acompana: 'idle',
-    escuchando: 'listening',
-    pensando: 'thinking',
-    respondiendo: 'speaking',
-    contenta: 'speaking',
-    invita: 'speaking',
-};
-
 const AVATAR_ANGOSTO = {
     zariguya: ChagraAgentAvatarZariguya,
     jaguar: ChagraAgentAvatarJaguar,
@@ -87,21 +79,25 @@ export default function ChagraAgentAvatar({ estado = undefined, ...props }) {
     const ComponenteAngosto = AVATAR_ANGOSTO[type];
 
     if (estado !== undefined) {
-        // Call-site "rico": Angelita y guacamaya entienden el vocabulario
-        // completo (bypasean la traducción angosta); el resto del elenco
-        // recibe la traducción a la baja (idle/thinking/speaking/listening).
-        // `visema`/`confianza`/etc. ya viajan dentro de `...props` — no hace
-        // falta desestructurarlos aparte (mismo camino que usa Angelita).
+        const visual = resolverEstadoVisualCompai(type, estado);
+        const atributosVisuales = {
+            'data-agt-estado': visual.estado,
+            'data-pose': visual.pose,
+            'data-visema': props.visema || undefined,
+        };
+
+        // El estado canónico se conserva en el rig. `state` mantiene la
+        // compatibilidad con cuerpos históricos de cuatro estados.
         if (type === 'guacamaya') {
-            return <ChagraAgentAvatarGuacamaya estado={estado} {...props} />;
+            return <ChagraAgentAvatarGuacamaya estado={visual.estado} state={visual.state} {...atributosVisuales} {...props} />;
         }
         if (ComponenteAngosto) {
-            return <ComponenteAngosto state={STATE_DE_ESTADO_RICO[estado] || 'idle'} {...props} />;
+            return <ComponenteAngosto estado={visual.estado} state={visual.state} {...atributosVisuales} {...props} />;
         }
         // Angelita pasa por el mismo adaptador que el selector y la galería.
         // Así no existe un segundo call-site que pueda perder props del cuerpo
         // canónico (rubber-hose, lip-sync o reduced-motion).
-        return <ChagraAgentAvatarAngelita estado={estado} {...props} />;
+        return <ChagraAgentAvatarAngelita estado={visual.estado} {...atributosVisuales} {...props} />;
     }
 
     if (ComponenteAngosto) return <ComponenteAngosto {...props} />;

@@ -44,6 +44,9 @@ export default function ChagraAgentAvatarGuacamaya({
     className = '',
     ariaLabel = 'Chagra IA',
     reaccionaPresencia = true,
+    'data-agt-estado': dataEstado = undefined,
+    'data-pose': dataPose = undefined,
+    'data-visema': dataVisema = undefined,
 }) {
     const { despierta, handlers: handlersPresencia } = useAngelitaPresencia({ activo: reaccionaPresencia });
     const estadoBase = estado || state;
@@ -58,6 +61,9 @@ export default function ChagraAgentAvatarGuacamaya({
             title={ariaLabel}
             className={className}
             style={glow ? { filter: 'drop-shadow(0 0 10px rgba(224,36,32,0.65))' } : undefined}
+            data-agt-estado={dataEstado || estadoBase}
+            data-pose={dataPose}
+            data-visema={dataVisema || visema || undefined}
         />
     );
 

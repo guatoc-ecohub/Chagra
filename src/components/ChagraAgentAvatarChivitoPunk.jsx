@@ -18,6 +18,8 @@ import { useAngelitaPresencia, esPasivo } from '../visual/agente/useAngelitaPres
  */
 export default function ChagraAgentAvatarChivitoPunk({
     state = 'idle',
+    estado = undefined,
+    visema = null,
     size = 48,
     withLabel = false,
     onClick = undefined,
@@ -26,9 +28,13 @@ export default function ChagraAgentAvatarChivitoPunk({
     className = '',
     ariaLabel = 'Chagra IA',
     reaccionaPresencia = true,
+    'data-agt-estado': dataEstado = undefined,
+    'data-pose': dataPose = undefined,
+    'data-visema': dataVisema = undefined,
 }) {
     const { despierta, handlers: handlersPresencia } = useAngelitaPresencia({ activo: reaccionaPresencia });
-    const estadoEfectivo = despierta && esPasivo(state) ? 'idle' : state;
+    const estadoAgente = estado || state;
+    const estadoEfectivo = despierta && esPasivo(estadoAgente) ? 'idle' : state;
     const bicho = (
         <ChivitoPunk
             state={estadoEfectivo}
@@ -36,6 +42,9 @@ export default function ChagraAgentAvatarChivitoPunk({
             title={ariaLabel}
             className={className}
             style={glow ? { filter: 'drop-shadow(0 0 10px rgba(140,70,232,0.65))' } : undefined}
+            estado={dataEstado || estadoAgente}
+            pose={dataPose}
+            visema={dataVisema || visema || undefined}
         />
     );
 
