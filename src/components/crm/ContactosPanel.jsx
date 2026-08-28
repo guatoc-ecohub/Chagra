@@ -60,6 +60,7 @@ export const ContactosPanel = ({
         <h2 className="text-xl font-semibold">Contactos</h2>
         {onNewContact && (
           <button
+            type="button"
             onClick={onNewContact}
             className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
           >
@@ -75,6 +76,7 @@ export const ContactosPanel = ({
           <div>
             <input
               type="text"
+              aria-label="Buscar contactos"
               placeholder="Buscar por nombre o vereda..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
@@ -85,6 +87,7 @@ export const ContactosPanel = ({
           {/* Filtro por tipo */}
           <div>
             <select
+              aria-label="Filtrar contactos por tipo"
               value={filterType}
               onChange={(e) => setFilterType(e.target.value)}
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
@@ -101,6 +104,7 @@ export const ContactosPanel = ({
           {/* Filtro por estado */}
           <div>
             <select
+              aria-label="Filtrar contactos por estado"
               value={filterStatus}
               onChange={(e) => setFilterStatus(e.target.value)}
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
@@ -125,14 +129,8 @@ export const ContactosPanel = ({
         ) : (
           filteredContacts.map((contact) => {
             const statusConfig = getStatusConfig(contact.attributes?.status);
-            return (
-              <div
-                key={contact.id}
-                onClick={() => onContactSelect?.(contact)}
-                className={`p-4 border rounded-lg hover:bg-gray-50 transition-colors cursor-pointer ${
-                  onContactSelect ? 'hover:shadow-md' : ''
-                }`}
-              >
+            const content = (
+              <>
                 <div className="flex justify-between items-start">
                   <div className="flex-1">
                     <div className="flex items-center gap-2">
@@ -150,7 +148,7 @@ export const ContactosPanel = ({
                       </span>
                     </div>
                     <p className="text-sm text-gray-600">
-                      {CONTACT_TYPE_LABELS[contact.attributes?.contact_type] || 'Otro'}
+                      {CONTACT_TYPE_LABELS[contact.attributes?.crm_contact_type] || 'Contacto'}
                     </p>
                     {(contact.attributes?.vereda || contact.attributes?.municipio) && (
                       <p className="text-sm text-gray-500 mt-1">
@@ -164,12 +162,30 @@ export const ContactosPanel = ({
                       </p>
                     )}
                   </div>
-                  {onContactSelect && (
-                    <div className="text-gray-400">
-                      →
-                    </div>
-                  )}
+                  {onContactSelect && <span className="text-gray-400" aria-hidden="true">→</span>}
                 </div>
+              </>
+            );
+
+            if (onContactSelect) {
+              return (
+                <button
+                  key={contact.id}
+                  type="button"
+                  onClick={() => onContactSelect(contact)}
+                  aria-label={`Ver historial de ${contact.attributes?.name || 'contacto'}`}
+                  className="w-full text-left p-4 border rounded-lg hover:bg-gray-50 hover:shadow-md transition-colors cursor-pointer"
+                >
+                  {content}
+                </button>
+              );
+            }
+            return (
+              <div
+                key={contact.id}
+                className="p-4 border rounded-lg"
+              >
+                {content}
               </div>
             );
           })

@@ -17,7 +17,7 @@ export const RedView = ({ networkStats = null, loading = false }) => {
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <div className="text-gray-500">⏳</div>
+        <div className="text-gray-500" role="status">Cargando red…</div>
       </div>
     );
   }
@@ -46,7 +46,9 @@ export const RedView = ({ networkStats = null, loading = false }) => {
         {tabs.map((tab) => (
           <button
             key={tab.id}
+            type="button"
             onClick={() => setSelectedTab(tab.id)}
+            aria-pressed={selectedTab === tab.id}
             className={`px-4 py-2 transition-colors ${
               selectedTab === tab.id
                 ? 'border-b-2 border-green-600 text-green-600 font-semibold'
@@ -124,7 +126,7 @@ export const RedView = ({ networkStats = null, loading = false }) => {
           <div>
             <h3 className="font-semibold mb-3">Contactos Más Activos</h3>
             <div className="space-y-2">
-              {networkStats.contactosMasActivos.map((contact, index) => (
+              {(networkStats.contactosMasActivos || []).map((contact, index) => (
                 <div
                   key={contact.id}
                   className="flex justify-between items-center p-3 bg-gray-50 rounded"
@@ -145,7 +147,7 @@ export const RedView = ({ networkStats = null, loading = false }) => {
                   </span>
                 </div>
               ))}
-              {networkStats.contactosMasActivos.length === 0 && (
+              {(networkStats.contactosMasActivos || []).length === 0 && (
                 <p className="text-gray-500 text-center py-4">
                   No hay suficientes datos para mostrar
                 </p>
