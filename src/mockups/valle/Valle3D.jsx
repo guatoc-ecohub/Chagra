@@ -2906,12 +2906,15 @@ function Escena({ clima, focoId, animo, energia, onEntrar, onAlerta, onCasa = nu
   const poseReposo = pose || { position: CAMARA_VALLE.position, fov: CAMARA_VALLE.fov, k: 1, mira: MIRA_VALLE };
   const miraReposo = poseReposo.mira || MIRA_VALLE;
   const controls = useRef(null);
-  const superficie = useMemo(() => crearSuperficieErosionada({
-    resolution: perfil.segmentosTerreno,
-    sampleBase: alturaTerreno,
-    seed: 20260824 + (tier === 'alto' ? 3 : tier === 'medio' ? 2 : 1),
-    droplets: tier === 'alto' ? 900 : tier === 'medio' ? 450 : 160,
-  }), [perfil.segmentosTerreno, tier]);
+  const superficie = useMemo(() => {
+    const opcionesSuperficie = {
+      resolution: perfil.segmentosTerreno,
+      sampleBase: alturaTerreno,
+      seed: 20260824 + (tier === 'alto' ? 3 : tier === 'medio' ? 2 : 1),
+      droplets: tier === 'alto' ? 900 : tier === 'medio' ? 450 : 160,
+    };
+    return crearSuperficieErosionada(opcionesSuperficie);
+  }, [perfil.segmentosTerreno, tier]);
   const altura = superficie.heightAt;
   /* La cámara de director (FASE 4, flag `camaraDirector`) se monta DESPUÉS de
      CamaraViajera y gana por orden de frame durante su barrido. `avatarRef`
