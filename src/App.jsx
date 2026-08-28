@@ -22,6 +22,7 @@ import { PRIMARY_WORKER_NAME } from './config/workerConfig';
 import { tieneAccesoGlaciarActual, esOperadorActual } from './config/glaciarAccess';
 import { getProfile, getMarco3DPreference } from './services/userProfileService';
 import { parseSeguimientoView } from './config/seguimientoProcesos';
+import { homeCampesinoBActivo } from './config/homeCampesinoBFlag';
 // NOTA (unificación compai 2026-08-23): el manifiesto de rutas se usaba SOLO
 // para decidir dónde montar CompaiOverlay. Al retirar ese segundo compai de la
 // PWA 2D (un solo compai por pantalla = el AgentFab canónico), `getMapaNucleo`
@@ -44,6 +45,11 @@ import useAlertStore from './store/useAlertStore';
 // comentario abajo donde se removió el render).
 // import FieldFeedback from './components/FieldFeedback';
 const AgentFab = lazy(() => import('./components/AgentFab'));
+const HomeCampesinoB = lazy(() => import('./components/dashboard/HomeCampesinoB'));
+// Compai que CAMINA (marcha real, useCompaiRoam) para la portada campesina B.
+// En esa home el AgentFab (idle 'acompana') se suprime; el único compai es este
+// overlay que deambula. Ver render condicionado a `homeCampesinoBActivo()`.
+const CompaiOverlay = lazy(() => import('./components/CompaiOverlay'));
 const CompaiFotosOverlay = lazy(() => import('./components/CompaiFotosOverlay'));
 // CompaiOverlay (segundo compai que deambulaba por la franja inferior) RETIRADO
 // de la PWA 2D el 2026-08-23 (unificación compai): en cada ruta 2D montaba una
@@ -812,6 +818,7 @@ const MOCKUP_HASH_ROUTES = {
   'mockups/montana-mundos-campesino': 'mockup_montana_mundos_campesino',
   'mockups/entrada-campesina': 'mockup_entrada_campesina',
   'mockups/home-campesino': 'mockup_home_campesino',
+  'mockups/home-campesino-b': 'mockup_home_campesino_b',
   'mockups/boton-anarquia': 'mockup_boton_anarquia',
   'mockups/transicion-agente-plano': 'mockup_transicion_agente_plano',
   'mockups/avatar-biopunk': 'mockup_avatar_biopunk',
@@ -1180,6 +1187,21 @@ function DashboardLiveView({ onNavigate, onLogout }) {
       if (navigator.onLine) syncFromServer(fetchFromFarmOS);
     });
   }, [hydrate, syncFromServer]);
+
+  // Portada campesina B (layout "rica" aprobado + CTA de voz "Toque y hable con
+  // Compai"). Se sirve como la home del dashboard cuando la bandera está activa
+  // (default). Wrapper con scroll vertical propio: `.cb-home` es min-height:100dvh
+  // y crece hacia abajo, así que el contenedor DEBE poder desplazarse (un
+  // overflow-hidden recortaría todo lo que va bajo el pliegue).
+  if (homeCampesinoBActivo()) {
+    return (
+      <div className="relative h-[100dvh] w-full overflow-y-auto">
+        <Suspense fallback={<div className="h-full w-full bg-[#f7f0df]" />}>
+          <HomeCampesinoB onNavigate={onNavigate} onLogout={onLogout} />
+        </Suspense>
+      </div>
+    );
+  }
 
   if (fincaViva) {
     // F2: el hero (FincaVivaHero, dentro de DashboardLive) gobierna el fondo, la
@@ -2211,6 +2233,16 @@ export default function App() {
           <ErrorBoundary>
             <ErrorFallback moduleName="Entrada campesina">
               <EntradaCampesinaMockup onBack={() => navigate('dashboard')} />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
+      case 'mockup_home_campesino_b':
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="Home campesino B">
+              <Suspense fallback={<div className="h-[100dvh] w-full bg-[#f7f0df]" />}>
+                <HomeCampesinoB onNavigate={navigate} />
+              </Suspense>
             </ErrorFallback>
           </ErrorBoundary>
         );
@@ -4410,12 +4442,18 @@ export default function App() {
     // sin banners de instalación/datos ni FABs encima.
     currentView.startsWith('mockup_');
 
+  // La portada campesina B (dashboard, bandera activa) trae su propia barra
+  // superior con indicador "Con señal / Sin señal" y su propio compai que
+  // camina (CompaiOverlay). Por eso suprime la NetworkStatusBar global y el
+  // AgentFab idle, para no duplicar chrome ni compai encima del layout aprobado.
+  const esHomeCampesinoB = currentView === 'dashboard' && homeCampesinoBActivo();
+
   return (
     <>
       {/* Transición Angelita home→conversación (~2s). Encima de todo (z alto);
           la conversación monta detrás y queda limpia al terminar. */}
       <ColibriTransition active={colibriTransition} onDone={() => setColibriTransition(false)} />
-      <NetworkStatusBar />
+      {!esHomeCampesinoB && <NetworkStatusBar />}
       {/* Banners de instalación PWA: NO en las vistas pre-auth (login /
           loading / oauth-callback). En el login son un overlay `fixed`
           z-50 que se encimaba sobre el formulario —en desktop tapaba e
@@ -4469,7 +4507,18 @@ export default function App() {
         {currentView !== 'loading' && currentView !== 'login' && currentView !== 'oauth-callback' && !currentView.startsWith('mockup_') && currentView !== 'voz' && currentView !== 'agente' && currentView !== 'dashboard' && currentView !== 'onboarding-perfil' && currentView !== 'onboarding-perfil-clasico' && <AgentFab onNavigate={navigate} />}
         {currentView !== 'loading' && currentView !== 'login' && !currentView.startsWith('mockup_') && currentView !== 'onboarding-perfil' && currentView !== 'onboarding-perfil-clasico' && <AgentFab onNavigate={navigate} pantalla={currentView} />}
         {currentView !== 'loading' && <AgentFab onNavigate={navigate} pantalla={currentView} />}
+        {currentView !== 'loading' && !currentView.startsWith('mockup_') && !esHomeCampesinoB && <AgentFab onNavigate={navigate} pantalla={currentView} />}
       </Suspense>
+      {/* Compai que CAMINA en la portada campesina B: un solo compai (el
+          AgentFab idle se suprime arriba). CompaiOverlay corre la marcha real
+          (useCompaiRoam → estado 'caminando') para los compai CON_MARCHA
+          (jaguar / oso-baston / zarigüeya); Angelita, que es el NORTE, conserva
+          su estado correcto y no se toca. */}
+      {esHomeCampesinoB && (
+        <Suspense fallback={null}>
+          <CompaiOverlay currentView={currentView} />
+        </Suspense>
+      )}
       {/* Escucha manos libres (operador 2026-07-05, caso guantes/manos
           embarradas). Abre el widget "Chagra está escuchando" que navega o
           pregunta al agente punta a punta por voz.
