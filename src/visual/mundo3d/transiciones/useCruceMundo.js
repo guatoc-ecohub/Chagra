@@ -22,14 +22,23 @@
  * `cruce.fase` ('quieto'|'entrando'|'saliendo') y `cruce.destino` sirven de
  * insumo para la CamaraCruce si el host tiene canvas 3D. DOM puro, cero three.
  */
-import { useCallback, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
+/**
+ * @param {{tier?: 'alto'|'medio'|'bajo', reducedMotion?: boolean, onSwap?: (destino: string|null) => void}} opciones
+ */
 export function useCruceMundo({ tier = 'medio', reducedMotion = false, onSwap } = {}) {
   const [estado, setEstado] = useState({ fase: 'quieto', destino: null });
   const swapRef = useRef(onSwap);
-  swapRef.current = onSwap;
   const estadoRef = useRef(estado);
-  estadoRef.current = estado;
+
+  useEffect(() => {
+    swapRef.current = onSwap;
+  }, [onSwap]);
+
+  useEffect(() => {
+    estadoRef.current = estado;
+  }, [estado]);
 
   const entrar = useCallback((destino) => {
     setEstado((e) => (e.fase === 'quieto' ? { fase: 'entrando', destino } : e));

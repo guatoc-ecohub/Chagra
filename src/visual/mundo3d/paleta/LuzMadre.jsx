@@ -35,6 +35,7 @@ import { ATMOSFERA, mezclarCielo } from '../atmosferaMadre.js';
 
 /* Las proporciones de la casa, exportadas como dato (para consumidores no-r3f
    o para quien necesite leer la receta sin montar luces). */
+// eslint-disable-next-line react-refresh/only-export-components
 export const LUZ_MADRE = {
   hemisferio: 0.55,
   ambiente: 0.28,
@@ -52,6 +53,9 @@ export const LUZ_MADRE = {
  *                                 60% hacia la madre. Default: madre pura.
  * @param {object} [props.perfil]  perfilDeTier(tier); decide castShadow.
  * @param {number} [props.escala]  atenuador global (1 = receta tal cual).
+ * @param {[number, number, number]} [props.solPos] posición opcional del sol.
+ * @param {{left?: number, right?: number, top?: number, bottom?: number, far?: number}} [props.sombra]
+ *                                 límites opcionales de la cámara de sombras.
  */
 export default function LuzMadre({
   madre = ATMOSFERA,
