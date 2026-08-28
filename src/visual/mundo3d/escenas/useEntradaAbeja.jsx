@@ -109,6 +109,9 @@ function puntoDeCruce(camera, foco, out) {
  * @param {string}  [opts.hora='dorada']  hora de cielosHoraData: de 'noche'
  *   Angelita se ACURRUCA (idle nocturno de creatureIdle).
  * @param {string}  [opts.tier='alto']  'bajo' → idle frugal (solo respiración).
+ * @param {string}  [opts.especie='abeja-angelita']  perfil idle del cuerpo.
+ * @param {{percha:{x:number,y:number,z:number},rondaAltura:number,sombra:{opacidadMin:number,opacidadBase:number,atenuaPorAltura:number,ensanchaPorAltura:number}}} [opts.presencia]
+ *   presencia espacial propia de la especie; Angelita es el fallback.
  * @param {{ current: { fase: string, pos: THREE.Vector3 } }|null} [opts.viajeRef]
  *   canal de solo-escritura hacia la CÁMARA (auditoría #50): cada frame el hook
  *   publica aquí la fase del cruce ('oculta'|'picada'|'no'|'salida') y la

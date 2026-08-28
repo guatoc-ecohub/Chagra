@@ -19,8 +19,12 @@ import { idleDeCreature, IDLE_PERFILES } from '../../creatures/creatureIdle.js';
 const VELOCIDAD = 0.42;
 const _destino = new THREE.Vector3();
 
+/**
+ * @param {THREE.Vector3} foco
+ * @param {{especie?:string,reducedMotion?:boolean,entrando?:boolean,saliendo?:boolean,hora?:string,tier?:string}} opciones
+ */
 function useVueloAve(foco, {
-  especie,
+  especie = 'guacamaya',
   reducedMotion = false,
   entrando = true,
   saliendo = false,
@@ -110,11 +114,14 @@ function AveCompai({
   const { visema } = useLipSync({ activo: !reducedMotion });
   const size = presencia.billboardBase + Math.round(energia * presencia.billboardPorEnergia);
   const state = hablando && !reducedMotion ? 'speaking' : 'idle';
-  const origen = useMemo(() => [
-    foco.x + presencia.percha.x,
-    foco.y + presencia.percha.y,
-    foco.z + presencia.percha.z,
-  ], [foco, presencia]);
+  const origen = useMemo(
+    () => /** @type {[number, number, number]} */ ([
+      foco.x + presencia.percha.x,
+      foco.y + presencia.percha.y,
+      foco.z + presencia.percha.z,
+    ]),
+    [foco, presencia],
+  );
 
   return (
     <group ref={ref} position={origen}>
