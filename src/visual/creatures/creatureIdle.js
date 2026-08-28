@@ -154,7 +154,7 @@ export const IDLE_PERFILES = {
   },
   /* Chivito de páramo: colibrí pequeño de aire frío, con aleteo inquieto y
      descansos breves en la flor. */
-  chivito: {
+  'chivito-punk': {
     medio: 'aire', poseBase: 'vuela',
     respira: { freq: 2.45, amp: 0.032, vaiven: 0.39 },
     vuelta: { base: 18, jitter: 2.5, dur: 0.9, grados: 360, anticipo: 23 },
@@ -275,6 +275,8 @@ export const IDLE_PERFILES = {
    viejo caía en silencio al fallback (¡la rana se movía como abeja!). Se
    mantiene el alias para no romper consumidores/tests históricos. */
 IDLE_PERFILES['rana-dorada'] = IDLE_PERFILES['rana-andina'];
+// Compatibilidad con consumidores anteriores al slug canónico del roster-7.
+IDLE_PERFILES.chivito = IDLE_PERFILES['chivito-punk'];
 
 /* Overshoot del giro (grados que se pasa antes de asentar). */
 const PASADA = 24;
