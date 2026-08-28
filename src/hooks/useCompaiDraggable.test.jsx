@@ -87,6 +87,48 @@ describe('useCompaiDraggable', () => {
     expect(saved).toBeDefined();
   });
 
+  it('acepta un evento con coordenadas de mouse aunque no tenga touches', () => {
+    const { result } = renderHook(() => useCompaiDraggable());
+    result.current.compaiRef.current = {
+      getBoundingClientRect: () => ({ bottom: 678, right: 1010 }),
+    };
+
+    expect(() => {
+      act(() => {
+        result.current.dragHandlers.onTouchStart({
+          clientX: 900,
+          clientY: 600,
+          target: { closest: vi.fn(() => null) },
+        });
+      });
+    }).not.toThrow();
+    expect(result.current.isDragging).toBe(true);
+  });
+
+  it('mantiene el arrastre táctil con coordenadas en touches', () => {
+    const { result } = renderHook(() => useCompaiDraggable());
+    result.current.compaiRef.current = {
+      getBoundingClientRect: () => ({ bottom: 678, right: 1010 }),
+    };
+
+    act(() => {
+      result.current.dragHandlers.onTouchStart({
+        touches: [{ clientX: 900, clientY: 600 }],
+        target: { closest: vi.fn(() => null) },
+      });
+    });
+
+    act(() => {
+      const movimiento = new Event('touchmove', { bubbles: true, cancelable: true });
+      Object.defineProperty(movimiento, 'touches', {
+        value: [{ clientX: 800, clientY: 500 }],
+      });
+      document.dispatchEvent(movimiento);
+    });
+
+    expect(result.current.position).toEqual({ bottom: 190, right: 114 });
+  });
+
   it('debería resetear posición y localStorage', () => {
     localStorage.setItem('compai-position', JSON.stringify({ bottom: 120, right: 180 }));
     const { result } = renderHook(() => useCompaiDraggable());

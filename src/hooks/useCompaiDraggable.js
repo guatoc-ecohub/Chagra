@@ -23,6 +23,13 @@ const NATURAL_POSITION = {
 const FAB_SIZE = 84;
 const MIN_PADDING = 14;
 
+// Unifica eventos de mouse y touch. Algunos consumidores disparan el handler
+// táctil con un evento sin `touches` (por ejemplo, gestos sintetizados); ese
+// caso debe degradar sin tumbar el FAB.
+function obtenerPuntoCliente(evento) {
+  return evento.touches?.[0] ?? evento.changedTouches?.[0] ?? evento;
+}
+
 export default function useCompaiDraggable({ enabled = true, storageKey = STORAGE_KEY } = {}) {
   // Cargar posición inicial desde localStorage
   const getInitialPosition = useCallback(() => {
@@ -144,15 +151,17 @@ export default function useCompaiDraggable({ enabled = true, storageKey = STORAG
   // Manejadores táctiles
   const handleTouchStart = useCallback((e) => {
     if (e.target.closest('[data-compai-no-drag="true"]')) return;
-    const touch = e.touches[0];
-    handleDragStart(touch.clientX, touch.clientY);
+    const punto = obtenerPuntoCliente(e);
+    if (!Number.isFinite(punto.clientX) || !Number.isFinite(punto.clientY)) return;
+    handleDragStart(punto.clientX, punto.clientY);
   }, [handleDragStart]);
 
   const handleTouchMove = useCallback((e) => {
     if (!isDragging) return;
+    const punto = obtenerPuntoCliente(e);
+    if (!Number.isFinite(punto.clientX) || !Number.isFinite(punto.clientY)) return;
     e.preventDefault();
-    const touch = e.touches[0];
-    handleDragMove(touch.clientX, touch.clientY);
+    handleDragMove(punto.clientX, punto.clientY);
   }, [isDragging, handleDragMove]);
 
   const handleTouchEnd = useCallback(() => {
