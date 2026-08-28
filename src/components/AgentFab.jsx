@@ -220,7 +220,8 @@ export default function AgentFab({ onNavigate, pantalla = null }) {
   //        `.agt-avatar-glow` (ver más abajo) cuando `responseReady` — el
   //        personaje mismo invita, no un cartel aparte.
   //   R4 — Al tocarlo: ASOMA el peek de pizarra (BurbujaPizarraPeek) con el
-  //        último aviso (typewriter) y Ver / Escuchar / Callar. "Más opciones"
+  //        último aviso (texto ESTÁTICO, NO typewriter: el texto en movimiento
+  //        le daba mareo al operador) y Ver / Escuchar / Callar. "Más opciones"
   //        abre el menú compacto de siempre.
   const [avatarType] = useAgentAvatarType();
   const nombreCompai = AVATAR_NOMBRE[avatarType] || AVATAR_NOMBRE[DEFAULT_AVATAR_TYPE];
@@ -607,8 +608,9 @@ export default function AgentFab({ onNavigate, pantalla = null }) {
       )}
 
       {/* PEEK DEL TOQUE (rediseño operador 2026-08-27): pizarra de colegio
-          compacta con el último aviso (typewriter) + Ver / Escuchar / Callar.
-          NO tapa la pantalla; "Más opciones" abre el menú compacto de abajo. */}
+          compacta con el último aviso (texto ESTÁTICO, no typewriter) +
+          Ver / Escuchar / Callar. NO tapa la pantalla; "Más opciones" abre el
+          menú compacto de abajo. */}
       {peekAbierto && (
         <BurbujaPizarraPeek
           mensaje={contenidoPanel.descripcion}

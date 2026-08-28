@@ -1,61 +1,114 @@
-/* ── <BurbujaPizarraPeek> — el asomo del compai como PIZARRA DE COLEGIO
-      (BurbujaPizarraPeek.jsx). Superficie de pizarra verde-oscura, texto en
-      TIZA (blanco hueso), marco fino discreto. Chiquita: cabe arriba del FAB
-      SIN tapar la pantalla de Chagra (regla dura R1 2026-08-27). Crece HACIA
-      ARRIBA (bottom:100%) y ocupa poco: es AYUDA, no estorbo. */
+/* ── <BurbujaPizarraPeek> — el ASOMO del compai como PIZARRA DE COLEGIO ───────
+   (BurbujaPizarraPeek.jsx). Rediseño 2026-08-27 v2 (alta gama).
+
+   Objetivo: que se sienta un tablero de tiza DE VERDAD, hermoso, y —regla dura
+   del operador— ESTÁTICO. El texto aparece y se queda quieto: la única
+   transición es una aparición de OPACIDAD muy corta del recuadro entero (no
+   desplaza el texto). Con prefers-reduced-motion, ni eso.
+
+   Craft (skills high-end + apple-design):
+   - Doble bisel (marco fino oscuro + tablero de slate con radios concéntricos),
+     como una placa metida en un riel; NUNCA un tablón café (el operador odió la
+     madera).
+   - Profundidad: sombra ambiental honda + un canto frío que define el borde
+     sobre fondos casi-negros (apple: superficie grande => sombra más honda).
+   - Grano de tiza y marcas de borrador con pseudo-elementos (sin nodos
+     repetidos), autocontenidos (cero red, cero assets externos).
+   - Tipografía de tiza (Baloo 2), con bleed de gis por text-shadow.
+   Compacto: cabe ARRIBA del FAB sin tapar la pantalla de Chagra (R4). */
 
 .burbuja-pizarra-peek {
-  --pizarra-fondo: #26332b;
-  --pizarra-alto: #2f3f35;
-  --pizarra-bajo: #1c261f;
-  /* Marco en grafito oscuro — NUNCA madera (regla dura del operador,
-     2026-09-03: "canónico = pizarra/tiza, nunca madera"). Antes era un
-     marrón de madera (#3a2c1c); ahora es un gris-grafito de la MISMA familia
-     tonal que la pizarra, no un material distinto. */
-  --pizarra-marco: #2a322c;
-  --tiza: #f3efe4;
-  --tiza-tenue: rgba(243, 239, 228, 0.66);
+  /* Slate de pizarra (verde-oscuro de colegio) + tiza crema. Marco FRÍO
+     casi-negro, jamás café — regla dura del operador (2026-09-03: "canónico =
+     pizarra/tiza, NUNCA madera"). El marrón de madera (#3a2c1c) que hubo aquí
+     quedó proscrito; este riel es de la misma familia tonal de la pizarra. */
+  --pizarra-alto: #32433a;
+  --pizarra-fondo: #253128;
+  --pizarra-bajo: #151d18;
+  --marco: #0c110e;
+  --marco-luz: rgba(240, 238, 228, 0.12);
+  --rim-frio: rgba(151, 173, 160, 0.18);
+  --tiza: #f5f1e7;
+  --tiza-tenue: rgba(245, 241, 231, 0.6);
+  --tiza-borde: rgba(245, 241, 231, 0.34);
 
   position: absolute;
   bottom: 100%;
   right: 0;
-  margin-bottom: 10px;
-  width: 232px;
+  margin-bottom: 12px;
+  width: 248px;
   max-width: calc(100vw - 24px);
   z-index: 42;
   pointer-events: auto;
   display: flex;
   flex-direction: column;
-  gap: 6px;
-  animation: burbuja-pizarra-in 0.24s ease both;
+  gap: 7px;
+  font-family: 'Baloo 2', 'Nunito', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  /* R2 — aparición SÓLO de opacidad, muy corta. Nada de transform: el texto no
+     se desplaza ni un pixel. */
+  animation: burbuja-pizarra-aparece 180ms ease-out both;
 }
 
-/* La pizarra: fondo verde-oscuro con un grano finísimo de tiza y un marco
-   delgado en grafito (nunca madera). El texto de tiza va escrito a máquina
-   encima. */
+/* La pizarra: tablero de slate con doble bisel. El marco es un riel fino oscuro
+   (borde + canto frío + sombra), NUNCA un tablón de madera. El grano y las
+   marcas de borrador viven en los pseudo-elementos. */
 .burbuja-pizarra-peek__tabla {
   position: relative;
-  padding: 9px 26px 9px 11px;
-  border-radius: 8px;
+  isolation: isolate;
+  padding: 12px 28px 13px 14px;
+  border-radius: 14px;
   color: var(--tiza);
   background-color: var(--pizarra-fondo);
   background-image:
-    radial-gradient(circle at 22% 18%, rgba(243, 239, 228, 0.05) 0%, transparent 42%),
-    linear-gradient(150deg, var(--pizarra-alto) 0%, var(--pizarra-fondo) 55%, var(--pizarra-bajo) 100%);
-  border: 3px solid var(--pizarra-marco);
+    /* vignette: el centro del tablero se lee más «fresco» que los bordes */
+    radial-gradient(125% 95% at 50% 20%, rgba(255, 255, 255, 0.06) 0%, transparent 58%),
+    /* leve oscurecido en las esquinas bajas, como slate real */
+    radial-gradient(140% 120% at 50% 118%, rgba(8, 12, 10, 0.5) 0%, transparent 45%),
+    linear-gradient(158deg, var(--pizarra-alto) 0%, var(--pizarra-fondo) 52%, var(--pizarra-bajo) 100%);
+  /* marco: riel fino oscuro + canto frío que define el borde sobre negro +
+     luz en el canto superior (apple: el material atrapa la luz arriba) +
+     sombra ambiental honda para levantar el tablero del fondo. */
+  border: 2.5px solid var(--marco);
   box-shadow:
-    0 6px 16px rgba(12, 18, 14, 0.42),
-    inset 0 0 0 1px rgba(243, 239, 228, 0.06);
+    0 0 0 1px var(--rim-frio),
+    0 18px 38px rgba(6, 10, 8, 0.5),
+    0 5px 12px rgba(6, 10, 8, 0.42),
+    inset 0 1.5px 0 var(--marco-luz),
+    inset 0 0 0 1px rgba(245, 241, 231, 0.055),
+    inset 0 -12px 22px rgba(8, 12, 10, 0.38);
 }
 
-.burbuja-pizarra-peek__texto {
-  margin: 0;
-  font-size: 0.86rem;
-  font-weight: 500;
-  line-height: 1.35;
-  letter-spacing: 0.2px;
-  /* La tiza «respira» con un realce muy leve, como trazo de gis. */
-  text-shadow: 0 0 1px rgba(243, 239, 228, 0.35);
+/* Grano de tiza: doble speckle finísimo (autocontenido, sin data-URI ni red).
+   Da la textura de gis molido sobre el slate. Estático, decorativo. */
+.burbuja-pizarra-peek__tabla::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  z-index: -1;
+  background-image:
+    radial-gradient(rgba(245, 241, 231, 0.06) 0.5px, transparent 0.6px),
+    radial-gradient(rgba(245, 241, 231, 0.045) 0.5px, transparent 0.6px);
+  background-size: 3px 3px, 5px 5px;
+  background-position: 0 0, 2px 3px;
+  mix-blend-mode: soft-light;
+  opacity: 0.9;
+}
+
+/* Marcas de «borrador»: dos barridos suaves y muy tenues, como tiza a medio
+   borrar, en diagonal. Venden un tablero USADO sin ensuciar la lectura. */
+.burbuja-pizarra-peek__tabla::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  z-index: -1;
+  background-image:
+    linear-gradient(112deg, transparent 10%, rgba(245, 241, 231, 0.05) 24%, transparent 42%),
+    linear-gradient(-96deg, transparent 52%, rgba(245, 241, 231, 0.038) 70%, transparent 86%);
+  opacity: 0.95;
 }
 
 /* El molde del texto debe quedarse dentro de la pizarra: si desborda, puede
@@ -67,15 +120,15 @@
 
 .burbuja-pizarra-peek__cerrar {
   position: absolute;
-  top: 3px;
-  right: 3px;
-  width: 18px;
-  height: 18px;
+  top: 4px;
+  right: 4px;
+  width: 19px;
+  height: 19px;
   border-radius: 50%;
   border: none;
   background: transparent;
   color: var(--tiza-tenue);
-  font-size: 14px;
+  font-size: 15px;
   line-height: 1;
   display: flex;
   align-items: center;
@@ -88,14 +141,67 @@
 }
 .burbuja-pizarra-peek__cerrar:hover,
 .burbuja-pizarra-peek__cerrar:focus-visible {
-  background: rgba(243, 239, 228, 0.12);
+  background: rgba(245, 241, 231, 0.12);
   color: var(--tiza);
+  outline: none;
 }
 
-/* Los tres controles: pastillas de contorno de tiza, discretas, bajo la pizarra. */
+/* Rótulo de la tiza (encabezado): pequeño, tenue, con tracking amplio — como
+   el título escrito arriba de la lección. El aviso es el héroe, esto lo apoya. */
+.burbuja-pizarra-peek__rotulo {
+  position: relative;
+  margin: 0 0 6px;
+  padding-right: 6px;
+  font-size: 0.64rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--tiza-tenue);
+  text-shadow: 0 0 1px rgba(245, 241, 231, 0.28);
+  width: fit-content;
+}
+
+/* Subrayado de tiza dibujado a mano (SVG estático). Trazo irregular, con un
+   halo suave para que parezca gis, no un borde vectorial. */
+.burbuja-pizarra-peek__subrayado {
+  display: block;
+  width: 100%;
+  height: 5px;
+  margin-top: 3px;
+  overflow: visible;
+}
+.burbuja-pizarra-peek__subrayado path {
+  fill: none;
+  stroke: var(--tiza);
+  stroke-width: 1.5;
+  stroke-linecap: round;
+  opacity: 0.55;
+  filter: drop-shadow(0 0 0.7px rgba(245, 241, 231, 0.6));
+}
+
+/* El aviso, en tiza. ESTÁTICO. Bleed de gis con doble text-shadow (halo claro +
+   un pelín de sombra hundida en el slate). Clamp a 3 líneas: compacto. */
+.burbuja-pizarra-peek__texto {
+  margin: 0;
+  font-size: 0.9rem;
+  font-weight: 500;
+  line-height: 1.42;
+  letter-spacing: 0.1px;
+  color: var(--tiza);
+  text-shadow:
+    0 0 0.7px rgba(245, 241, 231, 0.45),
+    0 1px 0 rgba(9, 14, 11, 0.3);
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+  overflow: hidden;
+}
+
+/* Los tres controles: pastillas de contorno de tiza, opacas (legibles sobre
+   CUALQUIER fondo de la app), compactas, bajo la pizarra. */
 .burbuja-pizarra-peek__controles {
   display: flex;
-  gap: 4px;
+  gap: 5px;
   padding: 0 1px;
 }
 
@@ -106,60 +212,73 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 2px;
-  min-height: 40px;
-  padding: 5px 3px;
-  border-radius: 8px;
+  gap: 3px;
+  min-height: 42px;
+  padding: 6px 3px;
+  border-radius: 11px;
   white-space: nowrap;
-  border: 1.5px solid rgba(243, 239, 228, 0.4);
-  /* Fondo OPACO (pizarra) para que el texto de tiza se lea sobre CUALQUIER
-     pantalla de la app, no dependa del fondo de detrás. */
-  background: #2b382f;
+  border: 1.5px solid var(--tiza-borde);
+  /* Fondo OPACO de slate: el texto de tiza no depende del fondo de detrás. */
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.035), transparent 60%),
+    #27342d;
   color: var(--tiza);
-  font-size: 11px;
+  font-family: inherit;
+  font-size: 0.66rem;
   font-weight: 600;
-  letter-spacing: 0.1px;
+  letter-spacing: 0.02em;
   cursor: pointer;
-  transition: background 0.16s ease, border-color 0.16s ease, transform 0.14s ease;
+  box-shadow: 0 2px 6px rgba(6, 10, 8, 0.3);
+  transition: background-color 0.16s ease, border-color 0.16s ease, transform 0.14s cubic-bezier(0.34, 1.4, 0.64, 1);
+}
+.burbuja-pizarra-peek__control svg {
+  opacity: 0.92;
 }
 .burbuja-pizarra-peek__control:hover {
-  background: #38473d;
-  border-color: rgba(243, 239, 228, 0.62);
+  background: #32413a;
+  border-color: rgba(245, 241, 231, 0.6);
 }
-/* Foco de teclado: outline de tiza, sin aclarar el fondo (el texto blanco debe
-   seguir legible; nunca un fondo claro que lo borre). */
+/* Foco de teclado: outline de tiza, sin fondo claro que borre el texto blanco. */
 .burbuja-pizarra-peek__control:focus-visible {
-  background: #38473d;
-  border-color: rgba(243, 239, 228, 0.62);
-  outline: 2px solid rgba(243, 239, 228, 0.75);
+  background: #32413a;
+  border-color: rgba(245, 241, 231, 0.62);
+  outline: 2px solid rgba(245, 241, 231, 0.75);
   outline-offset: 1px;
 }
+/* Press: hundido, feedback físico directo (apple). */
 .burbuja-pizarra-peek__control:active {
-  transform: scale(0.97);
+  transform: scale(0.965);
 }
 .burbuja-pizarra-peek__control--mas {
-  flex: 0 0 30px;
+  flex: 0 0 34px;
 }
 
-/* Sólo para lectores de pantalla: quién habla. */
-.burbuja-pizarra-peek__sr {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  padding: 0;
-  margin: -1px;
-  overflow: hidden;
-  clip: rect(0, 0, 0, 0);
-  white-space: nowrap;
-  border: 0;
+/* R2 — aparición SÓLO de opacidad. Sin transform => cero desplazamiento de
+   texto. Muy corta. */
+@keyframes burbuja-pizarra-aparece {
+  from { opacity: 0; }
+  to   { opacity: 1; }
 }
 
-@keyframes burbuja-pizarra-in {
-  from { opacity: 0; transform: translateY(6px); }
-  to   { opacity: 1; transform: translateY(0); }
-}
-
+/* Accesibilidad — sin movimiento: aparece de una, sin transiciones. */
 @media (prefers-reduced-motion: reduce) {
   .burbuja-pizarra-peek { animation: none; }
-  .burbuja-pizarra-peek__control { transition: none; }
+  .burbuja-pizarra-peek__control,
+  .burbuja-pizarra-peek__cerrar { transition: none; }
+  .burbuja-pizarra-peek__control:active { transform: none; }
+}
+
+/* Menos transparencia / más contraste: el tablero ya es opaco; reforzamos el
+   marco y la tiza para lectura dura. */
+@media (prefers-contrast: more) {
+  .burbuja-pizarra-peek {
+    --tiza-borde: rgba(245, 241, 231, 0.6);
+  }
+  .burbuja-pizarra-peek__tabla {
+    border-color: #000;
+  }
+  .burbuja-pizarra-peek__texto {
+    color: #fff;
+    text-shadow: none;
+  }
 }
