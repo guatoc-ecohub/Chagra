@@ -69,6 +69,16 @@ export default function CompaiOverlay({ currentView = 'dashboard' }) {
   const [compaiState, setCompaiState] = useState('idle'); // idle, thinking, speaking, listening
   const [lastView, setLastView] = useState(currentView);
 
+  // Tamaño del avatar — se declara ANTES del roam porque useCompaiRoam lo recibe
+  // como `escala` para acoplar la velocidad al pie (#3054). Debe quedar arriba:
+  // usarlo antes de su declaración `const` rompe con TDZ ("Cannot access
+  // 'avatarSize' before initialization") al montar el overlay tras el login.
+  // Un felino/animal realista (jaguar) NO cabe digno en un disco chico: se le da
+  // más tamaño para que se LEA. Los compai chicos (abeja, luciérnaga…) van en un
+  // tamaño intermedio, cómodo, sin disco de color detrás.
+  const esRealista = avatarType === 'jaguar';
+  const avatarSize = esRealista ? 112 : 84;
+
   // El compai recorre la pantalla actual y conserva la posición elegida por la
   // persona. Ver useCompaiRoam.
   // `parada` se incrementa cada vez que LLEGA a un punto de su paseo — con eso
@@ -121,12 +131,6 @@ export default function CompaiOverlay({ currentView = 'dashboard' }) {
   const handleClose = useCallback(() => {
     setIsOpen(false);
   }, []);
-
-  // Un felino/animal realista (jaguar) NO cabe digno en un disco chico: se le
-  // da más tamaño para que se LEA. Los compai chicos (abeja, luciérnaga…) van
-  // en un tamaño intermedio, cómodo, sin disco de color detrás.
-  const esRealista = avatarType === 'jaguar';
-  const avatarSize = esRealista ? 112 : 84;
 
   // Mientras deambula, los compai CON MARCHA real corren su ciclo de andar
   // ('caminando'): el jaguar (JaguarTrazado, la lámina auto-trazada, su marcha
