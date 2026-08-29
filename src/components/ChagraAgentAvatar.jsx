@@ -97,7 +97,7 @@ export default function ChagraAgentAvatar({ estado = undefined, ...props }) {
         // Angelita pasa por el mismo adaptador que el selector y la galería.
         // Así no existe un segundo call-site que pueda perder props del cuerpo
         // canónico (rubber-hose, lip-sync o reduced-motion).
-        return <ChagraAgentAvatarAngelita estado={visual.estado} {...atributosVisuales} {...props} />;
+        return <ChagraAgentAvatarAngelita estado={visual.estado} {...props} {...atributosVisuales} />;
     }
 
     if (ComponenteAngosto) return <ComponenteAngosto {...props} />;

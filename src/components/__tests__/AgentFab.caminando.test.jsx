@@ -17,6 +17,13 @@ vi.mock('../../hooks/useComportamientoCompai.js', () => ({
   }),
 }));
 
+// El susurro nocturno mete a Angelita en 'invita' según la hora local real
+// (esDeNoche), lo que volvía este test flaky: de noche pisaba 'caminando' y
+// fallaba. Se neutraliza para que la aserción sea determinista a cualquier hora.
+vi.mock('../../hooks/useCompaiSusurroNocturno', () => ({
+  useCompaiSusurroNocturno: () => {},
+}));
+
 import AgentFab from '../AgentFab.jsx';
 import useAngelitaStore from '../../store/useAngelitaStore.js';
 import useAgentNotificationStore from '../../store/useAgentNotificationStore.js';

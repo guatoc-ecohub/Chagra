@@ -608,8 +608,6 @@ export function Angelita({
       role="img"
       aria-label={aria}
       data-agente="angelita"
-      data-agt-estado={dataEstado || e}
-      data-pose={dataPose || (vivo ? pose : undefined)}
       data-agt-direccion={direccion}
       data-agt-vivo={vivo ? '1' : undefined}
       /* El visema del TTS también en el root: el CSS acopla las ondas de miel
@@ -619,8 +617,12 @@ export function Angelita({
       data-agt-idle={idleActivo ? momento : undefined}
       data-agt-confianza={nivel || undefined}
       data-tier={tier || undefined}
-      data-visema={dataVisema || visema || undefined}
       {...rest}
+      // El caller puede proyectar un estado transversal como locomoción sin
+      // ampliar el vocabulario conversacional interno de Angelita.
+      data-agt-estado={dataEstado ?? e}
+      data-pose={dataPose ?? (vivo ? pose : undefined)}
+      data-visema={dataVisema ?? visema ?? undefined}
     >
       <title>{aria}</title>
       {halo}

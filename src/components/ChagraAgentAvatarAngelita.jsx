@@ -98,12 +98,14 @@ export default function ChagraAgentAvatarAngelita({
             idleCerebro={idleCerebro || despiertaNatural}
             gafas={gafas}
             cejas={cejas}
-            data-agt-estado={dataEstado}
-            data-pose={dataPose}
-            data-visema={dataVisema}
             className={`${glow ? 'agt-avatar-glow ' : ''}${className}`.trim() || undefined}
             title={title || ariaLabel}
             {...rest}
+            // Los atributos visuales del dispatcher son contrato de salida,
+            // por eso quedan después de cualquier prop residual.
+            data-agt-estado={dataEstado}
+            data-pose={dataPose}
+            data-visema={dataVisema}
         />
     );
 
