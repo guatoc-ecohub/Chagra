@@ -34,6 +34,8 @@ const VISEMA_DE_STATE = {
 
 export default function ChagraAgentAvatarZariguya({
     state = 'idle',
+    estado = undefined,
+    visema: visemaRecibido = null,
     size = 48,
     withLabel = false,
     onClick = undefined,
@@ -46,6 +48,9 @@ export default function ChagraAgentAvatarZariguya({
     // (tier), y no debe descartarlos donde el host los cablee.
     animated = true,
     tier = undefined,
+    'data-agt-estado': dataEstado = undefined,
+    'data-pose': dataPose = undefined,
+    'data-visema': dataVisema = undefined,
     // Presencia (pedido operador 2026-08-24, transversal al elenco): con
     // reaccionaPresencia la zarigüeya DESPIERTA a su idle vivo al detectar
     // presencia, sin pisar una actuación conversacional real. Mismo contrato
@@ -58,9 +63,10 @@ export default function ChagraAgentAvatarZariguya({
     // La presencia solo despierta cuando el estado es pasivo (idle): jamás
     // interrumpe una actuación conversacional ni la caminata. La zarigüeya ya
     // vive en idle (idle-cerebro), así que despertar = garantizar su idle.
-    const despiertaNatural = despierta && esPasivo(state);
+    const estadoAgente = estado || state;
+    const despiertaNatural = despierta && esPasivo(estadoAgente);
     const estadoEfectivo = despiertaNatural ? 'idle' : state;
-    const visema = VISEMA_DE_STATE[estadoEfectivo] || null;
+    const visema = visemaRecibido ?? VISEMA_DE_STATE[estadoEfectivo] ?? null;
 
     const bicho = (
         <ZariguyaTrazado
@@ -72,6 +78,9 @@ export default function ChagraAgentAvatarZariguya({
             title={ariaLabel}
             className={className}
             style={glow ? { filter: 'drop-shadow(0 0 10px rgba(255,158,203,0.65))' } : undefined}
+            data-agt-estado={dataEstado || estadoAgente}
+            data-pose={dataPose}
+            data-visema={dataVisema || visema || undefined}
         />
     );
 

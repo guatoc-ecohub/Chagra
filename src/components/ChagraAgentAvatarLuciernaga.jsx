@@ -40,6 +40,8 @@ const VISEMA_DE_STATE = {
 
 export default function ChagraAgentAvatarLuciernaga({
     state = 'idle',
+    estado = undefined,
+    visema: visemaRecibido = null,
     size = 48,
     withLabel = false,
     onClick = undefined,
@@ -47,24 +49,34 @@ export default function ChagraAgentAvatarLuciernaga({
     glow = false,
     className = '',
     ariaLabel = 'Chagra IA',
+    animated = true,
+    tier = undefined,
+    'data-agt-estado': dataEstado = undefined,
+    'data-pose': dataPose = undefined,
+    'data-visema': dataVisema = undefined,
     reaccionaPresencia = true,
 }) {
     const { despierta, handlers: handlersPresencia } = useAngelitaPresencia({ activo: reaccionaPresencia });
-    const estadoEfectivo = despierta && esPasivo(state) ? 'idle' : state;
+    const estadoAgente = estado || state;
+    const estadoEfectivo = despierta && esPasivo(estadoAgente) ? 'idle' : state;
     const pose = POSE_DE_STATE[estadoEfectivo] || 'vuela';
     const eco = ECO_DE_STATE[estadoEfectivo] || null;
-    const visema = VISEMA_DE_STATE[estadoEfectivo] || null;
+    const visema = visemaRecibido ?? VISEMA_DE_STATE[estadoEfectivo] ?? null;
 
     const bicho = (
         <Luciernaga
             pose={pose}
             eco={eco}
             visema={visema}
-            tier={undefined}
+            animated={animated}
+            tier={tier}
             size={size}
             title={ariaLabel}
             className={className}
             style={glow ? { filter: 'drop-shadow(0 0 10px rgba(199,255,78,0.65))' } : undefined}
+            data-agt-estado={dataEstado || estadoAgente}
+            data-pose={dataPose || pose}
+            data-visema={dataVisema || visema || undefined}
         />
     );
 

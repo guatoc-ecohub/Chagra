@@ -48,6 +48,9 @@ const ESTADO_DE_STATE = {
  */
 export function ChivitoPunk({
   state = 'idle',
+  estado = undefined,
+  pose = undefined,
+  visema = null,
   size = 64,
   className = '',
   style = undefined,
@@ -57,7 +60,7 @@ export function ChivitoPunk({
   const sufijo = useId().replace(/[:]/g, '');
   const marcado = useMemo(() => namespaceSvg(MARCADO_CRUDO, IDS, sufijo), [sufijo]);
   const css = useMemo(() => namespaceCss(CSS_RIG, IDS, sufijo), [sufijo]);
-  const estado = ESTADO_DE_STATE[state] || 'idle';
+  const estadoRig = ESTADO_DE_STATE[state] || 'idle';
 
   return (
     <svg
@@ -69,8 +72,10 @@ export function ChivitoPunk({
       role="img"
       aria-label={title}
       data-creature={CHIVITO_SLUG}
-      data-estado={estado}
-      data-visema={state === 'speaking' ? 'V2' : undefined}
+      data-estado={estadoRig}
+      data-agt-estado={estado || state}
+      data-pose={pose}
+      data-visema={visema ?? (state === 'speaking' ? 'V2' : undefined)}
       {...rest}
     >
       <title>{title}</title>

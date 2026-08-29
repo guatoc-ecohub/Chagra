@@ -61,6 +61,9 @@ export default function ChagraAgentAvatarAngelita({
     gafas = false,
     cejas = undefined,
     title = undefined,
+    'data-agt-estado': dataEstado = undefined,
+    'data-pose': dataPose = undefined,
+    'data-visema': dataVisema = undefined,
     // Presencia (pedido operador 2026-08-24): con reaccionaPresencia, Angelita
     // se mueve a su estado natural (idle vivo 'acompana') cuando la persona
     // hace mouse over o toca la pantalla — sin pisar un estado activo real.
@@ -98,6 +101,11 @@ export default function ChagraAgentAvatarAngelita({
             className={`${glow ? 'agt-avatar-glow ' : ''}${className}`.trim() || undefined}
             title={title || ariaLabel}
             {...rest}
+            // Los atributos visuales del dispatcher son contrato de salida,
+            // por eso quedan después de cualquier prop residual.
+            data-agt-estado={dataEstado}
+            data-pose={dataPose}
+            data-visema={dataVisema}
         />
     );
 

@@ -269,6 +269,9 @@ export function Angelita({
      (CEJAS_DE_ESTADO — el que habla hace eyebrow-flash, la contenta arquea). */
   cejas = undefined,
   title = undefined,
+  'data-agt-estado': dataEstado = undefined,
+  'data-pose': dataPose = undefined,
+  'data-visema': dataVisema = undefined,
   ...rest
 }) {
   const e = estadoCanonico(estado);
@@ -605,7 +608,6 @@ export function Angelita({
       role="img"
       aria-label={aria}
       data-agente="angelita"
-      data-agt-estado={e}
       data-agt-direccion={direccion}
       data-agt-vivo={vivo ? '1' : undefined}
       /* El visema del TTS también en el root: el CSS acopla las ondas de miel
@@ -616,6 +618,11 @@ export function Angelita({
       data-agt-confianza={nivel || undefined}
       data-tier={tier || undefined}
       {...rest}
+      // El caller puede proyectar un estado transversal como locomoción sin
+      // ampliar el vocabulario conversacional interno de Angelita.
+      data-agt-estado={dataEstado ?? e}
+      data-pose={dataPose ?? (vivo ? pose : undefined)}
+      data-visema={dataVisema ?? visema ?? undefined}
     >
       <title>{aria}</title>
       {halo}

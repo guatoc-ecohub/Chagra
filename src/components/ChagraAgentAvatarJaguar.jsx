@@ -30,6 +30,8 @@ const VISEMA_DE_STATE = {
 
 export default function ChagraAgentAvatarJaguar({
     state = 'idle',
+    estado = undefined,
+    visema: visemaRecibido = null,
     size = 48,
     withLabel = false,
     onClick = undefined,
@@ -42,6 +44,9 @@ export default function ChagraAgentAvatarJaguar({
     // (tier), y no debe descartarlos donde el host los cablea.
     animated = true,
     tier = undefined,
+    'data-agt-estado': dataEstado = undefined,
+    'data-pose': dataPose = undefined,
+    'data-visema': dataVisema = undefined,
     // Presencia (pedido operador 2026-08-24, transversal al elenco): con
     // reaccionaPresencia el jaguar DESPIERTA a su estado natural (idle vivo:
     // useVidaIdle 70/30 — acecha/ruge/reposo) cuando la persona hace mouse
@@ -55,9 +60,10 @@ export default function ChagraAgentAvatarJaguar({
     // La presencia solo despierta cuando el estado es pasivo (idle): jamás
     // interrumpe una actuación conversacional. El jaguar ya está vivo en idle
     // (idle-cerebro), así que despertar = garantizar animated ON + su idle.
-    const despiertaNatural = despierta && esPasivo(state);
+    const estadoAgente = estado || state;
+    const despiertaNatural = despierta && esPasivo(estadoAgente);
     const estadoEfectivo = despiertaNatural ? 'idle' : state;
-    const visema = VISEMA_DE_STATE[estadoEfectivo] || null;
+    const visema = visemaRecibido ?? VISEMA_DE_STATE[estadoEfectivo] ?? null;
 
     const bicho = (
         <JaguarTrazado
@@ -69,6 +75,9 @@ export default function ChagraAgentAvatarJaguar({
             title={ariaLabel}
             className={className}
             style={glow ? { filter: 'drop-shadow(0 0 10px rgba(168,85,247,0.65))' } : undefined}
+            data-agt-estado={dataEstado || estadoAgente}
+            data-pose={dataPose}
+            data-visema={dataVisema || visema || undefined}
         />
     );
 

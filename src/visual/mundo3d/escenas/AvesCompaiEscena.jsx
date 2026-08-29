@@ -14,13 +14,26 @@ import { ChivitoPunk } from '../../creatures/ChivitoPunk.jsx';
 import { GUACAMAYA_PRESENCIA } from '../../creatures/guacamayaIdentidad.js';
 import { CHIVITO_PRESENCIA } from '../../creatures/chivitoIdentidad.js';
 import { useLipSync } from '../../creatures/useLipSync.js';
+import { idleDeCreature, IDLE_PERFILES } from '../../creatures/creatureIdle.js';
 
 const VELOCIDAD = 0.42;
 const _destino = new THREE.Vector3();
 
-function useVueloAve(foco, { reducedMotion = false, entrando = true, saliendo = false } = {}) {
+/**
+ * @param {THREE.Vector3} foco
+ * @param {{especie?:string,reducedMotion?:boolean,entrando?:boolean,saliendo?:boolean,hora?:string,tier?:string}} opciones
+ */
+function useVueloAve(foco, {
+  especie = 'guacamaya',
+  reducedMotion = false,
+  entrando = true,
+  saliendo = false,
+  hora = 'dorada',
+  tier = 'alto',
+} = {}) {
   const ref = useRef(null);
   const caraRef = useRef(null);
+  const idleRef = useRef(null);
   const nacioEn = useRef(null);
   const salioEn = useRef(null);
   const prevX = useRef(foco.x);
@@ -33,10 +46,12 @@ function useVueloAve(foco, { reducedMotion = false, entrando = true, saliendo = 
     const t = state.clock.elapsedTime;
     const dt = Math.min(delta || 0.016, 0.05);
     if (nacioEn.current === null) nacioEn.current = t;
+    const idle = idleDeCreature(t, { especie, hora, reducedMotion, tier });
     if (saliendo && salioEn.current === null) salioEn.current = t;
     const destino = _destino.set(
       foco.x + (saliendo ? -2.5 : entrando ? 0.5 : 0.35 + Math.sin(t * 0.23) * 0.9),
-      foco.y + (saliendo ? 0.72 : entrando ? 0.9 : 1.25 + Math.sin(t * 0.31) * 0.18),
+      foco.y + (saliendo ? 0.72 : entrando ? 0.9 : 1.25 + Math.sin(t * 0.31) * 0.18)
+        + idle.dy - idle.posada * 0.22,
       foco.z + (saliendo ? 0.55 : entrando ? 0.55 : 0.55 + Math.cos(t * 0.23) * 0.55),
     );
     ref.current.position.lerp(destino, VELOCIDAD * dt);
@@ -70,45 +85,66 @@ function useVueloAve(foco, { reducedMotion = false, entrando = true, saliendo = 
         caraRef.current.style.opacity = valor;
       }
     }
+    if (idleRef.current) {
+      idleRef.current.style.transform = `rotate(${idle.rot.toFixed(1)}deg) scale(${idle.sx.toFixed(3)},${idle.sy.toFixed(3)})`;
+      if (idleRef.current.dataset.pose !== idle.pose) idleRef.current.dataset.pose = idle.pose;
+    }
     state.invalidate();
   });
 
-  return { ref, caraRef };
+  return { ref, caraRef, idleRef };
 }
 
-function AveCompai({ tipo, foco, entrando, saliendo = false, reducedMotion, hablando, energia = 1, tier = 'alto' }) {
+function AveCompai({
+  tipo,
+  foco,
+  entrando,
+  saliendo = false,
+  reducedMotion,
+  hablando,
+  energia = 1,
+  tier = 'alto',
+  hora = 'dorada',
+}) {
   const esGuacamaya = tipo === 'guacamaya';
   const presencia = esGuacamaya ? GUACAMAYA_PRESENCIA : CHIVITO_PRESENCIA;
-  const { ref, caraRef } = useVueloAve(foco, { entrando, saliendo, reducedMotion });
+  const { ref, caraRef, idleRef } = useVueloAve(foco, {
+    especie: tipo, entrando, saliendo, reducedMotion, hora, tier,
+  });
   const { visema } = useLipSync({ activo: !reducedMotion });
   const size = presencia.billboardBase + Math.round(energia * presencia.billboardPorEnergia);
   const state = hablando && !reducedMotion ? 'speaking' : 'idle';
-  const origen = useMemo(() => [
-    foco.x + presencia.percha.x,
-    foco.y + presencia.percha.y,
-    foco.z + presencia.percha.z,
-  ], [foco, presencia]);
+  const origen = useMemo(
+    () => /** @type {[number, number, number]} */ ([
+      foco.x + presencia.percha.x,
+      foco.y + presencia.percha.y,
+      foco.z + presencia.percha.z,
+    ]),
+    [foco, presencia],
+  );
 
   return (
     <group ref={ref} position={origen}>
       <Html center distanceFactor={presencia.distancia} zIndexRange={[40, 10]}>
         <div ref={caraRef} className="mundo-abeja" aria-hidden="true" data-creature={tipo}>
-          {esGuacamaya ? (
-            <GuacamayaCompai
-              state={state}
-              visema={reducedMotion ? null : visema}
-              size={size}
-              animated={!reducedMotion}
-              tier={tier}
-              title="Guacamaya"
-            />
-          ) : (
-            <ChivitoPunk
-              state={state}
-              size={size}
-              title="Chivito"
-            />
-          )}
+          <div ref={idleRef} data-pose={IDLE_PERFILES[tipo]?.poseBase || 'vuela'}>
+            {esGuacamaya ? (
+              <GuacamayaCompai
+                state={state}
+                visema={reducedMotion ? null : visema}
+                size={size}
+                animated={!reducedMotion}
+                tier={tier}
+                title="Guacamaya"
+              />
+            ) : (
+              <ChivitoPunk
+                state={state}
+                size={size}
+                title="Chivito"
+              />
+            )}
+          </div>
         </div>
       </Html>
     </group>
