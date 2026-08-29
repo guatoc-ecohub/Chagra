@@ -38,6 +38,18 @@ vi.mock('../WelcomeStatsHero', () => ({
 vi.mock('../LegalLinks', () => ({
   default: () => <div data-testid="legal-links">legal</div>,
 }));
+vi.mock('../../visual/effects', () => ({
+  CirculoRotoMilpa: ({ trigger, onRupturaCompleta, className, children }) => (
+    <div data-testid="circulo-roto-milpa" data-fase="quieta" className={className}>
+      {children}
+    </div>
+  ),
+}));
+vi.mock('../../visual/agente/AngelitaSalida.jsx', () => ({
+  default: ({ activa, onIdo, size, title }) => (
+    <div data-agente="angelita" data-activa={activa}>{title}</div>
+  ),
+}));
 
 import LoginScreen from '../LoginScreen';
 import { authenticateUser } from '../../services/authService';
@@ -46,8 +58,8 @@ import { setCurrentOperator } from '../../services/operatorIdentityService';
 function setup() {
   const onLoginSuccess = vi.fn();
   const onSave = vi.fn();
-  render(<LoginScreen onLoginSuccess={onLoginSuccess} onSave={onSave} />);
-  return { onLoginSuccess, onSave };
+  const { container } = render(<LoginScreen onLoginSuccess={onLoginSuccess} onSave={onSave} />);
+  return { onLoginSuccess, onSave, container };
 }
 
 describe('LoginScreen — render y accesibilidad', () => {
@@ -75,6 +87,14 @@ describe('LoginScreen — render y accesibilidad', () => {
     expect(screen.getByText(/Software libre/i)).toBeInTheDocument();
     expect(screen.getByTestId('welcome-stats-hero')).toBeInTheDocument();
     expect(screen.getByTestId('legal-links')).toBeInTheDocument();
+  });
+
+  it('monta el círculo de la milpa con una sola Angelita en la ranura', () => {
+    const { container } = setup();
+    const circulo = screen.getByTestId('circulo-roto-milpa');
+    expect(circulo).toHaveAttribute('data-fase', 'quieta');
+    expect(circulo.querySelectorAll('[data-agente="angelita"]')).toHaveLength(1);
+    expect(container.querySelectorAll('[data-compai-draggable]')).toHaveLength(0);
   });
 
   it('el botón mostrar/ocultar contraseña alterna el tipo del campo (usted)', () => {
