@@ -543,7 +543,8 @@ export default function FincaVivaHero({ onNavigate, onOpenAgent, onGestionar, on
         <main className="fvh-main">
           {/* ── ESCENA ISOMÉTRICA (o slot institucional) ────────────────────── */}
           <div className={`fvh-escena-wrap${escenaVivaActiva ? ' fvh-escena-wrap--viva' : ''}${organismoActivo ? ' fvh-escena-wrap--organismo' : ''}`}>
-            <div className="fvh-escena">
+            <ValleHomeGateway onNavigate={onNavigate} enabled={tieneFincaPropia && escala === 'finca'}>
+              <div className="fvh-escena">
               {/* globo del agente colibrí */}
               <button
                 type="button"
@@ -618,7 +619,8 @@ export default function FincaVivaHero({ onNavigate, onOpenAgent, onGestionar, on
               ) : (
                 <div className="fvh-institucional">{children}</div>
               )}
-            </div>
+              </div>
+            </ValleHomeGateway>
 
             {/* [ARCHIVADO 2026-08-26] Aquí iba el PANEL DE VITALIDAD DEL
                 ESPÍRITU, debajo de la escena. Desmontado del home 2D por orden
@@ -729,13 +731,6 @@ export default function FincaVivaHero({ onNavigate, onOpenAgent, onGestionar, on
             a los mundos sigue por las puertas-cartas de abajo (PortalesMano) y
             MundosDeMiFinca. Componente en src/components/_archivado/.
             Ver ops/ARCHIVO-HOME-2D-20260826.md. */}
-
-        {/* LA PUERTA DEL VALLE (reintroducida 2026-08-27, decisión del
-            operador): ValleHomeGateway reemplaza al UmbralValle archivado —
-            teaser liviano con CUADROS REALES del valle en loop + entrada New
-            Donk al valle 3D. Solo con finca propia: la RED institucional del
-            extensionista no es un valle. */}
-        {tieneFincaPropia && <ValleHomeGateway onNavigate={onNavigate} />}
 
         {/* ── LAS 6 PUERTAS como CARTAS EN LA MANO (usabilidad campesina #5 +
             FABLE_50 §A6). Antes: tarjetas planas con emoji. Ahora: viñetas de

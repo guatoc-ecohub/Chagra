@@ -1,9 +1,9 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { ArrowUpRight, Sparkles } from 'lucide-react';
+/* eslint-disable chagra-i18n/no-hardcoded-spanish -- copy visible de esta
+ * interacción puntual, fuera del alcance de la migración i18n ADR-050. */
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { ArrowUpRight, Sparkles, X } from 'lucide-react';
 import { TransicionNewDonk } from '../../visual/mundo3d/index.js';
 import {
-  VALLE_AUTO_DELAY_MS,
-  VALLE_TEASER_MS,
   VALLE_TEASER_FRAMES,
   precargarFramesTeaser,
   preloadValleMarco,
@@ -21,149 +21,154 @@ function navegarAlValle(onNavigate) {
 }
 
 /**
- * Puerta compartida por las dos portadas de finca: FincaVivaHero y la tarjeta
- * legacy MiFincaVivaHomeCard.
+ * Capa de entrada al valle sobre el frame vivo de la finca.
  *
- * El auto-teaser muestra CUADROS REALES del valle 3D (GPU-capturados, webp
- * livianos en public/valle-teaser/) — no una postal CSS. Rota entre los cuadros
- * en cada aparición y los precarga en idle: nunca descarga la escena 3D pesada.
- * La entrada de la persona sí usa la transición New Donk completa y solo
- * entonces prepara el destino.
+ * La escena que recibe como children conserva su animación y sus controles. La
+ * puerta solo se hace visible cuando una persona pasa el mouse, toca o enfoca
+ * el frame. Los cuadros del valle son referencias públicas livianas, no parte
+ * del bundle de la escena 3D.
+ *
+ * @param {object} props
+ * @param {React.ReactNode} props.children frame animado de la finca
+ * @param {Function} [props.onNavigate] navegación de la app
+ * @param {boolean} [props.enabled] activa la puerta para este frame
+ * @param {boolean} [props.compact] variante para una tarjeta compacta
  */
-export default function ValleHomeGateway({ onNavigate, compact = false }) {
-  const [fase, setFase] = useState('reposo'); // reposo | teaser | entrando
-  const [teaserFrame, setTeaserFrame] = useState(0); // cuadro real visible
-  const timerRef = useRef(null);
-  const reducedMotion = useMemo(
-    () => typeof window !== 'undefined'
+export default function ValleHomeGateway({ children, onNavigate, enabled = true }) {
+  const [fase, setFase] = useState('reposo'); // reposo | teaser | confirmando | entrando
+  const [confirmOpen, setConfirmOpen] = useState(false);
+  const [reducedMotion] = useState(() => (
+    typeof window !== 'undefined'
       && typeof window.matchMedia === 'function'
-      && window.matchMedia('(prefers-reduced-motion: reduce)').matches,
-    [],
-  );
+      && window.matchMedia('(prefers-reduced-motion: reduce)').matches
+  ));
+  const confirmarRef = useRef(null);
 
-  const limpiarTimer = useCallback(() => {
-    if (timerRef.current) {
-      clearTimeout(timerRef.current);
-      timerRef.current = null;
-    }
+  const revelar = useCallback(() => {
+    if (!enabled || fase === 'entrando' || confirmOpen) return;
+    precargarFramesTeaser();
+    setFase('teaser');
+  }, [confirmOpen, enabled, fase]);
+
+  const ocultar = useCallback(() => {
+    if (enabled && !confirmOpen && fase !== 'entrando') setFase('reposo');
+  }, [confirmOpen, enabled, fase]);
+
+  const pedirConfirmacion = useCallback(() => {
+    setConfirmOpen(true);
+    setFase('confirmando');
   }, []);
 
-  // Precarga perezosa de los cuadros reales: en idle, jamas en el primer paint.
-  useEffect(() => {
-    if (reducedMotion) return undefined;
-    const idle = typeof window !== 'undefined' && typeof window.requestIdleCallback === 'function';
-    const id = idle
-      ? window.requestIdleCallback(precargarFramesTeaser, { timeout: 3000 })
-      : setTimeout(precargarFramesTeaser, 1500);
-    return () => {
-      if (idle && typeof window.cancelIdleCallback === 'function') window.cancelIdleCallback(id);
-      else clearTimeout(id);
-    };
-  }, [reducedMotion]);
+  const cancelar = useCallback(() => {
+    setConfirmOpen(false);
+    setFase('reposo');
+  }, []);
 
-  useEffect(() => {
-    if (reducedMotion) return undefined;
-    let activo = true;
-    const programar = () => {
-      timerRef.current = setTimeout(() => {
-        if (!activo) return;
-        setFase('teaser');
-        timerRef.current = setTimeout(() => {
-          if (!activo) return;
-          setFase('reposo');
-          // Rota al siguiente cuadro real mientras el teaser esta oculto: sin
-          // parpadeo, y en 3 apariciones se ven los tres cuadros del valle.
-          setTeaserFrame((i) => (i + 1) % VALLE_TEASER_FRAMES.length);
-          programar();
-        }, VALLE_TEASER_MS);
-      }, VALLE_AUTO_DELAY_MS);
-    };
-    programar();
-    return () => {
-      activo = false;
-      limpiarTimer();
-    };
-  }, [limpiarTimer, reducedMotion]);
-
-  const entrar = useCallback(() => {
-    if (fase === 'entrando') return;
-    limpiarTimer();
+  const confirmarEntrada = useCallback(() => {
+    setConfirmOpen(false);
     setFase('entrando');
-    // La importación ocurre por gesto explícito, nunca en el primer paint.
     preloadValleMarco();
-  }, [fase, limpiarTimer]);
+  }, []);
+
+  useEffect(() => {
+    if (!confirmOpen) return undefined;
+
+    const previousFocus = document.activeElement;
+    confirmarRef.current?.focus();
+    const onKeyDown = (event) => {
+      if (event.key === 'Escape') cancelar();
+    };
+    document.addEventListener('keydown', onKeyDown);
+
+    return () => {
+      document.removeEventListener('keydown', onKeyDown);
+      previousFocus?.focus?.();
+    };
+  }, [cancelar, confirmOpen]);
 
   const terminarEntrada = useCallback(() => {
     navegarAlValle(onNavigate);
   }, [onNavigate]);
 
+  if (!enabled) return children;
+
   return (
     <section
-      className={`vhw${compact ? ' vhw--compact' : ''}`}
+      className="vhw vhw--frame"
       data-testid="valle-home-gateway"
       data-fase={fase}
       aria-label="Entrada al valle de su finca"
+      onMouseEnter={revelar}
+      onMouseLeave={ocultar}
+      onPointerDown={revelar}
+      onTouchStart={revelar}
+      onFocusCapture={revelar}
     >
-      <button
-        type="button"
-        className="vhw__portal"
-        onClick={entrar}
-        disabled={fase === 'entrando'}
-        aria-label="Entrar al valle de su finca en 3D"
-      >
-        <span className="vhw__sky" aria-hidden="true">
-          <span className="vhw__aurora" />
-          <span className="vhw__moon" />
-          <span className="vhw__ridge vhw__ridge--far" />
-          <span className="vhw__ridge vhw__ridge--near" />
-          <span className="vhw__house">
-            <i className="vhw__roof" />
-            <i className="vhw__window" />
-          </span>
-          <span className="vhw__river" />
-          <span className="vhw__firefly vhw__firefly--one" />
-          <span className="vhw__firefly vhw__firefly--two" />
-        </span>
-        <span className="vhw__copy">
-          <span className="vhw__kicker"><Sparkles size={13} aria-hidden="true" /> Su valle vivo</span>
-          <strong>Caminar el valle</strong>
-          <small>Entre a su finca en 3D</small>
-        </span>
-        <span className="vhw__arrow" aria-hidden="true"><ArrowUpRight size={21} /></span>
-      </button>
+      <div className="vhw__frame">{children}</div>
 
-      {fase === 'teaser' && (
-        <button
-          type="button"
-          className="vhw__teaser"
-          data-testid="valle-home-teaser"
-          onClick={entrar}
-          aria-label="Entrar al valle de su finca en 3D"
-        >
-          <div className="vhw__teaser-rays" aria-hidden="true">
-            <i /><i /><i /><i /><i /><i /><i /><i />
-          </div>
+      {(fase === 'teaser' || fase === 'confirmando') && (
+        <div className="vhw__teaser" data-testid="valle-home-teaser">
+          <div className="vhw__teaser-backdrop" aria-hidden="true" />
           <div className="vhw__teaser-window" aria-hidden="true">
-            {/* CUADRO REAL del valle 3D (no postal CSS). El fondo-gradiente de la
-                ventana queda como fallback si la imagen no carga. */}
-            <img
-              key={teaserFrame}
-              className="vhw__teaser-frame"
-              src={VALLE_TEASER_FRAMES[teaserFrame]}
-              alt=""
-              loading="lazy"
-              decoding="async"
-              onError={(e) => { e.currentTarget.style.display = 'none'; }}
-            />
+            {VALLE_TEASER_FRAMES.map((frame, index) => (
+              <img
+                key={frame}
+                className="vhw__teaser-frame"
+                src={frame}
+                alt=""
+                loading={index === 0 ? 'eager' : 'lazy'}
+                decoding="async"
+                onError={(event) => { event.currentTarget.style.display = 'none'; }}
+              />
+            ))}
           </div>
-          <p><Sparkles size={16} aria-hidden="true" /> El valle le está llamando</p>
-        </button>
+          <div className="vhw__teaser-copy">
+            <span><Sparkles size={15} aria-hidden="true" /> Tres vistas reales del valle</span>
+            <strong>Entrá al valle 3D</strong>
+            <small>Hacé clic o tocá para mirar adentro</small>
+          </div>
+          <button
+            type="button"
+            className="vhw__invite"
+            data-testid="valle-home-invite"
+            onClick={pedirConfirmacion}
+            aria-label="Entrá al valle 3D"
+          >
+            Entrá al valle 3D
+            <ArrowUpRight size={19} aria-hidden="true" />
+          </button>
+        </div>
+      )}
+
+      {confirmOpen && (
+        <div className="vhw__dialog-backdrop" role="presentation">
+          <div
+            className="vhw__dialog"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="valle-home-confirm-title"
+            aria-describedby="valle-home-confirm-copy"
+            data-testid="valle-home-confirm"
+          >
+            <button type="button" className="vhw__dialog-close" onClick={cancelar} aria-label="Cerrar diálogo">
+              <X size={20} aria-hidden="true" />
+            </button>
+            <span className="vhw__dialog-kicker"><Sparkles size={15} aria-hidden="true" /> Entrada guiada</span>
+            <h2 id="valle-home-confirm-title">¿Entrar al valle 3D?</h2>
+            <p id="valle-home-confirm-copy">La finca queda aquí mientras recorres el valle.</p>
+            <div className="vhw__dialog-actions">
+              <button type="button" onClick={cancelar}>Cancelar</button>
+              <button type="button" ref={confirmarRef} onClick={confirmarEntrada}>Confirmar</button>
+            </div>
+          </div>
+        </div>
       )}
 
       {fase === 'entrando' && (
         <TransicionNewDonk
           mundoId="valle"
           destinoLabel="El valle de su finca"
+          reducedMotion={reducedMotion}
           onMitad={preloadValleMarco}
           onFin={terminarEntrada}
         />

@@ -1,122 +1,177 @@
-/* La puerta del valle: portal 2D liviano, con atmósfera de póster nocturno. */
+/* La finca vieja permanece visible y sin velo en reposo. Esta capa solo se
+   pinta después de que la persona pasa el mouse, toca o enfoca el frame. */
 .vhw {
   position: relative;
-  z-index: 3;
-  width: min(100% - 2rem, 34rem);
-  margin: 1rem auto 0;
-  color: #f4f7e8;
+  min-width: 0;
 }
 
-.vhw__portal {
-  position: relative;
+.vhw__frame { position: relative; min-width: 0; }
+
+.vhw__teaser {
+  position: absolute;
+  z-index: 12;
+  inset: 0;
   display: grid;
-  grid-template-columns: 7.2rem 1fr auto;
+  grid-template-columns: minmax(7rem, 11rem) minmax(0, 1fr) auto;
+  align-content: center;
   align-items: center;
-  gap: 0.9rem;
-  width: 100%;
-  min-height: 8.2rem;
-  padding: 0.65rem 0.8rem 0.65rem 0.65rem;
+  gap: clamp(0.7rem, 2vw, 1rem);
+  padding: clamp(1rem, 4vw, 2rem);
   overflow: hidden;
-  border: 1px solid rgb(201 239 158 / 0.42);
-  border-radius: 1.5rem;
-  background: linear-gradient(115deg, rgb(8 30 41 / 0.96), rgb(23 54 46 / 0.92));
-  color: inherit;
-  text-align: left;
-  cursor: pointer;
-  box-shadow: 0 1.1rem 2.8rem rgb(3 13 18 / 0.24), inset 0 0 0 1px rgb(255 255 255 / 0.08);
-  transition: transform 180ms ease, border-color 180ms ease, box-shadow 180ms ease;
+  background: linear-gradient(180deg, rgb(6 20 31 / 0.08), rgb(6 20 31 / 0.64));
+  animation: vhw-invite-in 180ms ease-out both;
 }
 
-.vhw__portal::before {
+.vhw__teaser-backdrop {
   position: absolute;
   inset: 0;
-  content: '';
-  background: radial-gradient(circle at 70% 8%, rgb(250 203 118 / 0.3), transparent 35%), linear-gradient(135deg, transparent 30%, rgb(110 223 174 / 0.07));
+  background: radial-gradient(circle at 50% 40%, rgb(255 224 143 / 0.18), transparent 48%);
   pointer-events: none;
 }
 
-.vhw__portal:hover,
-.vhw__portal:focus-visible {
-  border-color: rgb(239 220 147 / 0.88);
-  box-shadow: 0 1.25rem 3.2rem rgb(3 13 18 / 0.34), 0 0 0 3px rgb(222 244 162 / 0.14);
-  transform: translateY(-2px);
-}
-
-.vhw__portal:active { transform: translateY(1px) scale(0.99); }
-.vhw__portal:disabled { cursor: wait; }
-
-.vhw__sky {
+.vhw__teaser-window {
   position: relative;
-  display: block;
-  height: 6.8rem;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: 1.45fr 1fr;
+  grid-template-rows: 1fr 1fr;
+  gap: 0.25rem;
+  height: 5.3rem;
   overflow: hidden;
-  border: 1px solid rgb(255 239 178 / 0.34);
-  border-radius: 1rem;
-  background: linear-gradient(180deg, #19294f 0%, #426c70 61%, #a6b96b 62%, #304f38 100%);
-  isolation: isolate;
+  border: 0.28rem solid #eedb9d;
+  border-radius: 0.9rem;
+  background: #19294f;
+  box-shadow: 0 0.8rem 2rem rgb(0 0 0 / 0.3), 0 0 1.5rem rgb(255 214 127 / 0.25);
 }
 
-.vhw__aurora { position: absolute; inset: 0 0 43%; background: radial-gradient(ellipse at 72% 16%, rgb(255 206 116 / 0.72), transparent 18%), linear-gradient(165deg, transparent 16%, rgb(149 100 184 / 0.28) 52%, transparent 75%); }
-.vhw__moon { position: absolute; top: 0.72rem; right: 0.7rem; width: 1.25rem; height: 1.25rem; border-radius: 50%; background: #f5e8be; box-shadow: 0 0 0 0.35rem rgb(245 232 190 / 0.12), 0 0 1.3rem rgb(244 205 117 / 0.55); }
-.vhw__ridge { position: absolute; bottom: 2.65rem; display: block; width: 120%; height: 3.1rem; transform: skewX(-18deg) rotate(-7deg); transform-origin: bottom; }
-.vhw__ridge--far { left: -1.1rem; background: #435a70; clip-path: polygon(0 75%, 22% 20%, 39% 60%, 58% 10%, 77% 58%, 100% 28%, 100% 100%, 0 100%); opacity: 0.88; }
-.vhw__ridge--near { left: -0.4rem; bottom: 2rem; background: #365d47; clip-path: polygon(0 70%, 19% 40%, 33% 62%, 55% 14%, 75% 55%, 100% 34%, 100% 100%, 0 100%); }
-.vhw__house { position: absolute; right: 1rem; bottom: 2.35rem; display: block; width: 1.25rem; height: 1.1rem; border: 2px solid #f2e5c5; background: #b36c46; }
-.vhw__roof { position: absolute; top: -0.48rem; left: -0.22rem; width: 1.55rem; height: 0.6rem; background: #a34f3d; clip-path: polygon(50% 0, 100% 100%, 0 100%); }
-.vhw__window { position: absolute; top: 0.23rem; left: 0.4rem; width: 0.35rem; height: 0.35rem; background: #ffe59c; box-shadow: 0 0 0.7rem #ffe59c; }
-.vhw__river { position: absolute; right: -0.4rem; bottom: 0.35rem; width: 80%; height: 1.3rem; background: #72b8bd; clip-path: polygon(0 58%, 42% 28%, 100% 62%, 100% 100%, 15% 100%); opacity: 0.78; }
-.vhw__firefly { position: absolute; z-index: 2; width: 0.28rem; height: 0.28rem; border-radius: 50%; background: #ffe6a4; box-shadow: 0 0 0.55rem 0.18rem rgb(255 226 142 / 0.64); animation: vhw-glow 2.8s ease-in-out infinite; }
-.vhw__firefly--one { right: 2.8rem; bottom: 2.1rem; }
-.vhw__firefly--two { right: 4.1rem; bottom: 1.2rem; animation-delay: -1.3s; }
+.vhw__teaser-window::after {
+  position: absolute;
+  inset: 0;
+  content: '';
+  background: linear-gradient(145deg, transparent 35%, rgb(255 241 191 / 0.26) 48%, transparent 60%);
+  pointer-events: none;
+}
 
-.vhw__copy { position: relative; display: flex; flex-direction: column; gap: 0.1rem; min-width: 0; }
-.vhw__kicker { display: inline-flex; align-items: center; gap: 0.3rem; color: #e6d28b; font-size: 0.7rem; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; }
-.vhw__copy strong { margin-top: 0.2rem; color: #fff9dd; font-family: 'Baloo 2', system-ui, sans-serif; font-size: clamp(1.12rem, 4vw, 1.45rem); line-height: 1.05; }
-.vhw__copy small { color: rgb(231 242 214 / 0.74); font-size: 0.78rem; font-weight: 700; }
-.vhw__arrow { position: relative; display: grid; place-items: center; width: 2.65rem; height: 2.65rem; border-radius: 50%; background: #f1d58c; color: #183c35; box-shadow: 0 0 0 0.35rem rgb(241 213 140 / 0.12); }
+.vhw__teaser-frame {
+  width: 100%;
+  height: 100%;
+  min-width: 0;
+  object-fit: cover;
+}
+.vhw__teaser-frame:first-child { grid-row: 1 / -1; }
 
-.vhw--compact { width: 100%; margin-top: 0.9rem; }
-.vhw--compact .vhw__portal { grid-template-columns: 5.6rem 1fr auto; min-height: 6.6rem; border-radius: 1.1rem; }
-.vhw--compact .vhw__sky { height: 5.3rem; }
-.vhw--compact .vhw__copy strong { font-size: 1rem; }
-.vhw--compact .vhw__copy small { font-size: 0.7rem; }
+.vhw__teaser-copy {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.16rem;
+  min-width: 0;
+  color: #fff9dd;
+  text-shadow: 0 1px 0.7rem rgb(0 0 0 / 0.4);
+}
+.vhw__teaser-copy span,
+.vhw__dialog-kicker {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  color: #f3d77f;
+  font-size: 0.67rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.vhw__teaser-copy strong { font-size: clamp(1rem, 3vw, 1.45rem); line-height: 1.05; }
+.vhw__teaser-copy small { color: rgb(231 242 214 / 0.82); font-size: 0.76rem; font-weight: 700; }
 
-.vhw__teaser { position: fixed; z-index: 38; inset: 0; display: grid; place-items: center; overflow: hidden; border: 0; padding: 0; background: radial-gradient(circle at 50% 70%, rgb(255 221 139 / 0.98) 0%, rgb(117 86 117 / 0.96) 24%, rgb(8 23 38 / 0.98) 72%); color: inherit; cursor: pointer; animation: vhw-teaser-in 0.55s ease both; }
-.vhw__teaser::before { position: absolute; inset: 0; content: ''; background: radial-gradient(ellipse at center, transparent 0 22%, rgb(6 17 31 / 0.26) 58%, rgb(3 10 21 / 0.82) 100%); }
-.vhw__teaser-rays { position: absolute; inset: -20%; animation: vhw-rays 4.6s ease-out both; }
-.vhw__teaser-rays i { position: absolute; left: 50%; top: 50%; width: 0.55rem; height: 75%; border-radius: 999px; background: linear-gradient(180deg, transparent, rgb(255 239 176 / 0.98) 40%, transparent); transform-origin: 50% 0; filter: drop-shadow(0 0 0.8rem rgb(255 222 138 / 0.78)); }
-.vhw__teaser-rays i:nth-child(1) { transform: rotate(0deg) translateY(-15%); }
-.vhw__teaser-rays i:nth-child(2) { transform: rotate(28deg) translateY(-15%); }
-.vhw__teaser-rays i:nth-child(3) { transform: rotate(58deg) translateY(-15%); }
-.vhw__teaser-rays i:nth-child(4) { transform: rotate(92deg) translateY(-15%); }
-.vhw__teaser-rays i:nth-child(5) { transform: rotate(128deg) translateY(-15%); }
-.vhw__teaser-rays i:nth-child(6) { transform: rotate(160deg) translateY(-15%); }
-.vhw__teaser-rays i:nth-child(7) { transform: rotate(204deg) translateY(-15%); }
-.vhw__teaser-rays i:nth-child(8) { transform: rotate(246deg) translateY(-15%); }
-.vhw__teaser-window { position: relative; width: min(76vw, 38rem); aspect-ratio: 1.45; overflow: hidden; border: 0.55rem solid #eedb9d; border-radius: 1.6rem; background: linear-gradient(180deg, #1e2451, #d17b66 60%, #405d42 61%); box-shadow: 0 0 0 0.4rem rgb(25 15 33 / 0.5), 0 2rem 5rem rgb(0 0 0 / 0.5), 0 0 4rem rgb(255 214 127 / 0.48); animation: vhw-window 4.6s cubic-bezier(0.2, 0.8, 0.2, 1) both; }
-.vhw__teaser-window::before { position: absolute; inset: 0; z-index: 1; content: ''; background: linear-gradient(155deg, transparent 30%, rgb(255 241 191 / 0.34) 48%, transparent 59%); mix-blend-mode: screen; pointer-events: none; }
-/* CUADRO REAL del valle 3D (GPU-capturado). Cubre la ventana con object-fit y
-   un Ken-Burns lento; el gradiente de .vhw__teaser-window queda debajo como
-   fallback si la imagen no carga (onError la oculta). */
-.vhw__teaser-frame { position: absolute; inset: 0; z-index: 0; width: 100%; height: 100%; object-fit: cover; transform-origin: 52% 58%; animation: vhw-kenburns 4.6s ease-out both; }
-.vhw__teaser p { position: absolute; bottom: 9vh; display: inline-flex; align-items: center; gap: 0.45rem; margin: 0; color: #fff4cd; font-size: clamp(0.92rem, 3vw, 1.1rem); font-weight: 800; letter-spacing: 0.02em; text-shadow: 0 2px 1rem rgb(0 0 0 / 0.55); animation: vhw-copy-in 0.7s 0.4s ease both; }
+.vhw__invite {
+  position: relative;
+  z-index: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.3rem;
+  min-height: 2.75rem;
+  border: 0;
+  border-radius: 999px;
+  padding: 0.55rem 0.85rem;
+  background: #f1d58c;
+  color: #183c35;
+  font: inherit;
+  font-size: 0.82rem;
+  font-weight: 800;
+  cursor: pointer;
+  box-shadow: 0 0 0 0.3rem rgb(241 213 140 / 0.12);
+}
+.vhw__invite:hover,
+.vhw__invite:focus-visible { background: #fff0b8; }
 
-@keyframes vhw-glow { 0%, 100% { opacity: 0.42; transform: scale(0.76); } 50% { opacity: 1; transform: scale(1.25); } }
-@keyframes vhw-teaser-in { from { opacity: 0; } to { opacity: 1; } }
-@keyframes vhw-rays { from { transform: rotate(-10deg) scale(0.15); opacity: 0; } 32% { opacity: 1; } to { transform: rotate(10deg) scale(1.1); opacity: 0.66; } }
-@keyframes vhw-window { from { transform: scale(0.68) rotate(-2deg); opacity: 0; } 28% { opacity: 1; } 72% { transform: scale(1.06) rotate(1deg); } to { transform: scale(1) rotate(0); opacity: 0.86; } }
-@keyframes vhw-copy-in { from { opacity: 0; transform: translateY(0.6rem); } to { opacity: 1; transform: translateY(0); } }
-@keyframes vhw-kenburns { from { transform: scale(1.03); } to { transform: scale(1.11); } }
+.vhw__dialog-backdrop {
+  position: fixed;
+  z-index: 45;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: 1rem;
+  background: rgb(3 12 20 / 0.62);
+  backdrop-filter: blur(4px);
+}
+.vhw__dialog {
+  position: relative;
+  width: min(100%, 26rem);
+  padding: 1.5rem;
+  border: 1px solid rgb(247 229 157 / 0.72);
+  border-radius: 1.4rem;
+  background: linear-gradient(145deg, #102d37, #193e39);
+  color: #fff9dd;
+  box-shadow: 0 1.5rem 4rem rgb(0 0 0 / 0.42);
+}
+.vhw__dialog h2 { margin: 0.6rem 2rem 0.45rem 0; font-size: clamp(1.4rem, 5vw, 1.8rem); line-height: 1.1; }
+.vhw__dialog p { margin: 0; color: rgb(231 242 214 / 0.82); font-size: 0.92rem; line-height: 1.45; }
+.vhw__dialog-close {
+  position: absolute;
+  top: 0.8rem;
+  right: 0.8rem;
+  display: grid;
+  place-items: center;
+  width: 2.4rem;
+  height: 2.4rem;
+  border: 1px solid rgb(255 255 255 / 0.18);
+  border-radius: 50%;
+  background: transparent;
+  color: #fff9dd;
+  cursor: pointer;
+}
+.vhw__dialog-actions { display: flex; justify-content: flex-end; gap: 0.65rem; margin-top: 1.25rem; }
+.vhw__dialog-actions button {
+  min-height: 2.75rem;
+  border-radius: 999px;
+  padding: 0.55rem 0.85rem;
+  font: inherit;
+  font-size: 0.82rem;
+  font-weight: 800;
+  cursor: pointer;
+}
+.vhw__dialog-actions button:first-child { border: 1px solid rgb(255 255 255 / 0.3); background: transparent; color: #fff9dd; }
+.vhw__dialog-actions button:last-child { border: 0; background: #f1d58c; color: #183c35; }
+.vhw__dialog-actions button:first-child:hover,
+.vhw__dialog-actions button:first-child:focus-visible { background: rgb(255 255 255 / 0.1); }
+.vhw__dialog-actions button:last-child:hover,
+.vhw__dialog-actions button:last-child:focus-visible { background: #fff0b8; }
 
-@media (max-width: 430px) {
-  .vhw { width: min(100% - 1.25rem, 34rem); }
-  .vhw__portal { grid-template-columns: 5.8rem 1fr auto; gap: 0.65rem; min-height: 7.3rem; }
-  .vhw__sky { height: 5.9rem; }
-  .vhw__copy strong { font-size: 1.05rem; }
-  .vhw__copy small { font-size: 0.7rem; }
-  .vhw__kicker { font-size: 0.6rem; }
+@keyframes vhw-invite-in { from { opacity: 0; transform: scale(0.98); } to { opacity: 1; transform: scale(1); } }
+
+@media (min-width: 900px) {
+  .fvh-main > .vhw { flex: 1 1 60%; min-width: 0; }
+  .vhw__frame > .fvh-escena-wrap { height: 100%; }
+}
+
+@media (max-width: 560px) {
+  .vhw__teaser { grid-template-columns: 5.6rem minmax(0, 1fr); }
+  .vhw__teaser-window { height: 4.8rem; }
+  .vhw__invite { grid-column: 1 / -1; }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .vhw__portal, .vhw__firefly, .vhw__teaser, .vhw__teaser-rays, .vhw__teaser-window, .vhw__teaser-frame, .vhw__teaser p { animation: none; transition: none; }
+  .vhw__teaser { animation: none; }
 }

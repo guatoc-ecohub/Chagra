@@ -1,10 +1,6 @@
-export const VALLE_AUTO_DELAY_MS = 12000;
-export const VALLE_TEASER_MS = 4600;
-
 // FRAMES REALES del valle 3D (GPU-capturados del valle vivo, no una postal CSS).
-// Viven en public/valle-teaser/ como webp livianos (~50KB c/u): NUNCA entran al
-// bundle crítico; se piden por red, perezosos y en idle. Decisión del operador
-// 2026-08-27: el teaser del home usa cuadros reales del valle, no un mock.
+// Viven en public/valle-teaser/ como webp livianos y solo se piden al revelar la
+// invitación. No entran al bundle crítico.
 export const VALLE_TEASER_FRAMES = [
   '/valle-teaser/valle-teaser-1.webp',
   '/valle-teaser/valle-teaser-2.webp',
@@ -13,11 +9,7 @@ export const VALLE_TEASER_FRAMES = [
 
 let framesPrecargadas = false;
 
-/**
- * Precarga los cuadros del teaser UNA sola vez, en tiempo ocioso. No corre en el
- * primer paint del home ni entra al bundle: son peticiones de red de baja
- * prioridad para que el teaser (a los 12 s) aparezca ya cacheado.
- */
+/** Precarga los cuadros reales una sola vez, después de la interacción. */
 export function precargarFramesTeaser() {
   if (framesPrecargadas || typeof window === 'undefined' || typeof Image === 'undefined') return;
   framesPrecargadas = true;
@@ -30,10 +22,7 @@ export function precargarFramesTeaser() {
 
 let vallePreload = null;
 
-/**
- * Precalienta únicamente el módulo de destino. No se ejecuta al importar el
- * home: solo al entrar, o cuando la animación ya cubrió la pantalla.
- */
+/** Precalienta únicamente el módulo pesado después de una decisión explícita. */
 export function preloadValleMarco() {
   if (!vallePreload) {
     // La ruta permanece dinámica para que el valle pesado no entre al bundle
