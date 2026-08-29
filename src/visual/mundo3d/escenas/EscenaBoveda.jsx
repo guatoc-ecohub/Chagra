@@ -617,7 +617,7 @@ function CapaEnso({ climaLive, tier = 'alto', cima = 3.5, reducedMotion }) {
   );
 }
 
-function Diorama({ params, climaLive, reducedMotion, tier, fauna }) {
+function Diorama({ params, climaLive, reducedMotion, tier, fauna, viento }) {
   const hora = params?.hora ?? 0.62;
   const temporada = climaLive?.lluvia ? 'lluvia' : 'seca';
   const niebla = params?.niebla ?? 0.6;
@@ -692,7 +692,7 @@ function Diorama({ params, climaLive, reducedMotion, tier, fauna }) {
           />
         )}
 
-        {esDia && <Fauna items={fauna} reducedMotion={reducedMotion} />}
+        {esDia && <Fauna items={fauna} reducedMotion={reducedMotion} tier={tier} viento={viento} />}
       </group>
       {/* el fondo y la luz de cielo atardecen con el sol (no en hora fija) */}
       <CieloVivo hora={hora} reducedMotion={reducedMotion} />
@@ -734,7 +734,7 @@ export default function EscenaBoveda(props) {
       piso={DY - 0.04}
       entrada={{ ...props.entrada, zoom: props.entrada?.zoom ?? 7.5, centro: [0, 0.55, 0] }}
     >
-      <Diorama params={props.params} climaLive={props.climaLive} reducedMotion={props.reducedMotion} tier={props.tier} fauna={faunaDeMundo(props.mundoId, { tier: props.tier })} />
+      <Diorama params={props.params} climaLive={props.climaLive} reducedMotion={props.reducedMotion} tier={props.tier} fauna={faunaDeMundo(props.mundoId, { tier: props.tier })} viento={props.estadoFinca?.viento} />
     </EscenaBase3D>
   );
 }

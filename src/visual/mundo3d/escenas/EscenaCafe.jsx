@@ -158,7 +158,7 @@ function TrampaBroca({ pos }) {
   );
 }
 
-function Diorama({ tier, reducedMotion }) {
+function Diorama({ tier, reducedMotion, viento }) {
   const perfil = perfilDeTier(tier);
   const q = calidadCafetal(tier);
   const frugal = tier === 'bajo';
@@ -263,7 +263,7 @@ function Diorama({ tier, reducedMotion }) {
         ))}
 
       {/* LA VIDA que trae la sombra: colibríes y mariposas (café con hábitat) */}
-      {perfil.criaturas > 0 && <Fauna items={fauna} reducedMotion={reducedMotion} />}
+      {perfil.criaturas > 0 && <Fauna items={fauna} reducedMotion={reducedMotion} tier={tier} viento={viento} />}
     </group>
   );
 }
@@ -278,7 +278,7 @@ export default function EscenaCafe(props) {
          entre las copas del sombrío. */
       camara={props.camara || { position: CAMARA.reposo, fov: CAMARA.fov }}
     >
-      <Diorama tier={props.tier || 'alto'} reducedMotion={!!props.reducedMotion} />
+      <Diorama tier={props.tier || 'alto'} reducedMotion={!!props.reducedMotion} viento={props.estadoFinca?.viento} />
     </EscenaBase3D>
   );
 }

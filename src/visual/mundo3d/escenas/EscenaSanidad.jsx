@@ -79,11 +79,11 @@ function matasDecaidas(ratio, total) {
    larva o adulto come cientos de pulgones. Media esfera roja + cabeza + puntos.
    Como CONTROLADORA, PATRULLA las matas en zigzag buscando pulgón (misma
    coreografía de rol que la fauna billboard); se congela con reduced-motion. */
-function Mariquita({ pos, escala = 1, fase = 0, reducedMotion = false }) {
+function Mariquita({ pos, escala = 1, fase = 0, reducedMotion = false, viento = null }) {
   const ref = useRef(null);
   useFrame((state) => {
     if (reducedMotion || !ref.current) return;
-    const [dx, dy, dz] = coreografia('patrulla', state.clock.elapsedTime, fase);
+    const [dx, dy, dz] = coreografia('patrulla', state.clock.elapsedTime, fase, viento);
     // a ras de la hoja: el barrido lateral manda, el zumbido vertical se atenúa.
     ref.current.position.set(pos[0] + dx, pos[1] + dy * 0.4, pos[2] + dz);
   });
@@ -221,7 +221,8 @@ function FlorBorde({ pos, tono = '#e8963f' }) {
   );
 }
 
-function Diorama({ params, reducedMotion, fauna, estadoFinca }) {
+function Diorama({ params, reducedMotion, fauna, estadoFinca, tier }) {
+  const viento = tier === 'bajo' ? null : estadoFinca?.viento;
   // ESPEJO VIVO de la salud real (§5b): cuántas matas se ven decaídas es el
   // reflejo del ratio de matas vivas de la finca. Sin dato → 0 (huerta sana).
   // Marcamos las ÚLTIMAS del arreglo (deja las del frente firmes). No es plaga.
@@ -302,11 +303,11 @@ function Diorama({ params, reducedMotion, fauna, estadoFinca }) {
       ))}
 
       {/* los enemigos naturales insignia: dos mariquitas patrullando las matas */}
-      <Mariquita pos={[-0.42, 0.5, 0.42]} escala={1.3} fase={0.8} reducedMotion={reducedMotion} />
-      <Mariquita pos={[0.6, 0.32, 0.12]} escala={1.05} fase={2.9} reducedMotion={reducedMotion} />
+      <Mariquita pos={[-0.42, 0.5, 0.42]} escala={1.3} fase={0.8} reducedMotion={reducedMotion} viento={viento} />
+      <Mariquita pos={[0.6, 0.32, 0.12]} escala={1.05} fase={2.9} reducedMotion={reducedMotion} viento={viento} />
 
       {/* la fauna funcional billboard: carábido patrullando + polinizadores del borde */}
-      <Fauna items={fauna} reducedMotion={reducedMotion} />
+      <Fauna items={fauna} reducedMotion={reducedMotion} tier={tier} viento={viento} />
     </group>
   );
 }
@@ -344,6 +345,7 @@ export default function EscenaSanidad(props) {
         reducedMotion={props.reducedMotion}
         fauna={fauna}
         estadoFinca={props.estadoFinca}
+        tier={props.tier}
       />
     </EscenaBase3D>
   );
