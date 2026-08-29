@@ -231,7 +231,7 @@ function Cultivo({ pos = [2.3, -0.3, -0.55], surcos = 4, desde, color }) {
   );
 }
 
-function Diorama({ params, tinte, reducedMotion, fauna }) {
+function Diorama({ params, tinte, reducedMotion, fauna, tier, viento }) {
   const color = params?.agua || (tinte && tinte[0]) || '#3f8fb0';
   const hitos = params?.hitos;
   const curva3 = useMemo(() => {
@@ -318,7 +318,7 @@ function Diorama({ params, tinte, reducedMotion, fauna }) {
         />
       )}
       {/* la vida que vive del agua: polinizadores de ribera y huerta regada */}
-      <Fauna items={fauna} reducedMotion={reducedMotion} />
+      <Fauna items={fauna} reducedMotion={reducedMotion} tier={tier} viento={viento} />
     </group>
   );
 }
@@ -353,7 +353,7 @@ export default function EscenaFlujo(props) {
       camara={{ position: [3.6, 4.5, 5.1], fov: 42 }}
     >
       <group position={[0, BAJADA, 0]}>
-        <Diorama params={props.params} tinte={props.tinte} reducedMotion={props.reducedMotion} fauna={fauna} />
+        <Diorama params={props.params} tinte={props.tinte} reducedMotion={props.reducedMotion} fauna={fauna} tier={props.tier} viento={props.estadoFinca?.viento} />
       </group>
     </EscenaBase3D>
   );

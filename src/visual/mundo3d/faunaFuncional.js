@@ -23,6 +23,10 @@
  * (mismo criterio que las escenas de sanidad/suelo/milpa). Módulo puro (sin R3F):
  * la math de coreografía la comparten los billboards (FaunaEscena) y las mallas
  * low-poly (la mariquita de sanidad, la avispa de la milpa).
+ *
+ * La percepción por viento adapta una idea de red-sands (MIT): aquí no sirve
+ * para asustar fauna sino para su oficio ecológico. El controlador remonta la
+ * brisa al rastrear plaga y el polinizador deriva con ella entre flores.
  */
 
 import { perfilDeTier } from './deviceTier.js';
@@ -50,6 +54,23 @@ const FLORES = [
   [-0.30, 0.02, 0.22],
 ];
 
+/** Viento válido y perceptible, normalizado sin inventar una dirección. */
+function vectorViento(viento) {
+  const fuerza = Number(viento?.fuerza);
+  const x = Number(viento?.direccion?.x);
+  const z = Number(viento?.direccion?.z);
+  const largo = Math.hypot(x, z);
+  // Bajo este gesto mínimo queda EXACTAMENTE la coreografía histórica.
+  if (!Number.isFinite(fuerza) || fuerza <= 0.5 || !Number.isFinite(largo) || largo === 0) return null;
+  return {
+    x: x / largo,
+    z: z / largo,
+    // La velocidad real conserva su magnitud en estadoFinca; este tope solo
+    // protege la amplitud pequeña del diorama ante una ráfaga excepcional.
+    intensidad: Math.min(1, (fuerza - 0.5) / 20),
+  };
+}
+
 /**
  * CoreografÍa por rol: el offset [dx, dy, dz] (unidades de escena) respecto del
  * ancla, dado el tiempo `t` y una `fase` que desincroniza a cada bicho. Pura y
@@ -57,9 +78,10 @@ const FLORES = [
  * @param {'polinizar'|'patrulla'|'reptar'|'revoloteo'} patron
  * @param {number} t     segundos (clock.elapsedTime)
  * @param {number} [fase]
+ * @param {{direccion?:{x?:number,z?:number},fuerza?:number}|null} [viento]
  * @returns {[number, number, number]}
  */
-export function coreografia(patron, t, fase = 0) {
+export function coreografia(patron, t, fase = 0, viento = null) {
   if (patron === 'reptar') {
     // descomponedor: anda a ras, avance lento en x con un cabeceo mínimo.
     return [Math.sin(t * 0.4 + fase) * 0.09, Math.abs(Math.sin(t * 1.1 + fase)) * 0.02, 0];
@@ -70,10 +92,14 @@ export function coreografia(patron, t, fase = 0) {
     // profundidad desfasado = recorrido en diente de sierra sobre el cultivo,
     // zumbando bajito y alerta (el enemigo natural rastreando la plaga).
     const u = t * 0.22 + fase;
+    const brisa = vectorViento(viento);
+    // El controlador remonta el viento: sesgo contra la corriente para buscar
+    // plaga a barlovento. Sin viento válido, los tres valores son los de antes.
+    const contraViento = brisa ? -0.12 * brisa.intensidad : 0;
     return [
-      tri(u) * 0.34,
+      tri(u) * 0.34 + (brisa ? brisa.x * contraViento : 0),
       0.03 + Math.abs(Math.sin(t * 4 + fase)) * 0.03,
-      tri(u + 0.5) * 0.14,
+      tri(u + 0.5) * 0.14 + (brisa ? brisa.z * contraViento : 0),
     ];
   }
 
@@ -94,10 +120,13 @@ export function coreografia(patron, t, fase = 0) {
     const a = FLORES[seg % FLORES.length];
     const b = FLORES[(seg + 1) % FLORES.length];
     const arco = Math.sin(e * Math.PI) * 0.14; // sube al despegar, baja al posarse
+    const brisa = vectorViento(viento);
+    // Sólo deriva durante el salto: posada, la flor sigue siendo su ancla.
+    const aFavor = brisa ? e * 0.12 * brisa.intensidad : 0;
     return [
-      a[0] + (b[0] - a[0]) * e,
+      a[0] + (b[0] - a[0]) * e + (brisa ? brisa.x * aFavor : 0),
       a[1] + (b[1] - a[1]) * e + arco + Math.sin(t * 3 + fase) * 0.015,
-      a[2] + (b[2] - a[2]) * e,
+      a[2] + (b[2] - a[2]) * e + (brisa ? brisa.z * aFavor : 0),
     ];
   }
 

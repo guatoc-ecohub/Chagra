@@ -52,7 +52,7 @@ function Planta({ x, z, alto, color, r }) {
 }
 
 /* ── El bosque comestible (mundo `disenio`) — sin cambios ─────────────────── */
-function DioramaEstratos({ params, reducedMotion, fauna }) {
+function DioramaEstratos({ params, reducedMotion, fauna, tier, viento }) {
   const estratos = params?.estratos || ESTRATOS_DEF;
   const plantas = useMemo(() => {
     const out = [];
@@ -79,7 +79,7 @@ function DioramaEstratos({ params, reducedMotion, fauna }) {
         <Planta key={p.key} x={p.x} z={p.z} alto={p.alto} color={p.color} r={p.r} />
       ))}
       {/* la vida repartida por estratos: polinizadores arriba, descomponedor abajo */}
-      <Fauna items={fauna} reducedMotion={reducedMotion} />
+      <Fauna items={fauna} reducedMotion={reducedMotion} tier={tier} viento={viento} />
     </group>
   );
 }
@@ -368,7 +368,7 @@ function Cordillera() {
    arriba (el suelo también cuenta el gradiente térmico). */
 const TALUD_COLOR = ['#8a6a44', '#8d6b45', '#7e6248', '#71625a'];
 
-function DioramaPisos({ params, reducedMotion, fauna }) {
+function DioramaPisos({ params, reducedMotion, fauna, tier, viento }) {
   const pisos = useMemo(() => params?.pisos || [], [params?.pisos]);
   // Cultivos por terraza, con aire (3 por piso, jitter y escala deterministas —
   // antes iban 2 matas diminutas por piso y la ladera se veía pelada).
@@ -519,7 +519,7 @@ function DioramaPisos({ params, reducedMotion, fauna }) {
       </group>
 
       {/* vida sólo donde vive: polinizadores del templado/frío; páramo sin fauna */}
-      <Fauna items={fauna} reducedMotion={reducedMotion} />
+      <Fauna items={fauna} reducedMotion={reducedMotion} tier={tier} viento={viento} />
     </group>
   );
 }
@@ -541,9 +541,9 @@ export default function EscenaEstratos(props) {
       entrada={{ ...props.entrada, centro }}
     >
       {esPisos ? (
-        <DioramaPisos params={props.params} reducedMotion={props.reducedMotion} fauna={fauna} />
+        <DioramaPisos params={props.params} reducedMotion={props.reducedMotion} fauna={fauna} tier={props.tier} viento={props.estadoFinca?.viento} />
       ) : (
-        <DioramaEstratos params={props.params} reducedMotion={props.reducedMotion} fauna={fauna} />
+        <DioramaEstratos params={props.params} reducedMotion={props.reducedMotion} fauna={fauna} tier={props.tier} viento={props.estadoFinca?.viento} />
       )}
     </EscenaBase3D>
   );

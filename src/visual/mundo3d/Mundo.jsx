@@ -4,7 +4,7 @@
  *   <Mundo mundoId tier reducedMotion onHotspot onSalir animo energia
  *          estadoFinca hayAlerta />
  *
- * `estadoFinca` = { clima, enso, cosechaReciente, saludFinca, animales } — el
+ * `estadoFinca` = { clima, enso, viento, cosechaReciente, saludFinca, animales } — el
  * estado REAL de la finca que Angelita SIEMPRE refleja (auditoría §5b). Si el
  * host no lo pasa, se cose aquí con `useFincaViva()` (el espejo vivo del dato
  * real, offline-first y anti-fabricación); un `estadoFinca` explícito lo pisa.

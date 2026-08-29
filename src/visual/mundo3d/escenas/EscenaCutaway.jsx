@@ -352,11 +352,11 @@ function RaizNodulos({ base, largo = 1.4 }) {
    (Spodoptera frugiperda), la plaga #1 del maíz andino. Cuerpo ámbar con bandas
    oscuras, cintura fina (pecíolo) y alas translúcidas; low-poly, sin cajas. Su
    zigzag es la misma coreografía de rol 'patrulla'; se congela con reduced-motion. */
-function AvispaParasitoide({ base, fase = 0, reducedMotion = false }) {
+function AvispaParasitoide({ base, fase = 0, reducedMotion = false, viento = null }) {
   const ref = useRef(null);
   useFrame((state) => {
     if (reducedMotion || !ref.current) return;
-    const [dx, dy, dz] = coreografia('patrulla', state.clock.elapsedTime, fase);
+    const [dx, dy, dz] = coreografia('patrulla', state.clock.elapsedTime, fase, viento);
     ref.current.position.set(base[0] + dx, base[1] + dy, base[2] + dz);
   });
   return (
@@ -411,7 +411,7 @@ function AvispaParasitoide({ base, fase = 0, reducedMotion = false }) {
    se siembra una segunda caña compañera (más baja, con su fríjol y su raíz
    nodulada) y la asociación se lee como siembra viva. Las raíces van un pelín
    más al frente (CARA-0.02) para que el relieve del corte las muestre. */
-function Milpa({ total, config, reducedMotion }) {
+function Milpa({ total, config, reducedMotion, viento }) {
   const cfg = config === true ? {} : (config || {});
   const zF = CARA - 0.16; // el frente del corte, donde crecen las plantas
   const zRaiz = CARA - 0.02; // pegado a la cara: las raíces se ven en el corte
@@ -440,12 +440,12 @@ function Milpa({ total, config, reducedMotion }) {
         <Mariposa size={38} animated={!reducedMotion} />
       </Fauna>
       {/* CONTROLADOR: la avispa parasitoide patrullando sobre el maíz (caza el cogollero) */}
-      <AvispaParasitoide base={[maizX + 0.2, total + maizAlto * 0.82, zF + 0.12]} fase={0.7} reducedMotion={reducedMotion} />
+      <AvispaParasitoide base={[maizX + 0.2, total + maizAlto * 0.82, zF + 0.12]} fase={0.7} reducedMotion={reducedMotion} viento={viento} />
     </group>
   );
 }
 
-function Diorama({ params, abono = false, reducedMotion }) {
+function Diorama({ params, abono = false, reducedMotion, viento }) {
   const vida = clamp01(params?.vida);
   /* Con la milpa el diorama BAJA (precedente: DioramaPisos en EscenaEstratos):
      las hermanas suben ~1.7 sobre el bloque y el target de reposo es el origen —
@@ -610,7 +610,7 @@ function Diorama({ params, abono = false, reducedMotion }) {
       {/* el CALOR de la pila (solo abono): el vapor de la fase termófila */}
       {abono && <VaporCompost top={total} reducedMotion={reducedMotion} />}
       {/* la milpa: las tres hermanas arriba y los nódulos de N abajo (opt-in) */}
-      {params?.milpa && <Milpa total={total} config={params.milpa} reducedMotion={reducedMotion} />}
+      {params?.milpa && <Milpa total={total} config={params.milpa} reducedMotion={reducedMotion} viento={viento} />}
     </group>
   );
 }
@@ -649,7 +649,7 @@ export default function EscenaCutaway(props) {
       entrada={entrada}
       piso={-alto / 2 - (esMilpa ? 0.55 : 0)}
     >
-      <Diorama params={props.params} abono={esAbono} reducedMotion={props.reducedMotion} />
+      <Diorama params={props.params} abono={esAbono} reducedMotion={props.reducedMotion} viento={props.tier === 'bajo' ? null : props.estadoFinca?.viento} />
     </EscenaBase3D>
   );
 }
