@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="es-CO">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Gate 7 compai — harness</title>
+    <script>
+      /* Fuerza la especie ANTES de que arranque el bundle: useAgentAvatarType
+         lee compai:companero (precede) y chagra:agent-avatar-type en el
+         initializer de useState, así que sembrarlo aquí basta para el 1er render. */
+      (function () {
+        var q = new URLSearchParams(location.search);
+        var esp = q.get('especie') || 'angelita';
+        try {
+          localStorage.setItem('compai:companero', esp);
+          localStorage.setItem('chagra:agent-avatar-type', esp);
+        } catch (e) {}
+      })();
+    </script>
+    <style>
+      html, body { margin: 0; height: 100%; }
+      /* mitad clara / mitad oscura para juzgar el arte en ambos fondos */
+      #raiz {
+        min-height: 100vh;
+        display: grid;
+        grid-template-rows: 1fr 1fr;
+      }
+      .banda { display: flex; align-items: center; justify-content: center; }
+      .clara { background: #f4efe4; }
+      .oscura { background: #14181f; }
+      #cap {
+        position: fixed; top: 8px; left: 50%; transform: translateX(-50%);
+        font: 600 13px/1.2 system-ui, sans-serif; color: #333;
+        background: rgba(255,255,255,.85); padding: 4px 10px; border-radius: 6px;
+        z-index: 9; letter-spacing: .02em;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="cap"></div>
+    <div id="raiz"></div>
+    <script type="module" src="/src/harness-compai.jsx"></script>
+  </body>
+</html>
