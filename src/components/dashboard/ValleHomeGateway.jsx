@@ -73,7 +73,9 @@ export default function ValleHomeGateway({ children, onNavigate, enabled = true 
   useEffect(() => {
     if (!confirmOpen) return undefined;
 
-    const previousFocus = document.activeElement;
+    const previousFocus = document.activeElement instanceof HTMLElement
+      ? document.activeElement
+      : null;
     confirmarRef.current?.focus();
     const onKeyDown = (event) => {
       if (event.key === 'Escape') cancelar();
@@ -158,7 +160,7 @@ export default function ValleHomeGateway({ children, onNavigate, enabled = true 
             <p id="valle-home-confirm-copy">La finca queda aquí mientras recorres el valle.</p>
             <div className="vhw__dialog-actions">
               <button type="button" onClick={cancelar}>Cancelar</button>
-              <button type="button" ref={confirmarRef} onClick={confirmarEntrada}>Confirmar</button>
+              <button type="button" ref={confirmarRef} onClick={confirmarEntrada}>Entrá al valle 3D</button>
             </div>
           </div>
         </div>

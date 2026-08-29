@@ -56,9 +56,8 @@ import SceneTrazoMinimal from './SceneTrazoMinimal';
 // a src/components/_archivado/. Las puertas como cartas (PortalesMano) siguen
 // como la vía a los mundos. Ver ops/ARCHIVO-HOME-2D-20260826.md.
 import PortalesMano from './PortalesMano';
-// LA PUERTA DEL VALLE: teaser con CUADROS REALES del valle en loop + entrada
-// New Donk. Reintroduce el acceso al valle 3D desde el home 2D (reemplazo del
-// UmbralValle archivado 2026-08-26).
+// LA PUERTA DEL VALLE: teaser con CUADROS REALES del valle + entrada New Donk.
+// Reintroduce el acceso al valle 3D desde el home 2D con una capa ligera.
 import ValleHomeGateway from './ValleHomeGateway';
 import './scene-finca-organismo.css';
 import './scene-finca-nature.css';
