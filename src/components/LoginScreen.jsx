@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { User, Lock, Eye, EyeOff, WifiOff, ShieldCheck, Leaf } from 'lucide-react';
 import { applyTheme, normalizeTheme, STORAGE_KEY, DEFAULT_THEME } from '../hooks/useTheme';
 import { authenticateUser } from '../services/authService';
@@ -6,7 +6,8 @@ import { setCurrentOperator } from '../services/operatorIdentityService';
 import { setActiveTenantId } from '../services/tenantContext';
 import { version as APP_VERSION } from '../../package.json';
 import ChagraGrowLoader from './ChagraGrowLoader';
-import ChagraAgentAvatar from './ChagraAgentAvatar';
+import { CirculoRotoMilpa } from '../visual/effects';
+import AngelitaSalida from '../visual/agente/AngelitaSalida.jsx';
 import LegalLinks from './LegalLinks';
 import WelcomeStatsHero from './WelcomeStatsHero';
 import useOllamaWarmStore from '../store/useOllamaWarmStore';
@@ -37,6 +38,8 @@ import { friendlyMessage } from '../utils/friendlyErrors';
 export default function LoginScreen({ onLoginSuccess, onSave }) {
   const [creds, setCreds] = useState({ username: '', password: '' });
   const [loading, setLoading] = useState(false);
+  const [angelitaVisible, setAngelitaVisible] = useState(true);
+  const [angelitaSale, setAngelitaSale] = useState(false);
   // Mostrar/ocultar la contraseña ayuda a quien escribe despacio o con poca
   // costumbre del teclado del teléfono a verificar lo que digitó (a11y +
   // baja alfabetización digital). Arranca oculta: el campo sigue siendo
@@ -157,6 +160,9 @@ export default function LoginScreen({ onLoginSuccess, onSave }) {
     }
   };
 
+  const iniciarSalidaAngelita = useCallback(() => setAngelitaSale(true), []);
+  const desmontarAngelita = useCallback(() => setAngelitaVisible(false), []);
+
   return (
     <div className="login-screen relative min-h-[100dvh] w-full bg-slate-950 bg-biopunk-pattern flex flex-col items-center overflow-y-auto text-slate-100 px-5 sm:px-6 pt-[max(2rem,env(safe-area-inset-top))] pb-[max(2rem,env(safe-area-inset-bottom))]">
       {/* Capa 1 — Foto del páramo curado. Detrás de todo, con un gradiente de
@@ -186,25 +192,25 @@ export default function LoginScreen({ onLoginSuccess, onSave }) {
 
       <main className="relative z-10 w-full max-w-md flex flex-col items-center gap-7 animate-fadeIn">
         {/* ─────────────────────────────────────────────────────────────
-            MARCA — el compAI que el usuario eligió (ChagraAgentAvatar lee
-            `chagra:agent-avatar-type`; Angelita la abeja por defecto, o su
-            planta de maíz si la escogió en Perfil — fix 2026-07-25: antes
-            este header ignoraba la elección e importaba a Angelita directo)
-            posado en un orbe neón. Personaje adulto y elegante, no mascota;
-            reemplaza el ícono genérico anterior por el rostro de la marca.
+            MARCA — Angelita aparece dentro de la milpa y sale cuando la raíz
+            rompe el círculo. Personaje adulto y elegante, no mascota;
+            la animación es liviana y no carga el avatar del shell pre-auth.
             ───────────────────────────────────────────────────────────── */}
         <header className="flex flex-col items-center text-center gap-3 pt-2">
-          <div className="relative w-28 h-28 sm:w-32 sm:h-32 rounded-full bg-slate-900/70 backdrop-blur-sm ring-1 ring-muzo/40 shadow-neon-muzo flex items-center justify-center">
-            <span
-              aria-hidden="true"
-              className="absolute inset-0 rounded-full ring-1 ring-muzo/20 animate-pulse"
-            />
-            <ChagraAgentAvatar
-              state="idle"
-              size={108}
-              ariaLabel="Chagra IA"
-            />
-          </div>
+          <CirculoRotoMilpa
+            trigger
+            onRupturaCompleta={iniciarSalidaAngelita}
+            className="relative w-28 h-28 sm:w-32 sm:h-32 rounded-full bg-slate-900/70 backdrop-blur-sm ring-1 ring-muzo/40 shadow-neon-muzo"
+          >
+            {angelitaVisible && (
+              <AngelitaSalida
+                activa={angelitaSale}
+                onIdo={desmontarAngelita}
+                size={88}
+                title="Chagra IA"
+              />
+            )}
+          </CirculoRotoMilpa>
 
           <div>
             <h1 className="text-5xl font-black tracking-tight text-muzo drop-shadow-[0_0_18px_rgba(16,185,129,0.45)]">

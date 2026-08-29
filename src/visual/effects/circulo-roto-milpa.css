@@ -1,0 +1,383 @@
+/* ════════════════════════════════════════════════════════════════════════════
+   circulo-roto-milpa.css — coreografía del CÍRCULO QUE SE ROMPE invadido por
+   la RAÍZ DE LA MILPA (login: la abeja "encerrada" se libera a los 9s).
+
+   Timeline desde que se aplica `.crm-activa` (todo con fill-mode both):
+
+     0.05s  el montículo de tierra aparece dentro del círculo
+     0.10s  el grano de maíz brilla (la semilla despierta)
+     0.30s  el montículo SE PARTE: las raíces empujan desde abajo
+     0.35s  raíces de sostén (zancos rosados) trepan y AGARRAN el aro
+     0.55s  cabellera fasciculada se derrama por el fondo del aro
+     0.50s  el aro TIEMBLA (steps, cadencia dibujada) y su glow parpadea
+     0.85s  GRIETAS dentadas se propagan por los bordes de fractura
+     1.58s  FLASH en la brecha + onda expansiva
+     1.62s  RUPTURA: los fragmentos se desplazan con overshoot, dos esquirlas
+            salen volando (se pierden), una queda colgando; chispas + tierra
+     1.95s  segunda ola: raíces INVASORAS entran por las grietas y cruzan
+            por encima de la banda rota
+     2.00s  el brote (plúmula) sube; las hojas se DESENROLLAN con overshoot
+     2.75s  estado vivo: line-boil de la raíz, motas de polen, brasas verdes
+            en las puntas rotas — el círculo queda ROTO pero VIVO.
+
+   Reglas de la casa: solo transform/opacity animados (+ stroke-dashoffset del
+   auto-dibujo §13.11); filtros estáticos; reduced-motion = fotograma final
+   digno (el estado `.crm-roto` estático es idéntico al final de la animación).
+   ════════════════════════════════════════════════════════════════════════════ */
+
+.crm-wrap {
+  position: relative;
+  /* El host suele aportar `w-* h-*` en este mismo nodo. No fijar aquí
+     width/height: `height: 100%` dejaba el wrapper en 0px cuando el padre era
+     auto-height y el SVG se reducía a una línea. El aspect-ratio conserva un
+     fallback cuadrado para hosts que solo aportan ancho. */
+  aspect-ratio: 1 / 1;
+  /* Momentos compartidos del timeline */
+  --crm-rotura: 1.62s;
+  --crm-idle: 2.75s;
+  /* Curvas (easing.dev; nunca los built-in débiles) */
+  --crm-out: cubic-bezier(0.23, 1, 0.32, 1);
+  --crm-back: cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.crm-svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible; /* esquirlas y raíces viven fuera del viewBox */
+  pointer-events: none;
+}
+
+/* Ranura para el compai (la lámina de Angelita la pone quien integra) */
+.crm-centro {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ── ESTADO QUIETA (antes del trigger): círculo íntegro que respira ──────── */
+.crm-wrap:not(.crm-activa):not(.crm-roto) .crm-anillo {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: crm-respira 5.2s ease-in-out infinite; /* = --vfx-beat */
+}
+@keyframes crm-respira {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.012); }
+}
+
+/* Todo lo que nace con la ruptura arranca invisible */
+.crm-monticulo,
+.crm-grano,
+.crm-hoja,
+.crm-particula,
+.crm-polvo,
+.crm-flash,
+.crm-onda,
+.crm-aro-pulso,
+.crm-mota,
+.crm-brasa {
+  opacity: 0;
+}
+
+/* Los trazos auto-dibujados (raíces, grietas, tallo) esperan ocultos:
+   pathLength=1 + dasharray 1 + dashoffset 1 = trazo sin dibujar. */
+.crm-trazo {
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+}
+
+/* ═══ FASE ACTIVA — la coreografía ═══════════════════════════════════════ */
+
+/* Auto-dibujo genérico: cada trazo trae su --d (delay) y --dur inline */
+.crm-activa .crm-trazo {
+  animation: crm-dibuja var(--dur, 0.7s) var(--crm-out) var(--d, 0s) both;
+}
+@keyframes crm-dibuja {
+  from { stroke-dashoffset: 1; }
+  to { stroke-dashoffset: 0; }
+}
+
+/* Montículo de tierra: aparece hinchándose y luego SE PARTE en dos */
+.crm-activa .crm-monticulo {
+  animation: crm-mont-aparece 0.35s var(--crm-out) 0.05s both;
+}
+.crm-activa .crm-mont-izq {
+  animation:
+    crm-mont-aparece 0.35s var(--crm-out) 0.05s both,
+    crm-mont-abre-izq 0.45s var(--crm-out) 0.3s both;
+}
+.crm-activa .crm-mont-der {
+  animation:
+    crm-mont-aparece 0.35s var(--crm-out) 0.05s both,
+    crm-mont-abre-der 0.45s var(--crm-out) 0.3s both;
+}
+.crm-mont-izq,
+.crm-mont-der {
+  transform-box: fill-box;
+}
+.crm-mont-izq { transform-origin: right bottom; }
+.crm-mont-der { transform-origin: left bottom; }
+@keyframes crm-mont-aparece {
+  from { opacity: 0; transform: translateY(3px) scale(0.7); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+@keyframes crm-mont-abre-izq {
+  from { transform: rotate(0deg) translate(0, 0); }
+  to { transform: rotate(-9deg) translate(-2.5px, 0); }
+}
+@keyframes crm-mont-abre-der {
+  from { transform: rotate(0deg) translate(0, 0); }
+  to { transform: rotate(9deg) translate(2.5px, 0); }
+}
+
+/* El grano de maíz despierta (fade + asentada) */
+.crm-activa .crm-grano {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: crm-grano-despierta 0.4s var(--crm-back) 0.1s both;
+}
+@keyframes crm-grano-despierta {
+  from { opacity: 0; transform: scale(0.6); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+/* El aro TIEMBLA mientras las raíces empujan — cadencia dibujada (steps).
+   7 iteraciones de 0.16s desde 0.5s ⇒ termina exactamente en la ruptura. */
+.crm-anillo {
+  transform-box: fill-box;
+  transform-origin: center;
+}
+.crm-activa .crm-anillo {
+  animation: crm-tiembla 0.16s steps(4, end) 0.5s 7;
+}
+@keyframes crm-tiembla {
+  0%, 100% { transform: translate(0, 0) rotate(0deg); }
+  25% { transform: translate(0.9px, -0.5px) rotate(0.45deg); }
+  50% { transform: translate(-0.8px, 0.6px) rotate(-0.4deg); }
+  75% { transform: translate(0.6px, 0.5px) rotate(0.3deg); }
+}
+
+/* Energía acumulándose: un aro fantasma parpadea encima (flicker stepped) */
+.crm-activa .crm-aro-pulso {
+  animation: crm-carga 1.02s steps(6, end) 0.6s both;
+}
+@keyframes crm-carga {
+  0% { opacity: 0; }
+  18% { opacity: 0.28; }
+  32% { opacity: 0.1; }
+  52% { opacity: 0.38; }
+  70% { opacity: 0.16; }
+  88% { opacity: 0.5; }
+  100% { opacity: 0; }
+}
+
+/* Grietas: se dibujan (dashoffset) y se ESFUMAN al abrirse la fractura real */
+.crm-activa .crm-grieta {
+  animation:
+    crm-dibuja 0.26s var(--crm-out) var(--d, 0.85s) both,
+    crm-esfuma 0.14s linear var(--crm-rotura) both;
+}
+@keyframes crm-esfuma {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+
+/* El vidrio interior del orbe se disuelve con la ruptura */
+.crm-vidrio { opacity: 0.55; }
+.crm-activa .crm-vidrio {
+  animation: crm-vidrio-esfuma 0.5s var(--crm-out) var(--crm-rotura) both;
+}
+@keyframes crm-vidrio-esfuma {
+  from { opacity: 0.55; }
+  to { opacity: 0; }
+}
+
+/* FLASH en la brecha + onda expansiva */
+.crm-flash {
+  transform-box: fill-box;
+  transform-origin: center;
+}
+.crm-activa .crm-flash {
+  animation: crm-flashea 0.38s var(--crm-out) 1.58s both;
+}
+@keyframes crm-flashea {
+  0% { opacity: 0; transform: scale(0.4); }
+  30% { opacity: 0.95; transform: scale(1); }
+  100% { opacity: 0; transform: scale(1.2); }
+}
+.crm-onda {
+  transform-box: fill-box;
+  transform-origin: center;
+}
+.crm-activa .crm-onda {
+  animation: crm-expande 0.6s var(--crm-out) var(--crm-rotura) both;
+}
+@keyframes crm-expande {
+  0% { opacity: 0.55; transform: scale(0.96); }
+  100% { opacity: 0; transform: scale(1.3); }
+}
+
+/* RUPTURA: cada fragmento trae inline su --dx/--dy/--rot (normal exterior).
+   Overshoot al 55% y asentada — placas de vidrio que ceden, no un fade. */
+.crm-frag,
+.crm-esquirla {
+  transform-box: fill-box;
+  transform-origin: center;
+}
+.crm-activa .crm-frag {
+  animation: crm-frag-rompe 0.58s var(--crm-out) var(--crm-rotura) both;
+}
+@keyframes crm-frag-rompe {
+  0% { transform: translate(0, 0) rotate(0deg); }
+  55% {
+    transform:
+      translate(calc(var(--dx) * 1.25), calc(var(--dy) * 1.25))
+      rotate(calc(var(--rot) * 1.18));
+  }
+  78% {
+    transform:
+      translate(calc(var(--dx) * 0.92), calc(var(--dy) * 0.92))
+      rotate(calc(var(--rot) * 0.94));
+  }
+  100% { transform: translate(var(--dx), var(--dy)) rotate(var(--rot)); }
+}
+
+/* Esquirlas: vuelan girando; dos se pierden (--op2: 0), una queda colgando */
+.crm-activa .crm-esquirla {
+  animation: crm-esquirla-vuela 0.85s var(--crm-out) var(--crm-rotura) both;
+}
+@keyframes crm-esquirla-vuela {
+  0% { transform: translate(0, 0) rotate(0deg); opacity: 1; }
+  45% { transform: translate(var(--dx1), var(--dy1)) rotate(var(--rot1)); opacity: 1; }
+  100% { transform: translate(var(--dx2), var(--dy2)) rotate(var(--rot2)); opacity: var(--op2); }
+}
+
+/* Chispas de esmeralda + terrones: estallan radiales y se apagan */
+.crm-activa .crm-particula {
+  animation: crm-particula 0.75s var(--crm-out) var(--d, 1.6s) both;
+}
+@keyframes crm-particula {
+  0% { transform: translate(0, 0) scale(1); opacity: 0; }
+  10% { opacity: 1; }
+  100% { transform: translate(var(--dx), var(--dy)) scale(0.25); opacity: 0; }
+}
+
+/* Polvo: bocanadas suaves al partirse la tierra y al romperse el aro */
+.crm-polvo {
+  transform-box: fill-box;
+  transform-origin: center bottom;
+}
+.crm-activa .crm-polvo {
+  animation: crm-polvea 0.7s var(--crm-out) var(--d, 0.32s) both;
+}
+@keyframes crm-polvea {
+  0% { opacity: 0; transform: scale(0.5) translateY(2px); }
+  35% { opacity: 0.45; }
+  100% { opacity: 0; transform: scale(1.5) translateY(-7px); }
+}
+
+/* HOJAS del brote: se DESENROLLAN (rubber-hose, overshoot back-out).
+   Cada hoja trae --curl (enrollado inicial) y --d inline; el origen es su
+   punto de inserción en el tallo (var inline --org). */
+.crm-hoja {
+  transform-box: fill-box;
+  transform-origin: var(--org, center bottom);
+}
+.crm-activa .crm-hoja {
+  animation: crm-hoja-brota 0.55s var(--crm-back) var(--d, 2.25s) both;
+}
+@keyframes crm-hoja-brota {
+  0% { opacity: 0; transform: rotate(var(--curl, -60deg)) scale(0.15); }
+  35% { opacity: 1; }
+  70% { transform: rotate(calc(var(--curl, -60deg) * -0.12)) scale(1.07); }
+  100% { opacity: 1; transform: rotate(0deg) scale(1); }
+}
+
+/* ═══ ESTADO VIVO FINAL (activa desde --crm-idle, y también en .crm-roto) ══ */
+
+/* Line-boil de la raíz: 2 fotogramas discretos (steps) — respira dibujada */
+.crm-activa .crm-milpa,
+.crm-roto .crm-milpa {
+  transform-box: fill-box;
+  transform-origin: center bottom;
+  animation: crm-boil 1.1s steps(1, end) var(--crm-boil-d, var(--crm-idle)) infinite;
+}
+.crm-roto .crm-milpa { --crm-boil-d: 0s; }
+@keyframes crm-boil {
+  0%, 100% { transform: scale(1, 1) rotate(0deg); }
+  50% { transform: scale(1.008, 0.994) rotate(0.25deg); }
+}
+
+/* Vaivén lento de las hojas (período co-primo con el boil: nunca en compás) */
+.crm-activa .crm-hojas-vaiven,
+.crm-roto .crm-hojas-vaiven {
+  transform-box: fill-box;
+  transform-origin: center bottom;
+  animation: crm-vaiven 5.2s ease-in-out var(--crm-boil-d, var(--crm-idle)) infinite;
+}
+@keyframes crm-vaiven {
+  0%, 100% { transform: rotate(0deg); }
+  50% { transform: rotate(1.6deg); }
+}
+
+/* Motas de polen que suben desde el brote */
+.crm-mota {
+  transform-box: fill-box;
+  transform-origin: center;
+}
+.crm-activa .crm-mota,
+.crm-roto .crm-mota {
+  animation: crm-mota-sube 4.4s linear var(--d, 3s) infinite;
+}
+@keyframes crm-mota-sube {
+  0% { opacity: 0; transform: translate(0, 0); }
+  18% { opacity: 0.85; }
+  70% { opacity: 0.4; }
+  100% { opacity: 0; transform: translate(var(--dx, 4px), -16px); }
+}
+
+/* Brasas verdes en las puntas rotas del aro: laten despacio */
+.crm-activa .crm-brasa,
+.crm-roto .crm-brasa {
+  animation: crm-brasa-late 3.4s ease-in-out var(--d, var(--crm-idle)) infinite;
+}
+@keyframes crm-brasa-late {
+  0%, 100% { opacity: 0.2; }
+  50% { opacity: 0.75; }
+}
+
+/* ═══ ESTADO ROTO ESTÁTICO (montaje directo / reduced-motion) ═════════════
+   Idéntico al último fotograma de la coreografía. */
+.crm-roto .crm-trazo { stroke-dashoffset: 0; }
+.crm-roto .crm-frag {
+  transform: translate(var(--dx), var(--dy)) rotate(var(--rot));
+}
+.crm-roto .crm-esquirla {
+  transform: translate(var(--dx2), var(--dy2)) rotate(var(--rot2));
+  opacity: var(--op2);
+}
+.crm-roto .crm-grieta { opacity: 0; }
+.crm-roto .crm-vidrio { opacity: 0; }
+.crm-roto .crm-monticulo,
+.crm-roto .crm-grano,
+.crm-roto .crm-hoja {
+  opacity: 1;
+}
+.crm-roto .crm-mont-izq { transform: rotate(-9deg) translate(-2.5px, 0); }
+.crm-roto .crm-mont-der { transform: rotate(9deg) translate(2.5px, 0); }
+
+/* ═══ REDUCED MOTION: fotograma final digno, sin loops ════════════════════ */
+@media (prefers-reduced-motion: reduce) {
+  .crm-wrap .crm-anillo,
+  .crm-wrap .crm-milpa,
+  .crm-wrap .crm-hojas-vaiven,
+  .crm-wrap .crm-mota,
+  .crm-wrap .crm-brasa {
+    animation: none;
+  }
+  .crm-roto .crm-brasa { opacity: 0.4; }
+}
