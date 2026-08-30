@@ -193,11 +193,10 @@ describe('Home F2 — reestructuración 2.0 "Los mundos de mi finca" (V4)', () =
     fireEvent.click(screen.getByTestId('mundo-abono'));
     expect(onNavigate).toHaveBeenCalledWith('mundo', { mundo: 'abono' });
 
-    // Clima ganó su propia mini-app (#2045): ahora tiene DOS entradas
-    // (su día en la finca + el boletín del clima que viene), así que ya no
-    // es de una sola pantalla → abre la pantalla de mundo genérica.
+    // El boletín 2D es la entrada canónica del mundo clima. El acceso directo
+    // evita sumar un tercer toque por la grilla plegada + hub genérico.
     fireEvent.click(screen.getByTestId('mundo-clima'));
-    expect(onNavigate).toHaveBeenCalledWith('mundo', { mundo: 'clima' });
+    expect(onNavigate).toHaveBeenCalledWith('clima_boletin', undefined);
   });
 
   test('las tiles sueltas viejas ya NO existen en F2 (viven dentro de sus mundos)', async () => {

@@ -28,7 +28,6 @@
     "src/components/cafe/LaminaCafeto.jsx": 3,
     "src/components/clima/ClimaBoletinScreen.jsx": 1,
     "src/components/clima/ClimaBoletinScreen.test.jsx": 3,
-    "src/components/clima/PaginaTiempo2D.jsx": 6,
     "src/components/dashboard/__tests__/ClimaStrip.coarseConfidence.test.jsx": 1,
     "src/components/dashboard/__tests__/ClimaStrip.locationButton.test.jsx": 1,
     "src/components/hoy/HoyEnFincaScreen.jsx": 1,

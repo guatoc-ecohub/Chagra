@@ -206,6 +206,9 @@ export const MUNDOS_FINCA = [
         emoji: '⛅',
         lema: 'Lo que viene y qué hacer: los boletines del IDEAM en campesino',
         tinte: ['#4c7fa0', '#dce9f2'],
+        // Acceso prioritario a la pantalla 2D canónica: en el home F2 la
+        // grilla está plegada y el mundo genérico agregaba un tercer toque.
+        directo: { view: 'clima_boletin' },
         entradas: [
             { view: 'clima_boletin', label: 'El clima que viene', desc: 'Qué trae El Niño o La Niña y qué hacer, leído del IDEAM', emoji: '⛅' },
             { view: 'hoy_finca', label: 'Su día en la finca', desc: 'Lluvia, heladas y avisos para hoy', emoji: '🌤️' },
