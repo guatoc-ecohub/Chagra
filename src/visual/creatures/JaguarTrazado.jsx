@@ -1,9 +1,12 @@
 import { useEffect, useRef, useState } from 'react';
 import { JAGUAR_TRAZADO_SVG } from './jaguarTrazado/pielTrazado.js';
 import { useVidaIdle, useMiradaUsted } from './useVidaIdle.js';
+import { CompaiAgente } from '../agente/CompaiAgente.jsx';
+import { COMPAI_ESPECIES } from '../agente/compaiEspecies.js';
 import './jaguarTrazado/jaguarHuesos.css';
 
 const JAGUAR_SLUG = 'jaguar';
+const JAGUAR_PERFIL = COMPAI_ESPECIES.jaguar;
 
 /* Estados del contrato de avatar → forma canónica interna (mismo mapa que
    JaguarHuesos: el atributo data-agt-estado viaja crudo para paridad de
@@ -13,6 +16,11 @@ const ESTADO_CANON = {
   thinking: 'thinking', pensando: 'thinking',
   speaking: 'speaking', respondiendo: 'speaking', hablando: 'speaking',
   listening: 'listening', escuchando: 'listening',
+  contenta: 'speaking', celebra: 'speaking',
+  preocupada: 'listening',
+  'no-se': 'thinking', nose: 'thinking',
+  senala: 'thinking', señala: 'thinking',
+  invita: 'speaking', husmea: 'thinking',
   caminando: 'caminando', walking: 'caminando', anda: 'caminando',
 };
 
@@ -36,11 +44,13 @@ const TRAMO_ACTUANDO = 0.3;
  *   style, title, visema ('V1'..'V4'), tier ('bajo' apaga vida), onClick,
  *   onDoubleClick.
  */
-export default function JaguarTrazado({
+function JaguarTrazadoRig({
   estado = 'idle',
   modo = 'auto',
   size = 48,
   animated = true,
+  reducedMotion = false,
+  pose = 'anda',
   className = '',
   style = undefined,
   title = 'Jaguar',
@@ -53,7 +63,8 @@ export default function JaguarTrazado({
   const raizRef = useRef(null);
   const canon = ESTADO_CANON[estado] || 'idle';
   const enIdle = canon === 'idle';
-  const activoVida = animated && tier !== 'bajo';
+  const vivo = animated && !reducedMotion;
+  const activoVida = vivo && tier !== 'bajo';
 
   // Fase propia por instancia: dos jaguares jamás laten al mismo compás
   // (mismo patrón lazy-useState que useRitmoPropio: impuro solo al montar).
@@ -109,14 +120,15 @@ export default function JaguarTrazado({
       aria-label={title}
       data-creature={JAGUAR_SLUG}
       data-agt-estado={estado}
-      data-modo={animated ? modoVigente : 'normal'}
+      data-modo={vivo ? modoVigente : 'normal'}
       data-visema={visema || undefined}
-      data-vida={animated && momento ? momento : undefined}
+      data-pose={vivo ? pose : undefined}
+      data-vida={vivo && momento ? momento : undefined}
       data-tier={tier || undefined}
       title={title}
       className={`jaguarHuesos jaguarTrazado ${className || ''}`.trim()}
       style={estiloRaiz}
-      {...(animated ? null : { 'data-quieto': '' })}
+      {...(vivo ? null : { 'data-quieto': '' })}
       {...rest}
       /* La piel es un string plano (pielTrazado.js) — el MISMO markup que
          consumen los hosts sin React. Los atributos de arriba mandan el CSS. */
@@ -140,3 +152,55 @@ export default function JaguarTrazado({
   }
   return contenedor;
 }
+
+function AdaptadorJaguar({
+  especie: _especie,
+  creatureSlug: _creatureSlug,
+  capacidades: _capacidades,
+  perfil: _perfil,
+  idlePerfil: _idlePerfil,
+  climaPerfil: _climaPerfil,
+  pose,
+  estadoLegado = undefined,
+  reducedMotion,
+  'data-agt-especie': dataEspecie,
+  'data-creature': dataCreature,
+  'data-agt-estado': dataEstado,
+  'data-pose': dataPose,
+  'data-visema': dataVisema,
+  'data-clima': dataClima,
+  'data-tier': dataTier,
+  ...props
+}) {
+  return (
+    <JaguarTrazadoRig
+      {...props}
+      pose={pose}
+      reducedMotion={reducedMotion}
+      data-agt-especie={dataEspecie}
+      data-creature={dataCreature}
+      data-agt-estado={estadoLegado || dataEstado}
+      data-pose={dataPose}
+      data-visema={dataVisema}
+      data-clima={dataClima}
+      data-tier={dataTier}
+    />
+  );
+}
+
+/** Fachada del rig del jaguar sobre el contrato común Compai. */
+export default function JaguarTrazado({ estado = 'idle', ...props }) {
+  return (
+    <CompaiAgente
+      {...props}
+      estado={estado}
+      estadoLegado={estado}
+      especie={JAGUAR_PERFIL.avatarType}
+      chrome={false}
+      preserveRigAnimation
+      adaptador={AdaptadorJaguar}
+    />
+  );
+}
+
+export { JaguarTrazadoRig };

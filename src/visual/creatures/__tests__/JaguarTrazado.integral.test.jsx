@@ -82,4 +82,27 @@ describe('ChagraAgentAvatarJaguar — el agente 2D usa la skin trazada', () => {
     expect(container.querySelector('button')).toBeNull();
     expect(container.querySelector('div[data-creature="jaguar"]')).toBeInTheDocument();
   });
+
+  it.each([
+    ['acompana', 'anda'], ['escuchando', 'reposo'], ['pensando', 'anda'],
+    ['respondiendo', 'anda'], ['contenta', 'celebra'], ['preocupada', 'anda'],
+    ['no-se', 'anda'], ['senala', 'señala'], ['invita', 'anda'], ['husmea', 'anda'],
+  ])('estado rico %s conserva la pose del registro %s', (estado, pose) => {
+    const { container } = render(<ChagraAgentAvatarJaguar estado={estado} reaccionaPresencia={false} />);
+    const raiz = container.querySelector('div[data-creature="jaguar"]');
+    expect(raiz).toHaveAttribute('data-agt-estado', estado);
+    expect(raiz).toHaveAttribute('data-pose', pose);
+  });
+
+  it('caminando conserva dos frames del gait cuadrúpedo en el mismo rig', () => {
+    const { container } = render(
+      <ChagraAgentAvatarJaguar estado="caminando" reaccionaPresencia={false} />,
+    );
+    const raiz = container.querySelector('div[data-creature="jaguar"]');
+    expect(raiz).toHaveAttribute('data-pose', 'camina');
+    expect(raiz.querySelector('.jh-pataDelCerca')).toBeInTheDocument();
+    expect(raiz.querySelector('.jh-pataDelLejos')).toBeInTheDocument();
+    expect(raiz.querySelector('.jh-pataTrasCerca')).toBeInTheDocument();
+    expect(raiz.querySelector('.jh-pataTrasLejos')).toBeInTheDocument();
+  });
 });
