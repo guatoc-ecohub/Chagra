@@ -1,10 +1,14 @@
-import { describe, it, expect } from 'vitest';
+import { afterEach, describe, it, expect } from 'vitest';
+import { cleanup, render } from '@testing-library/react';
+import { createElement } from 'react';
 import { resolverCompai, COMPAI_REGISTRO } from '../compaiRegistry.js';
 import { cuerpoPortalDe } from '../CompaiTransicion.jsx';
+import AbejaTransicion from '../../../creatures/AbejaTransicion.jsx';
 import { ABEJA_PRESENCIA } from '../../../creatures/abejaIdentidad.js';
 import { AbejaAngelita } from '../../../creatures/AbejaAngelita.jsx';
-import { Zariguya } from '../../../creatures/Zariguya.jsx';
 import { AVATAR_TYPES } from '../../../../hooks/useAgentAvatarType.js';
+
+afterEach(cleanup);
 
 describe('compaiRegistry.resolverCompai', () => {
   it('cubre TODOS los tipos de avatar reales (sin huérfanos)', () => {
@@ -87,24 +91,35 @@ describe('compaiRegistry.resolverCompai', () => {
     expect(c.esFallback).toBe(true);
   });
 
-  it('el portal cruza el cuerpo del guía elegido', () => {
+  it('cada canónico registra su propio cuerpo de portal', () => {
+    for (const tipo of AVATAR_TYPES) {
+      const c = resolverCompai(tipo);
+      expect(c.PortalComponent, `${tipo} sin PortalComponent`).toBeTruthy();
+      expect(cuerpoPortalDe(c)).toBe(c.PortalComponent);
+    }
     expect(cuerpoPortalDe(resolverCompai('angelita'))).toBe(AbejaAngelita);
-    expect(cuerpoPortalDe(resolverCompai('zariguya'))).toBe(Zariguya);
-    expect(resolverCompai('zariguya').PortalComponent).not.toBe(resolverCompai('angelita').PortalComponent);
   });
 
-  it('jaguar, oso del bastón y luciérnaga: escena 3D propia, pero el portal 2D aún cae a Angelita', () => {
-    // F26 (2026-08-13) solo resolvió la presencia 3D de los tres — el cuerpo
-    // 2D del portal (PortalComponent) sigue pendiente, así que cuerpoPortalDe
-    // debe seguir cayendo a Angelita sin lanzar (regla del fallback en
-    // CompaiTransicion.jsx, independiente de pendienteFable/EscenaComponent).
-    for (const tipo of ['jaguar', 'oso-baston', 'luciernaga']) {
-      expect(() => resolverCompai(tipo)).not.toThrow();
+  it('entrada y vuelta conservan el slug del cuerpo elegido', () => {
+    for (const tipo of AVATAR_TYPES) {
       const c = resolverCompai(tipo);
-      expect(c.pendienteFable).toBe(false);
-      expect(typeof c.EscenaComponent).toBe('function');
-      expect(cuerpoPortalDe(c)).toBe(AbejaAngelita);
+      for (const sentido of ['entrar', 'volver']) {
+        const { container } = render(createElement(AbejaTransicion, {
+          sentido,
+          Cuerpo: c.PortalComponent,
+        }));
+        expect(
+          container.querySelector(`[data-creature="${c.especie}"]`),
+          `${tipo} perdió su cuerpo durante ${sentido}`,
+        ).toBeTruthy();
+        cleanup();
+      }
     }
+  });
+
+  it('usa Angelita solo como fallback para una entrada inválida', () => {
+    expect(cuerpoPortalDe(null)).toBe(AbejaAngelita);
+    expect(cuerpoPortalDe({ avatarType: 'inventado' })).toBe(AbejaAngelita);
   });
 
   it('maiz se retiró del roster (2026-08-14): resuelve como cualquier tipo desconocido, cae a Angelita', () => {
