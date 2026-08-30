@@ -55,6 +55,8 @@ export function CompaiAgente({
   adaptador = undefined,
   Adaptador: AdaptadorProp = undefined,
   adapter = undefined,
+  chrome = true,
+  preserveRigAnimation = false,
   children = null,
   className = '',
   style = undefined,
@@ -86,14 +88,14 @@ export function CompaiAgente({
     clima,
     enso,
     direccion,
-    animated: animado,
+    animated: preserveRigAnimation ? Boolean(animated) : animado,
     reducedMotion: quieto,
     tier,
     capacidades: perfil.capacidades,
     perfil,
     idlePerfil: perfil.idlePerfil,
     climaPerfil: perfil.climaPerfil,
-    title: title || perfil.nombreAccesible,
+    title,
     className,
     style,
     'data-creature': perfil.creatureSlug,
@@ -104,6 +106,10 @@ export function CompaiAgente({
     'data-clima': climaResuelto,
     'data-tier': tier || undefined,
   };
+
+  const cuerpo = Adaptador ? <Adaptador {...propsDelAdaptador} /> : children;
+
+  if (!chrome) return cuerpo;
 
   return (
     <span
@@ -138,7 +144,7 @@ export function CompaiAgente({
         <span className="compai-agente__feedback compai-agente__clima" data-agt-chrome="clima" />
       </span>
       <span className="compai-agente__cuerpo">
-        {Adaptador ? <Adaptador {...propsDelAdaptador} /> : children}
+        {cuerpo}
       </span>
     </span>
   );
