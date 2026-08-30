@@ -73,6 +73,10 @@ export default function ChagraAgentAvatarOsoBaston({
     // los cablee.
     animated = true,
     tier = undefined,
+    clima = null,
+    enso = 'neutro',
+    direccion = 'derecha',
+    reducedMotion = false,
     vida = true,
     'data-agt-estado': dataEstado = undefined,
     'data-pose': dataPose = undefined,
@@ -103,6 +107,10 @@ export default function ChagraAgentAvatarOsoBaston({
             visema={visema}
             size={size}
             animated={animated}
+            clima={clima}
+            enso={enso}
+            direccion={direccion}
+            reducedMotion={reducedMotion}
             tier={tier}
             vida={vida || despiertaNatural}
             title={ariaLabel}

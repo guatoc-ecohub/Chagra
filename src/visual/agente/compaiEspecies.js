@@ -40,6 +40,14 @@ const POSES_SUELO = {
   caminando: 'camina',
 };
 
+// El oso del bastón conserva su gesto corporal propio al responder: la
+// celebración del bastón es su adaptación de `respondiendo`, no un paso de
+// marcha genérico. Debe estar en el perfil para que perfil y rig no diverjan.
+const POSES_OSO = {
+  ...POSES_SUELO,
+  respondiendo: 'celebra',
+};
+
 /*
  * Las coordenadas son anclas normalizadas del montaje, no coordenadas del
  * dibujo. El chrome las convierte a porcentajes y cada rig conserva su arte.
@@ -173,7 +181,9 @@ if (faltanteEnRegistro || entradaFueraDeRoster) {
 const crearEntrada = (avatarType) => {
   const base = DEFINICIONES[avatarType];
   const ficha = ELENCO[avatarType];
-  const poses = base.medio === 'aire' ? POSES_AIRE : POSES_SUELO;
+  const poses = avatarType === 'oso-baston'
+    ? POSES_OSO
+    : base.medio === 'aire' ? POSES_AIRE : POSES_SUELO;
   const anclas = ANCLAS[base.medio];
 
   validarPerfilDeEstados(poses, base.creatureSlug);

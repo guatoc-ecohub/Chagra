@@ -55,6 +55,10 @@ export default function ChagraAgentAvatarJaguar({
     // (tier), y no debe descartarlos donde el host los cablea.
     animated = true,
     tier = undefined,
+    clima = null,
+    enso = 'neutro',
+    direccion = 'derecha',
+    reducedMotion = false,
     'data-agt-estado': dataEstado = undefined,
     'data-pose': dataPose = undefined,
     'data-visema': dataVisema = undefined,
@@ -82,6 +86,10 @@ export default function ChagraAgentAvatarJaguar({
             visema={visema}
             size={size}
             animated={animated}
+            clima={clima}
+            enso={enso}
+            direccion={direccion}
+            reducedMotion={reducedMotion}
             tier={tier}
             title={ariaLabel}
             className={className}
