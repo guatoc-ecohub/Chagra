@@ -207,8 +207,8 @@ export const MUNDOS_FINCA = [
         lema: 'Lo que viene y qué hacer: los boletines del IDEAM en campesino',
         tinte: ['#4c7fa0', '#dce9f2'],
         entradas: [
-            { view: 'hoy_finca', label: 'Su día en la finca', desc: 'Lluvia, heladas y avisos para hoy', emoji: '🌤️' },
             { view: 'clima_boletin', label: 'El clima que viene', desc: 'Qué trae El Niño o La Niña y qué hacer, leído del IDEAM', emoji: '⛅' },
+            { view: 'hoy_finca', label: 'Su día en la finca', desc: 'Lluvia, heladas y avisos para hoy', emoji: '🌤️' },
         ],
     },
     {

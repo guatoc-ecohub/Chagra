@@ -192,3 +192,15 @@ describe('La página del tiempo — puente al agente', () => {
     }));
   });
 });
+
+describe('La página del tiempo — puente al mundo 3D', () => {
+  it('muestra el botón al mundo 3D y navega correctamente', () => {
+    const onNavigate = vi.fn();
+    render(<ClimaBoletinScreen onBack={() => {}} onNavigate={onNavigate} />);
+    const btnMundo3d = screen.getByTestId('clima-ver-mundo3d');
+    expect(btnMundo3d).toBeInTheDocument();
+    expect(btnMundo3d).toHaveTextContent(/Ver el mundo del clima en 3D/i);
+    fireEvent.click(btnMundo3d);
+    expect(onNavigate).toHaveBeenCalledWith('mockup_mundo3d_clima');
+  });
+});
