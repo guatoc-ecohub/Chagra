@@ -153,6 +153,15 @@ export default function useComportamientoCompai(ref, opciones = {}) {
   const posicionRef = useRef({ x: 0, y: 0 });
   const pausadoRef = useRef(pausado);
 
+  // Estado para arrastre manual (drag+persistencia histórica)
+  const dragState = useRef({
+    isDragging: false,
+    startX: 0,
+    startY: 0,
+    initialX: 0,
+    initialY: 0,
+  });
+
   useEffect(() => {
     pausadoRef.current = pausado;
   }, [pausado]);
@@ -296,6 +305,47 @@ export default function useComportamientoCompai(ref, opciones = {}) {
       if (event.target?.closest?.('[data-compai-no-drag]')) return;
       setPresencia(true);
       setNotificacionVisible(true);
+      // Iniciar arrastre para compatibilidad histórica con tests
+      dragState.current = {
+        isDragging: true,
+        startX: event.clientX,
+        startY: event.clientY,
+        initialX: posicionRef.current.x,
+        initialY: posicionRef.current.y,
+      };
+    },
+    onPointerMove: (event) => {
+      // Manejar arrastre para compatibilidad histórica con tests
+      if (dragState.current.isDragging) {
+        const deltaX = event.clientX - dragState.current.startX;
+        const deltaY = event.clientY - dragState.current.startY;
+        const newX = dragState.current.initialX + deltaX;
+        const newY = dragState.current.initialY + deltaY;
+        posicionRef.current = { x: newX, y: newY };
+        if (ref.current) {
+          escribirTransform(ref.current, posicionRef.current);
+        }
+      }
+    },
+    onPointerUp: (_event) => {
+      // Finalizar arrastre y persistir para compatibilidad histórica con tests
+      if (dragState.current.isDragging) {
+        dragState.current.isDragging = false;
+        // Persistir en localStorage con formato histórico
+        const storageKey = `chagra:compai:posicion:${especie}:${_superficie}`;
+        try {
+          localStorage.setItem(storageKey, JSON.stringify({
+            x: Math.round(posicionRef.current.x),
+            y: Math.round(posicionRef.current.y),
+          }));
+        } catch (_error) {
+          // Silenciar error de localStorage
+        }
+      }
+    },
+    onPointerCancel: () => {
+      // Cancelar arrastre sin persistir
+      dragState.current.isDragging = false;
     },
     onClick: () => setNotificacionVisible(true),
   };

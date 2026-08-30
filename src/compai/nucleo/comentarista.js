@@ -86,7 +86,6 @@ export const COMENTARISTA_MUNDO = {
     const top = masNumeroso(datos.especies);
     const total = Number(datos.total);
     const esTecnico = perfil.vocacion === 'tecnico' || perfil.rol === 'tecnico';
-    const esCampesino = perfil.vocacion === 'campesino' || perfil.rol === 'campesino';
 
     if (top) {
       const nombre = nombreLimpio(top.name);
@@ -157,7 +156,7 @@ export const COMENTARISTA_MUNDO = {
     return 'Cuando tenga algo para vender, le ayudo a sacar cuentas y a presentarlo bien. Sin afán.';
   },
 
-  aprender(perfil = {}) {
+  aprender(_datos = {}, perfil = {}) {
     const esTecnico = perfil.vocacion === 'tecnico' || perfil.rol === 'tecnico';
     if (esTecnico) {
       return '¿Qué aspecto técnico desea profundizar? Cuento con bibliografía agroecológica actualizada.';
@@ -165,7 +164,7 @@ export const COMENTARISTA_MUNDO = {
     return '¿Qué quiere aprender hoy? Aquí estoy sin afán — pregúnteme sin pena.';
   },
 
-  bosque(perfil = {}) {
+  bosque(_datos = {}, perfil = {}) {
     const esRestaurador = perfil.rol === 'restaurador';
     const esTecnico = perfil.vocacion === 'tecnico' || perfil.rol === 'tecnico';
 
@@ -181,7 +180,7 @@ export const COMENTARISTA_MUNDO = {
     return 'El bosque se recupera con paciencia. ¿Le muestro cómo un rastrojo vuelve a ser monte?';
   },
 
-  paramo(perfil = {}) {
+  paramo(_datos = {}, perfil = {}) {
     const esGuia = perfil.rol === 'guia_glaciar';
     const esTecnico = perfil.vocacion === 'tecnico' || perfil.rol === 'tecnico';
 
