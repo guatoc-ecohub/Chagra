@@ -36,6 +36,17 @@ const ECO_DE_STATE = {
 
 const VISEMA_DE_STATE = {
     speaking: 'V2',
+    respondiendo: 'V2',
+};
+
+const ESTADO_DE_STATE = {
+    idle: 'acompana',
+    // eslint-disable-next-line chagra-i18n/no-hardcoded-spanish
+    thinking: 'pensando',
+    // eslint-disable-next-line chagra-i18n/no-hardcoded-spanish
+    speaking: 'respondiendo',
+    listening: 'escuchando',
+    caminando: 'caminando',
 };
 
 export default function ChagraAgentAvatarLuciernaga({
@@ -51,14 +62,18 @@ export default function ChagraAgentAvatarLuciernaga({
     ariaLabel = 'Chagra IA',
     animated = true,
     tier = undefined,
+    clima = null,
+    enso = 'neutro',
+    direccion = 'derecha',
+    reducedMotion = false,
     'data-agt-estado': dataEstado = undefined,
     'data-pose': dataPose = undefined,
     'data-visema': dataVisema = undefined,
     reaccionaPresencia = true,
 }) {
     const { despierta, handlers: handlersPresencia } = useAngelitaPresencia({ activo: reaccionaPresencia });
-    const estadoAgente = estado || state;
-    const estadoEfectivo = despierta && esPasivo(estadoAgente) ? 'idle' : state;
+    const estadoAgente = estado || ESTADO_DE_STATE[state] || 'acompana';
+    const estadoEfectivo = despierta && esPasivo(estadoAgente) ? 'acompana' : estadoAgente;
     const pose = POSE_DE_STATE[estadoEfectivo] || 'vuela';
     const eco = ECO_DE_STATE[estadoEfectivo] || null;
     const visema = visemaRecibido ?? VISEMA_DE_STATE[estadoEfectivo] ?? null;
@@ -68,7 +83,12 @@ export default function ChagraAgentAvatarLuciernaga({
             pose={pose}
             eco={eco}
             visema={visema}
+            estado={estadoEfectivo}
+            clima={clima}
+            enso={enso}
+            direccion={direccion}
             animated={animated}
+            reducedMotion={reducedMotion}
             tier={tier}
             size={size}
             title={ariaLabel}

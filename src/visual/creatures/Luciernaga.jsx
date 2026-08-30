@@ -12,6 +12,8 @@ import { cuerpoDeClima } from './creatureClimaCuerpo.js';
 import { LineBoilFilter } from './LineBoilFilter.jsx';
 import { AuraPoder } from './AuraPoder.jsx';
 import { auraDeBicho } from './transformacion.js';
+import { CompaiAgente } from '../agente/CompaiAgente.jsx';
+import { COMPAI_ESPECIES } from '../agente/compaiEspecies.js';
 
 /* LA LUCIÉRNAGA (cocuyo) — Lampyridae, el ESCARABAJO bioluminiscente de la finca:
    guía NOCTURNA, científica y BIOINDICADORA — la que "lee la noche". Hermana
@@ -42,12 +44,15 @@ import { auraDeBicho } from './transformacion.js';
    La IDENTIDAD (paleta + proporciones + firma + estados eco) vive en
    `luciernagaIdentidad.js`; la CADENCIA, en `creatures.css` (clases `luci-*`). */
 const VIEWBOX = '-175 -150 350 340';
+const LUCIERNAGA_PERFIL = COMPAI_ESPECIES.luciernaga;
 
-export function Luciernaga({
+function LuciernagaRig({
   size = 64,
   className = '',
   inline = false,
   animated = true,
+  reducedMotion = false,
+  estado = 'acompana',
   title = 'Luciérnaga (cocuyo)',
   /* Pose de VIDA (idle-life), species-agnostic (gestos rh-g-* de creatures.css):
      'vuela' (base, flota) | 'celebra' | 'reposo' | 'señala'. */
@@ -87,7 +92,7 @@ export function Luciernaga({
   const gPronoto = `luci-pronoto-${uid}`;
   const gLinterna = `luci-linterna-${uid}`;
   const gHalo = `luci-halo-${uid}`;
-  const vivo = animated;
+  const vivo = animated && !reducedMotion;
 
   // ═══ VIDA PROPIA (idle-cerebro + ritmo propio + mirada — vara Angelita v2).
   const raizRef = useRef(null);
@@ -103,6 +108,7 @@ export function Luciernaga({
 
   // CLIMA → cuerpo (determinista): tinte + opacidad al contorno.
   const cuerpoClima = cuerpoDeClima(clima, { enso: /** @type {any} */ (enso), tier, perfil: PERFIL_LUCIERNAGA });
+  const climaEstado = typeof clima === 'string' ? clima : clima?.estado || clima?.tipo;
   const estiloClima = (cuerpoClima.tinte || cuerpoClima.opacidad < 1)
     ? { filter: cuerpoClima.tinte || undefined, opacity: cuerpoClima.opacidad < 1 ? cuerpoClima.opacidad : undefined }
     : undefined;
@@ -301,9 +307,11 @@ export function Luciernaga({
 
   const estadoAttrs = {
     'data-creature': LUCIERNAGA_SLUG,
+    'data-agt-estado': estado,
     'data-pose': vivo ? poseFx : undefined,
     'data-animo': animo,
     'data-tier': tier || undefined,
+    'data-clima': climaEstado || undefined,
     'data-visema': visema || undefined,
     'data-eco': ecoFx || undefined,
     'data-destella': destellaFx ? '1' : undefined,
@@ -347,4 +355,60 @@ export function Luciernaga({
   return svg;
 }
 
+const POSE_RIG_DE_ESTADO = LUCIERNAGA_PERFIL.posePorEstado;
+
+function AdaptadorLuciernaga({
+  especie: _especie,
+  creatureSlug: _creatureSlug,
+  capacidades: _capacidades,
+  perfil: _perfil,
+  idlePerfil: _idlePerfil,
+  climaPerfil: _climaPerfil,
+  pose: posePerfil,
+  estadoLegado = undefined,
+  reducedMotion,
+  'data-agt-especie': dataEspecie,
+  'data-creature': dataCreature,
+  'data-agt-estado': dataEstado,
+  'data-pose': dataPose,
+  'data-visema': dataVisema,
+  'data-clima': dataClima,
+  'data-tier': dataTier,
+  ...props
+}) {
+  const estadoActual = estadoLegado || dataEstado || 'acompana';
+  const pose = POSE_RIG_DE_ESTADO[estadoActual] || posePerfil || 'vuela';
+  return (
+    <LuciernagaRig
+      {...props}
+      estado={estadoActual}
+      pose={pose}
+      reducedMotion={reducedMotion}
+      data-agt-especie={dataEspecie}
+      data-creature={dataCreature}
+      data-agt-estado={estadoActual}
+      data-pose={dataPose || pose}
+      data-visema={dataVisema}
+      data-clima={dataClima}
+      data-tier={dataTier}
+    />
+  );
+}
+
+/** Fachada compatible de la luciérnaga sobre el contrato común Compai. */
+export function Luciernaga({ estado = 'acompana', ...props }) {
+  return (
+    <CompaiAgente
+      {...props}
+      estado={estado}
+      estadoLegado={estado}
+      especie={LUCIERNAGA_PERFIL.avatarType}
+      chrome={false}
+      preserveRigAnimation
+      adaptador={AdaptadorLuciernaga}
+    />
+  );
+}
+
+export { LuciernagaRig };
 export default Luciernaga;
