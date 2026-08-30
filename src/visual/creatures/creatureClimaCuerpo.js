@@ -130,33 +130,81 @@ const SEQUIA_BASE = {
  *   tintes  {clima→str}  sustituye tintes por identidad de especie (opcional).
  */
 export const PERFIL_ABEJA = Object.freeze({
-  alas: true, humedad: 1, difusa: 1, sequia: 1,
+  medio: 'aire', alas: true, humedad: 1, difusa: 1, sequia: 1,
 });
 /* Colibrí: plumas aceitadas que escurren el agua (menos mojado), ágil y
    pequeño (la niebla lo traga casi como a la abeja), aguanta algo la seca. */
 export const PERFIL_COLIBRI = Object.freeze({
-  alas: true, humedad: 0.55, difusa: 0.9, sequia: 0.7,
+  medio: 'aire', alas: true, humedad: 0.55, difusa: 0.9, sequia: 0.7,
 });
 /* Oso andino: pelaje que empapa despacio, mole grande (la niebla apenas lo
    difumina), robusto ante la seca. Sin alas. */
 export const PERFIL_OSO = Object.freeze({
-  alas: false, humedad: 0.7, difusa: 0.45, sequia: 0.4,
+  medio: 'suelo', alas: false, humedad: 0.7, difusa: 0.45, sequia: 0.4,
 });
 /* Rana: anfibia — la más brillante mojada y la MÁS golpeada por la sequía
    (la piel se le reseca). Sin alas. Su tinte de lluvia empuja el verde húmedo. */
 export const PERFIL_RANA = Object.freeze({
-  alas: false, humedad: 1, difusa: 0.85, sequia: 1,
+  medio: 'suelo', alas: false, humedad: 1, difusa: 0.85, sequia: 1,
   tintes: { lluvia: 'saturate(1.2) brightness(1.06) contrast(1.05)' },
 });
 
-/** Registro consultable slug→perfil (para cablear el selector de avatar). */
-export const PERFILES = Object.freeze({
-  'abeja-angelita': PERFIL_ABEJA,
-  colibri: PERFIL_COLIBRI,
-  'oso-andino': PERFIL_OSO,
-  rana: PERFIL_RANA,
-  'rana-andina': PERFIL_RANA, // alias del slug de la creature 2D (RanaAndina)
+/* Perfiles propios de los siete compai canónicos. Los valores son parámetros
+   visuales, no conocimiento de la criatura: `cuerpoDeClima` sigue siendo una
+   función pura y cada rig decide cómo presentar el resultado. */
+export const PERFIL_JAGUAR = Object.freeze({
+  medio: 'suelo', alas: false, humedad: 0.6, difusa: 0.5, sequia: 0.3,
 });
+
+export const PERFIL_OSO_BASTON = Object.freeze({
+  medio: 'suelo', alas: false, humedad: 0.55, difusa: 0.5, sequia: 0.5,
+});
+
+export const PERFIL_ZARIGUYA = Object.freeze({
+  medio: 'suelo', alas: false, humedad: 0.8, difusa: 0.7, sequia: 0.35,
+});
+
+export const PERFIL_LUCIERNAGA = Object.freeze({
+  medio: 'aire', alas: true, humedad: 0.2, difusa: 0.85, sequia: 0.95,
+});
+
+export const PERFIL_CHIVITO_PUNK = Object.freeze({
+  medio: 'aire', alas: true, humedad: 0.65, difusa: 0.7, sequia: 0.75,
+});
+
+export const PERFIL_GUACAMAYA = Object.freeze({
+  medio: 'aire', alas: true, humedad: 0.75, difusa: 0.45, sequia: 0.55,
+});
+
+/* Aliases de identidad para consumidores que nombran al compai, no al slug
+   técnico de su cuerpo. */
+export const PERFIL_ANGELITA = PERFIL_ABEJA;
+export const PERFIL_CHIVITO = PERFIL_CHIVITO_PUNK;
+
+/** Registro consultable slug→perfil de los siete compai canónicos. */
+const PERFILES_CANONICOS = {
+  'abeja-angelita': PERFIL_ABEJA,
+  jaguar: PERFIL_JAGUAR,
+  'oso-baston': PERFIL_OSO_BASTON,
+  zariguya: PERFIL_ZARIGUYA,
+  luciernaga: PERFIL_LUCIERNAGA,
+  'chivito-punk': PERFIL_CHIVITO_PUNK,
+  guacamaya: PERFIL_GUACAMAYA,
+};
+
+/* Los aliases viejos siguen resolviendo, pero no cuentan como identidades
+   canónicas al enumerar el registro. */
+Object.defineProperties(PERFILES_CANONICOS, {
+  angelita: { value: PERFIL_ABEJA },
+  chivito: { value: PERFIL_CHIVITO_PUNK },
+  colibri: { value: PERFIL_COLIBRI },
+  'oso-andino': { value: PERFIL_OSO },
+  rana: { value: PERFIL_RANA },
+  'rana-andina': { value: PERFIL_RANA },
+});
+
+export const PERFILES = Object.freeze(PERFILES_CANONICOS);
+export const PERFILES_COMPAI = PERFILES;
 
 function clamp01(n) {
   return Math.max(0, Math.min(1, n));
@@ -178,7 +226,9 @@ function aplicarPerfil(base, perfil, clima, tier) {
   // caída (una mole difumina menos). difusa=1 → caída plena; 0 → nunca se borra.
   const caida = (1 - base.opacidad) * (perfil.difusa ?? 1);
   const opacidad = clamp01(1 - caida);
-  const velocidadAlas = perfil.alas === false ? 1 : base.velocidadAlas;
+  const velocidadAlas = perfil.alas === false || perfil.medio === 'suelo'
+    ? 1
+    : base.velocidadAlas;
   // tinte: identidad de especie si la define; si no, el canónico. En tier bajo
   // se poda el blur (raster caro en gama baja): la opacidad sola cuenta la niebla.
   let tinte = perfil.tintes?.[clima] ?? base.tinte;
@@ -202,7 +252,7 @@ function aplicarPerfil(base, perfil, clima, tier) {
  * @returns {{humedad:number, opacidad:number, tinte:(string|null), velocidadAlas:number, altura:number}}
  */
 export function cuerpoDeClima(clima, { enso = 'neutro', tier, perfil = PERFIL_ABEJA } = {}) {
-  const p = perfil || PERFIL_ABEJA;
+  const p = typeof perfil === 'string' ? (PERFILES[perfil] || PERFIL_ABEJA) : (perfil || PERFIL_ABEJA);
   // Sequía (Niño + día claro): gana sobre 'dorada'/'soleado' salvo especie
   // inmune (perfil.sequia === 0), que entonces ve su clima normal.
   if (esSequia(clima, enso) && (p.sequia ?? 1) > 0) {
