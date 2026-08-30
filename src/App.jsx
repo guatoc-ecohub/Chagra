@@ -872,6 +872,7 @@ const MOCKUP_HASH_ROUTES = {
 };
 
 const HASH_VIEW_ROUTES = {
+  dashboard: 'dashboard',
   agente: 'agente',
   'ciclo-vivo': 'ciclo_vivo',
   faq: 'faq',
