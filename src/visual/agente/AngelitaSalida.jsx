@@ -69,6 +69,7 @@ function prefiereQuietud() {
  * @param {boolean} [props.animated=true]  false = sin teatro, se va digna.
  * @param {string} [props.tier]  'bajo' apaga line-boil (el número sigue).
  * @param {string} [props.title]  Título accesible del avatar.
+ * @param {string} [props.className]  Clases CSS adicionales.
  * @param {() => void} [props.onIdo]  la compañera ya se fue (para desmontar).
  *   El resto de props (clima, enso, …) pasan a <Angelita>.
  */
