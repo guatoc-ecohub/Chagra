@@ -4404,7 +4404,7 @@ export default function App() {
       {/* Transición Angelita home→conversación (~2s). Encima de todo (z alto);
           la conversación monta detrás y queda limpia al terminar. */}
       <ColibriTransition active={colibriTransition} onDone={() => setColibriTransition(false)} />
-      {!esHomeCampesinoB && <NetworkStatusBar />}
+      {(!esHomeCampesinoB || !navigator.onLine) && <NetworkStatusBar />}
       {/* Banners de instalación PWA: NO en las vistas pre-auth (login /
           loading / oauth-callback). En el login son un overlay `fixed`
           z-50 que se encimaba sobre el formulario —en desktop tapaba e
