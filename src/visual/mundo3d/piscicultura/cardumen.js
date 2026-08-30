@@ -62,6 +62,21 @@ export function crearCardumen({ n, estanque, semilla = 1, fondo = 0 }) {
  * Avanza el estado in situ. Las fuerzas se calculan desde una fotografía del
  * cuadro anterior, así el resultado no depende del orden de los peces.
  *
+ * @param {Object} estado - Estado actual del cardumen con estanque y peces
+ * @param {number} dt - Delta tiempo en segundos
+ * @param {Object} [opciones={}] - Opciones de configuración
+ * @param {number} [opciones.vision] - Radio de visión de los peces
+ * @param {number} [opciones.separacionDistancia] - Distancia de separación
+ * @param {number} [opciones.maximoAceleracion] - Aceleración máxima
+ * @param {number} [opciones.velocidadMaxima] - Velocidad máxima
+ * @param {number} [opciones.velocidadMinima] - Velocidad mínima
+ * @param {number} [opciones.separacion] - Fuerza de separación
+ * @param {number} [opciones.alineacion] - Fuerza de alineación
+ * @param {number} [opciones.cohesion] - Fuerza de cohesión
+ * @param {number} [opciones.borde] - Fuerza de repulsión de bordes
+ * @param {number} [opciones.depredador] - Fuerza de repulsión del depredador
+ * @param {{x: number, y: number, z: number, radio?: number}} [opciones.depredadorPunto] - Posición del depredador (opcional)
+ *
  * `depredadorPunto` es opcional: { x, y, z, radio? }. Puede representar puntero,
  * mano u otro estímulo de la escena sin acoplar la simulación al renderer.
  */

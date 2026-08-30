@@ -200,6 +200,7 @@ export default function LoginScreen({ onLoginSuccess, onSave }) {
           <CirculoRotoMilpa
             trigger
             onRupturaCompleta={iniciarSalidaAngelita}
+            onAsentado={() => {}}
             className="relative w-28 h-28 sm:w-32 sm:h-32 rounded-full bg-slate-900/70 backdrop-blur-sm ring-1 ring-muzo/40 shadow-neon-muzo"
           >
             {angelitaVisible && (
