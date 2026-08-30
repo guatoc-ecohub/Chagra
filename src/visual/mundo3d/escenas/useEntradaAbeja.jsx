@@ -1,18 +1,19 @@
 /*
- * useEntradaAbeja + AbejaEscena — LA COREOGRAFÍA COMPARTIDA de Angelita.
+ * useEntradaAbeja + AbejaEscena — LA COREOGRAFÍA PROPIA de Angelita.
  *
  * El DR de mundos-3D pide que la entrada viva UNA sola vez y la herede toda
- * escena-mundo (§4.4). `useEntradaCompai` parametriza la coreografía con especie
- * y presencia; `useEntradaAbeja` conserva el alias histórico. `AbejaEscena` es
- * únicamente el adaptador de cuerpo de Angelita. El dispatcher `CompaiEscena`
- * monta el adaptador propio del guía elegido.
+ * escena-mundo (§4.4). `useEntradaCompai` es el motor interno de este adaptador;
+ * `useEntradaAbeja` conserva el alias histórico. `AbejaEscena` es únicamente
+ * el adaptador de cuerpo de Angelita. El dispatcher `CompaiEscena` monta el
+ * adaptador propio del guía elegido.
  *
  * Vive dentro de escenas/ (chunk perezoso `vendor-three`): importa @react-three
  * y three, así que NUNCA se importa desde el barrel base del framework.
  *
- * El nombre se conserva a propósito: este hook sigue siendo la coreografía
- * nativa y fallback de Angelita. El ruteo del guía elegido vive en
- * `CompaiTransicion`/`compaiRegistry`, sin convertir este hook en un dispatcher.
+ * El nombre se conserva a propósito: este hook es exclusivo de la entrada
+ * nativa de Angelita. No es fallback de los siete canónicos y no debe decidir
+ * qué compañero fue elegido; ese ruteo vive en `CompaiTransicion`/
+ * `compaiRegistry`.
  */
 /* eslint-disable react-refresh/only-export-components -- este módulo (hook de
    coreografía + su componente de escena) se importa SIEMPRE perezoso dentro de
@@ -109,9 +110,10 @@ function puntoDeCruce(camera, foco, out) {
  * @param {string}  [opts.hora='dorada']  hora de cielosHoraData: de 'noche'
  *   Angelita se ACURRUCA (idle nocturno de creatureIdle).
  * @param {string}  [opts.tier='alto']  'bajo' → idle frugal (solo respiración).
- * @param {string}  [opts.especie='abeja-angelita']  perfil idle del cuerpo.
+ * @param {string}  [opts.especie='abeja-angelita']  perfil idle del cuerpo
+ *   de Angelita (parámetro interno de compatibilidad).
  * @param {{percha:{x:number,y:number,z:number},rondaAltura:number,sombra:{opacidadMin:number,opacidadBase:number,atenuaPorAltura:number,ensanchaPorAltura:number}}} [opts.presencia]
- *   presencia espacial propia de la especie; Angelita es el fallback.
+ *   presencia espacial de Angelita (parámetro interno de compatibilidad).
  * @param {{ current: { fase: string, pos: THREE.Vector3 } }|null} [opts.viajeRef]
  *   canal de solo-escritura hacia la CÁMARA (auditoría #50): cada frame el hook
  *   publica aquí la fase del cruce ('oculta'|'picada'|'no'|'salida') y la
@@ -323,13 +325,13 @@ export function useEntradaCompai(foco, {
   return { ref, caraRef, sombraRef, visRef, idleRef, aparecioRef };
 }
 
-// Alias compatible para todos los consumidores existentes de Angelita.
+// Alias histórico: sigue siendo exclusivo del adaptador de Angelita.
 export const useEntradaAbeja = useEntradaCompai;
 
 /**
- * Angelita ya montada en una escena: usa `useEntradaAbeja` para la coreografía y
- * dibuja el cuerpo (`AbejaAngelita`) como billboard `<Html>`. Es la ÚNICA abeja
- * dentro de un mundo (la del footer se oculta): por eso REFLEJA EL HABLA —pulsa
+ * Angelita ya montada en una escena: usa `useEntradaAbeja` para su coreografía y
+ * dibuja el cuerpo (`AbejaAngelita`) como billboard `<Html>`. Es el adaptador
+ * EXCLUSIVO de Angelita, no el fallback de otro compañero: por eso REFLEJA EL HABLA —pulsa
  * cuando el agente narra (`hablando`)— y da un microrrebote al tocar un hotspot
  * (`rebote`, un contador que sube por toque). Tres transformaciones en tres capas
  * DOM que no se pisan: pulso (raíz), rebote (medio), aparición mística (cara, que el
