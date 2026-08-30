@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { User, Lock, Eye, EyeOff, WifiOff, ShieldCheck, Leaf } from 'lucide-react';
 import { applyTheme, normalizeTheme, STORAGE_KEY, DEFAULT_THEME } from '../hooks/useTheme';
 import { authenticateUser } from '../services/authService';
@@ -7,13 +7,21 @@ import { setActiveTenantId } from '../services/tenantContext';
 import { version as APP_VERSION } from '../../package.json';
 import ChagraGrowLoader from './ChagraGrowLoader';
 import { CirculoRotoMilpa } from '../visual/effects';
-import AngelitaSalida from '../visual/agente/AngelitaSalida.jsx';
+import AngelitaVueloLogin from '../visual/agente/AngelitaVueloLogin.jsx';
+import LaminaMilpa from '../visual/laminas/LaminaMilpa.jsx';
 import LegalLinks from './LegalLinks';
 import WelcomeStatsHero from './WelcomeStatsHero';
 import useOllamaWarmStore from '../store/useOllamaWarmStore';
 import { prewarmCorpus } from '../services/ragRetriever';
 import useThemeBackgroundStore, { getBackgroundSrc, esGradiente } from '../store/useThemeBackgroundStore';
 import { friendlyMessage } from '../utils/friendlyErrors';
+import { MENSAJES_LOGIN_ANGELITA } from './loginAngelitaMensajes.js';
+
+const LOGIN_FASE_MS = {
+  despierta: 3000,
+  aura: 6000,
+  ruptura: 9000,
+};
 
 /**
  * LoginScreen — puerta de entrada de Chagra.
@@ -38,8 +46,11 @@ import { friendlyMessage } from '../utils/friendlyErrors';
 export default function LoginScreen({ onLoginSuccess, onSave }) {
   const [creds, setCreds] = useState({ username: '', password: '' });
   const [loading, setLoading] = useState(false);
-  const [angelitaVisible, setAngelitaVisible] = useState(true);
-  const [angelitaSale, setAngelitaSale] = useState(false);
+  const [angelitaFase, setAngelitaFase] = useState('quieta');
+  const [angelitaOrigen, setAngelitaOrigen] = useState(null);
+  const [triadaPlantada, setTriadaPlantada] = useState(false);
+  const [mensajeIndice, setMensajeIndice] = useState(0);
+  const orbeRef = useRef(null);
   // Mostrar/ocultar la contraseña ayuda a quien escribe despacio o con poca
   // costumbre del teclado del teléfono a verificar lo que digitó (a11y +
   // baja alfabetización digital). Arranca oculta: el campo sigue siendo
@@ -51,6 +62,26 @@ export default function LoginScreen({ onLoginSuccess, onSave }) {
   // (DEFAULT_BACKGROUND_SRC), así el login nunca muestra el patrón viejo.
   const selectedBackground = useThemeBackgroundStore((s) => s.selected);
   const loginBgSrc = getBackgroundSrc(selectedBackground);
+
+  /* La fase temporal vive aquí, no dentro del asset Fase 1. Así el círculo
+     permanece quieto durante los primeros 9 segundos y CirculoRotoMilpa solo
+     recibe el flanco de subida en el momento exacto de la ruptura. */
+  useEffect(() => {
+    const timers = Object.entries(LOGIN_FASE_MS).map(([fase, demora]) => (
+      window.setTimeout(() => setAngelitaFase(fase), demora)
+    ));
+    return () => timers.forEach((timer) => window.clearTimeout(timer));
+  }, []);
+
+  /* Los mensajes son fijos y no conversacionales. Cada cambio remonta el
+     Typewriter que vive dentro de BurbujaAngelita. */
+  useEffect(() => {
+    if (angelitaFase !== 'volando') return undefined;
+    const timer = window.setInterval(() => {
+      setMensajeIndice((actual) => (actual + 1) % MENSAJES_LOGIN_ANGELITA.length);
+    }, 8000);
+    return () => window.clearInterval(timer);
+  }, [angelitaFase]);
 
   // FIX prod 2026-06-10: la login está diseñada en estilo BIOPUNK (dark) —
   // `bg-slate-950` + `bg-biopunk-pattern` + texto claro. Con el tema 'auto'
@@ -160,8 +191,24 @@ export default function LoginScreen({ onLoginSuccess, onSave }) {
     }
   };
 
-  const iniciarSalidaAngelita = useCallback(() => setAngelitaSale(true), []);
-  const desmontarAngelita = useCallback(() => setAngelitaVisible(false), []);
+  const iniciarSalidaAngelita = useCallback(() => {
+    const caja = orbeRef.current?.getBoundingClientRect();
+    if (caja) {
+      setAngelitaOrigen({
+        x: caja.left + caja.width / 2 - 44,
+        y: caja.top + caja.height / 2 - 44,
+      });
+    }
+    setMensajeIndice(0);
+    setAngelitaFase('volando');
+  }, []);
+
+  const plantarTriada = useCallback(() => setTriadaPlantada(true), []);
+
+  const angelitaVolando = angelitaFase === 'volando';
+  const angelitaViva = angelitaFase !== 'quieta';
+  const angelitaAura = angelitaFase === 'aura' || angelitaFase === 'ruptura';
+  const mensajeAngelita = MENSAJES_LOGIN_ANGELITA[mensajeIndice];
 
   return (
     <div className="login-screen relative min-h-[100dvh] w-full bg-slate-950 bg-biopunk-pattern flex flex-col items-center overflow-y-auto text-slate-100 px-5 sm:px-6 pt-[max(2rem,env(safe-area-inset-top))] pb-[max(2rem,env(safe-area-inset-bottom))]">
@@ -197,20 +244,32 @@ export default function LoginScreen({ onLoginSuccess, onSave }) {
             la animación es liviana y no carga el avatar del shell pre-auth.
             ───────────────────────────────────────────────────────────── */}
         <header className="flex flex-col items-center text-center gap-3 pt-2">
-          <CirculoRotoMilpa
-            trigger
-            onRupturaCompleta={iniciarSalidaAngelita}
-            className="relative w-28 h-28 sm:w-32 sm:h-32 rounded-full bg-slate-900/70 backdrop-blur-sm ring-1 ring-muzo/40 shadow-neon-muzo"
-          >
-            {angelitaVisible && (
-              <AngelitaSalida
-                activa={angelitaSale}
-                onIdo={desmontarAngelita}
-                size={88}
-                title="Chagra IA"
+          <div ref={orbeRef} className="login-abejita-stage">
+            <CirculoRotoMilpa
+              trigger={angelitaFase === 'ruptura' || angelitaVolando}
+              onRupturaCompleta={iniciarSalidaAngelita}
+              onAsentado={plantarTriada}
+              className="relative w-28 h-28 sm:w-32 sm:h-32 rounded-full bg-slate-900/70 backdrop-blur-sm ring-1 ring-muzo/40 shadow-neon-muzo"
+            >
+              <AngelitaVueloLogin
+                volando={angelitaVolando}
+                origen={angelitaOrigen}
+                mensaje={mensajeAngelita}
+                estado={angelitaAura || angelitaVolando ? 'invita' : 'acompana'}
+                animated={angelitaViva}
+                aura={angelitaAura}
               />
-            )}
-          </CirculoRotoMilpa>
+              {triadaPlantada && (
+                <div
+                  className="login-triada-piso"
+                  data-testid="login-triada-piso"
+                  aria-label="La tríada de la milpa: maíz, frijol y calabaza"
+                >
+                  <LaminaMilpa aria-hidden="true" />
+                </div>
+              )}
+            </CirculoRotoMilpa>
+          </div>
 
           <div>
             <h1 className="text-5xl font-black tracking-tight text-muzo drop-shadow-[0_0_18px_rgba(16,185,129,0.45)]">
