@@ -53,6 +53,12 @@ const LAZY_EXCLUDED_PREFIXES = [
   join(DIST, 'valle'),
 ];
 
+// El registro de fauna compartido solo se alcanza desde rutas lazy 3D y la
+// vitrina de avatar. Rolldown lo emite como un archivo común en assets/, no
+// bajo una carpeta propia, por eso se excluye por prefijo de nombre igual que
+// vendor-three: cache-on-use, nunca parte del arranque 2D.
+const LAZY_EXCLUDED_ASSET_PREFIXES = ['creatures-'];
+
 function formatSize(bytes) {
   if (bytes < 1024) return `${bytes} B`;
   if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
@@ -60,7 +66,9 @@ function formatSize(bytes) {
 }
 
 function isLazyExcluded(fullPath) {
-  return LAZY_EXCLUDED_PREFIXES.some((p) => fullPath === p || fullPath.startsWith(p + '/'));
+  if (LAZY_EXCLUDED_PREFIXES.some((p) => fullPath === p || fullPath.startsWith(p + '/'))) return true;
+  const assetName = fullPath.startsWith(ASSETS + '/') ? fullPath.slice(ASSETS.length + 1) : '';
+  return LAZY_EXCLUDED_ASSET_PREFIXES.some((prefix) => assetName.startsWith(prefix));
 }
 
 function getDirSizeRaw(dir) {
@@ -106,6 +114,10 @@ function checkBudget() {
   for (const p of LAZY_EXCLUDED_PREFIXES) {
     if (existsSync(p)) lazyExcluded += getDirSizeRaw(p);
   }
+  for (const f of readdirSync(ASSETS)) {
+    const fp = join(ASSETS, f);
+    if (isLazyExcluded(fp) && lstatSync(fp).isFile()) lazyExcluded += statSync(fp).size;
+  }
 
   let mainBundleSize = 0;
   const chunkSizes = [];
@@ -129,7 +141,7 @@ function checkBudget() {
   // Baseline del reland Compai: el trazado JaguarTrazado es el arte aprobado
   // compartido por los avatares, y su chunk ya existía en el conjunto que se
   // vuelve a aterrizar. Se conserva la alerta para chunks nuevos.
-  const CHUNK_ALLOWLIST = [/^vendor-three-/, /^JaguarTrazado-/];
+  const CHUNK_ALLOWLIST = [/^vendor-three-/, /^JaguarTrazado-/, /^creatures-/];
   for (const { file, size } of chunkSizes) {
     if (size > THRESHOLDS.chunkMax && !CHUNK_ALLOWLIST.some((re) => re.test(file))) {
       errors.push('CHUNK "' + file + '" exceeds 500KB: ' + formatSize(size));
