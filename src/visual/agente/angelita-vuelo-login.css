@@ -1,0 +1,146 @@
+/* La salida es vuelo vivo: la opacidad permanece completa durante todo el
+   trayecto, sin disolución, encogimiento místico ni segundo avatar. */
+.login-abejita-stage {
+  position: relative;
+  width: 112px;
+  height: 112px;
+  flex: 0 0 auto;
+}
+
+.login-triada-piso {
+  position: absolute;
+  inset: -20px;
+  display: grid;
+  place-items: center;
+  overflow: visible;
+  z-index: 2;
+  pointer-events: none;
+  animation: login-triada-planta 0.7s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+.login-triada-piso > svg {
+  width: 178px;
+  height: auto;
+  filter: drop-shadow(0 0 5px rgba(251, 191, 36, 0.22));
+}
+
+@keyframes login-triada-planta {
+  from { opacity: 0; transform: translateY(8px) scale(0.7); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.login-angelita-presencia {
+  display: grid;
+  place-items: center;
+  width: 88px;
+  height: 88px;
+  z-index: 3;
+}
+
+.login-angelita-presencia.is-en-orbe {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.login-angelita-presencia.is-con-aura::before {
+  content: '';
+  position: absolute;
+  width: 132px;
+  height: 132px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(251, 191, 36, 0.3), rgba(16, 185, 129, 0.12) 42%, transparent 72%);
+  box-shadow: 0 0 28px rgba(251, 191, 36, 0.3);
+  pointer-events: none;
+  animation: login-angelita-aura-respira 2.1s ease-in-out infinite;
+}
+
+@keyframes login-angelita-aura-respira {
+  0%, 100% { opacity: 0.62; transform: scale(0.92); }
+  50% { opacity: 1; transform: scale(1.08); }
+}
+
+.login-angelita-presencia.is-volando {
+  position: fixed;
+  right: 14px;
+  bottom: max(90px, calc(env(safe-area-inset-bottom, 0px) + 90px));
+  width: 84px;
+  height: 84px;
+  pointer-events: none;
+  z-index: 45;
+}
+
+/* El aterrizaje conserva exactamente el puesto natural del FAB. La clase se
+   separa de `.is-volando` para que el transform de la animación no quede como
+   estado de reposo, pero la entidad React sigue siendo la misma. */
+.login-angelita-presencia.is-asentada {
+  position: fixed;
+  right: 14px;
+  bottom: max(90px, calc(env(safe-area-inset-bottom, 0px) + 90px));
+  width: 84px;
+  height: 84px;
+  pointer-events: none;
+  z-index: 45;
+  transform: none;
+}
+
+.login-angelita-presencia.is-volando.is-vuelo-listo {
+  animation: login-angelita-vuela 1.8s cubic-bezier(0.18, 0.86, 0.24, 1) both;
+}
+
+@keyframes login-angelita-vuela {
+  0% {
+    opacity: 1;
+    transform: translate3d(var(--login-vuelo-dx), var(--login-vuelo-dy), 0) rotate(-8deg) scale(0.9);
+  }
+  28% {
+    opacity: 1;
+    transform: translate3d(calc(var(--login-vuelo-dx) * 0.72), calc(var(--login-vuelo-dy) * 0.28), 0) rotate(7deg) scale(1.04);
+  }
+  58% {
+    opacity: 1;
+    transform: translate3d(calc(var(--login-vuelo-dx) * 0.38), calc(var(--login-vuelo-dy) * 0.78), 0) rotate(-5deg) scale(0.97);
+  }
+  82% {
+    opacity: 1;
+    transform: translate3d(calc(var(--login-vuelo-dx) * 0.1), calc(var(--login-vuelo-dy) * 0.98), 0) rotate(3deg) scale(1.02);
+  }
+  100% {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) rotate(0deg) scale(1);
+  }
+}
+
+.login-angelita-presencia.is-volando .agt-angelita {
+  filter: drop-shadow(0 0 7px rgba(251, 191, 36, 0.72));
+}
+
+.login-angelita-burbuja {
+  position: absolute;
+  right: 0;
+  bottom: calc(100% + 10px);
+  z-index: 2;
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .login-triada-piso {
+    animation: none;
+  }
+
+  .login-angelita-presencia.is-con-aura::before {
+    animation: none;
+    opacity: 0.82;
+  }
+  .login-angelita-presencia.is-volando.is-vuelo-listo {
+    animation: none;
+  }
+}
+
+@media (min-width: 640px) {
+  .login-abejita-stage {
+    width: 128px;
+    height: 128px;
+  }
+}

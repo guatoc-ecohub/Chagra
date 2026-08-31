@@ -48,6 +48,7 @@ export default function LoginScreen({ onLoginSuccess, onSave }) {
   const [loading, setLoading] = useState(false);
   const [angelitaFase, setAngelitaFase] = useState('quieta');
   const [angelitaOrigen, setAngelitaOrigen] = useState(null);
+  const [angelitaAterrizada, setAngelitaAterrizada] = useState(false);
   const [triadaPlantada, setTriadaPlantada] = useState(false);
   const [mensajeIndice, setMensajeIndice] = useState(0);
   const orbeRef = useRef(null);
@@ -204,8 +205,12 @@ export default function LoginScreen({ onLoginSuccess, onSave }) {
   }, []);
 
   const plantarTriada = useCallback(() => setTriadaPlantada(true), []);
+  const terminarAterrizaje = useCallback(() => {
+    setAngelitaAterrizada(true);
+    setAngelitaFase('asentada');
+  }, []);
 
-  const angelitaVolando = angelitaFase === 'volando';
+  const angelitaVolando = angelitaFase === 'volando' && !angelitaAterrizada;
   const angelitaViva = angelitaFase !== 'quieta';
   const angelitaAura = angelitaFase === 'aura' || angelitaFase === 'ruptura';
   const mensajeAngelita = MENSAJES_LOGIN_ANGELITA[mensajeIndice];
@@ -253,11 +258,13 @@ export default function LoginScreen({ onLoginSuccess, onSave }) {
             >
               <AngelitaVueloLogin
                 volando={angelitaVolando}
+                asentada={angelitaAterrizada}
                 origen={angelitaOrigen}
                 mensaje={mensajeAngelita}
                 estado={angelitaAura || angelitaVolando ? 'invita' : 'acompana'}
                 animated={angelitaViva}
                 aura={angelitaAura}
+                onAterrizaje={terminarAterrizaje}
               />
               {triadaPlantada && (
                 <div

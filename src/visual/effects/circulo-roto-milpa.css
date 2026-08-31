@@ -79,7 +79,8 @@
 .crm-onda,
 .crm-aro-pulso,
 .crm-mota,
-.crm-brasa {
+.crm-brasa,
+.crm-fruto {
   opacity: 0;
 }
 
@@ -306,10 +307,27 @@
   transform-origin: center bottom;
   animation: crm-boil 1.1s steps(1, end) var(--crm-boil-d, var(--crm-idle)) infinite;
 }
+.crm-milpa {
+  transform-box: fill-box;
+  transform-origin: center bottom;
+  transform: scale(var(--crm-milpa-scale, 1));
+}
 .crm-roto .crm-milpa { --crm-boil-d: 0s; }
 @keyframes crm-boil {
-  0%, 100% { transform: scale(1, 1) rotate(0deg); }
-  50% { transform: scale(1.008, 0.994) rotate(0.25deg); }
+  0%, 100% { transform: scale(var(--crm-milpa-scale, 1), var(--crm-milpa-scale, 1)) rotate(0deg); }
+  50% { transform: scale(calc(var(--crm-milpa-scale, 1) * 1.008), calc(var(--crm-milpa-scale, 1) * 0.994)) rotate(0.25deg); }
+}
+
+/* Los tres frutos entran con el brote y quedan sólidos en el fotograma final. */
+.crm-activa .crm-fruto {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: crm-fruto-brota 0.5s var(--crm-back) var(--d, 2.2s) both;
+}
+@keyframes crm-fruto-brota {
+  from { opacity: 0; transform: scale(0.35); }
+  70% { opacity: 1; transform: scale(1.08); }
+  to { opacity: 1; transform: scale(1); }
 }
 
 /* Vaivén lento de las hojas (período co-primo con el boil: nunca en compás) */
@@ -364,7 +382,8 @@
 .crm-roto .crm-vidrio { opacity: 0; }
 .crm-roto .crm-monticulo,
 .crm-roto .crm-grano,
-.crm-roto .crm-hoja {
+.crm-roto .crm-hoja,
+.crm-roto .crm-fruto {
   opacity: 1;
 }
 .crm-roto .crm-mont-izq { transform: rotate(-9deg) translate(-2.5px, 0); }
