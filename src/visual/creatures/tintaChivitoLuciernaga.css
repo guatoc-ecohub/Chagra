@@ -1,0 +1,69 @@
+/*
+ * tintaChivitoLuciernaga.css — CADENCIA propia de la TINTA NUEVA (2026-08-31):
+ * el chivito de páramo y la luciérnaga de las bases aprobadas por el operador.
+ *
+ * Archivo APARTE de `creatures.css` a propósito: el arte tinta existente está
+ * CONGELADO y no se toca — aquí viven solo los compases nuevos (el pulso de la
+ * linterna de la luciérnaga y el pop de la cresta punk del chivito). Las
+ * cadencias transversales (rh-boil, rh-sway, rh-blink, rh-antic…) se heredan
+ * de `creatures.css` como siempre — cero duplicación.
+ *
+ * Períodos co-primos con los de la casa (rubberhoseSpec.RH_PERIODOS): la
+ * linterna late a 3.4s — no divide ni al boil (1.5) ni al sway (2.4) ni al
+ * blink (5.6): la vida idle nunca cae en el mismo compás.
+ */
+
+/* ── LA LINTERNA DE LA LUCIÉRNAGA (su alma): late suave, viva ──────────────── */
+.lucit-linterna {
+  transform-box: fill-box;
+  transform-origin: center;
+}
+.lucit-pulso {
+  animation: lucit-pulso 3.4s ease-in-out infinite;
+}
+@keyframes lucit-pulso {
+  0%, 100% { opacity: 0.78; }
+  42% { opacity: 1; }
+  58% { opacity: 0.9; }
+}
+.lucit-halo {
+  transform-box: fill-box;
+  transform-origin: center;
+}
+.lucit-halo-pulso {
+  animation: lucit-halo-pulso 3.4s ease-in-out infinite;
+}
+@keyframes lucit-halo-pulso {
+  0%, 100% { opacity: 0.36; transform: scale(0.94); }
+  42% { opacity: 0.62; transform: scale(1.05); }
+  58% { opacity: 0.5; transform: scale(1); }
+}
+
+/* ── LA CRESTA PUNK DEL CHIVITO: se para de golpe cuando ACTÚA ────────────────
+   El mohawk no es permanente — es el estado "cuando actúa". Al montarse hace
+   UN overshoot rubber-hose (la curva canónica de la casa) y se queda parado. */
+.chiv-cresta {
+  transform-box: fill-box;
+  transform-origin: center bottom;
+}
+.chiv-punk-pop {
+  animation: chiv-punk-pop 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) 1 both;
+}
+@keyframes chiv-punk-pop {
+  0% { transform: scaleY(0.25); }
+  100% { transform: scaleY(1); }
+}
+
+/* ── Gates de la casa: tier bajo y reduced-motion apagan el idle continuo.
+   La linterna NO se apaga del todo (es su alma): queda encendida fija. */
+[data-tier='bajo'] .lucit-pulso,
+[data-tier='bajo'] .lucit-halo-pulso {
+  animation: none;
+}
+@media (prefers-reduced-motion: reduce) {
+  .lucit-pulso,
+  .lucit-halo-pulso,
+  .chiv-punk-pop {
+    animation: none;
+  }
+}
