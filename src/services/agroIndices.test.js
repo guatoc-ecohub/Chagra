@@ -7,6 +7,7 @@ import { describe, it, expect } from 'vitest';
 import {
     vpdKpa, etcMm, balanceHidricoDia, presionEnfermedad, anomalia,
     parseCultivos, kcDeCultivo, amplitudTermica, leerUv, MODELOS_ENFERMEDAD,
+    horasFrio, spi,
 } from './agroIndices.js';
 
 describe('VPD', () => {
@@ -73,6 +74,27 @@ describe('Anomalía (hoy vs. lo normal)', () => {
     });
     it('sin normales → null (no inventa la anomalía)', () => {
         expect(anomalia(21, 1, null)).toBeNull();
+    });
+});
+
+describe('Horas-frío', () => {
+    it('cuenta las horas con temperatura estrictamente menor a 7 °C', () => {
+        expect(horasFrio([6.9, 7, 5, 8, null, 4])).toBe(3);
+    });
+    it('acepta la forma horaria de Open-Meteo y no inventa con entrada inválida', () => {
+        expect(horasFrio({ temperature_2m: [8, 6, 3, 7] })).toBe(2);
+        expect(horasFrio(null)).toBeNull();
+    });
+});
+
+describe('SPI de precipitación', () => {
+    it('estandariza la anomalía frente a media y desviación históricas', () => {
+        expect(spi(2, { precip_dia_normal: 6, precip_dia_desv: 2 })).toBe(-2);
+        expect(spi(10, 6, 2)).toBe(2);
+    });
+    it('queda pendiente si falta la desviación o es cero', () => {
+        expect(spi(2, { precip_dia_normal: 6 })).toBeNull();
+        expect(spi(2, 6, 0)).toBeNull();
     });
 });
 

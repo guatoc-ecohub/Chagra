@@ -15,7 +15,7 @@ import { getProfile } from '../../services/userProfileService';
 import { fetchClimaSnapshot, resolveClimaLocation } from '../../services/climaService';
 import { fetchAgroMeteo, fetchNormales } from '../../services/agroMeteoService';
 import {
-    parseCultivos, vpdKpa, leerVpd, leerUv, amplitudTermica, anomalia,
+    parseCultivos, vpdKpa, leerVpd, leerUv, amplitudTermica, anomalia, spi,
 } from '../../services/agroIndices';
 import {
     LECTURA_ENSO, ACCIONES_ENSO, REGLA_INSIGNIA, BOLETINES_IDEAM,
@@ -74,6 +74,8 @@ function FuenteFase({ source }) {
     const map = {
         live: { icon: Radio, label: 'En vivo (IDEAM/NOAA)', cls: 'text-emerald-300 border-emerald-500/40 bg-emerald-500/10' },
         manual: { icon: MapPin, label: 'Fijada a mano', cls: 'text-amber-300 border-amber-500/40 bg-amber-500/10' },
+        openmeteo: { icon: Radio, label: 'Open-Meteo', cls: 'text-sky-300 border-sky-500/40 bg-sky-500/10' },
+        archive: { icon: Radio, label: 'Open-Meteo archive (ERA5)', cls: 'text-sky-300 border-sky-500/40 bg-sky-500/10' },
         // eslint-disable-next-line chagra-i18n/no-hardcoded-spanish -- copy UI es-CO, deuda ADR-050 (messages.js) pendiente igual que el resto del módulo
         default: { icon: Hourglass, label: 'Sin conexión — valor base', cls: 'text-slate-400 border-slate-600/50 bg-slate-700/20' },
     };
@@ -93,14 +95,14 @@ function FuenteDato({ children }) {
 }
 
 /* Ficha de un índice del día (tile). */
-function IndiceTile({ icon, label, valor, unidad, sub, accent = 'slate', children }) {
+function IndiceTile({ icon, label, valor, unidad, sub, accent = 'slate', testid, children }) {
     const Icon = icon;
     const tint = {
         sky: 'text-sky-300', amber: 'text-amber-300', emerald: 'text-emerald-300',
         red: 'text-red-300', orange: 'text-orange-300', slate: 'text-slate-200',
     }[accent] || 'text-slate-200';
     return (
-        <div className="rounded-2xl border border-slate-700/60 bg-slate-900/50 p-3">
+        <div data-testid={testid} className="rounded-2xl border border-slate-700/60 bg-slate-900/50 p-3">
             <p className="flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wide text-slate-400">
                 <Icon size={13} className={tint} aria-hidden="true" /> {label}
             </p>
@@ -121,13 +123,15 @@ function IndiceTile({ icon, label, valor, unidad, sub, accent = 'slate', childre
 }
 
 /* ── HORIZONTE 1 · HOY ─────────────────────────────────────────────────── */
-function HorizonteHoy({ agrometeo, loading, anom, cultivos, sinFicha, faseFamily, faseLabel, onRefresh }) {
+function HorizonteHoy({ agrometeo, normales, loading, anom, cultivos, sinFicha, faseFamily, faseLabel, onRefresh }) {
     const now = agrometeo?.now;
     const today = agrometeo?.today;
     const vpd = now ? vpdKpa(now.temp, now.rh) : null;
     const vpdL = leerVpd(vpd);
     const uvL = leerUv(today?.uv_max);
     const amplitud = today ? amplitudTermica(today.temp_max, today.temp_min) : null;
+    const horasFrioHoy = Number.isFinite(today?.horas_frio) ? today.horas_frio : null;
+    const spiHoy = spi(today?.precip_mm, normales);
 
     return (
         <section className="clima-seccion space-y-4" data-testid="horizonte-hoy">
@@ -235,6 +239,18 @@ function HorizonteHoy({ agrometeo, loading, anom, cultivos, sinFicha, faseFamily
                     <IndiceTile icon={ThermometerSun} label="Amplitud térmica" valor={amplitud} unidad="°C" accent="orange"
                         sub={amplitud != null ? (amplitud >= 12 ? 'grande: ojo helada/quemado' : 'moderada') : undefined}>
                         <FuenteDato>Estimado por Chagra · Open-Meteo (máx−mín)</FuenteDato>
+                    </IndiceTile>
+
+                    <IndiceTile testid="clima-indice-horas-frio" icon={ThermometerSun} label="Horas-frío" valor={horasFrioHoy} unidad="h" accent="sky"
+                        sub="horas con T menor a 7 °C">
+                        <FuenteFase source="openmeteo" />
+                        <FuenteDato>Estimado por Chagra · serie horaria Open-Meteo</FuenteDato>
+                    </IndiceTile>
+
+                    <IndiceTile testid="clima-indice-spi" icon={CloudRain} label="SPI de lluvia" valor={spiHoy} accent={spiHoy != null && spiHoy <= -1 ? 'amber' : 'emerald'}
+                        sub={spiHoy == null ? 'anomalía estandarizada' : spiHoy <= -1 ? 'más seco que el histórico' : spiHoy >= 1 ? 'más lluvioso que el histórico' : 'cerca del histórico'}>
+                        <FuenteFase source="archive" />
+                        <FuenteDato>Precipitación de hoy frente a media y desviación del archivo ERA5</FuenteDato>
                     </IndiceTile>
                 </div>
             )}
@@ -762,7 +778,7 @@ export default function ClimaBoletinScreen({ onBack, onNavigate = undefined, loc
 
                 {horizonte === 'hoy' && (
                     <HorizonteHoy
-                        agrometeo={agrometeo} loading={loading} anom={anom}
+                        agrometeo={agrometeo} normales={normales} loading={loading} anom={anom}
                         cultivos={cultivos} sinFicha={sinFicha}
                         faseFamily={faseFamily} faseLabel={faseLabel}
                         onRefresh={() => { setLoading(true); setRefreshTick((t) => t + 1); }}

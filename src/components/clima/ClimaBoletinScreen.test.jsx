@@ -17,7 +17,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent, cleanup } from '@testing-library/react';
 import ClimaBoletinScreen from './ClimaBoletinScreen.jsx';
 import { setEnsoPhase, clearEnsoPhase } from '../../services/ensoService.js';
-import { fetchAgroMeteo } from '../../services/agroMeteoService.js';
+import { fetchAgroMeteo, fetchNormales } from '../../services/agroMeteoService.js';
 
 // Perfil andino (Boyacá) → región 'andina' para la lectura regional.
 vi.mock('../../services/userProfileService', async (importActual) => {
@@ -178,6 +178,32 @@ describe('La página del tiempo — 7–16 días remite a la fuente oficial', ()
     const bsa = await screen.findByTestId('clima-bsa-link');
     expect(bsa).toHaveAttribute('target', '_blank');
     expect(bsa.getAttribute('href')).toMatch(/ideam\.gov\.co.*bsa/i);
+  });
+});
+
+describe('La página del tiempo — motores agroclimáticos', () => {
+  it('muestra horas-frío y SPI con sus fuentes cuando llegan los datos', async () => {
+    vi.mocked(fetchAgroMeteo).mockResolvedValueOnce({
+      now: { temp: 6, rh: 80, weather: { emoji: '🌤️', label: 'Casi despejado' } },
+      today: { temp_max: 12, temp_min: 4, precip_mm: 2, horas_frio: 3, uv_max: 2 },
+      daily: [],
+    });
+    vi.mocked(fetchNormales).mockResolvedValueOnce({
+      temp_media_normal: 8,
+      precip_dia_normal: 6,
+      precip_dia_desv: 2,
+      source: 'Open-Meteo archive (ERA5)',
+    });
+
+    render(<ClimaBoletinScreen onBack={() => {}} location={{ lat: 5.5, lng: -73.4 }} />);
+
+    const frio = await screen.findByTestId('clima-indice-horas-frio');
+    expect(frio).toHaveTextContent('3');
+    expect(frio).toHaveTextContent('Open-Meteo');
+
+    const indiceSpi = await screen.findByTestId('clima-indice-spi');
+    expect(indiceSpi).toHaveTextContent('-2');
+    expect(indiceSpi).toHaveTextContent('Open-Meteo archive (ERA5)');
   });
 });
 
