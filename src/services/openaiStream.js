@@ -216,7 +216,13 @@ export async function streamOpenAI(url, body, onToken, { signal, onDone } = {}) 
             mergeToolCallDeltas(accumulatedToolCalls, tc);
           }
           if (isDoneChunk(parsed)) {
-            // Empty block - finish_reason detected but we continue processing
+            // `finish_reason` es el fin semántico del stream. Algunos proxies
+            // interrumpen la conexión después de este chunk y omiten el
+            // sentinel `[DONE]` (por ejemplo, cuando un tool MCP falló aguas
+            // arriba). Seguir esperando ese sentinel deja al consumidor
+            // bloqueado en `reader.read()` para siempre.
+            done = true;
+            break;
           }
         }
         if (done) break;
@@ -233,6 +239,9 @@ export async function streamOpenAI(url, body, onToken, { signal, onDone } = {}) 
     });
     throw err;
   } finally {
+    if (done) {
+      try { await reader.cancel(); } catch (_) { /* noop */ }
+    }
     try { reader.releaseLock(); } catch (_) { /* noop */ }
   }
 

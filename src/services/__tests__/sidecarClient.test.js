@@ -362,6 +362,20 @@ describe('sidecarClient — feature flag on', () => {
       // throw) y el formatter puede señalar el gap al LLM.
       expect(res).toEqual({ _error: true, reason: 'fetch_failed', tool: 'get_companions' });
     });
+
+    it('502 de get_calendario_siembra → ToolError fetch_failed sin bloquear el caller', async () => {
+      fetchMock.mockResolvedValueOnce(jsonResponse(502, { error: 'bad gateway' }));
+      const { callTool } = await importFresh();
+      const res = await callTool('get_calendario_siembra', {
+        piso_termico: 'frio',
+        mes: 8,
+      });
+      expect(res).toEqual({
+        _error: true,
+        reason: 'fetch_failed',
+        tool: 'get_calendario_siembra',
+      });
+    });
   });
 
   describe('configuración / base URL', () => {
