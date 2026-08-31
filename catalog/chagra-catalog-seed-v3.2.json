@@ -1,7 +1,7 @@
 {
   "schema_version": "3.2",
   "seed_version": "0.2.0-oss-subset",
-  "generated_at": "2026-08-12",
+  "generated_at": "2026-08-31",
   "generated_by": "scripts/migrate-v31-to-v32.mjs — transform automático v3.1 → v3.2. ADR-030 Regla 1 (tracking_mode). Revisión agronómica requerida para especies con tracking_mode=null.",
   "_meta": {
     "fuente_migracion": "chagra-catalog-seed-v3.1.json",
@@ -5873,6 +5873,57 @@
       "_anti_confusion": "El 'mirto' aquí es Murraya paniculata (Rutaceae, ornamental asiático), NO el mirto mediterráneo (Myrtus communis, Myrtaceae). Pertenece a la misma familia (Rutaceae) que los cítricos, de ahí su papel como reservorio del psílido vector del HLB.",
       "valor_pedagogico": "El mirto o azahar de la India (Murraya paniculata (L.) Jack, familia Rutaceae) es un arbusto ornamental siempreverde originario de Asia tropical, muy usado como cerca viva y seto recortado en jardines y antejardines de tierra cálida y templada en Colombia por sus flores blancas perfumadas (similares al azahar de los cítricos) y su follaje denso. Pertenece a la familia Rutaceae, la misma de los cítricos, y por ello es importante en sanidad vegetal: es el hospedero preferido y reservorio del psílido asiático de los cítricos (Diaphorina citri), insecto vector de la bacteria del Huanglongbing (HLB) o 'dragón amarillo', la enfermedad más destructiva de la citricultura mundial. El ICA y la curaduría de Chagra desaconsejan sembrar mirto cerca de huertos cítricos precisamente por servir de puente epidemiológico del vector. No debe confundirse con el mirto mediterráneo (Myrtus communis). Lección viva sobre epidemiología vegetal, plantas reservorio de vectores y el principio de no introducir hospederos de plagas cerca de cultivos sensibles. Fuentes Tier A de taxonomía: GBIF, POWO Kew, Bernal 2015.",
       "tracking_mode": "aggregate"
+    },
+    {
+      "_curation_status": "VALIDADO: taxonomía y distribución colombiana en POWO; manejo hortícola y MIP respaldados por fuentes de extensión/IPM citadas. Rendimiento: SlotPendiente.",
+      "id": "eruca_vesicaria",
+      "nombre_comun": "Rúcula / Arúgula",
+      "nombre_comunes_regionales": [
+        "rúgula",
+        "oruga",
+        "rocket"
+      ],
+      "nombre_cientifico": "Eruca vesicaria (L.) Cav.",
+      "familia_botanica": "Brassicaceae",
+      "category": "hortalizas_hoja",
+      "thermal_zones": [
+        "templado",
+        "frio"
+      ],
+      "roles_in_guild": [
+        "crop"
+      ],
+      "cultivable": true,
+      "conservation_status": "naturalizada",
+      "altitud_msnm": {
+        "min_absoluto": 1910,
+        "optimo_min": 1910,
+        "optimo_max": 2600,
+        "max_absoluto": 2600
+      },
+      "radiacion": "sol_pleno",
+      "agua": "medio",
+      "drenaje_requerido": "bueno",
+      "harvest_type": "hoja",
+      "cycleMonths": 1.5,
+      "propagation": {
+        "metodo_principal": "semilla",
+        "notas": "Siembra directa. Las guías de extensión consultadas la tratan como hortaliza de estación fresca y reportan primera cosecha aproximada de 25-45 días, según sistema y variedad; no usar ese intervalo como rendimiento."
+      },
+      "source_ids": [
+        "powo-kew",
+        "gbif-taxonomic-backbone",
+        "bernal-2015-plantas-liquenes-colombia",
+        "uc-ipm-cole-crops-arugula",
+        "umn-vegetable-planning-arugula",
+        "agrosavia-inocuidad-frutas-hortalizas-2019",
+        "jbb-rugula-density-2021"
+      ],
+      "valor_pedagogico": "La rúcula o arúgula (Eruca vesicaria (L.) Cav., Brassicaceae) es una hortaliza anual de hoja. POWO registra una distribución adventicia en Colombia entre 1910 y 2600 msnm, en los Andes, y acepta este nombre científico. Las guías de extensión consultadas la describen como cultivo de estación fresca, tolerante a heladas y apto para siembra directa. Para MIP, UC IPM documenta en rúcula la roya blanca (Albugo candida) y el daño de la chinche bagrada en crucíferas; recomienda evitar lotes con antecedentes de roya blanca, reducir humedad foliar y monitorear plagas. AGROSAVIA documenta producción ecológica, manejo de plagas y biopreparados para frutas y hortalizas, pero no se encontró una cifra de rendimiento específica y transferible para esta entrada: rendimiento = SlotPendiente, no inventar.",
+      "companions": [],
+      "antagonists": [],
+      "confidence_notes": "La franja 1910-2600 msnm es distribución colombiana reportada por POWO, no un óptimo productivo experimental. La aptitud final del lote depende de temperatura, humedad, suelo y variedad. Rendimiento pendiente de una fuente específica para el sistema de la finca evaluada.",
+      "tracking_mode": "aggregate"
     }
   ],
   "biopreparados": [
@@ -7305,6 +7356,51 @@
     }
   ],
   "sources": [
+    {
+      "id": "uc-ipm-cole-crops-arugula",
+      "tipo": "manual_tecnico",
+      "autores": "UC Statewide Integrated Pest Management Program",
+      "año": null,
+      "titulo": "Pest Management Guidelines: Cole Crops",
+      "institucion": "University of California Agriculture and Natural Resources",
+      "url": "https://ipm.ucanr.edu/pdf/pmg/pmgcolecrops.pdf",
+      "tier": "A",
+      "observaciones": "Incluye rúcula entre los hospederos de roya blanca y describe manejo IPM para crucíferas."
+    },
+    {
+      "id": "umn-vegetable-planning-arugula",
+      "tipo": "manual_tecnico",
+      "autores": "University of Minnesota Extension",
+      "año": 2026,
+      "titulo": "Crop and field planning tools for vegetable farmers",
+      "institucion": "University of Minnesota Extension",
+      "url": "https://extension.umn.edu/vegetable-growing-guides-farmers/crop-and-field-planning-tools-vegetable-farmers",
+      "tier": "A",
+      "observaciones": "Clasifica la rúcula como hortaliza de hoja de clima fresco, tolerante a heladas, y ofrece un intervalo de días a madurez para ese contexto de extensión."
+    },
+    {
+      "id": "agrosavia-inocuidad-frutas-hortalizas-2019",
+      "tipo": "manual_tecnico",
+      "autores": "AGROSAVIA",
+      "año": 2019,
+      "titulo": "Cultivando la inocuidad de mis frutas y hortalizas",
+      "institucion": "AGROSAVIA",
+      "doi": "10.21930/agrosavia.nbook.7403084",
+      "url": "https://editorial.agrosavia.co/index.php/publicaciones/catalog/book/98",
+      "tier": "A",
+      "observaciones": "Aborda buenas prácticas, manejo de plagas y enfermedades, producción ecológica, biopreparados y compostaje."
+    },
+    {
+      "id": "jbb-rugula-density-2021",
+      "tipo": "informe_tecnico",
+      "autores": "Jardín Botánico de Bogotá José Celestino Mutis",
+      "año": 2021,
+      "titulo": "Semillas por propagación tradicional y de productividad de 4 especies útiles para la agricultura urbana",
+      "institucion": "Jardín Botánico de Bogotá José Celestino Mutis",
+      "url": "https://catalogador.jbb.gov.co/app/resource?r=001_bio-em_sc_2021038_2",
+      "tier": "A",
+      "observaciones": "Recurso experimental que incluye Eruca vesicaria y mediciones de crecimiento y biomasa; no se usa para afirmar un rendimiento general."
+    },
     {
       "id": "agrosavia-bacillus-2018",
       "tipo": "manual_tecnico",
