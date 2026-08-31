@@ -4393,10 +4393,10 @@ export default function App() {
     // sin banners de instalación/datos ni FABs encima.
     currentView.startsWith('mockup_');
 
-  // La portada campesina B (dashboard, bandera activa) trae su propia barra
-  // superior con indicador "Con señal / Sin señal" y su propio compai que
-  // camina (CompaiOverlay). Por eso suprime la NetworkStatusBar global y el
-  // AgentFab idle, para no duplicar chrome ni compai encima del layout aprobado.
+  // La portada campesina B (dashboard, bandera activa) trae su propio
+  // indicador de señal y su propio compai que camina. NetworkStatusBar se
+  // mantiene montada porque es la señal durable de la cola offline, pero solo
+  // se hace visible al perder conexión o durante una sincronización.
   const esHomeCampesinoB = currentView === 'dashboard' && homeCampesinoBActivo();
 
   return (
@@ -4404,7 +4404,7 @@ export default function App() {
       {/* Transición Angelita home→conversación (~2s). Encima de todo (z alto);
           la conversación monta detrás y queda limpia al terminar. */}
       <ColibriTransition active={colibriTransition} onDone={() => setColibriTransition(false)} />
-      {!esHomeCampesinoB && <NetworkStatusBar />}
+      <NetworkStatusBar />
       {/* Banners de instalación PWA: NO en las vistas pre-auth (login /
           loading / oauth-callback). En el login son un overlay `fixed`
           z-50 que se encimaba sobre el formulario —en desktop tapaba e

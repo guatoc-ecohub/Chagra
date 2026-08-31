@@ -106,7 +106,12 @@ describe('compaiRegistry.resolverCompai', () => {
       for (const sentido of ['entrar', 'volver']) {
         const { container } = render(createElement(AbejaTransicion, {
           sentido,
+          // Los portales comparten el contrato runtime de AbejaTransicion,
+          // aunque cada rig declara props JSDoc más estrechas que el default.
+          // La prueba valida el handoff real, no la firma estática del SVG.
+          // @ts-expect-error Componentes de portal heterogéneos bajo contrato común.
           Cuerpo: c.PortalComponent,
+          onFin: () => {},
         }));
         expect(
           container.querySelector(`[data-creature="${c.especie}"]`),

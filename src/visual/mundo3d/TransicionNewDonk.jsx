@@ -30,8 +30,7 @@
  */
 import { useEffect, useRef } from 'react';
 import ChagraAgentAvatar from '../../components/ChagraAgentAvatar.jsx';
-import useCompaiElegido from './escenas/useCompaiElegido.js';
-import { AVATAR_NOMBRE, DEFAULT_AVATAR_TYPE } from '../../hooks/useAgentAvatarType.js';
+import useAgentAvatarType, { AVATAR_NOMBRE, DEFAULT_AVATAR_TYPE } from '../../hooks/useAgentAvatarType.js';
 import { tinteDeMundo, tituloDeMundo } from './resolverMundo.js';
 
 /** Duración total del viaje New Donk (ms). */
@@ -171,7 +170,7 @@ export default function TransicionNewDonk({
   onMitad,
   onFin,
 }) {
-  const { avatarType } = useCompaiElegido();
+  const [avatarType] = useAgentAvatarType();
   const nombreCompai = AVATAR_NOMBRE[avatarType] || AVATAR_NOMBRE[DEFAULT_AVATAR_TYPE];
   const mitadRef = useRef(onMitad);
   const finRef = useRef(onFin);

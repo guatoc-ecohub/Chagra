@@ -133,7 +133,7 @@ describe('P1 contrato integrado del elenco compai', () => {
 
       for (const sentido of ['entrar', 'volver']) {
         const { container, unmount } = render(
-          <AbejaTransicion sentido={sentido} Cuerpo={cuerpoPortalDe(compai)} />,
+          <AbejaTransicion sentido={sentido} Cuerpo={cuerpoPortalDe(compai)} onFin={() => {}} />,
         );
         expect(
           container.querySelector(`[data-creature="${compai.especie}"]`),

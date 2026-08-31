@@ -103,7 +103,16 @@ describe('4. caso dorado — fachada común sin tocar estados ni poses', () => {
   });
 
   it('conserva la bandera de animación del rig bajo reduced motion', () => {
-    const matchMedia = vi.spyOn(window, 'matchMedia').mockImplementation(() => ({ matches: true }));
+    const matchMedia = vi.spyOn(window, 'matchMedia').mockImplementation(() => ({
+      matches: true,
+      media: '(prefers-reduced-motion: reduce)',
+      onchange: null,
+      addListener: () => {},
+      removeListener: () => {},
+      addEventListener: () => {},
+      removeEventListener: () => {},
+      dispatchEvent: () => true,
+    }));
 
     try {
       const { container } = render(<Angelita estado="acompana" animated />);

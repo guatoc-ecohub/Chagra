@@ -180,6 +180,7 @@ export const ariaParaEstado = ariaDeEstado;
 
 /* Alias compatible con Angelita: conserva exactamente el copy histórico,
    incluido el descriptor de abeja que ya pueden anunciar consumidores viejos. */
+/** @type {Record<string, string>} */
 export const ARIA_DE_ESTADO = Object.freeze({
   ...Object.fromEntries(ESTADOS_AGENTE.map((estado) => [estado, ariaDeEstado(estado, 'Angelita')])),
   acompana: 'Angelita la abeja lo acompaña',

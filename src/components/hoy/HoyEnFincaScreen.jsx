@@ -18,8 +18,7 @@ import JourneyGuideCard from './JourneyGuideCard';
 import FincaEvolutionCard from './FincaEvolutionCard';
 import { AngelitaGuia } from '../../visual/agente';
 import ChagraAgentAvatar from '../ChagraAgentAvatar';
-import useCompaiElegido from '../../visual/mundo3d/escenas/useCompaiElegido.js';
-import { AVATAR_NOMBRE, DEFAULT_AVATAR_TYPE } from '../../hooks/useAgentAvatarType.js';
+import useAgentAvatarType, { AVATAR_NOMBRE, DEFAULT_AVATAR_TYPE } from '../../hooks/useAgentAvatarType.js';
 import useCompaiPaseo from '../../hooks/useCompaiPaseo';
 import { registrarParadas, desregistrarParadas } from '../../services/compaiParadasPorPantalla';
 import useAngelitaStore from '../../store/useAngelitaStore';
@@ -96,7 +95,7 @@ function prefillAgent(prompt) {
 /** @param {{ onBack?: () => void, onHome?: () => void, onNavigate?: (view: string, params?: object) => void }} props */
 export default function HoyEnFincaScreen({ onBack, onHome, onNavigate }) {
     const activeAlerts = useAlertStore((s) => s.activeAlerts);
-    const { avatarType } = useCompaiElegido();
+    const [avatarType] = useAgentAvatarType();
     const nombreCompai = AVATAR_NOMBRE[avatarType] || AVATAR_NOMBRE[DEFAULT_AVATAR_TYPE];
 
     // Ubicación GUARDADA del perfil — nunca geolocalización en vivo (memoria

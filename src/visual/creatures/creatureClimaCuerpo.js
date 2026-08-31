@@ -182,6 +182,7 @@ export const PERFIL_ANGELITA = PERFIL_ABEJA;
 export const PERFIL_CHIVITO = PERFIL_CHIVITO_PUNK;
 
 /** Registro consultable slug→perfil de los siete compai canónicos. */
+/** @type {Record<string, {medio:string, alas:boolean, humedad:number, difusa:number, sequia:number, tintes?:Record<string,string>}>} */
 const PERFILES_CANONICOS = {
   'abeja-angelita': PERFIL_ABEJA,
   jaguar: PERFIL_JAGUAR,

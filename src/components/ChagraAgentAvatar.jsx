@@ -1,3 +1,4 @@
+import { lazy, Suspense } from 'react';
 import ChagraAgentAvatarAngelita from './ChagraAgentAvatarAngelita';
 import ChagraAgentAvatarZariguya from './ChagraAgentAvatarZariguya';
 import ChagraAgentAvatarJaguar from './ChagraAgentAvatarJaguar';
@@ -59,7 +60,7 @@ import { estadoCanonico } from '../visual/agente/angelitaEstados.js';
  * qué perfil está activo. Un slug inválido usa el perfil seguro de Angelita;
  * los siete slugs registrados tienen adaptador y no tienen fallback propio.
  */
-const ADAPTADOR_POR_ESPECIE = {
+const ADAPTADORES_DEV = {
     angelita: ChagraAgentAvatarAngelita,
     zariguya: ChagraAgentAvatarZariguya,
     jaguar: ChagraAgentAvatarJaguar,
@@ -68,6 +69,21 @@ const ADAPTADOR_POR_ESPECIE = {
     guacamaya: ChagraAgentAvatarGuacamaya,
     'chivito-punk': ChagraAgentAvatarChivitoPunk,
 };
+
+/* Los adaptadores 2D conservan el contrato síncrono en tests/dev, donde los
+   callers históricos inspeccionan el SVG en el mismo tick. En producción se
+   cargan después del shell y cada rig queda fuera del chunk de arranque. */
+const ADAPTADORES_PROD = {
+    angelita: lazy(() => import('./ChagraAgentAvatarAngelita.jsx')),
+    zariguya: lazy(() => import('./ChagraAgentAvatarZariguya.jsx')),
+    jaguar: lazy(() => import('./ChagraAgentAvatarJaguar.jsx')),
+    'oso-baston': lazy(() => import('./ChagraAgentAvatarOsoBaston.jsx')),
+    luciernaga: lazy(() => import('./ChagraAgentAvatarLuciernaga.jsx')),
+    guacamaya: lazy(() => import('./ChagraAgentAvatarGuacamaya.jsx')),
+    'chivito-punk': lazy(() => import('./ChagraAgentAvatarChivitoPunk.jsx')),
+};
+
+const ADAPTADOR_POR_ESPECIE = import.meta.env.PROD ? ADAPTADORES_PROD : ADAPTADORES_DEV;
 
 const STATE_DE_ESTADO_RICO = Object.freeze({
     acompana: 'idle',
@@ -123,13 +139,15 @@ export default function ChagraAgentAvatar({ estado = undefined, state = undefine
     const stateEntrada = STATE_DE_ESTADO_RICO[estadoEntrada] || state;
 
     return (
-        <CompaiAgente
-            {...props}
-            especie={perfil.avatarType}
-            estado={estadoEntrada}
-            state={stateEntrada}
-            chrome={false}
-            adaptador={Adaptador}
-        />
+        <Suspense fallback={<span role="img" aria-label="Compañero cargando" data-agt-especie={perfil.avatarType} />}>
+            <CompaiAgente
+                {...props}
+                especie={perfil.avatarType}
+                estado={estadoEntrada}
+                state={stateEntrada}
+                chrome={false}
+                adaptador={Adaptador}
+            />
+        </Suspense>
     );
 }

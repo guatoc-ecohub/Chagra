@@ -384,6 +384,7 @@ function AdaptadorLuciernaga({
       estado={estadoActual}
       pose={pose}
       reducedMotion={reducedMotion}
+      tier={dataTier}
       data-agt-especie={dataEspecie}
       data-creature={dataCreature}
       data-agt-estado={estadoActual}
