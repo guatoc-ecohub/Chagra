@@ -95,6 +95,46 @@ export function deficitAcumulado(dias) {
     return n ? { faltaMm: Math.round(acc * 10) / 10, dias: n } : null;
 }
 
+/* ───────────────────────── HORAS-FRÍO ────────────────────────────────────
+ * Conteo simple de porciones horarias por debajo de 7 °C. La serie puede ser
+ * el array `temperature_2m` de Open-Meteo, un array de muestras numéricas o
+ * muestras con `temperature_2m`/`temperature`.
+ */
+export function horasFrio(serieHoraria, umbralC = 7) {
+    if (!Number.isFinite(umbralC)) return null;
+    const muestras = Array.isArray(serieHoraria)
+        ? serieHoraria
+        : serieHoraria?.temperature_2m;
+    if (!Array.isArray(muestras)) return null;
+
+    return muestras.reduce((total, muestra) => {
+        const temp = typeof muestra === 'number'
+            ? muestra
+            : muestra?.temperature_2m ?? muestra?.temperature;
+        return total + (Number.isFinite(temp) && temp < umbralC ? 1 : 0);
+    }, 0);
+}
+
+/* ───────────────────────────── SPI ───────────────────────────────────────
+ * SPI aquí significa la anomalía estandarizada solicitada por el producto:
+ * (precipitación observada − media histórica) / desviación histórica.
+ * La distribución histórica la entrega el archivo de Open-Meteo; sin media o
+ * desviación válidas se devuelve null para que la UI use SlotPendiente.
+ */
+export function spi(precipMm, historico, desviacion = undefined) {
+    if (!Number.isFinite(precipMm)) return null;
+
+    const media = typeof historico === 'number'
+        ? historico
+        : historico?.precip_dia_normal ?? historico?.media ?? historico?.mean;
+    const desv = typeof historico === 'number'
+        ? desviacion
+        : historico?.precip_dia_desv ?? historico?.desviacion ?? historico?.standardDeviation ?? historico?.stddev;
+
+    if (!Number.isFinite(media) || !Number.isFinite(desv) || desv <= 0) return null;
+    return Math.round(((precipMm - media) / desv) * 100) / 100;
+}
+
 /* ─────────────────────────── ANOMALÍA ────────────────────────────────────
  * Hoy vs. la normal (media histórica). Hace TANGIBLE el ENSO.
  */

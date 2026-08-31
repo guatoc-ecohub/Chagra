@@ -34,6 +34,8 @@
  * Open-Meteo con FAO-56 Penman-Monteith nativo.
  */
 
+import { horasFrio } from './agroIndices.js';
+
 const FORECAST_URL = 'https://api.open-meteo.com/v1/forecast';
 const ARCHIVE_URL = 'https://archive-api.open-meteo.com/v1/archive';
 
@@ -42,7 +44,7 @@ const NORMALS_TTL_MS = 30 * 24 * 60 * 60 * 1000; // 30 días — la climatologí
 const FETCH_TIMEOUT_MS = 12_000;
 
 const LS_FORECAST = 'chagra:agrometeo:forecast-v1';
-const LS_NORMALS = 'chagra:agrometeo:normals-v1';
+const LS_NORMALS = 'chagra:agrometeo:normals-v2';
 
 const DAILY_VARS = [
     'weathercode',
@@ -168,7 +170,7 @@ function aggregateHourly(hourly, dayIso) {
         // Mojado foliar aproximado: horas con HR ≥ 90 % (rocío/agua libre sobre la hoja).
         horas_hr_alta: rh.filter((v) => v >= 90).length,
         // Horas-frío: horas con temperatura < 7 °C (base frutales caducifolios, FAO/UC-Davis).
-        horas_frio: temps.filter((v) => v < 7).length,
+        horas_frio: temps.length ? horasFrio(temps) : null,
         cloud_mean: mean(cloud),
     };
 }
@@ -285,7 +287,7 @@ export async function fetchAgroMeteo(loc, opts = {}) {
  * llama cuando la vista estacional necesita la anomalía. Nunca throw → null.
  *
  * @param {{lat:number,lng:number}} loc
- * @returns {Promise<{temp_media_normal:number,precip_dia_normal:number,years:number,doy_window:number,source:string}|null>}
+ * @returns {Promise<{temp_media_normal:number,precip_dia_normal:number,precip_dia_desv:number|null,years:number,doy_window:number,source:string}|null>}
  */
 export async function fetchNormales(loc) {
     const lat = Number(loc?.lat);
@@ -345,9 +347,14 @@ export async function fetchNormales(loc) {
         return null;
     }
     const mean = (a) => a.reduce((s, v) => s + v, 0) / a.length;
+    const precipMean = precs.length ? mean(precs) : null;
+    const precipVariance = precs.length
+        ? precs.reduce((sum, value) => sum + ((value - precipMean) ** 2), 0) / precs.length
+        : null;
     const payload = {
         temp_media_normal: Math.round(mean(temps) * 10) / 10,
-        precip_dia_normal: Math.round(mean(precs) * 10) / 10,
+        precip_dia_normal: precipMean == null ? null : Math.round(precipMean * 10) / 10,
+        precip_dia_desv: precipVariance == null ? null : Math.round(Math.sqrt(precipVariance) * 100) / 100,
         years: endYear - startYear + 1,
         doy_window: WINDOW,
         source: `Open-Meteo archive (ERA5), media ${startYear}–${endYear} · ventana ±${WINDOW} d`,
