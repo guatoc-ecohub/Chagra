@@ -2379,6 +2379,7 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
         // evitando la cascada de "NO es viable a N msnm" por cada variedad. Los
         // guards de SAFETY (agroquímico, dosis, visión, nombre) corren igual.
         userMessage: text,
+        toolEvidence,
       });
       if (guarded.modified) {
         console.debug('[guards] salida corregida', { reasons: guarded.reasons });

@@ -198,6 +198,104 @@ const PLANTING_INTENT_PATTERNS = [
   /\ben\s+mi\s+finca\b/,
 ];
 
+// P1 de auditoría 41 especies: el catálogo no tiene una cifra uniforme de
+// rendimiento. Esta intención solo cubre preguntas por una cifra o dato de
+// producción, no consejos generales como "¿cómo mejoro el rendimiento?".
+const YIELD_QUERY_RE =
+  /\b(cu[aá]nt[oa]s?|qu[eé]|cu[aá]l(?:es)?|dato[s]?|cifra[s]?)\b.{0,60}\b(rendimiento|productividad|produ[cç]ci[oó]n|produce|cosecha)\b|\b(rendimiento|productividad|produ[cç]ci[oó]n)\b.{0,60}\b(kg|t\s*\/?\s*ha|hect[aá]rea|planta|cifra|dato)\b/;
+
+const YIELD_VALUE_KEYS = new Set([
+  'rendimiento',
+  'yield',
+  'rendimientos',
+  'productividad',
+  'produccion',
+  'producción',
+  'rendimiento_promedio_t_ha',
+  'rendimiento_kg_ha',
+  'yield_kg_ha',
+  'cosecha_estimada_kg_por_planta',
+]);
+
+function hasDocumentedYield(value, seen = new Set()) {
+  if (!value || typeof value !== 'object' || seen.has(value)) return false;
+  seen.add(value);
+  for (const [key, candidate] of Object.entries(value)) {
+    if (!YIELD_VALUE_KEYS.has(key)) continue;
+    if (candidate === null || candidate === undefined || candidate === '') continue;
+    if (typeof candidate === 'string' && /slotpendiente|pendiente|sin dato|no document/i.test(candidate)) continue;
+    if (typeof candidate === 'object') {
+      const valueKeys = new Set(['valor', 'value', 'cantidad', 'min', 'max', 'promedio', 'kg_ha', 't_ha']);
+      if (
+        Object.entries(candidate).some(([nestedKey, nestedValue]) => {
+          if (!valueKeys.has(nestedKey) || nestedValue === null || nestedValue === undefined || nestedValue === '') {
+            return false;
+          }
+          return !(typeof nestedValue === 'string' && /slotpendiente|pendiente|sin dato|no document/i.test(nestedValue));
+        }) ||
+        hasDocumentedYield(candidate, seen)
+      ) {
+        return true;
+      }
+      continue;
+    }
+    return true;
+  }
+  return false;
+}
+
+function yieldEntityName(toolEvidence, entities) {
+  const evidence = Array.isArray(toolEvidence) ? toolEvidence : [toolEvidence];
+  for (const ev of evidence) {
+    const result = ev?.result;
+    const species = result?.species || result;
+    const name = species?.nombre_comun || species?.nombre || species?.nombre_cientifico;
+    if (typeof name === 'string' && name.trim()) return name.trim();
+  }
+  const entity = Array.isArray(entities)
+    ? entities.find((entry) => entry && (entry.nombre_comun || entry.nombre_cientifico || entry.mentioned))
+    : null;
+  return entity?.nombre_comun || entity?.nombre_cientifico || entity?.mentioned || 'la especie consultada';
+}
+
+/**
+ * Bloquea cifras de rendimiento inventadas cuando la evidencia consultada no
+ * contiene un valor documentado. Si una evidencia sí contiene rendimiento,
+ * deja pasar la respuesta para no tapar un dato respaldado.
+ *
+ * @param {string} responseText
+ * @param {{userMessage?: string|null, toolEvidence?: object|Array<object>|null, resolvedEntities?: Array<object>|null}} [ctx]
+ * @returns {{text:string, modified:boolean, reason:string|null}}
+ */
+export function guardMissingYield(responseText, { userMessage = null, toolEvidence = null, resolvedEntities = null } = {}) {
+  if (typeof responseText !== 'string' || responseText.length === 0) {
+    return { text: responseText ?? '', modified: false, reason: null };
+  }
+  const query = _stripDiacritics(userMessage || '');
+  if (!YIELD_QUERY_RE.test(query)) return { text: responseText, modified: false, reason: null };
+
+  const evidence = Array.isArray(toolEvidence) ? toolEvidence : [toolEvidence];
+  const hasYield = evidence.some((ev) => {
+    const result = ev?.result;
+    return hasDocumentedYield(result?.species || result);
+  });
+  if (hasYield) return { text: responseText, modified: false, reason: null };
+
+  // Sin tool ni entidad no podemos atribuir el SlotPendiente a una especie;
+  // el prompt general conserva el comportamiento honesto en ese caso.
+  if (!toolEvidence && (!Array.isArray(resolvedEntities) || resolvedEntities.length === 0)) {
+    return { text: responseText, modified: false, reason: null };
+  }
+
+  const name = yieldEntityName(toolEvidence, resolvedEntities);
+  bumpGuardTelemetry('missing_yield');
+  return {
+    text: `SlotPendiente: rendimiento de ${name}. El catálogo Chagra no tiene una cifra verificada para esta especie y sistema. No invento kg/ha ni kg/planta. Fuente: catálogo Chagra, ficha consultada sin campo de rendimiento; requiere curaduría editorial.`,
+    modified: true,
+    reason: 'rendimiento_sin_dato_verificado',
+  };
+}
+
 /**
  * classifyQueryIntent — heurística simple de intención sobre la pregunta del
  * usuario (A12). Devuelve:
@@ -10509,6 +10607,7 @@ export function applyOutputGuards(
     forecastTempMin = null,
     forecastTempMax = null,
     userMessage = null,
+    toolEvidence = null,
   } = {},
 ) {
   if (typeof responseText !== 'string' || responseText.length === 0) {
@@ -10610,6 +10709,17 @@ export function applyOutputGuards(
     // Respuesta off-domain reemplazada: no corremos más guards sobre la
     // declinación (no hay cultivo/entidad que razonar).
     return { text: offDom.text, modified: true, reasons: offDom.reason ? [offDom.reason] : [] };
+  }
+
+  // P1 auditoría 41 especies: el rendimiento faltante es un SlotPendiente,
+  // nunca una invitación a completar cifras desde memoria del modelo.
+  const missingYield = guardMissingYield(text, { userMessage, toolEvidence, resolvedEntities: entities });
+  if (missingYield.modified) {
+    return {
+      text: missingYield.text,
+      modified: true,
+      reasons: missingYield.reason ? [missingYield.reason] : [],
+    };
   }
 
   // GUARD de visión PRIMERO: si la respuesta afirma un diagnóstico visual sin
