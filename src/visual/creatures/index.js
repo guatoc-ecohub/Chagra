@@ -65,6 +65,8 @@ export {
 export { RanaAndina } from './RanaAndina.jsx';
 export { Ardilla } from './Ardilla.jsx';
 export { Jaguar } from './Jaguar.jsx';
+export { ChivitoTrazado } from './ChivitoTrazado.jsx';
+export { LuciernagaTrazado } from './LuciernagaTrazado.jsx';
 /* La IDENTIDAD del jaguar como datos (paleta leonada + rosetas, proporciones y
    su perfil de clima). Solo datos: jamás arrastra three al bundle base — igual
    que abejaIdentidad/faunaAndina. */
