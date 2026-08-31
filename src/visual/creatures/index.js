@@ -210,6 +210,17 @@ export {
    lentitud. Su voz-maestra (el guion de botánica/clima/conservación/caza) vive
    en useEntGuion (fallback digno hasta que aterrice src/data/entGuion.js). */
 export { EntFrailejon } from './EntFrailejon.jsx';
+/* ── TINTA NUEVA (2026-08-31, bases aprobadas por el operador) ────────────────
+   El chivito de páramo (normal + cresta punk cuando ACTÚA) y la luciérnaga DE
+   PIE (lápiz + libro + linterna encendida), dibujados a mano — línea limpia +
+   planos de color, cero trazado. El registro CREATURES sigue apuntando a las
+   láminas (`ChivitoPunkLaminaViva` / `LuciernagaLaminaViva`) hasta que el
+   operador juzgue la tinta y ordene el cambio — trabajo aparte, misma regla
+   que la zarigüeya (#2613 → trazado). */
+export { ChivitoTinta } from './ChivitoTinta.jsx';
+export { CHIVITO_TINTA_PALETA, PERFIL_CHIVITO_TINTA } from './chivitoTintaIdentidad.js';
+export { LuciernagaTinta } from './LuciernagaTinta.jsx';
+export { LUCIERNAGA_TINTA_PALETA } from './luciernagaTintaIdentidad.js';
 export {
   useEntGuion, resolverGuionEnt, ENT_GUION_PLACEHOLDER, ENT_TEMAS,
 } from './useEntGuion.js';
