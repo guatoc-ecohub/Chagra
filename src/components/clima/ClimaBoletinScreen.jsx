@@ -15,7 +15,8 @@ import { getProfile } from '../../services/userProfileService';
 import { fetchClimaSnapshot, resolveClimaLocation } from '../../services/climaService';
 import { fetchAgroMeteo, fetchNormales } from '../../services/agroMeteoService';
 import {
-    parseCultivos, vpdKpa, leerVpd, leerUv, amplitudTermica, anomalia, spi,
+    parseCultivos, vpdKpa, leerVpd, leerUv, amplitudTermica, anomalia,
+    etcMm, balanceHidricoDia, spi, spei,
 } from '../../services/agroIndices';
 import {
     LECTURA_ENSO, ACCIONES_ENSO, REGLA_INSIGNIA, BOLETINES_IDEAM,
@@ -132,6 +133,9 @@ function HorizonteHoy({ agrometeo, normales, loading, anom, cultivos, sinFicha, 
     const amplitud = today ? amplitudTermica(today.temp_max, today.temp_min) : null;
     const horasFrioHoy = Number.isFinite(today?.horas_frio) ? today.horas_frio : null;
     const spiHoy = spi(today?.precip_mm, normales);
+    const etcReferenciaHoy = today ? etcMm(today.eto_mm, 1) : null;
+    const balanceHoy = today ? balanceHidricoDia(today.precip_mm, etcReferenciaHoy) : null;
+    const speiHoy = spei(balanceHoy ? [balanceHoy] : null, normales);
 
     return (
         <section className="clima-seccion space-y-4" data-testid="horizonte-hoy">
@@ -251,6 +255,13 @@ function HorizonteHoy({ agrometeo, normales, loading, anom, cultivos, sinFicha, 
                         sub={spiHoy == null ? 'anomalía estandarizada' : spiHoy <= -1 ? 'más seco que el histórico' : spiHoy >= 1 ? 'más lluvioso que el histórico' : 'cerca del histórico'}>
                         <FuenteFase source="archive" />
                         <FuenteDato>Precipitación de hoy frente a media y desviación del archivo ERA5</FuenteDato>
+                    </IndiceTile>
+
+                    <IndiceTile testid="clima-indice-spei" icon={Droplets} label="SPEI de balance" valor={speiHoy}
+                        accent={speiHoy != null && speiHoy <= -1 ? 'amber' : speiHoy != null && speiHoy >= 1 ? 'sky' : 'emerald'}
+                        sub={speiHoy == null ? 'anomalía estandarizada' : speiHoy <= -1 ? 'balance seco: cuide el agua' : speiHoy >= 1 ? 'balance húmedo' : 'cerca del histórico'}>
+                        <FuenteFase source="archive" />
+                        <FuenteDato>Lluvia − ETc de referencia (Kc 1.0) frente a media y desviación del archivo ERA5</FuenteDato>
                     </IndiceTile>
                 </div>
             )}

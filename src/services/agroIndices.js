@@ -135,6 +135,73 @@ export function spi(precipMm, historico, desviacion = undefined) {
     return Math.round(((precipMm - media) / desv) * 100) / 100;
 }
 
+/* ───────────────────────────── SPEI ─────────────────────────────────────
+ * SPEI es el SPI aplicado al balance hídrico (precipitación − PET/ETc), no a
+ * la precipitación cruda. La serie se acumula en la ventana antes de
+ * estandarizarla, de modo que un déficit sostenido conserva signo negativo.
+ * Acepta números netos, resultados de balanceHidricoDia() o días con
+ * `precipMm`/`etcMm` (también sus nombres normalizados con guion bajo).
+ * La normal debe describir el balance de la misma ventana y traer media y
+ * desviación, igual que spi().
+ */
+function balanceNetoDeDia(dia) {
+    if (Number.isFinite(dia)) return dia;
+    if (Number.isFinite(dia?.netoMm)) return dia.netoMm;
+
+    const precip = dia?.precipMm ?? dia?.precip_mm ?? dia?.precip ?? dia?.precipitation;
+    const etc = dia?.etcMm ?? dia?.etc_mm ?? dia?.etc;
+    if (!Number.isFinite(precip) || !Number.isFinite(etc)) return null;
+    return balanceHidricoDia(precip, etc)?.netoMm ?? null;
+}
+
+function balanceAcumulado(serie) {
+    if (Number.isFinite(serie)) return serie;
+    if (serie && typeof serie === 'object' && !Array.isArray(serie)) return balanceNetoDeDia(serie);
+    if (!Array.isArray(serie)) return null;
+    let acumulado = 0;
+    let dias = 0;
+    for (const dia of serie) {
+        const neto = balanceNetoDeDia(dia);
+        if (Number.isFinite(neto)) {
+            acumulado += neto;
+            dias += 1;
+        }
+    }
+    return dias ? acumulado : null;
+}
+
+export function spei(serieBalance, historico, desviacion = undefined) {
+    const acumulado = balanceAcumulado(serieBalance);
+    if (!Number.isFinite(acumulado)) return null;
+
+    const media = typeof historico === 'number'
+        ? historico
+        : historico?.balance_acumulado_normal
+            ?? historico?.balance_hidrico_acumulado_normal
+            ?? historico?.balance_normal
+            ?? historico?.balance_hidrico_normal
+            ?? historico?.balance_dia_normal
+            ?? historico?.balanceNormal
+            ?? historico?.balanceMmNormal
+            ?? historico?.media
+            ?? historico?.mean;
+    const desv = typeof historico === 'number'
+        ? desviacion
+        : historico?.balance_acumulado_desv
+            ?? historico?.balance_hidrico_acumulado_desv
+            ?? historico?.balance_desv
+            ?? historico?.balance_hidrico_desv
+            ?? historico?.balance_dia_desv
+            ?? historico?.balanceDesv
+            ?? historico?.balanceMmDesv
+            ?? historico?.desviacion
+            ?? historico?.standardDeviation
+            ?? historico?.stddev;
+
+    if (!Number.isFinite(media) || !Number.isFinite(desv) || desv <= 0) return null;
+    return Math.round(((acumulado - media) / desv) * 100) / 100;
+}
+
 /* ─────────────────────────── ANOMALÍA ────────────────────────────────────
  * Hoy vs. la normal (media histórica). Hace TANGIBLE el ENSO.
  */

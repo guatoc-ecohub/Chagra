@@ -185,13 +185,15 @@ describe('La página del tiempo — motores agroclimáticos', () => {
   it('muestra horas-frío y SPI con sus fuentes cuando llegan los datos', async () => {
     vi.mocked(fetchAgroMeteo).mockResolvedValueOnce({
       now: { temp: 6, rh: 80, weather: { emoji: '🌤️', label: 'Casi despejado' } },
-      today: { temp_max: 12, temp_min: 4, precip_mm: 2, horas_frio: 3, uv_max: 2 },
+      today: { temp_max: 12, temp_min: 4, precip_mm: 2, eto_mm: 4, horas_frio: 3, uv_max: 2 },
       daily: [],
     });
     vi.mocked(fetchNormales).mockResolvedValueOnce({
       temp_media_normal: 8,
       precip_dia_normal: 6,
       precip_dia_desv: 2,
+      balance_dia_normal: 0,
+      balance_dia_desv: 2,
       source: 'Open-Meteo archive (ERA5)',
     });
 
@@ -204,6 +206,10 @@ describe('La página del tiempo — motores agroclimáticos', () => {
     const indiceSpi = await screen.findByTestId('clima-indice-spi');
     expect(indiceSpi).toHaveTextContent('-2');
     expect(indiceSpi).toHaveTextContent('Open-Meteo archive (ERA5)');
+
+    const indiceSpei = await screen.findByTestId('clima-indice-spei');
+    expect(indiceSpei).toHaveTextContent('-1');
+    expect(indiceSpei).toHaveTextContent('ETc de referencia');
   });
 });
 

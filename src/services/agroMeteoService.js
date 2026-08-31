@@ -34,7 +34,7 @@
  * Open-Meteo con FAO-56 Penman-Monteith nativo.
  */
 
-import { horasFrio } from './agroIndices.js';
+import { horasFrio, etcMm, balanceHidricoDia } from './agroIndices.js';
 
 const FORECAST_URL = 'https://api.open-meteo.com/v1/forecast';
 const ARCHIVE_URL = 'https://archive-api.open-meteo.com/v1/archive';
@@ -44,7 +44,7 @@ const NORMALS_TTL_MS = 30 * 24 * 60 * 60 * 1000; // 30 días — la climatologí
 const FETCH_TIMEOUT_MS = 12_000;
 
 const LS_FORECAST = 'chagra:agrometeo:forecast-v1';
-const LS_NORMALS = 'chagra:agrometeo:normals-v2';
+const LS_NORMALS = 'chagra:agrometeo:normals-v3';
 
 const DAILY_VARS = [
     'weathercode',
@@ -287,7 +287,7 @@ export async function fetchAgroMeteo(loc, opts = {}) {
  * llama cuando la vista estacional necesita la anomalía. Nunca throw → null.
  *
  * @param {{lat:number,lng:number}} loc
- * @returns {Promise<{temp_media_normal:number,precip_dia_normal:number,precip_dia_desv:number|null,years:number,doy_window:number,source:string}|null>}
+ * @returns {Promise<{temp_media_normal:number,precip_dia_normal:number,precip_dia_desv:number|null,balance_dia_normal:number|null,balance_dia_desv:number|null,years:number,doy_window:number,source:string}|null>}
  */
 export async function fetchNormales(loc) {
     const lat = Number(loc?.lat);
@@ -308,7 +308,7 @@ export async function fetchNormales(loc) {
         longitude: String(lng),
         start_date: `${startYear}-01-01`,
         end_date: `${endYear}-12-31`,
-        daily: 'temperature_2m_mean,precipitation_sum',
+        daily: 'temperature_2m_mean,precipitation_sum,et0_fao_evapotranspiration',
         timezone: 'auto',
     });
 
@@ -328,6 +328,7 @@ export async function fetchNormales(loc) {
     const WINDOW = 10;
     const temps = [];
     const precs = [];
+    const balances = [];
     const times = raw.daily.time;
     for (let i = 0; i < times.length; i += 1) {
         const dt = new Date(`${times[i]}T00:00:00Z`);
@@ -338,8 +339,15 @@ export async function fetchNormales(loc) {
         if (dist <= WINDOW) {
             const tm = raw.daily.temperature_2m_mean?.[i];
             const pr = raw.daily.precipitation_sum?.[i];
+            const eto = raw.daily.et0_fao_evapotranspiration?.[i];
             if (Number.isFinite(tm)) temps.push(tm);
             if (Number.isFinite(pr)) precs.push(pr);
+            if (Number.isFinite(pr) && Number.isFinite(eto)) {
+                // SPEI de referencia: ETc = ETo × Kc con Kc 1.0.
+                const etc = etcMm(eto, 1);
+                const balance = balanceHidricoDia(pr, etc);
+                if (balance) balances.push(balance.netoMm);
+            }
         }
     }
     if (temps.length < 30) {
@@ -351,13 +359,21 @@ export async function fetchNormales(loc) {
     const precipVariance = precs.length
         ? precs.reduce((sum, value) => sum + ((value - precipMean) ** 2), 0) / precs.length
         : null;
+    const balanceMean = balances.length
+        ? balances.reduce((sum, value) => sum + value, 0) / balances.length
+        : null;
+    const balanceVariance = balances.length
+        ? balances.reduce((sum, value) => sum + ((value - balanceMean) ** 2), 0) / balances.length
+        : null;
     const payload = {
         temp_media_normal: Math.round(mean(temps) * 10) / 10,
         precip_dia_normal: precipMean == null ? null : Math.round(precipMean * 10) / 10,
         precip_dia_desv: precipVariance == null ? null : Math.round(Math.sqrt(precipVariance) * 100) / 100,
+        balance_dia_normal: balanceMean == null ? null : Math.round(balanceMean * 10) / 10,
+        balance_dia_desv: balanceVariance == null ? null : Math.round(Math.sqrt(balanceVariance) * 100) / 100,
         years: endYear - startYear + 1,
         doy_window: WINDOW,
-        source: `Open-Meteo archive (ERA5), media ${startYear}–${endYear} · ventana ±${WINDOW} d`,
+        source: `Open-Meteo archive (ERA5), media ${startYear}–${endYear} · ventana ±${WINDOW} d · balance de referencia Kc 1.0`,
     };
     writeLS(LS_NORMALS, { ts: Date.now(), key, payload });
     return payload;
