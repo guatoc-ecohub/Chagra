@@ -148,7 +148,7 @@ function balanceNetoDeDia(dia) {
     if (Number.isFinite(dia)) return dia;
     if (Number.isFinite(dia?.netoMm)) return dia.netoMm;
 
-    const precip = dia?.precipMm ?? dia?.precip_mm ?? dia?.precipitation;
+    const precip = dia?.precipMm ?? dia?.precip_mm ?? dia?.precip ?? dia?.precipitation;
     const etc = dia?.etcMm ?? dia?.etc_mm ?? dia?.etc;
     if (!Number.isFinite(precip) || !Number.isFinite(etc)) return null;
     return balanceHidricoDia(precip, etc)?.netoMm ?? null;
@@ -156,6 +156,7 @@ function balanceNetoDeDia(dia) {
 
 function balanceAcumulado(serie) {
     if (Number.isFinite(serie)) return serie;
+    if (serie && typeof serie === 'object' && !Array.isArray(serie)) return balanceNetoDeDia(serie);
     if (!Array.isArray(serie)) return null;
     let acumulado = 0;
     let dias = 0;
@@ -180,6 +181,7 @@ export function spei(serieBalance, historico, desviacion = undefined) {
             ?? historico?.balance_normal
             ?? historico?.balance_hidrico_normal
             ?? historico?.balance_dia_normal
+            ?? historico?.balanceNormal
             ?? historico?.balanceMmNormal
             ?? historico?.media
             ?? historico?.mean;
@@ -190,6 +192,7 @@ export function spei(serieBalance, historico, desviacion = undefined) {
             ?? historico?.balance_desv
             ?? historico?.balance_hidrico_desv
             ?? historico?.balance_dia_desv
+            ?? historico?.balanceDesv
             ?? historico?.balanceMmDesv
             ?? historico?.desviacion
             ?? historico?.standardDeviation
