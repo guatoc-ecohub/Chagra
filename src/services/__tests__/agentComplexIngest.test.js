@@ -61,6 +61,20 @@ describe('agentComplexIngest — Caso 1 multi-entidad', () => {
     expect(decomposeComplexIngest('Ayer aboné el tomate.', { now: HOY })).toEqual({ detected: false });
   });
 
+  it('acepta la forma corta usada en campo: 3 cosechas, c/15d y problemas unidos', () => {
+    const result = /** @type {any} */ (decomposeComplexIngest(
+      'sembré 10 tomate cherry en surco 12 hace 3 meses, 3 cosechas, abono c/15d, trozador+gota',
+      { now: HOY },
+    ));
+
+    expect(result.detected).toBe(true);
+    expect(result.operations).toHaveLength(8);
+    expect(result.operations.slice(2, 5)).toHaveLength(3);
+    expect(result.operations[5].parameters.interval_days).toBe(15);
+    expect(result.operations.slice(6).map((operation) => operation.parameters.name)).toEqual(['trozador', 'gota']);
+    expect(result.operations.slice(6).every((operation) => operation.parameters.treatment_status === 'missing')).toBe(true);
+  });
+
   it('entrega las operaciones al executor existente en orden y solo tras confirmación', async () => {
     const plan = /** @type {any} */ (decomposeComplexIngest(CASO_1, { now: HOY }));
     const executor = vi.fn().mockResolvedValue({ status: 'executed', result: { success: true } });

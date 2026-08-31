@@ -45,6 +45,7 @@ export default function ActionConfirmModal({
     actualizar_planta: 'Actualizar planta',
     agendar_riego: 'Programar riego',
     query_corpus_dr034: 'Buscar en corpus',
+    registrar_ingesta_compleja: 'Confirmar registro de campo',
   };
 
   return (

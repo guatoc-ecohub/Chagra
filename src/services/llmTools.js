@@ -14,6 +14,7 @@
  */
 
 import useAssetStore from '../store/useAssetStore';
+import { persistComplexIngest } from './agentComplexIngest';
 
 /**
  * @typedef {Object} ToolDefinition
@@ -364,6 +365,38 @@ registerTool({
     }
   },
   requiresGate: false,
+});
+
+/**
+ * Tool interna para la ingesta determinista multi-entidad. El plan solo llega
+ * desde AgentScreen después de pasar por el parser local. Mantiene un único
+ * gate humano para que la aprobación cubra el conjunto completo y delega la
+ * escritura en los servicios offline-first de FarmProcess.
+ */
+registerTool({
+  name: 'registrar_ingesta_compleja',
+  description: 'Revisar y registrar una siembra histórica con sus cosechas, abonos y observaciones detectadas',
+  parameters: {
+    type: 'object',
+    properties: {
+      plan: {
+        type: 'object',
+        description: 'Plan determinista de operaciones extraído del mensaje del operador',
+      },
+    },
+    required: ['plan'],
+  },
+  handler: async ({ plan }) => {
+    const result = await persistComplexIngest(plan);
+    return {
+      success: result.status === 'executed',
+      message: result.status === 'executed'
+        ? 'Ingesta persistida localmente y encolada para sincronización'
+        : 'La ingesta quedó incompleta y no se debe presentar como totalmente registrada',
+      summary: result,
+    };
+  },
+  requiresGate: true,
 });
 
 export default {

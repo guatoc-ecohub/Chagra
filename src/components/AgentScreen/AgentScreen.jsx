@@ -35,7 +35,7 @@ import { retrieve } from '../../services/ragRetriever';
 // Se consulta ANTES del pipeline sidecar/LLM: si el texto describe varias
 // acciones de campo, se ejecutan las operaciones confirmadas vía actionExecutor
 // (lote/siembra) y se agenda la sugerencia agroecológica en segundo plano.
-import { decomposeComplexIngest, executeComplexIngest, scheduleAgroecologicalSuggestion } from '../../services/agentComplexIngest';
+import { decomposeComplexIngest, scheduleAgroecologicalSuggestion } from '../../services/agentComplexIngest';
 import { parseIntent, formatIntentDescription } from '../../services/agentIntentParser';
 import { streamOpenAI } from '../../services/openaiStream';
 import { buildLLMRequest, selectChatRoute } from '../../services/llmRouter';
@@ -2897,11 +2897,11 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
 
   // agentComplexIngest — descompositor determinista de registros multi-entidad.
   // Se consulta ANTES de enrutar al pipeline sidecar/LLM (handleSubmit). Si el
-  // texto describe varias acciones de campo, muestra la confirmación de cada
-  // operación (gate del actionExecutor) y ejecuta la ingesta confirmada con un
-  // adaptador sobre `executeAction` (resuelve lote y siembra). La sugerencia
-  // agroecológica se agenda async, sin bloquear el cierre del turno. Devuelve
-  // true si el turno se manejó por esta ruta, false para el flujo normal.
+  // texto describe varias acciones de campo, muestra una confirmación conjunta
+  // (gate del actionExecutor) y ejecuta la ingesta confirmada por las puertas
+  // offline-first existentes. La sugerencia agroecológica se agenda async, sin
+  // bloquear el cierre del turno. Devuelve true si el turno se manejó por esta
+  // ruta, false para el flujo normal.
   const handleComplexIngest = async (text) => {
     const plan = decomposeComplexIngest(text);
     if (!plan || !plan.detected) return false;
@@ -2922,20 +2922,47 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
     });
 
     try {
-      // Adaptador sobre actionExecutor: el gate humano se abre por cada
-      // operación (requiresConfirmation) y resuelve crear_lote / registrar_siembra.
-      const summary = await executeComplexIngest(plan, {
-        operatorId,
-        execute: (proposal, opId) => executeAction(proposal, opId),
+      // Un solo gate cubre el plan completo. La tool interna delega en las
+      // puertas offline-first de lote y FarmProcess después de la aprobación.
+      const actionResult = await executeAction({
+        tool_name: 'registrar_ingesta_compleja',
+        parameters: { plan },
+        intent: text,
+        llm_response: '',
+        timestamp: new Date().toISOString(),
+      }, operatorId);
+      const summary = actionResult?.result?.summary || {
+        status: actionResult?.status === 'executed' ? 'executed' : 'partial',
+        executed: 0,
+        failed: 1,
+        results: [],
+      };
+      const registered = summary.results
+        .filter((item) => item.status === 'executed')
+        .map(({ operation }) => operation);
+      const notRegistered = plan.operations.filter(
+        (operation) => !registered.some((item) => item.kind === operation.kind && item.parameters?.ordinal === operation.parameters?.ordinal && item.parameters?.name === operation.parameters?.name),
+      );
+      const registeredLabels = registered.map((operation) => {
+        if (operation.kind === 'ensure_land') return 'el surco';
+        if (operation.kind === 'create_seeding') return 'la siembra retrofechada';
+        if (operation.kind === 'register_harvest') return `la cosecha ${operation.parameters.ordinal}`;
+        if (operation.kind === 'register_fertilizer_cadence') return `el abono cada ${operation.parameters.interval_days} días`;
+        return `la observación de ${operation.parameters.name}`;
       });
+      const missingTreatment = plan.operations.some(
+        (operation) => operation.kind === 'register_problem' && operation.parameters.treatment_status === 'missing',
+      );
+      const suggestion = 'Opción agroecológica inicial para tomate: revisar a diario, retirar manualmente los trozadores y las hojas con síntomas, mejorar la ventilación y evitar mojar el follaje. Si persiste, consultamos una alternativa verificada antes de aplicar cualquier insumo.';
+      const allPersisted = actionResult?.status === 'executed' && actionResult?.result?.success !== false;
 
       const assistantMessage = {
         role: 'assistant',
-        content: summary.status === 'executed'
-          ? `Listo, registré ${summary.executed} operaciones del surco. ${plan.followUpQuestion || ''}`
-          : summary.status === 'partial'
-            ? 'Registré parte de las operaciones. Faltó confirmar algunas. Cuéntame el resto cuando quieras.'
-            : 'No registré ninguna operación. Cuéntame de nuevo los detalles y confirmo antes de guardar.',
+        content: allPersisted
+          ? `Listo. Registré ${registeredLabels.join(', ')}. ${missingTreatment ? 'No se registró ningún tratamiento porque no fue informado.' : ''} ${plan.followUpQuestion || ''} ${suggestion}`
+          : registeredLabels.length > 0
+            ? `Registré solo ${registeredLabels.join(', ')}. No registré ${notRegistered.length} operación${notRegistered.length === 1 ? '' : 'es'} porque la escritura no terminó. ${missingTreatment ? 'El tratamiento sigue pendiente.' : ''}`
+            : 'No registré ninguna operación porque la confirmación o la escritura no terminó. No se guardó el tratamiento.',
         timestamp: Date.now(),
       };
       setMessages((prev) => [...prev, assistantMessage]);
