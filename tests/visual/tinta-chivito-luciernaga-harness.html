@@ -1,0 +1,25 @@
+<!doctype html>
+<!--
+  tinta-chivito-luciernaga-harness.html — Harness AISLADO, temporal, para el
+  GATE HEADED de la TINTA NUEVA (2026-08-31, spec
+  Chagra-strategy/ops/specs/2026-08-31-tinta-chivito-luciernaga): monta
+  ChivitoTinta (normal + punk) y LuciernagaTinta grandes y a 64px, sobre fondo
+  claro y oscuro, para captura cruda con navegador real (DISPLAY=:0).
+
+  NO participa de ningún test de regresión con snapshots (a diferencia de
+  component-harness.html) — es solo para la captura del gate y el juicio del
+  operador. Ver tests/visual/tinta-chivito-luciernaga-harness.jsx.
+
+  Uso: npx vite  →  /tests/visual/tinta-chivito-luciernaga-harness.html
+-->
+<html lang="es-CO">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Tinta nueva — chivito (normal + punk) + luciérnaga</title>
+  </head>
+  <body>
+    <div id="tinta-root"></div>
+    <script type="module" src="./tinta-chivito-luciernaga-harness.jsx"></script>
+  </body>
+</html>
