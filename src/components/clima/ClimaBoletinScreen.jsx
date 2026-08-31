@@ -754,6 +754,17 @@ export default function ClimaBoletinScreen({ onBack, onNavigate = undefined, loc
                     <p className="mt-1 text-center text-[11px] italic leading-snug text-slate-500">
                         El tiempo de su finca en tres miradas — hoy, la semana y la temporada. Números reales con su fuente; lo que no se sabe aún, se dice.
                     </p>
+
+                    {/* Enlace al mundo 3D del clima */}
+                    <button
+                        type="button"
+                        onClick={() => onNavigate?.('mockup_mundo3d_clima')}
+                        className="mt-3 w-full flex items-center justify-center gap-2 rounded-xl border border-sky-600/40 bg-sky-500/10 px-4 py-2.5 text-sm font-bold text-sky-200 active:bg-sky-500/20 transition-colors"
+                        data-testid="clima-ver-mundo3d"
+                    >
+                        <Sparkles size={16} aria-hidden="true" />
+                        Ver el mundo del clima en 3D
+                    </button>
                 </div>
 
                 {/* Navegación por horizontes */}
