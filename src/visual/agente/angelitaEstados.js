@@ -117,11 +117,17 @@ export const ARIA_DE_ESTADO = {
   respondiendo: 'Angelita le está respondiendo',
   contenta: 'Angelita está contenta',
   preocupada: 'Angelita está preocupada: hay algo que conviene revisar',
-  'no-se': 'Angelita no sabe la respuesta, y se lo dice con honestidad',
+  'no-se': 'Angelita niega con la cabeza: no sabe la respuesta, y se lo dice con honestidad',
   senala: 'Angelita le está señalando algo',
   invita: 'Angelita lo invita a acercarse',
   husmea: 'Angelita está husmeando: revisa la finca con cuidado',
 };
+
+/* Cuando Angelita NO SABE, el globo (BurbujaAngelita) debe decirlo CLARO: "No
+   sé" a secas, nunca una evasiva ni un rodeo — decir "no sé" es la conducta
+   correcta (política anti-alucinación de Chagra), no una falla que disimular.
+   Los hosts que compongan el mensaje del estado 'no-se' parten de aquí. */
+export const TEXTO_NO_SE = 'No sé.';
 
 /* ── EL REPERTORIO DEL IDLE VIVO (estado acompana) ───────────────────────────
    Una vecina de verdad EXISTE aunque nadie le hable: entre ratos de vuelo
@@ -145,6 +151,12 @@ export const MOMENTOS_IDLE = {
   acicala: { dur: 3000, peso: 2 },    // se acicala la antena con la manita (aseo de abeja)
   rasca: { dur: 2400, peso: 1.5 },    // se rasca la barriguita, satisfecha
   sacude: { dur: 1500, peso: 1.5 },   // sacudón de alas: escalofrío alegre que la esponja
+  guino: { dur: 1800, peso: 1.2 },    // se pica el ojo: complicidad, no biología (SPEC)
+  estira: { dur: 2600, peso: 1.4 },   // se estira a gusto: bracitos arriba, bosteza el cuerpo
+  bosteza: { dur: 3200, peso: 1.1 },  // bostezo de goma: boca enorme, manita tarde a taparla
+  rascanuca: { dur: 2400, peso: 1.3 },// se rasca la nuca, medio apenada (rascarse distinto)
+  cabecea: { dur: 3600, peso: 0.9 },  // se le van los ojos… zzz… y DESPIERTA de un brinco
+  voltereta: { dur: 1700, peso: 0.8 },// pirueta juguetona: vuelta de campana con anticipación
   posa: { dur: 1150, peso: 2 },       // aterriza con peso (→ posada → despega)
   posada: { dur: [3400, 5200], peso: 0 }, // descansa posada: alitas plegadas, respira hondo
   despega: { dur: 950, peso: 0 },     // se agacha, coge impulso y vuelve al aire

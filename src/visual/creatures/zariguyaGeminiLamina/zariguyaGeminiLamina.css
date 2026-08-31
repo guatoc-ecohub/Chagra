@@ -1,0 +1,329 @@
+/* zariguyaGeminiLamina.css — LA VIDA sobre la piel del SET GEMINI aprobado
+ * (2026-08-23). Dos planos que se COMPONEN:
+ *
+ *  1. LA LÁMINA-RIG (.zgl-lamina): la hero horneada en capas — port 1:1 de
+ *     zariguyaLamina.css (misma señalética: --rh-blink-*, data-rh-mira,
+ *     data-vida, data-agt-estado, --zgl-jaw) MÁS la pieza de rig de la cola
+ *     (.zgl-colaRig): cola COMPLETA dibujada aparte → enroscado con amplitud
+ *     real, imposible para el recorte rígido.
+ *  2. LAS POSES PLENAS (.zgl-poses): láminas completas del set (cute /
+ *     ver-lupa / muerta / crías / escucha ×4) que entran por CROSSFADE cuando el
+ *     estado lo pide (data-modo='pose' en la raíz). Cada pose activa lleva
+ *     data-activa y su micro-vida propia (respirar, leer, "hacerse la
+ *     muerta" respirando a escondidas).
+ *
+ * señal (hook/estado)                → qué mueve, aquí
+ *   --rh-blink-dur/-delay (ritmo)      → parpadeo real de los dos ojos juntos
+ *   data-rh-mira + --rh-mx/--rh-my     → la CABEZA gira siguiendo al usuario
+ *   data-vida=husmea                   → husmeo en la lámina-rig
+ *   data-vida=tanatosis                → POSE muerta (el gag firma del set)
+ *   data-vida=reposo                   → POSE cute (se voltea de frente)
+ *   data-vida=crias                    → POSE crías al lomo (la firma de
+ *                                        identidad — momento ocasional)
+ *   data-agt-estado=listening          → POSE escucha (ciclo 02→03→04, o el
+ *                                        close-up 01 en avatar chico)
+ *   data-agt-estado=thinking           → POSE ver-lupa (lee con la lupa)
+ *   data-agt-estado=speaking + --zgl-jaw → mandíbula que habla (lámina-rig)
+ *   data-agt-estado=caminando          → BAMBOLEO plantígrado (waddle
+ *                                        portado de la lámina hermana)
+ *
+ * Gates de la casa: reduced-motion congela en fotograma digno;
+ * data-tier='bajo' corta lo continuo decorativo. */
+
+.zgl-stage {
+  position: relative;
+  display: block;
+  transform-origin: 50% 50%;
+  animation: zgl-stageBob 4.2s ease-in-out infinite alternate;
+}
+@keyframes zgl-stageBob {
+  from { transform: translateY(-0.6%); }
+  to   { transform: translateY(0.6%); }
+}
+
+.zgl-capa {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+/* ═══ EL CROSSFADE lámina-rig ⇄ pose plena ═══ */
+.zgl-lamina {
+  position: absolute;
+  inset: 0;
+  opacity: 1;
+  transition: opacity 0.26s ease;
+}
+[data-modo='pose'] .zgl-lamina { opacity: 0; }
+
+.zgl-poses { position: absolute; inset: 0; pointer-events: none; }
+.zgl-pose {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  /* ancladas al PISO: la línea de pies no salta entre poses (bbox medido). */
+  object-position: 50% 100%;
+  opacity: 0;
+  transition: opacity 0.24s ease;
+}
+.zgl-pose[data-activa='si'] { opacity: 1; }
+
+/* ═══ VIDA DE CUERPO al ANDAR (`.zgl-cuerpoVida`) — el nodo que en la lámina
+   hermana carga el BAMBOLEO plantígrado (port de `feat/zariguya-lamina-camina`,
+   zlv-→zgl-). Envuelve al `.zgl-cuerpoPivote` (respiro/cadera) para que las
+   dos capas COMPONGAN sin pisarse el `transform` — mismo truco que la cabeza
+   anidada. El origen (los APOYOS, entre los pies) lo pone
+   anatomia.CUERPO_VIDA_PIVOTE vía el JSX. En idle este nodo NO anima: el idle
+   Gemini aprobado (zgl-respira) queda tal cual — el BOIL de la hermana NO se
+   porta (decisión mirada: no tocar lo aprobado; el encargo es el andar). */
+.zgl-cuerpoVida { position: absolute; inset: 0; }
+
+/* ═══ IDLE VIVO de la lámina-rig — respira menudo, testa cabecea, manitos
+   se mecen. (Port de zariguyaLamina.css; la cola ahora es pieza de rig.) */
+.zgl-cuerpoPivote { position: absolute; inset: 0; animation: zgl-respira 3.1s ease-in-out infinite; }
+@keyframes zgl-respira {
+  0%, 100% { transform: translateY(0) scale(1); }
+  50%      { transform: translateY(-0.5%) scale(1.014); }
+}
+
+.zgl-cabezaGesto { position: absolute; inset: 0; }
+.zgl-cabezaMira  { position: absolute; inset: 0; transition: transform 0.5s cubic-bezier(0.2, 0.7, 0.3, 1); }
+.zgl-cabezaPivote { position: absolute; inset: 0; animation: zgl-cabeza-idle 3.1s ease-in-out infinite; }
+@keyframes zgl-cabeza-idle {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  50%      { transform: translateY(0.5%) rotate(-0.5deg); }
+}
+
+/* LA COLA DE RIG — su firma, ahora con músculo de verdad: la pieza completa
+   se enrosca/desenrosca desde la grupa con amplitud que el recorte de lámina
+   jamás toleró (±3° vs esto), y un pelín de scale para que "apriete". */
+.zgl-colaRigPivote { position: absolute; animation: zgl-colaRig 5.3s ease-in-out infinite alternate; }
+@keyframes zgl-colaRig {
+  from { transform: rotate(-4deg) scale(0.99); }
+  to   { transform: rotate(7deg) scale(1.03); }
+}
+
+/* orejas — mecido con follow-through, fases distintas. */
+.zgl-orejaIzqPivote { position: absolute; inset: 0; animation: zgl-oreja-sway 3.4s ease-in-out infinite; }
+.zgl-orejaDerPivote { position: absolute; inset: 0; animation: zgl-oreja-sway 3.4s ease-in-out -1.3s infinite; }
+@keyframes zgl-oreja-sway {
+  0%, 100% { transform: rotate(0deg); }
+  50%      { transform: rotate(2deg); }
+}
+
+/* las manitos — micro-vaivén de quien sostiene algo (nunca lo suelta). */
+.zgl-brazoLapizPivote { position: absolute; inset: 0; animation: zgl-brazo-idle 4.7s ease-in-out infinite; }
+.zgl-brazoBrujulaPivote { position: absolute; inset: 0; animation: zgl-brazo-idle 4.7s ease-in-out -2.1s infinite; }
+@keyframes zgl-brazo-idle {
+  0%, 100% { transform: rotate(0deg); }
+  50%      { transform: rotate(1.3deg); }
+}
+
+/* ═══ PARPADEO REAL con ritmo propio (cadencia rh de la familia). */
+.zgl-parpado {
+  position: absolute;
+  transform-origin: 50% 0%;
+  animation: zgl-blink var(--rh-blink-dur, 5.6s) linear var(--rh-blink-delay, 0s) infinite;
+}
+@keyframes zgl-blink {
+  0%, 36%, 40%, 74%, 78%, 82%, 86%, 100% { transform: scaleY(0); }
+  38% { transform: scaleY(1); }
+  76% { transform: scaleY(1); }
+  80% { transform: scaleY(1); }
+}
+
+/* ═══ LA MIRADA — la cabeza sigue al usuario (useMiradaUsted). */
+[data-rh-mira='usted'] .zgl-cabezaMira {
+  transform: translate(
+    calc(var(--rh-mx, 0px) * var(--zgl-mira-k, 4)),
+    calc(var(--rh-my, 0px) * var(--zgl-mira-k, 4))
+  );
+}
+
+/* ═══ MANDÍBULA / LIP-SYNC — la sonrisa YA está abierta en la lámina:
+   --zgl-jaw (0..1) la abre MÁS. Bisagra en la comisura izquierda. */
+.zgl-mandibulaPivote {
+  position: absolute;
+  inset: 0;
+  transition: transform 0.13s ease;
+  transform: translateY(calc(var(--zgl-jaw, 0) * 1.4%)) rotate(calc(var(--zgl-jaw, 0) * 4deg));
+}
+.zgl-bocaInterior {
+  pointer-events: none;
+  /* Paleta de TINTA (gate vitrina 2026-08-24): el gradiente rojizo de la
+     lámina hermana leía como una BARRA GRANATE plana cruzando la boca a
+     media apertura — fuera del registro grabado. Interior casi-negro con
+     apenas sangre en la entrada, como el propio hueco de boca de la lámina. */
+  background: radial-gradient(ellipse 110% 130% at 55% 0%, #3d2523 0%, #201110 46%, #0c0605 100%);
+  clip-path: polygon(0% 0%, 100% 0%, 100% 78%, 62% 100%, 10% 46%, 0% 14%);
+  transform: scaleY(var(--zgl-jaw, 0));
+  /* A poca apertura la lámina ya trae su propio oscuro entre dientes: el
+     sintético ENTRA EN RAMPA (invisible abajo de ~jaw .25) en vez de asomar
+     como filo desde el primer píxel. */
+  opacity: clamp(0, calc((var(--zgl-jaw, 0) - 0.18) * 2.2), 1);
+  transition: transform 0.13s ease, opacity 0.13s ease;
+}
+
+/* HABLA — aleteo de mandíbula modulado por el visema. */
+[data-agt-estado='speaking'] .zgl-mandibulaPivote {
+  animation: zgl-habla 0.34s ease-in-out infinite;
+}
+@keyframes zgl-habla {
+  0%, 100% { transform: translateY(calc(var(--zgl-jaw, 0.42) * 0.9%)) rotate(calc(var(--zgl-jaw, 0.42) * 2deg)); }
+  50%      { transform: translateY(calc(var(--zgl-jaw, 0.42) * 2.6%)) rotate(calc(var(--zgl-jaw, 0.42) * 6deg)); }
+}
+[data-agt-estado='speaking'] .zgl-bocaInterior {
+  animation: zgl-habla-interior 0.34s ease-in-out infinite;
+}
+@keyframes zgl-habla-interior {
+  0%, 100% { transform: scaleY(calc(var(--zgl-jaw, 0.42) * 0.5)); }
+  50%      { transform: scaleY(calc(var(--zgl-jaw, 0.42) * 1)); }
+}
+/* Hablando atiende de frente y gesticula con el lápiz, apenas. */
+[data-agt-estado='speaking'] .zgl-brazoLapizPivote { animation: zgl-brazo-idle 2.3s ease-in-out infinite; }
+
+/* ═══ PIENSA / ESCUCHA / GAGS — son POSES PLENAS del set (el JSX pone
+   data-modo='pose' + data-pose); aquí solo la micro-vida de cada una. */
+
+/* VER-LUPA (thinking): lee — barrido lento de quien repasa el documento. */
+[data-pose='verlupa'] .zgl-pose[data-activa='si'] { animation: zgl-lee 4.6s ease-in-out infinite; }
+@keyframes zgl-lee {
+  0%, 100% { transform: rotate(0deg) translateX(0); }
+  35%      { transform: rotate(-0.8deg) translateX(-0.6%); }
+  70%      { transform: rotate(0.5deg) translateX(0.5%); }
+}
+
+/* CUTE (reposo): quieta de frente, respiración menuda. */
+[data-pose='cute'] .zgl-pose[data-activa='si'] { animation: zgl-cute-respira 3.4s ease-in-out infinite; transform-origin: 50% 100%; }
+@keyframes zgl-cute-respira {
+  0%, 100% { transform: scale(1); }
+  50%      { transform: scale(1.012); }
+}
+
+/* CRÍAS AL LOMO (momento 'crias'): la firma de identidad — madre en cuatro
+   patas con las 5 crías montadas. Respira más hondo que la cute (carga
+   encima) y se mece apenas: las crías van a caballo, no pegadas. */
+[data-pose='crias'] .zgl-pose[data-activa='si'] { animation: zgl-crias-carga 4.2s ease-in-out infinite; transform-origin: 50% 100%; }
+@keyframes zgl-crias-carga {
+  0%, 100% { transform: scale(1) rotate(0deg); }
+  45%      { transform: scale(1.016) rotate(-0.35deg); }
+  75%      { transform: scale(1.008) rotate(0.25deg); }
+}
+
+/* MUERTA (tanatosis): tendida, lengua afuera… y RESPIRANDO a escondidas —
+   se le nota, y que se le note es el chiste (no está muerta ni por asomo). */
+[data-pose='muerta'] .zgl-pose[data-activa='si'] { animation: zgl-finge 2.2s ease-in-out infinite; transform-origin: 50% 100%; }
+@keyframes zgl-finge {
+  0%, 100% { transform: scaleY(1); }
+  50%      { transform: scaleY(1.015); }
+}
+
+/* ESCUCHA (listening): el ciclo lo lleva el JSX (02→03→04→03, crossfade
+   CSS de .zgl-pose); el close-up 01 (avatar chico) ladea apenas. */
+[data-pose='escucha-01'] .zgl-pose[data-activa='si'] { animation: zgl-escucha-closeup 2.8s ease-in-out infinite; transform-origin: 50% 80%; }
+@keyframes zgl-escucha-closeup {
+  0%, 100% { transform: rotate(0deg); }
+  55%      { transform: rotate(-1.6deg); }
+}
+
+/* ═══ CAMINA — port del BAMBOLEO PLANTÍGRADO auditado de la lámina hermana
+   (`feat/zariguya-lamina-camina`, zlv-→zgl-): antes esto era un bob plano
+   ("María Antonieta": la cargaban, no andaba). El marsupial erguido reparte
+   el peso PIE A PIE: `.zgl-cuerpoVida` (origen en los apoyos) hace el rock
+   lateral de peso + el bob vertical + squash del apoyo; el pivote de masa
+   aporta el vaivén de cadera; las dos manitos-pata bombean en OPOSICIÓN (el
+   swing de brazos del andar); la cola de rig hace de contrapeso y la testa
+   cabecea con retardo (follow-through). Las patas traseras no son pieza
+   (lección "3-4 patas"): su alternancia se LEE del rock de peso del cuerpo
+   sobre los apoyos — honesto, sin péndulo fantasma. Un ciclo (0→100%) =
+   DOS pasos (apoyo izq → apoyo der). */
+[data-agt-estado='caminando'] .zgl-cuerpoVida { animation: zgl-waddle 0.52s ease-in-out infinite; }
+@keyframes zgl-waddle {
+  0%   { transform: translateY(1.8%) rotate(-2.4deg) scale(1.01, 0.985); }  /* apoyo IZQ: baja, pesa, rueda a la izq */
+  25%  { transform: translateY(-1.8%) rotate(0deg) scale(0.994, 1.012); }   /* paso: sube, estira */
+  50%  { transform: translateY(1.8%) rotate(2.4deg) scale(1.01, 0.985); }   /* apoyo DER: baja, pesa, rueda a la der */
+  75%  { transform: translateY(-1.8%) rotate(0deg) scale(0.994, 1.012); }   /* paso */
+  100% { transform: translateY(1.8%) rotate(-2.4deg) scale(1.01, 0.985); }
+}
+/* vaivén de CADERA — translación lateral en el período de DOS pasos (1.04s),
+   desfasada del rock para que el peso RUEDE y no solo se incline. */
+[data-agt-estado='caminando'] .zgl-cuerpoPivote { animation: zgl-hipShift 1.04s ease-in-out infinite; }
+@keyframes zgl-hipShift {
+  0%, 100% { transform: translateX(-1.1%); }
+  50%      { transform: translateX(1.1%); }
+}
+/* la testa cabecea con RETARDO de un cuarto de paso (follow-through). */
+[data-agt-estado='caminando'] .zgl-cabezaPivote { animation: zgl-cabezaBob 0.52s ease-in-out -0.13s infinite; }
+@keyframes zgl-cabezaBob {
+  0%, 100% { transform: translateY(-1.5%) rotate(-1deg); }
+  50%      { transform: translateY(2%) rotate(1deg); }
+}
+/* cola de RIG de CONTRAPESO — barre una vez por ciclo completo (2 pasos),
+   con la amplitud real que la pieza tolera (el recorte solo aguantaba ±3°). */
+[data-agt-estado='caminando'] .zgl-colaRigPivote { animation: zgl-colaRig-anda 1.04s ease-in-out infinite; }
+@keyframes zgl-colaRig-anda {
+  0%, 100% { transform: rotate(-4deg) scale(0.99); }
+  50%      { transform: rotate(7deg) scale(1.03); }
+}
+/* manitos-pata con vaivén en OPOSICIÓN — el swing de brazos del andar. SOLO
+   giro CORTO clavado en el hombro (nada de translate: sacarlas del hombro
+   DESTAPA el fade/fondo — la costura blanca que midió el gate 04 de la
+   hermana). El desfase -0.26s = medio paso: una va mientras la otra vuelve.
+   La alternancia FUERTE la carga el rock de peso; esto es el acento. */
+[data-agt-estado='caminando'] .zgl-brazoLapizPivote { animation: zgl-paw-anda 0.52s ease-in-out infinite; }
+[data-agt-estado='caminando'] .zgl-brazoBrujulaPivote { animation: zgl-paw-anda 0.52s ease-in-out -0.26s infinite; }
+@keyframes zgl-paw-anda {
+  0%, 100% { transform: rotate(-1.8deg); }
+  50%      { transform: rotate(1.8deg); }
+}
+
+/* ═══ IDLE-CEREBRO en la lámina-rig — HUSMEA (tanatosis y reposo son poses
+   plenas, arriba). Vive por la nariz: la testa se alza y tantea. */
+[data-vida='husmea'] .zgl-cabezaGesto { animation: zgl-husmea-cabeza 1.05s ease-in-out infinite; }
+@keyframes zgl-husmea-cabeza {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  30%      { transform: translateY(-1.4%) rotate(1.8deg); }
+  65%      { transform: translateY(-1%) rotate(0.6deg); }
+}
+[data-vida='husmea'] .zgl-orejaIzqPivote { animation: zgl-oreja-husmea 1.05s ease-in-out infinite; }
+[data-vida='husmea'] .zgl-orejaDerPivote { animation: zgl-oreja-husmea 1.05s ease-in-out -0.2s infinite; }
+@keyframes zgl-oreja-husmea {
+  0%, 100% { transform: rotate(0deg); }
+  40%      { transform: rotate(-3.5deg); }
+}
+
+/* ═══ GATES DE LA CASA ═══ */
+/* animated=false (fotograma digno): las clases de vida no se aplican desde
+   el JSX (cls()), pero la capa de poses conserva su clase por layout — aquí
+   se le apaga la micro-vida y el crossfade queda instantáneo. */
+[data-quieto='si'] .zgl-pose,
+[data-quieto='si'] .zgl-lamina { animation: none !important; transition: none !important; }
+
+[data-tier='bajo'] .zgl-stage,
+[data-tier='bajo'] .zgl-cuerpoVida,
+[data-tier='bajo'] .zgl-cuerpoPivote,
+[data-tier='bajo'] .zgl-cabezaPivote,
+[data-tier='bajo'] .zgl-colaRigPivote,
+[data-tier='bajo'] .zgl-orejaIzqPivote,
+[data-tier='bajo'] .zgl-orejaDerPivote,
+[data-tier='bajo'] .zgl-brazoLapizPivote,
+[data-tier='bajo'] .zgl-brazoBrujulaPivote,
+[data-tier='bajo'] .zgl-pose { animation: none; }
+
+@media (prefers-reduced-motion: reduce) {
+  .zgl-stage, .zgl-cuerpoVida, .zgl-cuerpoPivote, .zgl-cabezaGesto, .zgl-cabezaMira, .zgl-cabezaPivote,
+  .zgl-colaRigPivote, .zgl-orejaIzqPivote, .zgl-orejaDerPivote,
+  .zgl-brazoLapizPivote, .zgl-brazoBrujulaPivote,
+  .zgl-mandibulaPivote, .zgl-bocaInterior, .zgl-parpado, .zgl-pose,
+  .zgl-lamina {
+    animation: none !important;
+    transition: none !important;
+  }
+  .zgl-cabezaMira, .zgl-mandibulaPivote { transform: none !important; }
+  .zgl-bocaInterior { transform: scaleY(0) !important; }  /* la sonrisa de la lámina, digna */
+  .zgl-parpado { visibility: hidden !important; }          /* ojos abiertos, quietos */
+}

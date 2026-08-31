@@ -4,9 +4,9 @@
 /* eslint-disable chagra-i18n/no-hardcoded-spanish */
 import { useMemo, useState } from 'react';
 import {
-  ChevronLeft, ChevronRight, ArrowRight, Sprout, Wheat, Snowflake,
+  ChevronLeft, ChevronRight, ArrowRight, Sprout, Snowflake,
   Archive, FlaskConical, Bug, Calculator, CheckCircle2, AlertTriangle,
-  Info, Percent, Users, Sun, Droplets, ShieldCheck,
+  Info, Percent, Users, ShieldCheck,
 } from 'lucide-react';
 import {
   CULTIVOS_SEMILLA, SISTEMAS_REPRODUCTIVOS, evaluarSeleccion, ROGUING_PCT,

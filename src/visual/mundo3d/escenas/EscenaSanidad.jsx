@@ -79,11 +79,11 @@ function matasDecaidas(ratio, total) {
    larva o adulto come cientos de pulgones. Media esfera roja + cabeza + puntos.
    Como CONTROLADORA, PATRULLA las matas en zigzag buscando pulgón (misma
    coreografía de rol que la fauna billboard); se congela con reduced-motion. */
-function Mariquita({ pos, escala = 1, fase = 0, reducedMotion = false }) {
+function Mariquita({ pos, escala = 1, fase = 0, reducedMotion = false, viento = null }) {
   const ref = useRef(null);
   useFrame((state) => {
     if (reducedMotion || !ref.current) return;
-    const [dx, dy, dz] = coreografia('patrulla', state.clock.elapsedTime, fase);
+    const [dx, dy, dz] = coreografia('patrulla', state.clock.elapsedTime, fase, viento);
     // a ras de la hoja: el barrido lateral manda, el zumbido vertical se atenúa.
     ref.current.position.set(pos[0] + dx, pos[1] + dy * 0.4, pos[2] + dz);
   });
@@ -118,18 +118,25 @@ function Mariquita({ pos, escala = 1, fase = 0, reducedMotion = false }) {
   );
 }
 
-/* Una TRAMPA CROMÁTICA: estaca + tarjeta pegajosa de color. El color no es
-   decorativo — decide a qué insecto llama (amarillo: mosca blanca/minador;
-   azul: trips). */
+/* Una TRAMPA CROMÁTICA: estaca + tarjeta pegajosa de color enmarcada. El color
+   NO es decorativo — decide a qué insecto llama (amarillo: mosca blanca/minador;
+   azul: trips). El marco oscuro la lee como "tarjeta pegajosa" (no un rectángulo
+   flotante) y la sube un poco para que asome sobre las matas y se lea de lejos. */
 function Trampa({ pos, color = '#f2c531' }) {
   return (
     <group position={pos}>
-      <mesh position={[0, 0.34, 0]}>
-        <cylinderGeometry args={[0.02, 0.026, 0.68, 5]} />
+      <mesh position={[0, 0.37, 0]}>
+        <cylinderGeometry args={[0.022, 0.028, 0.74, 5]} />
         <meshLambertMaterial color={PALETA.madera} flatShading />
       </mesh>
-      <mesh position={[0, 0.62, 0]}>
-        <boxGeometry args={[0.22, 0.28, 0.02]} />
+      {/* el marco oscuro tras la tarjeta */}
+      <mesh position={[0, 0.7, -0.006]}>
+        <boxGeometry args={[0.3, 0.36, 0.012]} />
+        <meshLambertMaterial color="#3a2c1a" flatShading />
+      </mesh>
+      {/* la tarjeta pegajosa de color */}
+      <mesh position={[0, 0.7, 0.006]}>
+        <boxGeometry args={[0.26, 0.32, 0.02]} />
         <meshLambertMaterial color={color} />
       </mesh>
     </group>
@@ -140,18 +147,21 @@ function Trampa({ pos, color = '#f2c531' }) {
    (espejo de la salud real, NO una plaga) la amarillea, achica y hace inclinar
    las hojas — la mata que la finca reporta decaída, atendida por la clínica. */
 function Mata({ pos, color = '#4e8f3f', decaida = false }) {
+  // Mata SANA = fronda llena y erguida (planta vigorosa, lo que se protege): un
+  // copo grande arriba y hojas laterales que la redondean. Se lee "planta sana".
   const hojas = [
-    [0, 0.44, 0, 0.17], [0.13, 0.35, 0.05, 0.12], [-0.12, 0.37, -0.05, 0.12],
+    [0, 0.66, 0, 0.24], [0.19, 0.52, 0.08, 0.17], [-0.18, 0.55, -0.07, 0.17],
+    [0.06, 0.44, -0.18, 0.14], [-0.1, 0.46, 0.17, 0.14],
   ];
   // Decaída: hoja amarillo-enfermiza, más pequeña y caída; tallo mustio.
   const colorHoja = decaida ? '#b6a24a' : color;
   const colorTallo = decaida ? '#6e6636' : '#5a6a2e';
-  const caida = decaida ? -0.06 : 0; // las hojas se hunden un poco
-  const merma = decaida ? 0.82 : 1; // y menguan
+  const caida = decaida ? -0.09 : 0; // las hojas se hunden un poco
+  const merma = decaida ? 0.8 : 1; // y menguan
   return (
     <group position={pos} rotation={decaida ? [0.14, 0, 0.1] : [0, 0, 0]}>
-      <mesh position={[0, 0.2, 0]}>
-        <cylinderGeometry args={[0.03, 0.05, 0.42, 5]} />
+      <mesh position={[0, 0.28, 0]}>
+        <cylinderGeometry args={[0.035, 0.06, 0.6, 5]} />
         <meshLambertMaterial color={colorTallo} flatShading />
       </mesh>
       {hojas.map(([x, y, z, r], i) => (
@@ -188,23 +198,31 @@ function EstacionBio({ pos }) {
 }
 
 /* Una FLOR del borde push-pull (caléndula/aromática): repele plagas y aloja
-   enemigos naturales. Tallo + botón anaranjado. */
-function FlorBorde({ pos }) {
+   enemigos naturales. Tallo + corola anaranjada con corazón amarillo, para que
+   la orla de flores se lea como flores (no puntos) desde el encuadre. */
+function FlorBorde({ pos, tono = '#e8963f' }) {
   return (
     <group position={pos}>
-      <mesh position={[0, 0.12, 0]}>
-        <cylinderGeometry args={[0.015, 0.02, 0.24, 5]} />
+      <mesh position={[0, 0.13, 0]}>
+        <cylinderGeometry args={[0.016, 0.022, 0.26, 5]} />
         <meshLambertMaterial color="#4e7d3f" flatShading />
       </mesh>
-      <mesh position={[0, 0.26, 0]}>
-        <sphereGeometry args={[0.06, 8, 6]} />
-        <meshLambertMaterial color="#e8963f" flatShading />
+      {/* la corola */}
+      <mesh position={[0, 0.29, 0]}>
+        <sphereGeometry args={[0.075, 9, 6, 0, Math.PI * 2, 0, Math.PI * 0.62]} />
+        <meshLambertMaterial color={tono} flatShading />
+      </mesh>
+      {/* el corazón de la flor */}
+      <mesh position={[0, 0.31, 0]}>
+        <sphereGeometry args={[0.032, 7, 6]} />
+        <meshLambertMaterial color="#f2d24a" flatShading />
       </mesh>
     </group>
   );
 }
 
-function Diorama({ params, reducedMotion, fauna, estadoFinca }) {
+function Diorama({ params, reducedMotion, fauna, estadoFinca, tier }) {
+  const viento = tier === 'bajo' ? null : estadoFinca?.viento;
   // ESPEJO VIVO de la salud real (§5b): cuántas matas se ven decaídas es el
   // reflejo del ratio de matas vivas de la finca. Sin dato → 0 (huerta sana).
   // Marcamos las ÚLTIMAS del arreglo (deja las del frente firmes). No es plaga.
@@ -277,32 +295,57 @@ function Diorama({ params, reducedMotion, fauna, estadoFinca }) {
       ))}
       {/* la estación de biocontrol (hongos entomopatógenos) */}
       <EstacionBio pos={[1.05, 0, -0.75]} />
-      {/* el borde push-pull de flores aromáticas */}
+      {/* el borde push-pull de flores aromáticas: alterna caléndula (jala/aloja
+          enemigos) y flor de muerto/Tagetes más amarilla (empuja la plaga) — el
+          doble color cuenta las dos labores del borde. */}
       {flores.map((p, i) => (
-        <FlorBorde key={i} pos={p} />
+        <FlorBorde key={i} pos={p} tono={i % 2 === 0 ? '#e8963f' : '#f0b429'} />
       ))}
 
       {/* los enemigos naturales insignia: dos mariquitas patrullando las matas */}
-      <Mariquita pos={[-0.42, 0.5, 0.42]} escala={1} fase={0.8} reducedMotion={reducedMotion} />
-      <Mariquita pos={[0.6, 0.32, 0.12]} escala={0.85} fase={2.9} reducedMotion={reducedMotion} />
+      <Mariquita pos={[-0.42, 0.5, 0.42]} escala={1.3} fase={0.8} reducedMotion={reducedMotion} viento={viento} />
+      <Mariquita pos={[0.6, 0.32, 0.12]} escala={1.05} fase={2.9} reducedMotion={reducedMotion} viento={viento} />
 
       {/* la fauna funcional billboard: carábido patrullando + polinizadores del borde */}
-      <Fauna items={fauna} reducedMotion={reducedMotion} />
+      <Fauna items={fauna} reducedMotion={reducedMotion} tier={tier} viento={viento} />
     </group>
   );
 }
 
+/* Cielo propio de la huerta-clínica: parte de CIELOS.huerta (verde fresco que la
+   madre de la franja entibia sola) con un pelín más de luz para que los verdes
+   sanos y los colores de las trampas (amarillo/azul) canten. Se sigue mezclando
+   hacia la hora del valle en EscenaBase3D — no rompe la cohesión diurna. */
+const CIELO_SANIDAD = { ...CIELOS.huerta, fondo: '#d8e8bd', cielo: '#f0f6de', intensidad: 1.14 };
+
+/* Encuadre de la huerta-clínica: el zoom del manifiesto (7) dejaba el diorama
+   chico y lavado; lo acercamos para que las matas, las trampas y los enemigos
+   naturales se lean de una. Menor zoom → cámara más cerca, niebla/anillo/órbita
+   escalan solos (contrato de EscenaBase3D). `camara` fija un 3/4 que mira hacia
+   dentro del recinto (más alto que ancho, la clínica se recorre). */
+const ZOOM_SANIDAD = 5.4;
+const CAMARA_SANIDAD = {
+  position: /** @type {[number, number, number]} */ ([
+    ZOOM_SANIDAD * 0.48, ZOOM_SANIDAD * 0.52, ZOOM_SANIDAD * 0.96,
+  ]),
+  fov: 40,
+};
+
 export default function EscenaSanidad(props) {
-  // Cielo fresco y sano de huerta (se mezcla igual hacia la hora dorada del valle).
-  const cielo = CIELOS.huerta;
   const fauna = faunaDeMundo(props.mundoId, { tier: props.tier });
   return (
-    <EscenaBase3D {...props} cielo={cielo} entrada={{ ...props.entrada, centro: [0, 0.45, 0] }}>
+    <EscenaBase3D
+      {...props}
+      cielo={CIELO_SANIDAD}
+      camara={CAMARA_SANIDAD}
+      entrada={{ ...props.entrada, zoom: ZOOM_SANIDAD, centro: [0, 0.42, 0] }}
+    >
       <Diorama
         params={props.params}
         reducedMotion={props.reducedMotion}
         fauna={fauna}
         estadoFinca={props.estadoFinca}
+        tier={props.tier}
       />
     </EscenaBase3D>
   );

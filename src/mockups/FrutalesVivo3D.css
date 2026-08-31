@@ -1,0 +1,282 @@
+/*
+ * FrutalesVivo3D.css — vitrina del mundo de los frutales
+ * (#/mockups/frutales-vivo-3d). Autocontenida: sin fuentes/imágenes externas.
+ * Móvil-first desde 320px. La paleta la levanta LA FRUTA: el amarillo del mango
+ * de azúcar y el naranja del cítrico sobre el verde de tierra caliente — este
+ * mundo NO puede quedar pardo. Solo opacity/transform se animan.
+ */
+
+.fviva {
+  min-height: 100vh;
+  min-height: 100dvh;
+  padding: 1rem 0.9rem 2.5rem;
+  /* la luz abierta de tierra caliente (familia plaza), no bruma de montaña */
+  background: linear-gradient(180deg, #e6e4c2 0%, #efe4c4 46%, #f6e9c8 100%);
+  color: #2f3324;
+  font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+}
+
+.fviva__head {
+  max-width: 46rem;
+  margin: 0 auto 1rem;
+}
+.fviva__kicker {
+  margin: 0 0 0.2rem;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #b56a12;
+}
+.fviva__head h1 {
+  margin: 0;
+  font-size: clamp(1.5rem, 5vw, 2.2rem);
+  line-height: 1.15;
+  color: #34401f;
+}
+.fviva__lema {
+  margin: 0.4rem 0 0;
+  font-size: 0.98rem;
+  line-height: 1.45;
+  max-width: 40rem;
+}
+
+.fviva__escena {
+  max-width: 46rem;
+  margin: 0 auto;
+}
+.fviva__lienzo {
+  position: relative;
+  height: min(66vh, 32rem);
+  min-height: 320px;
+  border-radius: 14px;
+  overflow: hidden;
+  border: 1px solid rgba(181, 106, 18, 0.28);
+  box-shadow: 0 12px 30px rgba(60, 52, 26, 0.16);
+  background: radial-gradient(120% 90% at 50% 20%, #dfe2b6 0%, #b4bd85 100%);
+}
+.fviva__lienzo canvas {
+  display: block;
+  width: 100% !important;
+  height: 100% !important;
+  touch-action: none;
+}
+.frutales-canvas {
+  opacity: 0;
+  transition: opacity 0.6s ease;
+}
+.frutales-canvas--lista {
+  opacity: 1;
+}
+
+.fviva__cargando {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  font-size: 0.9rem;
+  color: #46502f;
+  opacity: 0.85;
+}
+
+.fviva__barra {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin-top: 0.6rem;
+}
+.fviva__tier {
+  margin: 0;
+  font-size: 0.85rem;
+  opacity: 0.85;
+}
+.fviva__toggle {
+  border: 1.5px solid #b56a12;
+  background: #fff;
+  color: #a35d0d;
+  font-weight: 700;
+  font-size: 0.85rem;
+  padding: 0.45rem 0.9rem;
+  border-radius: 999px;
+  cursor: pointer;
+}
+.fviva__toggle:hover,
+.fviva__toggle:focus-visible {
+  background: #b56a12;
+  color: #fff;
+  outline-offset: 2px;
+}
+
+/* ---- Ficha 2D: el mango y el cítrico A ESCALA (la lección sin GPU) ---- */
+.fviva__ficha {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.3rem;
+  background: radial-gradient(120% 90% at 50% 25%, #e0e3b4 0%, #aeb87e 100%);
+}
+.fviva__estampa {
+  position: relative;
+  width: 230px;
+  height: 180px;
+  margin-bottom: 0.5rem;
+}
+/* la línea de suelo que los pone en la misma tierra (la escala se compara) */
+.fviva__suelo {
+  position: absolute;
+  left: 4px;
+  right: 4px;
+  bottom: 12px;
+  height: 2px;
+  border-radius: 2px;
+  background: linear-gradient(90deg, #8a6a4400 0%, #8a6a44 18%, #8a6a44 82%, #8a6a4400 100%);
+  opacity: 0.55;
+}
+
+/* EL MANGO: tronco corto y grueso, copa MÁS ANCHA QUE ALTA que lo eclipsa todo */
+.fviva__mango-tronco {
+  position: absolute;
+  bottom: 12px;
+  left: 62px;
+  width: 17px;
+  height: 44px;
+  border-radius: 30% 30% 22% 22%;
+  background: linear-gradient(90deg, #3c2d20 0%, #4f3d2c 55%, #382a1e 100%);
+}
+.fviva__mango-copa {
+  position: absolute;
+  bottom: 48px;
+  left: 4px;
+  width: 134px;
+  height: 74px;
+  border-radius: 52% 48% 46% 54% / 62% 66% 34% 38%;
+  background: radial-gradient(circle at 40% 28%, #3f7034 0%, #274d28 62%, #1d3b20 100%);
+  box-shadow: inset -9px -7px 16px rgba(0, 0, 0, 0.22);
+}
+/* el brote VINO-COBRIZO en las puntas: la seña que delata al mango */
+.fviva__brote {
+  position: absolute;
+  width: 22px;
+  height: 13px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 40% 35%, #a3563a 0%, #7e3a2c 75%);
+  opacity: 0.95;
+}
+.fviva__brote--a { top: 6px; left: 12px; }
+.fviva__brote--b { top: 14px; right: 10px; }
+/* el mango de azúcar colgando: pequeño y amarillo */
+.fviva__mango-fruto {
+  position: absolute;
+  width: 15px;
+  height: 19px;
+  border-radius: 48% 52% 46% 54% / 40% 40% 60% 60%;
+  background: radial-gradient(circle at 36% 30%, #f4d05c 0%, #f4b63c 55%, #d99323 100%);
+  box-shadow: inset -2px -3px 4px rgba(0, 0, 0, 0.22);
+}
+.fviva__mango-fruto--a { bottom: -8px; left: 36px; }
+.fviva__mango-fruto--b { bottom: -4px; right: 40px; }
+
+/* EL CÍTRICO: al lado, MUCHO más chico — copa redonda compacta y cargada */
+.fviva__citrico-tronco {
+  position: absolute;
+  bottom: 12px;
+  right: 42px;
+  width: 8px;
+  height: 20px;
+  border-radius: 30%;
+  background: linear-gradient(90deg, #63553f 0%, #7a6a52 55%, #5b4d39 100%);
+}
+.fviva__citrico-copa {
+  position: absolute;
+  bottom: 28px;
+  right: 20px;
+  width: 52px;
+  height: 48px;
+  border-radius: 50% 50% 46% 54% / 52% 52% 48% 48%;
+  background: radial-gradient(circle at 38% 30%, #49913c 0%, #2e6b2f 68%, #245524 100%);
+  box-shadow: inset -5px -4px 9px rgba(0, 0, 0, 0.2);
+}
+.fviva__naranja {
+  position: absolute;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 36% 32%, #f5a53a 0%, #f08a1d 60%, #d1700f 100%);
+  box-shadow: inset -2px -2px 3px rgba(0, 0, 0, 0.24);
+}
+.fviva__naranja--a { top: 10px; left: 8px; }
+.fviva__naranja--b { top: 26px; left: 26px; }
+.fviva__naranja--c { top: 30px; left: 6px; }
+
+.fviva__ficha-nombre {
+  margin: 0;
+  font-weight: 800;
+  font-size: 1rem;
+  color: #34401f;
+}
+.fviva__ficha-sub {
+  margin: 0;
+  font-size: 0.85rem;
+  color: #4f5a34;
+  text-align: center;
+  padding: 0 0.6rem;
+}
+
+/* ---- Saberes ---- */
+.fviva__saberes {
+  max-width: 46rem;
+  margin: 1.6rem auto 0;
+}
+.fviva__saberes h2 {
+  font-size: 1.15rem;
+  margin: 0 0 0.7rem;
+  color: #34401f;
+}
+.fviva__saberes ol {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.6rem;
+}
+@media (min-width: 640px) {
+  .fviva__saberes ol {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+.fviva__saberes li {
+  display: flex;
+  gap: 0.65rem;
+  align-items: flex-start;
+  background: rgba(255, 255, 255, 0.72);
+  border: 1px solid rgba(181, 106, 18, 0.18);
+  border-radius: 12px;
+  padding: 0.7rem 0.8rem;
+}
+.fviva__emoji {
+  font-size: 1.4rem;
+  line-height: 1.2;
+}
+.fviva__saberes b {
+  display: block;
+  font-size: 0.92rem;
+  color: #34401f;
+}
+.fviva__saberes li p {
+  margin: 0.15rem 0 0;
+  font-size: 0.86rem;
+  line-height: 1.42;
+}
+.fviva__cierre {
+  margin: 0.9rem 0 0;
+  font-size: 0.9rem;
+  line-height: 1.5;
+  color: #46502f;
+  max-width: 42rem;
+}

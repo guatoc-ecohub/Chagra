@@ -143,9 +143,8 @@ const useAssetStore = create((set, get) => ({
         // assets legítimos que aparecerán en páginas posteriores.
         const allRemoteIdsForType = new Set();
         // Si el sync se aborta o falla parcialmente, NO purgar: el universo
-        // remoto no es confiable. `syncCompletedForType` solo se vuelve true
-        // cuando todas las páginas se procesaron sin signal aborted.
-        let syncCompletedForType = false;
+        // remoto no es confiable. La purga final (abajo) solo corre cuando
+        // todas las páginas se procesaron sin signal aborted.
 
         while (hasMore && !signal?.aborted) {
           const offset = page * pageLimit;
@@ -180,14 +179,11 @@ const useAssetStore = create((set, get) => ({
           break;
         }
         // Universo completo del tipo recolectado → ahora sí, GC final.
-        syncCompletedForType = true;
-        if (syncCompletedForType) {
-          try {
-            await assetCache.purgeAbsent(t, allRemoteIdsForType);
-          } catch (purgeErr) {
-            // Si la purga falla, mejor preservar datos: log y continuar.
-            console.warn(`[Sync] purgeAbsent(${t}) falló — preservando local:`, purgeErr);
-          }
+        try {
+          await assetCache.purgeAbsent(t, allRemoteIdsForType);
+        } catch (purgeErr) {
+          // Si la purga falla, mejor preservar datos: log y continuar.
+          console.warn(`[Sync] purgeAbsent(${t}) falló — preservando local:`, purgeErr);
         }
       }
 

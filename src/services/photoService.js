@@ -244,6 +244,45 @@ export async function listUserPhotosBySpecies(speciesSlug) {
 }
 
 /**
+ * Lista fotos propias recientes para superficies contextuales del compai.
+ * El filtro es una proyección en memoria de media_cache, nunca un campo nuevo
+ * de Asset. Si no hay coincidencias contextuales, cae a fotos recientes de la
+ * finca para que la pantalla pueda ofrecer una salida útil y honesta.
+ */
+export async function listRecentUserPhotos({ assetIds = new Set(), speciesSlugs = new Set(), limit = 12 } = {}) {
+  try {
+    const db = await openDB();
+    const tx = db.transaction(STORES.MEDIA_CACHE, 'readonly');
+    const store = tx.objectStore(STORES.MEDIA_CACHE);
+    const all = await new Promise((resolve) => {
+      const req = store.getAll();
+      req.onsuccess = () => resolve(req.result || []);
+      req.onerror = () => resolve([]);
+    });
+    const own = all.filter((photo) => photo?.isUserOverride !== false && photo?.blob);
+    const contextual = own.filter((photo) => (
+      assetIds.has(String(photo.assetId)) || speciesSlugs.has(photo.speciesSlug)
+    ));
+    const chosen = (contextual.length > 0 ? contextual : own)
+      .sort((a, b) => String(b.capturedAt || b.createdAt || '').localeCompare(String(a.capturedAt || a.createdAt || '')))
+      .slice(0, Math.max(0, limit));
+    return chosen.map((photo) => {
+      const url = URL.createObjectURL(photo.blob);
+      return {
+        id: photo.id,
+        url,
+        label: photo.speciesSlug || 'Foto de la finca',
+        alt: `Foto de ${photo.speciesSlug || 'la finca'}`,
+        revoke: () => URL.revokeObjectURL(url),
+      };
+    });
+  } catch (err) {
+    console.error('[photoService] listRecentUserPhotos failed:', err);
+    return [];
+  }
+}
+
+/**
  * Lee una foto específica de media_cache por su id.
  * Usado por AssetTimeline para renderizar PHOTO_ATTACHMENT markers
  * (cada [PHOTO_ATTACHMENT] log apunta a un media_cache.id vía photo_ref).
@@ -312,6 +351,7 @@ function loadViaImg(file) {
     };
     img.onerror = (e) => {
       URL.revokeObjectURL(url);
+      // eslint-disable-next-line chagra-i18n/no-hardcoded-spanish -- mensaje accesible preexistente
       reject(new Error(`No se pudo cargar imagen: ${e}`));
     };
     img.src = url;

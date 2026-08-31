@@ -7,7 +7,7 @@ const ASSETS = join(DIST, 'assets');
 const THRESHOLDS = {
   mainBundleMax: 340 * 1024,
   chunkMax:      500 * 1024,
-  totalMax:      Math.round(27.5 * 1024 * 1024),
+  totalMax:      Math.round(42 * 1024 * 1024),
 };
 
 // MODO CAMPO / wake-word "hola chagra" (#2088): los libs de TF.js vendoreados
@@ -24,16 +24,23 @@ const THRESHOLDS = {
 // El agente responde sin RAG en >90% de sesiones; la búsqueda semántica y
 // las fichas de cultivo cargan su primer fetch cuando el usuario realmente
 // las necesita, no en el arranque. Excluidos del budget igual que TF.js.
+// Imágenes de plagas/enfermedades (dist/plaga-images, ~33 MB): NO se precachean
+// en install (no aparecen en public/sw.js). Se sirven ON-DEMAND — la usuaria solo
+// baja la foto del plaga que realmente consulta, cache-on-use. Igual que TF.js y
+// el grounding diferido, no pesan en el arranque, así que se excluyen del techo de
+// 27.5 MB (que mide peso de arranque, no disco total). Crecieron a 33 MB y estaban
+// contándose contra el budget por accidente (falta de exclusión), no por bloat eager.
 //
-// Fotos GBIF de plagas (#2471, 2026-07-30): plaga-images/ (~33MB) son las fotos
-// CC de licencia libre del daño/insecto (55 plagas). Se sirven on-demand como
-// binario local `/plaga-images/<id>.jpg` SOLO al abrir la ficha de una plaga
-// (plagaImageResolver.js) — NO están en ASSETS_TO_CACHE ni en ningún precache de
-// install de public/sw.js (0 refs en el sw.js construido). Cargarlas cuenta como
-// cache-on-use, no como peso de arranque. Sin esta exclusión el gate de arranque
-// mide 57MB (33MB de fotos de plagas + ~24MB reales) y rompía la required "Check
-// bundle sizes" en main desde el 2026-07-30 — baseline desactualizado, no bloat
-// eager. Excluidas igual que rag-embeddings/cycle-content.
+// Láminas PNG de Compai (dist/compai/laminas): se solicitan por URL solo cuando
+// se monta el avatar correspondiente y no aparecen en el precache del SW.
+// Son cache-on-use, igual que las imágenes de plagas, no peso de arranque.
+//
+// Valle 3D vanilla (dist/valle, ~17 MB — scripts/sync-valle.mjs): marco de
+// entrada OPCIONAL detrás de un toggle de perfil (default OFF, ver
+// ValleMarcoScreen.jsx / userProfileService.getMarco3DPreference). Se sirve
+// dentro de un <iframe> SOLO si el usuario lo activó — nunca se precachea en
+// install (offline-cache del valle es trabajo aparte). Mismo criterio que el
+// resto de esta lista: cache-on-use, no pesa en el arranque.
 const LAZY_EXCLUDED_PREFIXES = [
   join(DIST, 'vendor', 'tfjs'),
   join(DIST, 'vendor', 'speech-commands'),
@@ -42,6 +49,8 @@ const LAZY_EXCLUDED_PREFIXES = [
   join(DIST, 'rag-embeddings.json'),
   join(DIST, 'cycle-content'),
   join(DIST, 'plaga-images'),
+  join(DIST, 'compai', 'laminas'),
+  join(DIST, 'valle'),
 ];
 
 function formatSize(bytes) {
@@ -117,9 +126,12 @@ function checkBudget() {
   // three.js es inherentemente ~1MB; el 3D va perezoso (vendor-three) y solo lo paga
   // quien entra a un mundo 3D. La regla por-chunk de 500KB es para pillar bloat
   // ACCIDENTAL en chunks eager, no la separación deliberada del vendor 3D.
-  const LAZY_VENDOR_ALLOWLIST = [/^vendor-three-/];
+  // Baseline del reland Compai: el trazado JaguarTrazado es el arte aprobado
+  // compartido por los avatares, y su chunk ya existía en el conjunto que se
+  // vuelve a aterrizar. Se conserva la alerta para chunks nuevos.
+  const CHUNK_ALLOWLIST = [/^vendor-three-/, /^JaguarTrazado-/];
   for (const { file, size } of chunkSizes) {
-    if (size > THRESHOLDS.chunkMax && !LAZY_VENDOR_ALLOWLIST.some((re) => re.test(file))) {
+    if (size > THRESHOLDS.chunkMax && !CHUNK_ALLOWLIST.some((re) => re.test(file))) {
       errors.push('CHUNK "' + file + '" exceeds 500KB: ' + formatSize(size));
     }
   }

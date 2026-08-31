@@ -150,7 +150,7 @@ describe('ClimaStrip — re-fijar ubicación siempre alcanzable (re-pin)', () =>
         vi.mocked(getProfileMunicipio).mockReturnValue('Choachí');
         const eventSpy = vi.fn();
         window.addEventListener('chagra:nav', eventSpy);
-        render(<ClimaStrip onNavigate={() => {}} />);
+        render(<ClimaStrip />);
 
         const repin = await screen.findByTestId('clima-repin');
         fireEvent.click(repin);

@@ -748,6 +748,10 @@ function Diorama({ tier, reducedMotion, foco }) {
   const controls = useRef(null);
   const gY = (p) => /** @type {[number, number, number]} */ ([p[0], alturaPotrero(p[0], p[1]), p[1]]);
 
+  /* Cuánta luz le FALTA a la hora para que la lección se lea (la noche y el
+     atardecer bajan `atm.intensidad`; a mediodía esto es ~0). */
+  const refuerzo = Math.max(0, 1 - atm.intensidad);
+
   return (
     <>
       <AtmosferaMundo
@@ -759,6 +763,26 @@ function Diorama({ tier, reducedMotion, foco }) {
         sombra={SOMBRA_LECHERIA}
       />
       <DomoCielo atm={atm} radio={70} />
+
+      {/* EL PISO DE LECTURA de la lechería (mismo remedio del cafetal #2707 y
+          el aguacatal #2709): de noche la quesera, el biodigestor y el montón
+          de abono caían a bulto negro y la lección de cuatro pasos se perdía.
+          Dos luces locales de la escena (no tocan el kit): un relleno
+          hemisférico cálido que COMPENSA lo que la hora apaga (de noche sube,
+          a mediodía casi no suma) y una clave dorada fija SIN sombras — deja
+          ver la cantina, el queso y la bolsa de gas sin tocar el dibujo de la
+          sombra proyectada. El domo y la niebla siguen contando la hora: la
+          noche se conserva noche, pero la cadena láctea se LEE. */}
+      <hemisphereLight
+        color="#f2e6c8"
+        groundColor="#3d4a2a"
+        intensity={0.38 + 1.15 * refuerzo}
+      />
+      <directionalLight
+        position={[7, 10, 5]}
+        color="#ffe9c0"
+        intensity={0.5 + 0.95 * refuerzo}
+      />
 
       {/* EL POTRERO por bandas toon (recibe la sombra del banco forrajero). */}
       <mesh geometry={geoPotrero} receiveShadow={perfil.sombras}>

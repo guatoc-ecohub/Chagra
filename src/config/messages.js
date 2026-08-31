@@ -290,6 +290,21 @@ const messages = {
     plantaTuya: 'Planta tuya',
     plantasTuyas: 'Plantas tuyas',
   },
+  // Tipos de eventos de ciclo (farm_process_events) — etiquetas legibles
+  // para humanos en hoja de vida por mata (hojaVidaMataService).
+  eventTypes: {
+    sowing_confirmed: 'Siembra confirmada',
+    transplanting: 'Trasplante',
+    observation: 'Observación',
+    fertilizer_applied: 'Fertilización',
+    pesticide_applied: 'Aplicación de insumo',
+    harvest: 'Cosecha',
+    pruning: 'Poda',
+    irrigation: 'Riego',
+    stage_change: 'Cambio de etapa',
+    health_issue: 'Problema de sanidad',
+    weather_event: 'Evento climático',
+  },
   // Modo campo / wake-word "hola chagra" (#2088) — ver ModoCampoPanel.jsx,
   // EnrollmentModoCampo.jsx, wakeWordService.js.
   modoCampo: {

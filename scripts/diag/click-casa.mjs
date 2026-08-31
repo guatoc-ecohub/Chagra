@@ -2,6 +2,7 @@
 /* Click-through de un solo uso: tocar la casa del valle y ver a dónde navega. */
 import { chromium } from 'playwright';
 import { execSync } from 'node:child_process';
+import { mkdirSync } from 'node:fs';
 
 const chromiumPath = execSync('which chromium', { encoding: 'utf8' }).trim();
 const browser = await chromium.launch({
@@ -48,7 +49,9 @@ for (const [x, y] of candidatos) {
   if (hash.includes('vitrina_maestra')) { cambio = true; break; }
 }
 await page.waitForTimeout(9000);
-await page.screenshot({ path: '/tmp/claude-1000/-home-kortux/93695a3d-dc16-45f5-8c0e-608e6e767ffd/scratchpad/valle-casa-click.png', animations: 'disabled' });
+const shotPath = '/tmp/chagra-shots/valle-casa-click.png';
+mkdirSync('/tmp/chagra-shots', { recursive: true });
+await page.screenshot({ path: shotPath, animations: 'disabled' });
 console.log('hash final:', await page.evaluate(() => window.location.hash));
 console.log('cambio a vitrina_maestra:', cambio);
 await ctx.close();

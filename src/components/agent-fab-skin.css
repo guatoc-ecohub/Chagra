@@ -23,28 +23,59 @@
    Español de Colombia (tú/usted), sin voseo. Offline-first (CSS puro).
    ========================================================================== */
 
+/* Separación de la tinta del avatar: clara en la piel oscura y sutil en las
+   pieles claras. El componente consume este token desde su filter inline. */
+.chagra-fab {
+  --chagra-fab-rim: rgba(255, 255, 255, 0.22);
+}
+
+[data-theme="nature"] .chagra-fab,
+[data-theme="minimalista"] .chagra-fab,
+[data-theme="verde-vivo"] .chagra-fab {
+  --chagra-fab-rim: rgb(var(--t-bg-rgb, 255 255 255) / 0.30);
+}
+
 /* Plinto + borde del FAB por el acento del tema. El plinto es un radial sutil
    de la superficie del tema; el borde, el acento. */
 .fvh-skin.chagra-fab {
-  background:
-    radial-gradient(circle at 30% 25%,
-      rgb(var(--c-surface-card, 30 41 59)) 0%,
-      rgb(var(--c-surface, 15 23 42)) 72%) !important;
-  border: 2px solid rgb(var(--t-accent-rgb, 16 185 129) / 0.55) !important;
-  box-shadow:
-    0 4px 16px rgb(var(--scrim-bg, 0 0 0) / 0.4),
-    0 0 14px rgb(var(--t-accent-rgb, 16 185 129) / 0.35) !important;
+  /* operador 2026-08-24 (repetido): SIN disco/fondo negro — el compai flota
+     libre. Solo una sombra suave en el personaje para legibilidad sobre
+     fondos variados; nada de plinto oscuro ni burbuja. */
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  filter: drop-shadow(0 3px 6px rgb(var(--scrim-bg, 0 0 0) / 0.45));
 }
 
 /* Hover: el plinto se realza con un toque más del acento del tema. */
 .fvh-skin.chagra-fab.is-hover {
-  box-shadow:
-    0 6px 22px rgb(var(--scrim-bg, 0 0 0) / 0.5),
-    0 0 22px rgb(var(--t-accent-rgb, 16 185 129) / 0.6) !important;
+  box-shadow: none !important;
+  filter: drop-shadow(0 4px 10px rgb(var(--scrim-bg, 0 0 0) / 0.55));
 }
 
 /* "Respuesta lista": anillo ámbar de aviso (igual semántica en todos los temas
    para que el aviso sea reconocible; el ámbar ya retiñe vía --c-amber-400). */
 .fvh-skin.chagra-fab.is-ready {
   border-color: rgb(var(--c-amber-400, 251 191 36) / 0.8) !important;
+}
+
+/* ============================================================================
+   Menú del gesto de interacción (#66/#70, 2026-07-30) — AgentFabMenu.jsx.
+   SIN scope de .fvh-skin: se ve igual en todos los temas y en prod (la flag
+   VITE_FINCA_VIVA_HOME_PERFIL no gobierna el gesto, solo la piel del plinto).
+   ========================================================================== */
+.agt-fab-menu-item:hover,
+.agt-fab-menu-item:focus-visible {
+  background: rgb(var(--t-accent-rgb, 16 185 129) / 0.18);
+  outline: none;
+}
+.agt-fab-menu-item:focus-visible {
+  box-shadow: 0 0 0 2px rgb(var(--t-accent-rgb, 16 185 129) / 0.6);
+}
+.agt-fab-menu-item:active {
+  background: rgb(var(--t-accent-rgb, 16 185 129) / 0.28);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .agt-fab-menu-item { transition: none !important; }
 }

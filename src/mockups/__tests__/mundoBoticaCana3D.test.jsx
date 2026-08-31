@@ -1,0 +1,159 @@
+import React from 'react';
+import { cleanup, fireEvent, render, screen } from '@testing-library/react';
+import '@testing-library/jest-dom';
+import { afterEach, beforeAll, describe, expect, test, vi } from 'vitest';
+
+/*
+ * El Canvas se mockea abajo (como en sus mundos hermanos) para poder leer el
+ * árbol de la escena con testing-library, sin WebGL real. Eso significa que
+ * `<instancedMesh>` (el cañal de `Canal`, 2 draw calls instanciados) monta
+ * como un elemento DOM plano, no como un `THREE.InstancedMesh` real — y su
+ * `useEffect` de siembra llama `setMatrixAt`/`setColorAt`/`instanceMatrix`
+ * sobre esa ref. Sin este parche, CUALQUIER render de este mundo revienta en
+ * ese efecto (nada que ver con `paso`/`etiquetas`: es el cañal, no tocado por
+ * este cableado). Se rellenan como no-op solo para que el efecto no truene;
+ * no se afirma nada sobre el cañal en estos tests.
+ */
+beforeAll(() => {
+  const proto = window.HTMLUnknownElement?.prototype;
+  if (proto && !proto.setMatrixAt) {
+    proto.setMatrixAt = () => {};
+    proto.setColorAt = () => {};
+    Object.defineProperty(proto, 'instanceMatrix', {
+      configurable: true,
+      get() { return { needsUpdate: false }; },
+      set() {},
+    });
+    Object.defineProperty(proto, 'instanceColor', {
+      configurable: true,
+      get() { return null; },
+      set() {},
+    });
+  }
+});
+
+vi.mock('@react-three/fiber', () => ({
+  Canvas: ({ children, onCreated, ...props }) => {
+    React.useEffect(() => onCreated?.(), [onCreated]);
+    return <div data-testid="canvas" {...props}>{children}</div>;
+  },
+  useFrame: vi.fn(),
+}));
+
+vi.mock('@react-three/drei', () => ({
+  AdaptiveDpr: () => null,
+  OrbitControls: () => null,
+  Html: ({ children }) => <div data-testid="html-billboard">{children}</div>,
+}));
+
+vi.mock('../../visual/mundo3d/ParticulasAmbientales.jsx', () => ({
+  ParticulasAmbientales: () => null,
+}));
+
+import MundoBoticaCana3D from '../MundoBoticaCana3D.jsx';
+
+afterEach(cleanup);
+
+describe('MundoBoticaCana3D', () => {
+  test('presenta la botica y el trapiche, y monta su propio Canvas', () => {
+    render(<MundoBoticaCana3D />);
+    expect(screen.getByRole('heading', { name: 'La botica y el trapiche' })).toBeInTheDocument();
+    expect(screen.getByLabelText('La botica campesina y el trapiche panelero en 3D')).toBeInTheDocument();
+    expect(screen.getByRole('list', { name: 'Recorrido de la botica y de la caña a la panela' })).toBeInTheDocument();
+    expect(screen.getAllByRole('button')).toHaveLength(6);
+  });
+
+  // Cableado de `paso`: antes `etiquetas` era un booleano todo-o-nada que no
+  // movía la cámara ni distinguía un paso de otro dentro del Canvas.
+  describe('cablea el recorrido de la caña a la panela al Canvas', () => {
+    test('en vista calma (sin tocar nada) no hay etiquetas 3D y la cámara mira al punto de reposo', () => {
+      const { container } = render(<MundoBoticaCana3D />);
+      expect(container.querySelector('group[name="etiqueta-paso-1"]')).toBeNull();
+      const foco = container.querySelector('group[name="foco-paso"]');
+      expect(foco).toBeTruthy();
+      // #2698 reencuadró la vista calma hacia el trapiche para que el molino
+      // y el buey queden dentro del encuadre vertical.
+      expect(foco.getAttribute('position')).toBe('0.9,1,1.8');
+      expect(screen.getByRole('status')).toHaveTextContent(/Toque el botón/i);
+    });
+
+    test('tocar "2. El molino" activa el recorrido, resalta esa etiqueta y usa su propio ojo de cámara', () => {
+      const { container } = render(<MundoBoticaCana3D />);
+      fireEvent.click(screen.getByRole('button', { name: '2. El molino' }));
+
+      // La cámara (el foco) se mueve al punto del paso 2, no al de reposo.
+      const foco = container.querySelector('group[name="foco-paso"]');
+      expect(foco.getAttribute('position')).toBe('6.2,2.5,1.6');
+      const ojo = container.querySelector('group[name="ojo-paso"]');
+      expect(ojo.getAttribute('position')).toBe('8,4.8,8.1');
+
+      // Solo la etiqueta del paso 2 lleva la clase de "activo".
+      const etiqueta2 = container.querySelector('div[data-testid="html-billboard"] .bocana-chip--activo');
+      expect(etiqueta2).toBeTruthy();
+      expect(etiqueta2).toHaveTextContent('El molino');
+
+      // El botón queda marcado y el texto cambia al del recorrido.
+      expect(screen.getByRole('button', { name: '2. El molino' })).toHaveAttribute('aria-pressed', 'true');
+      expect(screen.getByRole('status')).toHaveTextContent(/Siga los números/i);
+    });
+
+    test('el paso de la caña acerca el ojo al cañal desde fuera de la enramada', () => {
+      const { container } = render(<MundoBoticaCana3D />);
+      fireEvent.click(screen.getByRole('button', { name: '1. La caña' }));
+
+      const foco = container.querySelector('group[name="foco-paso"]');
+      const ojo = container.querySelector('group[name="ojo-paso"]');
+      expect(foco.getAttribute('position')).toBe('9.5,3.6,-4.5');
+      expect(ojo.getAttribute('position')).toBe('10.4,5.2,3.3');
+    });
+
+    test.each([
+      ['1. La caña', '9.5,3.6,-4.5', '10.4,5.2,3.3'],
+      ['2. El molino', '6.2,2.5,1.6', '8,4.8,8.1'],
+      ['3. El jugo', '4.8,1.9,2.8', '7.3,4.2,9.1'],
+      ['4. La paila', '3.2,2.5,4.3', '5.2,4.8,10.7'],
+      ['5. La panela', '0.7,2,5.9', '2.4,4.1,12.5'],
+    ])('cada paso del recorrido panelero mueve la cámara: %s', (nombre, focoEsperado, ojoEsperado) => {
+      const { container } = render(<MundoBoticaCana3D />);
+      fireEvent.click(screen.getByRole('button', { name: nombre }));
+
+      expect(container.querySelector('group[name="foco-paso"]')).toHaveAttribute('position', focoEsperado);
+      expect(container.querySelector('group[name="ojo-paso"]')).toHaveAttribute('position', ojoEsperado);
+      expect(screen.getByRole('button', { name: nombre })).toHaveAttribute('aria-pressed', 'true');
+    });
+
+    // Bug de producto: los cinco pasos originales miraban SOLO al trapiche —
+    // los canteros de la botica (las siete matas, PR #2701) nunca quedaban
+    // cerca de la cámara. Este paso 6 cierra el recorrido volviendo a la casa.
+    test('el paso 6 ("La botica") acerca la cámara a los tres canteros de las siete matas', () => {
+      const { container } = render(<MundoBoticaCana3D />);
+      fireEvent.click(screen.getByRole('button', { name: '6. La botica' }));
+
+      const foco = container.querySelector('group[name="foco-paso"]');
+      const ojo = container.querySelector('group[name="ojo-paso"]');
+      expect(foco.getAttribute('position')).toBe('-5.9,1.1,4.1');
+      expect(ojo.getAttribute('position')).toBe('-7.9,3.9,15.1');
+
+      const etiqueta6 = container.querySelector('div[data-testid="html-billboard"] .bocana-chip--activo');
+      expect(etiqueta6).toBeTruthy();
+      expect(etiqueta6).toHaveTextContent('La botica');
+
+      expect(screen.getByRole('button', { name: '6. La botica' })).toHaveAttribute('aria-pressed', 'true');
+    });
+
+    test('tocar el mismo paso otra vez vuelve a la vista calma (apaga el recorrido)', () => {
+      const { container } = render(<MundoBoticaCana3D />);
+      const boton = screen.getByRole('button', { name: '4. La paila' });
+      fireEvent.click(boton);
+      expect(boton).toHaveAttribute('aria-pressed', 'true');
+      fireEvent.click(boton);
+      expect(boton).toHaveAttribute('aria-pressed', 'false');
+      expect(container.querySelector('group[name="etiqueta-paso-4"]')).toBeNull();
+      expect(container.querySelector('group[name="ojo-paso"]')).toBeNull();
+      const foco = container.querySelector('group[name="foco-paso"]');
+      // Al apagar el recorrido se vuelve a la MISMA vista calma que #2698
+      // reencuadró hacia el trapiche (0.9,1,1.8), no al punto de reposo viejo.
+      expect(foco.getAttribute('position')).toBe('0.9,1,1.8');
+    });
+  });
+});

@@ -403,7 +403,7 @@ const FAUNA_INVERNADERO = [
   { tipo: 'colibri', base: [4.1, 1.4, 5.2], patron: 'revoloteo', size: 28, fase: 1.2, df: 10 },
 ];
 
-function Diorama({ tier, reducedMotion, foco }) {
+function Diorama({ tier, reducedMotion, foco, especie, cantidad, layout }) {
   const perfil = perfilDeTier(tier);
   const conteos = useMemo(() => invernaderoDeTier(tier), [tier]);
 
@@ -417,6 +417,10 @@ function Diorama({ tier, reducedMotion, foco }) {
   const horaQ = Math.round(hora * 20) / 20;
   const sol = useMemo(() => solDeInvernadero(horaQ), [horaQ]);
   const bruma = useMemo(() => brumaDeHora(horaQ), [horaQ]);
+
+  /* Cuánta luz le FALTA a la hora para que el interior se lea (la noche y el
+     atardecer bajan `atm.intensidad`; a mediodía esto es ~0). */
+  const refuerzo = Math.max(0, 1 - atm.intensidad);
 
   /* El gradiente de bandas (toma B): terreno y montes comparten escalones. */
   const bandas = useGradienteBandas();
@@ -484,6 +488,27 @@ function Diorama({ tier, reducedMotion, foco }) {
       <ambientLight
         intensity={(sol.deDia ? 0.3 + 0.1 * sol.fade : 0.26) * atm.intensidad}
         color={mezclar(atm.luz, NIEBLAS.lechosa, 0.4)}
+      />
+      {/* EL PISO DE LECTURA del túnel (mismo remedio del cafetal #2707, el
+          aguacatal #2709, la lechería #2712 y el papal #2713, ADAPTADO al
+          interior): de noche todo lo de adentro — camas, almácigo, tomate,
+          goteo — caía a bulto negro y la lección no se leía. Dos luces
+          locales que COMPENSAN lo que la hora apaga (a mediodía suman ~0).
+          Como esto es un ESPACIO CERRADO bajo plástico, aquí manda la
+          HEMISFÉRICA lechosa (la claridad difusa, sin dirección, que el
+          calibre 6 fabrica) y la clave es apenas un empujón cálido SIN
+          sombras — nada de sol duro adentro. El domo, las estrellas y la
+          bruma siguen contando la hora: la noche sigue siendo noche, pero
+          el invernadero se LEE. */}
+      <hemisphereLight
+        color="#f3ecd6"
+        groundColor="#4a4030"
+        intensity={0.3 + 1.35 * refuerzo}
+      />
+      <directionalLight
+        position={[3, 9, 6]}
+        color="#ffeccb"
+        intensity={0.25 + 0.8 * refuerzo}
       />
       {/* EL SOL DE VERDAD viaja su arco continuo — afuera modela y da sombra;
           ADENTRO la cubierta (castShadow) se la come: la sombra del plástico
@@ -553,7 +578,13 @@ function Diorama({ tier, reducedMotion, foco }) {
 
       {/* LA VIDA sembrada: bandejas, brotes que respiran, bolsas, tomate,
           frutos madurando y la hortaliza. */}
-      <FloraInvernadero tier={tier} reducedMotion={reducedMotion} />
+      <FloraInvernadero
+        tier={tier}
+        reducedMotion={reducedMotion}
+        especie={especie}
+        cantidad={cantidad}
+        layout={layout}
+      />
 
       {/* LA ALFOMBRA DE LUZ DIFUSA: el charco sin borde que la mancha deja en
           las camas — deriva de poniente a oriente con el día. Dos elipses
@@ -649,9 +680,16 @@ function Diorama({ tier, reducedMotion, foco }) {
 
 /**
  * El micro-mundo del invernadero campesino. Montar SOLO perezosa (lazy).
- * @param {{tier?: 'alto'|'medio'|'bajo', reducedMotion?: boolean, foco?: number[]|null}} props
+ * @param {{tier?: 'alto'|'medio'|'bajo', reducedMotion?: boolean, foco?: number[]|null, especie?: string, cantidad?: number, layout?: string|object}} props
  */
-export default function EscenaInvernaderoVivo({ tier = 'alto', reducedMotion = false, foco = null }) {
+export default function EscenaInvernaderoVivo({
+  tier = 'alto',
+  reducedMotion = false,
+  foco = null,
+  especie = 'tomate',
+  cantidad = 1500,
+  layout = 'surcos',
+}) {
   const perfil = perfilDeTier(tier);
   const [listo, setListo] = useState(false);
   return (
@@ -664,7 +702,14 @@ export default function EscenaInvernaderoVivo({ tier = 'alto', reducedMotion = f
       frameloop={reducedMotion ? 'demand' : 'always'}
       onCreated={() => setListo(true)}
     >
-      <Diorama tier={tier} reducedMotion={reducedMotion} foco={foco} />
+      <Diorama
+        tier={tier}
+        reducedMotion={reducedMotion}
+        foco={foco}
+        especie={especie}
+        cantidad={cantidad}
+        layout={layout}
+      />
     </Canvas>
   );
 }

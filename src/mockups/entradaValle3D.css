@@ -531,7 +531,19 @@
   transition: transform 0.7s cubic-bezier(0.22, 0.9, 0.3, 1);
   will-change: transform;
 }
-.valle2d__svg { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+/* SVG con contain para que se vea completo en portrait sin cortes */
+.valle2d__svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+/* En landscape, usar cover para llenar el espacio (el valle es horizontal por diseño) */
+@media (orientation: landscape) {
+  .valle2d__svg { object-fit: cover; }
+}
 .valle2d__mundos { position: absolute; inset: 0; }
 
 /* Angelita en el 2D: el avatar que vuela hacia el lugar al entrar */

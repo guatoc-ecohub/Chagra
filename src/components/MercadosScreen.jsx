@@ -20,9 +20,10 @@ import { marketplaceOfertas } from '../db/marketplaceOfertas';
 import { CATEGORIAS, UNIDADES, OFERTAS_SEED } from '../data/marketplaceSeed';
 import { getProfile } from '../services/userProfileService';
 import {
-  formatearCOP, construirContacto, resolverPrecioReferencia,
+  formatearCOP, construirContacto,
   validarOferta, filtrarOfertas,
 } from '../services/marketplaceService';
+import { useSipsaMarketReference } from '../hooks/useSipsaMarketReference';
 
 /**
  * MercadosScreen — el MARKETPLACE agroecológico de Chagra (circuitos cortos).
@@ -40,16 +41,19 @@ import {
  *      patrón del resto de la app. Sin transacción ni pago dentro de Chagra:
  *      deflección honesta sobre pagos.
  *
- * Precio de referencia GROUNDEADO: si hay dato citado (SIPSA/DANE) para el
- * producto, se muestra con su fuente y la fecha del boletín; si no, deflección
- * honesta ("sin precio de referencia todavía"). NUNCA se inventa un precio ni
- * una tendencia (la tabla es una foto puntual del boletín, no una serie
- * temporal — por eso no hay flecha de subida/bajada). Se muestra en DOS
- * momentos: (1) al PUBLICAR, para que el productor calibre su precio mientras
- * escribe el nombre del producto; (2) en el detalle de una oferta, para que el
- * comprador la vea también. Mismo componente (`PrecioReferenciaBloque`), texto
- * de deflección adaptado por `contexto`. El gancho para el dato SIPSA EN VIVO
- * (no esta foto estática) sigue en cola — ver precioReferencia.js.
+ * Precio de referencia GROUNDEADO: prefiere el FEED VIVO SIPSA/DANE (tool
+ * `get_precio_sipsa`, tabla `chagra.sipsa_precios` poblada a diario por el
+ * servicio REST oficial DANE) vía el hook `useSipsaMarketReference`; si el
+ * sidecar no responde (flag off / offline / timeout / sin dato) cae con
+ * honestidad a la FOTO estática citada del boletín (`precioReferencia.js`), con
+ * SU fecha; y si ninguna fuente tiene el producto, deflección honesta ("sin
+ * precio de referencia todavía"). NUNCA se inventa un precio ni una tendencia
+ * (cada dato es un punto fechado, no una serie temporal — por eso no hay flecha
+ * de subida/bajada). Se muestra en DOS momentos: (1) al PUBLICAR, para que el
+ * productor calibre su precio mientras escribe el nombre del producto; (2) en el
+ * detalle de una oferta, para que el comprador la vea también. Mismo componente
+ * (`PrecioReferenciaBloque`), que rotula "en vivo" vs. boletín según el origen y
+ * siempre muestra la fecha del dato.
  *
  * @param {object} props
  * @param {() => void} [props.onBack] - volver al dashboard.
@@ -383,7 +387,11 @@ function OfertaCard({ oferta, onContactar }) {
 
 function DetalleOferta({ oferta, onClose, onEliminar }) {
   const contacto = construirContacto(oferta);
-  const ref = resolverPrecioReferencia(oferta.producto);
+  // Referencia mayorista: feed VIVO SIPSA con fallback honesto a la foto
+  // estática. El nombre de la oferta ya está completo → el hook siempre trae
+  // una referencia (o deflección honesta si ninguna fuente tiene el producto).
+  const { referencia } = useSipsaMarketReference(oferta.producto);
+  const ref = referencia || { disponible: false, origen: 'ninguno' };
   const precio = formatearCOP(oferta.precio);
   const cat = CATEGORIAS.find((c) => c.id === oferta.categoria);
   // RED humana: paso de cierre "¿se concretó el negocio?" — el gesto que
@@ -502,27 +510,45 @@ function DetalleOferta({ oferta, onClose, onEliminar }) {
 
 /**
  * PrecioReferenciaBloque — cita el precio de referencia mayorista SIPSA/DANE
- * (banda + plaza(s) + boletín fechado) o deflecta honestamente si no hay dato
- * para el producto. Es una FOTO puntual del boletín, no un precio en vivo: por
- * eso el rótulo dice "referencia" y siempre muestra la fecha del boletín, y
- * por eso NUNCA se dibuja una flecha de tendencia (no hay serie temporal
- * detrás, solo un punto — inventar una tendencia sería alucinar).
+ * (banda + plaza(s) + fecha) o deflecta honestamente si no hay dato para el
+ * producto. Dos orígenes, ambos citados y fechados:
+ *   - `origen: 'vivo'`     → dato del FEED VIVO (tool `get_precio_sipsa`, tabla
+ *     `chagra.sipsa_precios` poblada a diario por el servicio REST oficial DANE).
+ *     Muestra la FECHA del dato vivo y, si el sidecar lo marca `desactualizado`,
+ *     un sello honesto ("último dato, no el de hoy") para no vender un dato
+ *     viejo como el de hoy.
+ *   - `origen: 'estatico'` → FOTO puntual del boletín citado (fallback cuando el
+ *     feed vivo no responde: flag off, offline, timeout o sin dato). Muestra la
+ *     fecha del boletín.
+ * NUNCA se dibuja una flecha de tendencia (cada punto es una foto, no una serie
+ * temporal — inventar una tendencia sería alucinar) ni se fabrica un número.
  *
- * `contexto` ajusta solo el texto de la deflección (cuando no hay dato):
+ * `contexto` ajusta el texto de la deflección/aclaración:
  *   - 'oferta'   (default): la ve un comprador mirando una oferta publicada.
  *   - 'publicar': la ve el productor mientras redacta su propia oferta.
  *
  * @param {object} props
- * @param {{disponible:boolean, banda?:string, mercado?:string, fuente?:string,
- *   fuenteUrl?:string, boletinFecha?:string}} props.referencia
+ * @param {{disponible:boolean, origen?:'vivo'|'estatico'|'ninguno', banda?:string,
+ *   mercado?:string, fuente?:string, fuenteUrl?:string, fecha?:string,
+ *   boletinFecha?:string, desactualizado?:boolean, diasDesdeDato?:number|null}} props.referencia
  * @param {'oferta'|'publicar'} [props.contexto]
  */
 function PrecioReferenciaBloque({ referencia, contexto = 'oferta' }) {
   if (referencia.disponible) {
+    const enVivo = referencia.origen === 'vivo';
+    // La fecha citada: dato vivo si viene del feed, si no la del boletín estático.
+    const fechaCitada = referencia.fecha || referencia.boletinFecha || null;
+    const sello = enVivo
+      ? (referencia.desactualizado
+        ? `dato ${fechaCitada || 'reciente'} · último disponible${
+          typeof referencia.diasDesdeDato === 'number' ? ` (hace ${referencia.diasDesdeDato} día${referencia.diasDesdeDato === 1 ? '' : 's'})` : ''
+        }`
+        : (fechaCitada ? `dato del ${fechaCitada}` : 'dato en vivo'))
+      : (fechaCitada ? `boletín ${fechaCitada}` : null);
     return (
       <div className="rounded-lg border border-sky-500/30 bg-sky-500/5 p-3 text-sm">
         <p className="text-sky-200 font-semibold flex items-center gap-1.5">
-          <Tag size={14} /> Referencia SIPSA (precio mayorista)
+          <Tag size={14} /> Referencia SIPSA {enVivo ? 'en vivo ' : ''}(precio mayorista)
         </p>
         <p className="text-white mt-1">{referencia.banda}{referencia.mercado ? ` · ${referencia.mercado}` : ''}</p>
         <p className="text-slate-400 text-xs mt-1">
@@ -533,12 +559,14 @@ function PrecioReferenciaBloque({ referencia, contexto = 'oferta' }) {
           ) : (
             <>Fuente: {referencia.fuente}</>
           )}
-          {referencia.boletinFecha ? ` · boletín ${referencia.boletinFecha}` : ''}
+          {sello ? ` · ${sello}` : ''}
         </p>
         <p className="text-slate-500 text-[11px] mt-1.5">
           {contexto === 'publicar'
             ? 'Es una referencia mayorista, no lo que le van a pagar a usted en finca. Úsela solo para calibrar su precio.'
-            : 'Es una referencia mayorista de ese día, no un precio en vivo.'}
+            : (enVivo
+              ? 'Es el precio mayorista más reciente del feed SIPSA/DANE, no un precio de finca.'
+              : 'Es una referencia mayorista de ese día, no un precio en vivo.')}
         </p>
       </div>
     );
@@ -580,12 +608,10 @@ function PublicarPanel({ onPublicada, onCancelar }) {
 
   // Precio de referencia SIPSA/DANE mientras el productor escribe el producto:
   // se calcula solo con 3+ caracteres para no mostrar la deflección sobre un
-  // campo recién abierto. Reusa la misma lógica GROUNDEADA que el detalle de
-  // la oferta (resolverPrecioReferencia) — nunca inventa un precio.
-  const refPrecio = useMemo(() => {
-    const q = form.producto.trim();
-    return q.length >= 3 ? resolverPrecioReferencia(q) : null;
-  }, [form.producto]);
+  // campo recién abierto. Reusa la MISMA lógica GROUNDEADA que el detalle de la
+  // oferta (useSipsaMarketReference): FEED VIVO SIPSA con fallback honesto a la
+  // foto estática — nunca inventa un precio.
+  const { referencia: refPrecio } = useSipsaMarketReference(form.producto);
 
   const handleGuardar = useCallback(async () => {
     const { ok, errors: errs } = validarOferta(form);

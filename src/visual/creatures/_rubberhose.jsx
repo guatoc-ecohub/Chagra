@@ -14,25 +14,48 @@
  * solo PONEN las clases; el CSS decide si corren.
  */
 
+import {
+  RH_SPEC_TINTA, RH_SPEC_PUPILA, RH_SPEC_HUESO, RH_SPEC_GUANTE,
+  RH_SPEC_CHISPA, RH_SPEC_CHAPETA, RH_SPEC_BOCA, RH_SPEC_LENGUA,
+} from './rubberhoseSpec.js';
+
 /* Tinta cálida (no negro puro): el contorno grueso "andino" de toda la familia.
-   Rubber-hose = línea que manda; que sea tierra-oscura, no industrial. */
-export const RH_INK = '#2a1a0c';
+   Rubber-hose = línea que manda; que sea tierra-oscura, no industrial.
+   Los VALORES viven en `rubberhoseSpec.js` (la ley como datos, fuente única
+   compartida con `_faunaRubberTokens.js`); aquí solo se re-exportan con los
+   nombres históricos del kit. */
+export const RH_INK = RH_SPEC_TINTA;
 /* Guante/mitón crema (manos de goma) y chapeta coral (cachete campesino). */
-export const RH_GLOVE = '#fff3d8';
-export const RH_CHEEK = '#f2907a';
+export const RH_GLOVE = RH_SPEC_GUANTE;
+export const RH_CHEEK = RH_SPEC_CHAPETA;
 
 /**
  * Ojos expresivos de goma (Cuphead/Miss Minutes): esclerótica blanca con
  * contorno grueso, pupila GRANDE y brillo (catchlight). Un mismo grupo parpadea
  * (`rh-blink`) para que los dos ojos cierren sincronizados.
  *
+ * Opt-in ANATOMÍA HONESTA (iter2 2026-08-23, default = el ojo de siempre):
+ *   `esclera` tiñe el globo (un insecto de ojo COMPUESTO no tiene blanco de
+ *   ojo — Angelita pasa su miel oscura); `iris` enciende un anillo cálido
+ *   alrededor de la pupila (la "pseudopupila" que en el ojo compuesto real se
+ *   ve como punto cálido que sigue al observador — acá es también la calidez
+ *   de mascota); `tornasol` pinta el barrido de luz corneal de las láminas
+ *   naturalistas. Los tres son opcionales: oso, colibrí y el resto de la
+ *   familia siguen renderizando EXACTO igual sin tocar una línea.
+ *
  * @param {Object} props
  * @param {Array<{cx:number,cy:number,r:number}>} [props.ojos]
  * @param {[number,number]} [props.mirar=[0.32,0.34]]
  * @param {boolean} [props.parpadea=true]
  * @param {string} [props.ink=RH_INK]
+ * @param {string} [props.esclera=RH_SPEC_HUESO]  fill del globo ocular
+ * @param {string|null} [props.iris=null]  anillo cálido bajo la pupila (opt-in)
+ * @param {boolean} [props.tornasol=false]  brillo corneal superior (opt-in)
  */
-export function OjosRubber({ ojos = [], mirar = [0.32, 0.34], parpadea = true, ink = RH_INK }) {
+export function OjosRubber({
+  ojos = [], mirar = [0.32, 0.34], parpadea = true, ink = RH_INK,
+  esclera = RH_SPEC_HUESO, iris = null, tornasol = false,
+}) {
   const [mx, my] = mirar;
   return (
     <g className={parpadea ? 'rh-blink' : undefined} style={{ transformBox: 'fill-box', transformOrigin: 'center' }}>
@@ -42,15 +65,34 @@ export function OjosRubber({ ojos = [], mirar = [0.32, 0.34], parpadea = true, i
         const py = o.cy + my * o.r;
         return (
           <g key={i}>
-            <circle cx={o.cx} cy={o.cy} r={o.r} fill="#fffaf0" stroke={ink} strokeWidth={o.r * 0.42} />
+            <circle cx={o.cx} cy={o.cy} r={o.r} fill={esclera} stroke={ink} strokeWidth={o.r * 0.42} />
+            {/* tornasol: el barrido de luz sobre la córnea (ojo compuesto de
+                lámina naturalista) — vive en el GLOBO, no sigue a la mirada */}
+            {tornasol && (
+              <path
+                d={`M${o.cx - o.r * 0.62},${o.cy - o.r * 0.16} Q${o.cx - o.r * 0.08},${o.cy - o.r * 0.8} ${o.cx + o.r * 0.55},${o.cy - o.r * 0.3}`}
+                stroke={RH_SPEC_HUESO} strokeWidth={o.r * 0.13} fill="none"
+                strokeLinecap="round" opacity="0.3"
+              />
+            )}
             {/* pupila + catchlight en su grupo `rh-mirada`: cuando la criatura
                 está viva, las pupilas se van de reojo y miran arriba curiosas
                 (período co-primo con el parpadeo — nunca el mismo compás).
                 Ambos ojos comparten la clase → dardean sincronizados. */}
             <g className={parpadea ? 'rh-mirada' : undefined}>
-              <circle cx={px} cy={py} r={pr} fill="#20130a" />
+              {iris ? (
+                /* modo ojo compuesto: anillo cálido (pseudopupila) + pupila
+                   adentro — el conjunto ocupa el MISMO radio pr de siempre,
+                   así el dart de la mirada jamás se sale del globo */
+                <>
+                  <circle cx={px} cy={py} r={pr} fill={iris} opacity="0.9" />
+                  <circle cx={px} cy={py} r={pr * 0.72} fill={RH_SPEC_PUPILA} />
+                </>
+              ) : (
+                <circle cx={px} cy={py} r={pr} fill={RH_SPEC_PUPILA} />
+              )}
               {/* catchlight arriba-izquierda: la chispa de vida del ojo */}
-              <circle cx={px - pr * 0.4} cy={py - pr * 0.5} r={pr * 0.42} fill="#fffdf7" />
+              <circle cx={px - pr * 0.4} cy={py - pr * 0.5} r={pr * 0.42} fill={RH_SPEC_CHISPA} />
             </g>
           </g>
         );
@@ -118,10 +160,14 @@ export function Sonrisa({ cx = 0, cy = 0, w = 3, prof = 1.4, ink = RH_INK }) {
  * @param {string} [props.origen='top center']  transform-origen (el hombro)
  * @param {string} [props.ink]
  * @param {string} [props.glove]
+ * @param {boolean} [props.sinGuante=false]  OPT-IN: true = SIN mitón/guante —
+ *   la manguera remata desnuda con un puntito de tinta muy sutil (la manita/
+ *   piecito de la angelita re-skin 2026-08-21). El default (false) conserva el
+ *   mitón crema de siempre: oso andino, colibrí y el resto no cambian.
  */
 export function Miembro({
   d, ancho = 2.3, punta = null, puntaR = 1.6, pie = false, sway = false, delay = 0,
-  clase, origen = 'top center', ink = RH_INK, glove = RH_GLOVE,
+  clase, origen = 'top center', ink = RH_INK, glove = RH_GLOVE, sinGuante = false,
 }) {
   const style = {
     transformBox: 'fill-box',
@@ -132,7 +178,20 @@ export function Miembro({
   return (
     <g className={clases} style={style}>
       <path d={d} stroke={ink} strokeWidth={ancho} fill="none" strokeLinecap="round" strokeLinejoin="round" />
-      {punta && (pie ? (
+      {punta && (sinGuante ? (
+        /* Remate DESNUDO (sin mitón): masa de tinta en la punta que da manita/
+           piecito sin dibujar guante — los gestos (celebra/señala) conservan
+           un remate legible en la punta de la manguera. (2026-08-23: la punta
+           creció — con 0.62·puntaR quedaba MÁS chica que el grosor del tubo y
+           era invisible: la manguera se leía como palito que termina en nada.
+           Rubber-hose = el miembro remata SIEMPRE en una masa; sigue siendo
+           tinta desnuda, el guante no vuelve.) */
+        <ellipse
+          cx={punta[0]} cy={punta[1]}
+          rx={puntaR * (pie ? 0.95 : 0.92)} ry={puntaR * (pie ? 0.6 : 0.92)}
+          fill={ink}
+        />
+      ) : pie ? (
         <ellipse cx={punta[0]} cy={punta[1]} rx={puntaR * 1.15} ry={puntaR * 0.72} fill={glove} stroke={ink} strokeWidth="0.7" />
       ) : (
         <circle cx={punta[0]} cy={punta[1]} r={puntaR} fill={glove} stroke={ink} strokeWidth="0.7" />
@@ -165,7 +224,7 @@ export function AntenaRubber({ d, bulbo, bulboR = 1.15, sway = false, delay = 0,
 }
 
 /* Boca interior (garganta) para las bocas abiertas — un rojo cálido tenue. */
-export const RH_BOCA = '#8a3b34';
+export const RH_BOCA = RH_SPEC_BOCA;
 
 /**
  * BocaVisema — la BOCA de goma en sus 4 formas de LIP-SYNC
@@ -209,7 +268,7 @@ export function BocaVisema({ cx = 0, cy = 0, w = 3, prof = 1.1, visema = 'V1', i
     return (
       <g>
         <ellipse cx={cx} cy={cy + prof * 0.55} rx={w * 0.42} ry={prof * 1.05} fill={boca} stroke={ink} strokeWidth="0.9" />
-        <path d={`M${cx - w * 0.3},${cy + prof * 1.1} Q${cx},${cy + prof * 1.7} ${cx + w * 0.3},${cy + prof * 1.1} Z`} fill="#d1615a" />
+        <path d={`M${cx - w * 0.3},${cy + prof * 1.1} Q${cx},${cy + prof * 1.7} ${cx + w * 0.3},${cy + prof * 1.1} Z`} fill={RH_SPEC_LENGUA} />
       </g>
     );
   }

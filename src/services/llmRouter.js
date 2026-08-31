@@ -18,6 +18,7 @@
  */
 
 import { analyzeQueryComplexity } from './queryComplexityAnalyzer';
+import { ENV } from '../config/env';
 
 /**
  * BUG A (fuga de roles, incidente prod 2026-05-30) — stop sequences anti
@@ -87,15 +88,11 @@ export const ROUTES = {
     // Plus: usar el mismo modelo para chat simple y complex elimina el
     // cold-start cuando el router escala (no hay 2do modelo que cargar).
     // Tradeoff de latencia amortizado por UX queueing + tip flotante.
-    // Override via env VITE_LLM_CHAT_MODEL para experimentos.
-    model:
-      (typeof import.meta !== 'undefined' && import.meta?.env?.VITE_LLM_CHAT_MODEL) ||
-      // 2026-07-22: granite3.3:8b -> gemma4:e2b. La nota de arriba decía que
-      // granite3.3 se eligió para "mitigar errores geográficos + piso térmico
-      // observados en producción". La medición dice que NO los mitigó: con juez
-      // semántico sobre 70 sondas, granite3.3 falla el piso térmico el 41,7% de
-      // las veces y contamina el 47,7% global. gemma4:e2b: 6,7% y 10%.
-      'qwen3.5:4b',
+    // Modelo leído de ENV.CHAT_MODEL (src/config/env.js, fuente única de
+    // verdad — override en build-time con VITE_LLM_CHAT_MODEL para
+    // experimentos, sin tocar código). Ver el comentario de esa clave para
+    // el historial de bench (granite3.3 → gemma4:e2b → gemma4:e4b → gemma3:4b).
+    model: ENV.CHAT_MODEL,
     keep_alive_min: 30,
     temperature: 0.3,
     // 2026-06-06: 512→768. Fuga real (interacción operador): respuesta de
@@ -111,20 +108,15 @@ export const ROUTES = {
     stop: CHAT_STOP_SEQUENCES,
     url: '/api/ollama/v1/chat/completions',
     rationale:
-      'qwen3.5:4b (chat+complex unificado, evita cold-start). ' +
+      `${ENV.CHAT_MODEL} (chat+complex unificado, evita cold-start). ` +
       'Detalle + por qué + alternativas en Chagra-strategy/ops/MODELS.md (fuente única).',
   },
   chat_complex: {
-    // Override por env para que el operador pueda probar otros modelos
-    // sin redeploy de código. Si VITE_LLM_COMPLEX_MODEL no está seteado,
-    // usa el modelo complex configurado (según bench interno, la opción que
-    // evita confusiones taxonómicas con cupo de GPU razonable).
-    model:
-      (typeof import.meta !== 'undefined' && import.meta?.env?.VITE_LLM_COMPLEX_MODEL) ||
-      // 2026-07-22: la nota de arriba decía que granite3.3 "evita confusiones
-      // taxonómicas". El bench con juez semántico lo desmiente: confusión de
-      // especie y cruce de cultivos al 91,7%. gemma4:e2b baja el cruce a 33,3%.
-      'qwen3.5:4b',
+    // Modelo leído de ENV.CHAT_COMPLEX_MODEL (src/config/env.js, fuente
+    // única de verdad — override en build-time con VITE_LLM_COMPLEX_MODEL
+    // para experimentos, sin tocar código). Ver el comentario de esa clave
+    // para el historial de bench (granite3.3 → gemma4:e2b → gemma4:e4b → gemma3:4b).
+    model: ENV.CHAT_COMPLEX_MODEL,
     keep_alive_min: 5,
     temperature: 0.3,
     // 2026-06-06: 768→1024. Las queries complejas (planes multi-cultivo,
@@ -135,21 +127,22 @@ export const ROUTES = {
     stop: CHAT_STOP_SEQUENCES,
     url: '/api/ollama/v1/chat/completions',
     rationale:
-      'qwen3.5:4b (chat+complex unificado, evita cold-start). ' +
+      `${ENV.CHAT_COMPLEX_MODEL} (chat+complex unificado, evita cold-start). ` +
       'Detalle + por qué + alternativas en Chagra-strategy/ops/MODELS.md (fuente única).',
   },
   nlu: {
-    // NLU REAL = sidecar agro-mcp nlu.ts (granite3.3:8b). Este campo es
-    // vestigial: la PWA delega NLU al sidecar /nlu. Ver
-    // Chagra-strategy/ops/MODELS.md (fuente única de verdad de modelos).
-    model: 'qwen3.5:4b',
+    // NLU REAL = sidecar agro-mcp nlu.ts (repo aparte chagra-pro, su propia
+    // env var runtime NLU_MODEL). Este campo es vestigial: la PWA delega NLU
+    // al sidecar /nlu. Se deja consistente con ENV.NLU_MODEL (src/config/env.js,
+    // fuente única de verdad) por si algún caller legacy invoca esta ruta.
+    model: ENV.NLU_MODEL,
     keep_alive_min: 0,
     temperature: 0,
     max_tokens: 150,
     url: '/api/ollama/v1/chat/completions',
     rationale:
-      'Vestigial — NLU real ejecuta en sidecar agro-mcp nlu.ts con ' +
-      'qwen3.5:4b (unificado con chat para no tener 2 modelos en 12 GB). ' +
+      'Vestigial — NLU real ejecuta en sidecar agro-mcp nlu.ts con su propio ' +
+      `NLU_MODEL runtime (debe alinearse con ${ENV.NLU_MODEL}). ` +
       'Detalle en Chagra-strategy/ops/MODELS.md (fuente única).',
   },
   reasoning: {
@@ -166,13 +159,55 @@ export const ROUTES = {
       'mejor capability) o deepseek-r1:8b (46 t/s, chain-of-thought).',
   },
   vision: {
-    model: 'qwen3-vl:8b',
-    keep_alive_min: 0,
+    // 2026-07-23 (PR #2738 §9): qwen3-vl:8b JUBILADO. Bench profundo (18
+    // plagas + 5 sanas control) da a gemma3:4b 45.5 (33.3% ident., 100%
+    // honestidad) contra 16.9 de qwen3-vl:8b (11.1% ident., 80% honestidad,
+    // + el swap de ~53s que este cambio elimina al unificar con el modelo
+    // de texto). Ver ENV.VISION_MODEL en src/config/env.js (fuente única)
+    // para el caveat metodológico pendiente de confirmación (el bench
+    // "Arena visual 2026-07-22" citado abajo usaba un diseño distinto —
+    // presencia SIEMPRE emparejada con su ausencia — que no se re-testeó
+    // con el dataset nuevo).
+    model: ENV.VISION_MODEL,
+    // 2026-07-26 — ERA 0, decisión del operador: QUITARLO. El 0 venía de
+    // cuando visión era `qwen3-vl:8b` y "no cabía" junto al chat en 12 GiB.
+    // Medido, esa premisa es falsa: los dos modelos conviven (9691/12288 MiB)
+    // y con keep_alive normal la foto baja de ~8,5 s a 0,8 s. Ver
+    // `keepAliveEfectivo` abajo para la medición completa y la guarda.
+    keep_alive_min: 10,
     temperature: 0.2,
+    // marca de rol: la usa `keepAliveEfectivo` y el segundo paso.
+    _paso: 1,
     max_tokens: 512,
     url: '/api/ollama/v1/chat/completions',
     rationale:
-      'Arena visual 2026-07-22 (12 casos, cada presencia emparejada con su ausencia, GPU limpia): qwen3-vl:8b acierta 12/12 — 5/5 presencia y 7/7 ausencia — a 17s por imagen, 100% GPU sin offload (7,6 GB). Le siguen qwen2.5vl:7b 92% (pero pide 14 GB y SIEMPRE hace offload, verificado con la GPU vacia), gemma4:e4b 75%, gemma3:4b 58% (el que estaba aqui: fallaba 3 de 7 ausencias, o sea decia ver cosas que no estan — inservible como gate) y moondream 0%. El bench del 2026-06-23 daba a qwen2.5vl como el PEOR: lo midio en thrashing por el offload, con granite3.3 ocupando la GPU. El cambio a gemma4:e2b (8,1 GB) libero el espacio que permite este carril. keep_alive_min 0 se conserva: se carga, responde y se descarga, asi que los 17s no compiten con el agente. Detalle en Chagra-strategy/ops/MODELS.md (fuente unica).',
+      'Histórico (Arena visual 2026-07-22, 12 casos, cada presencia emparejada con su ausencia, GPU limpia): qwen3-vl:8b acierta 12/12 — 5/5 presencia y 7/7 ausencia — a 17s por imagen, 100% GPU sin offload (7,6 GB). Le seguían qwen2.5vl:7b 92%, gemma4:e4b 75%, gemma3:4b 58% (fallaba 3 de 7 ausencias — inservible como gate en ESE diseño) y moondream 0%. Superseded por PR #2738 §9 (dataset distinto, 18 plagas + 5 sanas): gemma3:4b sale primero en identificación y honestidad. Detalle en Chagra-strategy/ops/MODELS.md (fuente unica).',
+  },
+  /* ── EL SEGUNDO PASO DEL DIAGNÓSTICO DE FOTO ─────────────────────────────
+     Decisión del operador 2026-07-26: el primero contesta de una y este
+     vuelve a mirar en segundo plano, avisando SÓLO si encuentra algo que el
+     otro pasó por alto. Un modelo DISTINTO del chat a propósito — si fuera el
+     mismo, la segunda mirada no aportaría nada nuevo.
+
+     ⚠️ `num_predict` amplio y NO se le cree a `think:false`: qwen3-vl:4b
+     razona igual, y con presupuesto corto devuelve CADENA VACÍA
+     (`done_reason: "length"`). Medido: con 90 sacaba 4/11; con presupuesto
+     suficiente, 11/11. No es que no sepa — es que no lo dejan hablar.
+
+     ⚠️ Convivencia MEDIDA en alpha: qwen3.5:4b (6,0 GB) + qwen3-vl:4b
+     (4,8 GB) = 9691/12288 MiB, y el chat sigue contestando en 0,70 s — pero
+     SÓLO serializado. Disparándolo en paralelo con el embebedor del RAG se
+     reprodujo el DESALOJO del chat pineado, con 8,56 s de recarga. El cerrojo
+     de un-solo-vuelo vive en services/segundaOpinionFoto.js. */
+  visionRevision: {
+    model: ENV.VISION_REVIEW_MODEL,
+    keep_alive_min: 10,
+    temperature: 0.1,
+    max_tokens: 700,
+    url: '/api/ollama/v1/chat/completions',
+    _paso: 2,
+    rationale:
+      'Segundo paso del diagnostico de foto. Bench propio sobre 19 fotos reales de matas del repo, emparejado presencia/ausencia (scripts/bench-vision-matas.mjs, 2026-07-26): qwen3-vl:4b 19/19 (11/11 enfermas, 8/8 sanas) contra 18/19 de qwen3.5:4b, que nunca alarma de mas pero dejo pasar la broca del cafe. Precio: 2,3x en latencia (6,22 s vs 2,75 s de mediana) porque razona aunque se le pida que no; por eso corre en segundo plano, nunca en el camino critico. Los errores de ambos son de TIPO OPUESTO: el segundo cubre el hueco del primero.',
   },
 };
 
@@ -210,6 +245,42 @@ export function getModelFor(task) {
  *   ]);
  *   const response = await streamOpenAI(url, body, onToken);
  */
+/**
+ * keep_alive efectivo de una ruta. **La guarda que faltaba.**
+ *
+ * `keep_alive: 0` significa "descargá el modelo apenas contestes". Es una
+ * estrategia legítima cuando la ruta usa un modelo PROPIO (se carga, responde
+ * y libera la GPU). Pero desde que los roles se unificaron en un solo modelo
+ * (`config/env.js`: chat, nlu, extractor, complex y visión son todos
+ * `qwen3.5:4b`), ese 0 dejó de liberar a un invitado y pasó a **echar al
+ * dueño de casa**: cada turno con foto le decía a Ollama que descargara el
+ * modelo del que depende el chat, y el siguiente mensaje pagaba el arranque
+ * en frío completo.
+ *
+ * MEDIDO en alpha (2026-07-26, Quadro M6000 12 GiB):
+ *   · el mecanismo, probado con un modelo señuelo para no tocar producción:
+ *     `gemma3:4b` residente + una petición con `keep_alive:0` → desaparece.
+ *   · el costo, en el carril de visión: con 0, cada foto paga carga en frío
+ *     (8,51 s y 5,72 s). Con `keep_alive` normal: 6,70 s la primera y luego
+ *     **0,80 s y 0,78 s**.
+ *   · y no hacía falta: `qwen3.5:4b` (6,0 GB) y `qwen3-vl:4b` (4,8 GB)
+ *     CONVIVEN en 9691 de 12288 MiB. La premisa de que no cabían era falsa.
+ *
+ * Por eso la regla es estructural y no ruta-por-ruta: **ninguna ruta puede
+ * pedir la descarga del modelo que sirve el chat.** Si una ruta futura vuelve
+ * a compartir modelo con el chat, queda protegida sola.
+ *
+ * @param {ModelRoute} route
+ * @returns {number} minutos de keep_alive a enviar.
+ */
+export function keepAliveEfectivo(route) {
+  const min = Number(route?.keep_alive_min) || 0;
+  if (min > 0) return min;
+  // Comparte modelo con el chat → jamás 0: se hereda el del chat.
+  if (route?.model && route.model === ROUTES.chat.model) return ROUTES.chat.keep_alive_min;
+  return min;
+}
+
 export function buildLLMRequest(task, messages, overrides = {}) {
   const route = getModelFor(task);
   const body = {
@@ -219,7 +290,8 @@ export function buildLLMRequest(task, messages, overrides = {}) {
     max_tokens: overrides.max_tokens ?? route.max_tokens,
     // keep_alive controla cuánto Ollama mantiene el modelo en RAM tras
     // esta request. Formato Ollama: número en segundos o sufijo "m"/"h".
-    keep_alive: `${route.keep_alive_min}m`,
+    // Pasa por la guarda: una ruta nunca descarga el modelo del chat.
+    keep_alive: `${keepAliveEfectivo(route)}m`,
   };
   // BUG A fix (2026-05-30): forward stop sequences (de la ruta o del
   // override). Ollama OpenAI-compat respeta `stop` (string[]). Solo se

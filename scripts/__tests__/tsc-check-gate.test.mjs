@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { parseTscOutput, compareToBaseline, formatReport } from '../tsc-check-gate.mjs';
+import { parseTscOutput, outputFromTscDiagnostic, compareToBaseline, formatReport } from '../tsc-check-gate.mjs';
 
 describe('parseTscOutput', function () {
   it('counts one error per opening diagnostic line', function () {
@@ -52,6 +52,19 @@ describe('parseTscOutput', function () {
   });
 });
 
+describe('outputFromTscDiagnostic', function () {
+  it('returns diagnostics when tsc exits after reporting type errors', function () {
+    var output = outputFromTscDiagnostic({ status: 2, stdout: 'src/a.js(1,1): error TS2322: Type mismatch.\n' });
+    expect(output).toContain('TS2322');
+  });
+
+  it('fails instead of treating a terminated tsc process as zero errors', function () {
+    expect(function () {
+      outputFromTscDiagnostic({ status: null, signal: 'SIGKILL' });
+    }).toThrow('tsc no terminó correctamente por señal SIGKILL');
+  });
+});
+
 describe('compareToBaseline', function () {
   it('passes when current matches baseline exactly', function () {
     var current = { total: 3, byFile: { 'a.js': 2, 'b.js': 1 } };
@@ -93,6 +106,23 @@ describe('compareToBaseline', function () {
     var r = compareToBaseline(current, baseline);
     expect(r.ok).toBe(false);
     expect(r.regressions).toEqual([{ file: 'a.js', baselineCount: 2, currentCount: 5, delta: 3 }]);
+  });
+
+  it('fails for a new 3D file with type errors', function () {
+    var current = { total: 1, byFile: { 'src/visual/mundo3d/NuevoMundo.jsx': 1 } };
+    var r = compareToBaseline(current, { totalErrors: 0, byFile: {} });
+    expect(r.ok).toBe(false);
+    expect(r.newFiles).toEqual([{ file: 'src/visual/mundo3d/NuevoMundo.jsx', count: 1 }]);
+  });
+
+  it('fails when a 3D file error count increases past the baseline', function () {
+    var current = { total: 2, byFile: { 'src/mockups/Valle3D.jsx': 2 } };
+    var baseline = { totalErrors: 1, byFile: { 'src/mockups/Valle3D.jsx': 1 } };
+    var r = compareToBaseline(current, baseline);
+    expect(r.ok).toBe(false);
+    expect(r.regressions).toEqual([
+      { file: 'src/mockups/Valle3D.jsx', baselineCount: 1, currentCount: 2, delta: 1 },
+    ]);
   });
 
   it('handles a missing baseline (no byFile) as an all-new report', function () {

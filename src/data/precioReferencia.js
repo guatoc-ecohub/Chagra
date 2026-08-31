@@ -27,16 +27,21 @@
  * Cada precio es el cotizado ESE día en la(s) plaza(s) mayorista(s) listada(s)
  * en `mercado` (no un promedio nacional). Es una referencia FECHADA para que
  * el productor calibre su oferta, no un precio "vigente ahora": no
- * sobrevender esta tabla como feed en vivo. El pipeline de consulta SIPSA en
- * vivo para el marketplace sigue en cola (DR de comercialización); refrescar
- * esta foto hoy requiere repetir la extracción de un boletín reciente.
+ * sobrevender esta tabla como feed en vivo.
  *
- * (Nota: Chagra sí tiene un canal SIPSA EN VIVO separado — el tool de agente
- * `get_precio_sipsa` vía sidecarClient.js/agentService.js, PR #1894/#1897 — que
- * lee la tabla `chagra.sipsa_precios` poblada por el feed diario DANE. Ese
- * canal alimenta la respuesta del agente y la alerta de cosecha
- * (cropAlertEngine.js); esta tabla es la referencia ESTÁTICA y citada del
- * formulario de publicación del marketplace, un consumidor distinto.)
+ * ESTADO (actualizado): esta tabla ya NO es el dato primario del marketplace,
+ * sino el FALLBACK HONESTO. El marketplace ahora prefiere el FEED VIVO SIPSA
+ * (`get_precio_sipsa` → tabla `chagra.sipsa_precios`, feed diario DANE) vía
+ * `resolverPrecioReferenciaVivo`/`useSipsaMarketReference`; solo cae a esta foto
+ * fechada cuando el sidecar no responde (flag off / offline / timeout / sin dato
+ * para el producto). Sigue siendo un dato citado y fechado, no un invento.
+ *
+ * (Nota: el canal SIPSA EN VIVO — el tool de agente `get_precio_sipsa` vía
+ * sidecarClient.js/agentService.js, PR #1894/#1897 — lee la tabla
+ * `chagra.sipsa_precios` poblada por el feed diario DANE; ese mismo canal
+ * alimenta la respuesta del agente, la alerta de cosecha (cropAlertEngine.js) y
+ * ahora la referencia del marketplace. Esta tabla es la capa estática de
+ * respaldo cuando ese feed no está disponible.)
  *
  * Forma de un registro de referencia:
  *   {

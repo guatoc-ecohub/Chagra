@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import { AlertTriangle, ShieldCheck, Scale, Ruler, Leaf, ArrowUpRight, Sprout, Activity } from 'lucide-react';
+import { AlertTriangle, ShieldCheck, Scale, Ruler, Leaf, Sprout, Activity } from 'lucide-react';
 import { evaluarPSA } from '../services/psaElegibilidad';
 import { detectarAlertaCarbono } from '../services/carbonoAlerta';
 import RESTAURACION from '../data/restauracion.json';

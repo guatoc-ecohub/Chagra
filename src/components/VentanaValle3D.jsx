@@ -26,8 +26,9 @@
  */
 import { lazy, Suspense, useEffect, useMemo, useRef, useState } from 'react';
 import { decidirTier, permite3D } from '../visual/mundo3d/deviceTier.js';
-import { AbejaAngelita } from '../visual/creatures/AbejaAngelita.jsx';
+import ChagraAgentAvatar from './ChagraAgentAvatar.jsx';
 import './ventanaValle3D.css';
+import useCompaiHold from '../hooks/useCompaiHold.js';
 
 const EscenaVentana = lazy(() => import('./VentanaValle3DEscena.jsx'));
 
@@ -36,7 +37,7 @@ const EscenaVentana = lazy(() => import('./VentanaValle3DEscena.jsx'));
  * remotos). Es el piso para tier bajo / sin-WebGL Y el fallback de Suspense
  * mientras baja el chunk 3D — la ventana nunca queda en blanco ni rota.
  */
-function Valle2D({ reducedMotion, tier }) {
+function Valle2D({ reducedMotion }) {
   return (
     <div className="vv-2d">
       <svg
@@ -44,7 +45,7 @@ function Valle2D({ reducedMotion, tier }) {
         viewBox="0 0 320 220"
         preserveAspectRatio="xMidYMax slice"
         role="img"
-        aria-label="El valle de su finca: lomas verdes con matas y la abeja angelita volando bajo un cielo cálido"
+          aria-label="El valle de su finca: lomas verdes con matas y su compai volando bajo un cielo cálido"
       >
         <title>El valle de su finca</title>
         <defs>
@@ -84,9 +85,9 @@ function Valle2D({ reducedMotion, tier }) {
         </g>
       </svg>
 
-      {/* la Angelita 2D volando en el espejo (misma creature del home) */}
+      {/* El compai elegido volando en el espejo 2D del home. */}
       <div className={`vv-abeja vv-abeja--2d${reducedMotion ? ' vv-abeja--quieta' : ''}`}>
-        <AbejaAngelita size={44} animo="pleno" energia={0.9} animated={!reducedMotion} tier={tier} tempC={0} />
+        <ChagraAgentAvatar size={44} state="idle" ariaLabel="Compai de Chagra" />
       </div>
     </div>
   );
@@ -151,6 +152,7 @@ export function VentanaValle3D({
   const tier = tierProp || decision.tier;
   const reducedMotion = rmProp ?? decision.reducedMotion;
   const con3D = permite3D(tier);
+  const compaiHoldHandlers = useCompaiHold();
 
   // La escena 3D NO se pide hasta que la ventana entra al viewport: el home
   // no descarga `vendor-three` por un widget que quedó bajo el fold.
@@ -181,6 +183,7 @@ export function VentanaValle3D({
       type="button"
       ref={hostRef}
       className={`vv${className ? ` ${className}` : ''}`}
+      {...compaiHoldHandlers}
       data-tier={tier}
       onClick={onEntrar}
       aria-label={`${titulo}. ${pista}`}
@@ -189,11 +192,11 @@ export function VentanaValle3D({
       <span className="vv-marco" aria-hidden="true">
         <span className="vv-vidrio">
           {con3D && aLaVista ? (
-            <Suspense fallback={<Valle2D reducedMotion={reducedMotion} tier={tier} />}>
+            <Suspense fallback={<Valle2D reducedMotion={reducedMotion} />}>
               <EscenaVentana tier={tier === 'alto' ? 'alto' : 'medio'} reducedMotion={reducedMotion} />
             </Suspense>
           ) : (
-            <Valle2D reducedMotion={reducedMotion} tier={tier} />
+            <Valle2D reducedMotion={reducedMotion} />
           )}
           {/* la luz que se cuela por la ventana (vidrio con brillo cálido) */}
           <span className="vv-luz" />

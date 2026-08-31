@@ -1,0 +1,289 @@
+/* zariguyaLamina.css — LA VIDA DE ANGELITA sobre la piel de la lámina de la
+ * zarigüeya. Hermano de jaguarLamina.css: mismo cableado (los hooks de
+ * JS producen señales; este CSS solo las CONSUME sobre cada pieza), otra
+ * criatura y otro CARÁCTER — nocturna, husmeadora, la que anota y se ubica
+ * (por eso carga lápiz y brújula).
+ *
+ *   señal (hook/estado)                → qué pieza mueve, aquí
+ *   --rh-blink-dur/-delay (ritmo)      → parpadeo REAL de los dos ojos juntos
+ *   data-rh-mira + --rh-mx/--rh-my     → la CABEZA gira siguiendo al usuario
+ *   data-vida=husmea|tanatosis|reposo  → el idle-cerebro (vidaEstados.js:
+ *                                        el repertorio que ya tenía la
+ *                                        zarigüeya vector — husmeo por la
+ *                                        nariz, hacerse la muerta, respiro)
+ *   data-agt-estado=listening          → PARA LAS OREJAS + ladea la testa
+ *   data-agt-estado=speaking + --zlv-jaw→ mandíbula que habla (lip-sync
+ *                                        sobre la sonrisa YA abierta)
+ *   data-agt-estado=thinking           → alza el LÁPIZ y escribe en el aire
+ *   data-agt-estado=caminando          → bob de cuerpo/cabeza + cola viva
+ *                                        (el andar se lee del roaming)
+ *
+ * HONESTIDAD: el interior de boca (.zlv-bocaInterior) es SINTÉTICO (solo se
+ * ve al abrir MÁS que la lámina). La mirada es GIRO DE CABEZA, no pupila
+ * suelta. Las patas no se cortan (lección "3-4 patas" del jaguar).
+ *
+ * Gates de la casa: reduced-motion congela todo en fotograma digno;
+ * data-tier='bajo' corta lo continuo decorativo. */
+
+.zlv-stage {
+  position: relative;
+  display: block;
+  transform-origin: 50% 50%;
+  animation: zlv-stageBob 4.2s ease-in-out infinite alternate;
+}
+@keyframes zlv-stageBob {
+  from { transform: translateY(-0.6%); }
+  to   { transform: translateY(0.6%); }
+}
+
+.zlv-capa {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+/* ═══ IDLE VIVO — alive-in-place: respira menudo (bicho chico), la testa
+   cabecea, la cola prensil se enrosca sola, las manitos se mecen apenas. */
+.zlv-cuerpoPivote { position: absolute; inset: 0; animation: zlv-respira 3.1s ease-in-out infinite; }
+@keyframes zlv-respira {
+  0%, 100% { transform: translateY(0) scale(1); }
+  50%      { transform: translateY(-0.5%) scale(1.014); }
+}
+
+.zlv-cabezaGesto { position: absolute; inset: 0; }
+.zlv-cabezaMira  { position: absolute; inset: 0; transition: transform 0.5s cubic-bezier(0.2, 0.7, 0.3, 1); }
+.zlv-cabezaPivote { position: absolute; inset: 0; animation: zlv-cabeza-idle 3.1s ease-in-out infinite; }
+@keyframes zlv-cabeza-idle {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  50%      { transform: translateY(0.5%) rotate(-0.5deg); }
+}
+
+/* la cola prensil — SE ENROSCA Y DESENROSCA sola (su firma): giro con peso
+   desde la grupa, período co-primo con la respiración. */
+.zlv-colaPivote { position: absolute; inset: 0; animation: zlv-cola 5.3s ease-in-out infinite alternate; }
+@keyframes zlv-cola {
+  from { transform: rotate(-2.5deg) scale(1); }
+  to   { transform: rotate(3.5deg) scale(1.015); }
+}
+
+/* orejas — mecido con follow-through, fases distintas. */
+.zlv-orejaIzqPivote { position: absolute; inset: 0; animation: zlv-oreja-sway 3.4s ease-in-out infinite; }
+.zlv-orejaDerPivote { position: absolute; inset: 0; animation: zlv-oreja-sway 3.4s ease-in-out -1.3s infinite; }
+@keyframes zlv-oreja-sway {
+  0%, 100% { transform: rotate(0deg); }
+  50%      { transform: rotate(2deg); }
+}
+
+/* las manitos — micro-vaivén de quien sostiene algo (nunca lo suelta). */
+.zlv-brazoLapizPivote { position: absolute; inset: 0; animation: zlv-brazo-idle 4.7s ease-in-out infinite; }
+.zlv-brazoBrujulaPivote { position: absolute; inset: 0; animation: zlv-brazo-idle 4.7s ease-in-out -2.1s infinite; }
+@keyframes zlv-brazo-idle {
+  0%, 100% { transform: rotate(0deg); }
+  50%      { transform: rotate(1.3deg); }
+}
+
+/* ═══ PARPADEO REAL con RITMO PROPIO — cadencia rh de la familia (un
+   parpadeo suelto + un blink-blink doble por vuelta, cierres ~110ms). El
+   párpado es un parche de piel que TAPA el ojo: scaleY(0)=abierto. */
+.zlv-parpado {
+  position: absolute;
+  transform-origin: 50% 0%;
+  animation: zlv-blink var(--rh-blink-dur, 5.6s) linear var(--rh-blink-delay, 0s) infinite;
+}
+@keyframes zlv-blink {
+  0%, 36%, 40%, 74%, 78%, 82%, 86%, 100% { transform: scaleY(0); }
+  38% { transform: scaleY(1); }
+  76% { transform: scaleY(1); }
+  80% { transform: scaleY(1); }
+}
+
+/* ═══ LA MIRADA — la cabeza sigue al usuario (useMiradaUsted). */
+[data-rh-mira='usted'] .zlv-cabezaMira {
+  transform: translate(
+    calc(var(--rh-mx, 0px) * var(--zlv-mira-k, 4)),
+    calc(var(--rh-my, 0px) * var(--zlv-mira-k, 4))
+  );
+}
+
+/* ═══ MANDÍBULA / LIP-SYNC — la sonrisa YA está abierta en la lámina:
+   --zlv-jaw (0..1) la abre MÁS. En reposo (jaw=0) = lámina EXACTA. La
+   bisagra está en la comisura IZQUIERDA (el hocico apunta a la derecha):
+   rotación NEGATIVA = el mentón baja. */
+.zlv-mandibulaPivote {
+  position: absolute;
+  inset: 0;
+  transition: transform 0.13s ease;
+  transform: translateY(calc(var(--zlv-jaw, 0) * 1.4%)) rotate(calc(var(--zlv-jaw, 0) * 4deg));
+}
+.zlv-bocaInterior {
+  pointer-events: none;
+  background: radial-gradient(ellipse 110% 130% at 55% 0%, #6a3c3c 0%, #341715 52%, #180a09 100%);
+  /* CUÑA: la bisagra de la mandíbula está a la IZQUIERDA — ahí la apertura
+     real es ~0 y el interior no debe asomar; crece hacia el lado de la
+     trufa (medido en el gate 03: una banda pareja se salía por la comisura). */
+  clip-path: polygon(0% 0%, 100% 0%, 100% 78%, 62% 100%, 10% 46%, 0% 14%);
+  transform: scaleY(var(--zlv-jaw, 0));
+  transition: transform 0.13s ease;
+}
+
+/* HABLA — aleteo de mandíbula modulado por el visema (con visema estático
+   'V2' igual se ve hablando; con lip-sync real la amplitud sigue la voz). */
+[data-agt-estado='speaking'] .zlv-mandibulaPivote {
+  animation: zlv-habla 0.34s ease-in-out infinite;
+}
+@keyframes zlv-habla {
+  0%, 100% { transform: translateY(calc(var(--zlv-jaw, 0.42) * 0.9%)) rotate(calc(var(--zlv-jaw, 0.42) * 2deg)); }
+  50%      { transform: translateY(calc(var(--zlv-jaw, 0.42) * 2.6%)) rotate(calc(var(--zlv-jaw, 0.42) * 6deg)); }
+}
+[data-agt-estado='speaking'] .zlv-bocaInterior {
+  animation: zlv-habla-interior 0.34s ease-in-out infinite;
+}
+@keyframes zlv-habla-interior {
+  0%, 100% { transform: scaleY(calc(var(--zlv-jaw, 0.42) * 0.5)); }
+  50%      { transform: scaleY(calc(var(--zlv-jaw, 0.42) * 1)); }
+}
+
+/* ═══ ESCUCHA — PARA LAS OREJAS (giro corto: la derecha linda con el ojo,
+   medido en anatomia.js) + ladea la testa + parpadea menos. La manito de
+   la brújula se AQUIETA: atención plena. */
+[data-agt-estado='listening'] .zlv-orejaIzqPivote { animation: zlv-orejaIzq-perk 2.8s ease-in-out infinite; }
+[data-agt-estado='listening'] .zlv-orejaDerPivote { animation: zlv-orejaDer-perk 2.8s ease-in-out infinite; }
+@keyframes zlv-orejaIzq-perk {
+  0%        { transform: rotate(0deg); }
+  20%, 100% { transform: rotate(-6deg); }
+  55%       { transform: rotate(-8deg); }   /* twitch de atención */
+  75%       { transform: rotate(-6deg); }
+}
+@keyframes zlv-orejaDer-perk {
+  0%        { transform: rotate(0deg); }
+  20%, 100% { transform: rotate(5deg); }
+  55%       { transform: rotate(7deg); }
+  75%       { transform: rotate(5deg); }
+}
+[data-agt-estado='listening'] .zlv-cabezaGesto { animation: zlv-escucha-cabeza 4s ease-in-out infinite; }
+@keyframes zlv-escucha-cabeza {
+  0%, 100% { transform: rotate(0deg) translateY(0); }
+  50%      { transform: rotate(-2deg) translateY(-0.5%); }
+}
+[data-agt-estado='listening'] .zlv-parpado { animation-duration: calc(var(--rh-blink-dur, 5.2s) * 4.5); }
+[data-agt-estado='listening'] .zlv-brazoBrujulaPivote { animation: none; }
+
+/* ═══ PIENSA — alza el LÁPIZ y ESCRIBE en el aire (para eso lo carga: es la
+   que anota), la testa apenas arriba. */
+[data-agt-estado='thinking'] .zlv-cabezaGesto { animation: zlv-piensa-cabeza 4.6s ease-in-out infinite; }
+@keyframes zlv-piensa-cabeza {
+  0%, 100% { transform: rotate(0deg) translateY(0); }
+  50%      { transform: rotate(1.2deg) translateY(-1.2%); }
+}
+[data-agt-estado='thinking'] .zlv-brazoLapizPivote { animation: zlv-escribe 1.9s ease-in-out infinite; }
+@keyframes zlv-escribe {
+  0%, 100% { transform: rotate(0deg); }
+  18%      { transform: rotate(-3.6deg); }   /* alza el lápiz */
+  32%      { transform: rotate(-2.4deg); }   /* y garabatea */
+  46%      { transform: rotate(-3.4deg); }
+  60%      { transform: rotate(-2.6deg); }
+  74%      { transform: rotate(-3.2deg); }
+}
+
+/* ═══ CAMINA — el andar se lee del DESPLAZAMIENTO del host (roaming): aquí
+   solo bob de cuerpo/cabeza, cola de contrapeso más viva y manitos al
+   compás. Las patas no existen como pieza (no hay péndulo que fantasmee). */
+[data-agt-estado='caminando'] .zlv-cuerpoPivote { animation: zlv-cuerpoBob 0.56s ease-in-out infinite; }
+@keyframes zlv-cuerpoBob {
+  0%, 100% { transform: translateY(1.8%) rotate(0.5deg); }
+  50%      { transform: translateY(-2.2%) rotate(-0.4deg); }
+}
+[data-agt-estado='caminando'] .zlv-cabezaPivote { animation: zlv-cabezaBob 0.56s ease-in-out -0.13s infinite; }
+@keyframes zlv-cabezaBob {
+  0%, 100% { transform: translateY(-1.6%) rotate(-0.5deg); }
+  50%      { transform: translateY(2%) rotate(0.5deg); }
+}
+[data-agt-estado='caminando'] .zlv-colaPivote { animation: zlv-cola 1.6s ease-in-out infinite alternate; }
+[data-agt-estado='caminando'] .zlv-brazoLapizPivote { animation: zlv-brazo-anda 0.56s ease-in-out infinite; }
+[data-agt-estado='caminando'] .zlv-brazoBrujulaPivote { animation: zlv-brazo-anda 0.56s ease-in-out -0.28s infinite; }
+@keyframes zlv-brazo-anda {
+  0%, 100% { transform: rotate(1.6deg); }
+  50%      { transform: rotate(-1.6deg); }
+}
+
+/* ═══ IDLE-CEREBRO (data-vida) — el repertorio de la zarigüeya. */
+/* HUSMEA — vive por la nariz: la testa se alza y tantea a lado y lado
+   (3 tanteos = los 3.15s del momento), las orejas acompañan. */
+[data-vida='husmea'] .zlv-cabezaGesto { animation: zlv-husmea-cabeza 1.05s ease-in-out infinite; }
+@keyframes zlv-husmea-cabeza {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  30%      { transform: translateY(-1.4%) rotate(1.8deg); }
+  65%      { transform: translateY(-1%) rotate(0.6deg); }
+}
+[data-vida='husmea'] .zlv-orejaIzqPivote { animation: zlv-oreja-husmea 1.05s ease-in-out infinite; }
+[data-vida='husmea'] .zlv-orejaDerPivote { animation: zlv-oreja-husmea 1.05s ease-in-out -0.2s infinite; }
+@keyframes zlv-oreja-husmea {
+  0%, 100% { transform: rotate(0deg); }
+  40%      { transform: rotate(-3.5deg); }
+}
+
+/* TANATOSIS — el gag más suyo ("playing possum"): se ladea desmayada un
+   instante, los OJOS SE CIERRAN sostenido, las manitos caen… y la cola
+   sigue enroscándose sola porque no está muerta ni por asomo (la anima
+   zlv-cola de siempre, que NO se toca aquí — ese contraste es el chiste). */
+[data-vida='tanatosis'] .zlv-cuerpoPivote { animation: zlv-desmayo 2.6s ease-in-out infinite; }
+@keyframes zlv-desmayo {
+  0%, 8%, 92%, 100% { transform: rotate(0deg) translateY(0); }
+  30%, 70% { transform: rotate(9deg) translateY(2.4%); }
+}
+[data-vida='tanatosis'] .zlv-cabezaGesto { animation: zlv-desmayo-cabeza 2.6s ease-in-out infinite; }
+@keyframes zlv-desmayo-cabeza {
+  0%, 8%, 92%, 100% { transform: rotate(0deg); }
+  30%, 70% { transform: rotate(6deg) translateY(1.6%); }
+}
+[data-vida='tanatosis'] .zlv-parpado { animation: zlv-parpado-cerrado 2.6s linear infinite; }
+@keyframes zlv-parpado-cerrado {
+  0%, 8%, 92%, 100% { transform: scaleY(0); }
+  16%, 84% { transform: scaleY(1); }
+}
+[data-vida='tanatosis'] .zlv-brazoLapizPivote,
+[data-vida='tanatosis'] .zlv-brazoBrujulaPivote { animation: zlv-brazo-caido 2.6s ease-in-out infinite; }
+@keyframes zlv-brazo-caido {
+  0%, 8%, 92%, 100% { transform: rotate(0deg); }
+  30%, 70% { transform: rotate(5deg); }
+}
+
+/* REPOSO — respira hondo, sacudón corto de testa al entrar (la firma
+   "me sacudo" de la familia adaptada al marsupial). */
+[data-vida='reposo'] .zlv-cuerpoPivote { animation: zlv-reposo-cuerpo 4.4s ease-in-out infinite; }
+@keyframes zlv-reposo-cuerpo {
+  0%, 100% { transform: translateY(0) scale(1); }
+  50%      { transform: translateY(0.7%) scale(1.02); }
+}
+[data-vida='reposo'] .zlv-cabezaGesto { animation: zlv-reposo-cabeza 4.4s ease-in-out infinite; }
+@keyframes zlv-reposo-cabeza {
+  0%, 14%, 100% { transform: rotate(0deg); }
+  4%  { transform: rotate(-2.4deg); }
+  8%  { transform: rotate(2.2deg); }
+  11% { transform: rotate(-0.8deg); }
+}
+
+/* ═══ GATES DE LA CASA ═══ */
+[data-tier='bajo'] .zlv-stage,
+[data-tier='bajo'] .zlv-cuerpoPivote,
+[data-tier='bajo'] .zlv-cabezaPivote,
+[data-tier='bajo'] .zlv-colaPivote,
+[data-tier='bajo'] .zlv-orejaIzqPivote,
+[data-tier='bajo'] .zlv-orejaDerPivote,
+[data-tier='bajo'] .zlv-brazoLapizPivote,
+[data-tier='bajo'] .zlv-brazoBrujulaPivote { animation: none; }
+
+@media (prefers-reduced-motion: reduce) {
+  .zlv-stage, .zlv-cuerpoPivote, .zlv-cabezaGesto, .zlv-cabezaMira, .zlv-cabezaPivote,
+  .zlv-colaPivote, .zlv-orejaIzqPivote, .zlv-orejaDerPivote,
+  .zlv-brazoLapizPivote, .zlv-brazoBrujulaPivote,
+  .zlv-mandibulaPivote, .zlv-bocaInterior, .zlv-parpado {
+    animation: none !important;
+    transition: none !important;
+  }
+  .zlv-cabezaMira, .zlv-mandibulaPivote { transform: none !important; }
+  .zlv-bocaInterior { transform: scaleY(0) !important; }  /* la sonrisa de la lámina, digna */
+  .zlv-parpado { visibility: hidden !important; }          /* ojos abiertos, quietos */
+}

@@ -24,7 +24,7 @@
  *
  * Mockup standalone con su propio <Canvas>. Ruta #/mockups/new-donk, sin auth.
  */
-import { useCallback, useMemo, useRef, useState } from 'react';
+import { useCallback, useRef, useState } from 'react';
 import * as THREE from 'three';
 import { Canvas, useFrame } from '@react-three/fiber';
 import { Html } from '@react-three/drei';

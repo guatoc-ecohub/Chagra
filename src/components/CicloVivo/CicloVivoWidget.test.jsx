@@ -7,6 +7,15 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { render, screen, waitFor, fireEvent } from '@testing-library/react';
 import CicloVivoWidget from './CicloVivoWidget';
 import { PHASES } from './cicloVivoData';
+import { __TEST__ as sipsaPriceTest } from '../../hooks/useSipsaLatestPrice';
+
+const { getPrecioSipsa } = vi.hoisted(() => ({
+  getPrecioSipsa: vi.fn(),
+}));
+
+vi.mock('../../services/sidecarClient', () => ({
+  getPrecioSipsa,
+}));
 
 /** Construye un mapa de capacidades: todo 'activo', con overrides puntuales. */
 function buildCaps(overrides = {}) {
@@ -32,8 +41,15 @@ function stubStatsFetch(caps) {
 }
 
 describe('CicloVivoWidget', () => {
-  beforeEach(() => { try { globalThis.localStorage.clear(); } catch { /* ignore */ } });
-  afterEach(() => vi.unstubAllGlobals());
+  beforeEach(() => {
+    try { globalThis.localStorage.clear(); } catch { /* ignore */ }
+    getPrecioSipsa.mockReset();
+    getPrecioSipsa.mockResolvedValue(null);
+  });
+  afterEach(() => {
+    sipsaPriceTest.clearCache();
+    vi.unstubAllGlobals();
+  });
 
   it('refleja el conteo de "en camino" desde la fuente de verdad', async () => {
     stubStatsFetch(buildCaps({ viabilidad_semilla: 'proximamente', guardar_semilla: 'proximamente' }));
@@ -58,5 +74,27 @@ describe('CicloVivoWidget', () => {
     await waitFor(() => {
       expect(screen.getByText(/en camino/)).toBeInTheDocument();
     });
+  });
+
+  it('muestra el precio SIPSA vivo del cultivo sugerido', async () => {
+    getPrecioSipsa.mockResolvedValueOnce({
+      available: true,
+      price: {
+        producto: 'Maiz',
+        plaza: 'Corabastos',
+        fecha: '2026-07-01',
+        precio_promedio_cop_kg: 1450,
+      },
+      central_abastos: 'Corabastos, Bogotá',
+      frescura: {
+        fecha_dato: '2026-07-01',
+        desactualizado: false,
+      },
+    });
+
+    render(<CicloVivoWidget onNavigate={() => {}} />);
+
+    expect(await screen.findByText('SIPSA $1.450 COP/kg')).toBeInTheDocument();
+    expect(screen.getByTitle(/SIPSA · Maiz · Corabastos, Bogotá/)).toBeInTheDocument();
   });
 });

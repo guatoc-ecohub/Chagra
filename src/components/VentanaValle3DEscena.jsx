@@ -19,7 +19,7 @@
 import { useMemo, useRef, useState } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
 import { Html, AdaptiveDpr } from '@react-three/drei';
-import { AbejaAngelita } from '../visual/creatures/AbejaAngelita.jsx';
+import ChagraAgentAvatar from './ChagraAgentAvatar.jsx';
 
 /* Luz de media mañana en el valle: cielo cálido, verdes VIVOS (biopunk suave). */
 const CIELO = { fondo: '#eaf0d3', cielo: '#f6ecd2', suelo: '#8fae6a', niebla: '#e6eecb' };
@@ -115,10 +115,10 @@ function Esporas({ cuantas, reducedMotion }) {
   );
 }
 
-/* La Angelita 2D (la preferida — el MISMO SVG rubber-hose del home) flotando
+/* El compai 2D (la misma selección del home) flotando
    en el valle via `Html`: cruza despacio y sube-baja con las alas batiendo.
    Decorativa aquí (aria-hidden): la a11y la lleva el botón-ventana de afuera. */
-function AngelitaVuela({ reducedMotion, tier }) {
+function AngelitaVuela({ reducedMotion }) {
   const g = useRef(null);
   useFrame((state) => {
     if (reducedMotion || !g.current) return;
@@ -130,14 +130,14 @@ function AngelitaVuela({ reducedMotion, tier }) {
     <group ref={g} position={[0.45, 1.02, 0.9]}>
       <Html center distanceFactor={6} zIndexRange={[30, 10]} wrapperClass="vv-abeja-html">
         <div className="vv-abeja" aria-hidden="true">
-          <AbejaAngelita size={46} animo="pleno" energia={0.9} animated={!reducedMotion} tier={tier} tempC={0} />
+          <ChagraAgentAvatar size={46} state="idle" ariaLabel="Compai de Chagra" />
         </div>
       </Html>
     </group>
   );
 }
 
-function Vineta({ frugal, reducedMotion, tier }) {
+function Vineta({ frugal, reducedMotion }) {
   const matas = useMemo(() => {
     const r = rng(29);
     return Array.from({ length: frugal ? 4 : 7 }, (_, i) => ({
@@ -175,7 +175,7 @@ function Vineta({ frugal, reducedMotion, tier }) {
       ))}
       <Mata pos={[-1.05, 0.42, 1.15]} alto={0.95} hoja="#5f9c50" />
 
-      <AngelitaVuela reducedMotion={reducedMotion} tier={tier} />
+      <AngelitaVuela reducedMotion={reducedMotion} />
       <Esporas cuantas={frugal ? 5 : 9} reducedMotion={reducedMotion} />
       <AdaptiveDpr pixelated />
     </>
@@ -205,7 +205,7 @@ export default function VentanaValle3DEscena({ tier = 'alto', reducedMotion = fa
         setListo(true);
       }}
     >
-      <Vineta frugal={frugal} reducedMotion={reducedMotion} tier={tier} />
+      <Vineta frugal={frugal} reducedMotion={reducedMotion} />
     </Canvas>
   );
 }

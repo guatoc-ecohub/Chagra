@@ -1,0 +1,26 @@
+[
+  {
+    "name": "registrar_cosecha",
+    "description": "Registrar una cosecha de un cultivo",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "cantidad": { "type": "number", "description": "cantidad numérica cosechada" },
+        "unidad": { "type": "string", "description": "unidad de la cantidad" },
+        "cultivo": { "type": "string", "description": "cultivo cosechado" }
+      },
+      "required": ["cantidad", "unidad", "cultivo"]
+    }
+  },
+  {
+    "name": "consultar_control_plaga",
+    "description": "Consultar qué biopreparado controla una plaga",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "plaga": { "type": "string", "description": "nombre de la plaga" }
+      },
+      "required": ["plaga"]
+    }
+  }
+]

@@ -25,6 +25,7 @@ import {
   raleParamo,
   calidadDeTier,
   distribucionFlora,
+  despejarCorredor,
   geomFrailejon,
   geomCampesinoEscala,
   geomYarumo,
@@ -234,10 +235,14 @@ function NieblaRasante({ n, reducedMotion }) {
  * de otro lado. La roseta plateada queda a la altura de mira (en cuadro). El
  * campesino se planta a su pie. La queñua (Ent) queda detrás, de guardiana.
  */
+/* (Páramo definitivo 2026-07-22) El trío se corre a los BORDES del cuadro de
+   reposo: el centro del encuadre queda libre para el corredor de la ABRA — el
+   patriarca del claro y, detrás, la cordillera y el mar de nubes. Los gigantes
+   siguen imponiendo, pero ENMARCAN en vez de tapar. */
 const PROSCENIO = [
-  { x: 5.7, z: 8.2, escala: 2.3, rotY: 0.5, tiltX: 0.04, tiltZ: -0.05 }, // centro, el mayor
-  { x: 3.5, z: 8.9, escala: 1.9, rotY: 2.6, tiltX: -0.05, tiltZ: 0.05 }, // hacia el borde izq.
-  { x: 7.6, z: 6.6, escala: 2.05, rotY: 4.0, tiltX: 0.05, tiltZ: 0.04 }, // hacia el borde der.
+  { x: 3.8, z: 11.2, escala: 2.15, rotY: 0.5, tiltX: 0.04, tiltZ: -0.05 }, // borde izq., el mayor
+  { x: 4.9, z: 14.6, escala: 1.8, rotY: 2.6, tiltX: -0.05, tiltZ: 0.05 }, // izq. cerquísima (recorte)
+  { x: 11.6, z: 8.9, escala: 2.0, rotY: 4.0, tiltX: 0.05, tiltZ: 0.04 }, // borde derecho
 ];
 
 /*
@@ -317,6 +322,11 @@ export default function FloraParamo({ tier = 'alto', reducedMotion = false, altu
   // --- Distribución biogeográfica (una vez por tier), posada en el relieve. ---
   const dist = useMemo(() => {
     const d = distribucionFlora(conteos, 707, bioma);
+    // En páramo, las matas ALTAS se rotan fuera del corredor de la inmensidad
+    // (la abra + el frente de cámara): nada tapa la cordillera ni el patriarca.
+    if (bioma === 'paramo') {
+      despejarCorredor(d, ['frailejonHero', 'frailejonViejo', 'gaque', 'roble', 'encenillo', 'yarumo', 'aliso']);
+    }
     if (!alturaDe) return d;
     const posar = (items) => items.map((it) => ({
       ...it,
@@ -369,8 +379,11 @@ export default function FloraParamo({ tier = 'alto', reducedMotion = false, altu
       <Especie geo={geos.frailejonFlor} mat={mat} items={dist.frailejonFlor} />
 
       {/* La VARA DE MEDIR: un campesino pequeño al pie del frailejonal héroe.
-          Sin él, el ojo no sabe que el frailejón mide 3-4 m (lente Colossus). */}
-      <FiguraEscala mat={mat} alturaDe={alturaDe} />
+          Sin él, el ojo no sabe que el frailejón mide 3-4 m (lente Colossus).
+          En el PÁRAMO definitivo NO va (pedido textual del operador 2026-07-22:
+          "excluye el ent, el campesino, están horribles") — allá la escala la
+          dan la cordillera y el frailejonal del horizonte (fondoParamo). */}
+      {bioma !== 'paramo' && <FiguraEscala mat={mat} alturaDe={alturaDe} />}
 
       {/* Árboles de fondo (anillo exterior, velados por la niebla). */}
       <Especie geo={geos.gaque} mat={mat} items={dist.gaque} castShadow={sombra} />

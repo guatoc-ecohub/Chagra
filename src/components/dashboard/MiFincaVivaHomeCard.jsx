@@ -14,6 +14,7 @@ import { tieneAccesoGlaciarActual } from '../../config/glaciarAccess';
 import { WORLD_STAGES } from '../../services/fincaGameService';
 import { fincaVivaHomePerfilActivo } from '../../config/fincaVivaHomeFlag';
 import FincaWorldScene from '../juego/FincaWorldScene';
+import ValleHomeGateway from './ValleHomeGateway';
 import '../juego/juego-finca.css';
 
 /**
@@ -126,31 +127,33 @@ export default function MiFincaVivaHomeCard({ onNavigate }) {
       </div>
 
       {/* La ESCENA 2D — el corazón visual. Toda la escena es un botón. */}
-      <button
-        type="button"
-        onClick={abrirJuego}
-        aria-label={
-          scene.vacia
-            ? 'Tu finca está por sembrar. Toca para empezar.'
-            : `${scene.resumen}. Toca para ver tu finca viva.`
-        }
-        className="block w-full text-left active:scale-[0.99] transition"
-      >
-        {variant ? (
-          // Escena RICA (#34 fase 2): plantas por tipo×fase, zonas declaradas e
-          // invernadero por forma. Pasa los lotes/animales REALES de la escena.
-          <FincaWorldScene
-            stage={stageVariante}
-            criaturas={[]}
-            vacia={scene.vacia}
-            variant={variant}
-            lotes={scene.lotes}
-            animales={scene.animales}
-          />
-        ) : (
-          <FincaScene2D scene={scene} cargando={cargando} />
-        )}
-      </button>
+      <ValleHomeGateway onNavigate={onNavigate} compact>
+        <button
+          type="button"
+          onClick={abrirJuego}
+          aria-label={
+            scene.vacia
+              ? 'Tu finca está por sembrar. Toca para empezar.'
+              : `${scene.resumen}. Toca para ver tu finca viva.`
+          }
+          className="block w-full text-left active:scale-[0.99] transition"
+        >
+          {variant ? (
+            // Escena RICA (#34 fase 2): plantas por tipo×fase, zonas declaradas e
+            // invernadero por forma. Pasa los lotes/animales REALES de la escena.
+            <FincaWorldScene
+              stage={stageVariante}
+              criaturas={[]}
+              vacia={scene.vacia}
+              variant={variant}
+              lotes={scene.lotes}
+              animales={scene.animales}
+            />
+          ) : (
+            <FincaScene2D scene={scene} cargando={cargando} />
+          )}
+        </button>
+      </ValleHomeGateway>
 
       {/* Vitalidad + resumen (vistazo útil para el campesino) */}
       <div className="px-4 pt-3 pb-4">
@@ -181,6 +184,7 @@ export default function MiFincaVivaHomeCard({ onNavigate }) {
           </>
         )}
       </div>
+
     </section>
   );
 }

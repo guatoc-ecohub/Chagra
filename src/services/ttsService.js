@@ -79,8 +79,14 @@ function applyVoseoGuard(text) {
  * GOTCHA: ante una voz no servible el server cae SILENCIOSO a la DEFAULT_VOICE.
  * `em_santa` (Santa) es la voz elegida por el operador — es la Santa ESPAÑOLA
  * de Kokoro (voz baked-in del modelo, prefijo `em_` = español masculino), NO la
- * portuguesa `pm_santa` que sonaba robótica. `em_alex`/`ef_dora` quedan como
- * alternativas, también en español.
+ * portuguesa `pm_santa` que sonaba robótica. `em_alex` queda como alternativa,
+ * también en español.
+ *
+ * DORA FUERA (2026-08-02) — el operador reportó que `ef_dora` suena "gringa"
+ * (prosodia anglo) y pidió que NUNCA se oiga. Se retira de KOKORO_VOICES para
+ * que `toServableVoice` la coercione a santa (dora no viaja al server ni por
+ * fallback silencioso) y para que el selector no la ofrezca. Ver PR #2240/#2304
+ * (dora había reaparecido en el catálogo por error) y el reporte de voz.
  */
 export const KOKORO_VOICES = Object.freeze([
   {
@@ -95,14 +101,12 @@ export const KOKORO_VOICES = Object.freeze([
     description: 'Voz de hombre, natural y clara.',
     gender: 'masculina',
   },
-  {
-    id: 'ef_dora',
-    label: 'Dora',
-    description: 'Voz de mujer, suave y clara.',
-    gender: 'femenina',
-  },
 ]);
 
+// Punto único de la voz del asistente (Compai = Angelita = Colibrí = Agente:
+// una sola entidad con varias pieles). getPreferredVoice() y toServableVoice()
+// cuelgan de aquí; este es también el gancho para una futura voz clonada
+// personalizada — cambiar la voz por defecto se hace SOLO aquí.
 export const DEFAULT_KOKORO_VOICE = 'em_santa';
 export const DEFAULT_KOKORO_RATE = 1.0;
 export const KOKORO_RATE_MIN = 0.85;

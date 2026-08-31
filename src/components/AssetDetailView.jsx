@@ -1,16 +1,17 @@
 /* eslint-disable chagra-i18n/no-hardcoded-spanish -- legacy UI copy already tracked separately */
 import React, { useState, useMemo, useEffect } from 'react';
-import { X, Calendar, Tag, Activity, MapPin, AlertCircle, Images, Skull, Layers, Sprout } from 'lucide-react';
+import { X, Calendar, Activity, MapPin, AlertCircle, Images, Skull, Layers, Sprout } from 'lucide-react';
 import { SplitFlow } from './SplitFlow';
 import PlantCemeteryModal from './PlantCemeteryModal';
 import useAssetStore from '../store/useAssetStore';
+import useAngelitaStore from '../store/useAngelitaStore';
 import AssetTimeline from './AssetTimeline';
 import { InputLogForm } from './InputLogForm';
 import MapPicker from './MapPicker';
 import PlanEditor from './PlanEditor';
 import { useAssetPerformance } from '../hooks/useAssetPerformance';
 import { MATERIAL_CATEGORIES } from '../config/materials';
-import { FARM_CONFIG } from '../config/defaults';
+import { getContextoGeoParaIA } from '../services/perfilFincaService';
 import { geoJsonToWkt, wktToGeoJson } from '../utils/geo';
 import { proximityCheck, findNearestLand, checkInvasiveProximity, getCoords } from '../utils/spatialAnalysis';
 import { ExternalAiButton } from './common/ExternalAiButton';
@@ -869,7 +870,7 @@ export const AssetDetailView = () => {
                     </>
                   )}
                   <ExternalAiButton
-                    context={{ speciesName: name, thermalZones: FARM_CONFIG.THERMAL_ZONES, speciesThermalZones, altitudMsnm: FARM_CONFIG.ALTITUD_MSNM, municipio: FARM_CONFIG.MUNICIPIO }}
+                    context={{ speciesName: name, speciesThermalZones, ...getContextoGeoParaIA() }}
                     buildPrompt={buildOpenExternalPrompt}
                     label="Ayuda IA"
                   />
@@ -979,6 +980,16 @@ export const AssetDetailView = () => {
           onConfirm={async (_reason) => {
             const updatedAsset = { ...asset, attributes: { ...asset.attributes, status: 'dead' } };
             await updateAsset('plant', updatedAsset, []);
+            // #109 "luto y fiesta": al registrar la baja, el compañero
+            // acompaña en luto — breve, gris, tierno, NUNCA culposo (nunca
+            // "usted la dejó morir": PlantCemeteryModal ya trata la pérdida
+            // como currículo, no como culpa; el compAI sostiene ese mismo
+            // tono). Dedup por asset.id: la misma planta no se lamenta dos
+            // veces.
+            useAngelitaStore.getState().lamentar({
+              id: `luto:${asset.id}`,
+              texto: `Se nos fue ${String(name || 'esta planta').toLowerCase()}. Pasa, y de cada una se aprende algo para la próxima.`,
+            });
             setShowCemeteryModal(false);
           }}
         />

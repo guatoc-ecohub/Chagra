@@ -1,0 +1,123 @@
+name: Deploy mundos 3D (3d.guatoc.co)
+
+# Despliegue automatico del SPA publico (build --base=/app/) que sirve los 19
+# mundos aprobados en 3d.guatoc.co, cada uno via su stub /<slug>/ ->
+# /app/#/mockups/<slug>.
+#
+# ALCANCE: este workflow SOLO redespliega /app/ (el bundle de la SPA con los
+# mockups). NO toca el valle ni el indice /mundos/.
+#
+# Target: /home/kortux/demos/3d/app/ en alpha, servido por microapp-3d.service.
+# El runner debe tener acceso de escritura a esta ruta. No usar $HOME: el
+# servicio del runner define HOME en su propio work tree.
+
+on:
+  push:
+    branches: ['dev', 'dev/*']
+    paths-ignore:
+      - '**.md'
+      - 'LICENSE'
+
+concurrency:
+  group: deploy-3d-guatoc-${{ github.ref_name }}
+  cancel-in-progress: true
+
+jobs:
+  build-and-deploy:
+    runs-on: [self-hosted, alpha]
+    timeout-minutes: 30
+    steps:
+      - name: Detect runner identity
+        run: |
+          if echo "$HOME" | grep -q claude-runner; then
+            echo "SKIP_DEPLOY=1" >> "$GITHUB_ENV"
+          fi
+
+      - if: env.SKIP_DEPLOY != '1'
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - if: env.SKIP_DEPLOY != '1'
+        name: Install dependencies
+        run: npm ci
+
+      - if: env.SKIP_DEPLOY != '1'
+        name: Build (base=/app/, mismas envs publicas que dev-deploy.yml)
+        run: npx vite build --base=/app/
+        env:
+          VITE_FARMOS_URL: ""
+          VITE_FARMOS_CLIENT_ID: farm
+          VITE_USE_SIDECAR_AGRO_MCP: "true"
+          VITE_FINCA_VIVA_HOME_PERFIL: "true"
+          VITE_REGISTRO_UNIFICADO: "true"
+          VITE_COLIBRI: "true"
+          VITE_CHAGRA_MCP_TOKEN: ${{ secrets.VITE_CHAGRA_MCP_TOKEN }}
+
+      - if: env.SKIP_DEPLOY != '1'
+        name: Deploy a /home/kortux/demos/3d/app/
+        run: |
+          set -e
+          TARGET=/home/kortux/demos/3d/app
+          test -d "$(dirname "$TARGET")" || {
+            echo "El padre del target no existe: $TARGET"
+            exit 1
+          }
+          mkdir -p "$TARGET"
+          umask 002
+          rsync -a --delete --chmod=Du=rwx,Dg=rwx,Do=rx,Fu=rw,Fg=rw,Fo=r \
+            dist/ "$TARGET/"
+
+      - if: env.SKIP_DEPLOY != '1'
+        name: Verify served deployment
+        run: |
+          set -euo pipefail
+          VERIFY_URL=https://3d.guatoc.co/app/index.html
+          EXPECTED_HASH=$(sha256sum dist/index.html | cut -d' ' -f1)
+          SERVED_HASH=$(nix-shell -p curl --run \
+            "curl -fsSL --retry 3 --retry-delay 1 --max-time 20 $VERIFY_URL" \
+            | sha256sum | cut -d' ' -f1)
+          echo "dist/index.html sha256:   $EXPECTED_HASH"
+          echo "servido por $VERIFY_URL: $SERVED_HASH"
+          if [ "$EXPECTED_HASH" != "$SERVED_HASH" ]; then
+            echo "Deploy INCOMPLETO: el servidor no sirve el build que se acaba de construir."
+            exit 1
+          fi
+          echo "Deploy servido OK: $(date -Iseconds)"
+
+      - if: env.SKIP_DEPLOY != '1'
+        name: Verify referenced assets exist
+        run: |
+          set -euo pipefail
+          TARGET=/home/kortux/demos/3d/app
+          INDEX="$TARGET/index.html"
+          test -f "$INDEX" || { echo "index.html ausente en $TARGET"; exit 1; }
+          refs=$(grep -oE '/app/assets/[A-Za-z0-9._/-]+\.(js|css)' "$INDEX" | sort -u || true)
+          missing=0
+          while IFS= read -r ref; do
+            [ -z "$ref" ] && continue
+            file="$TARGET${ref#/app}"
+            if [ -f "$file" ]; then
+              echo "ok   $ref"
+            else
+              echo "FALTA $ref  (esperado en $file)"
+              missing=$((missing + 1))
+            fi
+          done <<< "$refs"
+          if [ "$missing" -gt 0 ]; then
+            echo "Deploy INCOMPLETO: $missing asset(s) referenciados por index.html no existen en disco."
+            exit 1
+          fi
+          echo "Integridad de assets OK."
+
+      - if: env.SKIP_DEPLOY != '1'
+        name: curl smoke test (200 en 3 rutas)
+        run: |
+          set -euo pipefail
+          sleep 5
+          for p in "" "cafetal-vivo-3d/" "bosque-tres-estratos/"; do
+            code=$(nix-shell -p curl --run \
+              "curl -fsS -o /dev/null -w '%{http_code}' --max-time 10 https://3d.guatoc.co/$p")
+            echo "https://3d.guatoc.co/$p -> $code"
+            test "$code" = 200
+          done

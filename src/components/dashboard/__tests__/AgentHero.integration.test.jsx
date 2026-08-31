@@ -3,7 +3,7 @@
  * post-pulido (portada fiel del operador 2026-06-06).
  *
  * Cubre los 5 puntos del task #TEST-int:
- *   1. enviar=colibrí navega (el botón de enviar usa el avatar global y navega)
+ *   1. enviar conserva su acción y navega sin duplicar el compai visual
  *   2. sin clip (no hay botón de adjuntar/clip, solo cámara)
  *   3. marca/ubicación no se duplican dentro del hero
  *   4. sugerencia contextual presente (crop suggestions rotativas)
@@ -156,21 +156,15 @@ afterEach(() => {
 });
 
 describe('AgentHero — integración post-pulido (task #TEST-int)', () => {
-  describe('1. enviar=colibrí navega', () => {
-    test('el botón de enviar tiene el avatar global dentro', () => {
+  describe('1. enviar conserva su acción', () => {
+    test('el botón de enviar tiene un icono de acción', () => {
       render(<AgentHero onNavigate={vi.fn()} />);
       const sendBtn = screen.getByLabelText('Enviar al agente');
 
-      const avatar = sendBtn.querySelector('[data-testid="avatar"]');
-      expect(avatar).toBeTruthy();
-
-      // Verifica que tiene los atributos correctos (44: protagonismo de
-      // Angelita — el avatar llena el botón de 44px, 2026-07-18)
-      expect(avatar).toHaveAttribute('data-size', '44');
-      expect(avatar).toHaveAttribute('data-state', 'listening');
+      expect(sendBtn.querySelector('svg')).toBeTruthy();
     });
 
-    test('al enviar texto, el colibrí (botón enviar) navega a agente', async () => {
+    test('al enviar texto, el botón enviar navega a agente', async () => {
       const onNavigate = vi.fn();
       render(<AgentHero onNavigate={onNavigate} />);
       
@@ -199,25 +193,23 @@ describe('AgentHero — integración post-pulido (task #TEST-int)', () => {
       await waitFor(() => expect(onNavigate).toHaveBeenCalledWith('agente'));
     });
 
-    test('el colibrí del compositor solo se usa en enviar (no duplicado en la barra)', () => {
+    test('el compai aparece una sola vez en la escena del home', () => {
       const { container } = render(<AgentHero onNavigate={vi.fn()} />);
 
-      // Dentro del COMPOSITOR el colibrí (avatar) vive SOLO en el botón de
-      // enviar — no duplicado en la barra de íconos.
+      // El compositor conserva sus controles, pero no duplica el compai.
       const composer = container.querySelector('.agentport-composer');
       expect(composer).toBeTruthy();
       const composerAvatars = composer.querySelectorAll('[data-testid="avatar"]');
-      expect(composerAvatars.length).toBe(1);
+      expect(composerAvatars.length).toBe(0);
 
-      // El botón "Abrir Chagra IA" del header tiene su PROPIO avatar (entrada
-      // explícita al overlay, tarea #51) — es intencional, fuera del compositor.
+      // La entrada explícita del header conserva un icono neutro.
       const openBtn = container.querySelector('.agentport-open');
       expect(openBtn).toBeTruthy();
-      expect(openBtn.querySelectorAll('[data-testid="avatar"]').length).toBe(1);
+      expect(openBtn.querySelectorAll('[data-testid="avatar"]').length).toBe(0);
 
-      // El colibrí de la escena (.agentport-hummer) es separado
-      const sceneHummer = container.querySelector('.agentport-hummer');
-      expect(sceneHummer).toBeTruthy();
+      // La escena del hero ya no monta un compai adicional: el protagonista
+      // ambiental anterior fue retirado para no duplicar la presencia global.
+      expect(container.querySelector('.agentport-hummer')).toBeNull();
     });
   });
 
@@ -606,9 +598,9 @@ describe('AgentHero — integración post-pulido (task #TEST-int)', () => {
       const ta = screen.getByLabelText('Escribe tu pregunta al agente');
       fireEvent.change(ta, { target: { value: '¿Cómo abono mis cafés?' } });
       
-      // 4. Envía (tocando el colibrí)
+      // 4. Envía (tocando el control de envío)
       const sendBtn = screen.getByLabelText('Enviar al agente');
-      expect(sendBtn.querySelector('[data-testid="avatar"]')).toBeTruthy();
+      expect(sendBtn.querySelector('svg')).toBeTruthy();
       
       await act(async () => {
         fireEvent.click(sendBtn);

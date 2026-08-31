@@ -42,7 +42,6 @@ import {
   geomGallina,
   geomPerroAndante,
 } from '../../visual/mundo3d/finca/fincaRealista.geom.js';
-import { usePerrosGuardianes } from '../../visual/creatures/senalPerrosGuardianes.js';
 import {
   CASA_VALLE,
   COMPOSICION_LUGARES,
@@ -511,9 +510,6 @@ export default function HatoMovil({
     }
 
     /* ── PERROS: Dante y Oliver RONDAN la finca — juntos, con marcha real ──
-       PRELUDIO de guardianes (EL MOMENTO, cruce 3D↔2D) al tope del forEach:
-       'oculto' y 'alerta' cortan el frame con return temprano y la ronda
-       queda PAUSADA donde iba (al volver a 'normal' se retoma sin teleport).
        Motor de etapas compartido (rondaDePerros): 'arrea' orbita el rebaño,
        'camino' avanza por la ruta de la etapa (preparada al entrar con la
        posición actual prependida: cero teleports entre etapas), 'para' es el
@@ -549,76 +545,6 @@ export default function HatoMovil({
     hato.perros.forEach((pr, i) => {
       const { escala, fase } = pr.cfg;
       const info = g.perros[pr.cfg.raza];
-
-      // ── LA SEÑAL DE LOS GUARDIANES (EL MOMENTO, cruce 3D↔2D) ───────────
-      // Preludio: manda sobre la ronda. La etapa/modo/pos quedan congelados
-      // mientras dure la guardia y se retoman al volver a 'normal'.
-      const modoGuardian = guardia[pr.cfg.raza];
-      if (modoGuardian === 'oculto') {
-        // héroe 2D activo: mesh dormido y CONGELADO (el JSX lo esconde)
-        pr.enGuardia = true;
-        return;
-      }
-      if (modoGuardian === 'alerta') {
-        // AVISA: se planta mirando al monte y LADRA — pulsos que empinan el
-        // cuerpo y rematan en el hocico; patas plantadas en diagonales, cola
-        // alta y tensa. Es anticipación de guardián, nunca agresión.
-        pr.enGuardia = true;
-        const grp = refPerros.current[i];
-        if (!grp) return;
-        const hacia = guardia.hacia;
-        if (hacia) {
-          const rx = hacia[0] - pr.pos[0];
-          const rz = hacia[1] - pr.pos[1];
-          if (Math.hypot(rx, rz) > 1e-4) {
-            pr.rumbo += giroCorto(pr.rumbo, rumboY(rx, rz)) * Math.min(1, dt * 6);
-          }
-        }
-        const yB = alturaDe(pr.pos[0], pr.pos[1]);
-        const ladra = Math.pow(Math.max(0, Math.sin(t * 8.5 + i * 1.9)), 2); // pulso ¡guau!
-        grp.visible = true;
-        grp.position.set(pr.pos[0], yB + info.largoPata * escala * 0.012 + ladra * 0.014, pr.pos[1]);
-        grp.rotation.set(0, pr.rumbo, ladra * 0.07); // se empina al ladrar
-        grp.scale.setScalar(escala);
-        const patasAl = refPatasPerro.current[i];
-        for (let k = 0; k < 4; k++) {
-          const gp = patasAl && patasAl[k];
-          if (!gp) continue;
-          gp.rotation.z = AMP_TRANCO * 0.5 * Math.cos(FASE_DIAGONAL[k]); // plantado
-          gp.scale.y = 1;
-        }
-        const cabAl = refCabezasPerro.current[i];
-        if (cabAl) {
-          cabAl.rotation.y = 0;
-          cabAl.rotation.x = 0;
-          cabAl.rotation.z = 0.05 + ladra * 0.28; // el hocico remata cada ladrido
-        }
-        const colaAl = refColasPerro.current[i];
-        if (colaAl) {
-          colaAl.rotation.x = Math.sin(t * 10 + i) * 0.16; // alta y tensa
-          colaAl.rotation.y = 0;
-        }
-        const somAl = refSombras.current[i];
-        if (somAl) {
-          somAl.position.set(pr.pos[0], yB + 0.02, pr.pos[1]);
-          somAl.scale.setScalar(escala);
-          sombraAssets.mats[i].opacity = 0.44;
-        }
-        return;
-      }
-      // Al VOLVER de la guardia: si estaba arreando, re-anclar la órbita a
-      // su posición real (el ancla del rebaño siguió derivando mientras el
-      // perro estaba plantado/oculto) — retoma la etapa donde quedó, sin
-      // teleport. En 'camino'/'para'/'cita' la posición sale de pr.pos y de
-      // pr.s (que no avanzaron), así que ya retoman solas.
-      if (pr.enGuardia) {
-        pr.enGuardia = false;
-        if (pr.modo === 'arrea') {
-          pr.angArreo = Math.atan2(pr.pos[1] - rb.pos[1], pr.pos[0] - rb.pos[0]);
-          pr.rArreo = Math.max(0.35, Math.hypot(pr.pos[0] - rb.pos[0], pr.pos[1] - rb.pos[1]));
-        }
-      }
-
       const otro = hato.perros[1 - i];
       const dOtro0 = Math.hypot(pr.pos[0] - otro.pos[0], pr.pos[1] - otro.pos[1]);
       let px = pr.pos[0];
