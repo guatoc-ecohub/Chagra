@@ -1,0 +1,68 @@
+.trazado-creature {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  overflow: visible;
+  line-height: 0;
+  vertical-align: middle;
+}
+
+.trazado-creature > svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+.trazado-creature-button {
+  display: inline-flex;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  line-height: 0;
+  cursor: pointer;
+}
+
+.trazado-creature[data-trazado-animated='true'] > svg {
+  transform-origin: 50% 90%;
+}
+
+.trazado-chivito-normal[data-trazado-animated='true'] > svg {
+  animation: trazado-chivito-respira 3.4s ease-in-out infinite;
+}
+
+.trazado-chivito-punk[data-trazado-animated='true'] > svg {
+  animation: trazado-chivito-actua 1.05s cubic-bezier(.34, 1.56, .64, 1) infinite;
+}
+
+.trazado-luciernaga[data-trazado-animated='true'] > svg {
+  animation: trazado-luciernaga-late 3.1s ease-in-out infinite;
+}
+
+.trazado-luciernaga-fuerte[data-trazado-animated='true'] > svg {
+  filter: drop-shadow(0 0 8px rgba(199, 255, 78, .7));
+}
+
+.trazado-luciernaga-apagada > svg {
+  filter: saturate(.35) brightness(.72);
+}
+
+@keyframes trazado-chivito-respira {
+  0%, 100% { transform: translateY(0) rotate(-.35deg); }
+  50% { transform: translateY(-1.4%) rotate(.35deg); }
+}
+
+@keyframes trazado-chivito-actua {
+  0%, 100% { transform: translateY(0) rotate(-1.2deg) scale(1); }
+  45% { transform: translateY(-2.5%) rotate(1.5deg) scale(1.025, .985); }
+  75% { transform: translateY(.5%) rotate(-.4deg) scale(.99, 1.01); }
+}
+
+@keyframes trazado-luciernaga-late {
+  0%, 100% { transform: translateY(0) scale(1); }
+  48% { transform: translateY(-.8%) scale(1.012); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .trazado-creature > svg { animation: none !important; }
+}
