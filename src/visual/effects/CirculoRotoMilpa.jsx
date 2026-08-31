@@ -257,11 +257,21 @@ const VERDE_HOJA = '#7aa23f';
 const VERDE_HOJA_LUZ = '#9dbf55';
 const VERDE_HOJA_BORDE = '#3f5620';
 
+/* Tres frutos compactos, uno por hermana visible del dibujo. Son formas SVG
+   propias del mismo lenguaje de la lámina, no un asset nuevo: el gate puede
+   contar exactamente los tres nodos que deben quedar legibles. */
+const FRUTOS = [
+  { id: 'maiz', cx: 132, cy: 215, rx: 7, ry: 10, fill: GRANO, stroke: GRANO_OSC, delay: '2.2s' },
+  { id: 'frijol', cx: 160, cy: 190, rx: 6, ry: 9, fill: '#a8443a', stroke: '#71352f', delay: '2.34s' },
+  { id: 'calabaza', cx: 191, cy: 216, rx: 8, ry: 7, fill: '#d98b3c', stroke: '#9a5d2c', delay: '2.48s' },
+];
+
 export default function CirculoRotoMilpa({
   trigger = false,
   roto = false,
   onRupturaCompleta,
   onAsentado,
+  milpaScale = 1.3,
   className,
   children,
 }) {
@@ -309,6 +319,7 @@ export default function CirculoRotoMilpa({
   return (
     <div
       className={['crm-wrap', faseClase, className].filter(Boolean).join(' ')}
+      style={{ '--crm-milpa-scale': milpaScale }}
       data-fase={fase}
       data-testid="circulo-roto-milpa"
     >
@@ -414,6 +425,36 @@ export default function CirculoRotoMilpa({
 
         {/* LA MILPA: tierra, grano, raíces, brote */}
         <g className="crm-milpa">
+          {/* Frutos claros de las tres plantas de la milpa. */}
+          <g className="crm-frutos">
+            {FRUTOS.map((fruto) => (
+              <g
+                key={fruto.id}
+                className="crm-fruto"
+                style={{ '--d': fruto.delay }}
+                data-crm-fruto={fruto.id}
+                data-crm-planta={fruto.id}
+              >
+                <ellipse
+                  cx={fruto.cx}
+                  cy={fruto.cy}
+                  rx={fruto.rx}
+                  ry={fruto.ry}
+                  fill={fruto.fill}
+                  stroke={fruto.stroke}
+                  strokeWidth="1.4"
+                />
+                <path
+                  d={`M ${fruto.cx - 2} ${fruto.cy - fruto.ry + 2} q 2 3 4 0`}
+                  fill="none"
+                  stroke="#f8e7b0"
+                  strokeWidth="1.1"
+                  strokeLinecap="round"
+                  opacity="0.8"
+                />
+              </g>
+            ))}
+          </g>
           {/* Montículo de tierra que se parte en dos */}
           <g className="crm-monticulo crm-mont-izq">
             <path
