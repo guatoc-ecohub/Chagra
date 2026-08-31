@@ -80,3 +80,19 @@ chagra-anthropic-judge-key
 # RESULTADO del entrenamiento (public/models/hola-chagra/{examples.bin,
 # metadata.json}) SÍ se commitea — es lo que se shippea.
 /scripts/wake-word/samples/
+
+# Canario nocturno: reportes y datasets (efímeros, nunca commitear)
+/data/canary-runs/
+
+# Experimento chunking passage-level (exp/rag-chunking-passages) — artefactos grandes, NO commitear
+# (se ignora el CONTENIDO, no el dir, para poder re-incluir results.json: git no
+#  desciende a un dir excluido, así que un `!` sobre el dir entero no funciona.)
+/data/rag-chunking-exp/*
+!/data/rag-chunking-exp/results.json
+
+# Valle 3D vanilla (marco de entrada opcional, ver src/components/ValleMarcoScreen.jsx):
+# árbol GENERADO por scripts/sync-valle.mjs (prebuild) desde el checkout local
+# del valle (~/demos/3d o $VALLE_SRC_DIR), NO es fuente de este repo — ~17 MB,
+# 280+ archivos vanilla (three r160, su propio importmap). Se re-sincroniza en
+# cada build; commitearlo lo dejaría stale y duplicaría el peso del repo.
+/public/valle/

@@ -669,7 +669,7 @@ export const EVENTOS = Object.freeze([
  */
 export function factorResistencia(parcela, evento = null) {
   const d = diversidadParcela(parcela);
-  let factor = 1.0;
+  let factor;
 
   // Resistencia base por diversidad
   if (d <= 1) factor = 1.0;

@@ -6,6 +6,7 @@ import DeepResearchCard from '../DeepResearchCard';
 import InsightProactivoCard from '../Aprende/InsightProactivoCard';
 import ThinkingSteps from './ThinkingSteps';
 import { MSG } from '../../config/messages';
+import useAgentAvatarType, { AVATAR_NOMBRE, DEFAULT_AVATAR_TYPE, adjetivoAgroecologico } from '../../hooks/useAgentAvatarType';
 
 // Bug piloto 2026-06-04 (B): "para devolverme tengo que ir hasta el inicio de
 // la conversación sin importar lo larga que sea". El único "Volver" vivía en el
@@ -76,6 +77,15 @@ export default function ChatHistory({ messages = [], streamingContent = '', isSt
     if (floatingBackIdleTimerRef.current) clearTimeout(floatingBackIdleTimerRef.current);
   }, []);
 
+  // COHERENCIA DEL SALUDO (bug operador): el agente saludaba SIEMPRE "Soy
+  // Angelita" sin mirar qué compAI eligió el usuario. El saludo (proactivo y el
+  // fallback estático) debe NOMBRAR al compAI ACTIVO. `useAgentAvatarType` es
+  // reactivo (evento `chagra:agent-avatar-changed` + `storage`): si el usuario
+  // cambia de avatar, este componente re-renderiza y el saludo cambia de nombre.
+  const [avatarType] = useAgentAvatarType();
+  const nombreCompai = AVATAR_NOMBRE[avatarType] || AVATAR_NOMBRE[DEFAULT_AVATAR_TYPE];
+  const adjAgro = adjetivoAgroecologico(avatarType);
+
   // Fuente ÚNICA del auto-scroll del chat (tarea #58). El contenedor scrollable
   // real es `scrollRef`; `bottomRef` es el marcador del fondo DENTRO de él.
   //
@@ -130,16 +140,17 @@ export default function ChatHistory({ messages = [], streamingContent = '', isSt
         <div className="text-center max-w-md">
           <ChagraAgentAvatar state="idle" size={200} className="mx-auto mb-4" />
           {proactiveGreeting ? (
-            <ProactiveGreeting greeting={proactiveGreeting} />
+            <ProactiveGreeting greeting={proactiveGreeting} nombreCompai={nombreCompai} />
           ) : (
             <>
               {/* V3: saludo en Baloo 2 (display de la casa) — el mismo trazo
-                  redondo del home Finca Viva, no la sans genérica. */}
+                  redondo del home Finca Viva, no la sans genérica. El nombre y el
+                  adjectivo salen del compAI ACTIVO (no hard-coded a Angelita). */}
               <p
                 className="text-slate-200 text-xl mb-2"
                 style={{ fontFamily: "'Baloo 2', 'Nunito', system-ui, sans-serif", fontWeight: 700, letterSpacing: '-0.3px' }}
               >
-                ¡Hola! Soy Angelita, su asistente agroecológica.
+                ¡Hola! Soy {nombreCompai}, su asistente {adjAgro}.
               </p>
               <p className="text-slate-500 text-xs">Puede hablarme o escribirme sobre sus plantas.</p>
             </>
@@ -336,7 +347,7 @@ const FLOATING_BACK_CSS = `
  * una idea contextual sin inventar alarmas. CTA siembra el prompt sugerido en
  * el input (el operador revisa y envía — no auto-submit).
  */
-function ProactiveGreeting({ greeting }) {
+function ProactiveGreeting({ greeting, nombreCompai = AVATAR_NOMBRE[DEFAULT_AVATAR_TYPE] }) {
   if (!greeting) return null;
   // `prompt` del saludo ya no se usa: la pastilla-CTA se retiró (tarea #58).
   const { hi, state, lead, items = [], restCount = 0 } = greeting;
@@ -348,9 +359,10 @@ function ProactiveGreeting({ greeting }) {
         className="text-slate-200 text-xl mb-1.5"
         style={{ fontFamily: "'Baloo 2', 'Nunito', system-ui, sans-serif", fontWeight: 700, letterSpacing: '-0.3px' }}
       >
-        {/* 2026-07-16: el agente ES Angelita (la abeja) — el texto acompaña
-            a la cara que el operador ya ve arriba. */}
-        {hi}. Soy <span className="text-emerald-300">Angelita</span>, de Chagra.
+        {/* El texto NOMBRA al compAI activo (la cara que el operador ya ve
+            arriba): Angelita, el jaguar, el oso de anteojos… El nombre llega
+            de AVATAR_NOMBRE vía props para no re-suscribir el hook aquí. */}
+        {hi}. Soy <span data-testid="proactive-greeting-nombre" className="text-emerald-300">{nombreCompai}</span>, de Chagra.
       </p>
       <p
         className="text-slate-300 text-sm leading-relaxed mb-3"
@@ -381,7 +393,7 @@ function ProactiveGreeting({ greeting }) {
       )}
 
       {isPending && restCount > 0 && (
-        <p className="text-[11px] text-slate-500 mb-3" data-testid="proactive-greeting-rest">
+        <p className="text-[11px] text-slate-400 mb-3" data-testid="proactive-greeting-rest">
           {restCount === 1
             ? 'Hay 1 pendiente más en la campana 🔔.'
             : `Hay ${restCount} pendientes más en la campana 🔔.`}

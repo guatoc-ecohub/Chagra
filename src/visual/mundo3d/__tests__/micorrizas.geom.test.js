@@ -21,6 +21,11 @@ import {
   motasSuelo,
   mergeGeos,
   SUELO,
+  muestrasDeRed,
+  entornoSuelo,
+  pelusaDeRed,
+  pelosRadicales,
+  hojasSuperficie,
 } from '../micorrizas/micorrizas.geom.js';
 
 describe('micorrizas.geom — tiers', () => {
@@ -188,5 +193,80 @@ describe('micorrizas.geom — pulsos y motas', () => {
   test('motasSuelo respeta el conteo (0 → vacío)', () => {
     expect(motasSuelo(0)).toEqual([]);
     expect(motasSuelo(30)).toHaveLength(30);
+  });
+});
+
+describe('micorrizas.geom — pasada de arte «suelo vivo» (masa, no low-poly)', () => {
+  const { curvas: raizCurvas, puntasRaiz } = sistemaRaices(11);
+  const libres = nodosLibres(12, 23);
+  const { hilos } = construirRed(puntasRaiz, libres, { vecinos: 2 }, 37);
+
+  test('los presupuestos de masa bajan de tier en tier (nunca al revés)', () => {
+    for (const campo of ['pelusaPorHilo', 'mantoPorPunta', 'pelosPorRaiz', 'segEntorno', 'piedras']) {
+      expect(PARAMS_TIER.alto[campo]).toBeGreaterThan(PARAMS_TIER.medio[campo]);
+      expect(PARAMS_TIER.medio[campo]).toBeGreaterThan(PARAMS_TIER.bajo[campo]);
+    }
+  });
+
+  test('muestrasDeRed recorre cada hilo y los puentes alumbran más', () => {
+    const muestras = muestrasDeRed(hilos);
+    expect(muestras.length).toBeGreaterThan(hilos.length);
+    for (const m of muestras) {
+      expect(Number.isFinite(m.x + m.y + m.z)).toBe(true);
+      expect(m.fuerza).toBeGreaterThan(0);
+      expect(m.fuerza).toBeLessThanOrEqual(1);
+    }
+    if (hilos.some((h) => h.puente)) {
+      expect(muestras.some((m) => m.fuerza === 1)).toBe(true);
+    }
+  });
+
+  test('pelusaDeRed: segmentos con color, deterministas, y el manto suma vello', () => {
+    const g1 = pelusaDeRed(hilos, puntasRaiz, { porHilo: 4, manto: 12 }, 97);
+    const g2 = pelusaDeRed(hilos, puntasRaiz, { porHilo: 4, manto: 12 }, 97);
+    const sinManto = pelusaDeRed(hilos, puntasRaiz, { porHilo: 4, manto: 0 }, 97);
+    expect(g1).toBeInstanceOf(THREE.BufferGeometry);
+    expect(g1.attributes.position.count % 2).toBe(0); // pares de puntos (LineSegments)
+    expect(g1.attributes.color.count).toBe(g1.attributes.position.count);
+    expect(g1.attributes.position.array).toEqual(g2.attributes.position.array);
+    expect(g1.attributes.position.count).toBeGreaterThan(sinManto.attributes.position.count);
+    g1.dispose(); g2.dispose(); sinManto.dispose();
+  });
+
+  test('pelosRadicales: pelitos bajo tierra, deterministas', () => {
+    const g1 = pelosRadicales(raizCurvas, { porRaiz: 14 }, 101);
+    const g2 = pelosRadicales(raizCurvas, { porRaiz: 14 }, 101);
+    expect(g1.attributes.position.count).toBeGreaterThan(0);
+    expect(g1.attributes.position.count % 2).toBe(0);
+    expect(g1.attributes.position.array).toEqual(g2.attributes.position.array);
+    const pos = g1.attributes.position;
+    for (let i = 0; i < pos.count; i++) expect(pos.getY(i)).toBeLessThan(0.05);
+    g1.dispose(); g2.dispose();
+  });
+
+  test('entornoSuelo: una sola malla con color y normales; la red le hornea luz', () => {
+    const luces = muestrasDeRed(hilos);
+    const conLuz = entornoSuelo({ luces, seg: 10, piedras: 4 }, 91);
+    const sinLuz = entornoSuelo({ luces: [], seg: 10, piedras: 4 }, 91);
+    expect(conLuz).toBeInstanceOf(THREE.BufferGeometry);
+    expect(conLuz.attributes.color).toBeTruthy();
+    expect(conLuz.attributes.normal).toBeTruthy();
+    // mismo seed → misma geometría (determinista)
+    expect(conLuz.attributes.position.array).toEqual(sinLuz.attributes.position.array);
+    // la luz horneada de la red SUMA color (la tierra se enciende cerca de los hilos)
+    const suma = (g) => g.attributes.color.array.reduce((s, v) => s + v, 0);
+    expect(suma(conLuz)).toBeGreaterThan(suma(sinLuz));
+    conLuz.dispose(); sinLuz.dispose();
+  });
+
+  test('hojasSuperficie: hojas de verdad sobre las tres hermanas', () => {
+    const g = hojasSuperficie(103);
+    expect(g.attributes.color).toBeTruthy();
+    g.computeBoundingBox();
+    // cubre del maíz (x≈-2.55) a la ahuyama (x≈1.5) y vive SOBRE la superficie
+    expect(g.boundingBox.min.x).toBeLessThan(-2);
+    expect(g.boundingBox.max.x).toBeGreaterThan(1.2);
+    expect(g.boundingBox.min.y).toBeGreaterThan(-0.12);
+    g.dispose();
   });
 });

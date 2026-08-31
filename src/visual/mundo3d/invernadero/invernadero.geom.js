@@ -554,18 +554,121 @@ export function geomBolsa(seed = 11) {
 }
 
 /* -------------------------------------------------------------------------- */
-/*  CONTEOS POR TIER + DISTRIBUCIÓN DETERMINISTA                               */
+/*  CULTIVO PARAMETRIZABLE + DISTRIBUCIÓN DETERMINISTA                         */
 /* -------------------------------------------------------------------------- */
 
+/**
+ * Catálogo pequeño de arquetipos que el motor puede sembrar en masa.
+ *
+ * La geometría de cada arquetipo sigue siendo deliberadamente intercambiable:
+ * Fable puede reemplazarla sin tocar el contrato de cantidad, layout o GPU.
+ * El tomate es el primer ciudadano del contrato porque es el cultivo prioritario.
+ */
+export const ESPECIES_INVERNADERO = Object.freeze({
+  tomate: Object.freeze({ id: 'tomate', nombre: 'Tomate', geometria: 'tomate', fruto: true }),
+  pimenton: Object.freeze({ id: 'pimenton', nombre: 'Pimentón', geometria: 'hortaliza', fruto: false }),
+  lechuga: Object.freeze({ id: 'lechuga', nombre: 'Lechuga', geometria: 'hortaliza', fruto: false }),
+});
+
+const ALIAS_ESPECIES = Object.freeze({
+  tomate: 'tomate',
+  tomato: 'tomate',
+  pimenton: 'pimenton',
+  pimiento: 'pimenton',
+  lechuga: 'lechuga',
+});
+
+const TIPOS_LAYOUT = new Set(['surcos', 'franjas', 'compacto']);
+
+/**
+ * Normaliza la entrada pública del cultivo. El límite es intencional: deja un
+ * contrato explícito para la prueba de 1.500 y 10.000 plantas y evita que una
+ * URL o un control accidental convierta la escena en una reserva infinita.
+ */
+export function normalizarCultivo({ especie = 'tomate', cantidad = 1500, layout = 'surcos' } = {}) {
+  const especieTexto = String(especie || 'tomate')
+    .trim()
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '');
+  const especieId = ALIAS_ESPECIES[especieTexto] || 'tomate';
+  const numero = Number(cantidad);
+  const n = Number.isFinite(numero) ? Math.round(numero) : 1500;
+  const cantidadNormalizada = Math.min(10000, Math.max(1, n));
+  const layoutTipo = typeof layout === 'string' ? layout : layout?.tipo;
+  const tipo = TIPOS_LAYOUT.has(layoutTipo) ? layoutTipo : 'surcos';
+  const custom = layout && typeof layout === 'object' ? layout : {};
+  const filasPersonalizadas = custom.filas;
+
+  return {
+    especie: especieId,
+    especieInfo: ESPECIES_INVERNADERO[especieId],
+    cantidad: cantidadNormalizada,
+    layout: {
+      tipo,
+      // El usuario puede ajustar el número de surcos sin romper el marco del
+      // túnel. El motor calcula las columnas restantes según la cantidad.
+      filas: filasPersonalizadas != null && Number.isFinite(Number(filasPersonalizadas))
+        ? Math.min(180, Math.max(2, Math.round(Number(filasPersonalizadas))))
+        : null,
+    },
+  };
+}
+
+/** Puntos de una plantación en masa, siempre dentro del volumen del túnel. */
+export function posicionesCultivo(cultivo, semilla = 733) {
+  const { cantidad, layout } = normalizarCultivo(cultivo);
+  const r = rng(semilla);
+  const ancho = layout.tipo === 'compacto' ? 4.85 : 4.55;
+  const largo = layout.tipo === 'franjas' ? 11.25 : 11.55;
+  const aspecto = ancho / largo;
+  const columnas = layout.filas || Math.max(2, Math.ceil(Math.sqrt(cantidad * aspecto)));
+  const filas = Math.ceil(cantidad / columnas);
+  const items = [];
+  const pasoX = columnas > 1 ? ancho / (columnas - 1) : 0;
+  const pasoZ = filas > 1 ? largo / (filas - 1) : 0;
+  const ruido = layout.tipo === 'compacto' ? 0.12 : layout.tipo === 'franjas' ? 0.22 : 0.16;
+
+  for (let i = 0; i < cantidad; i++) {
+    const columna = i % columnas;
+    const fila = Math.floor(i / columnas);
+    const x = -ancho / 2 + columna * pasoX;
+    const z = -largo / 2 + fila * pasoZ;
+    // El jitter es proporcional al paso: conserva la lectura de surcos cuando
+    // hay 1.500 y evita una cuadrícula artificial cuando hay 10.000.
+    const jx = (r() - 0.5) * pasoX * ruido;
+    const jz = (r() - 0.5) * pasoZ * ruido;
+    items.push({
+      pos: [x + jx, 0.32, z + jz],
+      rotY: r() * Math.PI * 2,
+      escala: 0.88 + r() * 0.24,
+      tint: tintDe('#ffffff'),
+    });
+  }
+  return items;
+}
+
 /** Cuánta vida siembra cada gama (el fotograma digno no se negocia). */
-export function invernaderoDeTier(tier) {
+export function invernaderoDeTier(tier, cultivo) {
+  const cultivoNormalizado = normalizarCultivo(cultivo);
+  const frutosPorPlanta = cultivoNormalizado.especieInfo.fruto
+    ? cultivoNormalizado.cantidad <= 2500
+      ? 3
+      : cultivoNormalizado.cantidad <= 7000
+        ? 2
+        : 1
+    : 0;
+  const base = {
+    cultivo: cultivoNormalizado,
+    frutosPorPlanta,
+  };
   if (tier === 'alto') {
-    return { tomate: 14, frutosPorMata: 5, hortaliza: 27, bandeja: 6, brotesPorBandeja: 15, bolsa: 8, era: 4, vaho: 5, gotas: 10, perlas: 150 };
+    return { ...base, hortaliza: 27, bandeja: 6, brotesPorBandeja: 15, bolsa: 8, era: 4, vaho: 5, gotas: 10, perlas: 150 };
   }
   if (tier === 'medio') {
-    return { tomate: 10, frutosPorMata: 4, hortaliza: 18, bandeja: 4, brotesPorBandeja: 12, bolsa: 6, era: 3, vaho: 3, gotas: 6, perlas: 64 };
+    return { ...base, hortaliza: 18, bandeja: 4, brotesPorBandeja: 12, bolsa: 6, era: 3, vaho: 3, gotas: 6, perlas: 64 };
   }
-  return { tomate: 8, frutosPorMata: 3, hortaliza: 12, bandeja: 3, brotesPorBandeja: 8, bolsa: 4, era: 2, vaho: 0, gotas: 0, perlas: 0 };
+  return { ...base, hortaliza: 12, bandeja: 3, brotesPorBandeja: 8, bolsa: 4, era: 2, vaho: 0, gotas: 0, perlas: 0 };
 }
 
 const tintDe = (c) => {
@@ -586,7 +689,7 @@ const BROTE_ETAPAS = ['#a9c47a', '#8db95f', '#74a94e', '#5f9a43'];
  */
 export function distribucionInvernadero(conteos, semilla = 733) {
   const r = rng(semilla);
-  const out = { bandeja: [], brote: [], tomate: [], fruto: [], hortaliza: [], bolsa: [] };
+  const out = { bandeja: [], brote: [], cultivo: [], fruto: [], hortaliza: [], bolsa: [] };
 
   // Las BANDEJAS sobre la mesa de almácigo (2 columnas × 3 filas).
   const [mx, mz] = SITIO_MESA;
@@ -619,17 +722,15 @@ export function distribucionInvernadero(conteos, semilla = 733) {
     }
   }
 
-  // El TOMATE tutorado (cama izquierda) + sus racimos madurando de abajo arriba.
-  const matas = posicionesTomate(conteos.tomate);
-  for (const [tx, tz] of matas) {
-    out.tomate.push({
-      pos: [tx, 0.32, tz],
-      rotY: r() * Math.PI * 2,
-      escala: 0.88 + r() * 0.24,
-      tint: tintDe('#ffffff'),
-    });
-    for (let k = 0; k < conteos.frutosPorMata; k++) {
-      const alturaFrac = (k + 0.5) / conteos.frutosPorMata; // 0 abajo … 1 arriba
+  // El CULTIVO PRINCIPAL es una sola familia instanciada. La geometría sigue
+  // siendo intercambiable por especie, pero el contrato soporta 1.500–10.000.
+  const cultivo = conteos.cultivo || normalizarCultivo({ cantidad: conteos.tomate || 14 });
+  out.cultivo = posicionesCultivo(cultivo, semilla + 17);
+  for (const planta of out.cultivo) {
+    if (!conteos.frutosPorPlanta) continue;
+    const [tx, , tz] = planta.pos;
+    for (let k = 0; k < conteos.frutosPorPlanta; k++) {
+      const alturaFrac = (k + 0.5) / conteos.frutosPorPlanta; // 0 abajo … 1 arriba
       const a = r() * Math.PI * 2;
       const etapa = Math.min(FRUTO_ETAPAS.length - 1, Math.floor(alturaFrac * FRUTO_ETAPAS.length));
       out.fruto.push({

@@ -189,6 +189,13 @@
   background: var(--cv-cream-2); font-size: 12px; color: var(--cv-ink-soft);
   display: flex; align-items: center; justify-content: center; border: none; cursor: pointer;
 }
+/* Target táctil de 44px (a11y) sin alterar el círculo visible de 30px:
+   overlay transparente centrado; el pseudo-elemento recibe el toque por el botón. */
+.cv-sheet-close::after {
+  content: ""; position: absolute; top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  width: 44px; height: 44px; border-radius: 50%;
+}
 .cv-sheet-header { display: flex; align-items: center; gap: 13px; margin-bottom: 4px; padding-right: 34px; }
 .cv-sheet-glyph {
   width: 58px; height: 58px; border-radius: 19px; flex-shrink: 0;
@@ -318,7 +325,41 @@
 .cvivo-state-pill.activo { background: color-mix(in srgb, #4C7A3D 16%, white); color: #2F4A34; }
 .cvivo-state-pill.parcial { background: color-mix(in srgb, var(--cv-gold-strong) 26%, white); color: #6b5309; }
 .cvivo-state-pill.proximamente { background: rgba(107, 90, 71, .12); color: var(--cv-ink-soft); }
+.cvivo-state-pill.precio {
+  background: linear-gradient(135deg, color-mix(in srgb, var(--cv-ocre) 22%, white), color-mix(in srgb, var(--cv-gold-strong) 20%, white));
+  color: #6B5309;
+}
+.cvivo-state-pill.precio.live {
+  background: linear-gradient(135deg, color-mix(in srgb, #4C7A3D 24%, white), color-mix(in srgb, #CDE7CA 30%, white));
+  color: #2F4A34;
+}
+.cvivo-state-pill.precio.quiet {
+  background: rgba(107, 90, 71, .10);
+  color: var(--cv-ink-soft);
+}
 .cvivo-card-cta { margin-left: auto; align-self: center; color: var(--cv-ocre); flex-shrink: 0; }
+
+.cv-chip-stack {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 1px;
+  line-height: 1.06;
+}
+.cv-chip-main {
+  font-size: 12.5px;
+  font-weight: 800;
+}
+.cv-chip-sub {
+  font-size: 10px;
+  font-weight: 700;
+  opacity: .95;
+}
+.cv-chip-subtle {
+  font-size: 9px;
+  font-weight: 600;
+  opacity: .78;
+}
 
 /* Reduce motion */
 @media (prefers-reduced-motion: reduce) {

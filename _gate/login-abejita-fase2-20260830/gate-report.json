@@ -1,0 +1,23 @@
+{
+  "errors": [],
+  "viewport": { "width": 1280, "height": 720 },
+  "angelita": "asentada",
+  "bbox": { "x": 1167, "y": 546, "width": 84, "height": 84 },
+  "bottomGap": 90,
+  "rightGapFromLayoutViewport": 14,
+  "crm": "activa",
+  "triada": true,
+  "frutos": [
+    { "id": "maiz", "opacity": "1", "width": 10.939, "height": 15.362 },
+    { "id": "frijol", "opacity": "1", "width": 9.379, "height": 13.823 },
+    { "id": "calabaza", "opacity": "1", "width": 12.472, "height": 10.774 }
+  ],
+  "frutosVisibles": 3,
+  "fab": 0,
+  "maquinaSola": true,
+  "capturas": [
+    "final-viewport.png",
+    "final-full.png",
+    "final-orbe.png"
+  ]
+}

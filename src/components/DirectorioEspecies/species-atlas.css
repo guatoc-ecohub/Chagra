@@ -1,0 +1,109 @@
+.species-atlas {
+  --atlas-ink: #f4ecd8;
+  --atlas-muted: #b8c5ad;
+  --atlas-line: rgba(200, 222, 166, 0.2);
+  --atlas-cream: #f1d98f;
+  --atlas-green: #17362d;
+  margin: 1.25rem 1rem 0;
+  border-top: 1px solid var(--atlas-line);
+  color: var(--atlas-ink);
+}
+
+.species-atlas__heading,
+.species-atlas__stage-head,
+.species-atlas__quiz-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.species-atlas__heading { padding: 1.1rem 0 0.85rem; justify-content: flex-start; }
+.species-atlas__heading-icon,
+.species-atlas__lesson-mark {
+  display: grid;
+  place-items: center;
+  flex: 0 0 auto;
+  width: 2.2rem;
+  height: 2.2rem;
+  border: 1px solid rgba(241, 217, 143, 0.35);
+  border-radius: 0.75rem;
+  color: var(--atlas-cream);
+  background: rgba(241, 217, 143, 0.08);
+}
+
+.species-atlas h2,
+.species-atlas h3,
+.species-atlas h4,
+.species-atlas p { margin: 0; }
+.species-atlas h2 { font-size: 1.05rem; line-height: 1.1; }
+.species-atlas h3 { font-size: 1rem; line-height: 1.1; }
+.species-atlas h4 { font-size: 0.98rem; line-height: 1.15; }
+.species-atlas__eyebrow { color: var(--atlas-cream); font-size: 0.62rem; font-weight: 800; letter-spacing: 0.13em; text-transform: uppercase; }
+.species-atlas__quiet { padding: 0 0 1rem; color: var(--atlas-muted); font-size: 0.82rem; line-height: 1.55; }
+
+.species-atlas__stage-shell { overflow: hidden; border: 1px solid var(--atlas-line); border-radius: 1.15rem; background: linear-gradient(145deg, #1a4033, #0b211e); box-shadow: 0 18px 45px rgba(0, 0, 0, 0.24); }
+.species-atlas__stage-head { padding: 0.85rem 0.9rem 0.7rem; }
+.species-atlas__gesture { display: inline-flex; align-items: center; gap: 0.28rem; color: var(--atlas-muted); font-size: 0.65rem; white-space: nowrap; }
+.species-atlas__canvas-wrap { position: relative; height: 18rem; }
+.species-atlas__canvas { display: block; width: 100%; height: 100%; }
+.species-atlas__canvas-fallback { display: grid; place-items: center; height: 100%; padding: 1.5rem; color: var(--atlas-muted); font-size: 0.78rem; line-height: 1.5; text-align: center; }
+.species-atlas__canvas-note { position: absolute; right: 0.7rem; bottom: 0.6rem; color: rgba(244, 236, 216, 0.62); font-size: 0.58rem; letter-spacing: 0.05em; text-transform: uppercase; pointer-events: none; }
+.species-atlas__marker { padding: 0.28rem 0.42rem; border: 1px solid rgba(244, 227, 165, 0.55); border-radius: 999px; color: #1b2d22; background: rgba(244, 227, 165, 0.94); box-shadow: 0 3px 12px rgba(0, 0, 0, 0.24); font: 800 0.62rem/1 inherit; white-space: nowrap; cursor: pointer; transition: transform 160ms ease, background 160ms ease; }
+.species-atlas__marker:hover,
+.species-atlas__marker:focus-visible,
+.species-atlas__marker.is-target { transform: scale(1.08); background: #f2c86b; outline: 2px solid rgba(242, 200, 107, 0.42); outline-offset: 2px; }
+
+.species-atlas__marker-list { display: flex; flex-wrap: wrap; gap: 0.45rem; padding: 0.7rem 0.8rem 0.85rem; border-top: 1px solid rgba(200, 222, 166, 0.14); }
+.species-atlas__marker-list button { display: inline-flex; align-items: center; gap: 0.38rem; padding: 0.35rem 0.5rem; border: 1px solid rgba(200, 222, 166, 0.19); border-radius: 0.45rem; color: var(--atlas-muted); background: rgba(0, 0, 0, 0.12); font-size: 0.68rem; cursor: pointer; }
+.species-atlas__marker-list button span { color: var(--atlas-cream); font-variant-numeric: tabular-nums; }
+.species-atlas__marker-list button.is-selected { border-color: rgba(241, 217, 143, 0.65); color: var(--atlas-ink); background: rgba(241, 217, 143, 0.12); }
+
+.species-atlas__stage-tabs { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.45rem; margin-top: 0.75rem; }
+.species-atlas__stage-tabs button { min-height: 3.25rem; padding: 0.5rem 0.4rem; border: 1px solid var(--atlas-line); border-radius: 0.75rem; color: var(--atlas-muted); background: rgba(10, 25, 21, 0.72); text-align: left; cursor: pointer; }
+.species-atlas__stage-tabs button span,
+.species-atlas__stage-tabs button small { display: block; }
+.species-atlas__stage-tabs button span { font-weight: 800; font-size: 0.75rem; }
+.species-atlas__stage-tabs button small { margin-top: 0.18rem; font-size: 0.62rem; }
+.species-atlas__stage-tabs button.is-active { border-color: rgba(241, 217, 143, 0.65); color: var(--atlas-ink); background: rgba(241, 217, 143, 0.1); }
+
+.species-atlas__lesson,
+.species-atlas__detail { display: flex; gap: 0.75rem; margin-top: 0.75rem; padding: 0.85rem; border: 1px solid rgba(200, 222, 166, 0.17); border-radius: 0.9rem; background: rgba(18, 46, 38, 0.54); }
+.species-atlas__lesson > div:last-child { min-width: 0; }
+.species-atlas__lesson h4 { margin-top: 0.15rem; }
+.species-atlas__lesson p:not(.species-atlas__eyebrow),
+.species-atlas__detail p:not(.species-atlas__eyebrow) { margin-top: 0.4rem; color: var(--atlas-muted); font-size: 0.78rem; line-height: 1.5; }
+.species-atlas__observe { color: #e8e2c9 !important; }
+.species-atlas__detail { border-color: rgba(241, 217, 143, 0.28); background: rgba(83, 67, 27, 0.22); }
+
+.species-atlas__quiz-head { margin-top: 1.35rem; padding-top: 1rem; border-top: 1px solid var(--atlas-line); }
+.species-atlas__score { color: var(--atlas-cream); font-size: 0.72rem; font-weight: 800; }
+.species-atlas__quiz-actions { display: grid; gap: 0.5rem; margin: 0.75rem 0 1.15rem; }
+.species-atlas__quiz-actions button,
+.species-atlas__next,
+.species-atlas__back { display: inline-flex; align-items: center; justify-content: center; gap: 0.45rem; min-height: 2.6rem; padding: 0.55rem 0.75rem; border: 1px solid rgba(241, 217, 143, 0.3); border-radius: 0.7rem; color: #18251e; background: var(--atlas-cream); font-size: 0.78rem; font-weight: 800; cursor: pointer; }
+.species-atlas__quiz-actions button + button { color: var(--atlas-ink); background: rgba(200, 222, 166, 0.11); }
+.species-atlas__quiz-card { margin: 0.75rem 0 1.15rem; padding: 0.85rem; border: 1px solid rgba(241, 217, 143, 0.28); border-radius: 0.9rem; background: rgba(83, 67, 27, 0.16); }
+.species-atlas__quiz-prompt { color: var(--atlas-ink); font-size: 0.86rem; line-height: 1.45; }
+.species-atlas__quiz-help { margin-top: 0.45rem !important; color: var(--atlas-muted); font-size: 0.72rem; line-height: 1.45; }
+.species-atlas__options { display: grid; gap: 0.45rem; margin-top: 0.75rem; }
+.species-atlas__options button { display: flex; align-items: center; gap: 0.55rem; padding: 0.55rem; border: 1px solid rgba(200, 222, 166, 0.22); border-radius: 0.6rem; color: var(--atlas-ink); background: rgba(18, 46, 38, 0.7); font-size: 0.76rem; text-align: left; cursor: pointer; }
+.species-atlas__options button span { display: grid; place-items: center; width: 1.35rem; height: 1.35rem; border-radius: 50%; color: #203228; background: rgba(241, 217, 143, 0.85); font-size: 0.65rem; font-weight: 900; }
+.species-atlas__options button.is-correct { border-color: #9ed48b; background: rgba(67, 124, 69, 0.42); }
+.species-atlas__options button.is-wrong { border-color: #e28c78; background: rgba(124, 55, 50, 0.42); }
+.species-atlas__feedback { display: flex; gap: 0.45rem; margin-top: 0.75rem; padding: 0.6rem; border-radius: 0.6rem; color: var(--atlas-muted); font-size: 0.74rem; line-height: 1.45; }
+.species-atlas__feedback.is-correct { background: rgba(67, 124, 69, 0.26); color: #d7f2c4; }
+.species-atlas__feedback.is-wrong { background: rgba(124, 55, 50, 0.27); color: #ffd4c7; }
+.species-atlas__quiz-footer { display: flex; justify-content: space-between; gap: 0.5rem; margin-top: 0.8rem; }
+.species-atlas__back { color: var(--atlas-muted); background: transparent; }
+.species-atlas__next { color: #18251e; background: var(--atlas-cream); }
+
+@media (min-width: 640px) {
+  .species-atlas { margin-inline: 1.25rem; }
+  .species-atlas__canvas-wrap { height: 22rem; }
+  .species-atlas__quiz-actions { grid-template-columns: 1fr 1fr; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .species-atlas__marker { transition: none; }
+}

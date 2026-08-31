@@ -24,6 +24,7 @@ import { retrieve } from './ragRetriever';
 import { callTool, isSidecarEnabled, judgeVisionAsync } from './sidecarClient';
 import { parseJsonTolerant } from '../utils/parseJsonTolerant';
 import { hashImage, getCached, setCached } from './visionCacheService';
+import { ENV } from '../config/env';
 
 // Ruta relativa: Nginx proxea /api/ollama/ → http://localhost:11434/
 // Ruta final: /api/ollama/api/generate → http://localhost:11434/api/generate

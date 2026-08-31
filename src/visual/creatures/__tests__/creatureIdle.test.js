@@ -142,11 +142,21 @@ describe('creatureIdle — gates (noche, reduced-motion, tier)', () => {
 });
 
 describe('creatureIdle — genérica por especie (misma máquina, otro animal)', () => {
-  it('los cuatro perfiles de la casa existen y declaran su medio', () => {
-    for (const slug of ['abeja-angelita', 'colibri', 'oso-andino', 'rana-dorada']) {
+  it('los perfiles de la casa existen y declaran su medio', () => {
+    for (const slug of ['abeja-angelita', 'colibri', 'luciernaga', 'guacamaya', 'chivito', 'oso-andino', 'rana-dorada']) {
       expect(IDLE_PERFILES[slug]).toBeDefined();
       expect(['aire', 'suelo']).toContain(IDLE_PERFILES[slug].medio);
       expect(IDLE_PERFILES[slug].poseBase).toBeTruthy();
+    }
+  });
+
+  it('los siete compai canónicos tienen perfil propio y no caen a la abeja', () => {
+    const roster = ['abeja-angelita', 'jaguar', 'oso-baston', 'zariguya', 'luciernaga', 'chivito-punk', 'guacamaya'];
+    for (const slug of roster) {
+      expect(IDLE_PERFILES[slug], `falta perfil idle de ${slug}`).toBeDefined();
+      if (slug !== 'abeja-angelita') {
+        expect(IDLE_PERFILES[slug]).not.toBe(IDLE_PERFILES['abeja-angelita']);
+      }
     }
   });
 

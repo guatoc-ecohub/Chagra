@@ -1,3 +1,11 @@
+/* eslint-disable chagra-i18n/no-hardcoded-spanish --
+ * Las etiquetas legibles de INTENT_META (label: 'Observación', 'Planta'…) y los
+ * textos de dominio del registro por voz (#23) que produce este extractor —
+ * fenología/síntomas/labores canónicos — NO son UI de pantalla: son valores del
+ * modelo que el confirm muestra editables y que se escriben en las notas FarmOS.
+ * Su migración a src/config/messages.js (ADR-050 i18n) es transversal y fuera del
+ * alcance de #23 — mismo criterio que sus hermanos del flujo (voiceRecordPayload.js,
+ * RegistroVozConfirm.jsx). Los errores reales de ESLint siguen activos. */
 /**
  * voiceFieldExtractor — Extractor DETERMINÍSTICO on-device (offline) del
  * registro por voz unificado (#23, "botón único de voz").
@@ -202,8 +210,13 @@ function numAfterKeyword(kw) {
   return new RegExp(`(?:${kw})\\s+(?:unos?\\s+|como\\s+|de\\s+)?(\\d+|${NUMBER_WORD_RE})`);
 }
 
-/** Extrae altura/ancho/cantidad y unidad regional desde el texto normalizado. */
-function extractMeasures(t) {
+/**
+ * Extrae altura/ancho/cantidad y unidad regional desde el texto normalizado.
+ * `species` (opcional) son las especies ya resueltas por el catálogo: habilita
+ * el conteo genérico "N + especie" ("20 tomate cherry", "50 lechugas") que la
+ * lista cerrada de sustantivos-conteo no cubría — sin red caía a qty=1.
+ */
+function extractMeasures(t, species = []) {
   const measures = {};
 
   // Altura: "dos metros de alto", "mide unos seis metros", "como dos metros de alto".
@@ -238,6 +251,27 @@ function extractMeasures(t) {
       if (n != null) { measures.cantidad = n; measures.unidad = 'unidades'; }
     }
   }
+  if (measures.cantidad == null && Array.isArray(species) && species.length) {
+    // Conteo genérico "N + especie del catálogo": "20 tomate cherry",
+    // "50 lechugas", "sembré 15 aguacates". Ancla en el token que YA resolvió
+    // el catálogo (species[].raw), tolerando "matas/maticas/palos de" en medio.
+    // Cierra el hueco offline donde la siembra caía a qty=1.
+    for (const sp of species) {
+      const raw = sp && sp.raw;
+      if (!raw) continue;
+      const esc = raw.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      const re = new RegExp(
+        `(\\d+|${NUMBER_WORD_RE})\\s+(?:de\\s+)?`
+        + `(?:matas?\\s+de\\s+|matic\\w+\\s+de\\s+|palos?\\s+de\\s+|plantas?\\s+de\\s+|arboles?\\s+de\\s+)?`
+        + `${esc}(?:es|s)?(?![a-z])`,
+      );
+      const m = t.match(re);
+      if (m) {
+        const n = parseNumberToken(m[1]);
+        if (n != null) { measures.cantidad = n; measures.unidad = 'unidades'; break; }
+      }
+    }
+  }
   return measures;
 }
 
@@ -250,6 +284,7 @@ const PHENOLOGY_RULES = [
   { re: /apenas\s+pegando|\bpegando\b|prendiendo|reci[eé]n\s+sembrad/, canon: 'establecimiento' },
   { re: /cuajad|pepas?\s+chiquit|frutos?\s+peque/, canon: 'cuajado' },
   { re: /cargad/, canon: 'fructificación (cargado)' },
+  { re: /produci(?:endo|r)?|producen|producci[oó]n|en\s+producci|dando\s+(?:fruto|cosecha)|ya\s+(?:esta|estan)\s+dando/, canon: 'producción (en cosecha)' },
 ];
 
 /** Devuelve todas las fenologías detectadas (campesino → canónico). */
@@ -260,6 +295,18 @@ function extractPhenology(t) {
     if (m) out.push({ raw: m[0], canon });
   }
   return out;
+}
+
+// Variedades/cultivares campesinos frecuentes. Se capturan como MODIFICADOR
+// aparte (no reemplazan la especie): aunque "tomate cherry" ya resuelva al slug
+// cherry, guardamos "cherry" para que el confirm/las notas no la pierdan cuando
+// la especie cae al genérico (ej. "papa criolla" → phureja).
+const VARIETY_RE = /\b(cherry|cereza|chonto|milano|larga\s+vida|criolla|pastusa|sabanera|capiro|castilla)\b/;
+
+/** Variedad/cultivar nombrado (best-effort, texto corto). Null si no hay. */
+function extractVariety(t) {
+  const m = t.match(VARIETY_RE);
+  return m ? m[1].replace(/\s+/g, ' ').trim() : null;
 }
 
 const SYMPTOM_RULES = [
@@ -330,7 +377,7 @@ function extractPosition(t) {
   // copia sin puntuación para no cortar la zona en la coma.
   const tp = t.replace(/[,.;]/g, ' ').replace(/\s+/g, ' ');
   const zona = tp.match(
-    /(?:en\s+(?:el\s+|la\s+)?|del\s+|cerca\s+del\s+|al\s+lado\s+del\s+|\bel\s+|\bla\s+|\buna\s+)((?:era|lote|huerta|cama|filo|nacedero|parcela|invernadero|balcon|patio)\b[\w\s]{0,18}?)(?=\s+(?:hace|que|y|porque|pero|tiene|esta|con|ya)\b|$)/,
+    /(?:en\s+(?:el\s+|la\s+|este\s+|esta\s+|ese\s+|esa\s+)?|del\s+|cerca\s+del\s+|al\s+lado\s+del\s+|\bel\s+|\bla\s+|\beste\s+|\besta\s+|\buna\s+)((?:era|lote|surco|huerta|cama|filo|nacedero|parcela|invernadero|balcon|patio)\b[\w\s]{0,18}?)(?=\s+(?:hace|que|y|porque|pero|tiene|esta|con|ya)\b|$)/,
   );
   return {
     raw: zona ? zona[1].trim() : (locative ? locative[0] : ''),
@@ -338,15 +385,42 @@ function extractPosition(t) {
   };
 }
 
+// Días por unidad temporal. Aproximación determinística DOCUMENTADA (mes≈30 d,
+// año≈365 d): no es calendario exacto, es el desfase que el confirm muestra y
+// el usuario ajusta — suficiente para "sembrado hace ~3 meses".
+const UNIT_DAYS = { dia: 1, semana: 7, mes: 30, ano: 365 };
+function unitDays(u) {
+  const s = normalize(u);
+  if (s.startsWith('semana')) return UNIT_DAYS.semana;
+  if (s.startsWith('mes')) return UNIT_DAYS.mes;
+  if (s.startsWith('ano') || s.startsWith('anio')) return UNIT_DAYS.ano;
+  return UNIT_DAYS.dia; // dia/dias
+}
+
 const TIME_RULES = [
-  { re: /hace\s+(\d+|[a-z]+)\s+d[ií]as?/, fn: (m) => -(parseNumberToken(m[1]) ?? 0), raw: (m) => m[0] },
+  // "hace N días/semanas/meses/años" (unidad explícita; N en dígito o palabra).
+  {
+    re: /hace\s+(\d+|[a-z]+)\s+(d[ií]as?|semanas?|meses?|a[ñn]os?)/,
+    fn: (m) => -((parseNumberToken(m[1]) ?? 1) * unitDays(m[2])),
+    raw: (m) => m[0],
+  },
+  // "el mes/la semana/el año pasado" (N=1 implícito).
+  { re: /(?:el\s+)?mes\s+pasad[oa]/, fn: () => -UNIT_DAYS.mes, raw: () => 'el mes pasado' },
+  { re: /(?:la\s+)?semana\s+pasad[oa]/, fn: () => -UNIT_DAYS.semana, raw: () => 'la semana pasada' },
+  { re: /(?:el\s+)?a[ñn]o\s+pasad[oa]/, fn: () => -UNIT_DAYS.ano, raw: () => 'el año pasado' },
   { re: /anteayer|antier/, fn: () => -2, raw: () => 'anteayer' },
   { re: /\bayer\b/, fn: () => -1, raw: () => 'ayer' },
   { re: /esta\s+ma[ñn]ana|en\s+la\s+ma[ñn]ana|esta\s+tarde|\bhoy\b|acabo\s+de|ahorita|ahora|reci[eé]n/, fn: () => 0, raw: (m) => m[0] },
 ];
 
-/** Tiempo relativo → { raw, offsetDays }. Default hoy (0). */
-function extractTime(t) {
+/**
+ * Tiempo relativo → { raw, offsetDays }. Default hoy (0). EXPORTADA para que el
+ * router funda el `tiempo` que deduzca el LLM (ej. "hace 3 meses") con la MISMA
+ * aritmética que el on-device. Normaliza internamente (idempotente).
+ */
+export function parseRelativeTime(text) {
+  const t = normalize(String(text ?? ''));
+  if (!t) return { raw: '', offsetDays: 0 };
   for (const { re, fn, raw } of TIME_RULES) {
     const m = t.match(re);
     if (m) return { raw: raw(m), offsetDays: fn(m) };
@@ -423,19 +497,20 @@ export function classifyAndExtractLocal(text, opts = {}) {
       intent: INTENTS.OBSERVACION, secondary: null, confidence: 0, source: 'ondevice',
       transcription, species: [], measures: {}, phenology: [], symptoms: [],
       pest: null, labors: [], input: null, position: { raw: '', locative: false },
-      time: { raw: '', offsetDays: 0 }, timestampMs: now,
+      time: { raw: '', offsetDays: 0 }, variedad: null, timestampMs: now,
     };
   }
 
   const species = scanSpecies(t);
-  const measures = extractMeasures(t);
+  const measures = extractMeasures(t, species);
   const phenology = extractPhenology(t);
   const symptoms = extractSymptoms(t);
   const pest = extractPest(t);
   const labors = extractLabors(t);
   const input = extractInput(t);
   const position = extractPosition(t);
-  const time = extractTime(t);
+  const variedad = extractVariety(t);
+  const time = parseRelativeTime(t);
 
   const { intent, secondary } = classifyIntent(t, { species, symptoms, measures, pest });
 
@@ -464,6 +539,7 @@ export function classifyAndExtractLocal(text, opts = {}) {
     pest,
     labors,
     input,
+    variedad,
     position,
     needsGps: georef,
     time,

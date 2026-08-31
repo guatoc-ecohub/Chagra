@@ -13,6 +13,7 @@ import { retrieve } from '../ragRetriever';
 import {
   resolveSpecies,
   resolveSpeciesBatch,
+  findCropInText,
   __resetSpeciesResolverCache,
 } from '../speciesResolver';
 
@@ -22,16 +23,19 @@ const SPECIES_FIXTURE = [
     name_es: 'Tomate Cherry',
     name_la: 'Solanum lycopersicum var. cerasiforme',
     nombres_comunes: ['tomatico', 'cherry'],
+    roles_in_guild: ['crop'],
   },
   {
     slug: 'fragaria_ananassa_monterrey',
     name_es: 'Fresa Monterrey',
     name_la: 'Fragaria × ananassa cv. Monterrey',
+    roles_in_guild: ['crop'],
   },
   {
     slug: 'annona_muricata',
     name_es: 'Guanábana',
     name_la: 'Annona muricata',
+    cultivable: true,
   },
 ];
 
@@ -139,5 +143,21 @@ describe('resolveSpeciesBatch', () => {
   it('no-array → {resolved:[], skipped:[]}', async () => {
     const r = await resolveSpeciesBatch(null);
     expect(r).toEqual({ resolved: [], skipped: [] });
+  });
+});
+
+describe('findCropInText', () => {
+  it('encuentra una mención del catálogo y prioriza el nombre más específico', async () => {
+    const r = await findCropInText('Estoy revisando la fresa monterrey de la cama norte');
+    expect(r?.slug).toBe('fragaria_ananassa_monterrey');
+    expect(r?.match).toBe('exact');
+  });
+
+  it('no convierte una especie sin rol de cultivo en insight', async () => {
+    vi.mocked(getAllSpecies).mockResolvedValue([
+      { id: 'oso', nombre_comun: 'Oso', roles_in_guild: ['wildlife'] },
+    ]);
+    __resetSpeciesResolverCache();
+    await expect(findCropInText('vi un oso')).resolves.toBeNull();
   });
 });

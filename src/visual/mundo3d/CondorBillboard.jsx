@@ -430,7 +430,10 @@ export default function CondorBillboard({
           <circleGeometry args={[1, 20]} />
           <meshBasicMaterial
             ref={matSombra}
-            color="#101613"
+            /* sombra de contacto CÁLIDA (ley de la casa: ATMOSFERA.sombra /
+               valle rgb(8,6,4)) — bajo el sol andino ni la sombra es azul.
+               Antes era #101613 (negro verdoso frío), el único blob frío del 3D. */
+            color="#1c140b"
             transparent
             opacity={0.2}
             depthWrite={false}

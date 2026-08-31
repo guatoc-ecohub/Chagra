@@ -37,6 +37,7 @@ const LoginScreen = lazy(() => import('../components/LoginScreen.jsx'));
 // El asistente existia, con idle-cerebro, ritmo propio, mirada y lip-sync — y en
 // produccion no aparecia en ninguna de las 48 pantallas.
 const AgentFab = lazy(() => import('../components/AgentFab.jsx'));
+const EscuchaOverlay = lazy(() => import('../components/escucha/EscuchaOverlay.jsx'));
 const OAuthCallback = lazy(() => import('../components/OAuthCallback.jsx'));
 
 // ── Mapa de lazy components (generado del manifiesto) ─────────────
@@ -54,10 +55,6 @@ const LAZY_MAP = {
   VentanaValle3D: lazy(() => import('../components/VentanaValle3D.jsx')),
   VistaGlobalSierra: lazy(() => import('../visual/mundo3d/VistaGlobalSierra.jsx')),
   GaleriaSierraArboles: lazy(() => import('../visual/mundo3d/sierra/GaleriaSierraArboles.jsx')),
-  NavegadorGrafoDemo: lazy(() => import('../mockups/NavegadorGrafoDemo.jsx')),
-  RestauracionEnElTiempo: lazy(() => import('../visual/mundo3d/restauracion/RestauracionEnElTiempo.jsx')),
-  DemoAtmosferaViva: lazy(() => import('../visual/mundo3d/atmosfera/DemoAtmosferaViva.jsx')),
-  TransicionesOdysseyDemo: lazy(() => import('../mockups/TransicionesOdysseyDemo.jsx')),
   SierraMonte3D: lazy(() => import('../visual/mundo3d/sierra/SierraMonte3D.jsx')),
   SierraCorteVertical: lazy(() => import('../visual/mundo3d/sierra/SierraCorteVertical.jsx')),
   // Mundos de cultivo por piso térmico (café templado, cacao cálido, papa fría):
@@ -71,10 +68,13 @@ const LAZY_MAP = {
   MundoEntBosque: lazy(() => import('../visual/mundo3d/bosque/MundoEntBosque.jsx')),
   MontanaMundosCampesino: lazy(() => import('../mockups/MontanaMundosCampesino.jsx')),
   VitrinaMaestraMundos: lazy(() => import('../mockups/VitrinaMaestraMundos.jsx')),
+  // La casa por dentro: la puerta de la casa en el valle 3D metía a
+  // `casa_adentro`, que no estaba en el manifiesto ni aquí → rebotaba al valle
+  // (auditoría de clic Valle3D 2026-08-23 #1). Registrado en NUCLEO_3D.
+  MundoCasaAdentro: lazy(() => import('../visual/mundo3d/casa/MundoCasaAdentro.jsx')),
   MundoScreen: lazy(() => import('../components/MundoScreen.jsx')),
   MundoAbejas3D: lazy(() => import('../mockups/MundoAbejas3D.jsx')),
   MundoGallinero3D: lazy(() => import('../mockups/MundoGallinero3D.jsx')),
-  MundoParamo3D: lazy(() => import('../mockups/MundoParamo3D.jsx')),
   MundoBoticaCana3D: lazy(() => import('../mockups/MundoBoticaCana3D.jsx')),
   MundoFrutales3D: lazy(() => import('../mockups/MundoFrutales3D.jsx')),
   MundoLeguminosas3D: lazy(() => import('../mockups/MundoLeguminosas3D.jsx')),
@@ -104,7 +104,7 @@ const LAZY_MAP = {
   AgentScreen: lazy(() => import('../components/AgentScreen/AgentScreen.jsx')),
   ProfileScreen: lazy(() => import('../components/ProfileScreen.jsx')),
   EspirituProScreen: lazy(() => import('../components/EspirituProScreen.jsx')),
-  OnboardingProfile: lazy(() => import('../components/OnboardingProfile.jsx')),
+  OnboardingCondensado: lazy(() => import('../components/OnboardingCondensado.jsx')),
   HoyEnFincaScreen: lazy(() => import('../components/hoy/HoyEnFincaScreen.jsx')),
   MiFincaEvolucionScreen: lazy(() => import('../components/hoy/MiFincaEvolucionScreen.jsx')),
   DirectorioEspeciesScreen: lazy(() => import('../components/DirectorioEspecies/DirectorioEspeciesScreen.jsx')),
@@ -181,9 +181,10 @@ const LAZY_MAP = {
   AprenderConAgente: lazy(() => import('../components/Aprende/AprenderConAgente.jsx')),
   CursoChagra: lazy(() => import('../components/curso/CursoChagra.jsx')),
   DashboardLive: lazy(() => import('../components/dashboard/DashboardLive.jsx')),
+  // Reactivada (fix 2026-07-25, sacada de EXCLUIDO — ver rutasProdChagraApp.js).
+  EntradaCampesina: lazy(() => import('../mockups/EntradaCampesina.jsx')),
 
   // ── PENDIENTE_DECISION (operador dijo "nada afuera") ────────────
-  OnboardingCondensado: lazy(() => import('../components/OnboardingCondensado.jsx')),
   OnboardingSiembra: lazy(() => import('../mockups/OnboardingSiembra.jsx')),
   // La sala de juegos: el hub que hace VISIBLES los juegos (#juegos) desde
   // Aprender. Los dos de abajo estaban en el manifiesto SIN entrada aquí →
@@ -278,6 +279,10 @@ const VISTAS_SIN_SALIDA = new Set([
   'diorama_lecheria',
   'diorama_vergel_frutal',
   'subsuelo', 'mundo3d_micorrizas',
+  // La casa por dentro monta con onSalir=undefined (el shell pasa onBack, que
+  // MundoCasaAdentro no consume) → sin su botón "← El valle" propio. Sin esta
+  // entrada quedaría como trampa: el 🏠 del shell es su única salida al valle.
+  'casa_adentro', 'mundo_casa_adentro', 'casa-adentro',
   'camara_director', 'artesania_andina', 'efectos_funcionales',
   'catalogo_infra', 'colocar_infra', 'gemelos_2d',
   'aliados_finca', 'momento_venta',
@@ -464,10 +469,18 @@ export default function ProdChagraApp() {
   // Las rutas 3D son públicas; lo que pide sesión es la finca del campesino.
   if (!auth && !RUTAS.has(currentView) && currentView !== 'valle3d'
       && currentView !== 'login' && currentView !== 'oauth-callback') {
-    return <Suspense fallback={<ChagraGrowLoader />}><LoginScreen onLoginSuccess={handleLoginSuccess} onSave={() => {}} /></Suspense>;
+    return (
+      <Suspense fallback={<ChagraGrowLoader />}>
+        <LoginScreen onLoginSuccess={handleLoginSuccess} onSave={() => {}} />
+      </Suspense>
+    );
   }
   if (currentView === 'login') {
-    return <Suspense fallback={<ChagraGrowLoader />}><LoginScreen onLoginSuccess={handleLoginSuccess} onSave={() => {}} /></Suspense>;
+    return (
+      <Suspense fallback={<ChagraGrowLoader />}>
+        <LoginScreen onLoginSuccess={handleLoginSuccess} onSave={() => {}} />
+      </Suspense>
+    );
   }
   if (currentView === 'oauth-callback') {
     return <Suspense fallback={<ChagraGrowLoader />}><OAuthCallback onSuccess={() => navigate('valle3d')} onError={() => navigate('login')} /></Suspense>;
@@ -573,14 +586,12 @@ export default function ProdChagraApp() {
           (una sola abeja — feedback del operador 2026-07-16: "se ven 3
           abejitas") y la barra "Pregúntele a su finca…" abre el agente. */}
       {!esHome
-        && currentView !== 'loading'
         && currentView !== 'agente'
         && currentView !== 'voz'
-        && !currentView.startsWith('mockup_')
-        && !currentView.startsWith('onboarding')
         && (
         <AgentFab onNavigate={navigate} pantalla={currentView} />
       )}
+      <EscuchaOverlay />
       <NetworkStatusBar />
     </Suspense>
   );

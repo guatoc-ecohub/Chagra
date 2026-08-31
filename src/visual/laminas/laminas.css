@@ -31,3 +31,59 @@
 @media (prefers-reduced-motion: reduce) {
   .lam-mata-brota { animation: none; }
 }
+
+/* ════════════════════════════════════════════════════════════════════════
+   AgentLamina — el ADJUNTO de lámina que el agente incrusta en el chat.
+   La lámina trae sus propios colores fijos (ilustración que enseña, tinta
+   sepia). El envoltorio solo pone el "papel de cuaderno" (crema) para que el
+   arte tenga contraste AA tanto en una burbuja oscura (chat) como sobre el
+   escritorio claro del mockup. Todo bajo el namespace `lam-agente-*`.
+   Responsive desde 320px; el auto-dibujado del trazo vive en effects.css.
+   ════════════════════════════════════════════════════════════════════════ */
+.lam-agente {
+  margin: 0;
+  width: 100%;
+}
+.lam-agente-tit {
+  margin: 0 0 6px;
+  font-family: 'Georgia', 'Times New Roman', serif;
+  font-style: italic;
+  font-weight: 700;
+  font-size: 0.95rem;
+  line-height: 1.2;
+  /* Rótulo sobre papel de cuaderno: sepia oscuro (AA sobre crema y legible
+     sobre burbuja oscura, donde el título va encima de un chip claro). */
+  color: #5c4326;
+}
+/* la hoja de papel donde nace la lámina (crema fijo → contraste con la tinta) */
+.lam-agente-hoja {
+  padding: 8px;
+  border-radius: 10px;
+  background: #f7efdd;
+  border: 1px solid rgba(92, 67, 38, 0.22);
+  overflow: hidden;
+  /* entrada suave del papel (el trazo interior lo dibuja effects.css). */
+  animation: lam-agente-entra 0.45s ease both;
+}
+.lam-agente-svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  user-select: none;
+}
+@keyframes lam-agente-entra {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Cuando el rótulo va sobre burbuja OSCURA, el título del papel-crema debe
+   pintarse claro para no perderse. El chat marca el contenedor con
+   data-chat-dark; el mockup (fondo claro) no. */
+[data-chat-dark] .lam-agente-tit {
+  color: #e7dab8;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  /* reduced-motion: la lámina aparece completa y quieta, sin entrada. */
+  .lam-agente-hoja { animation: none; }
+}

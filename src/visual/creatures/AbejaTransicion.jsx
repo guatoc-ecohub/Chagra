@@ -42,22 +42,26 @@
  *      mismo punto ~100 ms después: empalme de capas. La señal se auto-resetea
  *      al montar la siguiente escena (no hay que limpiarla a mano).
  */
-import { useEffect, useRef } from 'react';
+import { createElement, useEffect, useRef } from 'react';
 import { AbejaAngelita } from './AbejaAngelita.jsx';
+import {
+  CRUCE_ATRAPA_MS,
+  CRUCE_ENTRAR_MS,
+  CRUCE_VOLVER_MS,
+  CRUCE_SUELTA_MS,
+  configurarTransicion,
+} from './comportamientos/index.js';
 import './creatures.css';
+
+export {
+  CRUCE_ATRAPA_MS,
+  CRUCE_ENTRAR_MS,
+  CRUCE_VOLVER_MS,
+  CRUCE_SUELTA_MS,
+} from './comportamientos/transicion.js';
 
 /** Instante del ATRAPE (ms): la 2D se apaga y el mesh aparece. La coreografía
     del mesh (useEntradaAbeja) importa ESTA constante — una sola fuente. */
-export const CRUCE_ATRAPA_MS = 760;
-/** Vida total del overlay al entrar (deja terminar el puff del atrape). */
-export const CRUCE_ENTRAR_MS = 980;
-/** Vida del reverso al volver (corto: la vuelta no debe sentirse lenta). */
-export const CRUCE_VOLVER_MS = 620;
-/** Instante de la SUELTA al volver (ms desde `avisarSalidaAbeja()`): el mesh
-    vuela hacia el punto de suelta y se APAGA aquí, cuando el overlay 'volver'
-    (que el host monta en el mismo instante) ya brotó (~100 ms). El pequeño
-    solape es a propósito: cubre el relevo de capas sin hueco. */
-export const CRUCE_SUELTA_MS = 180;
 /* La SEÑAL de salida (avisarSalidaAbeja / useSalidaAbeja) vive en
    `senalSalidaAbeja.js` — módulo propio para que este archivo de componentes
    quede fast-refresh-limpio. */
@@ -79,6 +83,7 @@ export function AlMontarEscena({ onMonta }) {
 
 export default function AbejaTransicion({
   sentido = 'entrar', // 'entrar' (2D se clava al mundo) | 'volver' (brota del mundo)
+  Cuerpo = AbejaAngelita,
   animo = 'sereno',
   energia = 1,
   tier = 'alto',
@@ -92,7 +97,7 @@ export default function AbejaTransicion({
 
   useEffect(() => {
     let hecho = false;
-    const dura = sentido === 'entrar' ? CRUCE_ENTRAR_MS : CRUCE_VOLVER_MS;
+    const transicion = configurarTransicion(sentido, { reducedMotion });
     const t = setTimeout(
       () => {
         if (!hecho) {
@@ -100,7 +105,7 @@ export default function AbejaTransicion({
           finRef.current?.();
         }
       },
-      reducedMotion ? 0 : dura,
+      transicion.duracion,
     );
     return () => {
       hecho = true;
@@ -115,7 +120,7 @@ export default function AbejaTransicion({
       <div className="abeja-cruce__pos">
         <div className="abeja-cruce__vuelo">
           <div className="abeja-cruce__giro">
-            <AbejaAngelita size={76} animo={animo} energia={energia} animated tier={tier} />
+            {createElement(Cuerpo, { size: 76, animo, energia, animated: true, tier })}
           </div>
         </div>
         {sentido === 'entrar' && <span className="abeja-cruce__puff" />}

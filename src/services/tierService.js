@@ -29,6 +29,7 @@
  */
 
 import { getActiveTenantId } from './tenantContext.js';
+import { ROLE_IDS } from '../config/roleCatalog.js';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // ALLOWLIST — editar SOLO este Set para activar/desactivar Pro a un usuario.
@@ -60,6 +61,47 @@ export const PRO_USERNAMES = new Set([
                          // Match es case-insensitive (resolveTier lowercasea). Si su
                          // login exacto en farmOS difiere (ej. 'ana.maria'), ajustar aquí.
 ]);
+
+/**
+ * Tiers de licencia para federacion de usuarios.
+ *
+ * maxSubUsers cuenta a la gente activa de la finca. El asesor no consume cupo
+ * porque depende de delegacion externa.
+ */
+export const TIERS = Object.freeze({
+  free: Object.freeze({
+    maxSubUsers: 1,
+    roles: Object.freeze(['dueno']),
+    canDelegate: false,
+  }),
+  familiar: Object.freeze({
+    maxSubUsers: 4,
+    roles: Object.freeze(['dueno', 'esposa', 'trabajador', 'nina']),
+    canDelegate: false,
+  }),
+  cuadrilla: Object.freeze({
+    maxSubUsers: 12,
+    roles: Object.freeze(['dueno', 'esposa', 'trabajador', 'nina']),
+    canDelegate: true,
+  }),
+  cooperativa: Object.freeze({
+    maxSubUsers: 50,
+    roles: Object.freeze(['dueno', 'esposa', 'trabajador', 'nina', 'asesor']),
+    canDelegate: true,
+  }),
+});
+
+function normalizeTierId(tier) {
+  if (typeof tier !== 'string') return null;
+  const normalized = tier.trim().toLowerCase();
+  return TIERS[normalized] ? normalized : null;
+}
+
+function normalizeRoleId(roleId) {
+  if (typeof roleId !== 'string') return null;
+  const normalized = roleId.trim().toLowerCase();
+  return ROLE_IDS.includes(normalized) ? normalized : null;
+}
 
 // ─────────────────────────────────────────────────────────────────────────────
 // API pública
@@ -114,4 +156,40 @@ export function buildSidecarHeaders(token) {
     headers['X-Chagra-Token'] = token;
   }
   return headers;
+}
+
+/**
+ * @param {{ tier?: string, usuarios?: Array<{ status?: string }> }} roster
+ * @returns {boolean}
+ */
+export function canAddSubUser(roster) {
+  if (!roster || typeof roster !== 'object') return false;
+  const tierId = normalizeTierId(roster.tier);
+  const tier = tierId ? TIERS[tierId] : null;
+  if (!tier) return false;
+  const usuarios = Array.isArray(roster.usuarios) ? roster.usuarios : [];
+  const activeUsers = usuarios.filter((user) => !user || user.status !== 'revoked').length;
+  return activeUsers < tier.maxSubUsers;
+}
+
+/**
+ * @param {string} tier
+ * @param {string} roleId
+ * @returns {boolean}
+ */
+export function tierAllowsRole(tier, roleId) {
+  const tierId = normalizeTierId(tier);
+  const normalizedRole = normalizeRoleId(roleId);
+  if (!tierId || !normalizedRole) return false;
+  return TIERS[tierId].roles.includes(normalizedRole);
+}
+
+/**
+ * @param {string} tier
+ * @returns {boolean}
+ */
+export function tierAllowsDelegation(tier) {
+  const tierId = normalizeTierId(tier);
+  if (!tierId) return false;
+  return TIERS[tierId].canDelegate === true;
 }

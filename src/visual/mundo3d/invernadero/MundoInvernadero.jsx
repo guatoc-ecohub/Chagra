@@ -34,7 +34,7 @@ const PASOS = [
     id: 'microclima',
     kicker: 'Paso 1 de 5 · Un clima que usted fabrica',
     texto:
-      'Este techo de plástico no es lujo: es CLIMA hecho a mano. Adentro no golpea el aguacero, no quema la helada de madrugada y el calorcito se queda. Mire el plástico por dentro, perlado de gotas: es el agua que la tierra y las matas sudan y el techo atrapa — el microclima trabajando a la vista.',
+      'Este techo de plástico no es lujo: es CLIMA hecho a mano. Adentro no golpea el aguacero, no quema la helada de madrugada y el calorcito se queda. Mire el plástico por dentro, perlado de gotas: es el agua que la tierra y las matas sudan y el techo atrapa. El microclima está trabajando a la vista.',
     foco: enSuelo(SITIO_PUERTA),
   },
   {
@@ -55,14 +55,14 @@ const PASOS = [
     id: 'tomate',
     kicker: 'Paso 4 de 5 · El tomate bajo techo',
     texto:
-      'El tomate se enferma con la hoja mojada: bajo el plástico la lluvia no lo toca y los hongos pierden. Cada mata va amarrada a su TUTOR de guadua, y el racimo madura de abajo hacia arriba — verde, pintón, rojo.',
+      'El tomate se enferma con la hoja mojada: bajo el plástico la lluvia no lo toca y los hongos pierden. Cada mata va amarrada a su TUTOR de guadua, y el racimo madura de abajo hacia arriba: verde, pintón, rojo.',
     foco: [SITIO_TOMATE[0], 0.4, SITIO_TOMATE[1]],
   },
   {
     id: 'goteo',
     kicker: 'Paso 5 de 5 · El agua, contada por gotas',
     texto:
-      'Bajo techo no llueve: el agua la pone usted. De la caneca salen las líneas de GOTEO tendidas sobre las camas — entregan el agua al pie de la mata, gota a gota, sin mojar la hoja y sin desperdiciar un balde.',
+      'Bajo techo no llueve: el agua la pone usted. De la caneca salen las líneas de GOTEO tendidas sobre las camas. Entregan el agua al pie de la mata, gota a gota, sin mojar la hoja y sin desperdiciar un balde.',
     foco: enSuelo(SITIO_CANECA),
   },
 ];
@@ -91,9 +91,16 @@ const TEMA_PANEL = {
 /**
  * El micro-mundo del invernadero, completo: escena + pasos didácticos.
  * Montar SOLO perezoso (lazy); llena a su contenedor.
- * @param {{tier?: 'alto'|'medio'|'bajo', reducedMotion?: boolean}} props
+ * @param {{tier?: 'alto'|'medio'|'bajo', reducedMotion?: boolean, foco?: number[]|null, especie?: string, cantidad?: number, layout?: string|object}} props
  */
-export default function MundoInvernadero({ tier: tierProp, reducedMotion: rmProp } = {}) {
+export default function MundoInvernadero({
+  tier: tierProp,
+  reducedMotion: rmProp,
+  foco: focoProp,
+  especie = 'tomate',
+  cantidad = 1500,
+  layout = 'surcos',
+} = {}) {
   // Contrato de mundos: props del host si llegan; si se monta suelto,
   // auto-detección del equipo (no matar la gama baja).
   const auto = useMemo(() => decidirTier(), []);
@@ -106,7 +113,14 @@ export default function MundoInvernadero({ tier: tierProp, reducedMotion: rmProp
   return (
     <div className="minvernadero">
       <style>{CSS}</style>
-      <EscenaInvernaderoVivo tier={tier} reducedMotion={reducedMotion} foco={actual.foco} />
+      <EscenaInvernaderoVivo
+        tier={tier}
+        reducedMotion={reducedMotion}
+        foco={focoProp ?? actual.foco}
+        especie={especie}
+        cantidad={cantidad}
+        layout={layout}
+      />
 
       <PanelPasos
         etiqueta="La lección del invernadero"

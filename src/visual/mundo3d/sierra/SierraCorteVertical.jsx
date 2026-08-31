@@ -55,7 +55,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import * as THREE from 'three';
 import { Canvas, useFrame } from '@react-three/fiber';
-import { Html } from '@react-three/drei';
 import { ATMOSFERA } from '../atmosferaMadre.js';
 import { perfilDeTier } from '../deviceTier.js';
 import { PISOS_TERMICOS, CUMBRE_SIERRA_M } from '../pisosTermicos.js';

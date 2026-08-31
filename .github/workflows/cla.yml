@@ -75,7 +75,7 @@ jobs:
 
           # Leer signatures/cla.json del branch cla-signatures via API.
           # Si el branch o el archivo no existe, no hay firmas todavia.
-          CLA_DATA='{"contributors":[]}'
+          CLA_DATA='{"signedContributors":[]}'
           SIGNATURES_API="/repos/$REPO/contents/signatures/cla.json?ref=cla-signatures"
           API_ERR=$(mktemp)
           if gh api "$SIGNATURES_API" > /tmp/cla-signatures.json 2>"$API_ERR"; then
@@ -103,7 +103,7 @@ jobs:
               echo "✅ $author en allowlist"
               continue
             fi
-            SIGNED=$(echo "$CLA_DATA" | jq --arg login "$author" '[(.contributors // [])[] | select(.login == $login)] | length')
+            SIGNED=$(echo "$CLA_DATA" | jq --arg login "$author" '[(.signedContributors // [])[] | select(.login == $login)] | length')
             if [ "$SIGNED" -gt 0 ]; then
               echo "✅ $author firmó CLA"
               continue

@@ -1,0 +1,59 @@
+/*
+ * etiquetasMundo.css — estilo POR DEFECTO de `<EtiquetasMundo>` (kit 3D
+ * compartido). Un consumidor con su propia línea gráfica pasa su
+ * `className` propio (ver `EstanteLaminas`/etc. en MundoSanidad3D.jsx, que
+ * reusan su chip `.clivo-chip` ya existente) — estas reglas solo entran
+ * cuando no se pasa nada.
+ *
+ * Mismo contrato de modos que `rotulosValle3D.css` (valle 3D de producción):
+ *   data-modo='pleno'  → chip con texto, tamaño normal;
+ *   data-modo='punto'  → círculo mínimo (44px, piso táctil WCAG 2.5.5), sin
+ *                        texto — el consumidor decide si el punto lleva un
+ *                        marcador propio (emoji/color) vía su propio CSS;
+ *   data-modo='oculto' → invisible y fuera de toque (anti-colisión: cedió su
+ *                        espacio en pantalla, o quedó tras la cámara).
+ */
+.mundo-etiqueta {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35em;
+  padding: 0.3em 0.65em;
+  border-radius: 999px;
+  background: rgba(20, 26, 16, 0.86);
+  color: #fdf6e3;
+  font: 600 0.82rem/1.3 system-ui, -apple-system, sans-serif;
+  white-space: nowrap;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.28);
+  transition: opacity 0.18s ease;
+}
+.mundo-etiqueta b {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.35em;
+  height: 1.35em;
+  border-radius: 50%;
+  background: #8bab4a;
+  color: #24300f;
+  font-size: 0.72em;
+}
+.mundo-etiqueta[data-modo='punto'] {
+  width: 12px;
+  height: 12px;
+  min-width: 0;
+  padding: 0;
+  border-radius: 50%;
+}
+.mundo-etiqueta[data-modo='punto'] > *,
+.mundo-etiqueta[data-modo='oculto'] > * {
+  display: none;
+}
+.mundo-etiqueta[data-modo='oculto'] {
+  opacity: 0;
+  pointer-events: none;
+}
+@media (prefers-reduced-motion: reduce) {
+  .mundo-etiqueta {
+    transition: none;
+  }
+}

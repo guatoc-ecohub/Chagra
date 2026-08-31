@@ -28,6 +28,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import Valle3D from '../../../mockups/valle/Valle3D.jsx';
 import { FaunaAmbiental } from '../../creatures/FaunaAmbiental.jsx';
 import useAvatarCreature from '../../../hooks/useAvatarCreature.js';
+import useCompaiHold from '../../../hooks/useCompaiHold.js';
 
 /* EL VALLE VIVO: los personajes asoman A LO LEJOS (banda del horizonte y
    bordes), hacen su giño y se van — nunca más de lo que el tier aguanta.
@@ -102,6 +103,7 @@ export default function EscenaValle({
      gatean adentro (tier bajo o calma = cámara fija). Un solo prop la apaga. */
   camaraDirector = true,
 }) {
+  const compaiHoldHandlers = useCompaiHold();
   const climaReal = params?.clima || entrada?.clima || 'soleado';
   /* Buzón de beats para el director: el coro ambiental (FaunaAmbiental) marca
      sus slots con `data-fase='gesto'` al hacer su giño; un MutationObserver
@@ -184,6 +186,7 @@ export default function EscenaValle({
       ref={raizRef}
       className={`cielotoque${toque ? ` cielotoque--${toque}` : ''}${reducedMotion ? ' cielotoque--rm' : ''}`}
       data-clima-real={climaReal}
+      {...compaiHoldHandlers}
     >
       <style>{CSS_CIELO}</style>
       <Valle3D

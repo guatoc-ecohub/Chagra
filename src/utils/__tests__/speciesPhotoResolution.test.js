@@ -208,6 +208,10 @@ describe('cobertura amplia: foto correcta por especie común', () => {
       if (spec.forbidGenus) {
         expect(r.id.startsWith(`${spec.forbidGenus}_`)).toBe(false);
       }
+      // Una especie opcional puede estar en el subset, pero sin foto todavía.
+      // En ese caso aceptamos el vacío sin relajar el control de género.
+      if (spec.optional && !hasImageForBinomio(r.nombre_cientifico)) return;
+
       // La especie resuelta debe tener imagen (exacta o por cultivar).
       expect(
         hasImageForBinomio(r.nombre_cientifico),

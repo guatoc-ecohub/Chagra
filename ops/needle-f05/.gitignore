@@ -1,0 +1,26 @@
+# Model binaries (re-downloadable from HuggingFace, Apache-2.0)
+models/
+*.cact
+*.pkl
+*.whl
+
+# Official vendor runtime artifacts (Apache-2.0, re-downloadable from HF:
+# Cactus-Compute/needle2 -> vendor/{needle.wasm,needle.js,tokenizer.*,config.json,...}).
+# Minified emscripten JS + binary tokenizer; kept out of git like models/.
+vendor/
+
+# Downloaded native binary (14.8 MB, re-downloadable)
+linux-x86_64/
+
+# Python venv
+.venv-needle/
+
+# Cloned / extracted upstream sources (re-obtainable)
+run/needle-src/
+run/wheel-src/
+
+# Training outputs (adapters live here)
+run/ckpt/
+
+# Emscripten cache / tool index
+*.idx

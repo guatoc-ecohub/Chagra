@@ -10,6 +10,20 @@
  *
  * Si un ID no está aquí, el rótulo solo enfoca la cámara (comportamiento
  * original) y no navega — se considera "solo exploración 3D sin destino 2D".
+ *
+ * ⚠️ DIVERGENCIA DE NAMESPACE (auditoría de clic Valle3D 2026-08-23 #4) — SIN
+ * RESOLVER a propósito (cambio grande y riesgoso, marcado en vez de arreglado):
+ * los VALORES de este mapa son NOMBRES DE VISTA con guion_bajo (`cafetal_vivo`,
+ * `mundo_cultivos`, `sanidad_sintoma`, `clima_boletin`, `diorama_paramo`). Eso
+ * resuelve BIEN en prod (ProdChagraApp los usa como `path` del manifiesto), y el
+ * test `wire3DNav.rutas-navegables.test.js` lo blinda. PERO en el shell clásico
+ * App.jsx el router indexa TOKENS DE URL con guion (`HASH_VIEW_ROUTES`), y
+ * `navegarDesde3D` escribe estos valores directo al hash: si algún día
+ * EntradaValle3D se monta en App.jsx CON navegación real (hoy solo vive como
+ * vitrina `#/mockups/entrada-3d` SIN onNavigate), esos "Abrir <mundo>" caerían
+ * en el early-return de `handleHashRoute` y morirían. Antes de montar el valle
+ * R3F con navegación en App.jsx: unificar el namespace (que `wire3DNav` emita el
+ * token del router activo, o que ambos routers acepten guion↔guion_bajo).
  */
 
 /** @type {Record<string, string>} */
@@ -44,6 +58,14 @@ export const RUTA_2D_DESDE_3D = {
   // abre el mundo del páramo entero.
   paramo: 'diorama_paramo',
   bosque_vivo: 'bosque_vivo',
+  // El KIOSCO DEL SABER (portal APRENDER) del valle (valleData.js LUGARES):
+  // antes no tenía ruta NI escena → el panel caía siempre en "abre pronto",
+  // un dead-end permanente (auditoría de clic Valle3D 2026-08-23 #2). Lo lleva
+  // al portal Aprender (AprenderConAgente, ruta `aprende` — registrada en prod
+  // y con case en App.jsx), que reúne las lecciones del monte Y la puerta a la
+  // sala de juegos (SalaJuegosBanner). "Los juegos y saberes reunidos en un
+  // solo patio", como promete su lema.
+  aprender: 'aprende',
 
   // ── Sub-hotspots de cada escena 3D (mundoData.js hotspots con view:) ─
   subsuelo: 'subsuelo',

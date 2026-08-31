@@ -1,6 +1,6 @@
 /**
- * angelitaAvisoTipos — taxonomía de los avisos de Angelita: 8 tipos, cada uno
- * con color accesible + ícono. El COLOR NUNCA VA SOLO (WCAG 1.4.1 y guía del
+ * angelitaAvisoTipos — taxonomía de los avisos de Angelita: cada tipo con
+ * color accesible + ícono. El COLOR NUNCA VA SOLO (WCAG 1.4.1 y guía del
  * DR de notificaciones): cada tipo lleva también un ícono/forma, para que un
  * usuario daltónico distinga una alerta de una sugerencia sin depender del
  * tinte. El texto de la burbuja queda SIEMPRE casi-blanco sobre fondo oscuro
@@ -15,7 +15,7 @@
  * Módulo de datos puro: sin React, sin red, sin estado.
  */
 
-/** Los 8 tipos canónicos de aviso. */
+/** Los tipos canónicos de aviso. */
 export const TIPOS_AVISO = /** @type {const} */ ([
   'bienvenida',
   'informativa',
@@ -25,6 +25,10 @@ export const TIPOS_AVISO = /** @type {const} */ ([
   'celebracion',
   'planta',
   'nino',
+  // #109 "luto y fiesta": gris y sobrio a propósito — el opuesto visual de
+  // 'celebracion'. Nunca rojo/alerta (no es un error del usuario), nunca
+  // dorado/fiesta (no es un logro). Un tono de acompañamiento, punto.
+  'luto',
 ]);
 
 /**
@@ -110,6 +114,18 @@ export const AVISO_TIPOS = {
     etiqueta: 'Para niños',
     aria: 'Mensaje amable para niños',
   },
+  // #109: gris ceniza, sin urgencia ni fiesta — el compañero acompaña, no
+  // alarma. El icono es una hojita caída (nunca una calavera): tierno, no
+  // mórbido — coherente con "fracaso como currículo" (PlantCemeteryModal).
+  luto: {
+    acento: '#A8B0BD',
+    borde: 'rgba(168, 176, 189, 0.45)',
+    fondo: 'rgba(30, 32, 38, 0.9)',
+    fondoIcono: 'rgba(168, 176, 189, 0.16)',
+    icono: '🍂',
+    etiqueta: 'Acompañamiento',
+    aria: 'Angelita lo acompaña por una planta que se perdió',
+  },
 };
 
 /** Apariencia de un tipo, con fallback seguro a informativa. */
@@ -119,13 +135,14 @@ export function aparienciaDeTipo(tipo) {
 
 /**
  * Clasifica una decisión del motor (angelitaInteligencia.resolverComportamiento)
- * en uno de los 8 tipos de aviso. Determinista y puro.
+ * en uno de los tipos de aviso. Determinista y puro.
  *
- * Mapa: celebra → celebracion · aviso alta → alerta · aviso media → atencion ·
- * aviso baja → informativa · husmea en mis_matas → planta · husmea en mundos
- * de consejo (bosque/páramo/aprender/vender/animales) → sugerencia · primer
- * mensaje de la sesión (husmeo) → bienvenida · modo niño → nino (manda sobre
- * todo lo no urgente; una alerta real sigue siendo alerta).
+ * Mapa: luto → luto (manda sobre modo niño) · celebra → celebracion ·
+ * aviso alta → alerta · aviso media → atencion · aviso baja → informativa ·
+ * husmea en mis_matas → planta · husmea en mundos de consejo
+ * (bosque/páramo/aprender/vender/animales) → sugerencia · primer mensaje de
+ * la sesión (husmeo) → bienvenida · modo niño → nino (manda sobre todo lo no
+ * urgente salvo luto; una alerta real sigue siendo alerta).
  *
  * @param {{ estado?: string, severidad?: ('alta'|'media'|'baja'|null) }} decision
  * @param {{ mundo?: string|null, esNino?: boolean, esBienvenida?: boolean }} [ctx]
@@ -140,6 +157,10 @@ export function tipoDeDecision(decision, ctx = {}) {
     if (decision.severidad === 'media') return 'atencion';
     return 'informativa';
   }
+  // #109: el luto manda sobre "modo niño" — un tono dorado/estrella sobre
+  // una pérdida sería justo la gamificación tóxica que el diseño educativo
+  // de Chagra prohíbe (project_chagra_educational_dimension).
+  if (decision.estado === 'luto') return 'luto';
   if (esNino) return 'nino';
   if (decision.estado === 'celebra') return 'celebracion';
   // husmea

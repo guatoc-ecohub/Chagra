@@ -1,21 +1,25 @@
 /*
  * useEntradaAbeja + AbejaEscena — LA COREOGRAFÍA COMPARTIDA de Angelita.
  *
- * El DR de mundos-3D pide que "la abeja baja y entra" viva UNA sola vez y la
- * herede toda escena-mundo (§4.4). Aquí está: extraída del `CompaneroAbeja` del
- * valle (Valle3D), generalizada para cualquier arquetipo. La ESCENA solo le pasa
- * el `foco` (posición del hotspot activo o el centro del diorama); el hook mueve
- * a Angelita con `lerp` hacia él, la hace flotar según su energía, y la voltea a
- * mirar hacia donde viaja. El CUERPO siempre es `<AbejaAngelita>` (la creature
- * de la librería): la escena POSEE la coreografía, la creature POSEE el cuerpo.
+ * El DR de mundos-3D pide que la entrada viva UNA sola vez y la herede toda
+ * escena-mundo (§4.4). `useEntradaCompai` parametriza la coreografía con especie
+ * y presencia; `useEntradaAbeja` conserva el alias histórico. `AbejaEscena` es
+ * únicamente el adaptador de cuerpo de Angelita. El dispatcher `CompaiEscena`
+ * monta el adaptador propio del guía elegido.
  *
  * Vive dentro de escenas/ (chunk perezoso `vendor-three`): importa @react-three
  * y three, así que NUNCA se importa desde el barrel base del framework.
+ *
+ * El nombre se conserva a propósito: este hook sigue siendo la coreografía
+ * nativa y fallback de Angelita. El ruteo del guía elegido vive en
+ * `CompaiTransicion`/`compaiRegistry`, sin convertir este hook en un dispatcher.
  */
 /* eslint-disable react-refresh/only-export-components -- este módulo (hook de
    coreografía + su componente de escena) se importa SIEMPRE perezoso dentro de
    un <Canvas> vía EscenaBase3D; no es hot-reload-sensible. Van juntos a propósito:
    la creature posee el cuerpo, la escena posee la coreografía (contrato del DR). */
+/* eslint-disable react-hooks/immutability, react-hooks/refs -- R3F ejecuta el
+   movimiento y la visibilidad de este hook imperativamente dentro de useFrame. */
 import { useEffect, useMemo, useRef } from 'react';
 import { useFrame } from '@react-three/fiber';
 import { Html } from '@react-three/drei';
@@ -39,8 +43,8 @@ const VUELO_NEUTRO = { altura: 1, velocidad: 1, vagar: 1, tiembla: 0 };
 /* LA IDENTIDAD COMPARTIDA (abejaIdentidad.js): percha, tamaño de billboard y
    sombra salen de la MISMA fuente que pinta la Angelita 2D del home — una sola
    abeja, no dos. La escena posee la coreografía; la creature, cuerpo e identidad. */
-const PERCHA = ABEJA_PRESENCIA.percha;
-const SOMBRA = ABEJA_PRESENCIA.sombra;
+const PERCHA_ABEJA = ABEJA_PRESENCIA.percha;
+const SOMBRA_ABEJA = ABEJA_PRESENCIA.sombra;
 
 /* EL CRUCE 2D→3D (AbejaTransicion): el mesh nace OCULTO exactamente en el
    PUNTO DE ATRAPE — el píxel de pantalla donde la Angelita 2D del overlay se
@@ -81,7 +85,7 @@ function puntoDeCruce(camera, foco, out) {
 
 /**
  * Devuelve `{ ref, caraRef, sombraRef, visRef }` para colgar del `<group>` de
- * la abeja, de su cara (para el volteo), de su sombra de contacto (el blob que
+ * la abeja, de su cara (para la aparición mística), de su sombra de contacto (el blob que
  * la sigue por el piso — auditoría 3D: la abeja no debe volar "a la deriva") y
  * del billboard DOM (la visibilidad del cruce). Corre `useFrame` (debe usarse
  * DENTRO de un `<Canvas>`).
@@ -105,17 +109,29 @@ function puntoDeCruce(camera, foco, out) {
  * @param {string}  [opts.hora='dorada']  hora de cielosHoraData: de 'noche'
  *   Angelita se ACURRUCA (idle nocturno de creatureIdle).
  * @param {string}  [opts.tier='alto']  'bajo' → idle frugal (solo respiración).
+ * @param {string}  [opts.especie='abeja-angelita']  perfil idle del cuerpo.
+ * @param {{percha:{x:number,y:number,z:number},rondaAltura:number,sombra:{opacidadMin:number,opacidadBase:number,atenuaPorAltura:number,ensanchaPorAltura:number}}} [opts.presencia]
+ *   presencia espacial propia de la especie; Angelita es el fallback.
+ * @param {{ current: { fase: string, pos: THREE.Vector3 } }|null} [opts.viajeRef]
+ *   canal de solo-escritura hacia la CÁMARA (auditoría #50): cada frame el hook
+ *   publica aquí la fase del cruce ('oculta'|'picada'|'no'|'salida') y la
+ *   posición viva de la abeja, para que el director de cámara la ESCOLTE en la
+ *   picada y la despida en la salida — sin acoplar cámara y criatura por props.
  */
-export function useEntradaAbeja(foco, {
+export function useEntradaCompai(foco, {
   entrando = true, energia = 1, reducedMotion = false, piso = 0, vuelo = VUELO_NEUTRO,
-  cruce = false, saliendo = false, hora = 'dorada', tier = 'alto',
+  cruce = false, saliendo = false, hora = 'dorada', tier = 'alto', viajeRef = null,
+  especie = 'abeja-angelita', presencia = ABEJA_PRESENCIA,
 } = {}) {
   const ref = useRef(null);
   const caraRef = useRef(null);
   const sombraRef = useRef(null);
   const visRef = useRef(null);
+  const percha = presencia?.percha || PERCHA_ABEJA;
+  const sombra = presencia?.sombra || SOMBRA_ABEJA;
+  const rondaAltura = presencia?.rondaAltura ?? ABEJA_PRESENCIA.rondaAltura;
   // ── PERSONALIDAD IDLE (creatureIdle.js): la capa DOM que recibe el squash &
-  //    stretch/giros (idleRef, hermana del volteo para no pelear con su
+  //    stretch/gestos (idleRef, hermana de la aparición para no pelear con su
   //    transition CSS), el reloj de llegada (dispara la CELEBRACIÓN), y cachés
   //    imperativos (string del transform + pose discreta + nodo del svg) para
   //    escribir al DOM SOLO cuando algo cambió.
@@ -129,9 +145,20 @@ export function useEntradaAbeja(foco, {
   const fase = useRef(cruce && !reducedMotion ? 'oculta' : 'no');
   const salioEn = useRef(null); // reloj del inicio de la salida
   const prevX = useRef(foco.x);
+  const signoCara = useRef(0);
+  const apagoEn = useRef(null);
+  const ultimaOpCara = useRef('');
   // Visibilidad del billboard DOM + su sombra (el <Html> de drei es un portal:
   // no hereda `group.visible`, así que se apaga a mano por estilo).
+  // `aparecioRef` (BUG-COMPAI-ENTRADA, 2026-07-26): una vez que la abeja
+  // APARECIÓ, queda marcado — AbejaEscena lo lee en render para NO volver a
+  // estampar el `visibility:hidden` inicial. Sin esto, cualquier re-render de
+  // React posterior al atrape (p.ej. `hablando` al narrar el mundo) re-aplicaba
+  // el estilo inline y la abeja quedaba escondida PARA SIEMPRE: el cruce
+  // espectacular existía en el código y nadie lo veía en vivo.
+  const aparecioRef = useRef(false);
   const ponVis = (visible) => {
+    if (visible) aparecioRef.current = true;
     if (visRef.current) visRef.current.style.visibility = visible ? '' : 'hidden';
     if (sombraRef.current) sombraRef.current.visible = visible;
   };
@@ -140,6 +167,14 @@ export function useEntradaAbeja(foco, {
   // montar la escena (que nace de un tap para entrar al mundo) → gesto-derivado.
   const haptics = useHaptics({ reducedMotion });
   const posadaEn = useRef(null); // el foco ya celebrado (no repetir por frame)
+  // El PARTE DE VIAJE para la cámara (auditoría #50): fase + posición viva.
+  const avisarViaje = (faseViaje) => {
+    const v = viajeRef && viajeRef.current;
+    if (v) {
+      v.fase = faseViaje;
+      v.pos.copy(ref.current.position);
+    }
+  };
   useFrame((state) => {
     if (!ref.current) return;
     const t = state.clock.elapsedTime;
@@ -152,11 +187,12 @@ export function useEntradaAbeja(foco, {
     //    CRUCE_SUELTA_S. Con reduced-motion no hay viaje: el host corta en seco
     //    y este mesh muere con la escena, visible hasta el final.
     if (saliendo && !reducedMotion) {
-      if (fase.current === 'oculta') { ponVis(false); return; } // salió antes de nacer
+      if (fase.current === 'oculta') { ponVis(false); avisarViaje('salida'); return; } // salió antes de nacer
       if (salioEn.current === null) salioEn.current = t;
-      if (t - salioEn.current >= CRUCE_SUELTA_S) { ponVis(false); return; }
+      if (t - salioEn.current >= CRUCE_SUELTA_S) { ponVis(false); avisarViaje('salida'); return; }
       puntoDeCruce(state.camera, foco, _punto);
       ref.current.position.lerp(_punto, CRUCE_HUIDA);
+      avisarViaje('salida');
       return; // sin vagar ni sombra: es un suspiro de 180 ms hacia la cámara
     }
     salioEn.current = null;
@@ -169,7 +205,7 @@ export function useEntradaAbeja(foco, {
     if (fase.current === 'oculta') {
       puntoDeCruce(state.camera, foco, _punto);
       ref.current.position.copy(_punto);
-      if (vida < CRUCE_ATRAPA_S) { ponVis(false); return; }
+      if (vida < CRUCE_ATRAPA_S) { ponVis(false); avisarViaje('oculta'); return; }
       fase.current = 'picada';
       ponVis(true);
     } else if (fase.current === 'picada' && vida >= CRUCE_ATRAPA_S + CRUCE_PICADA_S) {
@@ -182,7 +218,7 @@ export function useEntradaAbeja(foco, {
     //    pleno cruce va NEUTRA (nadie da piruetas en picada). reducedMotion
     //    devuelve la pose calma estática (activo=false → cero invalidate).
     const idle = fase.current !== 'no' ? IDLE_NEUTRO : idleDeCreature(t, {
-      especie: 'abeja-angelita', hora, reducedMotion, tier,
+      especie, hora, reducedMotion, tier,
       llegadaHace: llegoEn.current === null ? null : t - llegoEn.current,
     });
     const quieta = Math.max(0, idle.posada);
@@ -218,11 +254,11 @@ export function useEntradaAbeja(foco, {
     //    `idle.posada` la baja a su percha idle (flor/hoja: la altura se recoge
     //    a ~28%) y aquieta el vagar y el bob (posada no ronda ni flota); su
     //    asomo negativo al despegar es el brinquito de overshoot.
-    const alto = (entrando ? PERCHA.y : ABEJA_PRESENCIA.rondaAltura) * mAltura * (1 - 0.72 * idle.posada);
+    const alto = (entrando ? percha.y : rondaAltura) * mAltura * (1 - 0.72 * idle.posada);
     const dest = _dest.set(
-      foco.x + (entrando ? PERCHA.x : 0.35 + vagarX * (1 - quieta)) + tembleque + arrebato * (entrando ? 0.3 : 1),
+      foco.x + (entrando ? percha.x : 0.35 + vagarX * (1 - quieta)) + tembleque + arrebato * (entrando ? 0.3 : 1),
       foco.y + alto + bob * (1 - 0.85 * quieta) + idle.dy + tembleque * 0.5 + arrebato * 0.18,
-      foco.z + (entrando ? PERCHA.z : 0.55 + vagarZ * (1 - quieta)),
+      foco.z + (entrando ? percha.z : 0.55 + vagarZ * (1 - quieta)),
     );
     ref.current.position.lerp(dest, (entrando ? 0.06 : 0.05) * mVel * empuje);
     // Angelita se posa: al cruzar el umbral de llegada al foco, un roce háptico
@@ -233,12 +269,32 @@ export function useEntradaAbeja(foco, {
       llegoEn.current = t; // arranca la CELEBRACIÓN idle (giro alegre + overshoot)
       haptics.abeja();
     }
+    // El compai no gira para cambiar de rumbo. Se desvanece y reaparece con
+    // el nuevo paso, el mismo lenguaje místico de todas las especies.
     if (caraRef.current) {
       const vx = ref.current.position.x - prevX.current;
-      if (Math.abs(vx) > 0.0015) caraRef.current.style.transform = `scaleX(${vx < 0 ? -1 : 1})`;
+      if (Math.abs(vx) > 0.0015) {
+        const signo = vx < 0 ? -1 : 1;
+        if (signoCara.current && signo !== signoCara.current && !reducedMotion && apagoEn.current === null) {
+          apagoEn.current = state.clock.elapsedTime;
+        }
+        signoCara.current = signo;
+      }
       prevX.current = ref.current.position.x;
+      let op = 1;
+      if (apagoEn.current !== null) {
+        const transcurrido = state.clock.elapsedTime - apagoEn.current;
+        const k = transcurrido / 0.52;
+        op = k < 1 ? Math.abs(Math.cos(k * Math.PI)) : 1;
+        if (k >= 1) apagoEn.current = null;
+      }
+      const ops = op.toFixed(2);
+      if (ops !== ultimaOpCara.current) {
+        ultimaOpCara.current = ops;
+        caraRef.current.style.opacity = ops;
+      }
     }
-    // El idle se ESCRIBE al DOM en su propia capa (no pisa el volteo ni su
+    // El idle se ESCRIBE al DOM en su propia capa (no pisa la aparición ni su
     // transition): un solo style-write, cacheado por string — sin animación
     // activa la cadena no cambia y el DOM no se toca. La pose discreta viaja
     // como data-pose al svg del cuerpo ('celebra'/'reposo' tienen CSS propio).
@@ -259,12 +315,16 @@ export function useEntradaAbeja(foco, {
       const pos = ref.current.position;
       const h = Math.max(0, pos.y - piso);
       sombraRef.current.position.set(pos.x, piso + 0.03, pos.z);
-      sombraRef.current.scale.setScalar(1 + h * SOMBRA.ensanchaPorAltura);
-      sombraRef.current.material.opacity = Math.max(SOMBRA.opacidadMin, SOMBRA.opacidadBase - h * SOMBRA.atenuaPorAltura);
+      sombraRef.current.scale.setScalar(1 + h * sombra.ensanchaPorAltura);
+      sombraRef.current.material.opacity = Math.max(sombra.opacidadMin, sombra.opacidadBase - h * sombra.atenuaPorAltura);
     }
+    avisarViaje(fase.current); // el parte de viaje del frame (picada o vuelo normal)
   });
-  return { ref, caraRef, sombraRef, visRef, idleRef };
+  return { ref, caraRef, sombraRef, visRef, idleRef, aparecioRef };
 }
+
+// Alias compatible para todos los consumidores existentes de Angelita.
+export const useEntradaAbeja = useEntradaCompai;
 
 /**
  * Angelita ya montada en una escena: usa `useEntradaAbeja` para la coreografía y
@@ -272,7 +332,7 @@ export function useEntradaAbeja(foco, {
  * dentro de un mundo (la del footer se oculta): por eso REFLEJA EL HABLA —pulsa
  * cuando el agente narra (`hablando`)— y da un microrrebote al tocar un hotspot
  * (`rebote`, un contador que sube por toque). Tres transformaciones en tres capas
- * DOM que no se pisan: pulso (raíz), rebote (medio), volteo scaleX (cara, que el
+ * DOM que no se pisan: pulso (raíz), rebote (medio), aparición mística (cara, que el
  * useFrame maneja imperativo). Cualquier arquetipo la coloca con
  * `<AbejaEscena foco=… animo=… energia=… hablando=… rebote=… reducedMotion=… />`.
  */
@@ -301,6 +361,9 @@ export function AbejaEscena({
   //    cabla el dato real con useFincaViva. Si NO se pasa, la abeja usa el
   //    `animo`/`energia` sueltos de siempre (contrato viejo intacto).
   estadoFinca = null, hayAlerta = false,
+  // El canal hacia la cámara (auditoría #50): la escena lo comparte con su
+  // director para que la cámara ESCOLTE la picada de entrada. Opcional.
+  viajeRef = null,
 }) {
   // La señal de SALIDA del host (avisarSalidaAbeja): cruza el reconciler de r3f
   // vía store externo. Al montar se limpia (la señal es de la escena ANTERIOR);
@@ -343,9 +406,9 @@ export function AbejaEscena({
   // La hora del valle (cielosHoraData): de noche el idle la ACURRUCA. Se lee UNA
   // vez al montar — determinista, nada de reloj en render.
   const hora = useMemo(() => horaDeReloj(), []);
-  const { ref, caraRef, sombraRef, visRef, idleRef } = useEntradaAbeja(foco, {
+  const { ref, caraRef, sombraRef, visRef, idleRef, aparecioRef } = useEntradaAbeja(foco, {
     entrando, energia: energiaReal, reducedMotion, piso, vuelo: vueloClima,
-    cruce: cruceVivo, saliendo, hora, tier,
+    cruce: cruceVivo, saliendo, hora, tier, viajeRef,
   });
   // Microrrebote: cada toque de hotspot sube `rebote`; reiniciamos la animación
   // CSS (quitar → reflow → poner) para que dispare aun en toques seguidos. El
@@ -371,7 +434,7 @@ export function AbejaEscena({
   const { visema } = useLipSync({ activo: vivo });
   return (
     <>
-      <group ref={ref} position={[foco.x + PERCHA.x, foco.y + PERCHA.y, foco.z + PERCHA.z]}>
+      <group ref={ref} position={[foco.x + PERCHA_ABEJA.x, foco.y + PERCHA_ABEJA.y, foco.z + PERCHA_ABEJA.z]}>
         <Html center distanceFactor={ABEJA_PRESENCIA.distancia} zIndexRange={[40, 10]}>
           {/* Reacción al estado real, también en el wrapper (brillo mojado,
               temblor sediento, bamboleo de mordisco — rubber-hose). Gate RM.
@@ -381,7 +444,9 @@ export function AbejaEscena({
           <div
             ref={visRef}
             className="mundo-abeja"
-            style={cruceVivo ? { visibility: 'hidden' } : undefined}
+            /* hidden SOLO hasta el atrape: después del primer ponVis(true) los
+               re-renders NO deben volver a esconderla (BUG-COMPAI-ENTRADA). */
+            style={cruceVivo && !aparecioRef.current ? { visibility: 'hidden' } : undefined}
             aria-hidden="true"
             data-hablando={hablando && vivo ? '1' : undefined}
             data-mojada={mojada && vivo ? '1' : undefined}
@@ -389,9 +454,9 @@ export function AbejaEscena({
             data-comiendo={comiendo && vivo ? '1' : undefined}
           >
             <div ref={reboteRef} className="mundo-abeja__rebote">
-              {/* Cuarta capa de gesto: el IDLE (squash&stretch, vueltas de
+              {/* Cuarta capa de gesto: el IDLE (squash&stretch, gestos de
                   campana, celebración) — imperativa por frame desde el hook.
-                  Propia para no pisar la transition del volteo de la cara.
+                  Propia para no pisar la aparición mística de la cara.
                   data-creature → el hook le cuelga data-pose (CSS de creatures). */}
               <div ref={idleRef} className="mundo-abeja__idle" data-creature="abeja-angelita">
                 <div ref={caraRef} className="mundo-abeja__cara">
@@ -425,10 +490,10 @@ export function AbejaEscena({
           hasta la sombra de Angelita está dibujada con su propia línea. */}
       <SombraContacto
         refExt={sombraRef}
-        pos={[foco.x + PERCHA.x, piso + 0.03, foco.z + PERCHA.z]}
-        radio={SOMBRA.radio}
+        pos={[foco.x + PERCHA_ABEJA.x, piso + 0.03, foco.z + PERCHA_ABEJA.z]}
+        radio={SOMBRA_ABEJA.radio}
         color={ABEJA_TINTA}
-        opacidad={SOMBRA.opacidad}
+        opacidad={SOMBRA_ABEJA.opacidad}
         orden={3}
       />
     </>

@@ -5,8 +5,8 @@
 /* eslint-disable chagra-i18n/no-hardcoded-spanish */
 import { useMemo, useState } from 'react';
 import {
-  ChevronLeft, ChevronRight, Info, AlertTriangle, Sprout, Leaf, Bug, Recycle,
-  Copy, RefreshCw, Sun, ShieldCheck, Ruler, Scissors, Trees, Wheat, Camera,
+  ChevronLeft, ChevronRight, Info, Sprout, Leaf, Bug, Recycle,
+  Copy, RefreshCw, ShieldCheck, Ruler, Scissors, Trees, Wheat, Camera,
   Droplets, CheckCircle2,
 } from 'lucide-react';
 import {

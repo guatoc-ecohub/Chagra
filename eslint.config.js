@@ -2,7 +2,6 @@ import js from '@eslint/js'
 import globals from 'globals'
 import reactHooks from 'eslint-plugin-react-hooks'
 import reactRefresh from 'eslint-plugin-react-refresh'
-import { defineConfig, globalIgnores } from 'eslint/config'
 
 // ---------------------------------------------------------------------------
 // Plugin i18n — regla "no-hardcoded-spanish" (soft enforcement, warn)
@@ -69,17 +68,19 @@ const vitestGlobals = {
   vi: 'readonly',
 }
 
-export default defineConfig([
-  globalIgnores([
-    'dist',
-    'dist-prod',
-    // Modo campo (#2088): librerías de terceros vendoreadas TAL CUAL (UMD
-    // minificado de @tensorflow/tfjs-core|layers|data|backend-wasm y
-    // @tensorflow-models/speech-commands, ver scripts/wake-word/vendor-libs.mjs).
-    // NO son código propio — lintearlas tira cientos de falsos + (exports/
-    // require UMD, vars de una letra minificadas, etc.).
-    'public/vendor/**',
-  ]),
+export default [
+  {
+    ignores: [
+      'dist',
+      'dist-prod',
+      // Modo campo (#2088): librerías de terceros vendoreadas TAL CUAL (UMD
+      // minificado de @tensorflow/tfjs-core|layers|data|backend-wasm y
+      // @tensorflow-models/speech-commands, ver scripts/wake-word/vendor-libs.mjs).
+      // NO son código propio — lintearlas tira cientos de falsos + (exports/
+      // require UMD, vars de una letra minificadas, etc.).
+      'public/vendor/**',
+    ],
+  },
   {
     // Configs Node (playwright/vite/etc.) — requieren globals.node.
     files: ['*.config.{js,mjs,ts}', 'playwright.config.js', 'vite.config.js'],
@@ -103,16 +104,14 @@ export default defineConfig([
       },
     },
   },
+  js.configs.recommended,
+  reactHooks.configs.flat.recommended,
+  reactRefresh.configs.vite,
   {
     files: ['**/*.{js,jsx}'],
     plugins: {
       'chagra-i18n': i18nPlugin,
     },
-    extends: [
-      js.configs.recommended,
-      reactHooks.configs.flat.recommended,
-      reactRefresh.configs.vite,
-    ],
     languageOptions: {
       ecmaVersion: 2020,
       globals: globals.browser,
@@ -150,4 +149,4 @@ export default defineConfig([
     files: ['**/*.test.{js,jsx}', '**/*.spec.{js,jsx}'],
     rules: { 'chagra-i18n/no-hardcoded-spanish': 'off' },
   },
-])
+]

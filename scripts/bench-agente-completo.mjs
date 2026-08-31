@@ -98,6 +98,11 @@ async function unloadModel(modelName) {
 //   3) RECOMMENDED_OLLAMA_JUDGE_MODEL (qwen2.5:14b)
 // Sin la flag, el scoring es keyword-FLEXIBLE (sinónimos/lemas).
 const USE_JUDGE = process.argv.includes('--judge');
+// El juez externo es un paso opcional y separado. Antes se ejecutaba siempre
+// al final, aunque el bench no llevara `--judge`, y podía dejar la primera
+// corrida abierta indefinidamente esperando credenciales o red. El runner
+// alpha lo habilita explícitamente cuando corresponde.
+const RUN_EXTERNAL_JUDGE = process.env.BENCH_RUN_JUDGE === '1';
 function parseJudgeArg() {
   const i = process.argv.indexOf('--judge');
   if (i >= 0) {
@@ -857,6 +862,15 @@ async function checkOllamaModels() {
       return;
     }
 
+    if (process.env.BENCH_SKIP_MISSING_MODELS === '1') {
+      MODELS = Object.fromEntries(Object.entries(MODELS).filter(([, model]) => installed.has(model)));
+      console.warn(`[preflight] Omitiendo ${missing.length} modelo(s) no instalados: ${missing.join(', ')}`);
+      if (Object.keys(MODELS).length === 0) {
+        throw new Error('[preflight] Ningún modelo del bench está instalado.');
+      }
+      return;
+    }
+
     console.error(`[preflight] FALTAN ${missing.length} modelo(s) — abortando.`);
     for (const m of missing) {
       console.error(`  - ${m}`);
@@ -1404,16 +1418,21 @@ La revisión humana es obligatoria antes de promover un modelo.
   console.log(`    Reporte:  ${summaryPath}`);
   console.log('');
   
-  console.log(`\n[bench] Invocando LLM-judge para evaluar calidad...`);
-  try {
-    console.log(`[bench] node scripts/bench-llm-judge.mjs --from ${jsonlPath}`);
-    execSync(`node scripts/bench-llm-judge.mjs --from ${jsonlPath}`, {
-      cwd: ROOT_DIR,
-      stdio: 'inherit',
-    });
-    console.log(`[bench] LLM-judge completado exitosamente.`);
-  } catch (err) {
-    console.log(`[bench] ⚠️  LLM-judge falló o no está disponible: ${err.message}`);
+  if (RUN_EXTERNAL_JUDGE) {
+    console.log(`\n[bench] Invocando LLM-judge para evaluar calidad...`);
+    try {
+      console.log(`[bench] node scripts/bench-llm-judge.mjs --from ${jsonlPath}`);
+      execSync(`node scripts/bench-llm-judge.mjs --from ${jsonlPath}`, {
+        cwd: ROOT_DIR,
+        stdio: 'inherit',
+        timeout: Number(process.env.BENCH_JUDGE_TIMEOUT_MS || 10 * 60 * 1000),
+      });
+      console.log(`[bench] LLM-judge completado exitosamente.`);
+    } catch (err) {
+      console.log(`[bench] ⚠️  LLM-judge falló o no está disponible: ${err.message}`);
+    }
+  } else {
+    console.log('[bench] LLM-judge omitido; habilitar con BENCH_RUN_JUDGE=1.');
   }
 }
 

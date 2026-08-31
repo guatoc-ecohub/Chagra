@@ -79,10 +79,22 @@ const useFincaActiveStore = create(
                     try {
                         const candidateUrl = new URL(candidate);
                         const currentHost = window.location.hostname;
+                        // dev (2026-08-24): chagra-dev.guatoc.co ↔ farmos.guatoc.co.
+                        // El regex /^chagra\./ NO cubría 'chagra-dev.' → dev salía
+                        // cross-origin a farmos.guatoc.co (tras CF Access = 403 =
+                        // "Failed to fetch"). Ampliado: si el origen empieza por
+                        // 'chagra' y el candidato es 'farmos.' del MISMO apex,
+                        // colapsar a same-origin (el proxy nginx inyecta el token).
+                        const apexOf = (h) => h.split('.').slice(-2).join('.');
+                        const cousinDevHost =
+                            currentHost.startsWith('chagra') &&
+                            candidateUrl.hostname.startsWith('farmos.') &&
+                            apexOf(currentHost) === apexOf(candidateUrl.hostname);
                         const sameOrCousinHost =
                             candidateUrl.hostname === currentHost ||
                             candidateUrl.hostname === currentHost.replace(/^chagra\./, 'farmos.') ||
-                            currentHost === candidateUrl.hostname.replace(/^farmos\./, 'chagra.');
+                            currentHost === candidateUrl.hostname.replace(/^farmos\./, 'chagra.') ||
+                            cousinDevHost;
                         if (sameOrCousinHost) return '';
                     } catch (_) { /* candidate no es URL válida, retornarlo como está */ }
                 }

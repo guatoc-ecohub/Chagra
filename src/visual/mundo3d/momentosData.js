@@ -31,6 +31,19 @@ export const easeOutBack = (p) => {
   return 1 + c3 * (p - 1) ** 3 + c1 * (p - 1) ** 2;
 };
 
+/* Forma del arco de un vuelo balístico con estirón (parábola simple: 0 en los
+   extremos, 1 en el pico e=0.5). Es la MISMA curva que ya vive repetida a
+   mano en dos sitios — el fruto que vuela al canasto (`FASES_MOMENTO.cosecha`
+   más abajo, `Math.sin(Math.PI*e)` en MomentosFinca.jsx) y el costal que
+   vuela al almacén (EfectosFuncionalesDemo) — cualquier "llevar un objeto de
+   A a B" del framework la puede reusar en vez de reescribirla:
+   `y += arcoDeVuelo(e) * alturaArco` (altura del arco) y
+   `escalaEje = 1 + arcoDeVuelo(e) * estiron` con `escalaCruzada = 1/√escalaEje`
+   (estirón que conserva volumen: se alarga en el eje de vuelo, se afina en
+   los otros dos).
+   @param {number} e  progreso del vuelo, 0..1 (se clampa por si acaso). */
+export const arcoDeVuelo = (e) => Math.sin(Math.PI * clamp01(e));
+
 /* Progreso LOCAL de una fase: mapea p∈[0,1] global al tramo [ini,fin] y lo
    normaliza a [0,1] con clamp. Las fases se SOLAPAN un poco a propósito
    (follow-through: la acción siguiente arranca antes de que muera la previa). */

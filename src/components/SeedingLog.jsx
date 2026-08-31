@@ -1,28 +1,65 @@
 /* i18n (ADR-050): este formulario es 100% user-facing en español Colombia
  * (etiquetas, ayudas, toasts). La regla chagra-i18n es soft (warn); se desactiva
  * a nivel de archivo —mismo criterio que SpeciesSelect / SeguimientoProcesoScreen—
- */
+ * para no bloquear el pre-commit (max-warnings=0). La migración i18n es trabajo
+ * aparte. */
+/* eslint-disable chagra-i18n/no-hardcoded-spanish */
 // @ts-nocheck
+import React, { useState, useEffect, useRef, useMemo } from 'react';
+import { ArrowLeft, AlertCircle, MapPin, CheckCircle } from 'lucide-react';
+import { savePayload } from '../services/payloadService';
+import { savePhoto } from '../services/photoService';
+import { createFarmProcess } from '../services/farmEventService';
+import { buildDraftFromSeeding } from '../services/buildDraftFromSeeding';
+import { newUlid } from '../utils/id';
+import DateField from './DateField';
+import PhotoCaptureField from './PhotoCaptureField';
+import { getAllSpecies } from '../db/catalogDB';
+import { extractVarieties, varietyHelpText } from '../utils/speciesVariety';
+import SpeciesCombobox from './SpeciesCombobox';
 import { ENV } from '../config/env.js';
 
-export default function SeedingLog({ onBack, onSave, initialData: initialDataRaw }) {
-  // Fallback graceful: sin conexión a farmOS (env vars no definidas), mostrar
-  // estado vacío digno en vez de romper el ErrorBoundary.
-  if (!ENV.FARMOS_CLIENT_ID) {
-    return (
-      <div className="flex flex-col items-center justify-center min-h-[60vh] px-6 text-center text-slate-300">
-        <div className="text-5xl mb-4" aria-hidden="true">🌱</div>
-        <h2 className="text-lg font-semibold text-slate-200 mb-2">Configuración de siembra no disponible</h2>
-        <p className="text-sm text-slate-400 max-w-sm">Conéctese a su finca para registrar siembras. Sin conexión a farmOS, esta sección no puede cargarse.</p>
-        {onBack && (
-          <button onClick={onBack} className="mt-6 px-5 py-2 rounded-xl bg-slate-700 text-slate-200 text-sm hover:bg-slate-600 transition-colors">
-            Volver
-          </button>
-        )}
-      </div>
-    );
-  }
+// Bug 069.10 — validación client-side: límites razonables para evitar
+// payloads inválidos sincronizándose con FarmOS.
+const MAX_QUANTITY = 100000; // sanity cap: 100k plántulas en una siembra es ya raro
+const MIN_CROP_LEN = 2;
 
+/**
+ * Fallback graceful: sin conexión a farmOS (env vars no definidas), mostrar
+ * estado vacío digno en vez de romper el ErrorBoundary.
+ *
+ * Vive en su propio componente —y no como early-return dentro del formulario—
+ * porque un `return` antes de los 19 hooks de SeedingLogForm viola las Rules of
+ * Hooks (react-hooks/rules-of-hooks, 19 errores de eslint).
+ */
+function SeedingLogSinFarmOS({ onBack }) {
+  return (
+    <div className="flex flex-col items-center justify-center min-h-[60vh] px-6 text-center text-slate-300">
+      <div className="text-5xl mb-4" aria-hidden="true">🌱</div>
+      <h2 className="text-lg font-semibold text-slate-200 mb-2">Configuración de siembra no disponible</h2>
+      <p className="text-sm text-slate-400 max-w-sm">Conéctese a su finca para registrar siembras. Sin conexión a farmOS, esta sección no puede cargarse.</p>
+      {onBack && (
+        <button onClick={onBack} className="mt-6 px-5 py-2 rounded-xl bg-slate-700 text-slate-200 text-sm hover:bg-slate-600 transition-colors">
+          Volver
+        </button>
+      )}
+    </div>
+  );
+}
+
+/**
+ * Punto de entrada: decide entre el fallback y el formulario ANTES de que
+ * cualquiera de los dos monte sus hooks. Cada rama es un componente distinto,
+ * así que React nunca ve dos órdenes de hooks para el mismo componente.
+ */
+export default function SeedingLog({ onBack, onSave, initialData }) {
+  if (!ENV.FARMOS_CLIENT_ID) {
+    return <SeedingLogSinFarmOS onBack={onBack} />;
+  }
+  return <SeedingLogForm onBack={onBack} onSave={onSave} initialData={initialData} />;
+}
+
+function SeedingLogForm({ onBack, onSave, initialData: initialDataRaw }) {
   // Bug B4 piloto 2026-05-28: QuickActionsPanel "Agregar planta" navega a
   // 'sembrar' sin pasar currentViewData → App.jsx pasa initialData={null} →
   // default param `= {}` NO aplica con null (solo con undefined) → línea 18
