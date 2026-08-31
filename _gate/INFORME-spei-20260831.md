@@ -31,4 +31,3 @@ campos.
 ## Commits
 
 Implementación: `61dbdd1ae feat(clima): agregar indice SPEI de balance hidrico`.
-
