@@ -37,6 +37,13 @@ const SPECIES_FIXTURE = [
     name_la: 'Annona muricata',
     cultivable: true,
   },
+  {
+    id: 'cucurbita_pepo',
+    nombre_comun: 'Calabacín / Zucchini',
+    nombre_cientifico: 'Cucurbita pepo L.',
+    nombre_comunes_regionales: ['calabacita'],
+    roles_in_guild: ['crop'],
+  },
 ];
 
 beforeEach(() => {
@@ -70,6 +77,15 @@ describe('resolveSpecies', () => {
     expect(r?.match).toBe('exact');
     expect(r?.slug).toBe('solanum_lycopersicum_cherry');
   });
+
+  it.each(['calabacín', 'zucchini', 'calabacita'])(
+    'rutea %s a Cucurbita pepo por nombre de catálogo',
+    async (name) => {
+      const r = await resolveSpecies(name);
+      expect(r?.match).toBe('exact');
+      expect(r?.slug).toBe('cucurbita_pepo');
+    },
+  );
 
   it('folds acentos y normaliza', async () => {
     const r = await resolveSpecies('GUANÁBANA');
