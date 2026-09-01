@@ -10,7 +10,8 @@
  * No genera consejo para un cultivo sin ficha ni para una condición climática
  * sin dato. Los textos son plantillas puras, sin LLM ni cifras de respaldo.
  */
-import { parseCultivos, presionEnfermedad } from './agroIndices.js';
+import { balanceHidricoDia, etcMm, kcDeCultivo, parseCultivos, presionEnfermedad, spei, spi } from './agroIndices.js';
+import { evaluarAlertasAgroclimaticas } from '../data/fichasAgroclimaticas.js';
 
 const SEVERITY_WEIGHT = Object.freeze({ critical: 3, warning: 2, info: 1 });
 
@@ -175,6 +176,46 @@ function wetSuggestion(name, ficha, phase, climaLive) {
   };
 }
 
+function fichaAlertSuggestion(name, ficha, climaLive) {
+  const fichaAgroclimatica = ficha?.fichaAgroclimatica;
+  const day = nextForecastDay(climaLive);
+  if (!fichaAgroclimatica || !day) return null;
+
+  const normales = climaLive?.normales || climaLive?.indices?.normales;
+  const precipMm = finite(day.precip_mm);
+  const spiCalculado = spi(precipMm, normales);
+  const kc = kcDeCultivo(ficha, 'mid');
+  const etc = etcMm(finite(day.eto_mm), kc);
+  const balance = balanceHidricoDia(precipMm, etc);
+  const speiCalculado = balance ? spei([balance], normales) : null;
+  const alertas = evaluarAlertasAgroclimaticas(fichaAgroclimatica, {
+    tempMin: finite(day.temp_min ?? climaLive?.tempMin),
+    tempMax: finite(day.temp_max ?? climaLive?.tempMax),
+    humedad: finite(day.rh_mean ?? climaLive?.humedad),
+    // SPI/SPEI se calculan con los motores existentes si llegan las normales.
+    // Si el proveedor no trae normales o ETo, quedan null y no se inventa alerta.
+    spi: spiCalculado ?? finite(climaLive?.indices?.spi ?? climaLive?.spi),
+    spei: speiCalculado ?? finite(climaLive?.indices?.spei ?? climaLive?.spei),
+  });
+  const item = alertas[0];
+  if (!item) return null;
+
+  const etiqueta = {
+    frio: 'Noche fría para el cultivo',
+    calor: 'Calor por encima del rango',
+    'humedad-alta': 'Humedad alta',
+    'deficit-hidrico': 'Déficit hídrico',
+    'exceso-hidrico': 'Exceso de lluvia',
+  }[item.id] || 'Condición agroclimática';
+  const severity = ['frio', 'calor', 'deficit-hidrico'].includes(item.id) ? 'critical' : 'warning';
+  return {
+    severity,
+    title: etiqueta,
+    text: `${name}: ${item.accion}`,
+    why: `${etiqueta} frente a la ficha agroclimática validada`,
+  };
+}
+
 function ensoSuggestion(name, ficha, climaLive, regionLine, ensoFamily) {
   if (!climaLive?.tieneEnso || !regionLine || ensoFamily === 'neutral') return null;
   const note = ficha?.aguaNota;
@@ -241,6 +282,7 @@ export function buildClimaCultivoSuggestions({ plants = [], climaLive = null, gr
     const suggestion = [
       frostSuggestion(name, profile, climaLive),
       alertSuggestion(name, relevantAlert(climaLive, ficha, profile)),
+      fichaAlertSuggestion(name, ficha, climaLive),
       coolSuggestion(name, profile, climaLive),
       wetSuggestion(name, ficha, phase, climaLive),
       ensoSuggestion(name, ficha, climaLive, regionLine, ensoFamily),
