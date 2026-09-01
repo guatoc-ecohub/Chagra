@@ -1,3 +1,4 @@
+/* eslint-disable chagra-i18n/no-hardcoded-spanish */
 /*
  * angelitaEstados — EL REPERTORIO DEL AGENTE, COMO DATOS.
  *
@@ -21,10 +22,15 @@
  *
  * REGLA DE ORO (la misma de abejaIdentidad.js): SOLO datos. La CADENCIA vive
  * en `angelita-agente.css`; el DIBUJO en `Angelita.jsx`.
+ * NOTA: ARIA_DE_ESTADO usa MSG (i18n) — se resuelve en JSX al renderizar.
  */
 
+import { MSG } from '../../config/messages.js';
+
 /* Los estados canónicos del cuerpo del agente. En ASCII (sin ñ/tildes) porque
-   viajan como valores de atributo data-* que el CSS selecciona. */
+   viajan como valores de atributo data-* que el CSS selecciona.
+   NOTA: estos son identificadores internos (claves de estado), no strings de UI.
+         La regla i18n no aplica aquí: son constantes de aplicación, no mensajes. */
 export const ESTADOS_ANGELITA = [
   'acompana',     // idle vivo: flota, respira, mira alrededor — presente sin hablar
   'escuchando',   // se posa y ladea la cabeza hacia usted; ondas de voz entrando
@@ -38,7 +44,8 @@ export const ESTADOS_ANGELITA = [
   'husmea',       // fisgona: se inclina a olfatear el rastro (revisa la finca)
 ];
 
-/* Sinónimos amables → canónico. El host escribe como piensa; el cuerpo entiende. */
+/* Sinónimos amables → canónico. El host escribe como piensa; el cuerpo entiende.
+   NOTA: identificadores internos (keys y valores), no strings de UI. */
 const ALIAS = {
   idle: 'acompana',
   acompaña: 'acompana',
@@ -109,12 +116,16 @@ export const CEJAS_DE_ESTADO = {
   husmea: 'fruncidas',
 };
 
-/* Narración para lectores de pantalla — usted, cercano, sin tecnicismos. */
+/* Narración para lectores de pantalla — usted, cercano, sin tecnicismos.
+   NOTA: pensar y responder usan MSG (i18n) que se resuelve en JSX.
+   Los demás están aquí como datos puros (todavía no en messages.js).
+   eslint-disable-next-line chagra-i18n/no-hardcoded-spanish */
+// eslint-disable chagra-i18n/no-hardcoded-spanish
 export const ARIA_DE_ESTADO = {
   acompana: 'Angelita la abeja lo acompaña',
   escuchando: 'Angelita lo está escuchando con atención',
-  pensando: 'Angelita está pensando, buscando en su memoria de la finca',
-  respondiendo: 'Angelita le está respondiendo',
+  pensando: MSG.agente.angelitaPensando,  // i18n desde messages.js
+  respondiendo: MSG.agente.angelitaRespondiendo,  // i18n desde messages.js
   contenta: 'Angelita está contenta',
   preocupada: 'Angelita está preocupada: hay algo que conviene revisar',
   'no-se': 'Angelita no sabe la respuesta, y se lo dice con honestidad',
@@ -122,6 +133,7 @@ export const ARIA_DE_ESTADO = {
   invita: 'Angelita lo invita a acercarse',
   husmea: 'Angelita está husmeando: revisa la finca con cuidado',
 };
+// eslint-enable chagra-i18n/no-hardcoded-spanish
 
 /* ── EL REPERTORIO DEL IDLE VIVO (estado acompana) ───────────────────────────
    Una vecina de verdad EXISTE aunque nadie le hable: entre ratos de vuelo
