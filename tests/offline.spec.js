@@ -250,6 +250,9 @@ test.describe('Offline-first — siembra pendiente y reconexión', () => {
 
     // Simula desconexión de red.
     await context.setOffline(true);
+    await expect
+      .poll(() => page.evaluate(() => navigator.onLine), { timeout: 5_000 })
+      .toBe(false);
     await page.evaluate(() => window.dispatchEvent(new Event('offline')));
 
     await expect(page.getByText(/sin conexion|offline-first/i).first()).toBeVisible({
