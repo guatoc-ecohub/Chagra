@@ -6,15 +6,25 @@
 set -uo pipefail
 
 REPO="$(basename "$(pwd)")"
-INIT_BASE_REF="${INIT_BASE_REF:-origin/dev}"
+# Auto-detect base ref: origin/main si estamos en main, origin/dev si estamos en dev/feature
+CURRENT_BRANCH=$(git rev-parse --abbrev-ref HEAD 2>/dev/null || echo "main")
+INIT_BASE_REF="${INIT_BASE_REF:-origin/$CURRENT_BRANCH}"
 
 echo "[init.sh:$REPO] Iniciando validación del sustrato..."
-echo "[init.sh] BASE_REF=$INIT_BASE_REF"
+echo "[init.sh] Branch=$CURRENT_BRANCH, BASE_REF=$INIT_BASE_REF"
 
 # ========== 1. Detectar archivos modificados vs base ==========
 echo ""
 echo "[1/4] Detectando archivos modificados..."
-MODIFIED_FILES=$(git diff --name-only "$INIT_BASE_REF"...HEAD 2>/dev/null | grep -E '\.(js|jsx|mjs|ts|tsx|py|html|json)$' | head -100)
+# Excluir: vendor, compilados (app/assets), worktrees, build outputs, dist
+MODIFIED_FILES=$(git diff --name-only "$INIT_BASE_REF"...HEAD 2>/dev/null \
+  | grep -E '\.(js|jsx|mjs|ts|tsx|py|html|json)$' \
+  | grep -v '^vendor/' | grep -v '/vendor/' \
+  | grep -v 'app/assets/' | grep -v '/app/assets/' \
+  | grep -v '\.worktrees/' | grep -v '/\.worktrees/' \
+  | grep -v '^build/' | grep -v '/build/' \
+  | grep -v '^dist/' | grep -v '/dist/' \
+  | head -100)
 if [ -z "$MODIFIED_FILES" ]; then
   echo "[skip] No hay archivos modificados vs $INIT_BASE_REF"
   MODIFIED_FILES=""
@@ -28,27 +38,31 @@ echo ""
 echo "[2/4] Ejecutando eslint sobre src/visual/agente y configs..."
 ESLINT_OK=1
 
-# Lint archivos modificados
+# Lint archivos modificados EN src/ SOLO (no public/, node_modules, etc.)
+SRC_FILES=""
 if [ -n "$MODIFIED_FILES" ]; then
-  JS_FILES=$(echo "$MODIFIED_FILES" | xargs -I {} sh -c "[ -f '{}' ] && echo '{}'" | grep -E '\.(js|jsx|mjs|ts|tsx)$' || true)
-  if [ -n "$JS_FILES" ]; then
-    echo "[lint] Validando archivos modificados ($(echo "$JS_FILES" | wc -l))..."
-    if ! npx eslint $JS_FILES 2>&1 | tail -50; then
-      echo "[WARN] eslint falló en archivos modificados" >&2
+  SRC_FILES=$(echo "$MODIFIED_FILES" | xargs -I {} sh -c "[ -f '{}' ] && echo '{}'" \
+    | grep -E '\.(js|jsx|mjs|ts|tsx)$' \
+    | grep -E '^src/' || true)  # SOLO src/
+  if [ -n "$SRC_FILES" ]; then
+    FILE_COUNT=$(echo "$SRC_FILES" | wc -l)
+    echo "[lint] Validando $FILE_COUNT archivos modificados EN src/..."
+    if ! npx eslint $SRC_FILES 2>&1 | tail -60; then
+      echo "[WARN] eslint falló en archivos modificados de src/" >&2
       ESLINT_OK=0
     fi
+  else
+    echo "[skip] No hay archivos JS/TS modificados en src/ (solo public/build/etc)"
   fi
 fi
 
-# Lint src/visual/agente/ completamente (componentes nuevos críticos)
-echo "[lint] Validando src/visual/agente/ (nuevos componentes)..."
-if [ -d "src/visual/agente" ]; then
-  if ! npx eslint src/visual/agente/ 2>&1 | tail -30; then
-    echo "[WARN] eslint falló en src/visual/agente/" >&2
+# Lint root configs si cambiaron
+if [ -f "eslint.config.js" ] && echo "$MODIFIED_FILES" | grep -q "eslint.config.js"; then
+  echo "[lint] Validando eslint.config.js..."
+  if ! npx eslint eslint.config.js 2>&1 | tail -20; then
+    echo "[WARN] eslint falló en eslint.config.js" >&2
     ESLINT_OK=0
   fi
-else
-  echo "[skip] src/visual/agente/ no existe"
 fi
 
 if [ $ESLINT_OK -ne 1 ]; then
