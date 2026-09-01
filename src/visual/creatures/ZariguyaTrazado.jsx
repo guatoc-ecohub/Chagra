@@ -4,9 +4,12 @@ import {
   POSES_TRAZADO_KEYS, srcDePose, ESCUCHA_CICLO, ESCUCHA_PASO_MS, UMBRAL_CLOSEUP,
 } from './zariguyaTrazado/posesTrazado.js';
 import { useVidaIdle, useMiradaUsted, prefiereQuietud } from './useVidaIdle.js';
+import { CompaiAgente } from '../agente/CompaiAgente.jsx';
+import { COMPAI_ESPECIES } from '../agente/compaiEspecies.js';
 import './zariguyaTrazado/zariguyaHuesos.css';
 
 const ZARIGUYA_SLUG = 'zariguya';
+const ZARIGUYA_PERFIL = COMPAI_ESPECIES.zariguya;
 
 /* Estados del contrato de avatar → forma canónica interna (mismo mapa que
    ZariguyaHuesos: el atributo data-agt-estado viaja crudo para paridad de
@@ -17,6 +20,10 @@ const ESTADO_CANON = {
   thinking: 'thinking', pensando: 'thinking',
   speaking: 'speaking', respondiendo: 'speaking', hablando: 'speaking',
   listening: 'listening', escuchando: 'listening',
+  preocupada: 'listening',
+  'no-se': 'thinking', nose: 'thinking',
+  senala: 'thinking', señala: 'thinking',
+  invita: 'speaking', husmea: 'thinking',
   caminando: 'caminando', walking: 'caminando', anda: 'caminando',
   contenta: 'contenta', celebra: 'contenta', happy: 'contenta',
 };
@@ -45,11 +52,13 @@ const TRAMO_ACTUANDO = 0.3;
  *   poseForzada (clave de POSES_TRAZADO_KEYS) — clava una viñeta exacta
  *   (arnés de gate / vitrina; sigue exigiendo el PNG cargado).
  */
-export default function ZariguyaTrazado({
+function ZariguyaTrazadoRig({
   estado = 'idle',
   modo = 'auto',
   size = 48,
   animated = true,
+  reducedMotion = false,
+  pose: poseRig = 'anda',
   className = '',
   style = undefined,
   title = 'Zarigüeya (chucha)',
@@ -64,7 +73,8 @@ export default function ZariguyaTrazado({
   const raizRef = useRef(null);
   const canon = ESTADO_CANON[estado] || 'idle';
   const enIdle = canon === 'idle';
-  const activoVida = animated && tier !== 'bajo';
+  const vivo = animated && !reducedMotion;
+  const activoVida = vivo && tier !== 'bajo';
   const sizeChico = size < UMBRAL_CLOSEUP;
 
   // Fase propia por instancia (hash del useId — puro y estable por render).
@@ -101,10 +111,10 @@ export default function ZariguyaTrazado({
   // NO se resetea al salir: re-entrar a media vuelta es tan válido como en 02.
   const [tickEscucha, setTickEscucha] = useState(0);
   useEffect(() => {
-    if (canon !== 'listening' || !animated || sizeChico || prefiereQuietud()) return undefined;
+    if (canon !== 'listening' || !vivo || sizeChico || prefiereQuietud()) return undefined;
     const id = setInterval(() => setTickEscucha((t) => t + 1), ESCUCHA_PASO_MS);
     return () => clearInterval(id);
-  }, [canon, animated, sizeChico]);
+  }, [canon, vivo, sizeChico]);
 
   // Qué viñeta pide el estado (null = la lámina-rig articulada de FASE 1).
   // Cada mapa entra al repertorio UNA lámina a la vez con gate (spec FASE 2):
@@ -121,7 +131,7 @@ export default function ZariguyaTrazado({
     }
     return null;
   })();
-  const pose = poseDeseada && POSES_TRAZADO_KEYS.includes(poseDeseada) && cargadas[poseDeseada]
+  const poseLamina = poseDeseada && POSES_TRAZADO_KEYS.includes(poseDeseada) && cargadas[poseDeseada]
     ? poseDeseada
     : null;
 
@@ -170,15 +180,15 @@ export default function ZariguyaTrazado({
       aria-label={title}
       data-creature={ZARIGUYA_SLUG}
       data-agt-estado={estado}
-      data-modo={animated ? modoVigente : 'normal'}
-      data-pose={pose || undefined}
+      data-modo={vivo ? modoVigente : 'normal'}
+      data-pose={poseLamina || (vivo ? poseRig : undefined)}
       data-visema={visema || undefined}
-      data-vida={animated && momento ? momento : undefined}
+      data-vida={vivo && momento ? momento : undefined}
       data-tier={tier || undefined}
       title={title}
       className={`zariguyaHuesos zariguyaTrazado ${className || ''}`.trim()}
       style={estiloRaiz}
-      {...(animated ? null : { 'data-quieto': '' })}
+      {...(vivo ? null : { 'data-quieto': '' })}
       {...rest}
       /* La piel es un string plano (pielTrazado.js) — el MISMO markup que
          consumen los hosts sin React. Los atributos de arriba mandan el CSS. */
@@ -202,3 +212,55 @@ export default function ZariguyaTrazado({
   }
   return contenedor;
 }
+
+function AdaptadorZariguya({
+  especie: _especie,
+  creatureSlug: _creatureSlug,
+  capacidades: _capacidades,
+  perfil: _perfil,
+  idlePerfil: _idlePerfil,
+  climaPerfil: _climaPerfil,
+  pose,
+  estadoLegado = undefined,
+  reducedMotion,
+  'data-agt-especie': dataEspecie,
+  'data-creature': dataCreature,
+  'data-agt-estado': dataEstado,
+  'data-pose': dataPose,
+  'data-visema': dataVisema,
+  'data-clima': dataClima,
+  'data-tier': dataTier,
+  ...props
+}) {
+  return (
+    <ZariguyaTrazadoRig
+      {...props}
+      pose={pose}
+      reducedMotion={reducedMotion}
+      data-agt-especie={dataEspecie}
+      data-creature={dataCreature}
+      data-agt-estado={estadoLegado || dataEstado}
+      data-pose={dataPose}
+      data-visema={dataVisema}
+      data-clima={dataClima}
+      data-tier={dataTier}
+    />
+  );
+}
+
+/** Fachada del trazado de la zarigüeya sobre el contrato común Compai. */
+export default function ZariguyaTrazado({ estado = 'idle', ...props }) {
+  return (
+    <CompaiAgente
+      {...props}
+      estado={estado}
+      estadoLegado={estado}
+      especie={ZARIGUYA_PERFIL.avatarType}
+      chrome={false}
+      preserveRigAnimation
+      adaptador={AdaptadorZariguya}
+    />
+  );
+}
+
+export { ZariguyaTrazadoRig };

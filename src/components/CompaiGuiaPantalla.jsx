@@ -1,8 +1,7 @@
 import { useCallback, useEffect, useRef } from 'react';
 import BurbujaAngelita from '../visual/agente/BurbujaAngelita.jsx';
 import useCompaiGuiaPantalla from '../hooks/useCompaiGuiaPantalla.js';
-import useCompaiElegido from '../visual/mundo3d/escenas/useCompaiElegido.js';
-import { AVATAR_NOMBRE, DEFAULT_AVATAR_TYPE } from '../hooks/useAgentAvatarType.js';
+import useAgentAvatarType, { AVATAR_NOMBRE, DEFAULT_AVATAR_TYPE } from '../hooks/useAgentAvatarType.js';
 import { speakSentences } from '../services/ttsService.js';
 import usePrefsStore from '../store/usePrefsStore.js';
 
@@ -34,7 +33,7 @@ import usePrefsStore from '../store/usePrefsStore.js';
  */
 export default function CompaiGuiaPantalla({ pantalla, onNavigate }) {
   const { explicacion, visible, descartar } = useCompaiGuiaPantalla(pantalla);
-  const { avatarType } = useCompaiElegido();
+  const [avatarType] = useAgentAvatarType();
   const nombre = AVATAR_NOMBRE[avatarType] || AVATAR_NOMBRE[DEFAULT_AVATAR_TYPE];
   const ttsEnabled = usePrefsStore((s) => s.ttsEnabled);
   const raizRef = useRef(null);

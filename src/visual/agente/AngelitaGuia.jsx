@@ -1,15 +1,15 @@
 import ChagraAgentAvatar from '../../components/ChagraAgentAvatar.jsx';
-import useCompaiElegido from '../mundo3d/escenas/useCompaiElegido.js';
-import { AVATAR_NOMBRE, DEFAULT_AVATAR_TYPE } from '../../hooks/useAgentAvatarType.js';
+import useAgentAvatarType, { AVATAR_NOMBRE, DEFAULT_AVATAR_TYPE } from '../../hooks/useAgentAvatarType.js';
 import BurbujaAngelita from './BurbujaAngelita.jsx';
 import { useAngelitaGuia } from '../../hooks/useAngelitaGuia.js';
 import './angelita-guia.css';
 
 /*
- * <AngelitaGuia> — Angelita vuela hasta un elemento real de la pantalla, lo
- * señala/invita/mira (el gesto que usted declaró — reutiliza
- * angelitaEstados.js, CERO estados nuevos) y explica QUÉ hay ahí, con
- * criterio agroecológico real. Reutilizable en CUALQUIER vista 2D.
+ * <AngelitaGuia> — la guía histórica conserva su export, pero muestra el
+ * compañero elegido hasta un elemento real de la pantalla, lo señala/invita/
+ * mira (el gesto que usted declaró, reutiliza angelitaEstados.js, CERO estados
+ * nuevos) y explica QUÉ hay ahí, con criterio agroecológico real. Reutilizable
+ * en CUALQUIER vista 2D.
  *
  * ADOPCIÓN EN OTRA PANTALLA (las 3 líneas que hacen falta):
  *
@@ -59,7 +59,8 @@ export function AngelitaGuia({
   AvatarComponent = null,
   nombreCompai = undefined,
 }) {
-  const { avatarType } = useCompaiElegido();
+  const [avatarType] = useAgentAvatarType();
+  const especie = avatarType === 'angelita' ? 'abeja-angelita' : avatarType;
   const nombreElegido = nombreCompai || AVATAR_NOMBRE[avatarType] || AVATAR_NOMBRE[DEFAULT_AVATAR_TYPE];
   const AvatarActivo = AvatarComponent || ChagraAgentAvatar;
   const guia = useAngelitaGuia(paradas, { activo, tamano, recordarCierreId, demoraInicialMs });
@@ -92,6 +93,8 @@ export function AngelitaGuia({
             direccion={guia.direccion}
             size={tamano}
             ariaLabel={nombreElegido}
+            especie={avatarType}
+            data-creature={especie}
           />
         </button>
       </div>

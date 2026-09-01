@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import './angelita-agente.css';
+import { CompaiAgente } from './CompaiAgente.jsx';
 import { AbejaAngelita } from '../creatures/AbejaAngelita.jsx';
 import { RH_INK, RH_CHEEK } from '../creatures/_rubberhose.jsx';
 import { ABEJA_PALETA } from '../creatures/abejaIdentidad.js';
@@ -246,7 +247,7 @@ function Zetitas() {
  *   número: nada que compita con la entrada que viene).
  * @param {string} [props.title]  pisa la narración aria derivada del estado.
  */
-export function Angelita({
+function AngelitaRig({
   estado = 'acompana',
   confianza = null,
   direccion = 'derecha',
@@ -660,6 +661,62 @@ export function Angelita({
       {mota}
       {zetitas}
     </svg>
+  );
+}
+
+/*
+ * Adaptador del perfil dorado. CompaiAgente resuelve el contrato común y este
+ * adaptador conserva el cuerpo histórico sin dejar que los metadatos del
+ * registro terminen como props desconocidas sobre el SVG.
+ */
+function AdaptadorAngelita({
+  especie: _especie,
+  creatureSlug: _creatureSlug,
+  capacidades: _capacidades,
+  perfil: _perfil,
+  idlePerfil: _idlePerfil,
+  climaPerfil: _climaPerfil,
+  pose: _pose,
+  reducedMotion: _reducedMotion,
+  'data-agt-especie': dataEspecie,
+  'data-creature': dataCreature,
+  'data-agt-estado': dataEstado,
+  'data-pose': dataPose,
+  'data-visema': dataVisema,
+  'data-clima': dataClima,
+  'data-tier': dataTier,
+  ...props
+}) {
+  return (
+    <AngelitaRig
+      {...props}
+      data-agt-especie={dataEspecie}
+      data-creature={dataCreature}
+      data-agt-estado={dataEstado}
+      data-pose={dataPose}
+      data-visema={dataVisema}
+      data-clima={dataClima}
+      data-tier={dataTier}
+    />
+  );
+}
+
+/**
+ * Fachada histórica de Angelita sobre el contrato común de Compai.
+ *
+ * `chrome={false}` es intencional: Angelita ya contiene sus halos, ondas,
+ * burbujas, señales y gestos aprobados. El shell común sigue resolviendo el
+ * perfil, la pose y los atributos, pero no duplica una señal visible.
+ */
+export function Angelita(props) {
+  return (
+    <CompaiAgente
+      {...props}
+      especie="angelita"
+      chrome={false}
+      preserveRigAnimation
+      adaptador={AdaptadorAngelita}
+    />
   );
 }
 

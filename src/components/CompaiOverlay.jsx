@@ -7,9 +7,8 @@
 import React, { useState, useCallback, useMemo, useRef } from 'react';
 import { X, Volume2 } from 'lucide-react';
 import ChagraAgentAvatar from './ChagraAgentAvatar';
-import useCompaiElegido from '../visual/mundo3d/escenas/useCompaiElegido.js';
 import useCompaiRoam from '../hooks/useCompaiRoam.js';
-import { AVATAR_NOMBRE, DEFAULT_AVATAR_TYPE } from '../hooks/useAgentAvatarType.js';
+import useAgentAvatarType, { AVATAR_NOMBRE, DEFAULT_AVATAR_TYPE } from '../hooks/useAgentAvatarType.js';
 // El hint por ruta se PLEGÓ a src/config/compaiHints.js (unificación 2026-08-23):
 // el AgentFab canónico lo usa como enseñanza en idle. Este overlay ya no se monta
 // en la PWA 2D; se conserva leyendo del MISMO mapa para no duplicar contenido.
@@ -63,7 +62,7 @@ function escucharTexto(texto) {
  * CompaiOverlay — el componente principal.
  */
 export default function CompaiOverlay({ currentView = 'dashboard' }) {
-  const { avatarType } = useCompaiElegido();
+  const [avatarType] = useAgentAvatarType();
   const nombreCompai = AVATAR_NOMBRE[avatarType] || AVATAR_NOMBRE[DEFAULT_AVATAR_TYPE];
   const [isOpen, setIsOpen] = useState(false);
   const [compaiState, setCompaiState] = useState('idle'); // idle, thinking, speaking, listening

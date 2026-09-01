@@ -30,6 +30,17 @@ import { useAngelitaPresencia, esPasivo } from '../visual/agente/useAngelitaPres
  */
 const VISEMA_DE_STATE = {
     speaking: 'V2',
+    respondiendo: 'V2',
+};
+
+const ESTADO_DE_STATE = {
+    idle: 'acompana',
+    // eslint-disable-next-line chagra-i18n/no-hardcoded-spanish
+    thinking: 'pensando',
+    // eslint-disable-next-line chagra-i18n/no-hardcoded-spanish
+    speaking: 'respondiendo',
+    listening: 'escuchando',
+    caminando: 'caminando',
 };
 
 export default function ChagraAgentAvatarZariguya({
@@ -48,6 +59,10 @@ export default function ChagraAgentAvatarZariguya({
     // (tier), y no debe descartarlos donde el host los cablee.
     animated = true,
     tier = undefined,
+    clima = null,
+    enso = 'neutro',
+    direccion = 'derecha',
+    reducedMotion = false,
     'data-agt-estado': dataEstado = undefined,
     'data-pose': dataPose = undefined,
     'data-visema': dataVisema = undefined,
@@ -63,9 +78,9 @@ export default function ChagraAgentAvatarZariguya({
     // La presencia solo despierta cuando el estado es pasivo (idle): jamás
     // interrumpe una actuación conversacional ni la caminata. La zarigüeya ya
     // vive en idle (idle-cerebro), así que despertar = garantizar su idle.
-    const estadoAgente = estado || state;
+    const estadoAgente = estado || ESTADO_DE_STATE[state] || 'acompana';
     const despiertaNatural = despierta && esPasivo(estadoAgente);
-    const estadoEfectivo = despiertaNatural ? 'idle' : state;
+    const estadoEfectivo = despiertaNatural ? 'acompana' : estadoAgente;
     const visema = visemaRecibido ?? VISEMA_DE_STATE[estadoEfectivo] ?? null;
 
     const bicho = (
@@ -74,6 +89,10 @@ export default function ChagraAgentAvatarZariguya({
             visema={visema}
             size={size}
             animated={animated}
+            clima={clima}
+            enso={enso}
+            direccion={direccion}
+            reducedMotion={reducedMotion}
             tier={tier}
             title={ariaLabel}
             className={className}

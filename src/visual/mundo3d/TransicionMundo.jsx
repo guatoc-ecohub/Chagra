@@ -16,8 +16,7 @@
  */
 import { useEffect, useRef } from 'react';
 import ChagraAgentAvatar from '../../components/ChagraAgentAvatar.jsx';
-import useCompaiElegido from './escenas/useCompaiElegido.js';
-import { AVATAR_NOMBRE, DEFAULT_AVATAR_TYPE } from '../../hooks/useAgentAvatarType.js';
+import useAgentAvatarType, { AVATAR_NOMBRE, DEFAULT_AVATAR_TYPE } from '../../hooks/useAgentAvatarType.js';
 import { tinteDeMundo, tituloDeMundo } from './resolverMundo.js';
 import './mundo.css';
 
@@ -32,7 +31,7 @@ export default function TransicionMundo({
   reducedMotion = false,
   onFin,
 }) {
-  const { avatarType } = useCompaiElegido();
+  const [avatarType] = useAgentAvatarType();
   const nombreCompai = AVATAR_NOMBRE[avatarType] || AVATAR_NOMBRE[DEFAULT_AVATAR_TYPE];
   const finRef = useRef(onFin);
   // Ref "ultima version": se actualiza en un effect (no en render) para que el

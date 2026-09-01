@@ -27,10 +27,18 @@ export default function ChagraAgentAvatarChivitoPunk({
     glow = false,
     className = '',
     ariaLabel = 'Chagra IA',
+    animated = true,
+    tier = undefined,
+    clima = null,
+    enso = 'neutro',
+    direccion = 'derecha',
+    reducedMotion = false,
     reaccionaPresencia = true,
     'data-agt-estado': dataEstado = undefined,
     'data-pose': dataPose = undefined,
     'data-visema': dataVisema = undefined,
+    'data-clima': dataClima = undefined,
+    'data-tier': dataTier = undefined,
 }) {
     const { despierta, handlers: handlersPresencia } = useAngelitaPresencia({ activo: reaccionaPresencia });
     const estadoAgente = estado || state;
@@ -45,6 +53,13 @@ export default function ChagraAgentAvatarChivitoPunk({
             estado={dataEstado || estadoAgente}
             pose={dataPose}
             visema={dataVisema || visema || undefined}
+            animated={animated}
+            reducedMotion={reducedMotion}
+            tier={dataTier || tier}
+            clima={clima}
+            enso={enso}
+            direccion={direccion}
+            data-clima={dataClima}
         />
     );
 

@@ -1,0 +1,190 @@
+/* Chrome transversal. El cuerpo del compañero conserva el arte del
+   adaptador; estas capas solo comunican estado, clima y confianza. */
+.compai-agente {
+  --compai-tinta: rgba(39, 31, 25, 0.82);
+  --compai-miel: #e1a63c;
+  --compai-alerta: #cc6a58;
+  --compai-clima: #7daab2;
+  position: relative;
+  display: inline-grid;
+  width: max-content;
+  min-width: 1px;
+  line-height: 0;
+  isolation: isolate;
+  vertical-align: middle;
+}
+
+.compai-agente__cuerpo,
+.compai-agente__chrome {
+  grid-area: 1 / 1;
+}
+
+.compai-agente__cuerpo {
+  position: relative;
+  z-index: 1;
+  display: inline-flex;
+}
+
+.compai-agente__chrome {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+}
+
+.compai-agente__halo,
+.compai-agente__feedback {
+  position: absolute;
+  display: block;
+  pointer-events: none;
+  opacity: 0;
+}
+
+.compai-agente__halo {
+  inset: -7%;
+  border: 1px solid var(--compai-miel);
+  border-radius: 50%;
+}
+
+[data-agt-confianza='alta'] .compai-agente__halo,
+[data-agt-confianza='media'] .compai-agente__halo,
+[data-agt-confianza='baja'] .compai-agente__halo {
+  opacity: 0.48;
+}
+
+[data-agt-confianza='media'] .compai-agente__halo {
+  border-style: dashed;
+}
+
+[data-agt-confianza='baja'] .compai-agente__halo {
+  border-style: dotted;
+  opacity: 0.36;
+}
+
+.compai-agente__feedback {
+  width: 20%;
+  height: 20%;
+  border: 1px solid currentColor;
+  border-radius: 50%;
+  color: var(--compai-miel);
+}
+
+.compai-agente__escucha {
+  left: -5%;
+  top: 35%;
+  border-right-color: transparent;
+}
+
+.compai-agente__respuesta {
+  right: -5%;
+  top: 35%;
+  border-left-color: transparent;
+}
+
+.compai-agente__pensamiento {
+  right: 8%;
+  top: -5%;
+  width: 13%;
+  height: 13%;
+  border-width: 2px;
+}
+
+.compai-agente__alerta {
+  inset: -3%;
+  width: auto;
+  height: auto;
+  border-color: var(--compai-alerta);
+  border-radius: 44% 56% 50% 48%;
+}
+
+.compai-agente__guia {
+  right: -5%;
+  bottom: 3%;
+  border-color: var(--compai-miel);
+  box-shadow: 5px 3px 0 -3px var(--compai-miel);
+}
+
+.compai-agente__visema {
+  left: var(--agt-boca-x, 70%);
+  top: var(--agt-boca-y, 43%);
+  width: 10%;
+  height: 7%;
+  border-color: var(--compai-miel);
+  border-radius: 50%;
+}
+
+.compai-agente__clima {
+  left: 4%;
+  bottom: 2%;
+  width: 12%;
+  height: 12%;
+  border-color: var(--compai-clima);
+  border-radius: 65% 35% 60% 40%;
+}
+
+[data-agt-estado='escuchando'] .compai-agente__escucha,
+[data-agt-estado='respondiendo'] .compai-agente__respuesta,
+[data-agt-estado='pensando'] .compai-agente__pensamiento,
+[data-agt-estado='preocupada'] .compai-agente__alerta,
+[data-agt-estado='senala'] .compai-agente__guia,
+[data-agt-estado='invita'] .compai-agente__guia,
+[data-agt-visema] .compai-agente__visema,
+[data-agt-clima] .compai-agente__clima {
+  opacity: 0.72;
+}
+
+[data-agt-animado='1'][data-agt-estado='escuchando'] .compai-agente__escucha,
+[data-agt-animado='1'][data-agt-estado='respondiendo'] .compai-agente__respuesta,
+[data-agt-animado='1'][data-agt-estado='pensando'] .compai-agente__pensamiento,
+[data-agt-animado='1'][data-agt-estado='preocupada'] .compai-agente__alerta,
+[data-agt-animado='1'][data-agt-estado='senala'] .compai-agente__guia,
+[data-agt-animado='1'][data-agt-estado='invita'] .compai-agente__guia {
+  animation: compai-feedback-pulso 1.8s ease-in-out infinite;
+}
+
+[data-agt-animado='1'] .compai-agente__halo {
+  animation: compai-halo-respira 3.8s ease-in-out infinite;
+}
+
+[data-agt-animado='1'][data-agt-visema] .compai-agente__visema {
+  animation: compai-visema 0.42s steps(2, end) infinite;
+}
+
+[data-agt-animado='1'][data-agt-clima] .compai-agente__clima {
+  animation: compai-clima 2.7s ease-in-out infinite;
+}
+
+/* La gama baja conserva las señales, pero elimina los loops continuos. */
+[data-agt-loop='0'] .compai-agente__loop,
+[data-agt-loop='0'] .compai-agente__feedback {
+  animation: none;
+}
+
+@keyframes compai-feedback-pulso {
+  0%, 100% { transform: scale(0.82); }
+  45% { transform: scale(1.08); }
+}
+
+@keyframes compai-halo-respira {
+  0%, 100% { transform: scale(0.98); opacity: 0.34; }
+  50% { transform: scale(1.03); opacity: 0.62; }
+}
+
+@keyframes compai-visema {
+  0%, 100% { transform: scaleX(0.7); }
+  50% { transform: scaleX(1.15); }
+}
+
+@keyframes compai-clima {
+  0%, 100% { transform: translateY(0) rotate(-4deg); }
+  50% { transform: translateY(2px) rotate(5deg); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .compai-agente *,
+  .compai-agente::before,
+  .compai-agente::after {
+    animation: none !important;
+    transition: none !important;
+  }
+}

@@ -26,6 +26,17 @@ import { useAngelitaPresencia, esPasivo } from '../visual/agente/useAngelitaPres
  */
 const VISEMA_DE_STATE = {
     speaking: 'V2',
+    respondiendo: 'V2',
+};
+
+const ESTADO_DE_STATE = {
+    idle: 'acompana',
+    // eslint-disable-next-line chagra-i18n/no-hardcoded-spanish
+    thinking: 'pensando',
+    // eslint-disable-next-line chagra-i18n/no-hardcoded-spanish
+    speaking: 'respondiendo',
+    listening: 'escuchando',
+    caminando: 'caminando',
 };
 
 export default function ChagraAgentAvatarJaguar({
@@ -44,6 +55,10 @@ export default function ChagraAgentAvatarJaguar({
     // (tier), y no debe descartarlos donde el host los cablea.
     animated = true,
     tier = undefined,
+    clima = null,
+    enso = 'neutro',
+    direccion = 'derecha',
+    reducedMotion = false,
     'data-agt-estado': dataEstado = undefined,
     'data-pose': dataPose = undefined,
     'data-visema': dataVisema = undefined,
@@ -60,9 +75,9 @@ export default function ChagraAgentAvatarJaguar({
     // La presencia solo despierta cuando el estado es pasivo (idle): jamás
     // interrumpe una actuación conversacional. El jaguar ya está vivo en idle
     // (idle-cerebro), así que despertar = garantizar animated ON + su idle.
-    const estadoAgente = estado || state;
+    const estadoAgente = estado || ESTADO_DE_STATE[state] || 'acompana';
     const despiertaNatural = despierta && esPasivo(estadoAgente);
-    const estadoEfectivo = despiertaNatural ? 'idle' : state;
+    const estadoEfectivo = despiertaNatural ? 'acompana' : estadoAgente;
     const visema = visemaRecibido ?? VISEMA_DE_STATE[estadoEfectivo] ?? null;
 
     const bicho = (
@@ -71,6 +86,10 @@ export default function ChagraAgentAvatarJaguar({
             visema={visema}
             size={size}
             animated={animated}
+            clima={clima}
+            enso={enso}
+            direccion={direccion}
+            reducedMotion={reducedMotion}
             tier={tier}
             title={ariaLabel}
             className={className}

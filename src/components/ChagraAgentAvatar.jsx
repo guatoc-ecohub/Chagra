@@ -1,3 +1,4 @@
+import { lazy, Suspense } from 'react';
 import ChagraAgentAvatarAngelita from './ChagraAgentAvatarAngelita';
 import ChagraAgentAvatarZariguya from './ChagraAgentAvatarZariguya';
 import ChagraAgentAvatarJaguar from './ChagraAgentAvatarJaguar';
@@ -5,8 +6,14 @@ import ChagraAgentAvatarOsoBaston from './ChagraAgentAvatarOsoBaston';
 import ChagraAgentAvatarLuciernaga from './ChagraAgentAvatarLuciernaga';
 import ChagraAgentAvatarGuacamaya from './ChagraAgentAvatarGuacamaya';
 import ChagraAgentAvatarChivitoPunk from './ChagraAgentAvatarChivitoPunk';
-import useCompaiElegido from '../visual/mundo3d/escenas/useCompaiElegido.js';
-import { resolverEstadoVisualCompai } from '../visual/agente/compaiEstadoVisual.js';
+import useAgentAvatarType from '../hooks/useAgentAvatarType.js';
+import CompaiAgente from '../visual/agente/CompaiAgente.jsx';
+import {
+    ESPECIE_COMPAI_DEFECTO,
+    COMPAI_ESPECIES,
+    obtenerEspecieCompai,
+} from '../visual/agente/compaiEspecies.js';
+import { estadoCanonico } from '../visual/agente/angelitaEstados.js';
 
 /**
  * ChagraAgentAvatar — wrapper que delega según preferencia del usuario
@@ -29,15 +36,10 @@ import { resolverEstadoVisualCompai } from '../visual/agente/compaiEstadoVisual.
  * onDoubleClick, glow, className, ariaLabel (+ visema/confianza que
  * Angelita entiende y el resto ignora).
  *
- * API "rica" (fix 2026-07-25 — bug: varios call-sites que necesitaban el
- * vocabulario Spanish completo de Angelita, `angelitaEstados.js` —p.ej.
- * 'contenta', 'invita', 'acompana'— importaban `<Angelita>` CRUDO, sin pasar
- * por este dispatcher, así que ignoraban la elección del usuario (AgentFab,
- * AgentHero, FincaVivaHero, ColibriTransition). Se acepta ahora una prop
- * alterna `estado` (en vez de `state`) para esos call-sites: si el tipo
- * elegido no es Angelita, se traduce al vocabulario angosto (idle/thinking/
- * speaking/listening) que el resto del elenco entiende; si es Angelita, pasa
- * directo sin perder fidelidad.
+ * API "rica": `estado` conserva el vocabulario completo de
+ * `angelitaEstados.js` para cualquier especie. Los adaptadores de los siete
+ * compai reciben el mismo contrato, y cada cuerpo decide cómo representar la
+ * actuación sin que este dispatcher la reduzca a cuatro estados.
  *
  * 3ra opción (2026-07-25): 'zariguya' — la zarigüeya (crías al lomo, PR
  * #2783), adaptador en ChagraAgentAvatarZariguya.jsx.
@@ -54,18 +56,12 @@ import { resolverEstadoVisualCompai } from '../visual/agente/compaiEstadoVisual.
  * FaunaCalido.jsx), no se redibujaron a mano. Los 7: angelita, jaguar,
  * oso-baston, zariguya, luciernaga, chivito-punk, guacamaya.
  *
- * GUACAMAYA PROMOVIDA A "AVATAR RICO" (2026-08-21, "guacamaya = compai de
- * agente completo"): hasta hoy, `type==='guacamaya'` con la API rica caía en
- * `ComponenteAngosto` (traducción a la baja vía `STATE_DE_ESTADO_RICO`,
- * perdiendo 6 de los 10 estados) — solo Angelita bypaseaba esa traducción.
- * `GuacamayaCompai.jsx` ahora entiende el vocabulario rico de verdad (`estado`
- * + `visema`, ver ese archivo), así que se le da el MISMO bypass que ya tenía
- * Angelita: `estado`/`visema`/`confianza`/etc. le llegan directo, sin pasar
- * por `STATE_DE_ESTADO_RICO`. El resto del elenco (jaguar/oso-baston/
- * zariguya/luciernaga/chivito-punk) sigue traduciéndose a la baja hasta que
- * reciban la misma migración.
+ * El registro visual común (`COMPAI_ESPECIES`) es la única fuente para saber
+ * qué perfil está activo. Un slug inválido usa el perfil seguro de Angelita;
+ * los siete slugs registrados tienen adaptador y no tienen fallback propio.
  */
-const AVATAR_ANGOSTO = {
+const ADAPTADORES_DEV = {
+    angelita: ChagraAgentAvatarAngelita,
     zariguya: ChagraAgentAvatarZariguya,
     jaguar: ChagraAgentAvatarJaguar,
     'oso-baston': ChagraAgentAvatarOsoBaston,
@@ -74,33 +70,84 @@ const AVATAR_ANGOSTO = {
     'chivito-punk': ChagraAgentAvatarChivitoPunk,
 };
 
-export default function ChagraAgentAvatar({ estado = undefined, ...props }) {
-    const { avatarType: type } = useCompaiElegido();
-    const ComponenteAngosto = AVATAR_ANGOSTO[type];
+/* Los adaptadores 2D conservan el contrato síncrono en tests/dev, donde los
+   callers históricos inspeccionan el SVG en el mismo tick. En producción se
+   cargan después del shell y cada rig queda fuera del chunk de arranque. */
+const ADAPTADORES_PROD = {
+    angelita: lazy(() => import('./ChagraAgentAvatarAngelita.jsx')),
+    zariguya: lazy(() => import('./ChagraAgentAvatarZariguya.jsx')),
+    jaguar: lazy(() => import('./ChagraAgentAvatarJaguar.jsx')),
+    'oso-baston': lazy(() => import('./ChagraAgentAvatarOsoBaston.jsx')),
+    luciernaga: lazy(() => import('./ChagraAgentAvatarLuciernaga.jsx')),
+    guacamaya: lazy(() => import('./ChagraAgentAvatarGuacamaya.jsx')),
+    'chivito-punk': lazy(() => import('./ChagraAgentAvatarChivitoPunk.jsx')),
+};
 
+const ADAPTADOR_POR_ESPECIE = import.meta.env.PROD ? ADAPTADORES_PROD : ADAPTADORES_DEV;
+
+const STATE_DE_ESTADO_RICO = Object.freeze({
+    acompana: 'idle',
+    escuchando: 'listening',
+    pensando: 'thinking',
+    respondiendo: 'speaking',
+    contenta: 'speaking',
+    preocupada: 'listening',
+    'no-se': 'thinking',
+    senala: 'thinking',
+    invita: 'speaking',
+    husmea: 'thinking',
+    caminando: 'caminando',
+});
+
+const ESTADO_RICO_DE_STATE = Object.freeze({
+    idle: 'acompana',
+    listening: 'escuchando',
+    // eslint-disable-next-line chagra-i18n/no-hardcoded-spanish
+    thinking: 'pensando',
+    // eslint-disable-next-line chagra-i18n/no-hardcoded-spanish
+    speaking: 'respondiendo',
+    caminando: 'caminando',
+});
+
+const faltante = Object.keys(COMPAI_ESPECIES).find((especie) => !ADAPTADOR_POR_ESPECIE[especie]);
+if (faltante) {
+    throw new Error(`Dispatcher compai sin adaptador registrado: ${faltante}`);
+}
+
+function estadoRicoDeEntrada(estado, state) {
     if (estado !== undefined) {
-        const visual = resolverEstadoVisualCompai(type, estado);
-        const atributosVisuales = {
-            'data-agt-estado': visual.estado,
-            'data-pose': visual.pose,
-            'data-visema': props.visema || undefined,
-        };
-
-        // El estado canónico se conserva en el rig. `state` mantiene la
-        // compatibilidad con cuerpos históricos de cuatro estados.
-        if (type === 'guacamaya') {
-            return <ChagraAgentAvatarGuacamaya estado={visual.estado} state={visual.state} {...atributosVisuales} {...props} />;
-        }
-        if (ComponenteAngosto) {
-            return <ComponenteAngosto estado={visual.estado} state={visual.state} {...atributosVisuales} {...props} />;
-        }
-        // Angelita pasa por el mismo adaptador que el selector y la galería.
-        // Así no existe un segundo call-site que pueda perder props del cuerpo
-        // canónico (rubber-hose, lip-sync o reduced-motion).
-        return <ChagraAgentAvatarAngelita estado={visual.estado} {...props} {...atributosVisuales} />;
+        // `estadoCanonico` no conoce locomoción conversacional: conservarla
+        // aquí evita que caminando vuelva silenciosamente a acompana.
+        return estado === 'caminando' ? 'caminando' : estadoCanonico(estado);
     }
+    return ESTADO_RICO_DE_STATE[state] || 'acompana';
+}
 
-    if (ComponenteAngosto) return <ComponenteAngosto {...props} />;
-    // default → Angelita, el agente de Chagra.
-    return <ChagraAgentAvatarAngelita {...props} />;
+/** Resuelve el perfil y el adaptador exclusivamente desde el slug elegido. */
+function resolverAvatarCompai(especie) {
+    const perfil = obtenerEspecieCompai(especie) || ESPECIE_COMPAI_DEFECTO;
+    return {
+        perfil,
+        Adaptador: ADAPTADOR_POR_ESPECIE[perfil.avatarType],
+    };
+}
+
+export default function ChagraAgentAvatar({ estado = undefined, state = undefined, ...props }) {
+    const [type] = useAgentAvatarType();
+    const { perfil, Adaptador } = resolverAvatarCompai(type);
+    const estadoEntrada = estadoRicoDeEntrada(estado, state);
+    const stateEntrada = STATE_DE_ESTADO_RICO[estadoEntrada] || state;
+
+    return (
+        <Suspense fallback={<span role="img" aria-label="Compañero cargando" data-agt-especie={perfil.avatarType} />}>
+            <CompaiAgente
+                {...props}
+                especie={perfil.avatarType}
+                estado={estadoEntrada}
+                state={stateEntrada}
+                chrome={false}
+                adaptador={Adaptador}
+            />
+        </Suspense>
+    );
 }

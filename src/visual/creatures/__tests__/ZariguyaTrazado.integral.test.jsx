@@ -111,4 +111,27 @@ describe('ChagraAgentAvatarZariguya — el agente 2D usa la skin trazada', () =>
     fireEvent.pointerEnter(boton);
     expect(boton).toBeInTheDocument();
   });
+
+  it.each([
+    ['acompana', 'anda'], ['escuchando', 'reposo'], ['pensando', 'anda'],
+    ['respondiendo', 'anda'], ['contenta', 'celebra'], ['preocupada', 'anda'],
+    ['no-se', 'anda'], ['senala', 'señala'], ['invita', 'anda'], ['husmea', 'anda'],
+  ])('estado rico %s conserva la pose del registro %s', (estado, pose) => {
+    const { container } = render(<ChagraAgentAvatarZariguya estado={estado} reaccionaPresencia={false} />);
+    const raiz = container.querySelector('div[data-creature="zariguya"]');
+    expect(raiz).toHaveAttribute('data-agt-estado', estado);
+    expect(raiz).toHaveAttribute('data-pose', pose);
+  });
+
+  it('caminando conserva dos frames de marcha y las crías siguen en la piel', () => {
+    const { container } = render(
+      <ChagraAgentAvatarZariguya estado="caminando" reaccionaPresencia={false} />,
+    );
+    const raiz = container.querySelector('div[data-creature="zariguya"]');
+    expect(raiz).toHaveAttribute('data-pose', 'camina');
+    expect(raiz.querySelector('.zh-piernaCerca')).toBeInTheDocument();
+    expect(raiz.querySelector('.zh-piernaLejos')).toBeInTheDocument();
+    expect(raiz.querySelector('.zh-piernaCercaBaja')).toBeInTheDocument();
+    expect(raiz.querySelector('.zh-piernaLejosBaja')).toBeInTheDocument();
+  });
 });

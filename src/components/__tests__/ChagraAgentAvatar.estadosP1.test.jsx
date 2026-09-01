@@ -12,6 +12,8 @@ const ELENCO = [
   'guacamaya',
 ];
 
+const ESTADOS_RICOS = ['preocupada', 'no-se', 'senala', 'husmea', 'caminando'];
+
 function elegir(especie) {
   localStorage.setItem('compai:companero', especie);
   localStorage.setItem('chagra:agent-avatar-type', especie);
@@ -49,6 +51,19 @@ describe('ChagraAgentAvatar — P1 estados ricos por especie', () => {
       );
       expect(rig(container)).toHaveAttribute('data-agt-estado', 'preocupada');
       unmount();
+    }
+  });
+
+  it('entrega los cinco estados ricos críticos a los siete adaptadores', () => {
+    for (const especie of ELENCO) {
+      elegir(especie);
+      for (const estado of ESTADOS_RICOS) {
+        const { container, unmount } = render(
+          <ChagraAgentAvatar estado={estado} reaccionaPresencia={false} />,
+        );
+        expect(rig(container)).toHaveAttribute('data-agt-estado', estado);
+        unmount();
+      }
     }
   });
 });

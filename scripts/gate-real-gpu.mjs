@@ -63,6 +63,14 @@ const ctx = await browser.newContext({
   serviceWorkers: 'block',
 });
 const page = await ctx.newPage();
+if (process.env.GATE_AVATAR_TYPE) {
+  // Permite repetir el mismo gate para cada compañero sin depender de una
+  // sesión persistente ni de clicks manuales en el selector.
+  await page.addInitScript((avatarType) => {
+    localStorage.setItem('compai:companero', avatarType);
+    localStorage.setItem('chagra:agent-avatar-type', avatarType);
+  }, process.env.GATE_AVATAR_TYPE);
+}
 
 // TROIKA / drei <Text>: en chromium 148 los blob-workers de troika mueren async y
 // dejan TODA la escena 3D suspendida — el canvas queda de un solo color y la captura
