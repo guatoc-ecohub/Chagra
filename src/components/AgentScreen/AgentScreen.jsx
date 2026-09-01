@@ -191,6 +191,22 @@ const STATE_IDLE = 'idle';
 const STATE_RECORDING = 'recording';
 const STATE_THINKING = 'thinking';
 
+const MCP_TOOL_FAILURE_LABELS = {
+  get_calendario_siembra: 'el calendario',
+};
+
+const findMcpToolFailure = (toolEvidence) => {
+  const evidences = Array.isArray(toolEvidence) ? toolEvidence : [toolEvidence];
+  return evidences.find((evidence) => evidence?.result?._error === true) || null;
+};
+
+const mcpToolFailureMessage = (toolEvidence) => {
+  const failure = findMcpToolFailure(toolEvidence);
+  if (!failure) return '';
+  const label = MCP_TOOL_FAILURE_LABELS[failure.tool] || 'esa consulta técnica';
+  return `No pude consultar ${label} ahora. Intenta de nuevo en un momento.`;
+};
+
 export default function AgentScreen({ onBack, onNavigate, initialContext }) {
   // B1: clase de animación de entrada, resuelta UNA vez al montar (no en cada
   // re-render — si no, la animación se reiniciaría con cada mensaje). Vacía bajo
@@ -1420,6 +1436,10 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
         interruptErr.interruptReason = cancelReasonRef.current || 'abort';
         throw interruptErr;
       }
+      // Preserve the typed sidecar failure so the outer pipeline can show the
+      // tool-specific honest message instead of replacing it with a generic
+      // LLM error.
+      if (e?.mcpToolError) throw e;
       const match = e.message.match(/^LLM (\d+)/);
       if (match) {
         const status = parseInt(match[1], 10);
@@ -2300,6 +2320,12 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
       if (deterministicPrice != null) {
         console.debug('[precio] respuesta determinista SIPSA (sin LLM)', { route: nluRoute });
       }
+      const toolFailureMessage = mcpToolFailureMessage(toolEvidence);
+      if (toolFailureMessage) {
+        // El modelo puede completar con conocimiento general, pero el fallo
+        // del dato MCP debe quedar visible y accionable para el operador.
+        setError(toolFailureMessage);
+      }
       // Fallback estructurado (Item 9): si el LLM retornó vacío (timeout, OOM,
       // modelo caído), construimos una respuesta útil con lo que sabemos
       // (toolEvidence, entidades) en vez de un silencio o banner rojo.
@@ -2803,7 +2829,13 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
       } else {
         // NUNCA e.message crudo al banner ("Failed to fetch", stacktraces):
         // mensajeErrorCampesino respeta frases ya curadas y traduce lo técnico.
-        setError(mensajeErrorCampesino(e, 'No pude con esa pregunta. Intente de nuevo, o pregunte de otra forma.'));
+        const mcpStreamError = e?.mcpToolError
+          ? mcpToolFailureMessage({
+              tool: e.tool,
+              result: { _error: true },
+            })
+          : '';
+        setError(mcpStreamError || mensajeErrorCampesino(e, 'No pude con esa pregunta. Intente de nuevo, o pregunte de otra forma.'));
         // Error NO-interrupción (HTTP 5xx, sesión, etc.): marcar failed. El
         // prompt queda intacto en IDB; la cola durable NO lo reintenta (no es
         // recuperable solo con reintentar), pero NO se pierde el dato.
