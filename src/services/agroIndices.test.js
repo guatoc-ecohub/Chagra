@@ -145,6 +145,13 @@ describe('parseCultivos (texto libre del perfil → fichas)', () => {
         const { cultivos } = parseCultivos('cafe');
         expect(cultivos[0].enfermedades).toContain('roya_cafe');
     });
+    it('resuelve las ocho fichas nuevas, incluidas variantes de invernadero', () => {
+        const { cultivos, sinFicha } = parseCultivos('Fresa, Granadilla, Tomate Cherry-Invernadero, Tomate, Espinaca, Gulupa, Limón-Invernadero, Guayaba');
+        expect(cultivos.map((cultivo) => cultivo.key)).toEqual(expect.arrayContaining([
+            'fresa', 'granadilla', 'tomate_cherry', 'tomate', 'espinaca', 'gulupa', 'limon', 'guayaba',
+        ]));
+        expect(sinFicha).toHaveLength(0);
+    });
 });
 
 describe('Índices auxiliares', () => {
