@@ -9,9 +9,9 @@ export function LuciernagaTrazado({
   animated = true,
   title = 'Luciérnaga',
   linterna = 'normal',
-  style,
-  onClick,
-  onDoubleClick,
+  style = undefined,
+  onClick = undefined,
+  onDoubleClick = undefined,
   ...rest
 }) {
   const estado = ['normal', 'fuerte', 'apagada'].includes(linterna) ? linterna : 'normal';

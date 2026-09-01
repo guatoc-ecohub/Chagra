@@ -26,7 +26,7 @@ import ChagraAgentAvatarLuciernaga from '../ChagraAgentAvatarLuciernaga';
 import ChagraAgentAvatarGuacamaya from '../ChagraAgentAvatarGuacamaya';
 import ChagraAgentAvatarChivitoPunk from '../ChagraAgentAvatarChivitoPunk';
 
-const raizSvg = (container, slug) => container.querySelector(`svg[data-creature="${slug}"]`);
+const raizSvg = (container, slug) => container.querySelector(`[data-creature="${slug}"]`);
 const raizDiv = (container, slug) => container.querySelector(`div[data-creature="${slug}"]`);
 
 const CASOS = [

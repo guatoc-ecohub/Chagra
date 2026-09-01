@@ -2,6 +2,7 @@ import { render } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
 import { ChivitoTrazado } from '../ChivitoTrazado.jsx';
 import { LuciernagaTrazado } from '../LuciernagaTrazado.jsx';
+import { CREATURES } from '../index.js';
 
 describe('criaturas auto-trazadas', () => {
   it('monta la piel generada y mantiene el punk reservado a actuando', () => {
@@ -11,7 +12,7 @@ describe('criaturas auto-trazadas', () => {
         <ChivitoTrazado data-testid="punk" punk modo="actuando" />
       </>,
     );
-    const roots = container.querySelectorAll('[data-creature="chivito-páramo"]');
+    const roots = container.querySelectorAll('[data-creature="chivito-punk"]');
     expect(roots).toHaveLength(2);
     expect(roots[0].querySelector('svg')).toBeTruthy();
     expect(roots[0].querySelector('svg').outerHTML).not.toBe(roots[1].querySelector('svg').outerHTML);
@@ -26,5 +27,10 @@ describe('criaturas auto-trazadas', () => {
     expect(root).toHaveAttribute('data-linterna', 'apagada');
     expect(root.querySelector('svg')).toBeTruthy();
     expect(root.querySelectorAll('path').length).toBeGreaterThan(100);
+  });
+
+  it('el registro visible de la PWA usa tinta para los slugs canónicos', () => {
+    expect(CREATURES.luciernaga.Component).toBe(LuciernagaTrazado);
+    expect(CREATURES['chivito-punk'].Component).toBe(ChivitoTrazado);
   });
 });

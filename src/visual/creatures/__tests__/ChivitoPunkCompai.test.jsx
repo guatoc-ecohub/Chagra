@@ -6,30 +6,30 @@ import ChagraAgentAvatarChivitoPunk from '../../../components/ChagraAgentAvatarC
 afterEach(cleanup);
 
 const ESTADOS = [
-  ['acompana', 'vuela'], ['escuchando', 'reposo'], ['pensando', 'vuela'],
-  ['respondiendo', 'vuela'], ['contenta', 'celebra'], ['preocupada', 'vuela'],
-  ['no-se', 'vuela'], ['senala', 'señala'], ['invita', 'vuela'],
-  ['husmea', 'vuela'], ['caminando', 'vuela'],
+  ['acompana', 'normal'], ['escuchando', 'normal'], ['pensando', 'normal'],
+  ['respondiendo', 'actuando'], ['contenta', 'normal'], ['preocupada', 'normal'],
+  ['no-se', 'normal'], ['senala', 'normal'], ['invita', 'actuando'],
+  ['husmea', 'normal'], ['caminando', 'normal'],
 ];
 
 describe('ChagraAgentAvatarChivitoPunk — contrato Compai', () => {
-  it.each(ESTADOS)('estado %s conserva la pose física %s', (estado, pose) => {
+  it.each(ESTADOS)('estado %s conserva la piel %s', (estado, modo) => {
     const { container } = render(
       <ChagraAgentAvatarChivitoPunk estado={estado} reaccionaPresencia={false} />,
     );
-    const raiz = container.querySelector('svg[data-creature="chivito-punk"]');
+    const raiz = container.querySelector('[data-creature="chivito-punk"]');
     expect(raiz).toHaveAttribute('data-agt-estado', estado);
-    expect(raiz).toHaveAttribute('data-pose', pose);
-    expect(raiz).not.toHaveAttribute('data-creature', 'chivito');
+    expect(raiz).toHaveAttribute('data-modo', modo);
+    expect(raiz.querySelector('svg')).toBeInTheDocument();
   });
 
   it('caminando resuelve vuelo y conserva el rig F24 inlineado', () => {
     const { container } = render(
       <ChagraAgentAvatarChivitoPunk estado="caminando" reaccionaPresencia={false} />,
     );
-    const raiz = container.querySelector('svg[data-creature="chivito-punk"]');
-    expect(raiz).toHaveAttribute('data-pose', 'vuela');
-    expect(raiz.querySelector('[id*="chivitoWrap"]')).toBeInTheDocument();
+    const raiz = container.querySelector('[data-creature="chivito-punk"]');
+    expect(raiz).toHaveAttribute('data-modo', 'normal');
+    expect(raiz.querySelector('svg')).toBeInTheDocument();
   });
 
   it('forwardea visema, clima y tier al rig canónico', () => {
@@ -42,7 +42,7 @@ describe('ChagraAgentAvatarChivitoPunk — contrato Compai', () => {
         reaccionaPresencia={false}
       />,
     );
-    const raiz = container.querySelector('svg[data-creature="chivito-punk"]');
+    const raiz = container.querySelector('[data-creature="chivito-punk"]');
     expect(raiz).toHaveAttribute('data-visema', 'V4');
     expect(raiz).toHaveAttribute('data-clima', 'niebla');
     expect(raiz).toHaveAttribute('data-tier', 'bajo');

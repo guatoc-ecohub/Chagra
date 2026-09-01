@@ -1,4 +1,4 @@
-import { Luciernaga } from '../visual/creatures/Luciernaga';
+import LuciernagaTrazado from '../visual/creatures/LuciernagaTrazado.jsx';
 import { useAngelitaPresencia, esPasivo } from '../visual/agente/useAngelitaPresencia';
 
 /**
@@ -6,39 +6,18 @@ import { useAngelitaPresencia, esPasivo } from '../visual/agente/useAngelitaPres
  * del agente de Chagra, 6ta opción del elenco.
  *
  * Cierra parte del ítem #8 del GAP compAI (2026-08-13): la luciérnaga ya
- * tenía cuerpo dibujado (`Luciernaga.jsx`, cruzó a la PWA el 2026-08-11) y ya
+ * tiene cuerpo dibujado (`LuciernagaTrazado.jsx`, cruzó a la PWA el 2026-08-11) y ya
  * estaba marcada `enPWA:true` en `compai/nucleo/elenco.js` (#96) — pero
  * ningún selector la ofrecía. Este adaptador es el que faltaba.
  *
  * Adaptador puro (mismo contrato que ChagraAgentAvatarZariguya): traduce la
  * API histórica del avatar del agente (state 'idle'|'thinking'|'speaking'|
- * 'listening', glow, withLabel, onClick/onDoubleClick) al vocabulario de VIDA
- * de `Luciernaga.jsx` (`visual/creatures/`). Cero lógica nueva de agente,
- * cero cambios en `visual/creatures/`.
+ * 'listening', glow, withLabel, onClick/onDoubleClick) a la tinta Trazado de
+ * `LuciernagaTrazado.jsx`. Cero lógica nueva de agente.
  *
- *   - idle       → pose 'vuela' (base, flota).
- *   - thinking   → pose 'vuela' + `eco='leer'`: la linterna pulsa atenta
- *                  mientras "lee la noche" — su reacción-firma científica
- *                  leída como "pensando".
- *   - speaking   → pose 'celebra' + visema del lip-sync.
- *   - listening  → pose 'reposo': se posa atenta.
+ *   - idle/listening → linterna normal.
+ *   - thinking/speaking → linterna fuerte.
  */
-const POSE_DE_STATE = {
-    idle: 'vuela',
-    thinking: 'vuela',
-    speaking: 'celebra',
-    listening: 'reposo',
-};
-
-const ECO_DE_STATE = {
-    thinking: 'leer',
-};
-
-const VISEMA_DE_STATE = {
-    speaking: 'V2',
-    respondiendo: 'V2',
-};
-
 const ESTADO_DE_STATE = {
     idle: 'acompana',
     // eslint-disable-next-line chagra-i18n/no-hardcoded-spanish
@@ -48,6 +27,12 @@ const ESTADO_DE_STATE = {
     listening: 'escuchando',
     caminando: 'caminando',
 };
+
+/* eslint-disable chagra-i18n/no-hardcoded-spanish */
+const ESTADOS_LINTERNA_FUERTE = new Set([
+    'thinking', 'pensando', 'speaking', 'respondiendo', 'hablando', 'actuando',
+]);
+/* eslint-enable chagra-i18n/no-hardcoded-spanish */
 
 export default function ChagraAgentAvatarLuciernaga({
     state = 'idle',
@@ -74,29 +59,25 @@ export default function ChagraAgentAvatarLuciernaga({
     const { despierta, handlers: handlersPresencia } = useAngelitaPresencia({ activo: reaccionaPresencia });
     const estadoAgente = estado || ESTADO_DE_STATE[state] || 'acompana';
     const estadoEfectivo = despierta && esPasivo(estadoAgente) ? 'acompana' : estadoAgente;
-    const pose = POSE_DE_STATE[estadoEfectivo] || 'vuela';
-    const eco = ECO_DE_STATE[estadoEfectivo] || null;
-    const visema = visemaRecibido ?? VISEMA_DE_STATE[estadoEfectivo] ?? null;
+    const linterna = ESTADOS_LINTERNA_FUERTE.has(estadoEfectivo) ? 'fuerte' : 'normal';
+    const visema = visemaRecibido || (ESTADOS_LINTERNA_FUERTE.has(estadoEfectivo) ? 'V2' : undefined);
 
     const bicho = (
-        <Luciernaga
-            pose={pose}
-            eco={eco}
-            visema={visema}
-            estado={estadoEfectivo}
-            clima={clima}
-            enso={enso}
-            direccion={direccion}
-            animated={animated}
-            reducedMotion={reducedMotion}
-            tier={tier}
+        <LuciernagaTrazado
+            animated={animated && !reducedMotion}
             size={size}
             title={ariaLabel}
             className={className}
             style={glow ? { filter: 'drop-shadow(0 0 10px rgba(199,255,78,0.65))' } : undefined}
+            linterna={linterna}
             data-agt-estado={dataEstado || estadoAgente}
-            data-pose={dataPose || pose}
-            data-visema={dataVisema || visema || undefined}
+            data-estado={estadoEfectivo}
+            data-pose={dataPose || undefined}
+            data-visema={dataVisema || visema}
+            data-clima={clima || undefined}
+            data-tier={tier || undefined}
+            data-enso={enso}
+            data-direccion={direccion}
         />
     );
 

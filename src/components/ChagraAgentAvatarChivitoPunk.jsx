@@ -1,4 +1,4 @@
-import ChivitoPunk from '../visual/creatures/ChivitoPunk';
+import ChivitoTrazado from '../visual/creatures/ChivitoTrazado.jsx';
 import { useAngelitaPresencia, esPasivo } from '../visual/agente/useAngelitaPresencia';
 
 /**
@@ -9,12 +9,13 @@ import { useAngelitaPresencia, esPasivo } from '../visual/agente/useAngelitaPres
  *
  * Cierra el ítem #8 del GAP compAI: el chivito no tenía cuerpo en la PWA
  * (`ELENCO['chivito-punk'].enPWA` seguía `false`); ahora lo tiene reusando el
- * rig F24 del valle (`visual/creatures/ChivitoPunk.jsx`, ver ese archivo).
+ * tinta Trazado (`visual/creatures/ChivitoTrazado.jsx`, ver ese archivo).
  *
  * Adaptador puro (mismo contrato que los hermanos ChagraAgentAvatar*): traduce
  * la API histórica del avatar del agente (state 'idle'|'thinking'|'speaking'|
  * 'listening', glow, withLabel, onClick/onDoubleClick) al `state` que
- * `ChivitoPunk.jsx` ya entiende directo.
+ * `ChivitoTrazado.jsx` mantiene la piel normal en reposo y activa la variante
+ * punk solo durante la actuación.
  */
 export default function ChagraAgentAvatarChivitoPunk({
     state = 'idle',
@@ -43,23 +44,28 @@ export default function ChagraAgentAvatarChivitoPunk({
     const { despierta, handlers: handlersPresencia } = useAngelitaPresencia({ activo: reaccionaPresencia });
     const estadoAgente = estado || state;
     const estadoEfectivo = despierta && esPasivo(estadoAgente) ? 'idle' : state;
+    // eslint-disable-next-line chagra-i18n/no-hardcoded-spanish
+    const estaActuando = ['speaking', 'respondiendo', 'hablando', 'actuando', 'invita', 'celebra'].includes(estadoAgente);
+    const visemaEfectivo = dataVisema || visema || (estaActuando ? 'V2' : undefined);
     const bicho = (
-        <ChivitoPunk
-            state={estadoEfectivo}
+        <ChivitoTrazado
             size={size}
             title={ariaLabel}
             className={className}
             style={glow ? { filter: 'drop-shadow(0 0 10px rgba(140,70,232,0.65))' } : undefined}
-            estado={dataEstado || estadoAgente}
-            pose={dataPose}
-            visema={dataVisema || visema || undefined}
             animated={animated}
-            reducedMotion={reducedMotion}
-            tier={dataTier || tier}
-            clima={clima}
-            enso={enso}
-            direccion={direccion}
-            data-clima={dataClima}
+            punk
+            actuando={estaActuando}
+            modo={estaActuando ? 'actuando' : 'normal'}
+            data-agt-estado={dataEstado || estadoAgente}
+            data-estado={estadoEfectivo}
+            data-pose={dataPose || undefined}
+            data-visema={visemaEfectivo}
+            data-clima={dataClima || clima || undefined}
+            data-tier={dataTier || tier}
+            data-enso={enso}
+            data-direccion={direccion}
+            data-reduced-motion={reducedMotion ? 'true' : undefined}
         />
     );
 

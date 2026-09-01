@@ -16,16 +16,16 @@ export function ChivitoTrazado({
   modo = 'normal',
   actuando = false,
   punk = false,
-  style,
-  onClick,
-  onDoubleClick,
+  style = undefined,
+  onClick = undefined,
+  onDoubleClick = undefined,
   ...rest
 }) {
   const esPunk = Boolean(punk && (actuando || modo === 'actuando'));
   return (
     <TrazadoBase
       markup={esPunk ? TRAZADOS.punk : TRAZADOS.normal}
-      creature="chivito-páramo"
+      creature="chivito-punk"
       size={size}
       title={title}
       animated={animated}

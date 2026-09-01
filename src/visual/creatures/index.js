@@ -215,10 +215,9 @@ export { EntFrailejon } from './EntFrailejon.jsx';
 /* ── TINTA NUEVA (2026-08-31, bases aprobadas por el operador) ────────────────
    El chivito de páramo (normal + cresta punk cuando ACTÚA) y la luciérnaga DE
    PIE (lápiz + libro + linterna encendida), dibujados a mano — línea limpia +
-   planos de color, cero trazado. El registro CREATURES sigue apuntando a las
-   láminas (`ChivitoPunkLaminaViva` / `LuciernagaLaminaViva`) hasta que el
-   operador juzgue la tinta y ordene el cambio — trabajo aparte, misma regla
-   que la zarigüeya (#2613 → trazado). */
+   planos de color, cero trazado. El registro CREATURES y los adaptadores del
+   elenco apuntan a `ChivitoTrazado` / `LuciernagaTrazado`; las láminas
+   `*LaminaViva` quedan como compatibilidad histórica fuera del montaje activo. */
 export { ChivitoTinta } from './ChivitoTinta.jsx';
 export { CHIVITO_TINTA_PALETA, PERFIL_CHIVITO_TINTA } from './chivitoTintaIdentidad.js';
 export { LuciernagaTinta } from './LuciernagaTinta.jsx';
@@ -294,6 +293,8 @@ import OsoGuardian from './OsoGuardian.jsx';
 import RanaAndina from './RanaAndina.jsx';
 import Perezoso from './Perezoso.jsx';
 import Ardilla from './Ardilla.jsx';
+import ChivitoTrazado from './ChivitoTrazado.jsx';
+import LuciernagaTrazado from './LuciernagaTrazado.jsx';
 /* EL JAGUAR DEL ELENCO = JaguarTrazado (decisión operador 2026-08-24,
    DEFINITIVA): la lámina AUTO-TRAZADA a tinta sobre el esqueleto de huesos
    reemplaza a `JaguarLaminaViva` (la PNG recortada en capas, rechazada — el
@@ -322,9 +323,7 @@ import Gallina from './Gallina.jsx';
    conservado (ZARIGUYA_PRESENCIA sin cambios). `ZariguyaLaminaViva.jsx` y
    `ZariguyaGeminiLaminaViva.jsx` NO se borran (huérfanos, por historia). */
 import ZariguyaTrazado from './ZariguyaTrazado.jsx';
-import LuciernagaLaminaViva from './LuciernagaLaminaViva.jsx';
 import OsoBastonLaminaViva from './OsoBastonLaminaViva.jsx';
-import ChivitoPunkLaminaViva from './ChivitoPunkLaminaViva.jsx';
 import MaizCompai from './MaizCompai.jsx';
 import EntFrailejon from './EntFrailejon.jsx';
 
@@ -370,8 +369,8 @@ export const CREATURES = {
   zariguya: { Component: ZariguyaTrazado, nombre: 'Zarigüeya (chucha)', cientifico: 'Didelphis marsupialis' },
   // El escarabajo bioluminiscente de la finca (la guía que lee la noche — su
   // linterna es un medidor vivo del cambio climático).
-  luciernaga: { Component: LuciernagaLaminaViva, nombre: 'Luciérnaga (cocuyo)', cientifico: 'Lampyridae' },
-  'chivito-punk': { Component: ChivitoPunkLaminaViva, nombre: 'Chivito de páramo', cientifico: 'Oxypogon guerinii' },
+  luciernaga: { Component: LuciernagaTrazado, nombre: 'Luciérnaga (cocuyo)', cientifico: 'Lampyridae' },
+  'chivito-punk': { Component: ChivitoTrazado, nombre: 'Chivito de páramo', cientifico: 'Oxypogon guerinii' },
   // La mata madre de la milpa (flora compañera, como el Ent): el avatar-planta
   // arraigado que se mece, alimenta y corona en espiga.
   maiz: { Component: MaizCompai, nombre: 'Planta de maíz', cientifico: 'Zea mays' },
