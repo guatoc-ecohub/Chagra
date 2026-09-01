@@ -1221,7 +1221,7 @@ describe('sidecarClient — companionSpeciesGuard post-LLM', () => {
     expect(url).toBe('/api/mcp/agro/companion-species-guard');
     expect(opts.method).toBe('POST');
     const body = JSON.parse(opts.body);
-    expect(body).toEqual({ response: 'respuesta del agente ya generada' });
+    expect(body).toEqual({ response_text: 'respuesta del agente ya generada' });
   });
 
   it('degrada a null si el endpoint cae o no responde 2xx', async () => {

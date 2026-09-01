@@ -681,7 +681,7 @@ export async function companionSpeciesGuard(
     const res = await fetchImpl(`${sidecarUrl}/companion-species-guard`, {
       method: 'POST',
       headers,
-      body: JSON.stringify({ response: responseText }),
+      body: JSON.stringify({ response_text: responseText }),
       signal: AbortSignal.timeout(5000),
     });
     if (!res.ok) return { has_companion_species: false, system_prompt_block: '' };

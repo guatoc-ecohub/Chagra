@@ -830,7 +830,7 @@ export async function pestVsDiseaseGuard(userMessage) {
  */
 export async function companionSpeciesGuard(responseText) {
   if (!responseText || typeof responseText !== 'string' || !responseText.trim()) return null;
-  const raw = await postJson('/companion-species-guard', { response: responseText }, TOOL_TIMEOUT_MS);
+  const raw = await postJson('/companion-species-guard', { response_text: responseText }, TOOL_TIMEOUT_MS);
   if (!raw || typeof raw !== 'object') return null;
   const hasCompanionSpecies =
     raw.has_companion_species === true ||
