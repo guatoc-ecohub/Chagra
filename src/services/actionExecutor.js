@@ -102,7 +102,7 @@ const gateResult = await pendingActionCallback({
   if (gateResult.status === 'edited') {
     const editedParams = gateResult.edited_params || proposal.parameters;
     const execResult = await executeTool(tool, editedParams);
-    
+
     await logAuditTrail(proposal, operatorId, {
       status: 'executed',
       edited: true,
@@ -121,7 +121,7 @@ const gateResult = await pendingActionCallback({
 
   if (gateResult.status === 'approved') {
     const execResult = await executeTool(tool, proposal.parameters);
-    
+
     await logAuditTrail(proposal, operatorId, {
       status: 'executed',
       result: execResult,
