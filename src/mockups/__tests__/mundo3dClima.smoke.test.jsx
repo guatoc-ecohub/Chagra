@@ -71,7 +71,6 @@ describe('vitrina del mundo del clima (mockups/mundo3d-clima)', () => {
     expect(screen.getByTestId('clima-metrica-lluvia')).toHaveTextContent('1.6 mm');
     expect(screen.getByTestId('clima-metrica-viento')).toHaveTextContent('13 km/h');
   });
-
   test('muestra la alerta por cultivo en el radar del mundo', () => {
     render(<CultivoRadar isHydrated suggestions={[{
       key: 'fresa',
