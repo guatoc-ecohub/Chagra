@@ -44,6 +44,34 @@ describe('derivarClima3D', () => {
     expect(niebla.helada).toBe(true);
   });
 
+  test('conecta las cuatro métricas del payload canónico de Open-Meteo', () => {
+    const clima = derivarClima3D(snapshot({
+      openmeteo: {
+        available: true,
+        current: {
+          temperature_2m: 18.4,
+          relative_humidity_2m: 74,
+          precipitation: 1.6,
+          wind_speed_10m: 13.2,
+          cloud_cover: 48,
+        },
+        forecast_7d: [{
+          date: hoy,
+          temperature_2m_min: 9.5,
+          temperature_2m_max: 22.1,
+          precipitation_sum: 1.6,
+        }],
+      },
+    }));
+
+    expect(clima.temp).toBe(18.4);
+    expect(clima.humedad).toBe(74);
+    expect(clima.lluviaMm).toBe(1.6);
+    expect(clima.viento).toBe(13.2);
+    expect(clima.tempMin).toBe(9.5);
+    expect(clima.tempMax).toBe(22.1);
+  });
+
   test('sin snapshot no inventa cifras ni fenómenos', () => {
     const clima = derivarClima3D(null);
 
