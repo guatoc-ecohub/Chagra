@@ -20,6 +20,8 @@
  *     (falta el dato) es SlotPendiente en la UI, nunca un inventado.
  */
 
+import { FICHAS_AGROCLIMATICAS } from '../data/fichasAgroclimaticas.js';
+
 /* ─────────────────────────── VPD ─────────────────────────────────────────
  * Déficit de presión de vapor (kPa): "cuánta sed tiene el aire".
  * es(T) = 0.6108·exp(17.27·T/(T+237.3))  [Tetens, FAO-56 eq. 11]
@@ -359,6 +361,7 @@ export const CULTIVOS_AGRO = Object.freeze({
         nombre: 'Tomate', emoji: '🍅', kc: { ini: 0.6, mid: 1.15, end: 0.8 }, kcConfianza: 'alta',
         kcFuente: 'FAO-56 Tabla 12 (tomate)', enfermedades: ['tizon_tomate', 'antracnosis'], gddId: null,
         piso: 'templado', aguaNota: 'UV alto quema el fruto; riego constante evita rajado.',
+        fichaAgroclimatica: FICHAS_AGROCLIMATICAS.tomate,
     },
     frijol: {
         nombre: 'Fríjol', emoji: '🫘', kc: { ini: 0.4, mid: 1.15, end: 0.35 }, kcConfianza: 'alta',
@@ -400,6 +403,48 @@ export const CULTIVOS_AGRO = Object.freeze({
         kcFuente: 'FAO-56 (berries ~1.05)', enfermedades: ['antracnosis'], gddId: null,
         piso: 'frio', aguaNota: 'Poda y buen drenaje; la antracnosis mancha el fruto.',
     },
+    fresa: {
+        nombre: 'Fresa', emoji: '🍓', kc: {}, kcConfianza: 'pendiente',
+        kcFuente: 'Kc pendiente de una fuente específica para esta ficha', enfermedades: [], gddId: null,
+        piso: 'frio', aguaNota: 'Evite humedad persistente en flores y frutos.',
+        fichaAgroclimatica: FICHAS_AGROCLIMATICAS.fresa,
+    },
+    granadilla: {
+        nombre: 'Granadilla', emoji: '🟠', kc: {}, kcConfianza: 'pendiente',
+        kcFuente: 'Kc pendiente de una fuente específica para esta ficha', enfermedades: [], gddId: null,
+        piso: 'templado', aguaNota: 'Revise drenaje y ventilación en épocas húmedas.',
+        fichaAgroclimatica: FICHAS_AGROCLIMATICAS.granadilla,
+    },
+    tomate_cherry: {
+        nombre: 'Tomate Cherry', emoji: '🍅', kc: { ini: 0.6, mid: 1.15, end: 0.8 }, kcConfianza: 'alta',
+        kcFuente: 'FAO-56 Tabla 12 (tomate)', enfermedades: ['tizon_tomate', 'antracnosis'], gddId: null,
+        piso: 'templado', aguaNota: 'Mantenga ventilación y riego uniforme bajo cubierta.',
+        fichaAgroclimatica: FICHAS_AGROCLIMATICAS.tomate_cherry,
+    },
+    espinaca: {
+        nombre: 'Espinaca', emoji: '🥬', kc: {}, kcConfianza: 'pendiente',
+        kcFuente: 'Kc pendiente de una fuente específica para esta ficha', enfermedades: [], gddId: null,
+        piso: 'frio', aguaNota: 'El calor y la sequía aceleran la floración.',
+        fichaAgroclimatica: FICHAS_AGROCLIMATICAS.espinaca,
+    },
+    gulupa: {
+        nombre: 'Gulupa', emoji: '🟣', kc: {}, kcConfianza: 'pendiente',
+        kcFuente: 'Kc pendiente de una fuente específica para esta ficha', enfermedades: [], gddId: null,
+        piso: 'templado', aguaNota: 'Revise vigor y agua disponible durante floración.',
+        fichaAgroclimatica: FICHAS_AGROCLIMATICAS.gulupa,
+    },
+    limon: {
+        nombre: 'Limón', emoji: '🍋', kc: {}, kcConfianza: 'pendiente',
+        kcFuente: 'Kc pendiente de una fuente específica para esta ficha', enfermedades: [], gddId: null,
+        piso: 'templado', aguaNota: 'Revise brotes después de noches frías.',
+        fichaAgroclimatica: FICHAS_AGROCLIMATICAS.limon,
+    },
+    guayaba: {
+        nombre: 'Guayaba', emoji: '🍐', kc: {}, kcConfianza: 'pendiente',
+        kcFuente: 'Kc pendiente de una fuente específica para esta ficha', enfermedades: [], gddId: null,
+        piso: 'calido', aguaNota: 'Las lluvias altas elevan el riesgo de antracnosis en fruto.',
+        fichaAgroclimatica: FICHAS_AGROCLIMATICAS.guayaba,
+    },
     aguacate: {
         nombre: 'Aguacate', emoji: '🥑', kc: { ini: 0.6, mid: 0.85, end: 0.75 }, kcConfianza: 'baja',
         kcFuente: 'Estimado (fuera de FAO-56 Tabla 12)', enfermedades: [], gddId: null,
@@ -422,7 +467,7 @@ const SINONIMOS = Object.freeze({
     cafe: 'cafe', café: 'cafe', cafeto: 'cafe',
     papa: 'papa', papas: 'papa',
     maiz: 'maiz', maíz: 'maiz', choclo: 'maiz', mazorca: 'maiz',
-    tomate: 'tomate', jitomate: 'tomate',
+    tomate: 'tomate', jitomate: 'tomate', 'tomate cherry': 'tomate_cherry', 'tomate-cherry': 'tomate_cherry', 'tomate cherry-invernadero': 'tomate_cherry',
     frijol: 'frijol', fríjol: 'frijol', frijoles: 'frijol', habichuela: 'frijol', poroto: 'frijol',
     platano: 'platano', plátano: 'platano', banano: 'platano', guineo: 'platano',
     cacao: 'cacao',
@@ -430,7 +475,12 @@ const SINONIMOS = Object.freeze({
     arroz: 'arroz',
     cana: 'cana', caña: 'cana', 'caña de azucar': 'cana',
     yuca: 'yuca', mandioca: 'yuca',
-    mora: 'mora', mortiño: 'mora', arandano: 'mora', arándano: 'mora', fresa: 'mora', frutilla: 'mora',
+    mora: 'mora', mortiño: 'mora', arandano: 'mora', arándano: 'mora', fresa: 'fresa', 'fresa-invernadero': 'fresa', frutilla: 'fresa',
+    granadilla: 'granadilla',
+    espinaca: 'espinaca',
+    gulupa: 'gulupa', 'gulupa-invernadero': 'gulupa',
+    limon: 'limon', limón: 'limon', 'limon-invernadero': 'limon', 'limón-invernadero': 'limon',
+    guayaba: 'guayaba', 'guayaba-invernadero': 'guayaba',
     aguacate: 'aguacate', palta: 'aguacate',
     lulo: 'lulo', naranjilla: 'lulo',
     pasto: 'pasto', potrero: 'pasto', pastura: 'pasto', forraje: 'pasto', ganado: 'pasto',
