@@ -12,10 +12,10 @@ else
 fi
 
 # ESLint (fail-closed para leftthook)
-if command -v eslint >/dev/null 2>&1; then
-  echo "  ✓ eslint ok"
+if npx eslint --version >/dev/null 2>&1; then
+  echo "  ✓ eslint ok ($(npx eslint --version))"
 else
-  echo "  → eslint no disponible (npm install debería haberlo traído)"
+  echo "  ✗ eslint no disponible"
   exit 1
 fi
 
