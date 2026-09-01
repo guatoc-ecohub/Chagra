@@ -1,0 +1,1 @@
+import{i as e}from"./rolldown-runtime-aKtaBQYM.js";import"./transformacion-DXdlLFWw.js";import{Ri as t}from"./vendor-icons-CAOH8z0e.js";import{n,t as r}from"./vendor-react-C-6LStLo.js";import{t as i}from"./Mercado-BeovxXDa.js";var a=e(t(),1),o=e(n(),1),s=e(r(),1);(0,o.createRoot)(document.getElementById(`root`)).render((0,s.jsx)(a.StrictMode,{children:(0,s.jsx)(i,{})}));

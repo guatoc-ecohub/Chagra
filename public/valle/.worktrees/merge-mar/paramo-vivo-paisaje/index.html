@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="es-CO">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#8aaa72">
+<title>Páramo Vivo · Paisaje</title>
+<style>
+  :root{
+    --ink:#e8f0da;
+    --ink-dim:#bfd0b5;
+    --paper:rgba(14,20,15,.66);
+    --paper-strong:rgba(247,241,222,.94);
+    --edge:rgba(255,255,255,.12);
+    --leaf:#86b55a;
+    --leaf2:#c3d395;
+    --soil:#3a3d28;
+    --soil2:#5f7346;
+    --warm:#f6d98c;
+  }
+  html,body{margin:0;height:100%;overflow:hidden;background:#0e1711;color:var(--ink);font-family:Georgia,"Times New Roman",serif}
+  body{touch-action:none;overscroll-behavior:none}
+  #app{
+    position:fixed;inset:0;overflow:hidden;
+    background:
+      radial-gradient(1200px 800px at 50% 12%, rgba(255,243,197,.15), transparent 52%),
+      radial-gradient(900px 520px at 50% 100%, rgba(80,120,60,.2), transparent 58%),
+      linear-gradient(180deg,#1a2e1e 0%,#2a4530 32%,#7a9a60 68%,#c8d4b8 100%);
+  }
+  canvas#game{
+    position:absolute;inset:0;width:100%;height:100%;display:block;
+    touch-action:none
+  }
+  #hud{
+    position:absolute;left:12px;top:12px;z-index:8;
+    max-width:min(92vw,400px);
+    background:linear-gradient(180deg,rgba(16,24,18,.82),rgba(12,16,13,.64));
+    border:1px solid rgba(255,255,255,.12);
+    border-radius:18px;padding:11px 13px 12px;
+    box-shadow:0 12px 32px rgba(0,0,0,.26);
+    backdrop-filter:blur(9px)
+  }
+  #brand{
+    display:flex;align-items:center;gap:10px;
+    letter-spacing:.1em;text-transform:uppercase;font-size:11px;color:var(--warm)
+  }
+  #brand .dot{
+    width:10px;height:10px;border-radius:50%;
+    background:radial-gradient(circle at 35% 35%, #fff5dd 0 18%, #d8b64f 26% 46%, #61471d 58% 100%);
+    box-shadow:0 0 16px rgba(248,212,111,.38)
+  }
+  #title{
+    margin:8px 0 4px;font-size:clamp(24px,5vw,42px);line-height:.94;font-style:italic;
+    letter-spacing:.01em;text-wrap:balance
+  }
+  #lead{
+    margin:0;font-size:13px;line-height:1.45;color:var(--ink-dim)
+  }
+  #chips{display:flex;flex-wrap:wrap;gap:7px;margin-top:10px}
+  .chip{
+    display:inline-flex;align-items:center;gap:6px;
+    border-radius:999px;padding:5px 9px;
+    background:rgba(255,255,255,.06);
+    border:1px solid rgba(255,255,255,.08);
+    color:#f4eecf;font-size:12px;line-height:1
+  }
+  .chip b{color:#fff3ca}
+  #perf{
+    position:absolute;right:12px;top:12px;z-index:8;
+    padding:8px 10px;border-radius:12px;
+    background:rgba(10,16,12,.66);border:1px solid rgba(255,255,255,.1);
+    color:#eff8e9;font:12px/1.25 monospace;white-space:pre;pointer-events:none
+  }
+  #info{
+    position:absolute;right:12px;bottom:12px;z-index:8;
+    width:min(36vw,400px);min-width:260px;
+    background:linear-gradient(180deg,rgba(247,241,222,.95),rgba(232,223,195,.9));
+    color:#3a2717;border:2px solid rgba(68,43,22,.2);
+    border-radius:18px;padding:12px 13px 12px;
+    box-shadow:0 16px 34px rgba(0,0,0,.22);
+    opacity:0;transition:opacity .25s ease;pointer-events:none
+  }
+  #info.show{opacity:1}
+  #info .kicker{
+    text-transform:uppercase;letter-spacing:.1em;font-size:11px;color:#785f31
+  }
+  #info h2{
+    margin:6px 0 4px;font-size:17px;line-height:1.08;font-style:italic;color:#533219
+  }
+  #info p{
+    margin:0;font-size:13px;line-height:1.45;color:#4b3421
+  }
+  #info .tiny{
+    margin-top:8px;font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:#7a6446
+  }
+  @media (max-width:760px){
+    #hud{max-width:calc(100vw - 24px)}
+    #info{left:12px;right:12px;bottom:12px;width:auto;min-width:0}
+  }
+</style>
+<script type="importmap">
+{
+  "imports": {
+    "three": "../vendor/three.module.js",
+    "three/addons/": "../vendor/addons/"
+  }
+}
+</script>
+</head>
+<body>
+<div id="app">
+  <canvas id="game"></canvas>
+  <div id="hud">
+    <div id="brand"><span class="dot"></span>Páramo vivo · paisaje</div>
+    <h1 id="title">PÁRAMO VIVO</h1>
+    <p id="lead">Frailejones, rocas y fauna de altura. Arrastre para explorar, rueda para acercar. Toque un ser vivo para leer su ciencia.</p>
+    <div id="chips">
+      <span class="chip"><b>Arrastre</b> girar</span>
+      <span class="chip"><b>Rueda</b> zoom</span>
+      <span class="chip"><b>Toque</b> ficha</span>
+    </div>
+  </div>
+  <div id="perf">FPS --</div>
+  <div id="info">
+    <div class="kicker">Observación</div>
+    <h2>Acérquese a un frailejón o a un animal</h2>
+    <p>Cada punto del paisaje cuenta algo real. La cámara orbital le permite explorar el páramo desde cualquier ángulo.</p>
+    <div class="tiny">Mirada Humboldt</div>
+  </div>
+</div>
+<script type="module" src="./main.js"></script>
+</body>
+</html>

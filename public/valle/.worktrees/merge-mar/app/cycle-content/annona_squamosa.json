@@ -1,0 +1,69 @@
+{
+  "species_slug": "annona_squamosa",
+  "scientific_name": "Annona squamosa L.",
+  "common_names": [
+    "Anón"
+  ],
+  "family": "Annonaceae",
+  "category": "frutales_perennes",
+  "cultivable": true,
+  "conservation_status": "naturalizada",
+  "thermal_zones": [
+    "calido"
+  ],
+  "roles_in_guild": [
+    "crop"
+  ],
+  "antagonists": [],
+  "especies_nativas_sustitutas": [],
+  "propagation": {
+    "metodo_principal": "semilla",
+    "notas": "Se propaga por semilla de frutos maduros; la germinación toma 30-60 días. También por injerto de púa para mantener características varietales. El crecimiento es lento los primeros 2 años."
+  },
+  "requirements": {
+    "agua": "medio",
+    "altitud_msnm": {
+      "min_absoluto": 0,
+      "optimo_min": 100,
+      "optimo_max": 800,
+      "max_absoluto": 1500
+    },
+    "temperatura_c": {
+      "helada_letal": 2,
+      "optimo_min": 22,
+      "optimo_max": 28,
+      "max_tolerable": 35
+    },
+    "radiacion": "sol_pleno",
+    "drenaje_requerido": "bueno"
+  },
+  "valor_pedagogico": "El anón (Annona squamosa L.) es un frutal de la familia Annonaceae adaptado a climas cálidos-secos a templados bajos colombianos, valorado por su fruto pulposo dulce de aroma característico. Se cultiva en Tolima (Norte, Mariquita), Huila (Garzón, La Plata), Cundinamarca (Tocaima, Apulo), Valle del Cauca, Antioquia y Magdalena entre 0 y 1.600 msnm en zona térmica cálida a templada. Árbol pequeño 4-6 m, ciclo a primera cosecha 3-4 años. Frutos cosechados pintones (cambio color, semi-firmes) para madurar fuera del árbol. Manejo agroecológico: poda formación copa baja, fertilización con compost + roca fosfórica, control de la perforadora del fruto (Bephratelloides cubensis) con embolsado de frutos y captura de adultos con trampas amarillas. Polinización manual mejora cuajado (Annona spp. son auto-poco-fértiles). Fuentes Tier A: AGROSAVIA Manual Frutales Tropicales, ICA Resolución 3168/2015, POWO Kew, GBIF Backbone Taxonomy.",
+  "sources": [
+    {
+      "id": "gbif-taxonomic-backbone",
+      "title": "gbif-taxonomic-backbone",
+      "tier": "A",
+      "url": "https://www.gbif.org/dataset/d7dddbf4-2cf0-4f39-9b2a-bb099caae36c"
+    },
+    {
+      "id": "powo-kew",
+      "title": "powo-kew",
+      "tier": "A",
+      "url": "https://powo.science.kew.org"
+    },
+    {
+      "id": "agrosavia-manual-frutales-tropicales",
+      "title": "agrosavia-manual-frutales-tropicales",
+      "tier": "A",
+      "url": null
+    },
+    {
+      "id": "ica-resolucion-3168-2015",
+      "title": "ica-resolucion-3168-2015",
+      "tier": "A",
+      "url": null
+    }
+  ],
+  "_generated_by": "scripts/build-cycle-content-from-catalog.mjs",
+  "_generated_at": "2026-05-19T00:42:57.356Z"
+}

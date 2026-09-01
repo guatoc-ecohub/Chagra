@@ -1,0 +1,90 @@
+{
+  "species_slug": "selaginella_lepidophylla",
+  "scientific_name": "Selaginella lepidophylla (Hook. & Grev.) Spring",
+  "common_names": [
+    "Siempreviva del desierto andino"
+  ],
+  "family": "Selaginellaceae",
+  "category": "medicinales_alelopaticas",
+  "cultivable": true,
+  "conservation_status": "nativo_silvestre",
+  "thermal_zones": [
+    "calido",
+    "templado"
+  ],
+  "roles_in_guild": [
+    "crop",
+    "ground_cover"
+  ],
+  "antagonists": [],
+  "especies_nativas_sustitutas": [],
+  "propagation": {
+    "methods": [
+      "division_mata",
+      "espora"
+    ],
+    "best_method": "division_mata",
+    "protocol_resumen": "División de mata: separar rosetas individuales con sus rizoides, plantar sobre roca caliza fisurada o sustrato pedregoso bien drenado con poco suelo (NO suelo profundo — la planta es xerófita rupícola). Esporas: difícil germinación fuera de laboratorio. Riego: paradójicamente moderado — sumergir en agua revive la planta en 2-4 horas, pero exceso de riego en sustrato la mata por pudrimiento.",
+    "tiempo_a_establecimiento_dias": 60,
+    "notas": "Especie de rocas calizas secas, taludes pedregosos, afloramientos rocosos áridos. Fenómeno fascinante de poiquilohidria: puede perder >95% del agua celular, formar una bola seca aparentemente muerta por meses/años, y reverdecer completamente al recibir agua — modelo biológico de tolerancia extrema a desecación estudiado para biotecnología agrícola (transferencia de tolerancia a cultivos).",
+    "fuente": "Bernal 2015; POWO; Flora Colombia Pteridophyta; JBB; etnobotánica popular Caribe-Andes"
+  },
+  "requirements": {
+    "agua": "bajo",
+    "altitud_msnm": {
+      "min_absoluto": 200,
+      "optimo_min": 800,
+      "optimo_max": 2200,
+      "max_absoluto": 2800
+    },
+    "temperatura_c": {
+      "helada_letal": 0,
+      "optimo_min": 15,
+      "optimo_max": 28,
+      "max_tolerable": 38
+    },
+    "radiacion": "sol_pleno",
+    "drenaje_requerido": "excelente"
+  },
+  "valor_pedagogico": "La siempreviva del desierto andino o rosa de Jericó americana (Selaginella lepidophylla (Hook. & Grev.) Spring, Selaginellaceae) es una de las plantas más fascinantes y biológicamente extraordinarias del Neotrópico, famosa mundialmente por su capacidad de \"resurrección\" — un fenómeno biológico de tolerancia a desecación extrema (poiquilohidria) que la convierte en modelo de estudio internacional para entender los mecanismos celulares de supervivencia a la sequía y para transferir esa tolerancia a cultivos agrícolas mediante biotecnología. Especie nativa del Neotrópico (México hasta Perú), en Colombia se distribuye en enclaves xéricos y semi-áridos de las regiones Andina (Villa de Leyva-Boyacá, Patía alto-Cauca, Chicamocha-Santander, valle alto del Magdalena en Huila-Tolima-Cundinamarca, Sabana de Bogotá zonas xéricas), Caribe (zonas secas de Cesar, Guajira sur, Bolívar) y Orinoquía (sabanas estacionalmente secas) entre 200 y 2.800 msnm en suelos pedregosos calizos secos bien drenados con sol pleno y precipitación baja-moderada. Es planta licófita (linaje paleobotánico distinto a helechos y angiospermas, cercano a los antiguos licopodios arborescentes del Carbonífero) rupícola rastrera con tallos ramificados dicotómicamente formando una roseta plana circular de 5-15 cm de diámetro y hojas microfilas escamosas diminutas (2-3 mm) dispuestas en cuatro hileras (dos dorsales pequeñas y dos ventrales mayores — característica diagnóstica de Selaginella heterofilia). Reproducción por esporas en estróbilos terminales (la única familia de licófitas vivas con heterospora: produce micro y mega-esporas separadas, intermedia entre helechos homospóricos y plantas con semilla — fascinante puente evolutivo). Fenómeno extraordinario de poiquilohidria — \"la planta de la resurrección\": cuando la sequía agota el agua disponible, la planta no muere sino que entra en un estado de tolerancia a desecación extrema: pierde hasta >95% del agua celular, sus tallos se enrollan hacia adentro formando una bola seca compacta marrón aparentemente muerta, y puede permanecer en este estado de \"muerte aparente\" durante meses o incluso años. Al recibir agua de nuevo (lluvia, rocío, sumergir en agua), en 2-4 horas la bola se abre, los tallos se desenrollan, los cloroplastos se reactivan, la planta reverdece completamente y reanuda fotosíntesis y crecimiento — sin daño celular. Los mecanismos moleculares de este fenómeno incluyen: (1) acumulación masiva de trehalosa (azúcar protector que sustituye al agua en las membranas celulares); (2) proteínas LEA (Late Embryogenesis Abundant) que estabilizan estructuras celulares en seco; (3) anhidrobiosis controlada del citoplasma; (4) capacidad de re-iniciar la maquinaria fotosintética intacta. Esta planta y otras pocas (Craterostigma plantagineum, Xerophyta humilis) son los modelos biológicos del proyecto internacional \"Resurrection Plants\" que busca transferir genes de tolerancia a desecación a cultivos comerciales (maíz, arroz, trigo) para crear variedades resistentes a sequía severa — frontera de la biotecnología agrícola frente al cambio climático. Uso etnomedicinal mesoamericano-andino: el tallo seco molido o en infusión tiene uso patrimonial en medicina tradicional indígena y mestiza para tratamiento de cálculos renales, infecciones urinarias, hipertensión arterial leve, gota, hemorragias internas, regulación menstrual, diabetes mellitus tipo 2 — con respaldo etnofarmacológico documentado y estudios químicos que identifican flavonoides, ácidos fenólicos y biflavonas con propiedades diuréticas, antiinflamatorias y antioxidantes. Uso ornamental y pedagógico: vendida como \"rosa de Jericó americana\" en mercados de plantas (a diferenciar de la Rosa de Jericó verdadera Anastatica hierochuntica del desierto del Sahara, especie distinta no relacionada) — el cliente recibe una bola seca aparentemente muerta y la \"resucita\" sumergiéndola en agua, fenómeno espectacular usado pedagógicamente en escuelas, museos de ciencia, terapias ocupacionales, y en jardinería esotérica popular. Cultivo: extremadamente fácil pero contra-intuitivo — la planta NO necesita riego abundante, al contrario: prefiere sustrato pedregoso bien drenado (calizo si posible) con poco suelo, riego ligero cada 7-10 días dejando secar entre riegos. Exceso de riego en sustrato la mata por pudrición de rizoides. Multiplicación: división de mata separando rosetas individuales — extremadamente fácil y abundante. Funciona en maceta plana, jardín rocoso, talud seco, xerojardín, jardín mediterráneo o de cactus. Es lección extraordinaria de biología extrema (cómo una planta puede \"resucitar\" después de meses muerta-seca), de evolución (un linaje del Devónico-Carbonífero aún caminando), de biotecnología de frontera (modelo para tolerancia a sequía en cultivos), de etnomedicina patrimonial mesoamericana-andina, y de pedagogía de la ciencia (¡regalar una planta-bola seca y verla revivir es magia comprobable!). En el huerto agroecológico de zonas secas o semi-secas (enclaves xéricos andinos colombianos), es cobertura ideal para rocas, taludes, terrazas pedregosas, donde nada más crece — y a la vez recurso medicinal familiar bajo precaución de uso moderado. Fuentes Tier A: Bernal et al. 2015 Catálogo Plantas y Líquenes Colombia, POWO Kew, GBIF Backbone Taxonomy, Flora Colombia Pteridophyta, JBB Plantas Medicinales, SiB Colombia.",
+  "sources": [
+    {
+      "id": "bernal-2015-plantas-liquenes-colombia",
+      "title": "bernal-2015-plantas-liquenes-colombia",
+      "tier": "A",
+      "url": "http://catalogoplantasdecolombia.unal.edu.co"
+    },
+    {
+      "id": "powo-kew",
+      "title": "powo-kew",
+      "tier": "A",
+      "url": "https://powo.science.kew.org"
+    },
+    {
+      "id": "gbif-taxonomic-backbone",
+      "title": "gbif-taxonomic-backbone",
+      "tier": "A",
+      "url": "https://www.gbif.org/dataset/d7dddbf4-2cf0-4f39-9b2a-bb099caae36c"
+    },
+    {
+      "id": "flora-colombia-pteridophyta",
+      "title": "flora-colombia-pteridophyta",
+      "tier": "A",
+      "url": null
+    },
+    {
+      "id": "jbb-plantas-medicinales",
+      "title": "jbb-plantas-medicinales",
+      "tier": "A",
+      "url": null
+    },
+    {
+      "id": "sib-colombia",
+      "title": "sib-colombia",
+      "tier": "A",
+      "url": "https://sibcolombia.net"
+    }
+  ],
+  "_generated_by": "scripts/build-cycle-content-from-catalog.mjs",
+  "_generated_at": "2026-05-19T00:42:57.391Z"
+}

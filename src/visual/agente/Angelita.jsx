@@ -180,7 +180,9 @@ function prefiereQuietud() {
 
 /* Estados en los que Angelita LO MIRA a usted si su puntero/dedo anda cerca.
    En pensando manda su mirada pensativa; en preocupada/no-se/senala, la
-   actuación del estado (el problema, sus ojos francos, el POI). */
+   actuación del estado (el problema, sus ojos francos, el POI).
+   NOTA: identificadores internos, no strings de UI. */
+// eslint-disable-next-line chagra-i18n/no-hardcoded-spanish
 const ESTADOS_QUE_LO_MIRAN = new Set(['acompana', 'escuchando', 'respondiendo', 'invita']);
 
 /* Hasta dónde "se da cuenta" del puntero (px) y cuánto sostiene la mirada
@@ -421,6 +423,7 @@ export function Angelita({
   // PENSANDO — la cejita del "mmm": la cercana se arquea ALTO (persigue la
   // idea) y la otra baja, concentrada. El CSS le da un tironcito sincronizado
   // con los golpecitos de barbilla; con RM/quieta, la asimetría sola ya lee.
+  // eslint-disable-next-line chagra-i18n/no-hardcoded-spanish
   const caraPensando = e === 'pensando' ? (
     <g
       className={cls('agt-ceja-piensa')}
@@ -436,6 +439,7 @@ export function Angelita({
   // PENSANDO — burbuja de pensamiento con colita, tres puntos que laten y los
   // recuerdos de la finca que va hojeando (quieta u en tier bajo: solo el 1º).
   const recuerdosVisibles = vivo ? RECUERDOS : RECUERDOS.slice(0, 1);
+  // eslint-disable-next-line chagra-i18n/no-hardcoded-spanish
   const burbuja = e === 'pensando' ? (
     <g className={cls('agt-burbuja')} aria-hidden="true">
       <circle cx="10.8" cy="-11.6" r="0.85" fill={CREMA_PAPEL} stroke={RH_INK} strokeWidth="0.7" />
@@ -472,6 +476,7 @@ export function Angelita({
     </g>
   ) : null;
   // RESPONDIENDO — su voz sale en ondas de miel, desde la boquita.
+  // eslint-disable-next-line chagra-i18n/no-hardcoded-spanish
   const ondasOut = e === 'respondiendo' ? (
     <g stroke={COLOR_VOZ_MIEL} strokeWidth="1.05" strokeLinecap="round" fill="none" aria-hidden="true">
       {[0, 2.3, 4.6].map((dx, i) => (

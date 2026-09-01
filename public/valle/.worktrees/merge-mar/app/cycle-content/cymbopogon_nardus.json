@@ -1,0 +1,66 @@
+{
+  "species_slug": "cymbopogon_nardus",
+  "scientific_name": "Cymbopogon nardus (L.) Rendle",
+  "common_names": [
+    "Citronela"
+  ],
+  "family": "Poaceae",
+  "category": "medicinales_alelopaticas",
+  "cultivable": true,
+  "conservation_status": "cultivo_comun",
+  "thermal_zones": [
+    "calido",
+    "templado"
+  ],
+  "roles_in_guild": [
+    "pest_repellent",
+    "biomass_producer",
+    "windbreak"
+  ],
+  "antagonists": [],
+  "especies_nativas_sustitutas": [],
+  "propagation": {
+    "metodo_principal": "division_mata",
+    "notas": "Se reproduce por division de macollos. Cultivada en Colombia para extraccion de aceites esenciales repelentes de insectos."
+  },
+  "requirements": {
+    "agua": "medio",
+    "altitud_msnm": {
+      "min_absoluto": 0,
+      "optimo_min": 0,
+      "optimo_max": 1200,
+      "max_absoluto": 2000
+    },
+    "temperatura_c": {
+      "helada_letal": 0,
+      "optimo_min": 18,
+      "optimo_max": 30,
+      "max_tolerable": 38
+    },
+    "radiacion": "sol_pleno",
+    "drenaje_requerido": "bueno"
+  },
+  "valor_pedagogico": "La citronela (Cymbopogon nardus (L.) Rendle, Poaceae) es una gramínea perenne en macollo, introducida de Sri Lanka y aclimatada en zona cálida a templada colombiana (0-2.000 msnm) en Tolima, Huila, Valle del Cauca, Llanos y Eje cafetero bajo. Propagación facilísima por división de macollo en temporada lluviosa. Sus hojas largas y fibrosas concentran aceite esencial rico en citronelal, geraniol y citronelol — compuestos que dan el olor a limón y efecto repelente contra mosquitos (Aedes, Culex) y mosca blanca. Lección viva: las plantas fabrican su propia farmacia para defenderse; basta restregar una hoja entre las manos para soltar el perfume defensivo. Manejo: se siembra en bordes como cortina aromática biorrepelente, sin agroquímicos, y la mata se renueva cada 4-5 años por división. Fuentes Tier A: Pérez Arbeláez 1947, POWO Kew, GBIF Backbone.",
+  "sources": [
+    {
+      "id": "perez-arbelaez-1947-plantas-utiles",
+      "title": "perez-arbelaez-1947-plantas-utiles",
+      "tier": "A",
+      "url": null
+    },
+    {
+      "id": "gbif-taxonomic-backbone",
+      "title": "gbif-taxonomic-backbone",
+      "tier": "A",
+      "url": "https://www.gbif.org/dataset/d7dddbf4-2cf0-4f39-9b2a-bb099caae36c"
+    },
+    {
+      "id": "powo-kew",
+      "title": "powo-kew",
+      "tier": "A",
+      "url": "https://powo.science.kew.org"
+    }
+  ],
+  "_generated_by": "scripts/build-cycle-content-from-catalog.mjs",
+  "_generated_at": "2026-05-19T00:42:57.378Z"
+}

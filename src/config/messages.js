@@ -90,11 +90,15 @@ const messages = {
   agente: {
     placeholder: 'Cuéntele a Chagra qué pasa en su finca...',
     pensando: 'Chagra está pensando...',
+    respondiendo: 'Respondiendo',
     // Estado "pensando" del chat: el texto visible es solo la palabra (los
     // puntos suspensivos animados van en spans aparte) y el aria describe el
     // estado completo para lectores de pantalla.
     pensandoTexto: 'Pensando',
     pensandoAria: 'Chagra IA está pensando',
+    // Burbuja de Angelita: estados de pensamiento y respuesta
+    angelitaPensando: 'Angelita está pensando, buscando en su memoria de la finca',
+    angelitaRespondiendo: 'Angelita le está respondiendo',
     // Fases visibles del "pensando" (perceived performance): el pipeline
     // interno (transcripción → entendimiento → grounding/tools → generación)
     // se asoma a la UI para que la espera larga se sienta viva y con avance,

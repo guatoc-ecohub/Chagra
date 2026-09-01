@@ -1,0 +1,1 @@
+import{S as e}from"./main-BM4hX9AL.js";function t(t=``){let n=(t||``).trim();return e()?n?`${n} fvh-skin`:`fvh-skin`:n}function n(){try{return document.documentElement.getAttribute(`data-theme`)||`biopunk`}catch{return`biopunk`}}export{n,t};

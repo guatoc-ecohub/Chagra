@@ -1,0 +1,181 @@
+<g id="chivitoWrap">
+      <g id="chivito" filter="url(#boil)">
+        <g class="flota">
+          <g id="cuerpoRig">
+
+            <!-- COLA — tres plumas broncíneas en abanico -->
+            <g transform="translate(-6,112)"><g id="cola">
+              <g transform="rotate(38)">
+                <path d="M0,0 C -13,50 -13,116 0,162 C 13,116 13,50 0,0 Z" fill="#4c5227" stroke="#2c2318" stroke-width="3.5"/>
+                <path d="M0,18 C -6,54 -6,104 0,140" stroke="#efe6c8" stroke-width="3.5" fill="none" stroke-linecap="round"/>
+              </g>
+              <g transform="rotate(17)">
+                <path d="M0,0 C -13,52 -13,122 0,170 C 13,122 13,52 0,0 Z" fill="#5f6633" stroke="#2c2318" stroke-width="3.5"/>
+              </g>
+              <g transform="rotate(-4)">
+                <path d="M0,0 C -12,48 -12,110 0,152 C 12,110 12,48 0,0 Z" fill="#6e7440" stroke="#2c2318" stroke-width="3.5"/>
+                <path d="M0,18 C 5,50 5,96 0,132" stroke="#efe6c8" stroke-width="3" fill="none" stroke-linecap="round"/>
+              </g>
+            </g></g>
+
+            <!-- ALAS — nítidas + fantasma de aleteo, bien afuera del cuerpo -->
+            <g transform="translate(-56,34) rotate(18)"><g id="alaIzq" class="alaVuelo">
+              <path d="M0,0 C -44,4 -90,-14 -122,-58 C -86,-80 -38,-58 -8,-20 Z" transform="rotate(34 0 0)" fill="#6f7c3c" opacity=".2" filter="url(#blurAla)"/>
+              <path d="M0,0 C -44,4 -90,-14 -122,-58 C -86,-80 -38,-58 -8,-20 Z" transform="rotate(16 0 0)" fill="#6f7c3c" opacity=".35" filter="url(#blurAla)"/>
+              <path d="M0,0 C -44,4 -90,-14 -122,-58 C -86,-80 -38,-58 -8,-20 Z" fill="#7d8a44" stroke="#2c2318" stroke-width="3.5"/>
+            </g></g>
+            <g transform="translate(56,34) rotate(-18)"><g id="alaDer" class="alaVuelo">
+              <path d="M0,0 C 44,4 90,-14 122,-58 C 86,-80 38,-58 8,-20 Z" transform="rotate(-34 0 0)" fill="#6f7c3c" opacity=".2" filter="url(#blurAla)"/>
+              <path d="M0,0 C 44,4 90,-14 122,-58 C 86,-80 38,-58 8,-20 Z" transform="rotate(-16 0 0)" fill="#6f7c3c" opacity=".35" filter="url(#blurAla)"/>
+              <path d="M0,0 C 44,4 90,-14 122,-58 C 86,-80 38,-58 8,-20 Z" fill="#7d8a44" stroke="#2c2318" stroke-width="3.5"/>
+            </g></g>
+
+            <!-- patitas -->
+            <g stroke="#2c2318" stroke-width="5" stroke-linecap="round" fill="none">
+              <path d="M-14,124 c -1,12 -6,17 -12,19"/>
+              <path d="M14,124 c 1,12 6,17 12,19"/>
+            </g>
+
+            <!-- CUERPO -->
+            <ellipse cx="0" cy="62" rx="56" ry="64" fill="url(#gCuerpo)" stroke="#2c2318" stroke-width="4"/>
+            <path d="M0,6 C 28,12 38,44 36,80 C 32,112 -32,112 -36,80 C -38,44 -28,12 0,6 Z" fill="#f0ead6"/>
+            <g fill="#6d7a3c" opacity=".7">
+              <ellipse cx="-24" cy="60" rx="4.5" ry="6"/><ellipse cx="25" cy="56" rx="4.5" ry="6"/>
+              <ellipse cx="-28" cy="86" rx="4" ry="5.5"/><ellipse cx="28" cy="84" rx="4" ry="5.5"/>
+              <ellipse cx="-12" cy="102" rx="3.5" ry="5"/><ellipse cx="14" cy="102" rx="3.5" ry="5"/>
+            </g>
+
+            <!-- CABEZA -->
+            <g id="cabeza">
+              <!-- CRESTA (piel F24): DOS caras del MISMO hueso. `crestaNormal`
+                   = plumas negro-verdosas barridas hacia atrás (lámina
+                   chivito-normal.png, el animal quieto). `crestaPunk` =
+                   abanico de púas plateadas con PUNTAS MORADAS (lámina
+                   chivito-punk.png) que SÓLO existe en la pose `hablar`:
+                   el punk es un ESTADO, no otro pájaro (ver CSS). -->
+              <g id="cresta" transform="translate(-2,-128)">
+                <g id="crestaNormal">
+                  <path class="pluma"    d="M-34,14 C -44,-8 -47,-32 -40,-54 C -28,-36 -22,-12 -16,8 Z" fill="#2b3a22" stroke="#2c2318" stroke-width="2.6"/>
+                  <path class="pluma p2" d="M-18,8 C -22,-26 -16,-58 -2,-82 C 4,-54 2,-22 0,6 Z" fill="#3c5029" stroke="#2c2318" stroke-width="2.6"/>
+                  <path class="pluma p3" d="M-2,6 C 2,-38 14,-76 36,-100 C 32,-62 22,-26 14,6 Z" fill="#2b3a22" stroke="#2c2318" stroke-width="2.6"/>
+                  <path class="pluma p4" d="M14,8 C 24,-26 42,-54 64,-72 C 52,-40 36,-10 26,10 Z" fill="#3c5029" stroke="#2c2318" stroke-width="2.6"/>
+                  <path class="pluma p5" d="M26,12 C 40,-8 56,-24 76,-34 C 62,-14 46,4 36,16 Z" fill="#2b3a22" stroke="#2c2318" stroke-width="2.6"/>
+                  <!-- vetas de viso verde (la lámina) -->
+                  <g stroke="#7fcf8d" stroke-width="3" fill="none" stroke-linecap="round" opacity=".75">
+                    <path d="M-38,-46 C -32,-30 -27,-12 -24,4"/>
+                    <path d="M-7,-70 C -8,-44 -8,-18 -8,4"/>
+                    <path d="M28,-86 C 20,-56 13,-24 9,4"/>
+                    <path d="M56,-62 C 44,-38 32,-12 24,8"/>
+                    <path d="M68,-30 C 56,-14 44,2 36,12"/>
+                  </g>
+                </g>
+                <g id="crestaPunk">
+                  <g class="pluma">
+                    <path d="M-34,12 C -46,-12 -54,-38 -60,-62 C -46,-42 -34,-14 -24,8 Z" fill="#d8d8cd" stroke="#2c2318" stroke-width="2.4"/>
+                    <path d="M-60,-62 C -55,-51 -50,-41 -46,-33 L -57,-39 Z" fill="#8b3fd1" stroke="#2c2318" stroke-width="1.4"/>
+                  </g>
+                  <g class="pluma p2">
+                    <path d="M-18,8 C -26,-24 -28,-58 -26,-88 C -14,-56 -8,-22 -4,6 Z" fill="#e2e2d8" stroke="#2c2318" stroke-width="2.4"/>
+                    <path d="M-26,-88 C -24,-74 -22,-62 -18,-51 L -29,-59 Z" fill="#8b3fd1" stroke="#2c2318" stroke-width="1.4"/>
+                  </g>
+                  <g class="pluma p3">
+                    <path d="M-2,6 C -4,-32 -2,-70 4,-102 C 12,-66 12,-28 10,6 Z" fill="#d8d8cd" stroke="#2c2318" stroke-width="2.4"/>
+                    <path d="M4,-102 C 6,-86 7,-73 9,-61 L -3,-70 Z" fill="#8b3fd1" stroke="#2c2318" stroke-width="1.4"/>
+                  </g>
+                  <g class="pluma p4">
+                    <path d="M12,8 C 18,-24 30,-58 44,-86 C 40,-50 32,-16 24,10 Z" fill="#e2e2d8" stroke="#2c2318" stroke-width="2.4"/>
+                    <path d="M44,-86 C 39,-72 35,-60 30,-49 L 24,-60 Z" fill="#8b3fd1" stroke="#2c2318" stroke-width="1.4"/>
+                  </g>
+                  <g class="pluma p5">
+                    <path d="M26,12 C 36,-10 50,-32 66,-48 C 56,-26 44,-2 36,14 Z" fill="#d8d8cd" stroke="#2c2318" stroke-width="2.4"/>
+                    <path d="M66,-48 C 59,-39 53,-31 47,-24 L 41,-33 Z" fill="#8b3fd1" stroke="#2c2318" stroke-width="1.4"/>
+                  </g>
+                </g>
+                <!-- base blanca del penacho (compartida por las dos caras) -->
+                <path d="M-36,16 C -14,4 24,4 44,18 C 20,10 -12,10 -36,16 Z" fill="#f6efdc" stroke="#2c2318" stroke-width="2"/>
+              </g>
+
+              <!-- cabeza: cara crema con corona oliva -->
+              <circle cx="0" cy="-56" r="78" fill="#f2eddc" stroke="#2c2318" stroke-width="4"/>
+              <path d="M-77,-66 A 78,78 0 0 1 77,-66 C 56,-96 -56,-96 -77,-66 Z" fill="#262b1c"/>
+
+              <!-- MÁSCARA oscura tipo escudo, bordeada de crema (patrón real de la especie) -->
+              <path d="M0,-108 C -28,-106 -50,-94 -57,-75 C -62,-55 -56,-34 -42,-22 C -28,-11 -13,-7 0,-7 C 13,-7 28,-11 42,-22 C 56,-34 62,-55 57,-75 C 50,-94 28,-106 0,-108 Z" fill="none" stroke="#e8d5a8" stroke-width="7"/>
+              <path d="M0,-106 C -26,-104 -47,-93 -54,-74 C -59,-55 -53,-35 -40,-24 C -27,-13 -12,-9 0,-9 C 12,-9 27,-13 40,-24 C 53,-35 59,-55 54,-74 C 47,-93 26,-104 0,-106 Z" fill="#1c3f26" stroke="#2c2318" stroke-width="3"/>
+
+              <!-- OJOS -->
+              <g class="ojo ojoIzq">
+                <ellipse cx="-28" cy="-60" rx="23" ry="28" fill="#fdfbf4"/>
+                <ellipse cx="-28" cy="-60" rx="23" ry="28" fill="none" stroke="#2c2318" stroke-width="3"/>
+                <g class="pupila">
+                  <circle cx="-25" cy="-56" r="12" fill="#2c2318"/>
+                  <circle cx="-21" cy="-61" r="4.5" fill="#ffffff"/>
+                  <circle cx="-29" cy="-52" r="2" fill="#ffffff" opacity=".8"/>
+                </g>
+              </g>
+              <g class="ojo ojoDer">
+                <ellipse cx="28" cy="-60" rx="23" ry="28" fill="#fdfbf4"/>
+                <ellipse cx="28" cy="-60" rx="23" ry="28" fill="none" stroke="#2c2318" stroke-width="3"/>
+                <g class="pupila">
+                  <circle cx="31" cy="-56" r="12" fill="#2c2318"/>
+                  <circle cx="35" cy="-61" r="4.5" fill="#ffffff"/>
+                  <circle cx="27" cy="-52" r="2" fill="#ffffff" opacity=".8"/>
+                </g>
+              </g>
+
+              <!-- mejillas -->
+              <ellipse cx="-60" cy="-22" rx="11" ry="7.5" fill="#e3a99a" opacity=".6"/>
+              <ellipse cx="60" cy="-22" rx="11" ry="7.5" fill="#e3a99a" opacity=".6"/>
+
+            </g>
+
+            <!-- BARBA — la chiva: corta el escudo oscuro en blanco -->
+            <g id="barba" transform="translate(0,-12)">
+              <path id="barbaAtras" class="barbaCapa" d="M-21,-2 C -29,30 -25,70 -3,104 C 17,72 25,30 20,-2 C 7,5 -9,5 -21,-2 Z" fill="#157a42" stroke="#2c2318" stroke-width="3.5"/>
+              <g id="barbaFrente" class="barbaCapa">
+                <!-- piel F24: la chiva es ESMERALDA (lámina), no blanca -->
+                <path d="M-17,0 C -24,28 -20,62 -2,90 C 14,62 20,28 16,0 C 5,6 -7,6 -17,0 Z" fill="#2fa35c" stroke="#2c2318" stroke-width="3"/>
+                <path d="M-14,30 C -16,44 -14,58 -9,70 M14,28 C 16,42 14,56 9,68" stroke="#10653a" stroke-width="2.6" fill="none" stroke-linecap="round"/>
+                <!-- franja iridiscente violeta-verde -->
+                <path d="M-7,5 C -10,28 -8,52 -1,74 C 6,52 8,28 6,5 C 2.5,7 -3.5,7 -7,5 Z" fill="url(#gIris)"/>
+              </g>
+            </g>
+
+            <!-- PICO CORTO y casi recto (rasgo distintivo del Oxypogon) -->
+            <g id="pico" transform="translate(0,-28)">
+              <path id="picoBajo" d="M-9,7 C -3,5 3,5 9,7 L 2,19 C 1,20.5 -1,20.5 -2,19 Z" fill="#4a4a44" stroke="#2c2318" stroke-width="2"/>
+              <ellipse id="boca" cx="0" cy="10" rx="5.5" ry="3.8" fill="#5c2020"/>
+              <path id="picoAlto" d="M-13,0 C -5,-6 5,-6 13,0 C 11,8 5,14 0,17 C -5,14 -11,8 -13,0 Z" fill="#6e6e66" stroke="#2c2318" stroke-width="2.4"/>
+              <path d="M-8,-1 C -4,-3 -1,-4 0,-3 L -1,10 C -4,7 -7,3 -8,-1 Z" fill="#8e8e84"/>
+            </g>
+
+            <!-- lana en el pico (tejer) -->
+            <g id="lanaPico" transform="translate(16,-12) scale(1.3)">
+              <circle cx="0" cy="0" r="11" fill="#f8f2dd" stroke="#d8cca6" stroke-width="2"/>
+              <circle cx="10" cy="-5" r="7" fill="#f2ead0"/>
+              <circle cx="-7" cy="-7" r="6" fill="#fdf8e8"/>
+              <path d="M8,6 C 18,10 26,10 34,4" stroke="#f2ead0" stroke-width="3" fill="none" stroke-linecap="round"/>
+            </g>
+
+            <!-- BRAZOS — fideo de tinta con guantes (rubber hose) -->
+            <g transform="translate(-54,44)"><g id="brazoIzq" class="brazo">
+              <path d="M0,0 C -26,18 -46,26 -60,22" stroke="#2c2318" stroke-width="12" fill="none" stroke-linecap="round"/>
+              <g transform="translate(-64,20)">
+                <circle cx="0" cy="0" r="15" fill="#fdfbf4" stroke="#2c2318" stroke-width="3.5"/>
+              </g>
+            </g></g>
+            <g transform="translate(54,44)"><g id="brazoDer" class="brazo">
+              <path d="M0,0 C 26,18 46,26 60,22" stroke="#2c2318" stroke-width="12" fill="none" stroke-linecap="round"/>
+              <g id="manoAbiertaDer" transform="translate(64,20)">
+                <circle cx="0" cy="0" r="15" fill="#fdfbf4" stroke="#2c2318" stroke-width="3.5"/>
+              </g>
+              <g id="manoPuntaDer" transform="translate(64,20) rotate(-14)">
+                <circle cx="-2" cy="5" r="13" fill="#fdfbf4" stroke="#2c2318" stroke-width="3.5"/>
+                <path d="M4,-4 L 32,-17 C 36,-18.5 39,-14 36,-11 L 12,7 Z" fill="#fdfbf4" stroke="#2c2318" stroke-width="3" stroke-linejoin="round"/>
+              </g>
+            </g></g>
+
+          </g><!-- /cuerpoRig -->
+        </g><!-- /flota -->
+      </g><!-- /chivito -->
+    </g>

@@ -1,0 +1,198 @@
+<!doctype html>
+<html lang="es-CO">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#eef1ec">
+<title>Chagra Kart · Mundos</title>
+<style>
+  :root {
+    color-scheme: light dark;
+    --bg: #eef1ec;
+    --panel: #fbfcfa;
+    --ink: #17231d;
+    --muted: #5a685f;
+    --line: #d4ddd5;
+    --accent: #1f6847;
+    --accent-ink: #fff;
+    --tag: #e5eee7;
+    --shadow: 0 14px 36px rgb(22 42 29 / 10%);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #101612;
+      --panel: #18221b;
+      --ink: #edf5ee;
+      --muted: #aab8ad;
+      --line: #304036;
+      --accent: #7cc795;
+      --accent-ink: #102016;
+      --tag: #26372b;
+      --shadow: 0 14px 36px rgb(0 0 0 / 28%);
+    }
+  }
+  * { box-sizing: border-box; }
+  html { background: var(--bg); }
+  body {
+    margin: 0;
+    min-height: 100vh;
+    color: var(--ink);
+    background:
+      radial-gradient(circle at 15% -10%, rgb(117 173 130 / 14%), transparent 38rem),
+      var(--bg);
+    font: 16px/1.5 system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  }
+  main { width: min(1080px, calc(100% - 32px)); margin: 0 auto; padding: 42px 0 56px; }
+  header { max-width: 760px; margin-bottom: 28px; }
+  .eyebrow { margin: 0 0 8px; color: var(--accent); font-size: 12px; font-weight: 800; letter-spacing: .14em; text-transform: uppercase; }
+  h1, h2, p { margin-top: 0; }
+  h1 { margin-bottom: 10px; font-size: clamp(34px, 8vw, 64px); line-height: .98; letter-spacing: -.04em; }
+  header p { max-width: 60ch; margin-bottom: 0; color: var(--muted); }
+  .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+  .card, .experiments { border: 1px solid var(--line); border-radius: 20px; background: var(--panel); box-shadow: var(--shadow); }
+  .card { display: flex; min-width: 0; flex-direction: column; overflow: hidden; }
+  .thumb { position: relative; height: 142px; overflow: hidden; border-bottom: 1px solid var(--line); }
+  .thumb::after { content: ""; position: absolute; left: 13%; right: 13%; bottom: 18%; height: 18%; border: 7px solid rgb(25 35 29 / 70%); border-top: 0; border-radius: 0 0 50% 50%; transform: rotate(-7deg); }
+  .thumb::before { content: ""; position: absolute; left: 45%; bottom: 26%; width: 22px; height: 30px; border: 4px solid #f4c44e; border-radius: 8px 8px 4px 4px; box-shadow: 0 16px 0 -7px #202a24; transform: rotate(-8deg); z-index: 1; }
+  .paramo { background: linear-gradient(175deg, #a7d3e0 0 48%, #90a968 49% 72%, #60784e 73%); }
+  .chorrera { background: linear-gradient(175deg, #a6c6ce 0 35%, #657f77 36% 57%, #52644a 58%); }
+  .mar { background: linear-gradient(175deg, #90d0dc 0 38%, #398da2 39% 72%, #1e647b 73%); }
+  .card-body { display: flex; flex: 1; flex-direction: column; padding: 19px; }
+  .card h2 { margin-bottom: 7px; font-size: 23px; line-height: 1.1; }
+  .card p { flex: 1; margin-bottom: 18px; color: var(--muted); font-size: 14px; }
+  .play { display: inline-flex; align-items: center; justify-content: center; min-height: 44px; padding: 9px 15px; border-radius: 999px; color: var(--accent-ink); background: var(--accent); font-weight: 800; text-decoration: none; }
+  .play:focus-visible, a:focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; }
+  .section-title { margin: 48px 0 12px; font-size: 25px; line-height: 1.1; }
+  .experiments { padding: 21px; }
+  .experiments > p { margin-bottom: 18px; color: var(--muted); }
+  .experiment { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 16px; padding: 16px 0; border-top: 1px solid var(--line); }
+  .experiment:first-of-type { border-top: 0; padding-top: 0; }
+  .experiment:last-of-type { padding-bottom: 0; }
+  .experiment h3 { margin: 0 0 4px; font-size: 17px; }
+  .experiment p { margin: 0; color: var(--muted); font-size: 14px; }
+  .tag { align-self: start; padding: 5px 9px; border-radius: 999px; color: var(--muted); background: var(--tag); font-size: 12px; font-weight: 750; white-space: nowrap; }
+  .ledger { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin: 0; padding: 0; list-style: none; }
+  .ledger li { display: grid; grid-template-columns: 7.5rem minmax(0, 1fr); gap: 4px 10px; min-width: 0; padding: 11px 12px; border: 1px solid var(--line); border-radius: 12px; background: color-mix(in srgb, var(--panel) 86%, var(--tag)); }
+  .ledger span { grid-row: span 2; color: var(--muted); font-size: 12px; }
+  .ledger strong, .ledger code, .ledger small { min-width: 0; overflow-wrap: anywhere; }
+  .ledger strong { font-size: 13px; }
+  .ledger code { color: var(--accent); font-size: 12px; }
+  .ledger small { grid-column: 2; color: var(--muted); font-size: 12px; line-height: 1.3; }
+  footer { margin-top: 24px; color: var(--muted); font-size: 13px; }
+  @media (max-width: 760px) {
+    main { width: min(100% - 22px, 560px); padding-top: 28px; }
+    .grid { grid-template-columns: 1fr; gap: 13px; }
+    .thumb { height: 118px; }
+    .section-title { margin-top: 36px; }
+    .ledger { grid-template-columns: 1fr; }
+  }
+  @media (max-width: 430px) {
+    .experiment { grid-template-columns: 1fr; gap: 8px; }
+    .tag { justify-self: start; }
+  }
+</style>
+</head>
+<body>
+<main>
+  <header>
+    <p class="eyebrow">Chagra Kart · hub canónico</p>
+    <h1>Elegí un mundo.</h1>
+    <p>Los tres tableros jugables del circuito. Cada botón abre el build canónico con arranque automático.</p>
+  </header>
+
+  <section aria-labelledby="jugables">
+    <h2 id="jugables" class="section-title">Mundos jugables</h2>
+    <div class="grid">
+      <article class="card">
+        <div class="thumb paramo" role="img" aria-label="Ilustración del páramo"></div>
+        <div class="card-body">
+          <h2>Páramo</h2>
+          <p>El descenso original entre frailejones, bosque andino y niebla.</p>
+          <a class="play" href="index.html?mundo=paramo&amp;autoStart=1">Jugar Páramo</a>
+        </div>
+      </article>
+      <article class="card">
+        <div class="thumb chorrera" role="img" aria-label="Ilustración de La Chorrera"></div>
+        <div class="card-body">
+          <h2>Chorrera</h2>
+          <p>El descenso de La Chorrera, con sus pozas y el tramo de retorno.</p>
+          <a class="play" href="index.html?mundo=chorrera&amp;autoStart=1">Jugar Chorrera</a>
+        </div>
+      </article>
+      <article class="card">
+        <div class="thumb mar" role="img" aria-label="Ilustración del mar"></div>
+        <div class="card-body">
+          <h2>Mar de la Chagra</h2>
+          <p>El mismo circuito sobre el mar, con la chiva y sus flotadores.</p>
+          <a class="play" href="index.html?mundo=mar&amp;autoStart=1">Jugar Mar</a>
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <section aria-labelledby="variantes">
+    <h2 id="variantes" class="section-title">Variantes / a reconciliar</h2>
+    <div class="experiments">
+      <p>Experimentos pendientes de decidir. No son tableros canónicos y se mantienen visibles para evitar rutas duplicadas.</p>
+      <article class="experiment">
+        <div>
+          <h3>Chorrera v2 “LA MADRE” · 110 m</h3>
+          <p>Repo: <code>3d-codex-kart</code> · rama: <code>codex/kart-mundo2-features-20260825</code></p>
+        </div>
+        <span class="tag">Pendiente</span>
+      </article>
+      <article class="experiment">
+        <div>
+          <h3>Chorrera · 590 m</h3>
+          <p>Repo: <code>3d-chorrera-590</code> · rama: <code>wip/chorrera-590m</code></p>
+        </div>
+        <span class="tag">Pendiente</span>
+      </article>
+    </div>
+  </section>
+
+  <section aria-labelledby="contrato">
+    <h2 id="contrato" class="section-title">Contrato operativo</h2>
+    <div class="experiments">
+      <p>Esta ficha deja explícita la navegación y el estado de cada destino para que futuras páginas no inventen otra combinación de parámetros.</p>
+      <ul class="ledger">
+        <li><span>Destino</span><strong>Páramo</strong><code>mundo=paramo</code><small>Es el trazado por defecto del kart.</small></li>
+        <li><span>Destino</span><strong>Chorrera</strong><code>mundo=chorrera</code><small>Activa el descenso específico de La Chorrera.</small></li>
+        <li><span>Destino</span><strong>Mar</strong><code>mundo=mar</code><small>Activa el mismo circuito con superficie marina.</small></li>
+        <li><span>Arranque</span><strong>Automático</strong><code>autoStart=1</code><small>Los tres botones lo incluyen para abrir directo la partida.</small></li>
+        <li><span>Ruta base</span><strong>Build canónico</strong><code>index.html</code><small>Los tres mundos parten de la misma entrada.</small></li>
+        <li><span>Selección</span><strong>Páramo</strong><code>default</code><small>Un parámetro desconocido no crea un cuarto mundo.</small></li>
+        <li><span>Selector</span><strong>Chorrera</strong><code>mundoKartDesdeUrl</code><small>El atajo reconoce la URL sin duplicar el trazado.</small></li>
+        <li><span>Selector</span><strong>Mar</strong><code>nombreMundoKart</code><small>El rótulo público es “Mar de la Chagra”.</small></li>
+        <li><span>Física</span><strong>Compartida</strong><code>pista.js</code><small>La lógica de carrera sigue siendo la del kart canónico.</small></li>
+        <li><span>Física MAR</span><strong>Nivel estable</strong><code>altura=0</code><small>Las olas son visuales; no mueven los huesos de la física.</small></li>
+        <li><span>Ambiente</span><strong>Terrestre</strong><code>entorno.js</code><small>Se mantiene para Páramo y Chorrera.</small></li>
+        <li><span>Ambiente MAR</span><strong>Marino</strong><code>entorno-mar.js</code><small>Se carga sólo cuando la URL pide el mundo MAR.</small></li>
+        <li><span>Superficie</span><strong>Olas</strong><code>mar/mar-capa.js</code><small>La capa anima el mar aun durante el menú.</small></li>
+        <li><span>Vehículo</span><strong>Chiva</strong><code>flotadores.js</code><small>Los pontones se añaden al modelo activo del mundo MAR.</small></li>
+        <li><span>Obstáculos</span><strong>Rocas y troncos</strong><code>obstaculos-mar.js</code><small>Entran al resolver de choques sólo en MAR.</small></li>
+        <li><span>Biodiversidad</span><strong>Islas y coral</strong><code>mar-biodiversidad.js</code><small>Reemplaza los props terrestres del ambiente marino.</small></li>
+        <li><span>Animación</span><strong>Boyas</strong><code>tickMar</code><small>Comparten fase con la superficie oceánica.</small></li>
+        <li><span>Colisiones</span><strong>Estáticos</strong><code>tipo=obstaculo</code><small>No se tratan como vehículos ni alteran su velocidad.</small></li>
+        <li><span>Chorrera</span><strong>Poza</strong><code>mundo=chorrera</code><small>Su camino y sus efectos no se mezclan con MAR.</small></li>
+        <li><span>Chorrera</span><strong>Portal</strong><code>portal-newdonk.js</code><small>El flujo de retorno existente queda intacto.</small></li>
+        <li><span>Regresión</span><strong>Páramo</strong><code>page errors=0</code><small>La captura GPU de prueba conserva el ambiente terrestre.</small></li>
+        <li><span>Regresión</span><strong>Chorrera</strong><code>page errors=0</code><small>La captura GPU de prueba conserva el descenso.</small></li>
+        <li><span>Gate MAR</span><strong>WebGL vivo</strong><code>page errors=0</code><small>La escena carga sin fallos de página en el puerto de prueba.</small></li>
+        <li><span>Gate MAR</span><strong>Agua visible</strong><code>malla oceánica</code><small>La superficie ocupa el plano de la carrera.</small></li>
+        <li><span>Gate MAR</span><strong>Chiva visible</strong><code>vehículos[0]</code><small>La captura debe leer el vehículo real del juego.</small></li>
+        <li><span>Gate MAR</span><strong>Flotadores visibles</strong><code>pontones</code><small>Los apoyos laterales quedan sobre el agua.</small></li>
+        <li><span>Variantes</span><strong>LA MADRE</strong><code>110 m</code><small>Se conserva como experimento sin decisión.</small></li>
+        <li><span>Variantes</span><strong>Chorrera 590 m</strong><code>590 m</code><small>Se conserva como experimento sin decisión.</small></li>
+        <li><span>Política</span><strong>Sin ocultar</strong><code>pendiente</code><small>Las variantes no aparecen como mundos jugables.</small></li>
+        <li><span>Política</span><strong>Una fuente</strong><code>mundos.html</code><small>Esta página es el índice humano de destinos.</small></li>
+        <li><span>Compatibilidad</span><strong>Móvil</strong><code>390 px+</code><small>La grilla colapsa y mantiene botones grandes.</small></li>
+        <li><span>Dependencias</span><strong>Locales</strong><code>sin CDN</code><small>El HUB no necesita red para dibujar su contenido.</small></li>
+      </ul>
+    </div>
+  </section>
+
+  <footer>Fuente de navegación: estos tres enlaces son los destinos canónicos de kart.</footer>
+</main>
+</body>
+</html>

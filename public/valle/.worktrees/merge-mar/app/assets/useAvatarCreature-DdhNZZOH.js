@@ -1,0 +1,1 @@
+import{n as e,t}from"./usePrefsStore-30W8WvP_.js";import{t as n}from"./creatures-P8ozsv3a.js";function r(){return i(e(e=>e.avatarCreatureId))}function i(e){let r=e&&n[e]?e:t,i=n[r];return{id:r,Component:i.Component,nombre:i.nombre,cientifico:i.cientifico}}export{r as t};

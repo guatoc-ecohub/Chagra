@@ -1,0 +1,1 @@
+var e={LOCATION_ID:`uuid_de_ubicacion_principal`,FARM_NAME:`Granja Principal`,ALTITUD_MSNM:null,MUNICIPIO:null,THERMAL_ZONES:``.split(`,`).map(e=>e.trim()).filter(Boolean),LATITUDE:4.526,LONGITUDE:-73.922};export{e as t};

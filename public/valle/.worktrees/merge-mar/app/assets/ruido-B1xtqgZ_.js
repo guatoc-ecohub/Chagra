@@ -1,0 +1,1 @@
+import"./sombreadoVegetal-BStrazjc.js";function e(e,t){return Math.sin(e*.8+t*.6)*.5+Math.sin(e*1.9-t*1.4+2.3)*.3+Math.sin(e*3.1+t*2.7+5.1)*.2}var t=e=>e<0?0:e>1?1:e;function n(e,n,r){let i=t((r-e)/(n-e||1e-6));return i*i*(3-2*i)}export{n,e as t};
