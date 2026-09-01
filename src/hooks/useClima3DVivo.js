@@ -24,6 +24,18 @@ function numero(value) {
   return Number.isFinite(n) ? n : null;
 }
 
+/** Primer número real de un conjunto de nombres que conviven en el contrato.
+ * El sidecar normalizado usa `temp`/`rh`/`viento`; el payload nativo de
+ * Open-Meteo usa `temperature_2m`/`relative_humidity_2m`/`wind_speed_10m`.
+ * La vitrina recibe ambos durante la transición, sin fabricar un respaldo. */
+function lectura(source, ...names) {
+  for (const name of names) {
+    const value = numero(source?.[name]);
+    if (value != null) return value;
+  }
+  return null;
+}
+
 function hoyISO() {
   const now = new Date();
   return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
@@ -62,12 +74,21 @@ export function derivarClima3D(snapshot, now = new Date()) {
   const pronostico = Array.isArray(snapshot?.openmeteo?.forecast_7d)
     ? snapshot.openmeteo.forecast_7d
     : [];
-  const current = snapshot?.openmeteo?.now || snapshot?.now || {};
+  // El snapshot del sidecar puede conservar el bloque `current` nativo de
+  // Open-Meteo. Antes solo se leía `now`, el alias interno, por lo que las
+  // cuatro métricas del HUD quedaban vacías aunque la respuesta sí las traía.
+  const current = snapshot?.openmeteo?.now
+    || snapshot?.openmeteo?.current
+    || snapshot?.now
+    || snapshot?.current
+    || {};
   const enso = snapshot?.enso_status || null;
   const alertasTexto = textoAlertas(snapshot);
-  const lluviaMm = numero(day?.precip_mm ?? current?.precip);
-  const nubosidad = numero(current?.cloud ?? day?.cloud_mean);
-  const tempMin = numero(day?.temp_min);
+  const lluviaMm = lectura(day, 'precip_mm', 'precipitation_sum', 'precipitation')
+    ?? lectura(current, 'precip', 'precipitation', 'rain');
+  const nubosidad = lectura(current, 'cloud', 'cloud_cover', 'cloudcover')
+    ?? lectura(day, 'cloud_mean', 'cloud_cover_mean_pct', 'cloud_cover');
+  const tempMin = lectura(day, 'temp_min', 'temp_min_c', 'temperature_2m_min');
   const tieneOpenMeteo = snapshot?.openmeteo?.available === true && !!day;
   const tieneEnso = !!enso?.phase;
   const senal = tieneOpenMeteo || tieneEnso;
@@ -96,12 +117,13 @@ export function derivarClima3D(snapshot, now = new Date()) {
     helada,
     lluviaMm,
     nubosidad,
-    temp: numero(current?.temp ?? current?.temperature),
+    temp: lectura(current, 'temp', 'temperature', 'temperature_2m'),
     tempMin,
-    tempMax: numero(day?.temp_max),
+    tempMax: lectura(day, 'temp_max', 'temp_max_c', 'temperature_2m_max'),
     pronostico,
-    humedad: numero(current?.rh),
-    viento: numero(current?.viento ?? current?.wind),
+    humedad: lectura(current, 'rh', 'humidity', 'relative_humidity_2m'),
+    viento: lectura(current, 'viento', 'wind', 'wind_speed_10m', 'windspeed_10m')
+      ?? lectura(day, 'viento_max', 'wind_speed_10m_max', 'windspeed_10m_max'),
     ensoFamily: familiaEnso(enso?.phase),
     ensoPhase: enso?.phase || null,
     ensoLabel: enso?.label || null,
