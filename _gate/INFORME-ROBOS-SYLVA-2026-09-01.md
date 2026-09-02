@@ -20,6 +20,9 @@ usado fue `ops/ssot/kg-task.sh`, con el lock de escritura de la API SSOT. El
 backup del grafo se tomó antes de escribir y quedó validado con tamaño de
 53.166.797 bytes en almacenamiento local protegido.
 
+Los conteos se obtuvieron mediante `chagra_ssot.list_tasks()`, la API de
+lectura SSOT que expone el conjunto de nodos `:Task` a este carril.
+
 ## Mapeo al contrato SSOT vigente
 
 El contrato live de `:Task` exige `task_id=tsk_<24 hex>` y un conjunto cerrado
@@ -69,5 +72,11 @@ Los ids cortos verificados son `sylva-s01` hasta `sylva-s50`.
 - No hubo gate visual ni FPS: es una escritura de metadata, no una escena 3D.
   El script `./_gate/herramientas/gate-x-estado.sh` no existe dentro de este
   workspace, por lo que no se reporta ningún estado visual inventado.
+- No se obtuvo un conteo administrativo independiente con `MATCH` en esta
+  sesión: el rol de servicio no tiene acceso directo al schema AGE y el rol
+  administrativo probado no existe en el contenedor. El conteo citado es el
+  de la API SSOT, verificado tres veces.
+- Un worker previo de esta misma tarea seguía vivo al cierre. No fue detenido;
+  su eventual actividad posterior a la medición final no está verificada.
 - No se modificó `pending.txt` ni el catálogo. La fuente local contiene 50
   entradas Sylva y el grafo quedó con 50 correspondencias verificadas.
