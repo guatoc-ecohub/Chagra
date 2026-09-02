@@ -4456,7 +4456,7 @@ export default function App() {
           todas las vistas que ya tienen shell, también durante interacción y
           offline. La entrada mística es la única que puede desvanecerlo. */}
       <Suspense fallback={null}>
-        {currentView !== 'loading' && !currentView.startsWith('mockup_') && !esHomeCampesinoB && <AgentFab onNavigate={navigate} pantalla={currentView} />}
+        {!isPreAuthView && !esHomeCampesinoB && <AgentFab onNavigate={navigate} pantalla={currentView} />}
       </Suspense>
       {/* Compai que CAMINA en la portada campesina B: un solo compai (el
           AgentFab idle se suprime arriba). CompaiOverlay corre la marcha real
