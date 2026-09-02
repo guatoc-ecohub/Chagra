@@ -53,6 +53,13 @@
   text-shadow: 0 0 1px rgba(243, 239, 228, 0.35);
 }
 
+/* El molde del texto debe quedarse dentro de la pizarra: si desborda, puede
+   quedar sobre la X y convertir el descarte en un toque inalcanzable. */
+.burbuja-pizarra-peek__texto .tw {
+  display: block;
+  max-width: 100%;
+}
+
 .burbuja-pizarra-peek__cerrar {
   position: absolute;
   top: 3px;
@@ -70,6 +77,8 @@
   justify-content: center;
   cursor: pointer;
   padding: 0;
+  z-index: 1;
+  pointer-events: auto;
   transition: background 0.18s ease, color 0.18s ease;
 }
 .burbuja-pizarra-peek__cerrar:hover,

@@ -94,6 +94,7 @@ export default function BurbujaPizarraPeek({
       ref={cajaRef}
       className="burbuja-pizarra-peek"
       data-testid="compai-fab-peek"
+      data-compai-no-drag="true"
       role="dialog"
       aria-label={`Aviso de ${nombre}`}
     >
@@ -110,7 +111,7 @@ export default function BurbujaPizarraPeek({
         </button>
         <span className="burbuja-pizarra-peek__sr">{nombre} le dice: </span>
         <p className="burbuja-pizarra-peek__texto">
-          <Typewriter texto={texto} velocidadMs={18} />
+          <Typewriter texto={texto} animado={false} />
         </p>
       </div>
 
