@@ -872,6 +872,7 @@ const MOCKUP_HASH_ROUTES = {
 };
 
 const HASH_VIEW_ROUTES = {
+  dashboard: 'dashboard',
   agente: 'agente',
   'ciclo-vivo': 'ciclo_vivo',
   faq: 'faq',
@@ -4405,6 +4406,7 @@ export default function App() {
           la conversación monta detrás y queda limpia al terminar. */}
       <ColibriTransition active={colibriTransition} onDone={() => setColibriTransition(false)} />
       <NetworkStatusBar />
+      {(!esHomeCampesinoB || !navigator.onLine) && <NetworkStatusBar />}
       {/* Banners de instalación PWA: NO en las vistas pre-auth (login /
           loading / oauth-callback). En el login son un overlay `fixed`
           z-50 que se encimaba sobre el formulario —en desktop tapaba e

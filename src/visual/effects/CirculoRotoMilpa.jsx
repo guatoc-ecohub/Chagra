@@ -47,8 +47,27 @@ const R_EXT = 104;
 const R_INT = 92;
 const RAD = Math.PI / 180;
 
+/**
+ * Convierte ángulo y radio a tupla [x, y] relativa al centro (CX, CY).
+ * @param {number} a - Ángulo en grados
+ * @param {number} r - Radio
+ * @returns {[number, number]} Tupla [x, y]
+ */
 const P = (a, r) => [CX + r * Math.cos(a * RAD), CY + r * Math.sin(a * RAD)];
+
+/**
+ * Formatea una tupla [x, y] a string de coordenadas SVG.
+ * @param {[number, number]} coords - Tupla [x, y]
+ * @returns {string} Coordenadas formateadas "x y"
+ */
 const fxy = ([x, y]) => `${x.toFixed(2)} ${y.toFixed(2)}`;
+
+/**
+ * Convierte ángulo y radio a string de coordenadas SVG.
+ * @param {number} a - Ángulo en grados
+ * @param {number} r - Radio
+ * @returns {string} Coordenadas formateadas "x y"
+ */
 const pp = (a, r) => fxy(P(a, r));
 
 /* Bordes de fractura: ángulo + jitter angular del filo dentado (5 puntos de
@@ -70,6 +89,13 @@ const R_FILO = [R_EXT, 100.2, 96.8, 94.4, R_INT];
 
 /** Puntos del filo dentado del borde k (opcionalmente con el ángulo corrido
  *  una vuelta, para el fragmento que cruza 360°). */
+/**
+ * Puntos del filo dentado del borde k (opcionalmente con el ángulo corrido
+ *  una vuelta, para el fragmento que cruza 360°).
+ * @param {number} k - Índice del borde
+ * @param {number} [aOverride] - Ángulo de override opcional
+ * @returns {[number, number][]} Array de tuplas [x, y]
+ */
 function filo(k, aOverride) {
   const ang = aOverride ?? BORDES[k].a;
   return R_FILO.map((r, i) => P(ang + BORDES[k].jit[i], r));
@@ -266,6 +292,16 @@ const FRUTOS = [
   { id: 'calabaza', cx: 191, cy: 216, rx: 8, ry: 7, fill: '#d98b3c', stroke: '#9a5d2c', delay: '2.48s' },
 ];
 
+/**
+ * Componente del círculo roto de la milpa para el login.
+ * @param {Object} props
+ * @param {boolean} [props.trigger=false] - Flanco de subida ⇒ arranca la ruptura (una vez)
+ * @param {boolean} [props.roto=false] - Montar directo en estado final roto (sin animar)
+ * @param {() => void} [props.onRupturaCompleta] - Callback cuando la brecha está abierta (~2.25s)
+ * @param {() => void} [props.onAsentado] - Callback cuando la raíz está asentada (~3.4s)
+ * @param {string} [props.className] - Clases extra sobre el wrapper
+ * @param {React.ReactNode} [props.children] - Lámina del compai (ranura centrada, opcional)
+ */
 export default function CirculoRotoMilpa({
   trigger = false,
   roto = false,
