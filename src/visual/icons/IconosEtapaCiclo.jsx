@@ -2,10 +2,16 @@
  * Iconos de ETAPA DE CICLO — set coherente para catálogo y cards.
  *
  * Seis glifos que cuentan la vida de una mata en orden: semilla que germina →
- * mata frondosa → flor → fruto → canasta de cosecha → frasco guardado. Todos
- * comparten la MISMA familia visual: línea de un solo grosor, uniones
- * redondeadas y `currentColor` — no traen color propio, así que toman el tinte
- * de su etapa (la clase `text-*` del contenedor) y quedan legibles a 16 px.
+ * mata frondosa → flor → fruto → canasta de cosecha → frasco guardado.
+ *
+ * UNA sola lógica de abstracción para los seis (es lo que los hace familia):
+ *   - Silueta abierta, sin rellenos: todo es contorno de un solo grosor,
+ *     uniones redondeadas, sobre `currentColor` (toman el tinte de su etapa).
+ *   - Nada de detalle interior menor de ~6 unidades: a 16 px (tamaño real de
+ *     card) el detalle fino se funde en mancha; lo que lee es la silueta.
+ *   - La mata se dibuja como MASA (copa lobulada), no como hojas contables.
+ *   - Las plantas (1-3) nacen de un tallo en x=12; los objetos (4-6) se
+ *     asientan en la misma línea de base (y≈20.5). Mismo tamaño de bloque.
  *
  * Reutilizable: antes de dibujar un icono de fase, úselos desde aquí. La forma
  * de consumo canónica es <IconoEtapaCiclo orden={1..6} />, que respeta el mismo
@@ -48,79 +54,67 @@ function IconoEtapaBase({ size = 16, title = '', className = '', children, ...re
   );
 }
 
-/* 1 · Germinación — la semilla revienta y saca su primer par de cotiledones. */
+/* 1 · Germinación — sobre la línea de tierra, la semilla saca sus dos cotiledones. */
 export function IconoGerminacion(props) {
   return (
     <IconoEtapaBase {...props}>
-      <path d="M3.5 19 H20.5" />
-      <path d="M12 19 V11.5" />
-      <path d="M12 12.5 C9.4 12.9 7.5 11.6 6.7 9.2 C9.4 8.8 11.4 10.1 12 12.5 Z" />
-      <path d="M12 12.5 C14.6 12.9 16.5 11.6 17.3 9.2 C14.6 8.8 12.6 10.1 12 12.5 Z" />
+      <path d="M3.5 20.5 H20.5" />
+      <path d="M12 20.5 V12" />
+      <path d="M12 12 C8.6 12.6 5.8 10.6 4.8 6.4 C8.6 5.8 11.4 8.2 12 12 Z" />
+      <path d="M12 12 C15.4 12.6 18.2 10.6 19.2 6.4 C15.4 5.8 12.6 8.2 12 12 Z" />
     </IconoEtapaBase>
   );
 }
 
-/* 2 · Vegetativo — la mata frondosa: tallo con dos pares de hojas. */
+/* 2 · Vegetativo — la mata como masa: una copa lobulada sobre su tallo. */
 export function IconoVegetativo(props) {
   return (
     <IconoEtapaBase {...props}>
-      <path d="M12 21 V6" />
-      <path d="M12 9.5 C9.6 9.9 7.7 8.6 6.9 6.2 C9.6 5.8 11.4 7.1 12 9.5 Z" />
-      <path d="M12 9.5 C14.4 9.9 16.3 8.6 17.1 6.2 C14.4 5.8 12.6 7.1 12 9.5 Z" />
-      <path d="M12 14.5 C9.8 14.9 8 13.7 7.3 11.5 C9.8 11.1 11.5 12.3 12 14.5 Z" />
-      <path d="M12 14.5 C14.2 14.9 16 13.7 16.7 11.5 C14.2 11.1 12.5 12.3 12 14.5 Z" />
+      <path d="M12 20.5 V15" />
+      <path d="M8.5 15 C4.6 15 3.4 11.2 5.8 9.6 C4.6 6.8 8 4.9 10.2 6.3 C10.8 4.2 13.2 4.2 13.8 6.3 C16 4.9 19.4 6.8 18.2 9.6 C20.6 11.2 19.4 15 15.5 15 Z" />
     </IconoEtapaBase>
   );
 }
 
-/* 3 · Floración — flor de cinco pétalos sobre su tallo con hoja. */
+/* 3 · Floración — la flor abierta como copa (tulipán) sobre su tallo, con una hoja. */
 export function IconoFloracion(props) {
   return (
     <IconoEtapaBase {...props}>
-      <path d="M12 21 V13" />
-      <path d="M12 16.5 C10 16.9 8.4 15.7 7.8 13.7 C10 13.3 11.5 14.5 12 16.5 Z" />
-      <g transform="translate(12 8.5)">
-        <ellipse cx="0" cy="-3.3" rx="1.6" ry="2.5" />
-        <ellipse cx="0" cy="-3.3" rx="1.6" ry="2.5" transform="rotate(72)" />
-        <ellipse cx="0" cy="-3.3" rx="1.6" ry="2.5" transform="rotate(144)" />
-        <ellipse cx="0" cy="-3.3" rx="1.6" ry="2.5" transform="rotate(216)" />
-        <ellipse cx="0" cy="-3.3" rx="1.6" ry="2.5" transform="rotate(288)" />
-      </g>
-      <circle cx="12" cy="8.5" r="1.5" fill="currentColor" stroke="none" />
+      <path d="M12 20.5 V13.5" />
+      <path d="M12 17.5 C9.8 17.5 8 16 7.4 13.8" />
+      <path d="M6 4.5 C6 11.2 8.6 13.5 12 13.5 C15.4 13.5 18 11.2 18 4.5 C16.2 6.8 14 6.8 12 4.5 C10 6.8 7.8 6.8 6 4.5 Z" />
     </IconoEtapaBase>
   );
 }
 
-/* 4 · Fructificación — el fruto cuajado con su pedúnculo y una hoja. */
+/* 4 · Fructificación — el fruto cuajado, con su pedúnculo y una hoja. */
 export function IconoFructificacion(props) {
   return (
     <IconoEtapaBase {...props}>
-      <path d="M12 21 C8.9 21 6.7 18.6 6.7 15.6 C6.7 12.8 9.1 11.2 12 11.2 C14.9 11.2 17.3 12.8 17.3 15.6 C17.3 18.6 15.1 21 12 21 Z" />
-      <path d="M12 11.2 V7.5" />
-      <path d="M12.2 9.1 C13.4 7.2 15.5 6.4 17.4 6.6 C17.2 8.6 15.4 9.6 12.2 9.1 Z" />
+      <path d="M12 20.5 C8.8 20.5 6.2 17.8 6.2 14.6 C6.2 11.8 8.2 10.2 10.4 10.6 C11 10.7 11.6 11 12 11.4 C12.4 11 13 10.7 13.6 10.6 C15.8 10.2 17.8 11.8 17.8 14.6 C17.8 17.8 15.2 20.5 12 20.5 Z" />
+      <path d="M12 11.4 V6.5" />
+      <path d="M12.2 8.2 C13.2 6.4 15 5.8 16.8 6.2" />
     </IconoEtapaBase>
   );
 }
 
-/* 5 · Cosecha — la canasta con asa y banda de trenzado. */
+/* 5 · Cosecha — canasta de campo: ancha, con su asa alta. */
 export function IconoCosecha(props) {
   return (
     <IconoEtapaBase {...props}>
-      <path d="M8 11 C8.4 7.6 15.6 7.6 16 11" />
-      <path d="M4.5 11 H19.5" />
-      <path d="M6 11 L7.4 19.2 A1.3 1.3 0 0 0 8.7 20.3 H15.3 A1.3 1.3 0 0 0 16.6 19.2 L18 11" />
-      <path d="M6.8 15.5 H17.2" />
+      <path d="M8 10.5 C8 3.5 16 3.5 16 10.5" />
+      <path d="M3.5 10.5 H20.5" />
+      <path d="M5.5 10.5 L7.3 18.8 A2 2 0 0 0 9.3 20.5 H14.7 A2 2 0 0 0 16.7 18.8 L18.5 10.5" />
     </IconoEtapaBase>
   );
 }
 
-/* 6 · Producto — la cosecha guardada en su frasco, con su tapa y nivel. */
+/* 6 · Producto — el frasco con hombros y su tapa: la cosecha guardada. */
 export function IconoProducto(props) {
   return (
     <IconoEtapaBase {...props}>
-      <path d="M8.5 3.5 H15.5 A1 1 0 0 1 16.5 4.5 V6 H7.5 V4.5 A1 1 0 0 1 8.5 3.5 Z" />
-      <path d="M8 6 H16 V18.5 A2 2 0 0 1 14 20.5 H10 A2 2 0 0 1 8 18.5 Z" />
-      <path d="M8 12 H16" />
+      <path d="M8.5 3.5 H15.5 A1 1 0 0 1 16.5 4.5 V6.5 H7.5 V4.5 A1 1 0 0 1 8.5 3.5 Z" />
+      <path d="M7.5 6.5 C5.2 7.5 4.5 9.5 4.5 12 V17.5 A3 3 0 0 0 7.5 20.5 H16.5 A3 3 0 0 0 19.5 17.5 V12 C19.5 9.5 18.8 7.5 16.5 6.5" />
     </IconoEtapaBase>
   );
 }
