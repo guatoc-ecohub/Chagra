@@ -376,6 +376,31 @@ describe('sidecarClient — feature flag on', () => {
         tool: 'get_calendario_siembra',
       });
     });
+
+    it('BUG-03 raiz: piso_termico con tilde ("frío", lo que devuelve pisoTermicoFromAltitud a 2200 msnm) se normaliza antes de salir — evita el 502 real', async () => {
+      // Repro exacto del bug reportado: "¿Cuánto rinde la rúcula y cómo la
+      // siembro a 2200 msnm?" -> pisoTermicoFromAltitud(2200) = 'frío' (CON
+      // tilde). Confirmado en vivo contra el sidecar real (127.0.0.1:7880,
+      // 2026-09-03): 'frío' sin normalizar -> 502 mcp_call_failed
+      // (invalid_enum_value, Zod). Este mock representa la respuesta 200 real
+      // que da el mismo endpoint una vez el body llega normalizado a 'frio'.
+      fetchMock.mockResolvedValueOnce(jsonResponse(200, {
+        mes: 9,
+        mes_nombre: 'septiembre',
+        piso_termico: 'frio',
+        cultivos: [{ species_id: 'phaseolus_vulgaris', common_name: 'fríjol cargamanto', estado: 'optimo' }],
+        source: 'hardcoded_v1',
+      }));
+      const { callTool } = await importFresh();
+      const res = await callTool('get_calendario_siembra', { piso_termico: 'frío' });
+      expect(res).not.toHaveProperty('_error');
+      expect(res.piso_termico).toBe('frio');
+      const [, opts] = fetchMock.mock.calls[0];
+      // El body que SALE debe llevar el valor ya normalizado — si esta
+      // aserción falla (vuelve a viajar 'frío' con tilde) es exactamente el
+      // bug reportado: el sidecar real lo rechazaría con 502.
+      expect(JSON.parse(opts.body)).toEqual({ piso_termico: 'frio' });
+    });
   });
 
   describe('configuración / base URL', () => {
