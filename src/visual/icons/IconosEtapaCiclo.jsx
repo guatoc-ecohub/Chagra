@@ -20,6 +20,7 @@
 const VIEWBOX = '0 0 24 24';
 
 /* Rasgos compartidos por las seis etapas: una sola familia de trazo. */
+/** @type {import('react').SVGProps<SVGGElement>} */
 const TRAZO = {
   fill: 'none',
   stroke: 'currentColor',
