@@ -8,7 +8,11 @@
   --pizarra-fondo: #26332b;
   --pizarra-alto: #2f3f35;
   --pizarra-bajo: #1c261f;
-  --pizarra-marco: #3a2c1c;
+  /* Marco en grafito oscuro — NUNCA madera (regla dura del operador,
+     2026-09-03: "canónico = pizarra/tiza, nunca madera"). Antes era un
+     marrón de madera (#3a2c1c); ahora es un gris-grafito de la MISMA familia
+     tonal que la pizarra, no un material distinto. */
+  --pizarra-marco: #2a322c;
   --tiza: #f3efe4;
   --tiza-tenue: rgba(243, 239, 228, 0.66);
 
@@ -27,7 +31,8 @@
 }
 
 /* La pizarra: fondo verde-oscuro con un grano finísimo de tiza y un marco
-   delgado (madera fina). El texto de tiza va escrito a máquina encima. */
+   delgado en grafito (nunca madera). El texto de tiza va escrito a máquina
+   encima. */
 .burbuja-pizarra-peek__tabla {
   position: relative;
   padding: 9px 26px 9px 11px;
