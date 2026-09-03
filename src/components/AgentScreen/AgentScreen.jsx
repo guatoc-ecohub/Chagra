@@ -790,6 +790,12 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
         actionGateResolverRef.current = resolve;
         setActionModal({
           isOpen: true,
+          // gateId: remonta el ActionConfirmModal por acción (key en el JSX).
+          // BUG-01 (P1, hard-test David/Cata): sin esto el modal conservaba el
+          // borrador de parámetros del primer render ({}) y aprobaba la
+          // ejecución de la tool con un plan vacío — el agente decía que
+          // registraba y no persistía nada.
+          gateId: `gate-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
           toolName,
           description,
           parameters,
@@ -4540,8 +4546,11 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
         disabled={state === STATE_RECORDING}
       />
 
-      {/* Action Confirmation Modal — alimentado por actionExecutor gate callback (057.4) */}
+      {/* Action Confirmation Modal — alimentado por actionExecutor gate callback (057.4).
+          key=gateId: remonta por acción para que el borrador de parámetros
+          arranque SIEMPRE con los de esta acción (BUG-01, P1). */}
       <ActionConfirmModal
+        key={actionModal.gateId}
         isOpen={actionModal.isOpen}
         toolName={actionModal.toolName || ''}
         description={actionModal.description || ''}
