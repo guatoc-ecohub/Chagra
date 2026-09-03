@@ -77,7 +77,7 @@ export default function PhenologyTimeline({
   // Una ventana genérica (no específica de la especie) marca todo el timeline
   // como aproximado por tipo de cultivo.
   const isGenericEstimate = useMemo(
-    () => windows.some((w) => w.isGeneric),
+    () => windows.some((w) => /** @type {any} */ (w).isGeneric),
     [windows],
   );
 

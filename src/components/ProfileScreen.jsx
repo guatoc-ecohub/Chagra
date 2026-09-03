@@ -2,13 +2,16 @@ import React, { useState, useEffect, useRef } from 'react';
 import {
   User, Palette, Briefcase, Save, Check, Mic, MapPin, Home, Volume2, Wrench,
   Sprout, ChevronRight, ChevronLeft, Bell, Users, Camera, Trash2, Shield,
-  Archive, LifeBuoy, LayoutGrid, GraduationCap, Vibrate, Waves, Mountain,
+  Archive, LifeBuoy, LayoutGrid, GraduationCap, Vibrate, Waves, Mountain, Type,
 } from 'lucide-react';
 import { ScreenShell } from './common/ScreenShell';
 import { esExtensionistaActual } from '../config/extensionistaAccess';
+import { can as roleCan } from '../services/roleService';
 import ThemeSelector from './common/ThemeSelector';
 import ThemeLivePreview from './common/ThemeLivePreview';
 import AgentAvatarSelector from './Settings/AgentAvatarSelector';
+import AvatarSelector from './Settings/AvatarSelector';
+import useAvatarCreature from '../hooks/useAvatarCreature';
 import BackgroundSelector from './Settings/BackgroundSelector';
 import BackupExportButton from './BackupExportButton';
 import CuadernoPDFButton from './CuadernoPDFButton';
@@ -27,12 +30,16 @@ import {
   getNotificationStyle, setNotificationStyle, getTelemetryConsent,
   setTelemetryConsent, HOME_MODULES, getModuleVisibility, setModuleVisibility,
   hasManualModuleVisibility, getProfile, saveProfile, getProfileMunicipio,
+  getMarco3DPreference, setMarco3DPreference,
 } from '../services/userProfileService';
 import { selectHomeModuleVisibilityMap } from '../services/homeModuleSelector';
 import { tieneAccesoGlaciarActual, esOperadorActual, operatorOverrideActivo, setOperatorOverride } from '../config/glaciarAccess';
 import { getOperatorPhoto, setOperatorPhotoFromFile, removeOperatorPhotoLocal } from '../services/operatorPhotoService';
 import ProfileSwitcher from './Settings/ProfileSwitcher';
 import { useTheme, getSelectableThemes } from '../hooks/useTheme';
+// T49 (rescate #2668 → cableado): modo lectura (letra grande) para adultos
+// mayores. Es un MODIFICADOR sobre el tema activo, no un tema nuevo.
+import { useModoLectura } from '../hooks/useModoLectura';
 import { fincaVivaHomePerfilActivo } from '../config/fincaVivaHomeFlag';
 import { MSG } from '../config/messages';
 
@@ -103,6 +110,7 @@ const NIVELES_RESPUESTA = [
 ];
 
 /** Catálogo de secciones del morral. El orden define la rejilla del hub. */
+/* eslint-disable chagra-i18n/no-hardcoded-spanish -- array de config, preexistente; disable puntual exigido por lefthook max-warnings=0 al tocar este archivo (roles/usuarios) */
 const SECTIONS = [
   { id: 'apariencia', label: 'Apariencia', icon: Palette, tint: 'text-amber-400', tintBg: 'bg-amber-900/30 border-amber-700/40', desc: 'Tema, fondo y avatar' },
   { id: 'agente', label: 'Mi agente', icon: Sprout, tint: 'text-emerald-400', tintBg: 'bg-emerald-900/30 border-emerald-700/40', desc: 'Respuestas y voz' },
@@ -114,6 +122,7 @@ const SECTIONS = [
   { id: 'ayuda', label: 'Ayuda', icon: LifeBuoy, tint: 'text-amber-300', tintBg: 'bg-amber-900/30 border-amber-700/40', desc: 'Manual de uso', action: true },
   { id: 'avanzado', label: 'Avanzado', icon: Wrench, tint: 'text-slate-400', tintBg: 'bg-slate-800/60 border-slate-700', desc: 'Modo técnico y más' },
 ];
+/* eslint-enable chagra-i18n/no-hardcoded-spanish */
 
 const SECTION_LABELS = Object.fromEntries(SECTIONS.map((s) => [s.id, s.label]));
 
@@ -311,9 +320,13 @@ export default function ProfileScreen({ onBack, onHome }) {
 
   // ── Estado vivo para las tarjetas del morral ────────────────────────────
   const { theme } = useTheme();
+  const modoLectura = useModoLectura();
   const selectableThemes = getSelectableThemes(fincaVivaHomePerfilActivo());
   const themeLabel = selectableThemes.find((t) => t.id === theme)?.label || theme;
   const ttsEnabled = usePrefsStore((s) => s.ttsEnabled);
+  // El animal elegido por la persona (Apariencia → "Su animal de la chagra"):
+  // sin foto de perfil, la cédula muestra su bicho en vez del ícono genérico.
+  const avatarCreature = useAvatarCreature();
   const activeFincaSlug = useFincaActiveStore((s) => s.activeFincaSlug);
   const municipio = (() => {
     try { return getProfileMunicipio(); } catch (_) { return null; }
@@ -388,7 +401,13 @@ export default function ProfileScreen({ onBack, onHome }) {
                       data-testid="profile-photo-img"
                     />
                   ) : (
-                    <User size={38} className="text-emerald-400" aria-hidden="true" />
+                    <span data-testid="profile-avatar-creature" className="pointer-events-none">
+                      <avatarCreature.Component
+                        size={56}
+                        animated={false}
+                        title={`Su animal: ${avatarCreature.nombre}`}
+                      />
+                    </span>
                   )}
                 </div>
                 <button
@@ -589,7 +608,46 @@ export default function ProfileScreen({ onBack, onHome }) {
             </div>
 
             <BackgroundSelector />
+            {/* El animal del USUARIO (avatar propio, registro de creatures) —
+                distinto del avatar del agente IA de abajo. */}
+            <AvatarSelector />
             <AgentAvatarSelector />
+
+            {/* Modo lectura (T49): letra más grande en toda la app. Pensado
+                para adultos mayores o para leer bajo el sol del campo, donde
+                el texto pequeño cuesta más. Es un modificador sobre el tema
+                activo, no un tema nuevo — funciona igual en los 4 temas. */}
+            <div className="space-y-3 bg-slate-900/40 border border-slate-800 rounded-2xl p-5">
+              <div className="flex items-center gap-2 px-1">
+                <Type size={18} className="text-emerald-400" />
+                <h3 className="text-sm font-bold text-slate-300 uppercase tracking-wider">Modo lectura</h3>
+              </div>
+              <label className="flex items-center justify-between gap-3 p-3 rounded-xl bg-slate-800/50 cursor-pointer min-h-[48px]">
+                <div className="flex flex-col gap-0.5 flex-1">
+                  <span className="text-sm font-bold text-slate-200">Letra grande</span>
+                  <span className="text-xs text-slate-400 leading-snug">
+                    Agranda el texto en toda la app. Útil si le cuesta leer
+                    letra pequeña o si el sol le dificulta ver la pantalla.
+                  </span>
+                </div>
+                <button
+                  type="button"
+                  role="switch"
+                  aria-checked={modoLectura.activo}
+                  aria-label="Activar o desactivar el modo lectura (letra grande)"
+                  onClick={modoLectura.toggle}
+                  className={`tap-target relative w-12 h-7 rounded-full transition-colors shrink-0 ${
+                    modoLectura.activo ? 'bg-emerald-600' : 'bg-slate-700'
+                  }`}
+                >
+                  <span
+                    className={`absolute top-0.5 left-0.5 w-6 h-6 bg-white rounded-full shadow transition-transform ${
+                      modoLectura.activo ? 'translate-x-5' : 'translate-x-0'
+                    }`}
+                  />
+                </button>
+              </label>
+            </div>
 
             {/* Estilo de notificación (operador 2026-06-06 + 2026-06-11):
                 decide CUÁL campana única se muestra. */}
@@ -707,6 +765,11 @@ export default function ProfileScreen({ onBack, onHome }) {
 
             {/* FASE 0 game-dev: la entrada 3D del valle desde el home (flag). */}
             <Valle3DSection />
+
+            {/* Marco de entrada OPCIONAL: el valle 3D vanilla (3d.guatoc.co,
+                three r160 aislado en su propio iframe) — DISTINTO del toggle
+                de arriba, ver Marco3DSection. */}
+            <Marco3DSection />
           </div>
         )}
 
@@ -1034,6 +1097,35 @@ export default function ProfileScreen({ onBack, onHome }) {
                 </button>
               </div>
             )}
+
+            {/* Gestión de usuarios de la finca (dueño/esposa/trabajador/niña):
+                SOLO se renderiza si el actor tiene el permiso user:manage
+                (roleService — dueño o esposa). 2D/onboarding, nunca 3D. */}
+            {roleCan(undefined, 'user:manage') && (
+              <div className="space-y-4 bg-slate-900/40 border border-slate-800 rounded-2xl p-5">
+                <div className="flex items-center gap-2 px-1">
+                  <Users size={18} className="text-emerald-400" />
+                  <h3 className="text-sm font-bold text-slate-300 uppercase tracking-wider">Gestión de usuarios</h3>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => {
+                    window.dispatchEvent(new CustomEvent('chagra:nav', { detail: { view: 'usuarios' } }));
+                  }}
+                  data-testid="profile-nav-usuarios"
+                  className="w-full flex items-center justify-between gap-3 p-3 rounded-xl bg-slate-800/50 hover:bg-slate-700/60 transition-colors min-h-[48px] text-left cursor-pointer"
+                >
+                  <div className="flex flex-col gap-0.5 flex-1">
+                    <span className="text-sm font-bold text-slate-200">Usuarios de su finca</span>
+                    <span className="text-xs text-slate-400 leading-snug">
+                      Cree usuarios para su esposa/esposo, trabajadores o sus
+                      hijos. Cada rol define qué puede ver y hacer.
+                    </span>
+                  </div>
+                  <ChevronRight size={18} className="text-slate-400 shrink-0" aria-hidden="true" />
+                </button>
+              </div>
+            )}
           </div>
         )}
 
@@ -1056,7 +1148,9 @@ export default function ProfileScreen({ onBack, onHome }) {
  *
  * Toggle "Voz del agente activa" persistido en usePrefsStore (key
  * `chagra:prefs:tts-enabled`). Al desactivar, stop() inmediato del
- * ttsService. Equivalente al doble-click del avatar colibrí.
+ * ttsService. Equivalente al doble-click del avatar del agente (Angelita
+ * por defecto, o el que el usuario haya elegido — fix 2026-07-25: el copy
+ * de abajo decía "colibrí", jubilado como cara del agente desde 2026-07-18).
  */
 function AgentVoiceSection() {
   const ttsEnabled = usePrefsStore((s) => s.ttsEnabled);
@@ -1083,7 +1177,7 @@ function AgentVoiceSection() {
           <span className="text-sm font-bold text-slate-200">Voz del agente activa</span>
           <span className="text-xs text-slate-400 leading-snug">
             Cuando está activa, Chagra IA lee en voz alta sus respuestas con una
-            sola voz natural. Doble click en el avatar colibrí silencia o
+            sola voz natural. Doble click en el avatar del agente silencia o
             reactiva sin abrir esta pantalla.
           </span>
         </div>
@@ -1251,6 +1345,12 @@ function SonidoSection() {
  * Doble gate: además del flag, el device-tier (deviceTier.js) decide — en
  * equipos humildes la banda no aparece y el home 2D sigue idéntico. Acá se
  * le dice honesto al usuario qué verá su equipo.
+ *
+ * DESDE task #42 (2026-08-14) la banda monta el mismo `<ValleMarcoScreen>`
+ * (valle vanilla canónico) que `Marco3DSection` de abajo — antes abría un
+ * diorama aparte (`EntradaValle3D`, React-Three-Fiber). Sigue siendo una
+ * PUERTA distinta a propósito (banda dentro del dashboard, no reemplaza toda
+ * la entrada): ver la nota "DOS PUERTAS, UN VALLE" en ValleMarcoScreen.jsx.
  */
 function Valle3DSection() {
   const valle3d = usePrefsStore((s) => s.valle3d ?? false);
@@ -1303,6 +1403,65 @@ function Valle3DSection() {
           todos los mundos siguen completos en su versión de siempre.
         </p>
       )}
+    </div>
+  );
+}
+
+/**
+ * Marco3DSection — marco de entrada OPCIONAL: el valle 3D VANILLA (el mismo
+ * build que sirve 3d.guatoc.co) embebido a pantalla completa en un <iframe>
+ * (ValleMarcoScreen.jsx), detrás de sesión. Persiste en el perfil (`marco3d`,
+ * userProfileService), DEFAULT OFF.
+ *
+ * DISTINTO de `Valle3DSection` de arriba en la FORMA de entrar, no en el
+ * DESTINO — desde task #42 (2026-08-14) las dos puertas montan el mismo
+ * `<ValleMarcoScreen>` (el valle vanilla canónico). Este toggle REEMPLAZA la
+ * entrada entera (`case 'dashboard'`); el de arriba solo agrega una banda
+ * dentro del dashboard (`case 'valle3d'`) — dos formas de llegar al mismo
+ * valle, copy deliberadamente distinto para no confundir la FORMA.
+ */
+function Marco3DSection() {
+  const [marco3d, setMarco3dState] = useState(() => getMarco3DPreference());
+
+  return (
+    <div className="space-y-4 bg-slate-900/40 border border-slate-800 rounded-2xl p-5">
+      <div className="flex items-center gap-2 px-1">
+        <Mountain size={18} className="text-emerald-400" />
+        <h3 className="text-sm font-bold text-slate-300 uppercase tracking-wider">Marco de inicio</h3>
+      </div>
+
+      <label className="flex items-center justify-between gap-3 p-3 rounded-xl bg-slate-800/50 cursor-pointer min-h-[48px]">
+        <div className="flex flex-col gap-0.5 flex-1">
+          <span className="text-sm font-bold text-slate-200">Entrar por el valle 3D (3d.guatoc.co)</span>
+          <span className="text-xs text-slate-400 leading-snug">
+            Reemplaza la entrada simple por el valle 3D completo — los mundos
+            y el kart en pantalla completa. Puede volver a la entrada simple
+            en cualquier momento, desde dentro del valle o apagando esta
+            opción.
+          </span>
+        </div>
+        <button
+          type="button"
+          role="switch"
+          aria-checked={marco3d}
+          aria-label="Activar o desactivar el marco de entrada del valle 3D"
+          data-testid="marco3d-toggle"
+          onClick={() => {
+            const next = !marco3d;
+            setMarco3dState(next);
+            setMarco3DPreference(next);
+          }}
+          className={`tap-target relative w-12 h-7 rounded-full transition-colors shrink-0 ${
+            marco3d ? 'bg-emerald-600' : 'bg-slate-700'
+          }`}
+        >
+          <span
+            className={`absolute top-0.5 left-0.5 w-6 h-6 bg-white rounded-full shadow transition-transform ${
+              marco3d ? 'translate-x-5' : 'translate-x-0'
+            }`}
+          />
+        </button>
+      </label>
     </div>
   );
 }

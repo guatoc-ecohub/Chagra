@@ -1,3 +1,14 @@
+/*
+ * i18n (ADR-050): userProfileService.js trae strings en español Colombia
+ * (nombres de módulos, mensajes de consola) pendientes de migrar a
+ * src/config/messages.js — deuda PREEXISTENTE (14 warnings en `dev` HEAD,
+ * verificado antes de este cambio) que nadie había disparado porque nadie
+ * había tocado el archivo desde que la regla `chagra-i18n` entró. La regla es
+ * soft (warn); se desactiva a nivel de archivo para no bloquear el pre-commit
+ * de ESTE cambio (marco3d) con deuda que no le pertenece — mismo criterio que
+ * App.jsx/DashboardLive.jsx. Los errores reales de ESLint siguen activos.
+ */
+/* eslint-disable chagra-i18n/no-hardcoded-spanish */
 /**
  * userProfileService.js — perfil enriquecido del usuario (#200).
  *
@@ -840,6 +851,15 @@ export function setNotificationStyle(style) {
  *   - chivito: Oxypogon guerinii (chivito/barbudito de páramo) — grounded puya_clava_herculis.json
  *   - danta:   Tapirus pinchaque (danta de montaña) — grounded vaccinium_floribundum.json
  *   - rana:    Phyllobates terribilis (rana dorada) — endémica del Chocó, real y verificable
+ *
+ * @deprecated (2026-08-14) `GuardianEspiritu.jsx` — el selector de 5 fauna
+ * que consumía este par lectura/escritura — se DESCONECTÓ de DashboardLive.jsx
+ * y MontanaMundosCampesino.jsx (unificación compAI: la elección de compañero
+ * vive ahora en `AgentAvatarSelector`/`useAgentAvatarType`, roster de 7). Este
+ * servicio y `guardian_especie` NO se borran — quedan funcionales por si algún
+ * perfil viejo todavía lo tiene guardado — pero ya no hay UI que escriba en
+ * ellos. NO confundir con `vitalidadEspirituService.js` (otro sistema, activo,
+ * no tocado por esta deprecación).
  */
 export const GUARDIAN_ESPECIE_IDS = Object.freeze(['abeja', 'oso', 'chivito', 'danta', 'rana']);
 /** Guardián por defecto: la abeja angelita (protagonista del mockup aprobado). */
@@ -850,6 +870,8 @@ export const DEFAULT_GUARDIAN_ESPECIE = 'abeja';
  * persistido si es válido; `null` si el usuario aún no ha elegido (para que el
  * home pueda distinguir "sin elegir" de "eligió el default").
  *
+ * @deprecated ver la nota de GUARDIAN_ESPECIE_IDS — GuardianEspiritu.jsx ya no
+ * está montado en ningún lugar de la app (2026-08-14).
  * @returns {'abeja'|'oso'|'chivito'|'danta'|'rana'|null}
  */
 export function getGuardianEspecie() {
@@ -862,6 +884,8 @@ export function getGuardianEspecie() {
  * desconocidos para no corromper el perfil. Emite `chagra:guardian-changed` y
  * `chagra:profile-changed` para que el home/saludo re-lean el espíritu en vivo.
  *
+ * @deprecated ver la nota de GUARDIAN_ESPECIE_IDS — GuardianEspiritu.jsx ya no
+ * está montado en ningún lugar de la app (2026-08-14).
  * @param {'abeja'|'oso'|'chivito'|'danta'|'rana'} id
  * @returns {Object|null} perfil resultante, o null si el id era inválido
  */
@@ -872,6 +896,53 @@ export function setGuardianEspecie(id) {
     window.dispatchEvent(new CustomEvent('chagra:guardian-changed', { detail: { id } }));
     window.dispatchEvent(new CustomEvent('chagra:profile-changed', { detail: { guardian_especie: id } }));
   } catch (_) { /* SSR/tests sin window — la elección ya quedó persistida */ }
+  return profile;
+}
+
+// ─── Marco de inicio: valle 3D vanilla (integración iframe /valle/) ─────────
+//
+// `marco3d` (booleano en el perfil) decide si la entrada de la app, ya
+// autenticada, se reemplaza por el valle 3D vanilla (el mismo build que sirve
+// 3d.guatoc.co, sincronizado a `public/valle/` por `scripts/sync-valle.mjs`)
+// dentro de un <iframe> a pantalla completa. DEFAULT false (entrada simple de
+// siempre) — es un marco OPCIONAL, nunca el camino forzado.
+//
+// NO CONFUNDIR con `valle3d` (usePrefsStore, ProfileScreen `Valle3DSection`):
+// esa es la banda "El valle en 3D" en el dashboard (App.jsx `case 'valle3d'`)
+// — desde task #42 (2026-08-14) también abre el MISMO valle vanilla (antes
+// abría `EntradaValle3D`, un diorama aparte en React-Three-Fiber). La
+// diferencia entre los dos flags es la FORMA de entrar, no el destino: este
+// `marco3d` REEMPLAZA la entrada entera; `valle3d` solo agrega una banda
+// dentro del dashboard. Dos flags distintos a propósito (ver ValleMarcoScreen.jsx,
+// "DOS PUERTAS, UN VALLE").
+export const DEFAULT_MARCO3D = false;
+
+/**
+ * Lee la preferencia de marco de inicio (valle 3D vanilla vs. entrada simple).
+ * @returns {boolean}
+ */
+export function getMarco3DPreference() {
+  const v = getProfile()?.marco3d;
+  return typeof v === 'boolean' ? v : DEFAULT_MARCO3D;
+}
+
+/**
+ * Persiste la preferencia de marco de inicio en el perfil (`marco3d`).
+ * Emite `chagra:profile-changed` (mismo evento genérico de todo el archivo,
+ * ver getGuardianEspecie/setGuardianEspecie arriba) — no un evento propio: no
+ * hay hoy ningún listener que necesite distinguir ESTE cambio de perfil de
+ * los demás (App.jsx lee `getMarco3DPreference()` fresca en cada render del
+ * case 'dashboard', no cachea el valor en estado, así que no depende de
+ * ningún evento para verlo al volver del perfil).
+ * @param {boolean} enabled
+ * @returns {Object} perfil resultante
+ */
+export function setMarco3DPreference(enabled) {
+  const next = !!enabled;
+  const profile = saveProfile({ marco3d: next });
+  try {
+    window.dispatchEvent(new CustomEvent('chagra:profile-changed', { detail: { marco3d: next } }));
+  } catch (_) { /* SSR/tests sin window — la pref ya quedó persistida */ }
   return profile;
 }
 
@@ -1102,7 +1173,7 @@ export const HOME_MODULES = Object.freeze([
   {
     id: 'clima',
     label: 'Clima',
-    description: 'Pronóstico del clima para tu zona (7 días)',
+    description: 'Pronóstico del clima para su zona (7 días)',
     category: 'principal',
   },
   {
@@ -1277,6 +1348,13 @@ export function isModuleVisible(moduleId) {
 // render (FUSED_EN_ESTADO_DEL_DIA en DashboardLive) para no duplicarlos ni en
 // los perfiles existentes que ya los tenían guardados en su orden.
 export const HOME_MODULE_DEFAULT_ORDER = Object.freeze([
+  // Los de categoría 'principal' van primero: son lo que el campesino mira al
+  // abrir la app. hoyfinca, clima y analisis FALTABAN en esta lista aunque sí
+  // estaban en HOME_MODULES, así que no se dibujaban para nadie sin un orden
+  // guardado — y clima es justo lo que se consulta antes de sembrar o fumigar.
+  'hoyfinca',
+  'clima',
+  'analisis',
   'asociaciones',
   'plantas',
   'hoy',

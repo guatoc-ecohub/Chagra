@@ -27,11 +27,21 @@ const SONIDO_MODES = ['off', 'suave', 'on'];
 // prende el flag en Perfil ve la banda de entrada en "Los mundos de su finca"
 // — y solo si su equipo aguanta 3D (device-tier alto/medio, deviceTier.js).
 const STORAGE_KEY_VALLE3D = 'chagra:prefs:valle3d';
-// Migración de salida: versiones anteriores podían dejar este flag apagado en
-// localStorage. Para destrabar la experiencia 3D en el build actual, la primera
-// carga posterior a esta migración lo vuelve a encender una sola vez y después
-// respeta el valor elegido por el usuario.
-const STORAGE_KEY_VALLE3D_MIGRATED = 'chagra:prefs:valle3d:migrated-v1';
+// Migración de ENTRADA a 2D-por-defecto (2026-08-02): chagra.app debe ABRIR en
+// 2D. La migración previa (migrated-v1) forzaba el valle 3D encendido en la
+// primera carga de cada usuario — por eso todos veían el valle 3D como home
+// aunque el default declarado fuera false. Esta migración v2 DESACTIVA el valle
+// 3D una sola vez para quienes quedaron con el flag encendido por la migración
+// vieja, y a partir de ahí respeta lo que el usuario elija en Perfil →
+// experiencia. Quien QUIERA el valle 3D lo prende ahí; el default es 2D.
+const STORAGE_KEY_VALLE3D_MIGRATED = 'chagra:prefs:valle3d:migrated-v2-2d-default';
+// Avatar del USUARIO (2026-07-13): el animal de la chagra que la persona
+// elige como su avatar (slug del registro CREATURES de src/visual/creatures).
+// Default: la abeja angelita. El store solo persiste el slug como string —
+// la resolución slug→componente vive en useAvatarCreature (hooks), para no
+// arrastrar los SVG de fauna a todo consumidor del store.
+const STORAGE_KEY_AVATAR_CREATURE = 'chagra:prefs:avatar-creature';
+export const AVATAR_CREATURE_DEFAULT = 'abeja-angelita';
 
 function load(key, fallback) {
   try {
@@ -50,14 +60,16 @@ function loadValle3d() {
   try {
     const migrated = localStorage.getItem(STORAGE_KEY_VALLE3D_MIGRATED) === '1';
     if (!migrated) {
+      // Migración v2: apagar el valle 3D una sola vez (2D-por-defecto) y no
+      // volver a tocarlo. Después respeta la elección del usuario en Perfil.
       localStorage.setItem(STORAGE_KEY_VALLE3D_MIGRATED, '1');
-      localStorage.setItem(STORAGE_KEY_VALLE3D, JSON.stringify(true));
-      return true;
+      localStorage.setItem(STORAGE_KEY_VALLE3D, JSON.stringify(false));
+      return false;
     }
   } catch (_) {
-    return true;
+    return false;
   }
-  return load(STORAGE_KEY_VALLE3D, true);
+  return load(STORAGE_KEY_VALLE3D, false);
 }
 
 const usePrefsStore = create((set, _get) => ({
@@ -68,6 +80,7 @@ const usePrefsStore = create((set, _get) => ({
   haptics: load(STORAGE_KEY_HAPTICS, 'auto'),
   sonido: load(STORAGE_KEY_SONIDO, 'off'),
   valle3d: loadValle3d(),
+  avatarCreatureId: load(STORAGE_KEY_AVATAR_CREATURE, AVATAR_CREATURE_DEFAULT),
 
   setVoiceRegion: (region) => {
     save(STORAGE_KEY_VOICE_REGION, region);
@@ -101,6 +114,12 @@ const usePrefsStore = create((set, _get) => ({
     const valid = SONIDO_MODES.includes(mode) ? mode : 'off';
     save(STORAGE_KEY_SONIDO, valid);
     set({ sonido: valid });
+  },
+
+  setAvatarCreatureId: (id) => {
+    const slug = typeof id === 'string' && id.trim() ? id.trim() : AVATAR_CREATURE_DEFAULT;
+    save(STORAGE_KEY_AVATAR_CREATURE, slug);
+    set({ avatarCreatureId: slug });
   },
 
   setValle3d: (flag) => {

@@ -25,6 +25,7 @@ import React from 'react';
 
 const STATE_LABEL = {
     idle: 'Chagra IA',
+    // eslint-disable-next-line chagra-i18n/no-hardcoded-spanish
     thinking: 'Chagra IA · pensando',
     speaking: 'Chagra IA · hablando',
     listening: 'Chagra IA · escuchando',
@@ -41,11 +42,11 @@ export default function ChagraAgentAvatarMaiz({
     state = 'idle',
     size = 56,
     withLabel = false,
-    onClick,
-    onDoubleClick,
+    onClick = undefined,
+    onDoubleClick = undefined,
     glow = false,
     className = '',
-    ariaLabel,
+    ariaLabel = undefined,
 }) {
     const tone = STATE_TONE_TEXT[state] || STATE_TONE_TEXT.idle;
     const label = STATE_LABEL[state] || STATE_LABEL.idle;

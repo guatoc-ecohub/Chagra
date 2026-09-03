@@ -24,7 +24,7 @@ describe('getTasksForCycle', () => {
     const process = { attributes: { current_stage: 'vegetative' } };
     const tasks = getTasksForCycle(process, stageOrder);
     expect(tasks.length).toBeGreaterThan(0);
-    const stages = [...new Set(tasks.map((t) => t.stage))];
+    const stages = [...new Set(tasks.map((t) => /** @type {any} */ (t).stage))];
     expect(stages).toContain('vegetative');
     expect(stages).toContain('flowering');
     expect(stages).not.toContain('sowing');
@@ -38,7 +38,7 @@ describe('getUrgentTasks', () => {
       { task: 'B', priority: 'media' },
       { task: 'C', priority: 'alta' },
     ];
-    const urgent = getUrgentTasks(tasks);
+    const urgent = getUrgentTasks(/** @type {any} */ (tasks));
     expect(urgent).toHaveLength(2);
   });
 });

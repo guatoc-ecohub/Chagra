@@ -1,0 +1,71 @@
+{
+  "species_slug": "cynara_cardunculus_scolymus",
+  "scientific_name": "Cynara cardunculus L. var. scolymus",
+  "common_names": [
+    "Alcachofa"
+  ],
+  "family": "Asteraceae",
+  "category": "hortalizas_fruto_flor",
+  "cultivable": true,
+  "conservation_status": "cultivo_comun",
+  "thermal_zones": [
+    "templado",
+    "frio"
+  ],
+  "roles_in_guild": [
+    "crop",
+    "pollinator_attractor"
+  ],
+  "antagonists": [],
+  "especies_nativas_sustitutas": [],
+  "propagation": {
+    "metodo_principal": "hijuelos",
+    "notas": "Se propaga por hijuelos (rebrotes de la corona) o por semilla. Planta perenne que produce durante 3-5 años. El capitulo o cabeza floral inmadura es la parte comestible."
+  },
+  "requirements": {
+    "agua": "medio",
+    "altitud_msnm": {
+      "min_absoluto": 1000,
+      "optimo_min": 1800,
+      "optimo_max": 2500,
+      "max_absoluto": 2800
+    },
+    "temperatura_c": {
+      "helada_letal": -3,
+      "optimo_min": 14,
+      "optimo_max": 20,
+      "max_tolerable": 26
+    },
+    "radiacion": "sol_pleno",
+    "drenaje_requerido": "bueno"
+  },
+  "valor_pedagogico": "La alcachofa (Cynara cardunculus L. var. scolymus, Asteraceae) es una hortaliza perenne mediterránea domesticada del cardo silvestre, aclimatada en zonas frías y templadas colombianas entre 1.800 y 2.500 msnm (Boyacá altiplano, Cundinamarca norte, Nariño, Antioquia oriente, Eje cafetero alto). Enseña una lección viva de morfología floral y domesticación humana: lo que se come no es una fruta ni una hoja, sino una inflorescencia inmadura completa — el capítulo o cabeza floral antes de que las flores violetas se abran. Cada bráctea (la 'hojita' que se desprende y se chupa) es realmente una hoja modificada que protege cientos de flores tubulosas todavía dormidas; el corazón es el receptáculo donde van pegadas las flores. Si se deja madurar, se abre como un cardo púrpura espectacular que atrae abejas, abejorros y mariposas: por eso la planta cumple doble función en la chagra como cultivo y como atractor de polinizadores. Domesticación: el ancestro silvestre (cardo) tiene capítulos chicos y espinosos; siglos de selección campesina mediterránea agrandaron el receptáculo carnoso y redujeron las espinas. Manejo agroecológico: propagación por hijuelos de la corona en mayo-junio para aprovechar lluvias, marco amplio 1,2 × 1 m, abonado de fondo con compost o bocashi, planta perenne productiva 3-5 años, después se renueva con hijuelos propios. Tolera heladas suaves hasta -3 °C. Fuentes Tier A: POWO Kew, GBIF Backbone Taxonomy, FAO EcoCrop, Pérez Arbeláez 1947 Plantas Útiles de Colombia.",
+  "sources": [
+    {
+      "id": "powo-kew",
+      "title": "powo-kew",
+      "tier": "A",
+      "url": "https://powo.science.kew.org"
+    },
+    {
+      "id": "gbif-taxonomic-backbone",
+      "title": "gbif-taxonomic-backbone",
+      "tier": "A",
+      "url": "https://www.gbif.org/dataset/d7dddbf4-2cf0-4f39-9b2a-bb099caae36c"
+    },
+    {
+      "id": "fao-ecocrop",
+      "title": "fao-ecocrop",
+      "tier": "A",
+      "url": "https://gaez.fao.org/pages/ecocrop"
+    },
+    {
+      "id": "perez-arbelaez-1947-plantas-utiles",
+      "title": "perez-arbelaez-1947-plantas-utiles",
+      "tier": "A",
+      "url": null
+    }
+  ],
+  "_generated_by": "scripts/build-cycle-content-from-catalog.mjs",
+  "_generated_at": "2026-05-19T00:42:57.376Z"
+}

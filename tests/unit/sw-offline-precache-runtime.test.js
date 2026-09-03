@@ -127,7 +127,12 @@ const SAMPLE_INDEX = '<!doctype html><html><head>' +
   '</body></html>';
 
 describe('SW RAG grounding precache (T108)', () => {
-  it('install precachea rag-embeddings.json en bucket grounding separado', async () => {
+  it('install precachea grafo-relations.json en bucket grounding separado', async () => {
+    // NOTA: Desde la refactorización de optimización de install time, los archivos
+    // pesados (rag-embeddings.json ~1.7MB, cycle-content/ ~3.4MB) ya NO se precachean
+    // en install. En su lugar, se cachean on-demand (cache-on-use) en el fetch handler.
+    // Solo el grafo-relations.json (~66KB) se precachea en install por ser liviano
+    // y esencial para el grounding offline. Ver comentario en public/sw.js líneas 79-91.
     const { listeners, fakeCaches } = loadSW({ online: true, indexHtml: SAMPLE_INDEX });
     const { waited } = fireEvent(listeners.install, {});
     await waited;
@@ -138,8 +143,7 @@ describe('SW RAG grounding precache (T108)', () => {
 
     const groundingCache = await fakeCaches.open(groundingBuckets[0]);
     const keys = (await groundingCache.keys()).map((r) => new URL(r.url).pathname);
-    expect(keys).toContain('/rag-embeddings.json');
-    expect(keys).toContain('/cycle-content/manifest.json');
+    expect(keys).toContain('/grafo-relations.json');
   });
 
   it('install precachea iconos PWA en bucket shell', async () => {
@@ -200,6 +204,56 @@ describe('SW map tiles cache (T108)', () => {
     const names = await fakeCaches.keys();
     const tilesBucket = names.find((n) => n.startsWith('chagra-map-tiles-'));
     expect(tilesBucket).toBeTruthy();
+  });
+});
+
+describe('SW cache-on-use RAG grounding (T108)', () => {
+  it('cachea rag-embeddings.json on-demand (no en install)', async () => {
+    // Los archivos pesados (~1.7MB) se cachean la PRIMERA vez que se usan,
+    // no en install. Esto optimiza el install time. Ver comentario en sw.js líneas 79-91.
+    const { listeners, fakeCaches } = loadSW({ online: true, indexHtml: SAMPLE_INDEX });
+    await fireEvent(listeners.install, {}).waited;
+
+    // Simula una petición de rag-embeddings.json
+    const req = { url: 'https://chagra.guatoc.co/rag-embeddings.json', method: 'GET' };
+    const { responded } = fireEvent(listeners.fetch, req);
+    await responded;
+
+    const groundingCache = await fakeCaches.open('chagra-rag-grounding-v1');
+    const keys = (await groundingCache.keys()).map((r) => new URL(r.url).pathname);
+    expect(keys).toContain('/rag-embeddings.json');
+  });
+
+  it('cachea cycle-content/manifest.json on-demand (no en install)', async () => {
+    // Los archivos de cycle-content se cachean on-demand en el fetch handler.
+    const { listeners, fakeCaches } = loadSW({ online: true, indexHtml: SAMPLE_INDEX });
+    await fireEvent(listeners.install, {}).waited;
+
+    // Simula una petición de cycle-content/manifest.json
+    const req = { url: 'https://chagra.guatoc.co/cycle-content/manifest.json', method: 'GET' };
+    const { responded } = fireEvent(listeners.fetch, req);
+    await responded;
+
+    const groundingCache = await fakeCaches.open('chagra-rag-grounding-v1');
+    const keys = (await groundingCache.keys()).map((r) => new URL(r.url).pathname);
+    expect(keys).toContain('/cycle-content/manifest.json');
+  });
+
+  it('sirve grounding cacheado offline', async () => {
+    // Una vez cacheado, el grounding debe servir offline sin error.
+    const { listeners } = loadSW({ online: true, indexHtml: SAMPLE_INDEX });
+    await fireEvent(listeners.install, {}).waited;
+
+    // Primera petición online para cachear
+    const req = { url: 'https://chagra.guatoc.co/rag-embeddings.json', method: 'GET' };
+    await fireEvent(listeners.fetch, req).responded;
+
+    // Segunda petición offline (fakeCaches.fetch devuelve TypeError)
+    const { listeners: listeners2 } = loadSW({ online: false, indexHtml: SAMPLE_INDEX });
+    const req2 = { url: 'https://chagra.guatoc.co/rag-embeddings.json', method: 'GET' };
+    const { responded: responded2 } = fireEvent(listeners2.fetch, req2);
+    const res2 = await responded2;
+    expect(res2).toBeTruthy();
   });
 });
 

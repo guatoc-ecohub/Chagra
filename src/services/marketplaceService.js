@@ -80,7 +80,7 @@ export function construirContacto(oferta) {
  * banda de precios, la plaza, y la cita resuelta a deep-link (SIPSA/DANE).
  *
  * @param {string} producto — nombre del producto.
- * @returns {{ disponible:boolean, banda?:string, mercado?:string,
+ * @returns {{ disponible:boolean, producto?:string, banda?:string, mercado?:string,
  *   fuente?:string, fuenteUrl?:string, boletinFecha?:string }}
  */
 export function resolverPrecioReferencia(producto) {
@@ -92,13 +92,88 @@ export function resolverPrecioReferencia(producto) {
   const cita = classifySource(ref.fuente, { concept: producto });
   return {
     disponible: true,
+    origen: 'estatico',
     producto: ref.producto,
     banda,
     mercado: ref.mercado,
     fuente: cita.fuente || ref.fuente,
     fuenteUrl: cita.fuente_url || null,
     boletinFecha: ref.boletinFecha,
+    fecha: ref.boletinFecha,
   };
+}
+
+/**
+ * resolverPrecioReferenciaVivo — precio de referencia mayorista PREFIRIENDO el
+ * FEED VIVO SIPSA (tool `get_precio_sipsa`, tabla `chagra.sipsa_precios` poblada
+ * a diario por el servicio REST oficial DANE) con FALLBACK HONESTO a la foto
+ * estática citada (`precioReferencia.js`).
+ *
+ * Escalera (nunca inventa un número):
+ *   1. Si el sidecar devolvió un precio REAL (`available:true` + un
+ *      `precio_promedio_cop_kg` numérico) → `origen:'vivo'` con la banda del día,
+ *      la plaza/central, la FECHA del dato vivo y el sello de frescura honesto
+ *      (`desactualizado`/`diasDesdeDato`) para que la UI no venda un dato viejo
+ *      como el de hoy.
+ *   2. Si el sidecar no respondió (flag off, offline, timeout, sin dato para el
+ *      producto → `null`/`available:false`) → se cae a la FOTO estática del
+ *      boletín (`resolverPrecioReferencia`), que trae su propia fecha.
+ *   3. Si NINGUNA fuente tiene dato → `{ disponible:false }`. La UI deflecta
+ *      ("sin precio de referencia todavía"), jamás fabrica una banda.
+ *
+ * Reusa el cliente SIPSA existente (el `sipsaResult` lo produce
+ * `getPrecioSipsa`/`fetchLatestSipsaPrice` vía el hook `useSipsaLatestPrice`);
+ * esta función es PURA y solo mapea ese resultado al view-model del marketplace
+ * — NO abre un segundo canal de datos.
+ *
+ * @param {string} producto — nombre del producto (texto libre).
+ * @param {object|null} [sipsaResult] - resultado crudo de `getPrecioSipsa('latest_price', …)`.
+ * @returns {{ disponible:boolean, origen?:'vivo'|'estatico'|'ninguno', producto?:string,
+ *   banda?:string, mercado?:string, fuente?:string, fuenteUrl?:string, fecha?:string,
+ *   boletinFecha?:string, desactualizado?:boolean, diasDesdeDato?:number|null }}
+ */
+export function resolverPrecioReferenciaVivo(producto, sipsaResult = null) {
+  const q = typeof producto === 'string' ? producto.trim() : '';
+
+  // 1) FEED VIVO. Solo si el sidecar cantó un precio numérico real.
+  const r = sipsaResult && typeof sipsaResult === 'object' ? sipsaResult : null;
+  const price = r && r.available === true && r.price && typeof r.price === 'object' ? r.price : null;
+  const prom = price && typeof price.precio_promedio_cop_kg === 'number' ? price.precio_promedio_cop_kg : null;
+
+  if (prom != null && Number.isFinite(prom) && prom > 0) {
+    const promFmt = formatearCOP(prom);
+    const min = formatearCOP(price.precio_min_cop_kg);
+    const max = formatearCOP(price.precio_max_cop_kg);
+    // Banda del día si el feed trae min/max distintos; si no, el promedio puntual.
+    const banda = min && max && min !== max ? `${min}–${max} / kg` : `${promFmt} / kg`;
+    const mercado = (typeof r.central_abastos === 'string' && r.central_abastos.trim())
+      || (typeof price.plaza === 'string' && price.plaza.trim())
+      || null;
+    const frescura = r.frescura && typeof r.frescura === 'object' ? r.frescura : null;
+    const fecha = (typeof price.fecha === 'string' && price.fecha)
+      || (frescura && typeof frescura.fecha_dato === 'string' && frescura.fecha_dato)
+      || null;
+    const cita = classifySource('SIPSA', { concept: q });
+    return {
+      disponible: true,
+      origen: 'vivo',
+      producto: (typeof price.producto === 'string' && price.producto.trim()) || q,
+      banda,
+      mercado,
+      fuente: cita.fuente || 'SIPSA',
+      fuenteUrl: cita.fuente_url || null,
+      fecha,
+      desactualizado: !!(frescura && frescura.desactualizado === true),
+      diasDesdeDato: frescura && typeof frescura.dias_desde_dato === 'number' ? frescura.dias_desde_dato : null,
+    };
+  }
+
+  // 2) FALLBACK HONESTO: foto estática citada del boletín (con su fecha).
+  const est = resolverPrecioReferencia(q);
+  if (est.disponible) return est;
+
+  // 3) Sin dato verificable en NINGUNA fuente → deflección honesta. NUNCA inventa.
+  return { disponible: false, origen: 'ninguno' };
 }
 
 /**
@@ -165,7 +240,7 @@ export function validarOferta(form) {
       errors.precio = 'El precio debe ser un número válido';
     }
   }
-  return { ok: Object.keys(errors).length === 0, errors };
+  return { ok: Object.keys(errors).length === 0, errors: /** @type {Record<string,string>} */ (/** @type {unknown} */ (errors)) };
 }
 
 /**

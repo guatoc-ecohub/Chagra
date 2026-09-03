@@ -49,7 +49,7 @@ beforeEach(() => {
 
 // Marcadores de neutralización / caveat (para chequear que lideran la salida).
 const VARIETY_NEUTRALIZER = /no\s+me\s+consta|no\s+existe\s+una\s+variedad|no\s+hay\s+una\s+variedad/i;
-const HELADA_CAVEAT = /riesgo\s+de\s+helada|en\s+el\s+l[ií]mite/i;
+const HELADA_CAVEAT = /riesgo\s+de\s+helada|en\s+el\s+l[ií]mite|heladas?\s+que\s+lo\s+matan/i;
 
 // ── GUARD A · BORDE-007 ──────────────────────────────────────────────────────
 

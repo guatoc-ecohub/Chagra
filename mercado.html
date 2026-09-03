@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="theme-color" content="#0f172a" />
+    <title>Mercado Chagra: catálogo real de Milpa</title>
+    <meta
+      name="description"
+      content="Catálogo real de Milpa en el mercado Chagra: productos con su foto, precio y unidad de venta."
+    />
+    <!-- Página estática del catálogo real (sin auth, sin sqlite-wasm
+         ni service worker): CSP mínima, no necesita 'wasm-unsafe-eval'. -->
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; object-src 'none'; base-uri 'self'"
+    />
+    <style>
+      html, body { background: #020617; margin: 0; }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/entries/mercado.jsx"></script>
+  </body>
+</html>

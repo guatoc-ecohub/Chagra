@@ -30,16 +30,42 @@
    para que el lado 3D tiña la sombra de Angelita con su misma línea. */
 export { RH_INK as ABEJA_TINTA } from './_rubberhose.jsx';
 
-/* Paleta del cuerpo — Tetragonisca angustula elevada a rubber-hose andino. */
+/* Paleta del cuerpo — Tetragonisca angustula REAL elevada a rubber-hose andino.
+   La firma de la especie es la ESTRUCTURA DE VALORES: cabeza y tórax OSCUROS
+   (casi negros) + abdomen ámbar PÁLIDO y LISO. Es lo contrario de la Apis
+   europea (cabeza/tórax claros + abdomen con bandas oscuras) — la que saquea
+   las colmenas de angelita; por eso el color es fidelidad, no decoración. */
 export const ABEJA_PALETA = {
-  cuerpo: '#ffb54f',      // ámbar del tronco y del aura viva
-  cuerpoGlow: 'rgba(255,181,79,0.9)', // el mismo ámbar como resplandor (drop-shadow)
-  cabeza: '#ffd76a',      // cabeza clara
-  hiloChumbe: '#9c3b1e',  // hilo tierra dentro de la banda de tinta (chumbe)
-  alaTul: '#bfeaff',      // ala grande de tul
-  alaTulClara: '#eafff6', // ala chica, más pálida
+  cuerpo: '#f2c064',      // ámbar PÁLIDO del abdomen liso y del aura viva
+  cuerpoGlow: 'rgba(242,192,100,0.85)', // el mismo ámbar como resplandor (drop-shadow)
+  cabeza: '#ffd76a',      // dorado histórico: acento de UI del agente (certeza) — NO el color real
+  testa: '#33281a',       // cabeza OSCURA REAL del meliponino (dibujo 2D + billboard 3D), NO Apis
+  torax: '#3d2c19',       // tórax oscuro (un pelo más cálido que la cabeza)
+  cara: '#ffe3ad',        // máscara facial clara (clípeo amarillo real de la angelita)
+  hiloChumbe: '#c98a3e',  // tergite tenue del abdomen (línea suave, ya NO banda)
+  bandaClara: '#fce3a9',  // bandas CLARAS de los tergitos: segmentos pálidos sobre
+                          // el ámbar (la angelita real; lo vetado son las barras
+                          // OSCURAS de la Apis, nunca lo claro)
+  franjaTorax: '#e8b45a', // franja dorada del costado del mesosoma — la marca
+                          // amarilla lateral del tórax negro, firma de campo
+                          // de T. angustula (Nates-Parra; iNaturalist)
+  alaTul: '#d8ecea',      // ala grande de tul (hialina — vidrio neutro apenas
+                          // verdoso; el azul-bebé anterior enfriaba el dibujo
+                          // contra la paleta tierra/ámbar, 2026-08-23)
+  alaTulClara: '#ebf6ef', // ala chica, más pálida
   lengua: '#c9524e',      // probóscide (sed / libar)
   gota: '#bfe6ff',        // gotas de lluvia cuando está mojada
+  ojo: '#40260f',         // globo del OJO COMPUESTO: miel muy oscura (iter2
+                          // 2026-08-23 — una abeja no tiene esclerótica blanca;
+                          // el ojo real de la angelita es una masa oscura
+                          // lateral, cálida, jamás blanco de caricatura)
+  ojoIris: '#e8b45a',     // anillo de la pseudopupila: el MISMO dorado de la
+                          // franja del mesosoma — la calidez de mascota vive
+                          // en un destello congruente con su firma de campo
+  ocelo: '#c98a3e',       // los 3 ocelos ámbar de la coronilla (triángulo
+                          // entre las antenas — anatomía real del meliponino)
+  pelusa: '#6b4b28',      // pilosidad del mesosoma: el mismo tono de la luz
+                          // de lomo — pelitos, no púas
 };
 
 /* Silueta canónica en unidades del viewBox del SVG ('-15 -15 32 30'). */
@@ -55,8 +81,8 @@ export const ABEJA_PROPORCION = {
 export const ABEJA_PRESENCIA = {
   /* Billboard <Html>: px base + ganancia por energía (0..1) y el
      distanceFactor con el que la cámara la escala. */
-  billboardBase: 40,
-  billboardPorEnergia: 12,
+  billboardBase: 48,
+  billboardPorEnergia: 14,
   distancia: 7,
   /* Su percha junto al foco (hotspot activo o centro del diorama) y la altura
      a la que ronda cuando no está entrando. */

@@ -138,7 +138,7 @@ export const EvidenceCapture = ({
       // que excedan su bodyLimit.
       const preCompressed = await compressImage(file);
       if (!preCompressed.ok) {
-        if (preCompressed.reason === 'too_large') {
+        if (/** @type {any} */ (preCompressed).reason === 'too_large') {
           window.dispatchEvent(new CustomEvent('chagraToast', {
             detail: { message: IMAGE_TOO_LARGE_MESSAGE },
           }));
@@ -179,7 +179,7 @@ export const EvidenceCapture = ({
             const aiNotes = [
               '[AI_INFERENCE]',
               `source: vision_model`,
-              `model_version: gemma3:4b`,
+              `model_version: qwen3-vl:8b`,
               `confidence: ${confidence.toFixed(2)}`,
               `needs_human_review: ${needsReview}`,
               '',
@@ -347,7 +347,7 @@ export const EvidenceCapture = ({
             active
             label="Analizando follaje"
             accent="morpho"
-            meta={<span className="font-mono">gemma3:4b · visión</span>}
+            meta={<span className="font-mono">qwen3-vl:8b · visión</span>}
           />
         </ErrorBoundary>
       )}

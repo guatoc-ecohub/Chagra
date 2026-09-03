@@ -43,40 +43,40 @@ describe('detectProcessType', () => {
 
 describe('buildDraftsFromVoice — process_type', () => {
   it('propaga el tipo detectado al draft y usa unidad árboles en reforestación', () => {
-    const drafts = buildDraftsFromVoice({
+    const drafts = buildDraftsFromVoice(/** @type {any} */ ({
       transcription: 'reforesté 30 robles en el lote alto',
       entities: [{ crop: 'roble', quantity: 30, location: { id: 'l1', type: 'asset--land', name: 'Lote' } }],
-    });
+    }));
     expect(drafts).toHaveLength(1);
     expect(drafts[0].process_type).toBe('restoration');
     expect(drafts[0].unit).toBe('árboles');
   });
 
   it('usa unidad kg en cosecha por defecto', () => {
-    const drafts = buildDraftsFromVoice({
+    const drafts = buildDraftsFromVoice(/** @type {any} */ ({
       transcription: 'coseché 50 kilos de café',
       entities: [{ crop: 'café', quantity: 50, location: 'lote norte' }],
-    });
+    }));
     expect(drafts).toHaveLength(1);
     expect(drafts[0].process_type).toBe('harvest');
     expect(drafts[0].unit).toBe('kg');
   });
 
   it('usa unidad kg en post-cosecha por defecto', () => {
-    const drafts = buildDraftsFromVoice({
+    const drafts = buildDraftsFromVoice(/** @type {any} */ ({
       transcription: 'secado 30 kilos de café',
       entities: [{ crop: 'café', quantity: 30, location: 'bodega' }],
-    });
+    }));
     expect(drafts).toHaveLength(1);
     expect(drafts[0].process_type).toBe('post_harvest');
     expect(drafts[0].unit).toBe('kg');
   });
 
   it('usa unidad litros en manejo de plagas por defecto', () => {
-    const drafts = buildDraftsFromVoice({
+    const drafts = buildDraftsFromVoice(/** @type {any} */ ({
       transcription: 'aplicamos 2 litros de biol en el tomate',
       entities: [{ crop: 'tomate', quantity: 2, location: 'invernadero' }],
-    });
+    }));
     expect(drafts).toHaveLength(1);
     expect(drafts[0].process_type).toBe('pest_management');
     expect(drafts[0].unit).toBe('litros');

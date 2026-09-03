@@ -61,12 +61,22 @@
   animation: clima-tab-pulso 0.4s ease-out;
 }
 
+/* La explicación de Julieta ("¿qué es esto?") entra suave al desplegarse. */
+@keyframes clima-pedagogia-abre {
+  from { opacity: 0; transform: translateY(-4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.clima-pedagogia-entra {
+  animation: clima-pedagogia-abre 0.24s ease-out;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .clima-sol-rayos,
   .clima-nube-deriva,
   .clima-gota,
   .clima-seccion,
-  .clima-tab-activo {
+  .clima-tab-activo,
+  .clima-pedagogia-entra {
     animation: none;
   }
   .clima-sol-rayos { opacity: 1; }

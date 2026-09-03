@@ -35,8 +35,27 @@
 import { useEffect, useRef } from 'react';
 import { useFrame, useThree } from '@react-three/fiber';
 import * as THREE from 'three';
+/* La señal de salida de Angelita (host → mesh → CÁMARA): el mismo store que ya
+   escucha AbejaEscena. Cuando el host avisa la vuelta al valle, este director
+   RETROCEDE acompañando (auditoría #51: "la transición se acompaña, no se
+   corta") mientras la abeja vuela al punto de suelta. */
+import { useSalidaAbeja } from '../../creatures/senalSalidaAbeja.js';
 
 const easeOutCubic = (p) => 1 - (1 - p) ** 3;
+
+/* ── LA ESCOLTA DE LA PICADA (auditoría #50) ─────────────────────────────────
+   Cuando la abeja cruza de la capa 2D y cae en picada a su percha, la cámara
+   la ACOMPAÑA: la mirada se curva hacia ella (ventana seno: entra y sale
+   suave, aterriza EXACTO en el encuadre de siempre) y el lente da un
+   micro-punch que se asienta con ella. Es lo que vuelve "espectacular" lo que
+   era solo "correcto": transición y personaje dejan de correr en paralelo. */
+const ESCOLTA_S = 1.9;      // ventana de la escolta (cubre la picada de 1.6s + asentada)
+const ESCOLTA_PESO = 0.45;  // cuánto se curva la mirada hacia la abeja (pico de la ventana)
+const ESCOLTA_LENTE = 0.05; // micro-punch del focal en el pico (5%)
+/* La RETIRADA de salida: exhalación — arranca suave y acelera alejándose. */
+const RETIRADA_S = 1.15;    // dura lo que el velo tarda en cubrir
+const RETIRADA_ATRAS = 1.4; // factor de alejamiento sobre el eje cámara→target
+const _miraEscolta = new THREE.Vector3();
 
 /* Claves ya presentadas en esta sesión: volver al valle no repite su intro. */
 const yaPresentados = new Set();
@@ -60,14 +79,47 @@ export default function CamaraDirector({
   activa = true,
   /** Si viene, el intro corre UNA vez por sesión para esa clave. */
   unaVezClave = null,
+  /** ref `{ current: { fase, pos } }` del viaje de la abeja (useEntradaAbeja
+      lo publica): la cámara la ESCOLTA en la picada de entrada. null → sin
+      escolta (comportamiento de siempre, cero regresión). */
+  siga = null,
 }) {
   const { camera } = useThree();
+  const camPersp = /** @type {import('three').PerspectiveCamera} */ (camera);
   // ¿Saltar el intro? Se decide UNA vez al montar (ref-initializer): inactiva,
   // o clave ya presentada. La respiración igual queda gateada por `activa`.
   const saltarIntro = useRef(!activa || (unaVezClave !== null && yaPresentados.has(unaVezClave)));
   /** Estado del intro en curso; null = terminado (o nunca hubo). */
   const intro = useRef(null);
   const respiroPrev = useRef(0);
+  /** La escolta de la picada: arranca al VER la fase 'picada' y corre su
+      ventana seno completa (entra, acompaña, suelta — y el encuadre queda
+      EXACTO donde estaba). */
+  const escolta = useRef({ on: false, t: 0 });
+  /** La retirada de salida en curso (null = no hay). */
+  const retirada = useRef(null);
+
+  // ── LA SALIDA ACOMPAÑADA (auditoría #51): al avisar la vuelta al valle, la
+  //    cámara EXHALA — retrocede sobre su propio eje, sube un pelo y abre el
+  //    lente, acelerando mientras el velo cubre. La abeja, en el mismo beat,
+  //    vuela al punto de suelta: se van JUNTAS, no se corta.
+  const saliendo = useSalidaAbeja();
+  useEffect(() => {
+    if (!saliendo || !activa) return;
+    intro.current = null; // si el intro seguía, la salida manda
+    const c = controls ? controls.current : null;
+    const target = c ? c.target.clone() : new THREE.Vector3();
+    const eje = camPersp.position.clone().sub(target);
+    retirada.current = {
+      p: 0,
+      desde: camPersp.position.clone(),
+      hasta: target.clone()
+        .add(eje.multiplyScalar(RETIRADA_ATRAS))
+        .add(new THREE.Vector3(0, eje.length() * 0.08, 0)),
+      fDesde: camPersp.getFocalLength(),
+      target,
+    };
+  }, [saliendo, activa, controls, camPersp]);
 
   useEffect(() => {
     if (saltarIntro.current) return undefined;
@@ -90,13 +142,13 @@ export default function CamaraDirector({
     // El "lente que se asienta": del focal de reposo (el fov que ya fijó el
     // Canvas) a uno ~12% más corto (más abierto) al arrancar. `setFocalLength`
     // actualiza fov + projection matrix por método.
-    const fRep = camera.getFocalLength();
+    const fRep = camPersp.getFocalLength();
     const fAmp = fRep / 1.12;
     intro.current = { p: 0, desde, hasta, tDesde, tHasta, fAmp, fRep };
-    camera.position.copy(desde);
-    camera.setFocalLength(fAmp);
+    camPersp.position.copy(desde);
+    camPersp.setFocalLength(fAmp);
     if (tDesde && c) c.target.copy(tDesde);
-    camera.lookAt(tDesde || tHasta);
+    camPersp.lookAt(tDesde || tHasta);
 
     // El primer gesto del usuario ACELERA la presentación (capture en window:
     // también los hotspots DOM, que no burbujean por el canvas). Sin saltos:
@@ -113,21 +165,55 @@ export default function CamaraDirector({
 
   useFrame((state, delta) => {
     const c = controls.current;
+    // delta acotado: una pestaña dormida no "salta" nada al despertar.
+    const dt = Math.min(delta, 1 / 20);
+
+    // ── LA RETIRADA (salida acompañada, #51): manda sobre todo lo demás.
+    //    Ease-in cuadrático: exhala — arranca suave y acelera alejándose
+    //    mientras la abeja vuela al punto de suelta y el velo cubre. No hay
+    //    aterrizaje: la escena muere debajo del velo, todavía en viaje.
+    const r = retirada.current;
+    if (r) {
+      r.p = Math.min(1, r.p + dt / RETIRADA_S);
+      const e = r.p * r.p;
+      camPersp.position.lerpVectors(r.desde, r.hasta, e);
+      camPersp.setFocalLength(r.fDesde / (1 + 0.12 * e)); // el lente abre al irse
+      camPersp.lookAt(r.target);
+      return;
+    }
+
+    // ── El reloj de la ESCOLTA (#50): arranca al ver la picada y corre su
+    //    ventana seno completa — entra suave, acompaña, suelta suave.
+    const esc = escolta.current;
+    const viaje = siga ? siga.current : null;
+    if (!esc.on && viaje && viaje.fase === 'picada') esc.on = true;
+    let ventana = 0;
+    if (esc.on && esc.t < 1) {
+      esc.t = Math.min(1, esc.t + dt / ESCOLTA_S);
+      ventana = Math.sin(Math.PI * esc.t);
+    }
+
     const st = intro.current;
     if (st) {
-      // delta acotado: una pestaña dormida no "salta" el dolly al despertar.
-      st.p = Math.min(1, st.p + Math.min(delta, 1 / 20) / duracion);
+      st.p = Math.min(1, st.p + dt / duracion);
       const e = easeOutCubic(st.p);
-      camera.position.lerpVectors(st.desde, st.hasta, e);
+      camPersp.position.lerpVectors(st.desde, st.hasta, e);
       if (st.tDesde && c) c.target.lerpVectors(st.tDesde, st.tHasta, e);
-      camera.setFocalLength(THREE.MathUtils.lerp(st.fAmp, st.fRep, e));
-      camera.lookAt(c ? c.target : st.tHasta);
+      // El lente del intro + el micro-punch de la escolta (se asienta con ella).
+      camPersp.setFocalLength(
+        THREE.MathUtils.lerp(st.fAmp, st.fRep, e) * (1 + ESCOLTA_LENTE * ventana),
+      );
+      // La mirada del intro, CURVADA hacia la abeja mientras cae en picada:
+      // la ventana seno garantiza que al final mira EXACTO el target de siempre.
+      _miraEscolta.copy(c ? c.target : st.tHasta);
+      if (ventana > 0 && viaje) _miraEscolta.lerp(viaje.pos, ventana * ESCOLTA_PESO);
+      camPersp.lookAt(_miraEscolta);
       if (st.p >= 1) {
         // Aterrizaje EXACTO en la pose de reposo. El target solo se fija si
         // este director lo condujo (`mirada`); si otro lo lleva (CamaraViajera
         // en el valle), ni tocarlo.
-        camera.position.copy(st.hasta);
-        camera.setFocalLength(st.fRep);
+        camPersp.position.copy(st.hasta);
+        camPersp.setFocalLength(st.fRep);
         if (c) {
           if (st.tDesde) c.target.copy(st.tHasta);
           c.update();
@@ -136,6 +222,16 @@ export default function CamaraDirector({
       }
       return;
     }
+
+    // ── La COLA de la escolta (la picada dura un pelo más que el intro):
+    //    solo la mirada sigue curvada hacia la abeja hasta que la ventana
+    //    cierra sola en el encuadre de siempre. Posición y lente ya reposan.
+    if (ventana > 0 && viaje && c) {
+      _miraEscolta.copy(c.target).lerp(viaje.pos, ventana * ESCOLTA_PESO);
+      camPersp.lookAt(_miraEscolta);
+      return;
+    }
+
     // ── La respiración del encuadre (solo activa y con amplitud) ──
     if (!activa || respiro <= 0 || !c) return;
     const t = state.clock.elapsedTime;

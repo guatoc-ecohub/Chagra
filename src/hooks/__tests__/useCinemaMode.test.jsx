@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React from 'react';
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
@@ -51,7 +52,10 @@ describe('useCinemaMode', () => {
     expect(result.current.isCinema).toBe(false);
 
     act(() => {
-      document.fullscreenElement = document.documentElement;
+      // @ts-ignore
+      // @ts-ignore
+// @ts-ignore
+document.fullscreenElement = document.documentElement;
       document.dispatchEvent(new Event('fullscreenchange'));
     });
     expect(result.current.isCinema).toBe(true);

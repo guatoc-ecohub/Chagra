@@ -249,7 +249,11 @@ REGLA: usa SOLO estas relaciones verificadas para razonar la cadena cultivo→pl
 
 // ── Réplica del ensamblado de callLLM (mismos builders, mismos gates) ──────
 
-function assembleForQuery({ query, resolvedEntities, suggestedEntities = null, toolEvidence, subgrafoBloque = '', corpus = CORPUS, contextMemory = MEMORY, nivelRespuestas }) {
+/**
+ * @param {any} data
+ */
+function assembleForQuery(data) {
+  const { query, resolvedEntities, suggestedEntities = null, toolEvidence, subgrafoBloque = '', corpus = CORPUS, contextMemory = MEMORY, nivelRespuestas } = data;
   const analysis = analyzeQuery(query);
   const systemPrompt = buildBasePrompt({
     plantContext: PLANT_CONTEXT,

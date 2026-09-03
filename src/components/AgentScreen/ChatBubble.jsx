@@ -11,6 +11,7 @@ import FeedbackButtons from '../FeedbackButtons';
 import AIBetaBadge from '../AIBetaBadge';
 import SemaforoConfianza from './SemaforoConfianza';
 import AgentMarkdown from './AgentMarkdown';
+import AgentLamina from '../../visual/laminas/AgentLamina';
 
 function formatTime(timestamp) {
   if (!timestamp) return '';
@@ -66,7 +67,14 @@ function toolLabel(toolName) {
  * @param {string} props.testId - data-testid estable (contrato de tests).
  * @param {string} [props.title] - Tooltip nativo (desktop).
  * @param {Object} [props.dataAttrs] - Atributos data-* extra (data-source…).
+ *
+ * Falso positivo preexistente de no-unused-vars sobre `Icon` más abajo:
+ * `Icon` SÍ se usa como tag JSX (`<Icon .../>`); el core de eslint no
+ * reconoce el uso de un parámetro destructurado capitalizado cuando SOLO
+ * aparece como nombre de elemento JSX (sin eslint-plugin-react en este
+ * repo). El mismo falso positivo existe en origin/dev sin tocar este PR.
  */
+// eslint-disable-next-line no-unused-vars
 function Sello({ nivel, Icon, label, sub, explica, testId, title, dataAttrs = {} }) {
   const [abierto, setAbierto] = useState(false);
   const cuerpo = (
@@ -261,14 +269,23 @@ function FuenteBadge({ metadata }) {
   const md = metadata || {};
   const url = typeof md.fuente_url === 'string' ? md.fuente_url.trim() : '';
   const label = (typeof md.fuente === 'string' && md.fuente.trim()) || 'fuente externa';
+  let safeUrl = null;
+  try {
+    const parsedUrl = new URL(url);
+    if (parsedUrl.protocol === 'http:' || parsedUrl.protocol === 'https:') {
+      safeUrl = parsedUrl.href;
+    }
+  } catch {
+    // Una fuente mal formada se degrada a texto plano o se omite.
+  }
 
   // Forma 1: recurso citado → link clickeable. Sello VERDE del semáforo (la
   // fuente es verificable), pero sigue siendo <a> nativo CSP-safe — el toque
   // navega al recurso, no expande nota.
-  if (/^https?:\/\//i.test(url)) {
+  if (safeUrl) {
     return (
       <a
-        href={url}
+        href={safeUrl}
         target="_blank"
         rel="noopener noreferrer"
         data-testid="fuente-badge"
@@ -466,7 +483,7 @@ export default function ChatBubble({ message, isStreaming = false, promptText, o
       {!isUser && (
         <div className="v3-byline" aria-hidden="true">
           <span className={`v3-byline-avatar${isStreaming ? ' is-streaming' : ''}`}>
-            <ChagraAgentAvatar state={agentState} size={22} ariaLabel="Chagra IA" />
+            <ChagraAgentAvatar state={agentState} size={30} ariaLabel="Chagra IA" />
           </span>
           <span>Chagra</span>
         </div>
@@ -525,6 +542,26 @@ export default function ChatBubble({ message, isStreaming = false, promptText, o
             /* break-words: sin esto una URL o palabra larga sin espacios
                desborda la burbuja en horizontal a 320px. */
             <p className="text-[15px] leading-relaxed whitespace-pre-wrap break-words">{message.content}</p>
+          )}
+          {/* ═══ LÁMINA QUE SE DIBUJA SOLA (DR "el agente dibuja fiable") ═══
+              HOOK DEL BACKEND: el agente inyecta en el turno assistant un
+              `metadata.lamina = { slug, props }` — slug de un conjunto CERRADO
+              (LAMINAS_FIABLES) + prop de enum cerrado. AgentLamina lo lee y
+              monta la lámina LOCAL con su auto-dibujado; si el slug no es fiable
+              o la prop no calza, AgentLamina degrada a NULL → solo texto. El
+              modelo NUNCA emite SVG. El GATE DE GROUNDING (regla #3: que la
+              especie/proposición esté aterrizada en la evidencia del turno) lo
+              cablea el agente aguas arriba, NO este componente — aquí solo se
+              renderiza lo que ya venga validado en metadata.lamina.
+              TODO(agente): poblar message.metadata.lamina desde el handler de
+              `dibujar_lamina` tras revalidar el gate contra resolvedEntities. */}
+          {!isUser && !isStreaming && !message._orphan_recovery && message.metadata?.lamina?.slug && (
+            <div className="mt-2" data-chat-dark="true">
+              <AgentLamina
+                slug={message.metadata.lamina.slug}
+                props={message.metadata.lamina.props}
+              />
+            </div>
           )}
           {/* UX-1 (#284): badge "beta" permanente cerca de cualquier respuesta
               IA del agente. NO reemplaza a SourceBadge (que es la fuente

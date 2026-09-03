@@ -93,6 +93,19 @@ export const FarmMap = ({ focusZoneId = null, onAssetClick, onTaskComplete, show
   const mapRef = useRef(null);
   const featureGroupRef = useRef(null);
 
+  // Fallback sin prop (barrido de controles 2026-07-15): el shell de prod
+  // monta FarmMap SIN onAssetClick → el botón "Ver logs" de cada popup era un
+  // tap muerto. Sin prop: seleccionar el activo en el store y pedir la vista
+  // de activos por el evento global que ambos shells escuchan. El shell viejo
+  // sigue pasando su propio onAssetClick (idéntico comportamiento).
+  const assetClickRef = useRef(/** @type {(id: string) => void} */ ((id) => {
+    try { useAssetStore.getState().setSelectedAsset(id); } catch { /* store no inicializado */ }
+    window.dispatchEvent(new CustomEvent('chagraNavigate', { detail: { view: 'activos' } }));
+  }));
+  useEffect(() => {
+    if (onAssetClick) assetClickRef.current = /** @type {(id: string) => void} */ (onAssetClick);
+  }, [onAssetClick]);
+
   const plants = useAssetStore((s) => s.plants);
   const structures = useAssetStore((s) => s.structures);
   const lands = useAssetStore((s) => s.lands);
@@ -146,18 +159,19 @@ export const FarmMap = ({ focusZoneId = null, onAssetClick, onTaskComplete, show
     map.on('moveend', saveViewport);
     map.on('zoomend', saveViewport);
 
-    // Delegación de click para botones "Ver logs →" dentro de popups
-    if (onAssetClick) {
-      map.on('popupopen', (e) => {
-        const btn = e.popup.getElement()?.querySelector('.chagra-popup-logs');
-        if (btn) {
-          btn.addEventListener('click', () => {
-            const assetId = btn.getAttribute('data-asset-id');
-            if (assetId) onAssetClick(assetId);
-          });
-        }
-      });
-    }
+    // Delegación de click para botones "Ver logs →" dentro de popups.
+    // Siempre activa: sin prop onAssetClick usa el fallback del ref (evento
+    // global chagraNavigate) — antes el binding entero se saltaba y el botón
+    // del popup quedaba muerto en prod.
+    map.on('popupopen', (e) => {
+      const btn = e.popup.getElement()?.querySelector('.chagra-popup-logs');
+      if (btn) {
+        btn.addEventListener('click', () => {
+          const assetId = btn.getAttribute('data-asset-id');
+          if (assetId) assetClickRef.current(assetId);
+        });
+      }
+    });
 
     return () => {
       map.remove();

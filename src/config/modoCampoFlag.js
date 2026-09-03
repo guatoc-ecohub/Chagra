@@ -14,6 +14,10 @@
  * (registroUnificadoFlag.js) y `fincaVivaHomePerfilActivo()`
  * (fincaVivaHomeFlag.js).
  *
+ * La prueba de campo con un dispositivo y voz reales queda pendiente del
+ * operador. Este módulo sólo deja listo el contrato de activación y su puerta
+ * de despliegue.
+ *
  * CÓMO ACTIVARLA (dev): en el `.env` (o `.env.local`) del frontend:
  *
  *     VITE_MODO_CAMPO=true
@@ -26,6 +30,7 @@
  */
 
 const FLAG_KEY = 'VITE_MODO_CAMPO';
+export const MODO_CAMPO_WAKE_WORD = 'hola chagra';
 
 /**
  * ¿Está disponible el modo campo (wake-word "hola chagra")?
@@ -52,6 +57,21 @@ export function modoCampoDisponible() {
   } catch (_) {
     return false;
   }
+}
+
+/**
+ * Contrato tipado que consumen los coordinadores del modo campo. Mantener la
+ * configuración junto al flag evita que una llamada futura al detector pueda
+ * saltarse accidentalmente la puerta de despliegue.
+ *
+ * @returns {{enabled:boolean, wakeWord:'hola chagra', mode:'on-device'}}
+ */
+export function modoCampoWakeWordConfig() {
+  return {
+    enabled: modoCampoDisponible(),
+    wakeWord: MODO_CAMPO_WAKE_WORD,
+    mode: 'on-device',
+  };
 }
 
 export default modoCampoDisponible;

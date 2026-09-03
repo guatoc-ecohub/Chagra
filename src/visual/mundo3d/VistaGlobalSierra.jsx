@@ -47,20 +47,24 @@
  *     pisoUsuario="frio"          // opcional: resalta el piso de la finca
  *   />                            // 'calido'|'templado'|'frio'|'paramo'|'superparamo'|'nival'
  *
- *   // O componer el grupo dentro de un Canvas propio:
+ *   // O componer el grupo dentro de un Canvas propio (encuadre inmersivo:
+ *   // desde el mar mirando al sur; target ≈ [0, 2.3, 2.5]):
  *   import { SierraDiorama } from './visual/mundo3d/VistaGlobalSierra.jsx';
- *   <Canvas camera={{ position: [-3.6, 5.6, -15], fov: 40 }}>
+ *   <Canvas camera={{ position: [-1.5, 5.2, -11], fov: 48 }}>
  *     <SierraDiorama tier={tier} reducedMotion={reducedMotion} />
  *   </Canvas>
  *
  * El contenedor padre define el alto (como `.mundo-root`).
  */
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import * as THREE from 'three';
 import { Canvas, useFrame } from '@react-three/fiber';
-import { Html, OrbitControls, AdaptiveDpr } from '@react-three/drei';
+import { Html, Billboard, OrbitControls, AdaptiveDpr } from '@react-three/drei';
 import { ATMOSFERA } from './atmosferaMadre.js';
 import { perfilDeTier } from './deviceTier.js';
+import PisosTermicosBandas from './PisosTermicosBandas.jsx';
+import TransicionSierraMundo from './TransicionSierraMundo.jsx';
+import { PISOS_TERMICOS, PISOS_TERMICOS_SIERRA } from './pisosTermicos.js';
 
 /* ── Geografía del macizo (validada contra el DR: mar al norte, macizo al sur,
       cumbres gemelas + Simmonds, costa de Palomino). Coordenadas de MUNDO:
@@ -69,7 +73,10 @@ const CIMA = 5.0; // altura de referencia (≈ 5.775 m escalados con drama sobri
 const COSTA_Z = -3; // latitud de la línea de costa en Z
 const ANCHO = 22; // extensión E-O del terreno
 const FONDO = 20; // extensión N-S del terreno
-const LINEA_NIEVE = 4.15; // ≈ 4.800 msnm: arranca la nieve perpetua
+// La cota de "nieve perpetua" (≈ 4.800 msnm → topeWorldY 4.15) vive en la tabla
+// canónica PISOS_TERMICOS_SIERRA (pisosTermicos.js); aquí solo se LEE, no se
+// redefine: es el tope del superpáramo, justo debajo de la nieve.
+const LINEA_NIEVE = PISOS_TERMICOS_SIERRA.find((p) => p.id === 'superparamo')?.topeWorldY ?? 4.15;
 
 const clamp = (v, a, b) => Math.min(b, Math.max(a, v));
 const smoothstep = (a, b, x) => {
@@ -110,34 +117,56 @@ const PALOMINO = { x: 5.0, y: 0.2, z: -2.85 }; // desembocadura sobre el Caribe
 
 /* ── Banding de pisos térmicos por altitud (colores cálidos de hora dorada;
       la luz del sol termina de entibiarlos). El bosque de niebla es la banda
-      donde se enganchan las nubes. ── */
+      donde se enganchan las nubes.
+
+      Los 6 pisos ecológicos (cálido→nival) LEEN su color de la tabla canónica
+      `PISOS_TERMICOS` (`pisosTermicos.js`), la fuente única que acaba de nacer
+      en el Paso 1 — este render no la edita, la consume. La playa es la banda
+      propia de la costa (0→0.28), que la tabla canónica no separa del cálido.
+      La separación entre bandas se afina angostando la transición del smoothstep
+      (para que se lean 7, no 3) y con el brillo del nival, que bajo la luz dorada
+      debe leerse NIEVE, no ocre (§6-B del diseño). ── */
+const bandColor = (id) => {
+  const p = PISOS_TERMICOS.find((b) => b.id === id);
+  return p ? new THREE.Color(p.color) : new THREE.Color('#ddc78d');
+};
+/* Snow: blanco casi puro con un dejo frío, para que sobreviva a la luz dorada
+   del atardecer sin volverse ocre (defecto §2.3.1). El casquete es pequeño por
+   doctrina: Colombia perdió casi todo el glaciar, así que la nieve ocupa solo
+   la franja más alta y MUERDE con una línea de nieve nítida (§6-B). */
 const BANDAS = [
   { tope: 0.28, c: new THREE.Color('#ddc78d') }, // playa / arena
-  { tope: 0.95, c: new THREE.Color('#b3a955') }, // bosque seco tropical
-  { tope: 1.75, c: new THREE.Color('#437233') }, // selva húmeda
-  { tope: 2.6, c: new THREE.Color('#5c8a69') }, // bosque de niebla
-  { tope: 3.45, c: new THREE.Color('#94975a') }, // páramo / frailejones
-  { tope: LINEA_NIEVE, c: new THREE.Color('#a58f68') }, // superpáramo (roca)
-  { tope: Infinity, c: new THREE.Color('#f2ead6') }, // nieve perpetua (blanco cálido)
+  { tope: 0.95, c: bandColor('calido') }, // bosque seco tropical
+  { tope: 1.75, c: bandColor('templado') }, // selva húmeda
+  { tope: 2.6, c: bandColor('frio') }, // bosque de niebla
+  { tope: 3.45, c: bandColor('paramo') }, // páramo / frailejones
+  { tope: LINEA_NIEVE, c: bandColor('superparamo') }, // superpáramo (roca)
+  { tope: Infinity, c: new THREE.Color('#f4f9ff') }, // nieve perpetua (blanco frío luminoso)
 ];
+/* El GROSOR de la transición entre bandas. Interior: angosto (~±0.09 world Y)
+   para que cada piso se lea separado. La línea de nieve (última) MUCHO más
+   angosta (±0.02): un filo nevado nítido, no un difuminado ocre. */
 function colorPorAltura(y, out) {
   let i = 0;
   while (i < BANDAS.length - 1 && y > BANDAS[i].tope) i++;
   if (i === 0) return out.copy(BANDAS[0].c);
   const borde = BANDAS[i - 1].tope;
-  const t = smoothstep(borde - 0.16, borde + 0.16, y); // transición suave por banda
+  const esNieve = i === BANDAS.length - 1;
+  const ancho = esNieve ? 0.02 : 0.09;
+  const t = smoothstep(borde - ancho, borde + ancho, y); // filo nítido por banda
   return out.lerpColors(BANDAS[i - 1].c, BANDAS[i].c, t);
 }
 
 /* La clave de pisos accesible (DOM del modo con Canvas). Nombres de piso, sin
-   palabras-gatillo del linter i18n; el color acompaña a la etiqueta. */
+   palabras-gatillo del linter i18n; el color acompaña a la etiqueta. Refleja
+   los mismos colores derivados de la tabla canónica que pinta la ladera. */
 const CLAVE_PISOS = [
-  { c: '#f2ead6', t: 'Nieve perpetua' },
-  { c: '#a58f68', t: 'Superpáramo' },
-  { c: '#94975a', t: 'Páramo y frailejones' },
-  { c: '#5c8a69', t: 'Bosque de niebla' },
-  { c: '#437233', t: 'Selva húmeda' },
-  { c: '#b3a955', t: 'Bosque seco' },
+  { c: '#f4f9ff', t: 'Nieve perpetua' },
+  { c: '#b9c6cc', t: 'Superpáramo' },
+  { c: '#9fb6bf', t: 'Páramo y frailejones' },
+  { c: '#4f8f7d', t: 'Bosque de niebla' },
+  { c: '#6f9e4a', t: 'Selva húmeda' },
+  { c: '#cba04a', t: 'Bosque seco' },
   { c: '#ddc78d', t: 'Playa y costa' },
 ];
 
@@ -205,10 +234,67 @@ function Mar({ reducedMotion, conNiebla }) {
   );
 }
 
-/* Nubes bajas que se ENGANCHAN en el bosque de niebla (banda ~1.8–2.4): esferas
-   blancas aplastadas ancladas a la ladera, que derivan sin prisa. */
+/* Textura de nube-suave: mancha fbm blanca con borde MUY emplumado, en canvas
+   (offline-first, determinista). Solo importa el canal alfa: la forma es difusa,
+   de borde degradado, para que la nube NUNCA se lea como polígono de borde duro
+   (defecto §2.3.3) — el patrón del jirón de `brumaVolumetrica.js`. */
+function textoNubeSuave(seed = 3) {
+  const tam = 256;
+  const cv = document.createElement('canvas');
+  cv.width = cv.height = tam;
+  /* Sin contexto 2D no hay textura que tejer. Pasa de verdad: jsdom (los tests
+     de cableado), canvas bloqueado por privacidad, o presión de memoria en gama
+     baja. Degradar a `null` — la nube se dibuja como billboard liso, que es
+     exactamente el aspecto previo — en vez de tumbar la Sierra ENTERA por una
+     textura decorativa. `map={null}` es válido en three.js. */
+  const ctx = typeof cv.getContext === 'function' ? cv.getContext('2d') : null;
+  if (!ctx || typeof ctx.createImageData !== 'function') return null;
+  const img = ctx.createImageData(tam, tam);
+  const px = img.data;
+  const o = seed * 13.7;
+  for (let y = 0; y < tam; y++) {
+    for (let x = 0; x < tam; x++) {
+      // elipse achatada (la nube es más ancha que alta) + fbm que rompe el borde
+      const dx = (x / tam - 0.5) / 0.5;
+      const dy = (y / tam - 0.5) / 0.34;
+      const r = Math.sqrt(dx * dx + dy * dy);
+      const n =
+        Math.sin(x * 0.021 + o) * 0.5 +
+        Math.sin(x * 0.047 - y * 0.031 + o * 1.7) * 0.28 +
+        Math.sin(x * 0.013 + y * 0.037 + o * 2.3) * 0.22;
+      const n2 = n * 0.5 + 0.5;
+      const borde = Math.max(0, Math.min(1, (1.0 - r + (n2 - 0.5) * 0.55) / 0.6));
+      const suave = borde * borde * (3 - 2 * borde);
+      const a = suave * (0.18 + 0.82 * Math.abs(n2)) * 0.92;
+      const i = (y * tam + x) * 4;
+      px[i] = px[i + 1] = px[i + 2] = 255;
+      px[i + 3] = Math.round(Math.max(0, Math.min(1, a)) * 255);
+    }
+  }
+  ctx.putImageData(img, 0, 0);
+  const tex = new THREE.CanvasTexture(cv);
+  tex.colorSpace = THREE.SRGBColorSpace;
+  return tex;
+}
+
+/* Nube-suave determinista (cacheada una sola vez). El flag `_nubeTexIntentada`
+   evita reintentar el tejido en cada render cuando NO hay contexto 2D. */
+let _nubeTex = null;
+let _nubeTexIntentada = false;
+function nubeTextura() {
+  if (!_nubeTexIntentada) {
+    _nubeTexIntentada = true;
+    _nubeTex = textoNubeSuave(3);
+  }
+  return _nubeTex;
+}
+
+/* Nubes bajas que se ENGANCHAN en el bosque de niebla (banda ~1.8–2.4): planos
+   billboard con textura de borde emplumado, anclados a la ladera, que derivan
+   sin prisa. Cero polígonos contables: cada nube es un sprite suave. */
 function NubesDeNiebla({ cuantas, reducedMotion }) {
   const grupo = useRef(null);
+  const tex = nubeTextura();
   const nubes = useMemo(() => {
     const out = [];
     for (let i = 0; i < cuantas; i++) {
@@ -223,6 +309,7 @@ function NubesDeNiebla({ cuantas, reducedMotion }) {
         key: `n${i}`,
         base: [wx, alturaSierra(wx, wz) + 0.35, wz],
         esc: 0.7 + ((i * 37) % 10) / 16,
+        ancho: 2.0 + ((i * 53) % 7) / 5, // placa ancha, chata
         fase: (i * 1.7) % (Math.PI * 2),
       });
     }
@@ -240,16 +327,12 @@ function NubesDeNiebla({ cuantas, reducedMotion }) {
   return (
     <group ref={grupo}>
       {nubes.map((n) => (
-        <group key={n.key} position={n.base} scale={[n.esc * 1.9, n.esc * 0.5, n.esc * 1.2]}>
-          <mesh>
-            <sphereGeometry args={[0.6, 9, 7]} />
-            <meshBasicMaterial color="#fbf4e6" transparent opacity={0.82} depthWrite={false} />
+        <Billboard key={n.key} position={/** @type {[number, number, number]} */ (n.base)}>
+          <mesh scale={[n.ancho * n.esc, 0.5 * n.esc, 1]}>
+            <planeGeometry args={[2.4, 1.6]} />
+            <meshBasicMaterial map={tex} color="#fbf4e6" transparent opacity={0.85} depthWrite={false} side={THREE.DoubleSide} />
           </mesh>
-          <mesh position={[0.5, 0.05, 0.1]} scale={0.7}>
-            <sphereGeometry args={[0.6, 8, 6]} />
-            <meshBasicMaterial color="#fdf8ee" transparent opacity={0.72} depthWrite={false} />
-          </mesh>
-        </group>
+        </Billboard>
       ))}
     </group>
   );
@@ -289,13 +372,26 @@ function LucesDoradas() {
   );
 }
 
-/* Etiqueta sobria de un lugar (sin ornamento, tipografía discreta). */
-function Rotulo({ pos, texto, sub, distancia = 20 }) {
+/* Etiqueta sobria de un lugar, con LEADER LINE: el grupo se ancla en el punto
+   geográfico (cima, desembocadura) y una línea fina sube hasta el rótulo. El
+   `alto` se ESCALONA entre rótulos vecinos para que nunca colisionen en
+   pantalla (Cristóbal Colón·Bolívar arriba, Simmonds a media asta, Palomino a
+   ras de costa), sin importar el barrido de la órbita. */
+function Rotulo({ pos, texto, sub, distancia = 12, alto = 0.6 }) {
   return (
     <group position={pos}>
-      <Html center distanceFactor={distancia} zIndexRange={[30, 10]} style={{ pointerEvents: 'none' }}>
+      {/* punto de anclaje sobre el lugar */}
+      <mesh position={[0, 0.04, 0]}>
+        <sphereGeometry args={[0.055, 10, 8]} />
+        <meshBasicMaterial color="#fff3cf" depthWrite={false} />
+      </mesh>
+      {/* la línea guía hasta el rótulo */}
+      <mesh position={[0, alto / 2, 0]}>
+        <cylinderGeometry args={[0.014, 0.014, alto, 6]} />
+        <meshBasicMaterial color="#5a4326" transparent opacity={0.65} depthWrite={false} />
+      </mesh>
+      <Html center position={[0, alto + 0.12, 0]} distanceFactor={distancia} zIndexRange={[30, 10]} style={{ pointerEvents: 'none' }}>
         <div className="vsierra-rotulo" aria-hidden="true">
-          <span className="vsierra-rotulo__punto" />
           <span className="vsierra-rotulo__txt">
             {texto}
             {sub ? <em className="vsierra-rotulo__sub">{sub}</em> : null}
@@ -307,7 +403,12 @@ function Rotulo({ pos, texto, sub, distancia = 20 }) {
 }
 
 /* Marcador "usted está aquí": haz de luz suave sobre la ladera, a la altitud del
-   piso de la finca. Sobrio, sin gamificación. Solo si `pisoUsuario` es válido. */
+   piso de la finca. Sobrio, sin gamificación. Solo si `pisoUsuario` es válido.
+
+   Quitado el haz vertical (cono/aro translúcido grande): sus bordes rectos se
+   leían como fuga de luz y LAVABAN el color de las bandas altas (defecto §2.3.2).
+   Ahora es un punto de luz suave + un aro fino pegado al suelo, SOBRE la banda y
+   casi sin área de cobertura: marca sin tapar el piso que señala. */
 function MarcadorPiso({ piso }) {
   const punto = useMemo(() => {
     const objetivo = PISOS_Y[piso];
@@ -322,16 +423,18 @@ function MarcadorPiso({ piso }) {
   }, [piso]);
   if (!punto) return null;
   return (
-    <group position={punto}>
-      <mesh position={[0, 1.4, 0]}>
-        <cylinderGeometry args={[0.04, 0.32, 2.8, 10, 1, true]} />
-        <meshBasicMaterial color="#fff0c2" transparent opacity={0.34} side={THREE.DoubleSide} depthWrite={false} />
+    <group position={/** @type {[number, number, number]} */ (punto)}>
+      {/* aro fino pegado al suelo: "esto es donde está" sin elevarse */}
+      <mesh position={[0, 0.05, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+        <ringGeometry args={[0.5, 0.72, 24]} />
+        <meshBasicMaterial color="#ffdf9c" transparent opacity={0.7} depthWrite={false} side={THREE.DoubleSide} />
       </mesh>
-      <mesh position={[0, 0.06, 0]} rotation={[-Math.PI / 2, 0, 0]}>
-        <ringGeometry args={[0.28, 0.42, 24]} />
-        <meshBasicMaterial color="#ffdf9c" transparent opacity={0.85} depthWrite={false} />
+      {/* núcleo suave: pequeño resplandor sobre la banda, sin área de cobertura */}
+      <mesh position={[0, 0.26, 0]}>
+        <circleGeometry args={[0.22, 24]} />
+        <meshBasicMaterial color="#fff0c2" transparent opacity={0.5} depthWrite={false} side={THREE.DoubleSide} />
       </mesh>
-      <Html center distanceFactor={16} position={[0, 3, 0]} zIndexRange={[40, 20]} style={{ pointerEvents: 'none' }}>
+      <Html center distanceFactor={16} position={[0, 0.9, 0]} zIndexRange={[40, 20]} style={{ pointerEvents: 'none' }}>
         <div className="vsierra-aqui" aria-hidden="true">Aquí está usted</div>
       </Html>
     </group>
@@ -366,6 +469,8 @@ function CreditoPueblos() {
  * @param {boolean} [props.luces=true]  monta las luces de la hora dorada.
  * @param {boolean} [props.atmosfera=true]  fondo + niebla dorada de la escena.
  * @param {boolean} [props.credito=true]  pie de crédito 3D a los cuatro pueblos.
+ * @param {(piso:object)=>void} [props.onSeleccionPiso]  avisa al host al llegar a un piso.
+ * @param {string|null} [props.pisoActivo=null]  piso resaltado desde el host.
  */
 export function SierraDiorama({
   tier = 'alto',
@@ -374,6 +479,8 @@ export function SierraDiorama({
   luces = true,
   atmosfera = true,
   credito = true,
+  onSeleccionPiso,
+  pisoActivo = null,
 }) {
   const perfil = perfilDeTier(tier);
   const geo = useMemo(
@@ -400,12 +507,24 @@ export function SierraDiorama({
       <Mar reducedMotion={reducedMotion} conNiebla={perfil.fog} />
       <NubesDeNiebla cuantas={nubes} reducedMotion={reducedMotion} />
 
-      {/* Rótulos sobrios de los lugares exigidos por el encargo. */}
-      <Rotulo pos={[CUMBRE.x, CUMBRE.y + 0.5, CUMBRE.z]} texto="Cristóbal Colón · Simón Bolívar" sub="5.775 m" distancia={26} />
-      <Rotulo pos={[SIMMONDS.x, SIMMONDS.y + 0.45, SIMMONDS.z]} texto="Pico Simmonds" sub="5.560 m" distancia={22} />
-      <Rotulo pos={[PALOMINO.x, PALOMINO.y + 0.35, PALOMINO.z]} texto="Palomino" sub="Caribe · 0 m" distancia={18} />
+      {/* Rótulos sobrios de los lugares exigidos por el encargo. Los `alto`
+          escalonados (1.25 / 0.6 / 0.45) separan los rótulos verticalmente en
+          pantalla — antes se encimaban ilegibles sobre las cumbres. */}
+      <Rotulo pos={[CUMBRE.x, CUMBRE.y, CUMBRE.z]} texto="Cristóbal Colón · Simón Bolívar" sub="5.775 m" distancia={13} alto={1.25} />
+      <Rotulo pos={[SIMMONDS.x, SIMMONDS.y, SIMMONDS.z]} texto="Pico Simmonds" sub="5.560 m" distancia={12} alto={0.6} />
+      <Rotulo pos={[PALOMINO.x, PALOMINO.y, PALOMINO.z]} texto="Palomino" sub="Caribe · 0 m" distancia={11} alto={0.45} />
 
       {pisoUsuario && <MarcadorPiso piso={pisoUsuario} />}
+      <PisosTermicosBandas
+        pisoUsuario={pisoUsuario}
+        tier={tier}
+        reducedMotion={reducedMotion}
+        alturaCumbre={CIMA}
+        radioBase={4}
+        radioCumbre={0.35}
+        onSeleccionPiso={onSeleccionPiso}
+        pisoActivo={pisoActivo}
+      />
       {credito && <CreditoPueblos />}
     </>
   );
@@ -413,11 +532,10 @@ export function SierraDiorama({
 
 /* Estilos de los rótulos y pie de crédito (viven aquí: son de ESTA escena). */
 const CSS_SIERRA = `
-.vsierra-root { position: relative; width: 100%; height: 100%; min-height: 320px; overflow: hidden; background: ${ATMOSFERA.fondo}; }
+.vsierra-root { position: relative; width: 100%; height: 100dvh; min-height: 320px; overflow: hidden; background: ${ATMOSFERA.fondo}; }
 .vsierra-canvas { position: absolute; inset: 0; opacity: 0; transition: opacity 0.7s ease; }
 .vsierra-canvas--lista { opacity: 1; }
-.vsierra-rotulo { display: flex; align-items: center; gap: 0.34rem; white-space: nowrap; transform: translateY(-0.2rem); font: 600 0.74rem/1.1 system-ui, sans-serif; color: #402c16; text-shadow: 0 1px 3px rgba(255,246,224,0.9); }
-.vsierra-rotulo__punto { width: 7px; height: 7px; border-radius: 50%; background: #fff3cf; box-shadow: 0 0 0 2px rgba(64,44,22,0.55); flex: 0 0 auto; }
+.vsierra-rotulo { white-space: nowrap; font: 600 0.78rem/1.15 system-ui, sans-serif; color: #402c16; padding: 0.16rem 0.5rem; border-radius: 999px; background: rgba(255,248,233,0.82); box-shadow: 0 1px 5px rgba(60,42,24,0.22); }
 .vsierra-rotulo__txt { display: inline-flex; align-items: baseline; gap: 0.3rem; }
 .vsierra-rotulo__sub { font-weight: 500; font-style: normal; opacity: 0.72; font-size: 0.9em; }
 .vsierra-aqui { padding: 0.2rem 0.55rem; border-radius: 999px; background: rgba(64,44,22,0.82); color: #fff3d6; font: 600 0.72rem/1.1 system-ui, sans-serif; white-space: nowrap; box-shadow: 0 2px 8px rgba(30,18,6,0.3); }
@@ -426,10 +544,11 @@ const CSS_SIERRA = `
 .vsierra-chrome { position: absolute; inset: 0; pointer-events: none; display: flex; flex-direction: column; justify-content: space-between; }
 .vsierra-titulo { margin: 0; padding: 0.9rem 1rem 0; color: #3a2a18; text-shadow: 0 1px 4px rgba(255,246,224,0.85); font: 700 1.15rem/1.2 system-ui, sans-serif; letter-spacing: 0.01em; }
 .vsierra-titulo small { display: block; font: 500 0.8rem/1.3 system-ui, sans-serif; opacity: 0.78; margin-top: 0.15rem; }
-.vsierra-clave { align-self: flex-end; margin: 0 0.8rem; display: flex; flex-direction: column; gap: 0.24rem; padding: 0.5rem 0.65rem; border-radius: 0.7rem; background: rgba(255,248,233,0.72); backdrop-filter: blur(3px); box-shadow: 0 4px 14px rgba(60,42,24,0.16); }
+.vsierra-clave { align-self: flex-end; margin: 0 0.8rem 0.55rem; display: flex; flex-direction: column; gap: 0.24rem; padding: 0.5rem 0.65rem; border-radius: 0.7rem; background: rgba(255,248,233,0.72); backdrop-filter: blur(3px); box-shadow: 0 4px 14px rgba(60,42,24,0.16); }
 .vsierra-clave li { display: flex; align-items: center; gap: 0.42rem; list-style: none; font: 500 0.72rem/1.1 system-ui, sans-serif; color: #3a2a18; }
 .vsierra-clave b { width: 12px; height: 12px; border-radius: 3px; flex: 0 0 auto; box-shadow: inset 0 0 0 1px rgba(60,42,24,0.18); }
 .vsierra-clave ul { margin: 0; padding: 0; }
+.vsierra-abajo { display: flex; flex-direction: column; align-items: stretch; }
 .vsierra-pie { pointer-events: none; padding: 0 1rem 0.85rem; display: flex; justify-content: center; }
 .vsierra-pie p { margin: 0; max-width: 42rem; text-align: center; padding: 0.42rem 0.85rem; border-radius: 0.7rem; background: rgba(24,16,7,0.5); backdrop-filter: blur(3px); color: #f4ecdd; font: 500 0.76rem/1.4 system-ui, sans-serif; }
 @media (prefers-reduced-motion: reduce) { .vsierra-canvas { transition: none; } }
@@ -445,16 +564,28 @@ const CSS_SIERRA = `
  * @param {'alto'|'medio'|'bajo'} [props.tier='alto']  presupuesto de render.
  * @param {boolean} [props.reducedMotion=false]  sin órbita ni nubes; frameloop a demanda.
  * @param {string}  [props.pisoUsuario]  piso de la finca a resaltar (opcional).
+ * @param {(piso:object)=>void} [props.onSeleccionPiso]  se llama al llegar al piso seleccionado.
  * @param {string}  [props.className]  clases extra del contenedor.
  */
 export default function VistaGlobalSierra({
   tier = 'alto',
   reducedMotion = false,
   pisoUsuario,
+  onSeleccionPiso,
   className = '',
 }) {
   const [listo, setListo] = useState(false);
+  const [pisoActivo, setPisoActivo] = useState(null);
+  const [viaje, setViaje] = useState(null);
   const perfil = perfilDeTier(tier);
+  const seleccionarPiso = useCallback((piso) => {
+    setPisoActivo(piso.id);
+    setViaje({ piso, activa: true });
+  }, []);
+  const llegarAPiso = useCallback(() => {
+    if (viaje?.piso) onSeleccionPiso?.(viaje.piso);
+  }, [onSeleccionPiso, viaje]);
+  const terminarViaje = useCallback(() => setViaje(null), []);
   return (
     <section
       className={`vsierra-root${className ? ` ${className}` : ''}`}
@@ -466,27 +597,36 @@ export default function VistaGlobalSierra({
         className={`vsierra-canvas${listo ? ' vsierra-canvas--lista' : ''}`}
         dpr={perfil.dpr}
         gl={{ antialias: perfil.antialias, powerPreference: 'high-performance' }}
-        camera={{ position: [-3.6, 5.6, -15], fov: 40 }}
+        camera={{ position: [-1.5, 5.2, -11], fov: 48 }}
         frameloop={reducedMotion ? 'demand' : 'always'}
         onCreated={() => setListo(true)}
       >
+        {/* Cámara PARADA sobre el mar Caribe (−Z, norte), mirando al SUR (+Z) y
+            un poco hacia arriba: el mar llena el primer plano y las cumbres
+            nevadas suben en el tercio superior. El encuadre roto anterior venía
+            de clamps de azimuth centrados en 0 (lado equivocado) con la cámara
+            en −Z (azimuth ≈ ±π): OrbitControls la teletransportaba fuera del
+            macizo. Aquí los clamps abrazan el azimuth natural (≈ −3.0 rad). El
+            `fov` vertical (48°) encuadra igual en portrait y en landscape. */}
         <SierraDiorama
           tier={tier}
           reducedMotion={reducedMotion}
           pisoUsuario={pisoUsuario}
           credito={false}
+          onSeleccionPiso={seleccionarPiso}
+          pisoActivo={pisoActivo}
         />
         <OrbitControls
           makeDefault
           enablePan={false}
           enableZoom
-          minDistance={11}
-          maxDistance={24}
-          target={[-0.2, 2.4, 2.4]}
-          minPolarAngle={0.55}
-          maxPolarAngle={1.32}
-          minAzimuthAngle={-0.85}
-          maxAzimuthAngle={0.5}
+          minDistance={9}
+          maxDistance={16}
+          target={[0, 2.3, 2.5]}
+          minPolarAngle={1.05}
+          maxPolarAngle={1.45}
+          minAzimuthAngle={-Math.PI}
+          maxAzimuthAngle={-2.75}
           enableDamping
           dampingFactor={0.08}
           autoRotate={!reducedMotion}
@@ -495,28 +635,41 @@ export default function VistaGlobalSierra({
         <AdaptiveDpr pixelated />
       </Canvas>
 
-      {/* Chrome DOM: título, clave de pisos (accesible) y pie de crédito. */}
+      <TransicionSierraMundo
+        activa={viaje?.activa ?? false}
+        pisoDestino={viaje?.piso.id}
+        tier={tier}
+        reducedMotion={reducedMotion}
+        onMitad={llegarAPiso}
+        onFin={terminarViaje}
+      />
+
+      {/* Chrome DOM anclado a la composición: título arriba; abajo la clave de
+          pisos (accesible) y el pie de crédito, apoyados sobre la playa/mar del
+          encuadre — nada flota fuera de la escena. */}
       <div className="vsierra-chrome">
         <h2 className="vsierra-titulo">
           Sierra Nevada de Santa Marta
           <small>Del Caribe a la nieve: todos los pisos térmicos en un solo macizo</small>
         </h2>
-        <ul className="vsierra-clave" aria-label="Pisos térmicos, de la nieve al mar">
-          {CLAVE_PISOS.map((b) => (
-            <li key={b.t}>
-              <b style={{ background: b.c }} aria-hidden="true" />
-              {b.t}
-            </li>
-          ))}
-        </ul>
-      </div>
-      <div className="vsierra-pie">
-        <p role="contentinfo">
-          Territorio ancestral y sagrado de los pueblos Kogui, Arhuaco (Iku),
-          Wiwa y Kankuamo — el Corazón del Mundo, dentro de la Línea Negra.
-          Representado con respeto; su uso público requiere consulta con las
-          comunidades.
-        </p>
+        <div className="vsierra-abajo">
+          <ul className="vsierra-clave" aria-label="Pisos térmicos, de la nieve al mar">
+            {CLAVE_PISOS.map((b) => (
+              <li key={b.t}>
+                <b style={{ background: b.c }} aria-hidden="true" />
+                {b.t}
+              </li>
+            ))}
+          </ul>
+          <div className="vsierra-pie">
+            <p role="contentinfo">
+              Territorio ancestral y sagrado de los pueblos Kogui, Arhuaco (Iku),
+              Wiwa y Kankuamo — el Corazón del Mundo, dentro de la Línea Negra.
+              Representado con respeto; su uso público requiere consulta con las
+              comunidades.
+            </p>
+          </div>
+        </div>
       </div>
     </section>
   );

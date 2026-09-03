@@ -101,7 +101,7 @@ describe('buildProactiveGreeting — CON pendientes (lidera con lo clave)', () =
   it('soporta activeAlerts como Map (forma interna del engine)', () => {
     const map = new Map();
     map.set('helada', { type: 'helada', severity: 'danger', title: 'Helada nocturna' });
-    const g = buildProactiveGreeting({ activeAlerts: map, pendingTasks: [], date: MORNING });
+    const g = buildProactiveGreeting({ activeAlerts: /** @type {any} */ (map), pendingTasks: [], date: MORNING });
     expect(g.state).toBe('pending');
     expect(g.lead).toContain('Helada nocturna');
   });
@@ -198,25 +198,25 @@ describe('buildProactiveGreeting — saludo según hora', () => {
 describe('resolveProactiveGreeting — hidrata desde stores async', () => {
   it('llama getPendingTasks y arma el saludo con pendientes', async () => {
     const dosDiasAtras = Math.floor(MORNING.getTime() / 1000) - 2 * 24 * 60 * 60;
-    const g = await resolveProactiveGreeting({
+    const g = await resolveProactiveGreeting(/** @type {any} */ ({
       activeAlerts: [],
       getPendingTasks: async () => [
         { type: 'log--task', status: 'pending', name: 'Deshierbe del lote de arveja', timestamp: dosDiasAtras },
       ],
       date: MORNING,
-    });
+    }));
     expect(g.state).toBe('pending');
     expect(g.lead).toContain('Deshierbe del lote de arveja');
   });
 
   it('degrada a idea si getPendingTasks lanza error (no rompe el render)', async () => {
-    const g = await resolveProactiveGreeting({
+    const g = await resolveProactiveGreeting(/** @type {any} */ ({
       activeAlerts: [],
       getPendingTasks: async () => { throw new Error('IndexedDB caído'); },
       cultivos: [{ name: 'Maíz', count: 5 }],
       altitud: 1800,
       date: MORNING,
-    });
+    }));
     expect(g.state).toBe('idea');
     expect(g.lead.toLowerCase()).toContain('maíz');
   });

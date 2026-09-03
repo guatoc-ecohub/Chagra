@@ -32,7 +32,7 @@ export function bootstrapOssModules() {
     requiredInfra: ['whisper'],
     mount: async () => {
       const mod = await import('../components/VoiceCapture');
-      return { default: mod.default || mod.VoiceCapture };
+      return { default: mod.default || /** @type {any} */ (mod).VoiceCapture };
     },
   });
 
@@ -43,7 +43,7 @@ export function bootstrapOssModules() {
     requiredInfra: ['ollama', 'home-assistant'],
     mount: async () => {
       const mod = await import('../components/TelemetryAlerts');
-      return { default: mod.default || mod.TelemetryAlerts };
+      return { default: mod.default || /** @type {any} */ (mod).TelemetryAlerts };
     },
   });
 }

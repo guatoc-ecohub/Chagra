@@ -32,6 +32,30 @@ import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 import { PALETA } from '../atmosferaMadre.js';
 
+/**
+ * @typedef {Object} ParamsInfra
+ * @property {number} [arcos]
+ * @property {string} [plastico]
+ * @property {boolean} [puerta]
+ * @property {number} [pared]
+ * @property {string} [sombra]
+ * @property {number} [mesas]
+ * @property {string} [malla]
+ * @property {number} [refugio]
+ * @property {string} [cortina]
+ * @property {string} [techo]
+ * @property {boolean} [comedero]
+ * @property {number} [plazas]
+ * @property {boolean} [porton]
+ * @property {number} [modulos]
+ * @property {string} [madera]
+ * @property {string} [material]
+ * @property {boolean} [tapa]
+ * @property {boolean} [tuberia]
+ * @property {string} [grano]
+ * @property {boolean} [camas]
+ */
+
 /* Colores locales de obra que no viven en la PALETA madre (translúcidos y
    herrajes propios de la infraestructura). Grises CÁLIDOS, jamás neutros. */
 const OBRA = {
@@ -251,7 +275,7 @@ function CosechaGuardada({ L, W, frugal, reducedMotion }) {
 /* Brote de llenado (rubber-hose): escala con overshoot al montar. Se usa SOLO
    cuando hay motion permitido; con reducedMotion el contenido va directo. */
 function GrupoBrota({ children }) {
-  const ref = useRef();
+  const ref = useRef(null);
   const inicio = useRef(null);
   useFrame(({ clock }) => {
     const g = ref.current;
@@ -276,6 +300,13 @@ function GrupoBrota({ children }) {
 // cilindro (dome arriba, base en y=0), estirado en Y para respetar `alto` cuando
 // no es exactamente el radio. Arcos de guadua/tubo cada tanto + tapas de plástico
 // en los extremos + camas de tierra adentro.
+/**
+ * @param {Object} props
+ * @param {{ largo: number, ancho: number, alto: number }} props.dims
+ * @param {ParamsInfra} [props.params]
+ * @param {boolean} [props.frugal=false]
+ * @param {Object|null} [props.vida=null]
+ */
 export function InvernaderoTunel({ dims, params = {}, frugal = false, vida = null }) {
   const { largo: L, ancho: W, alto: H } = dims;
   const r = W / 2;
@@ -381,6 +412,13 @@ export function InvernaderoTunel({ dims, params = {}, frugal = false, vida = nul
 // Paredes rectas hasta `pared` y techo a dos aguas hasta `alto` (cumbrera).
 // Postes en las esquinas y a media luz, paños de plástico en las paredes, dos
 // faldones de techo y la viga de cumbrera.
+/**
+ * @param {Object} props
+ * @param {{ largo: number, ancho: number, alto: number }} props.dims
+ * @param {ParamsInfra} [props.params]
+ * @param {boolean} [props.frugal=false]
+ * @param {Object|null} [props.vida=null]
+ */
 export function InvernaderoCapilla({ dims, params = {}, frugal = false, vida = null }) {
   const { largo: L, ancho: W, alto: H } = dims;
   const p = Math.min(params.pared ?? 2.5, H - 0.4); // altura de pared (alero)
@@ -495,6 +533,12 @@ export function InvernaderoCapilla({ dims, params = {}, frugal = false, vida = n
 // ─── 3. MEDIA-SOMBRA / VIVERO ───────────────────────────────────────────────
 // Techo plano de polisombra sobre postes, paños de malla en los lados y mesas de
 // propagación con bandejas de plántulas.
+/**
+ * @param {Object} props
+ * @param {{ largo: number, ancho: number, alto: number }} props.dims
+ * @param {ParamsInfra} [props.params]
+ * @param {boolean} [props.frugal=false]
+ */
 export function MediaSombra({ dims, params = {}, frugal = false }) {
   const { largo: L, ancho: W, alto: H } = dims;
   const sombra = params.sombra || OBRA.malla;
@@ -568,6 +612,13 @@ export function MediaSombra({ dims, params = {}, frugal = false }) {
 // ─── 4. GALLINERO A CAMPO ABIERTO ───────────────────────────────────────────
 // Un corral de malla (postes + paños translúcidos) con un refugio techado en una
 // esquina: casita de tablas + techo a un agua + pop-hole y palo de dormir.
+/**
+ * @param {Object} props
+ * @param {{ largo: number, ancho: number, alto: number }} props.dims
+ * @param {ParamsInfra} [props.params]
+ * @param {boolean} [props.frugal=false]
+ * @param {Object|null} [props.vida=null]
+ */
 export function GallineroCampo({ dims, params = {}, frugal = false, vida = null }) {
   const { largo: L, ancho: W, alto: H } = dims;
   const malla = params.malla || OBRA.malla;
@@ -680,6 +731,13 @@ export function GallineroCampo({ dims, params = {}, frugal = false, vida = null 
 // ─── 5. GALPÓN AVÍCOLA (cerrado) ────────────────────────────────────────────
 // Nave larga y baja: zócalo bajo, cortinas laterales enrollables (bandas de
 // color), techo a dos aguas de zinc con alero, y muros de frente/fondo.
+/**
+ * @param {Object} props
+ * @param {{ largo: number, ancho: number, alto: number }} props.dims
+ * @param {ParamsInfra} [props.params]
+ * @param {boolean} [props.frugal=false]
+ * @param {Object|null} [props.vida=null]
+ */
 export function Galpon({ dims, params = {}, frugal = false, vida = null }) {
   const { largo: L, ancho: W, alto: H } = dims;
   const cortina = params.cortina || '#c9b487';
@@ -775,6 +833,13 @@ export function Galpon({ dims, params = {}, frugal = false, vida = null }) {
 // ─── 6. ESTABLO DE BOVINOS ──────────────────────────────────────────────────
 // Cobertizo de lados abiertos: piso firme, postes, pared de tablas atrás, techo
 // a un agua de zinc y comedero corrido al frente.
+/**
+ * @param {Object} props
+ * @param {{ largo: number, ancho: number, alto: number }} props.dims
+ * @param {ParamsInfra} [props.params]
+ * @param {boolean} [props.frugal=false]
+ * @param {Object|null} [props.vida=null]
+ */
 export function Establo({ dims, params = {}, frugal = false, vida = null }) {
   const { largo: L, ancho: W, alto: H } = dims;
   const techo = params.techo || OBRA.zinc;
@@ -863,6 +928,14 @@ export function Establo({ dims, params = {}, frugal = false, vida = null }) {
 // ─── 7. ALMACÉN / BODEGA ────────────────────────────────────────────────────
 // Construcción cerrada: placa, cuatro muros, techo a dos aguas de zinc, portón
 // grande y una ventanita.
+/**
+ * @param {Object} props
+ * @param {{ largo: number, ancho: number, alto: number }} props.dims
+ * @param {ParamsInfra} [props.params]
+ * @param {boolean} [props.frugal=false]
+ * @param {boolean} [props.reducedMotion=false]
+ * @param {Object|null} [props.vida=null]
+ */
 export function AlmacenBodega({ dims, params = {}, frugal = false, reducedMotion = false, vida = null }) {
   const { largo: L, ancho: W, alto: H } = dims;
   const pared = params.pared || '#e3d7bf';
@@ -949,6 +1022,12 @@ export function AlmacenBodega({ dims, params = {}, frugal = false, reducedMotion
 // ─── 8. COMPOSTERA ──────────────────────────────────────────────────────────
 // Módulos de tablas (guadua/madera) con montones de compost en distinto punto de
 // madurez: fresco (verdoso), medio (café) y hecho (tierra negra).
+/**
+ * @param {Object} props
+ * @param {{ largo: number, ancho: number, alto: number }} props.dims
+ * @param {ParamsInfra} [props.params]
+ * @param {boolean} [props.frugal=false]
+ */
 export function Compostera({ dims, params = {}, frugal = false }) {
   const { largo: L, ancho: W, alto: H } = dims;
   const n = params.modulos ?? 3;
@@ -1004,6 +1083,12 @@ export function Compostera({ dims, params = {}, frugal = false }) {
 // ─── 9. TANQUE / RESERVORIO DE AGUA ─────────────────────────────────────────
 // Depósito cilíndrico con base, agua adentro, tapa opcional y una tubería en L
 // que entra el agua.
+/**
+ * @param {Object} props
+ * @param {{ ancho: number, alto: number }} props.dims
+ * @param {ParamsInfra} [props.params]
+ * @param {boolean} [props.frugal=false]
+ */
 export function TanqueAgua({ dims, params = {}, frugal = false }) {
   const { ancho: W, alto: H } = dims;
   const r = W / 2;
@@ -1055,6 +1140,12 @@ export function TanqueAgua({ dims, params = {}, frugal = false }) {
 // Túnel bajo de plástico (arco parabólico, más achatado que el invernadero)
 // sobre camas elevadas donde el pergamino seca al sol. Patas + tablero + capa de
 // grano + piel de plástico.
+/**
+ * @param {Object} props
+ * @param {{ largo: number, ancho: number, alto: number }} props.dims
+ * @param {ParamsInfra} [props.params]
+ * @param {boolean} [props.frugal=false]
+ */
 export function SecaderoCafe({ dims, params = {}, frugal = false }) {
   const { largo: L, ancho: W, alto: H } = dims;
   const r = W / 2;

@@ -12,6 +12,15 @@ import SeedingLog from '../SeedingLog';
  * antes.
  */
 
+// Mock ENV para evitar el fallback "Configuración de siembra no disponible"
+vi.mock('../../config/env.js', () => ({
+  ENV: {
+    FARMOS_CLIENT_ID: 'test-client-id',
+    FARMOS_CLIENT_SECRET: 'test-secret',
+    FARMOS_URL: 'https://test.farmos.com',
+  },
+}));
+
 // Mock pesado de servicios externos no relevantes al smoke.
 vi.mock('../../services/payloadService', () => ({
   savePayload: vi.fn().mockResolvedValue({ success: true, message: 'ok' }),
@@ -35,25 +44,25 @@ vi.mock('../PhotoCaptureField', () => ({
 
 describe('UX-25 — SeedingLog usa PhotoCaptureField', () => {
   it('monta PhotoCaptureField (mismo componente que invasoras)', () => {
-    render(<SeedingLog onBack={() => {}} onSave={() => {}} />);
+    render(<SeedingLog onBack={() => {}} onSave={() => {}} initialData={null} />);
     expect(screen.getByTestId('photo-capture-field-stub')).toBeInTheDocument();
   });
 
   it('pasa onPhoto y onRemove como callbacks', () => {
-    render(<SeedingLog onBack={() => {}} onSave={() => {}} />);
+    render(<SeedingLog onBack={() => {}} onSave={() => {}} initialData={null} />);
     const stub = screen.getByTestId('photo-capture-field-stub');
     expect(stub.dataset.hasOnphoto).toBe('yes');
     expect(stub.dataset.hasOnremove).toBe('yes');
   });
 
   it('pasa label "Foto del cultivo"', () => {
-    render(<SeedingLog onBack={() => {}} onSave={() => {}} />);
+    render(<SeedingLog onBack={() => {}} onSave={() => {}} initialData={null} />);
     const stub = screen.getByTestId('photo-capture-field-stub');
     expect(stub.dataset.label).toBe('Foto del cultivo');
   });
 
   it('NO renderiza los antiguos botones manuales "Tomar foto" / "Subir desde galería"', () => {
-    render(<SeedingLog onBack={() => {}} onSave={() => {}} />);
+    render(<SeedingLog onBack={() => {}} onSave={() => {}} initialData={null} />);
     // El botón manual antiguo tenía esos textos directos. Como ahora
     // PhotoCaptureField está stubeado, no deben aparecer en el render
     // de SeedingLog directamente.

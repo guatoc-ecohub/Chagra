@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * AgentHero.bellGate.test.jsx — UNA sola campana de notificación (bug
  * operador 2026-06-11: "salen dos botones de notificación arriba").

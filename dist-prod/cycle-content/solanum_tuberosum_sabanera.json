@@ -1,0 +1,69 @@
+{
+  "species_slug": "solanum_tuberosum_sabanera",
+  "scientific_name": "Solanum tuberosum L. subsp. andigenum var. Sabanera",
+  "common_names": [
+    "Papa Sabanera"
+  ],
+  "family": "Solanaceae",
+  "category": "tuberculos_raices",
+  "cultivable": true,
+  "conservation_status": "cultivo_comun",
+  "thermal_zones": [
+    "frio"
+  ],
+  "roles_in_guild": [
+    "crop"
+  ],
+  "antagonists": [],
+  "especies_nativas_sustitutas": [],
+  "propagation": {
+    "metodo_principal": "tuberculo (semilla asexual)",
+    "notas": "Variedad tradicional del altiplano cundiboyacense. Ciclo largo (5-7 meses). Requiere periodos de dormancia antes de resiembra."
+  },
+  "requirements": {
+    "agua": "medio",
+    "altitud_msnm": {
+      "min_absoluto": 2000,
+      "optimo_min": 2400,
+      "optimo_max": 3000,
+      "max_absoluto": 3400
+    },
+    "temperatura_c": {
+      "helada_letal": -3,
+      "optimo_min": 10,
+      "optimo_max": 17,
+      "max_tolerable": 22
+    },
+    "radiacion": "sol_pleno",
+    "drenaje_requerido": "bueno"
+  },
+  "valor_pedagogico": "La papa Sabanera (Solanum tuberosum L. variedad Sabanera) es una variedad colombiana de papa de gran adaptación al altiplano cundiboyacense, desarrollada y registrada por ICA y AGROSAVIA. Se cultiva en Cundinamarca (Mosquera, Bojacá, Soacha), Boyacá (Tunja, Ventaquemada, Toca) y Nariño entre 2.500 y 3.200 msnm en zona térmica fría. Ciclo vegetativo 5-6 meses, rendimientos comerciales 25-35 t/ha. Tubérculo grande oblongo con piel crema y carne amarilla suave. Susceptible a Phytophthora infestans (tizón tardío); manejo agroecológico incluye rotación trienal con leguminosas (haba, arveja andina), siembra escalonada, manejo de inóculo de papa-volunta, biopreparados como caldo bordelés y trichoderma. Fuentes Tier A: AGROSAVIA fichas papa, ICA Resolución 3168/2015, POWO Kew, GBIF Backbone Taxonomy, Bernal et al. Catálogo Plantas y Líquenes Colombia.",
+  "sources": [
+    {
+      "id": "perez-rodriguez-gomez-2008",
+      "title": "perez-rodriguez-gomez-2008",
+      "tier": "A",
+      "url": null
+    },
+    {
+      "id": "nustez-rodriguez-2024-unal",
+      "title": "nustez-rodriguez-2024-unal",
+      "tier": "A",
+      "url": null
+    },
+    {
+      "id": "gbif-taxonomic-backbone",
+      "title": "gbif-taxonomic-backbone",
+      "tier": "A",
+      "url": "https://www.gbif.org/dataset/d7dddbf4-2cf0-4f39-9b2a-bb099caae36c"
+    },
+    {
+      "id": "powo-kew",
+      "title": "powo-kew",
+      "tier": "A",
+      "url": "https://powo.science.kew.org"
+    }
+  ],
+  "_generated_by": "scripts/build-cycle-content-from-catalog.mjs",
+  "_generated_at": "2026-05-19T00:42:57.369Z"
+}

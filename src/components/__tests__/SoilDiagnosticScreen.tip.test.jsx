@@ -32,7 +32,7 @@ function irADiagnostico() {
 
 describe('SoilDiagnosticScreen — tip de confiabilidad', () => {
   it('muestra el tip junto a las pruebas sugeridas la primera vez', () => {
-    render(<SoilDiagnosticScreen onBack={() => {}} />);
+    render(<SoilDiagnosticScreen onBack={() => {}} onNavigate={() => {}} />);
     irADiagnostico();
     const tip = screen.getByTestId('context-tip-diagnostico-confianza');
     expect(tip.textContent).toMatch(/puntos/i);
@@ -40,12 +40,12 @@ describe('SoilDiagnosticScreen — tip de confiabilidad', () => {
   });
 
   it('descartado con "Entendido" no vuelve a aparecer', () => {
-    const { unmount } = render(<SoilDiagnosticScreen onBack={() => {}} />);
+    const { unmount } = render(<SoilDiagnosticScreen onBack={() => {}} onNavigate={() => {}} />);
     irADiagnostico();
     fireEvent.click(screen.getByRole('button', { name: /entendido/i }));
     expect(screen.queryByTestId('context-tip-diagnostico-confianza')).toBeNull();
     unmount();
-    render(<SoilDiagnosticScreen onBack={() => {}} />);
+    render(<SoilDiagnosticScreen onBack={() => {}} onNavigate={() => {}} />);
     irADiagnostico();
     expect(screen.queryByTestId('context-tip-diagnostico-confianza')).toBeNull();
   });

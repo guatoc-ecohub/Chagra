@@ -21,21 +21,22 @@
 
 import { streamOllama } from './ollamaStream';
 import { retrieve } from './ragRetriever';
-import { callTool, isSidecarEnabled, judgeVision } from './sidecarClient';
+import { callTool, isSidecarEnabled, judgeVisionAsync } from './sidecarClient';
 import { parseJsonTolerant } from '../utils/parseJsonTolerant';
 import { hashImage, getCached, setCached } from './visionCacheService';
+import { ENV } from '../config/env';
 
 // Ruta relativa: Nginx proxea /api/ollama/ → http://localhost:11434/
 // Ruta final: /api/ollama/api/generate → http://localhost:11434/api/generate
 const OLLAMA_BASE = '/api/ollama';
 const OLLAMA_URL = `${OLLAMA_BASE}/api/generate`;
 // Modelo de diagnóstico multimodal configurado.
-const DIAGNOSIS_MODEL = 'gemma3:4b';
+const DIAGNOSIS_MODEL = 'qwen3-vl:8b';
 // Modelo de visión configurado para reconocimiento de especies. La
 // selección de primary y de los fallbacks se basa en bench interno de
 // confiabilidad del parseo JSON y de latencia en GPU local.
 const VISION_SPECIES_MODEL = 'llama3.2-vision:11b';
-const VISION_SPECIES_FALLBACK_MODEL = 'gemma3:4b';
+const VISION_SPECIES_FALLBACK_MODEL = 'qwen3-vl:8b';
 const VISION_SPECIES_FALLBACK_2_MODEL = 'qwen2.5vl:7b';
 
 // Prompt base sin contexto RAG. Fallback usado cuando el corpus no cargó
@@ -499,10 +500,19 @@ export const recognizeSpeciesGrounded = async (imageBlob, options = {}) => {
   // confirmó que el NOMBRE existe en catálogo, pero no que la imagen coincida
   // (el modelo de visión pudo alucinar el binomial). Best-effort: el sidecar
   // capa a 500 ms y nunca bloquea; cualquier fallo → null (no degrada la UX).
+  // Gate ASYNC (#328): el juez local tarda ~16-23s (minicpm-v:8b en CPU, fuera de
+  // la VRAM del agente); el sync `/judge-vision` lo abortaba el propio cliente a
+  // TOOL_TIMEOUT_MS=5s → veredicto SIEMPRE null (gate muerto). Encolamos SIN
+  // bloquear el diagnóstico (no metemos 20s de latencia a la foto). `_grounded.judge`
+  // queda `{status:'async', request_id}`; el veredicto se recoge luego con
+  // `judgeVisionResult(request_id)` (badge que se resuelve solo). Best-effort:
+  // cualquier fallo → null (no degrada la UX, igual que antes).
   const runJudge = async (speciesId) => {
     try {
       const b64 = await blobToBase64(imageBlob);
-      return await judgeVision(speciesId, b64);
+      const q = await judgeVisionAsync(speciesId, b64);
+      if (!q || !q.request_id) return null;
+      return { status: 'async', request_id: q.request_id };
     } catch (_) {
       return null;
     }

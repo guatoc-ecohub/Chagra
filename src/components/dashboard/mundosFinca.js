@@ -206,9 +206,12 @@ export const MUNDOS_FINCA = [
         emoji: '⛅',
         lema: 'Lo que viene y qué hacer: los boletines del IDEAM en campesino',
         tinte: ['#4c7fa0', '#dce9f2'],
+        // Acceso prioritario a la pantalla 2D canónica: en el home F2 la
+        // grilla está plegada y el mundo genérico agregaba un tercer toque.
+        directo: { view: 'clima_boletin' },
         entradas: [
-            { view: 'hoy_finca', label: 'Su día en la finca', desc: 'Lluvia, heladas y avisos para hoy', emoji: '🌤️' },
             { view: 'clima_boletin', label: 'El clima que viene', desc: 'Qué trae El Niño o La Niña y qué hacer, leído del IDEAM', emoji: '⛅' },
+            { view: 'hoy_finca', label: 'Su día en la finca', desc: 'Lluvia, heladas y avisos para hoy', emoji: '🌤️' },
         ],
     },
     {
@@ -243,7 +246,7 @@ export const MUNDOS_FINCA = [
             { view: 'nutricion', label: 'La comida que alimenta', desc: 'Qué te da comer cada cultivo: fuerza, cuerpo, sangre y defensas (ICBF)', emoji: '🍽️' },
             { view: 'bodega', label: 'Bodega de insumos', desc: 'Lo que tiene guardado y lo que se acaba', emoji: '🏚️' },
             { view: 'informes', label: 'Sacar reportes', desc: 'Para imprimir o llevar al banco o la cooperativa', emoji: '🖨️' },
-            { view: 'fermentos', label: 'Fermentos de la cocina', desc: 'Masato, chicha y kéfir con sus vetos de seguridad', emoji: '🫙' },
+            { view: 'fermentos', label: 'Fermentos de la cocina', desc: 'Chucrut, kombucha, yogur y masato: recetas con fotos y su seguridad', emoji: '🫙' },
         ],
     },
     {
@@ -275,6 +278,17 @@ export const MUNDOS_FINCA = [
             { view: 'ciclo', label: 'Cómo va la matica', desc: 'La vida de la plántula etapa por etapa, del brote al endurecimiento', emoji: '🔄' },
             { view: 'calendario_finca', label: 'Cuándo sembrar', desc: 'Las fechas de semillero y trasplante para su clima', emoji: '🗓️' },
         ],
+    },
+    {
+        id: 'micorrizas',
+        titulo: 'La red del suelo',
+        emoji: '🍄',
+        lema: 'El internet de hongos que conecta y alimenta sus matas bajo tierra',
+        // Turquesa de micelio + mint clarito (fondo de tarjeta).
+        tinte: ['#1f9e86', '#d6f2ea'],
+        // Mundo 3D flagship (la red micorrízica bajo tierra, con pulsos de
+        // nutrientes y el Ent asomando). La tarjeta abre el mundo directo.
+        directo: { view: 'mundo3d_micorrizas' },
     },
 ];
 

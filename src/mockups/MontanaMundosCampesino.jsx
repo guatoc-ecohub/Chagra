@@ -21,8 +21,10 @@
  *      gran plano general → regreso a la finca con el momento de llegada.
  *   3. LOS NODOS-MUNDO SON ESCENAS REALES REUSADAS — "Su finca por dentro"
  *      abre SceneFincaOrganismo (la escena biopunk del home vivo), "Su
- *      guardián" abre GuardianEspiritu y "Sus mundos" abre ArbolDeMundos,
- *      en una hoja cinematográfica sobre la montaña. Nada de cajas grises.
+ *      guardián" abre AgentAvatarSelector (2026-08-14: reemplazó a
+ *      GuardianEspiritu, sistema paralelo desconectado) y "Sus mundos" abre
+ *      ArbolDeMundos, en una hoja cinematográfica sobre la montaña. Nada de
+ *      cajas grises.
  *   4. DATOS CONCRETOS DE MUESTRA — los mundos de SU piso hablan con sus
  *      cosas: "Su papa pastusa · 3 surcos · 42 días", "Su corral · 12
  *      gallinas · la vaca Lucero", el mercado con precio del día, y la
@@ -44,8 +46,13 @@ import './montana-mundos-campesino.css';
 // (en el home lo importa FincaVivaHero) — aquí lo importamos nosotros.
 import SceneFincaOrganismo from '../components/dashboard/SceneFincaOrganismo';
 import '../components/dashboard/scene-finca-organismo.css';
-import GuardianEspiritu from '../components/dashboard/GuardianEspiritu';
+// GuardianEspiritu (5 fauna) se retiró de aquí el 2026-08-14 (unificación
+// compAI): sistema paralelo desconectado del roster real de 7 compañeros. La
+// escena "Su guardián" ahora abre el mismo AgentAvatarSelector del resto de
+// la app — ver el render de `escena === 'guardian'` más abajo.
+import AgentAvatarSelector from '../components/Settings/AgentAvatarSelector';
 import ArbolDeMundos from '../components/dashboard/ArbolDeMundos';
+import { navegarDesde3D } from '../prodApp/wire3DNav.js';
 
 // ── Geometría de la escena (unidades del viewBox 390×1440) ──────────────────
 const VB_W = 390;
@@ -965,7 +972,12 @@ export default function MontanaMundosCampesino({ onBack = null }) {
               style={{ left: pct(m.x, VB_W), top: pct(m.y, VB_H) }}
               data-testid={`mm2-mundo-${m.id}`}
               aria-label={`${m.etiqueta}: abre ${m.abre}`}
-              onClick={() => (m.escena ? setEscena(m.escena) : avisar(`Aquí se abre ${m.abre}.`))}
+              onClick={() => {
+                if (m.escena) { setEscena(m.escena); return; }
+                avisar(`Aquí se abre ${m.abre}.`);
+                // Navegar a la ruta 2D correspondiente (wire nav 3D→2D)
+                setTimeout(() => navegarDesde3D(m.id), 600);
+              }}
             >
               <span className="mm2-mundo-halo" aria-hidden="true" />
               <span className="mm2-mundo-etiqueta">
@@ -1090,9 +1102,9 @@ export default function MontanaMundosCampesino({ onBack = null }) {
 
       {/* ── HOJA DE ESCENA REAL (idea 3): el nodo-mundo no abre una caja —
           abre la escena de verdad del home vivo, sobre la montaña, con
-          noche de cine detrás. SceneFincaOrganismo llega con datos de
-          muestra; GuardianEspiritu y ArbolDeMundos son los componentes
-          reales tal cual viven en el dashboard. ── */}
+          noche de cine detrás. SceneFincaOrganismo, AgentAvatarSelector y
+          ArbolDeMundos son los componentes reales tal cual viven en el
+          dashboard. ── */}
       {escena && (
         <div className="mm4-hoja" role="dialog" aria-modal="true" aria-label={ESCENAS[escena].titulo} data-testid="mm4-hoja">
           <button
@@ -1126,11 +1138,7 @@ export default function MontanaMundosCampesino({ onBack = null }) {
                   />
                 </div>
               )}
-              {escena === 'guardian' && (
-                <GuardianEspiritu
-                  onChange={(id, especie) => avisar(`Su guardián ahora es ${especie?.nombre || 'otra especie'}.`)}
-                />
-              )}
+              {escena === 'guardian' && <AgentAvatarSelector />}
               {escena === 'arbol' && (
                 <ArbolDeMundos
                   onNavigate={() => avisar('Aquí se entra a ese mundo de su finca.')}

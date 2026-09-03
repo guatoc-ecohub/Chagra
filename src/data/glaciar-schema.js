@@ -98,8 +98,6 @@ export const ESCALA_DUREZA = [
 
 /** Códigos de dureza "blanda" (la mano todavía entra). Útil para reglas. */
 export const DUREZAS_BLANDAS = Object.freeze(['F', '4F']);
-/** Códigos de dureza de hielo (ya no entra la mano, se prueba con piolet). */
-const DUREZAS_HIELO = Object.freeze(['H1', 'H2']);
 
 /* ── Tipo de superficie del hielo/nieve (7) ──────────────────────────────
  * Cada tipo trae una implicación de seguridad corta (qué significa para el

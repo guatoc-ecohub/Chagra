@@ -1,0 +1,413 @@
+/* ============================================================================
+ * confianza.css — LA CADENCIA del lenguaje visual de la confianza (cfz-*).
+ *
+ * El dibujo vive en los JSX de esta carpeta; aquí vive el TIEMPO: cómo respira
+ * la costura firme, cómo avanza el hilván, cómo titila el hilo suelto, cómo
+ * invita el caminito dorado del "no sé", y cómo SE ASIENTA (no chilla) la
+ * advertencia con peso.
+ *
+ * Reglas de la casa:
+ *   - Solo transform/opacity + dashoffset (GPU-friendly, tier-safe).
+ *   - TODO lo continuo respeta prefers-reduced-motion y el gate
+ *     [data-cfz-vivo='0'] (fotograma digno, quieto).
+ *   - Ritmos parientes del halo de Angelita (5.2s respirar, 3.1s dudar):
+ *     misma respiración, misma casa.
+ *   - Cero rojo UI, cero porcentajes, cero neón: la confianza se cose,
+ *     no se grafica.
+ * ========================================================================== */
+
+/* ── El trazo (la puntada) ─────────────────────────────────────────────── */
+.cfz-trazo {
+  display: block;
+  width: 100%;
+  height: 14px;
+  overflow: visible;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  /* alta: la costura firme respira lento — serena, sin afán. */
+  [data-cfz-vivo='1'] .cfz-hilo-firme {
+    animation: cfz-respira 5.2s ease-in-out infinite;
+  }
+
+  /* media: el hilván avanza despacio — saber que camina, sin aterrizar aún. */
+  [data-cfz-vivo='1'] .cfz-hilo-hilvan {
+    animation: cfz-avanza 8s linear infinite;
+  }
+
+  /* baja: el hilo suelto titila — la duda no se esconde. */
+  [data-cfz-vivo='1'] .cfz-hilo-suelto {
+    animation: cfz-titila 3.1s ease-in-out infinite;
+  }
+  /* …y la hebra salida vacila, como quien no se decide. */
+  [data-cfz-vivo='1'] .cfz-hebra {
+    transform-box: fill-box;
+    transform-origin: 10% 20%;
+    animation: cfz-vacila 3.1s ease-in-out infinite;
+  }
+
+  /* honesta: el caminito dorado camina hacia la señal — una invitación,
+     nunca una disculpa. El nudo NO se anima: un remate está quieto. */
+  [data-cfz-vivo='1'] .cfz-camino-dorado {
+    animation: cfz-camina 2.6s linear infinite;
+  }
+}
+
+@keyframes cfz-respira {
+  0%, 100% { opacity: 0.85; }
+  50%      { opacity: 1; }
+}
+@keyframes cfz-avanza {
+  from { stroke-dashoffset: 0; }
+  to   { stroke-dashoffset: -30; } /* 2 ciclos de "9 6": avance sin costura */
+}
+@keyframes cfz-titila {
+  0%, 100% { opacity: 0.75; }
+  22%      { opacity: 0.35; }
+  30%      { opacity: 0.65; }
+  58%      { opacity: 0.4; }
+  70%      { opacity: 0.7; }
+}
+@keyframes cfz-vacila {
+  0%, 100% { transform: rotate(0deg); }
+  30%      { transform: rotate(9deg); }
+  65%      { transform: rotate(-6deg); }
+}
+@keyframes cfz-camina {
+  from { stroke-dashoffset: 0; }
+  to   { stroke-dashoffset: -14; } /* 2 pasos de "0.5 6.5" */
+}
+
+/* ── La marca de origen (raíz / etiqueta / horizonte / rombo) ──────────── */
+.cfz-origen {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 9px 3px 5px;
+  border-radius: 999px;
+  border: 1.5px solid rgb(36 26 16 / 0.28); /* tinta cálida al 28% */
+  background: rgb(255 248 236 / 0.75); /* hueso translúcido */
+  color: #241a10;
+  font-family: 'Nunito', system-ui, sans-serif;
+  font-size: 11.5px;
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: 0.01em;
+  white-space: nowrap;
+}
+.cfz-origen-marca {
+  display: block;
+  overflow: visible; /* la raíz de "su finca" baja HONDO, por fuera del aro */
+}
+/* De su finca: el chip mismo se agarra un pelín más fuerte a la página. */
+.cfz-origen[data-origen='finca'] {
+  border-color: rgb(95 138 63 / 0.55);
+}
+/* Saber de la gente: el borde lleva el índigo del textil, no la tinta. */
+.cfz-origen[data-origen='tradicion'] {
+  border-color: rgb(51 48 92 / 0.5);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  /* La raicilla de "su finca" se acomoda en la tierra al aparecer: honda. */
+  [data-cfz-vivo='1'] .cfz-raiz {
+    transform-box: fill-box;
+    transform-origin: top center;
+    animation: cfz-arraiga 0.9s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+  }
+}
+@keyframes cfz-arraiga {
+  from { transform: scaleY(0.2); opacity: 0; }
+  to   { transform: scaleY(1); opacity: 1; }
+}
+
+/* ── La ficha de fuente (etiqueta de herbario) ─────────────────────────── */
+.cfz-ficha {
+  position: relative;
+  display: inline-block;
+  max-width: 100%;
+  font-family: 'Nunito', system-ui, sans-serif;
+  /* Papel de campo, apenas torcido: lo pegó una mano, no una máquina. */
+  transform: rotate(-0.5deg);
+}
+.cfz-ficha-cara {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  max-width: 100%;
+  padding: 6px 11px 6px 7px;
+  background: #fffaf0; /* crema papel (el mismo de la burbuja de Angelita) */
+  color: #241a10;
+  border: 1.5px solid rgb(36 26 16 / 0.55);
+  /* Esquinas desparejas: cortada con tijera, no troquelada. */
+  border-radius: 9px 12px 8px 13px;
+  box-shadow: 1px 2px 0 rgb(36 26 16 / 0.16);
+  cursor: pointer;
+  text-align: left;
+  -webkit-tap-highlight-color: transparent;
+  transition: transform 0.16s ease, box-shadow 0.16s ease;
+}
+.cfz-ficha-cara:hover {
+  transform: translateY(-1px) rotate(0.4deg);
+  box-shadow: 1px 3px 0 rgb(36 26 16 / 0.2);
+}
+.cfz-ficha-cara:focus-visible {
+  outline: 2px solid rgb(122 90 56 / 0.85);
+  outline-offset: 2px;
+}
+.cfz-ficha-cara[aria-expanded='true'] {
+  border-radius: 9px 12px 2px 2px;
+  box-shadow: none;
+}
+.cfz-ficha-ojal {
+  flex: none;
+  overflow: visible;
+}
+.cfz-ficha-titulo {
+  font-size: 12.5px;
+  font-weight: 800;
+  line-height: 1.25;
+  overflow-wrap: anywhere;
+}
+.cfz-ficha-tipo {
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: rgb(36 26 16 / 0.6);
+  white-space: nowrap;
+}
+/* El pliego que se abre al toque: la misma hoja, doblada hacia abajo. */
+.cfz-ficha-pliego {
+  display: grid;
+  grid-template-rows: 1fr;
+  border: 1.5px solid rgb(36 26 16 / 0.55);
+  border-top: 1.5px dashed rgb(36 26 16 / 0.35); /* el doblez */
+  border-radius: 2px 2px 11px 9px;
+  background: #fffaf0;
+  color: #241a10;
+  box-shadow: 1px 2px 0 rgb(36 26 16 / 0.16);
+}
+.cfz-ficha-pliego > div {
+  overflow: hidden;
+  padding: 8px 11px;
+}
+.cfz-ficha-detalle {
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.5;
+}
+.cfz-ficha-enlace {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  margin-top: 7px;
+  font-size: 11.5px;
+  font-weight: 800;
+  color: #5a4326; /* madera oscura: tinta de sello, no azul de link */
+  text-decoration: underline;
+  text-decoration-style: dotted;
+  text-underline-offset: 3px;
+}
+@media (prefers-reduced-motion: no-preference) {
+  [data-cfz-vivo='1'] .cfz-ficha-pliego {
+    animation: cfz-despliega 0.28s cubic-bezier(0.34, 1.3, 0.64, 1) both;
+  }
+}
+@keyframes cfz-despliega {
+  from { grid-template-rows: 0fr; opacity: 0; }
+  to   { grid-template-rows: 1fr; opacity: 1; }
+}
+
+/* ── El "no sé" digno ──────────────────────────────────────────────────── */
+.cfz-nose {
+  max-width: 100%;
+  padding: 12px 14px 10px;
+  background: #fff8ec; /* hueso: papel limpio — nada que esconder */
+  color: #241a10;
+  border: 1.5px solid rgb(36 26 16 / 0.5);
+  border-radius: 12px 14px 12px 15px;
+  font-family: 'Nunito', system-ui, sans-serif;
+}
+.cfz-nose-frase {
+  margin: 0 0 4px;
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1.5;
+}
+.cfz-nose-caminos {
+  list-style: none;
+  margin: 10px 0 0;
+  padding: 0;
+  display: grid;
+  gap: 8px;
+}
+.cfz-nose-camino {
+  display: flex;
+  align-items: flex-start;
+  gap: 9px;
+  font-size: 12.5px;
+  line-height: 1.45;
+}
+.cfz-nose-letrero {
+  flex: none;
+  margin-top: 1px;
+  overflow: visible;
+}
+.cfz-nose-camino strong {
+  font-weight: 800;
+}
+.cfz-nose-camino span.cfz-nose-detalle {
+  color: rgb(36 26 16 / 0.78);
+}
+@media (prefers-reduced-motion: no-preference) {
+  /* Los letreros aparecen uno tras otro, clavándose derechos: dignos. */
+  [data-cfz-vivo='1'] .cfz-nose-camino {
+    animation: cfz-clava 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+  }
+  [data-cfz-vivo='1'] .cfz-nose-camino:nth-child(2) { animation-delay: 0.12s; }
+  [data-cfz-vivo='1'] .cfz-nose-camino:nth-child(3) { animation-delay: 0.24s; }
+  [data-cfz-vivo='1'] .cfz-nose-camino:nth-child(n + 4) { animation-delay: 0.36s; }
+}
+@keyframes cfz-clava {
+  from { transform: translateY(-5px); opacity: 0; }
+  to   { transform: translateY(0); opacity: 1; }
+}
+
+/* ── La advertencia con peso ───────────────────────────────────────────────
+   No titila, no chilla, no es un iconito: SE ASIENTA como una piedra.
+   Tinta gruesa, banda cochinilla y una sombra-repisa maciza debajo —
+   el elemento con más peso visual de toda la casa, reservado para cuando
+   de verdad hay riesgo (veneno, zoonosis, agua mala, botulismo). */
+.cfz-peso {
+  display: flex;
+  align-items: stretch;
+  gap: 0;
+  max-width: 100%;
+  background: #fff8ec;
+  color: #241a10;
+  border: 3px solid #241a10; /* la línea más gruesa del lenguaje: pesa */
+  border-radius: 10px;
+  overflow: hidden;
+  font-family: 'Nunito', system-ui, sans-serif;
+  /* La sombra-repisa: sólida, pegada al suelo. Una piedra no flota. */
+  box-shadow: 0 7px 0 -2px rgb(36 26 16 / 0.38);
+}
+.cfz-peso-marca {
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 12px;
+  background: #d1382b; /* cochinilla: el rojo textil, en serio por una vez */
+  border-right: 3px solid #241a10;
+}
+.cfz-peso-cuerpo {
+  padding: 10px 14px 11px;
+  font-size: 13px;
+  line-height: 1.5;
+}
+.cfz-peso-titulo {
+  display: block;
+  margin-bottom: 3px;
+  font-size: 14px;
+  font-weight: 900;
+  letter-spacing: 0.01em;
+}
+.cfz-peso-cuerpo p { margin: 0; }
+.cfz-peso-cuerpo p + p { margin-top: 6px; }
+@media (prefers-reduced-motion: no-preference) {
+  /* Entra asentándose: cae dos dedos, toca fondo, se acomoda. Un golpe
+     sordo de una sola vez — jamás un parpadeo en bucle. */
+  [data-cfz-vivo='1'].cfz-peso {
+    animation: cfz-asienta 0.55s cubic-bezier(0.22, 1.2, 0.36, 1) both;
+  }
+}
+@keyframes cfz-asienta {
+  0%   { transform: translateY(-10px); opacity: 0; }
+  62%  { transform: translateY(2px) scaleY(0.985); opacity: 1; }
+  100% { transform: translateY(0) scaleY(1); opacity: 1; }
+}
+
+/* ── El saber de la gente (guarda tejida) ──────────────────────────────────
+   Ni verde ni ámbar ni gris: TEXTIL. La tradición se envuelve en la guarda
+   de rombos (maíz sobre índigo) — el marco que se le da a lo que la gente
+   sabe, con respeto y sin calificarlo. */
+.cfz-tradicion {
+  max-width: 100%;
+  background: #fff8ec;
+  color: #241a10;
+  border-left: 1.5px solid rgb(51 48 92 / 0.45);
+  border-right: 1.5px solid rgb(51 48 92 / 0.45);
+  font-family: 'Nunito', system-ui, sans-serif;
+}
+.cfz-tradicion-guarda {
+  display: block;
+  width: 100%;
+  height: 11px;
+}
+.cfz-tradicion-cuerpo {
+  padding: 9px 14px 10px;
+  font-size: 13px;
+  line-height: 1.55;
+}
+.cfz-tradicion-cuerpo p { margin: 0; }
+.cfz-tradicion-cuerpo p + p { margin-top: 6px; }
+.cfz-tradicion-voz {
+  display: inline-block;
+  margin-bottom: 5px;
+  font-size: 10.5px;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: #33305c; /* índigo de mortiño */
+}
+.cfz-tradicion-nota {
+  margin-top: 7px !important;
+  font-size: 11.5px;
+  font-style: italic;
+  color: rgb(36 26 16 / 0.66);
+}
+
+/* ── La vitrina (GaleriaConfianza) ─────────────────────────────────────── */
+.cfz-galeria {
+  max-width: 640px;
+  margin: 0 auto;
+  padding: 20px 16px 40px;
+  background: #efe7d8; /* cal: la pared encalada donde se cuelga el cuaderno */
+  color: #241a10;
+  font-family: 'Nunito', system-ui, sans-serif;
+}
+.cfz-galeria h2 {
+  margin: 26px 0 4px;
+  font-size: 15px;
+  font-weight: 900;
+}
+.cfz-galeria h2:first-child { margin-top: 0; }
+.cfz-galeria-nota {
+  margin: 0 0 12px;
+  font-size: 12px;
+  color: rgb(36 26 16 / 0.6);
+}
+.cfz-galeria-respuesta {
+  margin: 0 0 4px;
+  padding: 10px 12px 6px;
+  background: #fffaf0;
+  border: 1.5px solid rgb(36 26 16 / 0.3);
+  border-radius: 10px 12px 10px 13px;
+  font-size: 13px;
+  line-height: 1.55;
+}
+.cfz-galeria-respuesta p { margin: 0 0 6px; }
+.cfz-galeria-fila {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin: 8px 0;
+}
+.cfz-galeria hr {
+  border: none;
+  border-top: 1.5px dashed rgb(36 26 16 / 0.25);
+  margin: 20px 0;
+}

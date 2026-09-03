@@ -15,7 +15,10 @@
  *   · la TARIMA DE PROCEDENCIA — el letrero del terroir: de qué vereda y qué
  *     piso térmico viene (el sello de origen andino que da confianza y valor);
  *   · la BALANZA del PRECIO JUSTO — la pesa que reparte parejo, sin la tajada
- *     del intermediario.
+ *     del intermediario;
+ *   · la GENTE de la feria — los campesinos VENDIENDO detrás de su mesa y quien
+ *     compra al frente (rubber-hose de primitivas: ruana + sombrero);
+ *   · los BANDERINES de día de mercado, colgados entre los dos toldos.
  *
  * Todo `MeshLambert`/`Basic`, sin sombras (contrato de EscenaBase3D). Geometría
  * de primitivas: cero GLTF, offline y liviano.
@@ -29,6 +32,7 @@
  * producto, no cuatro surtidos de muestra).
  */
 import { useMemo } from 'react';
+import { Quaternion, Vector3 } from 'three';
 import EscenaBase3D from './EscenaBase3D.jsx';
 import { Fauna } from './FaunaEscena.jsx';
 import AnimalMomento from './AnimalMomento.jsx';
@@ -52,6 +56,12 @@ const COLOR_PRODUCTO = {
 };
 /** Tono producto neutro para un cultivo sin color propio (mimbre ámbar). */
 const PRODUCTO_NEUTRO = '#c98a3f';
+
+/* Dónde vive la BALANZA en esta plaza (frente-izquierda, en el empedrado
+   abierto) y dónde flota su píldora `precio` (en el cielo, sobre ella). Una
+   sola fuente para que letrero y pesa no se desencuentren. */
+const POS_BALANZA = /** @type {[number, number, number]} */ ([-0.5, 0, 0.78]);
+const POS_PILDORA_PRECIO = [POS_BALANZA[0], 1.55, POS_BALANZA[2]];
 
 /** Minúsculas y sin tildes, para casar el nombre del cultivo con el mapa. */
 function normalizaCultivo(nombre) {
@@ -82,6 +92,11 @@ function colorDeProducto(cultivo) {
  * cosecha → un par de canastos del MISMO cultivo real (un lote creíble), no un
  * surtido de muestra. Un `params.canastos` explícito (vitrina) manda por encima.
  *
+ * Con cosecha, el lote se ve DONDE se vende: canastos SOBRE las mesas (la mesa
+ * es para eso), canastos al PIE de cada mesa (el producto al frente del puesto,
+ * visible bajo el ala del toldo — el toldo tapa la mesa desde la cámara de
+ * calle) y el bulto ante quien compra — así el producto se lee de una.
+ *
  * @param {object|null} cosechaReciente  { cultivo, mundoId } | null
  * @param {Array|undefined} override  params.canastos explícito (vitrina)
  * @returns {Array<{producto:string, color:string, pos:number[]}>}
@@ -92,8 +107,11 @@ function canastosDeCosecha(cosechaReciente, override) {
   if (!cultivo) return [];
   const color = colorDeProducto(cultivo);
   return [
-    { producto: cultivo, color, pos: [-0.85, 0, 0.75] },
-    { producto: cultivo, color, pos: [0.55, 0, 0.7] },
+    { producto: cultivo, color, pos: [-0.85, 0.475, 0.2] }, // en la mesa del vecino
+    { producto: cultivo, color, pos: [0.9, 0.475, -0.1] },  // en la mesa de la huerta
+    { producto: cultivo, color, pos: [-0.62, 0, 0.68] },    // al pie del puesto del vecino
+    { producto: cultivo, color, pos: [1.08, 0, 0.42] },     // al pie del puesto de la huerta
+    { producto: cultivo, color, pos: [0.62, 0, 0.98] },     // el bulto ante quien compra
   ];
 }
 
@@ -234,6 +252,110 @@ function Balanza({ pos }) {
   );
 }
 
+/* Un CAMPESINO de la feria (el brief del mundo: "vender directo es poner la
+   cara"): silueta rubber-hose de primitivas — la ruana en cono, la cabeza, el
+   sombrero de ala ancha con su franja y los brazos hacia la mesa. Sin cara
+   dibujada (la escala del diorama no la pide): el sombrero + la ruana SON el
+   personaje, como en las láminas. `rotY` lo gira (el que compra mira al que
+   vende). */
+function Campesino({ pos, ruana = '#5c6b35', rotY = 0 }) {
+  return (
+    <group position={pos} rotation={[0, rotY, 0]}>
+      {/* la ruana (el cuerpo entero: cono ancho de hombros caídos) */}
+      <mesh position={[0, 0.23, 0]}>
+        <coneGeometry args={[0.16, 0.46, 7]} />
+        <meshLambertMaterial color={ruana} flatShading />
+      </mesh>
+      {/* la cabeza */}
+      <mesh position={[0, 0.5, 0]}>
+        <sphereGeometry args={[0.075, 8, 7]} />
+        <meshLambertMaterial color="#d9a06a" flatShading />
+      </mesh>
+      {/* el sombrero: ala ancha + copa con su franja oscura */}
+      <mesh position={[0, 0.565, 0]}>
+        <cylinderGeometry args={[0.115, 0.115, 0.018, 10]} />
+        <meshLambertMaterial color="#efe3c2" flatShading />
+      </mesh>
+      <mesh position={[0, 0.585, 0]}>
+        <cylinderGeometry args={[0.06, 0.066, 0.016, 8]} />
+        <meshLambertMaterial color="#4a3a24" flatShading />
+      </mesh>
+      <mesh position={[0, 0.615, 0]}>
+        <cylinderGeometry args={[0.055, 0.062, 0.05, 8]} />
+        <meshLambertMaterial color="#efe3c2" flatShading />
+      </mesh>
+      {/* los brazos, hacia la mesa (el gesto de atender) */}
+      {[-1, 1].map((lado) => (
+        <mesh
+          key={lado}
+          position={[lado * 0.135, 0.32, 0.05]}
+          rotation={[-0.5, 0, lado * -0.75]}
+        >
+          <cylinderGeometry args={[0.02, 0.024, 0.2, 5]} />
+          <meshLambertMaterial color={ruana} flatShading />
+        </mesh>
+      ))}
+    </group>
+  );
+}
+
+/* Los BANDERINES de la feria: un mástil corto sobre el remate de cada toldo
+   (izan la cuerda POR ENCIMA de los conos, para que cruce contra el cielo y no
+   se pierda contra la tela) y la cuerda de cabuya entre las puntas — dos tramos
+   rectos con su seno al medio, low-poly honesto — con sus triángulos de papel.
+   Es la seña de "día de mercado" que se lee desde lejos, sin un asset externo. */
+function Banderines({ desde, hasta, alza = 0.24, sag = 0.12 }) {
+  const { mastiles, tramos, banderas } = useMemo(() => {
+    const a = new Vector3(desde[0], desde[1] + alza, desde[2]);
+    const b = new Vector3(hasta[0], hasta[1] + alza, hasta[2]);
+    const palos = [desde, hasta].map((p) => [p[0], p[1] + alza / 2, p[2]]);
+    const m = a.clone().add(b).multiplyScalar(0.5);
+    m.y -= sag;
+    const arriba = new Vector3(0, 1, 0);
+    const pares = [[a, m], [m, b]];
+    const segs = pares.map(([p, q]) => {
+      const dir = q.clone().sub(p);
+      const len = dir.length();
+      const quat = new Quaternion().setFromUnitVectors(arriba, dir.clone().normalize());
+      const mid = p.clone().add(q).multiplyScalar(0.5);
+      return { mid: mid.toArray(), quat, len };
+    });
+    /* triángulos alternados (papel de plaza: rojo, maíz, verde, añil) */
+    const COLORES = ['#c94f3f', '#e7c451', '#3f8f4e', '#4a7ab5'];
+    const flags = [];
+    pares.forEach(([p, q]) => {
+      for (const t of [0.18, 0.42, 0.66, 0.9]) {
+        const pt = p.clone().lerp(q, t);
+        pt.y -= 0.055;
+        flags.push({ pos: pt.toArray(), color: COLORES[flags.length % 4] });
+      }
+    });
+    return { mastiles: palos, tramos: segs, banderas: flags };
+  }, [desde, hasta, alza, sag]);
+  return (
+    <group>
+      {mastiles.map((p, i) => (
+        <mesh key={`m${i}`} position={p}>
+          <cylinderGeometry args={[0.012, 0.014, alza, 4]} />
+          <meshLambertMaterial color={PALETA.madera} flatShading />
+        </mesh>
+      ))}
+      {tramos.map((s, i) => (
+        <mesh key={`c${i}`} position={s.mid} quaternion={s.quat}>
+          <cylinderGeometry args={[0.008, 0.008, s.len, 4]} />
+          <meshLambertMaterial color="#d9c69a" />
+        </mesh>
+      ))}
+      {banderas.map((f, i) => (
+        <mesh key={`b${i}`} position={f.pos} rotation={[Math.PI, 0, 0]}>
+          <coneGeometry args={[0.04, 0.09, 3]} />
+          <meshLambertMaterial color={f.color} flatShading />
+        </mesh>
+      ))}
+    </group>
+  );
+}
+
 /* Una MATA de la parcela (al fondo de la ruta): de aquí sale la cosecha. Tallo
    verde + copa redonda — la finca que alimenta la plaza. */
 function MataCampo({ pos, color = '#4e8f3f' }) {
@@ -251,7 +373,7 @@ function MataCampo({ pos, color = '#4e8f3f' }) {
   );
 }
 
-function Diorama({ params, reducedMotion, tier, fauna, estadoFinca }) {
+function Diorama({ params, reducedMotion, tier, fauna, estadoFinca, onHotspot = () => {} }) {
   const puestos = params?.puestos || [
     { color: '#c96a2f', pos: [-0.85, 0, 0.2] },
     { color: '#3f8f4e', pos: [0.9, 0, -0.1] },
@@ -307,7 +429,7 @@ function Diorama({ params, reducedMotion, tier, fauna, estadoFinca }) {
         <meshLambertMaterial color="#6d8a3e" />
       </mesh>
       {parcela.map(([x, z, c], i) => (
-        <MataCampo key={i} pos={[Number(x), 0, Number(z)]} color={c} />
+        <MataCampo key={i} pos={[Number(x), 0, Number(z)]} color={/** @type {string} */ (c)} />
       ))}
 
       {/* el anillo vivo de la plaza (el borde de la feria) */}
@@ -321,19 +443,54 @@ function Diorama({ params, reducedMotion, tier, fauna, estadoFinca }) {
         <Puesto key={i} pos={p.pos} color={p.color} />
       ))}
 
+      {/* los banderines de día de mercado, colgados entre los dos toldos */}
+      {puestos.length >= 2 && (
+        <Banderines
+          desde={[puestos[0].pos[0], 1.14, puestos[0].pos[2]]}
+          hasta={[puestos[1].pos[0], 1.14, puestos[1].pos[2]]}
+        />
+      )}
+
+      {/* la GENTE de la feria (el corazón del brief: campesinos VENDIENDO):
+          cada vendedor atendiendo en la esquina de su puesto — por FUERA del
+          ala del toldo, que detrás de la mesa el techo los tapaba desde la
+          cámara — y quien compra al frente, con su canasto: el trato directo
+          hecho cuerpo. Giros mirando al centro de la plaza (a su clientela). */}
+      {puestos[0] && (
+        <Campesino
+          pos={[puestos[0].pos[0] - 0.77, 0, puestos[0].pos[2] + 0.42]}
+          ruana="#5c6b35"
+          rotY={1.35}
+        />
+      )}
+      {puestos[1] && (
+        <Campesino
+          pos={[puestos[1].pos[0] + 0.62, 0, puestos[1].pos[2] + 0.32]}
+          ruana="#a04434"
+          rotY={-1.25}
+        />
+      )}
+      {/* quien compra llega por el frente derecho, de medio lado (que la luz
+          de la plaza le dé en la ruana y no lea como silueta a contraluz) */}
+      <group scale={0.92}>
+        <Campesino pos={[0.95, 0, 1.2]} ruana="#9aa8c5" rotY={-Math.PI * 0.7} />
+      </group>
+
       {/* los canastos con la cosecha REAL de la finca (sobre las mesas y el piso) */}
       {canastos.map((c, i) => (
         <Canasto key={i} pos={c.pos} color={c.color} />
       ))}
-      {/* plaza tranquila (sin cosecha reciente): un canasto VACÍO que espera */}
-      {plazaTranquila && <Canasto pos={[-0.85, 0, 0.75]} vacio />}
+      {/* plaza tranquila (sin cosecha reciente): un canasto VACÍO esperando
+          sobre la mesa — la feria lista, la cosecha que aún no llega */}
+      {plazaTranquila && <Canasto pos={[-0.85, 0.475, 0.2]} vacio />}
 
       {/* la tarima del sello de procedencia (el terroir andino) */}
       <TarimaProcedencia pos={[-1.4, 0, -0.35]} />
 
-      {/* la balanza del precio justo — posada en el empedrado (antes flotaba
-          ~0.45 sobre el piso sin mesa que la sostuviera). */}
-      <Balanza pos={[0.15, 0, 0.55]} />
+      {/* la balanza del precio justo — posada en el empedrado del frente-
+          izquierda (el punto despejado de la plaza: antes vivía en el centro
+          exacto y su píldora tapaba los puestos; su hotspot la acompaña). */}
+      <Balanza pos={POS_BALANZA} />
 
       {/* los VENDIDOS que llegan del corral: bajan por la ruta y se posan al
           frente de los puestos, cada uno con su NOMBRE (el dato viajó con él). */}
@@ -345,15 +502,18 @@ function Diorama({ params, reducedMotion, tier, fauna, estadoFinca }) {
             animal={a}
             modo="llega"
             origen={[x, 0, -2.1]}
-            destino={[x, 0, 0.4]}
+            destino={[x, 0, 0.75]}
             reducedMotion={reducedMotion}
             tier={tier}
+            /* tocar al vendido abre la puerta de VENDER (contrato onHotspot =
+               (view, data), no el objeto animal: eso rompía la narración) */
+            onPick={() => onHotspot('mercado')}
           />
         );
       })}
 
       {/* la fauna que anima la feria (polinizadores de puesto y plaza) */}
-      <Fauna items={fauna} reducedMotion={reducedMotion} />
+      <Fauna items={fauna} reducedMotion={reducedMotion} tier={tier} viento={estadoFinca?.viento} />
     </group>
   );
 }
@@ -363,14 +523,49 @@ export default function EscenaMercado(props) {
   // hora dorada del valle: entrar debe sentirse como acercarse, no otra app).
   const cielo = CIELOS.plaza;
   const fauna = faunaDeMundo(props.mundoId, { tier: props.tier });
+  // Ajuste PRESENTACIONAL de la escena (gate visual 2026-07-30): las píldoras
+  // de las puertas flotaban a media altura del diorama y la PLENA (el foco por
+  // "más apuntado" de EscenaBase3D, siempre la más central) caía encima de los
+  // puestos, la gente y los banderines — tapaba el mercado entero. Se suben
+  // TODAS por encima de la línea de banderines (y≈1.14): la plena queda como el
+  // rótulo flotante de la plaza en la franja de cielo vacía (Angelita la ronda
+  // allá arriba) y las demás se calman a punto-chip sobre su puerta. `precio`
+  // además acompaña a la balanza, que en esta escena vive al frente-izquierda
+  // (ver Diorama). El DATO (mundoData) no se toca: view, label y puerta siguen
+  // idénticos; solo se acomoda el letrero en el aire.
+  const hotspots = useMemo(
+    () =>
+      (props.hotspots || []).map((h) => {
+        if (h.id === 'precio') return { ...h, pos: POS_PILDORA_PRECIO };
+        // TODAS las demás también por encima de la línea de banderines: la que
+        // gane el foco (la más centrada cambia con la cámara) siempre queda en
+        // el cielo, nunca tapando puestos/gente/producto.
+        return { ...h, pos: [h.pos[0], 1.45, h.pos[2]] };
+      }),
+    [props.hotspots],
+  );
   return (
-    <EscenaBase3D {...props} cielo={cielo} entrada={{ ...props.entrada, centro: [0, 0.5, 0] }}>
+    <EscenaBase3D
+      {...props}
+      hotspots={hotspots}
+      cielo={cielo}
+      /* Encuadre propio de la escena (gate visual 2026-07-30): con zoom 7 la
+         plaza quedaba chiquita en un mar de cielo. 5.2 la sienta en el marco
+         (la cámara arranca ~6.5u del centro, la plaza llena el ancho) y el
+         centro bajito deja aire arriba para toldos y banderines sin cortarlos. */
+      entrada={{ ...props.entrada, zoom: 5.2, centro: [0, 0.25, 0] }}
+      /* Cámara a media altura de calle (no el picado default de zoom*0.5): a
+         esta plaza se entra caminando — así se ve DEBAJO de los toldos (mesas,
+         gente, producto) y los banderines quedan contra el cielo. */
+      camara={{ position: [2.9, 2.05, 5.2], fov: 44 }}
+    >
       <Diorama
         params={props.params}
         reducedMotion={props.reducedMotion}
         tier={props.tier}
         fauna={fauna}
         estadoFinca={props.estadoFinca}
+        onHotspot={props.onHotspot}
       />
     </EscenaBase3D>
   );

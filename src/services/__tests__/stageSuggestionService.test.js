@@ -44,14 +44,14 @@ describe('suggestStageFromText', () => {
 
 describe('suggestStageFromObservation', () => {
   it('crea observacion con stage_suggestion si hay match', async () => {
-    await suggestStageFromObservation({ processId: 'p1', text: 'salió el brote' });
+    await suggestStageFromObservation(/** @type {any} */ ({ processId: 'p1', text: 'salió el brote' }));
     expect(registerObservation).toHaveBeenCalledWith(
       expect.objectContaining({ processId: 'p1' })
     );
   });
 
   it('crea observacion sin stage_suggestion si no hay match', async () => {
-    await suggestStageFromObservation({ processId: 'p1', text: 'hoy hace buen clima' });
+    await suggestStageFromObservation(/** @type {any} */ ({ processId: 'p1', text: 'hoy hace buen clima' }));
     expect(registerObservation).toHaveBeenCalled();
   });
 });

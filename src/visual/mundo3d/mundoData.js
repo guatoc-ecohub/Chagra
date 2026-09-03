@@ -14,6 +14,7 @@
  *     valle,      // (opcional) landmark en el mapa del valle: { tipo, pos, escala }
  *     gate,       // (opcional) perfil requerido (p.ej. 'animales')
  *     ambiental,  // (opcional) el clima ya vive en el ambiente del valle
+ *     pisoTermico,// piso de anclaje en la Sierra (la compatibilidad se deriva)
  *   }
  *
  * Sumar un mundo = UNA de estas entradas + assets de la librería (lámina/creature/
@@ -22,6 +23,8 @@
  * Título/emoji/tinte NO se duplican: se resuelven contra el manifiesto real
  * (mundosFinca.js) en `resolverTinte`/`tituloMundo` (mundo host).
  */
+import { BOVEDA_PISOS_DEF } from './pisosTermicos.js';
+
 
 /*
  * EL HATO DE MUESTRA — UNA sola fuente para DOS mundos (consistencia cross-mundo,
@@ -37,6 +40,10 @@ const HATO_MUESTRA = [
   { especie: 'cerdo', nombre: 'Canelo', raza: 'duroc', tamano: 'mediano', estado: 'sano' },
   { especie: 'cerdo', nombre: 'Rosita', raza: 'landrace', tamano: 'pequeño', estado: 'sano' },
   { especie: 'cerdo', nombre: 'Manchas', raza: 'sanpedreño', tamano: 'pequeño', estado: 'sano' },
+  // Herradura: la TERCERA criolla porcina colombiana (AGROSAVIA) — capa
+  // rojiza-amarillenta y casco entero como el de una mula. Que el hato de
+  // muestra enseñe las tres, no solo dos.
+  { especie: 'cerdo', nombre: 'Herradura', raza: 'casco de mula', tamano: 'mediano', estado: 'sano' },
   { especie: 'cerdo', nombre: 'Tocineta', raza: 'landrace', tamano: 'pequeño', estado: 'sano' },
   { especie: 'vaca', nombre: 'Lola', raza: 'normando', tamano: 'grande', estado: 'sano' },
   // Camilo: VENDIDO. En el corral queda su huella; en el mercado llega en cuerpo.
@@ -58,6 +65,7 @@ export const MUNDO = {
   // 🌱 EL SUELO VIVO — el PROTOTIPO del DR (cutaway). Reusa mundoSubsueloEngine
   //    para la densidad de vida (`params.vida` 0..1; aquí, valor de muestra).
   suelo: {
+    pisoTermico: 'templado',
     escena: 'cutaway',
     valle: { tipo: 'era', pos: [-1.1, 0, 3.6], escala: 1 },
     params: {
@@ -65,14 +73,20 @@ export const MUNDO = {
       vidaFrom: 'mundoSubsueloEngine',
       capas: [
         { nombre: 'hojarasca', color: '#6b4a2e', alto: 0.5, bichos: ['lombriz'] },
-        { nombre: 'suelo negro', color: '#3a2a1a', alto: 1.2, bichos: ['lombriz', 'raiz', 'hifa'] },
+        // #3a2a1a leía como masa NEGRA ilegible aun con el piso de luz (QA
+        // visual 2026-07-23): albedo, no iluminación. Sigue siendo la capa más
+        // oscura (la didáctica del "suelo negro" queda), pero ahora se lee.
+        { nombre: 'suelo negro', color: '#4a3624', alto: 1.2, bichos: ['lombriz', 'raiz', 'hifa'] },
         { nombre: 'subsuelo', color: '#8a6a44', alto: 1.0, bichos: ['raiz'] },
       ],
     },
     hotspots: [
       { id: 'juego', pos: [0, 0.6, 0.6], emoji: '🪱', label: 'Despierte su suelo', view: 'subsuelo' },
       { id: 'cuaderno', pos: [1.3, 0.2, 0.4], emoji: '📓', label: 'Cuaderno del suelo', view: 'salud_suelo' },
-      { id: 'crom', pos: [-1.3, 0.2, 0.4], emoji: '🎯', label: 'Cromatografía', view: 'cromatografia' },
+      // La cromatografía lee el PERFIL completo → su puerta va abajo, en el
+      // subsuelo. En y=0.2 su píldora se montaba sobre «Despierte su suelo» y
+      // tapaba el texto en móvil 390px (QA visual 2026-07-23).
+      { id: 'crom', pos: [-1.3, -0.55, 0.4], emoji: '🎯', label: 'Cromatografía', view: 'cromatografia' },
     ],
     entrada: { zoom: 6.5, narra: 'suelo' },
   },
@@ -84,6 +98,7 @@ export const MUNDO = {
   //    Todo es DATOS: la curva de la quebrada + los hitos del recorrido los
   //    leen por igual el diorama 3D (EscenaFlujo) y su gemelo 2D (FondoFlujo).
   agua: {
+    pisoTermico: 'paramo',
     escena: 'flujo',
     valle: { tipo: 'quebrada', pos: [0.6, 0, -1.4], escala: 1 },
     params: {
@@ -125,6 +140,7 @@ export const MUNDO = {
   //    real de farmOS aquí mismo (misma forma; `pos` es opcional — sin él, los
   //    sitios salen solos). MUESTRA compartida con el mercado (mismo dato):
   animales: {
+    pisoTermico: 'calido',
     escena: 'recinto',
     valle: { tipo: 'corral', pos: [-4.6, 0, -1.8], escala: 1 },
     gate: 'animales',
@@ -141,6 +157,7 @@ export const MUNDO = {
 
   // 🌳 DISEÑO DE LA FINCA — la verticalidad del bosque comestible (estratos).
   disenio: {
+    pisoTermico: 'templado',
     escena: 'estratos',
     valle: { tipo: 'bosque', pos: [4.8, 0, -2.6], escala: 1.1 },
     params: {},
@@ -155,6 +172,7 @@ export const MUNDO = {
   // 🗺️ EL VALLE — el mapa navegable (valle). Es "un mundo más" del registro: su
   //    escena ES el mapa entero; sus hotspots son los demás mundos.
   valle: {
+    pisoTermico: 'calido',
     escena: 'valle',
     params: { clima: 'soleado' },
     entrada: { narra: 'bienvenida', clima: 'soleado', alertaView: 'hoy_finca' },
@@ -165,6 +183,7 @@ export const MUNDO = {
   // 🐄 ESTIÉRCOL Y COMPOST — REUSA `cutaway` para el corte de la pila (capas
   //    café/verde, calor). Prueba viva de "sumar un SÍ-3D = datos, sin código".
   abono: {
+    pisoTermico: 'templado',
     escena: 'cutaway',
     valle: { tipo: 'huerta', pos: [1.8, 0, 4.4], escala: 0.95 },
     params: {
@@ -186,6 +205,7 @@ export const MUNDO = {
 
   // 🌾 CULTIVOS — arquetipo `lamina`: reusa la lámina de maíz de la librería.
   cultivos: {
+    pisoTermico: 'calido',
     escena: 'lamina',
     valle: { tipo: 'milpa', pos: [-3.2, 0, 1.6], escala: 1.15 },
     params: { lamina: 'maiz' },
@@ -208,35 +228,29 @@ export const MUNDO = {
   //    Cada punto es una puerta a una pantalla REAL. En equipo humilde cae a su
   //    ficha 2D digna (la infografía del café).
   cafe: {
+    pisoTermico: 'templado',
     escena: 'cafe',
     valle: { tipo: 'cafetal', pos: [3.4, 0, 2.2], escala: 1 },
-    params: {
-      // El diorama tiene defaults propios; aquí los hacemos explícitos y
-      // deterministas (mismos cafetos, sombra y estados del grano).
-      cafetos: [
-        { color: '#3f6f3a', pos: [-0.55, 0, 0.42], cerezas: 6 },
-        { color: '#468637', pos: [0.5, 0, 0.12], cerezas: 5 },
-        { color: '#3f6f3a', pos: [0.02, 0, -0.5], cerezas: 4, roya: true },
-        { color: '#457d38', pos: [-0.78, 0, -0.32], cerezas: 5 },
-      ],
-      sombra: [
-        { pos: [-1.65, 0, -0.95], color: '#4b7a3a', alto: 2.2 }, // guamo (Inga)
-        { pos: [1.7, 0, -0.8], color: '#3f6b39', alto: 2.0 },    // nogal cafetero
-      ],
-      granos: [
-        { estado: 'cereza', color: '#b8342a', pos: [-1.5, 0, 0.75] },
-        { estado: 'pergamino', color: '#d4c199', pos: [-1.15, 0, 1.05] },
-        { estado: 'oro', color: '#9fae5a', pos: [-0.72, 0, 1.2] },
-      ],
-    },
+    // La escena es LA LADERA COMPLETA de `cafetal/` (geografía determinista en
+    // floraCafetal.geom): ya no hay cafetos de mesa que declarar aquí. El `id`
+    // ancla la capa viva (partículas/momentos) a la siembra propia del mundo.
+    params: { id: 'cafe' },
+    // Las puertas repartidas EN PROFUNDIDAD ladera arriba (entrada con aire, un
+    // solo foco cerca): el grano en la mata protagonista del camino, la sombra
+    // en el guamo del centro, la roya en su mata señalada, el manejo en la
+    // trampa de broca y el beneficio en la casa que corona la loma. Alturas
+    // horneadas del terreno real (alturaLadera + el porte de cada elemento).
     hotspots: [
-      { id: 'grano', pos: [-0.55, 0.9, 0.42], emoji: '☕', label: 'El grano, paso a paso', view: 'cafe' },
-      { id: 'sombra', pos: [-1.65, 2.5, -0.95], emoji: '🌳', label: 'El café bajo sombra', view: 'biodiversidad' },
-      { id: 'roya', pos: [0.02, 0.85, -0.5], emoji: '🍂', label: 'La roya y la broca', view: 'plagas' },
-      { id: 'manejo', pos: [0.5, 0.82, 0.12], emoji: '🐞', label: 'Manejo sin veneno', view: 'biopreparados' },
-      { id: 'beneficio', pos: [1.0, 0.7, 0.55], emoji: '💧', label: 'Despulpar, fermentar, secar', view: 'poscosecha' },
+      { id: 'grano', pos: [-2.8, 1.9, 5.6], emoji: '☕', label: 'El grano, paso a paso', view: 'cafe' },
+      { id: 'sombra', pos: [3.2, 4.7, 2.4], emoji: '🌳', label: 'El café bajo sombra', view: 'biodiversidad' },
+      { id: 'roya', pos: [-5.6, 2.7, -1.5], emoji: '🍂', label: 'La roya y la broca', view: 'plagas' },
+      { id: 'manejo', pos: [4.6, 2.6, -0.6], emoji: '🐞', label: 'Manejo sin veneno', view: 'biopreparados' },
+      { id: 'beneficio', pos: [10.2, 7.5, -13.6], emoji: '💧', label: 'Despulpar, fermentar, secar', view: 'poscosecha' },
     ],
-    entrada: { zoom: 7.5, narra: 'cafe' },
+    // El centro se corre atrás y abajo para que la mirada de EscenaBase3D
+    // (centro.y + zoom·0.12) caiga en CAMARA.mirada de floraCafetal.geom: la
+    // cámara pasa POR DEBAJO del techo de sombra, no entre las copas.
+    entrada: { zoom: 13, centro: [-0.4, 2.24, -3.4], narra: 'cafe' },
     // El gemelo 2D digno: la ficha del café (misma lección, en cifras y notas).
     fallback2d: {
       escena: 'infografia',
@@ -257,6 +271,7 @@ export const MUNDO = {
 
   // 🍊 FRUTALES — arquetipo `ficha`: tarjeta de especie foto-secuencial.
   frutales: {
+    pisoTermico: 'calido',
     escena: 'ficha',
     params: {
       nombre: 'Frutales de la finca',
@@ -283,6 +298,7 @@ export const MUNDO = {
   //    intermediario). Cada punto es una puerta a una pantalla REAL. En equipo
   //    humilde cae a su ficha 2D digna (la infografía del mercado y la despensa).
   mercado: {
+    pisoTermico: 'calido',
     escena: 'mercado',
     valle: { tipo: 'mercado', pos: [1.2, 0, 6.6], escala: 1 },
     params: {
@@ -334,6 +350,7 @@ export const MUNDO = {
   //    (mariquita, carábido). Cada punto es una puerta a una pantalla REAL. En
   //    equipo humilde cae a su ficha 2D digna (la infografía de la sanidad).
   sanidad: {
+    pisoTermico: 'templado',
     escena: 'sanidad',
     valle: { tipo: 'huerta', pos: [3.8, 0, 4.9], escala: 0.95 },
     params: {
@@ -388,6 +405,7 @@ export const MUNDO = {
   //    hacia 2040–2050). NOTA DE CONCIENCIA, esperanza no colapso: el páramo es la
   //    fábrica de agua. En equipo humilde cae al gemelo 2D (mirror → cielo).
   clima: {
+    pisoTermico: 'paramo',
     escena: 'boveda',
     valle: { tipo: 'veleta', pos: [-3.8, 0, -4.8], escala: 1 },
     ambiental: true,
@@ -395,13 +413,17 @@ export const MUNDO = {
       hora: 0.62,           // media tarde andina (0 amanece · 0.5 mediodía · 1 anochece)
       temporada: 'lluvia',  // régimen BIMODAL andino: dos lluvias / dos secas
       niebla: 0.6,          // niebla del páramo: el frailejón peina el agua de la nube
-      // La montaña en cuatro pisos térmicos (misma paleta del mundo #4).
-      pisos: [
-        { nombre: 'cálido', color: '#c7a24b', h: 0.95, r0: 2.4, r1: 1.95 },
-        { nombre: 'templado', color: '#8fae55', h: 0.9, r1: 1.42 },
-        { nombre: 'frío', color: '#6f9a72', h: 0.85, r1: 0.9 },
-        { nombre: 'páramo', color: '#9fb6bf', h: 0.8, r1: 0.42 },
-      ],
+      // 🔴 LA MONTAÑA SON SIETE PISOS, no cuatro. Hasta el 2026-09-02 esta lista
+      // traía cuatro pisos con paleta propia (`#c7a24b`/`#8fae55`/`#6f9a72`/
+      // `#9fb6bf`) — el defecto §0 del diseño: «Clima enseña 4 pisos; la Sierra
+      // enseña 7. Se contradicen». Ahora se LEE la tabla canónica
+      // (`BOVEDA_PISOS_DEF`, derivada de `PISOS_TERMICOS_SIERRA`), que es la
+      // misma que pintan la vista global, el descenso y el macizo 3D. La
+      // geometría no cambia (cima 3,5 · base 2,4 · cima 0,42 en los dos juegos,
+      // verificado); lo que cambia es que el GEMELO 2D de la bóveda —el que ve
+      // el equipo humilde, `laminas2d/LaminaMundo.jsx` FondoBoveda— deja de
+      // enseñar cuatro bandas inventadas y enseña las siete de la tabla.
+      pisos: BOVEDA_PISOS_DEF,
       // El hielo de hoy + la línea de hasta dónde llegaba (retroceso). Ámbar de
       // "cuídelo", jamás rojo de catástrofe.
       glaciar: { nieve: 0.32, retroceso: 0.7 },
@@ -410,7 +432,9 @@ export const MUNDO = {
       // como ciclo (Niña→Neutro→Niño), no como amenaza. DIDÁCTICO: arranca en una
       // fase visible; el día que exista un `get_enso_status` real (índice ONI de
       // la región Niño 3.4) se cablea aquí la fase viva. Estados: 'nina'|'neutral'|'nino'.
-      enso: { fase: 'nino' },
+      // Sin snapshot ENSO no se elige una fase a mano. La escena arranca en
+      // neutral y, cuando climaService tiene señal viva, la sustituye.
+      enso: { fase: 'neutral' },
     },
     hotspots: [
       { id: 'hoy', pos: [2.7, 3.4, 0.6], emoji: '⛅', label: 'El tiempo hoy', view: 'hoy_finca' },
@@ -430,6 +454,7 @@ export const MUNDO = {
   //    arquetipo `cutaway` (mismas capas + vida) y enciende el módulo `milpa`.
   //    Policultivo, no monocultivo: juntas rinden más y se cuidan (push-pull).
   milpa: {
+    pisoTermico: 'calido',
     escena: 'cutaway',
     params: {
       vida: 0.5,
@@ -464,6 +489,7 @@ export const MUNDO = {
   //    gradiente ALTITUDINAL, que vive en `params.pisos` (de bajo a alto) y lo
   //    leen por igual el diorama 3D y su gemelo 2D. Vitrina: #/mockups/mundo3d-bosque.
   pisos: {
+    pisoTermico: 'frio',
     escena: 'estratos',
     params: {
       // Pisos de bajo (cálido) a alto (páramo). Verificado (catálogo thermal_zones
@@ -477,11 +503,14 @@ export const MUNDO = {
         { id: 'paramo', nombre: 'Páramo', rango: '3000–4200 m', color: '#aec7cf', cultivo: 'frailejon', niebla: true, protege: true },
       ],
     },
+    // Hotspots en el espacio de la escena: el diorama de la ladera baja 1.55
+    // (centrado en el origen para el encuadre digno con reduced-motion — ver
+    // DioramaPisos en EscenaEstratos.jsx); estas alturas van bajadas igual.
     hotspots: [
-      { id: 'directorio', pos: [-1.4, 1.7, 0.7], emoji: '🌡️', label: 'Qué siembro según mi altura', view: 'directorio' },
-      { id: 'cafe', pos: [1.0, 1.75, 0.15], emoji: '☕', label: 'El piso del café', view: 'cafe' },
-      { id: 'papa', pos: [-1.0, 2.9, -0.35], emoji: '🥔', label: 'El piso de la papa', view: 'tuberculos' },
-      { id: 'paramo', pos: [0.7, 4.0, -0.9], emoji: '🏔️', label: 'El páramo se cuida', view: 'restauracion' },
+      { id: 'directorio', pos: [-1.4, 0.15, 0.7], emoji: '🌡️', label: 'Qué siembro según mi altura', view: 'directorio' },
+      { id: 'cafe', pos: [1.0, 0.2, 0.15], emoji: '☕', label: 'El piso del café', view: 'cafe' },
+      { id: 'papa', pos: [-1.0, 1.35, -0.35], emoji: '🥔', label: 'El piso de la papa', view: 'tuberculos' },
+      { id: 'paramo', pos: [0.7, 2.45, -0.9], emoji: '🏔️', label: 'El páramo se cuida', view: 'restauracion' },
     ],
     entrada: { zoom: 8, narra: 'pisos' },
   },
@@ -498,6 +527,7 @@ export const MUNDO = {
   //    ficha 2D digna (la infografía del semillero).
   //    (anti-conflicto de merge: entrada de mundo nueva SIEMPRE al final.)
   semillero: {
+    pisoTermico: 'templado',
     escena: 'semillero',
     valle: { tipo: 'semillero', pos: [-2.6, 0, 6.2], escala: 1 },
     params: {
@@ -535,6 +565,142 @@ export const MUNDO = {
         ],
       },
     },
+  },
+
+  // 🍄 EL SUELO VIVO — la RED MICORRÍZICA bajo tierra (arquetipo SÍ-3D nuevo
+  //    `micorrizas`, el "wood-wide web"). La cámara baja BAJO EL SUELO y se ve lo
+  //    invisible: la red de hongos bioluminiscente que enlaza las raíces del maíz,
+  //    el fríjol y la ahuyama (las tres hermanas) y del árbol madre, con PULSOS de
+  //    nutrientes corriendo por los hilos —fósforo/agua que SUBEN a la mata, azúcar
+  //    que BAJA al hongo— y los PUENTES entre plantas distintas (el reparto). El
+  //    Ent de la queñua asoma enseñando. Se ancla en TEMPLADO (el corazón de la
+  //    chagra), pero el suelo vivo aplica a todos los pisos. Cada punto es una
+  //    puerta real; en equipo humilde cae a su espejo 2D.
+  //    (anti-conflicto de merge: entrada de mundo nueva SIEMPRE al final.)
+  micorrizas: {
+    pisoTermico: 'templado',
+    escena: 'micorrizas',
+    valle: { tipo: 'hongos', pos: [-2.7, 0, 3.3], escala: 1 },
+    params: {},
+    hotspots: [
+      { id: 'reparto', pos: [-1.4, -1.3, 0.3], emoji: '🤝', label: 'Se ayudan bajo tierra', view: 'asociaciones' },
+      { id: 'intercambio', pos: [0.5, -2.1, 0.2], emoji: '💛', label: 'Fósforo por azúcar', view: 'salud_suelo' },
+      { id: 'cuidar', pos: [-2.4, -0.35, 0.4], emoji: '🛡️', label: 'Cuide la red: compost, no queme', view: 'compost' },
+      { id: 'arbol', pos: [2.6, 0.4, -0.3], emoji: '🌳', label: 'El árbol madre alimenta', view: 'restauracion' },
+    ],
+    entrada: { zoom: 6.5, narra: 'micorrizas' },
+    // El gemelo 2D digno (mirror → motivo `micorrizas`): la misma red, dibujada.
+    fallback2d: { escena: 'mirror' },
+  },
+
+  // 🏔️ EL PÁRAMO — la FÁBRICA DE AGUA de la finca (arquetipo SÍ-3D `paramo`). El
+  //    mundo alto de la cordillera: la planicie altoandina sobre 3.000+ m, con el
+  //    FRAILEJONAL caulirrósulo (tallo vestido de enagua de necromasa + roseta
+  //    afelpada plateada que le peina el agua a la niebla), el pajonal/sotobosque,
+  //    la NIEBLA densa en capas y la INMENSIDAD de la montaña (cordillera y mar de
+  //    nubes). Render ilustrado tipo lámina de Humboldt + atmósfera Ghibli, huesos
+  //    reales (estructura/escala/altitud EXACTAS del DR-paramo-frailejon). El
+  //    páramo se CUIDA, no se ara: sus puertas hablan de agua, conservación y vida.
+  //    Reusa el páramo definitivo aprobado (bosque/EscenaBosqueVivo) — cero arte
+  //    nuevo. En equipo humilde cae a su ficha 2D (infografía del páramo).
+  //    (anti-conflicto de merge: entrada de mundo nueva SIEMPRE al final.)
+  paramo: {
+    pisoTermico: 'paramo',
+    escena: 'paramo',
+    // La puerta de arriba del valle (zona alta/lejana de la ladera): espeja el
+    // landmark de valleData (LUGARES.paramo) para el mapa navegable.
+    valle: { tipo: 'frailejonal', pos: [-0.9, 0, -7.6], escala: 0.95 },
+    params: {},
+    // Puertas del páramo (por DATOS). Cada `view` es una vista REAL de App.jsx.
+    // `pos` queda para el anclaje 3D fino de Opus; la capa DOM usa emoji+label.
+    hotspots: [
+      { id: 'agua', pos: [-1.6, 3.4, 0.6], emoji: '💧', label: 'La fábrica de agua', view: 'agua', data: { tema: 'nacimiento' } },
+      { id: 'cuidar', pos: [4.1, 3.0, -3.9], emoji: '🏔️', label: 'El páramo se cuida, no se ara', view: 'restauracion' },
+      { id: 'vida', pos: [1.9, 2.6, 1.7], emoji: '🦅', label: 'La vida del páramo', view: 'biodiversidad' },
+    ],
+    entrada: { zoom: 9, narra: 'paramo' },
+    // El gemelo 2D digno: la ficha del páramo (misma lección, en cifras y notas).
+    fallback2d: {
+      escena: 'infografia',
+      params: {
+        titulo: 'El páramo, la fábrica de agua',
+        cifras: [
+          { valor: '3.000–4.200', unidad: 'm', label: 'la altura del páramo andino, por encima del bosque altoandino y bajo las nieves' },
+          { valor: '~1', unidad: 'cm/año', label: 'lo que crece un frailejón: los grandes son viejísimos, por eso la colonia va dispersa' },
+          { valor: '~50', unidad: '%', label: 'de los páramos del mundo están en Colombia: un ecosistema casi único que nos toca cuidar' },
+        ],
+        notas: [
+          'El frailejón peina el agua de la niebla con sus hojas de lana (tricomas) y la enagua de hojas muertas lo abriga del frío; el musgo la guarda como esponja y la suelta despacio al suelo.',
+          'De aquí, gota a gota, nace el agua que baja a la finca. Por eso el páramo se cuida, no se ara: ni ganado, ni quema, ni papa en lo alto.',
+          'Es un mundo de niebla y frío: casi sin árboles, con frailejonal y pajonal sobre suelo negro y turberas. La vida de aquí —cóndor, oso, venadito— vive de esa agua.',
+        ],
+      },
+    },
+  },
+
+  // 🌿 EL BOSQUE NATIVO — el BOSQUE ALTOANDINO DE TRES ESTRATOS (arquetipo SÍ-3D
+  //    nuevo `bosque`). NO es el bosque comestible de la finca (ese es `disenio`,
+  //    que usa `estratos` para los 7 estratos productivos): este es el MONTE
+  //    NATIVO que la abraza — el bosque de niebla de 2400-3300 msnm, leído como
+  //    una lámina de Humboldt viva. Uno se para en el CLARO y mira la orilla del
+  //    rodal: el DOSEL (encenillo, cedro, nogal, palma de cera emergente), el
+  //    SOTOBOSQUE (mano de oso, helecho arbóreo, chusque, arbusto en flor, bejuco
+  //    con bromelias) y el SUELO (helechos, hierba de sombra, cojines de musgo).
+  //    Las epífitas van horneadas sobre los forófitos; la niebla y la luz
+  //    filtrada ponen la atmósfera. Los tres botones señalan cada estrato sin
+  //    salir del mundo. En equipo humilde cae a su ficha 2D digna (la lámina de
+  //    los tres estratos). (anti-conflicto de merge: entrada nueva SIEMPRE al final.)
+  bosque: {
+    pisoTermico: 'frio',
+    escena: 'bosque',
+    valle: { tipo: 'bosque', pos: [6.0, 0, -5.2], escala: 1.1 },
+    params: { seed: 4242, extension: 23 },
+    entrada: { narra: 'bosque' },
+    // El gemelo 2D digno: la lámina de los tres estratos (misma lección en notas).
+    fallback2d: {
+      escena: 'infografia',
+      params: {
+        titulo: 'El bosque nativo altoandino',
+        cifras: [
+          { valor: '2.400–3.300', unidad: 'm', label: 'la altura del bosque de niebla altoandino' },
+          { valor: '3', unidad: 'estratos', label: 'dosel (9–17 m) · sotobosque (2–6 m) · suelo (musgo y helechos)' },
+        ],
+        notas: [
+          'El DOSEL es el techo: encenillo, cedro, nogal y la palma de cera asomando. Su sombra hace el clima de todo lo de abajo.',
+          'El SOTOBOSQUE vive de la luz colada: helechos arbóreos, chusque, arbustos en flor y el bejuco que sube cargando bromelias.',
+          'El SUELO es una esponja de musgo, briofitas y hojarasca que guarda el agua de la niebla y la suelta despacio.',
+          'Las epífitas —orquídeas, bromelias y helechos— viven montadas sobre los troncos sin robarles: son el sello del bosque de niebla.',
+        ],
+      },
+    },
+  },
+
+  // 💦 LA CHORRERA — la QUEBRADA DE MONTAÑA con su salto (arquetipo SÍ-3D nuevo
+  //    `chorrera`). No es el `flujo` (el agua que BAJA por la pendiente para
+  //    regar): aquí el agua CAE. El bosque de niebla andino (~2200–2800 msnm)
+  //    hecho lugar: el cauce rocoso estrecho de alta pendiente, la CHORRERA
+  //    sobre el escarpe estratificado (roca sedimentaria angular), el POZO
+  //    cristalino de guijarros pulidos en la base, la escalera de terrazas y
+  //    micro-cascadas, y el bosque prehistórico de helechos arborescentes,
+  //    musgo aterciopelado y epífitas bajo la niebla. Huesos reales de la
+  //    quebrada de Guatoc (DR-chorrera-quebrada-guatoc), piel dibujada estilo
+  //    lámina naturalista de Humboldt + atmósfera Ghibli. Agua SIN física
+  //    (planos + shader + sprites). En equipo humilde cae a su espejo 2D.
+  //    (anti-conflicto de merge: entrada de mundo nueva SIEMPRE al final.)
+  chorrera: {
+    pisoTermico: 'frio',
+    escena: 'chorrera',
+    valle: { tipo: 'chorrera', pos: [2.4, 0, -3.6], escala: 1 },
+    params: {},
+    hotspots: [
+      { id: 'salto', pos: [0, 2.2, -0.6], emoji: '💦', label: 'El salto de agua', view: 'agua', data: { tema: 'nacimiento' } },
+      { id: 'pozo', pos: [0.15, 0.7, 0.35], emoji: '💧', label: 'El pozo cristalino', view: 'biodiversidad' },
+      { id: 'helechos', pos: [-2.85, 1.6, 1.7], emoji: '🌿', label: 'Helechos y musgos', view: 'restauracion' },
+      { id: 'ronda', pos: [2.7, 1.4, 1.15], emoji: '🌳', label: 'La ronda que la cuida', view: 'restauracion' },
+    ],
+    entrada: { zoom: 8.5, centro: [0, 1.7, -0.3], narra: 'chorrera' },
+    // El gemelo 2D digno (mirror → motivo `chorrera`): la misma quebrada, dibujada.
+    fallback2d: { escena: 'mirror' },
   },
 };
 

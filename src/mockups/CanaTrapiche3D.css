@@ -1,0 +1,300 @@
+/*
+ * CanaTrapiche3D.css — vitrina del mundo de la caña (#/mockups/cana-trapiche-3d).
+ * Autocontenida: sin fuentes/imágenes externas. Móvil-first desde 320px.
+ * Paleta de tierra caliente: el dorado seco del cañaveral, el pardo quemado de
+ * la hornilla y el ámbar de la miel. Solo opacity/transform se animan.
+ */
+
+.ctrap {
+  min-height: 100vh;
+  min-height: 100dvh;
+  padding: 1rem 0.9rem 2.5rem;
+  /* la familia plaza bajo la hora dorada (paleta madre): tierra baja, no menta */
+  background: linear-gradient(180deg, #ecdcb6 0%, #f0e2c2 46%, #f6ecd4 100%);
+  color: #33291b;
+  font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+}
+
+.ctrap__head {
+  max-width: 46rem;
+  margin: 0 auto 1rem;
+}
+.ctrap__kicker {
+  margin: 0 0 0.2rem;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #9a4a1c;
+}
+.ctrap__head h1 {
+  margin: 0;
+  font-size: clamp(1.5rem, 5vw, 2.2rem);
+  line-height: 1.15;
+  color: #43361f;
+}
+.ctrap__lema {
+  margin: 0.4rem 0 0;
+  font-size: 0.98rem;
+  line-height: 1.45;
+  max-width: 40rem;
+}
+
+.ctrap__escena {
+  max-width: 46rem;
+  margin: 0 auto;
+}
+.ctrap__lienzo {
+  position: relative;
+  height: min(66vh, 32rem);
+  min-height: 320px;
+  border-radius: 14px;
+  overflow: hidden;
+  border: 1px solid rgba(154, 74, 28, 0.28);
+  box-shadow: 0 12px 30px rgba(58, 42, 22, 0.18);
+  background: radial-gradient(120% 90% at 52% 22%, #e8d2a2 0%, #c3a878 100%);
+}
+.ctrap__lienzo canvas {
+  display: block;
+  width: 100% !important;
+  height: 100% !important;
+}
+.ctrap__cargando {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  font-size: 0.95rem;
+  color: #5a4423;
+  background: radial-gradient(120% 90% at 52% 22%, #e8d2a2 0%, #c3a878 100%);
+}
+
+.ctrap__barra {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  align-items: center;
+  justify-content: space-between;
+  margin: 0.6rem 0 0;
+}
+.ctrap__tier {
+  margin: 0;
+  font-size: 0.85rem;
+  line-height: 1.4;
+  color: #5b4a2e;
+  flex: 1 1 14rem;
+}
+.ctrap__toggle {
+  flex: 0 0 auto;
+  padding: 0.5rem 0.95rem;
+  border: 1px solid rgba(154, 74, 28, 0.4);
+  border-radius: 999px;
+  background: linear-gradient(180deg, #f0a83e 0%, #c9761f 100%);
+  color: #2a1606;
+  font: inherit;
+  font-size: 0.88rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform 0.15s ease, opacity 0.15s ease;
+}
+.ctrap__toggle:hover {
+  opacity: 0.92;
+}
+.ctrap__toggle:active {
+  transform: scale(0.97);
+}
+.ctrap__toggle:focus-visible {
+  outline: 3px solid #7a3d10;
+  outline-offset: 2px;
+}
+
+.ctrap__saberes {
+  max-width: 46rem;
+  margin: 1.8rem auto 0;
+}
+.ctrap__saberes h2 {
+  margin: 0 0 0.7rem;
+  font-size: clamp(1.15rem, 4vw, 1.5rem);
+  color: #43361f;
+}
+.ctrap__saberes ol {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.7rem;
+}
+.ctrap__saberes li {
+  display: flex;
+  gap: 0.7rem;
+  align-items: flex-start;
+  padding: 0.8rem 0.9rem;
+  border-radius: 12px;
+  background: rgba(255, 250, 238, 0.72);
+  border: 1px solid rgba(154, 74, 28, 0.16);
+}
+.ctrap__emoji {
+  font-size: 1.35rem;
+  line-height: 1.2;
+  flex: 0 0 auto;
+}
+.ctrap__saberes b {
+  display: block;
+  margin-bottom: 0.15rem;
+  color: #7a3d10;
+  font-size: 0.98rem;
+}
+.ctrap__saberes p {
+  margin: 0;
+  font-size: 0.92rem;
+  line-height: 1.5;
+}
+.ctrap__cierre {
+  margin: 1rem 0 0;
+  font-size: 0.95rem;
+  line-height: 1.55;
+  font-style: italic;
+  color: #5b4a2e;
+}
+
+/* -------------------------------------------------------------------------- */
+/*  La ficha: el fallback digno para equipo humilde / sin WebGL                */
+/* -------------------------------------------------------------------------- */
+
+.ctrap__ficha {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.3rem;
+  padding: 1rem;
+  background: linear-gradient(180deg, #e8d2a2 0%, #cdb582 62%, #b59a6a 100%);
+}
+.ctrap__estampa {
+  position: relative;
+  width: 200px;
+  height: 190px;
+  margin-bottom: 0.4rem;
+}
+
+/* la enramada del fondo: techo a dos aguas sobre sus horcones */
+.ctrap__enramada {
+  position: absolute;
+  right: 4px;
+  bottom: 34px;
+  width: 108px;
+  height: 52px;
+  background:
+    linear-gradient(180deg, #b0603f 0%, #b0603f 34%, transparent 34%),
+    linear-gradient(90deg, transparent 8%, #7a5a38 8%, #7a5a38 13%, transparent 13%,
+      transparent 46%, #7a5a38 46%, #7a5a38 51%, transparent 51%,
+      transparent 86%, #7a5a38 86%, #7a5a38 91%, transparent 91%);
+  clip-path: polygon(0 34%, 50% 0, 100% 34%, 100% 100%, 0 100%);
+}
+.ctrap__chimenea {
+  position: absolute;
+  right: 92px;
+  bottom: 66px;
+  width: 13px;
+  height: 40px;
+  border-radius: 2px;
+  background: linear-gradient(180deg, #4a3a30 0%, #a35a3c 45%, #8f4b31 100%);
+}
+.ctrap__humo {
+  position: absolute;
+  right: 90px;
+  bottom: 104px;
+  width: 17px;
+  height: 40px;
+  border-radius: 50% 50% 40% 60%;
+  background: radial-gradient(circle at 40% 80%, rgba(150, 143, 133, 0.62), rgba(150, 143, 133, 0) 70%);
+}
+
+/* LA CAÑA: un tallo con sus NUDOS bien marcados — la firma de la planta */
+.ctrap__cana {
+  position: absolute;
+  left: 44px;
+  bottom: 12px;
+  width: 15px;
+  height: 152px;
+  border-radius: 7px;
+  background: linear-gradient(90deg, #6f8a34 0%, #9ab84c 38%, #7d9a3c 100%);
+  box-shadow: 0 2px 6px rgba(50, 38, 18, 0.28);
+}
+.ctrap__cana i {
+  position: absolute;
+  left: -2px;
+  width: 19px;
+  height: 5px;
+  border-radius: 3px;
+  background: linear-gradient(90deg, #b9cd82 0%, #e3ecc2 45%, #adc276 100%);
+}
+.ctrap__cana i:nth-child(1) { bottom: 20px; }
+.ctrap__cana i:nth-child(2) { bottom: 48px; }
+.ctrap__cana i:nth-child(3) { bottom: 76px; }
+.ctrap__cana i:nth-child(4) { bottom: 104px; }
+.ctrap__cana i:nth-child(5) { bottom: 130px; }
+
+/* las hojas acintadas, que se arquean y caen de punta */
+.ctrap__hoja {
+  position: absolute;
+  width: 74px;
+  height: 13px;
+  background: linear-gradient(180deg, #7fa63c 0%, #cfdd96 46%, #5f8a2e 54%, #4e7526 100%);
+}
+.ctrap__hoja--a {
+  left: 52px;
+  bottom: 128px;
+  transform: rotate(-24deg);
+  border-radius: 0 60% 60% 0 / 0 70% 70% 0;
+  transform-origin: left center;
+}
+.ctrap__hoja--b {
+  right: 108px;
+  bottom: 110px;
+  transform: rotate(20deg) scaleX(-1);
+  border-radius: 0 60% 60% 0 / 0 70% 70% 0;
+  transform-origin: right center;
+}
+/* el penacho plumoso de la caña que ya espigó */
+.ctrap__penacho {
+  position: absolute;
+  left: 42px;
+  bottom: 158px;
+  width: 19px;
+  height: 30px;
+  border-radius: 50% 50% 40% 40%;
+  background: radial-gradient(circle at 50% 85%, #efe7ce 0%, rgba(226, 216, 188, 0.5) 58%, rgba(226, 216, 188, 0) 78%);
+}
+
+.ctrap__ficha-nombre {
+  margin: 0;
+  font-weight: 700;
+  font-size: 1.02rem;
+  color: #3a2c18;
+}
+.ctrap__ficha-sub {
+  margin: 0;
+  font-size: 0.84rem;
+  color: #5f4c2c;
+}
+
+@media (min-width: 40rem) {
+  .ctrap {
+    padding: 1.6rem 1.4rem 3rem;
+  }
+  .ctrap__saberes ol {
+    grid-template-columns: 1fr 1fr;
+  }
+  .ctrap__saberes li:last-child {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ctrap__toggle {
+    transition: none;
+  }
+}

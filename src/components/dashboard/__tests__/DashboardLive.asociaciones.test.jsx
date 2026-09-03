@@ -9,7 +9,7 @@ vi.mock('../../../config/glaciarAccess', () => ({
 }));
 
 vi.mock('../AgentHero', () => ({ default: () => <div data-testid="agent-hero" /> }));
-vi.mock('../../OnboardingHero', () => ({ default: () => <div /> }));
+vi.mock('../../PrimerRegistroCard', () => ({ default: () => <div /> }));
 vi.mock('../SelectedBackgroundReveal', () => ({ default: () => <div /> }));
 vi.mock('../ClimaStrip', () => ({ default: () => <div /> }));
 vi.mock('../HoyEnFincaStrip', () => ({ default: () => <div /> }));
@@ -32,7 +32,7 @@ vi.mock('../../../db/farmProcessCache', () => ({
 
 let mockProfile = { rol: 'campesino' };
 vi.mock('../../../services/userProfileService', async (importOriginal) => {
-  const actual = await importOriginal();
+  const actual = /** @type {any} */ (await importOriginal());
   return {
     ...actual,
     getProfile: vi.fn(() => mockProfile),

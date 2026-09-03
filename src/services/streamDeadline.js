@@ -75,12 +75,13 @@ export const HARD_CEILING_MS = 300000;
  *                 No-op si ya se detuvo o ya disparó.
  *   - `stop()`    limpia ambos timers. Llamar al completar/abortar la respuesta.
  */
-export function createStreamDeadline({
-  idleMs = IDLE_TIMEOUT_MS,
-  firstTokenMs = FIRST_TOKEN_TIMEOUT_MS,
-  ceilingMs = HARD_CEILING_MS,
-  onTimeout,
-} = {}) {
+export function createStreamDeadline(opts = /** @type {any} */ ({})) {
+  const {
+    idleMs = IDLE_TIMEOUT_MS,
+    firstTokenMs = FIRST_TOKEN_TIMEOUT_MS,
+    ceilingMs = HARD_CEILING_MS,
+    onTimeout,
+  } = opts;
   let idleTimer = null;
   let ceilingTimer = null;
   // Latch: el deadline sólo puede disparar/limpiar una vez. Evita que idle y

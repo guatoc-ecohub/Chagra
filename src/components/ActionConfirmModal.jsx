@@ -1,6 +1,33 @@
 import React, { useState } from 'react';
 import { X, Check, Pencil, AlertTriangle, Loader2 } from 'lucide-react';
 
+/**
+ * Gate humano de las tools con escritura (actionExecutor).
+ *
+ * BUG-01 (hard-test David/Cata 2026-08-31, P1): este modal vive SIEMPRE montado
+ * (renderiza null cuando está cerrado), así que `useState(parameters)` solo
+ * capturaba los parámetros del primer render ({}). Al aprobar enviaba ese
+ * borrador rancio → el executor ejecutaba la tool con {} → la herramienta de
+ * registro NO persistía nada mientras el agente hablaba de registrar.
+ *
+ * El contrato ahora es: el caller (AgentScreen) pasa `key={gateId}` con un id
+ * único por acción, así React REMONTA este componente por cada gate y el
+ * borrador arranca siempre con los parámetros de ESA acción. Si vas a abrir
+ * este modal desde otra pantalla, pasale también un key que cambie por acción.
+ */
+/**
+ * @param {object} props
+ * @param {boolean} [props.isOpen] cerrado el modal renderiza null.
+ * @param {string} [props.toolName]
+ * @param {string} [props.description]
+ * @param {object} [props.parameters] parámetros de ESTA acción (el borrador
+ *        arranca de acá en cada remount por key).
+ * @param {string|null} [props.intent]
+ * @param {string|null} [props.llm_response]
+ * @param {(parameters: object) => Promise<void>|void} props.onApprove
+ * @param {() => Promise<void>|void} props.onReject
+ * @param {(parameters: object) => Promise<void>|void} props.onEdit
+ */
 export default function ActionConfirmModal({
   isOpen,
   toolName,
@@ -45,6 +72,7 @@ export default function ActionConfirmModal({
     actualizar_planta: 'Actualizar planta',
     agendar_riego: 'Programar riego',
     query_corpus_dr034: 'Buscar en corpus',
+    registrar_ingesta_compleja: 'Confirmar registro de campo',
   };
 
   return (

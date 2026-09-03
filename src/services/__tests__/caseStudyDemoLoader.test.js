@@ -42,7 +42,7 @@ beforeEach(() => {
 describe('loadCaseStudyDemos — wiring speciesResolver', () => {
   it('preserva species_ids resueltos (exact match)', async () => {
     vi.mocked(resolveSpecies).mockImplementation((id) =>
-      Promise.resolve({ slug: id, match: 'exact', confidence: 1 })
+      /** @type {any} */ (Promise.resolve({ slug: id, match: 'exact', confidence: 1 }))
     );
     const manifest = { cases: ['case1.json'] };
     const cases = [
@@ -85,7 +85,7 @@ describe('loadCaseStudyDemos — wiring speciesResolver', () => {
 
   it('dropea fuzzy con confidence < 0.6', async () => {
     vi.mocked(resolveSpecies).mockImplementation(() =>
-      Promise.resolve({ slug: 'algo', match: 'fuzzy', confidence: 0.4 })
+      /** @type {any} */ (Promise.resolve({ slug: 'algo', match: 'fuzzy', confidence: 0.4 }))
     );
     const manifest = { cases: ['c.json'] };
     const cases = [{ id: 'c', subject: { species_ids: ['rasguñoso'] } }];

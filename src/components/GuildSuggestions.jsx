@@ -4,13 +4,14 @@ import { Sprout, AlertTriangle, Sparkles, Loader2, Check } from 'lucide-react';
 import { getSuggestedCompanions, buildGuildPrompt } from '../services/guildService';
 import { getAllSpecies } from '../db/catalogDB';
 import { SPECIES_DEFAULTS } from '../config/speciesDefaults';
-import { FARM_CONFIG } from '../config/defaults';
+import { getContextoGeoParaIA } from '../services/perfilFincaService';
 import { CROP_TAXONOMY } from '../config/taxonomy';
 import { registry } from '../core/moduleRegistry';
 import useAssetStore from '../store/useAssetStore';
 import ExternalAiButton from './common/ExternalAiButton';
 import { buildGuildExternalPrompt } from '../services/externalAiPromptBuilder';
 import { fetchWithAuthRetry } from '../services/apiService';
+import { ENV } from '../config/env';
 
 // Autopilot #8 (2026-05-03): re-rank companions putting existing plants first.
 // Reduce friction de "tengo que comprar otra especie", mostrar primero las
@@ -138,7 +139,7 @@ export const GuildSuggestions = ({ speciesId, onSelectCompanion }) => {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          model: 'gemma3:4b',
+          model: ENV.CHAT_MODEL,
           stream: false,
           messages: [
             { role: 'system', content: 'Asistente de diseño de gremios agroecológicos. Responde SOLO en JSON válido, sin texto adicional.' },
@@ -270,7 +271,7 @@ export const GuildSuggestions = ({ speciesId, onSelectCompanion }) => {
               estrato: defaults.estrato,
               companions: companions.map((c) => c.name),
               antagonists: antagonists.map((a) => a.name),
-              thermalZones: FARM_CONFIG.THERMAL_ZONES || [],
+              ...getContextoGeoParaIA(),
               speciesThermalZones,
               altitudMsnm: defaults.altitud_msnm?.optimo_min,
             }}

@@ -62,7 +62,7 @@ const ESPECIES = [
     cientifico: 'Tapirus pinchaque',
     eje: 'Suelo y semillas del bosque',
     frase: 'Soy la danta de montaña: siembro el bosque con cada semilla que dejo.',
-    fuente: 'Tapir andino endémico (EN) · fauna paramuna del catálogo de Chagra',
+    fuente: 'Tapir andino (EN) · Colombia, Ecuador y norte del Perú · fauna paramuna del catálogo de Chagra',
     acc: '#7fd0ff', accRgb: '127, 208, 255',
   },
   {
@@ -211,8 +211,10 @@ const AVATAR = {
   danta: AvatarDanta,
 };
 
-/** Un avatar aislado dibujado en su propio SVG (para chips y héroe). */
-function GuardianAvatar({ id, size = 46 }) {
+/** Un avatar aislado dibujado en su propio SVG (para chips y héroe).
+    Exportado: el valle 3D monta el oso negro biopunk como vecino del monte
+    (decisión del operador — este es EL oso, no el rubber-hose café). */
+export function GuardianAvatar({ id, size = 46 }) {
   const Cuerpo = AVATAR[id] || AvatarAbeja;
   return (
     <svg viewBox="-26 -24 52 46" width={size} height={size} aria-hidden="true" focusable="false">
@@ -261,16 +263,30 @@ export default function GuardianEspiritu({ onChange = null }) {
       data-testid="guardian-selector"
       data-guardian={activoId}
     >
+      {/* noche viva: estrellas sutiles detrás de todo (solo opacity) */}
+      <svg className="ge-stars" viewBox="0 0 320 110" preserveAspectRatio="none" aria-hidden="true" focusable="false">
+        <circle className="ge-tw" cx="26" cy="16" r="1" fill="#eafff6" />
+        <circle className="ge-tw ge-tw2" cx="88" cy="34" r="0.8" fill="#bfffe9" />
+        <circle className="ge-tw ge-tw3" cx="158" cy="12" r="1.1" fill="#eafff6" />
+        <circle className="ge-tw" cx="224" cy="28" r="0.8" fill="#2dffc4" />
+        <circle className="ge-tw ge-tw2" cx="286" cy="14" r="1" fill="#eafff6" />
+        <circle className="ge-tw ge-tw3" cx="304" cy="52" r="0.7" fill="#b28dff" />
+        <circle className="ge-tw ge-tw2" cx="46" cy="72" r="0.7" fill="#9dff3f" />
+      </svg>
+
       <header className="ge-head">
         <span className="ge-kicker">SU GUARDIÁN</span>
         <h2 className="ge-title">Escoja una especie nativa</h2>
         <p className="ge-sub">
-          El guardián que elija se vuelve el espíritu de su finca. Fauna nativa colombiana, real y verificable.
+          {elegido
+            ? 'Este espíritu ya acompaña su finca. Toque otra especie si quiere cambiarlo.'
+            : 'El guardián que elija se vuelve el espíritu de su finca. Fauna nativa colombiana, real y verificable.'}
         </p>
       </header>
 
-      {/* héroe: el guardián elegido, en grande, con su nombre científico */}
-      <div className="ge-hero" data-testid="guardian-hero">
+      {/* héroe: el guardián elegido, en grande, con su nombre científico.
+          key=activoId re-monta el bloque al cambiar → animación de llegada */}
+      <div className="ge-hero" data-testid="guardian-hero" key={activoId}>
         <span className="ge-hero-avatar">
           <GuardianAvatar id={activoId} size={78} />
         </span>

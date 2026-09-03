@@ -417,7 +417,7 @@ const ANIMAL_PATTERNS = [
 function detectAnimalSilvo(text) {
   const t = String(text);
   for (const [re, animal] of ANIMAL_PATTERNS) {
-    if (/** @type {RegExp} */ (re).test(t)) return animal;
+    if (/** @type {RegExp} */ (re).test(t)) return /** @type {'bovino'|'ovino'|'caprino'} */ (animal);
   }
   return null;
 }

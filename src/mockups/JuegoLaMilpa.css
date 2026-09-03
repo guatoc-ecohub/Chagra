@@ -260,6 +260,9 @@
   transform-box: fill-box;
 }
 @keyframes milpa-spin { to { transform: rotate(360deg); } }
+/* Los rayos giran sobre el CENTRO REAL de su caja (la geometria es simetrica
+   alrededor de 150,120) — sin transform-origin inline en px del viewBox, que
+   con fill-box corria el eje y los rayos se salian de la cara. */
 .milpa-sun-rays {
   animation: milpa-spin 44s linear infinite;
   transform-origin: center;
@@ -269,7 +272,8 @@
   0%, 100% { transform: translateY(0); }
   50%      { transform: translateY(-5px); }
 }
-.milpa-sun-core { animation: milpa-bob 3.2s ease-in-out infinite; transform-box: fill-box; transform-origin: center; }
+/* Bobea el sol ENTERO (cara + rayos juntos): nunca se despegan. */
+.milpa-sun { animation: milpa-bob 3.2s ease-in-out infinite; }
 @keyframes milpa-bee-fly {
   0%   { transform: translate(0, 0) rotate(-4deg); }
   25%  { transform: translate(150px, -34px) rotate(6deg); }
@@ -291,6 +295,6 @@
 
 @media (prefers-reduced-motion: reduce) {
   .milpa-pop, .milpa-sway, .milpa-sway-soft, .milpa-sun-rays,
-  .milpa-sun-core, .milpa-bee, .milpa-wing, .milpa-confetti,
+  .milpa-sun, .milpa-bee, .milpa-wing, .milpa-confetti,
   .milpa-tip-bee { animation: none !important; }
 }

@@ -28,6 +28,7 @@ import {
  *   - mantiene los seis temas guía (voz/uso/ciclo/diccionario/agente/datos).
  * Consistente con el FAQ groundeado (src/data/faqChagra.json, #1856).
  *
+ * @param {object} props
  * @param {Function} props.onSelect    cambia de sub-vista DENTRO del Manual.
  * @param {Function} [props.onNavigate] cierra el Manual y abre una pantalla
  *   real de la app (atajos a especies / calendario / mercados / faq...).

@@ -99,13 +99,13 @@ export async function callOllama(messages, {
   model = DEFAULT_MODEL,
   ollamaUrl = DEFAULT_OLLAMA_URL,
   fetchImpl = fetch,
-  timeoutMs = 120_000,
-  numPredict = 600,
+  timeoutMs = Number(process.env.AUDIT_TIMEOUT_MS || 180_000),
+  numPredict = Number(process.env.AUDIT_NUM_PREDICT || 600),
 } = {}) {
   const response = await fetchImpl(ollamaUrl, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ model, messages, stream: false, keep_alive: '30m', options: { temperature: 0.2, num_predict: numPredict } }),
+    body: JSON.stringify({ model, messages, stream: false, think: false, keep_alive: process.env.AUDIT_KEEP_ALIVE || '2m', options: { temperature: 0.2, num_predict: numPredict } }),
     signal: AbortSignal.timeout(timeoutMs),
   });
   if (!response.ok) throw new Error(`Ollama HTTP ${response.status}: ${(await response.text()).slice(0, 300)}`);
@@ -148,7 +148,10 @@ export async function runCase(item, options = {}) {
 
 export async function runCases(cases, options = {}) {
   const results = [];
-  await warmupModel(options);
+  // Warmup NO debe abortar la corrida: en carga fría un modelo grande puede
+  // exceder el timeout del callOllama. Si falla, seguimos — el primer caso
+  // absorbe la carga (con su propio timeout+catch por caso).
+  try { await warmupModel(options); } catch { /* cold load; los casos siguen igual */ }
   for (let index = 0; index < cases.length; index += 1) {
     const result = await runCase(cases[index], options);
     results.push(result);
@@ -204,10 +207,16 @@ export function parseJudgeOutput(output, expectedIds) {
   return expectedIds.map((id) => {
     const verdict = byId.get(id);
     if (!verdict) throw new Error(`El juez omitio el caso ${id}`);
+    // Tolerancia a verdicts malformados del juez (claude-code a veces devuelve un
+    // puntaje fuera de rango en UNA dimensión): en vez de abortar TODA la corrida
+    // del modelo, se satura al rango válido [0,2] (redondeando) y se sigue. Un
+    // caso ruidoso no debe invalidar los otros 29.
+    const dims = { ...(verdict.dimensions || {}) };
     for (const dimension of DIMENSIONS) {
-      if (![0, 1, 2].includes(verdict.dimensions?.[dimension])) throw new Error(`${id}: puntaje invalido en ${dimension}`);
+      const v = Number(dims[dimension]);
+      dims[dimension] = Number.isFinite(v) ? Math.max(0, Math.min(2, Math.round(v))) : 0;
     }
-    return { ...verdict, failures: Array.isArray(verdict.failures) ? verdict.failures : [] };
+    return { ...verdict, dimensions: dims, failures: Array.isArray(verdict.failures) ? verdict.failures : [] };
   });
 }
 

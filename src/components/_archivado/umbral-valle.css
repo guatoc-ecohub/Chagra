@@ -1,0 +1,235 @@
+/*
+ * umbral-valle.css — la puerta grande del home al valle 3D (UmbralValle.jsx).
+ *
+ * Reglas de la casa: animaciones SOLO transform/opacity (Android barato),
+ * cero blur/filter costoso, prefers-reduced-motion congela todo en un
+ * fotograma digno. Los colores vivos llegan por variables (--uv-*) desde el
+ * componente (cielo/luz de la franja real del día).
+ */
+
+.uv {
+  padding: 4px 16px 0;
+}
+
+/* ── LA PUERTA: una carta grande con la vista viva adentro ── */
+.uv-puerta {
+  position: relative;
+  display: block;
+  width: 100%;
+  min-height: 200px;
+  border: 0;
+  border-radius: 26px;
+  padding: 0;
+  overflow: hidden;
+  cursor: pointer;
+  /* el cielo de la hora ES el fondo; la vista SVG apoya el terreno encima */
+  background: linear-gradient(180deg, var(--uv-cielo-a), var(--uv-cielo-b) 78%);
+  box-shadow:
+    0 18px 38px rgba(18, 26, 18, 0.35),
+    inset 0 0 0 2px rgba(255, 255, 255, 0.16),
+    inset 0 -26px 40px rgba(24, 20, 14, 0.22);
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+.uv-puerta:active { transform: scale(0.985); }
+.uv-puerta:focus-visible {
+  outline: 3px solid var(--fvh-lima, #a3e635);
+  outline-offset: 3px;
+}
+@media (min-width: 720px) {
+  /* el panorama completo del lienzo (720×210): el ancho se capa a su
+     aspecto para que el cielo y las crestas nunca se recorten */
+  .uv-puerta {
+    min-height: 280px;
+    max-width: 960px;
+    margin-inline: auto;
+  }
+  .uv-puerta:hover {
+    transform: translateY(-2px);
+    box-shadow:
+      0 24px 46px rgba(18, 26, 18, 0.4),
+      inset 0 0 0 2px rgba(255, 255, 255, 0.2),
+      inset 0 -26px 40px rgba(24, 20, 14, 0.22);
+  }
+}
+
+.uv-vista {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+/* ── vida sutil de la vista (todo transform/opacity) ── */
+.uv-niebla { animation: uv-niebla-deriva 46s ease-in-out infinite alternate; }
+@keyframes uv-niebla-deriva {
+  from { transform: translateX(-14px); }
+  to { transform: translateX(14px); }
+}
+
+.uv-astro { animation: uv-astro-respira 7s ease-in-out infinite alternate; transform-origin: center; }
+@keyframes uv-astro-respira {
+  from { opacity: 0.92; }
+  to { opacity: 1; }
+}
+
+.uv-estrella { animation: uv-titila 3.2s ease-in-out infinite alternate; }
+.uv-estrella--1 { animation-delay: 1.1s; }
+.uv-estrella--2 { animation-delay: 2.2s; }
+@keyframes uv-titila {
+  from { opacity: 0.35; }
+  to { opacity: 1; }
+}
+
+.uv-ventana-prendida { animation: uv-titila 5s ease-in-out infinite alternate; }
+
+.uv-luciernaga { animation: uv-vuela 6.5s ease-in-out infinite alternate; }
+.uv-luciernaga--1 { animation-delay: 1.6s; animation-duration: 7.4s; }
+.uv-luciernaga--2 { animation-delay: 3.1s; animation-duration: 5.8s; }
+.uv-luciernaga--3 { animation-delay: 4.4s; }
+@keyframes uv-vuela {
+  0% { transform: translate(0, 0); opacity: 0.25; }
+  40% { opacity: 1; }
+  100% { transform: translate(9px, -14px); opacity: 0.35; }
+}
+
+/* ── el barbudito guía, sobrevolando el umbral ── */
+.uv-colibri {
+  position: absolute;
+  top: 25%;
+  left: 58%;
+  animation: uv-colibri-flota 5.4s ease-in-out infinite alternate;
+  pointer-events: none;
+}
+@keyframes uv-colibri-flota {
+  from { transform: translateY(0) rotate(-2deg); }
+  to { transform: translateY(-9px) rotate(2.5deg); }
+}
+
+/* ── rótulos sobre el cielo ── */
+.uv-eyebrow,
+.uv-hora {
+  position: absolute;
+  top: 12px;
+  font: 800 11px/1 var(--fvh-body, 'Nunito', system-ui, sans-serif);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgba(30, 26, 18, 0.78);
+  background: rgba(255, 252, 240, 0.72);
+  padding: 6px 10px;
+  border-radius: 999px;
+  pointer-events: none;
+}
+.uv-eyebrow { right: 12px; }
+.uv-hora { left: 12px; }
+
+/* ── la invitación (CTA dentro de la puerta) ── */
+.uv-cta {
+  position: absolute;
+  left: 12px;
+  bottom: 12px;
+  max-width: min(248px, 68%);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-height: 58px;
+  padding: 8px 10px 8px 16px;
+  border-radius: 18px;
+  background: rgba(255, 252, 240, 0.9);
+  box-shadow: 0 8px 18px rgba(24, 20, 14, 0.28);
+  pointer-events: none;
+}
+.uv-cta-txt {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+  text-align: left;
+}
+.uv-cta-txt b {
+  font-family: var(--fvh-display, 'Baloo 2', system-ui, sans-serif);
+  font-size: 19px;
+  font-weight: 700;
+  line-height: 1.05;
+  color: #23301b;
+}
+.uv-cta-txt small {
+  font: 700 12.5px/1.2 var(--fvh-body, 'Nunito', system-ui, sans-serif);
+  color: #55613f;
+}
+.uv-cta-flecha {
+  flex: none;
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: var(--uv-luz, #ffd98f);
+  box-shadow: inset 0 0 0 2px rgba(44, 36, 28, 0.28);
+  animation: uv-flecha-invita 2.6s ease-in-out infinite;
+}
+@keyframes uv-flecha-invita {
+  0%, 100% { transform: translateX(0); }
+  50% { transform: translateX(4px); }
+}
+
+/* ── EL DESPEGUE: el cielo de la hora inunda la pantalla (velo del viaje).
+      Es un nodo imperativo en <body> (sobrevive al swap de vista): cubre en
+      0.62s, la navegación corre debajo, SOSTIENE la meseta y se desvanece
+      sobre el valle que recibe. Tres actos, dos animaciones. ── */
+.uv-despegue {
+  position: fixed;
+  inset: 0;
+  z-index: 90;
+  pointer-events: none;
+  background: linear-gradient(180deg, var(--uv-cielo-a), var(--uv-cielo-b));
+  opacity: 0;
+  animation:
+    uv-despega 0.62s ease-in forwards,
+    uv-desvanece 0.55s ease-out 1.35s forwards;
+}
+.uv-despegue::after {
+  /* el estallido de luz del centro: la puerta que se abre */
+  content: '';
+  position: absolute;
+  inset: -30%;
+  background: radial-gradient(circle at 50% 62%, var(--uv-luz) 0%, transparent 52%);
+  opacity: 0;
+  transform: scale(0.6);
+  animation: uv-despega-luz 0.62s ease-out forwards;
+}
+@keyframes uv-despega {
+  0% { opacity: 0; }
+  55% { opacity: 1; }
+  100% { opacity: 1; }
+}
+@keyframes uv-despega-luz {
+  0% { opacity: 0; transform: scale(0.6); }
+  45% { opacity: 0.9; }
+  100% { opacity: 0.55; transform: scale(1.15); }
+}
+@keyframes uv-desvanece {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+.uv-puerta--despega { transform: scale(1.02); }
+
+/* ── reduced-motion: un fotograma digno, cero vaivén ── */
+@media (prefers-reduced-motion: reduce) {
+  .uv-niebla,
+  .uv-astro,
+  .uv-estrella,
+  .uv-ventana-prendida,
+  .uv-luciernaga,
+  .uv-colibri,
+  .uv-cta-flecha,
+  .uv-despegue,
+  .uv-despegue::after {
+    animation: none !important;
+  }
+  .uv-puerta,
+  .uv-puerta:active,
+  .uv-puerta--despega { transition: none; transform: none; }
+}

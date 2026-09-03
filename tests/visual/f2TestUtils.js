@@ -194,6 +194,7 @@ export async function seedSession(page, { user = F2_USER, nivelRespuestas = 'sim
             piso_termico: 'frio',
             piso_confirmado: '1',
             animales: ['gallinas'],
+            marco3d: false,
           }),
         );
         window.localStorage.setItem('chagra:profile:done:v1', '1');
@@ -240,13 +241,13 @@ export async function flagF2Activa(page) {
 export async function entrarAFincaViva(page, context, { nivelRespuestas = 'simple' } = {}) {
   await seedSession(page, { nivelRespuestas });
   await mockBackendBasico(context);
-  await page.goto('/', { waitUntil: 'domcontentloaded' });
+  await page.goto('/#dashboard', { waitUntil: 'domcontentloaded' });
 
   const flagOn = await flagF2Activa(page);
   if (!flagOn) return false;
 
   await login(page);
-  await page.goto('/', { waitUntil: 'domcontentloaded' });
+  await page.goto('/#dashboard', { waitUntil: 'domcontentloaded' });
   await page.waitForLoadState('networkidle').catch(() => {});
   await expect(page.getByTestId('finca-viva-hero')).toBeVisible({ timeout: 20000 });
   return true;

@@ -18,13 +18,13 @@ import { validateFarmProcess, validateFarmProcessEvent } from '../types/farmProc
  *
  * @param {string} processId
  * @param {import('../types/farmProcess').FarmProcess} [hint]
- * @param {number} occurredAt — timestamp del evento que disparó el upsert
+ * @param {number} [occurredAt] - timestamp del evento que disparo el upsert
  * @returns {import('../types/farmProcess').FarmProcess}
  */
 export const buildUpsertPlaceholder = (processId, hint, occurredAt) => {
   /** @type {Partial<import('../types/farmProcess').FarmProcessAttributes>} */
   const ha = (hint && hint.attributes) || {};
-  const createdAt = Number.isInteger(ha.created_at) && ha.created_at > 0 ? ha.created_at : occurredAt;
+  const createdAt = Number.isInteger(ha.created_at) && ha.created_at > 0 ? ha.created_at : (occurredAt || Date.now());
   return {
     process_id: processId,
     type: 'farm_process',
@@ -39,7 +39,8 @@ export const buildUpsertPlaceholder = (processId, hint, occurredAt) => {
       status: ha.status || 'active',
       current_stage: ha.current_stage || 'sowing_confirmed',
       created_at: createdAt,
-      updated_at: occurredAt,
+      updated_at: occurredAt || Date.now(),
+      /** @ts-ignore */
       _synthetic: true,
     },
   };
@@ -60,6 +61,7 @@ export const buildUpsertPlaceholder = (processId, hint, occurredAt) => {
  * @param {string} [input.source]
  * @param {Object} [input.payload]
  * @param {string} [input.idempotency_key]
+ * @param {boolean} [input.await_sync] - espera la creación de la transacción pendiente
  * @param {number} [input.confidence]
  * @param {string} [input.evidence]
  * @param {import('../types/farmProcess').FarmProcess} [input.process_hint] - proceso
@@ -135,12 +137,19 @@ export const recordFarmEvent = async (input) => {
     dedupReq.onerror = () => reject(dedupReq.error);
 
     tx.oncomplete = () => {
-      resolve(event);
-      // Fire-and-forget: encolar para sync a FarmOS (NO bloquea el registro local).
-      // Si falla, el evento ya está seguro en IDB. Cap #9 — antes dormido.
-      import('./farmProcessSync').then(({ enqueueFarmProcessEvent }) =>
+      // Fire-and-forget por defecto: el evento ya está seguro en IDB. Algunas
+      // rutas de confirmación necesitan devolver después de crear también la
+      // transacción de sync, por eso aceptamos await_sync sin cambiar el
+      // comportamiento de los callers existentes.
+      const enqueue = () => import('./farmProcessSync').then(({ enqueueFarmProcessEvent }) =>
         enqueueFarmProcessEvent(event, null).catch(() => {}),
-      );
+      ).catch(() => {});
+      if (input.await_sync) {
+        enqueue().finally(() => resolve(/** @type {any} */ (event)));
+      } else {
+        resolve(/** @type {any} */ (event));
+        enqueue();
+      }
     };
     tx.onerror = () => reject(tx.error);
   });
@@ -151,7 +160,7 @@ export const recordFarmEvent = async (input) => {
  * @param {import('../types/farmProcess').FarmProcess} process
  * @returns {Promise<{process: import('../types/farmProcess').FarmProcess, event: import('../types/farmProcess').FarmProcessEvent}>}
  */
-export const createFarmProcess = async (process) => {
+export const createFarmProcess = async (process, { awaitSync = false } = {}) => {
   validateFarmProcess(process);
 
   const db = await openDB();
@@ -194,11 +203,15 @@ export const createFarmProcess = async (process) => {
           window.dispatchEvent(new CustomEvent('farmProcessChanged', { detail: { process_id: process.process_id } }));
         }
       } catch { /* noop */ }
-      resolve({ process, event });
-      // Fire-and-forget: encolar para sync a FarmOS (NO bloquea).
-      import('./farmProcessSync').then(({ enqueueFarmProcessEvent }) =>
-        enqueueFarmProcessEvent(event, process).catch(() => {}),
-      );
+      const enqueue = () => import('./farmProcessSync').then(({ enqueueFarmProcessEvent }) =>
+        enqueueFarmProcessEvent(/** @type {any} */ (event), process).catch(() => {}),
+      ).catch(() => {});
+      if (awaitSync) {
+        enqueue().finally(() => resolve({ process, event: /** @type {any} */ (event) }));
+      } else {
+        resolve({ process, event: /** @type {any} */ (event) });
+        enqueue();
+      }
     };
     tx.onerror = () => reject(tx.error);
   });

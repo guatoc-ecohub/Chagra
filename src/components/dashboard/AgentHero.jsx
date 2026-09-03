@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState, useCallback } from 'react';
-import { Mic, Square, Camera, X } from 'lucide-react';
+import { Mic, Square, Camera, X, MessageCircle, Send } from 'lucide-react';
 import useVoiceRecorder from '../../hooks/useVoiceRecorder';
 import { captureAndCompress } from '../../services/photoService';
 import { isAnalyzableImageAttachment } from '../../services/agentOutboxAttachment';
@@ -19,8 +19,7 @@ import {
 } from '../../services/userProfileService';
 import { buildCropSuggestions } from '../../data/cropSuggestions';
 import { syncManager } from '../../services/syncManager';
-import { iconForTheme } from './themeIcon';
-import ChagraAgentAvatar from '../ChagraAgentAvatar';
+import BotonAnarquiaGlyph from './BotonAnarquiaGlyph';
 import { lunarPhase, solarTimes, moonPathD } from '../../utils/skyEphemeris';
 import { resolveClimaLocation, getCachedClimaSnapshot } from '../../services/climaService';
 import {
@@ -237,34 +236,6 @@ function SkyAstro({ night, condition, moonFraction }) {
     );
 }
 
-// Colibrí 2D del demo (SVG .hummer). Se usa tanto en la escena ambiente (vuela)
-// como DENTRO del botón de enviar (operador 2026-06-06: "el colibrí es enviar").
-// Se factoriza para que ambos usos compartan exactamente el mismo trazo.
-function HummerSvg({ width = 62, height = 46, flap = true }) {
-    return (
-        <svg width={width} height={height} viewBox="0 0 62 46" aria-hidden="true">
-            {/* cuerpo */}
-            <ellipse cx="34" cy="28" rx="11" ry="6.5" fill="#2f7d6b" />
-            <ellipse cx="34" cy="27" rx="9" ry="4.2" fill="#3fa489" />
-            {/* cabeza */}
-            <circle cx="46" cy="24" r="6" fill="#2a6f60" />
-            <circle cx="48.5" cy="22.5" r="1.4" fill="#11332c" />
-            {/* gorguera roja */}
-            <path d="M44 28 q5 2 8 0 q-3 4 -8 3 z" fill="#d05038" />
-            {/* pico largo */}
-            <path d="M52 24 L62 19" stroke="#3a2a18" strokeWidth="2" strokeLinecap="round" />
-            {/* cola */}
-            <path d="M23 28 L8 22 M23 30 L8 32" stroke="#256155" strokeWidth="3" strokeLinecap="round" />
-            {/* ala (animada solo cuando vuela en la escena) */}
-            <g className={flap ? 'wing' : undefined}>
-                <path d="M30 24 C18 6 6 8 2 16 C12 18 22 24 30 30 Z" fill="#4fb89a" opacity=".9" />
-            </g>
-        </svg>
-    );
-}
-
-// Saludos por hora del día. En modo "experto" (nivel detallado) el demo abre
-// con "Hola." en vez de "Buenos días." (COPY.experto.greetHi). Replicamos.
 function greetingForNow(nivel) {
     if (nivel === 'detallado') return 'Hola.';
     const h = typeof Date !== 'undefined' ? new Date().getHours() : 9;
@@ -1007,8 +978,8 @@ export default function AgentHero({ onNavigate }) {
                     transform-origin: center; will-change: transform;
                 }
                 .agentport-hummer svg { display: block; filter: drop-shadow(0 6px 6px rgba(90,60,20,.18)); }
-                /* bio-punk = tema base (sin data-theme): glow neón teal */
-                .agentport-hummer svg { filter: drop-shadow(0 0 8px rgba(25,201,154,.7)) drop-shadow(0 0 16px rgba(25,240,192,.35)); }
+                /* bio-punk = tema base (sin data-theme): glow de miel (ámbar) */
+                .agentport-hummer svg { filter: drop-shadow(0 0 8px rgba(240,178,60,.6)) drop-shadow(0 0 16px rgba(240,200,120,.3)); }
                 [data-theme="nature"] .agentport-hummer svg { filter: drop-shadow(0 6px 6px rgba(90,60,20,.18)); }
                 /* minimalista: SIN colibrí (escena limpia del demo). */
                 [data-theme="minimalista"] .agentport-hummer { display: none !important; }
@@ -1103,7 +1074,7 @@ export default function AgentHero({ onNavigate }) {
                 /* "Abrir Chagra IA" — botón redondo con el avatar del agente.
                    Entrada explícita al overlay desde la portada (tarea #51). */
                 .agentport-open {
-                    width: 38px; height: 38px; flex: none; border-radius: 50%;
+                    width: 52px; height: 52px; flex: none; border-radius: 50%;
                     display: inline-flex; align-items: center; justify-content: center;
                     overflow: hidden; padding: 0; cursor: pointer;
                     background: rgb(var(--c-surface-card) / 0.65);
@@ -1415,9 +1386,12 @@ export default function AgentHero({ onNavigate }) {
                 .agentport-iconbtn:active { transform: scale(0.9); }
                 .agentport-iconbtn:disabled { opacity: 0.4; cursor: not-allowed; }
 
-                /* Botón Ⓐ — herramienta. Ícono del tema dentro; anillo que respira
-                   (pulseRing del demo) y se rellena con el acento al abrir. */
-                .agentport-tool { padding: 7px; }
+                /* Botón Ⓐ — herramienta. Dentro vive "El Machetazo Forjado"
+                   (BotonAnarquiaGlyph, variante #4): el aro de la propia Ⓐ hace
+                   de borde del FAB, así que el padding es mínimo para que el
+                   glifo llene el botón. Anillo que respira (pulseRing del demo)
+                   y acento al abrir. */
+                .agentport-tool { padding: 2px; }
                 .agentport-tool .agentport-tool-ico { width: 100%; height: 100%; display: inline-flex; }
                 .agentport-tool .agentport-tool-ico svg { width: 100%; height: 100%; display: block; }
                 .agentport-tool:not(.is-open) {
@@ -1434,15 +1408,9 @@ export default function AgentHero({ onNavigate }) {
                     0%, 100% { box-shadow: 0 0 12px -2px rgb(var(--t-accent-rgb) / 0.55); }
                     50% { box-shadow: 0 0 24px 2px rgb(var(--t-accent-rgb) / 0.85); }
                 }
-                /* al abrir, el ícono se vuelve blanco para contrastar con el acento
-                   (cubre también los rellenos de la Ⓐ de herramientas: cabeza del
-                   azadón, hoja y punta del machete) */
-                .agentport-tool.is-open .agentport-tool-ico path,
-                .agentport-tool.is-open .agentport-tool-ico line,
-                .agentport-tool.is-open .agentport-tool-ico circle[stroke] { stroke: #fff; }
-                .agentport-tool.is-open .agentport-tool-ico circle[fill],
-                .agentport-tool.is-open .agentport-tool-ico polygon[fill],
-                .agentport-tool.is-open .agentport-tool-ico path[fill]:not([fill="none"]) { fill: #fff; }
+                /* al abrir, el glifo pasa a esténcil blanco sobre el acento —
+                   lo maneja el propio BotonAnarquiaGlyph vía el ancestro
+                   \`.is-open\` (reglas .is-open .baf-* en su CSS scoped). */
                 @keyframes agentport-pulse-ring {
                     0% { box-shadow: 0 0 0 0 rgb(var(--t-accent-rgb) / 0.45); }
                     70% { box-shadow: 0 0 0 12px rgb(var(--t-accent-rgb) / 0); }
@@ -1725,12 +1693,6 @@ export default function AgentHero({ onNavigate }) {
                     <div className="agentport-horizon" />
                 </div>
 
-                {/* — COLIBRÍ 2D — vuela en bio-punk y nature (SVG del demo
-                     nature). En minimalista se oculta vía CSS: el demo limpio no
-                     lleva colibrí. — */}
-                <div className="agentport-hummer">
-                    <HummerSvg />
-                </div>
             </div>
 
             {/* ===================== TOGGLE Campesino/Experto ===================== */}
@@ -1762,7 +1724,7 @@ export default function AgentHero({ onNavigate }) {
                         title="Abrir Chagra IA"
                         className="agentport-open"
                     >
-                        <ChagraAgentAvatar size={26} state="idle" ariaLabel="Chagra IA" />
+                        <MessageCircle size={24} aria-hidden="true" />
                     </button>
 
                     <div className="agentport-mode" role="tablist" aria-label="Nivel de respuestas">
@@ -2069,15 +2031,18 @@ export default function AgentHero({ onNavigate }) {
                             aria-expanded={menuOpen && !menuClosing}
                             className={['agentport-iconbtn agentport-tool !w-11 !h-11', menuOpen && !menuClosing ? 'is-open' : ''].join(' ')}
                         >
-                            {/* key={theme}: al cambiar el tema el ícono se REMONTA →
-                                corre el markSwap del demo (y la "forja" de la Ⓐ de
-                                herramientas vuelve a dibujarse trazo a trazo). */}
+                            {/* Glifo Ⓐ = "El Machetazo Forjado" (variante #4 elegida por
+                                el operador 2026-07-09): pala + azadón + machete se estampan
+                                a golpes y FORMAN la A; el aro de la Ⓐ es el borde del FAB.
+                                Es el MISMO glifo en todos los temas (identidad del agente).
+                                key={theme}: al cambiar el tema el ícono se REMONTA → corre
+                                el markSwap del demo y el estampado vuelve a dibujarse. */}
                             <span
                                 key={theme}
                                 className={['agentport-tool-ico', themeSwapped ? 'agentport-swap' : ''].join(' ')}
                                 aria-hidden="true"
                             >
-                                {iconForTheme(theme)}
+                                <BotonAnarquiaGlyph />
                             </span>
                         </button>
 
@@ -2109,9 +2074,8 @@ export default function AgentHero({ onNavigate }) {
                             {isRecording ? <Square size={16} strokeWidth={2.5} aria-hidden="true" /> : <Mic size={18} strokeWidth={2.5} aria-hidden="true" />}
                         </button>
 
-                        {/* Enviar — usa el mismo colibrí foto/video del FAB global.
-                            Comportamiento del demo: con el campo VACÍO no se apaga;
-                            tocarlo abre el menú didáctico de capacidades. */}
+                        {/* Enviar: el compai vive una sola vez en la escena superior;
+                            este control conserva la acción sin duplicar su dibujo. */}
                         <button
                             type="button"
                             onClick={handleSendText}
@@ -2128,9 +2092,7 @@ export default function AgentHero({ onNavigate }) {
                               position: 'relative'
                             }}
                         >
-                            <div style={{ width: '100%', height: '100%', position: 'relative' }}>
-                              <ChagraAgentAvatar size={38} state={canSend ? 'idle' : 'listening'} ariaLabel="Enviar al agente" />
-                            </div>
+                            <Send size={20} aria-hidden="true" />
                         </button>
                     </div>
 

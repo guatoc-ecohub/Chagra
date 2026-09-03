@@ -2,10 +2,21 @@ import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { streamOpenAI } from '../../../services/openaiStream';
+import { isSidecarEnabled, planNlu, callTool, isToolAllowed } from '../../../services/sidecarClient';
 
+/**
+ * @param {any} state
+ */
 function createStoreHook(state) {
+  /**
+   * @param {any} selector
+   */
   const hook = (selector) => (typeof selector === 'function' ? selector(state) : state);
   hook.getState = () => state;
+  /**
+   * @param {any} patch
+   */
   hook.setState = (patch) => Object.assign(state, patch);
   return hook;
 }
@@ -118,7 +129,7 @@ vi.mock('../../../services/ragRetriever', () => ({
 }));
 
 vi.mock('../../../services/agentIntentParser', () => ({
-  parseIntent: vi.fn(() => null),
+  parseIntent: vi.fn(() => ({ intent: null })),
   formatIntentDescription: vi.fn(() => ''),
 }));
 
@@ -155,6 +166,7 @@ vi.mock('../../../services/sidecarClient', () => ({
   pisoTermicoGuard: vi.fn(),
   confusionEspecieGuard: vi.fn(),
   pestVsDiseaseGuard: vi.fn(),
+  toxicSafetyGuard: vi.fn(),
   companionSpeciesGuard: vi.fn(),
   postValidate: vi.fn(),
   getClimaIdeam: vi.fn(),
@@ -168,6 +180,17 @@ vi.mock('../../../services/skyConditionService', () => ({
 vi.mock('../../../services/promptAssembler', () => ({
   assembleSystemContent: vi.fn(() => ({ content: 'mock-system' })),
   TOP_N_RAG: 5,
+  TOP_N_EDGES: 12,
+}));
+
+vi.mock('../../../services/agentPromptBase', () => ({
+  buildBasePrompt: vi.fn(() => 'mock-base-prompt'),
+  analyzeQuery: vi.fn(() => ({ isEnum: false })),
+  buildQueryAnalysisBlock: vi.fn(() => ''),
+  buildCorpusVariants: vi.fn(() => ['']),
+  buildResolvedEntitiesBlock: vi.fn(() => ''),
+  formatToolEvidence: vi.fn(() => ''),
+  truncateEdgesBlock: vi.fn((value) => value || ''),
 }));
 
 vi.mock('../../../services/outputGuards', () => ({
@@ -242,6 +265,12 @@ vi.mock('../../../store/useAgentQueueStore', () => ({
     processing: null,
     pending: [],
     reset: vi.fn(),
+    enqueue: vi.fn(() => ({
+      status: 'started',
+      item: { id: 'request-1', prompt: 'pregunta', model: 'chat', expectedEtaMs: 1000 },
+    })),
+    completeProcessing: vi.fn(() => null),
+    updateProcessingRoute: vi.fn(),
   }),
 }));
 
@@ -297,6 +326,7 @@ vi.mock('../../../services/agentService', () => ({
   buildClimaContext: vi.fn(() => ''),
   buildFincaContext: vi.fn(() => ''),
   buildViabilityContext: vi.fn(() => ''),
+  generateViabilityRules: vi.fn(() => ''),
   buildFrostHeatContext: vi.fn(() => ''),
   buildAssociationContext: vi.fn(() => ''),
   buildInvasiveSafetyContext: vi.fn(() => ''),
@@ -305,7 +335,7 @@ vi.mock('../../../services/agentService', () => ({
   resolveUserRegion: vi.fn(() => null),
   stripRoleLeak: vi.fn((text) => text),
   buildPriceDeclineContext: vi.fn(() => ''),
-  buildPriceAnswer: vi.fn(() => ''),
+  buildPriceAnswer: vi.fn(() => null),
   buildSuggestedEntitiesContext: vi.fn(() => ''),
   isLowConfidenceEntity: vi.fn(() => false),
   buildFallbackResponse: vi.fn(() => ''),
@@ -331,6 +361,10 @@ vi.mock('../../../services/speciesResolver', () => ({
 }));
 
 vi.mock('../../ChatHistory', () => ({
+  default: () => <div data-testid="chat-history-stub" />,
+}));
+
+vi.mock('../ChatHistory', () => ({
   default: () => <div data-testid="chat-history-stub" />,
 }));
 
@@ -401,7 +435,7 @@ describe('AgentScreen - chips toolbar', () => {
   });
 
   it('V3: colapsa la bandeja en la mochila; el disparador la abre y elegir un modo lo fuerza, la cierra y lo muestra', async () => {
-    render(<AgentScreen onBack={() => {}} />);
+    render(<AgentScreen onBack={() => {}} onNavigate={() => {}} initialContext={null} />);
 
     // El disparador vive en el compositor; la mochila arranca CERRADA (el
     // chat recupera el alto completo). ChipsToolbar NO está montada aún y no
@@ -439,5 +473,48 @@ describe('AgentScreen - chips toolbar', () => {
     fireEvent.click(screen.getByTestId('agent-modo-clear'));
     expect(screen.queryByTestId('agent-modo-tag')).not.toBeInTheDocument();
     expect(screen.getByTestId('agent-input')).toHaveAttribute('placeholder', 'Escribe tu pregunta...');
+  });
+
+  it('cierra PENSANDO y muestra fallo honesto si calendario MCP responde 502', async () => {
+    vi.stubGlobal('navigator', { onLine: true });
+    vi.mocked(isSidecarEnabled).mockReturnValue(true);
+    vi.mocked(isToolAllowed).mockReturnValue(true);
+    vi.mocked(planNlu).mockResolvedValue({
+      useTool: true,
+      tool: 'get_calendario_siembra',
+      args: { piso_termico: 'frio', mes: 8 },
+      toolChain: null,
+      // Forma completa del contrato NLU (sidecarClient.planNlu): el plan
+      // viene del sidecar, no de la heurística local.
+      latencyMs: 12,
+      modelUsed: null,
+      heuristicSkipped: false,
+      reason: null,
+      error: null,
+    });
+    vi.mocked(callTool).mockResolvedValue({
+      _error: true,
+      reason: 'fetch_failed',
+      tool: 'get_calendario_siembra',
+    });
+    vi.mocked(streamOpenAI).mockResolvedValue({ fullText: 'Respuesta general.', toolCalls: null });
+
+    render(<AgentScreen onBack={() => {}} onNavigate={() => {}} initialContext={null} />);
+    fireEvent.change(screen.getByTestId('agent-input'), {
+      target: { value: '¿Cuánto rinde la rúcula y cómo la siembro a 2200 msnm?' },
+    });
+    fireEvent.click(screen.getByTestId('agent-submit'));
+
+    await waitFor(() => {
+      expect(vi.mocked(callTool)).toHaveBeenCalledWith(
+        'get_calendario_siembra',
+        { piso_termico: 'frio', mes: 8 },
+      );
+      expect(vi.mocked(streamOpenAI)).toHaveBeenCalled();
+    });
+    await waitFor(() => {
+      expect(screen.queryByTestId('eta-label')).not.toBeInTheDocument();
+    });
+    expect(screen.getByText('No pude consultar el calendario ahora. Intenta de nuevo en un momento.')).toBeInTheDocument();
   });
 });

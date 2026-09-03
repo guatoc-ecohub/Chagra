@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback, useRef, useMemo } from 'react';
-import { ArrowLeft, Mic, MicOff, Send, Sparkles, Wifi, WifiOff, Volume2, VolumeX, RotateCcw, X, Home, Camera, Square, Sprout, HelpCircle } from 'lucide-react';
+import { ArrowLeft, Mic, Sparkles, Wifi, WifiOff, Volume2, VolumeX, RotateCcw, X, Home, Camera, Square, Sprout, HelpCircle } from 'lucide-react';
 import useVoiceRecorder from '../../hooks/useVoiceRecorder';
 import { mensajeErrorCampesino } from '../../utils/mensajeErrorCampesino';
 import { transcribe, queueForRetry } from '../../services/voiceService';
@@ -15,6 +15,7 @@ import {
 import { analyzeFoliage } from '../../services/aiService';
 import { captureAndCompress } from '../../services/photoService';
 import { processPhotoItem, buildPhotoUserMessage } from '../../services/agentOutboxPhoto';
+import { useCompaiSegundaOpinionFoto } from '../../hooks/useCompaiSegundaOpinionFoto';
 import { isAnalyzableImageAttachment, buildAttachmentRejection } from '../../services/agentOutboxAttachment';
 import { AGENT_ENTRANCE_CSS, AGENT_COMPOSITOR_CSS, AGENT_V3_CSS, agentEntranceClass } from './agentEntrance';
 import {
@@ -30,6 +31,11 @@ import {
   shouldStartNewSession,
 } from '../../services/conversationMemory';
 import { retrieve } from '../../services/ragRetriever';
+// agentComplexIngest — descompositor determinista de registros multi-entidad.
+// Se consulta ANTES del pipeline sidecar/LLM: si el texto describe varias
+// acciones de campo, se ejecutan las operaciones confirmadas vía actionExecutor
+// (lote/siembra) y se agenda la sugerencia agroecológica en segundo plano.
+import { decomposeComplexIngest, scheduleAgroecologicalSuggestion } from '../../services/agentComplexIngest';
 import { parseIntent, formatIntentDescription } from '../../services/agentIntentParser';
 import { streamOpenAI } from '../../services/openaiStream';
 import { buildLLMRequest, selectChatRoute } from '../../services/llmRouter';
@@ -47,7 +53,8 @@ import { createStreamDeadline } from '../../services/streamDeadline';
 // Sidecar agro-mcp (ADR-045 Fase 2 Step B/C). Detrás de feature flag
 // `VITE_USE_SIDECAR_AGRO_MCP` — con flag off, las funciones devuelven null
 // y el AgentScreen se comporta idéntico al pipeline RAG-only previo.
-import { isSidecarEnabled, planNlu, callTool, executeToolChain, resolveEntities, fermentoPrefilter, biopreparadoGrounding, pisoTermicoGuard, confusionEspecieGuard, pestVsDiseaseGuard, companionSpeciesGuard, postValidate, getClimaIdeam, isToolAllowed } from '../../services/sidecarClient';
+import { isSidecarEnabled, planNlu, callTool, executeToolChain, resolveEntities, fermentoPrefilter, biopreparadoGrounding, pisoTermicoGuard, confusionEspecieGuard, pestVsDiseaseGuard, companionSpeciesGuard, toxicSafetyGuard, postValidate, getClimaIdeam, isToolAllowed } from '../../services/sidecarClient';
+import { retrieveCorpus } from '../../services/corpusRetriever';
 // CHIPS DE MODO (A3/A4, decisión operador 2026-06-02): el router PURO mapea
 // la intención forzada del chip → tool determinístico, SALTANDO el NLU
 // (que misroutea). `planForcedIntent` decide tool+args; `isStubIntent` marca
@@ -98,7 +105,6 @@ import { submitDeepResearch, pollDeepResearch, isDeepResearchEnabled } from '../
 // isPro controla el gate de la UI (chip 🔬); x-chagra-tier se inyecta en el
 // sidecarClient/deepResearchClient vía buildSidecarHeaders (defense-in-depth).
 import { getCurrentTier } from '../../services/tierService';
-import DeepResearchCard from '../DeepResearchCard';
 import { normalizeUserInputForRegion, buildClimaContext, buildFincaContext, buildViabilityContext, buildFrostHeatContext, buildAssociationContext, buildInvasiveSafetyContext, buildCuratedFactsContext, applyVoseoFilter, resolveUserRegion, stripRoleLeak, buildPriceDeclineContext, buildPriceAnswer, buildSuggestedEntitiesContext, isLowConfidenceEntity, buildFallbackResponse, pisoTermicoFromAltitud, groupAndLimitCultivos } from '../../services/agentService';
 import { buildPriceReferenceAnswer } from '../../services/marketplaceService';
 import { buildBasePrompt, analyzeQuery, buildQueryAnalysisBlock, buildCorpusVariants, buildResolvedEntitiesBlock, formatToolEvidence, truncateEdgesBlock } from '../../services/agentPromptBase';
@@ -106,6 +112,7 @@ import { appendScientificFooter } from '../../services/semaforoConfianza';
 // Nubosidad real para el grounding (fix Choachí 2026-06) — solo lee caches.
 import { summarizeSkyForGrounding } from '../../services/skyConditionService';
 import { assembleSystemContent, TOP_N_RAG } from '../../services/promptAssembler';
+import { buildSpatialContextPin } from '../../services/spatialAgentContext';
 import { applyOutputGuards, classifyQueryIntent } from '../../services/outputGuards';
 import { createStreamGuard } from '../../services/streamGuards';
 import { getProfile, getModuleVisibility } from '../../services/userProfileService';
@@ -119,7 +126,8 @@ import { prependCorrectionBlock } from './responseGuards';
 // idea contextual (cultivo/clima/temporada) sin inventar alarmas. Lógica pura
 // y testeable extraída a proactiveGreeting; aquí solo la hidratamos desde los
 // stores en vivo y la pintamos en el empty-state del chat.
-import { resolveProactiveGreeting } from '../../services/proactiveGreeting';
+import { resolveProactiveGreeting, saludoPorHora } from '../../services/proactiveGreeting';
+import { saludoDePantalla } from '../../services/saludoPantalla';
 import useLogStore from '../../store/useLogStore';
 // Bug UX 2026-05-30: preservar respuesta parcial ante abort/timeout/cancel.
 // La lógica pura del merge del estado final vive en agentPartialMerge (testeable
@@ -137,7 +145,6 @@ import ChatHistory from './ChatHistory';
 import ActionConfirmModal from '../ActionConfirmModal';
 import FeedbackConsentModal from '../FeedbackConsentModal';
 import ChagraAgentAvatar from '../ChagraAgentAvatar';
-import ChagraAgentAvatarColibriPhoto from '../ChagraAgentAvatarColibriPhoto';
 import { AgentManoOverlay } from '../agent/AgentShell';
 import { mapCapabilityPick } from '../agent/capabilityRouting';
 import { agentSounds } from '../../services/agentSoundService';
@@ -146,13 +153,13 @@ import ManoChagraGlyph from '../dashboard/ManoChagraGlyph';
 // AgentHero): el acceso a capacidades entra por el ícono del tema, no por la
 // mano (operador 2026-06-18). Misma fuente que TopBar.jsx / AgentHero.jsx.
 import { useTheme } from '../../hooks/useTheme';
-import { iconForTheme } from '../dashboard/themeIcon';
+import BotonAnarquiaGlyph from '../dashboard/BotonAnarquiaGlyph';
 import { fincaVivaHomePerfilActivo } from '../../config/fincaVivaHomeFlag';
 // Agente guiado: selección PURA de un insight verificado proactivo a partir del
 // texto del turno (cultivo detectado → dato con fuente que el usuario no vio).
 // El hook useInsightProactivo exporta estas funciones puras; aquí las usamos
 // imperativamente al cerrar cada turno para ofrecer el insight DENTRO del chat.
-import { detectarSlugEnTexto, elegirInsight } from '../../hooks/useInsightProactivo';
+import { detectarSlugEnTexto, elegirInsight, detectarInsightCatalogo } from '../../hooks/useInsightProactivo';
 import usePrefsStore from '../../store/usePrefsStore';
 import useAssetStore from '../../store/useAssetStore';
 import useAgentNotificationStore from '../../store/useAgentNotificationStore';
@@ -184,6 +191,22 @@ const STATE_IDLE = 'idle';
 const STATE_RECORDING = 'recording';
 const STATE_THINKING = 'thinking';
 
+const MCP_TOOL_FAILURE_LABELS = {
+  get_calendario_siembra: 'el calendario',
+};
+
+const findMcpToolFailure = (toolEvidence) => {
+  const evidences = Array.isArray(toolEvidence) ? toolEvidence : [toolEvidence];
+  return evidences.find((evidence) => evidence?.result?._error === true) || null;
+};
+
+const mcpToolFailureMessage = (toolEvidence) => {
+  const failure = findMcpToolFailure(toolEvidence);
+  if (!failure) return '';
+  const label = MCP_TOOL_FAILURE_LABELS[failure.tool] || 'esa consulta técnica';
+  return `No pude consultar ${label} ahora. Intenta de nuevo en un momento.`;
+};
+
 export default function AgentScreen({ onBack, onNavigate, initialContext }) {
   // B1: clase de animación de entrada, resuelta UNA vez al montar (no en cada
   // re-render — si no, la animación se reiniciaría con cada mensaje). Vacía bajo
@@ -197,6 +220,9 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
   // colibrí dblclick) AgentScreen no se enteraba.
   const ttsEnabled = usePrefsStore((s) => s.ttsEnabled);
   const setTtsEnabled = usePrefsStore((s) => s.setTtsEnabled);
+  // #67/#43: segunda mirada real sobre la MISMA foto (qwen3-vl:4b, en
+  // segundo plano) — habla SÓLO si discrepa con lo que ya se le dijo.
+  const { pedirRevision: pedirSegundaOpinionFoto } = useCompaiSegundaOpinionFoto();
   const setResponseReady = useAgentNotificationStore((s) => s.setResponseReady);
   const setLastNotificationMessage = useAgentNotificationStore((s) => s.setLastMessage);
   const markRead = useAgentNotificationStore((s) => s.markRead);
@@ -235,6 +261,13 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
   // Contexto ambiental de la finca (#202 mejora inteligencia): alertas activas
   // del alertEngine para que el agente las tenga en cuenta sin pedir fetch.
   const activeAlerts = useAlertStore((s) => s.activeAlerts);
+  // El valle 3D entrega un pin de turno 0 al abrir el chat. No se mezcla con
+  // el texto del usuario ni se persiste en memoria conversacional: permanece
+  // como sistema durante esta sesión y el flujo del chat sigue intacto.
+  const spatialContextPin = useMemo(
+    () => buildSpatialContextPin(initialContext?.spatialContext),
+    [initialContext],
+  );
 
   const [messages, setMessages] = useState([]);
   // Agente guiado: ids de insights ya ofrecidos/vistos en esta sesión de chat,
@@ -259,7 +292,9 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
   const [thinkingPhase, setThinkingPhase] = useState(null);
   const [isOnline, setIsOnline] = useState(navigator.onLine);
   const [error, setError] = useState('');
-  const [actionModal, setActionModal] = useState({ isOpen: false, intent: null, llmResponse: '' });
+  // gateId: id único por acción; el key del ActionConfirmModal remonta el
+  // modal en cada gate (BUG-01). '' = ningún gate abierto todavía.
+  const [actionModal, setActionModal] = useState({ isOpen: false, gateId: '', intent: null, llmResponse: '', toolName: '', description: '', parameters: {} });
   // Task #194: Modal de consentimiento para feedback
   const [feedbackConsentModal, setFeedbackConsentModal] = useState({ isOpen: false, pendingAction: null });
   const ttsSupported = isSupported();
@@ -566,6 +601,19 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
         ensoOutlook = getEnsoOutlook({ phase, region, probabilities: probs });
       }
     } catch (_) { /* sin ENSO no pasa nada — la idea cae a temporada/piso */ }
+    // SALUDO CONTEXTUAL POR PANTALLA (2026-07-16): si el operador tocó a
+    // Angelita desde una pantalla mapeada (AgentFab pasa `desdePantalla`),
+    // ella saluda sobre ESO — "¿le ayudo con la germinación?" en #semilla.
+    // Los pendientes URGENTES siguen mandando (una alerta de plaga le gana
+    // a la cortesía); el saludo de pantalla solo reemplaza la idea genérica.
+    const saludoPantalla = saludoDePantalla(initialContext?.desdePantalla);
+    const greetingDePantalla = (hi) => ({
+      state: 'idea',
+      hi: hi || saludoPorHora(),
+      lead: saludoPantalla,
+      items: [],
+      restCount: 0,
+    });
     resolveProactiveGreeting({
       activeAlerts,
       getPendingTasks: () => useLogStore.getState().getPendingTasks(),
@@ -573,8 +621,17 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
       altitud: finca?.altitud != null ? Number(finca.altitud) : null,
       ensoOutlook,
     }).then((g) => {
-      if (alive) setProactiveGreeting(g);
-    }).catch(() => { /* degrada silencioso al copy estático */ });
+      if (!alive) return;
+      if (saludoPantalla && (!g || g.state !== 'pending')) {
+        setProactiveGreeting(greetingDePantalla(g?.hi));
+      } else {
+        setProactiveGreeting(g);
+      }
+    }).catch(() => {
+      // Degrada silencioso: con saludo de pantalla lo usamos igual; sin él,
+      // cae al copy estático de siempre.
+      if (alive && saludoPantalla) setProactiveGreeting(greetingDePantalla());
+    });
     return () => { alive = false; };
     // Solo al montar: el saludo es la primera impresión, no debe re-evaluarse en
     // cada cambio de inventario/alerta mientras el operador ya está leyéndolo.
@@ -589,8 +646,9 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
   // normal NO debe re-disparar el prompt.
   useEffect(() => {
     if (!initialContext) return;
-    const { prefilledPrompt, prompt, sourceLabel, sourceUrl, alertContext, autoSend, fromVoice } = initialContext;
+    const { prefilledPrompt, prompt, sourceLabel, sourceUrl, alertContext, autoSend, fromVoice, autoOpenCamera } = initialContext;
     let autoSendTimer = null;
+    let autoCameraTimer = null;
     // Alias defensivo: varias pantallas de mundo pasaban la clave `prompt`
     // (SemillaScreen, PlatanoBanano, Poscosecha, Almacenamiento, Compost,
     // SaludSuelo…) creyendo que prellenaban el input, pero solo se leía
@@ -610,6 +668,16 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
         setInputText(seed);
       }
     }
+    // "Enviar foto" desde el menú del gesto del compañero (#66/#70, AgentFab):
+    // llega con autoOpenCamera y disparamos el mismo input oculto que usa el
+    // botón de cámara del compositor — el diagnóstico real llega después
+    // (handleAgentPhotoPick de siempre); aquí solo destrabamos el picker sin
+    // que el operador tenga que buscar el botón.
+    if (autoOpenCamera) {
+      autoCameraTimer = setTimeout(() => {
+        cameraInputAgentRef.current?.click();
+      }, 250);
+    }
     if (sourceUrl || sourceLabel || alertContext) {
       setAlertContextBanner({
         sourceLabel: sourceLabel || null,
@@ -617,7 +685,10 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
         alertContext: alertContext || null,
       });
     }
-    return () => { if (autoSendTimer) clearTimeout(autoSendTimer); };
+    return () => {
+      if (autoSendTimer) clearTimeout(autoSendTimer);
+      if (autoCameraTimer) clearTimeout(autoCameraTimer);
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -721,6 +792,12 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
         actionGateResolverRef.current = resolve;
         setActionModal({
           isOpen: true,
+          // gateId: remonta el ActionConfirmModal por acción (key en el JSX).
+          // BUG-01 (P1, hard-test David/Cata): sin esto el modal conservaba el
+          // borrador de parámetros del primer render ({}) y aprobaba la
+          // ejecución de la tool con un plan vacío — el agente decía que
+          // registraba y no persistía nada.
+          gateId: `gate-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
           toolName,
           description,
           parameters,
@@ -803,7 +880,7 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
     const wasEdited = JSON.stringify(params) !== JSON.stringify(actionModal.parameters);
     const resolver = actionGateResolverRef.current;
     actionGateResolverRef.current = null;
-    setActionModal({ isOpen: false, intent: null, llmResponse: '' });
+    setActionModal({ isOpen: false, gateId: '', intent: null, llmResponse: '', toolName: '', description: '', parameters: {} });
     if (resolver) {
       resolver({
         status: wasEdited ? 'edited' : 'approved',
@@ -815,7 +892,7 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
   const handleActionReject = () => {
     const resolver = actionGateResolverRef.current;
     actionGateResolverRef.current = null;
-    setActionModal({ isOpen: false, intent: null, llmResponse: '' });
+    setActionModal({ isOpen: false, gateId: '', intent: null, llmResponse: '', toolName: '', description: '', parameters: {} });
     if (resolver) {
       resolver({ status: 'rejected' });
     }
@@ -875,7 +952,7 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
   // formatToolEvidence y analyzeQuery viven en agentPromptBase (funciones
   // puras, testeables y medibles fuera de React).
 
-  const callLLM = async (query, contextMemory, contextCorpus, toolEvidence, resolvedEntities, suggestedEntities = null, fermentoBlock = '', subgrafoBloque = '', biopreparadoBlock = '', pisoTermicoBlock = '', confusionEspecieBlock = '', pestVsDiseaseBlock = '', groundingPolicyBlock = '') => {
+  const callLLM = async (query, contextMemory, contextCorpus, toolEvidence, resolvedEntities, suggestedEntities = null, fermentoBlock = '', subgrafoBloque = '', biopreparadoBlock = '', pisoTermicoBlock = '', confusionEspecieBlock = '', pestVsDiseaseBlock = '', groundingPolicyBlock = '', toxicSafetyBlock = '') => {
     // Fase 3 del "pensando" visible: generación en el LLM. Cuando llega el
     // primer token, la UI pasa sola al parcial streaming (streamingContent).
     setThinkingPhase('escribiendo');
@@ -945,7 +1022,7 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
         const { getActiveDiseaseForCycle } = await import('../../services/diseaseObservationService');
         const STAGE_LBL = { sowing: 'Siembra', emergence: 'Brotó', vegetative: 'Creciendo', flowering: 'Floración', fruiting: 'Frutos', harvest_window: 'Cosecha', closed: 'Terminado' };
         const cycles = (await listFarmProcesses({ status: 'active' })) || [];
-        return await Promise.all(cycles.slice(0, 5).map(async (c) => {
+        return await Promise.all(cycles.slice(0, 5).map(async (/** @type {any} */ c) => {
           const at = c.attributes || {};
           const id = c.process_id || c.id;
           const base = String(at.current_stage || '').replace(/_confirmed$/, '');
@@ -1126,6 +1203,18 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
       ? `\n\n${pestVsDiseaseBlock}`
       : '';
 
+    // PISO DE SEGURIDAD ANTE VENENOS (chagra-pro P0 #2, query-side). El sidecar
+    // /toxic-safety-guard escaneó la CONSULTA del usuario: si nombró un
+    // plaguicida tóxico/prohibido, armó un bloque de advertencia + alternativas
+    // MIP. Va de ÚLTIMO (máxima recency, después de todas las guardas) porque es
+    // seguridad y debe DOMINAR — y es INDEPENDIENTE del RAG: cierra el hueco de
+    // la abstención (el guard de salida no ve el veneno si el modelo no repite
+    // el nombre). '' (no-op) cuando la consulta no menciona veneno o el sidecar
+    // no respondió (degradación graceful — no rompe el turno).
+    const toxicSafetyContext = (typeof toxicSafetyBlock === 'string' && toxicSafetyBlock.trim())
+      ? `\n\n${toxicSafetyBlock}`
+      : '';
+
     // MODO CIENTÍFICO (#17) — bloque answer/hedge/abstain ya formateado por
     // el sidecar (WIRING real de grounding-policy.ts/grounding-prompt-
     // formatter.ts). Va DENTRO del cluster de grounding (después de la cadena
@@ -1170,10 +1259,12 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
       pisoTermico: pisoTermicoSafetyBlock,
       confusionEspecie: confusionEspecieSafetyBlock,
       pestVsDisease: pestVsDiseaseSafetyBlock,
+      toxicSafety: toxicSafetyContext,
     });
 
     const messages = [
       { role: 'system', content: assembled.content },
+      ...(spatialContextPin ? [{ role: 'system', content: spatialContextPin }] : []),
       ...(contextMemory ? [{ role: 'user', content: contextMemory }] : []),
       { role: 'user', content: query },
     ];
@@ -1348,11 +1439,15 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
         // que runAgentPipeline corra el merge del estado final y preserve el
         // texto streamed si lo hubo. cancelReasonRef lo setea handleCancelLLM
         // (cancel) o el timer/watchdog (timeout); por defecto 'abort' genérico.
-        const interruptErr = new Error('Inferencia interrumpida');
+        const interruptErr = /** @type {Error & {interrupted: boolean, interruptReason: string}} */ (new Error('Inferencia interrumpida'));
         interruptErr.interrupted = true;
         interruptErr.interruptReason = cancelReasonRef.current || 'abort';
         throw interruptErr;
       }
+      // Preserve the typed sidecar failure so the outer pipeline can show the
+      // tool-specific honest message instead of replacing it with a generic
+      // LLM error.
+      if (e?.mcpToolError) throw e;
       const match = e.message.match(/^LLM (\d+)/);
       if (match) {
         const status = parseInt(match[1], 10);
@@ -1441,7 +1536,15 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
       await addTurn(operatorId, { role: 'user', content: text.trim() });
 
       const contextMemory = wasFreshSession ? '' : await getContextString(operatorId, 10);
-      const contextCorpus = await retrieve(textForLLM, TOP_N_RAG, 'agente');
+      const contextCorpusBase = await retrieve(textForLLM, TOP_N_RAG, 'agente');
+      // #2593 corpus→chat: suma los chunks del corpus server-side (pgvector +
+      // reranker neural bge-reranker-v2-m3 + gate low_relevance) vía
+      // /hybrid-retrieve. Gated por VITE_USE_CORPUS_RETRIEVAL (OFF por defecto)
+      // y fail-soft (devuelve [] si falla) → sin el flag, cero cambio en el chat.
+      const corpusExtra = await retrieveCorpus(textForLLM, 3);
+      const contextCorpus = corpusExtra.length
+        ? [...contextCorpusBase, ...corpusExtra]
+        : contextCorpusBase;
 
       // ADR-045 Fase 2 Step B/C — sidecar NLU + MCP tool grounding.
       // Solo si flag VITE_USE_SIDECAR_AGRO_MCP=true Y estamos online.
@@ -1493,6 +1596,11 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
       // coinciden). '' por default → no-op (degradación graceful, incluye el
       // caso de desacuerdo catálogo↔heurística — fail-safe a propósito).
       let pestVsDiseaseBlock = '';
+      // PISO DE SEGURIDAD ANTE VENENOS (chagra-pro P0 #2, query-side). Bloque de
+      // advertencia toxicidad + MIP ya formateado por el sidecar
+      // (/toxic-safety-guard) cuando la CONSULTA menciona un plaguicida
+      // tóxico/prohibido. '' por default → no-op (degradación graceful).
+      let toxicSafetyBlock = '';
       // MODO CIENTÍFICO (#17) — WIRING real de grounding-policy.ts/grounding-
       // prompt-formatter.ts (audit 2026-07-04-optimizacion-grounding-
       // velocidad-inteligencia.md win #4). El sidecar decide answer/hedge/
@@ -1525,7 +1633,7 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
           // numérica. Sin esto, el guard igual funciona vía texto libre del
           // mensaje (degradación por diseño del sidecar).
           const rePisoTermico = (() => {
-            try { const p = getProfile(); if (p && p.piso_termico) return p.piso_termico; } catch (_) { /* noop */ }
+            try { const p = getProfile(); if (p.piso_termico) return p.piso_termico; } catch (_) { /* noop */ }
             return null;
           })();
           const tRE0 = performance.now();
@@ -1535,13 +1643,14 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
           // /resolve-entities (mismo turno, antes del LLM) — CERO latencia
           // serial añadida. Los seis wrappers son no-throw (devuelven null en
           // error/timeout), así que Promise.all no puede rechazar por ellos.
-          const [resolved, fermento, biopreparado, pisoTermico, confusionEspecie, pestVsDisease] = await Promise.all([
+          const [resolved, fermento, biopreparado, pisoTermico, confusionEspecie, pestVsDisease, toxicSafety] = await Promise.all([
             resolveEntities(textForLLM, { fincaAltitud: reAltitud, context: contextMemory }),
             fermentoPrefilter(textForLLM),
             biopreparadoGrounding(textForLLM),
             pisoTermicoGuard(textForLLM, { fincaAltitud: reAltitud, pisoTermico: rePisoTermico }),
             confusionEspecieGuard(textForLLM),
             pestVsDiseaseGuard(textForLLM),
+            toxicSafetyGuard(textForLLM),
           ]);
           const tRE1 = performance.now();
           // FERMENTOS: si el sidecar marcó intención-fermento, inyectamos su
@@ -1618,6 +1727,18 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
               termCategoria: pestVsDisease.term_categoria,
               manejoEquivocadoDetectado: pestVsDisease.manejo_equivocado_detectado,
               reason: pestVsDisease.reason,
+            });
+          }
+          // PISO DE SEGURIDAD ANTE VENENOS (P0 #2): si el sidecar detectó que la
+          // CONSULTA menciona un plaguicida tóxico/prohibido, inyectamos su
+          // bloque de advertencia + MIP (máxima recency, independiente del RAG).
+          // Si el sidecar no respondió (null) o no hay veneno, toxicSafetyBlock
+          // queda '' → no-op, el turno sigue sin romperse (fail-safe).
+          if (toxicSafety && toxicSafety.has_toxic_mention && typeof toxicSafety.system_prompt_block === 'string' && toxicSafety.system_prompt_block.trim()) {
+            toxicSafetyBlock = toxicSafety.system_prompt_block;
+            console.debug('[sidecar] toxic-safety-guard', {
+              toxics: toxicSafety.toxics,
+              reason: toxicSafety.reason,
             });
           }
           if (resolved && Array.isArray(resolved.entities) && resolved.entities.length > 0) {
@@ -1778,9 +1899,9 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
             // es cliente-side, usa datos del DR consolidado, y sus guardas
             // anti-mito afloran en la respuesta del agente.
             if (!toolEvidence) {
-              const modules = [
+              const modules = /** @type {Array<[Function, () => Promise<any>, string, string]>} */ ([
                 [hasSoilDiagnosticIntent, () => import('../../services/soilDiagnostic'), 'soil_diagnostic', 'suelo'],
-              ];
+              ]);
               // Agua, animal, restauracion, riesgo-incendio si el intent matcher existe
               try {
                 const { hasWaterDiagnosticIntent, hasAnimalDiagnosticIntent, hasRestauracionDiagnosticIntent, hasIncendioRiskIntent } = await import('../../services/knowledgeIntentRouter');
@@ -1804,7 +1925,7 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
               for (const [hasIntent, loadMod, tool, label] of modules) {
                 if (hasIntent(textForLLM)) {
                   try {
-                    const mod = await loadMod();
+                    const mod = /** @type {{diagnosticar: Function, formatear: Function}} */ (await loadMod());
                     const diag = mod.diagnosticar(textForLLM, { altitud: restAltitud });
                     if (diag && (diag.sin_datos === false || diag.alerta)) {
                       const bloque = mod.formatear(diag);
@@ -1846,7 +1967,7 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
             const pisoTermicoChip = (() => {
               try {
                 const p = getProfile();
-                if (p && p.piso_termico) return p.piso_termico;
+                if (p.piso_termico) return p.piso_termico;
               } catch (_) { /* noop */ }
               return pisoTermicoFromAltitud(fincaAltitudChip);
             })();
@@ -1858,7 +1979,7 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
             if (forcedPlan && forcedPlan.localGrounding === 'precio_referencia') {
               const priceMsg = buildPriceReferenceAnswer(forcedPlan.args?.producto || textForLLM);
               if (priceMsg) {
-                const userMessage = { role: 'user', content: trimmed, timestamp: Date.now() };
+                const userMessage = { role: 'user', content: text.trim(), timestamp: Date.now() };
                 const assistantMessage = {
                   role: 'assistant',
                   content: priceMsg,
@@ -1866,7 +1987,7 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
                 };
                 setMessages((prev) => [...prev, userMessage, assistantMessage]);
                 try {
-                  await addTurn(operatorId, { role: 'user', content: trimmed });
+                  await addTurn(operatorId, { role: 'user', content: text.trim() });
                   await addTurn(operatorId, { role: 'assistant', content: priceMsg });
                 } catch (e) {
                   console.warn('[Agent] precio addTurn failed (continuo):', e?.message);
@@ -2203,9 +2324,15 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
       const deterministicPrice = buildPriceAnswer({ userMessage: text, toolEvidence });
       const rawResponse = deterministicPrice != null
         ? deterministicPrice
-        : await callLLM(textForLLM, contextMemory, contextCorpus, toolEvidence, resolvedEntities, suggestedEntities, fermentoBlock, edgesTruncated, biopreparadoBlock, pisoTermicoBlock, confusionEspecieBlock, pestVsDiseaseBlock, groundingPolicyBlock);
+        : await callLLM(textForLLM, contextMemory, contextCorpus, toolEvidence, resolvedEntities, suggestedEntities, fermentoBlock, edgesTruncated, biopreparadoBlock, pisoTermicoBlock, confusionEspecieBlock, pestVsDiseaseBlock, groundingPolicyBlock, toxicSafetyBlock);
       if (deterministicPrice != null) {
         console.debug('[precio] respuesta determinista SIPSA (sin LLM)', { route: nluRoute });
+      }
+      const toolFailureMessage = mcpToolFailureMessage(toolEvidence);
+      if (toolFailureMessage) {
+        // El modelo puede completar con conocimiento general, pero el fallo
+        // del dato MCP debe quedar visible y accionable para el operador.
+        setError(toolFailureMessage);
       }
       // Fallback estructurado (Item 9): si el LLM retornó vacío (timeout, OOM,
       // modelo caído), construimos una respuesta útil con lo que sabemos
@@ -2239,7 +2366,7 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
       // hacen nada salvo el guard de agroquímico, que usa denylist propia).
       const guardAltitud =
         (fincaActiva && fincaActiva.altitud) ||
-        (() => { try { const p = getProfile(); return (p && p.finca_altitud) || null; } catch (_) { return null; } })();
+        (() => { try { const p = getProfile(); return p.finca_altitud || null; } catch (_) { return null; } })();
       // P0 (prod 2026-05-31): el agente FABRICABA un diagnóstico visual sin foto
       // real ("Analicé una foto, estado 95/100" + hallazgos de Mapacho del RAG
       // de tabaco). hadVision marca si ESTE turno trajo una imagen real
@@ -2249,7 +2376,7 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
       // concluyente. Para turnos de texto/voz, visionContext es null → hadVision
       // false → corrige cualquier afirmación visual inventada.
       const guardProfileName =
-        (() => { try { const p = getProfile(); return (p && p.nombre) || null; } catch (_) { return null; } })();
+        (() => { try { const p = getProfile(); return p.nombre || null; } catch (_) { return null; } })();
       // HARDENING térmico (audit #23): mínima/máxima esperadas del pronóstico ya
       // cacheado (mismo snapshot que buildFrostHeatContext — NO se re-pide).
       // Habilita guardThermalViability para advertir helada/golpe de calor sobre
@@ -2286,6 +2413,7 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
         // evitando la cascada de "NO es viable a N msnm" por cada variedad. Los
         // guards de SAFETY (agroquímico, dosis, visión, nombre) corren igual.
         userMessage: text,
+        toolEvidence,
       });
       if (guarded.modified) {
         console.debug('[guards] salida corregida', { reasons: guarded.reasons });
@@ -2324,6 +2452,7 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
       // del assistant fue grounded contra el catálogo (tool MCP devolvió
       // match) o fue solo generativo del LLM. ChatBubble lee este metadata
       // para renderizar el badge verde/amber/gris (ver computeSourceMetadata).
+      /** @type {any} */
       let sourceMetadata = computeSourceMetadata(toolEvidence);
 
       // #18 + #20: surfacéa en metadata las señales del grounding curado que la
@@ -2371,13 +2500,13 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
               : [],
           }
         : {};
-      sourceMetadata = {
+      sourceMetadata = /** @type {any} */ ({
         ...sourceMetadata,
         ...evidenceSourceLink,
         ...groundingBadges,
         ...groundingSemaphoreMeta,
         auto_corrected: responseAutoCorrected,
-      };
+      });
       const profileMode = (() => {
         try {
           return getProfile()?.nivel_respuestas || '';
@@ -2402,7 +2531,7 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
       // pinta "Dato de otro cultivo · verifica"). Solo corre sobre turnos que
       // IBAN a salir verificados. Graceful: cualquier fallo deja el sello
       // intacto (jamás degrada por error).
-      if (sourceMetadata && sourceMetadata.grounded === true) {
+      if (sourceMetadata.grounded === true) {
         try {
           const cropInFocusIds = Array.from(new Set(
             (resolvedEntities || [])
@@ -2458,7 +2587,7 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
             .filter((n) => typeof n === 'string' && n.trim().length > 0);
           if (expected.length > 0) {
             const pv = await postValidate(responseBody, expected);
-            sourceMetadata = mergePostValidateMetadata(sourceMetadata, pv);
+            sourceMetadata = /** @type {any} */ (mergePostValidateMetadata(sourceMetadata, pv));
             if (sourceMetadata.hallucinated_names || sourceMetadata.suspect_names) {
               console.debug('[sidecar] post-validate flags', {
                 hallucinated: sourceMetadata.hallucinated_names,
@@ -2494,6 +2623,16 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
           if (candidato && candidato.id) {
             insightProactivo = candidato;
             insightsVistosRef.current = [...insightsVistosRef.current, candidato.id];
+          }
+        }
+        // Las cards históricas cubren cultivos conocidos. Para el resto, el
+        // resolver consulta el catálogo real y sólo deriva un dato estructurado
+        // si existe evidencia utilizable.
+        if (!insightProactivo && typeof detectarInsightCatalogo === 'function') {
+          const resultadoCatalogo = await detectarInsightCatalogo(textoTurno, insightsVistosRef.current);
+          if (resultadoCatalogo?.insight?.id) {
+            insightProactivo = resultadoCatalogo.insight;
+            insightsVistosRef.current = [...insightsVistosRef.current, resultadoCatalogo.insight.id];
           }
         }
       } catch (e) {
@@ -2532,10 +2671,10 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
           session_id: `${operatorId}:${activeFincaSlug || 'sin-finca'}`,
           nlu_route: nluRoute,
           entities_grounded: Array.isArray(resolvedEntities)
-            ? resolvedEntities.map((e) => e?.canonical_id || e?.id || e?.mentioned).filter(Boolean)
+            ? resolvedEntities.map((/** @type {any} */ e) => e?.canonical_id || e?.id || e?.mentioned).filter(Boolean)
             : [],
           guards_fired: guarded.modified ? guarded.reasons || [] : [],
-          grounded_status: sourceMetadata?.source || sourceMetadata?.grounded_status || null,
+          grounded_status: (/** @type {any} */ (sourceMetadata))?.source || (/** @type {any} */ (sourceMetadata))?.grounded_status || null,
           latency_ms: Math.round(performance.now() - pipelineStartedAt),
           model: selectChatRoute(textForLLM),
           eval_rate: currentLlmStats?.eval_rate ?? null,
@@ -2559,10 +2698,10 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
             latency: { t_first_token_ms: currentLlmStats?.first_token_ms ?? null },
             grounding: {
               entities: Array.isArray(resolvedEntities)
-                ? resolvedEntities.map((e) => e?.canonical_id || e?.id || e?.mentioned).filter(Boolean)
+                ? resolvedEntities.map((/** @type {any} */ e) => e?.canonical_id || e?.id || e?.mentioned).filter(Boolean)
                 : [],
               tools: Array.isArray(toolEvidence)
-                ? toolEvidence.map((t) => t?.tool || t?.name).filter(Boolean)
+                ? toolEvidence.map((/** @type {any} */ t) => t?.tool || t?.name).filter(Boolean)
                 : [],
               rag_chunks: Array.isArray(contextCorpus) ? contextCorpus.length : 0,
               nlu_route: nluRoute || durableRoute,
@@ -2698,7 +2837,13 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
       } else {
         // NUNCA e.message crudo al banner ("Failed to fetch", stacktraces):
         // mensajeErrorCampesino respeta frases ya curadas y traduce lo técnico.
-        setError(mensajeErrorCampesino(e, 'No pude con esa pregunta. Intente de nuevo, o pregunte de otra forma.'));
+        const mcpStreamError = e?.mcpToolError
+          ? mcpToolFailureMessage({
+              tool: e.tool,
+              result: { _error: true },
+            })
+          : '';
+        setError(mcpStreamError || mensajeErrorCampesino(e, 'No pude con esa pregunta. Intente de nuevo, o pregunte de otra forma.'));
         // Error NO-interrupción (HTTP 5xx, sesión, etc.): marcar failed. El
         // prompt queda intacto en IDB; la cola durable NO lo reintenta (no es
         // recuperable solo con reintentar), pero NO se pierde el dato.
@@ -2789,6 +2934,94 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
       ),
     );
   }, []);
+
+  // agentComplexIngest — descompositor determinista de registros multi-entidad.
+  // Se consulta ANTES de enrutar al pipeline sidecar/LLM (handleSubmit). Si el
+  // texto describe varias acciones de campo, muestra una confirmación conjunta
+  // (gate del actionExecutor) y ejecuta la ingesta confirmada por las puertas
+  // offline-first existentes. La sugerencia agroecológica se agenda async, sin
+  // bloquear el cierre del turno. Devuelve true si el turno se manejó por esta
+  // ruta, false para el flujo normal.
+  const handleComplexIngest = async (text) => {
+    const plan = decomposeComplexIngest(text);
+    if (!plan || !plan.detected) return false;
+
+    const userMessage = { role: 'user', content: text, timestamp: Date.now() };
+    setMessages((prev) => [...prev, userMessage]);
+    try {
+      await addTurn(operatorId, { role: 'user', content: text });
+    } catch (e) {
+      console.warn('[ComplexIngest] addTurn user failed:', e?.message);
+    }
+    setActiveIntent(null);
+
+    // Agenda la sugerencia agroecológica en segundo plano. NO se espera: la
+    // ruta secundaria (grafo/LLM) nunca participa en la ejecución de registros.
+    scheduleAgroecologicalSuggestion(plan, (suggestion) => {
+      console.debug('[ComplexIngest] sugerencia agroecológica agendada:', suggestion);
+    });
+
+    try {
+      // Un solo gate cubre el plan completo. La tool interna delega en las
+      // puertas offline-first de lote y FarmProcess después de la aprobación.
+      const actionResult = await executeAction({
+        tool_name: 'registrar_ingesta_compleja',
+        parameters: { plan },
+        intent: text,
+        llm_response: '',
+        timestamp: new Date().toISOString(),
+      }, operatorId);
+      const summary = actionResult?.result?.summary || {
+        status: actionResult?.status === 'executed' ? 'executed' : 'partial',
+        executed: 0,
+        failed: 1,
+        results: [],
+      };
+      const registered = summary.results
+        .filter((item) => item.status === 'executed')
+        .map(({ operation }) => operation);
+      const notRegistered = plan.operations.filter(
+        (operation) => !registered.some((item) => item.kind === operation.kind && item.parameters?.ordinal === operation.parameters?.ordinal && item.parameters?.name === operation.parameters?.name),
+      );
+      const registeredLabels = registered.map((operation) => {
+        if (operation.kind === 'ensure_land') return 'el surco';
+        if (operation.kind === 'create_seeding') return 'la siembra retrofechada';
+        if (operation.kind === 'register_harvest') return `la cosecha ${operation.parameters.ordinal}`;
+        if (operation.kind === 'register_fertilizer_cadence') return `el abono cada ${operation.parameters.interval_days} días`;
+        return `la observación de ${operation.parameters.name}`;
+      });
+      const missingTreatment = plan.operations.some(
+        (operation) => operation.kind === 'register_problem' && operation.parameters.treatment_status === 'missing',
+      );
+      const suggestion = 'Opción agroecológica inicial para tomate: revisar a diario, retirar manualmente los trozadores y las hojas con síntomas, mejorar la ventilación y evitar mojar el follaje. Si persiste, consultamos una alternativa verificada antes de aplicar cualquier insumo.';
+      const allPersisted = actionResult?.status === 'executed' && actionResult?.result?.success !== false;
+
+      const assistantMessage = {
+        role: 'assistant',
+        content: allPersisted
+          ? `Listo. Registré ${registeredLabels.join(', ')}. ${missingTreatment ? 'No se registró ningún tratamiento porque no fue informado.' : ''} ${plan.followUpQuestion || ''} ${suggestion}`
+          : registeredLabels.length > 0
+            ? `Registré solo ${registeredLabels.join(', ')}. No registré ${notRegistered.length} operación${notRegistered.length === 1 ? '' : 'es'} porque la escritura no terminó. ${missingTreatment ? 'El tratamiento sigue pendiente.' : ''}`
+            : 'No registré ninguna operación porque la confirmación o la escritura no terminó. No se guardó el tratamiento.',
+        timestamp: Date.now(),
+      };
+      setMessages((prev) => [...prev, assistantMessage]);
+      try {
+        await addTurn(operatorId, { role: 'assistant', content: assistantMessage.content });
+      } catch (e) {
+        console.warn('[ComplexIngest] addTurn assistant failed:', e?.message);
+      }
+    } catch (e) {
+      console.warn('[ComplexIngest] execute failed:', e?.message);
+      const errMsg = {
+        role: 'assistant',
+        content: 'No pude registrar las operaciones. Intenta de nuevo.',
+        timestamp: Date.now(),
+      };
+      setMessages((prev) => [...prev, errMsg]);
+    }
+    return true;
+  };
 
   const handleSubmit = async (text, { fromVoice = false, suppressUserBubble = false, visionContext = null, forcedIntent = null } = {}) => {
     if (!text || !text.trim()) return;
@@ -3018,6 +3251,14 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
       }
     }
 
+    // agentComplexIngest: descomponer el texto ANTES de enrutar al sidecar/LLM.
+    // Si detecta un registro multi-entidad (Caso 1), se muestran las
+    // operaciones a confirmar y se ejecutan sin pasar por el pipeline RAG/LLM.
+    // Si no, devuelve false y el turno sigue el flujo normal.
+    if (await handleComplexIngest(trimmed)) {
+      return;
+    }
+
     const route = selectChatRoute(trimmed);
     const result = useAgentQueueStore.getState().enqueue(trimmed, route);
 
@@ -3240,6 +3481,33 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
     setAgentPickError('');
   };
 
+  /**
+   * #67/#43 — dispara la segunda mirada real sobre la foto que YA se
+   * diagnosticó en este turno (fire-and-forget: nunca bloquea ni retrasa la
+   * respuesta principal, que ya salió). Si discrepa, `avisar` inserta una
+   * burbuja de asistente NUEVA — el mismo lugar donde ya vive la
+   * conversación — y la habla si el usuario tiene TTS activo (mismo canal
+   * por el que ya viene escuchando). Si coincide, queda en silencio total
+   * (regla del propio módulo): no hay burbuja "confirmado" que sea puro ruido.
+   */
+  const dispararSegundaOpinionFoto = useCallback((blob, finding) => {
+    if (!blob) return;
+    pedirSegundaOpinionFoto({
+      imageBlob: blob,
+      finding,
+      canal: ttsEnabled ? 'voz' : 'texto',
+      avisar: (texto, { canal }) => {
+        setMessages((prev) => [
+          ...prev,
+          { role: 'assistant', content: texto, timestamp: Date.now(), _segundaOpinion: true },
+        ]);
+        if (canal === 'voz' && ttsEnabled) {
+          try { speakSentences(texto); } catch (_) { /* degradar en silencio: el texto ya se pintó */ }
+        }
+      },
+    }).catch(() => { /* pedirSegundaOpinion ya degrada en silencio; esto es cinturón extra */ });
+  }, [pedirSegundaOpinionFoto, ttsEnabled]);
+
   const handleAgentSend = async () => {
     if (state === STATE_RECORDING) return;
     // Shimmer/lift animation al enviar (paridad AgentHero).
@@ -3279,6 +3547,9 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
             finding && typeof finding.confidence === 'number' ? finding.confidence : null,
         },
       });
+      // #67/#43: segunda mirada en segundo plano — no bloquea, no retrasa,
+      // habla solo si discrepa con lo que ya se respondió.
+      dispararSegundaOpinionFoto(item.blob, finding);
       return;
     }
     if (!inputText.trim()) return;
@@ -3424,6 +3695,9 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
               finding && typeof finding.confidence === 'number' ? finding.confidence : null,
           },
         });
+        // #67/#43: segunda mirada en segundo plano — no bloquea, no retrasa,
+        // habla solo si discrepa con lo que ya se respondió.
+        dispararSegundaOpinionFoto(item.blob, finding);
         await outboxMarkAnswered(item.id);
         return true;
       }
@@ -3558,10 +3832,12 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
         >
           <Home size={20} />
         </button>
-        {/* Avatar + título */}
-        <ChagraAgentAvatarColibriPhoto
+        {/* Avatar + título. 2026-07-16: iba directo a la foto del colibrí
+            saltándose el wrapper — ahora respeta la preferencia (default
+            Angelita, "jubila el colibrí" — operador). */}
+        <ChagraAgentAvatar
           state={state === STATE_RECORDING ? 'listening' : (state === STATE_THINKING || isVoicePlaying) ? 'thinking' : 'idle'}
-          size={36}
+          size={52}
           onDoubleClick={async () => {
             if (isSpeaking() || ttsEnabled) {
               stop(); setTtsEnabled(false); agentSounds.cancel(); return;
@@ -3957,11 +4233,11 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
           <div className="flex items-center gap-2 px-1 pb-1 pt-0.5">
             {/* Botón Ⓐ — abre la MANO de Chagra (AgentRedMenu). Este botón ES la
                 raíz geométrica de la red (anchorRef): la mano brota de él, igual
-                que en el home. El GLIFO del botón es el ÍCONO DEL TEMA (no la
-                mano): paridad con home/TopBar y AgentHero — el acceso a
-                capacidades entra por el ícono del tema en el compositor
-                (operador 2026-06-18). `key={theme}` remonta el SVG al cambiar de
-                tema para que la "forja" de la Ⓐ biopunk vuelva a dibujarse. */}
+                que en el home. El GLIFO del botón es "El Machetazo Forjado"
+                (BotonAnarquiaGlyph, variante #4 elegida por el operador
+                2026-07-09): pala + azadón + machete se estampan y FORMAN la A —
+                paridad exacta con el Ⓐ de AgentHero. `key={theme}` remonta el
+                SVG al cambiar de tema para que el estampado vuelva a dibujarse. */}
             <button
               ref={aButtonRef}
               type="button"
@@ -3971,8 +4247,8 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
               aria-expanded={sheetOpen}
               className={['as-iconbtn as-tool', sheetOpen ? 'is-open' : ''].join(' ')}
             >
-              <span key={theme} className="w-[20px] h-[20px] flex items-center justify-center" aria-hidden="true">
-                {iconForTheme(theme)}
+              <span key={theme} className="w-10 h-10 flex items-center justify-center" aria-hidden="true">
+                <BotonAnarquiaGlyph />
               </span>
             </button>
 
@@ -4062,7 +4338,7 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
               }}
             >
               <ChagraAgentAvatar
-                size={38}
+                size={46}
                 state={state === STATE_THINKING ? 'thinking' : 'idle'}
                 ariaLabel="Enviar al agente"
               />
@@ -4272,8 +4548,11 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
         disabled={state === STATE_RECORDING}
       />
 
-      {/* Action Confirmation Modal — alimentado por actionExecutor gate callback (057.4) */}
+      {/* Action Confirmation Modal — alimentado por actionExecutor gate callback (057.4).
+          key=gateId: remonta por acción para que el borrador de parámetros
+          arranque SIEMPRE con los de esta acción (BUG-01, P1). */}
       <ActionConfirmModal
+        key={actionModal.gateId}
         isOpen={actionModal.isOpen}
         toolName={actionModal.toolName || ''}
         description={actionModal.description || ''}

@@ -10,6 +10,7 @@
  *   estadoFinca = {
  *     clima,            // 'dorada'|'soleado'|'niebla'|'lluvia'|'noche'
  *     enso,             // 'nino' | 'nina' | 'neutro'  (fase ENSO efectiva)
+ *     viento,           // null | { direccion:{x,z,grados}, fuerza } (Open-Meteo real)
  *     cosechaReciente,  // null | { cultivo, mundoId }
  *     saludFinca,       // { matasVivas, matasTotal, agua? }  (conteos REALES)
  *     animales,         // [{ especie, nombre, raza, tamano, estado }]
@@ -45,6 +46,8 @@ import {
   resolveClimaLocation,
   CLIMA_UPDATED_EVENT,
 } from '../../services/climaService.js';
+import { getProfile } from '../../services/userProfileService.js';
+import { normalizarPisoUsuario } from './pisosTermicos.js';
 
 /** Re-evalúa la atmósfera cada 10 min (mismo ritmo que useClimaAtmosphere). */
 const REEVAL_MS = 10 * 60 * 1000;
@@ -115,7 +118,60 @@ export function aguaDeLluvia(snapshot, now = new Date()) {
   return Math.max(0, Math.min(1, 0.5 + (Math.min(precip, 25) / 25) * 0.45));
 }
 
-/** Deriva { clima, enso, agua } de la señal de clima/ENSO cacheada (síncrona). */
+/**
+ * Viento real de Open-Meteo, expresado para el plano XZ de los dioramas.
+ *
+ * Open-Meteo describe el rumbo como el origen meteorológico del viento: 0° es
+ * norte y 90° es este. La escena necesita hacia dónde VIAJA, por eso el vector
+ * invierte ese rumbo. No se infiere dirección desde lluvia, nubosidad ni ENSO:
+ * sin velocidad y rumbo del mismo registro el resultado es `null`.
+ *
+ * El snapshot ha tenido nombres distintos según la versión del sidecar. Se
+ * aceptan solamente pares conocidos, primero lectura actual y luego el resumen
+ * diario. `fuerza` preserva la magnitud que entregó Open-Meteo; la coreografía
+ * la normaliza solo para su amplitud visual.
+ *
+ * @param {object|null} snapshot getCachedClimaSnapshot()
+ * @param {Date} now
+ * @returns {null | {direccion:{x:number,z:number,grados:number}, fuerza:number}}
+ */
+export function vientoDeClima(snapshot, now = new Date()) {
+  const om = snapshot?.openmeteo;
+  if (!om?.available) return null;
+  const hoy = isoDiaLocal(now);
+  const dia = Array.isArray(om.forecast_7d)
+    ? om.forecast_7d.find((d) => d?.date === hoy) || om.forecast_7d[0]
+    : null;
+  const fuentes = [om.current, dia].filter((v) => v && typeof v === 'object');
+  const pares = [
+    ['wind_speed_10m', 'wind_direction_10m'],
+    ['wind_speed', 'wind_direction'],
+    ['wind_speed_kmh', 'wind_direction_deg'],
+    ['wind_speed_10m_max', 'wind_direction_10m_dominant'],
+    ['wind_speed_max', 'wind_direction_dominant'],
+  ];
+
+  for (const fuente of fuentes) {
+    for (const [campoFuerza, campoDireccion] of pares) {
+      const fuerza = Number(fuente[campoFuerza]);
+      const grados = Number(fuente[campoDireccion]);
+      if (!Number.isFinite(fuerza) || fuerza < 0 || !Number.isFinite(grados)) continue;
+      const rumbo = ((grados % 360) + 360) % 360;
+      const rad = rumbo * Math.PI / 180;
+      return {
+        direccion: {
+          x: -Math.sin(rad),
+          z: Math.cos(rad),
+          grados: rumbo,
+        },
+        fuerza,
+      };
+    }
+  }
+  return null;
+}
+
+/** Deriva { clima, enso, agua, viento } de la señal cacheada (síncrona). */
 function derivarAtmosfera(now = new Date()) {
   const location = resolveClimaLocation();
   const snapshot = getCachedClimaSnapshot();
@@ -124,6 +180,7 @@ function derivarAtmosfera(now = new Date()) {
     clima: mapearClima(luz, condicion),
     enso: mapearEnso(getEnsoPhase()),
     agua: aguaDeLluvia(snapshot, now),
+    viento: vientoDeClima(snapshot, now),
   };
 }
 
@@ -152,12 +209,19 @@ export function cosechaRecienteDe(summary, now = new Date()) {
   return { cultivo: reciente.crop, mundoId: null };
 }
 
+/** Piso confirmado del perfil, o derivado de la altitud real de la finca. */
+export function pisoTermicoDePerfil(profile) {
+  const declarado = normalizarPisoUsuario(profile?.piso_termico);
+  if (declarado) return declarado;
+  return normalizarPisoUsuario(profile?.finca_altitud ?? profile?.altitud);
+}
+
 /**
  * Arma el `estadoFinca` completo desde las piezas ya cargadas. Puro: la vista
  * (useFincaViva) inyecta procesos/plantas/cosecha/atmósfera ya resueltos.
  */
-function armarEstadoFinca({ processes, plants, summary, atmosfera, now = new Date() }) {
-  const { clima, enso, agua } = atmosfera;
+function armarEstadoFinca({ processes, plants, summary, atmosfera, pisoTermico, now = new Date() }) {
+  const { clima, enso, agua, viento } = atmosfera;
 
   // saludFinca: conteos REALES de matas (buildFincaScene, la misma fuente que el
   // panel de vitalidad). Pendiente hasta que carguen los procesos, y OMITIDA si
@@ -177,6 +241,8 @@ function armarEstadoFinca({ processes, plants, summary, atmosfera, now = new Dat
   return {
     clima,
     enso,
+    viento,
+    pisoTermico,
     cosechaReciente: cosechaRecienteDe(summary, now),
     saludFinca,
     // Sin inventario de hato real (no hay asset animal): [] = "dato en camino".
@@ -191,7 +257,7 @@ function armarEstadoFinca({ processes, plants, summary, atmosfera, now = new Dat
  * fuente, al corral). Se re-arma cuando cambian los datos de finca (plantas /
  * cosecha), el clima (evento CLIMA_UPDATED) o el paso del sol (intervalo).
  *
- * @returns {{clima:string, enso:string, cosechaReciente:(null|object), saludFinca:(object|undefined), animales:Array}}
+ * @returns {{clima:string, enso:string, viento:(null|object), cosechaReciente:(null|object), saludFinca:(object|undefined), animales:Array}}
  */
 export function useFincaViva() {
   // Procesos reales (IndexedDB, offline-first). null = aún cargando (pendiente).
@@ -204,6 +270,9 @@ export function useFincaViva() {
   const plants = useAssetStore((s) => s.plants);
   const summary = useCosechaStore((s) => s.summary);
   const cosechaCargando = useCosechaStore((s) => s.isLoading);
+  let profile = null;
+  try { profile = getProfile(); } catch (_) { profile = null; }
+  const pisoTermico = pisoTermicoDePerfil(profile);
 
   // Cargar los procesos una vez (y limpiar si el hook se desmonta antes).
   useEffect(() => {
@@ -239,8 +308,8 @@ export function useFincaViva() {
   // Identidad estable mientras las piezas no cambian: reaccionFinca (memoizado
   // en la escena por identidad de estadoFinca) no recalcula por render.
   return useMemo(
-    () => armarEstadoFinca({ processes, plants, summary, atmosfera }),
-    [processes, plants, summary, atmosfera],
+    () => armarEstadoFinca({ processes, plants, summary, atmosfera, pisoTermico }),
+    [processes, plants, summary, atmosfera, pisoTermico],
   );
 }
 

@@ -1,0 +1,1734 @@
+/*
+ * ahorcado-contaminado.css — capa visual del juego "Ahorcado Contaminado"
+ * (Tarea #93). Ahorcado clásico con metáfora de CONTAMINACIÓN en vez de
+ * horca: la finca se va apagando en 6 pasos con cada letra errada.
+ *
+ * Prefijo `jp-ah-` para no chocar con otros temas de juego (jp-ms-*, msx-*).
+ * CSS puro (offline-first, sin libs), respeta prefers-reduced-motion.
+ */
+
+.jp-ahorcado {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding: 0.5rem 0 2rem;
+  max-width: 40rem;
+  margin: 0 auto;
+}
+
+/* ── Selector de categoría ────────────────────────────────────────────── */
+
+.jp-ah-categorias {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  justify-content: center;
+}
+
+.jp-ah-chip {
+  border: 2px solid rgba(148, 163, 184, 0.4);
+  background: rgba(15, 23, 42, 0.5);
+  color: #e2e8f0;
+  border-radius: 999px;
+  padding: 0.4rem 0.9rem;
+  font-size: 0.85rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s, transform 0.1s;
+}
+
+.jp-ah-chip:hover {
+  border-color: rgba(74, 222, 128, 0.6);
+}
+
+.jp-ah-chip:active {
+  transform: scale(0.97);
+}
+
+.jp-ah-chip.activo {
+  background: rgba(22, 163, 74, 0.35);
+  border-color: rgba(74, 222, 128, 0.8);
+  color: #fff;
+}
+
+/* ══ Escena viva de la chagra (reemplaza la horca y los emojis) ═════════
+ *
+ * Un SVG-paisaje andino (mata + abeja + agua + suelo + frailejones + sol)
+ * que se contamina paso a paso. Los errores se acumulan como clases p1..p6
+ * sobre .jp-ah-vivo; cada regla usa :not(.gano) para que al ganar la escena
+ * REVIVA sola con las mismas transiciones.
+ *
+ * Rubber-hose andino: squash&stretch con volumen preservado, follow-through
+ * escalonado en hojas, line-boil steps(3) en los seres vivos.
+ */
+
+.jp-ah-escena {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.6rem 0.6rem 0.85rem;
+  border-radius: 1.25rem;
+  border: 2px solid rgba(148, 163, 184, 0.3);
+  background: linear-gradient(180deg, rgba(15, 23, 42, 0.6), rgba(15, 23, 42, 0.3));
+  transition: border-color 0.6s ease, box-shadow 0.6s ease;
+}
+
+.jp-ah-vivo {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-height: 42vh;
+  border-radius: 0.9rem;
+  overflow: hidden;
+}
+
+.jp-ah-escena-texto {
+  color: #f1f5f9;
+  font-weight: 600;
+  text-align: center;
+  margin: 0;
+  font-size: 0.95rem;
+  line-height: 1.3;
+  min-height: 2.4em;
+  display: flex;
+  align-items: center;
+}
+
+.jp-ah-estado-fila {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.jp-ah-intentos {
+  color: #94a3b8;
+  font-size: 0.85rem;
+  margin: 0;
+}
+
+/* Borde del marco: acompaña la degradación (verde → ocre → rojizo) */
+.jp-ah-escena.sana { border-color: rgba(74, 222, 128, 0.5); }
+.jp-ah-escena.paso-1 { border-color: rgba(163, 230, 53, 0.5); }
+.jp-ah-escena.paso-2 { border-color: rgba(234, 179, 8, 0.5); }
+.jp-ah-escena.paso-3 { border-color: rgba(217, 119, 6, 0.55); }
+.jp-ah-escena.paso-4 { border-color: rgba(190, 24, 93, 0.55); }
+.jp-ah-escena.paso-5 { border-color: rgba(220, 38, 38, 0.6); }
+.jp-ah-escena.paso-6 { border-color: rgba(127, 29, 29, 0.8); }
+.jp-ah-escena.escena-gano {
+  border-color: rgba(74, 222, 128, 0.9);
+  box-shadow: 0 0 18px rgba(74, 222, 128, 0.35);
+}
+
+/* ── Medidor de vida: 6 hojitas que se apagan ── */
+
+.jp-ah-medidor {
+  display: flex;
+  gap: 0.25rem;
+}
+
+.jp-ah-medidor-hoja {
+  width: 1.1rem;
+  height: 1.1rem;
+  overflow: visible;
+  transition: transform 0.5s ease;
+  transform-origin: bottom center;
+}
+
+.jp-ah-medidor-hoja path {
+  fill: #4ade80;
+  stroke: #166534;
+  stroke-width: 1;
+  transition: fill 0.5s ease, stroke 0.5s ease;
+}
+
+.jp-ah-medidor-hoja .jp-ah-medidor-vena {
+  fill: none;
+  stroke: #166534;
+  stroke-width: 0.9;
+  stroke-linecap: round;
+}
+
+.jp-ah-medidor-hoja.apagada {
+  transform: rotate(38deg);
+}
+
+.jp-ah-medidor-hoja.apagada path {
+  fill: rgba(100, 116, 139, 0.45);
+  stroke: rgba(100, 116, 139, 0.7);
+}
+
+/* ── Variables de la escena (estado SANO por defecto) ──
+ * Los pasos p1..p6 (:not(.gano)) las degradan; ganar las restaura solas. */
+
+@property --nube-x {
+  syntax: '<length>';
+  inherits: true;
+  initial-value: 0px;
+}
+
+@property --nube-y {
+  syntax: '<length>';
+  inherits: true;
+  initial-value: 0px;
+}
+
+@property --mata-doblez {
+  syntax: '<angle>';
+  inherits: true;
+  initial-value: 0deg;
+}
+
+.jp-ah-vivo {
+  --montana-lejos: #9fbfae;
+  --montana-cerca: #6da26e;
+  --frailejon: #4e7d58;
+  --suelo: #5b4232;
+  --humus: #3a2a1e;
+  --agua: #74c7e8;
+  --tallo: #3f8f4f;
+  --hoja: #55a860;
+  --hoja-vena: #2f7a3e;
+  --petalo: #f2a7c3;
+  --flor-centro: #f4b31c;
+  --pasto: #4e9a58;
+  --nube-y: -52px;
+  --nube-x: 0px;
+  --mata-doblez: 0deg;
+  /* Mariposas secundarias: sus colores viven en variables para que la
+     degradación (p2/p4/p6) las vaya apagando en transición, no de golpe. */
+  --mar-ala: #f6a34c;
+  --mar-ala-borde: #c86f1d;
+  --mar-mota: #fde68a;
+  --mar-cuerpo: #4a3524;
+}
+
+/* ── Cielo: crossfade sano → tóxico ── */
+
+.jp-ah-cielo-toxico {
+  opacity: 0;
+  transition: opacity 1.4s ease;
+}
+
+.jp-ah-vivo.p2:not(.gano) .jp-ah-cielo-toxico { opacity: 0.22; }
+.jp-ah-vivo.p3:not(.gano) .jp-ah-cielo-toxico { opacity: 0.45; }
+.jp-ah-vivo.p4:not(.gano) .jp-ah-cielo-toxico { opacity: 0.65; }
+.jp-ah-vivo.p5:not(.gano) .jp-ah-cielo-toxico { opacity: 0.85; }
+.jp-ah-vivo.p6:not(.gano) .jp-ah-cielo-toxico { opacity: 1; }
+
+/* ── Sol ── */
+
+.jp-ah-sol-disco {
+  fill: #ffd23e;
+  stroke: #e8a615;
+  stroke-width: 1.5;
+  transition: fill 1.2s ease, stroke 1.2s ease;
+}
+
+.jp-ah-sol-halo {
+  fill: #fff3b0;
+  opacity: 0.4;
+  animation: jp-ah-halo 4s ease-in-out infinite;
+  transition: opacity 1.2s ease;
+}
+
+@keyframes jp-ah-halo {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.12); }
+}
+
+.jp-ah-sol-rayos {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: jp-ah-girar 36s linear infinite;
+}
+
+.jp-ah-sol-rayos line {
+  stroke: #f4b31c;
+  stroke-width: 2.5;
+  stroke-linecap: round;
+  transition: opacity 1.2s ease;
+}
+
+@keyframes jp-ah-girar {
+  to { transform: rotate(360deg); }
+}
+
+.jp-ah-vivo.p4:not(.gano) .jp-ah-sol-disco { fill: #d9d0a2; stroke: #b3a97e; }
+.jp-ah-vivo.p4:not(.gano) .jp-ah-sol-halo { opacity: 0.12; }
+.jp-ah-vivo.p4:not(.gano) .jp-ah-sol-rayos line { opacity: 0.35; }
+.jp-ah-vivo.p5:not(.gano) .jp-ah-sol-disco { fill: #b8b49a; stroke: #96927c; }
+.jp-ah-vivo.p5:not(.gano) .jp-ah-sol-halo { opacity: 0; }
+.jp-ah-vivo.p5:not(.gano) .jp-ah-sol-rayos line { opacity: 0; }
+
+.jp-ah-vivo.gano .jp-ah-sol-halo {
+  opacity: 0.6;
+  animation-duration: 1.6s;
+}
+
+/* ── Cordillera + niebla + frailejones ── */
+
+.jp-ah-montana-lejos {
+  fill: var(--montana-lejos);
+  transition: fill 1.4s ease;
+}
+
+.jp-ah-montana-cerca {
+  fill: var(--montana-cerca);
+  transition: fill 1.4s ease;
+}
+
+.jp-ah-niebla {
+  fill: #ffffff;
+  opacity: 0.14;
+}
+
+.jp-ah-frailejon rect,
+.jp-ah-frailejon ellipse {
+  fill: var(--frailejon);
+  transition: fill 1.4s ease;
+}
+
+.jp-ah-frailejon-flor {
+  fill: #f4c945;
+  stroke: #c99a1e;
+  stroke-width: 0.7;
+  transition: fill 1.4s ease, opacity 1.4s ease;
+}
+
+.jp-ah-vivo.p5:not(.gano) .jp-ah-frailejon-flor { fill: #8f8a76; opacity: 0.5; }
+
+/* ── Nubes blancas amigables (huyen del químico) ── */
+
+.jp-ah-nube-blanca-forma ellipse {
+  fill: #ffffff;
+  opacity: 0.85;
+}
+
+.jp-ah-nube-blanca {
+  transition: opacity 1.4s ease;
+}
+
+.jp-ah-nube-blanca-forma {
+  animation: jp-ah-nube-blanca-deriva 9s ease-in-out infinite alternate;
+}
+
+.nube-blanca-2 .jp-ah-nube-blanca-forma { animation-delay: -4.5s; }
+
+@keyframes jp-ah-nube-blanca-deriva {
+  from { transform: translateX(-5px); }
+  to { transform: translateX(5px); }
+}
+
+.jp-ah-vivo.p1:not(.gano) .jp-ah-nube-blanca { opacity: 0.5; }
+.jp-ah-vivo.p3:not(.gano) .jp-ah-nube-blanca { opacity: 0; }
+
+.jp-ah-vivo.p3:not(.gano) { --montana-cerca: #87906f; }
+.jp-ah-vivo.p5:not(.gano) {
+  --montana-lejos: #8a8a90;
+  --montana-cerca: #77776f;
+  --frailejon: #6f6f68;
+}
+
+/* ── Suelo: fértil → pálido y agrietado ── */
+
+.jp-ah-suelo {
+  fill: var(--suelo);
+  transition: fill 1.4s ease;
+}
+
+.jp-ah-humus ellipse {
+  fill: var(--humus);
+  transition: fill 1.4s ease, opacity 1.4s ease;
+}
+
+.jp-ah-grietas path {
+  fill: none;
+  stroke: #756450;
+  stroke-width: 1.6;
+  stroke-linecap: round;
+  opacity: 0;
+  transition: opacity 1.2s ease;
+}
+
+.jp-ah-vivo.p3:not(.gano) { --suelo: #7a6a52; --humus: #64553f; }
+.jp-ah-vivo.p3:not(.gano) .jp-ah-grietas path { opacity: 0.9; }
+.jp-ah-vivo.p5:not(.gano) { --suelo: #8b8271; --humus: #756c58; }
+.jp-ah-vivo.p6:not(.gano) { --suelo: #90897c; }
+
+/* ── Agua de riego: limpia → turbia ── */
+
+.jp-ah-agua-cuerpo {
+  fill: var(--agua);
+  stroke: rgba(30, 100, 140, 0.5);
+  stroke-width: 1.4;
+  transition: fill 1.4s ease, stroke 1.4s ease;
+}
+
+.jp-ah-onda {
+  fill: none;
+  stroke: rgba(255, 255, 255, 0.65);
+  stroke-width: 1.3;
+  stroke-linecap: round;
+  animation: jp-ah-ondear 3.2s ease-in-out infinite alternate;
+  transition: stroke 1.4s ease;
+}
+
+.jp-ah-onda.onda-2 { animation-delay: -1.6s; }
+
+@keyframes jp-ah-ondear {
+  from { transform: translateX(-3px); }
+  to { transform: translateX(3px); }
+}
+
+.jp-ah-destello {
+  fill: #ffffff;
+  opacity: 0.75;
+  animation: jp-ah-destellar 2.8s ease-in-out infinite;
+  transition: opacity 1s ease;
+}
+
+@keyframes jp-ah-destellar {
+  0%, 100% { opacity: 0.75; }
+  50% { opacity: 0.25; }
+}
+
+.jp-ah-burbujas circle {
+  fill: #9db35f;
+  opacity: 0;
+}
+
+.jp-ah-vivo.p4:not(.gano) { --agua: #8d7f5c; }
+.jp-ah-vivo.p4:not(.gano) .jp-ah-agua-cuerpo { stroke: rgba(90, 74, 40, 0.6); }
+.jp-ah-vivo.p4:not(.gano) .jp-ah-onda { stroke: rgba(60, 48, 26, 0.5); animation-duration: 6s; }
+.jp-ah-vivo.p4:not(.gano) .jp-ah-destello { opacity: 0; animation: none; }
+.jp-ah-vivo.p4:not(.gano) .jp-ah-burbujas circle { animation: jp-ah-burbujear 2.4s ease-out infinite; }
+.jp-ah-vivo.p4:not(.gano) .jp-ah-burbujas .burbuja-2 { animation-delay: 0.8s; }
+.jp-ah-vivo.p4:not(.gano) .jp-ah-burbujas .burbuja-3 { animation-delay: 1.5s; }
+.jp-ah-vivo.p6:not(.gano) { --agua: #7c6f58; }
+
+@keyframes jp-ah-burbujear {
+  0% { transform: translateY(2px); opacity: 0; }
+  30% { opacity: 0.85; }
+  100% { transform: translateY(-9px); opacity: 0; }
+}
+
+/* ── Pastos (sway idle → droop marchito) ── */
+
+.jp-ah-pasto path {
+  fill: none;
+  stroke: var(--pasto);
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  transform-box: fill-box;
+  transform-origin: bottom center;
+  animation: jp-ah-sway 3.4s ease-in-out infinite alternate;
+  transition: stroke 1.4s ease, transform 1.2s ease;
+}
+
+.jp-ah-pasto path:nth-child(2) { animation-delay: -1.1s; }
+.jp-ah-pasto path:nth-child(3) { animation-delay: -2.3s; }
+.jp-ah-pasto.pasto-2 path { animation-delay: -0.6s; }
+.jp-ah-pasto.pasto-3 path { animation-delay: -1.8s; }
+
+@keyframes jp-ah-sway {
+  from { transform: rotate(-4deg); }
+  to { transform: rotate(4deg); }
+}
+
+.jp-ah-vivo.p3:not(.gano) { --pasto: #9a9257; }
+.jp-ah-vivo.p3:not(.gano) .jp-ah-pasto path { animation: none; transform: rotate(-28deg); }
+.jp-ah-vivo.p5:not(.gano) { --pasto: #8a7a52; }
+.jp-ah-vivo.p5:not(.gano) .jp-ah-pasto path { transform: rotate(-52deg); }
+
+/* ── Surco de brotecitos (parcela cultivada) ── */
+
+.jp-ah-brote {
+  transform-box: fill-box;
+  transform-origin: bottom center;
+  transition: transform 1.2s ease, opacity 1.2s ease;
+}
+
+.jp-ah-brote-tallo {
+  fill: none;
+  stroke: var(--tallo);
+  stroke-width: 1.6;
+  stroke-linecap: round;
+  transition: stroke 1.4s ease;
+}
+
+.jp-ah-brote-hoja {
+  fill: var(--hoja);
+  transition: fill 1.4s ease;
+}
+
+.jp-ah-vivo.p2:not(.gano) .jp-ah-brote { transform: rotate(-16deg) scale(0.94); }
+.jp-ah-vivo.p3:not(.gano) .jp-ah-brote { transform: rotate(-34deg) scale(0.8); }
+.jp-ah-vivo.p5:not(.gano) .jp-ah-brote { transform: rotate(-58deg) scale(0.66); opacity: 0.75; }
+
+/* ── Sombra de la mata (ancla al suelo, da profundidad) ── */
+
+.jp-ah-mata-sombra {
+  fill: #1d130b;
+  opacity: 0.16;
+  transition: opacity 1.4s ease;
+}
+
+.jp-ah-vivo.p5:not(.gano) .jp-ah-mata-sombra { opacity: 0.08; }
+
+/* ── La mata protagonista ──
+ * Respira (squash&stretch con volumen preservado). El doblez por
+ * contaminación entra como variable dentro de los keyframes para no pelear
+ * con la animación idle. */
+
+.jp-ah-mata {
+  transform-box: fill-box;
+  transform-origin: bottom center;
+  transition: --mata-doblez 1.2s ease;
+  animation:
+    jp-ah-respira 3.8s ease-in-out infinite,
+    jp-ah-boil 0.55s linear infinite;
+}
+
+@keyframes jp-ah-respira {
+  0%, 100% { transform: rotate(var(--mata-doblez, 0deg)) scale(1.015, 0.985); }
+  50% { transform: rotate(calc(var(--mata-doblez, 0deg) + 1.4deg)) scale(0.99, 1.014); }
+}
+
+@keyframes jp-ah-boil {
+  0%, 32.9% { filter: url(#jpAhBoil1); }
+  33%, 65.9% { filter: url(#jpAhBoil2); }
+  66%, 100% { filter: url(#jpAhBoil3); }
+}
+
+.jp-ah-tallo {
+  fill: none;
+  stroke: var(--tallo);
+  stroke-width: 4.5;
+  stroke-linecap: round;
+  transition: stroke 1.4s ease;
+}
+
+.jp-ah-hoja {
+  transform-box: fill-box;
+  transform-origin: right center;
+  transition: transform 1.1s cubic-bezier(0.34, 1.2, 0.64, 1);
+}
+
+.jp-ah-hoja-forma {
+  fill: var(--hoja);
+  stroke: var(--hoja-vena);
+  stroke-width: 1.1;
+  transition: fill 1.4s ease, stroke 1.4s ease;
+}
+
+.jp-ah-hoja-vena {
+  fill: none;
+  stroke: var(--hoja-vena);
+  stroke-width: 1;
+  stroke-linecap: round;
+  transition: stroke 1.4s ease;
+}
+
+/* Flutter idle con follow-through (delays escalonados por hoja) */
+.jp-ah-hoja path {
+  transform-box: fill-box;
+  transform-origin: right center;
+  animation: jp-ah-flutter 3.8s ease-in-out infinite;
+}
+
+.hoja-b path { animation-delay: -0.4s; }
+.hoja-c path { animation-delay: -0.9s; }
+.hoja-d path { animation-delay: -1.3s; }
+.hoja-e path { animation-delay: -1.8s; }
+.hoja-f path { animation-delay: -2.2s; }
+
+@keyframes jp-ah-flutter {
+  0%, 100% { transform: rotate(0deg); }
+  50% { transform: rotate(-2.6deg); }
+}
+
+/* Droop progresivo: cada error dobla más hojas (rotación desde la unión) */
+.jp-ah-vivo.p1:not(.gano) .hoja-a { transform: rotate(-20deg); }
+.jp-ah-vivo.p1:not(.gano) { --hoja: #7da457; }
+.jp-ah-vivo.p2:not(.gano) .hoja-a { transform: rotate(-42deg); }
+.jp-ah-vivo.p2:not(.gano) .hoja-b { transform: rotate(-30deg); }
+.jp-ah-vivo.p2:not(.gano) .hoja-c { transform: rotate(-14deg); }
+.jp-ah-vivo.p2:not(.gano) { --hoja: #98a24f; --petalo: #dfa8bb; }
+.jp-ah-vivo.p3:not(.gano) .hoja-b { transform: rotate(-48deg); }
+.jp-ah-vivo.p3:not(.gano) .hoja-c { transform: rotate(-30deg); }
+.jp-ah-vivo.p3:not(.gano) .hoja-d { transform: rotate(-22deg); }
+.jp-ah-vivo.p3:not(.gano) { --mata-doblez: 4deg; --hoja: #a89a4c; --tallo: #6e8f4a; }
+.jp-ah-vivo.p4:not(.gano) .hoja-e { transform: rotate(-26deg); }
+.jp-ah-vivo.p4:not(.gano) .hoja-f { transform: rotate(-20deg); }
+.jp-ah-vivo.p4:not(.gano) { --hoja: #ab8f49; --hoja-vena: #7a6a38; }
+.jp-ah-vivo.p5:not(.gano) .hoja-a { transform: rotate(-62deg); }
+.jp-ah-vivo.p5:not(.gano) .hoja-b { transform: rotate(-58deg); }
+.jp-ah-vivo.p5:not(.gano) .hoja-c { transform: rotate(-48deg); }
+.jp-ah-vivo.p5:not(.gano) .hoja-d { transform: rotate(-44deg); }
+.jp-ah-vivo.p5:not(.gano) .hoja-e { transform: rotate(-40deg); }
+.jp-ah-vivo.p5:not(.gano) .hoja-f { transform: rotate(-36deg); }
+.jp-ah-vivo.p5:not(.gano) { --mata-doblez: 9deg; --hoja: #b0894a; --tallo: #8a7a45; --petalo: #b9a08d; --flor-centro: #b08d4a; }
+.jp-ah-vivo.p6:not(.gano) { --hoja: #9c8663; --hoja-vena: #6e5f48; --tallo: #8a7a5c; --petalo: #a39288; --flor-centro: #96826a; }
+.jp-ah-vivo.p6:not(.gano) .jp-ah-mata {
+  animation: jp-ah-boil 0.55s linear infinite;
+  transform: rotate(15deg) scale(0.96, 0.8);
+  transition: transform 1.4s ease;
+}
+.jp-ah-vivo.p6:not(.gano) .jp-ah-hoja path { animation: none; }
+
+/* ── Flor: pulso idle, se cierra al marchitarse, bloom al ganar ── */
+
+.jp-ah-flor-corola {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: jp-ah-flor-pulso 3.8s ease-in-out infinite;
+  transition: transform 1.2s ease;
+}
+
+@keyframes jp-ah-flor-pulso {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.06); }
+}
+
+.jp-ah-petalo {
+  fill: var(--petalo);
+  stroke: rgba(160, 70, 110, 0.4);
+  stroke-width: 0.8;
+  transition: fill 1.4s ease;
+}
+
+.jp-ah-flor-centro {
+  fill: var(--flor-centro);
+  stroke: rgba(140, 90, 10, 0.5);
+  stroke-width: 1;
+  transition: fill 1.4s ease;
+}
+
+.jp-ah-vivo.p5:not(.gano) .jp-ah-flor-corola {
+  animation: none;
+  transform: scale(0.55) rotate(-14deg);
+}
+
+.jp-ah-vivo.p6:not(.gano) .jp-ah-flor-corola {
+  animation: none;
+  transform: scale(0.42) rotate(-28deg);
+}
+
+/* Bloom de victoria: overshoot rubber-hose */
+.jp-ah-vivo.gano .jp-ah-flor-corola {
+  animation: jp-ah-bloom 1s cubic-bezier(0.34, 1.56, 0.64, 1) both,
+    jp-ah-flor-pulso 3.8s ease-in-out 1s infinite;
+}
+
+@keyframes jp-ah-bloom {
+  0% { transform: scale(0.5); }
+  60% { transform: scale(1.25); }
+  100% { transform: scale(1); }
+}
+
+/* ── Pétalos que se desprenden y hojas que caen ── */
+
+.jp-ah-petalo-caido ellipse {
+  fill: var(--petalo);
+  opacity: 0;
+}
+
+.jp-ah-vivo.p2:not(.gano) .jp-ah-petalo-caido.caido-1 {
+  animation: jp-ah-petalo-cae 1.8s ease-in both;
+}
+
+.jp-ah-vivo.p3:not(.gano) .jp-ah-petalo-caido.caido-2 {
+  animation: jp-ah-petalo-cae-2 2s ease-in both;
+}
+
+.jp-ah-vivo.p2:not(.gano) .jp-ah-petalo-caido.caido-1 ellipse,
+.jp-ah-vivo.p3:not(.gano) .jp-ah-petalo-caido.caido-2 ellipse {
+  opacity: 0.85;
+}
+
+@keyframes jp-ah-petalo-cae {
+  0% { transform: translate(0, 0) rotate(0deg); }
+  100% { transform: translate(-16px, 52px) rotate(-130deg); }
+}
+
+@keyframes jp-ah-petalo-cae-2 {
+  0% { transform: translate(0, 0) rotate(0deg); }
+  100% { transform: translate(12px, 54px) rotate(140deg); }
+}
+
+.jp-ah-hoja-caida path {
+  fill: var(--hoja);
+  opacity: 0;
+}
+
+.jp-ah-vivo.p2:not(.gano) .jp-ah-hoja-caida.hcaida-1 { animation: jp-ah-hoja-cae 3.6s linear infinite; }
+.jp-ah-vivo.p3:not(.gano) .jp-ah-hoja-caida.hcaida-2 { animation: jp-ah-hoja-cae 3.6s linear 1.8s infinite; }
+.jp-ah-vivo.p2:not(.gano) .jp-ah-hoja-caida.hcaida-1 path { opacity: 0.9; }
+.jp-ah-vivo.p3:not(.gano) .jp-ah-hoja-caida.hcaida-2 path { opacity: 0.9; }
+.jp-ah-vivo.p6:not(.gano) .jp-ah-hoja-caida { animation: none; }
+.jp-ah-vivo.p6:not(.gano) .jp-ah-hoja-caida path { opacity: 0; }
+
+@keyframes jp-ah-hoja-cae {
+  0% { transform: translate(10px, -46px) rotate(0deg); opacity: 0; }
+  10% { opacity: 1; }
+  33% { transform: translate(-4px, -32px) rotate(-60deg); }
+  66% { transform: translate(8px, -16px) rotate(-110deg); }
+  92% { opacity: 0.9; }
+  100% { transform: translate(-6px, -2px) rotate(-170deg); opacity: 0; }
+}
+
+/* ── Nube de químico: entra con el primer error, gotea, crece ── */
+
+.jp-ah-nube {
+  opacity: 0;
+  transition: opacity 1.4s ease, --nube-y 1.4s ease, --nube-x 1.4s ease;
+}
+
+.jp-ah-nube-cuerpo {
+  animation: jp-ah-nube-bob 5s ease-in-out infinite alternate;
+}
+
+.jp-ah-nube-cuerpo ellipse {
+  fill: #8e81a8;
+  stroke: #5f5478;
+  stroke-width: 1.2;
+  transition: fill 1.4s ease;
+}
+
+@keyframes jp-ah-nube-bob {
+  from { transform: translate(var(--nube-x, 0px), var(--nube-y, 0px)); }
+  to { transform: translate(var(--nube-x, 0px), calc(var(--nube-y, 0px) + 4px)); }
+}
+
+.jp-ah-gotas .gota {
+  fill: #a3e635;
+  stroke: #65a30d;
+  stroke-width: 0.9;
+  animation: jp-ah-gotear 1.7s ease-in infinite;
+  opacity: 0;
+}
+
+.jp-ah-gotas g:nth-child(2) .gota { animation-delay: 0.55s; }
+.jp-ah-gotas g:nth-child(3) .gota { animation-delay: 1.1s; }
+
+@keyframes jp-ah-gotear {
+  0% { transform: translateY(0); opacity: 0; }
+  12% { opacity: 0.95; }
+  78% { transform: translateY(24px); opacity: 0.9; }
+  100% { transform: translateY(29px); opacity: 0; }
+}
+
+.jp-ah-vivo.p1:not(.gano) .jp-ah-nube { opacity: 1; --nube-y: 0px; }
+.jp-ah-vivo.p1:not(.gano) .jp-ah-nube-2 { opacity: 0; }
+.jp-ah-vivo.p3:not(.gano) .jp-ah-nube-cuerpo ellipse { fill: #7a6d96; }
+.jp-ah-vivo.p5:not(.gano) .jp-ah-nube-2 { opacity: 1; }
+.jp-ah-vivo.gano .jp-ah-nube { opacity: 0; --nube-x: -160px; --nube-y: -30px; }
+
+/* ── Bruma final ── */
+
+.jp-ah-bruma {
+  fill: #6f7d63;
+  opacity: 0;
+  transition: opacity 1.6s ease;
+  pointer-events: none;
+}
+
+.jp-ah-vivo.p6:not(.gano) .jp-ah-bruma { opacity: 0.2; }
+
+/* ── Angelita, la protagonista (AbejaAngelita REAL en modo inline) ──
+ * La ÓRBITA (trayectoria) vive en los wrappers del juego; el dibujo y su
+ * actuación (aleteo crt-wing, parpadeo rh-blink, antics rh-*, jadeo, cejas)
+ * son del componente compartido src/visual/creatures/AbejaAngelita — que NO
+ * se modifica: el juego solo lo dirige por props (pose/animo/energia/sed) y
+ * con estas riendas CSS de alcance jp-ah-. Estados: feliz → preocupada →
+ * tambaleo → desmayada (sin morbo). */
+
+/* ENTRADA espectacular (el lenguaje del cruce de Angelita, AbejaTransicion:
+   anticipa → se CLAVA en barrel roll → rebasa → asienta): corre UNA vez al
+   montar la escena y, mejor aún, se RE-DISPARA sola al ganar desde p3+ (las
+   reglas de órbita por paso llevan :not(.gano); al volver a la animación base
+   el nombre cambia y la entrada vuelve a correr = revivir espectacular). */
+.jp-ah-abeja-orbita {
+  animation:
+    jp-ah-angelita-entrada 1.6s cubic-bezier(0.33, 1, 0.55, 1) both,
+    jp-ah-vuelo-feliz 9s ease-in-out 1.6s infinite;
+}
+
+@keyframes jp-ah-angelita-entrada {
+  0% { transform: translate(392px, 4px) rotate(356deg) scale(0.3); }
+  16% { transform: translate(366px, 16px) rotate(370deg) scale(0.42); }
+  62% { transform: translate(206px, 96px) rotate(-30deg) scale(1.12); }
+  82% { transform: translate(180px, 52px) rotate(5deg) scale(0.96); }
+  100% { transform: translate(188px, 60px) rotate(-4deg) scale(1); }
+}
+
+@keyframes jp-ah-vuelo-feliz {
+  0%, 100% { transform: translate(188px, 60px) rotate(-4deg); }
+  25% { transform: translate(240px, 82px) rotate(5deg); }
+  50% { transform: translate(206px, 102px) rotate(-3deg); }
+  75% { transform: translate(148px, 82px) rotate(4deg); }
+}
+
+.jp-ah-abeja {
+  animation: jp-ah-abeja-bob 1.3s ease-in-out infinite alternate,
+    jp-ah-boil 0.55s linear infinite;
+}
+
+@keyframes jp-ah-abeja-bob {
+  from { transform: translateY(-2.5px); }
+  to { transform: translateY(2.5px); }
+}
+
+/* El marco de Angelita: solo transiciona el FILTRO (el gris del desmayo
+   entra suave). Su transform (escala + espejo) va como atributo en el JSX y
+   este nodo no lleva animaciones CSS — nada se lo pisa. */
+.jp-ah-angelita {
+  transition: filter 1.4s ease;
+}
+
+.jp-ah-zzz { opacity: 0; }
+
+.jp-ah-zzz text {
+  font-family: inherit;
+  font-size: 9px;
+  font-weight: 800;
+  fill: #cbd5e1;
+}
+
+/* Estados de Angelita por paso */
+.jp-ah-vivo.p3:not(.gano) .jp-ah-abeja-orbita {
+  animation: jp-ah-vuelo-preocupado 6s ease-in-out infinite;
+}
+
+@keyframes jp-ah-vuelo-preocupado {
+  0%, 100% { transform: translate(178px, 96px) rotate(-8deg); }
+  30% { transform: translate(212px, 112px) rotate(9deg); }
+  60% { transform: translate(160px, 110px) rotate(-10deg); }
+}
+
+.jp-ah-vivo.p5:not(.gano) .jp-ah-abeja-orbita {
+  animation: jp-ah-tambaleo 3s ease-in-out infinite;
+}
+
+/* Alas de tul PESADAS: el aleteo del kit (crt-wingbeat 0.15s) se arrastra —
+   casi no puede volar. Sin clima en props, el componente no estampa duración
+   inline: esta rienda CSS manda. */
+.jp-ah-vivo.p5:not(.gano) .jp-ah-angelita .crt-wing { animation-duration: 0.42s; }
+
+@keyframes jp-ah-tambaleo {
+  0%, 100% { transform: translate(182px, 116px) rotate(-16deg); }
+  20% { transform: translate(198px, 128px) rotate(18deg); }
+  45% { transform: translate(172px, 136px) rotate(-22deg); }
+  70% { transform: translate(192px, 124px) rotate(14deg); }
+  85% { transform: translate(178px, 134px) rotate(-12deg); }
+}
+
+/* Cayó: desmayada junto a la mata (ojitos cerrados + zZz, sin morbo) */
+.jp-ah-vivo.p6:not(.gano) .jp-ah-abeja-orbita {
+  animation: jp-ah-caer 1.3s cubic-bezier(0.4, 0, 1, 1) both;
+}
+
+@keyframes jp-ah-caer {
+  0% { transform: translate(178px, 128px) rotate(-10deg); }
+  62% { transform: translate(162px, 158px) rotate(26deg); }
+  74% { transform: translate(160px, 153px) rotate(20deg); }
+  100% { transform: translate(158px, 159px) rotate(18deg); }
+}
+
+.jp-ah-vivo.p6:not(.gano) .jp-ah-abeja {
+  animation: jp-ah-desmayo 3s ease-in-out infinite alternate;
+}
+
+@keyframes jp-ah-desmayo {
+  from { transform: scale(1, 1); }
+  to { transform: scale(1.03, 0.97); }
+}
+
+/* Desmayada: React ya la puso en pose reposo (alitas plegadas del kit) y
+   ánimo descansa (sin antics ni miradas). Aquí el juego le cierra los OJITOS
+   aplastando el grupo rh-blink del componente (su transform-box/origin ya
+   vienen inline del kit) y la destiñe con un gris suave que entra en
+   transición — dormida digna, sin morbo. */
+.jp-ah-vivo.p6:not(.gano) .jp-ah-angelita {
+  filter: grayscale(0.55) brightness(0.92);
+}
+
+.jp-ah-vivo.p6:not(.gano) .jp-ah-angelita .rh-blink {
+  animation: none;
+  transform: scaleY(0.14);
+}
+
+.jp-ah-vivo.p6:not(.gano) .jp-ah-angelita .rh-mirada { animation: none; }
+.jp-ah-vivo.p6:not(.gano) .jp-ah-zzz { opacity: 1; }
+
+.jp-ah-vivo.p6:not(.gano) .jp-ah-zzz text {
+  animation: jp-ah-zzz-flota 2.6s ease-out infinite;
+}
+
+.jp-ah-vivo.p6:not(.gano) .jp-ah-zzz .z-2 { animation-delay: 0.85s; }
+.jp-ah-vivo.p6:not(.gano) .jp-ah-zzz .z-3 { animation-delay: 1.7s; }
+
+@keyframes jp-ah-zzz-flota {
+  0% { transform: translateY(3px); opacity: 0; }
+  30% { opacity: 0.9; }
+  100% { transform: translateY(-7px); opacity: 0; }
+}
+
+/* Celebración al ganar: re-entrada rápida + vuelo alegre más vivo (dos
+   duraciones: la primera es de la entrada, la segunda de la órbita). */
+.jp-ah-vivo.gano .jp-ah-abeja-orbita { animation-duration: 1.2s, 5s; }
+
+/* ── La abejita obrera: la abeja del arte anterior, ahora SECUNDARIA ──
+ * Pedido del operador: no se saca. Vuela al otro lado de la chagra (sobre el
+ * agua) y muere CON Angelita: aleteo pesado (p2) → tambaleo (p4) → cae
+ * desmayada a la orilla (p6: ojitos cerrados, alitas plegadas, desteñida).
+ * Todo con :not(.gano): al ganar revive con las demás. */
+
+.jp-ah-abeja2-orbita {
+  animation: jp-ah-abeja2-vuelo 10s ease-in-out infinite;
+}
+
+@keyframes jp-ah-abeja2-vuelo {
+  0%, 100% { transform: translate(300px, 74px) rotate(4deg) scale(0.8); }
+  30% { transform: translate(262px, 92px) rotate(-6deg) scale(0.8); }
+  60% { transform: translate(318px, 104px) rotate(5deg) scale(0.8); }
+  80% { transform: translate(330px, 82px) rotate(-4deg) scale(0.8); }
+}
+
+.jp-ah-abeja2 {
+  animation: jp-ah-abeja-bob 1.3s ease-in-out infinite alternate,
+    jp-ah-boil 0.55s linear infinite;
+}
+
+.jp-ah-abeja-cuerpo {
+  fill: #ffd23e;
+  stroke: #3a2c1a;
+  stroke-width: 1.3;
+  transition: fill 1.4s ease;
+}
+
+.jp-ah-franja { fill: #3a2c1a; }
+
+.jp-ah-abeja-cabeza {
+  fill: #3a2c1a;
+}
+
+.jp-ah-antenas path {
+  fill: none;
+  stroke: #3a2c1a;
+  stroke-width: 1.1;
+  stroke-linecap: round;
+  transform-box: fill-box;
+  transform-origin: bottom right;
+  transition: transform 1s ease;
+}
+
+.jp-ah-antenas circle { fill: #3a2c1a; }
+
+.jp-ah-ala ellipse {
+  fill: rgba(219, 234, 254, 0.8);
+  stroke: #93c5fd;
+  stroke-width: 0.9;
+}
+
+.jp-ah-ala {
+  transform-box: fill-box;
+  transform-origin: center bottom;
+  animation: jp-ah-aleteo 0.16s linear infinite alternate;
+  transition: transform 1s ease;
+}
+
+.jp-ah-ala.ala-der { animation-delay: -0.08s; }
+
+@keyframes jp-ah-aleteo {
+  from { transform: scaleY(1) rotate(-4deg); }
+  to { transform: scaleY(0.4) rotate(6deg); }
+}
+
+.jp-ah-ojos-abiertos ellipse { fill: #ffffff; }
+.jp-ah-ojos-abiertos .jp-ah-pupila { fill: #1c140c; }
+
+.jp-ah-sonrisa,
+.jp-ah-ojos-cerrados path {
+  fill: none;
+  stroke: #ffffff;
+  stroke-width: 0.8;
+  stroke-linecap: round;
+}
+
+.jp-ah-ojos-cerrados { opacity: 0; }
+
+.jp-ah-patitas path {
+  fill: none;
+  stroke: #3a2c1a;
+  stroke-width: 1;
+  stroke-linecap: round;
+}
+
+/* p2: el aleteo se le hace pesado y baja a volar cerca del agua. */
+.jp-ah-vivo.p2:not(.gano) .jp-ah-abeja2-orbita {
+  animation: jp-ah-abeja2-pesada 7s ease-in-out infinite;
+}
+
+.jp-ah-vivo.p2:not(.gano) .jp-ah-ala { animation-duration: 0.3s; }
+
+@keyframes jp-ah-abeja2-pesada {
+  0%, 100% { transform: translate(296px, 104px) rotate(-5deg) scale(0.8); }
+  35% { transform: translate(268px, 118px) rotate(7deg) scale(0.8); }
+  70% { transform: translate(316px, 124px) rotate(-6deg) scale(0.8); }
+}
+
+/* p4: tambalea igual que su compañera grande. */
+.jp-ah-vivo.p4:not(.gano) .jp-ah-abeja2-orbita {
+  animation: jp-ah-abeja2-tambalea 3.4s ease-in-out infinite;
+}
+
+.jp-ah-vivo.p4:not(.gano) .jp-ah-ala { animation-duration: 0.45s; }
+
+@keyframes jp-ah-abeja2-tambalea {
+  0%, 100% { transform: translate(288px, 128px) rotate(-14deg) scale(0.8); }
+  25% { transform: translate(302px, 140px) rotate(16deg) scale(0.8); }
+  55% { transform: translate(276px, 146px) rotate(-18deg) scale(0.8); }
+  80% { transform: translate(294px, 136px) rotate(12deg) scale(0.8); }
+}
+
+/* p6: cae desmayada a la orilla del agua turbia, junto a la chagra apagada. */
+.jp-ah-vivo.p6:not(.gano) .jp-ah-abeja2-orbita {
+  animation: jp-ah-abeja2-cae 1.4s cubic-bezier(0.4, 0, 1, 1) 0.15s both;
+}
+
+@keyframes jp-ah-abeja2-cae {
+  0% { transform: translate(288px, 138px) rotate(-10deg) scale(0.8); }
+  62% { transform: translate(310px, 182px) rotate(24deg) scale(0.8); }
+  76% { transform: translate(312px, 177px) rotate(19deg) scale(0.8); }
+  100% { transform: translate(314px, 184px) rotate(16deg) scale(0.8); }
+}
+
+.jp-ah-vivo.p6:not(.gano) .jp-ah-abeja2 {
+  animation: jp-ah-desmayo 3s ease-in-out infinite alternate;
+}
+
+.jp-ah-vivo.p6:not(.gano) .jp-ah-ala {
+  animation: none;
+  transform: scaleY(0.5) rotate(48deg);
+  opacity: 0.7;
+}
+
+.jp-ah-vivo.p6:not(.gano) .jp-ah-antenas path { transform: rotate(34deg); }
+.jp-ah-vivo.p6:not(.gano) .jp-ah-ojos-abiertos { opacity: 0; }
+.jp-ah-vivo.p6:not(.gano) .jp-ah-ojos-cerrados { opacity: 1; }
+.jp-ah-vivo.p6:not(.gano) .jp-ah-abeja-cuerpo { fill: #d9c383; }
+
+/* ── El colibrí chillón: secundaria de aire (Colibri REAL del kit) ──
+ * Entra DARDEANDO desde fuera de cuadro (entrada espectacular de la casa:
+ * dardo que se pasa → corrige con overshoot → se asienta) y se cierne sobre
+ * la flor. Su actuación (dardos, estelas, parpadeo) es del componente vía
+ * los MISMOS props de Angelita; aquí van la órbita y el desmayo (p6: caído
+ * al pie de la mata, ojitos cerrados con el truco rh-blink, gris suave). */
+
+.jp-ah-colibri-orbita {
+  animation:
+    jp-ah-colibri-entrada 1.3s cubic-bezier(0.3, 1.4, 0.5, 1) both,
+    jp-ah-colibri-vuelo 7s ease-in-out 1.3s infinite;
+}
+
+.jp-ah-colibri-marco { transition: filter 1.4s ease; }
+
+@keyframes jp-ah-colibri-entrada {
+  0% { transform: translate(-34px, 12px); }
+  55% { transform: translate(152px, 32px); }
+  75% { transform: translate(96px, 46px); }
+  100% { transform: translate(108px, 38px); }
+}
+
+@keyframes jp-ah-colibri-vuelo {
+  0%, 100% { transform: translate(108px, 38px); }
+  20% { transform: translate(148px, 30px); }
+  45% { transform: translate(158px, 50px); }
+  70% { transform: translate(118px, 54px); }
+}
+
+.jp-ah-vivo.p2:not(.gano) .jp-ah-colibri-marco { filter: saturate(0.8); }
+
+.jp-ah-vivo.p3:not(.gano) .jp-ah-colibri-orbita {
+  animation: jp-ah-colibri-preocupado 5s ease-in-out infinite;
+}
+
+@keyframes jp-ah-colibri-preocupado {
+  0%, 100% { transform: translate(122px, 62px) rotate(-6deg); }
+  35% { transform: translate(146px, 72px) rotate(7deg); }
+  70% { transform: translate(108px, 76px) rotate(-8deg); }
+}
+
+.jp-ah-vivo.p4:not(.gano) .jp-ah-colibri-marco { filter: saturate(0.6) brightness(0.96); }
+
+.jp-ah-vivo.p5:not(.gano) .jp-ah-colibri-orbita {
+  animation: jp-ah-colibri-tambalea 2.8s ease-in-out infinite;
+}
+
+.jp-ah-vivo.p5:not(.gano) .jp-ah-colibri-marco .crt-wing { animation-duration: 0.34s; }
+
+@keyframes jp-ah-colibri-tambalea {
+  0%, 100% { transform: translate(112px, 80px) rotate(-14deg); }
+  25% { transform: translate(128px, 92px) rotate(15deg); }
+  55% { transform: translate(100px, 96px) rotate(-17deg); }
+  80% { transform: translate(120px, 88px) rotate(11deg); }
+}
+
+/* p6: cae al pie de la mata, del lado contrario a Angelita — los dos
+   polinizadores juntos. React ya lo puso en reposo/descansa (posado, alitas
+   plegadas, respirando); el juego cierra ojitos y destiñe. */
+.jp-ah-vivo.p6:not(.gano) .jp-ah-colibri-orbita {
+  animation: jp-ah-colibri-cae 1.4s cubic-bezier(0.4, 0, 1, 1) 0.1s both;
+}
+
+@keyframes jp-ah-colibri-cae {
+  0% { transform: translate(114px, 84px) rotate(-10deg); }
+  60% { transform: translate(96px, 156px) rotate(-30deg); }
+  78% { transform: translate(93px, 150px) rotate(-24deg); }
+  100% { transform: translate(92px, 162px) rotate(-20deg); }
+}
+
+.jp-ah-vivo.p6:not(.gano) .jp-ah-colibri-marco {
+  filter: grayscale(0.55) brightness(0.92);
+}
+
+.jp-ah-vivo.p6:not(.gano) .jp-ah-colibri-marco .rh-blink {
+  animation: none;
+  transform: scaleY(0.14);
+}
+
+.jp-ah-vivo.p6:not(.gano) .jp-ah-colibri-marco .rh-mirada { animation: none; }
+
+/* ── La mariposa pasionaria: LA QUE MUERE (Mariposa REAL del kit) ──
+ * Corrección del operador "que la una mariposa muera": ESTA es la que muere.
+ * Aletea alto sobre el surco con sus cuatro alas; se destiñe (saturate
+ * progresivo), tambalea y CAE plegada al suelo — su caída es la que hace
+ * huir a las chiquitas. Revive al ganar. */
+
+.jp-ah-dione-orbita {
+  animation:
+    jp-ah-dione-entrada 1.8s cubic-bezier(0.34, 1.3, 0.6, 1) both,
+    jp-ah-dione-vuelo 12s ease-in-out 1.8s infinite;
+}
+
+.jp-ah-dione-marco { transition: filter 1.4s ease; }
+
+@keyframes jp-ah-dione-entrada {
+  0% { transform: translate(-32px, 152px) rotate(-20deg); }
+  60% { transform: translate(74px, 92px) rotate(14deg); }
+  100% { transform: translate(56px, 112px) rotate(4deg); }
+}
+
+@keyframes jp-ah-dione-vuelo {
+  0%, 100% { transform: translate(56px, 112px) rotate(4deg); }
+  30% { transform: translate(84px, 100px) rotate(-6deg); }
+  55% { transform: translate(96px, 120px) rotate(5deg); }
+  80% { transform: translate(66px, 126px) rotate(-5deg); }
+}
+
+.jp-ah-vivo.p2:not(.gano) .jp-ah-dione-marco { filter: saturate(0.75); }
+.jp-ah-vivo.p2:not(.gano) .jp-ah-dione-marco .crt-fwing { animation-duration: 0.6s; }
+
+.jp-ah-vivo.p4:not(.gano) .jp-ah-dione-orbita {
+  animation: jp-ah-dione-tambalea 3.8s ease-in-out infinite;
+}
+
+.jp-ah-vivo.p4:not(.gano) .jp-ah-dione-marco { filter: saturate(0.5) brightness(0.95); }
+.jp-ah-vivo.p4:not(.gano) .jp-ah-dione-marco .crt-fwing { animation-duration: 0.9s; }
+
+@keyframes jp-ah-dione-tambalea {
+  0%, 100% { transform: translate(70px, 132px) rotate(-10deg); }
+  30% { transform: translate(88px, 142px) rotate(12deg); }
+  65% { transform: translate(58px, 148px) rotate(-13deg); }
+}
+
+.jp-ah-vivo.p6:not(.gano) .jp-ah-dione-orbita {
+  animation: jp-ah-dione-cae 1.6s cubic-bezier(0.4, 0, 1, 1) 0.2s both;
+}
+
+@keyframes jp-ah-dione-cae {
+  0% { transform: translate(70px, 140px) rotate(-8deg); }
+  62% { transform: translate(44px, 164px) rotate(-60deg); }
+  78% { transform: translate(42px, 159px) rotate(-52deg); }
+  100% { transform: translate(40px, 168px) rotate(-75deg); }
+}
+
+.jp-ah-vivo.p6:not(.gano) .jp-ah-dione-marco { filter: grayscale(0.75) brightness(0.9); }
+
+.jp-ah-vivo.p6:not(.gano) .jp-ah-dione-marco .crt-fwing {
+  animation: none;
+  transform: scaleX(0.3);
+}
+
+/* ── El escarabajo estercolero: secundaria de suelo (Escarabajo REAL) ──
+ * Entra RODANDO su bola desde el borde (frena con un pasito de arrastre) y
+ * patrulla el primer plano. El suelo agrietado (p3) lo pone lento; en p5 se
+ * frena donde va (play-state paused: sin saltos) y en p6 se VUELCA gris —
+ * un suelo muerto no tiene abono que rodar. */
+
+.jp-ah-escarabajo-orbita {
+  animation:
+    jp-ah-escarabajo-entrada 1.8s cubic-bezier(0.3, 1.2, 0.5, 1) both,
+    jp-ah-escarabajo-camina 16s ease-in-out 1.8s infinite alternate;
+}
+
+.jp-ah-escarabajo-marco {
+  transform-box: fill-box;
+  transform-origin: center;
+  transition: filter 1.4s ease, transform 1.2s ease;
+}
+
+@keyframes jp-ah-escarabajo-entrada {
+  0% { transform: translate(392px, 186px); }
+  70% { transform: translate(208px, 184px); }
+  85% { transform: translate(219px, 184px); }
+  100% { transform: translate(214px, 185px); }
+}
+
+@keyframes jp-ah-escarabajo-camina {
+  from { transform: translate(214px, 185px); }
+  to { transform: translate(140px, 187px); }
+}
+
+.jp-ah-vivo.p3:not(.gano) .jp-ah-escarabajo-orbita { animation-duration: 1.8s, 34s; }
+.jp-ah-vivo.p3:not(.gano) .jp-ah-escarabajo-marco { filter: saturate(0.7); }
+
+.jp-ah-vivo.p5:not(.gano) .jp-ah-escarabajo-orbita { animation-play-state: paused, paused; }
+
+.jp-ah-vivo.p6:not(.gano) .jp-ah-escarabajo-orbita { animation-play-state: paused, paused; }
+
+.jp-ah-vivo.p6:not(.gano) .jp-ah-escarabajo-marco {
+  transform: scale(-0.75, 0.75) rotate(160deg);
+  filter: grayscale(0.7) brightness(0.9);
+}
+
+.jp-ah-vivo.p6:not(.gano) .jp-ah-escarabajo-marco .crt-legs,
+.jp-ah-vivo.p6:not(.gano) .jp-ah-escarabajo-marco .crt-ball { animation: none; }
+
+/* ── La lombriz nativa: secundaria de suelo (Lombriz REAL del kit) ──
+ * BROTA del suelo fértil con overshoot (su entrada) y se mece; el suelo
+ * agrietado la retrae y palidece, y en p6 queda lánguida sobre la tierra
+ * muerta. Al ganar re-brota — el suelo vivo vuelve. */
+
+.jp-ah-lombriz-marco {
+  transform-box: fill-box;
+  transform-origin: bottom center;
+  animation:
+    jp-ah-lombriz-brota 1.4s cubic-bezier(0.34, 1.56, 0.64, 1) both,
+    jp-ah-lombriz-mece 4.6s ease-in-out 1.4s infinite alternate;
+  transition: filter 1.4s ease, transform 1.2s ease;
+}
+
+@keyframes jp-ah-lombriz-brota {
+  0% { transform: translateY(16px) scaleY(0.2); }
+  70% { transform: translateY(-2px) scaleY(1.08); }
+  100% { transform: translateY(0) scaleY(1); }
+}
+
+@keyframes jp-ah-lombriz-mece {
+  from { transform: rotate(-6deg); }
+  to { transform: rotate(7deg); }
+}
+
+.jp-ah-vivo.p3:not(.gano) .jp-ah-lombriz-marco {
+  animation: none;
+  transform: translateY(7px) rotate(24deg);
+  filter: saturate(0.6) brightness(0.95);
+}
+
+.jp-ah-vivo.p5:not(.gano) .jp-ah-lombriz-marco {
+  animation: none;
+  transform: translateY(9px) rotate(52deg);
+  filter: saturate(0.4) brightness(0.92);
+}
+
+.jp-ah-vivo.p6:not(.gano) .jp-ah-lombriz-marco {
+  animation: none;
+  transform: translateY(10px) rotate(80deg);
+  filter: grayscale(0.7) brightness(0.9);
+}
+
+/* ── Las mariposas chiquitas: "EL RESTO" que HUYE ──
+ * Corrección del operador: "que la una mariposa muera, el resto huyen". La que
+ * muere es la Dione (más arriba, cae al suelo en p6). ESTAS dos son el resto:
+ * revolotean sanas → con la contaminación se ponen nerviosas y se alejan (p2)
+ * → al ver caer a su compañera ESCAPAN fuera de cuadro (p6). No caen: huyen.
+ * Todo con :not(.gano): al ganar re-entran volando con la escena revivida. */
+
+.jp-ah-mariposa-orbita {
+  animation: jp-ah-mariposeo 11s ease-in-out infinite;
+}
+
+@keyframes jp-ah-mariposeo {
+  0%, 100% { transform: translate(288px, 92px) rotate(6deg); }
+  20% { transform: translate(258px, 74px) rotate(-8deg); }
+  45% { transform: translate(300px, 62px) rotate(5deg); }
+  70% { transform: translate(322px, 88px) rotate(-6deg); }
+  85% { transform: translate(300px, 102px) rotate(4deg); }
+}
+
+/* La mariposita chiquita baila su propia órbita al otro lado de la chagra,
+   sobre el surco de brotes — dos compañeras, no un clon en el mismo camino. */
+.mariposa-orbita-2 {
+  animation: jp-ah-mariposeo-2 13s ease-in-out infinite;
+}
+
+@keyframes jp-ah-mariposeo-2 {
+  0%, 100% { transform: translate(58px, 64px) rotate(-5deg); }
+  25% { transform: translate(86px, 50px) rotate(7deg); }
+  50% { transform: translate(100px, 68px) rotate(-4deg); }
+  75% { transform: translate(76px, 82px) rotate(6deg); }
+}
+
+.jp-ah-mariposa {
+  animation: jp-ah-abeja-bob 1.1s ease-in-out infinite alternate;
+}
+
+.jp-ah-mariposa-cuerpo { fill: var(--mar-cuerpo); transition: fill 1.4s ease; }
+
+.jp-ah-mariposa-antena {
+  fill: none;
+  stroke: var(--mar-cuerpo);
+  stroke-width: 0.7;
+  stroke-linecap: round;
+  transition: stroke 1.4s ease;
+}
+
+.jp-ah-mariposa-ala path {
+  fill: var(--mar-ala);
+  stroke: var(--mar-ala-borde);
+  stroke-width: 0.8;
+  transition: fill 1.4s ease, stroke 1.4s ease;
+}
+
+.jp-ah-mariposa-ala circle { fill: var(--mar-mota); transition: fill 1.4s ease; }
+
+.jp-ah-mariposa-ala {
+  transform-box: fill-box;
+  animation: jp-ah-mariposa-aleteo 0.34s ease-in-out infinite alternate;
+}
+
+.jp-ah-mariposa-ala.ala-m-izq { transform-origin: right center; }
+.jp-ah-mariposa-ala.ala-m-der { transform-origin: left center; animation-direction: alternate-reverse; }
+
+@keyframes jp-ah-mariposa-aleteo {
+  from { transform: scaleX(1); }
+  to { transform: scaleX(0.3); }
+}
+
+/* p2: los colores se empiezan a apagar; siguen revoloteando pero más nerviosas
+   (aleteo un poco más rápido) — ya sienten el químico. */
+.jp-ah-vivo.p2:not(.gano) {
+  --mar-ala: #dda45c;
+  --mar-ala-borde: #a9722e;
+}
+
+.jp-ah-vivo.p2:not(.gano) .jp-ah-mariposa-orbita {
+  animation: jp-ah-mariposa-nerviosa 6s ease-in-out infinite;
+}
+
+.jp-ah-vivo.p2:not(.gano) .mariposa-orbita-2 {
+  animation: jp-ah-mariposa-nerviosa-2 6.5s ease-in-out infinite;
+}
+
+.jp-ah-vivo.p2:not(.gano) .jp-ah-mariposa-ala { animation-duration: 0.24s; }
+
+@keyframes jp-ah-mariposa-nerviosa {
+  0%, 100% { transform: translate(288px, 78px) rotate(6deg); }
+  25% { transform: translate(316px, 60px) rotate(-9deg); }
+  55% { transform: translate(300px, 52px) rotate(7deg); }
+  80% { transform: translate(322px, 70px) rotate(-6deg); }
+}
+
+@keyframes jp-ah-mariposa-nerviosa-2 {
+  0%, 100% { transform: translate(58px, 58px) rotate(-5deg); }
+  30% { transform: translate(40px, 44px) rotate(9deg); }
+  65% { transform: translate(70px, 50px) rotate(-7deg); }
+}
+
+/* p4: se alejan hacia los bordes (empiezan a huir), aleteo agitado. Suben y
+   se apartan de la chagra que se apaga — todavía dentro de cuadro. */
+.jp-ah-vivo.p4:not(.gano) {
+  --mar-ala: #cf9a58;
+  --mar-ala-borde: #9c6c34;
+}
+
+.jp-ah-vivo.p4:not(.gano) .jp-ah-mariposa-orbita {
+  animation: jp-ah-mariposa-aleja 4s ease-in-out infinite;
+}
+
+.jp-ah-vivo.p4:not(.gano) .mariposa-orbita-2 {
+  animation: jp-ah-mariposa-aleja-2 4.4s ease-in-out infinite;
+}
+
+.jp-ah-vivo.p4:not(.gano) .jp-ah-mariposa-ala { animation-duration: 0.2s; }
+
+@keyframes jp-ah-mariposa-aleja {
+  0%, 100% { transform: translate(328px, 46px) rotate(-10deg); }
+  40% { transform: translate(342px, 30px) rotate(12deg); }
+  70% { transform: translate(320px, 38px) rotate(-8deg); }
+}
+
+@keyframes jp-ah-mariposa-aleja-2 {
+  0%, 100% { transform: translate(34px, 40px) rotate(8deg); }
+  45% { transform: translate(20px, 26px) rotate(-11deg); }
+  75% { transform: translate(42px, 34px) rotate(9deg); }
+}
+
+/* p6: al caer la Dione (su compañera), ESCAPAN de la escena — se van volando
+   fuera de cuadro por lados opuestos, encogiéndose y desvaneciéndose. NO
+   caen: huyen. Al ganar re-entran (la animación base vuelve, :not(.gano)). */
+.jp-ah-vivo.p6:not(.gano) {
+  --mar-ala: #cf9a58;
+  --mar-ala-borde: #9c6c34;
+}
+
+.jp-ah-vivo.p6:not(.gano) .jp-ah-mariposa-orbita {
+  animation: jp-ah-mariposa-huye 1.6s ease-in both;
+}
+
+.jp-ah-vivo.p6:not(.gano) .mariposa-orbita-2 {
+  animation: jp-ah-mariposa-huye-2 1.8s ease-in 0.2s both;
+}
+
+.jp-ah-vivo.p6:not(.gano) .jp-ah-mariposa-ala { animation-duration: 0.18s; }
+
+@keyframes jp-ah-mariposa-huye {
+  0% { transform: translate(328px, 46px) rotate(-10deg) scale(1); opacity: 1; }
+  100% { transform: translate(404px, -32px) rotate(28deg) scale(0.4); opacity: 0; }
+}
+
+@keyframes jp-ah-mariposa-huye-2 {
+  0% { transform: translate(34px, 40px) rotate(8deg) scale(1); opacity: 1; }
+  100% { transform: translate(-52px, -28px) rotate(-30deg) scale(0.4); opacity: 0; }
+}
+
+/* ── Chispas + florecitas de victoria ── */
+
+.jp-ah-chispa {
+  fill: #ffe58a;
+  stroke: #f4b31c;
+  stroke-width: 0.6;
+  opacity: 0;
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+.jp-ah-vivo.gano .jp-ah-chispa {
+  animation: jp-ah-twinkle 1.4s ease-in-out infinite;
+}
+
+.jp-ah-vivo.gano .chispa-2 { animation-delay: 0.25s; }
+.jp-ah-vivo.gano .chispa-3 { animation-delay: 0.5s; }
+.jp-ah-vivo.gano .chispa-4 { animation-delay: 0.75s; }
+.jp-ah-vivo.gano .chispa-5 { animation-delay: 1s; }
+.jp-ah-vivo.gano .chispa-6 { animation-delay: 1.2s; }
+
+@keyframes jp-ah-twinkle {
+  0%, 100% { opacity: 0; transform: scale(0.4) rotate(0deg); }
+  50% { opacity: 1; transform: scale(1.15) rotate(24deg); }
+}
+
+/* Las florecitas silvestres VIVEN en la chagra sana, se marchitan con la
+   contaminación y re-brotan con overshoot al ganar. */
+.jp-ah-flor-extra {
+  transform-box: fill-box;
+  transform-origin: bottom center;
+  transition: transform 1.2s ease, opacity 1.2s ease;
+}
+
+.jp-ah-flor-extra-tallo {
+  fill: none;
+  stroke: #3f8f4f;
+  stroke-width: 1.2;
+  stroke-linecap: round;
+  transition: stroke 1.4s ease;
+}
+
+.jp-ah-flor-extra-petalo {
+  fill: #fbd0e0;
+  stroke: #e78fb3;
+  stroke-width: 0.5;
+  transition: fill 1.4s ease, stroke 1.4s ease;
+}
+
+.jp-ah-flor-extra-centro { fill: #f4b31c; transition: fill 1.4s ease; }
+
+.jp-ah-vivo.p2:not(.gano) .jp-ah-flor-extra {
+  transform: scale(0.7) rotate(-24deg);
+}
+
+.jp-ah-vivo.p2:not(.gano) .jp-ah-flor-extra-petalo { fill: #cbb3ba; stroke: #a98f96; }
+.jp-ah-vivo.p2:not(.gano) .jp-ah-flor-extra-centro { fill: #b09a6a; }
+.jp-ah-vivo.p2:not(.gano) .jp-ah-flor-extra-tallo { stroke: #8f9257; }
+
+.jp-ah-vivo.p3:not(.gano) .jp-ah-flor-extra {
+  transform: scale(0.45) rotate(-48deg);
+  opacity: 0;
+}
+
+.jp-ah-vivo.gano .jp-ah-flor-extra {
+  animation: jp-ah-brotar 0.9s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+.jp-ah-vivo.gano .florx-2 { animation-delay: 0.3s; }
+.jp-ah-vivo.gano .florx-3 { animation-delay: 0.55s; }
+
+@keyframes jp-ah-brotar {
+  0% { transform: scale(0); }
+  70% { transform: scale(1.2); }
+  100% { transform: scale(1); }
+}
+
+/* ── prefers-reduced-motion: congelar en estados claros, sin animar ── */
+
+@media (prefers-reduced-motion: reduce) {
+  .jp-ah-vivo *,
+  .jp-ah-vivo {
+    animation: none !important;
+    transition: none !important;
+  }
+
+  /* Las órbitas animadas posicionaban a Angelita y las mariposas: sin
+     animación quedan en (0,0), así que las plantamos en un punto legible por
+     estado. Las mariposas chiquitas son "el resto que huye": en p4 ya están en
+     los bordes y en p6 quedan FUERA de cuadro (opacity 0) — huyeron. */
+  .jp-ah-mariposa-orbita { transform: translate(288px, 80px); }
+  .mariposa-orbita-2 { transform: translate(84px, 64px); }
+  .jp-ah-vivo.p2:not(.gano) .jp-ah-mariposa-orbita { transform: translate(308px, 64px); }
+  .jp-ah-vivo.p2:not(.gano) .mariposa-orbita-2 { transform: translate(52px, 50px); }
+  .jp-ah-vivo.p4:not(.gano) .jp-ah-mariposa-orbita { transform: translate(332px, 36px) rotate(-10deg); }
+  .jp-ah-vivo.p4:not(.gano) .mariposa-orbita-2 { transform: translate(28px, 32px) rotate(8deg); }
+  .jp-ah-vivo.p6:not(.gano) .jp-ah-mariposa-orbita { opacity: 0; }
+  .jp-ah-vivo.p6:not(.gano) .mariposa-orbita-2 { opacity: 0; }
+  .jp-ah-abeja2-orbita { transform: translate(300px, 88px) scale(0.8); }
+  .jp-ah-vivo.p2:not(.gano) .jp-ah-abeja2-orbita { transform: translate(290px, 112px) scale(0.8); }
+  .jp-ah-vivo.p4:not(.gano) .jp-ah-abeja2-orbita { transform: translate(288px, 136px) rotate(-14deg) scale(0.8); }
+  .jp-ah-vivo.p6:not(.gano) .jp-ah-abeja2-orbita { transform: translate(314px, 184px) rotate(16deg) scale(0.8); }
+  .jp-ah-colibri-orbita { transform: translate(120px, 42px); }
+  .jp-ah-vivo.p3:not(.gano) .jp-ah-colibri-orbita { transform: translate(122px, 66px); }
+  .jp-ah-vivo.p5:not(.gano) .jp-ah-colibri-orbita { transform: translate(112px, 84px) rotate(-12deg); }
+  .jp-ah-vivo.p6:not(.gano) .jp-ah-colibri-orbita { transform: translate(92px, 162px) rotate(-20deg); }
+  .jp-ah-dione-orbita { transform: translate(64px, 112px); }
+  .jp-ah-vivo.p4:not(.gano) .jp-ah-dione-orbita { transform: translate(72px, 136px) rotate(-8deg); }
+  .jp-ah-vivo.p6:not(.gano) .jp-ah-dione-orbita { transform: translate(40px, 168px) rotate(-75deg); }
+  .jp-ah-vivo.p6:not(.gano) .jp-ah-dione-marco .crt-fwing { transform: scaleX(0.3); }
+  .jp-ah-escarabajo-orbita { transform: translate(200px, 185px); }
+  .jp-ah-vivo.p6:not(.gano) .jp-ah-ala { transform: scaleY(0.5) rotate(48deg); }
+  .jp-ah-vivo.p6:not(.gano) .jp-ah-ojos-cerrados { opacity: 1; }
+  .jp-ah-vivo.p6:not(.gano) .jp-ah-ojos-abiertos { opacity: 0; }
+  .jp-ah-abeja-orbita { transform: translate(200px, 80px); }
+  .jp-ah-vivo.p3:not(.gano) .jp-ah-abeja-orbita { transform: translate(185px, 105px); }
+  .jp-ah-vivo.p5:not(.gano) .jp-ah-abeja-orbita { transform: translate(180px, 128px) rotate(-16deg); }
+  .jp-ah-vivo.p6:not(.gano) .jp-ah-abeja-orbita { transform: translate(158px, 159px) rotate(18deg); }
+  .jp-ah-vivo.p6:not(.gano) .jp-ah-zzz { opacity: 1; }
+  .jp-ah-vivo.p6:not(.gano) .jp-ah-zzz text { opacity: 0.8; }
+
+  /* Los elementos "aparecen por animación" deben quedar visibles fijos */
+  .jp-ah-vivo.gano .jp-ah-chispa { opacity: 0.9; transform: scale(1); }
+  .jp-ah-vivo.gano .jp-ah-flor-extra { transform: scale(1); }
+  .jp-ah-vivo.p2:not(.gano) .jp-ah-petalo-caido.caido-1 { transform: translate(-16px, 52px) rotate(-130deg); }
+  .jp-ah-vivo.p3:not(.gano) .jp-ah-petalo-caido.caido-2 { transform: translate(12px, 54px) rotate(140deg); }
+  .jp-ah-vivo.p2:not(.gano) .jp-ah-hoja-caida path,
+  .jp-ah-vivo.p3:not(.gano) .jp-ah-hoja-caida path { opacity: 0; }
+  .jp-ah-gotas .gota { opacity: 0.9; transform: translateY(10px); }
+}
+
+/* ── Palabra oculta ────────────────────────────────────────────────────── */
+
+.jp-ah-palabra {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.35rem;
+}
+
+.jp-ah-letra-casillero {
+  min-width: 1.9rem;
+  height: 2.4rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-bottom: 3px solid rgba(148, 163, 184, 0.6);
+  color: #fff;
+  font-weight: 800;
+  font-size: 1.3rem;
+  font-family: ui-monospace, monospace;
+}
+
+.jp-ah-espacio {
+  width: 1rem;
+}
+
+/* ── Resultado educativo (gana o pierde: siempre revela el dato) ───────── */
+
+.jp-ah-resultado {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 1rem 1.1rem;
+  border-radius: 1rem;
+  border: 2px solid;
+}
+
+.jp-ah-resultado.gano {
+  background: rgba(22, 101, 52, 0.35);
+  border-color: rgba(74, 222, 128, 0.6);
+}
+
+.jp-ah-resultado.perdio {
+  background: rgba(120, 53, 15, 0.35);
+  border-color: rgba(251, 191, 36, 0.5);
+}
+
+.jp-ah-resultado-titulo {
+  margin: 0;
+  font-weight: 800;
+  color: #fff;
+  font-size: 1.05rem;
+}
+
+.jp-ah-resultado-palabra {
+  margin: 0;
+  color: #e2e8f0;
+}
+
+.jp-ah-resultado-pista {
+  margin: 0;
+  color: #f1f5f9;
+  line-height: 1.4;
+}
+
+.jp-ah-resultado-fuente {
+  margin: 0;
+  color: #94a3b8;
+  font-size: 0.8rem;
+  font-style: italic;
+}
+
+.jp-ah-btn-otra {
+  align-self: flex-start;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin-top: 0.25rem;
+  padding: 0.5rem 1rem;
+  border-radius: 999px;
+  border: none;
+  background: rgba(74, 222, 128, 0.9);
+  color: #052e16;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.jp-ah-btn-otra:active {
+  transform: scale(0.97);
+}
+
+/* ── Teclado en pantalla (táctil, PWA móvil) ────────────────────────────── */
+
+.jp-ah-teclado {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 0.4rem;
+}
+
+@media (min-width: 30rem) {
+  .jp-ah-teclado {
+    grid-template-columns: repeat(9, minmax(0, 1fr));
+  }
+}
+
+.jp-ah-tecla {
+  min-height: 2.6rem;
+  border-radius: 0.6rem;
+  border: 2px solid rgba(148, 163, 184, 0.35);
+  background: rgba(30, 41, 59, 0.7);
+  color: #f1f5f9;
+  font-weight: 700;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+.jp-ah-tecla:active {
+  transform: scale(0.94);
+}
+
+.jp-ah-tecla:disabled {
+  cursor: default;
+}
+
+.jp-ah-tecla.acierto {
+  background: rgba(22, 163, 74, 0.6);
+  border-color: rgba(74, 222, 128, 0.8);
+  color: #fff;
+}
+
+.jp-ah-tecla.fallo {
+  background: rgba(153, 27, 27, 0.5);
+  border-color: rgba(248, 113, 113, 0.6);
+  color: #fecaca;
+}
+
+/* ── Pie con advertencia toxicológica ────────────────────────────────────── */
+
+.jp-ah-pie {
+  display: flex;
+  justify-content: center;
+  margin-top: 0.5rem;
+}
+
+.jp-ah-btn-advertencia {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.4rem 0.9rem;
+  border-radius: 999px;
+  border: 1px solid rgba(251, 191, 36, 0.5);
+  background: rgba(120, 53, 15, 0.25);
+  color: #fde68a;
+  font-size: 0.8rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.jp-ah-modal-fondo {
+  position: fixed;
+  inset: 0;
+  background: rgba(2, 6, 23, 0.75);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.25rem;
+  z-index: 60;
+}
+
+.jp-ah-modal {
+  max-width: 28rem;
+  width: 100%;
+  background: #0f172a;
+  border: 2px solid rgba(251, 191, 36, 0.5);
+  border-radius: 1rem;
+  padding: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.jp-ah-modal h3 {
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #fde68a;
+  font-size: 1.05rem;
+}
+
+.jp-ah-modal p {
+  margin: 0;
+  color: #e2e8f0;
+  line-height: 1.5;
+  font-size: 0.9rem;
+}

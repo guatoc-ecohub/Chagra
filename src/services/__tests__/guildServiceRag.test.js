@@ -205,7 +205,7 @@ describe('suggestGuildsFor (RAG-based)', () => {
     expect(await suggestGuildsFor('')).toEqual(empty);
     expect(await suggestGuildsFor(null)).toEqual(empty);
     expect(await suggestGuildsFor(undefined)).toEqual(empty);
-    expect(await suggestGuildsFor(42)).toEqual(empty);
+    expect(await suggestGuildsFor(/** @type {any} */ (42))).toEqual(empty);
   });
 
   it('si retrieve falla, hace fallback al curado en lugar de tirar la UI', async () => {
@@ -295,7 +295,7 @@ describe('suggestPolyculture (cross-reference)', () => {
     const empty = { companions: [], antagonists: [], strata: [] };
     expect(await suggestPolyculture([])).toEqual(empty);
     expect(await suggestPolyculture(null)).toEqual(empty);
-    expect(await suggestPolyculture('zea_mays')).toEqual(empty);
+    expect(await suggestPolyculture(/** @type {any} */ ('zea_mays'))).toEqual(empty);
   });
 
   it('top-8 cap: nunca devuelve más de 8 companions aunque haya muchos votos', async () => {

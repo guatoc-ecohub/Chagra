@@ -93,7 +93,9 @@ test.describe('IDB schema v9 — índice compuesto asset_id+timestamp', () => {
   });
 
   test('logs store tiene índice compuesto asset_id_timestamp y retorna logs ordenados', async ({ page }) => {
-    await page.goto('/');
+    // La raíz pública abre el valle 3D; el contrato offline necesita la ruta
+    // explícita del formulario para autenticar la sesión simulada.
+    await page.goto('/#login');
   // El arranque en dev (vite cold-compile) puede tardar con el grafo de módulos completo;
   // esperamos explícitamente al formulario de login antes de escribir (robustez del gate).
   await expect(page.getByLabel(/usuario/i)).toBeVisible({ timeout: 90_000 });
@@ -226,7 +228,9 @@ test.describe('Offline-first — siembra pendiente y reconexión', () => {
     context,
     page,
   }) => {
-    await page.goto('/');
+    // La raíz pública abre el valle 3D; el contrato offline necesita la ruta
+    // explícita del formulario para autenticar la sesión simulada.
+    await page.goto('/#login');
 
     // Login vía UI contra endpoint mockeado.
     // El arranque en dev (vite cold-compile) puede tardar con el grafo de módulos
@@ -246,6 +250,9 @@ test.describe('Offline-first — siembra pendiente y reconexión', () => {
 
     // Simula desconexión de red.
     await context.setOffline(true);
+    await expect
+      .poll(() => page.evaluate(() => navigator.onLine), { timeout: 5_000 })
+      .toBe(false);
     await page.evaluate(() => window.dispatchEvent(new Event('offline')));
 
     await expect(page.getByText(/sin conexion|offline-first/i).first()).toBeVisible({

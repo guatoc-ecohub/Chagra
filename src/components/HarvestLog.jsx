@@ -6,6 +6,7 @@ import { logCache } from '../db/logCache';
 import { fincaVivaHomePerfilActivo } from '../config/fincaVivaHomeFlag';
 import RegistroShell from './registro/RegistroShell';
 import { TextField, NumberField, SelectField, TextAreaField } from './registro/RegistroFields';
+import useAngelitaStore from '../store/useAngelitaStore';
 
 // Bug 069.10 — sanity caps para evitar typos absurdos (ej. "100kg" → 100000)
 // que rompan analítica downstream sin que el operador lo note.
@@ -104,6 +105,7 @@ export default function HarvestLog({ onBack, onSave }) {
   const [syncedOffline, setSyncedOffline] = useState(false);
   const [view, setView] = useState('form'); // 'form' | 'success'
   const [touched, setTouched] = useState(/** @type {Record<string, boolean>} */ ({}));
+  const celebrar = useAngelitaStore((s) => s.celebrar);
 
   // Bug 069.10 — validación inline (subArea, product, quantity, date)
   const errors = useMemo(() => {
@@ -208,6 +210,18 @@ export default function HarvestLog({ onBack, onSave }) {
       const isOfflineFallback = (result.message || '').toLowerCase().includes('local');
       setSyncedOffline(isOfflineFallback);
       onSave(result.message || 'Registro guardado localmente (Pendiente de sincronización)', !result.success);
+
+      // Celebrar cosecha registrada (task #hc-motor2)
+      if (result.success || isOfflineFallback) {
+        const product = formData.product || 'cosecha';
+        const quantity = formData.quantity;
+        const unit = formData.unit;
+        const logroId = `harvest-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+        celebrar({
+          id: logroId,
+          texto: `¡Bien! Registró ${quantity} ${unit.toLowerCase()} de ${product}.`
+        });
+      }
 
       setFormData(prev => ({ ...prev, quantity: '', notes: '' }));
       setView('success');
@@ -368,6 +382,7 @@ export default function HarvestLog({ onBack, onSave }) {
           rows={3}
           value={formData.notes}
           onChange={handleInput}
+          // @ts-ignore placeholder not in strict prop types
           placeholder="Ej: fruta pequeña, algo picada por pájaros…"
         />
       </RegistroShell>

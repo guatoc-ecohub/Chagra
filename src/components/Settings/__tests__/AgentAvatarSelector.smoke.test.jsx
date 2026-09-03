@@ -7,48 +7,97 @@ describe('AgentAvatarSelector smoke', () => {
         localStorage.clear();
     });
 
-    it('renderiza 3 opciones colibri-real + colibri-svg + maiz', () => {
+    it('renderiza las 7 opciones del elenco unificado (colibrí jubilado, maíz retirado)', () => {
         render(<AgentAvatarSelector />);
-        expect(screen.getByText('Colibrí real')).toBeInTheDocument();
-        expect(screen.getByText('Colibrí ilustrado')).toBeInTheDocument();
-        expect(screen.getByText('Planta de maíz')).toBeInTheDocument();
+        expect(screen.getByText('Angelita, la abeja', { selector: 'p' })).toBeInTheDocument();
+        expect(screen.getByText('Zarigüeya', { selector: 'p' })).toBeInTheDocument();
+        expect(screen.getByText('Jaguar', { selector: 'p' })).toBeInTheDocument();
+        expect(screen.getByText('Oso de anteojos', { selector: 'p' })).toBeInTheDocument();
+        expect(screen.getByText('Luciérnaga', { selector: 'p' })).toBeInTheDocument();
+        expect(screen.getByText('Chivito de páramo', { selector: 'p' })).toBeInTheDocument();
+        expect(screen.getByText('Guacamaya', { selector: 'p' })).toBeInTheDocument();
+        expect(screen.queryByText(/colibrí/i)).toBeNull();
+        expect(screen.queryByText(/maíz/i)).toBeNull();
     });
 
-    it('colibri-real seleccionado por default', () => {
+    it('click en zarigüeya cambia la preferencia y persiste en localStorage', () => {
         render(<AgentAvatarSelector />);
-        const colibriBtn = screen.getByText('Colibrí real').closest('button');
-        expect(colibriBtn).toHaveAttribute('aria-pressed', 'true');
+        const zariguyaBtn = screen.getByText('Zarigüeya', { selector: 'p' }).closest('button');
+        fireEvent.click(zariguyaBtn);
+        expect(zariguyaBtn).toHaveAttribute('aria-pressed', 'true');
+        expect(localStorage.getItem('chagra:agent-avatar-type')).toBe('zariguya');
+        const angelitaBtn = screen.getByText('Angelita, la abeja', { selector: 'p' }).closest('button');
+        expect(angelitaBtn).toHaveAttribute('aria-pressed', 'false');
     });
 
-    it('click en maiz cambia la preferencia y persiste en localStorage', () => {
+    it('localStorage zariguya preselecciona zarigüeya al montar', () => {
+        localStorage.setItem('chagra:agent-avatar-type', 'zariguya');
         render(<AgentAvatarSelector />);
-        const maizBtn = screen.getByText('Planta de maíz').closest('button');
-        fireEvent.click(maizBtn);
-        expect(maizBtn).toHaveAttribute('aria-pressed', 'true');
-        expect(localStorage.getItem('chagra:agent-avatar-type')).toBe('maiz');
-        const colibriBtn = screen.getByText('Colibrí real').closest('button');
-        expect(colibriBtn).toHaveAttribute('aria-pressed', 'false');
+        const zariguyaBtn = screen.getByText('Zarigüeya', { selector: 'p' }).closest('button');
+        expect(zariguyaBtn).toHaveAttribute('aria-pressed', 'true');
     });
 
-    it('click en colibri-svg cambia la preferencia y persiste', () => {
+    it('angelita seleccionada por default', () => {
         render(<AgentAvatarSelector />);
-        const svgBtn = screen.getByText('Colibrí ilustrado').closest('button');
-        fireEvent.click(svgBtn);
-        expect(svgBtn).toHaveAttribute('aria-pressed', 'true');
-        expect(localStorage.getItem('chagra:agent-avatar-type')).toBe('colibri_svg');
+        const angelitaBtn = screen.getByText('Angelita, la abeja', { selector: 'p' }).closest('button');
+        expect(angelitaBtn).toHaveAttribute('aria-pressed', 'true');
     });
 
-    it('localStorage maiz preselecciona maiz al montar', () => {
+    it('maiz ya NO es una opción del selector (retirado 2026-08-14)', () => {
+        render(<AgentAvatarSelector />);
+        expect(screen.queryByText('Planta de maíz')).toBeNull();
+    });
+
+    it('localStorage maiz (usuario viejo) NO rompe el selector: cae a angelita', () => {
         localStorage.setItem('chagra:agent-avatar-type', 'maiz');
         render(<AgentAvatarSelector />);
-        const maizBtn = screen.getByText('Planta de maíz').closest('button');
-        expect(maizBtn).toHaveAttribute('aria-pressed', 'true');
+        const angelitaBtn = screen.getByText('Angelita, la abeja', { selector: 'p' }).closest('button');
+        expect(angelitaBtn).toHaveAttribute('aria-pressed', 'true');
     });
 
-    it('localStorage colibri_svg preselecciona el ilustrado al montar', () => {
+    it('slug legacy colibri_svg en localStorage migra a angelita seleccionada', () => {
         localStorage.setItem('chagra:agent-avatar-type', 'colibri_svg');
         render(<AgentAvatarSelector />);
-        const svgBtn = screen.getByText('Colibrí ilustrado').closest('button');
-        expect(svgBtn).toHaveAttribute('aria-pressed', 'true');
+        const angelitaBtn = screen.getByText('Angelita, la abeja', { selector: 'p' }).closest('button');
+        expect(angelitaBtn).toHaveAttribute('aria-pressed', 'true');
+    });
+
+    it('slug legacy colibri en localStorage migra a angelita seleccionada', () => {
+        localStorage.setItem('chagra:agent-avatar-type', 'colibri');
+        render(<AgentAvatarSelector />);
+        const angelitaBtn = screen.getByText('Angelita, la abeja', { selector: 'p' }).closest('button');
+        expect(angelitaBtn).toHaveAttribute('aria-pressed', 'true');
+    });
+
+    // Ítem #8 del GAP compAI (2026-08-13, ampliado 2026-08-14 con el roster-7
+    // completo): jaguar, oso de anteojos, luciérnaga, chivito y guacamaya ya
+    // tienen cuerpo 2.5D y `enPWA:true` en el núcleo (#96).
+    it.each([
+        ['jaguar', 'Jaguar'],
+        ['oso-baston', 'Oso de anteojos'],
+        ['luciernaga', 'Luciérnaga'],
+        ['chivito-punk', 'Chivito de páramo'],
+        ['guacamaya', 'Guacamaya'],
+    ])('click en %s cambia la preferencia y persiste en localStorage', (slug, label) => {
+        render(<AgentAvatarSelector />);
+        const btn = screen.getByText(label, { selector: 'p' }).closest('button');
+        fireEvent.click(btn);
+        expect(btn).toHaveAttribute('aria-pressed', 'true');
+        expect(localStorage.getItem('chagra:agent-avatar-type')).toBe(slug);
+        const angelitaBtn = screen.getByText('Angelita, la abeja', { selector: 'p' }).closest('button');
+        expect(angelitaBtn).toHaveAttribute('aria-pressed', 'false');
+    });
+
+    it.each([
+        ['jaguar', 'Jaguar'],
+        ['oso-baston', 'Oso de anteojos'],
+        ['luciernaga', 'Luciérnaga'],
+        ['chivito-punk', 'Chivito de páramo'],
+        ['guacamaya', 'Guacamaya'],
+    ])('localStorage %s preselecciona esa opción al montar', (slug, label) => {
+        localStorage.setItem('chagra:agent-avatar-type', slug);
+        render(<AgentAvatarSelector />);
+        const btn = screen.getByText(label, { selector: 'p' }).closest('button');
+        expect(btn).toHaveAttribute('aria-pressed', 'true');
     });
 });

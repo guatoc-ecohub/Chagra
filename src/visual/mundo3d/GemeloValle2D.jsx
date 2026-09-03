@@ -28,7 +28,7 @@
  *      reducedMotion onEntrar onAlerta />` donde hoy se monta Valle2DFallback.
  */
 import { MUNDOS_VALLE, COSA_DEL_DIA, CLIMAS } from '../../mockups/valle/valleData';
-import { AbejaAngelita } from '../creatures/AbejaAngelita.jsx';
+import ChagraAgentAvatar from '../../components/ChagraAgentAvatar.jsx';
 import './GemeloValle2D.css';
 
 /* ── Proyección: mismas coordenadas [x,z] del valle 3D, aplanadas a la lámina
@@ -37,7 +37,9 @@ import './GemeloValle2D.css';
 const VB_W = 480;
 const VB_H = 360;
 function iso(x, z) {
-  return { cx: 240 + (x - z) * 26, cy: 200 + (x + z) * 11 };
+  // (Escala al día con el VALLE GRANDE del rediseño 2026-07: los lugares
+  //  viven en x ∈ [-8.6, 8.6], z ∈ [-9.4, 9.6].)
+  return { cx: 240 + (x - z) * 12, cy: 200 + (x + z) * 8 };
 }
 function pct(x, z) {
   const { cx, cy } = iso(x, z);
@@ -457,7 +459,7 @@ export default function GemeloValle2D({
                   className={`gv-poi${activo ? ' gv-poi--activo' : ''}`}
                   style={{
                     left: `${clampPct(p.left)}%`,
-                    top: `${p.top - (alto / VB_H) * 100 - 1.5}%`,
+                    top: `${clampPct(p.top - (alto / VB_H) * 100 - 1.5)}%`,
                     '--poi-tinte': m.tinte[0],
                   }}
                   onClick={() => onEntrar?.(m.id)}
@@ -476,7 +478,10 @@ export default function GemeloValle2D({
                 <button
                   type="button"
                   className="gv-alerta"
-                  style={{ left: `${clampPct(p.left)}%`, top: `${p.top - 14}%` }}
+                  style={{
+                    left: `${clampPct(p.left)}%`,
+                    top: `${clampPct(p.top - 14)}%`,
+                  }}
                   onClick={() => onAlerta?.()}
                   aria-label={`Alerta del día: ${alerta.titulo}. ${alerta.detalle || ''}`}
                 >
@@ -492,11 +497,13 @@ export default function GemeloValle2D({
               aria-hidden="true"
             >
               <div className="gv-abeja__bob">
-                <AbejaAngelita
+                <ChagraAgentAvatar
+                  estado={animo}
                   size={foco ? 38 : 40 + Math.round(energia * 12)}
                   animo={animo}
                   energia={energia}
                   animated={!reducedMotion}
+                  ariaLabel="Compañero de Chagra"
                 />
               </div>
             </div>

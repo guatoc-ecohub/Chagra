@@ -8,9 +8,12 @@ import { useProCapability } from '../../hooks/useProCapability';
 import usePrefsStore from '../../store/usePrefsStore';
 /* Import DIRECTO de deviceTier (no el barrel de mundo3d): este archivo vive en
    el bundle base del home y solo necesita el tiering (three-free, 0 deps). */
-// El tiering 3D-vs-2D lo decide el propio view EntradaValle3D; el home solo
-// muestra la puerta cuando el usuario prendió el flag. (Se quitó `permite3D`:
-// antes ocultaba la entrada en tier 'bajo' → prender el toggle no hacía nada.)
+// El home solo muestra la puerta cuando el usuario prendió el flag. (Se quitó
+// `permite3D` de este archivo: antes ocultaba la entrada en tier 'bajo' →
+// prender el toggle no hacía nada — el tiering de la vista de destino, si
+// aplica, es asunto suyo, no de esta banda.) Desde task #42 (2026-08-14) la puerta abre
+// el valle vanilla canónico (ValleMarcoScreen, ver App.jsx `case 'valle3d'`),
+// no el diorama EntradaValle3D.
 import './mundos-finca.css';
 
 /**
@@ -205,6 +208,25 @@ export default function MundosDeMiFinca({ onNavigate, mostrarAnimales = true, pl
                         <small>Recórrala en 3D: cada mundo es un lugar al que se viaja</small>
                     </span>
                     <span className="mf-espiritu-sello" aria-hidden="true">Nuevo</span>
+                </button>
+            )}
+
+            {/* ── Galería de mundos 3D (hub): todos los mundos como portales de
+                piedra con el cruce Odyssey. Mismo gate que el valle (flag +
+                device-tier). Es el índice navegable de TODO el 3D. ── */}
+            {mostrarValle3d && (
+                <button
+                    type="button"
+                    className="mf-espiritu mf-galeria3d"
+                    data-testid="entrada-galeria3d"
+                    onClick={() => onNavigate?.('mockup_vitrina_maestra')}
+                    aria-label="Galería de mundos en 3D: todos los mundos de su finca como portales de piedra"
+                >
+                    <span className="mf-espiritu-glifo" aria-hidden="true">🗺️</span>
+                    <span className="mf-espiritu-txt">
+                        <b>Galería de mundos</b>
+                        <small>Todos sus mundos en 3D, uno por uno, como portales</small>
+                    </span>
                 </button>
             )}
 

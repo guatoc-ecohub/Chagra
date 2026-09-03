@@ -34,11 +34,17 @@ function texturaRadial() {
   return _tex;
 }
 
+// `refExt` es OPCIONAL: solo lo pasa quien necesita mover el mesh por fuera
+// (useEntradaAbeja). Sin un valor por defecto, tsc lo infiere REQUERIDO y toda
+// llamada normal —`<SombraContacto pos radio color opacidad orden />`— rompe el
+// gate `tsc:check vs baseline` con TS2741. Eso tenía trabados los PRs de rescate
+// de mundos (páramo/bosque/chorrera/Ents). El `= undefined` lo vuelve opcional
+// sin cambiar una línea de comportamiento.
 export function SombraContacto({
-  refExt, pos = [0, 0, 0], radio = 0.5, color = '#2e2012', opacidad = 0.35, orden = 2,
+  refExt = undefined, pos = [0, 0, 0], radio = 0.5, color = '#2e2012', opacidad = 0.35, orden = 2,
 }) {
   return (
-    <mesh ref={refExt} position={pos} rotation={[-Math.PI / 2, 0, 0]} renderOrder={orden}>
+    <mesh ref={refExt} position={/** @type {[number, number, number]} */ (pos)} rotation={[-Math.PI / 2, 0, 0]} renderOrder={orden}>
       <planeGeometry args={[radio * 2, radio * 2]} />
       <meshBasicMaterial
         map={texturaRadial()}

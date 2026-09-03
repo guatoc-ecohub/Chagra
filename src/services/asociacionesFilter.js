@@ -16,7 +16,7 @@ export function norm(value) {
 }
 
 function roleFromProfile(profile) {
-  const p = profile && typeof profile === 'object' ? profile : {};
+  const p = /** @type {any} */ (profile && typeof profile === 'object' ? profile : {});
   return norm(p.rol) || norm(p.vocacion) || DEFAULT_ROLE;
 }
 
@@ -47,7 +47,7 @@ function uniqByNorm(items) {
 }
 
 export function filterAsociacionesByRole(items = arquetipos, profile = {}, opts = {}) {
-  if (opts.esOperador) return items;
+  if (/** @type {{esOperador?:boolean}} */ (opts).esOperador) return items;
   const role = roleFromProfile(profile);
   return items.filter((item) => Array.isArray(item.rol) && item.rol.map(norm).includes(role));
 }
@@ -72,7 +72,7 @@ export function getCultivosDisponibles(items = arquetipos, profile = {}, opts = 
 }
 
 export function getCultivosFromProfile(profile = {}) {
-  const p = profile && typeof profile === 'object' ? profile : {};
+  const p = /** @type {any} */ (profile && typeof profile === 'object' ? profile : {});
   return uniqByNorm([
     ...splitCultivosText(p.cultivos_actuales),
     ...splitCultivosText(p.cultivos_interes),
@@ -116,7 +116,7 @@ export function findCultivoInItems(items = arquetipos, value) {
 export function selectCultivoInicial(items = arquetipos, profile = {}, opts = {}) {
   const visibles = filterAsociacionesByRole(items, profile, opts);
   const disponibles = getCultivosDisponibles(items, profile, opts);
-  const finca = [...(opts.cultivosFinca || []), ...getCultivosFromProfile(profile)];
+  const finca = [...(/** @type {{cultivosFinca?:string[]}} */ (opts).cultivosFinca || []), ...getCultivosFromProfile(profile)];
 
   for (const cultivo of finca) {
     const match = findCultivoInItems(visibles, cultivo);

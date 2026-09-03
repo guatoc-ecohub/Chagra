@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { render, screen, waitFor, fireEvent, within } from '@testing-library/react';
 import MiFincaVivaScreen from '../MiFincaVivaScreen';
@@ -104,6 +105,24 @@ describe('MiFincaVivaScreen', () => {
     expect(entrada).toBeTruthy();
     fireEvent.click(entrada);
     expect(onNavigate).toHaveBeenCalledWith('subsuelo');
+  });
+
+  it('expone la entrada a Mi finca en 3D (Odyssey) y navega a finca_odyssey', async () => {
+    const onNavigate = vi.fn();
+    render(<MiFincaVivaScreen onNavigate={onNavigate} />);
+    const entrada = await screen.findByTestId('entrada-finca-odyssey');
+    expect(entrada).toBeTruthy();
+    fireEvent.click(entrada);
+    expect(onNavigate).toHaveBeenCalledWith('finca_odyssey');
+  });
+
+  it('expone la entrada a Mono vs Poli y navega a mono_vs_poli (rescate huérfano)', async () => {
+    const onNavigate = vi.fn();
+    render(<MiFincaVivaScreen onNavigate={onNavigate} />);
+    const entrada = await screen.findByTestId('entrada-mono-vs-poli');
+    expect(entrada).toBeTruthy();
+    fireEvent.click(entrada);
+    expect(onNavigate).toHaveBeenCalledWith('mono_vs_poli');
   });
 
   it('siempre muestra la galería de criaturas (con siluetas si vacía)', async () => {

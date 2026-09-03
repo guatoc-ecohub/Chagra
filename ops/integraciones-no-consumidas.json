@@ -53,5 +53,412 @@
       "reason": "Construido chagra-pro #77 (serie ubicación, PRs #75-77) para una cascada Tier1/Tier2 vía sidecar. El propio spec tests/ubicacion-auto.spec.js lo documenta: 'muchos tests están skipped hasta que se mergee el PR 4/4'. Ese PR4 SÍ se mergeó (#1143, 2026-06) pero implementó otra cosa — un fallback OFFLINE (32 dptos x municipios curados) para cuando Nominatim falla, no la llamada al sidecar. locationService.js::resolveUbicacion() es una reimplementación cliente (Nominatim + fallback offline) con el mismo nombre mas no llama al endpoint. A diferencia de los otros casos, esto NO parece un olvido sino una decisión de producto razonable (mejor para offline-first evitar el round-trip a alpha) que dejó el endpoint del sidecar como infraestructura huérfana sin que nadie lo haya limpiado del lado chagra-pro. No cablear — si acaso, evaluar deprecar el endpoint en chagra-pro. Caso 5 del ADR, encontrado por este script.",
       "date": "2026-07-15"
     }
+  ],
+  "orphan_components": [
+    {
+      "id": "src/visual/mundo3d/ArtesaniaAndina.jsx",
+      "reason": "Extensión D-5 del audit (2026-07-21, ver ADR-INTEGRACIONES-NO-CONSUMIDAS-2026-07-15 §componentes): verificado con grep en todo src/ — únicamente su smoke test (__tests__/artesania.smoke.test.jsx) importa el componente; ningún archivo de producto lo hace. Solo el módulo de datos hermano (artesaniaAndina.js: PERFILES_VASIJA/SEGMENTOS_VASIJA) tiene consumidor real (el propio ArtesaniaAndina.jsx). Encontrado por el nuevo check, no cableado en este PR (es una PR de test, no de producto) — requiere decidir en qué mundo/vitrina se monta.",
+      "date": "2026-07-21"
+    },
+    {
+      "id": "src/visual/mundo3d/CamaraDioramas.jsx",
+      "reason": "Verificado con grep: nadie importa el componente React <CamaraDioramas>. Lo que SÍ está cableado (App.jsx, mockups/vitrina3d/VitrinaMundos.jsx) es resolverEncuadre() desde el módulo hermano camaraDioramas.js — la lógica de encuadre se usa directo, sin pasar por el wrapper de componente. El 'import CamaraDioramas from ...' que aparece en el docstring de camaraDioramas.js es un ejemplo de uso en prosa, no código real (y su ruta relativa ni siquiera resuelve). Encontrado por el nuevo check.",
+      "date": "2026-07-21"
+    },
+    {
+      "id": "src/visual/mundo3d/CielosHora.jsx",
+      "reason": "El propio comentario de CapaVivaMundo.jsx dice literalmente 'CielosHora.jsx no existe en dev a la fecha de esta capa; cuando aterrice, se compone aquí mismo' — es un scaffold para una integración futura documentada, todavía sin consumidor real. Encontrado por el nuevo check; no se cablea en este PR (decisión de producto pendiente, no un olvido silencioso).",
+      "date": "2026-07-21"
+    },
+    {
+      "id": "src/visual/mundo3d/GemeloValle2D.jsx",
+      "reason": "Verificado con grep en src/: el único importador es su propio smoke test (__tests__/gemeloValle2D.smoke.test.jsx). Sin consumidor de producto. Encontrado por el nuevo check.",
+      "date": "2026-07-21"
+    },
+    {
+      "id": "src/visual/mundo3d/PisosTermicosBandas.jsx",
+      "reason": "El comentario de pisosTermicos.js dice 'Lo consume el overlay PisosTermicosBandas.jsx (bandas r3f)', pero verificado con grep: ningún archivo real importa el componente — la intención de diseño no llegó a cablearse. Encontrado por el nuevo check.",
+      "date": "2026-07-21"
+    },
+    {
+      "id": "src/visual/mundo3d/TransicionMundoKit.jsx",
+      "reason": "Verificado con grep: el único importador real es su propio test (__tests__/transicionMundoKit.test.jsx). Su hermano TransicionSierraMundo.jsx solo lo menciona en un comentario de docstring ('misma filosofía que'), no en código. Encontrado por el nuevo check.",
+      "date": "2026-07-21"
+    },
+    {
+      "id": "src/visual/mundo3d/TransicionSierraMundo.jsx",
+      "reason": "Mismo caso que TransicionMundoKit.jsx: sin consumidor real fuera de su propia prosa de docstring y su export default. Ninguno de los dos está montado en una ruta viva hoy. Encontrado por el nuevo check.",
+      "date": "2026-07-21"
+    },
+    {
+      "id": "src/visual/mundo3d/infraestructura/InfraestructuraViva.jsx",
+      "reason": "Exportado por el barrel infraestructura/index.js ('export { default as InfraestructuraViva } from ./InfraestructuraViva.jsx'), pero ese barrel a su vez no tiene NINGÚN importador real — solo la variante base Infraestructura.jsx (importada directo, sin pasar por el barrel) está cableada hoy. La variante 'Viva' (auto-alimentada) quedó construida sin consumidor. Encontrado por el nuevo check.",
+      "date": "2026-07-21"
+    },
+    {
+      "id": "src/mockups/_archivo/BosqueVivo3D-legacy.jsx",
+      "reason": "Archivo en directorio _archivo (archivado intencionalmente). Versión legacy del BosqueVivo3D reemplazada por ParamoDefinitivoMockup. El sufijo -legacy indica explícitamente que es una versión antigua mantenida por razones históricas, no para producción.",
+      "date": "2026-08-30"
+    },
+    {
+      "id": "src/mockups/_archivo/BosqueVivo3D.jsx",
+      "reason": "Archivo en directorio _archivo (archivado intencionalmente). Versión previa del BosqueVivo3D reemplazada por ParamoDefinitivoMockup (ver comentario en App.jsx línea 196-198: 'Reemplaza a BosqueVivo3D, MundoParamo3D y SueloDemo3D (los tres archivados en src/mockups/_archivo/)').",
+      "date": "2026-08-30"
+    },
+    {
+      "id": "src/mockups/_archivo/CasaAdentro3D.jsx",
+      "reason": "Archivo en directorio _archivo (archivado intencionalmente). Mockup previo reemplazado por otras implementaciones. La ruta 'casa_adentro' y 'mockups/casa-adentro' en MOCKUP_HASH_ROUTES apuntan a 'mundo_casa_adentro', no a este archivo archivado.",
+      "date": "2026-08-30"
+    },
+    {
+      "id": "src/mockups/_archivo/MundoParamo3D.jsx",
+      "reason": "Archivo en directorio _archivo (archivado intencionalmente). Versión previa del páramo reemplazada por ParamoDefinitivoMockup (ver comentario en App.jsx línea 196-198).",
+      "date": "2026-08-30"
+    },
+    {
+      "id": "src/mockups/_archivo/SueloDemo3D-legacy.jsx",
+      "reason": "Archivo en directorio _archivo con sufijo -legacy (archivado intencionalmente). Versión antigua del demo de suelo, reemplazada por implementaciones más recientes.",
+      "date": "2026-08-30"
+    },
+    {
+      "id": "src/mockups/_archivo/SueloDemo3D.jsx",
+      "reason": "Archivo en directorio _archivo (archivado intencionalmente). Versión previa del demo de suelo reemplazada por ParamoDefinitivoMockup y otras implementaciones.",
+      "date": "2026-08-30"
+    },
+    {
+      "id": "src/mockups/valle/_archivo/vistaParamo.archivado.jsx",
+      "reason": "Archivo con nombre literal 'archivado' en subdirectorio _archivo dentro de valle. Indicador explícito de que es código archivado intencionalmente, no un olvido de integración.",
+      "date": "2026-08-30"
+    },
+    {
+      "id": "src/mockups/GuacamayaViva.jsx",
+      "reason": "Mockup experimental de la guacamaya como séptima criatura del elenco (Ara macao, rig F24). El comentario menciona ruta #/mockups/guacamaya-viva pero no está en MOCKUP_HASH_ROUTES. Parece ser un experimento paralelo a AngelitaViva que nunca se cableó completamente. Los componentes hermano (GuacamayaEntrada/GuacamayaSalida) también están huérfanos, indicando que el sistema de guacamaya como compai alternativo no se terminó.",
+      "date": "2026-08-30"
+    },
+    {
+      "id": "src/mockups/MundoLecheria3D.jsx",
+      "reason": "Mockup de mundo lechería (60KB) que nunca se cableó en App.jsx. No existe ruta correspondiente en MOCKUP_HASH_ROUTES. Parece ser un mundo temático que se diseñó pero no se integró al sistema de rutas.",
+      "date": "2026-08-30"
+    },
+    {
+      "id": "src/mockups/MundoSanidad3D.jsx",
+      "reason": "Versión alternativa (60KB) del mundo sanidad que quedó huérfana. La versión que sí está cableada es Mundo3DSanidad.jsx (6.7KB, importado como Mundo3DSanidadMockup). Este parece ser una versión más grande que se reemplazó por la más compacta.",
+      "date": "2026-08-30"
+    },
+    {
+      "id": "src/mockups/MundoVergelFrutal3D.jsx",
+      "reason": "Mockup de mundo vergel frutal que nunca se cableó. No existe ruta en MOCKUP_HASH_ROUTES. Parece ser un mundo temático (frutales) que se diseñó pero no se integró al sistema de rutas.",
+      "date": "2026-08-30"
+    },
+    {
+      "id": "src/mockups/TransicionesOdysseyDemo.jsx",
+      "reason": "Demo de transiciones Odyssey que nunca se cableó. El nombre 'Demo' indica explícitamente que es una demo experimental, no producción. No existe ruta correspondiente en MOCKUP_HASH_ROUTES.",
+      "date": "2026-08-30"
+    },
+    {
+      "id": "src/mockups/mercado/CintaAltitud.jsx",
+      "reason": "Componente del módulo mercado (CintaAltitud con altitud de fincas en la montaña) que nunca se cableó. Es una pieza de UI para visualizar fincas por piso térmico en una cinta vertical. Parece ser un experimento de visualización de mercado que no se terminó de integrar.",
+      "date": "2026-08-30"
+    },
+    {
+      "id": "src/mockups/mercado/ProductoIlustracion.jsx",
+      "reason": "Componente del módulo mercado (ilustración de productos) que nunca se cableó. Parece ser una pieza de visualización para el mercado campesino que no se terminó de integrar.",
+      "date": "2026-08-30"
+    },
+    {
+      "id": "src/mockups/mercado/Rostro.jsx",
+      "reason": "Componente del módulo mercado (rostro de productor, usado por CintaAltitud) que nunca se cableó. Es una pieza de UI para mostrar fotos/rostros de productores en la visualización de mercado. El módulo mercado completo parece ser un experimento inconcluso.",
+      "date": "2026-08-30"
+    },
+    {
+      "id": "src/visual/agente/GuacamayaEntrada.jsx",
+      "reason": "Componente de entrada teatral para guacamaya como compai, equivalente a AngelitaEntrada pero nunca cableado. El sistema de guacamaya (GuacamayaEntrada, GuacamayaSalida, GuacamayaCompai) parece ser un experimento de séptima criatura que nunca se terminó de integrar al sistema de compaís.",
+      "date": "2026-08-30"
+    },
+    {
+      "id": "src/visual/agente/GuacamayaSalida.jsx",
+      "reason": "Componente de salida épica para guacamaya como compai, equivalente a la salida que Angelita aún no tiene. Comentado en GuacamayaViva como 'la salida épica' pero el sistema de guacamaya completo quedó inconcluso.",
+      "date": "2026-08-30"
+    },
+    {
+      "id": "src/visual/confianza/AdvertenciaPeso.jsx",
+      "reason": "Componente del módulo confianza (piedra de advertencia sobre peso de afirmaciones). El módulo confianza (7 componentes) parece ser un experimento de lenguaje visual anti-alucinación que nunca se cableó en el producto. GaleriaConfianza.jsx describe una 'vitrina viva del lenguaje de la confianza' pero nunca se montó en ninguna ruta.",
+      "date": "2026-08-30"
+    },
+    {
+      "id": "src/visual/confianza/FichaFuente.jsx",
+      "reason": "Componente del módulo confianza (ficha de herbario con fuente). Pieza del sistema de confianza que muestra procedencia de información (fuentes de Agrosavia, etc.). El módulo completo nunca se integró al producto.",
+      "date": "2026-08-30"
+    },
+    {
+      "id": "src/visual/confianza/GaleriaConfianza.jsx",
+      "reason": "Componente principal del módulo confianza (vitrina del vocabulario completo). Comentado como 'Standalone y sin wiring: se monta donde haga falta revisarla' pero nunca se encontró el lugar. El sistema de 7 componentes (confianzaTokens, TrazoConfianza, etc.) quedó como experimento sin integrar.",
+      "date": "2026-08-30"
+    },
+    {
+      "id": "src/visual/confianza/MarcaOrigen.jsx",
+      "reason": "Componente del módulo confianza (marca de origen: finca, laboratorio, herbario). Visualiza si la info viene de la finca del campesino, de validación científica, o de tradición. Parte del experimento inconcluso.",
+      "date": "2026-08-30"
+    },
+    {
+      "id": "src/visual/confianza/NoSeHonesto.jsx",
+      "reason": "Componente del módulo confianza (el 'no sé' honesto con letreros visuales). Pieza del sistema anti-alucinación que enseña a Chagra a decir 'no sé' con claridad. El módulo completo quedó sin wirear.",
+      "date": "2026-08-30"
+    },
+    {
+      "id": "src/visual/confianza/SaberTradicion.jsx",
+      "reason": "Componente del módulo confianza (guarda del saber campesino tradicional). Visualiza conocimiento de tradición oral vs validación científica. Parte del experimento inconcluso.",
+      "date": "2026-08-30"
+    },
+    {
+      "id": "src/visual/confianza/TrazoConfianza.jsx",
+      "reason": "Componente del módulo confianza (hilo de confianza que conecta nivel alto/medio/bajo). Visualización del gradiente de confianza (4 hilos de colores). El módulo completo (7 componentes) quedó como experimento sin integrar.",
+      "date": "2026-08-30"
+    },
+    {
+      "id": "src/visual/creatures/BarbuditoParamo.jsx",
+      "reason": "Criatura especial (barbudito del páramo) que nunca se cableó. Parece ser parte del elenco de criaturas emblemáticas (como el jaguar, zariguya) que se diseñaron pero no se integraron a los mundos principales.",
+      "date": "2026-08-30"
+    },
+    {
+      "id": "src/visual/creatures/JaguarHuesos.jsx",
+      "reason": "Criatura especial (jaguar de huesos) que nunca se cableó. Parece ser una representación artística/esquemática del jaguar, diferente a la versión realista. El elenco de criaturas especiales quedó como experimento visual.",
+      "date": "2026-08-30"
+    },
+    {
+      "id": "src/visual/creatures/JaguarLaminaViva.jsx",
+      "reason": "Criatura especial (jaguar en lámina viva) que nunca se cableó. Versión del jaguar para láminas educativas/infografías. Parece ser parte de un sistema de láminas que no se terminó.",
+      "date": "2026-08-30"
+    },
+    {
+      "id": "src/visual/creatures/ZariguyaLaminaViva.jsx",
+      "reason": "Criatura especial (zariguya en lámina viva) que nunca se cableó. Versión de la zariguya para láminas educativas. Parte del sistema de láminas inconcluso.",
+      "date": "2026-08-30"
+    },
+    {
+      "id": "src/visual/cuaderno/CuadernoVivo.jsx",
+      "reason": "Componente principal del módulo cuaderno (cuaderno campesino vivo). El módulo cuaderno (5 componentes) parece ser un experimento de interfaz tipo cuaderno de campo que nunca se cableó. La descripción menciona un cuaderno que se abre y respira pero nunca se encontró el lugar de montaje.",
+      "date": "2026-08-30"
+    },
+    {
+      "id": "src/visual/cuaderno/LaPaciencia.jsx",
+      "reason": "Componente del módulo cuaderno (la pacienciada del cultivo). Pieza educativa que muestra el tiempo de espera en ciclos de cultivo. Parte del experimento inconcluso.",
+      "date": "2026-08-30"
+    },
+    {
+      "id": "src/visual/cuaderno/PaginaCuaderno.jsx",
+      "reason": "Componente del módulo cuaderno (página individual del cuaderno). Pieza de UI para páginas de cuaderno de campo. El módulo completo quedó sin wirear.",
+      "date": "2026-08-30"
+    },
+    {
+      "id": "src/visual/cuaderno/TrazoVivo.jsx",
+      "reason": "Componente del módulo cuaderno (trazo/dibujo vivo en el cuaderno). Pieza de animación de trazos como dibujo en progreso. Parte del experimento inconcluso.",
+      "date": "2026-08-30"
+    },
+    {
+      "id": "src/visual/cuaderno/TresTemporadas.jsx",
+      "reason": "Componente del módulo cuaderno (tres temporadas de cultivo). Pieza educativa que muestra ciclos temporales. El módulo completo quedó sin integrar.",
+      "date": "2026-08-30"
+    },
+    {
+      "id": "src/visual/diferencial/LaminaDiferencial.jsx",
+      "reason": "Componente del módulo diferencial (lámina que muestra diferencias). El módulo diferencial (4 componentes) parece ser un sistema de láminas comparativas/educativas que nunca se cableó. Tipo infografías de antes/después o diferencias clave.",
+      "date": "2026-08-30"
+    },
+    {
+      "id": "src/visual/diferencial/LaminaDuda.jsx",
+      "reason": "Componente del módulo diferencial (lámina de duda/incertidumbre). Pieza que visualiza 'no estoy seguro' o 'necesito más info'. Parte del experimento inconcluso.",
+      "date": "2026-08-30"
+    },
+    {
+      "id": "src/visual/diferencial/LaminaLlave.jsx",
+      "reason": "Componente del módulo diferencial (lámina llave/clave). Pieza que muestra la clave o insight principal. Parte del sistema de láminas inconcluso.",
+      "date": "2026-08-30"
+    },
+    {
+      "id": "src/visual/diferencial/motivosDano.jsx",
+      "reason": "Componente del módulo diferencial (motivos de daño en lámina). Pieza educativa que muestra causas de problemas. El módulo completo quedó sin integrar.",
+      "date": "2026-08-30"
+    },
+    {
+      "id": "src/visual/iconos/TazaCafe.jsx",
+      "reason": "Icono de taza de café que nunca se cableó. Parece ser un icono ilustrado para UI del tema café que no se encontró lugar de uso. Los iconos principales de la app vienen de lucide-react.",
+      "date": "2026-08-30"
+    },
+    {
+      "id": "src/visual/laminas/botanicas/LaminaBotanica.jsx",
+      "reason": "Lámina botánica principal del sistema de láminas botánicas. El módulo (4 componentes en botánicas + pintores) parece ser un sistema de fichas botánicas ilustradas que nunca se cableó. Comentado como sistema de hábito, órganos, tipografía pero nunca se montó.",
+      "date": "2026-08-30"
+    },
+    {
+      "id": "src/visual/laminas/botanicas/pintores/PintaHabito.jsx",
+      "reason": "Componente del sistema de láminas botánicas (pinta hábito de crecimiento). Pieza que visualiza el hábito (arbusto, árbol, hierba) de una especie. El sistema completo quedó inconcluso.",
+      "date": "2026-08-30"
+    },
+    {
+      "id": "src/visual/laminas/botanicas/pintores/organos.jsx",
+      "reason": "Componente del sistema de láminas botánicas (pinta órganos de la planta). Pieza que visualiza hojas, flores, frutos. El módulo de láminas botánicas (4 archivos) quedó sin wirear.",
+      "date": "2026-08-30"
+    },
+    {
+      "id": "src/visual/laminas/botanicas/pintores/tipografia.jsx",
+      "reason": "Componente del sistema de láminas botánicas (tipografía de lámina). Sistema de letras/tipografía para fichas botánicas. El módulo completo quedó como experimento sin integrar.",
+      "date": "2026-08-30"
+    },
+    {
+      "id": "src/visual/mundo3d/artesania/ArtesaniaKit.jsx",
+      "reason": "Kit de artesanía andina (vasijas, segmentos) que nunca se cableó. El archivo hermano ArtesaniaAndina.jsx sí se usa en mockups/artesania-andina, pero este kit quedó huérfano. Parece ser la lógica de rendering de vasijas que no se terminó de integrar.",
+      "date": "2026-08-30"
+    },
+    {
+      "id": "src/visual/mundo3d/beneficos/EscenaBeneficos.jsx",
+      "reason": "Escena 3D de organismos benéficos (control biológico) que nunca se cableó. Parece ser una escena educativa sobre mariquitas, crisopas, trichogramas (aliados contra plagas) que no se montó en ningún mundo.",
+      "date": "2026-08-30"
+    },
+    {
+      "id": "src/visual/mundo3d/bosque/DoselBiodiverso.jsx",
+      "reason": "Escena 3D del dosel biodiverso del bosque que nunca se cableó. Visualización estratificada del bosque (dosel alto, medio, bajo) con biodiversidad en cada capa. Parece ser una pieza educativa que no se integró al mundo bosque.",
+      "date": "2026-08-30"
+    },
+    {
+      "id": "src/visual/mundo3d/bosque/EscenaEntMaestro.jsx",
+      "reason": "Escena 3D del Ent maestro del bosque que nunca se cableó. Versión principal/maestra del Ent de la queñua (Polylepis) que no se montó. La versión usada está en MundoEntBosque.jsx (paramo-definitivo), esta parece ser una versión alternativa que quedó huérfana.",
+      "date": "2026-08-30"
+    },
+    {
+      "id": "src/visual/mundo3d/escenas/MaizCompaiEscena.jsx",
+      "reason": "Escena 3D del compai maíz que nunca se cableó. Parece ser una visualización del compai (abeja) en el contexto del cultivo de maíz que no se terminó de integrar al sistema de compaís.",
+      "date": "2026-08-30"
+    },
+    {
+      "id": "src/visual/mundo3d/estiercol/Biocompostera.jsx",
+      "reason": "Componente del módulo estiercol (biocompostera) que nunca se cableó. Visualización 3D de una compostera. El módulo completo (4 componentes: Biocompostera, Biodigestor, CicloCerrado, EscenaEstiercol) parece ser un experimento de manejo de estiercol que no se integró.",
+      "date": "2026-08-30"
+    },
+    {
+      "id": "src/visual/mundo3d/estiercol/Biodigestor.jsx",
+      "reason": "Componente del módulo estiercol (biodigestor) que nunca se cableó. Visualización 3D de un biodigestor para biogás. Parte del experimento inconcluso de manejo de estiercol.",
+      "date": "2026-08-30"
+    },
+    {
+      "id": "src/visual/mundo3d/estiercol/CicloCerrado.jsx",
+      "reason": "Componente del módulo estiercol (ciclo cerrado de nutrientes) que nunca se cableó. Visualización del ciclo de estiercol→compost→suelo→cultivo. Parte del experimento inconcluso.",
+      "date": "2026-08-30"
+    },
+    {
+      "id": "src/visual/mundo3d/estiercol/EscenaEstiercol.jsx",
+      "reason": "Escena principal del módulo estiercol que nunca se cableó. Agrupa los componentes (Biocompostera, Biodigestor, CicloCerrado) en una escena completa. El módulo de 4 componentes quedó como experimento sin wirear.",
+      "date": "2026-08-30"
+    },
+    {
+      "id": "src/visual/mundo3d/fauna/AguilaParamo.jsx",
+      "reason": "Criatura 3D (águila del páramo) que nunca se cableó. Parece ser parte de la fauna emblemática del páramo que se diseñó pero no se integró al mundo paramo/bosque.",
+      "date": "2026-08-30"
+    },
+    {
+      "id": "src/visual/mundo3d/fauna/ColibriGuardian.jsx",
+      "reason": "Criatura 3D (colibrí guardián) que nunca se cableó. Parte de la fauna emblemática que se diseñó para los mundos pero no se encontró lugar de montaje.",
+      "date": "2026-08-30"
+    },
+    {
+      "id": "src/visual/mundo3d/fauna/CuadrupedoRealista.jsx",
+      "reason": "Criatura 3D (cuadrúpedo realista genérico) que nunca se cableó. Parece ser una base para animales como venados, osos, etc. que no se terminó de integrar a la fauna de los mundos.",
+      "date": "2026-08-30"
+    },
+    {
+      "id": "src/visual/mundo3d/fauna/EscenaFaunaEmblematica.jsx",
+      "reason": "Escena 3D de fauna emblemática que nunca se cableó. Agrupa las criaturas emblemáticas (águila, colibrí, rana arlequín, etc.) en una escena. El módulo fauna (5 componentes) quedó como experimento sin integrar.",
+      "date": "2026-08-30"
+    },
+    {
+      "id": "src/visual/mundo3d/fauna/RanaArlequin.jsx",
+      "reason": "Criatura 3D (rana arlequín del páramo) que nunca se cableó. Parte de la fauna emblemática que se diseñó pero no se montó en ningún mundo.",
+      "date": "2026-08-30"
+    },
+    {
+      "id": "src/visual/mundo3d/laminas2d/MundoValle2D.jsx",
+      "reason": "Mundo 2D del valle que nunca se cableó. Parece ser una versión plana/2D del valle 3D para equipos sin WebGL o como alternativa visual. La versión principal del valle es 3D (iframe a /valle/), esta quedó huérfana.",
+      "date": "2026-08-30"
+    },
+    {
+      "id": "src/visual/mundo3d/olor/CocheraEnCorte.jsx",
+      "reason": "Componente del módulo olor (cochera en corte de perfil) que nunca se cableó. El módulo olor (9 componentes) es un sistema educativo sobre carbono/orgánico visible que quedó inconcluso. Este componente es la cochera en formato SVG para equipos sin 3D.",
+      "date": "2026-08-30"
+    },
+    {
+      "id": "src/visual/mundo3d/olor/EscenaOlorVisible.jsx",
+      "reason": "Escena principal del módulo olor que nunca se cableó. Comentado como 'pieza completa: la cochera y su aire' pero no se encontró lugar de montaje. El módulo completo de 9 componentes (OlorVisible, PaladaDeSeco, etc.) quedó como experimento sin wirear.",
+      "date": "2026-08-30"
+    },
+    {
+      "id": "src/visual/mundo3d/olor/MoscasDelCharco.jsx",
+      "reason": "Componente del módulo olor (moscas del charco) que nunca se cableó. Visualización de moscas en charco de estiercol como indicador. Parte del experimento inconcluso.",
+      "date": "2026-08-30"
+    },
+    {
+      "id": "src/visual/mundo3d/olor/NitrogenoQueSeVa.jsx",
+      "reason": "Componente del módulo olor (nitrógeno que se volatiliza) que nunca se cableó. Animación de pérdida de nitrógeno (gas volando). Parte del sistema educativo sobre manejo de carbono/nitrógeno.",
+      "date": "2026-08-30"
+    },
+    {
+      "id": "src/visual/mundo3d/olor/NubeQueCruzaLaCerca.jsx",
+      "reason": "Componente del módulo olor (nube de olor que cruza la cerca) que nunca se cableó. Metáfora visual de olor/gas que se escapa de la finca. Parte del experimento inconcluso.",
+      "date": "2026-08-30"
+    },
+    {
+      "id": "src/visual/mundo3d/olor/OlorVisible.jsx",
+      "reason": "Componente principal del módulo olor que nunca se cableó. Comentado como 'el anfitrión' que junta las tres cosas (decide tier, monta cochera, pone palada). El módulo completo (9 componentes) de educación visual sobre carbono quedó sin integrar.",
+      "date": "2026-08-30"
+    },
+    {
+      "id": "src/visual/mundo3d/olor/PaladaDeSeco.jsx",
+      "reason": "Componente del módulo olor (palada de material seco) que nunca se cableó. Visualización de carbono en forma de palada de estierco seco. Parte del experimento inconcluso.",
+      "date": "2026-08-30"
+    },
+    {
+      "id": "src/visual/mundo3d/olor/PozoQueCalla.jsx",
+      "reason": "Componente del módulo olor (pozo que calla/sin emisiones) que nunca se cableó. Metáfora visual de manejo correcto (pozo bien manejado no huele). Parte del experimento inconcluso.",
+      "date": "2026-08-30"
+    },
+    {
+      "id": "src/visual/mundo3d/olor/VeloQuePesa.jsx",
+      "reason": "Componente del módulo olor (velo que pesa/opresa) que nunca se cableó. Metáfora visual de mal manejo (olor como velo pesado). Parte del experimento inconcluso.",
+      "date": "2026-08-30"
+    },
+    {
+      "id": "src/visual/mundo3d/semillas/EscenaBancoSemillas.jsx",
+      "reason": "Escena 3D del banco de semillas que nunca se cableó. Visualización 3D de un vivero/banco de semillas con germinación, repique, endurecimiento. Comentado como el mundo del semillero, pero no se montó (la ruta mockups/mundo3d-semillero existe pero usa otro componente).",
+      "date": "2026-08-30"
+    },
+    {
+      "id": "src/visual/mundo3d/sierra/ArbolMayor.jsx",
+      "reason": "Componente del módulo sierra (árbol mayor/anciano) que nunca se cableó. Visualización 3D de un árbol grande/viejo como guardián de la sierra. El módulo sierra (4 componentes) parece ser un experimento de paisaje de sierra que no se integró.",
+      "date": "2026-08-30"
+    },
+    {
+      "id": "src/visual/mundo3d/sierra/GaleriaSierraArboles.jsx",
+      "reason": "Componente del módulo sierra (galería de árboles de la sierra) que nunca se cableó. Visualización de múltiples especies de árboles de montaña. Parte del experimento inconcluso.",
+      "date": "2026-08-30"
+    },
+    {
+      "id": "src/visual/mundo3d/sierra/SierraCorteVertical.jsx",
+      "reason": "Componente del módulo sierra (sierra en corte vertical) que nunca se cableó. Visualización del perfil de montaña en sección vertical mostrando pisos térmicos. Parte del experimento inconcluso.",
+      "date": "2026-08-30"
+    },
+    {
+      "id": "src/visual/mundo3d/sierra/SierraMonte3D.jsx",
+      "reason": "Escena 3D de sierra/monte que nunca se cableó. Mundo 3D de paisaje de sierra con árboles estratificados por altitud. El módulo sierra (4 componentes) quedó como experimento sin wirear.",
+      "date": "2026-08-30"
+    },
+    {
+      "id": "src/visual/mundo3d/suelo-comparado/EscenaSueloComparado.jsx",
+      "reason": "Escena 3D de suelo comparado (antes/después) que nunca se cableó. Visualización comparativa de suelo degradado vs suelo sano con compost. Parece ser una pieza educativa sobre manejo de suelo que no se integró.",
+      "date": "2026-08-30"
+    },
+    {
+      "id": "src/visual/mundo3d/transiciones/CamaraCruce.jsx",
+      "reason": "Cámara de cruce (transición entre mundos) que nunca se cableó. Visualización 3D de cámara que cruza de un mundo a otro (ej. valle→sierra). Parece ser una pieza de transición cinematográfica que no se encontró lugar de montaje.",
+      "date": "2026-08-30"
+    }
   ]
 }

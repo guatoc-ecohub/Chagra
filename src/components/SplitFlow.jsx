@@ -65,7 +65,7 @@ export const SplitFlow = ({ asset, onClose }) => {
                     <Layers className="text-emerald-400" />
                     {trackingMode === 'individual' ? 'Juntar en grupo' : 'Dividir en plantas individuales'}
                 </h2>
-                <button onClick={onClose} aria-label="Cerrar" className="p-2 text-slate-400 hover:text-white transition-colors">
+                <button onClick={/** @type {React.MouseEventHandler<HTMLButtonElement>} */ (onClose)} aria-label="Cerrar" className="p-2 text-slate-400 hover:text-white transition-colors">
                     <X size={24} />
                 </button>
             </div>
@@ -154,7 +154,7 @@ export const SplitFlow = ({ asset, onClose }) => {
                                 onChange={(e) => setRationale(e.target.value)}
                                 placeholder="Ej: error al sembrar, cambio de estrategia..."
                                 className="w-full bg-slate-900 border border-slate-800 rounded-xl p-4 text-white text-sm focus:border-emerald-500 transition-colors"
-                                rows="3"
+                                rows={3}
                             />
                         </div>
 
@@ -221,7 +221,7 @@ export const SplitFlow = ({ asset, onClose }) => {
                             El activo original ha sido marcado como padre del split.
                         </p>
                         <button
-                            onClick={onClose}
+                            onClick={/** @type {React.MouseEventHandler<HTMLButtonElement>} */ (onClose)}
                             className="w-full py-4 bg-emerald-600 text-white rounded-2xl font-black mt-8"
                         >
                             Listo, volver

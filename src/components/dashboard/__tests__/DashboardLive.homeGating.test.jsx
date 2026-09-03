@@ -30,14 +30,14 @@ vi.mock('../../../config/glaciarAccess', () => ({
 // Hijos pesados → stubs livianos. NO mockeamos FincaCards (queremos las
 // tarjetas de seguimiento reales para ver "Cerdos").
 vi.mock('../AgentHero', () => ({ default: () => <div data-testid="agent-hero" /> }));
-vi.mock('../../OnboardingHero', () => ({ default: () => <div data-testid="onboarding-hero" /> }));
+vi.mock('../../PrimerRegistroCard', () => ({ default: () => <div data-testid="primer-registro-card" /> }));
 vi.mock('../SelectedBackgroundReveal', () => ({ default: () => <div /> }));
 vi.mock('../ClimaStrip', () => ({ default: () => <div /> }));
 vi.mock('../HoyEnFincaStrip', () => ({ default: () => <div /> }));
 vi.mock('../AIStatusFooter', () => ({ default: () => <div /> }));
 vi.mock('../AnalisisProactivoIA', () => ({ default: () => <div /> }));
 
-// Store de assets: plantsCount > 0 para no montar el OnboardingHero de primer uso.
+// Store de assets: plantsCount > 0 para no montar el primer registro.
 vi.mock('../../../store/useAssetStore', () => ({
   default: (selector) => selector({ plants: [{ id: 'p1' }], lands: [], materials: [], isHydrated: true, iotAlerts: [] }),
 }));
@@ -52,7 +52,7 @@ let mockProfile = {};
 let mockManual = false;
 let mockManualMap = {};
 vi.mock('../../../services/userProfileService', async (importOriginal) => {
-  const actual = await importOriginal();
+  const actual = /** @type {any} */ (await importOriginal());
   return {
     ...actual,
     getProfile: vi.fn(() => mockProfile),

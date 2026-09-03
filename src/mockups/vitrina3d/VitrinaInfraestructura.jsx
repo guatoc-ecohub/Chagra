@@ -31,7 +31,7 @@ import {
   INFRAESTRUCTURA_IDS,
   INFRAESTRUCTURA_CATEGORIAS,
 } from '../../visual/mundo3d/infraestructura/infraestructuraData.js';
-import Infraestructura from '../../visual/mundo3d/infraestructura/Infraestructura.jsx';
+import InfraestructuraViva from '../../visual/mundo3d/infraestructura/InfraestructuraViva.jsx';
 import { decidirTier, permite3D } from '../../visual/mundo3d/deviceTier.js';
 import { ATMOSFERA } from '../../visual/mundo3d/atmosferaMadre.js';
 import './VitrinaInfraestructura.css';
@@ -126,7 +126,7 @@ function LienzoPieza({ tipo, dims, tier, reducedMotion }) {
         <meshLambertMaterial color="#b49873" />
       </mesh>
       <Suspense fallback={null}>
-        <Infraestructura tipo={tipo} dims={dims} tier={tier} reducedMotion={reducedMotion} />
+        <InfraestructuraViva tipo={tipo} dims={dims} params={{}} tier={tier} reducedMotion={reducedMotion} />
       </Suspense>
       <OrbitControls
         target={[0, dims.alto * 0.42, 0]}
@@ -410,11 +410,13 @@ function DemoColocar({ modo3D, tier, reducedMotion }) {
             <directionalLight position={[-6, 5, -8]} intensity={0.22} color={ATMOSFERA.relleno} />
             <TerrenoDemo segmentos={tier === 'alto' ? 56 : 34} onTocar={tocarTerreno} />
             {colocadas.map((c, i) => (
-              <Infraestructura
+              <InfraestructuraViva
                 key={`${c.tipo}-${i}`}
                 tipo={c.tipo}
                 pos={c.pos}
                 rot={c.rot}
+                dims={/** @type {any} */ (undefined)}
+                params={/** @type {any} */ (undefined)}
                 tier={tier}
                 reducedMotion={reducedMotion}
               />
@@ -422,10 +424,12 @@ function DemoColocar({ modo3D, tier, reducedMotion }) {
             {borrador && (
               <>
                 <AnilloBorrador borrador={borrador} />
-                <Infraestructura
+                <InfraestructuraViva
                   tipo={borrador.tipo}
                   pos={borrador.pos}
                   rot={borrador.rot}
+                  dims={/** @type {any} */ (undefined)}
+                  params={/** @type {any} */ (undefined)}
                   tier={tier}
                   reducedMotion={reducedMotion}
                 />
@@ -460,9 +464,9 @@ function DemoColocar({ modo3D, tier, reducedMotion }) {
 
 /* ── La vitrina ────────────────────────────────────────────────────────────── */
 export default function VitrinaInfraestructura({ onBack }) {
-  const tierInicial = useMemo(() => decidirTier(), []);
+  const tierInicial = useMemo(() => decidirTier().tier, []);
   const [pestana, setPestana] = useState(PESTANAS[0].id);
-  const [tier, setTier] = useState(tierInicial === 'bajo' ? 'bajo' : tierInicial);
+  const [tier, setTier] = useState(/** @type {any} */ (tierInicial));
   const [soloFichas, setSoloFichas] = useState(() => !permite3D(tierInicial));
   const [reducedMotion, setReducedMotion] = useState(
     () =>

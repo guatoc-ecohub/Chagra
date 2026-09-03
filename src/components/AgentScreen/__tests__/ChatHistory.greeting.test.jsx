@@ -6,18 +6,35 @@
  *   - SIN pendientes → idea contextual, sin pintar ítems de alarma.
  *   - Sin saludo resuelto → cae al copy estático de siempre (backward compat).
  *   - La pastilla-CTA de sugerencia YA NO se renderiza (retirada en tarea #58).
+ *   - COHERENCIA: el saludo NOMBRA al compAI ACTIVO (no hard-coded a Angelita) y
+ *     cambia de nombre cuando el usuario cambia de avatar (reactivo).
  *
  * La LÓGICA del saludo se prueba en services/__tests__/proactiveGreeting.test.js.
  * Aquí solo probamos que ChatHistory lo renderiza fiel a los datos.
  */
 import React from 'react';
-import { render, screen } from '@testing-library/react';
+import { render, screen, act } from '@testing-library/react';
 import '@testing-library/jest-dom';
-import { describe, it, expect, vi } from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import ChatHistory from '../ChatHistory';
+import { LLAVE_COMPANERO } from '../../../compai/nucleo/elenco.js';
 
 // El avatar trae assets/animaciones que no aportan al test del saludo.
 vi.mock('../../ChagraAgentAvatar', () => ({ default: () => <div data-testid="avatar-mock" /> }));
+
+// El saludo lee el compAI elegido de localStorage (useAgentAvatarType). Cada
+// caso parte de un almacenamiento limpio → default 'angelita'.
+beforeEach(() => {
+  try { window.localStorage.clear(); } catch { /* modo privado */ }
+});
+afterEach(() => {
+  try { window.localStorage.clear(); } catch { /* modo privado */ }
+});
+
+/** Fija el compAI activo como si el usuario lo hubiera elegido en el selector. */
+function elegirCompai(slug) {
+  window.localStorage.setItem(LLAVE_COMPANERO, slug);
+}
 
 describe('ChatHistory — saludo proactivo (empty state)', () => {
   it('CON pendientes: lidera nombrando la alerta top y muestra el ítem', () => {
@@ -68,6 +85,51 @@ describe('ChatHistory — saludo proactivo (empty state)', () => {
   it('sin saludo resuelto → copy estático de siempre (backward compat)', () => {
     render(<ChatHistory messages={[]} proactiveGreeting={null} />);
     expect(screen.queryByTestId('proactive-greeting')).toBeNull();
-    expect(screen.getByText(/Soy tu asistente agroecológico/i)).toBeInTheDocument();
+    expect(screen.getByText(/Soy Angelita, su asistente agroecológica/i)).toBeInTheDocument();
+  });
+});
+
+describe('ChatHistory — coherencia: el saludo nombra al compAI ACTIVO', () => {
+  const greetingIdea = {
+    hi: 'Buenas noches', state: 'idea', lead: 'Todo tranquilo por ahora.', items: [], restCount: 0,
+    prompt: 'Dame un resumen del estado de mi finca hoy.',
+  };
+
+  it('default (abeja): saludo proactivo dice "Soy Angelita, de Chagra"', () => {
+    render(<ChatHistory messages={[]} proactiveGreeting={greetingIdea} />);
+    expect(screen.getByTestId('proactive-greeting-nombre')).toHaveTextContent('Angelita');
+    expect(screen.getByTestId('proactive-greeting')).toHaveTextContent('Buenas noches. Soy Angelita, de Chagra.');
+  });
+
+  it('jaguar elegido: saludo proactivo dice "Soy el jaguar, de Chagra"', () => {
+    elegirCompai('jaguar');
+    render(<ChatHistory messages={[]} proactiveGreeting={greetingIdea} />);
+    expect(screen.getByTestId('proactive-greeting-nombre')).toHaveTextContent('el jaguar');
+    expect(screen.getByTestId('proactive-greeting')).toHaveTextContent('Buenas noches. Soy el jaguar, de Chagra.');
+    // NO debe seguir diciendo Angelita.
+    expect(screen.getByTestId('proactive-greeting')).not.toHaveTextContent('Angelita');
+  });
+
+  it('oso elegido: fallback estático concuerda en género (agroecológico)', () => {
+    elegirCompai('oso-baston');
+    render(<ChatHistory messages={[]} proactiveGreeting={null} />);
+    expect(screen.getByText(/Soy el oso de anteojos, su asistente agroecológico\./i)).toBeInTheDocument();
+    expect(screen.queryByText(/Soy Angelita/i)).toBeNull();
+  });
+
+  it('zarigüeya elegida: usa artículo (no el posesivo "su"), femenino', () => {
+    elegirCompai('zariguya');
+    render(<ChatHistory messages={[]} proactiveGreeting={null} />);
+    expect(screen.getByText(/Soy la zarigüeya, su asistente agroecológica\./i)).toBeInTheDocument();
+  });
+
+  it('reactivo: al cambiar de avatar, el saludo cambia de nombre sin remount', () => {
+    render(<ChatHistory messages={[]} proactiveGreeting={greetingIdea} />);
+    expect(screen.getByTestId('proactive-greeting-nombre')).toHaveTextContent('Angelita');
+    // El usuario cambia de avatar en otra parte de la app.
+    act(() => {
+      window.dispatchEvent(new CustomEvent('chagra:agent-avatar-changed', { detail: 'luciernaga' }));
+    });
+    expect(screen.getByTestId('proactive-greeting-nombre')).toHaveTextContent('la luciérnaga');
   });
 });

@@ -60,6 +60,7 @@ function buildNotes(record) {
   if (m.ancho_m != null) bits.push(`ancho ${m.ancho_m} m`);
   if (m.cantidad != null) bits.push(`cantidad ${m.cantidad}${m.unidad ? ` ${m.unidad}` : ''}${m.kg_aprox ? ` (~${m.kg_aprox} kg)` : ''}`);
   if (bits.length) lines.push(`Medidas: ${bits.join(', ')}.`);
+  if (record.variedad) lines.push(`Variedad: ${record.variedad}.`);
   const phen = (record.phenology || []).map((p) => p.canon).join(', ');
   if (phen) lines.push(`Fenología: ${phen}.`);
   if (record.symptoms?.length) lines.push(`Síntomas: ${record.symptoms.join('; ')}.`);

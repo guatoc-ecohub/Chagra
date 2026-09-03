@@ -1,0 +1,71 @@
+{
+  "species_slug": "hypericum_juniperinum",
+  "scientific_name": "Hypericum juniperinum Kunth",
+  "common_names": [
+    "Hipérico de páramo"
+  ],
+  "family": "Hypericaceae",
+  "category": "medicinales_alelopaticas",
+  "cultivable": false,
+  "conservation_status": "nativo_silvestre",
+  "thermal_zones": [
+    "paramo",
+    "frio"
+  ],
+  "roles_in_guild": [
+    "dynamic_accumulator",
+    "pollinator_attractor"
+  ],
+  "antagonists": [],
+  "especies_nativas_sustitutas": [],
+  "propagation": {
+    "metodo_principal": "semilla",
+    "notas": "Arbusto bajo paramuno endémico de Andes colombianos-venezolano-ecuatorianos con hojas pequeñas escamiformes tipo junípero (de ahí el epíteto) y flores amarillas vistosas con muchos estambres prominentes característicos de Hypericum. Pariente neotropical del hipérico europeo (Hypericum perforatum) usado como antidepresivo natural. Contiene hipericina, hiperforina y flavonoides con actividad antidepresiva-ansiolítica-antiinflamatoria-antibacteriana. Protección indirecta por Ley 1930/2018 dentro de páramos delimitados."
+  },
+  "requirements": {
+    "agua": "medio",
+    "altitud_msnm": {
+      "min_absoluto": 2700,
+      "optimo_min": 3000,
+      "optimo_max": 3800,
+      "max_absoluto": 4200
+    },
+    "temperatura_c": {
+      "helada_letal": -12,
+      "optimo_min": 2,
+      "optimo_max": 11,
+      "max_tolerable": 18
+    },
+    "radiacion": "sol_pleno",
+    "drenaje_requerido": "bueno"
+  },
+  "valor_pedagogico": "El hipérico de páramo o chite (Hypericum juniperinum Kunth, familia Hypericaceae) es un arbusto bajo paramuno endémico de los Andes colombianos-venezolano-ecuatorianos, pariente neotropical del célebre hipérico europeo o hierba de San Juan (Hypericum perforatum L.) usado en farmacopea fitoterapéutica europea como antidepresivo natural validado por meta-análisis clínicos. Es una de las plantas más distintivas del paisaje paramuno colombiano por su porte denso ramoso (30-80 cm altura), sus hojas pequeñas escamiformes verde-oscuras tipo junípero (de ahí el epíteto específico 'juniperinum' = parecido a Juniperus, el género del enebro europeo) que cubren los tallos en disposición decussada apretada, y especialmente por sus flores amarillas vistosas (1.5-2.5 cm diámetro) con cinco pétalos amarillo-dorados y un denso penacho central de numerosos estambres amarillos prominentes — patrón floral diagnóstico del género Hypericum a nivel mundial. En Colombia se distribuye en páramos y subpáramos de las tres cordilleras (Oriental: Sumapaz, Chingaza, Cocuy, Pisba, Santurbán, Almorzadero; Central: Los Nevados, Las Hermosas, Puracé; Occidental: Tatamá, Frontino-Urrao, Paramillo) entre 2.700 y 4.200 msnm, con óptimo en 3.000-3.800 msnm en frailejonales-pajonales-matorrales paramunos asociado a Espeletia, Calamagrostis, Disterigma, Pernettya, Bartsia, Diplostephium, Pentacalia y otras especies del cortejo florístico paramuno. Lección viva de farmacognosia comparada neotrópico-paleártico y de medicina tradicional andina: el género Hypericum incluye ~500 especies de distribución cosmopolita con un perfil fitoquímico característico globalmente conservado — naftodiantronas (hipericina, pseudohipericina), floroglucinoles (hiperforina, adhiperforina), flavonoides (quercetina, rutina, hiperósido, quercitrina, isoquercitrina), xantonas, taninos catequínicos y aceite esencial — que confieren al género propiedades farmacológicas validadas: actividad antidepresiva-ansiolítica (por inhibición de recaptación de serotonina, dopamina, noradrenalina y GABA por la hiperforina), antiinflamatoria, cicatrizante tópica, antibacteriana, antiviral (incluyendo actividad contra herpes virus por la hipericina foto-activada) y diurética suave. En Colombia el chite de páramo H. juniperinum (junto con su pariente cercano H. mexicanum) es la sustitución funcional nativa del H. perforatum europeo en la medicina tradicional muisca-uwa-pijao y campesina andina del altiplano cundiboyacense y Cocuy. García-Barriga (1974 Flora Medicinal de Colombia) documenta uso etnobotánico ancestral del chite paramuno en infusión y maceración alcohólica para: tratamiento de melancolía-tristeza-decaimiento (uso 'antidepresivo' tradicional), heridas-quemaduras-úlceras (uso cicatrizante tópico), inflamación urinaria (uso diurético-antiséptico genitourinario), dolor reumático y articular (uso antiinflamatorio tópico) y trastornos del sueño-ansiedad nocturna (uso ansiolítico-hipnótico suave). Uso etnobotánico tradicional (precaución farmacológica importante): infusión 1-2 g de sumidades floridas en 200 ml agua hirviendo 10 min, 1-2 tazas/día, máximo 4-6 semanas continuas. PRECAUCIÓN FARMACOLÓGICA: el género Hypericum (incluido H. juniperinum por analogía fitoquímica) es FOTOSENSIBILIZANTE — la hipericina activada por luz UV solar provoca dermatitis fotosensible en piel expuesta, especialmente en personas de piel clara, ganado bovino-ovino-caprino que pasta H. perforatum en regiones templadas. Más crítico aún, Hypericum es INDUCTOR POTENTE del citocromo P450 (especialmente CYP3A4 y CYP2C9) y de la glicoproteína P, lo que produce INTERACCIONES FARMACOLÓGICAS PELIGROSAS con: anticonceptivos orales (reducción de eficacia, riesgo de embarazo no deseado), warfarina y anticoagulantes (reducción de efecto anticoagulante con riesgo trombótico), ciclosporina y tacrolimus (riesgo de rechazo de injerto en trasplantados), antirretrovirales (especialmente indinavir y otros inhibidores de proteasa con reducción de niveles plasmáticos), digoxina, teofilina, antidepresivos ISRS (riesgo de síndrome serotoninérgico por suma de mecanismo). El uso del chite paramuno requiere supervisión médica calificada si la persona toma alguna de estas medicaciones. Recolección silvestre con responsabilidad: solo sumidades floridas en floración (octubre-febrero), nunca arrancar la planta completa, dejar >70% del rodal sin recolectar para regeneración, NO recolectar dentro de Parques Nacionales Naturales sin permiso. Manejo agroecológico (cultivo restringido a finca alta montaña fría >2.500 msnm): propagación por semilla en sustrato turba paramuna + arena + MO en invernadero frío, germinación 30-60 días, trasplante a bolsa 4-6 meses, plantación definitiva 8-10 meses, asocio con otras medicinales paramunas (Senecio formosus, Bartsia, Disterigma) en huertos pedagógicos de alta montaña. Fuentes Tier A: POWO Kew, GBIF Taxonomic Backbone, GBIF Colombia, Bernal 2015 Catálogo Plantas Colombia, García-Barriga 1974 Flora Medicinal de Colombia, Humboldt Flora de Páramos, Robson Hypericum Monograph (Kew).",
+  "sources": [
+    {
+      "id": "powo-kew",
+      "title": "powo-kew",
+      "tier": "A",
+      "url": "https://powo.science.kew.org"
+    },
+    {
+      "id": "gbif-taxonomic-backbone",
+      "title": "gbif-taxonomic-backbone",
+      "tier": "A",
+      "url": "https://www.gbif.org/dataset/d7dddbf4-2cf0-4f39-9b2a-bb099caae36c"
+    },
+    {
+      "id": "gbif-colombia",
+      "title": "gbif-colombia",
+      "tier": "A",
+      "url": "https://www.gbif.org/country/CO"
+    },
+    {
+      "id": "bernal-2015-plantas-liquenes-colombia",
+      "title": "bernal-2015-plantas-liquenes-colombia",
+      "tier": "A",
+      "url": "http://catalogoplantasdecolombia.unal.edu.co"
+    }
+  ],
+  "_generated_by": "scripts/build-cycle-content-from-catalog.mjs",
+  "_generated_at": "2026-05-19T00:42:57.399Z"
+}

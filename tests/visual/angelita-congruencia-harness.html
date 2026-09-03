@@ -1,0 +1,21 @@
+<!doctype html>
+<!--
+  angelita-congruencia-harness.html — Harness AISLADO del gate de congruencia
+  visual de Angelita. Monta la AbejaAngelita REAL (componente de producción)
+  en hero + lupa por regiones + lectura chica + poses + estados + alpha, SIN
+  pasar por el router/auth de la app. Sirve para capturar en Chromium headed
+  (GPU real) y juzgar silueta · color · línea · movimiento por regiones.
+
+  Uso: npx vite → /tests/visual/angelita-congruencia-harness.html
+-->
+<html lang="es-CO">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Angelita — gate de congruencia visual</title>
+  </head>
+  <body>
+    <div id="gate-root"></div>
+    <script type="module" src="./angelita-congruencia-harness.jsx"></script>
+  </body>
+</html>

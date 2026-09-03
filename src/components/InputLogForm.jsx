@@ -179,7 +179,7 @@ export const InputLogForm = ({ assetId, onComplete }) => {
           </label>
           <textarea
             id="input-log-notas"
-            rows="2"
+            rows={2}
             value={formData.notes}
             onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
             className="bg-slate-800 border border-slate-700 rounded-lg text-sm p-2.5 text-white resize-none outline-none focus:border-blue-500"

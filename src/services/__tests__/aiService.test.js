@@ -1,5 +1,8 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
+const CANONICAL_VISION_MODEL = 'qwen3-vl:8b';
+const RETIRED_VISION_MODEL_PATTERN = /^(granite|gemma|ministral)/i;
+
 // Mocks DEBEN declararse antes del import del módulo bajo test.
 // Audit 2026-05-18 #4: integramos RAG en analyzeFoliage; estos tests
 // aíslan el flujo de retrieval + prompt building + propagación de
@@ -20,13 +23,16 @@ vi.mock('../ragRetriever', () => ({
 // pero el resultado depende del shape del Blob. Polyfill defensivo: si
 // global no provee FileReader compatible, simulamos suficiente.
 if (typeof globalThis.FileReader === 'undefined') {
-  globalThis.FileReader = class {
+  globalThis.FileReader = /** @type {any} */ (class {
     constructor() { this.onloadend = null; this.onerror = null; this.result = null; }
     readAsDataURL(_blob) {
       this.result = 'data:image/webp;base64,FAKE_BASE64';
       queueMicrotask(() => this.onloadend && this.onloadend());
     }
-  };
+    static get EMPTY() { return 0; }
+    static get LOADING() { return 1; }
+    static get DONE() { return 2; }
+  });
 }
 
 const { analyzeFoliage, __TEST__, __retrieveRagContextForFoliage } = await import('../aiService');
@@ -164,7 +170,9 @@ describe('aiService — analyzeFoliage integración RAG', () => {
 
     expect(streamOllamaMock).toHaveBeenCalledTimes(1);
     const [, body, , options] = streamOllamaMock.mock.calls[0];
-    expect(body.model).toBe('gemma3:4b');
+    // No se compara contra ENV.VISION_MODEL porque el código bajo prueba produce ese mismo valor.
+    expect(body.model).toBe(CANONICAL_VISION_MODEL);
+    expect(body.model).not.toMatch(RETIRED_VISION_MODEL_PATTERN);
     expect(body.prompt).toContain('<CONTEXTO_CIENTÍFICO>');
     expect(body.prompt).toContain('Mycosphaerella fragariae');
     expect(body.prompt).toContain('caldo bordelés');

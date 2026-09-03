@@ -1,7 +1,7 @@
 /**
  * smoke-final-142.test.js — Smoke final post-merge con el lote 132-141 integrado.
  *
- * Verifica que los 3 contratos reparados (PlanEditor, OnboardingHero, TaskScreen)
+ * Verifica que los contratos vivos reparados (PlanEditor, TaskScreen)
  * siguen verdes junto con los contratos de alias y smoke unificado.
  *
  * Comando: npx vitest run tests/unit/smoke-final-142.test.js
@@ -14,11 +14,7 @@ describe('Smoke final 142 — contratos reparados', () => {
     expect(typeof mod.default).toBe('function');
   });
 
-  it('OnboardingHero se importa sin errores', async () => {
-    const mod = await import('../../src/components/OnboardingHero.jsx');
-    expect(typeof mod.default).toBe('function');
-  });
-
+  // OnboardingHero archivado/reemplazado por OnboardingCondensado (#2685); se retira del smoke.
   it('TaskScreen se importa sin errores', async () => {
     const mod = await import('../../src/components/TaskScreen.jsx');
     expect(typeof mod.default).toBe('function');

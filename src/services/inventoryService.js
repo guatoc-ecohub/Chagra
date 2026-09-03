@@ -171,7 +171,7 @@ export function compareEventOrder(a, b) {
  * Garantía: dos máquinas con los mismos eventos producen el MISMO snapshot.
  *
  * @param {Array} events - lista de log entries (cualquier orden)
- * @returns {Map<itemId, {quantity, unit, last_updated, last_event_id}>}
+ * @returns {Map<string, {quantity: number, unit: string, last_updated: number, last_event_id: string}>}
  */
 export function projectStock(events) {
   const sorted = [...events].sort(compareEventOrder);

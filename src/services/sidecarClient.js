@@ -41,10 +41,10 @@ import { buildSidecarHeaders } from './tierService.js';
 // meta-pregunta) se resolvían a especies fantasma (col rizada / Pennisetum
 // setaceum) y el agente construía la respuesta sobre esa basura porque el
 // único filtro (filterNoiseEntities) corría DESPUÉS de que el LLM ya había
-// respondido (outputGuards.applyOutputGuards). Filtramos ACÁ, apenas llega la
+// respondido (outputGuards.applyOutputGuards). Filtramos AQUÍ, apenas llega la
 // respuesta del sidecar, para que ningún consumidor (prompt del LLM incluido)
 // vea entidades-ruido. outputGuards.js no importa nada (0 imports) → no hay
-// ciclo posible al importarlo desde acá.
+// ciclo posible al importarlo desde aquí.
 import { filterNoiseEntities } from './outputGuards.js';
 
 const NLU_TIMEOUT_MS = 18000;
@@ -148,10 +148,12 @@ async function getJson(path, query, timeoutMs) {
 }
 
 /**
- * Wrapper interno: POST con timeout + headers + degrade-to-null.
- * No exportado — el contrato público son planNlu y callTool.
+ * Wrapper POST con timeout + headers + degrade-to-null (offline/timeout/non-2xx → null).
+ * Exportado como primitivo compartido para servicios de feature que hablan con el
+ * mismo sidecar (p.ej. redService.js / RED de trueque). Mantiene el mismo auth-retry,
+ * tier header y degradación graceful que el resto del cliente.
  */
-async function postJson(path, body, timeoutMs) {
+export async function postJson(path, body, timeoutMs) {
   if (!isSidecarEnabled()) return null;
   if (typeof navigator !== 'undefined' && navigator.onLine === false) {
     console.debug('[sidecar] offline — skip', path);
@@ -393,6 +395,24 @@ const ALLOWED_TOOLS = new Set([
   'get_cultivos_viables',
   'get_diseno_finca',
   'get_dosis_biopreparado',
+  // ── Reconciliación allow-list · Fase 3 (SSOT 2026-07-29). main las exponía
+  //    (39 tools), dev no (35) → el NLU las ruteaba y el cliente las rechazaba
+  //    con `not_allowed` → el turno degradaba a RAG SIN grounding en silencio.
+  //    Las 4 son read-only del grafo AGE / dataset institucional local, con args
+  //    que el NLU SÍ rellena desde una frase. VERIFICADAS EN VIVO (200):
+  //  - get_folk_sintoma: mapea un nombre folk de síntoma/enfermedad al grafo
+  //    (args `sintoma`/`cultivo`). Muy ruteada por el NLU. found:false → pide
+  //    foto/descripción, NUNCA inventa a qué plaga corresponde.
+  //  - get_aporte_nutricional: aporte nutricional (ICBF TCAC) por especie
+  //    (arg `species_id_or_name`). found:false si no documentado.
+  //  - get_canales_comercializacion: canales de comercialización por especie
+  //    (arg `species_id_or_name`).
+  //  - get_practicas_agua: prácticas de manejo del agua (arg `accion`:
+  //    conservacion|captacion|tratamiento|riesgo).
+  'get_folk_sintoma',
+  'get_aporte_nutricional',
+  'get_canales_comercializacion',
+  'get_practicas_agua',
   // FASE 2 (deferidas, NO exponer aún):
   //  - get_grado_dia: requiere `fecha_siembra` (ISO YYYY-MM-DD, sin default) que
   //    el NLU no puede sintetizar con fiabilidad desde una frase libre de chat.
@@ -664,6 +684,37 @@ export async function pisoTermicoGuard(userMessage, opts = {}) {
 }
 
 /**
+ * PISO DE SEGURIDAD ANTE VENENOS query-side (chagra-pro P0 #2, determinista,
+ * PRE-LLM). Llama `POST ${BASE}/toxic-safety-guard` con `{ user_message }`: si
+ * la CONSULTA del usuario menciona un plaguicida tóxico/prohibido (clorpirifos,
+ * glifosato, paraquat, lorsban…), el sidecar devuelve un `system_prompt_block`
+ * de advertencia + alternativas MIP para inyectar al system prompt,
+ * INDEPENDIENTE del RAG. Cierra el hueco de la abstención (`low_relevance`),
+ * donde el guard de SALIDA `detectPoisonEndorsement` no ve nada porque el
+ * modelo respondió "no tengo información" sin repetir el nombre del veneno.
+ * FAIL-SAFE: null ante error/timeout → no-op, el turno sigue sin romperse.
+ *
+ * @param {string} userMessage
+ * @returns {Promise<null | {
+ *   has_toxic_mention: boolean,
+ *   toxics: string[],
+ *   system_prompt_block: string,
+ *   reason: string,
+ * }>}
+ */
+export async function toxicSafetyGuard(userMessage) {
+  if (!userMessage || typeof userMessage !== 'string') return null;
+  const raw = await postJson('/toxic-safety-guard', { user_message: userMessage }, NLU_TIMEOUT_MS);
+  if (!raw || typeof raw !== 'object') return null;
+  return {
+    has_toxic_mention: raw.has_toxic_mention === true,
+    toxics: Array.isArray(raw.toxics) ? raw.toxics.filter((t) => typeof t === 'string') : [],
+    system_prompt_block: typeof raw.system_prompt_block === 'string' ? raw.system_prompt_block : '',
+    reason: typeof raw.reason === 'string' ? raw.reason : '',
+  };
+}
+
+/**
  * GUARDA de CONFUSIÓN DE ESPECIE / familia botánica equivocada (chagra-pro
  * #292, determinista, PRE-LLM — segundo driver de contaminación
  * cross-domain, sonda `confusion_especie` de `bench-contaminacion.mjs`,
@@ -770,6 +821,21 @@ export async function pestVsDiseaseGuard(userMessage) {
  * agente contra el catalogo y devuelve un bloque de correccion listo para
  * anteponer. Es fail-safe: si el endpoint cae, el turno sigue igual.
  *
+ * BUG-04 (2026-09-03): el endpoint real (`chagra-pro/modules/agro-mcp/
+ * sidecar/src/server.ts`, `POST /companion-species-guard`) exige el campo
+ * `agent_response` -- asi lo documenta su propio comentario ("Recibe
+ * {agent_response, piso_termico?}"). El cliente mandaba `response_text`
+ * (un intento previo de fix que corrigio el casing pero no el nombre del
+ * campo), asi que el sidecar respondia 400 `{error:"agent_response
+ * required"}` en CADA turno -- confirmado en vivo contra el sidecar real
+ * (127.0.0.1:7880) el 2026-09-03. La salvaguarda de especies antagonistas
+ * quedaba muerta en silencio (postJson degrada 400 a null, no rompe UI).
+ * El shape de respuesta real tambien usa `has_fabricated_species` (NO
+ * `has_companion_species`/`has_companion`/`needs_correction`, que nunca
+ * existieron en el servidor) -- sin embargo el gate real en AgentScreen usa
+ * `system_prompt_block` (ya bien parseado), asi que este segundo mismatch
+ * solo rompia la telemetria `console.debug`, no el guard en si.
+ *
  * @param {string} responseText - salida final del LLM ya generada.
  * @returns {Promise<null | {
  *   has_companion_species: boolean,
@@ -779,12 +845,9 @@ export async function pestVsDiseaseGuard(userMessage) {
  */
 export async function companionSpeciesGuard(responseText) {
   if (!responseText || typeof responseText !== 'string' || !responseText.trim()) return null;
-  const raw = await postJson('/companion-species-guard', { response: responseText }, TOOL_TIMEOUT_MS);
+  const raw = await postJson('/companion-species-guard', { agent_response: responseText }, TOOL_TIMEOUT_MS);
   if (!raw || typeof raw !== 'object') return null;
-  const hasCompanionSpecies =
-    raw.has_companion_species === true ||
-    raw.has_companion === true ||
-    raw.needs_correction === true;
+  const hasCompanionSpecies = raw.has_fabricated_species === true;
   return {
     has_companion_species: hasCompanionSpecies,
     system_prompt_block: typeof raw.system_prompt_block === 'string' ? raw.system_prompt_block : '',
@@ -873,13 +936,48 @@ export function coerceNumericArgs(args) {
   return changed ? out : args;
 }
 
+/**
+ * BUG-03 (2026-09-03) — coercion defensiva de `piso_termico`. Los enums Zod
+ * del sidecar exigen el vocabulario canonico SIN tildes ('frio'/'templado'/
+ * 'calido'[/'paramo'] segun el tool) -- el propio schema de
+ * `get_calendario_siembra` lo documenta: "Sin tildes a proposito... el
+ * agente deberia mapear 'frío'->'frio' antes de invocar este tool". Nadie
+ * hacia ese mapeo: `pisoTermicoFromAltitud()` (agentService.js) devuelve el
+ * piso CON tildes para lectura humana ('frío','cálido','páramo'), y el NLU
+ * planner (LLM server-side) tiende a lo mismo por ortografia natural.
+ *
+ * Repro real BUG-03: "...a 2200 msnm" -> pisoTermicoFromAltitud() = 'frío'
+ * -> get_calendario_siembra rechaza con Zod invalid_enum_value -> el
+ * dispatcher generico del sidecar (`/tools/:name`, mismo catch de
+ * NUMERIC_TOOL_ARGS/P0 2026-06-13) lo envuelve como 502. Confirmado en vivo
+ * contra el sidecar real (127.0.0.1:7880, 2026-09-03): 'frío' -> 502
+ * mcp_call_failed / invalid_enum_value; 'frio' -> 200 con datos reales.
+ *
+ * Mismo chokepoint que `coerceNumericArgs` para que CUALQUIER caller (chat
+ * LLM, chips deterministicos, plan NLU) sea robusto. Solo quita tildes/
+ * espacios/mayusculas -- un piso_termico genuinamente invalido (ej.
+ * 'montaña') sigue sin matchear el enum y el sidecar lo sigue rechazando,
+ * como corresponde.
+ */
+export function normalizePisoTermicoArg(args) {
+  if (!args || typeof args !== 'object' || typeof args.piso_termico !== 'string') return args;
+  const normalized = args.piso_termico
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .trim()
+    .toLowerCase();
+  if (normalized === args.piso_termico) return args;
+  return { ...args, piso_termico: normalized };
+}
+
 export async function callTool(toolName, args) {
   if (!toolName || typeof toolName !== 'string') return null;
   if (!ALLOWED_TOOLS.has(toolName)) {
     console.debug('[sidecar] tool no permitido', toolName);
     return { _error: true, reason: 'not_allowed', tool: toolName };
   }
-  const result = await postJson(`/tools/${toolName}`, coerceNumericArgs(args || {}), TOOL_TIMEOUT_MS);
+  const sanitizedArgs = normalizePisoTermicoArg(coerceNumericArgs(args || {}));
+  const result = await postJson(`/tools/${toolName}`, sanitizedArgs, TOOL_TIMEOUT_MS);
   if (result !== null) return result;
   // postJson retornó null. Distinguir: tool fue intentado pero falló
   // (timeout / HTTP error / network) vs. ni siquiera se intentó (flag off / offline).
@@ -918,6 +1016,51 @@ export async function judgeVision(speciesId, imageB64) {
     confidence: typeof raw.confidence === 'number' ? raw.confidence : null,
     motivo: typeof raw.motivo === 'string' ? raw.motivo : '',
   };
+}
+
+/**
+ * Gate ASÍNCRONO del juez de visión (#328). El juez local tarda ~16-23s
+ * (minicpm-v:8b en CPU, fuera de la VRAM del agente) y el sync `/judge-vision`
+ * lo aborta el propio cliente a TOOL_TIMEOUT_MS=5s → veredicto siempre null
+ * (gate muerto). Este par desacopla: `judgeVisionAsync` ENCOLA (202 en ~11ms)
+ * y devuelve `{request_id}`; `judgeVisionResult` recoge el veredicto luego
+ * (poll). Así el diagnóstico NO se bloquea esperando al juez.
+ *
+ * @param {string} speciesId @param {string} imageB64
+ * @returns {Promise<null | {request_id: string}>}
+ */
+export async function judgeVisionAsync(speciesId, imageB64) {
+  if (!speciesId || typeof speciesId !== 'string') return null;
+  if (!imageB64 || typeof imageB64 !== 'string') return null;
+  const raw = await postJson(
+    '/judge-vision-async',
+    { species_id: speciesId, image_b64: imageB64 },
+    TOOL_TIMEOUT_MS,
+  );
+  if (!raw || typeof raw !== 'object' || typeof raw.request_id !== 'string') {
+    return null;
+  }
+  return { request_id: raw.request_id };
+}
+
+/**
+ * Recoge el veredicto async por `request_id` (poll del gate #328). El sidecar
+ * devuelve `{status:'pending'}` mientras el juez CPU no termina, `{status:'done',
+ * plausible, confidence, motivo}` cuando resuelve, o `{status:'error', reason}`.
+ * Pasa el body crudo del sidecar tal cual (el consumidor decide por `status`).
+ *
+ * @param {string} requestId
+ * @returns {Promise<null | {status:'done', plausible:boolean|null, confidence:number|null, motivo:string} | {status:'pending'} | {status:'error', reason?:string}>}
+ */
+export async function judgeVisionResult(requestId) {
+  if (!requestId || typeof requestId !== 'string') return null;
+  const raw = await getJson(
+    '/judge-vision-result',
+    { request_id: requestId },
+    TOOL_TIMEOUT_MS,
+  );
+  if (!raw || typeof raw !== 'object') return null;
+  return raw;
 }
 
 /**

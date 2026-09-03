@@ -93,6 +93,51 @@ export const ARQUETIPOS = {
     nombre: 'El semillero/vivero', clave: 'la propagación: germinar, repicar y endurecer bajo el túnel protegido',
     ejemplo: 'semillero', tambien: [],
   },
+  // El SUELO VIVO bajo tierra: la RED MICORRÍZICA (el wood-wide web). Familia
+  // propia (una escena espacial genuinamente nueva: la cámara BAJO el suelo): la
+  // red de hongos bioluminiscente que enlaza las raíces de las plantas y reparte
+  // fósforo/agua ↔ carbono, con pulsos de nutrientes corriendo por los hilos y el
+  // Ent asomando. En equipo humilde cae a su espejo 2D (motivo `micorrizas`).
+  // (anti-conflicto: arquetipo 3D nuevo al final del bloque.)
+  micorrizas: {
+    dim: '3d', role: 'mundo3d-archetype', motivo: 'micorrizas', espejo: 'mirror',
+    nombre: 'La red del suelo', clave: 'el wood-wide web: la red de hongos que conecta las raíces y reparte nutrientes bajo tierra',
+    ejemplo: 'micorrizas', tambien: [],
+  },
+  // EL PÁRAMO, la fábrica de agua: familia propia (una escena espacial genuinamente
+  // nueva — la planicie altoandina sobre 3.000+ m, escala de montaña, con la
+  // inmensidad de la cordillera y el mar de nubes). El frailejón caulirrósula
+  // (enagua de necromasa + roseta plateada) peina el agua a la niebla; el páramo
+  // se CUIDA, no se ara. Render ilustrado tipo lámina de Humboldt + atmósfera
+  // Ghibli. En equipo humilde cae a su ficha 2D (infografía del páramo).
+  // (anti-conflicto: arquetipo 3D nuevo al final del bloque.)
+  paramo: {
+    dim: '3d', role: 'mundo3d-archetype', motivo: 'paramo', espejo: 'infografia',
+    nombre: 'El páramo', clave: 'la fábrica de agua altoandina: frailejonal caulirrósulo, niebla e inmensidad de montaña',
+    ejemplo: 'paramo', tambien: [],
+  },
+  // El bosque nativo altoandino de TRES ESTRATOS: familia propia (una escena a
+  // ESCALA DE BOSQUE, autocontenida como el valle — no un diorama chico de la
+  // base). Su lección es la verticalidad del bosque de niebla nativo leída como
+  // una lámina de Humboldt viva: dosel / sotobosque / suelo, con epífitas y
+  // niebla. En equipo humilde cae a su ficha 2D (la lámina de los tres estratos).
+  // (anti-conflicto: arquetipo 3D nuevo al final del bloque.)
+  bosque: {
+    dim: '3d', role: 'mundo3d-archetype', motivo: 'bosque', espejo: 'mirror',
+    nombre: 'El bosque nativo', clave: 'el bosque altoandino de niebla y sus tres estratos: dosel, sotobosque y suelo, con epífitas',
+    ejemplo: 'bosque', tambien: [],
+  },
+  // La QUEBRADA CON SALTO: una metáfora espacial genuinamente nueva — el agua
+  // que CAE (no la que baja por pendiente, que es `flujo`). El cauce rocoso de
+  // alta pendiente, la chorrera sobre el escarpe estratificado, el pozo
+  // cristalino y el bosque de niebla (helechos arborescentes, musgo, epífitas).
+  // En equipo humilde cae a su espejo 2D (motivo `chorrera`).
+  // (anti-conflicto: arquetipo 3D nuevo al final del bloque.)
+  chorrera: {
+    dim: '3d', role: 'mundo3d-archetype', motivo: 'chorrera', espejo: 'mirror',
+    nombre: 'La quebrada con salto', clave: 'el agua que cae: chorrera sobre escarpe, pozo cristalino y bosque de niebla',
+    ejemplo: 'chorrera', tambien: [],
+  },
 
   // ── Arquetipos 2D (primera clase) ────────────────────────────────────────
   mirror: {

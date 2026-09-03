@@ -51,7 +51,7 @@ describe('TaskScreen — validacion de formulario', () => {
     render(<TaskScreen onBack={onBack} onSave={onSave} />);
 
     const select = screen.getByRole('combobox', { name: /prioridad/i });
-    expect(select.value).toBe('medium');
+    expect(/** @type {HTMLSelectElement} */ (select).value).toBe('medium');
   });
 
   it('estado tiene default "pending" sin input del usuario', () => {

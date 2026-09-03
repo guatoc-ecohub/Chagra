@@ -1,0 +1,102 @@
+/*
+ * gallina.css — la CADENCIA de la gallina criolla (clases gna-*).
+ *
+ * El DIBUJO vive en Gallina.jsx; aquí vive el compás rubber-hose:
+ *   - PICOTEO: anticipación (alza la cabeza), golpe seco al suelo, DOBLE
+ *     picoteo (la gallina real nunca picotea una sola vez) y recuperación
+ *     con overshoot. Períodos co-primos con rh-boil (1.5s) y rh-blink (5.6s)
+ *     para que la parvada nunca caiga en el mismo compás.
+ *   - COLA: meneo con follow-through (secondary motion del cuerpo que respira).
+ *   - ANDA: el CABECEO de gallina (la cabeza se adelanta y el cuerpo la
+ *     alcanza — head-thrust real del pollo) + patas que se columpian.
+ *
+ * Todo transform/opacity (GPU, Android gama baja). Gates de la casa:
+ * reduced-motion congela en fotograma digno; data-tier='bajo' apaga la
+ * cadencia continua (el parpadeo del kit queda, que es barato).
+ */
+
+/* Pivote del picoteo: la BASE DEL CUELLO (abajo-derecha del grupo cabeza). */
+[data-creature='gallina'] .gna-cabeza {
+  transform-box: fill-box;
+  transform-origin: 88% 92%;
+}
+[data-creature='gallina'][data-pose='picotea'] .gna-cabeza.gna-viva {
+  animation: gna-picoteo 2.9s ease-in-out infinite;
+}
+@keyframes gna-picoteo {
+  0%, 46%, 100% { transform: rotate(0deg); }
+  52% { transform: rotate(6deg); }    /* anticipación: alza y apunta */
+  58% { transform: rotate(-34deg); }  /* ¡pica! */
+  64% { transform: rotate(-24deg); }  /* medio rebote */
+  70% { transform: rotate(-37deg); }  /* doble picoteo (la firma) */
+  80% { transform: rotate(3deg); }    /* recupera con overshoot */
+  88% { transform: rotate(-1deg); }
+}
+
+/* Cola: meneo suave con follow-through, período co-primo (3.7s). */
+[data-creature='gallina'] .gna-cola {
+  transform-box: fill-box;
+  transform-origin: left bottom;
+}
+[data-creature='gallina'][data-pose='picotea'] .gna-cola,
+[data-creature='gallina'][data-pose='anda'] .gna-cola {
+  animation: gna-cola 3.7s ease-in-out infinite;
+}
+@keyframes gna-cola {
+  0%, 100% { transform: rotate(0deg); }
+  30% { transform: rotate(5deg); }
+  55% { transform: rotate(-3deg); }
+  72% { transform: rotate(6.5deg); }  /* el latigazo cuando el boil squashea */
+}
+
+/* ANDA: cabeceo de gallina — la cabeza SE ADELANTA seca y espera al cuerpo.
+   Co-primo con el columpio de patas (0.62s vs 0.62s en contrafase: el paso). */
+[data-creature='gallina'][data-pose='anda'] .gna-cabeza.gna-viva {
+  animation: gna-cabeceo 0.62s ease-in-out infinite;
+}
+@keyframes gna-cabeceo {
+  0%, 100% { transform: translateX(0) rotate(0deg); }
+  38% { transform: translateX(-1.6px) rotate(-4deg); } /* thrust adelante */
+  60% { transform: translateX(-0.3px) rotate(1deg); }  /* el cuerpo la alcanza */
+}
+[data-creature='gallina'] .gna-pata {
+  transform-box: fill-box;
+  transform-origin: center top;
+}
+[data-creature='gallina'][data-pose='anda'] .gna-pata-l {
+  animation: gna-paso 0.62s ease-in-out infinite;
+}
+[data-creature='gallina'][data-pose='anda'] .gna-pata-r {
+  animation: gna-paso 0.62s ease-in-out infinite;
+  animation-delay: -0.31s; /* contrafase: paso alternado */
+}
+@keyframes gna-paso {
+  0%, 100% { transform: rotate(14deg); }
+  50% { transform: rotate(-16deg); }
+}
+
+/* MARCHA dirigida por el HOST (billboards 3D): el mundo estampa
+   data-marcha='anda' en el wrapper del billboard cuando la gallina va en
+   camino (cero re-renders de React) y el CSS conmuta picoteo→cabeceo+paso.
+   Un attr más de especificidad que el picoteo: la marcha manda. */
+[data-marcha='anda'] [data-creature='gallina'][data-pose] .gna-cabeza.gna-viva {
+  animation: gna-cabeceo 0.62s ease-in-out infinite;
+}
+[data-marcha='anda'] [data-creature='gallina'][data-pose] .gna-pata-l {
+  animation: gna-paso 0.62s ease-in-out infinite;
+}
+[data-marcha='anda'] [data-creature='gallina'][data-pose] .gna-pata-r {
+  animation: gna-paso 0.62s ease-in-out infinite;
+  animation-delay: -0.31s;
+}
+
+/* Gates de la casa: tier bajo apaga la cadencia continua; reduced-motion
+   congela TODO en fotograma digno (cabeza en alto, cola asentada). */
+[data-tier='bajo'] .gna-cabeza,
+[data-tier='bajo'] .gna-cola,
+[data-tier='bajo'] .gna-pata { animation: none !important; }
+@media (prefers-reduced-motion: reduce) {
+  [data-creature='gallina'] .gna-cabeza,
+  [data-creature='gallina'] .gna-cola,
+  [data-creature='gallina'] .gna-pata { animation: none !important; }
+}

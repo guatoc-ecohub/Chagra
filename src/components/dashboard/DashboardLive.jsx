@@ -28,8 +28,7 @@ import {
 import { CSS } from '@dnd-kit/utilities';
 import { GripVertical, Snowflake, ChevronRight, Layers, TestTube, ShieldAlert, BookOpen, ClipboardList, Recycle, FlaskConical, Wheat, Droplets, Wrench, Eye, CalendarDays, Sprout, HelpCircle, Store, Mic, CloudRain, Leaf, Gauge, Stethoscope } from 'lucide-react';
 import AgentHero from './AgentHero';
-import OnboardingHero from '../OnboardingHero';
-import BienvenidaFinca, { bienvenidaYaVista } from '../BienvenidaFinca';
+import PrimerRegistroCard from '../PrimerRegistroCard';
 import {
     getProfile,
     getModuleVisibility,
@@ -62,11 +61,13 @@ import CicloVivoWidget from '../CicloVivo/CicloVivoWidget';
 // las funciones dispersas del home F2 en 9 mundos coherentes (mundosFinca.js).
 // Solo se monta con la flag F2 ON; el legacy conserva sus tiles.
 import MundosDeMiFinca from './MundosDeMiFinca';
-// SELECTOR DEL GUARDIÁN (espíritu de la finca) — portado del mockup aprobado
-// #/mockups/avatar-biopunk. Fauna nativa colombiana REAL (grounded), la elección
-// persiste en el perfil (userProfileService: guardian_especie). Vive en el menú
-// vivo (ambos layouts) para que sea público, no huérfano.
-import GuardianEspiritu from './GuardianEspiritu';
+// GuardianEspiritu (selector de 5 fauna, portado de #/mockups/avatar-biopunk)
+// se DESMONTÓ de aquí el 2026-08-14 (unificación compAI): era un sistema
+// paralelo desconectado del roster real de 7 compañeros. "Su guardián" pasa a
+// ser el mismo AgentAvatarSelector que usa el resto de la app (Perfil →
+// Apariencia) — un solo selector de compañero, no dos. El archivo
+// GuardianEspiritu.jsx sigue en el repo (no se borró), solo dejó de montarse.
+import AgentAvatarSelector from '../Settings/AgentAvatarSelector';
 import ArbolDeMundos from './ArbolDeMundos';
 import ClimaStrip from './ClimaStrip';
 import HoyEnFincaStrip from './HoyEnFincaStrip';
@@ -397,13 +398,8 @@ export default function DashboardLive({ onNavigate, regionalGreeting = null, onL
         }
     });
     const iotAlerts = useAssetStore((s) => s.iotAlerts) || [];
-    // Primer uso (feat/onboarding-ayuda): sin plantas registradas se re-monta
-    // el OnboardingHero existente (quedó huérfano del DashboardView legacy al
-    // pasar a DashboardLive 2026-05-28). Trae el Paso 1 "piso térmico" —
-    // filtro maestro de todos los módulos — + las 3 rutas de registro.
-    // Si falta capturar/confirmar el piso, el Paso 1 se muestra como banner
-    // compacto flotando SOBRE el AgentHero (overlay, no empuja el hero — ver
-    // el bloque de render); ya confirmado, las 3 rutas bajan al flujo normal.
+    // Primer uso: OnboardingCondensado concentra la configuracion. Cuando ya
+    // existe perfil, PrimerRegistroCard conserva las tres rutas operativas.
     const plantsCount = useAssetStore((s) => s.plants.length);
     const [needsPisoCapture] = useState(() => {
         const p = getProfile();
@@ -411,16 +407,6 @@ export default function DashboardLive({ onNavigate, regionalGreeting = null, onL
         const hasAltitud = p.finca_altitud !== '' && p.finca_altitud != null && Number.isFinite(alt);
         return !hasAltitud || p.piso_confirmado !== '1';
     });
-    // Bienvenida de PRIMERA VEZ (BienvenidaFinca): recorrido de 5 momentos
-    // (colibrí + capacidades estrella + "hola Chagra" manos-libres +
-    // instalar la app + ubicación mágica) que se muestra UNA
-    // sola vez, con la MISMA señal de primer uso del banner compacto (sin
-    // plantas y sin piso) + flag persistente "ya la vi". Capa 100% visual:
-    // "Ubicar mi finca" delega en la ruta existente 'ubicacion-detectada';
-    // al saltar queda el flujo de siempre (banner del piso térmico).
-    const [showBienvenida, setShowBienvenida] = useState(
-        () => plantsCount === 0 && needsPisoCapture && !bienvenidaYaVista(),
-    );
 
     // HOME "Finca Viva" por perfil (flag VITE_FINCA_VIVA_HOME_PERFIL). Se evalúa
     // una vez al montar. Con la flag ON: (1) la escena de la finca se muestra
@@ -657,7 +643,7 @@ export default function DashboardLive({ onNavigate, regionalGreeting = null, onL
     // procesos"): Reforestación · Silvopastoreo · Páramo · Cerdos. Gateado por
     // perfil (un urbano no lo ve). En F2 BAJA (audit: es de nicho, no roba el
     // primer scroll); con OFF conserva su posición/rótulo legacy.
-    const renderSeguimiento = ({ f2 } = {}) => ((seguimientoKeys === null || seguimientoKeys.length > 0) && (
+    const renderSeguimiento = ({ f2 } = /** @type {any} */ ({})) => ((seguimientoKeys === null || seguimientoKeys.length > 0) && (
         <div className={`px-4 pt-3 ${fincaVivaFlag ? 'fvh-resto-block' : ''}`}>
             {blockLabel(f2 ? 'Sus proyectos de finca' : 'Seguimiento de procesos', 'from-emerald-400 to-teal-400')}
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3" data-testid="seguimiento-cards">
@@ -671,33 +657,6 @@ export default function DashboardLive({ onNavigate, regionalGreeting = null, onL
             className="relative flex flex-col w-full h-full overflow-y-auto pb-6"
             data-scroll-key="dashboard-live"
         >
-            {/* BIENVENIDA de primera vez — overlay a pantalla completa SOBRE
-                cualquiera de las dos portadas (AgentHero / Finca Viva). Solo
-                se monta en el verdadero primer uso y una sola vez (flag en
-                localStorage dentro del componente). */}
-            {showBienvenida && (
-                <BienvenidaFinca
-                    onUbicar={() => {
-                        setShowBienvenida(false);
-                        onNavigate('ubicacion-detectada');
-                    }}
-                    onClose={() => setShowBienvenida(false)}
-                    onExplorarEjemplo={async () => {
-                        // SKIP rico: sembrar la finca de ejemplo (multi-piso,
-                        // grounded al catálogo) y quedarse en el home, que la
-                        // renderiza POBLADA sin recargar (seedExampleFinca
-                        // re-hidrata el asset store). Import perezoso: no pesa en
-                        // el bundle del dashboard salvo que se use.
-                        try {
-                            const { seedExampleFinca } = await import('../../services/demoFincaEjemplo');
-                            await seedExampleFinca();
-                        } catch (err) {
-                            console.error('[DashboardLive] No se pudo sembrar la finca de ejemplo:', err);
-                        }
-                        setShowBienvenida(false);
-                    }}
-                />
-            )}
             {/* PORTADA del home — depende de la flag VITE_FINCA_VIVA_HOME_PERFIL:
                 ─────────────────────────────────────────────────────────────────
                 · Flag ON  → la ESCENA ISOMÉTRICA "Finca Viva" (mockup F2) es el
@@ -746,7 +705,7 @@ export default function DashboardLive({ onNavigate, regionalGreeting = null, onL
                             data-testid="dashboard-onboarding-top"
                         >
                             <div className="pointer-events-auto mx-auto w-full max-w-[26rem]">
-                                <OnboardingHero onNavigate={onNavigate} compact />
+                                <PrimerRegistroCard onNavigate={onNavigate} compact />
                             </div>
                         </div>
                     )}
@@ -803,14 +762,15 @@ export default function DashboardLive({ onNavigate, regionalGreeting = null, onL
                 </div>
             )}
 
-            {/* SU GUARDIÁN — el espíritu de la finca (mockup #/mockups/avatar-biopunk).
-                Vive en el menú vivo en AMBOS layouts (F2 y legacy/prod) para que sea
-                público y no huérfano. Especies nativas colombianas REALES (grounded);
-                la elección PERSISTE en el perfil (guardian_especie) y re-tiñe su
-                propio HUD + emite chagra:guardian-changed para el saludo/espíritu. */}
+            {/* SU COMPAÑERO — quién lo acompaña en Chagra. Vive en el menú vivo en
+                AMBOS layouts (F2 y legacy/prod) para que sea público y no huérfano.
+                Reemplaza al viejo "Su guardián" (GuardianEspiritu, 5 fauna, sistema
+                paralelo desconectado del roster real) por el MISMO
+                AgentAvatarSelector que usa Perfil → Apariencia (2026-08-14,
+                unificación compAI: un solo selector de compañero, roster de 7). */}
             <div className="px-4 pt-3 fvh-resto-block" data-testid="bloque-guardian">
-                {blockLabel('Su guardián', 'from-teal-400 to-violet-400')}
-                <GuardianEspiritu />
+                {blockLabel('Su compañero', 'from-teal-400 to-violet-400')}
+                <AgentAvatarSelector />
             </div>
 
             {fincaVivaFlag ? (
@@ -1078,7 +1038,7 @@ export default function DashboardLive({ onNavigate, regionalGreeting = null, onL
             {/* Primer uso con piso ya confirmado: las 3 rutas de registro. */}
             {plantsCount === 0 && !needsPisoCapture && (
                 <div className="px-4 pt-3">
-                    <OnboardingHero onNavigate={onNavigate} />
+                    <PrimerRegistroCard onNavigate={onNavigate} />
                 </div>
             )}
 

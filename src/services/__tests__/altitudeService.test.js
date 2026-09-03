@@ -550,7 +550,8 @@ describe('altitudeService (#altitude) — obtención de altitud del dispositivo'
     });
 
     it('salta a fallbacks cuando getCurrentPosition no es función', async () => {
-      globalThis.navigator.geolocation = {};
+      // @ts-ignore
+      globalThis.navigator.geolocation = /** @type {any} */ ({});
       
       vi.mocked(openDB).mockResolvedValue(makeFakeDB(1600));
       
@@ -562,7 +563,8 @@ describe('altitudeService (#altitude) — obtención de altitud del dispositivo'
 
   describe('offline mode', () => {
     it('no llama a API si navigator.onLine es false', async () => {
-      globalThis.navigator.onLine = /** @type {any} */ (false);
+      // @ts-ignore
+      globalThis.navigator.onLine = false;
       
       vi.mocked(globalThis.navigator.geolocation.getCurrentPosition).mockImplementation(
         (success) => {

@@ -56,9 +56,9 @@ describe('VoiceSelector — rediseño mínima fricción', () => {
   });
 
   test('respeta la voz preferida persistida', () => {
-    localStorage.setItem('chagra:tts:voice', 'pm_santa');
+    localStorage.setItem('chagra:tts:voice', 'em_alex');
     render(<VoiceSelector />);
-    expect(screen.getByTestId('voice-puesta-pm_santa')).toBeInTheDocument();
+    expect(screen.getByTestId('voice-puesta-em_alex')).toBeInTheDocument();
   });
 
   test('UN toque reproduce la voz Y la persiste de una (sin Guardar)', async () => {
@@ -77,7 +77,7 @@ describe('VoiceSelector — rediseño mínima fricción', () => {
 
   test('tocar corta el audio previo antes de reproducir (evita overlap)', async () => {
     render(<VoiceSelector />);
-    fireEvent.click(screen.getByTestId('voice-option-pm_santa'));
+    fireEvent.click(screen.getByTestId('voice-option-em_alex'));
     await waitFor(() => {
       expect(stopTTS).toHaveBeenCalled();
       expect(speakKokoro).toHaveBeenCalledTimes(1);
@@ -93,11 +93,11 @@ describe('VoiceSelector — rediseño mínima fricción', () => {
     // Y esa velocidad viaja en el siguiente preview.
     fireEvent.click(screen.getByTestId('voice-option-em_alex'));
     await waitFor(() => expect(speakKokoro).toHaveBeenCalled());
-    const [, opts] = speakKokoro.mock.calls[0];
+    const [, opts] = /** @type {any} */ (speakKokoro).mock.calls[0];
     expect(opts.rate).toBeCloseTo(1.1);
   });
 
-  test('ya no ofrece a Dora (ef_dora): el operador la quitó', () => {
+  test('no ofrece a Dora (ef_dora)', () => {
     render(<VoiceSelector />);
     expect(screen.queryByTestId('voice-option-ef_dora')).not.toBeInTheDocument();
   });

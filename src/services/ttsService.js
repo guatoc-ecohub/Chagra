@@ -79,8 +79,14 @@ function applyVoseoGuard(text) {
  * GOTCHA: ante una voz no servible el server cae SILENCIOSO a la DEFAULT_VOICE.
  * `em_santa` (Santa) es la voz elegida por el operador — es la Santa ESPAÑOLA
  * de Kokoro (voz baked-in del modelo, prefijo `em_` = español masculino), NO la
- * portuguesa `pm_santa` que sonaba robótica. `em_alex`/`ef_dora` quedan como
- * alternativas, también en español.
+ * portuguesa `pm_santa` que sonaba robótica. `em_alex` queda como alternativa,
+ * también en español.
+ *
+ * DORA FUERA (2026-08-02) — el operador reportó que `ef_dora` suena "gringa"
+ * (prosodia anglo) y pidió que NUNCA se oiga. Se retira de KOKORO_VOICES para
+ * que `toServableVoice` la coercione a santa (dora no viaja al server ni por
+ * fallback silencioso) y para que el selector no la ofrezca. Ver PR #2240/#2304
+ * (dora había reaparecido en el catálogo por error) y el reporte de voz.
  */
 export const KOKORO_VOICES = Object.freeze([
   {
@@ -95,14 +101,12 @@ export const KOKORO_VOICES = Object.freeze([
     description: 'Voz de hombre, natural y clara.',
     gender: 'masculina',
   },
-  {
-    id: 'ef_dora',
-    label: 'Dora',
-    description: 'Voz de mujer, suave y clara.',
-    gender: 'femenina',
-  },
 ]);
 
+// Punto único de la voz del asistente (Compai = Angelita = Colibrí = Agente:
+// una sola entidad con varias pieles). getPreferredVoice() y toServableVoice()
+// cuelgan de aquí; este es también el gancho para una futura voz clonada
+// personalizada — cambiar la voz por defecto se hace SOLO aquí.
 export const DEFAULT_KOKORO_VOICE = 'em_santa';
 export const DEFAULT_KOKORO_RATE = 1.0;
 export const KOKORO_RATE_MIN = 0.85;
@@ -400,6 +404,21 @@ export function isAudioPlaying() {
   return audioPlaying;
 }
 
+/**
+ * Elemento <audio> que está sonando ahora (Kokoro/XTTS/streaming), o null.
+ *
+ * Getter puro y aditivo (no cambia el playback) para que el LIP-SYNC 2D
+ * ([[reference_animacion_rubber_hose_spec]] §2) pueda colgar un AnalyserNode
+ * sobre el audio activo y derivar visemas del RMS. Web Speech no tiene elemento
+ * (devuelve null) → el hook cae a su boca de relleno. El blob URL de Kokoro es
+ * same-origin, así que `createMediaElementSource` no lo contamina.
+ *
+ * @returns {HTMLAudioElement|null}
+ */
+export function getActiveAudio() {
+  return currentKokoroAudio;
+}
+
 // ──────────────────────────────────────────────────────────────────────────
 // Streaming sentence-by-sentence (Free 7→10 fix-pack)
 // ──────────────────────────────────────────────────────────────────────────
@@ -553,6 +572,21 @@ async function synthesizeSentence(sentence, voice, format, lang, signal) {
  */
 function playSentenceBlob(url, rate) {
   return new Promise((resolve, reject) => {
+    // Garantía de UNA sola voz: cortar cualquier audio Kokoro previo que siga
+    // sonando antes de arrancar el nuevo. Sin esto, dos llamadas (bienvenida +
+    // mundo, o un efecto que re-dispara) apilan voces "papá noel" que se pisan
+    // y se quedan en loop. speak()/speakSentences() ya cortan; este path no lo
+    // hacía y era la raíz del solape/loop de la voz em_santa.
+    if (currentKokoroAudio) {
+      try {
+        currentKokoroAudio.pause();
+        currentKokoroAudio.onended = null;
+        currentKokoroAudio.onerror = null;
+      } catch { /* noop */ }
+    }
+    if (currentKokoroUrl && currentKokoroUrl !== url) {
+      try { URL.revokeObjectURL(currentKokoroUrl); } catch { /* noop */ }
+    }
     const audio = new Audio(url);
     audio.playbackRate = clampRate(rate);
     currentKokoroAudio = audio;
@@ -955,10 +989,10 @@ export async function speakKokoro(text, options = {}) {
  *   3. Si Kokoro también falla → fallback a speak() Web Speech API
  *
  * @param {string} text - Texto a sintetizar (puede tener markdown)
- * @param {Object} options - Opciones adicionales
- * @param {string} options.voiceUrl - URL del audio sample colombiano (10s)
- * @param {string} options.format - Formato de audio output (mp3, wav)
- * @param {string} options.lang - Idioma (default 'es')
+ * @param {Object} [options] - Opciones adicionales
+ * @param {string} [options.voiceUrl] - URL del audio sample colombiano (10s)
+ * @param {string} [options.format] - Formato de audio output (mp3, wav)
+ * @param {string} [options.lang] - Idioma (default 'es')
  * @returns {Promise<Audio|null>} - Audio element o null si todos fallan
  */
 export async function speakXTTS(text, options = {}) {
@@ -1015,12 +1049,12 @@ export async function speakXTTS(text, options = {}) {
 
     await audio.play();
     notifySpeaking(true);
-    return audio;
+    return /** @type {any} */ (audio);
   } catch (e) {
     // Fallback a Kokoro si XTTS falla (timeout, error HTTP, XTTS not available)
     console.warn('[TTS] XTTS failed, fallback to Kokoro:', e.message);
     notifySpeaking(false);
-    return await speakKokoro(text, options);
+    return /** @type {any} */ (await speakKokoro(text, options));
   }
 }
 
@@ -1111,6 +1145,8 @@ export default {
   // TIER 2 #5: estado observable de reproducción para la UI "hablando".
   onSpeakingChange,
   isAudioPlaying,
+  // Lip-sync 2D: el <audio> activo para colgar un AnalyserNode encima.
+  getActiveAudio,
   getVoices,
   getSpanishVoice,
   replayLast,

@@ -21,7 +21,7 @@ name: Unit Tests (vitest)
 # estabilizar esos 2 tests; ver el cuerpo del PR para el detalle.
 on:
   pull_request:
-    branches: [main]
+    branches: [main, dev, app-3d]
   push:
     branches: [main]
 
@@ -47,6 +47,10 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          # El detector compara contra origin/${GITHUB_BASE_REF}. El checkout
+          # shallow no trae ese ref y convertiría un error de diff en output vacío.
+          fetch-depth: 0
 
       - name: Setup Node
         uses: actions/setup-node@v4
@@ -57,14 +61,32 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      # Test del PUNTO DE ACCESO #1 + dependencias deterministas. Determinista
-      # en CI (sin crypto/IndexedDB/red). Falla RUIDOSAMENTE si un chip-ejemplo
-      # devuelve vacío/error tras el pipeline de salida.
-      - name: Run entrypoint unit tests
+      # El detector selecciona solo tests relacionados con los archivos del PR.
+      # Si no puede calcular el diff, termina con error y el gate falla.
+      - name: Detect changed files and map to tests
+        id: detect-tests
+        run: |
+          set -euo pipefail
+          TESTS=$(node scripts/detect-changed-tests.mjs)
+          echo "tests=$TESTS" >> "$GITHUB_OUTPUT"
+          if [[ -n "$TESTS" ]]; then
+            echo "has_tests=true" >> "$GITHUB_OUTPUT"
+            echo "Detected tests: $TESTS"
+          else
+            echo "has_tests=false" >> "$GITHUB_OUTPUT"
+            echo "Detected tests: none"
+          fi
+
+      - name: Run relevant unit tests
+        # Un output vacío significa que no hay tests relevantes. Se salta este
+        # paso para no expandirse a `npm run test:unit --`, que corre la suite
+        # completa. La allowlist fija ya no es fallback: el detector es el
+        # contrato de selección y falla ruidosamente si no puede medir.
+        if: steps.detect-tests.outputs.has_tests == 'true'
         run: >-
           npm run test:unit --
-          tests/unit/exampleQuestions.entrypoint.test.jsx
-          tests/unit/outputGuards.test.js
-          tests/unit/catalog-count.test.js
-          src/components/__tests__/QuickChipsBar.smoke.test.jsx
-          src/components/__tests__/ChipsToolbar.smoke.test.jsx
+          ${{ steps.detect-tests.outputs.tests }}
+
+      - name: No relevant unit tests
+        if: steps.detect-tests.outputs.has_tests == 'false'
+        run: echo "No relevant unit tests for the changed files"

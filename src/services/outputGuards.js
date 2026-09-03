@@ -198,6 +198,104 @@ const PLANTING_INTENT_PATTERNS = [
   /\ben\s+mi\s+finca\b/,
 ];
 
+// P1 de auditoría 41 especies: el catálogo no tiene una cifra uniforme de
+// rendimiento. Esta intención solo cubre preguntas por una cifra o dato de
+// producción, no consejos generales como "¿cómo mejoro el rendimiento?".
+const YIELD_QUERY_RE =
+  /\b(cu[aá]nt[oa]s?|qu[eé]|cu[aá]l(?:es)?|dato[s]?|cifra[s]?)\b.{0,60}\b(rendimiento|productividad|produ[cç]ci[oó]n|produce|cosecha)\b|\b(rendimiento|productividad|produ[cç]ci[oó]n)\b.{0,60}\b(kg|t\s*\/?\s*ha|hect[aá]rea|planta|cifra|dato)\b/;
+
+const YIELD_VALUE_KEYS = new Set([
+  'rendimiento',
+  'yield',
+  'rendimientos',
+  'productividad',
+  'produccion',
+  'producción',
+  'rendimiento_promedio_t_ha',
+  'rendimiento_kg_ha',
+  'yield_kg_ha',
+  'cosecha_estimada_kg_por_planta',
+]);
+
+function hasDocumentedYield(value, seen = new Set()) {
+  if (!value || typeof value !== 'object' || seen.has(value)) return false;
+  seen.add(value);
+  for (const [key, candidate] of Object.entries(value)) {
+    if (!YIELD_VALUE_KEYS.has(key)) continue;
+    if (candidate === null || candidate === undefined || candidate === '') continue;
+    if (typeof candidate === 'string' && /slotpendiente|pendiente|sin dato|no document/i.test(candidate)) continue;
+    if (typeof candidate === 'object') {
+      const valueKeys = new Set(['valor', 'value', 'cantidad', 'min', 'max', 'promedio', 'kg_ha', 't_ha']);
+      if (
+        Object.entries(candidate).some(([nestedKey, nestedValue]) => {
+          if (!valueKeys.has(nestedKey) || nestedValue === null || nestedValue === undefined || nestedValue === '') {
+            return false;
+          }
+          return !(typeof nestedValue === 'string' && /slotpendiente|pendiente|sin dato|no document/i.test(nestedValue));
+        }) ||
+        hasDocumentedYield(candidate, seen)
+      ) {
+        return true;
+      }
+      continue;
+    }
+    return true;
+  }
+  return false;
+}
+
+function yieldEntityName(toolEvidence, entities) {
+  const evidence = Array.isArray(toolEvidence) ? toolEvidence : [toolEvidence];
+  for (const ev of evidence) {
+    const result = ev?.result;
+    const species = result?.species || result;
+    const name = species?.nombre_comun || species?.nombre || species?.nombre_cientifico;
+    if (typeof name === 'string' && name.trim()) return name.trim();
+  }
+  const entity = Array.isArray(entities)
+    ? entities.find((entry) => entry && (entry.nombre_comun || entry.nombre_cientifico || entry.mentioned))
+    : null;
+  return entity?.nombre_comun || entity?.nombre_cientifico || entity?.mentioned || 'la especie consultada';
+}
+
+/**
+ * Bloquea cifras de rendimiento inventadas cuando la evidencia consultada no
+ * contiene un valor documentado. Si una evidencia sí contiene rendimiento,
+ * deja pasar la respuesta para no tapar un dato respaldado.
+ *
+ * @param {string} responseText
+ * @param {{userMessage?: string|null, toolEvidence?: object|Array<object>|null, resolvedEntities?: Array<object>|null}} [ctx]
+ * @returns {{text:string, modified:boolean, reason:string|null}}
+ */
+export function guardMissingYield(responseText, { userMessage = null, toolEvidence = null, resolvedEntities = null } = {}) {
+  if (typeof responseText !== 'string' || responseText.length === 0) {
+    return { text: responseText ?? '', modified: false, reason: null };
+  }
+  const query = _stripDiacritics(userMessage || '');
+  if (!YIELD_QUERY_RE.test(query)) return { text: responseText, modified: false, reason: null };
+
+  const evidence = Array.isArray(toolEvidence) ? toolEvidence : [toolEvidence];
+  const hasYield = evidence.some((ev) => {
+    const result = ev?.result;
+    return hasDocumentedYield(result?.species || result);
+  });
+  if (hasYield) return { text: responseText, modified: false, reason: null };
+
+  // Sin tool ni entidad no podemos atribuir el SlotPendiente a una especie;
+  // el prompt general conserva el comportamiento honesto en ese caso.
+  if (!toolEvidence && (!Array.isArray(resolvedEntities) || resolvedEntities.length === 0)) {
+    return { text: responseText, modified: false, reason: null };
+  }
+
+  const name = yieldEntityName(toolEvidence, resolvedEntities);
+  bumpGuardTelemetry('missing_yield');
+  return {
+    text: `SlotPendiente: rendimiento de ${name}. El catálogo Chagra no tiene una cifra verificada para esta especie y sistema. No invento kg/ha ni kg/planta. Fuente: catálogo Chagra, ficha consultada sin campo de rendimiento; requiere curaduría editorial.`,
+    modified: true,
+    reason: 'rendimiento_sin_dato_verificado',
+  };
+}
+
 /**
  * classifyQueryIntent — heurística simple de intención sobre la pregunta del
  * usuario (A12). Devuelve:
@@ -275,7 +373,7 @@ const NLU_NOISE_MENTIONS = new Set([
   // una recomendación no está nombrando un cultivo, aunque el resolver a
   // veces case el token contra prosa del catálogo (ver "fuente" arriba). El
   // cotejo es sobre `mentioned` COMPLETO y normalizado, no substring: "pasto
-  // fuente" (mención de una especie real) NO cae acá, solo "fuente" sola.
+  // fuente" (mención de una especie real) NO cae aquí, solo "fuente" sola.
   'fuente', 'fuentes', 'entidad', 'entidades', 'norma', 'normativa',
   'resolucion', 'decreto', 'ley', 'cartilla', 'referencia', 'recomendacion',
   // NOTA: se evaluaron 'ica'/'sena'/'agrosavia'/... y 'car'/'fao' (siglas
@@ -2383,8 +2481,8 @@ export function guardThermalViability(
     return { text: responseText, modified: false, reason: null };
   }
 
-  const fMin = forecastTempMin != null && forecastTempMin !== '' ? Number(forecastTempMin) : NaN;
-  const fMax = forecastTempMax != null && forecastTempMax !== '' ? Number(forecastTempMax) : NaN;
+  const fMin = forecastTempMin != null && /** @type {any} */ (forecastTempMin) !== '' ? Number(forecastTempMin) : NaN;
+  const fMax = forecastTempMax != null && /** @type {any} */ (forecastTempMax) !== '' ? Number(forecastTempMax) : NaN;
   const haveMin = Number.isFinite(fMin);
   const haveMax = Number.isFinite(fMax);
   // Sin NINGÚN dato de pronóstico → no-op graceful (gap documentado).
@@ -2422,7 +2520,7 @@ export function guardThermalViability(
     }
     if (Number.isFinite(tMax) && haveMax && fMax >= tMax - marginC) {
       partes.push(
-        `riesgo de golpe de calor: ${nombre} se estresa por encima de ~${tMax}°C y el pronóstico sube a ` +
+        `riesgo de golpe de calor: ${nombre} se estresa desde ~${tMax}°C y el pronóstico sube a ` +
           `${Math.round(fMax)}°C`,
       );
     }
@@ -2430,9 +2528,9 @@ export function guardThermalViability(
 
     disparadas.push(nombre);
     advertencias.push(
-      `Ojo con ${nombre}: ${partes.join('; y ')}. No te digo que no lo siembres —hay quien lo logra con ` +
-        `cuidados— pero requiere protección (cobertor/manta térmica en las noches frías, o sombra y mulch ` +
-        `para el calor). Tenlo en cuenta antes de arriesgar la semilla.`,
+      `Ojo con ${nombre}: ${partes.join('; y ')}. No le digo que no lo siembre porque hay quien lo logra con ` +
+        `cuidados, pero requiere protección (cobertor o manta térmica en las noches frías, o sombra y mulch ` +
+        `para el calor). Téngalo en cuenta antes de arriesgar la semilla.`,
     );
   }
 
@@ -2584,6 +2682,26 @@ const DECREE_RE =
   /\b(?:Decreto|Resolución|Res|Dec\.|Decreto\s+No\.?)\s*(?:\d+|[IVXLCDM]+)(?:\s+de\s+\d{4})?\b/gi;
 
 /**
+ * Instituciones y canales oficiales colombianos que suelen aparecer en
+ * consultas de contacto agro/rural. La lista es conservadora y solo cubre
+ * entidades que el usuario puede nombrar como canal oficial genérico.
+ */
+const OFFICIAL_CONTACT_INSTITUTION_RE =
+  /\b(?:ica|agrosavia|umata|alcald[ií]a|secretar[ií]a(?:\s+de)?\s+agricultura|secretar[ií]a(?:\s+de)?\s+desarrollo\s+rural|secretar[ií]a(?:\s+de)?\s+ambiente|gobernaci[oó]n|ministerio\s+de\s+agricultura|corporaci[oó]n\s+aut[oó]noma\s+regional|car\b|invima|ins|sena)\b/;
+
+/**
+ * Textos que suenan a afirmación de contacto específico.
+ */
+const CONTACT_ASSERTION_RE =
+  /\b(?:llama(?:r)?|marc[aá]|contacta(?:r)?|comun[ií]cate|escrib(?:e|a)|consulta(?:r)?|tel[eé]fono|celular|linea|línea|correo|email|whatsapp|direccion|dirección|sede|oficina|atenci[oó]n)\b/;
+
+/**
+ * Patrones de direcciones postales comunes en Colombia.
+ */
+const ADDRESS_RE =
+  /\b(?:calle|cl\.?|cra\.?|carrera|avenida|av\.?|diagonal|transversal|km|kil[oó]metro)\s*[0-9][0-9A-Za-z#\-\s.,]*/i;
+
+/**
  * Guard 5 — contacto inventado. Si el texto incluye teléfonos, correos,
  * URLs o números de decreto/resolución que NO estén en la allowlist
  * verificada, los MARCA/REEMPLAZA por un texto seguro que indica al
@@ -2662,6 +2780,94 @@ export function guardInventedContact(responseText, _resolvedEntities = null, _fi
   }
 
   return { text: responseText, modified: false, reason: null };
+}
+
+/**
+ * Guard de contacto institucional inventado.
+ *
+ * Si el texto afirma un teléfono, celular, línea, correo o dirección concreta
+ * de una entidad como ICA, Agrosavia, UMATA, alcaldía o secretaría, lo
+ * sustituye por una remisión al canal oficial genérico. No toca menciones
+ * legítimas de la entidad sin dato de contacto.
+ *
+ * @returns {{text:string, modified:boolean, reason:string|null}}
+ */
+export function guardHallucinatedContact(responseText, { userMessage = null } = {}) {
+  if (typeof responseText !== 'string' || responseText.length === 0) {
+    return { text: responseText ?? '', modified: false, reason: null };
+  }
+
+  if (responseText.includes('Consulte el canal oficial de la entidad')) {
+    return { text: responseText, modified: false, reason: null };
+  }
+
+  const userAskedForContact =
+    typeof userMessage === 'string' && CONTACT_ASSERTION_RE.test(_stripDiacritics(userMessage));
+
+  const protectedText = responseText.replace(EMAIL_RE, (email) => email.replace(/\./g, '__DOT__'));
+  const sentences = _splitSentences(protectedText);
+  const hits = [];
+  let changed = false;
+  let lastWasReplacement = false;
+
+  const replacement =
+    'Consulte el canal oficial de la entidad, por ejemplo la página del ICA (ica.gov.co) o la UMATA de su municipio. ' +
+    'No me es posible confirmar un número telefónico específico sin riesgo de darle uno equivocado.';
+
+  const out = sentences
+    .map((sentence) => {
+      const originalSentence = sentence.replace(/__DOT__/g, '.');
+      const norm = _stripDiacritics(originalSentence);
+      const hasInstitution = OFFICIAL_CONTACT_INSTITUTION_RE.test(norm);
+      if (!hasInstitution) {
+        lastWasReplacement = false;
+        return sentence;
+      }
+
+      const phoneRe = new RegExp(PHONE_RE.source, 'g');
+      const emailRe = new RegExp(EMAIL_RE.source, 'g');
+      const addressRe = new RegExp(ADDRESS_RE.source, ADDRESS_RE.flags);
+      const hasPhone = phoneRe.test(originalSentence);
+      const hasEmail = emailRe.test(originalSentence);
+      const hasAddress = addressRe.test(originalSentence);
+      const hasContactCue = CONTACT_ASSERTION_RE.test(norm);
+
+      if (!(hasPhone || hasEmail || hasAddress || hasContactCue || userAskedForContact)) {
+        lastWasReplacement = false;
+        return sentence;
+      }
+
+      const specificContacts = [];
+      const phones = originalSentence.match(phoneRe) || [];
+      for (const phone of phones) specificContacts.push(phone);
+      const emails = originalSentence.match(emailRe) || [];
+      for (const email of emails) specificContacts.push(email);
+      if (addressRe.test(originalSentence)) specificContacts.push(originalSentence.match(addressRe)?.[0] || 'direccion');
+
+      if (specificContacts.length === 0) {
+        lastWasReplacement = false;
+        return sentence;
+      }
+
+      changed = true;
+      for (const item of specificContacts) if (!hits.includes(item)) hits.push(item);
+      if (lastWasReplacement) return '';
+      lastWasReplacement = true;
+      const trailing = originalSentence.match(/\s*$/)?.[0] || ' ';
+      return `${replacement}${trailing}`;
+    })
+    .join('');
+
+  if (!changed) {
+    return { text: responseText, modified: false, reason: null };
+  }
+
+  bumpGuardTelemetry('hallucinated_contact');
+  return {
+    text: out.trim() || replacement,
+    modified: true,
+    reason: `contacto_institucional_hallucinado: ${[...new Set(hits)].slice(0, 5).join(', ')}`,
+  };
 }
 
 // ── GUARD: norma numerada afirmada como obligacion ──────────────────────────
@@ -4855,7 +5061,7 @@ export function guardOffDomain(responseText, { userMessage = null } = {}) {
  */
 const SYMPTOM_DIAG_INTENT_PATTERNS = [
   /\bmanch(a|as)\b/,
-  /\bhojas?\s+(amarill|seca|negra|cafe|marchit|enroll|con\s+hueco)/,
+  /\bhojas?\s+(amarill|seca|negra|cafe|marchit|enroll|chamusc|mordid|perforad|con\s+hueco)/,
   // "se está secando", "se me está secando", "se me secan", "se le marchitan":
   // tolera el pronombre/clítico intermedio (me/le/te/nos) y la conjugación 3ª pl.
   /\bse\s+(me\s+|le\s+|te\s+|nos\s+)?(esta(n)?\s+)?(secand|marchitand|muriend|pudriend|amarilland|enferman|enrollan|cae|caen|secan|marchitan|mueren|pudren)/,
@@ -4869,6 +5075,7 @@ const SYMPTOM_DIAG_INTENT_PATTERNS = [
   /\b(plaga|enfermedad|hongo|bicho|gusano)s?\s+que\s+(no\s+conozco|no\s+s[eé]\s+qu[eé]|no\s+identifico)/,
   /\bpudric(ion|iones)\b/,
   /\bpuntos?\s+(negro|cafe|amarillo)/,
+  /\b(hueco|agujero|mordida|perforacion|melaza|fumagina)s?\b/,
   // síntomas vagos adicionales reportados en campo
   /\bse\s+(esta\s+)?(poniend|volviend)\s+(amarill|negr|cafe|seca)/,
   /\b(esta|se\s+ve)\s+(triste|mal|enferm|marchit|amarill|deca[ií]d)/,
@@ -4879,6 +5086,82 @@ function _isSymptomDiagnosisQuery(userMessage) {
   if (typeof userMessage !== 'string' || !userMessage.trim()) return false;
   const norm = _stripDiacritics(userMessage);
   return SYMPTOM_DIAG_INTENT_PATTERNS.some((re) => re.test(norm));
+}
+
+// Diagnostico observable: separa el aparato bucal antes de pedir evidencia.
+// Esta guarda se limita a sintomas con una primera hipotesis accionable y no
+// intenta identificar patogenos ni organismos a nivel de especie.
+const CHEWING_DAMAGE_RE = /\b(hueco|huequito|agujero|perforacion|perforad[ao]|mordida|mordido|comida|comido|borde\s+mordisqueado)s?\b/;
+const SUCKING_DAMAGE_RE = /\b(melaza|fumagina|pegajos[ao]s?|amarillamiento|amarillas?|moteado\s+amarillo)\b/;
+const SCORCHED_LEAF_RE = /\b(chamuscad[ao]s?|quemad[ao]s?|borde[s]?\s+(seco|quemado|necrotico)s?|necrosis\s+marginal)\b/;
+const GREENHOUSE_RE = /\b(invernadero|bajo\s+cubierta|cubierta\s+plastica)\b/;
+const TREE_TOMATO_RE = /\b(tomate\s+de\s+(arbol|palo)|tamarillo)\b/;
+
+const FIELD_PHOTO_REQUEST =
+  'Después de hacer esa revisión, envíe una foto de cerca y otra de la planta completa. Con esas imágenes puedo afinar la causa sin retrasar la primera acción.';
+
+/**
+ * Da un triaje comprometido para sintomas cuyo mecanismo ya orienta el manejo.
+ * Reemplaza el cuerpo completo para que no sobrevivan plagas de otro cultivo,
+ * variedades no consultadas ni una inversion entre chupadores y masticadores.
+ *
+ * @param {string} responseText
+ * @param {{userMessage?: string|null, hadVision?: boolean}} [ctx]
+ * @returns {{text:string, modified:boolean, reason:string|null}}
+ */
+export function guardObservableSymptomTriage(
+  responseText,
+  { userMessage = null, hadVision = false } = {},
+) {
+  if (typeof responseText !== 'string' || responseText.length === 0) {
+    return { text: responseText ?? '', modified: false, reason: null };
+  }
+  if (hadVision || typeof userMessage !== 'string' || !userMessage.trim()) {
+    return { text: responseText, modified: false, reason: null };
+  }
+
+  const userNorm = _stripDiacritics(userMessage);
+  const hasChewingDamage = CHEWING_DAMAGE_RE.test(userNorm);
+  const hasSuckingDamage = SUCKING_DAMAGE_RE.test(userNorm);
+  const hasScorchedLeaves = SCORCHED_LEAF_RE.test(userNorm);
+  if (!hasChewingDamage && !hasSuckingDamage && !hasScorchedLeaves) {
+    return { text: responseText, modified: false, reason: null };
+  }
+
+  const parts = [];
+  if (hasScorchedLeaves) {
+    const subject = TREE_TOMATO_RE.test(userNorm) ? 'En el tomate de árbol' : 'En las hojas chamuscadas';
+    const ventilation = GREENHOUSE_RE.test(userNorm)
+      ? 'Abra la ventilación lateral y superior desde ahora y ponga sombra temporal en las horas de mayor radiación.'
+      : 'Ponga sombra temporal en las horas de mayor radiación y revise que el suelo conserve humedad sin encharcarse.';
+    parts.push(
+      `${subject}, la hipótesis más probable es golpe de calor o quemadura de sol, favorecida por poca ventilación. ` +
+        `La segunda posibilidad es necrosis marginal por acumulación de sales o un desbalance de potasio. ${ventilation} ` +
+        'Además, revise la conductividad del agua o del drenaje antes de aplicar más fertilizante.',
+    );
+  }
+  if (hasChewingDamage) {
+    const greenhouse = GREENHOUSE_RE.test(userNorm);
+    parts.push(
+      'Para los huecos o mordidas, la hipótesis más probable es daño de masticadores. ' +
+        (greenhouse
+          ? 'En invernadero, primero sospeche babosas o caracoles. Revise al anochecer el envés, el borde de las camas y debajo de materas o residuos; retire los que encuentre y reduzca refugios húmedos.'
+          : 'Primero revise babosas, caracoles, orugas o tierreros al anochecer y retire los que encuentre.'),
+    );
+  }
+  if (hasSuckingDamage) {
+    parts.push(
+      'Para el amarillamiento, la melaza o la fumagina, la hipótesis más probable es daño de chupadores, como pulgones o mosca blanca. ' +
+        'Revise el envés de las hojas y coloque una trampa amarilla para confirmar presencia antes de tratar.',
+    );
+  }
+
+  bumpGuardTelemetry('observable_symptom_triage');
+  return {
+    text: `${parts.join('\n\n')}\n\n${FIELD_PHOTO_REQUEST}`,
+    modified: true,
+    reason: 'triaje_sintoma_observable',
+  };
 }
 
 /**
@@ -5426,7 +5709,7 @@ function _findInventedClimateVariety(norm) {
         if (opuestoRe.test(s)) {
           return {
             name,
-            clima: entry.clima,
+            clima: /** @type {'frio'|'calido'} */ (entry.clima),
             opuesto: entry.clima === 'calido' ? 'frio' : 'calido',
             // GAP 1 (#1303): el binomio canónico de la especie. Va al texto de
             // neutralización para cubrir el must_include del bench ("Bactris
@@ -7078,8 +7361,8 @@ export function guardInventedBrand(responseText) {
  * ENCIMA de `max` es INVIABLE (no zona-gris). `range` es el texto del rango viable
  * que devolvemos al campesino en la corrección.
  *
- * Solo cultivos de clima inequívoco/acotado: los de banda ancha (maíz, fríjol, yuca)
- * NO entran — su tolerancia amplia haría falsos positivos. La altitud sale de la
+ * Solo cultivos de clima inequívoco/acotado: los de banda ancha (maíz, fríjol)
+ * NO entran. La altitud sale de la
  * PREGUNTA del usuario (o de la respuesta): el caso del bench es "café a 3600 m",
  * "Hass a 2800 m", "mora a 450 m" — datos que el operador da en su mensaje.
  */
@@ -7150,6 +7433,94 @@ const HARD_ALTITUDE_BANDS = [
     max: 3800,
     range: '2200–3600 msnm (clima frío/de altura)',
   },
+  {
+    names: ['platano', 'plátano'],
+    binomial: 'musa x paradisiaca',
+    display: 'plátano',
+    min: 0,
+    max: 2200,
+    range: '0–2200 msnm (tierra cálida/templada)',
+  },
+  {
+    names: ['banano', 'guineo'],
+    binomial: 'musa acuminata',
+    display: 'banano / guineo',
+    min: 0,
+    max: 1300,
+    range: '0–1300 msnm (tierra cálida/templada)',
+  },
+  {
+    names: ['yuca', 'yuca dulce', 'yuca de comer'],
+    binomial: 'manihot esculenta',
+    display: 'yuca dulce',
+    min: 0,
+    max: 2000,
+    range: '0–2000 msnm (tierra cálida/templada)',
+  },
+  {
+    names: ['piña', 'pina'],
+    binomial: 'ananas comosus',
+    display: 'piña',
+    min: 0,
+    max: 1500,
+    range: '0–1500 msnm (tierra cálida)',
+  },
+  {
+    names: ['papaya'],
+    binomial: 'carica papaya',
+    display: 'papaya',
+    min: 0,
+    max: 1600,
+    range: '0–1600 msnm (tierra cálida/templada)',
+  },
+  {
+    names: ['mango'],
+    binomial: 'mangifera indica',
+    display: 'mango',
+    min: 0,
+    max: 1800,
+    range: '0–1800 msnm (tierra cálida)',
+  },
+  {
+    names: ['arroz'],
+    binomial: 'oryza sativa',
+    display: 'arroz',
+    min: 0,
+    max: 1300,
+    range: '0–1300 msnm (tierra cálida/templada)',
+  },
+  {
+    names: ['papa', 'papa parda pastusa', 'papa comun', 'pastusa'],
+    binomial: 'solanum tuberosum',
+    display: 'papa',
+    min: 2400,
+    max: 3400,
+    range: '2400–3400 msnm (clima frío)',
+  },
+  {
+    names: ['lulo', 'naranjilla', 'chuva'],
+    binomial: 'solanum quitoense',
+    display: 'lulo / naranjilla / chuva',
+    min: 1200,
+    max: 2800,
+    range: '1200–2800 msnm (clima templado/frío)',
+  },
+  {
+    names: ['tomate de arbol', 'tomate de árbol', 'tamarillo', 'tomate de palo', 'tomate de monte', 'tomate cimarron', 'tomate cimarrón'],
+    binomial: 'solanum betaceum',
+    display: 'tomate de árbol',
+    min: 1200,
+    max: 3000,
+    range: '1200–3000 msnm (clima templado/frío)',
+  },
+  {
+    names: ['gulupa'],
+    binomial: 'passiflora edulis f. edulis',
+    display: 'gulupa',
+    min: 1600,
+    max: 2600,
+    range: '1600–2600 msnm (clima templado/frío)',
+  },
 ];
 
 /**
@@ -7166,10 +7537,10 @@ const HARD_PROMOTES_CROP_RE =
  * promoviendo → no hay nada que suprimir. Sobre texto normalizado.
  */
 const HARD_ALREADY_INVIABLE_RE =
-  /(no\s+es\s+viable|inviable|no\s+se\s+da\b|no\s+prosper|demasiad[oa]\s+(frio|fria|alt|caliente|calid[oa])|no\s+(la?\s+)?siembres|no\s+(es\s+)?recomendable\s+(sembrar|cultivar))/;
+  /(\bno\s+es\s+viable\b|inviable|\bno\s+se\s+da\b|\bno\s+prosper|\bdemasiad[oa]\s+(frio|fria|alt|caliente|calid[oa])\b|\bno\s+(la?\s+)?siembres\b|\bno\s+(es\s+)?recomendable\s+(sembrar|cultivar)\b)/;
 
 /** Marca idempotente del reemplazo de inviabilidad dura. */
-const HARD_ALTITUDE_MARKER = 'no es viable a esa altura';
+const HARD_ALTITUDE_MARKER = 'NO es viable a esa altura';
 
 /**
  * Extrae altitudes (msnm) de un texto SIN el piso de 800 m de `_extractAltitudes`
@@ -7208,12 +7579,21 @@ function _hardAltitudeReplacement(band, alt, demasiadoAlto) {
     ? `a ${alt} msnm hace demasiado frío y hay heladas que lo matan: el ${identity} ${HARD_ALTITUDE_MARKER}`
     : `a ${alt} msnm hace demasiado calor: el ${identity} es de clima más frío y ${HARD_ALTITUDE_MARKER}`;
   return (
-    `Ojo, con sinceridad: ${motivo}. Su rango viable está alrededor de ${band.range}. ` +
+    `Corrección importante: Ojo, con sinceridad: ${motivo}. Su rango viable está alrededor de ${band.range}. ` +
     'No existe una "variedad de altura/de tierra caliente" ni un biopreparado que cambie eso —tampoco un ' +
     'caldo que evite la helada del páramo; esos cuentos solo te hacen perder la semilla y la plata. ' +
     `Si quieres sembrar a ${alt} msnm, mejor escoge un cultivo que sí corresponda a esa altura, y con gusto te ` +
     'oriento cuáles se dan bien ahí.'
   );
+}
+
+function _bandNameHit(norm, name) {
+  const needle = _stripDiacritics(name);
+  if (!needle) return false;
+  if (/^[a-z0-9]+$/.test(needle) && needle.length <= 5) {
+    return new RegExp(`\\b${_escapeRegExpLiteral(needle)}\\b`).test(norm);
+  }
+  return norm.includes(needle);
 }
 
 /**
@@ -7278,7 +7658,7 @@ export function guardHardAltitudeViability(responseText, { userMessage = null } 
   }
 
   for (const band of HARD_ALTITUDE_BANDS) {
-    const nameHit = band.names.some((n) => norm.includes(_stripDiacritics(n)));
+    const nameHit = band.names.some((n) => _bandNameHit(norm, n));
     if (!nameHit && !norm.includes(band.binomial)) continue;
     for (const alt of altitudes) {
       const demasiadoAlto = alt > band.max;
@@ -7565,7 +7945,7 @@ const WARM_COLD_PROMOTES_RE =
  * calor", "inviable" → no re-suprimimos. Anti-FP central. Sobre normalizado.
  */
 const WARM_COLD_ALREADY_FLAGS_RE =
-  /(no\s+se\s+da\b|no\s+prosper|inviable|no\s+es\s+viable|necesita\s+(un\s+)?clima\s+(frio|de\s+altura|fresco)|es\s+de\s+(clima\s+)?(frio|tierra\s+fria|altura)|no\s+(aguanta|resiste|soporta)\s+(el\s+)?calor|demasiado\s+(calor|calid)|no\s+es\s+(el\s+)?clima\s+(adecuad|para))/;
+  /(\bno\s+se\s+da\b|\bno\s+prosper|inviable|\bno\s+es\s+viable\b|necesita\s+(un\s+)?clima\s+(frio|de\s+altura|fresco)|es\s+de\s+(clima\s+)?(frio|tierra\s+fria|altura)|\bno\s+(aguanta|resiste|soporta)\s+(el\s+)?calor\b|demasiado\s+(calor|calid)|\bno\s+es\s+(el\s+)?clima\s+(adecuad|para)\b)/;
 
 /**
  * Construye la corrección de inviabilidad por clima para un cultivo de frío en
@@ -7643,6 +8023,183 @@ export function guardWarmLowlandColdCrop(responseText, { userMessage = null } = 
     text: _warmColdCropReplacement(coldCrop, climaUsuario),
     modified: true,
     reason: `cultivo_frio_en_tierra_caliente: ${coldCrop.names[0]}${warmToponym ? ` (${warmToponym})` : ''}`,
+  };
+}
+
+// ── GUARD: cultivo cálido/templado promovido en páramo/frío textual ─────────
+
+const COLD_HIGHLAND_USER_RE =
+  /\b(paramo[s]?|subparamo[s]?|tierra\s+fria|clima\s+frio|zona\s+fria|frio\s+de\s+altura)\b/;
+
+const COLD_HIGHLAND_TOPONYMS = [
+  'bogota',
+  'tunja',
+  'zipaquira',
+  'sumapaz',
+  'duitama',
+  'sogamoso',
+  'fomeque',
+  'ventaquemada',
+];
+
+const COLD_HIGHLAND_WARM_CROP_MARKER = 'no va en ese piso';
+
+const COLD_HIGHLAND_PROMOTES_RE =
+  /(se\s+da\b|es\s+viable|opcion\s+viable|se\s+puede\s+(cultivar|sembrar|dar)|siembr\w*|sembr\w*|cultiv\w*|manej\w*|aguanta\b|resiste\b|adaptad[oa]\b|se\s+cultiva|produce\b|para\s+(la\s+)?mejor\s+cosecha|distancia\s+de\s+siembra|metros\s+entre\s+plantas)/;
+
+const COLD_HIGHLAND_ALREADY_FLAGS_RE =
+  /(\bno\s+se\s+da\b|\bno\s+prosper|inviable|\bno\s+es\s+viable\b|\bno\s+(aguanta|resiste|soporta)\s+(el\s+)?frio\b|\bno\s+es\s+(el\s+)?(clima|piso|la\s+altura|altura)\s+(adecuad|correct|apropiad|ideal)\b|\bno\s+corresponde\s+a\s+ese\s+(clima|piso|altura)\b|\bdemasiad[oa]\s+frio\b|\bdemasiado\s+fria\b)/;
+
+const COLD_HIGHLAND_CROP_MARKERS = [
+  {
+    names: ['cacao'],
+    display: 'cacao',
+    climate: 'tierra cálida',
+    binomial: 'theobroma cacao',
+  },
+  {
+    names: ['platano', 'plátano'],
+    display: 'plátano',
+    climate: 'tierra cálida o templada',
+    binomial: 'musa x paradisiaca',
+  },
+  {
+    names: ['banano', 'guineo'],
+    display: 'banano / guineo',
+    climate: 'tierra cálida o templada',
+    binomial: 'musa acuminata',
+  },
+  {
+    names: ['yuca', 'yuca dulce', 'yuca de comer'],
+    display: 'yuca dulce',
+    climate: 'tierra cálida o templada',
+    binomial: 'manihot esculenta',
+  },
+  {
+    names: ['mango'],
+    display: 'mango',
+    climate: 'tierra cálida',
+    binomial: 'mangifera indica',
+  },
+  {
+    names: ['papaya'],
+    display: 'papaya',
+    climate: 'tierra cálida o templada',
+    binomial: 'carica papaya',
+  },
+  {
+    names: ['arroz'],
+    display: 'arroz',
+    climate: 'tierra cálida o templada',
+    binomial: 'oryza sativa',
+  },
+  {
+    names: ['piña', 'pina'],
+    display: 'piña',
+    climate: 'tierra cálida',
+    binomial: 'ananas comosus',
+  },
+  {
+    names: ['chontaduro'],
+    display: 'chontaduro',
+    climate: 'tierra cálida',
+    binomial: 'bactris gasipaes',
+  },
+  {
+    names: ['palma'],
+    display: 'palma',
+    climate: 'tierra cálida',
+    binomial: 'bactris gasipaes',
+  },
+  {
+    names: ['maranon', 'marañón', 'merey'],
+    display: 'marañón',
+    climate: 'tierra cálida',
+    binomial: 'anacardium occidentale',
+  },
+  {
+    names: ['copoazu', 'copoazú', 'cupuacu', 'cupuaçu'],
+    display: 'copoazú',
+    climate: 'tierra cálida',
+    binomial: 'theobroma grandiflorum',
+  },
+  {
+    names: ['cafe', 'cafe arabica', 'cafe de altura', 'cafeto'],
+    display: 'café',
+    climate: 'tierra templada o fría, no de páramo',
+    binomial: 'coffea arabica',
+  },
+];
+
+function _coldHighlandContextFromText(userNorm) {
+  if (typeof userNorm !== 'string' || !userNorm) return null;
+  if (COLD_HIGHLAND_USER_RE.test(userNorm)) {
+    if (/\bparamo[s]?\b/.test(userNorm)) {
+      return { label: 'en el páramo', reasonSuffix: 'páramo', kind: 'paramo' };
+    }
+    return { label: 'en clima frío', reasonSuffix: 'clima frio', kind: 'frio' };
+  }
+  const toponym = COLD_HIGHLAND_TOPONYMS.find((t) => userNorm.includes(t)) || null;
+  if (!toponym) return null;
+  return { label: 'en clima frío', reasonSuffix: toponym, kind: 'toponym' };
+}
+
+function _coldHighlandWarmCropReplacement(entry, pisoLabel) {
+  const binom = entry.binomial ? ` (${_displayBinomial(entry.binomial)})` : '';
+  return (
+    `Ojo: ${entry.display}${binom} no va ${pisoLabel}; es un cultivo de ${entry.climate}. ` +
+    'Sembrarlo ahi es inviable.'
+  );
+}
+
+/**
+ * guardColdHighlandWarmCrop - espejo de guardWarmLowlandColdCrop. Detecta un
+ * cultivo cálido o templado promovido en un piso de páramo o frío descrito por
+ * palabra o toponimo, y reemplaza por una advertencia determinista.
+ *
+ * Firma propia (necesita userMessage) - se invoca aparte en applyOutputGuards.
+ *
+ * @param {string} responseText
+ * @param {{userMessage?: string|null}} [ctx]
+ * @returns {{text:string, modified:boolean, reason:string|null}}
+ */
+export function guardColdHighlandWarmCrop(responseText, { userMessage = null } = {}) {
+  if (typeof responseText !== 'string' || responseText.length === 0) {
+    return { text: responseText ?? '', modified: false, reason: null };
+  }
+  if (responseText.includes(COLD_HIGHLAND_WARM_CROP_MARKER)) {
+    return { text: responseText, modified: false, reason: null };
+  }
+
+  const userNorm = typeof userMessage === 'string' ? _stripDiacritics(userMessage) : '';
+  const coldContext = _coldHighlandContextFromText(userNorm);
+  if (!coldContext) {
+    return { text: responseText, modified: false, reason: null };
+  }
+
+  const norm = _stripDiacritics(responseText);
+  if (COLD_HIGHLAND_ALREADY_FLAGS_RE.test(norm)) {
+    return { text: responseText, modified: false, reason: null };
+  }
+  if (!COLD_HIGHLAND_PROMOTES_RE.test(norm)) {
+    return { text: responseText, modified: false, reason: null };
+  }
+
+  const crop = COLD_HIGHLAND_CROP_MARKERS.find((entry) =>
+    entry.names.some((name) => _bandNameHit(userNorm, name)),
+  ) || COLD_HIGHLAND_CROP_MARKERS.find((entry) => entry.names.some((name) => _bandNameHit(norm, name)));
+  if (!crop) {
+    return { text: responseText, modified: false, reason: null };
+  }
+  if (crop.display === 'café' && coldContext.kind === 'frio') {
+    return { text: responseText, modified: false, reason: null };
+  }
+
+  bumpGuardTelemetry('cold_highland_warm_crop');
+  return {
+    text: _coldHighlandWarmCropReplacement(crop, coldContext.label),
+    modified: true,
+    reason: `cultivo_calido_en_piso_frio: ${crop.display} (${coldContext.reasonSuffix})`,
   };
 }
 
@@ -7764,7 +8321,7 @@ const BINOMIAL_FALSE_POSITIVES = new Set([
 
 /**
  * ¿El texto contiene al menos un binomio latino?
- * @param {string} normText  texto sin diacríticos y en minúsculas
+ * @param {string} text  texto sin diacríticos y en minúsculas
  * @returns {string|null} el primer binomio encontrado, o null
  */
 function _extractLatinBinomial(text) {
@@ -9463,8 +10020,15 @@ const GUARD_CHAIN = [
  * @returns {{text:string, modified:boolean, reasons:string[]}}
  */
 
-const MAX_CONCISE_WORDS = 250;
-const MAX_CONCISE_WORDS_HARD = 400;
+// 2026-07-12 (operador: "se cortó a menos de la tercera parte"): los umbrales
+// viejos (250/400) MUTILABAN respuestas técnicas legítimas a 2-3 oraciones —
+// una respuesta agroecológica detallada (plagas de la fresa, plan de manejo) es
+// naturalmente 300-600 palabras y ES el valor del agente. Cortarla degrada
+// inteligencia (regla dura del operador). Subidos MUCHO: solo recorta verborrea
+// genuinamente desbocada, y aun así conserva bastantes oraciones (ver kept).
+// La rama de DEDUP (redundancia) se conserva — esa sí es útil sin degradar.
+const MAX_CONCISE_WORDS = 700;
+const MAX_CONCISE_WORDS_HARD = 1300;
 
 /**
  * guardConciseResponse — guard de CONCISIÓN (Item 7).
@@ -9486,7 +10050,11 @@ export function guardConciseResponse(responseText) {
   }
 
   const words = responseText.split(/\s+/).filter(Boolean);
-  if (words.length < MAX_CONCISE_WORDS) {
+  // Gate BAJO solo para poder correr el DEDUP (redundancia) en respuestas
+  // medianas; la truncación por LARGO usa umbrales altos (700/1300) más abajo,
+  // así una respuesta técnica de 200-700 palabras NO-redundante queda intacta.
+  const DEDUP_MIN_WORDS = 200;
+  if (words.length < DEDUP_MIN_WORDS) {
     return { text: responseText, modified: false, reason: null };
   }
 
@@ -9534,15 +10102,16 @@ export function guardConciseResponse(responseText) {
   let reason = '';
 
   if (words.length >= MAX_CONCISE_WORDS_HARD) {
-    // Hard limit: preámbulo de seguridad (si lo hay) + 2 oraciones del cuerpo.
-    const kept = [...sentences.slice(0, prefixCount), ...sentences.slice(prefixCount, prefixCount + 2)];
+    // Hard limit (>1300 palabras, verborrea real): preámbulo de seguridad + 6
+    // oraciones del cuerpo (antes 2 = stub que mutilaba el plan).
+    const kept = [...sentences.slice(0, prefixCount), ...sentences.slice(prefixCount, prefixCount + 6)];
     conciseText = `${kept.join(' ').trim()}\n\n¿Quieres que profundice en algo específico?`;
     reason = `guardConciseResponse:hard_limit (${words.length} palabras, max ${MAX_CONCISE_WORDS_HARD})`;
   } else if (hasRedundancy) {
     // Deduplicar: mantener primera mención de cada recomendación
     const seen = new Set();
     const deduped = sentences.filter(s => {
-      const key = s.trim().toLowerCase().slice(0, 60);
+      const key = /** @type {string} */ (/** @type {any} */ (s).trim().toLowerCase().slice(0, 60));
       if (seen.has(key)) return false;
       seen.add(key);
       return true;
@@ -9550,11 +10119,15 @@ export function guardConciseResponse(responseText) {
     conciseText = deduped.join(' ').trim();
     if (conciseText.length < 30) conciseText = responseText.slice(0, 500) + '...';
     reason = `guardConciseResponse:redundant_recommendation (${sentences.length} -> ${deduped.length} oraciones)`;
-  } else {
-    // Soft limit: preámbulo de seguridad (si lo hay) + 3 oraciones del cuerpo.
-    const kept = [...sentences.slice(0, prefixCount), ...sentences.slice(prefixCount, prefixCount + 3)];
+  } else if (words.length >= MAX_CONCISE_WORDS) {
+    // Soft limit (700-1300 palabras): preámbulo de seguridad + 10 oraciones del
+    // cuerpo (antes 3 = mutilaba respuestas técnicas legítimas).
+    const kept = [...sentences.slice(0, prefixCount), ...sentences.slice(prefixCount, prefixCount + 10)];
     conciseText = `${kept.join(' ').trim()}\n\n¿Quieres que profundice en algo específico?`;
     reason = `guardConciseResponse:verbose (${words.length} palabras, recomendado <${MAX_CONCISE_WORDS})`;
+  } else {
+    // 200-700 palabras, no-redundante: respuesta técnica legítima → NO tocar.
+    return { text: responseText, modified: false, reason: null };
   }
 
   bumpGuardTelemetry('concise');
@@ -10034,6 +10607,7 @@ export function applyOutputGuards(
     forecastTempMin = null,
     forecastTempMax = null,
     userMessage = null,
+    toolEvidence = null,
   } = {},
 ) {
   if (typeof responseText !== 'string' || responseText.length === 0) {
@@ -10054,7 +10628,7 @@ export function applyOutputGuards(
   // instrucciones, grafo), se reemplaza toda la respuesta antes de que otros
   // guards anexen contenido.
   const internals = stripInternalsLeak(text);
-  if (internals && internals.modified) {
+  if (internals.modified) {
     return {
       text: internals.text,
       modified: true,
@@ -10071,17 +10645,41 @@ export function applyOutputGuards(
   // redacción. Corre SIEMPRE (no gateado por entidades). Espejo aplicado-al-texto
   // de sanitizeToolingLeak del sidecar.
   const toolingLeak = guardToolingLeakRedaction(text);
-  if (toolingLeak && toolingLeak.modified) {
+  if (toolingLeak.modified) {
     text = toolingLeak.text;
     modified = true;
     if (toolingLeak.reason) reasons.push(toolingLeak.reason);
+  }
+
+  // Una pregunta cortada tiene precedencia sobre cualquier lectura del
+  // síntoma: no se puede inferir qué mezcla o acción iba a completar el usuario.
+  const earlyTruncated = guardTruncatedUserPrompt(text, { userMessage });
+  if (earlyTruncated && earlyTruncated.modified) {
+    return {
+      text: earlyTruncated.text,
+      modified: true,
+      reasons: earlyTruncated.reason ? [earlyTruncated.reason] : [],
+    };
+  }
+
+  // TRIAJE DE SINTOMAS OBSERVABLES: cuando el mecanismo del dano ya permite
+  // orientar una primera accion, responde antes que las guardas genericas de
+  // plagas. El reemplazo elimina contaminacion de otros cultivos y deja la foto
+  // como confirmacion posterior, no como excusa para evitar una hipotesis.
+  const observableTriage = guardObservableSymptomTriage(text, { userMessage, hadVision });
+  if (observableTriage && observableTriage.modified) {
+    return {
+      text: observableTriage.text,
+      modified: true,
+      reasons: observableTriage.reason ? [observableTriage.reason] : [],
+    };
   }
 
   // GUARD CROP-AGNOSTIC SAFETY: debe liderar ANTES que cualquier guard específico.
   // Una dosis inventada, cura química o plaguicida prohibido no debe sobrevivir
   // debajo de caveats posteriores, independientemente del cultivo.
   const cropAgnosticSafety = guardCropAgnosticSafetyTraps(text, { userMessage });
-  if (cropAgnosticSafety && cropAgnosticSafety.modified) {
+  if (cropAgnosticSafety.modified) {
     return {
       text: cropAgnosticSafety.text,
       modified: true,
@@ -10093,7 +10691,7 @@ export function applyOutputGuards(
   // Una dosis, cura química o asociación riesgosa de tomate no debe sobrevivir
   // debajo de caveats posteriores.
   const tomatoSafety = guardTomateSafetyTraps(text, { userMessage });
-  if (tomatoSafety && tomatoSafety.modified) {
+  if (tomatoSafety.modified) {
     return {
       text: tomatoSafety.text,
       modified: true,
@@ -10107,10 +10705,21 @@ export function applyOutputGuards(
   // otro guard sobre un texto que se va a reemplazar. Firma propia (necesita
   // userMessage), por eso va fuera de GUARD_CHAIN. No-op si la query es agro.
   const offDom = guardOffDomain(text, { userMessage });
-  if (offDom && offDom.modified) {
+  if (offDom.modified) {
     // Respuesta off-domain reemplazada: no corremos más guards sobre la
     // declinación (no hay cultivo/entidad que razonar).
     return { text: offDom.text, modified: true, reasons: offDom.reason ? [offDom.reason] : [] };
+  }
+
+  // P1 auditoría 41 especies: el rendimiento faltante es un SlotPendiente,
+  // nunca una invitación a completar cifras desde memoria del modelo.
+  const missingYield = guardMissingYield(text, { userMessage, toolEvidence, resolvedEntities: entities });
+  if (missingYield.modified) {
+    return {
+      text: missingYield.text,
+      modified: true,
+      reasons: missingYield.reason ? [missingYield.reason] : [],
+    };
   }
 
   // GUARD de visión PRIMERO: si la respuesta afirma un diagnóstico visual sin
@@ -10118,7 +10727,7 @@ export function applyOutputGuards(
   // texto que vamos a reemplazar entero. Firma propia (contexto de visión), por
   // eso va fuera de GUARD_CHAIN.
   const vis = guardVisionWithoutPhoto(text, { hadVision, visionConfidence });
-  if (vis && vis.modified) {
+  if (vis.modified) {
     text = vis.text;
     modified = true;
     if (vis.reason) reasons.push(vis.reason);
@@ -10129,15 +10738,15 @@ export function applyOutputGuards(
   // alimento u organismo benéfico inventado.
   if (!(vis && vis.modified)) {
     const trunc = guardTruncatedUserPrompt(text, { userMessage });
-    if (trunc && trunc.modified) {
+    if (trunc.modified) {
       return { text: trunc.text, modified: true, reasons: trunc.reason ? [trunc.reason] : [] };
     }
     const toxicFood = guardToxicResidueOnFood(text, { userMessage });
-    if (toxicFood && toxicFood.modified) {
+    if (toxicFood.modified) {
       return { text: toxicFood.text, modified: true, reasons: toxicFood.reason ? [toxicFood.reason] : [] };
     }
     const fakeBeneficial = guardRequestedFabricatedBeneficial(text, { userMessage });
-    if (fakeBeneficial && fakeBeneficial.modified) {
+    if (fakeBeneficial.modified) {
       return { text: fakeBeneficial.text, modified: true, reasons: fakeBeneficial.reason ? [fakeBeneficial.reason] : [] };
     }
   }
@@ -10153,7 +10762,7 @@ export function applyOutputGuards(
   // early-return, igual que off-domain y visión-sin-foto.
   if (!(vis && vis.modified)) {
     const dx = guardDiagnosisWithoutPhoto(text, { userMessage, hadVision });
-    if (dx && dx.modified) {
+    if (dx.modified) {
       return { text: dx.text, modified: true, reasons: dx.reason ? [dx.reason] : [] };
     }
   }
@@ -10168,13 +10777,13 @@ export function applyOutputGuards(
   // ya hubo un reemplazo de visión (texto distinto al original).
   if (!(vis && vis.modified)) {
     const fp = guardFalsePremise(text, { userMessage });
-    if (fp && fp.modified) {
+    if (fp.modified) {
       return { text: fp.text, modified: true, reasons: fp.reason ? [fp.reason] : [] };
     }
   }
 
   const wrongAuthority = guardWrongColombiaAuthority(text, { userMessage });
-  if (wrongAuthority && wrongAuthority.modified) {
+  if (wrongAuthority.modified) {
     return {
       text: wrongAuthority.text,
       modified: true,
@@ -10189,7 +10798,7 @@ export function applyOutputGuards(
   // es independiente de la intención de siembra/precio. Como REEMPLAZA el texto
   // entero (la recomendación ilegal es íntegramente dañina), early-return.
   const paramo = guardParamoNormativa(text);
-  if (paramo && paramo.modified) {
+  if (paramo.modified) {
     return {
       text: paramo.text,
       modified: true,
@@ -10223,7 +10832,7 @@ export function applyOutputGuards(
   // Es un guard de SIEMBRA/identidad → solo corre si la consulta no es de precio.
   if (runPlantingGuards && !(vis && vis.modified)) {
     const iv = guardInventedVariety(text, { userMessage });
-    if (iv && iv.modified) {
+    if (iv.modified) {
       return { text: iv.text, modified: true, reasons: iv.reason ? [iv.reason] : [] };
     }
   }
@@ -10238,7 +10847,7 @@ export function applyOutputGuards(
   // early-return. Guard de SIEMBRA/identidad.
   if (runPlantingGuards && !(vis && vis.modified)) {
     const ve = guardVarietyWithoutEvidence(text, { userMessage });
-    if (ve && ve.modified) {
+    if (ve.modified) {
       return { text: ve.text, modified: true, reasons: ve.reason ? [ve.reason] : [] };
     }
   }
@@ -10253,7 +10862,7 @@ export function applyOutputGuards(
   // premisa-falsa. Es un guard de SIEMBRA/viabilidad → solo si la consulta no es de precio.
   if (runPlantingGuards && !(vis && vis.modified)) {
     const hav = guardHardAltitudeViability(text, { userMessage });
-    if (hav && hav.modified) {
+    if (hav.modified) {
       return { text: hav.text, modified: true, reasons: hav.reason ? [hav.reason] : [] };
     }
   }
@@ -10267,8 +10876,21 @@ export function applyOutputGuards(
   // REEMPLAZA todo el cuerpo, early-return. Guard de SIEMBRA/viabilidad.
   if (runPlantingGuards && !(vis && vis.modified)) {
     const wcc = guardWarmLowlandColdCrop(text, { userMessage });
-    if (wcc && wcc.modified) {
+    if (wcc.modified) {
       return { text: wcc.text, modified: true, reasons: wcc.reason ? [wcc.reason] : [] };
+    }
+  }
+
+  // GUARD CULTIVO CÁLIDO/TEMPLADO en PÁRAMO/FRÍO textual: cuando el usuario
+  // describe un piso frío o un topónimo altoandino y la respuesta promueve cacao,
+  // plátano, banano, yuca, mango, papaya, arroz, piña, chontaduro, palma, marañón,
+  // copoazú o café como si fueran viables ahí, SUPRIME el cuerpo y lo REEMPLAZA por
+  // una advertencia determinista. Complementa a guardHardAltitudeViability, que
+  // exige altitud numérica.
+  if (runPlantingGuards && !(vis && vis.modified)) {
+    const chw = guardColdHighlandWarmCrop(text, { userMessage });
+    if (chw && chw.modified) {
+      return { text: chw.text, modified: true, reasons: chw.reason ? [chw.reason] : [] };
     }
   }
 
@@ -10283,7 +10905,7 @@ export function applyOutputGuards(
   // early-return. Guard de SIEMBRA/viabilidad → solo si la consulta no es de precio.
   if (runPlantingGuards && !(vis && vis.modified)) {
     const efp = guardEmbeddedAltitudeFalsePremise(text, { userMessage, resolvedEntities: entities });
-    if (efp && efp.modified) {
+    if (efp.modified) {
       return { text: efp.text, modified: true, reasons: efp.reason ? [efp.reason] : [] };
     }
   }
@@ -10295,7 +10917,7 @@ export function applyOutputGuards(
   // sobre el cuerpo que ya afirmó una especie no-grounded.
   if (runPlantingGuards && !(vis && vis.modified)) {
     const regional = guardUnidentifiedRegionalCrop(text, { userMessage });
-    if (regional && regional.modified) {
+    if (regional.modified) {
       return { text: regional.text, modified: true, reasons: regional.reason ? [regional.reason] : [] };
     }
   }
@@ -10316,7 +10938,7 @@ export function applyOutputGuards(
   // lo primero. Firma propia (userMessage). Corre SIEMPRE (consulta de manejo, no de
   // siembra). Idempotente.
   const caldoRes = guardClassicCaldoRecipe(text, { userMessage });
-  if (caldoRes && caldoRes.modified) {
+  if (caldoRes.modified) {
     text = caldoRes.text;
     modified = true;
     if (caldoRes.reason) reasons.push(caldoRes.reason);
@@ -10328,7 +10950,7 @@ export function applyOutputGuards(
     // corren siempre.
     if (!runPlantingGuards && PLANTING_GUARDS.has(guard)) continue;
     const res = guard(text, entities, fincaAltitud);
-    if (res && res.modified) {
+    if (res.modified) {
       text = res.text;
       modified = true;
       if (res.reason) reasons.push(res.reason);
@@ -10345,7 +10967,7 @@ export function applyOutputGuards(
       forecastTempMin,
       forecastTempMax,
     });
-    if (thermalRes && thermalRes.modified) {
+    if (thermalRes.modified) {
       text = thermalRes.text;
       modified = true;
       if (thermalRes.reason) reasons.push(thermalRes.reason);
@@ -10358,7 +10980,7 @@ export function applyOutputGuards(
     // Firma propia (userMessage para la altitud). Guard de SIEMBRA. Va tras el
     // térmico (que requiere pronóstico) como red sin pronóstico al caso límite.
     const altRiskRes = guardAltitudeRiskCaveat(text, { userMessage });
-    if (altRiskRes && altRiskRes.modified) {
+    if (altRiskRes.modified) {
       text = altRiskRes.text;
       modified = true;
       if (altRiskRes.reason) reasons.push(altRiskRes.reason);
@@ -10366,7 +10988,7 @@ export function applyOutputGuards(
   }
   // Guard de nombre inventado: firma propia (necesita el nombre del perfil).
   const nameRes = guardInventedName(text, { profileName });
-  if (nameRes && nameRes.modified) {
+  if (nameRes.modified) {
     text = nameRes.text;
     modified = true;
     if (nameRes.reason) reasons.push(nameRes.reason);
@@ -10376,7 +10998,7 @@ export function applyOutputGuards(
   // (no es guard de siembra) pero solo actúa si la respuesta/pregunta tocan un
   // fermento. Fail-safe: ante un claim de salud, redirige a la frase segura.
   const fermRes = guardFermentoHealthClaim(text, { userMessage });
-  if (fermRes && fermRes.modified) {
+  if (fermRes.modified) {
     text = fermRes.text;
     modified = true;
     if (fermRes.reason) reasons.push(fermRes.reason);
@@ -10389,7 +11011,7 @@ export function applyOutputGuards(
   // del LLM. Va DESPUÉS del guard de claims de salud (su redirect queda debajo de
   // la receta; el caveat de inocuidad lidera arriba).
   const fermRecipeRes = guardFermentoRecipeSafety(text, { userMessage });
-  if (fermRecipeRes && fermRecipeRes.modified) {
+  if (fermRecipeRes.modified) {
     text = fermRecipeRes.text;
     modified = true;
     if (fermRecipeRes.reason) reasons.push(fermRecipeRes.reason);
@@ -10402,7 +11024,7 @@ export function applyOutputGuards(
   // el bloque de redirección orgánica (si disparó) queda arriba y el recordatorio MIP
   // detrás —ambos suman, fuerzan la alternativa agroecológica completa. ADITIVO.
   const mipRes = guardPestIntegratedManagement(text, { userMessage });
-  if (mipRes && mipRes.modified) {
+  if (mipRes.modified) {
     text = mipRes.text;
     modified = true;
     if (mipRes.reason) reasons.push(mipRes.reason);
@@ -10414,7 +11036,7 @@ export function applyOutputGuards(
   // combustible. Fail-safe: ADVIERTE que no se recomienda para restauración (no
   // la borra). Determinístico (lista hardcodeada), no depende del grounding.
   const reforestRes = guardReforestacionInvasora(text, { userMessage });
-  if (reforestRes && reforestRes.modified) {
+  if (reforestRes.modified) {
     text = reforestRes.text;
     modified = true;
     if (reforestRes.reason) reasons.push(reforestRes.reason);
@@ -10427,7 +11049,7 @@ export function applyOutputGuards(
   // que su nota quede después de cualquier advertencia de invasora. Determinístico
   // (lista hardcodeada), no depende del grounding.
   const reforestNativasRes = guardReforestacionNativasRol(text, { userMessage });
-  if (reforestNativasRes && reforestNativasRes.modified) {
+  if (reforestNativasRes.modified) {
     text = reforestNativasRes.text;
     modified = true;
     if (reforestNativasRes.reason) reasons.push(reforestNativasRes.reason);
@@ -10440,7 +11062,7 @@ export function applyOutputGuards(
   // aplicar por separado). Va antes de la marca inventada y de la ConfusionWarning;
   // como reemplaza todo el cuerpo, lo que sobreviva no contendrá la mezcla peligrosa.
   const mixRes = guardIncompatibleBiopreparadoMix(text, { userMessage });
-  if (mixRes && mixRes.modified) {
+  if (mixRes.modified) {
     text = mixRes.text;
     modified = true;
     if (mixRes.reason) reasons.push(mixRes.reason);
@@ -10453,7 +11075,7 @@ export function applyOutputGuards(
   // verdad de seguridad (no es comestible + por qué + redirección). Va tras la
   // mezcla incompatible y antes de la marca inventada / ConfusionWarning.
   const toxPrepRes = guardToxicFoodPreparation(text);
-  if (toxPrepRes && toxPrepRes.modified) {
+  if (toxPrepRes.modified) {
     text = toxPrepRes.text;
     modified = true;
     if (toxPrepRes.reason) reasons.push(toxPrepRes.reason);
@@ -10465,7 +11087,7 @@ export function applyOutputGuards(
   // (yuca brava), neutraliza esas frases y antepone el aviso con la molécula + procesar.
   // Va tras la preparación de tóxicos no-comestibles y antes de la marca inventada.
   const rawToxFoodRes = guardToxicRawFoodConsumption(text, resolvedEntities);
-  if (rawToxFoodRes && rawToxFoodRes.modified) {
+  if (rawToxFoodRes.modified) {
     text = rawToxFoodRes.text;
     modified = true;
     if (rawToxFoodRes.reason) reasons.push(rawToxFoodRes.reason);
@@ -10477,7 +11099,7 @@ export function applyOutputGuards(
   // segura (diluir, nunca puro, fitotoxicidad). Va tras los guards de tóxicos y antes
   // de la marca inventada. Idempotente.
   const pureFoliarRes = guardPureFoliarBiopreparado(text, { userMessage });
-  if (pureFoliarRes && pureFoliarRes.modified) {
+  if (pureFoliarRes.modified) {
     text = pureFoliarRes.text;
     modified = true;
     if (pureFoliarRes.reason) reasons.push(pureFoliarRes.reason);
@@ -10490,10 +11112,21 @@ export function applyOutputGuards(
   // antes de la superficie de ConfusionWarning, para que el prefijo tóxico de esta
   // última (si dispara) siga liderando la respuesta.
   const brandRes = guardInventedBrand(text);
-  if (brandRes && brandRes.modified) {
+  if (brandRes.modified) {
     text = brandRes.text;
     modified = true;
     if (brandRes.reason) reasons.push(brandRes.reason);
+  }
+  // Guard SAFETY de CONTACTO INSTITUCIONAL HALLUCINADO: si el texto afirma un
+  // teléfono, correo o dirección concreta de una entidad como ICA, Agrosavia,
+  // UMATA, alcaldía o secretaría, lo cambia por una remisión al canal oficial
+  // genérico. Va antes del guard de contacto inventado para capturar el caso
+  // específico con una respuesta más útil. Idempotente.
+  const hallucinatedContactRes = guardHallucinatedContact(text, { userMessage });
+  if (hallucinatedContactRes && hallucinatedContactRes.modified) {
+    text = hallucinatedContactRes.text;
+    modified = true;
+    if (hallucinatedContactRes.reason) reasons.push(hallucinatedContactRes.reason);
   }
   // Guard SAFETY de CONTACTO INVENTADO (teléfonos, correos, URLs, decretos):
   // firma propia (solo el texto). Corre SIEMPRE (no es de siembra). SUPPRESS-AND-REPLACE:
@@ -10524,7 +11157,7 @@ export function applyOutputGuards(
   // verificada → ICA/Agrosavia/UMATA/CAR). Análogo institucional de la marca y el
   // contacto inventados: va justo tras ellos. Idempotente.
   const institutionRes = guardFabricatedInstitution(text);
-  if (institutionRes && institutionRes.modified) {
+  if (institutionRes.modified) {
     text = institutionRes.text;
     modified = true;
     if (institutionRes.reason) reasons.push(institutionRes.reason);
@@ -10537,7 +11170,7 @@ export function applyOutputGuards(
   // producto-milagro; manejo sanitario + biopreparado real). Va tras la marca inventada
   // (que cubre marcas Título-Caso) — este cubre el genérico-milagro que aquella no atrapa.
   const disgRes = guardDisguisedGenericAgrochem(text);
-  if (disgRes && disgRes.modified) {
+  if (disgRes.modified) {
     text = disgRes.text;
     modified = true;
     if (disgRes.reason) reasons.push(disgRes.reason);
@@ -10546,7 +11179,7 @@ export function applyOutputGuards(
   // "biopreparado Mosca del Mediterráneo", etc.). Va tras marca/genérico
   // inventado y antes de caveats de benéficos: aquí el cuerpo completo es dañino.
   const fakeProductRes = guardInventedProductRecipe(text);
-  if (fakeProductRes && fakeProductRes.modified) {
+  if (fakeProductRes.modified) {
     text = fakeProductRes.text;
     modified = true;
     if (fakeProductRes.reason) reasons.push(fakeProductRes.reason);
@@ -10561,7 +11194,7 @@ export function applyOutputGuards(
   // milagro (que cubre el "sirve para todo" sin binomio) — este cubre el binomio inventado
   // que aquel no atrapa. Usa `entities` (grounding filtrado) ya calculado arriba.
   const extractRes = guardInventedBotanicalExtract(text, entities);
-  if (extractRes && extractRes.modified) {
+  if (extractRes.modified) {
     text = extractRes.text;
     modified = true;
     if (extractRes.reason) reasons.push(extractRes.reason);
@@ -10585,7 +11218,7 @@ export function applyOutputGuards(
   // catálogo. Va tras los aditivos y antes de la superficie de ConfusionWarning,
   // para que el prefijo tóxico de esta última (si dispara) siga liderando.
   const benefRes = guardFabricatedBeneficialBinomial(text, resolvedEntities);
-  if (benefRes && benefRes.modified) {
+  if (benefRes.modified) {
     text = benefRes.text;
     modified = true;
     if (benefRes.reason) reasons.push(benefRes.reason);
@@ -10599,7 +11232,7 @@ export function applyOutputGuards(
   // páramo, puede ofrecer la especie REAL en su lugar. Si corre primero el genérico,
   // el paréntesis ya no existe y este guard no tiene nada que corregir.
   const paramoNativesRes = guardFabricatedParamoNatives(text, resolvedEntities);
-  if (paramoNativesRes && paramoNativesRes.modified) {
+  if (paramoNativesRes.modified) {
     text = paramoNativesRes.text;
     modified = true;
     if (paramoNativesRes.reason) reasons.push(paramoNativesRes.reason);
@@ -10615,7 +11248,7 @@ export function applyOutputGuards(
   // antes de la superficie de ConfusionWarning, para que su prefijo tóxico siga
   // liderando. Conservador: sin grounding no actúa.
   const invBinRes = guardInventedBinomialOutOfGrounding(text, resolvedEntities);
-  if (invBinRes && invBinRes.modified) {
+  if (invBinRes.modified) {
     text = invBinRes.text;
     modified = true;
     if (invBinRes.reason) reasons.push(invBinRes.reason);
@@ -10634,7 +11267,7 @@ export function applyOutputGuards(
         .filter(Boolean)
     );
     const unverifiedGuard = guardUnverifiedTermBinomial(text, { userMessage, resolvedMentions });
-    if (unverifiedGuard && unverifiedGuard.modified) {
+    if (unverifiedGuard.modified) {
       text = unverifiedGuard.text;
       modified = true;
       if (unverifiedGuard.reason) reasons.push(unverifiedGuard.reason);
@@ -10650,7 +11283,7 @@ export function applyOutputGuards(
   // `resolvedEntities` crudo (no `entities` filtrado) porque la CW vive en la
   // entidad tal como la resolvió el sidecar.
   const cwRes = guardSurfaceConfusionWarning(text, resolvedEntities);
-  if (cwRes && cwRes.modified) {
+  if (cwRes.modified) {
     text = cwRes.text;
     modified = true;
     if (cwRes.reason) reasons.push(cwRes.reason);
@@ -10664,7 +11297,7 @@ export function applyOutputGuards(
   // no quede sepultada. Espejo aplicado-al-texto de detectBurnEndorsement del
   // sidecar (el PWA solo lo usaba para la badge; aquí sí reescribe guarded.text).
   const burnRes = guardBurnEndorsementCorrection(text);
-  if (burnRes && burnRes.modified) {
+  if (burnRes.modified) {
     text = burnRes.text;
     modified = true;
     if (burnRes.reason) reasons.push(burnRes.reason);
@@ -10678,7 +11311,7 @@ export function applyOutputGuards(
   //   2. Si > 200 palabras y detecta repetición del mismo consejo,
   //      deduplica (deja la primera mención).
   const conciseRes = guardConciseResponse(text);
-  if (conciseRes && conciseRes.modified) {
+  if (conciseRes.modified) {
     text = conciseRes.text;
     modified = true;
     if (conciseRes.reason) reasons.push(conciseRes.reason);
@@ -10689,7 +11322,7 @@ export function applyOutputGuards(
   // cualquier corrección de seguridad/legal. Firma propia (necesita forecastTempMin
   // y forecastTempMax del pronóstico). Corre SIEMPRE, no es guard de siembra.
   const climaRes = guardClimaConsejo(text, { forecastTempMin, forecastTempMax });
-  if (climaRes && climaRes.modified) {
+  if (climaRes.modified) {
     text = climaRes.text;
     modified = true;
     if (climaRes.reason) reasons.push(climaRes.reason);

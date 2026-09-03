@@ -21,7 +21,7 @@
  * Todo offline: cero red en runtime. Sin nombres propios de personas.
  */
 
-import { CULTIVOS, ASOCIACIONES } from '../../services/milpaGameEngine';
+import { CULTIVOS } from '../../services/milpaGameEngine';
 export { OCUPACION_CULTIVO, SLOTS_POR_PARCELA } from '../../services/milpaGameEngine';
 
 /**
@@ -335,7 +335,7 @@ export const LOGROS = Object.freeze([
 
 /** Alias para retrocompatibilidad. */
 export const TRES_HERMANAS = CULTIVOS_INFO.filter(c =>
-  [CULTIVOS.MAIZ, CULTIVOS.FRIJOL, CULTIVOS.AHUYAMA].includes(c.id)
+  [CULTIVOS.MAIZ, CULTIVOS.FRIJOL, CULTIVOS.AHUYAMA].includes(/** @type {'maiz'|'frijol'|'ahuyama'} */ (c.id))
 );
 export const HERMANA_POR_ID = CULTIVO_POR_ID;
 export const CIFRAS_MILPA = CIFRAS_SISTEMAS.milpa;

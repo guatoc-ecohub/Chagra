@@ -143,7 +143,7 @@ function anonymizeIdentity(identity) {
  * @param {Object} [p.meta]        { session_id, turn_index, nlu_route, entities_grounded,
  *                                   guards_fired, grounded_status, latency_ms, model }
  */
-export function captureExchange({ userText, agentText, identity = {}, meta = {} } = {}) {
+export function captureExchange({ userText = '', agentText = '', identity = {}, meta = {} } = /** @type {any} */ ({})) {
   if (!isCaptureEnabled()) return;
   // Gate de consentimiento: por defecto exigido (privacy-first). En modo PILOTO
   // (VITE_CAPTURE_REQUIRE_CONSENT=false) se captura a todos los usuarios.

@@ -40,7 +40,7 @@ describe('llmTools — funciones de registry', () => {
         requiresGate: false,
       };
       
-      expect(() => registerTool(toolWithoutName)).toThrow('Tool must have name and handler');
+      expect(() => registerTool(/** @type {any} */ (toolWithoutName))).toThrow('Tool must have name and handler');
     });
 
     it('lanza error si la tool no tiene handler', () => {
@@ -50,7 +50,7 @@ describe('llmTools — funciones de registry', () => {
         requiresGate: false,
       };
       
-      expect(() => registerTool(toolWithoutHandler)).toThrow('Tool must have name and handler');
+      expect(() => registerTool(/** @type {any} */ (toolWithoutHandler))).toThrow('Tool must have name and handler');
     });
 
     it('registra una tool válida correctamente', () => {
@@ -87,12 +87,12 @@ describe('llmTools — funciones de registry', () => {
         requiresGate: true,
       };
       
-      registerTool(tool1);
-      expect(getTool('override_test').description).toBe('Primera versión');
+      registerTool(/** @type {any} */ (tool1));
+      expect(/** @type {any} */ (getTool('override_test')).description).toBe('Primera versión');
       
-      registerTool(tool2);
-      expect(getTool('override_test').description).toBe('Segunda versión');
-      expect(getTool('override_test').requiresGate).toBe(true);
+      registerTool(/** @type {any} */ (tool2));
+      expect(/** @type {any} */ (getTool('override_test')).description).toBe('Segunda versión');
+      expect(/** @type {any} */ (getTool('override_test')).requiresGate).toBe(true);
     });
   });
 
@@ -109,12 +109,12 @@ describe('llmTools — funciones de registry', () => {
         requiresGate: false,
       };
       
-      registerTool(tool);
+      registerTool(/** @type {any} */ (tool));
       const retrieved = getTool('lookup_test');
       
       expect(retrieved).not.toBeNull();
-      expect(retrieved.name).toBe('lookup_test');
-      expect(retrieved.description).toBe('Tool para lookup');
+      expect(/** @type {any} */ (retrieved).name).toBe('lookup_test');
+      expect(/** @type {any} */ (retrieved).description).toBe('Tool para lookup');
     });
 
     it('retorna las herramientas pre-registradas del módulo', () => {
@@ -206,12 +206,12 @@ describe('llmTools — funciones de registry', () => {
 
     it('maneja tools sin parameters correctamente', () => {
       // Registrar una tool sin parameters para testear edge case
-      registerTool({
+      registerTool(/** @type {any} */ ({
         name: 'tool_no_params',
         description: 'Tool sin parameters',
         handler: async () => ({}),
         requiresGate: false,
-      });
+      }));
       
       const tools = getToolsForLLM();
       const toolNoParams = tools.find((t) => t.function.name === 'tool_no_params');
@@ -224,7 +224,7 @@ describe('llmTools — funciones de registry', () => {
 
   describe('validación de schemas de herramientas pre-registradas', () => {
     it('crear_log tiene schema correcto con propiedades requeridas', () => {
-      const tool = getTool('crear_log');
+      const tool = /** @type {any} */ (getTool('crear_log'));
       
       expect(tool.parameters.type).toBe('object');
       expect(tool.parameters.properties.asset_id).toBeDefined();
@@ -238,7 +238,7 @@ describe('llmTools — funciones de registry', () => {
     });
 
     it('actualizar_planta tiene schema con asset_id requerido y campos opcionales', () => {
-      const tool = getTool('actualizar_planta');
+      const tool = /** @type {any} */ (getTool('actualizar_planta'));
       
       expect(tool.parameters.required).toContain('asset_id');
       expect(tool.parameters.properties.name).toBeDefined();
@@ -249,7 +249,7 @@ describe('llmTools — funciones de registry', () => {
     });
 
     it('agendar_riego tiene schema con asset_id y scheduled_time requeridos', () => {
-      const tool = getTool('agendar_riego');
+      const tool = /** @type {any} */ (getTool('agendar_riego'));
 
       expect(tool.parameters.required).toContain('asset_id');
       expect(tool.parameters.required).toContain('scheduled_time');
@@ -263,7 +263,7 @@ describe('llmTools — funciones de registry', () => {
     // debe acotar el disparo a intención EXPLÍCITA de agendar y advertir contra
     // diagnóstico/"plan".
     it('agendar_riego acota su descripción a intención explícita de agendar (no plan/enfermedad)', () => {
-      const tool = getTool('agendar_riego');
+      const tool = /** @type {any} */ (getTool('agendar_riego'));
       const desc = tool.description.toLowerCase();
       expect(desc).toContain('explícita');
       expect(desc).toContain('agénda');
@@ -272,7 +272,7 @@ describe('llmTools — funciones de registry', () => {
     });
 
     it('query_corpus_dr034 tiene schema con query requerido y species opcional', () => {
-      const tool = getTool('query_corpus_dr034');
+      const tool = /** @type {any} */ (getTool('query_corpus_dr034'));
       
       expect(tool.parameters.required).toContain('query');
       expect(tool.parameters.properties.species).toBeDefined();

@@ -206,7 +206,7 @@ export async function searchSpecies(query, opts = {}) {
 
   word.sort((a, b) => a._w - b._w);
   const ranked = [...aliasFirst, ...exact, ...word.map(({ _w, ...rest }) => rest)];
-  return ranked.slice(0, limit);
+  return /** @type {Array<{id:any, comun:any, cientifico:any, familia:any, match:'exact'|'alias'|'word'}>} */ (ranked.slice(0, limit));
 }
 
 /** Recolecta todos los nombres buscables de una especie del catálogo. */

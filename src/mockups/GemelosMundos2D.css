@@ -1,0 +1,402 @@
+/* ===========================================================================
+ * GemelosMundos2D — láminas 2D de PRIMERA CLASE (no "modo degradado").
+ *
+ * Cuando el equipo es de gama baja, el usuario pidió "menos movimiento" o el 3D
+ * no carga, cada mundo tiene un GEMELO 2D bello: una postal andina hand-inked
+ * (rubber-hose) que respira, con los MISMOS hotspots navegables que su diorama
+ * 3D. Estética: la voz cálida de Mi Finca Viva (Baloo 2) + línea de tinta gruesa
+ * + fondo de papel + relleno plano andino. Cero CDN, cero imágenes externas,
+ * cero filtros SVG pesados (esto TIENE que volar en un teléfono humilde).
+ *
+ * La FIRMA: la "chapa de esmalte" — un pin de tinta plantado en la escena que
+ * respira quieto y hace squash-bounce al tocarlo. Es el hotspot: la puerta.
+ *
+ * Todo el movimiento se apaga con prefers-reduced-motion y con .is-quieto.
+ * =========================================================================== */
+
+.g2 {
+  --g2-ink: #241a12;
+  --g2-paper: #f6efe0;
+  --g2-paper-2: #efe4cf;
+  --g2-line: #2a1d12;
+  --g2-a: #7a4a24; /* tinte del mundo (lo pisa cada gemelo) */
+  --g2-b: #efe0cf;
+
+  font-family: 'Baloo 2', 'Nunito', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  color: var(--g2-ink);
+  background:
+    radial-gradient(120% 80% at 50% -10%, color-mix(in srgb, var(--g2-a) 12%, var(--g2-paper)) 0%, var(--g2-paper) 60%),
+    var(--g2-paper);
+  min-height: 100%;
+  padding: clamp(14px, 4vw, 34px) clamp(12px, 4vw, 28px) clamp(28px, 6vw, 54px);
+  box-sizing: border-box;
+  overflow-x: hidden;
+}
+
+/* ── Cabecera ─────────────────────────────────────────────────────────── */
+.g2__head {
+  max-width: 640px;
+  margin: 0 auto clamp(14px, 3vw, 22px);
+  text-align: center;
+}
+.g2__kicker {
+  margin: 0 0 6px;
+  font-size: clamp(0.66rem, 2.4vw, 0.78rem);
+  font-weight: 700;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: color-mix(in srgb, var(--g2-a) 78%, var(--g2-ink));
+}
+.g2__title {
+  margin: 0;
+  font-size: clamp(1.9rem, 8vw, 3.1rem);
+  font-weight: 800;
+  line-height: 0.98;
+  letter-spacing: -0.01em;
+}
+.g2__title span {
+  display: inline-block;
+  color: var(--g2-a);
+  -webkit-text-stroke: 1.5px var(--g2-line);
+  paint-order: stroke fill;
+}
+.g2__lema {
+  margin: 10px auto 0;
+  max-width: 46ch;
+  font-family: Inter, system-ui, sans-serif;
+  font-size: clamp(0.9rem, 3.2vw, 1.02rem);
+  line-height: 1.5;
+  color: color-mix(in srgb, var(--g2-ink) 82%, transparent);
+}
+
+/* ── Lámina: marco + escena + capa de hotspots ───────────────────────────── */
+.g2__lamina {
+  position: relative;
+  max-width: 720px;
+  margin: 0 auto;
+  border-radius: 26px;
+  overflow: hidden;
+  background: var(--g2-b);
+  border: 3px solid var(--g2-line);
+  box-shadow:
+    0 2px 0 0 var(--g2-line),
+    0 16px 34px -18px color-mix(in srgb, var(--g2-line) 60%, transparent);
+}
+.g2__escena {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+/* Sello cosido del marco (puntada de costura del papel) */
+.g2__lamina::after {
+  content: '';
+  position: absolute;
+  inset: 8px;
+  border: 2px dashed color-mix(in srgb, var(--g2-line) 34%, transparent);
+  border-radius: 18px;
+  pointer-events: none;
+}
+
+/* ── Capa navegable: las chapas (hotspots) ───────────────────────────────── */
+.g2__capa {
+  position: absolute;
+  inset: 0;
+  pointer-events: none; /* la capa deja pasar; cada chapa reactiva su hit */
+}
+.g2__chapa {
+  --sz: clamp(38px, 10vw, 52px);
+  position: absolute;
+  left: var(--x);
+  top: var(--y);
+  transform: translate(-50%, -50%);
+  width: var(--sz);
+  height: var(--sz);
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+  pointer-events: auto;
+  -webkit-tap-highlight-color: transparent;
+  animation: g2-flota 4.5s ease-in-out infinite;
+  animation-delay: var(--d, 0s);
+}
+.g2__chapa-disco {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: radial-gradient(circle at 34% 30%, #fff9ee 0%, var(--g2-b) 46%, color-mix(in srgb, var(--g2-a) 40%, var(--g2-b)) 100%);
+  border: 3px solid var(--g2-line);
+  box-shadow: 0 3px 0 0 var(--g2-line);
+  display: grid;
+  place-items: center;
+  font-size: calc(var(--sz) * 0.44);
+  line-height: 1;
+  transition: transform 140ms cubic-bezier(0.34, 1.7, 0.5, 1);
+  transform-origin: 50% 90%;
+}
+.g2__chapa-brillo {
+  position: absolute;
+  top: 16%;
+  left: 22%;
+  width: 26%;
+  height: 20%;
+  border-radius: 50%;
+  background: #fffdf6;
+  opacity: 0.7;
+  pointer-events: none;
+}
+.g2__chapa-punta {
+  position: absolute;
+  left: 50%;
+  bottom: -7px;
+  width: 12px;
+  height: 12px;
+  transform: translateX(-50%) rotate(45deg);
+  background: color-mix(in srgb, var(--g2-a) 40%, var(--g2-b));
+  border-right: 3px solid var(--g2-line);
+  border-bottom: 3px solid var(--g2-line);
+  z-index: -1;
+}
+/* Cinta con el nombre — aparece al enfocar/tocar, siempre legible */
+.g2__chapa-cinta {
+  position: absolute;
+  left: 50%;
+  bottom: calc(var(--sz) * -0.02);
+  transform: translate(-50%, 100%) scale(0.9);
+  transform-origin: 50% 0;
+  white-space: nowrap;
+  background: var(--g2-line);
+  color: #fdf6e6;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  padding: 3px 9px;
+  border-radius: 999px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 120ms ease, transform 160ms cubic-bezier(0.34, 1.7, 0.5, 1);
+  box-shadow: 0 2px 0 0 color-mix(in srgb, var(--g2-line) 60%, #000);
+  z-index: 3;
+}
+.g2__chapa:hover .g2__chapa-disco,
+.g2__chapa:focus-visible .g2__chapa-disco {
+  transform: translateY(-4px) scale(1.12);
+}
+.g2__chapa:active .g2__chapa-disco {
+  transform: translateY(1px) scale(0.9, 1.08); /* squash rubber-hose */
+}
+.g2__chapa:hover .g2__chapa-cinta,
+.g2__chapa:focus-visible .g2__chapa-cinta,
+.g2__chapa.is-abierta .g2__chapa-cinta {
+  opacity: 1;
+  transform: translate(-50%, 100%) scale(1);
+}
+.g2__chapa:focus-visible {
+  outline: none;
+}
+.g2__chapa:focus-visible .g2__chapa-disco {
+  outline: 3px solid var(--g2-ink);
+  outline-offset: 3px;
+}
+.g2__chapa.is-abierta .g2__chapa-disco {
+  transform: translateY(-4px) scale(1.14);
+}
+
+/* ── Globo "a dónde lo lleva" (vitrina sin sesión) ───────────────────────── */
+.g2__globo {
+  position: absolute;
+  left: 50%;
+  bottom: 12px;
+  transform: translateX(-50%);
+  width: min(92%, 420px);
+  background: var(--g2-paper);
+  border: 3px solid var(--g2-line);
+  border-radius: 16px;
+  padding: 12px 14px;
+  box-shadow: 0 3px 0 0 var(--g2-line);
+  z-index: 5;
+  animation: g2-sube 200ms cubic-bezier(0.34, 1.56, 0.5, 1);
+}
+.g2__globo-emoji {
+  font-size: 1.3rem;
+}
+.g2__globo b {
+  display: block;
+  font-size: 1rem;
+  margin: 2px 0 3px;
+}
+.g2__globo p {
+  margin: 0;
+  font-family: Inter, system-ui, sans-serif;
+  font-size: 0.86rem;
+  line-height: 1.4;
+  color: color-mix(in srgb, var(--g2-ink) 82%, transparent);
+}
+.g2__globo-destino {
+  color: var(--g2-a);
+  font-weight: 600;
+}
+.g2__globo-cerrar {
+  position: absolute;
+  top: 6px;
+  right: 8px;
+  border: 0;
+  background: none;
+  font-size: 1.1rem;
+  line-height: 1;
+  cursor: pointer;
+  color: color-mix(in srgb, var(--g2-ink) 60%, transparent);
+}
+
+/* ── Pie de la lámina + guía de toque ───────────────────────────────────── */
+.g2__pie {
+  max-width: 720px;
+  margin: 10px auto 0;
+  text-align: center;
+  font-family: Inter, system-ui, sans-serif;
+  font-size: 0.82rem;
+  color: color-mix(in srgb, var(--g2-ink) 62%, transparent);
+}
+
+/* ── Leyenda: pieza por pieza ─────────────────────────────────────────────── */
+.g2__leyenda {
+  max-width: 720px;
+  margin: clamp(20px, 5vw, 34px) auto 0;
+}
+.g2__leyenda h2 {
+  font-size: clamp(1.2rem, 5vw, 1.6rem);
+  font-weight: 800;
+  margin: 0 0 14px;
+  text-align: center;
+}
+.g2__piezas {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 12px;
+}
+.g2__pieza {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 12px;
+  align-items: start;
+  background: var(--g2-paper);
+  border: 2.5px solid var(--g2-line);
+  border-radius: 16px;
+  padding: 13px 15px;
+  box-shadow: 0 3px 0 0 var(--g2-line);
+}
+.g2__pieza-emoji {
+  font-size: 1.5rem;
+  line-height: 1;
+  width: 40px;
+  height: 40px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--g2-a) 16%, var(--g2-paper));
+  border: 2.5px solid var(--g2-line);
+}
+.g2__pieza b {
+  font-size: 1rem;
+}
+.g2__pieza p {
+  margin: 3px 0 0;
+  font-family: Inter, system-ui, sans-serif;
+  font-size: 0.9rem;
+  line-height: 1.48;
+  color: color-mix(in srgb, var(--g2-ink) 84%, transparent);
+}
+.g2__cierre {
+  max-width: 58ch;
+  margin: clamp(16px, 4vw, 24px) auto 0;
+  text-align: center;
+  font-family: Inter, system-ui, sans-serif;
+  font-size: 0.94rem;
+  line-height: 1.55;
+  color: color-mix(in srgb, var(--g2-ink) 80%, transparent);
+}
+
+/* ── Galería (default export): las tres láminas juntas ───────────────────── */
+.g2gal {
+  display: grid;
+  gap: clamp(30px, 7vw, 56px);
+}
+.g2gal__intro {
+  max-width: 640px;
+  margin: clamp(10px, 3vw, 20px) auto 0;
+  padding: 0 16px;
+  text-align: center;
+}
+.g2gal__intro h1 {
+  font-family: 'Baloo 2', 'Nunito', system-ui, sans-serif;
+  font-size: clamp(1.8rem, 7vw, 2.7rem);
+  font-weight: 800;
+  margin: 0 0 8px;
+}
+.g2gal__intro p {
+  font-family: Inter, system-ui, sans-serif;
+  font-size: clamp(0.92rem, 3.2vw, 1.04rem);
+  line-height: 1.55;
+  color: #4b524c;
+  margin: 0;
+}
+
+/* ── Respiración de la escena (barata, GPU) ─────────────────────────────── */
+@keyframes g2-flota {
+  0%, 100% { transform: translate(-50%, -50%); }
+  50% { transform: translate(-50%, calc(-50% - 4px)); }
+}
+@keyframes g2-sube {
+  from { opacity: 0; transform: translate(-50%, 8px); }
+  to { opacity: 1; transform: translate(-50%, 0); }
+}
+.g2-sol { transform-box: fill-box; transform-origin: center; animation: g2-latir 5s ease-in-out infinite; }
+.g2-nube { animation: g2-derivar 14s ease-in-out infinite; }
+.g2-nube-2 { animation: g2-derivar 18s ease-in-out infinite reverse; }
+.g2-hoja { transform-box: fill-box; transform-origin: 50% 100%; animation: g2-mecer 4.5s ease-in-out infinite; }
+.g2-agua { animation: g2-fluir 3.4s ease-in-out infinite; }
+.g2-pez { transform-box: fill-box; transform-origin: center; animation: g2-nadar 5.5s ease-in-out infinite; }
+.g2-bicho { transform-box: fill-box; transform-origin: center; animation: g2-brincar 3.8s ease-in-out infinite; }
+@keyframes g2-latir { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05); } }
+@keyframes g2-derivar { 0%, 100% { transform: translateX(0); } 50% { transform: translateX(14px); } }
+@keyframes g2-mecer { 0%, 100% { transform: rotate(-2.5deg); } 50% { transform: rotate(2.5deg); } }
+@keyframes g2-fluir { 0%, 100% { opacity: 0.72; } 50% { opacity: 1; } }
+@keyframes g2-nadar { 0%, 100% { transform: translateX(0) scaleX(1); } 50% { transform: translateX(10px) scaleX(-1); } }
+@keyframes g2-brincar { 0%, 100% { transform: translateY(0) rotate(0); } 50% { transform: translateY(-5px) rotate(8deg); } }
+
+/* ── Menos movimiento: OS o toggle de la app ────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  .g2__chapa,
+  .g2-sol, .g2-nube, .g2-nube-2, .g2-hoja, .g2-agua, .g2-pez, .g2-bicho,
+  .g2__globo {
+    animation: none !important;
+  }
+}
+.g2.is-quieto .g2__chapa,
+.g2.is-quieto .g2-sol,
+.g2.is-quieto .g2-nube,
+.g2.is-quieto .g2-nube-2,
+.g2.is-quieto .g2-hoja,
+.g2.is-quieto .g2-agua,
+.g2.is-quieto .g2-pez,
+.g2.is-quieto .g2-bicho,
+.g2.is-quieto .g2__globo {
+  animation: none !important;
+}
+
+/* ── Papel oscuro (respeta el tema del visor) ───────────────────────────── */
+@media (prefers-color-scheme: dark) {
+  .g2 {
+    --g2-ink: #f4ead3;
+    --g2-paper: #241f1a;
+    --g2-paper-2: #2c2620;
+    --g2-line: #120c07;
+  }
+  .g2gal__intro p { color: #cdbfa4; }
+}
+
+@media (min-width: 560px) {
+  .g2__piezas { grid-template-columns: 1fr 1fr; }
+}

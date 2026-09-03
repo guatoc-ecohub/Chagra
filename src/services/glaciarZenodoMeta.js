@@ -84,6 +84,7 @@ export function buildZenodoMetadata(reportes, options = {}) {
       // Dublin Core básicos (mapeados automáticamente por Zenodo)
       language: 'es',
       version: datasetVersion(reportesArray),
+      // @ts-ignore doi is an optional Zenodo metadata field
       doi: opts.doi || undefined, // Si ya se tiene DOI reservado, incluirlo
     },
   };

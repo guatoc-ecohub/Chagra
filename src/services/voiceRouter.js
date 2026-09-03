@@ -23,7 +23,7 @@
 import { streamOllama } from './ollamaStream';
 import { parseJsonTolerant } from '../utils/parseJsonTolerant';
 import { ENV } from '../config/env';
-import { classifyAndExtractLocal, INTENTS } from './voiceFieldExtractor';
+import { classifyAndExtractLocal, INTENTS, parseRelativeTime } from './voiceFieldExtractor';
 
 const OLLAMA_CHAT_URL = '/api/ollama/api/chat';
 const TIMEOUT_MS = 45000;
@@ -51,6 +51,7 @@ Schema EXACTO:
 {
   "intent": "<una de las 7>",
   "especie": "<nombre común tal como lo dijo, o ''>",
+  "variedad": "<cultivar/variedad si lo dijo (cherry, chonto, criolla, pastusa...) o ''>",
   "altura_m": <número o null>,
   "ancho_m": <número o null>,
   "cantidad": <número o null>,
@@ -59,22 +60,33 @@ Schema EXACTO:
   "sintomas": ["<frase corta>"],
   "insumo": "<producto aplicado o ''>",
   "labores": ["<poda|deshierbe|...>"],
-  "lugar": "<lugar tal como lo dijo o ''>",
-  "tiempo": "<hoy|ayer|hace N dias|esta mañana|ahora|''>"
+  "lugar": "<lugar/zona tal como lo dijo (surco, era, lote, cama, huerta...) o ''>",
+  "tiempo": "<hoy|ayer|hace N dias|hace N semanas|hace N meses|hace N años|el mes pasado|la semana pasada|esta mañana|ahora|''>"
 }
 
 Reglas:
 - Numerales en palabra a número: "dos"=2, "veinte"=20, "cincuenta"=50.
 - NO inventes la especie ni su nombre científico: copia el nombre común literal.
 - Si un campo no aplica, usa null (números) o '' / [] (texto/listas).
+- Tiempo relativo: CONSERVA la unidad ("hace 3 meses", "la semana pasada"); NO la conviertas a días.
+- Copia el lugar/zona LITERAL ("en este surco" → "surco"); no inventes zonas ni GPS.
 - Devuelve SOLO el objeto JSON.`;
 
 /** Construye un ejemplo few-shot del durazno (ancla la salida). */
 const FEW_SHOT_USER = 'aquí tengo un durazno que tiene como dos metros de alto y está floriado';
 const FEW_SHOT_ASSISTANT = JSON.stringify({
-  intent: 'registrar_planta', especie: 'durazno', altura_m: 2, ancho_m: null,
-  cantidad: null, unidad: '', fenologia: 'floración', sintomas: [], insumo: '',
-  labores: [], lugar: 'aquí', tiempo: '',
+  intent: 'registrar_planta', especie: 'durazno', variedad: '', altura_m: 2,
+  ancho_m: null, cantidad: null, unidad: '', fenologia: 'floración', sintomas: [],
+  insumo: '', labores: [], lugar: 'aquí', tiempo: '',
+});
+
+/** Segundo few-shot: siembra rica (cantidad + variedad + zona + tiempo en meses). */
+const FEW_SHOT_USER_2 = 'sembré 20 tomate cherry aquí en este surco hace 3 meses, ya están produciendo';
+const FEW_SHOT_ASSISTANT_2 = JSON.stringify({
+  intent: 'registrar_siembra', especie: 'tomate cherry', variedad: 'cherry',
+  altura_m: null, ancho_m: null, cantidad: 20, unidad: 'matas',
+  fenologia: 'producción', sintomas: [], insumo: '', labores: [],
+  lugar: 'surco', tiempo: 'hace 3 meses',
 });
 
 const num = (v) => (typeof v === 'number' && Number.isFinite(v) ? v : null);
@@ -85,7 +97,7 @@ const str = (v) => (typeof v === 'string' ? v.trim() : '');
  * Llama al NLU del sidecar y devuelve el objeto parseado, o null si falla
  * (offline, timeout, JSON inválido). Nunca lanza.
  */
-async function callNlu(text, { onToken } = {}) {
+async function callNlu(text, { onToken } = /** @type {any} */ ({})) {
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), TIMEOUT_MS);
   try {
@@ -97,6 +109,8 @@ async function callNlu(text, { onToken } = {}) {
           { role: 'system', content: SYSTEM_PROMPT },
           { role: 'user', content: FEW_SHOT_USER },
           { role: 'assistant', content: FEW_SHOT_ASSISTANT },
+          { role: 'user', content: FEW_SHOT_USER_2 },
+          { role: 'assistant', content: FEW_SHOT_ASSISTANT_2 },
           { role: 'user', content: text },
         ],
         options: { temperature: TEMPERATURE, num_predict: 512 },
@@ -119,7 +133,7 @@ async function callNlu(text, { onToken } = {}) {
  * La especie queda intacta (catálogo manda); el LLM solo aporta hint + rellena
  * huecos.
  */
-function mergeNlu(base, nlu) {
+function mergeNlu(base, nlu, now = Date.now()) {
   if (!nlu) return base;
   const merged = { ...base, source: 'sidecar' };
 
@@ -148,6 +162,29 @@ function mergeNlu(base, nlu) {
   // editable, jamás reemplaza el slug groundeado.
   merged.speciesHint = str(nlu.especie) || null;
 
+  // Variedad: la base determinística manda; el LLM rellena si la base no la sacó.
+  merged.variedad = base.variedad || str(nlu.variedad) || null;
+
+  // Lugar/zona: si el on-device no capturó zona nombrada, adopta la del LLM
+  // (editable en el confirm; nunca fuerza GPS por su cuenta).
+  merged.position = { ...base.position };
+  if (!str(base.position && base.position.raw) && str(nlu.lugar)) {
+    merged.position.raw = str(nlu.lugar);
+  }
+
+  // Tiempo: si el on-device quedó en "hoy" (sin señal) y el LLM dedujo un
+  // tiempo relativo, se funde con la MISMA aritmética (parseRelativeTime) y se
+  // recalcula el timestamp contra el `now` de la clasificación. El on-device
+  // manda si YA sacó una fecha (no la pisa el LLM).
+  const baseHasTime = !!(base.time && (base.time.raw || base.time.offsetDays));
+  if (!baseHasTime && str(nlu.tiempo)) {
+    const parsed = parseRelativeTime(nlu.tiempo);
+    if (parsed.raw || parsed.offsetDays) {
+      merged.time = parsed;
+      merged.timestampMs = now + parsed.offsetDays * 86400000;
+    }
+  }
+
   return merged;
 }
 
@@ -170,7 +207,7 @@ export async function classifyAndExtract(text, opts = {}) {
   if (opts.preferLocal || !online) return base;
 
   const nlu = await callNlu(text, { onToken: opts.onToken });
-  return mergeNlu(base, nlu);
+  return mergeNlu(base, nlu, now);
 }
 
 export default classifyAndExtract;

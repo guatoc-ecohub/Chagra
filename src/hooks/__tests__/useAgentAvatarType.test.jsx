@@ -14,19 +14,31 @@ describe('useAgentAvatarType', () => {
   });
 
   it('lee preferencia guardada en localStorage', () => {
-    localStorage.setItem('chagra:agent-avatar-type', 'maiz');
+    localStorage.setItem('chagra:agent-avatar-type', 'jaguar');
     const { result } = renderHook(() => useAgentAvatarType());
     const [type] = result.current;
-    expect(type).toBe('maiz');
+    expect(type).toBe('jaguar');
   });
 
   it('permite cambiar tipo valido', () => {
     const { result } = renderHook(() => useAgentAvatarType());
     const [, updateType] = result.current;
-    act(() => { updateType('maiz'); });
+    act(() => { updateType('jaguar'); });
     const [type] = result.current;
-    expect(type).toBe('maiz');
-    expect(localStorage.getItem('chagra:agent-avatar-type')).toBe('maiz');
+    expect(type).toBe('jaguar');
+    expect(localStorage.getItem('chagra:agent-avatar-type')).toBe('jaguar');
+  });
+
+  it('maiz se retiró del roster (2026-08-14): lee/escribe y siempre migra a angelita', () => {
+    localStorage.setItem('chagra:agent-avatar-type', 'maiz');
+    const { result } = renderHook(() => useAgentAvatarType());
+    const [type, updateType] = result.current;
+    expect(type).toBe(DEFAULT_AVATAR_TYPE);
+
+    act(() => { updateType('maiz'); });
+    // updateType rechaza 'maiz' porque ya no está en AVATAR_TYPES — el tipo
+    // se queda en el default, no se corrompe el storage.
+    expect(result.current[0]).toBe(DEFAULT_AVATAR_TYPE);
   });
 
   it('ignora tipo invalido', () => {

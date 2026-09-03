@@ -8,8 +8,10 @@
  * abeja VUELA hasta el lugar: el mismo "entrar al mundo" del 3D, dibujado.
  * "Wow" 3D se pierde; el PROPÓSITO no.
  */
-import { MUNDOS_VALLE, MUNDO_VALLE_BY_ID, COSA_DEL_DIA, CLIMAS } from './valleData';
+import { MUNDOS_VALLE, indexarMundosValle, COSA_DEL_DIA, CLIMAS } from './valleData';
 import { AbejaAngelita } from '../../visual/creatures/AbejaAngelita.jsx';
+import useAngelitaStore from '../../store/useAngelitaStore';
+import BurbujaAngelita from '../../visual/agente/BurbujaAngelita';
 
 /* Proyección isométrica plana de las coordenadas del valle a la lámina SVG. */
 function iso(x, z) {
@@ -24,6 +26,35 @@ function pct(x, z) {
   return { left: (cx / 400) * 100, top: (cy / 340) * 100 };
 }
 
+/* Anti-corte de borde (BUG-VALLE-390): la proyección isométrica de arriba
+ * puede caer bien afuera de [0,400]x[0,340] para lugares en los bordes de la
+ * ladera (la milpa a la izquierda, el mercado abajo…) — en un equipo angosto
+ * (390px) ese % negativo o >100%, sumado al `translate(-50%,-50%)` que
+ * centra el chip sobre su punto, dejaba las primeras letras del rótulo
+ * fuera de cuadro («semillas» en vez de «Cultivos y semillas»). `clampPct`
+ * mezcla unidades (px fijos de aire + % del contenedor) para que el chip
+ * SIEMPRE quede entero dentro de la pantalla, sea cual sea su ancho: no se
+ * reubica el lugar en el valle, solo dónde CAE su etiqueta en pantalla. */
+function clampPct(pct, mitadPx) {
+  return `clamp(${mitadPx}px, ${pct}%, calc(100% - ${mitadPx}px))`;
+}
+
+/* Ancho/alto aproximados (px) de un chip 2D según su texto — el emoji vive
+ * ARRIBA del nombre (columna), así que el ancho lo manda el texto, no la
+ * suma de los dos. Basta con acercarse: solo evita el corte de borde, no
+ * exige exactitud de layout. */
+function mitadChip2D(titulo) {
+  return Math.max(34, Math.round((titulo.length * 6.6) / 2 + 14));
+}
+
+/* Medio-alto (px) del chip más alto medido (emoji+nombre en 2 líneas, p. ej.
+ * "El páramo"): 88px de alto real ⇒ 44px de mitad. Antes esta constante
+ * estaba en 28px (la mitad del chip de UNA línea) y el chip de "El clima"
+ * — con el mismo alto de una línea pero un `top` natural apenas por encima
+ * del piso de 28px — seguía asomando ~5px por el borde SUPERIOR. Usar el
+ * caso más alto como piso cubre a todos, de una sola línea o dos. */
+const MEDIO_ALTO_CHIP2D = 44;
+
 export default function Valle2DFallback({
   clima,
   focoId,
@@ -32,20 +63,50 @@ export default function Valle2DFallback({
   reducedMotion = false,
   onEntrar,
   onAlerta,
+  webglBloqueado = false,
+  /* LOS LUGARES DE SU VALLE (valle dinámico): la lista sembrada del perfil de
+     la finca, que el host (EntradaValle3D) construye con
+     construirMundosValle(perfil). Default = el valle completo de siempre: sin
+     perfil, esta lámina se ve exactamente como antes. */
+  mundos = MUNDOS_VALLE,
 }) {
   const c = CLIMAS[clima];
-  const ancla = MUNDOS_VALLE.find((m) => m.id === COSA_DEL_DIA.anclaMundo);
+  const lugares = Array.isArray(mundos) && mundos.length > 0 ? mundos : MUNDOS_VALLE;
+  const ancla = lugares.find((m) => m.id === COSA_DEL_DIA.anclaMundo);
   // Mundos ordenados de atrás hacia adelante para que se solapen bien.
-  const orden = [...MUNDOS_VALLE].sort((a, b) => a.pos[0] + a.pos[2] - (b.pos[0] + b.pos[2]));
+  const orden = [...lugares].sort((a, b) => a.pos[0] + a.pos[2] - (b.pos[0] + b.pos[2]));
 
   // "Entrar al mundo": la lámina se acerca hacia el lugar tocado y la abeja
   // vuela hasta él. Sin foco, la abeja ronda el centro del valle.
-  const foco = focoId ? MUNDO_VALLE_BY_ID[focoId] : null;
+  const foco = focoId ? indexarMundosValle(lugares)[focoId] : null;
   const camPos = foco ? pct(foco.pos[0], foco.pos[2]) : { left: 50, top: 50 };
   const abejaPos = foco ? pct(foco.pos[0], foco.pos[2]) : { left: 52, top: 46 };
 
+  // BURBUJA RICA DE ANGELITA (task #b5-r5-burbuja): reutilizamos el mismo
+  // componente de burbuja que vive en el valle 3D, con estados de ánimo
+  // adaptados (clima/susurro/agro) — el mensaje se ve como burbuja, no solo glow.
+  const mensajeAngelita = useAngelitaStore((s) => s.mensaje);
+  const tipoAngelita = useAngelitaStore((s) => s.tipo);
+
   return (
     <div className="valle2d" data-clima={clima} data-entrando={foco ? 'si' : 'no'}>
+      {/* Aviso cuando el 3D está BLOQUEADO por el navegador (WebGL off — Brave
+          shield, aceleración por hardware apagada): explica el porqué y da la
+          salida, en vez de dejar al usuario sin saber por qué no ve el 3D. */}
+      {webglBloqueado && (
+        <p
+          role="status"
+          style={{
+            position: 'absolute', top: 8, left: 8, right: 8, zIndex: 20, margin: 0,
+            padding: '8px 12px', borderRadius: 12, background: 'rgba(22,32,26,0.86)',
+            color: '#f0ead8', fontSize: 13, lineHeight: 1.35, textAlign: 'center',
+          }}
+        >
+          Su navegador tiene el 3D bloqueado (WebGL). Active la aceleración por
+          hardware o el escudo del navegador (Brave y otros lo apagan) para verlo.
+          Mientras, aquí tiene el valle dibujado.
+        </p>
+      )}
       {/* cámara-lámina: se acerca al lugar tocado (transform-origin en el POI) */}
       <div
         className="valle2d__cam"
@@ -83,10 +144,15 @@ export default function Valle2DFallback({
           {orden.map((m) => {
             const p = pct(m.pos[0], m.pos[2]);
             const activo = focoId === m.id;
+            const mitad = mitadChip2D(m.titulo);
             return (
               <button key={m.id} type="button"
                 className={`valle2d__poi${activo ? ' valle2d__poi--activo' : ''}`}
-                style={{ left: `${p.left}%`, top: `${p.top}%`, '--poi-tinte': m.tinte[0] }}
+                style={{
+                  left: clampPct(p.left, mitad),
+                  top: clampPct(p.top, MEDIO_ALTO_CHIP2D),
+                  '--poi-tinte': m.tinte[0],
+                }}
                 onClick={() => onEntrar(m.id)}
                 aria-label={`Viajar al mundo ${m.titulo}. ${m.lema}`}>
                 <span className="valle2d__emoji" aria-hidden="true">{m.emoji}</span>
@@ -98,9 +164,13 @@ export default function Valle2DFallback({
           {/* la cosa del día: un solo destello, anclado a su lugar */}
           {ancla && (() => {
             const p = pct(ancla.pos[0], ancla.pos[2]);
+            // Fila (emoji + texto), no columna: un poco más ancha que el chip
+            // de lugar de arriba — el mismo criterio de mitadChip2D se queda
+            // corto para ella.
+            const mitad = mitadChip2D(COSA_DEL_DIA.titulo) + 20;
             return (
               <button type="button" className="valle2d__alerta"
-                style={{ left: `${p.left}%`, top: `${p.top - 12}%` }}
+                style={{ left: clampPct(p.left, mitad), top: clampPct(p.top - 12, 24) }}
                 onClick={onAlerta}
                 aria-label={`Alerta del día: ${COSA_DEL_DIA.titulo}. ${COSA_DEL_DIA.detalle}`}>
                 <span aria-hidden="true">⚠️</span> {COSA_DEL_DIA.titulo}
@@ -115,6 +185,29 @@ export default function Valle2DFallback({
             aria-hidden="true"
           >
             <AbejaAngelita size={foco ? 40 : 46} animo={animo} energia={energia} animated={!reducedMotion} />
+            {/* BURBUJA RICA DE ANGELITA (task #b5-r5-burbuja): cuando Angelita tiene
+                algo que decir, se muestra como burbuja con estados de ánimo del
+                valle, no solo como glow. Se posiciona cerca de la abeja y respeta
+                los mismos estilos que en el valle 3D (BurbujaAngelita autocontenida). */}
+            {mensajeAngelita && (
+              <div
+                className="valle2d__burbuja-angelita"
+                style={{
+                  position: 'absolute',
+                  top: '-60px', // Sobre la abeja
+                  left: '50%',
+                  transform: 'translateX(-50%)',
+                  zIndex: 10,
+                  pointerEvents: 'none',
+                }}
+              >
+                <BurbujaAngelita
+                  mensaje={mensajeAngelita}
+                  tipo={tipoAngelita || 'informativa'}
+                  animado={!reducedMotion}
+                />
+              </div>
+            )}
           </div>
         </div>
       </div>

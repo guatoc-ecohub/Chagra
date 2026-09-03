@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import React from 'react';
@@ -159,5 +160,26 @@ describe('HoyEnFincaScreen', () => {
     expect(screen.queryByTestId('clima-hoy-card')).toBeNull();
     fireEvent.click(cta);
     expect(onNavigate).toHaveBeenCalledWith('ubicacion-detectada');
+  });
+
+  // RETIRADO (2026-09-03, feedback_pizarra_unico_aviso_compai): <AngelitaGuia>
+  // ya no vuela por esta pantalla — era un SEGUNDO compai junto al AgentFab de
+  // siempre (dos personajes explicando la pantalla a la vez). La orden dura
+  // del operador es una sola pizarra en toda la app. Este test antes esperaba
+  // `.ang-guia__panel`; ahora prueba lo contrario (nunca aparece) Y que el
+  // texto que daba ("aviso apenas algo necesite su atención...") se migró al
+  // hint compartido `hoy_finca` que el AgentFab (montado en App.jsx, fuera de
+  // este render aislado) lee para su propia pizarra — la info no se perdió,
+  // solo dejó de tener un segundo personaje que la anunciara por su cuenta.
+  it('Angelita guía (#24) RETIRADA: no vuela más — su explicación vive en el hint compartido', async () => {
+    render(<HoyEnFincaScreen onNavigate={vi.fn()} />);
+    // Ni al montar ni tras esperar (el viejo paseo autónomo tardaba en arrancar).
+    expect(document.querySelector('.ang-guia__panel')).toBeNull();
+    expect(document.querySelector('.ang-guia')).toBeNull();
+    await new Promise((resolve) => { setTimeout(resolve, 50); });
+    expect(document.querySelector('.ang-guia__panel')).toBeNull();
+
+    const { RUTA_HINTS } = await import('../../config/compaiHints.js');
+    expect(RUTA_HINTS.hoy_finca.descripcion).toMatch(/atención/i);
   });
 });

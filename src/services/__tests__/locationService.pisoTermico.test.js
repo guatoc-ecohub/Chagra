@@ -127,9 +127,9 @@ describe('locationService — getPisoTermicoInfo (puro)', () => {
     });
 
     it('altitud string inválida devuelve null', () => {
-      expect(getPisoTermicoInfo('abc')).toBeNull();
-      expect(getPisoTermicoInfo('')).toBeNull();
-      expect(getPisoTermicoInfo('123abc')).toBeNull();
+      expect(getPisoTermicoInfo(/** @type {any} */ ('abc'))).toBeNull();
+      expect(getPisoTermicoInfo(/** @type {any} */ (''))).toBeNull();
+      expect(getPisoTermicoInfo(/** @type {any} */ ('123abc'))).toBeNull();
     });
 
     it('altitud null devuelve null', () => {

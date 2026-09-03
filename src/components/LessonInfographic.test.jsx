@@ -82,6 +82,7 @@ describe('LessonInfographic', () => {
   });
 
   it('degrada limpio (retorna null) sin título', () => {
+    // @ts-expect-error test intentionally omits titulo to check graceful degradation
     const { container } = render(<LessonInfographic pasos={PASOS} />);
     expect(container.firstChild).toBeNull();
   });

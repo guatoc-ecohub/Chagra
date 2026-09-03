@@ -77,9 +77,9 @@ vi.mock('../../db/dbCore', () => ({
 
 // jsdom no expone IDBKeyRange por defecto; este shim alcanza para el test.
 beforeEach(() => {
-  globalThis.IDBKeyRange = {
+  globalThis.IDBKeyRange = /** @type {any} */ ({
     only: (val) => ({ lower: val, upper: val }),
-  };
+  });
   store = new Map();
   _resetForTests();
 });

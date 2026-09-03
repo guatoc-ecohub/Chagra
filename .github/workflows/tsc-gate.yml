@@ -11,7 +11,7 @@ name: TSC Gate (anti-regresión)
 
 on:
   pull_request:
-    branches: [main]
+    branches: [main, dev, app-3d]
   push:
     branches: [main, feat/**, fix/**, chore/**]
 

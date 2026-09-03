@@ -162,8 +162,8 @@ export default function CicloDetalle({ cycle, altitudeM, onReload }) {
   const pestRisks = useMemo(() => { try { return getPestRisksByStage(displayStage, a.subject_slug) || []; } catch { return []; } }, [displayStage, a.subject_slug]);
   const bios = useMemo(() => { try { return getBiopreparadosForStage(baseStage(displayStage)) || []; } catch { return []; } }, [displayStage]);
   const ensoLabel = getEnsoLabel();
-  const ensoTasks = useMemo(() => { try { return getEnsemblePreventiveTasks(getEnsoServicePhase(), baseStage(displayStage)) || []; } catch { return []; } }, [displayStage]);
-  const tasks = useMemo(() => { try { return getTasksForCycle(effectiveCycle) || []; } catch { return []; } }, [effectiveCycle]);
+  const ensoTasks = useMemo(() => { try { return getEnsemblePreventiveTasks(getEnsoServicePhase(), baseStage(displayStage)); } catch { return []; } }, [displayStage]);
+  const tasks = useMemo(() => { try { return getTasksForCycle(effectiveCycle); } catch { return []; } }, [effectiveCycle]);
   const urgent = useMemo(() => { try { return getUrgentTasks(tasks) || []; } catch { return []; } }, [tasks]);
 
   const handleStage = useCallback(async (newStage) => {
@@ -197,7 +197,7 @@ export default function CicloDetalle({ cycle, altitudeM, onReload }) {
         catalogImage={species?.imagen || species?.image || species?.media?.image || species?.media || null}
       />
 
-      <FarmProcessSummary process={effectiveCycle} pestRisks={pestRisks} altitudeM={altitudeM} />
+      <FarmProcessSummary process={effectiveCycle} pestRisks={pestRisks} altitudeM={altitudeM} lastObservation={null} />
 
       {/* Etapa actual + confirmar cambio (stageConfirmationService) */}
       <section className="bg-slate-900 border border-slate-800 rounded-xl p-3">
@@ -292,7 +292,8 @@ export default function CicloDetalle({ cycle, altitudeM, onReload }) {
             Labores de esta etapa {urgent.length > 0 && <span className="text-amber-400">· {urgent.length} urgente(s)</span>}
           </h2>
           <ul className="flex flex-col gap-1.5">
-            {tasks.map((t, i) => {
+            {tasks.map((tItem, i) => {
+              const /** @type {any} */ t = tItem;
               const label = t.label || t.name || t.title || String(t);
               const done = !!doneTasks[label];
               return (

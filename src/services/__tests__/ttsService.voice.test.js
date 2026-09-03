@@ -54,7 +54,7 @@ describe('ttsService — preferencias de voz Kokoro (task #124)', () => {
     });
     globalThis.fetch = fetchMock;
     originalAudio = globalThis.Audio;
-    globalThis.Audio = MockAudio;
+    globalThis.Audio = /** @type {any} */ (MockAudio);
     originalCreateObjectURL = URL.createObjectURL;
     originalRevokeObjectURL = URL.revokeObjectURL;
     URL.createObjectURL = vi.fn(() => 'blob:fake-url');
@@ -89,6 +89,14 @@ describe('ttsService — preferencias de voz Kokoro (task #124)', () => {
         localStorage.setItem('chagra:tts:voice', voice.id);
         expect(getPreferredVoice()).toBe(voice.id);
       }
+    });
+
+    it('ef_dora no está en KOKORO_VOICES y una preferencia persistida vuelve a santa', () => {
+      const doraInVoices = KOKORO_VOICES.some(v => v.id === 'ef_dora');
+      expect(doraInVoices).toBe(false);
+      localStorage.setItem('chagra:tts:voice', 'ef_dora');
+      expect(getPreferredVoice()).toBe(DEFAULT_KOKORO_VOICE);
+      expect(setPreferredVoice('ef_dora')).toBe(false);
     });
   });
 
@@ -153,15 +161,15 @@ describe('ttsService — preferencias de voz Kokoro (task #124)', () => {
     });
 
     it('sin voice explícito usa la voz preferida persistida', async () => {
-      setPreferredVoice('ef_dora');
+      setPreferredVoice('em_alex');
       await speakKokoro('Hola mundo');
       const [, init] = fetchMock.mock.calls[0];
       const body = JSON.parse(init.body);
-      expect(body.voice).toBe('ef_dora');
+      expect(body.voice).toBe('em_alex');
     });
 
     it('voice explícito en options gana sobre la voz preferida (backwards compat)', async () => {
-      setPreferredVoice('em_alex');
+      setPreferredVoice('em_santa');
       await speakKokoro('Hola mundo', { voice: 'em_alex' });
       const [, init] = fetchMock.mock.calls[0];
       const body = JSON.parse(init.body);
@@ -169,26 +177,30 @@ describe('ttsService — preferencias de voz Kokoro (task #124)', () => {
     });
 
     it('voice explícito gana aunque sea distinto del default (no se "promueve" preferencia)', async () => {
-      setPreferredVoice('em_alex');
-      await speakKokoro('Hola', { voice: 'ef_dora' });
-      const [, init] = fetchMock.mock.calls[0];
-      const body = JSON.parse(init.body);
-      expect(body.voice).toBe('ef_dora');
-    });
-
-    it('coerciona ef_dora (no servible) a la default santa: dora NUNCA viaja al server', async () => {
-      await speakKokoro('Hola', { voice: 'ef_dora' });
+      setPreferredVoice('em_santa');
+      await speakKokoro('Hola', { voice: 'em_alex' });
       const [, init] = fetchMock.mock.calls[0];
       const body = JSON.parse(init.body);
       expect(body.voice).toBe('em_alex');
     });
 
-    it('coerciona voces inglesas inexistentes (ef_aoede/ef_kore) a santa, no a dora', async () => {
+    it('coerciona ef_dora (no servible) a la default santa: dora NUNCA viaja al server', async () => {
+      // ef_dora fue retirada del catálogo (suena "gringa", 2026-08-02): al no
+      // estar en KOKORO_VOICES, toServableVoice la coerciona al DEFAULT (santa).
+      await speakKokoro('Hola', { voice: 'ef_dora' });
+      const [, init] = fetchMock.mock.calls[0];
+      const body = JSON.parse(init.body);
+      expect(body.voice).toBe(DEFAULT_KOKORO_VOICE);
+      expect(body.voice).toBe('em_santa');
+      expect(body.voice).not.toBe('ef_dora');
+    });
+
+    it('coerciona voces inexistentes a santa', async () => {
       await speakKokoro('Hola', { voice: 'ef_aoede' });
       await speakKokoro('Hola', { voice: 'ef_kore' });
       for (const call of fetchMock.mock.calls) {
         const body = JSON.parse(call[1].body);
-        expect(body.voice).toBe('em_alex');
+        expect(body.voice).toBe('em_santa');
         expect(body.voice).not.toBe('ef_dora');
       }
     });

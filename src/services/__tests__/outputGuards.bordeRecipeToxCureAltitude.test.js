@@ -10,8 +10,9 @@
  *   (c) FALSA CURA                        → guardFalsePremise (BORDE-008) — ya existía;
  *       aquí solo se verifica que sigue cubriendo el patrón.
  *   (d) consejo FUERA DE RANGO (altitud/clima) → bandas nuevas de
- *       guardHardAltitudeViability (cacao/chontaduro/quinua) + guardWarmLowlandColdCrop
- *       (BORDE-009, cultivo de frío en tierra caliente textual sin número).
+ *       guardHardAltitudeViability (cacao/chontaduro/quinua + papa/lulo/tomate/gulupa
+ *       y otras frecuentes) + guardWarmLowlandColdCrop + guardColdHighlandWarmCrop
+ *       (BORDE-009, choque textual sin número en ambos sentidos).
  *
  * Todos los guards SUPRIMEN-Y-REEMPLAZAN (o ANTEPONEN, en los aditivos) el cuerpo
  * peligroso por una respuesta SEGURA — patrón establecido (memoria
@@ -24,6 +25,7 @@ import {
   guardClassicCaldoRecipe,
   guardPureFoliarBiopreparado,
   guardToxicRawFoodConsumption,
+  guardColdHighlandWarmCrop,
   guardWarmLowlandColdCrop,
   guardHardAltitudeViability,
   guardFalsePremise,
@@ -248,6 +250,15 @@ describe('guardHardAltitudeViability — bandas nuevas cacao/chontaduro/quinua (
     const r = guardHardAltitudeViability(resp, { userMessage: user });
     expect(r.modified).toBe(false);
   });
+
+  it('BORDE-? papa validada a 1.800 m → suprime por banda nueva', () => {
+    const user = 'quiero sembrar papa a 1.800 metros en clima templado';
+    const resp = 'La papa se da bien a 1.800 msnm y produce buena cosecha con riego.';
+    const r = guardHardAltitudeViability(resp, { userMessage: user });
+    expect(r.modified).toBe(true);
+    expect(r.text.toLowerCase()).toMatch(/no es viable|inviable/);
+    expect(r.text.toLowerCase()).toContain('papa');
+  });
 });
 
 describe('guardWarmLowlandColdCrop — cultivo de frío en tierra caliente textual (BORDE-009)', () => {
@@ -294,6 +305,42 @@ describe('guardWarmLowlandColdCrop — cultivo de frío en tierra caliente textu
     const resp = 'La quinua no se da en Quibdó: necesita un clima frío de altura, con ese calor no prospera.';
     const r = guardWarmLowlandColdCrop(resp, { userMessage: user });
     expect(r.modified).toBe(false);
+  });
+});
+
+describe('guardColdHighlandWarmCrop — cultivo cálido/templado en páramo/frío textual', () => {
+  it('cafe en paramo → suprime, advierte que no va en ese piso', () => {
+    const user = 'puedo sembrar cafe en paramo?';
+    const resp = 'Sí, el café se puede sembrar en el páramo con sombra y riego; se da bien.';
+    const r = guardColdHighlandWarmCrop(resp, { userMessage: user });
+    expect(r.modified).toBe(true);
+    expect(r.text.toLowerCase()).toMatch(/caf[eé]/);
+    expect(r.text.toLowerCase()).toMatch(/no va en el páramo|no va en ese piso/);
+    expect(r.text.toLowerCase()).toContain('inviable');
+  });
+
+  it('platano en paramo → suprime, advierte tierra cálida o templada', () => {
+    const user = 'en el paramo quiero platano';
+    const resp = 'El plátano se da bien en el páramo con riego y abrigo, es viable.';
+    const r = guardColdHighlandWarmCrop(resp, { userMessage: user });
+    expect(r.modified).toBe(true);
+    expect(r.text.toLowerCase()).toContain('plátano');
+    expect(r.text.toLowerCase()).toMatch(/tierra c[aá]lida|templada/);
+  });
+
+  it('anti-FP: papa en frio es valido, no se toca', () => {
+    const user = 'papa en frio';
+    const resp = 'La papa se da muy bien en clima frio, es una especie de altura.';
+    const r = guardColdHighlandWarmCrop(resp, { userMessage: user });
+    expect(r.modified).toBe(false);
+  });
+
+  it('anti-FP: papa en tierra caliente sigue bloqueada por el guard existente', () => {
+    const user = 'en tierra caliente quiero papa';
+    const resp = 'La papa se puede sembrar en tierra caliente con sombrio y riego, se da bien.';
+    const r = guardWarmLowlandColdCrop(resp, { userMessage: user });
+    expect(r.modified).toBe(true);
+    expect(r.text.toLowerCase()).toContain('inviable');
   });
 });
 

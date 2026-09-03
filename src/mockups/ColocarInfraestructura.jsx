@@ -34,6 +34,7 @@ import {
 import Infraestructura from '../visual/mundo3d/infraestructura/Infraestructura.jsx';
 import { decidirTier, permite3D } from '../visual/mundo3d/index.js';
 import { ATMOSFERA } from '../visual/mundo3d/atmosferaMadre.js';
+import { MSG } from '../config/messages.js';
 import './colocar-infraestructura.css';
 
 /* ── El terreno ──────────────────────────────────────────────────────────────
@@ -161,6 +162,14 @@ function AnilloBorrador({ borrador }) {
   );
 }
 
+/* Retrato (teléfono en vertical), decidido UNA vez al cargar el módulo: la
+   toma de escritorio dejaba el terreno en una franja arriba y media pantalla
+   de vacío. El sujeto es EL TERRENO donde se coloca: en retrato la cámara
+   pica más y el lote llena el cuadro. */
+const RETRATO = typeof window !== 'undefined'
+  && typeof window.matchMedia === 'function'
+  && window.matchMedia('(max-aspect-ratio: 19/20)').matches;
+
 /* La escena completa de colocación: ladera + lo ya colocado + el borrador. */
 function EscenaColocar({ tier, reducedMotion, colocadas, borrador, onTocar }) {
   const segmentos = tier === 'alto' ? 48 : 28;
@@ -169,7 +178,7 @@ function EscenaColocar({ tier, reducedMotion, colocadas, borrador, onTocar }) {
       className="cinf__canvas"
       dpr={[1, tier === 'alto' ? 1.5 : 1.15]}
       gl={{ antialias: tier === 'alto', powerPreference: 'high-performance' }}
-      camera={{ position: [0, 13, 19], fov: 46 }}
+      camera={RETRATO ? { position: [0, 16, 11.5], fov: 48 } : { position: [0, 13, 19], fov: 46 }}
       frameloop={reducedMotion ? 'demand' : 'always'}
     >
       <color attach="background" args={[ATMOSFERA.fondo]} />
@@ -180,15 +189,16 @@ function EscenaColocar({ tier, reducedMotion, colocadas, borrador, onTocar }) {
       <Terreno segmentos={segmentos} onTocar={onTocar} />
       <Suspense fallback={null}>
         {colocadas.map((c, i) => (
-          <Infraestructura
-            // eslint-disable-next-line react/no-array-index-key -- lista append/pop only
-            key={`${c.tipo}-${i}`}
-            tipo={c.tipo}
-            pos={c.pos}
-            rot={c.rot}
-            tier={tier}
-            reducedMotion={reducedMotion}
-          />
+            <Infraestructura
+                    key={`${c.tipo}-${i}`}
+              tipo={c.tipo}
+              pos={c.pos}
+              rot={c.rot}
+              dims={c.dims}
+              params={c.params || {}}
+              tier={tier}
+              reducedMotion={reducedMotion}
+            />
         ))}
         {borrador && (
           <>
@@ -196,6 +206,8 @@ function EscenaColocar({ tier, reducedMotion, colocadas, borrador, onTocar }) {
               tipo={borrador.tipo}
               pos={borrador.pos}
               rot={borrador.rot}
+              dims={borrador.dims}
+              params={borrador.params || {}}
               tier={tier}
               reducedMotion={reducedMotion}
             />
@@ -204,7 +216,7 @@ function EscenaColocar({ tier, reducedMotion, colocadas, borrador, onTocar }) {
         )}
       </Suspense>
       <OrbitControls
-        target={[0, 2.2, 0]}
+        target={RETRATO ? [0, 0.6, 0] : [0, 2.2, 0]}
         makeDefault
         enablePan={false}
         enableZoom
@@ -266,8 +278,7 @@ function Plano2D({ colocadas, borrador, onTocar }) {
       <span className="cinf__plano-rotulo cinf__plano-rotulo--alto">Páramo (arriba)</span>
       <span className="cinf__plano-rotulo cinf__plano-rotulo--bajo">Tierra caliente (abajo)</span>
       {colocadas.map((c, i) => (
-        // eslint-disable-next-line react/no-array-index-key -- lista append/pop only
-        <Marcador2D key={`${c.tipo}-${i}`} item={c} />
+        <Marcador2D key={`${c.tipo}-${i}`} item={c} borrador={false} />
       ))}
       {borrador && <Marcador2D item={borrador} borrador />}
     </div>
@@ -411,7 +422,7 @@ export default function ColocarInfraestructura() {
                 ✓ Ponerla aquí
               </button>
               <button type="button" className="cinf__btn cinf__btn--no" onClick={cancelar}>
-                ✕ Cancelar
+                ✕ {MSG.action.cancelar}
               </button>
             </div>
           </div>
@@ -423,7 +434,7 @@ export default function ColocarInfraestructura() {
             </p>
             <div className="cinf__botonera">
               <button type="button" className="cinf__btn cinf__btn--no" onClick={cancelar}>
-                ✕ Cancelar
+                ✕ {MSG.action.cancelar}
               </button>
             </div>
           </div>

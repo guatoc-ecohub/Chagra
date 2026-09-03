@@ -285,3 +285,168 @@ export function compatibilidadPiso(pisoUsuario) {
 
   return { pisoUsuarioId, hayPisoUsuario, pisos };
 }
+
+/* ────────────────────────────────────────────────────────────────────────────
+ * PISOS_TERMICOS_SIERRA — LA TABLA CANÓNICA de las 7 bandas visuales de la
+ * Sierra (del mar de Palomino a la nieve perpetua, 0 → 5 775 m).
+ *
+ * Consolidación de PASO 1 (transición climática, 2026-09-02): antes cada una
+ * de las cuatro vistas (EscenaBoveda `PISOS_DEF`, VistaGlobalSierra `BANDAS`
+ * y `CLAVE_PISOS`, TransicionSierraMundo `PISOS`) tenía su propia lista de
+ * cotas/colores/nombres hardcodeada, con valores que fueron derivando.
+ * Esta tabla ES la fuente única: las cuatro listas se DERIVAN de acá, así no
+ * hay cotas duplicadas ni huecos entre pisos.
+ *
+ * Orden top→bottom (de la cima al mar). `piso` referencia el id en el
+ * `PISOS_TERMICOS` de Caldas (6 pisos); aquí el piso cálido se parte en dos
+ * bandas visuales (bosque seco 300-1000 m y playa/costa 0-300 m), por eso
+ * dos filas apuntan a `calido`. `nombre` es la etiqueta canónica del DOM
+ * (CLAVE_PISOS); `nombreTransicion` la etiqueta gramatical del transecto.
+ * `boveda` son las cotas de la montaña 3D (EscenaBoveda), `topeWorldY` el
+ * tope mundial de la Sierra (VistaGlobalSierra), `tintA/tintB` y `claves`
+ * los tintes y palabras-clave del transecto (TransicionSierraMundo).
+ * ──────────────────────────────────────────────────────────────────────────── */
+export const PISOS_TERMICOS_SIERRA = [
+  {
+    id: 'nival',
+    nombre: 'Nieve perpetua',
+    nombreTransicion: 'la nieve perpetua',
+    minMsnm: 4800,
+    maxMsnm: CUMBRE_SIERRA_M,
+    color: '#f2ead6',
+    piso: 'nival',
+    topeWorldY: Infinity,
+    tintA: '#eef4f8',
+    tintB: '#9fb8c8',
+    claves: ['nieve', 'nival', 'glaciar', 'simmonds'],
+    boveda: { h: 0.5, r0: 0.6, r1: 0.42 },
+  },
+  {
+    id: 'superparamo',
+    nombre: 'Superpáramo',
+    nombreTransicion: 'el superpáramo',
+    minMsnm: 4000,
+    maxMsnm: 4800,
+    color: '#a58f68',
+    piso: 'superparamo',
+    topeWorldY: 4.15,
+    tintA: '#c9d2cf',
+    tintB: '#75878a',
+    claves: ['superparamo'],
+    boveda: { h: 0.5, r0: 0.85, r1: 0.6 },
+  },
+  {
+    id: 'paramo',
+    nombre: 'Páramo y frailejones',
+    nombreTransicion: 'el páramo',
+    minMsnm: 3000,
+    maxMsnm: 4000,
+    color: '#94975a',
+    piso: 'paramo',
+    topeWorldY: 3.45,
+    tintA: '#c7bb6e',
+    tintB: '#5f6b45',
+    claves: ['paramo', 'frailejon'],
+    boveda: { h: 0.5, r0: 1.15, r1: 0.85 },
+  },
+  {
+    id: 'frio',
+    nombre: 'Bosque de niebla',
+    nombreTransicion: 'el bosque de niebla',
+    minMsnm: 2000,
+    maxMsnm: 3000,
+    color: '#5c8a69',
+    piso: 'frio',
+    topeWorldY: 2.6,
+    tintA: '#8fae9a',
+    tintB: '#33544a',
+    claves: ['niebla', 'frio', 'bosque de niebla', 'bosque_niebla', 'nublado'],
+    boveda: { h: 0.5, r0: 1.45, r1: 1.15 },
+  },
+  {
+    id: 'templado',
+    nombre: 'Selva húmeda',
+    nombreTransicion: 'la selva húmeda',
+    minMsnm: 1000,
+    maxMsnm: 2000,
+    color: '#437233',
+    piso: 'templado',
+    topeWorldY: 1.75,
+    tintA: '#7fae5f',
+    tintB: '#2c5a33',
+    claves: ['templado', 'selva', 'humedo', 'cafetero', 'cafe'],
+    boveda: { h: 0.5, r0: 1.75, r1: 1.45 },
+  },
+  {
+    id: 'calido_seco',
+    nombre: 'Bosque seco',
+    nombreTransicion: 'el bosque seco',
+    minMsnm: 300,
+    maxMsnm: 1000,
+    color: '#b3a955',
+    piso: 'calido',
+    topeWorldY: 0.95,
+    tintA: '#e8c675',
+    tintB: '#8a6a33',
+    claves: ['calido', 'bosque seco', 'bosque_seco', 'seco'],
+    boveda: { h: 0.5, r0: 2.1, r1: 1.75 },
+  },
+  {
+    id: 'playa',
+    nombre: 'Playa y costa',
+    nombreTransicion: 'Palomino',
+    minMsnm: 0,
+    maxMsnm: 300,
+    color: '#ddc78d',
+    piso: 'calido',
+    topeWorldY: 0.28,
+    tintA: '#8fd0d8',
+    tintB: '#2a7c8f',
+    claves: ['playa', 'mar', 'palomino', 'costa', 'litoral'],
+    boveda: { h: 0.5, r0: 2.4, r1: 2.1 },
+  },
+];
+
+/**
+ * Cota msnm por piso, verificable: los rangos deben encadenarse sin huecos ni
+ * solapamiento (de 0 a CUMBRE_SIERRA_M). Helper para el test de invariantes.
+ */
+export function validarCotasPisosSierra(extra = {}) {
+  const pisos = extra.pisos || PISOS_TERMICOS_SIERRA;
+  const ordenados = [...pisos].sort((a, b) => a.minMsnm - b.minMsnm);
+  const huecos = [];
+  let esperado = 0;
+  for (const p of ordenados) {
+    if (p.minMsnm !== esperado) huecos.push({ piso: p.id, minMsnm: p.minMsnm, esperado });
+    esperado = p.maxMsnm;
+  }
+  if (esperado !== CUMBRE_SIERRA_M) huecos.push({ fin: esperado, esperadoFin: CUMBRE_SIERRA_M });
+  return { ok: huecos.length === 0, huecos };
+}
+
+/** Leyenda DOM accesible de la Sierra (VistaGlobalSierra `CLAVE_PISOS`). */
+export const CLAVE_PISOS_SIERRA = PISOS_TERMICOS_SIERRA.map((p) => ({ c: p.color, t: p.nombre }));
+
+/** Nos reservamos los topes en color hex; la vista envuelve cada uno en THREE.Color. */
+export const NOMBRES_PISOS_SIERRA = PISOS_TERMICOS_SIERRA.map((p) => p.nombre);
+
+/** Bandas por el tope mundial (VistaGlobalSierra `BANDAS`): `{ tope, hexColor }`. */
+export const BANDAS_SIERRA = PISOS_TERMICOS_SIERRA.map((p) => ({ tope: p.topeWorldY, hexColor: p.color }));
+
+/** Lista del transecto (TransicionSierraMundo `PISOS`): `{ claves, nombre, a, b }`. */
+export const PISOS_TRANSICION_SIERRA = PISOS_TERMICOS_SIERRA.map((p) => ({
+  claves: [...p.claves],
+  nombre: p.nombreTransicion,
+  a: p.tintA,
+  b: p.tintB,
+}));
+
+/**
+ * La montaña de la bóveda (EscenaBoveda `PISOS_DEF`): SE INVIERTE bottom-up
+ * (playa abajo, nival arriba) porque el montaje apila de y=0 hacia la cima.
+ * Suma de alturas = 3.5 world units, igual que la montaña de 4 pisos previa,
+ * así la cima/casquete/línea ámbar/cámara siguen válidos.
+ */
+export const BOVEDA_PISOS_DEF = [...PISOS_TERMICOS_SIERRA]
+  .reverse()
+  .map((p) => ({ nombre: p.nombre, color: p.color, h: p.boveda.h, r0: p.boveda.r0, r1: p.boveda.r1 }));

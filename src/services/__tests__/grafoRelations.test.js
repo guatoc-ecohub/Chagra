@@ -608,4 +608,110 @@ describe('grafoRelations — loader offline del grafo', () => {
     expect(await mod.resolvePestSynonym('gota')).toBeNull();
     expect(await mod.getPestIndex()).toEqual({});
   });
+
+  // ── SLICE conocimiento ampliado (2026-07-14) ────────────────────────────
+  // Cobertura de los nuevos accesores para los 6 tópicos sourceados.
+  const KNOWLEDGE_FIXTURE = {
+    _meta: { schema_version: 1, species_count: 1 },
+    _piso_termico: {
+      definicion: 'Clasificación altitudinal andina.',
+      fuentes: [
+        {
+          cite: 'Caldas, F.J. (1808). Memoria sobre el nivel de las plantas.',
+          tipo: 'historico',
+        },
+      ],
+      gradiente_termico_c_por_100m: 0.6,
+      pisos: [
+        {
+          id: 'calido',
+          nombre: 'Piso cálido tropical',
+          altitud_m: { min: 0, max: 1000 },
+          temperatura_media_c: { min: 24, max: 30 },
+          cultivos_representativos: ['manihot_esculenta', 'zea_mays'],
+          notas: 'Cultivos tropicales.',
+        },
+      ],
+    },
+    _micorrizas: {
+      definicion: 'Simbiosis mutualista planta-hongo.',
+      fuentes: [
+        {
+          cite: 'Smith & Read (2008). Mycorrhizal Symbiosis.',
+          tipo: 'book',
+        },
+      ],
+      tipos: [
+        {
+          id: 'amf',
+          nombre: 'Micorrizas arbusculares (AMF)',
+          caracteristicas: 'Hongos endófitos que forman arbúsculos.',
+          hospederos_en_grafo: ['coffea_arabica', 'manihot_esculenta'],
+        },
+      ],
+    },
+    species: {
+      manihot_esculenta: { nombre_comun: 'Yuca' },
+    },
+  };
+
+  it('getKnowledgeTopics lista los tópicos disponibles (fixture con piso_termico)', async () => {
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(mockJsonResponse(KNOWLEDGE_FIXTURE)));
+    const topics = await mod.getKnowledgeTopics();
+    expect(topics).toContain('_piso_termico');
+    expect(topics).toContain('_micorrizas');
+  });
+
+  it('getKnowledgeTopic devuelve la sección cruda', async () => {
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(mockJsonResponse(KNOWLEDGE_FIXTURE)));
+    const sec = await mod.getKnowledgeTopic('_piso_termico');
+    expect(sec).not.toBeNull();
+    expect(Array.isArray(sec.pisos)).toBe(true);
+    expect(sec.gradiente_termico_c_por_100m).toBe(0.6);
+  });
+
+  it('getKnowledgeTopic normaliza key sin prefijo `_`', async () => {
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(mockJsonResponse(KNOWLEDGE_FIXTURE)));
+    const sec = await mod.getKnowledgeTopic('micorrizas');
+    expect(sec).not.toBeNull();
+    expect(sec.tipos[0].id).toBe('amf');
+  });
+
+  it('getKnowledgeTopic rechaza tópico no declarado', async () => {
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(mockJsonResponse(KNOWLEDGE_FIXTURE)));
+    expect(await mod.getKnowledgeTopic('_inventado')).toBeNull();
+    expect(await mod.getKnowledgeTopic('inventado')).toBeNull();
+    expect(await mod.getKnowledgeTopic('')).toBeNull();
+  });
+
+  it('buildKnowledgeTopicBlock arma bloque con definicion, fuentes y pisos', async () => {
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(mockJsonResponse(KNOWLEDGE_FIXTURE)));
+    const bloque = await mod.buildKnowledgeTopicBlock('_piso_termico');
+    expect(bloque).not.toBe('');
+    expect(bloque).toContain('CONOCIMIENTO DEL GRAFO (offline) — piso_termico:');
+    expect(bloque).toContain('Definición: Clasificación altitudinal andina.');
+    expect(bloque).toContain('Fuentes: Caldas, F.J. (1808)');
+    expect(bloque).toContain('Piso Piso cálido tropical (0-1000 m, 24-30 °C):');
+    expect(bloque).toContain('manihot_esculenta, zea_mays');
+  });
+
+  it('buildKnowledgeTopicBlock arma bloque para micorrizas (tipos)', async () => {
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(mockJsonResponse(KNOWLEDGE_FIXTURE)));
+    const bloque = await mod.buildKnowledgeTopicBlock('micorrizas');
+    expect(bloque).toContain('CONOCIMIENTO DEL GRAFO (offline) — micorrizas:');
+    expect(bloque).toContain('Micorrizas arbusculares (AMF): coffea_arabica, manihot_esculenta.');
+  });
+
+  it('buildKnowledgeTopicBlock para tópico inexistente devuelve cadena vacía', async () => {
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(mockJsonResponse(KNOWLEDGE_FIXTURE)));
+    expect(await mod.buildKnowledgeTopicBlock('_inventado')).toBe('');
+    expect(await mod.buildKnowledgeTopicBlock('')).toBe('');
+  });
+
+  it('getKnowledgeTopics OFFLINE (fetch rechaza) → array vacío sin lanzar', async () => {
+    vi.stubGlobal('fetch', vi.fn().mockRejectedValue(new Error('red caida')));
+    expect(await mod.getKnowledgeTopics()).toEqual([]);
+    expect(await mod.getKnowledgeTopic('_piso_termico')).toBeNull();
+    expect(await mod.buildKnowledgeTopicBlock('_piso_termico')).toBe('');
+  });
 });

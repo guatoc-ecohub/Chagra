@@ -6,6 +6,7 @@
 import { useState } from 'react';
 import { ArrowLeft } from 'lucide-react';
 import LaminaMataEtapa from './LaminaMataEtapa';
+import { ETAPAS_MATA, MATA_MUESTRA } from './hojaVidaMataData.js';
 import './hoja-vida-mata.css';
 
 /**
@@ -26,69 +27,6 @@ import './hoja-vida-mata.css';
  * @param {Object} props
  * @param {Function} [props.onBack] volver al dashboard.
  */
-
-// Datos de muestra de UNA mata concreta. En producción saldrían del asset +
-// sus logs (siembra/observación/cosecha) — el modelo asset-flat + log de Chagra.
-const MATA = {
-  nombre: 'Tomate #7',
-  variedad: 'Tomate chonto',
-  ubicacion: 'era 3 · huerta de la casa',
-  sembrada: '08 de marzo, 2026',
-  etapaActual: 'cosecha',
-};
-
-// Las seis etapas, con el día desde la siembra y una lectura de campo de qué
-// mirar en cada una. `dia` es el número de días transcurridos (dato observado).
-const ETAPAS = [
-  {
-    id: 'semilla',
-    orden: 1,
-    nombre: 'Semilla',
-    dia: 0,
-    lectura:
-      'La semilla en la tierra. Arriba no se ve nada: está echando raíz. Aquí toca esperar y mantener el semillero húmedo, sin encharcarlo.',
-  },
-  {
-    id: 'plantula',
-    orden: 2,
-    nombre: 'Plántula',
-    dia: 12,
-    lectura:
-      'Rompió el suelo. Esos dos gajitos de abajo (los cotiledones) no son hoja de verdad; la hoja verdadera es la del centro. Está tiernita: cuídela del sol fuerte y del frío.',
-  },
-  {
-    id: 'juvenil',
-    orden: 3,
-    nombre: 'Juvenil',
-    dia: 28,
-    lectura:
-      'Ya es una matica. Echa hojas y sube derecha. Es buen momento para pasarla al surco, con la tierra suelta y bien abonada.',
-  },
-  {
-    id: 'adulto',
-    orden: 4,
-    nombre: 'Adulta',
-    dia: 45,
-    lectura:
-      'La mata se hizo. Pide tutor para no irse al suelo con el peso. Tallo grueso y hojas grandes: está lista para florecer.',
-  },
-  {
-    id: 'floracion',
-    orden: 5,
-    nombre: 'Floración',
-    dia: 57,
-    lectura:
-      'Salieron las flores amarillas en racimo. De cada flor, si cuaja, sale un tomate. No le falte agua pareja en esta etapa o bota la flor.',
-  },
-  {
-    id: 'cosecha',
-    orden: 6,
-    nombre: 'Cosecha',
-    dia: 110,
-    lectura:
-      'Los racimos cargados. Se recoge el tomate cuando empieza a pintar y termina de madurar en la mata. Vaya cosechando parejo para que siga cargando.',
-  },
-];
 
 // La línea de tiempo: lo que REALMENTE le pasó a esta mata. `tipo` marca el
 // punto (hito de crecimiento / cuidado que se atendió / estado de hoy).
@@ -147,8 +85,8 @@ const EVENTOS = [
 const TIPO_CLASE = { hito: 'is-hito', cuidado: 'is-cuidado', actual: 'is-actual' };
 
 export default function HojaVidaMataMockup({ onBack }) {
-  const [etapaId, setEtapaId] = useState(MATA.etapaActual);
-  const etapa = ETAPAS.find((e) => e.id === etapaId) || ETAPAS[0];
+  const [etapaId, setEtapaId] = useState(MATA_MUESTRA.etapaActual);
+  const etapa = ETAPAS_MATA.find((e) => e.id === etapaId) || ETAPAS_MATA[0];
   const volver = onBack || (() => { window.location.hash = ''; });
 
   return (
@@ -162,12 +100,12 @@ export default function HojaVidaMataMockup({ onBack }) {
 
       {/* Cabecera de la ficha */}
       <header className="hvm-cabecera">
-        <h1 className="hvm-titulo">{MATA.nombre} · {MATA.ubicacion.split(' · ')[0]}</h1>
-        <p className="hvm-sub">{MATA.variedad}</p>
+        <h1 className="hvm-titulo">{MATA_MUESTRA.nombre} · {MATA_MUESTRA.ubicacion.split(' · ')[0]}</h1>
+        <p className="hvm-sub">{MATA_MUESTRA.variedad}</p>
         <div className="hvm-meta">
-          <span className="hvm-chip">Sembrada el {MATA.sembrada}</span>
-          <span className="hvm-chip">{MATA.ubicacion}</span>
-          <span className="hvm-chip">Hoy: {etapa.nombre.toLowerCase()} · día {ETAPAS.find((e) => e.id === MATA.etapaActual).dia}</span>
+          <span className="hvm-chip">Sembrada el {MATA_MUESTRA.sembrada}</span>
+          <span className="hvm-chip">{MATA_MUESTRA.ubicacion}</span>
+          <span className="hvm-chip">Hoy: {etapa.nombre.toLowerCase()} · día {ETAPAS_MATA.find((e) => e.id === MATA_MUESTRA.etapaActual).dia}</span>
         </div>
       </header>
 
@@ -178,7 +116,7 @@ export default function HojaVidaMataMockup({ onBack }) {
         </div>
 
         <div className="hvm-etapas" role="group" aria-label="Etapas de la mata">
-          {ETAPAS.map((e) => (
+          {ETAPAS_MATA.map((e) => (
             <button
               key={e.id}
               type="button"
@@ -186,7 +124,7 @@ export default function HojaVidaMataMockup({ onBack }) {
               aria-pressed={e.id === etapaId}
               onClick={() => setEtapaId(e.id)}
             >
-              <span className="hvm-etapa-orden">{e.orden} de {ETAPAS.length}</span>
+              <span className="hvm-etapa-orden">{e.orden} de {ETAPAS_MATA.length}</span>
               <span className="hvm-etapa-nom">{e.nombre}</span>
               <span className="hvm-etapa-dia">día {e.dia}</span>
             </button>
@@ -196,7 +134,7 @@ export default function HojaVidaMataMockup({ onBack }) {
         <div className="hvm-lamina-pie">
           <p className="hvm-estado-hoy">
             {etapa.nombre}
-            {etapa.id === MATA.etapaActual ? ' — así está hoy' : ` — día ${etapa.dia}`}
+            {etapa.id === MATA_MUESTRA.etapaActual ? ' — así está hoy' : ` — día ${etapa.dia}`}
           </p>
           <p className="hvm-estado-desc">{etapa.lectura}</p>
         </div>

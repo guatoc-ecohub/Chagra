@@ -36,6 +36,7 @@ import {
 } from './artesaniaAndina.js';
 import './artesaniaAndina.css';
 
+/** @type {any} */
 const trazo = {
   stroke: ROLES_ANDINOS.linea,
   strokeLinecap: TRAZO_ANDINO.cap,

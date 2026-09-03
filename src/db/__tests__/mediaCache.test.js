@@ -158,9 +158,9 @@ vi.mock('../dbCore', () => ({
 // jsdom no expone IDBKeyRange por defecto
 beforeEach(() => {
   vi.unstubAllEnvs();
-  globalThis.IDBKeyRange = {
+  globalThis.IDBKeyRange = /** @type {any} */ ({
     only: (val) => ({ lower: val, upper: val }),
-  };
+  });
   store = [];
   nextId = 1;
   cursorIndex = 0;

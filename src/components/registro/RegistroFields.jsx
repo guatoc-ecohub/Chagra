@@ -71,6 +71,7 @@ export function TextField({ label, hint, Icon, error, ...rest }) {
  * @param {boolean} [props.required]
  * @param {string|number} [props.step]
  * @param {string|number} [props.min]
+ * @param {string} [props.placeholder]
  */
 export function NumberField({ label, hint, Icon, error, ...rest }) {
   return (

@@ -1,0 +1,242 @@
+/*
+ * CacaoVivo3D.css — vitrina del mundo del cacao (#/mockups/cacao-vivo-3d).
+ * Autocontenida: sin fuentes/imágenes externas. Móvil-first desde 320px.
+ * Paleta de piso cálido: verde de vega, calina dorada y el cobre de la
+ * mazorca madura. Solo opacity/transform se animan.
+ */
+
+.kviva {
+  min-height: 100vh;
+  min-height: 100dvh;
+  padding: 1rem 0.9rem 2.5rem;
+  background: linear-gradient(180deg, #e2e6c2 0%, #e8e3c4 44%, #efe3c6 100%);
+  color: #322c20;
+  font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+}
+
+.kviva__head {
+  max-width: 46rem;
+  margin: 0 auto 1rem;
+}
+.kviva__kicker {
+  margin: 0 0 0.2rem;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #8a4a20;
+}
+.kviva__head h1 {
+  margin: 0;
+  font-size: clamp(1.5rem, 5vw, 2.2rem);
+  line-height: 1.15;
+  color: #3c3a22;
+}
+.kviva__lema {
+  margin: 0.4rem 0 0;
+  font-size: 0.98rem;
+  line-height: 1.45;
+  max-width: 40rem;
+}
+
+.kviva__escena {
+  max-width: 46rem;
+  margin: 0 auto;
+}
+.kviva__lienzo {
+  position: relative;
+  height: min(66vh, 32rem);
+  min-height: 320px;
+  border-radius: 14px;
+  overflow: hidden;
+  border: 1px solid rgba(138, 74, 32, 0.25);
+  box-shadow: 0 12px 30px rgba(58, 50, 32, 0.16);
+  background: radial-gradient(120% 90% at 50% 20%, #dee4ba 0%, #b8bd8c 100%);
+}
+.kviva__lienzo canvas {
+  display: block;
+  width: 100% !important;
+  height: 100% !important;
+  touch-action: none;
+}
+.cacao-canvas {
+  opacity: 0;
+  transition: opacity 0.6s ease;
+}
+.cacao-canvas--lista {
+  opacity: 1;
+}
+
+.kviva__cargando {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  font-size: 0.9rem;
+  color: #4a4430;
+  opacity: 0.85;
+}
+
+.kviva__barra {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin-top: 0.6rem;
+}
+.kviva__tier {
+  margin: 0;
+  font-size: 0.85rem;
+  opacity: 0.85;
+}
+.kviva__toggle {
+  border: 1.5px solid #8a4a20;
+  background: #fff;
+  color: #8a4a20;
+  font-weight: 700;
+  font-size: 0.85rem;
+  padding: 0.45rem 0.9rem;
+  border-radius: 999px;
+  cursor: pointer;
+}
+.kviva__toggle:hover,
+.kviva__toggle:focus-visible {
+  background: #8a4a20;
+  color: #fff;
+  outline-offset: 2px;
+}
+
+/* ---- Ficha 2D (fallback digno, sin GPU) ---- */
+.kviva__ficha {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.3rem;
+  background: radial-gradient(120% 90% at 50% 25%, #dfe0b8 0%, #adad84 100%);
+}
+.kviva__estampa {
+  position: relative;
+  width: 190px;
+  height: 180px;
+  margin-bottom: 0.4rem;
+}
+/* el guamo del sombrío, detrás y bien alto */
+.kviva__guamo {
+  position: absolute;
+  top: 0;
+  left: 8px;
+  width: 145px;
+  height: 60px;
+  border-radius: 56% 44% 60% 40% / 70% 74% 26% 30%;
+  background: radial-gradient(circle at 42% 30%, #68984a77 0%, #4a7c38 65%, #3c662c 100%);
+  box-shadow: inset -8px -6px 14px rgba(0, 0, 0, 0.16);
+}
+.kviva__guamo-tronco {
+  position: absolute;
+  top: 46px;
+  left: 72px;
+  width: 13px;
+  height: 90px;
+  border-radius: 40%;
+  background: linear-gradient(90deg, #4f3c28 0%, #6b533a 55%, #4a3a26 100%);
+}
+/* la copa del cacao, ancha y baja */
+.kviva__copa {
+  position: absolute;
+  top: 62px;
+  left: 42px;
+  width: 108px;
+  height: 52px;
+  border-radius: 48% 52% 44% 56% / 62% 58% 42% 38%;
+  background: radial-gradient(circle at 38% 32%, #4f8340 0%, #33642f 70%, #27522a 100%);
+  box-shadow: inset -7px -6px 12px rgba(0, 0, 0, 0.2);
+}
+/* el TRONCO del cacao — de él cuelgan las mazorcas (caulifloria) */
+.kviva__tronco {
+  position: absolute;
+  top: 100px;
+  left: 88px;
+  width: 16px;
+  height: 80px;
+  border-radius: 38%;
+  background: linear-gradient(90deg, #40301e 0%, #54402c 55%, #3c2e1c 100%);
+}
+.kviva__mazorca {
+  position: absolute;
+  width: 15px;
+  height: 24px;
+  border-radius: 50% 50% 46% 46% / 42% 42% 58% 58%;
+  box-shadow: inset -2px -3px 4px rgba(0, 0, 0, 0.28);
+}
+.kviva__mazorca--verde { top: 8px; left: -13px; background: #6da03f; transform: rotate(-10deg); }
+.kviva__mazorca--amarilla { top: 30px; left: 13px; background: #dcae3a; transform: rotate(9deg); }
+.kviva__mazorca--roja { top: 44px; left: -11px; background: #9c4523; transform: rotate(-6deg); }
+.kviva__ficha-nombre {
+  margin: 0;
+  font-weight: 800;
+  font-size: 1rem;
+  color: #3c3a22;
+}
+.kviva__ficha-sub {
+  margin: 0;
+  font-size: 0.85rem;
+  color: #5a5238;
+}
+
+/* ---- Saberes ---- */
+.kviva__saberes {
+  max-width: 46rem;
+  margin: 1.6rem auto 0;
+}
+.kviva__saberes h2 {
+  font-size: 1.15rem;
+  margin: 0 0 0.7rem;
+  color: #3c3a22;
+}
+.kviva__saberes ol {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.6rem;
+}
+@media (min-width: 640px) {
+  .kviva__saberes ol {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+.kviva__saberes li {
+  display: flex;
+  gap: 0.65rem;
+  align-items: flex-start;
+  background: rgba(255, 255, 255, 0.7);
+  border: 1px solid rgba(138, 74, 32, 0.16);
+  border-radius: 12px;
+  padding: 0.7rem 0.8rem;
+}
+.kviva__emoji {
+  font-size: 1.4rem;
+  line-height: 1.2;
+}
+.kviva__saberes b {
+  display: block;
+  font-size: 0.92rem;
+  color: #3c3a22;
+}
+.kviva__saberes li p {
+  margin: 0.15rem 0 0;
+  font-size: 0.86rem;
+  line-height: 1.42;
+}
+.kviva__cierre {
+  margin: 0.9rem 0 0;
+  font-size: 0.9rem;
+  line-height: 1.5;
+  color: #4a4430;
+  max-width: 42rem;
+}
