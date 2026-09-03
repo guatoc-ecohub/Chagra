@@ -50,6 +50,25 @@
  *   etiqueta      override del texto de estado (accesibilidad/tono lo decide
  *                 el host si quiere).
  *
+ * MODO `escena3d` (PASO 3 del descenso por la Sierra, 2026-09-02) — ADITIVO:
+ * el modo CSS de arriba queda EXACTAMENTE como estaba, reloj incluido.
+ *   escena3d      true = descenso 3D · false = nunca · 'auto' (default) =
+ *                 consulta `?descenso3d=1`. Los 12 FX de clima siguen apagados
+ *                 por defecto en la entrada pública: cambiar un default es
+ *                 potestad del gate móvil (Paso 7), no de este archivo.
+ *                 Además exige `permite3D(tier)`, sin reduced-motion, sentido
+ *                 'bajar' y que no lo haya visto ya: el descenso corre UNA vez.
+ *   msnmUsuario   cota real de la finca del usuario: el viaje FRENA ahí. Sin
+ *                 ella para en la banda templada (1 000–2 000 m, la modal
+ *                 andina) y lo DICE — nunca inventa una cota ni un clima.
+ *   faseEnso      fase ENSO VIVA ('neutral'|'el_nino'|'la_nina'), leída por el
+ *                 host con `getEnsoPhase()` de `services/ensoService.js` (la
+ *                 fuente única, GR-9). NUNCA la constante `ENSO_WATCH_2026`.
+ *   humedad       humedad relativa real (0..100) si el dato vivo la trae: mueve
+ *                 la cota de condensación de la nube en vez de hornearla.
+ *   onDescenso    callback por cuadro con el estado del viaje (altitud, banda,
+ *                 óptica). Lo consume el aterrizaje (Paso 4).
+ *
  * CABLEO SUGERIDO (este archivo no toca nada existente — compone por props):
  *   1. El host de la vista global (p.ej. quien monte VistaGlobalSierra) guarda
  *      un estado `viaje = { activa, direccion, pisoDestino }`;
@@ -68,8 +87,21 @@
  *      `<PerspectiveCamera ref={camRef}/>` (o `useThree().camera` guardada en
  *      un ref) → `camaraRef={camRef}`.
  */
-import { useEffect, useRef } from 'react';
+import { Suspense, lazy, useEffect, useMemo, useRef, useState } from 'react';
 import { PISOS_TRANSICION_SIERRA as PISOS } from './pisosTermicos.js';
+import { permite3D } from './deviceTier.js';
+import {
+  cotaDestino,
+  descenso3dPedido,
+  descensoYaVisto,
+  duracionDescenso,
+  marcarDescensoVisto,
+  planDescenso,
+} from './sierra/descensoSierra.js';
+
+/* La escena 3D del descenso se carga PEREZOSA: en modo CSS (el de hoy, y el
+   fallback de tier bajo) no entra ni un byte de three al bundle inicial. */
+const EscenaDescensoSierra = lazy(() => import('./sierra/EscenaDescensoSierra.jsx'));
 
 /* ------------------------------ reloj interno --------------------------- */
 /* No se exportan (react-refresh/only-export-components): el host cronometra
@@ -93,6 +125,8 @@ function duracionViaje(tier, reducedMotion) {
  * bandas; esto solo tiñe el beat de llegada y la etiqueta. */
 
 const PISO_DEFAULT = { nombre: 'su destino', a: '#f2c063', b: '#1d4030' };
+/* Sin ubicación confirmada NO se inventa una cota ni un clima: se dice. */
+const SIN_UBICACION = 'sin su ubicación todavía';
 
 function normaliza(texto) {
   return String(texto ?? '')
@@ -182,6 +216,74 @@ const CSS = `
 @keyframes tsm-asciende {
   0% { transform: translateY(-200vh); }
   100% { transform: translateY(0); }
+}
+
+/* ── modo escena3d: la tapa se vuelve SEMITRANSPARENTE y debajo corre el
+   descenso real. El lienzo 3D es quien cubre la pantalla (es una escena opaca),
+   así que el intercambio de escena del host sigue ocurriendo BAJO TAPA; la
+   columna de bandas queda como tinte de transecto encima, y como red de
+   seguridad si el 3D no monta. ── */
+.tsm__lienzo {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.tsm--3d .tsm__bandas {
+  /* Nada de mix-blend-mode soft-light: medido en el gate del 2026-09-02, esa
+     mezcla sobre una escena a color la empuja al gris medio y le come el croma
+     al macizo — justo lo que la puerta del Paso 3 tiene que poder leer. Acá la
+     columna queda como TINTE tenue y como red de seguridad si el 3D no monta,
+     no como capa de dirección de arte. */
+  animation-name: tsm-cubre-3d, tsm-desciende;
+}
+
+.tsm--3d[data-direccion='subir'] .tsm__bandas {
+  animation-name: tsm-cubre-3d, tsm-asciende;
+}
+
+@keyframes tsm-cubre-3d {
+  0% { opacity: 0; }
+  30%, 70% { opacity: 0.16; }
+  100% { opacity: 0; }
+}
+
+/* En 3D el beat de llegada y la viñeta bajan de peso: el frenazo lo vende la
+   cámara, no un velo encima. */
+.tsm--3d .tsm__tinte { animation-name: tsm-beat-3d; }
+
+@keyframes tsm-beat-3d {
+  0%, 40% { opacity: 0; }
+  62%, 72% { opacity: 0.34; }
+  88%, 100% { opacity: 0; }
+}
+
+/* El rótulo de altitud que CORRE de 5.775 a la cota del usuario (§3.2): una de
+   las cuatro capas con que el descenso comunica la altura, y la única que se
+   puede leer como número. */
+.tsm__altimetro {
+  position: absolute;
+  top: 10vh;
+  left: 0;
+  right: 0;
+  margin: 0;
+  text-align: center;
+  color: #fdf8ec;
+  font: 600 1.5rem/1.1 ui-monospace, SFMono-Regular, Menlo, monospace;
+  letter-spacing: 0.04em;
+  text-shadow: 0 2px 10px rgba(10, 24, 20, 0.7);
+  opacity: 0;
+  animation: tsm-txt var(--tsm-ms) ease-in-out both;
+}
+
+.tsm__altimetro small {
+  display: block;
+  margin-top: 0.2rem;
+  font: 500 0.78rem/1.2 system-ui, sans-serif;
+  letter-spacing: 0.02em;
+  opacity: 0.86;
 }
 
 /* Beat de llegada: velo radial con el tinte del piso destino que respira en
@@ -347,9 +449,55 @@ export default function TransicionSierraMundo({
   colorA,
   colorB,
   etiqueta,
+  escena3d = 'auto',
+  msnmUsuario = null,
+  faseEnso = 'neutral',
+  humedad = null,
+  onDescenso,
 }) {
   const mitadRef = useRef(onMitad);
   const finRef = useRef(onFin);
+  const altimetroRef = useRef(null);
+  const estadoRef = useRef(onDescenso);
+  useEffect(() => {
+    estadoRef.current = onDescenso;
+  });
+
+  /*
+   * ¿Corre el descenso 3D? Cuatro condiciones, todas conservadoras:
+   *   1. pedido explícito (prop `escena3d`) o `?descenso3d=1` — los FX de clima
+   *      siguen APAGADOS por defecto en la entrada pública; el gate móvil del
+   *      Paso 7 es la única puerta para cambiar un default;
+   *   2. el tier lo permite (`permite3D`): en gama baja cae a la columna CSS,
+   *      que es barata, digna y probada — resultado ACEPTABLE, no fracaso;
+   *   3. no hay reduced-motion (ahí manda el corte simple);
+   *   4. no lo vio ya: corre UNA vez (decisión del operador).
+   */
+  const [yaVisto] = useState(() => descensoYaVisto());
+  const usar3d =
+    (escena3d === true || (escena3d === 'auto' && descenso3dPedido())) &&
+    permite3D(tier) &&
+    !reducedMotion &&
+    direccion !== 'subir' &&
+    !yaVisto;
+
+  const destino = useMemo(() => cotaDestino(msnmUsuario), [msnmUsuario]);
+  const plan = useMemo(
+    () => (usar3d ? planDescenso(destino.cota, tier) : null),
+    [usar3d, destino.cota, tier],
+  );
+  /*
+   * EL RELOJ COMPARTIDO. El instante cero lo fija el mismo efecto que arma los
+   * timers del contrato, y viaja a la escena como REF (no como valor): la
+   * escena se carga perezosa y su primer cuadro llega ~400-500 ms tarde, así
+   * que si midiera desde su propio montaje iría atrasada esos milisegundos y el
+   * viaje se cortaría antes de llegar. Medido en el gate del 2026-09-02: con el
+   * reloj propio, el altímetro marcaba 2.136 m a los 4 000 ms de un viaje que
+   * debía terminar en 1.500 — el FRENAZO, que es el punto entero del descenso
+   * (§4.3), no llegaba a verse nunca. Con la ref, la escena lee el cero real en
+   * su primer cuadro, ya escrito.
+   */
+  const inicioRef = useRef(0);
   // Refs "última versión": se actualizan en un effect (no en render) para que
   // los timers llamen siempre al callback más fresco sin re-armarse.
   useEffect(() => {
@@ -357,10 +505,17 @@ export default function TransicionSierraMundo({
     finRef.current = onFin;
   });
 
-  // Contrato temporal: timers deterministas, cada callback a lo sumo una vez.
+  /* Contrato temporal: timers deterministas, cada callback a lo sumo una vez.
+     INTACTO. Lo único que cambia en modo 3D es el NÚMERO de milisegundos:
+     4 200 / 2 800 / 1 400 (decisión del operador, §3.2) en vez de los 1 500 del
+     modo CSS. El modo CSS conserva su reloj exacto: no se le cambia el tiempo a
+     una transición que ya está en producción por una función que no usa. */
   useEffect(() => {
     if (!activa) return undefined;
-    const total = duracionViaje(tier, reducedMotion);
+    const total = usar3d
+      ? duracionDescenso(tier, reducedMotion)
+      : duracionViaje(tier, reducedMotion);
+    inicioRef.current = typeof performance !== 'undefined' ? performance.now() : Date.now();
     let hechoMitad = false;
     let hechoFin = false;
     const tMitad = setTimeout(() => {
@@ -372,6 +527,7 @@ export default function TransicionSierraMundo({
     const tFin = setTimeout(() => {
       if (!hechoFin) {
         hechoFin = true;
+        if (usar3d) marcarDescensoVisto(); // corre UNA vez
         finRef.current?.();
       }
     }, total);
@@ -381,13 +537,15 @@ export default function TransicionSierraMundo({
       clearTimeout(tMitad);
       clearTimeout(tFin);
     };
-  }, [activa, direccion, tier, reducedMotion]);
+  }, [activa, direccion, tier, reducedMotion, usar3d]);
 
   // Tween de cámara OPCIONAL: dolly vertical + push/pull de FOV solo durante
   // la fase de cubierta; al terminar (o abortar) restaura pos/fov iniciales —
   // el intercambio de escena ocurre bajo tapa y la cámara vuelve intacta.
   useEffect(() => {
-    if (!activa || reducedMotion || !camaraRef) return undefined;
+    // En modo 3D la cámara del descenso es la de la escena propia; el tween
+    // sobre la cámara del host sobra y competiría con ella.
+    if (!activa || reducedMotion || !camaraRef || usar3d) return undefined;
     const cam = camaraRef.current;
     if (!cam || !cam.position || typeof cam.position.y !== 'number') return undefined;
 
@@ -430,12 +588,14 @@ export default function TransicionSierraMundo({
       cancelAnimationFrame(raf);
       restaura();
     };
-  }, [activa, direccion, tier, reducedMotion, camaraRef, caidaCamara]);
+  }, [activa, direccion, tier, reducedMotion, camaraRef, caidaCamara, usar3d]);
 
   if (!activa) return null;
 
   const piso = resolverPiso(pisoDestino);
-  const total = duracionViaje(tier, reducedMotion);
+  const total = usar3d
+    ? duracionDescenso(tier, reducedMotion)
+    : duracionViaje(tier, reducedMotion);
   const conAdornos = tier !== 'bajo' && !reducedMotion;
   const baja = direccion !== 'subir';
   const texto =
@@ -443,10 +603,11 @@ export default function TransicionSierraMundo({
 
   return (
     <div
-      className="tsm"
+      className={usar3d ? 'tsm tsm--3d' : 'tsm'}
       data-direccion={baja ? 'bajar' : 'subir'}
       data-tier={tier}
       data-reducida={reducedMotion ? '1' : '0'}
+      data-escena3d={usar3d ? '1' : '0'}
       style={{
         '--tsm-a': colorA ?? piso.a,
         '--tsm-b': colorB ?? piso.b,
@@ -462,6 +623,25 @@ export default function TransicionSierraMundo({
         <div className="tsm__corte" aria-hidden="true" />
       ) : (
         <>
+          {usar3d && (
+            <Suspense fallback={null}>
+              <EscenaDescensoSierra
+                plan={plan}
+                fase={faseEnso}
+                humedad={humedad}
+                tier={tier}
+                inicioRef={inicioRef}
+                onEstado={(est) => {
+                  // El rótulo se escribe DIRECTO en el DOM: 60 setState por
+                  // segundo re-renderizarían el overlay entero y el número que
+                  // corre es justo lo que no puede tartamudear.
+                  const n = altimetroRef.current;
+                  if (n) n.textContent = `${est.rotuloMsnm.toLocaleString('es-CO')} m`;
+                  estadoRef.current?.(est);
+                }}
+              />
+            </Suspense>
+          )}
           <div className="tsm__bandas" aria-hidden="true" />
           {conAdornos && (
             <>
@@ -473,6 +653,12 @@ export default function TransicionSierraMundo({
           )}
           <div className="tsm__tinte" aria-hidden="true" />
           {tier === 'alto' && <div className="tsm__destello" aria-hidden="true" />}
+          {usar3d && (
+            <p className="tsm__altimetro" aria-hidden="true">
+              <span ref={altimetroRef}>5.775 m</span>
+              <small>{destino.conUbicacion ? piso.nombre : SIN_UBICACION}</small>
+            </p>
+          )}
           <p className="tsm__txt">{texto}</p>
         </>
       )}
