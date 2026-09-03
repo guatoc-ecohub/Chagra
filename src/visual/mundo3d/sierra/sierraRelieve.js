@@ -22,7 +22,7 @@
  * Cristóbal Colón). De ahí `METROS_POR_UNIDAD ≈ 1155`, que es la constante con
  * la que la tabla canónica `PISOS_TERMICOS_SIERRA` derivó sus `topeWorldY`.
  */
-import { BANDAS_SIERRA } from '../pisosTermicos.js';
+import { PISOS_TERMICOS } from '../pisosTermicos.js';
 
 /* ── Geografía del macizo. Coordenadas de MUNDO: X = oriente-occidente,
       Y = altura, Z = norte(mar, −) → sur(cumbres, +). ── */
@@ -86,37 +86,59 @@ export function alturaSierra(wx, wz) {
   return h;
 }
 
-/* ── Color por altura, derivado de la tabla canónica ─────────────────────────
-   El ANCHO del cruce entre bandas es la perilla que el PASO 2 está afinando
-   para que se lean 7 pisos y no 3 (defecto §2.3.4). Vive acá, con un solo
-   valor, para que afinarlo no obligue a tocar dos archivos. El valor actual
-   (0.16 world Y ≈ ±185 m) es el heredado; cuando el Paso 2 cierre con su
-   número medido, se cambia AQUÍ y lo heredan la vista global y el descenso. */
-export const ANCHO_CRUCE_BANDA = 0.16;
-/** Cruce de la línea de nieve: más angosto = filo nevado, no difuminado ocre. */
-export const ANCHO_CRUCE_NIEVE = 0.16;
+/* ── Color por altura: EL DESCENSO HEREDA LA SIERRA, no inventa su paleta ────
+ *
+ * Esta tabla es, banda por banda y valor por valor, la que el PASO 2 dejó en
+ * `VistaGlobalSierra.jsx` (commit `0ad96442f`). Se copia a propósito: la puerta
+ * del Paso 3 exige que el descenso y la vista global se lean como el MISMO
+ * macizo, y el 2026-09-02 se midió que no lo hacían — el verde de la vista
+ * global daba rgb(91,120,51) y el del descenso rgb(45,66,33), porque cada uno
+ * leía un juego de colores distinto del mismo archivo.
+ *
+ * ⚠️ DECISIÓN DE CANON ABIERTA, para el operador — la dejo escrita, no la tomo:
+ * `pisosTermicos.js` expone HOY dos juegos de color para lo mismo. El Paso 1
+ * derivó `PISOS_TERMICOS_SIERRA` (7 bandas, verdes oscuros: `#437233`,
+ * `#5c8a69`, `#94975a`…); el Paso 2 decidió leer `PISOS_TERMICOS` (6 pisos
+ * ecológicos, verdes más claros: `#6f9e4a`, `#4f8f7d`, `#9fb6bf`…) y añadir la
+ * playa a mano. Los dos «leen de la tabla canónica» y dan macizos distintos.
+ * Mientras eso no se resuelva, el descenso sigue a la Sierra, que es la vista
+ * que el usuario ve primero. Cuál de los dos juegos es EL canónico es decisión
+ * de la tabla y del arte, no de este archivo.
+ *
+ * El nival va a `#f4f9ff` y no al canónico por la misma razón: es el override
+ * de render que el Paso 2 documentó (§ su informe, punto 1) para que la nieve
+ * sobreviva a la luz dorada y no se lea ocre. Si el operador prefiere el
+ * canónico, se cambia acá y en `VistaGlobalSierra.jsx` — los dos, o vuelven a
+ * divergir. ── */
+const LINEA_NIEVE = 4.15; // superpáramo → nival (≈ 4 793 msnm)
+
+const colorPiso = (id, fallback) => {
+  const p = PISOS_TERMICOS.find((b) => b.id === id);
+  return hexARgb(p ? p.color : fallback);
+};
+
+/* De menor a mayor altitud. El orden IMPORTA: `colorPorAlturaRGB` recorre la
+   lista hacia arriba, y una lista al revés hace que toda cota devuelva la
+   primera banda (fue exactamente el bug que se midió acá el 2026-09-02). */
+const BANDAS_RGB = [
+  { tope: 0.28, rgb: hexARgb('#ddc78d') }, // playa / arena (la tabla no la separa)
+  { tope: 0.95, rgb: colorPiso('calido', '#cba04a') }, // bosque seco tropical
+  { tope: 1.75, rgb: colorPiso('templado', '#6f9e4a') }, // selva húmeda
+  { tope: 2.6, rgb: colorPiso('frio', '#4f8f7d') }, // bosque de niebla
+  { tope: 3.45, rgb: colorPiso('paramo', '#9fb6bf') }, // páramo / frailejones
+  { tope: LINEA_NIEVE, rgb: colorPiso('superparamo', '#b9c6cc') }, // superpáramo (roca)
+  { tope: Infinity, rgb: hexARgb('#f4f9ff') }, // nieve perpetua (override de render)
+].sort((a, b) => a.tope - b.tope);
 
 /*
- * 🔴 EL ORDEN IMPORTA — y la tabla canónica viene al revés de lo que este
- * algoritmo necesita.
- *
- * `BANDAS_SIERRA` (Paso 1) viene ordenada de la CIMA al MAR: su primer tope es
- * `Infinity` (la nieve perpetua). El recorrido `while (y > BANDAS[i].tope) i++`
- * espera lo contrario, de menor a mayor. Con el orden de la tabla, `y > Infinity`
- * es falso en la primera vuelta, el índice se queda en 0 y TODA altitud devuelve
- * el color de la primera banda: el macizo entero pintado de crema nival, sin
- * ninguno de los 7 pisos. Medido acá el 2026-09-02: `colorPorAlturaRGB` devolvía
- * `#f2ead6` para y = 0,1 … 4,9 sin excepción.
- *
- * Acá se ORDENA al consumir. No se toca la tabla canónica: es de otro carril, y
- * su orden cima→mar es correcto PARA ELLA (es el orden de la leyenda). El que
- * estaba mal era el consumidor. ⚠️ `VistaGlobalSierra.jsx` en la rama del Paso 1
- * tiene el mismo consumidor sin ordenar — ver el informe del Paso 3.
+ * El ANCHO del cruce entre bandas: la perilla del contraste. Los dos valores
+ * son los que el PASO 2 midió y dejó en producción — interior angosto para que
+ * se lean SIETE pisos y no tres, y línea de nieve casi a filo para que la cima
+ * lea NIEVE y no un difuminado ocre. Viven acá, en un solo lugar, para que
+ * afinarlos no obligue a tocar dos archivos.
  */
-const BANDAS_RGB = BANDAS_SIERRA.map((b) => ({
-  tope: b.tope,
-  rgb: hexARgb(b.hexColor),
-})).sort((a, b) => a.tope - b.tope);
+export const ANCHO_CRUCE_BANDA = 0.09;
+export const ANCHO_CRUCE_NIEVE = 0.02;
 
 /** '#rrggbb' → [r,g,b] en 0..1 (sRGB tal cual, sin conversión de espacio). */
 export function hexARgb(hex) {
@@ -126,7 +148,7 @@ export function hexARgb(hex) {
 }
 
 /**
- * Color de ladera para una altura de mundo, mezclando entre bandas canónicas.
+ * Color de ladera para una altura de mundo, mezclando entre bandas.
  * Devuelve `[r,g,b]` 0..1. Es la MISMA ley que pinta la vista global.
  */
 export function colorPorAlturaRGB(y) {
