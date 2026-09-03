@@ -23,6 +23,8 @@
  * Título/emoji/tinte NO se duplican: se resuelven contra el manifiesto real
  * (mundosFinca.js) en `resolverTinte`/`tituloMundo` (mundo host).
  */
+import { BOVEDA_PISOS_DEF } from './pisosTermicos.js';
+
 
 /*
  * EL HATO DE MUESTRA — UNA sola fuente para DOS mundos (consistencia cross-mundo,
@@ -411,13 +413,17 @@ export const MUNDO = {
       hora: 0.62,           // media tarde andina (0 amanece · 0.5 mediodía · 1 anochece)
       temporada: 'lluvia',  // régimen BIMODAL andino: dos lluvias / dos secas
       niebla: 0.6,          // niebla del páramo: el frailejón peina el agua de la nube
-      // La montaña en cuatro pisos térmicos (misma paleta del mundo #4).
-      pisos: [
-        { nombre: 'cálido', color: '#c7a24b', h: 0.95, r0: 2.4, r1: 1.95 },
-        { nombre: 'templado', color: '#8fae55', h: 0.9, r1: 1.42 },
-        { nombre: 'frío', color: '#6f9a72', h: 0.85, r1: 0.9 },
-        { nombre: 'páramo', color: '#9fb6bf', h: 0.8, r1: 0.42 },
-      ],
+      // 🔴 LA MONTAÑA SON SIETE PISOS, no cuatro. Hasta el 2026-09-02 esta lista
+      // traía cuatro pisos con paleta propia (`#c7a24b`/`#8fae55`/`#6f9a72`/
+      // `#9fb6bf`) — el defecto §0 del diseño: «Clima enseña 4 pisos; la Sierra
+      // enseña 7. Se contradicen». Ahora se LEE la tabla canónica
+      // (`BOVEDA_PISOS_DEF`, derivada de `PISOS_TERMICOS_SIERRA`), que es la
+      // misma que pintan la vista global, el descenso y el macizo 3D. La
+      // geometría no cambia (cima 3,5 · base 2,4 · cima 0,42 en los dos juegos,
+      // verificado); lo que cambia es que el GEMELO 2D de la bóveda —el que ve
+      // el equipo humilde, `laminas2d/LaminaMundo.jsx` FondoBoveda— deja de
+      // enseñar cuatro bandas inventadas y enseña las siete de la tabla.
+      pisos: BOVEDA_PISOS_DEF,
       // El hielo de hoy + la línea de hasta dónde llegaba (retroceso). Ámbar de
       // "cuídelo", jamás rojo de catástrofe.
       glaciar: { nieve: 0.32, retroceso: 0.7 },

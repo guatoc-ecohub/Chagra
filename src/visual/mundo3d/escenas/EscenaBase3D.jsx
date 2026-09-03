@@ -85,6 +85,7 @@ const _projHotspot = new THREE.Vector3();
 
 function Contenido({
   params, hotspots, entrada, tinte, reducedMotion, onHotspot, cielo, animo, energia, piso = 0,
+  franja: franjaDeclarada = null,
   frugal = false, tier = 'alto', hablando = false, focoId = null, focoToken = 0,
   estadoFinca = ESTADO_FINCA_MUESTRA, hayAlerta = false, camaraInicial,
   tierInicial = 'medio',
@@ -119,7 +120,17 @@ function Contenido({
   // La receta vive en atmosferaMadre (mezclarCielo): ley exportada, mismo
   // resultado aquí y en cualquier consumidor. Memoizado por cielo + franja
   // (la franja cambia unas pocas veces al día; en demo, cada tantos segundos).
-  const { franja } = useCicloDia({ reducedMotion });
+  /* 🔴 La luz obedece la hora DECLARADA por la escena cuando la escena declara
+     una (`franja`); si no, el reloj real. Medido el 2026-09-02 en la bóveda del
+     clima: su cielo, su sol y su fondo están clavados a `hora: 0.62` (media
+     tarde) mientras la luz seguía el reloj del aparato — a las 21:30 la pantalla
+     pintaba un cielo de tarde con luz de NOCHE (intensidad 0.55, clave
+     `#b9c6e6` viniendo de DETRÁS en [-6,7,-4]) y el macizo se leía como una
+     silueta negra. Contradicción medible: con la MISMA malla, los pisos
+     distinguibles pasaban de 7/7 a 5/7 según la hora en que se tomara la
+     captura. Un mundo que declara su hora tiene que iluminarse con ESA hora. */
+  const { franja: franjaReloj } = useCicloDia({ reducedMotion });
+  const franja = franjaDeclarada || franjaReloj;
   const madre = useMemo(() => presetDeHora(franja), [franja]);
   const c = useMemo(() => mezclarCielo(cielo, madre), [cielo, madre]);
 
@@ -386,7 +397,12 @@ export default function EscenaBase3D({
   /* El estado REAL de la finca (auditoría §5b): Angelita SIEMPRE lo refleja.
      Hoy MUESTRA (reaccionFinca); codex lo cabla con useFincaViva sin tocar
      esta interfaz. `hayAlerta` la pone atenta si hay algo del día pendiente. */
-  estadoFinca = ESTADO_FINCA_MUESTRA, hayAlerta = false, children,
+  estadoFinca = ESTADO_FINCA_MUESTRA, hayAlerta = false,
+  /* Hora DECLARADA por la escena ('amanecer'|'manana'|'mediodia'|'tarde'|
+     'atardecer'|'noche'). Opcional: sin ella manda el reloj real, que es el
+     comportamiento de siempre de todos los mundos. */
+  franja = null,
+  children,
 }) {
   const [listo, setListo] = useState(false);
   const compaiHoldHandlers = useCompaiHold();
@@ -429,6 +445,7 @@ export default function EscenaBase3D({
           focoToken={focoToken}
           estadoFinca={estadoFinca}
           hayAlerta={hayAlerta}
+          franja={franja}
           camaraInicial={cam}
           tierInicial={tierInicial}
           presupuestoInicial={presupuestoInicial}
