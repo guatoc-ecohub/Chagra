@@ -15,7 +15,10 @@ import useOllamaWarmStore from '../store/useOllamaWarmStore';
 import { prewarmCorpus } from '../services/ragRetriever';
 import useThemeBackgroundStore, { getBackgroundSrc, esGradiente } from '../store/useThemeBackgroundStore';
 import { friendlyMessage } from '../utils/friendlyErrors';
-import { MENSAJES_LOGIN_ANGELITA } from './loginAngelitaMensajes.js';
+// MENSAJES_LOGIN_ANGELITA (loginAngelitaMensajes.js) ya NO se importa (2026-09-03,
+// feedback_pizarra_unico_aviso_compai): alimentaba la burbuja de bienvenida que
+// AngelitaVueloLogin retiró (era un tercer formato de aviso, y de sus 5 mensajes
+// solo 1 tenía copy real — los otros 4 eran placeholders sin terminar).
 
 const LOGIN_FASE_MS = {
   despierta: 3000,
@@ -50,7 +53,6 @@ export default function LoginScreen({ onLoginSuccess, onSave }) {
   const [angelitaOrigen, setAngelitaOrigen] = useState(null);
   const [angelitaAterrizada, setAngelitaAterrizada] = useState(false);
   const [triadaPlantada, setTriadaPlantada] = useState(false);
-  const [mensajeIndice, setMensajeIndice] = useState(0);
   const orbeRef = useRef(null);
   // Mostrar/ocultar la contraseña ayuda a quien escribe despacio o con poca
   // costumbre del teclado del teléfono a verificar lo que digitó (a11y +
@@ -73,16 +75,6 @@ export default function LoginScreen({ onLoginSuccess, onSave }) {
     ));
     return () => timers.forEach((timer) => window.clearTimeout(timer));
   }, []);
-
-  /* Los mensajes son fijos y no conversacionales. Cada cambio remonta el
-     Typewriter que vive dentro de BurbujaAngelita. */
-  useEffect(() => {
-    if (angelitaFase !== 'volando') return undefined;
-    const timer = window.setInterval(() => {
-      setMensajeIndice((actual) => (actual + 1) % MENSAJES_LOGIN_ANGELITA.length);
-    }, 8000);
-    return () => window.clearInterval(timer);
-  }, [angelitaFase]);
 
   // FIX prod 2026-06-10: la login está diseñada en estilo BIOPUNK (dark) —
   // `bg-slate-950` + `bg-biopunk-pattern` + texto claro. Con el tema 'auto'
@@ -200,7 +192,6 @@ export default function LoginScreen({ onLoginSuccess, onSave }) {
         y: caja.top + caja.height / 2 - 44,
       });
     }
-    setMensajeIndice(0);
     setAngelitaFase('volando');
   }, []);
 
@@ -213,7 +204,6 @@ export default function LoginScreen({ onLoginSuccess, onSave }) {
   const angelitaVolando = angelitaFase === 'volando' && !angelitaAterrizada;
   const angelitaViva = angelitaFase !== 'quieta';
   const angelitaAura = angelitaFase === 'aura' || angelitaFase === 'ruptura';
-  const mensajeAngelita = MENSAJES_LOGIN_ANGELITA[mensajeIndice];
 
   return (
     <div className="login-screen relative min-h-[100dvh] w-full bg-slate-950 bg-biopunk-pattern flex flex-col items-center overflow-y-auto text-slate-100 px-5 sm:px-6 pt-[max(2rem,env(safe-area-inset-top))] pb-[max(2rem,env(safe-area-inset-bottom))]">
@@ -260,7 +250,6 @@ export default function LoginScreen({ onLoginSuccess, onSave }) {
                 volando={angelitaVolando}
                 asentada={angelitaAterrizada}
                 origen={angelitaOrigen}
-                mensaje={mensajeAngelita}
                 estado={angelitaAura || angelitaVolando ? 'invita' : 'acompana'}
                 animated={angelitaViva}
                 aura={angelitaAura}
