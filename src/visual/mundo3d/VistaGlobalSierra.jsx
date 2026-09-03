@@ -59,12 +59,12 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import * as THREE from 'three';
 import { Canvas, useFrame } from '@react-three/fiber';
-import { Html, OrbitControls, AdaptiveDpr } from '@react-three/drei';
+import { Html, Billboard, OrbitControls, AdaptiveDpr } from '@react-three/drei';
 import { ATMOSFERA } from './atmosferaMadre.js';
 import { perfilDeTier } from './deviceTier.js';
 import PisosTermicosBandas from './PisosTermicosBandas.jsx';
 import TransicionSierraMundo from './TransicionSierraMundo.jsx';
-import { BANDAS_SIERRA, CLAVE_PISOS_SIERRA } from './pisosTermicos.js';
+import { PISOS_TERMICOS, PISOS_TERMICOS_SIERRA } from './pisosTermicos.js';
 
 /* ── Geografía del macizo (validada contra el DR: mar al norte, macizo al sur,
       cumbres gemelas + Simmonds, costa de Palomino). Coordenadas de MUNDO:
@@ -73,8 +73,10 @@ const CIMA = 5.0; // altura de referencia (≈ 5.775 m escalados con drama sobri
 const COSTA_Z = -3; // latitud de la línea de costa en Z
 const ANCHO = 22; // extensión E-O del terreno
 const FONDO = 20; // extensión N-S del terreno
-// (la cota de "nieve perpetua" ≈ 4.800 msnm → topeWorldY 4.15 vive en la tabla
-//  canónica PISOS_TERMICOS_SIERRA, pisosTermicos.js, no aquí)
+// La cota de "nieve perpetua" (≈ 4.800 msnm → topeWorldY 4.15) vive en la tabla
+// canónica PISOS_TERMICOS_SIERRA (pisosTermicos.js); aquí solo se LEE, no se
+// redefine: es el tope del superpáramo, justo debajo de la nieve.
+const LINEA_NIEVE = PISOS_TERMICOS_SIERRA.find((p) => p.id === 'superparamo')?.topeWorldY ?? 4.15;
 
 const clamp = (v, a, b) => Math.min(b, Math.max(a, v));
 const smoothstep = (a, b, x) => {
@@ -115,22 +117,58 @@ const PALOMINO = { x: 5.0, y: 0.2, z: -2.85 }; // desembocadura sobre el Caribe
 
 /* ── Banding de pisos térmicos por altitud (colores cálidos de hora dorada;
       la luz del sol termina de entibiarlos). El bosque de niebla es la banda
-      donde se enganchan las nubes. DERIVADO de la tabla canónica
-      `PISOS_TERMICOS_SIERRA` (pisosTermicos.js): cotas y colores compartidos. ── */
-const BANDAS = BANDAS_SIERRA.map((b) => ({ tope: b.tope, c: new THREE.Color(b.hexColor) }));
+      donde se enganchan las nubes.
+
+      Los 6 pisos ecológicos (cálido→nival) LEEN su color de la tabla canónica
+      `PISOS_TERMICOS` (`pisosTermicos.js`), la fuente única que acaba de nacer
+      en el Paso 1 — este render no la edita, la consume. La playa es la banda
+      propia de la costa (0→0.28), que la tabla canónica no separa del cálido.
+      La separación entre bandas se afina angostando la transición del smoothstep
+      (para que se lean 7, no 3) y con el brillo del nival, que bajo la luz dorada
+      debe leerse NIEVE, no ocre (§6-B del diseño). ── */
+const bandColor = (id) => {
+  const p = PISOS_TERMICOS.find((b) => b.id === id);
+  return p ? new THREE.Color(p.color) : new THREE.Color('#ddc78d');
+};
+/* Snow: blanco casi puro con un dejo frío, para que sobreviva a la luz dorada
+   del atardecer sin volverse ocre (defecto §2.3.1). El casquete es pequeño por
+   doctrina: Colombia perdió casi todo el glaciar, así que la nieve ocupa solo
+   la franja más alta y MUERDE con una línea de nieve nítida (§6-B). */
+const BANDAS = [
+  { tope: 0.28, c: new THREE.Color('#ddc78d') }, // playa / arena
+  { tope: 0.95, c: bandColor('calido') }, // bosque seco tropical
+  { tope: 1.75, c: bandColor('templado') }, // selva húmeda
+  { tope: 2.6, c: bandColor('frio') }, // bosque de niebla
+  { tope: 3.45, c: bandColor('paramo') }, // páramo / frailejones
+  { tope: LINEA_NIEVE, c: bandColor('superparamo') }, // superpáramo (roca)
+  { tope: Infinity, c: new THREE.Color('#f4f9ff') }, // nieve perpetua (blanco frío luminoso)
+];
+/* El GROSOR de la transición entre bandas. Interior: angosto (~±0.09 world Y)
+   para que cada piso se lea separado. La línea de nieve (última) MUCHO más
+   angosta (±0.02): un filo nevado nítido, no un difuminado ocre. */
 function colorPorAltura(y, out) {
   let i = 0;
   while (i < BANDAS.length - 1 && y > BANDAS[i].tope) i++;
   if (i === 0) return out.copy(BANDAS[0].c);
   const borde = BANDAS[i - 1].tope;
-  const t = smoothstep(borde - 0.16, borde + 0.16, y); // transición suave por banda
+  const esNieve = i === BANDAS.length - 1;
+  const ancho = esNieve ? 0.02 : 0.09;
+  const t = smoothstep(borde - ancho, borde + ancho, y); // filo nítido por banda
   return out.lerpColors(BANDAS[i - 1].c, BANDAS[i].c, t);
 }
 
 /* La clave de pisos accesible (DOM del modo con Canvas). Nombres de piso, sin
-   palabras-gatillo del linter i18n; el color acompaña a la etiqueta.
-   DERIVADA de la tabla canónica (misma fuente que BANDAS). */
-const CLAVE_PISOS = CLAVE_PISOS_SIERRA;
+   palabras-gatillo del linter i18n; el color acompaña a la etiqueta. Refleja
+   los mismos colores derivados de la tabla canónica que pinta la ladera. */
+const CLAVE_PISOS = [
+  { c: '#f4f9ff', t: 'Nieve perpetua' },
+  { c: '#b9c6cc', t: 'Superpáramo' },
+  { c: '#9fb6bf', t: 'Páramo y frailejones' },
+  { c: '#4f8f7d', t: 'Bosque de niebla' },
+  { c: '#6f9e4a', t: 'Selva húmeda' },
+  { c: '#cba04a', t: 'Bosque seco' },
+  { c: '#ddc78d', t: 'Playa y costa' },
+];
 
 /* Altitud representativa de cada piso (world Y), para el marcador "usted". */
 const PISOS_Y = {
@@ -196,10 +234,67 @@ function Mar({ reducedMotion, conNiebla }) {
   );
 }
 
-/* Nubes bajas que se ENGANCHAN en el bosque de niebla (banda ~1.8–2.4): esferas
-   blancas aplastadas ancladas a la ladera, que derivan sin prisa. */
+/* Textura de nube-suave: mancha fbm blanca con borde MUY emplumado, en canvas
+   (offline-first, determinista). Solo importa el canal alfa: la forma es difusa,
+   de borde degradado, para que la nube NUNCA se lea como polígono de borde duro
+   (defecto §2.3.3) — el patrón del jirón de `brumaVolumetrica.js`. */
+function textoNubeSuave(seed = 3) {
+  const tam = 256;
+  const cv = document.createElement('canvas');
+  cv.width = cv.height = tam;
+  /* Sin contexto 2D no hay textura que tejer. Pasa de verdad: jsdom (los tests
+     de cableado), canvas bloqueado por privacidad, o presión de memoria en gama
+     baja. Degradar a `null` — la nube se dibuja como billboard liso, que es
+     exactamente el aspecto previo — en vez de tumbar la Sierra ENTERA por una
+     textura decorativa. `map={null}` es válido en three.js. */
+  const ctx = typeof cv.getContext === 'function' ? cv.getContext('2d') : null;
+  if (!ctx || typeof ctx.createImageData !== 'function') return null;
+  const img = ctx.createImageData(tam, tam);
+  const px = img.data;
+  const o = seed * 13.7;
+  for (let y = 0; y < tam; y++) {
+    for (let x = 0; x < tam; x++) {
+      // elipse achatada (la nube es más ancha que alta) + fbm que rompe el borde
+      const dx = (x / tam - 0.5) / 0.5;
+      const dy = (y / tam - 0.5) / 0.34;
+      const r = Math.sqrt(dx * dx + dy * dy);
+      const n =
+        Math.sin(x * 0.021 + o) * 0.5 +
+        Math.sin(x * 0.047 - y * 0.031 + o * 1.7) * 0.28 +
+        Math.sin(x * 0.013 + y * 0.037 + o * 2.3) * 0.22;
+      const n2 = n * 0.5 + 0.5;
+      const borde = Math.max(0, Math.min(1, (1.0 - r + (n2 - 0.5) * 0.55) / 0.6));
+      const suave = borde * borde * (3 - 2 * borde);
+      const a = suave * (0.18 + 0.82 * Math.abs(n2)) * 0.92;
+      const i = (y * tam + x) * 4;
+      px[i] = px[i + 1] = px[i + 2] = 255;
+      px[i + 3] = Math.round(Math.max(0, Math.min(1, a)) * 255);
+    }
+  }
+  ctx.putImageData(img, 0, 0);
+  const tex = new THREE.CanvasTexture(cv);
+  tex.colorSpace = THREE.SRGBColorSpace;
+  return tex;
+}
+
+/* Nube-suave determinista (cacheada una sola vez). El flag `_nubeTexIntentada`
+   evita reintentar el tejido en cada render cuando NO hay contexto 2D. */
+let _nubeTex = null;
+let _nubeTexIntentada = false;
+function nubeTextura() {
+  if (!_nubeTexIntentada) {
+    _nubeTexIntentada = true;
+    _nubeTex = textoNubeSuave(3);
+  }
+  return _nubeTex;
+}
+
+/* Nubes bajas que se ENGANCHAN en el bosque de niebla (banda ~1.8–2.4): planos
+   billboard con textura de borde emplumado, anclados a la ladera, que derivan
+   sin prisa. Cero polígonos contables: cada nube es un sprite suave. */
 function NubesDeNiebla({ cuantas, reducedMotion }) {
   const grupo = useRef(null);
+  const tex = nubeTextura();
   const nubes = useMemo(() => {
     const out = [];
     for (let i = 0; i < cuantas; i++) {
@@ -214,6 +309,7 @@ function NubesDeNiebla({ cuantas, reducedMotion }) {
         key: `n${i}`,
         base: [wx, alturaSierra(wx, wz) + 0.35, wz],
         esc: 0.7 + ((i * 37) % 10) / 16,
+        ancho: 2.0 + ((i * 53) % 7) / 5, // placa ancha, chata
         fase: (i * 1.7) % (Math.PI * 2),
       });
     }
@@ -231,16 +327,12 @@ function NubesDeNiebla({ cuantas, reducedMotion }) {
   return (
     <group ref={grupo}>
       {nubes.map((n) => (
-        <group key={n.key} position={/** @type {[number, number, number]} */ (n.base)} scale={[n.esc * 1.9, n.esc * 0.5, n.esc * 1.2]}>
-          <mesh>
-            <sphereGeometry args={[0.6, 9, 7]} />
-            <meshBasicMaterial color="#fbf4e6" transparent opacity={0.82} depthWrite={false} />
+        <Billboard key={n.key} position={/** @type {[number, number, number]} */ (n.base)}>
+          <mesh scale={[n.ancho * n.esc, 0.5 * n.esc, 1]}>
+            <planeGeometry args={[2.4, 1.6]} />
+            <meshBasicMaterial map={tex} color="#fbf4e6" transparent opacity={0.85} depthWrite={false} side={THREE.DoubleSide} />
           </mesh>
-          <mesh position={[0.5, 0.05, 0.1]} scale={0.7}>
-            <sphereGeometry args={[0.6, 8, 6]} />
-            <meshBasicMaterial color="#fdf8ee" transparent opacity={0.72} depthWrite={false} />
-          </mesh>
-        </group>
+        </Billboard>
       ))}
     </group>
   );
@@ -311,7 +403,12 @@ function Rotulo({ pos, texto, sub, distancia = 12, alto = 0.6 }) {
 }
 
 /* Marcador "usted está aquí": haz de luz suave sobre la ladera, a la altitud del
-   piso de la finca. Sobrio, sin gamificación. Solo si `pisoUsuario` es válido. */
+   piso de la finca. Sobrio, sin gamificación. Solo si `pisoUsuario` es válido.
+
+   Quitado el haz vertical (cono/aro translúcido grande): sus bordes rectos se
+   leían como fuga de luz y LAVABAN el color de las bandas altas (defecto §2.3.2).
+   Ahora es un punto de luz suave + un aro fino pegado al suelo, SOBRE la banda y
+   casi sin área de cobertura: marca sin tapar el piso que señala. */
 function MarcadorPiso({ piso }) {
   const punto = useMemo(() => {
     const objetivo = PISOS_Y[piso];
@@ -327,15 +424,17 @@ function MarcadorPiso({ piso }) {
   if (!punto) return null;
   return (
     <group position={/** @type {[number, number, number]} */ (punto)}>
-      <mesh position={[0, 1.4, 0]}>
-        <cylinderGeometry args={[0.04, 0.32, 2.8, 10, 1, true]} />
-        <meshBasicMaterial color="#fff0c2" transparent opacity={0.34} side={THREE.DoubleSide} depthWrite={false} />
+      {/* aro fino pegado al suelo: "esto es donde está" sin elevarse */}
+      <mesh position={[0, 0.05, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+        <ringGeometry args={[0.5, 0.72, 24]} />
+        <meshBasicMaterial color="#ffdf9c" transparent opacity={0.7} depthWrite={false} side={THREE.DoubleSide} />
       </mesh>
-      <mesh position={[0, 0.06, 0]} rotation={[-Math.PI / 2, 0, 0]}>
-        <ringGeometry args={[0.28, 0.42, 24]} />
-        <meshBasicMaterial color="#ffdf9c" transparent opacity={0.85} depthWrite={false} />
+      {/* núcleo suave: pequeño resplandor sobre la banda, sin área de cobertura */}
+      <mesh position={[0, 0.26, 0]}>
+        <circleGeometry args={[0.22, 24]} />
+        <meshBasicMaterial color="#fff0c2" transparent opacity={0.5} depthWrite={false} side={THREE.DoubleSide} />
       </mesh>
-      <Html center distanceFactor={16} position={[0, 3, 0]} zIndexRange={[40, 20]} style={{ pointerEvents: 'none' }}>
+      <Html center distanceFactor={16} position={[0, 0.9, 0]} zIndexRange={[40, 20]} style={{ pointerEvents: 'none' }}>
         <div className="vsierra-aqui" aria-hidden="true">Aquí está usted</div>
       </Html>
     </group>

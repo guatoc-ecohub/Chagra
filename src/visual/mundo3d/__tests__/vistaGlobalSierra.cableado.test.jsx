@@ -8,8 +8,13 @@ vi.mock('@react-three/fiber', () => ({
   useFrame: () => {},
 }));
 
+// Stub del surface de drei que ESTE componente usa. `Billboard` entra aquí
+// porque las nubes de niebla pasaron de esferas a planos billboard (Paso 2):
+// el mock debe reflejar los imports reales del componente, o el render revienta
+// con "Element type is invalid" antes de montar una sola banda.
 vi.mock('@react-three/drei', () => ({
   AdaptiveDpr: () => null,
+  Billboard: ({ children }) => <div>{children}</div>,
   Html: ({ children }) => <div>{children}</div>,
   OrbitControls: () => null,
 }));
