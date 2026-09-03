@@ -140,6 +140,21 @@ function texturaJironSuave(semilla = 7) {
   cv.width = tam;
   cv.height = tam;
   const ctx = cv.getContext('2d');
+  /* En jsdom (y en cualquier entorno sin canvas 2D) `getContext` devuelve null.
+     Sin este guardia el módulo revienta al montarse en un test — le pasó al
+     Paso 2 el 2026-09-02, que dejó `vistaGlobalSierra.cableado.test.jsx` en rojo
+     por exactamente esta línea. Sin contexto se devuelve un jirón liso: la
+     escena pierde textura, no se cae. */
+  if (!ctx) {
+    const lisa = new THREE.DataTexture(
+      new Uint8Array([255, 255, 255, 180]),
+      1,
+      1,
+      THREE.RGBAFormat,
+    );
+    lisa.needsUpdate = true;
+    return lisa;
+  }
   const img = ctx.createImageData(tam, tam);
   const px = img.data;
   const o = semilla * 11.3;
