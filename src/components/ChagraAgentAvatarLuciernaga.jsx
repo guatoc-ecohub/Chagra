@@ -54,6 +54,12 @@ export default function ChagraAgentAvatarLuciernaga({
     'data-agt-estado': dataEstado = undefined,
     'data-pose': dataPose = undefined,
     'data-visema': dataVisema = undefined,
+    // Contrato DOM del elenco (CompaiP1.contract): el rig debe exponer
+    // data-agt-especie y data-creature para TODAS las especies. CompaiAgente
+    // los entrega por propsDelAdaptador; sin reenviarlos aquí la luciérnaga
+    // queda sin especie en su nodo raíz (regresión detectada en dev rojo).
+    'data-agt-especie': dataEspecie = undefined,
+    'data-creature': dataCreature = undefined,
     reaccionaPresencia = true,
 }) {
     const { despierta, handlers: handlersPresencia } = useAngelitaPresencia({ activo: reaccionaPresencia });
@@ -78,6 +84,11 @@ export default function ChagraAgentAvatarLuciernaga({
             data-tier={tier || undefined}
             data-enso={enso}
             data-direccion={direccion}
+            // Spread CONDICIONAL: si llegan undefined (montado directo, sin
+            // CompaiAgente) NO deben pisar el data-creature fijo del Trazado
+            // (un spread undefined en JSX borra el atributo explícito previo).
+            {...(dataEspecie ? { 'data-agt-especie': dataEspecie } : {})}
+            {...(dataCreature ? { 'data-creature': dataCreature } : {})}
         />
     );
 
