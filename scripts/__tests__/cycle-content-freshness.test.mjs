@@ -96,7 +96,7 @@ describe('frescura del corpus RAG vs seed v3.1', () => {
     if (failures.length > 0) {
       throw new Error(
         `corpus rancio: ${failures.length} divergencia(s) seed→corpus. ` +
-          `Re-corré: node scripts/build-cycle-content-from-catalog.mjs\n  - ` +
+          `Vuelva a correr: node scripts/build-cycle-content-from-catalog.mjs\n  - ` +
           failures.join('\n  - '),
       );
     }
