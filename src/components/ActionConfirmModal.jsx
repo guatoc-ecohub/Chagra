@@ -15,6 +15,19 @@ import { X, Check, Pencil, AlertTriangle, Loader2 } from 'lucide-react';
  * borrador arranca siempre con los parámetros de ESA acción. Si vas a abrir
  * este modal desde otra pantalla, pasale también un key que cambie por acción.
  */
+/**
+ * @param {object} props
+ * @param {boolean} [props.isOpen] cerrado el modal renderiza null.
+ * @param {string} [props.toolName]
+ * @param {string} [props.description]
+ * @param {object} [props.parameters] parámetros de ESTA acción (el borrador
+ *        arranca de acá en cada remount por key).
+ * @param {string|null} [props.intent]
+ * @param {string|null} [props.llm_response]
+ * @param {(parameters: object) => Promise<void>|void} props.onApprove
+ * @param {() => Promise<void>|void} props.onReject
+ * @param {(parameters: object) => Promise<void>|void} props.onEdit
+ */
 export default function ActionConfirmModal({
   isOpen,
   toolName,

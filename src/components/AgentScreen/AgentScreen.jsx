@@ -292,7 +292,9 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
   const [thinkingPhase, setThinkingPhase] = useState(null);
   const [isOnline, setIsOnline] = useState(navigator.onLine);
   const [error, setError] = useState('');
-  const [actionModal, setActionModal] = useState({ isOpen: false, intent: null, llmResponse: '', toolName: '', description: '', parameters: {} });
+  // gateId: id único por acción; el key del ActionConfirmModal remonta el
+  // modal en cada gate (BUG-01). '' = ningún gate abierto todavía.
+  const [actionModal, setActionModal] = useState({ isOpen: false, gateId: '', intent: null, llmResponse: '', toolName: '', description: '', parameters: {} });
   // Task #194: Modal de consentimiento para feedback
   const [feedbackConsentModal, setFeedbackConsentModal] = useState({ isOpen: false, pendingAction: null });
   const ttsSupported = isSupported();
@@ -878,7 +880,7 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
     const wasEdited = JSON.stringify(params) !== JSON.stringify(actionModal.parameters);
     const resolver = actionGateResolverRef.current;
     actionGateResolverRef.current = null;
-    setActionModal({ isOpen: false, intent: null, llmResponse: '', toolName: '', description: '', parameters: {} });
+    setActionModal({ isOpen: false, gateId: '', intent: null, llmResponse: '', toolName: '', description: '', parameters: {} });
     if (resolver) {
       resolver({
         status: wasEdited ? 'edited' : 'approved',
@@ -890,7 +892,7 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
   const handleActionReject = () => {
     const resolver = actionGateResolverRef.current;
     actionGateResolverRef.current = null;
-    setActionModal({ isOpen: false, intent: null, llmResponse: '', toolName: '', description: '', parameters: {} });
+    setActionModal({ isOpen: false, gateId: '', intent: null, llmResponse: '', toolName: '', description: '', parameters: {} });
     if (resolver) {
       resolver({ status: 'rejected' });
     }
