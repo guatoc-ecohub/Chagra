@@ -33,4 +33,23 @@ interface Window {
   __pr?: () => { dpr: number; css: number[]; buffer: number[]; drawCalls: number; triangulos: number };
   // Tiempo de GPU real (finish + readPixels de 1 px), por si el rAF miente.
   __gpuMs?: (n?: number) => { n: number; min: number; p50: number; p95: number; max: number };
+
+  // ── Sondas del vendor de flora (sierra/vendor/flora) ──────────────────────
+  // Mismo contrato de gate: el vendor cuelga censo/estado para el arnés y las
+  // borra quien las colgó. Tipos según lo que cada módulo asigna.
+  // FollajeMasa: estado de la oclusión horneada (estado() + ajuste en vivo).
+  __aoHorneado?: { estado: () => Record<string, unknown>; fuerza: (fuerza: number, directo: number) => number };
+  // vientoMundos: reloj del viento (t avanza ⇒ árbol vivo) y fuerza actual.
+  __vientoVM?: { t: number; f: number };
+  // flora-eztree-bake: si la hoja procedural está activa para este bake.
+  __floraHoja?: { activa: boolean };
+  // flora.js: censo del verde extendido (conteos sembrados por rodal).
+  __verdeExt?: { r1LaderaCerca: number; r2Hueco: number; r3Subparamo: number; matorral: number; pasto: number };
+  // flora.js: contrato de inspección de la variación por especie.
+  __floraSpecies?: {
+    activa: boolean;
+    semilla: number;
+    perfiles: { nombre: string; ancho: number; profundidad: number; instancias: number }[];
+    lejanas: { nombre: string; instancias: number }[];
+  };
 }
