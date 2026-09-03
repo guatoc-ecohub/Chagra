@@ -2,44 +2,64 @@
   "species_slug": "vaccinium_meridionale",
   "scientific_name": "Vaccinium meridionale Sw.",
   "common_names": [
-    "Mortino / Agraz"
+    "Agraz / Mortiño"
   ],
   "family": "Ericaceae",
   "category": "frutales_perennes",
   "cultivable": true,
   "conservation_status": "nativo_silvestre",
   "thermal_zones": [
-    "frio"
+    "frio",
+    "paramo"
   ],
   "roles_in_guild": [
-    "pollinator_attractor",
-    "crop"
+    "crop",
+    "pollinator_attractor"
   ],
   "antagonists": [],
   "especies_nativas_sustitutas": [],
   "propagation": {
-    "metodo_principal": "esqueje",
-    "notas": "Propagación por estacas semileñosas bajo sombra parcial de aliso/encenillo. Germinación lenta por semilla (3-6 meses); requiere estratificación fría. También por acodo."
+    "methods": [
+      "semilla",
+      "esqueje",
+      "acodo"
+    ],
+    "best_method": "esqueje",
+    "protocol_resumen": "Propagación por semilla (germinación lenta y errática, requiere sustrato ácido y luz) o clonal por estaca/acodo de material seleccionado de poblaciones silvestres. La domesticación está en curso (AGROSAVIA, UNAL): la mayor parte de la cosecha aún proviene de recolección silvestre en relictos de bosque altoandino.",
+    "tiempo_a_establecimiento_dias": 120,
+    "notas": "Fenología: arbusto perenne de bosque altoandino; floración y fructificación marcadas por la estacionalidad de lluvias, con cosecha silvestre tradicional en julio-agosto y noviembre-enero en la región andina. Fruto pequeño azul-negro de alto contenido de antocianinas y antioxidantes (mayor que el arándano comercial). Crecimiento lento; entra en producción al año 3-4."
   },
   "requirements": {
     "agua": "medio",
     "altitud_msnm": {
-      "min_absoluto": 2500,
-      "optimo_min": 2600,
-      "optimo_max": 3400,
-      "max_absoluto": 3600
+      "min_absoluto": 1800,
+      "optimo_min": 2300,
+      "optimo_max": 3200,
+      "max_absoluto": 3800
     },
     "temperatura_c": {
-      "helada_letal": -4,
+      "helada_letal": -6,
       "optimo_min": 8,
-      "optimo_max": 16,
-      "max_tolerable": 22
+      "optimo_max": 20,
+      "max_tolerable": 26
     },
-    "radiacion": "sombra_parcial",
+    "radiacion": "sol_pleno",
     "drenaje_requerido": "bueno"
   },
-  "valor_pedagogico": "El mortiño (Vaccinium meridionale Sw.) es un arbusto nativo de los bosques altoandinos de la Cordillera Oriental colombiana, específicamente en los departamentos de Cundinamarca, Boyacá y Santander, entre 2500 y 3600 msnm. Su manejo agronómico se realiza mediante propagación de estacas semileñosas en sombra parcial bajo árboles de aliso o enenillo, lo que favorece el enraizamiento y establecimiento exitoso. En el contexto muisca tradicional, sus frutos azulado-negros se consumen frescos y se utilizan medicinalmente como antidiarreico, formando parte del saber ancestral de estas comunidades indígenas. Esta información está respaldada por fuentes taxonómicas de autoridad incluyendo la cita clásica de Pérez Arbeláez 1947 (uso tradicional), así como verificaciones actuales en GBIF, POWO y el Instituto Alexander von Humboldt (IAvH), lo que garantiza su validez científica y cultural.",
+  "valor_pedagogico": "El agraz o mortiño (Vaccinium meridionale Sw., familia Ericaceae) es el arándano andino NATIVO de Colombia, un arbusto silvestre de los bosques altoandinos y subpáramos que crece de forma natural entre 2.300 y 3.200 msnm en Cundinamarca, Boyacá (provincias de Norte y Gutiérrez, Arcabuco, Villa de Leyva), Santander, Antioquia, Nariño y la cordillera Oriental, y que también se distribuye en Venezuela y los Andes del norte (no es endémico de Colombia). Su fruto pequeño, azul-negro y de sabor ácido-dulce, ha sido recolectado tradicionalmente por las comunidades campesinas para preparar el 'sabajón de agraz', vinos, mermeladas, coladas y postres, y tiene un contenido de antocianinas y capacidad antioxidante superior al del arándano comercial importado (Vaccinium corymbosum), lo que lo posiciona como un superalimento nativo de altísimo potencial. A diferencia del arándano azul de cultivo, gran parte de la cosecha aún proviene de recolección silvestre en relictos de bosque altoandino, lo que lo vincula directamente a la conservación de esos ecosistemas: el agraz es a la vez alimento, ingreso campesino y especie clave para fauna frugívora y polinizadores. La domesticación y propagación clonal están en curso (AGROSAVIA, Universidad Nacional) para reducir la presión sobre las poblaciones silvestres. Como toda ericácea requiere suelo ácido (pH 4.5-5.5), micorriza ericoide nativa y NO tolera el encalado. Su manejo agroecológico privilegia el aprovechamiento sostenible de rodales silvestres (no cosechar más del fruto disponible, dejar semilla para regeneración) y el establecimiento de cultivos con material seleccionado en sustrato ácido. El agraz enseña el valor de los frutales nativos como alternativa de soberanía alimentaria frente a la dependencia de especies importadas, y la importancia de conservar el bosque altoandino que lo alberga. Fuentes Tier A: AGROSAVIA Manual de frutales tropicales, Humboldt Flora Alto-Andina, GBIF Backbone, POWO Kew.",
   "sources": [
+    {
+      "id": "agrosavia-manual-frutales-tropicales",
+      "title": "agrosavia-manual-frutales-tropicales",
+      "tier": "A",
+      "url": null
+    },
+    {
+      "id": "humboldt-flora-alto-andina",
+      "title": "humboldt-flora-alto-andina",
+      "tier": "A",
+      "url": null
+    },
     {
       "id": "gbif-taxonomic-backbone",
       "title": "gbif-taxonomic-backbone",
@@ -51,20 +71,8 @@
       "title": "powo-kew",
       "tier": "A",
       "url": "https://powo.science.kew.org"
-    },
-    {
-      "id": "bernal-2015-plantas-liquenes-colombia",
-      "title": "bernal-2015-plantas-liquenes-colombia",
-      "tier": "A",
-      "url": "http://catalogoplantasdecolombia.unal.edu.co"
-    },
-    {
-      "id": "perez-arbelaez-1947-plantas-utiles",
-      "title": "perez-arbelaez-1947-plantas-utiles",
-      "tier": "A",
-      "url": null
     }
   ],
   "_generated_by": "scripts/build-cycle-content-from-catalog.mjs",
-  "_generated_at": "2026-05-19T00:42:57.369Z"
+  "_generated_at": "2026-09-03T07:40:20.315Z"
 }

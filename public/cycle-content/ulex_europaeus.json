@@ -19,11 +19,7 @@
     "erythrina_edulis"
   ],
   "especies_nativas_sustitutas": [
-    "alnus_acuminata",
-    "escallonia_paniculata",
-    "miconia_squamulosa",
-    "sambucus_peruviana",
-    "weinmannia_tomentosa"
+    "alnus_acuminata"
   ],
   "propagation": null,
   "requirements": {
@@ -79,5 +75,5 @@
     }
   ],
   "_generated_by": "scripts/build-cycle-content-from-catalog.mjs",
-  "_generated_at": "2026-05-19T00:42:57.367Z"
+  "_generated_at": "2026-09-03T07:40:20.309Z"
 }
