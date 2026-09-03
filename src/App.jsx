@@ -70,9 +70,15 @@ const EscuchaOverlay = lazy(() => import('./components/escucha/EscuchaOverlay'))
 // muestra justamente CUANDO no hay red. Si fuera lazy, el import() fallaría
 // offline sin cache → el usuario nunca vería la pantalla de offline.
 import AgentOfflineGuard from './components/AgentScreen/AgentOfflineGuard';
-// Transición home→conversación: el colibrí en video (~2s). Eager (debe
-// aparecer al instante al enviar desde el hero).
-import ColibriTransition from './components/agent/ColibriTransition';
+// Transición home→conversación (~2s). LAZY (gate 087): este era el único
+// import estático que mantenía el dispatcher ChagraAgentAvatar —y con él los
+// 7 rigs de tinta (~3 MB de SVG de *Trazado)— dentro del grafo de arranque
+// (main → App → aquí → dispatcher). El overlay se monta desde el inicio
+// (active=false → null), así que el chunk se pide al montar el shell y ya
+// está caliente cuando el usuario envía desde el hero; el ARTE de cada
+// compai se sigue pagando solo con el avatar elegido (React.lazy por
+// especie dentro del dispatcher). Ver _gate/087/INFORME-087.md.
+const ColibriTransition = lazy(() => import('./components/agent/ColibriTransition'));
 import { ScreenShell } from './components/common/ScreenShell';
 import ChagraGrowLoader from './components/ChagraGrowLoader';
 import Confetti from './components/common/Confetti';
@@ -4403,8 +4409,12 @@ export default function App() {
   return (
     <>
       {/* Transición Angelita home→conversación (~2s). Encima de todo (z alto);
-          la conversación monta detrás y queda limpia al terminar. */}
-      <ColibriTransition active={colibriTransition} onDone={() => setColibriTransition(false)} />
+          la conversación monta detrás y queda limpia al terminar. Suspense
+          local (087): fallback null porque inactivo renderiza null — el
+          boundary no debe tirar el árbol entero a un fallback de ruta. */}
+      <Suspense fallback={null}>
+        <ColibriTransition active={colibriTransition} onDone={() => setColibriTransition(false)} />
+      </Suspense>
       <NetworkStatusBar />
       {(!esHomeCampesinoB || !navigator.onLine) && <NetworkStatusBar />}
       {/* Banners de instalación PWA: NO en las vistas pre-auth (login /
