@@ -92,6 +92,13 @@ export function mulberry32(a) {
 // (geo = fusionarCopaMasa, mat = materialCopaMasaInstanciada — código real del
 // valle). Misma seed de esqueleto por especie en los tres niveles → la MISMA
 // silueta (los lóbulos), solo cambia el presupuesto de cards/núcleo (s47).
+/**
+ * @param {object} [opts]
+ * @param {Array<{ clave: string, tono: string, claro: string, oscuro: string, ancho: number, profundidad: number }>} [opts.especies]
+ *                               perfiles a hornear; def: PERFILES_BOSQUE_S48
+ *                               (el bosque nativo S48 completo).
+ * @param {number} [opts.seed=20027] seed del esqueleto compartido entre niveles.
+ */
 export function bakearLodPorEspecie({ especies, seed = 20027 } = {}) {
   const lista = (especies && especies.length ? especies : PERFILES_BOSQUE_S48);
   const porEspecie = new Map();
