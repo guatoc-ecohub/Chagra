@@ -212,37 +212,57 @@ export function wzDeAltura(yObjetivo, wx = 0, { desde = COSTA_Z, hasta = 6.5, pa
  * @param {number} opts.radio    medio ancho de destino.
  * @param {number} [opts.segmentos] resolución de la malla (por lado).
  */
-export function mallaMacizo({ alto = 3.5, radio = 2.4, segmentos = 72 } = {}) {
-  const kx = (radio * 2) / ANCHO; // el macizo ocupa el ancho pedido
+export function mallaMacizo({ alto = 3.5, radio = 2.4, segmentos = 72, ventana = 5.5 } = {}) {
+  /*
+   * LA VENTANA, y por qué no es el campo entero. La primera versión muestreaba
+   * los 22 × 9 world units completos y el resultado, medido en captura, fue un
+   * MONTÍCULO PLANO: la cumbre es un pico angosto dentro de un campo ancho, así
+   * que en la tarjeta se veía sobre todo el faldón bajo — verde oscuro de punta
+   * a punta, con los 7 pisos ilegibles, y el casquete y la línea ámbar
+   * FLOTANDO por encima de una montaña que ya no llegaba hasta ellos. Eso
+   * rompía justo la pedagogía que este paso tenía que conservar.
+   *
+   * Se muestrea una ventana CENTRADA EN LA CUMBRE (x −0,1 · z 4,1, medida sobre
+   * la propia ley de altura). A ±5,5 el 41 % del área queda sobre la cota del
+   * bosque de niebla, así que la tarjeta enseña montaña alta y no faldón.
+   */
+  const CUMBRE_X = -0.1;
+  const CUMBRE_Z = 4.1;
   const n = segmentos + 1;
-  /* La cumbre REAL de la malla no es `CIMA`: `alturaSierra` suma varias
-     gaussianas y los picos gemelos se pasan de 5,0 (medido: ~5,16). Escalar por
-     `alto / CIMA` dejaba el macizo 3 % por encima del alto pedido, y en la
-     bóveda eso significa que la montaña le sale por encima al casquete de hielo
-     — justo la pieza que la línea ámbar mide. Se normaliza por el máximo real. */
+  const kx = radio / ventana;
+
   let maxReal = 0;
+  const alturaVentana = (ix, iz) => {
+    const u = ix / segmentos - 0.5;
+    const v = iz / segmentos - 0.5;
+    const wx = CUMBRE_X + u * 2 * ventana;
+    const wz = CUMBRE_Z + v * 2 * ventana;
+    /* Caída radial hacia el borde: la ventana es un recorte, y sin esto la
+       montaña quedaría cortada a cuchillo en los cuatro lados — una meseta
+       flotante. Con ella el macizo se apoya en el piso de la tarjeta. */
+    const r = Math.min(1, Math.hypot(u, v) / 0.5);
+    const falda = 1 - smoothstep(0.62, 1.0, r);
+    return { wx, wz, h: Math.max(0, alturaSierra(wx, wz)) * falda };
+  };
+
   for (let iz = 0; iz < n; iz++) {
-    const wz = -2.6 + (9.2 * iz) / segmentos;
     for (let ix = 0; ix < n; ix++) {
-      const h = alturaSierra(-ANCHO / 2 + (ANCHO * ix) / segmentos, wz);
+      const h = alturaVentana(ix, iz).h;
       if (h > maxReal) maxReal = h;
     }
   }
   const ky = alto / (maxReal > 0 ? maxReal : CIMA);
+
   const posiciones = new Float32Array(n * n * 3);
   const colores = new Float32Array(n * n * 3);
   let p = 0;
   for (let iz = 0; iz < n; iz++) {
-    // Solo la mitad sur del campo: es donde está el macizo. El mar y la costa
-    // no caben en una tarjeta de clima y sobran para lo que ésta enseña.
-    const wz = -2.6 + (9.2 * iz) / segmentos;
     for (let ix = 0; ix < n; ix++) {
-      const wx = -ANCHO / 2 + (ANCHO * ix) / segmentos;
-      const y = Math.max(0, alturaSierra(wx, wz)); // el mar no baja del piso
-      posiciones[p] = wx * kx;
-      posiciones[p + 1] = y * ky;
-      posiciones[p + 2] = (wz + 2.6 - 4.6) * kx * 1.35;
-      const [r, g, b] = colorPorAlturaRGB(y); // color por la cota REAL, no la escalada
+      const { h } = alturaVentana(ix, iz);
+      posiciones[p] = (ix / segmentos - 0.5) * 2 * ventana * kx;
+      posiciones[p + 1] = h * ky;
+      posiciones[p + 2] = (iz / segmentos - 0.5) * 2 * ventana * kx;
+      const [r, g, b] = colorPorAlturaRGB(h); // color por la cota REAL, no la escalada
       colores[p] = r;
       colores[p + 1] = g;
       colores[p + 2] = b;
