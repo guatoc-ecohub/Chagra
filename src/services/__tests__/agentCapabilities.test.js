@@ -148,7 +148,7 @@ describe('CHIP_DEFS — derivación (filter + map con spreads condicionales)', (
     const chipMoreEsperados = CAPABILITY_MANIFEST.filter((e) => e.chipMore).map((e) => e.intent).sort();
     expect(conMoreGroup).toEqual(chipMoreEsperados);
     expect(conMoreGroup).toEqual(
-      ['alerta_paramo', 'fenologia', 'polinizacion', 'saberes_tradicionales', 'toxicidad', 'variedades'].sort(),
+      ['alerta_paramo', 'fenologia', 'fuente_doi', 'polinizacion', 'saberes_tradicionales', 'toxicidad', 'variedades'].sort(),
     );
   });
 

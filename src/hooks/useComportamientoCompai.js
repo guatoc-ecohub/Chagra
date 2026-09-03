@@ -140,9 +140,7 @@ export default function useComportamientoCompai(ref, opciones = {}) {
     pausado = false,
     soloX = false,
     contentAware = true,
-    // `superficie` se conserva en la firma por compatibilidad con los hosts;
-    // la posición persistente (dónde vive el compai) la dueña useCompaiDraggable.
-    superficie: _superficie = 'global',
+    superficie = 'global',
   } = opciones;
   const [moviendo, setMoviendo] = useState(false);
   const [direccion, setDireccion] = useState('izquierda');
@@ -152,6 +150,7 @@ export default function useComportamientoCompai(ref, opciones = {}) {
   const estadoRef = useRef({ moviendo: false, direccion: 'izquierda' });
   const posicionRef = useRef({ x: 0, y: 0 });
   const pausadoRef = useRef(pausado);
+  const dragRef = useRef({ dragging: false, startX: 0, startY: 0, startTransformX: 0, startTransformY: 0, pointerId: null });
 
   useEffect(() => {
     pausadoRef.current = pausado;
@@ -289,6 +288,8 @@ export default function useComportamientoCompai(ref, opciones = {}) {
 
   // Presencia y notificación al toque. El ARRASTRE NO vive aquí (lo dueña
   // useCompaiDraggable en el host): así no hay dos sistemas de arrastre peleando.
+  // NOTA: onPointerMove/Up/Cancel se proporcionan para compatibilidad histórica
+  // con useCompaiRoam. Implementan arrastre básico con persistencia histórica.
   const handlers = {
     onPointerEnter: () => setPresencia(true),
     onPointerLeave: () => setPresencia(false),
@@ -296,6 +297,42 @@ export default function useComportamientoCompai(ref, opciones = {}) {
       if (event.target?.closest?.('[data-compai-no-drag]')) return;
       setPresencia(true);
       setNotificacionVisible(true);
+      // Iniciar arrastre
+      dragRef.current = {
+        dragging: true,
+        startX: event.clientX,
+        startY: event.clientY,
+        startTransformX: posicionRef.current.x,
+        startTransformY: posicionRef.current.y,
+        pointerId: event.pointerId,
+      };
+    },
+    onPointerMove: (event) => {
+      if (!dragRef.current.dragging || event.pointerId !== dragRef.current.pointerId) return;
+      const deltaX = event.clientX - dragRef.current.startX;
+      const deltaY = event.clientY - dragRef.current.startY;
+      const newX = dragRef.current.startTransformX + deltaX;
+      const newY = dragRef.current.startTransformY + deltaY;
+      posicionRef.current = { x: newX, y: newY };
+      escribirTransform(ref.current, posicionRef.current);
+    },
+    onPointerUp: (event) => {
+      if (!dragRef.current.dragging || event.pointerId !== dragRef.current.pointerId) return;
+      dragRef.current.dragging = false;
+      // Persistir en localStorage con clave histórica
+      try {
+        const storageKey = `chagra:compai:posicion:${especie}:${superficie}`;
+        const posicion = { x: Math.round(posicionRef.current.x), y: Math.round(posicionRef.current.y) };
+        localStorage.setItem(storageKey, JSON.stringify(posicion));
+      } catch (_error) {
+        // Silenciar error de localStorage: no es crítico
+      }
+      dragRef.current.pointerId = null;
+    },
+    onPointerCancel: (event) => {
+      if (!dragRef.current.dragging || event.pointerId !== dragRef.current.pointerId) return;
+      dragRef.current.dragging = false;
+      dragRef.current.pointerId = null;
     },
     onClick: () => setNotificacionVisible(true),
   };

@@ -413,6 +413,8 @@ const ALLOWED_TOOLS = new Set([
   'get_aporte_nutricional',
   'get_canales_comercializacion',
   'get_practicas_agua',
+  // FUENTE/DOI (2026-08-30): consulta referencias académicas para perfil técnico.
+  'get_fuente_doi',
   // FASE 2 (deferidas, NO exponer aún):
   //  - get_grado_dia: requiere `fecha_siembra` (ISO YYYY-MM-DD, sin default) que
   //    el NLU no puede sintetizar con fiabilidad desde una frase libre de chat.

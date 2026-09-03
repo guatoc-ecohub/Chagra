@@ -21,7 +21,7 @@ import {
  */
 
 describe('chipIntentRouter — enum y definiciones', () => {
-  it('expone los 17 intents del enum (incluye restauración, silvopastoreo, páramo, incendio, grounding oscuro)', () => {
+  it('expone los 19 intents del enum (incluye restauración, silvopastoreo, páramo, incendio, grounding oscuro, asociaciones, fuente_doi)', () => {
     expect(CHIP_INTENTS).toEqual({
       siembro: 'siembro',
       plaga: 'plaga',
@@ -42,10 +42,12 @@ describe('chipIntentRouter — enum y definiciones', () => {
       variedades: 'variedades',
       polinizacion: 'polinizacion',
       fenologia: 'fenologia',
+      asociaciones: 'asociaciones',
+      fuente_doi: 'fuente_doi',
     });
   });
 
-  it('CHIP_DEFS tiene los 17 chips con label en español colombiano (sin voseo)', () => {
+  it('CHIP_DEFS tiene los 19 chips con label en español colombiano (sin voseo)', () => {
     const ids = CHIP_DEFS.map((c) => c.intent);
     expect(ids).toEqual([
       'siembro',
@@ -65,6 +67,8 @@ describe('chipIntentRouter — enum y definiciones', () => {
       'variedades',
       'polinizacion',
       'fenologia',
+      'asociaciones',
+      'fuente_doi',
     ]);
     // Labels presentes y emoji declarado
     for (const def of CHIP_DEFS) {
@@ -446,6 +450,7 @@ describe('chipIntentRouter — contrato de orden y consistencia del índice', ()
       'siembro', 'plaga', 'biopreparado', 'clima', 'precio', 'calendario', 'deep',
       'restauracion', 'silvopastoreo', 'paramo', 'incendio',
       'toxicidad', 'saberes_tradicionales', 'alerta_paramo', 'variedades', 'polinizacion', 'fenologia',
+      'asociaciones', 'fuente_doi',
     ]);
   });
 

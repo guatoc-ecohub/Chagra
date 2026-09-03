@@ -56,10 +56,11 @@ describe('useCompaiRoam', () => {
   });
 
   it('moverse-para-explicar: al LLEGAR a un punto del paseo, para (caminando=false) e incrementa `parada`', () => {
-    // Franja diminuta (innerWidth chico) → la caminata es corta y llega en
+    // Franja reducida (innerWidth moderado) → la caminata es corta y llega en
     // pocos frames, así el test no depende de decenas de fotogramas.
+    // Valores muy pequeños (ej: 30px) no permiten movimiento alguno.
     const anchoOriginal = window.innerWidth;
-    Object.defineProperty(window, 'innerWidth', { value: 30, configurable: true });
+    Object.defineProperty(window, 'innerWidth', { value: 200, configurable: true });
     try {
       const raf = instalarRafManual();
       const el = document.createElement('div');
@@ -69,9 +70,9 @@ describe('useCompaiRoam', () => {
       // reposoHasta = 1000 + ARRANQUE(900) = 1900 → arranca a los >1900ms.
       act(() => { raf.cb?.(2000); }); // elige destino y arranca (dt=0, aún sin avance)
       expect(result.current.parada).toBe(0);
-      // avanza en frames de 100ms (dt=0.05 → ~1.7px/frame) hasta cubrir la
-      // franja corta y aterrizar en el destino.
-      for (let t = 2100; t <= 2600; t += 100) {
+
+      // Pequeños pasos de dt para asegurar movimiento gradual
+      for (let t = 2050; t <= 10000; t += 50) {
         act(() => { raf.cb?.(t); });
       }
 

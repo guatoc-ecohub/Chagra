@@ -318,6 +318,18 @@ export function planForcedIntent(intent, text, opts = {}) {
         localGrounding: 'precio_referencia',
       };
 
+    case CHIP_INTENTS.asociaciones: {
+      // ASOCIACIONES Y POLICULTIVO (2026-08-27): navegación a la vista de
+      // asociaciones. kind:'nav' → no llama a ningún tool del sidecar.
+      // El router no hace nada especial; el AgentScreen maneja la navegación.
+      return { ...base };
+    }
+
+    case CHIP_INTENTS.fuente_doi:
+      // FUENTE/DOI (2026-08-27): tool para consultar referencias académicas.
+      // kind:'tool' → tool 'get_fuente_doi' del sidecar.
+      return { ...base, tool: 'get_fuente_doi', args: { query: prompt } };
+
     case CHIP_INTENTS.deep:
       // STUB (B14): la investigación profunda aún no tiene backend servible en
       // prod (el job async vive detrás de VITE_DEEP_RESEARCH_ENABLED, off por
