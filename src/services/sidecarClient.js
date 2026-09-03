@@ -821,6 +821,21 @@ export async function pestVsDiseaseGuard(userMessage) {
  * agente contra el catalogo y devuelve un bloque de correccion listo para
  * anteponer. Es fail-safe: si el endpoint cae, el turno sigue igual.
  *
+ * BUG-04 (2026-09-03): el endpoint real (`chagra-pro/modules/agro-mcp/
+ * sidecar/src/server.ts`, `POST /companion-species-guard`) exige el campo
+ * `agent_response` -- asi lo documenta su propio comentario ("Recibe
+ * {agent_response, piso_termico?}"). El cliente mandaba `response_text`
+ * (un intento previo de fix que corrigio el casing pero no el nombre del
+ * campo), asi que el sidecar respondia 400 `{error:"agent_response
+ * required"}` en CADA turno -- confirmado en vivo contra el sidecar real
+ * (127.0.0.1:7880) el 2026-09-03. La salvaguarda de especies antagonistas
+ * quedaba muerta en silencio (postJson degrada 400 a null, no rompe UI).
+ * El shape de respuesta real tambien usa `has_fabricated_species` (NO
+ * `has_companion_species`/`has_companion`/`needs_correction`, que nunca
+ * existieron en el servidor) -- sin embargo el gate real en AgentScreen usa
+ * `system_prompt_block` (ya bien parseado), asi que este segundo mismatch
+ * solo rompia la telemetria `console.debug`, no el guard en si.
+ *
  * @param {string} responseText - salida final del LLM ya generada.
  * @returns {Promise<null | {
  *   has_companion_species: boolean,
@@ -830,12 +845,9 @@ export async function pestVsDiseaseGuard(userMessage) {
  */
 export async function companionSpeciesGuard(responseText) {
   if (!responseText || typeof responseText !== 'string' || !responseText.trim()) return null;
-  const raw = await postJson('/companion-species-guard', { response_text: responseText }, TOOL_TIMEOUT_MS);
+  const raw = await postJson('/companion-species-guard', { agent_response: responseText }, TOOL_TIMEOUT_MS);
   if (!raw || typeof raw !== 'object') return null;
-  const hasCompanionSpecies =
-    raw.has_companion_species === true ||
-    raw.has_companion === true ||
-    raw.needs_correction === true;
+  const hasCompanionSpecies = raw.has_fabricated_species === true;
   return {
     has_companion_species: hasCompanionSpecies,
     system_prompt_block: typeof raw.system_prompt_block === 'string' ? raw.system_prompt_block : '',
@@ -924,13 +936,48 @@ export function coerceNumericArgs(args) {
   return changed ? out : args;
 }
 
+/**
+ * BUG-03 (2026-09-03) — coercion defensiva de `piso_termico`. Los enums Zod
+ * del sidecar exigen el vocabulario canonico SIN tildes ('frio'/'templado'/
+ * 'calido'[/'paramo'] segun el tool) -- el propio schema de
+ * `get_calendario_siembra` lo documenta: "Sin tildes a proposito... el
+ * agente deberia mapear 'frío'->'frio' antes de invocar este tool". Nadie
+ * hacia ese mapeo: `pisoTermicoFromAltitud()` (agentService.js) devuelve el
+ * piso CON tildes para lectura humana ('frío','cálido','páramo'), y el NLU
+ * planner (LLM server-side) tiende a lo mismo por ortografia natural.
+ *
+ * Repro real BUG-03: "...a 2200 msnm" -> pisoTermicoFromAltitud() = 'frío'
+ * -> get_calendario_siembra rechaza con Zod invalid_enum_value -> el
+ * dispatcher generico del sidecar (`/tools/:name`, mismo catch de
+ * NUMERIC_TOOL_ARGS/P0 2026-06-13) lo envuelve como 502. Confirmado en vivo
+ * contra el sidecar real (127.0.0.1:7880, 2026-09-03): 'frío' -> 502
+ * mcp_call_failed / invalid_enum_value; 'frio' -> 200 con datos reales.
+ *
+ * Mismo chokepoint que `coerceNumericArgs` para que CUALQUIER caller (chat
+ * LLM, chips deterministicos, plan NLU) sea robusto. Solo quita tildes/
+ * espacios/mayusculas -- un piso_termico genuinamente invalido (ej.
+ * 'montaña') sigue sin matchear el enum y el sidecar lo sigue rechazando,
+ * como corresponde.
+ */
+export function normalizePisoTermicoArg(args) {
+  if (!args || typeof args !== 'object' || typeof args.piso_termico !== 'string') return args;
+  const normalized = args.piso_termico
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .trim()
+    .toLowerCase();
+  if (normalized === args.piso_termico) return args;
+  return { ...args, piso_termico: normalized };
+}
+
 export async function callTool(toolName, args) {
   if (!toolName || typeof toolName !== 'string') return null;
   if (!ALLOWED_TOOLS.has(toolName)) {
     console.debug('[sidecar] tool no permitido', toolName);
     return { _error: true, reason: 'not_allowed', tool: toolName };
   }
-  const result = await postJson(`/tools/${toolName}`, coerceNumericArgs(args || {}), TOOL_TIMEOUT_MS);
+  const sanitizedArgs = normalizePisoTermicoArg(coerceNumericArgs(args || {}));
+  const result = await postJson(`/tools/${toolName}`, sanitizedArgs, TOOL_TIMEOUT_MS);
   if (result !== null) return result;
   // postJson retornó null. Distinguir: tool fue intentado pero falló
   // (timeout / HTTP error / network) vs. ni siquiera se intentó (flag off / offline).
