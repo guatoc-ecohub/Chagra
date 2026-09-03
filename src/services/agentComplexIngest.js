@@ -228,6 +228,9 @@ export async function persistComplexIngest(plan, { operatorId = 'operator', now 
         result = await createLote({ name: params.name, landType: params.land_type || 'bed' });
         context.landId = result.id;
       } else if (operation.kind === 'create_seeding') {
+        // La anotación conserva el literal 'farm_process' en `type` (sin ella
+        // tsc lo ensancha a string y FarmProcess exige el literal).
+        /** @type {import('../types/farmProcess').FarmProcess} */
         const process = {
           process_id: newUlid(),
           type: 'farm_process',
