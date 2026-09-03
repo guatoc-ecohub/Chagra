@@ -31,7 +31,7 @@
  * lluvia y la niebla se CONGELAN en su fotograma (nunca desaparecen). PRNG
  * determinista: mismo dato → mismo cielo.
  */
-import { useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useFrame, useThree } from '@react-three/fiber';
 import { Html } from '@react-three/drei';
 import * as THREE from 'three';
@@ -43,6 +43,7 @@ import LluviaValle from '../atmosfera/clima/LluviaValle.jsx';
 import NieblaLadera from '../atmosfera/clima/NieblaLadera.jsx';
 import HeladaValle from '../atmosfera/clima/HeladaValle.jsx';
 import { BOVEDA_PISOS_DEF as PISOS_DEF } from '../pisosTermicos.js';
+import { mallaMacizo } from '../sierra/sierraRelieve.js';
 
 /* Radio de la BÓVEDA. Tiene que ENCERRAR a la cámara siempre: la pose de
    reposo queda a ~9 del origen y el orbit permite alejarse hasta zoom*2.6
@@ -368,6 +369,40 @@ function RotuloHielo({ yAntes, rAntes }) {
   );
 }
 
+/* EL MACIZO — la MISMA ladera de la Sierra que pintan la vista global y el
+   descenso, reescalada a la bóveda. Reemplaza los cuatro troncos de cono de
+   SIETE LADOS con flat-shading (§2.8 del diseño: un zigurat heptagonal cuya
+   faceta se cuenta a simple vista, prohibido por la regla anti-low-poly).
+   Normales suaves SIEMPRE: la degradación por equipo es de DENSIDAD —el número
+   de segmentos—, nunca de forma. */
+function Macizo({ alto, radio, segmentos = 72 }) {
+  const geo = useMemo(() => {
+    const { posiciones, colores, indices } = mallaMacizo({ alto, radio, segmentos });
+    const g = new THREE.BufferGeometry();
+    g.setAttribute('position', new THREE.BufferAttribute(posiciones, 3));
+    // El atributo `color` se interpreta en espacio LINEAL y la tabla canónica es
+    // sRGB: sin convertir, el macizo sale lavado y gris (medido el 2026-09-02).
+    const c = new THREE.Color();
+    const lin = new Float32Array(colores.length);
+    for (let i = 0; i < colores.length; i += 3) {
+      c.setRGB(colores[i], colores[i + 1], colores[i + 2], THREE.SRGBColorSpace);
+      lin[i] = c.r;
+      lin[i + 1] = c.g;
+      lin[i + 2] = c.b;
+    }
+    g.setAttribute('color', new THREE.BufferAttribute(lin, 3));
+    g.setIndex(indices);
+    g.computeVertexNormals();
+    return g;
+  }, [alto, radio, segmentos]);
+  useEffect(() => () => geo.dispose(), [geo]);
+  return (
+    <mesh geometry={geo} name="boveda-macizo">
+      <meshLambertMaterial vertexColors />
+    </mesh>
+  );
+}
+
 /* LA MONTAÑA: los SIETE pisos térmicos de la Sierra apilados como troncos de
    cono (paleta canónica compartida). Corona: el casquete de hielo + la línea
    ámbar de hasta dónde llegaba el hielo (retroceso glaciar) — nota de
@@ -395,6 +430,7 @@ function Montana({ pisos = PISOS_DEF, glaciar = {} }) {
   }, [pisos]);
   const cima = bandas.reduce((acc, b) => acc + b.h, 0);
   const rCima = bandas[bandas.length - 1]?.rArriba ?? 0.42;
+  const rBase = bandas[0]?.rAbajo ?? 2.4;
   const nieve = Math.max(0, Math.min(1, glaciar.nieve ?? 0.32));
   const retroceso = Math.max(0, Math.min(1, glaciar.retroceso ?? 0.7));
   // La línea de nieve de antes: sube con el retroceso (más retroceso = casquete
@@ -403,16 +439,14 @@ function Montana({ pisos = PISOS_DEF, glaciar = {} }) {
   const rAntes = rCima + 0.5 + retroceso * 0.45;
   return (
     <group position={[0, 0, -0.4]}>
-      {bandas.map((b) => (
-        <mesh key={b.key} position={[0, b.y + b.h / 2, 0]}>
-          <cylinderGeometry args={[b.rArriba, b.rAbajo, b.h, 7]} />
-          <meshLambertMaterial color={b.color} flatShading />
-        </mesh>
-      ))}
-      {/* el casquete de hielo de hoy (más pequeño de lo que fue) */}
-      <mesh position={[0, cima + nieve * 0.28, 0]}>
-        <coneGeometry args={[rCima + 0.05, 0.35 + nieve * 0.55, 7]} />
-        <meshLambertMaterial color="#eef4f7" flatShading />
+      <Macizo alto={cima} radio={rBase} />
+      {/* el casquete de hielo de hoy (más pequeño de lo que fue). Sigue siendo
+          un casquete aparte y a propósito: es la pieza que la línea ámbar mide,
+          y tiene que poder encogerse sin tocar la ladera. Ya no es un cono de 7
+          lados sino una calota suave. */}
+      <mesh position={[0, cima - 0.06 + nieve * 0.18, 0]}>
+        <sphereGeometry args={[rCima + 0.14, 24, 12, 0, Math.PI * 2, 0, Math.PI / 2.6]} />
+        <meshLambertMaterial color="#eef4f7" />
       </mesh>
       {/* la línea ámbar: hasta aquí llegaba el hielo (cuidado, no alarma) */}
       <mesh position={[0, yAntes, 0]} rotation={[Math.PI / 2, 0, 0]}>

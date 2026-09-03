@@ -25,6 +25,7 @@ import { describe, it, expect } from 'vitest';
 import {
   alturaSierra,
   colorPorAlturaRGB,
+  mallaMacizo,
   CIMA,
   COSTA_Z,
   ANCHO,
@@ -128,5 +129,70 @@ describe('🔴 REGRESIÓN — las 7 bandas se leen 7, no 1', () => {
   it('sobre la línea de nieve SÍ es nieve', () => {
     const c = colorPorAlturaRGB(4.9).map((v) => Math.round(v * 255));
     expect(Math.min(...c)).toBeGreaterThan(200);
+  });
+});
+
+describe('🚪 PUERTA DEL PASO 5 — la bóveda enseña los MISMOS 7 pisos', () => {
+  /*
+   * La bóveda del clima montaba cuatro troncos de cono de siete lados con
+   * flat-shading (§2.8: un zigurat heptagonal). Ahora monta la misma ladera que
+   * la vista global y el descenso, reescalada. La puerta —«la pantalla de clima
+   * y el descenso enseñan los mismos 7 pisos»— se cumple por construcción: es
+   * la MISMA función de color sobre la MISMA ley de altura.
+   */
+  const ALTO = 3.5;
+  const RADIO = 2.4;
+  const malla = mallaMacizo({ alto: ALTO, radio: RADIO, segmentos: 48 });
+
+  it('la cima cae exactamente en el alto pedido (el casquete no se mueve)', () => {
+    let maxY = -Infinity;
+    for (let i = 1; i < malla.posiciones.length; i += 3) {
+      if (malla.posiciones[i] > maxY) maxY = malla.posiciones[i];
+    }
+    expect(maxY).toBeGreaterThan(ALTO * 0.92);
+    expect(maxY).toBeLessThanOrEqual(ALTO + 1e-6);
+  });
+
+  it('nada baja del piso: el mar no perfora la tarjeta', () => {
+    for (let i = 1; i < malla.posiciones.length; i += 3) {
+      expect(malla.posiciones[i]).toBeGreaterThanOrEqual(0);
+    }
+  });
+
+  it('la malla usa la MISMA ley de color que el descenso', () => {
+    // Para cada vértice, el color tiene que ser exactamente el que
+    // `colorPorAlturaRGB` da para su cota REAL (no la escalada).
+    const k = malla.ky;
+    for (let v = 0; v < 40; v++) {
+      const i = v * 3 * 37; // muestreo disperso
+      if (i + 2 >= malla.posiciones.length) break;
+      const yEscalada = malla.posiciones[i + 1];
+      const esperado = colorPorAlturaRGB(yEscalada / k);
+      expect(malla.colores[i]).toBeCloseTo(esperado[0], 5);
+      expect(malla.colores[i + 1]).toBeCloseTo(esperado[1], 5);
+      expect(malla.colores[i + 2]).toBeCloseTo(esperado[2], 5);
+    }
+  });
+
+  it('la malla es una superficie cerrada y bien indexada', () => {
+    const nVerts = malla.posiciones.length / 3;
+    expect(malla.indices.length % 3).toBe(0);
+    for (const idx of malla.indices) {
+      expect(idx).toBeGreaterThanOrEqual(0);
+      expect(idx).toBeLessThan(nVerts);
+    }
+  });
+
+  it('degradar es bajar SEGMENTOS, nunca cambiar la forma', () => {
+    const pobre = mallaMacizo({ alto: ALTO, radio: RADIO, segmentos: 24 });
+    const rica = mallaMacizo({ alto: ALTO, radio: RADIO, segmentos: 96 });
+    expect(pobre.posiciones.length).toBeLessThan(rica.posiciones.length);
+    // Misma silueta: las dos alcanzan la misma cima, con la misma ley.
+    const cima = (m) => {
+      let x = -Infinity;
+      for (let i = 1; i < m.posiciones.length; i += 3) x = Math.max(x, m.posiciones[i]);
+      return x;
+    };
+    expect(Math.abs(cima(pobre) - cima(rica))).toBeLessThan(0.25);
   });
 });

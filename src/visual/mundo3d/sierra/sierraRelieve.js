@@ -186,3 +186,78 @@ export function wzDeAltura(yObjetivo, wx = 0, { desde = COSTA_Z, hasta = 6.5, pa
   }
   return null;
 }
+
+/* ─────────────────── el macizo, para pantallas pequeñas ────────────────────
+ * La bóveda del clima (`escenas/EscenaBoveda.jsx`) enseñaba la montaña como
+ * cuatro troncos de cono de SIETE LADOS con flat-shading: un zigurat
+ * heptagonal, cuya faceta se cuenta a simple vista. Es el defecto §2.8 del
+ * diseño y viola de frente la regla anti-low-poly.
+ *
+ * Esto devuelve la MISMA ladera que pintan la vista global y el descenso —
+ * misma ley de altura, mismos colores canónicos, mismas cotas— reescalada al
+ * espacio de la bóveda. No es "otra montaña más bonita": es la misma montaña.
+ * Por eso la puerta del Paso 5 («la pantalla de clima y el descenso enseñan los
+ * mismos 7 pisos») se cumple por construcción y no por parecido.
+ * ────────────────────────────────────────────────────────────────────────── */
+
+/**
+ * Malla del macizo escalada a un alto y un radio dados.
+ * Devuelve `{ posiciones, colores, indices, ky, maxReal }` (arrays planos, sin
+ * three) para
+ * que quien la monte arme su `BufferGeometry` sin que este módulo importe la
+ * librería de render.
+ *
+ * @param {object} opts
+ * @param {number} opts.alto     alto de destino en unidades de la escena.
+ * @param {number} opts.radio    medio ancho de destino.
+ * @param {number} [opts.segmentos] resolución de la malla (por lado).
+ */
+export function mallaMacizo({ alto = 3.5, radio = 2.4, segmentos = 72 } = {}) {
+  const kx = (radio * 2) / ANCHO; // el macizo ocupa el ancho pedido
+  const n = segmentos + 1;
+  /* La cumbre REAL de la malla no es `CIMA`: `alturaSierra` suma varias
+     gaussianas y los picos gemelos se pasan de 5,0 (medido: ~5,16). Escalar por
+     `alto / CIMA` dejaba el macizo 3 % por encima del alto pedido, y en la
+     bóveda eso significa que la montaña le sale por encima al casquete de hielo
+     — justo la pieza que la línea ámbar mide. Se normaliza por el máximo real. */
+  let maxReal = 0;
+  for (let iz = 0; iz < n; iz++) {
+    const wz = -2.6 + (9.2 * iz) / segmentos;
+    for (let ix = 0; ix < n; ix++) {
+      const h = alturaSierra(-ANCHO / 2 + (ANCHO * ix) / segmentos, wz);
+      if (h > maxReal) maxReal = h;
+    }
+  }
+  const ky = alto / (maxReal > 0 ? maxReal : CIMA);
+  const posiciones = new Float32Array(n * n * 3);
+  const colores = new Float32Array(n * n * 3);
+  let p = 0;
+  for (let iz = 0; iz < n; iz++) {
+    // Solo la mitad sur del campo: es donde está el macizo. El mar y la costa
+    // no caben en una tarjeta de clima y sobran para lo que ésta enseña.
+    const wz = -2.6 + (9.2 * iz) / segmentos;
+    for (let ix = 0; ix < n; ix++) {
+      const wx = -ANCHO / 2 + (ANCHO * ix) / segmentos;
+      const y = Math.max(0, alturaSierra(wx, wz)); // el mar no baja del piso
+      posiciones[p] = wx * kx;
+      posiciones[p + 1] = y * ky;
+      posiciones[p + 2] = (wz + 2.6 - 4.6) * kx * 1.35;
+      const [r, g, b] = colorPorAlturaRGB(y); // color por la cota REAL, no la escalada
+      colores[p] = r;
+      colores[p + 1] = g;
+      colores[p + 2] = b;
+      p += 3;
+    }
+  }
+  const indices = [];
+  for (let iz = 0; iz < segmentos; iz++) {
+    for (let ix = 0; ix < segmentos; ix++) {
+      const a = iz * n + ix;
+      const b = a + 1;
+      const d = a + n;
+      const e = d + 1;
+      indices.push(a, d, b, b, d, e);
+    }
+  }
+  return { posiciones, colores, indices, ky, maxReal };
+}
