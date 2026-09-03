@@ -298,12 +298,16 @@ export async function streamChatViaSidecar({
   }
 
   if (streamError) {
-    const error = new Error('El sidecar no pudo completar la consulta.');
-    error.mcpToolError = true;
-    error.tool = typeof streamError.tool === 'string' ? streamError.tool : null;
-    error.reason = typeof streamError.reason === 'string'
-      ? streamError.reason
-      : typeof streamError.detail === 'string' ? streamError.detail : 'sidecar_error';
+    // Object.assign le da al error un tipo de intersección real
+    // (Error & { mcpToolError, tool, reason }) que los consumidores de la UI
+    // pueden leer sin casts.
+    const error = Object.assign(new Error('El sidecar no pudo completar la consulta.'), {
+      mcpToolError: true,
+      tool: typeof streamError.tool === 'string' ? streamError.tool : null,
+      reason: typeof streamError.reason === 'string'
+        ? streamError.reason
+        : typeof streamError.detail === 'string' ? streamError.detail : 'sidecar_error',
+    });
     recordLLMEvent({
       model: doneEventStats?.model || model,
       endpoint: url,

@@ -484,6 +484,13 @@ describe('AgentScreen - chips toolbar', () => {
       tool: 'get_calendario_siembra',
       args: { piso_termico: 'frio', mes: 8 },
       toolChain: null,
+      // Forma completa del contrato NLU (sidecarClient.planNlu): el plan
+      // viene del sidecar, no de la heurística local.
+      latencyMs: 12,
+      modelUsed: null,
+      heuristicSkipped: false,
+      reason: null,
+      error: null,
     });
     vi.mocked(callTool).mockResolvedValue({
       _error: true,

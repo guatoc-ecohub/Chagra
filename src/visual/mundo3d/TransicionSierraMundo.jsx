@@ -473,6 +473,32 @@ const CSS = `
 
 /* ------------------------------ componente ------------------------------- */
 
+/**
+ * @param {object} props
+ * @param {boolean} [props.activa] si la transición corre.
+ * @param {'bajar'|'subir'} [props.direccion]
+ * @param {string} [props.pisoDestino] id de piso (`pisosTermicos.PISOS_TERMICOS`).
+ * @param {'alto'|'medio'|'bajo'} [props.tier]
+ * @param {boolean} [props.reducedMotion]
+ * @param {() => void} [props.onMitad] intercambio de escena (mitad del viaje).
+ * @param {() => void} [props.onFin] cierre del viaje (UNA vez).
+ * @param {{ current: { position: { y: number }, fov: number, updateProjectionMatrix: () => void } | null } | null} [props.camaraRef]
+ *        Ref de la cámara del host para el tween opcional (solo modo CSS).
+ * @param {number} [props.caidaCamara] metros de dolly vertical del tween.
+ * @param {string} [props.colorA] color superior del velo (si el host lo impone).
+ * @param {string} [props.colorB] color inferior del velo.
+ * @param {string} [props.etiqueta] rótulo del viaje (default: «Descendiendo a …»).
+ * @param {boolean | 'auto'} [props.escena3d] true = 3D · false = nunca ·
+ *        'auto' = consulta `?descenso3d=1`.
+ * @param {number|null} [props.msnmUsuario] cota real de la finca: el viaje frena ahí.
+ * @param {'neutral'|'el_nino'|'la_nina'|null} [props.faseEnso] fase ENSO VIVA
+ *        leída por el host con `getEnsoPhase()`, nunca la constante snapshot.
+ * @param {{descripcion?: string, temperatura?: number}|null} [props.clima]
+ *        clima del día (dato vivo) para la línea de aterrizaje; null si no hay.
+ * @param {number|null} [props.humedad] humedad relativa real (0..100) del dato vivo.
+ * @param {(estado: object) => void} [props.onDescenso] callback por cuadro con
+ *        el estado del viaje (altitud, banda, óptica).
+ */
 export default function TransicionSierraMundo({
   activa = false,
   direccion = 'bajar',

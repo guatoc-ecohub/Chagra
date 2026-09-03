@@ -126,14 +126,16 @@ export function planDescenso(cota = COTA_SIN_UBICACION, tier = 'alto', reducedMo
     tramos.push({ banda: BANDAS_DESCENSO[0], desde: CUMBRE_M, hasta: destino, peso: 1 });
   }
   const sumaPeso = tramos.reduce((s, t) => s + t.peso, 0) || 1;
+  // Cada tramo nace completo (con sus ms de inicio/fin): mutar propiedades
+  // después de crear el objeto hacía que tsc viera tramos sin tiempos.
   let acumulado = 0;
-  for (const t of tramos) {
-    t.msInicio = acumulado;
+  const tramosConTiempos = tramos.map((t) => {
+    const msInicio = acumulado;
     acumulado += (t.peso / sumaPeso) * total;
-    t.msFin = acumulado;
-  }
-  tramos[tramos.length - 1].msFin = total; // cierra exacto, sin residuo de coma flotante
-  return { total, freno, destino, tramos };
+    return { ...t, msInicio, msFin: acumulado };
+  });
+  tramosConTiempos[tramosConTiempos.length - 1].msFin = total; // cierra exacto, sin residuo de coma flotante
+  return { total, freno, destino, tramos: tramosConTiempos };
 }
 
 /*
