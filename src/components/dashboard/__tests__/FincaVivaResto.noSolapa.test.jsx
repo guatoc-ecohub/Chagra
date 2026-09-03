@@ -25,7 +25,7 @@
  *       en el orden correcto (portales antes que la hoja).
  */
 import React from 'react';
-import { describe, it, test, expect, vi, beforeEach, afterEach } from 'vitest';
+import { describe, it, test, expect, vi, beforeAll, beforeEach, afterEach } from 'vitest';
 import { render, screen, cleanup, within, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { readFileSync } from 'node:fs';
@@ -113,6 +113,20 @@ import DashboardLive from '../DashboardLive';
 
 afterEach(() => cleanup());
 beforeEach(() => vi.clearAllMocks());
+
+// FincaVivaHero es lazy() desde PERF-1 (2026-07, -158KB del chunk de
+// DashboardLive en prod con la flag OFF). Este test NO mockea FincaVivaHero
+// (necesita las 6 puertas reales) — pero el import() dinámico del componente
+// real (2000+ líneas + su árbol de imports) puede tardar MÁS que el timeout de
+// findByTestId cuando el transform es frío y el host está cargado (suite
+// completa con workers en paralelo): el primer test pagaba la transformación
+// y moría por timeout aunque el producto estuviera bien (dev rojo, task 090.b).
+// La precarga AQUÍ deja el módulo en el cache de vitest antes del primer
+// render: ningún test compite contra el reloj de transform. Los timeouts de
+// findByTestId se conservan como red de seguridad.
+beforeAll(async () => {
+  await import('../FincaVivaHero');
+});
 
 // timeout explícito (10000ms) en los findByTestId de 'finca-viva-portales':
 // FincaVivaHero es lazy() desde PERF-1 (2026-07, -158KB del chunk de
