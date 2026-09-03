@@ -92,7 +92,7 @@ describe('extractPassageText branches', function () {
 describe('extractPassageText corpus coverage', function () {
   it('produces non-empty text for every slug in the manifest', function () {
     const manifest = JSON.parse(readFileSync(MANIFEST_PATH, 'utf8'));
-    expect(manifest.slugs).toHaveLength(501);
+    expect(manifest.slugs).toHaveLength(517);
 
     for (const slug of manifest.slugs) {
       const docPath = resolve(CORPUS_DIR, `${slug}.json`);

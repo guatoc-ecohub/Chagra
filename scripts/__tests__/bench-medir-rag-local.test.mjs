@@ -31,13 +31,14 @@ describe('medir-rag-local', () => {
       expect(speciesCount).toBeGreaterThanOrEqual(400);
     });
 
-    it('debe tener 501 especies (catálogo completo)', () => {
+    it('debe tener 517 especies (catálogo completo)', () => {
       const manifestPath = join(ROOT_DIR, 'public', 'cycle-content', 'manifest.json');
       const manifest = JSON.parse(readFileSync(manifestPath, 'utf8'));
       const speciesCount = manifest.slugs?.length || manifest.length || 0;
       
-      // El catálogo completo debe tener 501 especies tras PR #2860
-      expect(speciesCount).toBe(501);
+      // El catálogo completo debe tener 517 especies: 501 tras PR #2860
+      // + 16 regenerados desde seed v3.1 (corpus rancio 070.9, 2026-09-03)
+      expect(speciesCount).toBe(517);
     });
   });
 

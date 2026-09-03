@@ -1,7 +1,7 @@
 /**
  * bench-rag-retrieve.loader.test.mjs — test del loader del RAG bench.
  *
- * Verifica que el stub de getAllSpecies devuelva las 501 especies del
+ * Verifica que el stub de getAllSpecies devuelva las 517 especies del
  * manifest real (no [] como antes del fix #rag-bench-harness-501).
  */
 import { describe, it, expect } from 'vitest';
@@ -15,14 +15,14 @@ const LOADER_PATH = join(ROOT_DIR, 'scripts', 'bench-rag-retrieve.loader.mjs');
 const MANIFEST_PATH = join(ROOT_DIR, 'public', 'cycle-content', 'manifest.json');
 
 describe('bench-rag-retrieve.loader.mjs', () => {
-  it('el stub de getAllSpecies debe contener 501 especies (no [])', () => {
+  it('el stub de getAllSpecies debe contener 517 especies (no [])', () => {
     // Leer el contenido del loader
     const loaderContent = readFileSync(LOADER_PATH, 'utf8');
 
     // Verificar que NO contiene el stub viejo (array vacío)
     expect(loaderContent).not.toContain('getAllSpecies = async () => []');
 
-    // Verificar que contiene el stub nuevo con las 501 especies
+    // Verificar que contiene el stub nuevo con las 517 especies
     expect(loaderContent).toContain('getAllSpecies = async () => [{id:"');
 
     // Extraer y contar las especies del stub
@@ -32,8 +32,8 @@ describe('bench-rag-retrieve.loader.mjs', () => {
     const stubArray = match[1];
     const speciesCount = (stubArray.match(/\{id:/g) || []).length;
 
-    // Verificar que hay 501 especies
-    expect(speciesCount).toBe(501);
+    // Verificar que hay 517 especies
+    expect(speciesCount).toBe(517);
 
     console.log(`\n[loader stub] contiene ${speciesCount} especies ✓`);
   });
