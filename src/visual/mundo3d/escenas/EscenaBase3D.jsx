@@ -20,8 +20,8 @@
  * no como abrir otra app). `piso` (y del suelo, default 0) posa la alfombra y
  * las sombras de contacto; solo cutaway lo necesita (su bloque centra en 0).
  */
-import { Suspense, lazy, useMemo, useRef, useState } from 'react';
-import { Canvas, useFrame } from '@react-three/fiber';
+import { Suspense, lazy, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { Html, OrbitControls, Stars } from '@react-three/drei';
 import * as THREE from 'three';
 import { CompaiEscena } from './CompaiEscena.jsx';
@@ -390,6 +390,26 @@ function Contenido({
   );
 }
 
+/* SONDA DE MEDICIÓN (gate del Paso 5 / DOM-tapa-montaña): expone
+   `{ gl, scene, camera }` en `window.__three` para que
+   `_gate/descenso-20260902/medir-pisos-boveda.mjs` proyecte las 7 cotas con
+   la cámara viva. DORMIDA por defecto — mismo patrón que `AuditoriaValle`
+   (`?auditar=1`): solo despierta con `?sonda3d=1` en la query (antes del
+   hash de ruta). Sin ese parámetro no toca `window` ni cuesta nada: cero
+   cambio de arte, cero cambio de comportamiento. */
+function SondaTres3D() {
+  const { gl, scene, camera } = useThree();
+  useLayoutEffect(() => {
+    if (typeof window === 'undefined') return undefined;
+    if (!new URLSearchParams(window.location.search).has('sonda3d')) return undefined;
+    window.__three = { gl, scene, camera };
+    return () => {
+      delete window.__three;
+    };
+  }, [gl, scene, camera]);
+  return null;
+}
+
 export default function EscenaBase3D({
   params, hotspots, entrada, tinte, reducedMotion,
   onHotspot, cielo, animo = 'sereno', energia = 1, camara, piso = 0, tier = 'alto',
@@ -426,6 +446,7 @@ export default function EscenaBase3D({
       frameloop={reducedMotion ? 'demand' : 'always'}
       onCreated={() => setListo(true)}
     >
+      <SondaTres3D />
       <Suspense fallback={null}>
         <Contenido
           params={params}
