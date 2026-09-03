@@ -1,7 +1,7 @@
 {
   "schema_version": "3.2",
   "seed_version": "0.2.0-oss-subset",
-  "generated_at": "2026-08-12",
+  "generated_at": "2026-08-28",
   "generated_by": "scripts/migrate-v31-to-v32.mjs — transform automático v3.1 → v3.2. ADR-030 Regla 1 (tracking_mode). Revisión agronómica requerida para especies con tracking_mode=null.",
   "_meta": {
     "fuente_migracion": "chagra-catalog-seed-v3.1.json",
