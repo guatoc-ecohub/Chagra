@@ -821,6 +821,21 @@ export async function pestVsDiseaseGuard(userMessage) {
  * agente contra el catalogo y devuelve un bloque de correccion listo para
  * anteponer. Es fail-safe: si el endpoint cae, el turno sigue igual.
  *
+ * BUG-04 (2026-09-03): el endpoint real (`chagra-pro/modules/agro-mcp/
+ * sidecar/src/server.ts`, `POST /companion-species-guard`) exige el campo
+ * `agent_response` -- asi lo documenta su propio comentario ("Recibe
+ * {agent_response, piso_termico?}"). El cliente mandaba `response_text`
+ * (un intento previo de fix que corrigio el casing pero no el nombre del
+ * campo), asi que el sidecar respondia 400 `{error:"agent_response
+ * required"}` en CADA turno -- confirmado en vivo contra el sidecar real
+ * (127.0.0.1:7880) el 2026-09-03. La salvaguarda de especies antagonistas
+ * quedaba muerta en silencio (postJson degrada 400 a null, no rompe UI).
+ * El shape de respuesta real tambien usa `has_fabricated_species` (NO
+ * `has_companion_species`/`has_companion`/`needs_correction`, que nunca
+ * existieron en el servidor) -- sin embargo el gate real en AgentScreen usa
+ * `system_prompt_block` (ya bien parseado), asi que este segundo mismatch
+ * solo rompia la telemetria `console.debug`, no el guard en si.
+ *
  * @param {string} responseText - salida final del LLM ya generada.
  * @returns {Promise<null | {
  *   has_companion_species: boolean,
@@ -830,12 +845,9 @@ export async function pestVsDiseaseGuard(userMessage) {
  */
 export async function companionSpeciesGuard(responseText) {
   if (!responseText || typeof responseText !== 'string' || !responseText.trim()) return null;
-  const raw = await postJson('/companion-species-guard', { response_text: responseText }, TOOL_TIMEOUT_MS);
+  const raw = await postJson('/companion-species-guard', { agent_response: responseText }, TOOL_TIMEOUT_MS);
   if (!raw || typeof raw !== 'object') return null;
-  const hasCompanionSpecies =
-    raw.has_companion_species === true ||
-    raw.has_companion === true ||
-    raw.needs_correction === true;
+  const hasCompanionSpecies = raw.has_fabricated_species === true;
   return {
     has_companion_species: hasCompanionSpecies,
     system_prompt_block: typeof raw.system_prompt_block === 'string' ? raw.system_prompt_block : '',
