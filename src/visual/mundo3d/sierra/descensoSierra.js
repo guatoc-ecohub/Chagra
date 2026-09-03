@@ -387,20 +387,40 @@ export function camaraEnMsnm(msnm, optica) {
 export function estadoDescenso(ms, { plan, fase = 'neutral', humedad = null, tier = 'alto' } = {}) {
   const p = plan ?? planDescenso(COTA_SIN_UBICACION, tier);
   const msnm = msnmEnMs(ms, p);
-  const optica = opticaEnMsnm(msnm, { fase, humedad });
-  const { banda, pesos } = bandaDominante(msnm);
   return {
+    ...estadoEnMsnm(msnm, { fase, humedad, tier }),
     ms: clamp(ms, 0, p.total),
     progreso: clamp(ms / p.total, 0, 1),
-    msnm,
-    rotuloMsnm: Math.round(msnm),
+    frenando: ms >= p.total - p.freno,
+    plan: p,
+  };
+}
+
+/**
+ * El mismo estado, pero indexado por ALTITUD en vez de por reloj. Es la forma
+ * que `estadoDescenso` usa por dentro, y la que el GATE necesita: para saber
+ * lo que cuesta un FX en el Mali hay que PARAR el viaje en una cota y medir
+ * ahí varios segundos — un viaje de 4 200 ms no da una muestra estable, y
+ * medir «el descenso entero» mezcla siete bandas en un solo número que no
+ * dice de quién es el costo. Congelar la cota es lo que hace la medición
+ * atribuible. No cambia nada del viaje: `estadoDescenso` sigue mandando.
+ */
+export function estadoEnMsnm(msnm, { fase = 'neutral', humedad = null, tier = 'alto' } = {}) {
+  const m = clamp(msnm, 0, CUMBRE_M);
+  const optica = opticaEnMsnm(m, { fase, humedad });
+  const { banda, pesos } = bandaDominante(m);
+  return {
+    ms: 0,
+    progreso: 0,
+    msnm: m,
+    rotuloMsnm: Math.round(m),
     banda,
     pesos,
     optica,
-    fx: fxEnMsnm(msnm, tier),
-    camara: camaraEnMsnm(msnm, optica),
-    frenando: ms >= p.total - p.freno,
-    plan: p,
+    fx: fxEnMsnm(m, tier),
+    camara: camaraEnMsnm(m, optica),
+    frenando: false,
+    plan: null,
   };
 }
 
