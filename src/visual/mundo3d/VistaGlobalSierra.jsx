@@ -64,6 +64,7 @@ import { ATMOSFERA } from './atmosferaMadre.js';
 import { perfilDeTier } from './deviceTier.js';
 import PisosTermicosBandas from './PisosTermicosBandas.jsx';
 import TransicionSierraMundo from './TransicionSierraMundo.jsx';
+import { BANDAS_SIERRA, CLAVE_PISOS_SIERRA } from './pisosTermicos.js';
 
 /* ── Geografía del macizo (validada contra el DR: mar al norte, macizo al sur,
       cumbres gemelas + Simmonds, costa de Palomino). Coordenadas de MUNDO:
@@ -72,7 +73,8 @@ const CIMA = 5.0; // altura de referencia (≈ 5.775 m escalados con drama sobri
 const COSTA_Z = -3; // latitud de la línea de costa en Z
 const ANCHO = 22; // extensión E-O del terreno
 const FONDO = 20; // extensión N-S del terreno
-const LINEA_NIEVE = 4.15; // ≈ 4.800 msnm: arranca la nieve perpetua
+// (la cota de "nieve perpetua" ≈ 4.800 msnm → topeWorldY 4.15 vive en la tabla
+//  canónica PISOS_TERMICOS_SIERRA, pisosTermicos.js, no aquí)
 
 const clamp = (v, a, b) => Math.min(b, Math.max(a, v));
 const smoothstep = (a, b, x) => {
@@ -113,16 +115,9 @@ const PALOMINO = { x: 5.0, y: 0.2, z: -2.85 }; // desembocadura sobre el Caribe
 
 /* ── Banding de pisos térmicos por altitud (colores cálidos de hora dorada;
       la luz del sol termina de entibiarlos). El bosque de niebla es la banda
-      donde se enganchan las nubes. ── */
-const BANDAS = [
-  { tope: 0.28, c: new THREE.Color('#ddc78d') }, // playa / arena
-  { tope: 0.95, c: new THREE.Color('#b3a955') }, // bosque seco tropical
-  { tope: 1.75, c: new THREE.Color('#437233') }, // selva húmeda
-  { tope: 2.6, c: new THREE.Color('#5c8a69') }, // bosque de niebla
-  { tope: 3.45, c: new THREE.Color('#94975a') }, // páramo / frailejones
-  { tope: LINEA_NIEVE, c: new THREE.Color('#a58f68') }, // superpáramo (roca)
-  { tope: Infinity, c: new THREE.Color('#f2ead6') }, // nieve perpetua (blanco cálido)
-];
+      donde se enganchan las nubes. DERIVADO de la tabla canónica
+      `PISOS_TERMICOS_SIERRA` (pisosTermicos.js): cotas y colores compartidos. ── */
+const BANDAS = BANDAS_SIERRA.map((b) => ({ tope: b.tope, c: new THREE.Color(b.hexColor) }));
 function colorPorAltura(y, out) {
   let i = 0;
   while (i < BANDAS.length - 1 && y > BANDAS[i].tope) i++;
@@ -133,16 +128,9 @@ function colorPorAltura(y, out) {
 }
 
 /* La clave de pisos accesible (DOM del modo con Canvas). Nombres de piso, sin
-   palabras-gatillo del linter i18n; el color acompaña a la etiqueta. */
-const CLAVE_PISOS = [
-  { c: '#f2ead6', t: 'Nieve perpetua' },
-  { c: '#a58f68', t: 'Superpáramo' },
-  { c: '#94975a', t: 'Páramo y frailejones' },
-  { c: '#5c8a69', t: 'Bosque de niebla' },
-  { c: '#437233', t: 'Selva húmeda' },
-  { c: '#b3a955', t: 'Bosque seco' },
-  { c: '#ddc78d', t: 'Playa y costa' },
-];
+   palabras-gatillo del linter i18n; el color acompaña a la etiqueta.
+   DERIVADA de la tabla canónica (misma fuente que BANDAS). */
+const CLAVE_PISOS = CLAVE_PISOS_SIERRA;
 
 /* Altitud representativa de cada piso (world Y), para el marcador "usted". */
 const PISOS_Y = {
