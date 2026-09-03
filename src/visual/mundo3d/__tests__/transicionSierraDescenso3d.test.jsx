@@ -172,3 +172,65 @@ describe('lo que el descenso recibe', () => {
     expect(alt.textContent.toLowerCase()).toContain('ubicaci');
   });
 });
+
+describe('PASO 4 — el aterrizaje, en pantalla', () => {
+  it('con cota y clima reales dice el clima de hoy y el piso, sin inventar', async () => {
+    render(
+      <TransicionSierraMundo
+        activa
+        escena3d
+        tier="alto"
+        msnmUsuario={2640}
+        faseEnso="neutral"
+        clima={{ descripcion: 'llovizna', temperatura: 14.2 }}
+      />,
+    );
+    await esperarLienzo();
+    const caja = document.querySelector('.tsm__aterrizaje');
+    expect(caja.textContent).toContain('llovizna, 14°');
+    expect(caja.textContent.toLowerCase()).toContain('piso frío');
+    expect(document.querySelector('.tsm__altimetro small').textContent).toContain('2.640 m');
+  });
+
+  it('🔴 a 2.200 m bajo El Niño avisa de HELADA, no de calor', async () => {
+    render(
+      <TransicionSierraMundo activa escena3d tier="alto" msnmUsuario={2200} faseEnso="el_nino" />,
+    );
+    await esperarLienzo();
+    const txt = document.querySelector('.tsm__aterrizaje').textContent.toLowerCase();
+    expect(txt).toMatch(/hela/);
+    expect(txt).not.toMatch(/más calor/);
+  });
+
+  it('a 900 m bajo El Niño sí avisa de calor, y NO de helada', async () => {
+    render(
+      <TransicionSierraMundo activa escena3d tier="alto" msnmUsuario={900} faseEnso="el_nino" />,
+    );
+    await esperarLienzo();
+    const txt = document.querySelector('.tsm__aterrizaje').textContent.toLowerCase();
+    expect(txt).toMatch(/calor/);
+    expect(txt).not.toMatch(/hela/);
+  });
+
+  it('sin ubicación no pinta clima ni piso: solo lo declara', async () => {
+    render(<TransicionSierraMundo activa escena3d tier="alto" />);
+    await esperarLienzo();
+    expect(document.querySelector('.tsm__altimetro small').textContent.toLowerCase()).toContain(
+      'ubicaci',
+    );
+    expect(document.querySelector('.tsm__aterrizaje').textContent).not.toMatch(/Hoy en su predio/);
+  });
+
+  it('🚪 PUERTA 2 — el descenso completo NO toca `compai:companero`', () => {
+    vi.useFakeTimers();
+    window.localStorage.setItem('compai:companero', 'jaguar');
+    const antes = JSON.stringify({ ...window.localStorage });
+    render(<TransicionSierraMundo activa escena3d tier="alto" msnmUsuario={2640} />);
+    vi.advanceTimersByTime(4300); // el viaje entero, de punta a punta
+    const despues = { ...window.localStorage };
+    expect(despues['compai:companero']).toBe('jaguar');
+    // Lo único que el descenso escribe es su propia marca de «ya lo vio».
+    delete despues[LLAVE_VISTO];
+    expect(JSON.stringify(despues)).toBe(antes);
+  });
+});

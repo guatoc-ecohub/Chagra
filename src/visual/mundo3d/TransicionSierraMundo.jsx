@@ -98,6 +98,12 @@ import {
   marcarDescensoVisto,
   planDescenso,
 } from './sierra/descensoSierra.js';
+import {
+  anfitrionDeBanda,
+  companeroDelUsuario,
+  faseEnsoViva,
+  resolverAterrizaje,
+} from './sierra/aterrizajeDescenso.js';
 
 /* La escena 3D del descenso se carga PEREZOSA: en modo CSS (el de hoy, y el
    fallback de tier bajo) no entra ni un byte de three al bundle inicial. */
@@ -125,8 +131,6 @@ function duracionViaje(tier, reducedMotion) {
  * bandas; esto solo tiñe el beat de llegada y la etiqueta. */
 
 const PISO_DEFAULT = { nombre: 'su destino', a: '#f2c063', b: '#1d4030' };
-/* Sin ubicación confirmada NO se inventa una cota ni un clima: se dice. */
-const SIN_UBICACION = 'sin su ubicación todavía';
 
 function normaliza(texto) {
   return String(texto ?? '')
@@ -258,6 +262,39 @@ const CSS = `
   0%, 40% { opacity: 0; }
   62%, 72% { opacity: 0.34; }
   88%, 100% { opacity: 0; }
+}
+
+/* El ATERRIZAJE: aparece en el último tramo, cuando la cámara ya está frenando.
+   Es el punto entero del descenso — no se termina en el mar, se termina en el
+   predio del usuario, y ahí se le dice qué significa su cota. Aparece por
+   keyframes (no por estado de React) para no re-renderizar el overlay entero
+   mientras corre el número de la altitud. */
+.tsm__aterrizaje {
+  position: absolute;
+  left: 50%;
+  bottom: 20vh;
+  transform: translateX(-50%);
+  max-width: min(88vw, 34rem);
+  margin: 0;
+  padding: 0.7rem 1rem;
+  border-radius: 0.9rem;
+  background: rgba(18, 26, 22, 0.58);
+  backdrop-filter: blur(4px);
+  color: #fdf8ec;
+  text-align: center;
+  font: 500 0.92rem/1.45 system-ui, sans-serif;
+  text-shadow: 0 1px 6px rgba(8, 18, 14, 0.6);
+  opacity: 0;
+  animation: tsm-aterriza var(--tsm-ms) ease-out both;
+}
+
+.tsm__aterrizaje b { display: block; font-weight: 650; }
+.tsm__aterrizaje em { display: block; font-style: normal; opacity: 0.86; margin-top: 0.25rem; }
+.tsm__aterrizaje small { display: block; margin-top: 0.4rem; opacity: 0.78; font-size: 0.82em; }
+
+@keyframes tsm-aterriza {
+  0%, 74% { opacity: 0; transform: translate(-50%, 8px); }
+  86%, 100% { opacity: 1; transform: translate(-50%, 0); }
 }
 
 /* El rótulo de altitud que CORRE de 5.775 a la cota del usuario (§3.2): una de
@@ -451,7 +488,8 @@ export default function TransicionSierraMundo({
   etiqueta,
   escena3d = 'auto',
   msnmUsuario = null,
-  faseEnso = 'neutral',
+  faseEnso = null,
+  clima = null,
   humedad = null,
   onDescenso,
 }) {
@@ -481,7 +519,20 @@ export default function TransicionSierraMundo({
     direccion !== 'subir' &&
     !yaVisto;
 
+  /* La fase que manda es la VIVA (`getEnsoPhase()` vía `faseEnsoViva`), nunca la
+     constante `ENSO_WATCH_2026`. El host puede imponerla por prop para pruebas. */
+  const fase = faseEnso ?? faseEnsoViva();
   const destino = useMemo(() => cotaDestino(msnmUsuario), [msnmUsuario]);
+  const aterrizaje = useMemo(
+    () => resolverAterrizaje({ msnmUsuario, clima, fase }),
+    [msnmUsuario, clima, fase],
+  );
+  /* El compai del usuario: SE LEE, no se escribe. El anfitrión de la banda de
+     llegada es de presentación y temporal; el compañero nunca se va. */
+  const visita = useMemo(
+    () => anfitrionDeBanda(aterrizaje.pisoId, companeroDelUsuario()),
+    [aterrizaje.pisoId],
+  );
   const plan = useMemo(
     () => (usar3d ? planDescenso(destino.cota, tier) : null),
     [usar3d, destino.cota, tier],
@@ -627,7 +678,7 @@ export default function TransicionSierraMundo({
             <Suspense fallback={null}>
               <EscenaDescensoSierra
                 plan={plan}
-                fase={faseEnso}
+                fase={fase}
                 humedad={humedad}
                 tier={tier}
                 inicioRef={inicioRef}
@@ -654,10 +705,26 @@ export default function TransicionSierraMundo({
           <div className="tsm__tinte" aria-hidden="true" />
           {tier === 'alto' && <div className="tsm__destello" aria-hidden="true" />}
           {usar3d && (
-            <p className="tsm__altimetro" aria-hidden="true">
-              <span ref={altimetroRef}>5.775 m</span>
-              <small>{destino.conUbicacion ? piso.nombre : SIN_UBICACION}</small>
-            </p>
+            <>
+              <p className="tsm__altimetro" aria-hidden="true">
+                <span ref={altimetroRef}>5.775 m</span>
+                <small>{aterrizaje.lineaCota}</small>
+              </p>
+              <p className="tsm__aterrizaje" role="status">
+                {aterrizaje.lineaClima && <b>{aterrizaje.lineaClima}</b>}
+                {aterrizaje.lineaPiso && <em>{aterrizaje.lineaPiso}</em>}
+                {aterrizaje.enso.titular && (
+                  <em>
+                    {aterrizaje.enso.titular} {aterrizaje.enso.accion}
+                  </em>
+                )}
+                {visita.hayRelevo && visita.idea && (
+                  <small>
+                    {visita.rotulo}: {visita.idea}
+                  </small>
+                )}
+              </p>
+            </>
           )}
           <p className="tsm__txt">{texto}</p>
         </>
