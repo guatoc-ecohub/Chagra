@@ -121,14 +121,17 @@ const colorPiso = (id, fallback) => {
    lista hacia arriba, y una lista al revés hace que toda cota devuelva la
    primera banda (fue exactamente el bug que se midió acá el 2026-09-02). */
 const BANDAS_RGB = [
-  { tope: 0.28, rgb: hexARgb('#ddc78d') }, // playa / arena (la tabla no la separa)
-  { tope: 0.95, rgb: colorPiso('calido', '#cba04a') }, // bosque seco tropical
-  { tope: 1.75, rgb: colorPiso('templado', '#6f9e4a') }, // selva húmeda
-  { tope: 2.6, rgb: colorPiso('frio', '#4f8f7d') }, // bosque de niebla
-  { tope: 3.45, rgb: colorPiso('paramo', '#9fb6bf') }, // páramo / frailejones
-  { tope: LINEA_NIEVE, rgb: colorPiso('superparamo', '#b9c6cc') }, // superpáramo (roca)
-  { tope: Infinity, rgb: hexARgb('#f4f9ff') }, // nieve perpetua (override de render)
+  { id: 'playa', tope: 0.28, rgb: hexARgb('#ddc78d') }, // playa / arena (la tabla no la separa)
+  { id: 'calido', tope: 0.95, rgb: colorPiso('calido', '#cba04a') }, // bosque seco tropical
+  { id: 'templado', tope: 1.75, rgb: colorPiso('templado', '#6f9e4a') }, // selva húmeda
+  { id: 'frio', tope: 2.6, rgb: colorPiso('frio', '#4f8f7d') }, // bosque de niebla
+  { id: 'paramo', tope: 3.45, rgb: colorPiso('paramo', '#9fb6bf') }, // páramo / frailejones
+  { id: 'superparamo', tope: LINEA_NIEVE, rgb: colorPiso('superparamo', '#b9c6cc') }, // superpáramo (roca)
+  { id: 'nival', tope: Infinity, rgb: hexARgb('#f4f9ff') }, // nieve perpetua (override de render)
 ].sort((a, b) => a.tope - b.tope);
+
+/** Los IDs de las 7 bandas canónicas, de mar a cima. */
+export const IDS_BANDA = BANDAS_RGB.map((b) => b.id);
 
 /*
  * El ANCHO del cruce entre bandas: la perilla del contraste. Los dos valores
@@ -212,6 +215,65 @@ export function wzDeAltura(yObjetivo, wx = 0, { desde = COSTA_Z, hasta = 6.5, pa
  * @param {number} opts.radio    medio ancho de destino.
  * @param {number} [opts.segmentos] resolución de la malla (por lado).
  */
+/* La ventana del macizo, en un solo sitio: la usan la malla y `cotasMacizo`.
+   Si divergieran, la niebla del páramo dejaría de caer sobre el páramo. */
+const CUMBRE_X = -0.1;
+const CUMBRE_Z = 4.1;
+
+/**
+ * Altura REAL del terreno dentro de la ventana del macizo, en coordenadas de
+ * ventana `u,v` ∈ [-0.5, 0.5] (con la caída radial del borde ya aplicada).
+ */
+export function alturaVentanaMacizo(u, v, ventana = 5.5) {
+  const wx = CUMBRE_X + u * 2 * ventana;
+  const wz = CUMBRE_Z + v * 2 * ventana;
+  const r = Math.min(1, Math.hypot(u, v) / 0.5);
+  const falda = 1 - smoothstep(0.62, 1.0, r);
+  return Math.max(0, alturaSierra(wx, wz)) * falda;
+}
+
+/** El máximo de altura real dentro de la ventana (el que normaliza la malla). */
+export function maxAlturaVentana({ ventana = 5.5, segmentos = 72 } = {}) {
+  let maxReal = 0;
+  for (let iz = 0; iz <= segmentos; iz++) {
+    for (let ix = 0; ix <= segmentos; ix++) {
+      const h = alturaVentanaMacizo(ix / segmentos - 0.5, iz / segmentos - 0.5, ventana);
+      if (h > maxReal) maxReal = h;
+    }
+  }
+  return maxReal;
+}
+
+/**
+ * LAS COTAS CANÓNICAS DEL MACIZO, ya escaladas al `alto` de la escena que lo
+ * monta. Existe para que nadie tenga que ADIVINAR a qué altura del modelo cae
+ * una banda: el 2026-09-02 se midió que la «niebla del páramo» de la bóveda
+ * estaba plantada con una fórmula suelta (`cima - 0.6 - azar*0.7`) que la
+ * dejaba sobre el SUPERPÁRAMO y el NIVAL — tapando de blanco justo las bandas
+ * altas que la pantalla debía enseñar. La cota se LEE de la tabla, no se tantea.
+ *
+ * @returns {{ ky:number, maxReal:number, bandas: Array<{id:string, tope:number, yTope:number, yBase:number, yMedio:number}> }}
+ *   `y*` en unidades de la escena (0 = base del macizo, `alto` = cima).
+ */
+export function cotasMacizo({ alto = 3.5, ventana = 5.5, segmentos = 72 } = {}) {
+  const maxReal = maxAlturaVentana({ ventana, segmentos });
+  const ky = alto / (maxReal > 0 ? maxReal : CIMA);
+  let base = 0;
+  const bandas = BANDAS_RGB.map((b) => {
+    const tope = Number.isFinite(b.tope) ? b.tope : maxReal;
+    const fila = { id: b.id, tope, yBase: base * ky, yTope: tope * ky, yMedio: ((base + tope) / 2) * ky };
+    base = tope;
+    return fila;
+  });
+  return { ky, maxReal, bandas };
+}
+
+/** Cota media (y de escena) de una banda del macizo escalado a `alto`. */
+export function yBandaMacizo(id, opts = {}) {
+  const f = cotasMacizo(opts).bandas.find((b) => b.id === id);
+  return f ? f.yMedio : null;
+}
+
 export function mallaMacizo({ alto = 3.5, radio = 2.4, segmentos = 72, ventana = 5.5 } = {}) {
   /*
    * LA VENTANA, y por qué no es el campo entero. La primera versión muestreaba
@@ -226,31 +288,17 @@ export function mallaMacizo({ alto = 3.5, radio = 2.4, segmentos = 72, ventana =
    * la propia ley de altura). A ±5,5 el 41 % del área queda sobre la cota del
    * bosque de niebla, así que la tarjeta enseña montaña alta y no faldón.
    */
-  const CUMBRE_X = -0.1;
-  const CUMBRE_Z = 4.1;
   const n = segmentos + 1;
   const kx = radio / ventana;
 
-  let maxReal = 0;
-  const alturaVentana = (ix, iz) => {
-    const u = ix / segmentos - 0.5;
-    const v = iz / segmentos - 0.5;
-    const wx = CUMBRE_X + u * 2 * ventana;
-    const wz = CUMBRE_Z + v * 2 * ventana;
-    /* Caída radial hacia el borde: la ventana es un recorte, y sin esto la
-       montaña quedaría cortada a cuchillo en los cuatro lados — una meseta
-       flotante. Con ella el macizo se apoya en el piso de la tarjeta. */
-    const r = Math.min(1, Math.hypot(u, v) / 0.5);
-    const falda = 1 - smoothstep(0.62, 1.0, r);
-    return { wx, wz, h: Math.max(0, alturaSierra(wx, wz)) * falda };
-  };
+  /* Caída radial hacia el borde (dentro de `alturaVentanaMacizo`): la ventana
+     es un recorte, y sin ella la montaña quedaría cortada a cuchillo en los
+     cuatro lados — una meseta flotante. Con ella el macizo se apoya en el
+     piso de la tarjeta. La ley vive arriba, en UN solo sitio, porque
+     `cotasMacizo` tiene que dar exactamente las mismas cotas. */
+  const alturaVentana = (ix, iz) => alturaVentanaMacizo(ix / segmentos - 0.5, iz / segmentos - 0.5, ventana);
 
-  for (let iz = 0; iz < n; iz++) {
-    for (let ix = 0; ix < n; ix++) {
-      const h = alturaVentana(ix, iz).h;
-      if (h > maxReal) maxReal = h;
-    }
-  }
+  const maxReal = maxAlturaVentana({ ventana, segmentos });
   const ky = alto / (maxReal > 0 ? maxReal : CIMA);
 
   const posiciones = new Float32Array(n * n * 3);
@@ -258,7 +306,7 @@ export function mallaMacizo({ alto = 3.5, radio = 2.4, segmentos = 72, ventana =
   let p = 0;
   for (let iz = 0; iz < n; iz++) {
     for (let ix = 0; ix < n; ix++) {
-      const { h } = alturaVentana(ix, iz);
+      const h = alturaVentana(ix, iz);
       posiciones[p] = (ix / segmentos - 0.5) * 2 * ventana * kx;
       posiciones[p + 1] = h * ky;
       posiciones[p + 2] = (iz / segmentos - 0.5) * 2 * ventana * kx;

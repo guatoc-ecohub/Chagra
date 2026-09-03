@@ -43,7 +43,8 @@ import LluviaValle from '../atmosfera/clima/LluviaValle.jsx';
 import NieblaLadera from '../atmosfera/clima/NieblaLadera.jsx';
 import HeladaValle from '../atmosfera/clima/HeladaValle.jsx';
 import { BOVEDA_PISOS_DEF as PISOS_DEF } from '../pisosTermicos.js';
-import { mallaMacizo } from '../sierra/sierraRelieve.js';
+import { cotasMacizo, mallaMacizo } from '../sierra/sierraRelieve.js';
+import { franjaDeHoraDecimal } from '../cielosHoraData.js';
 
 /* Radio de la BÓVEDA. Tiene que ENCERRAR a la cámara siempre: la pose de
    reposo queda a ~9 del origen y el orbit permite alejarse hasta zoom*2.6
@@ -302,25 +303,51 @@ function Jiron({ base, escala, fase, reducedMotion }) {
   useFrame((state) => {
     if (reducedMotion || !ref.current) return;
     const s = escala * (1 + Math.sin(state.clock.elapsedTime * 0.5 + fase) * 0.06);
-    ref.current.scale.set(s, s * 0.4, s);
+    ref.current.scale.set(s * 1.75, s * 0.34, s * 0.95);
     ref.current.material.opacity = 0.22 + Math.sin(state.clock.elapsedTime * 0.5 + fase) * 0.06;
   });
+  /* TENDIDO, no redondo: la niebla de páramo se acuesta a lo largo de la
+     ladera. Esférico y del tamaño de la montaña era una CÚPULA sobre la cumbre
+     (medido el 2026-09-02: tapaba superpáramo y nival); alargado en X y aplanado
+     en Y lee como la franja de niebla que el frailejón peina. */
   return (
-    <mesh ref={ref} position={base} scale={[escala, escala * 0.4, escala]}>
-      <sphereGeometry args={[1, 12, 8]} />
+    <mesh ref={ref} position={base} scale={[escala * 1.75, escala * 0.34, escala * 0.95]}>
+      <sphereGeometry args={[1, 14, 8]} />
       <meshBasicMaterial color="#eef4f6" transparent opacity={0.26} depthWrite={false} />
     </mesh>
   );
 }
 
+/* LA NIEBLA DEL PÁRAMO — sobre el PÁRAMO, que es lo que su propio nombre dice.
+ *
+ * 🔴 Medido el 2026-09-02 (gate del Paso 5): la cota de los jirones se tanteaba
+ * con `cima - 0.6 - azar*0.7`, que con `cima = 3.5` los dejaba entre y 2,2 y
+ * 2,9 — o sea sobre el SUPERPÁRAMO (2,34-2,81) y el NIVAL (2,81-3,5), no sobre
+ * el páramo (1,76-2,34). Tres esferas blancas translúcidas al 26 % apiladas
+ * delante de la cumbre lavaban justo las bandas altas que esta pantalla tiene
+ * que enseñar: el ΔE entre superpáramo y nival caía de 67 (macizo solo) a 8,8
+ * (canvas). Ahora la cota se LEE de la tabla canónica (`cotasMacizo`), los
+ * jirones se reparten en X para no apilarse en la misma columna, y su radio se
+ * acota para que lean como una FRANJA de niebla en la ladera y no como una
+ * cúpula sobre la montaña. Sigue siendo la misma niebla, en su piso.
+ */
 function NieblaParamo({ niebla = 0.6, cima = 3.6, reducedMotion }) {
   const jirones = useMemo(() => {
     const r = prng(909);
     const n = 1 + Math.round(niebla * 3);
+    const banda = cotasMacizo({ alto: cima }).bandas.find((b) => b.id === 'paramo');
+    const yBase = banda ? banda.yBase : cima * 0.5;
+    const alturaBanda = banda ? banda.yTope - banda.yBase : cima * 0.2;
     return Array.from({ length: n }, (_, i) => ({
       key: i,
-      base: [(r() - 0.5) * 2.2, cima - 0.6 - r() * 0.7, 0.6 + r() * 0.6],
-      escala: 0.7 + r() * 0.6,
+      base: [
+        // repartidos a lo ancho: apilados en el centro se sumaban tres velos
+        ((i + 0.5) / n - 0.5) * 3.0 + (r() - 0.5) * 0.4,
+        // dentro de la banda de páramo, nunca por encima de su tope
+        yBase + alturaBanda * (0.15 + r() * 0.6),
+        0.55 + r() * 0.5,
+      ],
+      escala: 0.45 + r() * 0.3,
       fase: r() * 6,
     }));
   }, [niebla, cima]);
@@ -764,6 +791,16 @@ export default function EscenaBoveda(props) {
       hotspots={hotspots}
       cielo={cielo}
       camara={{ position: [3.9, 2.3, 7.6], fov: 50 }}
+      /* 🔴 La LUZ obedece la hora que ESTA escena declara. Su cielo, su sol y su
+         fondo ya salen de `hora`; hasta el 2026-09-02 la luz salía del reloj del
+         aparato, así que de noche la pantalla pintaba un cielo de tarde
+         iluminado como medianoche y el macizo se leía como una silueta negra
+         (7/7 pisos distinguibles de día contra 5/7 de noche, misma malla). */
+      /* `hora` 0..1 recorre el ARCO DIURNO (0 = amanecer · 0.5 = mediodía ·
+         1 = anochecer — así lo usan `arcoSol` y `esDia`), no las 24 h del
+         reloj. En los Andes ecuatoriales el sol sale ~6 y se esconde ~18 todo
+         el año (`franjaDeHoraDecimal`), así que el arco son 12 horas. */
+      franja={franjaDeHoraDecimal(6 + hora * 12)}
       piso={DY - 0.04}
       entrada={{ ...props.entrada, zoom: props.entrada?.zoom ?? 7.5, centro: [0, 0.55, 0] }}
     >
