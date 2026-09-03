@@ -69,6 +69,7 @@
  *      un ref) → `camaraRef={camRef}`.
  */
 import { useEffect, useRef } from 'react';
+import { PISOS_TRANSICION_SIERRA as PISOS } from './pisosTermicos.js';
 
 /* ------------------------------ reloj interno --------------------------- */
 /* No se exportan (react-refresh/only-export-components): el host cronometra
@@ -86,18 +87,10 @@ function duracionViaje(tier, reducedMotion) {
 
 /* ------------------------- paleta de pisos térmicos --------------------- */
 /* Tintes [claro, profundo] + nombre legible por piso. Claves normalizadas
- * (minúsculas, sin acentos). El transecto completo vive en el CSS de las
+ * (minúsculas, sin acentos). DERIVADO de la tabla canónica
+ * `PISOS_TERMICOS_SIERRA` (pisosTermicos.js): misma fuente que la leyenda y
+ * las bandas de la Sierra. El transecto completo vive en el CSS de las
  * bandas; esto solo tiñe el beat de llegada y la etiqueta. */
-
-const PISOS = [
-  { claves: ['nieve', 'nival', 'glaciar', 'simmonds'], nombre: 'la nieve perpetua', a: '#eef4f8', b: '#9fb8c8' },
-  { claves: ['superparamo'], nombre: 'el superpáramo', a: '#c9d2cf', b: '#75878a' },
-  { claves: ['paramo', 'frailejon'], nombre: 'el páramo', a: '#c7bb6e', b: '#5f6b45' },
-  { claves: ['niebla', 'frio', 'bosque de niebla', 'bosque_niebla', 'nublado'], nombre: 'el bosque de niebla', a: '#8fae9a', b: '#33544a' },
-  { claves: ['templado', 'selva', 'humedo', 'cafetero', 'cafe'], nombre: 'la selva húmeda', a: '#7fae5f', b: '#2c5a33' },
-  { claves: ['calido', 'bosque seco', 'bosque_seco', 'seco'], nombre: 'el bosque seco', a: '#e8c675', b: '#8a6a33' },
-  { claves: ['playa', 'mar', 'palomino', 'costa', 'litoral'], nombre: 'Palomino', a: '#8fd0d8', b: '#2a7c8f' },
-];
 
 const PISO_DEFAULT = { nombre: 'su destino', a: '#f2c063', b: '#1d4030' };
 

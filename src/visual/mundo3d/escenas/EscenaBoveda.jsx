@@ -12,8 +12,8 @@
  *                         secas; NO cuatro estaciones europeas). En lluvia: nubes
  *                         más llenas + aguacero suave. En seca: cielo despejado.
  *   · niebla      0..1  → la NIEBLA del páramo que el frailejón peina para dar agua.
- *   · pisos       [...] → la MONTAÑA en cuatro pisos térmicos (misma paleta del
- *                         mundo #4): cálido→templado→frío→páramo, apilados.
+ *   · pisos       [...] → la MONTAÑA en SIETE pisos térmicos de la Sierra
+ *                         (playa→nival, derivados de la tabla canónica), apilados.
  *   · glaciar     {...} → el casquete de hielo + la línea ámbar de hasta dónde
  *                         llegaba (retroceso). NOTA DE CONCIENCIA, jamás alarma:
  *                         se pinta ÁMBAR de "cuídelo", nunca rojo de catástrofe.
@@ -42,6 +42,7 @@ import { ATMOSFERA, CIELOS, PALETA } from '../atmosferaMadre.js';
 import LluviaValle from '../atmosfera/clima/LluviaValle.jsx';
 import NieblaLadera from '../atmosfera/clima/NieblaLadera.jsx';
 import HeladaValle from '../atmosfera/clima/HeladaValle.jsx';
+import { BOVEDA_PISOS_DEF as PISOS_DEF } from '../pisosTermicos.js';
 
 /* Radio de la BÓVEDA. Tiene que ENCERRAR a la cámara siempre: la pose de
    reposo queda a ~9 del origen y el orbit permite alejarse hasta zoom*2.6
@@ -331,12 +332,9 @@ function NieblaParamo({ niebla = 0.6, cima = 3.6, reducedMotion }) {
   );
 }
 
-const PISOS_DEF = [
-  { nombre: 'cálido', color: '#c7a24b', h: 0.95, r0: 2.4, r1: 1.95 },
-  { nombre: 'templado', color: '#8fae55', h: 0.9, r1: 1.42 },
-  { nombre: 'frío', color: '#6f9a72', h: 0.85, r1: 0.9 },
-  { nombre: 'páramo', color: '#9fb6bf', h: 0.8, r1: 0.42 },
-];
+/* `PISOS_DEF` son los 7 pisos térmicos de la Sierra, DERIVADOS de la tabla
+   canónica `PISOS_TERMICOS_SIERRA` (src/visual/mundo3d/pisosTermicos.js) en
+   orden bottom-up (playa→nival) para el apilado de la montaña. Ver el import. */
 
 /* MICRO-RÓTULO tocable de la línea ámbar: le pone PALABRAS al retroceso glaciar
    (un campesino no decodifica "aro ámbar = el hielo bajó"). Discreto —un punto
@@ -370,9 +368,10 @@ function RotuloHielo({ yAntes, rAntes }) {
   );
 }
 
-/* LA MONTAÑA: los cuatro pisos térmicos apilados como troncos de cono (paleta
-   del mundo #4). Corona: el casquete de hielo + la LÍNEA ÁMBAR de hasta dónde
-   llegaba el hielo (retroceso glaciar) — nota de conciencia, esperanza no colapso. */
+/* LA MONTAÑA: los SIETE pisos térmicos de la Sierra apilados como troncos de
+   cono (paleta canónica compartida). Corona: el casquete de hielo + la línea
+   ámbar de hasta dónde llegaba el hielo (retroceso glaciar) — nota de
+   conciencia, esperanza no colapso. */
 /**
  * @param {Object} props
  * @param {Array<{nombre?:string, color?:string, h?:number, r0?:number, r1?:number}>} [props.pisos]
