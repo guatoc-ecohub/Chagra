@@ -1,5 +1,4 @@
 import React from 'react';
-// @ts-nocheck
 import { render, screen, fireEvent, waitFor, act } from '@testing-library/react';
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 
@@ -82,7 +81,7 @@ describe('EvidenceCapture — audit 070.6 satélite: bridge diagnóstico IA → 
     });
 
     const { container } = render(
-      <EvidenceCapture logId="task-padre-1" assetId="plant-9" speciesSlug="fragaria_ananassa" />
+      <EvidenceCapture logId="task-padre-1" assetId="plant-9" speciesSlug="fragaria_ananassa" onCountChange={vi.fn()} onDiagnosis={vi.fn()} />
     );
     await capturePhoto(container);
 
@@ -117,7 +116,7 @@ describe('EvidenceCapture — audit 070.6 satélite: bridge diagnóstico IA → 
     });
 
     const { container } = render(
-      <EvidenceCapture logId="task-padre-2" assetId="plant-9" speciesSlug="fragaria_ananassa" />
+      <EvidenceCapture logId="task-padre-2" assetId="plant-9" speciesSlug="fragaria_ananassa" onCountChange={vi.fn()} onDiagnosis={vi.fn()} />
     );
     await capturePhoto(container);
 
@@ -137,7 +136,7 @@ describe('EvidenceCapture — audit 070.6 satélite: bridge diagnóstico IA → 
       savePayloadMock.mockRejectedValue(new Error('falla de red + IDB'));
 
       const { container } = render(
-        <EvidenceCapture logId="task-padre-3" assetId="plant-9" speciesSlug="fragaria_ananassa" />
+        <EvidenceCapture logId="task-padre-3" assetId="plant-9" speciesSlug="fragaria_ananassa" onCountChange={vi.fn()} onDiagnosis={vi.fn()} />
       );
       await capturePhoto(container);
 
