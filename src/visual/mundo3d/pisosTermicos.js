@@ -297,23 +297,82 @@ export function compatibilidadPiso(pisoUsuario) {
  * Esta tabla ES la fuente única: las cuatro listas se DERIVAN de acá, así no
  * hay cotas duplicadas ni huecos entre pisos.
  *
- * Orden top→bottom (de la cima al mar). `piso` referencia el id en el
- * `PISOS_TERMICOS` de Caldas (6 pisos); aquí el piso cálido se parte en dos
- * bandas visuales (bosque seco 300-1000 m y playa/costa 0-300 m), por eso
- * dos filas apuntan a `calido`. `nombre` es la etiqueta canónica del DOM
- * (CLAVE_PISOS); `nombreTransicion` la etiqueta gramatical del transecto.
- * `boveda` son las cotas de la montaña 3D (EscenaBoveda), `topeWorldY` el
- * tope mundial de la Sierra (VistaGlobalSierra), `tintA/tintB` y `claves`
- * los tintes y palabras-clave del transecto (TransicionSierraMundo).
+ * 🔴 UNIFICACIÓN DE PALETA (2026-09-02, decisión del operador «unifica»).
+ * Hasta hoy convivían DOS juegos de color para las MISMAS bandas: esta tabla
+ * traía ocres propios (`#f2ead6` `#a58f68` `#94975a` `#5c8a69` `#437233`
+ * `#b3a955`) y `PISOS_TERMICOS` —la canónica ecológica— traía los verdes/fríos
+ * (`#eef2f4` `#b9c6cc` `#9fb6bf` `#4f8f7d` `#6f9e4a` `#cba04a`). El commit
+ * `a5343eb84` ya había resuelto ese mismo choque para el DESCENSO a favor de
+ * los verdes, midiendo rgb(91,120,51) contra rgb(45,66,33); mantener los ocres
+ * dejaba la vista global peleada con su propio descenso y con la bóveda.
+ * AHORA el `color` de cada banda NO se escribe: se DERIVA de `PISOS_TERMICOS`
+ * por el id de `piso` (ver `colorDeBanda`), con dos excepciones DECLARADAS —
+ * que son excepciones de render, no una segunda paleta:
+ *   · `playa`  — no tiene piso ecológico propio (es la mitad baja del cálido),
+ *                así que conserva su arena `#ddc78d`.
+ *   · `nival`  — override de render que el PASO 2 documentó: bajo la luz
+ *                dorada del atardecer el `#eef2f4` canónico se lee OCRE, y la
+ *                cima tiene que leerse NIEVE (§6-B). Va a `#f4f9ff`.
+ * Consecuencia medible: la vista global y el descenso NO cambian un solo pixel
+ * (ya leían estos valores a mano); la que cambia es la BÓVEDA —y con ella el
+ * gemelo 2D del equipo humilde—, que deja los ocres y se alinea con las otras.
+ *
+ * 🔴 ORDEN — la trampa que ya mordió una vez. Esta tabla va de la CIMA AL MAR
+ * (índice 0 = nival, `topeWorldY: Infinity`). Ese orden es OBLIGATORIO: lo
+ * consume `BANDAS_DESCENSO` (descensoSierra.js), que arranca el viaje en
+ * `[0]` = la cumbre. Pero los algoritmos de color (`colorPorAltura` en la
+ * vista global, `colorPorAlturaRGB` en el descenso) recorren su lista HACIA
+ * ARRIBA (`while (y > banda.tope) i++`): alimentarlos con esta tabla tal cual
+ * deja el índice clavado en 0 y pinta CREMA NIVAL PARA TODA ALTITUD — pasó en
+ * `dev` y se descubrió por casualidad. Por eso el derivado `BANDAS_SIERRA` va
+ * al revés (MAR→CIMA, `Infinity` de último) y `ORDEN_*` deja los dos sentidos
+ * por escrito. `pisosTermicosUnificados.test.js` fija ambos.
+ *
+ * `piso` referencia el id en el `PISOS_TERMICOS` de Caldas (6 pisos); aquí el
+ * piso cálido se parte en dos bandas visuales (bosque seco 300-1000 m y
+ * playa/costa 0-300 m), por eso dos filas apuntan a `calido`. `nombre` es la
+ * etiqueta canónica del DOM (CLAVE_PISOS); `nombreTransicion` la etiqueta
+ * gramatical del transecto. `boveda` son las cotas de la montaña 3D
+ * (EscenaBoveda), `topeWorldY` el tope mundial de la Sierra
+ * (VistaGlobalSierra), `tintA/tintB` y `claves` los tintes y palabras-clave
+ * del transecto (TransicionSierraMundo).
  * ──────────────────────────────────────────────────────────────────────────── */
-export const PISOS_TERMICOS_SIERRA = [
+
+/** El sentido de recorrido de `PISOS_TERMICOS_SIERRA`: índice 0 = la cumbre. */
+export const ORDEN_PISOS_SIERRA = 'cima→mar';
+/** El sentido de recorrido de `BANDAS_SIERRA`: índice 0 = el mar. */
+export const ORDEN_BANDAS_SIERRA = 'mar→cima';
+
+/**
+ * Excepciones de RENDER al color canónico. No son una paleta paralela: son dos
+ * casos con razón escrita (ver la cabecera). Cualquier otra banda que quiera
+ * salirse de `PISOS_TERMICOS` tiene que justificarse aquí, a la vista.
+ */
+export const COLOR_BANDA_EXCEPCION = {
+  // la costa no es un piso térmico: es la mitad baja del cálido, y su color es arena
+  playa: '#ddc78d',
+  // la nieve tiene que leerse NIEVE bajo la hora dorada, no ocre (PASO 2, §6-B)
+  nival: '#f4f9ff',
+};
+
+/** El color de una banda: el de su piso en `PISOS_TERMICOS`, salvo excepción. */
+function colorDeBanda(idBanda, idPiso) {
+  if (COLOR_BANDA_EXCEPCION[idBanda]) return COLOR_BANDA_EXCEPCION[idBanda];
+  const p = PISOS_TERMICOS.find((x) => x.id === idPiso);
+  if (!p) throw new Error(`banda "${idBanda}": piso desconocido "${idPiso}"`);
+  return p.color;
+}
+
+/* Las 7 bandas SIN color: el color lo pone `colorDeBanda` abajo, de una sola
+   fuente. Escribir un `color` a mano en esta lista es exactamente el error que
+   la unificación vino a cerrar. */
+const BANDAS_SIERRA_BASE = [
   {
     id: 'nival',
     nombre: 'Nieve perpetua',
     nombreTransicion: 'la nieve perpetua',
     minMsnm: 4800,
     maxMsnm: CUMBRE_SIERRA_M,
-    color: '#f2ead6',
     piso: 'nival',
     topeWorldY: Infinity,
     tintA: '#eef4f8',
@@ -327,7 +386,6 @@ export const PISOS_TERMICOS_SIERRA = [
     nombreTransicion: 'el superpáramo',
     minMsnm: 4000,
     maxMsnm: 4800,
-    color: '#a58f68',
     piso: 'superparamo',
     topeWorldY: 4.15,
     tintA: '#c9d2cf',
@@ -341,7 +399,6 @@ export const PISOS_TERMICOS_SIERRA = [
     nombreTransicion: 'el páramo',
     minMsnm: 3000,
     maxMsnm: 4000,
-    color: '#94975a',
     piso: 'paramo',
     topeWorldY: 3.45,
     tintA: '#c7bb6e',
@@ -355,7 +412,6 @@ export const PISOS_TERMICOS_SIERRA = [
     nombreTransicion: 'el bosque de niebla',
     minMsnm: 2000,
     maxMsnm: 3000,
-    color: '#5c8a69',
     piso: 'frio',
     topeWorldY: 2.6,
     tintA: '#8fae9a',
@@ -369,7 +425,6 @@ export const PISOS_TERMICOS_SIERRA = [
     nombreTransicion: 'la selva húmeda',
     minMsnm: 1000,
     maxMsnm: 2000,
-    color: '#437233',
     piso: 'templado',
     topeWorldY: 1.75,
     tintA: '#7fae5f',
@@ -383,7 +438,6 @@ export const PISOS_TERMICOS_SIERRA = [
     nombreTransicion: 'el bosque seco',
     minMsnm: 300,
     maxMsnm: 1000,
-    color: '#b3a955',
     piso: 'calido',
     topeWorldY: 0.95,
     tintA: '#e8c675',
@@ -397,7 +451,6 @@ export const PISOS_TERMICOS_SIERRA = [
     nombreTransicion: 'Palomino',
     minMsnm: 0,
     maxMsnm: 300,
-    color: '#ddc78d',
     piso: 'calido',
     topeWorldY: 0.28,
     tintA: '#8fd0d8',
@@ -406,6 +459,16 @@ export const PISOS_TERMICOS_SIERRA = [
     boveda: { h: 0.5, r0: 2.4, r1: 2.1 },
   },
 ];
+
+/**
+ * LA TABLA CANÓNICA de las 7 bandas, ya con su color derivado. Orden cima→mar
+ * (`ORDEN_PISOS_SIERRA`). TODO lo de abajo sale de aquí: nadie más escribe una
+ * cota, un nombre ni un color de banda.
+ */
+export const PISOS_TERMICOS_SIERRA = BANDAS_SIERRA_BASE.map((b) => ({
+  ...b,
+  color: colorDeBanda(b.id, b.piso),
+}));
 
 /**
  * Cota msnm por piso, verificable: los rangos deben encadenarse sin huecos ni
@@ -430,8 +493,40 @@ export const CLAVE_PISOS_SIERRA = PISOS_TERMICOS_SIERRA.map((p) => ({ c: p.color
 /** Nos reservamos los topes en color hex; la vista envuelve cada uno en THREE.Color. */
 export const NOMBRES_PISOS_SIERRA = PISOS_TERMICOS_SIERRA.map((p) => p.nombre);
 
-/** Bandas por el tope mundial (VistaGlobalSierra `BANDAS`): `{ tope, hexColor }`. */
-export const BANDAS_SIERRA = PISOS_TERMICOS_SIERRA.map((p) => ({ tope: p.topeWorldY, hexColor: p.color }));
+/**
+ * Bandas por el tope mundial, para los DOS algoritmos de color de ladera
+ * (`colorPorAltura` en VistaGlobalSierra, `colorPorAlturaRGB` en sierraRelieve).
+ *
+ * 🔴 ORDEN MAR→CIMA, `Infinity` DE ÚLTIMO — al revés que `PISOS_TERMICOS_SIERRA`.
+ * No es un capricho: los dos algoritmos avanzan con `while (y > banda.tope) i++`,
+ * o sea recorren la lista de menor a mayor tope. Con la tabla en su orden nativo
+ * (cima→mar, `Infinity` primero) el índice nunca pasa de 0 y TODA altitud sale
+ * crema nival — el macizo entero de un solo color, que fue el bug real en `dev`.
+ * El `.sort()` no es defensivo-por-si-acaso: es LA garantía, y el test la fija.
+ */
+export const BANDAS_SIERRA = PISOS_TERMICOS_SIERRA
+  .map((p) => ({ id: p.id, nombre: p.nombre, tope: p.topeWorldY, hexColor: p.color }))
+  .sort((a, b) => a.tope - b.tope);
+
+/**
+ * ¿Está esta lista de bandas en el sentido que los algoritmos de ladera
+ * necesitan? Topes estrictamente crecientes y el `Infinity` de último.
+ * Devuelve `{ ok, fallas }` — helper para los tests, y para cualquiera que
+ * arme una lista de bandas propia (que no debería, pero pasa).
+ */
+export function validarOrdenBandas(bandas = BANDAS_SIERRA) {
+  const fallas = [];
+  for (let i = 1; i < bandas.length; i += 1) {
+    if (!(bandas[i].tope > bandas[i - 1].tope)) {
+      fallas.push({ i, tope: bandas[i].tope, previo: bandas[i - 1].tope });
+    }
+  }
+  const ultimo = bandas[bandas.length - 1];
+  if (!ultimo || ultimo.tope !== Infinity) {
+    fallas.push({ finEsperado: Infinity, finHallado: ultimo ? ultimo.tope : null });
+  }
+  return { ok: fallas.length === 0, fallas };
+}
 
 /** Lista del transecto (TransicionSierraMundo `PISOS`): `{ claves, nombre, a, b }`. */
 export const PISOS_TRANSICION_SIERRA = PISOS_TERMICOS_SIERRA.map((p) => ({
