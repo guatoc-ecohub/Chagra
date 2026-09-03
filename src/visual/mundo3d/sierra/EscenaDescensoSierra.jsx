@@ -362,7 +362,9 @@ function Piloto({ plan, fase, humedad, tier, refEstado, onEstado, t0, inicioRef 
     camera.position.set(est.camara.pos[0], est.camara.pos[1], est.camara.pos[2]);
     objetivo.set(est.camara.objetivo[0], est.camara.objetivo[1], est.camara.objetivo[2]);
     camera.lookAt(objetivo);
-    if (camera.fov !== est.camara.fov) {
+    // El Canvas crea una PerspectiveCamera (fov 48) y el tween de fov solo
+    // tiene sentido ahí; el instanceof lo declara en tipos, no en un cast.
+    if (camera instanceof THREE.PerspectiveCamera && camera.fov !== est.camara.fov) {
       camera.fov = est.camara.fov;
       camera.updateProjectionMatrix();
     }
@@ -383,7 +385,10 @@ function Piloto({ plan, fase, humedad, tier, refEstado, onEstado, t0, inicioRef 
     if (scene.fog) {
       colorNiebla.copy(NIEBLA_ALTA).lerp(NIEBLA_BAJA, est.optica.luzCalidez);
       scene.fog.color.copy(colorNiebla);
-      scene.fog.density = est.optica.nieblaDensidad;
+      // Este componente monta FogExp2; la densidad solo existe en esa clase.
+      if (scene.fog instanceof THREE.FogExp2) {
+        scene.fog.density = est.optica.nieblaDensidad;
+      }
     }
     onEstado?.(est);
   });
