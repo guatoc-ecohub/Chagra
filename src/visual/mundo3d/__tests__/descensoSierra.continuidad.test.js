@@ -280,3 +280,42 @@ describe('pesos de banda', () => {
     expect(p.paramo + p.frio).toBeGreaterThan(0.9);
   });
 });
+
+/*
+ * CONTRATO TEMPORAL DE LOS TRAMOS — los tramos del plan nacen COMPLETOS: cada
+ * uno trae sus msInicio/msFin desde la construcción (los tramos se arman con
+ * sus tiempos en un solo paso, no mutándolos después). La escena lee esa línea
+ * de tiempo por cuadro; si un tramo llegara a nacer sin tiempos o con huecos,
+ * el viaje se cortaría o se saltaría una banda y este test lo ve.
+ */
+describe('plan del descenso — contrato temporal de los tramos', () => {
+  it('cada tramo trae msInicio/msFin contiguos, monótonos y cerrados en total', () => {
+    for (const cota of [0, 300, 1500, 2640, 3900]) {
+      const plan = planDescenso(cota, 'alto');
+      expect(plan.tramos.length).toBeGreaterThan(0);
+      expect(plan.tramos[0].msInicio).toBe(0);
+      let msFinAnterior = null;
+      for (const t of plan.tramos) {
+        expect(typeof t.msInicio).toBe('number');
+        expect(typeof t.msFin).toBe('number');
+        expect(t.msFin).toBeGreaterThan(t.msInicio);
+        if (msFinAnterior !== null) {
+          expect(t.msInicio).toBe(msFinAnterior); // contiguo: sin huecos
+        }
+        msFinAnterior = t.msFin;
+      }
+      // Cierra EXACTO en el total (sin residuo de coma flotante).
+      expect(plan.tramos[plan.tramos.length - 1].msFin).toBe(plan.total);
+    }
+  });
+
+  it('sin ubicación confirmada el plan conserva el mismo contrato', () => {
+    const plan = planDescenso(COTA_SIN_UBICACION, 'alto');
+    expect(plan.tramos.length).toBeGreaterThan(0);
+    expect(plan.tramos[0].msInicio).toBe(0);
+    expect(plan.tramos[plan.tramos.length - 1].msFin).toBe(plan.total);
+    for (const t of plan.tramos) {
+      expect(t.msFin).toBeGreaterThan(t.msInicio);
+    }
+  });
+});
