@@ -11,6 +11,8 @@ import AIStreamPanel from './common/AIStreamPanel';
 import { ErrorBoundary } from './ErrorBoundary';
 import { savePayload } from '../services/payloadService';
 import { useGeolocation } from '../hooks/useGeolocation';
+import CaseLinkModal from './CaseLinkModal';
+import { healthScoreToCaseSeverity } from '../utils/caseBridge';
 
 /**
  * EvidenceCapture, Captura con diagnóstico IA y evolución histórica (Fase 20.2b).
@@ -54,6 +56,12 @@ export const EvidenceCapture = ({
   // Alias para retro-compat con handlers que limpian el input tras procesar.
   // Apunta a "el último input que disparó el change" — set en handleCapture.
   const inputRef = useRef(null);
+  // Audit 070.6 satélite — modal payload cuando el diagnóstico IA arroja un
+  // score de salud < 50 (planta en problema). Shape idéntico al de
+  // ObservationScreen: { logId, severity, description, speciesSlug, plantId,
+  // landId }. logId apunta al log--observation de LA INFERENCIA (no al log
+  // padre que evidencia esta captura).
+  const [caseBridgePayload, setCaseBridgePayload] = useState(null);
 
   // Cargar evidencias existentes + historial anterior del asset
   useEffect(() => {
@@ -176,6 +184,13 @@ export const EvidenceCapture = ({
             const confidence = result.score / 100;
             const needsReview = confidence < 0.85; // Guardrail ADR-019
 
+            // Audit 070.6 satélite — id pre-asignado (patrón
+            // ObservationScreen 070.5) para que el bridge case_study tenga
+            // un logId estable aún si el POST cae al fallback offline.
+            const aiLogId = (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function')
+              ? crypto.randomUUID()
+              : `ai-obs-${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
+
             const aiNotes = [
               '[AI_INFERENCE]',
               `source: vision_model`,
@@ -193,6 +208,7 @@ export const EvidenceCapture = ({
             const payload = {
               data: {
                 type: 'log--observation',
+                id: aiLogId,
                 attributes: {
                   name: `Diagnóstico IA: ${result.issues[0] || 'Sin hallazgos'}`,
                   timestamp: new Date().toISOString().split('.')[0] + '+00:00',
@@ -207,6 +223,22 @@ export const EvidenceCapture = ({
             };
 
             await savePayload('observation', payload);
+
+            // Audit 070.6 satélite — bridge severity → case_study. Solo tras
+            // el save exitoso (si savePayload rechaza, el catch externo nos
+            // saca del flujo y no se ofrece vincular un log que no existe).
+            // Score de salud < 50 → severity 'high' (utils/caseBridge).
+            const bridgeSeverity = healthScoreToCaseSeverity(result.score);
+            if (bridgeSeverity) {
+              setCaseBridgePayload({
+                logId: aiLogId,
+                severity: bridgeSeverity,
+                description: result.issues[0] || `Diagnóstico IA score ${result.score}/100`,
+                speciesSlug,
+                plantId: assetId,
+                landId: null, // EvidenceCapture no conoce el land del asset.
+              });
+            }
           }
         } finally {
           setDiagnosing(false);
@@ -401,6 +433,20 @@ export const EvidenceCapture = ({
         <p className="text-[10px] text-amber-400 italic">
           Se requiere al menos una foto para completar la tarea.
         </p>
+      )}
+
+      {/* Audit 070.6 satélite — bridge severity → case_study (mismo modal
+          que ObservationScreen; overlay fixed, no afecta el layout). */}
+      {caseBridgePayload && (
+        <CaseLinkModal
+          logId={caseBridgePayload.logId}
+          severity={caseBridgePayload.severity}
+          description={caseBridgePayload.description}
+          speciesSlug={caseBridgePayload.speciesSlug}
+          plantId={caseBridgePayload.plantId}
+          landId={caseBridgePayload.landId}
+          onClose={() => setCaseBridgePayload(null)}
+        />
       )}
     </div>
   );
