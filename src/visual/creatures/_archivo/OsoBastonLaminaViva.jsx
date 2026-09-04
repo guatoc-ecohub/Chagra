@@ -2,11 +2,11 @@ import { useEffect, useRef, useState } from 'react';
 import {
   CARPETA_LAMINA, ARCHIVO_LAMINA, ANCHO, ALTO,
   CABEZA, OREJA_IZQ, OREJA_DER, MANDIBULA, CORONA, CUERPO_PIVOTE, BOCA,
-} from './osoLamina/anatomia.js';
-import { hornearOso } from './osoLamina/capas.js';
-import { useVidaIdle, useRitmoPropio, useMiradaUsted } from './useVidaIdle.js';
-import { OSO_BASTON_SLUG } from './osoBastonIdentidad.js';
-import './osoLamina/osoLamina.css';
+} from '../osoLamina/anatomia.js';
+import { hornearOso } from '../osoLamina/capas.js';
+import { useVidaIdle, useRitmoPropio, useMiradaUsted } from '../useVidaIdle.js';
+import { OSO_BASTON_SLUG } from '../osoBastonIdentidad.js';
+import '../osoLamina/osoLamina.css';
 
 /* Estados del contrato de avatar → forma canónica interna. El host escribe
    'idle'|'thinking'|'speaking'|'listening' (o 'caminando'); esto los

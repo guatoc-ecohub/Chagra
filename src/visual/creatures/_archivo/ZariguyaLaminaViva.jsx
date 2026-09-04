@@ -3,11 +3,11 @@ import {
   CARPETA_LAMINA, ARCHIVO_LAMINA, ANCHO, ALTO,
   CABEZA, OREJA_IZQ, OREJA_DER, MANDIBULA, BOCA,
   BRAZO_LAPIZ, BRAZO_BRUJULA, COLA, CUERPO_PIVOTE,
-} from './zariguyaLamina/anatomia.js';
-import { hornearZariguya } from './zariguyaLamina/capas.js';
-import { useVidaIdle, useRitmoPropio, useMiradaUsted } from './useVidaIdle.js';
-import { ZARIGUYA_SLUG } from './zariguyaIdentidad.js';
-import './zariguyaLamina/zariguyaLamina.css';
+} from '../zariguyaLamina/anatomia.js';
+import { hornearZariguya } from '../zariguyaLamina/capas.js';
+import { useVidaIdle, useRitmoPropio, useMiradaUsted } from '../useVidaIdle.js';
+import { ZARIGUYA_SLUG } from '../zariguyaIdentidad.js';
+import '../zariguyaLamina/zariguyaLamina.css';
 
 /* Estados del contrato de avatar → forma canónica interna (mismo mapa que
    JaguarLaminaViva: el atributo data-agt-estado viaja crudo para paridad de
