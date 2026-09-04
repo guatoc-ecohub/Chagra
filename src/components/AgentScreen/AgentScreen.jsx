@@ -1796,22 +1796,30 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
           if (cropEnt) relArgs.cultivo = cropEnt.canonical_id || cropEnt.mentioned;
 
           if (relArgs.pest || relArgs.cultivo) {
-            // Capa 1: subgrafo estructural (todas las relaciones del grafo)
+            // Las dos lecturas reciben exactamente los mismos anclajes ya
+            // resueltos y ninguna consume la salida de la otra. Ejecutarlas en
+            // paralelo conserva los dos bloques y su orden de ensamblado, pero
+            // evita que multihop espere la ida y vuelta de subgrafo.
             try {
-              const sub = await callTool('get_subgrafo_relacional', relArgs);
+              const [subEvidence, mhEvidence] = await executeToolChain([
+                { tool: 'get_subgrafo_relacional', args: relArgs },
+                { tool: 'get_multihop_companions', args: relArgs },
+              ]);
+              const sub = subEvidence?.result;
+              const mh = mhEvidence?.result;
+
+              // Capa 1: subgrafo estructural (todas las relaciones del grafo).
               if (sub && sub.found && typeof sub.bloque === 'string' && sub.bloque.trim()) {
                 subgrafoBloque = sub.bloque;
                 console.debug('[sidecar] subgrafo-relacional', {
                   nodes: sub.nodes?.length, rels: sub.relaciones?.length,
                 });
               }
-            } catch (_) { /* graceful */ }
 
-            // Capa 2 (AIA-008): multihop funcional (cadenas de control biologico
-            // a N saltos — NO redundante con el subgrafo: el subgrafo da
-            // adyacencia estructural, multihop da cadenas ecologicas funcionales)
-            try {
-              const mh = await callTool('get_multihop_companions', relArgs);
+              // Capa 2 (AIA-008): multihop funcional (cadenas de control
+              // biologico a N saltos, no redundante con el subgrafo: el
+              // subgrafo da adyacencia estructural y multihop da cadenas
+              // ecologicas funcionales).
               if (mh && mh.found && typeof mh.bloque === 'string' && mh.bloque.trim()) {
                 subgrafoBloque = [subgrafoBloque, mh.bloque].filter(Boolean).join('\n\n');
                 console.debug('[sidecar] multihop-companions', {
