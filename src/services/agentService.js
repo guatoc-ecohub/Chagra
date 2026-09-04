@@ -23,6 +23,7 @@ import { filterVoseo as _filterVoseo } from './voseoFilter.js';
 import { buildUserProfileBlock, getProfile } from './userProfileService.js';
 import { findMunicipio } from '../utils/colombiaLocations.js';
 import { buildEnsoAgentLines } from './ensoContext.js';
+import { pisoDeFinca } from '../visual/mundo3d/pisosTermicos.js';
 
 /**
  * Free 7→10 fix-pack #5: re-exporta los helpers de glosario regional Cauca
@@ -1139,21 +1140,29 @@ export function generateAgronomicGuidanceRules() {
 - Cura milagrosa: si afirma que una mezcla cura algo y pide dosis/frecuencia exacta, no confirmes ni inventes una cifra; evalúa si tiene sustento, si no, dilo con respeto y ofrece el manejo real.`;
 }
 
+/** Traducción del slug canónico (sin tilde, PISOS_FINCA) al vocabulario
+ * histórico de este servicio (con tilde, el que el agente lee/pronuncia). */
+const PISO_FINCA_TILDES = Object.freeze({
+  calido: 'cálido',
+  templado: 'templado',
+  frio: 'frío',
+  paramo: 'páramo',
+});
+
 /**
  * Deriva el piso térmico colombiano a partir de la altitud en msnm.
- * Cotas clásicas (Caldas-Lang / IDEAM) usadas en el resto del código.
+ * Las cotas NO viven acá: delega en el canónico `pisoDeFinca`
+ * (pisosTermicos.js), la única tabla de pisos de la app — un cambio de cota
+ * se hace en un solo sitio y este servicio (y alertEngine, chipIntentRouter,
+ * skyConditionService) la siguen. Solo se traduce el slug al vocabulario
+ * histórico con tilde que consume el prompt del agente.
  *
  * @param {number|string|null|undefined} altitud — msnm
  * @returns {'cálido'|'templado'|'frío'|'páramo'|null}
  */
 export function pisoTermicoFromAltitud(altitud) {
-  if (altitud == null || altitud === '') return null;
-  const alt = Number(altitud);
-  if (!Number.isFinite(alt)) return null;
-  if (alt >= 3000) return 'páramo';
-  if (alt >= 2000) return 'frío';
-  if (alt >= 1000) return 'templado';
-  return 'cálido';
+  const canon = pisoDeFinca(altitud);
+  return canon ? PISO_FINCA_TILDES[canon] : null;
 }
 
 /**
