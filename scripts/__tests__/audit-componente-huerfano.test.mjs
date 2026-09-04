@@ -137,7 +137,6 @@ describe('CONTROL POSITIVO — los seis casos del card 095 sobre dev', () => {
       'src/services/compaiExplicaPantallas.js',
       'src/components/CompaiGuiaPantalla.jsx',
       'src/components/aprendizaje/GuiaEspecieCards.jsx',
-      'src/visual/creatures/ChivitoPunkLaminaViva.jsx',
       'src/visual/agente/AngelitaSalida.jsx',
       'src/visual/creatures/comportamientos/gestos.js',
       'chip:asociaciones',
@@ -145,6 +144,19 @@ describe('CONTROL POSITIVO — los seis casos del card 095 sobre dev', () => {
     ]) {
       expect(ids.has(id), `falta en hallazgos: ${id}`).toBe(true);
     }
+  });
+
+  it('ChivitoPunkLaminaViva sigue siendo HUERFANO, pero ya está DECLARADA (#3108)', () => {
+    // Cuando se escribió este control, la lámina salía como hallazgo sin
+    // declarar. El PR #3108 (2026-09-03) la declaró en
+    // `ops/integraciones-no-consumidas.json` con razón sustantiva: la tinta la
+    // reemplazó en el registro el 2026-08-31 y el archivo queda por historia.
+    // Por eso ya NO está en `hallazgos` — está en `declarados`. Lo que este
+    // control tiene que seguir viendo es el VEREDICTO: si algún día vuelve a
+    // salir MONTADO sin que nadie la cablee, el instrumento se rompió.
+    const id = 'src/visual/creatures/ChivitoPunkLaminaViva.jsx';
+    expect(veredicto(id)).toBe('HUERFANO');
+    expect(new Set(out.hallazgos.map((h) => h.id)).has(id)).toBe(false);
   });
 });
 

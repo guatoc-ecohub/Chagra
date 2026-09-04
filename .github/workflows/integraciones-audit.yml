@@ -1,10 +1,17 @@
 name: Integraciones no consumidas
 
 # Gate anti-patrón "se construye y no se conecta" (ADR-INTEGRACIONES-NO-CONSUMIDAS,
-# Chagra-strategy/ops/, privado). Falla si una capacidad (export "de conocimiento" en
-# src/services/grafoRelations.js, o — cuando chagra-pro está disponible — un endpoint
-# del sidecar agro-mcp) no tiene consumidor real en src/ Y no está declarada en
-# ops/integraciones-no-consumidas.json con razón + fecha.
+# Chagra-strategy/ops/, privado). Falla si una capacidad no tiene consumidor real Y no
+# está declarada en ops/integraciones-no-consumidas.json con razón + fecha:
+#   · export "de conocimiento" en src/services/grafoRelations.js sin quien lo llame;
+#   · (solo con chagra-pro al lado) endpoint del sidecar agro-mcp sin quien lo pegue;
+#   · pieza de src/ que NINGUNA ruta alcanzable por un usuario monta.
+#
+# La tercera la mide `scripts/lib/alcance-simbolica.mjs`, el mismo motor que usa
+# `npm run audit:huerfanos`. Hasta el 2026-09-03 esta sección tenía su propio BFS por
+# archivo sobre `src/mockups`+`src/visual` y daba falso NEGATIVO por tres vías (un
+# barril re-exportando lavaba todo lo que arrastraba · los 216 `lazy()` de App.jsx en
+# un solo saco · dos carpetas de las muchas que tiene src/). Task 095.b.
 #
 # Este job SOLO tiene acceso al repo público (chagra) — chagra-pro es privado y no se
 # clona acá (anti-leak, ver el header de scripts/audit-integraciones.mjs). Por eso el
@@ -15,6 +22,7 @@ name: Integraciones no consumidas
 #
 # Barato a propósito (segundos, sin build, sin red, sin GPU) — mismo criterio que
 # unit-tests.yml: correr SIEMPRE en cada PR a main es viable solo si es gratis.
+# Medido sobre dev el 2026-09-03 con el motor por símbolo: ~2,3 s para 1.593 módulos.
 on:
   pull_request:
     branches: [main]
