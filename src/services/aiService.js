@@ -189,6 +189,8 @@ export const __retrieveRagContextForFoliage = async (speciesSlug, { skipRag = fa
  *        al passage de esa especie. Si es null/undefined, fallback genérico.
   * @param {string} [options._assetId] - solo telemetría, opcional. No se
   *        persiste (privacy-safe).
+  * @param {boolean} [options.skipRag] - omite la construcción del contexto RAG
+  *        (adjunto de foto: todavía no se conoce la especie). Default `false`.
  * @returns {Promise<{score: number, issues: string[], treatment_suggestion: string} | null>}
  *          null si el modelo no responde o no es multimodal.
  * @example
