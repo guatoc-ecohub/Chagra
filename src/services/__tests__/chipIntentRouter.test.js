@@ -30,6 +30,11 @@ import {
 //     ALLOWED_TOOLS del sidecarClient ni verificada en el sidecar; cablearla
 //     sin esa verificación degradaría el turno a RAG sin grounding en
 //     silencio (la misma patología que el fix grounding P0 2026-06-25).
+//     VERIFICADO EN VIVO 2026-09-04 (ver docs/known-issues/
+//     chips-menu-perfiles-sin-cablear.md): la tool NO existe — 404 en
+//     POST /tools/get_fuente_doi contra el sidecar (build 5bd011ff, 45 tools
+//     listadas, ninguna con fuente/doi) y cero apariciones en el código de
+//     chagra-pro. La tool hay que escribirla ANTES de cablear el chip.
 // Cualquier cambio en este set debe ser consciente: cablear un intent implica
 // sacarlo de esta lista y cubrirlo con tests de routing real (tool + args).
 const INTENTS_SIN_ROUTING = Object.freeze(['asociaciones', 'fuente_doi']);
