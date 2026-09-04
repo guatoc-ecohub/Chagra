@@ -93,6 +93,7 @@ import { permite3D } from './deviceTier.js';
 import {
   cotaDestino,
   descenso3dPedido,
+  leerGateDescenso,
   descensoYaVisto,
   duracionDescenso,
   marcarDescensoVisto,
@@ -547,11 +548,15 @@ export default function TransicionSierraMundo({
 
   /* La fase que manda es la VIVA (`getEnsoPhase()` vía `faseEnsoViva`), nunca la
      constante `ENSO_WATCH_2026`. El host puede imponerla por prop para pruebas. */
-  const fase = faseEnso ?? faseEnsoViva();
+  const gate = useMemo(() => leerGateDescenso(), []);   // ?msnm= ?enso= ?helada= — solo para el gate; null en el viaje real
+  const fase = faseEnso ?? gate.fase ?? faseEnsoViva();
   const destino = useMemo(() => cotaDestino(msnmUsuario), [msnmUsuario]);
+  /* Con `?msnm=` (gate) y sin finca, la línea y el anfitrión siguen la cota CONGELADA:
+     a 2 200 m la línea del Niño es la de frío (helada), no la de cálido. */
+  const msnmLinea = msnmUsuario ?? gate.msnmFijo ?? null;
   const aterrizaje = useMemo(
-    () => resolverAterrizaje({ msnmUsuario, clima, fase }),
-    [msnmUsuario, clima, fase],
+    () => resolverAterrizaje({ msnmUsuario: msnmLinea, clima, fase }),
+    [msnmLinea, clima, fase],
   );
   /* El compai del usuario: SE LEE, no se escribe. El anfitrión de la banda de
      llegada es de presentación y temporal; el compañero nunca se va. */
@@ -601,20 +606,26 @@ export default function TransicionSierraMundo({
         mitadRef.current?.();
       }
     }, Math.round(total * MITAD_FRAC));
-    const tFin = setTimeout(() => {
-      if (!hechoFin) {
-        hechoFin = true;
-        if (usar3d) marcarDescensoVisto(); // corre UNA vez
-        finRef.current?.();
-      }
-    }, total);
+    /* GATE (2026-09-04): con `?msnm=` el viaje está CONGELADO en una cota para
+       medirlo/capturarlo; entonces no se programa el cierre (ni se marca «visto»):
+       la transición se sostiene hasta desmontar. Sin `?msnm=` nada cambia. */
+    const sostener = gate.msnmFijo != null;
+    const tFin = sostener
+      ? null
+      : setTimeout(() => {
+          if (!hechoFin) {
+            hechoFin = true;
+            if (usar3d) marcarDescensoVisto(); // corre UNA vez
+            finRef.current?.();
+          }
+        }, total);
     return () => {
       hechoMitad = true;
       hechoFin = true;
       clearTimeout(tMitad);
-      clearTimeout(tFin);
+      if (tFin) clearTimeout(tFin);
     };
-  }, [activa, direccion, tier, reducedMotion, usar3d]);
+  }, [activa, direccion, tier, reducedMotion, usar3d, gate.msnmFijo]);
 
   // Tween de cámara OPCIONAL: dolly vertical + push/pull de FOV solo durante
   // la fase de cubierta; al terminar (o abortar) restaura pos/fov iniciales —
@@ -708,6 +719,8 @@ export default function TransicionSierraMundo({
                 humedad={humedad}
                 tier={tier}
                 inicioRef={inicioRef}
+                msnmFijo={gate.msnmFijo}
+                helada={gate.helada}
                 onEstado={(est) => {
                   // El rótulo se escribe DIRECTO en el DOM: 60 setState por
                   // segundo re-renderizarían el overlay entero y el número que

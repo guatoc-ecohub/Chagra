@@ -37,7 +37,7 @@
    SIEMPRE perezoso desde la transición; junto a la escena viaja el conteo de
    estratos que el gate consulta, y separarlo en otro archivo solo para el
    linter escondería el número que hay que contar. */
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef } from 'react';
 import * as THREE from 'three';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { Sky as SkyImpl } from 'three/addons/objects/Sky.js';
@@ -111,14 +111,71 @@ function construirLadera(segX, segZ) {
   return geo;
 }
 
-function Ladera({ segmentos }) {
+/* Banda de la escarcha en unidades de mundo (1 u = 1 155 m): frío + páramo,
+   2 000-4 000 m, con el cruce suave de 170 m del descenso. */
+const ESCARCHA_BANDA = { yMin: 2000 / 1155, yMax: 4000 / 1155, cruce: 170 / 1155 };
+
+function Ladera({ segmentos, refEstado = null }) {
   const geo = useMemo(() => construirLadera(segmentos, segmentos), [segmentos]);
   useEffect(() => () => geo.dispose(), [geo]);
-  return (
-    <mesh geometry={geo} name="descenso-ladera" receiveShadow>
-      <meshLambertMaterial vertexColors />
-    </mesh>
-  );
+  /* EL MANTO DE LA HELADA (DIRECCION-HELADA-20260904 §4.2, §4.5): un término de
+     color en el mismo material de la ladera, cero geometría. El peso por vértice
+     es banda (frío/páramo) × PLANITUD (n.y): el aire frío drena como agua y se
+     empoza en lo plano; la ladera y la cresta quedan limpias. Sin DEM de finca
+     acá el «pozo» se simplifica a bandas (§4.2 último punto). El uniform
+     `uEscarcha` lo mueve el piloto con `optica.escarcha` (continuo, nunca
+     conmuta). Con uEscarcha = 0 la salida es EXACTAMENTE la de antes. */
+  const mat = useMemo(() => {
+    const m = new THREE.MeshLambertMaterial({ vertexColors: true });
+    m.onBeforeCompile = (sh) => {
+      sh.uniforms.uEscarcha = { value: 0 };
+      sh.uniforms.uMantoCol = { value: new THREE.Color('#c9d6e8') }; // manto en sombra (token `manto.sombra`)
+      sh.uniforms.uBandaEscarcha = { value: new THREE.Vector3(ESCARCHA_BANDA.yMin, ESCARCHA_BANDA.yMax, ESCARCHA_BANDA.cruce) };
+      sh.vertexShader = sh.vertexShader
+        .replace('#include <common>', '#include <common>\nvarying float vEscarchaW;\nuniform vec3 uBandaEscarcha;')
+        .replace(
+          '#include <begin_vertex>',
+          `#include <begin_vertex>
+          {
+            float yb = position.y;
+            float enBanda = smoothstep(uBandaEscarcha.x - uBandaEscarcha.z, uBandaEscarcha.x + uBandaEscarcha.z, yb)
+                          * (1.0 - smoothstep(uBandaEscarcha.y - uBandaEscarcha.z, uBandaEscarcha.y + uBandaEscarcha.z, yb));
+            float plano = smoothstep(0.80, 0.97, normal.y);   // potrero plano sí; talud no
+            // sin DEM de finca (DIRECCION-HELADA §4.2, último punto) el pozo se simplifica a BANDAS:
+            // el manto vive en la BASE de la banda fría/páramo (el aire frío drena hacia abajo)
+            float base = 1.0 - smoothstep(uBandaEscarcha.x, uBandaEscarcha.x + 0.5 * (uBandaEscarcha.y - uBandaEscarcha.x), yb);
+            vEscarchaW = enBanda * max(plano, 0.6 * base);   // medido 2026-09-04: con 0,35 el domo (sin plano) casi no lo mostraba
+          }`,
+        );
+      sh.fragmentShader = sh.fragmentShader
+        .replace('#include <common>', '#include <common>\nvarying float vEscarchaW;\nuniform float uEscarcha;\nuniform vec3 uMantoCol;')
+        .replace(
+          '#include <color_fragment>',
+          '#include <color_fragment>\n  diffuseColor.rgb = mix(diffuseColor.rgb, uMantoCol, clamp(uEscarcha * vEscarchaW, 0.0, 1.0) * 0.85);',
+        );
+      m.userData.shader = sh;
+    };
+    m.customProgramCacheKey = () => 'descenso-ladera-escarcha';
+    return m;
+  }, []);
+  useEffect(() => () => mat.dispose(), [mat]);
+  useFrame(() => {
+    const sh = mat.userData.shader;
+    const est = refEstado?.current;
+    if (!est) return;
+    // el tier decide si el FX existe; la óptica (banda × dato × Niño × (1 − nube)) cuánto
+    const forzado = typeof window !== 'undefined' && Number.isFinite(window.__escarchaForzar) ? window.__escarchaForzar : null;   // solo gate
+    const k = forzado ?? ('escarcha' in (est.fx || {}) ? est.optica.escarcha || 0 : 0);
+    if (sh) sh.uniforms.uEscarcha.value = k;
+    // hook del gate (patrón __csm/__cielo): lo que el manto está recibiendo, leído desde afuera
+    if (typeof window !== 'undefined') {
+      window.__escarcha = {
+        k, optica: est.optica.escarcha ?? null, fxTiene: 'escarcha' in (est.fx || {}), shader: !!sh, msnm: est.msnm,
+        parche: sh ? { frag: sh.fragmentShader.includes('uMantoCol'), vert: sh.vertexShader.includes('vEscarchaW') } : null,
+      };
+    }
+  });
+  return <mesh geometry={geo} material={mat} name="descenso-ladera" receiveShadow />;
 }
 
 function MarCaribe() {
@@ -599,7 +656,7 @@ function aplicarFxForzado(fx, { on = [], off = [] } = {}) {
  * contrato temporal de la transición son timers deterministas y esta escena
  * tiene que ir sincronizada con ellos aunque el navegador estrangule cuadros.
  */
-function Piloto({ plan, fase, humedad, tier, refEstado, onEstado, t0, inicioRef, msnmFijo = null, fxForzado = null, luzRef = null }) {
+function Piloto({ plan, fase, humedad, tier, refEstado, onEstado, t0, inicioRef, msnmFijo = null, fxForzado = null, luzRef = null, helada = null }) {
   const { camera, scene } = useThree();
   /* El instante cero, por orden de precedencia: (1) la ref que comparte el
      host — el cero REAL del viaje, escrito cuando se armaron los timers del
@@ -645,8 +702,8 @@ function Piloto({ plan, fase, humedad, tier, refEstado, onEstado, t0, inicioRef,
        no lo usa nunca (default null). */
     const est =
       msnmFijo == null
-        ? estadoDescenso(ms, { plan, fase, humedad, tier })
-        : estadoEnMsnm(msnmFijo, { fase, humedad, tier });
+        ? estadoDescenso(ms, { plan, fase, humedad, tier, helada })
+        : estadoEnMsnm(msnmFijo, { fase, humedad, tier, helada });
     if (fxForzado) aplicarFxForzado(est.fx, fxForzado);
     refEstado.current = est;
 
@@ -735,6 +792,9 @@ function Piloto({ plan, fase, humedad, tier, refEstado, onEstado, t0, inicioRef,
  * @param {boolean}      [props.conBruma]       jirones de bruma encendidos (def true).
  * @param {boolean|null} [props.conCSM]         fuerza CSM (`?csm=1`); null = apagado
  *                                              (veredicto medido, ver §5.1 abajo).
+ * @param {object|null}  [props.helada]         gate único de la helada de la finca
+ *                                              (`{ nivel, intensidad }` de `hayHelada`);
+ *                                              null = sin dato → solo «aviso» bajo Niño.
  */
 export default function EscenaDescensoSierra({
   plan,
@@ -752,6 +812,7 @@ export default function EscenaDescensoSierra({
   conNieblaAltura = true,
   conBruma = true,
   conCSM = null,
+  helada = null,
 }) {
   const perfil = perfilDeTier(tier);
   /* La reserva se toma en el PRIMER render de este componente — antes de que
@@ -761,6 +822,9 @@ export default function EscenaDescensoSierra({
      recompila solo. El efecto toma su propia reserva y suelta la del render,
      de modo que el saldo neto sea 1 mientras la escena viva y 0 al desmontar. */
   const soltarRender = useRef(null);
+  // La lectura del ref EN RENDER es deliberada (ver párrafo de arriba): la reserva
+  // tiene que existir antes de que three compile el primer material.
+  // eslint-disable-next-line react-hooks/refs
   if (soltarRender.current === null && conNieblaAltura !== false) {
     soltarRender.current = reservarNieblaAltura(NIEBLA_SIERRA);
   }
@@ -823,8 +887,9 @@ export default function EscenaDescensoSierra({
         msnmFijo={msnmFijo}
         fxForzado={fxForzado}
         luzRef={luzPrincipal}
+        helada={helada}
       />
-      <Ladera segmentos={segmentos} />
+      <Ladera segmentos={segmentos} refEstado={refEstado} />
       <MarCaribe />
       <EstratosNube cuantos={estratos} refEstado={refEstado} />
       <BrumaDescenso refEstado={refEstado} jirones={jironesBruma} haces={hacesBruma} />

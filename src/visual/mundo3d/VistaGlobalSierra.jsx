@@ -64,7 +64,9 @@ import { ATMOSFERA } from './atmosferaMadre.js';
 import { perfilDeTier } from './deviceTier.js';
 import PisosTermicosBandas from './PisosTermicosBandas.jsx';
 import TransicionSierraMundo from './TransicionSierraMundo.jsx';
-import { BANDAS_SIERRA, CLAVE_PISOS_SIERRA } from './pisosTermicos.js';
+import { BANDAS_SIERRA, CLAVE_PISOS_SIERRA, PISOS_TERMICOS_SIERRA } from './pisosTermicos.js';
+import { franjaCondensacion, leerGateDescenso } from './sierra/descensoSierra.js';
+import { faseEnsoViva } from './sierra/aterrizajeDescenso.js';
 
 /* ── Geografía del macizo (validada contra el DR: mar al norte, macizo al sur,
       cumbres gemelas + Simmonds, costa de Palomino). Coordenadas de MUNDO:
@@ -277,29 +279,43 @@ function nubeTextura() {
 /* Nubes bajas que se ENGANCHAN en el bosque de niebla (banda ~1.8–2.4): planos
    billboard con textura de borde emplumado, anclados a la ladera, que derivan
    sin prisa. Cero polígonos contables: cada nube es un sprite suave. */
-function NubesDeNiebla({ cuantas, reducedMotion }) {
+/* LA COTA DE LA NUBE ES UN FENÓMENO, NO UN NÚMERO HORNEADO (integración clima
+   2026-09-04, DIRECCION-CIELO-Y-NUBE §3.5): antes `1.9 + (i % 3)·0.22`. Ahora
+   sale de `franjaCondensacion(fase, humedad)` — la MISMA función que consume
+   el descenso — con la fase ENSO VIVA (`getEnsoPhase`, fuente única GR-9):
+   bajo El Niño la banda SUBE 380 m y se adelgaza (amplitud ×0,62: el bosque
+   de niebla quedándose sin niebla); bajo La Niña baja 260 m y engorda. Y la
+   nube va EN EL AIRE delante del talud, no pegada a la ladera; relación
+   ancho/alto ≤ 3:1 (sábana = mentira visual). `humedad` = null: sin dato de
+   finca no se inventa. */
+function NubesDeNiebla({ cuantas, reducedMotion, fase = 'neutral', humedad = null }) {
   const grupo = useRef(null);
   const tex = nubeTextura();
+  const franja = useMemo(() => franjaCondensacion(fase, humedad), [fase, humedad]);
   const nubes = useMemo(() => {
     const out = [];
+    const cotaY = franja.cota / 1155;               // 1 u = 1 155 m (escala canónica §2.2)
+    const sigmaY = (franja.sigma / 1155) * 0.6;
     for (let i = 0; i < cuantas; i++) {
       const wx = -7 + (14 * (i + 0.5)) / cuantas + Math.sin(i * 2.3) * 1.4;
-      // buscar en la ladera norte una Z cuya altura caiga en el bosque de niebla
+      const y = cotaY + (((i * 7) % 5) - 2) * 0.5 * sigmaY;  // jitter determinista dentro de la franja
+      // la Z de la ladera norte donde el terreno alcanza ESA cota; la nube cuelga delante (en el aire)
       let wz = COSTA_Z + 1.2, mejor = 99;
       for (let z = COSTA_Z + 0.5; z < 6; z += 0.25) {
-        const d = Math.abs(alturaSierra(wx, z) - (1.9 + (i % 3) * 0.22));
+        const d = Math.abs(alturaSierra(wx, z) - y);
         if (d < mejor) { mejor = d; wz = z; }
       }
       out.push({
         key: `n${i}`,
-        base: [wx, alturaSierra(wx, wz) + 0.35, wz],
+        base: [wx, y, wz - 0.9],
         esc: 0.7 + ((i * 37) % 10) / 16,
-        ancho: 2.0 + ((i * 53) % 7) / 5, // placa ancha, chata
+        ancho: 1.6 + ((i * 53) % 7) / 6, // cuerpo, no placa
+        opacidad: (0.55 + 0.3 * (((i * 3) % 4) / 3)) * franja.amplitud,
         fase: (i * 1.7) % (Math.PI * 2),
       });
     }
     return out;
-  }, [cuantas]);
+  }, [cuantas, franja]);
 
   useFrame((st) => {
     if (reducedMotion || !grupo.current) return;
@@ -313,9 +329,9 @@ function NubesDeNiebla({ cuantas, reducedMotion }) {
     <group ref={grupo}>
       {nubes.map((n) => (
         <Billboard key={n.key} position={/** @type {[number, number, number]} */ (n.base)}>
-          <mesh scale={[n.ancho * n.esc, 0.5 * n.esc, 1]}>
+          <mesh scale={[n.ancho * n.esc, n.ancho * n.esc * 0.55, 1]}>
             <planeGeometry args={[2.4, 1.6]} />
-            <meshBasicMaterial map={tex} color="#fbf4e6" transparent opacity={0.85} depthWrite={false} side={THREE.DoubleSide} />
+            <meshBasicMaterial map={tex} color="#fbf4e6" transparent opacity={n.opacidad} depthWrite={false} side={THREE.DoubleSide} />
           </mesh>
         </Billboard>
       ))}
@@ -475,6 +491,7 @@ export function SierraDiorama({
   useEffect(() => () => geo.dispose(), [geo]);
 
   const nubes = tier === 'alto' ? 7 : tier === 'medio' ? 5 : 3;
+  const faseEnso = useMemo(() => leerGateDescenso().fase ?? faseEnsoViva(), []);   // `?enso=` solo para el gate; la app lee la fase VIVA
 
   /* `color`/`fogExp2` se adjuntan a la ESCENA: van como hijos directos (fragment),
      nunca envueltos en un <group> (adjuntaría al grupo y no pintaría). */
@@ -490,7 +507,7 @@ export function SierraDiorama({
       </mesh>
 
       <Mar reducedMotion={reducedMotion} conNiebla={perfil.fog} />
-      <NubesDeNiebla cuantas={nubes} reducedMotion={reducedMotion} />
+      <NubesDeNiebla cuantas={nubes} reducedMotion={reducedMotion} fase={faseEnso} />
 
       {/* Rótulos sobrios de los lugares exigidos por el encargo. Los `alto`
           escalonados (1.25 / 0.6 / 0.45) separan los rótulos verticalmente en
@@ -560,8 +577,18 @@ export default function VistaGlobalSierra({
   className = '',
 }) {
   const [listo, setListo] = useState(false);
-  const [pisoActivo, setPisoActivo] = useState(null);
-  const [viaje, setViaje] = useState(null);
+  /* GATE (2026-09-04): `?viaje=<id de banda>` (antes del hash) arranca el viaje a
+     ese piso sin clic — es lo que permite capturar el descenso congelado con
+     `?msnm=`. Estado INICIAL perezoso (nada de setState en un efecto); sin el
+     parámetro, null, como siempre. */
+  const [viajeInicial] = useState(() => {
+    const id = new URLSearchParams(globalThis.location?.search ?? '').get('viaje');
+    if (!id) return null;
+    const banda = PISOS_TERMICOS_SIERRA.find((b) => b.id === id || b.piso === id);
+    return banda ? { id: banda.piso, nombre: banda.nombre, minMsnm: banda.minMsnm, maxMsnm: banda.maxMsnm, banda } : null;
+  });
+  const [pisoActivo, setPisoActivo] = useState(viajeInicial ? viajeInicial.id : null);
+  const [viaje, setViaje] = useState(viajeInicial ? { piso: viajeInicial, activa: true } : null);
   const perfil = perfilDeTier(tier);
   const seleccionarPiso = useCallback((piso) => {
     setPisoActivo(piso.id);
