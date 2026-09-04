@@ -350,6 +350,19 @@ function entradasDelBuild() {
     let x;
     while ((x = re.exec(bloque[1])) !== null) htmls.add(x[1]);
   }
+  // Y TODO *.html de la raíz, esté o no en `rollupOptions.input`. No es celo:
+  // es un FALSO POSITIVO medido. `index-prod.html` (la app 3D-first de
+  // prod.chagra.app) NO está en el input de vite — `scripts/build-prod.mjs` la
+  // copia encima de `index.html` y corre el build. Sin esta línea,
+  // `src/main-prod.jsx` y toda su cadena (ProdChagraApp, MundoSanidad3D,
+  // EtiquetasMundo) salían HUERFANOS teniendo un build que las emite. Leer el
+  // input de vite y creer que ahí están TODAS las entradas es la misma clase de
+  // error que mirar dos carpetas y creer que ahí está todo el repo.
+  try {
+    for (const e of readdirSync(ROOT)) {
+      if (e.endsWith('.html')) htmls.add(e);
+    }
+  } catch { /* raíz ilegible: nos quedamos con lo que dijo vite.config */ }
   if (!htmls.size) htmls.add('index.html');
   const out = [];
   for (const h of htmls) {
