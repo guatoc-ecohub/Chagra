@@ -14,7 +14,7 @@ import {
 } from '../../services/agentOutboxService';
 import { analyzeFoliage } from '../../services/aiService';
 import { captureAndCompress } from '../../services/photoService';
-import { processPhotoItem, buildPhotoUserMessage } from '../../services/agentOutboxPhoto';
+import { processPhotoItemBounded, buildPhotoUserMessage } from '../../services/agentOutboxPhoto';
 import { useCompaiSegundaOpinionFoto } from '../../hooks/useCompaiSegundaOpinionFoto';
 import { isAnalyzableImageAttachment, buildAttachmentRejection } from '../../services/agentOutboxAttachment';
 import { AGENT_ENTRANCE_CSS, AGENT_COMPOSITOR_CSS, AGENT_V3_CSS, agentEntranceClass } from './agentEntrance';
@@ -1536,7 +1536,13 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
       await addTurn(operatorId, { role: 'user', content: text.trim() });
 
       const contextMemory = wasFreshSession ? '' : await getContextString(operatorId, 10);
-      const contextCorpusBase = await retrieve(textForLLM, TOP_N_RAG, 'agente');
+      // La foto ya pasó por visión. En un arranque frío, construir el índice
+      // RAG completo aquí vuelve a descargar cientos de fichas antes de la
+      // respuesta. Para este turno dejamos que la nota y el diagnóstico guíen
+      // al modelo y evitamos convertir una mejora de contexto en un bloqueo.
+      const contextCorpusBase = visionContext?.skipRag
+        ? []
+        : await retrieve(textForLLM, TOP_N_RAG, 'agente');
       // #2593 corpus→chat: suma los chunks del corpus server-side (pgvector +
       // reranker neural bge-reranker-v2-m3 + gate low_relevance) vía
       // /hybrid-retrieve. Gated por VITE_USE_CORPUS_RETRIEVAL (OFF por defecto)
@@ -3542,10 +3548,11 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
     setTimeout(() => setComposerPhase('idle'), 560);
     if (agentAttachment) {
       // Foto inline: armar burbuja + correr visión + handleSubmit
+      const attachment = agentAttachment;
       const item = {
         kind: 'photo',
-        blob: agentAttachment.blob,
-        mime: agentAttachment.mime,
+        blob: attachment.blob,
+        mime: attachment.mime,
         text: inputText.trim(),
       };
       // Pintar burbuja con la imagen DE INMEDIATO
@@ -3557,19 +3564,35 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
       };
       const { message } = buildPhotoUserMessage(item, createUrl);
       setMessages((prev) => [...prev, message]);
-      // Correr visión y armar prompt
-      const { prompt, finding } = await processPhotoItem(item, {
-        analyze: analyzeFoliage,
-        createUrl: null,
-      });
+      // El envío ya quedó aceptado: liberar el compositor ANTES de esperar
+      // visión. Así una red lenta no deja la misma foto y nota listas para un
+      // reenvío duplicado.
       setInputText('');
       clearAgentAttachment();
       setActiveIntent(null);
       setAlertContextBanner(null);
+      setState(STATE_THINKING);
+      setThinkingPhase('consultando');
+
+      const visionController = new AbortController();
+      // Correr visión con un techo duro. Si no termina, el agente continúa con
+      // la nota del operador y muestra un aviso legible, no queda esperando.
+      const { prompt, finding, timedOut } = await processPhotoItemBounded(item, {
+        analyze: (blob) => analyzeFoliage(blob, {
+          signal: visionController.signal,
+          skipRag: true,
+        }),
+        createUrl: null,
+        onTimeout: () => visionController.abort(),
+      });
+      if (timedOut) {
+        setAgentPickError('No pude analizar la foto automáticamente. Voy a responder con tu nota.');
+      }
       await handleSubmit(prompt, {
         suppressUserBubble: true,
         visionContext: {
           hadVision: true,
+          skipRag: true,
           visionConfidence:
             finding && typeof finding.confidence === 'number' ? finding.confidence : null,
         },
@@ -3705,10 +3728,18 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
         // 2) Correr la visión y armar el prompt (degrada a "por descripción"
         //    si analyzeFoliage falla). Reusa processPhotoItem para la parte
         //    pura del prompt (sin re-pintar burbuja: createUrl ya consumido).
-        const { prompt, finding } = await processPhotoItem(item, {
-          analyze: analyzeFoliage,
+        const visionController = new AbortController();
+        const { prompt, finding, timedOut } = await processPhotoItemBounded(item, {
+          analyze: (blob) => analyzeFoliage(blob, {
+            signal: visionController.signal,
+            skipRag: true,
+          }),
           createUrl: null,
+          onTimeout: () => visionController.abort(),
         });
+        if (timedOut) {
+          setAgentPickError('No pude analizar la foto automáticamente. Voy a responder con tu nota.');
+        }
         // 3) Despachar al pipeline con la burbuja ya pintada (no duplicar).
         //    visionContext marca que ESTE turno SÍ trajo una foto real: el guard
         //    de visión NO corrige un diagnóstico visual legítimo. La confianza
@@ -3718,6 +3749,7 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
           suppressUserBubble: true,
           visionContext: {
             hadVision: true,
+            skipRag: true,
             visionConfidence:
               finding && typeof finding.confidence === 'number' ? finding.confidence : null,
           },
