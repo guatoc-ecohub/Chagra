@@ -24,6 +24,7 @@ import useAgentAvatarType, { AVATAR_NOMBRE, DEFAULT_AVATAR_TYPE } from '../hooks
 import { getHintForRuta } from '../config/compaiHints.js';
 import AgentFabMenu from './AgentFabMenu';
 import BurbujaPizarraPeek from './BurbujaPizarraPeek';
+import CompaiGuiaPantalla from './CompaiGuiaPantalla';
 import useComportamientoCompai from '../hooks/useComportamientoCompai.js';
 import useCompaiDraggable from '../hooks/useCompaiDraggable';
 import './agent-fab-skin.css';
@@ -273,8 +274,11 @@ export default function AgentFab({ onNavigate, pantalla = null }) {
   }, [registrarSenalMolestia]);
 
   // Contenido del panel "Ver" y del PEEK: el aviso vivo / último mensaje si lo
-  // hay, si no el hint de la ruta, y como último recurso una línea amable — así
-  // el peek nunca queda sin qué decir ni revienta al leer `.descripcion`.
+  // hay, si no el aviso de la ruta — que desde el cableado 2026-09-03 ES la
+  // explicación de la pantalla (`compaiExplicaPantallas`, vía getHintForRuta,
+  // decisión del operador: el texto de la pantalla SALE EN LA PIZARRA
+  // SIEMPRE) — y como último recurso una línea amable, así el peek nunca queda
+  // sin qué decir ni revienta al leer `.descripcion`.
   const contenidoPanel = useMemo(() => {
     if (mensajeAngelita) return { titulo: `${nombreCompai}: un aviso para usted`, descripcion: mensajeAngelita };
     if (lastAssistantMessage) return { titulo: `${nombreCompai}: un aviso para usted`, descripcion: lastAssistantMessage };
@@ -581,8 +585,15 @@ export default function AgentFab({ onNavigate, pantalla = null }) {
           se quitaron. Su contenido sigue disponible al tocar el compai — ver
           `contenidoPanel` y el peek de pizarra más abajo. */}
 
-      {/* R4 — PANEL "Ver": leer el mensaje/hint en detalle + Escuchar. Se abre
-          desde el menú (opción "Ver") o tocando una burbuja. */}
+      {/* R4 — PANEL "Ver": leer el mensaje en detalle + Escuchar. Se abre
+          desde el menú (opción "Ver") o desde el "Ver" del peek.
+          CABLEADO 2026-09-03 (decisión del operador: el texto de explicación
+          de la pantalla SALE EN LA PIZARRA SIEMPRE): si la pantalla está en
+          `compaiExplicaPantallas`, `CompaiGuiaPantalla` escribe acá dentro su
+          explicación con las funciones de la pantalla y el salto al agente.
+          Con un aviso vivo, el aviso va primero y la guía de la pantalla lo
+          acompaña SIEMPRE debajo — todo DENTRO de la pizarra, nada compite
+          afuera. */}
       {panelAbierto && (
         <div
           style={panelStyle}
@@ -602,7 +613,14 @@ export default function AgentFab({ onNavigate, pantalla = null }) {
               <span aria-hidden="true">×</span>
             </button>
           </div>
-          <p style={panelTextoStyle}>{contenidoPanel.descripcion}</p>
+          {/* Si el contenido ES la explicación de la pantalla (tiene
+              funciones), el texto lo escribe CompaiGuiaPantalla y no se
+              repite aquí; si es un aviso vivo / último mensaje, su texto va
+              primero y la guía de la pantalla lo acompaña SIEMPRE debajo. */}
+          {contenidoPanel.funciones?.length ? null : (
+            <p style={panelTextoStyle}>{contenidoPanel.descripcion}</p>
+          )}
+          <CompaiGuiaPantalla pantalla={pantalla} onNavigate={onNavigate} />
           <button
             type="button"
             onClick={() => leerEnVoz(contenidoPanel.titulo, contenidoPanel.descripcion)}

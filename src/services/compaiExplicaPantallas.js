@@ -18,6 +18,27 @@
  * guía (`compaiParadasPorPantalla`) se explica sola — el hook global cede
  * (ver `useCompaiGuiaPantalla`). Nunca dos voces explicando la misma pantalla.
  *
+ * CABLEADO 2026-09-03 (decisión del operador: el texto de explicación de la
+ * pantalla SALE EN LA PIZARRA SIEMPRE; regla dura, commit 3233f7f06: la
+ * pizarra es el ÚNICO aviso del compai): `getHintForRuta`
+ * (src/config/compaiHints.js) consulta ESTE manifiesto primero y los hints
+ * de allá quedan como capa de reserva para rutas aún no cubiertas. Este
+ * manifiesto ya no alimenta una burbuja auto-pop (prohibida): su texto se
+ * escribe en la pizarra (peek del toque + panel "Ver" del AgentFab, y la
+ * pizarra del CompaiOverlay en la portada B).
+ *
+ * ALINEACIÓN DE CATÁLOGOS (2026-09-03): existían DOS catálogos desalineados
+ * —este manifiesto (37 pantallas) y `RUTA_HINTS` en compaiHints.js (31 claves)
+ * — con conjuntos distintos y textos distintos para las 11 pantallas
+ * compartidas. Se alinearon: las 20 pantallas que SOLO estaban en RUTA_HINTS
+ * se plegaron acá (texto de la casa, usted, sin em dashes) y las pantallas
+ * compartidas quedan con UNA sola voz: la de este manifiesto. OJO: siguen sin
+ * explicación propia las familias de cultivos 3D (cafe, cacao, uchuva,
+ * aguacate, frutales, citricos, mango, platano, quinua, fique, cana,
+ * hortalizas, aromaticas, tuberculos…), juegos y vistas admin — para esas
+ * cae el hint genérico; redactarlas exige revisar cada pantalla viva, no
+ * inventar (regla de este módulo: mejor callado que inventado).
+ *
  * TONO (regla de la casa): español de Colombia, USTED, campesino, corto y
  * accionable. Sin voseo argentino, sin em dashes.
  *
@@ -32,12 +53,47 @@
  * @property {string[]} funciones — qué se puede hacer ahí (labels cortos).
  */
 
+// ── Alineación 2026-09-03: pantallas plegadas desde compaiHints.js ──────────
+// Objetos reusados por rutas que son la misma pantalla vía alias del
+// manifiesto (mismo patrón que HINT_CATALOGO / HINT_HISTORIAL allá).
+const EXPLICA_CATALOGO = Object.freeze({
+  titulo: 'Catálogo de especies',
+  texto: 'Busque plantas, plagas y enemigos naturales de su región. Toque una ficha para ver cuidados, asociaciones y cómo manejarla.',
+  funciones: ['Buscar una planta', 'Ver cuidados y asociaciones'],
+});
+const EXPLICA_HISTORIAL = Object.freeze({
+  titulo: 'Registro de su finca',
+  texto: 'Aquí están anotadas todas las acciones de su finca: siembras, cosechas, insumos y observaciones, ordenadas por fecha.',
+  funciones: ['Buscar por fecha', 'Revisar una anotación'],
+});
+const EXPLICA_CULTIVOS = Object.freeze({
+  titulo: 'Sus cultivos',
+  texto: 'Explore por cultivo (café, cacao, plátano, frutales) y vea el manejo recomendado para su piso térmico.',
+  funciones: ['Elegir un cultivo', 'Ver su manejo'],
+});
+
 /**
  * Las pantallas 2D mapeadas. Las rutas son los `currentView` del shell
  * (mismos ids que HASH_VIEW_ROUTES / saludoPantalla).
  * @type {Record<string, ExplicaPantalla>}
  */
 export const EXPLICA_PANTALLAS = Object.freeze({
+  // ── Inicio, agente y catálogo (plegadas de compaiHints.js, 2026-09-03) ──
+  dashboard: {
+    titulo: 'Bienvenido a su finca',
+    texto: 'Este es su tablero: aquí ve el clima de hoy, las tareas pendientes y accesos rápidos al mapa, al catálogo y a registrar lo que hizo en la finca.',
+    funciones: ['Ver el clima de hoy', 'Revisar tareas pendientes', 'Ir al mapa o al catálogo'],
+  },
+  agente: {
+    titulo: 'Pregúntele a su compai',
+    texto: 'Escriba o hable y le respondo sobre cultivos, plagas, clima y manejo de su finca. Toque el micrófono para preguntar con la voz.',
+    funciones: ['Escribir su pregunta', 'Preguntar con la voz'],
+  },
+  directorio: EXPLICA_CATALOGO,
+  especies: EXPLICA_CATALOGO,
+  plagas: EXPLICA_CATALOGO,
+  catalogo: EXPLICA_CATALOGO,
+
   // ── Registro y seguimiento ──
   activos: {
     titulo: 'Su inventario',
@@ -60,8 +116,11 @@ export const EXPLICA_PANTALLAS = Object.freeze({
     funciones: ['Revisar discrepancias', 'Ajustar existencias'],
   },
   hoy_finca: {
-    titulo: 'El día en su finca',
-    texto: 'Lo que toca hoy: alertas, tareas de la etapa real de sus cultivos y accesos rápidos.',
+    titulo: 'Hoy en la finca',
+    // Texto ampliado 2026-09-03: recoge las 3 explicaciones que daba el paseo
+    // autónomo de esta pantalla (retirado; ver compaiHints.js) para que no se
+    // pierda nada con la pizarra como único aviso.
+    texto: 'Lo que importa hoy: le aviso apenas algo necesite su atención (helada, plaga, clima raro), toque la alerta para preguntar qué hacer. Las tareas siguen la etapa real de sus cultivos, no un calendario genérico. Y desde aquí registra por voz lo que va pasando: entre más anote, mejor lo acompaño.',
     funciones: ['Ver alertas', 'Revisar labores', 'Registrar por voz'],
   },
   evolucion: {
@@ -75,11 +134,52 @@ export const EXPLICA_PANTALLAS = Object.freeze({
     funciones: ['Leer un informe', 'Revisar lo sembrado'],
   },
 
+  // ── Registro de la finca (plegadas de compaiHints.js, 2026-09-03) ──
+  registro_unificado: {
+    titulo: 'Registrar en su finca',
+    texto: 'Desde aquí anota siembras, cosechas, insumos u observaciones, todo en un solo lugar.',
+    funciones: ['Anotar una labor', 'Elegir qué registrar'],
+  },
+  sembrar: {
+    titulo: 'Registrar una siembra',
+    texto: 'Anote qué sembró, cuándo y dónde. Queda en el historial de su finca y ayuda a calcular la cosecha.',
+    funciones: ['Anotar una siembra', 'Ver siembras pasadas'],
+  },
+  cosechar: {
+    titulo: 'Registrar una cosecha',
+    texto: 'Anote lo que cosechó y cuánto. Así lleva la cuenta de la producción de su finca.',
+    funciones: ['Anotar una cosecha', 'Ver lo cosechado'],
+  },
+  insumos: {
+    titulo: 'Registrar insumos',
+    texto: 'Anote los abonos, biopreparados o materiales que aplicó, con la fecha y el lote.',
+    funciones: ['Anotar una aplicación', 'Ver insumos usados'],
+  },
+  observacion: {
+    titulo: 'Anotar una observación',
+    texto: '¿Vio una plaga, una enfermedad o algo raro en un cultivo? Anótelo aquí, con foto si quiere.',
+    funciones: ['Anotar lo que vio', 'Adjuntar una foto'],
+  },
+  voz: {
+    titulo: 'Registrar con la voz',
+    texto: 'Hable y yo anoto por usted. Diga qué hizo en la finca y lo guardo en el registro.',
+    funciones: ['Hablar y registrar', 'Revisar lo dictado'],
+  },
+  historial: EXPLICA_HISTORIAL,
+  bitacora: EXPLICA_HISTORIAL,
+
   // ── Siembra y ciclo ──
   calendario_finca: {
     titulo: 'Calendario de la finca',
     texto: 'Lo que le toca hacer por estas fechas, para que nada se le pase.',
     funciones: ['Ver el mes', 'Agendar labores', 'Preguntar cuándo sembrar'],
+  },
+  mundo_cultivos: EXPLICA_CULTIVOS,
+  plantas: EXPLICA_CULTIVOS,
+  asociaciones: {
+    titulo: 'Asociaciones de cultivos',
+    texto: 'Qué plantas se ayudan entre sí y cuáles no conviene juntar. Para sembrar mejor.',
+    funciones: ['Ver buenas asociaciones', 'Revisar malas combinaciones'],
   },
   almanaque: {
     titulo: 'Almanaque campesino',
@@ -140,6 +240,16 @@ export const EXPLICA_PANTALLAS = Object.freeze({
   },
 
   // ── Sanidad y clima ──
+  defensores: {
+    titulo: 'Defensores naturales',
+    texto: 'Los enemigos naturales de las plagas: insectos y aves que le ayudan a cuidar sus cultivos sin químicos.',
+    funciones: ['Ver defensores de una plaga', 'Buscar un aliado'],
+  },
+  clima_boletin: {
+    titulo: 'El clima de su zona',
+    texto: 'El boletín del tiempo para su finca: lluvia, temperatura y qué esperar los próximos días.',
+    funciones: ['Ver el boletín', 'Preguntar por el clima'],
+  },
   toxicologia: {
     titulo: 'Toxicología',
     texto: 'Antes de echar algo a la mata, mire aquí si es seguro y cómo se usa.',
@@ -196,6 +306,11 @@ export const EXPLICA_PANTALLAS = Object.freeze({
   },
 
   // ── Aprender y acompañamiento ──
+  aprende: {
+    titulo: 'Aprenda con Chagra',
+    texto: 'Cursos, juegos y guías sobre agroecología y el manejo de su finca. A su ritmo.',
+    funciones: ['Ver los cursos', 'Entrar a un juego'],
+  },
   casos: {
     titulo: 'Casos de campo',
     texto: 'Los casos reales de la región y cómo se resolvieron, para aprender de ellos.',

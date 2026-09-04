@@ -11,12 +11,25 @@
  *   - lo que quede de `CompaiOverlay` (tests, usos 3D futuros) siga leyendo del
  *     MISMO sitio (cero duplicación de contenido pedagógico).
  *
+ * CABLEADO 2026-09-03 (decisión del operador: el texto de explicación de la
+ * pantalla SALE EN LA PIZARRA SIEMPRE; regla dura, commit 3233f7f06: la
+ * pizarra es el ÚNICO aviso del compai): `getHintForRuta` consulta PRIMERO el
+ * manifiesto `compaiExplicaPantallas` (FUENTE ÚNICA, 57 pantallas) y los
+ * RUTA_HINTS de abajo quedan como capa de RESERVA para las rutas que el
+ * manifiesto aún no cubre (familias de cultivos 3D, juegos, admin). Así los
+ * DOS consumidores del peek (AgentFab y CompaiOverlay) escriben en la pizarra
+ * la explicación redactada en usted de la pantalla actual, sin burbujas
+ * auto-pop (prohibidas). Alineación completa de los dos catálogos: ver el
+ * encabezado de src/services/compaiExplicaPantallas.js.
+ *
  * NOTA: los mensajes son la capa BASE (qué es cada pantalla). Los tips VIVOS de
  * finca+pendientes (datos reales del usuario) son una capa ADITIVA aparte (ver
  * `notificacionesInteligentes` en AgentFab). Aquí NO se inventan datos del
  * usuario.
  */
 /* eslint-disable chagra-i18n/no-hardcoded-spanish -- hints pedagógicos es-CO, deuda i18n preexistente (ADR-050) */
+
+import { explicacionDePantalla } from '../services/compaiExplicaPantallas.js';
 
 // Objetos reusados por rutas que son la misma pantalla vía alias del manifiesto.
 const HINT_CATALOGO = {
@@ -33,8 +46,12 @@ const HINT_CULTIVOS = {
 };
 
 /**
- * Mapa ruta → hint contextual. La CLAVE es el `path` de la ruta 2D (o su alias)
- * del manifiesto `config/rutasProdChagraApp.js`. Extensible:
+ * Mapa ruta → hint contextual. CAPA DE RESERVA desde el cableado 2026-09-03:
+ * la FUENTE ÚNICA de qué dice el compai de una pantalla es
+ * `compaiExplicaPantallas` (consultada primero por `getHintForRuta`); las
+ * claves que allá se cubrían se plegaron a ese manifiesto. Lo que queda aquí
+ * sirve para las rutas aún sin explicación propia. La CLAVE es el `path` de la
+ * ruta 2D (o su alias) del manifiesto `config/rutasProdChagraApp.js`. Extensible:
  *   - Añadir rutas nuevas (usar el `path` real del manifiesto, o su alias)
  *   - `getHintForRuta` cae a un prefijo (`animales_gallinas` → `animales`) y,
  *     si nada calza, al hint 'default'.
@@ -159,10 +176,30 @@ export const RUTA_HINTS = {
 };
 
 /**
- * Obtiene el hint para una ruta dada. `nombreCompai` personaliza SOLO el hint
- * default (para las rutas sin mensaje propio).
+ * Obtiene el aviso para una ruta dada — lo que la PIZARRA escribe al tocar el
+ * compai (peek y panel "Ver").
+ *
+ * Orden de resolución (cableado 2026-09-03, decisión del operador):
+ *   1. La EXPLICACIÓN de la pantalla (`compaiExplicaPantallas`, FUENTE ÚNICA),
+ *      que viaja con sus `funciones` para el panel "Ver".
+ *   2. El hint de la ruta en RUTA_HINTS (capa de reserva).
+ *   3. Fallback por prefijo de subruta (animales_gallinas → animales).
+ *   4. El hint default, personalizado con `nombreCompai`.
+ *
+ * `nombreCompai` personaliza SOLO el hint default (rutas sin mensaje propio).
  */
 export function getHintForRuta(ruta, nombreCompai = 'Angelita') {
+  // 1) La explicación de la pantalla manda: es el texto que SALE EN LA
+  //    PIZARRA SIEMPRE (peek + panel), sin burbujas auto-pop.
+  const explicacion = explicacionDePantalla(ruta);
+  if (explicacion) {
+    return {
+      titulo: explicacion.titulo,
+      descripcion: explicacion.texto,
+      funciones: explicacion.funciones,
+    };
+  }
+
   const hintDefault = {
     ...RUTA_HINTS.default,
     titulo: `${nombreCompai} está aquí`,
