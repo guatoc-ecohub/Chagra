@@ -37,7 +37,7 @@
    SIEMPRE perezoso desde la transición; junto a la escena viaja el conteo de
    estratos que el gate consulta, y separarlo en otro archivo solo para el
    linter escondería el número que hay que contar. */
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef } from 'react';
 import * as THREE from 'three';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { Sky as SkyImpl } from 'three/addons/objects/Sky.js';
