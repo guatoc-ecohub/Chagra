@@ -2519,6 +2519,35 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
         metadata: sourceMetadata,
       });
 
+      // PERF (latencia P1, re-hecho sobre dev 2026-09-03): el post-validate del
+      // sidecar (una ida y vuelta de red al MCP) es INDEPENDIENTE del
+      // affects-gate — ambos LEEN el `responseBody` ya final (post
+      // companion-species-guard, que no se muta más acá) y solo ESCRIBEN a
+      // `sourceMetadata` campos disjuntos (affects-gate: grounded/cross_crop;
+      // post-validate: hallucinated_names/suspect_names). Antes corrían en
+      // serie (affects-gate await → post-validate await); ahora disparamos la
+      // promesa del post-validate ANTES del affects-gate (sin await) para
+      // SOLAPAR su latencia de red con el trabajo local del gate, y hacemos el
+      // await + merge DESPUÉS del gate → el orden de merge sobre
+      // sourceMetadata se preserva EXACTO (gate primero, post-validate
+      // después), así que el comportamiento observable (badges/sellos) es
+      // idéntico; solo desaparece el tiempo muerto entre las dos llamadas. El
+      // post-validate sigue siendo 100% graceful (null ante flag off/offline/
+      // timeout/AGE caído → sin badge) y jamás bloquea el chat.
+      const postValidateInFlight = (isOnline && isSidecarEnabled() && Array.isArray(resolvedEntities) && resolvedEntities.length > 0)
+        ? (async () => {
+            const expected = resolvedEntities
+              .map((e) => e?.nombre_cientifico)
+              .filter((n) => typeof n === 'string' && n.trim().length > 0);
+            if (expected.length === 0) return null;
+            return await postValidate(responseBody, expected);
+          })().catch((pvErr) => {
+            // post-validate jamás bloquea el chat — la respuesta ya está lista.
+            console.debug('[sidecar] post-validate fail (sigo sin badge):', pvErr?.message);
+            return null;
+          })
+        : null;
+
       // AFFECTS-GATE (auditoría anti-contaminación cruzada de cultivo, 2026-07):
       // el sello "Catálogo verificado" NO debe pintarse cuando la evidencia
       // surfacea un organismo (plaga) que NO afecta al cultivo EN FOCO. Caso
@@ -2580,24 +2609,19 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
       // muestre el badge correspondiente. NO bloquea ni reescribe la respuesta.
       // Solo corre si hubo entidades resueltas. 100% graceful: postValidate
       // devuelve null ante flag off / offline / timeout / AGE caído → sin badge.
-      if (isOnline && isSidecarEnabled() && Array.isArray(resolvedEntities) && resolvedEntities.length > 0) {
-        try {
-          const expected = resolvedEntities
-            .map((e) => e?.nombre_cientifico)
-            .filter((n) => typeof n === 'string' && n.trim().length > 0);
-          if (expected.length > 0) {
-            const pv = await postValidate(responseBody, expected);
-            sourceMetadata = /** @type {any} */ (mergePostValidateMetadata(sourceMetadata, pv));
-            if (sourceMetadata.hallucinated_names || sourceMetadata.suspect_names) {
-              console.debug('[sidecar] post-validate flags', {
-                hallucinated: sourceMetadata.hallucinated_names,
-                suspect: sourceMetadata.suspect_names,
-              });
-            }
+      // PERF (latencia P1): la llamada ya se disparó ANTES del affects-gate
+      // (postValidateInFlight); acá solo esperamos su resultado y hacemos el
+      // merge — el orden (gate → post-validate) y la semántica se preservan.
+      if (postValidateInFlight) {
+        const pv = await postValidateInFlight;
+        if (pv) {
+          sourceMetadata = /** @type {any} */ (mergePostValidateMetadata(sourceMetadata, pv));
+          if (sourceMetadata.hallucinated_names || sourceMetadata.suspect_names) {
+            console.debug('[sidecar] post-validate flags', {
+              hallucinated: sourceMetadata.hallucinated_names,
+              suspect: sourceMetadata.suspect_names,
+            });
           }
-        } catch (pvErr) {
-          // post-validate jamás bloquea el chat — la respuesta ya está lista.
-          console.debug('[sidecar] post-validate fail (sigo sin badge):', pvErr?.message);
         }
       }
 
