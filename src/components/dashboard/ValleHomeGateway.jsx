@@ -126,17 +126,17 @@ export default function ValleHomeGateway({ children, onNavigate, enabled = true 
           </div>
           <div className="vhw__teaser-copy">
             <span><Sparkles size={15} aria-hidden="true" /> Tres vistas reales del valle</span>
-            <strong>Entrá al valle 3D</strong>
-            <small>Hacé clic o tocá para mirar adentro</small>
+            <strong>Entre al valle 3D</strong>
+            <small>Haga clic o toque para mirar adentro</small>
           </div>
           <button
             type="button"
             className="vhw__invite"
             data-testid="valle-home-invite"
             onClick={pedirConfirmacion}
-            aria-label="Entrá al valle 3D"
+            aria-label="Entre al valle 3D"
           >
-            Entrá al valle 3D
+            Entre al valle 3D
             <ArrowUpRight size={19} aria-hidden="true" />
           </button>
         </div>
@@ -160,7 +160,7 @@ export default function ValleHomeGateway({ children, onNavigate, enabled = true 
             <p id="valle-home-confirm-copy">La finca queda aquí mientras recorres el valle.</p>
             <div className="vhw__dialog-actions">
               <button type="button" onClick={cancelar}>Cancelar</button>
-              <button type="button" ref={confirmarRef} onClick={confirmarEntrada}>Entrá al valle 3D</button>
+              <button type="button" ref={confirmarRef} onClick={confirmarEntrada}>Entre al valle 3D</button>
             </div>
           </div>
         </div>
