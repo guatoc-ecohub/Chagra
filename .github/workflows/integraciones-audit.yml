@@ -25,9 +25,13 @@ name: Integraciones no consumidas
 # Medido sobre dev el 2026-09-03 con el motor por símbolo: ~2,3 s para 1.593 módulos.
 on:
   pull_request:
-    branches: [main]
+    # dev agregado (C2a, auditoría de proceso de gates rojos 2026-09-03):
+    # el flujo real de PRs apunta a dev, no solo a main.
+    branches: [main, dev]
   push:
-    branches: [main]
+    # dev agregado (C2a): gate ABSOLUTO — audita src/ + la allowlist commiteada,
+    # no depende del ref base.
+    branches: [main, dev]
 
 permissions:
   contents: read

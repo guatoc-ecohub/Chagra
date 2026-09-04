@@ -109,14 +109,23 @@ jobs:
           retention-days: 14
 
   # Suite E2E completa (40 specs). INFORMATIVO / NO-REQUERIDO: no bloquea merge.
-  # El suite se inflo a 30min+ y rompia el gate de todo el backlog; aqui corre con
-  # continue-on-error mientras se re-estabiliza alrededor del bench "prueba del
-  # tomate" (auditoria del grafo 2026-06-17). NO marcar como required en el ruleset.
+  # El suite se inflo a 30min+ y rompia el gate de todo el backlog; aqui corre
+  # mientras se re-estabiliza alrededor del bench "prueba del tomate"
+  # (auditoria del grafo 2026-06-17). NO marcar como required en el ruleset.
+  #
+  # POR QUE continue-on-error vive en el STEP de ejecucion y NO en el job
+  # (C1, auditoria de proceso de gates rojos 2026-09-03): a nivel de JOB el
+  # flag solo evita que la conclusion del workflow run sea failure, pero el
+  # check-run del PR IGUAL reporta "failure" y ensuciaba el semaforo agregado
+  # del PR (medido: ~40% de PRs rojos solo por jobs informativos). A nivel de
+  # STEP el fallo queda como warning del paso, el job concluye "success" y el
+  # check queda verde; el artifact del reporte de Playwright se conserva
+  # (el upload corre con if: !cancelled()) y el paso fallido sigue visible
+  # en el log para diagnosticar.
   e2e-full:
     name: E2E suite completa (informativo)
     runs-on: ubuntu-latest
     timeout-minutes: 30
-    continue-on-error: true
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -130,6 +139,9 @@ jobs:
       - name: Install Playwright browsers
         run: npx playwright install --with-deps chromium
       - name: Run full Playwright suite
+        # Informativo: el fallo de este paso NO debe fallar el job (ver el
+        # comentario del job e2e-full arriba).
+        continue-on-error: true
         run: npm run test:e2e
         env:
           CI: '1'

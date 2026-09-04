@@ -23,6 +23,15 @@ on:
   pull_request:
     branches: [main, dev, app-3d]
   push:
+    # SIN dev A PROPOSITO (C2a, auditoria de proceso de gates rojos
+    # 2026-09-03): en eventos push GITHUB_BASE_REF no existe y
+    # detect-changed-tests.mjs cae a 'main'; el diff origin/main...HEAD de
+    # dev son ~1100 commits / ~1560 archivos => selecciona ~345 tests,
+    # incluyendo aiService.test.js (CI-flaky documentado en el header de
+    # arriba). El gate naceria ROJO en cada push a dev: el ruido que C1
+    # apaga. Encenderlo requiere decidir antes la logica del detector en
+    # push (p. ej. GITHUB_BASE_REF: dev para push) — fuera del alcance de
+    # la contramedida, que solo toca CUANDO corren los gates.
     branches: [main]
 
 permissions:
