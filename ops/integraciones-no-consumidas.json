@@ -479,6 +479,126 @@
       "id": "src/visual/mundo3d/sierra/vendor/godRaysSylva.js",
       "reason": "Vendorizado por el arnés de medición móvil del descenso (#3103, 2026-09-03) para que la banda 4 use los MISMOS rayos de dosel del valle; su byte-a-byte lo fija fxSylva.vendor.test.js. No tiene consumidor de producto: EscenaDescensoSierra.jsx no monta un pase de god rays — FX_POR_BANDA lo lista para páramo/frío pero la escena, mirada en el gate, deja los haces de bruma en 0 por un defecto visto (franjas de borde recto cruzando el cielo sin dosel que las recorte; comentario en la propia escena) y el pase de rayos exige un sol EN CUADRO (en el valle se apaga sin fuente fingida desde 2026-09-04). Declarado por el audit ampliado (454 → 1593 sujetos, 2026-09-03). Decisión pendiente de dirección: rayos solo en el hero shot de la banda 4 a contraluz (contrato §3.2). Al cablear, borrar esta entrada.",
       "date": "2026-09-04"
+    },
+    {
+      "id": "src/services/agentTelemetryFlywheel.js",
+      "reason": "Recuperado en #2668 (2026-07-21) como captura local-first de interacciones y señales de calidad. El único uso de producto de exportarJSONL vive en AgentMetricsDashboard, que el alcance simbólico marca sin ruta viva; registrarInteraccion y actualizarSenal no tienen llamada desde el agente. Mantener el módulo y sus pruebas evita perder el contrato de telemetría mientras se decide el punto de captura y la pantalla de métricas.",
+      "date": "2026-09-04"
+    },
+    {
+      "id": "src/services/biodiversidadMonitor.js",
+      "reason": "Creado en #1451 (2026-06-11) como adaptador del catálogo de indicadores de biodiversidad. checklistBiodiversidad solo tiene consumidores de prueba: no hay pantalla ni recomendación viva que presente esos umbrales al usuario. Conservarlo permite cablear el mismo shape curado cuando se diseñe esa superficie.",
+      "date": "2026-09-04"
+    },
+    {
+      "id": "src/services/compaiExplicaPantallas.js",
+      "reason": "El manifiesto de explicaciones fue recuperado en 2026-08-24 y lo consume useCompaiGuiaPantalla, pero el hook y CompaiGuiaPantalla no alcanzan una ruta de producto según el motor simbólico. No se cablea desde este alcance porque requiere montar la guía en el shell, no cambiar el manifiesto de copy.",
+      "date": "2026-09-04"
+    },
+    {
+      "id": "src/services/compaiParadasPorPantalla.js",
+      "reason": "Parte de la Ola 2 del paseo autónomo (#2820, 2026-07-30). useCompaiPaseo y useCompaiGuiaPantalla lo importan, pero ambos quedan fuera de una ruta viva; el registro de paradas no debe activarse sin el montaje y desmontaje real de cada pantalla. Se conserva como contrato en memoria y con pruebas hasta ese cableado.",
+      "date": "2026-09-04"
+    },
+    {
+      "id": "src/services/compaiPaseoPlanificador.js",
+      "reason": "El planificador puro también llegó en #2820 (2026-07-30). Su único consumidor es useCompaiPaseo, que el alcance simbólico reporta no alcanzable; por ello no autoriza paseos en ninguna vista de producto hoy. Borrarlo descartaría la lógica y pruebas del paseo antes de decidir su montaje real.",
+      "date": "2026-09-04"
+    },
+    {
+      "id": "src/services/datosAbiertos.js",
+      "reason": "Es una referencia de fuentes y normalizador SIPSA, no un cliente de producción: el propio módulo documenta que faltan proxy CORS y caché local. normalizarPrecioSIPSA solo se usa en pruebas y MercadoScreen no lo consume. No se cablea para no presentar precios sin una ruta de actualización verificable.",
+      "date": "2026-09-04"
+    },
+    {
+      "id": "src/services/ensoModulador.js",
+      "reason": "Creado en #1451 (2026-06-11) para añadir contexto ENSO a una recomendación ya resuelta. modularPorENSO conserva pruebas, pero ningún recomendador vivo le entrega una recomendación base ni una fase ENSO actual. Integrarlo sin esa fuente convertiría el módulo en copy sin dato real.",
+      "date": "2026-09-04"
+    },
+    {
+      "id": "src/services/fenologyRecommendations.js",
+      "reason": "Motor puro recuperado en 2026-08-24 para la cola 010: recibe pronóstico por inyección para seguir offline-first. No hay ruta viva que construya esa solicitud ni le inyecte pronóstico; solo lo cubren pruebas. Se conserva hasta que una pantalla de siembra defina la entrada climática y la presentación de sus advertencias.",
+      "date": "2026-09-04"
+    },
+    {
+      "id": "src/services/fincaScope.js",
+      "reason": "Fundación MF-1 de multi-finca en #1804 (2026-06-22), protegida por VITE_MULTI_FINCA y diseñada como no-op con el flag apagado. Ningún store vivo estampa o filtra _finca_id todavía; cablearlo exigiría una migración coordinada de persistencia, no una importación local. Se mantiene con sus pruebas de compatibilidad single-finca.",
+      "date": "2026-09-04"
+    },
+    {
+      "id": "src/services/fotoOfflineService.js",
+      "reason": "Rescatado en #2668 (2026-07-21) como cola IndexedDB separada de fotos pendientes. El flujo actual de medios usa mediaCache/photoService y no llama a esta cola; no se conectan dos mecanismos de persistencia sin decidir cuál conserva la fuente de verdad. Sus pruebas documentan el comportamiento para una futura consolidación.",
+      "date": "2026-09-04"
+    },
+    {
+      "id": "src/services/glaciarCaaml.js",
+      "reason": "Exportador CAAML v6 creado en #1552 (2026-06-14). Genera XML y descarga de reportes, pero no existe una ruta viva de reportes glaciares que ofrezca esa exportación; solo sus pruebas invocan el módulo. Se conserva el formato interoperable mientras se decide si esa superficie sigue en el producto.",
+      "date": "2026-09-04"
+    },
+    {
+      "id": "src/services/glaciarZenodoMeta.js",
+      "reason": "Generador de metadatos para publicar conjuntos de reportes, creado en #1551 (2026-06-14). No hay flujo de exportación o publicación de glaciares alcanzable desde la PWA y buildZenodoMetadata solo tiene pruebas. Mantenerlo evita rehacer el mapeo si vuelve la interfaz de reporte.",
+      "date": "2026-09-04"
+    },
+    {
+      "id": "src/services/hojaVidaMataService.js",
+      "reason": "Construido en #045b054b0 (2026-08-03) para cruzar procesos, logs y grafo AGE. No tiene consumidor fuera de sus pruebas y la UI viva no debe persistir una hoja de vida: debe renderizar el timeline derivado de logs. Se declara, en vez de cablearlo, hasta que se diseñe ese selector derivado conforme al modelo Asset+Log.",
+      "date": "2026-09-04"
+    },
+    {
+      "id": "src/services/iotCostCalculator.js",
+      "reason": "Calculadora de componentes IoT incorporada en #1445 (2026-06-11). estimarCostoIoT solo aparece en pruebas; ninguna pantalla captura la configuración ni muestra el resultado. No se cablea para evitar que una estimación fija se presente como cotización o decisión de compra.",
+      "date": "2026-09-04"
+    },
+    {
+      "id": "src/services/iotValeLaPena.js",
+      "reason": "Heurística de conveniencia IoT de #1451 (2026-06-11), cubierta por pruebas pero sin formulario o asesor activo que aporte sus cinco señales de entrada. Mostrar su veredicto sin la conversación que recolecta esas señales sería una recomendación sin contexto; se conserva para ese flujo futuro.",
+      "date": "2026-09-04"
+    },
+    {
+      "id": "src/services/lunarPestService.js",
+      "reason": "Creado para PestMonitoringWindow en #174 (2026-05-06). Ese componente importa pestMonitoringMessage, pero no está en una ruta viva según el alcance simbólico; por tanto la ventana lunar no se muestra al usuario. Se preserva el cálculo y su cobertura hasta montar la superficie de monitoreo de plagas.",
+      "date": "2026-09-04"
+    },
+    {
+      "id": "src/services/networkRetry.js",
+      "reason": "Helper de fetch con reintento y backoff, cubierto solo por networkRetry.test.js. Ningún cliente de red de producto lo importa: sustituir fetch de forma global cambiaría timeouts y degradación offline sin una decisión por endpoint. Se mantiene como utilidad probada, no como política implícita.",
+      "date": "2026-09-04"
+    },
+    {
+      "id": "src/services/ragWithPhotos.js",
+      "reason": "Añadido en #933 (2026-05-19) como join lateral entre resultados RAG y fotos del usuario. retrieveWithPhotos solo tiene prueba; el agente vivo no consume ni gestiona sus URLs de Blob. Se conserva separado del RAG textual hasta que una vista defina la presentación y liberación de esos recursos.",
+      "date": "2026-09-04"
+    },
+    {
+      "id": "src/services/recorridoService.js",
+      "reason": "Las tripas del recorrido por voz llegaron en #2152 (2026-07-09). useRecorridoStore lo usa, pero ese store no entra a una ruta viva en el alcance actual; GPS, resumen y TTS no se activan hoy. Borrarlo perdería el contrato offline y las pruebas antes de montar el recorrido.",
+      "date": "2026-09-04"
+    },
+    {
+      "id": "src/services/redService.js",
+      "reason": "Cliente de los cuatro endpoints de trueque creado en #2792 (2026-07-25) como andamiaje explícitamente sin pantallas de Fase 1. El producto usa el módulo distinto services/red/redService.js para su red local; este cliente sidecar no tiene importador. Se mantiene hasta decidir si esa fase remota se integra o se retira de forma coordinada.",
+      "date": "2026-09-04"
+    },
+    {
+      "id": "src/services/restauracionRecetaFormatter.js",
+      "reason": "Formateador de diagnóstico agroecológico de #1451 (2026-06-11). Tiene pruebas, pero ninguna pantalla ni respuesta de agente usa formatearRecetaAgroecologica para presentar roles, sucesión y alertas. Se conserva porque cablearlo exige decidir la fuente de diagnóstico y la superficie de lectura.",
+      "date": "2026-09-04"
+    },
+    {
+      "id": "src/services/socialPrefiltro.js",
+      "reason": "Prefiltro de seguridad creado en #1457 (2026-06-11) y probado de forma aislada. No existe flujo social alcanzable que lo invoque antes de publicar o responder; conectarlo a una ruta no social sería aplicar una política distinta a su propósito. Se mantiene para el flujo social cuando se habilite.",
+      "date": "2026-09-04"
+    },
+    {
+      "id": "src/services/subgrafoToText.js",
+      "reason": "Adaptador AGE a texto incorporado en #1457 (2026-06-11). No hay consumidor vivo que reciba un subgrafo y lo muestre con este formato; solo el test lo invoca. Se conserva como formato determinista mientras se define qué respuestas del agente deben exponer relaciones del grafo.",
+      "date": "2026-09-04"
+    },
+    {
+      "id": "src/services/vitalidadEspirituService.js",
+      "reason": "Modelo fundamentado del panel de vitalidad creado en #2244 (2026-07-09). El único panel que importa buildVitalidadEspiritu está archivado y FincaVivaHero solo lo referencia en comentarios, por lo que no hay montaje vivo. Se conserva para no reemplazar sus métricas derivadas por estado persistido cuando se rediseñe el panel.",
+      "date": "2026-09-04"
     }
   ]
 }
