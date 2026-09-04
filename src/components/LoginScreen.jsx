@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { User, Lock, Eye, EyeOff, WifiOff, ShieldCheck, Leaf } from 'lucide-react';
 import { applyTheme, normalizeTheme, STORAGE_KEY, DEFAULT_THEME } from '../hooks/useTheme';
-import { authenticateUser } from '../services/authService';
+import { authenticateUser, iniciarLoginPKCE, resolverCaminoLogin } from '../services/authService';
 import { setCurrentOperator } from '../services/operatorIdentityService';
 import { setActiveTenantId } from '../services/tenantContext';
 import { version as APP_VERSION } from '../../package.json';
@@ -15,6 +15,7 @@ import useOllamaWarmStore from '../store/useOllamaWarmStore';
 import { prewarmCorpus } from '../services/ragRetriever';
 import useThemeBackgroundStore, { getBackgroundSrc, esGradiente } from '../store/useThemeBackgroundStore';
 import { friendlyMessage } from '../utils/friendlyErrors';
+import { MSG } from '../config/messages';
 // MENSAJES_LOGIN_ANGELITA (loginAngelitaMensajes.js) ya NO se importa (2026-09-03,
 // feedback_pizarra_unico_aviso_compai): alimentaba la burbuja de bienvenida que
 // AngelitaVueloLogin retiró (era un tercer formato de aviso, y de sus 5 mensajes
@@ -42,9 +43,15 @@ const LOGIN_FASE_MS = {
  * Español colombiano en USTED, cálido y campesino (ingrese/escriba/revise).
  * NUNCA voseo argentino.
  *
- * NO cambia la lógica de autenticación: `handleLogin` conserva el mismo flujo
- * (authenticateUser → operador HMAC → tenant → foto → warm-up Ollama + corpus).
- * Solo se rediseñó la capa visual, los textos y la estructura.
+ * Lógica de autenticación (task URGENTE-login-se-apaga-25sep): `handleLogin`
+ * consulta authService.resolverCaminoLogin() y el camino real es Authorization
+ * Code + PKCE (iniciarLoginPKCE → redirect a farmOS → regreso por
+ * /callback/OAuthCallback). El password grant clásico (authenticateUser) queda
+ * como fallback SOLO mientras no llegue PASSWORD_GRANT_DEPRECATION_DATE
+ * (2026-09-25); pasada esa fecha, si el camino PKCE no puede arrancar se
+ * muestra un error claro — nunca un botón mudo.
+ * Tras el login exitoso (por cualquiera de los dos caminos) sigue el flujo:
+ * operador HMAC → tenant → foto → warm-up Ollama + corpus.
  */
 export default function LoginScreen({ onLoginSuccess, onSave }) {
   const [creds, setCreds] = useState({ username: '', password: '' });
@@ -95,6 +102,47 @@ export default function LoginScreen({ onLoginSuccess, onSave }) {
     if (!creds.username || !creds.password) {
       onSave('Escriba su usuario y su contraseña para ingresar.', true);
       return;
+    }
+
+    // CABLEADO PKCE (task URGENTE-login-se-apaga-25sep): authService resuelve
+    // el camino. 'pkce' es el camino real (redirect a farmOS); el password
+    // grant clásico queda como fallback SOLO mientras no llegue la fecha de
+    // deprecación (2026-09-25). Si el camino queda 'bloqueado' (fecha vencida
+    // sin PKCE operativo) se avisa claro en vez de dejar el botón mudo — ese
+    // era justo el escenario de la bomba de tiempo original.
+    const ruta = resolverCaminoLogin();
+
+    if (ruta.camino === 'bloqueado') {
+      onSave(ruta.motivo, true);
+      return;
+    }
+
+    if (ruta.camino === 'pkce') {
+      setLoading(true);
+      let inicio;
+      try {
+        inicio = await iniciarLoginPKCE();
+      } catch (err) {
+        // Crypto/WebCrypto u otro fallo inesperado construyendo el redirect.
+        // NUNCA exponer el mensaje crudo (ver friendlyMessage abajo).
+        inicio = { success: false, error: friendlyMessage(err) };
+      }
+      if (inicio.success) {
+        // El navegador ya sale hacia farmOS (/oauth/authorize). Se deja el
+        // botón en "Entrando…": si farmOS rechaza (redirect_uri sin
+        // registrar, PKCE off en el cliente), el operador vuelve y aterriza
+        // de nuevo en esta pantalla.
+        return;
+      }
+      setLoading(false);
+      if (!ruta.passwordGrantVivo) {
+        // Fecha vencida: NO hay acceso clásico que estirar. Error explícito.
+        onSave(inicio.error || MSG.auth.accesoSeguroFallido, true);
+        return;
+      }
+      // Fallback temporal (mientras la fecha no llegue): continuar el MISMO
+      // intento con el acceso clásico.
+      onSave(MSG.auth.accesoSeguroFallidoUsandoClasico, false);
     }
 
     setLoading(true);

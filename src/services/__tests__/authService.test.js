@@ -12,6 +12,9 @@ import {
     getAccessToken,
     getLastRefreshFailureReason,
     refreshAccessToken,
+    puedeUsarPKCE,
+    resolverCaminoLogin,
+    iniciarLoginPKCE,
 } from '../authService';
 
 // Mock localforage
@@ -556,6 +559,102 @@ describe('authService — OAuth PKCE flow', () => {
             expect(getLastRefreshFailureReason()).toBe('network');
             expect(localforage.removeItem).not.toHaveBeenCalledWith('farmos_access_token');
             expect(localforage.removeItem).not.toHaveBeenCalledWith('farmos_refresh_token');
+        });
+    });
+
+    // ──────────────────────────────────────────────────────────────────────
+    // Cableado PKCE del login (task URGENTE-login-se-apaga-25sep). La matriz
+    // de resolverCaminoLogin es la cura de la bomba de tiempo: decide entre
+    // 'pkce' (camino real), 'password' (fallback pre-fecha) y 'bloqueado'
+    // (aviso claro). Dependencias INYECTADAS: no depende del .env de la
+    // máquina ni del reloj del módulo.
+    // ──────────────────────────────────────────────────────────────────────
+    describe('resolverCaminoLogin — matriz flag/fecha/config', () => {
+        const ANTES = new Date('2026-09-24T12:00:00Z').getTime();
+        const EN_EL_CORTE = new Date('2026-09-25T00:00:00Z').getTime();
+        const DESPUES = new Date('2026-09-26T12:00:00Z').getTime();
+
+        it('flag off + fecha no vencida → password grant (este cableado no cambia el comportamiento de hoy)', () => {
+            expect(resolverCaminoLogin({ fechaActual: ANTES, pkceOperativo: true, pkceActivado: false }))
+                .toEqual({ camino: 'password', passwordGrantVivo: true });
+        });
+
+        it('flag on + config ok + fecha no vencida → PKCE es el camino, con fallback vivo', () => {
+            const ruta = resolverCaminoLogin({ fechaActual: ANTES, pkceOperativo: true, pkceActivado: true });
+            expect(ruta.camino).toBe('pkce');
+            expect(ruta.passwordGrantVivo).toBe(true);
+        });
+
+        it('flag on pero sin config + fecha no vencida → cae a password grant (no rompe producción)', () => {
+            expect(resolverCaminoLogin({ fechaActual: ANTES, pkceOperativo: false, pkceActivado: true }))
+                .toEqual({ camino: 'password', passwordGrantVivo: true });
+        });
+
+        it('fecha vencida + config ok → PKCE obligatorio AUNQUE el flag falte (el switch se ignora)', () => {
+            const ruta = resolverCaminoLogin({ fechaActual: DESPUES, pkceOperativo: true, pkceActivado: false });
+            expect(ruta.camino).toBe('pkce');
+            expect(ruta.passwordGrantVivo).toBe(false);
+        });
+
+        it('fecha vencida sin config → "bloqueado" con motivo claro (la bomba suena, no queda muda)', () => {
+            const ruta = resolverCaminoLogin({ fechaActual: DESPUES, pkceOperativo: false, pkceActivado: false });
+            expect(ruta.camino).toBe('bloqueado');
+            expect(ruta.passwordGrantVivo).toBe(false);
+            expect(typeof ruta.motivo).toBe('string');
+            expect(ruta.motivo.length).toBeGreaterThan(0);
+        });
+
+        it('borde: en el instante exacto del corte (2026-09-25 00:00) el grant clásico todavía vive', () => {
+            // Mismo predicado que PASSWORD_GRANT_DEPRECATED (> estricto): la
+            // deprecación arranca DESPUÉS de la fecha, no en ella.
+            const ruta = resolverCaminoLogin({ fechaActual: EN_EL_CORTE, pkceOperativo: false, pkceActivado: false });
+            expect(ruta.camino).toBe('password');
+        });
+
+        it('por defecto (sin dependencias) devuelve un camino válido para este build', () => {
+            const ruta = resolverCaminoLogin();
+            expect(['pkce', 'password', 'bloqueado']).toContain(ruta.camino);
+            if (ruta.camino === 'bloqueado') {
+                expect(ruta.motivo).toBeTruthy();
+            }
+            expect(typeof puedeUsarPKCE()).toBe('boolean');
+        });
+    });
+
+    describe('iniciarLoginPKCE — puerta de entrada del login al flujo PKCE', () => {
+        beforeEach(() => {
+            vi.clearAllMocks();
+            mockLocation.href = '';
+        });
+
+        it('con config operativa genera state, persiste verifier+state y redirige a /oauth/authorize', async () => {
+            const resultado = await iniciarLoginPKCE({ pkceOperativo: true });
+
+            expect(resultado.success).toBe(true);
+            // El state CSRF lo genera iniciarLoginPKCE (el caller no lo pasa).
+            expect(localforage.setItem).toHaveBeenCalledWith('oauth_state', expect.any(String));
+            expect(localforage.setItem).toHaveBeenCalledWith('oauth_code_verifier', expect.any(String));
+            expect(mockLocation.href).toContain('/oauth/authorize');
+            expect(mockLocation.href).toContain('response_type=code');
+            expect(mockLocation.href).toContain('code_challenge_method=S256');
+        });
+
+        it('sin config operativa NO redirige y devuelve error claro (no-throw)', async () => {
+            const resultado = await iniciarLoginPKCE({ pkceOperativo: false });
+
+            expect(resultado.success).toBe(false);
+            expect(resultado.error).toContain('PKCE');
+            expect(mockLocation.href).toBe('');
+            expect(localforage.setItem).not.toHaveBeenCalled();
+        });
+
+        it('si algo revienta construyendo el redirect, devuelve error en vez de colgar al caller', async () => {
+            vi.mocked(localforage.setItem).mockRejectedValueOnce(new Error('IDB lleno'));
+
+            const resultado = await iniciarLoginPKCE({ pkceOperativo: true });
+
+            expect(resultado.success).toBe(false);
+            expect(resultado.error).toContain('No se pudo iniciar el acceso seguro');
         });
     });
 });
