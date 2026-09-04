@@ -1,0 +1,1 @@
+/mnt/data/coldstore/chagra-laminas-fuera-20260904/src/visual/creatures/_archivo/JaguarLaminaViva.jsx

@@ -32,11 +32,9 @@ const GATE_SCRIPT = resolve(__dirname, '../audit-integraciones.mjs');
 const REPO_ROOT = resolve(__dirname, '../..');
 const ALLOWLIST_REPO = join(REPO_ROOT, 'ops/integraciones-no-consumidas.json');
 
-// Los ids EXACTOS que hicieron rojo el gate sobre dev (verificado en local
-// el 2026-09-03, exit 1 con estos dos [orphan] y ningún otro). Si alguien
-// quita estas entradas del allowlist sin cablear o borrar los componentes,
-// el gate vuelve a rojo — este test lo explica en el mensaje de fallo.
-const IDS_REGRESION_090C = [
+// Las láminas archivadas salen del alcance del gate de producto: no se
+// declaran como huérfanas porque ya no pertenecen al árbol vivo.
+const IDS_LAMINAS_ARCHIVADAS = [
   'src/visual/creatures/ChivitoPunkLaminaViva.jsx',
   'src/visual/creatures/LuciernagaLaminaViva.jsx',
 ];
@@ -283,16 +281,10 @@ describe('ops/integraciones-no-consumidas.json (repo real)', function () {
     expect(problemas).toEqual([]);
   });
 
-  it('REGRESIÓN 090c: las dos láminas vivas causantes del rojo siguen declaradas', function () {
-    // ChivitoPunkLaminaViva y LuciernagaLaminaViva quedaron sin consumidor
-    // cuando el PR #3079 (2026-08-31) puso ChivitoTrazado/LuciernagaTrazado
-    // en el registro CREATURES. Quitar estas entradas sin cablear o borrar
-    // los componentes devuelve el gate a rojo (exit 1) — exactamente el rojo
-    // que esta task cerró. Ver ops/integraciones-no-consumidas.json para la
-    // justificación completa de cada excepción.
+  it('REGRESIÓN 094: las láminas archivadas no quedan declaradas como producto', function () {
     const ids = new Set((allowlist.orphan_components || []).map(function (e) { return e.id; }));
-    for (const id of IDS_REGRESION_090C) {
-      expect(ids.has(id), `falta la entrada allowlist de ${id} — el gate volvería a rojo`).toBe(true);
+    for (const id of IDS_LAMINAS_ARCHIVADAS) {
+      expect(ids.has(id), `la entrada archivada no debe seguir en el allowlist: ${id}`).toBe(false);
     }
   });
 
@@ -333,20 +325,13 @@ describe('ops/integraciones-no-consumidas.json (repo real)', function () {
       expect(salida).toContain(id);
     });
 
-    // CONTROL NEGATIVO · lo que SÍ está montado no puede salir acusado.
-    // Estas dos pasan por el mismo barril y NO son huérfanas, cada una por su
-    // razón, y por eso están acá: es el par que separa "pasa por un barril" de
-    // "está lavado".
-    //   · OsoBastonLaminaViva — el barril la importa por DEFAULT (línea 326) y
-    //     la mete en el objeto de registro CREATURES. Eso es un valor, no un
-    //     re-export: el bundler la emite.
-    //   · ZariguyaGeminiLaminaViva — sí es `export … from` en el barril, pero
-    //     además `ZariguyaCompaiEscena.jsx` la importa directo y la renderiza.
-    const MONTADAS_DE_VERDAD = [
+    // Las dos que antes entraban por registro/escena quedaron archivadas y no
+    // pueden reaparecer en el reporte de alcance de producto.
+    const ARCHIVADAS = [
       'src/visual/creatures/OsoBastonLaminaViva.jsx',
       'src/visual/creatures/ZariguyaGeminiLaminaViva.jsx',
     ];
-    it.each(MONTADAS_DE_VERDAD)('%s NO sale acusado', function (id) {
+    it.each(ARCHIVADAS)('%s no sale en el alcance activo', function (id) {
       expect(salida).not.toContain(id);
     });
 

@@ -37,12 +37,13 @@
  *
  * REGLA DE ORO: módulo PLANO — solo datos/strings (cero react, cero three),
  * igual que pielTrazado.js. Los datos de pose (archivo, W/H, ciclo, umbral)
- * se REUSAN de `zariguyaGeminiLamina/anatomia.js` — una sola fuente.
+ * se REUSAN del registro archivado `zariguyaGeminiLamina/anatomia.js` — una
+ * sola fuente, sin volver a montar la lámina raster.
  */
 
 import {
   CARPETA_LAMINA, POSES, ESCUCHA_CICLO, ESCUCHA_PASO_MS, UMBRAL_CLOSEUP,
-} from '../zariguyaGeminiLamina/anatomia.js';
+} from '../_archivo/zariguyaGeminiLamina/anatomia.js';
 
 /* Las poses YA INTEGRADAS al trazado. La lista crece UNA lámina a la vez,
    cada una con su gate GPU-headed + juez visión (spec 2026-08-26 FASE 2):

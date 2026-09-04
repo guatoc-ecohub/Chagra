@@ -26,7 +26,7 @@ import process from 'node:process';
 // import.meta.url en jsdom no es file:). Ruta desde la raíz del repo (cwd
 // de vitest, fijada por vite.config).
 const cssCrudo = readFileSync(
-  resolve(process.cwd(), 'src/visual/creatures/zariguyaGeminiLamina/zariguyaGeminiLamina.css'), 'utf8',
+  resolve(process.cwd(), 'src/visual/creatures/_archivo/zariguyaGeminiLamina/zariguyaGeminiLamina.css'), 'utf8',
 );
 import ZariguyaGeminiLaminaViva from '../../ZariguyaGeminiLaminaViva.jsx';
 

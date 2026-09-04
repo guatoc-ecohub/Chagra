@@ -12,7 +12,7 @@
  *
  * Este test:
  * 1. Descubre dinámicamente los módulos *LaminaViva.jsx bajo
- *    src/visual/creatures/
+ *    src/visual/creatures/ de forma recursiva, incluso los archivados
  * 2. Extrae de cada uno las rutas de asset .png/.webp/.svg que referencia
  *    (leyendo las constantes CARPETA_LAMINA y ARCHIVO_LAMINA de su
  *    anatomia.js)
@@ -49,8 +49,16 @@ const MIN_BYTES = 60000;
  * de creatures.
  */
 function discoverLaminaVivaComponents() {
-  const files = fs.readdirSync(CREATURES_DIR);
-  return files.filter((f) => f.endsWith('LaminaViva.jsx'));
+  const hallados = [];
+  const camina = (dir) => {
+    for (const entrada of fs.readdirSync(dir, { withFileTypes: true })) {
+      const ruta = path.join(dir, entrada.name);
+      if (entrada.isDirectory()) camina(ruta);
+      else if (entrada.name.endsWith('LaminaViva.jsx')) hallados.push(ruta);
+    }
+  };
+  camina(CREATURES_DIR);
+  return hallados;
 }
 
 /**
@@ -60,7 +68,8 @@ function discoverLaminaVivaComponents() {
  * @param {string} componentName - Nombre del componente (ej: 'JaguarLaminaViva')
  * @returns {{carpeta: string, archivo: string}|null}
  */
-function extractAssetPaths(componentName) {
+function extractAssetPaths(componentPath) {
+  const componentName = path.basename(componentPath, '.jsx');
   // Deriva el nombre del directorio de anatomía desde el componente
   // Ej: JaguarLaminaViva -> jaguarLamina
   // Ej: ChivitoPunkLaminaViva -> chivitoLamina
@@ -86,13 +95,15 @@ function extractAssetPaths(componentName) {
     laminaDir = base.charAt(0).toLowerCase() + base.slice(1);
   }
 
-  const anatomiaPath = path.resolve(CREATURES_DIR, laminaDir, 'anatomia.js');
+  const anatomiaPath = path.resolve(path.dirname(componentPath), laminaDir, 'anatomia.js');
+  const anatomiaViva = path.resolve(CREATURES_DIR, laminaDir, 'anatomia.js');
+  const rutaAnatomia = fs.existsSync(anatomiaPath) ? anatomiaPath : anatomiaViva;
   
-  if (!fs.existsSync(anatomiaPath)) {
+  if (!fs.existsSync(rutaAnatomia)) {
     return null;
   }
 
-  const content = fs.readFileSync(anatomiaPath, 'utf-8');
+  const content = fs.readFileSync(rutaAnatomia, 'utf-8');
   
   // Extrae CARPETA_LAMINA
   const carpetaMatch = content.match(/export\s+const\s+CARPETA_LAMINA\s*=\s*['"`]([^'"`]+)['"`]/);
@@ -135,14 +146,14 @@ describe('REGRESIÓN: Cada componente *LaminaViva tiene su asset en public/', ()
     );
   });
 
-  describe.each(components.map((f) => f.replace('.jsx', '')))(
+  describe.each(components.map((f) => [path.basename(f, '.jsx'), f]))(
     '%s',
-    (componentName) => {
+    (componentName, componentPath) => {
       let assetInfo;
       let resolvedPath;
 
       beforeAll(() => {
-        assetInfo = extractAssetPaths(componentName);
+        assetInfo = extractAssetPaths(componentPath);
         if (assetInfo) {
           resolvedPath = resolveAssetPath(assetInfo.carpeta, assetInfo.archivo);
         }

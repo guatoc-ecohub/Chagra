@@ -3,9 +3,9 @@
  * (avatarType 'zariguya').
  *
  * Molde: useEntradaAbeja/AbejaEscena (la escena posee la coreografía, la
- * creature posee el cuerpo). SKIN DEFINITIVA (operador 2026-08-25):
- * `ZariguyaGeminiLaminaViva` — la lámina raster Gemini aprobada, con sus
- * poses completas y vida propia. Pero la chucha NO vuela — es un
+ * creature posee el cuerpo). SKIN TINTA (operador 2026-09-04):
+ * `ZariguyaTrazado`; el set Gemini raster quedó archivado. Pero la chucha
+ * NO vuela — es un
  * marsupial NOCTURNO de piso, y su coreografía entera sale de esa verdad:
  *
  *   · CAMINA: se desplaza PEGADA AL SUELO con trote de pasos cortos (bob de
@@ -39,7 +39,7 @@ import { useEffect, useMemo, useRef } from 'react';
 import { useFrame } from '@react-three/fiber';
 import { Html } from '@react-three/drei';
 import * as THREE from 'three';
-import ZariguyaGeminiLaminaViva from '../../creatures/ZariguyaGeminiLaminaViva.jsx';
+import ZariguyaTrazado from '../../creatures/ZariguyaTrazado.jsx';
 import { ZARIGUYA_PRESENCIA, ZARIGUYA_TINTA, ZARIGUYA_SLUG } from '../../creatures/zariguyaIdentidad.js';
 import { idleDeCreature, IDLE_NEUTRO } from '../../creatures/creatureIdle.js';
 import { useLipSync } from '../../creatures/useLipSync.js';
@@ -258,8 +258,7 @@ export function useAndanzaZariguya(foco, {
 /**
  * La zarigüeya ya montada en una escena: drop-in del contrato de AbejaEscena
  * (CompaiEscena le pasa las mismas props). Billboard `<Html>` con la SKIN
- * definitiva `ZariguyaGeminiLaminaViva` (lámina raster aprobada,
- * operador 2026-08-25); PULSA al narrar y REBOTA al toque con las clases
+ * TINTA `ZariguyaTrazado`; PULSA al narrar y REBOTA al toque con las clases
  * genéricas del billboard (`.mundo-abeja*`). Su husmeo/tanatosis/reposo corren
  * en el idle-cerebro de la propia lámina. VIRAJE MÍSTICO: no gira — se
  * desvanece y reaparece.
@@ -312,7 +311,7 @@ export function ZariguyaCompaiEscena({
   // idle-cerebro 70/30 husmea/tanatosis/reposo corre solo). El trote se lee en
   // el waddle del idleRef + el desplazamiento del billboard, no en un
   // walk-cycle interno (así la marcha no se duplica con el bamboleo del molde).
-  const estadoGemini = hablando && vivo ? 'speaking' : 'idle';
+  const estadoPiel = hablando && vivo ? 'speaking' : 'idle';
   const cruceVivo = cruce && !reducedMotion;
   return (
     <>
@@ -336,9 +335,9 @@ export function ZariguyaCompaiEscena({
                   para no pisar la aparición mística de la cara. */}
               <div ref={idleRef} style={{ transformOrigin: 'center bottom' }} data-creature={ZARIGUYA_SLUG}>
                 <div ref={caraRef} className="mundo-abeja__cara">
-                  <ZariguyaGeminiLaminaViva
+                  <ZariguyaTrazado
                     size={size}
-                    estado={estadoGemini}
+                    estado={estadoPiel}
                     visema={vivo ? visema : null}
                     animated={vivo}
                     tier={tier}

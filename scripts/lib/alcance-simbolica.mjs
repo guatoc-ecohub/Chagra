@@ -71,7 +71,7 @@ const EXTS_COMPONENTE = new Set(['.jsx', '.tsx']);
 function walk(dir, out = []) {
   if (!existsSync(dir)) return out;
   for (const e of readdirSync(dir)) {
-    if (e === 'node_modules' || e.startsWith('.')) continue;
+    if (e === 'node_modules' || e === '_archivo' || e.startsWith('.')) continue;
     const p = join(dir, e);
     const st = statSync(p);
     if (st.isDirectory()) walk(p, out);

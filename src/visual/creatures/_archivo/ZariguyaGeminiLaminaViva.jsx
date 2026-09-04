@@ -6,8 +6,8 @@ import {
   PARTE_COLA, POSES, ESCUCHA_CICLO, ESCUCHA_PASO_MS, UMBRAL_CLOSEUP,
 } from './zariguyaGeminiLamina/anatomia.js';
 import { hornearZariguyaGemini } from './zariguyaGeminiLamina/capas.js';
-import { useVidaIdle, useRitmoPropio, useMiradaUsted, prefiereQuietud } from './useVidaIdle.js';
-import { ZARIGUYA_SLUG } from './zariguyaIdentidad.js';
+import { useVidaIdle, useRitmoPropio, useMiradaUsted, prefiereQuietud } from '../useVidaIdle.js';
+import { ZARIGUYA_SLUG } from '../zariguyaIdentidad.js';
 import './zariguyaGeminiLamina/zariguyaGeminiLamina.css';
 
 /* Estados del contrato de avatar → forma canónica interna (mismo mapa que

@@ -5,7 +5,7 @@ import {
   OREJA_IZQ, OREJA_DER, MANDIBULA, BOCA,
 } from './jaguarLamina/anatomia.js';
 import { hornearJaguar } from './jaguarLamina/capas.js';
-import { useVidaIdle, useRitmoPropio, useMiradaUsted } from './useVidaIdle.js';
+import { useVidaIdle, useRitmoPropio, useMiradaUsted } from '../useVidaIdle.js';
 import './jaguarLamina/jaguarLamina.css';
 
 const JAGUAR_SLUG = 'jaguar';
