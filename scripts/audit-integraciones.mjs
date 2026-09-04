@@ -151,7 +151,9 @@ function walk(dir, exts) {
 }
 
 const SRC_EXTS = new Set(['.js', '.jsx', '.mjs', '.ts', '.tsx']);
-const allSrcFiles = walk(SRC_DIR, SRC_EXTS);
+// `extname('declaracion.d.ts')` devuelve `.ts`. Las declaraciones las consume
+// TypeScript, no el bundle, y no son capacidades candidatas de esta auditoría.
+const allSrcFiles = walk(SRC_DIR, SRC_EXTS).filter((file) => !file.endsWith('.d.ts'));
 
 // -----------------------------
 // 1) SAME_REPO_TARGETS audit
@@ -310,6 +312,16 @@ const allowedOrphanIds = new Map();
 for (const e of allowlist.orphan_components || []) {
   validateAllowlistEntry(e, e.id || '(sin id)');
   allowedOrphanIds.set(e.id, e);
+}
+for (const group of allowlist.orphan_debt_groups || []) {
+  validateAllowlistEntry(group, group.id || '(grupo sin id)');
+  if (!Array.isArray(group.ids) || group.ids.length === 0 || group.ids.some((id) => typeof id !== 'string' || !id.startsWith('src/'))) {
+    die(2, 'allowlist: orphan_debt_groups requiere un arreglo no vacío de ids bajo src/.');
+  }
+  for (const id of group.ids) {
+    if (allowedOrphanIds.has(id)) die(2, `allowlist: id huérfano duplicado: ${id}`);
+    allowedOrphanIds.set(id, group);
+  }
 }
 
 // -----------------------------

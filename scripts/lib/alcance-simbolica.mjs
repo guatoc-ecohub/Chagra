@@ -67,6 +67,10 @@ export function analizarAlcance({ root, conConsumo = true } = {}) {
 const EXTS_RESOLVE = ['.jsx', '.js', '.mjs', '.ts', '.tsx', '.css', '.json', '.svg', '.png'];
 const EXTS_MODULO = new Set(['.js', '.jsx', '.mjs', '.ts', '.tsx']);
 const EXTS_COMPONENTE = new Set(['.jsx', '.tsx']);
+// Una declaración de tipos participa en el chequeo de TypeScript, no en el
+// grafo de módulos que puede llegar al bundle. `extname('x.d.ts')` es `.ts`,
+// por lo que la exclusión necesita mirar el nombre completo.
+const esModuloAuditable = (f) => EXTS_MODULO.has(extname(f)) && !f.endsWith('.d.ts');
 
 function walk(dir, out = []) {
   if (!existsSync(dir)) return out;
@@ -667,7 +671,7 @@ const vistasVitrinaNoProducto = [...vistasVitrinaCandidatas].filter((v) => !PROD
 // ---------------------------------------------------------------------------
 // 5 · Grafo de importadores (para SOLO_TEST y para el control B)
 // ---------------------------------------------------------------------------
-const TODOS = walk(SRC).filter((f) => EXTS_MODULO.has(extname(f)));
+const TODOS = walk(SRC).filter(esModuloAuditable);
 const MODULOS = TODOS.filter((f) => !esTest(f));
 const TESTS = TODOS.filter((f) => esTest(f));
 

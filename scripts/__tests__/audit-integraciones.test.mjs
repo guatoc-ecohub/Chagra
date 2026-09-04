@@ -58,6 +58,8 @@ function construirFixture({ conConsumidor = true, conAllowlist = true, allowlist
   mkdirSync(join(root, 'ops'), { recursive: true });
   mkdirSync(join(root, 'src/mockups'), { recursive: true });
   mkdirSync(join(root, 'src/services'), { recursive: true });
+  mkdirSync(join(root, 'src/hooks'), { recursive: true });
+  mkdirSync(join(root, 'src/types'), { recursive: true });
 
   // El script se COPIA: su ROOT es el padre de su propia carpeta, así que la
   // copia audita el árbol fixture.
@@ -71,10 +73,14 @@ function construirFixture({ conConsumidor = true, conAllowlist = true, allowlist
   // Los 3 SAME_REPO_TARGETS del script apuntan a src/services/grafoRelations.js.
   writeFileSync(join(root, 'src/services/grafoRelations.js'), GRAFO_FIXTURE);
 
-  // Componente ALCANZABLE desde App.jsx (import estático, dos saltos: App →
-  // Montado → módulo de servicio) y componente HUÉRFANO (nadie lo importa).
+  // Componente ALCANZABLE desde App.jsx (import estático, tres saltos: App →
+  // Montado → hook) y componente HUÉRFANO (nadie lo importa).
   writeFileSync(join(root, 'src/App.jsx'), "import { Montado } from './mockups/index.js';\nexport default function App() { return Montado; }\n");
   writeFileSync(join(root, 'src/mockups/Huerfano.jsx'), 'export default function Huerfano() { return null; }\n');
+  writeFileSync(join(root, 'src/hooks/useConectado.js'), 'export function useConectado() { return true; }\n');
+  // Control negativo: TypeScript sí ve esta declaración, pero no es un módulo
+  // emitible ni una capacidad que una ruta pueda montar.
+  writeFileSync(join(root, 'src/types/solo-tipos.d.ts'), 'declare const soloTipos: string;\n');
 
   // Barril que re-exporta el huérfano SIN que nadie le pida el nombre. Es el
   // control positivo de la ceguera nº1: el barril SÍ es alcanzable (App.jsx lo
@@ -99,7 +105,7 @@ function construirFixture({ conConsumidor = true, conAllowlist = true, allowlist
     // El segundo salto del BFS pasa por grafoRelations (Montado → servicio).
     writeFileSync(
       join(root, 'src/mockups/Montado.jsx'),
-      "import { getKnowledgeTopics } from '../services/grafoRelations.js';\nexport default function Montado() { return getKnowledgeTopics; }\n",
+      "import { getKnowledgeTopics } from '../services/grafoRelations.js';\nimport { useConectado } from '../hooks/useConectado.js';\nexport default function Montado() { return getKnowledgeTopics && useConectado; }\n",
     );
   } else {
     // Variante SIN ningún consumidor de getKnowledgeTopics en el árbol
@@ -150,7 +156,7 @@ function conFixture(opciones, aserciones) {
 
 describe('audit-integraciones (fixture hermético)', function () {
   it('pasa (exit 0) cuando el huérfano está declarado en el allowlist y el alcanzable no se reporta', function () {
-    conFixture({}, function ({ status, stdout }) {
+    conFixture({}, function ({ status, stdout, stderr }) {
       expect(status).toBe(0);
       expect(stdout).toContain('Auditoría limpia');
       // Huerfano.jsx está allowlisted (warn, no falla)...
@@ -158,6 +164,14 @@ describe('audit-integraciones (fixture hermético)', function () {
       // ...y Montado.jsx NO aparece como huérfano: el BFS desde App.jsx lo
       // alcanza por import estático (por eso no hay ningún warn sobre él).
       expect(stdout).not.toMatch(/SIN ruta viva pero allowlisted: src\/mockups\/Montado\.jsx/);
+      // Un módulo de apoyo importado desde una cadena alcanzable también queda
+      // montado. Si se rompe la propagación de imports estáticos, este control
+      // pasa a nombrarlo como huérfano.
+      expect(stdout).not.toContain('src/hooks/useConectado.js');
+      // Una `.d.ts` no entra al universo de módulos auditables. Quitar la
+      // exclusión de `*.d.ts` la hace aparecer y este control falla.
+      expect(stdout).not.toContain('src/types/solo-tipos.d.ts');
+      expect(stderr).not.toContain('src/types/solo-tipos.d.ts');
       // El barril NO lava: `Lavado.jsx` es huérfano aunque el barril esté vivo.
       expect(stdout).toContain('src/mockups/Lavado.jsx');
     });
@@ -278,6 +292,23 @@ describe('ops/integraciones-no-consumidas.json (repo real)', function () {
       }
       if (!existsSync(resolve(REPO_ROOT, id))) {
         problemas.push(`${id} no existe en disco (entrada vieja — eliminarla)`);
+      }
+    }
+    expect(problemas).toEqual([]);
+  });
+
+  it('cada grupo de deuda declara ids existentes, reason y date', function () {
+    const problemas = [];
+    for (const grupo of allowlist.orphan_debt_groups || []) {
+      if (!grupo.reason || !grupo.date) problemas.push(`${grupo.id || '(sin id)'} sin reason o date`);
+      if (!Array.isArray(grupo.ids) || grupo.ids.length === 0) {
+        problemas.push(`${grupo.id || '(sin id)'} sin ids`);
+        continue;
+      }
+      for (const id of grupo.ids) {
+        if (!/^src\//.test(id) || !/\.(jsx|tsx|js|mjs|ts)$/.test(id) || !existsSync(resolve(REPO_ROOT, id))) {
+          problemas.push(`${grupo.id || '(sin id)'} contiene id inválido: ${id}`);
+        }
       }
     }
     expect(problemas).toEqual([]);
