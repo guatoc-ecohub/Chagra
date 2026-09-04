@@ -1,0 +1,196 @@
+
+ RUN  v4.1.8 /tmp/laminas-r2-20260904
+
+stderr | src/mockups/__tests__/visualLib.smoke.test.jsx > VisualLib storybook > monta la vitrina completa sin lanzar
+Received `true` for a non-boolean attribute `ruge`.
+
+If you want to write it to the DOM, pass a string instead: ruge="true" or ruge={value.toString()}.
+Received `true` for a non-boolean attribute `acecha`.
+
+If you want to write it to the DOM, pass a string instead: acecha="true" or acecha={value.toString()}.
+Received `true` for a non-boolean attribute `vestuario`.
+
+If you want to write it to the DOM, pass a string instead: vestuario="true" or vestuario={value.toString()}.
+React does not recognize the `mundoId` prop on a DOM element. If you intentionally want it to appear in the DOM as a custom attribute, spell it as lowercase `mundoid` instead. If you accidentally passed it from a parent component, remove it from the DOM element.
+Received `true` for a non-boolean attribute `poder`.
+
+If you want to write it to the DOM, pass a string instead: poder="true" or poder={value.toString()}.
+React does not recognize the `lineBoil` prop on a DOM element. If you intentionally want it to appear in the DOM as a custom attribute, spell it as lowercase `lineboil` instead. If you accidentally passed it from a parent component, remove it from the DOM element.
+
+ ❯ src/mockups/__tests__/visualLib.smoke.test.jsx (2 tests | 1 failed) 32718ms
+     × monta la vitrina completa sin lanzar 32699ms
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: navigation to another Document
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: navigation to another Document
+Not implemented: navigation to another Document
+Not implemented: navigation to another Document
+Not implemented: navigation to another Document
+Not implemented: navigation to another Document
+Not implemented: navigation to another Document
+Not implemented: navigation to another Document
+Not implemented: navigation to another Document
+Not implemented: navigation to another Document
+Not implemented: navigation to another Document
+Not implemented: navigation to another Document
+Not implemented: navigation to another Document
+Not implemented: navigation to another Document
+Not implemented: navigation to another Document
+Not implemented: navigation to another Document
+Not implemented: navigation to another Document
+Not implemented: navigation to another Document
+Not implemented: navigation to another Document
+Not implemented: navigation to another Document
+Not implemented: navigation to another Document
+Not implemented: navigation to another Document
+Not implemented: navigation to another Document
+Warning: A vi.mock("../llmTelemetryService") call in "/tmp/laminas-r2-20260904/src/services/__tests__/offlineContracts.test.js" is not at the top level of the module. Although it appears nested, it will be hoisted and executed before any tests run. Move it to the top level to reflect its actual execution order. This will become an error in a future version.
+See: https://vitest.dev/guide/mocking/modules#how-it-works
+Warning: A vi.mock("../llmTelemetryService") call in "/tmp/laminas-r2-20260904/src/services/__tests__/offlineContracts.test.js" is not at the top level of the module. Although it appears nested, it will be hoisted and executed before any tests run. Move it to the top level to reflect its actual execution order. This will become an error in a future version.
+See: https://vitest.dev/guide/mocking/modules#how-it-works
+[cenchrus_clandestinus] (especies_invasoras) → tracking_mode=NULL (revisión manual requerida)
+[eucalyptus_globulus] (especies_invasoras) → tracking_mode=NULL (revisión manual requerida)
+[pteridium_aquilinum] (especies_invasoras) → tracking_mode=NULL (revisión manual requerida)
+[ulex_europaeus] (especies_invasoras) → tracking_mode=NULL (revisión manual requerida)
+[melinis_minutiflora] (especies_invasoras) → tracking_mode=NULL (revisión manual requerida)
+[eichhornia_crassipes] (especies_invasoras) → tracking_mode=NULL (revisión manual requerida)
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+ ❯ src/services/__tests__/waterDiagnostic.test.js (24 tests | 1 failed) 109ms
+     × incluye captacion, riego, conservacion, guardas 50ms
+Warning: A vi.mock("../climaService.js") call in "/tmp/laminas-r2-20260904/src/services/__tests__/alertEngine.guards.test.js" is not at the top level of the module. Although it appears nested, it will be hoisted and executed before any tests run. Move it to the top level to reflect its actual execution order. This will become an error in a future version.
+See: https://vitest.dev/guide/mocking/modules#how-it-works
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/mockups/__tests__/visualLib.smoke.test.jsx > VisualLib storybook > monta la vitrina completa sin lanzar
+Error: Test timed out in 30000ms.
+If this is a long-running test, pass a timeout value as the last argument or configure it globally with "testTimeout".
+ ❯ src/mockups/__tests__/visualLib.smoke.test.jsx:12:3
+     10|
+     11| describe('VisualLib storybook', () => {
+     12|   test('monta la vitrina completa sin lanzar', () => {
+       |   ^
+     13|     const { container, getByText } = render(<VisualLib />);
+     14|     expect(getByText('Librería visual')).toBeInTheDocument();
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
+
+ FAIL  src/services/__tests__/waterDiagnostic.test.js > formatearGroundingAgua > incluye captacion, riego, conservacion, guardas
+AssertionError: expected '**Captacion estimada:** 55,080 L/año …' to contain '55.080'
+
+- Expected
++ Received
+
+- 55.080
++ **Captacion estimada:** 55,080 L/año (151 L/dia) desde 60m² de techo con 1200mm de lluvia y Ce=0.9.
++
++ **Problemas detectados:** deficit_hidrico, estres_sequia.
++
++ **Sistemas de riego recomendados:**
++
++ - Goteo con cinta 16mm (eficiencia 88%, Funciona por gravedad desde tanque a 1.5m de altura. 1-2 L/h por gotero.)
++
++ - Riego por mecha (wicking) (eficiencia 80%, Algodon o tela de mecha entre un reservorio y la planta. Para almácigos y pequeñas areas.)
++
++ **Practicas de conservacion:**
++
++ - Mulch o cobertura: Reduce evaporacion 30-70%, uso de agua 29%. Capa >=5cm de residuos vegetales.
++
++ - Materia organica en el suelo: Cada 1% de MO retiene ~15-20mm mas por metro de suelo. Conecta con modulo de suelos.
++
++ **Acciones ante sequia/ENSO:**
++
++ - cosechar agua masivo
++
++ - reservorios
++
++ - mulch en perennes
++
++ **GUARDAS:**
++
++ - La marchitez al mediodia NO significa que necesita riego — es cierre estomatico normal por calor. Haga la prueba del punado a 15-20cm: si el suelo arena NO forma bola esta seco; si arcilla forma cinta sin escurrir esta en capacidad de campo. Regar con suelo humedo enfria las raices (shock) y desperdicia agua.
++
++ - Regar en la manana o madrugada (menos evaporacion, las plantas absorben antes del calor). Regar de noche puede favorecer hongos en clima frio.
++
++ - Desvie los primeros 0.5-1mm de lluvia (1L por m2 de techo). Lava polvo, heces de aves y hojas acumuladas.
++
++ - Tape el tanque con tapa hermosa o malla anti-zancudo. En clima calido la evaporacion puede ser 5-7mm/dia.
++
++ Fuente: DR-AGUA-1-consolidado (3/3 DeepSeek+Gemini+Meta, 2026-06-11)
+
+ ❯ src/services/__tests__/waterDiagnostic.test.js:157:15
+    155|     const f = formatearGroundingAgua(d);
+    156|     expect(f).toContain('Captacion estimada');
+    157|     expect(f).toContain('55.080');
+       |               ^
+    158|     expect(f).toContain('GUARDAS');
+    159|     expect(f).toContain('DR-AGUA-1');
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/2]⎯
+
+⎯⎯⎯⎯⎯⎯ Unhandled Errors ⎯⎯⎯⎯⎯⎯
+
+Vitest caught 1 unhandled error during the test run.
+This might cause false positive tests. Resolve unhandled errors to make sure your tests are not affected.
+
+⎯⎯⎯⎯ Unhandled Rejection ⎯⎯⎯⎯⎯
+ReferenceError: window is not defined
+ ❯ resolveUpdatePriority ../../home/kortux/Workspace/chagra/node_modules/react-dom/cjs/react-dom-client.development.js:1308:7
+ ❯ requestUpdateLane ../../home/kortux/Workspace/chagra/node_modules/react-dom/cjs/react-dom-client.development.js:16345:11
+ ❯ dispatchSetState ../../home/kortux/Workspace/chagra/node_modules/react-dom/cjs/react-dom-client.development.js:9126:14
+ ❯ src/hooks/usePendingSyncCount.js:30:68
+     28|           syncManager.getSyncStats()
+     29|             .then((stats) => setPending(stats?.pendingCount ?? 0))
+     30|             .catch(() => _leerDeIDB().then(setPending).catch(() => set…
+       |                                                                    ^
+     31|         } else {
+     32|           _leerDeIDB().then(setPending).catch(() => setPending(0));
+
+This error originated in "src/__tests__/App.evolucion-route.test.jsx" test file. It doesn't mean the error was thrown inside the file itself, but while it was running.
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+
+
+ Test Files  2 failed | 1040 passed | 3 skipped (1045)
+      Tests  2 failed | 13880 passed | 3 expected fail | 37 skipped (13922)
+     Errors  1 error
+   Start at  09:46:55
+   Duration  449.62s (transform 166.50s, setup 444.30s, import 497.51s, tests 1278.63s, environment 2194.00s)
+
