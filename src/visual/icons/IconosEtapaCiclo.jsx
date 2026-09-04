@@ -66,12 +66,13 @@ export function IconoGerminacion(props) {
   );
 }
 
-/* 2 · Vegetativo — la mata como masa: una copa lobulada sobre su tallo. */
+/* 2 · Vegetativo — la mata creciendo: tallo alto con dos masas de follaje escalonadas (silueta en zigzag, nunca un redondel). */
 export function IconoVegetativo(props) {
   return (
     <IconoEtapaBase {...props}>
-      <path d="M12 20.5 V15" />
-      <path d="M8.5 15 C4.6 15 3.4 11.2 5.8 9.6 C4.6 6.8 8 4.9 10.2 6.3 C10.8 4.2 13.2 4.2 13.8 6.3 C16 4.9 19.4 6.8 18.2 9.6 C20.6 11.2 19.4 15 15.5 15 Z" />
+      <path d="M12 20.5 V5" />
+      <path d="M12 18 C8 18.8 4 16 4.2 11.8 C7.6 10.2 11 12.6 12 18 Z" />
+      <path d="M12 11.5 C16 12.3 20 9.5 19.8 5.3 C16.4 3.7 13 6.1 12 11.5 Z" />
     </IconoEtapaBase>
   );
 }
