@@ -46,7 +46,7 @@ describe('ValleHomeGateway', () => {
     fireEvent.mouseEnter(gateway);
 
     expect(screen.getByTestId('valle-home-teaser')).toBeInTheDocument();
-    expect(screen.getByTestId('valle-home-invite')).toHaveTextContent('Entrá al valle 3D');
+    expect(screen.getByTestId('valle-home-invite')).toHaveTextContent('Entre al valle 3D');
     expect(screen.getAllByAltText('')).toHaveLength(VALLE_TEASER_FRAMES.length);
   });
 
@@ -68,7 +68,7 @@ describe('ValleHomeGateway', () => {
 
     fireEvent.mouseEnter(gateway);
     fireEvent.click(screen.getByTestId('valle-home-invite'));
-    fireEvent.click(within(screen.getByRole('dialog')).getByRole('button', { name: 'Entrá al valle 3D' }));
+    fireEvent.click(within(screen.getByRole('dialog')).getByRole('button', { name: 'Entre al valle 3D' }));
     expect(screen.getByTestId('tnd')).toBeInTheDocument();
 
     act(() => vi.advanceTimersByTime(ND_VIAJE_MS));
@@ -93,7 +93,7 @@ describe('ValleHomeGateway', () => {
 
     fireEvent.mouseEnter(screen.getByTestId('valle-home-gateway'));
     fireEvent.click(screen.getByTestId('valle-home-invite'));
-    fireEvent.click(within(screen.getByRole('dialog')).getByRole('button', { name: 'Entrá al valle 3D' }));
+    fireEvent.click(within(screen.getByRole('dialog')).getByRole('button', { name: 'Entre al valle 3D' }));
 
     act(() => vi.advanceTimersByTime(ND_REDUCIDA_MS));
     expect(onNavigate).toHaveBeenCalledWith('valle3d');
