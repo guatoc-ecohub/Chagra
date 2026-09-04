@@ -295,6 +295,7 @@ import Perezoso from './Perezoso.jsx';
 import Ardilla from './Ardilla.jsx';
 import ChivitoTrazado from './ChivitoTrazado.jsx';
 import LuciernagaTrazado from './LuciernagaTrazado.jsx';
+import Borugo from './Borugo.jsx';
 /* EL JAGUAR DEL ELENCO = JaguarTrazado (decisión operador 2026-08-24,
    DEFINITIVA): la lámina AUTO-TRAZADA a tinta sobre el esqueleto de huesos
    reemplaza a `JaguarLaminaViva` (la PNG recortada en capas, rechazada — el
@@ -347,9 +348,7 @@ export const CREATURES = {
   ardilla: { Component: Ardilla, nombre: 'Ardilla de cola roja', cientifico: 'Notosciurus granatensis' },
   jaguar: { Component: JaguarTrazado, nombre: 'Jaguar', cientifico: 'Panthera onca' },
   morrocoy: { Component: Morrocoy, nombre: 'Morrocoy de patas rojas', cientifico: 'Chelonoidis carbonarius' },
-  /* BORUGO ARCHIVADO (operador, 2026-07-18): dibujo rechazado por feo — fuera
-     del registro para que NADA data-driven lo surfacee (avatar-selector, fauna
-     ambiental, vecinos del valle). El componente queda por si se rehace. */
+  borugo: { Component: Borugo, nombre: 'Borugo', cientifico: 'Cuniculus taczanowskii' },
   danta: { Component: Danta, nombre: 'Danta de páramo', cientifico: 'Tapirus pinchaque' },
   condor: { Component: Condor, nombre: 'Cóndor de los Andes', cientifico: 'Vultur gryphus' },
   // Los perros de la casa (razas reconocibles: el alto moteado y el bajito orejón).
