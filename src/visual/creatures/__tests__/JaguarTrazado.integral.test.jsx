@@ -105,4 +105,15 @@ describe('ChagraAgentAvatarJaguar — el agente 2D usa la skin trazada', () => {
     expect(raiz.querySelector('.jh-pataTrasCerca')).toBeInTheDocument();
     expect(raiz.querySelector('.jh-pataTrasLejos')).toBeInTheDocument();
   });
+
+  it('a 64 px usa la piel compacta de rosetas; a 65 px conserva el trazado completo', () => {
+    const { container: compacto } = render(<ChagraAgentAvatarJaguar size={64} reaccionaPresencia={false} />);
+    expect(compacto.querySelector('.jaguarHuesos')).toBeInTheDocument();
+    expect(compacto.querySelector('.jaguarTrazado')).not.toBeInTheDocument();
+    expect(compacto.querySelector('[data-creature="jaguar"]')).toHaveAttribute('data-rosetas-compactas');
+
+    const { container: completo } = render(<ChagraAgentAvatarJaguar size={65} reaccionaPresencia={false} />);
+    expect(completo.querySelector('.jaguarTrazado')).toBeInTheDocument();
+    expect(completo.querySelector('[data-creature="jaguar"]')).not.toHaveAttribute('data-rosetas-compactas');
+  });
 });

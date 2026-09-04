@@ -54,6 +54,12 @@ div.jaguarHuesos > svg{ width: 100%; height: 100%; display: block; overflow: vis
 .jaguarHuesos .jh-pj{ filter: url(#jhBoilSuave); }
 .jaguarHuesos[data-modo="actuando"] .jh-pj{ filter: url(#jhBoil); }
 
+/* A 64 px las rosetas densas colapsan en rayas. La variante compacta conserva
+   seis anillos con centro, separados y legibles en la tarjeta del selector. */
+.jaguarHuesos .jh-rosetas-compactas{ display: none; }
+.jaguarHuesos[data-rosetas-compactas] .jh-patron-denso{ display: none; }
+.jaguarHuesos[data-rosetas-compactas] .jh-rosetas-compactas{ display: inline; }
+
 /* ════════════════ VIDA BASE (todos los estados, ambos modos) ═════════════ */
 
 /* respiración: el tronco se hincha apenas — digno, nada de goma en normal */

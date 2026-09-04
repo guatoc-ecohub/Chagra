@@ -1,5 +1,8 @@
 import JaguarTrazado from '../visual/creatures/JaguarTrazado';
+import JaguarHuesos from '../visual/creatures/JaguarHuesos';
 import { useAngelitaPresencia, esPasivo } from '../visual/agente/useAngelitaPresencia';
+
+const TAMANO_COMPACTO = 64;
 
 /**
  * ChagraAgentAvatarJaguar — el jaguar (Panthera onca) como CARA del agente de
@@ -80,9 +83,11 @@ export default function ChagraAgentAvatarJaguar({
     const despiertaNatural = despierta && esPasivo(estadoAgente);
     const estadoEfectivo = despiertaNatural ? 'acompana' : estadoAgente;
     const visema = visemaRecibido ?? VISEMA_DE_STATE[estadoEfectivo] ?? null;
+    const usaPielCompacta = size === TAMANO_COMPACTO;
+    const SkinJaguar = usaPielCompacta ? JaguarHuesos : JaguarTrazado;
 
     const bicho = (
-        <JaguarTrazado
+        <SkinJaguar
             estado={estadoEfectivo}
             visema={visema}
             size={size}
@@ -98,6 +103,7 @@ export default function ChagraAgentAvatarJaguar({
             data-agt-estado={dataEstado || estadoAgente}
             data-pose={dataPose}
             data-visema={dataVisema || visema || undefined}
+            {...(usaPielCompacta ? { 'data-rosetas-compactas': '' } : {})}
             {...atributosConducta}
         />
     );

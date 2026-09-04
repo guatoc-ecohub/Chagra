@@ -334,6 +334,7 @@ const TRONCO = `
     <path d="M316,88 C 312,132 314,184 322,228"/>
     <path d="M430,80 C 428,130 430,185 436,232"/>
   </g>
+  <g class="jh-patron-denso">
   <!-- cresta dorsal: blotches alargados que rompen la línea del lomo -->
   <g fill="${P.roseta}">
     <ellipse cx="278" cy="60" rx="9" ry="3.2" transform="rotate(-10 278 60)"/>
@@ -373,7 +374,12 @@ const TRONCO = `
     fill="#5a3212" opacity=".2"/>
   <!-- penumbra del ijar (tras el hombro) y del flanco trasero -->
   <path d="M258,110 C 268,158 272,200 268,236 C 258,204 252,162 254,122 Z" fill="#5a3212" opacity=".14"/>
-  <path d="M556,110 C 574,140 580,180 570,214 C 578,180 574,142 560,116 Z" fill="#5a3212" opacity=".16"/>`;
+  <path d="M556,110 C 574,140 580,180 570,214 C 578,180 574,142 560,116 Z" fill="#5a3212" opacity=".16"/>
+  </g>
+  <g class="jh-rosetas-compactas">
+    ${roseta(300, 104, 2.15, -8, 0)}${roseta(382, 100, 2.3, 4, 1)}${roseta(470, 116, 2.1, 22, 0)}
+    ${roseta(308, 182, 2.05, -10, 1)}${roseta(398, 178, 2.3, 6, 0)}${roseta(490, 184, 1.9, 24, 2)}
+  </g>`;
 
 /* ── PECHO/BABERO (parte del tronco, entre las patas delanteras): crema
       profundo con las barras negras del grabado ── */
