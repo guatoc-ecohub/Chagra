@@ -165,6 +165,14 @@ export function muestreadorFacetas(hFn, { ancho, fondo, segX, segZ }) {
 
 /**
  * Curvas de nivel por marching squares sobre `hFn`, encadenadas en polilíneas.
+ * @param {(x:number,z:number)=>number} hFn  altura del macizo
+ * @param {number} nivel  cota a la que se traza la curva (hFn(x,z) === nivel)
+ * @param {Object} [opts]  ventana de muestreo en coordenadas de mundo
+ * @param {number} [opts.x0]
+ * @param {number} [opts.x1]
+ * @param {number} [opts.z0]
+ * @param {number} [opts.z1]
+ * @param {number} [opts.paso]
  * @returns {Array<Array<[number,number]>>} polilíneas [wx, wz]
  */
 export function contornoNivel(hFn, nivel, { x0, x1, z0, z1, paso = 0.08 } = {}) {
@@ -172,6 +180,7 @@ export function contornoNivel(hFn, nivel, { x0, x1, z0, z1, paso = 0.08 } = {}) 
   const g = new Float32Array(nx * nz);
   for (let iz = 0; iz < nz; iz++) for (let ix = 0; ix < nx; ix++) g[iz * nx + ix] = hFn(x0 + ix * paso, z0 + iz * paso) - nivel;
   const segs = [];
+  /** @type {(xa: number, za: number, va: number, xb: number, zb: number, vb: number) => [number, number]} */
   const lerpP = (xa, za, va, xb, zb, vb) => { const t = va / (va - vb); return [xa + (xb - xa) * t, za + (zb - za) * t]; };
   for (let iz = 0; iz < nz - 1; iz++) for (let ix = 0; ix < nx - 1; ix++) {
     const x = x0 + ix * paso, z = z0 + iz * paso;
