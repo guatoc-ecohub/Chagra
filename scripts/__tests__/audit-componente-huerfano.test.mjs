@@ -16,7 +16,8 @@
  */
 import { describe, it, expect, beforeAll } from 'vitest';
 import { execFileSync } from 'node:child_process';
-import { readFileSync, writeFileSync, mkdtempSync, rmSync } from 'node:fs';
+import { readFileSync, writeFileSync, mkdtempSync, rmSync, existsSync } from 'node:fs';
+import process from 'node:process';
 import { join, dirname, resolve } from 'node:path';
 import { tmpdir } from 'node:os';
 import { fileURLToPath } from 'node:url';
@@ -132,11 +133,15 @@ describe('CONTROL POSITIVO — los seis casos del card 095 sobre dev', () => {
   });
 
   it('los seis casos aparecen en el reporte de hallazgos, no solo en el detalle', () => {
+    // NOTA (tanda 1 del drenaje, 2026-09-04): GuiaEspecieCards salió de esta
+    // lista porque quedó DECLARADA en ops/componentes-huerfanos-allowlist.json
+    // (prototipo con datos demo, ver su entrada). No se cableó ni se borró:
+    // lo que el control sigue viendo es su VEREDICTO (test de abajo). Si un
+    // día desaparece de declarados sin actualizarse acá, se apagó el control.
     const ids = new Set(out.hallazgos.map((h) => h.id));
     for (const id of [
       'src/services/compaiExplicaPantallas.js',
       'src/components/CompaiGuiaPantalla.jsx',
-      'src/components/aprendizaje/GuiaEspecieCards.jsx',
       'src/visual/agente/AngelitaSalida.jsx',
       'src/visual/creatures/comportamientos/gestos.js',
       'chip:asociaciones',
@@ -157,6 +162,84 @@ describe('CONTROL POSITIVO — los seis casos del card 095 sobre dev', () => {
     const id = 'src/visual/creatures/ChivitoPunkLaminaViva.jsx';
     expect(veredicto(id)).toBe('HUERFANO');
     expect(new Set(out.hallazgos.map((h) => h.id)).has(id)).toBe(false);
+  });
+
+  it('GuiaEspecieCards sigue siendo SOLO_TEST, pero ya está DECLARADA (tanda 1 del drenaje)', () => {
+    // Tanda 1 del drenaje (2026-09-04): el prototipo del módulo de aprendizaje
+    // quedó declarado en ops/componentes-huerfanos-allowlist.json con razón
+    // sustantiva — montarlo hoy inyectaría GUIAS_DEMO (papa/café a mano) en
+    // pantallas grounded desde catalog.sqlite. NO se cableó ni se borró: sigue
+    // SOLO_TEST y ahora vive en `declarados`, no en `hallazgos`.
+    const id = 'src/components/aprendizaje/GuiaEspecieCards.jsx';
+    expect(veredicto(id)).toBe('SOLO_TEST');
+    expect(new Set(out.hallazgos.map((h) => h.id)).has(id)).toBe(false);
+  });
+});
+
+describe('TANDA 1 DEL DRENAJE — decisiones escritas (2026-09-04, ops/DRENAJE-HUERFANOS-TANDA-1-2026-09-04.md)', () => {
+  // Las 9 piezas DECLARADAS en ops/componentes-huerfanos-allowlist.json.
+  // Declarar no es cablear: el veredicto del control NO cambia — lo que cambia
+  // es que dejan de ser hallazgos sin decisión y pasan a `declarados`.
+  const DECLARADAS = [
+    'src/components/aprendizaje/GuiaEspecieCards.jsx',
+    'src/components/_archivado/UmbralValle.jsx',
+    'src/components/_archivo/OnboardingModal.jsx',
+    'src/components/_archivo/BienvenidaFinca.jsx',
+    'src/components/_archivo/OnboardingHero.jsx',
+    'src/components/_archivo/OnboardingProfile.jsx',
+    'src/components/_archivado/PanelVitalidadEspiritu.jsx',
+    'src/visual/mundo3d/atmosfera/DemoAtmosferaViva.jsx',
+    'src/components/lotes/LoteCroquisPlaceholder.jsx',
+  ];
+
+  // Las 6 PROPUESTAS DE BORRADO de la tanda 1. Aquí NO se borra nada — eso lo
+  // decide el operador. Mientras tanto el control las sigue acusando: si este
+  // test falla es porque alguien las borró o las cableó sin actualizar acá.
+  const PROPUESTAS_BORRADO = [
+    'src/components/ChagraAgentAvatarColibri.jsx',
+    'src/components/ChagraAgentAvatarColibriPhoto.jsx',
+    'src/components/ChagraAgentAvatarMaiz.jsx',
+    'src/components/SplashAngelita.jsx',
+    'src/components/escucha/EscuchaFab.jsx',
+    'src/components/QuickChipsBar.jsx',
+  ];
+
+  it('las 9 piezas declaradas de la tanda 1 ya no salen como hallazgos', () => {
+    const ids = new Set(out.hallazgos.map((h) => h.id));
+    for (const id of DECLARADAS) {
+      expect(ids.has(id), `sigue acusada, falta su entrada en el allowlist: ${id}`).toBe(false);
+    }
+  });
+
+  it('declarar no es cablear: su veredicto sigue siendo inalcanzable', () => {
+    for (const id of DECLARADAS) {
+      expect(NO_ALCANZABLE).toContain(veredicto(id));
+    }
+  });
+
+  it('los archivos declarados existen: si uno desaparece, su entrada vence y hay que revisarla', () => {
+    for (const id of DECLARADAS) {
+      expect(existsSync(join(ROOT, id)), `archivo borrado con entrada de allowlist viva: ${id}`).toBe(true);
+    }
+  });
+
+  it('cada entrada de la tanda 1 lleva reason sustantiva y date válida', () => {
+    const al = JSON.parse(readFileSync(join(ROOT, 'ops/componentes-huerfanos-allowlist.json'), 'utf8'));
+    const porId = new Map((al.componentes || []).map((e) => [e.id, e]));
+    for (const id of DECLARADAS) {
+      const e = porId.get(id);
+      expect(e, `falta entrada de allowlist: ${id}`).toBeTruthy();
+      expect(String(e.reason || '').length, `razón muy corta para ser sustantiva: ${id}`).toBeGreaterThanOrEqual(80);
+      expect(e.date, `date inválida: ${id}`).toMatch(/^\d{4}-\d{2}-\d{2}$/);
+    }
+  });
+
+  it('las 6 propuestas de borrado SIGUEN acusadas: siguen vivas hasta que el operador decida', () => {
+    const ids = new Set(out.hallazgos.map((h) => h.id));
+    for (const id of PROPUESTAS_BORRADO) {
+      expect(ids.has(id), `dejó de acusarse sin que se resuelva su propuesta: ${id}`).toBe(true);
+      expect(NO_ALCANZABLE).toContain(veredicto(id));
+    }
   });
 });
 
