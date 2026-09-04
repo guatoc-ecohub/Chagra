@@ -1,3 +1,8 @@
+// Pragma node para eslint (process.on más abajo): el arnés siempre fue un
+// script node; se declara explícito al tocar el archivo (cableado pizarra
+// 2026-09-03) para que el hook de eslint (staged, --max-warnings=0) no se
+// tropiece con el no-undef heredado de la config.
+/* global process */
 /**
  * Arnés de aceptación del control de componente huérfano (card 095).
  *
@@ -78,10 +83,25 @@ describe('premisas que el control mide en vez de recordar', () => {
 });
 
 describe('CONTROL POSITIVO — los seis casos del card 095 sobre dev', () => {
-  it('caso 1 · compaiExplicaPantallas + hook + CompaiGuiaPantalla: ninguna ruta viva', () => {
-    expect(NO_ALCANZABLE).toContain(veredicto('src/services/compaiExplicaPantallas.js'));
-    expect(NO_ALCANZABLE).toContain(veredicto('src/hooks/useCompaiGuiaPantalla.js'));
-    expect(NO_ALCANZABLE).toContain(veredicto('src/components/CompaiGuiaPantalla.jsx'));
+  it('caso 1 · RESUELTO: compaiExplicaPantallas + hook + CompaiGuiaPantalla están MONTADOS', () => {
+    // ACTUALIZADO A MANO 2026-09-03 (protocolo de este arnés: "si alguno de
+    // los seis se CABLEA o se BORRA de verdad, este test empieza a fallar —
+    // hay que actualizarlo A MANO, dejando escrito qué pasó con la pieza").
+    // Qué pasó: la cadena explicación→pizarra se CABLEÓ (decisión del
+    // operador: el texto de explicación de la pantalla SALE EN LA PIZARRA
+    // SIEMPRE; regla dura, commit 3233f7f06 — la pizarra es el único aviso
+    // del compai). AgentFab importa y monta <CompaiGuiaPantalla> dentro de su
+    // panel "Ver"; el componente consume useCompaiGuiaPantalla; el hook
+    // consume explicacionDePantalla; y getHintForRuta (compaiHints.js)
+    // consulta el manifiesto PRIMERO, así el texto también llega a la
+    // pizarra del CompaiOverlay y al peek del toque. El componente dejó de
+    // ser una burbuja auto-pop (prohibida) y es un bloque de la pizarra.
+    // Este control ahora protege el RESULTADO: si alguien des-cablea la
+    // cadena, los veredictos vuelven a HUERFANO/SOLO_TEST y esto se pone
+    // rojo.
+    expect(veredicto('src/services/compaiExplicaPantallas.js')).toBe('MONTADO');
+    expect(veredicto('src/hooks/useCompaiGuiaPantalla.js')).toBe('MONTADO');
+    expect(veredicto('src/components/CompaiGuiaPantalla.jsx')).toBe('MONTADO');
   });
 
   it('caso 2 · la librería comportamientos/ expone superficie que nadie consume', () => {
@@ -133,21 +153,30 @@ describe('CONTROL POSITIVO — los seis casos del card 095 sobre dev', () => {
   });
 
   it('los seis casos aparecen en el reporte de hallazgos, no solo en el detalle', () => {
-    // NOTA (tanda 1 del drenaje, 2026-09-04): GuiaEspecieCards salió de esta
+// NOTA (tanda 1 del drenaje, 2026-09-04): GuiaEspecieCards salió de esta
     // lista porque quedó DECLARADA en ops/componentes-huerfanos-allowlist.json
     // (prototipo con datos demo, ver su entrada). No se cableó ni se borró:
     // lo que el control sigue viendo es su VEREDICTO (test de abajo). Si un
     // día desaparece de declarados sin actualizarse acá, se apagó el control.
+    // Rebase 2026-09-04 (PR #3115): las dos piezas del caso 1
+    // (compaiExplicaPantallas.js y CompaiGuiaPantalla.jsx) salieron también del
+    // listado porque se CABLEARON de verdad, ya no son hallazgos, son producto.
     const ids = new Set(out.hallazgos.map((h) => h.id));
     for (const id of [
-      'src/services/compaiExplicaPantallas.js',
-      'src/components/CompaiGuiaPantalla.jsx',
       'src/visual/agente/AngelitaSalida.jsx',
       'src/visual/creatures/comportamientos/gestos.js',
       'chip:asociaciones',
       'chip:fuente_doi',
     ]) {
       expect(ids.has(id), `falta en hallazgos: ${id}`).toBe(true);
+    }
+    // Y la cadena cableada NO puede volver a salir como hallazgo:
+    for (const id of [
+      'src/services/compaiExplicaPantallas.js',
+      'src/hooks/useCompaiGuiaPantalla.js',
+      'src/components/CompaiGuiaPantalla.jsx',
+    ]) {
+      expect(ids.has(id), `la pieza cableada volvió a salir como hallazgo: ${id}`).toBe(false);
     }
   });
 
