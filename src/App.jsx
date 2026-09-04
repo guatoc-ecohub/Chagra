@@ -6,7 +6,8 @@
  * errores reales de ESLint siguen activos.
  */
 /* eslint-disable chagra-i18n/no-hardcoded-spanish */
-import React, { lazy, Suspense, useState, useEffect, useCallback, useRef } from 'react';
+import React, { Suspense, useState, useEffect, useCallback, useRef } from 'react';
+import { lazy } from './components/common/lazyWithRecovery';
 import { MapPin, Eye, Package, CheckCircle, WifiOff, Mic, Network, Beaker, Scale } from 'lucide-react';
 import localforage from 'localforage';
 import { useTheme } from './hooks/useTheme';

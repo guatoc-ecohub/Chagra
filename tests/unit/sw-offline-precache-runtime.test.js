@@ -51,7 +51,7 @@ function makeFakeCaches(getFetch) {
   };
 }
 
-function loadSW({ online = true, indexHtml, assetExists = () => true } = {}) {
+function loadSW({ online = true, indexHtml, assetExists = () => true, assetResponse } = {}) {
   const listeners = {};
   let fetchImpl;
   const fakeCaches = makeFakeCaches(() => fetchImpl);
@@ -74,7 +74,17 @@ function loadSW({ online = true, indexHtml, assetExists = () => true } = {}) {
       return { ok: true, status: 200, text: async () => '{"slugs":[]}', clone() { return this; } };
     }
     const exists = assetExists(pathname);
-    return { ok: exists, status: exists ? 200 : 404, url: urlStr, clone() { return { ok: exists, status: this.status, url: urlStr }; } };
+    const configured = assetResponse?.(pathname);
+    const status = configured?.status ?? (exists ? 200 : 404);
+    const contentType = configured?.contentType ?? 'text/javascript';
+    const response = {
+      ok: status >= 200 && status < 300,
+      status,
+      url: urlStr,
+      headers: { get: (name) => (name.toLowerCase() === 'content-type' ? contentType : null) },
+    };
+    response.clone = () => ({ ...response, clone: response.clone });
+    return response;
   });
 
   const self = {
@@ -108,15 +118,19 @@ function loadSW({ online = true, indexHtml, assetExists = () => true } = {}) {
 }
 
 function fireEvent(cb, request) {
-  let waited = null;
+  const waits = [];
   let responded = null;
   const event = {
     request,
-    waitUntil: (p) => { waited = p; },
+    waitUntil: (p) => { waits.push(p); },
     respondWith: (p) => { responded = p; },
   };
   cb(event);
-  return { waited, responded };
+  return {
+    waited: Promise.all(waits),
+    waitForBackground: () => Promise.all(waits),
+    responded,
+  };
 }
 
 const SAMPLE_INDEX = '<!doctype html><html><head>' +
@@ -290,6 +304,38 @@ describe('SW cold reload offline (T108)', () => {
     const res = await responded;
     expect(res).toBeTruthy();
     expect(res.status).toBe(504);
+  });
+
+  it('control negativo: un 200 text/html para un chunk JS no entra al cache', async () => {
+    const { listeners, fakeCaches } = loadSW({
+      online: true,
+      indexHtml: SAMPLE_INDEX,
+      assetResponse: (pathname) =>
+        pathname === '/assets/chunk-ausente.js'
+          ? { status: 200, contentType: 'text/html' }
+          : undefined,
+    });
+    const req = { url: 'https://chagra.guatoc.co/assets/chunk-ausente.js', method: 'GET' };
+    const event = fireEvent(listeners.fetch, req);
+
+    const response = await event.responded;
+    await event.waitForBackground();
+    expect(response.status).toBe(200);
+
+    const shell = await fakeCaches.open('chagra-dev');
+    expect(await shell.match(req)).toBeUndefined();
+  });
+
+  it('control positivo: un chunk JS con MIME JavaScript sí entra al cache', async () => {
+    const { listeners, fakeCaches } = loadSW({ online: true, indexHtml: SAMPLE_INDEX });
+    const req = { url: 'https://chagra.guatoc.co/assets/chunk-real.js', method: 'GET' };
+    const event = fireEvent(listeners.fetch, req);
+
+    await event.responded;
+    await event.waitForBackground();
+
+    const shell = await fakeCaches.open('chagra-dev');
+    expect(await shell.match(req)).toBeTruthy();
   });
 
   it('offline + /catalog.sqlite no cacheado → 504', async () => {
