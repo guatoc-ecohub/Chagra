@@ -92,14 +92,8 @@ export const VIDA_REPERTORIO = {
       reposo: { dur: 8800, peso: 1.5 }, // 2× rh-g-reposo — descansar es lo suyo
     },
   },
-  borugo: {
-    descanso: [4200, 9800],
-    momentos: {
-      olfatea: { dur: 3300, peso: 2.5 }, // 6× borugo-olfateo 0.55s · 3× orejas 1.1s
-      acurruca: { dur: 4600, peso: 1 }, // 1× borugo-acurruca 4.6s — el corazón del cierre
-      reposo: { dur: 4400, peso: 1 }, // 1× rh-g-reposo
-    },
-  },
+  /* BORUGO: archivado (operador 2026-07-18, "dibujo rechazado por feo") —
+     fuera de CREATURES. El componente, test y datos quedan por historia. */
   dalmata: {
     descanso: [2600, 6400], // perro joven: gesticula seguido, casi no se aquieta
     momentos: {

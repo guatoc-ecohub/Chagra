@@ -21,7 +21,9 @@ import { CREATURES } from '../index.js';
 
 afterEach(cleanup);
 
-describe('Borugo — contrato base intacto', () => {
+describe.skip('Borugo — contrato base intacto (archivado 2026-07-18)', () => {
+  // BORUGO ARCHIVADO: operador rechazó el dibujo como feo. Componente, test y
+  // datos quedan por historia. Este describe skipped hasta que se redibuje.
   it('render por defecto = svg accesible, sin capas nuevas', () => {
     const { container } = render(<Borugo tier="medio" />);
     const svg = container.querySelector('svg[data-creature="borugo"]');
