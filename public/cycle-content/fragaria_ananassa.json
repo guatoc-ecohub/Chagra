@@ -1,0 +1,79 @@
+{
+  "species_slug": "fragaria_ananassa",
+  "scientific_name": "Fragaria × ananassa (Duchesne ex Weston) Duchesne ex Rozier",
+  "common_names": [
+    "Fresa"
+  ],
+  "family": "Rosaceae",
+  "category": "frutales_perennes",
+  "cultivable": true,
+  "conservation_status": "cultivo_comun",
+  "thermal_zones": [
+    "frio",
+    "templado"
+  ],
+  "roles_in_guild": [
+    "crop"
+  ],
+  "antagonists": [],
+  "especies_nativas_sustitutas": [],
+  "propagation": {
+    "methods": [
+      "estolon",
+      "division_mata"
+    ],
+    "best_method": "estolon",
+    "protocol_resumen": "Propagación clonal por estolones (guías): se enraízan las plántulas hijas que emite la planta madre y se trasplantan con corona sana y raíz desnuda o en cepellón. Densidad 4-6 plantas/m² en camas elevadas con acolchado (mulch) plástico o de cascarilla. La semilla solo se usa en mejoramiento (híbrido segrega).",
+    "tiempo_a_establecimiento_dias": 30,
+    "notas": "Fenología por etapas: (1) Establecimiento/enraizamiento de corona 0-30 días; (2) Desarrollo vegetativo y emisión de hojas/estolones 30-75 días; (3) Inducción floral y floración 75-110 días (favorecida por días cortos y frío); (4) Cuajado y desarrollo de fruto 110-150 días; (5) Cosecha escalonada continua a partir de ~120 días, con picos cada 7-10 días durante varios meses; (6) Renovación de plantación cada 12-18 meses por caída de vigor y acumulación de patógenos. Eliminar estolones excesivos para concentrar energía en fruto.",
+    "fuente": "AGROSAVIA Manual de fresa (2013); AGROSAVIA Manual de biopreparados (2015)."
+  },
+  "requirements": {
+    "agua": "medio",
+    "altitud_msnm": {
+      "min_absoluto": 1800,
+      "optimo_min": 2000,
+      "optimo_max": 2800,
+      "max_absoluto": 3000
+    },
+    "temperatura_c": {
+      "helada_letal": -3,
+      "optimo_min": 12,
+      "optimo_max": 22,
+      "max_tolerable": 28
+    },
+    "radiacion": "sol_pleno",
+    "drenaje_requerido": "excelente"
+  },
+  "valor_pedagogico": "La fresa (Fragaria × ananassa, familia Rosaceae) es un híbrido hortofrutícola perenne de clima frío, originado en el siglo XVIII en Europa por el cruzamiento accidental de dos especies americanas: Fragaria chiloensis (de Chile) y Fragaria virginiana (de Norteamérica) — de ahí el nombre 'ananassa' por su aroma a piña. En Colombia es un cultivo de alto valor en zonas frías de Cundinamarca (Sabana de Bogotá, Sibaté, Facatativá, Subachoque, Chocontá, Guasca), Antioquia (La Ceja, Marinilla, El Carmen de Viboral, oriente antioqueño) y Boyacá entre 2.000 y 2.800 msnm, sembrado en camas elevadas con acolchado (mulch) plástico que conserva humedad, controla maleza y mantiene el fruto limpio. La planta produce por estolones (guías) que enraízan plántulas hijas clonales, y fructifica de forma escalonada y continua durante varios meses. Su mayor reto fitosanitario es el moho gris (Botrytis cinerea), que pudre flores y frutos en el ambiente frío y húmedo de la Sabana, seguido por el ácaro de dos puntos (Tetranychus urticae), los trips (Frankliniella) que deforman el fruto, y la antracnosis (Colletotrichum) y Verticillium que se acumulan en el suelo. Manejo agroecológico: drenaje excelente y camas elevadas (la fresa muere por encharcamiento y Phytophthora cactorum de corona); trasplante de la corona a nivel exacto del suelo (enterrada pudre, alta seca); Trichoderma al sustrato; Bacillus subtilis preventivo contra Botrytis al inicio de floración; ventilación de la cama y riego por goteo para no mojar el follaje; caldo sulfocálcico diluido contra ácaro y oídio; asociación con lechuga, cebolla larga (que repele ácaros y áfidos) y caléndula; y rotación del lote cada 2-3 años para no acumular Verticillium y nematodos. La fresa enseña el manejo del microclima del cultivo — humedad, ventilación y sanidad de la corona — como base de la prevención frente a la dependencia de fungicidas. Fuentes Tier A: AGROSAVIA Manual de fresa 2013, AGROSAVIA Manual de biopreparados 2015, GBIF Backbone, POWO Kew.",
+  "feeding_plan_markdown": "### Plan de alimentación\n\nFuente: AGROSAVIA Manual de fresa (2013) + Manual de biopreparados (2015) — manejo agroecológico de transición en cama elevada con acolchado, clima frío 2000-2800 msnm.\n\n- D+0: Aplicar bocashi a la cama a la siembra · bocashi · 200 g — Cama elevada con drenaje excelente (la fresa muere por encharcamiento/Phytophthora). Trasplantar coronas sanas a nivel del suelo: corona enterrada pudre, corona alta seca.\n- D+20: Inocular Trichoderma harzianum al sustrato · trichoderma_harzianum_suelo · 12 g — Preventivo Phytophthora cactorum, Verticillium y Colletotrichum de corona durante el enraizamiento.\n- D+45: Drench con humus líquido en desarrollo vegetativo · humus_liquido · 150 ml — Dilución 1:5. Aporte de N orgánico para foliaje sano antes de la inducción floral.\n- D+75: Foliar preventivo con Bacillus subtilis al inicio de floración · bacillus_subtilis_foliar · 80 ml — Antagonista de Botrytis cinerea — el moho gris ataca flor y fruto. Aplicar al atardecer; mejorar ventilación de la cama y NO mojar el follaje en la tarde.\n- D+90: Foliar con supermagro en cuajado de fruto · supermagro · 50 ml — Dilución 1:15. K y micronutrientes para llenado, color y dulzor del fruto.\n- D+110: Aplicar caldo sulfocálcico preventivo de ácaro/oídio · caldo_sulfocalcico · 40 ml — Dilución baja (0.5-1° Bé) — el azufre concentrado fitotóxica el follaje tierno y el fruto. Preventivo Tetranychus y oídio. NO aplicar en floración plena ni con sol fuerte.",
+  "companions_markdown": "### Especies asociadas favorables\n\nEstas especies favorecen el cultivo cuando se siembran cerca:\n- lactuca_sativa_capitata — Lechuga cogollo morada (Lactuca sativa var. capitata L.)\n- allium_fistulosum — Cebollín / Cebolla larga (Allium fistulosum L.)\n- calendula_officinalis — Caléndula (Calendula officinalis L.)",
+  "sources": [
+    {
+      "id": "agrosavia-manual-fresa-2013",
+      "title": "agrosavia-manual-fresa-2013",
+      "tier": "A",
+      "url": null
+    },
+    {
+      "id": "agrosavia-manual-biopreparados-2015",
+      "title": "agrosavia-manual-biopreparados-2015",
+      "tier": "A",
+      "url": null
+    },
+    {
+      "id": "gbif-taxonomic-backbone",
+      "title": "gbif-taxonomic-backbone",
+      "tier": "A",
+      "url": "https://www.gbif.org/dataset/d7dddbf4-2cf0-4f39-9b2a-bb099caae36c"
+    },
+    {
+      "id": "powo-kew",
+      "title": "powo-kew",
+      "tier": "A",
+      "url": "https://powo.science.kew.org"
+    }
+  ],
+  "_generated_by": "scripts/build-cycle-content-from-catalog.mjs",
+  "_generated_at": "2026-09-03T07:40:20.307Z"
+}

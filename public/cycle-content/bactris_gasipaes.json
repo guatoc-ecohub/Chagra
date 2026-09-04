@@ -2,7 +2,7 @@
   "species_slug": "bactris_gasipaes",
   "scientific_name": "Bactris gasipaes Kunth",
   "common_names": [
-    "Chontaduro"
+    "Palmito de chontaduro"
   ],
   "family": "Arecaceae",
   "category": "frutales_perennes",
@@ -13,39 +13,45 @@
   ],
   "roles_in_guild": [
     "crop",
-    "biomass_producer",
-    "living_fence"
+    "biomass_producer"
   ],
   "antagonists": [],
   "especies_nativas_sustitutas": [],
   "propagation": {
     "metodo_principal": "semilla",
-    "notas": "Germinacion lenta (3-6 meses); se recomienda siembra en bolsa y transplante con 2-3 hojas. Tradicionalmente sembrado en las chagras indigenas del Pacifico y Amazonia."
+    "notas": "Fenologia: germinacion lenta, vivero de palma, establecimiento, emision de macollas, crecimiento de tallos cosechables y corte selectivo de palmito."
   },
   "requirements": {
-    "agua": "medio",
+    "agua": "alto",
     "altitud_msnm": {
       "min_absoluto": 0,
       "optimo_min": 100,
-      "optimo_max": 500,
-      "max_absoluto": 1000
+      "optimo_max": 900,
+      "max_absoluto": 1200
     },
     "temperatura_c": {
       "helada_letal": 8,
       "optimo_min": 24,
       "optimo_max": 30,
-      "max_tolerable": 36
+      "max_tolerable": 35
     },
     "radiacion": "sol_pleno",
     "drenaje_requerido": "bueno"
   },
-  "valor_pedagogico": "Palma multiproposito por excelencia del tropico colombiano: fruto rico en vitamina A y aceites, palmito comestible, y madera para construccion rural. Ensenia agroforesteria tropical y seguridad alimentaria.",
+  "valor_pedagogico": "El palmito de chontaduro (Bactris gasipaes) usa la misma especie del chontaduro, manejada con enfasis en tallos tiernos y macollamiento para corte de palmito. En Colombia tiene sentido en Amazonia y Pacifico calido humedo, con suelos profundos, humedad constante y drenaje bueno. Su fenologia incluye germinacion lenta, vivero, establecimiento de palma, emision de macollas, crecimiento de tallos cosechables y corte selectivo. La ficha ensena diferencia entre aprovechamiento de fruto y aprovechamiento de tallo, y por que la cosecha de palmito debe planearse para no destruir la cepa productiva. Plagas y enfermedades clave: picudos, acaros, pudricion del cogollo y manchas foliares.",
+  "companions_markdown": "### Especies asociadas favorables\n\nEstas especies favorecen el cultivo cuando se siembran cerca:\n- theobroma_cacao — Cacao (Theobroma cacao L.)\n- musa_paradisiaca — Plátano (Musa × paradisiaca L.)",
   "sources": [
     {
-      "id": "bernal-2015-plantas-liquenes-colombia",
-      "title": "bernal-2015-plantas-liquenes-colombia",
+      "id": "sinchi-frutas-amazonia-chontaduro",
+      "title": "sinchi-frutas-amazonia-chontaduro",
       "tier": "A",
-      "url": "http://catalogoplantasdecolombia.unal.edu.co"
+      "url": "https://www.sinchi.org.co/files/publicaciones/publicaciones/pdf/catalogo%20de%20frutales%20web.pdf"
+    },
+    {
+      "id": "ica-resolucion-3168-2015",
+      "title": "ica-resolucion-3168-2015",
+      "tier": "A",
+      "url": null
     },
     {
       "id": "powo-kew",
@@ -61,5 +67,5 @@
     }
   ],
   "_generated_by": "scripts/build-cycle-content-from-catalog.mjs",
-  "_generated_at": "2026-05-19T00:42:57.374Z"
+  "_generated_at": "2026-09-03T07:40:20.316Z"
 }

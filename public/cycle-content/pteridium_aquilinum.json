@@ -17,11 +17,7 @@
   ],
   "antagonists": [],
   "especies_nativas_sustitutas": [
-    "alnus_acuminata",
-    "hesperomeles_goudotiana",
-    "miconia_squamulosa",
-    "vallea_stipularis",
-    "weinmannia_tomentosa"
+    "alnus_acuminata"
   ],
   "propagation": null,
   "requirements": {
@@ -36,7 +32,7 @@
     "radiacion": null,
     "drenaje_requerido": null
   },
-  "valor_pedagogico": "El helecho marranero (Pteridium aquilinum var. caudatum) es nativo cosmopolita pero se comporta como invasor agresivo post-quema en potreros andinos colombianos (1500-3200 msnm). Tras incendios o tala, sus rizomas profundos rebrotan y forman monocultivos densos que impiden regeneración de bosque andino. Toxicidad: contiene ptaquilósido (carcinogénico para ganado y humanos por leche contaminada). En Cruz Verde-Sumapaz, ocupa hectáreas de bordes de páramo degradado. Manejo: NO quemar (estimula rebrote), corte mecánico repetido durante 3-5 años + siembra de especies nativas competidoras (Weinmannia, Hesperomeles). Resolución 684/2018 MADS lo lista como prioridad de manejo en restauración paramuna.",
+  "valor_pedagogico": "El helecho marranero (Pteridium aquilinum (L.) Kuhn, Dennstaedtiaceae) es NATIVA pantropical (cosmopolita). NO es introducida — POWO confirma estatus nativo en Colombia. Tendencia expansiva en suelos degradados post-fuego, sobrepastoreo y deforestación, particularmente en potreros andinos (1500-3200 msnm) donde rizomas profundos rebrotan post-disturbio y forman monocultivos densos que impiden regeneración del bosque andino. La Resolución 684/2018 MADS la lista para control en áreas protegidas (Cruz Verde-Sumapaz, Iguaque, bordes de páramo degradado) PORQUE desplaza la regeneración natural del bosque, NO porque sea invasora exótica. Distinción crítica: el comportamiento expansivo es post-disturbio biogeografíamente nativo, no introducción exógena. Manejo: restauración ecológica activa (siembra de especies nativas competidoras: Weinmannia tomentosa, Hesperomeles goudotiana, Miconia squamulosa, Alnus acuminata, Vallea stipularis a 1600 ind/ha), NO erradicación; corte mecánico repetido 3-5 años + sombra forzada por dosel arbóreo; NUNCA fuego controlado (estimula rebrote del rizoma). RIESGO SANITARIO ELEVADO: ptaquilósido carcinogénico para ganado y humanos por exposición directa o leche contaminada — no permitir pastoreo bovino en zonas con invasión consolidada, manipulación SIEMPRE con EPP (guantes, mascarilla N95). Fuentes Tier A: POWO Kew (nativo Colombia), IAvH Humboldt Invasoras Andes (control post-disturbio), Resolución 684/2018 MADS, GBIF Backbone Taxonomy, Flora Colombia Pteridophyta.",
   "sources": [
     {
       "id": "flora-colombia-pteridophyta",
@@ -82,5 +78,5 @@
     }
   ],
   "_generated_by": "scripts/build-cycle-content-from-catalog.mjs",
-  "_generated_at": "2026-05-19T00:42:57.364Z"
+  "_generated_at": "2026-09-03T07:40:20.308Z"
 }

@@ -21,7 +21,7 @@
   "especies_nativas_sustitutas": [],
   "propagation": {
     "metodo_principal": "acodo",
-    "notas": "Propagacion por acodo de punta o esqueje. La forma silvestre presenta espinas; requiere tutorado en espaldera. Produce frutos a partir del segundo año."
+    "notas": "Propagacion por acodo de punta o esqueje. La forma silvestre presenta espinas; requiere tutorado en espaldera. Produce frutos a partir del segundo ano."
   },
   "requirements": {
     "agua": "medio",
@@ -70,5 +70,5 @@
     }
   ],
   "_generated_by": "scripts/build-cycle-content-from-catalog.mjs",
-  "_generated_at": "2026-05-19T00:42:57.370Z"
+  "_generated_at": "2026-09-03T07:40:20.310Z"
 }

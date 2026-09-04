@@ -1,0 +1,91 @@
+{
+  "species_slug": "solanum_tuberosum",
+  "scientific_name": "Solanum tuberosum L.",
+  "common_names": [
+    "Papa"
+  ],
+  "family": "Solanaceae",
+  "category": "tuberculos_raices",
+  "cultivable": true,
+  "conservation_status": "cultivo_comun",
+  "thermal_zones": [
+    "frio",
+    "paramo"
+  ],
+  "roles_in_guild": [
+    "crop"
+  ],
+  "antagonists": [],
+  "especies_nativas_sustitutas": [],
+  "propagation": {
+    "methods": [
+      "tuberculo",
+      "semilla"
+    ],
+    "best_method": "tuberculo",
+    "protocol_resumen": "Tubérculo-semilla certificado pre-brotado (yemas de 1-2 cm, verdeado a luz difusa). Siembra a 10-15 cm de profundidad, distancia 30 cm entre plantas × 90-100 cm entre surcos. Densidad ~33.000-40.000 plantas/ha. La semilla sexual (botánica) solo se usa en programas de mejoramiento, no en producción comercial.",
+    "tiempo_a_establecimiento_dias": 21,
+    "notas": "Renovar semilla certificada cada 2-3 ciclos por degeneración viral (PVY, PLRV) y bacteriana (Ralstonia, Pectobacterium). Fenología por etapas: (1) Brotación/emergencia 0-25 días; (2) Desarrollo vegetativo y crecimiento de follaje 25-45 días; (3) Inicio de tuberización (estolones) 45-60 días — etapa que define el número de tubérculos; (4) Llenado/engrose de tubérculo 60-110 días — máxima demanda de K y agua; (5) Maduración de piel y senescencia del follaje 110-150 días; (6) Cosecha 150-180 días según variedad.",
+    "fuente": "AGROSAVIA Manual tubérculos andinos 2017; Pérez-Rodríguez-Gómez 2008; Núñez-Rodríguez 2024 UNAL."
+  },
+  "requirements": {
+    "agua": "medio",
+    "altitud_msnm": {
+      "min_absoluto": 2000,
+      "optimo_min": 2500,
+      "optimo_max": 3200,
+      "max_absoluto": 3500
+    },
+    "temperatura_c": {
+      "helada_letal": -2,
+      "optimo_min": 10,
+      "optimo_max": 18,
+      "max_tolerable": 24
+    },
+    "radiacion": "sol_pleno",
+    "drenaje_requerido": "bueno"
+  },
+  "valor_pedagogico": "La papa (Solanum tuberosum L., familia Solanaceae) es el cultivo de tubérculo más importante del clima frío colombiano y el segundo alimento de consumo nacional después del arroz. Domesticada hace más de 7.000 años en los Andes (cuenca del lago Titicaca, Perú-Bolivia), llegó al altiplano colombiano y hoy se cultiva intensivamente entre 2.500 y 3.200 msnm en Cundinamarca (Sabana de Bogotá, Subachoque, Zipaquirá, Une, Carmen de Carupa), Boyacá (Ventaquemada, Toca, Soracá, Tunja), Nariño (Túquerres, Pupiales, Guachucal, Ipiales — principal departamento productor) y norte de Antioquia (La Unión, Sonsón). Las variedades comerciales dominantes en Colombia son Diacol Capiro (R-12, industrial para fritura), Pastusa Suprema, Superior, Única, Esmeralda y la papa criolla amarilla (Grupo Phureja). El enemigo número uno es la gota o tizón tardío (Phytophthora infestans), un oomiceto que en clima frío húmedo y con neblina puede destruir un lote entero en menos de una semana; fue el patógeno responsable de la Gran Hambruna Irlandesa (1845-1849) y sigue siendo el factor que más encarece y contamina el cultivo, pues ata al productor a 8-14 aplicaciones de fungicida por ciclo. Manejo agroecológico de transición: rotación obligatoria con leguminosas (haba, arveja, lupino/chocho) que fijan nitrógeno y rompen el ciclo de plagas de suelo; semilla certificada renovada cada 2-3 ciclos contra la degeneración viral (PVY, PLRV); aporque alto para proteger tubérculos de la polilla guatemalteca (Tecia solanivora) y del verdeo; manejo PREVENTIVO de la gota con caldo bordelés al 1% y Bacillus subtilis alternados antes de las lluvias (nunca como cura una vez establecida); Trichoderma harzianum al suelo contra Rhizoctonia y sarna polvosa; y asociación con caléndula y tagetes para repeler insectos y nematodos. La papa enseña la lección central de la soberanía alimentaria andina: la inmensa diversidad de variedades nativas (más de 4.000 en los Andes) es el seguro biológico frente a plagas y cambio climático, y su erosión por el monocultivo de pocas variedades comerciales es un riesgo real. Fuentes Tier A: AGROSAVIA Manual Tubérculos Andinos 2017, Núñez-Rodríguez 2024 UNAL, Pérez-Rodríguez-Gómez 2008, ICA Resolución 3168/2015, GBIF Backbone, POWO Kew.",
+  "feeding_plan_markdown": "### Plan de alimentación\n\nFuente: AGROSAVIA Manual tubérculos andinos (2017) + Pérez-Rodríguez-Gómez (2008) — plan agroecológico de transición para papa de año clima frío 2500-3200 msnm. Énfasis preventivo contra gota (Phytophthora infestans).\n\n- D+0: Aplicar bocashi al surco a la siembra · bocashi · 300 g — Surco preparado 0-20 cm. Tubérculo-semilla certificado pre-brotado. Suelo bien drenado; evitar encharcamiento (favorece Phytophthora y Ralstonia).\n- D+25: Inocular Trichoderma harzianum al suelo · trichoderma_harzianum_suelo · 15 g — Preventivo Rhizoctonia solani y Spongospora subterranea. Coincide con emergencia/inicio vegetativo.\n- D+45: Primer aporque + drench con humus líquido · humus_liquido · 200 ml — Dilución 1:5. Aporque alto fundamental: cubre estolones, protege tubérculos de la luz (evita verdeo/solanina) y de la polilla Tecia, y mejora drenaje. Inicio de tuberización.\n- D+60: Foliar preventivo de gota con caldo bordelés · caldo_bordeles · 100 ml — Concentración 1%. PREVENTIVO de Phytophthora infestans — NUNCA curativo. Iniciar antes de la primera lluvia persistente y repetir cada 10-14 días en condición de niebla/lluvia. El Cu deja residuo: alternar con Bacillus subtilis foliar y reducir frecuencia en seco.\n- D+75: Foliar con Bacillus subtilis (alternar con bordelés) · bacillus_subtilis_foliar · 80 ml — Antagonista preventivo de Phytophthora y Alternaria; reduce dependencia del cobre. Aplicar al atardecer.\n- D+90: Foliar con supermagro durante llenado de tubérculo · supermagro · 60 ml — Dilución 1:15. K crítico para engrose de tubérculo y materia seca. Etapa de máxima demanda hídrica y de potasio.\n- D+130: Suspender riego para madurar la piel · biofertilizante no especificado · dosis no especificada — Reducir riego 80% las últimas 3 semanas. Piel madura = mejor conservación y menor pudrición post-cosecha. Cosecha 150-180 días. Curar tubérculos a la sombra 1-2 semanas antes de almacenar.",
+  "companions_markdown": "### Especies asociadas favorables\n\nEstas especies favorecen el cultivo cuando se siembran cerca:\n- calendula_officinalis — Caléndula (Calendula officinalis L.)\n- lupinus_mutabilis — Chocho / Tarwi (Lupinus mutabilis Sweet)\n- phaseolus_vulgaris — Frijol arbustivo / voluble (Phaseolus vulgaris L.)\n- oxalis_tuberosa — Oca / Hibia (Oxalis tuberosa Molina)\n- ullucus_tuberosus — Ulluco / Chugua (Ullucus tuberosus Caldas)",
+  "sources": [
+    {
+      "id": "agrosavia-manual-tuberculos-andinos-2017",
+      "title": "agrosavia-manual-tuberculos-andinos-2017",
+      "tier": "A",
+      "url": null
+    },
+    {
+      "id": "nustez-rodriguez-2024-unal",
+      "title": "nustez-rodriguez-2024-unal",
+      "tier": "A",
+      "url": null
+    },
+    {
+      "id": "perez-rodriguez-gomez-2008",
+      "title": "perez-rodriguez-gomez-2008",
+      "tier": "A",
+      "url": null
+    },
+    {
+      "id": "ica-resolucion-3168-2015",
+      "title": "ica-resolucion-3168-2015",
+      "tier": "A",
+      "url": null
+    },
+    {
+      "id": "gbif-taxonomic-backbone",
+      "title": "gbif-taxonomic-backbone",
+      "tier": "A",
+      "url": "https://www.gbif.org/dataset/d7dddbf4-2cf0-4f39-9b2a-bb099caae36c"
+    },
+    {
+      "id": "powo-kew",
+      "title": "powo-kew",
+      "tier": "A",
+      "url": "https://powo.science.kew.org"
+    }
+  ],
+  "_generated_by": "scripts/build-cycle-content-from-catalog.mjs",
+  "_generated_at": "2026-09-03T07:40:20.311Z"
+}
