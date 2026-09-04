@@ -51,6 +51,11 @@
       "id": "src/components/lotes/LoteCroquisPlaceholder.jsx",
       "reason": "Andamiaje declarado transitorio por su propio encabezado: será reemplazado por el canvas real de dibujo (Leaflet + herramienta de polígono/punto). Su valor hoy es la capa de datos ya cableada (useLoteStore + loteService) que documenta el contrato del croquis; no debe montarse como UI final. Decisión tanda 1 del drenaje (095).",
       "date": "2026-09-04"
+    },
+    {
+      "id": "src/components/dashboard/ValleHoverConfirm.jsx",
+      "reason": "Rescatado de un worktree huérfano del 27-ago (PR #3132) con el hunk de FincaVivaHero.jsx sin aplicar. Auditado al integrar: PR #3051 (2026-08-29) ya trajo ValleHomeGateway, que envuelve la MISMA fvh-escena-wrap con el mismo flujo hover/touch → teaser de 3 frames (VALLE_TEASER_FRAMES) → diálogo de confirmación → TransicionNewDonk → navegar a valle3d, y sigue vivo en dev (PR #3112, 2026-09-03, le sacó el voseo). Aplicar el hunk hoy anidaría dos capas de hover-confirm sobre la misma región: UI duplicada y rota. Se declara huérfano a propósito; el componente y su test quedan en el árbol por si se necesita comparar la implementación, pero NO se monta. Decisión de integración del rescate de worktrees (2026-09-04).",
+      "date": "2026-09-04"
     }
   ],
   "exports": [],

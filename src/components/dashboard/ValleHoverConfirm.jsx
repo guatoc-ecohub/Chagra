@@ -42,6 +42,12 @@ function useReducedMotion() {
  * La capa que aparece sobre la escena ya existente de FincaVivaHero. No anima
  * ni sustituye la finca: solo muestra los tres cuadros reales tras un gesto de
  * intención y pide confirmar antes de iniciar el viaje.
+ *
+ * @param {object} props
+ * @param {boolean} [props.active] hover o toque activo sobre la escena.
+ * @param {Function} [props.onDismiss] se llama al cancelar el diálogo.
+ * @param {Function} [props.onDialogOpenChange] notifica si el diálogo de confirmación está abierto.
+ * @param {Function} [props.onNavigate] navegación de la app; sin ella cae al evento chagraNavigate.
  */
 export default function ValleHoverConfirm({ active, onDismiss, onDialogOpenChange, onNavigate }) {
   const [dialogOpen, setDialogOpen] = useState(false);

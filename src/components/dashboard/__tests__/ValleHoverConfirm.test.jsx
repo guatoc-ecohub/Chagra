@@ -22,7 +22,7 @@ describe('ValleHoverConfirm', () => {
 
     rerender(<ValleHoverConfirm active onNavigate={vi.fn()} />);
     expect(screen.getByTestId('valle-hover-confirm')).toBeInTheDocument();
-    expect(screen.getAllByRole('img', { hidden: true })).toHaveLength(3);
+    expect(screen.getAllByAltText('')).toHaveLength(3);
     expect(screen.getByRole('button', { name: 'Entrá al valle 3D' })).toBeInTheDocument();
   });
 
