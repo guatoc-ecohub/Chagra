@@ -1,4 +1,4 @@
-import { readdirSync, statSync, lstatSync, existsSync } from 'node:fs';
+import { readdirSync, statSync, lstatSync, existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 
 const DIST = join(import.meta.dirname, '..', 'dist');
@@ -57,7 +57,26 @@ const LAZY_EXCLUDED_PREFIXES = [
 // vitrina de avatar. Rolldown lo emite como un archivo común en assets/, no
 // bajo una carpeta propia, por eso se excluye por prefijo de nombre igual que
 // vendor-three: cache-on-use, nunca parte del arranque 2D.
-const LAZY_EXCLUDED_ASSET_PREFIXES = ['creatures-'];
+//
+// ARTE DE TRAZADO EN TINTA (gate 087, 2026-09-03): los chunks de la familia
+// trazado — JaguarTrazado-, trazadoCreature- (payloads SVG compartidos por
+// los rigs), ChivitoTrazado-, …— son DATO, no código: SVG generado por
+// scripts/trazar-lamina.sh ("huesos reales, piel dibujada"), inherentemente
+// >500KB y NO degradable por presupuesto. Están excluidos del techo de
+// arranque PORQUE SON LAZY DE VERDAD, no porque pesen: verificado midiendo el
+// cierre estático de index.html → main-* en el dist (ver _gate/087/) — solo
+// son alcanzables por import() dinámico (React.lazy por especie del
+// dispatcher de avatar + rutas 3D), así que se cargan cache-on-use al montar
+// el avatar/escena elegida y no bloquean el arranque.
+//
+// La exclusion es por FAMILIA (regex), no por nombre literal: los chunks se
+// llaman como su módulo fuente y cada rename o criatura nueva rompía la lista
+// literal — exactamente lo que dejó la base en rojo (`JaguarTrazado-` y
+// `creatures-` exceptuados, `trazadoCreature-` no). El patrón exige prefijo
+// camelCase sin guiones para no tragarse por accidente otros
+// "…-trazado-…" que no sean arte.
+const FAMILIA_TRAZADO_RE = /^[a-z]*trazado/i;
+const LAZY_EXCLUDED_ASSET_PREFIXES = ['creatures-', FAMILIA_TRAZADO_RE];
 
 function formatSize(bytes) {
   if (bytes < 1024) return `${bytes} B`;
@@ -68,7 +87,52 @@ function formatSize(bytes) {
 function isLazyExcluded(fullPath) {
   if (LAZY_EXCLUDED_PREFIXES.some((p) => fullPath === p || fullPath.startsWith(p + '/'))) return true;
   const assetName = fullPath.startsWith(ASSETS + '/') ? fullPath.slice(ASSETS.length + 1) : '';
-  return LAZY_EXCLUDED_ASSET_PREFIXES.some((prefix) => assetName.startsWith(prefix));
+  return LAZY_EXCLUDED_ASSET_PREFIXES.some((prefix) =>
+    typeof prefix === 'string' ? assetName.startsWith(prefix) : prefix.test(assetName)
+  );
+}
+
+/* ── Verificación lazy-vs-grafo (gate 087) ─────────────────────────────────
+ * Una exclusión "lazy" que mienta es peor que un gate roto: en la base la
+ * allowlist decía "lazy" mientras el chunk EAGER en el arranque (por eso el
+ * rojo de trazadoCreature-). Esta función calcula el CIERRE ESTÁTICO de
+ * arranque del dist real — index.html → entry <script type=module> (+ sus
+ * <link rel=modulepreload>) → imports estáticos transitivos — para que
+ * checkBudget() pueda VERIFICAR que ningún chunk exceptuado como lazy
+ * aparezca ahí. Si un refactor futuro vuelve a enganchar el arte al
+ * arranque, el gate falla con un mensaje preciso en vez de aprobar en falso.
+ *
+ * Formato asumido del bundler (rolldown-vite, verificado 2026-09-03):
+ * `…from"./chunk-hash.js"` y `import"./chunk-hash.js"` son estáticos; los
+ * dinámicos (`import("./x")`) y las listas de strings de __vite__mapDeps no
+ * matchean. Solo sigue .js (el CSS viaja con el chunk que lo importa). */
+function computeStartupClosure() {
+  const html = readFileSync(join(DIST, 'index.html'), 'utf8');
+  const entry = html.match(/<script[^>]*type="module"[^>]*src="\/?(assets\/[^"]+)"/);
+  if (!entry) {
+    throw new Error('perf-budget: no se encontró el entry module en dist/index.html — no se puede verificar la exclusión lazy');
+  }
+  const starts = [entry[1]];
+  for (const m of html.matchAll(/<link[^>]*rel="modulepreload"[^>]*href="\/?(assets\/[^"]+)"/g)) {
+    starts.push(m[1]);
+  }
+  const STATIC_IMPORT_RE = /(?:from|import)"\.\/([^"]+\.js)"/g;
+  const seen = new Set();
+  const queue = starts.map((p) => p.slice('assets/'.length)).filter((f) => existsSync(join(ASSETS, f)));
+  while (queue.length) {
+    const c = queue.pop();
+    if (seen.has(c)) continue;
+    seen.add(c);
+    const src = readFileSync(join(ASSETS, c), 'utf8');
+    for (const m of src.matchAll(STATIC_IMPORT_RE)) {
+      if (!seen.has(m[1]) && existsSync(join(ASSETS, m[1]))) queue.push(m[1]);
+    }
+  }
+  if (seen.size < 10) {
+    // Fail-closed: si el grafo no parsea, NO aprobamos las exclusiones.
+    throw new Error(`perf-budget: grafo de arranque no parseable (${seen.size} chunks) — revisar el formato de imports del bundler`);
+  }
+  return seen;
 }
 
 function getDirSizeRaw(dir) {
@@ -138,13 +202,39 @@ function checkBudget() {
   // three.js es inherentemente ~1MB; el 3D va perezoso (vendor-three) y solo lo paga
   // quien entra a un mundo 3D. La regla por-chunk de 500KB es para pillar bloat
   // ACCIDENTAL en chunks eager, no la separación deliberada del vendor 3D.
-  // Baseline del reland Compai: el trazado JaguarTrazado es el arte aprobado
-  // compartido por los avatares, y su chunk ya existía en el conjunto que se
-  // vuelve a aterrizar. Se conserva la alerta para chunks nuevos.
-  const CHUNK_ALLOWLIST = [/^vendor-three-/, /^JaguarTrazado-/, /^creatures-/];
+  //
+  // FAMILIA TRAZADO (gate 087): exceptuada PORQUE es lazy, no porque pese —
+  // el arte de tinta en SVG se paga solo al montar el avatar/escena elegida
+  // (ver comentario de FAMILIA_TRAZADO_RE arriba y _gate/087/INFORME-087.md
+  // por la evidencia del grafo de arranque). Patrón por familia, no por
+  // literal: la base exceptuaba "JaguarTrazado-" y se cayó cuando el payload
+  // compartido salió como "trazadoCreature-" — cada rename rompía la lista.
+  // Un chunk NUEVO que no sea de esta familia sigue cazado por la regla.
+  const CHUNK_ALLOWLIST = [/^vendor-three-/, /^creatures-/, FAMILIA_TRAZADO_RE];
   for (const { file, size } of chunkSizes) {
     if (size > THRESHOLDS.chunkMax && !CHUNK_ALLOWLIST.some((re) => re.test(file))) {
       errors.push('CHUNK "' + file + '" exceeds 500KB: ' + formatSize(size));
+    }
+  }
+
+  // Verificación de las EXCLUSIONES lazy contra el grafo de arranque real
+  // (gate 087): toda familia exceptuada como "lazy" (vendor-three, creatures,
+  // trazado) debe estar FUERA del cierre estático de index.html → main-*. Si
+  // aparece, la exclusión es mentira y el gate lo dice — es el modo de fallo
+  // exacto que dejó la base en rojo (allowlist "lazy", chunk EAGER).
+  const startupClosure = computeStartupClosure();
+  const FAMILIAS_LAZY_VERIFICADAS = [
+    ['vendor-three', (f) => f.startsWith('vendor-three-')],
+    ['creatures', (f) => f.startsWith('creatures-')],
+    ['trazado', (f) => FAMILIA_TRAZADO_RE.test(f)],
+  ];
+  for (const f of startupClosure) {
+    const familia = FAMILIAS_LAZY_VERIFICADAS.find(([, test]) => test(f));
+    if (familia) {
+      errors.push(
+        'LAZY MENTIRA: "' + f + '" (familia ' + familia[0] + ', exceptuada como lazy) ' +
+        'aparece como import estático del arranque — sacarlo del grafo eager o corregir la exclusión',
+      );
     }
   }
 
@@ -154,6 +244,11 @@ function checkBudget() {
   }
   console.log('Main bundle: ' + formatSize(mainBundleSize));
   console.log('Chunk count: ' + chunkSizes.length);
+  const lazyMentira = errors.filter((e) => e.startsWith('LAZY MENTIRA')).length;
+  console.log(
+    'Grafo de arranque verificado: ' + startupClosure.size + ' chunks estáticos' +
+    (lazyMentira ? ' — ' + lazyMentira + ' familia(s) lazy EN el arranque (arriba)' : ' (ninguna familia lazy presente)'),
+  );
 
   if (errors.length > 0) {
     console.error('\nBUDGET EXCEEDED:\n' + errors.map(e => '  - ' + e).join('\n'));

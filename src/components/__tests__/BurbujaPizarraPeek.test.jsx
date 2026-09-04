@@ -1,8 +1,9 @@
 /**
  * BurbujaPizarraPeek.test.jsx — el asomo (peek) del compai como PIZARRA de
- * colegio (rediseño 2026-08-27; reemplaza el asomo de madera desaprobado por el
- * operador). El toque muestra el último aviso en tiza con tres controles claros
- * Ver / Escuchar / Callar, y "Más opciones" cuando el FAB lo permite.
+ * colegio (rediseño 2026-08-27 v2; reemplaza el asomo de madera desaprobado y
+ * el typewriter que mareaba). El toque muestra el último aviso en tiza,
+ * ESTÁTICO (aparece y se queda quieto), con tres controles claros Ver /
+ * Escuchar / Callar, y "Más opciones" cuando el FAB lo permite.
  *
  * Español de Colombia (usted), sin voseo.
  */
@@ -26,13 +27,33 @@ describe('BurbujaPizarraPeek', () => {
       />,
     );
     expect(screen.getByTestId('compai-fab-peek')).toBeInTheDocument();
-    // El texto lo escribe Typewriter (varios spans: molde/tinta/sr) → getAllByText.
+    // ESTÁTICO y SIN DUPLICADO: el aviso está UNA sola vez en el DOM (no hay
+    // molde/tinta del typewriter que lo repitan).
     expect(
-      screen.getAllByText('En su zona se espera lluvia mañana en la tarde.').length,
-    ).toBeGreaterThan(0);
+      screen.getAllByText('En su zona se espera lluvia mañana en la tarde.'),
+    ).toHaveLength(1);
     expect(screen.getByRole('button', { name: /Ver el mensaje completo/i })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /Escuchar este aviso en voz alta/i })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /Que se quede callado/i })).toBeInTheDocument();
+  });
+
+  it('el aviso es ESTÁTICO: texto completo de una vez, sin máquina de escribir', () => {
+    const msg = 'Revise la helada de esta noche en su parcela alta.';
+    const { container } = render(
+      <BurbujaPizarraPeek
+        mensaje={msg}
+        onVer={noop}
+        onEscuchar={noop}
+        onCallar={noop}
+        onCerrar={noop}
+      />,
+    );
+    // No existe el primitivo Typewriter (ni su contenedor) en el asomo.
+    expect(container.querySelector('.typewriter')).toBeNull();
+    // El aviso está COMPLETO desde el primer render (no se revela letra a letra).
+    const texto = container.querySelector('.burbuja-pizarra-peek__texto');
+    expect(texto).not.toBeNull();
+    expect(texto.textContent).toBe(msg);
   });
 
   it('invoca cada control', () => {
@@ -113,7 +134,7 @@ describe('BurbujaPizarraPeek', () => {
     render(
       <BurbujaPizarraPeek mensaje="" onVer={noop} onEscuchar={noop} onCallar={noop} onCerrar={noop} />,
     );
-    expect(screen.getAllByText(/Estoy pendiente de su chagra/i).length).toBeGreaterThan(0);
+    expect(screen.getAllByText(/Estoy pendiente de su chagra/i)).toHaveLength(1);
     expect(screen.queryByText(/tablero|pizarra|madera/i)).toBeNull();
   });
 });

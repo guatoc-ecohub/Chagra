@@ -1,11 +1,4 @@
 import { lazy, Suspense } from 'react';
-import ChagraAgentAvatarAngelita from './ChagraAgentAvatarAngelita';
-import ChagraAgentAvatarZariguya from './ChagraAgentAvatarZariguya';
-import ChagraAgentAvatarJaguar from './ChagraAgentAvatarJaguar';
-import ChagraAgentAvatarOsoBaston from './ChagraAgentAvatarOsoBaston';
-import ChagraAgentAvatarLuciernaga from './ChagraAgentAvatarLuciernaga';
-import ChagraAgentAvatarGuacamaya from './ChagraAgentAvatarGuacamaya';
-import ChagraAgentAvatarChivitoPunk from './ChagraAgentAvatarChivitoPunk';
 import useAgentAvatarType from '../hooks/useAgentAvatarType.js';
 import CompaiAgente from '../visual/agente/CompaiAgente.jsx';
 import {
@@ -60,16 +53,6 @@ import { estadoCanonico } from '../visual/agente/angelitaEstados.js';
  * qué perfil está activo. Un slug inválido usa el perfil seguro de Angelita;
  * los siete slugs registrados tienen adaptador y no tienen fallback propio.
  */
-const ADAPTADORES_DEV = {
-    angelita: ChagraAgentAvatarAngelita,
-    zariguya: ChagraAgentAvatarZariguya,
-    jaguar: ChagraAgentAvatarJaguar,
-    'oso-baston': ChagraAgentAvatarOsoBaston,
-    luciernaga: ChagraAgentAvatarLuciernaga,
-    guacamaya: ChagraAgentAvatarGuacamaya,
-    'chivito-punk': ChagraAgentAvatarChivitoPunk,
-};
-
 /* Los adaptadores 2D conservan el contrato síncrono en tests/dev, donde los
    callers históricos inspeccionan el SVG en el mismo tick. En producción se
    cargan después del shell y cada rig queda fuera del chunk de arranque. */
@@ -82,6 +65,21 @@ const ADAPTADORES_PROD = {
     guacamaya: lazy(() => import('./ChagraAgentAvatarGuacamaya.jsx')),
     'chivito-punk': lazy(() => import('./ChagraAgentAvatarChivitoPunk.jsx')),
 };
+
+/* Gate 087 — el mapa DEV síncrono vive en su PROPIO módulo y solo se alcanza
+   por esta rama, muerta en build de prod (`import.meta.env.PROD` se resuelve
+   a `true` → rolldown elimina la rama y su dynamic import). Antes los
+   imports estáticos de ese mapa vivían aquí mismo y el bundler no podía
+   podarlos (sin `sideEffects` en package.json, la cadena arrastra CSS y
+   payloads SVG top-level), con lo que los 7 rigs de tinta (~3 MB) caían al
+   grafo de arranque aunque esta rama nunca corriera en prod. En dev/test el
+   top-level await resuelve antes de montar la app: el contrato síncrono de
+   los tests no cambia. Evidencia: _gate/087/INFORME-087.md. */
+let ADAPTADORES_DEV = null;
+if (!import.meta.env.PROD) {
+    const { ADAPTADORES_SYNC } = await import('./ChagraAgentAvatarAdaptadoresSync.js');
+    ADAPTADORES_DEV = ADAPTADORES_SYNC;
+}
 
 const ADAPTADOR_POR_ESPECIE = import.meta.env.PROD ? ADAPTADORES_PROD : ADAPTADORES_DEV;
 

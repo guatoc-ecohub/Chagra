@@ -376,6 +376,31 @@ describe('sidecarClient — feature flag on', () => {
         tool: 'get_calendario_siembra',
       });
     });
+
+    it('BUG-03 raiz: piso_termico con tilde ("frío", lo que devuelve pisoTermicoFromAltitud a 2200 msnm) se normaliza antes de salir — evita el 502 real', async () => {
+      // Repro exacto del bug reportado: "¿Cuánto rinde la rúcula y cómo la
+      // siembro a 2200 msnm?" -> pisoTermicoFromAltitud(2200) = 'frío' (CON
+      // tilde). Confirmado en vivo contra el sidecar real (127.0.0.1:7880,
+      // 2026-09-03): 'frío' sin normalizar -> 502 mcp_call_failed
+      // (invalid_enum_value, Zod). Este mock representa la respuesta 200 real
+      // que da el mismo endpoint una vez el body llega normalizado a 'frio'.
+      fetchMock.mockResolvedValueOnce(jsonResponse(200, {
+        mes: 9,
+        mes_nombre: 'septiembre',
+        piso_termico: 'frio',
+        cultivos: [{ species_id: 'phaseolus_vulgaris', common_name: 'fríjol cargamanto', estado: 'optimo' }],
+        source: 'hardcoded_v1',
+      }));
+      const { callTool } = await importFresh();
+      const res = await callTool('get_calendario_siembra', { piso_termico: 'frío' });
+      expect(res).not.toHaveProperty('_error');
+      expect(res.piso_termico).toBe('frio');
+      const [, opts] = fetchMock.mock.calls[0];
+      // El body que SALE debe llevar el valor ya normalizado — si esta
+      // aserción falla (vuelve a viajar 'frío' con tilde) es exactamente el
+      // bug reportado: el sidecar real lo rechazaría con 502.
+      expect(JSON.parse(opts.body)).toEqual({ piso_termico: 'frio' });
+    });
   });
 
   describe('configuración / base URL', () => {
@@ -1204,8 +1229,12 @@ describe('sidecarClient — companionSpeciesGuard post-LLM', () => {
   });
 
   it('200 con bloque de correccion → normaliza has_companion_species y system_prompt_block', async () => {
+    // Shape REAL del servidor (chagra-pro server.ts + companion-species-guard.ts,
+    // verificado en vivo contra el sidecar 2026-09-03): el campo es
+    // `has_fabricated_species`, NO `has_companion_species`.
     fetchMock.mockResolvedValueOnce(jsonResponse(200, {
-      has_companion_species: true,
+      has_fabricated_species: true,
+      detection_tier: 'clasificacion_incorrecta',
       system_prompt_block: '[CORRECCION] La especie companera correcta es X.',
       reason: 'catalog_match',
     }));
@@ -1221,7 +1250,23 @@ describe('sidecarClient — companionSpeciesGuard post-LLM', () => {
     expect(url).toBe('/api/mcp/agro/companion-species-guard');
     expect(opts.method).toBe('POST');
     const body = JSON.parse(opts.body);
-    expect(body).toEqual({ response_text: 'respuesta del agente ya generada' });
+    // BUG-04: el sidecar exige `agent_response` (ver server.ts linea ~1889:
+    // "Recibe { agent_response, piso_termico? }"). `response_text` (el
+    // nombre previo) responde 400 `{error:"agent_response required"}` en
+    // CADA turno -- confirmado en vivo 2026-09-03.
+    expect(body).toEqual({ agent_response: 'respuesta del agente ya generada' });
+  });
+
+  it('BUG-04 control negativo: el servidor real rechaza response_text con 400 y el guard degrada a null', async () => {
+    // Espeja el 400 real del sidecar (`{error:"agent_response required"}`)
+    // que se ve si el contrato del cliente sigue mandando el campo viejo.
+    // Prueba que, ante ese 400, companionSpeciesGuard degrada limpio a null
+    // (postJson: non-2xx -> null) en vez de romper el turno -- la salvaguarda
+    // queda "muerta en silencio", que es justo el sintoma reportado.
+    fetchMock.mockResolvedValueOnce(jsonResponse(400, { error: 'agent_response required' }));
+    const { companionSpeciesGuard } = await importFresh();
+    const res = await companionSpeciesGuard('respuesta del agente ya generada');
+    expect(res).toBeNull();
   });
 
   it('degrada a null si el endpoint cae o no responde 2xx', async () => {

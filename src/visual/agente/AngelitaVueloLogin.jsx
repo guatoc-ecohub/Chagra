@@ -1,7 +1,6 @@
 import { useLayoutEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { Angelita } from './Angelita.jsx';
-import BurbujaAngelita from './BurbujaAngelita.jsx';
 import './angelita-vuelo-login.css';
 
 /*
@@ -12,12 +11,25 @@ import './angelita-vuelo-login.css';
  * y solo cambia de ancla cuando la brecha de CirculoRotoMilpa está abierta.
  * La posición de origen se mide en viewport para que el vuelo siga siendo
  * correcto si la pantalla de login se desplazó antes de los 9 segundos.
+ *
+ * RETIRADO (2026-09-03, feedback_pizarra_unico_aviso_compai): la burbuja
+ * `<BurbujaAngelita>` con el mensaje de bienvenida que aparecía DURANTE el
+ * vuelo se quitó — era un TERCER formato de aviso (además de la pizarra y el
+ * viejo aviso rico del FAB), y encima se anunciaba a sí misma ("Bienvenido a
+ * su chagra superpersona...") en vez de dar ayuda real: de los 5 mensajes de
+ * `loginAngelitaMensajes.js` solo el primero tenía copy, los otros 4 eran
+ * placeholders `[TODO copy operador]` sin terminar — ver ese archivo. Nada se
+ * migró a la pizarra: no hay compai-puesto/FAB en el login (es pre-auth), y
+ * el saludo era decorativo, no información operativa que el usuario
+ * necesite. Angelita SIGUE volando y aterrizando igual — se le tocó el
+ * aviso, no a ella. El prop `mensaje` se quitó de la firma junto con la
+ * burbuja (LoginScreen ya no lo pasa); si el login necesita en el futuro un
+ * texto accesible, que sea un aria-label, no un globo nuevo.
  */
 export default function AngelitaVueloLogin({
   volando = false,
   asentada = false,
   origen = null,
-  mensaje = null,
   estado = 'acompana',
   animated = true,
   aura = false,
@@ -70,13 +82,6 @@ export default function AngelitaVueloLogin({
         lineBoil={volando}
         title="Angelita, compañera de Chagra"
       />
-      {volando && mensaje && (
-        <BurbujaAngelita
-          mensaje={mensaje}
-          tipo="informativa"
-          className="login-angelita-burbuja"
-        />
-      )}
     </span>
   );
 

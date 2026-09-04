@@ -54,9 +54,13 @@ export const RUTA_HINTS = {
     descripcion: 'Aquí actualiza su ubicación, el tipo de finca, el compai que le acompaña y preferencias como la letra grande.',
   },
   // ── Hoy / evolución ────────────────────────────────────────────
+  // descripcion ampliada 2026-09-03 (feedback_pizarra_unico_aviso_compai):
+  // recoge las 3 explicaciones que daba <AngelitaGuia> en su paseo autónomo
+  // por esta pantalla (alertas/tareas/accesos, retirado — ver
+  // HoyEnFincaScreen.jsx) para que se sigan leyendo, ahora en la pizarra.
   hoy_finca: {
     titulo: 'Hoy en la finca',
-    descripcion: 'Lo que importa hoy: el clima, las alertas de plagas de su zona y las tareas que conviene hacer en estos días.',
+    descripcion: 'Lo que importa hoy: le aviso apenas algo necesite su atención (helada, plaga, clima raro) — toque la alerta para preguntarme qué hacer. Las tareas siguen la etapa real de sus cultivos, no un calendario genérico. Y desde aquí registra por voz lo que va pasando: entre más anote, mejor la acompaño.',
   },
   evolucion: {
     titulo: 'Cómo va su finca',

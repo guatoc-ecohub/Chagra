@@ -162,6 +162,29 @@ export function decomposeComplexIngest(text, options = {}) {
 }
 
 /**
+ * Etiqueta humana de una operación del plan, compartida por el mensaje de
+ * resumen de AgentScreen y por el gate de confirmación (ActionConfirmModal),
+ * para que el operador lea «la cosecha 2» y no un volcado JSON crudo.
+ *
+ * Control negativo: un kind desconocido devuelve el kind tal cual (nunca
+ * inventa una etiqueta) y una operación inválida devuelve undefined sin
+ * lanzar, para que el modal nunca quede en blanco por un plan parcial.
+ *
+ * @param {{kind?: string, parameters?: object}|null|undefined} operation
+ * @returns {string|undefined}
+ */
+export function describeComplexIngestOperation(operation) {
+  switch (operation?.kind) {
+    case 'ensure_land': return 'el surco';
+    case 'create_seeding': return 'la siembra retrofechada';
+    case 'register_harvest': return `la cosecha ${operation?.parameters?.ordinal}`;
+    case 'register_fertilizer_cadence': return `el abono cada ${operation?.parameters?.interval_days} días`;
+    case 'register_problem': return `la observación de ${operation?.parameters?.name}`;
+    default: return operation?.kind;
+  }
+}
+
+/**
  * Ejecuta secuencialmente propuestas ya confirmadas a través del executor
  * existente. La UI conserva el gate porque cada propuesta lleva la marca de
  * confirmación y `executeAction` abre el modal para sus herramientas write.
@@ -228,6 +251,9 @@ export async function persistComplexIngest(plan, { operatorId = 'operator', now 
         result = await createLote({ name: params.name, landType: params.land_type || 'bed' });
         context.landId = result.id;
       } else if (operation.kind === 'create_seeding') {
+        // La anotación conserva el literal 'farm_process' en `type` (sin ella
+        // tsc lo ensancha a string y FarmProcess exige el literal).
+        /** @type {import('../types/farmProcess').FarmProcess} */
         const process = {
           process_id: newUlid(),
           type: 'farm_process',
