@@ -165,13 +165,17 @@ export function muestreadorFacetas(hFn, { ancho, fondo, segX, segZ }) {
 
 /**
  * Curvas de nivel por marching squares sobre `hFn`, encadenadas en polilíneas.
+ * @param {(x:number,z:number)=>number} hFn  altura del macizo
+ * @param {number} nivel  cota de la curva: se traza donde hFn(x,z) == nivel
+ * @param {{x0:number, x1:number, z0:number, z1:number, paso?:number}} opts  ventana de muestreo en coords de mundo y paso de la grilla (requerida: sin ella la grilla es NaN)
  * @returns {Array<Array<[number,number]>>} polilíneas [wx, wz]
  */
-export function contornoNivel(hFn, nivel, { x0, x1, z0, z1, paso = 0.08 } = {}) {
+export function contornoNivel(hFn, nivel, { x0, x1, z0, z1, paso = 0.08 }) {
   const nx = Math.ceil((x1 - x0) / paso) + 1, nz = Math.ceil((z1 - z0) / paso) + 1;
   const g = new Float32Array(nx * nz);
   for (let iz = 0; iz < nz; iz++) for (let ix = 0; ix < nx; ix++) g[iz * nx + ix] = hFn(x0 + ix * paso, z0 + iz * paso) - nivel;
   const segs = [];
+  /** @returns {[number, number]} punto de corte [wx, wz] */
   const lerpP = (xa, za, va, xb, zb, vb) => { const t = va / (va - vb); return [xa + (xb - xa) * t, za + (zb - za) * t]; };
   for (let iz = 0; iz < nz - 1; iz++) for (let ix = 0; ix < nx - 1; ix++) {
     const x = x0 + ix * paso, z = z0 + iz * paso;
