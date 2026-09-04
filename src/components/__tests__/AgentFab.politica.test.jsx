@@ -2,10 +2,20 @@
  * AgentFab.politica.test.jsx — política dura del compai 2D
  * (POLITICA-COMPAI-COMPORTAMIENTO-2D-3D.md, unificación 2026-08-23):
  *   R2 — se ATENÚA cuando el usuario interactúa con la pantalla.
- *   R3 — ENSEÑA en idle (hint contextual de la ruta, plegado del CompaiOverlay),
- *        respetando silencio.
- *   R4 — al tocarlo, el menú ofrece "Ver" (leer el mensaje/panel).
- *   R5 — el mensaje ADAPTADO (respuesta lista) se pinta como burbuja de AVISO.
+ *   R3/R5 — RETIRADAS (2026-09-03, feedback_pizarra_unico_aviso_compai): las
+ *        burbujas AUTO-POP "enseña en idle" (R3, hint por ruta) y "aviso rico"
+ *        (R5, mensaje adaptado con tipo/ánimo) competían con la pizarra —
+ *        orden dura del operador: "el único que debe salir en toda la app es
+ *        la pizarra, no más elementos para compai en ese sentido". Se
+ *        retiraron los DOS render blocks y su testid (`compai-fab-hint`,
+ *        `compai-fab-aviso`) — el contenido NO se perdió: sigue siendo
+ *        exactamente lo que `contenidoPanel` calcula (mensaje vivo → última
+ *        respuesta → hint de ruta), que es lo que `BurbujaPizarraPeek`
+ *        muestra al TOCAR el compai (ver describe "R4" abajo). Este archivo
+ *        prueba ahora que (a) esos testids nunca aparecen sin que el usuario
+ *        toque nada, y (b) la información sigue alcanzable por el peek.
+ *   R4 — al tocarlo, ASOMA el peek de pizarra (BurbujaPizarraPeek); su "Ver"
+ *        abre el panel de lectura.
  *
  * Español de Colombia (usted), sin voseo.
  */
@@ -35,27 +45,27 @@ beforeEach(() => {
 });
 afterEach(cleanup);
 
-describe('AgentFab — R3 enseña en idle', () => {
-  it('en reposo muestra la burbuja de enseñanza con el hint de la ruta', () => {
+describe('AgentFab — R3 retirada: sin burbuja de enseñanza AUTO-POP', () => {
+  it('en reposo NO aparece ninguna burbuja sola — solo la pizarra al tocar', () => {
     render(<AgentFab onNavigate={() => {}} pantalla="mapa" />);
-    expect(screen.getByTestId('compai-fab-hint')).toBeInTheDocument();
-    expect(screen.getByText('Su finca en el mapa')).toBeInTheDocument();
+    expect(screen.queryByTestId('compai-fab-hint')).toBeNull();
+    // El hint de la ruta sigue ahí, pero solo se lee TOCANDO el compai (peek,
+    // que muestra la DESCRIPCIÓN del hint; el título vive en el panel "Ver").
+    // El texto lo pinta <Typewriter> en grafemas — se busca por textContent
+    // del contenedor, no por getByText (que exige un solo nodo de texto).
+    fireEvent.click(screen.getByRole('button', { name: /Chagra IA/i }));
+    expect(screen.getByTestId('compai-fab-peek').textContent)
+      .toContain('Toque un lugar para ver el piso térmico');
   });
 
-  it('sin pantalla no fuerza enseñanza (no hay ruta que explicar)', () => {
+  it('sin pantalla tampoco hay burbuja sola (nunca la hubo, ahora es universal)', () => {
     render(<AgentFab onNavigate={() => {}} />);
     expect(screen.queryByTestId('compai-fab-hint')).toBeNull();
   });
 
-  it('silenciado (🔔): NO enseña — respeta la anti-molestia del store', () => {
+  it('silenciado (🔔): sigue sin burbuja sola (el silencio ya no tiene nada que tapar)', () => {
     useAngelitaStore.setState({ silenciado: true });
     render(<AgentFab onNavigate={() => {}} pantalla="mapa" />);
-    expect(screen.queryByTestId('compai-fab-hint')).toBeNull();
-  });
-
-  it('la ✕ oculta la enseñanza por esta entrada', () => {
-    render(<AgentFab onNavigate={() => {}} pantalla="mapa" />);
-    fireEvent.click(screen.getByRole('button', { name: /Ocultar esta ayuda por ahora/i }));
     expect(screen.queryByTestId('compai-fab-hint')).toBeNull();
   });
 });
@@ -85,8 +95,9 @@ describe('AgentFab — política v2: visible 100%, NUNCA se oculta al interactua
 describe('AgentFab — R4 peek "Ver" abre el panel de lectura', () => {
   it('tocar el compai asoma el peek y su "Ver" muestra el panel con el hint', () => {
     render(<AgentFab onNavigate={() => {}} pantalla="mapa" />);
-    // TAP = PEEK (decisión operador 2026-08-27): el toque asoma la burbuja de
-    // madera con el último aviso + Ver/Escuchar/Callar (no un menú).
+    // TAP = PEEK (decisión operador 2026-08-27): el toque asoma la PIZARRA
+    // (BurbujaPizarraPeek, chalk, nunca madera) con el último aviso +
+    // Ver/Escuchar/Callar (no un menú).
     fireEvent.click(screen.getByRole('button', { name: /Chagra IA/i }));
     expect(screen.getByTestId('compai-fab-peek')).toBeInTheDocument();
     fireEvent.click(screen.getByRole('button', { name: /Ver el mensaje completo/i }));
@@ -95,20 +106,25 @@ describe('AgentFab — R4 peek "Ver" abre el panel de lectura', () => {
   });
 });
 
-describe('AgentFab — R5 aviso adaptado visible en prod 2D', () => {
-  it('con respuesta real esperando, pinta el MENSAJE como burbuja de aviso (no solo glow)', () => {
+describe('AgentFab — R5 retirada: el aviso adaptado NO pinta su propia burbuja', () => {
+  it('con respuesta real esperando, NO aparece ninguna burbuja sola — el avatar invita, y el mensaje está en la pizarra al tocar', () => {
     useAgentNotificationStore.setState({
       responseReady: true,
       lastAssistantMessage: 'En su zona se espera lluvia mañana en la tarde.',
     });
     render(<AgentFab onNavigate={() => {}} pantalla="mapa" />);
-    expect(screen.getByTestId('compai-fab-aviso')).toBeInTheDocument();
-    expect(screen.getAllByText('En su zona se espera lluvia mañana en la tarde.').length).toBeGreaterThan(0);
-    // El aviso manda: no se pinta además la enseñanza (una cosa a la vez).
+    // Ni la burbuja rica retirada (R5) ni la de enseñanza (R3): CERO avisos
+    // sueltos. La única señal de "hay algo nuevo" es el propio avatar
+    // (estado 'invita' + .agt-avatar-glow, ver aria-label abajo).
+    expect(screen.queryByTestId('compai-fab-aviso')).toBeNull();
     expect(screen.queryByTestId('compai-fab-hint')).toBeNull();
+    expect(screen.getByRole('button', { name: /tiene respuesta nueva/i })).toBeInTheDocument();
+    // El mensaje NO se perdió: tocar el compai lo muestra en la pizarra.
+    fireEvent.click(screen.getByRole('button', { name: /tiene respuesta nueva/i }));
+    expect(screen.getAllByText('En su zona se espera lluvia mañana en la tarde.').length).toBeGreaterThan(0);
   });
 
-  it('cablea la burbuja rica con tipo y ánimo del compai', () => {
+  it('ya no cablea la burbuja rica por tipo/ánimo (esa riqueza visual murió con R5): la pizarra es sobria para TODO tipo de aviso', () => {
     useAngelitaStore.setState({
       estado: 'aviso',
       visualEstado: 'preocupada',
@@ -120,7 +136,13 @@ describe('AgentFab — R5 aviso adaptado visible en prod 2D', () => {
       lastAssistantMessage: 'Revise la helada de esta noche.',
     });
     const { container } = render(<AgentFab onNavigate={() => {}} pantalla="mapa" />);
-    expect(container.querySelector('.angelita-burbuja--alerta')).toBeInTheDocument();
-    expect(container.querySelector('[data-agt-estado="preocupada"]')).toBeInTheDocument();
+    // Sin BurbujaAngelita montada sola: no hay clase rica `.angelita-burbuja--*`
+    // en el DOM hasta que el usuario toque y abra la pizarra.
+    expect(container.querySelector('.angelita-burbuja--alerta')).toBeNull();
+    fireEvent.click(screen.getByRole('button', { name: /Chagra IA/i }));
+    // Tocar SÍ muestra el mensaje — en la pizarra sobria, sin variante "rica".
+    expect(screen.getByTestId('compai-fab-peek')).toBeInTheDocument();
+    expect(screen.getAllByText('Revise la helada de esta noche.').length).toBeGreaterThan(0);
+    expect(container.querySelector('.angelita-burbuja--alerta')).toBeNull();
   });
 });

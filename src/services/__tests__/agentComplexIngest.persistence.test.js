@@ -22,12 +22,32 @@ describe('persistComplexIngest', () => {
     vi.mocked(createLote).mockResolvedValue({ id: 'land-12', type: 'asset--land' });
     vi.mocked(createFarmProcess).mockImplementation(async (process) => ({
       process,
-      event: { event_id: 'seed-event', type: 'farm_process_event' },
+      event: {
+        event_id: 'seed-event',
+        type: 'farm_process_event',
+        attributes: {
+          process_id: process.process_id,
+          event_type: 'sowing_confirmed',
+          occurred_at: NOW.getTime(),
+          source: 'llm',
+        },
+      },
     }));
     vi.mocked(recordFarmEvent).mockImplementation(async (input) => ({
       event_id: `event-${input.event_type}-${input.idempotency_key}`,
       type: 'farm_process_event',
-      attributes: input,
+      attributes: {
+        process_id: input.process_id,
+        event_type: input.event_type,
+        // occurred_at es requerido por FarmProcessEventAttributes; el
+        // productor real siempre la envía, el mock la respalda con NOW.
+        occurred_at: input.occurred_at ?? NOW.getTime(),
+        actor: input.actor,
+        source: input.source,
+        payload: input.payload,
+        idempotency_key: input.idempotency_key,
+        await_sync: input.await_sync,
+      },
     }));
   });
 

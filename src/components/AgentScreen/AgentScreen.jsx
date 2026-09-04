@@ -35,7 +35,7 @@ import { retrieve } from '../../services/ragRetriever';
 // Se consulta ANTES del pipeline sidecar/LLM: si el texto describe varias
 // acciones de campo, se ejecutan las operaciones confirmadas vía actionExecutor
 // (lote/siembra) y se agenda la sugerencia agroecológica en segundo plano.
-import { decomposeComplexIngest, scheduleAgroecologicalSuggestion } from '../../services/agentComplexIngest';
+import { decomposeComplexIngest, describeComplexIngestOperation, scheduleAgroecologicalSuggestion } from '../../services/agentComplexIngest';
 import { parseIntent, formatIntentDescription } from '../../services/agentIntentParser';
 import { streamOpenAI } from '../../services/openaiStream';
 import { buildLLMRequest, selectChatRoute } from '../../services/llmRouter';
@@ -292,7 +292,9 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
   const [thinkingPhase, setThinkingPhase] = useState(null);
   const [isOnline, setIsOnline] = useState(navigator.onLine);
   const [error, setError] = useState('');
-  const [actionModal, setActionModal] = useState({ isOpen: false, intent: null, llmResponse: '', toolName: '', description: '', parameters: {} });
+  // gateId: id único por acción; el key del ActionConfirmModal remonta el
+  // modal en cada gate (BUG-01). '' = ningún gate abierto todavía.
+  const [actionModal, setActionModal] = useState({ isOpen: false, gateId: '', intent: null, llmResponse: '', toolName: '', description: '', parameters: {} });
   // Task #194: Modal de consentimiento para feedback
   const [feedbackConsentModal, setFeedbackConsentModal] = useState({ isOpen: false, pendingAction: null });
   const ttsSupported = isSupported();
@@ -790,6 +792,12 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
         actionGateResolverRef.current = resolve;
         setActionModal({
           isOpen: true,
+          // gateId: remonta el ActionConfirmModal por acción (key en el JSX).
+          // BUG-01 (P1, hard-test David/Cata): sin esto el modal conservaba el
+          // borrador de parámetros del primer render ({}) y aprobaba la
+          // ejecución de la tool con un plan vacío — el agente decía que
+          // registraba y no persistía nada.
+          gateId: `gate-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
           toolName,
           description,
           parameters,
@@ -872,7 +880,7 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
     const wasEdited = JSON.stringify(params) !== JSON.stringify(actionModal.parameters);
     const resolver = actionGateResolverRef.current;
     actionGateResolverRef.current = null;
-    setActionModal({ isOpen: false, intent: null, llmResponse: '', toolName: '', description: '', parameters: {} });
+    setActionModal({ isOpen: false, gateId: '', intent: null, llmResponse: '', toolName: '', description: '', parameters: {} });
     if (resolver) {
       resolver({
         status: wasEdited ? 'edited' : 'approved',
@@ -884,7 +892,7 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
   const handleActionReject = () => {
     const resolver = actionGateResolverRef.current;
     actionGateResolverRef.current = null;
-    setActionModal({ isOpen: false, intent: null, llmResponse: '', toolName: '', description: '', parameters: {} });
+    setActionModal({ isOpen: false, gateId: '', intent: null, llmResponse: '', toolName: '', description: '', parameters: {} });
     if (resolver) {
       resolver({ status: 'rejected' });
     }
@@ -2975,13 +2983,9 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
       const notRegistered = plan.operations.filter(
         (operation) => !registered.some((item) => item.kind === operation.kind && item.parameters?.ordinal === operation.parameters?.ordinal && item.parameters?.name === operation.parameters?.name),
       );
-      const registeredLabels = registered.map((operation) => {
-        if (operation.kind === 'ensure_land') return 'el surco';
-        if (operation.kind === 'create_seeding') return 'la siembra retrofechada';
-        if (operation.kind === 'register_harvest') return `la cosecha ${operation.parameters.ordinal}`;
-        if (operation.kind === 'register_fertilizer_cadence') return `el abono cada ${operation.parameters.interval_days} días`;
-        return `la observación de ${operation.parameters.name}`;
-      });
+      // Etiquetas legibles compartidas con el gate (ActionConfirmModal) para
+      // que mensaje y confirmación nombren las operaciones igual.
+      const registeredLabels = registered.map(describeComplexIngestOperation);
       const missingTreatment = plan.operations.some(
         (operation) => operation.kind === 'register_problem' && operation.parameters.treatment_status === 'missing',
       );
@@ -4540,8 +4544,11 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
         disabled={state === STATE_RECORDING}
       />
 
-      {/* Action Confirmation Modal — alimentado por actionExecutor gate callback (057.4) */}
+      {/* Action Confirmation Modal — alimentado por actionExecutor gate callback (057.4).
+          key=gateId: remonta por acción para que el borrador de parámetros
+          arranque SIEMPRE con los de esta acción (BUG-01, P1). */}
       <ActionConfirmModal
+        key={actionModal.gateId}
         isOpen={actionModal.isOpen}
         toolName={actionModal.toolName || ''}
         description={actionModal.description || ''}

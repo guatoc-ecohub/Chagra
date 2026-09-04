@@ -108,9 +108,10 @@ const PISOS_FRIOS = new Set(['frio', 'paramo', 'superparamo', 'nival']);
 /**
  * ¿Qué se le dice a ESTE usuario, en SU piso, con la fase que hay hoy?
  *
- * @param {object} opts
+ * @param {object} [opts]
  * @param {string} [opts.fase]    fase viva; si falta se lee de `ensoService`.
- * @param {string} opts.pisoId    id de piso (`pisosTermicos.PISOS_TERMICOS`).
+ * @param {string} [opts.pisoId]  id de piso (`pisosTermicos.PISOS_TERMICOS`);
+ *                                si falta se trata como piso no frío.
  * @param {string} [opts.region]  región de `regionFromProfile()`, para el respaldo.
  * @returns {{fase, familia, esPisoFrio, titular, accion, mecanismo, respaldo}}
  *          En fase neutral `titular` es '' (no se fuerza ruido) y el respaldo
@@ -139,9 +140,11 @@ export function lineaEnsoPorPiso({ fase, pisoId, region = 'andina' } = {}) {
  * Resuelve el aterrizaje completo. NUNCA inventa: sin cota confirmada para en
  * la banda templada y lo declara; sin clima del día no describe un clima.
  *
- * @param {object} opts
- * @param {number|null} opts.msnmUsuario  cota real de la finca (o null).
- * @param {object|null} opts.clima        { descripcion, temperatura } del dato
+ * @param {object} [opts]
+ * @param {number|string|null} [opts.msnmUsuario]  cota real de la finca; se
+ *                                        acepta string numérico por defensa.
+ * @param {{descripcion?: string, temperatura?: number}|null} [opts.clima]
+ *                                        { descripcion, temperatura } del dato
  *                                        vivo, o null si no hay.
  * @param {string} [opts.fase]            fase ENSO viva.
  * @param {string} [opts.region]          región para el respaldo del DR.

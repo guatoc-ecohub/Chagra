@@ -116,13 +116,8 @@
   filter: drop-shadow(0 0 7px rgba(251, 191, 36, 0.72));
 }
 
-.login-angelita-burbuja {
-  position: absolute;
-  right: 0;
-  bottom: calc(100% + 10px);
-  z-index: 2;
-  pointer-events: none;
-}
+/* .login-angelita-burbuja RETIRADA (2026-09-03, feedback_pizarra_unico_aviso_compai)
+   junto con la burbuja de bienvenida — ver AngelitaVueloLogin.jsx. */
 
 @media (prefers-reduced-motion: reduce) {
   .login-triada-piso {
