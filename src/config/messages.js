@@ -232,6 +232,10 @@ const messages = {
   },
   ui: {
     cargando: 'Cargando...',
+    // BUG-08 2026-09-04: puertas al event sourcing desde la Bodega.
+    conteoManual: 'Conteo manual',
+    bitacora: 'Bitácora',
+    bitacoraDeItem: (itemId) => `Bitácora · ${itemId}`,
     cargandoReportes: 'Cargando reportes...',
     cargandoPlan: 'Cargando plan...',
     cargandoCiclos: 'Cargando tus ciclos...',

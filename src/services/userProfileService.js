@@ -992,6 +992,26 @@ export function hasSeenProfileOnboarding() {
   );
 }
 
+/**
+ * Vista a la que debe caer la app justo después de iniciar sesión (BUG-09
+ * 2026-09-04): si el usuario nunca vio el onboarding (ni lo completó ni lo
+ * saltó), la primera pantalla es 'onboarding-perfil'; en cualquier otro caso,
+ * 'dashboard' como siempre.
+ *
+ * Por qué existe: los flags done/skipped (markProfileDone /
+ * markProfileSkipped, este último "respeta #283") se escribían desde
+ * OnboardingCondensado pero NADIE los leía en el login — la única vía al
+ * onboarding era la tarjeta opt-in del dashboard. Con esta decisión central
+ * el redirect dispara UNA sola vez: "Saltar todo" y "Explorar ejemplo"
+ * marcan skipped, así que quien no quiera el recorrido no lo ve de nuevo en
+ * los siguientes ingresos.
+ *
+ * @returns {'onboarding-perfil'|'dashboard'} vista destino post-login.
+ */
+export function resolveDestinoPostLogin() {
+  return hasSeenProfileOnboarding() ? 'dashboard' : 'onboarding-perfil';
+}
+
 const LABEL_LOOKUP = (() => {
   const map = {};
   for (const q of PROFILE_QUESTIONS) {
