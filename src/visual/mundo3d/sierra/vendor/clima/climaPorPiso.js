@@ -153,6 +153,8 @@ export function ninoPintaCalor(piso) {
  * Qué fenómeno DIBUJA el motor dado lo que se consulta. Implementa la regla dura:
  * en frío/páramo, `sol` bajo El Niño devuelve `helada` (aviso: noche despejada).
  * `enso`: 'neutro'|'nino'|'nina' (acepta el_nino/la_nina/neutral).
+ * @param {{ piso?: string|number|null, fenomeno?: string, enso?: string }} [consulta]
+ * @returns {string}
  */
 export function fenomenoEfectivo({ piso, fenomeno, enso = 'neutro' } = {}) {
   const p = pisoDeFinca(piso);
@@ -173,6 +175,9 @@ export function fenomenoEfectivo({ piso, fenomeno, enso = 'neutro' } = {}) {
  * · frío/páramo: 'escarcha' exige tempMin ≤ HELADA_MIN_C[piso] Y nubosidad < 40 % Y viento < 10 km/h,
  *   O alerta 'helada' del sidecar. 'negra' = tempMin ≤ −2. Niño SIN dato → 'aviso' (nunca manto).
  * · Sin snapshot ni piso → 'no' (anti-fabricación).
+ * @param {{ piso?: string|number|null, tempMin?: number|null, nubosidad?: number|null, viento?: number|null,
+ *   alertas?: Array<string|{ tipo?: string, type?: string }>, ensoFamily?: string, hora?: number|null }} [dato]
+ * @returns {{ nivel: 'no'|'aviso'|'rocio'|'escarcha'|'negra', intensidad: number }}
  */
 export function hayHelada({ piso, tempMin = null, nubosidad = null, viento = null, alertas = [], ensoFamily = 'neutro', hora = null } = {}) {
   const p = pisoDeFinca(piso);
@@ -181,7 +186,7 @@ export function hayHelada({ piso, tempMin = null, nubosidad = null, viento = nul
   if (!p) return { nivel: 'no', intensidad: 0 };
   if (p === 'calido') return { nivel: 'no', intensidad: 0 };
   if (p === 'templado') return t !== null && t <= HELADA_MIN_C.templado ? { nivel: 'rocio', intensidad: 0.3 } : { nivel: 'no', intensidad: 0 };
-  const alerta = Array.isArray(alertas) && alertas.some((a) => String(a?.tipo ?? a?.type ?? a).toLowerCase().includes('helada'));
+  const alerta = Array.isArray(alertas) && alertas.some((a) => String(typeof a === 'string' ? a : (a?.tipo ?? a?.type ?? '')).toLowerCase().includes('helada'));
   const umbral = HELADA_MIN_C[p];
   const nub = nubosidad === null ? null : Number(nubosidad);
   const vie = viento === null ? null : Number(viento);
@@ -201,7 +206,10 @@ export function hayHelada({ piso, tempMin = null, nubosidad = null, viento = nul
   return { nivel: 'no', intensidad: 0 };
 }
 
-/** Un solo objeto para el motor: la celda (piso, fenómeno, enso) con lo que cada sistema lee. */
+/**
+ * Un solo objeto para el motor: la celda (piso, fenómeno, enso) con lo que cada sistema lee.
+ * @param {{ piso?: string|number|null, fenomeno?: string, enso?: string, humedad?: number|null }} [consulta]
+ */
 export function celdaClima({ piso, fenomeno = 'sol', enso = 'neutro', humedad = null } = {}) {
   const p = pisoDeFinca(piso) || 'frio';
   const ef = fenomenoEfectivo({ piso: p, fenomeno, enso });

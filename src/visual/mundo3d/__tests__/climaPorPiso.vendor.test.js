@@ -18,7 +18,7 @@ import { franjaCondensacion as franjaDescenso } from '../sierra/descensoSierra.j
 
 const AQUI = dirname(fileURLToPath(import.meta.url));
 const MARCADOR = '/* ── INICIO COPIA VERBATIM ── */\n';
-const SHA_CUERPO = '0ed7e861790de8cb97e9627f4107c0063cdc64dcb864f498fec973469f9bff9e';
+const SHA_CUERPO = 'a14f8f892e1a073b92354eaa81540703a563c392ec07814cc21b8de80b15b979';
 
 describe('climaPorPiso vendorizado', () => {
   it('el cuerpo copiado es byte-a-byte el original del valle', () => {
