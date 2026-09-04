@@ -37,7 +37,7 @@
    SIEMPRE perezoso desde la transición; junto a la escena viaja el conteo de
    estratos que el gate consulta, y separarlo en otro archivo solo para el
    linter escondería el número que hay que contar. */
-import { useEffect, useMemo, useRef } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import * as THREE from 'three';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { Sky as SkyImpl } from 'three/addons/objects/Sky.js';
@@ -50,9 +50,14 @@ import {
   alturaSierra,
   colorPorAlturaRGB,
   yDeMsnm,
+  wzDeAltura,
 } from './sierraRelieve.js';
-import { estadoDescenso } from './descensoSierra.js';
+import { estadoDescenso, estadoEnMsnm } from './descensoSierra.js';
 import { crearCieloSylva } from './cieloSylva.js';
+import { instalarNieblaAltura } from './vendor/nieblaAltura.js';
+import { crearBrumaVolumetrica } from './vendor/brumaVolumetrica.js';
+import { crearCSM } from './vendor/csmSylva.js';
+import { crearFloraDescenso } from './floraDescenso.js';
 
 /* ─────────────────────────── la ladera del macizo ───────────────────────── */
 
@@ -123,6 +128,63 @@ function MarCaribe() {
       <meshLambertMaterial color="#4c93ab" transparent opacity={0.96} />
     </mesh>
   );
+}
+
+/* ─────────────────── la niebla estratificada por ALTURA ─────────────────── */
+/*
+ * `nieblaAltura.js` es el FX que más imagen da por vatio de todo el lote: la
+ * densidad exponencial con la altura resuelta en FORMA CERRADA a lo largo del
+ * rayo — cero pasos de marcha, ~12 ALU por fragmento. No es un pase ni un mesh:
+ * reemplaza los `#include <fog_*>` de `THREE.ShaderChunk`, así que la ladera, el
+ * mar y los jirones la heredan a la vez sin tocar un solo material.
+ *
+ * SE INSTALA EN EL PRIMER RENDER del componente, antes de que monte un solo
+ * hijo: three resuelve los `#include` al COMPILAR, y un programa ya compilado no
+ * se recompila solo. Instalarlo en un `useEffect` llegaría tarde para la ladera.
+ *
+ * LOS PARÁMETROS NO SON LOS DEL VALLE, y no podían serlo: allá la escala es
+ * 0,6 u/m y el `H = 45 u` del valle son ~75 m de altura de escala. Acá 1 unidad
+ * son 1 155 m, así que ese mismo 45 serían 52 km — la capa taparía el planeta.
+ * Reescalado a la Sierra: `H = 1,6 u ≈ 1 850 m` (altura de escala del vapor de
+ * agua sobre un macizo tropical) y `y0 = 0` = nivel del mar, que es de verdad
+ * donde el aire es más denso. Con eso la capa se extingue sola en la cima
+ * (a 5 u la densidad cae ×0,044) sin necesidad de apagarla por banda: la física
+ * hace la continuidad, que es justo lo que la puerta del Paso 3 exige.
+ *
+ * ALCANCE, declarado: el parche es GLOBAL al módulo three de la página. El
+ * descenso es una toma de pantalla completa y se desinstala al desmontar, pero
+ * mientras corre, cualquier material nuevo de otra escena heredaría la capa.
+ */
+const NIEBLA_SIERRA = { factor: 1.0, escala: 1.6, base: 0 };
+
+/*
+ * RESERVA CON CONTEO, y por qué hizo falta: la primera versión instalaba en el
+ * primer render y desinstalaba en la limpieza del efecto. En desarrollo React
+ * invoca los efectos DOS veces (montar → limpiar → montar), así que la limpieza
+ * restauraba los chunks originales y la capa quedaba apagada sin un solo error.
+ * Se detectó midiendo: A/B de 24 celdas, diferencia máxima 0 en las 24 — el
+ * parche no estaba puesto. Con conteo de referencias, soltar una reserva no
+ * desinstala mientras quede otra viva.
+ *
+ * §10.2 la marca ✅ en los TRES tiers y §10.3 la pone entre las que «nunca se
+ * apagan»: es piso mínimo junto con el gradeo y el follaje de masa.
+ */
+let nieblaRefs = 0;
+let nieblaHook = null;
+function reservarNieblaAltura(params) {
+  nieblaRefs += 1;
+  if (!nieblaHook) nieblaHook = instalarNieblaAltura(THREE, params);
+  let soltada = false;
+  return () => {
+    if (soltada) return;
+    soltada = true;
+    nieblaRefs -= 1;
+    if (nieblaRefs <= 0) {
+      nieblaHook?.desinstalar();
+      nieblaHook = null;
+      nieblaRefs = 0;
+    }
+  };
 }
 
 /* ──────────────────────── estratos de nube (parallax) ───────────────────── */
@@ -238,7 +300,217 @@ function EstratosNube({ cuantos, refEstado }) {
   );
 }
 
+/* ──────────────── la bruma volumétrica: jirones entre las rosetas ───────── */
+/*
+ * `brumaVolumetrica.js` es el otro miembro del par estrella de la banda 4
+ * (§5.1): la niebla de altura pone el MEDIO y la bruma pone los JIRONES, que es
+ * lo que hace que el bosque de niebla se lea como fenómeno y no como una banda
+ * de color. Cuesta 2 draw calls — uno para todos los jirones, otro para los
+ * haces — porque son billboards instanciados con textura fbm de canvas y borde
+ * emplumado, no polígonos. Eso importa: el defecto §2.3.3 de la vista global es
+ * justamente «nubes que son polígonos de borde duro», y aquí no se puede
+ * reincidir.
+ *
+ * LAS DISTANCIAS SE REESCALAN, como la niebla. Los `cerca [4,14]` y
+ * `lejos [50,95]` del valle son metros de cañón; acá 1 unidad son 1 155 m, así
+ * que a esos valores la bruma nunca se disolvería ni colapsaría dentro del
+ * cuadro. Van divididos para que el jirón se abra al pasarle al lado y se
+ * entregue al FogExp2 en la distancia.
+ *
+ * ANCLAS: al nivel del suelo, sobre la ladera REAL, repartidas por la franja de
+ * condensación. La cota del ancla sale de `wzDeAltura`, la misma ley de altura
+ * de la vista global — no de un número inventado.
+ */
+function anclasDeBruma(cuantas, semilla = 47) {
+  const anclas = [];
+  let s = semilla >>> 0;
+  const rnd = () => ((s = (s * 1664525 + 1013904223) >>> 0) / 4294967296);
+  for (let i = 0; i < cuantas; i++) {
+    // Repartidas por la franja 3 200 → 1 900 m: páramo alto, bosque de niebla y
+    // el borde de la selva. Es donde la nube vive de verdad.
+    const msnm = 3200 - (1300 * i) / Math.max(1, cuantas - 1);
+    const y = yDeMsnm(msnm);
+    const wz = wzDeAltura(y, 0);
+    if (wz == null) continue;
+    const x = (rnd() - 0.5) * 9;
+    anclas.push({ x, y: alturaSierra(x, wz), z: wz + (rnd() - 0.5) * 0.7 });
+  }
+  return anclas;
+}
+
+function BrumaDescenso({ refEstado, jirones, haces }) {
+  const { scene } = useThree();
+  const api = useRef(null);
+  useEffect(() => {
+    if (jirones <= 0) return undefined;
+    const b = crearBrumaVolumetrica(THREE, {
+      puntos: anclasDeBruma(Math.max(6, Math.round(jirones / 8))),
+      jirones,
+      haces,
+      solDir: solDireccion(),
+      seed: 47,
+      dispersion: 0.8,
+      cerca: [0.3, 1.2],
+      lejos: [4.5, 9.5],
+      intensidad: 0,
+      color: 0xdce7e2,
+    });
+    b.grupo.name = 'descenso-bruma';
+    scene.add(b.grupo);
+    api.current = b;
+    return () => {
+      scene.remove(b.grupo);
+      api.current = null;
+    };
+  }, [scene, jirones, haces]);
+
+  useFrame((_, dt) => {
+    const est = refEstado.current;
+    const b = api.current;
+    if (!est || !b) return;
+    b.tick(Math.min(dt, 0.1));
+    /* El peso de banda dice SI la bruma vive en esta cota; la niebla óptica
+       dice CUÁNTA hay ahí, y ésa ya trae dentro El Niño (la franja sube y se
+       adelgaza) y la humedad real. Multiplicarlas es lo que hace que el jirón
+       se comporte como el fenómeno y no como un interruptor. */
+    b.setIntensidad((est.fx.bruma ?? 0) * est.optica.niebla);
+  });
+
+  return null;
+}
+
+/* ─────────── CSM: la sombra en cascada de la hora dorada baja ───────────── */
+/*
+ * §5.1 pide `csmSylva` desde la banda 1 hasta la 6. Acá el que proyecta es EL
+ * MACIZO SOBRE SÍ MISMO: con el sol a 14° la ladera de sotavento se apaga y las
+ * quebradas se dibujan, que es la lectura de relieve que el sombreado Lambert
+ * por normales no da. Sin flora todavía no hay otro proyector, y eso es honesto
+ * decirlo: hoy CSM aporta autosombra de terreno, no sombra de árboles.
+ *
+ * §10.2 lo reparte alto = 2 cascadas · medio = 1 · bajo = ❌ (1 280 KB de mapa
+ * es mucho para un Mali). Acá el módulo trae sus 2 cascadas fijas, así que el
+ * reparto por tier es encendido/apagado, no número de cascadas — se declara.
+ */
+function CSMDescenso({ activo, luzRef }) {
+  const { scene, gl, camera } = useThree();
+  const api = useRef(null);
+  useEffect(() => {
+    if (!activo || !luzRef.current) return undefined;
+    const terreno = scene.getObjectByName('descenso-ladera');
+    if (terreno) {
+      terreno.castShadow = true;
+      terreno.receiveShadow = true;
+    }
+    const csm = crearCSM(THREE, {
+      scene,
+      renderer: gl,
+      sunLight: luzRef.current,
+      camera,
+      terrainGroup: terreno ?? undefined,
+    });
+    api.current = csm;
+    if (typeof window !== 'undefined') window.__csm = csm;
+    return () => {
+      csm.dispose();
+      if (terreno) terreno.castShadow = false;
+      gl.shadowMap.enabled = false;
+      api.current = null;
+      if (typeof window !== 'undefined' && window.__csm === csm) delete window.__csm;
+    };
+  }, [activo, scene, gl, camera, luzRef]);
+  useFrame(() => api.current?.update(camera));
+  return null;
+}
+
+/* ─────────────────────────── la vegetación ──────────────────────────────── */
+/*
+ * El anillo de cercanía de `floraDescenso.js`. Va DESPUÉS de la ladera en el
+ * árbol porque necesita que `descenso-ladera` exista para apoyarse en la misma
+ * ley de altura, y se actualiza por cuadro con el estado completo — la mezcla
+ * de arquetipos sale de los pesos CONTINUOS de banda, así que cruzar de banda
+ * no conmuta nada.
+ */
+function FloraDescenso({ refEstado, tier, densidad }) {
+  const { scene } = useThree();
+  const api = useRef(null);
+  useEffect(() => {
+    if (densidad <= 0) return undefined;
+    const f = crearFloraDescenso({ escena: scene, tier, densidad, semilla: 7 });
+    api.current = f;
+    if (typeof window !== 'undefined') window.__floraDescenso = f;
+    return () => {
+      f.dispose();
+      api.current = null;
+      if (typeof window !== 'undefined' && window.__floraDescenso === f) {
+        delete window.__floraDescenso;
+      }
+    };
+  }, [scene, tier, densidad]);
+  useFrame(() => {
+    const est = refEstado.current;
+    if (est && api.current) api.current.actualizar(est);
+  });
+  return null;
+}
+
 /* ───────────────────────────── el cielo Sylva ───────────────────────────── */
+
+function SondaGate() {
+  /* El gate del Pixel lee `window.__r` para estampar el renderer REAL en la
+     evidencia. Sin esto, «medido en Mali» es una afirmación, no un dato.
+     Y `window.__gpuMs` existe porque EL MEDIDOR MINTIÓ: contar cuadros con
+     `requestAnimationFrame` da 59,2 fps en el Pixel tanto a DPR 4 (5,2 Mpx)
+     como a DPR 8 (20,9 Mpx por cuadro), que es físicamente imposible en un
+     Mali-G78. Por encima de vsync el contador de rAF se satura y deja de
+     medir el render. `__gpuMs` dibuja a mano y SINCRONIZA con `finish()` +
+     un `readPixels` de 1 px, así que devuelve tiempo de GPU de verdad. */
+  const { gl, scene, camera } = useThree();
+  useEffect(() => {
+    if (typeof window === 'undefined') return undefined;
+    window.__r = gl;
+    window.__THREE = THREE; // el gate necesita ver el ShaderChunk vivo
+    /* `__pr` es la sonda que el A/B del Pixel estampa en cada muestra. Sin ella
+       una corrida a «dpr=4» puede no estar dibujando a 4: el instrumento miente
+       antes que el sujeto, y ya pasó — dos corridas a DPR distinta dieron el
+       mismo número porque la DPR no se estaba aplicando. */
+    window.__pr = () => {
+      const s = gl.getSize(new THREE.Vector2());
+      const r = gl.info.render;
+      return {
+        dpr: gl.getPixelRatio(),
+        css: [s.x, s.y],
+        buffer: [gl.domElement.width, gl.domElement.height],
+        drawCalls: r.calls,
+        triangulos: r.triangles,
+      };
+    };
+    const px = new Uint8Array(4);
+    window.__gpuMs = (n = 40) => {
+      const ctx = gl.getContext();
+      const ms = [];
+      gl.render(scene, camera); // calienta: compilación fuera de la muestra
+      ctx.finish();
+      for (let i = 0; i < n; i++) {
+        const t0 = performance.now();
+        gl.render(scene, camera);
+        ctx.finish();
+        // `finish()` solo no basta en ANGLE: el readPixels de 1 px fuerza la
+        // sincronía de verdad (el driver no puede devolverlo sin haber pintado).
+        ctx.readPixels(0, 0, 1, 1, ctx.RGBA, ctx.UNSIGNED_BYTE, px);
+        ms.push(performance.now() - t0);
+      }
+      ms.sort((a, b) => a - b);
+      const q = (f) => ms[Math.min(n - 1, Math.floor(n * f))];
+      return { n, min: ms[0], p50: q(0.5), p95: q(0.95), max: ms[n - 1] };
+    };
+    return () => {
+      if (window.__r === gl) delete window.__r;
+      if (window.__pr) delete window.__pr;
+      if (window.__gpuMs) delete window.__gpuMs;
+    };
+  }, [gl, scene, camera]);
+  return null;
+}
 
 function CieloSylva({ refEstado, pasos }) {
   const { scene, camera } = useThree();
@@ -310,13 +582,24 @@ function solDireccion() {
   return v;
 }
 
+/*
+ * GATE: forzar un FX a 0 o a 1 sin tocar la coreografía. Sirve para el A/B
+ * PAREADO — misma cota, mismo cuadro, el FX es la ÚNICA diferencia. Sin esto
+ * el «costo» de un efecto se mide contra otra escena y no vale nada.
+ */
+function aplicarFxForzado(fx, { on = [], off = [] } = {}) {
+  for (const k of on) if (k in fx) fx[k] = 1;
+  for (const k of off) if (k in fx) fx[k] = 0;
+  return fx;
+}
+
 /* ─────────────────────────── el piloto del viaje ────────────────────────── */
 /*
  * El reloj es `performance.now()` desde el montaje, NO el reloj de r3f: el
  * contrato temporal de la transición son timers deterministas y esta escena
  * tiene que ir sincronizada con ellos aunque el navegador estrangule cuadros.
  */
-function Piloto({ plan, fase, humedad, tier, refEstado, onEstado, t0, inicioRef }) {
+function Piloto({ plan, fase, humedad, tier, refEstado, onEstado, t0, inicioRef, msnmFijo = null, fxForzado = null, luzRef = null }) {
   const { camera, scene } = useThree();
   /* El instante cero, por orden de precedencia: (1) la ref que comparte el
      host — el cero REAL del viaje, escrito cuando se armaron los timers del
@@ -356,13 +639,23 @@ function Piloto({ plan, fase, humedad, tier, refEstado, onEstado, t0, inicioRef 
         compartido > 0 ? compartido : Number.isFinite(t0) && t0 > 0 ? t0 : ahora;
     }
     const ms = ahora - t0Ref.current;
-    const est = estadoDescenso(ms, { plan, fase, humedad, tier });
+    /* GATE: con `msnmFijo` el viaje se CONGELA en una cota. Es lo que hace
+       atribuible la medición en el Mali — «el descenso entero» mezcla siete
+       bandas en un solo número que no dice de quién es el costo. El viaje real
+       no lo usa nunca (default null). */
+    const est =
+      msnmFijo == null
+        ? estadoDescenso(ms, { plan, fase, humedad, tier })
+        : estadoEnMsnm(msnmFijo, { fase, humedad, tier });
+    if (fxForzado) aplicarFxForzado(est.fx, fxForzado);
     refEstado.current = est;
 
     camera.position.set(est.camara.pos[0], est.camara.pos[1], est.camara.pos[2]);
     objetivo.set(est.camara.objetivo[0], est.camara.objetivo[1], est.camara.objetivo[2]);
     camera.lookAt(objetivo);
-    if (camera.fov !== est.camara.fov) {
+    // El Canvas crea una PerspectiveCamera (fov 48) y el tween de fov solo
+    // tiene sentido ahí; el instanceof lo declara en tipos, no en un cast.
+    if (camera instanceof THREE.PerspectiveCamera && camera.fov !== est.camara.fov) {
       camera.fov = est.camara.fov;
       camera.updateProjectionMatrix();
     }
@@ -383,7 +676,10 @@ function Piloto({ plan, fase, humedad, tier, refEstado, onEstado, t0, inicioRef 
     if (scene.fog) {
       colorNiebla.copy(NIEBLA_ALTA).lerp(NIEBLA_BAJA, est.optica.luzCalidez);
       scene.fog.color.copy(colorNiebla);
-      scene.fog.density = est.optica.nieblaDensidad;
+      // Este componente monta FogExp2; la densidad solo existe en esa clase.
+      if (scene.fog instanceof THREE.FogExp2) {
+        scene.fog.density = est.optica.nieblaDensidad;
+      }
     }
     onEstado?.(est);
   });
@@ -400,7 +696,14 @@ function Piloto({ plan, fase, humedad, tier, refEstado, onEstado, t0, inicioRef 
         intensity={0.85}
       />
       <ambientLight intensity={0.32} color="#fff1d6" />
-      <directionalLight ref={dirLuz} position={[-12, 6, -4]} intensity={1.25} />
+      <directionalLight
+        ref={(o) => {
+          dirLuz.current = o;
+          if (luzRef) luzRef.current = o;
+        }}
+        position={[-12, 6, -4]}
+        intensity={1.25}
+      />
       <directionalLight position={[8, 4, 10]} intensity={0.28} color={ATMOSFERA.relleno} />
     </>
   );
@@ -420,6 +723,18 @@ function Piloto({ plan, fase, humedad, tier, refEstado, onEstado, t0, inicioRef 
  *                                     Gana sobre `t0`: sin ella la escena mide
  *                                     desde su propio montaje y llega tarde.
  * @param {Function} [props.onEstado] se llama por cuadro con el estado (rótulo).
+ * ── Arnés de medición móvil (gate paso 7, PR #3103) ──────────────────────
+ * @param {number|null}  [props.msnmFijo]       cota en msnm que CONGELA el viaje
+ *                                              (gate en terreno); null = libre.
+ * @param {object|null}  [props.fxForzado]      fx impuestos `{ on: string[], off: string[] }`
+ *                                              (ver aplicarFxForzado); null = natural.
+ * @param {number}       [props.densidadFlora]  0..1, escala las instancias de flora (def 1).
+ * @param {number|null}  [props.dprForzada]     devicePixelRatio impuesto por el arnés.
+ * @param {number|null}  [props.cieloPasos]     pasos del cielo Sylva; null = por tier.
+ * @param {boolean}      [props.conNieblaAltura] reserva de niebla por altura (def true).
+ * @param {boolean}      [props.conBruma]       jirones de bruma encendidos (def true).
+ * @param {boolean|null} [props.conCSM]         fuerza CSM (`?csm=1`); null = apagado
+ *                                              (veredicto medido, ver §5.1 abajo).
  */
 export default function EscenaDescensoSierra({
   plan,
@@ -429,22 +744,72 @@ export default function EscenaDescensoSierra({
   t0,
   inicioRef = null,
   onEstado,
+  msnmFijo = null,
+  fxForzado = null,
+  densidadFlora = 1,
+  dprForzada = null,
+  cieloPasos = null,
+  conNieblaAltura = true,
+  conBruma = true,
+  conCSM = null,
 }) {
   const perfil = perfilDeTier(tier);
+  /* La reserva se toma en el PRIMER render de este componente — antes de que
+     monte ningún hijo y, por tanto, antes de que se compile un solo material.
+     Es el único punto del ciclo de React donde el parche llega a tiempo:
+     three resuelve los `#include` al compilar y un programa ya compilado no se
+     recompila solo. El efecto toma su propia reserva y suelta la del render,
+     de modo que el saldo neto sea 1 mientras la escena viva y 0 al desmontar. */
+  const soltarRender = useRef(null);
+  if (soltarRender.current === null && conNieblaAltura !== false) {
+    soltarRender.current = reservarNieblaAltura(NIEBLA_SIERRA);
+  }
+  useEffect(() => {
+    const soltar = conNieblaAltura !== false ? reservarNieblaAltura(NIEBLA_SIERRA) : null;
+    soltarRender.current?.();
+    soltarRender.current = null;
+    return () => soltar?.();
+  }, [conNieblaAltura]);
   const refEstado = useRef(null);
+  const luzPrincipal = useRef(null);
   const segmentos = tier === 'alto' ? 96 : tier === 'medio' ? 64 : 40;
   const estratos = tier === 'bajo' ? 3 : 4;
-  const pasosCielo = tier === 'bajo' ? 8 : 12; // §10.2: en Mali, 8 pasos
+  /* §10.2: alto = jirones + haces · medio = solo jirones · bajo = jirones a la
+     mitad de densidad. Nunca se apaga del todo — es lo que sostiene la banda 4. */
+  const jironesBruma = conBruma === false ? 0 : tier === 'alto' ? 88 : tier === 'medio' ? 56 : 30;
+  /* HACES = 0 EN TODOS LOS TIERS, y no es economía: es un defecto MIRADO. Con
+     los haces encendidos la banda 4 sale con franjas verticales pálidas de
+     borde recto que cruzan el CIELO por encima del macizo, donde no hay bruma
+     ninguna. Es exactamente el defecto §2.3.2 que este mismo plan le reprocha a
+     la vista global («cuña translúcida con bordes rectos duros… lee como fuga
+     de luz, no como marcador»). Los haces de Sylva están calibrados para un
+     dosel de bosque a metros de la cámara; a 1 155 m por unidad no hay dosel
+     que los recorte y quedan como rayas. Los jirones SÍ se quedan: son el
+     fenómeno. Evidencia cruda: `desk-bruma-1.png` (con haces) del gate. */
+  const hacesBruma = 0;
+  /*
+   * CSM APAGADO POR DEFECTO, y es un veredicto medido, no economía. §5.1 lo
+   * pide de la banda 1 a la 6, pero hoy en el descenso NO HAY QUIEN PROYECTE:
+   * la ladera es un domo suave que el término Lambert ya oscurece en el lado de
+   * sotavento, y las instancias de flora todavía no llevan `castShadow`. El A/B
+   * pareado a 3 600 m da diferencia máxima de 3 niveles sobre 24 celdas — o sea
+   * nada — a cambio de 1 280 KB de mapa de sombras y dos pasadas extra
+   * (+0,4 ms, dentro del ruido pero no gratis). Se enciende cuando la flora
+   * proyecte: ahí sí tiene de qué hacer sombra. `?csm=1` lo fuerza.
+   */
+  const csmActivo = conCSM ?? false;
+  const pasosCielo = cieloPasos ?? (tier === 'bajo' ? 8 : 12); // §10.2: en Mali, 8 pasos
 
   return (
     <Canvas
       className="tsm__lienzo"
-      dpr={perfil.dpr}
+      dpr={dprForzada ?? perfil.dpr}
       gl={{ antialias: perfil.antialias, powerPreference: 'high-performance' }}
       camera={{ position: [-1.5, 5.6, -13.2], fov: 48, near: 0.1, far: 900 }}
       frameloop="always"
       data-testid="tsm-lienzo"
     >
+      <SondaGate />
       <CieloSylva refEstado={refEstado} pasos={pasosCielo} />
       <Piloto
         plan={plan}
@@ -455,10 +820,16 @@ export default function EscenaDescensoSierra({
         inicioRef={inicioRef}
         refEstado={refEstado}
         onEstado={onEstado}
+        msnmFijo={msnmFijo}
+        fxForzado={fxForzado}
+        luzRef={luzPrincipal}
       />
       <Ladera segmentos={segmentos} />
       <MarCaribe />
       <EstratosNube cuantos={estratos} refEstado={refEstado} />
+      <BrumaDescenso refEstado={refEstado} jirones={jironesBruma} haces={hacesBruma} />
+      <CSMDescenso activo={csmActivo} luzRef={luzPrincipal} />
+      <FloraDescenso refEstado={refEstado} tier={tier} densidad={densidadFlora} />
     </Canvas>
   );
 }

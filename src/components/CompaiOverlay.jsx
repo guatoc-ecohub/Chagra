@@ -5,34 +5,42 @@
  * eslint-disable a nivel de archivo.
  */
 import React, { useState, useCallback, useMemo, useRef } from 'react';
-import { X, Volume2 } from 'lucide-react';
 import ChagraAgentAvatar from './ChagraAgentAvatar';
 import useCompaiRoam from '../hooks/useCompaiRoam.js';
 import useAgentAvatarType, { AVATAR_NOMBRE, DEFAULT_AVATAR_TYPE } from '../hooks/useAgentAvatarType.js';
+import useAngelitaStore from '../store/useAngelitaStore.js';
+import BurbujaPizarraPeek from './BurbujaPizarraPeek.jsx';
 // El hint por ruta se PLEGÓ a src/config/compaiHints.js (unificación 2026-08-23):
 // el AgentFab canónico lo usa como enseñanza en idle. Este overlay ya no se monta
 // en la PWA 2D; se conserva leyendo del MISMO mapa para no duplicar contenido.
 import { getHintForRuta } from '../config/compaiHints.js';
 
 /**
- * CompaiOverlay — el compai elegido, minimizable y contextual en todas las rutas 2D.
- *
- * Un componente global que monta UNA sola vez en el layout raíz (App.jsx),
- * visible en todas las rutas 2D (Home, Perfil, Catálogo, Mapa, etc.).
+ * CompaiOverlay — el compai que CAMINA (portada campesina B), minimizable y
+ * contextual. Se monta SOLO cuando `esHomeCampesinoB` (ver App.jsx) —
+ * AgentFab se suprime ahí para no duplicar el compai.
  *
  * Estados:
  *   - Minimizado (por defecto): el compai a fondo TRANSPARENTE, con tamaño
  *     legible y sombra suave, que recorre la pantalla actual y conserva la
  *     posición elegida (useCompaiRoam).
- *   - Expandido: panel con guía contextual, botón de voz.
+ *   - Peek: al TOCARLO asoma `<BurbujaPizarraPeek>` — LA MISMA pizarra que usa
+ *     AgentFab en el resto de la app (regla dura del operador, 2026-09-03,
+ *     feedback_pizarra_unico_aviso_compai: "el único que debe salir en toda
+ *     la app es la pizarra"). Antes este overlay tenía SU PROPIA burbuja de
+ *     parada (auto-pop al llegar a un punto del paseo) y SU PROPIO panel —
+ *     un segundo formato de aviso, distinto del de AgentFab. Los DOS se
+ *     retiraron; nada de información se perdió: el mismo `hint` de la ruta
+ *     que mostraban se lee ahora en la pizarra (Ver/Escuchar/Callar), y
+ *     "Callar" ahora SÍ silencia (antes este overlay no tenía interruptor).
  *
  * Comportamiento:
- *   - Toque en el compai → abre panel (toggle); mientras el panel está abierto
- *     el compai vuelve a casa y se queda quieto (no se corre bajo la guía).
+ *   - Toque en el compai → asoma la pizarra (toggle).
  *   - El compai se desplaza según su especie y cambia de punto con aparición
- *     mística, sin girar ni espejarse.
+ *     mística, sin girar ni espejarse (esto NO cambió: Angelita no se toca).
  *   - El hint cambia según la ruta actual (mapa ruta→hint, extensible)
- *   - Botón "Escuchar" usa TTS (kokoro, fail-silent si no hay saldo)
+ *   - "Escuchar" usa TTS (kokoro, fail-silent si no hay saldo); "Callar" usa
+ *     el silencio GLOBAL (useAngelitaStore), el mismo que AgentFab.
  *   - Respeta preferencias del usuario (avatar seleccionado en AvatarSelector)
  *
  * Props:
@@ -64,7 +72,12 @@ function escucharTexto(texto) {
 export default function CompaiOverlay({ currentView = 'dashboard' }) {
   const [avatarType] = useAgentAvatarType();
   const nombreCompai = AVATAR_NOMBRE[avatarType] || AVATAR_NOMBRE[DEFAULT_AVATAR_TYPE];
-  const [isOpen, setIsOpen] = useState(false);
+  const silenciado = useAngelitaStore((s) => s.silenciado);
+  const silenciar = useAngelitaStore((s) => s.silenciar);
+  // `peekAbierto` = la pizarra asomada (toque corto, igual que AgentFab).
+  // `panelAbierto` = el detalle grande que abre el "Ver" de la pizarra.
+  const [peekAbierto, setPeekAbierto] = useState(false);
+  const [panelAbierto, setPanelAbierto] = useState(false);
   const [compaiState, setCompaiState] = useState('idle'); // idle, thinking, speaking, listening
   const [lastView, setLastView] = useState(currentView);
 
@@ -83,7 +96,7 @@ export default function CompaiOverlay({ currentView = 'dashboard' }) {
   // `parada` se incrementa cada vez que LLEGA a un punto de su paseo — con eso
   // hacemos el "moverse-para-explicar" (ver la burbuja de parada más abajo).
   const roamRef = useRef(null);
-  const { caminando, parada, handlers: comportamientoHandlers } = useCompaiRoam(roamRef, {
+  const { caminando, handlers: comportamientoHandlers } = useCompaiRoam(roamRef, {
     escala: avatarSize,
     pausado: false,
     especie: avatarType,
@@ -93,30 +106,25 @@ export default function CompaiOverlay({ currentView = 'dashboard' }) {
   });
 
   // El mensaje contextual de la pantalla actual (capa BASE: qué es esta
-  // pantalla). El compai lo muestra al parar y al abrir el panel.
+  // pantalla). Es lo que la pizarra muestra al tocar el compai.
   // TODO: inyectar tips vivos de finca+pendientes (datos reales del usuario) —
   // p.ej. "hoy toca regar el lote 2" o "tiene 3 registros sin sincronizar" —
   // como capa ADITIVA sobre este hint, leyendo del store de pendientes + perfil
   // de finca. Es un gancho: NO inventar datos aquí; la fuente se cablea aparte.
   const hint = useMemo(() => getHintForRuta(currentView, nombreCompai), [currentView, nombreCompai]);
 
-  // Burbuja de PARADA ("moverse-para-explicar"): el compai camina, llega a un
-  // punto y —mientras descansa ahí (unos segundos)— muestra el mensaje de esta
-  // pantalla; al reanudar la caminata desaparece sola. Se DERIVA del render (sin
-  // timers ni setState en effect): visible cuando ya paró al menos una vez
-  // (parada > 0), está quieto (!caminando) y el panel no está abierto.
-  const mostrarBurbujaParada = parada > 0 && !caminando && !isOpen;
-
-  // Al cambiar de ruta, cierra el panel (UX: no queda abierto entre pantallas).
-  // Detecta el cambio comparando lastView ≠ currentView; luego actualiza ambos.
-  // Esto evita llamar setState en el effect (react-hooks/set-state-in-effect).
+  // Al cambiar de ruta, cierra la pizarra/panel (UX: no queda abierto entre
+  // pantallas). Detecta el cambio comparando lastView ≠ currentView; luego
+  // actualiza ambos. Esto evita llamar setState en el effect
+  // (react-hooks/set-state-in-effect).
   if (lastView !== currentView) {
-    setIsOpen(false);
+    setPeekAbierto(false);
+    setPanelAbierto(false);
     setLastView(currentView);
   }
 
   const handleToggle = useCallback(() => {
-    setIsOpen((prev) => !prev);
+    setPeekAbierto((prev) => !prev);
   }, []);
 
   const handleEscuchar = useCallback(() => {
@@ -127,8 +135,30 @@ export default function CompaiOverlay({ currentView = 'dashboard' }) {
     setTimeout(() => setCompaiState('idle'), 4000);
   }, [hint]);
 
+  /** Peek → "Ver": abre el detalle grande (mismo patrón que AgentFab). */
+  const handlePeekVer = useCallback(() => {
+    setPeekAbierto(false);
+    setPanelAbierto(true);
+  }, []);
+
+  /** Peek → "Escuchar": lee el hint real en voz, sin cerrar la pizarra. */
+  const handlePeekEscuchar = useCallback(() => {
+    handleEscuchar();
+  }, [handleEscuchar]);
+
+  /** Peek → "Callar": silencio GLOBAL — el mismo interruptor que AgentFab
+   *  (antes este overlay no tenía ninguno). */
+  const handlePeekCallar = useCallback(() => {
+    setPeekAbierto(false);
+    silenciar(true);
+  }, [silenciar]);
+
+  const handlePeekCerrar = useCallback(() => {
+    setPeekAbierto(false);
+  }, []);
+
   const handleClose = useCallback(() => {
-    setIsOpen(false);
+    setPanelAbierto(false);
   }, []);
 
   // Mientras deambula, los compai CON MARCHA real corren su ciclo de andar
@@ -147,9 +177,8 @@ export default function CompaiOverlay({ currentView = 'dashboard' }) {
       className="fixed bottom-4 right-4 z-40 pointer-events-none"
       data-testid="compai-overlay-container"
     >
-      {/* El compai que deambula (roamRef desplaza SOLO este nodo;
-          el panel queda anclado a la posición del compai). La burbuja de parada viaja
-          DENTRO de este nodo → se queda pegada al compai donde se detuvo. */}
+      {/* El compai que deambula (roamRef desplaza SOLO este nodo; la pizarra
+          queda anclada a la posición del compai, viaja DENTRO de este nodo). */}
       <div
         ref={roamRef}
         className="will-change-transform relative"
@@ -160,27 +189,6 @@ export default function CompaiOverlay({ currentView = 'dashboard' }) {
         onPointerUp={comportamientoHandlers.onPointerUp}
         onPointerCancel={comportamientoHandlers.onPointerCancel}
       >
-        {/* Burbuja de PARADA: al detenerse en su paseo, el compai "enuncia por
-            mensaje" qué hay en esta pantalla (el hint de la ruta). Toque = abre
-            el panel para leer más / escuchar. Solo cuando no está abierto el
-            panel (ver mostrarBurbujaParada). */}
-        {mostrarBurbujaParada && (
-          <button
-            type="button"
-            onClick={handleToggle}
-            className="pointer-events-auto absolute bottom-full mb-2 right-0 w-56 text-left bg-slate-900/95 border border-slate-700 rounded-2xl rounded-br-sm px-3 py-2 shadow-xl backdrop-blur-sm animate-fadeIn"
-            aria-live="polite"
-            aria-label={`${hint.titulo}. ${hint.descripcion}. Toque para ampliar.`}
-            data-testid="compai-burbuja"
-          >
-            <span className="block text-sm font-bold text-slate-100 leading-snug">
-              {hint.titulo}
-            </span>
-            <span className="mt-0.5 block text-xs text-slate-300 leading-snug line-clamp-2">
-              {hint.descripcion}
-            </span>
-          </button>
-        )}
         {/* Presencia flotante SIN disco de color: el compai a fondo transparente,
             con una sombra suave que lo asienta sobre cualquier pantalla. */}
         <button
@@ -188,7 +196,7 @@ export default function CompaiOverlay({ currentView = 'dashboard' }) {
           onClick={handleToggle}
           className="pointer-events-auto relative inline-flex items-center justify-center bg-transparent border-none p-0 hover:scale-105 transition-transform active:scale-95 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-400 rounded-2xl"
           aria-label={`Abrir ayuda de ${nombreCompai}`}
-          aria-expanded={isOpen}
+          aria-expanded={peekAbierto}
           data-testid="compai-bubble"
         >
           <span className="inline-flex" style={{ filter: 'drop-shadow(0 6px 9px rgba(0, 0, 0, 0.34))' }}>
@@ -200,13 +208,31 @@ export default function CompaiOverlay({ currentView = 'dashboard' }) {
             />
           </span>
         </button>
+
+        {/* LA PIZARRA (BurbujaPizarraPeek) — el único aviso de compai, igual
+            que en el resto de la app. Reemplaza la vieja burbuja de parada
+            auto-pop + el panel a medida (ver docstring arriba). */}
+        {peekAbierto && (
+          <BurbujaPizarraPeek
+            mensaje={hint.descripcion}
+            nombre={nombreCompai}
+            silenciado={silenciado}
+            onVer={handlePeekVer}
+            onEscuchar={handlePeekEscuchar}
+            onCallar={handlePeekCallar}
+            onCerrar={handlePeekCerrar}
+          />
+        )}
       </div>
 
-      {/* Panel expandido (solo si isOpen) */}
-      {isOpen && (
+      {/* Detalle grande ("Ver" de la pizarra): mismo patrón que el panel
+          "Ver" de AgentFab — título + descripción completa + Escuchar. */}
+      {panelAbierto && (
         <div
           className="pointer-events-auto absolute bottom-full mb-3 right-0 w-80 bg-slate-900/95 border border-slate-700 rounded-2xl p-4 shadow-2xl backdrop-blur-sm"
           data-testid="compai-panel"
+          role="dialog"
+          aria-label={hint.titulo}
         >
           {/* Header: título + cerrar */}
           <div className="flex items-start justify-between mb-4 gap-3">
@@ -220,7 +246,7 @@ export default function CompaiOverlay({ currentView = 'dashboard' }) {
               aria-label={`Cerrar panel de ${nombreCompai}`}
               data-testid="compai-close-btn"
             >
-              <X size={20} />
+              <span aria-hidden="true">×</span>
             </button>
           </div>
 
@@ -237,7 +263,7 @@ export default function CompaiOverlay({ currentView = 'dashboard' }) {
             aria-label="Escuchar esta guía en voz alta"
             data-testid="compai-listen-btn"
           >
-            <Volume2 size={16} aria-hidden="true" />
+            <span aria-hidden="true">🔊</span>
             Escuchar
           </button>
         </div>

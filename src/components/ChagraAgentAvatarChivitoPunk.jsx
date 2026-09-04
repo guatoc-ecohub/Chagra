@@ -40,6 +40,12 @@ export default function ChagraAgentAvatarChivitoPunk({
     'data-visema': dataVisema = undefined,
     'data-clima': dataClima = undefined,
     'data-tier': dataTier = undefined,
+    // Contrato DOM del elenco (CompaiP1.contract): el rig debe exponer
+    // data-agt-especie y data-creature para TODAS las especies. CompaiAgente
+    // los entrega por propsDelAdaptador; sin reenviarlos aquí el chivito
+    // queda sin especie en su nodo raíz (regresión detectada en dev rojo).
+    'data-agt-especie': dataEspecie = undefined,
+    'data-creature': dataCreature = undefined,
 }) {
     const { despierta, handlers: handlersPresencia } = useAngelitaPresencia({ activo: reaccionaPresencia });
     const estadoAgente = estado || state;
@@ -66,6 +72,11 @@ export default function ChagraAgentAvatarChivitoPunk({
             data-enso={enso}
             data-direccion={direccion}
             data-reduced-motion={reducedMotion ? 'true' : undefined}
+            // Spread CONDICIONAL: si llegan undefined (montado directo, sin
+            // CompaiAgente) NO deben pisar el data-creature fijo del Trazado
+            // (un spread undefined en JSX borra el atributo explícito previo).
+            {...(dataEspecie ? { 'data-agt-especie': dataEspecie } : {})}
+            {...(dataCreature ? { 'data-creature': dataCreature } : {})}
         />
     );
 

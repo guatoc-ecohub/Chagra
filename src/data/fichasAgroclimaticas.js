@@ -76,6 +76,43 @@ const VENTANA_BIMODAL_ANDINA = Object.freeze({
   fuente: 'ideam_mta',
 });
 
+/**
+ * Un dato puntual con fuente respaldada, o el marcador `pendiente` cuando no
+ * se halló un valor apto para usar como umbral.
+ *
+ * @typedef {Object} DatoAgroclimatico
+ * @property {number|null} valor Valor numérico, null si está pendiente.
+ * @property {string|null} fuente Clave de FUENTES_AGROCLIMATICAS, null si está pendiente.
+ * @property {'verificado'|'pendiente'} estado
+ */
+
+/**
+ * Rango de cultivo (no pronóstico) con mínimo, óptimo y máximo verificados.
+ * Algunos rangos pueden traer `opt` o `max` como marcador `pendiente`.
+ *
+ * @typedef {Object} RangoAgroclimatico
+ * @property {DatoAgroclimatico} min
+ * @property {DatoAgroclimatico} opt
+ * @property {DatoAgroclimatico} max
+ * @property {string} [unidad] Solo para rangos que no son °C ni % HR (p. ej. mm/año).
+ */
+
+/**
+ * @typedef {Object} FichaAgroclimaticaParams
+ * @property {string} id
+ * @property {string} nombre
+ * @property {string} cientifico
+ * @property {string[]} sinonimos
+ * @property {boolean} [invernadero]
+ * @property {RangoAgroclimatico} temperatura
+ * @property {RangoAgroclimatico|DatoAgroclimatico} [humedad] Rango verificado o `pendiente`.
+ * @property {RangoAgroclimatico|DatoAgroclimatico} [altitud] Rango verificado o `pendiente`.
+ * @property {RangoAgroclimatico|DatoAgroclimatico} [precipitacion] Rango verificado o `pendiente`.
+ * @property {{ nombre: string, gatillo: string, fuente: string|null }[]} [riesgos]
+ * @property {object[]} [alertas] Resultados de `alerta(...)`.
+ */
+
+/** @param {FichaAgroclimaticaParams} param */
 function ficha({ id, nombre, cientifico, sinonimos, invernadero = false, temperatura, humedad = pendiente, altitud = pendiente, precipitacion = pendiente, riesgos = [], alertas = [] }) {
   return Object.freeze({ id, nombre, cientifico, sinonimos: Object.freeze(sinonimos), invernadero, temperatura, humedad, altitud, precipitacion, ventanaSiembra: VENTANA_BIMODAL_ANDINA, riesgos: Object.freeze(riesgos), alertas: Object.freeze(alertas) });
 }

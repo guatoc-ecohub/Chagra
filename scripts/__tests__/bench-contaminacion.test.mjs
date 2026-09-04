@@ -387,19 +387,31 @@ describe('buildEnrichedSystemPrompt (guard piso térmico chagra-pro #288)', () =
 
 describe('companionSpeciesGuard (post-LLM cross_thermal)', () => {
   it('devuelve bloque y flag cuando el sidecar corrige una respuesta', async () => {
-    const fetchImpl = async () => ({
-      ok: true,
-      status: 200,
-      json: async () => ({
-        has_companion_species: true,
-        system_prompt_block: '[GUARD COMPANION SPECIES] Corrige la compania.',
-      }),
-    });
+    let seenBody = null;
+    // Shape REAL del servidor (chagra-pro server.ts + companion-species-guard.ts,
+    // verificado en vivo 2026-09-03): el campo es `has_fabricated_species`.
+    const fetchImpl = async (_url, opts) => {
+      seenBody = JSON.parse(opts.body);
+      return {
+        ok: true,
+        status: 200,
+        json: async () => ({
+          has_fabricated_species: true,
+          detection_tier: 'clasificacion_incorrecta',
+          system_prompt_block: '[GUARD COMPANION SPECIES] Corrige la compania.',
+        }),
+      };
+    };
     const res = await companionSpeciesGuard('respuesta del agente', { sidecarUrl: 'http://sidecar', fetchImpl });
     expect(res).toEqual({
       has_companion_species: true,
       system_prompt_block: '[GUARD COMPANION SPECIES] Corrige la compania.',
     });
+    // BUG-04: el sidecar exige `agent_response` (ver server.ts linea ~1889).
+    // `response_text` (el nombre previo) responde 400
+    // `{error:"agent_response required"}` en CADA turno -- confirmado en
+    // vivo 2026-09-03.
+    expect(seenBody).toEqual({ agent_response: 'respuesta del agente' });
   });
 
   it('degrada a bloque vacio si el sidecar cae', async () => {
@@ -410,6 +422,19 @@ describe('companionSpeciesGuard (post-LLM cross_thermal)', () => {
       system_prompt_block: '',
       error: 'down',
     });
+  });
+
+  it('BUG-04 control negativo: el 400 real del sidecar (agent_response faltante) degrada a bloque vacio', async () => {
+    // Espeja el 400 real (`{error:"agent_response required"}`) que devuelve
+    // el sidecar en vivo cuando el contrato del cliente manda el campo
+    // viejo `response_text`. El bench debe degradar limpio, no romper.
+    const fetchImpl = async () => ({
+      ok: false,
+      status: 400,
+      json: async () => ({ error: 'agent_response required' }),
+    });
+    const res = await companionSpeciesGuard('respuesta del agente', { sidecarUrl: 'http://sidecar', fetchImpl });
+    expect(res).toEqual({ has_companion_species: false, system_prompt_block: '' });
   });
 });
 
