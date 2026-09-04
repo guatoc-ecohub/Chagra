@@ -43,15 +43,21 @@ describe('AgentScreen — compositor de foto inline consolidado', () => {
     expect(imageInputs).toHaveLength(1);
   });
 
-  it('usa processPhotoItem como unica ruta de analisis', () => {
-    // processPhotoItem centraliza la visión + armado del prompt + filtro
-    // agrícola. Llamadas directas a analyzeFoliage fuera de esta ruta
+  it('usa una ruta de foto acotada y libera el compositor antes de esperar visión', () => {
+    // processPhotoItemBounded centraliza la visión + armado del prompt +
+    // vencimiento. Llamadas directas a analyzeFoliage fuera de esta ruta
     // reintroducirían la duplicación.
-    const processPhotoCalls = (source.match(/processPhotoItem/g) || []).length;
+    const processPhotoCalls = (source.match(/processPhotoItemBounded/g) || []).length;
     expect(processPhotoCalls).toBeGreaterThanOrEqual(2); // inline + outbox
+    expect(source).toContain('skipRag: true');
 
-    // NO debe llamar analyzeFoliage directamente (salvo pasándolo como
-    // argumento a processPhotoItem)
+    const sendStart = source.indexOf('const handleAgentSend = async () =>');
+    const sendEnd = source.indexOf('// ── Consumo de la OUTBOX', sendStart);
+    const sendSource = source.slice(sendStart, sendEnd);
+    expect(sendSource.indexOf("setInputText('')")).toBeLessThan(sendSource.indexOf('await processPhotoItemBounded'));
+    expect(sendSource.indexOf('clearAgentAttachment()')).toBeLessThan(sendSource.indexOf('await processPhotoItemBounded'));
+
+    // analyzeFoliage se pasa como dependencia del procesador acotado.
     const directAnalyzeCalls = source.match(/analyzeFoliage\(/g);
     if (directAnalyzeCalls) {
       // analyzeFoliage aparece solo como referencia { analyze: analyzeFoliage }

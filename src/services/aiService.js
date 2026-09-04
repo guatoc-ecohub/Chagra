@@ -152,7 +152,12 @@ const blobToBase64 = (blob) =>
  *
  * @internal exportado solo para tests.
  */
-export const __retrieveRagContextForFoliage = async (speciesSlug) => {
+export const __retrieveRagContextForFoliage = async (speciesSlug, { skipRag = false } = {}) => {
+  // Al adjuntar una foto todavía no sabemos qué especie contiene. Construir el
+  // índice entero para una query genérica descarga cientos de fichas y retrasa
+  // el turno. La visión usa el prompt base y el chat posterior puede aportar
+  // contexto desde la nota, sin bloquear la interacción.
+  if (skipRag) return [];
   try {
     const query = buildRagQuery(speciesSlug);
     const passages = await retrieve(query, 3, 'foliage');
@@ -193,12 +198,12 @@ export const __retrieveRagContextForFoliage = async (speciesSlug) => {
  * });
  * // result => { score: 85, issues: ["mancha foliar"], treatment_suggestion: "aplicar caldo bordelés (Fuente 1)" }
  */
-const analyzeFoliageUncached = async (imageBlob, { onToken, signal, speciesSlug, _assetId } = {}) => {
+const analyzeFoliageUncached = async (imageBlob, { onToken, signal, speciesSlug, _assetId, skipRag = false } = {}) => {
   try {
     const base64 = await blobToBase64(imageBlob);
 
     // 1) RAG context (graceful degrade — nunca rompe el call si falla)
-    const passages = await __retrieveRagContextForFoliage(speciesSlug);
+    const passages = await __retrieveRagContextForFoliage(speciesSlug, { skipRag });
     const ragContext = formatRagContext(passages);
     const prompt = buildDiagnosisPrompt(ragContext);
 
