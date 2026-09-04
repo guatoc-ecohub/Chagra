@@ -17,6 +17,17 @@ interface Window {
   // escena está montada (el cleanup las borra); nadie en la app las lee.
   // CSM del descenso: forma de retorno de crearCSM() (vendor/csmSylva.js).
   __csm?: { activa: boolean; update(camera: unknown): void; dispose(): void; stats(): unknown };
+  /** Hook de gate del manto de la helada en el descenso de la Sierra (EscenaDescensoSierra.jsx::Ladera). */
+  __escarcha?: {
+    k: number;
+    optica: number | null;
+    fxTiene: boolean;
+    shader: boolean;
+    msnm: number;
+    parche: { frag: boolean; vert: boolean } | null;
+  };
+  /** Solo gate: fuerza el uniform del manto (0..1) para el A/B en la misma carga. */
+  __escarchaForzar?: number | null;
   // API de floraDescenso.crearFloraDescenso(), para el censo del arnés.
   __floraDescenso?: {
     actualizar(estado: unknown): void;

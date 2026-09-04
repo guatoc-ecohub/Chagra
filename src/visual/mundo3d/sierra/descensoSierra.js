@@ -216,13 +216,26 @@ export function franjaCondensacion(fase = 'neutral', humedad = null) {
  * Estado óptico completo en una altitud. Todas las salidas son funciones
  * suaves de `msnm`: no hay conmutación por banda en ninguna de ellas.
  */
-export function opticaEnMsnm(msnm, { fase = 'neutral', humedad = null } = {}) {
+export function opticaEnMsnm(msnm, { fase = 'neutral', humedad = null, helada = null } = {}) {
   const m = clamp(msnm, 0, CUMBRE_M);
   const col = fraccionColumna(m);
   const franja = franjaCondensacion(fase, humedad);
+  /* LA ESCARCHA (DIRECCION-HELADA-20260904 §4.5), continua como todo acá:
+       escarcha = peso(páramo)·e3 + peso(frío)·e4
+       e3 = 0,35 + 0,45·[Niño]  — el páramo escarcha casi cada madrugada despejada; bajo Niño más
+       e4 = dato ? intensidad : (Niño ? 0,25 : 0) — en frío solo es «aviso» salvo que el dato de
+            la finca la confirme (`helada` = { nivel, intensidad } del gate único `hayHelada`)
+     Regla dura: bajo la NUBE no hay escarcha (la nube es cobija) → se multiplica por
+     (1 − niebla). Y por debajo de 2 000 m el peso de banda es 0: si sale > 0, es bug de datos. */
+  const esNino = fase === 'el_nino' || fase === 'nino';
+  const pesos = pesosBanda(m);
+  const intensidadDato = helada && (helada.nivel === 'escarcha' || helada.nivel === 'negra') ? clamp(helada.intensidad ?? 0.6, 0, 1) : 0;
+  const e3 = 0.35 + 0.45 * (esNino ? 1 : 0);
+  const e4 = intensidadDato > 0 ? intensidadDato : esNino ? 0.25 : 0;
 
   const d = (m - franja.cota) / franja.sigma;
   const niebla = franja.amplitud * Math.exp(-d * d);
+  const escarcha = clamp(((pesos.paramo ?? 0) * e3 + (pesos.frio ?? 0) * e4) * (1 - 0.85 * niebla), 0, 1);
 
   // Rayleigh: arriba hay MENOS aire encima → cenit más profundo, casi violeta.
   const rayleigh = 0.52 + 0.86 * col;
@@ -260,6 +273,7 @@ export function opticaEnMsnm(msnm, { fase = 'neutral', humedad = null } = {}) {
     luzIntensidad,
     luzCalidez,
     sombraDureza,
+    escarcha,
   };
 }
 
@@ -307,8 +321,8 @@ export function bandaDominante(msnm) {
 const FX_POR_BANDA = {
   nival: ['cielo', 'csm', 'quarks'],
   superparamo: ['cielo', 'niebla', 'csm'],
-  paramo: ['cielo', 'niebla', 'bruma', 'csm', 'godRays', 'flora'],
-  frio: ['cielo', 'niebla', 'bruma', 'csm', 'godRays', 'flora', 'horizonte'],
+  paramo: ['cielo', 'niebla', 'bruma', 'csm', 'godRays', 'flora', 'escarcha'],
+  frio: ['cielo', 'niebla', 'bruma', 'csm', 'godRays', 'flora', 'horizonte', 'escarcha'],
   templado: ['cielo', 'niebla', 'csm', 'godRays', 'flora', 'mojado', 'dof'],
   calido_seco: ['cielo', 'niebla', 'csm', 'flora', 'quarks'],
   playa: ['cielo', 'niebla', 'flora'],
@@ -322,9 +336,9 @@ const FX_POR_BANDA = {
  * lo que garantiza que el móvil vea poca densidad, JAMÁS low-poly.
  */
 const TIER_PERMITE = {
-  alto: ['cielo', 'niebla', 'bruma', 'csm', 'godRays', 'dof', 'mojado', 'quarks', 'flora', 'horizonte'],
-  medio: ['cielo', 'niebla', 'bruma', 'csm', 'godRays', 'mojado', 'flora'],
-  bajo: ['cielo', 'niebla', 'bruma', 'flora'],
+  alto: ['cielo', 'niebla', 'bruma', 'csm', 'godRays', 'dof', 'mojado', 'quarks', 'flora', 'horizonte', 'escarcha'],
+  medio: ['cielo', 'niebla', 'bruma', 'csm', 'godRays', 'mojado', 'flora', 'escarcha'],
+  bajo: ['cielo', 'niebla', 'bruma', 'flora', 'escarcha'],   // escarcha = un tinte de suelo: ~cero costo, va en los tres tiers
 };
 
 /** Peso 0..1 de cada FX a una altitud dada, ya recortado por tier. */
@@ -384,11 +398,11 @@ export function camaraEnMsnm(msnm, optica) {
  * @param {number} ms      milisegundos desde el inicio del viaje
  * @param {object} opts    { plan, fase, humedad, tier }
  */
-export function estadoDescenso(ms, { plan, fase = 'neutral', humedad = null, tier = 'alto' } = {}) {
+export function estadoDescenso(ms, { plan, fase = 'neutral', humedad = null, tier = 'alto', helada = null } = {}) {
   const p = plan ?? planDescenso(COTA_SIN_UBICACION, tier);
   const msnm = msnmEnMs(ms, p);
   return {
-    ...estadoEnMsnm(msnm, { fase, humedad, tier }),
+    ...estadoEnMsnm(msnm, { fase, humedad, tier, helada }),
     ms: clamp(ms, 0, p.total),
     progreso: clamp(ms / p.total, 0, 1),
     frenando: ms >= p.total - p.freno,
@@ -405,9 +419,9 @@ export function estadoDescenso(ms, { plan, fase = 'neutral', humedad = null, tie
  * dice de quién es el costo. Congelar la cota es lo que hace la medición
  * atribuible. No cambia nada del viaje: `estadoDescenso` sigue mandando.
  */
-export function estadoEnMsnm(msnm, { fase = 'neutral', humedad = null, tier = 'alto' } = {}) {
+export function estadoEnMsnm(msnm, { fase = 'neutral', humedad = null, tier = 'alto', helada = null } = {}) {
   const m = clamp(msnm, 0, CUMBRE_M);
-  const optica = opticaEnMsnm(m, { fase, humedad });
+  const optica = opticaEnMsnm(m, { fase, humedad, helada });
   const { banda, pesos } = bandaDominante(m);
   return {
     ms: 0,
@@ -436,6 +450,31 @@ export function descenso3dPedido(search = globalThis.location?.search ?? '') {
   const v = q.get('descenso3d');
   if (v === null || v === '0' || v === 'off' || v === 'false') return false;
   return true;
+}
+
+/**
+ * Parámetros de GATE del descenso (arnés de medición, 2026-09-04; pedido en
+ * DIRECCION-HELADA §7 paso 2: «msnmFijo es prop, no URL — exponerlo como ?msnm=»).
+ * Van ANTES del hash (`/?descenso3d=1&msnm=2200&enso=el_nino&helada=escarcha#/mockups/sierra-global`).
+ *   · `msnm`   congela el viaje en esa cota (null = viaje libre);
+ *   · `enso`   fuerza la fase (el_nino | la_nina | neutral; acepta nino/nina) — solo para el gate,
+ *              la app lee siempre la fase VIVA;
+ *   · `helada` nivel del gate único (escarcha | negra | aviso) con intensidad opcional `heladaK`.
+ * Nada de esto se lee en el viaje real si no viene en la URL: default = null.
+ */
+export function leerGateDescenso(search = globalThis.location?.search ?? '') {
+  const q = new URLSearchParams(search);
+  const msnm = Number(q.get('msnm'));
+  const ensoRaw = String(q.get('enso') || '').toLowerCase();
+  const fase = ensoRaw === '' ? null : ensoRaw.includes('nina') ? 'la_nina' : ensoRaw.includes('nino') ? 'el_nino' : 'neutral';
+  const nivel = String(q.get('helada') || '').toLowerCase();
+  // `Number(null)` es 0, no NaN (la raíz de la Isla Nula, 2026-09-03): ausencia ≠ cero
+  const kRaw = q.get('heladaK');
+  const k = kRaw === null || kRaw === '' ? NaN : Number(kRaw);
+  const helada = ['escarcha', 'negra', 'aviso'].includes(nivel)
+    ? { nivel, intensidad: Number.isFinite(k) ? clamp(k, 0, 1) : nivel === 'negra' ? 1 : nivel === 'escarcha' ? 0.8 : 0 }
+    : null;
+  return { msnmFijo: q.get('msnm') !== null && Number.isFinite(msnm) ? clamp(msnm, 0, CUMBRE_M) : null, fase, helada };
 }
 
 /** ¿Ya lo vio? Corre UNA vez (decisión del operador). Nunca revienta. */
