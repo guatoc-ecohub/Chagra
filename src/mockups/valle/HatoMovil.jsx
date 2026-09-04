@@ -46,6 +46,8 @@ import {
   CASA_VALLE,
   COMPOSICION_LUGARES,
 } from '../../visual/mundo3d/direccion/composicionValle.js';
+// Fix no-undef preexistente en dev: el hook se usa abajo pero nunca se importó.
+import { usePerrosGuardianes } from '../../visual/creatures/senalPerrosGuardianes.js';
 
 /* ── PRNG determinista (mulberry32): la escena es la misma en cada carga ── */
 function prng(semilla) {
@@ -109,7 +111,7 @@ function geomEntera({ cuerpo, cabeza, pivote }, etiqueta) {
   if (!g) {
     throw new Error(
       `[HatoMovil] "${etiqueta}": mergeGeometries devolvió NULL (atributos dispares). ` +
-        'El animal quedaría invisible sin error — revisá la fábrica.',
+        'El animal quedaría invisible sin error — revise la fábrica.',
     );
   }
   return g;
