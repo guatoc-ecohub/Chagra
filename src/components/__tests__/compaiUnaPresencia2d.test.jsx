@@ -8,6 +8,11 @@ vi.mock('../../services/authService', () => ({
   authenticateUser: vi.fn(),
   isAuthenticated: vi.fn(),
   logoutUser: vi.fn(() => Promise.resolve()),
+  // Camino PKCE (URGENTE-login-se-apaga-25sep): este test monta el
+  // LoginScreen real (vista login, sin sesión) y el componente ahora importa
+  // estas dos exportaciones. Default = build sin flag (password grant vivo).
+  resolverCaminoLogin: vi.fn(() => ({ camino: 'password', passwordGrantVivo: true })),
+  iniciarLoginPKCE: vi.fn(() => Promise.resolve({ success: true })),
 }));
 vi.mock('../../db/catalogDB', () => ({ initCatalog: vi.fn(() => Promise.resolve()) }));
 vi.mock('../../services/ragRetriever', () => ({
