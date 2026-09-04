@@ -487,6 +487,46 @@ export function validarCotasPisosSierra(extra = {}) {
   return { ok: huecos.length === 0, huecos };
 }
 
+/* ────────────────────────────────────────────────────────────────────────────
+ * PISOS DE FINCA (4) — la contradicción «el clima enseña 4 pisos y la Sierra 7»
+ * se cierra AQUÍ, en un solo lugar (integración clima 2026-09-04):
+ *   · las 7 cotas de arriba son GEOGRAFÍA: la Sierra las dibuja y el descenso
+ *     las recorre;
+ *   · los 4 pisos de finca (cálido · templado · frío · páramo) son a quien se le
+ *     avisa y a quien el clima le pinta. `pisoDeFinca()` es la ÚNICA función
+ *     que colapsa: playa + bosque seco → cálido; superpáramo + nival → PÁRAMO
+ *     (arriba de 4 000 m nadie siembra; para clima y alertas heredan las reglas
+ *     del páramo y NUNCA el `default: 3 °C` de alertThresholds, que sería menos
+ *     estricto que el páramo estando más arriba).
+ * Copia vendorizada para el valle vanilla: `sierra/vendor/clima/climaPorPiso.js`
+ * (test de igualdad en `__tests__/climaPorPiso.vendor.test.js`).
+ * ──────────────────────────────────────────────────────────────────────────── */
+export const PISOS_FINCA = Object.freeze(['calido', 'templado', 'frio', 'paramo']);
+const FINCA_POR_PISO = Object.freeze({
+  calido: 'calido', templado: 'templado', frio: 'frio', paramo: 'paramo', superparamo: 'paramo', nival: 'paramo',
+});
+
+/**
+ * Piso de finca (uno de PISOS_FINCA) desde una altitud (m), un id de banda de
+ * la Sierra (7), un id de PISOS_TERMICOS (6) o un id de finca. `null` si no
+ * sabe (anti-fabricación: sin altitud no se inventa piso).
+ */
+export function pisoDeFinca(x) {
+  if (x == null) return null;
+  if (typeof x === 'number') {
+    const p = pisoPorAltitud(x);
+    return p ? FINCA_POR_PISO[p.id] ?? null : null;
+  }
+  const s = String(x).trim().toLowerCase();
+  if (s === '') return null;
+  if (PISOS_FINCA.includes(s)) return s;
+  if (FINCA_POR_PISO[s]) return FINCA_POR_PISO[s];
+  const banda = PISOS_TERMICOS_SIERRA.find((b) => b.id === s);
+  if (banda) return FINCA_POR_PISO[banda.piso] ?? null;
+  const n = Number(s);
+  return Number.isFinite(n) ? pisoDeFinca(n) : null;
+}
+
 /** Leyenda DOM accesible de la Sierra (VistaGlobalSierra `CLAVE_PISOS`). */
 export const CLAVE_PISOS_SIERRA = PISOS_TERMICOS_SIERRA.map((p) => ({ c: p.color, t: p.nombre }));
 

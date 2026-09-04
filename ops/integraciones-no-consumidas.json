@@ -469,6 +469,16 @@
       "id": "src/visual/mundo3d/transiciones/CamaraCruce.jsx",
       "reason": "Cámara de cruce (transición entre mundos) que nunca se cableó. Visualización 3D de cámara que cruza de un mundo a otro (ej. valle→sierra). Parece ser una pieza de transición cinematográfica que no se encontró lugar de montaje.",
       "date": "2026-08-30"
+    },
+    {
+      "id": "src/visual/mundo3d/sierra/vendor/clima/climaPorPiso.js",
+      "reason": "Vendorizado 2026-09-04 (PR #3116, integración de clima por piso). Copia verbatim del SSOT del valle (~/demos/3d/lib3d/clima/climaPorPiso.js). HOY su único consumidor es __tests__/climaPorPiso.vendor.test.js, y eso es a propósito: la copia existe (1) para el test de igualdad que cierra la contradicción «4 pisos vs 7 cotas» contra los canónicos de este repo (pisosTermicos.js, alertThresholds.js, descensoSierra.js), y (2) para los consumidores de producto que el operador ordenó para la PRÓXIMA tanda, no esta: hayHelada() montando la helada desde el dato vivo en el descenso (DIRECCION-HELADA-20260904 §6) y PALETA/fenomenoEfectivo en el velo CSS y CieloENSO por piso (DIRECCION-ARTE-CLIMA §2.9). Cablearlo ahora sería arrancar esa tanda antes de la orden. Al cablear, borrar esta entrada.",
+      "date": "2026-09-04"
+    },
+    {
+      "id": "src/visual/mundo3d/sierra/vendor/godRaysSylva.js",
+      "reason": "Vendorizado por el arnés de medición móvil del descenso (#3103, 2026-09-03) para que la banda 4 use los MISMOS rayos de dosel del valle; su byte-a-byte lo fija fxSylva.vendor.test.js. No tiene consumidor de producto: EscenaDescensoSierra.jsx no monta un pase de god rays — FX_POR_BANDA lo lista para páramo/frío pero la escena, mirada en el gate, deja los haces de bruma en 0 por un defecto visto (franjas de borde recto cruzando el cielo sin dosel que las recorte; comentario en la propia escena) y el pase de rayos exige un sol EN CUADRO (en el valle se apaga sin fuente fingida desde 2026-09-04). Declarado por el audit ampliado (454 → 1593 sujetos, 2026-09-03). Decisión pendiente de dirección: rayos solo en el hero shot de la banda 4 a contraluz (contrato §3.2). Al cablear, borrar esta entrada.",
+      "date": "2026-09-04"
     }
   ]
 }
