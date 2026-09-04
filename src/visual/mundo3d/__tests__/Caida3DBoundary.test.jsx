@@ -3,6 +3,12 @@ import { describe, expect, it, vi } from 'vitest';
 import { render, waitFor } from '@testing-library/react';
 import Caida3DBoundary from '../Caida3DBoundary.jsx';
 
+/**
+ * Escena falsa que siempre se cae al renderizar. Nunca retorna: por eso el
+ * tipo es `never` (un `() => void` no es un componente JSX válido, TS2786).
+ *
+ * @returns {never}
+ */
 function EscenaConChunkRechazado() {
   throw new Error('No se pudo cargar el chunk de la escena');
 }
