@@ -8,6 +8,7 @@
 
 import localforage from 'localforage';
 import { clearActiveTenantId } from './tenantContext';
+import { MSG } from '../config/messages';
 
 const FARMOS_URL = import.meta.env.VITE_FARMOS_URL;
 const CLIENT_ID = import.meta.env.VITE_FARMOS_CLIENT_ID;
@@ -33,9 +34,85 @@ export const SESSION_EXPIRED_EVENT = 'chagra:session-expired';
  *   2. PKCE habilitado en el cliente (cliente público / pkce on).
  *   3. VITE_FARMOS_CLIENT_ID seteado en el build prod al cliente correcto.
  *   4. Flujo probado end-to-end en staging.
+ *
+ * ESTADO DEL CABLEADO (2026-09-04, task URGENTE-login-se-apaga-25sep): el
+ * flujo PKCE YA NO está muerto. LoginScreen consulta resolverCaminoLogin() y
+ * dispara iniciarLoginPKCE() como camino real; el password grant queda como
+ * fallback mientras no llegue la fecha. La activación del camino PKCE es el
+ * flag de build VITE_AUTH_PKCE_ENABLED (que el operador pone en 'true' SOLO
+ * tras cumplir las 4 precondiciones de arriba); pasada la fecha, PKCE se usa
+ * aunque el flag falte (ver resolverCaminoLogin).
  */
 const PASSWORD_GRANT_DEPRECATION_DATE = new Date('2026-09-25');
 const PASSWORD_GRANT_DEPRECATED = Date.now() > PASSWORD_GRANT_DEPRECATION_DATE.getTime();
+
+/**
+ * Interruptor de rollout del camino PKCE (task URGENTE-login-se-apaga-25sep).
+ *
+ * `VITE_AUTH_PKCE_ENABLED=true` convierte a Authorization Code + PKCE en el
+ * camino REAL del login. Mientras el flag esté ausente o en 'false', el
+ * password grant clásico sigue siendo el camino vivo y el PKCE queda
+ * cableado pero en espera — así este cableado NO rompe producción antes de
+ * que el operador complete las 4 precondiciones backend documentadas arriba.
+ * Tras PASSWORD_GRANT_DEPRECATION_DATE el flag se ignora: PKCE es el único
+ * camino posible (ver resolverCaminoLogin).
+ */
+const PKCE_ENABLED = import.meta.env.VITE_AUTH_PKCE_ENABLED === 'true';
+
+/**
+ * ¿Está esta instalación lista para intentar PKCE? Requiere la URL del
+ * backend y el client_id OAuth en el build: son los dos datos que el flujo
+ * necesita para construir /oauth/authorize. Si falta alguno, redirigir
+ * sería mandar al operador a una pantalla de error de farmOS con
+ * client_id=undefined — mejor fallar acá y usar el fallback.
+ *
+ * @returns {boolean}
+ */
+export const puedeUsarPKCE = () => !!(FARMOS_URL && CLIENT_ID);
+
+/**
+ * Resuelve el camino de login disponible según configuración y fecha.
+ * Función PURA (dependencias inyectables) para poder probar la matriz
+ * flag/fecha/config sin viajear el reloj del módulo.
+ *
+ *   - 'pkce':      login vía Authorization Code + PKCE (redirect a farmOS).
+ *                  Es el camino real cuando el rollout está activado (flag
+ *                  o fecha vencida) y la config existe.
+ *   - 'password':  password grant clásico — fallback mientras viva la fecha.
+ *   - 'bloqueado': ni PKCE operativo ni password grant vivo. Antes de este
+ *                  cableado, llegar aquí significaba un login MUDO (el
+ *                  servicio rechazaba y no había alternativa); ahora la UI
+ *                  muestra `motivo` claro en vez de quedarse callada.
+ *
+ * @param {object} [deps] - overrides para tests.
+ * @param {number} [deps.fechaActual] - epoch ms a evaluar (default: ahora).
+ * @param {boolean} [deps.pkceOperativo] - config PKCE presente (default: puedeUsarPKCE()).
+ * @param {boolean} [deps.pkceActivado] - rollout PKCE activo (default: flag o fecha vencida).
+ * @returns {{camino: 'pkce'|'password'|'bloqueado', passwordGrantVivo: boolean, motivo?: string}}
+ */
+export const resolverCaminoLogin = ({
+    fechaActual = Date.now(),
+    pkceOperativo = puedeUsarPKCE(),
+    pkceActivado,
+} = {}) => {
+    const passwordGrantVivo = fechaActual <= PASSWORD_GRANT_DEPRECATION_DATE.getTime();
+    // La fecha GANA sobre el flag: pasado el corte, PKCE es obligatorio y un
+    // flag en 'false' NO puede reactivar el grant retirado.
+    const activado = !passwordGrantVivo
+        || (pkceActivado !== undefined ? pkceActivado : PKCE_ENABLED);
+
+    if (activado && pkceOperativo) {
+        return { camino: 'pkce', passwordGrantVivo };
+    }
+    if (passwordGrantVivo) {
+        return { camino: 'password', passwordGrantVivo };
+    }
+    return {
+        camino: 'bloqueado',
+        passwordGrantVivo: false,
+        motivo: MSG.auth.instalacionSinCamino,
+    };
+};
 
 /**
  * Genera un code_verifier random para PKCE (43-128 caracteres).
@@ -93,6 +170,42 @@ export const initiateAuthorizationCodeFlow = async (state) => {
 
     const authUrl = `${FARMOS_URL}/oauth/authorize?${params.toString()}`;
     window.location.href = authUrl;
+};
+
+/**
+ * Puerta de entrada del LoginScreen al flujo PKCE (task
+ * URGENTE-login-se-apaga-25sep). Genera el state CSRF, persiste
+ * verifier+state y redirige el navegador a farmOS (/oauth/authorize).
+ *
+ * Contrato NO-throw (mismo patrón que authenticateUser/exchangeCodeForToken):
+ * devuelve `{ success: true }` cuando el redirect quedó en curso — el usuario
+ * continúa en el dominio de farmOS y regresa por /callback (OAuthCallback,
+ * ya cableado en App.jsx). Si algo falla ANTES de salir (config ausente,
+ * crypto rota), devuelve `{ success: false, error }` para que el caller
+ * decida el fallback sin dejar el botón colgado.
+ *
+ * @param {object} [deps] - overrides para tests.
+ * @param {boolean} [deps.pkceOperativo] - config PKCE presente (default: puedeUsarPKCE()).
+ * @returns {Promise<{success: boolean, error?: string}>}
+ */
+export const iniciarLoginPKCE = async ({ pkceOperativo = puedeUsarPKCE() } = {}) => {
+    if (!pkceOperativo) {
+        console.warn('[Auth] PKCE solicitado sin configuración (VITE_FARMOS_URL / VITE_FARMOS_CLIENT_ID).');
+        return {
+            success: false,
+            error: MSG.auth.pkceNoConfigurado,
+        };
+    }
+    try {
+        await initiateAuthorizationCodeFlow(generateOAuthState());
+        return { success: true };
+    } catch (err) {
+        console.error('[Auth] no se pudo iniciar el flujo PKCE:', err);
+        return {
+            success: false,
+            error: MSG.auth.accesoSeguroFallido,
+        };
+    }
 };
 
 /**
