@@ -35,6 +35,7 @@ import {
 import { fetchClimaSnapshot } from './climaService';
 import { getProfile } from './userProfileService';
 import { annotateAlertWithEnso, regionFromProfile } from './ensoContext';
+import { pisoDeFinca } from '../visual/mundo3d/pisosTermicos.js';
 
 const POLLING_INTERVAL_MS = 15 * 60 * 1000; // 15 minutos
 const SOURCE_OPENMETEO = 'Open-Meteo (pronóstico 7d) · umbrales agroecológicos Chagra';
@@ -130,13 +131,12 @@ class AlertEngine {
       if (piso.includes('frio') || piso.includes('frío')) return 'frio';
       if (piso.includes('templado')) return 'templado';
       if (piso.includes('calido') || piso.includes('cálido')) return 'calido';
-      // Fallback por altitud si no hay piso térmico explícito.
+      // Fallback por altitud si no hay piso térmico explícito: delega en el
+      // canónico `pisoDeFinca` (pisosTermicos.js). Sin altitud numérica no se
+      // inventa piso (vuelve 'default' → umbral de helada más estricto).
       const alt = Number(p.finca_altitud);
       if (Number.isFinite(alt)) {
-        if (alt >= 3000) return 'paramo';
-        if (alt >= 2000) return 'frio';
-        if (alt >= 1000) return 'templado';
-        return 'calido';
+        return pisoDeFinca(alt) || 'default';
       }
     } catch (_) { /* noop */ }
     return 'default';

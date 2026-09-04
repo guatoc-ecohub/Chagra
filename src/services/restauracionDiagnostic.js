@@ -9,15 +9,22 @@
  */
 import REST_DATA from '../data/restauracion.json';
 import ESPECIES_DATA from '../data/restauracion-especies.json';
+import { pisoDeFinca } from '../visual/mundo3d/pisosTermicos.js';
+
+/** Bucket de restauración (claves de REST_DATA) por slug canónico de piso de
+ * finca. El colapso altitud→piso lo hace pisoDeFinca (pisosTermicos.js), la
+ * única tabla; acá solo se nombra el bucket. */
+const PISO_A_BUCKET = Object.freeze({
+  calido: 'calido_0_1000',
+  templado: 'templado_1000_2000',
+  frio: 'frio_2000_3000',
+  paramo: 'paramo_3000',
+});
 
 /** Deriva el piso térmico desde la altitud (m s.n.m.) del perfil de la finca. */
 function pisoDesdeAltitud(alt) {
-  const a = Number(alt);
-  if (alt == null || Number.isNaN(a)) return null;
-  if (a >= 3000) return 'paramo_3000';
-  if (a >= 2000) return 'frio_2000_3000';
-  if (a >= 1000) return 'templado_1000_2000';
-  return 'calido_0_1000';
+  const canon = pisoDeFinca(alt);
+  return canon ? PISO_A_BUCKET[canon] : null;
 }
 
 export function diagnosticarRestauracion(descripcion, opts = {}) {

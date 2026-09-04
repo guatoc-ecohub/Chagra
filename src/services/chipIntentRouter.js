@@ -50,6 +50,7 @@
  */
 
 import { CHIP_INTENTS, CHIP_DEFS } from './agentCapabilities.js';
+import { pisoDeFinca } from '../visual/mundo3d/pisosTermicos.js';
 export { CHIP_INTENTS, CHIP_DEFS };
 
 const DEF_BY_INTENT = Object.freeze(
@@ -453,9 +454,11 @@ function calendarioPiso(opts) {
   if (piso === 'paramo') return 'frio';
   const alt = toAltitud(opts && opts.altitud);
   if (alt == null) return null;
-  if (alt >= 2000) return 'frio';
-  if (alt >= 1000) return 'templado';
-  return 'calido';
+  // Cotas del canónico pisoDeFinca (pisosTermicos.js): el tool de calendario
+  // no soporta 'paramo', así que el páramo bajo cae al piso frío.
+  const canon = pisoDeFinca(alt);
+  if (!canon) return null;
+  return canon === 'paramo' ? 'frio' : canon;
 }
 
 // Meses en español → número (1..12). Sin tildes a propósito (matcheamos sobre

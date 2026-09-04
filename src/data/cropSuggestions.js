@@ -43,9 +43,14 @@ export function normalizeCropName(s) {
     .trim();
 }
 
+import { pisoDeFinca } from '../visual/mundo3d/pisosTermicos.js';
+
 /**
  * Deriva el piso térmico colombiano a partir de la altitud (msnm).
- * Cálido <1000 · templado 1000–2000 · frío 2000–3000 · páramo >3000.
+ * Las cotas viven en el canónico `pisoDeFinca` (pisosTermicos.js) — una sola
+ * tabla en la app. Este lector conserva su guard anti-fabricación: altitud
+ * ausente o no positiva (0 msnm sin confirmar) devuelve null, nunca un piso
+ * inventado a nivel del mar.
  *
  * @param {number|string|null|undefined} altitud
  * @returns {'calido'|'templado'|'frio'|'paramo'|null}
@@ -53,10 +58,7 @@ export function normalizeCropName(s) {
 export function pisoTermicoFromAltitud(altitud) {
   const n = Number(altitud);
   if (!Number.isFinite(n) || n <= 0) return null;
-  if (n < 1000) return 'calido';
-  if (n < 2000) return 'templado';
-  if (n < 3000) return 'frio';
-  return 'paramo';
+  return pisoDeFinca(n);
 }
 
 /**
