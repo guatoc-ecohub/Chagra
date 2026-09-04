@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { coerceNumericArgs, normalizePisoTermicoArg } from '../sidecarClient';
+import { coerceNumericArgs, normalizePisoTermicoArg, omitEmptyCalendarioArgs } from '../sidecarClient';
 
 // Fix P0 (test integral Daniel 2026-06-13): el sidecar (Zod) espera number en
 // altitud_msnm; el chat LLM lo pasaba como string → 502 → Daniel sin respuesta.
@@ -75,5 +75,20 @@ describe('normalizePisoTermicoArg', () => {
     expect(normalizePisoTermicoArg(a)).toBe(a);
     expect(normalizePisoTermicoArg(null)).toBe(null);
     expect(normalizePisoTermicoArg(undefined)).toBe(undefined);
+  });
+});
+
+describe('omitEmptyCalendarioArgs', () => {
+  it('BUG-03a: omite mes y piso_termico vacíos del planner, nunca los convierte en valores válidos falsos', () => {
+    expect(omitEmptyCalendarioArgs('get_calendario_siembra', {
+      mes: '',
+      piso_termico: '   ',
+      cultivo: 'rucula',
+    })).toEqual({ cultivo: 'rucula' });
+  });
+
+  it('no toca strings vacíos de herramientas con otro contrato', () => {
+    const args = { mes: '', piso_termico: '' };
+    expect(omitEmptyCalendarioArgs('get_species', args)).toBe(args);
   });
 });

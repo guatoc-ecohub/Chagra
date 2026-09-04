@@ -401,6 +401,19 @@ describe('sidecarClient — feature flag on', () => {
       // bug reportado: el sidecar real lo rechazaría con 502.
       expect(JSON.parse(opts.body)).toEqual({ piso_termico: 'frio' });
     });
+
+    it('BUG-03a control negativo: get_calendario_siembra nunca envía mes ni piso_termico como string vacío', async () => {
+      fetchMock.mockResolvedValueOnce(jsonResponse(200, { cultivos: [] }));
+      const { callTool } = await importFresh();
+
+      await callTool('get_calendario_siembra', { mes: '', piso_termico: '' });
+
+      const [, opts] = fetchMock.mock.calls[0];
+      const body = JSON.parse(opts.body);
+      expect(body).not.toHaveProperty('mes', '');
+      expect(body).not.toHaveProperty('piso_termico', '');
+      expect(body).toEqual({});
+    });
   });
 
   describe('configuración / base URL', () => {
