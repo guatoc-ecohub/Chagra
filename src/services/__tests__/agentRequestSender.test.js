@@ -30,6 +30,20 @@ describe('agentRequestSender — buildSenderMessages', () => {
     expect(msgs[0].role).toBe('system');
     expect(msgs[0].content.length).toBeGreaterThan(0);
   });
+
+  it('el prompt del sistema usa español colombiano, sin voseo argentino', () => {
+    const msgs = buildSenderMessages({ prompt: 'hola' });
+    const system = msgs[0].content;
+    // Boundary Unicode-aware: \b de JS no corta tras vocal acentuada
+    // (mismo patrón de src/services/voseoFilter.js). Regresión: el prompt
+    // headless pedía "Sos Chagra… Respondé… sabés… decilo".
+    const voseo = new RegExp(
+      '(?<![\\p{L}\\p{N}])(?:sos|respondé|sabés|decilo)(?![\\p{L}\\p{N}])',
+      'iu',
+    );
+    expect(system).not.toMatch(voseo);
+    expect(system).toMatch(/Eres Chagra/);
+  });
 });
 
 describe('agentRequestSender — createAgentRequestSender', () => {
