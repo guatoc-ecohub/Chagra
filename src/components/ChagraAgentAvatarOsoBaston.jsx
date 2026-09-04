@@ -86,6 +86,7 @@ export default function ChagraAgentAvatarOsoBaston({
     // detectar presencia, sin pisar una actuación conversacional real. Mismo
     // contrato que ChagraAgentAvatarAngelita/Jaguar.
     reaccionaPresencia = true,
+    ...atributosConducta
 }) {
     const { despierta, handlers: handlersPresencia } = useAngelitaPresencia({
         activo: reaccionaPresencia,
@@ -119,6 +120,7 @@ export default function ChagraAgentAvatarOsoBaston({
             data-agt-estado={dataEstado || estadoAgente}
             data-pose={dataPose}
             data-visema={dataVisema || visema || undefined}
+            {...atributosConducta}
         />
     );
 

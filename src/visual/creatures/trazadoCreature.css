@@ -28,7 +28,7 @@
 }
 
 .trazado-chivito-normal[data-trazado-animated='true'] > svg {
-  animation: trazado-chivito-respira 3.4s ease-in-out infinite;
+  animation: trazado-chivito-respira 1.6s ease-in-out infinite;
 }
 
 .trazado-chivito-punk[data-trazado-animated='true'] > svg {
@@ -37,6 +37,12 @@
 
 .trazado-luciernaga[data-trazado-animated='true'] > svg {
   animation: trazado-luciernaga-late 3.1s ease-in-out infinite;
+}
+
+/* La linterna —no el cuerpo— es la respiración principal (0.65 → 1.0). */
+.trazado-luciernaga[data-linterna='normal'][data-trazado-animated='true'] > svg {
+  filter: brightness(.82);
+  animation: trazado-luciernaga-late 3.1s ease-in-out infinite, trazado-luciernaga-luz 3.1s ease-in-out infinite;
 }
 
 .trazado-luciernaga-fuerte[data-trazado-animated='true'] > svg {
@@ -61,6 +67,11 @@
 @keyframes trazado-luciernaga-late {
   0%, 100% { transform: translateY(0) scale(1); }
   48% { transform: translateY(-.8%) scale(1.012); }
+}
+
+@keyframes trazado-luciernaga-luz {
+  0%, 100% { filter: brightness(.65); }
+  48% { filter: brightness(1); }
 }
 
 @media (prefers-reduced-motion: reduce) {

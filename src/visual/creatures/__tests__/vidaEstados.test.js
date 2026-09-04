@@ -24,7 +24,8 @@ const CON_VIDA = Object.keys(VIDA_REPERTORIO);
 describe('1. El repertorio cubre exactamente las especies con vida propia', () => {
   it('cada especie declarada en el repertorio tiene sus datos de vida', () => {
     expect(Object.keys(VIDA_REPERTORIO).sort()).toEqual(CON_VIDA.sort());
-    expect(CON_VIDA).toHaveLength(13);
+    // Se suman chivito y guacamaya: ya no quedan en identidad muda.
+    expect(CON_VIDA).toHaveLength(15);
   });
 
   it('cada repertorio trae descanso [min,max] y ≥2 gestos con peso > 0', () => {

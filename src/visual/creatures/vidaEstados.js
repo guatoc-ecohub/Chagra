@@ -24,6 +24,7 @@
  * CADENCIA vive en `creatures.css`; el RELOJ en `useVidaIdle.js`; el DIBUJO
  * en cada bicho.
  */
+import { PERFILES_CONDUCTA } from '../../compai/nucleo/perfilesConducta.js';
 
 /* ── EL REPERTORIO POR ESPECIE ───────────────────────────────────────────────
    momento → { dur, peso }. El nombre del momento ES el nombre del gesto-firma
@@ -42,18 +43,6 @@ export const VIDA_REPERTORIO = {
       resopla: { dur: 4500, peso: 2 }, // 3× oso-resoplido 1.5s · 5× oso-cejas-frunce 0.9s
       rasca: { dur: 3000, peso: 2 }, // 3× oso-rasca-cuerpo 1.0s · 6× oso-rasca 0.5s
       reposo: { dur: 8800, peso: 1 }, // 2× rh-g-reposo 4.4s — el guardián se sienta
-    },
-  },
-  /* Tremarctos ornatus, dirección CAMINANTE (el oso del bastón). El mismo
-     temperamento lento de la especie, pero su gesto estrella no es rascarse:
-     es detenerse a HACER FLORECER el bastón (el dispersor de semillas hecho
-     gesto). */
-  'oso-baston': {
-    descanso: [4200, 9800], // caminante pausado: anda, se planta, florece
-    momentos: {
-      florece: { dur: 3400, peso: 2 }, // 2× osb-florece 1.7s — el bastón late EN FLOR
-      resopla: { dur: 4500, peso: 1.5 }, // 3× oso-resoplido 1.5s · 5× oso-cejas-frunce 0.9s
-      reposo: { dur: 8800, peso: 1 }, // 2× rh-g-reposo 4.4s — el caminante se aquieta
     },
   },
   colibri: {
@@ -88,14 +77,6 @@ export const VIDA_REPERTORIO = {
       reposo: { dur: 4400, peso: 0.6 }, // 1× rh-g-reposo — descansa POCO
     },
   },
-  jaguar: {
-    descanso: [4200, 9800],
-    momentos: {
-      acecha: { dur: 6400, peso: 2 }, // 2× jaguar-acecho 3.2s · 4× cejas 1.6s
-      ruge: { dur: 3200, peso: 1 }, // 2× jaguar-rugido 1.6s — raro e imponente
-      reposo: { dur: 8800, peso: 1 }, // 2× rh-g-reposo
-    },
-  },
   morrocoy: {
     descanso: [6400, 13200], // ancestral: la sabiduría no corre
     momentos: {
@@ -110,25 +91,6 @@ export const VIDA_REPERTORIO = {
       olfatea: { dur: 3300, peso: 2.5 }, // 6× borugo-olfateo 0.55s · 3× orejas 1.1s
       acurruca: { dur: 4600, peso: 1 }, // 1× borugo-acurruca 4.6s — el corazón del cierre
       reposo: { dur: 4400, peso: 1 }, // 1× rh-g-reposo
-    },
-  },
-  zariguya: {
-    descanso: [3000, 7200], // nocturna atareada: se para a oler cada nada
-    momentos: {
-      husmea: { dur: 3150, peso: 2.5 }, // 3× zari-hocico-husmea 1.05s — vive por la nariz
-      /* tanatosis ES la firma "se-hace-la-muerta" del brief (playing possum,
-         exclusiva de la especie). En el trazado FASE 2 el momento muestra la
-         lámina Gemini `muerta` como pose plena (posesTrazado.js). */
-      tanatosis: { dur: 2600, peso: 0.6 }, // 1× zari-desmayo 2.6s — rarísimo, y por eso gracioso
-      reposo: { dur: 4400, peso: 1 }, // 1× rh-g-reposo — el idle-cerebro de la piel trazada
-    },
-  },
-  luciernaga: {
-    descanso: [3000, 7200], // nocturna atareada: lee la noche y vuelve a flotar
-    momentos: {
-      destella: { dur: 2600, peso: 2.5 }, // 2× luci-destella 1.3s — el fogonazo de la linterna
-      lee: { dur: 3200, peso: 1.2 }, // 1× luci-lee 3.2s — se yergue y lee la noche (antenas atentas)
-      reposo: { dur: 4400, peso: 1 }, // 1× rh-g-reposo — bicho menudo, descansa poco
     },
   },
   dalmata: {
@@ -148,6 +110,11 @@ export const VIDA_REPERTORIO = {
     },
   },
 };
+
+// Los seis repertorios canónicos se proyectan de la fuente única de conducta.
+Object.assign(VIDA_REPERTORIO, Object.fromEntries(
+  Object.entries(PERFILES_CONDUCTA).map(([slug, perfil]) => [slug, perfil.vida]),
+));
 
 /* El nombre de momento que significa "pose species-agnostic", no gesto-firma:
    el bicho lo traduce a data-pose='reposo' en vez de a un data-attr propio. */

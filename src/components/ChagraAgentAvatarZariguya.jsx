@@ -71,6 +71,7 @@ export default function ChagraAgentAvatarZariguya({
     // presencia, sin pisar una actuación conversacional real. Mismo contrato
     // que ChagraAgentAvatarAngelita/Jaguar.
     reaccionaPresencia = true,
+    ...atributosConducta
 }) {
     const { despierta, handlers: handlersPresencia } = useAngelitaPresencia({
         activo: reaccionaPresencia,
@@ -100,6 +101,7 @@ export default function ChagraAgentAvatarZariguya({
             data-agt-estado={dataEstado || estadoAgente}
             data-pose={dataPose}
             data-visema={dataVisema || visema || undefined}
+            {...atributosConducta}
         />
     );
 

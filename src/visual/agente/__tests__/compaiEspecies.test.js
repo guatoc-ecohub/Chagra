@@ -10,6 +10,7 @@ import {
 import { ESTADOS_DE_PERFIL } from '../angelitaEstados.js';
 import { IDLE_PERFILES } from '../../creatures/creatureIdle.js';
 import { PERFILES as PERFILES_CLIMA } from '../../creatures/creatureClimaCuerpo.js';
+import { PERFILES_CONDUCTA } from '../../../compai/nucleo/perfilesConducta.js';
 
 const CAPACIDADES = ['cara', 'visema', 'clima', 'guia', 'entrada', 'marcha'];
 
@@ -28,7 +29,7 @@ describe('COMPAI_ESPECIES', () => {
     for (const perfil of Object.values(COMPAI_ESPECIES)) {
       expect(Object.keys(perfil.posePorEstado)).toEqual(ESTADOS_DE_PERFIL);
       expect(perfil.posePorEstado.caminando).toBe(perfil.medio === 'aire' ? 'vuela' : 'camina');
-      expect(Object.keys(perfil.capacidades)).toEqual(CAPACIDADES);
+      expect(Object.keys(perfil.capacidades).slice(0, CAPACIDADES.length)).toEqual(CAPACIDADES);
       for (const capacidad of Object.values(perfil.capacidades)) {
         expect(typeof capacidad.estrategia).toBe('string');
         expect(capacidad.estrategia.length).toBeGreaterThan(0);
@@ -46,6 +47,18 @@ describe('COMPAI_ESPECIES', () => {
       expect(perfil.idlePerfil).toBe(perfil.creatureSlug);
     }
     expect(COMPAI_ESPECIES.angelita.idlePerfil).toBe('abeja-angelita');
+  });
+
+  it('no deja a un compai canónico sin el perfil de conducta único', () => {
+    for (const [avatarType, perfil] of Object.entries(COMPAI_ESPECIES)) {
+      if (avatarType === 'angelita') {
+        expect(perfil.conducta).toBeUndefined();
+        continue;
+      }
+      expect(PERFILES_CONDUCTA[perfil.creatureSlug], `${avatarType} sin conducta`).toBeTruthy();
+      expect(perfil.conducta).toBe(PERFILES_CONDUCTA[perfil.creatureSlug]);
+      expect(perfil.capacidades.masa.valor).toBe(PERFILES_CONDUCTA[perfil.creatureSlug].masa);
+    }
   });
 
   it('resuelve por avatarType y por creatureSlug, con fallback seguro', () => {

@@ -30,7 +30,7 @@ function valorClima(clima) {
 function atributosDeCapacidades(capacidades) {
   return Object.fromEntries(Object.entries(capacidades).map(([nombre, capacidad]) => [
     `data-agt-capacidad-${nombre}`,
-    capacidad.estrategia,
+    capacidad.valor ?? capacidad.estrategia,
   ]));
 }
 
@@ -105,6 +105,7 @@ export function CompaiAgente({
     'data-visema': visema || undefined,
     'data-clima': climaResuelto,
     'data-tier': tier || undefined,
+    ...atributosCapacidad,
   };
 
   const cuerpo = Adaptador ? <Adaptador {...propsDelAdaptador} /> : children;
