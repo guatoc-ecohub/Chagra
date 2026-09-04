@@ -10,10 +10,11 @@
  *        retiraron los DOS render blocks y su testid (`compai-fab-hint`,
  *        `compai-fab-aviso`) — el contenido NO se perdió: sigue siendo
  *        exactamente lo que `contenidoPanel` calcula (mensaje vivo → última
- *        respuesta → hint de ruta), que es lo que `BurbujaPizarraPeek`
- *        muestra al TOCAR el compai (ver describe "R4" abajo). Este archivo
- *        prueba ahora que (a) esos testids nunca aparecen sin que el usuario
- *        toque nada, y (b) la información sigue alcanzable por el peek.
+ *        respuesta → explicación de la pantalla vía getHintForRuta), que es
+ *        lo que `BurbujaPizarraPeek` muestra al TOCAR el compai (ver describe
+ *        "R4" abajo). Este archivo prueba ahora que (a) esos testids nunca
+ *        aparecen sin que el usuario toque nada, y (b) la información sigue
+ *        alcanzable por el peek.
  *   R4 — al tocarlo, ASOMA el peek de pizarra (BurbujaPizarraPeek); su "Ver"
  *        abre el panel de lectura.
  *
@@ -49,13 +50,15 @@ describe('AgentFab — R3 retirada: sin burbuja de enseñanza AUTO-POP', () => {
   it('en reposo NO aparece ninguna burbuja sola — solo la pizarra al tocar', () => {
     render(<AgentFab onNavigate={() => {}} pantalla="mapa" />);
     expect(screen.queryByTestId('compai-fab-hint')).toBeNull();
-    // El hint de la ruta sigue ahí, pero solo se lee TOCANDO el compai (peek,
-    // que muestra la DESCRIPCIÓN del hint; el título vive en el panel "Ver").
+    // La explicación de la pantalla (compaiExplicaPantallas, cableado
+    // 2026-09-03: el texto de la pantalla SALE EN LA PIZARRA SIEMPRE) sigue
+    // ahí, pero solo se lee TOCANDO el compai (peek, que muestra la
+    // DESCRIPCIÓN del aviso de la ruta; el título vive en el panel "Ver").
     // El texto lo pinta <Typewriter> en grafemas — se busca por textContent
     // del contenedor, no por getByText (que exige un solo nodo de texto).
     fireEvent.click(screen.getByRole('button', { name: /Chagra IA/i }));
     expect(screen.getByTestId('compai-fab-peek').textContent)
-      .toContain('Toque un lugar para ver el piso térmico');
+      .toContain('Su finca en el mapa, con sus lotes, aguas y siembras ubicados.');
   });
 
   it('sin pantalla tampoco hay burbuja sola (nunca la hubo, ahora es universal)', () => {
@@ -93,7 +96,7 @@ describe('AgentFab — política v2: visible 100%, NUNCA se oculta al interactua
 });
 
 describe('AgentFab — R4 peek "Ver" abre el panel de lectura', () => {
-  it('tocar el compai asoma el peek y su "Ver" muestra el panel con el hint', () => {
+  it('tocar el compai asoma el peek y su "Ver" muestra el panel con la explicación de la pantalla', () => {
     render(<AgentFab onNavigate={() => {}} pantalla="mapa" />);
     // TAP = PEEK (decisión operador 2026-08-27): el toque asoma la PIZARRA
     // (BurbujaPizarraPeek, chalk, nunca madera) con el último aviso +
@@ -102,7 +105,9 @@ describe('AgentFab — R4 peek "Ver" abre el panel de lectura', () => {
     expect(screen.getByTestId('compai-fab-peek')).toBeInTheDocument();
     fireEvent.click(screen.getByRole('button', { name: /Ver el mensaje completo/i }));
     expect(screen.getByTestId('compai-fab-panel')).toBeInTheDocument();
-    expect(screen.getByText('Su finca en el mapa')).toBeInTheDocument();
+    // Cableado 2026-09-03: el título del panel ES el del manifiesto
+    // (compaiExplicaPantallas) para las pantallas cubiertas.
+    expect(screen.getByText('El mapa')).toBeInTheDocument();
   });
 });
 
