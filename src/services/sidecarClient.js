@@ -970,13 +970,39 @@ export function normalizePisoTermicoArg(args) {
   return { ...args, piso_termico: normalized };
 }
 
+/**
+ * El planner NLU es un límite no confiable: sus argumentos son inferencias,
+ * no una garantía de que tenga el dato. En particular,
+ * `get_calendario_siembra` acepta que `mes` y `piso_termico` no se deriven,
+ * pero el sidecar no acepta el string vacío como valor de esos campos.
+ *
+ * Omitimos únicamente los strings vacíos de este contrato. Un valor ausente
+ * conserva la semántica de «no se pudo derivar» y deja que la herramienta use
+ * sus defaults o responda un error tipado; nunca llega como un 502 de schema.
+ */
+export function omitEmptyCalendarioArgs(toolName, args) {
+  if (toolName !== 'get_calendario_siembra' || !args || typeof args !== 'object') return args;
+
+  let sanitized = null;
+  for (const field of ['mes', 'piso_termico']) {
+    if (typeof args[field] === 'string' && args[field].trim() === '') {
+      sanitized ||= { ...args };
+      delete sanitized[field];
+    }
+  }
+  return sanitized || args;
+}
+
 export async function callTool(toolName, args) {
   if (!toolName || typeof toolName !== 'string') return null;
   if (!ALLOWED_TOOLS.has(toolName)) {
     console.debug('[sidecar] tool no permitido', toolName);
     return { _error: true, reason: 'not_allowed', tool: toolName };
   }
-  const sanitizedArgs = normalizePisoTermicoArg(coerceNumericArgs(args || {}));
+  const sanitizedArgs = omitEmptyCalendarioArgs(
+    toolName,
+    normalizePisoTermicoArg(coerceNumericArgs(args || {})),
+  );
   const result = await postJson(`/tools/${toolName}`, sanitizedArgs, TOOL_TIMEOUT_MS);
   if (result !== null) return result;
   // postJson retornó null. Distinguir: tool fue intentado pero falló
