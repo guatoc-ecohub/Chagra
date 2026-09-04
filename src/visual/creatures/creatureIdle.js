@@ -190,6 +190,10 @@ export const IDLE_PERFILES = {
     celebra: { dur: 1.3, grados: 360 },
     noche: { freq: 1.0, amp: 0.05, rot: -5 },
   },
+  /* Panthera onca — el jaguar ES MÍSTICO y el mortal (vuelta de campana) le
+     está PROHIBIDO — regla dura del operador (2026-09-03). El perfil viene de
+     PERFILES_CONDUCTA con vuelta: null (carril ausente = excluido a propósito,
+     no avería); la proyección idleDePerfilConducta lo conserva así abajo. */
   /* Chelonoidis carbonarius — ancestral y PACIENTE: el más lento en girar;
      su "aseo" es guardarse un momento (la retracción). */
   morrocoy: {
@@ -314,7 +318,8 @@ export function idleDeCreature(t, {
   const activos = [];
   for (const carril of CARRILES) {
     const cfg = p[carril.tipo];
-    if (!cfg) continue;
+    if (!cfg) continue; // carril ausente del perfil = excluido a propósito
+    // (p. ej. el jaguar ES MÍSTICO: sin vuelta de campana — prohibido el mortal)
     const v = ventana(t, s, carril.id, cfg);
     if (v) activos.push({ tipo: carril.tipo, id: carril.id, cfg, f: v.f, k: v.k, inicio: t - v.f * cfg.dur });
   }
@@ -324,7 +329,7 @@ export function idleDeCreature(t, {
     const bloqueado = CARRILES.some((otro) => {
       if (otro.id === cand.id) return false;
       const cfgOtro = p[otro.tipo];
-      if (!cfgOtro) return false;
+      if (!cfgOtro) return false; // ese carril no existe en este perfil
       const w = ventana(cand.inicio, s, otro.id, cfgOtro);
       return w !== null && w.f > 0; // otro carril ya corría cuando este arrancó
     });
