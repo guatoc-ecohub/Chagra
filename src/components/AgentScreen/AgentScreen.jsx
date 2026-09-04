@@ -35,7 +35,7 @@ import { retrieve } from '../../services/ragRetriever';
 // Se consulta ANTES del pipeline sidecar/LLM: si el texto describe varias
 // acciones de campo, se ejecutan las operaciones confirmadas vía actionExecutor
 // (lote/siembra) y se agenda la sugerencia agroecológica en segundo plano.
-import { decomposeComplexIngest, scheduleAgroecologicalSuggestion } from '../../services/agentComplexIngest';
+import { decomposeComplexIngest, describeComplexIngestOperation, scheduleAgroecologicalSuggestion } from '../../services/agentComplexIngest';
 import { parseIntent, formatIntentDescription } from '../../services/agentIntentParser';
 import { streamOpenAI } from '../../services/openaiStream';
 import { buildLLMRequest, selectChatRoute } from '../../services/llmRouter';
@@ -2983,13 +2983,9 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
       const notRegistered = plan.operations.filter(
         (operation) => !registered.some((item) => item.kind === operation.kind && item.parameters?.ordinal === operation.parameters?.ordinal && item.parameters?.name === operation.parameters?.name),
       );
-      const registeredLabels = registered.map((operation) => {
-        if (operation.kind === 'ensure_land') return 'el surco';
-        if (operation.kind === 'create_seeding') return 'la siembra retrofechada';
-        if (operation.kind === 'register_harvest') return `la cosecha ${operation.parameters.ordinal}`;
-        if (operation.kind === 'register_fertilizer_cadence') return `el abono cada ${operation.parameters.interval_days} días`;
-        return `la observación de ${operation.parameters.name}`;
-      });
+      // Etiquetas legibles compartidas con el gate (ActionConfirmModal) para
+      // que mensaje y confirmación nombren las operaciones igual.
+      const registeredLabels = registered.map(describeComplexIngestOperation);
       const missingTreatment = plan.operations.some(
         (operation) => operation.kind === 'register_problem' && operation.parameters.treatment_status === 'missing',
       );
