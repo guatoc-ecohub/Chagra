@@ -9,36 +9,37 @@
   "cultivable": true,
   "conservation_status": "cultivo_comun",
   "thermal_zones": [
-    "frio"
+    "frio",
+    "paramo"
   ],
   "roles_in_guild": [
-    "crop",
-    "ground_cover"
+    "crop"
   ],
   "antagonists": [],
   "especies_nativas_sustitutas": [],
   "propagation": {
     "metodo_principal": "tuberculo",
-    "notas": "Variedades de colores vibrantes; requiere suelos con alto contenido de materia orgánica para un desarrollo óptimo."
+    "notas": "Fenologia: siembra de tuberculo semilla, emergencia, cobertura baja, crecimiento vegetativo, tuberizacion, amarillamiento del follaje y cosecha."
   },
   "requirements": {
     "agua": "medio",
     "altitud_msnm": {
-      "min_absoluto": 1800,
-      "optimo_min": 2200,
-      "optimo_max": 3000,
-      "max_absoluto": 3400
+      "min_absoluto": 2400,
+      "optimo_min": 2800,
+      "optimo_max": 3400,
+      "max_absoluto": 3800
     },
     "temperatura_c": {
-      "helada_letal": -5,
-      "optimo_min": 12,
-      "optimo_max": 18,
-      "max_tolerable": 24
+      "helada_letal": -4,
+      "optimo_min": 8,
+      "optimo_max": 16,
+      "max_tolerable": 22
     },
     "radiacion": "sol_pleno",
     "drenaje_requerido": "bueno"
   },
-  "valor_pedagogico": "El ulluco (Ullucus tuberosus Caldas) es un tubérculo andino cultivado en Colombia principalmente en los departamentos de Cundinamarca, Boyacá y Nariño entre 1800 y 3400 msnm en zonas térmicas frías. Su manejo agronómico incluye propagación mediante tubérculos semilla con un ciclo de cultivo de 6-8 meses, requiere suelos con alto contenido de materia orgánica para un desarrollo óptimo, se asocia beneficiosamente con maíz y haba en sistemas de cultivo mixto, y requiere manejo de plagas como el gorgojo del ulluco y enfermedades como el mildiu mediante rotación de cultivos y uso de biopreparados andinos. En el contexto cultural andino, especialmente muisca, el ulluco ha sido cultivado desde tiempos prehispánicos como alimento esencial en la dieta campesino, utilizado tanto en su forma fresca en guisos y sopas como en forma seca para conservación, formando parte de la chagra tradicional como uno de los tubérculos originarios de los Andes. Según la taxonomía verificada por GBIF Backbone Taxonomy y Plants of the World Online (POWO), su nombre científico válido es Ullucus tuberosus Caldas.",
+  "valor_pedagogico": "El ulluco o chugua (Ullucus tuberosus) es un tuberculo andino de la familia Basellaceae, cultivado en pisos frios y altoandinos de Colombia. Su fenologia se observa en siembra de tuberculo semilla, emergencia, crecimiento vegetativo bajo, tuberizacion, amarillamiento del follaje y cosecha. Es valioso para educacion agroecologica porque muestra que la seguridad alimentaria andina no depende solo de papa: tambien incluye especies con texturas, colores y ciclos propios. En manejo se debe cuidar semilla sana, rotacion y drenaje. Plagas y enfermedades clave incluyen babosas, gusanos de suelo, pulgones, virosis en material vegetativo y pudriciones de tuberculo.",
+  "companions_markdown": "### Especies asociadas favorables\n\nEstas especies favorecen el cultivo cuando se siembran cerca:\n- solanum_tuberosum — Papa (Solanum tuberosum L.)\n- oxalis_tuberosa — Oca / Hibia (Oxalis tuberosa Molina)",
   "sources": [
     {
       "id": "agrosavia-manual-tuberculos-andinos-2017",
@@ -47,10 +48,10 @@
       "url": null
     },
     {
-      "id": "gbif-taxonomic-backbone",
-      "title": "gbif-taxonomic-backbone",
+      "id": "ica-resolucion-3168-2015",
+      "title": "ica-resolucion-3168-2015",
       "tier": "A",
-      "url": "https://www.gbif.org/dataset/d7dddbf4-2cf0-4f39-9b2a-bb099caae36c"
+      "url": null
     },
     {
       "id": "powo-kew",
@@ -59,12 +60,12 @@
       "url": "https://powo.science.kew.org"
     },
     {
-      "id": "ica-resolucion-3168-2015",
-      "title": "ica-resolucion-3168-2015",
+      "id": "gbif-taxonomic-backbone",
+      "title": "gbif-taxonomic-backbone",
       "tier": "A",
-      "url": null
+      "url": "https://www.gbif.org/dataset/d7dddbf4-2cf0-4f39-9b2a-bb099caae36c"
     }
   ],
   "_generated_by": "scripts/build-cycle-content-from-catalog.mjs",
-  "_generated_at": "2026-05-19T00:42:57.367Z"
+  "_generated_at": "2026-09-03T07:40:20.316Z"
 }

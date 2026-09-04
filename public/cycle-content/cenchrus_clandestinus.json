@@ -9,6 +9,7 @@
   "cultivable": false,
   "conservation_status": "invasor",
   "thermal_zones": [
+    "templado",
     "frio"
   ],
   "roles_in_guild": [
@@ -16,11 +17,7 @@
     "ground_cover"
   ],
   "antagonists": [],
-  "especies_nativas_sustitutas": [
-    "agrostis_foliata",
-    "calamagrostis_effusa",
-    "festuca_sp_paramo"
-  ],
+  "especies_nativas_sustitutas": [],
   "propagation": null,
   "requirements": {
     "agua": null,
@@ -56,5 +53,5 @@
     }
   ],
   "_generated_by": "scripts/build-cycle-content-from-catalog.mjs",
-  "_generated_at": "2026-05-19T00:42:57.359Z"
+  "_generated_at": "2026-09-03T07:40:20.306Z"
 }

@@ -60,20 +60,38 @@ function construirFixture({ conConsumidor = true, conAllowlist = true, allowlist
   mkdirSync(join(root, 'src/services'), { recursive: true });
 
   // El script se COPIA: su ROOT es el padre de su propia carpeta, así que la
-  // copia audita el árbol fixture. Es autocontenido (solo node:), la copia
-  // es segura.
+  // copia audita el árbol fixture.
   cpSync(GATE_SCRIPT, join(root, 'scripts/audit-integraciones.mjs'));
+  // Y con él su motor. Desde 095.b el gate no tiene resolver propio: llama a
+  // `scripts/lib/alcance-simbolica.mjs`, el MISMO que usa
+  // `audit-componente-huerfano.mjs`. Sin copiar la carpeta, la copia del gate
+  // muere en el import y el fixture deja de probar nada.
+  cpSync(resolve(__dirname, '../lib'), join(root, 'scripts/lib'), { recursive: true });
 
   // Los 3 SAME_REPO_TARGETS del script apuntan a src/services/grafoRelations.js.
   writeFileSync(join(root, 'src/services/grafoRelations.js'), GRAFO_FIXTURE);
 
   // Componente ALCANZABLE desde App.jsx (import estático, dos saltos: App →
   // Montado → módulo de servicio) y componente HUÉRFANO (nadie lo importa).
-  writeFileSync(join(root, 'src/App.jsx'), "import Montado from './mockups/Montado.jsx';\nexport default function App() { return Montado; }\n");
+  writeFileSync(join(root, 'src/App.jsx'), "import { Montado } from './mockups/index.js';\nexport default function App() { return Montado; }\n");
   writeFileSync(join(root, 'src/mockups/Huerfano.jsx'), 'export default function Huerfano() { return null; }\n');
+
+  // Barril que re-exporta el huérfano SIN que nadie le pida el nombre. Es el
+  // control positivo de la ceguera nº1: el barril SÍ es alcanzable (App.jsx lo
+  // importa por `Montado`), así que un BFS por ARCHIVO daba `Lavado.jsx` por
+  // cableado. Con alcance por SÍMBOLO no se lava: nadie pide `Lavado`.
+  writeFileSync(
+    join(root, 'src/mockups/index.js'),
+    "export { default as Montado } from './Montado.jsx';\nexport { default as Lavado } from './Lavado.jsx';\n",
+  );
+  writeFileSync(join(root, 'src/mockups/Lavado.jsx'), 'export default function Lavado() { return null; }\n');
 
   if (conConsumidor) {
     // Consumidor real del tercer target (fuera del módulo y de __tests__).
+    // Ojo: nadie lo importa, así que desde 095.b (el gate barre TODO src/, no
+    // solo mockups+visual) es él mismo un huérfano — y por eso está declarado
+    // en el allowlist del fixture. Eso es intencional: prueba que el gate ya
+    // mira `src/services`, que antes quedaba fuera de su radar.
     writeFileSync(
       join(root, 'src/services/consumidorGrafo.js'),
       "import { getKnowledgeTopics } from './grafoRelations.js';\nexport const usarConocimiento = getKnowledgeTopics;\n",
@@ -102,6 +120,8 @@ function construirFixture({ conConsumidor = true, conAllowlist = true, allowlist
       sidecar_endpoints: [],
       orphan_components: [
         { id: 'src/mockups/Huerfano.jsx', reason: 'excepcion de prueba del fixture', date: '2026-09-03' },
+        { id: 'src/mockups/Lavado.jsx', reason: 'excepcion de prueba del fixture (barril que lava)', date: '2026-09-03' },
+        { id: 'src/services/consumidorGrafo.js', reason: 'excepcion de prueba del fixture (barrido ancho)', date: '2026-09-03' },
       ],
     };
     writeFileSync(join(root, 'ops/integraciones-no-consumidas.json'), JSON.stringify(contenido, null, 2));
@@ -138,6 +158,8 @@ describe('audit-integraciones (fixture hermético)', function () {
       // ...y Montado.jsx NO aparece como huérfano: el BFS desde App.jsx lo
       // alcanza por import estático (por eso no hay ningún warn sobre él).
       expect(stdout).not.toMatch(/SIN ruta viva pero allowlisted: src\/mockups\/Montado\.jsx/);
+      // El barril NO lava: `Lavado.jsx` es huérfano aunque el barril esté vivo.
+      expect(stdout).toContain('src/mockups/Lavado.jsx');
     });
   });
 
@@ -157,6 +179,16 @@ describe('audit-integraciones (fixture hermético)', function () {
         expect(status).toBe(1);
         expect(stderr).toContain('[orphan]');
         expect(stderr).toContain('src/mockups/Huerfano.jsx');
+        // CONTROL POSITIVO de la ceguera nº1: `Lavado.jsx` solo llega por un
+        // `export … from` de un barril vivo. El gate viejo lo daba por
+        // cableado; este tiene que nombrarlo.
+        expect(stderr).toContain('src/mockups/Lavado.jsx');
+        // CONTROL POSITIVO de la ceguera nº3: `src/services/` no es
+        // `src/mockups` ni `src/visual` — antes ni se miraba.
+        expect(stderr).toContain('src/services/consumidorGrafo.js');
+        // CONTROL NEGATIVO: `Montado.jsx` SÍ está pedido por nombre desde el
+        // barril que App.jsx importa. Nada cableado puede salir acusado.
+        expect(stderr).not.toContain('src/mockups/Montado.jsx');
       },
     );
   });
@@ -224,18 +256,24 @@ describe('ops/integraciones-no-consumidas.json (repo real)', function () {
     expect(problemas).toEqual([]);
   });
 
-  it('cada id de orphan_components existe en disco, es .jsx/.tsx y vive bajo src/mockups o src/visual', function () {
+  it('cada id de orphan_components existe en disco y es un módulo de src/', function () {
     // Si un renombre o borrado deja una entrada apuntando a un archivo que ya
     // no existe, la entrada queda muerta (y el gate ya no protege nada ahí).
+    //
+    // 095.b relajó DOS restricciones de esta guardia, y las dos por la misma
+    // razón: el gate ya no audita solo `src/mockups`+`src/visual` ni solo
+    // `.jsx/.tsx`. Exigirle a una entrada que viva en dos carpetas concretas
+    // era heredar en el allowlist la misma ceguera que se arregló en el gate —
+    // un huérfano de `src/hooks` no se podría ni declarar.
     const problemas = [];
     for (const entrada of allowlist.orphan_components || []) {
       const id = entrada.id || '(sin id)';
-      if (!/^(src\/mockups|src\/visual)\//.test(id)) {
-        problemas.push(`${id} fuera de los directorios auditados`);
+      if (!/^src\//.test(id)) {
+        problemas.push(`${id} no es una ruta bajo src/`);
         continue;
       }
-      if (!/\.(jsx|tsx)$/.test(id)) {
-        problemas.push(`${id} no es componente (.jsx/.tsx)`);
+      if (!/\.(jsx|tsx|js|mjs|ts)$/.test(id)) {
+        problemas.push(`${id} no es un módulo auditable`);
         continue;
       }
       if (!existsSync(resolve(REPO_ROOT, id))) {
@@ -258,11 +296,75 @@ describe('ops/integraciones-no-consumidas.json (repo real)', function () {
     }
   });
 
-  it('el gate corre verde end-to-end sobre este repo', function () {
-    // Verde DESPUÉS permanente: si un PR nuevo deja un componente huérfano
-    // bajo src/mockups|src/visual sin declararlo, este test falla igual que
-    // el workflow Integraciones no consumidas — doble guarda barata.
-    const r = spawnSync(execPath, [GATE_SCRIPT], { encoding: 'utf8', cwd: REPO_ROOT });
-    expect(r.status, `gate rojo:\n${r.stderr || r.stdout}`).toBe(0);
+  // -------------------------------------------------------------------------
+  // CONTROLES sobre el repo real (095.b)
+  // -------------------------------------------------------------------------
+  // Acá NO se afirma "el gate corre verde". Hasta 2026-09-03 este test exigía
+  // exit 0, y ese era justo el incentivo equivocado: al arreglarle la ceguera al
+  // gate aparecen hallazgos reales, y un test que exige verde empuja a
+  // declararlos en masa para callarlo — que es convertir el gate en trámite.
+  // Lo que se guarda acá es que el INSTRUMENTO no vuelva a mentir: que vea lo
+  // que se le escapaba y que no acuse a lo que sí está montado. Verde o rojo
+  // sobre dev es una decisión de drenaje del operador, no del arnés.
+  describe('el gate ve lo que antes se le escapaba (095.b)', function () {
+    const r = spawnSync(execPath, [GATE_SCRIPT], {
+      encoding: 'utf8',
+      cwd: REPO_ROOT,
+      env: { ...process.env, CHAGRA_PRO_PATH: '/__no_existe__' },
+    });
+    const salida = `${r.stdout || ''}\n${r.stderr || ''}`;
+
+    // CONTROL POSITIVO · el barril que lavaba. Estos ocho solo llegan por un
+    // `export … from` de `src/visual/creatures/index.js`, que sí está vivo:
+    // nadie les pide el nombre, así que un bundler con tree-shaking no los
+    // emite. El BFS por ARCHIVO los daba por cableados; el alcance por SÍMBOLO
+    // los nombra. Si alguien vuelve a un resolver por archivo, esto se cae.
+    const LAVADOS_POR_EL_BARRIL = [
+      'src/visual/creatures/Borugo.jsx',
+      'src/visual/creatures/ChivitoTinta.jsx',
+      'src/visual/creatures/LuciernagaTinta.jsx',
+      'src/visual/creatures/MomentoGuardianes.jsx',
+      'src/visual/creatures/OsoAndino.jsx',
+      'src/visual/creatures/OsoAnteojos.jsx',
+      'src/visual/creatures/PerroHeroe.jsx',
+      'src/visual/creatures/PerroTransicion.jsx',
+    ];
+    it.each(LAVADOS_POR_EL_BARRIL)('%s sale nombrado (el barril no lava)', function (id) {
+      expect(salida).toContain(id);
+    });
+
+    // CONTROL NEGATIVO · lo que SÍ está montado no puede salir acusado.
+    // Estas dos pasan por el mismo barril y NO son huérfanas, cada una por su
+    // razón, y por eso están acá: es el par que separa "pasa por un barril" de
+    // "está lavado".
+    //   · OsoBastonLaminaViva — el barril la importa por DEFAULT (línea 326) y
+    //     la mete en el objeto de registro CREATURES. Eso es un valor, no un
+    //     re-export: el bundler la emite.
+    //   · ZariguyaGeminiLaminaViva — sí es `export … from` en el barril, pero
+    //     además `ZariguyaCompaiEscena.jsx` la importa directo y la renderiza.
+    const MONTADAS_DE_VERDAD = [
+      'src/visual/creatures/OsoBastonLaminaViva.jsx',
+      'src/visual/creatures/ZariguyaGeminiLaminaViva.jsx',
+    ];
+    it.each(MONTADAS_DE_VERDAD)('%s NO sale acusado', function (id) {
+      expect(salida).not.toContain(id);
+    });
+
+    // CONTROL POSITIVO · el radar de dos carpetas. Estos tres viven fuera de
+    // `src/mockups`/`src/visual` y por eso el gate viejo ni los miraba.
+    it.each([
+      'src/components/aprendizaje/GuiaEspecieCards.jsx',
+      'src/hooks/useCompaiGuiaPantalla.js',
+      'src/services/compaiExplicaPantallas.js',
+    ])('%s sale nombrado (el gate ya no mira solo dos carpetas)', function (id) {
+      expect(salida).toContain(id);
+    });
+
+    it('el gate sigue barato: termina en menos de 20 s', function () {
+      // No se mide el tiempo acá (el spawn ya corrió); se afirma que corrió y
+      // devolvió un veredicto legible en vez de colgarse o reventar.
+      expect([0, 1]).toContain(r.status);
+      expect(salida).toContain('alcance de src/:');
+    });
   });
 });

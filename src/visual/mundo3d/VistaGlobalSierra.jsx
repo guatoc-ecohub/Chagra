@@ -64,7 +64,7 @@ import { ATMOSFERA } from './atmosferaMadre.js';
 import { perfilDeTier } from './deviceTier.js';
 import PisosTermicosBandas from './PisosTermicosBandas.jsx';
 import TransicionSierraMundo from './TransicionSierraMundo.jsx';
-import { PISOS_TERMICOS, PISOS_TERMICOS_SIERRA } from './pisosTermicos.js';
+import { BANDAS_SIERRA, CLAVE_PISOS_SIERRA } from './pisosTermicos.js';
 
 /* ── Geografía del macizo (validada contra el DR: mar al norte, macizo al sur,
       cumbres gemelas + Simmonds, costa de Palomino). Coordenadas de MUNDO:
@@ -73,10 +73,9 @@ const CIMA = 5.0; // altura de referencia (≈ 5.775 m escalados con drama sobri
 const COSTA_Z = -3; // latitud de la línea de costa en Z
 const ANCHO = 22; // extensión E-O del terreno
 const FONDO = 20; // extensión N-S del terreno
-// La cota de "nieve perpetua" (≈ 4.800 msnm → topeWorldY 4.15) vive en la tabla
-// canónica PISOS_TERMICOS_SIERRA (pisosTermicos.js); aquí solo se LEE, no se
-// redefine: es el tope del superpáramo, justo debajo de la nieve.
-const LINEA_NIEVE = PISOS_TERMICOS_SIERRA.find((p) => p.id === 'superparamo')?.topeWorldY ?? 4.15;
+// La cota de "nieve perpetua" (≈ 4.800 msnm → topeWorldY 4.15) ya NO se declara
+// acá: llega dentro de `BANDAS_SIERRA` como el tope del superpáramo. Tenerla
+// suelta en esta vista era otra copia de la misma cota, esperando a desincronizarse.
 
 const clamp = (v, a, b) => Math.min(b, Math.max(a, v));
 const smoothstep = (a, b, x) => {
@@ -115,34 +114,26 @@ const CUMBRE = { x: -0.4, y: 5.0, z: 4.1 }; // Colón · Bolívar (gemelas nevad
 const SIMMONDS = { x: 2.9, y: 4.36, z: 2.9 };
 const PALOMINO = { x: 5.0, y: 0.2, z: -2.85 }; // desembocadura sobre el Caribe
 
-/* ── Banding de pisos térmicos por altitud (colores cálidos de hora dorada;
-      la luz del sol termina de entibiarlos). El bosque de niebla es la banda
+/* ── Banding de pisos térmicos por altitud. El bosque de niebla es la banda
       donde se enganchan las nubes.
 
-      Los 6 pisos ecológicos (cálido→nival) LEEN su color de la tabla canónica
-      `PISOS_TERMICOS` (`pisosTermicos.js`), la fuente única que acaba de nacer
-      en el Paso 1 — este render no la edita, la consume. La playa es la banda
-      propia de la costa (0→0.28), que la tabla canónica no separa del cálido.
-      La separación entre bandas se afina angostando la transición del smoothstep
-      (para que se lean 7, no 3) y con el brillo del nival, que bajo la luz dorada
-      debe leerse NIEVE, no ocre (§6-B del diseño). ── */
-const bandColor = (id) => {
-  const p = PISOS_TERMICOS.find((b) => b.id === id);
-  return p ? new THREE.Color(p.color) : new THREE.Color('#ddc78d');
-};
-/* Snow: blanco casi puro con un dejo frío, para que sobreviva a la luz dorada
-   del atardecer sin volverse ocre (defecto §2.3.1). El casquete es pequeño por
-   doctrina: Colombia perdió casi todo el glaciar, así que la nieve ocupa solo
-   la franja más alta y MUERDE con una línea de nieve nítida (§6-B). */
-const BANDAS = [
-  { tope: 0.28, c: new THREE.Color('#ddc78d') }, // playa / arena
-  { tope: 0.95, c: bandColor('calido') }, // bosque seco tropical
-  { tope: 1.75, c: bandColor('templado') }, // selva húmeda
-  { tope: 2.6, c: bandColor('frio') }, // bosque de niebla
-  { tope: 3.45, c: bandColor('paramo') }, // páramo / frailejones
-  { tope: LINEA_NIEVE, c: bandColor('superparamo') }, // superpáramo (roca)
-  { tope: Infinity, c: new THREE.Color('#f4f9ff') }, // nieve perpetua (blanco frío luminoso)
-];
+      🔴 UNIFICADO (2026-09-02): las 7 bandas —cota, nombre y COLOR— salen
+      enteras de `BANDAS_SIERRA` (`pisosTermicos.js`). Antes esta lista se
+      escribía a mano leyendo colores de `PISOS_TERMICOS` piso por piso y
+      añadiendo playa y nieve como literales; la bóveda mientras tanto leía el
+      OTRO juego de colores de la misma tabla, y los dos «leían la canónica».
+      Ya no hay dos juegos: el color de cada banda lo decide la tabla, incluida
+      la playa (arena, no es un piso) y el nival (blanco frío, override de
+      render para que la cima lea NIEVE y no ocre bajo la hora dorada, §6-B).
+      La separación entre bandas se afina angostando el smoothstep (para que se
+      lean 7, no 3), abajo.
+
+      🔴 EL ORDEN IMPORTA: `BANDAS_SIERRA` llega MAR→CIMA con `Infinity` de
+      último, que es justo lo que `colorPorAltura` necesita para avanzar. La
+      tabla nativa va al revés (cima→mar); alimentarla cruda dejaría el índice
+      en 0 y pintaría crema nival toda la ladera. `pisosTermicosUnificados.test.js`
+      fija ese sentido. ── */
+const BANDAS = BANDAS_SIERRA.map((b) => ({ tope: b.tope, c: new THREE.Color(b.hexColor) }));
 /* El GROSOR de la transición entre bandas. Interior: angosto (~±0.09 world Y)
    para que cada piso se lea separado. La línea de nieve (última) MUCHO más
    angosta (±0.02): un filo nevado nítido, no un difuminado ocre. */
@@ -158,17 +149,11 @@ function colorPorAltura(y, out) {
 }
 
 /* La clave de pisos accesible (DOM del modo con Canvas). Nombres de piso, sin
-   palabras-gatillo del linter i18n; el color acompaña a la etiqueta. Refleja
-   los mismos colores derivados de la tabla canónica que pinta la ladera. */
-const CLAVE_PISOS = [
-  { c: '#f4f9ff', t: 'Nieve perpetua' },
-  { c: '#b9c6cc', t: 'Superpáramo' },
-  { c: '#9fb6bf', t: 'Páramo y frailejones' },
-  { c: '#4f8f7d', t: 'Bosque de niebla' },
-  { c: '#6f9e4a', t: 'Selva húmeda' },
-  { c: '#cba04a', t: 'Bosque seco' },
-  { c: '#ddc78d', t: 'Playa y costa' },
-];
+   palabras-gatillo del linter i18n; el color acompaña a la etiqueta. Sale de la
+   MISMA tabla que pinta la ladera —antes era una copia a mano de esos colores,
+   que es como se destiñen las leyendas—, en orden cima→mar, que es como se lee
+   una montaña de arriba abajo. */
+const CLAVE_PISOS = CLAVE_PISOS_SIERRA;
 
 /* Altitud representativa de cada piso (world Y), para el marcador "usted". */
 const PISOS_Y = {

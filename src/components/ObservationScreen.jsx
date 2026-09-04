@@ -7,6 +7,7 @@ import useAssetStore from '../store/useAssetStore';
 import { getParentLandIdFromAsset } from '../utils/assetRelationships';
 import { retrieve as ragRetrieve } from '../services/ragRetriever';
 import { compressImage, IMAGE_TOO_LARGE_MESSAGE } from '../utils/imageCompress';
+import { shouldTriggerCaseBridge } from '../utils/caseBridge';
 
 // Bug 069.10 — observation requiere descripción mínima útil + ubicación.
 // Mínimo de 5 caracteres descarta entries vacíos tipo "ok" o "test".
@@ -20,8 +21,8 @@ const MAX_DESCRIPTION_LEN = 2000;
 // Audit deep 070.6 — bridge severity → case_study. Si severity ∈ {high,
 // critical} y savePayload resuelve OK, abrimos CaseLinkModal con el logId
 // resultante para que el operador linke a caso existente o cree uno nuevo
-// (pre-fill species_slug + timeline[0]).
-const SEVERITY_TRIGGER_CASE_BRIDGE = new Set(['high', 'critical']);
+// (pre-fill species_slug + timeline[0]). La regla vive en utils/caseBridge
+// (compartida con los satélites AssetTimeline/EvidenceCapture).
 
 // L1.5 — sugerencia proactiva de tratamientos vía RAG.
 // Cuando el operador describe una observación con severity media-alta,
@@ -239,7 +240,7 @@ function ObservationScreen({ onBack, onSave }) {
       // abrimos el modal ANTES de navegar atrás para que el operador pueda
       // linkar o crear caso. La planta seleccionada (si la hay) alimenta el
       // pre-fill de species_slug.
-      const triggersCaseBridge = SEVERITY_TRIGGER_CASE_BRIDGE.has(formData.severity);
+      const triggersCaseBridge = shouldTriggerCaseBridge(formData.severity);
       if (triggersCaseBridge) {
         const selectedPlant = formData.plantId
           ? (plants || []).find((p) => p.id === formData.plantId)

@@ -1,0 +1,55 @@
+{
+  "species_slug": "elaeis_guineensis",
+  "scientific_name": "Elaeis guineensis Jacq.",
+  "common_names": [
+    "Palma de aceite"
+  ],
+  "family": "Arecaceae",
+  "category": "frutales_perennes",
+  "cultivable": true,
+  "conservation_status": "cultivo_comun",
+  "thermal_zones": [
+    "calido"
+  ],
+  "roles_in_guild": [
+    "crop"
+  ],
+  "antagonists": [],
+  "especies_nativas_sustitutas": [],
+  "propagation": null,
+  "requirements": {
+    "agua": null,
+    "altitud_msnm": {
+      "min_absoluto": 0,
+      "optimo_min": 0,
+      "optimo_max": 500,
+      "max_absoluto": 700
+    },
+    "temperatura_c": null,
+    "radiacion": null,
+    "drenaje_requerido": null
+  },
+  "valor_pedagogico": "La palma de aceite o palma africana (Elaeis guineensis Jacq., familia Arecaceae) es una palma perenne de tierra caliente originaria del África occidental, hoy el cultivo oleaginoso más extenso de Colombia, sembrado en cuatro zonas (Norte: Magdalena, Cesar; Central: Santander; Oriental: Meta, Casanare; Suroccidental: Tumaco), siendo Colombia el primer productor de aceite de palma de América y cuarto del mundo. Su racimo de frutos rojo-anaranjados se procesa para aceite de palma (mesocarpio) y de palmiste (almendra). Es un cultivo de fuerte controversia socioambiental por su asociación histórica con deforestación, conflictos de tierra y pérdida de biodiversidad cuando reemplaza bosque o sistemas campesinos, aunque existen modelos de certificación sostenible. Está afectada por un complejo sanitario severo: pudrición del cogollo (Phytophthora palmivora), anillo rojo (nematodo Bursaphelenchus cocophilus transmitido por el picudo Rhynchophorus palmarum), marchitez letal (vector Haplaxius crudus) y pudrición basal por Ganoderma zonatum, todos registrados en la curaduría de Chagra. Lección viva crítica sobre agroindustria tropical, monocultivo, transición agroecológica y tensiones entre exportación y soberanía alimentaria. Fuentes Tier A de taxonomía: GBIF, POWO Kew, Bernal 2015.",
+  "sources": [
+    {
+      "id": "gbif-taxonomic-backbone",
+      "title": "gbif-taxonomic-backbone",
+      "tier": "A",
+      "url": "https://www.gbif.org/dataset/d7dddbf4-2cf0-4f39-9b2a-bb099caae36c"
+    },
+    {
+      "id": "powo-kew",
+      "title": "powo-kew",
+      "tier": "A",
+      "url": "https://powo.science.kew.org"
+    },
+    {
+      "id": "bernal-2015-plantas-liquenes-colombia",
+      "title": "bernal-2015-plantas-liquenes-colombia",
+      "tier": "A",
+      "url": "http://catalogoplantasdecolombia.unal.edu.co"
+    }
+  ],
+  "_generated_by": "scripts/build-cycle-content-from-catalog.mjs",
+  "_generated_at": "2026-09-03T07:40:20.316Z"
+}

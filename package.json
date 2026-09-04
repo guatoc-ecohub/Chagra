@@ -19,6 +19,7 @@
     "coverage": "vitest run --coverage",
     "audit:bundle": "node scripts/audit-bundle.mjs",
     "audit:integraciones": "node scripts/audit-integraciones.mjs",
+    "audit:huerfanos": "node scripts/audit-componente-huerfano.mjs",
     "detect:unwired": "node scripts/detect-unwired.mjs",
     "grafo:snapshot": "node scripts/snapshot-grafo-crecimiento.mjs",
     "gen:stats": "node scripts/gen-chagra-stats.mjs",

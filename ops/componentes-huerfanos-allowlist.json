@@ -1,0 +1,12 @@
+{
+  "_meta": {
+    "descripcion": "Allowlist del control de componente huérfano (scripts/audit-componente-huerfano.mjs, card 095). Declara lo que NO está montado A PROPÓSITO. Cada entrada exige reason + date.",
+    "regla_dura": "Una entrada que no le hace match a ningún sujeto real se reporta como [allowlist-obsoleta]. Es la lección del CHUNK_ALLOWLIST, que exceptuaba 'creatures-' mientras el chunk que reventaba se llamaba 'trazadoCreature-': la excepción por nombre literal se cae con cada rename y nadie se entera. Acá se entera.",
+    "no_poner_aca": "Las vitrinas públicas bajo MOCKUP_HASH_ROUTES NO necesitan entrada: el control las deriva del router de App.jsx, así que un rename no las vuelve a marcar. Si una vitrina aparece en el reporte es porque la sacaron del router — eso SÍ hay que mirarlo.",
+    "formato_id": "controlA → ruta del archivo (src/...). B1 → '<ruta>::componentes'. B2 → '<ruta>::modulo'. C → 'chip:<intent>'.",
+    "heredado": "ops/integraciones-no-consumidas.json (orphan_components) se lee como allowlist heredado para no duplicar razones ya escritas; se marca como heredada en el reporte."
+  },
+  "componentes": [],
+  "exports": [],
+  "afordancias": []
+}

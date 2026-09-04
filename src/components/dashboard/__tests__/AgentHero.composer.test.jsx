@@ -59,6 +59,7 @@ vi.mock('../../ChagraAgentAvatar', () => ({
 }));
 
 import AgentHero, { SEND_TRANSITION_MS } from '../AgentHero';
+import ValleHomeGateway from '../ValleHomeGateway.jsx';
 
 beforeEach(() => {
   sendMock.mockClear();
@@ -358,19 +359,53 @@ describe('AgentHero — acción de enviar + botón de perfil (operador 2026-06-0
 
 });
 
-describe('AgentHero — voseo (español colombiano)', () => {
-  test('los textos visibles usan tú/usted, sin voseo argentino', () => {
+describe('AgentHero y ValleHomeGateway — voseo (español colombiano)', () => {
+  // Boundary Unicode-aware. El \b de JS no corta tras vocal acentuada
+  // ("mirá", "tenés") — problema documentado en src/services/voseoFilter.js.
+  const construirGuard = (marcadores) => new RegExp(
+    `(?<![\\p{L}\\p{N}])(?:${marcadores.join('|')})(?![\\p{L}\\p{N}])`,
+    'iu',
+  );
+
+  // Marcadores de voseo argentino prohibidos en copy visible al usuario:
+  // imperativos tildados (entrá, hacé), presentes agudos (tenés, querés),
+  // enclíticos sin tilde (fijate, decilo) y pronombre/léxico fuerte
+  // (vos, sos). Mismo espíritu que el filtro runtime DR-LANG-1.
+  const MARCADORES_VOSEO = [
+    'escribí', 'tocá', 'enviá', 'preguntá', 'mostrá', 'contá',
+    'tenés', 'querés', 'podés', 'sabés',
+    'entrá', 'hacé', 'hacés', 'volvé', 'dejá', 'buscá', 'agregá',
+    'elegí', 'vení', 'andá', 'decí', 'decilo', 'mirá', 'activá',
+    'fijate', 'fijáte', 'mirate', 'acordate', 'quedate',
+    'vos', 'sos',
+  ];
+  const RE_VOSEO = construirGuard(MARCADORES_VOSEO);
+
+  test('AgentHero: los textos visibles usan tú/usted, sin voseo argentino', () => {
     const { container } = render(<AgentHero onNavigate={vi.fn()} />);
     const text = container.textContent || '';
-    // Marcadores de voseo prohibidos.
-    expect(text).not.toMatch(/\bescribí\b/);
-    expect(text).not.toMatch(/\btocá\b/);
-    expect(text).not.toMatch(/\benviá\b/);
-    expect(text).not.toMatch(/\bpreguntá\b/);
-    expect(text).not.toMatch(/\bmostrá\b/);
-    expect(text).not.toMatch(/\bcontá\b/);
-    expect(text).not.toMatch(/\btenés\b/);
-    expect(text).not.toMatch(/\bquerés\b/);
+    expect(text).not.toMatch(RE_VOSEO);
+  });
+
+  test('ValleHomeGateway: teaser y diálogo de confirmación sin voseo argentino', () => {
+    const { container } = render(
+      <ValleHomeGateway onNavigate={vi.fn()}>
+        <div data-testid="finca-frame">Finca animada</div>
+      </ValleHomeGateway>,
+    );
+    // El teaser y su botón de invitación solo se montan al hover — hay
+    // que revelarlos para que el copy sea parte del textContent.
+    fireEvent.mouseEnter(screen.getByTestId('valle-home-gateway'));
+    let text = container.textContent || '';
+    expect(text).toContain('Entre al valle 3D');
+    expect(text).toContain('Haga clic o toque para mirar adentro');
+    expect(text).not.toMatch(RE_VOSEO);
+
+    // El diálogo de confirmación monta un segundo copy de entrada.
+    fireEvent.click(screen.getByTestId('valle-home-invite'));
+    text = container.textContent || '';
+    expect(text).toContain('¿Entrar al valle 3D?');
+    expect(text).not.toMatch(RE_VOSEO);
   });
 
   test('no duplica el wordmark del TopBar dentro del hero — HOME-FIX', () => {

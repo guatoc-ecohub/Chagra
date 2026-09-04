@@ -8,6 +8,7 @@
  * MISMOS `params` que el arquetipo 3D (capas/curva/animales/estratos) + los
  * hotspots, así que sumar el espejo de un mundo no cuesta datos nuevos.
  */
+import { BOVEDA_PISOS_DEF } from '../pisosTermicos.js';
 
 /* Fondo SVG por motivo. Cada uno usa el `tinte` del mundo para no desentonar. */
 function FondoCutaway({ params, acento }) {
@@ -526,9 +527,12 @@ function FondoEstratos({ params, acento }) {
 function FondoBoveda({ params, acento }) {
   const temporada = params?.temporada ?? 'lluvia';
   const niebla = Math.max(0, Math.min(1, params?.niebla ?? 0.6));
-  const pisos = params?.pisos || [
-    { color: '#c7a24b' }, { color: '#8fae55' }, { color: '#6f9a72' }, { color: '#9fb6bf' },
-  ];
+  // 🔴 El fallback era la ÚLTIMA lista de CUATRO pisos con paleta propia que
+  // quedaba viva (`#c7a24b`/`#8fae55`/`#6f9a72`/`#9fb6bf`): el gemelo 2D —el que
+  // ve el equipo humilde— enseñaba cuatro bandas inventadas cada vez que le
+  // faltaban `params`, mientras el 3D enseñaba siete. Ahora, con o sin params,
+  // son las SIETE de la tabla canónica.
+  const pisos = params?.pisos || BOVEDA_PISOS_DEF;
   // pico central: bandas de piso apiladas como un triángulo escalonado
   const bandas = pisos.map((p, i) => {
     const n = pisos.length;

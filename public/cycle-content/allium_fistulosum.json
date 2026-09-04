@@ -42,6 +42,7 @@
     "drenaje_requerido": "bueno_a_moderado"
   },
   "valor_pedagogico": "Allium fistulosum, conocida como cebolla larga o cebollín, es una aliácea hortícola perenne ampliamente cultivada en el cinturón agrícola de Cundinamarca, particularmente en las zonas de Aquitania y Sumapaz, donde abastece los mercados de Bogotá entre 1800 y 2800 msnm en zonas térmicas templadas y frías. Su manejo agronómico incluye propagación mediante división de bulbillos (hijuelos) cada 4 meses para cosecha permanente, asociaciones beneficiosas con zanahoria y lechuga que mejora la salud del huerto, y requiere manejo de plagas como trips y manchas foliares mediante monitoreo frecuente y biopreparados andinos. En el contexto campesino andino, esta cebolla ha sido tradicionalmente utilizada en sofritos y guisos como base aromática esencial, preservando sabores prehispánicos en las cocinas rurales de Cundinamarca y Boyacá. Según el inventario taxonómico de GBIF Backbone Taxonomy y Plants of the World Online (POWO), su nombre científico válido es Allium fistulosum L.",
+  "companions_markdown": "### Especies asociadas favorables\n\nEstas especies favorecen el cultivo cuando se siembran cerca:\n- fragaria_ananassa — Fresa (Fragaria × ananassa (Duchesne ex Weston) Duchesne ex Rozier)",
   "antagonists_markdown": "### Antagonistas (no asociar)\n\nEvite sembrar estas especies cerca; compiten o comparten plagas/patógenos:\n- phaseolus_vulgaris — Frijol arbustivo / voluble (Phaseolus vulgaris L.)",
   "sources": [
     {
@@ -70,5 +71,5 @@
     }
   ],
   "_generated_by": "scripts/build-cycle-content-from-catalog.mjs",
-  "_generated_at": "2026-05-19T00:42:57.356Z"
+  "_generated_at": "2026-09-03T07:40:20.305Z"
 }

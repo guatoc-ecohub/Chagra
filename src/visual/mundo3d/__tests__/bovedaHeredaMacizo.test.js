@@ -121,10 +121,19 @@ describe('el mundo del clima declara SIETE pisos, los de la tabla canónica', ()
   it('sus colores salen de PISOS_TERMICOS_SIERRA, uno por banda', () => {
     const canon = PISOS_TERMICOS_SIERRA.map((p) => p.color);
     for (const p of pisos) expect(canon).toContain(p.color);
-    // y ninguno de los cuatro colores inventados de antes sobrevive
-    for (const viejo of ['#c7a24b', '#8fae55', '#6f9a72', '#9fb6bf']) {
+    // y ninguno de los colores INVENTADOS de la lista de cuatro sobrevive.
+    // 🔴 Ojo con `#9fb6bf`: estaba en aquella lista de cuatro, pero NO era
+    // inventado — es el color canónico del páramo en `PISOS_TERMICOS`, que la
+    // lista vieja había tomado prestado. Desde la unificación de paleta
+    // (2026-09-02, «unifica») la bóveda lee los verdes/fríos canónicos, así que
+    // el páramo vuelve legítimamente a `#9fb6bf`. Prohibir ese hex acá sería
+    // prohibir el canon. Se vigilan los tres que sí eran de cosecha propia.
+    for (const viejo of ['#c7a24b', '#8fae55', '#6f9a72']) {
       expect(pisos.map((p) => p.color)).not.toContain(viejo);
     }
+    // el páramo es el canónico, no el ocre `#94975a` que traía la otra tabla
+    expect(pisos.map((p) => p.color)).toContain('#9fb6bf');
+    expect(pisos.map((p) => p.color)).not.toContain('#94975a');
   });
 
   it('la GEOMETRÍA del macizo no cambia (cima, base y cima del cono)', () => {
