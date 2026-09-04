@@ -12,7 +12,10 @@
  *
  * Este test:
  * 1. Descubre dinámicamente los módulos *LaminaViva.jsx bajo
- *    src/visual/creatures/
+ *    src/visual/creatures/ — RECURSIVO desde el 2026-09-04: las láminas-viva
+ *    quedaron ARCHIVADAS en `src/visual/creatures/_archivo/` (regla dura del
+ *    operador: compais solo con TINTA, task #094) y archivar no les quita el
+ *    guardia — sus PNG siguen servidos en public/compai/laminas/
  * 2. Extrae de cada uno las rutas de asset .png/.webp/.svg que referencia
  *    (leyendo las constantes CARPETA_LAMINA y ARCHIVO_LAMINA de su
  *    anatomia.js)
@@ -46,11 +49,23 @@ const MIN_BYTES = 60000;
 
 /**
  * Descubre dinámicamente todos los archivos *LaminaViva.jsx en el directorio
- * de creatures.
+ * de creatures — caminando el árbol en profundidad (las láminas viven hoy en
+ * `_archivo/`; ver encabezado).
  */
 function discoverLaminaVivaComponents() {
-  const files = fs.readdirSync(CREATURES_DIR);
-  return files.filter((f) => f.endsWith('LaminaViva.jsx'));
+  const hallados = [];
+  const camina = (dir) => {
+    for (const entrada of fs.readdirSync(dir, { withFileTypes: true })) {
+      const ruta = path.join(dir, entrada.name);
+      if (entrada.isDirectory()) {
+        camina(ruta);
+      } else if (entrada.name.endsWith('LaminaViva.jsx')) {
+        hallados.push(entrada.name);
+      }
+    }
+  };
+  camina(CREATURES_DIR);
+  return hallados;
 }
 
 /**

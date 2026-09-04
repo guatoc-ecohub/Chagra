@@ -4,11 +4,11 @@ import {
   CABEZA, OREJA_IZQ, OREJA_DER, MANDIBULA, BOCA,
   BRAZO_LAPIZ, BRAZO_BRUJULA, CUERPO_PIVOTE, CUERPO_VIDA_PIVOTE,
   PARTE_COLA, POSES, ESCUCHA_CICLO, ESCUCHA_PASO_MS, UMBRAL_CLOSEUP,
-} from './zariguyaGeminiLamina/anatomia.js';
-import { hornearZariguyaGemini } from './zariguyaGeminiLamina/capas.js';
-import { useVidaIdle, useRitmoPropio, useMiradaUsted, prefiereQuietud } from './useVidaIdle.js';
-import { ZARIGUYA_SLUG } from './zariguyaIdentidad.js';
-import './zariguyaGeminiLamina/zariguyaGeminiLamina.css';
+} from '../zariguyaGeminiLamina/anatomia.js';
+import { hornearZariguyaGemini } from '../zariguyaGeminiLamina/capas.js';
+import { useVidaIdle, useRitmoPropio, useMiradaUsted, prefiereQuietud } from '../useVidaIdle.js';
+import { ZARIGUYA_SLUG } from '../zariguyaIdentidad.js';
+import '../zariguyaGeminiLamina/zariguyaGeminiLamina.css';
 
 /* Estados del contrato de avatar → forma canónica interna (mismo mapa que
    Jaguar/ZariguyaLaminaViva: data-agt-estado viaja crudo para paridad de

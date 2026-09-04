@@ -3,10 +3,10 @@ import {
   CARPETA_LAMINA, ARCHIVO_LAMINA, ANCHO, ALTO,
   CABEZA, PATAS_DEL, PATA_TRASERA, COLA, CUERPO_PIVOTE,
   OREJA_IZQ, OREJA_DER, MANDIBULA, BOCA,
-} from './jaguarLamina/anatomia.js';
-import { hornearJaguar } from './jaguarLamina/capas.js';
-import { useVidaIdle, useRitmoPropio, useMiradaUsted } from './useVidaIdle.js';
-import './jaguarLamina/jaguarLamina.css';
+} from '../jaguarLamina/anatomia.js';
+import { hornearJaguar } from '../jaguarLamina/capas.js';
+import { useVidaIdle, useRitmoPropio, useMiradaUsted } from '../useVidaIdle.js';
+import '../jaguarLamina/jaguarLamina.css';
 
 const JAGUAR_SLUG = 'jaguar';
 

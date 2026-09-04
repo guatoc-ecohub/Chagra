@@ -28,7 +28,7 @@ import process from 'node:process';
 const cssCrudo = readFileSync(
   resolve(process.cwd(), 'src/visual/creatures/zariguyaGeminiLamina/zariguyaGeminiLamina.css'), 'utf8',
 );
-import ZariguyaGeminiLaminaViva from '../../ZariguyaGeminiLaminaViva.jsx';
+import ZariguyaGeminiLaminaViva from '../../_archivo/ZariguyaGeminiLaminaViva.jsx';
 
 describe('haySoporteCanvas', () => {
   it('devuelve un booleano y no truena aunque jsdom no traiga canvas real', () => {

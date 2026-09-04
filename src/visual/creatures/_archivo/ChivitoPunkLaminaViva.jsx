@@ -2,11 +2,11 @@ import { useEffect, useRef, useState } from 'react';
 import {
   CARPETA_LAMINA, ARCHIVO_LAMINA, ANCHO, ALTO,
   CABEZA, MANDIBULA, BOCA, MANO_LAPIZ, CUERPO_PIVOTE,
-} from './chivitoLamina/anatomia.js';
-import { hornearChivito } from './chivitoLamina/capas.js';
-import { useVidaIdle, useRitmoPropio, useMiradaUsted } from './useVidaIdle.js';
-import { CHIVITO_SLUG, CHIVITO_NOMBRE } from './chivitoIdentidad.js';
-import './chivitoLamina/chivitoLamina.css';
+} from '../chivitoLamina/anatomia.js';
+import { hornearChivito } from '../chivitoLamina/capas.js';
+import { useVidaIdle, useRitmoPropio, useMiradaUsted } from '../useVidaIdle.js';
+import { CHIVITO_SLUG, CHIVITO_NOMBRE } from '../chivitoIdentidad.js';
+import '../chivitoLamina/chivitoLamina.css';
 
 /* Estados del contrato de avatar → forma canónica interna. El host escribe
    'idle'|'thinking'|'speaking'|'listening' (o 'caminando' para andar); esto

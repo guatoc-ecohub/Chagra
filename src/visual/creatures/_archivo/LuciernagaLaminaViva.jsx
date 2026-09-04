@@ -3,10 +3,10 @@ import {
   CARPETA_LAMINA, ARCHIVO_LAMINA, ANCHO, ALTO,
   CABEZA, MANDIBULA, BOCA, ANTENA_IZQ, ANTENA_DER,
   MANO_LAPIZ, CUERPO_PIVOTE,
-} from './luciernagaLamina/anatomia.js';
-import { hornearLuciernaga } from './luciernagaLamina/capas.js';
-import { useVidaIdle, useRitmoPropio, useMiradaUsted } from './useVidaIdle.js';
-import './luciernagaLamina/luciernagaLamina.css';
+} from '../luciernagaLamina/anatomia.js';
+import { hornearLuciernaga } from '../luciernagaLamina/capas.js';
+import { useVidaIdle, useRitmoPropio, useMiradaUsted } from '../useVidaIdle.js';
+import '../luciernagaLamina/luciernagaLamina.css';
 
 const LUCIERNAGA_SLUG = 'luciernaga';
 
