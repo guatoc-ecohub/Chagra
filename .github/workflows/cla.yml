@@ -49,7 +49,7 @@ jobs:
           set -euo pipefail
 
           # Allowlist
-          ALLOWLIST="dependabot[bot],renovate[bot],github-actions[bot],guatoc-ecohub,kortux"
+          ALLOWLIST="dependabot[bot],renovate[bot],github-actions[bot],guatoc-ecohub,kortux,santiagoht,claude"
 
           # Si el evento es un comentario de "recheck" o "I have read...", verificamos.
           # Cualquier otro comentario se ignora.
