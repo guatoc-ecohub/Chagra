@@ -77,6 +77,9 @@ export const CHAT_STOP_SEQUENCES = Object.freeze([
  * @property {string} url             - Endpoint OpenAI-compat (`/api/ollama/v1/chat/completions`).
  * @property {string} rationale       - Por qué este modelo para esta tarea.
  * @property {string[]|readonly string[]} [stop]        - Stop sequences (opcional).
+ * @property {string} [reasoning_effort] - Esfuerzo de razonamiento que se envía
+ *                                       al endpoint OpenAI-compat. Si falta,
+ *                                       `buildLLMRequest` usa 'none' (ver BUG-06).
  */
 
 /** @type {Record<LLMTask, ModelRoute>} */
@@ -292,6 +295,22 @@ export function buildLLMRequest(task, messages, overrides = {}) {
     // esta request. Formato Ollama: número en segundos o sufijo "m"/"h".
     // Pasa por la guarda: una ruta nunca descarga el modelo del chat.
     keep_alive: `${keepAliveEfectivo(route)}m`,
+    // BUG-06 (2026-09-03): qwen3.5:4b es modelo "thinking" y el endpoint
+    // OpenAI-compat de Ollama IGNORA `think:false` (ese flag solo funciona en
+    // el endpoint NATIVO /api/chat, que es el que usa el sidecar nlu.ts). Sin
+    // apagar el razonamiento, el modelo quema el presupuesto de max_tokens en
+    // un bloque que llega por `delta.reasoning` — campo que
+    // `openaiStream.extractContent` no lee — y la respuesta queda VACÍA con
+    // finish_reason "length". Medido en vivo en alpha (mismo prompt real,
+    // modelo tibio): ANTES 48.6 s / 0 caracteres / "length"; DESPUÉS 7.7 s /
+    // 890 caracteres / "stop". `reasoning_effort` es el campo que SÍ apaga el
+    // razonamiento en este endpoint. Los modelos no-thinking lo ignoran sin
+    // efecto (mismo patrón que `think` en el sidecar). Overridable por
+    // `overrides.reasoningEffort` o `route.reasoning_effort` por si una ruta
+    // futura sí quiere razonar (ver también el comentario de visionRevision:
+    // el equipo ya había chocado con este síntoma y lo parchó con num_predict
+    // amplio en vez de apagar la causa).
+    reasoning_effort: overrides.reasoningEffort ?? route.reasoning_effort ?? 'none',
   };
   // BUG A fix (2026-05-30): forward stop sequences (de la ruta o del
   // override). Ollama OpenAI-compat respeta `stop` (string[]). Solo se

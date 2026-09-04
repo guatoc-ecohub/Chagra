@@ -398,9 +398,11 @@ export function makeFlora(scene, { dirt = false } = {}) {
   // instConMatrices: instanceColor MULTIPLICA sobre el color por-vértice y
   // apaga el gradiente. La variación de tono por individuo la da el bake (seed)
   // y el jitter de escala/giro de matricesMasa — suficiente para no clonar.
+  /** @typedef {{ clave: string, nombre: string, ancho: number, profundidad: number, tono: string, claro: string, oscuro: string }} PerfilCorona perfil de silueta del bosque mixto */
+  /** @type {Map<object, PerfilCorona>} bake → perfil de corona */
   const perfilPorBake = new Map([
-    ...bosqueBakes.map((bake, i) => [bake, perfilesBosque[i]]),
-    ...bosqueLejosBakes.map((bake, i) => [bake, perfilesLejos[i]]),
+    ...bosqueBakes.map(/** @type {(bake: object, i: number) => [object, PerfilCorona]} */ ((bake, i) => [bake, perfilesBosque[i]])),
+    ...bosqueLejosBakes.map(/** @type {(bake: object, i: number) => [object, PerfilCorona]} */ ((bake, i) => [bake, perfilesLejos[i]])),
   ]);
   const arbolMasaScatter = (bake, pts, { hBajo = 8, hAlto = 14, sink = 0.3, perfil = perfilPorBake.get(bake) } = {}) => {
     const mats = matricesMasa(pts, {
@@ -410,9 +412,10 @@ export function makeFlora(scene, { dirt = false } = {}) {
     });
     return { matrices: mats };
   };
+  /** @type {Map<object, object[]>} bake → matrices acumuladas de su silueta */
   const matricesPorSilueta = new Map([
-    ...bosqueBakes.map((bake) => [bake, []]),
-    ...bosqueLejosBakes.map((bake) => [bake, []]),
+    ...bosqueBakes.map(/** @type {(bake: object) => [object, object[]]} */ ((bake) => [bake, []])),
+    ...bosqueLejosBakes.map(/** @type {(bake: object) => [object, object[]]} */ ((bake) => [bake, []])),
     [oroBake, []],
     [chachaBake, []],
   ]);

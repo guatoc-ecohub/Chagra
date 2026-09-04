@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { X, Check, Pencil, AlertTriangle, Loader2 } from 'lucide-react';
+import { describeComplexIngestOperation } from '../services/agentComplexIngest';
 
 /**
  * Gate humano de las tools con escritura (actionExecutor).
@@ -125,7 +126,16 @@ export default function ActionConfirmModal({
             <p className="text-xs text-slate-400 mb-2">
               Parámetros {isEditing ? '(editando)' : ''}:
             </p>
-            {isEditing ? (
+            {toolName === 'registrar_ingesta_compleja' && Array.isArray(parameters?.plan?.operations) ? (
+              /* BUG-02: el plan multi-entidad se lee como lista de operaciones,
+                 no como volcado JSON crudo. Solo presentación: aprobar/editar
+                 siguen enviando el objeto de parámetros completo e intacto. */
+              <ul className="text-sm text-slate-300 list-disc list-inside space-y-1">
+                {parameters.plan.operations.map((operation, index) => (
+                  <li key={`${operation?.kind}-${index}`}>{describeComplexIngestOperation(operation)}</li>
+                ))}
+              </ul>
+            ) : isEditing ? (
               <div className="space-y-2">
                 {Object.entries(editedParams).map(([key, value]) => (
                   <div key={key} className="flex flex-col">

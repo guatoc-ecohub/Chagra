@@ -109,6 +109,19 @@ function bakearArquetipo(clave, { detalle = 'lod' } = {}) {
 //   'lejos' → keep≈0.34 (card 2.4,  90 cards, núcleo [5,4])  = `lejos:true` hoy
 // `nivel:'full'` (default) conserva EXACTA la geometría actual; `lejos:true`
 // sigue significando lo mismo que siempre (alias de nivel 'lejos').
+/**
+ * @param {string} clave   id del arquetipo (ESPECIES_EZTREE).
+ * @param {object} [opts]
+ * @param {string} [opts.detalle='lod'] detalle del esqueleto ez-tree.
+ * @param {string} [opts.tono='#35612d'] color base de la copa.
+ * @param {string} [opts.claro]  luz del gradiente vertical de la copa
+ *                               (def: el tono aclarado en HSL).
+ * @param {string} [opts.oscuro] sombra del gradiente (def: el tono oscurecido).
+ * @param {number|null} [opts.seed=null] seed del bake; null = derivada del arquetipo.
+ * @param {boolean} [opts.lejos=false] alias histórico de `nivel: 'lejos'`.
+ * @param {'full'|'mid'|'lejos'|null} [opts.nivel=null] presupuesto de cards/núcleo
+ *                               (ver tabla de niveles arriba); null = resuelve por `lejos`.
+ */
 export function bakearArbolMasa(clave, { detalle = 'lod', tono = '#35612d', claro, oscuro, seed = null, lejos = false, nivel = null } = {}) {
   const nivelResuelto = nivel ?? (lejos ? 'lejos' : 'full');
   const perfilNivel = {

@@ -723,6 +723,18 @@ function Piloto({ plan, fase, humedad, tier, refEstado, onEstado, t0, inicioRef,
  *                                     Gana sobre `t0`: sin ella la escena mide
  *                                     desde su propio montaje y llega tarde.
  * @param {Function} [props.onEstado] se llama por cuadro con el estado (rótulo).
+ * ── Arnés de medición móvil (gate paso 7, PR #3103) ──────────────────────
+ * @param {number|null}  [props.msnmFijo]       cota en msnm que CONGELA el viaje
+ *                                              (gate en terreno); null = libre.
+ * @param {object|null}  [props.fxForzado]      fx impuestos `{ on: string[], off: string[] }`
+ *                                              (ver aplicarFxForzado); null = natural.
+ * @param {number}       [props.densidadFlora]  0..1, escala las instancias de flora (def 1).
+ * @param {number|null}  [props.dprForzada]     devicePixelRatio impuesto por el arnés.
+ * @param {number|null}  [props.cieloPasos]     pasos del cielo Sylva; null = por tier.
+ * @param {boolean}      [props.conNieblaAltura] reserva de niebla por altura (def true).
+ * @param {boolean}      [props.conBruma]       jirones de bruma encendidos (def true).
+ * @param {boolean|null} [props.conCSM]         fuerza CSM (`?csm=1`); null = apagado
+ *                                              (veredicto medido, ver §5.1 abajo).
  */
 export default function EscenaDescensoSierra({
   plan,

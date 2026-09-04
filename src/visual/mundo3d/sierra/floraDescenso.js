@@ -403,7 +403,9 @@ function construirMatorral(rng) {
  * @param {number}   [opts.densidad=1] 0..1, escala lineal las instancias activas
  *                                   sin recrear el pool.
  * @param {number}   [opts.semilla=7] determinismo.
- * @returns {{ actualizar, conteo, dispose }}
+ * @returns {{ actualizar, conteo, dispose, meshes, capacidades }}
+ *     meshes      arquetipo id → THREE.InstancedMesh vivo en la escena.
+ *     capacidades arquetipo id → presupuesto de instancias según densidad.
  */
 export function crearFloraDescenso({ escena, tier = 'alto', densidad = 1, semilla = 7 }) {
   const presu = PRESUPUESTO[tier] ?? PRESUPUESTO.medio;

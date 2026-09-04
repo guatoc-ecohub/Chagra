@@ -549,6 +549,7 @@ function texturaLiquen(seed = 9, tam = 1024) {
   // ESCALA: una costra crustosa real mide de 1 a 8 cm. Sobre un bloque de ~1.5 m
   // eso son manchas CHICAS y MUCHAS, no cuatro lamparones. El primer gate salió
   // con costras de 20 cm y leía a payaso.
+  /** @type {[string, string, number][]} filas: [tipo de costra, color, cuántas] */
   const receta = [
     ['gris', PALETA_PARAMO.liquenGris, 46],
     ['mapa', PALETA_PARAMO.liquenMapa, 38],

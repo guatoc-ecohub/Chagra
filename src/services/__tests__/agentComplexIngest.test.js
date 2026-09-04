@@ -1,6 +1,7 @@
 import { describe, expect, it, vi } from 'vitest';
 import {
   decomposeComplexIngest,
+  describeComplexIngestOperation,
   executeComplexIngest,
   scheduleAgroecologicalSuggestion,
 } from '../agentComplexIngest.js';
@@ -98,5 +99,31 @@ describe('agentComplexIngest — Caso 1 multi-entidad', () => {
 
     expect(suggest).toHaveBeenCalledWith(plan.agroecologicalSuggestion);
     expect(suggestion).toEqual({ text: 'Manejo agroecológico listo.' });
+  });
+});
+
+describe('describeComplexIngestOperation — etiqueta legible de cada operación (BUG-02)', () => {
+  it('nombra cada kind del plan del Caso 1 en lenguaje humano, en orden', () => {
+    const plan = /** @type {any} */ (decomposeComplexIngest(CASO_1, { now: HOY }));
+
+    expect(plan.operations.map(describeComplexIngestOperation)).toEqual([
+      'el surco',
+      'la siembra retrofechada',
+      'la cosecha 1',
+      'la cosecha 2',
+      'la cosecha 3',
+      'el abono cada 15 días',
+      'la observación de trozador',
+      'la observación de gota',
+    ]);
+  });
+
+  it('control negativo: un kind desconocido devuelve el kind crudo y no inventa etiqueta', () => {
+    expect(describeComplexIngestOperation({ kind: 'kind_desconocido', parameters: {} })).toBe('kind_desconocido');
+  });
+
+  it('control negativo: una operación vacía o nula no lanza', () => {
+    expect(describeComplexIngestOperation(null)).toBeUndefined();
+    expect(describeComplexIngestOperation({})).toBeUndefined();
   });
 });

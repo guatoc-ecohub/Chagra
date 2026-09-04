@@ -178,7 +178,9 @@ export function aplicarVientoMundo(mat, opts = {}) {
         `#include <begin_vertex>
         ${BLOQUE_VIENTO_COHERENTE}`
       );
-    if (prev) prev(shader);
+    /* El eslabón previo declara un segundo parámetro (renderer) que la cadena
+       de este parche no usa; se acota la firma a lo que ejercita la cadena. */
+    if (prev) /** @type {(shader: object) => void} */ (prev)(shader);
   };
   mat.needsUpdate = true;
   return mat;
