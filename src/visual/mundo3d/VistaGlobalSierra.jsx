@@ -66,6 +66,9 @@ import PisosTermicosBandas from './PisosTermicosBandas.jsx';
 import TransicionSierraMundo from './TransicionSierraMundo.jsx';
 import { BANDAS_SIERRA, CLAVE_PISOS_SIERRA, PISOS_TERMICOS_SIERRA } from './pisosTermicos.js';
 import { franjaCondensacion, leerGateDescenso } from './sierra/descensoSierra.js';
+import {
+  NIEVE, anadirAtributoNieve, crearInyectorNieve, muestreadorFacetas, contornoNivel, geometriaCinta, texturaCinta, texturaNubeMasa,
+} from './sierra/nieveSierra.js';
 import { faseEnsoViva } from './sierra/aterrizajeDescenso.js';
 
 /* ── Geografía del macizo (validada contra el DR: mar al norte, macizo al sur,
@@ -135,7 +138,21 @@ const PALOMINO = { x: 5.0, y: 0.2, z: -2.85 }; // desembocadura sobre el Caribe
       tabla nativa va al revés (cima→mar); alimentarla cruda dejaría el índice
       en 0 y pintaría crema nival toda la ladera. `pisosTermicosUnificados.test.js`
       fija ese sentido. ── */
-const BANDAS = BANDAS_SIERRA.map((b) => ({ tope: b.tope, c: new THREE.Color(b.hexColor) }));
+/* 2026-09-04 (arte): la NIEVE ya no es color de vértice. Bajo la lámpara dorada el
+   `#eef2f4` nival salía ARENA (medido (212,196,166), más oscuro que el cielo): el
+   casquete va como capa con luz propia (`aNieve` + `inyectarNieve`, ver
+   sierra/nieveSierra.js). Lo que queda de vértice en la banda nival es la ROCA
+   entre parches. El swatch de la leyenda sigue saliendo de la tabla canónica. */
+const BANDAS = BANDAS_SIERRA.map((b, i, arr) => ({
+  tope: b.tope,
+  c: new THREE.Color(i === arr.length - 1 ? NIEVE.roca : b.hexColor),
+}));
+/* La línea de hielo CANÓNICA (4 800 m = tope del superpáramo): hasta aquí llegaba. */
+const LINEA_HIELO = BANDAS_SIERRA.find((b) => b.id === 'superparamo')?.tope ?? 4.15;
+/* La dirección del sol de la hora dorada (= la posición de la direccional principal). */
+const SOL_DIR = [-12, 6, -4];
+/* UNA sola instancia del inyector: r3f no recompila el material si la identidad no cambia. */
+const inyectarNieve = crearInyectorNieve({ lineaHielo: LINEA_HIELO });
 /* El GROSOR de la transición entre bandas. Interior: angosto (~±0.09 world Y)
    para que cada piso se lea separado. La línea de nieve (última) MUCHO más
    angosta (±0.02): un filo nevado nítido, no un difuminado ocre. */
@@ -192,6 +209,7 @@ function construirTerreno(segX, segZ, plano) {
   geo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
   geo.setAttribute('color', new THREE.BufferAttribute(col, 3));
   geo.setIndex(idx);
+  anadirAtributoNieve(geo, alturaSierra, { lineaHielo: LINEA_HIELO, sol: SOL_DIR });   // el casquete, antes de de-indexar
   if (plano) geo = geo.toNonIndexed();
   geo.computeVertexNormals();
   return geo;
@@ -221,57 +239,16 @@ function Mar({ reducedMotion, conNiebla }) {
   );
 }
 
-/* Textura de nube-suave: mancha fbm blanca con borde MUY emplumado, en canvas
-   (offline-first, determinista). Solo importa el canal alfa: la forma es difusa,
-   de borde degradado, para que la nube NUNCA se lea como polígono de borde duro
-   (defecto §2.3.3) — el patrón del jirón de `brumaVolumetrica.js`. */
-function textoNubeSuave(seed = 3) {
-  const tam = 256;
-  const cv = document.createElement('canvas');
-  cv.width = cv.height = tam;
-  /* Sin contexto 2D no hay textura que tejer. Pasa de verdad: jsdom (los tests
-     de cableado), canvas bloqueado por privacidad, o presión de memoria en gama
-     baja. Degradar a `null` — la nube se dibuja como billboard liso, que es
-     exactamente el aspecto previo — en vez de tumbar la Sierra ENTERA por una
-     textura decorativa. `map={null}` es válido en three.js. */
-  const ctx = typeof cv.getContext === 'function' ? cv.getContext('2d') : null;
-  if (!ctx || typeof ctx.createImageData !== 'function') return null;
-  const img = ctx.createImageData(tam, tam);
-  const px = img.data;
-  const o = seed * 13.7;
-  for (let y = 0; y < tam; y++) {
-    for (let x = 0; x < tam; x++) {
-      // elipse achatada (la nube es más ancha que alta) + fbm que rompe el borde
-      const dx = (x / tam - 0.5) / 0.5;
-      const dy = (y / tam - 0.5) / 0.34;
-      const r = Math.sqrt(dx * dx + dy * dy);
-      const n =
-        Math.sin(x * 0.021 + o) * 0.5 +
-        Math.sin(x * 0.047 - y * 0.031 + o * 1.7) * 0.28 +
-        Math.sin(x * 0.013 + y * 0.037 + o * 2.3) * 0.22;
-      const n2 = n * 0.5 + 0.5;
-      const borde = Math.max(0, Math.min(1, (1.0 - r + (n2 - 0.5) * 0.55) / 0.6));
-      const suave = borde * borde * (3 - 2 * borde);
-      const a = suave * (0.18 + 0.82 * Math.abs(n2)) * 0.92;
-      const i = (y * tam + x) * 4;
-      px[i] = px[i + 1] = px[i + 2] = 255;
-      px[i + 3] = Math.round(Math.max(0, Math.min(1, a)) * 255);
-    }
-  }
-  ctx.putImageData(img, 0, 0);
-  const tex = new THREE.CanvasTexture(cv);
-  tex.colorSpace = THREE.SRGBColorSpace;
-  return tex;
-}
-
-/* Nube-suave determinista (cacheada una sola vez). El flag `_nubeTexIntentada`
-   evita reintentar el tejido en cada render cuando NO hay contexto 2D. */
+/* La textura de la nube: RGBA con lomo/panza/honda (nieveSierra.texturaNubeMasa),
+   cacheada una sola vez. Antes era una mancha blanca de un solo tono × alfa
+   (`textoNubeSuave`): sin polígonos, pero SÁBANA. `null` sin contexto 2D (jsdom):
+   billboard liso, nunca tumba la Sierra. */
 let _nubeTex = null;
 let _nubeTexIntentada = false;
 function nubeTextura() {
   if (!_nubeTexIntentada) {
     _nubeTexIntentada = true;
-    _nubeTex = textoNubeSuave(3);
+    _nubeTex = texturaNubeMasa(3);
   }
   return _nubeTex;
 }
@@ -305,11 +282,14 @@ function NubesDeNiebla({ cuantas, reducedMotion, fase = 'neutral', humedad = nul
         const d = Math.abs(alturaSierra(wx, z) - y);
         if (d < mejor) { mejor = d; wz = z; }
       }
+      // (2026-09-04, arte) cuerpos más angostos: con ancho 1,6-2,6 × esc 0,7-1,3 sobre un
+      // plano de 2,4 u, a 2 u de paso, los siete se solapaban en UNA sábana. Ahora cada
+      // uno mide ~1,9-3,1 u y se tocan sin fundirse: se cuentan.
       out.push({
         key: `n${i}`,
         base: [wx, y, wz - 0.9],
-        esc: 0.7 + ((i * 37) % 10) / 16,
-        ancho: 1.6 + ((i * 53) % 7) / 6, // cuerpo, no placa
+        esc: 0.8 + ((i * 37) % 10) / 22,
+        ancho: 1.0 + ((i * 53) % 7) / 12, // cuerpo, no placa
         opacidad: (0.55 + 0.3 * (((i * 3) % 4) / 3)) * franja.amplitud,
         fase: (i * 1.7) % (Math.PI * 2),
       });
@@ -331,7 +311,9 @@ function NubesDeNiebla({ cuantas, reducedMotion, fase = 'neutral', humedad = nul
         <Billboard key={n.key} position={/** @type {[number, number, number]} */ (n.base)}>
           <mesh scale={[n.ancho * n.esc, n.ancho * n.esc * 0.55, 1]}>
             <planeGeometry args={[2.4, 1.6]} />
-            <meshBasicMaterial map={tex} color="#fbf4e6" transparent opacity={n.opacidad} depthWrite={false} side={THREE.DoubleSide} />
+            {/* el color viene horneado (tres tonos); sin tonemapping, como el cielo de fondo,
+                para que el lomo pueda ser MÁS claro que el cielo dorado */}
+            <meshBasicMaterial map={tex} color={tex ? "#ffffff" : "#e9e6df"} transparent opacity={n.opacidad} depthWrite={false} side={THREE.DoubleSide} toneMapped={false} />
           </mesh>
         </Billboard>
       ))}
@@ -442,6 +424,59 @@ function MarcadorPiso({ piso }) {
   );
 }
 
+/* EL MAPA VERTICAL, dibujado como mapa (2026-09-04, arte): curvas de nivel finas
+   sobre el relieve en los topes de cada banda, con la tinta de los rótulos, y la
+   LÍNEA ÁMBAR de la cota canónica del hielo (4 800 m) con su rótulo — «hasta aquí
+   llegaba» (§6-B: casquete mordido + cicatriz, nunca cima llena). Reemplaza la
+   cuña de conos translúcidos de `PisosTermicosBandas` (bordes rectos que lavaban
+   las bandas altas). Las cintas se apoyan en las FACETAS del terreno tal como se
+   dibujan (muestreadorFacetas), no en la función suave: no se hunden. Si hay
+   `pisoUsuario`, las dos curvas de su banda van en el color del piso. */
+function MapaDeNivel({ segmentos, pisoUsuario }) {
+  const capas = useMemo(() => {
+    const hF = muestreadorFacetas(alturaSierra, { ancho: ANCHO, fondo: FONDO, segX: segmentos, segZ: segmentos });
+    const region = { x0: -ANCHO / 2 + 0.2, x1: ANCHO / 2 - 0.2, z0: COSTA_Z + 0.4, z1: FONDO / 2 - 0.2, paso: 0.08 };
+    const out = [];
+    BANDAS_SIERRA.forEach((b, i) => {
+      if (!Number.isFinite(b.tope)) return;
+      const lineas = contornoNivel(alturaSierra, b.tope, region);
+      if (!lineas.length) return;
+      const esHielo = b.id === 'superparamo';
+      const suya = pisoUsuario && (b.id === pisoUsuario || BANDAS_SIERRA[i + 1]?.id === pisoUsuario);
+      out.push({
+        key: b.id,
+        geo: geometriaCinta(lineas, hF, { ancho: esHielo ? 0.06 : suya ? 0.045 : 0.03 }),
+        color: esHielo ? NIEVE.ambar : suya ? b.hexColor : NIEVE.tinta,
+        opacidad: esHielo ? 0.92 : suya ? 0.85 : 0.34,
+        ancla: esHielo ? lineas.flat().reduce((m, q) => (q[0] < m[0] ? q : m)) : null,   // el punto más oriental (screen-right): lejos de las etiquetas de banda, que van al occidente
+      });
+    });
+    return out;
+  }, [segmentos, pisoUsuario]);
+  useEffect(() => () => capas.forEach((c) => c.geo.dispose()), [capas]);
+  const tex = texturaCinta();
+  return (
+    <group name="mapa-de-nivel">
+      {capas.map((c) => (
+        <mesh key={c.key} geometry={c.geo}>
+          <meshBasicMaterial
+            map={tex} alphaMap={tex} color={c.color} transparent opacity={c.opacidad}
+            depthWrite={false} side={THREE.DoubleSide} toneMapped={false}
+            polygonOffset polygonOffsetFactor={-2} polygonOffsetUnits={-2}
+          />
+        </mesh>
+      ))}
+      {capas.filter((c) => c.ancla).map((c) => (
+        <group key={`${c.key}-rotulo`} position={[c.ancla[0], LINEA_HIELO + 0.06, c.ancla[1]]}>
+          <Html center distanceFactor={13} zIndexRange={[28, 8]} style={{ pointerEvents: 'none' }}>
+            <div className="vsierra-hielo" aria-hidden="true">Hasta aquí llegaba el hielo · 4.800 m</div>
+          </Html>
+        </group>
+      ))}
+    </group>
+  );
+}
+
 /* El pie de crédito a los cuatro pueblos, anclado en 3D (para el grupo
    componible). El modo con Canvas usa además el pie DOM accesible. */
 function CreditoPueblos() {
@@ -503,7 +538,7 @@ export function SierraDiorama({
       <SolDorado />
 
       <mesh geometry={geo}>
-        <meshLambertMaterial vertexColors flatShading={perfil.flatShading} />
+        <meshLambertMaterial vertexColors flatShading={perfil.flatShading} onBeforeCompile={inyectarNieve} />
       </mesh>
 
       <Mar reducedMotion={reducedMotion} conNiebla={perfil.fog} />
@@ -517,7 +552,9 @@ export function SierraDiorama({
       <Rotulo pos={[PALOMINO.x, PALOMINO.y, PALOMINO.z]} texto="Palomino" sub="Caribe · 0 m" distancia={11} alto={0.45} />
 
       {pisoUsuario && <MarcadorPiso piso={pisoUsuario} />}
+      <MapaDeNivel segmentos={perfil.segmentosTerreno} pisoUsuario={pisoUsuario} />
       <PisosTermicosBandas
+        aura={false}
         pisoUsuario={pisoUsuario}
         tier={tier}
         reducedMotion={reducedMotion}
@@ -540,6 +577,7 @@ const CSS_SIERRA = `
 .vsierra-rotulo { white-space: nowrap; font: 600 0.78rem/1.15 system-ui, sans-serif; color: #402c16; padding: 0.16rem 0.5rem; border-radius: 999px; background: rgba(255,248,233,0.82); box-shadow: 0 1px 5px rgba(60,42,24,0.22); }
 .vsierra-rotulo__txt { display: inline-flex; align-items: baseline; gap: 0.3rem; }
 .vsierra-rotulo__sub { font-weight: 500; font-style: normal; opacity: 0.72; font-size: 0.9em; }
+.vsierra-hielo { padding: 0.16rem 0.5rem; border-radius: 999px; background: rgba(255,248,233,0.86); color: #6a4a12; border: 1px solid rgba(224,168,74,0.9); font: 600 0.68rem/1.1 system-ui, sans-serif; white-space: nowrap; box-shadow: 0 1px 5px rgba(60,42,24,0.2); }
 .vsierra-aqui { padding: 0.2rem 0.55rem; border-radius: 999px; background: rgba(64,44,22,0.82); color: #fff3d6; font: 600 0.72rem/1.1 system-ui, sans-serif; white-space: nowrap; box-shadow: 0 2px 8px rgba(30,18,6,0.3); }
 .vsierra-credito { margin: 0; max-width: min(90vw, 40rem); text-align: center; font: 500 0.78rem/1.4 system-ui, sans-serif; color: #f4ecdd; }
 .vsierra-credito--3d { padding: 0.4rem 0.8rem; border-radius: 0.7rem; background: rgba(24,16,7,0.44); backdrop-filter: blur(3px); }
