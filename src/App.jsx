@@ -6,7 +6,8 @@
  * errores reales de ESLint siguen activos.
  */
 /* eslint-disable chagra-i18n/no-hardcoded-spanish */
-import React, { lazy, Suspense, useState, useEffect, useCallback, useRef } from 'react';
+import React, { Suspense, useState, useEffect, useCallback, useRef } from 'react';
+import { lazy } from './components/common/lazyWithRecovery';
 import { MapPin, Eye, Package, CheckCircle, WifiOff, Mic, Network, Beaker, Scale } from 'lucide-react';
 import localforage from 'localforage';
 import { useTheme } from './hooks/useTheme';
@@ -2453,7 +2454,6 @@ export default function App() {
         return (
           <ErrorBoundary>
             <ErrorFallback moduleName="El suelo vivo 3D">
-              {/* @ts-expect-error onBack prop not in type defs */}
               <MundoSueloVivoMockup onBack={() => navigate('dashboard')} />
             </ErrorFallback>
           </ErrorBoundary>
@@ -2464,7 +2464,6 @@ export default function App() {
         return (
           <ErrorBoundary>
             <ErrorFallback moduleName="Aliados de la finca">
-              {/* @ts-expect-error onBack prop not in type defs */}
               <AliadosFincaMockup onBack={() => navigate('dashboard')} />
             </ErrorFallback>
           </ErrorBoundary>
@@ -2475,7 +2474,6 @@ export default function App() {
         return (
           <ErrorBoundary>
             <ErrorFallback moduleName="El café bajo sombra">
-              {/* @ts-expect-error onBack prop not in type defs */}
               <MundoCafe3DMockup onBack={() => navigate('dashboard')} />
             </ErrorFallback>
           </ErrorBoundary>
@@ -2496,7 +2494,6 @@ export default function App() {
         return (
           <ErrorBoundary>
             <ErrorFallback moduleName="El semillero 3D">
-              {/* @ts-expect-error extra props for mockup */}
               <MundoSemilleroMockup onBack={() => navigate('dashboard')} />
             </ErrorFallback>
           </ErrorBoundary>
@@ -2507,7 +2504,6 @@ export default function App() {
         return (
           <ErrorBoundary>
             <ErrorFallback moduleName="El compost 3D">
-              {/* @ts-expect-error onBack prop not in type defs */}
               <MundoCompostMockup onBack={() => navigate('dashboard')} />
             </ErrorFallback>
           </ErrorBoundary>
@@ -2597,7 +2593,6 @@ export default function App() {
         return (
           <ErrorBoundary>
             <ErrorFallback moduleName="Gemelos 2D de los mundos">
-              {/* @ts-expect-error onBack prop not in type defs */}
               <GemelosMundosMockup onBack={() => navigate('dashboard')} />
             </ErrorFallback>
           </ErrorBoundary>
@@ -2608,7 +2603,6 @@ export default function App() {
         return (
           <ErrorBoundary>
             <ErrorFallback moduleName="La micro-fauna del suelo 3D">
-              {/* @ts-expect-error onBack prop not in type defs */}
               <MundoMicrofaunaMockup onBack={() => navigate('dashboard')} />
             </ErrorFallback>
           </ErrorBoundary>
