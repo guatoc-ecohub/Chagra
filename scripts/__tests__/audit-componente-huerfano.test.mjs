@@ -21,7 +21,7 @@
  */
 import { describe, it, expect, beforeAll } from 'vitest';
 import { execFileSync } from 'node:child_process';
-import { readFileSync, writeFileSync, mkdtempSync, rmSync, existsSync } from 'node:fs';
+import { readFileSync, writeFileSync, mkdtempSync, rmSync, lstatSync, existsSync } from 'node:fs';
 import process from 'node:process';
 import { join, dirname, resolve } from 'node:path';
 import { tmpdir } from 'node:os';
@@ -135,21 +135,23 @@ describe('CONTROL POSITIVO — los seis casos del card 095 sobre dev', () => {
     expect(out.controlC.inertes).toEqual(expect.arrayContaining(['asociaciones', 'fuente_doi']));
   });
 
-  it('caso 6 · láminas-viva (094): cuatro de las seis no las alcanza ninguna ruta viva', () => {
+  it('caso 6 · láminas-viva (094): las seis salieron del árbol que audita el build', () => {
     const laminas = out.controlA.filter((r) => /creatures\/\w+LaminaViva\.jsx$/.test(r.id));
-    expect(laminas.length).toBe(6);
-    const sinRuta = laminas.filter((r) => NO_ALCANZABLE.includes(r.veredicto)).map((r) => r.id);
-    // Medido sobre origin/dev el 2026-09-03. El card 094 sospechaba de cuatro
-    // y no había trazado la cadena; acá está trazada una por una.
-    expect(sinRuta.sort()).toEqual([
-      'src/visual/creatures/ChivitoPunkLaminaViva.jsx',
-      'src/visual/creatures/JaguarLaminaViva.jsx',
-      'src/visual/creatures/LuciernagaLaminaViva.jsx',
-      'src/visual/creatures/ZariguyaLaminaViva.jsx',
-    ]);
-    // Las otras dos SÍ tienen cadena real, y por eso no se reportan:
-    expect(veredicto('src/visual/creatures/ZariguyaGeminiLaminaViva.jsx')).toBe('MONTADO');
-    expect(veredicto('src/visual/creatures/OsoBastonLaminaViva.jsx')).toBe('MONTADO');
+    expect(laminas).toEqual([]);
+
+    const archivo = join(ROOT, 'src/visual/creatures/_archivo');
+    for (const nombre of [
+      'ChivitoPunkLaminaViva.jsx',
+      'JaguarLaminaViva.jsx',
+      'LuciernagaLaminaViva.jsx',
+      'OsoBastonLaminaViva.jsx',
+      'ZariguyaGeminiLaminaViva.jsx',
+      'ZariguyaLaminaViva.jsx',
+    ]) {
+      const ruta = join(archivo, nombre);
+      expect(lstatSync(ruta).isSymbolicLink(), `${nombre} debe seguir reversible`).toBe(true);
+      expect(existsSync(ruta), `${nombre} debe resolver a su archivo frío`).toBe(true);
+    }
   });
 
   it('los seis casos aparecen en el reporte de hallazgos, no solo en el detalle', () => {
@@ -178,19 +180,6 @@ describe('CONTROL POSITIVO — los seis casos del card 095 sobre dev', () => {
     ]) {
       expect(ids.has(id), `la pieza cableada volvió a salir como hallazgo: ${id}`).toBe(false);
     }
-  });
-
-  it('ChivitoPunkLaminaViva sigue siendo HUERFANO, pero ya está DECLARADA (#3108)', () => {
-    // Cuando se escribió este control, la lámina salía como hallazgo sin
-    // declarar. El PR #3108 (2026-09-03) la declaró en
-    // `ops/integraciones-no-consumidas.json` con razón sustantiva: la tinta la
-    // reemplazó en el registro el 2026-08-31 y el archivo queda por historia.
-    // Por eso ya NO está en `hallazgos` — está en `declarados`. Lo que este
-    // control tiene que seguir viendo es el VEREDICTO: si algún día vuelve a
-    // salir MONTADO sin que nadie la cablee, el instrumento se rompió.
-    const id = 'src/visual/creatures/ChivitoPunkLaminaViva.jsx';
-    expect(veredicto(id)).toBe('HUERFANO');
-    expect(new Set(out.hallazgos.map((h) => h.id)).has(id)).toBe(false);
   });
 
   it('GuiaEspecieCards sigue siendo SOLO_TEST, pero ya está DECLARADA (tanda 1 del drenaje)', () => {
