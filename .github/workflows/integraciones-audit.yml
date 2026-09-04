@@ -14,12 +14,16 @@ name: Integraciones no consumidas
 # chagra-pro que clona este repo público (esa dirección de lectura sí es segura).
 #
 # Barato a propósito (segundos, sin build, sin red, sin GPU) — mismo criterio que
-# unit-tests.yml: correr SIEMPRE en cada PR a main es viable solo si es gratis.
+# unit-tests.yml: correr SIEMPRE en cada PR a main/dev es viable solo si es gratis.
 on:
   pull_request:
-    branches: [main]
+    # dev agregado (C2a, auditoria de proceso de gates rojos 2026-09-03):
+    # el flujo real de PRs apunta a dev, no solo a main.
+    branches: [main, dev]
   push:
-    branches: [main]
+    # dev agregado (C2a): gate ABSOLUTO (audita src/ + la allowlist commiteada
+    # ops/integraciones-no-consumidas.json), no depende del ref base.
+    branches: [main, dev]
 
 permissions:
   contents: read
