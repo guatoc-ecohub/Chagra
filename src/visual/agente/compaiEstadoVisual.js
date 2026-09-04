@@ -5,9 +5,9 @@ import { estadoCanonico, POSE_DE_ESTADO } from './angelitaEstados.js';
 export const COMPAI_VOLADORES = new Set([
   'angelita',
   'luciernaga',
-  'guacamaya',
-  'chivito-punk',
 ]);
+
+const COMPAI_POSADOS = new Set(['guacamaya', 'chivito-punk']);
 
 const STATE_DE_ESTADO = {
   acompana: 'idle',
@@ -32,13 +32,15 @@ export function resolverEstadoVisualCompai(especie, estado) {
     return {
       estado: 'caminando',
       state: 'caminando',
-      pose: COMPAI_VOLADORES.has(especie) ? 'vuela' : 'camina',
+      pose: COMPAI_VOLADORES.has(especie) || COMPAI_POSADOS.has(especie) ? 'vuela' : 'camina',
     };
   }
 
   const canonico = estadoCanonico(estado);
   const poseAngelita = POSE_DE_ESTADO[canonico] || 'vuela';
-  const pose = COMPAI_VOLADORES.has(especie) || poseAngelita !== 'vuela'
+  const pose = COMPAI_POSADOS.has(especie)
+    ? 'reposo'
+    : COMPAI_VOLADORES.has(especie) || poseAngelita !== 'vuela'
     ? poseAngelita
     : 'anda';
 

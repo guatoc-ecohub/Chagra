@@ -7,6 +7,7 @@ import { describe, it, expect } from 'vitest';
 import {
   idleDeCreature, IDLE_PERFILES, IDLE_NEUTRO, semillaDe, azar01, backOut,
 } from '../creatureIdle.js';
+import { PERFILES_CONDUCTA } from '../../../compai/nucleo/perfilesConducta.js';
 
 /* Barre la línea de tiempo y devuelve los arranques del evento pedido. */
 function arranquesDe(evento, opts, hasta = 140, paso = 0.05) {
@@ -157,6 +158,23 @@ describe('creatureIdle — genérica por especie (misma máquina, otro animal)',
       if (slug !== 'abeja-angelita') {
         expect(IDLE_PERFILES[slug]).not.toBe(IDLE_PERFILES['abeja-angelita']);
       }
+    }
+  });
+
+  it('proyecta los seis perfiles desde el núcleo y apaga sus vueltas', () => {
+    for (const [slug, conducta] of Object.entries(PERFILES_CONDUCTA)) {
+      expect(IDLE_PERFILES[slug].respira).toBe(conducta.respira);
+      expect(IDLE_PERFILES[slug].vuelta).toBeNull();
+      const eventos = new Set();
+      for (let t = 0; t < 160; t += 0.1) eventos.add(idleDeCreature(t, { especie: slug }).evento);
+      expect(eventos.has('vuelta'), slug).toBe(false);
+    }
+    expect(IDLE_PERFILES.jaguar.respira.freq).toBe(1.85); // 3.4 s: ancla jhRespira
+  });
+
+  it('no acurruca a los nocturnos activos', () => {
+    for (const slug of ['jaguar', 'zariguya', 'luciernaga']) {
+      expect(idleDeCreature(10, { especie: slug, hora: 'noche' }).evento).not.toBe('acurruca');
     }
   });
 

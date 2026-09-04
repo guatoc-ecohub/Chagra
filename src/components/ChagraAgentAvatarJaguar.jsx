@@ -68,6 +68,7 @@ export default function ChagraAgentAvatarJaguar({
     // over o toca la pantalla, sin pisar un estado activo real (thinking/
     // speaking/listening). Mismo contrato que ChagraAgentAvatarAngelita.
     reaccionaPresencia = true,
+    ...atributosConducta
 }) {
     const { despierta, handlers: handlersPresencia } = useAngelitaPresencia({
         activo: reaccionaPresencia,
@@ -97,6 +98,7 @@ export default function ChagraAgentAvatarJaguar({
             data-agt-estado={dataEstado || estadoAgente}
             data-pose={dataPose}
             data-visema={dataVisema || visema || undefined}
+            {...atributosConducta}
         />
     );
 

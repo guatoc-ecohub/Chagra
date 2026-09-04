@@ -61,6 +61,7 @@ export default function ChagraAgentAvatarLuciernaga({
     'data-agt-especie': dataEspecie = undefined,
     'data-creature': dataCreature = undefined,
     reaccionaPresencia = true,
+    ...atributosConducta
 }) {
     const { despierta, handlers: handlersPresencia } = useAngelitaPresencia({ activo: reaccionaPresencia });
     const estadoAgente = estado || ESTADO_DE_STATE[state] || 'acompana';
@@ -89,6 +90,7 @@ export default function ChagraAgentAvatarLuciernaga({
             // (un spread undefined en JSX borra el atributo explícito previo).
             {...(dataEspecie ? { 'data-agt-especie': dataEspecie } : {})}
             {...(dataCreature ? { 'data-creature': dataCreature } : {})}
+            {...atributosConducta}
         />
     );
 

@@ -46,6 +46,7 @@ export default function ChagraAgentAvatarChivitoPunk({
     // queda sin especie en su nodo raíz (regresión detectada en dev rojo).
     'data-agt-especie': dataEspecie = undefined,
     'data-creature': dataCreature = undefined,
+    ...atributosConducta
 }) {
     const { despierta, handlers: handlersPresencia } = useAngelitaPresencia({ activo: reaccionaPresencia });
     const estadoAgente = estado || state;
@@ -77,6 +78,7 @@ export default function ChagraAgentAvatarChivitoPunk({
             // (un spread undefined en JSX borra el atributo explícito previo).
             {...(dataEspecie ? { 'data-agt-especie': dataEspecie } : {})}
             {...(dataCreature ? { 'data-creature': dataCreature } : {})}
+            {...atributosConducta}
         />
     );
 

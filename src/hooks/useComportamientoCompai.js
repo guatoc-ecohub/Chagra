@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import { PERFILES_CONDUCTA } from '../compai/nucleo/perfilesConducta.js';
 
 /**
  * Motor transversal de PRESENCIA del compai (FAB 2D).
@@ -26,26 +27,21 @@ import { useEffect, useRef, useState } from 'react';
 
 export const COMPAI_MOVIMIENTO = Object.freeze({
   angelita: 'vuela',
-  jaguar: 'camina',
-  'oso-baston': 'camina',
-  zariguya: 'camina',
-  guacamaya: 'vuela',
-  luciernaga: 'vuela',
-  'chivito-punk': 'vuela',
+  ...Object.fromEntries(Object.entries(PERFILES_CONDUCTA).map(([slug, perfil]) => [
+    slug,
+    perfil.locomocion.modo,
+  ])),
 });
 
 // 70% quieto / 30% en excursión (operador 2026-08-26). La pausa en el puesto se
 // calcula para que, sobre el ciclo completo, el compai quede quieto ~70%.
 export const COMPAI_QUIETO_RATIO = 0.7;
 
-const VELOCIDAD_POR_PX = 0.22;    // px/s por px de avatarSize = velocidad del pie en el apoyo (medido: pata 167 lámina, swing 28°, paso 1.05s). Amarra el cuerpo al pie → NO patina.
-const RADIO_X = 180;              // alcance máx. de la excursión a la IZQUIERDA del puesto
-const RADIO_Y = 160;              // alcance máx. de la excursión ARRIBA del puesto
-const EXCURSION_DWELL_MS = 900;   // dwell breve en el punto de la excursión ("explicando")
 const PAUSA_MS = 3000;            // dwell base cuando está pausado/arrastrado
 const ARRANQUE_MS = 1200;         // reposo inicial antes de la primera excursión
 const FADE_MS = 520;
 const DT_MAX = 0.05;
+const EXCURSION_DEFECTO = Object.freeze({ radioX: 180, radioY: 160, dwellMs: 900 });
 
 function puedeAnimar() {
   return typeof window !== 'undefined'
@@ -73,16 +69,16 @@ function obtenerTamano(el) {
 // Límites de la EXCURSIÓN: una caja corta arriba-izquierda del puesto (la
 // esquina inferior derecha). Nunca a la derecha ni por debajo del puesto
 // (maxX/maxY = 0) y acotada por RADIO_* sin salirse del viewport.
-function obtenerLimites(el, soloX) {
+function obtenerLimites(el, soloX, excursion) {
   const { width, height } = obtenerTamano(el);
   const viewportWidth = window.innerWidth || 360;
   const viewportHeight = window.innerHeight || 640;
   const espacioX = Math.max(0, viewportWidth - width - 8);
   const espacioY = Math.max(0, viewportHeight - height - 8);
   return {
-    minX: -Math.min(RADIO_X, espacioX),
+    minX: -Math.min(excursion.radioX, espacioX),
     maxX: 0,
-    minY: soloX ? 0 : -Math.min(RADIO_Y, espacioY),
+    minY: soloX ? 0 : -Math.min(excursion.radioY, espacioY),
     maxY: 0,
   };
 }
@@ -133,8 +129,6 @@ function siguienteDestino({ el, limites, soloX, contentAware, x, y }) {
  * @param {number} [opciones.escala=84] tamaño del avatar en píxeles
  */
 export default function useComportamientoCompai(ref, opciones = {}) {
-  const escalaAvatar = (opciones && opciones.escala) || 84;
-  const VELOCIDAD = VELOCIDAD_POR_PX * escalaAvatar; // px/s efectivo, igual al pie
   const {
     especie = 'angelita',
     activo = true,
@@ -150,11 +144,19 @@ export default function useComportamientoCompai(ref, opciones = {}) {
     // la posición persistente (dónde vive el compai) la dueña useCompaiDraggable.
     superficie: _superficie = 'global',
   } = opciones;
+  const escalaAvatar = (opciones && opciones.escala) || 84;
+  const conducta = PERFILES_CONDUCTA[especie] || null;
+  const locomocion = conducta?.locomocion;
+  const excursion = locomocion?.excursion || EXCURSION_DEFECTO;
+  // El nivel 0 conservador de la zarigüeya aún no tiene trepa; su vertical es mística.
+  const soloXDePerfil = soloX || locomocion?.modo === 'mistico' || locomocion?.vertical?.includes?.('mistico');
+  const VELOCIDAD = (locomocion?.velCuerposS || 0.22) * escalaAvatar;
   const [moviendo, setMoviendo] = useState(false);
   const [direccion, setDireccion] = useState('izquierda');
   const [parada, setParada] = useState(0);
   const [presencia, setPresencia] = useState(false);
   const [notificacionVisible, setNotificacionVisible] = useState(false);
+  const [eventoMovimiento, setEventoMovimiento] = useState(null);
   const estadoRef = useRef({ moviendo: false, direccion: 'izquierda' });
   const posicionRef = useRef({ x: 0, y: 0 });
   const pausadoRef = useRef(pausado);
@@ -234,7 +236,7 @@ export default function useComportamientoCompai(ref, opciones = {}) {
         marcar('moviendo', false, setMoviendo);
         return;
       }
-      const limites = obtenerLimites(el, soloX);
+      const limites = obtenerLimites(el, soloXDePerfil, excursion);
       const actual = posicionRef.current;
       const enPuesto = Math.abs(actual.x) < 1 && Math.abs(actual.y) < 1;
 
@@ -248,7 +250,7 @@ export default function useComportamientoCompai(ref, opciones = {}) {
         if (enPuesto) {
           // 30%: salir a una excursión corta, acotada, junto al puesto.
           destino = siguienteDestino({
-            el, limites, soloX, contentAware,
+            el, limites, soloX: soloXDePerfil, contentAware,
             x: actual.x, y: actual.y,
           });
           roamInicio = ts;
@@ -279,11 +281,15 @@ export default function useComportamientoCompai(ref, opciones = {}) {
             roamInicio = 0;
           } else {
             // Dwell breve en la excursión ("explicando"); luego regresa.
-            pausaMs = EXCURSION_DWELL_MS;
+            pausaMs = excursion.dwellMs;
           }
           faseHasta = ts + pausaMs;
           marcar('moviendo', false, setMoviendo);
-          if (!pausadoRef.current && !llegoAlPuesto) setParada((n) => n + 1);
+          if (!pausadoRef.current && !llegoAlPuesto) {
+            setParada((n) => n + 1);
+            // Gancho: el rig del oso podrá tocar clac + squash 8 % al plantar.
+            if (locomocion?.modo === 'mistico') setEventoMovimiento('planta');
+          }
         } else {
           const step = Math.min(VELOCIDAD * dt, distancia);
           actual.x += (dx / distancia) * step;
@@ -314,7 +320,7 @@ export default function useComportamientoCompai(ref, opciones = {}) {
       window.cancelAnimationFrame(rafId);
       if (el) el.style.opacity = '';
     };
-  }, [activo, contentAware, soloX, ref, VELOCIDAD]);
+  }, [activo, contentAware, soloXDePerfil, ref, VELOCIDAD, excursion, locomocion?.modo]);
 
   // Presencia y notificación al toque. El ARRASTRE NO vive aquí (lo dueña
   // useCompaiDraggable en el host): así no hay dos sistemas de arrastre peleando.
@@ -373,6 +379,8 @@ export default function useComportamientoCompai(ref, opciones = {}) {
   return {
     especie,
     movimientoNatural: COMPAI_MOVIMIENTO[especie] || 'camina',
+    locomocion,
+    eventoMovimiento,
     moviendo,
     caminando: moviendo,
     direccion,

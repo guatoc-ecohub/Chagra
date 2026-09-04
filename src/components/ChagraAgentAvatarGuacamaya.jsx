@@ -66,6 +66,7 @@ export default function ChagraAgentAvatarGuacamaya({
     'data-visema': dataVisema = undefined,
     'data-clima': dataClima = undefined,
     'data-tier': dataTier = undefined,
+    ...atributosConducta
 }) {
     const { despierta, handlers: handlersPresencia } = useAngelitaPresencia({ activo: reaccionaPresencia });
     const estadoBase = estado || ESTADO_DE_STATE[state] || 'acompana';
@@ -90,6 +91,7 @@ export default function ChagraAgentAvatarGuacamaya({
             data-pose={dataPose}
             data-visema={dataVisema || visema || undefined}
             data-clima={dataClima}
+            {...atributosConducta}
         />
     );
 

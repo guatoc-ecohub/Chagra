@@ -14,6 +14,7 @@ import {
 } from './angelitaEstados.js';
 import { PERFILES as PERFILES_CLIMA } from '../creatures/creatureClimaCuerpo.js';
 import { IDLE_PERFILES } from '../creatures/creatureIdle.js';
+import { PERFILES_CONDUCTA } from '../../compai/nucleo/perfilesConducta.js';
 
 const congelar = (valor) => {
   if (!valor || typeof valor !== 'object' || Object.isFrozen(valor)) return valor;
@@ -38,6 +39,16 @@ const POSES_SUELO = {
   invita: 'anda',
   husmea: 'anda',
   caminando: 'camina',
+};
+
+// Chivito y guacamaya viven posados; «vuela» solo describe el desplazamiento.
+const POSES_POSADO = {
+  ...POSES_AIRE,
+  acompana: 'reposo',
+  pensando: 'reposo',
+  'no-se': 'reposo',
+  escuchando: 'reposo',
+  caminando: 'vuela',
 };
 
 // El oso del bastón conserva su gesto corporal propio al responder: la
@@ -164,6 +175,15 @@ const DEFINICIONES = {
   },
 };
 
+const capacidadesDeConducta = (conducta) => ({
+  masa: capacidad('dato', { valor: conducta.masa }),
+  mirada: capacidad('dato', { valor: conducta.mirada }),
+  habla: capacidad('dato', { valor: conducta.habla.organo }),
+  noche: capacidad('dato', { valor: conducta.noche.modo }),
+  locomocion: capacidad('dato', { valor: conducta.locomocion.modo }),
+  respiraOrgano: capacidad('dato', { valor: conducta.respira.organo }),
+});
+
 const rosterPwa = Object.entries(ELENCO)
   .filter(([, ficha]) => ficha.enPWA)
   .map(([avatarType]) => avatarType);
@@ -181,8 +201,10 @@ if (faltanteEnRegistro || entradaFueraDeRoster) {
 const crearEntrada = (avatarType) => {
   const base = DEFINICIONES[avatarType];
   const ficha = ELENCO[avatarType];
+  const conducta = PERFILES_CONDUCTA[base.creatureSlug];
   const poses = avatarType === 'oso-baston'
     ? POSES_OSO
+    : avatarType === 'chivito-punk' || avatarType === 'guacamaya' ? POSES_POSADO
     : base.medio === 'aire' ? POSES_AIRE : POSES_SUELO;
   const anclas = ANCLAS[base.medio];
 
@@ -203,7 +225,8 @@ const crearEntrada = (avatarType) => {
     nombreAccesible: ficha.nombre,
     medio: base.medio,
     posePorEstado: { ...poses },
-    capacidades: base.capacidades,
+    capacidades: conducta ? { ...base.capacidades, ...capacidadesDeConducta(conducta) } : base.capacidades,
+    conducta,
     anclas: { ...anclas },
     variables: VARIABLES_CHROME(base.medio),
     tamano: TAMANO_CANONICO,

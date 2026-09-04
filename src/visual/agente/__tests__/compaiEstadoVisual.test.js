@@ -32,4 +32,12 @@ describe('compaiEstadoVisual — contrato por especie', () => {
       expect(resolverEstadoVisualCompai(especie, 'caminando').pose).toBe('camina');
     }
   });
+
+  it('chivito y guacamaya se conservan posados en estados estáticos', () => {
+    for (const especie of ['chivito-punk', 'guacamaya']) {
+      for (const estado of ['acompana', 'escuchando', 'pensando', 'no-se']) {
+        expect(resolverEstadoVisualCompai(especie, estado).pose).toBe('reposo');
+      }
+    }
+  });
 });
