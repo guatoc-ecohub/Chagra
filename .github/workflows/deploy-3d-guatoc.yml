@@ -59,10 +59,13 @@ jobs:
         run: |
           set -e
           TARGET=/home/kortux/demos/3d/app
-          test -d "$(dirname "$TARGET")" || {
-            echo "El padre del target no existe: $TARGET"
-            exit 1
-          }
+          # Guard honesto (card 099): `test -d` falla igual cuando el padre
+          # no existe y cuando el proceso no puede ATRAVESAR la ruta. Este
+          # guard distingue las dos causas y nombra el componente bloqueado
+          # (2026-09-05: el mensaje viejo reportó "no existe" durante todo
+          # un día cuando la causa real era que /home/kortux está en 0700 y
+          # el runner corre como `runner`).
+          bash scripts/guard-deploy-target.sh "$TARGET"
           mkdir -p "$TARGET"
           umask 002
           rsync -a --delete --chmod=Du=rwx,Dg=rwx,Do=rx,Fu=rw,Fg=rw,Fo=r \
