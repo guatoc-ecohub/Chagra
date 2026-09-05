@@ -8,6 +8,11 @@
  * `zariguyaHuesos.css`, articulada por CLIP-REGIONES (regiones.js).
  * Estructura IDÉNTICA a `jaguarTrazado/pielTrazado.js`.
  *
+ * A 3× (operador 2026-09-05): la lámina se traza ampliada ×3 (1443×1332) y
+ * cada grupo de región se escala 1/3 al montarse. A 1× el ajuste spline se
+ * comía el rayado fino (kipá en la coronilla, bigotes rotos, lomo en
+ * manchas); a 3× la MISMA receta lo resuelve (medido en generar-calco.mjs).
+ *
  * HISTORIA (por qué esta y no otra). El calco fue raster (el PNG embebido
  * como <image>, 2026-08-26) porque los primeros trazados salieron con borde
  * gordo y "gorro": AUDITORIA-ZARIGUYA-COMPAI-2026-08-25 encontró la causa —
@@ -46,9 +51,7 @@
  */
 
 import { RH_LINE_BOIL } from '../rubberhoseSpec.js';
-import {
-  CALCO_SILUETA_DEFS, CALCO_POR_REGION, CALCO_CORONILLA, CALCO_CORONILLA_OFFSET, CALCO_CORONILLA_SCALE,
-} from './calcoTrazado.js';
+import { CALCO_SILUETA_DEFS, CALCO_POR_REGION, CALCO_ESCALA } from './calcoTrazado.js';
 import { ZT_PIVOTES, ZT_REGIONES } from './regiones.js';
 import { POSES_TRAZADO_CAPA } from './posesTrazado.js';
 
@@ -88,8 +91,13 @@ const CLIPS = Object.entries(ZT_REGIONES)
    calco global. La silueta (clip del canal alfa, potrace) recorta el papel
    aplanado que el trazado trae alrededor de la figura. */
 const SILUETA = CALCO_SILUETA_DEFS.replace(/^<defs>/, '').replace(/<\/defs>$/, '');
+/* El trazado vive a 3× (1443×1332): cada grupo de región se ESCALA a la
+   lámina (481×444) aquí, y su clip de silueta (ztSilueta3) va en el espacio
+   del trazado porque el clip se interpreta en el espacio del elemento que
+   lo referencia (con su transform). Fuera de estos grupos todo sigue en px
+   de lámina: regiones, pivotes, cajas y el clip ztSilueta (escalado). */
 const CALCO_DEFS = Object.entries(CALCO_POR_REGION)
-  .map(([n, ps]) => `<g id="ztCalco-${n}" clip-path="url(#ztSilueta)">${ps}</g>`)
+  .map(([n, ps]) => `<g id="ztCalco-${n}" transform="scale(${CALCO_ESCALA})" clip-path="url(#ztSilueta3)">${ps}</g>`)
   .join('\n  ');
 
 /** Un hueso: <use> del calco DE SU REGIÓN recortado al polígono exacto. */
@@ -205,20 +213,6 @@ const DEFS = `<defs>
        espacio que clip-regiones/pivotes/casquetes: los <use…clip> calzan. -->
   ${SILUETA}
   ${CALCO_DEFS}
-  <!-- LA CORONILLA (generar-calco.mjs paso 3): la MISMA receta trazada a 3×
-       de resolución y escalada a 1/3. A 1× el ajuste spline se comía el
-       rayado fino y dejaba un casco de parches con borde (la kipá,
-       bloqueante 2026-09-05); a 3× lo resuelve (RMSE 0,072 → 0,032 contra la
-       lámina). Mismo trazo, misma paleta, cero color plano; va ENCIMA del
-       calco de la cabeza y se funde a la altura de las cejas (máscara
-       y40→54: los ojos arrancan en y≈54 y quedan fuera). -->
-  <g id="ztCoronilla" transform="translate(${CALCO_CORONILLA_OFFSET[0]} ${CALCO_CORONILLA_OFFSET[1]}) scale(${CALCO_CORONILLA_SCALE})">${CALCO_CORONILLA}</g>
-  <linearGradient id="ztFadeCoronilla" x1="0" y1="40" x2="0" y2="54" gradientUnits="userSpaceOnUse">
-    <stop offset="0" stop-color="#fff"/><stop offset="1" stop-color="#000"/>
-  </linearGradient>
-  <mask id="zt-m-coronilla" maskUnits="userSpaceOnUse" x="85" y="-8" width="255" height="62">
-    <rect x="85" y="-8" width="255" height="62" fill="url(#ztFadeCoronilla)"/>
-  </mask>
   ${CLIPS}
   ${JCLIPS}
   <radialGradient id="ztAura" cx=".5" cy=".5" r=".5">
@@ -293,23 +287,12 @@ const OJO_CERCA_VIVO = `
 
 /* ─────────────────────── LA CABEZA (con sus satélites) ───────────────────── */
 
-/* La coronilla 3× recortada a la región del hueso que la monta ∩ silueta,
-   fundida por la máscara. Se monta en la CABEZA y TAMBIÉN dentro de cada
-   OREJA (recortada a su rect): el rect de la oreja pinta su calco spline
-   encima de todo lo de la cabeza, y sin esta copia la banda de solape
-   (x150-158 / x222-230) y el pelo bajo la oreja quedarían en textura spline
-   entre dos texturas pixel — un rectángulo visible. Con ella, la banda gira
-   con la oreja igual que antes (patrón baseSub). */
-const coronilla = (region) =>
-  `<g clip-path="url(#zt-r-${region})"><g clip-path="url(#ztSilueta)"><use href="#ztCoronilla" mask="url(#zt-m-coronilla)"/></g></g>`;
-
 const CABEZA = `
   ${usoCalco('cabeza')}
-  ${coronilla('cabeza')}
   ${FAUCES}
   <g class="zh-hueso zh-mandibula"${origin('mandibula')}>${usoCalco('mandibula')}</g>
-  <g class="zh-hueso zh-orejaI"${origin('orejaI')}>${usoCalco('orejaI')}${coronilla('orejaI')}</g>
-  <g class="zh-hueso zh-orejaD"${origin('orejaD')}>${usoCalco('orejaD')}${coronilla('orejaD')}</g>
+  <g class="zh-hueso zh-orejaI"${origin('orejaI')}>${usoCalco('orejaI')}</g>
+  <g class="zh-hueso zh-orejaD"${origin('orejaD')}>${usoCalco('orejaD')}</g>
   <g class="zh-ojoGrupo">${HALOS}${OJO_CERCA_VIVO}${PARPADOS}</g>`;
 
 /* ─────────────────────────── EL SVG COMPLETO ─────────────────────────────── */

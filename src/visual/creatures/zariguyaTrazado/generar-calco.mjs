@@ -12,50 +12,39 @@
  * (→ "gorro"). Aquí NO se decide nada: se reproduce.
  *
  * Pipeline (documentado para regenerar el calco desde cero):
+ *   0. LA LÁMINA A 3× (operador 2026-09-05). A 481 px la receta se comía el
+ *      rayado fino: la coronilla salía como un casco de parches con borde
+ *      (la kipá), los bigotes fragmentados y el lomo/vientre en manchas.
+ *      Se MIDIÓ sobre la coronilla contra la lámina aplanada: más
+ *      «profundidad de color» (cp8/sp1/gs2..4) no cambiaba nada (RMSE 0,072
+ *      → 0,072); modo pixel y pixel+potrace daban 0,058-0,060 y el juez
+ *      seguía leyendo «casco con borde»; LA MISMA RECETA A 3× DE RESOLUCIÓN
+ *      dio 0,032 y «rayado fino, sin borde». Lo que se perdía era
+ *      RESOLUCIÓN: a 1× los trazos miden 1 px y el ajuste spline los funde.
+ *      Primero se aplicó solo a la coronilla (commit c88e258eb, overlay
+ *      escalado 1/3 fundido a la altura de las cejas); el operador aprobó
+ *      trazar TODA la lámina a 3×, que es lo que hace este pipeline:
+ *        magick public/compai/laminas/zariguya-gemini-hero.png \
+ *          -filter Lanczos -resize 300% zariguya-hero-3x.png
  *   1. VTRACER=<bin> bash scripts/trazar-lamina.sh \
- *        public/compai/laminas/zariguya-gemini-hero.png zariguya-trace.svg
- *      → receta clavada 2026-08-22: aplanar el alfa sobre papel (#eee8d7)
- *        ANTES de trazar + vtracer stacked spline --color_precision 8
- *        --filter_speckle 2 --gradient_step 8 + clipPath vectorial del canal
- *        alfa (potrace). 3220 paths en el espacio 481×444 de la lámina.
+ *        zariguya-hero-3x.png zariguya-trace.svg
+ *      → receta clavada 2026-08-22, sin tocar un parámetro: aplanar el alfa
+ *        sobre papel (#eee8d7) ANTES de trazar + vtracer stacked spline
+ *        --color_precision 8 --filter_speckle 2 --gradient_step 8 + clipPath
+ *        vectorial del canal alfa (potrace). Espacio 1443×1332 (= 481×444 × 3).
  *        (vtracer no está en el PATH de alpha: `nix build nixpkgs#vtracer
  *        --print-out-paths` y pasar el binario por VTRACER=.)
  *   2. npx svgo --multipass -p 2 zariguya-trace.svg -o zariguya-trace.min.svg
- *      → ~400 KB, translates horneados: TODO queda en el espacio absoluto
- *        481×444 de la lámina (el mismo de regiones.js y de los pivotes).
- *   3. LA CORONILLA (cirugía autorizada por el operador 2026-09-05, «la
- *      kipá es bloqueante»): a 1× la receta se come el rayado fino de la
- *      coronilla y la deja como un casco de parches con borde (kipá). Se
- *      MIDIÓ sobre el recorte (RMSE contra la lámina aplanada, colores en
- *      la coronilla, densidad de rayado; fuente = 2806 colores / 0,162):
- *        · receta 1× (spline cp8 sp2 gs8)      RMSE 0,072 · 1440 colores
- *        · cp8/sp1/gs2..4 (más «profundidad»)   sin cambio (2381→2471)
- *        · modo pixel                           RMSE 0,058 · el juez sigue
- *          leyendo «casco de parches con borde»
- *        · pixel + rayado potrace (umbral local) RMSE 0,060 · ídem
- *        · LA RECETA MISMA A 3× DE RESOLUCIÓN   RMSE 0,032 · 2886 colores
- *      Lo que perdía la coronilla no era profundidad de color sino
- *      RESOLUCIÓN: a 481 px los trazos del rayado miden 1 px y el ajuste de
- *      curva los funde; a 3× (Lanczos) la misma receta los resuelve. Se
- *      traza SOLO la coronilla a 3× y se monta encima del calco de la
- *      cabeza escalada a 1/3, fundida a la altura de las cejas. Mismo
- *      trazo, misma paleta, cero dibujo nuevo, cero color plano:
- *        magick flat.png -crop 255x90+85+0 +repage \
- *          -filter Lanczos -resize 300% coronilla-3x.png
- *        vtracer --input coronilla-3x.png --output coronilla-3x.svg \
- *          --mode spline --hierarchical stacked --color_precision 8 \
- *          --filter_speckle 2 --gradient_step 8 --path_precision 2
- *        npx svgo --multipass -p 2 coronilla-3x.svg -o coronilla-3x.min.svg
- *      (flat.png = la lámina aplanada sobre papel, como en el paso 1.)
- *      Costo: ~480 KB de paths para 255×90 px de lámina.
- *   4. node generar-calco.mjs zariguya-trace.min.svg coronilla-3x.min.svg
- *      → escribe ./calcoTrazado.js: CALCO_SILUETA_DEFS (el clip del alfa,
- *        renombrado de "a" a "ztSilueta" — anti-colisión entre compais) +
- *        CALCO_POR_REGION (paths por región de regiones.js, bbox del path
- *        contra bbox del polígono; el clip exacto lo pone pielTrazado) +
- *        CALCO_CORONILLA (los paths del paso 3, en el espacio del recorte
- *        a 3×) + CALCO_CORONILLA_OFFSET/SCALE (pielTrazado los traslada
- *        +85,0 y los escala 1/3 al espacio de la lámina).
+ *      → translates horneados: TODO queda en el espacio absoluto del svg.
+ *   3. node generar-calco.mjs zariguya-trace.min.svg
+ *      → lee el width del <svg> y calcula CALCO_ESCALA = 481 / width (1/3):
+ *        el reparto por región se hace en el espacio de la lámina (bbox del
+ *        path × escala contra el polígono de regiones.js) y pielTrazado
+ *        monta cada grupo de región con transform="scale(CALCO_ESCALA)".
+ *        Escribe ./calcoTrazado.js: CALCO_SILUETA_DEFS (DOS clips del alfa:
+ *        "ztSilueta3" en el espacio del trazado, para los grupos de región,
+ *        y "ztSilueta" en el espacio de la lámina, para casquetes y
+ *        respaldos que viven sin escalar) + CALCO_POR_REGION.
  *
  * El REPARTO es conservador (bbox vs bbox): un path que roza dos regiones
  * vive en ambas (el clip exacto de cada hueso corta lo que sobra). El orden
@@ -68,9 +57,8 @@ import { fileURLToPath } from 'node:url';
 import { ZT_REGIONES } from './regiones.js';
 
 const entrada = process.argv[2];
-const entradaCoronilla = process.argv[3];
-if (!entrada || !entradaCoronilla) {
-  console.error('uso: node generar-calco.mjs <trace.min.svg> <coronilla-3x.min.svg>');
+if (!entrada) {
+  console.error('uso: node generar-calco.mjs <trace.min.svg>');
   process.exit(1);
 }
 const svg = readFileSync(entrada, 'utf8');
@@ -78,14 +66,26 @@ const m = svg.match(/<svg[^>]*>([\s\S]*)<\/svg>/);
 if (!m) throw new Error('no encontré el <svg> raíz');
 let interior = m[1].trim();
 interior = interior
-  .replaceAll('clipPath id="a"', 'clipPath id="ztSilueta"')
-  .replaceAll('clip-path="url(#a)"', 'clip-path="url(#ztSilueta)"');
+  .replaceAll('clipPath id="a"', 'clipPath id="ztSilueta3"')
+  .replaceAll('clip-path="url(#a)"', 'clip-path="url(#ztSilueta3)"');
+
+// ── escala: el trazado vive en (481×ESCALA⁻¹) px; la lámina en 481×444 ──────
+const anchoSvg = parseFloat((svg.match(/<svg[^>]*\swidth="([\d.]+)"/) || [])[1]);
+if (!anchoSvg) throw new Error('el <svg> no trae width');
+const ESCALA = 481 / anchoSvg;
 if (/[`\\]|\$\{/.test(interior)) throw new Error('el trazado trae caracteres que romperían el template literal');
 
 // ── separar defs (silueta) del cuerpo ──────────────────────────────────────
 const defsM = interior.match(/<defs>[\s\S]*?<\/defs>/);
 if (!defsM) throw new Error('no encontré <defs> (el clip de silueta)');
-const siluetaDefs = defsM[0];
+// el clip del alfa DOS veces: en el espacio del trazado (ztSilueta3, para los
+// grupos de región que se escalan) y en el de la lámina (ztSilueta, para
+// casquetes/respaldos: la misma path con scale(ESCALA)).
+const siluetaTrazado = defsM[0].match(/<clipPath[\s\S]*?<\/clipPath>/)[0];
+const siluetaLamina = siluetaTrazado
+  .replace('id="ztSilueta3"', 'id="ztSilueta"')
+  .replace(/<path /, `<path transform="scale(${ESCALA})" `);
+const siluetaDefs = `<defs>${siluetaTrazado}${siluetaLamina}</defs>`;
 const cuerpo = interior.replace(defsM[0], '');
 
 // ── paths del cuerpo, en orden de apilado ──────────────────────────────────
@@ -140,25 +140,11 @@ const porRegion = Object.fromEntries(Object.keys(ZT_REGIONES).map((n) => [n, []]
 let repartidos = 0;
 for (const p of paths) {
   const d = p.match(/ d="([^"]+)"/)[1];
-  const [x0, y0, x1, y1] = bboxDeD(d);
+  const [x0, y0, x1, y1] = bboxDeD(d).map((v) => v * ESCALA); // a espacio de lámina
   for (const [n, [rx0, ry0, rx1, ry1]] of Object.entries(cajasRegion)) {
     if (x1 >= rx0 && x0 <= rx1 && y1 >= ry0 && y0 <= ry1) { porRegion[n].push(p); repartidos++; }
   }
 }
-
-// ── la coronilla en modo pixel (paso 3) ────────────────────────────────────
-const svgCor = readFileSync(entradaCoronilla, 'utf8');
-const mc = svgCor.match(/<svg[^>]*>([\s\S]*)<\/svg>/);
-if (!mc) throw new Error('coronilla: no encontré el <svg> raíz');
-const coronilla = mc[1].trim();
-if (/[`\\]|\$\{/.test(coronilla)) throw new Error('la coronilla trae caracteres que romperían el template literal');
-const nCoronilla = (coronilla.match(/<path[^>]*\/>/g) || []).length;
-if (nCoronilla < 500) throw new Error(`coronilla: solo ${nCoronilla} paths — algo anda mal`);
-
-// escala del recorte: el svg trae width="765" (255×3) → 1/3
-const anchoCor = parseFloat((svgCor.match(/<svg[^>]*\swidth="([\d.]+)"/) || [])[1]);
-if (!anchoCor) throw new Error('coronilla: el <svg> no trae width');
-const escalaCor = 255 / anchoCor;
 
 const cuerposRegion = Object.entries(porRegion)
   .map(([n, ps]) => `  ${JSON.stringify(n)}: \`${ps.join('')}\`,`)
@@ -170,7 +156,8 @@ const salida = `/*
  * AUTO-TRAZADA a vector con la receta del jaguar, PARTIDA POR REGIÓN DE
  * HUESO. GENERADO por generar-calco.mjs (ver ahí el pipeline y el porqué
  * del reparto) — NO editar a mano: regenerar.
- * ${paths.length} paths de origen en el espacio 481×444 de la lámina; reparto
+ * ${paths.length} paths de origen en el espacio ${anchoSvg}×${Math.round(444 / ESCALA)} del trazado
+ * (lámina 481×444 × ${(1 / ESCALA).toFixed(0)}, CALCO_ESCALA ${ESCALA.toFixed(4)}); reparto
  * conservador por bbox (un path fronterizo vive en las regiones que roza; el
  * clip exacto de cada hueso corta el resto). Cero dibujo nuevo.
  */
@@ -179,15 +166,12 @@ export const CALCO_POR_REGION = Object.freeze({
 ${cuerposRegion}
 });
 export const CALCO_N_PATHS = ${paths.length};
-/* La CORONILLA trazada a 3× (${nCoronilla} paths), en el espacio del recorte
-   255×90 tomado en (85,0) de la lámina y ampliado ×3 — pielTrazado la
-   traslada y la escala ${escalaCor.toFixed(4)}. */
-export const CALCO_CORONILLA = \`${coronilla}\`;
-export const CALCO_CORONILLA_OFFSET = Object.freeze([85, 0]);
-export const CALCO_CORONILLA_SCALE = ${escalaCor};
+/* Escala trazado → lámina (481 / width del svg). pielTrazado la aplica a
+   cada grupo de región. */
+export const CALCO_ESCALA = ${ESCALA};
 export default CALCO_POR_REGION;
 `;
 const destino = join(dirname(fileURLToPath(import.meta.url)), 'calcoTrazado.js');
 writeFileSync(destino, salida);
-console.log(`calcoTrazado.js escrito: ${paths.length} paths → ${repartidos} asignaciones + coronilla 3× ${nCoronilla} paths (${(salida.length / 1024).toFixed(0)} KiB)`);
+console.log(`calcoTrazado.js escrito: ${paths.length} paths → ${repartidos} asignaciones · escala ${ESCALA.toFixed(4)} (${(salida.length / 1024).toFixed(0)} KiB)`);
 console.log(resumen);

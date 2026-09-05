@@ -42,6 +42,15 @@ for (const v of VISTAS) {
       await page.waitForFunction((p) => document.querySelector('[data-creature="zariguya"]')?.getAttribute('data-pose') === p, v, { timeout: 20000 }).catch(() => errores.push(`pose ${v} no activó en 20 s`));
     }
     await page.waitForTimeout(2500);
+    if (process.env.FPS) {
+      // cuadros por segundo reales durante 3 s (rAF): el costo de render del calco
+      const fps = await page.evaluate(() => new Promise((r) => {
+        let n = 0; const t0 = performance.now();
+        const f = () => { n++; if (performance.now() - t0 < 3000) requestAnimationFrame(f); else r(n / 3); };
+        requestAnimationFrame(f);
+      }));
+      errores.push(`fps=${fps.toFixed(1)}`);
+    }
     const out = join(DIR, `${et}-${v}.png`);
     await page.screenshot({ path: out, clip: { x: 0, y: 0, width: lado, height: lado }, timeout: 20000 });
   })();
