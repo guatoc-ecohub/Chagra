@@ -438,7 +438,14 @@ export const MUNDO = {
     },
     hotspots: [
       { id: 'hoy', pos: [2.7, 3.4, 0.6], emoji: '⛅', label: 'El tiempo hoy', view: 'hoy_finca' },
-      { id: 'almanaque', pos: [0, 1.7, 1.9], emoji: '🗓️', label: 'Almanaque de la finca', view: 'almanaque' },
+      // 2026-09-02 (gate DOM-tapa-montaña): en [0, 1.7, 1.9] su píldora abierta
+      // proyectaba SOBRE la cara del macizo (medido con la cámara viva: tapaba
+      // templado con ΔE≈180 contra su propio color real). La corrección DY de
+      // EscenaBoveda (-0.55 solo para este id) ya la bajaba pero no alcanzaba
+      // a sacarla del relieve. Se corre a la izquierda y se adelanta hacia la
+      // cámara: sobre el disco de la finca, junto al pie de la montaña, no
+      // encima — sigue siendo la puerta más visible, ya no le tapa la cara.
+      { id: 'almanaque', pos: [-1.9, 2.1, 2.5], emoji: '🗓️', label: 'Almanaque de la finca', view: 'almanaque' },
       { id: 'lluvia', pos: [-2.7, 3.1, 0.5], emoji: '🌧️', label: 'Cuándo llueve', view: 'calendario_finca' },
     ],
     entrada: { zoom: 7.5, narra: 'clima' },
