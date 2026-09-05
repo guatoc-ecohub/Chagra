@@ -145,6 +145,7 @@ export function resumenClimaAterrizaje(climaVivo, { pisoId = null, sugerencias =
   const hayDato = Boolean(climaVivo?.senal);
   const tinta = [];
   const tiza = [];
+  let alertas = [];
   if (hayDato) {
     const ahora = lineaAhora(climaVivo);
     if (ahora) tinta.push(ahora);
@@ -154,11 +155,12 @@ export function resumenClimaAterrizaje(climaVivo, { pisoId = null, sugerencias =
     if (helada) tiza.push(helada);
     const cultivo = sugerenciaDeCultivo(sugerencias);
     if (!helada && cultivo) tiza.push(cultivo);
+    alertas = alertasAterrizaje(climaVivo);
   }
   return {
     hayDato,
     tinta,
-    alertas: alertasAterrizaje(climaVivo),
+    alertas,
     tiza: tiza.length > 0 ? tiza.join(' ') : null,
     familia: String(climaVivo?.ensoFamily ?? 'neutral'),
   };

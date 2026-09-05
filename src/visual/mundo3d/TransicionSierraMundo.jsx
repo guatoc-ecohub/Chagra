@@ -105,6 +105,7 @@ import {
   faseEnsoViva,
   resolverAterrizaje,
 } from './sierra/aterrizajeDescenso.js';
+import { resumenClimaAterrizaje } from './sierra/lecturaClimaAterrizaje.js';
 
 /* La escena 3D del descenso se carga PEREZOSA: en modo CSS (el de hoy, y el
    fallback de tier bajo) no entra ni un byte de three al bundle inicial. */
@@ -292,6 +293,18 @@ const CSS = `
 .tsm__aterrizaje b { display: block; font-weight: 650; }
 .tsm__aterrizaje em { display: block; font-style: normal; opacity: 0.86; margin-top: 0.25rem; }
 .tsm__aterrizaje small { display: block; margin-top: 0.4rem; opacity: 0.78; font-size: 0.82em; }
+/* El clima vivo entra al aterrizaje con dos materiales (DIRECCION NUMEROS VIVOS):
+   TINTA (vino de afuera: ahora / esta noche / avisos del servicio) y TIZA (lo que
+   Chagra dedujo por prioridad). Sin dato no se monta ninguna de las dos. */
+.tsm__aterrizaje .tsm__tinta { opacity: 0.94; font-weight: 560; }
+.tsm__aterrizaje .tsm__aviso { opacity: 0.92; font-weight: 650; }
+.tsm__aterrizaje .tsm__tiza {
+  opacity: 0.96;
+  margin-top: 0.45rem;
+  padding-top: 0.4rem;
+  border-top: 1px dashed rgba(253, 248, 236, 0.4);
+  font-weight: 560;
+}
 
 @keyframes tsm-aterriza {
   0%, 74% { opacity: 0; transform: translate(-50%, 8px); }
@@ -497,6 +510,11 @@ const CSS = `
  * @param {{descripcion?: string, temperatura?: number}|null} [props.clima]
  *        clima del día (dato vivo) para la línea de aterrizaje; null si no hay.
  * @param {number|null} [props.humedad] humedad relativa real (0..100) del dato vivo.
+ * @param {object|null} [props.climaVivo] salida completa de `useClima3DVivo`
+ *        (`derivarClima3D`): la fuente única del clima de la finca. El host lo
+ *        baja del hook; si no llega, el aterrizaje no inventa números (§8).
+ * @param {Array} [props.sugerencias] salida de `buildClimaCultivoSuggestions`
+ *        (solo si el host ya la calculó; sin plantas no hay prioridad 2).
  * @param {(estado: object) => void} [props.onDescenso] callback por cuadro con
  *        el estado del viaje (altitud, banda, óptica).
  */
@@ -518,6 +536,8 @@ export default function TransicionSierraMundo({
   faseEnso = null,
   clima = null,
   humedad = null,
+  climaVivo = null,
+  sugerencias = [],
   onDescenso,
 }) {
   const mitadRef = useRef(onMitad);
@@ -563,6 +583,14 @@ export default function TransicionSierraMundo({
   const visita = useMemo(
     () => anfitrionDeBanda(aterrizaje.pisoId, companeroDelUsuario()),
     [aterrizaje.pisoId],
+  );
+  /* El clima de la finca entra por el MISMO hook que la vitrina 2D
+     (`useClima3DVivo` → `derivarClima3D`), sin camino paralelo a los datos.
+     `resumenClimaAterrizaje` elige la tinta, los avisos y la única tiza por
+     prioridad; sin `senal` devuelve vacío y no se pinta nada. */
+  const lectura = useMemo(
+    () => resumenClimaAterrizaje(climaVivo, { pisoId: aterrizaje.pisoId, sugerencias }),
+    [climaVivo, aterrizaje.pisoId, sugerencias],
   );
   const plan = useMemo(
     () => (usar3d ? planDescenso(destino.cota, tier) : null),
@@ -751,6 +779,15 @@ export default function TransicionSierraMundo({
               </p>
               <p className="tsm__aterrizaje" role="status">
                 {aterrizaje.lineaClima && <b>{aterrizaje.lineaClima}</b>}
+                {lectura.tinta.map((linea) => (
+                  <em className="tsm__tinta" key={linea}>{linea}</em>
+                ))}
+                {lectura.alertas.map((alerta) => (
+                  <small className="tsm__aviso" key={`${alerta.tipo}-${alerta.mensaje}`}>
+                    {alerta.mensaje}
+                  </small>
+                ))}
+                {lectura.tiza && <em className="tsm__tiza">{lectura.tiza}</em>}
                 {aterrizaje.lineaPiso && <em>{aterrizaje.lineaPiso}</em>}
                 {aterrizaje.enso.titular && (
                   <em>
