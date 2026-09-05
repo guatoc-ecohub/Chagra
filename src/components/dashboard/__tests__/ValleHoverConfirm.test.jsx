@@ -16,14 +16,17 @@ afterEach(cleanup);
 
 describe('ValleHoverConfirm', () => {
   test('permanece ausente hasta que el hover o toque activa la invitación', () => {
-    const { rerender } = render(<ValleHoverConfirm active={false} onNavigate={vi.fn()} />);
+    const { rerender, container } = render(<ValleHoverConfirm active={false} onNavigate={vi.fn()} />);
     expect(screen.queryByTestId('valle-hover-confirm')).not.toBeInTheDocument();
     expect(screen.queryByTestId('valle-confirm-dialog')).not.toBeInTheDocument();
 
     rerender(<ValleHoverConfirm active onNavigate={vi.fn()} />);
     expect(screen.getByTestId('valle-hover-confirm')).toBeInTheDocument();
-    expect(screen.getAllByAltText('')).toHaveLength(3);
-    expect(screen.getByRole('button', { name: 'Entrá al valle 3D' })).toBeInTheDocument();
+    // Los frames del teaser son decorativos (alt="" dentro de un contenedor
+    // aria-hidden): su rol implícito es `presentation`, NO `img`, así que un
+    // query por rol no los encuentra. Se cuentan por clase.
+    expect(container.querySelectorAll('.vhc__frame')).toHaveLength(3);
+    expect(screen.getByRole('button', { name: 'Entra al valle 3D' })).toBeInTheDocument();
   });
 
   test('invita, confirma y solo entonces navega al valle3d sin depender del reloj', () => {

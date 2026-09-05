@@ -21,7 +21,7 @@ import useAssetStore from './store/useAssetStore';
 import { fetchFromFarmOS } from './services/apiService';
 import { PRIMARY_WORKER_NAME } from './config/workerConfig';
 import { tieneAccesoGlaciarActual, esOperadorActual } from './config/glaciarAccess';
-import { getProfile, getMarco3DPreference } from './services/userProfileService';
+import { getProfile, getMarco3DPreference, resolveDestinoPostLogin } from './services/userProfileService';
 import { parseSeguimientoView } from './config/seguimientoProcesos';
 import { homeCampesinoBActivo } from './config/homeCampesinoBFlag';
 // NOTA (unificación compai 2026-08-23): el manifiesto de rutas se usaba SOLO
@@ -1786,16 +1786,23 @@ export default function App() {
       case 'login':
         return (
           <ErrorBoundary>
-            <LoginScreen onLoginSuccess={() => { setSinSesion(false); navigate('dashboard'); }} onSave={showToast} />
+            {/* BUG-09 2026-09-04: el destino post-login lo decide
+                resolveDestinoPostLogin() — si el usuario nunca vio el
+                onboarding (ni completado ni saltado), cae en
+                'onboarding-perfil' en vez del dashboard. "Saltar todo" marca
+                skipped, así que solo pasa una vez (#283). */}
+            <LoginScreen onLoginSuccess={() => { setSinSesion(false); navigate(resolveDestinoPostLogin()); }} onSave={showToast} />
           </ErrorBoundary>
         );
       case 'oauth-callback':
         // Puente del flujo Authorization Code + PKCE. Intercambia el code por
         // token y navega al dashboard; si falla, vuelve al login con toast.
+        // Mismo criterio del password grant (BUG-09): primera vez va al
+        // onboarding si el usuario nunca lo vio.
         return (
           <ErrorBoundary>
             <OAuthCallback
-              onSuccess={() => navigate('dashboard')}
+              onSuccess={() => navigate(resolveDestinoPostLogin())}
               onError={(msg) => {
                 showToast(msg || 'No se pudo iniciar sesión con PKCE.', true);
                 navigate('login');
