@@ -358,7 +358,8 @@ export const EXPLICA_PANTALLAS = Object.freeze({
 /**
  * Explicación para una pantalla dada, o null si no está mapeada (el compAI
  * no describe pantallas que no conoce — mejor callado que inventado).
- * @param {string|null|undefined} pantalla — currentView del shell.
+ * @param {unknown} pantalla - currentView del shell; cualquier valor no cubierto
+ *   devuelve null (la función es defensiva y describe solo lo que conoce).
  * @returns {ExplicaPantalla|null}
  */
 export function explicacionDePantalla(pantalla) {

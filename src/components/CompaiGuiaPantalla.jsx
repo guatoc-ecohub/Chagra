@@ -27,8 +27,8 @@ import useAgentAvatarType, { AVATAR_NOMBRE, DEFAULT_AVATAR_TYPE } from '../hooks
  * accesible propio.
  *
  * @param {Object} props
- * @param {string|null} props.pantalla — currentView del shell (AgentFab lo pasa).
- * @param {Function} [props.onNavigate] — mismo contrato de navegación del AgentFab.
+ * @param {string|null} props.pantalla - currentView del shell (AgentFab lo pasa).
+ * @param {Function} [props.onNavigate] - mismo contrato de navegación del AgentFab.
  */
 export default function CompaiGuiaPantalla({ pantalla, onNavigate }) {
   const explicacion = useCompaiGuiaPantalla(pantalla);

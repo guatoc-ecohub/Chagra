@@ -31,6 +31,7 @@ vi.mock('../../hooks/useCompaiClimaVivo', () => ({ __esModule: true, default: ()
 vi.mock('../../hooks/useCompaiSusurroNocturno', () => ({ __esModule: true, default: () => {}, useCompaiSusurroNocturno: () => {} }));
 vi.mock('../../hooks/useCompaiAgroecologiaReal', () => ({ __esModule: true, default: () => {}, useCompaiAgroecologiaReal: () => {} }));
 vi.mock('../../services/angelitaInteligencia', async (importOriginal) => {
+  /** @type {object} */
   const actual = await importOriginal();
   return { ...actual, notificacionesInteligentes: () => ({ hay: false }) };
 });
