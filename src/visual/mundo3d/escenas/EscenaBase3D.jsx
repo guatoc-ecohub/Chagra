@@ -390,6 +390,9 @@ function Contenido({
   );
 }
 
+/** Estado que expone la sonda de medición al arnés visual, solo durante el gate. */
+/** @typedef {{ gl: import('three').WebGLRenderer, scene: import('three').Scene, camera: import('three').Camera }} ThreeSonda */
+
 /* SONDA DE MEDICIÓN (gate del Paso 5 / DOM-tapa-montaña): expone
    `{ gl, scene, camera }` en `window.__three` para que
    `_gate/descenso-20260902/medir-pisos-boveda.mjs` proyecte las 7 cotas con
@@ -402,9 +405,10 @@ function SondaTres3D() {
   useLayoutEffect(() => {
     if (typeof window === 'undefined') return undefined;
     if (!new URLSearchParams(window.location.search).has('sonda3d')) return undefined;
-    window.__three = { gl, scene, camera };
+    const ventana = /** @type {Window & { __three?: ThreeSonda }} */ (window);
+    ventana.__three = { gl, scene, camera };
     return () => {
-      delete window.__three;
+      delete ventana.__three;
     };
   }, [gl, scene, camera]);
   return null;
