@@ -168,15 +168,12 @@ export {
   ZARIGUYA_FIRMA, ZARIGUYA_PALETA, ZARIGUYA_PRESENCIA, ZARIGUYA_PROPORCION,
   ZARIGUYA_SLUG, ZARIGUYA_TINTA, PERFIL_ZARIGUYA,
 } from './zariguyaIdentidad.js';
-/* LA ZARIGÜEYA GEMINI (2026-08-24, `feat/zariguya-gemini-integra`) — el SET
-   estilo grabado/tinta aprobado por el operador (2026-08-23) hecho lámina
-   viva: la hero naturalista (lápiz+brújula, patas reales) horneada en capas
-   + cola de rig del despiece + las poses plenas del set (escucha ×4,
-   ver-lupa, cute, muerta) según el estado del agente. Es la cara ACTUAL del
-   AGENTE (`ChagraAgentAvatarZariguya`); `CREATURES.zariguya` (fauna del
-   valle/selector de criaturas) sigue en `ZariguyaLaminaViva` hasta que esa
-   superficie se migre — trabajo aparte, mismo set. */
-export { default as ZariguyaGeminiLaminaViva } from './ZariguyaGeminiLaminaViva.jsx';
+/* LA ZARIGÜEYA GEMINI (2026-08-24) fue el SET estilo grabado hecho lámina
+   viva. ARCHIVADA (2026-09-04, regla dura del operador: compais SOLO con
+   TINTA — task #094): vive en `_archivo/ZariguyaGeminiLaminaViva.jsx`, fuera
+   del árbol de build. Tanto el AGENTE (`ChagraAgentAvatarZariguya`) como
+   `CREATURES.zariguya` (fauna del valle/selector) y la escena compai montan
+   la piel TINTA `ZariguyaTrazado` — una sola chucha, a tinta. */
 /* LA LUCIÉRNAGA (cocuyo) — el ESCARABAJO bioluminiscente de la finca: la GUÍA
    nocturna, científica y BIOINDICADORA (la misma familia de personaje-guía que
    la abeja Angelita). Su LINTERNA es un medidor vivo del cambio climático (prop
@@ -300,7 +297,8 @@ import LuciernagaTrazado from './LuciernagaTrazado.jsx';
    reemplaza a `JaguarLaminaViva` (la PNG recortada en capas, rechazada — el
    pecho raster no aguanta el corte). Drop-in like-for-like: mismo <div
    data-creature="jaguar" role="img">, misma cadencia (jaguarHuesos.css).
-   `JaguarLaminaViva.jsx` NO se borra (huérfano GATED, por historia). */
+   `JaguarLaminaViva.jsx` ARCHIVADA en `_archivo/` (2026-09-04, regla dura del
+   operador: compais SOLO con TINTA — task #094). */
 import JaguarTrazado from './JaguarTrazado.jsx';
 import Morrocoy from './Morrocoy.jsx';
 import Danta from './Danta.jsx';
@@ -321,9 +319,17 @@ import Gallina from './Gallina.jsx';
    role="img">, cadencia propia (zariguyaTrazado/zariguyaHuesos.css) y CUERPO
    ENTERO en todos los estados (cero salto a close-up de cabeza). TAMAÑO
    conservado (ZARIGUYA_PRESENCIA sin cambios). `ZariguyaLaminaViva.jsx` y
-   `ZariguyaGeminiLaminaViva.jsx` NO se borran (huérfanos, por historia). */
+   `ZariguyaGeminiLaminaViva.jsx` ARCHIVADAS en `_archivo/` (2026-09-04, regla
+   dura del operador: compais SOLO con TINTA — task #094). */
 import ZariguyaTrazado from './ZariguyaTrazado.jsx';
-import OsoBastonLaminaViva from './OsoBastonLaminaViva.jsx';
+/* EL OSO DEL BASTÓN EN EL REGISTRO = OsoBaston (TINTA, 2026-09-04 — task
+   #094): la lámina-viva (`OsoBastonLaminaViva`, PNG horneada en capas) se
+   ARCHIVÓ en `_archivo/` con la regla dura del operador (compais SOLO con
+   TINTA). La tinta ya era la piel REAL del personaje: avatar
+   (`ChagraAgentAvatarOsoBaston`) y escena compai (`OsoBastonCompaiEscena`)
+   montaban `OsoBaston`; el registro es el último punto que quedaba colgado
+   del raster. Mismo slug, mismo binomio — solo cambia la piel. */
+import OsoBaston from './OsoBaston.jsx';
 import MaizCompai from './MaizCompai.jsx';
 import EntFrailejon from './EntFrailejon.jsx';
 
@@ -341,7 +347,8 @@ export const CREATURES = {
   'oso-guardian': { Component: OsoGuardian, nombre: 'Oso de anteojos', cientifico: 'Tremarctos ornatus' },
   // La dirección CAMINANTE del mismo oso (la referencia Cuphead aprobada):
   // erguido, botas y guantes, y el bastón florecido — el dispersor de semillas.
-  'oso-baston': { Component: OsoBastonLaminaViva, nombre: 'Oso del bastón', cientifico: 'Tremarctos ornatus' },
+  // Piel TINTA (2026-09-04, task #094): la lámina-viva quedó archivada.
+  'oso-baston': { Component: OsoBaston, nombre: 'Oso del bastón', cientifico: 'Tremarctos ornatus' },
   'rana-andina': { Component: RanaAndina, nombre: 'Rana arlequín andina', cientifico: 'Atelopus spp.' },
   perezoso: { Component: Perezoso, nombre: 'Perezoso de tres dedos', cientifico: 'Bradypus variegatus' },
   ardilla: { Component: Ardilla, nombre: 'Ardilla de cola roja', cientifico: 'Notosciurus granatensis' },

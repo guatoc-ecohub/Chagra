@@ -3,9 +3,11 @@
  * (avatarType 'zariguya').
  *
  * Molde: useEntradaAbeja/AbejaEscena (la escena posee la coreografía, la
- * creature posee el cuerpo). SKIN DEFINITIVA (operador 2026-08-25):
- * `ZariguyaGeminiLaminaViva` — la lámina raster Gemini aprobada, con sus
- * poses completas y vida propia. Pero la chucha NO vuela — es un
+ * creature posee el cuerpo). SKIN (2026-09-04, regla dura del operador:
+ * compais SOLO con TINTA — task #094): `ZariguyaTrazado`, la lámina
+ * auto-trazada a tinta que ya es la cara del agente y del registro
+ * CREATURES. Antes lo fue el set Gemini raster (`ZariguyaGeminiLaminaViva`,
+ * archivado en `_archivo/`). Pero la chucha NO vuela — es un
  * marsupial NOCTURNO de piso, y su coreografía entera sale de esa verdad:
  *
  *   · CAMINA: se desplaza PEGADA AL SUELO con trote de pasos cortos (bob de
@@ -18,7 +20,7 @@
  *     a un tronco — la cola prensil y las manitas son para eso.
  *   · RONDA: sin foco activo, MERODEA por el piso en óvalos irregulares
  *     (ondas co-primas, lentas). El HUSMEO ya no lo orquesta la escena: vive
- *     en el idle-cerebro de la propia lámina (data-vida husmea/tanatosis/
+ *     en el idle-cerebro de la propia piel (data-vida husmea/tanatosis/
  *     reposo, ver vidaEstados.js), su reacción-firma nativa.
  *   · VIRAJE MÍSTICO (operador 2026-08-25): al cambiar de sentido NO gira —
  *     la zarigüeya-espíritu se DESVANECE y REAPARECE (parpadeo espectral de
@@ -39,7 +41,7 @@ import { useEffect, useMemo, useRef } from 'react';
 import { useFrame } from '@react-three/fiber';
 import { Html } from '@react-three/drei';
 import * as THREE from 'three';
-import ZariguyaGeminiLaminaViva from '../../creatures/ZariguyaGeminiLaminaViva.jsx';
+import ZariguyaTrazado from '../../creatures/ZariguyaTrazado.jsx';
 import { ZARIGUYA_PRESENCIA, ZARIGUYA_TINTA, ZARIGUYA_SLUG } from '../../creatures/zariguyaIdentidad.js';
 import { idleDeCreature, IDLE_NEUTRO } from '../../creatures/creatureIdle.js';
 import { useLipSync } from '../../creatures/useLipSync.js';
@@ -258,10 +260,10 @@ export function useAndanzaZariguya(foco, {
 /**
  * La zarigüeya ya montada en una escena: drop-in del contrato de AbejaEscena
  * (CompaiEscena le pasa las mismas props). Billboard `<Html>` con la SKIN
- * definitiva `ZariguyaGeminiLaminaViva` (lámina raster aprobada,
- * operador 2026-08-25); PULSA al narrar y REBOTA al toque con las clases
+ * TINTA `ZariguyaTrazado` (lámina auto-trazada, regla dura solo-tinta,
+ * task #094); PULSA al narrar y REBOTA al toque con las clases
  * genéricas del billboard (`.mundo-abeja*`). Su husmeo/tanatosis/reposo corren
- * en el idle-cerebro de la propia lámina. VIRAJE MÍSTICO: no gira — se
+ * en el idle-cerebro de la propia piel. VIRAJE MÍSTICO: no gira — se
  * desvanece y reaparece.
  */
 export function ZariguyaCompaiEscena({
@@ -308,11 +310,11 @@ export function ZariguyaCompaiEscena({
   const vivo = !reducedMotion;
   // LIP-SYNC: la chucha "habla" cuando el agente narra (única boca del mundo).
   const { visema } = useLipSync({ activo: vivo });
-  // Estado del skin Gemini: narra → 'speaking'; parado/idle → 'idle' (su
+  // Estado del skin: narra → 'speaking'; parado/idle → 'idle' (su
   // idle-cerebro 70/30 husmea/tanatosis/reposo corre solo). El trote se lee en
   // el waddle del idleRef + el desplazamiento del billboard, no en un
   // walk-cycle interno (así la marcha no se duplica con el bamboleo del molde).
-  const estadoGemini = hablando && vivo ? 'speaking' : 'idle';
+  const estadoPiel = hablando && vivo ? 'speaking' : 'idle';
   const cruceVivo = cruce && !reducedMotion;
   return (
     <>
@@ -336,9 +338,9 @@ export function ZariguyaCompaiEscena({
                   para no pisar la aparición mística de la cara. */}
               <div ref={idleRef} style={{ transformOrigin: 'center bottom' }} data-creature={ZARIGUYA_SLUG}>
                 <div ref={caraRef} className="mundo-abeja__cara">
-                  <ZariguyaGeminiLaminaViva
+                  <ZariguyaTrazado
                     size={size}
-                    estado={estadoGemini}
+                    estado={estadoPiel}
                     visema={vivo ? visema : null}
                     animated={vivo}
                     tier={tier}

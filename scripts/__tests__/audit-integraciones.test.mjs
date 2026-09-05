@@ -62,8 +62,8 @@ const ALLOWLIST_REPO = join(REPO_ROOT, 'ops/integraciones-no-consumidas.json');
 // quita estas entradas del allowlist sin cablear o borrar los componentes,
 // el gate vuelve a rojo — este test lo explica en el mensaje de fallo.
 const IDS_REGRESION_090C = [
-  'src/visual/creatures/ChivitoPunkLaminaViva.jsx',
-  'src/visual/creatures/LuciernagaLaminaViva.jsx',
+  'src/visual/creatures/_archivo/ChivitoPunkLaminaViva.jsx',
+  'src/visual/creatures/_archivo/LuciernagaLaminaViva.jsx',
 ];
 
 // ---------------------------------------------------------------------------
@@ -372,10 +372,12 @@ describe('ops/integraciones-no-consumidas.json (repo real)', function () {
   it('REGRESIÓN 090c: las dos láminas vivas causantes del rojo siguen declaradas', function () {
     // ChivitoPunkLaminaViva y LuciernagaLaminaViva quedaron sin consumidor
     // cuando el PR #3079 (2026-08-31) puso ChivitoTrazado/LuciernagaTrazado
-    // en el registro CREATURES. Quitar estas entradas sin cablear o borrar
-    // los componentes devuelve el gate a rojo (exit 1) — exactamente el rojo
-    // que esta task cerró. Ver ops/integraciones-no-consumidas.json para la
-    // justificación completa de cada excepción.
+    // en el registro CREATURES. El 2026-09-04 las láminas-viva dejaron el
+    // árbol vivo y quedaron en _archivo/ como symlinks reversibles (el cable,
+    // el borrado y el archivo con razones viven en integraciones-no-consumidas
+    // y en ops/DRENAJE-HUERFANOS-TANDA-1-2026-09-04.md). Quitar estas entradas
+    // sin actualizar el estado devuelve el gate al rojo que esta task cerró.
+    // Ver ops/integraciones-no-consumidas.json para la justificación completa.
     const ids = new Set((allowlist.orphan_components || []).map(function (e) { return e.id; }));
     for (const id of IDS_REGRESION_090C) {
       expect(ids.has(id), `falta la entrada allowlist de ${id} — el gate volvería a rojo`).toBe(true);
