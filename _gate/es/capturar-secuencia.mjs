@@ -16,24 +16,31 @@
  * Uso:
  *   node capturar-secuencia.mjs --url <harness> --hacia jaguar --t 60,200,400,... --out /tmp/es/jaguar
  *   node capturar-secuencia.mjs --url <harness> --desde angelita --t 100,600 --congelar 0.4   (control, sin cambio)
+ *   Sin --out la salida va a un dir único bajo el tmp del SO y el script imprime la ruta.
  */
 /* global process, console, window, document, performance, CustomEvent, localStorage */
 import { chromium } from 'playwright';
-import { mkdirSync, writeFileSync } from 'node:fs';
+import { mkdirSync, mkdtempSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
+import { tmpdir } from 'node:os';
 import sharp from 'sharp';
 
 const arg = (k, d) => { const i = process.argv.indexOf(`--${k}`); return i > 0 ? process.argv[i + 1] : d; };
 const URL_ = arg('url');
 const DESDE = arg('desde', 'angelita');
 const HACIA = arg('hacia', null);
-const OUT = arg('out', `/tmp/es/${HACIA || DESDE}`);
+// mkdtempSync evita CodeQL js/insecure-temporary-file: un path hardcoded en
+// /tmp es vector de symlink attack. Sin --out, dir único O_EXCL (0700); con
+// --out explícito la elección es de quien invoca. El dir se imprime abajo.
+const OUT_ARG = arg('out', null);
+const OUT = OUT_ARG ?? mkdtempSync(join(tmpdir(), 'es-captura-'));
 const T = arg('t', '60,200,400,700,1000,1300,1700,2100,2600').split(',').map(Number);
 const ESPERA = Number(arg('espera', '3200')); // ms de asentamiento antes de disparar
 const CONGELAR = arg('congelar', null);       // s: congela keyframes CSS (control determinista)
 const VW = 430; const VH = 932; const CAJA = 300; const ZOOM = 3;
 
-mkdirSync(OUT, { recursive: true });
+if (OUT_ARG) mkdirSync(OUT, { recursive: true });
+console.log(`[capturar] salida: ${OUT}`);
 const browser = await chromium.launch({
   headless: true,
   executablePath: process.env.CHROME_BIN || '/home/kortux/.local/bin/chromium',
