@@ -89,7 +89,8 @@ export function lineaAhora(climaVivo) {
  * (la helada decide) y páramo. En el resto la cifra va al boletín.
  *
  * @param {object} climaVivo  salida de `derivarClima3D`.
- * @param {string} [pisoId]   piso del aterrizaje (de `resolverAterrizaje`).
+ * @param {{pisoId?: string}} [opts]  opciones; `opts.pisoId` es el piso del
+ *                                    aterrizaje (de `resolverAterrizaje`).
  * @returns {string|null}  «esta noche baja a 3°» o null sin dato/piso no frío.
  */
 export function lineaMinimaNoche(climaVivo, { pisoId } = {}) {

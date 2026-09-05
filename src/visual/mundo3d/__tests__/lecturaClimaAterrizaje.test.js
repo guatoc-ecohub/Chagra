@@ -68,6 +68,10 @@ describe('tinta: el ahora y la mínima de esta noche', () => {
     expect(lineaMinimaNoche(clima({ tempMin: 2.6 }), { pisoId: 'templado' })).toBeNull();
     expect(lineaMinimaNoche(clima({ tempMin: null }), { pisoId: 'frio' })).toBeNull();
   });
+
+  it('sin objeto de opciones (default {}) no hay piso y por tanto no hay línea', () => {
+    expect(lineaMinimaNoche(clima({ tempMin: 2.6 }))).toBeNull();
+  });
 });
 
 describe('tiza prioridad 1: la helada', () => {
