@@ -6,7 +6,7 @@
  * conserven la especie elegida, y que una entrada inválida sea el único caso
  * que use Angelita como fallback.
  */
-import { act, cleanup, render } from '@testing-library/react';
+import { cleanup, render } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import ChagraAgentAvatar from '../ChagraAgentAvatar.jsx';
 import CompaiGuiaPantalla from '../CompaiGuiaPantalla.jsx';
@@ -108,15 +108,16 @@ describe('P1 contrato integrado del elenco compai', () => {
   }
 
   it('conserva especie y nombre en la guía species-aware de pantalla', () => {
-    vi.useFakeTimers();
-
+    // RECABLEADO 2026-09-03 (decisión del operador: la explicación de la
+    // pantalla SALE EN LA PIZARRA SIEMPRE): el bloque ya no es una burbuja
+    // auto-pop con demora — se renderiza dentro de la pizarra al abrirse el
+    // panel "Ver", sin timers.
     for (const especie of ROSTER) {
       elegir(especie);
       const { container, unmount } = render(
         <CompaiGuiaPantalla pantalla="activos" onNavigate={() => {}} />,
       );
 
-      act(() => { vi.advanceTimersByTime(800); });
       const guia = container.querySelector('[role="region"]');
       expect(guia, `${especie} no presentó la guía`).toBeInTheDocument();
       expect(guia).toHaveAttribute('aria-label', `Guía de ${AVATAR_NOMBRE[especie]}`);

@@ -110,17 +110,19 @@ describe('CompaiOverlay', () => {
     await abrirPanelDetalle();
     expect(screen.getByText('Bienvenido a su finca')).toBeInTheDocument();
 
-    // Cambiar a perfil (pizarra/panel se cierran automáticamente)
+    // Cambiar a perfil (pizarra/panel se cierran automáticamente).
+    // Cableado 2026-09-03: para las pantallas del manifiesto
+    // (compaiExplicaPantallas) el aviso ES la explicación — UNA sola voz.
     rerender(<CompaiOverlay currentView="perfil" />);
 
     await abrirPanelDetalle();
-    expect(screen.getByText('Su perfil de la finca')).toBeInTheDocument();
+    expect(screen.getByText('Su perfil')).toBeInTheDocument();
   });
 
   it('debe cambiar el hint según currentView (mapa)', async () => {
     render(<CompaiOverlay currentView="mapa" />);
     await abrirPanelDetalle();
-    expect(screen.getByText('Su finca en el mapa')).toBeInTheDocument();
+    expect(screen.getByText('El mapa')).toBeInTheDocument();
   });
 
   it('debe cambiar el hint según currentView (historial)', async () => {
@@ -148,7 +150,9 @@ describe('CompaiOverlay', () => {
   it('debe resolver subrutas por prefijo (animales_gallinas → animales)', async () => {
     render(<CompaiOverlay currentView="animales_gallinas" />);
     await abrirPanelDetalle();
-    expect(screen.getByText('Sus animales')).toBeInTheDocument();
+    // Cableado 2026-09-03: animales_gallinas está EN el manifiesto, con voz
+    // propia (más específica que la del prefijo animales).
+    expect(screen.getByText('Sus gallinas')).toBeInTheDocument();
   });
 
   it('la burbuja de parada auto-pop YA NO EXISTE (retirada, la pizarra la reemplazó)', async () => {

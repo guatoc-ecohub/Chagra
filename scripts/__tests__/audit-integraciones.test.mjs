@@ -1,3 +1,8 @@
+// Pragma node para eslint (process.env más abajo): el arnés siempre fue un
+// script node; se declara explícito al tocar el archivo (cableado pizarra
+// 2026-09-03) para que el hook de eslint (staged, --max-warnings=0) no se
+// tropiece con el no-undef heredado de la config.
+/* global process */
 import { describe, it, expect } from 'vitest';
 import { spawnSync } from 'node:child_process';
 import { execPath } from 'node:process';
@@ -350,14 +355,29 @@ describe('ops/integraciones-no-consumidas.json (repo real)', function () {
       expect(salida).not.toContain(id);
     });
 
-    // CONTROL POSITIVO · el radar de dos carpetas. Estos tres viven fuera de
+    // CONTROL POSITIVO · el radar de dos carpetas. Estos viven fuera de
     // `src/mockups`/`src/visual` y por eso el gate viejo ni los miraba.
+    // ACTUALIZADO A MANO 2026-09-03 (protocolo del arnés): dos de los tres
+    // originales (useCompaiGuiaPantalla.js, compaiExplicaPantallas.js) se
+    // CABLEARON de verdad — la cadena explicación→pizarra quedó montada en
+    // AgentFab (decisión del operador: el texto de explicación de la pantalla
+    // SALE EN LA PIZARRA SIEMPRE, commit 3233f7f06) — y por eso dejaron de
+    // salir acusados. El control sigue de pie con GuiaEspecieCards y
+    // AdminPanel, huérfanos reales de src/components que el gate sí ve.
     it.each([
       'src/components/aprendizaje/GuiaEspecieCards.jsx',
-      'src/hooks/useCompaiGuiaPantalla.js',
-      'src/services/compaiExplicaPantallas.js',
+      'src/components/admin/AdminPanel.jsx',
     ])('%s sale nombrado (el gate ya no mira solo dos carpetas)', function (id) {
       expect(salida).toContain(id);
+    });
+
+    // CONTROL NEGATIVO · las piezas cableadas dejan de salir acusadas: si
+    // vuelven a aparecer acá, alguien des-cableó la cadena.
+    it.each([
+      'src/hooks/useCompaiGuiaPantalla.js',
+      'src/services/compaiExplicaPantallas.js',
+    ])('%s ya NO sale acusado (la cadena explicación→pizarra está cableada)', function (id) {
+      expect(salida).not.toContain(id);
     });
 
     it('el gate sigue barato: termina en menos de 20 s', function () {
