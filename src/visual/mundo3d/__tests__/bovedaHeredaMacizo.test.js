@@ -26,7 +26,7 @@ import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { cotasMacizo, mallaMacizo, IDS_BANDA } from '../sierra/sierraRelieve.js';
 import { franjaDeHoraDecimal } from '../cielosHoraData.js';
-import { BOVEDA_PISOS_DEF, PISOS_TERMICOS_SIERRA } from '../pisosTermicos.js';
+import { BOVEDA_PISOS_DEF, COLOR_BANDA_EXCEPCION, PISOS_TERMICOS_SIERRA } from '../pisosTermicos.js';
 import { MUNDO } from '../mundoData.js';
 
 const leer = (rel) => readFileSync(fileURLToPath(new URL(rel, import.meta.url)), 'utf8');
@@ -125,14 +125,19 @@ describe('el mundo del clima declara SIETE pisos, los de la tabla canónica', ()
     // 🔴 Ojo con `#9fb6bf`: estaba en aquella lista de cuatro, pero NO era
     // inventado — es el color canónico del páramo en `PISOS_TERMICOS`, que la
     // lista vieja había tomado prestado. Desde la unificación de paleta
-    // (2026-09-02, «unifica») la bóveda lee los verdes/fríos canónicos, así que
-    // el páramo vuelve legítimamente a `#9fb6bf`. Prohibir ese hex acá sería
-    // prohibir el canon. Se vigilan los tres que sí eran de cosecha propia.
+    // (2026-09-02, «unifica») la bóveda lee la MISMA tabla que la Sierra; y
+    // desde 2026-09-05 esa tabla declara para el páramo una excepción de render
+    // (`COLOR_BANDA_EXCEPCION.paramo`: pajonal, no escala térmica — el `#9fb6bf`
+    // distaba ΔE 7,5 del superpáramo y las dos bandas nacían indistinguibles).
+    // La bóveda hereda la excepción por la tabla, no por una copia. Se vigilan
+    // los tres que sí eran de cosecha propia.
     for (const viejo of ['#c7a24b', '#8fae55', '#6f9a72']) {
       expect(pisos.map((p) => p.color)).not.toContain(viejo);
     }
-    // el páramo es el canónico, no el ocre `#94975a` que traía la otra tabla
-    expect(pisos.map((p) => p.color)).toContain('#9fb6bf');
+    // el páramo es el de la tabla (su excepción declarada), no el ocre `#94975a`
+    // que traía la otra tabla ni el térmico que lo fundía con el superpáramo
+    expect(pisos.map((p) => p.color)).toContain(COLOR_BANDA_EXCEPCION.paramo);
+    expect(pisos.map((p) => p.color)).not.toContain('#9fb6bf');
     expect(pisos.map((p) => p.color)).not.toContain('#94975a');
   });
 
