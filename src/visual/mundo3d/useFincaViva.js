@@ -48,6 +48,7 @@ import {
 } from '../../services/climaService.js';
 import { getProfile } from '../../services/userProfileService.js';
 import { normalizarPisoUsuario } from './pisosTermicos.js';
+import { fincaDateISO } from '../../utils/farmDate.js';
 
 /** Re-evalúa la atmósfera cada 10 min (mismo ritmo que useClimaAtmosphere). */
 const REEVAL_MS = 10 * 60 * 1000;
@@ -88,14 +89,6 @@ export function mapearEnso(fase) {
   return 'neutro';
 }
 
-/** 'YYYY-MM-DD' local (mismo criterio que atmosphereService/ejeClima). */
-function isoDiaLocal(d) {
-  const y = d.getFullYear();
-  const m = String(d.getMonth() + 1).padStart(2, '0');
-  const day = String(d.getDate()).padStart(2, '0');
-  return `${y}-${m}-${day}`;
-}
-
 /**
  * `agua` (0..1) para saludFinca. NO hay sensor de humedad de suelo en el repo:
  * derivamos un PROXY honesto de la LLUVIA REAL de hoy (Open-Meteo, la misma
@@ -104,6 +97,9 @@ function isoDiaLocal(d) {
  * llega por El Niño + clima seco en reaccionFinca, no por este número. Sin
  * snapshot de clima → null (reaccionFinca usa su neutro 0.5).
  *
+ * BUG TODAY-UTC-HELADA-20260905: el "hoy" se resuelve en el calendario de la
+ * FINCA (fincaDateISO), no en la zona del runtime/UTC.
+ *
  * @param {object|null} snapshot  getCachedClimaSnapshot()
  * @param {Date} now
  * @returns {number|null}
@@ -111,7 +107,7 @@ function isoDiaLocal(d) {
 export function aguaDeLluvia(snapshot, now = new Date()) {
   const om = snapshot?.openmeteo;
   if (!om?.available || !Array.isArray(om.forecast_7d)) return null;
-  const hoy = isoDiaLocal(now);
+  const hoy = fincaDateISO(now);
   const dia = om.forecast_7d.find((d) => d?.date === hoy) || om.forecast_7d[0];
   const precip = Number(dia?.precip_mm);
   if (!Number.isFinite(precip)) return null;
@@ -138,7 +134,7 @@ export function aguaDeLluvia(snapshot, now = new Date()) {
 export function vientoDeClima(snapshot, now = new Date()) {
   const om = snapshot?.openmeteo;
   if (!om?.available) return null;
-  const hoy = isoDiaLocal(now);
+  const hoy = fincaDateISO(now);
   const dia = Array.isArray(om.forecast_7d)
     ? om.forecast_7d.find((d) => d?.date === hoy) || om.forecast_7d[0]
     : null;
