@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useEffect, useMemo } from 'react';
 import {
   perfilDeEspecie,
 } from './compaiEspecies.js';
@@ -40,6 +40,8 @@ function atributosDeCapacidades(capacidades) {
  * El cuerpo sigue siendo responsabilidad del adaptador que recibe `perfil`,
  * `estado` y `pose`. Esta capa solo resuelve el contrato transversal y monta
  * el chrome que puede acompañar a cualquier rig, sin conocer su arte.
+ * `onCuerpoMontado(avatarType)` avisa al host cuando el cuerpo quedó montado
+ * (después de resolver el adaptador perezoso); no llega al adaptador.
  */
 export function CompaiAgente({
   especie = 'angelita',
@@ -57,6 +59,7 @@ export function CompaiAgente({
   adapter = undefined,
   chrome = true,
   preserveRigAnimation = false,
+  onCuerpoMontado = undefined,
   children = null,
   className = '',
   style = undefined,
@@ -64,6 +67,12 @@ export function CompaiAgente({
   ...rest
 }) {
   const perfil = useMemo(() => perfilDeEspecie(especie), [especie]);
+  // Aviso "el cuerpo ya está": este efecto corre cuando el subárbol (incluido
+  // el adaptador perezoso de prod, que suspende) se COMMITEA de verdad. Lo usa
+  // CompaiEntradaSalida para no arrancar el número sobre el fallback de Suspense.
+  useEffect(() => {
+    onCuerpoMontado?.(perfil.avatarType);
+  }, [perfil.avatarType, onCuerpoMontado]);
   const estadoResuelto = estadoVisible(estado);
   const pose = perfil.posePorEstado[estadoResuelto] || perfil.posePorEstado.acompana;
   const climaResuelto = valorClima(clima);
