@@ -266,49 +266,143 @@ const CSS = `
   88%, 100% { opacity: 0; }
 }
 
-/* El ATERRIZAJE: aparece en el último tramo, cuando la cámara ya está frenando.
-   Es el punto entero del descenso — no se termina en el mar, se termina en el
-   predio del usuario, y ahí se le dice qué significa su cota. Aparece por
-   keyframes (no por estado de React) para no re-renderizar el overlay entero
-   mientras corre el número de la altitud. */
-.tsm__aterrizaje {
+/* El ATERRIZAJE EN TRES TIEMPOS (DIRECCION-NUMEROS-VIVOS §3.3), solo cuando el
+   viaje está PARADO en la cota (parametro de gate '?msnm=', o un host que
+   sostenga el viaje): la píldora oscura se RETIRÓ (PASO 1: era HUD y segundo
+   aviso del compai). Sus contenidos se reparten con dos materiales:
+     T0 · la cota para: número del mapa (tinta), con «a la altura de su finca»;
+     T1 · el ahora, en tinta, colgado bajo la cota («llovizna · 14° · ahora»);
+     T2 · UNA línea de tiza, en la pizarra firmada por el compai que la escribió
+          (helada → SU cultivo → sed/hongo → El Niño por piso → nada).
+   Los pasos los dispara un setTimeout determinista (contrato temporal), nunca
+   'animationend'. Sin dato no se monta ninguna pieza (el hueco es la ausencia). */
+
+.tsm__llegada {
   position: absolute;
+  top: calc(10vh + 2.6rem);
   left: 50%;
-  bottom: 20vh;
   transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
   max-width: min(88vw, 34rem);
-  margin: 0;
-  padding: 0.7rem 1rem;
-  border-radius: 0.9rem;
-  background: rgba(18, 26, 22, 0.58);
-  backdrop-filter: blur(4px);
-  color: #fdf8ec;
   text-align: center;
-  font: 500 0.92rem/1.45 system-ui, sans-serif;
-  text-shadow: 0 1px 6px rgba(8, 18, 14, 0.6);
-  opacity: 0;
-  animation: tsm-aterriza var(--tsm-ms) ease-out both;
+  pointer-events: none;
 }
 
-.tsm__aterrizaje b { display: block; font-weight: 650; }
-.tsm__aterrizaje em { display: block; font-style: normal; opacity: 0.86; margin-top: 0.25rem; }
-.tsm__aterrizaje small { display: block; margin-top: 0.4rem; opacity: 0.78; font-size: 0.82em; }
-/* El clima vivo entra al aterrizaje con dos materiales (DIRECCION NUMEROS VIVOS):
-   TINTA (vino de afuera: ahora / esta noche / avisos del servicio) y TIZA (lo que
-   Chagra dedujo por prioridad). Sin dato no se monta ninguna de las dos. */
-.tsm__aterrizaje .tsm__tinta { opacity: 0.94; font-weight: 560; }
-.tsm__aterrizaje .tsm__aviso { opacity: 0.92; font-weight: 650; }
-.tsm__aterrizaje .tsm__tiza {
-  opacity: 0.96;
-  margin-top: 0.45rem;
-  padding-top: 0.4rem;
-  border-top: 1px dashed rgba(253, 248, 236, 0.4);
-  font-weight: 560;
+/* T0 — el rótulo de la cota (tinta del mapa): número 26 px + nota bajo él. */
+.tsm__llegada__cota {
+  margin: 0;
+  padding: 0.5rem 1rem 0.55rem;
+  border-radius: 0.8rem;
+  background: rgba(255, 248, 233, 0.92);
+  color: #402c16;
+  box-shadow: 0 2px 10px rgba(20, 14, 6, 0.28);
+  font: 600 1.55rem/1.1 system-ui, sans-serif;
+  letter-spacing: 0.01em;
+  animation: tsm-llega 180ms ease-out both;
+}
+.tsm__llegada__cota strong { display: block; font-weight: 700; }
+.tsm__llegada__cota span {
+  display: block;
+  margin-top: 0.2rem;
+  font: 500 0.8rem/1.25 system-ui, sans-serif;
+  opacity: 0.82;
 }
 
-@keyframes tsm-aterriza {
-  0%, 74% { opacity: 0; transform: translate(-50%, 8px); }
-  86%, 100% { opacity: 1; transform: translate(-50%, 0); }
+/* T1 — el ahora en TINTA (vino de afuera), colgado bajo la cota. Cada línea
+   lleva su palabra de ventana (ahora / esta noche); sin dato no existe. */
+.tsm__llegada__tinta {
+  margin: 0;
+  padding: 0.4rem 0.9rem;
+  border-radius: 0.7rem;
+  background: rgba(255, 248, 233, 0.78);
+  color: #3a2a18;
+  box-shadow: 0 1px 8px rgba(20, 14, 6, 0.2);
+  font: 560 0.95rem/1.35 system-ui, sans-serif;
+  animation: tsm-llega 180ms ease-out both;
+}
+.tsm__llegada__tinta p { margin: 0; }
+.tsm__llegada__tinta p + p { margin-top: 0.2rem; opacity: 0.86; }
+.tsm__llegada__tinta small {
+  display: block;
+  font-size: 0.78em;
+  opacity: 0.72;
+}
+
+@keyframes tsm-llega {
+  from { opacity: 0; transform: translateY(4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* T2 — la pizarra firmada: tablero de slate con la tiza. Una sola línea (dos
+   como máximo) elegida por prioridad; si ninguna aplica, la pizarra calla. */
+.tsm__pizarra {
+  --pizarra-alto: #32433a;
+  --pizarra-fondo: #253128;
+  --pizarra-bajo: #151d18;
+  --marco: #0c110e;
+  --rim-frio: rgba(151, 173, 160, 0.18);
+  --tiza: #f5f1e7;
+  --tiza-tenue: rgba(245, 241, 231, 0.6);
+
+  position: absolute;
+  left: 4vw;
+  bottom: 10vh;
+  width: min(248px, calc(100vw - 32px));
+  z-index: 47;
+  padding: 12px 16px 13px;
+  border-radius: 14px;
+  color: var(--tiza);
+  background-color: var(--pizarra-fondo);
+  background-image:
+    radial-gradient(125% 95% at 50% 20%, rgba(255, 255, 255, 0.06) 0%, transparent 58%),
+    radial-gradient(140% 120% at 50% 118%, rgba(8, 12, 10, 0.5) 0%, transparent 45%),
+    linear-gradient(158deg, var(--pizarra-alto) 0%, var(--pizarra-fondo) 52%, var(--pizarra-bajo) 100%);
+  border: 2.5px solid var(--marco);
+  box-shadow:
+    0 0 0 1px var(--rim-frio),
+    0 18px 38px rgba(6, 10, 8, 0.5),
+    inset 0 1.5px 0 rgba(240, 238, 228, 0.12),
+    inset 0 -12px 22px rgba(8, 12, 10, 0.38);
+  font-family: 'Baloo 2', 'Nunito', system-ui, sans-serif;
+  animation: tsm-llega 180ms ease-out both;
+  pointer-events: none;
+}
+.tsm__pizarra::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  background-image:
+    radial-gradient(rgba(245, 241, 231, 0.06) 0.5px, transparent 0.6px),
+    radial-gradient(rgba(245, 241, 231, 0.045) 0.5px, transparent 0.6px);
+  background-size: 3px 3px, 5px 5px;
+  background-position: 0 0, 2px 3px;
+  mix-blend-mode: soft-light;
+  opacity: 0.9;
+}
+.tsm__pizarra__rotulo {
+  margin: 0 0 6px;
+  font-size: 0.64rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--tiza-tenue);
+  text-shadow: 0 0 1px rgba(245, 241, 231, 0.28);
+}
+.tsm__pizarra__texto {
+  margin: 0;
+  font-size: 0.92rem;
+  font-weight: 500;
+  line-height: 1.45;
+  letter-spacing: 0.1px;
+  color: var(--tiza);
+  text-shadow:
+    0 0 0.7px rgba(245, 241, 231, 0.45),
+    0 1px 0 rgba(9, 14, 11, 0.3);
 }
 
 /* El rótulo de altitud que CORRE de 5.775 a la cota del usuario (§3.2): una de
@@ -570,6 +664,14 @@ export default function TransicionSierraMundo({
      constante `ENSO_WATCH_2026`. El host puede imponerla por prop para pruebas. */
   const gate = useMemo(() => leerGateDescenso(), []);   // ?msnm= ?enso= ?helada= — solo para el gate; null en el viaje real
   const fase = faseEnso ?? gate.fase ?? faseEnsoViva();
+  /* ¿El viaje está PARADO en la cota? Solo ahí se compone el aterrizaje en tres
+     tiempos (§3.3): en un viaje que corre hacia un mundo no hay pizarra que
+     montar (el overlay se desmonta al llegar). `?msnm=` (gate) es la forma de
+     parar HOY; un host futuro puede sostener el viaje en la cota de la finca. */
+  const paradoEnCota = gate.msnmFijo != null;
+  /* Los tres tiempos: 0 = sin aterrizaje · 1 = T0 (la cota) · 2 = T1 (la tinta
+     del ahora) · 3 = T2 (la tiza en la pizarra). Timers deterministas. */
+  const [paso, setPaso] = useState(0);
   const destino = useMemo(() => cotaDestino(msnmUsuario), [msnmUsuario]);
   /* Con `?msnm=` (gate) y sin finca, la línea y el anfitrión siguen la cota CONGELADA:
      a 2 200 m la línea del Niño es la de frío (helada), no la de cálido. */
@@ -655,6 +757,25 @@ export default function TransicionSierraMundo({
     };
   }, [activa, direccion, tier, reducedMotion, usar3d, gate.msnmFijo]);
 
+  /* EL ATERRIZAJE EN TRES TIEMPOS (§3.3 de DIRECCION-NUMEROS-VIVOS): la píldora
+     se retiró; ahora cada pieza aparece por setTimeout determinista (contrato
+     temporal, nunca `animationend`). La base es el instante en que la píldora
+     vieja asomaba (86 % del viaje, la curva ya frenando); T1 a +800 ms y T2 a
+     +1 600 ms. Con reduced-motion el modo 3D no corre y esto no aplica. */
+  useEffect(() => {
+    if (!activa || !usar3d || !paradoEnCota) {
+      setPaso(0);
+      return undefined;
+    }
+    const base = Math.round(duracionDescenso(tier, reducedMotion) * 0.86);
+    const timers = [
+      setTimeout(() => setPaso((p) => Math.max(p, 1)), base),
+      setTimeout(() => setPaso((p) => Math.max(p, 2)), base + 800),
+      setTimeout(() => setPaso((p) => Math.max(p, 3)), base + 1600),
+    ];
+    return () => timers.forEach((t) => clearTimeout(t));
+  }, [activa, usar3d, paradoEnCota, tier, reducedMotion]);
+
   // Tween de cámara OPCIONAL: dolly vertical + push/pull de FOV solo durante
   // la fase de cubierta; al terminar (o abortar) restaura pos/fov iniciales —
   // el intercambio de escena ocurre bajo tapa y la cámara vuelve intacta.
@@ -717,6 +838,21 @@ export default function TransicionSierraMundo({
   const texto =
     etiqueta ?? (baja ? `Descendiendo a ${piso.nombre}…` : 'Subiendo a la Sierra…');
 
+  /* La tiza del aterrizaje: UNA línea por prioridad (§3.3). `lectura.tiza` ya
+     trae la elegida entre helada → SU cultivo → sed/hongo; si no aplica
+     ninguna, El Niño por piso es la prioridad 5 (y bajo neutral, nada). Si al
+     final no hay línea, la pizarra calla: «nada» es un estado válido. */
+  const tizaLinea =
+    lectura.tiza ||
+    (aterrizaje.enso?.titular
+      ? `${aterrizaje.enso.titular} ${aterrizaje.enso.accion}`.trim()
+      : null) ||
+    null;
+  /* Quién firma la tiza (decisión del operador 2026-09-04): el compai
+     visitante escribe y firma; sin relevo, firma el compañero del usuario,
+     que es quien lo dedujo. El compañero del usuario nunca desaparece. */
+  const firmaTiza = visita.hayRelevo ? visita.firma : visita.firmaCompai;
+
   return (
     <div
       className={usar3d ? 'tsm tsm--3d' : 'tsm'}
@@ -773,33 +909,46 @@ export default function TransicionSierraMundo({
           {tier === 'alto' && <div className="tsm__destello" aria-hidden="true" />}
           {usar3d && (
             <>
-              <p className="tsm__altimetro" aria-hidden="true">
-                <span ref={altimetroRef}>5.775 m</span>
-                <small>{aterrizaje.lineaCota}</small>
-              </p>
-              <p className="tsm__aterrizaje" role="status">
-                {aterrizaje.lineaClima && <b>{aterrizaje.lineaClima}</b>}
-                {lectura.tinta.map((linea) => (
-                  <em className="tsm__tinta" key={linea}>{linea}</em>
-                ))}
-                {lectura.alertas.map((alerta) => (
-                  <small className="tsm__aviso" key={`${alerta.tipo}-${alerta.mensaje}`}>
-                    {alerta.mensaje}
-                  </small>
-                ))}
-                {lectura.tiza && <em className="tsm__tiza">{lectura.tiza}</em>}
-                {aterrizaje.lineaPiso && <em>{aterrizaje.lineaPiso}</em>}
-                {aterrizaje.enso.titular && (
-                  <em>
-                    {aterrizaje.enso.titular} {aterrizaje.enso.accion}
-                  </em>
-                )}
-                {visita.hayRelevo && visita.idea && (
-                  <small>
-                    {visita.rotulo}: {visita.idea}
-                  </small>
-                )}
-              </p>
+              {!(paradoEnCota && paso >= 1) && (
+                <p className="tsm__altimetro" aria-hidden="true">
+                  <span ref={altimetroRef}>5.775 m</span>
+                  <small>{aterrizaje.lineaCota}</small>
+                </p>
+              )}
+              {paradoEnCota && (
+                <>
+                  {/* El aterrizaje, en tres tiempos. Cada pieza aparece por
+                      setTimeout; la píldora oscura ya no existe (PASO 1). */}
+                  <div className="tsm__llegada" data-testid="tsm-llegada">
+                    {paso >= 1 && (
+                      <p className="tsm__llegada__cota" data-testid="tsm-t0">
+                        <strong>{aterrizaje.cotaNumero}</strong>
+                        <span>{aterrizaje.cotaNota}</span>
+                      </p>
+                    )}
+                    {paso >= 2 &&
+                      lectura.hayDato &&
+                      (lectura.tinta.length > 0 || lectura.alertas.length > 0) && (
+                        <div className="tsm__llegada__tinta" data-testid="tsm-t1">
+                          {lectura.tinta.map((linea) => (
+                            <p key={linea}>{linea}</p>
+                          ))}
+                          {lectura.alertas.map((alerta) => (
+                            <small key={`${alerta.tipo}-${alerta.mensaje}`}>
+                              {alerta.mensaje}
+                            </small>
+                          ))}
+                        </div>
+                      )}
+                  </div>
+                  {paso >= 3 && tizaLinea && (
+                    <div className="tsm__pizarra" role="status" data-testid="tsm-t2">
+                      <p className="tsm__pizarra__rotulo">{firmaTiza}</p>
+                      <p className="tsm__pizarra__texto">{tizaLinea}</p>
+                    </div>
+                  )}
+                </>
+              )}
             </>
           )}
           <p className="tsm__txt">{texto}</p>
