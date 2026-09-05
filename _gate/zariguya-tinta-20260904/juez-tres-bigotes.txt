@@ -1,0 +1,11 @@
+IZQUIERDA:  
+- Los bigotes se ven como líneas continuas.  
+- Conto 3 bigotes largos.  
+- El pelaje se ve rayado.  
+- Es más fiel a un dibujo a tinta.  
+
+DERECHA:  
+- Los bigotes se ven rotos/fragmentados.  
+- Conto 2 bigotes largos.  
+- El pelaje se ve en manchas planas.  
+- No es tan fiel a un dibujo a tinta (más fragmentado y sin rayado).

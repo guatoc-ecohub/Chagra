@@ -1,0 +1,29 @@
+Analicemos cada lado por separado:
+
+**IZQUIERDA:**
+
+*   **Hueco o línea clara entre cabeza y cuello:** Sí, se observa una línea blanca fina y clara en la base inferior izquierda de la cabeza, donde esta se une con el cuerpo/cuello.
+*   **Franja o barra blanca en la boca o la mejilla:** Sí, hay una barra blanca horizontal muy notoria dentro de la boca del animal, situada por encima de la lengua y debajo de los dientes superiores.
+*   **Escalón en la silueta:** Sí, se aprecian escalones pixelados en varias partes de la silueta, especialmente en el contorno del pelaje oscuro del cuello y la mejilla izquierda que limita con el fondo claro.
+*   **Parche que no pertenece al pelaje:** Sí, la barra blanca dentro de la boca y la línea blanca entre la cabeza y el cuello son parches o artefactos que no corresponden al pelaje.
+*   **Gorro o casquete sobre la coronilla o la nuca:** No se observa.
+*   **Bigotes dobles:** No se observan.
+*   **Borde duro:** Sí, la línea blanca en la articulación cabeza-cuello y la barra blanca en la boca presentan bordes muy duros y artificiales.
+
+**DERECHA:**
+
+*   **Hueco o línea clara entre cabeza y cuello:** No se observa una línea clara ni un hueco. La transición del pelaje entre la cabeza y el cuerpo es más suave y continua.
+*   **Franja o barra blanca en la boca o la mejilla:** No se observa ninguna franja o barra blanca dentro de la boca ni en la mejilla. El interior de la boca es oscuro y consistente.
+*   **Escalón en la silueta:** Los escalones pixelados en la silueta son mucho menos pronunciados o prácticamente ausentes en comparación con la imagen de la izquierda. El contorno es más fluido.
+*   **Parche que no pertenece al pelaje:** No se observan parches que no pertenezcan al pelaje.
+*   **Gorro o casquete sobre la coronilla o la nuca:** No se observa.
+*   **Bigotes dobles:** No se observan.
+*   **Borde duro:** No se observan bordes duros antinaturales como los presentes en la imagen IZQUIERDA.
+
+---
+
+**¿Cuál articula más limpio y por qué?**
+
+La imagen de la **DERECHA** articula más limpio.
+
+**Razón:** La imagen de la DERECHA carece de los defectos de articulación que son claramente visibles en la imagen de la IZQUIERDA, como la barra blanca dentro de la boca y la línea blanca que separa antinaturalmente la cabeza del cuello. Además, su silueta general es más suave y presenta menos escalones pixelados, lo que indica una mejor integración de las partes y una ausencia de artefactos.
