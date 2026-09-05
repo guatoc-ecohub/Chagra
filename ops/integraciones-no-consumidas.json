@@ -226,24 +226,24 @@
       "date": "2026-08-30"
     },
     {
-      "id": "src/visual/creatures/JaguarLaminaViva.jsx",
-      "reason": "Criatura especial (jaguar en lámina viva) que nunca se cableó. Versión del jaguar para láminas educativas/infografías. Parece ser parte de un sistema de láminas que no se terminó.",
-      "date": "2026-08-30"
+      "id": "src/visual/creatures/_archivo/JaguarLaminaViva.jsx",
+      "reason": "Criatura especial (jaguar en lámina viva) que nunca se cableó. Versión del jaguar para láminas educativas/infografías. Parte de un sistema de láminas inconcluso. 2026-09-04: archivada en _archivo/ (PR #3124: láminas fuera del árbol vivo) como symlink reversible al disco frío; sigue sin cablearse.",
+      "date": "2026-09-04"
     },
     {
-      "id": "src/visual/creatures/ZariguyaLaminaViva.jsx",
-      "reason": "Criatura especial (zariguya en lámina viva) que nunca se cableó. Versión de la zariguya para láminas educativas. Parte del sistema de láminas inconcluso.",
-      "date": "2026-08-30"
+      "id": "src/visual/creatures/_archivo/ZariguyaLaminaViva.jsx",
+      "reason": "Criatura especial (zariguya en lámina viva) que nunca se cableó. Versión de la zariguya para láminas educativas. Parte del sistema de láminas inconcluso. 2026-09-04: archivada en _archivo/ (PR #3124: láminas fuera del árbol vivo) como symlink reversible al disco frío; sigue sin cablearse.",
+      "date": "2026-09-04"
     },
     {
-      "id": "src/visual/creatures/ChivitoPunkLaminaViva.jsx",
-      "reason": "La lámina viva del chivito de páramo (PNG recortada en capas por alfa) SÍ se cableó al registro CREATURES como 'chivito-punk' el 2026-08-18 (commit 306209569). El 2026-08-31 la tinta a mano trazada con la receta del jaguar (ChivitoTrazado, bases aprobadas por el operador, PR #3079) la reemplazó en el registro y en los adaptadores del elenco, y su import salió del barrel: el propio comentario de index.js la declara 'compatibilidad histórica fuera del montaje activo'. Queda en disco por historia, mismo patrón que JaguarLaminaViva/ZariguyaLaminaViva (huérfanas gated el 2026-08-30). No se recablea (revertiría la decisión certificada en _gate/INFORME-tinta-chivito-luciernaga-dev.md) ni se borra en este PR (el borrado de láminas reemplazadas es curaduría aparte del operador). Detectada por este audit — causante (con su hermana LuciernagaLaminaViva) del rojo del gate sobre dev desde el 2026-08-31.",
-      "date": "2026-09-03"
+      "id": "src/visual/creatures/_archivo/ChivitoPunkLaminaViva.jsx",
+      "reason": "La lámina viva del chivito de páramo (PNG recortada en capas por alfa) SÍ se cableó al registro CREATURES como 'chivito-punk' el 2026-08-18 y el 2026-08-31 la tinta a mano (ChivitoTrazado, PR #3079) la reemplazó en el registro y en los adaptadores del elenco (ver registro histórico y ops/DRENAJE-HUERFANOS-TANDA-1-2026-09-04.md). No se recablea (revertiría la decisión certificada) ni se borra: 2026-09-04 quedó archivada en _archivo/ como symlink reversible al disco frío (láminas fuera del árbol vivo), mismo patrón reversible que sus hermanas Jaguar/Zariguya/Luciernaga.",
+      "date": "2026-09-04"
     },
     {
-      "id": "src/visual/creatures/LuciernagaLaminaViva.jsx",
-      "reason": "Mismo caso que ChivitoPunkLaminaViva: la lámina viva de la luciérnaga (PNG recortada en capas por alfa) se cableó al registro CREATURES el 2026-08-18 (commit 306209569, slug 'luciernaga') y el 2026-08-31 la tinta trazada LuciernagaTrazado (PR #3079, receta jaguar aprobada por el operador) la reemplazó en el registro, en el avatar y en el selector; su import salió del barrel y el archivo quedó como compatibilidad histórica en disco (comentario de index.js). Sin consumidor real verificado con grep en todo src/ (ni producto ni test). No se recablea ni se borra en este PR — mismas razones que su hermana. Detectada por este audit — causante (con ChivitoPunkLaminaViva) del rojo del gate sobre dev desde el 2026-08-31.",
-      "date": "2026-09-03"
+      "id": "src/visual/creatures/_archivo/LuciernagaLaminaViva.jsx",
+      "reason": "Mismo caso que ChivitoPunkLaminaViva: la lámina viva de la luciérnaga (PNG recortada en capas por alfa) se cableó al registro CREATURES el 2026-08-18 y el 2026-08-31 la tinta trazada LuciernagaTrazado (PR #3079) la reemplazó en el registro, en el avatar y en el selector; su import salió del barrel. Sin consumidor real verificado con grep en todo src/ (ni producto ni test). No se recablea ni se borra: 2026-09-04 quedó archivada en _archivo/ como symlink reversible al disco frío (láminas fuera del árbol vivo), mismo patrón que su hermana.",
+      "date": "2026-09-04"
     },
     {
       "id": "src/visual/cuaderno/CuadernoVivo.jsx",
