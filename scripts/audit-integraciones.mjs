@@ -81,7 +81,7 @@
  * · 2 problema de ejecución (archivo target ausente, allowlist mal formado).
  */
 
-import { readFileSync, existsSync, readdirSync, statSync } from 'node:fs';
+import { readFileSync, existsSync, readdirSync } from 'node:fs';
 import { dirname, join, resolve, extname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -137,14 +137,24 @@ const SIDECAR_INFRA_ENDPOINTS = new Set([
   '/tools',
 ]);
 
+// La decisión de qué es un "archivo de src/ que auditar" se toma acá, una vez:
+// `Dirent` (readdirSync con withFileTypes) NO sigue symlinks. Un symlink —en
+// particular uno COLGANTE, cuyo destino no está montado (las láminas archivadas
+// apuntan a `/mnt/data/coldstore/...`, ausente en CI)— no es un módulo del
+// árbol de build: `statSync` (que SÍ sigue el enlace) reventaba con ENOENT en
+// CI y tumbaba el gate entero (medido: #3151). "Archivar ≠ borrar" lo vigila el
+// gate de vitest con lstat (`tests/unit/laminas-solo-tinta.test.js`); acá lo
+// archivado queda fuera del alcance auditado, como `node_modules` o lo que
+// empieza con `.`. Un symlink a un directorio tampoco se desciende (evita salir
+// del árbol o ciclar).
 function walk(dir, exts) {
   const out = [];
   if (!existsSync(dir)) return out;
-  for (const entry of readdirSync(dir)) {
-    if (entry === 'node_modules' || entry.startsWith('.')) continue;
-    const p = join(dir, entry);
-    const st = statSync(p);
-    if (st.isDirectory()) out.push(...walk(p, exts));
+  for (const entry of readdirSync(dir, { withFileTypes: true })) {
+    if (entry.name === 'node_modules' || entry.name.startsWith('.')) continue;
+    if (entry.isSymbolicLink()) continue; // colgante o no: fuera del árbol de build
+    const p = join(dir, entry.name);
+    if (entry.isDirectory()) out.push(...walk(p, exts));
     else if (exts.has(extname(p))) out.push(p);
   }
   return out;

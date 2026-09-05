@@ -8,7 +8,7 @@ import { spawnSync } from 'node:child_process';
 import { execPath } from 'node:process';
 import {
   mkdtempSync, mkdirSync, writeFileSync, readFileSync, rmSync, cpSync, existsSync,
-  readdirSync, statSync,
+  readdirSync, statSync, symlinkSync,
 } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join, dirname, resolve } from 'node:path';
@@ -77,12 +77,23 @@ const GRAFO_FIXTURE = [
   '',
 ].join('\n');
 
-function construirFixture({ conConsumidor = true, conAllowlist = true, allowlist } = {}) {
+function construirFixture({ conConsumidor = true, conAllowlist = true, allowlist, conSymlinkColgante = false } = {}) {
   const root = mkdtempSync(join(tmpdir(), 'audit-integraciones-fixture-'));
   mkdirSync(join(root, 'scripts'), { recursive: true });
   mkdirSync(join(root, 'ops'), { recursive: true });
   mkdirSync(join(root, 'src/mockups'), { recursive: true });
   mkdirSync(join(root, 'src/services'), { recursive: true });
+  if (conSymlinkColgante) {
+    // Réplica del árbol CI de las láminas archivadas (#3124/#3151): un symlink
+    // a `/mnt/data/coldstore/...`, un punto de montaje que el runner de CI no
+    // tiene. El symlink cuelga; un walker que lo siga con `statSync` revienta
+    // con ENOENT (el rojo de #3151) en vez de decidir.
+    mkdirSync(join(root, 'src/visual/creatures/_archivo'), { recursive: true });
+    symlinkSync(
+      '/mnt/data/coldstore/chagra-laminas-fuera-20260904/ChivitoPunkLaminaViva.jsx',
+      join(root, 'src/visual/creatures/_archivo/ChivitoPunkLaminaViva.jsx'),
+    );
+  }
 
   // El script se COPIA: su ROOT es el padre de su propia carpeta, así que la
   // copia audita el árbol fixture.
@@ -185,6 +196,24 @@ describe('audit-integraciones (fixture hermético)', function () {
       expect(stdout).not.toMatch(/SIN ruta viva pero allowlisted: src\/mockups\/Montado\.jsx/);
       // El barril NO lava: `Lavado.jsx` es huérfano aunque el barril esté vivo.
       expect(stdout).toContain('src/mockups/Lavado.jsx');
+    });
+  });
+
+  it('PRUEBA DE CONTROL #3151: un symlink colgante en src/ no tumba el gate (decide, no revienta)', function () {
+    // El 2026-09-05 el gate `audit-integraciones` de #3151 se caía con
+    // ENOENT: `walk()` hacía `statSync` (que SIGUE el enlace) sobre
+    // src/visual/creatures/_archivo/*.jsx, symlinks a un disco frío que el
+    // runner de CI no tiene montado. Un stat sobre un enlace roto tiene que
+    // DECIDIR (¿es un módulo del árbol de build? no: apunta fuera de src/),
+    // no reventar. Con el auditor de HOY esta prueba muere con el stack de
+    // `statSync`; con el arreglo el fixture corre igual que sin symlink y
+    // termina en el mismo veredicto (exit 0, auditoría limpia).
+    conFixture({ conSymlinkColgante: true }, function ({ status, stdout, stderr }) {
+      const salida = `${stdout}\n${stderr}`;
+      expect(status).toBe(0);
+      expect(stdout).toContain('Auditoría limpia');
+      expect(salida).not.toContain('ENOENT');
+      expect(salida).not.toContain('at walk');
     });
   });
 
