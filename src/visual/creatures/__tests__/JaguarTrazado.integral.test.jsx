@@ -14,6 +14,7 @@ import { describe, it, expect, afterEach } from 'vitest';
 import { render, cleanup, screen, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import JaguarTrazado from '../JaguarTrazado.jsx';
+import { JAGUAR_TRAZADO_SVG } from '../jaguarTrazado/pielTrazado.js';
 import { CREATURES } from '../index.js';
 import { resolveAvatarCreature } from '../../../hooks/useAvatarCreature.js';
 import ChagraAgentAvatarJaguar from '../../../components/ChagraAgentAvatarJaguar.jsx';
@@ -47,6 +48,14 @@ describe('JaguarTrazado — contrato de skin', () => {
   it("estado 'caminando' viaja (activa la marcha de perfil en jaguarHuesos.css)", () => {
     const { container } = render(<JaguarTrazado estado="caminando" />);
     expect(container.querySelector('[data-creature="jaguar"]')).toHaveAttribute('data-agt-estado', 'caminando');
+  });
+
+  it('cubre con vientre del calco la raíz móvil de pataDelCerca', () => {
+    const pata = JAGUAR_TRAZADO_SVG.indexOf('class="jh-hueso jh-pataDelCerca"');
+    const parche = JAGUAR_TRAZADO_SVG.lastIndexOf('jt-b-vientreHombro');
+    expect(parche).toBeGreaterThan(pata);
+    expect(JAGUAR_TRAZADO_SVG).toContain('mask="url(#jt-m-vientreHombro)"');
+    expect(JAGUAR_TRAZADO_SVG).toContain('href="#jtCalco-troncoCuerpo"');
   });
 
   it('visema viaja como data-visema; sin visema, ausente', () => {
