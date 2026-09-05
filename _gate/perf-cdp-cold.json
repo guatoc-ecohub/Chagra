@@ -1,0 +1,1916 @@
+{
+ "tag": "cdp-cold",
+ "url": "https://chagra-dev.guatoc.co/",
+ "domInfo": {
+  "url": "https://chagra-dev.guatoc.co/",
+  "title": "Chagra",
+  "bodyText": "N₂ del aire\nEl maíz: el tutor\nsube derecho, da la vara\nEl frijol trepa\ny fija el nitrógeno en la raíz\nLa calabaza tapa el suelo\nguarda humedad, ahoga la maleza\nChagra\n\nEl cuaderno vivo de su finca agroecológica\n\nRegistre, aprenda y cuide la tierra, con inteligencia que protege el páramo, aunque no tenga señal.\n\nFunciona sin internet\nSus datos son suyos\nSoftware libre\nEntre a su finca\n\nIngrese con el usuario que le entregaron para Chagra.\n\nUsuario\nContraseña\nIngresar\n\nChagra guarda todo en su tel",
+  "rootKids": 2,
+  "buildSha": "24748c25",
+  "fcp": 5972,
+  "lcpEntries": [],
+  "nav": {
+   "ttfb": 941,
+   "dcl": 6181
+  }
+ },
+ "t0": 1788635664606,
+ "tLoad": 6208,
+ "tEnd": 31224,
+ "totalRequests": 184,
+ "byInitiator": [
+  [
+   "about:client",
+   {
+    "count": 146,
+    "bytes": 1308527
+   }
+  ],
+  [
+   "script",
+   {
+    "count": 29,
+    "bytes": 499837
+   }
+  ],
+  [
+   "https://chagra-dev.guatoc.co/",
+   {
+    "count": 6,
+    "bytes": 206766
+   }
+  ],
+  [
+   "other",
+   {
+    "count": 2,
+    "bytes": 6035
+   }
+  ],
+  [
+   "https://chagra-dev.guatoc.co/assets/sello-confianza-BLfs4ivW.css",
+   {
+    "count": 1,
+    "bytes": 3063
+   }
+  ]
+ ],
+ "requestList": [
+  {
+   "deltaMs": 14,
+   "url": "",
+   "initiator": "other",
+   "initiatorUrl": "",
+   "stack": "",
+   "status": 200,
+   "ttfbMs": -868787528,
+   "bytes": 4025
+  },
+  {
+   "deltaMs": 1026,
+   "url": "fonts/baloo2-latin.woff2",
+   "initiator": "parser",
+   "initiatorUrl": "",
+   "stack": "",
+   "status": 200,
+   "ttfbMs": -869122428,
+   "bytes": 33590
+  },
+  {
+   "deltaMs": 1050,
+   "url": "fonts/nunito-latin.woff2",
+   "initiator": "parser",
+   "initiatorUrl": "",
+   "stack": "",
+   "status": 200,
+   "ttfbMs": -869113811,
+   "bytes": 39510
+  },
+  {
+   "deltaMs": 1050,
+   "url": "assets/main-D8QPsAnI.js",
+   "initiator": "parser",
+   "initiatorUrl": "",
+   "stack": "",
+   "status": 200,
+   "ttfbMs": -869332222,
+   "bytes": 74901
+  },
+  {
+   "deltaMs": 1050,
+   "url": "assets/rolldown-runtime-aKtaBQYM.js",
+   "initiator": "script",
+   "initiatorUrl": "about:client",
+   "stack": "",
+   "status": 200,
+   "ttfbMs": -869024713,
+   "bytes": 931
+  },
+  {
+   "deltaMs": 1050,
+   "url": "assets/modulepreload-polyfill-Dezn_h7o.js",
+   "initiator": "script",
+   "initiatorUrl": "about:client",
+   "stack": "",
+   "status": 200,
+   "ttfbMs": -868961651,
+   "bytes": 732
+  },
+  {
+   "deltaMs": 1050,
+   "url": "assets/preload-helper-zJ_50EbN.js",
+   "initiator": "script",
+   "initiatorUrl": "about:client",
+   "stack": "",
+   "status": 200,
+   "ttfbMs": -869013789,
+   "bytes": 1004
+  },
+  {
+   "deltaMs": 1050,
+   "url": "assets/id-1ap7d9X6.js",
+   "initiator": "script",
+   "initiatorUrl": "about:client",
+   "stack": "",
+   "status": 200,
+   "ttfbMs": -868955060,
+   "bytes": 1330
+  },
+  {
+   "deltaMs": 1050,
+   "url": "assets/env-VxYbXDIN.js",
+   "initiator": "script",
+   "initiatorUrl": "about:client",
+   "stack": "",
+   "status": 200,
+   "ttfbMs": -869092624,
+   "bytes": 884
+  },
+  {
+   "deltaMs": 1050,
+   "url": "assets/vendor-icons-oTeIlwf8.js",
+   "initiator": "script",
+   "initiatorUrl": "about:client",
+   "stack": "",
+   "status": 200,
+   "ttfbMs": -868775345,
+   "bytes": 26766
+  },
+  {
+   "deltaMs": 1050,
+   "url": "assets/vendor-state-u2S7F8oI.js",
+   "initiator": "script",
+   "initiatorUrl": "about:client",
+   "stack": "",
+   "status": 200,
+   "ttfbMs": -868663611,
+   "bytes": 12006
+  },
+  {
+   "deltaMs": 1050,
+   "url": "assets/messages-CGlJU4kW.js",
+   "initiator": "script",
+   "initiatorUrl": "about:client",
+   "stack": "",
+   "status": 200,
+   "ttfbMs": -868953985,
+   "bytes": 5067
+  },
+  {
+   "deltaMs": 1050,
+   "url": "assets/tenantContext-CARcf6MA.js",
+   "initiator": "script",
+   "initiatorUrl": "about:client",
+   "stack": "",
+   "status": 200,
+   "ttfbMs": -868982998,
+   "bytes": 756
+  },
+  {
+   "deltaMs": 1050,
+   "url": "assets/apiService-hPKz3981.js",
+   "initiator": "script",
+   "initiatorUrl": "about:client",
+   "stack": "",
+   "status": 200,
+   "ttfbMs": -868628631,
+   "bytes": 4765
+  },
+  {
+   "deltaMs": 1050,
+   "url": "assets/outputGuards-DaDCyJek.js",
+   "initiator": "script",
+   "initiatorUrl": "about:client",
+   "stack": "",
+   "status": 200,
+   "ttfbMs": -868828774,
+   "bytes": 61907
+  },
+  {
+   "deltaMs": 1050,
+   "url": "assets/sidecarClient-C9q_sPCX.js",
+   "initiator": "script",
+   "initiatorUrl": "about:client",
+   "stack": "",
+   "status": 200,
+   "ttfbMs": -868719912,
+   "bytes": 4817
+  },
+  {
+   "deltaMs": 1050,
+   "url": "assets/dbCore-UdodrkfO.js",
+   "initiator": "script",
+   "initiatorUrl": "about:client",
+   "stack": "",
+   "status": 200,
+   "ttfbMs": -868485567,
+   "bytes": 2621
+  },
+  {
+   "deltaMs": 1050,
+   "url": "assets/ragRetriever-XAN0toMG.js",
+   "initiator": "script",
+   "initiatorUrl": "about:client",
+   "stack": "",
+   "status": 200,
+   "ttfbMs": -868637926,
+   "bytes": 8928
+  },
+  {
+   "deltaMs": 1050,
+   "url": "assets/logCache-DbbvAKvx.js",
+   "initiator": "script",
+   "initiatorUrl": "about:client",
+   "stack": "",
+   "status": 200,
+   "ttfbMs": -868895534,
+   "bytes": 1646
+  },
+  {
+   "deltaMs": 1050,
+   "url": "assets/gpuTelemetryService-B_MHdDeK.js",
+   "initiator": "script",
+   "initiatorUrl": "about:client",
+   "stack": "",
+   "status": 200,
+   "ttfbMs": -868729049,
+   "bytes": 1576
+  },
+  {
+   "deltaMs": 1050,
+   "url": "assets/ollamaStream-B0AL051F.js",
+   "initiator": "script",
+   "initiatorUrl": "about:client",
+   "stack": "",
+   "status": 200,
+   "ttfbMs": -868734667,
+   "bytes": 1862
+  },
+  {
+   "deltaMs": 1050,
+   "url": "assets/pilotTelemetryService-B9O3M5VL.js",
+   "initiator": "script",
+   "initiatorUrl": "about:client",
+   "stack": "",
+   "status": 200,
+   "ttfbMs": -868754396,
+   "bytes": 1389
+  },
+  {
+   "deltaMs": 1050,
+   "url": "assets/syncManager-Dhndfyd0.js",
+   "initiator": "script",
+   "initiatorUrl": "about:client",
+   "stack": "",
+   "status": 200,
+   "ttfbMs": -868578553,
+   "bytes": 34320
+  },
+  {
+   "deltaMs": 1050,
+   "url": "assets/vendor-react-D8sd61i3.js",
+   "initiator": "script",
+   "initiatorUrl": "about:client",
+   "stack": "",
+   "status": 200,
+   "ttfbMs": -869271765,
+   "bytes": 61952
+  },
+  {
+   "deltaMs": 1050,
+   "url": "assets/userProfileService-DPvbVNoY.js",
+   "initiator": "script",
+   "initiatorUrl": "about:client",
+   "stack": "",
+   "status": 200,
+   "ttfbMs": -868572786,
+   "bytes": 34725
+  },
+  {
+   "deltaMs": 1050,
+   "url": "assets/ensoService-o1mVRrYi.js",
+   "initiator": "script",
+   "initiatorUrl": "about:client",
+   "stack": "",
+   "status": 200,
+   "ttfbMs": -868851088,
+   "bytes": 957
+  },
+  {
+   "deltaMs": 1050,
+   "url": "assets/climaService-DYY9g_K2.js",
+   "initiator": "script",
+   "initiatorUrl": "about:client",
+   "stack": "",
+   "status": 200,
+   "ttfbMs": -868657530,
+   "bytes": 1914
+  },
+  {
+   "deltaMs": 1050,
+   "url": "assets/assetCache-Dc_hObzh.js",
+   "initiator": "script",
+   "initiatorUrl": "about:client",
+   "stack": "",
+   "status": 200,
+   "ttfbMs": -868629599,
+   "bytes": 2084
+  },
+  {
+   "deltaMs": 1050,
+   "url": "assets/payloadService-D2labaLu.js",
+   "initiator": "script",
+   "initiatorUrl": "about:client",
+   "stack": "",
+   "status": 200,
+   "ttfbMs": -868637147,
+   "bytes": 1927
+  },
+  {
+   "deltaMs": 1050,
+   "url": "assets/useLogStore-BMeQWZbZ.js",
+   "initiator": "script",
+   "initiatorUrl": "about:client",
+   "stack": "",
+   "status": 200,
+   "ttfbMs": -868710971,
+   "bytes": 1315
+  },
+  {
+   "deltaMs": 1050,
+   "url": "assets/useAssetStore-BTogMZs0.js",
+   "initiator": "script",
+   "initiatorUrl": "about:client",
+   "stack": "",
+   "status": 200,
+   "ttfbMs": -868541448,
+   "bytes": 5994
+  },
+  {
+   "deltaMs": 1050,
+   "url": "assets/fincaActiveStore-Da_VX2Kq.js",
+   "initiator": "script",
+   "initiatorUrl": "about:client",
+   "stack": "",
+   "status": 200,
+   "ttfbMs": -868748374,
+   "bytes": 992
+  },
+  {
+   "deltaMs": 1050,
+   "url": "assets/regionalismsService-DKwje-Ye.js",
+   "initiator": "script",
+   "initiatorUrl": "about:client",
+   "stack": "",
+   "status": 200,
+   "ttfbMs": -868601806,
+   "bytes": 1723
+  },
+  {
+   "deltaMs": 1050,
+   "url": "assets/ensoContext-x9rgwf8o.js",
+   "initiator": "script",
+   "initiatorUrl": "about:client",
+   "stack": "",
+   "status": 200,
+   "ttfbMs": -868642451,
+   "bytes": 3019
+  },
+  {
+   "deltaMs": 1050,
+   "url": "assets/pisosTermicos-DDDWhxlF.js",
+   "initiator": "script",
+   "initiatorUrl": "about:client",
+   "stack": "",
+   "status": 200,
+   "ttfbMs": -868614727,
+   "bytes": 3018
+  },
+  {
+   "deltaMs": 1050,
+   "url": "assets/agentService-C-7Mzd1o.js",
+   "initiator": "script",
+   "initiatorUrl": "about:client",
+   "stack": "",
+   "status": 200,
+   "ttfbMs": -868636578,
+   "bytes": 23143
+  },
+  {
+   "deltaMs": 1050,
+   "url": "assets/notificationsService-oDeTo9bC.js",
+   "initiator": "script",
+   "initiatorUrl": "about:client",
+   "stack": "",
+   "status": 200,
+   "ttfbMs": -868635052,
+   "bytes": 3249
+  },
+  {
+   "deltaMs": 1050,
+   "url": "assets/skyConditionService-DS05kWVm.js",
+   "initiator": "script",
+   "initiatorUrl": "about:client",
+   "stack": "",
+   "status": 200,
+   "ttfbMs": -868637438,
+   "bytes": 2729
+  },
+  {
+   "deltaMs": 1050,
+   "url": "assets/useAlertStore-7XP1oqWV.js",
+   "initiator": "script",
+   "initiatorUrl": "about:client",
+   "stack": "",
+   "status": 200,
+   "ttfbMs": -868790318,
+   "bytes": 882
+  },
+  {
+   "deltaMs": 1050,
+   "url": "assets/main-CFy9-BK7.css",
+   "initiator": "parser",
+   "initiatorUrl": "",
+   "stack": "",
+   "status": 200,
+   "ttfbMs": -868938449,
+   "bytes": 4437
+  },
+  {
+   "deltaMs": 1050,
+   "url": "assets/sello-confianza-BLfs4ivW.css",
+   "initiator": "parser",
+   "initiatorUrl": "",
+   "stack": "",
+   "status": 200,
+   "ttfbMs": -868955178,
+   "bytes": 43990
+  },
+  {
+   "deltaMs": 5969,
+   "url": "https://static.cloudflareinsights.com/beacon.min.js/v31edd6df95cf4e85bb4c19e7a9bdbcba1788362987495",
+   "initiator": "parser",
+   "initiatorUrl": "",
+   "stack": "",
+   "status": 200,
+   "ttfbMs": -869577602,
+   "bytes": 10338
+  },
+  {
+   "deltaMs": 6155,
+   "url": "assets/ColibriTransition-DMiY208N.js",
+   "initiator": "script",
+   "initiatorUrl": "about:client",
+   "stack": "",
+   "status": 200,
+   "ttfbMs": -869186718,
+   "bytes": 1685
+  },
+  {
+   "deltaMs": 6155,
+   "url": "assets/ChagraAgentAvatar-ByVreHyO.js",
+   "initiator": "script",
+   "initiatorUrl": "about:client",
+   "stack": "",
+   "status": 200,
+   "ttfbMs": -869203938,
+   "bytes": 1960
+  },
+  {
+   "deltaMs": 6155,
+   "url": "assets/useAgentAvatarType-qEd6A699.js",
+   "initiator": "script",
+   "initiatorUrl": "about:client",
+   "stack": "",
+   "status": 200,
+   "ttfbMs": -869182107,
+   "bytes": 1005
+  },
+  {
+   "deltaMs": 6155,
+   "url": "assets/elenco-oIaRiBC0.js",
+   "initiator": "script",
+   "initiatorUrl": "about:client",
+   "stack": "",
+   "status": 200,
+   "ttfbMs": -869158465,
+   "bytes": 880
+  },
+  {
+   "deltaMs": 6155,
+   "url": "assets/CompaiAgente-B-_vR7PP.js",
+   "initiator": "script",
+   "initiatorUrl": "about:client",
+   "stack": "",
+   "status": 200,
+   "ttfbMs": -869392228,
+   "bytes": 4228
+  },
+  {
+   "deltaMs": 6155,
+   "url": "assets/perfilesConducta-COz_Of5q.js",
+   "initiator": "script",
+   "initiatorUrl": "about:client",
+   "stack": "",
+   "status": 200,
+   "ttfbMs": -869417913,
+   "bytes": 4379
+  },
+  {
+   "deltaMs": 6155,
+   "url": "assets/creatureIdle-yhzK2OBu.js",
+   "initiator": "script",
+   "initiatorUrl": "about:client",
+   "stack": "",
+   "status": 200,
+   "ttfbMs": -869408186,
+   "bytes": 2534
+  },
+  {
+   "deltaMs": 6155,
+   "url": "assets/CompaiAgente-DR1jes54.css",
+   "initiator": "script",
+   "initiatorUrl": "",
+   "stack": "<anon>>r><anon>",
+   "status": 200,
+   "ttfbMs": -869157057,
+   "bytes": 1395
+  },
+  {
+   "deltaMs": 6155,
+   "url": "assets/UpdateAvailableBanner-ZWu-b5O4.js",
+   "initiator": "script",
+   "initiatorUrl": "about:client",
+   "stack": "",
+   "status": 200,
+   "ttfbMs": -869405022,
+   "bytes": 1624
+  },
+  {
+   "deltaMs": 6182,
+   "url": "assets/alertEngine-BHWjXr5y.js",
+   "initiator": "script",
+   "initiatorUrl": "about:client",
+   "stack": "",
+   "status": 200,
+   "ttfbMs": -869154969,
+   "bytes": 4033
+  },
+  {
+   "deltaMs": 6182,
+   "url": "assets/alertThresholds-Nwxco3eM.js",
+   "initiator": "script",
+   "initiatorUrl": "about:client",
+   "stack": "",
+   "status": 200,
+   "ttfbMs": -868993443,
+   "bytes": 1078
+  },
+  {
+   "deltaMs": 6182,
+   "url": "assets/cropAlertEngine-COW2-OlA.js",
+   "initiator": "script",
+   "initiatorUrl": "about:client",
+   "stack": "",
+   "status": 200,
+   "ttfbMs": -868952692,
+   "bytes": 3673
+  },
+  {
+   "deltaMs": 6182,
+   "url": "assets/farmProcessCache-C7qVoLgK.js",
+   "initiator": "script",
+   "initiatorUrl": "about:client",
+   "stack": "",
+   "status": 200,
+   "ttfbMs": -869077517,
+   "bytes": 1655
+  },
+  {
+   "deltaMs": 6182,
+   "url": "assets/catalogDB-DmdFKJ3l.js",
+   "initiator": "script",
+   "initiatorUrl": "about:client",
+   "stack": "",
+   "status": 200,
+   "ttfbMs": -869384486,
+   "bytes": 71581
+  },
+  {
+   "deltaMs": 6182,
+   "url": "assets/phenologyCalculator-BKIJ5xWf.js",
+   "initiator": "script",
+   "initiatorUrl": "about:client",
+   "stack": "",
+   "status": 200,
+   "ttfbMs": -868969972,
+   "bytes": 2853
+  },
+  {
+   "deltaMs": 6182,
+   "url": "assets/phenologyTemplates-BS7-N5cK.js",
+   "initiator": "script",
+   "initiatorUrl": "about:client",
+   "stack": "",
+   "status": 200,
+   "ttfbMs": -868952290,
+   "bytes": 7742
+  },
+  {
+   "deltaMs": 6182,
+   "url": "assets/farmProcess-BN3B3gcE.js",
+   "initiator": "script",
+   "initiatorUrl": "about:client",
+   "stack": "",
+   "status": 200,
+   "ttfbMs": -869068040,
+   "bytes": 1577
+  },
+  {
+   "deltaMs": 6182,
+   "url": "assets/climateCycleService-BwiZFuB2.js",
+   "initiator": "script",
+   "initiatorUrl": "about:client",
+   "stack": "",
+   "status": 200,
+   "ttfbMs": -868979911,
+   "bytes": 1917
+  },
+  {
+   "deltaMs": 6182,
+   "url": "assets/farmEventService-DtqTizWs.js",
+   "initiator": "script",
+   "initiatorUrl": "about:client",
+   "stack": "",
+   "status": 200,
+   "ttfbMs": -868989907,
+   "bytes": 1856
+  },
+  {
+   "deltaMs": 6182,
+   "url": "assets/diseaseObservationService-CuNKU4qC.js",
+   "initiator": "script",
+   "initiatorUrl": "about:client",
+   "stack": "",
+   "status": 200,
+   "ttfbMs": -869005238,
+   "bytes": 1175
+  },
+  {
+   "deltaMs": 6183,
+   "url": "assets/sipsaPriceService-CBapAbrN.js",
+   "initiator": "script",
+   "initiatorUrl": "about:client",
+   "stack": "",
+   "status": 200,
+   "ttfbMs": -869107267,
+   "bytes": 1039
+  },
+  {
+   "deltaMs": 6266,
+   "url": "assets/LoginScreen-BQj77S5L.js",
+   "initiator": "script",
+   "initiatorUrl": "about:client",
+   "stack": "",
+   "status": 200,
+   "ttfbMs": -869031338,
+   "bytes": 13035
+  },
+  {
+   "deltaMs": 6266,
+   "url": "assets/package-CoAWB3Ys.js",
+   "initiator": "script",
+   "initiatorUrl": "about:client",
+   "stack": "",
+   "status": 200,
+   "ttfbMs": -869099666,
+   "bytes": 326
+  },
+  {
+   "deltaMs": 6266,
+   "url": "assets/operatorIdentityService-PszMq3lb.js",
+   "initiator": "script",
+   "initiatorUrl": "about:client",
+   "stack": "",
+   "status": 200,
+   "ttfbMs": -869069731,
+   "bytes": 991
+  },
+  {
+   "deltaMs": 6266,
+   "url": "assets/Angelita-QDXi4S_d.js",
+   "initiator": "script",
+   "initiatorUrl": "about:client",
+   "stack": "",
+   "status": 200,
+   "ttfbMs": -868910658,
+   "bytes": 4229
+  },
+  {
+   "deltaMs": 6266,
+   "url": "assets/AbejaAngelita-CpnYKKtW.js",
+   "initiator": "script",
+   "initiatorUrl": "about:client",
+   "stack": "",
+   "status": 200,
+   "ttfbMs": -868789024,
+   "bytes": 5954
+  },
+  {
+   "deltaMs": 6266,
+   "url": "assets/AccesoriosClima-h6Vd2qW0.js",
+   "initiator": "script",
+   "initiatorUrl": "about:client",
+   "stack": "",
+   "status": 200,
+   "ttfbMs": -868941683,
+   "bytes": 1309
+  },
+  {
+   "deltaMs": 6266,
+   "url": "assets/_rubberhose-DuqTMO26.js",
+   "initiator": "script",
+   "initiatorUrl": "about:client",
+   "stack": "",
+   "status": 200,
+   "ttfbMs": -868841897,
+   "bytes": 1657
+  },
+  {
+   "deltaMs": 6266,
+   "url": "assets/rubberhoseSpec-qtkdAVhs.js",
+   "initiator": "script",
+   "initiatorUrl": "about:client",
+   "stack": "",
+   "status": 200,
+   "ttfbMs": -868859488,
+   "bytes": 1220
+  },
+  {
+   "deltaMs": 6266,
+   "url": "assets/AccesoriosClima-BYx1beLc.css",
+   "initiator": "script",
+   "initiatorUrl": "",
+   "stack": "<anon>>r><anon>",
+   "status": 200,
+   "ttfbMs": -869096287,
+   "bytes": 592
+  },
+  {
+   "deltaMs": 6266,
+   "url": "assets/transformacion-BUkFdljM.js",
+   "initiator": "script",
+   "initiatorUrl": "about:client",
+   "stack": "",
+   "status": 200,
+   "ttfbMs": -868183694,
+   "bytes": 2830
+  },
+  {
+   "deltaMs": 6266,
+   "url": "assets/transformacion-COJ4Lwkg.css",
+   "initiator": "script",
+   "initiatorUrl": "",
+   "stack": "<anon>>r><anon>",
+   "status": 200,
+   "ttfbMs": -869354783,
+   "bytes": 957
+  },
+  {
+   "deltaMs": 6266,
+   "url": "assets/LineBoilFilter-DzAY0dW3.js",
+   "initiator": "script",
+   "initiatorUrl": "about:client",
+   "stack": "",
+   "status": 200,
+   "ttfbMs": -868826656,
+   "bytes": 778
+  },
+  {
+   "deltaMs": 6266,
+   "url": "assets/_filters-DEE-oa_d.js",
+   "initiator": "script",
+   "initiatorUrl": "about:client",
+   "stack": "",
+   "status": 200,
+   "ttfbMs": -868868250,
+   "bytes": 616
+  },
+  {
+   "deltaMs": 6266,
+   "url": "assets/_filters-vEo2yPRM.css",
+   "initiator": "script",
+   "initiatorUrl": "",
+   "stack": "<anon>>r><anon>",
+   "status": 200,
+   "ttfbMs": -868824918,
+   "bytes": 15706
+  },
+  {
+   "deltaMs": 6266,
+   "url": "assets/abejaIdentidad-PkclOpok.js",
+   "initiator": "script",
+   "initiatorUrl": "about:client",
+   "stack": "",
+   "status": 200,
+   "ttfbMs": -868745633,
+   "bytes": 733
+  },
+  {
+   "deltaMs": 6266,
+   "url": "assets/AbejaAngelita-wrF9UWAC.css",
+   "initiator": "script",
+   "initiatorUrl": "",
+   "stack": "<anon>>r><anon>",
+   "status": 200,
+   "ttfbMs": -868869647,
+   "bytes": 2726
+  },
+  {
+   "deltaMs": 6266,
+   "url": "assets/Angelita-DUYJ3hrR.css",
+   "initiator": "script",
+   "initiatorUrl": "",
+   "stack": "<anon>>r><anon>",
+   "status": 200,
+   "ttfbMs": -868848670,
+   "bytes": 7059
+  },
+  {
+   "deltaMs": 6266,
+   "url": "assets/effects-LsFNjy2E.js",
+   "initiator": "script",
+   "initiatorUrl": "about:client",
+   "stack": "",
+   "status": 200,
+   "ttfbMs": -868552644,
+   "bytes": 5809
+  },
+  {
+   "deltaMs": 6268,
+   "url": "assets/effects-mHjURhxR.css",
+   "initiator": "script",
+   "initiatorUrl": "",
+   "stack": "<anon>>r><anon>",
+   "status": 200,
+   "ttfbMs": -868771219,
+   "bytes": 2311
+  },
+  {
+   "deltaMs": 6268,
+   "url": "assets/LaminaMilpa-BaL45Xmw.js",
+   "initiator": "script",
+   "initiatorUrl": "about:client",
+   "stack": "",
+   "status": 200,
+   "ttfbMs": -868312719,
+   "bytes": 2421
+  },
+  {
+   "deltaMs": 6268,
+   "url": "assets/LoginScreen-D7g5fMOX.css",
+   "initiator": "script",
+   "initiatorUrl": "",
+   "stack": "<anon>>r><anon>",
+   "status": 200,
+   "ttfbMs": -869399609,
+   "bytes": 1209
+  },
+  {
+   "deltaMs": 6404,
+   "url": "assets/TopBar-CryBfbn8.js",
+   "initiator": "script",
+   "initiatorUrl": "about:client",
+   "stack": "",
+   "status": 200,
+   "ttfbMs": -867889937,
+   "bytes": 3636
+  },
+  {
+   "deltaMs": 6404,
+   "url": "assets/defaults-BTW5z05q.js",
+   "initiator": "script",
+   "initiatorUrl": "about:client",
+   "stack": "",
+   "status": 200,
+   "ttfbMs": -868674279,
+   "bytes": 485
+  },
+  {
+   "deltaMs": 6404,
+   "url": "assets/operatorPhotoService-CQb6Kk-2.js",
+   "initiator": "script",
+   "initiatorUrl": "about:client",
+   "stack": "",
+   "status": 200,
+   "ttfbMs": -867741232,
+   "bytes": 2707
+  },
+  {
+   "deltaMs": 6404,
+   "url": "assets/DashboardLive-BzAMuO5r.js",
+   "initiator": "script",
+   "initiatorUrl": "about:client",
+   "stack": "",
+   "status": 200,
+   "ttfbMs": -868977557,
+   "bytes": 69879
+  },
+  {
+   "deltaMs": 6404,
+   "url": "assets/cropSuggestions-CIhQwzSA.js",
+   "initiator": "script",
+   "initiatorUrl": "about:client",
+   "stack": "",
+   "status": 200,
+   "ttfbMs": -868003880,
+   "bytes": 2445
+  },
+  {
+   "deltaMs": 6404,
+   "url": "assets/cropSuggestions-BaXCo3bG.css",
+   "initiator": "script",
+   "initiatorUrl": "",
+   "stack": "<anon>>r><anon>",
+   "status": 200,
+   "ttfbMs": -868745620,
+   "bytes": 4668
+  },
+  {
+   "deltaMs": 6404,
+   "url": "assets/cicloVivoArte-vSmHgAyM.js",
+   "initiator": "script",
+   "initiatorUrl": "about:client",
+   "stack": "",
+   "status": 200,
+   "ttfbMs": -867740727,
+   "bytes": 7377
+  },
+  {
+   "deltaMs": 6404,
+   "url": "assets/cicloVivoData-B7R3nL0v.js",
+   "initiator": "script",
+   "initiatorUrl": "about:client",
+   "stack": "",
+   "status": 200,
+   "ttfbMs": -867896362,
+   "bytes": 4151
+  },
+  {
+   "deltaMs": 6404,
+   "url": "assets/AgentAvatarSelector-Ccj5x0ZJ.js",
+   "initiator": "script",
+   "initiatorUrl": "about:client",
+   "stack": "",
+   "status": 200,
+   "ttfbMs": -868163273,
+   "bytes": 1533
+  },
+  {
+   "deltaMs": 6404,
+   "url": "assets/ChagraAgentAvatarAngelita-CGYAbezj.js",
+   "initiator": "script",
+   "initiatorUrl": "about:client",
+   "stack": "",
+   "status": 200,
+   "ttfbMs": -869130027,
+   "bytes": 1226
+  },
+  {
+   "deltaMs": 6404,
+   "url": "assets/useAngelitaPresencia-BEW28fMU.js",
+   "initiator": "script",
+   "initiatorUrl": "about:client",
+   "stack": "",
+   "status": 200,
+   "ttfbMs": -868421308,
+   "bytes": 811
+  },
+  {
+   "deltaMs": 6404,
+   "url": "assets/ChagraAgentAvatarChivitoPunk-Faym74av.js",
+   "initiator": "script",
+   "initiatorUrl": "about:client",
+   "stack": "",
+   "status": 200,
+   "ttfbMs": -868443587,
+   "bytes": 1319
+  },
+  {
+   "deltaMs": 6404,
+   "url": "assets/ChivitoTrazado-DX7YmHT4.js",
+   "initiator": "script",
+   "initiatorUrl": "about:client",
+   "stack": "",
+   "status": 200,
+   "ttfbMs": -868615463,
+   "bytes": 705
+  },
+  {
+   "deltaMs": 6404,
+   "url": "assets/trazadoCreature-CsxRLPpt.js",
+   "initiator": "script",
+   "initiatorUrl": "about:client",
+   "stack": "",
+   "status": 200,
+   "ttfbMs": -868044362,
+   "bytes": 469145
+  },
+  {
+   "deltaMs": 6404,
+   "url": "assets/trazadoCreature-BAhPKTDs.css",
+   "initiator": "script",
+   "initiatorUrl": "",
+   "stack": "<anon>>r><anon>",
+   "status": 200,
+   "ttfbMs": -868797596,
+   "bytes": 1026
+  },
+  {
+   "deltaMs": 6404,
+   "url": "assets/ChagraAgentAvatarGuacamaya-Diu49Zn2.js",
+   "initiator": "script",
+   "initiatorUrl": "about:client",
+   "stack": "",
+   "status": 200,
+   "ttfbMs": -868429170,
+   "bytes": 1245
+  },
+  {
+   "deltaMs": 6404,
+   "url": "assets/GuacamayaCompai-DS9-5kUN.js",
+   "initiator": "script",
+   "initiatorUrl": "about:client",
+   "stack": "",
+   "status": 200,
+   "ttfbMs": -867979552,
+   "bytes": 12628
+  },
+  {
+   "deltaMs": 6404,
+   "url": "assets/GuacamayaCompai-BolzvoC3.css",
+   "initiator": "script",
+   "initiatorUrl": "",
+   "stack": "<anon>>r><anon>",
+   "status": 200,
+   "ttfbMs": -868893465,
+   "bytes": 774
+  },
+  {
+   "deltaMs": 6404,
+   "url": "assets/ChagraAgentAvatarJaguar-BTXjbs21.js",
+   "initiator": "script",
+   "initiatorUrl": "about:client",
+   "stack": "",
+   "status": 200,
+   "ttfbMs": -868513725,
+   "bytes": 1224
+  },
+  {
+   "deltaMs": 6404,
+   "url": "assets/JaguarTrazado-D-jlRNIi.js",
+   "initiator": "script",
+   "initiatorUrl": "about:client",
+   "stack": "",
+   "ttfbMs": null,
+   "bytes": 0
+  },
+  {
+   "deltaMs": 6404,
+   "url": "assets/useVidaIdle-p84l8mJy.js",
+   "initiator": "script",
+   "initiatorUrl": "about:client",
+   "stack": "",
+   "status": 200,
+   "ttfbMs": -868025191,
+   "bytes": 1744
+  },
+  {
+   "deltaMs": 6404,
+   "url": "assets/JaguarTrazado-D7lg6tU7.css",
+   "initiator": "script",
+   "initiatorUrl": "",
+   "stack": "<anon>>r><anon>",
+   "status": 200,
+   "ttfbMs": -868648802,
+   "bytes": 2840
+  },
+  {
+   "deltaMs": 6404,
+   "url": "assets/ChagraAgentAvatarLuciernaga-DeF5iBq1.js",
+   "initiator": "script",
+   "initiatorUrl": "about:client",
+   "stack": "",
+   "status": 200,
+   "ttfbMs": -868250160,
+   "bytes": 1353
+  },
+  {
+   "deltaMs": 6404,
+   "url": "assets/LuciernagaTrazado-B3_n5YKJ.js",
+   "initiator": "script",
+   "initiatorUrl": "about:client",
+   "stack": "",
+   "status": 200,
+   "ttfbMs": -868351924,
+   "bytes": 680
+  },
+  {
+   "deltaMs": 6416,
+   "url": "assets/ChagraAgentAvatarOsoBaston-DFoXVv0v.js",
+   "initiator": "script",
+   "initiatorUrl": "about:client",
+   "stack": "",
+   "status": 200,
+   "ttfbMs": -868067124,
+   "bytes": 1293
+  },
+  {
+   "deltaMs": 6416,
+   "url": "assets/OsoBaston-DoL3Do-t.js",
+   "initiator": "script",
+   "initiatorUrl": "about:client",
+   "stack": "",
+   "status": 200,
+   "ttfbMs": -867828194,
+   "bytes": 11716
+  },
+  {
+   "deltaMs": 6416,
+   "url": "assets/ChagraAgentAvatarZariguya-DFnqsSl6.js",
+   "initiator": "script",
+   "initiatorUrl": "about:client",
+   "stack": "",
+   "status": 200,
+   "ttfbMs": -868477621,
+   "bytes": 1238
+  },
+  {
+   "deltaMs": 6416,
+   "url": "assets/ZariguyaTrazado-CaV953pq.js",
+   "initiator": "script",
+   "initiatorUrl": "about:client",
+   "stack": "",
+   "ttfbMs": null,
+   "bytes": 0
+  },
+  {
+   "deltaMs": 6416,
+   "url": "assets/ZariguyaTrazado-DaFoGiUj.css",
+   "initiator": "script",
+   "initiatorUrl": "",
+   "stack": "<anon>>r><anon>",
+   "status": 200,
+   "ttfbMs": -868756037,
+   "bytes": 3666
+  },
+  {
+   "deltaMs": 6416,
+   "url": "assets/BotonAnarquiaGlyph-D6RpjoVC.js",
+   "initiator": "script",
+   "initiatorUrl": "about:client",
+   "stack": "",
+   "status": 200,
+   "ttfbMs": -867955166,
+   "bytes": 17706
+  },
+  {
+   "deltaMs": 6416,
+   "url": "assets/agentCapabilities-DkTVYNOz.js",
+   "initiator": "script",
+   "initiatorUrl": "about:client",
+   "stack": "",
+   "status": 200,
+   "ttfbMs": -867737792,
+   "bytes": 3914
+  },
+  {
+   "deltaMs": 6419,
+   "url": "assets/ArbolDeMundos-DB4d_VRw.js",
+   "initiator": "script",
+   "initiatorUrl": "about:client",
+   "stack": "",
+   "status": 200,
+   "ttfbMs": -867860871,
+   "bytes": 5354
+  },
+  {
+   "deltaMs": 6419,
+   "url": "assets/mundosFinca-DisAb9-r.js",
+   "initiator": "script",
+   "initiatorUrl": "about:client",
+   "stack": "",
+   "status": 200,
+   "ttfbMs": -867963332,
+   "bytes": 5181
+  },
+  {
+   "deltaMs": 6419,
+   "url": "assets/ArbolDeMundos-CScbLJFU.css",
+   "initiator": "script",
+   "initiatorUrl": "",
+   "stack": "<anon>>r><anon>",
+   "status": 200,
+   "ttfbMs": -868667963,
+   "bytes": 1933
+  },
+  {
+   "deltaMs": 6419,
+   "url": "assets/ClimaIconoVivo-DuqRuzPN.js",
+   "initiator": "script",
+   "initiatorUrl": "about:client",
+   "stack": "",
+   "status": 200,
+   "ttfbMs": -867973153,
+   "bytes": 1363
+  },
+  {
+   "deltaMs": 6419,
+   "url": "assets/ClimaIconoVivo-CoXJbA2A.css",
+   "initiator": "script",
+   "initiatorUrl": "",
+   "stack": "<anon>>r><anon>",
+   "status": 200,
+   "ttfbMs": -868924118,
+   "bytes": 863
+  },
+  {
+   "deltaMs": 6419,
+   "url": "assets/mundos-finca-YMmumw_M.js",
+   "initiator": "script",
+   "initiatorUrl": "about:client",
+   "stack": "",
+   "status": 200,
+   "ttfbMs": -867904783,
+   "bytes": 6957
+  },
+  {
+   "deltaMs": 6419,
+   "url": "assets/mundos-finca-CODYXZ38.css",
+   "initiator": "script",
+   "initiatorUrl": "",
+   "stack": "<anon>>r><anon>",
+   "status": 200,
+   "ttfbMs": -868473068,
+   "bytes": 3342
+  },
+  {
+   "deltaMs": 6419,
+   "url": "assets/ValleHomeGateway-h2FwP-38.js",
+   "initiator": "script",
+   "initiatorUrl": "about:client",
+   "stack": "",
+   "status": 200,
+   "ttfbMs": -869012356,
+   "bytes": 3322
+  },
+  {
+   "deltaMs": 6419,
+   "url": "assets/homeModuleSelector-CR1HgeMv.js",
+   "initiator": "script",
+   "initiatorUrl": "about:client",
+   "stack": "",
+   "status": 200,
+   "ttfbMs": -868091487,
+   "bytes": 1497
+  },
+  {
+   "deltaMs": 6419,
+   "url": "assets/profileChipSelector-CdYwUJQZ.js",
+   "initiator": "script",
+   "initiatorUrl": "about:client",
+   "stack": "",
+   "status": 200,
+   "ttfbMs": -868338313,
+   "bytes": 1447
+  },
+  {
+   "deltaMs": 6419,
+   "url": "assets/mundo3d-BtF7uFd_.js",
+   "initiator": "script",
+   "initiatorUrl": "about:client",
+   "stack": "",
+   "status": 200,
+   "ttfbMs": -867989616,
+   "bytes": 25520
+  },
+  {
+   "deltaMs": 6419,
+   "url": "assets/valleData-DqG8Kdev.js",
+   "initiator": "script",
+   "initiatorUrl": "about:client",
+   "stack": "",
+   "status": 200,
+   "ttfbMs": -868009377,
+   "bytes": 5504
+  },
+  {
+   "deltaMs": 6419,
+   "url": "assets/useFincaViva-CwGwCDDb.js",
+   "initiator": "script",
+   "initiatorUrl": "about:client",
+   "stack": "",
+   "status": 200,
+   "ttfbMs": -867858523,
+   "bytes": 6274
+  },
+  {
+   "deltaMs": 6419,
+   "url": "assets/useCosechaStore-8xhZPdtr.js",
+   "initiator": "script",
+   "initiatorUrl": "about:client",
+   "stack": "",
+   "status": 200,
+   "ttfbMs": -868605335,
+   "bytes": 831
+  },
+  {
+   "deltaMs": 6419,
+   "url": "assets/cosechaService-Ce1SrP4C.js",
+   "initiator": "script",
+   "initiatorUrl": "about:client",
+   "stack": "",
+   "status": 200,
+   "ttfbMs": -867949196,
+   "bytes": 2834
+  },
+  {
+   "deltaMs": 6419,
+   "url": "assets/loteService-BVZQOu1r.js",
+   "initiator": "script",
+   "initiatorUrl": "about:client",
+   "stack": "",
+   "status": 200,
+   "ttfbMs": -868242545,
+   "bytes": 1323
+  },
+  {
+   "deltaMs": 6419,
+   "url": "assets/geo-BP-vsu5o.js",
+   "initiator": "script",
+   "initiatorUrl": "about:client",
+   "stack": "",
+   "status": 200,
+   "ttfbMs": -868093327,
+   "bytes": 1960
+  },
+  {
+   "deltaMs": 6419,
+   "url": "assets/landTypes-DD0h14Z3.js",
+   "initiator": "script",
+   "initiatorUrl": "about:client",
+   "stack": "",
+   "status": 200,
+   "ttfbMs": -868236909,
+   "bytes": 619
+  },
+  {
+   "deltaMs": 6419,
+   "url": "assets/usePrefsStore-CTETT8oZ.js",
+   "initiator": "script",
+   "initiatorUrl": "about:client",
+   "stack": "",
+   "status": 200,
+   "ttfbMs": -868403415,
+   "bytes": 980
+  },
+  {
+   "deltaMs": 6419,
+   "url": "assets/AbejaTransicion-lqnE8H6g.js",
+   "initiator": "script",
+   "initiatorUrl": "about:client",
+   "stack": "",
+   "status": 200,
+   "ttfbMs": -869209670,
+   "bytes": 943
+  },
+  {
+   "deltaMs": 6419,
+   "url": "assets/laminas-qJ0iscun.js",
+   "initiator": "script",
+   "initiatorUrl": "about:client",
+   "stack": "",
+   "status": 200,
+   "ttfbMs": -868243841,
+   "bytes": 823
+  },
+  {
+   "deltaMs": 6419,
+   "url": "assets/AgentLamina-BBEWPkCh.js",
+   "initiator": "script",
+   "initiatorUrl": "about:client",
+   "stack": "",
+   "status": 200,
+   "ttfbMs": -867941680,
+   "bytes": 11997
+  },
+  {
+   "deltaMs": 6419,
+   "url": "assets/LaminaMataEtapa-B3qg-qPU.js",
+   "initiator": "script",
+   "initiatorUrl": "about:client",
+   "stack": "",
+   "status": 200,
+   "ttfbMs": -867958448,
+   "bytes": 2750
+  },
+  {
+   "deltaMs": 6419,
+   "url": "assets/LaminaMataEtapa-Bm5LDD3x.css",
+   "initiator": "script",
+   "initiatorUrl": "",
+   "stack": "<anon>>r><anon>",
+   "status": 200,
+   "ttfbMs": -869226965,
+   "bytes": 824
+  },
+  {
+   "deltaMs": 6419,
+   "url": "assets/effects-DXGKTUy7.css",
+   "initiator": "script",
+   "initiatorUrl": "",
+   "stack": "<anon>>r><anon>",
+   "status": 200,
+   "ttfbMs": -868130696,
+   "bytes": 1630
+  },
+  {
+   "deltaMs": 6419,
+   "url": "assets/resolverMundo-CAwuVd6H.js",
+   "initiator": "script",
+   "initiatorUrl": "about:client",
+   "stack": "",
+   "status": 200,
+   "ttfbMs": -868098306,
+   "bytes": 2038
+  },
+  {
+   "deltaMs": 6419,
+   "url": "assets/deviceTier-B-jDHPew.js",
+   "initiator": "script",
+   "initiatorUrl": "about:client",
+   "stack": "",
+   "status": 200,
+   "ttfbMs": -868236991,
+   "bytes": 1026
+  },
+  {
+   "deltaMs": 6419,
+   "url": "assets/mundoData-eTgKk20q.js",
+   "initiator": "script",
+   "initiatorUrl": "about:client",
+   "stack": "",
+   "status": 200,
+   "ttfbMs": -867956323,
+   "bytes": 6592
+  },
+  {
+   "deltaMs": 6419,
+   "url": "assets/mundo3d-PsaJ-CQC.css",
+   "initiator": "script",
+   "initiatorUrl": "",
+   "stack": "<anon>>r><anon>",
+   "status": 200,
+   "ttfbMs": -867870531,
+   "bytes": 5473
+  },
+  {
+   "deltaMs": 6422,
+   "url": "assets/ValleHomeGateway-SGRcMfH9.css",
+   "initiator": "script",
+   "initiatorUrl": "",
+   "stack": "<anon>>r><anon>",
+   "status": 200,
+   "ttfbMs": -868139120,
+   "bytes": 1684
+  },
+  {
+   "deltaMs": 6422,
+   "url": "assets/juego-finca-B_GznAlf.js",
+   "initiator": "script",
+   "initiatorUrl": "about:client",
+   "stack": "",
+   "status": 200,
+   "ttfbMs": -867966468,
+   "bytes": 11772
+  },
+  {
+   "deltaMs": 6422,
+   "url": "assets/fvhSkin-jk5J2OFg.js",
+   "initiator": "script",
+   "initiatorUrl": "about:client",
+   "stack": "",
+   "status": 200,
+   "ttfbMs": -868614411,
+   "bytes": 583
+  },
+  {
+   "deltaMs": 6422,
+   "url": "assets/agroecologyJourney-BBcOdVJE.js",
+   "initiator": "script",
+   "initiatorUrl": "about:client",
+   "stack": "",
+   "status": 200,
+   "ttfbMs": -867756928,
+   "bytes": 5624
+  },
+  {
+   "deltaMs": 6422,
+   "url": "assets/Ardilla-CpwsW-j3.js",
+   "initiator": "script",
+   "initiatorUrl": "about:client",
+   "stack": "",
+   "status": 200,
+   "ttfbMs": -868569488,
+   "bytes": 14488
+  },
+  {
+   "deltaMs": 6422,
+   "url": "assets/Colibri-DiDCJjdM.js",
+   "initiator": "script",
+   "initiatorUrl": "about:client",
+   "stack": "",
+   "status": 200,
+   "ttfbMs": -867819146,
+   "bytes": 3385
+  },
+  {
+   "deltaMs": 6422,
+   "url": "assets/jaguarIdentidad-BOQ-VXwk.js",
+   "initiator": "script",
+   "initiatorUrl": "about:client",
+   "stack": "",
+   "status": 200,
+   "ttfbMs": -868372538,
+   "bytes": 1169
+  },
+  {
+   "deltaMs": 6422,
+   "url": "assets/creatures-Cp8yWv2b.js",
+   "initiator": "script",
+   "initiatorUrl": "about:client",
+   "stack": "",
+   "status": 200,
+   "ttfbMs": -867908095,
+   "bytes": 22027
+  },
+  {
+   "deltaMs": 6422,
+   "url": "assets/Sirfido-Dt-0KK1d.js",
+   "initiator": "script",
+   "initiatorUrl": "about:client",
+   "stack": "",
+   "status": 200,
+   "ttfbMs": -867840061,
+   "bytes": 2943
+  },
+  {
+   "deltaMs": 6422,
+   "url": "assets/Lombriz-CmWO-xEQ.js",
+   "initiator": "script",
+   "initiatorUrl": "about:client",
+   "stack": "",
+   "status": 200,
+   "ttfbMs": -867691876,
+   "bytes": 1703
+  },
+  {
+   "deltaMs": 6422,
+   "url": "assets/Gallina-BFynGpUN.js",
+   "initiator": "script",
+   "initiatorUrl": "about:client",
+   "stack": "",
+   "status": 200,
+   "ttfbMs": -868109935,
+   "bytes": 2241
+  },
+  {
+   "deltaMs": 6422,
+   "url": "assets/Gallina-C7OqRzyq.css",
+   "initiator": "script",
+   "initiatorUrl": "",
+   "stack": "<anon>>r><anon>",
+   "status": 200,
+   "ttfbMs": -868480667,
+   "bytes": 907
+  },
+  {
+   "deltaMs": 6422,
+   "url": "assets/useLipSync-w8Wiaz1c.js",
+   "initiator": "script",
+   "initiatorUrl": "about:client",
+   "stack": "",
+   "status": 200,
+   "ttfbMs": -867970570,
+   "bytes": 7414
+  },
+  {
+   "deltaMs": 6422,
+   "url": "assets/ttsService-DXvahESX.js",
+   "initiator": "script",
+   "initiatorUrl": "about:client",
+   "stack": "",
+   "status": 200,
+   "ttfbMs": -867956341,
+   "bytes": 4229
+  },
+  {
+   "deltaMs": 6422,
+   "url": "assets/Mariposa-CgnDMVMI.js",
+   "initiator": "script",
+   "initiatorUrl": "about:client",
+   "stack": "",
+   "status": 200,
+   "ttfbMs": -868096448,
+   "bytes": 1375
+  },
+  {
+   "deltaMs": 6422,
+   "url": "assets/Perezoso-b-ZxGC56.js",
+   "initiator": "script",
+   "initiatorUrl": "about:client",
+   "stack": "",
+   "status": 200,
+   "ttfbMs": -868075485,
+   "bytes": 3277
+  },
+  {
+   "deltaMs": 6422,
+   "url": "assets/senalSalidaAbeja-6YBxyBdP.js",
+   "initiator": "script",
+   "initiatorUrl": "about:client",
+   "stack": "",
+   "status": 200,
+   "ttfbMs": -868490593,
+   "bytes": 594
+  },
+  {
+   "deltaMs": 6422,
+   "url": "assets/creatures-Cp-rHB31.css",
+   "initiator": "script",
+   "initiatorUrl": "",
+   "stack": "<anon>>r><anon>",
+   "status": 200,
+   "ttfbMs": -868154036,
+   "bytes": 2320
+  },
+  {
+   "deltaMs": 6422,
+   "url": "assets/juego-finca-BdaNaXtm.css",
+   "initiator": "script",
+   "initiatorUrl": "",
+   "stack": "<anon>>r><anon>",
+   "status": 200,
+   "ttfbMs": -869138532,
+   "bytes": 1328
+  },
+  {
+   "deltaMs": 6422,
+   "url": "assets/extensionistaService-CI4rc0Ud.js",
+   "initiator": "script",
+   "initiatorUrl": "about:client",
+   "stack": "",
+   "status": 200,
+   "ttfbMs": -868107959,
+   "bytes": 1405
+  },
+  {
+   "deltaMs": 6422,
+   "url": "assets/useAutosave-CDNNLFhj.js",
+   "initiator": "script",
+   "initiatorUrl": "about:client",
+   "stack": "",
+   "status": 200,
+   "ttfbMs": -868300830,
+   "bytes": 870
+  },
+  {
+   "deltaMs": 6422,
+   "url": "assets/useSipsaLatestPrice-F-xcwTBk.js",
+   "initiator": "script",
+   "initiatorUrl": "about:client",
+   "stack": "",
+   "status": 200,
+   "ttfbMs": -868009684,
+   "bytes": 814
+  },
+  {
+   "deltaMs": 6422,
+   "url": "assets/useVoiceRecorder-xqI1kPt7.js",
+   "initiator": "script",
+   "initiatorUrl": "about:client",
+   "stack": "",
+   "status": 200,
+   "ttfbMs": -868089995,
+   "bytes": 1828
+  },
+  {
+   "deltaMs": 6422,
+   "url": "assets/agentSoundService-CoHzivs7.js",
+   "initiator": "script",
+   "initiatorUrl": "about:client",
+   "stack": "",
+   "status": 200,
+   "ttfbMs": -868035341,
+   "bytes": 1096
+  },
+  {
+   "deltaMs": 6422,
+   "url": "assets/hoyEnFincaService-BT7Iv7bt.js",
+   "initiator": "script",
+   "initiatorUrl": "about:client",
+   "stack": "",
+   "status": 200,
+   "ttfbMs": -867856213,
+   "bytes": 2404
+  },
+  {
+   "deltaMs": 6422,
+   "url": "assets/cycleTaskService-CZJ6I0Ej.js",
+   "initiator": "script",
+   "initiatorUrl": "about:client",
+   "stack": "",
+   "status": 200,
+   "ttfbMs": -867747293,
+   "bytes": 2434
+  },
+  {
+   "deltaMs": 6422,
+   "url": "assets/locationService-CYGzM-md.js",
+   "initiator": "script",
+   "initiatorUrl": "about:client",
+   "stack": "",
+   "status": 200,
+   "ttfbMs": -867859315,
+   "bytes": 3196
+  },
+  {
+   "deltaMs": 6422,
+   "url": "assets/externalAiPromptBuilder-CSU9h1ov.js",
+   "initiator": "script",
+   "initiatorUrl": "about:client",
+   "stack": "",
+   "status": 200,
+   "ttfbMs": -867741171,
+   "bytes": 2596
+  },
+  {
+   "deltaMs": 6422,
+   "url": "assets/speciesResolver-1g9xvoqO.js",
+   "initiator": "script",
+   "initiatorUrl": "about:client",
+   "stack": "",
+   "status": 200,
+   "ttfbMs": -867777765,
+   "bytes": 1397
+  },
+  {
+   "deltaMs": 6422,
+   "url": "assets/perfilFincaService-CKcNC00y.js",
+   "initiator": "script",
+   "initiatorUrl": "about:client",
+   "stack": "",
+   "status": 200,
+   "ttfbMs": -867814912,
+   "bytes": 1679
+  },
+  {
+   "deltaMs": 6422,
+   "url": "assets/photoService-BhZdtGEw.js",
+   "initiator": "script",
+   "initiatorUrl": "about:client",
+   "stack": "",
+   "status": 200,
+   "ttfbMs": -867748136,
+   "bytes": 2386
+  },
+  {
+   "deltaMs": 6422,
+   "url": "assets/useCaseStudyStore-DM29LAbk.js",
+   "initiator": "script",
+   "initiatorUrl": "about:client",
+   "stack": "",
+   "status": 200,
+   "ttfbMs": -867688353,
+   "bytes": 2991
+  },
+  {
+   "deltaMs": 6422,
+   "url": "assets/DashboardLive-C7_JR1-U.css",
+   "initiator": "script",
+   "initiatorUrl": "",
+   "stack": "<anon>>r><anon>",
+   "status": 200,
+   "ttfbMs": -868180362,
+   "bytes": 1848
+  },
+  {
+   "deltaMs": 10954,
+   "url": "cdn-cgi/rum?",
+   "initiator": "script",
+   "initiatorUrl": "",
+   "stack": "e.sendObjectBeacon>D>B",
+   "status": 204,
+   "ttfbMs": -869629675,
+   "bytes": 410
+  },
+  {
+   "deltaMs": 10969,
+   "url": "favicon.svg",
+   "initiator": "other",
+   "initiatorUrl": "",
+   "stack": "",
+   "status": 200,
+   "ttfbMs": -869337085,
+   "bytes": 2010
+  },
+  {
+   "deltaMs": 11253,
+   "url": "cycle-content/manifest.json",
+   "initiator": "script",
+   "initiatorUrl": "",
+   "stack": "<anon>><anon>>Kc",
+   "status": 200,
+   "ttfbMs": -869344026,
+   "bytes": 5170
+  },
+  {
+   "deltaMs": 11315,
+   "url": "biopunk-pattern.svg",
+   "initiator": "parser",
+   "initiatorUrl": "assets/sello-confianza-BLfs4ivW.css",
+   "stack": "",
+   "status": 200,
+   "ttfbMs": -869274575,
+   "bytes": 3063
+  },
+  {
+   "deltaMs": 11427,
+   "url": "assets/sqlite3-BVKGSWc-.wasm",
+   "initiator": "script",
+   "initiatorUrl": "",
+   "stack": "j>M>t",
+   "status": 200,
+   "ttfbMs": -869278455,
+   "bytes": 426706
+  },
+  {
+   "deltaMs": 13939,
+   "url": "version.json",
+   "initiator": "script",
+   "initiatorUrl": "",
+   "stack": "Hu>qu><anon>",
+   "status": 200,
+   "ttfbMs": -869286316,
+   "bytes": 470
+  },
+  {
+   "deltaMs": 24837,
+   "url": "catalog.sqlite",
+   "initiator": "script",
+   "initiatorUrl": "",
+   "stack": "u>d>g",
+   "status": 200,
+   "ttfbMs": -869391218,
+   "bytes": 0
+  }
+ ],
+ "pageErrors": [],
+ "consoleWarn": [
+  "[warning] [API] Token no disponible. Continuando en modo offline.",
+  "[warning] [LogStore] Fallo en pull de log--seeding: Token no disponible.",
+  "[warning] [API] Token no disponible. Continuando en modo offline.",
+  "[warning] [LogStore] Fallo en pull de log--planting: Token no disponible.",
+  "[warning] [API] Token no disponible. Continuando en modo offline.",
+  "[warning] [LogStore] Fallo en pull de log--harvest: Token no disponible.",
+  "[warning] [API] Token no disponible. Continuando en modo offline.",
+  "[warning] [LogStore] Fallo en pull de log--input: Token no disponible.",
+  "[warning] [API] Token no disponible. Continuando en modo offline.",
+  "[warning] [LogStore] Fallo en pull de log--task: Token no disponible.",
+  "[warning] [API] Token no disponible. Continuando en modo offline.",
+  "[warning] [LogStore] Fallo en pull de log--observation: Token no disponible.",
+  "[warning] The resource https://chagra-dev.guatoc.co/fonts/nunito-latin.woff2 was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropria",
+  "[warning] The resource https://chagra-dev.guatoc.co/fonts/nunito-latin.woff2 was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropria",
+  "[warning] Deprecated API for given entry type."
+ ]
+}

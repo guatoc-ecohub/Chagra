@@ -1,0 +1,6 @@
+- **Cabeza/Cara**: La cara está **intacta**. Tiene ojos grandes y redondos, mejillas con tono rosado y una sonrisa claramente definida, sin deformaciones ni roturas visibles.  
+- **Alas y antenas**:  
+  - Las **antenas** están completas (dos antenas negras, curvadas, típicas de las abejas).  
+  - Las **alas** no están completas: solo se observa **una ala** (de color claro, con un efecto de movimiento suave), mientras que la otra ala parece estar ausente o no dibujada.  
+
+- **Defecto concreto**: Falta una ala (solo hay representada una ala en lugar de las dos típicas de una abeja).

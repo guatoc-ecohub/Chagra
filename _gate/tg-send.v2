@@ -1,0 +1,92 @@
+#!/usr/bin/env bash
+# tg-send — envía al operador por Telegram. Uso:
+#   tg-send "<texto>"                  → sendMessage
+#   tg-send <img>  [caption]           → sendPhoto
+#   tg-send <video> [caption]          → sendVideo  (mp4/webm/mov, detectado por extensión)
+#   tg-send --doc <archivo> [caption]  → sendDocument
+#
+# 🔴 GOTCHA RESUELTO 2026-09-03: en ~/.config hay VARIOS tokens de bot. El `head -1`
+# tomaba `guatoc_attach_bot`, que NO tiene acceso al chat del operador → todo envío
+# fallaba con {"ok":false,"description":"Chat not found"} — que NO es chat malo, es
+# BOT equivocado. Ahora se prueba cada token contra el chat real y se cachea el bueno.
+#
+# 🔴 HARDENING 2026-09-05 (queue #100, esclavos no mandan capturas): dos fallos en
+# silencio que había que cerrar:
+#   1. Un PNG inexistente caía en sendMessage y mandaba la RUTA como texto con
+#      `ok:true` (nadie notaba que no se envió nada). Ahora un argumento con
+#      extensión de archivo que no existe es ERROR (exit 1) ANTES de tocar red.
+#   2. Una respuesta no-ok de la API salía con exit 0. Ahora imprime msg_id en el
+#      éxito y el description + exit != 0 en el fallo. La entrega es NO REALIZADA.
+# La validación de archivo ocurre ANTES de resolver el token: sin archivo válido no
+# hay ni un solo request a Telegram.
+CHAT=208512105
+CACHE="$HOME/.config/.tg-send-token"
+
+token_valido() { # $1=token → 0 si ese bot alcanza el chat
+  [ -n "$1" ] || return 1
+  curl -s --max-time 15 "https://api.telegram.org/bot$1/sendChatAction" \
+    -d "chat_id=$CHAT" -d "action=typing" 2>/dev/null | grep -q '"ok":true'
+}
+
+_require_tok() {
+  TOK=""
+  [ -r "$CACHE" ] && { C=$(cat "$CACHE"); token_valido "$C" && TOK="$C"; }
+  if [ -z "$TOK" ]; then
+    for t in $(grep -rhoE "[0-9]{8,}:[A-Za-z0-9_-]{30,}" "$HOME/.config" 2>/dev/null | sort -u); do
+      token_valido "$t" && { TOK="$t"; printf '%s' "$t" > "$CACHE"; chmod 600 "$CACHE"; break; }
+    done
+  fi
+  [ -z "$TOK" ] && { echo "tg-send: ningún token de ~/.config alcanza el chat $CHAT" >&2; exit 1; }
+}
+
+# api <método> <curl args...> — imprime msg_id en éxito, description en fallo y
+# devuelve exit != 0 si la API no respondió ok.
+api() {
+  local out mid desc
+  out=$(curl -s --max-time 300 "https://api.telegram.org/bot$TOK/$1" "${@:2}") || {
+    echo "tg-send: curl rc=$? (sin red o timeout) en $1" >&2; return 1; }
+  if printf '%s' "$out" | grep -q '"ok":true'; then
+    mid=$(printf '%s' "$out" | grep -oE '"message_id":[0-9]+' | head -1 | cut -d: -f2)
+    echo "ok:true msg_id=${mid:-NA}"
+    return 0
+  fi
+  desc=$(printf '%s' "$out" | grep -oE '"description":"[^"]*"' | head -1 | cut -d'"' -f4)
+  echo "tg-send: FALLO $1 :: ${desc:-respuesta no-ok sin descripción}" >&2
+  return 1
+}
+
+# Un argumento que termina en extensión de archivo común y no existe es un archivo
+# que falta, NO un texto. Cierra el gotcha «ruta mandada como texto con ok:true».
+_parece_archivo_inexistente() {
+  case "${1,,}" in
+    *.png|*.jpg|*.jpeg|*.gif|*.webp|*.svg|*.mp4|*.webm|*.mov|*.mkv|*.pdf|*.doc|*.docx|*.xls|*.xlsx|*.csv|*.zip) return 0 ;;
+    *) return 1 ;;
+  esac
+}
+
+# ── dispatch (sin red hasta saber que hay archivo válido y token) ────────────
+if [ "$1" = "--doc" ]; then
+  [ -f "$2" ] || { echo "tg-send: --doc: archivo no existe: $2 — no se manda la ruta" >&2; exit 1; }
+  _require_tok
+  api sendDocument -F "chat_id=$CHAT" -F "document=@$2" -F "caption=${3:-}"
+  exit $?
+fi
+
+if [ -f "$1" ]; then
+  _require_tok
+  case "${1,,}" in
+    *.mp4|*.webm|*.mov|*.mkv)
+      api sendVideo -F "chat_id=$CHAT" -F "video=@$1" -F "caption=${2:-}" -F "supports_streaming=true" ;;
+    *) api sendPhoto -F "chat_id=$CHAT" -F "photo=@$1" -F "caption=${2:-}" ;;
+  esac
+  exit $?
+fi
+
+if _parece_archivo_inexistente "$1"; then
+  echo "tg-send: $1 NO existe (argumento con extensión de archivo) — sin envío, ENTREGA NO REALIZADA" >&2
+  exit 1
+fi
+
+_require_tok
+api sendMessage --data-urlencode "chat_id=$CHAT" --data-urlencode "text=$1"
+exit $?
