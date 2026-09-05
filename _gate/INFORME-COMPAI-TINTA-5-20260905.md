@@ -51,7 +51,7 @@ Veredictos breves (copias literales completas en `_gate/juez-compai5-*.txt` y `-
 - **oso-baston**: "Sí se lee como oso de anteojos. No hay defectos; las marcas claras de los 'anteojos' son nítidas." Al zoom: "cara intacta, sin defectos concretos". Lo clasificó "a color".
 - **luciernaga**: "No, se lee como cucaracha/escarabajo, no luciérnaga. Cara intacta. Abdomen no brilla." Al zoom: mismo veredicto, "abdomen sin brillo (opaco amarillento) y antenas más propias de escarabajo". Lo clasificó "a color".
 
-## 5. Medidas de píxel (sharp) — resumen
+## 5. Medidas de píxel (sharp), resumen
 
 | compai | papel % | tinta oscura % | color fuerte % | colores dominantes (no papel) |
 |---|---|---|---|---|
