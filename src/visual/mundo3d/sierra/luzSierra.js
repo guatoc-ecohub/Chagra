@@ -32,14 +32,21 @@ export const ATMOSFERA_SIERRA = {
      se ve contra la franja del horizonte, no contra el cenit: con #d9e5ee la nieve
      (239,240,239 tras la bruma) y el cielo daban ΔE 7,7 — sin silueta, medido. */
   fondo: '#bdd2e2', // cielo húmedo del trópico en el horizonte, lejos del sol
-  cenit: '#9dbad6', // el mismo cielo unos grados más arriba (domo de vértices)
+  /* (2026-09-05, del costero) El cenit se HUNDE: #9dbad6 era casi el horizonte y el
+     mar, que refleja el cielo de arriba, salía lechoso. Horizonte pálido y cenit
+     hondo es Rayleigh —el costero: 0xb9d4e4 / 0x2456a0—; aquí un punto menos hondo
+     porque en el cuadro solo entran 17° de cielo y el casquete se lee contra él. */
+  cenit: '#5f8fc6', // el cielo unos grados más arriba: azul de verdad (domo HDR + reflejo del mar)
   niebla: '#bdd2e2', // bruma de distancia = el color del horizonte, o la ladera lejana no se disuelve en él
   cielo: '#cfe0f0', // hemisferio arriba: luz de cielo azul (la que el domo dorado negaba)
   suelo: '#6e6a5c', // rebote de la ladera: gris cálido neutro (vegetación y roca), no naranja
   luz: '#ffe3b8', // el sol bajo del occidente: cálido, no naranja
   relleno: '#a8c2e0', // relleno frío del cielo abierto, por el lado opuesto al sol
   ambiente: '#f4f2ec', // un ambiente casi neutro, chico: el modelado lo dan sol y cielo
-  intensidad: { hemisferio: 0.7, ambiente: 0.16, sol: 1.35, relleno: 0.45 },
+  /* (2026-09-05) hemisferio 0,7 → 0,9 y ambiente 0,16 → 0,22: con sombras
+     proyectadas y crestas, la cara ESTE en sombra perdía sus bandas (medido).
+     El relleno de cielo es lo que en una tarde despejada ilumina la umbría. */
+  intensidad: { hemisferio: 0.9, ambiente: 0.22, sol: 1.35, relleno: 0.45 },
   /* 0,028 → 0,030: un punto más de perspectiva aérea (a 15 u, 18 % → 20 % de bruma). */
   densidadNiebla: 0.03,
 };

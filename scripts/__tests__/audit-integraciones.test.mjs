@@ -8,7 +8,7 @@ import { spawnSync } from 'node:child_process';
 import { execPath } from 'node:process';
 import {
   mkdtempSync, mkdirSync, writeFileSync, readFileSync, rmSync, cpSync, existsSync,
-  readdirSync, statSync, symlinkSync,
+  readdirSync, statSync, symlinkSync, lstatSync,
 } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join, dirname, resolve } from 'node:path';
@@ -683,12 +683,17 @@ describe('ops/integraciones-no-consumidas.json (repo real)', function () {
       }
     });
 
-    it('las entradas del remate son exactamente 123 y todas siguen siendo hallazgos allowlisted', function () {
+    it('las entradas con date 2026-09-05 son exactamente 126 (remate 123 + 3 apoyos de láminas) y todas siguen siendo hallazgos allowlisted', function () {
+      // El remate (#3149) declaró 123. La misma fecha sumó 3 apoyos de las
+      // láminas archivadas por #3151 (osoLamina/anatomia.js, osoLamina/capas.js
+      // y zariguyaGeminiLamina/capas.js — task gate-audit-3-laminas), cada uno
+      // con control de importadores verificado con grep: tests propios y
+      // hermanos de módulo, nada de producto.
       const remate = (allowlist.orphan_components || []).filter(function (e) { return e.date === '2026-09-05'; });
       expect(
         remate.length,
-        'el remate declaró 123: si este número cambia, actualícelo conscientemente (con control de importadores por entrada)',
-      ).toBe(123);
+        'el remate declaró 123 y la tanda láminas 3 (126 en total): si este número cambia, actualícelo conscientemente (con control de importadores por entrada)',
+      ).toBe(126);
       const flojos = remate.filter(function (e) {
         return !salida.includes(`pieza SIN ruta viva pero allowlisted: ${e.id}`);
       });
@@ -766,6 +771,14 @@ describe('ops/integraciones-no-consumidas.json (repo real)', function () {
         for (const entry of readdirSync(dir)) {
           if (entry === 'node_modules' || entry.startsWith('.')) continue;
           const ruta = join(dir, entry);
+          // MISMA semántica del gate (audit-integraciones.mjs / #3151): un
+          // symlink NO es módulo del árbol — ni como sujeto ni como
+          // consumidor. Sin este salto, el CONTROL leía (readFileSync sigue
+          // el enlace, y en alpha el disco frío está montado) los componentes
+          // ARCHIVADOS en _archivo/ y los contaba como importadores «vivos»
+          // de sus apoyos declarados — falso positivo que castigaría la
+          // declaración honesta del archivo.
+          if (lstatSync(ruta).isSymbolicLink()) continue;
           if (statSync(ruta).isDirectory()) { caminar(ruta); continue; }
           if (!/\.(js|jsx|mjs|ts|tsx)$/.test(entry)) continue;
           const texto = SIN_COMENTARIOS(readFileSync(ruta, 'utf8'));
@@ -816,6 +829,62 @@ describe('ops/integraciones-no-consumidas.json (repo real)', function () {
       // Si esto falla con importadores de verdad, alguien cableó el hook:
       // borrar la entrada del allowlist conscientemente.
       expect(mapaImportadores.de('src/hooks/useT.js')).toEqual([]);
+    });
+  });
+
+  // -------------------------------------------------------------------------
+  // TANDA LÁMINAS 2026-09-05 (task gate-audit-3-laminas)
+  // -------------------------------------------------------------------------
+  // #3151 archivó las láminas-viva en _archivo/ como symlinks al disco frío
+  // (regla dura del operador: «compais solo con TINTA»; archivar ≠ borrar) y
+  // desconectó sus últimos consumidores vivos (registro CREATURES y
+  // ZariguyaCompaiEscena). Las carpetas de apoyo (anatomia/capas) se quedaron
+  // en el árbol — el archivo es reversible — y el gate las acusó como 3
+  // módulos de apoyo sin consumidor: el rojo de audit-integraciones que esta
+  // tanda cierra. Los COMPONENTES dueños no se declaran a propósito: como
+  // symlinks quedan fuera del alcance del gate, y sus 4 hermanas ya
+  // declaradas (Jaguar/Zariguya/ChivitoPunk/Luciernaga, 2026-09-04) son hoy
+  // la advertencia «ya NO le hacen match» que el gate reporta — su retiro es
+  // curaduría del operador, no de este arnés.
+  describe('tanda láminas 2026-09-05: apoyos de láminas archivadas declarados', function () {
+    const APOYOS_LAMINAS = [
+      'src/visual/creatures/osoLamina/anatomia.js',
+      'src/visual/creatures/osoLamina/capas.js',
+      'src/visual/creatures/zariguyaGeminiLamina/capas.js',
+    ];
+
+    it('los 3 apoyos están declarados (quitarlos devuelve el gate al rojo que esta task cerró)', function () {
+      const porId = new Map((allowlist.orphan_components || []).map(function (e) { return [e.id, e]; }));
+      for (const id of APOYOS_LAMINAS) {
+        const e = porId.get(id);
+        expect(e, `falta la entrada allowlist de ${id} — el gate vuelve a rojo (3 hallazgos sin declarar)`).toBeTruthy();
+        expect(e.reason, `${id} sin reason: una excepción sin razón es exactamente lo que este archivo previene`).toBeTruthy();
+        expect(e.date, `${id} sin date`).toMatch(/^\d{4}-\d{2}-\d{2}$/);
+      }
+    });
+
+    it('los 3 siguen siendo hallazgos allowlisted (ni cableados ni borrados en silencio)', function () {
+      for (const id of APOYOS_LAMINAS) {
+        expect(
+          salida,
+          `${id} ya no sale como hallazgo allowlisted: o se cableó (borrar la entrada + este pin) o el archivo dejó de existir`,
+        ).toContain(`pieza SIN ruta viva pero allowlisted: ${id}`);
+      }
+    });
+
+    it('CONTROL anti-falso-huérfano: zariguyaGeminiLamina/anatomia.js NO se declara — está viva', function () {
+      // posesTrazado.js (el trazado tinta que vive en producto) importa la
+      // anatomía Gemini con specifier EXACTO: declararla sería tachar de
+      // muerto lo que una piel montada usa — la lección useT.js y data/*Finca.
+      // Si este test falla porque el import ya no existe, la cadena tinta
+      // cambió: revisar si anatomia pasó a huérfana ANTES de declararla.
+      const ids = new Set((allowlist.orphan_components || []).map(function (e) { return e.id; }));
+      expect(ids.has('src/visual/creatures/zariguyaGeminiLamina/anatomia.js')).toBe(false);
+      const poses = readFileSync(
+        resolve(REPO_ROOT, 'src/visual/creatures/zariguyaTrazado/posesTrazado.js'),
+        'utf8',
+      );
+      expect(poses).toContain("from '../zariguyaGeminiLamina/anatomia.js'");
     });
   });
 });

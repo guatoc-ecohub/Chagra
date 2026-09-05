@@ -1384,6 +1384,21 @@
       "id": "src/visual/icons/index.js",
       "reason": "Barril de iconos ilustrados: su único importador es GuiaEspecieCards.jsx (declarada aquí). Se declara junto a su consumidor.",
       "date": "2026-09-05"
+    },
+    {
+      "id": "src/visual/creatures/osoLamina/anatomia.js",
+      "reason": "Apoyo de OsoBastonLaminaViva.jsx (la anatomía MEDIDA de la lámina real aprobada del oso de anteojos, para el corte por alfa): sus únicos importadores son capas.js (hermano del mismo módulo) y el test capas.test.js. El componente dueño fue desconectado del registro CREATURES (la entrada 'oso-baston' monta la piel TINTA OsoBaston) y archivado 2026-09-04 en _archivo/ como symlink reversible al disco frío — regla dura del operador «compais solo con TINTA» (#3151; archivar ≠ borrar). La carpeta de apoyo NO se movió a propósito (mismo criterio que zariguyaGeminiLamina en #3151): si la lámina vuelve del disco frío, anatomia+capas son su rig. Se declara hasta decidir la vuelta o la baja de la lámina (curaduría del operador); al cablear o retirar, borrar la entrada junto con la de capas.js.",
+      "date": "2026-09-05"
+    },
+    {
+      "id": "src/visual/creatures/osoLamina/capas.js",
+      "reason": "Apoyo de OsoBastonLaminaViva.jsx (hornea oso.png en capas por alfa: cuerpo, cabeza, orejas, mandíbula, corona del bastón): su único importador es el test capas.test.js — el dueño archivado era su otro consumidor y ya no es visible para este gate (symlink). Mismo caso que su hermano anatomia.js (declarado aquí): el método de la casa («la piel es la lámina exacta, cero dibujo nuevo») queda preservado con sus pruebas mientras la lámina del oso espera en el disco frío (regla dura solo-tinta, #3151). Al cablear o retirar la lámina, borrar la entrada junto con la de anatomia.js.",
+      "date": "2026-09-05"
+    },
+    {
+      "id": "src/visual/creatures/zariguyaGeminiLamina/capas.js",
+      "reason": "Apoyo de ZariguyaGeminiLaminaViva.jsx (el set raster Gemini de la zarigüeya, horneado en 8 capas): su único importador es el test capas.test.jsx (el test de regresión de assets la descubre por fs, no la importa, así que no cuenta como consumidor para este gate). El componente dueño fue desconectado de ZariguyaCompaiEscena (monta la piel TINTA ZariguyaTrazado desde #3151) y archivado 2026-09-04 en _archivo/ como symlink reversible al disco frío — regla dura «compais solo con TINTA». Su hermana anatomia.js NO se declara: sigue viva (el trazado la reutiliza vía zariguyaTrazado/posesTrazado.js) y es la que ancla la carpeta. Se declara solo este apoyo hasta decidir la vuelta o la baja del set Gemini (curaduría del operador); al cablear o retirar, borrar la entrada.",
+      "date": "2026-09-05"
     }
   ]
 }

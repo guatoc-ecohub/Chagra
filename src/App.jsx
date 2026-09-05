@@ -187,6 +187,12 @@ const AvatarGameLibre = lazy(() => import('./mockups/AvatarGameLibre'));
 // Piezas de decisión visual (acuarela, clima, diagnóstico, evidencia, guardianes).
 const MapaAcuarelaMockup = lazy(() => import('./mockups/MapaAcuarela'));
 const ClimaAtmosferaMockup = lazy(() => import('./mockups/ClimaAtmosfera'));
+// Arte original del mockup "El clima como atmósfera viva" (Fable): pantalla de
+// decisión visual con 5 estados de clima que re-tiñen toda la escena vía
+// tokens data-clima. La ruta canónica #/mockups/clima-atmosfera quedó como
+// puente al mundo real (#2833); el arte vive en su ruta hermana para que
+// ninguna de las dos intenciones se pierda.
+const ClimaAtmosferaArteMockup = lazy(() => import('./mockups/ClimaAtmosferaArte'));
 const DiagnosticoSobreFoto = lazy(() => import('./mockups/DiagnosticoSobreFoto'));
 const EvidenciaIlustrada = lazy(() => import('./mockups/EvidenciaIlustrada'));
 const MockupGuardianesNarrativos = lazy(() => import('./mockups/MockupGuardianesNarrativos'));
@@ -299,6 +305,9 @@ const VitrinaInfraestructuraMockup = lazy(() => import('./mockups/vitrina3d/Vitr
 // con su encuadre de cámara curado (camaraDioramas) + botón «Entrar» al host real.
 const VitrinaMundosMockup = lazy(() => import('./mockups/vitrina3d/VitrinaMundos'));
 const SierraGlobalMockup = lazy(() => import('./visual/mundo3d/VistaGlobalSierra'));
+// SSOT de pisos térmicos: resuelve el mundo principal de una banda tocada
+// (fix bug P1 huérfanos-3D — tocar piso baja al mundo real, bajo tapa).
+import { mundoPrincipalDePiso } from './visual/mundo3d/pisosTermicos.js';
 const MundoSueloVivoMockup = lazy(() => import('./mockups/MundoSueloVivo3D'));
 const AliadosFincaMockup = lazy(() => import('./mockups/AliadosFinca3D'));
 const MundoCafe3DMockup = lazy(() => import('./mockups/MundoCafe3D'));
@@ -876,6 +885,9 @@ const MOCKUP_HASH_ROUTES = {
   'mockups/navegador-grafo': 'mockup_navegador_grafo',
   'mockups/navegacion-pisos': 'mockup_navegacion_pisos',
   'mockups/agente-dibuja': 'mockup_agente_dibuja',
+  // (rescate 2026-09-05) arte original del clima como atmósfera viva:
+  // 'mockups/clima-atmosfera' quedó como puente al mundo real (#2833).
+  'mockups/clima-atmosfera-arte': 'mockup_clima_atmosfera_arte',
 };
 
 const HASH_VIEW_ROUTES = {
@@ -2280,6 +2292,16 @@ export default function App() {
             </ErrorFallback>
           </ErrorBoundary>
         );
+      case 'mockup_clima_atmosfera_arte':
+        // Arte original "El clima como atmósfera viva" (Fable): selector de 5
+        // estados re-tiñe cielo, luz, partículas y tarjetas (datos de muestra).
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="Mockup Clima Atmósfera (arte)">
+              <ClimaAtmosferaArteMockup onBack={() => navigate('dashboard')} />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
       case 'mockup_clima_atmosfera':
         return (
           <ErrorBoundary>
@@ -2447,11 +2469,21 @@ export default function App() {
         // Vista global 3D de la Sierra Nevada de Santa Marta: el macizo maestro
         // (Simmonds + Palomino, bandas de piso térmico, hora dorada). Territorio
         // sagrado tratado con dignidad — crédito a Kogui/Arhuaco/Wiwa/Kankuamo.
-        // Ruta #/mockups/sierra-global, sin auth.
+        // Ruta #/mockups/sierra-global, sin auth. Tocar una banda de piso
+        // térmico SÍ navega de verdad (fix bug P1 huérfanos-3D, rescate
+        // 2026-09-05 de fix/valle2d-fallback-y-sierra-clic): `onSeleccionPiso`
+        // se dispara a MITAD de la transición (pantalla cubierta) y baja al
+        // primer mundo real que `pisosTermicos.js` declara para ese piso. Sin
+        // mundo declarado, no navega (nunca finge una ruta).
         return (
           <ErrorBoundary>
             <ErrorFallback moduleName="Vista global Sierra Nevada">
-              <SierraGlobalMockup />
+              <SierraGlobalMockup
+                onSeleccionPiso={(piso) => {
+                  const mundo = mundoPrincipalDePiso(piso);
+                  if (mundo?.view) navigate(mundo.view);
+                }}
+              />
             </ErrorFallback>
           </ErrorBoundary>
         );
