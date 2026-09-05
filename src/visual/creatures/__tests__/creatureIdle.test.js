@@ -117,7 +117,10 @@ describe('creatureIdle — jaguar SIN mortal (es místico, regla dura 2026-09-03
   const opts = { especie: 'jaguar', hora: 'dorada' };
 
   it('el perfil del jaguar NO declara vuelta (prohibida: es místico, no da el mortal)', () => {
-    expect(IDLE_PERFILES.jaguar.vuelta).toBeUndefined();
+    // El perfil llega proyectado de PERFILES_CONDUCTA con vuelta: null (carril
+    // ausente/excluido = prohibido), no con un carril real. Nulo o ausente, la
+    // máquina lo salta: el jaguar no da el mortal.
+    expect(IDLE_PERFILES.jaguar.vuelta).toBeNull();
   });
 
   it('barrido largo: el jaguar NUNCA da la vuelta de campana (y sigue vivo)', () => {
