@@ -50,27 +50,28 @@ function useReducedMotion() {
  * @param {Function} [props.onNavigate] navegación de la app; sin ella cae al evento chagraNavigate.
  */
 export default function ValleHoverConfirm({ active, onDismiss, onDialogOpenChange, onNavigate }) {
-  const [dialogOpen, setDialogOpen] = useState(false);
+  // `dialogoSolicitado` es la intención del usuario; la visibilidad real del
+  // diálogo se DERIVA (solicitud + hover vigente). Así el diálogo se cierra
+  // solo si el padre retira el hover, sin useEffect con setState (regla
+  // react-hooks/set-state-in-effect).
+  const [dialogoSolicitado, setDialogoSolicitado] = useState(false);
   const [entering, setEntering] = useState(false);
   const reducedMotion = useReducedMotion();
-
-  useEffect(() => {
-    if (!active && !entering) setDialogOpen(false);
-  }, [active, entering]);
+  const dialogOpen = dialogoSolicitado && active;
 
   const abrirDialogo = useCallback(() => {
-    setDialogOpen(true);
+    setDialogoSolicitado(true);
     onDialogOpenChange?.(true);
   }, [onDialogOpenChange]);
 
   const cancelar = useCallback(() => {
-    setDialogOpen(false);
+    setDialogoSolicitado(false);
     onDialogOpenChange?.(false);
     onDismiss?.();
   }, [onDialogOpenChange, onDismiss]);
 
   const confirmar = useCallback(() => {
-    setDialogOpen(false);
+    setDialogoSolicitado(false);
     onDialogOpenChange?.(false);
     setEntering(true);
   }, [onDialogOpenChange]);
@@ -104,7 +105,7 @@ export default function ValleHoverConfirm({ active, onDismiss, onDialogOpenChang
             onClick={abrirDialogo}
           >
             <Sparkles size={17} aria-hidden="true" />
-            <span>Entrá al valle 3D</span>
+            <span>Entra al valle 3D</span>
             <ArrowUpRight size={19} aria-hidden="true" />
           </button>
         </aside>
