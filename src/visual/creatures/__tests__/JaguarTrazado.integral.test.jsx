@@ -14,6 +14,7 @@ import { describe, it, expect, afterEach } from 'vitest';
 import { render, cleanup, screen, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import JaguarTrazado from '../JaguarTrazado.jsx';
+import { JAGUAR_TRAZADO_SVG, TARJETA_MAX_PX } from '../jaguarTrazado/pielTrazado.js';
 import { CREATURES } from '../index.js';
 import { resolveAvatarCreature } from '../../../hooks/useAvatarCreature.js';
 import ChagraAgentAvatarJaguar from '../../../components/ChagraAgentAvatarJaguar.jsx';
@@ -104,5 +105,46 @@ describe('ChagraAgentAvatarJaguar — el agente 2D usa la skin trazada', () => {
     expect(raiz.querySelector('.jh-pataDelLejos')).toBeInTheDocument();
     expect(raiz.querySelector('.jh-pataTrasCerca')).toBeInTheDocument();
     expect(raiz.querySelector('.jh-pataTrasLejos')).toBeInTheDocument();
+  });
+});
+
+describe('JaguarTrazado — ROSETAS DE TARJETA (defecto TIGRE a 64 px, medido 2026-09-04/05)', () => {
+  it('a tamaño de tarjeta (≤ TARJETA_MAX_PX) la raíz lleva data-tarjeta; a 560 px no', () => {
+    expect(TARJETA_MAX_PX).toBe(96);
+    const { container: chica } = render(<JaguarTrazado size={64} />);
+    expect(chica.querySelector('[data-creature="jaguar"]')).toHaveAttribute('data-tarjeta');
+    const { container: fab } = render(<JaguarTrazado size={82} />);
+    expect(fab.querySelector('[data-creature="jaguar"]')).toHaveAttribute('data-tarjeta');
+    const { container: grande } = render(<JaguarTrazado size={560} />);
+    expect(grande.querySelector('[data-creature="jaguar"]')).not.toHaveAttribute('data-tarjeta');
+  });
+
+  it('la capa jt-tarjeta trae SEIS rosetas discretas con punto adentro y el fondo del propio calco fuera de foco', () => {
+    const { container } = render(<JaguarTrazado size={64} />);
+    const capas = container.querySelectorAll('.jt-tarjeta');
+    expect(capas).toHaveLength(1);
+    const rosetas = capas[0].querySelectorAll('.jt-roseta');
+    expect(rosetas).toHaveLength(6);
+    rosetas.forEach((r) => {
+      // anillo de manchas (≥ 5 elipses + la interior) y el punto de adentro
+      expect(r.querySelectorAll('ellipse').length).toBeGreaterThanOrEqual(6);
+      expect(r.querySelector('circle')).toBeTruthy();
+    });
+    // el fondo es el MISMO calco del tronco (ningún parche nuevo), fuera de foco
+    const fondo = capas[0].querySelector('use[filter="url(#jtTarjetaFondo)"]');
+    expect(fondo).toBeTruthy();
+    expect(fondo).toHaveAttribute('href', '#jtCalco-troncoCuerpo');
+  });
+
+  it('la capa viaja OCULTA por su propia regla <style> (hosts sin React ni CSS incluidos) y solo data-tarjeta la enciende', () => {
+    expect(JAGUAR_TRAZADO_SVG).toContain('<style>.jt-tarjeta{display:none}[data-tarjeta] .jt-tarjeta{display:inline}</style>');
+  });
+
+  it('el avatar 2D del agente a 64 px (tarjeta del selector) enciende data-tarjeta sobre la MISMA piel trazada', () => {
+    const { container } = render(<ChagraAgentAvatarJaguar state="idle" size={64} reaccionaPresencia={false} />);
+    const raiz = container.querySelector('div[data-creature="jaguar"]');
+    expect(raiz).toHaveClass('jaguarTrazado');
+    expect(raiz).toHaveAttribute('data-tarjeta');
+    expect(raiz.querySelector('.jt-tarjeta .jt-roseta')).toBeTruthy();
   });
 });
