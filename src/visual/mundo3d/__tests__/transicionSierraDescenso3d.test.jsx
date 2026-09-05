@@ -234,3 +234,70 @@ describe('PASO 4 — el aterrizaje, en pantalla', () => {
     expect(JSON.stringify(despues)).toBe(antes);
   });
 });
+
+describe('PASO 5 — el clima VIVO entra al aterrizaje por el hook', () => {
+  /* La salida de `derivarClima3D` (la forma que `useClima3DVivo` ya expone). */
+  const climaVivo = {
+    senal: true,
+    tieneOpenMeteo: true,
+    condicion: 'niebla',
+    temp: 6.4,
+    tempMin: 1.9,
+    helada: true,
+    ensoFamily: 'nino',
+    alertas: [{ tipo: 'helada', mensaje: 'aviso de helada en el páramo' }],
+  };
+
+  it('con dato: tinta (ahora, esta noche), aviso local y la tiza de helada de El Niño', async () => {
+    render(
+      <TransicionSierraMundo
+        activa
+        escena3d
+        tier="alto"
+        msnmUsuario={2640}
+        faseEnso="el_nino"
+        climaVivo={climaVivo}
+      />,
+    );
+    await esperarLienzo();
+    const txt = document.querySelector('.tsm__aterrizaje').textContent.toLowerCase();
+    expect(txt).toContain('niebla de ladera · 6° · ahora');
+    expect(txt).toContain('esta noche baja a 2°');
+    expect(txt).toContain('aviso de helada en el páramo');
+    expect(txt).toContain('más helada, no menos');
+  });
+
+  it('la prioridad manda: la tiza de helada tapa la del cultivo (una sola tiza)', async () => {
+    render(
+      <TransicionSierraMundo
+        activa
+        escena3d
+        tier="alto"
+        msnmUsuario={2640}
+        climaVivo={climaVivo}
+        sugerencias={[{ suggestion: { severity: 'critical', text: 'proteja su gulupa esta noche' } }]}
+      />,
+    );
+    await esperarLienzo();
+    const txt = document.querySelector('.tsm__aterrizaje').textContent;
+    expect(txt).toContain('Puede helar');
+    expect(txt).not.toContain('proteja su gulupa');
+  });
+
+  it('sin señal el aterrizaje no inventa clima: nada de tinta, avisos ni tiza extra', async () => {
+    render(
+      <TransicionSierraMundo
+        activa
+        escena3d
+        tier="alto"
+        msnmUsuario={2640}
+        climaVivo={{ ...climaVivo, senal: false }}
+      />,
+    );
+    await esperarLienzo();
+    const txt = document.querySelector('.tsm__aterrizaje').textContent;
+    expect(txt).not.toMatch(/· ahora/);
+    expect(txt).not.toMatch(/esta noche baja/);
+    expect(txt).not.toMatch(/aviso de helada/);
+  });
+});
