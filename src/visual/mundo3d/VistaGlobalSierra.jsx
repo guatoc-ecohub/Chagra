@@ -95,6 +95,7 @@ import { MarSierra, PERFIL_PLAYA, PERFIL_PARAMO } from './sierra/marSierra.js';
 import { NUBES_POR_TIER, nubesAlisios, nubesOrograficas, nubesInterior, geometriaCumulos } from './sierra/nubesSierra.js';
 import { faseEnsoViva } from './sierra/aterrizajeDescenso.js';
 import { datoPisoPorId, TOTAL_ESPECIES_CATALOGO } from '../../services/sierraPisosDatos.js';
+import useClima3DVivo from '../../hooks/useClima3DVivo.js';
 
 /* ── Geografía del macizo: la ley de altura, la costa y las cotas viven en
       `sierra/sierraRelieve.js` (una sola montaña para la vista global, el
@@ -779,6 +780,8 @@ const CSS_SIERRA = `
  * @param {string}  [props.pisoUsuario]  piso de la finca a resaltar (opcional).
  * @param {(piso:object)=>void} [props.onSeleccionPiso]  se llama al llegar al piso seleccionado.
  * @param {string}  [props.className]  clases extra del contenedor.
+ * @param {Array}   [props.sugerencias]  salida de `buildClimaCultivoSuggestions`
+ *        si el host ya la calculó (sin plantas no hay tiza de SU cultivo).
  */
 export default function VistaGlobalSierra({
   tier = 'alto',
@@ -786,8 +789,14 @@ export default function VistaGlobalSierra({
   pisoUsuario,
   onSeleccionPiso,
   className = '',
+  sugerencias = [],
 }) {
   const [listo, setListo] = useState(false);
+  /* El clima de la finca entra por el MISMO hook que la vitrina 2D y la Página
+     del Tiempo (`useClima3DVivo`): lee la cache compartida y escucha el evento.
+     Se baja al aterrizaje del descenso para que la Sierra absorba el dato que
+     ya existe, sin armar un camino paralelo a `climaService`. */
+  const climaVivo = useClima3DVivo();
   /* GATE (2026-09-04): `?viaje=<id de banda>` (antes del hash) arranca el viaje a
      ese piso sin clic — es lo que permite capturar el descenso congelado con
      `?msnm=`. Estado INICIAL perezoso (nada de setState en un efecto); sin el
@@ -865,6 +874,8 @@ export default function VistaGlobalSierra({
         reducedMotion={reducedMotion}
         onMitad={llegarAPiso}
         onFin={terminarViaje}
+        climaVivo={climaVivo}
+        sugerencias={sugerencias}
       />
 
       {/* Chrome DOM anclado a la composición: título arriba; abajo la clave de
