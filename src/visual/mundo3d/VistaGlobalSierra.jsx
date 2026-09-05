@@ -70,6 +70,7 @@ import {
   NIEVE, anadirAtributoNieve, crearInyectorNieve, muestreadorFacetas, contornoNivel, geometriaCinta, texturaCinta, texturaNubeMasa,
 } from './sierra/nieveSierra.js';
 import { faseEnsoViva } from './sierra/aterrizajeDescenso.js';
+import { datoPisoPorId, TOTAL_ESPECIES_CATALOGO } from '../../services/sierraPisosDatos.js';
 
 /* ── Geografía del macizo (validada contra el DR: mar al norte, macizo al sur,
       cumbres gemelas + Simmonds, costa de Palomino). Coordenadas de MUNDO:
@@ -492,6 +493,65 @@ function CreditoPueblos() {
   );
 }
 
+/* Panel de DATOS REALES por piso térmico (2026-09-04, sierra-datos-por-piso):
+   cuando hay un piso activo (banda tocada o `?viaje=`), muestra qué crece ahí
+   con números verificables —catálogo (`thermal_zones`) y grafo (`_piso_termico`)—
+   en vez de prosa. Un piso sin especie documentada (superpáramo y nival en el
+   catálogo) dice "Sin datos para este piso", que es la verdad medida. */
+function PanelDatosPiso({ pisoId }) {
+  const dato = datoPisoPorId(pisoId);
+  if (!dato) return null;
+
+  const maxMostrar = 8;
+  const visibles = dato.representativos.slice(0, maxMostrar);
+  const restantes = dato.representativos.length - visibles.length;
+  const vacioDeDatos = !dato.con_dato;
+
+  const clima = [
+    dato.altitud_m?.min ?? null,
+    dato.altitud_m?.max ?? null,
+  ].every((v) => typeof v === 'number') && dato.temperatura_media_c?.min != null && dato.temperatura_media_c?.max != null
+    ? `${dato.altitud_m.min}–${dato.altitud_m.max} m · ${dato.temperatura_media_c.min}–${dato.temperatura_media_c.max} °C`
+    : null;
+
+  return (
+    <aside className="vsierra-datos" data-testid="panel-datos-piso" aria-live="polite">
+      {vacioDeDatos ? (
+        <>
+          <p className="vsierra-datos__tit">{dato.nombre || pisoId}</p>
+          <p className="vsierra-datos__vacio">Sin datos para este piso: sin especies documentadas en el catálogo.</p>
+          {dato.formacion ? <p className="vsierra-datos__formacion">{dato.formacion}</p> : null}
+        </>
+      ) : (
+        <>
+          <p className="vsierra-datos__tit">
+            {dato.nombre}
+            {clima ? <span>{clima}</span> : null}
+          </p>
+          <p className="vsierra-datos__num">
+            <strong>{dato.catalogo_total}</strong> especies documentadas en el catálogo
+            <small>· {dato.grafo_rango} del grafo en este rango</small>
+          </p>
+          {dato.formacion ? <p className="vsierra-datos__formacion">{dato.formacion}</p> : null}
+          {visibles.length > 0 ? (
+            <>
+              <ul className="vsierra-datos__lista">
+                {visibles.map((r) => (
+                  <li key={r.id}>{r.nombre}</li>
+                ))}
+              </ul>
+              {restantes > 0 ? <p className="vsierra-datos__mas">y {restantes} más</p> : null}
+            </>
+          ) : null}
+          <p className="vsierra-datos__nota">
+            De las {TOTAL_ESPECIES_CATALOGO} especies del catálogo. Fuente: catálogo de especies y grafo de Chagra.
+          </p>
+        </>
+      )}
+    </aside>
+  );
+}
+
 /**
  * SierraDiorama — el grupo r3f puro de la Sierra, para COMPONER dentro de un
  * `<Canvas>` propio (otra escena, un mockup, un preview). Trae el terreno, el
@@ -585,6 +645,18 @@ const CSS_SIERRA = `
 .vsierra-titulo { margin: 0; padding: 0.9rem 1rem 0; color: #3a2a18; text-shadow: 0 1px 4px rgba(255,246,224,0.85); font: 700 1.15rem/1.2 system-ui, sans-serif; letter-spacing: 0.01em; }
 .vsierra-titulo small { display: block; font: 500 0.8rem/1.3 system-ui, sans-serif; opacity: 0.78; margin-top: 0.15rem; }
 .vsierra-clave { align-self: flex-end; margin: 0 0.8rem 0.55rem; display: flex; flex-direction: column; gap: 0.24rem; padding: 0.5rem 0.65rem; border-radius: 0.7rem; background: rgba(255,248,233,0.72); backdrop-filter: blur(3px); box-shadow: 0 4px 14px rgba(60,42,24,0.16); }
+.vsierra-datos { align-self: flex-end; margin: 0.55rem 0.8rem 0 0; max-width: min(19rem, calc(100vw - 2rem)); padding: 0.62rem 0.78rem; border-radius: 0.7rem; background: rgba(255,248,233,0.8); backdrop-filter: blur(3px); box-shadow: 0 4px 14px rgba(60,42,24,0.16); font: 500 0.72rem/1.35 system-ui, sans-serif; color: #3a2a18; }
+.vsierra-datos__tit { margin: 0; font-weight: 700; font-size: 0.85rem; }
+.vsierra-datos__tit span { display: block; font-weight: 500; opacity: 0.72; font-size: 0.72rem; }
+.vsierra-datos__num { margin: 0.18rem 0 0.1rem; }
+.vsierra-datos__num strong { font-size: 1.12rem; }
+.vsierra-datos__num small { display: block; opacity: 0.72; }
+.vsierra-datos__formacion { margin: 0.1rem 0 0; opacity: 0.8; }
+.vsierra-datos__lista { margin: 0.18rem 0 0; padding: 0 0 0 1rem; }
+.vsierra-datos__lista li { margin: 0.04rem 0; }
+.vsierra-datos__mas { margin: 0.12rem 0 0; opacity: 0.7; }
+.vsierra-datos__nota { margin: 0.28rem 0 0; padding-top: 0.28rem; border-top: 1px solid rgba(60,42,24,0.14); opacity: 0.62; font-size: 0.66rem; }
+.vsierra-datos__vacio { margin: 0.18rem 0 0; }
 .vsierra-clave li { display: flex; align-items: center; gap: 0.42rem; list-style: none; font: 500 0.72rem/1.1 system-ui, sans-serif; color: #3a2a18; }
 .vsierra-clave b { width: 12px; height: 12px; border-radius: 3px; flex: 0 0 auto; box-shadow: inset 0 0 0 1px rgba(60,42,24,0.18); }
 .vsierra-clave ul { margin: 0; padding: 0; }
@@ -702,6 +774,7 @@ export default function VistaGlobalSierra({
           Sierra Nevada de Santa Marta
           <small>Del Caribe a la nieve: todos los pisos térmicos en un solo macizo</small>
         </h2>
+        <PanelDatosPiso pisoId={pisoActivo} />
         <div className="vsierra-abajo">
           <ul className="vsierra-clave" aria-label="Pisos térmicos, de la nieve al mar">
             {CLAVE_PISOS.map((b) => (
