@@ -1,0 +1,245 @@
+<!doctype html>
+<html lang="es-CO">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Sylva s48 — Batch e instancing por LOD y especie (masa del valle)</title>
+<style>
+  html,body{margin:0;height:100%;overflow:hidden;background:#0b0f0c;font-family:system-ui,-apple-system,"Segoe UI",sans-serif}
+  #c{display:block;width:100vw;height:100vh;touch-action:none}
+  #hud{position:fixed;top:14px;left:14px;padding:10px 14px;border-radius:12px;
+    background:rgba(10,18,12,.55);color:#eaffef;font-size:13px;line-height:1.55;
+    backdrop-filter:blur(8px);z-index:10;min-width:360px;box-shadow:0 8px 24px rgba(0,0,0,.25)}
+  #hud .row{display:flex;justify-content:space-between;gap:18px}
+  #hud .k{opacity:.68}
+  #hud b{font-variant-numeric:tabular-nums}
+  #err{position:fixed;inset:auto 14px 14px auto;max-width:72vw;color:#ffd9d9;background:rgba(90,20,20,.78);
+    padding:8px 12px;border-radius:10px;font-size:12px;white-space:pre-wrap;z-index:20;display:none}
+</style>
+<script type="importmap">
+{
+  "imports": {
+    "three": "./vendor/three.module.js",
+    "three/addons/": "./vendor/addons/"
+  }
+}
+</script>
+</head>
+<body>
+<canvas id="c"></canvas>
+<div id="hud">
+  <div class="row"><span class="k">FPS</span><b id="fps">--</b></div>
+  <div class="row"><span class="k">Modo s48</span><b id="modo">--</b></div>
+  <div class="row"><span class="k">Cámara</span><b id="cam">--</b></div>
+  <div class="row"><span class="k">Semilla · árboles</span><b id="seed">--</b></div>
+  <div class="row"><span class="k">Especies</span><b id="spp">--</b></div>
+  <div class="row"><span class="k">Copas dibujadas / total</span><b id="copas">--</b></div>
+  <div class="row"><span class="k">Tris bake full/mid/lejos</span><b id="tris">--</b></div>
+  <div class="row"><span class="k">Niveles full/mid/lejos</span><b id="niv">--</b></div>
+  <div class="row"><span class="k">Triángulos dibujados</span><b id="drawtris">--</b></div>
+  <div class="row"><span class="k">Umbral px (full/mid)</span><b id="th">--</b></div>
+</div>
+<div id="err"></div>
+<script type="module">
+// ═══════════════════════════════════════════════════════════════════════════
+// Sylva s48 — BATCH E INSTANCING POR LOD Y ESPECIE
+// realistic-forest (github.com/Token-Gremlin/realistic-forest, MIT © 2026 Token
+// Gremlin; notice retenido en lib3d/flora/LICENSE-sylva-MIT) no crea una malla
+// por árbol ni por rodal: cada (especie × LOD) es UN draw instanciado y todo
+// individuo de esa especie que en pantalla cae a ese LOD escribe su instancia
+// en el MISMO bucket (Trees.js `_makeDraws`/`_rebuildBuckets`). El número de
+// draws queda fijo y NO crece con los rodales; la asignación de LOD es en vivo
+// por altura proyectada en píxeles con histéresis. Así cada especie conserva su
+// mezcla hasta el fondo (no se la elimina de la franja lejana).
+//
+// Banco A/B sobre el código REAL del bosque del valle (bakearArbolMasa + s47
+// `nivel` + fusionarCopaMasa + materialCopaMasaInstanciada):
+//   ?s48=0  brazo A 'rodal':  un InstancedMesh por (población × especie), cada
+//           población con UN solo nivel de bake (full cerca / lejos lejos) —
+//           la arquitectura "un draw call por rodal" previa al lote.
+//   ?s48=1  brazo B 'batch':  un InstancedMesh por (especie × nivel), FIJO,
+//           y cada árbol se reubica en vivo por su altura proyectada.
+// Mismas semillas → mismísimos árboles y matrices; cambia solo la arquitectura
+// de dibujo. Emulación original del patrón; sin código literal de Sylva ni
+// dependencias nuevas.
+// ═══════════════════════════════════════════════════════════════════════════
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import {
+  NIVELES_SYLVA, PERFILES_BOSQUE_S48, umbralesPx, BANDAS_POR_DEFECTO,
+  bakearLodPorEspecie, poblarRodales, componerMatrices,
+  montarRodal, montarBatch,
+} from './lib3d/flora/lodEspecieSylva.js';
+
+const err = document.getElementById('err');
+addEventListener('error', (e) => { err.style.display = 'block'; err.textContent = 'ERROR: ' + (e.message || e); });
+addEventListener('unhandledrejection', (e) => { err.style.display = 'block'; err.textContent = 'REJECT: ' + ((e.reason && e.reason.message) || e.reason); });
+
+const q = new URLSearchParams(location.search);
+const S48 = q.get('s48') !== '0';                    // 1 = batch por especie×nivel; 0 = por rodal
+const _seed = Number(q.get('seed'));
+const SEED = Number.isInteger(_seed) && _seed >= 0 ? _seed : 20027;
+const CAM = q.get('cam') || 'mid';
+const ESCALA_N = Math.min(3, Math.max(0.3, Number(q.get('n')) || 1));  // multiplicador de árboles
+const ESPECIES = PERFILES_BOSQUE_S48;
+const bandas = BANDAS_POR_DEFECTO.map((b) => ({ ...b, n: Math.round(b.n * ESCALA_N) }));
+const umbrales = umbralesPx(q);
+
+const renderer = new THREE.WebGLRenderer({ canvas: document.getElementById('c'), antialias: true });
+renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.5));
+renderer.setSize(innerWidth, innerHeight);
+renderer.toneMapping = THREE.AgXToneMapping;      // = main.js del valle
+renderer.toneMappingExposure = 1.55;
+renderer.outputColorSpace = THREE.SRGBColorSpace;
+window.__r = renderer;
+
+const scene = new THREE.Scene();
+const fogColor = 0xbfd0c6;
+scene.background = new THREE.Color(fogColor);
+scene.fog = new THREE.Fog(fogColor, 120, 640);
+window.__escena = scene;
+
+const camera = new THREE.PerspectiveCamera(50, innerWidth / innerHeight, 0.1, 1400);
+window.__cam = camera;
+const controls = new OrbitControls(camera, renderer.domElement);
+controls.enableDamping = false;   // capturas estables (A/B idéntico a ojo)
+window.__ctl = controls;
+
+scene.add(new THREE.HemisphereLight(0x93a8c2, 0x1c2314, 0.55));
+const sol = new THREE.DirectionalLight(0xffe0c0, 2.7);
+sol.position.set(-40, 85, 30);
+scene.add(sol);
+
+const groundGeo = new THREE.CircleGeometry(560, 96);
+groundGeo.rotateX(-Math.PI / 2);
+scene.add(new THREE.Mesh(groundGeo, new THREE.MeshStandardMaterial({ color: 0x4e6a36, roughness: 1, metalness: 0 })));
+
+// ── bake + siembra (UNA vez; compartida por ambos brazos) ───────────────────
+const { porEspecie, trisPorNivel } = bakearLodPorEspecie({ especies: ESPECIES, seed: SEED });
+const { arboles, porBanda } = poblarRodales({ seed: SEED, bandas, especies: ESPECIES });
+const matrices = componerMatrices(THREE, arboles, porEspecie);
+window.__trisBake = trisPorNivel;
+
+// ── tronco compartido (como el valle: un solo lote para todos los bosques) ──
+const trunkGeo = new THREE.CylinderGeometry(0.22, 0.34, 2.4, 5);
+trunkGeo.translate(0, 1.0, 0);
+const trunkMat = new THREE.MeshStandardMaterial({ color: 0x4a3826, roughness: 0.95, flatShading: true });
+const troncos = new THREE.InstancedMesh(trunkGeo, trunkMat, arboles.length);
+matrices.forEach((m, i) => troncos.setMatrixAt(i, m));
+troncos.instanceMatrix.needsUpdate = true;
+troncos.frustumCulled = false;
+scene.add(troncos);
+
+// ── brazos A y B (grupos conmutables) ───────────────────────────────────────
+const brazoA = montarRodal(THREE, { porEspecie, bandas, especies: ESPECIES, arboles, porBanda, matrices });
+const brazoB = montarBatch(THREE, { porEspecie, especies: ESPECIES, arboles, matrices, umbrales });
+scene.add(brazoA.group);
+scene.add(brazoB.group);
+window.__sincronizarS48 = (camara, alto, forzar) => brazoB.sincronizar(camara, alto, forzar);
+
+let modoActual = S48 ? 'batch' : 'rodal';
+brazoA.group.visible = modoActual === 'rodal';
+brazoB.group.visible = modoActual === 'batch';
+
+function medirCopasDibujadas() {
+  let visibles = 0, instancias = 0, porNivel = { full: 0, mid: 0, lejos: 0 };
+  const grupo = modoActual === 'batch' ? brazoB.group : brazoA.group;
+  const copas = modoActual === 'batch' ? brazoB.copas : brazoA.copas;
+  if (modoActual === 'batch') {
+    for (const sp of ESPECIES) {
+      for (const nivel of NIVELES_SYLVA) {
+        const mesh = copas[sp.clave][nivel];
+        if (mesh.visible && mesh.count > 0) { visibles++; instancias += mesh.count; porNivel[nivel] += mesh.count; }
+      }
+    }
+    return { visibles, instancias, porNivel, meshesTotal: ESPECIES.length * 3 };
+  }
+  const lista = Array.isArray(copas) ? copas : [];
+  for (const mesh of lista) {
+    if (mesh.visible && mesh.count > 0) { visibles++; instancias += mesh.count; porNivel[mesh.userData.s48.nivel] += mesh.count; }
+  }
+  return { visibles, instancias, porNivel, meshesTotal: lista.length };
+}
+
+// ── cámaras ──────────────────────────────────────────────────────────────────
+const CAMERAS = {
+  near: { pos: [8, 6, 18], tgt: [0, 6, 0], fov: 55 },
+  mid: { pos: [4, 34, 120], tgt: [0, 8, 0], fov: 50 },
+  wide: { pos: [40, 130, 340], tgt: [0, 8, -20], fov: 50 },
+};
+const c = CAMERAS[CAM] || CAMERAS.mid;
+camera.position.set(...c.pos);
+camera.fov = c.fov;
+camera.updateProjectionMatrix();
+controls.target.set(...c.tgt);
+controls.update();
+
+// hooks del gate
+window.__s48 = {
+  activa: S48, semilla: SEED, camara: CAM, arboles: arboles.length, umbrales: { ...umbrales },
+};
+window.__medirS48 = () => {
+  const copas = medirCopasDibujadas();
+  return {
+    activa: modoActual === 'batch', modo: modoActual, semilla: SEED, camara: CAM, arboles: arboles.length,
+    umbrales: { ...umbrales },
+    trisPorBake: { ...trisPorNivel },
+    copasDibujadas: copas.visibles, meshesCopa: copas.meshesTotal, instancias: copas.instancias,
+    niveles: copas.porNivel,
+    gl: window.__r?.getContext?.()?.getError?.() ?? null,
+    calls: renderer.info.render.calls,
+    dibujados: renderer.info.render.triangles,
+  };
+};
+window.__ARRANQUE_OK = true;
+window.__ARRANQUE_FALLO = false;
+
+function pintarHud() {
+  const m = window.__medirS48();
+  document.getElementById('modo').textContent = m.modo === 'batch' ? 'batch especie×nivel' : 'rodal (draw por rodal×especie)';
+  document.getElementById('cam').textContent = `${CAM}`;
+  document.getElementById('seed').textContent = `${SEED} · ${m.arboles}`;
+  document.getElementById('spp').textContent = ESPECIES.map((e) => e.clave.split('_')[0]).join(', ');
+  document.getElementById('copas').textContent = `${m.copasDibujadas} / ${m.meshesCopa}`;
+  document.getElementById('tris').textContent = `${(trisPorNivel.full / 1e3).toFixed(0)}k / ${(trisPorNivel.mid / 1e3).toFixed(0)}k / ${(trisPorNivel.lejos / 1e3).toFixed(0)}k`;
+  document.getElementById('niv').textContent = `${m.niveles.full} / ${m.niveles.mid} / ${m.niveles.lejos}`;
+  document.getElementById('drawtris').textContent = (m.dibujados / 1e3).toFixed(0) + 'k';
+  document.getElementById('th').textContent = `${umbrales.fullEnter}/${umbrales.midEnter}`;
+}
+pintarHud();
+
+const drawingBuffer = new THREE.Vector2();
+const clock = new THREE.Clock();
+let frames = 0, fpsT = 0;
+let ultimoCam = null, ultimoAlto = -1;
+function tick() {
+  requestAnimationFrame(tick);
+  controls.update();
+  renderer.getDrawingBufferSize(drawingBuffer);
+  const camSig = `${camera.position.x.toFixed(3)}|${camera.position.y.toFixed(3)}|${camera.position.z.toFixed(3)}`;
+  if (modoActual === 'batch' && (camSig !== ultimoCam || drawingBuffer.y !== ultimoAlto)) {
+    // El reparto en vivo solo se re-calculó cuando cambia la cámara/proyección,
+    // no por frame: las matrices de instancias ya escritas no se tocan.
+    brazoB.sincronizar(camera, drawingBuffer.y, ultimoCam === null);
+    ultimoCam = camSig; ultimoAlto = drawingBuffer.y;
+  }
+  renderer.render(scene, camera);
+  frames++; fpsT += clock.getDelta();
+  if (fpsT >= 0.5) {
+    const m = window.__medirS48();
+    document.getElementById('fps').textContent = Math.round(frames / fpsT);
+    document.getElementById('copas').textContent = `${m.copasDibujadas} / ${m.meshesCopa}`;
+    document.getElementById('niv').textContent = `${m.niveles.full} / ${m.niveles.mid} / ${m.niveles.lejos}`;
+    document.getElementById('drawtris').textContent = (m.dibujados / 1e3).toFixed(0) + 'k';
+    frames = 0; fpsT = 0;
+  }
+}
+tick();
+addEventListener('resize', () => {
+  camera.aspect = innerWidth / innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(innerWidth, innerHeight);
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,347 @@
+<!doctype html>
+<html lang="es-CO">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Sylva s12 — Wildflowers con spawn por ruido (banco del valle)</title>
+<style>
+  html,body{margin:0;height:100%;overflow:hidden;background:#0b120c;font-family:system-ui,-apple-system,"Segoe UI",sans-serif}
+  #c{display:block;width:100vw;height:100vh;touch-action:none}
+  #hud{position:fixed;top:14px;left:14px;padding:10px 14px;border-radius:12px;
+    background:rgba(10,18,12,.58);color:#eaffef;font-size:13px;line-height:1.55;
+    backdrop-filter:blur(8px);z-index:10;min-width:304px;box-shadow:0 8px 24px rgba(0,0,0,.25)}
+  #hud .row{display:flex;justify-content:space-between;gap:18px}
+  #hud .k{opacity:.68}
+  #hud b{font-variant-numeric:tabular-nums}
+  #err{position:fixed;inset:auto 14px 14px auto;max-width:72vw;color:#ffd9d9;background:rgba(90,20,20,.78);
+    padding:8px 12px;border-radius:10px;font-size:12px;white-space:pre-wrap;z-index:20;display:none}
+</style>
+<script type="importmap">
+{
+  "imports": {
+    "three": "./vendor/three.module.js",
+    "three/addons/": "./vendor/addons/"
+  }
+}
+</script>
+</head>
+<body>
+<canvas id="c"></canvas>
+<div id="hud">
+  <div class="row"><span class="k">FPS</span><b id="fps">--</b></div>
+  <div class="row"><span class="k">Modo spawn</span><b id="modo">--</b></div>
+  <div class="row"><span class="k">Semilla / cámara</span><b id="seed">--</b></div>
+  <div class="row"><span class="k">Flores</span><b id="n">--</b></div>
+  <div class="row"><span class="k">CV vecino-más-cercano</span><b id="cvnn">--</b></div>
+  <div class="row"><span class="k">Alineación retícula</span><b id="grid">--</b></div>
+  <div class="row"><span class="k">Draw calls / tris</span><b id="draws">--</b></div>
+</div>
+<div id="err"></div>
+<script type="module">
+// ═══════════════════════════════════════════════════════════════════════════
+// Sylva s12 — WILDFLOWERS CON SPAWN POR RUIDO
+// Realistic-forest (github.com/Token-Gremlin/realistic-forest, MIT © 2026 Token
+// Gremlin; notice retenido en lib3d/flora/LICENSE-sylva-MIT) NO siembra la
+// vegetación baja como cuadrícula ni como Math.random: cada chunk genera puntos
+// candidatos desde un LATTICE con hash y jitter determinista, y cada punto se
+// acepta solo si supera un umbral de "ecología" que vive en un campo de ruido.
+// Resultado: las flores forman manchas y claros con la distribución del ruido,
+// nunca una retícula repetida ni un reguero parejo.
+//
+// Este banco emula ESA técnica de DISTRIBUCIÓN —no las máscaras de pétalo, que
+// el valle ya porta de cortiz/stylized-components en floresParamo.js— sobre el
+// suelo de potrero del valle (el prado que en flora.js cubre pasto de MASA):
+//   ?s12=0  baseline GRID: un punto por celda del lattice en el centro exacto
+//           con micro-jitter de 1% (solo anti-aliasing). Retícula legible.
+//   ?s12=1  (default) SYLVA: los candidatos nacen del MISMO lattice, se corren
+//           con un hash de la celda (hasta ±0.85·celda) y se aceptan si un campo
+//           de ruido de baja frecuencia (fbm → "claro fértil") supera ?umbral=.
+// A/B pareado sobre el MISMO seed y cámara: cambia solo el spawn; la flor es la
+// misma geometría y el costo por instancia igual. La "mejora medible" es de
+// DISTRIBUCIÓN: CV de vecino-más-cercano y alineación a retícula (un grid
+// perfecto da CV→0 y alineación→1; el ruido rompe la periodicidad sin dejar de
+// ser determinista por semilla).
+// ═══════════════════════════════════════════════════════════════════════════
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+
+const err = document.getElementById('err');
+addEventListener('error', (e) => { err.style.display = 'block'; err.textContent = 'ERROR: ' + (e.message || e); });
+addEventListener('unhandledrejection', (e) => { err.style.display = 'block'; err.textContent = 'REJECT: ' + ((e.reason && e.reason.message) || e.reason); });
+
+const q = new URLSearchParams(location.search);
+const S12 = q.get('s12') !== '0';                       // 1 = sylva noise; 0 = grid baseline
+const _seed = Number(q.get('seed'));
+const SEED = Number.isInteger(_seed) && _seed >= 0 ? _seed : 20027;
+const CAM = q.get('cam') || 'mid';
+const RADIO = Math.max(20, Math.min(240, Number(q.get('r')) || 92));    // radio del prado
+const ESP = Math.max(1.2, Math.min(10, Number(q.get('d')) || 4.0));     // celda lattice (u)
+const UMBRAL = Math.max(0.15, Math.min(0.85, Number(q.get('umbral')) || 0.5));
+
+// ── PRNG hash determinista POR CELDA (no secuencial: mismo punto en A y B) ───
+function mulberry32(a) {
+  return function () {
+    a |= 0; a = a + 0x6D2B79F5 | 0;
+    let t = Math.imul(a ^ a >>> 15, 1 | a);
+    t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t;
+    return ((t ^ t >>> 14) >>> 0) / 4294967296;
+  };
+}
+const rndCelda = (i, j) => {
+  const a = (SEED ^ Math.imul(i + 37, 0x9e3779b9) ^ Math.imul(j + 11, 0x85ebca6b)) >>> 0;
+  return mulberry32(a || 1);
+};
+// ruido fbm determinista (firma análoga a la de terrain.js fbm, sin el DEM)
+function fbm(x, z, oct = 3, lac = 2.0, gain = 0.5) {
+  let a = 1, f = 1, s = 0, n = 0;
+  for (let o = 0; o < oct; o++) {
+    s += a * (Math.sin(x * f * 0.021 + 3.1) * Math.sin(z * f * 0.017 + 1.7) + Math.cos(x * f * 0.013 + z * f * 0.011));
+    a *= gain; f *= lac; n += a;
+  }
+  return s / n;
+}
+const fert = (x, z) => 0.5 + 0.5 * Math.tanh(fbm(x + 17, z - 9, 3) + 0.15 * Math.sin(x * 0.043) * Math.cos(z * 0.037));
+
+// ── spawn: los DOS modos nacen del mismo lattice; cambia jitter+aceptación ──
+const puntos = [];
+{
+  const pasos = Math.floor(RADIO / ESP);
+  for (let j = -pasos; j <= pasos; j++) {
+    for (let i = -pasos; i <= pasos; i++) {
+      const x = i * ESP, z = j * ESP;
+      if (x * x + z * z > RADIO * RADIO) continue;
+      const r = rndCelda(i, j);
+      if (S12) {
+        const dx = (r() - 0.5) * 1.7 * ESP;
+        const dz = (r() - 0.5) * 1.7 * ESP;
+        const fx = x + dx, fz = z + dz;
+        if (fx * fx + fz * fz > RADIO * RADIO) continue;
+        const prob = THREE.MathUtils.clamp((fert(fx, fz) - UMBRAL) * 2.6 + 0.62, 0, 1);
+        if (r() > prob) continue;
+        puntos.push({ x: fx, z: fz });
+      } else {
+        const dx = (r() - 0.5) * 0.02 * ESP;
+        const dz = (r() - 0.5) * 0.02 * ESP;
+        puntos.push({ x: x + dx, z: z + dz });
+      }
+    }
+  }
+}
+
+// ── escena ───────────────────────────────────────────────────────────────────
+const renderer = new THREE.WebGLRenderer({ canvas: document.getElementById('c'), antialias: true });
+renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.5));
+renderer.setSize(innerWidth, innerHeight);
+renderer.toneMapping = THREE.AgXToneMapping;
+renderer.toneMappingExposure = 1.5;
+renderer.outputColorSpace = THREE.SRGBColorSpace;
+window.__r = renderer;
+
+const scene = new THREE.Scene();
+const fogColor = 0xcfdac8;
+scene.background = new THREE.Color(fogColor);
+scene.fog = new THREE.Fog(fogColor, RADIO * 2.6, RADIO * 6.0);
+window.__escena = scene;
+
+const camera = new THREE.PerspectiveCamera(50, innerWidth / innerHeight, 0.1, 1200);
+window.__cam = camera;
+const controls = new OrbitControls(camera, renderer.domElement);
+controls.enableDamping = false;   // capturas estables (A/B idéntico a ojo)
+window.__ctl = controls;
+
+scene.add(new THREE.HemisphereLight(0x93a8c2, 0x1c2314, 0.62));
+const sol = new THREE.DirectionalLight(0xffe0c0, 2.6);
+sol.position.set(-40, 85, 30);
+scene.add(sol);
+
+// prado de potrero (verde de MASA como pasto-potrero de flora.js)
+const groundGeo = new THREE.CircleGeometry(RADIO + 8, 96);
+groundGeo.rotateX(-Math.PI / 2);
+const groundMat = new THREE.MeshStandardMaterial({ color: 0x52793c, roughness: 1, metalness: 0 });
+const ground = new THREE.Mesh(groundGeo, groundMat);
+ground.position.y = -0.02;
+scene.add(ground);
+
+// ── daisy horneada (8 pétalos + centro) en UNA geo con vertex colors ─────────
+// Pétalos = esferoides alargados acostados en anillo; centro = esferoide chico
+// más arriba (capítulo). Una InstancedMesh por especie = 1 draw call por paleta.
+const _V = new THREE.Vector3(), _N = new THREE.Vector3(), _M = new THREE.Matrix4();
+function mergePiezas(piezas) {
+  const pos = [], nor = [], col = [];
+  for (const pz of piezas) {
+    // a triángulos sueltos: cada vértice se repite por triángulo (geo no-indexada)
+    const geo = pz.geo.index ? pz.geo.toNonIndexed() : pz.geo;
+    const cnt = geo.attributes.position.count;
+    for (let v = 0; v < cnt; v++) {
+      _V.fromBufferAttribute(geo.attributes.position, v).applyMatrix4(pz.m);
+      _N.fromBufferAttribute(geo.attributes.normal, v).transformDirection(pz.m).normalize();
+      pos.push(_V.x, _V.y, _V.z);
+      nor.push(_N.x, _N.y, _N.z);
+      col.push(pz.c.r, pz.c.g, pz.c.b);
+    }
+    if (geo !== pz.geo) geo.dispose();
+  }
+  const g = new THREE.BufferGeometry();
+  g.setAttribute('position', new THREE.BufferAttribute(new Float32Array(pos), 3));
+  g.setAttribute('normal', new THREE.BufferAttribute(new Float32Array(nor), 3));
+  g.setAttribute('color', new THREE.BufferAttribute(new Float32Array(col), 3));
+  g.computeBoundingSphere();
+  return g;
+}
+function daisyPiezas(petaCol) {
+  // margarita de prado ~1 u de diámetro ya con la escala de instancia (esc ~1).
+  // Pétalo: esfera unitaria estirada (0,55 radial · 0,20 ancho lateral · 0,07 Y).
+  const pet = new THREE.SphereGeometry(0.5, 6, 3);
+  const pC = new THREE.Color(petaCol), cC = new THREE.Color(0xb8862c);
+  const piezas = [];
+  const N = 8;
+  const R = 0.34;                       // centro del pétalo (radio del anillo)
+  for (let k = 0; k < N; k++) {
+    const a = (k / N) * Math.PI * 2;
+    const S = new THREE.Vector3(0.58, 0.07, 0.2);
+    const m = new THREE.Matrix4().makeRotationY(-a).scale(S);
+    m.setPosition(Math.cos(a) * R, 0.06, Math.sin(a) * R);
+    piezas.push({ geo: pet, m, c: pC });
+  }
+  // centro (capítulo) encima del anillo, para que los pétalos no queden tapados
+  const cen = new THREE.SphereGeometry(0.5, 6, 3);
+  const mC = new THREE.Matrix4().makeScale(0.24, 0.12, 0.24);
+  mC.setPosition(0, 0.10, 0);
+  piezas.push({ geo: cen, m: mC, c: cC });
+  pet.dispose(); cen.dispose();
+  return piezas;
+}
+const PALETAS = [
+  { petal: 0xdfe3bb },   // valeriana crema (mayoría)
+  { petal: 0xf2c94c },   // árnica amarilla (acento)
+  { petal: 0x9d8fd8 },   // lupino violeta (acento)
+];
+const geoDaisy = PALETAS.map((p) => mergePiezas(daisyPiezas(p.petal)));
+const matDaisy = PALETAS.map(() => new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 0.9, metalness: 0, side: THREE.DoubleSide }));
+
+// ── instanciar ────────────────────────────────────────────────────────────────
+const _q = new THREE.Quaternion(), _p = new THREE.Vector3(), _s = new THREE.Vector3(), _m4 = new THREE.Matrix4();
+const lotes = PALETAS.map(() => []);
+puntos.forEach((pt, i) => {
+  const r = rndCelda(i * 13 + 7, Math.floor(pt.z));
+  lotes[r() < 0.62 ? 0 : r() < 0.84 ? 1 : 2].push(pt);
+});
+let totalInstancias = 0;
+PALETAS.forEach((pal, pi) => {
+  const lista = lotes[pi];
+  if (!lista.length) return;
+  const mesh = new THREE.InstancedMesh(geoDaisy[pi], matDaisy[pi], lista.length);
+  lista.forEach((pt, i) => {
+    const r = rndCelda(i * 31 + 5, Math.floor(pt.z * 2));
+    const esc = 1.0 + r() * 0.9;
+    _q.setFromAxisAngle(new THREE.Vector3(0, 1, 0), r() * Math.PI * 2);
+    _s.set(esc, esc, esc);
+    _p.set(pt.x, 0.04 + r() * 0.03, pt.z);
+    _m4.compose(_p, _q, _s);
+    mesh.setMatrixAt(i, _m4);
+  });
+  mesh.instanceMatrix.needsUpdate = true;
+  mesh.count = lista.length;
+  mesh.name = `s12-flores-paleta${pi}`;
+  mesh.frustumCulled = false;
+  scene.add(mesh);
+  totalInstancias += lista.length;
+});
+
+// flor más cercana al origen: blanco garantizado para la cámara `near`
+const florCercana = puntos.reduce((best, p) =>
+  (p.x * p.x + p.z * p.z < best.x * best.x + best.z * best.z ? p : best), puntos[0]);
+
+// ── métricas de distribución (viven en la página: no dependen del reloj) ─────
+function medirS12() {
+  const n = puntos.length;
+  const xs = puntos.map((p) => p.x), zs = puntos.map((p) => p.z);
+  const nns = [];
+  for (let i = 0; i < n; i++) {
+    let best = Infinity;
+    for (let j = 0; j < n; j++) {
+      if (i === j) continue;
+      const d2 = (xs[i] - xs[j]) ** 2 + (zs[i] - zs[j]) ** 2;
+      if (d2 < best) best = d2;
+    }
+    nns.push(Math.sqrt(best));
+  }
+  const m = nns.reduce((a, b) => a + b, 0) / Math.max(1, nns.length);
+  const v = nns.reduce((a, b) => a + (b - m) * (b - m), 0) / Math.max(1, nns.length);
+  const cvNN = n > 2 ? Math.sqrt(v) / m : 0;
+  let aline = 0;
+  for (let i = 0; i < n; i++) {
+    const ax = Math.abs(xs[i] - Math.round(xs[i] / ESP) * ESP) / ESP;
+    const az = Math.abs(zs[i] - Math.round(zs[i] / ESP) * ESP) / ESP;
+    aline += Math.max(0, 1 - Math.min(ax, az) * 2);
+  }
+  return {
+    s12: S12 ? 1 : 0,
+    seed: SEED,
+    camara: CAM,
+    modo: S12 ? 'sylva-ruido' : 'grid-baseline',
+    n: puntos.length,
+    cvNN: +cvNN.toFixed(3),
+    alineacion: +(aline / Math.max(1, n)).toFixed(3),
+    radio: RADIO,
+    espaciado: ESP,
+    umbral: UMBRAL,
+    gl: window.__r?.getContext?.()?.getError?.() ?? null,
+    dibujados: renderer.info.render.triangles,
+  };
+}
+window.__medirS12 = medirS12;
+window.__s12 = {
+  activa: S12, seed: SEED,
+  puntos: puntos.slice(0, 3000).map((p) => [+p.x.toFixed(2), +p.z.toFixed(2)]),
+};
+window.__ARRANQUE_OK = true;
+
+const CAMERAS = {
+  near: { tgt: [florCercana.x, 0.2, florCercana.z], fov: 55 },
+  mid: { pos: [0, 14, 58], tgt: [0, 0, 0], fov: 50 },
+  wide: { pos: [40, 74, 150], tgt: [0, 0, 0], fov: 50 },
+};
+let c = CAMERAS[CAM] || CAMERAS.mid;
+if (CAM === 'near') {
+  // cerca: encuadre bajo sobre la flor más cercana + vecinas (3-5 flores), a 8 u
+  const ang = Math.atan2(florCercana.z, florCercana.x) + Math.PI;
+  c = { pos: [florCercana.x + Math.cos(ang) * 8, 1.4, florCercana.z + Math.sin(ang) * 8], ...CAMERAS.near };
+}
+camera.position.set(...c.pos);
+camera.fov = c.fov;
+camera.updateProjectionMatrix();
+controls.target.set(...c.tgt);
+controls.update();
+
+function pintarHud() {
+  const m = medirS12();
+  document.getElementById('modo').textContent = m.modo;
+  document.getElementById('seed').textContent = `${SEED} · ${CAM}`;
+  document.getElementById('n').textContent = m.n;
+  document.getElementById('cvnn').textContent = m.cvNN;
+  document.getElementById('grid').textContent = m.alineacion;
+  document.getElementById('draws').textContent = `${renderer.info.render.calls} / ${(renderer.info.render.triangles / 1e3).toFixed(0)}k`;
+}
+pintarHud();
+
+const clock = new THREE.Clock();
+let frames = 0, fpsT = 0;
+function tick() {
+  requestAnimationFrame(tick);
+  renderer.render(scene, camera);
+  frames++; fpsT += clock.getDelta();
+  if (fpsT >= 0.5) {
+    document.getElementById('fps').textContent = Math.round(frames / fpsT);
+    frames = 0; fpsT = 0;
+  }
+}
+tick();
+addEventListener('resize', () => {
+  camera.aspect = innerWidth / innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(innerWidth, innerHeight);
+});
+</script>
+</body>
+</html>

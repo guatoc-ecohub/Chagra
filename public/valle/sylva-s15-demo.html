@@ -1,0 +1,569 @@
+<!doctype html>
+<html lang="es-CO">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Sylva s15 — Ramas que caen en la tormenta (bosque del valle)</title>
+<style>
+  html,body{margin:0;height:100%;overflow:hidden;background:#0a0e0c;font-family:system-ui,-apple-system,"Segoe UI",sans-serif}
+  #c{display:block;width:100vw;height:100vh;touch-action:none}
+  #hud{position:fixed;top:14px;left:14px;padding:10px 14px;border-radius:12px;
+    background:rgba(10,16,12,.58);color:#eaf3e9;font-size:13px;line-height:1.55;
+    backdrop-filter:blur(8px);z-index:10;min-width:330px;box-shadow:0 8px 24px rgba(0,0,0,.3)}
+  #hud .row{display:flex;justify-content:space-between;gap:18px}
+  #hud .k{opacity:.68}
+  #hud b{font-variant-numeric:tabular-nums}
+  #err{position:fixed;inset:auto 14px 14px auto;max-width:72vw;color:#ffd9d9;background:rgba(90,20,20,.78);
+    padding:8px 12px;border-radius:10px;font-size:12px;white-space:pre-wrap;z-index:20;display:none}
+</style>
+<script type="importmap">
+{
+  "imports": {
+    "three": "./vendor/three.module.js",
+    "three/addons/": "./vendor/addons/"
+  }
+}
+</script>
+</head>
+<body>
+<canvas id="c"></canvas>
+<div id="hud">
+  <div class="row"><span class="k">FPS</span><b id="fps">--</b></div>
+  <div class="row"><span class="k">Rama</span><b id="modo">--</b></div>
+  <div class="row"><span class="k">Semilla / Cámara / Tormenta</span><b id="seed">--</b></div>
+  <div class="row"><span class="k">Ramas (aire / posadas / esfumadas)</span><b id="n">--</b></div>
+  <div class="row"><span class="k">Grosor sección madera (λ3/λ2)</span><b id="vol">--</b></div>
+  <div class="row"><span class="k">Reloj</span><b id="clock">--</b></div>
+  <div class="row"><span class="k">Draw calls / tris</span><b id="draws">--</b></div>
+</div>
+<div id="err"></div>
+<script type="module">
+// ═══════════════════════════════════════════════════════════════════════════
+// Sylva s15 — RAMAS QUE CAEN EN LA TORMENTA
+// realistic-forest (github.com/Token-Gremlin/realistic-forest, MIT © 2026 Token
+// Gremlin; notice retenido en lib3d/flora/LICENSE-sylva-MIT) NO anima una rama
+// rota como una tarjeta plana que se esfuma: `src/fx/FallingBranches.js` rompe
+// del dosel una RAMA REAL (madera bifurcada), la deja colgar, caer, voltearse y
+// darse contra el suelo, y allí QUEDA como rama caída — se lee como rama caída,
+// no como una desaparición. El despojo de la tormenta (hojas/ramitas) "lee como
+// basura"; la pieza que se parte de una copa es la rama que aterriza y queda.
+//
+// Este banco lo emula en el claro de un bosque altoandino nativo (verde
+// dominante, paleta de bosque.js/arbolesAltoandinos) con A/B pareado en el MISMO
+// seed, cámara y reloj — cambia SOLO la representación del individuo:
+//   ?s15=0  baseline: la rama rota es una TARJETA plana de silueta de rama que
+//           cae sin voltearse y al tocar el suelo SE ENCOGE y desaparece (el
+//           "cartel que se esfuma": el evento se lee como desaparición, no
+//           queda madera en el piso).
+//   ?s15=1  (default) SYLVA: la rama es MADERA REAL (tronco quebrado con taper,
+//           extremo de rotura con médula y una bifurcación), cuelga del dosel,
+//           se desprende, cae con vuelco y deriva con la ráfaga, rebota y QUEDA
+//           TENDIDA en el suelo como rama caída (visible y persistente).
+// La siembra y la agenda de rotura usan PRNG determinista por semilla
+// (doctrina s12/s13): el A/B es la misma escena y el mismo programa de roturas.
+// `?tormenta=0` congela el desprendimiento (control: sin tormenta no cae nada).
+// La pose por instancia se deriva de (id, reloj) sin lista de partículas por
+// frame (el "no hay lista CPU" de Sylva). Implementación original del patrón;
+// el GLSL de Sylva es un gbuffer con sombras que este banco no necesita.
+// ═══════════════════════════════════════════════════════════════════════════
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+
+const err = document.getElementById('err');
+addEventListener('error', (e) => { err.style.display = 'block'; err.textContent = 'ERROR: ' + (e.message || e); });
+addEventListener('unhandledrejection', (e) => { err.style.display = 'block'; err.textContent = 'REJECT: ' + ((e.reason && e.reason.message) || e.reason); });
+
+const q = new URLSearchParams(location.search);
+const S15 = q.get('s15') !== '0';
+const _seed = Number(q.get('seed'));
+const SEED = Number.isInteger(_seed) && _seed >= 0 ? _seed : 20027;
+const CAM = q.get('cam') || 'mid';
+const HUD = q.get('hud') !== '0';
+const _tor = q.get('tormenta');
+const TORMENTA = _tor != null ? THREE.MathUtils.clamp(Number(_tor), 0, 1) : 1;
+const _tv = q.get('t');
+const T_FIJO = (_tv != null && Number.isFinite(Number(_tv))) ? Number(_tv) : null;
+const N_RAMAS = Math.max(8, Math.min(48, Number(q.get('n')) || 16));
+const EPISODIO = 14;
+
+function mulberry32(a) {
+  return function () {
+    a |= 0; a = a + 0x6D2B79F5 | 0;
+    let t = Math.imul(a ^ a >>> 15, 1 | a);
+    t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t;
+    return ((t ^ t >>> 14) >>> 0) / 4294967296;
+  };
+}
+const rnd = mulberry32((SEED ^ 0x5f356495) >>> 0);
+const hashI = (id, s = 0) => { const a = (SEED ^ Math.imul(id + 13 + s * 131, 0x9e3779b9) ^ Math.imul(id + 7, 0x85ebca6b)) >>> 0; return mulberry32(a || 1); };
+function hash2(x, z) { let h = Math.sin(x * 127.1 + z * 311.7) * 43758.5453; return h - Math.floor(h); }
+function gust(t) {
+  const f = 1 + (SEED % 7) * 0.13;
+  return 0.55 + 0.30 * Math.sin(t * 0.30 * f + SEED * 0.01) + 0.15 * Math.sin(t * 0.62 * f + SEED * 0.7) + 0.10 * Math.sin(t * 1.10 * f + SEED * 0.3);
+}
+
+const C = {
+  monte: '#3f6f3a', brote: '#7a9a3f', niebla: '#3b5236', hojaCoriacea: '#43593b',
+  musgo: '#4c5c34', musgoClaro: '#5f6f42', mantillo: '#7d6038', mantilloSombra: '#6b5230',
+  roble: '#6a5c4a', corteza: '#54473a', raicilla: '#5a3b2b', cacao: '#4a2a20', medula: '#8a6b45',
+};
+const col = (h) => new THREE.Color(h);
+const mezcla = (a, b, t) => col(a).lerp(col(b), t);
+
+const renderer = new THREE.WebGLRenderer({ canvas: document.getElementById('c'), antialias: true });
+renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.5));
+renderer.setSize(innerWidth, innerHeight);
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure = 1.05;
+renderer.outputColorSpace = THREE.SRGBColorSpace;
+window.__r = renderer;
+
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0x69716a);
+const fogColor = 0x6d766d;
+scene.fog = new THREE.Fog(fogColor, 28, 120);
+window.__escena = scene;
+
+const camera = new THREE.PerspectiveCamera(50, innerWidth / innerHeight, 0.1, 300);
+window.__cam = camera;
+const controls = new OrbitControls(camera, renderer.domElement);
+controls.enableDamping = false;
+controls.target.set(0, 4, 0);
+window.__ctl = controls;
+
+scene.add(new THREE.HemisphereLight(0x9fb4a0, 0x2c3a2a, 0.9));
+const sol = new THREE.DirectionalLight(0xd8e0c0, 0.85);
+sol.position.set(-24, 40, 18);
+scene.add(sol);
+
+const sueloGeo = new THREE.PlaneGeometry(150, 150, 90, 90);
+sueloGeo.rotateX(-Math.PI / 2);
+{
+  const pos = sueloGeo.attributes.position;
+  const cols = new Float32Array(pos.count * 3);
+  const base = mezcla(C.musgo, C.mantilloSombra, 0.3), claro = col(C.musgoClaro), hoja = col(C.mantillo);
+  const tmp = new THREE.Color();
+  for (let i = 0; i < pos.count; i++) {
+    const x = pos.getX(i), z = pos.getZ(i);
+    pos.setY(i, (hash2(Math.floor(x * 0.07), Math.floor(z * 0.07)) - 0.5) * 0.5);
+    tmp.copy(base);
+    const m = hash2(x * 0.5 + 3, z * 0.5 - 8);
+    if (m > 0.55) tmp.lerp(claro, (m - 0.55) * 1.2);
+    if (hash2(x * 0.3 - 2, z * 0.3 + 5) > 0.72) tmp.lerp(hoja, 0.5);
+    cols[i * 3] = tmp.r; cols[i * 3 + 1] = tmp.g; cols[i * 3 + 2] = tmp.b;
+  }
+  sueloGeo.setAttribute('color', new THREE.BufferAttribute(cols, 3));
+  sueloGeo.computeVertexNormals();
+}
+scene.add(new THREE.Mesh(sueloGeo, new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 1 })));
+
+const MAT_VEG = new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 1, flatShading: true });
+
+// ── pintar + fusionar (doctrina bosque.js: nunca mergeGeometries a pelo) ─────
+function pintar(g, color) {
+  const gg = g.index ? g.toNonIndexed() : g;
+  const n = gg.attributes.position.count, arr = new Float32Array(n * 3);
+  const c = col(color);
+  for (let i = 0; i < n; i++) { arr[i * 3] = c.r; arr[i * 3 + 1] = c.g; arr[i * 3 + 2] = c.b; }
+  gg.setAttribute('color', new THREE.BufferAttribute(arr, 3));
+  return gg;
+}
+function fusionar(lista) {
+  const gs = lista.map((x) => (x.index ? x.toNonIndexed() : x));
+  let n = 0; for (const g of gs) n += g.attributes.position.count;
+  const pos = new Float32Array(n * 3), colr = new Float32Array(n * 3);
+  let o = 0;
+  for (const g of gs) {
+    const P = g.attributes.position.array, Cc = g.attributes.color.array;
+    for (let i = 0; i < g.attributes.position.count; i++) {
+      pos[(o + i) * 3] = P[i * 3]; pos[(o + i) * 3 + 1] = P[i * 3 + 1]; pos[(o + i) * 3 + 2] = P[i * 3 + 2];
+      colr[(o + i) * 3] = Cc[i * 3]; colr[(o + i) * 3 + 1] = Cc[i * 3 + 1]; colr[(o + i) * 3 + 2] = Cc[i * 3 + 2];
+    }
+    o += g.attributes.position.count; g.dispose();
+  }
+  const out = new THREE.BufferGeometry();
+  out.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+  out.setAttribute('color', new THREE.BufferAttribute(colr, 3));
+  out.computeVertexNormals(); out.computeBoundingSphere();
+  return out;
+}
+// cilindro con eje +Z (largo 1), base en z=0, radio en X/Y; color degradé opcional
+function cilindroZ(r0, r1, len, seg, ca, cb) {
+  const g = new THREE.CylinderGeometry(r1, r0, len, seg).rotateX(Math.PI / 2);
+  g.translate(0, 0, len / 2);
+  const gg = g.index ? g.toNonIndexed() : g;
+  const n = gg.attributes.position.count, arr = new Float32Array(n * 3);
+  const a = col(ca), b = col(cb);
+  for (let i = 0; i < n; i++) {
+    const t = hash2(i, 7);
+    arr[i * 3] = a.r + (b.r - a.r) * t;
+    arr[i * 3 + 1] = a.g + (b.g - a.g) * t;
+    arr[i * 3 + 2] = a.b + (b.b - a.b) * t;
+  }
+  gg.setAttribute('color', new THREE.BufferAttribute(arr, 3));
+  gg.translate(0, 0, 0);
+  return gg;
+}
+
+// ── MADERA REAL BIFURCADA (modo Sylva): en espacio de instancia X=Y=radio, Z=largo
+//    El eje largo local es +Z; radio ~1 en X/Y en la base. Una bifurcación sale
+//    a media rama y el extremo de rotura (z=0) lleva la médula clara.
+function geomRamaBifurcada() {
+  const partes = [];
+  // fuste principal: taper 1.0 → 0.5 en z 0..1 (con leve joroba)
+  const fuste = cilindroZ(1.0, 0.52, 1.0, 10, C.roble, C.corteza);
+  // joroba sutil: desplazo los anillos medios en +Y (simula el codo de la rama)
+  {
+    const p = fuste.attributes.position;
+    for (let i = 0; i < p.count; i++) {
+      const z = p.getZ(i);
+      const w = Math.sin(Math.PI * Math.min(1, Math.max(0, z))) * 0.14;
+      p.setY(i, p.getY(i) + w * (1 - Math.abs(p.getX(i))));
+    }
+    fuste.computeVertexNormals();
+  }
+  partes.push(fuste);
+  // extremo de rotura (z≈0): cabeza aplastada con la médula clara
+  const medula = new THREE.SphereGeometry(1.15, 10, 8);
+  medula.rotateX(Math.PI / 2);
+  medula.scale(1, 1, 0.18);
+  medula.translate(0, 0, -0.04);
+  partes.push(pintar(medula, C.medula));
+  const borde = new THREE.CylinderGeometry(1.18, 1.05, 0.08, 10);
+  borde.rotateX(Math.PI / 2);
+  borde.translate(0, 0, 0.0);
+  partes.push(pintar(borde, C.raicilla));
+  // bifurcación: tubo que nace a media rama (z≈0.5) y se abre lateral-arriba
+  {
+    const fGeo = cilindroZ(0.55, 0.2, 0.55, 6, C.roble, C.raicilla);   // base en z=0
+    const dirF = new THREE.Vector3(0.9, 0.9, 0.45).normalize();
+    const qF = new THREE.Quaternion().setFromUnitVectors(new THREE.Vector3(0, 0, 1), dirF);
+    fGeo.applyQuaternion(qF);
+    const nF = fGeo.attributes.position.count, arrF = new Float32Array(nF * 3);
+    const cF = mezcla(C.corteza, C.roble, 0.4);
+    for (let i = 0; i < nF; i++) { arrF[i * 3] = cF.r; arrF[i * 3 + 1] = cF.g; arrF[i * 3 + 2] = cF.b; }
+    fGeo.setAttribute('color', new THREE.BufferAttribute(arrF, 3));
+    fGeo.translate(0.05, 0.35, 0.52);   // nace en la superficie del fuste
+    partes.push(fGeo);
+  }
+  return fusionar(partes);
+}
+
+// ── TARJETA PLANA (baseline): una lámina larga muy delgada (volumetría≈0)
+function geomRamaTarjeta() {
+  const g = new THREE.BoxGeometry(1.0, 0.05, 1.0);
+  g.translate(0, 0, 0.5);
+  const gg = g.index ? g.toNonIndexed() : g;
+  const n = gg.attributes.position.count, arr = new Float32Array(n * 3);
+  const a = col(C.roble), b = col(C.raicilla);
+  for (let i = 0; i < n; i++) {
+    const t = hash2(i, 13);
+    arr[i * 3] = a.r + (b.r - a.r) * t;
+    arr[i * 3 + 1] = a.g + (b.g - a.g) * t;
+    arr[i * 3 + 2] = a.b + (b.b - a.b) * t;
+  }
+  gg.setAttribute('color', new THREE.BufferAttribute(arr, 3));
+  gg.computeVertexNormals();
+  return fusionar([gg]);
+}
+
+// volumetría GEOMÉTRICA de la sección (doctrina s13 + criterio de la tarjeta):
+// se mide sobre la geometría escalada a una instancia representativa
+// (radio 0.11 × largo 2.0, como la agenda). Autovalores de la nube de vértices:
+//   λmax = eje largo de la rama · λ2, λ3 = los dos ejes laterales.
+//   grosor = λ3/λ2 (redondez de la sección): madera real (sección casi circular)
+//            → ≈1 · tarjeta plana (un lateral colapsado) → ≈0.
+function autovalores(g) {
+  const p = g.attributes.position.array;
+  const n = g.attributes.position.count;
+  let mx = 0, my = 0, mz = 0;
+  for (let i = 0; i < n; i++) { mx += p[i * 3]; my += p[i * 3 + 1]; mz += p[i * 3 + 2]; }
+  mx /= n; my /= n; mz /= n;
+  let cxx = 0, cyy = 0, czz = 0, cxy = 0, cxz = 0, cyz = 0;
+  for (let i = 0; i < n; i++) {
+    const dx = p[i * 3] - mx, dy = p[i * 3 + 1] - my, dz = p[i * 3 + 2] - mz;
+    cxx += dx * dx; cyy += dy * dy; czz += dz * dz; cxy += dx * dy; cxz += dx * dz; cyz += dy * dz;
+  }
+  cxx /= n; cyy /= n; czz /= n; cxy /= n; cxz /= n; cyz /= n;
+  const A = [[cxx, cxy, cxz], [cxy, cyy, cyz], [cxz, cyz, czz]];
+  for (let sw = 0; sw < 16; sw++) {
+    let off = 0;
+    for (let p2 = 0; p2 < 3; p2++) for (let q2 = p2 + 1; q2 < 3; q2++) off += A[p2][q2] * A[p2][q2];
+    if (off < 1e-18) break;
+    for (let p2 = 0; p2 < 2; p2++) for (let q2 = p2 + 1; q2 < 3; q2++) {
+      if (Math.abs(A[p2][q2]) < 1e-12) continue;
+      const phi = 0.5 * Math.atan2(2 * A[p2][q2], A[q2][q2] - A[p2][p2]);
+      const s2 = Math.sin(phi), c2 = Math.cos(phi);
+      for (let k = 0; k < 3; k++) { const akp = A[k][p2], akq = A[k][q2]; A[k][p2] = c2 * akp - s2 * akq; A[k][q2] = s2 * akp + c2 * akq; }
+      for (let k = 0; k < 3; k++) { const apk = A[p2][k], aqk = A[q2][k]; A[p2][k] = c2 * apk - s2 * aqk; A[q2][k] = s2 * apk + c2 * aqk; }
+    }
+  }
+  return [Math.abs(A[0][0]), Math.abs(A[1][1]), Math.abs(A[2][2])].sort((a, b) => b - a);
+}
+const GEOM0 = S15 ? geomRamaBifurcada() : geomRamaTarjeta();
+// centro: la rotación debe pivotar a media rama, no en el extremo de rotura
+GEOM0.computeBoundingBox();
+{
+  const c = new THREE.Vector3();
+  GEOM0.boundingBox.getCenter(c);
+  GEOM0.translate(-c.x, -c.y, -c.z);
+  GEOM0.computeBoundingSphere();
+}
+const GEOM = GEOM0;
+// escala representativa por modo (radio 0.11, largo 2.0) para la métrica:
+// madera → X=Y=radio (sección redonda) · tarjeta → X=largo·0.18, Y=0.025 (plana)
+const GEOM_REP = GEOM.clone();
+GEOM_REP.scale(S15 ? 0.11 : 0.36, S15 ? 0.11 : 0.025, 2.0);
+const _ev = autovalores(GEOM_REP);
+const GROSOR = +Math.max(0, Math.min(1, _ev[2] / Math.max(_ev[1], 1e-9))).toFixed(3);
+
+// agenda determinista por instancia: cuándo se rompe, desde dónde cae, hacia dónde.
+// Las primeras instancias caen FRENTE al árbol héroe (+Z, la cámara `near` las
+// encuadra en el suelo): el A/B cerca siempre tiene una rama posada legible.
+const agenda = [];
+const HEROES = [[0.6, 2.1], [-0.8, 2.4], [1.5, 1.4], [0.0, 2.8], [2.1, 2.0]];
+for (let i = 0; i < N_RAMAS; i++) {
+  const r = hashI(i);
+  const a = r() * Math.PI * 2;
+  const dist = 3.2 + r() * 5.5;
+  const fd = r() * Math.PI * 2;
+  const hero = i < HEROES.length;
+  agenda.push({
+    id: i,
+    rompe: 1.2 + r() * (EPISODIO - 4.6),
+    caida: 1.5 + r() * 0.7,
+    largo: (hero ? 1.5 : 1.3) + r() * (hero ? 0.9 : 1.5),
+    radio: 0.09 + r() * 0.05,
+    destinoX: hero ? HEROES[i][0] : Math.cos(a) * dist,
+    destinoZ: hero ? HEROES[i][1] : Math.sin(a) * dist,
+    finalX: Math.cos(fd), finalZ: Math.sin(fd),
+    deriva: 2.0 + r() * 3.5,
+    rebote: r() > 0.45 ? 0.14 + r() * 0.2 : 0,
+  });
+}
+
+const ramas = new THREE.InstancedMesh(GEOM, MAT_VEG, N_RAMAS);
+ramas.frustumCulled = false;
+ramas.count = N_RAMAS;
+scene.add(ramas);
+
+const _m4 = new THREE.Matrix4(), _qB = new THREE.Quaternion();
+const _qS = new THREE.Quaternion(), _qTmp = new THREE.Quaternion();
+const _sc = new THREE.Vector3(), _pos = new THREE.Vector3();
+const _ref = new THREE.Vector3(1, 0, 0), _down = new THREE.Vector3(0, -1, 0);
+const _flat = new THREE.Vector3(), _dir = new THREE.Vector3();
+const _colX = new THREE.Vector3(), _colY = new THREE.Vector3(), _colZ = new THREE.Vector3();
+const _basisM = new THREE.Matrix4();
+let reloj = 0;
+let estadoVisible = [];
+let lluviaFase = 0;
+const vdir = new THREE.Vector2(Math.cos(0.6), Math.sin(0.6));
+const ALTURA_DOSEL = 11.5;
+
+function medirS15() {
+  const enAire = estadoVisible.filter((e) => e && e.estado === 'aire').length;
+  const posadas = estadoVisible.filter((e) => e && e.estado === 'posada').length;
+  const esfumadas = estadoVisible.filter((e) => e && e.estado === 'esfumada').length;
+  return {
+    s15: S15 ? 1 : 0,
+    seed: SEED, camara: CAM, tormenta: +TORMENTA.toFixed(2),
+    modo: S15 ? 'rama-bifurcada-real' : 'tarjeta-plana-baseline',
+    ramas: N_RAMAS, enAire, posadas, esfumadas,
+    grosorSeccion: GROSOR,
+    reloj: +reloj.toFixed(2),
+    gl: renderer.getContext().getError(),
+    dibujados: renderer.info.render.triangles,
+  };
+}
+window.__medirS15 = medirS15;
+window.__s15 = {
+  activa: S15, seed: SEED,
+  agenda: agenda.map((a) => ({ rompe: +a.rompe.toFixed(2), destino: [+a.destinoX.toFixed(2), +a.destinoZ.toFixed(2)], largo: +a.largo.toFixed(2) })),
+};
+window.__ARRANQUE_OK = true;
+
+// árboles de borde (contexto de bosque): fuste + copa masa; se mecen con la ráfaga
+function construirArbol(seedT, escala) {
+  const r = mulberry32(seedT);
+  const g = new THREE.Group();
+  const H = 6.5 + r() * 4.5;
+  const fuste = new THREE.CylinderGeometry(0.22 * escala, 0.4 * escala, H, 7);
+  const gg = fuste.index ? fuste.toNonIndexed() : fuste;
+  const n = gg.attributes.position.count, arr = new Float32Array(n * 3);
+  const a = col(C.roble), b = col(C.corteza);
+  for (let i = 0; i < n; i++) {
+    const t = hash2(i, seedT);
+    arr[i * 3] = a.r + (b.r - a.r) * t; arr[i * 3 + 1] = a.g + (b.g - a.g) * t; arr[i * 3 + 2] = a.b + (b.b - a.b) * t;
+  }
+  gg.setAttribute('color', new THREE.BufferAttribute(arr, 3));
+  gg.translate(0, H / 2, 0);
+  const mFuste = new THREE.Mesh(gg, MAT_VEG);
+  g.add(mFuste);
+  const copa = new THREE.Mesh(new THREE.IcosahedronGeometry(2.6 * escala, 1), MAT_VEG);
+  const cg = copa.geometry.index ? copa.geometry.toNonIndexed() : copa.geometry;
+  const cn = cg.attributes.position.count, carr = new Float32Array(cn * 3);
+  const v1 = mezcla(C.niebla, C.hojaCoriacea, r() * 0.4), v2 = mezcla(C.monte, C.brote, r() * 0.3);
+  for (let i = 0; i < cn; i++) {
+    const t = hash2(i, seedT * 3);
+    carr[i * 3] = v1.r + (v2.r - v1.r) * t; carr[i * 3 + 1] = v1.g + (v2.g - v1.g) * t; carr[i * 3 + 2] = v1.b + (v2.b - v1.b) * t;
+  }
+  cg.setAttribute('color', new THREE.BufferAttribute(carr, 3));
+  cg.translate(0, H + 0.8 * escala, 0);
+  copa.geometry = cg;
+  copa.scale.set(1, 0.75, 1);
+  g.add(copa);
+  g.userData.H = H;
+  return g;
+}
+const arboles = [];
+for (let i = 0; i < 8; i++) {
+  const a = (i / 8) * Math.PI * 2 + rnd() * 0.6;
+  const rad = 16 + rnd() * 13;
+  const arbol = construirArbol(3000 + i * 107, 0.9 + rnd() * 0.7);
+  arbol.position.set(Math.cos(a) * rad, 0, Math.sin(a) * rad);
+  arbol.rotation.y = rnd() * Math.PI * 2;
+  scene.add(arbol);
+  arboles.push(arbol);
+}
+
+// lluvia (cortina de trazos cortos, determinista por semilla)
+const N_LLUVIA = 220;
+const llGeo = new THREE.BufferGeometry();
+const llPos = new Float32Array(N_LLUVIA * 6);
+const llSeed = new Float32Array(N_LLUVIA);
+for (let i = 0; i < N_LLUVIA; i++) llSeed[i] = i;
+llGeo.setAttribute('position', new THREE.BufferAttribute(llPos, 3));
+const lluvia = new THREE.LineSegments(llGeo, new THREE.LineBasicMaterial({ color: 0xbcc8b8, transparent: true, opacity: 0.4 }));
+lluvia.frustumCulled = false;
+scene.add(lluvia);
+
+// cámaras de envelope
+const CAMERAS = {
+  near: { pos: [1.6, 0.9, 4.4], tgt: [0.5, 0.6, 1.6], fov: 50 },
+  mid:  { pos: [0, 5.2, 12.5], tgt: [0, 5.5, 0], fov: 55 },
+  wide: { pos: [10, 9, 24], tgt: [0, 5, -2], fov: 62 },
+};
+const cc = CAMERAS[CAM] || CAMERAS.mid;
+camera.position.set(...cc.pos);
+camera.fov = cc.fov;
+camera.updateProjectionMatrix();
+controls.target.set(...cc.tgt);
+controls.update();
+
+function pintarHud() {
+  if (!HUD) return;
+  const m = medirS15();
+  document.getElementById('modo').textContent = m.modo;
+  document.getElementById('seed').textContent = `${m.seed} · ${m.camara} · ${m.tormenta}`;
+  document.getElementById('n').textContent = `${m.enAire} / ${m.posadas} / ${m.esfumadas}`;
+  document.getElementById('vol').textContent = m.grosorSeccion;
+  document.getElementById('clock').textContent = m.reloj + ' s';
+  document.getElementById('draws').textContent = `${renderer.info.render.calls} / ${(m.dibujados / 1e3).toFixed(1)}k`;
+}
+pintarHud();
+if (!HUD) document.getElementById('hud').style.display = 'none';
+
+const clock = new THREE.Clock();
+let frames = 0, fpsT = 0;
+
+renderer.setAnimationLoop(() => {
+  const dReal = clock.getDelta();
+  const delta = T_FIJO != null ? 0 : dReal;
+  reloj = T_FIJO != null ? T_FIJO : reloj + delta;
+  lluviaFase += delta * 14;
+  const g = gust(reloj);
+  const sway = Math.sin(reloj * 0.9) * 0.03 + Math.sin(reloj * 2.1 + 1) * 0.02;
+
+  // árboles meciéndose
+  for (const arbol of arboles) {
+    arbol.rotation.z = sway * 0.5 * g;
+    arbol.rotation.x = Math.cos(reloj * 1.2 + arbol.position.x) * 0.015 * g;
+  }
+
+  // lluvia
+  {
+    const P = lluvia.geometry.attributes.position.array;
+    for (let i = 0; i < N_LLUVIA; i++) {
+      const si = llSeed[i];
+      const x0 = (hash2(si, 11) - 0.5) * 46;
+      const z0 = 6 + (hash2(si, 29) - 0.5) * 46;
+      const y = 12 - ((hash2(si, 3) * 26 - lluviaFase * g) % 26);
+      P[i * 6] = x0 + vdir.x * 0.6; P[i * 6 + 1] = y; P[i * 6 + 2] = z0 + vdir.y * 0.6;
+      P[i * 6 + 3] = x0 + vdir.x * 0.66; P[i * 6 + 4] = y - 0.8; P[i * 6 + 5] = z0 + vdir.y * 0.66;
+    }
+    lluvia.geometry.attributes.position.needsUpdate = true;
+  }
+
+  // ramas que caen
+  estadoVisible = [];
+  for (let i = 0; i < N_RAMAS; i++) {
+    const a = agenda[i];
+    if (TORMENTA < 0.12 || reloj < a.rompe) {
+      _m4.makeScale(0, 0, 0);
+      ramas.setMatrixAt(i, _m4);
+      estadoVisible.push(null);
+      continue;
+    }
+    const tc = reloj - a.rompe;
+    const k = Math.min(1, Math.max(0, tc / a.caida));
+    const sueloY = (hash2(Math.floor(a.destinoX * 0.07), Math.floor(a.destinoZ * 0.07)) - 0.5) * 0.5;
+    const driftX = vdir.x * a.deriva * g, driftZ = vdir.y * a.deriva * g;
+    _pos.set(a.destinoX + driftX * k * k, 0, a.destinoZ + driftZ * k * k);
+    // trayectoria: cuelga en el dosel → cae con deriva → rebota → queda tendida
+    const dropK = THREE.MathUtils.smoothstep(k, 0.05, 0.92);
+    let y = ALTURA_DOSEL - dropK * (ALTURA_DOSEL - sueloY - 0.12);
+    if (a.rebote > 0 && k > 0.72 && k < 0.86) {
+      const bt = (k - 0.72) / 0.14;
+      y += Math.sin(bt * Math.PI) * a.rebote * (1 - bt);
+    }
+    y = Math.max(y, sueloY + 0.12);
+    _pos.y = y;
+
+    // eje largo: colgando apunta abajo; al caer gira a horizontal (finalDir);
+    // al posar (k≈1) queda tendida (longitud horizontal, Y casi al ras)
+    const hor = THREE.MathUtils.smoothstep(k, 0.12, 0.92);
+    _dir.lerpVectors(_down, _flat.set(a.finalX, 0, a.finalZ).normalize(), hor).normalize();
+    // base ortonormal con eje largo = _dir; el vuelco se hace alrededor de él
+    _ref.set(Math.abs(_dir.y) < 0.96 ? 0 : 1, Math.abs(_dir.y) < 0.96 ? 1 : 0, 0).normalize();
+    _colX.crossVectors(_ref, _dir).normalize();
+    _colY.crossVectors(_dir, _colX).normalize();
+    _colZ.copy(_dir);
+    // orientación = base(_colX,_colY,_colZ) · vuelco sobre el eje largo
+    _basisM.makeBasis(_colX, _colY, _colZ);
+    _qB.setFromRotationMatrix(_basisM);
+    _qS.setFromAxisAngle(_dir, hor * (3.5 + (a.id % 5)) * k);
+    _qTmp.multiplyQuaternions(_qB, _qS);
+    // escala de la instancia: madera X=Y=radio, Z=largo; tarjeta ancha y plana
+    _sc.set(S15 ? a.radio : a.largo * 0.18, S15 ? a.radio : 0.025, a.largo);
+    _m4.compose(_pos, _qTmp, _sc);
+
+    let visible = true;
+    if (!S15) {
+      // la tarjeta, al tocar el suelo, se encoje y desaparece en ~0,5 s
+      const posar = Math.max(0, (tc - a.caida) / 0.5);
+      if (posar > 0) {
+        const shr = Math.max(0, 1 - posar);
+        if (shr <= 0.001) { _m4.makeScale(0, 0, 0); visible = false; }
+        else { _sc.set(a.largo * 0.18 * shr, 0.025 * shr, a.largo * shr); _m4.compose(_pos, _qTmp, _sc); }
+      }
+    }
+    ramas.setMatrixAt(i, _m4);
+    if (!visible) { estadoVisible.push({ id: i, estado: 'esfumada' }); continue; }
+    estadoVisible.push({ id: i, estado: k < 0.95 ? 'aire' : 'posada', x: _pos.x, y: _pos.y, z: _pos.z });
+  }
+  ramas.instanceMatrix.needsUpdate = true;
+
+  renderer.render(scene, camera);
+  frames++; fpsT += dReal;
+  if (fpsT >= 0.5) { document.getElementById('fps').textContent = Math.round(frames / fpsT); frames = 0; fpsT = 0; }
+  pintarHud();
+});
+
+addEventListener('resize', () => {
+  camera.aspect = innerWidth / innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(innerWidth, innerHeight);
+});
+</script>
+</body>
+</html>

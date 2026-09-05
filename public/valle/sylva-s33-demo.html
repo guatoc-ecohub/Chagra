@@ -1,0 +1,281 @@
+<!doctype html>
+<html lang="es-CO">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Sylva s33 — Settle view anti pop-in (LOD fade al asentar cámara)</title>
+<style>
+  html,body{margin:0;height:100%;overflow:hidden;background:#0b0f0c;font-family:system-ui,-apple-system,"Segoe UI",sans-serif}
+  #c{display:block;width:100vw;height:100vh;touch-action:none}
+  #hud{position:fixed;top:14px;left:14px;padding:10px 14px;border-radius:12px;
+    background:rgba(10,18,12,.55);color:#eaffef;font-size:13px;line-height:1.55;
+    backdrop-filter:blur(8px);z-index:10;min-width:300px;box-shadow:0 8px 24px rgba(0,0,0,.25)}
+  #hud .row{display:flex;justify-content:space-between;gap:18px}
+  #hud .k{opacity:.68}
+  #hud b{font-variant-numeric:tabular-nums}
+  #err{position:fixed;inset:auto 14px 14px auto;max-width:72vw;color:#ffd9d9;background:rgba(90,20,20,.78);
+    padding:8px 12px;border-radius:10px;font-size:12px;white-space:pre-wrap;z-index:20;display:none}
+</style>
+<script type="importmap">
+{
+  "imports": {
+    "three": "./vendor/three.module.js",
+    "three/addons/": "./vendor/addons/"
+  }
+}
+</script>
+</head>
+<body>
+<canvas id="c"></canvas>
+<div id="hud">
+  <div class="row"><span class="k">FPS</span><b id="fps">--</b></div>
+  <div class="row"><span class="k">Settle</span><b id="settle">--</b></div>
+  <div class="row"><span class="k">Cámara</span><b id="cam">--</b></div>
+  <div class="row"><span class="k">Semilla / árboles</span><b id="seed">--</b></div>
+  <div class="row"><span class="k">Tier full · mid · lejos</span><b id="tiers">--</b></div>
+  <div class="row"><span class="k">Fades activos · transiciones</span><b id="settleCount">--</b></div>
+  <div class="row"><span class="k">Triángulos dibujados</span><b id="drawtris">--</b></div>
+</div>
+<div id="err"></div>
+<script type="module">
+// Banco del robo Sylva s33 (Token-Gremlin/realistic-forest, MIT): SETTLE VIEW
+// ANTI POP-IN. En Sylva, al asentar la cámara (stop) las instancias de follaje
+// que cambian de nivel LOD se funden con un fade en vez de aparecer de golpe:
+// la escena se estabiliza sin aparición tardía de masa. Acá se emula sobre el
+// sistema de impostores+LOD real del valle (lib/impostor-lod.js): cuando termina
+// el movimiento de cámara que cruza los umbrales de píxeles, la opacidad del
+// nivel que entra se rampa 0→1 en unos pocos frames.
+//
+// MIT notice retenido (realistic-forest © 2026 Token Gremlin) en
+// lib3d/flora/LICENSE-sylva-MIT. El fade es implementación original de este
+// módulo (opt-in `settle` en makeImpostorLOD), no código copiado de Sylva.
+//
+// Instrumentación A/B: `?settle=0` desactiva el fade (baseline con pop-in
+// instantáneo); las cámaras `?cam=near|mid|wide` cubren el envelope de
+// distancia. `?fadeopacity=off` desactiva el post-proceso para ver geometría
+// cruda si el demo lo usara (s33 no aplica post).
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { makeImpostorLOD } from './lib/impostor-lod.js';
+import { tickVientoMundos } from './lib3d/flora/vientoMundos.js';
+
+const err = document.getElementById('err');
+addEventListener('error', (e) => { err.style.display = 'block'; err.textContent = 'ERROR: ' + (e.message || e); });
+addEventListener('unhandledrejection', (e) => { err.style.display = 'block'; err.textContent = 'REJECT: ' + ((e.reason && e.reason.message) || e.reason); });
+
+const q = new URLSearchParams(location.search);
+const SETTLE = q.get('settle') !== '0';          // 1 = fade al asentar; 0 = baseline (pop-in)
+const AUTOPASE = q.get('auto') !== '0';          // 1 = animación automática de cámara que cruza umbrales
+const _seed = Number(q.get('seed'));
+const SEED = Number.isInteger(_seed) && _seed >= 0 ? _seed : 7;
+const CAM = q.get('cam') || 'mid';
+const _qcal = q.get('quality')?.toLowerCase();
+const QUALITY = ['fluid', 'balanced', 'beautiful', 'max'].includes(_qcal) ? _qcal : 'balanced';
+const CULLING = q.get('cull') !== '0';
+const REGIONAL = q.get('regional') !== '0';
+
+// ── ruido determinista (misma forma que lib3d / impostores-demo) ────────────
+function hash2(x, y) { const h = Math.sin(x * 127.1 + y * 311.7) * 43758.5453; return h - Math.floor(h); }
+function vnoise(x, y) {
+  const xi = Math.floor(x), yi = Math.floor(y);
+  const xf = x - xi, yf = y - yi;
+  const u = xf * xf * (3 - 2 * xf), v = yf * yf * (3 - 2 * yf);
+  return hash2(xi, yi) * (1 - u) * (1 - v) + hash2(xi + 1, yi) * u * (1 - v) +
+    hash2(xi, yi + 1) * (1 - u) * v + hash2(xi + 1, yi + 1) * u * v;
+}
+function fbm(x, y, oct) {
+  let s = 0, amp = 1, f = 1, norm = 0;
+  for (let i = 0; i < oct; i++) { s += amp * vnoise(x * f, y * f); norm += amp; amp *= 0.5; f *= 2.03; }
+  return s / norm;
+}
+function terreno(x, z) {
+  const base = 4 + (z + 70) * 0.32;
+  const n = fbm(x * 0.022 + 3.1, z * 0.022 + 1.7, 2);
+  const rr = fbm(x * 0.07 + 9.3, z * 0.07 + 4.1, 2) * 0.5 + 0.5;
+  return base + (n - 0.5) * 16 + (rr - 0.5) * 2.2;
+}
+
+const renderer = new THREE.WebGLRenderer({ canvas: document.getElementById('c'), antialias: true });
+renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.5));
+renderer.setSize(innerWidth, innerHeight);
+window.__r = renderer;
+
+const scene = new THREE.Scene();
+const fogColor = 0xc9dbd0;
+scene.background = new THREE.Color(fogColor);
+scene.fog = new THREE.Fog(fogColor, 90, 400);
+window.__escena = scene;
+
+const camera = new THREE.PerspectiveCamera(55, innerWidth / innerHeight, 0.1, 900);
+window.__cam = camera;
+const controls = new OrbitControls(camera, renderer.domElement);
+controls.target.set(0, 28, -15);
+window.__ctl = controls;
+
+const CAMERAS = {
+  near: { pos: [0, 20, 30], tgt: [0, 19, -12] },
+  mid: { pos: [0, 37, 78], tgt: [0, 24, -14] },
+  wide: { pos: [0, 120, 300], tgt: [0, 28, -20] },
+};
+const C0 = CAMERAS[CAM] || CAMERAS.mid;
+camera.position.set(...C0.pos);
+controls.target.set(...C0.tgt);
+controls.enableDamping = false;   // capturas estables; la animación la controlamos nosotros
+controls.update();
+
+scene.add(new THREE.HemisphereLight(0xcfe8d0, 0x2a3a24, 0.85));
+const sun = new THREE.DirectionalLight(0xfff2d8, 1.25);
+sun.position.set(80, 120, 40);
+scene.add(sun);
+
+function buildGround() {
+  const geo = new THREE.PlaneGeometry(400, 160, 60, 26);
+  geo.rotateX(-Math.PI / 2);
+  geo.translate(0, 0, 5);
+  const P = geo.attributes.position;
+  const n = P.count;
+  for (let i = 0; i < n; i++) P.setY(i, terreno(P.getX(i), P.getZ(i)));
+  const col = new Float32Array(n * 3);
+  const cA = [0.13, 0.24, 0.11], cB = [0.37, 0.5, 0.24];
+  for (let i = 0; i < n; i++) {
+    const x = P.getX(i), z = P.getZ(i), h = P.getY(i);
+    const t = THREE.MathUtils.clamp((h - 2) / 56, 0, 1);
+    const parche = fbm(x * 0.05 + 5.1, z * 0.05 + 2.3, 2);
+    const k = t * 0.72 + 0.2 + (parche - 0.5) * 0.24;
+    const j = (fbm(x * 0.15 + 7.7, z * 0.15 + 4.1, 2) - 0.5) * 0.1;
+    col[i * 3] = Math.max(0, cA[0] + (cB[0] - cA[0]) * k + j);
+    col[i * 3 + 1] = Math.max(0, cA[1] + (cB[1] - cA[1]) * k + j);
+    col[i * 3 + 2] = Math.max(0, cA[2] + (cB[2] - cA[2]) * k + j);
+  }
+  geo.setAttribute('color', new THREE.BufferAttribute(col, 3));
+  scene.add(new THREE.Mesh(geo, new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 1, metalness: 0 })));
+}
+buildGround();
+
+const system = makeImpostorLOD({
+  count: 15740,
+  area: { x0: -185, x1: 185, z0: -55, z1: 75 },
+  alturaObjetivo: 11,
+  terreno,
+  paleta: { base: '#3a5c2a', claro: '#6f9140', oscuro: '#24391d', acento: '#c9b54a' },
+  fog: { near: 90, far: 400, color: fogColor },
+  seed: SEED,
+  canopyCards: true,
+  quality: QUALITY,
+  culling: CULLING ? { frustum: true } : false,
+  regional: REGIONAL ? { near: 90, mid: 170, far: 240, midStride: 2, farStride: 4 } : false,
+  settle: SETTLE,
+});
+scene.add(system.group);
+window.__impostorLOD = system;
+// Expone los alpha de los materiales (near=opacity, med/far=uniform uAlpha)
+// para que la sonda mida el ramp del settle por frame.
+window.__settleAlpha = () => {
+  const mats = [];
+  system.group.traverse((o) => { if (o.isMesh && o.material && !mats.includes(o.material)) mats.push(o.material); });
+  const readM = (m) => (m.opacity !== undefined ? m.opacity : (m.uniforms && m.uniforms.uAlpha ? m.uniforms.uAlpha.value : 1));
+  // near = el único MeshStandardMaterial (usa .opacity); med/far = ShaderMaterials (uAlpha)
+  const near = mats.find((m) => m.isMeshStandardMaterial) ?? mats[0];
+  const med = mats.find((m) => m.isShaderMaterial && m !== mats.find((mm) => mm.isShaderMaterial));
+  return {
+    near: near ? readM(near) : 1,
+    med: med ? readM(med) : (mats[1] ? readM(mats[1]) : 1),
+    far: mats[2] ? readM(mats[2]) : 1,
+  };
+};
+window.__ARRANQUE_OK = true;
+
+// ── paseo automático determinista que sólo cruza umbrales y luego se asienta ─
+// Arranca en C0, aleja la cámara para empujar mass hacia mid/lejos, vuelve a
+// acercar para empujar full, y al final se queda quieto. Cada cruce de umbral
+// dispara transiciones; con settle=1 se funden, con settle=0 popean.
+const AUTOPASE_DUR = AUTOPASE ? 6 : 0; // segundos de movimiento antes de asentar
+const _home = new THREE.Vector3(...C0.pos);
+let autopase = AUTOPASE_DUR;
+let autopaseT = 0;
+let asentado = false;
+
+function pintarHud(c) {
+  document.getElementById('fps').textContent = fps;
+  document.getElementById('settle').textContent = SETTLE ? 'fade (anti pop-in)' : 'baseline (pop-in)';
+  document.getElementById('cam').textContent = CAM;
+  document.getElementById('seed').textContent = `${SEED} · ${c.total}`;
+  document.getElementById('tiers').textContent = `${c.near} / ${c.med} / ${c.far}`;
+  document.getElementById('settleCount').textContent = `${c.settle.fadesActivos} · ${c.settle.transiciones}`;
+  document.getElementById('drawtris').textContent = renderer.info.render.triangles;
+}
+
+// Traza fina de los alpha por nivel (anillo de 120k = ~60 s a 2k fps). Le
+// permite a la sonda reconstruir el ramp del settle aunque empiece a leer muy
+// después del arranque: cada frame se registra (t, aN, aM, aF, fadeAct).
+const _alphaCap = 120000;
+const _alphaTraza = new Array(_alphaCap);
+let _alfaN = 0, _alfaCnt = 0;
+function registrarAlpha() {
+  if (typeof window.__settleAlpha !== 'function') return;
+  const a = window.__settleAlpha();
+  _alphaTraza[_alfaN] = {
+    t: clock.elapsedTime, aN: a.near, aM: a.med, aF: a.far,
+    fadeAct: system.counts().settle.fadesActivos,
+  };
+  _alfaN = (_alfaN + 1) % _alphaCap;
+  _alfaCnt = Math.min(_alfaCnt + 1, _alphaCap);
+}
+window.__leerAlphaTraza = () => {
+  const out = new Array(_alfaCnt);
+  for (let i = 0; i < _alfaCnt; i++) out[i] = _alphaTraza[(_alfaN - _alfaCnt + i + _alphaCap) % _alphaCap];
+  return out;
+};
+
+const clock = new THREE.Clock();
+let frames = 0, fpsT = 0, fps = 0;
+const drawingBuffer = new THREE.Vector2();
+window.__medirS33 = () => {
+  const c = system.counts();
+  return {
+    settle: SETTLE, cam: CAM, quality: QUALITY, seed: SEED, camara: CAM,
+    gl: window.__r?.getContext?.()?.getError?.() ?? null,
+    arranque: !!window.__ARRANQUE_OK,
+    tiers: { near: c.near, med: c.med, far: c.far },
+    settleCounts: { ...c.settle },
+    dibujados: renderer.info.render.triangles,
+    paseo: { duration: autopase, asentado },
+  };
+};
+
+function tick() {
+  requestAnimationFrame(tick);
+  const dt = clock.getDelta();
+  tickVientoMundos(clock.elapsedTime);
+
+  // Paseo automático: un vaivén de cámara que cruza umbrales en los primeros
+  // AUTOPASE_DUR segundos y luego se queda quieto para que asiente el fade.
+  if (autopase > 0) {
+    autopaseT += dt;
+    const p = Math.min(1, autopaseT / autopase);
+    // ida (aleja → masa va a mid/lejos) y vuelta (a home → masa vuelve a full)
+    const viaje = p < 0.5 ? p * 2 : 2 - p * 2; // 0→1→0
+    const dist = 1 + viaje * 2.2;              // 1x → 3.2x distancia a home
+    camera.position.copy(_home).multiplyScalar(dist);
+    if (p >= 1) { autopase = 0; asentado = true; }
+  }
+
+  controls.update();
+  renderer.getDrawingBufferSize(drawingBuffer);
+  system.update(camera, dt, drawingBuffer.y);
+  renderer.render(scene, camera);
+  registrarAlpha();
+
+  frames++; fpsT += dt;
+  if (fpsT >= 0.5) { fps = Math.round(frames / fpsT); frames = 0; fpsT = 0; }
+  pintarHud(system.counts());
+}
+tick();
+addEventListener('resize', () => {
+  camera.aspect = innerWidth / innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(innerWidth, innerHeight);
+});
+</script>
+</body>
+</html>

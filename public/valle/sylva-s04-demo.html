@@ -1,0 +1,211 @@
+<!doctype html>
+<html lang="es-CO">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Sylva s04 — Esqueleto procedural con fototropismo (ez-tree)</title>
+<style>
+  html,body{margin:0;height:100%;overflow:hidden;background:#0b0f0c;font-family:system-ui,-apple-system,"Segoe UI",sans-serif}
+  #c{display:block;width:100vw;height:100vh;touch-action:none}
+  #hud{position:fixed;top:14px;left:14px;padding:10px 14px;border-radius:12px;
+    background:rgba(10,18,12,.55);color:#eaffef;font-size:13px;line-height:1.55;
+    backdrop-filter:blur(8px);z-index:10;min-width:216px;box-shadow:0 8px 24px rgba(0,0,0,.25)}
+  #hud .row{display:flex;justify-content:space-between;gap:18px}
+  #hud .k{opacity:.68}
+  #hud b{font-variant-numeric:tabular-nums}
+  #err{position:fixed;inset:auto 14px 14px auto;max-width:72vw;color:#ffd9d9;background:rgba(90,20,20,.78);
+    padding:8px 12px;border-radius:10px;font-size:12px;white-space:pre-wrap;z-index:20;display:none}
+</style>
+<script type="importmap">
+{
+  "imports": {
+    "three": "./vendor/three.module.js",
+    "three/addons/": "./vendor/addons/"
+  }
+}
+</script>
+</head>
+<body>
+<canvas id="c"></canvas>
+<div id="hud">
+  <div class="row"><span class="k">FPS</span><b id="fps">--</b></div>
+  <div class="row"><span class="k">Fototropismo</span><b id="foto">--</b></div>
+  <div class="row"><span class="k">Especie</span><b id="especie">--</b></div>
+  <div class="row"><span class="k">Semilla</span><b id="seed">--</b></div>
+  <div class="row"><span class="k">Lean hacia luz (tipos)</span><b id="lean">--</b></div>
+  <div class="row"><span class="k">Draw calls</span><b id="draws">--</b></div>
+</div>
+<div id="err"></div>
+<script type="module">
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { Tree } from './flora/ez-tree/tree.js';
+import TreeOptions from './flora/ez-tree/options.js';
+import { ESPECIES_EZTREE } from './flora/especies-eztree.js';
+
+const err = document.getElementById('err');
+addEventListener('error', (e) => { err.style.display = 'block'; err.textContent = 'ERROR: ' + (e.message || e); });
+addEventListener('unhandledrejection', (e) => { err.style.display = 'block'; err.textContent = 'REJECT: ' + ((e.reason && e.reason.message) || e.reason); });
+
+const q = new URLSearchParams(location.search);
+const FOTO = q.get('foto') !== '0';
+const _especie = q.get('especie');
+const ESPECIE = ESPECIES_EZTREE[_especie] ? _especie : 'roble_negro';
+const _seed = Number(q.get('seed'));
+const SEED = Number.isInteger(_seed) && _seed >= 0 ? _seed : 20027;
+const CAM = q.get('cam') || 'mid';
+const TIEMPO_FIJO = (() => { const t = Number(q.get('t')); return Number.isFinite(t) ? t : null; })();
+const luzDir = new THREE.Vector3(
+  Number(q.get('dirx')) || 0.6,
+  Number(q.get('diry')) || 0.9,
+  Number(q.get('dirz')) || 0.35,
+).normalize();
+
+const renderer = new THREE.WebGLRenderer({ canvas: document.getElementById('c'), antialias: true });
+renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.5));
+renderer.setSize(innerWidth, innerHeight);
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure = 1.1;
+window.__r = renderer;
+
+const scene = new THREE.Scene();
+const fogColor = 0xc9dbd0;
+scene.background = new THREE.Color(fogColor);
+scene.fog = new THREE.Fog(fogColor, 60, 260);
+window.__escena = scene;
+
+const camera = new THREE.PerspectiveCamera(50, innerWidth / innerHeight, 0.1, 900);
+window.__cam = camera;
+
+const controls = new OrbitControls(camera, renderer.domElement);
+controls.enableDamping = true;
+controls.target.set(0, 8, 0);
+
+// ── luces: la DirectionalLight apunta DESDE la dirección de fototropismo ────
+scene.add(new THREE.HemisphereLight(0xcfe8d0, 0x2a3a24, 0.8));
+const sun = new THREE.DirectionalLight(0xfff2d8, 1.6);
+const solDist = 60;
+sun.position.copy(luzDir).multiplyScalar(solDist);
+scene.add(sun);
+// esfera visible en la dirección de la luz (para leer de dónde viene el sol)
+const sunMarker = new THREE.Mesh(
+  new THREE.SphereGeometry(1.1, 12, 10),
+  new THREE.MeshBasicMaterial({ color: 0xffe9b0 }),
+);
+sunMarker.position.copy(luzDir).multiplyScalar(solDist * 0.96);
+scene.add(sunMarker);
+
+// ── suelo sutil para que la silueta recule con la niebla ────────────────────
+const groundGeo = new THREE.CircleGeometry(160, 48);
+groundGeo.rotateX(-Math.PI / 2);
+const groundMat = new THREE.MeshStandardMaterial({ color: 0x4a6033, roughness: 1, metalness: 0 });
+const ground = new THREE.Mesh(groundGeo, groundMat);
+ground.position.y = -0.15;
+scene.add(ground);
+
+// ── árbol héroe: especie nativa, con fototropismo opt-in ────────────────────
+function buildTree() {
+  const def = ESPECIES_EZTREE[ESPECIE];
+  if (!def || def.arquetipo !== 'arbol') throw new Error(`especie "${ESPECIE}" no es arbol`);
+  const opts = new TreeOptions();
+  opts.copy(def.options);
+  opts.seed = SEED;
+  if (FOTO) {
+    opts.phototropism.enabled = true;
+    opts.phototropism.direction = { x: luzDir.x, y: luzDir.y, z: luzDir.z };
+    // fuerza por nivel: el fuste casi rígido, las ramas finas buscan el claro.
+    // El paso real por sección es strength / sectionRadius: L1 (~0.018 rad/seg),
+    // L2 (~0.06), L3 (~0.15) — la copa se inclina hacia el sol sin que el tronco
+    // se doble como un banderín. Calibrado sobre el árbol héroe (length[0] ~ 9 m).
+    opts.phototropism.strength = { 0: 0.0008, 1: 0.006, 2: 0.012, 3: 0.02 };
+  }
+  const tree = new Tree(opts);
+  tree.generate();
+  return tree;
+}
+
+const tree = buildTree();
+scene.add(tree);
+window.__arbol = tree;
+window.__foto = FOTO;
+window.__fotoDireccion = luzDir.toArray();
+window.__fotoSemilla = SEED;
+
+// Métrica determinista de fototropismo: para cada rama, cuánto se desplaza su
+// punta hacia la luz en el plano horizontal, normalizado por la longitud de la
+// rama. Baseline (sin fototropismo) sale ≈ 0 (simetría radial); con fototropismo
+// sale claramente > 0 hacia el azimut del sol. Es GEOMETRÍA del esqueleto, no
+// una opinión: mismo seed, mismo número exacto.
+function medirLean() {
+  const sk = tree.skeleton;
+  if (!sk || !sk.branches) return { tipos: 0, lean: 0, azimut: 0 };
+  const luzHorizontal = new THREE.Vector3(luzDir.x, 0, luzDir.z).normalize();
+  const azimut = Math.atan2(luzHorizontal.z, luzHorizontal.x);
+  let tipos = 0, acc = 0;
+  for (const b of sk.branches) {
+    if (b.sections.length < 2) continue;
+    const a = b.sections[0].origin;
+    const t = b.sections[b.sections.length - 1].origin;
+    const v = new THREE.Vector3().subVectors(t, a);
+    const largo = Math.max(0.001, v.length());
+    const horiz = new THREE.Vector3(v.x, 0, v.z);
+    const seno = horiz.length() / largo;         // inclinación fuera de vertical
+    const dot = horiz.dot(luzHorizontal) / Math.max(0.001, horiz.length());
+    acc += seno * dot;
+    tipos++;
+  }
+  return { tipos, lean: tipos ? acc / tipos : 0, azimut };
+}
+window.__medirLean = medirLean;
+
+// ── cámaras de envelope para el gate ────────────────────────────────────────
+const CAMERAS = {
+  near:  { pos: [4.2, 11, 8.5],  tgt: [0.5, 11.5, 0],  fov: 55 },
+  mid:   { pos: [0, 10.5, 21],   tgt: [0.8, 9.5, 0],  fov: 50 },
+  wide:  { pos: [0, 30, 62],     tgt: [0, 13, 0],     fov: 50 },
+};
+if (CAMERAS[CAM]) {
+  const c = CAMERAS[CAM];
+  camera.position.set(...c.pos);
+  camera.fov = c.fov;
+  camera.updateProjectionMatrix();
+  controls.target.set(...c.tgt);
+  controls.update();
+}
+
+document.getElementById('foto').textContent = FOTO ? 'SÍ' : 'no';
+document.getElementById('especie').textContent = ESPECIE;
+document.getElementById('seed').textContent = SEED;
+const leanInicial = medirLean();
+document.getElementById('lean').textContent = leanInicial.lean.toFixed(3) +
+  ' · ' + leanInicial.tipos + ' tipos';
+
+window.__ARRANQUE_OK = true;
+
+// ── bucle ───────────────────────────────────────────────────────────────────
+const clock = new THREE.Clock();
+let frames = 0, fpsT = 0, fps = 0;
+function tick() {
+  requestAnimationFrame(tick);
+  const dt = TIEMPO_FIJO !== null ? 0 : clock.getDelta();
+  if (TIEMPO_FIJO !== null) tree.update(TIEMPO_FIJO); else tree.update(clock.elapsedTime);
+  controls.update();
+  renderer.render(scene, camera);
+  frames++; fpsT += dt;
+  if (fpsT >= 0.5) {
+    fps = Math.round(frames / fpsT);
+    frames = 0; fpsT = 0;
+    document.getElementById('fps').textContent = fps;
+  }
+  document.getElementById('draws').textContent = renderer.info.render.calls;
+}
+tick();
+
+addEventListener('resize', () => {
+  camera.aspect = innerWidth / innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(innerWidth, innerHeight);
+});
+</script>
+</body>
+</html>
