@@ -124,8 +124,12 @@ Regla del brief aplicada en cada paso: verificar absorción **por CONTENIDO
   sin errores nuevos vs baseline **756**; un JSDoc se endureció (tipado
   honesto de `mundoPrincipalDePiso`), sin `any` ni `@ts-ignore`, baseline
   NO tocado.
-- `npm run build`: pendiente de confirmar en CI (no bloqueante para draft;
-  el bundle de App.jsx crece en 1 import estático de datos ~1 KB).
+- `npm run build` (rama 5, la de mayor impacto): **VERDE** — `vite build`
+  completo en 19.6 s con su prebuild de catálogo/manifests.
+- `npx eslint .` full-repo: OOM de Node en este entorno incluso con
+  `--max-old-space-size=6144` (limitación del entorno; el lint de la casa
+  corre SCOPED — ver init.sh, «lint archivos modificados»). Cobertura real:
+  todos los archivos tocados, limpios con `--max-warnings=0`.
 
 ## Estado de checks (separando los de la base)
 
