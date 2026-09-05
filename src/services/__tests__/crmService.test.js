@@ -36,9 +36,19 @@ import {
   updateContact,
 } from '../crmService.js';
 
+/**
+ * Fixture de contacto CRM. El validador real vive en crmService; acá se acepta
+ * cualquier string para poder ejercitar todos los valores de las constantes.
+ * @param {string} [type]
+ * @param {string} [status]
+ */
 const contact = (id, name, type = CONTACT_TYPE.CAMPESINO, status = CONTACT_STATUS.ACTIVO) => ({
   id, type: 'asset--person', attributes: { name, crm_contact_type: type, status },
 });
+/**
+ * Fixture de interacción CRM. Igual criterio: el tipo se valida en crmService.
+ * @param {string} [type]
+ */
 const interaction = (id, contactId, type = INTERACTION_TYPE.VISITA, timestamp = 100) => ({
   id, type: 'log--activity', asset_id: contactId, timestamp,
   attributes: { crm_interaction_type: type, status: 'done' },

@@ -29,6 +29,11 @@ const NETWORK_STATS = {
   ],
 };
 
+/**
+ * Mockup navegable del CRM agroecológico mínimo.
+ * @param {Object} props
+ * @param {() => void} [props.onBack] Vuelve al inicio cuando se pasa; sin ella el mockup se usa standalone.
+ */
 export default function CrmAgroecologico({ onBack }) {
   const [selectedContact, setSelectedContact] = useState(CONTACTS[0]);
   const history = useMemo(
