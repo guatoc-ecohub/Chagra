@@ -58,6 +58,7 @@
  */
 
 import { stripInstanceSuffix } from '../utils/agruparEntradas';
+import { fincaDateISO } from '../utils/farmDate.js';
 
 /** Escala de la barra de clima: 25 mm de lluvia en el día = barra llena. */
 export const PRECIP_ESCALA_MM = 25;
@@ -170,17 +171,12 @@ export function contarEspecies(processes = [], plants = [], { soloVivas = false 
   return set.size;
 }
 
-/** 'YYYY-MM-DD' local (mismo criterio que atmosphereService). */
-function isoDiaLocal(d) {
-  const y = d.getFullYear();
-  const m = String(d.getMonth() + 1).padStart(2, '0');
-  const day = String(d.getDate()).padStart(2, '0');
-  return `${y}-${m}-${day}`;
-}
-
 /**
  * Eje 💧 El clima, desde la señal guardada (snapshot cacheado + condición ya
  * derivada por atmosphereService). Ver contrato en el docstring del módulo.
+ *
+ * BUG TODAY-UTC-HELADA-20260905: el "hoy" se resuelve en el calendario de la
+ * FINCA (fincaDateISO), no en la zona del runtime/UTC.
  *
  * @param {{climaSnapshot?: object|null, condicion?: string|null, now?: Date}} [input]
  * @returns {SlotVitalidad}
@@ -188,7 +184,7 @@ function isoDiaLocal(d) {
 export function ejeClima({ climaSnapshot = null, condicion = null, now = new Date() } = {}) {
   const om = climaSnapshot?.openmeteo;
   const forecast = om?.available && Array.isArray(om.forecast_7d) ? om.forecast_7d : null;
-  const hoyKey = isoDiaLocal(now);
+  const hoyKey = fincaDateISO(now);
   const day = forecast?.find((d) => d?.date === hoyKey) || forecast?.[0] || null;
   const precip = finito(day?.precip_mm);
   const condTxt = condicion && CONDICION_LABEL[condicion] ? CONDICION_LABEL[condicion] : null;
