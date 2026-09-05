@@ -15,6 +15,7 @@
  */
 import { describe, it, expect } from 'vitest';
 import fs from 'node:fs';
+import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -45,6 +46,24 @@ function camina(dir) {
   return archivos;
 }
 
+/**
+ * sigueEnDisco — ¿la entrada sigue declarada en el árbol? (archivar ≠ borrar).
+ *
+ * Desde el 2026-09-04 las láminas archivadas viven como SYMLINKS al disco
+ * frío (`/mnt/data/coldstore/...`, fuera del repo). El symlink es la entrada
+ * real: git la guarda (modo 120000) y el archivo no se borró, aunque su
+ * destino no esté montado — así ocurre en CI, donde `/mnt/data/coldstore`
+ * no existe y `existsSync` (que SÍ sigue el enlace) devolvía false y pintaba
+ * este gate de rojo. Por eso se mira con `lstat` (NO sigue el enlace):
+ * symlink o archivo regular cuenta; lo que delataría un borrado es que la
+ * entrada ya no esté en el árbol.
+ */
+function sigueEnDisco(ruta) {
+  const st = fs.lstatSync(ruta, { throwIfNoEntry: false });
+  if (!st) return false;
+  return st.isSymbolicLink() || st.isFile();
+}
+
 describe('REGLA DURA solo-tinta: el árbol vivo de creatures/ no tiene láminas', () => {
   it('ningún *LaminaViva.jsx queda en la RAÍZ de src/visual/creatures/', () => {
     const enRaiz = fs.readdirSync(CREATURES_DIR)
@@ -54,12 +73,29 @@ describe('REGLA DURA solo-tinta: el árbol vivo de creatures/ no tiene láminas'
 
   it('las SEIS láminas siguen en disco, archivadas en _archivo/ (archivar ≠ borrar)', () => {
     for (const nombre of LAMINAS_ARCHIVADAS) {
-      expect(fs.existsSync(path.join(ARCHIVO_DIR, nombre)), nombre).toBe(true);
+      expect(sigueEnDisco(path.join(ARCHIVO_DIR, nombre)), nombre).toBe(true);
     }
     // y su test viajó con su sujeto
     expect(
-      fs.existsSync(path.join(ARCHIVO_DIR, '__tests__', 'JaguarLaminaViva.test.jsx')),
+      sigueEnDisco(path.join(ARCHIVO_DIR, '__tests__', 'JaguarLaminaViva.test.jsx')),
     ).toBe(true);
+  });
+
+  it('un symlink colgante también cuenta como archivado (CI sin disco frío)', () => {
+    // Repro del rojo de CI de #3124: el runner no tiene /mnt/data/coldstore,
+    // así que los symlinks de _archivo/ quedan colgando. El criterio viejo
+    // (existsSync, que sigue el enlace) los daba por borrados; el correcto
+    // es que la entrada siga declarada en el árbol.
+    const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'lamina-colgante-'));
+    try {
+      const enlace = path.join(tmp, 'LaminaColgante.jsx');
+      fs.symlinkSync(path.join(tmp, 'destino-que-no-existe.jsx'), enlace);
+      expect(fs.existsSync(enlace)).toBe(false); // el criterio viejo fallaba acá
+      expect(sigueEnDisco(enlace)).toBe(true); // el correcto sí la ve
+      expect(sigueEnDisco(path.join(tmp, 'nunca-existio.jsx'))).toBe(false); // borrado sí delata
+    } finally {
+      fs.rmSync(tmp, { recursive: true, force: true });
+    }
   });
 
   it('ningún archivo VIVO de src/ (fuera de _archivo y tests) importa una lámina', () => {
