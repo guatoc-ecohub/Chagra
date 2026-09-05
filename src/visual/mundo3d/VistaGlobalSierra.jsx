@@ -28,7 +28,10 @@
  * propios, sin post-proceso, sin shadow-map. Presupuesto por `tier`
  * (`perfilDeTier`): segmentos de malla, flat vs. smooth, niebla y densidad de
  * nubes. `reducedMotion` congela nubes/brillos y pasa a `frameloop='demand'`.
- * Hora dorada de `atmosferaMadre` (mismo atardecer que el resto de mundos).
+ * La luz es la de `sierra/luzSierra.js`: el MISMO sol bajo de la hora dorada de
+ * `atmosferaMadre` (dirección y calidez), pero con cielo y bruma AZULES —la
+ * lámpara dorada compartida multiplicaba el azul por 0,57 y volvía caqui cinco
+ * de las siete bandas (medido 2026-09-05; ver la cabecera de luzSierra.js).
  *
  * ── EXPORTS ─────────────────────────────────────────────────────────────────
  *   default  VistaGlobalSierra  → escena montable con su propio <Canvas> + pie
@@ -60,7 +63,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import * as THREE from 'three';
 import { Canvas, useFrame } from '@react-three/fiber';
 import { Html, Billboard, OrbitControls, AdaptiveDpr } from '@react-three/drei';
-import { ATMOSFERA } from './atmosferaMadre.js';
+import { ATMOSFERA_SIERRA, SOL_SIERRA, RELLENO_SIERRA } from './sierra/luzSierra.js';
 import { perfilDeTier } from './deviceTier.js';
 import PisosTermicosBandas from './PisosTermicosBandas.jsx';
 import TransicionSierraMundo from './TransicionSierraMundo.jsx';
@@ -151,7 +154,7 @@ const BANDAS = BANDAS_SIERRA.map((b, i, arr) => ({
 /* La línea de hielo CANÓNICA (4 800 m = tope del superpáramo): hasta aquí llegaba. */
 const LINEA_HIELO = BANDAS_SIERRA.find((b) => b.id === 'superparamo')?.tope ?? 4.15;
 /* La dirección del sol de la hora dorada (= la posición de la direccional principal). */
-const SOL_DIR = [-12, 6, -4];
+const SOL_DIR = SOL_SIERRA;
 /* UNA sola instancia del inyector: r3f no recompila el material si la identidad no cambia. */
 const inyectarNieve = crearInyectorNieve({ lineaHielo: LINEA_HIELO });
 /* El GROSOR de la transición entre bandas. Interior: angosto (~±0.09 world Y)
@@ -180,6 +183,23 @@ const PISOS_Y = {
   calido: 0.6, templado: 1.4, frio: 2.2, paramo: 3.0, superparamo: 3.9, nival: 4.6,
 };
 
+/* MOTEADO del manto (2026-09-05, arte): un dosel no es un degradado liso —el pie
+   ocre salía CALVO, medido al 300 %—. Una modulación de VALOR por vértice,
+   determinista (el mismo `ruido` del relieve, a otra escala), ±10 % en los
+   bosques, menos en los pisos abiertos, nada en la arena ni bajo el mar. Cero
+   costo: se hornea en el color de vértice. La LEY de bandas (`colorPorAltura`) no
+   cambia; esto es detalle del manto de la vista global — el descenso
+   (`sierraRelieve.colorPorAlturaRGB`) no lo lleva, a propósito: allí el detalle
+   lo pone la flora instanciada. */
+function amplitudMoteado(y) {
+  if (y < 0.12) return 0; // arena a ras del mar y fondo marino
+  if (y < BANDAS[0].tope) return 0.04; // playa
+  if (y < BANDAS[3].tope) return 0.1; // bosque seco · selva húmeda · bosque de niebla
+  if (y < BANDAS[4].tope) return 0.07; // páramo: pajonal y frailejonal
+  if (y < BANDAS[5].tope) return 0.06; // superpáramo: roca, cojines y líquenes
+  return 0.05; // la roca nival entre parches
+}
+
 /* Construye la malla del terreno en coordenadas de mundo. `plano` = flat-shading
    (des-indexa: caras facetadas, look low-poly de alto gusto en tier alto). */
 function construirTerreno(segX, segZ, plano) {
@@ -195,7 +215,8 @@ function construirTerreno(segX, segZ, plano) {
       const y = alturaSierra(wx, wz);
       pos[p] = wx; pos[p + 1] = y; pos[p + 2] = wz;
       colorPorAltura(y, c);
-      col[p] = c.r; col[p + 1] = c.g; col[p + 2] = c.b;
+      const m = 1 + amplitudMoteado(y) * ruido(wx * 2.2 + 1.3, wz * 2.2 - 0.6);
+      col[p] = c.r * m; col[p + 1] = c.g * m; col[p + 2] = c.b * m;
       p += 3;
     }
   }
@@ -216,42 +237,66 @@ function construirTerreno(segX, segZ, plano) {
   return geo;
 }
 
-/* El mar Caribe al norte: lámina baja y ancha que se pierde en la niebla dorada
-   del horizonte. Un destello de sol tenue que respira (apagado en calma). */
-function Mar({ reducedMotion, conNiebla }) {
-  const destello = useRef(null);
-  useFrame((st) => {
-    if (reducedMotion || !destello.current) return;
-    destello.current.material.opacity = 0.28 + Math.sin(st.clock.elapsedTime * 0.4) * 0.06;
-  });
+/* El mar Caribe al norte: lámina baja y ancha que se pierde en la bruma azul del
+   horizonte. (2026-09-05, arte) Se quitó el «destello de sol»: era un rectángulo
+   plano de 7×12 u con borde recto, y estaba donde el reflejo del sol NO cae (el
+   sol está al occidente, detrás de la cámara); con el mar ahora en primer plano
+   habría salido como una mancha con borde duro. El brillo del agua, si vuelve,
+   tiene que caer donde la física lo pone. */
+function Mar() {
   return (
-    <group>
-      <mesh position={[0, 0.02, -9]} rotation={[-Math.PI / 2, 0, 0]}>
-        <planeGeometry args={[46, 20]} />
-        <meshLambertMaterial color="#4c93ab" transparent opacity={0.96} />
-      </mesh>
-      {conNiebla && (
-        <mesh ref={destello} position={[-3.6, 0.05, -6.5]} rotation={[-Math.PI / 2, 0, 0]}>
-          <planeGeometry args={[7, 12]} />
-          <meshBasicMaterial color="#ffe6ad" transparent opacity={0.3} depthWrite={false} />
-        </mesh>
-      )}
-    </group>
+    <mesh position={[0, 0.02, -9]} rotation={[-Math.PI / 2, 0, 0]}>
+      <planeGeometry args={[46, 20]} />
+      {/* un punto más claro y azul que el #4c93ab de antes: bajo la luz corregida salía
+          (47,106,120), teal apagado; el Caribe visto desde el aire es más claro */}
+      <meshLambertMaterial color="#58a4c2" transparent opacity={0.96} />
+    </mesh>
   );
 }
 
-/* La textura de la nube: RGBA con lomo/panza/honda (nieveSierra.texturaNubeMasa),
-   cacheada una sola vez. Antes era una mancha blanca de un solo tono × alfa
-   (`textoNubeSuave`): sin polígonos, pero SÁBANA. `null` sin contexto 2D (jsdom):
-   billboard liso, nunca tumba la Sierra. */
-let _nubeTex = null;
+/* EL DOMO DEL CIELO (2026-09-05, arte): un `<color>` plano lee como cartulina, y con
+   la cámara por encima de la cumbre el casquete se ve contra el horizonte. Esfera
+   con COLOR DE VÉRTICE —horizonte abajo, cenit arriba—, el patrón de
+   `bosque/fondoParamo.jsx`: cero GLSL propio, UN draw call, sin niebla ni
+   tonemapping. Costo: el relleno del área de cielo (≈25-30 % del cuadro) con un
+   fragment trivial; en el Mali-G78 NO está medido. Solo con `perfil.fog` (el tier
+   bajo conserva el color plano: fill-rate al mínimo). La niebla usa el color del
+   horizonte: la ladera lejana se disuelve en el mismo aire. */
+function DomoCielo() {
+  const geo = useMemo(() => {
+    const g = new THREE.SphereGeometry(60, 24, 12);
+    const pos = g.getAttribute('position');
+    const col = new Float32Array(pos.count * 3);
+    const h = new THREE.Color(ATMOSFERA_SIERRA.fondo), z = new THREE.Color(ATMOSFERA_SIERRA.cenit), c = new THREE.Color();
+    for (let i = 0; i < pos.count; i++) {
+      const t = smoothstep(0, 0.22, pos.getY(i) / 60); // cenit pleno a ≈13° sobre el horizonte
+      c.lerpColors(h, z, t);
+      col[i * 3] = c.r; col[i * 3 + 1] = c.g; col[i * 3 + 2] = c.b;
+    }
+    g.setAttribute('color', new THREE.BufferAttribute(col, 3));
+    return g;
+  }, []);
+  useEffect(() => () => geo.dispose(), [geo]);
+  return (
+    <mesh geometry={geo} position={[0, 5, 0]} renderOrder={-1}>
+      <meshBasicMaterial vertexColors side={THREE.BackSide} depthWrite={false} fog={false} toneMapped={false} />
+    </mesh>
+  );
+}
+
+/* Las texturas de nube: RGBA con lomo/panza/honda (nieveSierra.texturaNubeMasa),
+   cacheadas una sola vez. DOS semillas que alternan (una con torre, una en pan):
+   con una sola, siete nubes idénticas se delataban como calcos. Antes era una
+   mancha blanca de un solo tono × alfa (`textoNubeSuave`): sin polígonos, pero
+   SÁBANA. `null` sin contexto 2D (jsdom): billboard liso, nunca tumba la Sierra. */
+let _nubeTex = /** @type {Array<THREE.Texture|null>} */ ([null, null]);
 let _nubeTexIntentada = false;
-function nubeTextura() {
+function nubeTextura(i = 0) {
   if (!_nubeTexIntentada) {
     _nubeTexIntentada = true;
-    _nubeTex = texturaNubeMasa(3);
+    _nubeTex = [texturaNubeMasa(5), texturaNubeMasa(9)];
   }
-  return _nubeTex;
+  return _nubeTex[i % 2];
 }
 
 /* Nubes bajas que se ENGANCHAN en el bosque de niebla (banda ~1.8–2.4): planos
@@ -268,14 +313,13 @@ function nubeTextura() {
    finca no se inventa. */
 function NubesDeNiebla({ cuantas, reducedMotion, fase = 'neutral', humedad = null }) {
   const grupo = useRef(null);
-  const tex = nubeTextura();
   const franja = useMemo(() => franjaCondensacion(fase, humedad), [fase, humedad]);
   const nubes = useMemo(() => {
     const out = [];
     const cotaY = franja.cota / 1155;               // 1 u = 1 155 m (escala canónica §2.2)
     const sigmaY = (franja.sigma / 1155) * 0.6;
     for (let i = 0; i < cuantas; i++) {
-      const wx = -7 + (14 * (i + 0.5)) / cuantas + Math.sin(i * 2.3) * 1.4;
+      const wx = -7 + (14 * (i + 0.5)) / cuantas + Math.sin(i * 2.3) * 0.7; // jitter corto: vecinas que no se montan
       const y = cotaY + (((i * 7) % 5) - 2) * 0.5 * sigmaY;  // jitter determinista dentro de la franja
       // la Z de la ladera norte donde el terreno alcanza ESA cota; la nube cuelga delante (en el aire)
       let wz = COSTA_Z + 1.2, mejor = 99;
@@ -283,15 +327,17 @@ function NubesDeNiebla({ cuantas, reducedMotion, fase = 'neutral', humedad = nul
         const d = Math.abs(alturaSierra(wx, z) - y);
         if (d < mejor) { mejor = d; wz = z; }
       }
-      // (2026-09-04, arte) cuerpos más angostos: con ancho 1,6-2,6 × esc 0,7-1,3 sobre un
-      // plano de 2,4 u, a 2 u de paso, los siete se solapaban en UNA sábana. Ahora cada
-      // uno mide ~1,9-3,1 u y se tocan sin fundirse: se cuentan.
+      // (2026-09-05, arte) CUERPOS, no sábana. Lo de 2026-09-04 («~1,9-3,1 u») medía en
+      // realidad 1,9-4,5 u (ancho × esc × 2,4) a 2 u de paso: en el cuadro completo los
+      // siete seguían fundidos en UNA franja blanca de x≈180 a x≈1070. Ahora cada nube
+      // mide 1,3-2,3 u de ancho y ≈2:1 de relación; se tocan a veces, no se funden. La
+      // silueta (lomos arriba, base plana en su cota) la pone la textura.
       out.push({
         key: `n${i}`,
         base: [wx, y, wz - 0.9],
-        esc: 0.8 + ((i * 37) % 10) / 22,
-        ancho: 1.0 + ((i * 53) % 7) / 12, // cuerpo, no placa
-        opacidad: (0.55 + 0.3 * (((i * 3) % 4) / 3)) * franja.amplitud,
+        ancho: 1.3 + ((i * 53) % 7) / 6, // 1,3 … 2,3 u
+        alto: (1.3 + ((i * 53) % 7) / 6) * (0.56 + ((i * 37) % 10) / 90), // ≈1,8:1 … 1,5:1 — cúmulo, no placa
+        opacidad: (0.62 + 0.28 * (((i * 3) % 4) / 3)) * franja.amplitud,
         fase: (i * 1.7) % (Math.PI * 2),
       });
     }
@@ -308,16 +354,19 @@ function NubesDeNiebla({ cuantas, reducedMotion, fase = 'neutral', humedad = nul
 
   return (
     <group ref={grupo}>
-      {nubes.map((n) => (
-        <Billboard key={n.key} position={/** @type {[number, number, number]} */ (n.base)}>
-          <mesh scale={[n.ancho * n.esc, n.ancho * n.esc * 0.55, 1]}>
-            <planeGeometry args={[2.4, 1.6]} />
-            {/* el color viene horneado (tres tonos); sin tonemapping, como el cielo de fondo,
-                para que el lomo pueda ser MÁS claro que el cielo dorado */}
-            <meshBasicMaterial map={tex} color={tex ? "#ffffff" : "#e9e6df"} transparent opacity={n.opacidad} depthWrite={false} side={THREE.DoubleSide} toneMapped={false} />
-          </mesh>
-        </Billboard>
-      ))}
+      {nubes.map((n, i) => {
+        const tex = nubeTextura(i);
+        return (
+          <Billboard key={n.key} position={/** @type {[number, number, number]} */ (n.base)}>
+            <mesh scale={[n.ancho / 2.4, n.alto / 1.6, 1]}>
+              <planeGeometry args={[2.4, 1.6]} />
+              {/* el color viene horneado (tres tonos); sin tonemapping, como el cielo de fondo,
+                  para que el lomo pueda ser MÁS claro que el cielo */}
+              <meshBasicMaterial map={tex} color={tex ? "#ffffff" : "#e9e6df"} transparent opacity={n.opacidad} depthWrite={false} side={THREE.DoubleSide} toneMapped={false} />
+            </mesh>
+          </Billboard>
+        );
+      })}
     </group>
   );
 }
@@ -343,15 +392,19 @@ function SolDorado() {
   );
 }
 
-/* Las luces de la hora madre (misma dirección de arte que el resto de mundos).
-   Sin shadow-map: es una vista lejana, el costo no se justifica en gama baja. */
-function LucesDoradas() {
+/* Las luces de la Sierra (`sierra/luzSierra.js`): el MISMO sol bajo y cálido de
+   la hora madre, y un cielo AZUL que rellena las sombras —antes el domo era
+   dorado y el ambiente cálido: 2,42 de intensidad cálida contra 0,28 de fría,
+   que mataba el azul de cinco bandas (medido). Sin shadow-map: es una vista
+   lejana, el costo no se justifica en gama baja. */
+function LucesSierra() {
+  const k = ATMOSFERA_SIERRA.intensidad;
   return (
     <>
-      <hemisphereLight intensity={0.85} color={ATMOSFERA.cielo} groundColor={ATMOSFERA.suelo} />
-      <ambientLight intensity={0.32} color="#fff1d6" />
-      <directionalLight position={[-12, 6, -4]} intensity={1.25} color={ATMOSFERA.luz} />
-      <directionalLight position={[8, 4, 10]} intensity={0.28} color={ATMOSFERA.relleno} />
+      <hemisphereLight intensity={k.hemisferio} color={ATMOSFERA_SIERRA.cielo} groundColor={ATMOSFERA_SIERRA.suelo} />
+      <ambientLight intensity={k.ambiente} color={ATMOSFERA_SIERRA.ambiente} />
+      <directionalLight position={SOL_SIERRA} intensity={k.sol} color={ATMOSFERA_SIERRA.luz} />
+      <directionalLight position={RELLENO_SIERRA} intensity={k.relleno} color={ATMOSFERA_SIERRA.relleno} />
     </>
   );
 }
@@ -468,7 +521,7 @@ function MapaDeNivel({ segmentos, pisoUsuario }) {
         </mesh>
       ))}
       {capas.filter((c) => c.ancla).map((c) => (
-        <group key={`${c.key}-rotulo`} position={[c.ancla[0], LINEA_HIELO + 0.06, c.ancla[1]]}>
+        <group key={`${c.key}-rotulo`} position={[c.ancla[0], LINEA_HIELO + 0.22, c.ancla[1]]}>{/* +0,22: con la cámara nueva, a +0,06 el rótulo rozaba el de «Nival» */}
           <Html center distanceFactor={13} zIndexRange={[28, 8]} style={{ pointerEvents: 'none' }}>
             <div className="vsierra-hielo" aria-hidden="true">Hasta aquí llegaba el hielo · 4.800 m</div>
           </Html>
@@ -592,16 +645,17 @@ export function SierraDiorama({
      nunca envueltos en un <group> (adjuntaría al grupo y no pintaría). */
   return (
     <>
-      {atmosfera && <color attach="background" args={[ATMOSFERA.fondo]} />}
-      {atmosfera && perfil.fog && <fogExp2 attach="fog" args={[ATMOSFERA.niebla, 0.028]} />}
-      {luces && <LucesDoradas />}
+      {atmosfera && <color attach="background" args={[ATMOSFERA_SIERRA.fondo]} />}
+      {atmosfera && perfil.fog && <fogExp2 attach="fog" args={[ATMOSFERA_SIERRA.niebla, ATMOSFERA_SIERRA.densidadNiebla]} />}
+      {atmosfera && perfil.fog && <DomoCielo />}
+      {luces && <LucesSierra />}
       <SolDorado />
 
       <mesh geometry={geo}>
         <meshLambertMaterial vertexColors flatShading={perfil.flatShading} onBeforeCompile={inyectarNieve} />
       </mesh>
 
-      <Mar reducedMotion={reducedMotion} conNiebla={perfil.fog} />
+      <Mar />
       <NubesDeNiebla cuantas={nubes} reducedMotion={reducedMotion} fase={faseEnso} />
 
       {/* Rótulos sobrios de los lugares exigidos por el encargo. Los `alto`
@@ -631,7 +685,7 @@ export function SierraDiorama({
 
 /* Estilos de los rótulos y pie de crédito (viven aquí: son de ESTA escena). */
 const CSS_SIERRA = `
-.vsierra-root { position: relative; width: 100%; height: 100dvh; min-height: 320px; overflow: hidden; background: ${ATMOSFERA.fondo}; }
+.vsierra-root { position: relative; width: 100%; height: 100dvh; min-height: 320px; overflow: hidden; background: ${ATMOSFERA_SIERRA.fondo}; }
 .vsierra-canvas { position: absolute; inset: 0; opacity: 0; transition: opacity 0.7s ease; }
 .vsierra-canvas--lista { opacity: 1; }
 .vsierra-rotulo { white-space: nowrap; font: 600 0.78rem/1.15 system-ui, sans-serif; color: #402c16; padding: 0.16rem 0.5rem; border-radius: 999px; background: rgba(255,248,233,0.82); box-shadow: 0 1px 5px rgba(60,42,24,0.22); }
@@ -719,13 +773,18 @@ export default function VistaGlobalSierra({
         className={`vsierra-canvas${listo ? ' vsierra-canvas--lista' : ''}`}
         dpr={perfil.dpr}
         gl={{ antialias: perfil.antialias, powerPreference: 'high-performance' }}
-        camera={{ position: [-1.5, 5.2, -11], fov: 48 }}
+        camera={{ position: [-1.5, 6.6, -12.8], fov: 48 }}
         frameloop={reducedMotion ? 'demand' : 'always'}
         onCreated={() => setListo(true)}
       >
         {/* Cámara PARADA sobre el mar Caribe (−Z, norte), mirando al SUR (+Z) y
             un poco hacia arriba: el mar llena el primer plano y las cumbres
-            nevadas suben en el tercio superior. El encuadre roto anterior venía
+            nevadas suben en el tercio superior. (2026-09-05, arte) Esa intención
+            estaba escrita y NO se cumplía: con la cámara en y=5,2 el borde
+            inferior del cuadro caía en z≈−3,9 y el Caribe era un hilo del 6 % del
+            alto, verde por la luz (medido). Más alta y más atrás —distancia 15,4
+            < max 16; polar 1,27 rad dentro de [1,05, 1,45]— el mar ocupa ≈14 % y
+            la cumbre sigue en el tercio superior. El encuadre roto anterior venía
             de clamps de azimuth centrados en 0 (lado equivocado) con la cámara
             en −Z (azimuth ≈ ±π): OrbitControls la teletransportaba fuera del
             macizo. Aquí los clamps abrazan el azimuth natural (≈ −3.0 rad). El
@@ -744,7 +803,7 @@ export default function VistaGlobalSierra({
           enableZoom
           minDistance={9}
           maxDistance={16}
-          target={[0, 2.3, 2.5]}
+          target={[0, 2.1, 2.2]}
           minPolarAngle={1.05}
           maxPolarAngle={1.45}
           minAzimuthAngle={-Math.PI}

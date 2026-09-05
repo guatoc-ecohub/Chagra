@@ -306,13 +306,19 @@ export function compatibilidadPiso(pisoUsuario) {
  * los verdes, midiendo rgb(91,120,51) contra rgb(45,66,33); mantener los ocres
  * dejaba la vista global peleada con su propio descenso y con la bóveda.
  * AHORA el `color` de cada banda NO se escribe: se DERIVA de `PISOS_TERMICOS`
- * por el id de `piso` (ver `colorDeBanda`), con dos excepciones DECLARADAS —
+ * por el id de `piso` (ver `colorDeBanda`), con tres excepciones DECLARADAS —
  * que son excepciones de render, no una segunda paleta:
  *   · `playa`  — no tiene piso ecológico propio (es la mitad baja del cálido),
  *                así que conserva su arena `#ddc78d`.
  *   · `nival`  — override de render que el PASO 2 documentó: bajo la luz
  *                dorada del atardecer el `#eef2f4` canónico se lee OCRE, y la
  *                cima tiene que leerse NIEVE (§6-B). Va a `#f4f9ff`.
+ *   · `paramo` — (2026-09-05, FABLE-SIERRA-ESTETICA) el `#9fb6bf` térmico y el
+ *                `#b9c6cc` del superpáramo distan ΔE76 = 7,5 YA EN LA TABLA:
+ *                nacieron indistinguibles y ningún smoothstep los separa. En la
+ *                montaña el páramo se pinta de lo que ES —pajonal y frailejonal,
+ *                paja y oliva, los mismos tintes que esta tabla ya le da al
+ *                transecto— y no de la escala térmica azul-plata. `#a9ad74`.
  * Consecuencia medible: la vista global y el descenso NO cambian un solo pixel
  * (ya leían estos valores a mano); la que cambia es la BÓVEDA —y con ella el
  * gemelo 2D del equipo humilde—, que deja los ocres y se alinea con las otras.
@@ -344,15 +350,24 @@ export const ORDEN_PISOS_SIERRA = 'cima→mar';
 export const ORDEN_BANDAS_SIERRA = 'mar→cima';
 
 /**
- * Excepciones de RENDER al color canónico. No son una paleta paralela: son dos
+ * Excepciones de RENDER al color canónico. No son una paleta paralela: son tres
  * casos con razón escrita (ver la cabecera). Cualquier otra banda que quiera
  * salirse de `PISOS_TERMICOS` tiene que justificarse aquí, a la vista.
  */
 export const COLOR_BANDA_EXCEPCION = {
-  // la costa no es un piso térmico: es la mitad baja del cálido, y su color es arena
-  playa: '#ddc78d',
+  // la costa no es un piso térmico: es la mitad baja del cálido, y su color es arena.
+  // (2026-09-05) de `#ddc78d` a una arena más pálida: contra el bosque seco `#cba04a`
+  // distaba 23 declarado y 10,5-12,6 renderizado (al filo del conteo); ahora 33.
+  playa: '#e4d6ab',
   // la nieve tiene que leerse NIEVE bajo la hora dorada, no ocre (PASO 2, §6-B)
   nival: '#f4f9ff',
+  // el páramo NACÍA indistinguible del superpáramo: `#9fb6bf` contra `#b9c6cc` distan
+  // ΔE76 = 7,5 en la tabla misma, bajo el umbral de conteo (12) — ningún smoothstep separa
+  // dos colores que son casi el mismo (medido 2026-09-05, GPU real). La identidad sale de
+  // lo que el piso ES (pajonal y frailejonal: paja y oliva, los tintes que esta tabla ya
+  // le da al transecto, tintA #c7bb6e / tintB #5f6b45), no de subir saturación.
+  // ΔE76 declarado: 35,6 contra superpáramo · 32,8 contra bosque de niebla.
+  paramo: '#a9ad74',
 };
 
 /** El color de una banda: el de su piso en `PISOS_TERMICOS`, salvo excepción. */

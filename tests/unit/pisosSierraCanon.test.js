@@ -138,10 +138,14 @@ describe('🎨 el color de cada banda SALE de PISOS_TERMICOS, no de una segunda 
     }
   });
 
-  it('las excepciones son exactamente DOS, y las dos con razón escrita', () => {
+  it('las excepciones son exactamente TRES, y las tres con razón escrita', () => {
     // playa: no es un piso térmico (es la mitad baja del cálido) → arena.
     // nival: override de render, la cima debe leer NIEVE bajo la hora dorada.
-    expect(Object.keys(COLOR_BANDA_EXCEPCION).sort()).toEqual(['nival', 'playa']);
+    // paramo: (2026-09-05) el `#9fb6bf` térmico distaba ΔE76 = 7,5 del superpáramo
+    //         en la tabla misma — nacían indistinguibles; en la montaña el páramo
+    //         se pinta de pajonal (paja y oliva), no de la escala térmica.
+    expect(Object.keys(COLOR_BANDA_EXCEPCION).sort()).toEqual(['nival', 'paramo', 'playa']);
+    expect(COLOR_BANDA_EXCEPCION.paramo).toBe('#a9ad74');
   });
 
   it('🔴 los ocres de la tabla vieja NO sobreviven en ninguna banda', () => {
