@@ -135,6 +135,35 @@ export function describeWeathercode(code, isDay = true) {
     return { label: 'Sin dato', emoji: '❓', family: 'nubes' };
 }
 
+/**
+ * ISO de calendario (YYYY-MM-DD) de un instante, en la zona horaria dada por
+ * su offset en segundos respecto a UTC — BUG-DIA-UTC-20260904.
+ *
+ * Por qué existe: `new Date().toISOString().slice(0,10)` da el día EN UTC.
+ * Colombia es UTC-5 (fijo, sin horario de verano): a las 19:00 hora local el
+ * reloj del sistema ya marca las 00:00 UTC del día siguiente, así que entre
+ * las 19:00 y medianoche esa expresión devuelve MAÑANA, no hoy — justo la
+ * ventana en la que se avisa una helada (que ocurre de madrugada y el aviso
+ * debe darse la noche anterior).
+ *
+ * El offset SIEMPRE viene de la respuesta de Open-Meteo (`utc_offset_seconds`,
+ * presente cuando se pide `timezone=auto` o un nombre de zona explícito).
+ * NUNCA una constante regional escrita a mano: Colombia no tiene horario de
+ * verano hoy, pero una constante sería una bomba dormida para cualquier otra
+ * región que use este mismo módulo.
+ *
+ * Sin offset (dato ausente) devuelve `null` — el caller degrada a un
+ * fallback ya declarado, nunca inventa el día.
+ *
+ * @param {number} nowMs epoch ms (inyectable en tests vía reloj falseado)
+ * @param {number|null|undefined} utcOffsetSeconds
+ * @returns {string|null}
+ */
+export function localIsoDate(nowMs, utcOffsetSeconds) {
+    if (!Number.isFinite(utcOffsetSeconds)) return null;
+    return new Date(nowMs + utcOffsetSeconds * 1000).toISOString().slice(0, 10);
+}
+
 /** Índice del array horario más cercano a "ahora" (hora local del sitio). */
 function nowHourIndex(times) {
     if (!Array.isArray(times) || times.length === 0) return 0;
@@ -216,6 +245,8 @@ export async function fetchAgroMeteo(loc, opts = {}) {
     }
 
     const d = raw.daily;
+    const utcOffsetSeconds = Number.isFinite(raw.utc_offset_seconds) ? raw.utc_offset_seconds : null;
+    const hoyFinca = localIsoDate(Date.now(), utcOffsetSeconds);
     const nHour = nowHourIndex(raw.hourly.time);
     const nowW = describeWeathercode(raw.current?.weathercode ?? raw.hourly.weathercode?.[nHour], (raw.current?.is_day ?? raw.hourly.is_day?.[nHour]) !== 0);
 
@@ -254,6 +285,7 @@ export async function fetchAgroMeteo(loc, opts = {}) {
         lng,
         elevation: raw.elevation ?? elevation ?? null,
         timezone: raw.timezone ?? null,
+        utc_offset_seconds: Number.isFinite(raw.utc_offset_seconds) ? raw.utc_offset_seconds : null,
         now: {
             temp: raw.current?.temperature_2m ?? raw.hourly.temperature_2m?.[nHour] ?? null,
             aparente: raw.current?.apparent_temperature ?? null,
@@ -269,9 +301,14 @@ export async function fetchAgroMeteo(loc, opts = {}) {
             soil_moisture_3_9: raw.hourly.soil_moisture_3_to_9cm?.[nHour] ?? null,
             weather: nowW,
         },
-        // El "hoy" agronómico = la entrada diaria de la fecha de hoy (o daily[1]
-        // cuando past_days=1 empuja ayer al índice 0).
-        today: dailyDigest.find((x) => x.date === new Date().toISOString().slice(0, 10)) || dailyDigest[1] || dailyDigest[0] || null,
+        // El "hoy" agronómico = la entrada diaria de la fecha de hoy EN LA
+        // ZONA HORARIA DE LA FINCA (BUG-DIA-UTC-20260904 — antes comparaba
+        // contra el día en UTC, que desde las 19:00 hora Colombia ya es
+        // mañana). Sin `utc_offset_seconds` en la respuesta (dato ausente),
+        // `hoyFinca` es null y cae al fallback ya documentado (daily[1],
+        // el "hoy" cuando past_days=1 empuja ayer al índice 0) — nunca se
+        // inventa el offset.
+        today: (hoyFinca && dailyDigest.find((x) => x.date === hoyFinca)) || dailyDigest[1] || dailyDigest[0] || null,
         daily: dailyDigest,
     };
 
@@ -318,8 +355,16 @@ export async function fetchNormales(loc) {
         return null;
     }
 
-    // Día-del-año de hoy y ventana ±10 días.
-    const now = new Date();
+    // Día-del-año de hoy y ventana ±10 días. Mismo patrón BUG-DIA-UTC-20260904
+    // que `today` en fetchAgroMeteo: `now` se corrige al día EN LA ZONA DE LA
+    // FINCA con el offset que la propia respuesta trae (`utc_offset_seconds`),
+    // no con el UTC crudo del reloj del sistema. Sin offset (dato ausente) se
+    // usa el reloj del sistema tal cual — la ventana es de ±10 días, así que
+    // un desfase de una fecha no cambia materialmente la media climatológica.
+    const utcOffsetSecondsNormales = Number.isFinite(raw.utc_offset_seconds) ? raw.utc_offset_seconds : null;
+    const now = utcOffsetSecondsNormales != null
+        ? new Date(Date.now() + utcOffsetSecondsNormales * 1000)
+        : new Date();
     const doy = (dt) => {
         const start = Date.UTC(dt.getUTCFullYear(), 0, 0);
         return Math.floor((Date.UTC(dt.getUTCFullYear(), dt.getUTCMonth(), dt.getUTCDate()) - start) / 86400000);
