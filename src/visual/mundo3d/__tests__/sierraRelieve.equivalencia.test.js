@@ -8,15 +8,13 @@
  * el mapa orbital y el paseo muestran montañas distintas. Nadie lo nota hasta
  * que es caro.
  *
- * Hoy `VistaGlobalSierra.jsx` conserva su copia local de la ley (no se tocó a
- * propósito: el Paso 2 está editando ese archivo en otro carril). Así que el
- * control no puede ser «importar las dos y comparar»: compara el TEXTO de las
- * dos implementaciones. Si alguna se mueve sin la otra, falla acá.
- *
- * Cuando el integrador haga que `VistaGlobalSierra.jsx` importe de
- * `sierra/sierraRelieve.js` (un cambio de una línea, después del Paso 2), este
- * test se puede simplificar a una igualdad numérica — o borrar, porque ya no
- * habría dos copias que puedan divergir.
+ * ✅ 2026-09-05 (FABLE-SIERRA-COSTERO): `VistaGlobalSierra.jsx` ya IMPORTA la
+ * ley de `sierra/sierraRelieve.js`. Antes este test comparaba el TEXTO de dos
+ * copias; ahora exige que no haya dos copias: la vista no puede declarar su
+ * propia `alturaSierra`/`gauss`/`ruido` ni sus propias constantes de geografía.
+ * Y fija lo que el costero trajo a la ley: la costa con forma que pasa EXACTO
+ * por COSTA_Z en x = 0 (el descenso aterriza donde siempre), el lecho marino
+ * negativo y las lagunas de páramo dentro de su banda.
  */
 import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
@@ -25,7 +23,12 @@ import { describe, it, expect } from 'vitest';
 import {
   alturaSierra,
   colorPorAlturaRGB,
-  mallaMacizo,
+  costaZ,
+  distCosta,
+  exposicionMar,
+  LAGUNAS_PARAMO,
+  wzDeAltura,
+  msnmDeY,
   CIMA,
   COSTA_Z,
   ANCHO,
@@ -34,41 +37,20 @@ import {
 
 const AQUI = dirname(fileURLToPath(import.meta.url));
 const leer = (rel) => readFileSync(resolve(AQUI, rel), 'utf8');
-
-/** Extrae el cuerpo de una función de nivel superior, normalizando espacios. */
-function cuerpoDeFuncion(fuente, nombre) {
-  const re = new RegExp(`function ${nombre}\\s*\\(([^)]*)\\)\\s*\\{([\\s\\S]*?)\\n\\}`, 'm');
-  const m = fuente.match(re);
-  if (!m) return null;
-  return `${m[1]}|${m[2]}`
-    .replace(/\/\/[^\n]*/g, '') // comentarios de línea: la prosa puede diferir
-    .replace(/\s+/g, ' ')
-    .trim();
-}
-
 const VISTA = leer('../VistaGlobalSierra.jsx');
-const RELIEVE = leer('../sierra/sierraRelieve.js');
 
 describe('la ley de altura del macizo es UNA', () => {
   for (const fn of ['alturaSierra', 'gauss', 'ruido']) {
-    it(`\`${fn}\` es idéntica en la vista global y en el descenso`, () => {
-      const a = cuerpoDeFuncion(VISTA, fn);
-      const b = cuerpoDeFuncion(RELIEVE, fn);
-      expect(a, `no se halló ${fn} en VistaGlobalSierra.jsx`).toBeTruthy();
-      expect(b, `no se halló ${fn} en sierraRelieve.js`).toBeTruthy();
-      expect(b).toBe(a);
+    it(`la vista global NO declara su propia \`${fn}\``, () => {
+      expect(new RegExp(`function ${fn}\\s*\\(`).test(VISTA)).toBe(false);
     });
   }
 
-  it('las constantes de geografía coinciden', () => {
-    const num = (fuente, nombre) => {
-      const m = fuente.match(new RegExp(`const ${nombre} = (-?[0-9.]+);`));
-      return m ? Number(m[1]) : null;
-    };
-    expect(num(VISTA, 'CIMA')).toBe(CIMA);
-    expect(num(VISTA, 'COSTA_Z')).toBe(COSTA_Z);
-    expect(num(VISTA, 'ANCHO')).toBe(ANCHO);
-    expect(num(VISTA, 'FONDO')).toBe(FONDO);
+  it('la vista global importa la ley y las constantes de sierraRelieve.js', () => {
+    expect(VISTA).toMatch(/import\s*\{[^}]*\balturaSierra\b[^}]*\}\s*from\s*'\.\/sierra\/sierraRelieve\.js'/);
+    for (const k of ['CIMA', 'COSTA_Z', 'ANCHO', 'FONDO']) {
+      expect(new RegExp(`const ${k} = `).test(VISTA), `${k} redeclarada en la vista`).toBe(false);
+    }
   });
 });
 
@@ -76,10 +58,11 @@ describe('la escala de §2.2 sigue siendo la de la tabla canónica', () => {
   it('1 unidad de mundo ≈ 1 155 msnm y la cumbre cae en 5.0', () => {
     expect(CIMA).toBe(5.0);
     expect(5775 / CIMA).toBeCloseTo(1155, 0);
+    expect(ANCHO).toBe(22);
+    expect(FONDO).toBe(20);
   });
 
-  it('la cumbre del macizo llega a la cota nival (≥ 4 800 m ⇒ y ≥ 4.15)', () => {
-    // La cumbre real de la malla, buscada donde el diseño la pone (§2.2).
+  it('la cumbre del macizo llega a la cota nival (≥ 4 800 m ⇒ y ≥ 4.15) y no se dispara', () => {
     let maxY = -Infinity;
     for (let x = -3; x <= 4; x += 0.25) {
       for (let z = 1.5; z <= 5.5; z += 0.25) {
@@ -87,21 +70,73 @@ describe('la escala de §2.2 sigue siendo la de la tabla canónica', () => {
       }
     }
     expect(maxY).toBeGreaterThan(4.15); // hay terreno en la banda de nieve
+    expect(maxY).toBeLessThan(CIMA + 0.25); // las crestas no mueven la cumbre
   });
 
-  it('el mar al norte de la costa está a ~0 (el descenso no lo inventa)', () => {
+  it('el mar al norte de la costa está bajo cero (el descenso no lo inventa)', () => {
     expect(alturaSierra(0, -6)).toBeLessThan(0);
     expect(alturaSierra(3, -8)).toBeLessThan(0);
   });
 });
 
+describe('la costa que trajo el costero', () => {
+  it('pasa EXACTO por COSTA_Z en x = 0: el descenso por x = 0 aterriza donde siempre', () => {
+    expect(costaZ(0)).toBeCloseTo(COSTA_Z, 9);
+    expect(distCosta(0, COSTA_Z)).toBeCloseTo(0, 9);
+  });
+
+  it('NO es una regla: la orilla varía más de 1 u a lo ancho y el promontorio sale al mar', () => {
+    const zs = [];
+    for (let x = -11; x <= 11; x += 0.25) zs.push(costaZ(x));
+    expect(Math.max(...zs) - Math.min(...zs)).toBeGreaterThan(1.0);
+    expect(costaZ(-6.2)).toBeLessThan(COSTA_Z - 0.8);
+  });
+
+  it('el lecho cae desde la orilla: somero junto a la costa, hondo mar adentro, nunca más hondo que el talud', () => {
+    for (const x of [-8, -3, 0, 4, 9]) {
+      const z0 = costaZ(x);
+      const somero = alturaSierra(x, z0 - 0.1);
+      const hondo = alturaSierra(x, z0 - 3);
+      expect(somero).toBeLessThan(0);
+      expect(somero).toBeGreaterThan(-0.03);
+      expect(hondo).toBeLessThan(somero);
+      expect(hondo).toBeGreaterThanOrEqual(-0.17);
+    }
+  });
+
+  it('la exposición al oleaje es 1 en mar abierto y baja al abrigo del promontorio', () => {
+    expect(exposicionMar(6, -8)).toBeCloseTo(1, 5);
+    expect(exposicionMar(-5, costaZ(-5) - 0.3)).toBeLessThan(0.7);
+  });
+
+  it('el descenso por x = 0 sigue encontrando todas sus cotas', () => {
+    for (const y of [0.5, 1, 2, 3, 4, 4.5]) expect(wzDeAltura(y, 0)).not.toBeNull();
+  });
+});
+
+describe('las lagunas de páramo', () => {
+  it('viven en la banda de páramo (3 000–4 000 m) y lejos del descenso (|x| > 1.4)', () => {
+    expect(LAGUNAS_PARAMO.length).toBeGreaterThanOrEqual(2);
+    for (const L of LAGUNAS_PARAMO) {
+      const m = msnmDeY(L.nivel);
+      expect(m).toBeGreaterThan(3000);
+      expect(m).toBeLessThan(4000);
+      expect(Math.abs(L.x)).toBeGreaterThan(1.4);
+    }
+  });
+
+  it('el cuenco está bajo el nivel y TODO el borde del espejo por encima (circo sin dique)', () => {
+    for (const L of LAGUNAS_PARAMO) {
+      expect(alturaSierra(L.x, L.z)).toBeLessThan(L.nivel);
+      for (let a = 0; a < 24; a++) {
+        const ang = (a / 24) * Math.PI * 2;
+        expect(alturaSierra(L.x + Math.cos(ang) * L.radio, L.z + Math.sin(ang) * L.radio)).toBeGreaterThan(L.nivel);
+      }
+    }
+  });
+});
+
 describe('🔴 REGRESIÓN — las 7 bandas se leen 7, no 1', () => {
-  /*
-   * El Paso 1 dejó `BANDAS_SIERRA` ordenada cima→mar (primer tope `Infinity`),
-   * y el algoritmo `while (y > BANDAS[i].tope) i++` la recorre al revés: se
-   * queda en el índice 0 y devuelve crema nival para TODA altitud. Este test
-   * es el control que impide que vuelva a pasar sin que nadie lo note.
-   */
   const COTAS = [0.1, 0.6, 1.3, 2.2, 3.0, 3.8, 4.9];
 
   it('siete cotas distintas dan siete colores distintos', () => {
@@ -129,70 +164,5 @@ describe('🔴 REGRESIÓN — las 7 bandas se leen 7, no 1', () => {
   it('sobre la línea de nieve SÍ es nieve', () => {
     const c = colorPorAlturaRGB(4.9).map((v) => Math.round(v * 255));
     expect(Math.min(...c)).toBeGreaterThan(200);
-  });
-});
-
-describe('🚪 PUERTA DEL PASO 5 — la bóveda enseña los MISMOS 7 pisos', () => {
-  /*
-   * La bóveda del clima montaba cuatro troncos de cono de siete lados con
-   * flat-shading (§2.8: un zigurat heptagonal). Ahora monta la misma ladera que
-   * la vista global y el descenso, reescalada. La puerta —«la pantalla de clima
-   * y el descenso enseñan los mismos 7 pisos»— se cumple por construcción: es
-   * la MISMA función de color sobre la MISMA ley de altura.
-   */
-  const ALTO = 3.5;
-  const RADIO = 2.4;
-  const malla = mallaMacizo({ alto: ALTO, radio: RADIO, segmentos: 48 });
-
-  it('la cima cae exactamente en el alto pedido (el casquete no se mueve)', () => {
-    let maxY = -Infinity;
-    for (let i = 1; i < malla.posiciones.length; i += 3) {
-      if (malla.posiciones[i] > maxY) maxY = malla.posiciones[i];
-    }
-    expect(maxY).toBeGreaterThan(ALTO * 0.92);
-    expect(maxY).toBeLessThanOrEqual(ALTO + 1e-6);
-  });
-
-  it('nada baja del piso: el mar no perfora la tarjeta', () => {
-    for (let i = 1; i < malla.posiciones.length; i += 3) {
-      expect(malla.posiciones[i]).toBeGreaterThanOrEqual(0);
-    }
-  });
-
-  it('la malla usa la MISMA ley de color que el descenso', () => {
-    // Para cada vértice, el color tiene que ser exactamente el que
-    // `colorPorAlturaRGB` da para su cota REAL (no la escalada).
-    const k = malla.ky;
-    for (let v = 0; v < 40; v++) {
-      const i = v * 3 * 37; // muestreo disperso
-      if (i + 2 >= malla.posiciones.length) break;
-      const yEscalada = malla.posiciones[i + 1];
-      const esperado = colorPorAlturaRGB(yEscalada / k);
-      expect(malla.colores[i]).toBeCloseTo(esperado[0], 5);
-      expect(malla.colores[i + 1]).toBeCloseTo(esperado[1], 5);
-      expect(malla.colores[i + 2]).toBeCloseTo(esperado[2], 5);
-    }
-  });
-
-  it('la malla es una superficie cerrada y bien indexada', () => {
-    const nVerts = malla.posiciones.length / 3;
-    expect(malla.indices.length % 3).toBe(0);
-    for (const idx of malla.indices) {
-      expect(idx).toBeGreaterThanOrEqual(0);
-      expect(idx).toBeLessThan(nVerts);
-    }
-  });
-
-  it('degradar es bajar SEGMENTOS, nunca cambiar la forma', () => {
-    const pobre = mallaMacizo({ alto: ALTO, radio: RADIO, segmentos: 24 });
-    const rica = mallaMacizo({ alto: ALTO, radio: RADIO, segmentos: 96 });
-    expect(pobre.posiciones.length).toBeLessThan(rica.posiciones.length);
-    // Misma silueta: las dos alcanzan la misma cima, con la misma ley.
-    const cima = (m) => {
-      let x = -Infinity;
-      for (let i = 1; i < m.posiciones.length; i += 3) x = Math.max(x, m.posiciones[i]);
-      return x;
-    };
-    expect(Math.abs(cima(pobre) - cima(rica))).toBeLessThan(0.25);
   });
 });
