@@ -594,6 +594,246 @@
       "id": "src/services/vitalidadEspirituService.js",
       "reason": "Modelo fundamentado del panel de vitalidad creado en #2244 (2026-07-09). El único panel que importa buildVitalidadEspiritu está archivado y FincaVivaHero solo lo referencia en comentarios, por lo que no hay montaje vivo. Se conserva para no reemplazar sus métricas derivadas por estado persistido cuando se rediseñe el panel.",
       "date": "2026-09-04"
+    },
+    {
+      "id": "src/visual/mundo3d/semillas/bancoSemillas.geom.js",
+      "reason": "Apoyo de EscenaBancoSemillas.jsx (la ruta mockups/mundo3d-semillero monta otro componente): sus únicos importadores son esa escena. El componente dueño fue declarado sin consumidor el 2026-08-30 (experimento de mundo 3D sin cablear). Hallazgo del barrido ancho del gate (095.b, #3113): hasta el 2026-09-03 este gate solo miraba componentes .jsx, por eso los componentes dueños se declararon el 2026-08-30 sin sus módulos de apoyo. Se cablea junto con su escena (decisión de producto, tanda 2 del drenaje — ops/DRENAJE-HUERFANOS-TANDA-1-2026-09-04.md); al cablear, borrar ambas entradas.",
+      "date": "2026-09-04"
+    },
+    {
+      "id": "src/visual/mundo3d/semillas/semillasData.js",
+      "reason": "Apoyo de EscenaBancoSemillas.jsx (la ruta mockups/mundo3d-semillero monta otro componente): sus únicos importadores son esa escena y el geom hermano bancoSemillas.geom.js. El componente dueño fue declarado sin consumidor el 2026-08-30 (experimento de mundo 3D sin cablear). Hallazgo del barrido ancho del gate (095.b, #3113): hasta el 2026-09-03 este gate solo miraba componentes .jsx, por eso los componentes dueños se declararon el 2026-08-30 sin sus módulos de apoyo. Se cablea junto con su escena (decisión de producto, tanda 2 del drenaje — ops/DRENAJE-HUERFANOS-TANDA-1-2026-09-04.md); al cablear, borrar ambas entradas.",
+      "date": "2026-09-04"
+    },
+    {
+      "id": "src/visual/mundo3d/artesania/geometriasArtesania.js",
+      "reason": "Apoyo de ArtesaniaKit.jsx (kit de artesanía andina; ArtesaniaAndina.jsx, el componente que sí vive en vitrina, importa sus datos directo y no por este kit): sus únicos importadores son ArtesaniaKit.jsx y el barril artesania/index.js. El componente dueño fue declarado sin consumidor el 2026-08-30 (experimento de mundo 3D sin cablear). Hallazgo del barrido ancho del gate (095.b, #3113): hasta el 2026-09-03 este gate solo miraba componentes .jsx, por eso los componentes dueños se declararon el 2026-08-30 sin sus módulos de apoyo. Se cablea junto con su escena (decisión de producto, tanda 2 del drenaje — ops/DRENAJE-HUERFANOS-TANDA-1-2026-09-04.md); al cablear, borrar ambas entradas.",
+      "date": "2026-09-04"
+    },
+    {
+      "id": "src/visual/mundo3d/artesania/materialesArtesania.js",
+      "reason": "Apoyo de ArtesaniaKit.jsx (kit de artesanía andina; ArtesaniaAndina.jsx, el componente que sí vive en vitrina, importa sus datos directo y no por este kit): sus únicos importadores son ArtesaniaKit.jsx y el barril artesania/index.js. El componente dueño fue declarado sin consumidor el 2026-08-30 (experimento de mundo 3D sin cablear). Hallazgo del barrido ancho del gate (095.b, #3113): hasta el 2026-09-03 este gate solo miraba componentes .jsx, por eso los componentes dueños se declararon el 2026-08-30 sin sus módulos de apoyo. Se cablea junto con su escena (decisión de producto, tanda 2 del drenaje — ops/DRENAJE-HUERFANOS-TANDA-1-2026-09-04.md); al cablear, borrar ambas entradas.",
+      "date": "2026-09-04"
+    },
+    {
+      "id": "src/visual/mundo3d/artesania/texturasArtesania.js",
+      "reason": "Apoyo de ArtesaniaKit.jsx (kit de artesanía andina; ArtesaniaAndina.jsx, el componente que sí vive en vitrina, importa sus datos directo y no por este kit): sus únicos importadores son materialesArtesania.js y el barril artesania/index.js. El componente dueño fue declarado sin consumidor el 2026-08-30 (experimento de mundo 3D sin cablear). Hallazgo del barrido ancho del gate (095.b, #3113): hasta el 2026-09-03 este gate solo miraba componentes .jsx, por eso los componentes dueños se declararon el 2026-08-30 sin sus módulos de apoyo. Se cablea junto con su escena (decisión de producto, tanda 2 del drenaje — ops/DRENAJE-HUERFANOS-TANDA-1-2026-09-04.md); al cablear, borrar ambas entradas.",
+      "date": "2026-09-04"
+    },
+    {
+      "id": "src/visual/mundo3d/artesania/tramaAndina.js",
+      "reason": "Apoyo de ArtesaniaKit.jsx (kit de artesanía andina; ArtesaniaAndina.jsx, el componente que sí vive en vitrina, importa sus datos directo y no por este kit): sus únicos importadores son ArtesaniaKit.jsx y geometriasArtesania.js. El componente dueño fue declarado sin consumidor el 2026-08-30 (experimento de mundo 3D sin cablear). Hallazgo del barrido ancho del gate (095.b, #3113): hasta el 2026-09-03 este gate solo miraba componentes .jsx, por eso los componentes dueños se declararon el 2026-08-30 sin sus módulos de apoyo. Se cablea junto con su escena (decisión de producto, tanda 2 del drenaje — ops/DRENAJE-HUERFANOS-TANDA-1-2026-09-04.md); al cablear, borrar ambas entradas.",
+      "date": "2026-09-04"
+    },
+    {
+      "id": "src/visual/mundo3d/artesania/index.js",
+      "reason": "Barril del módulo artesanía sin un solo importador: nadie lo pide en producto, vitrina ni test; sus piezas (ArtesaniaKit.jsx y hermanos) — declarados el 2026-08-30 — se importan entre sí o directo desde sus vitrinas. Candidato a borrado (decisión de curaduría del operador, misma cola de propuestas del drenaje tanda 1).",
+      "date": "2026-09-04"
+    },
+    {
+      "id": "src/visual/mundo3d/beneficos/beneficos.geom.js",
+      "reason": "Apoyo de EscenaBeneficos.jsx (organismos benéficos: mariquitas, crisopas, trichogramas): sus únicos importadores son esa escena. El componente dueño fue declarado sin consumidor el 2026-08-30 (experimento de mundo 3D sin cablear). Hallazgo del barrido ancho del gate (095.b, #3113): hasta el 2026-09-03 este gate solo miraba componentes .jsx, por eso los componentes dueños se declararon el 2026-08-30 sin sus módulos de apoyo. Se cablea junto con su escena (decisión de producto, tanda 2 del drenaje — ops/DRENAJE-HUERFANOS-TANDA-1-2026-09-04.md); al cablear, borrar ambas entradas.",
+      "date": "2026-09-04"
+    },
+    {
+      "id": "src/visual/mundo3d/beneficos/beneficosIdentidad.js",
+      "reason": "Apoyo de EscenaBeneficos.jsx (organismos benéficos: mariquitas, crisopas, trichogramas): sus únicos importadores son esa escena y beneficos.geom.js. El componente dueño fue declarado sin consumidor el 2026-08-30 (experimento de mundo 3D sin cablear). Hallazgo del barrido ancho del gate (095.b, #3113): hasta el 2026-09-03 este gate solo miraba componentes .jsx, por eso los componentes dueños se declararon el 2026-08-30 sin sus módulos de apoyo. Se cablea junto con su escena (decisión de producto, tanda 2 del drenaje — ops/DRENAJE-HUERFANOS-TANDA-1-2026-09-04.md); al cablear, borrar ambas entradas.",
+      "date": "2026-09-04"
+    },
+    {
+      "id": "src/visual/mundo3d/beneficos/dinamicaPlaga.js",
+      "reason": "Apoyo de EscenaBeneficos.jsx (organismos benéficos: mariquitas, crisopas, trichogramas): sus únicos importadores son esa escena y el barril beneficos/index.js. El componente dueño fue declarado sin consumidor el 2026-08-30 (experimento de mundo 3D sin cablear). Hallazgo del barrido ancho del gate (095.b, #3113): hasta el 2026-09-03 este gate solo miraba componentes .jsx, por eso los componentes dueños se declararon el 2026-08-30 sin sus módulos de apoyo. Se cablea junto con su escena (decisión de producto, tanda 2 del drenaje — ops/DRENAJE-HUERFANOS-TANDA-1-2026-09-04.md); al cablear, borrar ambas entradas.",
+      "date": "2026-09-04"
+    },
+    {
+      "id": "src/visual/mundo3d/beneficos/index.js",
+      "reason": "Barril del módulo beneficos sin un solo importador: nadie lo pide en producto, vitrina ni test; sus piezas (EscenaBeneficos.jsx y hermanos) — declarados el 2026-08-30 — se importan entre sí o directo desde sus vitrinas. Candidato a borrado (decisión de curaduría del operador, misma cola de propuestas del drenaje tanda 1).",
+      "date": "2026-09-04"
+    },
+    {
+      "id": "src/visual/mundo3d/bosque/corteSuelo.geom.js",
+      "reason": "Apoyo de EscenaEntMaestro.jsx (versión maestra no montada del Ent de la queñua; la que vive es MundoEntBosque.jsx): sus únicos importadores son esa escena. El componente dueño fue declarado sin consumidor el 2026-08-30 (experimento de mundo 3D sin cablear). Hallazgo del barrido ancho del gate (095.b, #3113): hasta el 2026-09-03 este gate solo miraba componentes .jsx, por eso los componentes dueños se declararon el 2026-08-30 sin sus módulos de apoyo. Se cablea junto con su escena (decisión de producto, tanda 2 del drenaje — ops/DRENAJE-HUERFANOS-TANDA-1-2026-09-04.md); al cablear, borrar ambas entradas.",
+      "date": "2026-09-04"
+    },
+    {
+      "id": "src/visual/mundo3d/bosque/doselBiodiverso.geom.js",
+      "reason": "Apoyo de DoselBiodiverso.jsx (visualización estratificada del bosque, sin montar): sus únicos importadores son ese componente. El componente dueño fue declarado sin consumidor el 2026-08-30 (experimento de mundo 3D sin cablear). Hallazgo del barrido ancho del gate (095.b, #3113): hasta el 2026-09-03 este gate solo miraba componentes .jsx, por eso los componentes dueños se declararon el 2026-08-30 sin sus módulos de apoyo. Se cablea junto con su escena (decisión de producto, tanda 2 del drenaje — ops/DRENAJE-HUERFANOS-TANDA-1-2026-09-04.md); al cablear, borrar ambas entradas.",
+      "date": "2026-09-04"
+    },
+    {
+      "id": "src/visual/mundo3d/estiercol/biodigestor.geom.js",
+      "reason": "Apoyo de los componentes del módulo (Biocompostera.jsx, Biodigestor.jsx, CicloCerrado.jsx, EscenaEstiercol.jsx — experimento de manejo de estiércol sin montar): sus únicos importadores son Biodigestor.jsx y EscenaEstiercol.jsx. El componente dueño fue declarado sin consumidor el 2026-08-30 (experimento de mundo 3D sin cablear). Hallazgo del barrido ancho del gate (095.b, #3113): hasta el 2026-09-03 este gate solo miraba componentes .jsx, por eso los componentes dueños se declararon el 2026-08-30 sin sus módulos de apoyo. Se cablea junto con su escena (decisión de producto, tanda 2 del drenaje — ops/DRENAJE-HUERFANOS-TANDA-1-2026-09-04.md); al cablear, borrar ambas entradas.",
+      "date": "2026-09-04"
+    },
+    {
+      "id": "src/visual/mundo3d/estiercol/compostera.geom.js",
+      "reason": "Apoyo de los componentes del módulo (Biocompostera.jsx, Biodigestor.jsx, CicloCerrado.jsx, EscenaEstiercol.jsx — experimento de manejo de estiércol sin montar): sus únicos importadores son Biocompostera.jsx y el barril estiercol/index.js. El componente dueño fue declarado sin consumidor el 2026-08-30 (experimento de mundo 3D sin cablear). Hallazgo del barrido ancho del gate (095.b, #3113): hasta el 2026-09-03 este gate solo miraba componentes .jsx, por eso los componentes dueños se declararon el 2026-08-30 sin sus módulos de apoyo. Se cablea junto con su escena (decisión de producto, tanda 2 del drenaje — ops/DRENAJE-HUERFANOS-TANDA-1-2026-09-04.md); al cablear, borrar ambas entradas.",
+      "date": "2026-09-04"
+    },
+    {
+      "id": "src/visual/mundo3d/estiercol/estiercol.geom.js",
+      "reason": "Apoyo de los componentes del módulo (Biocompostera.jsx, Biodigestor.jsx, CicloCerrado.jsx, EscenaEstiercol.jsx — experimento de manejo de estiércol sin montar): sus únicos importadores son Biocompostera.jsx y Biodigestor.jsx. El componente dueño fue declarado sin consumidor el 2026-08-30 (experimento de mundo 3D sin cablear). Hallazgo del barrido ancho del gate (095.b, #3113): hasta el 2026-09-03 este gate solo miraba componentes .jsx, por eso los componentes dueños se declararon el 2026-08-30 sin sus módulos de apoyo. Se cablea junto con su escena (decisión de producto, tanda 2 del drenaje — ops/DRENAJE-HUERFANOS-TANDA-1-2026-09-04.md); al cablear, borrar ambas entradas.",
+      "date": "2026-09-04"
+    },
+    {
+      "id": "src/visual/mundo3d/estiercol/index.js",
+      "reason": "Barril del módulo estiercol sin un solo importador: nadie lo pide en producto, vitrina ni test; sus cuatro componentes — declarados el 2026-08-30 — se importan entre sí o directo desde sus vitrinas. Candidato a borrado (decisión de curaduría del operador, misma cola de propuestas del drenaje tanda 1).",
+      "date": "2026-09-04"
+    },
+    {
+      "id": "src/visual/mundo3d/fauna/anatomiaFauna.geom.js",
+      "reason": "Apoyo de las criaturas del módulo (AguilaParamo.jsx, ColibriGuardian.jsx, CuadrupedoRealista.jsx, EscenaFaunaEmblematica.jsx, RanaArlequin.jsx — fauna emblemática sin montar): sus únicos importadores son AguilaParamo.jsx y ColibriGuardian.jsx. El componente dueño fue declarado sin consumidor el 2026-08-30 (experimento de mundo 3D sin cablear). Hallazgo del barrido ancho del gate (095.b, #3113): hasta el 2026-09-03 este gate solo miraba componentes .jsx, por eso los componentes dueños se declararon el 2026-08-30 sin sus módulos de apoyo. Se cablea junto con su escena (decisión de producto, tanda 2 del drenaje — ops/DRENAJE-HUERFANOS-TANDA-1-2026-09-04.md); al cablear, borrar ambas entradas.",
+      "date": "2026-09-04"
+    },
+    {
+      "id": "src/visual/mundo3d/fauna/faunaEmblematica.js",
+      "reason": "Apoyo de las criaturas del módulo (AguilaParamo.jsx, ColibriGuardian.jsx, CuadrupedoRealista.jsx, EscenaFaunaEmblematica.jsx, RanaArlequin.jsx — fauna emblemática sin montar): sus únicos importadores son EscenaFaunaEmblematica.jsx y el barril fauna/index.js. El componente dueño fue declarado sin consumidor el 2026-08-30 (experimento de mundo 3D sin cablear). Hallazgo del barrido ancho del gate (095.b, #3113): hasta el 2026-09-03 este gate solo miraba componentes .jsx, por eso los componentes dueños se declararon el 2026-08-30 sin sus módulos de apoyo. Se cablea junto con su escena (decisión de producto, tanda 2 del drenaje — ops/DRENAJE-HUERFANOS-TANDA-1-2026-09-04.md); al cablear, borrar ambas entradas.",
+      "date": "2026-09-04"
+    },
+    {
+      "id": "src/visual/mundo3d/fauna/iridiscencia.js",
+      "reason": "Apoyo de las criaturas del módulo (AguilaParamo.jsx, ColibriGuardian.jsx, CuadrupedoRealista.jsx, EscenaFaunaEmblematica.jsx, RanaArlequin.jsx — fauna emblemática sin montar): sus únicos importadores son ColibriGuardian.jsx y el barril fauna/index.js. El componente dueño fue declarado sin consumidor el 2026-08-30 (experimento de mundo 3D sin cablear). Hallazgo del barrido ancho del gate (095.b, #3113): hasta el 2026-09-03 este gate solo miraba componentes .jsx, por eso los componentes dueños se declararon el 2026-08-30 sin sus módulos de apoyo. Se cablea junto con su escena (decisión de producto, tanda 2 del drenaje — ops/DRENAJE-HUERFANOS-TANDA-1-2026-09-04.md); al cablear, borrar ambas entradas.",
+      "date": "2026-09-04"
+    },
+    {
+      "id": "src/visual/mundo3d/fauna/marcha.js",
+      "reason": "Apoyo de las criaturas del módulo (AguilaParamo.jsx, ColibriGuardian.jsx, CuadrupedoRealista.jsx, EscenaFaunaEmblematica.jsx, RanaArlequin.jsx — fauna emblemática sin montar): sus únicos importadores son CuadrupedoRealista.jsx y RanaArlequin.jsx. El componente dueño fue declarado sin consumidor el 2026-08-30 (experimento de mundo 3D sin cablear). Hallazgo del barrido ancho del gate (095.b, #3113): hasta el 2026-09-03 este gate solo miraba componentes .jsx, por eso los componentes dueños se declararon el 2026-08-30 sin sus módulos de apoyo. Se cablea junto con su escena (decisión de producto, tanda 2 del drenaje — ops/DRENAJE-HUERFANOS-TANDA-1-2026-09-04.md); al cablear, borrar ambas entradas.",
+      "date": "2026-09-04"
+    },
+    {
+      "id": "src/visual/mundo3d/fauna/pelajes.js",
+      "reason": "Apoyo de las criaturas del módulo (AguilaParamo.jsx, ColibriGuardian.jsx, CuadrupedoRealista.jsx, EscenaFaunaEmblematica.jsx, RanaArlequin.jsx — fauna emblemática sin montar): sus únicos importadores son faunaEmblematica.js y el barril fauna/index.js. El componente dueño fue declarado sin consumidor el 2026-08-30 (experimento de mundo 3D sin cablear). Hallazgo del barrido ancho del gate (095.b, #3113): hasta el 2026-09-03 este gate solo miraba componentes .jsx, por eso los componentes dueños se declararon el 2026-08-30 sin sus módulos de apoyo. Se cablea junto con su escena (decisión de producto, tanda 2 del drenaje — ops/DRENAJE-HUERFANOS-TANDA-1-2026-09-04.md); al cablear, borrar ambas entradas.",
+      "date": "2026-09-04"
+    },
+    {
+      "id": "src/visual/mundo3d/fauna/index.js",
+      "reason": "Barril del módulo fauna sin un solo importador: nadie lo pide en producto, vitrina ni test; sus criaturas — declarados el 2026-08-30 — se importan entre sí o directo desde sus vitrinas. Candidato a borrado (decisión de curaduría del operador, misma cola de propuestas del drenaje tanda 1).",
+      "date": "2026-09-04"
+    },
+    {
+      "id": "src/visual/mundo3d/olor/aireCargado.js",
+      "reason": "Apoyo de los 9 componentes del módulo olor (educación visual de carbono/nitrógeno alrededor de la cochera, sin montar): sus únicos importadores son CocheraEnCorte.jsx y EscenaOlorVisible.jsx. El componente dueño fue declarado sin consumidor el 2026-08-30 (experimento de mundo 3D sin cablear). Hallazgo del barrido ancho del gate (095.b, #3113): hasta el 2026-09-03 este gate solo miraba componentes .jsx, por eso los componentes dueños se declararon el 2026-08-30 sin sus módulos de apoyo. Se cablea junto con su escena (decisión de producto, tanda 2 del drenaje — ops/DRENAJE-HUERFANOS-TANDA-1-2026-09-04.md); al cablear, borrar ambas entradas.",
+      "date": "2026-09-04"
+    },
+    {
+      "id": "src/visual/mundo3d/olor/olor.geom.js",
+      "reason": "Apoyo de los 9 componentes del módulo olor (educación visual de carbono/nitrógeno alrededor de la cochera, sin montar): sus únicos importadores son CocheraEnCorte.jsx y EscenaOlorVisible.jsx. El componente dueño fue declarado sin consumidor el 2026-08-30 (experimento de mundo 3D sin cablear). Hallazgo del barrido ancho del gate (095.b, #3113): hasta el 2026-09-03 este gate solo miraba componentes .jsx, por eso los componentes dueños se declararon el 2026-08-30 sin sus módulos de apoyo. Se cablea junto con su escena (decisión de producto, tanda 2 del drenaje — ops/DRENAJE-HUERFANOS-TANDA-1-2026-09-04.md); al cablear, borrar ambas entradas.",
+      "date": "2026-09-04"
+    },
+    {
+      "id": "src/visual/mundo3d/olor/senalesDelCuerpo.js",
+      "reason": "Apoyo de los 9 componentes del módulo olor (educación visual de carbono/nitrógeno alrededor de la cochera, sin montar): sus únicos importadores son PaladaDeSeco.jsx y el barril olor/index.js. El componente dueño fue declarado sin consumidor el 2026-08-30 (experimento de mundo 3D sin cablear). Hallazgo del barrido ancho del gate (095.b, #3113): hasta el 2026-09-03 este gate solo miraba componentes .jsx, por eso los componentes dueños se declararon el 2026-08-30 sin sus módulos de apoyo. Se cablea junto con su escena (decisión de producto, tanda 2 del drenaje — ops/DRENAJE-HUERFANOS-TANDA-1-2026-09-04.md); al cablear, borrar ambas entradas.",
+      "date": "2026-09-04"
+    },
+    {
+      "id": "src/visual/mundo3d/olor/texturasOlor.js",
+      "reason": "Apoyo de los 9 componentes del módulo olor (educación visual de carbono/nitrógeno alrededor de la cochera, sin montar): sus únicos importadores son NitrogenoQueSeVa.jsx y NubeQueCruzaLaCerca.jsx. El componente dueño fue declarado sin consumidor el 2026-08-30 (experimento de mundo 3D sin cablear). Hallazgo del barrido ancho del gate (095.b, #3113): hasta el 2026-09-03 este gate solo miraba componentes .jsx, por eso los componentes dueños se declararon el 2026-08-30 sin sus módulos de apoyo. Se cablea junto con su escena (decisión de producto, tanda 2 del drenaje — ops/DRENAJE-HUERFANOS-TANDA-1-2026-09-04.md); al cablear, borrar ambas entradas.",
+      "date": "2026-09-04"
+    },
+    {
+      "id": "src/visual/mundo3d/olor/index.js",
+      "reason": "Barril del módulo olor sin un solo importador: nadie lo pide en producto, vitrina ni test; sus nueve componentes — declarados el 2026-08-30 — se importan entre sí o directo desde sus vitrinas. Candidato a borrado (decisión de curaduría del operador, misma cola de propuestas del drenaje tanda 1).",
+      "date": "2026-09-04"
+    },
+    {
+      "id": "src/visual/mundo3d/suelo-comparado/sueloComparado.geom.js",
+      "reason": "Apoyo de EscenaSueloComparado.jsx (suelo degradado vs suelo sano, sin montar): sus únicos importadores son esa escena. El componente dueño fue declarado sin consumidor el 2026-08-30 (experimento de mundo 3D sin cablear). Hallazgo del barrido ancho del gate (095.b, #3113): hasta el 2026-09-03 este gate solo miraba componentes .jsx, por eso los componentes dueños se declararon el 2026-08-30 sin sus módulos de apoyo. Se cablea junto con su escena (decisión de producto, tanda 2 del drenaje — ops/DRENAJE-HUERFANOS-TANDA-1-2026-09-04.md); al cablear, borrar ambas entradas.",
+      "date": "2026-09-04"
+    },
+    {
+      "id": "src/visual/mundo3d/suelo-comparado/sueloComparadoTextos.js",
+      "reason": "Apoyo de EscenaSueloComparado.jsx (suelo degradado vs suelo sano, sin montar): sus únicos importadores son esa escena. El componente dueño fue declarado sin consumidor el 2026-08-30 (experimento de mundo 3D sin cablear). Hallazgo del barrido ancho del gate (095.b, #3113): hasta el 2026-09-03 este gate solo miraba componentes .jsx, por eso los componentes dueños se declararon el 2026-08-30 sin sus módulos de apoyo. Se cablea junto con su escena (decisión de producto, tanda 2 del drenaje — ops/DRENAJE-HUERFANOS-TANDA-1-2026-09-04.md); al cablear, borrar ambas entradas.",
+      "date": "2026-09-04"
+    },
+    {
+      "id": "src/visual/mundo3d/suelo-comparado/index.js",
+      "reason": "Barril del módulo suelo-comparado sin un solo importador: nadie lo pide en producto, vitrina ni test; sus piezas — declarados el 2026-08-30 — se importan entre sí o directo desde sus vitrinas. Candidato a borrado (decisión de curaduría del operador, misma cola de propuestas del drenaje tanda 1).",
+      "date": "2026-09-04"
+    },
+    {
+      "id": "src/visual/mundo3d/transiciones/useCruceMundo.js",
+      "reason": "Máquina de estados del cruce Odyssey publicada como \"lista para cablear\" (lo declara su encabezado). Sus únicos importadores: el barril transiciones/index.js y TransicionesOdysseyDemo.jsx (demo declarada 2026-08-30). VeloOdyssey.jsx, montado en vitrina, la documenta como API de consumo pero ningún host la usa todavía: cablearla exige decidir el host del cruce entre mundos (decisión de producto, emparientada con el portal 2D→3D de #3140). Al cablear, borrar esta entrada.",
+      "date": "2026-09-04"
+    },
+    {
+      "id": "src/visual/mundo3d/transiciones/useTunelLamina.js",
+      "reason": "Hermana de useCruceMundo con memoria del rectángulo de la lámina de origen (\"lista para cablear\", encabezado). Su único importador es el barril transiciones/index.js (vivo por la vitrina, pero nadie le pide este nombre). TunelLamina.jsx, montado en vitrina, la menciona en su docstring como modo de uso previsto, pero hoy el host captura el rectángulo a mano. Cablearla exige decidir el host (decisión de producto). Al cablear, borrar esta entrada.",
+      "date": "2026-09-04"
+    },
+    {
+      "id": "src/visual/mundo3d/atmosfera/DemoAtmosferaViva.jsx",
+      "reason": "Demo aislada por contrato A4 (su encabezado lo declara): viñeta de QA/arte del arco del día. Cablearla rompería el contrato. Espeja la decisión ya escrita en ops/componentes-huerfanos-allowlist.json por el drenaje tanda 1 (#3120): este gate mantiene su propio allowlist y no lee el otro.",
+      "date": "2026-09-04"
+    },
+    {
+      "id": "src/visual/mundo3d/sierra/vendor/flora/FollajeMasa.js",
+      "reason": "Vendorizado por el arnés de medición móvil del descenso (#3103, 2026-09-03), copia del monorepo Sylva. Su integración a escena es la misma decisión pendiente que la de sus hermanos ya declarados sierra/vendor/godRaysSylva.js y sierra/vendor/clima/climaPorPiso.js: el pase de flora del descenso se cablea en la próxima tanda del operador. Al cablear, borrar esta entrada. Fue de los arreglados en raíz durante el 090.d (tipos JSDoc, sondas window, tuplas de Map) precisamente para NO excluirlo del TSC.",
+      "date": "2026-09-04"
+    },
+    {
+      "id": "src/visual/mundo3d/sierra/vendor/flora/arbolesAltoandinos.js",
+      "reason": "Vendorizado por el arnés de medición móvil del descenso (#3103, 2026-09-03), copia del monorepo Sylva. Su integración a escena es la misma decisión pendiente que la de sus hermanos ya declarados sierra/vendor/godRaysSylva.js y sierra/vendor/clima/climaPorPiso.js: el pase de flora del descenso se cablea en la próxima tanda del operador. Al cablear, borrar esta entrada. Fue de los arreglados en raíz durante el 090.d (tipos JSDoc, sondas window, tuplas de Map) precisamente para NO excluirlo del TSC.",
+      "date": "2026-09-04"
+    },
+    {
+      "id": "src/visual/mundo3d/sierra/vendor/flora/frailejonFabrica.js",
+      "reason": "Vendorizado por el arnés de medición móvil del descenso (#3103, 2026-09-03), copia del monorepo Sylva. Su integración a escena es la misma decisión pendiente que la de sus hermanos ya declarados sierra/vendor/godRaysSylva.js y sierra/vendor/clima/climaPorPiso.js: el pase de flora del descenso se cablea en la próxima tanda del operador. Al cablear, borrar esta entrada. Fue de los arreglados en raíz durante el 090.d (tipos JSDoc, sondas window, tuplas de Map) precisamente para NO excluirlo del TSC.",
+      "date": "2026-09-04"
+    },
+    {
+      "id": "src/visual/mundo3d/sierra/vendor/flora/matrizParamo.js",
+      "reason": "Vendorizado por el arnés de medición móvil del descenso (#3103, 2026-09-03), copia del monorepo Sylva. Su integración a escena es la misma decisión pendiente que la de sus hermanos ya declarados sierra/vendor/godRaysSylva.js y sierra/vendor/clima/climaPorPiso.js: el pase de flora del descenso se cablea en la próxima tanda del operador. Al cablear, borrar esta entrada. Fue de los arreglados en raíz durante el 090.d (tipos JSDoc, sondas window, tuplas de Map) precisamente para NO excluirlo del TSC.",
+      "date": "2026-09-04"
+    },
+    {
+      "id": "src/visual/mundo3d/sierra/vendor/flora/pisosTermicos.js",
+      "reason": "Vendorizado por el arnés de medición móvil del descenso (#3103, 2026-09-03), copia del monorepo Sylva. Su integración a escena es la misma decisión pendiente que la de sus hermanos ya declarados sierra/vendor/godRaysSylva.js y sierra/vendor/clima/climaPorPiso.js: el pase de flora del descenso se cablea en la próxima tanda del operador. Al cablear, borrar esta entrada. Fue de los arreglados en raíz durante el 090.d (tipos JSDoc, sondas window, tuplas de Map) precisamente para NO excluirlo del TSC.",
+      "date": "2026-09-04"
+    },
+    {
+      "id": "src/visual/mundo3d/sierra/vendor/flora/quickGrass.js",
+      "reason": "Vendorizado por el arnés de medición móvil del descenso (#3103, 2026-09-03), copia del monorepo Sylva. Su integración a escena es la misma decisión pendiente que la de sus hermanos ya declarados sierra/vendor/godRaysSylva.js y sierra/vendor/clima/climaPorPiso.js: el pase de flora del descenso se cablea en la próxima tanda del operador. Al cablear, borrar esta entrada. Fue de los arreglados en raíz durante el 090.d (tipos JSDoc, sondas window, tuplas de Map) precisamente para NO excluirlo del TSC.",
+      "date": "2026-09-04"
+    },
+    {
+      "id": "src/visual/mundo3d/sierra/vendor/flora/vientoMundos.js",
+      "reason": "Vendorizado por el arnés de medición móvil del descenso (#3103, 2026-09-03), copia del monorepo Sylva. Su integración a escena es la misma decisión pendiente que la de sus hermanos ya declarados sierra/vendor/godRaysSylva.js y sierra/vendor/clima/climaPorPiso.js: el pase de flora del descenso se cablea en la próxima tanda del operador. Al cablear, borrar esta entrada. Fue de los arreglados en raíz durante el 090.d (tipos JSDoc, sondas window, tuplas de Map) precisamente para NO excluirlo del TSC.",
+      "date": "2026-09-04"
+    },
+    {
+      "id": "src/visual/mundo3d/sierra/vendor/flora/flora.js",
+      "reason": "Vendorizado por el arnés de medición móvil del descenso (#3103, 2026-09-03), copia del monorepo Sylva. Su integración a escena es la misma decisión pendiente que la de sus hermanos ya declarados sierra/vendor/godRaysSylva.js y sierra/vendor/clima/climaPorPiso.js: el pase de flora del descenso se cablea en la próxima tanda del operador. Al cablear, borrar esta entrada. Además quedó fuera del gate TSC por decisión documentada en src/visual/mundo3d/__tests__/gateVendorFloraExclusion.test.js, que fija como premisa que permanece huérfano hasta la integración (importa módulos del monorepo Sylva que no se vendorizaron).",
+      "date": "2026-09-04"
+    },
+    {
+      "id": "src/visual/mundo3d/sierra/vendor/flora/flora-eztree-bake.js",
+      "reason": "Vendorizado por el arnés de medición móvil del descenso (#3103, 2026-09-03), copia del monorepo Sylva. Su integración a escena es la misma decisión pendiente que la de sus hermanos ya declarados sierra/vendor/godRaysSylva.js y sierra/vendor/clima/climaPorPiso.js: el pase de flora del descenso se cablea en la próxima tanda del operador. Al cablear, borrar esta entrada. Además quedó fuera del gate TSC por decisión documentada en src/visual/mundo3d/__tests__/gateVendorFloraExclusion.test.js, que fija como premisa que permanece huérfano hasta la integración (importa módulos del monorepo Sylva que no se vendorizaron).",
+      "date": "2026-09-04"
+    },
+    {
+      "id": "src/visual/mundo3d/sierra/vendor/flora/lodEspecieSylva.js",
+      "reason": "Vendorizado por el arnés de medición móvil del descenso (#3103, 2026-09-03), copia del monorepo Sylva. Su integración a escena es la misma decisión pendiente que la de sus hermanos ya declarados sierra/vendor/godRaysSylva.js y sierra/vendor/clima/climaPorPiso.js: el pase de flora del descenso se cablea en la próxima tanda del operador. Al cablear, borrar esta entrada. Además quedó fuera del gate TSC por decisión documentada en src/visual/mundo3d/__tests__/gateVendorFloraExclusion.test.js, que fija como premisa que permanece huérfano hasta la integración (importa módulos del monorepo Sylva que no se vendorizaron).",
+      "date": "2026-09-04"
+    },
+    {
+      "id": "src/visual/mundo3d/sonidosAmbientales.js",
+      "reason": "T48: paletas sonoras ambientales procedurales por mundo (WebAudio con osciladores y ruido filtrado, sin archivos de audio). Rescatado de una rama muerta en #2668 y sin un solo importador desde entonces. Cablearlo exige decidir la política de audio del mundo 3D (autoplay, reduced-motion, volumen por mundo): decisión de producto, no un cableado de una línea. Al cablear, borrar esta entrada.",
+      "date": "2026-09-04"
+    },
+    {
+      "id": "src/visual/mundo3d/kit/geometria.js",
+      "reason": "Superficie pública declarada del taller de geometría: su encabezado re-exporta la canónica de sombreadoVegetal.js para que toda escena nueva importe de un solo lugar, y prohíbe mover el código para evitar churn en las escenas que ya importan la canónica directo. Las escenas vivas siguen importando sombreadoVegetal.js y ninguna escena nueva ha llegado; su único importador es el barril kit/index.js (vivo, pero nadie le pide geometria). Se declara como superficie esperando adopción, no como código muerto: borrarla rompería el contrato del taller.",
+      "date": "2026-09-04"
+    },
+    {
+      "id": "src/visual/mundo3d/infraestructura/index.js",
+      "reason": "Barril del módulo infraestructura sin un solo importador: las vitrinas (mockup_vitrina_infra, mockup_infraestructura_3d, mockup_catalogo_infra) importan los componentes directo, sin pasar por el barril. Candidato a borrado (decisión de curaduría del operador, misma cola de propuestas del drenaje tanda 1).",
+      "date": "2026-09-04"
+    },
+    {
+      "id": "src/visual/mundo3d/polinizadores/index.js",
+      "reason": "Barril del módulo polinizadores sin un solo importador: la vitrina (mockup_mundo_polinizadores_3d) importa EscenaPolinizadores.jsx y hermanos directo, sin pasar por el barril. Candidato a borrado (decisión de curaduría del operador).",
+      "date": "2026-09-04"
     }
   ]
 }

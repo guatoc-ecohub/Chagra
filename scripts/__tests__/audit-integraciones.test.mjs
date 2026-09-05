@@ -8,6 +8,7 @@ import { spawnSync } from 'node:child_process';
 import { execPath } from 'node:process';
 import {
   mkdtempSync, mkdirSync, writeFileSync, readFileSync, rmSync, cpSync, existsSync,
+  readdirSync, statSync,
 } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join, dirname, resolve } from 'node:path';
@@ -30,6 +31,12 @@ import { fileURLToPath } from 'node:url';
  *     el allowlist no se pudra con renombres/borrados), los dos ids que
  *     causaron el rojo del 2026-08-31 siguen declarados, y una corrida
  *     end-to-end del gate sobre este repo que debe terminar en verde.
+ *  3. TANDA MUNDO3D 2026-09-04 (task audit-integraciones-rojo-en-la-base): el
+ *     motor por símbolo (095.b, #3113) destapó 48 archivos de
+ *     src/visual/mundo3d que el gate viejo (solo .jsx) no miraba — apoyos de
+ *     escenas ya declaradas el 2026-08-30, vendor flora de #3103, barriles
+ *     muertos y dos hooks "listos para cablear". Se declaran con reason; estos
+ *     tests sostienen la decisión y el des-cableado.
  */
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -239,6 +246,18 @@ describe('audit-integraciones (fixture hermético)', function () {
 describe('ops/integraciones-no-consumidas.json (repo real)', function () {
   const allowlist = JSON.parse(readFileSync(ALLOWLIST_REPO, 'utf8'));
 
+  // Una sola corrida del gate sobre este repo, compartida por los dos bloques
+  // de controles de abajo (095.b y tanda mundo3d 2026-09-04). CHAGRA_PRO_PATH
+  // imposible: en este repo público el sidecar no existe y la auditoría de
+  // endpoints se salta con warning (comportamiento esperado, ver el header del
+  // gate).
+  const r = spawnSync(execPath, [GATE_SCRIPT], {
+    encoding: 'utf8',
+    cwd: REPO_ROOT,
+    env: { ...process.env, CHAGRA_PRO_PATH: '/__no_existe__' },
+  });
+  const salida = `${r.stdout || ''}\n${r.stderr || ''}`;
+
   const secciones = [
     ['same_repo', 'id'],
     ['sidecar_endpoints', 'endpoint'],
@@ -312,13 +331,6 @@ describe('ops/integraciones-no-consumidas.json (repo real)', function () {
   // que se le escapaba y que no acuse a lo que sí está montado. Verde o rojo
   // sobre dev es una decisión de drenaje del operador, no del arnés.
   describe('el gate ve lo que antes se le escapaba (095.b)', function () {
-    const r = spawnSync(execPath, [GATE_SCRIPT], {
-      encoding: 'utf8',
-      cwd: REPO_ROOT,
-      env: { ...process.env, CHAGRA_PRO_PATH: '/__no_existe__' },
-    });
-    const salida = `${r.stdout || ''}\n${r.stderr || ''}`;
-
     // CONTROL POSITIVO · el barril que lavaba. Estos ocho solo llegan por un
     // `export … from` de `src/visual/creatures/index.js`, que sí está vivo:
     // nadie les pide el nombre, así que un bundler con tree-shaking no los
@@ -385,6 +397,145 @@ describe('ops/integraciones-no-consumidas.json (repo real)', function () {
       // devolvió un veredicto legible en vez de colgarse o reventar.
       expect([0, 1]).toContain(r.status);
       expect(salida).toContain('alcance de src/:');
+    });
+  });
+
+  // -------------------------------------------------------------------------
+  // TANDA MUNDO3D 2026-09-04 (task audit-integraciones-rojo-en-la-base)
+  // -------------------------------------------------------------------------
+  // El motor por símbolo (095.b, #3113) amplió el radar del gate de 454 a
+  // 1.593 sujetos y dejó rojo a TODOS los PRs: 48 archivos de mundo3d salían
+  // acusados sin entrada en el allowlist. Ninguno es un olvido nuevo:
+  //   · 34 apoyos (geom/datos/barriles) de escenas YA declaradas el
+  //     2026-08-30 — el gate viejo solo miraba .jsx y por eso los apoyos no
+  //     se declararon junto con su escena;
+  //   · 10 vendor flora de #3103 — mismos hermanos ya declarados
+  //     (godRaysSylva.js, climaPorPiso.js);
+  //   · DemoAtmosferaViva.jsx — contrato A4, ya declarada en el allowlist del
+  //     OTRO gate (drenaje tanda 1, #3120), que este gate no lee;
+  //   · 2 barriles muertos (infraestructura, polinizadores), kit/geometria.js
+  //     (superficie del taller sin adoptar), sonidosAmbientales.js (T48
+  //     rescatado en #2668) y useCruceMundo/useTunelLamina (hooks "listos
+  //     para cablear" sin host).
+  // Si alguien QUITA una de estas entradas sin cablear o borrar el archivo,
+  // el gate vuelve a rojo con ese id — este bloque lo explica en el fallo.
+  const IDS_TANDA_MUNDO3D = [
+    // apoyos de escenas declaradas 2026-08-30
+    'src/visual/mundo3d/semillas/bancoSemillas.geom.js',
+    'src/visual/mundo3d/semillas/semillasData.js',
+    'src/visual/mundo3d/artesania/geometriasArtesania.js',
+    'src/visual/mundo3d/artesania/materialesArtesania.js',
+    'src/visual/mundo3d/artesania/texturasArtesania.js',
+    'src/visual/mundo3d/artesania/tramaAndina.js',
+    'src/visual/mundo3d/artesania/index.js',
+    'src/visual/mundo3d/beneficos/beneficos.geom.js',
+    'src/visual/mundo3d/beneficos/beneficosIdentidad.js',
+    'src/visual/mundo3d/beneficos/dinamicaPlaga.js',
+    'src/visual/mundo3d/beneficos/index.js',
+    'src/visual/mundo3d/bosque/corteSuelo.geom.js',
+    'src/visual/mundo3d/bosque/doselBiodiverso.geom.js',
+    'src/visual/mundo3d/estiercol/biodigestor.geom.js',
+    'src/visual/mundo3d/estiercol/compostera.geom.js',
+    'src/visual/mundo3d/estiercol/estiercol.geom.js',
+    'src/visual/mundo3d/estiercol/index.js',
+    'src/visual/mundo3d/fauna/anatomiaFauna.geom.js',
+    'src/visual/mundo3d/fauna/faunaEmblematica.js',
+    'src/visual/mundo3d/fauna/index.js',
+    'src/visual/mundo3d/fauna/iridiscencia.js',
+    'src/visual/mundo3d/fauna/marcha.js',
+    'src/visual/mundo3d/fauna/pelajes.js',
+    'src/visual/mundo3d/olor/aireCargado.js',
+    'src/visual/mundo3d/olor/index.js',
+    'src/visual/mundo3d/olor/olor.geom.js',
+    'src/visual/mundo3d/olor/senalesDelCuerpo.js',
+    'src/visual/mundo3d/olor/texturasOlor.js',
+    'src/visual/mundo3d/suelo-comparado/index.js',
+    'src/visual/mundo3d/suelo-comparado/sueloComparado.geom.js',
+    'src/visual/mundo3d/suelo-comparado/sueloComparadoTextos.js',
+    'src/visual/mundo3d/transiciones/useCruceMundo.js',
+    'src/visual/mundo3d/transiciones/useTunelLamina.js',
+    // vendor flora #3103 (hermanos de godRaysSylva/climaPorPiso)
+    'src/visual/mundo3d/sierra/vendor/flora/FollajeMasa.js',
+    'src/visual/mundo3d/sierra/vendor/flora/arbolesAltoandinos.js',
+    'src/visual/mundo3d/sierra/vendor/flora/flora-eztree-bake.js',
+    'src/visual/mundo3d/sierra/vendor/flora/flora.js',
+    'src/visual/mundo3d/sierra/vendor/flora/frailejonFabrica.js',
+    'src/visual/mundo3d/sierra/vendor/flora/lodEspecieSylva.js',
+    'src/visual/mundo3d/sierra/vendor/flora/matrizParamo.js',
+    'src/visual/mundo3d/sierra/vendor/flora/pisosTermicos.js',
+    'src/visual/mundo3d/sierra/vendor/flora/quickGrass.js',
+    'src/visual/mundo3d/sierra/vendor/flora/vientoMundos.js',
+    // espejo del drenaje tanda 1 (contrato A4)
+    'src/visual/mundo3d/atmosfera/DemoAtmosferaViva.jsx',
+    // sueltos con decisión propia
+    'src/visual/mundo3d/sonidosAmbientales.js',
+    'src/visual/mundo3d/kit/geometria.js',
+    'src/visual/mundo3d/infraestructura/index.js',
+    'src/visual/mundo3d/polinizadores/index.js',
+  ];
+
+  describe('tanda mundo3d 2026-09-04: la declaración queda sostenida', function () {
+    it('las 48 entradas de la tanda están en el allowlist', function () {
+      const ids = new Set((allowlist.orphan_components || []).map(function (e) { return e.id; }));
+      const faltantes = IDS_TANDA_MUNDO3D.filter(function (id) { return !ids.has(id); });
+      expect(
+        faltantes,
+        'entradas tanda mundo3d quitadas sin cablear: el gate volvería a rojo con esos ids',
+      ).toEqual([]);
+    });
+
+    it('cada una sigue viva como hallazgo allowlisted (ni cableada ni borrada en silencio)', function () {
+      // El gate advierte en stdout cada hallazgo cubierto por el allowlist. Si
+      // un archivo se CABLEA, deja de salir (y su entrada se vuelve obsoleta —
+      // bien, pero entonces la entrada se borra y este test obliga a hacerlo
+      // consciente); si se BORRA del disco, la guardia de ids-en-disco de
+      // arriba truena. Acá se sostiene el estado declarado: siguen existiendo
+      // como hallazgos con excepción vigente.
+      const faltantes = IDS_TANDA_MUNDO3D.filter(function (id) {
+        return !salida.includes(`pieza SIN ruta viva pero allowlisted: ${id}`);
+      });
+      expect(
+        faltantes,
+        'estos ids ya no salen como hallazgo allowlisted: o se cablearon (borrar la entrada del allowlist y actualizar este pin) o el motor dejó de verlos',
+      ).toEqual([]);
+    });
+
+    it('el gate ya no acusa NINGÚN archivo de mundo3d en sus hallazgos', function () {
+      // La meta de la tanda: la porción mundo3d del rojo queda en cero. Los
+      // demás hallazgos (criaturas, dashboards, types/hooks — tanda 2 del
+      // drenaje) siguen en stderr a propósito: declararlos en masa sería
+      // convertir el gate en trámite.
+      expect(r.stderr || '').not.toContain('mundo3d');
+    });
+
+    it('muestra representativa: el único importador del apoyo es su escena declarada', function () {
+      // La premisa que sostiene la herencia de la declaración: bancoSemillas
+      // solo lo importa EscenaBancoSemillas.jsx (declarada 2026-08-30) y
+      // semillasData solo el geom + la escena. Si un módulo VIVO empieza a
+      // importarlos, la declaración dejó de ser honesta y toca cablear.
+      const importadoresDe = function (nombreBase) {
+        const encontrados = [];
+        const caminar = function (dir) {
+          for (const entry of readdirSync(dir)) {
+            if (entry === 'node_modules' || entry.startsWith('.')) continue;
+            const ruta = join(dir, entry);
+            if (statSync(ruta).isDirectory()) { caminar(ruta); continue; }
+            if (!/\.(js|jsx|mjs|ts|tsx)$/.test(entry)) continue;
+            const texto = readFileSync(ruta, 'utf8');
+            if (texto.includes(nombreBase) && !ruta.includes('__tests__')
+                && !ruta.endsWith(`${nombreBase}.js`)) {
+              encontrados.push(ruta);
+            }
+          }
+        };
+        caminar(join(REPO_ROOT, 'src'));
+        return encontrados.map(function (p) { return p.slice(REPO_ROOT.length + 1); });
+      };
+      // Ningún importador fuera del cluster semillas (todos declarados).
+      const ajenos = importadoresDe('bancoSemillas.geom')
+        .concat(importadoresDe('semillasData'))
+        .filter(function (f) { return !f.includes('mundo3d/semillas/'); });
+      expect(ajenos, 'un módulo vivo consume el apoyo declarado: la excepción ya no es inocua').toEqual([]);
     });
   });
 });
