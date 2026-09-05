@@ -1,0 +1,651 @@
+<!doctype html>
+<html lang="es-CO">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Sylva s34 — Editor live WASD y sliders</title>
+<style>
+  html,body{margin:0;height:100%;overflow:hidden;background:#0b120c;font-family:system-ui,-apple-system,"Segoe UI",sans-serif}
+  #c{display:block;width:100vw;height:100vh;touch-action:none}
+  #hud{position:fixed;top:14px;left:14px;padding:10px 14px;border-radius:12px;
+    background:rgba(10,18,12,.58);color:#eaffef;font-size:12.5px;line-height:1.5;backdrop-filter:blur(8px);
+    z-index:9;min-width:330px;max-width:min(94vw,560px);box-shadow:0 8px 24px rgba(0,0,0,.25)}
+  #hud .row{display:flex;justify-content:space-between;gap:16px}
+  #hud .k{opacity:.66}
+  #hud b{font-variant-numeric:tabular-nums}
+  #err{position:fixed;inset:auto 14px 14px auto;max-width:72vw;color:#ffd9d9;background:rgba(90,20,20,.78);
+    padding:8px 12px;border-radius:10px;font-size:12px;white-space:pre-wrap;z-index:20;display:none}
+  #editor{position:fixed;top:14px;right:14px;z-index:12;width:min(300px,calc(100vw - 32px));max-height:calc(100vh - 150px);
+    overflow:auto;background:rgba(12,20,14,.82);border:1px solid rgba(180,215,170,.22);border-radius:14px;
+    color:#eaffef;font-size:12.5px;backdrop-filter:blur(10px);padding:10px 12px;box-shadow:0 10px 30px rgba(0,0,0,.35);
+    display:none}
+  #editor.abierta{display:block}
+  #editor h3{margin:2px 0 8px;font-size:13px;color:#d9f5d0}
+  #editor .looks{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:8px}
+  #editor .looks button{border:1px solid rgba(180,215,170,.25);background:transparent;color:#cfe6c6;border-radius:7px;
+    padding:3px 8px;font:inherit;font-size:11.5px;cursor:pointer}
+  #editor .looks button.on{background:#2e4a26;border-color:#8fb87e}
+  #editor details{margin:6px 0}
+  #editor summary{cursor:pointer;color:#bcdcb0;font-size:12px;user-select:none}
+  #editor summary::after{content:' ▾';opacity:.5}
+  #editor details:not([open]) summary::after{content:' ▸'}
+  #editor label{display:flex;align-items:center;gap:7px;margin:4px 0;color:#d6e4d0}
+  #editor label .n{flex:1 1 auto;min-width:0;font-size:11.5px}
+  #editor label .v{color:#8fb88a;font-variant-numeric:tabular-nums;min-width:46px;text-align:right;font-size:11px}
+  #editor input[type=range]{flex:0 0 110px;height:12px;accent-color:#7fa055}
+  #editor input[type=checkbox]{accent-color:#7fa055}
+  #editor select{background:#16240f;color:#d6e4d0;border:1px solid #ffffff22;font:inherit;font-size:11.5px;border-radius:5px;flex:1}
+  #editor .btnrow{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+  #editor .btnrow button{background:#1c2e16;border:1px solid #4a6e3a;color:#dff3d8;border-radius:8px;
+    padding:4px 9px;font:inherit;font-size:11.5px;cursor:pointer}
+  #editor .btnrow button:hover{background:#2a4521}
+  #editor .hint{color:#8fa888;font-size:10px;line-height:1.45;margin-top:8px}
+  #toggleEditor{position:fixed;top:14px;right:14px;z-index:13;border:1px solid rgba(180,215,170,.3);
+    background:rgba(12,20,14,.8);color:#dff3d8;border-radius:10px;padding:6px 12px;font:inherit;font-size:12px;cursor:pointer;backdrop-filter:blur(8px)}
+  #toggleEditor:hover{background:#1c2e16}
+  @media (pointer:coarse){ #toggleEditor{display:none} }
+</style>
+<script type="importmap">
+{
+  "imports": {
+    "three": "./vendor/three.module.js",
+    "three/addons/": "./vendor/addons/"
+  }
+}
+</script>
+</head>
+<body>
+<canvas id="c"></canvas>
+<div id="hud">
+  <div class="row"><span class="k">FPS</span><b id="fps">--</b></div>
+  <div class="row"><span class="k">Modo</span><b id="modo">--</b></div>
+  <div class="row"><span class="k">Cámara</span><b id="cam">--</b></div>
+  <div class="row"><span class="k">Clearance del ojo</span><b id="clear">--</b></div>
+  <div class="row"><span class="k">Calidad / semilla</span><b id="q">--</b></div>
+  <div class="row"><span class="k">Instancias near/med/far</span><b id="tiers">--</b></div>
+  <div class="row"><span class="k">Ajustes en vivo · última latencia</span><b id="apply">--</b></div>
+  <div class="row"><span class="k">Triángulos dibujados</span><b id="tris">--</b></div>
+</div>
+<div id="toggleEditor" type="button">⚙ Editor (H)</div>
+<div id="editor"></div>
+<div id="err"></div>
+<script type="module">
+// ═══════════════════════════════════════════════════════════════════════════
+// Sylva s34 — EDITOR LIVE WASD Y SLIDERS
+// realistic-forest (github.com/Token-Gremlin/realistic-forest, MIT © 2026 Token
+// Gremlin; notice retenido en lib3d/flora/LICENSE-sylva-MIT) abre su sesión
+// como un ESTUDIO en vivo: cámara libre WASD+ratón con pointer lock (y un modo
+// caminata que sigue el terreno), más un panel de sliders que retocan la escena
+// AL INSTANTE y donde cada slider es una query string. Este banco lo emula
+// sobre el sistema real de masa del valle (lib/impostor-lod.js, makeImpostorLOD)
+// y un terreno analítico de la misma familia que los bancos hermanos.
+//
+// El editor es ESCRITORIO y opt-in (puntero fino). Mientras está cerrado —o en
+// pantalla táctil— el "recorrido" guiado que ya existía en el valle sigue
+// intacto: la cámara acompaña una spline que recorre el rodal y no se rompe ni
+// se reinicia al abrir/cerrar el editor (misma progresión al volver). Eso es la
+// mitad "sin romper el recorrido táctil" del criterio.
+//
+// A/B: `?ed=0` editor cerrado (recorrido) · `?ed=1` editor abierto. Los sliders
+// aplican EN VIVO (sin recargar): calidad/semilla reconstruyen el sistema
+// (pesado, debounce), niebla/sol/viento/alturaOjo/fov/exposición escriben
+// uniforms al frame siguiente (livianos, inmediatos). `window.__editorS34`
+// registra cada ajuste y su latencia para que la sonda la mida en la página.
+// `?walk=0` desactiva la caminata con suelo (baseline que puede atravesar el
+// terreno); `?cam=near|mid|wide` fija el encuadre de envelope.
+// `?rec=0` apaga el recorrido automático (deja OrbitControls quieto).
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { makeImpostorLOD } from './lib/impostor-lod.js';
+import { uniformesVientoMundo, tickVientoMundos } from './lib3d/flora/vientoMundos.js';
+
+const err = document.getElementById('err');
+addEventListener('error', (e) => { err.style.display = 'block'; err.textContent = 'ERROR: ' + (e.message || e); });
+addEventListener('unhandledrejection', (e) => { err.style.display = 'block'; err.textContent = 'REJECT: ' + ((e.reason && e.reason.message) || e.reason); });
+
+const q = new URLSearchParams(location.search);
+const COARSE = matchMedia('(pointer: coarse)').matches;   // táctil: el editor NO se ofrece
+const PUNTERO_FINO = !COARSE;
+const ED_FORZADO = q.get('ed') === '1';                    // el gate abre el editor con ?ed=1
+const EDITOR_DISPONIBLE = PUNTERO_FINO && (q.get('ed') === '0' ? false : true);
+// El recorrido guiado corre por defecto (es el "paseo táctil" de la portada);
+// con `?cam=` explícito el gate pide un encuadre quieto → sin recorrido salvo
+// que `?rec=1` lo fuerce. `?rec=0` lo apaga siempre.
+const RECORRIDO = q.get('rec') === '1' || (q.get('rec') === null && q.get('cam') === null);
+const WALK = q.get('walk') !== '0';                        // modo caminata sigue el terreno
+const _seed = Number(q.get('seed'));
+const SEED = Number.isInteger(_seed) && _seed >= 0 ? _seed : 20260902;
+const _qcal = q.get('quality')?.toLowerCase();
+const QUALITY_INI = ['fluid', 'balanced', 'beautiful', 'max'].includes(_qcal) ? _qcal : 'balanced';
+const CAM = q.get('cam') || 'mid';
+
+// ── ruido determinista (misma forma que lib3d / impostores-demo) ────────────
+function hash2(x, y) { const h = Math.sin(x * 127.1 + y * 311.7) * 43758.5453; return h - Math.floor(h); }
+function vnoise(x, y) {
+  const xi = Math.floor(x), yi = Math.floor(y);
+  const xf = x - xi, yf = y - yi;
+  const u = xf * xf * (3 - 2 * xf), v = yf * yf * (3 - 2 * yf);
+  return hash2(xi, yi) * (1 - u) * (1 - v) + hash2(xi + 1, yi) * u * (1 - v) +
+    hash2(xi, yi + 1) * (1 - u) * v + hash2(xi + 1, yi + 1) * u * v;
+}
+function fbm(x, z, oct) {
+  let s = 0, amp = 1, f = 1, norm = 0;
+  for (let i = 0; i < oct; i++) { s += amp * vnoise(x * f, z * f); norm += amp; amp *= 0.5; f *= 2.03; }
+  return s / norm;
+}
+// El mismo terreno analítico del banco s33: valle suave con terraceo y dos
+// frecuencias; es la superficie que la caminata del editor consulta.
+function terreno(x, z) {
+  const base = 4 + (z + 70) * 0.32;
+  const n = fbm(x * 0.022 + 3.1, z * 0.022 + 1.7, 2);
+  const rr = fbm(x * 0.07 + 9.3, z * 0.07 + 4.1, 2) * 0.5 + 0.5;
+  return base + (n - 0.5) * 16 + (rr - 0.5) * 2.2;
+}
+
+const renderer = new THREE.WebGLRenderer({ canvas: document.getElementById('c'), antialias: true });
+renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.5));
+renderer.setSize(innerWidth, innerHeight);
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure = 1.15;
+renderer.outputColorSpace = THREE.SRGBColorSpace;
+window.__r = renderer;
+
+const scene = new THREE.Scene();
+const fogColor = 0xc9dbd0;
+scene.background = new THREE.Color(fogColor);
+scene.fog = new THREE.Fog(fogColor, 90, 400);
+window.__escena = scene;
+
+const camera = new THREE.PerspectiveCamera(55, innerWidth / innerHeight, 0.1, 900);
+window.__cam = camera;
+
+const controls = new OrbitControls(camera, renderer.domElement);
+controls.enableDamping = false;
+controls.target.set(0, 28, -15);
+controls.update();
+
+// ── encuadres de envelope (basados en el banco s33) ─────────────────────────
+const CAMERAS = {
+  near: { pos: [0, 20, 30], tgt: [0, 19, -12] },
+  mid: { pos: [0, 37, 78], tgt: [0, 24, -14] },
+  wide: { pos: [0, 120, 300], tgt: [0, 28, -20] },
+};
+const C0 = CAMERAS[CAM] || CAMERAS.mid;
+camera.position.set(...C0.pos);
+controls.target.set(...C0.tgt);
+controls.update();
+
+scene.add(new THREE.HemisphereLight(0xcfe8d0, 0x2a3a24, 0.85));
+const sun = new THREE.DirectionalLight(0xfff2d8, 1.25);
+sun.position.set(80, 120, 40);
+scene.add(sun);
+
+function buildGround() {
+  const geo = new THREE.PlaneGeometry(400, 160, 60, 26);
+  geo.rotateX(-Math.PI / 2);
+  geo.translate(0, 0, 5);
+  const P = geo.attributes.position;
+  const n = P.count;
+  for (let i = 0; i < n; i++) P.setY(i, terreno(P.getX(i), P.getZ(i)));
+  const col = new Float32Array(n * 3);
+  const cA = [0.13, 0.24, 0.11], cB = [0.37, 0.5, 0.24];
+  for (let i = 0; i < n; i++) {
+    const x = P.getX(i), z = P.getZ(i), h = P.getY(i);
+    const t = THREE.MathUtils.clamp((h - 2) / 56, 0, 1);
+    const parche = fbm(x * 0.05 + 5.1, z * 0.05 + 2.3, 2);
+    const k = t * 0.72 + 0.2 + (parche - 0.5) * 0.24;
+    const j = (fbm(x * 0.15 + 7.7, z * 0.15 + 4.1, 2) - 0.5) * 0.1;
+    col[i * 3] = Math.max(0, cA[0] + (cB[0] - cA[0]) * k + j);
+    col[i * 3 + 1] = Math.max(0, cA[1] + (cB[1] - cA[1]) * k + j);
+    col[i * 3 + 2] = Math.max(0, cA[2] + (cB[2] - cA[2]) * k + j);
+  }
+  geo.setAttribute('color', new THREE.BufferAttribute(col, 3));
+  scene.add(new THREE.Mesh(geo, new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 1, metalness: 0 })));
+}
+buildGround();
+
+// ── el sistema REAL de masa del valle ───────────────────────────────────────
+// Se reconstruye (dispose + makeImpostorLOD) cuando el editor cambia un
+// parámetro PESADO (calidad, semilla); `resize` en vivo cubre la densidad.
+let system = null;
+let grupoActual = null;
+
+function construir(calidad = QUALITY_INI, semilla = SEED) {
+  if (system) {
+    scene.remove(grupoActual);
+    system.dispose();
+    grupoActual.traverse((o) => { o.geometry?.dispose?.(); });
+  }
+  system = makeImpostorLOD({
+    count: 15740,
+    area: { x0: -185, x1: 185, z0: -55, z1: 75 },
+    alturaObjetivo: 11,
+    terreno,
+    paleta: { base: '#3a5c2a', claro: '#6f9140', oscuro: '#24391d', acento: '#c9b54a' },
+    fog: { near: 90, far: 400, color: fogColor },
+    seed: semilla,
+    canopyCards: true,
+    quality: calidad,
+    culling: false,
+    regional: false,
+  });
+  grupoActual = system.group;
+  scene.add(grupoActual);
+  window.__sistemaS34 = system;
+}
+
+// ── editor en vivo: estado, sliders y looks ─────────────────────────────────
+const EDITOR = {
+  abierta: ED_FORZADO && EDITOR_DISPONIBLE,
+  editar: false,                               // editar = capturó el ratón (WASD)
+  caminar: WALK,                               // modo caminata: el ojo sigue el suelo
+  velocidad: 12,
+  yaw: 0, pitch: -0.2,
+  ojo: 1.6,                                    // altura de ojos en la caminata
+  valores: {
+    solElev: 38, solInt: 1.25, niebla: 1, viento: 1, fov: 55, expo: 1.15,
+    calidad: QUALITY_INI, semilla: SEED, densidad: 15740, eye: 1.6, walk: WALK ? 1 : 0, velocidad: 12,
+  },
+  calidadActual: QUALITY_INI,
+  ajustes: [],                                 // registro de ajustes en vivo para la sonda
+  teclas: new Set(),
+  pointerLock: false,
+};
+let aplicarTimer = null;                       // debounce de los pesados (reconstrucción)
+
+// registro del "recorrido": el paseo guiado. Progreso monotónico en segundos
+// que NO se reinicia al abrir/cerrar el editor (para eso guardamos pausa).
+const PASEO = { t: 0, pausado: true, puntos: null, curva: null };
+
+function construirRecorrido() {
+  const pts = [
+    new THREE.Vector3(0, 22, 60),   // sur del rodal, mirando el valle
+    new THREE.Vector3(-120, 40, -10),
+    new THREE.Vector3(0, 55, -60),
+    new THREE.Vector3(120, 42, 0),
+  ];
+  const c = new THREE.CatmullRomCurve3(pts, true, 'centripetal', 0.5);
+  PASEO.curva = c;
+  PASEO.puntos = pts;
+}
+construirRecorrido();
+
+function aplicarPesados() {
+  clearTimeout(aplicarTimer);
+  aplicarTimer = setTimeout(() => {
+    const v = EDITOR.valores;
+    const cambioEstructura = v.calidad !== EDITOR.calidadActual || v.semilla !== EDITOR.semillaActual;
+    if (cambioEstructura) {
+      // calidad/semilla = reconstrucción (dispose + makeImpostorLOD)
+      construir(v.calidad, v.semilla);
+      EDITOR.calidadActual = v.calidad;
+      EDITOR.semillaActual = v.semilla;
+      system.resize(v.densidad);
+    } else {
+      // solo densidad → resize en vivo del sistema existente
+      system.resize(v.densidad);
+    }
+    registrarAjuste({ tipo: 'pesado', calidad: v.calidad, semilla: v.semilla, densidad: system.counts().total });
+  }, 140);
+}
+
+function registrarAjuste(detalle) {
+  EDITOR.ajustes.push({ ...detalle, t: performance.now(), fps: fpsMedido });
+  if (EDITOR.ajustes.length > 40) EDITOR.ajustes.shift();
+  const el = document.getElementById('apply');
+  if (el && EDITOR.ajustes.length) {
+    const ult = EDITOR.ajustes[EDITOR.ajustes.length - 1];
+    el.textContent = `${EDITOR.ajustes.length} · ${(ult.latenciaMs ?? 0).toFixed(1)} ms`;
+  }
+}
+
+// Sliders LIVIANOS: escriben al frame siguiente (sin reconstruir).
+function aplicarUniform(k) {
+  const v = EDITOR.valores;
+  const t0 = performance.now();
+  if (k === 'solElev') {
+    const a = THREE.MathUtils.degToRad(v.solElev);
+    const r = 220;
+    sun.position.set(Math.cos(a) * r * 0.6, Math.sin(a) * r, Math.cos(a) * r * 0.6);
+  } else if (k === 'solInt') {
+    sun.intensity = v.solInt;
+  } else if (k === 'niebla') {
+    const far = 400 * v.niebla, near = 90 * Math.min(1, v.niebla * 0.8 + 0.2);
+    scene.fog.near = near; scene.fog.far = far;
+    grupoActual?.traverse((o) => {
+      if (o.isMesh && o.material?.uniforms?.uFogFar) {
+        o.material.uniforms.uFogNear.value = near;
+        o.material.uniforms.uFogFar.value = far;
+      }
+    });
+  } else if (k === 'viento') {
+    // uFuerzaVM es un uniform COMPARTIDO por referencia en todos los materiales
+    // parcheados (impostor y mundo): el slider fija su factor estable.
+    vientoFactor = v.viento;
+  } else if (k === 'fov') {
+    camera.fov = v.fov; camera.updateProjectionMatrix();
+  } else if (k === 'expo') {
+    renderer.toneMappingExposure = v.expo;
+  } else if (k === 'eye') {
+    EDITOR.ojo = v.eye;
+  } else if (k === 'walk') {
+    EDITOR.caminar = v.walk ? true : false;
+  } else if (k === 'velocidad') {
+    EDITOR.velocidad = v.velocidad;
+  }
+  const latenciaMs = performance.now() - t0;
+  registrarAjuste({ tipo: 'uniforme', k, latenciaMs });
+}
+let vientoFactor = 1;
+window.__editorS34 = {
+  set: (k, val) => {
+    if (!(k in EDITOR.valores)) return false;
+    EDITOR.valores[k] = val;
+    if (['calidad', 'semilla', 'densidad'].includes(k)) { aplicarPesados(); }
+    else { aplicarUniform(k); pintarHud(); }
+    return true;
+  },
+  abrir: () => { EDITOR.abierta = true; pintarPanel(); },
+  cerrar: () => { EDITOR.abierta = false; EDITOR.editar = false; pintarPanel(); },
+  // la sonda simula la captura del ratón sin pointer lock real del sistema
+  editar: (on) => { EDITOR.editar = !!on; EDITOR.pointerLock = false; },
+  // la sonda simula teclas sin pointer lock real
+  tecla: (code, down) => { if (down) EDITOR.teclas.add(code); else EDITOR.teclas.delete(code); },
+  mirar: (dx, dy) => {
+    EDITOR.yaw -= dx * 0.003;
+    EDITOR.pitch = THREE.MathUtils.clamp(EDITOR.pitch - dy * 0.003, -1.45, 1.45);
+  },
+  estado: () => ({
+    abierta: EDITOR.abierta, editar: EDITOR.editar, caminar: EDITOR.caminar,
+    pointerLock: EDITOR.pointerLock, coarse: COARSE,
+    valores: { ...EDITOR.valores },
+    paseo: { t: +PASEO.t.toFixed(3), pausado: PASEO.pausado },
+    eye: EDITOR.ojo,
+  }),
+  ajustes: () => EDITOR.ajustes.slice(),
+};
+
+// ── cámara editor (emula Controls.js de Sylva, implementación propia) ──────
+// Adelante es la proyección del yaw en el plano XZ; el pitch suma componente Y
+// en vuelo libre. En caminata la Y la fija el terreno + altura de ojo.
+function camaraEditor(dt) {
+  const k = EDITOR.teclas;
+  const dir = new THREE.Vector3();
+  const fwd = new THREE.Vector3(-Math.sin(EDITOR.yaw), 0, -Math.cos(EDITOR.yaw));
+  const right = new THREE.Vector3(-fwd.z, 0, fwd.x);
+  if (k.has('KeyW')) dir.add(fwd);
+  if (k.has('KeyS')) dir.sub(fwd);
+  if (k.has('KeyD')) dir.add(right);
+  if (k.has('KeyA')) dir.sub(right);
+  const boost = k.has('ShiftLeft') ? 3.2 : 1;
+  let vy = 0;
+  if (EDITOR.caminar) {
+    dir.y = 0;
+    if (dir.lengthSq() > 0) dir.normalize();
+    camera.position.addScaledVector(dir, EDITOR.velocidad * boost * dt);
+    // la caminata SIGUE el terreno: el ojo se planta sobre la cota analítica.
+    const h = terreno(camera.position.x, camera.position.z);
+    const deseado = h + EDITOR.ojo;
+    camera.position.y = Math.max(camera.position.y - (camera.position.y - deseado) * Math.min(1, dt * 6), h + 0.4);
+    camera.position.y = deseado;
+  } else {
+    if (k.has('Space') || k.has('KeyE')) vy += 1;
+    if (k.has('KeyQ')) vy -= 1;
+    if (dir.lengthSq() > 0) dir.normalize();
+    camera.position.addScaledVector(dir, EDITOR.velocidad * boost * dt);
+    const pitchV = new THREE.Vector3(0, Math.sin(EDITOR.pitch) * (k.has('KeyW') ? 1 : 0), 0);
+    camera.position.y += vy * EDITOR.velocidad * boost * dt + pitchV.y * EDITOR.velocidad * boost * dt * 0.4;
+  }
+  camera.quaternion.setFromEuler(new THREE.Euler(EDITOR.pitch, EDITOR.yaw, 0, 'YXZ'));
+}
+
+// ── recorrido guiado (el "paseo" que NO se debe romper) ─────────────────────
+function actualizarRecorrido(dt) {
+  if (!RECORRIDO || !PASEO.curva) { PASEO.pausado = true; return; }
+  if (EDITOR.editar || EDITOR.abierta) { PASEO.pausado = true; return; }
+  PASEO.pausado = false;
+  PASEO.t += dt * 0.045;                    // vuelta lenta del rodal
+  const u = PASEO.t % 1;
+  const p = PASEO.curva.getPointAt(u);
+  camera.position.copy(p);
+  // el recorrido también respeta el suelo (clearance constante como el paseo vivo)
+  camera.position.y = Math.max(p.y, terreno(p.x, p.z) + 8);
+  camera.lookAt(0, 26, -14);
+  controls.target.set(0, 26, -14);
+}
+
+// ── panel DOM (emula ui/panel.js de Sylva, implementación propia) ───────────
+function pintarHud() { /* los campos los actualiza el bucle */ }
+
+const editorEl = document.getElementById('editor');
+const toggleEl = document.getElementById('toggleEditor');
+
+function rangeInput(parent, label, key, min, max, step, fmt = (v) => v.toFixed(2)) {
+  const l = document.createElement('label');
+  const n = document.createElement('span'); n.className = 'n'; n.textContent = label;
+  const i = document.createElement('input');
+  i.type = 'range'; i.min = min; i.max = max; i.step = step; i.value = EDITOR.valores[key];
+  const v = document.createElement('span'); v.className = 'v'; v.textContent = fmt(Number(i.value));
+  i.addEventListener('input', () => {
+    const x = parseFloat(i.value);
+    EDITOR.valores[key] = x;
+    v.textContent = fmt(x);
+    if (['calidad', 'semilla', 'densidad'].includes(key)) aplicarPesados();
+    else aplicarUniform(key);
+    // round-trip a la URL (cada slider es una query string, como en Sylva)
+    const p = new URLSearchParams(location.search);
+    p.set(key, String(x));
+    history.replaceState(null, '', `${location.pathname}?${p.toString()}`);
+  });
+  l.append(n, i, v); parent.append(l);
+  return { input: i, refresh: () => { i.value = EDITOR.valores[key]; v.textContent = fmt(Number(i.value)); } };
+}
+
+function seccion(parent, titulo, abierta = true) {
+  const d = document.createElement('details');
+  d.open = abierta;
+  const s = document.createElement('summary'); s.textContent = titulo;
+  d.append(s); parent.append(d);
+  return d;
+}
+
+function pintarPanel() {
+  editorEl.innerHTML = '';
+  const h = document.createElement('h3');
+  h.textContent = 'Sylva s34 · editor del rodal';
+  editorEl.append(h);
+
+  const looks = document.createElement('div'); looks.className = 'looks';
+  const LOOKS = [
+    { id: 'bosque', nombre: 'Bosque', v: {} },
+    { id: 'claro', nombre: 'Claro', v: { densidad: 7000, solElev: 55, solInt: 1.5 } },
+    { id: 'dorado', nombre: 'Golden hour', v: { solElev: 12, solInt: 1.05, expo: 1.3 } },
+    { id: 'bruma', nombre: 'Bruma', v: { niebla: 1.9, solInt: 0.9 } },
+  ];
+  const pintarLooks = () => {
+    for (const b of looks.querySelectorAll('button')) b.classList.toggle('on', b.dataset.look === 'bosque');
+  };
+  for (const L of LOOKS) {
+    const b = document.createElement('button');
+    b.textContent = L.nombre; b.dataset.look = L.id;
+    b.addEventListener('click', () => {
+      for (const [kk, vv] of Object.entries(L.v)) window.__editorS34.set(kk, vv);
+      pintarLooks();
+    });
+    looks.append(b);
+  }
+  editorEl.append(looks);
+  pintarLooks();
+
+  const cam = seccion(editorEl, 'Cámara', true);
+  const refreshers = [];
+  const sl = (sec, lbl, key, mn, mx, st, f) => refreshers.push(rangeInput(sec, lbl, key, mn, mx, st, f).refresh);
+  sl(cam, 'Caminata sigue el suelo', 'walk', 0, 1, 1, (x) => (x ? 'sí' : 'no'));
+  sl(cam, 'Altura de ojos', 'eye', 0.6, 3.5, 0.05, (x) => `${x.toFixed(2)} u`);
+  sl(cam, 'Velocidad', 'velocidad', 3, 40, 0.5, (x) => x.toFixed(1));
+
+  const bosque = seccion(editorEl, 'Bosque', true);
+  const calidadSel = document.createElement('select');
+  for (const cQ of ['fluid', 'balanced', 'beautiful', 'max']) {
+    const o = document.createElement('option'); o.value = cQ; o.textContent = cQ;
+    calidadSel.append(o);
+  }
+  calidadSel.value = EDITOR.valores.calidad;
+  calidadSel.addEventListener('change', () => { window.__editorS34.set('calidad', calidadSel.value); });
+  const lq = document.createElement('label');
+  const nq = document.createElement('span'); nq.className = 'n'; nq.textContent = 'Calidad (reconstruye)';
+  lq.append(nq, calidadSel); bosque.append(lq);
+  sl(bosque, 'Semilla (reconstruye)', 'semilla', 0, 4294967295, 1, (x) => x.toFixed(0));
+  sl(bosque, 'Densidad (resize)', 'densidad', 4000, 20000, 250, (x) => x.toFixed(0));
+
+  const atm = seccion(editorEl, 'Atmósfera', true);
+  sl(atm, 'Elevación del sol', 'solElev', 2, 80, 1, (x) => `${x.toFixed(0)}°`);
+  sl(atm, 'Intensidad del sol', 'solInt', 0.2, 2.4, 0.05, (x) => x.toFixed(2));
+  sl(atm, 'Niebla', 'niebla', 0.3, 2, 0.05, (x) => x.toFixed(2));
+  sl(atm, 'Viento', 'viento', 0, 2.2, 0.05, (x) => x.toFixed(2));
+
+  const img = seccion(editorEl, 'Imagen', false);
+  sl(img, 'FOV', 'fov', 30, 90, 1, (x) => `${x.toFixed(0)}°`);
+  sl(img, 'Exposición', 'expo', 0.4, 2.4, 0.05, (x) => x.toFixed(2));
+
+  const row = document.createElement('div'); row.className = 'btnrow';
+  const cerrar = document.createElement('button');
+  cerrar.textContent = 'Cerrar editor';
+  cerrar.onclick = () => { EDITOR.abierta = false; EDITOR.editar = false; pintarPanel(); pintarEditorVis(); };
+  row.append(cerrar);
+  editorEl.append(row);
+  const hint = document.createElement('div'); hint.className = 'hint';
+  hint.textContent = 'Click en el canvas: captura el ratón (WASD + mirar). G = caminata con suelo · Shift = turbo · rueda = velocidad. H cierra/abre este panel.';
+  editorEl.append(hint);
+
+  // re-aplicar estado
+  for (const r of refreshers) r();
+}
+
+function pintarEditorVis() {
+  toggleEl.style.display = EDITOR_DISPONIBLE ? 'block' : 'none';
+  editorEl.classList.toggle('abierta', EDITOR.abierta && EDITOR_DISPONIBLE);
+  if (EDITOR.abierta && EDITOR_DISPONIBLE) pintarPanel();
+}
+
+toggleEl.addEventListener('click', () => {
+  if (!EDITOR_DISPONIBLE) return;
+  EDITOR.abierta = !EDITOR.abierta;
+  if (!EDITOR.abierta) { EDITOR.editar = false; if (document.pointerLockElement) document.exitPointerLock(); }
+  pintarEditorVis();
+});
+
+addEventListener('keydown', (e) => {
+  if (e.code === 'KeyH' && EDITOR_DISPONIBLE) {
+    EDITOR.abierta = !EDITOR.abierta;
+    if (!EDITOR.abierta) { EDITOR.editar = false; if (document.pointerLockElement) document.exitPointerLock(); }
+    pintarEditorVis();
+    pintarHud();
+  }
+  if (e.code === 'KeyG' && EDITOR.editar) {
+    EDITOR.caminar = !EDITOR.caminar;
+    EDITOR.valores.walk = EDITOR.caminar ? 1 : 0;
+    const p = new URLSearchParams(location.search); p.set('walk', EDITOR.caminar ? '1' : '0');
+    history.replaceState(null, '', `${location.pathname}?${p.toString()}`);
+  }
+});
+
+// pointer lock del editor (solo escritorio y cuando el editor está abierto)
+renderer.domElement.addEventListener('click', () => {
+  if (!EDITOR.abierta || !EDITOR_DISPONIBLE || EDITOR.pointerLock) return;
+  renderer.domElement.requestPointerLock?.();
+});
+document.addEventListener('pointerlockchange', () => {
+  EDITOR.pointerLock = document.pointerLockElement === renderer.domElement;
+  EDITOR.editar = EDITOR.pointerLock;
+});
+document.addEventListener('mousemove', (e) => {
+  if (!EDITOR.pointerLock) return;
+  window.__editorS34.mirar(e.movementX || 0, e.movementY || 0);
+});
+addEventListener('wheel', (e) => {
+  if (!EDITOR.editar) return;
+  EDITOR.velocidad = THREE.MathUtils.clamp(EDITOR.velocidad * Math.exp(-e.deltaY * 0.0012), 3, 60);
+}, { passive: true });
+
+// ── arranque ────────────────────────────────────────────────────────────────
+construir();
+EDITOR.calidadActual = QUALITY_INI;
+EDITOR.semillaActual = SEED;
+pintarEditorVis();
+window.__ARRANQUE_OK = true;
+
+// hooks del gate
+let fps = 0, frames = 0, fpsT = 0, fpsMedido = 0;
+const clock = new THREE.Clock();
+window.__medirS34 = () => {
+  const gl = renderer.getContext().getError();
+  const c = system.counts();
+  const eyeH = terreno(camera.position.x, camera.position.z);
+  return {
+    gl,
+    editor: { abierta: EDITOR.abierta, editar: EDITOR.editar, caminar: EDITOR.caminar,
+      disponible: EDITOR_DISPONIBLE, coarse: COARSE },
+    paseo: { t: +PASEO.t.toFixed(3), pausado: PASEO.pausado, activo: RECORRIDO && !EDITOR.editar && !EDITOR.abierta },
+    cam: CAM, walk: WALK, calidad: EDITOR.valores.calidad, semilla: EDITOR.valores.semilla,
+    densidad: c.total, tiers: { near: c.near, med: c.med, far: c.far },
+    clearance: +(camera.position.y - eyeH).toFixed(3),
+    pos: [camera.position.x, camera.position.y, camera.position.z],
+    ajustes: EDITOR.ajustes.length,
+    ultimaLatencia: EDITOR.ajustes.length ? EDITOR.ajustes[EDITOR.ajustes.length - 1].latenciaMs ?? null : null,
+    fps: fpsMedido,
+    tris: renderer.info.render.triangles,
+    webgl: renderer.capabilities.isWebGL2,
+  };
+};
+
+const _dir = new THREE.Vector3();
+function tick() {
+  const dt = Math.min(clock.getDelta(), 0.05);
+  tickVientoMundos(clock.getElapsedTime());
+  uniformesVientoMundo.uFuerzaVM.value *= vientoFactor;   // slider de viento sobre el uniform compartido
+
+  // paseo/editor: uno u otro manda la cámara
+  if (EDITOR.editar) {
+    camaraEditor(dt);
+    controls.enabled = false;
+    PASEO.pausado = true;
+  } else if (EDITOR.abierta && !EDITOR.editar) {
+    // editor abierto pero sin captura: la cámara queda donde estaba (OrbitControls)
+    controls.enabled = true;
+    controls.update();
+  } else {
+    controls.enabled = !RECORRIDO;
+    actualizarRecorrido(dt);
+    if (RECORRIDO) { /* el recorrido manda */ }
+    else controls.update();
+  }
+
+  renderer.getDrawingBufferSize(_dir);
+  system.update(camera, dt, _dir.y);
+  renderer.render(scene, camera);
+
+  frames++; fpsT += dt;
+  if (fpsT >= 0.5) { fpsMedido = Math.round(frames / fpsT); frames = 0; fpsT = 0; }
+  pintarHud();
+  document.getElementById('fps').textContent = fpsMedido;
+  document.getElementById('modo').textContent =
+    `${EDITOR.editar ? 'editor (WASD)' : (EDITOR.abierta ? 'editor en pausa' : (PASEO.pausado ? 'orbita' : 'recorrido'))}${COARSE ? ' · táctil' : ''}`;
+  document.getElementById('cam').textContent = `${camera.position.x.toFixed(0)},${camera.position.y.toFixed(0)},${camera.position.z.toFixed(0)}`;
+  document.getElementById('clear').textContent =
+    EDITOR.caminar || !EDITOR.editar ? `${(camera.position.y - terreno(camera.position.x, camera.position.z)).toFixed(2)} u` : 'vuelo libre';
+  document.getElementById('q').textContent = `${EDITOR.valores.calidad} · ${EDITOR.valores.semilla}`;
+  const c = system.counts();
+  document.getElementById('tiers').textContent = `${c.near} / ${c.med} / ${c.far}`;
+  document.getElementById('tris').textContent = renderer.info.render.triangles;
+}
+renderer.setAnimationLoop(tick);
+
+addEventListener('resize', () => {
+  camera.aspect = innerWidth / innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(innerWidth, innerHeight);
+});
+</script>
+</body>
+</html>

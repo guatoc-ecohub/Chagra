@@ -1,0 +1,313 @@
+<!doctype html>
+<html lang="es-CO">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Sylva s50 — Heightfield circular buffer</title>
+<style>
+  html,body{margin:0;height:100%;overflow:hidden;background:#0e1a14;font-family:system-ui,-apple-system,"Segoe UI",sans-serif}
+  #c{display:block;width:100vw;height:100vh;touch-action:none}
+  #hud{position:fixed;top:14px;left:14px;padding:10px 14px;border-radius:12px;
+    background:rgba(10,18,12,.62);color:#eaffef;font-size:12.5px;line-height:1.5;backdrop-filter:blur(8px);
+    z-index:10;min-width:380px;max-width:min(92vw,540px);box-shadow:0 8px 24px rgba(0,0,0,.25)}
+  #hud .row{display:flex;justify-content:space-between;gap:18px}
+  #hud .k{opacity:.66}
+  #hud b{font-variant-numeric:tabular-nums}
+  #err{position:fixed;inset:auto 14px 14px auto;max-width:72vw;color:#ffd9d9;background:rgba(90,20,20,.78);
+    padding:8px 12px;border-radius:10px;font-size:12px;white-space:pre-wrap;z-index:20;display:none}
+</style>
+<script type="importmap">
+{
+  "imports": {
+    "three": "./vendor/three.module.js",
+    "three/addons/": "./vendor/addons/"
+  }
+}
+</script>
+</head>
+<body>
+<canvas id="c"></canvas>
+<div id="hud">
+  <div class="row"><span class="k">FPS</span><b id="fps">--</b></div>
+  <div class="row"><span class="k">Modo</span><b id="modo">--</b></div>
+  <div class="row"><span class="k">Cámara</span><b id="cam">--</b></div>
+  <div class="row"><span class="k">Ventana poseída (u)</span><b id="dim">--</b></div>
+  <div class="row"><span class="k">Memoria anillo (bytes)</span><b id="bytes">--</b></div>
+  <div class="row"><span class="k">Naïve Map si guardase el corredor</span><b id="naive">--</b></div>
+  <div class="row"><span class="k">Celdas horneadas último cruce</span><b id="paso">--</b></div>
+  <div class="row"><span class="k">height() totales / bakes acumulados</span><b id="total">--</b></div>
+  <div class="row"><span class="k">Triángulos dibujados</span><b id="tris">--</b></div>
+  <div class="row"><span class="k">Máx. |anillo − analítica|</span><b id="delta">--</b></div>
+</div>
+<div id="err"></div>
+<script type="module">
+// ── Sylva s50 — HEIGHTFIELD CIRCULAR BUFFER ─────────────────────────────────
+// En Sylva (realistic-forest, MIT © 2026 Token Gremlin; notice completo en
+// lib3d/flora/LICENSE-sylva-MIT) el terreno es analítico y NADIE guarda las
+// alturas del mundo entero: los consumidores leen una VENTANA que acompaña a
+// la cámara y se rehornea al salir del medio. Memoria de altura = O(ventana),
+// no O(mundo). Este banco lo emula sobre la función de altura REAL del valle
+// (terrain.js height(), DEM de Guatoc): un anillo toroidal de esquinas que
+// sigue a la cámara y re-hornea solo la franja que entra.
+//
+// Qué mide (la mejora es de MEMORIA y de re-bake, no de FPS):
+//   · con el anillo, al recorrer un corredor LARGO la memoria poseída es
+//     constante (4·nx·nz·2 bytes) mientras que un guardado "naïve" de lo ya
+//     recorrido (Map) crece con las celdas visitadas;
+//   · por frame solo se re-hornea la franja que entra al cruzar una celda;
+//   · cada esquina se muestrea de la MISMA función analítica en coordenadas
+//     absolutas → la ventana calza con el suelo grueso (máx. delta ~ 0) y no
+//     hay discontinuidad al recorrer.
+// A/B: ?s50=1 (default) anillo · ?s50=0 re-hornea TODA la ventana cada cruce
+// (baseline: recálculo completo por cruce, sin slots reusados) · ?h=0 solo el
+// suelo grueso de referencia · ?naive=1 registra además el corredor en un Map.
+// ?recorre=1 espiral automática · ?cam=near|mid|wide · ?seed= · ?n= · ?celda=
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { height } from './terrain.js';
+import { crearHeightfieldCircularSylva } from './lib3d/fx/heightfieldCircularSylva.js';
+
+const err = document.getElementById('err');
+addEventListener('error', (e) => { err.style.display = 'block'; err.textContent = 'ERROR: ' + (e.message || e); });
+addEventListener('unhandledrejection', (e) => { err.style.display = 'block'; err.textContent = 'REJECT: ' + ((e.reason && e.reason.message) || e.reason); });
+
+const q = new URLSearchParams(location.search);
+const S50 = q.get('s50') !== '0';
+const MOSTRAR_FINA = q.get('h') !== '0';
+const NAIVE = q.get('naive') === '1';
+const NX = Math.max(8, Math.min(200, Number(q.get('n')) || 96));   // esquinas de ancho
+const NZ = Math.max(8, Math.min(200, Number(q.get('nz')) || NX));  // esquinas de alto
+const CELDA = Math.max(2, Math.min(80, Number(q.get('celda')) || 8));
+
+const canvas = document.getElementById('c');
+const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
+renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.5));
+renderer.setSize(innerWidth, innerHeight);
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure = 1.15;
+renderer.outputColorSpace = THREE.SRGBColorSpace;
+window.__r = renderer;
+
+const scene = new THREE.Scene();
+const fogColor = 0xc6d4c2;
+scene.background = new THREE.Color(fogColor);
+scene.fog = new THREE.FogExp2(fogColor, 0.0011);
+
+const camera = new THREE.PerspectiveCamera(50, innerWidth / innerHeight, 0.1, 5000);
+const CAMARAS = {
+  near: [-30, 22, 26],
+  mid: [-170, 95, 180],
+  wide: [-460, 240, 520],
+};
+const camName = q.get('cam') || 'mid';
+camera.position.set(...(CAMARAS[camName] || CAMARAS.mid));
+const controls = new OrbitControls(camera, renderer.domElement);
+controls.enableDamping = true;
+controls.dampingFactor = 0.08;
+controls.target.set(0, 30, 0);
+window.__cam = camera;
+
+scene.add(new THREE.HemisphereLight(0xe0ebd8, 0x39462c, 1.15));
+const sun = new THREE.DirectionalLight(0xfff2d2, 2.1);
+sun.position.set(-0.35, 0.92, 0.3);
+scene.add(sun);
+const fill = new THREE.DirectionalLight(0x9ec4ab, 0.4);
+fill.position.set(0.6, 0.3, -0.6);
+scene.add(fill);
+
+const verde = (elev) => {
+  const t = THREE.MathUtils.clamp((elev + 10) / 240, 0, 1);
+  const c = new THREE.Color();
+  c.setHSL(0.30 - t * 0.12, 0.42 + t * 0.1, 0.16 + t * 0.36);
+  return c;
+};
+
+// ── suelo grueso del valle: referencia continua ─────────────────────────────
+function construirSueloGrueso() {
+  const geo = new THREE.PlaneGeometry(2600, 2600, 260, 260);
+  geo.rotateX(-Math.PI / 2);
+  const pos = geo.attributes.position;
+  const col = new Float32Array(pos.count * 3);
+  const c = new THREE.Color();
+  for (let i = 0; i < pos.count; i++) {
+    const x = pos.getX(i), z = pos.getZ(i);
+    const y = height(x, z);
+    pos.setY(i, y);
+    c.copy(verde(y));
+    col[i * 3] = c.r; col[i * 3 + 1] = c.g; col[i * 3 + 2] = c.b;
+  }
+  geo.computeVertexNormals();
+  geo.setAttribute('color', new THREE.BufferAttribute(col, 3));
+  const mesh = new THREE.Mesh(geo, new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 1, metalness: 0 }));
+  mesh.name = 'suelo-grueso-valle';
+  scene.add(mesh);
+}
+construirSueloGrueso();
+
+// ── suelo fino del anillo: malla en coordenadas de mundo, esquinas enteras ──
+// La malla tiene exactamente (NX·NZ) vértices, uno por esquina poseída del
+// anillo; se construye una vez y solo se actualiza Y (y color) al re-hornear.
+function construirGrillaFina() {
+  const nv = NX * NZ;
+  const pos = new Float32Array(nv * 3);
+  const idx = [];
+  for (let j = 0; j < NZ - 1; j++) {
+    for (let i = 0; i < NX - 1; i++) {
+      const a = j * NX + i, b = a + 1, c = a + NX, d = c + 1;
+      idx.push(a, c, b, b, c, d);
+    }
+  }
+  const geo = new THREE.BufferGeometry();
+  geo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+  geo.setAttribute('color', new THREE.BufferAttribute(new Float32Array(nv * 3), 3));
+  geo.setIndex(idx);
+  geo.computeVertexNormals();
+  const mesh = new THREE.Mesh(geo, new THREE.MeshStandardMaterial({
+    vertexColors: true, roughness: 1, metalness: 0,
+    polygonOffset: true, polygonOffsetFactor: -1, polygonOffsetUnits: -1,
+  }));
+  mesh.name = 'suelo-fino-anillo';
+  if (q.get('borde') === '1') {
+    const bordeGeo = new THREE.EdgesGeometry(new THREE.PlaneGeometry((NX - 1) * CELDA, (NZ - 1) * CELDA));
+    const borde = new THREE.LineSegments(bordeGeo, new THREE.LineBasicMaterial({ color: 0xcfe8ff, transparent: true, opacity: 0.8 }));
+    borde.rotation.x = -Math.PI / 2;
+    mesh.add(borde);
+  }
+  mesh.frustumCulled = false;
+  scene.add(mesh);
+  return mesh;
+}
+const fino = construirGrillaFina();
+fino.visible = MOSTRAR_FINA;
+
+let evaluacionesAltura = 0;        // TODAS las llamadas a height() (cualquier modo)
+function contarAltura(x, z) { evaluacionesAltura++; return height(x, z); }
+
+const anillo = S50
+  ? crearHeightfieldCircularSylva({ altura: contarAltura, celda: CELDA, nx: NX, nz: NZ, cx: camera.position.x, cz: camera.position.z, corredor: NAIVE })
+  : null;
+
+let maxDelta = 0;
+let muestreosControl = 0;
+const _c = new THREE.Color();
+const gPos = fino.geometry.attributes.position;
+const gCol = fino.geometry.attributes.color;
+
+function verterVentana(ox, oz) {
+  // vuelca la ventana poseída [ox..ox+NX-1]×[oz..oz+NZ-1] en la malla fina.
+  // Cada vértice (i,j) va a la esquina de mundo ((ox+i)·celda, (oz+j)·celda).
+  for (let j = 0; j < NZ; j++) {
+    for (let i = 0; i < NX; i++) {
+      const idx = j * NX + i;
+      const x = (ox + i) * CELDA;
+      const z = (oz + j) * CELDA;
+      let y;
+      if (anillo) {
+        y = anillo.esquina(ox + i, oz + j);
+      } else {
+        y = contarAltura(x, z);
+      }
+      gPos.setXYZ(idx, x, y, z);
+      _c.copy(verde(y));
+      gCol.setXYZ(idx, _c.r, _c.g, _c.b);
+      // control de continuidad: muestra cada ~17.ª esquina contra la analítica.
+      // Se cuenta aparte (es instrumento, no render): pide height() directa.
+      if (anillo && ((i * 7 + j * 13) % 17 === 0)) {
+        const directa = height(x, z);
+        muestreosControl++;
+        const d = Math.abs(y - directa);
+        if (d > maxDelta) maxDelta = d;
+
+      }
+    }
+  }
+  gPos.needsUpdate = true;
+  gCol.needsUpdate = true;
+  fino.geometry.computeVertexNormals();
+}
+
+let ultimoOx = null, ultimoOz = null;
+let ventanaVertida = false;
+
+function actualizarVentana() {
+  const x = camera.position.x, z = camera.position.z;
+  if (anillo) {
+    const st0 = anillo.state();
+    const bakes = anillo.actualizar(x, z);
+    const st = anillo.state();
+    if (bakes > 0 || !ventanaVertida || st0.ox !== st.ox || st0.oz !== st.oz) {
+      verterVentana(st.ox, st.oz);
+      ventanaVertida = true;
+    }
+  } else if (MOSTRAR_FINA) {
+    const nox = Math.floor(x / CELDA) - Math.floor(NX / 2);
+    const noz = Math.floor(z / CELDA) - Math.floor(NZ / 2);
+    if (nox === ultimoOx && noz === ultimoOz) return;
+    ultimoOx = nox; ultimoOz = noz;
+    verterVentana(nox, noz);
+  }
+}
+
+actualizarVentana();
+window.__ARRANQUE_OK = true;
+window.__medirS50 = () => {
+  const gl = renderer.getContext().getError();
+  const st = anillo ? anillo.state() : null;
+  return {
+    gl,
+    s50: S50,
+    modo: anillo ? 'anillo-s50' : 'baseline-full-bake',
+    windowVisible: MOSTRAR_FINA,
+    ring: st,
+    bytesAnillo: st ? st.bytes : 0,
+    celdasNaive: st ? st.celdasUnicas : -1,
+    evaluacionesAltura,
+    muestreosControl,
+    maxDelta,
+    pos: [camera.position.x, camera.position.y, camera.position.z],
+    tris: renderer.info.render.triangles,
+  };
+};
+
+// espiral automática: cruza cientos de celdas → memoria del anillo NO crece
+let t = 0;
+let _prev = performance.now();
+function animate() {
+  const now = performance.now();
+  const dt = Math.min(0.05, (now - _prev) / 1000);
+  _prev = now;
+  t += dt;
+  if (q.get('recorre') === '1') {
+    const r = 240 + 330 * Math.min(1, t / 75);
+    const a = t * 0.075;
+    controls.target.set(Math.cos(a) * r, 0, Math.sin(a) * r * 0.7);
+    camera.position.set(Math.cos(a) * r, 150 + 70 * Math.sin(t * 0.05), Math.sin(a) * r * 0.7 + 30);
+  }
+  controls.update();
+  actualizarVentana();
+  renderer.render(scene, camera);
+  const st = anillo ? anillo.state() : null;
+  document.getElementById('fps').textContent = Math.round(1 / Math.max(dt, 1 / 240));
+  document.getElementById('modo').textContent = anillo
+    ? `anillo-s50 · ${NX}×${NZ} esquinas · celda ${CELDA}`
+    : (MOSTRAR_FINA ? 'baseline: re-hornea toda la ventana' : 'referencia: suelo grueso (h=0)');
+  document.getElementById('cam').textContent = `${camera.position.x.toFixed(0)},${camera.position.z.toFixed(0)}`;
+  document.getElementById('dim').textContent = st ? `${(st.nx * st.celda).toFixed(0)}×${(st.nz * st.celda).toFixed(0)} u` : '—';
+  document.getElementById('bytes').textContent = st ? st.bytes : '0';
+  document.getElementById('naive').textContent = (st ? st.celdasUnicas : -1) * 12;
+  document.getElementById('paso').textContent = st ? st.horneadasUltimoPaso : (MOSTRAR_FINA ? `${NX * NZ} (ventana)` : '—');
+  document.getElementById('total').textContent = `${evaluacionesAltura} eval. / ctrl ${muestreosControl}`;
+  document.getElementById('delta').textContent = muestreosControl ? maxDelta.toExponential(2) : '—';
+  document.getElementById('tris').textContent = renderer.info.render.triangles;
+  requestAnimationFrame(animate);
+}
+requestAnimationFrame(animate);
+
+window.addEventListener('resize', () => {
+  camera.aspect = innerWidth / innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(innerWidth, innerHeight);
+});
+</script>
+</body>
+</html>
