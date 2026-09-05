@@ -26,6 +26,20 @@
  *      fragmenta al cruzar regiones). Van en un <g> SIN clip, hijo del hueso
  *      CABEZA: giran como unidad con el cráneo. Trazos verificados en GPU
  *      (scratchpad/jaguar-final.svg, sesión 2026-08-22).
+ *   5. 🔴 ROSETAS DE TARJETA (defecto MEDIDO 2026-09-04/05, gate de los siete
+ *      de tinta): a 560 px el calco lee jaguar de rosetas; a 64 px (tarjeta
+ *      del selector) y 82 px (FAB) lee TIGRE de barras verticales — juez
+ *      qwen3-vl:8b sobre recorte SIN rótulo + ojo del operador. CONTROL: la
+ *      lámina raster reducida a 64 px lee tigre igual → no es el trazo, es
+ *      Nyquist: cada roseta mide ~2 px y en el flanco van en columnas, así
+ *      que se funden en barras. Ninguna receta de trazado lo arregla; hay
+ *      que bajar la FRECUENCIA del patrón SOLO a ese tamaño y DENTRO de esta
+ *      misma pieza (ver TARJETA): (a) el propio calco del tronco FUERA DE
+ *      FOCO como fondo (la técnica de casqueteCalco: promedia las rosetas
+ *      fundidas al tono local, ningún parche inventado) y (b) SEIS rosetas
+ *      discretas, separadas y CON PUNTO ADENTRO, en la tinta MEDIDA del
+ *      calco. La capa viaja OCULTA por su propia regla <style> y solo se
+ *      enciende con data-tarjeta en la raíz (size ≤ TARJETA_MAX_PX).
  *
  * ANATOMÍA MEDIDA (hallazgos del probe, espacio 705×394):
  *   - La lámina es ÚNICA (md5 6cb5f043… en todo el árbol) y es la MISMA que
@@ -56,6 +70,11 @@ import { JT_PIVOTES, JT_REGIONES } from './regiones.js';
 
 export { JT_PIVOTES, JT_REGIONES };
 
+/** Tamaño (px CSS) hasta el cual el rig enciende data-tarjeta: cubre la
+    tarjeta del selector (64), el FAB (82) y el avatar chico (48); el overlay
+    realista (112) y el valle 3D (132) siguen con el calco a pelo. */
+export const TARJETA_MAX_PX = 96;
+
 
 
 /* Paleta de casquetes: colores MEDIDOS sobre el calco (jt-probe2.mjs) en el
@@ -82,6 +101,11 @@ const P = Object.freeze({
   espectral: '#b98cff',
   ojoBrillo: '#ffe6a0',
   sombraSuelo: 'rgba(36,22,8,0.38)',
+  /* rosetas de tarjeta: el relleno OSCURO más frecuente del tronco del calco
+     (anillos de las rosetas reales) y un tono MEDIO del flanco — medidos con
+     un conteo de fills sobre CALCO_POR_REGION.troncoCuerpo (2026-09-05). */
+  rosetaTinta: '#3c1c0d',
+  rosetaInterior: '#af744a',
 });
 
 /* ─────────────────────────── helpers de string ───────────────────────────── */
@@ -176,6 +200,7 @@ const disco = (cx, cy, r, fill) => `<circle cx="${cx}" cy="${cy}" r="${r}" fill=
 /* ─────────────────────────────── defs ────────────────────────────────────── */
 
 const DEFS = `<defs>
+  <style>.jt-tarjeta{display:none}[data-tarjeta] .jt-tarjeta{display:inline}</style>
   ${SILUETA}
   ${CALCO_DEFS}
   ${CLIPS}
@@ -203,6 +228,7 @@ const DEFS = `<defs>
     <stop offset="1" stop-color="${P.ojoBrillo}" stop-opacity="0"/>
   </radialGradient>
   <filter id="jhBlur"><feGaussianBlur stdDeviation="4"/></filter>
+  <filter id="jtTarjetaFondo" filterUnits="userSpaceOnUse" x="196" y="12" width="380" height="280"><feGaussianBlur stdDeviation="10"/></filter>
   <filter id="jtBorrosoAtlas" filterUnits="userSpaceOnUse" x="106" y="8" width="132" height="256"><feGaussianBlur stdDeviation="0.9"/></filter>
   <filter id="jtBorrosoCruz" filterUnits="userSpaceOnUse" x="197" y="29" width="108" height="246"><feGaussianBlur stdDeviation="1.8"/></filter>
   <filter id="jtBorrosoColaMedia" filterUnits="userSpaceOnUse" x="521" y="125" width="64" height="64"><feGaussianBlur stdDeviation="1.8"/></filter>
@@ -304,6 +330,44 @@ const pata = (lado) => {
   </g>`;
 };
 
+/* ───────────────────── ROSETAS DE TARJETA (size ≤ 96 px) ─────────────────── */
+
+/* Anillo de MANCHAS (Panthera onca: la roseta es un anillo ROTO de manchas
+   con uno o dos puntos adentro, no una barra): radio 30 px de lámina ≈ 5 px a
+   64 px, manchas de ~15 px de grosor ≈ 1.2 px — lo mínimo que un anillo
+   necesita para leerse como anillo y no como pelota. Más ancho que alto
+   (flanco de perfil). `salto` quita una mancha: rompe el anillo. */
+const ROSETA_R = 30;
+const ROSETA_APLASTE = 0.86;
+const ROSETA_MANCHAS = [[0, 1], [58, 0.9], [122, 1.05], [180, 0.95], [238, 1], [300, 0.9]];
+const roseta = (cx, cy, rot = 0, salto = -1) => {
+  const manchas = ROSETA_MANCHAS.filter((_, i) => i !== salto).map(([a, k], i) => {
+    const rad = (a * Math.PI) / 180;
+    const bx = (Math.cos(rad) * ROSETA_R).toFixed(1);
+    const by = (Math.sin(rad) * ROSETA_R * ROSETA_APLASTE).toFixed(1);
+    const tang = (a + 90 + (i % 2 ? 12 : -8)).toFixed(0);
+    return `<ellipse cx="${bx}" cy="${by}" rx="${(13 * k).toFixed(1)}" ry="${(7.5 * k).toFixed(1)}" transform="rotate(${tang} ${bx} ${by})"/>`;
+  }).join('');
+  return `<g class="jt-roseta" transform="translate(${cx} ${cy}) rotate(${rot})">` +
+    `<ellipse rx="${ROSETA_R - 4}" ry="${(ROSETA_R * ROSETA_APLASTE - 3).toFixed(1)}" fill="${P.rosetaInterior}" opacity=".5"/>` +
+    `<g fill="${P.rosetaTinta}">${manchas}<circle cx="2" cy="-1" r="8"/></g></g>`;
+};
+
+/* FONDO: el calco del tronco fuera de foco (σ=10 px de lámina ≈ 0.8 px a
+   64 px: atenúa ~96 % el patrón de período ~25 px de las rosetas fundidas y
+   deja el tono local). Silueta POR FUERA del blur (sin halo al papel), igual
+   que casqueteCalco. Las seis rosetas van en dos filas al tresbolillo sobre
+   el tronco (px de lámina, dentro de troncoCuerpo y lejos de las patas
+   cercanas, que se pintan después y encima); recortadas a la silueta. */
+const TARJETA = `
+  <g class="jt-tarjeta">
+    <g clip-path="url(#jtSilueta)"><use href="#jtCalco-troncoCuerpo" clip-path="url(#jt-r-troncoCuerpo)" filter="url(#jtTarjetaFondo)"/></g>
+    <g clip-path="url(#jtSilueta)">
+      ${roseta(304, 104, -8)}${roseta(392, 100, 4)}${roseta(480, 112, 14, 5)}
+      ${roseta(312, 186, -10, 3)}${roseta(400, 182, 6)}${roseta(488, 186, 20, 1)}
+    </g>
+  </g>`;
+
 /* ─────────────────────────── EL SVG COMPLETO ─────────────────────────────── */
 
 /**
@@ -334,6 +398,7 @@ ${DEFS}
           </g>
         </g>
         ${usoCalco('troncoCuerpo')}
+        ${TARJETA}
         ${casquete('pataTrasCercaAlto', elipse(524, 254, 46, 36, P.musloCerca))}
         ${pata('TrasCerca')}
         ${casquete('pataDelCercaAlto', elipse(222, 252, 36, 30, P.hombroCerca))}

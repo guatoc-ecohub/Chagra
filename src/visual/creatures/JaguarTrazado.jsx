@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { JAGUAR_TRAZADO_SVG } from './jaguarTrazado/pielTrazado.js';
+import { JAGUAR_TRAZADO_SVG, TARJETA_MAX_PX } from './jaguarTrazado/pielTrazado.js';
 import { useVidaIdle, useMiradaUsted } from './useVidaIdle.js';
 import { CompaiAgente } from '../agente/CompaiAgente.jsx';
 import { COMPAI_ESPECIES } from '../agente/compaiEspecies.js';
@@ -125,6 +125,9 @@ function JaguarTrazadoRig({
       data-pose={vivo ? pose : undefined}
       data-vida={vivo && momento ? momento : undefined}
       data-tier={tier || undefined}
+      /* Tarjeta/FAB (size ≤ 96): enciende las ROSETAS DE TARJETA de la piel
+         (ver pielTrazado §5) — a ese tamaño el calco a pelo lee tigre. */
+      data-tarjeta={Number(size) <= TARJETA_MAX_PX ? '' : undefined}
       title={title}
       className={`jaguarHuesos jaguarTrazado ${className || ''}`.trim()}
       style={estiloRaiz}
