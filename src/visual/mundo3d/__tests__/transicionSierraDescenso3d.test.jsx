@@ -178,6 +178,13 @@ describe('PASO 1 + PASO 3 — píldora retirada y aterrizaje en tres tiempos', (
      (`?msnm=` en la URL, el caso que el diseño captura y el gate mide). Los
      tres tiempos corren por setTimeout: T0 a los 3 612 ms (86 % de 4 200),
      T1 a +800 y T2 a +1 600. */
+  /**
+   * @param {object} [opts]
+   * @param {number} [opts.msnm]
+   * @param {'neutral'|'el_nino'|'la_nina'} [opts.faseEnso]
+   * @param {object|null} [opts.climaVivo]
+   * @param {Array} [opts.sugerencias]
+   */
   async function montarEnCota({ msnm = 2640, faseEnso = 'neutral', climaVivo = null, sugerencias = [] } = {}) {
     window.history.replaceState({}, '', `/?descenso3d=1&msnm=${msnm}`);
     vi.useFakeTimers();
