@@ -1,10 +1,18 @@
-import { describe, it, expect } from 'vitest';
+import { afterEach, describe, it, expect } from 'vitest';
+import { cleanup, render } from '@testing-library/react';
+import { createElement } from 'react';
 import { resolverCompai, COMPAI_REGISTRO } from '../compaiRegistry.js';
 import { cuerpoPortalDe } from '../CompaiTransicion.jsx';
+import AbejaTransicion from '../../../creatures/AbejaTransicion.jsx';
 import { ABEJA_PRESENCIA } from '../../../creatures/abejaIdentidad.js';
 import { AbejaAngelita } from '../../../creatures/AbejaAngelita.jsx';
-import { Zariguya } from '../../../creatures/Zariguya.jsx';
+import ZariguyaTrazado from '../../../creatures/ZariguyaTrazado.jsx';
+import LuciernagaTrazado from '../../../creatures/LuciernagaTrazado.jsx';
+import ChivitoTrazado from '../../../creatures/ChivitoTrazado.jsx';
+import OsoBaston from '../../../creatures/OsoBaston.jsx';
 import { AVATAR_TYPES } from '../../../../hooks/useAgentAvatarType.js';
+
+afterEach(cleanup);
 
 describe('compaiRegistry.resolverCompai', () => {
   it('cubre TODOS los tipos de avatar reales (sin huérfanos)', () => {
@@ -87,24 +95,54 @@ describe('compaiRegistry.resolverCompai', () => {
     expect(c.esFallback).toBe(true);
   });
 
-  it('el portal cruza el cuerpo del guía elegido', () => {
+  it('cada canónico registra su propio cuerpo de portal', () => {
+    for (const tipo of AVATAR_TYPES) {
+      const c = resolverCompai(tipo);
+      expect(c.PortalComponent, `${tipo} sin PortalComponent`).toBeTruthy();
+      expect(cuerpoPortalDe(c)).toBe(c.PortalComponent);
+    }
     expect(cuerpoPortalDe(resolverCompai('angelita'))).toBe(AbejaAngelita);
-    expect(cuerpoPortalDe(resolverCompai('zariguya'))).toBe(Zariguya);
-    expect(resolverCompai('zariguya').PortalComponent).not.toBe(resolverCompai('angelita').PortalComponent);
   });
 
-  it('jaguar, oso del bastón y luciérnaga: escena 3D propia, pero el portal 2D aún cae a Angelita', () => {
-    // F26 (2026-08-13) solo resolvió la presencia 3D de los tres — el cuerpo
-    // 2D del portal (PortalComponent) sigue pendiente, así que cuerpoPortalDe
-    // debe seguir cayendo a Angelita sin lanzar (regla del fallback en
-    // CompaiTransicion.jsx, independiente de pendienteFable/EscenaComponent).
-    for (const tipo of ['jaguar', 'oso-baston', 'luciernaga']) {
-      expect(() => resolverCompai(tipo)).not.toThrow();
+  it('el portal 2D→3D de zarigüeya/luciérnaga/chivito es la TINTA Trazado, NO la piel vieja', () => {
+    // Migración 097 (2026-09-04): el agente PWA y el selector del usuario ya
+    // visten `*Trazado.jsx`; el portal del Valle 3D se quedó montando la piel
+    // rubber-hose vieja y el handoff 2D→3D cambiaba de especie. Este test es
+    // el control negativo real: si alguien revierte UN import del registro a
+    // `Zariguya.jsx`/`Luciernaga.jsx`/`ChivitoPunk.jsx`, este caso ROJO.
+    expect(resolverCompai('zariguya').PortalComponent, 'zariguya volvió a la piel vieja').toBe(ZariguyaTrazado);
+    expect(resolverCompai('luciernaga').PortalComponent, 'luciernaga volvió a la piel vieja').toBe(LuciernagaTrazado);
+    expect(resolverCompai('chivito-punk').PortalComponent, 'chivito-punk volvió a la piel vieja').toBe(ChivitoTrazado);
+    // El OSO DEL BASTÓN queda FUERA de la migración a propósito: su lámina
+    // musculosa está aprobada (SKIN CONSERVADA) y no existe OsoTrazado.
+    expect(resolverCompai('oso-baston').PortalComponent, 'oso-baston cambió de piel sin decisión de arte').toBe(OsoBaston);
+  });
+
+  it('entrada y vuelta conservan el slug del cuerpo elegido', () => {
+    for (const tipo of AVATAR_TYPES) {
       const c = resolverCompai(tipo);
-      expect(c.pendienteFable).toBe(false);
-      expect(typeof c.EscenaComponent).toBe('function');
-      expect(cuerpoPortalDe(c)).toBe(AbejaAngelita);
+      for (const sentido of ['entrar', 'volver']) {
+        const { container } = render(createElement(AbejaTransicion, {
+          sentido,
+          // Los portales comparten el contrato runtime de AbejaTransicion,
+          // aunque cada rig declara props JSDoc más estrechas que el default.
+          // La prueba valida el handoff real, no la firma estática del SVG.
+          // @ts-expect-error Componentes de portal heterogéneos bajo contrato común.
+          Cuerpo: c.PortalComponent,
+          onFin: () => {},
+        }));
+        expect(
+          container.querySelector(`[data-creature="${c.especie}"]`),
+          `${tipo} perdió su cuerpo durante ${sentido}`,
+        ).toBeTruthy();
+        cleanup();
+      }
     }
+  });
+
+  it('usa Angelita solo como fallback para una entrada inválida', () => {
+    expect(cuerpoPortalDe(null)).toBe(AbejaAngelita);
+    expect(cuerpoPortalDe({ avatarType: 'inventado' })).toBe(AbejaAngelita);
   });
 
   it('maiz se retiró del roster (2026-08-14): resuelve como cualquier tipo desconocido, cae a Angelita', () => {

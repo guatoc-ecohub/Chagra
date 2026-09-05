@@ -34,6 +34,8 @@
  * Open-Meteo con FAO-56 Penman-Monteith nativo.
  */
 
+import { horasFrio, etcMm, balanceHidricoDia } from './agroIndices.js';
+
 const FORECAST_URL = 'https://api.open-meteo.com/v1/forecast';
 const ARCHIVE_URL = 'https://archive-api.open-meteo.com/v1/archive';
 
@@ -42,7 +44,7 @@ const NORMALS_TTL_MS = 30 * 24 * 60 * 60 * 1000; // 30 días — la climatologí
 const FETCH_TIMEOUT_MS = 12_000;
 
 const LS_FORECAST = 'chagra:agrometeo:forecast-v1';
-const LS_NORMALS = 'chagra:agrometeo:normals-v1';
+const LS_NORMALS = 'chagra:agrometeo:normals-v3';
 
 const DAILY_VARS = [
     'weathercode',
@@ -133,6 +135,35 @@ export function describeWeathercode(code, isDay = true) {
     return { label: 'Sin dato', emoji: '❓', family: 'nubes' };
 }
 
+/**
+ * ISO de calendario (YYYY-MM-DD) de un instante, en la zona horaria dada por
+ * su offset en segundos respecto a UTC — BUG-DIA-UTC-20260904.
+ *
+ * Por qué existe: `new Date().toISOString().slice(0,10)` da el día EN UTC.
+ * Colombia es UTC-5 (fijo, sin horario de verano): a las 19:00 hora local el
+ * reloj del sistema ya marca las 00:00 UTC del día siguiente, así que entre
+ * las 19:00 y medianoche esa expresión devuelve MAÑANA, no hoy — justo la
+ * ventana en la que se avisa una helada (que ocurre de madrugada y el aviso
+ * debe darse la noche anterior).
+ *
+ * El offset SIEMPRE viene de la respuesta de Open-Meteo (`utc_offset_seconds`,
+ * presente cuando se pide `timezone=auto` o un nombre de zona explícito).
+ * NUNCA una constante regional escrita a mano: Colombia no tiene horario de
+ * verano hoy, pero una constante sería una bomba dormida para cualquier otra
+ * región que use este mismo módulo.
+ *
+ * Sin offset (dato ausente) devuelve `null` — el caller degrada a un
+ * fallback ya declarado, nunca inventa el día.
+ *
+ * @param {number} nowMs epoch ms (inyectable en tests vía reloj falseado)
+ * @param {number|null|undefined} utcOffsetSeconds
+ * @returns {string|null}
+ */
+export function localIsoDate(nowMs, utcOffsetSeconds) {
+    if (!Number.isFinite(utcOffsetSeconds)) return null;
+    return new Date(nowMs + utcOffsetSeconds * 1000).toISOString().slice(0, 10);
+}
+
 /** Índice del array horario más cercano a "ahora" (hora local del sitio). */
 function nowHourIndex(times) {
     if (!Array.isArray(times) || times.length === 0) return 0;
@@ -168,7 +199,7 @@ function aggregateHourly(hourly, dayIso) {
         // Mojado foliar aproximado: horas con HR ≥ 90 % (rocío/agua libre sobre la hoja).
         horas_hr_alta: rh.filter((v) => v >= 90).length,
         // Horas-frío: horas con temperatura < 7 °C (base frutales caducifolios, FAO/UC-Davis).
-        horas_frio: temps.filter((v) => v < 7).length,
+        horas_frio: temps.length ? horasFrio(temps) : null,
         cloud_mean: mean(cloud),
     };
 }
@@ -214,6 +245,8 @@ export async function fetchAgroMeteo(loc, opts = {}) {
     }
 
     const d = raw.daily;
+    const utcOffsetSeconds = Number.isFinite(raw.utc_offset_seconds) ? raw.utc_offset_seconds : null;
+    const hoyFinca = localIsoDate(Date.now(), utcOffsetSeconds);
     const nHour = nowHourIndex(raw.hourly.time);
     const nowW = describeWeathercode(raw.current?.weathercode ?? raw.hourly.weathercode?.[nHour], (raw.current?.is_day ?? raw.hourly.is_day?.[nHour]) !== 0);
 
@@ -252,6 +285,7 @@ export async function fetchAgroMeteo(loc, opts = {}) {
         lng,
         elevation: raw.elevation ?? elevation ?? null,
         timezone: raw.timezone ?? null,
+        utc_offset_seconds: Number.isFinite(raw.utc_offset_seconds) ? raw.utc_offset_seconds : null,
         now: {
             temp: raw.current?.temperature_2m ?? raw.hourly.temperature_2m?.[nHour] ?? null,
             aparente: raw.current?.apparent_temperature ?? null,
@@ -267,9 +301,14 @@ export async function fetchAgroMeteo(loc, opts = {}) {
             soil_moisture_3_9: raw.hourly.soil_moisture_3_to_9cm?.[nHour] ?? null,
             weather: nowW,
         },
-        // El "hoy" agronómico = la entrada diaria de la fecha de hoy (o daily[1]
-        // cuando past_days=1 empuja ayer al índice 0).
-        today: dailyDigest.find((x) => x.date === new Date().toISOString().slice(0, 10)) || dailyDigest[1] || dailyDigest[0] || null,
+        // El "hoy" agronómico = la entrada diaria de la fecha de hoy EN LA
+        // ZONA HORARIA DE LA FINCA (BUG-DIA-UTC-20260904 — antes comparaba
+        // contra el día en UTC, que desde las 19:00 hora Colombia ya es
+        // mañana). Sin `utc_offset_seconds` en la respuesta (dato ausente),
+        // `hoyFinca` es null y cae al fallback ya documentado (daily[1],
+        // el "hoy" cuando past_days=1 empuja ayer al índice 0) — nunca se
+        // inventa el offset.
+        today: (hoyFinca && dailyDigest.find((x) => x.date === hoyFinca)) || dailyDigest[1] || dailyDigest[0] || null,
         daily: dailyDigest,
     };
 
@@ -285,7 +324,7 @@ export async function fetchAgroMeteo(loc, opts = {}) {
  * llama cuando la vista estacional necesita la anomalía. Nunca throw → null.
  *
  * @param {{lat:number,lng:number}} loc
- * @returns {Promise<{temp_media_normal:number,precip_dia_normal:number,years:number,doy_window:number,source:string}|null>}
+ * @returns {Promise<{temp_media_normal:number,precip_dia_normal:number,precip_dia_desv:number|null,balance_dia_normal:number|null,balance_dia_desv:number|null,years:number,doy_window:number,source:string}|null>}
  */
 export async function fetchNormales(loc) {
     const lat = Number(loc?.lat);
@@ -306,7 +345,7 @@ export async function fetchNormales(loc) {
         longitude: String(lng),
         start_date: `${startYear}-01-01`,
         end_date: `${endYear}-12-31`,
-        daily: 'temperature_2m_mean,precipitation_sum',
+        daily: 'temperature_2m_mean,precipitation_sum,et0_fao_evapotranspiration',
         timezone: 'auto',
     });
 
@@ -316,8 +355,16 @@ export async function fetchNormales(loc) {
         return null;
     }
 
-    // Día-del-año de hoy y ventana ±10 días.
-    const now = new Date();
+    // Día-del-año de hoy y ventana ±10 días. Mismo patrón BUG-DIA-UTC-20260904
+    // que `today` en fetchAgroMeteo: `now` se corrige al día EN LA ZONA DE LA
+    // FINCA con el offset que la propia respuesta trae (`utc_offset_seconds`),
+    // no con el UTC crudo del reloj del sistema. Sin offset (dato ausente) se
+    // usa el reloj del sistema tal cual — la ventana es de ±10 días, así que
+    // un desfase de una fecha no cambia materialmente la media climatológica.
+    const utcOffsetSecondsNormales = Number.isFinite(raw.utc_offset_seconds) ? raw.utc_offset_seconds : null;
+    const now = utcOffsetSecondsNormales != null
+        ? new Date(Date.now() + utcOffsetSecondsNormales * 1000)
+        : new Date();
     const doy = (dt) => {
         const start = Date.UTC(dt.getUTCFullYear(), 0, 0);
         return Math.floor((Date.UTC(dt.getUTCFullYear(), dt.getUTCMonth(), dt.getUTCDate()) - start) / 86400000);
@@ -326,6 +373,7 @@ export async function fetchNormales(loc) {
     const WINDOW = 10;
     const temps = [];
     const precs = [];
+    const balances = [];
     const times = raw.daily.time;
     for (let i = 0; i < times.length; i += 1) {
         const dt = new Date(`${times[i]}T00:00:00Z`);
@@ -336,8 +384,15 @@ export async function fetchNormales(loc) {
         if (dist <= WINDOW) {
             const tm = raw.daily.temperature_2m_mean?.[i];
             const pr = raw.daily.precipitation_sum?.[i];
+            const eto = raw.daily.et0_fao_evapotranspiration?.[i];
             if (Number.isFinite(tm)) temps.push(tm);
             if (Number.isFinite(pr)) precs.push(pr);
+            if (Number.isFinite(pr) && Number.isFinite(eto)) {
+                // SPEI de referencia: ETc = ETo × Kc con Kc 1.0.
+                const etc = etcMm(eto, 1);
+                const balance = balanceHidricoDia(pr, etc);
+                if (balance) balances.push(balance.netoMm);
+            }
         }
     }
     if (temps.length < 30) {
@@ -345,12 +400,25 @@ export async function fetchNormales(loc) {
         return null;
     }
     const mean = (a) => a.reduce((s, v) => s + v, 0) / a.length;
+    const precipMean = precs.length ? mean(precs) : null;
+    const precipVariance = precs.length
+        ? precs.reduce((sum, value) => sum + ((value - precipMean) ** 2), 0) / precs.length
+        : null;
+    const balanceMean = balances.length
+        ? balances.reduce((sum, value) => sum + value, 0) / balances.length
+        : null;
+    const balanceVariance = balances.length
+        ? balances.reduce((sum, value) => sum + ((value - balanceMean) ** 2), 0) / balances.length
+        : null;
     const payload = {
         temp_media_normal: Math.round(mean(temps) * 10) / 10,
-        precip_dia_normal: Math.round(mean(precs) * 10) / 10,
+        precip_dia_normal: precipMean == null ? null : Math.round(precipMean * 10) / 10,
+        precip_dia_desv: precipVariance == null ? null : Math.round(Math.sqrt(precipVariance) * 100) / 100,
+        balance_dia_normal: balanceMean == null ? null : Math.round(balanceMean * 10) / 10,
+        balance_dia_desv: balanceVariance == null ? null : Math.round(Math.sqrt(balanceVariance) * 100) / 100,
         years: endYear - startYear + 1,
         doy_window: WINDOW,
-        source: `Open-Meteo archive (ERA5), media ${startYear}–${endYear} · ventana ±${WINDOW} d`,
+        source: `Open-Meteo archive (ERA5), media ${startYear}–${endYear} · ventana ±${WINDOW} d · balance de referencia Kc 1.0`,
     };
     writeLS(LS_NORMALS, { ts: Date.now(), key, payload });
     return payload;

@@ -52,14 +52,14 @@ const CONDICIONES = {
 
 function ValorHud({ label, value, unit, tone = 'cyan' }) {
   return (
-    <div className={`m3dc__metric m3dc__metric--${tone}`}>
+    <div className={`m3dc__metric m3dc__metric--${tone}`} data-testid={`clima-metrica-${label.toLowerCase()}`}>
       <span>{label}</span>
       <strong>{value == null ? '•••' : value}<small>{value == null ? '' : unit}</small></strong>
     </div>
   );
 }
 
-function ClimaHud({ climaLive }) {
+export function ClimaHud({ climaLive }) {
   const estado = climaLive.senal
     ? (CONDICIONES[climaLive.condicion] || (climaLive.lluvia ? 'Lluvia sobre la finca' : 'Lectura atmosférica'))
     : 'Esperando señal del cielo';
@@ -95,10 +95,10 @@ function ClimaHud({ climaLive }) {
         </div>
       </div>
       <div className="m3dc__metrics">
-        <ValorHud label="AHORA" value={climaLive.temp == null ? null : Math.round(climaLive.temp)} unit="°C" />
-        <ValorHud label="MÍNIMA" value={climaLive.tempMin == null ? null : Math.round(climaLive.tempMin)} unit="°C" tone="blue" />
-        <ValorHud label="LLUVIA" value={climaLive.lluviaMm == null ? null : climaLive.lluviaMm.toFixed(1)} unit=" mm" tone="amber" />
+        <ValorHud label="TEMPERATURA" value={climaLive.temp == null ? null : Math.round(climaLive.temp)} unit="°C" />
         <ValorHud label="HUMEDAD" value={climaLive.humedad == null ? null : Math.round(climaLive.humedad)} unit="%" tone="green" />
+        <ValorHud label="LLUVIA" value={climaLive.lluviaMm == null ? null : climaLive.lluviaMm.toFixed(1)} unit=" mm" tone="amber" />
+        <ValorHud label="VIENTO" value={climaLive.viento == null ? null : Math.round(climaLive.viento)} unit=" km/h" tone="blue" />
       </div>
       <div className="m3dc__phenomena" aria-label="Fenómenos visibles">
         <span className={climaLive.lluvia ? 'is-on' : ''}>Lluvia</span>
@@ -152,7 +152,7 @@ function CultivoSuggestionCard({ item, featured = false }) {
   );
 }
 
-function CultivoRadar({ suggestions, isHydrated }) {
+export function CultivoRadar({ suggestions, isHydrated }) {
   if (!isHydrated || suggestions.length === 0) return null;
   const actionable = suggestions.filter((item) => item.suggestion);
   const featuredKey = actionable[0]?.key;

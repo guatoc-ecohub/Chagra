@@ -30,6 +30,17 @@ import { useAngelitaPresencia, esPasivo } from '../visual/agente/useAngelitaPres
  */
 const VISEMA_DE_STATE = {
     speaking: 'V2',
+    respondiendo: 'V2',
+};
+
+const ESTADO_DE_STATE = {
+    idle: 'acompana',
+    // eslint-disable-next-line chagra-i18n/no-hardcoded-spanish
+    thinking: 'pensando',
+    // eslint-disable-next-line chagra-i18n/no-hardcoded-spanish
+    speaking: 'respondiendo',
+    listening: 'escuchando',
+    caminando: 'caminando',
 };
 
 export default function ChagraAgentAvatarGuacamaya({
@@ -43,21 +54,44 @@ export default function ChagraAgentAvatarGuacamaya({
     glow = false,
     className = '',
     ariaLabel = 'Chagra IA',
+    animated = true,
+    tier = undefined,
+    clima = null,
+    enso = 'neutro',
+    direccion = 'derecha',
+    reducedMotion = false,
     reaccionaPresencia = true,
+    'data-agt-estado': dataEstado = undefined,
+    'data-pose': dataPose = undefined,
+    'data-visema': dataVisema = undefined,
+    'data-clima': dataClima = undefined,
+    'data-tier': dataTier = undefined,
+    ...atributosConducta
 }) {
     const { despierta, handlers: handlersPresencia } = useAngelitaPresencia({ activo: reaccionaPresencia });
-    const estadoBase = estado || state;
+    const estadoBase = estado || ESTADO_DE_STATE[state] || 'acompana';
     const estadoEfectivo = despierta && esPasivo(estadoBase) ? 'idle' : estadoBase;
-    const visema = visemaProp || VISEMA_DE_STATE[estadoEfectivo] || null;
+    const visema = visemaProp ?? VISEMA_DE_STATE[estadoEfectivo] ?? null;
     const bicho = (
         <GuacamayaCompai
-            state={estadoEfectivo}
-            estado={despierta && esPasivo(estadoBase) ? undefined : estado}
+            state={state}
+            estado={despierta && esPasivo(estadoBase) ? undefined : estadoBase}
             visema={visema}
+            animated={animated}
+            reducedMotion={reducedMotion}
+            tier={dataTier || tier}
+            clima={clima}
+            enso={enso}
+            direccion={direccion}
             size={size}
             title={ariaLabel}
             className={className}
             style={glow ? { filter: 'drop-shadow(0 0 10px rgba(224,36,32,0.65))' } : undefined}
+            data-agt-estado={dataEstado || estadoBase}
+            data-pose={dataPose}
+            data-visema={dataVisema || visema || undefined}
+            data-clima={dataClima}
+            {...atributosConducta}
         />
     );
 

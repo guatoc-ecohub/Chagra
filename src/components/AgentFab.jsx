@@ -20,14 +20,14 @@ import { useCompaiClimaVivo } from '../hooks/useCompaiClimaVivo';
 import { useCompaiSusurroNocturno } from '../hooks/useCompaiSusurroNocturno';
 import { useCompaiAgroecologiaReal } from '../hooks/useCompaiAgroecologiaReal';
 import useTtsAmplitude, { visemaFromAmplitude } from '../hooks/useTtsAmplitude.js';
-import useInteraccionUsuario from '../hooks/useInteraccionUsuario.js';
 import useAgentAvatarType, { AVATAR_NOMBRE, DEFAULT_AVATAR_TYPE } from '../hooks/useAgentAvatarType.js';
 import { getHintForRuta } from '../config/compaiHints.js';
-import BurbujaAngelita from '../visual/agente/BurbujaAngelita.jsx';
 import AgentFabMenu from './AgentFabMenu';
 import BurbujaPizarraPeek from './BurbujaPizarraPeek';
+import CompaiGuiaPantalla from './CompaiGuiaPantalla';
 import useComportamientoCompai from '../hooks/useComportamientoCompai.js';
 import useCompaiDraggable from '../hooks/useCompaiDraggable';
+import CompaiEntradaSalida from '../visual/agente/CompaiEntradaSalida.jsx';
 import './agent-fab-skin.css';
 
 /**
@@ -35,11 +35,11 @@ import './agent-fab-skin.css';
  *
  * Decisión del operador (2026-07-16): "Angelita como el agente, jubila el
  * colibrí". El FAB deja de ser un porthole con foto de colibrí: es el compAI
- * elegido (Angelita por defecto, o la planta de maíz / la zarigüeya si el
- * usuario las escogió — `useAgentAvatarType`, ver fix 2026-07-25) volando o
- * creciendo libre en la esquina — compañía, no interrupción. El colibrí
- * (barbudito) se retira del rol de asistente y queda de decoración en los
- * mundos 3D (faunaFuncional, rol polinizador).
+ * elegido (Angelita por defecto, o la planta de maíz si el usuario la
+ * escogió — `useAgentAvatarType`, ver fix 2026-07-25) volando/creciendo libre
+ * en la esquina — compañía, no interrupción. El colibrí (barbudito) se retira
+ * del rol de asistente y queda de decoración en los mundos 3D (faunaFuncional,
+ * rol polinizador).
  *
  * Sus tres momentos (rubber-hose, angelitaEstados.js):
  *   - default        → 'acompana': idle-cerebro vivo (flota, se acicala, se
@@ -83,6 +83,9 @@ export default function AgentFab({ onNavigate, pantalla = null }) {
   const [pressed, setPressed] = useState(false);
   const [menuAbierto, setMenuAbierto] = useState(false);
   const [peekAbierto, setPeekAbierto] = useState(false);
+  // Panel "Ver" (R4): lectura del mensaje/hint en detalle. Declarado ACÁ ARRIBA
+  // (no más abajo) para que `pausado` del roam lo pueda leer sin caer en TDZ.
+  const [panelAbierto, setPanelAbierto] = useState(false);
   const { level: ttsLevel } = useTtsAmplitude();
 
   // Hook de arrastre y persistencia de posición
@@ -204,22 +207,27 @@ export default function AgentFab({ onNavigate, pantalla = null }) {
 
   // ── POLÍTICA DURA DEL COMPAI (POLITICA-COMPAI-COMPORTAMIENTO-2D-3D.md) ─────
   //   R1 — Nunca estorba: este FAB está ANCLADO por construcción (position:
-  //        fixed abajo-derecha); jamás flota en el medio. Sus burbujas (aviso /
-  //        enseñanza) crecen HACIA ARRIBA desde el ancla y son descartables — no
-  //        tapan el centro. Reemplaza al CompaiOverlay que deambulaba y tapaba
-  //        tarjetas (unificación 2026-08-23).
+  //        fixed abajo-derecha); jamás flota en el medio. Reemplaza al
+  //        CompaiOverlay que deambulaba y tapaba tarjetas (unificación
+  //        2026-08-23).
   //   R2 — Se quita al interactuar: cuando el usuario USA la pantalla
   //        (interactuando), el compai se OCULTA; reaparece en idle.
-  //   R3 — Enseña en idle: en reposo muestra el hint contextual de la ruta
-  //        (folded desde CompaiOverlay), UNA vez por entrada y respetando
-  //        silencio / "hoy no" / ocupado (anti-molestia del store).
+  //   R3/R5 — LA PIZARRA ES EL ÚNICO AVISO (regla dura del operador,
+  //        2026-09-03, feedback_pizarra_unico_aviso_compai): las burbujas
+  //        AUTO-POP de "enseñanza en idle" (R3, per-ruta) y de "aviso rico"
+  //        (R5, clima vivo/susurro/agroecología/respuesta lista) que se
+  //        pintaban solas encima del FAB SE RETIRARON — eran un segundo/tercer
+  //        elemento de aviso compitiendo con la pizarra. Nada de información
+  //        se perdió: `contenidoPanel` (abajo) ya prioriza mensajeAngelita →
+  //        lastAssistantMessage → hint por ruta, y es EXACTAMENTE lo que
+  //        `BurbujaPizarraPeek` muestra al tocar el compai. La única señal de
+  //        "algo nuevo" que queda es el propio avatar: `estado='invita'` +
+  //        `.agt-avatar-glow` (ver más abajo) cuando `responseReady` — el
+  //        personaje mismo invita, no un cartel aparte.
   //   R4 — Al tocarlo: ASOMA el peek de pizarra (BurbujaPizarraPeek) con el
-  //        último aviso (typewriter) y Ver / Escuchar / Callar. "Más opciones"
+  //        último aviso (texto ESTÁTICO, NO typewriter: el texto en movimiento
+  //        le daba mareo al operador) y Ver / Escuchar / Callar. "Más opciones"
   //        abre el menú compacto de siempre.
-  //   R5 — Notificaciones adaptadas: el mensaje REAL (clima vivo / susurro /
-  //        agroecología / respuesta lista) se pinta como burbuja de AVISO en
-  //        prod 2D (antes solo un glow). El texto ADAPTADO ya lo alimentan los
-  //        hooks de arriba; aquí se hace VISIBLE con la burbuja rica del valle.
   const [avatarType] = useAgentAvatarType();
   const nombreCompai = AVATAR_NOMBRE[avatarType] || AVATAR_NOMBRE[DEFAULT_AVATAR_TYPE];
   // El ARRASTRE lo dueña useCompaiDraggable (bottom/right, persistente). Mientras
@@ -231,85 +239,47 @@ export default function AgentFab({ onNavigate, pantalla = null }) {
     superficie: pantalla || 'global',
     contentAware: true,
     pausado: isDragging,
+    // CERO-MAREO (auditoría 3-roles 2026-08-27): con un asomo/menú/panel abierto
+    // el compai se CONGELA donde está — el peek vive DENTRO de este mismo div, y
+    // sin esto la excursión del roam lo arrastraba 24-42px bajo la vista. Se usa
+    // `congelado` (freeze in-place) y NO `pausado`: `pausado` devuelve el
+    // transform al puesto {0,0}, que si el peek se abre a mitad de excursión es
+    // una deriva de varios segundos igual de mareante (medido). Ver el hook.
+    congelado: peekAbierto || menuAbierto || panelAbierto,
   });
   const hint = useMemo(() => getHintForRuta(pantalla, nombreCompai), [pantalla, nombreCompai]);
 
-  const interactuando = useInteraccionUsuario();
   const estadoAngelita = useAngelitaStore((s) => s.estado);
   const visualEstadoAngelita = useAngelitaStore((s) => s.visualEstado);
   const mensajeAngelita = useAngelitaStore((s) => s.mensaje);
-  const tipoAngelita = useAngelitaStore((s) => s.tipo);
-  const hoyNoActivoFn = useAngelitaStore((s) => s.hoyNoActivo);
-  const hoyNo = typeof hoyNoActivoFn === 'function' ? hoyNoActivoFn() : false;
 
-  // Panel "Ver" (R4): lectura del mensaje/hint en detalle.
-  const [panelAbierto, setPanelAbierto] = useState(false);
-  // La enseñanza (R3) se descarta con la ✕ y se re-arma al cambiar de pantalla.
-  const [hintDescartado, setHintDescartado] = useState(false);
-  // "Una vez por entrada" (auditoría de mensajes 2026-08-23): al primer idle
-  // elegible arranca un reloj; tras la ventana de enseñanza se CONSUME y no
-  // reaparece esta entrada (nada de spam cada 2–5 s como el roam anterior). Se
-  // reinicia al cambiar de ruta — patrón derivado en render, sin setState en
-  // effect (react-hooks/set-state-in-effect).
-  const [hintArrancado, setHintArrancado] = useState(false);
-  const [hintConsumido, setHintConsumido] = useState(false);
   const [lastPantalla, setLastPantalla] = useState(pantalla);
   if (lastPantalla !== pantalla) {
     setLastPantalla(pantalla);
     setPanelAbierto(false);
     setPeekAbierto(false);
-    setHintDescartado(false);
-    setHintArrancado(false);
-    setHintConsumido(false);
   }
-
-  // Aviso ADAPTADO (R5): la decisión viva del compai lleva su mensaje, tipo y
-  // ánimo. Las respuestas del chat siguen siendo el fallback para no romper el
-  // camino existente de AgentScreen → AgentFab.
-  const mensajeAviso = estadoAngelita !== 'calma' && mensajeAngelita
-    ? mensajeAngelita
-    : lastAssistantMessage;
-  const tipoAviso = estadoAngelita !== 'calma' && tipoAngelita ? tipoAngelita : 'informativa';
-  const mostrarAviso = responseReady && !!mensajeAviso && !silenciado && !menuAbierto && !peekAbierto;
-
-  // Enseñanza (R3): reposo, sin aviso, sin silencio/"hoy no"/ocupado, sin
-  // menú/panel, no descartada ni ya consumida esta entrada.
-  const ensenanzaPermitida = !mostrarAviso && !silenciado && !hoyNo && !estaOcupado()
-    && pantalla != null && !menuAbierto && !panelAbierto && !peekAbierto;
-  const mostrarEnsenanza = ensenanzaPermitida && !interactuando && !hintDescartado && !hintConsumido;
-  if (mostrarEnsenanza && !hintArrancado) setHintArrancado(true);
 
   // POLÍTICA COMPAI v2 (operador 2026-08-24): el compai es VISIBLE 100% del
   // tiempo, NUNCA desaparece. La ocultación anterior (`oculto = interactuando
   // && !hover` → visibility:hidden) hacía justo lo contrario y era el bug de
   // "al onmouseover desaparece / ahora no sale ninguno". Al interactuar el
   // usuario, el compai vuelve a su posición natural (por ahora su puesto), NO
-  // se oculta. `interactuando` sigue gobernando SOLO la enseñanza (R3), no la
-  // visibilidad. Ver feedback_compai_politica_v2_visible_roam_natural.
+  // se oculta. Ver feedback_compai_politica_v2_visible_roam_natural.
   const oculto = false;
 
-  const abrirPanel = useCallback(() => {
-    setPanelAbierto(true);
-    registrarSenalMolestia('abrirTip');
-  }, [registrarSenalMolestia]);
   const cerrarPanel = useCallback(() => setPanelAbierto(false), []);
-  const descartarEnsenanza = useCallback(() => {
-    setHintDescartado(true);
-    registrarSenalMolestia('cerrarTipSinLeer');
-  }, [registrarSenalMolestia]);
-  const descartarAviso = useCallback(() => {
-    setResponseReady(false);
-    if (useAngelitaStore.getState().estado !== 'calma') useAngelitaStore.getState().reposar();
-    registrarSenalMolestia('cerrarTipSinLeer');
-  }, [setResponseReady, registrarSenalMolestia]);
   const leerEnVoz = useCallback((titulo, descripcion) => {
     speakSentences(`${titulo}. ${descripcion}`).catch(() => { /* degrada a solo texto */ });
     registrarSenalMolestia('escuchar');
   }, [registrarSenalMolestia]);
 
   // Contenido del panel "Ver" y del PEEK: el aviso vivo / último mensaje si lo
-  // hay, si no el hint de la ruta, y como último recurso una línea amable — así
-  // el peek nunca queda sin qué decir ni revienta al leer `.descripcion`.
+  // hay, si no el aviso de la ruta — que desde el cableado 2026-09-03 ES la
+  // explicación de la pantalla (`compaiExplicaPantallas`, vía getHintForRuta,
+  // decisión del operador: el texto de la pantalla SALE EN LA PIZARRA
+  // SIEMPRE) — y como último recurso una línea amable, así el peek nunca queda
+  // sin qué decir ni revienta al leer `.descripcion`.
   const contenidoPanel = useMemo(() => {
     if (mensajeAngelita) return { titulo: `${nombreCompai}: un aviso para usted`, descripcion: mensajeAngelita };
     if (lastAssistantMessage) return { titulo: `${nombreCompai}: un aviso para usted`, descripcion: lastAssistantMessage };
@@ -319,7 +289,7 @@ export default function AgentFab({ onNavigate, pantalla = null }) {
 
   // Estado del compai: el tacto manda; luego el ánimo rico del store; luego
   // la respuesta del chat y, al final, el idle.
-  const estado = pressed
+  const estadoBase = pressed
     ? 'contenta'
     : hover
       ? 'escuchando'
@@ -328,14 +298,12 @@ export default function AgentFab({ onNavigate, pantalla = null }) {
       : responseReady
         ? 'invita'
         : 'acompana';
-
-  // Ventana de enseñanza: se consume ~8 s tras el primer idle elegible → el hint
-  // enseña UNA vez por entrada (auditoría de mensajes: sin spam por parada).
-  useEffect(() => {
-    if (!hintArrancado || hintConsumido) return undefined;
-    const t = setTimeout(() => setHintConsumido(true), 8000);
-    return () => clearTimeout(t);
-  }, [hintArrancado, hintConsumido]);
+  // La locomoción solo pisa el idle. Una conversación, alerta o interacción
+  // conserva prioridad. El resolver por especie traduce `caminando` a marcha
+  // terrestre o vuelo, según el cuerpo elegido.
+  const estado = comportamiento.caminando && estadoBase === 'acompana'
+    ? 'caminando'
+    : estadoBase;
 
   const handleEnter = () => setHover(true);
   const handleLeave = () => { setHover(false); setPressed(false); soltarPulsacionLarga(); };
@@ -498,8 +466,8 @@ export default function AgentFab({ onNavigate, pantalla = null }) {
           silenciado
             ? 'Chagra IA (en silencio). Tocar para abrir el menú'
             : responseReady
-              ? 'Chagra IA tiene respuesta nueva'
-              : 'Chagra IA, su compañero de Chagra'
+              ? 'Angelita (Chagra IA) tiene respuesta nueva'
+              : 'Angelita, la asistente Chagra IA'
         }
         title={
           silenciado
@@ -556,26 +524,35 @@ export default function AgentFab({ onNavigate, pantalla = null }) {
         }}
       >
         {/* pointer-events:none — CRÍTICO: el click debe caer en el BOTÓN, nunca
-            en el SVG. Angelita (o el maíz, o la zarigüeya) se REMONTA al
-            cambiar de estado (key=estado en su .agt-vuelo) y hover/pressed
-            cambian el estado: si el mousedown cae en un nodo del dibujo que se
-            desconecta antes del mouseup, el navegador se traga el click
-            (verificado con playwright 2026-07-16). `estado` viaja en el
-            vocabulario RICO de Angelita — ChagraAgentAvatar lo traduce si el
-            usuario eligió otro compAI (fix 2026-07-25: antes este FAB ignoraba
-            la elección por completo). */}
+            en el SVG. Angelita se REMONTA al cambiar de estado (key=estado en su
+            .agt-vuelo) y hover/pressed cambian el estado: si el mousedown cae en
+            un nodo del dibujo que se desconecta antes del mouseup, el navegador
+            se traga el click (verificado con playwright 2026-07-16). */}
         <span style={{ pointerEvents: 'none', display: 'flex' }} aria-hidden="true">
-          <ChagraAgentAvatar
-            // eslint-disable-next-line chagra-i18n/no-hardcoded-spanish -- estado visual canónico del agente
-            estado={ttsLevel > 0.035 ? 'respondiendo' : estado}
-            size={82}
-            visema={visemaFromAmplitude(ttsLevel)}
-            direccion="izquierda"
-            className={responseReady ? 'agt-avatar-glow' : undefined}
-            title="Chagra IA"
-            ariaLabel="Chagra IA"
-            reaccionaPresencia
-          />
+          {/* ENTRADA/SALIDA POR ESPECIE (2026-09-04): el perfil de conducta de
+              cada compai de tinta ya decía cómo aparece y cómo se va (jaguar
+              místico desde la sombra, chivito en dardo, luciérnaga luz primero…)
+              y nadie lo leía: los seis entraban igual. El envoltorio es el
+              metrónomo de esas fases; Angelita no tiene perfil ahí y pasa tal
+              cual (su entrada histórica es la vara). Al cambiar de especie, la
+              que se va corre su salida antes de ceder el puesto. */}
+          <CompaiEntradaSalida especie={avatarType}>
+            {(especieMostrada, avisarCuerpo) => (
+              <ChagraAgentAvatar
+                especie={especieMostrada}
+                onCuerpoMontado={avisarCuerpo}
+                // eslint-disable-next-line chagra-i18n/no-hardcoded-spanish -- estado visual canónico del agente
+                estado={ttsLevel > 0.035 ? 'respondiendo' : estado}
+                size={82}
+                visema={visemaFromAmplitude(ttsLevel)}
+                direccion={comportamiento.direccion}
+                className={responseReady ? 'agt-avatar-glow' : undefined}
+                title="Chagra IA"
+                ariaLabel="Chagra IA"
+                reaccionaPresencia
+              />
+            )}
+          </CompaiEntradaSalida>
         </span>
       </button>
 
@@ -588,8 +565,8 @@ export default function AgentFab({ onNavigate, pantalla = null }) {
         data-compai-no-drag="true"
         onClick={(e) => { e.stopPropagation(); alternarSilencio(); }}
         aria-pressed={silenciado}
-        aria-label={silenciado ? 'Volver a oír a su compañero' : 'Que su compañero se quede callado'}
-        title={silenciado ? 'Volver a oír a su compañero' : 'Que su compañero se quede callado'}
+        aria-label={silenciado ? 'Volver a oír a Angelita' : 'Que Angelita se quede callada'}
+        title={silenciado ? 'Volver a oír a Angelita' : 'Que Angelita se quede callada'}
         style={{
           position: 'absolute',
           top: -2,
@@ -602,8 +579,9 @@ export default function AgentFab({ onNavigate, pantalla = null }) {
           color: '#fff',
           fontSize: 14,
           lineHeight: 1,
-          // El ícono aparece por clic/toque, nunca por hover en reposo.
-          display: (comportamiento.notificacionVisible || pressed || menuAbierto) ? 'flex' : 'none',
+          // Sólo queda oculto en reposo: se revela al acercarse, enfocar,
+          // tocar el personaje, abrir el menú o recibir una notificación.
+          display: (comportamiento.notificacionVisible || hover || pressed || menuAbierto) ? 'flex' : 'none',
           alignItems: 'center',
           justifyContent: 'center',
           cursor: 'pointer',
@@ -616,66 +594,20 @@ export default function AgentFab({ onNavigate, pantalla = null }) {
         <span aria-hidden="true">{silenciado ? '🔕' : '🔔'}</span>
       </button>
 
-      {/* R5 — BURBUJA RICA DE AVISO (mensaje ADAPTADO + tipo + ánimo): clima
-          vivo / susurro / agroecología / respuesta lista, visible en prod 2D.
-          Anclada ARRIBA del FAB, descartable → no tapa el centro (R1). */}
-      {mostrarAviso && (
-        <div style={burbujaWrapStyle} data-testid="compai-fab-aviso">
-          <div style={burbujaCardStyle}>
-            <button
-              type="button"
-              onClick={abrirPanel}
-              style={burbujaBotonStyle}
-              aria-label={`Aviso de su compañero: ${mensajeAviso}. Tocar para ver o escuchar.`}
-            >
-              <BurbujaAngelita
-                mensaje={mensajeAviso}
-                tipo={tipoAviso}
-                className="compai-fab-burbuja-rica"
-              />
-            </button>
-            <button
-              type="button"
-              onClick={descartarAviso}
-              style={burbujaCerrarStyle}
-              aria-label="Descartar este aviso"
-              title="Descartar"
-            >
-              <span aria-hidden="true">×</span>
-            </button>
-          </div>
-        </div>
-      )}
+      {/* R3/R5 RETIRADAS (2026-09-03, la pizarra es el único aviso): las dos
+          burbujas AUTO-POP que vivían aquí (aviso rico + enseñanza en idle)
+          se quitaron. Su contenido sigue disponible al tocar el compai — ver
+          `contenidoPanel` y el peek de pizarra más abajo. */}
 
-      {/* R3 — BURBUJA DE ENSEÑANZA (idle): explica QUÉ hay en esta pantalla, una
-          vez por entrada, descartable. Es el hint que se plegó del CompaiOverlay. */}
-      {mostrarEnsenanza && (
-        <div style={burbujaWrapStyle} data-testid="compai-fab-hint">
-          <div style={burbujaCardStyle}>
-            <button
-              type="button"
-              onClick={abrirPanel}
-              style={burbujaBotonStyle}
-              aria-label={`${hint.titulo}. ${hint.descripcion}. Tocar para ampliar o escuchar.`}
-            >
-              <span style={burbujaTituloStyle}>{hint.titulo}</span>
-              <span style={burbujaTextoStyle}>{hint.descripcion}</span>
-            </button>
-            <button
-              type="button"
-              onClick={descartarEnsenanza}
-              style={burbujaCerrarStyle}
-              aria-label="Ocultar esta ayuda por ahora"
-              title="Ocultar"
-            >
-              <span aria-hidden="true">×</span>
-            </button>
-          </div>
-        </div>
-      )}
-
-      {/* R4 — PANEL "Ver": leer el mensaje/hint en detalle + Escuchar. Se abre
-          desde el menú (opción "Ver") o tocando una burbuja. */}
+      {/* R4 — PANEL "Ver": leer el mensaje en detalle + Escuchar. Se abre
+          desde el menú (opción "Ver") o desde el "Ver" del peek.
+          CABLEADO 2026-09-03 (decisión del operador: el texto de explicación
+          de la pantalla SALE EN LA PIZARRA SIEMPRE): si la pantalla está en
+          `compaiExplicaPantallas`, `CompaiGuiaPantalla` escribe acá dentro su
+          explicación con las funciones de la pantalla y el salto al agente.
+          Con un aviso vivo, el aviso va primero y la guía de la pantalla lo
+          acompaña SIEMPRE debajo — todo DENTRO de la pizarra, nada compite
+          afuera. */}
       {panelAbierto && (
         <div
           style={panelStyle}
@@ -695,7 +627,14 @@ export default function AgentFab({ onNavigate, pantalla = null }) {
               <span aria-hidden="true">×</span>
             </button>
           </div>
-          <p style={panelTextoStyle}>{contenidoPanel.descripcion}</p>
+          {/* Si el contenido ES la explicación de la pantalla (tiene
+              funciones), el texto lo escribe CompaiGuiaPantalla y no se
+              repite aquí; si es un aviso vivo / último mensaje, su texto va
+              primero y la guía de la pantalla lo acompaña SIEMPRE debajo. */}
+          {contenidoPanel.funciones?.length ? null : (
+            <p style={panelTextoStyle}>{contenidoPanel.descripcion}</p>
+          )}
+          <CompaiGuiaPantalla pantalla={pantalla} onNavigate={onNavigate} />
           <button
             type="button"
             onClick={() => leerEnVoz(contenidoPanel.titulo, contenidoPanel.descripcion)}
@@ -709,8 +648,9 @@ export default function AgentFab({ onNavigate, pantalla = null }) {
       )}
 
       {/* PEEK DEL TOQUE (rediseño operador 2026-08-27): pizarra de colegio
-          compacta con el último aviso (typewriter) + Ver / Escuchar / Callar.
-          NO tapa la pantalla; "Más opciones" abre el menú compacto de abajo. */}
+          compacta con el último aviso (texto ESTÁTICO, no typewriter) +
+          Ver / Escuchar / Callar. NO tapa la pantalla; "Más opciones" abre el
+          menú compacto de abajo. */}
       {peekAbierto && (
         <BurbujaPizarraPeek
           mensaje={contenidoPanel.descripcion}
@@ -741,73 +681,10 @@ export default function AgentFab({ onNavigate, pantalla = null }) {
   );
 }
 
-// ── Estilos de las burbujas de aviso/enseñanza y del panel "Ver" ────────────
-// Ancladas al puesto del FAB; crecen HACIA ARRIBA (bottom:100%) para no tapar
-// el centro (R1). `maxWidth` las mantiene dentro del viewport en móvil.
-const burbujaWrapStyle = {
-  position: 'absolute',
-  bottom: '100%',
-  right: 0,
-  marginBottom: 12,
-  width: 244,
-  maxWidth: 'calc(100vw - 28px)',
-  pointerEvents: 'auto',
-  zIndex: 41,
-};
-const burbujaCardStyle = {
-  position: 'relative',
-  background: 'rgb(15 23 42 / 0.96)',
-  border: '1px solid rgb(51 65 85 / 0.8)',
-  borderRadius: 16,
-  borderBottomRightRadius: 4,
-  padding: '10px 30px 10px 12px',
-  boxShadow: '0 10px 28px rgb(0 0 0 / 0.45)',
-  backdropFilter: 'blur(4px)',
-};
-const burbujaBotonStyle = {
-  display: 'block',
-  width: '100%',
-  textAlign: 'left',
-  background: 'transparent',
-  border: 'none',
-  padding: 0,
-  cursor: 'pointer',
-};
-const burbujaTituloStyle = {
-  display: 'block',
-  fontSize: 13,
-  fontWeight: 700,
-  color: '#f1f5f9',
-  lineHeight: 1.3,
-};
-const burbujaTextoStyle = {
-  display: '-webkit-box',
-  WebkitBoxOrient: 'vertical',
-  WebkitLineClamp: 4,
-  overflow: 'hidden',
-  marginTop: 2,
-  fontSize: 12,
-  color: '#cbd5e1',
-  lineHeight: 1.4,
-};
-const burbujaCerrarStyle = {
-  position: 'absolute',
-  top: 4,
-  right: 4,
-  width: 24,
-  height: 24,
-  borderRadius: '50%',
-  border: 'none',
-  background: 'transparent',
-  color: '#94a3b8',
-  fontSize: 17,
-  lineHeight: 1,
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'center',
-  cursor: 'pointer',
-  padding: 0,
-};
+// ── Estilos del panel "Ver" (único elemento propio que le queda al FAB;
+// el aviso en sí lo pinta `BurbujaPizarraPeek`, ver burbuja-pizarra-peek.css).
+// Anclado al puesto del FAB, crece HACIA ARRIBA (bottom:100%) para no tapar
+// el centro (R1). `maxWidth` lo mantiene dentro del viewport en móvil.
 const panelStyle = {
   position: 'absolute',
   bottom: '100%',

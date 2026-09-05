@@ -7,6 +7,7 @@ import { describe, it, expect } from 'vitest';
 import {
   idleDeCreature, IDLE_PERFILES, IDLE_NEUTRO, semillaDe, azar01, backOut,
 } from '../creatureIdle.js';
+import { PERFILES_CONDUCTA } from '../../../compai/nucleo/perfilesConducta.js';
 
 /* Barre la línea de tiempo y devuelve los arranques del evento pedido. */
 function arranquesDe(evento, opts, hasta = 140, paso = 0.05) {
@@ -112,6 +113,45 @@ describe('creatureIdle — repertorio de Angelita', () => {
   });
 });
 
+describe('creatureIdle — jaguar SIN mortal (es místico, regla dura 2026-09-03)', () => {
+  const opts = { especie: 'jaguar', hora: 'dorada' };
+
+  it('el perfil del jaguar NO declara vuelta (prohibida: es místico, no da el mortal)', () => {
+    // Desde #3129 el perfil proyecta la fuente única (PERFILES_CONDUCTA), que
+    // declara `vuelta: null` para el jaguar — la prohibición vive en los datos.
+    // La máquina excluye carriles falsy (if (!cfg) continue), así que null ES
+    // la exclusión a propósito: undefined significaría que alguien borró la
+    // llave y la prohibición se volvió invisible para este control.
+    expect(IDLE_PERFILES.jaguar.vuelta).toBeNull();
+  });
+
+  it('barrido largo: el jaguar NUNCA da la vuelta de campana (y sigue vivo)', () => {
+    // 10 períodos de su percha (44 s): si alguien re-habilita la vuelta —
+    // por perfil o por máquina — este barrido la detecta (evento 'vuelta'
+    // o un rot con giro de mortal).
+    const eventos = new Set();
+    let rotMax = 0;
+    for (let t = 0; t <= 440; t += 0.05) {
+      const p = idleDeCreature(t, opts);
+      eventos.add(p.evento);
+      rotMax = Math.max(rotMax, Math.abs(p.rot));
+      expect(p.evento).not.toBe('vuelta');
+    }
+    expect(rotMax).toBeLessThan(45); // asedio/sacudida (≤13°), jamás un mortal
+    // la exclusión no apagó la máquina: respira, se posa y se asea
+    expect(eventos.has('respira')).toBe(true);
+    expect(eventos.has('percha')).toBe(true);
+    expect(eventos.has('rasca') || eventos.has('sacude')).toBe(true);
+  });
+
+  it('control negativo: la MÁQUINA sí da vueltas donde están permitidas (abeja)', () => {
+    // con la misma sonda, Angelita SÍ da vueltas de campana: el barrido de
+    // arriba puede detectarlas y lo del jaguar es exclusión, no avería.
+    const vueltasAbeja = arranquesDe('vuelta', { especie: 'abeja-angelita', hora: 'dorada' }, 140);
+    expect(vueltasAbeja.length).toBeGreaterThanOrEqual(3);
+  });
+});
+
 describe('creatureIdle — gates (noche, reduced-motion, tier)', () => {
   it('de noche se acurruca: reposo, posada, y CERO piruetas', () => {
     for (let t = 0; t < 120; t += 0.5) {
@@ -147,6 +187,33 @@ describe('creatureIdle — genérica por especie (misma máquina, otro animal)',
       expect(IDLE_PERFILES[slug]).toBeDefined();
       expect(['aire', 'suelo']).toContain(IDLE_PERFILES[slug].medio);
       expect(IDLE_PERFILES[slug].poseBase).toBeTruthy();
+    }
+  });
+
+  it('los siete compai canónicos tienen perfil propio y no caen a la abeja', () => {
+    const roster = ['abeja-angelita', 'jaguar', 'oso-baston', 'zariguya', 'luciernaga', 'chivito-punk', 'guacamaya'];
+    for (const slug of roster) {
+      expect(IDLE_PERFILES[slug], `falta perfil idle de ${slug}`).toBeDefined();
+      if (slug !== 'abeja-angelita') {
+        expect(IDLE_PERFILES[slug]).not.toBe(IDLE_PERFILES['abeja-angelita']);
+      }
+    }
+  });
+
+  it('proyecta los seis perfiles desde el núcleo y apaga sus vueltas', () => {
+    for (const [slug, conducta] of Object.entries(PERFILES_CONDUCTA)) {
+      expect(IDLE_PERFILES[slug].respira).toBe(conducta.respira);
+      expect(IDLE_PERFILES[slug].vuelta).toBeNull();
+      const eventos = new Set();
+      for (let t = 0; t < 160; t += 0.1) eventos.add(idleDeCreature(t, { especie: slug }).evento);
+      expect(eventos.has('vuelta'), slug).toBe(false);
+    }
+    expect(IDLE_PERFILES.jaguar.respira.freq).toBe(1.85); // 3.4 s: ancla jhRespira
+  });
+
+  it('no acurruca a los nocturnos activos', () => {
+    for (const slug of ['jaguar', 'zariguya', 'luciernaga']) {
+      expect(idleDeCreature(10, { especie: slug, hora: 'noche' }).evento).not.toBe('acurruca');
     }
   });
 

@@ -11,22 +11,32 @@ La región andina colombiana tiene DOS temporadas de lluvia (mar-may y sep-nov) 
 - **El Niño**: déficit de lluvia, más sol, menos nubosidad. Riesgo: sequía, incendios.
 - **La Niña**: exceso de lluvia, más nubosidad. Riesgo: inundaciones, hongos, deslizamientos.
 
-## Refresco de boletines
+## Verificación de fuentes
 
-El refresco operativo de `dr-clima-refresh.sh` debe ejecutarse a las 16:30 en
-hora de Bogotá, de lunes a viernes. Esa hora deja margen para el boletín diario
-SIPSA, que DANE suele publicar después del mediodía, y también cubre los
-boletines de IDEAM y NOAA CPC publicados antes.
+El refresco del cron ejecuta `scripts/clima/verificar-urls.mjs` antes de llamar
+a `~/.local/bin/dr-clima-refresh.sh`. El script extrae todas las URLs de
+`src/data/climaBoletines.js`, prueba `HEAD` y usa `GET` como respaldo cuando el
+servidor no acepta `HEAD`. Solo `200`, `301` y `302` cuentan como vivas; el
+reporte JSON se imprime en stdout y los fallos críticos hacen terminar el cron
+con código distinto de cero.
 
-Los sábados, domingos y festivos colombianos no se debe tratar el último
-boletín hábil como un dato del día. El wrapper
-[`scripts/clima/dr-clima-refresh-calendar.mjs`](../scripts/clima/dr-clima-refresh-calendar.mjs)
-omite esos días. El timer usa `Persistent=true` para recuperar una ejecución
-perdida por desconexión, y sus plantillas instalables están en
-[`ops/systemd-user`](../ops/systemd-user).
+Las URLs dentro de `FUENTES_VIVAS` son críticas. Una URL muerta se registra en
+el journal del servicio y detiene el refresco. No se sustituyen URLs
+automáticamente.
 
-La investigación y el comando exacto para aplicar las unidades de usuario
-están en [`INVESTIGACION_DR_CLIMA_REFRESH.md`](../INVESTIGACION_DR_CLIMA_REFRESH.md).
+El entry point se ejecuta desde la raíz del repositorio para que pueda resolver
+el archivo de fuentes. El comando que debe usar el host del cron, sin editar el
+wrapper externo, es:
+
+```bash
+DR_CLIMA_REFRESH_SCRIPT="$HOME/.local/bin/dr-clima-refresh.sh" node scripts/clima/dr-clima-refresh-calendar.mjs
+```
+
+Prueba local con URLs reales:
+
+```bash
+node scripts/clima/verificar-urls.mjs
+```
 
 ## Caso Choachí
 Choachí (Cundinamarca, 1900msnm) tiene régimen particular: solo 2 días de sol pleno por semana en promedio (vs 4 esperados). La nubosidad orográfica del páramo de Chingaza domina el microclima.

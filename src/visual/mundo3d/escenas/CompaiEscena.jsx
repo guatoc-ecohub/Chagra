@@ -3,11 +3,9 @@
  *
  * Drop-in de AbejaEscena (mismas props). Cierra el bug "oso→abeja": antes el
  * mundo montaba SIEMPRE a Angelita; ahora consulta el avatar elegido
- * (useCompaiElegido) y monta la escena propia del compañero si la tiene. Hoy
- * solo Angelita tiene arte 3D, así que maíz y zarigüeya caen a AbejaEscena (sin
- * regresión). Cuando el Fable de compai (#5) registre su <XEscena> en
- * compaiRegistry, este dispatcher la monta automáticamente — sin tocar este
- * archivo ni EscenaBase3D ni las escenas de cada mundo.
+ * (useCompaiElegido) y monta la escena propia del compañero si la tiene. Los
+ * siete tipos canónicos están registrados; Angelita conserva `AbejaEscena`
+ * como adaptador nativo y como fallback seguro para tipos desconocidos.
  *
  * Vive en escenas/ (chunk perezoso vendor-three): AbejaEscena arrastra
  * @react-three, así que este archivo NUNCA se importa desde el barrel base.
@@ -26,6 +24,6 @@ export function CompaiEscena(props) {
     const Escena = compai.EscenaComponent;
     return <Escena {...props} compai={compai} />;
   }
-  // Fallback: Angelita (angelita nativa, o maíz/zarigüeya aún sin arte 3D).
+  // Angelita nativa o fallback seguro para un tipo desconocido.
   return <AbejaEscena {...props} />;
 }

@@ -72,6 +72,8 @@ import {
 } from './arte-valle/nsRigValle.js';
 import { GUACAMAYA_SLUG, GUACAMAYA_NOMBRE } from './guacamayaIdentidad.js';
 import { estadoCanonico, elegirMomentoIdle, duracionDeMomento } from '../agente/angelitaEstados.js';
+import { CompaiAgente } from '../agente/CompaiAgente.jsx';
+import { COMPAI_ESPECIES } from '../agente/compaiEspecies.js';
 
 const MARCADOR_CSS = 'GUACAMAYA — rig rubber-hose';
 
@@ -115,6 +117,7 @@ const IDS = idsDeclaradosEnSvg(MARCADO_CRUDO);
    de sobra que recortar el ave. Pendiente afinar contra una captura
    GPU-headed real (ver nota del operador en el reporte de esta tarea). */
 const VIEWBOX = '-460 -460 920 920';
+const GUACAMAYA_PERFIL = COMPAI_ESPECIES.guacamaya;
 
 /* +15% de presencia (pedido del operador, 2026-08-24): la guacamaya se dibuja
    un 15% más grande que su `size` nominal — SOLO ella (esta constante vive en
@@ -181,6 +184,7 @@ const ESTADO_RIG_DE_ESTADO_AGENTE = {
   senala: 'senalar',
   invita: 'pacto',
   husmea: 'dispersar',
+  caminando: 'idle',
 };
 
 /* ¿El usuario pidió quietud? Mismo criterio que Angelita.jsx: los sistemas
@@ -238,11 +242,15 @@ const SUELTA_MIRADA_MS = 1900;
  * TAMAÑO: se dibuja un +15% sobre el `size` nominal (FACTOR_TAMANO) — SOLO la
  * guacamaya. El width/height del <svg> es `round(size * 1.15)`.
  */
-export function GuacamayaCompai({
+function GuacamayaCompaiRig({
   state = 'idle',
-  estado = undefined,
+  estado = 'acompana',
+  pose = 'vuela',
   visema = null,
   tier = undefined,
+  animated = true,
+  reducedMotion = false,
+  clima = null,
   size = 64,
   luces = 'auto',
   className = '',
@@ -260,10 +268,13 @@ export function GuacamayaCompai({
      salvo que se pida `luces='off'` o el tier sea bajo (gama baja: la capa es
      blend + animación continua). reduced-motion la apaga vía CSS. `realza`
      (entrada/salida) la enciende igual que `auto`, pero con más brío. */
-  const lucesActivas = luces !== 'off' && tier !== 'bajo';
+  const vivo = animated && !reducedMotion && !prefiereQuietud();
+  const lucesActivas = luces !== 'off' && tier !== 'bajo' && vivo;
+  const estadoAgente = estadoCanonico(estado);
   const dataEstado = estado !== undefined
-    ? (ESTADO_RIG_DE_ESTADO_AGENTE[estadoCanonico(estado)] || 'idle')
+    ? (ESTADO_RIG_DE_ESTADO_AGENTE[estadoAgente] || 'idle')
     : (ESTADO_DE_STATE[state] || 'idle');
+  const climaEstado = typeof clima === 'string' ? clima : clima?.estado || clima?.tipo;
 
   /* ═══ IDLE-CEREBRO — reusa el MISMO scheduler que Angelita.jsx (mismo
      patrón: setTimeout recursivo elige `elegirMomentoIdle`/`duracionDeMomento`
@@ -277,11 +288,12 @@ export function GuacamayaCompai({
      Gates: solo con `estado` (API rica), `acompana`/idle, `tier!=='bajo'`,
      `prefiereQuietud()`. */
   const idleActivo = estado !== undefined
-    && estadoCanonico(estado) === 'acompana'
+    && estadoAgente === 'acompana'
+    && vivo
     && tier !== 'bajo';
   const [momento, setMomento] = useState('flota');
   useEffect(() => {
-    if (!idleActivo || prefiereQuietud()) return undefined;
+    if (!idleActivo) return undefined;
     let timer = 0;
     let ultimoGesto = null;
     const programar = (nombre) => {
@@ -308,8 +320,7 @@ export function GuacamayaCompai({
      rAF) y lo sueltan a los ~2s para volver a su dardeo natural (rhMirada). DOM
      directo vía ref (cero re-renders por mover el mouse). Se une SIN tocar las
      luces místicas ni el arte aprobado. */
-  const estadoCanonicoParaGaze = estadoCanonico(estado || undefined);
-  const sigueUsted = tier !== 'bajo' && estadosQueLoMiran().has(estadoCanonicoParaGaze);
+  const sigueUsted = vivo && tier !== 'bajo' && estadosQueLoMiran().has(estadoAgente);
   useEffect(() => {
     const svg = svgRef.current;
     if (!sigueUsted || !svg || prefiereQuietud()) return undefined;
@@ -365,11 +376,15 @@ export function GuacamayaCompai({
       role="img"
       aria-label={title}
       data-creature={GUACAMAYA_SLUG}
+      data-agt-estado={estadoAgente}
       data-estado={dataEstado}
+      data-pose={pose}
       data-visema={visema || undefined}
+      data-clima={climaEstado || undefined}
       data-guaca-idle={idleActivo ? momento : undefined}
       data-guaca-luces={lucesActivas ? (luces === 'realza' ? 'realza' : 'auto') : undefined}
       data-tier={tier || undefined}
+      {...(!vivo ? { 'data-quieto': '' } : null)}
       {...rest}
     >
       <title>{title}</title>
@@ -432,4 +447,70 @@ export function GuacamayaCompai({
   );
 }
 
+function AdaptadorGuacamaya({
+  especie: _especie,
+  creatureSlug: _creatureSlug,
+  capacidades: _capacidades,
+  perfil: _perfil,
+  idlePerfil: _idlePerfil,
+  climaPerfil: _climaPerfil,
+  pose,
+  estadoLegado = undefined,
+  reducedMotion,
+  'data-agt-especie': dataEspecie,
+  'data-creature': dataCreature,
+  'data-agt-estado': dataEstado,
+  'data-pose': dataPose,
+  'data-visema': dataVisema,
+  'data-clima': dataClima,
+  'data-tier': dataTier,
+  ...props
+}) {
+  const estadoActual = estadoLegado || dataEstado || 'acompana';
+  return (
+    <GuacamayaCompaiRig
+      {...props}
+      estado={estadoActual}
+      pose={pose}
+      reducedMotion={reducedMotion}
+      data-agt-especie={dataEspecie}
+      data-creature={dataCreature}
+      data-agt-estado={estadoActual}
+      data-pose={dataPose || pose}
+      data-visema={dataVisema}
+      data-clima={dataClima}
+      data-tier={dataTier}
+    />
+  );
+}
+
+/** Fachada compatible de la guacamaya sobre el contrato común Compai. */
+export function GuacamayaCompai({
+  state = 'idle',
+  estado = undefined,
+  ...props
+}) {
+  const estadoEntrada = estado || ({
+    idle: 'acompana',
+    // eslint-disable-next-line chagra-i18n/no-hardcoded-spanish
+    thinking: 'pensando',
+    // eslint-disable-next-line chagra-i18n/no-hardcoded-spanish
+    speaking: 'respondiendo',
+    listening: 'escuchando',
+    caminando: 'caminando',
+  }[state] || 'acompana');
+  return (
+    <CompaiAgente
+      {...props}
+      estado={estadoEntrada}
+      estadoLegado={estadoEntrada}
+      especie={GUACAMAYA_PERFIL.avatarType}
+      chrome={false}
+      preserveRigAnimation
+      adaptador={AdaptadorGuacamaya}
+    />
+  );
+}
+
+export { GuacamayaCompaiRig };
 export default GuacamayaCompai;

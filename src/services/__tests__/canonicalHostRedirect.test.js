@@ -42,11 +42,30 @@ describe('canonicalHostRedirect', () => {
 
   it('permite únicamente los hosts de staging conocidos', () => {
     expect(isStagingHost('preprod.chagra.app')).toBe(true);
-    expect(isStagingHost('api.preprod.chagra.app')).toBe(true);
     expect(isStagingHost('chagra-dev.guatoc.co')).toBe(true);
     expect(isStagingHost('localhost')).toBe(true);
     expect(isStagingHost('127.0.0.1')).toBe(true);
     expect(isAllowedHost('preprod.chagra.app')).toBe(true);
+  });
+
+  it('rechaza un dominio tercero que contiene el token preprod', () => {
+    expect(isStagingHost('preprod.example.com')).toBe(false);
+    expect(isAllowedHost('preprod.example.com')).toBe(false);
+
+    const redirect = vi.fn();
+    const result = runCanonicalHostRedirectGuard({
+      location: {
+        hostname: 'preprod.example.com',
+        pathname: '/agente',
+        search: '?demo=1',
+        hash: '#/voz',
+      },
+      sessionStorage: storage,
+      redirect,
+    });
+
+    expect(result).toEqual({ redirected: true, reason: 'redirected-to-canonical' });
+    expect(redirect).toHaveBeenCalledWith(`https://${CANONICAL_HOSTNAME}/agente?demo=1#/voz`);
   });
 
   it('no redirige desde preprod hacia produccion', () => {
@@ -92,6 +111,11 @@ describe('canonicalHostRedirect', () => {
   it('permite 3d.guatoc.co (mundos 3D standalone) sin redirigir', () => {
     expect(isAllowedHost('3d.guatoc.co')).toBe(true);
   });
+
+  it('permite campesino.guatoc.co (HomeCampesinoB standalone) sin redirigir', () => {
+    expect(isAllowedHost('campesino.guatoc.co')).toBe(true);
+  });
+
 
   it('NO permite otros subdominios de guatoc.co (host exacto, no wildcard)', () => {
     // chagra.guatoc.co es el dominio legado de produccion: debe seguir

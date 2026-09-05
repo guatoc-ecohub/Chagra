@@ -41,10 +41,11 @@
  *
  * Uso:
  *   node scripts/migrate-v31-to-v32.mjs
+ *   node scripts/migrate-v31-to-v32.mjs --permitir-bajas  # escribe aunque pierda ids
  * ================================================================
  */
 
-import { readFileSync, writeFileSync } from 'node:fs';
+import { readFileSync, writeFileSync, existsSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -201,7 +202,72 @@ const output = {
   sources: v31.sources || [],
 };
 
-writeFileSync(OUT_PATH, JSON.stringify(output, null, 2) + '\n');
+// --- Guardia anti-regeneración destructiva (2026-09-04) ---
+//
+// El catálogo v3.2 en disco puede contener especies (y fuentes) dadas de alta a mano
+// DESPUÉS de la última migración. Este script parte de la fuente v3.1 y regenera el
+// archivo de salida incondicionalmente: si esas altas manuales no existen en v3.1, la
+// regeneración las borra en silencio y sale con exit 0. Eso ya pasó dos veces en un día
+// (incidente 2026-09-04): el borrado se llevó eruca_vesicaria (rúcula) y
+// cucurbita_pepo (calabacín), justo las del hard-test de entrega a usuarios prueba.
+//
+// Guardia: si el archivo de salida ya existe en disco, se compara el conjunto de ids
+// (species + sources) del existente contra el que se va a escribir. Si la salida PIERDE
+// aunque sea un id, se aborta sin escribir, se listan las bajas en stderr y se sale con
+// código distinto de cero. Con --permitir-bajas se escribe igual, pero el aviso se imprime.
+function idsOf(catalog) {
+  const set = new Set();
+  for (const sp of catalog.species || []) {
+    if (sp && typeof sp.id === 'string') set.add('sp:' + sp.id);
+  }
+  for (const src of catalog.sources || []) {
+    if (src && typeof src.id === 'string') set.add('src:' + src.id);
+  }
+  return set;
+}
+
+const ALLOW_LOSSES = process.argv.includes('--permitir-bajas');
+
+function writeGuarded() {
+  const json = JSON.stringify(output, null, 2) + '\n';
+  const hasExisting = existsSync(OUT_PATH);
+  if (hasExisting && !ALLOW_LOSSES) {
+    const existing = JSON.parse(readFileSync(OUT_PATH, 'utf8'));
+    const existingIds = idsOf(existing);
+    const newIds = idsOf(output);
+    const lost = [...existingIds].filter((id) => !newIds.has(id));
+    if (lost.length > 0) {
+      const detalles = lost.map((id) => {
+        const [kind, key] = id.split(':');
+        const entry =
+          kind === 'sp'
+            ? (output.species || []).find((s) => s.id === key)
+            : (output.sources || []).find((s) => s.id === key);
+        const nombre =
+          kind === 'sp'
+            ? entry?.nombre_comun || entry?.nombre_cientifico || ''
+            : entry?.titulo || entry?.title || entry?.nombre || '';
+        return `  - ${kind === 'sp' ? 'especie' : 'fuente'} ${key}${nombre ? ` (${nombre})` : ''}`;
+      });
+      console.error('\n[ABORTO] la migración perdería datos ya presentes en el catálogo v3.2:');
+      console.error(detalles.join('\n'));
+      console.error('\nSi el borrado es intencional, corré con la bandera --permitir-bajas.');
+      process.exit(1);
+    }
+  } else if (hasExisting && ALLOW_LOSSES) {
+    const existing = JSON.parse(readFileSync(OUT_PATH, 'utf8'));
+    const existingIds = idsOf(existing);
+    const newIds = idsOf(output);
+    const lost = [...existingIds].filter((id) => !newIds.has(id));
+    if (lost.length > 0) {
+      console.error(`\n[--permitir-bajas] se registran ${lost.length} bajas contra el catálogo existente:`);
+      console.error(lost.join('\n'));
+    }
+  }
+  writeFileSync(OUT_PATH, json);
+}
+
+writeGuarded();
 
 // --- Resumen en consola ---
 console.log('\n=== MIGRACIÓN v3.1 → v3.2 COMPLETADA ===');

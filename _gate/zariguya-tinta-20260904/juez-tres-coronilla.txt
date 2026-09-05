@@ -1,0 +1,10 @@
+Top-left: rayado fino de tinta; no borde/escalón visible  
+Top-right: gorro de parches planos con borde; hay borde/escalón visible  
+
+Middle-left: rayado fino de tinta; no borde/escalón visible  
+Middle-right: gorro de parches planos con borde; hay borde/escalón visible  
+
+Bottom-left: rayado fino de tinta; no borde/escalón visible  
+Bottom-right: gorro de parches planos con borde; hay borde/escalón visible  
+
+En cada fila, el lado derecho (DERECHA) tiene la coronilla como "gorro" (parches planos con borde), mientras que el izquierdo (IZQUIERDA) es "rayado fino de tinta".

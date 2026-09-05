@@ -20,6 +20,8 @@
  *     (falta el dato) es SlotPendiente en la UI, nunca un inventado.
  */
 
+import { FICHAS_AGROCLIMATICAS } from '../data/fichasAgroclimaticas.js';
+
 /* ─────────────────────────── VPD ─────────────────────────────────────────
  * Déficit de presión de vapor (kPa): "cuánta sed tiene el aire".
  * es(T) = 0.6108·exp(17.27·T/(T+237.3))  [Tetens, FAO-56 eq. 11]
@@ -93,6 +95,113 @@ export function deficitAcumulado(dias) {
         }
     }
     return n ? { faltaMm: Math.round(acc * 10) / 10, dias: n } : null;
+}
+
+/* ───────────────────────── HORAS-FRÍO ────────────────────────────────────
+ * Conteo simple de porciones horarias por debajo de 7 °C. La serie puede ser
+ * el array `temperature_2m` de Open-Meteo, un array de muestras numéricas o
+ * muestras con `temperature_2m`/`temperature`.
+ */
+export function horasFrio(serieHoraria, umbralC = 7) {
+    if (!Number.isFinite(umbralC)) return null;
+    const muestras = Array.isArray(serieHoraria)
+        ? serieHoraria
+        : serieHoraria?.temperature_2m;
+    if (!Array.isArray(muestras)) return null;
+
+    return muestras.reduce((total, muestra) => {
+        const temp = typeof muestra === 'number'
+            ? muestra
+            : muestra?.temperature_2m ?? muestra?.temperature;
+        return total + (Number.isFinite(temp) && temp < umbralC ? 1 : 0);
+    }, 0);
+}
+
+/* ───────────────────────────── SPI ───────────────────────────────────────
+ * SPI aquí significa la anomalía estandarizada solicitada por el producto:
+ * (precipitación observada − media histórica) / desviación histórica.
+ * La distribución histórica la entrega el archivo de Open-Meteo; sin media o
+ * desviación válidas se devuelve null para que la UI use SlotPendiente.
+ */
+export function spi(precipMm, historico, desviacion = undefined) {
+    if (!Number.isFinite(precipMm)) return null;
+
+    const media = typeof historico === 'number'
+        ? historico
+        : historico?.precip_dia_normal ?? historico?.media ?? historico?.mean;
+    const desv = typeof historico === 'number'
+        ? desviacion
+        : historico?.precip_dia_desv ?? historico?.desviacion ?? historico?.standardDeviation ?? historico?.stddev;
+
+    if (!Number.isFinite(media) || !Number.isFinite(desv) || desv <= 0) return null;
+    return Math.round(((precipMm - media) / desv) * 100) / 100;
+}
+
+/* ───────────────────────────── SPEI ─────────────────────────────────────
+ * SPEI es el SPI aplicado al balance hídrico (precipitación − PET/ETc), no a
+ * la precipitación cruda. La serie se acumula en la ventana antes de
+ * estandarizarla, de modo que un déficit sostenido conserva signo negativo.
+ * Acepta números netos, resultados de balanceHidricoDia() o días con
+ * `precipMm`/`etcMm` (también sus nombres normalizados con guion bajo).
+ * La normal debe describir el balance de la misma ventana y traer media y
+ * desviación, igual que spi().
+ */
+function balanceNetoDeDia(dia) {
+    if (Number.isFinite(dia)) return dia;
+    if (Number.isFinite(dia?.netoMm)) return dia.netoMm;
+
+    const precip = dia?.precipMm ?? dia?.precip_mm ?? dia?.precip ?? dia?.precipitation;
+    const etc = dia?.etcMm ?? dia?.etc_mm ?? dia?.etc;
+    if (!Number.isFinite(precip) || !Number.isFinite(etc)) return null;
+    return balanceHidricoDia(precip, etc)?.netoMm ?? null;
+}
+
+function balanceAcumulado(serie) {
+    if (Number.isFinite(serie)) return serie;
+    if (serie && typeof serie === 'object' && !Array.isArray(serie)) return balanceNetoDeDia(serie);
+    if (!Array.isArray(serie)) return null;
+    let acumulado = 0;
+    let dias = 0;
+    for (const dia of serie) {
+        const neto = balanceNetoDeDia(dia);
+        if (Number.isFinite(neto)) {
+            acumulado += neto;
+            dias += 1;
+        }
+    }
+    return dias ? acumulado : null;
+}
+
+export function spei(serieBalance, historico, desviacion = undefined) {
+    const acumulado = balanceAcumulado(serieBalance);
+    if (!Number.isFinite(acumulado)) return null;
+
+    const media = typeof historico === 'number'
+        ? historico
+        : historico?.balance_acumulado_normal
+            ?? historico?.balance_hidrico_acumulado_normal
+            ?? historico?.balance_normal
+            ?? historico?.balance_hidrico_normal
+            ?? historico?.balance_dia_normal
+            ?? historico?.balanceNormal
+            ?? historico?.balanceMmNormal
+            ?? historico?.media
+            ?? historico?.mean;
+    const desv = typeof historico === 'number'
+        ? desviacion
+        : historico?.balance_acumulado_desv
+            ?? historico?.balance_hidrico_acumulado_desv
+            ?? historico?.balance_desv
+            ?? historico?.balance_hidrico_desv
+            ?? historico?.balance_dia_desv
+            ?? historico?.balanceDesv
+            ?? historico?.balanceMmDesv
+            ?? historico?.desviacion
+            ?? historico?.standardDeviation
+            ?? historico?.stddev;
+
+    if (!Number.isFinite(media) || !Number.isFinite(desv) || desv <= 0) return null;
+    return Math.round(((acumulado - media) / desv) * 100) / 100;
 }
 
 /* ─────────────────────────── ANOMALÍA ────────────────────────────────────
@@ -252,6 +361,7 @@ export const CULTIVOS_AGRO = Object.freeze({
         nombre: 'Tomate', emoji: '🍅', kc: { ini: 0.6, mid: 1.15, end: 0.8 }, kcConfianza: 'alta',
         kcFuente: 'FAO-56 Tabla 12 (tomate)', enfermedades: ['tizon_tomate', 'antracnosis'], gddId: null,
         piso: 'templado', aguaNota: 'UV alto quema el fruto; riego constante evita rajado.',
+        fichaAgroclimatica: FICHAS_AGROCLIMATICAS.tomate,
     },
     frijol: {
         nombre: 'Fríjol', emoji: '🫘', kc: { ini: 0.4, mid: 1.15, end: 0.35 }, kcConfianza: 'alta',
@@ -293,6 +403,48 @@ export const CULTIVOS_AGRO = Object.freeze({
         kcFuente: 'FAO-56 (berries ~1.05)', enfermedades: ['antracnosis'], gddId: null,
         piso: 'frio', aguaNota: 'Poda y buen drenaje; la antracnosis mancha el fruto.',
     },
+    fresa: {
+        nombre: 'Fresa', emoji: '🍓', kc: {}, kcConfianza: 'pendiente',
+        kcFuente: 'Kc pendiente de una fuente específica para esta ficha', enfermedades: [], gddId: null,
+        piso: 'frio', aguaNota: 'Evite humedad persistente en flores y frutos.',
+        fichaAgroclimatica: FICHAS_AGROCLIMATICAS.fresa,
+    },
+    granadilla: {
+        nombre: 'Granadilla', emoji: '🟠', kc: {}, kcConfianza: 'pendiente',
+        kcFuente: 'Kc pendiente de una fuente específica para esta ficha', enfermedades: [], gddId: null,
+        piso: 'templado', aguaNota: 'Revise drenaje y ventilación en épocas húmedas.',
+        fichaAgroclimatica: FICHAS_AGROCLIMATICAS.granadilla,
+    },
+    tomate_cherry: {
+        nombre: 'Tomate Cherry', emoji: '🍅', kc: { ini: 0.6, mid: 1.15, end: 0.8 }, kcConfianza: 'alta',
+        kcFuente: 'FAO-56 Tabla 12 (tomate)', enfermedades: ['tizon_tomate', 'antracnosis'], gddId: null,
+        piso: 'templado', aguaNota: 'Mantenga ventilación y riego uniforme bajo cubierta.',
+        fichaAgroclimatica: FICHAS_AGROCLIMATICAS.tomate_cherry,
+    },
+    espinaca: {
+        nombre: 'Espinaca', emoji: '🥬', kc: {}, kcConfianza: 'pendiente',
+        kcFuente: 'Kc pendiente de una fuente específica para esta ficha', enfermedades: [], gddId: null,
+        piso: 'frio', aguaNota: 'El calor y la sequía aceleran la floración.',
+        fichaAgroclimatica: FICHAS_AGROCLIMATICAS.espinaca,
+    },
+    gulupa: {
+        nombre: 'Gulupa', emoji: '🟣', kc: {}, kcConfianza: 'pendiente',
+        kcFuente: 'Kc pendiente de una fuente específica para esta ficha', enfermedades: [], gddId: null,
+        piso: 'templado', aguaNota: 'Revise vigor y agua disponible durante floración.',
+        fichaAgroclimatica: FICHAS_AGROCLIMATICAS.gulupa,
+    },
+    limon: {
+        nombre: 'Limón', emoji: '🍋', kc: {}, kcConfianza: 'pendiente',
+        kcFuente: 'Kc pendiente de una fuente específica para esta ficha', enfermedades: [], gddId: null,
+        piso: 'templado', aguaNota: 'Revise brotes después de noches frías.',
+        fichaAgroclimatica: FICHAS_AGROCLIMATICAS.limon,
+    },
+    guayaba: {
+        nombre: 'Guayaba', emoji: '🍐', kc: {}, kcConfianza: 'pendiente',
+        kcFuente: 'Kc pendiente de una fuente específica para esta ficha', enfermedades: [], gddId: null,
+        piso: 'calido', aguaNota: 'Las lluvias altas elevan el riesgo de antracnosis en fruto.',
+        fichaAgroclimatica: FICHAS_AGROCLIMATICAS.guayaba,
+    },
     aguacate: {
         nombre: 'Aguacate', emoji: '🥑', kc: { ini: 0.6, mid: 0.85, end: 0.75 }, kcConfianza: 'baja',
         kcFuente: 'Estimado (fuera de FAO-56 Tabla 12)', enfermedades: [], gddId: null,
@@ -315,7 +467,7 @@ const SINONIMOS = Object.freeze({
     cafe: 'cafe', café: 'cafe', cafeto: 'cafe',
     papa: 'papa', papas: 'papa',
     maiz: 'maiz', maíz: 'maiz', choclo: 'maiz', mazorca: 'maiz',
-    tomate: 'tomate', jitomate: 'tomate',
+    tomate: 'tomate', jitomate: 'tomate', 'tomate cherry': 'tomate_cherry', 'tomate-cherry': 'tomate_cherry', 'tomate cherry-invernadero': 'tomate_cherry',
     frijol: 'frijol', fríjol: 'frijol', frijoles: 'frijol', habichuela: 'frijol', poroto: 'frijol',
     platano: 'platano', plátano: 'platano', banano: 'platano', guineo: 'platano',
     cacao: 'cacao',
@@ -323,7 +475,12 @@ const SINONIMOS = Object.freeze({
     arroz: 'arroz',
     cana: 'cana', caña: 'cana', 'caña de azucar': 'cana',
     yuca: 'yuca', mandioca: 'yuca',
-    mora: 'mora', mortiño: 'mora', arandano: 'mora', arándano: 'mora', fresa: 'mora', frutilla: 'mora',
+    mora: 'mora', mortiño: 'mora', arandano: 'mora', arándano: 'mora', fresa: 'fresa', 'fresa-invernadero': 'fresa', frutilla: 'fresa',
+    granadilla: 'granadilla',
+    espinaca: 'espinaca',
+    gulupa: 'gulupa', 'gulupa-invernadero': 'gulupa',
+    limon: 'limon', limón: 'limon', 'limon-invernadero': 'limon', 'limón-invernadero': 'limon',
+    guayaba: 'guayaba', 'guayaba-invernadero': 'guayaba',
     aguacate: 'aguacate', palta: 'aguacate',
     lulo: 'lulo', naranjilla: 'lulo',
     pasto: 'pasto', potrero: 'pasto', pastura: 'pasto', forraje: 'pasto', ganado: 'pasto',

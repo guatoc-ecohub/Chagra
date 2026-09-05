@@ -56,6 +56,9 @@ import SceneTrazoMinimal from './SceneTrazoMinimal';
 // a src/components/_archivado/. Las puertas como cartas (PortalesMano) siguen
 // como la vía a los mundos. Ver ops/ARCHIVO-HOME-2D-20260826.md.
 import PortalesMano from './PortalesMano';
+// LA PUERTA DEL VALLE: teaser con CUADROS REALES del valle + entrada New Donk.
+// Reintroduce el acceso al valle 3D desde el home 2D con una capa ligera.
+import ValleHomeGateway from './ValleHomeGateway';
 import './scene-finca-organismo.css';
 import './scene-finca-nature.css';
 import './scene-huerto-vivo.css';
@@ -539,7 +542,8 @@ export default function FincaVivaHero({ onNavigate, onOpenAgent, onGestionar, on
         <main className="fvh-main">
           {/* ── ESCENA ISOMÉTRICA (o slot institucional) ────────────────────── */}
           <div className={`fvh-escena-wrap${escenaVivaActiva ? ' fvh-escena-wrap--viva' : ''}${organismoActivo ? ' fvh-escena-wrap--organismo' : ''}`}>
-            <div className="fvh-escena">
+            <ValleHomeGateway onNavigate={onNavigate} enabled={tieneFincaPropia && escala === 'finca'}>
+              <div className="fvh-escena">
               {/* globo del agente colibrí */}
               <button
                 type="button"
@@ -614,7 +618,8 @@ export default function FincaVivaHero({ onNavigate, onOpenAgent, onGestionar, on
               ) : (
                 <div className="fvh-institucional">{children}</div>
               )}
-            </div>
+              </div>
+            </ValleHomeGateway>
 
             {/* [ARCHIVADO 2026-08-26] Aquí iba el PANEL DE VITALIDAD DEL
                 ESPÍRITU, debajo de la escena. Desmontado del home 2D por orden

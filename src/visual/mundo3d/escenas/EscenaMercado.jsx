@@ -513,7 +513,7 @@ function Diorama({ params, reducedMotion, tier, fauna, estadoFinca, onHotspot = 
       })}
 
       {/* la fauna que anima la feria (polinizadores de puesto y plaza) */}
-      <Fauna items={fauna} reducedMotion={reducedMotion} />
+      <Fauna items={fauna} reducedMotion={reducedMotion} tier={tier} viento={estadoFinca?.viento} />
     </group>
   );
 }

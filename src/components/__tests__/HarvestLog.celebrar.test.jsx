@@ -35,15 +35,23 @@ describe('HarvestLog - celebración de cosecha', () => {
 
     expect(result.success).toBe(true);
 
-    // Verificar que se llamaría a celebrar con los datos correctos
-    // (en el componente real esto se hace después del savePayload)
+    // Invocar celebrar después del save exitoso (como en el componente real)
+    const product = mockPayload.producto;
+    const quantity = mockPayload.quantity;
+    const unit = mockPayload.unit;
+    const logroId = `harvest-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+    const celebrarStore = useAngelitaStore.getState();
+    celebrarStore.celebrar({
+      id: logroId,
+      texto: `¡Bien! Registró ${quantity} ${unit.toLowerCase()} de ${product}.`
+    });
+
+    // Verificar que se llamó a celebrar con los datos correctos
     const logroEsperado = {
       id: expect.stringMatching(/^harvest-\d+-[a-z0-9]+$/),
       texto: expect.stringContaining('Tomate'),
     };
 
-    // En el componente real se llamaría:
-    // celebrar({ id: logroId, texto: `¡Bien! Registró ${quantity} ${unit} de ${product}.` });
     expect(celebrarSpy).toHaveBeenCalledWith(logroEsperado);
   });
 

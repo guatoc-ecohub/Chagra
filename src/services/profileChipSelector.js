@@ -60,7 +60,19 @@ const GENERAL_CHIPS = Object.freeze([
   CHIP_INTENTS.precio,
 ]);
 
-/** Chips de consulta técnica (variedades, fenología, polinización, fuentes). */
+/**
+ * Chips de consulta técnica (variedades, fenología, polinización, fuentes).
+ *
+ * `fuente_doi` sigue en este set porque SU DEUDA está documentada y decidida:
+ * la tool `get_fuente_doi` NO existe en el sidecar (verificación en vivo 4
+ * capas, 2026-09-04, build 5bd011ff: 45 tools, ninguna con fuente/doi; 404 en
+ * POST /tools/get_fuente_doi; fuera de ALLOWED_TOOLS — ver
+ * docs/known-issues/chips-menu-perfiles-sin-cablear.md). La task 092 manda
+ * PARAR el cableado hasta que la tool exista; despintarla de aquí sería otra
+ * decisión de producto que nadie tomó. La dejamos pintada para el técnico
+ * sabiendo que su turno cae al NLU — es la deuda abierta de la card 092, NO
+ * un estado nuevo.
+ */
 const TECHNICAL_CHIPS = Object.freeze([
   CHIP_INTENTS.variedades,
   CHIP_INTENTS.fenologia,
@@ -85,7 +97,14 @@ const RESTAURACION_CHIPS = Object.freeze([
 const ROLE_BASE_CHIPS = Object.freeze({
   [PROFILE_ROLES.campesino]: Object.freeze([
     CHIP_INTENTS.siembro,
-    CHIP_INTENTS.asociaciones, // destacado: policultivo es núcleo campesino.
+    // CHIP_INTENTS.asociaciones DESPINTADA de la toolbar (card 092, 2026-09-04):
+    // sin routing determinístico en planForcedIntent, el turno con texto caía
+    // al NLU en silencio. La alternativa honesta de la card cuando no hay
+    // decisión de producto es despintarla, no dejarla puesta sin efecto. La
+    // vista sigue viva por el heroRoute del AgentHero (kind:'nav' → vista
+    // 'asociaciones', que SÍ funciona) y el bypass de operador la conserva
+    // para que el operador pueda evaluarla. Ver
+    // docs/known-issues/chips-menu-perfiles-sin-cablear.md.
     CHIP_INTENTS.plaga,
     CHIP_INTENTS.biopreparado,
     CHIP_INTENTS.clima,
@@ -125,7 +144,9 @@ const ROLE_BASE_CHIPS = Object.freeze({
   // Técnico/agrónomo: set amplio (sabe usar todo); orden = cultivo, técnico, ecológico.
   [PROFILE_ROLES.tecnico]: Object.freeze([
     ...CULTIVO_CHIPS,
-    CHIP_INTENTS.asociaciones,
+    // CHIP_INTENTS.asociaciones despintada aquí también (card 092): mismo
+    // motivo que en el set campesino — sin routing el turno cae al NLU en
+    // silencio y el chip queda pintado sin efecto.
     ...TECHNICAL_CHIPS,
     ...GENERAL_CHIPS,
     ...RESTAURACION_CHIPS,

@@ -112,6 +112,13 @@ jobs:
           # en dev-deploy.yml; ahora prod renderiza el home de 4 portales + escenas
           # vivas por tema en vez del home oscuro tipo agente.
           VITE_FINCA_VIVA_HOME_PERFIL: "true"
+          # BLINDAJE (#3053 / regresión chagra-dev): homeCampesinoBActivo()
+          # (src/config/homeCampesinoBFlag.js) hace DEFAULT ON cuando
+          # VITE_HOME_CAMPESINO_B no está seteada. Sin esto, al promover
+          # dev→main la home campesina B reemplazaría la home NORMAL del PWA
+          # en producción. La campesina vive aparte en campesino.guatoc.co.
+          # Defensivo: NO cambia prod hoy (prod solo despliega en merge a main).
+          VITE_HOME_CAMPESINO_B: "false"
           # Captura server-side de conversaciones del agente para la auditoría
           # diaria (review de respuestas en todas las aristas). Doble gate: esta
           # flag + hasConsent() por usuario (privacy-first). PII completa (sin

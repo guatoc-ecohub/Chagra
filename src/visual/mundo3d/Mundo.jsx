@@ -4,7 +4,7 @@
  *   <Mundo mundoId tier reducedMotion onHotspot onSalir animo energia
  *          estadoFinca hayAlerta />
  *
- * `estadoFinca` = { clima, enso, cosechaReciente, saludFinca, animales } — el
+ * `estadoFinca` = { clima, enso, viento, cosechaReciente, saludFinca, animales } — el
  * estado REAL de la finca que Angelita SIEMPRE refleja (auditoría §5b). Si el
  * host no lo pasa, se cose aquí con `useFincaViva()` (el espejo vivo del dato
  * real, offline-first y anti-fabricación); un `estadoFinca` explícito lo pisa.
@@ -26,6 +26,7 @@ import useAudioMundo from './useAudioMundo.js';
 import useFincaViva from './useFincaViva.js';
 import InvitacionAudioMundo from './InvitacionAudioMundo.jsx';
 import { AlMontarEscena } from '../creatures/AbejaTransicion.jsx';
+import Caida3DBoundary from './Caida3DBoundary.jsx';
 import './mundo.css';
 
 /* Los dioramas 3D se cargan PEREZOSO: three/@react-three viven en su propio
@@ -212,36 +213,38 @@ function MundoInterno({
       : plan.entrada.params;
     return (
       <div className="mundo-root" data-dim="3d" data-mundo={mundoId}>
-        <Suspense fallback={<MundoCargando tinte={tinte} onTimeout={alTimeout3D} />}>
-          {/* `Escena` es un `lazy` resuelto en useMemo (fresco al reintentar —
-              mecanismo de caída digna, ver cabecera). react-hooks/static-components
-              no distingue ese patrón deliberado del anti-patrón; se silencia con
-              criterio (deuda preexistente en dev, ajena a este cambio). */}
-          {/* eslint-disable-next-line react-hooks/static-components */}
-          <Escena
-            mundoId={mundoId}
-            params={paramsEscena}
-            hotspots={plan.entrada.hotspots}
-            entrada={plan.entrada.entrada}
-            tinte={tinte}
-            tier={/** @type {"bajo"|"alto"|"medio"} */ (tier)}
-            reducedMotion={reducedMotion}
-            onHotspot={onHotspot}
-            onSalir={onSalir}
-            animo={animo}
-            energia={energia}
-            estadoFinca={estadoReal}
-            hayAlerta={hayAlerta}
-            climaLive={climaLive}
-            hablando={hablando}
-            focoId={focoId}
-            focoToken={focoToken}
-          />
-          {/* CRUCE 2D→3D: hermano de <Escena> — su useEffect dispara cuando el
-              chunk 3D resolvió y la escena montó (Suspense revela a los hijos
-              juntos). Enciende el overlay de Angelita cruzando de 2D a 3D. */}
-          <AlMontarEscena onMonta={() => { if (!reducedMotion) setCruce('entrar'); }} />
-        </Suspense>
+        <Caida3DBoundary key={intento} onCaida={alTimeout3D}>
+          <Suspense fallback={<MundoCargando tinte={tinte} onTimeout={alTimeout3D} />}>
+            {/* `Escena` es un `lazy` resuelto en useMemo (fresco al reintentar —
+                mecanismo de caída digna, ver cabecera). react-hooks/static-components
+                no distingue ese patrón deliberado del anti-patrón; se silencia con
+                criterio (deuda preexistente en dev, ajena a este cambio). */}
+            {/* eslint-disable-next-line react-hooks/static-components */}
+            <Escena
+              mundoId={mundoId}
+              params={paramsEscena}
+              hotspots={plan.entrada.hotspots}
+              entrada={plan.entrada.entrada}
+              tinte={tinte}
+              tier={/** @type {"bajo"|"alto"|"medio"} */ (tier)}
+              reducedMotion={reducedMotion}
+              onHotspot={onHotspot}
+              onSalir={onSalir}
+              animo={animo}
+              energia={energia}
+              estadoFinca={estadoReal}
+              hayAlerta={hayAlerta}
+              climaLive={climaLive}
+              hablando={hablando}
+              focoId={focoId}
+              focoToken={focoToken}
+            />
+            {/* CRUCE 2D→3D: hermano de <Escena> — su useEffect dispara cuando el
+                chunk 3D resolvió y la escena montó (Suspense revela a los hijos
+                juntos). Enciende el overlay de Angelita cruzando de 2D a 3D. */}
+            <AlMontarEscena onMonta={() => { if (!reducedMotion) setCruce('entrar'); }} />
+          </Suspense>
+        </Caida3DBoundary>
         {/* El overlay cruza al compañero elegido. La resolución vive en el
             chunk lazy para conservar el límite del bundle base. */}
         {cruce === 'entrar' && !reducedMotion && (

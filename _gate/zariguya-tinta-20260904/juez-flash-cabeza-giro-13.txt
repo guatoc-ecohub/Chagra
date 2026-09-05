@@ -1,0 +1,31 @@
+A continuación, se detalla la evaluación de defectos de articulación para cada imagen:
+
+---
+
+**VERSIÓN IZQUIERDA:**
+
+*   **Hueco o línea clara entre cabeza y cuello:** Sí, se observa una línea blanca delgada y un ligero hueco en la parte inferior de la cabeza, justo donde se une al cuello, debajo de la mandíbula. Esta línea se extiende sutilmente hacia el lado derecho del cuello, indicando una separación.
+*   **Escalón en la silueta:** No se observa un escalón marcado en la silueta general del animal.
+*   **Parche o mancha que no pertenece al pelaje:** Sí, hay pequeñas motas o residuos blanquecinos irregulares en el fondo alrededor del contorno del animal, especialmente a la izquierda del cuerpo y cerca de la boca. No se integran con el pelaje ni el fondo principal.
+*   **Gorro o casquete sobre la coronilla o la nuca:** No se observa un gorro o casquete.
+*   **Bigotes dobles o fantasma:** No se aprecian bigotes dobles o fantasma. Los bigotes son claros y definidos.
+*   **Borde duro o cortado:** Sí, el borde inferior izquierdo del cuerpo presenta un corte abrupto y duro. La transición del pelaje en algunas zonas, como la base de los bigotes del lado derecho del animal, también muestra un contraste algo duro con el fondo.
+
+---
+
+**VERSIÓN DERECHA:**
+
+*   **Hueco o línea clara entre cabeza y cuello:** Sí, se observa una línea blanca más prominente y un hueco más evidente que en la versión izquierda, justo en la unión de la cabeza y el cuello, debajo de la mandíbula y extendiéndose hacia el lado derecho del cuello.
+*   **Escalón en la silueta:** No se observa un escalón marcado en la silueta general del animal, aunque la baja resolución general le da un aspecto más "pixelado" a los bordes.
+*   **Parche o mancha que no pertenece al pelaje:** Sí, hay varias manchas oscuras irregulares claramente visibles y dispersas en el fondo blanco, especialmente a la izquierda del cuello y debajo de la mandíbula. Estas manchas no forman parte del pelaje ni del fondo deseado.
+*   **Gorro o casquete sobre la coronilla o la nuca:** No se observa un gorro o casquete.
+*   **Bigotes dobles o fantasma:** No se aprecian bigotes dobles o fantasma, aunque los bigotes son más gruesos y menos definidos que en la versión izquierda.
+*   **Borde duro o cortado:** Sí, el borde inferior izquierdo del cuerpo presenta un corte muy abrupto y duro. La mayoría de los bordes del animal, debido a la fuerte pixelación, se ven más cortados y menos suaves que en la versión izquierda.
+
+---
+
+**Conclusión:**
+
+La imagen de la **IZQUIERDA** articula más limpio.
+
+**Razón:** Aunque ambas versiones presentan defectos de articulación, la imagen izquierda exhibe una línea clara y huecos entre la cabeza y el cuello menos pronunciados, y las manchas o residuos en el fondo son más pequeños, más sutiles y blanquecinos (no oscuros), lo que los hace menos disruptivos visualmente. Además, el detalle del pelaje y los bigotes es más fino y la silueta general está menos pixelada, lo que resulta en una apariencia más integrada y menos "cortada" en comparación con la imagen derecha, que tiene manchas ajenas al pelaje más notorias y oscuras, y una pixelación general que endurece visiblemente todos sus bordes.

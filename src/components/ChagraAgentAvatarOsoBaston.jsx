@@ -36,24 +36,30 @@ import { useAngelitaPresencia, esPasivo } from '../visual/agente/useAngelitaPres
  * caminando). ADITIVA: `reaccionaPresencia=false` (el default) deja el
  * adaptador idéntico a como estaba.
  */
-const POSE_DE_STATE = {
-    idle: 'anda',
-    thinking: 'anda',
-    speaking: 'celebra',
-    listening: 'reposo',
-    caminando: 'camina',
-};
-
 const RESOPLA_DE_STATE = {
     thinking: true,
+    pensando: true,
 };
 
 const VISEMA_DE_STATE = {
     speaking: 'V2',
+    respondiendo: 'V2',
+};
+
+const ESTADO_DE_STATE = {
+    idle: 'acompana',
+    // eslint-disable-next-line chagra-i18n/no-hardcoded-spanish
+    thinking: 'pensando',
+    // eslint-disable-next-line chagra-i18n/no-hardcoded-spanish
+    speaking: 'respondiendo',
+    listening: 'escuchando',
+    caminando: 'caminando',
 };
 
 export default function ChagraAgentAvatarOsoBaston({
     state = 'idle',
+    estado = undefined,
+    visema: visemaRecibido = null,
     size = 48,
     withLabel = false,
     onClick = undefined,
@@ -67,12 +73,20 @@ export default function ChagraAgentAvatarOsoBaston({
     // los cablee.
     animated = true,
     tier = undefined,
+    clima = null,
+    enso = 'neutro',
+    direccion = 'derecha',
+    reducedMotion = false,
     vida = true,
+    'data-agt-estado': dataEstado = undefined,
+    'data-pose': dataPose = undefined,
+    'data-visema': dataVisema = undefined,
     // Presencia (pedido operador 2026-08-24, transversal al elenco): con
     // reaccionaPresencia el oso DESPIERTA a su estado natural (idle vivo) al
     // detectar presencia, sin pisar una actuación conversacional real. Mismo
     // contrato que ChagraAgentAvatarAngelita/Jaguar.
     reaccionaPresencia = true,
+    ...atributosConducta
 }) {
     const { despierta, handlers: handlersPresencia } = useAngelitaPresencia({
         activo: reaccionaPresencia,
@@ -80,24 +94,33 @@ export default function ChagraAgentAvatarOsoBaston({
     // La presencia solo despierta cuando el estado es pasivo (idle): jamás
     // interrumpe una actuación conversacional ni la caminata. Despertar =
     // garantizar el idle-cerebro (vida) encendido sobre su pose base 'anda'.
-    const despiertaNatural = despierta && esPasivo(state);
-    const estadoEfectivo = despiertaNatural ? 'idle' : state;
-    const pose = POSE_DE_STATE[estadoEfectivo] || 'anda';
+    const estadoAgente = estado || ESTADO_DE_STATE[state] || 'acompana';
+    const despiertaNatural = despierta && esPasivo(estadoAgente);
+    const estadoEfectivo = despiertaNatural ? 'acompana' : estadoAgente;
     const resopla = !!RESOPLA_DE_STATE[estadoEfectivo];
-    const visema = VISEMA_DE_STATE[estadoEfectivo] || null;
+    // eslint-disable-next-line chagra-i18n/no-hardcoded-spanish
+    const visema = visemaRecibido ?? VISEMA_DE_STATE[state] ?? (estadoEfectivo === 'respondiendo' ? 'V2' : null);
 
     const bicho = (
         <OsoBaston
-            pose={pose}
+            estado={estadoEfectivo}
             resopla={resopla}
             visema={visema}
             size={size}
             animated={animated}
+            clima={clima}
+            enso={enso}
+            direccion={direccion}
+            reducedMotion={reducedMotion}
             tier={tier}
             vida={vida || despiertaNatural}
             title={ariaLabel}
             className={className}
             style={glow ? { filter: 'drop-shadow(0 0 10px rgba(67,194,79,0.65))' } : undefined}
+            data-agt-estado={dataEstado || estadoAgente}
+            data-pose={dataPose}
+            data-visema={dataVisema || visema || undefined}
+            {...atributosConducta}
         />
     );
 

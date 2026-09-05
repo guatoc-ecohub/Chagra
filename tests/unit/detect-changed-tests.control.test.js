@@ -17,7 +17,7 @@ function git(cwd, ...args) {
   return execFileSync('git', args, { cwd, encoding: 'utf8' }).trim();
 }
 
-function fixture({ withBaseRef = true, changed = false } = {}) {
+function fixture({ withBaseRef = true, changed = false, changedSpec = false } = {}) {
   const root = mkdtempSync(join(tmpdir(), 'chagra-detector-control-'));
   mkdirSync(join(root, 'tests', 'unit'), { recursive: true });
   writeFileSync(join(root, 'tests', 'unit', 'selected.test.js'), 'export {}\n');
@@ -36,6 +36,19 @@ function fixture({ withBaseRef = true, changed = false } = {}) {
     writeFileSync(join(root, 'tests', 'unit', 'changed.test.js'), 'export {}\n');
     git(root, 'add', '.');
     git(root, 'commit', '-qm', 'change');
+  }
+  if (changedSpec) {
+    // Un `.spec.js` es Playwright E2E (o gate de carril en `_gate/`), NO un
+    // unit test de vitest: vitest.config.js solo incluye `*.test.{js,jsx,mjs}`
+    // y excluye `tests/*.spec.js`. Si el detector lo mandara al job de vitest,
+    // el filtro no matchea ningún archivo incluido y el gate muere con
+    // "No test files found" (el rojo de #3150). El contrato del detector es
+    // "tests unitarios relevantes al diff"; un spec sin unit test hermano no
+    // toca la superficie de vitest.
+    mkdirSync(join(root, '_gate'), { recursive: true });
+    writeFileSync(join(root, '_gate', 'gate-carril.spec.js'), 'export {}\n');
+    git(root, 'add', '.');
+    git(root, 'commit', '-qm', 'change spec');
   }
 
   return root;
@@ -83,6 +96,25 @@ describe('detect-changed-tests.mjs: control de la condición CI', () => {
     } finally {
       rmSync(emptyRoot, { recursive: true, force: true });
       rmSync(missingBaseRoot, { recursive: true, force: true });
+    }
+  });
+
+  it('NO manda un .spec.js de Playwright/gate al job de vitest (el rojo de #3150)', () => {
+    // Reproduce la condición exacta del check rojo de #3150: un diff que toca
+    // SOLO un `_gate/*.spec.js` (spec de Playwright de carril, no unit test).
+    // Con el detector viejo la salida era "_gate/gate-carril.spec.js", vitest
+    // filtraba contra sus include (que no cubren `_gate/` ni `.spec.`) y el
+    // gate moría con "No test files found". El contrato del detector es
+    // seleccionar UNIT tests de vitest: sin hermano `.test.*`, el diff no toca
+    // la superficie de vitest y la salida debe ser vacía (has_tests=false).
+    const root = fixture({ changedSpec: true });
+    try {
+      const result = runDetector(root);
+      expect(result.status).toBe(0);
+      expect(result.stdout.trim()).toBe('');
+      expect(result.stderr).toContain('sin tests unitarios relacionados');
+    } finally {
+      rmSync(root, { recursive: true, force: true });
     }
   });
 });

@@ -18,6 +18,7 @@ import { describe, it, expect, afterEach, beforeEach, vi } from 'vitest';
 import { render, cleanup, act } from '@testing-library/react';
 import { Angelita } from '../Angelita.jsx';
 import { TEXTO_NO_SE, ARIA_DE_ESTADO } from '../angelitaEstados.js';
+import { COMPAI_ESPECIES } from '../compaiEspecies.js';
 import BurbujaAngelita from '../BurbujaAngelita.jsx';
 
 afterEach(cleanup);
@@ -70,5 +71,54 @@ describe('3. idleCerebro — apaga SOLO el idle-cerebro grande (usado por la pau
     const { container } = render(<Angelita estado="acompana" animated />);
     act(() => { vi.advanceTimersByTime(0); });
     expect(container.querySelector('svg').getAttribute('data-agt-idle')).toBe('flota');
+  });
+});
+
+describe('4. caso dorado — fachada común sin tocar estados ni poses', () => {
+  it('conserva el mapa de estados/poses del perfil Angelita', () => {
+    const perfil = COMPAI_ESPECIES.angelita;
+    const estados = Object.keys(perfil.posePorEstado).filter((estado) => estado !== 'caminando');
+
+    for (const estado of estados) {
+      const { container, unmount } = render(<Angelita estado={estado} animated={false} />);
+      const svg = container.querySelector('svg[data-agente="angelita"]');
+
+      expect(svg).toHaveAttribute('data-agt-especie', 'angelita');
+      expect(svg).toHaveAttribute('data-creature', perfil.creatureSlug);
+      expect(svg).toHaveAttribute('data-agt-estado', estado);
+      expect(svg).toHaveAttribute('data-pose', perfil.posePorEstado[estado]);
+      unmount();
+    }
+  });
+
+  it('mantiene el SVG como raíz visual y no duplica el chrome del cuerpo dorado', () => {
+    const { container } = render(
+      <Angelita estado="respondiendo" confianza="baja" clima="lluvia" visema="V3" />,
+    );
+
+    expect(container.firstElementChild).toBe(container.querySelector('svg[data-agente="angelita"]'));
+    expect(container.querySelector('.compai-agente')).toBeNull();
+    expect(container.querySelector('[data-agt-chrome]')).toBeNull();
+    expect(container.querySelector('svg')).toHaveAttribute('data-visema', 'V3');
+  });
+
+  it('conserva la bandera de animación del rig bajo reduced motion', () => {
+    const matchMedia = vi.spyOn(window, 'matchMedia').mockImplementation(() => ({
+      matches: true,
+      media: '(prefers-reduced-motion: reduce)',
+      onchange: null,
+      addListener: () => {},
+      removeListener: () => {},
+      addEventListener: () => {},
+      removeEventListener: () => {},
+      dispatchEvent: () => true,
+    }));
+
+    try {
+      const { container } = render(<Angelita estado="acompana" animated />);
+      expect(container.querySelector('svg')).toHaveAttribute('data-agt-vivo', '1');
+    } finally {
+      matchMedia.mockRestore();
+    }
   });
 });

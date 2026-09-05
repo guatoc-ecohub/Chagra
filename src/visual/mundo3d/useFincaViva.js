@@ -10,6 +10,7 @@
  *   estadoFinca = {
  *     clima,            // 'dorada'|'soleado'|'niebla'|'lluvia'|'noche'
  *     enso,             // 'nino' | 'nina' | 'neutro'  (fase ENSO efectiva)
+ *     viento,           // null | { direccion:{x,z,grados}, fuerza } (Open-Meteo real)
  *     cosechaReciente,  // null | { cultivo, mundoId }
  *     saludFinca,       // { matasVivas, matasTotal, agua? }  (conteos REALES)
  *     animales,         // [{ especie, nombre, raza, tamano, estado }]
@@ -47,6 +48,7 @@ import {
 } from '../../services/climaService.js';
 import { getProfile } from '../../services/userProfileService.js';
 import { normalizarPisoUsuario } from './pisosTermicos.js';
+import { fincaDateISO } from '../../utils/farmDate.js';
 
 /** Re-evalúa la atmósfera cada 10 min (mismo ritmo que useClimaAtmosphere). */
 const REEVAL_MS = 10 * 60 * 1000;
@@ -87,14 +89,6 @@ export function mapearEnso(fase) {
   return 'neutro';
 }
 
-/** 'YYYY-MM-DD' local (mismo criterio que atmosphereService/ejeClima). */
-function isoDiaLocal(d) {
-  const y = d.getFullYear();
-  const m = String(d.getMonth() + 1).padStart(2, '0');
-  const day = String(d.getDate()).padStart(2, '0');
-  return `${y}-${m}-${day}`;
-}
-
 /**
  * `agua` (0..1) para saludFinca. NO hay sensor de humedad de suelo en el repo:
  * derivamos un PROXY honesto de la LLUVIA REAL de hoy (Open-Meteo, la misma
@@ -103,6 +97,9 @@ function isoDiaLocal(d) {
  * llega por El Niño + clima seco en reaccionFinca, no por este número. Sin
  * snapshot de clima → null (reaccionFinca usa su neutro 0.5).
  *
+ * BUG TODAY-UTC-HELADA-20260905: el "hoy" se resuelve en el calendario de la
+ * FINCA (fincaDateISO), no en la zona del runtime/UTC.
+ *
  * @param {object|null} snapshot  getCachedClimaSnapshot()
  * @param {Date} now
  * @returns {number|null}
@@ -110,14 +107,67 @@ function isoDiaLocal(d) {
 export function aguaDeLluvia(snapshot, now = new Date()) {
   const om = snapshot?.openmeteo;
   if (!om?.available || !Array.isArray(om.forecast_7d)) return null;
-  const hoy = isoDiaLocal(now);
+  const hoy = fincaDateISO(now);
   const dia = om.forecast_7d.find((d) => d?.date === hoy) || om.forecast_7d[0];
   const precip = Number(dia?.precip_mm);
   if (!Number.isFinite(precip)) return null;
   return Math.max(0, Math.min(1, 0.5 + (Math.min(precip, 25) / 25) * 0.45));
 }
 
-/** Deriva { clima, enso, agua } de la señal de clima/ENSO cacheada (síncrona). */
+/**
+ * Viento real de Open-Meteo, expresado para el plano XZ de los dioramas.
+ *
+ * Open-Meteo describe el rumbo como el origen meteorológico del viento: 0° es
+ * norte y 90° es este. La escena necesita hacia dónde VIAJA, por eso el vector
+ * invierte ese rumbo. No se infiere dirección desde lluvia, nubosidad ni ENSO:
+ * sin velocidad y rumbo del mismo registro el resultado es `null`.
+ *
+ * El snapshot ha tenido nombres distintos según la versión del sidecar. Se
+ * aceptan solamente pares conocidos, primero lectura actual y luego el resumen
+ * diario. `fuerza` preserva la magnitud que entregó Open-Meteo; la coreografía
+ * la normaliza solo para su amplitud visual.
+ *
+ * @param {object|null} snapshot getCachedClimaSnapshot()
+ * @param {Date} now
+ * @returns {null | {direccion:{x:number,z:number,grados:number}, fuerza:number}}
+ */
+export function vientoDeClima(snapshot, now = new Date()) {
+  const om = snapshot?.openmeteo;
+  if (!om?.available) return null;
+  const hoy = fincaDateISO(now);
+  const dia = Array.isArray(om.forecast_7d)
+    ? om.forecast_7d.find((d) => d?.date === hoy) || om.forecast_7d[0]
+    : null;
+  const fuentes = [om.current, dia].filter((v) => v && typeof v === 'object');
+  const pares = [
+    ['wind_speed_10m', 'wind_direction_10m'],
+    ['wind_speed', 'wind_direction'],
+    ['wind_speed_kmh', 'wind_direction_deg'],
+    ['wind_speed_10m_max', 'wind_direction_10m_dominant'],
+    ['wind_speed_max', 'wind_direction_dominant'],
+  ];
+
+  for (const fuente of fuentes) {
+    for (const [campoFuerza, campoDireccion] of pares) {
+      const fuerza = Number(fuente[campoFuerza]);
+      const grados = Number(fuente[campoDireccion]);
+      if (!Number.isFinite(fuerza) || fuerza < 0 || !Number.isFinite(grados)) continue;
+      const rumbo = ((grados % 360) + 360) % 360;
+      const rad = rumbo * Math.PI / 180;
+      return {
+        direccion: {
+          x: -Math.sin(rad),
+          z: Math.cos(rad),
+          grados: rumbo,
+        },
+        fuerza,
+      };
+    }
+  }
+  return null;
+}
+
+/** Deriva { clima, enso, agua, viento } de la señal cacheada (síncrona). */
 function derivarAtmosfera(now = new Date()) {
   const location = resolveClimaLocation();
   const snapshot = getCachedClimaSnapshot();
@@ -126,6 +176,7 @@ function derivarAtmosfera(now = new Date()) {
     clima: mapearClima(luz, condicion),
     enso: mapearEnso(getEnsoPhase()),
     agua: aguaDeLluvia(snapshot, now),
+    viento: vientoDeClima(snapshot, now),
   };
 }
 
@@ -166,7 +217,7 @@ export function pisoTermicoDePerfil(profile) {
  * (useFincaViva) inyecta procesos/plantas/cosecha/atmósfera ya resueltos.
  */
 function armarEstadoFinca({ processes, plants, summary, atmosfera, pisoTermico, now = new Date() }) {
-  const { clima, enso, agua } = atmosfera;
+  const { clima, enso, agua, viento } = atmosfera;
 
   // saludFinca: conteos REALES de matas (buildFincaScene, la misma fuente que el
   // panel de vitalidad). Pendiente hasta que carguen los procesos, y OMITIDA si
@@ -186,6 +237,7 @@ function armarEstadoFinca({ processes, plants, summary, atmosfera, pisoTermico, 
   return {
     clima,
     enso,
+    viento,
     pisoTermico,
     cosechaReciente: cosechaRecienteDe(summary, now),
     saludFinca,
@@ -201,7 +253,7 @@ function armarEstadoFinca({ processes, plants, summary, atmosfera, pisoTermico, 
  * fuente, al corral). Se re-arma cuando cambian los datos de finca (plantas /
  * cosecha), el clima (evento CLIMA_UPDATED) o el paso del sol (intervalo).
  *
- * @returns {{clima:string, enso:string, cosechaReciente:(null|object), saludFinca:(object|undefined), animales:Array}}
+ * @returns {{clima:string, enso:string, viento:(null|object), cosechaReciente:(null|object), saludFinca:(object|undefined), animales:Array}}
  */
 export function useFincaViva() {
   // Procesos reales (IndexedDB, offline-first). null = aún cargando (pendiente).

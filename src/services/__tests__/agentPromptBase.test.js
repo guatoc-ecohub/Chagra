@@ -189,6 +189,17 @@ describe('formatToolEvidence', () => {
     expect(b).toContain('DATOS VERIFICADOS');
   });
 
+  it('marca rendimiento como SlotPendiente cuando la ficha no tiene cifra', () => {
+    const ev = {
+      tool: 'get_species',
+      args: { q: 'rúcula' },
+      result: { found: true, species: { nombre_comun: 'Rúcula', rendimiento: null } },
+    };
+    const b = formatToolEvidence(ev);
+    expect(b).toContain('RENDIMIENTO = SlotPendiente');
+    expect(b).toContain('ficha sin campo de rendimiento verificado');
+  });
+
   it('trunca datos largos a TOOL_EVIDENCE_MAX_CHARS', () => {
     const longText = 'x'.repeat(TOOL_EVIDENCE_MAX_CHARS + 100);
     const ev = { tool: 'get_species', args: {}, result: { found: true, text: longText } };

@@ -55,10 +55,6 @@ const LAZY_MAP = {
   VentanaValle3D: lazy(() => import('../components/VentanaValle3D.jsx')),
   VistaGlobalSierra: lazy(() => import('../visual/mundo3d/VistaGlobalSierra.jsx')),
   GaleriaSierraArboles: lazy(() => import('../visual/mundo3d/sierra/GaleriaSierraArboles.jsx')),
-  NavegadorGrafoDemo: lazy(() => import('../mockups/NavegadorGrafoDemo.jsx')),
-  RestauracionEnElTiempo: lazy(() => import('../visual/mundo3d/restauracion/RestauracionEnElTiempo.jsx')),
-  DemoAtmosferaViva: lazy(() => import('../visual/mundo3d/atmosfera/DemoAtmosferaViva.jsx')),
-  TransicionesOdysseyDemo: lazy(() => import('../mockups/TransicionesOdysseyDemo.jsx')),
   SierraMonte3D: lazy(() => import('../visual/mundo3d/sierra/SierraMonte3D.jsx')),
   SierraCorteVertical: lazy(() => import('../visual/mundo3d/sierra/SierraCorteVertical.jsx')),
   // Mundos de cultivo por piso térmico (café templado, cacao cálido, papa fría):

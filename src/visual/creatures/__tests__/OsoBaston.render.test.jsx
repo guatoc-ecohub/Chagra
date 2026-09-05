@@ -26,6 +26,11 @@ import { esRubberhose } from '../rubberhoseSpec.js';
 
 afterEach(cleanup);
 
+const ESTADOS_RICOS = [
+  'acompana', 'escuchando', 'pensando', 'respondiendo', 'contenta',
+  'preocupada', 'no-se', 'senala', 'invita', 'husmea',
+];
+
 describe('Oso del bastón — contrato base intacto', () => {
   it('render por defecto = svg accesible, sin capas nuevas', () => {
     const { container } = render(<OsoBaston tier="medio" />);
@@ -180,5 +185,24 @@ describe('7. 70/30 — la piel-lámina sobre huesos y el modo (spec compai)', ()
   it('con animated=false no viaja modo (fotograma digno, sin relojes)', () => {
     const { container } = render(<OsoBaston animated={false} />);
     expect(container.querySelector('svg').getAttribute('data-modo')).toBeNull();
+  });
+});
+
+describe('8. Contrato Compai — estados ricos y marcha plantígrada', () => {
+  it.each(ESTADOS_RICOS)('estado rico %s conserva la pose y firma del oso', (estado) => {
+    const { container } = render(<OsoBaston estado={estado} tier="medio" />);
+    const svg = container.querySelector('svg[data-creature="oso-baston"]');
+    expect(svg).toHaveAttribute('data-agt-estado', estado);
+    expect(svg).toHaveAttribute('data-pose', estado === 'respondiendo' || estado === 'contenta' ? 'celebra' : estado === 'escuchando' ? 'reposo' : estado === 'senala' ? 'señala' : 'anda');
+    expect(svg.querySelector('.osb-baston')).toBeInTheDocument();
+  });
+
+  it('caminando conserva dos frames de marcha plantígrada con bastón', () => {
+    const { container } = render(<OsoBaston estado="caminando" tier="medio" />);
+    const svg = container.querySelector('svg[data-creature="oso-baston"]');
+    expect(svg).toHaveAttribute('data-pose', 'camina');
+    expect(svg.querySelector('.osb-pierna-i')).toBeInTheDocument();
+    expect(svg.querySelector('.osb-pierna-d')).toBeInTheDocument();
+    expect(svg.querySelector('.osb-baston')).toBeInTheDocument();
   });
 });

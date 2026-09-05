@@ -14,7 +14,7 @@ import {
 } from '../../services/agentOutboxService';
 import { analyzeFoliage } from '../../services/aiService';
 import { captureAndCompress } from '../../services/photoService';
-import { processPhotoItem, buildPhotoUserMessage } from '../../services/agentOutboxPhoto';
+import { processPhotoItemBounded, buildPhotoUserMessage } from '../../services/agentOutboxPhoto';
 import { useCompaiSegundaOpinionFoto } from '../../hooks/useCompaiSegundaOpinionFoto';
 import { isAnalyzableImageAttachment, buildAttachmentRejection } from '../../services/agentOutboxAttachment';
 import { AGENT_ENTRANCE_CSS, AGENT_COMPOSITOR_CSS, AGENT_V3_CSS, agentEntranceClass } from './agentEntrance';
@@ -31,6 +31,11 @@ import {
   shouldStartNewSession,
 } from '../../services/conversationMemory';
 import { retrieve } from '../../services/ragRetriever';
+// agentComplexIngest — descompositor determinista de registros multi-entidad.
+// Se consulta ANTES del pipeline sidecar/LLM: si el texto describe varias
+// acciones de campo, se ejecutan las operaciones confirmadas vía actionExecutor
+// (lote/siembra) y se agenda la sugerencia agroecológica en segundo plano.
+import { decomposeComplexIngest, describeComplexIngestOperation, scheduleAgroecologicalSuggestion } from '../../services/agentComplexIngest';
 import { parseIntent, formatIntentDescription } from '../../services/agentIntentParser';
 import { streamOpenAI } from '../../services/openaiStream';
 import { buildLLMRequest, selectChatRoute } from '../../services/llmRouter';
@@ -186,6 +191,22 @@ const STATE_IDLE = 'idle';
 const STATE_RECORDING = 'recording';
 const STATE_THINKING = 'thinking';
 
+const MCP_TOOL_FAILURE_LABELS = {
+  get_calendario_siembra: 'el calendario',
+};
+
+const findMcpToolFailure = (toolEvidence) => {
+  const evidences = Array.isArray(toolEvidence) ? toolEvidence : [toolEvidence];
+  return evidences.find((evidence) => evidence?.result?._error === true) || null;
+};
+
+const mcpToolFailureMessage = (toolEvidence) => {
+  const failure = findMcpToolFailure(toolEvidence);
+  if (!failure) return '';
+  const label = MCP_TOOL_FAILURE_LABELS[failure.tool] || 'esa consulta técnica';
+  return `No pude consultar ${label} ahora. Intenta de nuevo en un momento.`;
+};
+
 export default function AgentScreen({ onBack, onNavigate, initialContext }) {
   // B1: clase de animación de entrada, resuelta UNA vez al montar (no en cada
   // re-render — si no, la animación se reiniciaría con cada mensaje). Vacía bajo
@@ -271,7 +292,9 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
   const [thinkingPhase, setThinkingPhase] = useState(null);
   const [isOnline, setIsOnline] = useState(navigator.onLine);
   const [error, setError] = useState('');
-  const [actionModal, setActionModal] = useState({ isOpen: false, intent: null, llmResponse: '', toolName: '', description: '', parameters: {} });
+  // gateId: id único por acción; el key del ActionConfirmModal remonta el
+  // modal en cada gate (BUG-01). '' = ningún gate abierto todavía.
+  const [actionModal, setActionModal] = useState({ isOpen: false, gateId: '', intent: null, llmResponse: '', toolName: '', description: '', parameters: {} });
   // Task #194: Modal de consentimiento para feedback
   const [feedbackConsentModal, setFeedbackConsentModal] = useState({ isOpen: false, pendingAction: null });
   const ttsSupported = isSupported();
@@ -769,6 +792,12 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
         actionGateResolverRef.current = resolve;
         setActionModal({
           isOpen: true,
+          // gateId: remonta el ActionConfirmModal por acción (key en el JSX).
+          // BUG-01 (P1, hard-test David/Cata): sin esto el modal conservaba el
+          // borrador de parámetros del primer render ({}) y aprobaba la
+          // ejecución de la tool con un plan vacío — el agente decía que
+          // registraba y no persistía nada.
+          gateId: `gate-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
           toolName,
           description,
           parameters,
@@ -851,7 +880,7 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
     const wasEdited = JSON.stringify(params) !== JSON.stringify(actionModal.parameters);
     const resolver = actionGateResolverRef.current;
     actionGateResolverRef.current = null;
-    setActionModal({ isOpen: false, intent: null, llmResponse: '', toolName: '', description: '', parameters: {} });
+    setActionModal({ isOpen: false, gateId: '', intent: null, llmResponse: '', toolName: '', description: '', parameters: {} });
     if (resolver) {
       resolver({
         status: wasEdited ? 'edited' : 'approved',
@@ -863,7 +892,7 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
   const handleActionReject = () => {
     const resolver = actionGateResolverRef.current;
     actionGateResolverRef.current = null;
-    setActionModal({ isOpen: false, intent: null, llmResponse: '', toolName: '', description: '', parameters: {} });
+    setActionModal({ isOpen: false, gateId: '', intent: null, llmResponse: '', toolName: '', description: '', parameters: {} });
     if (resolver) {
       resolver({ status: 'rejected' });
     }
@@ -1415,6 +1444,10 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
         interruptErr.interruptReason = cancelReasonRef.current || 'abort';
         throw interruptErr;
       }
+      // Preserve the typed sidecar failure so the outer pipeline can show the
+      // tool-specific honest message instead of replacing it with a generic
+      // LLM error.
+      if (e?.mcpToolError) throw e;
       const match = e.message.match(/^LLM (\d+)/);
       if (match) {
         const status = parseInt(match[1], 10);
@@ -1503,7 +1536,13 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
       await addTurn(operatorId, { role: 'user', content: text.trim() });
 
       const contextMemory = wasFreshSession ? '' : await getContextString(operatorId, 10);
-      const contextCorpusBase = await retrieve(textForLLM, TOP_N_RAG, 'agente');
+      // La foto ya pasó por visión. En un arranque frío, construir el índice
+      // RAG completo aquí vuelve a descargar cientos de fichas antes de la
+      // respuesta. Para este turno dejamos que la nota y el diagnóstico guíen
+      // al modelo y evitamos convertir una mejora de contexto en un bloqueo.
+      const contextCorpusBase = visionContext?.skipRag
+        ? []
+        : await retrieve(textForLLM, TOP_N_RAG, 'agente');
       // #2593 corpus→chat: suma los chunks del corpus server-side (pgvector +
       // reranker neural bge-reranker-v2-m3 + gate low_relevance) vía
       // /hybrid-retrieve. Gated por VITE_USE_CORPUS_RETRIEVAL (OFF por defecto)
@@ -1763,22 +1802,30 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
           if (cropEnt) relArgs.cultivo = cropEnt.canonical_id || cropEnt.mentioned;
 
           if (relArgs.pest || relArgs.cultivo) {
-            // Capa 1: subgrafo estructural (todas las relaciones del grafo)
+            // Las dos lecturas reciben exactamente los mismos anclajes ya
+            // resueltos y ninguna consume la salida de la otra. Ejecutarlas en
+            // paralelo conserva los dos bloques y su orden de ensamblado, pero
+            // evita que multihop espere la ida y vuelta de subgrafo.
             try {
-              const sub = await callTool('get_subgrafo_relacional', relArgs);
+              const [subEvidence, mhEvidence] = await executeToolChain([
+                { tool: 'get_subgrafo_relacional', args: relArgs },
+                { tool: 'get_multihop_companions', args: relArgs },
+              ]);
+              const sub = subEvidence?.result;
+              const mh = mhEvidence?.result;
+
+              // Capa 1: subgrafo estructural (todas las relaciones del grafo).
               if (sub && sub.found && typeof sub.bloque === 'string' && sub.bloque.trim()) {
                 subgrafoBloque = sub.bloque;
                 console.debug('[sidecar] subgrafo-relacional', {
                   nodes: sub.nodes?.length, rels: sub.relaciones?.length,
                 });
               }
-            } catch (_) { /* graceful */ }
 
-            // Capa 2 (AIA-008): multihop funcional (cadenas de control biologico
-            // a N saltos — NO redundante con el subgrafo: el subgrafo da
-            // adyacencia estructural, multihop da cadenas ecologicas funcionales)
-            try {
-              const mh = await callTool('get_multihop_companions', relArgs);
+              // Capa 2 (AIA-008): multihop funcional (cadenas de control
+              // biologico a N saltos, no redundante con el subgrafo: el
+              // subgrafo da adyacencia estructural y multihop da cadenas
+              // ecologicas funcionales).
               if (mh && mh.found && typeof mh.bloque === 'string' && mh.bloque.trim()) {
                 subgrafoBloque = [subgrafoBloque, mh.bloque].filter(Boolean).join('\n\n');
                 console.debug('[sidecar] multihop-companions', {
@@ -2295,6 +2342,12 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
       if (deterministicPrice != null) {
         console.debug('[precio] respuesta determinista SIPSA (sin LLM)', { route: nluRoute });
       }
+      const toolFailureMessage = mcpToolFailureMessage(toolEvidence);
+      if (toolFailureMessage) {
+        // El modelo puede completar con conocimiento general, pero el fallo
+        // del dato MCP debe quedar visible y accionable para el operador.
+        setError(toolFailureMessage);
+      }
       // Fallback estructurado (Item 9): si el LLM retornó vacío (timeout, OOM,
       // modelo caído), construimos una respuesta útil con lo que sabemos
       // (toolEvidence, entidades) en vez de un silencio o banner rojo.
@@ -2374,6 +2427,7 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
         // evitando la cascada de "NO es viable a N msnm" por cada variedad. Los
         // guards de SAFETY (agroquímico, dosis, visión, nombre) corren igual.
         userMessage: text,
+        toolEvidence,
       });
       if (guarded.modified) {
         console.debug('[guards] salida corregida', { reasons: guarded.reasons });
@@ -2479,6 +2533,34 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
         metadata: sourceMetadata,
       });
 
+      // PERF (latencia P1, 2026-08-02): el post-validate del sidecar (una ida y
+      // vuelta de red al MCP) es INDEPENDIENTE del affects-gate — ambos LEEN el
+      // `responseBody` ya final (post companion-species-guard, que no se muta más
+      // acá) y solo ESCRIBEN a `sourceMetadata` campos disjuntos (affects-gate:
+      // grounded/cross_crop; post-validate: hallucinated_names/suspect_names).
+      // Antes corrían en serie (affects-gate await → post-validate await); ahora
+      // disparamos la promesa del post-validate ANTES del affects-gate (sin
+      // await) para SOLAPAR su latencia de red con el trabajo local del gate, y
+      // hacemos el await + merge DESPUÉS del gate → el orden de merge sobre
+      // sourceMetadata se preserva EXACTO (gate primero, post-validate después),
+      // así que el comportamiento observable (badges/sellos) es idéntico; solo
+      // desaparece el tiempo muerto entre las dos llamadas. El post-validate
+      // sigue siendo 100% graceful (null ante flag off/offline/timeout/AGE caído
+      // → sin badge) y jamás bloquea el chat.
+      const postValidateInFlight = (isOnline && isSidecarEnabled() && Array.isArray(resolvedEntities) && resolvedEntities.length > 0)
+        ? (async () => {
+            const expected = resolvedEntities
+              .map((e) => e?.nombre_cientifico)
+              .filter((n) => typeof n === 'string' && n.trim().length > 0);
+            if (expected.length === 0) return null;
+            return await postValidate(responseBody, expected);
+          })().catch((pvErr) => {
+            // post-validate jamás bloquea el chat — la respuesta ya está lista.
+            console.debug('[sidecar] post-validate fail (sigo sin badge):', pvErr?.message);
+            return null;
+          })
+        : null;
+
       // AFFECTS-GATE (auditoría anti-contaminación cruzada de cultivo, 2026-07):
       // el sello "Catálogo verificado" NO debe pintarse cuando la evidencia
       // surfacea un organismo (plaga) que NO afecta al cultivo EN FOCO. Caso
@@ -2540,24 +2622,19 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
       // muestre el badge correspondiente. NO bloquea ni reescribe la respuesta.
       // Solo corre si hubo entidades resueltas. 100% graceful: postValidate
       // devuelve null ante flag off / offline / timeout / AGE caído → sin badge.
-      if (isOnline && isSidecarEnabled() && Array.isArray(resolvedEntities) && resolvedEntities.length > 0) {
-        try {
-          const expected = resolvedEntities
-            .map((e) => e?.nombre_cientifico)
-            .filter((n) => typeof n === 'string' && n.trim().length > 0);
-          if (expected.length > 0) {
-            const pv = await postValidate(responseBody, expected);
-            sourceMetadata = /** @type {any} */ (mergePostValidateMetadata(sourceMetadata, pv));
-            if (sourceMetadata.hallucinated_names || sourceMetadata.suspect_names) {
-              console.debug('[sidecar] post-validate flags', {
-                hallucinated: sourceMetadata.hallucinated_names,
-                suspect: sourceMetadata.suspect_names,
-              });
-            }
+      // PERF (latencia P1): la llamada ya se disparó ANTES del affects-gate
+      // (postValidateInFlight); acá solo esperamos su resultado y hacemos el
+      // merge — el orden (gate → post-validate) y la semántica se preservan.
+      if (postValidateInFlight) {
+        const pv = await postValidateInFlight;
+        if (pv) {
+          sourceMetadata = /** @type {any} */ (mergePostValidateMetadata(sourceMetadata, pv));
+          if (sourceMetadata.hallucinated_names || sourceMetadata.suspect_names) {
+            console.debug('[sidecar] post-validate flags', {
+              hallucinated: sourceMetadata.hallucinated_names,
+              suspect: sourceMetadata.suspect_names,
+            });
           }
-        } catch (pvErr) {
-          // post-validate jamás bloquea el chat — la respuesta ya está lista.
-          console.debug('[sidecar] post-validate fail (sigo sin badge):', pvErr?.message);
         }
       }
 
@@ -2797,7 +2874,13 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
       } else {
         // NUNCA e.message crudo al banner ("Failed to fetch", stacktraces):
         // mensajeErrorCampesino respeta frases ya curadas y traduce lo técnico.
-        setError(mensajeErrorCampesino(e, 'No pude con esa pregunta. Intente de nuevo, o pregunte de otra forma.'));
+        const mcpStreamError = e?.mcpToolError
+          ? mcpToolFailureMessage({
+              tool: e.tool,
+              result: { _error: true },
+            })
+          : '';
+        setError(mcpStreamError || mensajeErrorCampesino(e, 'No pude con esa pregunta. Intente de nuevo, o pregunte de otra forma.'));
         // Error NO-interrupción (HTTP 5xx, sesión, etc.): marcar failed. El
         // prompt queda intacto en IDB; la cola durable NO lo reintenta (no es
         // recuperable solo con reintentar), pero NO se pierde el dato.
@@ -2888,6 +2971,90 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
       ),
     );
   }, []);
+
+  // agentComplexIngest — descompositor determinista de registros multi-entidad.
+  // Se consulta ANTES de enrutar al pipeline sidecar/LLM (handleSubmit). Si el
+  // texto describe varias acciones de campo, muestra una confirmación conjunta
+  // (gate del actionExecutor) y ejecuta la ingesta confirmada por las puertas
+  // offline-first existentes. La sugerencia agroecológica se agenda async, sin
+  // bloquear el cierre del turno. Devuelve true si el turno se manejó por esta
+  // ruta, false para el flujo normal.
+  const handleComplexIngest = async (text) => {
+    const plan = decomposeComplexIngest(text);
+    if (!plan || !plan.detected) return false;
+
+    const userMessage = { role: 'user', content: text, timestamp: Date.now() };
+    setMessages((prev) => [...prev, userMessage]);
+    try {
+      await addTurn(operatorId, { role: 'user', content: text });
+    } catch (e) {
+      console.warn('[ComplexIngest] addTurn user failed:', e?.message);
+    }
+    setActiveIntent(null);
+
+    // Agenda la sugerencia agroecológica en segundo plano. NO se espera: la
+    // ruta secundaria (grafo/LLM) nunca participa en la ejecución de registros.
+    scheduleAgroecologicalSuggestion(plan, (suggestion) => {
+      console.debug('[ComplexIngest] sugerencia agroecológica agendada:', suggestion);
+    });
+
+    try {
+      // Un solo gate cubre el plan completo. La tool interna delega en las
+      // puertas offline-first de lote y FarmProcess después de la aprobación.
+      const actionResult = await executeAction({
+        tool_name: 'registrar_ingesta_compleja',
+        parameters: { plan },
+        intent: text,
+        llm_response: '',
+        timestamp: new Date().toISOString(),
+      }, operatorId);
+      const summary = actionResult?.result?.summary || {
+        status: actionResult?.status === 'executed' ? 'executed' : 'partial',
+        executed: 0,
+        failed: 1,
+        results: [],
+      };
+      const registered = summary.results
+        .filter((item) => item.status === 'executed')
+        .map(({ operation }) => operation);
+      const notRegistered = plan.operations.filter(
+        (operation) => !registered.some((item) => item.kind === operation.kind && item.parameters?.ordinal === operation.parameters?.ordinal && item.parameters?.name === operation.parameters?.name),
+      );
+      // Etiquetas legibles compartidas con el gate (ActionConfirmModal) para
+      // que mensaje y confirmación nombren las operaciones igual.
+      const registeredLabels = registered.map(describeComplexIngestOperation);
+      const missingTreatment = plan.operations.some(
+        (operation) => operation.kind === 'register_problem' && operation.parameters.treatment_status === 'missing',
+      );
+      const suggestion = 'Opción agroecológica inicial para tomate: revisar a diario, retirar manualmente los trozadores y las hojas con síntomas, mejorar la ventilación y evitar mojar el follaje. Si persiste, consultamos una alternativa verificada antes de aplicar cualquier insumo.';
+      const allPersisted = actionResult?.status === 'executed' && actionResult?.result?.success !== false;
+
+      const assistantMessage = {
+        role: 'assistant',
+        content: allPersisted
+          ? `Listo. Registré ${registeredLabels.join(', ')}. ${missingTreatment ? 'No se registró ningún tratamiento porque no fue informado.' : ''} ${plan.followUpQuestion || ''} ${suggestion}`
+          : registeredLabels.length > 0
+            ? `Registré solo ${registeredLabels.join(', ')}. No registré ${notRegistered.length} operación${notRegistered.length === 1 ? '' : 'es'} porque la escritura no terminó. ${missingTreatment ? 'El tratamiento sigue pendiente.' : ''}`
+            : 'No registré ninguna operación porque la confirmación o la escritura no terminó. No se guardó el tratamiento.',
+        timestamp: Date.now(),
+      };
+      setMessages((prev) => [...prev, assistantMessage]);
+      try {
+        await addTurn(operatorId, { role: 'assistant', content: assistantMessage.content });
+      } catch (e) {
+        console.warn('[ComplexIngest] addTurn assistant failed:', e?.message);
+      }
+    } catch (e) {
+      console.warn('[ComplexIngest] execute failed:', e?.message);
+      const errMsg = {
+        role: 'assistant',
+        content: 'No pude registrar las operaciones. Intenta de nuevo.',
+        timestamp: Date.now(),
+      };
+      setMessages((prev) => [...prev, errMsg]);
+    }
+    return true;
+  };
 
   const handleSubmit = async (text, { fromVoice = false, suppressUserBubble = false, visionContext = null, forcedIntent = null } = {}) => {
     if (!text || !text.trim()) return;
@@ -3115,6 +3282,14 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
           return;
         }
       }
+    }
+
+    // agentComplexIngest: descomponer el texto ANTES de enrutar al sidecar/LLM.
+    // Si detecta un registro multi-entidad (Caso 1), se muestran las
+    // operaciones a confirmar y se ejecutan sin pasar por el pipeline RAG/LLM.
+    // Si no, devuelve false y el turno sigue el flujo normal.
+    if (await handleComplexIngest(trimmed)) {
+      return;
     }
 
     const route = selectChatRoute(trimmed);
@@ -3373,10 +3548,11 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
     setTimeout(() => setComposerPhase('idle'), 560);
     if (agentAttachment) {
       // Foto inline: armar burbuja + correr visión + handleSubmit
+      const attachment = agentAttachment;
       const item = {
         kind: 'photo',
-        blob: agentAttachment.blob,
-        mime: agentAttachment.mime,
+        blob: attachment.blob,
+        mime: attachment.mime,
         text: inputText.trim(),
       };
       // Pintar burbuja con la imagen DE INMEDIATO
@@ -3388,19 +3564,35 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
       };
       const { message } = buildPhotoUserMessage(item, createUrl);
       setMessages((prev) => [...prev, message]);
-      // Correr visión y armar prompt
-      const { prompt, finding } = await processPhotoItem(item, {
-        analyze: analyzeFoliage,
-        createUrl: null,
-      });
+      // El envío ya quedó aceptado: liberar el compositor ANTES de esperar
+      // visión. Así una red lenta no deja la misma foto y nota listas para un
+      // reenvío duplicado.
       setInputText('');
       clearAgentAttachment();
       setActiveIntent(null);
       setAlertContextBanner(null);
+      setState(STATE_THINKING);
+      setThinkingPhase('consultando');
+
+      const visionController = new AbortController();
+      // Correr visión con un techo duro. Si no termina, el agente continúa con
+      // la nota del operador y muestra un aviso legible, no queda esperando.
+      const { prompt, finding, timedOut } = await processPhotoItemBounded(item, {
+        analyze: (blob) => analyzeFoliage(blob, {
+          signal: visionController.signal,
+          skipRag: true,
+        }),
+        createUrl: null,
+        onTimeout: () => visionController.abort(),
+      });
+      if (timedOut) {
+        setAgentPickError('No pude analizar la foto automáticamente. Voy a responder con tu nota.');
+      }
       await handleSubmit(prompt, {
         suppressUserBubble: true,
         visionContext: {
           hadVision: true,
+          skipRag: true,
           visionConfidence:
             finding && typeof finding.confidence === 'number' ? finding.confidence : null,
         },
@@ -3536,10 +3728,18 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
         // 2) Correr la visión y armar el prompt (degrada a "por descripción"
         //    si analyzeFoliage falla). Reusa processPhotoItem para la parte
         //    pura del prompt (sin re-pintar burbuja: createUrl ya consumido).
-        const { prompt, finding } = await processPhotoItem(item, {
-          analyze: analyzeFoliage,
+        const visionController = new AbortController();
+        const { prompt, finding, timedOut } = await processPhotoItemBounded(item, {
+          analyze: (blob) => analyzeFoliage(blob, {
+            signal: visionController.signal,
+            skipRag: true,
+          }),
           createUrl: null,
+          onTimeout: () => visionController.abort(),
         });
+        if (timedOut) {
+          setAgentPickError('No pude analizar la foto automáticamente. Voy a responder con tu nota.');
+        }
         // 3) Despachar al pipeline con la burbuja ya pintada (no duplicar).
         //    visionContext marca que ESTE turno SÍ trajo una foto real: el guard
         //    de visión NO corrige un diagnóstico visual legítimo. La confianza
@@ -3549,6 +3749,7 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
           suppressUserBubble: true,
           visionContext: {
             hadVision: true,
+            skipRag: true,
             visionConfidence:
               finding && typeof finding.confidence === 'number' ? finding.confidence : null,
           },
@@ -4406,8 +4607,11 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
         disabled={state === STATE_RECORDING}
       />
 
-      {/* Action Confirmation Modal — alimentado por actionExecutor gate callback (057.4) */}
+      {/* Action Confirmation Modal — alimentado por actionExecutor gate callback (057.4).
+          key=gateId: remonta por acción para que el borrador de parámetros
+          arranque SIEMPRE con los de esta acción (BUG-01, P1). */}
       <ActionConfirmModal
+        key={actionModal.gateId}
         isOpen={actionModal.isOpen}
         toolName={actionModal.toolName || ''}
         description={actionModal.description || ''}

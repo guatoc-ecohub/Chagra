@@ -40,7 +40,7 @@
     "drenaje_requerido": "excelente"
   },
   "valor_pedagogico": "La quinua (Chenopodium quinoa Willd.) es un pseudocereal andino tradicional con alto valor proteico (~14-18%) y aminoácidos esenciales, redescubierta como cultivo estratégico de seguridad alimentaria. En Colombia se cultiva en Boyacá, Nariño, Cundinamarca y Cauca entre 2.500 y 3.500 msnm en zona térmica fría a páramo bajo. Las variedades AGROSAVIA Aurora, Tunkahuán y Blanca de Jericó están adaptadas al altiplano cundiboyacense con ciclo 5-6 meses. Tolera salinidad moderada, sequía y heladas leves (-2°C en estados vegetativos). Manejo agroecológico: rotación con leguminosas, fertilización orgánica con bocashi y biol, control mecánico de mildiú (Peronospora variabilis) por densidad de siembra adecuada (60-80 cm entre surcos). Fuentes Tier A: AGROSAVIA fichas técnicas, FAO Quinoa Sourcebook 2013, ICA Resolución 3168/2015, POWO Kew, GBIF Backbone.",
-  "companions_markdown": "### Especies asociadas favorables\n\nEstas especies favorecen el cultivo cuando se siembran cerca:\n- vicia_sativa — Veza común (Vicia sativa L.)\n- zea_mays — Maíz criollo (Zea mays L.)",
+  "companions_markdown": "### Especies asociadas favorables\n\nEstas especies favorecen el cultivo cuando se siembran cerca:\n- zea_mays — Maíz criollo (Zea mays L.)",
   "sources": [
     {
       "id": "gbif-taxonomic-backbone",
@@ -74,5 +74,5 @@
     }
   ],
   "_generated_by": "scripts/build-cycle-content-from-catalog.mjs",
-  "_generated_at": "2026-05-19T00:42:57.359Z"
+  "_generated_at": "2026-09-03T07:40:20.306Z"
 }

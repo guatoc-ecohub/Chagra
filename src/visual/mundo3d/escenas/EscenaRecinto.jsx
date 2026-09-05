@@ -42,7 +42,7 @@ const HATO_LEGADO = [
   { tipo: 'oveja', color: '#efe7d8', pos: [-0.35, 0, 1.15] },
 ];
 
-function Diorama({ params, reducedMotion, tier, fauna }) {
+function Diorama({ params, reducedMotion, tier, fauna, viento }) {
   const animales = params?.animales || HATO_LEGADO;
   const postes = useMemo(() => {
     const n = 12;
@@ -78,7 +78,7 @@ function Diorama({ params, reducedMotion, tier, fauna }) {
       {/* el hato: espejo del dato — instanciado, con nombre y estado */}
       <CorralVivo animales={animales} reducedMotion={reducedMotion} tier={tier} />
       {/* la fauna funcional: descomponedor en el abono + polinizadores por la cerca */}
-      <Fauna items={fauna} reducedMotion={reducedMotion} />
+      <Fauna items={fauna} reducedMotion={reducedMotion} tier={tier} viento={viento} />
     </group>
   );
 }
@@ -97,6 +97,7 @@ export default function EscenaRecinto(props) {
         params={props.params}
         reducedMotion={props.reducedMotion}
         tier={props.tier}
+        viento={props.estadoFinca?.viento}
         fauna={fauna}
       />
     </EscenaBase3D>

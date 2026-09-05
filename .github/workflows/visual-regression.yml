@@ -24,7 +24,13 @@ jobs:
     container:
       image: mcr.microsoft.com/playwright:v1.60.0-jammy
     timeout-minutes: 60
-    continue-on-error: ${{ github.event_name == 'pull_request' }}
+    # NOTA (C1, auditoria de proceso de gates rojos 2026-09-03): el
+    # continue-on-error NO vive aqui (nivel de job) sino en el step "Run
+    # visual comparison". A nivel de job el check-run del PR IGUAL reporta
+    # "failure" — el flag solo salva la conclusion del workflow run — y
+    # ensuciaba el semaforo agregado del PR. A nivel de step el job concluye
+    # "success" en PRs; en workflow_dispatch la expresion es false y un fallo
+    # si aborta (semantica anterior preservada).
     env:
       CI: '1'
       VITE_FARMOS_URL: ''
@@ -46,7 +52,10 @@ jobs:
         run: npm ci
 
       - name: Run visual comparison
+        # Informativo en PRs (no ensucia el check del PR); bloqueante en
+        # workflow_dispatch. Ver la nota del job visual arriba.
         if: ${{ github.event_name != 'workflow_dispatch' || inputs.update_snapshots == 'false' }}
+        continue-on-error: ${{ github.event_name == 'pull_request' }}
         run: npx playwright test --project=visual
 
       - name: Regenerate visual baseline

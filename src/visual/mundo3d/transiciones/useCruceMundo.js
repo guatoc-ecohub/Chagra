@@ -24,16 +24,21 @@
  */
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
-export function useCruceMundo({ tier = 'medio', reducedMotion = false, onSwap = undefined } = {}) {
+/**
+ * @param {{tier?: 'alto'|'medio'|'bajo', reducedMotion?: boolean, onSwap?: (destino: string|null) => void}} opciones
+ */
+export function useCruceMundo({ tier = 'medio', reducedMotion = false, onSwap } = {}) {
   const [estado, setEstado] = useState({ fase: 'quieto', destino: null });
-  // Refs "última versión": se actualizan en un effect (no en render) para que
-  // los timers llamen siempre al callback/estado más fresco sin re-armarse.
   const swapRef = useRef(onSwap);
   const estadoRef = useRef(estado);
+
   useEffect(() => {
     swapRef.current = onSwap;
+  }, [onSwap]);
+
+  useEffect(() => {
     estadoRef.current = estado;
-  });
+  }, [estado]);
 
   const entrar = useCallback((destino) => {
     setEstado((e) => (e.fase === 'quieto' ? { fase: 'entrando', destino } : e));

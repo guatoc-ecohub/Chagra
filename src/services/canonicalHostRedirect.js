@@ -63,14 +63,9 @@ const STAGING_HOSTS = new Set([
 export function isStagingHost(hostname) {
   // preprod.chagra.app = ambiente de STAGING que sirve la rama dev antes de que
   // llegue a main/prod. Si rebotara al canónico (chagra.app), el staging mandaría
-  // a producción y no probaría nada. El dominio propio queda anclado: se acepta
-  // preprod.chagra.app y sus subdominios, más la lista exacta de hosts de staging
-  // heredados. Un host tercero no entra solo porque contenga el token `preprod`.
-  const host = normalizeHostname(hostname);
-  return (
-    STAGING_HOSTS.has(host) ||
-    host.endsWith('.preprod.chagra.app')
-  );
+  // a producción y no probaría nada. La lista es exacta: no se acepta un host
+  // tercero solo porque contenga el token `preprod`.
+  return STAGING_HOSTS.has(normalizeHostname(hostname));
 }
 
 export function isThreeDWorldHost(hostname) {
@@ -83,6 +78,15 @@ export function isThreeDWorldHost(hostname) {
   return normalizeHostname(hostname) === '3d.guatoc.co';
 }
 
+export function isCampesinoHost(hostname) {
+  // campesino.guatoc.co = despliegue standalone de la HomeCampesinoB (preview
+  // pública campesina en su propio dominio propio, servida por microapp
+  // estática). Como prod.chagra.app / 3d.guatoc.co, NO debe rebotar al
+  // canónico chagra.app: si lo hiciera, el dominio serviría el PWA de prod en
+  // vez de la home campesina. Host EXACTO.
+  return normalizeHostname(hostname) === 'campesino.guatoc.co';
+}
+
 export function isAllowedHost(hostname) {
   return (
     isCanonicalHost(hostname) ||
@@ -90,7 +94,8 @@ export function isAllowedHost(hostname) {
     isPreviewHost(hostname) ||
     isProdAppHost(hostname) ||
     isStagingHost(hostname) ||
-    isThreeDWorldHost(hostname)
+    isThreeDWorldHost(hostname) ||
+    isCampesinoHost(hostname)
   );
 }
 

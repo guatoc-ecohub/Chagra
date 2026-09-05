@@ -88,7 +88,9 @@ export function susurroDeNoche({ fase = null, reaccionClima = null } = {}) {
     return { mensaje: 'Ya está oscureciendo. Yo también bajo el ritmo — descanse, que mañana seguimos.', gesto: 'susurra' };
   }
   partes.push('Descanse tranquilo, que mañana seguimos.');
-  return { mensaje: partes.join('. ') + '.', gesto: 'susurra' };
+  // El último parte ya termina en '.', así que join('. ') deja el punto final;
+  // colapsar cualquier '..' accidental (p.ej. "seguimos..") a uno solo.
+  return { mensaje: partes.join('. ').replace(/\.\.+/g, '.'), gesto: 'susurra' };
 }
 
 /**

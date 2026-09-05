@@ -26,7 +26,7 @@ import ChagraAgentAvatarLuciernaga from '../ChagraAgentAvatarLuciernaga';
 import ChagraAgentAvatarGuacamaya from '../ChagraAgentAvatarGuacamaya';
 import ChagraAgentAvatarChivitoPunk from '../ChagraAgentAvatarChivitoPunk';
 
-const raizSvg = (container, slug) => container.querySelector(`svg[data-creature="${slug}"]`);
+const raizSvg = (container, slug) => container.querySelector(`[data-creature="${slug}"]`);
 const raizDiv = (container, slug) => container.querySelector(`div[data-creature="${slug}"]`);
 
 const CASOS = [
@@ -98,5 +98,12 @@ describe('ChagraAgentAvatarOsoBaston — marcha', () => {
             expect(raizSvg(container, 'oso-baston')).toHaveAttribute('data-pose', pose);
             unmount();
         }
+    });
+});
+
+describe('ChagraAgentAvatarGuacamaya — visema rico', () => {
+    test('conserva el visema recibido aunque el state tenga fallback V2', () => {
+        const { container } = render(<ChagraAgentAvatarGuacamaya state="speaking" visema="V4" />);
+        expect(raizSvg(container, 'guacamaya')).toHaveAttribute('data-visema', 'V4');
     });
 });

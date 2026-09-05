@@ -9,7 +9,7 @@
  *   - `data: [DONE]` cierra el stream
  *   - 502 del sidecar → throw con mensaje legible
  *   - AbortSignal aborta fetch y propaga AbortError
- *   - Eventos `{type:"error"}` mid-stream invocan onError sin abortar
+ *   - Eventos `{type:"error"}` mid-stream invocan onError y finalizan
  *
  * Aislamiento: mock `globalThis.fetch` con ReadableStream + TextEncoder.
  * Sin red real. `vi.stubEnv` para configurar env vars `VITE_*`.
@@ -299,27 +299,23 @@ describe('streamChatViaSidecar — errores', () => {
     ).rejects.toMatchObject({ name: 'AbortError' });
   });
 
-  it('invoca onError cuando el sidecar emite {type:"error"} mid-stream pero no aborta', async () => {
+  it('invoca onError y finaliza cuando el sidecar emite {type:"error"}', async () => {
     fetchMock.mockResolvedValueOnce(sseResponse([
       'data: {"type":"start","model":"m"}\n\n',
       'data: {"type":"delta","content":"par"}\n\n',
       'data: {"type":"error","detail":"upstream lost connection"}\n\n',
-      'data: {"type":"delta","content":"cial"}\n\n',
-      'data: {"type":"done","total_ms":1,"first_token_ms":1,"eval_count":2,"eval_rate":2,"total_chars":6}\n\n',
-      'data: [DONE]\n\n',
     ]));
 
     const errs = [];
     const { streamChatViaSidecar } = await importFresh();
-    const { fullText } = await streamChatViaSidecar({
+    await expect(streamChatViaSidecar({
       model: 'm',
       messages: [{ role: 'user', content: 'hola' }],
       onError: (e) => errs.push(e),
-    });
+    })).rejects.toMatchObject({ mcpToolError: true, reason: 'upstream lost connection' });
 
     expect(errs).toHaveLength(1);
     expect(errs[0].detail).toMatch(/upstream lost connection/);
-    expect(fullText).toBe('parcial');
   });
 });
 

@@ -18,9 +18,7 @@
     "nitrogen_fixer"
   ],
   "antagonists": [
-    "allium_ampeloprasum",
-    "allium_fistulosum",
-    "foeniculum_vulgare"
+    "allium_fistulosum"
   ],
   "especies_nativas_sustitutas": [],
   "propagation": {
@@ -45,8 +43,8 @@
     "drenaje_requerido": "bueno"
   },
   "valor_pedagogico": "El frijol común (Phaseolus vulgaris L.) es un fijador de nitrógeno esencial en sistemas agrícolas andinos, contribuyendo con 50-80 kg N/ha mediante simbiosis con Rhizobium leguminosarum. En Colombia se cultiva ampliamente en departamentos como Cundinamarca (cinturón productivo Fómeque-Choachí), Boyacá y Nariño, entre 800-2800 msnm en zonas térmicas fría, templada y cálida. Varietales destacados incluyen Cargamanto, Bola Roja y Radical. Su manejo agronómico incluye propagación por semilla, ciclo de 3-4 meses, asociación tradicional en el sistema '3 hermanas' con maíz y ahuyama, y requiere monitoreo de plagas como Empoasca kraemeri y Bemisia tabaci. Culturalmente, ha sido parte fundamental de la dieta muisca y campesina andina desde época precolombina, utilizado en preparaciones como sopas, guisos y harinas. Fuente: nrc-1989-cultivos-andinos.",
-  "companions_markdown": "### Especies asociadas favorables\n\nEstas especies favorecen el cultivo cuando se siembran cerca:\n- lactuca_sativa_capitata — Lechuga cogollo morada (Lactuca sativa var. capitata L.)\n- zea_mays — Maíz criollo (Zea mays L.)",
-  "antagonists_markdown": "### Antagonistas (no asociar)\n\nEvite sembrar estas especies cerca; compiten o comparten plagas/patógenos:\n- allium_ampeloprasum — Cebolla puerro (Allium ampeloprasum var. porrum (L.) J. Gay)\n- allium_fistulosum — Cebollín / Cebolla larga (Allium fistulosum L.)\n- foeniculum_vulgare — Hinojo (Foeniculum vulgare Mill.)",
+  "companions_markdown": "### Especies asociadas favorables\n\nEstas especies favorecen el cultivo cuando se siembran cerca:\n- lactuca_sativa_capitata — Lechuga cogollo morada (Lactuca sativa var. capitata L.)\n- zea_mays — Maíz criollo (Zea mays L.)\n- musa_paradisiaca — Plátano (Musa × paradisiaca L.)\n- manihot_esculenta — Yuca brava amazónica (Manihot esculenta Crantz)\n- solanum_tuberosum — Papa (Solanum tuberosum L.)",
+  "antagonists_markdown": "### Antagonistas (no asociar)\n\nEvite sembrar estas especies cerca; compiten o comparten plagas/patógenos:\n- allium_fistulosum — Cebollín / Cebolla larga (Allium fistulosum L.)",
   "sources": [
     {
       "id": "nrc-1989-cultivos-andinos",
@@ -74,5 +72,5 @@
     }
   ],
   "_generated_by": "scripts/build-cycle-content-from-catalog.mjs",
-  "_generated_at": "2026-05-19T00:42:57.364Z"
+  "_generated_at": "2026-09-03T07:40:20.308Z"
 }

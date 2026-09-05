@@ -1,0 +1,57 @@
+{
+  "species_slug": "chrysanthemum_morifolium",
+  "scientific_name": "Chrysanthemum × morifolium Ramat.",
+  "common_names": [
+    "Crisantemo / Pompón"
+  ],
+  "family": "Asteraceae",
+  "category": "atractores_polinizadores",
+  "cultivable": true,
+  "conservation_status": "cultivo_comun",
+  "thermal_zones": [
+    "frio",
+    "templado"
+  ],
+  "roles_in_guild": [
+    "crop",
+    "pollinator_attractor"
+  ],
+  "antagonists": [],
+  "especies_nativas_sustitutas": [],
+  "propagation": null,
+  "requirements": {
+    "agua": null,
+    "altitud_msnm": {
+      "min_absoluto": 1600,
+      "optimo_min": 2000,
+      "optimo_max": 2700,
+      "max_absoluto": 2900
+    },
+    "temperatura_c": null,
+    "radiacion": null,
+    "drenaje_requerido": null
+  },
+  "valor_pedagogico": "El crisantemo o pompón (Chrysanthemum × morifolium Ramat., familia Asteraceae) es una herbácea ornamental de día corto cultivada de forma intensiva en la Sabana de Bogotá y el oriente antioqueño para flor de corte de exportación, donde Colombia es uno de los mayores proveedores mundiales. Su floración se induce manipulando el fotoperíodo (luz suplementaria nocturna y oscurecimiento con telas negras), una práctica que enseña la fisiología vegetal del fotoperiodismo de manera tangible. En el monocultivo florícola es susceptible a la roya blanca del crisantemo (Puccinia horiana), enfermedad cuarentenaria, y al minador de la hoja (Liriomyza spp.); la curaduría de Chagra registra ambas con su manejo agroecológico (eliminación de tejido infectado, trampas amarillas, conservación de avispas parasitoides). Pertenece a la misma familia (Asteraceae) que la caléndula y el girasol, plantas compañeras atractoras de polinizadores y controladoras naturales en la chagra. Lección viva sobre floricultura de exportación, fotoperiodismo y manejo integrado de plagas cuarentenarias. Fuentes Tier A de taxonomía: GBIF, POWO Kew, Bernal 2015.",
+  "sources": [
+    {
+      "id": "gbif-taxonomic-backbone",
+      "title": "gbif-taxonomic-backbone",
+      "tier": "A",
+      "url": "https://www.gbif.org/dataset/d7dddbf4-2cf0-4f39-9b2a-bb099caae36c"
+    },
+    {
+      "id": "powo-kew",
+      "title": "powo-kew",
+      "tier": "A",
+      "url": "https://powo.science.kew.org"
+    },
+    {
+      "id": "bernal-2015-plantas-liquenes-colombia",
+      "title": "bernal-2015-plantas-liquenes-colombia",
+      "tier": "A",
+      "url": "http://catalogoplantasdecolombia.unal.edu.co"
+    }
+  ],
+  "_generated_by": "scripts/build-cycle-content-from-catalog.mjs",
+  "_generated_at": "2026-09-03T07:40:20.316Z"
+}

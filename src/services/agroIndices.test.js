@@ -7,6 +7,7 @@ import { describe, it, expect } from 'vitest';
 import {
     vpdKpa, etcMm, balanceHidricoDia, presionEnfermedad, anomalia,
     parseCultivos, kcDeCultivo, amplitudTermica, leerUv, MODELOS_ENFERMEDAD,
+    horasFrio, spi, spei, deficitAcumulado,
 } from './agroIndices.js';
 
 describe('VPD', () => {
@@ -76,6 +77,56 @@ describe('Anomalía (hoy vs. lo normal)', () => {
     });
 });
 
+describe('Horas-frío', () => {
+    it('cuenta las horas con temperatura estrictamente menor a 7 °C', () => {
+        expect(horasFrio([6.9, 7, 5, 8, null, 4])).toBe(3);
+    });
+    it('acepta la forma horaria de Open-Meteo y no inventa con entrada inválida', () => {
+        expect(horasFrio({ temperature_2m: [8, 6, 3, 7] })).toBe(2);
+        expect(horasFrio(null)).toBeNull();
+    });
+});
+
+describe('SPI de precipitación', () => {
+    it('estandariza la anomalía frente a media y desviación históricas', () => {
+        expect(spi(2, { precip_dia_normal: 6, precip_dia_desv: 2 })).toBe(-2);
+        expect(spi(10, 6, 2)).toBe(2);
+    });
+    it('queda pendiente si falta la desviación o es cero', () => {
+        expect(spi(2, { precip_dia_normal: 6 })).toBeNull();
+        expect(spi(2, 6, 0)).toBeNull();
+    });
+});
+
+describe('SPEI de balance hídrico', () => {
+    const normal = { balance_dia_normal: 0, balance_dia_desv: 3 };
+
+    it('da anomalía negativa con un déficit sostenido', () => {
+        const dias = [
+            balanceHidricoDia(0, 5),
+            balanceHidricoDia(1, 5),
+        ];
+
+        expect(deficitAcumulado(dias).faltaMm).toBe(9);
+        expect(spei(dias, normal)).toBe(-3);
+    });
+
+    it('da anomalía positiva con una serie húmeda', () => {
+        expect(spei([
+            { precipMm: 8, etcMm: 4 },
+            { precipMm: 6, etcMm: 3 },
+        ], normal)).toBe(2.33);
+    });
+
+    it('da cero cuando el balance acumulado coincide con la normal', () => {
+        expect(spei([2, -1], { media: 1, desviacion: 2 })).toBe(0);
+    });
+
+    it('queda pendiente si falta la desviación del balance', () => {
+        expect(spei([{ netoMm: -4 }], { balance_dia_normal: 0 })).toBeNull();
+    });
+});
+
 describe('parseCultivos (texto libre del perfil → fichas)', () => {
     it('mapea sinónimos campesinos a fichas con Kc', () => {
         const { cultivos } = parseCultivos('Café, papa y maíz');
@@ -93,6 +144,13 @@ describe('parseCultivos (texto libre del perfil → fichas)', () => {
     it('café tiene su enfermedad clima-dependiente (roya)', () => {
         const { cultivos } = parseCultivos('cafe');
         expect(cultivos[0].enfermedades).toContain('roya_cafe');
+    });
+    it('resuelve las ocho fichas nuevas, incluidas variantes de invernadero', () => {
+        const { cultivos, sinFicha } = parseCultivos('Fresa, Granadilla, Tomate Cherry-Invernadero, Tomate, Espinaca, Gulupa, Limón-Invernadero, Guayaba');
+        expect(cultivos.map((cultivo) => cultivo.key)).toEqual(expect.arrayContaining([
+            'fresa', 'granadilla', 'tomate_cherry', 'tomate', 'espinaca', 'gulupa', 'limon', 'guayaba',
+        ]));
+        expect(sinFicha).toHaveLength(0);
     });
 });
 

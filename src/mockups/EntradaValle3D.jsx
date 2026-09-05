@@ -449,18 +449,8 @@ export default function EntradaValle3D({ onBack, onNavigate, initialMundoId = nu
   const preguntarAlAgente = useCallback(() => {
     if (typeof window === 'undefined') return;
     stopSpeak();
-    window.dispatchEvent(new CustomEvent('chagraNavigate', {
-      detail: {
-        view: 'agente',
-        initialData: buildSpatialAgentInitialContext({
-          mundoId: nav.mundoId,
-          hotspotActivo: focoId,
-          clima,
-          estadoFinca,
-        }),
-      },
-    }));
-  }, [nav.mundoId, focoId, clima, estadoFinca]);
+    window.dispatchEvent(new CustomEvent('chagraNavigate', { detail: { view: 'agente' } }));
+  }, []);
 
   // ── ENTRAR a un mundo (tarea del viaje): cierra el panel, la abeja guía la
   //    transición y el framework monta la escena del mundo. Si el mundo aún no

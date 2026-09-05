@@ -65,4 +65,39 @@ describe('buildClimaCultivoSuggestions', () => {
     expect(result[0].suggestion.severity).toBe('critical');
     expect(result[0].suggestion.text).toContain('Revise drenajes hoy.');
   });
+
+  it('resuelve una ficha nueva y usa su umbral verificable cuando no hay perfil AGE', () => {
+    const result = buildClimaCultivoSuggestions({
+      plants: [{ attributes: { name: 'Fresa-Invernadero' } }],
+      climaLive: {
+        tieneOpenMeteo: true,
+        pronostico: [
+          { date: '2026-08-26', temp_min: 12, precip_mm: 0 },
+          { date: '2026-08-27', temp_min: 7, temp_max: 18, precip_mm: 0 },
+        ],
+      },
+      graph: { species: {} },
+    });
+
+    expect(result).toHaveLength(1);
+    expect(result[0].status).toBe('ready');
+    expect(result[0].suggestion.title).toBe('Noche fría para el cultivo');
+  });
+
+  it('recibe SPI y SPEI de los motores cuando el radar tiene normales y ETo', () => {
+    const result = buildClimaCultivoSuggestions({
+      plants: [{ attributes: { name: 'Tomate' } }],
+      climaLive: {
+        tieneOpenMeteo: true,
+        normales: { precip_dia_normal: 8, precip_dia_desv: 2, balance_dia_normal: 0, balance_dia_desv: 1 },
+        pronostico: [
+          { date: '2026-08-26', temp_min: 20, precip_mm: 0 },
+          { date: '2026-08-27', temp_min: 20, temp_max: 25, precip_mm: 1, eto_mm: 5 },
+        ],
+      },
+      graph: { species: {} },
+    });
+
+    expect(result[0].suggestion.title).toBe('Déficit hídrico');
+  });
 });

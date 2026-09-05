@@ -1,20 +1,19 @@
 /*
- * useEntradaAbeja + AbejaEscena — LA COREOGRAFÍA COMPARTIDA de Angelita.
+ * useEntradaAbeja + AbejaEscena — LA COREOGRAFÍA PROPIA de Angelita.
  *
- * El DR de mundos-3D pide que "la abeja baja y entra" viva UNA sola vez y la
- * herede toda escena-mundo (§4.4). Aquí está: extraída del `CompaneroAbeja` del
- * valle (Valle3D), generalizada para cualquier arquetipo. La ESCENA solo le pasa
- * el `foco` (posición del hotspot activo o el centro del diorama); el hook mueve
- * a Angelita con `lerp` hacia él, la hace flotar según su energía y usa una
- * aparición mística al cambiar de rumbo. El CUERPO siempre es `<AbejaAngelita>` (la creature
- * de la librería): la escena POSEE la coreografía, la creature POSEE el cuerpo.
+ * El DR de mundos-3D pide que la entrada viva UNA sola vez y la herede toda
+ * escena-mundo (§4.4). `useEntradaCompai` es el motor interno de este adaptador;
+ * `useEntradaAbeja` conserva el alias histórico. `AbejaEscena` es únicamente
+ * el adaptador de cuerpo de Angelita. El dispatcher `CompaiEscena` monta el
+ * adaptador propio del guía elegido.
  *
  * Vive dentro de escenas/ (chunk perezoso `vendor-three`): importa @react-three
  * y three, así que NUNCA se importa desde el barrel base del framework.
  *
- * El nombre se conserva a propósito: este hook sigue siendo la coreografía
- * nativa y fallback de Angelita. El ruteo del guía elegido vive en
- * `CompaiTransicion`/`compaiRegistry`, sin convertir este hook en un dispatcher.
+ * El nombre se conserva a propósito: este hook es exclusivo de la entrada
+ * nativa de Angelita. No es fallback de los siete canónicos y no debe decidir
+ * qué compañero fue elegido; ese ruteo vive en `CompaiTransicion`/
+ * `compaiRegistry`.
  */
 /* eslint-disable react-refresh/only-export-components -- este módulo (hook de
    coreografía + su componente de escena) se importa SIEMPRE perezoso dentro de
@@ -45,8 +44,8 @@ const VUELO_NEUTRO = { altura: 1, velocidad: 1, vagar: 1, tiembla: 0 };
 /* LA IDENTIDAD COMPARTIDA (abejaIdentidad.js): percha, tamaño de billboard y
    sombra salen de la MISMA fuente que pinta la Angelita 2D del home — una sola
    abeja, no dos. La escena posee la coreografía; la creature, cuerpo e identidad. */
-const PERCHA = ABEJA_PRESENCIA.percha;
-const SOMBRA = ABEJA_PRESENCIA.sombra;
+const PERCHA_ABEJA = ABEJA_PRESENCIA.percha;
+const SOMBRA_ABEJA = ABEJA_PRESENCIA.sombra;
 
 /* EL CRUCE 2D→3D (AbejaTransicion): el mesh nace OCULTO exactamente en el
    PUNTO DE ATRAPE — el píxel de pantalla donde la Angelita 2D del overlay se
@@ -111,20 +110,28 @@ function puntoDeCruce(camera, foco, out) {
  * @param {string}  [opts.hora='dorada']  hora de cielosHoraData: de 'noche'
  *   Angelita se ACURRUCA (idle nocturno de creatureIdle).
  * @param {string}  [opts.tier='alto']  'bajo' → idle frugal (solo respiración).
+ * @param {string}  [opts.especie='abeja-angelita']  perfil idle del cuerpo
+ *   de Angelita (parámetro interno de compatibilidad).
+ * @param {{percha:{x:number,y:number,z:number},rondaAltura:number,sombra:{opacidadMin:number,opacidadBase:number,atenuaPorAltura:number,ensanchaPorAltura:number}}} [opts.presencia]
+ *   presencia espacial de Angelita (parámetro interno de compatibilidad).
  * @param {{ current: { fase: string, pos: THREE.Vector3 } }|null} [opts.viajeRef]
  *   canal de solo-escritura hacia la CÁMARA (auditoría #50): cada frame el hook
  *   publica aquí la fase del cruce ('oculta'|'picada'|'no'|'salida') y la
  *   posición viva de la abeja, para que el director de cámara la ESCOLTE en la
  *   picada y la despida en la salida — sin acoplar cámara y criatura por props.
  */
-export function useEntradaAbeja(foco, {
+export function useEntradaCompai(foco, {
   entrando = true, energia = 1, reducedMotion = false, piso = 0, vuelo = VUELO_NEUTRO,
   cruce = false, saliendo = false, hora = 'dorada', tier = 'alto', viajeRef = null,
+  especie = 'abeja-angelita', presencia = ABEJA_PRESENCIA,
 } = {}) {
   const ref = useRef(null);
   const caraRef = useRef(null);
   const sombraRef = useRef(null);
   const visRef = useRef(null);
+  const percha = presencia?.percha || PERCHA_ABEJA;
+  const sombra = presencia?.sombra || SOMBRA_ABEJA;
+  const rondaAltura = presencia?.rondaAltura ?? ABEJA_PRESENCIA.rondaAltura;
   // ── PERSONALIDAD IDLE (creatureIdle.js): la capa DOM que recibe el squash &
   //    stretch/gestos (idleRef, hermana de la aparición para no pelear con su
   //    transition CSS), el reloj de llegada (dispara la CELEBRACIÓN), y cachés
@@ -213,7 +220,7 @@ export function useEntradaAbeja(foco, {
     //    pleno cruce va NEUTRA (nadie da piruetas en picada). reducedMotion
     //    devuelve la pose calma estática (activo=false → cero invalidate).
     const idle = fase.current !== 'no' ? IDLE_NEUTRO : idleDeCreature(t, {
-      especie: 'abeja-angelita', hora, reducedMotion, tier,
+      especie, hora, reducedMotion, tier,
       llegadaHace: llegoEn.current === null ? null : t - llegoEn.current,
     });
     const quieta = Math.max(0, idle.posada);
@@ -249,11 +256,11 @@ export function useEntradaAbeja(foco, {
     //    `idle.posada` la baja a su percha idle (flor/hoja: la altura se recoge
     //    a ~28%) y aquieta el vagar y el bob (posada no ronda ni flota); su
     //    asomo negativo al despegar es el brinquito de overshoot.
-    const alto = (entrando ? PERCHA.y : ABEJA_PRESENCIA.rondaAltura) * mAltura * (1 - 0.72 * idle.posada);
+    const alto = (entrando ? percha.y : rondaAltura) * mAltura * (1 - 0.72 * idle.posada);
     const dest = _dest.set(
-      foco.x + (entrando ? PERCHA.x : 0.35 + vagarX * (1 - quieta)) + tembleque + arrebato * (entrando ? 0.3 : 1),
+      foco.x + (entrando ? percha.x : 0.35 + vagarX * (1 - quieta)) + tembleque + arrebato * (entrando ? 0.3 : 1),
       foco.y + alto + bob * (1 - 0.85 * quieta) + idle.dy + tembleque * 0.5 + arrebato * 0.18,
-      foco.z + (entrando ? PERCHA.z : 0.55 + vagarZ * (1 - quieta)),
+      foco.z + (entrando ? percha.z : 0.55 + vagarZ * (1 - quieta)),
     );
     ref.current.position.lerp(dest, (entrando ? 0.06 : 0.05) * mVel * empuje);
     // Angelita se posa: al cruzar el umbral de llegada al foco, un roce háptico
@@ -310,18 +317,21 @@ export function useEntradaAbeja(foco, {
       const pos = ref.current.position;
       const h = Math.max(0, pos.y - piso);
       sombraRef.current.position.set(pos.x, piso + 0.03, pos.z);
-      sombraRef.current.scale.setScalar(1 + h * SOMBRA.ensanchaPorAltura);
-      sombraRef.current.material.opacity = Math.max(SOMBRA.opacidadMin, SOMBRA.opacidadBase - h * SOMBRA.atenuaPorAltura);
+      sombraRef.current.scale.setScalar(1 + h * sombra.ensanchaPorAltura);
+      sombraRef.current.material.opacity = Math.max(sombra.opacidadMin, sombra.opacidadBase - h * sombra.atenuaPorAltura);
     }
     avisarViaje(fase.current); // el parte de viaje del frame (picada o vuelo normal)
   });
   return { ref, caraRef, sombraRef, visRef, idleRef, aparecioRef };
 }
 
+// Alias histórico: sigue siendo exclusivo del adaptador de Angelita.
+export const useEntradaAbeja = useEntradaCompai;
+
 /**
- * Angelita ya montada en una escena: usa `useEntradaAbeja` para la coreografía y
- * dibuja el cuerpo (`AbejaAngelita`) como billboard `<Html>`. Es la ÚNICA abeja
- * dentro de un mundo (la del footer se oculta): por eso REFLEJA EL HABLA —pulsa
+ * Angelita ya montada en una escena: usa `useEntradaAbeja` para su coreografía y
+ * dibuja el cuerpo (`AbejaAngelita`) como billboard `<Html>`. Es el adaptador
+ * EXCLUSIVO de Angelita, no el fallback de otro compañero: por eso REFLEJA EL HABLA —pulsa
  * cuando el agente narra (`hablando`)— y da un microrrebote al tocar un hotspot
  * (`rebote`, un contador que sube por toque). Tres transformaciones en tres capas
  * DOM que no se pisan: pulso (raíz), rebote (medio), aparición mística (cara, que el
@@ -426,7 +436,7 @@ export function AbejaEscena({
   const { visema } = useLipSync({ activo: vivo });
   return (
     <>
-      <group ref={ref} position={[foco.x + PERCHA.x, foco.y + PERCHA.y, foco.z + PERCHA.z]}>
+      <group ref={ref} position={[foco.x + PERCHA_ABEJA.x, foco.y + PERCHA_ABEJA.y, foco.z + PERCHA_ABEJA.z]}>
         <Html center distanceFactor={ABEJA_PRESENCIA.distancia} zIndexRange={[40, 10]}>
           {/* Reacción al estado real, también en el wrapper (brillo mojado,
               temblor sediento, bamboleo de mordisco — rubber-hose). Gate RM.
@@ -482,10 +492,10 @@ export function AbejaEscena({
           hasta la sombra de Angelita está dibujada con su propia línea. */}
       <SombraContacto
         refExt={sombraRef}
-        pos={[foco.x + PERCHA.x, piso + 0.03, foco.z + PERCHA.z]}
-        radio={SOMBRA.radio}
+        pos={[foco.x + PERCHA_ABEJA.x, piso + 0.03, foco.z + PERCHA_ABEJA.z]}
+        radio={SOMBRA_ABEJA.radio}
         color={ABEJA_TINTA}
-        opacidad={SOMBRA.opacidad}
+        opacidad={SOMBRA_ABEJA.opacidad}
         orden={3}
       />
     </>

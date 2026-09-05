@@ -20,8 +20,8 @@
  * no como abrir otra app). `piso` (y del suelo, default 0) posa la alfombra y
  * las sombras de contacto; solo cutaway lo necesita (su bloque centra en 0).
  */
-import { Suspense, lazy, useMemo, useRef, useState } from 'react';
-import { Canvas, useFrame } from '@react-three/fiber';
+import { Suspense, lazy, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { Html, OrbitControls, Stars } from '@react-three/drei';
 import * as THREE from 'three';
 import { CompaiEscena } from './CompaiEscena.jsx';
@@ -85,6 +85,7 @@ const _projHotspot = new THREE.Vector3();
 
 function Contenido({
   params, hotspots, entrada, tinte, reducedMotion, onHotspot, cielo, animo, energia, piso = 0,
+  franja: franjaDeclarada = null,
   frugal = false, tier = 'alto', hablando = false, focoId = null, focoToken = 0,
   estadoFinca = ESTADO_FINCA_MUESTRA, hayAlerta = false, camaraInicial,
   tierInicial = 'medio',
@@ -119,7 +120,17 @@ function Contenido({
   // La receta vive en atmosferaMadre (mezclarCielo): ley exportada, mismo
   // resultado aquí y en cualquier consumidor. Memoizado por cielo + franja
   // (la franja cambia unas pocas veces al día; en demo, cada tantos segundos).
-  const { franja } = useCicloDia({ reducedMotion });
+  /* 🔴 La luz obedece la hora DECLARADA por la escena cuando la escena declara
+     una (`franja`); si no, el reloj real. Medido el 2026-09-02 en la bóveda del
+     clima: su cielo, su sol y su fondo están clavados a `hora: 0.62` (media
+     tarde) mientras la luz seguía el reloj del aparato — a las 21:30 la pantalla
+     pintaba un cielo de tarde con luz de NOCHE (intensidad 0.55, clave
+     `#b9c6e6` viniendo de DETRÁS en [-6,7,-4]) y el macizo se leía como una
+     silueta negra. Contradicción medible: con la MISMA malla, los pisos
+     distinguibles pasaban de 7/7 a 5/7 según la hora en que se tomara la
+     captura. Un mundo que declara su hora tiene que iluminarse con ESA hora. */
+  const { franja: franjaReloj } = useCicloDia({ reducedMotion });
+  const franja = franjaDeclarada || franjaReloj;
   const madre = useMemo(() => presetDeHora(franja), [franja]);
   const c = useMemo(() => mezclarCielo(cielo, madre), [cielo, madre]);
 
@@ -316,12 +327,11 @@ function Contenido({
       })}
 
       {/* EL COMPAÑERO del mundo: según el avatar elegido (CompaiEscena resuelve
-          angelita/maíz/zarigüeya). Una sola por mundo (la del footer se oculta
+          el roster-7). Uno solo por mundo (el del footer se oculta
           dentro). `entrando` vive AHORA en si hay hotspot activo — con foco se
           posa junto a la puerta, sin foco RONDA (idle propio, ya no un fotograma
           clavado). `hablando` la hace pulsar cuando el agente narra; `rebote` es
-          el microrrebote del toque. Hoy maíz/zarigüeya caen a Angelita (fallback,
-          sin regresión) hasta que el Fable de compai (#5) les dé arte 3D. */}
+          el microrrebote del toque. */}
       <CompaiEscena
         foco={foco}
         entrando={!!activo}
@@ -380,6 +390,30 @@ function Contenido({
   );
 }
 
+/** Estado que expone la sonda de medición al arnés visual, solo durante el gate. */
+/** @typedef {{ gl: import('three').WebGLRenderer, scene: import('three').Scene, camera: import('three').Camera }} ThreeSonda */
+
+/* SONDA DE MEDICIÓN (gate del Paso 5 / DOM-tapa-montaña): expone
+   `{ gl, scene, camera }` en `window.__three` para que
+   `_gate/descenso-20260902/medir-pisos-boveda.mjs` proyecte las 7 cotas con
+   la cámara viva. DORMIDA por defecto — mismo patrón que `AuditoriaValle`
+   (`?auditar=1`): solo despierta con `?sonda3d=1` en la query (antes del
+   hash de ruta). Sin ese parámetro no toca `window` ni cuesta nada: cero
+   cambio de arte, cero cambio de comportamiento. */
+function SondaTres3D() {
+  const { gl, scene, camera } = useThree();
+  useLayoutEffect(() => {
+    if (typeof window === 'undefined') return undefined;
+    if (!new URLSearchParams(window.location.search).has('sonda3d')) return undefined;
+    const ventana = /** @type {Window & { __three?: ThreeSonda }} */ (window);
+    ventana.__three = { gl, scene, camera };
+    return () => {
+      delete ventana.__three;
+    };
+  }, [gl, scene, camera]);
+  return null;
+}
+
 export default function EscenaBase3D({
   params, hotspots, entrada, tinte, reducedMotion,
   onHotspot, cielo, animo = 'sereno', energia = 1, camara, piso = 0, tier = 'alto',
@@ -387,7 +421,12 @@ export default function EscenaBase3D({
   /* El estado REAL de la finca (auditoría §5b): Angelita SIEMPRE lo refleja.
      Hoy MUESTRA (reaccionFinca); codex lo cabla con useFincaViva sin tocar
      esta interfaz. `hayAlerta` la pone atenta si hay algo del día pendiente. */
-  estadoFinca = ESTADO_FINCA_MUESTRA, hayAlerta = false, children,
+  estadoFinca = ESTADO_FINCA_MUESTRA, hayAlerta = false,
+  /* Hora DECLARADA por la escena ('amanecer'|'manana'|'mediodia'|'tarde'|
+     'atardecer'|'noche'). Opcional: sin ella manda el reloj real, que es el
+     comportamiento de siempre de todos los mundos. */
+  franja = null,
+  children,
 }) {
   const [listo, setListo] = useState(false);
   const compaiHoldHandlers = useCompaiHold();
@@ -411,6 +450,7 @@ export default function EscenaBase3D({
       frameloop={reducedMotion ? 'demand' : 'always'}
       onCreated={() => setListo(true)}
     >
+      <SondaTres3D />
       <Suspense fallback={null}>
         <Contenido
           params={params}
@@ -430,6 +470,7 @@ export default function EscenaBase3D({
           focoToken={focoToken}
           estadoFinca={estadoFinca}
           hayAlerta={hayAlerta}
+          franja={franja}
           camaraInicial={cam}
           tierInicial={tierInicial}
           presupuestoInicial={presupuestoInicial}

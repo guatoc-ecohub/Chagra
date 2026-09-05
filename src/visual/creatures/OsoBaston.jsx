@@ -1,6 +1,8 @@
 import { useId, useRef } from 'react';
 import './creatures.css';
 import { useVidaIdle, useRitmoPropio, useMiradaUsted } from './useVidaIdle.js';
+import { CompaiAgente } from '../agente/CompaiAgente.jsx';
+import { COMPAI_ESPECIES } from '../agente/compaiEspecies.js';
 import { CreatureFilters } from './_filters.jsx';
 import { BocaVisema } from './_rubberhose.jsx';
 import {
@@ -52,6 +54,7 @@ import { auraDeBicho } from './transformacion.js';
    VERDE del bastón) y el BASTÓN FLORECIDO completo con su botánica nombrada
    (Espeletia grandiflora + Cattleya trianae — ver osoBastonIdentidad). */
 const VIEWBOX = '-17 -22 34 42';
+const OSO_PERFIL_COMPAI = COMPAI_ESPECIES['oso-baston'];
 
 /* ═══ EL TRONCO DE LA LÁMINA — la musculatura del caminante, no un costal:
    trapecio→HOMBROS ANCHOS (lo más ancho arriba, como en el PNG), pectorales,
@@ -205,11 +208,12 @@ const POLEN = [
   { cx: 12.8, cy: -18.2, r: 0.36, d: -1.4, s: 6.9 },
 ];
 
-export function OsoBaston({
+export function OsoBastonRig({
   size = 64,
   className = '',
   inline = false,
   animated = true,
+  reducedMotion = false,
   title = 'Oso del bastón',
   /* Pose de VIDA: 'anda' (base, plantado en su trocha) | 'camina' (el ciclo de
      ANDAR plantígrado con bastón — kart/mundos) | 'celebra' | 'reposo' |
@@ -268,7 +272,7 @@ export function OsoBaston({
   const trufaG = `osb-trufa-${uid}`;
   const ojoIClip = `osb-ojo-i-${uid}`;
   const ojoDClip = `osb-ojo-d-${uid}`;
-  const vivo = animated;
+  const vivo = animated && !reducedMotion;
 
   // ═══ VIDA PROPIA (idle-cerebro + ritmo propio + mirada — vara Angelita v2).
   const raizRef = useRef(null);
@@ -888,6 +892,75 @@ export function OsoBaston({
     );
   }
   return svg;
+}
+
+const POSE_RIG_DE_ESTADO = {
+  respondiendo: 'celebra',
+  contenta: 'celebra',
+  escuchando: 'reposo',
+  caminando: 'camina',
+};
+
+function AdaptadorOsoBaston({
+  especie: _especie,
+  creatureSlug: _creatureSlug,
+  capacidades: _capacidades,
+  perfil: _perfil,
+  idlePerfil: _idlePerfil,
+  climaPerfil: _climaPerfil,
+  pose,
+  poseLegada = undefined,
+  estadoLegado = undefined,
+  reducedMotion,
+  'data-agt-especie': dataEspecie,
+  'data-creature': dataCreature,
+  'data-agt-estado': dataEstado,
+  'data-pose': _dataPose,
+  'data-visema': dataVisema,
+  'data-clima': dataClima,
+  'data-tier': dataTier,
+  ...props
+}) {
+  const poseRig = poseLegada || POSE_RIG_DE_ESTADO[dataEstado] || pose;
+  // eslint-disable-next-line chagra-i18n/no-hardcoded-spanish
+  const resopla = props.resopla || dataEstado === 'pensando';
+  const rigAnimado = props.animated !== false && !reducedMotion;
+
+  return (
+    <OsoBastonRig
+      {...props}
+      pose={poseRig}
+      resopla={resopla}
+      reducedMotion={reducedMotion}
+      data-agt-especie={dataEspecie}
+      data-creature={dataCreature}
+      data-agt-estado={estadoLegado || dataEstado}
+      data-pose={rigAnimado ? poseRig : undefined}
+      data-visema={dataVisema}
+      data-clima={dataClima}
+      data-tier={dataTier}
+    />
+  );
+}
+
+/** Fachada del oso del bastón sobre el contrato común Compai. */
+export function OsoBaston({ inline = false, pose: poseLegada = undefined, estado = 'acompana', ...props }) {
+  // Los mundos 3D montan el cuerpo dentro de un SVG padre. Ese montaje no
+  // puede tener shell HTML, así que conserva el rig directo y su pose previa.
+  if (inline) return <OsoBastonRig {...props} inline pose={poseLegada} />;
+
+  return (
+    <CompaiAgente
+      {...props}
+      especie={OSO_PERFIL_COMPAI.avatarType}
+      estado={estado}
+      estadoLegado={estado}
+      chrome={false}
+      preserveRigAnimation
+      poseLegada={poseLegada}
+      adaptador={AdaptadorOsoBaston}
+    />
+  );
 }
 
 export default OsoBaston;

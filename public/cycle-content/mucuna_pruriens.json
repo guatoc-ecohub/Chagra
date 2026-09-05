@@ -47,7 +47,7 @@
     "drenaje_requerido": "bueno"
   },
   "valor_pedagogico": "El abono verde mas potente del tropico: el frijol terciopelo produce biomasa masivamente y cubre el suelo como una alfombra viva, ensenando como las leguminosas tropicales restauran suelos degradados en climas calidos.",
-  "companions_markdown": "### Especies asociadas favorables\n\nEstas especies favorecen el cultivo cuando se siembran cerca:\n- zea_mays — Maíz criollo (Zea mays L.)",
+  "companions_markdown": "### Especies asociadas favorables\n\nEstas especies favorecen el cultivo cuando se siembran cerca:\n- zea_mays — Maíz criollo (Zea mays L.)\n- anacardium_occidentale — Marañón (Anacardium occidentale L.)",
   "sources": [
     {
       "id": "powo-kew",
@@ -69,5 +69,5 @@
     }
   ],
   "_generated_by": "scripts/build-cycle-content-from-catalog.mjs",
-  "_generated_at": "2026-05-19T00:42:57.374Z"
+  "_generated_at": "2026-09-03T07:40:20.311Z"
 }

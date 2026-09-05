@@ -208,7 +208,7 @@ function Regadera({ pos }) {
   );
 }
 
-function Diorama({ params, reducedMotion }) {
+function Diorama({ params, reducedMotion, tier, viento }) {
   const bandejas = params?.bandejas || [
     { pos: [-0.35, 0, 0.35], rot: 0.1 },
     { pos: [0.32, 0, 0.3], rot: -0.08 },
@@ -296,7 +296,7 @@ function Diorama({ params, reducedMotion }) {
       <Bolsa pos={[1.18, 0, 0.78]} alto={0.38} color="#4e8f3f" />
 
       {/* la fauna que anima el vivero (mariposa/colibrí) */}
-      <Fauna items={FAUNA_SEMILLERO} reducedMotion={reducedMotion} />
+      <Fauna items={FAUNA_SEMILLERO} reducedMotion={reducedMotion} tier={tier} viento={viento} />
     </group>
   );
 }
@@ -328,7 +328,7 @@ export default function EscenaSemillero(props) {
       camara={CAMARA_SEMILLERO}
       entrada={{ ...props.entrada, zoom: ZOOM_SEMILLERO, centro: [0, 0.45, 0] }}
     >
-      <Diorama params={props.params} reducedMotion={props.reducedMotion} />
+      <Diorama params={props.params} reducedMotion={props.reducedMotion} tier={props.tier} viento={props.estadoFinca?.viento} />
     </EscenaBase3D>
   );
 }

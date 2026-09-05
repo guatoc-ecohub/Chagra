@@ -1,0 +1,56 @@
+{
+  "species_slug": "vitis_vinifera",
+  "scientific_name": "Vitis vinifera L.",
+  "common_names": [
+    "Vid / Uva"
+  ],
+  "family": "Vitaceae",
+  "category": "frutales_perennes",
+  "cultivable": true,
+  "conservation_status": "cultivo_comun",
+  "thermal_zones": [
+    "calido",
+    "templado"
+  ],
+  "roles_in_guild": [
+    "crop"
+  ],
+  "antagonists": [],
+  "especies_nativas_sustitutas": [],
+  "propagation": null,
+  "requirements": {
+    "agua": null,
+    "altitud_msnm": {
+      "min_absoluto": 400,
+      "optimo_min": 900,
+      "optimo_max": 1600,
+      "max_absoluto": 2000
+    },
+    "temperatura_c": null,
+    "radiacion": null,
+    "drenaje_requerido": null
+  },
+  "valor_pedagogico": "La vid o uva (Vitis vinifera L., familia Vitaceae) es una liana leñosa trepadora caducifolia originaria de Eurasia, cultivada en Colombia principalmente en el Valle del Cauca (zona de La Unión, Roldanillo, Toro — clima cálido moderado) y en el norte del Valle y Boyacá, tanto como uva de mesa como para vinos artesanales. A diferencia del clima templado estacional de origen, en el trópico la vid no entra en dormancia natural, por lo que se maneja con poda forzada para inducir hasta dos cosechas anuales, una práctica agronómica única que enseña cómo se adapta un cultivo de zona templada al trópico. Requiere tutorado (espaldera o parral) y es susceptible a la podredumbre gris (Botrytis cinerea) en racimo y a nematodos; la curaduría de Chagra registra ambos problemas. No debe confundirse con la 'uva caimarona' (Pourouma cecropiifolia) ni la 'uva camarona' (Macleania rupestris), frutos nativos amazónico-andinos sin parentesco botánico. Lección viva sobre adaptación de cultivos templados al trópico y poda fisiológica. Fuentes Tier A de taxonomía: GBIF, POWO Kew, Bernal 2015.",
+  "sources": [
+    {
+      "id": "gbif-taxonomic-backbone",
+      "title": "gbif-taxonomic-backbone",
+      "tier": "A",
+      "url": "https://www.gbif.org/dataset/d7dddbf4-2cf0-4f39-9b2a-bb099caae36c"
+    },
+    {
+      "id": "powo-kew",
+      "title": "powo-kew",
+      "tier": "A",
+      "url": "https://powo.science.kew.org"
+    },
+    {
+      "id": "bernal-2015-plantas-liquenes-colombia",
+      "title": "bernal-2015-plantas-liquenes-colombia",
+      "tier": "A",
+      "url": "http://catalogoplantasdecolombia.unal.edu.co"
+    }
+  ],
+  "_generated_by": "scripts/build-cycle-content-from-catalog.mjs",
+  "_generated_at": "2026-09-03T07:40:20.316Z"
+}

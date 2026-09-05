@@ -440,10 +440,26 @@ div.zariguyaHuesos > svg{ width: 100%; height: 100%; display: block; overflow: v
 /* la lámina-rig entera se apaga mientras una pose plena está al frente
    (mismo trato que [data-modo='pose'] .zgl-lamina en la hermana). El AURA
    rosa del actuando también: detrás de una viñeta lee como parche sintético
-   — las poses van limpias, como en la hermana Gemini. */
+   — las poses van limpias, como en la hermana Gemini. `data-pose` también
+   transporta la pose genérica del dispatcher (`anda`/`camina`); esas claves
+   NO son viñetas y deben dejar visible el rig base. */
 .zariguyaHuesos .zh-masa{ transition: opacity .24s ease; }
-.zariguyaHuesos[data-pose] .zh-masa{ opacity: 0; }
-.zariguyaHuesos[data-pose] .zh-aura{ opacity: 0 !important; animation: none !important; }
+.zariguyaHuesos[data-pose="escucha-01"] .zh-masa,
+.zariguyaHuesos[data-pose="escucha-02"] .zh-masa,
+.zariguyaHuesos[data-pose="escucha-03"] .zh-masa,
+.zariguyaHuesos[data-pose="escucha-04"] .zh-masa,
+.zariguyaHuesos[data-pose="verlupa"] .zh-masa,
+.zariguyaHuesos[data-pose="muerta"] .zh-masa,
+.zariguyaHuesos[data-pose="cute"] .zh-masa,
+.zariguyaHuesos[data-pose="crias"] .zh-masa{ opacity: 0; }
+.zariguyaHuesos[data-pose="escucha-01"] .zh-aura,
+.zariguyaHuesos[data-pose="escucha-02"] .zh-aura,
+.zariguyaHuesos[data-pose="escucha-03"] .zh-aura,
+.zariguyaHuesos[data-pose="escucha-04"] .zh-aura,
+.zariguyaHuesos[data-pose="verlupa"] .zh-aura,
+.zariguyaHuesos[data-pose="muerta"] .zh-aura,
+.zariguyaHuesos[data-pose="cute"] .zh-aura,
+.zariguyaHuesos[data-pose="crias"] .zh-aura{ opacity: 0 !important; animation: none !important; }
 
 /* ESCUCHA (listening): el ciclo 02→03→04→03 lo lleva el JSX (crossfade de
    arriba); el close-up 01 (avatar chico) ladea apenas. */

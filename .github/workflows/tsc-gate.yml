@@ -13,7 +13,11 @@ on:
   pull_request:
     branches: [main, dev, app-3d]
   push:
-    branches: [main, feat/**, fix/**, chore/**]
+    # dev incluido (C2a, auditoria de proceso de gates rojos 2026-09-03):
+    # los commits directos a dev cruzan el mismo gate. Es seguro porque el
+    # gate es ABSOLUTO (compara contra scripts/tsc-baseline.json commiteado),
+    # no depende de ningun ref base del evento.
+    branches: [main, dev, feat/**, fix/**, chore/**]
 
 permissions:
   contents: read

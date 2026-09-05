@@ -20,8 +20,30 @@ import {
  *   } | null  (null si intent desconocido o text vacío)
  */
 
+// Chips declarados en el manifiesto (fc2b6aa0b, 2026-08-27) SIN routing
+// determinístico en planForcedIntent: el router retorna null y el turno cae
+// al flujo NLU normal. Estado a medio cablear CONGELADO aquí:
+//   - asociaciones (kind:'nav'): su heroRoute navega a la vista
+//     'asociaciones' desde el AgentHero; qué debe hacer el CHIP al escribir
+//     texto (navegar, localGrounding, dejar al NLU) es decisión pendiente.
+//   - fuente_doi (kind:'tool'): declara tool 'get_fuente_doi' que NO está en
+//     ALLOWED_TOOLS del sidecarClient ni verificada en el sidecar; cablearla
+//     sin esa verificación degradaría el turno a RAG sin grounding en
+//     silencio (la misma patología que el fix grounding P0 2026-06-25).
+//     VERIFICADO EN VIVO 2026-09-04 (ver docs/known-issues/
+//     chips-menu-perfiles-sin-cablear.md): la tool NO existe — 404 en
+//     POST /tools/get_fuente_doi contra el sidecar (build 5bd011ff, 45 tools
+//     listadas, ninguna con fuente/doi) y cero apariciones en el código de
+//     chagra-pro. La tool hay que escribirla ANTES de cablear el chip.
+// Cualquier cambio en este set debe ser consciente: cablear un intent implica
+// sacarlo de esta lista y cubrirlo con tests de routing real (tool + args).
+const INTENTS_SIN_ROUTING = Object.freeze(['asociaciones', 'fuente_doi']);
+const INTENTS_CABLEADOS = Object.freeze(
+  Object.keys(CHIP_INTENTS).filter((intent) => !INTENTS_SIN_ROUTING.includes(intent)),
+);
+
 describe('chipIntentRouter — enum y definiciones', () => {
-  it('expone los 17 intents del enum (incluye restauración, silvopastoreo, páramo, incendio, grounding oscuro)', () => {
+  it('expone los 19 intents del enum (17 históricos + asociaciones y fuente_doi del menú por perfiles)', () => {
     expect(CHIP_INTENTS).toEqual({
       siembro: 'siembro',
       plaga: 'plaga',
@@ -42,10 +64,14 @@ describe('chipIntentRouter — enum y definiciones', () => {
       variedades: 'variedades',
       polinizacion: 'polinizacion',
       fenologia: 'fenologia',
+      // Menú por perfiles (fc2b6aa0b, 2026-08-27): asociaciones para el
+      // perfil campesino y fuente/DOI para el técnico.
+      asociaciones: 'asociaciones',
+      fuente_doi: 'fuente_doi',
     });
   });
 
-  it('CHIP_DEFS tiene los 17 chips con label en español colombiano (sin voseo)', () => {
+  it('CHIP_DEFS tiene los 19 chips con label en español colombiano (sin voseo)', () => {
     const ids = CHIP_DEFS.map((c) => c.intent);
     expect(ids).toEqual([
       'siembro',
@@ -65,6 +91,8 @@ describe('chipIntentRouter — enum y definiciones', () => {
       'variedades',
       'polinizacion',
       'fenologia',
+      'asociaciones',
+      'fuente_doi',
     ]);
     // Labels presentes y emoji declarado
     for (const def of CHIP_DEFS) {
@@ -440,24 +468,44 @@ describe('chipIntentRouter — Deep Research (B14: stub honesto, backend no serv
 });
 
 describe('chipIntentRouter — contrato de orden y consistencia del índice', () => {
-  it('CHIP_DEFS mantiene el orden de render estable (chips base + restauración/silvopastoreo/páramo/incendio + grounding oscuro al final)', () => {
+  it('CHIP_DEFS mantiene el orden de render estable (chips base + restauración/silvopastoreo/páramo/incendio + grounding oscuro + perfiles al final)', () => {
     const order = CHIP_DEFS.map((d) => d.intent);
     expect(order).toEqual([
       'siembro', 'plaga', 'biopreparado', 'clima', 'precio', 'calendario', 'deep',
       'restauracion', 'silvopastoreo', 'paramo', 'incendio',
       'toxicidad', 'saberes_tradicionales', 'alerta_paramo', 'variedades', 'polinizacion', 'fenologia',
+      'asociaciones', 'fuente_doi',
     ]);
   });
 
-  it('DEF_BY_INTENT indexa todos los intents sin entradas extra', () => {
+  it('DEF_BY_INTENT indexa todos los intents cableados sin entradas extra', () => {
     // DEF_BY_INTENT no es exportado, así que verificamos indirectamente:
-    // isStubIntent e isDeepResearchIntent cubren todos los intents sin error.
-    for (const intent of Object.keys(CHIP_INTENTS)) {
+    // planForcedIntent resuelve un plan para CADA intent cableado, sin error.
+    // Los 2 intents sin routing determinístico están congelados aparte (ver
+    // INTENTS_SIN_ROUTING y su test dedicado).
+    for (const intent of INTENTS_CABLEADOS) {
       expect(() => {
         // Estos son los únicos consumers del índice interno
         const plan = planForcedIntent(intent, 'test');
         expect(plan).not.toBeNull();
       }).not.toThrow();
+    }
+  });
+
+  it('los chips declarados sin routing determinístico están congelados (asociaciones, fuente_doi)', () => {
+    // Estado a medio cablear del menú por perfiles (fc2b6aa0b): ambos están
+    // en el enum y se pintan en la toolbar, pero planForcedIntent retorna
+    // null y el turno cae al NLU normal. Ver INTENTS_SIN_ROUTING arriba para
+    // la razón por intent. Si este test falla, alguien cableó uno de los dos
+    // (¡bien! — sáquelo de la lista y cúbralo con tests de routing real) o
+    // apareció un tercer intent sin caso en el switch (el test de
+    // DEF_BY_INTENT lo detecta porque espera plan no-null).
+    expect(Object.keys(CHIP_INTENTS).filter((i) => !INTENTS_CABLEADOS.includes(i))).toEqual([
+      'asociaciones',
+      'fuente_doi',
+    ]);
+    for (const intent of INTENTS_SIN_ROUTING) {
+      expect(planForcedIntent(intent, 'test')).toBeNull();
     }
   });
 });
@@ -493,10 +541,15 @@ describe('chipIntentRouter — opts ruidosos no contaminan los args', () => {
 });
 
 describe('chipIntentRouter — cross-reference con ALLOWED_TOOLS del sidecar', () => {
-  it('todas las tools de CHIP_DEFS kind:tool existen en ALLOWED_TOOLS', async () => {
+  it('todas las tools de CHIP_DEFS kind:tool cableadas existen en ALLOWED_TOOLS', async () => {
     const { __TEST__ } = await import('../sidecarClient.js');
     const allowed = __TEST__.ALLOWED_TOOLS;
-    const toolIntents = CHIP_DEFS.filter((d) => d.kind === 'tool');
+    // Solo intents CABLEADOS: fuente_doi (kind:'tool' sin routing, ver
+    // INTENTS_SIN_ROUTING) declara 'get_fuente_doi' fuera de la allow-list y
+    // su cableado está escalado — requiere tool verificada en el sidecar.
+    const toolIntents = CHIP_DEFS.filter(
+      (d) => d.kind === 'tool' && !INTENTS_SIN_ROUTING.includes(d.intent),
+    );
     for (const def of toolIntents) {
       // planForcedIntent revela el tool name real
       const plan = planForcedIntent(def.intent, 'test query', { municipio: 'Choachí' });
@@ -505,8 +558,12 @@ describe('chipIntentRouter — cross-reference con ALLOWED_TOOLS del sidecar', (
     }
   });
 
-  it('ningún kind:stub o kind:deep tiene tool en ALLOWED_TOOLS', () => {
-    const nonToolIntents = CHIP_DEFS.filter((d) => d.kind !== 'tool');
+  it('ningún kind:stub o kind:deep cableado tiene tool en ALLOWED_TOOLS', () => {
+    // asociaciones (kind:'nav') también queda fuera: es el caso sin routing
+    // congelado en INTENTS_SIN_ROUTING, no un stub ni un deep.
+    const nonToolIntents = CHIP_DEFS.filter(
+      (d) => d.kind !== 'tool' && !INTENTS_SIN_ROUTING.includes(d.intent),
+    );
     for (const def of nonToolIntents) {
       const plan = planForcedIntent(def.intent, 'test');
       // Ningún stub/deep debe tener un tool asignado (ni siquiera por error)
@@ -516,8 +573,8 @@ describe('chipIntentRouter — cross-reference con ALLOWED_TOOLS del sidecar', (
 });
 
 describe('chipIntentRouter — el prompt se preserva tal cual lo escribió el usuario', () => {
-  it('plan.prompt es el texto original trimmeado para todos los intents', () => {
-    for (const intent of Object.keys(CHIP_INTENTS)) {
+  it('plan.prompt es el texto original trimmeado para todos los intents cableados', () => {
+    for (const intent of INTENTS_CABLEADOS) {
       const plan = planForcedIntent(intent, '  tomate cherry  ', { municipio: 'Choachí' });
       expect(plan.prompt).toBe('tomate cherry');
     }

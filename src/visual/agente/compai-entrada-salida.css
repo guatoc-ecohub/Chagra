@@ -1,0 +1,291 @@
+/* compai-entrada-salida.css — ENTRADA y SALIDA por especie del compai (FAB 2D).
+ *
+ * El JS (CompaiEntradaSalida.jsx) es solo el metrónomo: pone la clase de fase
+ * `.compai-es--fase-<nombre>` y la duración en `--ce-ms` (leída del perfil de
+ * conducta de la especie). Aquí viven las curvas. Solo opacity / transform /
+ * filter (GPU) sobre el envoltorio: el rig de adentro no se toca.
+ *
+ * El envoltorio tiene dos capas: `__aura` (el color de aura del perfil,
+ * `--ce-aura`, que hace de sombra, luz o corona según la especie) y `__cuerpo`
+ * (el compai). Cada fase arranca donde terminó la anterior: `both` + valores
+ * de `from` iguales al `to` previo, para que el empalme no salte.
+ *
+ * Angelita nunca pasa por aquí: su entrada histórica es la vara.
+ */
+.compai-es {
+  position: relative;
+  display: inline-flex;
+  --ce-ms: 400ms;
+  --ce-aura: #ffd166;
+  --ce-squash: 0.05;
+  --ce-suave: cubic-bezier(0.22, 0.61, 0.36, 1);
+  --ce-rebase: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --ce-rebase-pesado: cubic-bezier(0.34, 1.18, 0.64, 1);
+}
+.compai-es__cuerpo {
+  display: inline-flex;
+  transform-origin: 50% 88%;
+  will-change: transform, opacity;
+}
+.compai-es__aura {
+  position: absolute;
+  inset: -16%;
+  border-radius: 50%;
+  pointer-events: none;
+  opacity: 0;
+  transform: scale(0.6);
+  background: radial-gradient(circle, var(--ce-aura) 0%, transparent 68%);
+  will-change: transform, opacity;
+}
+
+/* ESPERA — el número no arranca hasta que el cuerpo (chunk perezoso en prod)
+   está montado; mientras, ni cuerpo ni aura. */
+.compai-es--fase-espera .compai-es__cuerpo { opacity: 0; }
+
+/* ═══ MÍSTICO-SOMBRA (jaguar) — la sombra primero, el cuerpo condensa ═══ */
+.compai-es--fase-sombra .compai-es__cuerpo { opacity: 0; }
+.compai-es--fase-sombra .compai-es__aura {
+  animation: ce-aura-sube var(--ce-ms) var(--ce-suave) both;
+}
+.compai-es--mistico-sombra.compai-es--fase-cuerpo .compai-es__cuerpo {
+  animation: ce-cuerpo-condensa var(--ce-ms) var(--ce-suave) both;
+}
+.compai-es--mistico-sombra.compai-es--fase-cuerpo .compai-es__aura {
+  animation: ce-aura-cede var(--ce-ms) var(--ce-suave) both;
+}
+.compai-es--mistico-sombra.compai-es--fase-quieto .compai-es__aura {
+  animation: ce-aura-latente var(--ce-ms) ease-in-out both;
+}
+/* salida: el cuerpo se apaga, la sombra (ojos) queda un poco y se va */
+.compai-es--mistico-sombra.compai-es--salida.compai-es--fase-cuerpo .compai-es__cuerpo {
+  animation: ce-cuerpo-disuelve var(--ce-ms) var(--ce-suave) both;
+}
+.compai-es--mistico-sombra.compai-es--salida.compai-es--fase-cuerpo .compai-es__aura {
+  animation: ce-aura-sube var(--ce-ms) var(--ce-suave) both;
+}
+.compai-es--fase-ojos .compai-es__cuerpo { opacity: 0; }
+.compai-es--fase-ojos .compai-es__aura {
+  animation: ce-aura-apaga var(--ce-ms) ease-in both;
+}
+
+/* ═══ CAMINA-O-MÍSTICO (oso) — llega, se planta, florece, quieto ═══ */
+.compai-es--fase-llega .compai-es__cuerpo {
+  animation: ce-cuerpo-llega var(--ce-ms) var(--ce-suave) both;
+}
+.compai-es--fase-planta .compai-es__cuerpo {
+  animation: ce-cuerpo-planta var(--ce-ms) var(--ce-suave) both;
+}
+.compai-es--fase-florece .compai-es__cuerpo {
+  animation: ce-cuerpo-florece var(--ce-ms) var(--ce-rebase-pesado) both;
+}
+.compai-es--fase-florece .compai-es__aura {
+  animation: ce-aura-florece var(--ce-ms) var(--ce-suave) both;
+}
+.compai-es--camina-o-mistico.compai-es--fase-quieto .compai-es__aura {
+  animation: ce-aura-latente var(--ce-ms) ease-in-out both;
+}
+.compai-es--camina-o-mistico.compai-es--salida.compai-es--fase-cuerpo .compai-es__cuerpo {
+  animation: ce-cuerpo-disuelve var(--ce-ms) var(--ce-suave) both;
+}
+.compai-es--camina-o-mistico.compai-es--salida.compai-es--fase-cuerpo .compai-es__aura {
+  animation: ce-aura-sube var(--ce-ms) var(--ce-suave) both;
+}
+.compai-es--fase-corona .compai-es__cuerpo { opacity: 0; }
+.compai-es--fase-corona .compai-es__aura {
+  animation: ce-aura-apaga var(--ce-ms) ease-in both;
+}
+
+/* ═══ TROTE (zarigüeya) — trota desde el borde, frena, se yergue ═══ */
+.compai-es--fase-trote .compai-es__cuerpo {
+  animation: ce-cuerpo-trote var(--ce-ms) linear both;
+}
+.compai-es--fase-frena .compai-es__cuerpo {
+  animation: ce-cuerpo-frena var(--ce-ms) var(--ce-suave) both;
+}
+.compai-es--fase-yergue .compai-es__cuerpo {
+  animation: ce-cuerpo-yergue var(--ce-ms) var(--ce-rebase) both;
+}
+.compai-es--fase-corre .compai-es__cuerpo {
+  animation: ce-cuerpo-corre var(--ce-ms) ease-in both;
+}
+
+/* ═══ LUZ-PRIMERO (luciérnaga) — un punto de luz, el cuerpo alrededor ═══ */
+.compai-es--fase-luz .compai-es__cuerpo { opacity: 0; }
+.compai-es--fase-luz .compai-es__aura {
+  animation: ce-luz-prende var(--ce-ms) var(--ce-suave) both;
+}
+.compai-es--luz-primero.compai-es--fase-cuerpo .compai-es__cuerpo {
+  animation: ce-cuerpo-alrededor var(--ce-ms) var(--ce-suave) both;
+}
+.compai-es--luz-primero.compai-es--fase-cuerpo .compai-es__aura {
+  animation: ce-luz-asienta var(--ce-ms) ease-in-out both;
+}
+.compai-es--luz-primero.compai-es--tri.compai-es--fase-cuerpo .compai-es__aura {
+  animation: ce-luz-tri var(--ce-ms) ease-in-out both;
+}
+.compai-es--fase-deriva .compai-es__cuerpo {
+  animation: ce-cuerpo-deriva var(--ce-ms) ease-in both;
+}
+.compai-es--fase-deriva .compai-es__aura {
+  animation: ce-aura-apaga var(--ce-ms) ease-in both;
+}
+
+/* ═══ DARDO (chivito) — recta con estela, hover, se posa ═══ */
+.compai-es--entrada.compai-es--fase-dardo .compai-es__cuerpo {
+  animation: ce-cuerpo-dardo var(--ce-ms) var(--ce-suave) both;
+}
+.compai-es--fase-hover .compai-es__cuerpo {
+  animation: ce-cuerpo-hover var(--ce-ms) ease-in-out both;
+}
+.compai-es--fase-posa .compai-es__cuerpo {
+  animation: ce-cuerpo-posa var(--ce-ms) var(--ce-rebase) both;
+}
+.compai-es--salida.compai-es--fase-dardo .compai-es__cuerpo {
+  animation: ce-cuerpo-dardo-fuera var(--ce-ms) ease-in both;
+}
+
+/* ═══ TEATRAL (guacamaya) — asoma chiquita, quieta, crece, brillo ═══ */
+.compai-es--fase-asoma .compai-es__cuerpo {
+  animation: ce-cuerpo-asoma var(--ce-ms) var(--ce-rebase) both;
+}
+.compai-es--fase-quieta .compai-es__cuerpo { transform: scale(0.42); }
+.compai-es--fase-crece .compai-es__cuerpo {
+  animation: ce-cuerpo-crece var(--ce-ms) var(--ce-rebase) both;
+}
+.compai-es--fase-brillo .compai-es__aura {
+  animation: ce-aura-brillo var(--ce-ms) var(--ce-suave) both;
+}
+
+/* ═══ keyframes ═══ */
+@keyframes ce-aura-sube {
+  from { opacity: 0; transform: scale(0.6); }
+  to   { opacity: 0.9; transform: scale(1); }
+}
+@keyframes ce-aura-cede {
+  from { opacity: 0.9; transform: scale(1); }
+  to   { opacity: 0.35; transform: scale(0.92); }
+}
+@keyframes ce-aura-latente {
+  from { opacity: 0.35; transform: scale(0.92); }
+  to   { opacity: 0; transform: scale(0.85); }
+}
+@keyframes ce-aura-apaga {
+  from { opacity: 0.9; transform: scale(1); }
+  to   { opacity: 0; transform: scale(0.7); }
+}
+@keyframes ce-aura-florece {
+  0%   { opacity: 0; transform: scale(0.7); }
+  45%  { opacity: 0.8; transform: scale(1.05); }
+  100% { opacity: 0.35; transform: scale(0.92); }
+}
+@keyframes ce-aura-brillo {
+  0%   { opacity: 0; transform: scale(0.8); }
+  40%  { opacity: 0.9; transform: scale(1.1); }
+  100% { opacity: 0; transform: scale(1.2); }
+}
+@keyframes ce-luz-prende {
+  from { opacity: 0; transform: scale(0.15); }
+  to   { opacity: 1; transform: scale(0.45); }
+}
+@keyframes ce-luz-asienta {
+  from { opacity: 1; transform: scale(0.45); }
+  to   { opacity: 0.35; transform: scale(0.9); }
+}
+@keyframes ce-luz-tri {
+  0%   { opacity: 1; transform: scale(0.45); }
+  16%  { opacity: 0.3; }
+  33%  { opacity: 1; transform: scale(0.6); }
+  50%  { opacity: 0.3; }
+  66%  { opacity: 1; transform: scale(0.75); }
+  83%  { opacity: 0.3; }
+  100% { opacity: 0.35; transform: scale(0.9); }
+}
+@keyframes ce-cuerpo-condensa {
+  from { opacity: 0; filter: blur(2px); transform: scale(0.96); }
+  to   { opacity: 1; filter: blur(0); transform: scale(1); }
+}
+@keyframes ce-cuerpo-disuelve {
+  from { opacity: 1; filter: blur(0); }
+  to   { opacity: 0; filter: blur(2px); }
+}
+@keyframes ce-cuerpo-llega {
+  from { opacity: 0; filter: blur(1.5px); transform: translate(22%, 18%); }
+  to   { opacity: 1; filter: blur(0); transform: translate(0, 0); }
+}
+@keyframes ce-cuerpo-planta {
+  from { transform: scale(calc(1 + var(--ce-squash)), calc(1 - var(--ce-squash))); }
+  to   { transform: scale(1, 1); }
+}
+@keyframes ce-cuerpo-florece {
+  0%   { transform: scale(1, 1); }
+  55%  { transform: scale(0.99, 1.03); }
+  100% { transform: scale(1, 1); }
+}
+@keyframes ce-cuerpo-trote {
+  0%   { opacity: 0; transform: translate(120%, 0); }
+  10%  { opacity: 1; }
+  25%  { transform: translate(90%, -6%); }
+  50%  { transform: translate(60%, 0); }
+  75%  { transform: translate(30%, -6%); }
+  100% { opacity: 1; transform: translate(0, 0); }
+}
+@keyframes ce-cuerpo-frena {
+  from { transform: scale(calc(1 + var(--ce-squash)), calc(1 - var(--ce-squash))) rotate(-3deg); }
+  to   { transform: scale(1, 1) rotate(0deg); }
+}
+@keyframes ce-cuerpo-yergue {
+  0%   { transform: scale(1, 1); }
+  40%  { transform: scale(0.98, 1.06); }
+  100% { transform: scale(1, 1); }
+}
+@keyframes ce-cuerpo-corre {
+  0%   { opacity: 1; transform: translate(0, 0); }
+  30%  { transform: translate(40%, -6%); }
+  60%  { transform: translate(80%, 0); }
+  100% { opacity: 0; transform: translate(130%, -6%); }
+}
+@keyframes ce-cuerpo-alrededor {
+  from { opacity: 0; transform: scale(0.85); }
+  to   { opacity: 1; transform: scale(1); }
+}
+@keyframes ce-cuerpo-deriva {
+  from { opacity: 1; transform: translateY(0); }
+  to   { opacity: 0; transform: translateY(-45%); }
+}
+@keyframes ce-cuerpo-dardo {
+  from { opacity: 0.4; filter: blur(3px); transform: translate(140%, -40%) scale(1.18, 0.9); }
+  to   { opacity: 1; filter: blur(0); transform: translate(0, 0) scale(1, 1); }
+}
+@keyframes ce-cuerpo-hover {
+  0%   { transform: translateY(0); }
+  50%  { transform: translateY(-5%); }
+  100% { transform: translateY(0); }
+}
+@keyframes ce-cuerpo-posa {
+  from { transform: scale(calc(1 + var(--ce-squash)), calc(1 - var(--ce-squash))); }
+  to   { transform: scale(1, 1); }
+}
+@keyframes ce-cuerpo-dardo-fuera {
+  from { opacity: 1; filter: blur(0); transform: translate(0, 0); }
+  to   { opacity: 0; filter: blur(3px); transform: translate(140%, -40%) scale(1.18, 0.9); }
+}
+@keyframes ce-cuerpo-asoma {
+  from { opacity: 0; transform: scale(0); }
+  to   { opacity: 1; transform: scale(0.42); }
+}
+@keyframes ce-cuerpo-crece {
+  0%   { transform: scale(0.42); }
+  18%  { transform: scale(0.38, 0.46); }
+  70%  { transform: scale(1.06, 0.97); }
+  100% { transform: scale(1, 1); }
+}
+
+/* Tier bajo: sin blur (fill-rate del Mali), las fases siguen. */
+.compai-es[data-ce-tier='bajo'] .compai-es__cuerpo { filter: none !important; }
+
+/* Quietud pedida: nada de teatro. El JS ya no monta el envoltorio con
+   reduced-motion; esto es la defensa CSS equivalente. */
+@media (prefers-reduced-motion: reduce) {
+  .compai-es__cuerpo { animation: none !important; opacity: 1 !important; transform: none !important; filter: none !important; }
+  .compai-es__aura { animation: none !important; opacity: 0 !important; }
+}

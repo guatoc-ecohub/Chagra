@@ -126,14 +126,19 @@ describe('Mundos — el mapa cubre todo lo que el home F2 exponía (sin huérfan
     }
   });
 
-  test('el manifiesto es sano: ids únicos, tinte, y directo XOR entradas', () => {
+  test('el manifiesto es sano: ids únicos, tinte, y destino navegable', () => {
     const ids = MUNDOS_FINCA.map((m) => m.id);
     expect(new Set(ids).size).toBe(ids.length);
     for (const m of MUNDOS_FINCA) {
       expect(Array.isArray(m.tinte) && m.tinte.length === 2, `tinte de ${m.id}`).toBe(true);
       const tieneDirecto = !!m.directo;
       const tieneEntradas = (m.entradas || []).length > 0;
-      expect(tieneDirecto !== tieneEntradas, `${m.id} debe ser directo O tener entradas`).toBe(true);
+      if (m.id === 'clima') {
+        expect(m.directo).toEqual({ view: 'clima_boletin' });
+        expect(m.entradas?.[0]?.view).toBe('clima_boletin');
+      } else {
+        expect(tieneDirecto !== tieneEntradas, `${m.id} debe ser directo O tener entradas`).toBe(true);
+      }
     }
   });
 

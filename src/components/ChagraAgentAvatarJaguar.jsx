@@ -26,10 +26,23 @@ import { useAngelitaPresencia, esPasivo } from '../visual/agente/useAngelitaPres
  */
 const VISEMA_DE_STATE = {
     speaking: 'V2',
+    respondiendo: 'V2',
+};
+
+const ESTADO_DE_STATE = {
+    idle: 'acompana',
+    // eslint-disable-next-line chagra-i18n/no-hardcoded-spanish
+    thinking: 'pensando',
+    // eslint-disable-next-line chagra-i18n/no-hardcoded-spanish
+    speaking: 'respondiendo',
+    listening: 'escuchando',
+    caminando: 'caminando',
 };
 
 export default function ChagraAgentAvatarJaguar({
     state = 'idle',
+    estado = undefined,
+    visema: visemaRecibido = null,
     size = 48,
     withLabel = false,
     onClick = undefined,
@@ -42,12 +55,20 @@ export default function ChagraAgentAvatarJaguar({
     // (tier), y no debe descartarlos donde el host los cablea.
     animated = true,
     tier = undefined,
+    clima = null,
+    enso = 'neutro',
+    direccion = 'derecha',
+    reducedMotion = false,
+    'data-agt-estado': dataEstado = undefined,
+    'data-pose': dataPose = undefined,
+    'data-visema': dataVisema = undefined,
     // Presencia (pedido operador 2026-08-24, transversal al elenco): con
     // reaccionaPresencia el jaguar DESPIERTA a su estado natural (idle vivo:
     // useVidaIdle 70/30 — acecha/ruge/reposo) cuando la persona hace mouse
     // over o toca la pantalla, sin pisar un estado activo real (thinking/
     // speaking/listening). Mismo contrato que ChagraAgentAvatarAngelita.
     reaccionaPresencia = true,
+    ...atributosConducta
 }) {
     const { despierta, handlers: handlersPresencia } = useAngelitaPresencia({
         activo: reaccionaPresencia,
@@ -55,9 +76,10 @@ export default function ChagraAgentAvatarJaguar({
     // La presencia solo despierta cuando el estado es pasivo (idle): jamás
     // interrumpe una actuación conversacional. El jaguar ya está vivo en idle
     // (idle-cerebro), así que despertar = garantizar animated ON + su idle.
-    const despiertaNatural = despierta && esPasivo(state);
-    const estadoEfectivo = despiertaNatural ? 'idle' : state;
-    const visema = VISEMA_DE_STATE[estadoEfectivo] || null;
+    const estadoAgente = estado || ESTADO_DE_STATE[state] || 'acompana';
+    const despiertaNatural = despierta && esPasivo(estadoAgente);
+    const estadoEfectivo = despiertaNatural ? 'acompana' : estadoAgente;
+    const visema = visemaRecibido ?? VISEMA_DE_STATE[estadoEfectivo] ?? null;
 
     const bicho = (
         <JaguarTrazado
@@ -65,10 +87,18 @@ export default function ChagraAgentAvatarJaguar({
             visema={visema}
             size={size}
             animated={animated}
+            clima={clima}
+            enso={enso}
+            direccion={direccion}
+            reducedMotion={reducedMotion}
             tier={tier}
             title={ariaLabel}
             className={className}
             style={glow ? { filter: 'drop-shadow(0 0 10px rgba(168,85,247,0.65))' } : undefined}
+            data-agt-estado={dataEstado || estadoAgente}
+            data-pose={dataPose}
+            data-visema={dataVisema || visema || undefined}
+            {...atributosConducta}
         />
     );
 

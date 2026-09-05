@@ -89,7 +89,7 @@ import PastoVivoValle from './PastoVivoValle.jsx';
 import { CampesinosValle } from './CampesinosValle.jsx';
 import HatoMovil from './HatoMovil.jsx';
 /* Árboles POR ESPECIE (no genéricos): las mismas mallas del bosque altoandino
-   (roble, aliso, gaque) que ya viven en floraParamo — cada árbol se distingue. */
+   (roble, aliso, gaque) que ya viven en floraParamo. */
 import { geomRoble, geomAliso, geomGaque } from '../../visual/mundo3d/bosque/floraParamo.geom.js';
 /* Luciérnagas de la noche: el kit instanciado que ya existe (1-3 draw calls),
    sembrado sobre la tierra baja del valle cuando la franja las trae. */
@@ -451,10 +451,9 @@ function Quebrada({ color, viva, perfil, nocturno = false, alturaDe = alturaTerr
 }
 
 /* ── La arboleda POR ESPECIE del landmark 'bosque': roble andino (copa ancha
-      oscura), aliso (cónico de tronco claro) y gaque (domo bajo lustroso) —
-      cada árbol se distingue, nada de conos genéricos. Las mallas son las de
-      floraParamo (color horneado por vértice, 1 draw call por árbol); escala
-      ~0.5 para el diorama. `q` baja el detalle en perfil frugal. ── */
+      oscura con bellotas), aliso (cónico de tronco claro) y gaque (domo bajo
+      lustroso) — cada árbol se distingue, nada de conos genéricos. Las mallas
+      son las de floraParamo (color horneado); escala ~0.5 para el diorama. ── */
 const SITIOS_ARBOLEDA = [
   // (El monte del portal "toda mi finca" se espesó: 5 árboles, 3 especies —
   //  dosel multiespecie, no un parche de conos.)
@@ -477,7 +476,7 @@ function ArboledaEspecies({ q }) {
           key={i}
           geometry={a.geo}
           material={MATERIAL_FINCA}
-          position={/** @type {[number, number, number]} */ (a.args)}
+          position={a.args}
           rotation={[0, a.rot, 0]}
           scale={a.esc}
           castShadow
@@ -769,7 +768,7 @@ function LandmarkGeom({ tipo, tinte, reducedMotion, q = 1, forma = null }) {
           </Instances>
         </group>
       );
-    case 'animales': // los animales de la finca (reemplaza la vieja casita)
+    case 'animales': // el hato realista por raza (vaca, cerdos, gallinas, perro)
       return <AnimalesDeFinca reducedMotion={reducedMotion} q={q} />;
     case 'huerta': { // camas de la huerta: lomos redondeados con matas
       // PERF-VALLE-INSTANCING 2026-07-23: 8→2 draw calls.
@@ -2907,12 +2906,15 @@ function Escena({ clima, focoId, animo, energia, onEntrar, onAlerta, onCasa = nu
   const poseReposo = pose || { position: CAMARA_VALLE.position, fov: CAMARA_VALLE.fov, k: 1, mira: MIRA_VALLE };
   const miraReposo = poseReposo.mira || MIRA_VALLE;
   const controls = useRef(null);
-  const superficie = useMemo(() => crearSuperficieErosionada({
-    resolution: perfil.segmentosTerreno,
-    sampleBase: alturaTerreno,
-    seed: 20260824 + (tier === 'alto' ? 3 : tier === 'medio' ? 2 : 1),
-    droplets: tier === 'alto' ? 900 : tier === 'medio' ? 450 : 160,
-  }), [perfil.segmentosTerreno, tier]);
+  const superficie = useMemo(() => {
+    const opcionesSuperficie = {
+      resolution: perfil.segmentosTerreno,
+      sampleBase: alturaTerreno,
+      seed: 20260824 + (tier === 'alto' ? 3 : tier === 'medio' ? 2 : 1),
+      droplets: tier === 'alto' ? 900 : tier === 'medio' ? 450 : 160,
+    };
+    return crearSuperficieErosionada(opcionesSuperficie);
+  }, [perfil.segmentosTerreno, tier]);
   const altura = superficie.heightAt;
   /* La cámara de director (FASE 4, flag `camaraDirector`) se monta DESPUÉS de
      CamaraViajera y gana por orden de frame durante su barrido. `avatarRef`

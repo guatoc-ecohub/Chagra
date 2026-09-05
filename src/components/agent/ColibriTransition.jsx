@@ -1,7 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import ChagraAgentAvatar from '../ChagraAgentAvatar';
-import useCompaiElegido from '../../visual/mundo3d/escenas/useCompaiElegido.js';
-import { AVATAR_NOMBRE, DEFAULT_AVATAR_TYPE } from '../../hooks/useAgentAvatarType';
+import useAgentAvatarType, { AVATAR_NOMBRE, DEFAULT_AVATAR_TYPE } from '../../hooks/useAgentAvatarType';
 
 /**
  * Transición home → conversación (~2s): el compAI que el usuario eligió.
@@ -84,7 +83,7 @@ const CSS = `
 function AngelitaOverlay({ onDone }) {
   const [leaving, setLeaving] = useState(false);
   const doneRef = useRef(null);
-  const { avatarType } = useCompaiElegido();
+  const [avatarType] = useAgentAvatarType();
   const nombreAgente = AVATAR_NOMBRE[avatarType] || AVATAR_NOMBRE[DEFAULT_AVATAR_TYPE];
 
   // ref-latest del callback fuera de render (react-hooks/refs).

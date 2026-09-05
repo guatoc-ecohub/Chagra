@@ -52,6 +52,13 @@ jobs:
           VITE_FARMOS_CLIENT_ID: farm
           VITE_USE_SIDECAR_AGRO_MCP: "true"
           VITE_FINCA_VIVA_HOME_PERFIL: "true"
+          # HomeCampesinoB (#3053): la bandera homeCampesinoBActivo() hace
+          # DEFAULT ON cuando VITE_HOME_CAMPESINO_B no está seteada, lo que
+          # convirtió la home campesina en el default post-login de
+          # chagra-dev.guatoc.co (regresión). dev debe conservar la home
+          # NORMAL del PWA; la home campesina B vive en campesino.guatoc.co
+          # (build aparte con VITE_HOME_CAMPESINO_B=true). Apagamos aquí.
+          VITE_HOME_CAMPESINO_B: "false"
           # Registro unificado (#23): puerta única "Registrar" (voz + manual) en
           # dev. OFF en prod (deploy.yml no la define) hasta el visto bueno.
           VITE_REGISTRO_UNIFICADO: "true"
@@ -76,6 +83,17 @@ jobs:
           # para que dev = corpus-por-turno + deep-research + todos los guards =
           # build de referencia contra la que prod se iguala en la promoción.
           VITE_DEEP_RESEARCH_ENABLED: "true"
+          # --- Paridad con prod + piloto David/Cata (2026-08-28) ---
+          # MODO CAMPO (#2088): wake-word "hola chagra" (TF.js on-device, offline). ON en
+          # dev para probarlo en campo con voz real (criterio: PROBAR, no certificar; si no
+          # reconoce bien "hola chagra", se entrega APAGADO).
+          VITE_MODO_CAMPO: "true"
+          # Captura de conversaciones del agente (auditoria del piloto), en MODO PILOTO
+          # como prod: sin gate de consentimiento in-app, PII completa. Habeas Data Ley
+          # 1581: informar a los pilotos David/Cata FUERA de la app. Revertir
+          # REQUIRE_CONSENT a "true" al cerrar el piloto.
+          VITE_CAPTURE_CONVERSATIONS: "true"
+          VITE_CAPTURE_REQUIRE_CONSENT: "false"
           # Los bundles Pro no están servidos en dev. Sin esta variable,
           # loadProModules.js degrada al build OSS y no genera requests a
           # /pro-modules/<modulo>/index.js, que el SPA fallback respondería

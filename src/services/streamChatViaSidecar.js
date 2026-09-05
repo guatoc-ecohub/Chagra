@@ -229,6 +229,7 @@ export async function streamChatViaSidecar({
   let doneEventStats = null;
   let firstTokenWallMs = null;
   let streamFinished = false;
+  let streamError = null;
 
   try {
     while (!streamFinished) {
@@ -268,6 +269,12 @@ export async function streamChatViaSidecar({
             if (onError) {
               try { onError(parsed); } catch (_) { /* noop */ }
             }
+            // Un error del sidecar es terminal aunque el proxy no cierre la
+            // conexión ni emita `[DONE]`. Si seguimos leyendo, la UI puede
+            // quedarse en "pensando" hasta agotar un timeout externo.
+            streamError = parsed;
+            streamFinished = true;
+            break;
           }
         }
         if (streamFinished) break;
@@ -284,7 +291,32 @@ export async function streamChatViaSidecar({
     });
     throw err;
   } finally {
+    if (streamFinished) {
+      try { await reader.cancel(); } catch (_) { /* noop */ }
+    }
     try { reader.releaseLock(); } catch (_) { /* noop */ }
+  }
+
+  if (streamError) {
+    // Object.assign le da al error un tipo de intersección real
+    // (Error & { mcpToolError, tool, reason }) que los consumidores de la UI
+    // pueden leer sin casts.
+    const error = Object.assign(new Error('El sidecar no pudo completar la consulta.'), {
+      mcpToolError: true,
+      tool: typeof streamError.tool === 'string' ? streamError.tool : null,
+      reason: typeof streamError.reason === 'string'
+        ? streamError.reason
+        : typeof streamError.detail === 'string' ? streamError.detail : 'sidecar_error',
+    });
+    recordLLMEvent({
+      model: doneEventStats?.model || model,
+      endpoint: url,
+      flujo: 'chat_sidecar',
+      status: 'error',
+      total_ms: Math.round(((typeof performance !== 'undefined' && performance.now) ? performance.now() : Date.now()) - t0),
+      error_kind: 'sidecar_error',
+    });
+    throw error;
   }
 
   const totalMs = Math.round(((typeof performance !== 'undefined' && performance.now) ? performance.now() : Date.now()) - t0);

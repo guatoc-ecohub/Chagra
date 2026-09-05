@@ -11,7 +11,6 @@
  * gate GPU del operador (ver INFORME-ZARIGUYA-GEMINI.md).
  */
 import { describe, it, expect } from 'vitest';
-import { render } from '@testing-library/react';
 import { hornearZariguyaGemini, haySoporteCanvas, mascaras } from '../capas.js';
 import {
   ANCHO, ALTO, CABEZA, OJO, OJO_2, OREJA_IZQ, OREJA_DER,
@@ -28,7 +27,6 @@ import process from 'node:process';
 const cssCrudo = readFileSync(
   resolve(process.cwd(), 'src/visual/creatures/zariguyaGeminiLamina/zariguyaGeminiLamina.css'), 'utf8',
 );
-import ZariguyaGeminiLaminaViva from '../../ZariguyaGeminiLaminaViva.jsx';
 
 describe('haySoporteCanvas', () => {
   it('devuelve un booleano y no truena aunque jsdom no traiga canvas real', () => {
@@ -132,62 +130,5 @@ describe('zariguyaGeminiLamina.css — lock del waddle portado (zlv-→zgl-)', (
   it('gates de la casa cubren el nodo nuevo (tier bajo + reduced-motion)', () => {
     expect(cssCrudo).toMatch(/\[data-tier='bajo'\] \.zgl-cuerpoVida,/);
     expect(cssCrudo).toMatch(/\.zgl-stage, \.zgl-cuerpoVida, \.zgl-cuerpoPivote,/);
-  });
-});
-
-describe('ZariguyaGeminiLaminaViva — contrato observable (jsdom = degradación)', () => {
-  it('renderiza role=img con data-creature/data-lamina y el estado crudo', () => {
-    const { container } = render(<ZariguyaGeminiLaminaViva estado="listening" size={220} />);
-    const raiz = container.querySelector('div[data-creature="zariguya"]');
-    expect(raiz).toBeTruthy();
-    expect(raiz.getAttribute('role')).toBe('img');
-    expect(raiz.getAttribute('data-lamina')).toBe('gemini');
-    expect(raiz.getAttribute('data-agt-estado')).toBe('listening');
-  });
-
-  it('en jsdom (sin loads de imagen) degrada a la lámina plana en modo lamina — nunca un hueco', () => {
-    const { container } = render(<ZariguyaGeminiLaminaViva estado="thinking" size={220} />);
-    const raiz = container.querySelector('div[data-creature="zariguya"]');
-    // sin PNG cargado la pose no entra (honestidad: nunca media pose)…
-    expect(raiz.getAttribute('data-modo')).toBe('lamina');
-    // …y la hero plana está montada de respaldo.
-    const plana = container.querySelector(`img[src="/compai/laminas/zariguya-gemini-hero.png"]`);
-    expect(plana).toBeTruthy();
-  });
-
-  it("vidaForzada='crias' viaja como data-vida en idle SIN romper la honestidad de pose", () => {
-    // La firma de identidad como momento especial (operador 2026-08-24): en
-    // jsdom el PNG jamás carga, así que la pose NO entra (modo lamina) pero
-    // el momento sí queda declarado — el host y el CSS lo leen de data-vida.
-    const { container } = render(
-      <ZariguyaGeminiLaminaViva estado="idle" vidaForzada="crias" size={220} />,
-    );
-    const raiz = container.querySelector('div[data-creature="zariguya"]');
-    expect(raiz.getAttribute('data-vida')).toBe('crias');
-    expect(raiz.getAttribute('data-modo')).toBe('lamina'); // nunca media pose
-    // …y el PNG de la pose está montado en el plano de poses, precargando.
-    expect(container.querySelector('img[data-pose-key="crias"]')).toBeTruthy();
-  });
-
-  it('acepta "caminando" y cuelga el nodo del waddle (.zgl-cuerpoVida envolviendo al pivote)', () => {
-    const { container } = render(<ZariguyaGeminiLaminaViva estado="caminando" size={220} />);
-    const raiz = container.querySelector('div[data-creature="zariguya"]');
-    expect(raiz.getAttribute('data-agt-estado')).toBe('caminando');
-    const vida = container.querySelector('.zgl-cuerpoVida');
-    expect(vida).toBeTruthy();
-    // COMPONEN: el pivote de respiro/cadera vive DENTRO del nodo de waddle.
-    expect(vida.querySelector('.zgl-cuerpoPivote')).toBeTruthy();
-  });
-
-  it('animated=false = fotograma digno: la clase de waddle no se cuelga', () => {
-    const { container } = render(<ZariguyaGeminiLaminaViva estado="caminando" animated={false} />);
-    expect(container.querySelector('.zgl-cuerpoVida')).toBeNull();
-  });
-
-  it('con handlers expone botón real (teclado + lector de pantalla)', () => {
-    const { container } = render(
-      <ZariguyaGeminiLaminaViva estado="idle" onClick={() => {}} title="Zarigüeya" />,
-    );
-    expect(container.querySelector('button[type="button"]')).toBeTruthy();
   });
 });

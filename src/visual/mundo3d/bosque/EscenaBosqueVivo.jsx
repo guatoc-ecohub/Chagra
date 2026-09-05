@@ -73,6 +73,15 @@ const ENT_PROTAGONISTA = MAPA_PISO_ENT[protagonistaDePiso(PISO_MUNDO)]; // 'quen
 const PISO_VECINO = vecinoDePiso(PISO_MUNDO); // 'frio'
 const ENT_VECINO = PISO_VECINO ? MAPA_PISO_ENT[PISO_VECINO] : null; // 'aliso'
 
+/* PRNG local para conservar el mismo queñual de fondo en cada montaje. */
+function rng(seed) {
+  let estado = (seed >>> 0) || 1;
+  return () => {
+    estado = (estado * 1664525 + 1013904223) >>> 0;
+    return estado / 0x100000000;
+  };
+}
+
 /* ── LA ATMÓSFERA DEL BOSQUE DE NIEBLA ─────────────────────────────────────
       Los presets del día salen de CIELOS_HORA (la misma familia del valle:
       el bosque amanece y anochece CON el valle) pero sesgados a bosque de
@@ -810,6 +819,24 @@ function Diorama({ tier, reducedMotion, pose }) {
   // La llegada de Jackson (paneo del páramo viejo): mientras vuela, los
   // OrbitControls están desmontados. reduced-motion y gama baja la saltan.
   const [vuelo, setVuelo] = useState(() => !reducedMotion && tier !== 'bajo');
+
+  // El queñual menor: siluetas al fondo y a los lados (nunca delante del Ent).
+  const _quenual = useMemo(() => {
+    const n = tier === 'alto' ? 8 : tier === 'medio' ? 5 : 3;
+    const r = rng(303);
+    return Array.from({ length: n }, (_, i) => {
+      // arco trasero: de -200° a +20° aprox, dejando libre el frente (+Z)
+      const a = Math.PI * 0.62 + (i / Math.max(1, n - 1)) * Math.PI * 1.24 + (r() - 0.5) * 0.24;
+      const rad = 9.5 + r() * 6;
+      return {
+        key: `qn-${i}`,
+        pos: [Math.cos(a) * rad, 0, Math.sin(a) * rad],
+        escala: 1.5 + r() * 1.1,
+        giro: r() * Math.PI * 2,
+        tono: i % 2 === 0,
+      };
+    });
+  }, [tier]);
 
   return (
     <>

@@ -23,6 +23,8 @@
  * Título/emoji/tinte NO se duplican: se resuelven contra el manifiesto real
  * (mundosFinca.js) en `resolverTinte`/`tituloMundo` (mundo host).
  */
+import { BOVEDA_PISOS_DEF } from './pisosTermicos.js';
+
 
 /*
  * EL HATO DE MUESTRA — UNA sola fuente para DOS mundos (consistencia cross-mundo,
@@ -411,13 +413,17 @@ export const MUNDO = {
       hora: 0.62,           // media tarde andina (0 amanece · 0.5 mediodía · 1 anochece)
       temporada: 'lluvia',  // régimen BIMODAL andino: dos lluvias / dos secas
       niebla: 0.6,          // niebla del páramo: el frailejón peina el agua de la nube
-      // La montaña en cuatro pisos térmicos (misma paleta del mundo #4).
-      pisos: [
-        { nombre: 'cálido', color: '#c7a24b', h: 0.95, r0: 2.4, r1: 1.95 },
-        { nombre: 'templado', color: '#8fae55', h: 0.9, r1: 1.42 },
-        { nombre: 'frío', color: '#6f9a72', h: 0.85, r1: 0.9 },
-        { nombre: 'páramo', color: '#9fb6bf', h: 0.8, r1: 0.42 },
-      ],
+      // 🔴 LA MONTAÑA SON SIETE PISOS, no cuatro. Hasta el 2026-09-02 esta lista
+      // traía cuatro pisos con paleta propia (`#c7a24b`/`#8fae55`/`#6f9a72`/
+      // `#9fb6bf`) — el defecto §0 del diseño: «Clima enseña 4 pisos; la Sierra
+      // enseña 7. Se contradicen». Ahora se LEE la tabla canónica
+      // (`BOVEDA_PISOS_DEF`, derivada de `PISOS_TERMICOS_SIERRA`), que es la
+      // misma que pintan la vista global, el descenso y el macizo 3D. La
+      // geometría no cambia (cima 3,5 · base 2,4 · cima 0,42 en los dos juegos,
+      // verificado); lo que cambia es que el GEMELO 2D de la bóveda —el que ve
+      // el equipo humilde, `laminas2d/LaminaMundo.jsx` FondoBoveda— deja de
+      // enseñar cuatro bandas inventadas y enseña las siete de la tabla.
+      pisos: BOVEDA_PISOS_DEF,
       // El hielo de hoy + la línea de hasta dónde llegaba (retroceso). Ámbar de
       // "cuídelo", jamás rojo de catástrofe.
       glaciar: { nieve: 0.32, retroceso: 0.7 },
@@ -432,7 +438,14 @@ export const MUNDO = {
     },
     hotspots: [
       { id: 'hoy', pos: [2.7, 3.4, 0.6], emoji: '⛅', label: 'El tiempo hoy', view: 'hoy_finca' },
-      { id: 'almanaque', pos: [0, 1.7, 1.9], emoji: '🗓️', label: 'Almanaque de la finca', view: 'almanaque' },
+      // 2026-09-02 (gate DOM-tapa-montaña): en [0, 1.7, 1.9] su píldora abierta
+      // proyectaba SOBRE la cara del macizo (medido con la cámara viva: tapaba
+      // templado con ΔE≈180 contra su propio color real). La corrección DY de
+      // EscenaBoveda (-0.55 solo para este id) ya la bajaba pero no alcanzaba
+      // a sacarla del relieve. Se corre a la izquierda y se adelanta hacia la
+      // cámara: sobre el disco de la finca, junto al pie de la montaña, no
+      // encima — sigue siendo la puerta más visible, ya no le tapa la cara.
+      { id: 'almanaque', pos: [-1.9, 2.1, 2.5], emoji: '🗓️', label: 'Almanaque de la finca', view: 'almanaque' },
       { id: 'lluvia', pos: [-2.7, 3.1, 0.5], emoji: '🌧️', label: 'Cuándo llueve', view: 'calendario_finca' },
     ],
     entrada: { zoom: 7.5, narra: 'clima' },

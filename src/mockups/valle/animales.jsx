@@ -87,9 +87,6 @@ export const MATERIAL_HATO = new THREE.MeshLambertMaterial({
 /*
  * Un animal realista: cuerpo + cabeza pivotante. `geom` es el resultado de la
  * fábrica ({cuerpo, cabeza, pivote}); `gesto` elige el idle de la cabeza.
- * El jitter determinista por instancia (escala no uniforme + inclinación
- * mínima, sembrado por `fase`) evita que dos animales de la misma raza sean
- * clones — la repetición evidente mata la escena (DR §1).
  */
 function Animal({
   geom,
@@ -281,18 +278,18 @@ export default function AnimalesDeFinca({ reducedMotion = false, q = 1 }) {
   const g = useMemo(
     () => ({
       holstein: geomVaca({ raza: 'holstein', q }),
-      ternera: geomVaca({ raza: 'criolla', ubre: false, cuerno: 0, q }, 23),
+      ternera: geomVaca({ raza: 'criolla', ubre: false, q }),
       zungo: geomCerdo({ raza: 'zungo', q }),
-      duroc: geomCerdo({ raza: 'duroc', q }, 33),
-      landrace: geomCerdo({ raza: 'landrace', q }, 35),
+      duroc: geomCerdo({ raza: 'duroc', q }),
+      landrace: geomCerdo({ raza: 'landrace', q }),
       lechon: geomLechon({ raza: 'landrace' }),
       // Rebaño instanciado (Tarea A): geomOveja no toma raza — UNA sola
       // malla real para las dos, no una aproximación.
       oveja: geomOveja({ q }),
       campesina: geomGallina({ tipo: 'campesina', q }),
-      negra: geomGallina({ tipo: 'negra', q }, 43),
-      blanca: geomGallina({ tipo: 'blanca', q }, 45),
-      gallo: geomGallina({ tipo: 'gallo', q }, 47),
+      negra: geomGallina({ tipo: 'negra', q }),
+      blanca: geomGallina({ tipo: 'blanca', q }),
+      gallo: geomGallina({ tipo: 'gallo', q }),
       perro: geomPerro({ q }),
     }),
     [q],

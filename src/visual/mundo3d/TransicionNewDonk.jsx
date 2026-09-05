@@ -30,8 +30,7 @@
  */
 import { useEffect, useRef } from 'react';
 import ChagraAgentAvatar from '../../components/ChagraAgentAvatar.jsx';
-import useCompaiElegido from './escenas/useCompaiElegido.js';
-import { AVATAR_NOMBRE, DEFAULT_AVATAR_TYPE } from '../../hooks/useAgentAvatarType.js';
+import useAgentAvatarType, { AVATAR_NOMBRE, DEFAULT_AVATAR_TYPE } from '../../hooks/useAgentAvatarType.js';
 import { tinteDeMundo, tituloDeMundo } from './resolverMundo.js';
 
 /** Duración total del viaje New Donk (ms). */
@@ -157,6 +156,7 @@ const CSS_TND = `
  * @param {string}  props.mundoId        mundo destino (tinte + título).
  * @param {string}  [props.animo]        ánimo de Angelita (estado real de la finca).
  * @param {number}  [props.energia]      energía de Angelita.
+ * @param {string}  [props.destinoLabel] texto accesible del destino (si no, el título del mundo).
  * @param {boolean} [props.reducedMotion] corte directo, sin dolly.
  * @param {() => void} [props.onMitad]   pantalla cubierta: intercambie la escena.
  * @param {() => void} [props.onFin]     mundo revelado: desmonte el overlay.
@@ -166,10 +166,11 @@ export default function TransicionNewDonk({
   animo = 'sereno',
   energia = 1,
   reducedMotion = false,
+  destinoLabel,
   onMitad,
   onFin,
 }) {
-  const { avatarType } = useCompaiElegido();
+  const [avatarType] = useAgentAvatarType();
   const nombreCompai = AVATAR_NOMBRE[avatarType] || AVATAR_NOMBRE[DEFAULT_AVATAR_TYPE];
   const mitadRef = useRef(onMitad);
   const finRef = useRef(onFin);
@@ -210,6 +211,7 @@ export default function TransicionNewDonk({
   }, [mundoId, reducedMotion]);
 
   const tinte = tinteDeMundo(mundoId);
+  const destino = destinoLabel || tituloDeMundo(mundoId);
   const estilo = {
     '--tnd-a': tinte[1], // el tono claro del mundo, al centro del destello
     '--tnd-b': tinte[0], // el tono profundo, hacia el borde
@@ -221,7 +223,7 @@ export default function TransicionNewDonk({
       <div className="tnd tnd--corte" style={estilo} role="status" aria-live="polite" data-testid="tnd">
         <style>{CSS_TND}</style>
         <p className="tnd__txt" style={{ opacity: 1, animation: 'none' }}>
-          {`${nombreCompai} lo lleva a ${tituloDeMundo(mundoId)}…`}
+          {`${nombreCompai} lo lleva a ${destino}…`}
         </p>
       </div>
     );
@@ -242,7 +244,7 @@ export default function TransicionNewDonk({
           ariaLabel={`${nombreCompai}, compañero de Chagra`}
         />
       </div>
-      <p className="tnd__txt">{`${nombreCompai} lo lleva a ${tituloDeMundo(mundoId)}…`}</p>
+      <p className="tnd__txt">{`${nombreCompai} lo lleva a ${destino}…`}</p>
     </div>
   );
 }

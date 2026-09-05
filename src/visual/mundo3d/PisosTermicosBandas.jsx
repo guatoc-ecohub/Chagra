@@ -74,6 +74,7 @@ function BandaPiso({
   geo,
   reducedMotion,
   animar,
+  aura,
   resaltado,
   mostrarEtiqueta,
   etiquetaDistancia,
@@ -89,7 +90,7 @@ function BandaPiso({
   const respira = animar && piso.esMio && !reducedMotion;
 
   useFrame((state) => {
-    if (!respira) return;
+    if (!respira || !aura) return;
     const t = state.clock.elapsedTime;
     const onda = (Math.sin(t * 1.4) + 1) * 0.5; // 0..1 lento
     if (matRef.current) matRef.current.opacity = opacidad + onda * 0.14;
@@ -125,14 +126,14 @@ function BandaPiso({
           ref={matRef}
           color={piso.color}
           transparent
-          opacity={opacidad}
+          opacity={aura ? opacidad : 0}
           side={THREE.DoubleSide}
           depthWrite={false}
         />
       </mesh>
 
       {/* filo de acento en el borde alto: el "usted está aquí" del piso del usuario */}
-      {(piso.esMio || resaltado) && (
+      {aura && (piso.esMio || resaltado) && (
         <mesh ref={acentoRef} position={[0, geo.altura / 2, 0]} rotation={[-Math.PI / 2, 0, 0]}>
           <torusGeometry args={[geo.radioTop, geo.radioTop * 0.02 + 0.012, 6, geo.segmentos]} />
           <meshBasicMaterial color={piso.color} transparent opacity={0.9} depthWrite={false} />
@@ -226,6 +227,10 @@ function BandaPiso({
  * @param {number}   [props.cotaMaxima=CUMBRE_SIERRA_M]  metros en la cumbre (mapeo altitud→Y).
  * @param {boolean}  [props.mostrarEtiquetas=true]  etiquetas DOM por piso.
  * @param {string|null} [props.pisoActivo=null]  id de piso a resaltar por control externo (legenda/hover).
+ * @param {boolean}  [props.aura=true]  dibuja el aura translúcida (cilindros). `false` = solo
+ *        blancos de toque + etiquetas: la Sierra (2026-09-04) dibuja su mapa vertical
+ *        como curvas de nivel porque los conos apilados leían como una CUÑA de bordes
+ *        rectos que lavaba las bandas altas (DISENO §2.3.2).
  */
 export default function PisosTermicosBandas({
   pisoUsuario = null,
@@ -240,6 +245,7 @@ export default function PisosTermicosBandas({
   cotaMaxima = CUMBRE_SIERRA_M,
   mostrarEtiquetas = true,
   pisoActivo = null,
+  aura = true,
 }) {
   const { pisos } = useMemo(() => compatibilidadPiso(pisoUsuario), [pisoUsuario]);
 
@@ -285,6 +291,7 @@ export default function PisosTermicosBandas({
           geo={geo}
           reducedMotion={reducedMotion}
           animar={animar}
+          aura={aura}
           resaltado={pisoActivo === piso.id}
           mostrarEtiqueta={mostrarEtiquetas}
           etiquetaDistancia={etiquetaDistancia}

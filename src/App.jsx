@@ -6,7 +6,8 @@
  * errores reales de ESLint siguen activos.
  */
 /* eslint-disable chagra-i18n/no-hardcoded-spanish */
-import React, { lazy, Suspense, useState, useEffect, useCallback, useRef } from 'react';
+import React, { Suspense, useState, useEffect, useCallback, useRef } from 'react';
+import { lazy } from './components/common/lazyWithRecovery';
 import { MapPin, Eye, Package, CheckCircle, WifiOff, Mic, Network, Beaker, Scale } from 'lucide-react';
 import localforage from 'localforage';
 import { useTheme } from './hooks/useTheme';
@@ -21,6 +22,7 @@ import { fetchFromFarmOS } from './services/apiService';
 import { PRIMARY_WORKER_NAME } from './config/workerConfig';
 import { tieneAccesoGlaciarActual, esOperadorActual } from './config/glaciarAccess';
 import { getProfile, getMarco3DPreference } from './services/userProfileService';
+import { getProfile, getMarco3DPreference, resolveDestinoPostLogin } from './services/userProfileService';
 import { parseSeguimientoView } from './config/seguimientoProcesos';
 import { homeCampesinoBActivo } from './config/homeCampesinoBFlag';
 // NOTA (unificación compai 2026-08-23): el manifiesto de rutas se usaba SOLO
@@ -70,9 +72,15 @@ const EscuchaOverlay = lazy(() => import('./components/escucha/EscuchaOverlay'))
 // muestra justamente CUANDO no hay red. Si fuera lazy, el import() fallaría
 // offline sin cache → el usuario nunca vería la pantalla de offline.
 import AgentOfflineGuard from './components/AgentScreen/AgentOfflineGuard';
-// Transición home→conversación: el colibrí en video (~2s). Eager (debe
-// aparecer al instante al enviar desde el hero).
-import ColibriTransition from './components/agent/ColibriTransition';
+// Transición home→conversación (~2s). LAZY (gate 087): este era el único
+// import estático que mantenía el dispatcher ChagraAgentAvatar —y con él los
+// 7 rigs de tinta (~3 MB de SVG de *Trazado)— dentro del grafo de arranque
+// (main → App → aquí → dispatcher). El overlay se monta desde el inicio
+// (active=false → null), así que el chunk se pide al montar el shell y ya
+// está caliente cuando el usuario envía desde el hero; el ARTE de cada
+// compai se sigue pagando solo con el avatar elegido (React.lazy por
+// especie dentro del dispatcher). Ver _gate/087/INFORME-087.md.
+const ColibriTransition = lazy(() => import('./components/agent/ColibriTransition'));
 import { ScreenShell } from './components/common/ScreenShell';
 import ChagraGrowLoader from './components/ChagraGrowLoader';
 import Confetti from './components/common/Confetti';
@@ -181,6 +189,12 @@ const AvatarGameLibre = lazy(() => import('./mockups/AvatarGameLibre'));
 // Piezas de decisión visual (acuarela, clima, diagnóstico, evidencia, guardianes).
 const MapaAcuarelaMockup = lazy(() => import('./mockups/MapaAcuarela'));
 const ClimaAtmosferaMockup = lazy(() => import('./mockups/ClimaAtmosfera'));
+// Arte original del mockup "El clima como atmósfera viva" (Fable): pantalla de
+// decisión visual con 5 estados de clima que re-tiñen toda la escena vía
+// tokens data-clima. La ruta canónica #/mockups/clima-atmosfera quedó como
+// puente al mundo real (#2833); el arte vive en su ruta hermana para que
+// ninguna de las dos intenciones se pierda.
+const ClimaAtmosferaArteMockup = lazy(() => import('./mockups/ClimaAtmosferaArte'));
 const DiagnosticoSobreFoto = lazy(() => import('./mockups/DiagnosticoSobreFoto'));
 const EvidenciaIlustrada = lazy(() => import('./mockups/EvidenciaIlustrada'));
 const MockupGuardianesNarrativos = lazy(() => import('./mockups/MockupGuardianesNarrativos'));
@@ -293,6 +307,9 @@ const VitrinaInfraestructuraMockup = lazy(() => import('./mockups/vitrina3d/Vitr
 // con su encuadre de cámara curado (camaraDioramas) + botón «Entrar» al host real.
 const VitrinaMundosMockup = lazy(() => import('./mockups/vitrina3d/VitrinaMundos'));
 const SierraGlobalMockup = lazy(() => import('./visual/mundo3d/VistaGlobalSierra'));
+// SSOT de pisos térmicos: resuelve el mundo principal de una banda tocada
+// (fix bug P1 huérfanos-3D — tocar piso baja al mundo real, bajo tapa).
+import { mundoPrincipalDePiso } from './visual/mundo3d/pisosTermicos.js';
 const MundoSueloVivoMockup = lazy(() => import('./mockups/MundoSueloVivo3D'));
 const AliadosFincaMockup = lazy(() => import('./mockups/AliadosFinca3D'));
 const MundoCafe3DMockup = lazy(() => import('./mockups/MundoCafe3D'));
@@ -871,9 +888,13 @@ const MOCKUP_HASH_ROUTES = {
   'mockups/navegacion-pisos': 'mockup_navegacion_pisos',
   'mockups/agente-dibuja': 'mockup_agente_dibuja',
   'mockups/crm-agroecologico': 'mockup_crm_agroecologico',
+  // (rescate 2026-09-05) arte original del clima como atmósfera viva:
+  // 'mockups/clima-atmosfera' quedó como puente al mundo real (#2833).
+  'mockups/clima-atmosfera-arte': 'mockup_clima_atmosfera_arte',
 };
 
 const HASH_VIEW_ROUTES = {
+  dashboard: 'dashboard',
   agente: 'agente',
   'ciclo-vivo': 'ciclo_vivo',
   faq: 'faq',
@@ -1780,16 +1801,23 @@ export default function App() {
       case 'login':
         return (
           <ErrorBoundary>
-            <LoginScreen onLoginSuccess={() => { setSinSesion(false); navigate('dashboard'); }} onSave={showToast} />
+            {/* BUG-09 2026-09-04: el destino post-login lo decide
+                resolveDestinoPostLogin() — si el usuario nunca vio el
+                onboarding (ni completado ni saltado), cae en
+                'onboarding-perfil' en vez del dashboard. "Saltar todo" marca
+                skipped, así que solo pasa una vez (#283). */}
+            <LoginScreen onLoginSuccess={() => { setSinSesion(false); navigate(resolveDestinoPostLogin()); }} onSave={showToast} />
           </ErrorBoundary>
         );
       case 'oauth-callback':
         // Puente del flujo Authorization Code + PKCE. Intercambia el code por
         // token y navega al dashboard; si falla, vuelve al login con toast.
+        // Mismo criterio del password grant (BUG-09): primera vez va al
+        // onboarding si el usuario nunca lo vio.
         return (
           <ErrorBoundary>
             <OAuthCallback
-              onSuccess={() => navigate('dashboard')}
+              onSuccess={() => navigate(resolveDestinoPostLogin())}
               onError={(msg) => {
                 showToast(msg || 'No se pudo iniciar sesión con PKCE.', true);
                 navigate('login');
@@ -2215,6 +2243,7 @@ export default function App() {
             <ErrorFallback moduleName="Home campesino B">
               <Suspense fallback={<div className="h-[100dvh] w-full bg-[#f7f0df]" />}>
                 <HomeCampesinoB onNavigate={navigate} />
+                <HomeCampesinoB onNavigate={navigate} onLogout={handleLogout} />
               </Suspense>
             </ErrorFallback>
           </ErrorBoundary>
@@ -2272,6 +2301,16 @@ export default function App() {
           <ErrorBoundary>
             <ErrorFallback moduleName="Mapa acuarela">
               <MapaAcuarelaMockup onBack={() => navigate('dashboard')} />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
+      case 'mockup_clima_atmosfera_arte':
+        // Arte original "El clima como atmósfera viva" (Fable): selector de 5
+        // estados re-tiñe cielo, luz, partículas y tarjetas (datos de muestra).
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="Mockup Clima Atmósfera (arte)">
+              <ClimaAtmosferaArteMockup onBack={() => navigate('dashboard')} />
             </ErrorFallback>
           </ErrorBoundary>
         );
@@ -2442,11 +2481,21 @@ export default function App() {
         // Vista global 3D de la Sierra Nevada de Santa Marta: el macizo maestro
         // (Simmonds + Palomino, bandas de piso térmico, hora dorada). Territorio
         // sagrado tratado con dignidad — crédito a Kogui/Arhuaco/Wiwa/Kankuamo.
-        // Ruta #/mockups/sierra-global, sin auth.
+        // Ruta #/mockups/sierra-global, sin auth. Tocar una banda de piso
+        // térmico SÍ navega de verdad (fix bug P1 huérfanos-3D, rescate
+        // 2026-09-05 de fix/valle2d-fallback-y-sierra-clic): `onSeleccionPiso`
+        // se dispara a MITAD de la transición (pantalla cubierta) y baja al
+        // primer mundo real que `pisosTermicos.js` declara para ese piso. Sin
+        // mundo declarado, no navega (nunca finge una ruta).
         return (
           <ErrorBoundary>
             <ErrorFallback moduleName="Vista global Sierra Nevada">
-              <SierraGlobalMockup />
+              <SierraGlobalMockup
+                onSeleccionPiso={(piso) => {
+                  const mundo = mundoPrincipalDePiso(piso);
+                  if (mundo?.view) navigate(mundo.view);
+                }}
+              />
             </ErrorFallback>
           </ErrorBoundary>
         );
@@ -4407,6 +4456,10 @@ export default function App() {
   // superior con indicador "Con señal / Sin señal" y su propio compai que
   // camina (CompaiOverlay). Por eso suprime la NetworkStatusBar global y el
   // AgentFab idle, para no duplicar chrome ni compai encima del layout aprobado.
+  // La portada campesina B (dashboard, bandera activa) trae su propio
+  // indicador de señal y su propio compai que camina. NetworkStatusBar se
+  // mantiene montada porque es la señal durable de la cola offline, pero solo
+  // se hace visible al perder conexión o durante una sincronización.
   const esHomeCampesinoB = currentView === 'dashboard' && homeCampesinoBActivo();
 
   return (
@@ -4415,6 +4468,14 @@ export default function App() {
           la conversación monta detrás y queda limpia al terminar. */}
       <ColibriTransition active={colibriTransition} onDone={() => setColibriTransition(false)} />
       {!esHomeCampesinoB && <NetworkStatusBar />}
+          la conversación monta detrás y queda limpia al terminar. Suspense
+          local (087): fallback null porque inactivo renderiza null — el
+          boundary no debe tirar el árbol entero a un fallback de ruta. */}
+      <Suspense fallback={null}>
+        <ColibriTransition active={colibriTransition} onDone={() => setColibriTransition(false)} />
+      </Suspense>
+      <NetworkStatusBar />
+      {(!esHomeCampesinoB || !navigator.onLine) && <NetworkStatusBar />}
       {/* Banners de instalación PWA: NO en las vistas pre-auth (login /
           loading / oauth-callback). En el login son un overlay `fixed`
           z-50 que se encimaba sobre el formulario —en desktop tapaba e
@@ -4465,6 +4526,7 @@ export default function App() {
           offline. La entrada mística es la única que puede desvanecerlo. */}
       <Suspense fallback={null}>
         {currentView !== 'loading' && !currentView.startsWith('mockup_') && !esHomeCampesinoB && <AgentFab onNavigate={navigate} pantalla={currentView} />}
+        {!isPreAuthView && !esHomeCampesinoB && <AgentFab onNavigate={navigate} pantalla={currentView} />}
       </Suspense>
       {/* Compai que CAMINA en la portada campesina B: un solo compai (el
           AgentFab idle se suprime arriba). CompaiOverlay corre la marcha real

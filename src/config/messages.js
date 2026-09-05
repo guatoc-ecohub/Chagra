@@ -232,6 +232,10 @@ const messages = {
   },
   ui: {
     cargando: 'Cargando...',
+    // BUG-08 2026-09-04: puertas al event sourcing desde la Bodega.
+    conteoManual: 'Conteo manual',
+    bitacora: 'Bitácora',
+    bitacoraDeItem: (itemId) => `Bitácora · ${itemId}`,
     cargandoReportes: 'Cargando reportes...',
     cargandoPlan: 'Cargando plan...',
     cargandoCiclos: 'Cargando tus ciclos...',
@@ -320,6 +324,14 @@ const messages = {
   // Recorrido de finca por voz (useRecorridoStore / recorridoService).
   recorrido: {
     errorRegistro: 'No se pudo registrar la observación',
+  },
+  // Login y caminos de autenticación (URGENTE-login-se-apaga-25sep):
+  // mensajes del camino PKCE y su fallback (LoginScreen / authService).
+  auth: {
+    pkceNoConfigurado: 'El acceso seguro (PKCE) no está configurado en esta instalación.',
+    accesoSeguroFallido: 'No se pudo iniciar el acceso seguro. Intente de nuevo.',
+    accesoSeguroFallidoUsandoClasico: 'No se pudo iniciar el acceso seguro; se usará el acceso clásico.',
+    instalacionSinCamino: 'El acceso clásico fue retirado y esta instalación no tiene configurado el acceso seguro (PKCE). Contacte al administrador de Chagra.',
   },
   format,
 };

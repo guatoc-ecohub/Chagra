@@ -196,12 +196,10 @@ self.addEventListener('activate', (event) => {
 });
 
 // Estrategia de caché:
-//   - /assets/* (chunks Vite con hash en filename): PASSTHROUGH puro. Vite
-//     genera nombres immutables (index-XXXXX.js); el browser HTTP cache los
-//     maneja eficientemente. NUNCA interceptar en SW: si el deploy cambió
-//     los hashes y el SW tiene refs viejos, intentar cargar un chunk que
-//     ya no existe causa fallback a index.html (MIME text/html) → white
-//     screen. Es el bug que provocó el incidente 2026-05-06.
+//   - /assets/* (chunks Vite con hash en filename): Cache-First, solo JS/CSS
+//     con MIME esperado. Un fallback SPA mal configurado puede devolver 200
+//     text/html para un chunk ausente y esa respuesta jamás puede envenenar
+//     CACHE_NAME bajo la URL del chunk.
 //   - Static shell (HTML/manifest/icons): Stale-While-Revalidate
 //   - Otros GET: Network-First con fallback cache
 //   - POST/PUT/DELETE: pasthrough sin caché
@@ -232,10 +230,22 @@ self.addEventListener('fetch', (event) => {
         if (cached) return cached;
         return fetch(event.request)
           .then((response) => {
-            // Solo cacheamos respuestas completas y válidas (no opaque/parcial).
-            if (response && response.ok && response.status === 200) {
+            // Un 200 no basta: un fallback SPA defectuoso puede devolver
+            // index.html (text/html) para /assets/chunk-ausente.js. Guardarlo
+            // bajo la URL del chunk deja el veneno vivo hasta cambiar CACHE_NAME.
+            const contentType = response?.headers?.get?.('content-type') || '';
+            const esJavaScript = /^(?:application|text)\/(?:javascript|ecmascript)\b/i.test(contentType);
+            const esCss = /^text\/css\b/i.test(contentType);
+            const esAssetEsperado =
+              (url.pathname.endsWith('.js') && esJavaScript) ||
+              (url.pathname.endsWith('.css') && esCss);
+            if (response && response.ok && response.status === 200 && esAssetEsperado) {
               const respClone = response.clone();
-              caches.open(CACHE_NAME).then((cache) => cache.put(event.request, respClone));
+              event.waitUntil(
+                caches.open(CACHE_NAME)
+                  .then((cache) => cache.put(event.request, respClone))
+                  .catch(() => undefined)
+              );
             }
             return response;
           })

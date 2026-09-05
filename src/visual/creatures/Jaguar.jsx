@@ -938,16 +938,13 @@ export function Jaguar({
     </g>
   ) : null;
 
-  // Antics de VIDA (períodos co-primos) SOLO viva; nodos aparte para no pisar el
-  // boil de `.crt-body`. El CSS los apaga con RM / tier bajo / ánimo bajo /
-  // durante los gestos (celebra/reposo/señala) y estados (ruge/acecha) — y en
-  // la MARCHA (pose camina, CSS), donde el perfil ya lleva su propia cadencia.
+  // El jaguar NO monta rh-antic/rh-travieso (la vuelta de campana / el mortal):
+  // ES MÍSTICO y el mortal le está PROHIBIDO — regla dura del operador
+  // (2026-09-03), igual que el perezoso (quietud) y el cóndor (planeo). Su vida
+  // queda en el boil, las motas, el brillo del ojo y las estrellas: presencia,
+  // no volteretas.
   const figura = marchando ? lado : body;
-  const conAntics = vivo ? (
-    <g className="rh-antic">
-      <g className="rh-travieso">{figura}</g>
-    </g>
-  ) : figura;
+  const conAntics = figura;
   // El line-boil (contorno que hierve) envuelve TODO el dibujo cuando se pide.
   const conBoil = lineBoil ? <g filter={`url(#${boil})`}>{conAntics}</g> : conAntics;
   // La LEVITACIÓN de la revelación envuelve todo (ingravidez del espíritu):

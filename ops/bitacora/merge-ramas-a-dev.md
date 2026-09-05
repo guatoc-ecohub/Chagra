@@ -71,7 +71,7 @@ porque el refactor de fuente única es lo que corresponde conservar.
 
 ## Registro de ejecución
 
-### Paso 0 cerrado — bitácora commiteada antes de tocar nada (`d76981d4`)
+_(se va llenando abajo)_
 
 ---
 

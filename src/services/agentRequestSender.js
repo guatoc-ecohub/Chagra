@@ -49,8 +49,8 @@ function estimateTokens(text) {
  * respuesta útil en español campesino sin inventar.
  */
 const HEADLESS_SYSTEM_PROMPT =
-  'Sos Chagra, el asistente agrícola del campesino colombiano. Respondé claro, ' +
-  'corto y en español sencillo. Si no sabés algo con certeza, decilo; nunca ' +
+  'Eres Chagra, el asistente agrícola del campesino colombiano. Responde claro, ' +
+  'corto y en español sencillo. Si no sabes algo con certeza, dilo; nunca ' +
   'inventes datos, dosis ni nombres científicos.';
 
 /**

@@ -2,12 +2,12 @@
 // producción (src/services/ragRetriever.js) en Node, SIN el navegador.
 //
 // Es el hermano de scripts/bench-rag-retrieve.loader.mjs con UN cambio clave:
-// aquí `catalogDB.getAllSpecies()` devuelve el catálogo COMPLETO (los 501 slugs
+// aquí `catalogDB.getAllSpecies()` devuelve el catálogo COMPLETO (los 517 slugs
 // del manifest), no `[]`. Eso importa: con `[]` el tier-gate de buildCorpus()
 // degrada FAIL-CLOSED al subconjunto seguro (CROP_TAXONOMY ≈ 44 especies) y el
 // bench termina midiendo recall sobre 44 fichas en vez del catálogo real
 // (bug del loader documentado 2026-07-23). Con el catálogo completo el
-// tier-gate confía y el retriever indexa las 501 fichas — que es lo que corre
+// tier-gate confía y el retriever indexa las 517 fichas — que es lo que corre
 // en producción para un usuario con catálogo hidratado.
 //
 // El manifest se lee de public/cycle-content/manifest.json (mismo asset que

@@ -665,6 +665,16 @@ async function pestVsDiseaseGuard(userMessage, { sidecarUrl = SIDECAR_URL } = {}
  * El bench lo invoca solo para las sondas cross_thermal, sobre la respuesta ya
  * generada, para medir si el guard hubiera corregido el turno real.
  *
+ * BUG-04 (2026-09-03): el endpoint real (chagra-pro server.ts) exige el campo
+ * `agent_response`, no `response_text` -- mismo desajuste de contrato que
+ * tenia `src/services/sidecarClient.js` (confirmado en vivo contra el
+ * sidecar 127.0.0.1:7880 el 2026-09-03: `response_text` -> 400
+ * `{error:"agent_response required"}`). Este script duplicaba el mismo bug
+ * de forma independiente, asi que el bench de contaminacion cross_thermal
+ * media "0% de correccion" del guard sin que fuera un fallo real del guard
+ * -- el bench nunca llegaba a invocarlo con exito. El shape de respuesta
+ * real usa `has_fabricated_species`, no `has_companion_species`.
+ *
  * FAIL-SAFE: cualquier error/timeout/non-2xx degrada a bloque vacio.
  * @param {string} responseText
  * @param {{ sidecarUrl?: string }} [opts]
@@ -681,13 +691,13 @@ export async function companionSpeciesGuard(
     const res = await fetchImpl(`${sidecarUrl}/companion-species-guard`, {
       method: 'POST',
       headers,
-      body: JSON.stringify({ response: responseText }),
+      body: JSON.stringify({ agent_response: responseText }),
       signal: AbortSignal.timeout(5000),
     });
     if (!res.ok) return { has_companion_species: false, system_prompt_block: '' };
     const data = await res.json();
     return {
-      has_companion_species: data.has_companion_species === true || data.has_companion === true || data.needs_correction === true,
+      has_companion_species: data.has_fabricated_species === true,
       system_prompt_block: typeof data.system_prompt_block === 'string' ? data.system_prompt_block : '',
     };
   } catch (err) {
