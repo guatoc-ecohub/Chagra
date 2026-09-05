@@ -16,7 +16,7 @@ import {
 } from '../sierra/lecturaClimaAterrizaje.js';
 
 /* El snapshot ya resuelto por `derivarClima3D` (misma forma del hook). */
-function clima({ senal = true, condicion = null, temp = null, tempMin = null, helada = false, alertas = [], ensoFamily = 'neutral', openmeteo = true } = {}) {
+function clima({ senal = true, condicion = null, temp = null, tempMin = null, helada = false, alertas = [], ensoFamily = 'neutral', ensoPhase = null, openmeteo = true } = {}) {
   return {
     senal,
     condicion,
@@ -25,6 +25,7 @@ function clima({ senal = true, condicion = null, temp = null, tempMin = null, he
     helada,
     alertas,
     ensoFamily,
+    ensoPhase,
     tieneOpenMeteo: openmeteo,
   };
 }
@@ -137,10 +138,20 @@ describe('resumenClimaAterrizaje — el orden de la dirección', () => {
       { pisoId: 'frio', sugerencias: [{ suggestion: { severity: 'critical', text: 'proteja su gulupa' } }] },
     );
     expect(r.hayDato).toBe(true);
-    expect(r.tinta).toEqual(['niebla de ladera · 6° · ahora', 'esta noche baja a 2°']);
+    // La mínima no se duplica: la lleva la tiza de helada, no una tinta aparte.
+    expect(r.tinta).toEqual(['niebla de ladera · 6° · ahora']);
     expect(r.alertas).toHaveLength(1);
     expect(r.tiza).toContain('MÁS helada');
     expect(r.tiza).toContain('baja a 2°');
+  });
+
+  it('reconoce el slug canónico del sidecar: `ensoPhase=el_nino` con ensoFamily neutral es Niño', () => {
+    const r = resumenClimaAterrizaje(
+      clima({ tempMin: 1.5, helada: true, ensoPhase: 'el_nino', ensoFamily: 'neutral' }),
+      { pisoId: 'frio', sugerencias: [] },
+    );
+    expect(r.familia).toBe('nino');
+    expect(r.tiza).toContain('MÁS helada');
   });
 
   it('sin helada, la tiza pasa a SU cultivo (prioridad 2)', () => {

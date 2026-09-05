@@ -52,6 +52,20 @@ export function palabraCondicion(condicion) {
   return CONDICION_PALABRA[condicion] ?? condicion;
 }
 
+/*
+ * Familia ENSO robusta al vocabulario del sidecar. La normalización por
+ * `startsWith('nino')` de `useClima3DVivo` NO reconoce el slug canónico
+ * (`el_nino` → 'neutral', medido 2026-09-02). Acá se barre la fase con
+ * `includes` (mismo apaño que `compai/nucleo/ensoCanal.js`) y el campo ya
+ * normalizado de la dirección queda como respaldo para los fixtures.
+ */
+function familiaEnso(climaVivo) {
+  const phase = String(climaVivo?.ensoPhase ?? '').toLowerCase();
+  if (phase.includes('nino')) return 'nino';
+  if (phase.includes('nina')) return 'nina';
+  return String(climaVivo?.ensoFamily ?? 'neutral');
+}
+
 /**
  * La línea TINTA del ahora: condición + grado, con su palabra de ventana.
  * Sin señal no existe: `senal` es el guardián (§8: la ausencia es el «no sé»).
@@ -125,7 +139,7 @@ export function lineaHelada(climaVivo, { pisoId } = {}) {
     min != null
       ? `Puede helar en lo plano: esta noche baja a ${Math.round(min)}°.`
       : 'Puede helar en lo plano esta noche.';
-  if (climaVivo.ensoFamily === 'nino') {
+  if (familiaEnso(climaVivo) === 'nino') {
     return `${base} El Niño en el piso frío es MÁS helada, no menos.`;
   }
   return base;
@@ -149,12 +163,17 @@ export function resumenClimaAterrizaje(climaVivo, { pisoId = null, sugerencias =
   if (hayDato) {
     const ahora = lineaAhora(climaVivo);
     if (ahora) tinta.push(ahora);
-    const noche = lineaMinimaNoche(climaVivo, { pisoId });
-    if (noche) tinta.push(noche);
     const helada = lineaHelada(climaVivo, { pisoId });
-    if (helada) tiza.push(helada);
-    const cultivo = sugerenciaDeCultivo(sugerencias);
-    if (!helada && cultivo) tiza.push(cultivo);
+    if (helada) {
+      /* La tiza de helada ya lleva la mínima con su ventana («esta noche baja
+         a N°»): no se duplica la misma cifra en una línea de tinta aparte. */
+      tiza.push(helada);
+    } else {
+      const noche = lineaMinimaNoche(climaVivo, { pisoId });
+      if (noche) tinta.push(noche);
+      const cultivo = sugerenciaDeCultivo(sugerencias);
+      if (cultivo) tiza.push(cultivo);
+    }
     alertas = alertasAterrizaje(climaVivo);
   }
   return {
@@ -162,6 +181,6 @@ export function resumenClimaAterrizaje(climaVivo, { pisoId = null, sugerencias =
     tinta,
     alertas,
     tiza: tiza.length > 0 ? tiza.join(' ') : null,
-    familia: String(climaVivo?.ensoFamily ?? 'neutral'),
+    familia: familiaEnso(climaVivo),
   };
 }
