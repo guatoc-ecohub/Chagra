@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+/* global console, process */
 /**
  * audit-integraciones.mjs — auditor de "construido pero no conectado"
  * =====================================================================
