@@ -53,6 +53,7 @@ import '../components/dashboard/scene-finca-organismo.css';
 import AgentAvatarSelector from '../components/Settings/AgentAvatarSelector';
 import ArbolDeMundos from '../components/dashboard/ArbolDeMundos';
 import { navegarDesde3D } from '../prodApp/wire3DNav.js';
+import useClima3DVivo from '../hooks/useClima3DVivo.js';
 
 // ── Geometría de la escena (unidades del viewBox 390×1440) ──────────────────
 const VB_W = 390;
@@ -76,8 +77,21 @@ const FINCA = {
   nombre: 'El Recuerdo',
   vereda: 'El Roble',
   clima: 'Clima frío · 2.600 m',
-  hoy: 'Hoy: 13 °C · aguacero por la tarde',
 };
+
+const NOMBRE_CONDICION = {
+  despejado: 'cielo despejado',
+  nublado: 'cielo nublado',
+  lluvia: 'lluvia',
+  niebla: 'niebla',
+};
+
+function resumenClimaReal(clima) {
+  if (!clima?.senal) return 'Clima de hoy: esperando el dato real';
+  const temperatura = Number.isFinite(clima.temp) ? `Hoy: ${clima.temp.toFixed(1)} °C` : 'Clima de hoy';
+  const condicion = NOMBRE_CONDICION[clima.condicion] || (clima.lluvia ? 'lluvia' : 'lectura disponible');
+  return `${temperatura} · ${condicion}`;
+}
 
 // Mundos tocables (anclas de la geometría validada en las pasadas 1-3).
 // En SU piso los mundos hablan CONCRETO (dato de muestra bajo la etiqueta);
@@ -727,6 +741,8 @@ function PrimerPlanoSvg() {
 
 // `onBack` con default: los tests montan el mockup sin prop (gate tsc checkJs).
 export default function MontanaMundosCampesino({ onBack = null }) {
+  const climaVivo = useClima3DVivo();
+  const climaHoy = useMemo(() => resumenClimaReal(climaVivo), [climaVivo]);
   const [modo, setModo] = useState('finca'); // 'finca' | 'montana'
   const [piso, setPiso] = useState(PISO_FINCA);
   const [aviso, setAviso] = useState(null);
@@ -1073,8 +1089,8 @@ export default function MontanaMundosCampesino({ onBack = null }) {
           </div>
           <h1 className="mm2-titulo">La Montaña de los Mundos</h1>
           <div className="mm4-cedula" data-testid="mm4-cedula">
-            <span className="mm4-cedula-nombre">⭐ Finca {FINCA.nombre} — vereda {FINCA.vereda}</span>
-            <span className="mm4-cedula-dato">{FINCA.clima} · {FINCA.hoy}</span>
+            <span className="mm4-cedula-nombre">⭐ Finca {FINCA.nombre}, vereda {FINCA.vereda}</span>
+            <span className="mm4-cedula-dato">{FINCA.clima} · {climaHoy}</span>
           </div>
         </header>
 
