@@ -1,0 +1,345 @@
+{
+ "tag": "auth6",
+ "url": "https://chagra-dev.guatoc.co/",
+ "user": "admin                                                                                                       ",
+ "stages": {
+  "start": 0,
+  "loginForm": 9851,
+  "submit": 9980,
+  "firstDest": 60024,
+  "afterSkip": 89723,
+  "dashAt": 121236,
+  "settle": 129236,
+  "transDone": 137237
+ },
+ "dest": {
+  "onb": true,
+  "tile": false,
+  "head": "PASO 1 DE 6  Saltar todo Cuéntenos de usted  Dos toques y arrancamos. Todo se pu"
+ },
+ "transition": {
+  "clickFailed": true
+ },
+ "events": [
+  {
+   "k": "lt",
+   "t": 2004,
+   "d": 142
+  },
+  {
+   "k": "lt",
+   "t": 2181,
+   "d": 424
+  },
+  {
+   "k": "paint:first-paint",
+   "t": 2740,
+   "s": 0
+  },
+  {
+   "k": "paint:first-contentful-paint",
+   "t": 2740,
+   "s": 0
+  },
+  {
+   "k": "lcp",
+   "t": 2740,
+   "s": 2557
+  },
+  {
+   "k": "lt",
+   "t": 2782,
+   "d": 65
+  },
+  {
+   "k": "lcp",
+   "t": 5976,
+   "s": 4200
+  },
+  {
+   "k": "lcp",
+   "t": 9972,
+   "s": 10810
+  },
+  {
+   "k": "lt",
+   "t": 14791,
+   "d": 58
+  },
+  {
+   "k": "lt",
+   "t": 21207,
+   "d": 189
+  },
+  {
+   "k": "lt",
+   "t": 28978,
+   "d": 217
+  },
+  {
+   "k": "lt",
+   "t": 29334,
+   "d": 1990
+  },
+  {
+   "k": "lt",
+   "t": 31328,
+   "d": 168
+  },
+  {
+   "k": "lt",
+   "t": 31516,
+   "d": 54
+  },
+  {
+   "k": "lt",
+   "t": 31571,
+   "d": 302
+  },
+  {
+   "k": "lt",
+   "t": 31875,
+   "d": 1695
+  },
+  {
+   "k": "lt",
+   "t": 33590,
+   "d": 92
+  },
+  {
+   "k": "lt",
+   "t": 33683,
+   "d": 309
+  },
+  {
+   "k": "lt",
+   "t": 33993,
+   "d": 1342
+  },
+  {
+   "k": "lt",
+   "t": 35346,
+   "d": 319
+  },
+  {
+   "k": "lt",
+   "t": 35665,
+   "d": 1350
+  },
+  {
+   "k": "lt",
+   "t": 37028,
+   "d": 314
+  },
+  {
+   "k": "lt",
+   "t": 37342,
+   "d": 1723
+  },
+  {
+   "k": "lt",
+   "t": 39174,
+   "d": 1715
+  },
+  {
+   "k": "lt",
+   "t": 40968,
+   "d": 329
+  },
+  {
+   "k": "lt",
+   "t": 41387,
+   "d": 194
+  },
+  {
+   "k": "lt",
+   "t": 41628,
+   "d": 206
+  },
+  {
+   "k": "lt",
+   "t": 41835,
+   "d": 189
+  },
+  {
+   "k": "lcp",
+   "t": 41040,
+   "s": 32487
+  },
+  {
+   "k": "lt",
+   "t": 42033,
+   "d": 372
+  },
+  {
+   "k": "lt",
+   "t": 42406,
+   "d": 2372
+  },
+  {
+   "k": "lt",
+   "t": 44791,
+   "d": 449
+  },
+  {
+   "k": "lt",
+   "t": 45240,
+   "d": 2047
+  }
+ ],
+ "shotPath": "_gate/perf-auth6.png",
+ "requestsTotal": 1289,
+ "consoleMsgs": [
+  {
+   "t": 723,
+   "type": "warning",
+   "text": "The PerformanceObserver does not support buffered flag with the entryTypes argument."
+  },
+  {
+   "t": 5452,
+   "type": "warning",
+   "text": "[API] Token no disponible. Continuando en modo offline."
+  },
+  {
+   "t": 5452,
+   "type": "warning",
+   "text": "[LogStore] Fallo en pull de log--seeding: Token no disponible."
+  },
+  {
+   "t": 5453,
+   "type": "warning",
+   "text": "[API] Token no disponible. Continuando en modo offline."
+  },
+  {
+   "t": 5454,
+   "type": "warning",
+   "text": "[LogStore] Fallo en pull de log--planting: Token no disponible."
+  },
+  {
+   "t": 5455,
+   "type": "warning",
+   "text": "[API] Token no disponible. Continuando en modo offline."
+  },
+  {
+   "t": 5455,
+   "type": "warning",
+   "text": "[LogStore] Fallo en pull de log--harvest: Token no disponible."
+  },
+  {
+   "t": 5457,
+   "type": "warning",
+   "text": "[API] Token no disponible. Continuando en modo offline."
+  },
+  {
+   "t": 5457,
+   "type": "warning",
+   "text": "[LogStore] Fallo en pull de log--input: Token no disponible."
+  },
+  {
+   "t": 5457,
+   "type": "warning",
+   "text": "[API] Token no disponible. Continuando en modo offline."
+  },
+  {
+   "t": 5457,
+   "type": "warning",
+   "text": "[LogStore] Fallo en pull de log--task: Token no disponible."
+  },
+  {
+   "t": 5457,
+   "type": "warning",
+   "text": "[API] Token no disponible. Continuando en modo offline."
+  },
+  {
+   "t": 5457,
+   "type": "warning",
+   "text": "[LogStore] Fallo en pull de log--observation: Token no disponible."
+  },
+  {
+   "t": 9953,
+   "type": "warning",
+   "text": "[Auth] Intentando login password grant (DEPRECATED) para: admin                                                                             "
+  },
+  {
+   "t": 10507,
+   "type": "warning",
+   "text": "[operatorIdentity] Generated NEW account_uuid_master. Backup recommended."
+  },
+  {
+   "t": 15698,
+   "type": "warning",
+   "text": "The resource https://chagra-dev.guatoc.co/fonts/nunito-latin.woff2 was preloaded using link preload but not used within a few seconds from t"
+  },
+  {
+   "t": 25285,
+   "type": "warning",
+   "text": "The resource https://chagra-dev.guatoc.co/fonts/nunito-latin.woff2 was preloaded using link preload but not used within a few seconds from t"
+  },
+  {
+   "t": 60041,
+   "type": "warning",
+   "text": "The resource https://chagra-dev.guatoc.co/fonts/nunito-latin.woff2 was preloaded using link preload but not used within a few seconds from t"
+  },
+  {
+   "t": 91738,
+   "type": "warning",
+   "text": "[RAG] Failed to load phaseolus_vulgaris_nuna: TypeError: Failed to fetch"
+  },
+  {
+   "t": 91738,
+   "type": "warning",
+   "text": "[RAG] Failed to load plantago_major: TypeError: Failed to fetch"
+  },
+  {
+   "t": 91739,
+   "type": "warning",
+   "text": "[RAG] Failed to load pisum_sativum_andina: TypeError: Failed to fetch"
+  },
+  {
+   "t": 91739,
+   "type": "warning",
+   "text": "[RAG] Failed to load pithecellobium_dulce: TypeError: Failed to fetch"
+  },
+  {
+   "t": 91740,
+   "type": "warning",
+   "text": "[RAG] Failed to load physalis_philadelphica: TypeError: Failed to fetch"
+  },
+  {
+   "t": 91740,
+   "type": "warning",
+   "text": "[RAG] Failed to load pinus_patula: TypeError: Failed to fetch"
+  },
+  {
+   "t": 91740,
+   "type": "warning",
+   "text": "[RAG] Failed to load physalis_peruviana: TypeError: Failed to fetch"
+  },
+  {
+   "t": 91740,
+   "type": "warning",
+   "text": "[RAG] Failed to load pimpinella_anisum: TypeError: Failed to fetch"
+  },
+  {
+   "t": 91740,
+   "type": "warning",
+   "text": "[RAG] Failed to load piper_bogotense: TypeError: Failed to fetch"
+  },
+  {
+   "t": 91740,
+   "type": "warning",
+   "text": "[RAG] Failed to load phytelephas_seemannii: TypeError: Failed to fetch"
+  },
+  {
+   "t": 91740,
+   "type": "warning",
+   "text": "[RAG] Failed to load phaseolus_vulgaris_bola_roja: TypeError: Failed to fetch"
+  },
+  {
+   "t": 91740,
+   "type": "warning",
+   "text": "[RAG] Failed to load phytelephas_macrocarpa: TypeError: Failed to fetch"
+  }
+ ],
+ "jsErrors": []
+}

@@ -1,0 +1,43 @@
+{
+  "tag": "control",
+  "url": "data:text/html,<!doctype html><title>control</title><body><div id=root>hola control perf</div><style>body{background:#222}</style></body>",
+  "injectedSession": false,
+  "wallclockMs": 36386,
+  "pollRes": null,
+  "metrics": {
+    "url": "data:text/html,<!doctype html><title>control</title><body><div id=root>hola control perf</div><style>body{background:#222}%3C/style%3E%3C/body%3E",
+    "title": "control",
+    "buildSha": null,
+    "hasRoot": true,
+    "rootKids": 0,
+    "navTimes": {
+      "ttfb": 2,
+      "domInteractive": 43,
+      "domContentLoaded": 43,
+      "loadEventEnd": 51,
+      "transferSize": 402
+    },
+    "fcp": 100,
+    "lcp": {
+      "t": 100,
+      "size": 1944
+    },
+    "longTasks": [],
+    "longTaskCount": 0,
+    "totalBlockingMs": 0,
+    "cls": 0,
+    "totalResources": 0,
+    "totalBytesEncoded": 0,
+    "byType": {},
+    "topResources": [],
+    "slowResources": []
+  },
+  "swState": {
+    "supported": false
+  },
+  "consoleLogs": [],
+  "jsErrors": [],
+  "requestFailures": [],
+  "badResponses": [],
+  "shotPath": "_gate/perf-control.png"
+}

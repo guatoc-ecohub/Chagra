@@ -1,0 +1,38 @@
+PATH	REF	REMOTE	IN_DEV	IN_MAIN	DIRTY	AGE_DAYS	HEAD_ABBREV	SUBJ
+/home/kortux/Workspace/chagra	fix/audit-symlink-colgante-20260905	NO	NO	NO	57	0	0222836d3	fix(eslint): agregar eslint-env node a scripts/audit-integ
+/home/kortux/Workspace/chagra-catA-verify	detached	DETACHED	NO	NO	2	11	0056e2e4e	docs(ops): censo de rutas mockups - listado completo 105 r
+/home/kortux/Workspace/chagra-clima-paso3	feat/clima-paso3-descenso-3d	NO	NO	NO	4	1	efd5c4eed	fix(sierra): drop dead useState import — rescate ya absorb
+/home/kortux/Workspace/chagra-entrada-valle-hover-confirm	fix/entrada-valle-hover-confirm-20260827	NO	NO	NO	5	9	023187aac	fix(compai): matar patinaje — VELOCIDAD acoplada al pie (m
+/home/kortux/Workspace/chagra-fix-compai-caminar-huesos	fix/compai-caminar-huesos-20260825	NO	NO	NO	5	9	47985a90c	wip: checkpoint pre-poda 0827-1943
+/home/kortux/Workspace/chagra-merge-dev	dev	yes	NO	NO	5	11	fe8f29932	Merge remote-tracking branch 'origin/recon/batch-b-vitest-
+/home/kortux/Workspace/chagra-pr3101-20260904	fix/dom-tapa-montana-clima-20260902	NO	NO	NO	1	1	085970a7f	fix(tsc): tipar sonda three de clima
+/home/kortux/Workspace/chagra-vida-repertorio	fix/vida-repertorio-sincronizado-20260904	yes	NO	NO	0	1	82dd06dd4	fix(creatures): sincronizar repertorio de vida
+/home/kortux/Workspace/chagra-vida4-preview	detached	DETACHED	NO	NO	4	9	ad6b030ae	feat(compai): vida forward — gaze-follow guacamaya + ojo d
+/home/kortux/Workspace/chagra/.worktrees/bug-dia-utc-helada-20260904	fix/dia-en-zona-horaria-de-la-finca-20260904	NO	NO	NO	1	1	4398d6f23	fix(clima): elige "hoy" en la zona horaria de la finca, no
+/home/kortux/Workspace/chagra/.worktrees/clima-cierre-20260904	fix/clima-cierre-mecanico-20260904	NO	NO	NO	1	1	17a257c32	fix(clima): las copias de la tabla de pisos térmicos deleg
+/home/kortux/Workspace/chagra/.worktrees/dev-3134-ref	tmp/3134-dev-ref-20260904	NO	YES	NO	0	1	054ca5d78	docs(compai): auditoría de tintas y comportamientos de los
+/home/kortux/Workspace/chagra/.worktrees/gate-compai-tinta5-20260905	chore/gate-compai-tinta-5-20260905	NO	NO	NO	0	0	2fab0a52a	chore(gate): sin em dash en informe de gate de los 5 compa
+/home/kortux/Workspace/chagra/.worktrees/gate-portal-tinta-20260905	chore/gate-portal-tinta-20260905	NO	NO	NO	9	0	2906a4c55	chore(gate): portal 2D→3D en tinta (PR #3140) — harness vi
+/home/kortux/Workspace/chagra/.worktrees/informe-rescate	docs/rescate-4-prs-informe-20260904	NO	NO	NO	0	1	7a3dff717	docs(rescue): informe de entrega del rescate de 4 PRs (202
+/home/kortux/Workspace/chagra/.worktrees/jaguar-tinta-rosetas-20260905	fable/jaguar-tinta-rosetas-20260905	NO	YES	NO	8	0	57f8bf430	feat(compai): entrada y salida por especie desde el perfil
+/home/kortux/Workspace/chagra/.worktrees/jaguar-tinta-rosetas-64px-20260904	fix/jaguar-tinta-rosetas-64px-20260904	yes	NO	NO	2	1	4d972bec6	fix(compai): separar rosetas del jaguar a 64px
+/home/kortux/Workspace/chagra/.worktrees/rescue-2859-crm	detached	DETACHED	NO	NO	0	9	44d76cd88	feat(crm): completar modelo, pruebas e integración
+/home/kortux/Workspace/chagra/.worktrees/rescue-3124-laminas	chore/laminas-fuera-solo-tintas-20260904	yes	NO	NO	1	1	f00fd5946	test(creatures): sanear capas.test.jsx de la lamina archiv
+/home/kortux/Workspace/chagra/.worktrees/sierra-antes-3125-20260904	detached	DETACHED	YES	NO	1	1	973f0f9c9	chore(rescate): componente de UI y harness huérfanos, sobr
+/home/kortux/Workspace/chagra/.worktrees/sierra-fable-20260905	fable/sierra-realismo-costero-20260905	NO	YES	NO	8	0	f558557c4	feat(sierra): cielo azul, páramo pajonal, mar en cuadro y 
+/home/kortux/Workspace/chagra/.worktrees/sierra-nieve-y-pisos-20260904	fix/sierra-nieve-y-pisos-20260904	yes	YES	NO	1	1	054ca5d78	docs(compai): auditoría de tintas y comportamientos de los
+/home/kortux/Workspace/chagra/.worktrees/today-utc-helada-20260905	fix/today-utc-helada-20260905	NO	NO	NO	0	0	dcb4e3990	fix(clima): el día 'hoy' del pronóstico se resuelve en la 
+/home/kortux/Workspace/chagra/.worktrees/wt-3134-bigpickle-20260904	bigpickle/3134-rebase-20260904	NO	NO	NO	0	1	68b3d4d2a	fix(e2e): preserva el contrato offline-first bajo el routi
+/home/kortux/Workspace/chagra/.worktrees/zariguya-tinta-20260904	fable/zariguya-tinta-receta-jaguar-20260904	NO	NO	NO	249	0	8515b263f	feat(compai): zarigüeya — toda la lámina trazada a 3× con 
+/tmp/glm-094-archivar-laminas-viva-solo-tinta-glm-archivar-laminas-viva	glm/archivar-laminas-viva	NO	NO	NO	1	1	82b6734ae	test(creatures): gate de la regla dura solo-tinta — nada v
+/tmp/glm-3124-vitest-r3-20260905-glm-3124-vitest-r3-20260905	glm/3124-vitest-r3-20260905	NO	YES	NO	0	0	1e454471e	fix(sierra): rescate del descenso 3D — paso 3 (#3146)
+/tmp/glm-rebasar-3-prs-limpios-20260904-glm-rebasar-3-prs-limpios	glm/rebasar-3-prs-limpios	NO	YES	NO	0	1	04ef6b393	fix(test): skipear vidaEstados bloqueador de reviewer-gate
+/tmp/glm-wt-3111	glm/rb-3111-jaguar	NO	NO	NO	1	1	b551c3057	fix(creatures): jaguar no monta rh-antic/rh-travieso — el 
+/tmp/glm-wt-3119	glm/rb-3119-huerfano	NO	YES	NO	0	1	04ef6b393	fix(test): skipear vidaEstados bloqueador de reviewer-gate
+/tmp/glm-wt-3137	glm/rb-3137-init-sh	NO	NO	NO	1	1	0bdd6bd8b	chore(ops): init.sh sensor computacional (sustrato A del r
+/tmp/glm-wt-dev-ctrl	detached	DETACHED	YES	NO	0	1	04ef6b393	fix(test): skipear vidaEstados bloqueador de reviewer-gate
+/tmp/laminas-fuera-20260904	fix/auditor-integraciones-falsos-positivos-20260904	yes	NO	NO	12	1	d652bef9c	fix(audit): excluir tipos y declarar deuda de integracione
+/tmp/laminas-r2-20260904	chore/laminas-r2-archivado-real-20260904	NO	NO	NO	2	1	ad77c4689	docs(gate): registrar hallazgo laminas r3
+/tmp/verificar-3134	glm/cerrar-valle-hover-y-bugs-ui-local	NO	NO	NO	1	1	e1bfd55fa	fix(ui): rescata ValleHoverConfirm con tests en verde, cab
+/tmp/wt-3111	glm/jaguar-sin-mortal	NO	NO	NO	2	1	0fb63356e	fix(creatures): jaguar no monta rh-antic/rh-travieso — el 
+/tmp/wt-3119	detached	DETACHED	YES	NO	3	1	037ad7745	feat(visual): set coherente de iconos por etapa de ciclo e

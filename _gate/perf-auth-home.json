@@ -1,0 +1,2535 @@
+{
+ "tag": "auth-home",
+ "url": "https://chagra-dev.guatoc.co/",
+ "user": "admin                                                                                                       ",
+ "authTarget": "catalog",
+ "stages": {
+  "navLogin": 0,
+  "loginForm": 8506,
+  "submitClick": 8580,
+  "postAuthVisible": 53734,
+  "onboardingHandled": 53734,
+  "dashboardText": 60559,
+  "dashboardSettle": 64563,
+  "transitionClick": null
+ },
+ "transition": null,
+ "metrics": {
+  "url": "https://chagra-dev.guatoc.co/",
+  "title": "Chagra",
+  "buildSha": "24748c25",
+  "bodyText": "PASO 1 DE 6\n\nSaltar todo\nCuéntenos de usted\n\nDos toques y arrancamos. Todo se puede saltar.\n\n¿CÓMO SE LLAMA?\n\n¿QUÉ HACE EN EL CAMPO?\n\n🌱\nCultivo comida\nSiembro y cosecho\n🐄\nTengo animales\nGallinas, cerdos o ganado\n🌳\nRestauro la tierra\nNativas, bosque, páramo\n🏙️\nCultivo urbano\nBalcón, terraza o patio\n🔬\nAcompaño técnicamente\nAgrónomo/a o asesor/a\n\nELIJA SU COMPAI\n\nAvatar del agente\n\nElige cómo se ve la IA en la app. Cambio inmediato.\n\nAngelita, la abeja\n\nLa vecina que sabe de finca (recomendado)\n\nZarigüeya\n\nLa que carga a sus crías al lomo\n\nJaguar\n\nEl guardián de monte\n\nOso de anteojos\n\nEl ca",
+  "navTimes": {
+   "ttfb": 645,
+   "domContentLoaded": 4516,
+   "loadEventEnd": 8284
+  },
+  "fcp": 4324,
+  "lcp": {
+   "t": 8604,
+   "size": 8352
+  },
+  "longTaskCount": 13,
+  "longTasks": [
+   {
+    "t": 43851,
+    "d": 93,
+    "blocking": 43
+   },
+   {
+    "t": 55469,
+    "d": 206,
+    "blocking": 156
+   },
+   {
+    "t": 55729,
+    "d": 142,
+    "blocking": 92
+   },
+   {
+    "t": 56011,
+    "d": 213,
+    "blocking": 163
+   },
+   {
+    "t": 56309,
+    "d": 3809,
+    "blocking": 3759
+   },
+   {
+    "t": 60123,
+    "d": 359,
+    "blocking": 309
+   },
+   {
+    "t": 60561,
+    "d": 141,
+    "blocking": 91
+   },
+   {
+    "t": 60702,
+    "d": 766,
+    "blocking": 716
+   },
+   {
+    "t": 61469,
+    "d": 3344,
+    "blocking": 3294
+   },
+   {
+    "t": 65436,
+    "d": 145,
+    "blocking": 95
+   },
+   {
+    "t": 65584,
+    "d": 364,
+    "blocking": 314
+   },
+   {
+    "t": 65949,
+    "d": 2364,
+    "blocking": 2314
+   },
+   {
+    "t": 69097,
+    "d": 154,
+    "blocking": 104
+   }
+  ],
+  "totalBlockingMs": 11450,
+  "cls": 0
+ },
+ "shotPath": "_gate/perf-auth-home.png",
+ "requests": 441,
+ "statusCounts": {
+  "200": 440,
+  "204": 1,
+  "none": 8
+ },
+ "topByBytes": [],
+ "consoleMsgs": [
+  "[warning] [API] Token no disponible. Continuando en modo offline.",
+  "[warning] [LogStore] Fallo en pull de log--seeding: Token no disponible.",
+  "[warning] [API] Token no disponible. Continuando en modo offline.",
+  "[warning] [LogStore] Fallo en pull de log--planting: Token no disponible.",
+  "[warning] [API] Token no disponible. Continuando en modo offline.",
+  "[warning] [LogStore] Fallo en pull de log--harvest: Token no disponible.",
+  "[warning] [API] Token no disponible. Continuando en modo offline.",
+  "[warning] [LogStore] Fallo en pull de log--input: Token no disponible.",
+  "[warning] [API] Token no disponible. Continuando en modo offline.",
+  "[warning] [LogStore] Fallo en pull de log--task: Token no disponible.",
+  "[warning] [API] Token no disponible. Continuando en modo offline.",
+  "[warning] [LogStore] Fallo en pull de log--observation: Token no disponible.",
+  "[warning] [Auth] Intentando login password grant (DEPRECATED) para: admin                                                                                                       ",
+  "[warning] [operatorIdentity] Generated NEW account_uuid_master. Backup recommended.",
+  "[warning] The resource https://chagra-dev.guatoc.co/fonts/nunito-latin.woff2 was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropriate `as` value and it",
+  "[warning] The resource https://chagra-dev.guatoc.co/fonts/nunito-latin.woff2 was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropriate `as` value and it",
+  "[warning] The resource https://chagra-dev.guatoc.co/fonts/nunito-latin.woff2 was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropriate `as` value and it",
+  "[warning] The resource https://chagra-dev.guatoc.co/fonts/nunito-latin.woff2 was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropriate `as` value and it"
+ ],
+ "jsErrors": [],
+ "badHttp": [],
+ "requestList": [
+  {
+   "t": 7,
+   "url": "https://chagra-dev.guatoc.co/",
+   "type": "other",
+   "status": 200
+  },
+  {
+   "t": 663,
+   "url": "https://chagra-dev.guatoc.co/fonts/baloo2-latin.woff2",
+   "type": "parser",
+   "status": 200
+  },
+  {
+   "t": 663,
+   "url": "https://chagra-dev.guatoc.co/fonts/nunito-latin.woff2",
+   "type": "parser",
+   "status": 200
+  },
+  {
+   "t": 701,
+   "url": "https://chagra-dev.guatoc.co/assets/main-D8QPsAnI.js",
+   "type": "parser",
+   "status": 200
+  },
+  {
+   "t": 702,
+   "url": "https://chagra-dev.guatoc.co/assets/rolldown-runtime-aKtaBQYM.js",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 702,
+   "url": "https://chagra-dev.guatoc.co/assets/modulepreload-polyfill-Dezn_h7o.js",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 702,
+   "url": "https://chagra-dev.guatoc.co/assets/preload-helper-zJ_50EbN.js",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 703,
+   "url": "https://chagra-dev.guatoc.co/assets/id-1ap7d9X6.js",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 703,
+   "url": "https://chagra-dev.guatoc.co/assets/env-VxYbXDIN.js",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 703,
+   "url": "https://chagra-dev.guatoc.co/assets/vendor-icons-oTeIlwf8.js",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 703,
+   "url": "https://chagra-dev.guatoc.co/assets/vendor-state-u2S7F8oI.js",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 703,
+   "url": "https://chagra-dev.guatoc.co/assets/messages-CGlJU4kW.js",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 703,
+   "url": "https://chagra-dev.guatoc.co/assets/tenantContext-CARcf6MA.js",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 703,
+   "url": "https://chagra-dev.guatoc.co/assets/apiService-hPKz3981.js",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 703,
+   "url": "https://chagra-dev.guatoc.co/assets/outputGuards-DaDCyJek.js",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 703,
+   "url": "https://chagra-dev.guatoc.co/assets/sidecarClient-C9q_sPCX.js",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 703,
+   "url": "https://chagra-dev.guatoc.co/assets/dbCore-UdodrkfO.js",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 704,
+   "url": "https://chagra-dev.guatoc.co/assets/ragRetriever-XAN0toMG.js",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 704,
+   "url": "https://chagra-dev.guatoc.co/assets/logCache-DbbvAKvx.js",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 704,
+   "url": "https://chagra-dev.guatoc.co/assets/gpuTelemetryService-B_MHdDeK.js",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 704,
+   "url": "https://chagra-dev.guatoc.co/assets/ollamaStream-B0AL051F.js",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 704,
+   "url": "https://chagra-dev.guatoc.co/assets/pilotTelemetryService-B9O3M5VL.js",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 704,
+   "url": "https://chagra-dev.guatoc.co/assets/syncManager-Dhndfyd0.js",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 704,
+   "url": "https://chagra-dev.guatoc.co/assets/vendor-react-D8sd61i3.js",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 704,
+   "url": "https://chagra-dev.guatoc.co/assets/userProfileService-DPvbVNoY.js",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 704,
+   "url": "https://chagra-dev.guatoc.co/assets/ensoService-o1mVRrYi.js",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 704,
+   "url": "https://chagra-dev.guatoc.co/assets/climaService-DYY9g_K2.js",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 704,
+   "url": "https://chagra-dev.guatoc.co/assets/assetCache-Dc_hObzh.js",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 704,
+   "url": "https://chagra-dev.guatoc.co/assets/payloadService-D2labaLu.js",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 704,
+   "url": "https://chagra-dev.guatoc.co/assets/useLogStore-BMeQWZbZ.js",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 704,
+   "url": "https://chagra-dev.guatoc.co/assets/useAssetStore-BTogMZs0.js",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 704,
+   "url": "https://chagra-dev.guatoc.co/assets/fincaActiveStore-Da_VX2Kq.js",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 704,
+   "url": "https://chagra-dev.guatoc.co/assets/regionalismsService-DKwje-Ye.js",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 704,
+   "url": "https://chagra-dev.guatoc.co/assets/ensoContext-x9rgwf8o.js",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 704,
+   "url": "https://chagra-dev.guatoc.co/assets/pisosTermicos-DDDWhxlF.js",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 704,
+   "url": "https://chagra-dev.guatoc.co/assets/agentService-C-7Mzd1o.js",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 704,
+   "url": "https://chagra-dev.guatoc.co/assets/notificationsService-oDeTo9bC.js",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 704,
+   "url": "https://chagra-dev.guatoc.co/assets/skyConditionService-DS05kWVm.js",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 704,
+   "url": "https://chagra-dev.guatoc.co/assets/useAlertStore-7XP1oqWV.js",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 704,
+   "url": "https://chagra-dev.guatoc.co/assets/main-CFy9-BK7.css",
+   "type": "parser",
+   "status": 200
+  },
+  {
+   "t": 704,
+   "url": "https://chagra-dev.guatoc.co/assets/sello-confianza-BLfs4ivW.css",
+   "type": "parser",
+   "status": 200
+  },
+  {
+   "t": 4326,
+   "url": "https://static.cloudflareinsights.com/beacon.min.js/v31edd6df95cf4e85bb4c19e7a9bdbcba1788362987495",
+   "type": "parser",
+   "status": 200
+  },
+  {
+   "t": 4398,
+   "url": "https://chagra-dev.guatoc.co/assets/ColibriTransition-DMiY208N.js",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 4398,
+   "url": "https://chagra-dev.guatoc.co/assets/ChagraAgentAvatar-ByVreHyO.js",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 4398,
+   "url": "https://chagra-dev.guatoc.co/assets/useAgentAvatarType-qEd6A699.js",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 4398,
+   "url": "https://chagra-dev.guatoc.co/assets/elenco-oIaRiBC0.js",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 4398,
+   "url": "https://chagra-dev.guatoc.co/assets/CompaiAgente-B-_vR7PP.js",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 4398,
+   "url": "https://chagra-dev.guatoc.co/assets/perfilesConducta-COz_Of5q.js",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 4398,
+   "url": "https://chagra-dev.guatoc.co/assets/creatureIdle-yhzK2OBu.js",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 4398,
+   "url": "https://chagra-dev.guatoc.co/assets/CompaiAgente-DR1jes54.css",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 4398,
+   "url": "https://chagra-dev.guatoc.co/assets/UpdateAvailableBanner-ZWu-b5O4.js",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 4420,
+   "url": "https://chagra-dev.guatoc.co/assets/alertEngine-BHWjXr5y.js",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 4420,
+   "url": "https://chagra-dev.guatoc.co/assets/alertThresholds-Nwxco3eM.js",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 4420,
+   "url": "https://chagra-dev.guatoc.co/assets/cropAlertEngine-COW2-OlA.js",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 4420,
+   "url": "https://chagra-dev.guatoc.co/assets/farmProcessCache-C7qVoLgK.js",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 4420,
+   "url": "https://chagra-dev.guatoc.co/assets/catalogDB-DmdFKJ3l.js",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 4420,
+   "url": "https://chagra-dev.guatoc.co/assets/phenologyCalculator-BKIJ5xWf.js",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 4421,
+   "url": "https://chagra-dev.guatoc.co/assets/phenologyTemplates-BS7-N5cK.js",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 4421,
+   "url": "https://chagra-dev.guatoc.co/assets/farmProcess-BN3B3gcE.js",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 4421,
+   "url": "https://chagra-dev.guatoc.co/assets/climateCycleService-BwiZFuB2.js",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 4421,
+   "url": "https://chagra-dev.guatoc.co/assets/farmEventService-DtqTizWs.js",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 4421,
+   "url": "https://chagra-dev.guatoc.co/assets/diseaseObservationService-CuNKU4qC.js",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 4421,
+   "url": "https://chagra-dev.guatoc.co/assets/sipsaPriceService-CBapAbrN.js",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 4458,
+   "url": "https://chagra-dev.guatoc.co/assets/LoginScreen-BQj77S5L.js",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 4458,
+   "url": "https://chagra-dev.guatoc.co/assets/package-CoAWB3Ys.js",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 4458,
+   "url": "https://chagra-dev.guatoc.co/assets/operatorIdentityService-PszMq3lb.js",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 4458,
+   "url": "https://chagra-dev.guatoc.co/assets/Angelita-QDXi4S_d.js",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 4459,
+   "url": "https://chagra-dev.guatoc.co/assets/AbejaAngelita-CpnYKKtW.js",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 4459,
+   "url": "https://chagra-dev.guatoc.co/assets/AccesoriosClima-h6Vd2qW0.js",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 4459,
+   "url": "https://chagra-dev.guatoc.co/assets/_rubberhose-DuqTMO26.js",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 4459,
+   "url": "https://chagra-dev.guatoc.co/assets/rubberhoseSpec-qtkdAVhs.js",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 4459,
+   "url": "https://chagra-dev.guatoc.co/assets/AccesoriosClima-BYx1beLc.css",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 4459,
+   "url": "https://chagra-dev.guatoc.co/assets/transformacion-BUkFdljM.js",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 4459,
+   "url": "https://chagra-dev.guatoc.co/assets/transformacion-COJ4Lwkg.css",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 4459,
+   "url": "https://chagra-dev.guatoc.co/assets/LineBoilFilter-DzAY0dW3.js",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 4459,
+   "url": "https://chagra-dev.guatoc.co/assets/_filters-DEE-oa_d.js",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 4459,
+   "url": "https://chagra-dev.guatoc.co/assets/_filters-vEo2yPRM.css",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 4459,
+   "url": "https://chagra-dev.guatoc.co/assets/abejaIdentidad-PkclOpok.js",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 4459,
+   "url": "https://chagra-dev.guatoc.co/assets/AbejaAngelita-wrF9UWAC.css",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 4459,
+   "url": "https://chagra-dev.guatoc.co/assets/Angelita-DUYJ3hrR.css",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 4459,
+   "url": "https://chagra-dev.guatoc.co/assets/effects-LsFNjy2E.js",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 4459,
+   "url": "https://chagra-dev.guatoc.co/assets/effects-mHjURhxR.css",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 4459,
+   "url": "https://chagra-dev.guatoc.co/assets/LaminaMilpa-BaL45Xmw.js",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 4459,
+   "url": "https://chagra-dev.guatoc.co/assets/LoginScreen-D7g5fMOX.css",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 4518,
+   "url": "https://chagra-dev.guatoc.co/assets/TopBar-CryBfbn8.js",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 4519,
+   "url": "https://chagra-dev.guatoc.co/assets/defaults-BTW5z05q.js",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 4519,
+   "url": "https://chagra-dev.guatoc.co/assets/operatorPhotoService-CQb6Kk-2.js",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 4519,
+   "url": "https://chagra-dev.guatoc.co/assets/DashboardLive-BzAMuO5r.js",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 4519,
+   "url": "https://chagra-dev.guatoc.co/assets/cropSuggestions-CIhQwzSA.js",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 4519,
+   "url": "https://chagra-dev.guatoc.co/assets/cropSuggestions-BaXCo3bG.css",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 4519,
+   "url": "https://chagra-dev.guatoc.co/assets/cicloVivoArte-vSmHgAyM.js",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 4519,
+   "url": "https://chagra-dev.guatoc.co/assets/cicloVivoData-B7R3nL0v.js",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 4519,
+   "url": "https://chagra-dev.guatoc.co/assets/AgentAvatarSelector-Ccj5x0ZJ.js",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 4519,
+   "url": "https://chagra-dev.guatoc.co/assets/ChagraAgentAvatarAngelita-CGYAbezj.js",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 4519,
+   "url": "https://chagra-dev.guatoc.co/assets/useAngelitaPresencia-BEW28fMU.js",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 4519,
+   "url": "https://chagra-dev.guatoc.co/assets/ChagraAgentAvatarChivitoPunk-Faym74av.js",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 4519,
+   "url": "https://chagra-dev.guatoc.co/assets/ChivitoTrazado-DX7YmHT4.js",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 4519,
+   "url": "https://chagra-dev.guatoc.co/assets/trazadoCreature-CsxRLPpt.js",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 4519,
+   "url": "https://chagra-dev.guatoc.co/assets/trazadoCreature-BAhPKTDs.css",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 4519,
+   "url": "https://chagra-dev.guatoc.co/assets/ChagraAgentAvatarGuacamaya-Diu49Zn2.js",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 4519,
+   "url": "https://chagra-dev.guatoc.co/assets/GuacamayaCompai-DS9-5kUN.js",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 4519,
+   "url": "https://chagra-dev.guatoc.co/assets/GuacamayaCompai-BolzvoC3.css",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 4519,
+   "url": "https://chagra-dev.guatoc.co/assets/ChagraAgentAvatarJaguar-BTXjbs21.js",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 4519,
+   "url": "https://chagra-dev.guatoc.co/assets/JaguarTrazado-D-jlRNIi.js",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 4519,
+   "url": "https://chagra-dev.guatoc.co/assets/useVidaIdle-p84l8mJy.js",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 4519,
+   "url": "https://chagra-dev.guatoc.co/assets/JaguarTrazado-D7lg6tU7.css",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 4519,
+   "url": "https://chagra-dev.guatoc.co/assets/ChagraAgentAvatarLuciernaga-DeF5iBq1.js",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 4519,
+   "url": "https://chagra-dev.guatoc.co/assets/LuciernagaTrazado-B3_n5YKJ.js",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 4519,
+   "url": "https://chagra-dev.guatoc.co/assets/ChagraAgentAvatarOsoBaston-DFoXVv0v.js",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 4519,
+   "url": "https://chagra-dev.guatoc.co/assets/OsoBaston-DoL3Do-t.js",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 4519,
+   "url": "https://chagra-dev.guatoc.co/assets/ChagraAgentAvatarZariguya-DFnqsSl6.js",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 4519,
+   "url": "https://chagra-dev.guatoc.co/assets/ZariguyaTrazado-CaV953pq.js",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 4519,
+   "url": "https://chagra-dev.guatoc.co/assets/ZariguyaTrazado-DaFoGiUj.css",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 4519,
+   "url": "https://chagra-dev.guatoc.co/assets/BotonAnarquiaGlyph-D6RpjoVC.js",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 4520,
+   "url": "https://chagra-dev.guatoc.co/assets/agentCapabilities-DkTVYNOz.js",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 4520,
+   "url": "https://chagra-dev.guatoc.co/assets/ArbolDeMundos-DB4d_VRw.js",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 4520,
+   "url": "https://chagra-dev.guatoc.co/assets/mundosFinca-DisAb9-r.js",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 4520,
+   "url": "https://chagra-dev.guatoc.co/assets/ArbolDeMundos-CScbLJFU.css",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 4520,
+   "url": "https://chagra-dev.guatoc.co/assets/ClimaIconoVivo-DuqRuzPN.js",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 4520,
+   "url": "https://chagra-dev.guatoc.co/assets/ClimaIconoVivo-CoXJbA2A.css",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 4520,
+   "url": "https://chagra-dev.guatoc.co/assets/mundos-finca-YMmumw_M.js",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 4520,
+   "url": "https://chagra-dev.guatoc.co/assets/mundos-finca-CODYXZ38.css",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 4520,
+   "url": "https://chagra-dev.guatoc.co/assets/ValleHomeGateway-h2FwP-38.js",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 4521,
+   "url": "https://chagra-dev.guatoc.co/assets/homeModuleSelector-CR1HgeMv.js",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 4521,
+   "url": "https://chagra-dev.guatoc.co/assets/profileChipSelector-CdYwUJQZ.js",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 4521,
+   "url": "https://chagra-dev.guatoc.co/assets/mundo3d-BtF7uFd_.js",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 4521,
+   "url": "https://chagra-dev.guatoc.co/assets/valleData-DqG8Kdev.js",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 4521,
+   "url": "https://chagra-dev.guatoc.co/assets/useFincaViva-CwGwCDDb.js",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 4521,
+   "url": "https://chagra-dev.guatoc.co/assets/useCosechaStore-8xhZPdtr.js",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 4521,
+   "url": "https://chagra-dev.guatoc.co/assets/cosechaService-Ce1SrP4C.js",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 4521,
+   "url": "https://chagra-dev.guatoc.co/assets/loteService-BVZQOu1r.js",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 4521,
+   "url": "https://chagra-dev.guatoc.co/assets/geo-BP-vsu5o.js",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 4521,
+   "url": "https://chagra-dev.guatoc.co/assets/landTypes-DD0h14Z3.js",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 4521,
+   "url": "https://chagra-dev.guatoc.co/assets/usePrefsStore-CTETT8oZ.js",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 4521,
+   "url": "https://chagra-dev.guatoc.co/assets/AbejaTransicion-lqnE8H6g.js",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 4521,
+   "url": "https://chagra-dev.guatoc.co/assets/laminas-qJ0iscun.js",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 4521,
+   "url": "https://chagra-dev.guatoc.co/assets/AgentLamina-BBEWPkCh.js",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 4521,
+   "url": "https://chagra-dev.guatoc.co/assets/LaminaMataEtapa-B3qg-qPU.js",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 4521,
+   "url": "https://chagra-dev.guatoc.co/assets/LaminaMataEtapa-Bm5LDD3x.css",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 4521,
+   "url": "https://chagra-dev.guatoc.co/assets/effects-DXGKTUy7.css",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 4521,
+   "url": "https://chagra-dev.guatoc.co/assets/resolverMundo-CAwuVd6H.js",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 4522,
+   "url": "https://chagra-dev.guatoc.co/assets/deviceTier-B-jDHPew.js",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 4522,
+   "url": "https://chagra-dev.guatoc.co/assets/mundoData-eTgKk20q.js",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 4522,
+   "url": "https://chagra-dev.guatoc.co/assets/mundo3d-PsaJ-CQC.css",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 4522,
+   "url": "https://chagra-dev.guatoc.co/assets/ValleHomeGateway-SGRcMfH9.css",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 4522,
+   "url": "https://chagra-dev.guatoc.co/assets/juego-finca-B_GznAlf.js",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 4522,
+   "url": "https://chagra-dev.guatoc.co/assets/fvhSkin-jk5J2OFg.js",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 4523,
+   "url": "https://chagra-dev.guatoc.co/assets/agroecologyJourney-BBcOdVJE.js",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 4523,
+   "url": "https://chagra-dev.guatoc.co/assets/Ardilla-CpwsW-j3.js",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 4523,
+   "url": "https://chagra-dev.guatoc.co/assets/Colibri-DiDCJjdM.js",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 4523,
+   "url": "https://chagra-dev.guatoc.co/assets/jaguarIdentidad-BOQ-VXwk.js",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 4523,
+   "url": "https://chagra-dev.guatoc.co/assets/creatures-Cp8yWv2b.js",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 4523,
+   "url": "https://chagra-dev.guatoc.co/assets/Sirfido-Dt-0KK1d.js",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 4523,
+   "url": "https://chagra-dev.guatoc.co/assets/Lombriz-CmWO-xEQ.js",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 4523,
+   "url": "https://chagra-dev.guatoc.co/assets/Gallina-BFynGpUN.js",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 4523,
+   "url": "https://chagra-dev.guatoc.co/assets/Gallina-C7OqRzyq.css",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 4523,
+   "url": "https://chagra-dev.guatoc.co/assets/useLipSync-w8Wiaz1c.js",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 4523,
+   "url": "https://chagra-dev.guatoc.co/assets/ttsService-DXvahESX.js",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 4523,
+   "url": "https://chagra-dev.guatoc.co/assets/Mariposa-CgnDMVMI.js",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 4523,
+   "url": "https://chagra-dev.guatoc.co/assets/Perezoso-b-ZxGC56.js",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 4523,
+   "url": "https://chagra-dev.guatoc.co/assets/senalSalidaAbeja-6YBxyBdP.js",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 4523,
+   "url": "https://chagra-dev.guatoc.co/assets/creatures-Cp-rHB31.css",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 4523,
+   "url": "https://chagra-dev.guatoc.co/assets/juego-finca-BdaNaXtm.css",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 4523,
+   "url": "https://chagra-dev.guatoc.co/assets/extensionistaService-CI4rc0Ud.js",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 4523,
+   "url": "https://chagra-dev.guatoc.co/assets/useAutosave-CDNNLFhj.js",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 4523,
+   "url": "https://chagra-dev.guatoc.co/assets/useSipsaLatestPrice-F-xcwTBk.js",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 4523,
+   "url": "https://chagra-dev.guatoc.co/assets/useVoiceRecorder-xqI1kPt7.js",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 4523,
+   "url": "https://chagra-dev.guatoc.co/assets/agentSoundService-CoHzivs7.js",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 4523,
+   "url": "https://chagra-dev.guatoc.co/assets/hoyEnFincaService-BT7Iv7bt.js",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 4523,
+   "url": "https://chagra-dev.guatoc.co/assets/cycleTaskService-CZJ6I0Ej.js",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 4523,
+   "url": "https://chagra-dev.guatoc.co/assets/locationService-CYGzM-md.js",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 4523,
+   "url": "https://chagra-dev.guatoc.co/assets/externalAiPromptBuilder-CSU9h1ov.js",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 4523,
+   "url": "https://chagra-dev.guatoc.co/assets/speciesResolver-1g9xvoqO.js",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 4523,
+   "url": "https://chagra-dev.guatoc.co/assets/perfilFincaService-CKcNC00y.js",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 4523,
+   "url": "https://chagra-dev.guatoc.co/assets/photoService-BhZdtGEw.js",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 4523,
+   "url": "https://chagra-dev.guatoc.co/assets/useCaseStudyStore-DM29LAbk.js",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 4523,
+   "url": "https://chagra-dev.guatoc.co/assets/DashboardLive-C7_JR1-U.css",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 8299,
+   "url": "https://chagra-dev.guatoc.co/cdn-cgi/rum?",
+   "type": "script",
+   "status": 204
+  },
+  {
+   "t": 8299,
+   "url": "https://chagra-dev.guatoc.co/favicon.svg",
+   "type": "other",
+   "status": 200
+  },
+  {
+   "t": 8357,
+   "url": "https://chagra-dev.guatoc.co/cycle-content/manifest.json",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 8400,
+   "url": "https://chagra-dev.guatoc.co/biopunk-pattern.svg",
+   "type": "parser",
+   "status": 200
+  },
+  {
+   "t": 8675,
+   "url": "https://chagra-dev.guatoc.co/oauth/token",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 9313,
+   "url": "https://chagra-dev.guatoc.co/assets/IosInstallBanner--3fic1cP.js",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 9313,
+   "url": "https://chagra-dev.guatoc.co/assets/usePwaInstall-CT3JaqOH.js",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 9313,
+   "url": "https://chagra-dev.guatoc.co/assets/OnboardingCondensado-JAGgRzgI.js",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 9313,
+   "url": "https://chagra-dev.guatoc.co/assets/AvatarSelector-D5EzCoew.js",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 9313,
+   "url": "https://chagra-dev.guatoc.co/assets/useGeolocation-D7B-fA1K.js",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 9313,
+   "url": "https://chagra-dev.guatoc.co/assets/usePerfilFincaStore-DVFi7PA-.js",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 9313,
+   "url": "https://chagra-dev.guatoc.co/assets/AgentFab-Dk_rtUDp.js",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 9313,
+   "url": "https://chagra-dev.guatoc.co/assets/agroecologia-DVYNAAOK.js",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 9313,
+   "url": "https://chagra-dev.guatoc.co/assets/useAngelitaStore-DYH8ULSU.js",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 9313,
+   "url": "https://chagra-dev.guatoc.co/assets/angelitaVariedad-Ti7_3hlD.js",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 9313,
+   "url": "https://chagra-dev.guatoc.co/assets/proactiveGreeting-Bl_TTJvu.js",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 9313,
+   "url": "https://chagra-dev.guatoc.co/assets/angelitaAvisoTipos-XHBkd0pV.js",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 9313,
+   "url": "https://chagra-dev.guatoc.co/assets/useInventarioCompai-CGXCkefn.js",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 9313,
+   "url": "https://chagra-dev.guatoc.co/assets/useComportamientoCompai-DTQiLxrC.js",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 9313,
+   "url": "https://chagra-dev.guatoc.co/assets/useComportamientoCompai-CbEDNuZT.css",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 9313,
+   "url": "https://chagra-dev.guatoc.co/assets/speciesResolver-D79NSVY8.js",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 9314,
+   "url": "https://chagra-dev.guatoc.co/assets/AgentFab-CN6FehxG.css",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 9314,
+   "url": "https://chagra-dev.guatoc.co/assets/EscuchaOverlay-2picfa_y.js",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 9314,
+   "url": "https://chagra-dev.guatoc.co/assets/ManoChagraGlyph-CgTAs4wX.js",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 9314,
+   "url": "https://chagra-dev.guatoc.co/assets/voiceService-CLPDPE83.js",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 9314,
+   "url": "https://chagra-dev.guatoc.co/assets/EscuchaOverlay-BQR93N8n.css",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 9317,
+   "url": "https://chagra-dev.guatoc.co/assets/AndroidInstallBanner-Btakrxnj.js",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 9318,
+   "url": "https://chagra-dev.guatoc.co/api/ollama/api/generate",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 9322,
+   "url": "https://chagra-dev.guatoc.co/assets/CompaiFotosOverlay-DTGIaOLa.js",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 9325,
+   "url": "https://chagra-dev.guatoc.co/api/file/file?filter[filename][operator]=CONTAINS&filter[filename][value]=chagra-operator-photo-admin-&sort=-created&page[limit]=1",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 9335,
+   "url": "https://chagra-dev.guatoc.co/cycle-content/manifest.json",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 9835,
+   "url": "https://chagra-dev.guatoc.co/assets/sqlite3-BVKGSWc-.wasm",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 11290,
+   "url": "https://chagra-dev.guatoc.co/version.json",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 22333,
+   "url": "https://chagra-dev.guatoc.co/catalog.sqlite",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 43948,
+   "url": "https://chagra-dev.guatoc.co/chagra-stats.json",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 43954,
+   "url": "https://chagra-dev.guatoc.co/cycle-content/acacia_melanoxylon.json",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 43954,
+   "url": "https://chagra-dev.guatoc.co/cycle-content/acanthus_mollis.json",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 43954,
+   "url": "https://chagra-dev.guatoc.co/cycle-content/achillea_millefolium.json",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 43954,
+   "url": "https://chagra-dev.guatoc.co/cycle-content/actinidia_deliciosa.json",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 43954,
+   "url": "https://chagra-dev.guatoc.co/cycle-content/agave_americana.json",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 43954,
+   "url": "https://chagra-dev.guatoc.co/cycle-content/agave_cocui.json",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 43954,
+   "url": "https://chagra-dev.guatoc.co/cycle-content/agave_tequilana.json",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 43954,
+   "url": "https://chagra-dev.guatoc.co/cycle-content/agrostis_foliata.json",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 43954,
+   "url": "https://chagra-dev.guatoc.co/cycle-content/aiphanes_aculeata.json",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 43954,
+   "url": "https://chagra-dev.guatoc.co/cycle-content/albizia_guachapele.json",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 43954,
+   "url": "https://chagra-dev.guatoc.co/cycle-content/allium_ampeloprasum.json",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 43954,
+   "url": "https://chagra-dev.guatoc.co/cycle-content/allium_cepa.json",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 44354,
+   "url": "https://chagra-dev.guatoc.co/fincas-publicas.json",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 45046,
+   "url": "https://chagra-dev.guatoc.co/cycle-content/allium_fistulosum.json",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 45046,
+   "url": "https://chagra-dev.guatoc.co/cycle-content/allium_sativum.json",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 45046,
+   "url": "https://chagra-dev.guatoc.co/cycle-content/allium_schoenoprasum.json",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 45046,
+   "url": "https://chagra-dev.guatoc.co/cycle-content/alnus_acuminata.json",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 45046,
+   "url": "https://chagra-dev.guatoc.co/cycle-content/alocasia_macrorrhizos.json",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 45047,
+   "url": "https://chagra-dev.guatoc.co/cycle-content/aloe_arborescens.json",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 45047,
+   "url": "https://chagra-dev.guatoc.co/cycle-content/aloe_vera.json",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 45047,
+   "url": "https://chagra-dev.guatoc.co/cycle-content/aloysia_citrodora.json",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 45047,
+   "url": "https://chagra-dev.guatoc.co/cycle-content/amaranthus_caudatus.json",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 45047,
+   "url": "https://chagra-dev.guatoc.co/cycle-content/amaranthus_caudatus_kiwicha.json",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 45047,
+   "url": "https://chagra-dev.guatoc.co/cycle-content/anacardium_excelsum.json",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 45047,
+   "url": "https://chagra-dev.guatoc.co/cycle-content/anacardium_occidentale.json",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 46101,
+   "url": "https://chagra-dev.guatoc.co/cycle-content/ananas_comosus.json",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 46101,
+   "url": "https://chagra-dev.guatoc.co/cycle-content/andropogon_gayanus.json",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 46101,
+   "url": "https://chagra-dev.guatoc.co/cycle-content/anethum_graveolens.json",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 46101,
+   "url": "https://chagra-dev.guatoc.co/cycle-content/aniba_perutilis.json",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 46101,
+   "url": "https://chagra-dev.guatoc.co/cycle-content/annona_cherimola.json",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 46101,
+   "url": "https://chagra-dev.guatoc.co/cycle-content/annona_mucosa.json",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 46101,
+   "url": "https://chagra-dev.guatoc.co/cycle-content/annona_muricata.json",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 46101,
+   "url": "https://chagra-dev.guatoc.co/cycle-content/annona_squamosa.json",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 46102,
+   "url": "https://chagra-dev.guatoc.co/cycle-content/apium_graveolens.json",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 46102,
+   "url": "https://chagra-dev.guatoc.co/cycle-content/arachis_pintoi.json",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 46102,
+   "url": "https://chagra-dev.guatoc.co/cycle-content/aragoa_abietina.json",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 46102,
+   "url": "https://chagra-dev.guatoc.co/cycle-content/arrabidaea_chica.json",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 47121,
+   "url": "https://chagra-dev.guatoc.co/cycle-content/arracacia_xanthorrhiza.json",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 47121,
+   "url": "https://chagra-dev.guatoc.co/cycle-content/arracacia_xanthorrhiza_amarilla.json",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 47121,
+   "url": "https://chagra-dev.guatoc.co/cycle-content/artemisia_absinthium.json",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 47121,
+   "url": "https://chagra-dev.guatoc.co/cycle-content/aspidosperma_polyneuron.json",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 47121,
+   "url": "https://chagra-dev.guatoc.co/cycle-content/astrocaryum_chambira.json",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 47121,
+   "url": "https://chagra-dev.guatoc.co/cycle-content/astronium_graveolens.json",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 47121,
+   "url": "https://chagra-dev.guatoc.co/cycle-content/attalea_butyracea.json",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 47121,
+   "url": "https://chagra-dev.guatoc.co/cycle-content/attalea_speciosa.json",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 47121,
+   "url": "https://chagra-dev.guatoc.co/cycle-content/avena_sativa.json",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 47121,
+   "url": "https://chagra-dev.guatoc.co/cycle-content/axinaea_macrophylla.json",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 47121,
+   "url": "https://chagra-dev.guatoc.co/cycle-content/axonopus_compressus.json",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 47121,
+   "url": "https://chagra-dev.guatoc.co/cycle-content/azolla_filiculoides.json",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 48208,
+   "url": "https://chagra-dev.guatoc.co/cycle-content/bactris_gasipaes.json",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 48208,
+   "url": "https://chagra-dev.guatoc.co/cycle-content/bactris_gasipaes_amazonica.json",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 48208,
+   "url": "https://chagra-dev.guatoc.co/cycle-content/bartsia_santolinifolia.json",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 48208,
+   "url": "https://chagra-dev.guatoc.co/cycle-content/beta_vulgaris_altissima.json",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 48208,
+   "url": "https://chagra-dev.guatoc.co/cycle-content/beta_vulgaris_cicla_amarilla.json",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 48208,
+   "url": "https://chagra-dev.guatoc.co/cycle-content/beta_vulgaris_cicla_blanca.json",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 48208,
+   "url": "https://chagra-dev.guatoc.co/cycle-content/beta_vulgaris_cicla_roja.json",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 48208,
+   "url": "https://chagra-dev.guatoc.co/cycle-content/beta_vulgaris_conditiva.json",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 48208,
+   "url": "https://chagra-dev.guatoc.co/cycle-content/beta_vulgaris_var_cicla.json",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 48208,
+   "url": "https://chagra-dev.guatoc.co/cycle-content/bixa_orellana.json",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 48208,
+   "url": "https://chagra-dev.guatoc.co/cycle-content/bocconia_frutescens.json",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 48208,
+   "url": "https://chagra-dev.guatoc.co/cycle-content/bomarea_caldasii.json",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 49197,
+   "url": "https://chagra-dev.guatoc.co/cycle-content/bombacopsis_quinata.json",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 49197,
+   "url": "https://chagra-dev.guatoc.co/cycle-content/borago_officinalis.json",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 49197,
+   "url": "https://chagra-dev.guatoc.co/cycle-content/borojoa_patinoi.json",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 49197,
+   "url": "https://chagra-dev.guatoc.co/cycle-content/borojoa_sorbilis.json",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 49197,
+   "url": "https://chagra-dev.guatoc.co/cycle-content/brachiaria_brizantha.json",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 49197,
+   "url": "https://chagra-dev.guatoc.co/cycle-content/brachiaria_decumbens.json",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 49197,
+   "url": "https://chagra-dev.guatoc.co/cycle-content/brassica_oleracea_acephala_curly.json",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 49198,
+   "url": "https://chagra-dev.guatoc.co/cycle-content/brassica_oleracea_acephala_lacinato.json",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 49198,
+   "url": "https://chagra-dev.guatoc.co/cycle-content/brassica_oleracea_acephala_red_russian.json",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 49198,
+   "url": "https://chagra-dev.guatoc.co/cycle-content/brassica_oleracea_capitata_alba.json",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 49198,
+   "url": "https://chagra-dev.guatoc.co/cycle-content/brassica_oleracea_capitata_rubra.json",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 49198,
+   "url": "https://chagra-dev.guatoc.co/cycle-content/brassica_oleracea_italica.json",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 49831,
+   "url": "https://chagra-dev.guatoc.co/cycle-content/brassica_oleracea_sabauda.json",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 49831,
+   "url": "https://chagra-dev.guatoc.co/cycle-content/brassica_oleracea_var_acephala.json",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 49831,
+   "url": "https://chagra-dev.guatoc.co/cycle-content/brassica_oleracea_var_capitata.json",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 49831,
+   "url": "https://chagra-dev.guatoc.co/cycle-content/brassica_rapa_rapifera.json",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 49831,
+   "url": "https://chagra-dev.guatoc.co/cycle-content/brassica_rapa_var_rapa.json",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 49832,
+   "url": "https://chagra-dev.guatoc.co/cycle-content/buddleja_americana.json",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 49832,
+   "url": "https://chagra-dev.guatoc.co/cycle-content/bursera_graveolens.json",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 49832,
+   "url": "https://chagra-dev.guatoc.co/cycle-content/byrsonima_crassifolia.json",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 49832,
+   "url": "https://chagra-dev.guatoc.co/cycle-content/caesalpinia_sappan.json",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 49832,
+   "url": "https://chagra-dev.guatoc.co/cycle-content/cajanus_cajan.json",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 49832,
+   "url": "https://chagra-dev.guatoc.co/cycle-content/calamagrostis_effusa.json",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 49832,
+   "url": "https://chagra-dev.guatoc.co/cycle-content/calendula_officinalis.json",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 50431,
+   "url": "https://chagra-dev.guatoc.co/cycle-content/canavalia_ensiformis.json",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 50431,
+   "url": "https://chagra-dev.guatoc.co/cycle-content/canna_edulis.json",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 50431,
+   "url": "https://chagra-dev.guatoc.co/cycle-content/capsicum_annuum_aji_dulce_caribe.json",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 50431,
+   "url": "https://chagra-dev.guatoc.co/cycle-content/capsicum_baccatum_aji_amarillo.json",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 50431,
+   "url": "https://chagra-dev.guatoc.co/cycle-content/capsicum_chinense_aji_panca.json",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 50431,
+   "url": "https://chagra-dev.guatoc.co/cycle-content/capsicum_pubescens_rocoto.json",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 50431,
+   "url": "https://chagra-dev.guatoc.co/cycle-content/cariniana_estrellensis.json",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 50431,
+   "url": "https://chagra-dev.guatoc.co/cycle-content/cariniana_pyriformis.json",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 50431,
+   "url": "https://chagra-dev.guatoc.co/cycle-content/caryocar_glabrum.json",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 50431,
+   "url": "https://chagra-dev.guatoc.co/cycle-content/cassia_grandis.json",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 50431,
+   "url": "https://chagra-dev.guatoc.co/cycle-content/cattleya_trianae.json",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 50431,
+   "url": "https://chagra-dev.guatoc.co/cycle-content/cavendishia_bracteata.json",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 51054,
+   "url": "https://chagra-dev.guatoc.co/cycle-content/cecropia_telealba.json",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 51055,
+   "url": "https://chagra-dev.guatoc.co/cycle-content/cedrela_montana.json",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 51055,
+   "url": "https://chagra-dev.guatoc.co/cycle-content/cedrela_odorata.json",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 51055,
+   "url": "https://chagra-dev.guatoc.co/cycle-content/ceiba_pentandra.json",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 51055,
+   "url": "https://chagra-dev.guatoc.co/cycle-content/cenchrus_clandestinus_manejado.json",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 51055,
+   "url": "https://chagra-dev.guatoc.co/cycle-content/centaurea_cyanus.json",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 51055,
+   "url": "https://chagra-dev.guatoc.co/cycle-content/cestrum_nocturnum.json",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 51055,
+   "url": "https://chagra-dev.guatoc.co/cycle-content/chamaemelum_nobile.json",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 51055,
+   "url": "https://chagra-dev.guatoc.co/cycle-content/chenopodium_pallidicaule.json",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 51055,
+   "url": "https://chagra-dev.guatoc.co/cycle-content/chenopodium_quinoa.json",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 51056,
+   "url": "https://chagra-dev.guatoc.co/cycle-content/chrysophyllum_cainito.json",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 51056,
+   "url": "https://chagra-dev.guatoc.co/cycle-content/chuquiraga_jussieui.json",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 51670,
+   "url": "https://chagra-dev.guatoc.co/cycle-content/cicer_arietinum.json",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 51670,
+   "url": "https://chagra-dev.guatoc.co/cycle-content/cinchona_officinalis.json",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 51670,
+   "url": "https://chagra-dev.guatoc.co/cycle-content/cinchona_pubescens.json",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 51670,
+   "url": "https://chagra-dev.guatoc.co/cycle-content/citrus_latifolia.json",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 51670,
+   "url": "https://chagra-dev.guatoc.co/cycle-content/citrus_sinensis.json",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 51670,
+   "url": "https://chagra-dev.guatoc.co/cycle-content/clethra_fagifolia.json",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 51670,
+   "url": "https://chagra-dev.guatoc.co/cycle-content/clethra_kalbreyeri.json",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 51670,
+   "url": "https://chagra-dev.guatoc.co/cycle-content/clusia_grandiflora.json",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 51670,
+   "url": "https://chagra-dev.guatoc.co/cycle-content/clusia_multiflora.json",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 51670,
+   "url": "https://chagra-dev.guatoc.co/cycle-content/cnidoscolus_aconitifolius.json",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 51670,
+   "url": "https://chagra-dev.guatoc.co/cycle-content/cocos_nucifera.json",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 51670,
+   "url": "https://chagra-dev.guatoc.co/cycle-content/coffea_arabica.json",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 52279,
+   "url": "https://chagra-dev.guatoc.co/cycle-content/colocasia_antiquorum.json",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 52279,
+   "url": "https://chagra-dev.guatoc.co/cycle-content/colocasia_esculenta.json",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 52279,
+   "url": "https://chagra-dev.guatoc.co/cycle-content/cordia_alliodora.json",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 52279,
+   "url": "https://chagra-dev.guatoc.co/cycle-content/coriandrum_sativum.json",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 52279,
+   "url": "https://chagra-dev.guatoc.co/cycle-content/cosmos_sulphureus.json",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 52279,
+   "url": "https://chagra-dev.guatoc.co/cycle-content/costus_spicatus.json",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 52280,
+   "url": "https://chagra-dev.guatoc.co/cycle-content/couma_macrocarpa.json",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 52280,
+   "url": "https://chagra-dev.guatoc.co/cycle-content/crassula_ovata.json",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 52280,
+   "url": "https://chagra-dev.guatoc.co/cycle-content/cratylia_argentea.json",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 52280,
+   "url": "https://chagra-dev.guatoc.co/cycle-content/crotalaria_juncea.json",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 52280,
+   "url": "https://chagra-dev.guatoc.co/cycle-content/cucurbita_maxima.json",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 52280,
+   "url": "https://chagra-dev.guatoc.co/cycle-content/cucurbita_moschata.json",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 53179,
+   "url": "https://chagra-dev.guatoc.co/cycle-content/cuminum_cyminum.json",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 53179,
+   "url": "https://chagra-dev.guatoc.co/cycle-content/curcuma_longa.json",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 53179,
+   "url": "https://chagra-dev.guatoc.co/cycle-content/cyclanthera_pedata.json",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 53179,
+   "url": "https://chagra-dev.guatoc.co/cycle-content/cydonia_oblonga.json",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 53179,
+   "url": "https://chagra-dev.guatoc.co/cycle-content/cymbopogon_citratus.json",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 53179,
+   "url": "https://chagra-dev.guatoc.co/cycle-content/cymbopogon_flexuosus.json",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 53179,
+   "url": "https://chagra-dev.guatoc.co/cycle-content/cymbopogon_nardus.json",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 53180,
+   "url": "https://chagra-dev.guatoc.co/cycle-content/cynara_cardunculus_scolymus.json",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 53180,
+   "url": "https://chagra-dev.guatoc.co/cycle-content/cynodon_nlemfuensis.json",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 53180,
+   "url": "https://chagra-dev.guatoc.co/cycle-content/cyperus_articulatus.json",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 53180,
+   "url": "https://chagra-dev.guatoc.co/cycle-content/dahlia_imperialis.json",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 53180,
+   "url": "https://chagra-dev.guatoc.co/cycle-content/daucus_carota_subsp_sativus.json",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 53789,
+   "url": "https://chagra-dev.guatoc.co/cycle-content/desmodium_intortum.json",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 53789,
+   "url": "https://chagra-dev.guatoc.co/cycle-content/dicksonia_sellowiana.json",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 53789,
+   "url": "https://chagra-dev.guatoc.co/cycle-content/digitaria_decumbens.json",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 53790,
+   "url": "https://chagra-dev.guatoc.co/cycle-content/dioscorea_alata.json",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 53790,
+   "url": "https://chagra-dev.guatoc.co/cycle-content/dioscorea_cayennensis.json",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 53790,
+   "url": "https://chagra-dev.guatoc.co/cycle-content/dioscorea_japonica.json",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 53790,
+   "url": "https://chagra-dev.guatoc.co/cycle-content/dioscorea_rotundata.json",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 53790,
+   "url": "https://chagra-dev.guatoc.co/cycle-content/dioscorea_trifida.json",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 53790,
+   "url": "https://chagra-dev.guatoc.co/cycle-content/diplostephium_rosmarinifolium.json",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 53790,
+   "url": "https://chagra-dev.guatoc.co/cycle-content/disterigma_empetrifolium.json",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 53790,
+   "url": "https://chagra-dev.guatoc.co/cycle-content/dodonaea_viscosa.json",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 53790,
+   "url": "https://chagra-dev.guatoc.co/cycle-content/drimys_granadensis.json",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 54354,
+   "url": "https://chagra-dev.guatoc.co/cycle-content/dysphania_ambrosioides.json",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 54354,
+   "url": "https://chagra-dev.guatoc.co/cycle-content/eleocharis_dulcis.json",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 54354,
+   "url": "https://chagra-dev.guatoc.co/cycle-content/elettaria_cardamomum.json",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 54354,
+   "url": "https://chagra-dev.guatoc.co/cycle-content/enterolobium_cyclocarpum.json",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 54354,
+   "url": "https://chagra-dev.guatoc.co/cycle-content/epiphyllum_phyllanthus.json",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 54355,
+   "url": "https://chagra-dev.guatoc.co/cycle-content/equisetum_giganteum.json",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 54355,
+   "url": "https://chagra-dev.guatoc.co/cycle-content/eriobotrya_japonica.json",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 54355,
+   "url": "https://chagra-dev.guatoc.co/cycle-content/eryngium_foetidum.json",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 54355,
+   "url": "https://chagra-dev.guatoc.co/cycle-content/erythrina_edulis.json",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 54355,
+   "url": "https://chagra-dev.guatoc.co/cycle-content/erythrina_rubrinervia.json",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 54355,
+   "url": "https://chagra-dev.guatoc.co/cycle-content/escallonia_myrtilloides.json",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 54355,
+   "url": "https://chagra-dev.guatoc.co/cycle-content/escallonia_paniculata.json",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 54988,
+   "url": "https://chagra-dev.guatoc.co/cycle-content/escallonia_pendula.json",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 54988,
+   "url": "https://chagra-dev.guatoc.co/cycle-content/espeletia_argentea.json",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 54988,
+   "url": "https://chagra-dev.guatoc.co/cycle-content/espeletia_grandiflora.json",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 54988,
+   "url": "https://chagra-dev.guatoc.co/cycle-content/espeletia_killipii.json",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 54988,
+   "url": "https://chagra-dev.guatoc.co/cycle-content/espeletia_lopezii.json",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 54988,
+   "url": "https://chagra-dev.guatoc.co/cycle-content/espeletia_pycnophylla.json",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 54988,
+   "url": "https://chagra-dev.guatoc.co/cycle-content/espeletia_uribei.json",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 54988,
+   "url": "https://chagra-dev.guatoc.co/cycle-content/eucalyptus_globulus.json",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 54988,
+   "url": "https://chagra-dev.guatoc.co/cycle-content/eugenia_stipitata.json",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 54988,
+   "url": "https://chagra-dev.guatoc.co/cycle-content/eugenia_uniflora.json",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 54988,
+   "url": "https://chagra-dev.guatoc.co/cycle-content/euterpe_oleracea.json",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 54988,
+   "url": "https://chagra-dev.guatoc.co/cycle-content/euterpe_precatoria.json",
+   "type": "script",
+   "status": 200
+  },
+  {
+   "t": 55680,
+   "url": "https://chagra-dev.guatoc.co/compai/laminas/zariguya-gemini-escucha-01.png",
+   "type": "other",
+   "status": 200
+  },
+  {
+   "t": 55680,
+   "url": "https://chagra-dev.guatoc.co/compai/laminas/zariguya-gemini-escucha-02.png",
+   "type": "other",
+   "status": 200
+  },
+  {
+   "t": 55680,
+   "url": "https://chagra-dev.guatoc.co/compai/laminas/zariguya-gemini-escucha-03.png",
+   "type": "other",
+   "status": 200
+  },
+  {
+   "t": 55680,
+   "url": "https://chagra-dev.guatoc.co/compai/laminas/zariguya-gemini-escucha-04.png",
+   "type": "other",
+   "status": 200
+  },
+  {
+   "t": 55680,
+   "url": "https://chagra-dev.guatoc.co/compai/laminas/zariguya-gemini-verlupa.png",
+   "type": "other",
+   "status": 200
+  },
+  {
+   "t": 55680,
+   "url": "https://chagra-dev.guatoc.co/compai/laminas/zariguya-gemini-muerta.png",
+   "type": "other",
+   "status": 200
+  },
+  {
+   "t": 55680,
+   "url": "https://chagra-dev.guatoc.co/compai/laminas/zariguya-gemini-cute.png",
+   "type": "other",
+   "status": 200
+  }
+ ]
+}

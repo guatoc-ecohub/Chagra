@@ -1,0 +1,767 @@
+{
+ "tag": "auth4",
+ "url": "https://chagra-dev.guatoc.co/",
+ "user": "admin                                                                                                       ",
+ "stages": {
+  "start": 0,
+  "loginForm": 7402,
+  "submit": 7468,
+  "dashWaitEnd": 76204
+ },
+ "domLog": [
+  {
+   "tag": "goto",
+   "at": 4565,
+   "login": false,
+   "onb": false,
+   "tile": false,
+   "loader": true,
+   "head": "🌱 | CHAGRA | Cargando…",
+   "hash": "/"
+  },
+  {
+   "tag": "login",
+   "at": 7415,
+   "login": true,
+   "onb": false,
+   "tile": false,
+   "loader": false,
+   "head": "Chagra |  | El cuaderno vivo de su finca agroecológica |  | Registre, aprenda y cuide la tierra, con intelig",
+   "hash": "/"
+  },
+  {
+   "tag": "after-submit",
+   "at": 7558,
+   "login": true,
+   "onb": false,
+   "tile": false,
+   "loader": false,
+   "head": "Chagra |  | El cuaderno vivo de su finca agroecológica |  | Registre, aprenda y cuide la tierra, con intelig",
+   "hash": "/"
+  },
+  {
+   "tag": "wait-dash+2s",
+   "at": 9062,
+   "login": true,
+   "onb": false,
+   "tile": false,
+   "loader": false,
+   "head": "Chagra |  | El cuaderno vivo de su finca agroecológica |  | Registre, aprenda y cuide la tierra, con intelig",
+   "hash": "/"
+  },
+  {
+   "tag": "wait-dash+3s",
+   "at": 10564,
+   "login": true,
+   "onb": false,
+   "tile": false,
+   "loader": false,
+   "head": "Cargando…",
+   "hash": "/"
+  },
+  {
+   "tag": "wait-dash+5s",
+   "at": 12066,
+   "login": true,
+   "onb": false,
+   "tile": false,
+   "loader": false,
+   "head": "Cargando…",
+   "hash": "/"
+  },
+  {
+   "tag": "wait-dash+6s",
+   "at": 13572,
+   "login": true,
+   "onb": false,
+   "tile": false,
+   "loader": false,
+   "head": "Cargando… |  | Sigue cargando — con señal de campo puede tardar un poco más. No se perdió nada.",
+   "hash": "/"
+  },
+  {
+   "tag": "wait-dash+8s",
+   "at": 15074,
+   "login": true,
+   "onb": false,
+   "tile": false,
+   "loader": false,
+   "head": "Cargando… |  | Sigue cargando — con señal de campo puede tardar un poco más. No se perdió nada.",
+   "hash": "/"
+  },
+  {
+   "tag": "wait-dash+9s",
+   "at": 16576,
+   "login": true,
+   "onb": false,
+   "tile": false,
+   "loader": false,
+   "head": "Cargando… |  | Sigue cargando — con señal de campo puede tardar un poco más. No se perdió nada.",
+   "hash": "/"
+  },
+  {
+   "tag": "wait-dash+11s",
+   "at": 18078,
+   "login": true,
+   "onb": false,
+   "tile": false,
+   "loader": false,
+   "head": "Cargando… |  | Sigue cargando — con señal de campo puede tardar un poco más. No se perdió nada.",
+   "hash": "/"
+  },
+  {
+   "tag": "wait-dash+12s",
+   "at": 19580,
+   "login": true,
+   "onb": false,
+   "tile": false,
+   "loader": false,
+   "head": "Cargando… |  | Sigue cargando — con señal de campo puede tardar un poco más. No se perdió nada.",
+   "hash": "/"
+  },
+  {
+   "tag": "wait-dash+14s",
+   "at": 21082,
+   "login": true,
+   "onb": false,
+   "tile": false,
+   "loader": false,
+   "head": "Cargando… |  | Sigue cargando — con señal de campo puede tardar un poco más. No se perdió nada.",
+   "hash": "/"
+  },
+  {
+   "tag": "wait-dash+15s",
+   "at": 22584,
+   "login": true,
+   "onb": false,
+   "tile": false,
+   "loader": false,
+   "head": "Cargando… |  | Sigue cargando — con señal de campo puede tardar un poco más. No se perdió nada.",
+   "hash": "/"
+  },
+  {
+   "tag": "wait-dash+17s",
+   "at": 24088,
+   "login": true,
+   "onb": false,
+   "tile": false,
+   "loader": false,
+   "head": "Cargando… |  | Sigue cargando — con señal de campo puede tardar un poco más. No se perdió nada.",
+   "hash": "/"
+  },
+  {
+   "tag": "wait-dash+18s",
+   "at": 25590,
+   "login": true,
+   "onb": false,
+   "tile": false,
+   "loader": false,
+   "head": "Cargando… |  | Sigue cargando — con señal de campo puede tardar un poco más. No se perdió nada.",
+   "hash": "/"
+  },
+  {
+   "tag": "wait-dash+20s",
+   "at": 27091,
+   "login": true,
+   "onb": false,
+   "tile": false,
+   "loader": false,
+   "head": "Cargando… |  | Sigue cargando — con señal de campo puede tardar un poco más. No se perdió nada.",
+   "hash": "/"
+  },
+  {
+   "tag": "wait-dash+21s",
+   "at": 28593,
+   "login": true,
+   "onb": false,
+   "tile": false,
+   "loader": false,
+   "head": "Cargando… |  | Sigue cargando — con señal de campo puede tardar un poco más. No se perdió nada.",
+   "hash": "/"
+  },
+  {
+   "tag": "wait-dash+23s",
+   "at": 30094,
+   "login": true,
+   "onb": false,
+   "tile": false,
+   "loader": false,
+   "head": "Cargando… |  | Sigue cargando — con señal de campo puede tardar un poco más. No se perdió nada.",
+   "hash": "/"
+  },
+  {
+   "tag": "wait-dash+24s",
+   "at": 31597,
+   "login": true,
+   "onb": false,
+   "tile": false,
+   "loader": false,
+   "head": "Cargando… |  | Sigue cargando — con señal de campo puede tardar un poco más. No se perdió nada.",
+   "hash": "/"
+  },
+  {
+   "tag": "wait-dash+26s",
+   "at": 33098,
+   "login": true,
+   "onb": false,
+   "tile": false,
+   "loader": false,
+   "head": "Cargando… |  | Sigue cargando — con señal de campo puede tardar un poco más. No se perdió nada.",
+   "hash": "/"
+  },
+  {
+   "tag": "wait-dash+27s",
+   "at": 34599,
+   "login": true,
+   "onb": false,
+   "tile": false,
+   "loader": false,
+   "head": "Cargando… |  | Sigue cargando — con señal de campo puede tardar un poco más. No se perdió nada.",
+   "hash": "/"
+  },
+  {
+   "tag": "wait-dash+29s",
+   "at": 36101,
+   "login": true,
+   "onb": false,
+   "tile": false,
+   "loader": false,
+   "head": "Cargando… |  | Sigue cargando — con señal de campo puede tardar un poco más. No se perdió nada.",
+   "hash": "/"
+  },
+  {
+   "tag": "wait-dash+30s",
+   "at": 37603,
+   "login": true,
+   "onb": false,
+   "tile": false,
+   "loader": false,
+   "head": "Cargando… |  | Sigue cargando — con señal de campo puede tardar un poco más. No se perdió nada.",
+   "hash": "/"
+  },
+  {
+   "tag": "wait-dash+32s",
+   "at": 39104,
+   "login": true,
+   "onb": false,
+   "tile": false,
+   "loader": false,
+   "head": "Cargando… |  | Sigue cargando — con señal de campo puede tardar un poco más. No se perdió nada.",
+   "hash": "/"
+  },
+  {
+   "tag": "wait-dash+33s",
+   "at": 40606,
+   "login": true,
+   "onb": false,
+   "tile": false,
+   "loader": false,
+   "head": "Cargando… |  | Sigue cargando — con señal de campo puede tardar un poco más. No se perdió nada.",
+   "hash": "/"
+  },
+  {
+   "tag": "wait-dash+35s",
+   "at": 42109,
+   "login": true,
+   "onb": false,
+   "tile": false,
+   "loader": false,
+   "head": "Cargando… |  | Sigue cargando — con señal de campo puede tardar un poco más. No se perdió nada.",
+   "hash": "/"
+  },
+  {
+   "tag": "wait-dash+36s",
+   "at": 43611,
+   "login": true,
+   "onb": false,
+   "tile": false,
+   "loader": false,
+   "head": "Cargando… |  | Sigue cargando — con señal de campo puede tardar un poco más. No se perdió nada.",
+   "hash": "/"
+  },
+  {
+   "tag": "wait-dash+38s",
+   "at": 45113,
+   "login": true,
+   "onb": false,
+   "tile": false,
+   "loader": false,
+   "head": "Cargando… |  | Sigue cargando — con señal de campo puede tardar un poco más. No se perdió nada.",
+   "hash": "/"
+  },
+  {
+   "tag": "wait-dash+39s",
+   "at": 46615,
+   "login": true,
+   "onb": false,
+   "tile": false,
+   "loader": false,
+   "head": "Cargando… |  | Sigue cargando — con señal de campo puede tardar un poco más. No se perdió nada.",
+   "hash": "/"
+  },
+  {
+   "tag": "wait-dash+41s",
+   "at": 48116,
+   "login": true,
+   "onb": false,
+   "tile": false,
+   "loader": false,
+   "head": "Cargando… |  | Sigue cargando — con señal de campo puede tardar un poco más. No se perdió nada.",
+   "hash": "/"
+  },
+  {
+   "tag": "wait-dash+42s",
+   "at": 49623,
+   "login": true,
+   "onb": false,
+   "tile": false,
+   "loader": false,
+   "head": "Cargando… |  | Sigue cargando — con señal de campo puede tardar un poco más. No se perdió nada.",
+   "hash": "/"
+  },
+  {
+   "tag": "wait-dash+44s",
+   "at": 51124,
+   "login": true,
+   "onb": false,
+   "tile": false,
+   "loader": false,
+   "head": "Cargando… |  | Sigue cargando — con señal de campo puede tardar un poco más. No se perdió nada.",
+   "hash": "/"
+  },
+  {
+   "tag": "wait-dash+45s",
+   "at": 52628,
+   "login": true,
+   "onb": false,
+   "tile": false,
+   "loader": false,
+   "head": "Cargando… |  | Sigue cargando — con señal de campo puede tardar un poco más. No se perdió nada.",
+   "hash": "/"
+  },
+  {
+   "tag": "wait-dash+47s",
+   "at": 54147,
+   "login": true,
+   "onb": false,
+   "tile": false,
+   "loader": false,
+   "head": "Cargando… |  | Sigue cargando — con señal de campo puede tardar un poco más. No se perdió nada.",
+   "hash": "/"
+  },
+  {
+   "tag": "wait-dash+48s",
+   "at": 55655,
+   "login": true,
+   "onb": false,
+   "tile": false,
+   "loader": false,
+   "head": "Cargando… |  | Sigue cargando — con señal de campo puede tardar un poco más. No se perdió nada.",
+   "hash": "/"
+  },
+  {
+   "tag": "wait-dash+50s",
+   "at": 57156,
+   "login": true,
+   "onb": false,
+   "tile": false,
+   "loader": false,
+   "head": "Cargando… |  | Sigue cargando — con señal de campo puede tardar un poco más. No se perdió nada.",
+   "hash": "/"
+  },
+  {
+   "tag": "wait-dash+51s",
+   "at": 58665,
+   "login": true,
+   "onb": false,
+   "tile": false,
+   "loader": false,
+   "head": "Cargando… |  | Sigue cargando — con señal de campo puede tardar un poco más. No se perdió nada.",
+   "hash": "/"
+  },
+  {
+   "tag": "wait-dash+53s",
+   "at": 60168,
+   "login": true,
+   "onb": false,
+   "tile": false,
+   "loader": false,
+   "head": "Cargando… |  | Sigue cargando — con señal de campo puede tardar un poco más. No se perdió nada.",
+   "hash": "/"
+  },
+  {
+   "tag": "wait-dash+54s",
+   "at": 61672,
+   "login": true,
+   "onb": false,
+   "tile": false,
+   "loader": false,
+   "head": "Cargando… |  | Sigue cargando — con señal de campo puede tardar un poco más. No se perdió nada.",
+   "hash": "/"
+  },
+  {
+   "tag": "wait-dash+56s",
+   "at": 63179,
+   "login": true,
+   "onb": false,
+   "tile": false,
+   "loader": false,
+   "head": "Cargando… |  | Sigue cargando — con señal de campo puede tardar un poco más. No se perdió nada.",
+   "hash": "/"
+  },
+  {
+   "tag": "wait-dash+57s",
+   "at": 64703,
+   "login": true,
+   "onb": false,
+   "tile": false,
+   "loader": false,
+   "head": "Cargando… |  | Sigue cargando — con señal de campo puede tardar un poco más. No se perdió nada.",
+   "hash": "/"
+  },
+  {
+   "tag": "wait-dash+59s",
+   "at": 71199,
+   "login": false,
+   "onb": true,
+   "tile": false,
+   "loader": false,
+   "head": "PASO 1 DE 6 |  | Saltar todo | Cuéntenos de usted |  | Dos toques y arrancamos. Todo se puede saltar. |  | ¿CÓMO S",
+   "hash": "/"
+  },
+  {
+   "tag": "final",
+   "at": 76363,
+   "login": false,
+   "onb": true,
+   "tile": false,
+   "loader": false,
+   "head": "PASO 1 DE 6 |  | Saltar todo | Cuéntenos de usted |  | Dos toques y arrancamos. Todo se puede saltar. |  | ¿CÓMO S",
+   "hash": "/"
+  }
+ ],
+ "phases": {
+  "fcp": 4388,
+  "lcp": null,
+  "longtasks": [],
+  "blocking": 0
+ },
+ "transition": null,
+ "shotPath": "_gate/perf-auth4.png",
+ "requestsTotal": 581,
+ "postSubmitReqs": 400,
+ "statusCounts": {
+  "200": 392,
+  "none": 8
+ },
+ "byUrlPost": [
+  [
+   "oauth/token",
+   1
+  ],
+  [
+   "assets/IosInstallBanner--3fic1cP.js",
+   1
+  ],
+  [
+   "assets/usePwaInstall-CT3JaqOH.js",
+   1
+  ],
+  [
+   "assets/OnboardingCondensado-JAGgRzgI.js",
+   1
+  ],
+  [
+   "assets/AvatarSelector-D5EzCoew.js",
+   1
+  ],
+  [
+   "assets/useGeolocation-D7B-fA1K.js",
+   1
+  ],
+  [
+   "assets/usePerfilFincaStore-DVFi7PA-.js",
+   1
+  ],
+  [
+   "assets/AgentFab-Dk_rtUDp.js",
+   1
+  ],
+  [
+   "assets/agroecologia-DVYNAAOK.js",
+   1
+  ],
+  [
+   "assets/useAngelitaStore-DYH8ULSU.js",
+   1
+  ],
+  [
+   "assets/angelitaVariedad-Ti7_3hlD.js",
+   1
+  ],
+  [
+   "assets/proactiveGreeting-Bl_TTJvu.js",
+   1
+  ],
+  [
+   "assets/angelitaAvisoTipos-XHBkd0pV.js",
+   1
+  ],
+  [
+   "assets/useInventarioCompai-CGXCkefn.js",
+   1
+  ],
+  [
+   "assets/useComportamientoCompai-DTQiLxrC.js",
+   1
+  ],
+  [
+   "assets/useComportamientoCompai-CbEDNuZT.css",
+   1
+  ],
+  [
+   "assets/speciesResolver-D79NSVY8.js",
+   1
+  ],
+  [
+   "assets/AgentFab-CN6FehxG.css",
+   1
+  ],
+  [
+   "assets/EscuchaOverlay-2picfa_y.js",
+   1
+  ],
+  [
+   "assets/ManoChagraGlyph-CgTAs4wX.js",
+   1
+  ],
+  [
+   "assets/voiceService-CLPDPE83.js",
+   1
+  ],
+  [
+   "assets/EscuchaOverlay-BQR93N8n.css",
+   1
+  ],
+  [
+   "assets/AndroidInstallBanner-Btakrxnj.js",
+   1
+  ],
+  [
+   "api/ollama/api/generate",
+   1
+  ],
+  [
+   "assets/CompaiFotosOverlay-DTGIaOLa.js",
+   1
+  ],
+  [
+   "api/file/file",
+   1
+  ],
+  [
+   "cycle-content/manifest.json",
+   1
+  ],
+  [
+   "assets/sqlite3-BVKGSWc-.wasm",
+   1
+  ],
+  [
+   "version.json",
+   1
+  ],
+  [
+   "catalog.sqlite",
+   1
+  ]
+ ],
+ "consoleMsgs": [
+  {
+   "t": 4452,
+   "type": "info",
+   "text": "[DB] Upgrading schema to v27…"
+  },
+  {
+   "t": 4523,
+   "type": "info",
+   "text": "[Migration] Tareas migradas con éxito."
+  },
+  {
+   "t": 4524,
+   "type": "info",
+   "text": "[Migration] Tareas migradas con éxito."
+  },
+  {
+   "t": 4525,
+   "type": "info",
+   "text": "[Migration] Tareas migradas con éxito."
+  },
+  {
+   "t": 4526,
+   "type": "warning",
+   "text": "[API] Token no disponible. Continuando en modo offline."
+  },
+  {
+   "t": 4526,
+   "type": "warning",
+   "text": "[LogStore] Fallo en pull de log--seeding: Token no disponible."
+  },
+  {
+   "t": 4528,
+   "type": "warning",
+   "text": "[API] Token no disponible. Continuando en modo offline."
+  },
+  {
+   "t": 4528,
+   "type": "warning",
+   "text": "[LogStore] Fallo en pull de log--planting: Token no disponible."
+  },
+  {
+   "t": 4528,
+   "type": "warning",
+   "text": "[API] Token no disponible. Continuando en modo offline."
+  },
+  {
+   "t": 4529,
+   "type": "warning",
+   "text": "[LogStore] Fallo en pull de log--harvest: Token no disponible."
+  },
+  {
+   "t": 4529,
+   "type": "warning",
+   "text": "[API] Token no disponible. Continuando en modo offline."
+  },
+  {
+   "t": 4529,
+   "type": "warning",
+   "text": "[LogStore] Fallo en pull de log--input: Token no disponible."
+  },
+  {
+   "t": 4529,
+   "type": "warning",
+   "text": "[API] Token no disponible. Continuando en modo offline."
+  },
+  {
+   "t": 4529,
+   "type": "warning",
+   "text": "[LogStore] Fallo en pull de log--task: Token no disponible."
+  },
+  {
+   "t": 4529,
+   "type": "warning",
+   "text": "[API] Token no disponible. Continuando en modo offline."
+  },
+  {
+   "t": 4529,
+   "type": "warning",
+   "text": "[LogStore] Fallo en pull de log--observation: Token no disponible."
+  },
+  {
+   "t": 5066,
+   "type": "info",
+   "text": "[AlertEngine] Iniciando motor de alertas (clima real)..."
+  },
+  {
+   "t": 5066,
+   "type": "info",
+   "text": "[AlertEngine] Verificando thresholds (clima real)..."
+  },
+  {
+   "t": 5066,
+   "type": "info",
+   "text": "[AlertEngine] Sin coordenadas en el perfil — no se evalúa clima (degradación limpia, sin mock)."
+  },
+  {
+   "t": 5066,
+   "type": "info",
+   "text": "[AlertEngine] Verificación completada. Alertas activas: 0"
+  },
+  {
+   "t": 7514,
+   "type": "warning",
+   "text": "[Auth] Intentando login password grant (DEPRECATED) para: admin                                                                                                       "
+  },
+  {
+   "t": 8080,
+   "type": "info",
+   "text": "Service Worker registrado: https://chagra-dev.guatoc.co/"
+  },
+  {
+   "t": 8230,
+   "type": "warning",
+   "text": "[operatorIdentity] Generated NEW account_uuid_master. Backup recommended."
+  },
+  {
+   "t": 9548,
+   "type": "debug",
+   "text": "[useOllamaWarmStore] qwen3.5:4b warm-up OK (pinned)"
+  },
+  {
+   "t": 12457,
+   "type": "debug",
+   "text": "[agentTelemetrySync] consentimiento denegado — no sync"
+  },
+  {
+   "t": 12458,
+   "type": "debug",
+   "text": "[usageTelemetrySync] consentimiento denegado — no sync"
+  },
+  {
+   "t": 13373,
+   "type": "warning",
+   "text": "The resource https://chagra-dev.guatoc.co/fonts/nunito-latin.woff2 was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropria"
+  },
+  {
+   "t": 18061,
+   "type": "info",
+   "text": "[SQLite WASM] Engine loaded successfully."
+  },
+  {
+   "t": 21036,
+   "type": "warning",
+   "text": "The resource https://chagra-dev.guatoc.co/fonts/nunito-latin.woff2 was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropria"
+  },
+  {
+   "t": 27857,
+   "type": "warning",
+   "text": "The resource https://chagra-dev.guatoc.co/fonts/nunito-latin.woff2 was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropria"
+  },
+  {
+   "t": 45854,
+   "type": "info",
+   "text": "[SQLite WASM] Catalog loaded from /catalog.sqlite (tier=OSS)"
+  },
+  {
+   "t": 45873,
+   "type": "info",
+   "text": "[SQLite WASM] Opened SQLite DB locally from Memory deserialization"
+  },
+  {
+   "t": 45908,
+   "type": "info",
+   "text": "[RAG] Tier gate: 517 slugs en manifest, 469 dentro del catalogo (48 excluidos)."
+  },
+  {
+   "t": 50476,
+   "type": "info",
+   "text": "[SW] Service Worker activo y listo."
+  },
+  {
+   "t": 71218,
+   "type": "warning",
+   "text": "The resource https://chagra-dev.guatoc.co/fonts/nunito-latin.woff2 was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropria"
+  },
+  {
+   "t": 76409,
+   "type": "warning",
+   "text": "Deprecated API for given entry type."
+  },
+  {
+   "t": 76409,
+   "type": "warning",
+   "text": "Deprecated API for given entry type."
+  }
+ ],
+ "jsErrors": []
+}
