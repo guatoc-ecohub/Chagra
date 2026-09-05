@@ -8,6 +8,7 @@ import { spawnSync } from 'node:child_process';
 import { execPath } from 'node:process';
 import {
   mkdtempSync, mkdirSync, writeFileSync, readFileSync, rmSync, cpSync, existsSync,
+  readdirSync, statSync,
 } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join, dirname, resolve } from 'node:path';
@@ -30,6 +31,25 @@ import { fileURLToPath } from 'node:url';
  *     el allowlist no se pudra con renombres/borrados), los dos ids que
  *     causaron el rojo del 2026-08-31 siguen declarados, y una corrida
  *     end-to-end del gate sobre este repo que debe terminar en verde.
+ *  3. TANDA MUNDO3D 2026-09-04 (task audit-integraciones-rojo-en-la-base): el
+ *     motor por símbolo (095.b, #3113) destapó 48 archivos de
+ *     src/visual/mundo3d que el gate viejo (solo .jsx) no miraba — apoyos de
+ *     escenas ya declaradas el 2026-08-30, vendor flora de #3103, barriles
+ *     muertos y dos hooks "listos para cablear". Se declaran con reason; estos
+ *     tests sostienen la decisión y el des-cableado.
+ *  4. REMATE 2026-09-05 (task audit-gate-remate-20260905): con la tanda mundo3d
+ *     el rojo quedó en 126 hallazgos que frenaban TODOS los PRs (represa de 9).
+ *     El operador ordenó el remate: borrar 13 entradas fantasma (archivos que
+ *     se cablearon o pasaron a vitrina/página suelta y ya no eran hallazgo) y
+ *     declarar los 123 restantes — cada uno pasado por un CONTROL de
+ *     importadores con resolución exacta de especificadores, la lección de
+ *     useT.js (el 09-04 casi se declara muerto por un grep por substring que
+ *     le atribuyó los importadores de useTheme). El control pescó 3 FALSOS
+ *     huérfanos (data/aguaFinca, data/cacaoFinca, data/mangoFinca: importados
+ *     por pantallas MONTADAS con cláusulas >400 chars que el motor no veía —
+ *     fix en alcance-simbolica.mjs y su regresión en
+ *     alcance-simbolica.test.mjs) y por eso NO se declararon. Este bloque
+ *     sostiene el verde, la purga de fantasmas y el control.
  */
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -239,6 +259,38 @@ describe('audit-integraciones (fixture hermético)', function () {
 describe('ops/integraciones-no-consumidas.json (repo real)', function () {
   const allowlist = JSON.parse(readFileSync(ALLOWLIST_REPO, 'utf8'));
 
+  // Una sola corrida del gate sobre este repo, compartida por los tres bloques
+  // de controles de abajo (095.b, tanda mundo3d 2026-09-04 y remate
+  // 2026-09-05). CHAGRA_PRO_PATH imposible: en este repo público el sidecar no
+  // existe y la auditoría de endpoints se salta con warning (comportamiento
+  // esperado, ver el header del gate).
+  //
+  // Un matiz de robustez medido el 2026-09-05: cuando la suite completa corre
+  // en paralelo (12 workers con jsdom), el proceso del gate puede morir SIN
+  // veredicto a mitad de analizarAlcance (status null, stdout cortado tras los
+  // warnings del sidecar — reproducido 2/2 veces en `npx vitest run` completo,
+  // 0/10 veces en corrida del archivo solo o del trío de audités). Un proceso
+  // muerto NO es un veredicto: se reintenta (hasta 3 intentos) solo cuando
+  // status es null o hay error de spawn; un exit 0/1/2 se respeta tal cual —
+  // un rojo real NUNCA se reintenta para callarlo.
+  function correrGateReal() {
+    let intento = spawnSync(execPath, [GATE_SCRIPT], {
+      encoding: 'utf8',
+      cwd: REPO_ROOT,
+      env: { ...process.env, CHAGRA_PRO_PATH: '/__no_existe__' },
+    });
+    for (let i = 0; (intento.status === null || intento.error) && i < 2; i++) {
+      intento = spawnSync(execPath, [GATE_SCRIPT], {
+        encoding: 'utf8',
+        cwd: REPO_ROOT,
+        env: { ...process.env, CHAGRA_PRO_PATH: '/__no_existe__' },
+      });
+    }
+    return intento;
+  }
+  const r = correrGateReal();
+  const salida = `${r.stdout || ''}\n${r.stderr || ''}`;
+
   const secciones = [
     ['same_repo', 'id'],
     ['sidecar_endpoints', 'endpoint'],
@@ -314,13 +366,6 @@ describe('ops/integraciones-no-consumidas.json (repo real)', function () {
   // que se le escapaba y que no acuse a lo que sí está montado. Verde o rojo
   // sobre dev es una decisión de drenaje del operador, no del arnés.
   describe('el gate ve lo que antes se le escapaba (095.b)', function () {
-    const r = spawnSync(execPath, [GATE_SCRIPT], {
-      encoding: 'utf8',
-      cwd: REPO_ROOT,
-      env: { ...process.env, CHAGRA_PRO_PATH: '/__no_existe__' },
-    });
-    const salida = `${r.stdout || ''}\n${r.stderr || ''}`;
-
     // CONTROL POSITIVO · el barril que lavaba. Estos ocho solo llegan por un
     // `export … from` de `src/visual/creatures/index.js`, que sí está vivo:
     // nadie les pide el nombre, así que un bundler con tree-shaking no los
@@ -387,6 +432,361 @@ describe('ops/integraciones-no-consumidas.json (repo real)', function () {
       // devolvió un veredicto legible en vez de colgarse o reventar.
       expect([0, 1]).toContain(r.status);
       expect(salida).toContain('alcance de src/:');
+    });
+  });
+
+  // -------------------------------------------------------------------------
+  // TANDA MUNDO3D 2026-09-04 (task audit-integraciones-rojo-en-la-base)
+  // -------------------------------------------------------------------------
+  // El motor por símbolo (095.b, #3113) amplió el radar del gate de 454 a
+  // 1.593 sujetos y dejó rojo a TODOS los PRs: 48 archivos de mundo3d salían
+  // acusados sin entrada en el allowlist. Ninguno es un olvido nuevo:
+  //   · 34 apoyos (geom/datos/barriles) de escenas YA declaradas el
+  //     2026-08-30 — el gate viejo solo miraba .jsx y por eso los apoyos no
+  //     se declararon junto con su escena;
+  //   · 10 vendor flora de #3103 — mismos hermanos ya declarados
+  //     (godRaysSylva.js, climaPorPiso.js);
+  //   · DemoAtmosferaViva.jsx — contrato A4, ya declarada en el allowlist del
+  //     OTRO gate (drenaje tanda 1, #3120), que este gate no lee;
+  //   · 2 barriles muertos (infraestructura, polinizadores), kit/geometria.js
+  //     (superficie del taller sin adoptar), sonidosAmbientales.js (T48
+  //     rescatado en #2668) y useCruceMundo/useTunelLamina (hooks "listos
+  //     para cablear" sin host).
+  // Si alguien QUITA una de estas entradas sin cablear o borrar el archivo,
+  // el gate vuelve a rojo con ese id — este bloque lo explica en el fallo.
+  const IDS_TANDA_MUNDO3D = [
+    // apoyos de escenas declaradas 2026-08-30
+    'src/visual/mundo3d/semillas/bancoSemillas.geom.js',
+    'src/visual/mundo3d/semillas/semillasData.js',
+    'src/visual/mundo3d/artesania/geometriasArtesania.js',
+    'src/visual/mundo3d/artesania/materialesArtesania.js',
+    'src/visual/mundo3d/artesania/texturasArtesania.js',
+    'src/visual/mundo3d/artesania/tramaAndina.js',
+    'src/visual/mundo3d/artesania/index.js',
+    'src/visual/mundo3d/beneficos/beneficos.geom.js',
+    'src/visual/mundo3d/beneficos/beneficosIdentidad.js',
+    'src/visual/mundo3d/beneficos/dinamicaPlaga.js',
+    'src/visual/mundo3d/beneficos/index.js',
+    'src/visual/mundo3d/bosque/corteSuelo.geom.js',
+    'src/visual/mundo3d/bosque/doselBiodiverso.geom.js',
+    'src/visual/mundo3d/estiercol/biodigestor.geom.js',
+    'src/visual/mundo3d/estiercol/compostera.geom.js',
+    'src/visual/mundo3d/estiercol/estiercol.geom.js',
+    'src/visual/mundo3d/estiercol/index.js',
+    'src/visual/mundo3d/fauna/anatomiaFauna.geom.js',
+    'src/visual/mundo3d/fauna/faunaEmblematica.js',
+    'src/visual/mundo3d/fauna/index.js',
+    'src/visual/mundo3d/fauna/iridiscencia.js',
+    'src/visual/mundo3d/fauna/marcha.js',
+    'src/visual/mundo3d/fauna/pelajes.js',
+    'src/visual/mundo3d/olor/aireCargado.js',
+    'src/visual/mundo3d/olor/index.js',
+    'src/visual/mundo3d/olor/olor.geom.js',
+    'src/visual/mundo3d/olor/senalesDelCuerpo.js',
+    'src/visual/mundo3d/olor/texturasOlor.js',
+    'src/visual/mundo3d/suelo-comparado/index.js',
+    'src/visual/mundo3d/suelo-comparado/sueloComparado.geom.js',
+    'src/visual/mundo3d/suelo-comparado/sueloComparadoTextos.js',
+    'src/visual/mundo3d/transiciones/useCruceMundo.js',
+    'src/visual/mundo3d/transiciones/useTunelLamina.js',
+    // vendor flora #3103 (hermanos de godRaysSylva/climaPorPiso)
+    'src/visual/mundo3d/sierra/vendor/flora/FollajeMasa.js',
+    'src/visual/mundo3d/sierra/vendor/flora/arbolesAltoandinos.js',
+    'src/visual/mundo3d/sierra/vendor/flora/flora-eztree-bake.js',
+    'src/visual/mundo3d/sierra/vendor/flora/flora.js',
+    'src/visual/mundo3d/sierra/vendor/flora/frailejonFabrica.js',
+    'src/visual/mundo3d/sierra/vendor/flora/lodEspecieSylva.js',
+    'src/visual/mundo3d/sierra/vendor/flora/matrizParamo.js',
+    'src/visual/mundo3d/sierra/vendor/flora/pisosTermicos.js',
+    'src/visual/mundo3d/sierra/vendor/flora/quickGrass.js',
+    'src/visual/mundo3d/sierra/vendor/flora/vientoMundos.js',
+    // espejo del drenaje tanda 1 (contrato A4)
+    'src/visual/mundo3d/atmosfera/DemoAtmosferaViva.jsx',
+    // sueltos con decisión propia
+    'src/visual/mundo3d/sonidosAmbientales.js',
+    'src/visual/mundo3d/kit/geometria.js',
+    'src/visual/mundo3d/infraestructura/index.js',
+    'src/visual/mundo3d/polinizadores/index.js',
+  ];
+
+  describe('tanda mundo3d 2026-09-04: la declaración queda sostenida', function () {
+    it('las 48 entradas de la tanda están en el allowlist', function () {
+      const ids = new Set((allowlist.orphan_components || []).map(function (e) { return e.id; }));
+      const faltantes = IDS_TANDA_MUNDO3D.filter(function (id) { return !ids.has(id); });
+      expect(
+        faltantes,
+        'entradas tanda mundo3d quitadas sin cablear: el gate volvería a rojo con esos ids',
+      ).toEqual([]);
+    });
+
+    it('cada una sigue viva como hallazgo allowlisted (ni cableada ni borrada en silencio)', function () {
+      // El gate advierte en stdout cada hallazgo cubierto por el allowlist. Si
+      // un archivo se CABLEA, deja de salir (y su entrada se vuelve obsoleta —
+      // bien, pero entonces la entrada se borra y este test obliga a hacerlo
+      // consciente); si se BORRA del disco, la guardia de ids-en-disco de
+      // arriba truena. Acá se sostiene el estado declarado: siguen existiendo
+      // como hallazgos con excepción vigente.
+      const faltantes = IDS_TANDA_MUNDO3D.filter(function (id) {
+        return !salida.includes(`pieza SIN ruta viva pero allowlisted: ${id}`);
+      });
+      expect(
+        faltantes,
+        'estos ids ya no salen como hallazgo allowlisted: o se cablearon (borrar la entrada del allowlist y actualizar este pin) o el motor dejó de verlos',
+      ).toEqual([]);
+    });
+
+    it('el gate ya no acusa NINGÚN archivo de mundo3d en sus hallazgos', function () {
+      // La meta de la tanda: la porción mundo3d del rojo queda en cero. Los
+      // demás hallazgos (criaturas, dashboards, types/hooks — tanda 2 del
+      // drenaje) seguían en stderr a propósito: declararlos en masa habría
+      // sido convertir el gate en trámite. La decisión final sobre ellos la
+      // tomó el operador un día después, con control de importadores
+      // entrada por entrada: es el REMATE 2026-09-05 (bloque de abajo).
+      expect(r.stderr || '').not.toContain('mundo3d');
+    });
+
+    it('muestra representativa: el único importador del apoyo es su escena declarada', function () {
+      // La premisa que sostiene la herencia de la declaración: bancoSemillas
+      // solo lo importa EscenaBancoSemillas.jsx (declarada 2026-08-30) y
+      // semillasData solo el geom + la escena. Si un módulo VIVO empieza a
+      // importarlos, la declaración dejó de ser honesta y toca cablear.
+      const importadoresDe = function (nombreBase) {
+        const encontrados = [];
+        const caminar = function (dir) {
+          for (const entry of readdirSync(dir)) {
+            if (entry === 'node_modules' || entry.startsWith('.')) continue;
+            const ruta = join(dir, entry);
+            if (statSync(ruta).isDirectory()) { caminar(ruta); continue; }
+            if (!/\.(js|jsx|mjs|ts|tsx)$/.test(entry)) continue;
+            const texto = readFileSync(ruta, 'utf8');
+            if (texto.includes(nombreBase) && !ruta.includes('__tests__')
+                && !ruta.endsWith(`${nombreBase}.js`)) {
+              encontrados.push(ruta);
+            }
+          }
+        };
+        caminar(join(REPO_ROOT, 'src'));
+        return encontrados.map(function (p) { return p.slice(REPO_ROOT.length + 1); });
+      };
+      // Ningún importador fuera del cluster semillas (todos declarados).
+      const ajenos = importadoresDe('bancoSemillas.geom')
+        .concat(importadoresDe('semillasData'))
+        .filter(function (f) { return !f.includes('mundo3d/semillas/'); });
+      expect(ajenos, 'un módulo vivo consume el apoyo declarado: la excepción ya no es inocua').toEqual([]);
+    });
+  });
+
+  // -------------------------------------------------------------------------
+  // REMATE 2026-09-05 (task audit-gate-remate-20260905)
+  // -------------------------------------------------------------------------
+  // El rojo del gate represaba 9 PRs. El operador ordenó el remate: borrar 13
+  // entradas fantasma y declarar los 123 hallazgos restantes, CADA UNO pasado
+  // por un control de importadores con resolución exacta de especificadores.
+  // El control es la lección useT.js: un grep por substring le atribuyó los
+  // importadores de useTheme/useTts («14 importadores») y casi mata en el
+  // allowlist un hook que —verificado con frontera de palabra— no tiene
+  // ninguno. El mismo control, en la dirección contraria, pescó 3 archivos
+  // VIVOS a punto de declararse muertos (aguaFinca/cacaoFinca/mangoFinca,
+  // importados por pantallas MONTADAS con cláusulas >400 chars que el motor
+  // no veía): esos NO se declararon — se arregló el motor.
+  //
+  // De aquí en adelante: un hallazgo nuevo del gate NO se declara sin su
+  // control de importadores. Si el control encuentra un importador vivo, el
+  // archivo está vivo — se cablea el verdadero estado o se arregla el motor,
+  // nunca se declara por comodidad.
+  describe('remate 2026-09-05', function () {
+    const FANTASMAS_BORRADAS = [
+      // Se cablearon o pasaron a vitrina/página suelta y dejaron de ser
+      // hallazgo (el gate lo avisaba como «ya NO le hacen match»). Quitarlas
+      // de vuelta las volvería a convertir en excepciones protegiendo un
+      // fantasma.
+      'src/visual/mundo3d/ArtesaniaAndina.jsx',
+      'src/visual/mundo3d/GemeloValle2D.jsx',
+      'src/visual/mundo3d/PisosTermicosBandas.jsx',
+      'src/visual/mundo3d/TransicionMundoKit.jsx',
+      'src/visual/mundo3d/TransicionSierraMundo.jsx',
+      'src/visual/mundo3d/infraestructura/InfraestructuraViva.jsx',
+      'src/mockups/MundoLecheria3D.jsx',
+      'src/mockups/MundoSanidad3D.jsx',
+      'src/mockups/MundoVergelFrutal3D.jsx',
+      'src/visual/mundo3d/sierra/ArbolMayor.jsx',
+      'src/visual/mundo3d/sierra/GaleriaSierraArboles.jsx',
+      'src/visual/mundo3d/sierra/SierraCorteVertical.jsx',
+      'src/visual/mundo3d/sierra/SierraMonte3D.jsx',
+    ];
+    // Vivos a los que el motor acusaba por el bug de la cláusula >400:
+    // NO deben estar en el allowlist (sería declarar muerto lo que una
+    // pantalla MONTADA importa de verdad).
+    const VIVOS_RESCATADOS_DEL_MOTOR = [
+      'src/data/aguaFinca.js',
+      'src/data/cacaoFinca.js',
+      'src/data/mangoFinca.js',
+    ];
+
+    it('el gate queda VERDE sobre dev: 0 huérfanos sin declarar (el remate)', function () {
+      expect(
+        r.status,
+        `el gate murió sin veredicto tras los reintentos (status=${r.status}, error=${r.error && r.error.code}) — no es un rojo del gate, es el entorno`,
+      ).not.toBeNull();
+      expect(r.status, `el gate volvió a rojo:\n${(r.stderr || '').slice(0, 2000)}`).toBe(0);
+      expect(r.stdout).toContain('Auditoría limpia');
+    });
+
+    it('el allowlist no tiene NI UNA entrada fantasma', function () {
+      expect(r.stdout, 'hay entradas de orphan_components que ya no le hacen match a ningún hallazgo — borrarlas (curaduría), no dejarlas pudrirse')
+        .not.toContain('ya NO le hacen match');
+    });
+
+    it('las 13 entradas fantasma siguen borradas del allowlist', function () {
+      const ids = new Set((allowlist.orphan_components || []).map(function (e) { return e.id; }));
+      const vueltas = FANTASMAS_BORRADAS.filter(function (id) { return ids.has(id); });
+      expect(
+        vueltas,
+        'fantasmas de vuelta en el allowlist: sus archivos ya no son hallazgo (cableados/vitrina/página suelta)',
+      ).toEqual([]);
+    });
+
+    it('los 3 archivos vivos que el motor acusaba NO están declarados', function () {
+      const ids = new Set((allowlist.orphan_components || []).map(function (e) { return e.id; }));
+      for (const id of VIVOS_RESCATADOS_DEL_MOTOR) {
+        expect(ids.has(id), `${id} está declarado y es VIVO: una pantalla MONTADA lo importa (cláusula >400 chars). Ver alcance-simbolica.test.mjs.`).toBe(false);
+        expect(salida, `${id} sale del gate otra vez: ¿regresión del tope de cláusula del motor?`).not.toContain(id);
+      }
+    });
+
+    it('las entradas del remate son exactamente 123 y todas siguen siendo hallazgos allowlisted', function () {
+      const remate = (allowlist.orphan_components || []).filter(function (e) { return e.date === '2026-09-05'; });
+      expect(
+        remate.length,
+        'el remate declaró 123: si este número cambia, actualícelo conscientemente (con control de importadores por entrada)',
+      ).toBe(123);
+      const flojos = remate.filter(function (e) {
+        return !salida.includes(`pieza SIN ruta viva pero allowlisted: ${e.id}`);
+      });
+      expect(
+        flojos.map(function (e) { return e.id; }),
+        'estas entradas del remate ya no salen como hallazgo allowlisted: o se cablearon (borrar la entrada + este pin) o el motor dejó de verlas',
+      ).toEqual([]);
+    });
+
+    // EL CONTROL DE IMPORTADORES, hecho permanente. Resolución EXACTA de
+    // especificadores sobre src/ (sin comentarios — misma semántica runtime
+    // del motor): para cada entrada del remate, todo importador REAL y no-test
+    // debe estar a su vez declarado en el allowlist. Si esta prueba falla,
+    // alguien cableó un declarado (quitar la entrada, no callarla) o el
+    // hallazgo del motor era un falso negativo (arreglar el motor, no
+    // declarar por comodidad).
+    const mapaImportadores = (function () {
+      const SIN_COMENTARIOS = function (texto) {
+        let out = '';
+        let i = 0;
+        while (i < texto.length) {
+          const c = texto[i];
+          if (c === '/' && texto[i + 1] === '/') { while (i < texto.length && texto[i] !== '\n') i++; continue; }
+          if (c === '/' && texto[i + 1] === '*') {
+            i += 2;
+            while (i < texto.length && !(texto[i] === '*' && texto[i + 1] === '/')) i++;
+            i += 2;
+            continue;
+          }
+          if (c === '"' || c === "'" || c === '`') {
+            const cierre = c;
+            out += c; i++;
+            while (i < texto.length) {
+              if (texto[i] === '\\') { out += texto[i] + (texto[i + 1] || ''); i += 2; continue; }
+              out += texto[i];
+              const fin = texto[i] === cierre;
+              i++;
+              if (fin) break;
+            }
+            continue;
+          }
+          out += c;
+          i++;
+        }
+        return out;
+      };
+      const EXT = ['', '.js', '.jsx', '.mjs', '.ts', '.tsx', '/index.js', '/index.jsx', '/index.ts', '/index.tsx'];
+      const esTest = function (f) { return f.includes('__tests__') || /\.test\./.test(f) || /\.spec\./.test(f); };
+      const resolver = function (spec, desde) {
+        let base;
+        if (spec.startsWith('./') || spec.startsWith('../')) base = resolve(dirname(desde), spec);
+        else if (spec.startsWith('@/')) base = join(REPO_ROOT, 'src', spec.slice(2));
+        else return null; // bare specifier (paquete)
+        for (const ext of EXT) {
+          const ruta = base + ext;
+          if (existsSync(ruta) && statSync(ruta).isFile()) return ruta;
+        }
+        return null;
+      };
+      const reFrom = /(^|[\s;}])import\s+[^;'"]*?from\s*['"]([^'"]+)['"]/g;
+      const reBare = /(^|[\s;}])import\s*['"]([^'"]+)['"]/g;
+      const reDyn = /import\s*\(\s*['"]([^'"]+)['"]\s*\)/g;
+      // SÓLO los sujetos del remate interesan: filtrar DURANTE el escaneo y no
+      // guardar el grafo completo (1.600 módulos) — este arnés corre en
+      // paralelo con los dos gates que spawnean el motor y la memoria del
+      // worker no da para ambos (medido 2026-09-05: el spawn del gate moría
+      // con la salida truncada cuando el mapa guardaba todo).
+      const interesan = new Set(
+        (allowlist.orphan_components || [])
+          .filter(function (e) { return e.date === '2026-09-05'; })
+          .map(function (e) { return join(REPO_ROOT, e.id); }),
+      );
+      const importadoresDeRuta = {};
+      const caminar = function (dir) {
+        for (const entry of readdirSync(dir)) {
+          if (entry === 'node_modules' || entry.startsWith('.')) continue;
+          const ruta = join(dir, entry);
+          if (statSync(ruta).isDirectory()) { caminar(ruta); continue; }
+          if (!/\.(js|jsx|mjs|ts|tsx)$/.test(entry)) continue;
+          const texto = SIN_COMENTARIOS(readFileSync(ruta, 'utf8'));
+          const specs = [];
+          let m;
+          reFrom.lastIndex = 0;
+          while ((m = reFrom.exec(texto)) !== null) specs.push(m[2]);
+          reBare.lastIndex = 0;
+          while ((m = reBare.exec(texto)) !== null) specs.push(m[2]);
+          reDyn.lastIndex = 0;
+          while ((m = reDyn.exec(texto)) !== null) specs.push(m[1]);
+          for (const spec of specs) {
+            const destino = resolver(spec, ruta);
+            if (!destino || !interesan.has(destino)) continue;
+            (importadoresDeRuta[destino] = importadoresDeRuta[destino] || []).push(ruta);
+          }
+        }
+      };
+      caminar(join(REPO_ROOT, 'src'));
+      return {
+        de: function (idRelativo) {
+          return (importadoresDeRuta[join(REPO_ROOT, idRelativo)] || [])
+            .map(function (f) { return f.slice(REPO_ROOT.length + 1).split('\\').join('/'); })
+            .filter(function (f) { return f !== idRelativo && !esTest(f); });
+        },
+      };
+    })();
+
+    it('CONTROL: todo importador real de una entrada del remate está a su vez declarado', function () {
+      const declarados = new Set(
+        (allowlist.orphan_components || []).map(function (e) { return e.id; }),
+      );
+      const remate = (allowlist.orphan_components || []).filter(function (e) { return e.date === '2026-09-05'; });
+      const problemas = [];
+      for (const e of remate) {
+        for (const imp of mapaImportadores.de(e.id)) {
+          if (!declarados.has(imp)) problemas.push(`${e.id} ← ${imp} (vivo y SIN declarar)`);
+        }
+      }
+      expect(
+        problemas,
+        'importadores vivos bajo una entrada declarada: la declaración dejó de ser honesta — cablea y borra la entrada, o corrige el veredicto del motor',
+      ).toEqual([]);
+    });
+
+    it('CONTROL useT.js (la lección del 09-04): 0 importadores reales', function () {
+      // Los «14 importadores» eran matches por substring de useTheme/useTts.
+      // Si esto falla con importadores de verdad, alguien cableó el hook:
+      // borrar la entrada del allowlist conscientemente.
+      expect(mapaImportadores.de('src/hooks/useT.js')).toEqual([]);
     });
   });
 });

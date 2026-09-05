@@ -42,6 +42,7 @@
  */
 
 import { solarTimes } from '../utils/skyEphemeris.js';
+import { fincaDateISO } from '../utils/farmDate.js';
 
 /** Kill-switch: localStorage[ATMOSPHERE_KILL_KEY] === 'off' apaga la capa. */
 export const ATMOSPHERE_KILL_KEY = 'chagra:atmosfera';
@@ -71,14 +72,6 @@ const NIEBLA_FRIO_PCT = 60;
 function num(value) {
   const n = Number(value);
   return Number.isFinite(n) ? n : null;
-}
-
-/** YYYY-MM-DD local (los `date` del forecast vienen en fecha local). */
-function localISODate(d) {
-  const y = d.getFullYear();
-  const m = String(d.getMonth() + 1).padStart(2, '0');
-  const day = String(d.getDate()).padStart(2, '0');
-  return `${y}-${m}-${day}`;
 }
 
 /**
@@ -151,7 +144,9 @@ export function deriveCondicion(opts = /** @type {any} */ ({})) {
   const forecast = om?.available && Array.isArray(om.forecast_7d) ? om.forecast_7d : null;
   if (!forecast || forecast.length === 0) return null;
 
-  const todayKey = localISODate(now);
+  // "Hoy" en el calendario de la FINCA (BUG TODAY-UTC-HELADA-20260905): los
+  // `date` del forecast son locales de la finca, no del runtime ni de UTC.
+  const todayKey = fincaDateISO(now);
   const day = forecast.find((d) => d?.date === todayKey) || forecast[0];
   if (!day || typeof day !== 'object') return null;
 
