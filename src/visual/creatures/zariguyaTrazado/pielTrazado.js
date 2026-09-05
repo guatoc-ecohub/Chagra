@@ -46,7 +46,9 @@
  */
 
 import { RH_LINE_BOIL } from '../rubberhoseSpec.js';
-import { CALCO_SILUETA_DEFS, CALCO_POR_REGION } from './calcoTrazado.js';
+import {
+  CALCO_SILUETA_DEFS, CALCO_POR_REGION, CALCO_CORONILLA, CALCO_CORONILLA_OFFSET, CALCO_CORONILLA_SCALE,
+} from './calcoTrazado.js';
 import { ZT_PIVOTES, ZT_REGIONES } from './regiones.js';
 import { POSES_TRAZADO_CAPA } from './posesTrazado.js';
 
@@ -126,14 +128,17 @@ const CAJAS_JUNTURA = Object.freeze({
      esquivan los contornos mejilla/nuca contra AIRE (el respaldo borroso de
      esta juntura fugaría un halo sobre el papel). */
   cabeza: [112, 104, 316, 190],
-  /* mandibula (EXPERIMENTO 2026-09-05, medido): el polígono `cabeza`
-     EXCLUYE el rect de la mandíbula y bajo ella no había respaldo; al girar
-     la cabeza en horario (+10°, smear del double-take) la quijada vacía una
-     cuña de ~10 px en la comisura que mostraba PAPEL (167 px medidos en la
-     actual). Respaldo = copia estática del mentón (y≥112, bajo los dientes
-     que terminan en y≈108), solo a la izquierda del pivote (x≤212): a la
-     derecha la quijada baja al girar y tapa sola. */
-  mandibula: [140, 112, 212, 134],
+  /* mandibula (2026-09-05, medido): el polígono `cabeza` EXCLUYE el rect de
+     la mandíbula y bajo ella no había respaldo. Al girar la cabeza, la
+     quijada vacía una cuña de ~10 px que mostraba PAPEL: a +10° (smear del
+     double-take) a la IZQUIERDA del pivote, en la comisura (167 px medidos
+     en la actual); a −13° (mira a usted) a la DERECHA, bajo el mentón (la
+     «raya blanca bajo la mandíbula» del juez). La caja cubre el mentón
+     entero bajo los dientes (y≥104). El respaldo NO es el mentón mismo (una
+     copia estática del mentón asoma como doble barbilla al girar): es el
+     CUELLO del calco subido 16 px — el pelaje que estaría detrás de la
+     quijada, ver RESPALDO_TRASLADADO. */
+  mandibula: [140, 104, 246, 134],
   brazoLapiz: [116, 176, 204, 244],
   manoLapiz: [76, 158, 122, 208],
   brazoBrujula: null,
@@ -171,12 +176,22 @@ const JCLIPS = Object.entries(CAJAS_JUNTURA)
    región toca aire (medido: brazo-brújula/cola/mejilla, focos 454/143/133px
    en reposo cuando se aplicó a todo). */
 const RESPALDO_BORROSO = Object.freeze(new Set(['cabeza', 'mandibula']));
+/* Respaldo TRASLADADO: en vez de la copia estática de la propia región (que
+   al girar asoma como un fantasma de la pieza — doble barbilla), la juntura
+   se rellena con el calco de OTRA región desplazado: lo que estaría detrás.
+   [región fuente, dx, dy] en px de lámina. Sigue siendo el calco: cero
+   dibujo nuevo, cero color plano. */
+const RESPALDO_TRASLADADO = Object.freeze({
+  mandibula: ['cuello', 0, -16], // el pelaje del cuello sube a rellenar bajo la quijada
+});
 const casqueteCalco = (region) => {
   const caja = CAJAS_JUNTURA[region];
   const filtro = RESPALDO_BORROSO.has(region) ? ' filter="url(#ztRespaldo)"' : '';
+  const [fuente, dx, dy] = RESPALDO_TRASLADADO[region] || [region, 0, 0];
+  const traslado = dx || dy ? ` transform="translate(${dx} ${dy})"` : '';
   const uso = caja
-    ? `<g clip-path="url(#zt-j-${region})"><use href="#ztCalco-${region}"${filtro}/></g>`
-    : `<use href="#ztCalco-${region}"${filtro}/>`;
+    ? `<g clip-path="url(#zt-j-${region})"><use href="#ztCalco-${fuente}"${traslado}${filtro}/></g>`
+    : `<use href="#ztCalco-${fuente}"${traslado}${filtro}/>`;
   /* el clip de silueta va POR FUERA del blur (patrón jaguar): que el borde
      desenfocado no sangre un halo sobre el papel. */
   return `<g clip-path="url(#zt-r-${region})"><g clip-path="url(#ztSilueta)">${uso}</g></g>`;
@@ -190,6 +205,20 @@ const DEFS = `<defs>
        espacio que clip-regiones/pivotes/casquetes: los <use…clip> calzan. -->
   ${SILUETA}
   ${CALCO_DEFS}
+  <!-- LA CORONILLA (generar-calco.mjs paso 3): la MISMA receta trazada a 3×
+       de resolución y escalada a 1/3. A 1× el ajuste spline se comía el
+       rayado fino y dejaba un casco de parches con borde (la kipá,
+       bloqueante 2026-09-05); a 3× lo resuelve (RMSE 0,072 → 0,032 contra la
+       lámina). Mismo trazo, misma paleta, cero color plano; va ENCIMA del
+       calco de la cabeza y se funde a la altura de las cejas (máscara
+       y40→54: los ojos arrancan en y≈54 y quedan fuera). -->
+  <g id="ztCoronilla" transform="translate(${CALCO_CORONILLA_OFFSET[0]} ${CALCO_CORONILLA_OFFSET[1]}) scale(${CALCO_CORONILLA_SCALE})">${CALCO_CORONILLA}</g>
+  <linearGradient id="ztFadeCoronilla" x1="0" y1="40" x2="0" y2="54" gradientUnits="userSpaceOnUse">
+    <stop offset="0" stop-color="#fff"/><stop offset="1" stop-color="#000"/>
+  </linearGradient>
+  <mask id="zt-m-coronilla" maskUnits="userSpaceOnUse" x="85" y="-8" width="255" height="62">
+    <rect x="85" y="-8" width="255" height="62" fill="url(#ztFadeCoronilla)"/>
+  </mask>
   ${CLIPS}
   ${JCLIPS}
   <radialGradient id="ztAura" cx=".5" cy=".5" r=".5">
@@ -264,12 +293,23 @@ const OJO_CERCA_VIVO = `
 
 /* ─────────────────────── LA CABEZA (con sus satélites) ───────────────────── */
 
+/* La coronilla 3× recortada a la región del hueso que la monta ∩ silueta,
+   fundida por la máscara. Se monta en la CABEZA y TAMBIÉN dentro de cada
+   OREJA (recortada a su rect): el rect de la oreja pinta su calco spline
+   encima de todo lo de la cabeza, y sin esta copia la banda de solape
+   (x150-158 / x222-230) y el pelo bajo la oreja quedarían en textura spline
+   entre dos texturas pixel — un rectángulo visible. Con ella, la banda gira
+   con la oreja igual que antes (patrón baseSub). */
+const coronilla = (region) =>
+  `<g clip-path="url(#zt-r-${region})"><g clip-path="url(#ztSilueta)"><use href="#ztCoronilla" mask="url(#zt-m-coronilla)"/></g></g>`;
+
 const CABEZA = `
   ${usoCalco('cabeza')}
+  ${coronilla('cabeza')}
   ${FAUCES}
   <g class="zh-hueso zh-mandibula"${origin('mandibula')}>${usoCalco('mandibula')}</g>
-  <g class="zh-hueso zh-orejaI"${origin('orejaI')}>${usoCalco('orejaI')}</g>
-  <g class="zh-hueso zh-orejaD"${origin('orejaD')}>${usoCalco('orejaD')}</g>
+  <g class="zh-hueso zh-orejaI"${origin('orejaI')}>${usoCalco('orejaI')}${coronilla('orejaI')}</g>
+  <g class="zh-hueso zh-orejaD"${origin('orejaD')}>${usoCalco('orejaD')}${coronilla('orejaD')}</g>
   <g class="zh-ojoGrupo">${HALOS}${OJO_CERCA_VIVO}${PARPADOS}</g>`;
 
 /* ─────────────────────────── EL SVG COMPLETO ─────────────────────────────── */
