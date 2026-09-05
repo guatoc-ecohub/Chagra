@@ -1,0 +1,254 @@
+
+> chagra@1.0.55 audit:huerfanos
+> node scripts/audit-componente-huerfano.mjs
+
+Chagra — control de componente huérfano   (095)
+──────────────────────────────────────────────────────────────────────────────
+PREMISAS MEDIDAS (no recordadas)
+  entrada de build   index.html → src/main.jsx
+  entrada de build   mercado.html → src/entries/mercado.jsx
+  entrada de build   species-visor.html → src/speciesViewer/main.js
+  entrada de build   rigged-preview.html → src/visual/creatures/rigged/rigged-preview.js
+  entrada de build   index-prod.html → src/main-prod.jsx
+  entrada de build   shot-sierra.html → shot-sierra.jsx
+  src/main.jsx monta <App/>: sí · monta ProdChagraApp: no
+  src/config/rutasProdChagraApp.js en el cierre vivo: no → es un catálogo, no el router vivo
+  vistas en el switch de App.jsx: 224 · bindings lazy(): 216
+  vistas PRODUCTO (alcanzables navegando): 114
+  vistas VITRINA (solo por hash, no enlazadas desde el producto): 102
+  módulos ejecutados — producto 1234 · producto+vitrina 1520 · total en src/ 1595
+
+CONTROL A · alcance — ¿lo monta alguna ruta alcanzable?
+  MONTADO 1072 · SOLO_TEST 42 · HUERFANO 231 · SOLO_VITRINA 221 · SOLO_PAGINA_SUELTA 29
+
+  HUERFANO — 165 sin declarar de 231 (29 componente(s) + 136 módulo(s) de apoyo)
+    ⬛ src/components/_archivado/UmbralValle.jsx
+       nadie lo importa — ni producto, ni vitrina, ni test
+    ⬛ src/components/_archivo/OnboardingModal.jsx
+       nadie lo importa — ni producto, ni vitrina, ni test
+    ⬛ src/components/admin/AdminPanel.jsx
+       nadie lo importa — ni producto, ni vitrina, ni test
+    ⬛ src/components/admin/DashboardAdopcion.jsx
+       nadie lo importa — ni producto, ni vitrina, ni test
+    ⬛ src/components/agent/AgentMetricsDashboard.jsx
+       nadie lo importa — ni producto, ni vitrina, ni test
+    ⬛ src/components/agent/FeedbackSutil.jsx
+       nadie lo importa — ni producto, ni vitrina, ni test
+    ⬛ src/components/AgentScreen/SuggestedActions.jsx
+       solo lo importan archivos igual de inalcanzables: src/components/AgentScreen/index.js
+    ⬛ src/components/ChagraAgentAvatarColibri.jsx
+       nadie lo importa — ni producto, ni vitrina, ni test
+    ⬛ src/components/ChagraAgentAvatarColibriPhoto.jsx
+       nadie lo importa — ni producto, ni vitrina, ni test
+    ⬛ src/components/ErrorBoundaryRuta.jsx
+       nadie lo importa — ni producto, ni vitrina, ni test
+    ⬛ src/components/extensionista/ExtensionistaDashboard.jsx
+       nadie lo importa — ni producto, ni vitrina, ni test
+    ⬛ src/components/lotes/LoteCroquisPlaceholder.jsx
+       nadie lo importa — ni producto, ni vitrina, ni test
+    ⬛ src/components/OnboardingTour.jsx
+       nadie lo importa — ni producto, ni vitrina, ni test
+    ⬛ src/components/PestMonitoringWindow.jsx
+       nadie lo importa — ni producto, ni vitrina, ni test
+    ⬛ src/components/red/ExitosChagra.jsx
+       nadie lo importa — ni producto, ni vitrina, ni test
+    ⬛ src/components/SplashAngelita.jsx
+       nadie lo importa — ni producto, ni vitrina, ni test
+    ⬛ src/visual/creatures/_archivo/ChivitoPunkLaminaViva.jsx
+       nadie lo importa — ni producto, ni vitrina, ni test
+    ⬛ src/visual/creatures/_archivo/LuciernagaLaminaViva.jsx
+       nadie lo importa — ni producto, ni vitrina, ni test
+    ⬛ src/visual/creatures/_archivo/OsoBastonLaminaViva.jsx
+       nadie lo importa — ni producto, ni vitrina, ni test
+    ⬛ src/visual/creatures/_archivo/ZariguyaLaminaViva.jsx
+       nadie lo importa — ni producto, ni vitrina, ni test
+    ⬛ src/visual/creatures/Borugo.jsx
+       solo lo importan archivos igual de inalcanzables: src/visual/creatures/index.js
+    ⬛ src/visual/creatures/ChivitoTinta.jsx
+       solo lo importan archivos igual de inalcanzables: src/visual/creatures/index.js
+    ⬛ src/visual/creatures/LuciernagaTinta.jsx
+       solo lo importan archivos igual de inalcanzables: src/visual/creatures/index.js
+    ⬛ src/visual/creatures/MomentoGuardianes.jsx
+       solo lo importan archivos igual de inalcanzables: src/visual/creatures/index.js
+    ⬛ src/visual/creatures/OsoAndino.jsx
+       solo lo importan archivos igual de inalcanzables: src/visual/creatures/index.js
+    … 4 componente(s) más (--todo | --json)
+    módulos de apoyo (hooks/servicios/datos) por carpeta:
+      src/types/ → asset.js, css-custom-properties.d.ts, global.d.ts, index.d.ts, index.js, leaflet-stub.d.ts, log.js, static-assets-shim.d.ts, syncEvent.js, three-cdn-shim.d.ts, vite-env.d.ts, vitest-stub.d.ts
+      src/visual/mundo3d/sierra/vendor/flora/ → arbolesAltoandinos.js, flora-eztree-bake.js, flora.js, FollajeMasa.js, frailejonFabrica.js, lodEspecieSylva.js, matrizParamo.js, pisosTermicos.js, quickGrass.js, vientoMundos.js
+      src/services/ → agentTelemetryFlywheel.js, compaiExplicaPantallas.js, compaiParadasPorPantalla.js, compaiPaseoPlanificador.js, fenologyRecommendations.js, lunarPestService.js, recorridoService.js, redService.js
+      src/visual/creatures/ → borugoIdentidad.js, chivitoTintaIdentidad.js, escenaGuardianes.js, faunaRubberhose.registry.js, luciernagaTintaIdentidad.js, osoAnteojosIdentidad.js, useEntGuion.js
+      src/hooks/ → useAngelitaHusmeador.js, useBusquedaUnificada.js, useCompaiGuiaPantalla.js, useInteraccionUsuario.js, useSecurityRole.js, useT.js
+      src/visual/laminas/botanicas/geometria/ → flor.js, fruto.js, habito.js, hoja.js, raiz.js, sintoma.js
+      src/visual/mundo3d/fauna/ → anatomiaFauna.geom.js, faunaEmblematica.js, index.js, iridiscencia.js, marcha.js, pelajes.js
+      src/visual/mundo3d/artesania/ → geometriasArtesania.js, index.js, materialesArtesania.js, texturasArtesania.js, tramaAndina.js
+      src/visual/mundo3d/olor/ → aireCargado.js, index.js, olor.geom.js, senalesDelCuerpo.js, texturasOlor.js
+      src/utils/ → atajosTeclado.js, auditLog.js, backoff.js, validacionFormularios.js
+
+  SOLO_TEST — 40 sin declarar de 42 (14 componente(s) + 26 módulo(s) de apoyo)
+    ⬛ src/components/_archivado/PanelVitalidadEspiritu.jsx
+       solo lo importan tests: src/components/_archivado/__tests__/PanelVitalidadEspiritu.test.jsx
+    ⬛ src/components/_archivo/BienvenidaFinca.jsx
+       solo lo importan tests: src/components/__tests__/BienvenidaFinca.test.jsx
+    ⬛ src/components/_archivo/OnboardingHero.jsx
+       solo lo importan tests: src/components/__tests__/OnboardingHero.piso.test.jsx, src/components/__tests__/OnboardingHero.validation.test.jsx
+    ⬛ src/components/_archivo/OnboardingProfile.jsx
+       solo lo importan tests: src/components/__tests__/OnboardingProfile.explorarEjemplo.test.jsx, src/components/__tests__/OnboardingProfile.piso.test.jsx
+    ⬛ src/components/AgentDemoExample.jsx
+       solo lo importan tests: src/components/__tests__/AgentDemoExample.test.jsx
+    ⬛ src/components/AltitudeBadge.jsx
+       solo lo importan tests: src/components/AltitudeBadge.test.jsx
+    ⬛ src/components/aprendizaje/GuiaEspecieCards.jsx
+       solo lo importan tests: src/components/aprendizaje/GuiaEspecieCards.test.jsx
+    ⬛ src/components/ChagraAgentAvatarMaiz.jsx
+       solo lo importan tests: src/components/__tests__/ChagraAgentAvatar.test.jsx
+    ⬛ src/components/common/ScreenLoadingStatus.jsx
+       solo lo importan tests: src/components/__tests__/empty-states.test.jsx, src/components/__tests__/screen-reader.test.jsx
+    ⬛ src/components/CompaiGuiaPantalla.jsx
+       solo lo importan tests: src/components/__tests__/CompaiP1.contract.test.jsx
+    ⬛ src/components/escucha/EscuchaFab.jsx
+       solo lo importan tests: src/components/escucha/__tests__/EscuchaOverlay.test.jsx
+    ⬛ src/components/QuickChipsBar.jsx
+       solo lo importan tests: src/components/__tests__/QuickChipsBar.smoke.test.jsx
+    ⬛ src/visual/creatures/_archivo/JaguarLaminaViva.jsx
+       solo lo importan tests: src/visual/creatures/_archivo/__tests__/JaguarLaminaViva.test.jsx
+    ⬛ src/visual/creatures/_archivo/ZariguyaGeminiLaminaViva.jsx
+       solo lo importan tests: src/visual/creatures/zariguyaGeminiLamina/__tests__/capas.test.jsx
+    módulos de apoyo (hooks/servicios/datos) por carpeta:
+      src/services/ → biodiversidadMonitor.js, datosAbiertos.js, ensoModulador.js, fincaScope.js, fotoOfflineService.js, glaciarCaaml.js, glaciarZenodoMeta.js, hojaVidaMataService.js, iotCostCalculator.js, iotValeLaPena.js, networkRetry.js, ragWithPhotos.js, restauracionRecetaFormatter.js, socialPrefiltro.js, subgrafoToText.js, vitalidadEspirituService.js
+      src/hooks/ → useBackgroundImage.js, useCompaiPaseo.js, useEstadoFincaReal.js, useRecorridoVoz.js
+      src/compai/nucleo/ → gestos.js, zariguyaGestos.js
+      src/components/AgentScreen/ → photoAnalysis.js
+      src/data/ → mangoFinca.js
+      src/utils/ → wcagContraste.js
+      src/visual/agente/ → compaiEstadoVisual.js
+
+  SOLO_VITRINA (decisión ya tomada, no es hallazgo) — 221 archivo(s), 166 componente(s)
+  SOLO_PAGINA_SUELTA (decisión ya tomada, no es hallazgo) — 29 archivo(s), 12 componente(s)
+
+CONTROL B · consumo — vivo en el bundle pero nadie lo usa
+  B1 · componente React exportado sin ningún importador no-test: 16
+    ⬛ src/components/agent/AgentShell.jsx → AgentShell  (vivos: AgentManoOverlay)
+    ⬛ src/components/ChagraGrowLoader.jsx → ChagraCacaoLoader, ChagraCafeLoader, ChagraMaizLoader, ChagraFrailejonLoader  (vivos: ChagraGrowLoader)
+    ⬛ src/components/colibri/Barbudito.jsx → BarbuditoVentana, BarbuditoPosado, BarbuditoFlor, BarbuditoCruza  (vivos: BarbuditoIlustrado, BarbuditoRealLoop)
+    ⬛ src/components/dashboard/GuardianEspiritu.jsx → GuardianEspiritu  (vivos: GuardianAvatar)
+    ⬛ src/components/estiercol/EstiercolIlustraciones.jsx → EstiercolIlustraciones  (vivos: BiodigestorIlustracion, CicloCorralAbono, AbonoGlifo)
+    ⬛ src/mockups/metalslug/JuiceMetalSlug.jsx → StyleJuice  (vivos: ProyectilBio, EfectoImpacto, BarraVida, IndicadorMunicion, JuiceMetalSlug)
+    ⬛ src/mockups/valle/BancoValle.jsx → BancoValle  (vivos: Banco)
+    ⬛ src/visual/agente/AgentePlanoTransicion.jsx → AgentePlanoTransicion  (vivos: AgentePlanoPuente)
+    ⬛ src/visual/agente/AngelitaSalida.jsx → AngelitaSalida  (vivos: MotasMisticas)
+    ⬛ src/visual/mundo3d/GemeloValle2D.jsx → GemeloValle2D  (vivos: GemeloValleEscena)
+    ⬛ src/visual/mundo3d/HotspotFeedback.jsx → HotspotPop  (vivos: HotspotFeedback)
+    ⬛ src/visual/mundo3d/infraestructura/CatalogoInfra3D.jsx → InvernaderoTunel, GallineroCampo, Galpon, Establo, AlmacenBodega, TrojaSecado, TanqueReservorio, Compostera  (vivos: CatalogoInfra3D)
+    ⬛ src/visual/mundo3d/infraestructura/piezasInfra.jsx → InvernaderoCapilla, MediaSombra, GallineroCampo, Galpon, Establo, Compostera, TanqueAgua, SecaderoCafe  (vivos: InvernaderoTunel, AlmacenBodega)
+    ⬛ src/visual/mundo3d/MomentosFinca.jsx → MomentoCrece  (vivos: MomentoNace, MomentoCosecha, MomentoVende)
+    ⬛ src/visual/mundo3d/TransicionMundoKit.jsx → TransicionWipe, TransicionIris, TransicionZoom, TransicionFade  (vivos: TransicionMundoKit)
+    ⬛ src/visual/mundo3d/usePerformanceMonitor.jsx → MonitorRendimiento  (vivos: usePerformanceMonitor)
+
+  B2 · superficie muerta (exports que nadie importa por nombre; un barril que los re-exporta NO cuenta): 96 módulo(s)
+     umbral: ≥3 exports sin NINGÚN consumidor (ni test), o el 100% de la superficie.
+     421 módulo(s) por debajo del umbral y 759 export(s) "sostenidos solo por su test" salen con --exports.
+    src/services/  (18 módulo(s))
+      src/services/angelitaInteligencia.js  18/25 sin consumidor: ESTADOS_COMPORTAMIENTO, ariaDeComportamiento, MUNDOS, COOLDOWN_MS, debeHablar, +13
+      src/services/angelitaVariedad.js  4/10 sin consumidor: hashStr, validarParafrasis, refrescarPoolLLM, default · 4 sostenido(s) solo por su test
+      src/services/asociacionesFilter.js  3/9 sin consumidor: norm, getCultivosDisponibles, getCultivosFromProfile · 2 sostenido(s) solo por su test
+      src/services/canonicalHostRedirect.js  6/12 sin consumidor: isCanonicalHost, isLocalDevHost, isPreviewHost, isProdAppHost, isThreeDWorldHost, +1 · 5 sostenido(s) solo por su test
+      src/services/doomFincaEngine.js  3/16 sin consumidor: updatePest, plagaEnMira, checkPestReach · 5 sostenido(s) solo por su test
+      src/services/guildService.js  3/9 sin consumidor: selectRelevantAssets, buildAssetContext, default · 3 sostenido(s) solo por su test
+      … 12 más en esta carpeta
+    src/visual/creatures/comportamientos/  (6 módulo(s))
+      src/visual/creatures/comportamientos/clima.js  19/22 sin consumidor: CUERPO_NEUTRO, PERFIL_ANGELITA, PERFIL_COLIBRI, PERFIL_OSO, PERFIL_RANA, +14
+      src/visual/creatures/comportamientos/gestos.js  15/22 sin consumidor: POSES_RUBBERHOSE, volar, andar, caminar, respirar, +10 · 6 sostenido(s) solo por su test
+      src/visual/creatures/comportamientos/idle.js  6/7 sin consumidor: IDLE_PERFILES, IDLE_NEUTRO, semillaDe, azar01, backOut, +1
+      src/visual/creatures/comportamientos/lipsync.js  5/7 sin consumidor: UMBRAL_RMS, DEBOUNCE_MS, rmsDeMuestras, crearDebounceVisema, visemaFallback
+      src/visual/creatures/comportamientos/poder.js  5/6 sin consumidor: AURA_POR_BICHO, AURA_DEFECTO, CLASE_PODER, PODER_MS, usePoderTemporal
+      src/visual/creatures/comportamientos/rubberhose.js  4/5 sin consumidor: RH_EASE, RH_LINE_BOIL, RH_PERIODOS, esRubberhose
+    src/data/  (5 módulo(s))
+      src/data/cafeFinca.js  4/18 sin consumidor: ESTADO_GROUNDED_PENDIENTE, DENSIDAD_SIEMBRA, FERTILIZACION_CAFE, UMBRAL_MANEJO_BROCA
+      src/data/canaFinca.js  3/16 sin consumidor: ESTADO_GROUNDED_PENDIENTE, VARIEDAD_POR_ZONA, DISTANCIA_SIEMBRA
+      src/data/climaBoletines.js  3/16 sin consumidor: PILARES_CLIMA, LLUVIA_MENSUAL_ZONA, PROBABILIDAD_TRANSICION
+      src/data/exampleQuestions.js  3/6 sin consumidor: SUGGESTED_ACTIONS_QUESTIONS, AGENT_HERO_QUESTIONS, ALL_EXAMPLE_QUESTIONS
+      src/data/uchuvaFinca.js  3/20 sin consumidor: ESTADO_GROUNDED_PENDIENTE, DENSIDAD_SIEMBRA, GRADO_COLOR
+    src/visual/creatures/  (5 módulo(s))
+      src/visual/creatures/creatureClimaCuerpo.js  11/23 sin consumidor: CUERPO_NEUTRO, PERFIL_JAGUAR, PERFIL_OSO_BASTON, PERFIL_ZARIGUYA, PERFIL_LUCIERNAGA, +6 · 4 sostenido(s) solo por su test
+      src/visual/creatures/faunaAmbiental.js  4/19 sin consumidor: FASE_MS, DESCANSO_BASE_MS, DESCANSO_POR_SLOT_MS, DESCANSO_VARIACION_MS · 6 sostenido(s) solo por su test
+      src/visual/creatures/index.js  202/214 sin consumidor: ABEJA_PALETA, ABEJA_PROPORCION, ABEJA_PRESENCIA, ABEJA_TINTA, AbejaTransicion, +197
+      src/visual/creatures/rubberhoseSpec.js  4/16 sin consumidor: VISEMA, UMBRAL_RMS, DEBOUNCE_MS, RH_REGISTRO
+      src/visual/creatures/transformacion.js  3/6 sin consumidor: CLASE_PODER, PODER_MS, usePoderTemporal · 2 sostenido(s) solo por su test
+    src/visual/mundo3d/polinizadores/  (5 módulo(s))
+      src/visual/mundo3d/polinizadores/cultivos.geom.js  7/11 sin consumidor: geomMaracuya, geomFrutoMaracuya, geomAhuyama, geomFrutoAhuyama, geomCafe, +2
+      src/visual/mundo3d/polinizadores/floresSindrome.geom.js  7/10 sin consumidor: geomTubular, geomNocturna, geomCampana, geomPlato, geomMargarita, +2
+      src/visual/mundo3d/polinizadores/polinizadores.geom.js  9/14 sin consumidor: geomApis, geomAbejorro, geomColibri, geomSirfido, geomMariposa, +4
+      src/visual/mundo3d/polinizadores/polinizadoresIdentidad.js  14/25 sin consumidor: ABEJA_PALETA, ABEJA_TINTA, SINDROMES_IDS, POLINIZADORES_IDS, visitaSindrome, +9
+      src/visual/mundo3d/polinizadores/sembrado.js  3/11 sin consumidor: ZONAS, cultivoDeZona, cultivoInfo
+    src/visual/agente/  (4 módulo(s))
+      src/visual/agente/agentePlanoData.js  4/12 sin consumidor: FASE_TUNEL_POR_SENTIDO, APLANE_MS, LADO_POSADA_MIN, LADO_POSADA_MAX · 1 sostenido(s) solo por su test
+      src/visual/agente/angelitaEstados.js  13/30 sin consumidor: ESTADOS_COMPAI, ESTADOS_CONVERSACIONALES, ALIAS_DE_ESTADO, ALIAS_ESTADO, POSE_POR_ESTADO, +8 · 6 sostenido(s) solo por su test
+      src/visual/agente/compaiEspecies.js  6/13 sin consumidor: ESPECIES_COMPAI, REGISTRO_COMPAI, REGISTRO_ESPECIES, getCompaiEspecie, resolverCompaiEspecie, +1 · 3 sostenido(s) solo por su test
+      src/visual/agente/index.js  37/38 sin consumidor: Angelita, default, AngelitaEntrada, esDiaSoleado, useAngelitaGuia, +32
+    src/visual/mundo3d/  (4 módulo(s))
+      src/visual/mundo3d/artesaniaAndina.js  6/26 sin consumidor: SEGMENTOS_VASIJA, PHI, PROPORCION_ANDINA, SILUETAS_ANDINAS, perfilGenericoDe, +1
+      src/visual/mundo3d/camaraDioramas.js  4/5 sin consumidor: BEAT_DEFECTO, ENCUADRE_DEFECTO, ENCUADRES, ENCUADRE_IDS
+      src/visual/mundo3d/index.js  24/35 sin consumidor: Mundo, Mundo2D, MUNDO_IDS, mundosPorPisoTermico, ARQUETIPOS, +19
+      src/visual/mundo3d/pisosTermicos.js  10/23 sin consumidor: HITOS_SIERRA, ATRIBUCION_SIERRA, pisoPorId, ORDEN_PISOS_SIERRA, ORDEN_BANDAS_SIERRA, +5
+    src/visual/mundo3d/bosque/  (4 módulo(s))
+      src/visual/mundo3d/bosque/entQuenua.geom.js  5/34 sin consumidor: CORTEZA, HOJA, ROSTRO_T, FOLLAJE, factorSonrisa · 6 sostenido(s) solo por su test
+      src/visual/mundo3d/bosque/entsGradiente.geom.js  13/25 sin consumidor: PARAMS_TIER, curvaFuste, taperFuste, relieveCorteza, colorCorteza, +8
+      src/visual/mundo3d/bosque/estratosAltoandinos.geom.js  15/21 sin consumidor: ARQUETIPOS_FUERA, arquetiposDe, geomPalmaDeCera, geomEncenillo, geomCedro, +10
+      src/visual/mundo3d/bosque/gradienteAndino.geom.js  12/37 sin consumidor: Y_BASE, enEscarpe, perfilCauce, nivelAgua, alturaEnCorte, +7
+    src/compai/nucleo/  (3 módulo(s))
+      src/compai/nucleo/climaVivo.js  3/6 sin consumidor: UMBRAL_SEQUIA_MM, DIAS_SEQUIA, default · 2 sostenido(s) solo por su test
+      src/compai/nucleo/datosFinca.js  3/7 sin consumidor: nombreDeAsset, sinSufijoDeInstancia, default · 2 sostenido(s) solo por su test
+      src/compai/nucleo/susurroNocturno.js  3/6 sin consumidor: HORA_INICIO_NOCHE, HORA_FIN_NOCHE, default · 1 sostenido(s) solo por su test
+    src/mockups/valle/  (3 módulo(s))
+      src/mockups/valle/aguaVivaValle.geom.js  7/13 sin consumidor: TRAZADO_AGUA, POZAS_AGUA, COMPUERTAS_AGUA, LIFT, rngAgua, +2
+      src/mockups/valle/siembraValle.js  4/12 sin consumidor: sembrarGestoEnValle, CAUCE_VALLE, distanciaACauce, pendienteEn
+      src/mockups/valle/valleData.js  4/15 sin consumidor: pisoEnZ, SALUD_FINCA, ORDEN_CLIMA, climaPorHora
+    src/visual/mundo3d/invernadero/  (3 módulo(s))
+      src/visual/mundo3d/invernadero/hortalizasHumboldt.js  6/10 sin consumidor: PIMENTON_ANCHO, PIMENTON_ALTO, LECHUGA_ANCHO, LECHUGA_ALTO, pintarPimenton, +1 · 2 sostenido(s) solo por su test
+      src/visual/mundo3d/invernadero/invernadero.geom.js  7/28 sin consumidor: yBoveda, SITIO_ERA, posicionesTomate, geomTomatePlanta, geomTomateFruto, +2 · 1 sostenido(s) solo por su test
+      src/visual/mundo3d/invernadero/tomateHumboldt.js  7/15 sin consumidor: animarVaiven, ATLAS_TILE_W, ATLAS_TILE_H, LAYOUT_TOMATE, atlasTomateHumboldt, +2 · 7 sostenido(s) solo por su test
+    src/visual/mundo3d/transiciones/  (3 módulo(s))
+      src/visual/mundo3d/transiciones/index.js  21/24 sin consumidor: useCruceMundo, useTunelLamina, TUNEL_MS, duracionTunel, momentoCubiertoTunel, +16
+      src/visual/mundo3d/transiciones/tunelLaminaData.js  4/10 sin consumidor: TUNEL_MS, ESCALA_HOJA_MIN, ESCALA_HOJA_MAX, AMBICION_HOJA
+      src/visual/mundo3d/transiciones/velosData.js  7/17 sin consumidor: ANTICIPACION_FRAC, MESETA_INICIO_FRAC, MESETA_FIN_FRAC, EASE_LANZA, EASE_DESCUBRE, +2
+    … 28 carpeta(s) más (--exports | --json)
+
+CONTROL C · afordancia — pintada en la UI y sin conducta
+  intents declarados 19 · con routing determinístico 17
+  INERTE — 2: asociaciones, fuente_doi
+
+ALLOWLIST  85 entrada(s) · 68 en uso · 17 sin sujeto
+  [allowlist-obsoleta] entradas que ya no le hacen match a ningún sujeto: o el archivo se
+  borró, o lo renombraron, o la pieza SÍ se cableó y la excepción quedó protegiendo un
+  fantasma. Ese es el error del CHUNK_ALLOWLIST: la excepción por nombre literal se cae
+  con cada rename y nadie se entera. Revisar una por una y borrarlas del allowlist.
+    src/visual/mundo3d/ArtesaniaAndina.jsx (heredada de integraciones-no-consumidas.json)
+    src/visual/mundo3d/GemeloValle2D.jsx (heredada de integraciones-no-consumidas.json)
+    src/visual/mundo3d/PisosTermicosBandas.jsx (heredada de integraciones-no-consumidas.json)
+    src/visual/mundo3d/TransicionMundoKit.jsx (heredada de integraciones-no-consumidas.json)
+    src/visual/mundo3d/TransicionSierraMundo.jsx (heredada de integraciones-no-consumidas.json)
+    src/visual/mundo3d/infraestructura/InfraestructuraViva.jsx (heredada de integraciones-no-consumidas.json)
+    src/mockups/MundoLecheria3D.jsx (heredada de integraciones-no-consumidas.json)
+    src/mockups/MundoSanidad3D.jsx (heredada de integraciones-no-consumidas.json)
+    src/mockups/MundoVergelFrutal3D.jsx (heredada de integraciones-no-consumidas.json)
+    src/visual/creatures/JaguarLaminaViva.jsx (heredada de integraciones-no-consumidas.json)
+    src/visual/creatures/ZariguyaLaminaViva.jsx (heredada de integraciones-no-consumidas.json)
+    src/visual/creatures/ChivitoPunkLaminaViva.jsx (heredada de integraciones-no-consumidas.json)
+    … 5 más (--todo para verlas)
+
+──────────────────────────────────────────────────────────────────────────────
+RESUMEN
+  MONTAJE     223 sin declarar   (A: no lo alcanza ninguna ruta · B1: componente que nadie monta · C: afordancia inerte)
+  SUPERFICIE  96 sin declarar   (B2: exports vivos que nadie importa)
+  DECLARADOS  68 en allowlist · 17 entrada(s) de allowlist sin sujeto
+
+PARA CABLEARLO A CI (decisión del operador, no de este script):
+  1. Drenar o declarar los 223 de MONTAJE. Hoy incluyen los 6 casos del card, así que
+     cablearlo bloqueante de una deja el repo trabado — que es justo lo que el card prohíbe.
+  2. Correrlo con --fallar en un job APARTE y no bloqueante un par de semanas, para medir su
+     tasa de falso positivo contra renames, rutas nuevas y navegación armada en runtime.
+  3. Recién ahí volverlo bloqueante, y solo sobre MONTAJE. SUPERFICIE (B2) conviene dejarla
+     informativa: es deuda de higiene, no de producto roto.
+  El allowlist obsoleto (entradas sin sujeto) sí puede ser gate desde ya: es barato y no
+  depende de drenar nada.
