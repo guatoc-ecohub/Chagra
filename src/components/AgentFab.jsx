@@ -27,6 +27,7 @@ import BurbujaPizarraPeek from './BurbujaPizarraPeek';
 import CompaiGuiaPantalla from './CompaiGuiaPantalla';
 import useComportamientoCompai from '../hooks/useComportamientoCompai.js';
 import useCompaiDraggable from '../hooks/useCompaiDraggable';
+import CompaiEntradaSalida from '../visual/agente/CompaiEntradaSalida.jsx';
 import './agent-fab-skin.css';
 
 /**
@@ -528,17 +529,30 @@ export default function AgentFab({ onNavigate, pantalla = null }) {
             un nodo del dibujo que se desconecta antes del mouseup, el navegador
             se traga el click (verificado con playwright 2026-07-16). */}
         <span style={{ pointerEvents: 'none', display: 'flex' }} aria-hidden="true">
-          <ChagraAgentAvatar
-            // eslint-disable-next-line chagra-i18n/no-hardcoded-spanish -- estado visual canónico del agente
-            estado={ttsLevel > 0.035 ? 'respondiendo' : estado}
-            size={82}
-            visema={visemaFromAmplitude(ttsLevel)}
-            direccion={comportamiento.direccion}
-            className={responseReady ? 'agt-avatar-glow' : undefined}
-            title="Chagra IA"
-            ariaLabel="Chagra IA"
-            reaccionaPresencia
-          />
+          {/* ENTRADA/SALIDA POR ESPECIE (2026-09-04): el perfil de conducta de
+              cada compai de tinta ya decía cómo aparece y cómo se va (jaguar
+              místico desde la sombra, chivito en dardo, luciérnaga luz primero…)
+              y nadie lo leía: los seis entraban igual. El envoltorio es el
+              metrónomo de esas fases; Angelita no tiene perfil ahí y pasa tal
+              cual (su entrada histórica es la vara). Al cambiar de especie, la
+              que se va corre su salida antes de ceder el puesto. */}
+          <CompaiEntradaSalida especie={avatarType}>
+            {(especieMostrada, avisarCuerpo) => (
+              <ChagraAgentAvatar
+                especie={especieMostrada}
+                onCuerpoMontado={avisarCuerpo}
+                // eslint-disable-next-line chagra-i18n/no-hardcoded-spanish -- estado visual canónico del agente
+                estado={ttsLevel > 0.035 ? 'respondiendo' : estado}
+                size={82}
+                visema={visemaFromAmplitude(ttsLevel)}
+                direccion={comportamiento.direccion}
+                className={responseReady ? 'agt-avatar-glow' : undefined}
+                title="Chagra IA"
+                ariaLabel="Chagra IA"
+                reaccionaPresencia
+              />
+            )}
+          </CompaiEntradaSalida>
         </span>
       </button>
 
