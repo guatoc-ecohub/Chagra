@@ -13,6 +13,9 @@
  *   ?vista=<pose>    560 px, poseForzada: muerta · crias · verlupa · cute ·
  *                    escucha-02 (las viñetas del set)
  *   &fondo=noche     fondo oscuro (#101623) en vez de papel (#f4efe2)
+ *   ?vista=actua     560 px, modo actuando (double-take + boil); con &t=<s>
+ *                    congela TODAS las animaciones CSS en el segundo t del
+ *                    ciclo (smear del double-take: t≈2.77 s de 7.9 s)
  *   &giro=<deg>      clava el hueso cabezaGiro en ese ángulo (rango real de la
  *                    CSS: -13° double-take … +10°; husmea -12°, mira -10°) y
  *   &ladeo=<deg>     el hueso cabeza (ladeo -1.8° … +2°) — quieta, para ver la
@@ -32,6 +35,7 @@ const POSES = ['muerta', 'crias', 'verlupa', 'cute', 'escucha-01', 'escucha-02',
 
 function Pieza() {
   if (vista === 'card') return <ZariguyaTrazado size={64} animated={false} modo="normal" />;
+  if (vista === 'actua') return <ZariguyaTrazado size={560} estado="idle" modo="actuando" />;
   if (vista === 'camina') return <ZariguyaTrazado size={560} estado="caminando" modo="normal" />;
   if (vista === 'habla') return <ZariguyaTrazado size={560} estado="speaking" visema="V3" modo="normal" />;
   if (vista === 'husmea') return <ZariguyaTrazado size={560} estado="idle" vidaForzada="husmea" modo="normal" />;
@@ -50,9 +54,11 @@ function Gate() {
 
 const giro = q.get('giro');
 const ladeo = q.get('ladeo');
-if (giro !== null || ladeo !== null) {
+const t = q.get('t');
+if (giro !== null || ladeo !== null || t !== null) {
   const css = document.createElement('style');
   css.textContent = [
+    t !== null ? `.zariguyaHuesos *{animation-delay:-${Number(t)}s!important;animation-play-state:paused!important}` : '',
     giro !== null ? `.zariguyaHuesos .zh-cabezaGiro{animation:none!important;transform:rotate(${Number(giro)}deg)!important}` : '',
     ladeo !== null ? `.zariguyaHuesos .zh-cabeza{animation:none!important;transform:rotate(${Number(ladeo)}deg)!important}` : '',
   ].join('\n');

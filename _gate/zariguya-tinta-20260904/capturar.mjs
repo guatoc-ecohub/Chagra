@@ -32,6 +32,8 @@ for (const v of VISTAS) {
   let extra = v === 'idle-noche' ? '&fondo=noche' : '';
   const mg = /^giro([+-][\d.]+)(?:-ladeo([+-][\d.]+))?$/.exec(v);
   if (mg) { vista = 'idle'; extra = `&giro=${mg[1]}${mg[2] ? `&ladeo=${mg[2]}` : ''}`; }
+  const ma = /^actua-t([\d.]+)$/.exec(v);
+  if (ma) { vista = 'actua'; extra = `&t=${ma[1]}`; }
   const url = `${BASE}?vista=${vista}${extra}${process.env.RIG ? '&rig=1' : ''}`;
   const trabajo = (async () => {
     await page.goto(url, { waitUntil: 'load' });

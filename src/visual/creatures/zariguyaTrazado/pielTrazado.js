@@ -126,6 +126,14 @@ const CAJAS_JUNTURA = Object.freeze({
      esquivan los contornos mejilla/nuca contra AIRE (el respaldo borroso de
      esta juntura fugaría un halo sobre el papel). */
   cabeza: [112, 104, 316, 190],
+  /* mandibula (EXPERIMENTO 2026-09-05, medido): el polígono `cabeza`
+     EXCLUYE el rect de la mandíbula y bajo ella no había respaldo; al girar
+     la cabeza en horario (+10°, smear del double-take) la quijada vacía una
+     cuña de ~10 px en la comisura que mostraba PAPEL (167 px medidos en la
+     actual). Respaldo = copia estática del mentón (y≥112, bajo los dientes
+     que terminan en y≈108), solo a la izquierda del pivote (x≤212): a la
+     derecha la quijada baja al girar y tapa sola. */
+  mandibula: [140, 112, 212, 134],
   brazoLapiz: [116, 176, 204, 244],
   manoLapiz: [76, 158, 122, 208],
   brazoBrujula: null,
@@ -162,7 +170,7 @@ const JCLIPS = Object.entries(CAJAS_JUNTURA)
    foco. El borroso NO se generaliza: fuga un halo sobre el papel donde la
    región toca aire (medido: brazo-brújula/cola/mejilla, focos 454/143/133px
    en reposo cuando se aplicó a todo). */
-const RESPALDO_BORROSO = Object.freeze(new Set(['cabeza']));
+const RESPALDO_BORROSO = Object.freeze(new Set(['cabeza', 'mandibula']));
 const casqueteCalco = (region) => {
   const caja = CAJAS_JUNTURA[region];
   const filtro = RESPALDO_BORROSO.has(region) ? ' filter="url(#ztRespaldo)"' : '';
@@ -321,6 +329,7 @@ ${DEFS}
         <g class="zh-hueso zh-cuello"${origin('cuello')}>
           ${usoCalco('cuello')}
           ${casqueteCalco('cabeza')}
+          ${casqueteCalco('mandibula')}
           <g class="zh-hueso zh-cabezaGiro"${origin('cabeza')}>
             <g class="zh-hueso zh-cabeza"${origin('cabeza')}>
               ${CABEZA}
