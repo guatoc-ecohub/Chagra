@@ -15,6 +15,7 @@ import {
   CLIMA_UPDATED_EVENT,
 } from '../services/climaService.js';
 import { deriveAtmosphere } from '../services/atmosphereService.js';
+import { fincaDateISO } from '../utils/farmDate.js';
 import { pisoPorAltitud } from '../visual/mundo3d/pisosTermicos.js';
 
 const REEVAL_MS = 10 * 60 * 1000;
@@ -37,8 +38,9 @@ function lectura(source, ...names) {
 }
 
 function hoyISO() {
-  const now = new Date();
-  return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+  // BUG TODAY-UTC-HELADA-20260905: hoy en el calendario de la FINCA, no en la
+  // zona del runtime/UTC (los `date` del forecast son locales de la finca).
+  return fincaDateISO();
 }
 
 function diaActual(snapshot) {

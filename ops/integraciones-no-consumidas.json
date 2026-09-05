@@ -56,11 +56,6 @@
   ],
   "orphan_components": [
     {
-      "id": "src/visual/mundo3d/ArtesaniaAndina.jsx",
-      "reason": "Extensión D-5 del audit (2026-07-21, ver ADR-INTEGRACIONES-NO-CONSUMIDAS-2026-07-15 §componentes): verificado con grep en todo src/ — únicamente su smoke test (__tests__/artesania.smoke.test.jsx) importa el componente; ningún archivo de producto lo hace. Solo el módulo de datos hermano (artesaniaAndina.js: PERFILES_VASIJA/SEGMENTOS_VASIJA) tiene consumidor real (el propio ArtesaniaAndina.jsx). Encontrado por el nuevo check, no cableado en este PR (es una PR de test, no de producto) — requiere decidir en qué mundo/vitrina se monta.",
-      "date": "2026-07-21"
-    },
-    {
       "id": "src/visual/mundo3d/CamaraDioramas.jsx",
       "reason": "Verificado con grep: nadie importa el componente React <CamaraDioramas>. Lo que SÍ está cableado (App.jsx, mockups/vitrina3d/VitrinaMundos.jsx) es resolverEncuadre() desde el módulo hermano camaraDioramas.js — la lógica de encuadre se usa directo, sin pasar por el wrapper de componente. El 'import CamaraDioramas from ...' que aparece en el docstring de camaraDioramas.js es un ejemplo de uso en prosa, no código real (y su ruta relativa ni siquiera resuelve). Encontrado por el nuevo check.",
       "date": "2026-07-21"
@@ -68,31 +63,6 @@
     {
       "id": "src/visual/mundo3d/CielosHora.jsx",
       "reason": "El propio comentario de CapaVivaMundo.jsx dice literalmente 'CielosHora.jsx no existe en dev a la fecha de esta capa; cuando aterrice, se compone aquí mismo' — es un scaffold para una integración futura documentada, todavía sin consumidor real. Encontrado por el nuevo check; no se cablea en este PR (decisión de producto pendiente, no un olvido silencioso).",
-      "date": "2026-07-21"
-    },
-    {
-      "id": "src/visual/mundo3d/GemeloValle2D.jsx",
-      "reason": "Verificado con grep en src/: el único importador es su propio smoke test (__tests__/gemeloValle2D.smoke.test.jsx). Sin consumidor de producto. Encontrado por el nuevo check.",
-      "date": "2026-07-21"
-    },
-    {
-      "id": "src/visual/mundo3d/PisosTermicosBandas.jsx",
-      "reason": "El comentario de pisosTermicos.js dice 'Lo consume el overlay PisosTermicosBandas.jsx (bandas r3f)', pero verificado con grep: ningún archivo real importa el componente — la intención de diseño no llegó a cablearse. Encontrado por el nuevo check.",
-      "date": "2026-07-21"
-    },
-    {
-      "id": "src/visual/mundo3d/TransicionMundoKit.jsx",
-      "reason": "Verificado con grep: el único importador real es su propio test (__tests__/transicionMundoKit.test.jsx). Su hermano TransicionSierraMundo.jsx solo lo menciona en un comentario de docstring ('misma filosofía que'), no en código. Encontrado por el nuevo check.",
-      "date": "2026-07-21"
-    },
-    {
-      "id": "src/visual/mundo3d/TransicionSierraMundo.jsx",
-      "reason": "Mismo caso que TransicionMundoKit.jsx: sin consumidor real fuera de su propia prosa de docstring y su export default. Ninguno de los dos está montado en una ruta viva hoy. Encontrado por el nuevo check.",
-      "date": "2026-07-21"
-    },
-    {
-      "id": "src/visual/mundo3d/infraestructura/InfraestructuraViva.jsx",
-      "reason": "Exportado por el barrel infraestructura/index.js ('export { default as InfraestructuraViva } from ./InfraestructuraViva.jsx'), pero ese barrel a su vez no tiene NINGÚN importador real — solo la variante base Infraestructura.jsx (importada directo, sin pasar por el barrel) está cableada hoy. La variante 'Viva' (auto-alimentada) quedó construida sin consumidor. Encontrado por el nuevo check.",
       "date": "2026-07-21"
     },
     {
@@ -133,21 +103,6 @@
     {
       "id": "src/mockups/GuacamayaViva.jsx",
       "reason": "Mockup experimental de la guacamaya como séptima criatura del elenco (Ara macao, rig F24). El comentario menciona ruta #/mockups/guacamaya-viva pero no está en MOCKUP_HASH_ROUTES. Parece ser un experimento paralelo a AngelitaViva que nunca se cableó completamente. Los componentes hermano (GuacamayaEntrada/GuacamayaSalida) también están huérfanos, indicando que el sistema de guacamaya como compai alternativo no se terminó.",
-      "date": "2026-08-30"
-    },
-    {
-      "id": "src/mockups/MundoLecheria3D.jsx",
-      "reason": "Mockup de mundo lechería (60KB) que nunca se cableó en App.jsx. No existe ruta correspondiente en MOCKUP_HASH_ROUTES. Parece ser un mundo temático que se diseñó pero no se integró al sistema de rutas.",
-      "date": "2026-08-30"
-    },
-    {
-      "id": "src/mockups/MundoSanidad3D.jsx",
-      "reason": "Versión alternativa (60KB) del mundo sanidad que quedó huérfana. La versión que sí está cableada es Mundo3DSanidad.jsx (6.7KB, importado como Mundo3DSanidadMockup). Este parece ser una versión más grande que se reemplazó por la más compacta.",
-      "date": "2026-08-30"
-    },
-    {
-      "id": "src/mockups/MundoVergelFrutal3D.jsx",
-      "reason": "Mockup de mundo vergel frutal que nunca se cableó. No existe ruta en MOCKUP_HASH_ROUTES. Parece ser un mundo temático (frutales) que se diseñó pero no se integró al sistema de rutas.",
       "date": "2026-08-30"
     },
     {
@@ -438,26 +393,6 @@
     {
       "id": "src/visual/mundo3d/semillas/EscenaBancoSemillas.jsx",
       "reason": "Escena 3D del banco de semillas que nunca se cableó. Visualización 3D de un vivero/banco de semillas con germinación, repique, endurecimiento. Comentado como el mundo del semillero, pero no se montó (la ruta mockups/mundo3d-semillero existe pero usa otro componente).",
-      "date": "2026-08-30"
-    },
-    {
-      "id": "src/visual/mundo3d/sierra/ArbolMayor.jsx",
-      "reason": "Componente del módulo sierra (árbol mayor/anciano) que nunca se cableó. Visualización 3D de un árbol grande/viejo como guardián de la sierra. El módulo sierra (4 componentes) parece ser un experimento de paisaje de sierra que no se integró.",
-      "date": "2026-08-30"
-    },
-    {
-      "id": "src/visual/mundo3d/sierra/GaleriaSierraArboles.jsx",
-      "reason": "Componente del módulo sierra (galería de árboles de la sierra) que nunca se cableó. Visualización de múltiples especies de árboles de montaña. Parte del experimento inconcluso.",
-      "date": "2026-08-30"
-    },
-    {
-      "id": "src/visual/mundo3d/sierra/SierraCorteVertical.jsx",
-      "reason": "Componente del módulo sierra (sierra en corte vertical) que nunca se cableó. Visualización del perfil de montaña en sección vertical mostrando pisos térmicos. Parte del experimento inconcluso.",
-      "date": "2026-08-30"
-    },
-    {
-      "id": "src/visual/mundo3d/sierra/SierraMonte3D.jsx",
-      "reason": "Escena 3D de sierra/monte que nunca se cableó. Mundo 3D de paisaje de sierra con árboles estratificados por altitud. El módulo sierra (4 componentes) quedó como experimento sin wirear.",
       "date": "2026-08-30"
     },
     {
@@ -834,6 +769,621 @@
       "id": "src/visual/mundo3d/polinizadores/index.js",
       "reason": "Barril del módulo polinizadores sin un solo importador: la vitrina (mockup_mundo_polinizadores_3d) importa EscenaPolinizadores.jsx y hermanos directo, sin pasar por el barril. Candidato a borrado (decisión de curaduría del operador).",
       "date": "2026-09-04"
+    },
+    {
+      "id": "src/components/_archivado/PanelVitalidadEspiritu.jsx",
+      "reason": "Espejo de la declaratoria del drenaje tanda 1 (#3120, ops/componentes-huerfanos-allowlist.json, que este gate no lee) escrita en ops/DRENAJE-HUERFANOS-TANDA-1-2026-09-04.md. Panel desmontado del home 2D a propósito el 2026-08-26 (comentario en FincaVivaHero.jsx); su hermano de servicios vitalidadEspirituService.js ya está declarado aquí (2026-09-04). Hoy solo su test lo importa. Al rediseñar el panel se decide su vuelta.",
+      "date": "2026-09-05"
+    },
+    {
+      "id": "src/components/_archivado/UmbralValle.jsx",
+      "reason": "Espejo de la declaratoria del drenaje tanda 1 (#3120, ops/componentes-huerfanos-allowlist.json, que este gate no lee) escrita en ops/DRENAJE-HUERFANOS-TANDA-1-2026-09-04.md. Archivado a propósito: era la puerta grande home→valle 3D y la entrada viva es otra. Nadie lo importa (ni producto, ni vitrina, ni test).",
+      "date": "2026-09-05"
+    },
+    {
+      "id": "src/components/_archivo/BienvenidaFinca.jsx",
+      "reason": "Espejo de la declaratoria del drenaje tanda 1 (#3120, ops/componentes-huerfanos-allowlist.json, que este gate no lee) escrita en ops/DRENAJE-HUERFANOS-TANDA-1-2026-09-04.md. Archivado 2026-07-22; OnboardingCondensado lo reemplaza. Solo su test lo importa.",
+      "date": "2026-09-05"
+    },
+    {
+      "id": "src/components/_archivo/OnboardingHero.jsx",
+      "reason": "Espejo de la declaratoria del drenaje tanda 1 (#3120, ops/componentes-huerfanos-allowlist.json, que este gate no lee) escrita en ops/DRENAJE-HUERFANOS-TANDA-1-2026-09-04.md. Archivado 2026-07-22; OnboardingCondensado + PrimerRegistroCard conservan lo útil. Solo sus tests lo importan.",
+      "date": "2026-09-05"
+    },
+    {
+      "id": "src/components/_archivo/OnboardingModal.jsx",
+      "reason": "Espejo de la declaratoria del drenaje tanda 1 (#3120, ops/componentes-huerfanos-allowlist.json, que este gate no lee) escrita en ops/DRENAJE-HUERFANOS-TANDA-1-2026-09-04.md. Archivado 2026-07-22; FarmOSSetupModal conserva la configuración técnica. Nadie lo importa.",
+      "date": "2026-09-05"
+    },
+    {
+      "id": "src/components/_archivo/OnboardingProfile.jsx",
+      "reason": "Espejo de la declaratoria del drenaje tanda 1 (#3120, ops/componentes-huerfanos-allowlist.json, que este gate no lee) escrita en ops/DRENAJE-HUERFANOS-TANDA-1-2026-09-04.md. Archivado 2026-07-22; el flujo extendido vive en OnboardingCondensado + Perfil. Solo sus tests lo importan.",
+      "date": "2026-09-05"
+    },
+    {
+      "id": "src/components/admin/AdminPanel.jsx",
+      "reason": "Panel de administración sin ruta: nadie lo importa (ni producto, ni vitrina, ni test). Montarlo exige decidir quién administra y con qué roles — decisión de producto documentada como pendiente en la tanda 1 del drenaje, no un cableado.",
+      "date": "2026-09-05"
+    },
+    {
+      "id": "src/components/admin/DashboardAdopcion.jsx",
+      "reason": "Dashboard de adopción sin consumidor: nadie lo importa. La telemetría que mostraría (agentTelemetryFlywheel.js, declarado 2026-09-04) tampoco tiene ruta viva; decidir qué métrica se hace visible y a quién es decisión de producto.",
+      "date": "2026-09-05"
+    },
+    {
+      "id": "src/components/agent/AgentMetricsDashboard.jsx",
+      "reason": "Declarado junto a su fuente: agentTelemetryFlywheel.js (su único consumidor de producto) ya está declarado sin ruta viva (2026-09-04). Ni el dashboard ni la captura de métricas son alcanzables hoy; la pantalla de métricas sigue sin decidirse.",
+      "date": "2026-09-05"
+    },
+    {
+      "id": "src/components/agent/FeedbackSutil.jsx",
+      "reason": "Botones 👍/👎 de calidad por respuesta (su encabezado declara privacidad primero); registraría en agentTelemetryFlywheel.js, ya declarado sin ruta (2026-09-04). Nadie lo importa: montarlo sin decidir la política de la señal (quién la lee y cómo se agrega) dejaría una señal que nadie escucha.",
+      "date": "2026-09-05"
+    },
+    {
+      "id": "src/components/AgentScreen/SuggestedActions.jsx",
+      "reason": "Acciones sugeridas post-respuesta: lo único que lo importa es el barril AgentScreen/index.js (también declarado aquí, sin importador). La decisión de UX (chips post-respuesta vs toolbar viva) está pendiente.",
+      "date": "2026-09-05"
+    },
+    {
+      "id": "src/components/extensionista/ExtensionistaDashboard.jsx",
+      "reason": "Dashboard del rol extensionista sin ruta: nadie lo importa. El rol existe como copy pero no hay pantalla de extensionista decidida; montarlo antes de esa decisión sería una vitrina sin público.",
+      "date": "2026-09-05"
+    },
+    {
+      "id": "src/components/red/ExitosChagra.jsx",
+      "reason": "Vitrina de éxitos de la red: el módulo red quedó en andamiaje sin pantallas de Fase 1 (#2792; redService.js ya declarado 2026-09-04). Nadie lo importa; se declara hasta que la fase social de la red se decida.",
+      "date": "2026-09-05"
+    },
+    {
+      "id": "src/components/AgentDemoExample.jsx",
+      "reason": "Mini-demo predefinida del agente (decisión UX-4, issue #285): solo su test lo importa; el botón «Ver ejemplo (sin foto)» del AgentScreen que la montaría no existe en la pantalla viva. Se declara hasta decidir si la demo entra al chat real.",
+      "date": "2026-09-05"
+    },
+    {
+      "id": "src/components/AltitudeBadge.jsx",
+      "reason": "Badge de altitud sin consumidor: solo su test lo importa. Las pantallas vivas muestran la altitud por otras vías; adoptarlo es higiene transversal pantalla por pantalla, no un cableado.",
+      "date": "2026-09-05"
+    },
+    {
+      "id": "src/components/aprendizaje/GuiaEspecieCards.jsx",
+      "reason": "Espejo de la declaratoria del drenaje tanda 1 (#3120, ops/componentes-huerfanos-allowlist.json, que este gate no lee) escrita en ops/DRENAJE-HUERFANOS-TANDA-1-2026-09-04.md. (ítem 1) Prototipo del módulo de aprendizaje (PR #1674) con datos demo (guias-demo.js, que también se declara aquí). Montarlo hoy inyectaría datos demo en pantallas grounded desde catalog.sqlite; cuando lea del catálogo real (su propio TODO v3.1+) se decide su ruta.",
+      "date": "2026-09-05"
+    },
+    {
+      "id": "src/components/ChagraAgentAvatarColibri.jsx",
+      "reason": "Espejo tanda 1 (ítem 10): el avatar vivo lo escoge useAgentAvatarType y el mapa lazy de ChagraAgentAvatar (angelita, zariguya, jaguar, oso-baston, luciernaga, guacamaya, chivito-punk) — colibrí no está en el mapa. Solo una fila del README lo menciona. Propuesta de borrado: borrar lo decide el operador.",
+      "date": "2026-09-05"
+    },
+    {
+      "id": "src/components/ChagraAgentAvatarColibriPhoto.jsx",
+      "reason": "Espejo tanda 1 (ítem 11): variante foto del colibrí fuera del mapa canónico de avatares de ChagraAgentAvatar. Propuesta de borrado (curaduría del operador).",
+      "date": "2026-09-05"
+    },
+    {
+      "id": "src/components/ChagraAgentAvatarMaiz.jsx",
+      "reason": "Espejo tanda 1 (ítem 12): maíz no está en el mapa de useAgentAvatarType; solo un comentario en GuacamayaCompai.jsx y su test lo sostienen. Propuesta de borrado (curaduría del operador).",
+      "date": "2026-09-05"
+    },
+    {
+      "id": "src/components/common/ScreenLoadingStatus.jsx",
+      "reason": "Espejo de la declaratoria del drenaje tanda 1 (#3120, ops/componentes-huerfanos-allowlist.json, que este gate no lee) escrita en ops/DRENAJE-HUERFANOS-TANDA-1-2026-09-04.md. Estado de carga/vacío/error reutilizable: solo lo importan los tests empty-states y screen-reader. Su adopción es transversal, pantalla por pantalla.",
+      "date": "2026-09-05"
+    },
+    {
+      "id": "src/components/dashboard/ValleHoverConfirm.jsx",
+      "reason": "Portal home→valle 3D con confirmación por hover (teaser webp + TransicionNewDonk). El rescate #3134 lo dejó con tests verdes pero NO lo montó: hoy solo su test lo importa (verificado con el control de importadores del remate). El montaje —cuándo ofrecer el salto al valle— es decisión de producto.",
+      "date": "2026-09-05"
+    },
+    {
+      "id": "src/components/ErrorBoundaryRuta.jsx",
+      "reason": "Espejo de la declaratoria del drenaje tanda 1 (#3120, ops/componentes-huerfanos-allowlist.json, que este gate no lee) escrita en ops/DRENAJE-HUERFANOS-TANDA-1-2026-09-04.md. Reemplazaría el patrón ErrorBoundary+ErrorFallback de las 224 case del router: refactor transversal, no un cableado de una línea. Nadie lo importa.",
+      "date": "2026-09-05"
+    },
+    {
+      "id": "src/components/escucha/EscuchaFab.jsx",
+      "reason": "Espejo tanda 1 (ítem 14): el trigger de escucha vivo es AgentFab (hold + «Hola Chagra», decisión del operador 2026-08-27). Su import en App.jsx está COMENTADO a propósito (líneas 62-68). Ojo del remate: un grep por substring lo cuenta como importado por App.jsx; el control del 2026-09-05 verificó que el import está en comentario y el motor (que quita comentarios) lo tiene por SOLO_TEST. Propuesta de borrado pendiente del operador.",
+      "date": "2026-09-05"
+    },
+    {
+      "id": "src/components/lotes/LoteCroquisPlaceholder.jsx",
+      "reason": "Espejo de la declaratoria del drenaje tanda 1 (#3120, ops/componentes-huerfanos-allowlist.json, que este gate no lee) escrita en ops/DRENAJE-HUERFANOS-TANDA-1-2026-09-04.md. (ítem 9) Andamiaje transitorio declarado en su encabezado; espera el canvas real (Leaflet + polígono). No debe montarse como UI final.",
+      "date": "2026-09-05"
+    },
+    {
+      "id": "src/components/OnboardingTour.jsx",
+      "reason": "Tour guiado de onboarding sin montar: nadie lo importa. El onboarding vivo es OnboardingCondensado + PrimerRegistroCard; un tour paso a paso es una decisión de producto no tomada.",
+      "date": "2026-09-05"
+    },
+    {
+      "id": "src/components/PestMonitoringWindow.jsx",
+      "reason": "Ventana de monitoreo lunar de plagas: su fuente lunarPestService.js ya está declarada (2026-09-04) por el mismo motivo. Nadie la importa hoy; se declara hasta montar la superficie de monitoreo.",
+      "date": "2026-09-05"
+    },
+    {
+      "id": "src/components/QuickChipsBar.jsx",
+      "reason": "Espejo tanda 1 (ítem 15): su sucesor montado es ChipsToolbar en AgentScreen (decisión UX-5, issue #286). Solo su smoke test lo sostiene. Propuesta de borrado (curaduría del operador).",
+      "date": "2026-09-05"
+    },
+    {
+      "id": "src/components/SplashAngelita.jsx",
+      "reason": "Espejo tanda 1 (ítem 13): splash nunca adoptada; el boot vivo es ChagraGrowLoader con VIEW_LOADING_LABELS por vista (App.jsx), que ya da mensaje contextual. Propuesta de borrado (curaduría del operador).",
+      "date": "2026-09-05"
+    },
+    {
+      "id": "src/visual/creatures/Borugo.jsx",
+      "reason": "Criatura rubber-hose del elenco: solo la alcanza el re-export del barril creatures/index.js sin que ningún consumidor le pida el nombre (barril que lava — el gate por símbolo lo destapó; control LAVADOS_POR_EL_BARRIL del arnés). Su montaje natural es el esfuerzo de ramas feat/huerfanos-al-valle-3d: qué criaturas entran al valle y cómo es decisión de producto (tanda 1), no se cablea pieza por pieza. Particular: el borugo fue ARCHIVADO por decisión del operador el 2026-07-18 (commit 1979888ec, «archivar borugo completamente (rechazado)») — candidato a borrado junto a borugoIdentidad.js.",
+      "date": "2026-09-05"
+    },
+    {
+      "id": "src/visual/creatures/ChivitoTinta.jsx",
+      "reason": "Criatura rubber-hose del elenco: solo la alcanza el re-export del barril creatures/index.js sin que ningún consumidor le pida el nombre (barril que lava — el gate por símbolo lo destapó; control LAVADOS_POR_EL_BARRIL del arnés). Su montaje natural es el esfuerzo de ramas feat/huerfanos-al-valle-3d: qué criaturas entran al valle y cómo es decisión de producto (tanda 1), no se cablea pieza por pieza.",
+      "date": "2026-09-05"
+    },
+    {
+      "id": "src/visual/creatures/LuciernagaTinta.jsx",
+      "reason": "Criatura rubber-hose del elenco: solo la alcanza el re-export del barril creatures/index.js sin que ningún consumidor le pida el nombre (barril que lava — el gate por símbolo lo destapó; control LAVADOS_POR_EL_BARRIL del arnés). Su montaje natural es el esfuerzo de ramas feat/huerfanos-al-valle-3d: qué criaturas entran al valle y cómo es decisión de producto (tanda 1), no se cablea pieza por pieza.",
+      "date": "2026-09-05"
+    },
+    {
+      "id": "src/visual/creatures/MomentoGuardianes.jsx",
+      "reason": "Criatura rubber-hose del elenco: solo la alcanza el re-export del barril creatures/index.js sin que ningún consumidor le pida el nombre (barril que lava — el gate por símbolo lo destapó; control LAVADOS_POR_EL_BARRIL del arnés). Su montaje natural es el esfuerzo de ramas feat/huerfanos-al-valle-3d: qué criaturas entran al valle y cómo es decisión de producto (tanda 1), no se cablea pieza por pieza. Es además el único importador de PerroHeroe.jsx y PerroTransicion.jsx (ambas declaradas aquí).",
+      "date": "2026-09-05"
+    },
+    {
+      "id": "src/visual/creatures/OsoAndino.jsx",
+      "reason": "Criatura rubber-hose del elenco: solo la alcanza el re-export del barril creatures/index.js sin que ningún consumidor le pida el nombre (barril que lava — el gate por símbolo lo destapó; control LAVADOS_POR_EL_BARRIL del arnés). Su montaje natural es el esfuerzo de ramas feat/huerfanos-al-valle-3d: qué criaturas entran al valle y cómo es decisión de producto (tanda 1), no se cablea pieza por pieza.",
+      "date": "2026-09-05"
+    },
+    {
+      "id": "src/visual/creatures/OsoAnteojos.jsx",
+      "reason": "Criatura rubber-hose del elenco: solo la alcanza el re-export del barril creatures/index.js sin que ningún consumidor le pida el nombre (barril que lava — el gate por símbolo lo destapó; control LAVADOS_POR_EL_BARRIL del arnés). Su montaje natural es el esfuerzo de ramas feat/huerfanos-al-valle-3d: qué criaturas entran al valle y cómo es decisión de producto (tanda 1), no se cablea pieza por pieza.",
+      "date": "2026-09-05"
+    },
+    {
+      "id": "src/visual/creatures/PerroHeroe.jsx",
+      "reason": "Criatura rubber-hose del elenco: solo la alcanza el re-export del barril creatures/index.js sin que ningún consumidor le pida el nombre (barril que lava — el gate por símbolo lo destapó; control LAVADOS_POR_EL_BARRIL del arnés). Su montaje natural es el esfuerzo de ramas feat/huerfanos-al-valle-3d: qué criaturas entran al valle y cómo es decisión de producto (tanda 1), no se cablea pieza por pieza. Sus importadores: MomentoGuardianes.jsx (declarado aquí) y el barril.",
+      "date": "2026-09-05"
+    },
+    {
+      "id": "src/visual/creatures/PerroTransicion.jsx",
+      "reason": "Criatura rubber-hose del elenco: solo la alcanza el re-export del barril creatures/index.js sin que ningún consumidor le pida el nombre (barril que lava — el gate por símbolo lo destapó; control LAVADOS_POR_EL_BARRIL del arnés). Su montaje natural es el esfuerzo de ramas feat/huerfanos-al-valle-3d: qué criaturas entran al valle y cómo es decisión de producto (tanda 1), no se cablea pieza por pieza. Sus importadores: MomentoGuardianes.jsx (declarado aquí) y el barril.",
+      "date": "2026-09-05"
+    },
+    {
+      "id": "src/visual/creatures/Zariguya.jsx",
+      "reason": "Criatura rubber-hose del elenco: solo la alcanza el re-export del barril creatures/index.js sin que ningún consumidor le pida el nombre (barril que lava — el gate por símbolo lo destapó; control LAVADOS_POR_EL_BARRIL del arnés). Su montaje natural es el esfuerzo de ramas feat/huerfanos-al-valle-3d: qué criaturas entran al valle y cómo es decisión de producto (tanda 1), no se cablea pieza por pieza. La zarigüeya rubber-hose (PR #2613) compone el kit _rubberhose.jsx y zariguyaIdentidad.js; el registro CREATURES del barril la re-exporta sin que nadie le pida el nombre.",
+      "date": "2026-09-05"
+    },
+    {
+      "id": "src/visual/icons/IconosEtapaCiclo.jsx",
+      "reason": "Set de 6 glifos de etapa de ciclo (semilla→cosecha→guardado) para catálogo/cards: solo lo alcanza el barril icons/index.js (declarado aquí, cuyo único importador es GuiaEspecieCards.jsx, también declarada). El catálogo vivo muestra las etapas sin estos glifos todavía.",
+      "date": "2026-09-05"
+    },
+    {
+      "id": "src/types/index.js",
+      "reason": "FALSO POSITIVO CONOCIDO en la capa runtime, consumido de verdad en la capa de tipos: aiService, payloadService, photoService, inventoryEvents (todos MONTADOS), useAssetStore y planGeneratorService referencian sus @typedef vía JSDoc import('../types'). El gate mide consumo RUNTIME y quita comentarios, así que no ve JSDoc — verificado a mano el 2026-09-05 (control de importadores). No es código muerto: borrarlo rompería checkJs de esos servicios.",
+      "date": "2026-09-05"
+    },
+    {
+      "id": "src/types/asset.js",
+      "reason": "FALSO POSITIVO CONOCIDO (capa runtime): assetService.js (MONTADO) lo referencia vía @returns {{Promise<import('../types/asset.js').Asset|null>}} en JSDoc. El gate no ve comentarios; el consumo de tipos es real (checkJs).",
+      "date": "2026-09-05"
+    },
+    {
+      "id": "src/types/log.js",
+      "reason": "Vocabulario @typedef del modelo Asset+Log (log--seeding/input/harvest/observation…, estilo farmOS) sin referencia aún, ni runtime ni JSDoc. Se conserva como contrato del modelo mientras el par asset/log se adopta en stores y sync (misma cola que fincaScope.js y syncEvent.js).",
+      "date": "2026-09-05"
+    },
+    {
+      "id": "src/types/syncEvent.js",
+      "reason": "@typedef SyncEvent (cola de sincronización del modelo Asset+Log) sin referencia aún. Mismo caso que types/log.js: contrato del modelo a la espera de adopción.",
+      "date": "2026-09-05"
+    },
+    {
+      "id": "src/types/css-custom-properties.d.ts",
+      "reason": "Declaración TypeScript AMBIENTAL: la carga jsconfig.json por include (src/types/**/*.d.ts), no un import. La semántica del gate (consumo runtime) no aplica a .d.ts — falso positivo por categoría, verificado el 2026-09-05.",
+      "date": "2026-09-05"
+    },
+    {
+      "id": "src/types/global.d.ts",
+      "reason": "Declaración ambiental de Window (__ARRANQUE_OK/__ARRANQUE_FALLO de los gates visuales headless): la carga jsconfig include, no un import. Falso positivo por categoría.",
+      "date": "2026-09-05"
+    },
+    {
+      "id": "src/types/index.d.ts",
+      "reason": "Declaración ambiental: la carga jsconfig include, no un import. Falso positivo por categoría.",
+      "date": "2026-09-05"
+    },
+    {
+      "id": "src/types/leaflet-stub.d.ts",
+      "reason": "Stub tipado de leaflet cargado por el mapping paths.leaflet de jsconfig.json (no por import): falso positivo por categoría. Borrarlo rompería checkJs de todo lo que toca leaflet.",
+      "date": "2026-09-05"
+    },
+    {
+      "id": "src/types/static-assets-shim.d.ts",
+      "reason": "Shims ambientales de assets estáticos para checkJs (TS2882/TS2307; queue/069.6): los carga jsconfig include. Falso positivo por categoría.",
+      "date": "2026-09-05"
+    },
+    {
+      "id": "src/types/three-cdn-shim.d.ts",
+      "reason": "Shim ambiental del specifier CDN de Three.js del visor standalone de especies (A1): lo carga jsconfig include. Falso positivo por categoría.",
+      "date": "2026-09-05"
+    },
+    {
+      "id": "src/types/vite-env.d.ts",
+      "reason": "Declaración ambiental estándar de Vite: la carga jsconfig include, no un import. Falso positivo por categoría.",
+      "date": "2026-09-05"
+    },
+    {
+      "id": "src/types/vitest-stub.d.ts",
+      "reason": "Declaración ambiental para los globals de vitest: la carga jsconfig include. Falso positivo por categoría.",
+      "date": "2026-09-05"
+    },
+    {
+      "id": "src/hooks/useAngelitaHusmeador.js",
+      "reason": "Husmeo proactivo de Angelita al cambiar de mundo: sin un solo importador. Cablearlo exige decidir la política de interrupción voz-first (¿cuándo puede hablar la compai sin que la pidan?) — la misma decisión de producto que frena a useInteraccionUsuario.",
+      "date": "2026-09-05"
+    },
+    {
+      "id": "src/hooks/useBackgroundImage.js",
+      "reason": "Solo su test lo importa. El fondo vivo corre por useThemeBackgroundStore (importado por App.jsx y la pantalla de tema), que es el camino que quedó. Candidato a borrado (curaduría del operador).",
+      "date": "2026-09-05"
+    },
+    {
+      "id": "src/hooks/useBusquedaUnificada.js",
+      "reason": "Búsqueda instantánea local sobre catálogo (Ctrl+K, su encabezado): sin importador. Exige decidir una superficie de búsqueda global (paleta de comandos) — decisión de producto, no cableado.",
+      "date": "2026-09-05"
+    },
+    {
+      "id": "src/hooks/useCompaiPaseo.js",
+      "reason": "Ola 2 del paseo autónomo (#2820): su planificador (compaiPaseoPlanificador.js) y su registro de paradas (compaiParadasPorPantalla.js) ya están declarados sin ruta (2026-09-04). El hook solo lo importan tests hasta que la cadena del paseo tenga montaje y desmontaje reales por pantalla.",
+      "date": "2026-09-05"
+    },
+    {
+      "id": "src/hooks/useEstadoFincaReal.js",
+      "reason": "Construye estadoFinca desde IndexedDB para que el valle 3D refleje la finca real: solo su test lo importa. El valle vivo se sirve por iframe a /valle/ (fuera de este bundle); cablear aquí exige decidir qué estado cruza esa frontera.",
+      "date": "2026-09-05"
+    },
+    {
+      "id": "src/hooks/useInteraccionUsuario.js",
+      "reason": "Señal de «el usuario está usando la pantalla AHORA» (base de la política dura del compai): sin importador. Depende de la misma decisión de política de interrupción que useAngelitaHusmeador.js.",
+      "date": "2026-09-05"
+    },
+    {
+      "id": "src/hooks/useRecorridoVoz.js",
+      "reason": "Hermano del recorrido por voz (#2152): recorridoService.js (declarado 2026-09-04) y useRecorridoStore.js (declarado aquí) completan el cluster. Solo su test lo sostiene hasta montar el recorrido.",
+      "date": "2026-09-05"
+    },
+    {
+      "id": "src/hooks/useSecurityRole.js",
+      "reason": "PLANO 2 de federación (rol de seguridad, DISENO-FEDERACION-USUARIOS.md §0; distinto del rol de producto de userProfileService): sin importador. Su adopción depende de la fase de federación junto a didKeyService/ucanService (declarados aquí).",
+      "date": "2026-09-05"
+    },
+    {
+      "id": "src/hooks/useT.js",
+      "reason": "Hook de i18n (detecta idioma del navegador e interpola sobre config/messages.js). CONTROL DE IMPORTADORES del remate 2026-09-05: 0 importadores reales. Los «14 importadores» que se le atribuyeron el 2026-09-04 eran matches por substring de useTheme/useTts/useTunel — un grep sin frontera de palabra lo da por vivo; el grep con frontera (el correcto, verificado dos veces) no halla ninguno. La app resolvió las cadenas por MSG directo de config/messages.js (useRecorridoStore, useAssetStore) y los idiomas adicionales nunca llegaron. Adoptar i18n o borrar el hook es decisión de producto; NO se borra aquí.",
+      "date": "2026-09-05"
+    },
+    {
+      "id": "src/visual/creatures/borugoIdentidad.js",
+      "reason": "Identidad del Borugo: sus importadores son Borugo.jsx y el barril (ambos sin montar; el borugo fue archivado por el operador el 2026-07-18, commit 1979888ec). Candidato a borrado junto a su criatura (curaduría del operador).",
+      "date": "2026-09-05"
+    },
+    {
+      "id": "src/visual/creatures/chivitoTintaIdentidad.js",
+      "reason": "Identidad de ChivitoTinta: la importan ChivitoTinta.jsx y el barril (criatura rubber-hose sin montar, declarada aquí). Se cablea junto con su criatura.",
+      "date": "2026-09-05"
+    },
+    {
+      "id": "src/visual/creatures/escenaGuardianes.js",
+      "reason": "Apoyo de MomentoGuardianes.jsx (momento de guardianes sin montar, declarado aquí): sus únicos importadores son esa criatura y el barril.",
+      "date": "2026-09-05"
+    },
+    {
+      "id": "src/visual/creatures/faunaRubberhose.registry.js",
+      "reason": "Registro slug→componente de la fauna benéfica rubber-hose (binomio verificado por ficha). Su propio encabezado dice «lo cablea Opus» — pendiente de ese cableado consciente; hoy sin un solo importador.",
+      "date": "2026-09-05"
+    },
+    {
+      "id": "src/visual/creatures/luciernagaTintaIdentidad.js",
+      "reason": "Identidad de LuciernagaTinta: la importan LuciernagaTinta.jsx y el barril (criatura sin montar, declarada aquí).",
+      "date": "2026-09-05"
+    },
+    {
+      "id": "src/visual/creatures/osoAnteojosIdentidad.js",
+      "reason": "Identidad de OsoAnteojos: la importan OsoAnteojos.jsx y el barril (criatura sin montar, declarada aquí).",
+      "date": "2026-09-05"
+    },
+    {
+      "id": "src/visual/creatures/useEntGuion.js",
+      "reason": "Guion de la voz que enseña del Ent del páramo: solo lo alcanza el barril creatures/index.js. Se cablea junto con la criatura Ent que lo consuma (misma decisión de producto del elenco).",
+      "date": "2026-09-05"
+    },
+    {
+      "id": "src/visual/laminas/botanicas/index.js",
+      "reason": "Barril raíz del sistema de láminas botánicas sin un solo importador: sus piezas (LaminaBotanica.jsx y pintores, declarados 2026-08-30) se importan directo. Se cablea junto con el sistema (decisión de producto de la tanda 1).",
+      "date": "2026-09-05"
+    },
+    {
+      "id": "src/visual/laminas/botanicas/geometria/flor.js",
+      "reason": "Apoyo de organos.jsx y del barril botanicas/index.js (piezas del sistema de láminas botánicas declarado sin montar el 2026-08-30). Se declara junto con su sistema.",
+      "date": "2026-09-05"
+    },
+    {
+      "id": "src/visual/laminas/botanicas/geometria/fruto.js",
+      "reason": "Apoyo de organos.jsx y del barril botanicas/index.js (sistema sin montar, 2026-08-30). Se declara junto con su sistema.",
+      "date": "2026-09-05"
+    },
+    {
+      "id": "src/visual/laminas/botanicas/geometria/habito.js",
+      "reason": "Apoyo de PintaHabito.jsx y del barril botanicas/index.js (sistema sin montar, 2026-08-30). Se declara junto con su sistema.",
+      "date": "2026-09-05"
+    },
+    {
+      "id": "src/visual/laminas/botanicas/geometria/hoja.js",
+      "reason": "Apoyo de PintaHabito.jsx y del barril botanicas/index.js (sistema sin montar, 2026-08-30). Se declara junto con su sistema.",
+      "date": "2026-09-05"
+    },
+    {
+      "id": "src/visual/laminas/botanicas/geometria/raiz.js",
+      "reason": "Apoyo de LaminaBotanica.jsx y del barril botanicas/index.js (sistema sin montar, 2026-08-30). Se declara junto con su sistema.",
+      "date": "2026-09-05"
+    },
+    {
+      "id": "src/visual/laminas/botanicas/geometria/sintoma.js",
+      "reason": "Apoyo de organos.jsx y del barril botanicas/index.js (sistema sin montar, 2026-08-30). Se declara junto con su sistema.",
+      "date": "2026-09-05"
+    },
+    {
+      "id": "src/visual/laminas/botanicas/especies/index.js",
+      "reason": "Barril de fichas por piso térmico del sistema de láminas botánicas (sin montar, 2026-08-30): su único importador es el barril raíz botanicas/index.js (declarado aquí).",
+      "date": "2026-09-05"
+    },
+    {
+      "id": "src/visual/laminas/botanicas/especies/pisoCalido.js",
+      "reason": "Ficha de lámina botánica del piso cálido: solo la importan el barril especies/index.js (declarado aquí), dentro del sistema sin montar (2026-08-30).",
+      "date": "2026-09-05"
+    },
+    {
+      "id": "src/visual/laminas/botanicas/especies/pisoFrio.js",
+      "reason": "Ficha de lámina botánica del piso frío: solo la importan el barril especies/index.js (declarado aquí), dentro del sistema sin montar (2026-08-30).",
+      "date": "2026-09-05"
+    },
+    {
+      "id": "src/visual/laminas/botanicas/especies/pisoTemplado.js",
+      "reason": "Ficha de lámina botánica del piso templado: solo la importan el barril especies/index.js (declarado aquí), dentro del sistema sin montar (2026-08-30).",
+      "date": "2026-09-05"
+    },
+    {
+      "id": "src/visual/laminas/botanicas/nucleo/paletaLamina.js",
+      "reason": "Núcleo de paleta del sistema de láminas botánicas (sin montar, 2026-08-30): la importan LaminaBotanica.jsx y geometria/sintoma.js, todos dentro del cluster declarado.",
+      "date": "2026-09-05"
+    },
+    {
+      "id": "src/visual/laminas/botanicas/nucleo/rng.js",
+      "reason": "Núcleo de azar determinista del sistema de láminas botánicas (sin montar, 2026-08-30): lo importan LaminaBotanica.jsx y geometria/flor.js, dentro del cluster declarado.",
+      "date": "2026-09-05"
+    },
+    {
+      "id": "src/visual/laminas/botanicas/nucleo/trama.js",
+      "reason": "Núcleo de trama del sistema de láminas botánicas (sin montar, 2026-08-30): lo importan LaminaBotanica.jsx y geometria/fruto.js, dentro del cluster declarado.",
+      "date": "2026-09-05"
+    },
+    {
+      "id": "src/visual/laminas/botanicas/nucleo/trazo.js",
+      "reason": "Núcleo de trazo del sistema de láminas botánicas (sin montar, 2026-08-30): lo importan LaminaBotanica.jsx y geometria/flor.js, dentro del cluster declarado.",
+      "date": "2026-09-05"
+    },
+    {
+      "id": "src/utils/atajosTeclado.js",
+      "reason": "Atajos de teclado para power users (modal ?): sin un solo importador. Cablearlo implica decidir el set de atajos por pantalla — mejora sin dueño de ruta, se declara hasta que se adopte.",
+      "date": "2026-09-05"
+    },
+    {
+      "id": "src/utils/auditLog.js",
+      "reason": "Log circular de SISTEMA para debugging del operador (su encabezado aclara: no es telemetría de usuario): sin importador. Se declara hasta decidir dónde se consulta el log (consola/pantalla de operador).",
+      "date": "2026-09-05"
+    },
+    {
+      "id": "src/utils/backoff.js",
+      "reason": "T42, backoff exponencial con jitter para reintentos de sync: su encabezado dice «usado por syncManager», pero verificado con el control de importadores del remate (2026-09-05) ningún módulo vivo lo importa. Adoptarlo cambia la política de reintentos — decisión por endpoint, no un import.",
+      "date": "2026-09-05"
+    },
+    {
+      "id": "src/utils/validacionFormularios.js",
+      "reason": "T43, validación de formularios en tiempo real: sin importador. Su adopción es pantalla por pantalla; se declara mientras tanto.",
+      "date": "2026-09-05"
+    },
+    {
+      "id": "src/utils/wcagContraste.js",
+      "reason": "Utilidad de contraste WCAG: solo su test la importa. Se declara hasta que el pulido de accesibilidad la adopte en componentes vivos.",
+      "date": "2026-09-05"
+    },
+    {
+      "id": "src/data/fenologySpecies.js",
+      "reason": "Datos fenológicos de fenologyRecommendations.js (motor declarado 2026-09-04): su único importador. Se declara junto a su motor hasta que una pantalla de siembra pida pronóstico. (Sus hermanos aguaFinca/cacaoFinca/mangoFinca ya NO se declaran: el fix del tope {0,400} del motor del 2026-09-05 los alcanza vía AguaScreen/CacaoScreen/MangoScreen, que están MONTADAS.)",
+      "date": "2026-09-05"
+    },
+    {
+      "id": "src/visual/diferencial/formasBicho.js",
+      "reason": "Apoyo de LaminaDuda.jsx y del barril diferencial/index.js (láminas del módulo diferencial declaradas sin montar el 2026-08-30).",
+      "date": "2026-09-05"
+    },
+    {
+      "id": "src/visual/diferencial/formasHoja.js",
+      "reason": "Apoyo de LaminaDiferencial.jsx y LaminaDuda.jsx (declaradas sin montar el 2026-08-30).",
+      "date": "2026-09-05"
+    },
+    {
+      "id": "src/visual/diferencial/index.js",
+      "reason": "Barril del módulo diferencial sin un solo importador: sus láminas (declaradas 2026-08-30) se importan directo entre sí.",
+      "date": "2026-09-05"
+    },
+    {
+      "id": "src/visual/diferencial/paletaDano.js",
+      "reason": "Apoyo de LaminaDiferencial.jsx y LaminaDuda.jsx (declaradas sin montar el 2026-08-30).",
+      "date": "2026-09-05"
+    },
+    {
+      "id": "src/store/persistMiddleware.js",
+      "reason": "T47, middleware Zustand→localStorage: ningún store vivo lo usa. Adoptarlo toca la persistencia de preferencias — decisión coordinada (misma cola que fincaScope.js, declarado 2026-09-04).",
+      "date": "2026-09-05"
+    },
+    {
+      "id": "src/store/useLoteStore.js",
+      "reason": "Store de lotes: lo importan LoteCroquisPlaceholder.jsx (declarado aquí) y useRecorridoStore.js (también declarado). Ninguna ruta viva lo alcanza; se declara junto a su cluster.",
+      "date": "2026-09-05"
+    },
+    {
+      "id": "src/store/useRecorridoStore.js",
+      "reason": "Store del recorrido por voz (#2152): lo importa useRecorridoVoz.js (declarado aquí) y su servicio recorridoService.js ya está declarado (2026-09-04). El cluster del recorrido queda declarado completo hasta decidir su montaje.",
+      "date": "2026-09-05"
+    },
+    {
+      "id": "src/visual/cuaderno/cuadernoData.js",
+      "reason": "Apoyo de CuadernoVivo.jsx y PaginaCuaderno.jsx (módulo cuaderno declarado sin montar el 2026-08-30).",
+      "date": "2026-09-05"
+    },
+    {
+      "id": "src/visual/cuaderno/cuadernoTokens.js",
+      "reason": "Apoyo de LaPaciencia.jsx y PaginaCuaderno.jsx (módulo cuaderno declarado sin montar el 2026-08-30).",
+      "date": "2026-09-05"
+    },
+    {
+      "id": "src/visual/cuaderno/index.js",
+      "reason": "Barril del módulo cuaderno sin un solo importador: sus componentes (declarados 2026-08-30) se importan directo entre sí.",
+      "date": "2026-09-05"
+    },
+    {
+      "id": "src/compai/nucleo/gestos.js",
+      "reason": "Gestos táctiles del compai: solo lo importan sus tests (gestos.test.js, zariguyaGestos.test.js). La actuación compai de producto no los pide todavía; se declara hasta que la capa de gesto se adopte.",
+      "date": "2026-09-05"
+    },
+    {
+      "id": "src/compai/nucleo/zariguyaGestos.js",
+      "reason": "Gestos específicos de la zarigüeya: solo su test lo importa. Mismo caso que gestos.js.",
+      "date": "2026-09-05"
+    },
+    {
+      "id": "src/components/AgentScreen/index.js",
+      "reason": "Barril de AgentScreen sin un solo importador: AgentScreen.jsx se importa directo desde App.jsx. Candidato a borrado (curaduría del operador).",
+      "date": "2026-09-05"
+    },
+    {
+      "id": "src/components/AgentScreen/photoAnalysis.js",
+      "reason": "Armado del mensaje de análisis de foto (FEAT-2, #291): solo su test lo importa; el flujo vivo de foto del agente no pasa por este módulo hoy. Se declara hasta decidir si se adopta o se retira.",
+      "date": "2026-09-05"
+    },
+    {
+      "id": "src/services/crypto/didKeyService.js",
+      "reason": "Identidad did:key de la Fase 2 de federación (ADR-036): su único importador es ucanService.js (declarado aquí). Sin flujo vivo que cree identidades; se declara junto a la fase de federación.",
+      "date": "2026-09-05"
+    },
+    {
+      "id": "src/services/crypto/ucanService.js",
+      "reason": "Delegación UCAN (Fase 2, ADR-036, DISENO-FEDERACION-USUARIOS.md §5.2/§6.6): sin un solo importador. Cablearlo sin la fase de federación sería firma de capabilities sin emisor ni verificador; se declara hasta esa fase.",
+      "date": "2026-09-05"
+    },
+    {
+      "id": "src/visual/confianza/confianzaTokens.js",
+      "reason": "Tokens del módulo confianza (experimento anti-alucinación declarado sin montar el 2026-08-30): lo importan AdvertenciaPeso.jsx y FichaFuente.jsx, dentro del cluster declarado.",
+      "date": "2026-09-05"
+    },
+    {
+      "id": "src/visual/confianza/index.js",
+      "reason": "Barril del módulo confianza sin un solo importador: sus componentes (declarados 2026-08-30) se importan directo entre sí.",
+      "date": "2026-09-05"
+    },
+    {
+      "id": "src/visual/creatures/chivitoLamina/anatomia.js",
+      "reason": "Apoyo de ChivitoPunkLaminaViva.jsx (lámina fuera del montaje activo, declarada 2026-09-03 como compatibilidad histórica) y del capas hermano. Mismo patrón: queda en disco por historia; su borrado es curaduría del operador.",
+      "date": "2026-09-05"
+    },
+    {
+      "id": "src/visual/creatures/chivitoLamina/capas.js",
+      "reason": "Apoyo de ChivitoPunkLaminaViva.jsx (declarada 2026-09-03). Queda en disco por historia; borrado = curaduría del operador.",
+      "date": "2026-09-05"
+    },
+    {
+      "id": "src/visual/creatures/jaguarLamina/anatomia.js",
+      "reason": "Apoyo de JaguarLaminaViva.jsx (huérfana gated 2026-08-30) y del capas hermano. Se declara junto a su lámina.",
+      "date": "2026-09-05"
+    },
+    {
+      "id": "src/visual/creatures/jaguarLamina/capas.js",
+      "reason": "Apoyo de JaguarLaminaViva.jsx (huérfana gated 2026-08-30). Se declara junto a su lámina.",
+      "date": "2026-09-05"
+    },
+    {
+      "id": "src/visual/creatures/luciernagaLamina/anatomia.js",
+      "reason": "Apoyo de LuciernagaLaminaViva.jsx (declarada 2026-09-03 como compatibilidad histórica) y del capas hermano.",
+      "date": "2026-09-05"
+    },
+    {
+      "id": "src/visual/creatures/luciernagaLamina/capas.js",
+      "reason": "Apoyo de LuciernagaLaminaViva.jsx (declarada 2026-09-03).",
+      "date": "2026-09-05"
+    },
+    {
+      "id": "src/visual/creatures/zariguyaLamina/anatomia.js",
+      "reason": "Apoyo de ZariguyaLaminaViva.jsx (huérfana gated 2026-08-30; ZariguyaGeminiLaminaViva es la viva) y del capas hermano.",
+      "date": "2026-09-05"
+    },
+    {
+      "id": "src/visual/creatures/zariguyaLamina/capas.js",
+      "reason": "Apoyo de ZariguyaLaminaViva.jsx (huérfana gated 2026-08-30).",
+      "date": "2026-09-05"
+    },
+    {
+      "id": "src/components/juego/index.js",
+      "reason": "Barril del módulo juego sin un solo importador: los juegos vivos se importan directo desde App.jsx. Candidato a borrado (curaduría del operador).",
+      "date": "2026-09-05"
+    },
+    {
+      "id": "src/components/loginAngelitaMensajes.js",
+      "reason": "Copy de la coreografía del login: su propio encabezado lo declara pendiente — «el operador define la voz de las cuatro invitaciones, por eso no se rellenan con tono inventado». Sin importador hasta que esa voz se escriba: es un pendiente explícito del operador, no un olvido.",
+      "date": "2026-09-05"
+    },
+    {
+      "id": "src/data/aprendizaje/guias-demo.js",
+      "reason": "Datos demo de GuiaEspecieCards.jsx (declarada aquí): su único importador. Se declara junto a su componente; su propio encabezado dice «integrar con fuente real (catálogo v3.1+)».",
+      "date": "2026-09-05"
+    },
+    {
+      "id": "src/data/juegos/vocabularioAgroecologico.js",
+      "reason": "Dataset de vocabulario agroecológico para un juego sin consumidor: ningún juego vivo lo pide (los juegos vivos traen sus datos por otra vía). Se declara hasta que el juego de vocabulario exista.",
+      "date": "2026-09-05"
+    },
+    {
+      "id": "src/visual/agente/compaiEstadoVisual.js",
+      "reason": "Contrato visual común de estados del compai: solo su test lo importa. La actuación viva va por los adaptadores del elenco; unificar el contrato es refactor transversal sin dueño hoy.",
+      "date": "2026-09-05"
+    },
+    {
+      "id": "src/visual/creatures/jaguarHuesos/pielHuesos.js",
+      "reason": "Apoyo de JaguarHuesos.jsx (criatura especial declarada sin montar el 2026-08-30): su único importador. Se cablea junto con su criatura.",
+      "date": "2026-09-05"
+    },
+    {
+      "id": "src/visual/creatures/jaguarTrazado/generar-calco.mjs",
+      "reason": "HERRAMIENTA CLI, no módulo runtime: se corre «node generar-calco.mjs <svg>» para hornear calcoTrazado.js (cuyo output SÍ vive en el jaguar de producto). El gate mide consumo runtime de src/, una CLI no participa de esa semántica — falso positivo por categoría. NO borrar: regenera el calco (pipeline documentado en su encabezado).",
+      "date": "2026-09-05"
+    },
+    {
+      "id": "src/visual/creatures/zariguyaTrazado/generar-calco.mjs",
+      "reason": "HERRAMIENTA CLI, no módulo runtime: hornea calcoTrazado.js de la zarigüeya (output vivo en producto). Falso positivo por categoría (el gate mide consumo runtime); NO borrar: regenera el calco.",
+      "date": "2026-09-05"
+    },
+    {
+      "id": "src/visual/creatures/rigged/index.js",
+      "reason": "Barril del módulo rigged sin un solo importador: nadie lo pide en producto, vitrina ni test. Candidato a borrado (curaduría del operador).",
+      "date": "2026-09-05"
+    },
+    {
+      "id": "src/visual/icons/index.js",
+      "reason": "Barril de iconos ilustrados: su único importador es GuiaEspecieCards.jsx (declarada aquí). Se declara junto a su consumidor.",
+      "date": "2026-09-05"
     }
   ]
 }
