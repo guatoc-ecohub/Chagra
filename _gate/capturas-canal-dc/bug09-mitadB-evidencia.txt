@@ -1,0 +1,227 @@
+=== ENTRADA 1 (antes de entrar) ===
+{
+  "hash": "#login",
+  "flags": {},
+  "seen": false,
+  "decision": "onboarding-perfil"
+}
+=== ENTRADA 1 (onboarding visible) ===
+{
+  "hash": "#login",
+  "flags": {
+    "chagra:active_tenant_id": "e2e-operator"
+  },
+  "seen": false,
+  "decision": "onboarding-perfil"
+}
+=== ENTRADA 1 (tras "Saltar todo" → dashboard) ===
+{
+  "hash": "#login",
+  "flags": {
+    "chagra:profile:skipped:v1:e2e-operator": "1",
+    "chagra:active_tenant_id": "e2e-operator"
+  },
+  "seen": true,
+  "decision": "dashboard"
+}
+=== ENTRADA 2a (reabrir con sesión viva → dashboard) ===
+{
+  "hash": "",
+  "flags": {
+    "chagra:profile:skipped:v1:e2e-operator": "1",
+    "chagra:active_tenant_id": "e2e-operator"
+  },
+  "seen": true,
+  "decision": "dashboard"
+}
+=== ENTRADA 2b (logout + re-login → dashboard) ===
+{
+  "hash": "#login",
+  "flags": {
+    "chagra:profile:skipped:v1:e2e-operator": "1",
+    "chagra:active_tenant_id": "e2e-operator"
+  },
+  "seen": true,
+  "decision": "dashboard"
+}
+=== peticiones farmOS bloqueadas por el mock ===
+POST http://localhost:5173/api/ollama/api/generate
+GET http://localhost:5173/api/file/file?filter[filename][operator]=CONTAINS&filter[filename][value]=chagra-operator-photo-e2e-operator-&sort=-created&page[limit]=1
+POST http://localhost:5173/api/kokoro/tts
+POST http://localhost:5173/api/ollama/v1/chat/completions
+POST http://localhost:5173/api/kokoro/tts
+POST http://localhost:5173/api/kokoro/tts
+GET http://localhost:5173/api/log/activity?include=quantity&filter[date_range][condition][path]=timestamp&filter[date_range][condition][operator]=BETWEEN&filter[date_range][condition][value][0]=1787988561&filter[date_range][condition][value][1]=1789198161&filter[uid.name]=e2e-operator
+GET http://localhost:5173/api/log/activity?include=quantity&filter[date_range][condition][path]=timestamp&filter[date_range][condition][operator]=BETWEEN&filter[date_range][condition][value][0]=1787988561&filter[date_range][condition][value][1]=1789198161&filter[uid.name]=e2e-operator
+GET http://localhost:5173/api/asset/plant?sort=-created,id&page[limit]=500&page[offset]=0&filter[uid.name]=e2e-operator
+GET http://localhost:5173/api/asset/plant?sort=-created,id&page[limit]=500&page[offset]=0&filter[uid.name]=e2e-operator
+GET http://localhost:5173/api/log/seeding?include=quantity&filter[recent][condition][path]=timestamp&filter[recent][condition][operator]=%3E&filter[recent][condition][value]=1786001362&filter[uid.name]=e2e-operator
+GET http://localhost:5173/api/log/seeding?include=quantity&filter[recent][condition][path]=timestamp&filter[recent][condition][operator]=%3E&filter[recent][condition][value]=1786001362&filter[uid.name]=e2e-operator
+GET http://localhost:5173/api/log/harvest?include=quantity&filter[recent][condition][path]=timestamp&filter[recent][condition][operator]=%3E&filter[recent][condition][value]=1786001362&filter[uid.name]=e2e-operator
+GET http://localhost:5173/api/log/input?include=quantity&filter[recent][condition][path]=timestamp&filter[recent][condition][operator]=%3E&filter[recent][condition][value]=1786001362&filter[uid.name]=e2e-operator
+GET http://localhost:5173/api/log/activity?include=quantity&filter[recent][condition][path]=timestamp&filter[recent][condition][operator]=%3E&filter[recent][condition][value]=1786001362&filter[uid.name]=e2e-operator
+GET http://localhost:5173/api/log/observation?include=quantity&filter[recent][condition][path]=timestamp&filter[recent][condition][operator]=%3E&filter[recent][condition][value]=1786001362&filter[uid.name]=e2e-operator
+GET http://localhost:5173/api/log/seeding?include=quantity&filter[recent][condition][path]=timestamp&filter[recent][condition][operator]=%3E&filter[recent][condition][value]=1786001363&filter[uid.name]=e2e-operator
+GET http://localhost:5173/api/log/seeding?include=quantity&filter[recent][condition][path]=timestamp&filter[recent][condition][operator]=%3E&filter[recent][condition][value]=1786001363&filter[uid.name]=e2e-operator
+GET http://localhost:5173/api/log/harvest?include=quantity&filter[recent][condition][path]=timestamp&filter[recent][condition][operator]=%3E&filter[recent][condition][value]=1786001363&filter[uid.name]=e2e-operator
+GET http://localhost:5173/api/log/input?include=quantity&filter[recent][condition][path]=timestamp&filter[recent][condition][operator]=%3E&filter[recent][condition][value]=1786001363&filter[uid.name]=e2e-operator
+GET http://localhost:5173/api/log/activity?include=quantity&filter[recent][condition][path]=timestamp&filter[recent][condition][operator]=%3E&filter[recent][condition][value]=1786001363&filter[uid.name]=e2e-operator
+GET http://localhost:5173/api/log/observation?include=quantity&filter[recent][condition][path]=timestamp&filter[recent][condition][operator]=%3E&filter[recent][condition][value]=1786001363&filter[uid.name]=e2e-operator
+POST http://localhost:5173/api/ollama/api/generate
+GET http://localhost:5173/api/log/activity?include=quantity&filter[date_range][condition][path]=timestamp&filter[date_range][condition][operator]=BETWEEN&filter[date_range][condition][value][0]=1787988564&filter[date_range][condition][value][1]=1789198164&filter[uid.name]=e2e-operator
+GET http://localhost:5173/api/log/activity?include=quantity&filter[date_range][condition][path]=timestamp&filter[date_range][condition][operator]=BETWEEN&filter[date_range][condition][value][0]=1787988564&filter[date_range][condition][value][1]=1789198164&filter[uid.name]=e2e-operator
+GET http://localhost:5173/api/asset/plant?sort=-created,id&page[limit]=500&page[offset]=0&filter[uid.name]=e2e-operator
+GET http://localhost:5173/api/asset/plant?sort=-created,id&page[limit]=500&page[offset]=0&filter[uid.name]=e2e-operator
+POST http://localhost:5173/api/ollama/api/generate
+GET http://localhost:5173/api/file/file?filter[filename][operator]=CONTAINS&filter[filename][value]=chagra-operator-photo-e2e-operator-&sort=-created&page[limit]=1
+GET http://localhost:5173/api/log/activity?include=quantity&filter[date_range][condition][path]=timestamp&filter[date_range][condition][operator]=BETWEEN&filter[date_range][condition][value][0]=1787988568&filter[date_range][condition][value][1]=1789198168&filter[uid.name]=e2e-operator
+GET http://localhost:5173/api/log/activity?include=quantity&filter[date_range][condition][path]=timestamp&filter[date_range][condition][operator]=BETWEEN&filter[date_range][condition][value][0]=1787988568&filter[date_range][condition][value][1]=1789198168&filter[uid.name]=e2e-operator
+GET http://localhost:5173/api/asset/plant?sort=-created,id&page[limit]=500&page[offset]=0&filter[uid.name]=e2e-operator
+GET http://localhost:5173/api/asset/plant?sort=-created,id&page[limit]=500&page[offset]=0&filter[uid.name]=e2e-operator
+=== errores de consola ===
+console.error: Failed to load resource: net::ERR_FAILED
+console.error: Failed to load resource: net::ERR_FAILED
+console.error: In HTML, %s cannot be a descendant of <%s>.
+This will cause a hydration error.%s <button> button 
+
+  ...
+    <ModoCampoProvider>
+      <App>
+        <Suspense>
+        <NetworkStatusBar>
+        <NetworkStatusBar>
+        <Suspense>
+        <Confetti>
+        <GpsFincaBanner>
+        <DataLossBanner>
+        <CriticalAlertBanner>
+        <Suspense fallback={<LoadingFallback>}>
+          <div className="anim-scree...">
+            <ErrorBoundary>
+              <OnboardingCondensado onComplete={function onComplete} onClose={function onClose} ...>
+                <div className="min-h-[100...">
+                  <div>
+                  <div className="flex-1 w-f...">
+                    <div>
+                    <label>
+                    <div>
+                    <div data-testid="onb2-avatar">
+                      <p>
+                      <AgentAvatarSelector>
+                        <div className="bg-slate-9...">
+                          <div>
+                          <div className="grid grid-...">
+>                           <button
+>                             type="button"
+>                             onClick={function onClick}
+>                             aria-pressed={true}
+>                             className="relative flex flex-col items-center gap-1.5 px-1.5 py-3 rounded-xl border-2 t..."
+>                           >
+                              <span>
+                              <ChagraAgentAvatarAngelita state="thinking" size={64} ...>
+>                               <button
+>                                 type="button"
+>                                 onClick={undefined}
+>                                 onDoubleClick={function onDoubleClick}
+>                                 aria-label="Angelita, la abeja"
+>                                 title="Angelita, la abeja"
+>                                 style={{background:"none",border:"none",padding:0,cursor:"pointer",lineHeight:0}}
+>                                 onPointerEnter={function}
+>                                 onPointerDown={function}
+>                                 onTouchStart={function}
+>                               >
+                              ...
+                            ...
+                    ...
+                    ...
+                  ...
+        ...
+
+console.error: <%s> cannot contain a nested %s.
+See this log for the ancestor stack trace. button <button>
+console.error: React does not recognize the `%s` prop on a DOM element. If you intentionally want it to appear in the DOM as a custom attribute, spell it as lowercase `%s` instead. If you accidentally passed it from a parent component, remove it from the DOM element. data-agt-capacidad-respiraOrgano data-agt-capacidad-respiraorgano
+console.error: Failed to load resource: net::ERR_FAILED
+console.error: Failed to load resource: net::ERR_FAILED
+console.error: Failed to load resource: net::ERR_FAILED
+console.error: Failed to load resource: net::ERR_FAILED
+console.error: Failed to load resource: net::ERR_FAILED
+console.error: Error obteniendo tareas de FarmOS: TypeError: Failed to fetch
+    at fetchWithTimeout (http://localhost:5173/src/services/apiService.js:29:37)
+    at fetchFromFarmOS (http://localhost:5173/src/services/apiService.js:255:26)
+    at async SyncManager.fetchPendingTasksFromFarmOS (http://localhost:5173/src/services/syncManager.js:762:21)
+    at async fetchTasks (http://localhost:5173/src/components/PendingTasksWidget.jsx:53:25)
+console.error: Failed to load resource: net::ERR_FAILED
+console.error: Error obteniendo tareas de FarmOS: TypeError: Failed to fetch
+    at fetchWithTimeout (http://localhost:5173/src/services/apiService.js:29:37)
+    at fetchFromFarmOS (http://localhost:5173/src/services/apiService.js:255:26)
+    at async SyncManager.fetchPendingTasksFromFarmOS (http://localhost:5173/src/services/syncManager.js:762:21)
+    at async fetchTasks (http://localhost:5173/src/components/PendingTasksWidget.jsx:53:25)
+console.error: Failed to load resource: net::ERR_FAILED
+console.error: Error sincronizando activos: TypeError: Failed to fetch
+    at fetchWithTimeout (http://localhost:5173/src/services/apiService.js:29:37)
+    at fetchFromFarmOS (http://localhost:5173/src/services/apiService.js:255:26)
+    at async syncFromServer (http://localhost:5173/src/store/useAssetStore.js:156:18)
+console.error: Failed to load resource: net::ERR_FAILED
+console.error: Error sincronizando activos: TypeError: Failed to fetch
+    at fetchWithTimeout (http://localhost:5173/src/services/apiService.js:29:37)
+    at fetchFromFarmOS (http://localhost:5173/src/services/apiService.js:255:26)
+    at async syncFromServer (http://localhost:5173/src/store/useAssetStore.js:156:18)
+console.error: Failed to load resource: net::ERR_FAILED
+console.error: Failed to load resource: net::ERR_FAILED
+console.error: Failed to load resource: net::ERR_FAILED
+console.error: Failed to load resource: net::ERR_FAILED
+console.error: Failed to load resource: net::ERR_FAILED
+console.error: Failed to load resource: net::ERR_FAILED
+console.error: Failed to load resource: net::ERR_FAILED
+console.error: Failed to load resource: net::ERR_FAILED
+console.error: Failed to load resource: net::ERR_FAILED
+console.error: Failed to load resource: net::ERR_FAILED
+console.error: Failed to load resource: net::ERR_FAILED
+console.error: Failed to load resource: net::ERR_FAILED
+console.error: Failed to load resource: net::ERR_FAILED
+console.error: Failed to load resource: net::ERR_FAILED
+console.error: Error obteniendo tareas de FarmOS: TypeError: Failed to fetch
+    at fetchWithTimeout (http://localhost:5173/src/services/apiService.js:29:37)
+    at fetchFromFarmOS (http://localhost:5173/src/services/apiService.js:255:26)
+    at async SyncManager.fetchPendingTasksFromFarmOS (http://localhost:5173/src/services/syncManager.js:762:21)
+    at async fetchTasks (http://localhost:5173/src/components/PendingTasksWidget.jsx:53:25)
+console.error: Failed to load resource: net::ERR_FAILED
+console.error: Error obteniendo tareas de FarmOS: TypeError: Failed to fetch
+    at fetchWithTimeout (http://localhost:5173/src/services/apiService.js:29:37)
+    at fetchFromFarmOS (http://localhost:5173/src/services/apiService.js:255:26)
+    at async SyncManager.fetchPendingTasksFromFarmOS (http://localhost:5173/src/services/syncManager.js:762:21)
+    at async fetchTasks (http://localhost:5173/src/components/PendingTasksWidget.jsx:53:25)
+console.error: Failed to load resource: net::ERR_FAILED
+console.error: Error sincronizando activos: TypeError: Failed to fetch
+    at fetchWithTimeout (http://localhost:5173/src/services/apiService.js:29:37)
+    at fetchFromFarmOS (http://localhost:5173/src/services/apiService.js:255:26)
+    at async syncFromServer (http://localhost:5173/src/store/useAssetStore.js:156:18)
+console.error: Failed to load resource: net::ERR_FAILED
+console.error: Error sincronizando activos: TypeError: Failed to fetch
+    at fetchWithTimeout (http://localhost:5173/src/services/apiService.js:29:37)
+    at fetchFromFarmOS (http://localhost:5173/src/services/apiService.js:255:26)
+    at async syncFromServer (http://localhost:5173/src/store/useAssetStore.js:156:18)
+console.error: Failed to load resource: net::ERR_FAILED
+console.error: Failed to load resource: net::ERR_FAILED
+console.error: Failed to load resource: net::ERR_FAILED
+console.error: Error obteniendo tareas de FarmOS: TypeError: Failed to fetch
+    at fetchWithTimeout (http://localhost:5173/src/services/apiService.js:29:37)
+    at fetchFromFarmOS (http://localhost:5173/src/services/apiService.js:255:26)
+    at async SyncManager.fetchPendingTasksFromFarmOS (http://localhost:5173/src/services/syncManager.js:762:21)
+    at async fetchTasks (http://localhost:5173/src/components/PendingTasksWidget.jsx:53:25)
+console.error: Failed to load resource: net::ERR_FAILED
+console.error: Error obteniendo tareas de FarmOS: TypeError: Failed to fetch
+    at fetchWithTimeout (http://localhost:5173/src/services/apiService.js:29:37)
+    at fetchFromFarmOS (http://localhost:5173/src/services/apiService.js:255:26)
+    at async SyncManager.fetchPendingTasksFromFarmOS (http://localhost:5173/src/services/syncManager.js:762:21)
+    at async fetchTasks (http://localhost:5173/src/components/PendingTasksWidget.jsx:53:25)
+console.error: Failed to load resource: net::ERR_FAILED
+console.error: Error sincronizando activos: TypeError: Failed to fetch
+    at fetchWithTimeout (http://localhost:5173/src/services/apiService.js:29:37)
+    at fetchFromFarmOS (http://localhost:5173/src/services/apiService.js:255:26)
+    at async syncFromServer (http://localhost:5173/src/store/useAssetStore.js:156:18)
+console.error: Failed to load resource: net::ERR_FAILED
+console.error: Error sincronizando activos: TypeError: Failed to fetch
+    at fetchWithTimeout (http://localhost:5173/src/services/apiService.js:29:37)
+    at fetchFromFarmOS (http://localhost:5173/src/services/apiService.js:255:26)
+    at async syncFromServer (http://localhost:5173/src/store/useAssetStore.js:156:18)
