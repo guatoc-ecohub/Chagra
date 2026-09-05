@@ -226,26 +226,6 @@
       "date": "2026-08-30"
     },
     {
-      "id": "src/visual/creatures/JaguarLaminaViva.jsx",
-      "reason": "Criatura especial (jaguar en lámina viva) que nunca se cableó. Versión del jaguar para láminas educativas/infografías. Parece ser parte de un sistema de láminas que no se terminó.",
-      "date": "2026-08-30"
-    },
-    {
-      "id": "src/visual/creatures/ZariguyaLaminaViva.jsx",
-      "reason": "Criatura especial (zariguya en lámina viva) que nunca se cableó. Versión de la zariguya para láminas educativas. Parte del sistema de láminas inconcluso.",
-      "date": "2026-08-30"
-    },
-    {
-      "id": "src/visual/creatures/ChivitoPunkLaminaViva.jsx",
-      "reason": "La lámina viva del chivito de páramo (PNG recortada en capas por alfa) SÍ se cableó al registro CREATURES como 'chivito-punk' el 2026-08-18 (commit 306209569). El 2026-08-31 la tinta a mano trazada con la receta del jaguar (ChivitoTrazado, bases aprobadas por el operador, PR #3079) la reemplazó en el registro y en los adaptadores del elenco, y su import salió del barrel: el propio comentario de index.js la declara 'compatibilidad histórica fuera del montaje activo'. Queda en disco por historia, mismo patrón que JaguarLaminaViva/ZariguyaLaminaViva (huérfanas gated el 2026-08-30). No se recablea (revertiría la decisión certificada en _gate/INFORME-tinta-chivito-luciernaga-dev.md) ni se borra en este PR (el borrado de láminas reemplazadas es curaduría aparte del operador). Detectada por este audit — causante (con su hermana LuciernagaLaminaViva) del rojo del gate sobre dev desde el 2026-08-31.",
-      "date": "2026-09-03"
-    },
-    {
-      "id": "src/visual/creatures/LuciernagaLaminaViva.jsx",
-      "reason": "Mismo caso que ChivitoPunkLaminaViva: la lámina viva de la luciérnaga (PNG recortada en capas por alfa) se cableó al registro CREATURES el 2026-08-18 (commit 306209569, slug 'luciernaga') y el 2026-08-31 la tinta trazada LuciernagaTrazado (PR #3079, receta jaguar aprobada por el operador) la reemplazó en el registro, en el avatar y en el selector; su import salió del barrel y el archivo quedó como compatibilidad histórica en disco (comentario de index.js). Sin consumidor real verificado con grep en todo src/ (ni producto ni test). No se recablea ni se borra en este PR — mismas razones que su hermana. Detectada por este audit — causante (con ChivitoPunkLaminaViva) del rojo del gate sobre dev desde el 2026-08-31.",
-      "date": "2026-09-03"
-    },
-    {
       "id": "src/visual/cuaderno/CuadernoVivo.jsx",
       "reason": "Componente principal del módulo cuaderno (cuaderno campesino vivo). El módulo cuaderno (5 componentes) parece ser un experimento de interfaz tipo cuaderno de campo que nunca se cableó. La descripción menciona un cuaderno que se abre y respira pero nunca se encontró el lugar de montaje.",
       "date": "2026-08-30"
@@ -478,6 +458,51 @@
     {
       "id": "src/visual/mundo3d/sierra/vendor/godRaysSylva.js",
       "reason": "Vendorizado por el arnés de medición móvil del descenso (#3103, 2026-09-03) para que la banda 4 use los MISMOS rayos de dosel del valle; su byte-a-byte lo fija fxSylva.vendor.test.js. No tiene consumidor de producto: EscenaDescensoSierra.jsx no monta un pase de god rays — FX_POR_BANDA lo lista para páramo/frío pero la escena, mirada en el gate, deja los haces de bruma en 0 por un defecto visto (franjas de borde recto cruzando el cielo sin dosel que las recorte; comentario en la propia escena) y el pase de rayos exige un sol EN CUADRO (en el valle se apaga sin fuente fingida desde 2026-09-04). Declarado por el audit ampliado (454 → 1593 sujetos, 2026-09-03). Decisión pendiente de dirección: rayos solo en el hero shot de la banda 4 a contraluz (contrato §3.2). Al cablear, borrar esta entrada.",
+      "date": "2026-09-04"
+    },
+    {
+      "id": "src/visual/creatures/_archivo/ChivitoPunkLaminaViva.jsx",
+      "reason": "ARCHIVO (task #094, 2026-09-04 — regla dura del operador: compais SOLO con TINTA). La lámina-viva (PNG recortada en capas por alfa) fue cableada al registro CREATURES el 2026-08-18 (commit 306209569) y reemplazada por la tinta trazada el 2026-08-31 (receta jaguar aprobada por el operador, PR #3079). Este 2026-09-04 se movió del árbol de build a src/visual/creatures/_archivo/ (patrón _archivo de la casa): no se sirve ni pesa, el historial queda, y el gate solo-tinta (tests/unit/laminas-solo-tinta.test.js) impide que vuelva al árbol vivo. Sin consumidor POR DISEÑO; revivir el raster es decisión del operador.",
+      "date": "2026-09-04"
+    },
+    {
+      "id": "src/visual/creatures/_archivo/LuciernagaLaminaViva.jsx",
+      "reason": "ARCHIVO (task #094, 2026-09-04 — regla dura del operador: compais SOLO con TINTA). La lámina-viva (PNG recortada en capas por alfa) fue cableada al registro CREATURES el 2026-08-18 (commit 306209569) y reemplazada por la tinta trazada el 2026-08-31 (receta jaguar aprobada por el operador, PR #3079). Este 2026-09-04 se movió del árbol de build a src/visual/creatures/_archivo/ (patrón _archivo de la casa): no se sirve ni pesa, el historial queda, y el gate solo-tinta (tests/unit/laminas-solo-tinta.test.js) impide que vuelva al árbol vivo. Sin consumidor POR DISEÑO; revivir el raster es decisión del operador.",
+      "date": "2026-09-04"
+    },
+    {
+      "id": "src/visual/creatures/_archivo/JaguarLaminaViva.jsx",
+      "reason": "ARCHIVO (task #094, 2026-09-04 — regla dura del operador: compais SOLO con TINTA). La lámina-viva del jaguar (jaguar-natural.png recortada en capas) nunca se cableó: su único importador era su test, que viajó con ella a _archivo/__tests__/ (de ahí el veredicto SOLO_TEST). El jaguar del producto es JaguarTrazado desde la decisión operador 2026-08-24. Movida del árbol de build a _archivo/ para que no se sirva ni pese; el historial queda. Revivir el raster es decisión del operador.",
+      "date": "2026-09-04"
+    },
+    {
+      "id": "src/visual/creatures/_archivo/ZariguyaLaminaViva.jsx",
+      "reason": "ARCHIVO (task #094, 2026-09-04 — regla dura del operador: compais SOLO con TINTA). La lámina-viva de la zarigüeya (zariguya.png recortada en capas) quedó huérfana cuando ZariguyaTrazado (lámina auto-trazada a tinta, decisión operador 2026-08-25) tomó CREATURES.zariguya. Movida del árbol de build a _archivo/: no se sirve ni pesa, el historial queda. Su carpeta de apoyo zariguyaLamina/ queda en el árbol vivo (maquinaria huérfana pre-existente, no declarada por este PR). Revivir el raster es decisión del operador.",
+      "date": "2026-09-04"
+    },
+    {
+      "id": "src/visual/creatures/_archivo/OsoBastonLaminaViva.jsx",
+      "reason": "ARCHIVO (task #094, 2026-09-04 — regla dura del operador: compais SOLO con TINTA). Era la ÚLTIMA lámina MONTADA del elenco: CREATURES[\"oso-baston\"] la traía desde el 2026-08-18. Este PR desconectó ese último punto: el registro pasó a la tinta OsoBaston (la piel revectorizada que ya montaban el avatar ChagraAgentAvatarOsoBaston y OsoBastonCompaiEscena) y el archivo se movió a _archivo/. Su carpeta de apoyo osoLamina/ quedó huérfana con este mismo movimiento (entradas aparte, mismo date). Revivir el raster es decisión del operador.",
+      "date": "2026-09-04"
+    },
+    {
+      "id": "src/visual/creatures/_archivo/ZariguyaGeminiLaminaViva.jsx",
+      "reason": "ARCHIVO (task #094, 2026-09-04 — regla dura del operador: compais SOLO con TINTA). Era el último consumidor vivo del set Gemini raster: ZariguyaCompaiEscena.jsx lo renderizaba desde el 2026-08-25. Este PR desconectó ese montaje (la escena pasó a la tinta ZariguyaTrazado, drop-in con el mismo contrato de props) y el archivo se movió a _archivo/. Veredicto SOLO_TEST porque su test de capas (zariguyaGeminiLamina/__tests__/capas.test.jsx) la importa desde el archivo. Su módulo anatomia.js sigue VIVO (lo reutiliza el trazado vía posesTrazado.js) y por eso la carpeta no se movió. Revivir el raster es decisión del operador.",
+      "date": "2026-09-04"
+    },
+    {
+      "id": "src/visual/creatures/osoLamina/anatomia.js",
+      "reason": "Huérfana POR EL ARCHIVO de OsoBastonLaminaViva (task #094, 2026-09-04): era su único consumidor y estaba MONTADA en CREATURES[\"oso-baston\"] hasta que el registro pasó a la tinta OsoBaston. La carpeta osoLamina/ se queda en el árbol vivo (cohesión del set: anatomía del recorte + horneado en capas de public/compai/laminas/oso.png) por si el operador reviva el raster; mientras tanto es maquinaria de archivo en el árbol vivo.",
+      "date": "2026-09-04"
+    },
+    {
+      "id": "src/visual/creatures/osoLamina/capas.js",
+      "reason": "Huérfano POR EL ARCHIVO de OsoBastonLaminaViva (task #094, 2026-09-04): era su único consumidor y estaba MONTADO en CREATURES[\"oso-baston\"] hasta que el registro pasó a la tinta OsoBaston. Mismo caso que su hermano osoLamina/anatomia.js (ver esa entrada).",
+      "date": "2026-09-04"
+    },
+    {
+      "id": "src/visual/creatures/zariguyaGeminiLamina/capas.js",
+      "reason": "Huérfano POR EL ARCHIVO de ZariguyaGeminiLaminaViva (task #094, 2026-09-04 — regla dura del operador: compais SOLO con TINTA): era su único consumidor vivo (ZariguyaCompaiEscena la montó hasta que la escena pasó a la tinta ZariguyaTrazado). Queda en el árbol vivo porque su carpeta está anclada por anatomia.js, que SÍ está vivo (el trazado la reutiliza vía zariguyaTrazado/posesTrazado.js — una sola fuente de poses), y su test (zariguyaGeminiLamina/__tests__/capas.test.jsx) sigue ejerciendo el horneado en 8 capas contra la lámina archivada. Verificado con grep: ningún otro importador en src/.",
       "date": "2026-09-04"
     }
   ]
