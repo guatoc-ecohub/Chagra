@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { MSG } from '../config/messages.js';
 import { Wifi, WifiOff, RefreshCw, CheckCircle, AlertTriangle, X } from 'lucide-react';
 import { syncManager } from '../services/syncManager';
@@ -28,6 +28,7 @@ export default function NetworkStatusBar() {
   const [syncedCount, setSyncedCount] = useState(0);
   const [errorMessage, setErrorMessage] = useState('');
   const [visible, setVisible] = useState(!navigator.onLine);
+  const offlineRef = useRef(!navigator.onLine);
 
   const refreshStats = useCallback(async () => {
     try {
@@ -70,6 +71,7 @@ export default function NetworkStatusBar() {
 
   useEffect(() => {
     const handleOnline = async () => {
+      offlineRef.current = false;
       setStatus(STATUS.SYNCING);
       setVisible(true);
       setErrorMessage('');
@@ -83,12 +85,22 @@ export default function NetworkStatusBar() {
     };
 
     const handleOffline = () => {
+      offlineRef.current = true;
       setStatus(STATUS.OFFLINE);
       setVisible(true);
       setErrorMessage('');
     };
 
     const handleSyncError = (e) => {
+      // Una petición puede terminar después de que el navegador ya notificó
+      // `offline`. En ese caso el error de red no reemplaza la señal estable
+      // de modo offline-first por un mensaje técnico de reintento.
+      if (navigator.onLine === false || offlineRef.current) {
+        setStatus(STATUS.OFFLINE);
+        setErrorMessage('');
+        setVisible(true);
+        return;
+      }
       setStatus(STATUS.ERROR);
       setErrorMessage(e.detail?.message || 'Error sincronizando con FarmOS');
       setVisible(true);

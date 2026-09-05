@@ -39,6 +39,7 @@
     "drenaje_requerido": "bueno"
   },
   "valor_pedagogico": "La arracacha o zanahoria blanca (Arracacia xanthorrhiza Bancr., familia Apiaceae) es una apiácea perenne herbácea cultivada como tubérculo andino por excelencia de la chagra muisca colombiana, producida tradicionalmente por comunidades campesinas de Boyacá, Cundinamarca y Cauca por sus raíces tuberosas amarillo-pálidas a crema de textura suave, alta digestibilidad y bajo contenido de antinutrientes, recomendadas en dietas de destete infantil tradicional. Se cultiva en Boyacá (Sutamarchán, Tunja, Saboyá, Cucaita), Cundinamarca (Sumapaz, Pacho, Subachoque), Cauca (Silvia, Totoró), Nariño (Pasto, Yacuanquer) y Eje cafetero entre 1.500 y 2.800 msnm en zona térmica templada a fría. Ciclo largo 10-14 meses a cosecha, requiere paciencia y planificación de la chagra. Rendimientos 8-15 t/ha raíz fresca. Lección viva: enseña el manejo de cultivos de ciclo largo (vs hortalizas de ciclo corto 90-120 días), raíces de alta digestibilidad para alimentación infantil y adultos mayores, y valor económico campesino como cultivo comercial estable. Manejo agroecológico: siembra por hijuelos del cuello (propágulo vegetativo) en hoyos profundos 30 cm con compost al fondo, asocio con maíz y fríjol, aporque a los 4 meses, cosecha cuando follaje amarillea, almacenamiento en pozo fresco hasta 60 días. Fuentes Tier A: NRC 1989 Lost Crops of the Incas, AGROSAVIA Manual Tubérculos Andinos, ICA Resolución 3168/2015, POWO Kew, GBIF Backbone Taxonomy.",
+  "companions_markdown": "### Especies asociadas favorables\n\nEstas especies favorecen el cultivo cuando se siembran cerca:\n- zea_mays — Maíz criollo (Zea mays L.)",
   "sources": [
     {
       "id": "agrosavia-manual-tuberculos-andinos-2017",
@@ -54,5 +55,5 @@
     }
   ],
   "_generated_by": "scripts/build-cycle-content-from-catalog.mjs",
-  "_generated_at": "2026-05-19T00:42:57.369Z"
+  "_generated_at": "2026-09-03T07:40:20.310Z"
 }

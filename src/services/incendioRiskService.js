@@ -42,6 +42,7 @@
 import { getEnsoPhase, getEnsoPhaseSource } from './ensoService.js';
 import { ensoFamily, regionFromProfile } from './ensoContext.js';
 import { getProfile } from './userProfileService.js';
+import { pisoDeFinca } from '../visual/mundo3d/pisosTermicos.js';
 
 const MESES = Object.freeze([
   'enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio',
@@ -80,14 +81,10 @@ function currentMonth() {
   return new Date().getMonth() + 1;
 }
 
-/** Piso térmico coarse desde altitud (msnm), o null. */
+/** Piso térmico coarse desde altitud (msnm), o null. Cotas del canónico
+ * pisoDeFinca (pisosTermicos.js), no duplicadas acá. */
 function pisoDesdeAltitud(alt) {
-  const a = Number(alt);
-  if (alt == null || Number.isNaN(a)) return null;
-  if (a >= 3000) return 'paramo';
-  if (a >= 2000) return 'frio';
-  if (a >= 1000) return 'templado';
-  return 'calido';
+  return alt == null ? null : pisoDeFinca(alt);
 }
 
 /**
@@ -164,7 +161,7 @@ export function evaluarRiesgoIncendio(opts = {}) {
   const esNino = fam === 'nino';
 
   const factores = [];
-  let nivel = 'bajo';
+  let nivel;
 
   if (!fireProne) {
     // Pacífico o región sin señal clara → riesgo de incendio estructuralmente bajo.

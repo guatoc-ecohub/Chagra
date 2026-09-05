@@ -20,14 +20,16 @@ vi.mock('../../visual/mundo3d/deviceTier.js', () => ({
   perfilDeTier: () => ({ dpr: [1, 1], antialias: false }),
 }));
 
-import MundoParamo3D from '../MundoParamo3D.jsx';
-
 afterEach(() => {
   cleanup();
   window.location.hash = '';
 });
 
-describe('entrada desde la leccion del suelo', () => {
+// La ruta pública del mockup se conserva en el espacio explícito de archivo;
+// mantener el contrato de su puerta sin confundirlo con el host vigente.
+import MundoParamo3D from '../_archivo/MundoParamo3D.jsx';
+
+describe('entrada desde la leccion del suelo archivada', () => {
   test('muestra una puerta explicita hacia el mundo de microfauna', () => {
     render(<MundoParamo3D />);
 

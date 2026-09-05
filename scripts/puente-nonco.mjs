@@ -152,7 +152,7 @@ function getPestSynonyms() {
 /**
  * Normaliza un binomio científico para comparación.
  */
-function normalizeBinomio(binomio) {
+export function normalizeBinomio(binomio) {
   if (!binomio) return null;
   return String(binomio)
     .toLowerCase()
@@ -163,7 +163,7 @@ function normalizeBinomio(binomio) {
 /**
  * Extrae el género de un binomio científico.
  */
-function extractGenus(binomio) {
+export function extractGenus(binomio) {
   if (!binomio) return null;
   const parts = binomio.trim().split(/\s+/);
   return parts[0]?.toLowerCase() || null;
@@ -172,7 +172,7 @@ function extractGenus(binomio) {
 /**
  * Empareja NoncoPest con Pest por binomio científico exacto.
  */
-function matchByBinomioExacto(noncoPest, allPests) {
+export function matchByBinomioExacto(noncoPest, allPests) {
   const matches = [];
   const noncoBinomio = normalizeBinomio(noncoPest.nombre_cientifico || noncoPest.binomio);
   
@@ -188,7 +188,7 @@ function matchByBinomioExacto(noncoPest, allPests) {
         pest: pest.id,
         metodo: 'binomio_exacto',
         confianza: 1.0,
-        razon: `Binomio científico idéntico: ${noncoBinomio}`,
+        razon: `Binomio científico idéntico: ${noncoPest.nombre_cientifico || noncoPest.binomio}`,
       });
     }
   }
@@ -199,7 +199,7 @@ function matchByBinomioExacto(noncoPest, allPests) {
 /**
  * Empareja NoncoPest con Pest por género.
  */
-function matchByGenero(noncoPest, allPests) {
+export function matchByGenero(noncoPest, allPests) {
   const matches = [];
   const noncoGenus = extractGenus(noncoPest.nombre_cientifico || noncoPest.binomio);
   
@@ -212,7 +212,7 @@ function matchByGenero(noncoPest, allPests) {
     if (noncoGenus === pestGenus) {
       // Solo match si el NoncoPest tiene "sp." o similar
       const noncoBinomio = normalizeBinomio(noncoPest.nombre_cientifico || noncoPest.binomio);
-      if (noncoBinomio?.includes('sp.') || noncoBinomio?.includes('sp')) {
+      if (/(?:^|\s)sp{1,2}\.(?:\s|$)/i.test(noncoBinomio || '')) {
         matches.push({
           noncoPest: noncoPest.id,
           pest: pest.id,
@@ -230,7 +230,7 @@ function matchByGenero(noncoPest, allPests) {
 /**
  * Empareja NoncoPest con Pest por sinónimos taxonómicos.
  */
-function matchBySinonimos(noncoPest, allPests, pestSynonyms) {
+export function matchBySinonimos(noncoPest, allPests, pestSynonyms) {
   const matches = [];
   const noncoNombre = (noncoPest.nombre || '').toLowerCase().trim();
   const noncoBinomio = normalizeBinomio(noncoPest.nombre_cientifico || noncoPest.binomio);
@@ -241,7 +241,9 @@ function matchBySinonimos(noncoPest, allPests, pestSynonyms) {
     const pestNombre = (pest.nombre || '').toLowerCase().trim();
     const pestBinomio = normalizeBinomio(pest.nombre_cientifico || pest.binomio);
 
-    // Buscar si hay sinonimo que conecte
+    // Buscar si hay sinonimo que conecte. Un par NoncoPest/Pest sólo puede
+    // generar un puente, aunque coincida con más de un alias.
+    let matched = false;
     for (const [synonym, canonical] of Object.entries(pestSynonyms)) {
       const synLower = synonym.toLowerCase();
       
@@ -254,10 +256,11 @@ function matchBySinonimos(noncoPest, allPests, pestSynonyms) {
           confianza: 0.7,
           razon: `NoncoPest coincide con sinónimo "${synonym}" de ${canonical}`,
         });
+        matched = true;
       }
       
       // Si el Pest coincide con un sinonimo del NoncoPest
-      if (pestNombre === synLower || pestBinomio === synLower) {
+      if (!matched && (pestNombre === synLower || pestBinomio === synLower)) {
         matches.push({
           noncoPest: noncoPest.id,
           pest: pest.id,
@@ -265,7 +268,9 @@ function matchBySinonimos(noncoPest, allPests, pestSynonyms) {
           confianza: 0.7,
           razon: `Pest coincide con sinónimo "${synonym}" de ${canonical}`,
         });
+        matched = true;
       }
+      if (matched) break;
     }
   }
 
@@ -279,7 +284,7 @@ function matchBySinonimos(noncoPest, allPests, pestSynonyms) {
 /**
  * Genera un MERGE para crear un puente CO_RELEVANT.
  */
-function emitCoRelevantRel(fromId, toId, metodo, confianza, razon, createdAt = new Date().toISOString()) {
+export function emitCoRelevantRel(fromId, toId, metodo, confianza, razon, createdAt = new Date().toISOString()) {
   // AGE 1.5.0: los NoncoPest/Pest se emparejan por su id INTERNO (id(a)=<graphid>),
   // NO por una propiedad `id`. Cada valor va con su tipo: strings escapadas y entre
   // comillas, números crudos. Se evita `SET r += {map}` (soporte dudoso) usando SET
@@ -307,7 +312,7 @@ RETURN id(r)
 /**
  * Envuelve un Cypher en SELECT * FROM cypher(...).
  */
-function wrapCypher(cypher) {
+export function wrapCypher(cypher) {
   return `SELECT * FROM cypher('${GRAPH}', $$\n  ${cypher}\n$$) AS (v agtype);`;
 }
 

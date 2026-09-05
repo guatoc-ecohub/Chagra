@@ -133,6 +133,7 @@ describe('SeguimientoProcesoScreen', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Guardar cochera' }));
 
     await waitFor(() => expect(putFarmProcess).toHaveBeenCalled());
+    await waitFor(() => expect(screen.getByRole('button', { name: 'Registrar lote' })).not.toBeDisabled());
 
     fireEvent.change(screen.getByPlaceholderText('Raza'), { target: { value: 'Zungo' } });
     fireEvent.change(screen.getByPlaceholderText('Cantidad'), { target: { value: '6' } });
@@ -140,8 +141,13 @@ describe('SeguimientoProcesoScreen', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Registrar lote' }));
 
     await waitFor(() => expect(recordFarmEvent).toHaveBeenCalled());
+    await waitFor(() => expect(screen.getByRole('button', { name: 'Registrar evento' })).not.toBeDisabled());
 
-    fireEvent.change(screen.getAllByRole('combobox')[1], { target: { value: 'sanidad' } });
+    const tipoEvento = screen.getAllByRole('combobox').find(
+      (select) => select.querySelector('option[value="sanidad"]'),
+    );
+    expect(tipoEvento).toBeTruthy();
+    fireEvent.change(tipoEvento, { target: { value: 'sanidad' } });
     const sanitario = await screen.findByPlaceholderText('Ej: vacuna, desparasitación, observación sanitaria');
     fireEvent.change(sanitario, {
       target: { value: 'Vacuna y desparasitación' },

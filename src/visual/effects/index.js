@@ -16,6 +16,11 @@
 export { GlowFilter } from './GlowFilter.jsx';
 export { FiltroAcuarela } from './FiltroAcuarela.jsx';
 export { AutoDibujo } from './AutoDibujo.jsx';
+export {
+  default as CirculoRotoMilpa,
+  CRM_RUPTURA_MS,
+  CRM_ASENTADO_MS,
+} from './CirculoRotoMilpa.jsx';
 
 /* Ritmo del latido/respiración compartido (= `--vfx-beat` en effects.css y
    `--motion-beat`/`--fvo-beat` en el resto del repo). Útil desde JS cuando una

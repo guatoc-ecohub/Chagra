@@ -1,0 +1,75 @@
+{
+  "species_slug": "oryza_sativa",
+  "scientific_name": "Oryza sativa L.",
+  "common_names": [
+    "Arroz"
+  ],
+  "family": "Poaceae",
+  "category": "cereales",
+  "cultivable": true,
+  "conservation_status": "cultivo_comun",
+  "thermal_zones": [
+    "calido"
+  ],
+  "roles_in_guild": [
+    "crop"
+  ],
+  "antagonists": [],
+  "especies_nativas_sustitutas": [],
+  "propagation": {
+    "methods": [
+      "semilla"
+    ],
+    "best_method": "semilla",
+    "protocol_resumen": "Siembra directa al voleo o en hileras con semilla certificada (riego), o por trasplante de plántulas desde semillero (más común en pequeña escala/SRI). Densidad de siembra 150-200 kg/ha en voleo. Lámina de agua manejada por etapas en sistema de riego.",
+    "tiempo_a_establecimiento_dias": 15,
+    "notas": "Fenología por etapas (BBCH simplificado): (1) Germinación y plántula 0-15 días; (2) Macollamiento (ahijamiento) 15-45 días — definición del número de tallos productivos; (3) Inicio de primordio / fase reproductiva (encañe) 45-65 días; (4) Embuchamiento y emergencia de la panícula (floración/antesis) 65-90 días — etapa crítica de agua y la más sensible a daño por Tagosodes y vaneamiento; (5) Llenado de grano (lechoso → pastoso) 90-115 días; (6) Maduración y cosecha 115-150 días. El arroz de riego mantiene lámina de agua; el secano depende de lluvia.",
+    "fuente": "FEDEARROZ Manual técnico del cultivo de arroz (2018)."
+  },
+  "requirements": {
+    "agua": "alto",
+    "altitud_msnm": {
+      "min_absoluto": 0,
+      "optimo_min": 0,
+      "optimo_max": 1000,
+      "max_absoluto": 1300
+    },
+    "temperatura_c": {
+      "helada_letal": 5,
+      "optimo_min": 22,
+      "optimo_max": 30,
+      "max_tolerable": 38
+    },
+    "radiacion": "sol_pleno",
+    "drenaje_requerido": "bajo"
+  },
+  "valor_pedagogico": "El arroz (Oryza sativa L., familia Poaceae) es el cereal de mayor consumo per cápita en Colombia y el alimento básico de la dieta nacional, cultivado en tierra caliente entre 0 y 1.000 msnm bajo dos grandes sistemas: arroz de riego (con lámina de agua controlada) en el Tolima, Huila, Meta y Casanare, y arroz secano (de temporal, dependiente de lluvia) en los Llanos Orientales, el Bajo Cauca y la Costa Caribe. Domesticado hace más de 8.000 años en Asia, es una gramínea semiacuática cuya particularidad fisiológica es la tolerancia a la inundación gracias a tejidos aerénquima que llevan oxígeno a la raíz sumergida. Su fenología pasa por germinación, macollamiento (cuando define el número de tallos productivos), fase reproductiva con la emergencia de la panícula y antesis —la etapa más sensible a la falta de agua y al daño de plagas—, llenado de grano y maduración, en un ciclo de 4-5 meses. El mayor problema fitosanitario del arroz colombiano es el complejo sogata-Virus de la Hoja Blanca: el insecto Tagosodes orizicolus transmite un virus devastador, por lo que el manejo se centra en variedades resistentes y en evitar siembras escalonadas que mantengan poblaciones del vector. Le siguen el añublo o quema (Pyricularia oryzae), hongo que ataca hoja, cuello y panícula, el añublo bacterial (Burkholderia glumae) agravado por el calor nocturno, y plagas como el cogollero y los chinches que vanean el grano. Manejo agroecológico de transición: rotación con leguminosas de cobertura entre ciclos para fijar nitrógeno y cortar el ciclo de plagas; manejo eficiente del agua para reducir emisiones de metano del arroz inundado; integración rice-fish o con patos para control biológico de insectos y malezas; uso de Trichoderma y Bacillus contra hongos; y semilla certificada de variedades resistentes a sogata. El arroz enseña la gestión del agua como eje del cultivo y el reto ambiental de un sistema que, mal manejado, es gran emisor de metano y gran consumidor de agroquímicos. NOTA DE VERIFICACIÓN: las variedades comerciales y umbrales económicos de plaga deben consultarse en la ficha oficial vigente de FEDEARROZ/AGROSAVIA antes de decisiones de campo. Fuentes: FEDEARROZ Manual técnico del arroz 2018, FAO Ecocrop, GBIF Backbone, POWO Kew.",
+  "sources": [
+    {
+      "id": "fedearroz-manual-arroz-2018",
+      "title": "fedearroz-manual-arroz-2018",
+      "tier": "B",
+      "url": null
+    },
+    {
+      "id": "fao-ecocrop",
+      "title": "fao-ecocrop",
+      "tier": "A",
+      "url": "https://gaez.fao.org/pages/ecocrop"
+    },
+    {
+      "id": "gbif-taxonomic-backbone",
+      "title": "gbif-taxonomic-backbone",
+      "tier": "A",
+      "url": "https://www.gbif.org/dataset/d7dddbf4-2cf0-4f39-9b2a-bb099caae36c"
+    },
+    {
+      "id": "powo-kew",
+      "title": "powo-kew",
+      "tier": "A",
+      "url": "https://powo.science.kew.org"
+    }
+  ],
+  "_generated_by": "scripts/build-cycle-content-from-catalog.mjs",
+  "_generated_at": "2026-09-03T07:40:20.315Z"
+}

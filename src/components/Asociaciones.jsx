@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import { AlertTriangle, BarChart3, CheckCircle2, Leaf, Network, Sprout, TrendingUp, Layers, ArrowRight, Sparkles, Users, Zap, Shield } from 'lucide-react';
+import { AlertTriangle, BarChart3, CheckCircle2, Leaf, Network, Sprout, TrendingUp, Layers, Sparkles, Users, Zap, Shield } from 'lucide-react';
 import arquetipos from '../data/asociaciones-arquetipos.json';
 import comparativas from '../data/asociaciones-comparativa.json';
 import {

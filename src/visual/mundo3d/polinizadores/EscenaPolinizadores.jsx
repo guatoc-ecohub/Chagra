@@ -37,10 +37,12 @@
  *
  * Importa three/@react-three → montar SOLO perezosa (lazy) desde el host.
  */
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Canvas } from '@react-three/fiber';
 import { OrbitControls, AdaptiveDpr } from '@react-three/drei';
 import { perfilDeTier } from '../deviceTier.js';
+import { CIELOS_HORA, mezclaHex } from '../cielosHoraData.js';
+import { VERDES, TIERRAS, CORTEZAS, NEUTROS, mezclar } from '../paleta/index.js';
 import { PAL, rng, tierDe } from './polinizadoresIdentidad.js';
 import { sembrarFlores, FINCA, ZONA_POR_ID } from './sembrado.js';
 import { crearTelar } from './telar.js';
@@ -50,6 +52,30 @@ import RedPolinizacion from './RedPolinizacion.jsx';
 import Meliponario from './Meliponario.jsx';
 import ParcelaCultivos from './ParcelaCultivos.jsx';
 import AmenazaVeneno from './AmenazaVeneno.jsx';
+
+/* -------------------------------------------------------------------------- */
+/*  Las horas de la casa (congruencia de elenco)                               */
+/* -------------------------------------------------------------------------- */
+
+/* Este mundo era el último de Chagra con un cielo inventado a mano (un celeste
+   frío que se veía de otro juego). Ahora el día y la noche SON las franjas del
+   kit de cielos del valle, y todo lo demás se DERIVA de ellas con la mezcla de
+   la casa — como hace el páramo con su bruma fría. */
+const M = CIELOS_HORA.mediodia; // "mediodía andino: alto, limpio" — literal
+const N = CIELOS_HORA.noche; // LA noche estrellada del valle, no otra
+
+/* El ojo de la abeja: su mundo se corre hacia el azul-violeta y el UV (física
+   del síndrome floral, no filtro de moda). El corrimiento se aplica SOBRE el
+   mediodía de la casa: la finca es la misma, el ojo es otro. */
+const UV = '#7d8ce0';
+
+/* La noche pinta el suelo de la finca con el rebote CÁLIDO de la noche madre
+   (N.suelo es un negro tibio, nunca azul): los verdes del día, apagados. */
+const NOCTURNO = {
+  potrero: mezclaHex(PAL.potrero, N.suelo, 0.68),
+  sueloRico: mezclaHex(PAL.sueloRico, N.suelo, 0.68),
+  suelo: mezclaHex(PAL.suelo, N.suelo, 0.68),
+};
 
 /* -------------------------------------------------------------------------- */
 /*  El paisaje de fondo                                                        */
@@ -62,6 +88,21 @@ import AmenazaVeneno from './AmenazaVeneno.jsx';
  * en la finca. Se dibuja HONDO y enmarañado, contra el verde pobre y peinado del
  * potrero: la diferencia entre los dos verdes es un argumento.
  */
+/* Los verdes y cortezas del monte, DERIVADOS de la paleta madre (nunca un hex
+   inventado): copas alrededor de VERDES.monte, tronco pariente del encenillo. */
+const MONTE = {
+  tronco: mezclar(CORTEZAS.encenillo, NEUTROS.tinta, 0.12),
+  copaHonda: mezclar(VERDES.monte, NEUTROS.tinta, 0.18),
+  copaParda: mezclar(VERDES.monte, TIERRAS.siembra, 0.18),
+  copaFresca: mezclar(VERDES.monte, VERDES.brote, 0.25),
+};
+
+/* La cerca viva: madera curtida de la casa y rebrote del verde de trabajo. */
+const CERCA = {
+  poste: mezclar(TIERRAS.siembra, TIERRAS.camino, 0.25),
+  rebrote: mezclar(VERDES.trabajo, VERDES.monte, 0.35),
+};
+
 function RinconDeMonte({ tier, sombras }) {
   const arboles = useMemo(() => {
     const r = rng(313);
@@ -82,17 +123,17 @@ function RinconDeMonte({ tier, sombras }) {
         <group key={a.key} position={a.pos}>
           <mesh position={[0, a.alto * 0.45, 0]} castShadow={sombras}>
             <cylinderGeometry args={[0.06, 0.1, a.alto * 0.9, 5]} />
-            <meshLambertMaterial color="#5e4630" />
+            <meshLambertMaterial color={MONTE.tronco} />
           </mesh>
           {/* La copa: dos o tres masas, nunca una bola sola — el monte es
               enmarañado, no un parque. */}
           <mesh position={[0, a.alto, 0]} castShadow={sombras}>
             <sphereGeometry args={[a.radio, 7, 5]} />
-            <meshLambertMaterial color={a.tono > 0.5 ? PAL.monte : '#47643b'} />
+            <meshLambertMaterial color={a.tono > 0.5 ? PAL.monte : MONTE.copaParda} />
           </mesh>
           <mesh position={[a.radio * 0.5, a.alto - 0.25, a.radio * 0.3]} castShadow={sombras}>
             <sphereGeometry args={[a.radio * 0.72, 6, 5]} />
-            <meshLambertMaterial color={a.tono > 0.5 ? '#3c5733' : '#516f42'} />
+            <meshLambertMaterial color={a.tono > 0.5 ? MONTE.copaHonda : MONTE.copaFresca} />
           </mesh>
         </group>
       ))}
@@ -122,11 +163,11 @@ function CercaViva({ tier, sombras }) {
           {/* Poste VIVO: rebrota. Por eso florece y por eso alimenta. */}
           <mesh position={[0, p.alto / 2, 0]} castShadow={sombras}>
             <cylinderGeometry args={[0.04, 0.055, p.alto, 5]} />
-            <meshLambertMaterial color="#6b5236" />
+            <meshLambertMaterial color={CERCA.poste} />
           </mesh>
           <mesh position={[0, p.alto + 0.1, 0]} castShadow={sombras}>
             <sphereGeometry args={[0.19, 6, 5]} />
-            <meshLambertMaterial color="#4f7a35" />
+            <meshLambertMaterial color={CERCA.rebrote} />
           </mesh>
         </group>
       ))}
@@ -166,12 +207,36 @@ function Diorama({ tier, reducedMotion, momento, comoAbeja, veneno, meliponarioA
    */
   const luz = useMemo(() => {
     if (noche) {
-      return { cielo: PAL.cieloNoche, niebla: PAL.nieblaNoche, hemi: '#4a5a8a', suelo: '#141a24', dir: '#8fa8d8', int: 0.34, amb: 0.24 };
+      return {
+        cielo: PAL.cieloNoche, // = N.fondo
+        niebla: PAL.nieblaNoche, // = N.niebla
+        hemi: mezclaHex(N.cielo, N.luz, 0.35), // la bóveda aclarada por la luna
+        suelo: N.suelo, // rebote de tierra CÁLIDO (era el único frío del 3D)
+        dir: N.luz, // la luna plata de la casa
+        int: 0.34,
+        amb: 0.24,
+      };
     }
     if (comoAbeja) {
-      return { cielo: '#8f9ee8', niebla: '#9aa8e0', hemi: '#b8c0ff', suelo: '#2e3a2a', dir: '#e8e4ff', int: 1.0, amb: 0.42 };
+      return {
+        cielo: mezclaHex(M.fondo, UV, 0.82),
+        niebla: mezclaHex(M.niebla, UV, 0.72),
+        hemi: mezclaHex(M.cielo, UV, 0.55),
+        suelo: mezclaHex(M.suelo, VERDES.monte, 0.7), // el mismo suelo del día
+        dir: mezclaHex(M.luz, UV, 0.4), // sol pálido corrido al violeta
+        int: 1.05,
+        amb: 0.42,
+      };
     }
-    return { cielo: PAL.cieloDia, niebla: PAL.nieblaDia, hemi: '#e2f0f5', suelo: '#4a5a30', dir: '#fff6e0', int: 1.25, amb: 0.4 };
+    return {
+      cielo: PAL.cieloDia, // = M.fondo: el marfil del mediodía andino
+      niebla: PAL.nieblaDia, // = M.niebla
+      hemi: M.cielo,
+      suelo: mezclaHex(M.suelo, VERDES.monte, 0.7), // el verde rebotando del suelo
+      dir: M.luz, // el sol casi blanco del día pleno
+      int: 1.25,
+      amb: 0.4,
+    };
   }, [noche, comoAbeja]);
 
   return (
@@ -199,18 +264,18 @@ function Diorama({ tier, reducedMotion, momento, comoAbeja, veneno, meliponarioA
       {/* El suelo de la finca. */}
       <mesh rotation={[-Math.PI / 2, 0, 0]} receiveShadow>
         <circleGeometry args={[FINCA.radio * 2.4, 36]} />
-        <meshLambertMaterial color={noche ? '#2e3a28' : PAL.potrero} />
+        <meshLambertMaterial color={noche ? NOCTURNO.potrero : PAL.potrero} />
       </mesh>
       {/* La tierra buena: bajo el monte, oscura de materia orgánica. El suelo
           también cuenta quién ha cuidado qué. */}
       <mesh rotation={[-Math.PI / 2, 0, 0]} position={[-1.6, 0.01, -4.4]}>
         <circleGeometry args={[4.6, 24]} />
-        <meshLambertMaterial color={noche ? '#232c1e' : PAL.sueloRico} />
+        <meshLambertMaterial color={noche ? NOCTURNO.sueloRico : PAL.sueloRico} />
       </mesh>
       {/* La huerta, trabajada. */}
       <mesh rotation={[-Math.PI / 2, 0, 0]} position={[-1.5, 0.01, 1.9]}>
         <circleGeometry args={[1.9, 20]} />
-        <meshLambertMaterial color={noche ? '#2a3322' : PAL.suelo} />
+        <meshLambertMaterial color={noche ? NOCTURNO.suelo : PAL.suelo} />
       </mesh>
 
       <RinconDeMonte tier={tier} sombras={perfil.sombras} />

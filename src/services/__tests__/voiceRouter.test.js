@@ -77,3 +77,43 @@ describe('LLM caído — degrada a on-device', () => {
     expect(r.measures.cantidad).toBe(20);
   });
 });
+
+// ─────────── merge NLU funde lugar + tiempo + variedad (gap voiceRouter:mergeNlu) ───────────
+// Antes, mergeNlu DESCARTABA nlu.tiempo y nlu.lugar aunque el LLM los dedujera.
+// Ahora los funde SIN pisar lo que el on-device ya sacó, con la misma aritmética
+// de tiempo (parseRelativeTime) y recalculando el timestamp contra `now`.
+const D = 86400000;
+
+describe('merge NLU — funde lugar, tiempo y variedad cuando la base no los sacó', () => {
+  it('el LLM aporta zona "surco", tiempo "hace 3 meses" y variedad "cherry"', async () => {
+    // Frase que el on-device NO groundea (aguacate fuera de catálogo, sin zona
+    // ni tiempo reconocidos): el LLM rellena los huecos.
+    vi.mocked(streamOllama).mockResolvedValue(JSON.stringify({
+      intent: 'registrar_siembra', especie: 'aguacate', variedad: 'hass',
+      altura_m: null, ancho_m: null, cantidad: null, unidad: '', fenologia: '',
+      sintomas: [], insumo: '', labores: [], lugar: 'la loma', tiempo: 'hace 3 meses',
+    }));
+    const r = await classifyAndExtract('planté un mango por el rincón', { now: NOW });
+    expect(r.source).toBe('sidecar');
+    expect(r.position.raw).toBe('la loma'); // antes se descartaba
+    expect(r.variedad).toBe('hass');
+    expect(r.time.offsetDays).toBe(-90); // hace 3 meses
+    expect(r.timestampMs).toBe(NOW - 90 * D); // recalculado contra now
+  });
+
+  it('el tiempo del on-device MANDA: el LLM no lo pisa', async () => {
+    // El on-device ya sacó "hace dos días"; el LLM alucina "hoy" → se ignora.
+    vi.mocked(streamOllama).mockResolvedValue(JSON.stringify({
+      intent: 'registrar_siembra', especie: 'cebolla larga', variedad: '',
+      altura_m: null, ancho_m: null, cantidad: 20, unidad: '', fenologia: '',
+      sintomas: [], insumo: '', labores: [], lugar: '', tiempo: 'hoy',
+    }));
+    const r = await classifyAndExtract(
+      'sembré veinte maticas de cebolla larga aquí en la era nueva, hace dos días',
+      { now: NOW },
+    );
+    expect(r.time.offsetDays).toBe(-2); // on-device gana
+    expect(r.timestampMs).toBe(NOW - 2 * D);
+    expect(r.position.raw).toBe('era nueva'); // on-device ya tenía zona → no la pisa
+  });
+});

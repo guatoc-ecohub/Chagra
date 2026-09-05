@@ -3,10 +3,12 @@ import { MSG } from '../config/messages.js';
 import { Info } from 'lucide-react';
 import { assetCache } from '../db/assetCache';
 import { FARM_CONFIG } from '../config/defaults';
+import { getContextoGeoParaIA } from '../services/perfilFincaService';
 import AIStreamPanel from './common/AIStreamPanel';
 import IoTSensorCard from './IoTSensorCard';
 import ChagraGrowLoader from './ChagraGrowLoader';
 import { streamOllama } from '../services/ollamaStream';
+import { ENV } from '../config/env';
 import ExternalAiButton from './common/ExternalAiButton';
 import { buildDiagnosticExternalPrompt } from '../services/externalAiPromptBuilder';
 import { detectAndTruncateRepetition } from '../utils/repetitionGuard';
@@ -534,7 +536,7 @@ export default function TelemetryAlerts() {
         const content = await streamOllama(
           `${OLLAMA_URL}/api/chat`,
           {
-            model: 'qwen3.5:4b',
+            model: ENV.CHAT_MODEL,
             messages: [
               { role: 'system', content: 'Asistente agronómico para finca agroecológica andina (2400msnm). PROHIBIDO recomendar agroquímicos sintéticos. Solo biopreparados orgánicos (biol, caldo sulfocálcico, caldo bordelés, purín de ortiga, compost tea, microorganismos de montaña, Trichoderma). Responde en máximo 3 frases concisas, sin superlativos, sin repetir información.' },
               { role: 'user', content: userPrompt },
@@ -549,7 +551,7 @@ export default function TelemetryAlerts() {
             onDone: (parsed) => {
               if (parentSignal?.aborted) return;
               setAiMeta({
-                model: parsed.model || 'qwen3.5:4b',
+                model: parsed.model || ENV.CHAT_MODEL,
                 totalDuration: parsed.total_duration ? (parsed.total_duration / 1e9).toFixed(1) : null,
                 evalCount: parsed.eval_count || null,
                 promptTokens: parsed.prompt_eval_count || null,
@@ -823,9 +825,7 @@ export default function TelemetryAlerts() {
                 label="Copiar prompt para IA externa"
                 context={{
                   speciesName: 'cultivo en monitoreo',
-                  altitudMsnm: FARM_CONFIG.ALTITUD_MSNM,
-                  municipio: FARM_CONFIG.MUNICIPIO,
-                  thermalZones: FARM_CONFIG.THERMAL_ZONES || [],
+                  ...getContextoGeoParaIA(),
                   speciesThermalZones: [],
                   sintomas: aiAlert || '',
                 }}

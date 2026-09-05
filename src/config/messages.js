@@ -232,6 +232,10 @@ const messages = {
   },
   ui: {
     cargando: 'Cargando...',
+    // BUG-08 2026-09-04: puertas al event sourcing desde la Bodega.
+    conteoManual: 'Conteo manual',
+    bitacora: 'Bitácora',
+    bitacoraDeItem: (itemId) => `Bitácora · ${itemId}`,
     cargandoReportes: 'Cargando reportes...',
     cargandoPlan: 'Cargando plan...',
     cargandoCiclos: 'Cargando tus ciclos...',
@@ -290,6 +294,21 @@ const messages = {
     plantaTuya: 'Planta tuya',
     plantasTuyas: 'Plantas tuyas',
   },
+  // Tipos de eventos de ciclo (farm_process_events) — etiquetas legibles
+  // para humanos en hoja de vida por mata (hojaVidaMataService).
+  eventTypes: {
+    sowing_confirmed: 'Siembra confirmada',
+    transplanting: 'Trasplante',
+    observation: 'Observación',
+    fertilizer_applied: 'Fertilización',
+    pesticide_applied: 'Aplicación de insumo',
+    harvest: 'Cosecha',
+    pruning: 'Poda',
+    irrigation: 'Riego',
+    stage_change: 'Cambio de etapa',
+    health_issue: 'Problema de sanidad',
+    weather_event: 'Evento climático',
+  },
   // Modo campo / wake-word "hola chagra" (#2088) — ver ModoCampoPanel.jsx,
   // EnrollmentModoCampo.jsx, wakeWordService.js.
   modoCampo: {
@@ -305,6 +324,14 @@ const messages = {
   // Recorrido de finca por voz (useRecorridoStore / recorridoService).
   recorrido: {
     errorRegistro: 'No se pudo registrar la observación',
+  },
+  // Login y caminos de autenticación (URGENTE-login-se-apaga-25sep):
+  // mensajes del camino PKCE y su fallback (LoginScreen / authService).
+  auth: {
+    pkceNoConfigurado: 'El acceso seguro (PKCE) no está configurado en esta instalación.',
+    accesoSeguroFallido: 'No se pudo iniciar el acceso seguro. Intente de nuevo.',
+    accesoSeguroFallidoUsandoClasico: 'No se pudo iniciar el acceso seguro; se usará el acceso clásico.',
+    instalacionSinCamino: 'El acceso clásico fue retirado y esta instalación no tiene configurado el acceso seguro (PKCE). Contacte al administrador de Chagra.',
   },
   format,
 };

@@ -48,16 +48,17 @@ const COMPS = { colibri: Colibri, mariposa: Mariposa, escarabajo: Escarabajo, lo
  * @param {number}  [p.df=7]        distanceFactor (misma escala que Angelita).
  * @param {string}  [p.title]       etiqueta (decorativa; el billboard es aria-hidden).
  * @param {boolean} [p.reducedMotion=false]
+ * @param {{direccion?:{x?:number,z?:number},fuerza?:number}|null} [p.viento]
  */
 export function Bicho({
-  tipo, base, size = 30, rol, patron, fase = 0, df = 7, title, reducedMotion = false,
+  tipo, base, size = 30, rol, patron, fase = 0, df = 7, title, reducedMotion = false, viento = null,
 }) {
   const ref = useRef(null);
   const Comp = COMPS[tipo];
   const gesto = patron || patronDeRol(rol);
   useFrame((state) => {
     if (reducedMotion || !ref.current) return;
-    const [dx, dy, dz] = coreografia(gesto, state.clock.elapsedTime, fase);
+    const [dx, dy, dz] = coreografia(gesto, state.clock.elapsedTime, fase, viento);
     ref.current.position.set(base[0] + dx, base[1] + dy, base[2] + dz);
   });
   if (!Comp) return null;
@@ -77,12 +78,17 @@ export function Bicho({
  * @param {object} p
  * @param {Array<object>} p.items  cada uno = props de `<Bicho>`.
  * @param {boolean} [p.reducedMotion=false]
+ * @param {'alto'|'medio'|'bajo'} [p.tier='alto']
+ * @param {{direccion?:{x?:number,z?:number},fuerza?:number}|null} [p.viento]
  */
-export function Fauna({ items = [], reducedMotion = false }) {
+export function Fauna({ items = [], reducedMotion = false, tier = 'alto', viento = null }) {
+  // Gama baja ya recorta criaturas; si un consumidor monta alguna, conserva el
+  // gesto neutro para no pagar ni depender de esta capa de percepción.
+  const vientoActivo = tier === 'bajo' ? null : viento;
   return (
     <group>
       {items.map((it, i) => (
-        <Bicho key={it.key ?? i} reducedMotion={reducedMotion} {...it} />
+        <Bicho key={it.key ?? i} reducedMotion={reducedMotion} {...it} viento={vientoActivo} />
       ))}
     </group>
   );

@@ -1,0 +1,8 @@
+URL: http://127.0.0.1:41833/?descenso3d=1&viaje=frio&msnm=2200&enso=neutral#/mockups/sierra-global
+escena3d=1
+altimetro: 2.200 m | 2.200 m · su predio
+panel (2 líneas):
+  - Está en el piso frío.
+  - Chivito vino a contarle: Esta nube no está encima: usted está adentro. Aquí el aire se enfría lo justo para soltar el agua.
+pageerrors: 0
+requestFailures: 0

@@ -375,6 +375,47 @@ export const CAPABILITY_MANIFEST = Object.freeze([
     chipMore: true,
     heroRoute: { kind: 'unavailable' },
   },
+  {
+    // ASOCIACIONES Y POLICULTIVO (2026-08-27): chip destacado para el perfil
+    // CAMPESINO que expone la función de asociaciones/arquetipos que YA existe
+    // en el backend (asociaciones-arquetipos.json) pero no tenía chip propio.
+    // El icono 🌽 representa la milpa (maíz + fríjol + ahuyama), arquetipo
+    // campesino por excelencia. kind:'nav' → vista 'asociaciones' (App.jsx).
+    id: 'asociaciones',
+    group: 'cultivo',
+    status: 'live',
+    intent: 'asociaciones',
+    kind: 'nav',
+    icon: '🌽',
+    label: 'Asociación de cultivos',
+    desc: 'Combina plantas en policultivo: maíz con fríjol, café con sombra, cacao con plátano.',
+    placeholder: 'Escribe qué cultivos quieres combinar',
+    tool: null,
+    stubMessage: null,
+    hero: true,
+    featured: true, // destacada para campesinos (reemplaza una de las 6 del anillo).
+    heroRoute: { kind: 'nav', view: 'asociaciones' },
+  },
+  {
+    // FUENTE/DOI (2026-08-27): chip para perfil TÉCNICO que permite ver la
+    // fuente/DOI de la información que provee el agente. El grafo AGE tiene
+    // DOIs, pero sin trazabilidad visible el técnico desconfía. kind:'tool'
+    // → tool 'get_fuente_doi' del sidecar (devuelve referencias académicas).
+    id: 'fuente_doi',
+    group: 'aprender',
+    status: 'live',
+    intent: 'fuente_doi',
+    kind: 'tool',
+    icon: '📚',
+    label: 'Ver fuente/DOI',
+    desc: 'Consulte la fuente académica (DOI) de la información que le provee el agente.',
+    placeholder: 'Escriba el tema o cultivo del que quiere verificar la fuente',
+    tool: 'get_fuente_doi',
+    stubMessage: null,
+    hero: false,
+    chipMore: true,
+    heroRoute: { kind: 'unavailable' },
+  },
 
   // ═══════════════════════════════════════════════════════════════════════
   // AGENTHERO ACTIONS — aparecen solo en menú Ⓐ del AgentHero

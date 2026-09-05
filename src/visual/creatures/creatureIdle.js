@@ -38,12 +38,16 @@
  * QUIÉN ES QUIÉN: la IDENTIDAD (paleta/medidas) sigue en abejaIdentidad.js y
  * _faunaRubberTokens.js; la CADENCIA CSS en creatures.css. Aquí vive SOLO la
  * conducta en el tiempo, parametrizada por especie: Angelita la estrena, y el
- * oso andino, el colibrí y la rana dorada (los otros rubber-hose de la casa)
- * entran con su perfil sin tocar la máquina.
+ * resto de la familia rubber-hose (oso, colibrí, zariguya, rana andina,
+ * perezoso, ardilla, jaguar, morrocoy, borugo) entra con su perfil sin tocar
+ * la máquina.
+ * Sin perfil propio un bicho caería al de la abeja — personalidad equivocada
+ * por construcción — así que TODO personaje nuevo declara el suyo aquí.
  *
  * reducedMotion → pose CALMA estática (de noche, acurrucada quieta), activo
  * false: nada anima y nadie pide frames. Tier 'bajo' → solo la respiración.
  */
+import { PERFILES_CONDUCTA } from '../../compai/nucleo/perfilesConducta.js';
 
 /* ── Deterministas: hash entero → [0,1) por (semilla, evento, ciclo) ─────── */
 
@@ -97,8 +101,23 @@ const EV = { vuelta: 3, aseo: 4, tipoAseo: 5, percha: 6 };
 const CARRILES = [
   { tipo: 'percha', id: EV.percha },
   { tipo: 'vuelta', id: EV.vuelta },
+  { tipo: 'gesto', id: 7 },
   { tipo: 'aseo', id: EV.aseo },
 ];
+
+const idleDePerfilConducta = (perfil) => ({
+  masa: perfil.masa,
+  medio: perfil.medio,
+  poseBase: perfil.poseBase,
+  respira: perfil.respira,
+  mira: perfil.mira,
+  aseo: perfil.aseo,
+  vuelta: perfil.vuelta,
+  gesto: perfil.gesto,
+  percha: perfil.reposo || (perfil.vuelo && { ...perfil.vuelo, evento: 'vuelo' }),
+  celebra: perfil.celebra,
+  noche: perfil.noche,
+});
 
 /* ── Perfiles por especie: la MISMA máquina, otro animal ─────────────────────
    medio 'aire' (vuela: se posa en flor/hoja) | 'suelo' (anda: se sienta).
@@ -137,9 +156,10 @@ export const IDLE_PERFILES = {
     celebra: { dur: 2.0, grados: 360 },
     noche: { freq: 0.55, amp: 0.07, rot: -8 },
   },
-  /* Phyllobates terribilis — la garganta late; su "vuelta" es la voltereta
-     de brinco y su percha, quedarse quieta en la hoja (es lo suyo). */
-  'rana-dorada': {
+  /* Atelopus spp. — la rana arlequín ZEN (slug real de RanaAndina.jsx y de
+     creatures.css): la garganta late; su "vuelta" es la voltereta de brinco y
+     su percha, quedarse quieta en la hoja (es lo suyo). */
+  'rana-andina': {
     medio: 'suelo', poseBase: 'anda',
     respira: { freq: 1.7, amp: 0.06, vaiven: 0.37 },
     vuelta: { base: 26, jitter: 3, dur: 1.0, grados: 360, anticipo: 22 },
@@ -148,7 +168,64 @@ export const IDLE_PERFILES = {
     celebra: { dur: 1.4, grados: 360 },
     noche: { freq: 0.8, amp: 0.06, rot: -4 },
   },
+  /* Bradypus variegatus — TODO en cámara lenta (1/3 del resto): respira
+     hondísimo, jamás pirueta rápida; su "aseo" es un estirón sostenido. */
+  perezoso: {
+    medio: 'suelo', poseBase: 'anda',
+    respira: { freq: 0.45, amp: 0.045, vaiven: 0.17 },
+    vuelta: { base: 52, jitter: 6, dur: 3.4, grados: 360, anticipo: 14 },
+    aseo: { base: 21, jitter: 5, dur: 2.6 },
+    percha: { base: 34, jitter: 7, dur: 14 },
+    celebra: { dur: 3.0, grados: 360 },
+    noche: { freq: 0.35, amp: 0.06, rot: -7 },
+  },
+  /* Notosciurus granatensis — pizpireta e INQUIETA: todo late rapidito,
+     se asea seguido y casi no se queda posada. */
+  ardilla: {
+    medio: 'suelo', poseBase: 'anda',
+    respira: { freq: 2.4, amp: 0.045, vaiven: 0.39 },
+    vuelta: { base: 17, jitter: 2.5, dur: 0.9, grados: 360, anticipo: 24 },
+    aseo: { base: 8, jitter: 2.5, dur: 0.75 },
+    percha: { base: 27, jitter: 5, dur: 4 },
+    celebra: { dur: 1.3, grados: 360 },
+    noche: { freq: 1.0, amp: 0.05, rot: -5 },
+  },
+  /* Chelonoidis carbonarius — ancestral y PACIENTE: el más lento en girar;
+     su "aseo" es guardarse un momento (la retracción). */
+  morrocoy: {
+    medio: 'suelo', poseBase: 'anda',
+    respira: { freq: 0.6, amp: 0.035, vaiven: 0.15 },
+    vuelta: { base: 58, jitter: 6, dur: 3.8, grados: 360, anticipo: 12 },
+    aseo: { base: 23, jitter: 5, dur: 2.8 },
+    percha: { base: 40, jitter: 8, dur: 13 },
+    celebra: { dur: 2.6, grados: 360 },
+    noche: { freq: 0.4, amp: 0.05, rot: -4 },
+  },
+  /* Cuniculus taczanowskii — ternura nocturna, tímido y sereno: movimientos
+     suaves, nada de comedia bruta; de noche es cuando más vivo está. */
+  borugo: {
+    medio: 'suelo', poseBase: 'anda',
+    respira: { freq: 1.15, amp: 0.04, vaiven: 0.25 },
+    vuelta: { base: 39, jitter: 5, dur: 1.8, grados: 360, anticipo: 15 },
+    aseo: { base: 13, jitter: 4, dur: 1.2 },
+    percha: { base: 33, jitter: 7, dur: 10 },
+    celebra: { dur: 1.8, grados: 360 },
+    noche: { freq: 0.7, amp: 0.05, rot: -5 },
+  },
 };
+
+// Los seis seleccionables proyectan la fuente única; Angelita queda intacta.
+Object.assign(IDLE_PERFILES, Object.fromEntries(
+  Object.entries(PERFILES_CONDUCTA).map(([slug, perfil]) => [slug, idleDePerfilConducta(perfil)]),
+));
+
+/* Alias LEGACY: el perfil nació con el slug 'rana-dorada' (Phyllobates) pero la
+   creature real de la casa siempre fue 'rana-andina' (Atelopus spp.) — el slug
+   viejo caía en silencio al fallback (¡la rana se movía como abeja!). Se
+   mantiene el alias para no romper consumidores/tests históricos. */
+IDLE_PERFILES['rana-dorada'] = IDLE_PERFILES['rana-andina'];
+// Compatibilidad con consumidores anteriores al slug canónico del roster-7.
+IDLE_PERFILES.chivito = IDLE_PERFILES['chivito-punk'];
 
 /* Overshoot del giro (grados que se pasa antes de asentar). */
 const PASADA = 24;
@@ -183,7 +260,8 @@ export function idleDeCreature(t, {
 } = {}) {
   const p = IDLE_PERFILES[especie] || IDLE_PERFILES['abeja-angelita'];
   const deNoche = hora === 'noche';
-  if (reducedMotion) return deNoche ? IDLE_CALMA_NOCHE : IDLE_NEUTRO;
+  const duermeDeNoche = deNoche && p.noche?.modo !== 'activo';
+  if (reducedMotion) return duermeDeNoche ? IDLE_CALMA_NOCHE : IDLE_NEUTRO;
   const s = (semilla ?? semillaDe(especie)) >>> 0;
 
   // CELEBRA — llegó a un mundo: giro alegre pasado de rosca + rebotico de gozo.
@@ -202,7 +280,7 @@ export function idleDeCreature(t, {
 
   // ACURRUCA — de noche se recoge: baja del todo (posada=1), cabecita metida,
   // respiración honda y lenta. Nada de piruetas: el valle duerme.
-  if (deNoche) {
+  if (duermeDeNoche) {
     const r = Math.sin(t * p.noche.freq);
     return {
       pose: 'reposo',
@@ -215,9 +293,12 @@ export function idleDeCreature(t, {
 
   // RESPIRA — el squash & stretch de base (dos ondas que nunca comparten
   // compás): sobre él se montan los demás eventos.
-  const resp = Math.sin(t * p.respira.freq) * (1 + 0.35 * Math.sin(t * p.respira.vaiven));
-  let sx = 1 + p.respira.amp * resp;
-  let sy = 1 - p.respira.amp * 1.3 * resp;
+  const respiracion = deNoche && p.noche?.modo === 'activo' && p.noche.freq
+    ? { ...p.respira, freq: p.noche.freq, amp: p.noche.amp ?? p.respira.amp }
+    : p.respira;
+  const resp = Math.sin(t * respiracion.freq) * (1 + 0.35 * Math.sin(t * respiracion.vaiven));
+  let sx = 1 + respiracion.amp * resp;
+  let sy = 1 - respiracion.amp * 1.3 * resp;
 
   // Tier bajo: frugal — respira y nada más (los antics CSS ya están apagados).
   if (tier === 'bajo') {
@@ -233,6 +314,7 @@ export function idleDeCreature(t, {
   const activos = [];
   for (const carril of CARRILES) {
     const cfg = p[carril.tipo];
+    if (!cfg) continue;
     const v = ventana(t, s, carril.id, cfg);
     if (v) activos.push({ tipo: carril.tipo, id: carril.id, cfg, f: v.f, k: v.k, inicio: t - v.f * cfg.dur });
   }
@@ -241,7 +323,9 @@ export function idleDeCreature(t, {
   for (const cand of activos) {
     const bloqueado = CARRILES.some((otro) => {
       if (otro.id === cand.id) return false;
-      const w = ventana(cand.inicio, s, otro.id, p[otro.tipo]);
+      const cfgOtro = p[otro.tipo];
+      if (!cfgOtro) return false;
+      const w = ventana(cand.inicio, s, otro.id, cfgOtro);
       return w !== null && w.f > 0; // otro carril ya corría cuando este arrancó
     });
     if (!bloqueado) { ev = cand; break; }
@@ -251,6 +335,14 @@ export function idleDeCreature(t, {
   // reposa con las alitas plegadas y despega con brinquito de overshoot
   // (posada asoma negativa un instante = el hop).
   if (ev && ev.tipo === 'percha') {
+    if (ev.cfg.evento === 'vuelo') {
+      return {
+        pose: ev.cfg.pose,
+        sx, sy, rot: 0,
+        dy: 0.04 * Math.sin(Math.PI * ev.f),
+        posada: 0, activo: true, evento: 'vuelo',
+      };
+    }
     let posada; let pose = p.poseBase;
     if (ev.f < 0.18) posada = suave(ev.f / 0.18);
     else if (ev.f < 0.8) { posada = 1; pose = 'reposo'; }
@@ -272,6 +364,20 @@ export function idleDeCreature(t, {
     else rot = p.vuelta.grados + PASADA * (1 - suave((ev.f - 0.88) / 0.12));
     sx *= 1 + 0.08 * Math.sin(Math.PI * clamp01((ev.f - 0.16) / 0.72)); // smear del giro
     return { pose: p.poseBase, sx, sy, rot, dy: 0, posada: 0, activo: true, evento: 'vuelta' };
+  }
+
+  // GESTO — sustituto acotado de la vuelta en los seis compais: inclina y
+  // alza el cuerpo, nunca gira ni hace flip.
+  if (ev && ev.tipo === 'gesto') {
+    const pulso = Math.sin(Math.PI * ev.f);
+    return {
+      pose: p.poseBase,
+      sx: sx * (1 - (p.masa || 0) * 0.01 * pulso),
+      sy: sy * (1 + (p.gesto.alza || 0) * pulso),
+      rot: (p.gesto.incl || 0) * Math.sin(Math.PI * ev.f * 2),
+      dy: (p.gesto.alza || 0) * pulso,
+      posada: 0, activo: true, evento: 'gesto',
+    };
   }
 
   // ASEO — rascarse (se ladea, jiggle de patita) o sacudirse (perro mojado);

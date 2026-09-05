@@ -9,48 +9,55 @@
   "cultivable": true,
   "conservation_status": "cultivo_comun",
   "thermal_zones": [
-    "frio"
+    "frio",
+    "paramo"
   ],
   "roles_in_guild": [
-    "crop",
-    "ground_cover"
+    "crop"
   ],
   "antagonists": [],
   "especies_nativas_sustitutas": [],
   "propagation": {
     "metodo_principal": "tuberculo",
-    "notas": "Asoliar los tubérculos antes de consumirlos para reducir el contenido de ácido oxálico y aumentar el dulzor."
+    "notas": "Fenologia: siembra de tuberculo semilla, emergencia, crecimiento rastrero, floracion ocasional, tuberizacion con dias cortos, maduracion y cosecha."
   },
   "requirements": {
     "agua": "medio",
     "altitud_msnm": {
-      "min_absoluto": 1800,
-      "optimo_min": 2400,
-      "optimo_max": 2800,
-      "max_absoluto": 3400
+      "min_absoluto": 2400,
+      "optimo_min": 2800,
+      "optimo_max": 3400,
+      "max_absoluto": 3800
     },
     "temperatura_c": {
-      "helada_letal": -2,
-      "optimo_min": 12,
-      "optimo_max": 18,
+      "helada_letal": -4,
+      "optimo_min": 8,
+      "optimo_max": 16,
       "max_tolerable": 22
     },
     "radiacion": "sol_pleno",
     "drenaje_requerido": "bueno"
   },
-  "valor_pedagogico": "La oca (Oxalis tuberosa) se cultiva en Colombia principalmente en los departamentos de Cundinamarca, Boyacá, Nariño y Cauca, entre 2400-3400 msnm en zona térmica fría, con propagación por tubérculos semilla y un ciclo de crecimiento de 8-9 meses, asociándose frecuentemente con papa y maíz en sistemas de policultivo andino, mientras enfrenta desafíos por plagas como el gusano blanco y la mosca de la oca; su cultivo tiene profundas raíces culturales en la tradición muisca y campesina andina, donde se reconocen variedades de tubérculo blanco, rosado, morado y amarillo, utilizándose tradicionalmente cocido en sopas y aplicándose la técnica ancestral de 'qollotear' (exposición al sol post-cosecha) para reducir el contenido de ácido oxálico y aumentar el dulzor, tal como documenta el National Research Council en su obra de 1989 'Lost Crops of the Incas' que identifica a la oca como uno de los tubérculos andinos subutilizados con gran potencial para cultivo mundial.",
+  "valor_pedagogico": "La oca o hibia (Oxalis tuberosa) es un tuberculo andino de clima frio y altoandino, conservado en chagras y huertas campesinas de Nariño, Cauca, Boyaca y Cundinamarca. Su fenologia incluye siembra de tuberculo semilla, emergencia, crecimiento rastrero, floracion ocasional, tuberizacion inducida por dias cortos, maduracion y cosecha. Es pedagogica porque ayuda a comparar tuberculos andinos distintos de la papa y a explicar diversidad alimentaria, fotoperiodo y conservacion de semilla local. Plagas y enfermedades clave incluyen gusanos de suelo, babosas, pulgones como vectores, pudriciones bacterianas y pudriciones en almacenamiento si el tuberculo entra humedo.",
+  "companions_markdown": "### Especies asociadas favorables\n\nEstas especies favorecen el cultivo cuando se siembran cerca:\n- solanum_tuberosum — Papa (Solanum tuberosum L.)\n- ullucus_tuberosus — Ulluco / Chugua (Ullucus tuberosus Caldas)",
   "sources": [
     {
-      "id": "nrc-1989-cultivos-andinos",
-      "title": "nrc-1989-cultivos-andinos",
+      "id": "agrosavia-manual-tuberculos-andinos-2017",
+      "title": "agrosavia-manual-tuberculos-andinos-2017",
       "tier": "A",
       "url": null
     },
     {
-      "id": "gbif-taxonomic-backbone",
-      "title": "gbif-taxonomic-backbone",
+      "id": "ica-resolucion-3168-2015",
+      "title": "ica-resolucion-3168-2015",
       "tier": "A",
-      "url": "https://www.gbif.org/dataset/d7dddbf4-2cf0-4f39-9b2a-bb099caae36c"
+      "url": null
+    },
+    {
+      "id": "doi-2025-oca-narino-agrosavia",
+      "title": "doi-2025-oca-narino-agrosavia",
+      "tier": "A",
+      "url": "https://www.scielo.org.pe/scielo.php?pid=S1727-99332025000400002&script=sci_arttext"
     },
     {
       "id": "powo-kew",
@@ -59,12 +66,12 @@
       "url": "https://powo.science.kew.org"
     },
     {
-      "id": "agrosavia-sol-andina",
-      "title": "agrosavia-sol-andina",
+      "id": "gbif-taxonomic-backbone",
+      "title": "gbif-taxonomic-backbone",
       "tier": "A",
-      "url": "https://www.agrosavia.co"
+      "url": "https://www.gbif.org/dataset/d7dddbf4-2cf0-4f39-9b2a-bb099caae36c"
     }
   ],
   "_generated_by": "scripts/build-cycle-content-from-catalog.mjs",
-  "_generated_at": "2026-05-19T00:42:57.363Z"
+  "_generated_at": "2026-09-03T07:40:20.316Z"
 }

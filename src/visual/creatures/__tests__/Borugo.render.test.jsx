@@ -21,7 +21,9 @@ import { CREATURES } from '../index.js';
 
 afterEach(cleanup);
 
-describe('Borugo — contrato base intacto', () => {
+describe.skip('Borugo — contrato base intacto (archivado 2026-07-18)', () => {
+  // BORUGO ARCHIVADO: operador rechazó el dibujo como feo. Componente, test y
+  // datos quedan por historia. Este describe skipped hasta que se redibuje.
   it('render por defecto = svg accesible, sin capas nuevas', () => {
     const { container } = render(<Borugo tier="medio" />);
     const svg = container.querySelector('svg[data-creature="borugo"]');
@@ -45,8 +47,9 @@ describe('Borugo — contrato base intacto', () => {
   });
 
   it('está registrado como el binomio correcto (Cuniculus taczanowskii)', () => {
-    expect(CREATURES.borugo).toBeTruthy();
-    expect(CREATURES.borugo.cientifico).toBe('Cuniculus taczanowskii');
+    // Borugo quedó archivado por decisión visual y ya no se surfacea en el
+    // registro data-driven. El componente se conserva para poder rehacerlo.
+    expect(CREATURES.borugo).toBeUndefined();
   });
 });
 

@@ -1382,7 +1382,7 @@ describe('agentService — Task #202 Profile Context', () => {
     it('con toolEvidence get_species: construye respuesta con datos conocidos', () => {
       const toolEvidence = {
         tool: 'get_species',
-        result: { available: true, species_name: 'Fresa', viabilidad: 'viable' },
+        result: { available: true, species: { nombre_comun: 'Fresa', viabilidad: 'viable' } },
       };
       const r = buildFallbackResponse('', toolEvidence, []);
       expect(r).toMatch(/Fresa/);
@@ -1393,7 +1393,7 @@ describe('agentService — Task #202 Profile Context', () => {
     it('con toolEvidence get_pest_controllers: muestra controles disponibles', () => {
       const toolEvidence = {
         tool: 'get_pest_controllers',
-        result: { available: true, controls: ['control1', 'control2'] },
+        result: { available: true, matches_count: 2, matches: ['control1', 'control2'] },
       };
       const r = buildFallbackResponse('', toolEvidence, []);
       expect(r).toMatch(/2 control/);
@@ -1402,7 +1402,7 @@ describe('agentService — Task #202 Profile Context', () => {
     it('con toolEvidence get_biopreparados: muestra recetas disponibles', () => {
       const toolEvidence = {
         tool: 'get_biopreparados',
-        result: { available: true, recipes: ['rec1'] },
+        result: { available: true, matches_count: 1, matches: ['rec1'] },
       };
       const r = buildFallbackResponse('', toolEvidence, []);
       expect(r).toMatch(/1 receta/);
@@ -1439,7 +1439,7 @@ describe('agentService — Task #202 Profile Context', () => {
 
     it('acepta toolEvidence como array (NLU tool_chain)', () => {
       const toolEvidence = [
-        { tool: 'get_species', result: { available: true, species_name: 'Café' } },
+        { tool: 'get_species', result: { available: true, species: { nombre_comun: 'Café' } } },
         { tool: 'get_pest_controllers', result: { available: false } },
       ];
       const r = buildFallbackResponse('', toolEvidence, []);

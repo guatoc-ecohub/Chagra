@@ -300,7 +300,7 @@ function CordilleraFondo() {
         { x: -1, z: 8.5, s: [17, 5.6, 6], c: '#ddccab' },
         { x: 10, z: 10, s: [14, 4.8, 6], c: '#e3d4b4' },
       ].map((r, i) => (
-        <mesh key={i} position={[r.x, 0, r.z]} scale={r.s}>
+        <mesh key={i} position={/** @type {[number, number, number]} */ ([r.x, 0, r.z])} scale={/** @type {[number, number, number]} */ (r.s)}>
           <sphereGeometry args={[1, 10, 6, 0, Math.PI * 2, 0, Math.PI / 2]} />
           <meshLambertMaterial color={r.c} />
         </mesh>
@@ -635,7 +635,7 @@ function VinetaPiso({ pisoId, ancla, def, tier, reducedMotion }) {
 
   /* offsets relativos al ancla, con la Y muestreada del monte (el compañero se
      posa en SU punto de la ladera, no flota a la altura del héroe) */
-  const rel = (ox, oz) => [ox, alturaMonte(ancla[0] + ox, ancla[2] + oz) - ancla[1], oz];
+  const rel = (ox, oz) => /** @type {[number, number, number]} */ ([ox, alturaMonte(ancla[0] + ox, ancla[2] + oz) - ancla[1], oz]);
   const tilt = -Math.PI / 2 - Math.atan(pendienteEn(ancla[0], ancla[2]));
   const claroR = def.alto * 0.85;
 
@@ -1138,6 +1138,7 @@ function hexLerp(a, b, t) {
  * @param {string}  [props.pisoUsuario]  piso de la finca a resaltar (opcional).
  * @param {(pisoId:string)=>void} [props.onEntrarPiso]  navegar al mundo del piso.
  * @param {string}  [props.className]
+ * @param {(view: string, data?: any) => void} [props.onNavigate]  inyectada por el shell de prod; fallback de onEntrarPiso.
  */
 export default function GaleriaSierraArboles({
   tier = 'alto',
@@ -1145,7 +1146,14 @@ export default function GaleriaSierraArboles({
   pisoUsuario,
   onEntrarPiso,
   className = '',
+  // Inyectada por el shell de prod (barrido de controles 2026-07-15): nadie
+  // cableaba onEntrarPiso → los árboles héroe y las bandas de la leyenda eran
+  // taps muertos. Sin prop específica, entrar al piso lleva a la navegación
+  // de mundos por piso térmico (montaña), con el piso tocado como dato.
+  onNavigate = undefined,
 }) {
+  const entrarPiso = onEntrarPiso
+    ?? (onNavigate ? (pisoId) => onNavigate('montana_mundos', { piso: pisoId }) : undefined);
   const [listo, setListo] = useState(false);
   const [clima, setClima] = useState(0);
   const controles = useRef(null);
@@ -1172,7 +1180,7 @@ export default function GaleriaSierraArboles({
           reducedMotion={reducedMotion}
           clima={clima}
           pisoUsuario={pisoUsuario}
-          onEntrarPiso={onEntrarPiso}
+          onEntrarPiso={entrarPiso}
         />
         <OrbitControls
           ref={controles}
@@ -1201,7 +1209,7 @@ export default function GaleriaSierraArboles({
           <small>Del mar Caribe a la nieve: toque el árbol mayor de un piso para entrar a su mundo.</small>
         </h2>
 
-        <LeyendaPisos clima={clima} pisoUsuario={pisoUsuario} onEntrarPiso={onEntrarPiso} />
+        <LeyendaPisos clima={clima} pisoUsuario={pisoUsuario} onEntrarPiso={entrarPiso} />
 
         <div className="gsierra-abajo">
           {/* SLIDER CLIMÁTICO: el corrimiento de los pisos hoy→2050 */}

@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+/* global process, console, atob, createImageBitmap, Blob, OffscreenCanvas */
 /**
  * Mide valor, saturación, paleta cuantizada y detalle por tercio en PNG.
  * Recorta la UI superior/inferior y el minimapa derecho de forma constante.
@@ -41,7 +42,7 @@ async function medir(ruta) {
     const { data, width, height } = ctx.getImageData(x0, y0, x1 - x0, y1 - y0);
     const hist = new Uint32Array(256);
     const quant = new Set();
-    const tercios = Array.from({ length: 3 }, () => ({ n: 0, suma: 0, suma2: 0, bordes: 0, pruebasBorde: 0 }));
+    const tercios = Array.from({ length: 3 }, () => ({ n: 0, suma: 0, suma2: 0, r: 0, g: 0, b: 0, bordes: 0, pruebasBorde: 0 }));
     let n = 0; let suma = 0; let suma2 = 0; let sat = 0; let sat2 = 0; let negros = 0; let blancos = 0;
     const lum = (i) => (0.2126 * data[i] + 0.7152 * data[i + 1] + 0.0722 * data[i + 2]) / 255;
     for (let y = 0; y < height; y += 2) {
@@ -59,6 +60,7 @@ async function medir(ruta) {
         if (l > 0.98) blancos += 1;
         const t = tercios[tercio];
         t.n += 1; t.suma += l; t.suma2 += l * l;
+        t.r += data[i] / 255; t.g += data[i + 1] / 255; t.b += data[i + 2] / 255;
         if (x + 4 < width && y + 4 < height) {
           const gx = Math.abs(lum(i + 16) - l);
           const gy = Math.abs(lum(i + width * 16) - l);
@@ -74,7 +76,14 @@ async function medir(ruta) {
     };
     let entropia = 0;
     for (const h of hist) if (h) { const p = h / n; entropia -= p * Math.log2(p); }
-    const estad = (t) => ({ media: t.suma / t.n, desviacion: Math.sqrt(Math.max(0, t.suma2 / t.n - (t.suma / t.n) ** 2)), densidadBorde: t.bordes / t.pruebasBorde });
+    const estad = (t) => ({
+      media: t.suma / t.n,
+      desviacion: Math.sqrt(Math.max(0, t.suma2 / t.n - (t.suma / t.n) ** 2)),
+      densidadBorde: t.bordes / t.pruebasBorde,
+      // Receta B: el valle es verde-dominante. Reportamos RGB normalizado por
+      // tercio para que los gates C/D no deduzcan un tinte desde saturación.
+      rgbMedia: { r: t.r / t.n, g: t.g / t.n, b: t.b / t.n },
+    });
     const ts = tercios.map(estad);
     return {
       archivo: nombre, dimensiones: [bmp.width, bmp.height], recorteAnalizado: [x0, y0, x1, y1], muestras: n,

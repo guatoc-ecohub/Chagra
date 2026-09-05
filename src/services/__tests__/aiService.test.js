@@ -1,5 +1,8 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
+const CANONICAL_VISION_MODEL = 'qwen3-vl:8b';
+const RETIRED_VISION_MODEL_PATTERN = /^(granite|gemma|ministral)/i;
+
 // Mocks DEBEN declararse antes del import del módulo bajo test.
 // Audit 2026-05-18 #4: integramos RAG en analyzeFoliage; estos tests
 // aíslan el flujo de retrieval + prompt building + propagación de
@@ -129,6 +132,12 @@ describe('aiService — buildDiagnosisPrompt (helper)', () => {
 });
 
 describe('aiService — __retrieveRagContextForFoliage (graceful degrade)', () => {
+  it('skipRag evita cargar el corpus para una foto sin especie confirmada', async () => {
+    const result = await __retrieveRagContextForFoliage(undefined, { skipRag: true });
+    expect(result).toEqual([]);
+    expect(retrieveMock).not.toHaveBeenCalled();
+  });
+
   it('retrieve falla → retorna [] sin propagar la excepción', async () => {
     retrieveMock.mockRejectedValueOnce(new Error('corpus boom'));
     const result = await __retrieveRagContextForFoliage('cualquier');
@@ -150,6 +159,17 @@ describe('aiService — __retrieveRagContextForFoliage (graceful degrade)', () =
 });
 
 describe('aiService — analyzeFoliage integración RAG', () => {
+  it('skipRag manda la foto al modelo sin descargar fichas ni embeddings', async () => {
+    streamOllamaMock.mockResolvedValueOnce(happyDiagnosisJson);
+
+    await analyzeFoliage(makeBlob(), { skipRag: true });
+
+    expect(retrieveMock).not.toHaveBeenCalled();
+    const [, body, , options] = streamOllamaMock.mock.calls[0];
+    expect(body.prompt).toBe(__TEST__.DIAGNOSIS_BASE_PROMPT);
+    expect(options.meta).toEqual({ rag_passages_used: 0 });
+  });
+
   it('con speciesSlug → retrieve query incluye el slug + 3 passages al prompt', async () => {
     retrieveMock.mockResolvedValueOnce([
       { text: 'Mancha foliar en fresa por Mycosphaerella fragariae.', species: 'fragaria_ananassa_monterrey', key: 'valor_pedagogico' },
@@ -167,7 +187,9 @@ describe('aiService — analyzeFoliage integración RAG', () => {
 
     expect(streamOllamaMock).toHaveBeenCalledTimes(1);
     const [, body, , options] = streamOllamaMock.mock.calls[0];
-    expect(body.model).toBe('qwen3-vl:8b');
+    // No se compara contra ENV.VISION_MODEL porque el código bajo prueba produce ese mismo valor.
+    expect(body.model).toBe(CANONICAL_VISION_MODEL);
+    expect(body.model).not.toMatch(RETIRED_VISION_MODEL_PATTERN);
     expect(body.prompt).toContain('<CONTEXTO_CIENTÍFICO>');
     expect(body.prompt).toContain('Mycosphaerella fragariae');
     expect(body.prompt).toContain('caldo bordelés');

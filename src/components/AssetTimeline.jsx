@@ -6,6 +6,8 @@ import { parseAiInference, parseAiReview } from '../utils/aiInferenceParser';
 import { savePayload } from '../services/payloadService';
 import { PRIMARY_WORKER_NAME } from '../config/workerConfig';
 import { usePhotoUrl } from '../hooks/usePhotoUrl';
+import CaseLinkModal from './CaseLinkModal';
+import { shouldTriggerCaseBridge, healthScoreToCaseSeverity } from '../utils/caseBridge';
 import BeforeAfterPhoto from './BeforeAfterPhoto';
 import EmptyStateCampo from './common/EmptyStateCampo.jsx';
 
@@ -185,6 +187,10 @@ export default function AssetTimeline({ assetId }) {
   const isSyncing = useLogStore((state) => state.isSyncing);
   const loadLogsForAsset = useLogStore((state) => state.loadLogsForAsset);
   const [visibleMonths, setVisibleMonths] = useState(2);
+  // Audit 070.6 satélite — modal payload tras confirmar una revisión IA cuyo
+  // score de salud indica problema. Shape: { logId, severity, description,
+  // speciesSlug, plantId, landId } (mismo contrato que ObservationScreen).
+  const [caseBridgePayload, setCaseBridgePayload] = useState(null);
 
   // Generador dev-only de 1000 logs para stress test (ADR-030 Regla 4)
   useEffect(() => {
@@ -320,13 +326,30 @@ export default function AssetTimeline({ assetId }) {
     const pending = log._pending;
 
     const handleReview = async (verdict) => {
+      // Audit 070.6 satélite — id pre-asignado (patrón ObservationScreen
+      // 070.5) para que el bridge tenga un logId estable que pasar al
+      // CaseLinkModal aún en flujo offline.
+      const reviewLogId = (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function')
+        ? crypto.randomUUID()
+        : `review-${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
+
+      // Severity derivada de la señal existente: la inferencia guarda
+      // `confidence` = score de salud / 100 (único write-path:
+      // EvidenceCapture). Confirmar un hallazgo sobre una planta con score
+      // < 50 es el evento 'high' que dispara el bridge; rechazar nunca.
+      const severity = verdict === 'confirmed'
+        ? (healthScoreToCaseSeverity(aiData.confidence * 100) || 'info')
+        : 'info';
+
       const payload = {
         data: {
           type: 'log--observation',
+          id: reviewLogId,
           attributes: {
             name: `Revisión IA: ${verdict === 'confirmed' ? 'Confirmado' : 'Rechazado'}`,
             timestamp: Math.floor(Date.now() / 1000),
             status: "done",
+            severity,
             notes: {
               value: [
                 '[AI_REVIEW]',
@@ -344,8 +367,28 @@ export default function AssetTimeline({ assetId }) {
           }
         }
       };
-      await savePayload('observation', payload);
+      try {
+        await savePayload('observation', payload);
+      } catch (error) {
+        // Sin save no hay log que vincular: sin bridge y sin romper la consola.
+        console.error('[AssetTimeline] Error guardando revisión IA:', error);
+        return;
+      }
       useLogStore.getState().loadLogsForAsset(assetId);
+
+      // Audit 070.6 satélite — bridge severity → case_study. Solo tras el
+      // save exitoso (si savePayload rechaza, este bloque nunca corre y no
+      // se ofrece vincular un log que no existe).
+      if (shouldTriggerCaseBridge(severity)) {
+        setCaseBridgePayload({
+          logId: reviewLogId,
+          severity,
+          description: log.attributes?.name || aiData.findings[0] || '',
+          speciesSlug: null, // AssetTimeline solo conoce assetId (sin lookup de especie).
+          plantId: assetId,
+          landId: null,
+        });
+      }
     };
 
     return (
@@ -514,6 +557,20 @@ export default function AssetTimeline({ assetId }) {
             }}
           />
         </div>
+      )}
+
+      {/* Audit 070.6 satélite — bridge severity → case_study (mismo modal
+          que ObservationScreen; overlay fixed, no afecta el layout). */}
+      {caseBridgePayload && (
+        <CaseLinkModal
+          logId={caseBridgePayload.logId}
+          severity={caseBridgePayload.severity}
+          description={caseBridgePayload.description}
+          speciesSlug={caseBridgePayload.speciesSlug}
+          plantId={caseBridgePayload.plantId}
+          landId={caseBridgePayload.landId}
+          onClose={() => setCaseBridgePayload(null)}
+        />
       )}
     </div>
   );

@@ -26,6 +26,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { createWakeWordDetector } from '../services/wakeWordService';
 import { activarEscucha } from '../services/escuchaService';
+import { modoCampoDisponible } from '../config/modoCampoFlag';
 
 const INACTIVITY_MS = 10 * 60 * 1000; // 10 min sin disparos → apagar solo
 const LOW_BATTERY_LEVEL = 0.15; // ~15%
@@ -50,7 +51,8 @@ function readPersistedActive() {
  * }}
  */
 export function useModoCampo() {
-  const [active, setActive] = useState(readPersistedActive);
+  const enabled = modoCampoDisponible();
+  const [active, setActiveState] = useState(() => enabled && readPersistedActive());
   /** @type {[ModoCampoStatus, (s: ModoCampoStatus) => void]} */
   const [status, setStatus] = useState(/** @type {ModoCampoStatus} */ ('idle'));
   const [lastScore, setLastScore] = useState(0);
@@ -62,6 +64,20 @@ export function useModoCampo() {
   const detectorRef = useRef(null);
   const inactivityRef = useRef(null);
   const cancelledRef = useRef(false);
+
+  // El provider vive en el root aunque la feature esté dark. Si la flag se
+  // apaga después de una sesión anterior, no se debe reactivar el detector ni
+  // conservar el toggle persistido.
+  useEffect(() => {
+    if (enabled) return;
+    try { localStorage.removeItem(ACTIVE_KEY); } catch (_) { /* storage opcional */ }
+  }, [enabled]);
+
+  /** @param {boolean} next */
+  const setActive = useCallback((next) => {
+    if (!enabled) return;
+    setActiveState(next);
+  }, [enabled]);
 
   // Persiste el toggle: el modo campo sobrevive al navegar entre pantallas y al
   // reload (antes el estado vivía en ModoCampoPanel/Perfil y moría al salir →
@@ -85,7 +101,7 @@ export function useModoCampo() {
 
   // --- Motor de wake-word: carga/entrena/escucha mientras `active`. ---
   useEffect(() => {
-    if (!active) {
+    if (!enabled || !active) {
       // eslint-disable-next-line react-hooks/set-state-in-effect -- reset temprano en guard clause, no cambia durante render
       setStatus('idle');
       return undefined;
@@ -131,7 +147,7 @@ export function useModoCampo() {
         inactivityRef.current = null;
       }
     };
-  }, [active, dispararEscucha, resetInactivityTimer]);
+  }, [active, enabled, dispararEscucha, resetInactivityTimer]);
 
   // --- Screen Wake Lock: pantalla encendida mientras modo campo esté activo. ---
   useEffect(() => {

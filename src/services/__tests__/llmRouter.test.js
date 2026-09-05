@@ -120,6 +120,44 @@ describe('buildLLMRequest', () => {
       if (body.stop !== undefined) expect(Array.isArray(body.stop)).toBe(true);
     });
   });
+
+  // BUG-06 (2026-09-03): qwen3.5:4b es modelo "thinking" y el endpoint
+  // OpenAI-compat de Ollama IGNORA `think:false` (ese flag solo funciona en
+  // el endpoint NATIVO /api/chat, que es el que usa el sidecar nlu.ts). Sin
+  // apagar el razonamiento, el modelo quema el presupuesto de max_tokens en
+  // un bloque que llega por `delta.reasoning` — campo que
+  // `openaiStream.extractContent` no lee — y la respuesta visible queda
+  // VACÍA con finish_reason "length". Medido en vivo en alpha (mismo prompt
+  // real, modelo tibio): ANTES 48.6 s / 0 caracteres / "length" → DESPUÉS
+  // 7.7 s / 890 caracteres / "stop" con reasoning_effort:"none".
+  describe('BUG-06 — reasoning_effort apaga el razonamiento invisible (OpenAI-compat)', () => {
+    it('las rutas LLM llevan reasoning_effort:"none" por defecto', () => {
+      for (const task of ['chat', 'chat_complex', 'vision', 'visionRevision']) {
+        const { body } = /** @type {any} */ (buildLLMRequest(/** @type {any} */ (task), messages));
+        expect(body.reasoning_effort, task).toBe('none');
+      }
+    });
+
+    it('un override de reasoningEffort reemplaza el default', () => {
+      const { body } = /** @type {any} */ (buildLLMRequest('chat', messages, { reasoningEffort: 'low' }));
+      expect(body.reasoning_effort).toBe('low');
+    });
+
+    it('un route.reasoning_effort definido gana sobre el default "none"', () => {
+      // Simula una ruta futura que sí quiera razonar, sin dejar basura en
+      // ROUTES: se restaura en finally pase lo que pase.
+      const ruta = /** @type {any} */ (ROUTES.reasoning);
+      const previo = ruta.reasoning_effort;
+      ruta.reasoning_effort = 'medium';
+      try {
+        const { body } = /** @type {any} */ (buildLLMRequest('reasoning', messages));
+        expect(body.reasoning_effort).toBe('medium');
+      } finally {
+        if (previo === undefined) delete ruta.reasoning_effort;
+        else ruta.reasoning_effort = previo;
+      }
+    });
+  });
 });
 
 describe('selectChatRoute', () => {

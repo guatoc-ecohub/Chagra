@@ -6,7 +6,7 @@ import { execSync } from 'node:child_process';
 import { chromium } from 'playwright';
 
 const BASE = process.env.BASE_URL || 'http://127.0.0.1:5322';
-const OUT = process.env.OUT_DIR || '/tmp/claude-1000/-home-kortux/93695a3d-dc16-45f5-8c0e-608e6e767ffd/scratchpad';
+const OUT = process.env.OUT_DIR || '/tmp/chagra-shots';
 mkdirSync(OUT, { recursive: true });
 
 function chromiumPath() {

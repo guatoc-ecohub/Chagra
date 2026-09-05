@@ -20,11 +20,11 @@
  * no como abrir otra app). `piso` (y del suelo, default 0) posa la alfombra y
  * las sombras de contacto; solo cutaway lo necesita (su bloque centra en 0).
  */
-import { Suspense, lazy, useMemo, useRef, useState } from 'react';
-import { Canvas } from '@react-three/fiber';
+import { Suspense, lazy, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { Html, OrbitControls, Stars } from '@react-three/drei';
 import * as THREE from 'three';
-import { AbejaEscena } from './useEntradaAbeja.jsx';
+import { CompaiEscena } from './CompaiEscena.jsx';
 import CamaraDirector from './CamaraDirector.jsx';
 import { SombraContacto } from './SombraContacto.jsx';
 import { ESTADO_FINCA_MUESTRA } from './reaccionFinca.js';
@@ -44,14 +44,48 @@ import useCicloDia from '../useCicloDia.js';
 import { presetDeHora } from '../cielosHoraData.js';
 import { perfilDeTier } from '../deviceTier.js';
 import CapaVivaMundo from '../CapaVivaMundo.jsx';
+import useCompaiHold from '../../../hooks/useCompaiHold.js';
+/* HUD de FPS conmutable (dev/campo): lee el instrumento de usePerformanceMonitor
+   y lo muestra. DOM, fuera del <Canvas>. Apagado por defecto (return null). */
+import HudRendimiento from '../HudRendimiento.jsx';
+/* Álgebra pura de anti-colisión de etiquetas 3D→pantalla (proyección + cajas
+   AABB), la MISMA que ya generaliza `RotulosLugares` (Valle3D.jsx) para el kit
+   `EtiquetasMundo` — se reusa aquí en vez de duplicarla una tercera vez; solo
+   la POLÍTICA de foco (abajo) es propia de los hotspots. */
+import { proyectarAPantalla, rectanguloDe, seSolapan } from '../kit/etiquetasAntiColision.js';
 
 /* El bloom sutil de la hora dorada: chunk LAZY con gate ESTRICTO
    `tier === 'alto' && !reducedMotion` — medio y bajo NI LO DESCARGAN
    (el import dinámico solo dispara cuando el elemento llega a renderizarse). */
 const BloomSutil = lazy(() => import('./BloomSutil.jsx'));
 
+/* ── ANTI-COLISIÓN de hotspots en pantalla (ARREGLO ETIQUETAS ENCIMADAS,
+ * SPEC-UX-01): el MISMO criterio ya aprobado de `RotulosLugares` (Valle3D.jsx)
+ * y su port `CartelesNombres` (CorralVivo.jsx) — portado a la base compartida
+ * por los 9 arquetipos que la componen (los otros 2 de la familia de 11 — el
+ * valle y su calma — no la usan: el valle ya trae su propio RotulosLugares,
+ * la calma no tiene hotspots).
+ *
+ * Sin esto, `EscenaBase3D` pintaba la etiqueta COMPLETA de cada hotspot sin
+ * saber de las demás: dos puntos de interés cercanos EN PANTALLA (cámara
+ * alejada, auto-rotate) quedaban con sus rótulos encimados e ilegibles.
+ *
+ * NOTA de política (por qué NO se llama `resolverModos` del kit tal cual):
+ * `resolverModos` deja que CUALQUIER punto intente 'pleno' (útil para chips
+ * didácticos sueltos). Los hotspots son botones de NAVEGACIÓN, no chips, y el
+ * criterio YA aprobado para ellos (RotulosLugares banda 'media' / CorralVivo
+ * `CartelesNombres`) es más calmo: SOLO el activo/enfocado intenta 'pleno' —
+ * los demás van derecho a 'punto'. Se reusa la geometría pura del kit
+ * (`proyectarAPantalla`/`rectanguloDe`/`seSolapan`) pero se mantiene ESA
+ * política aquí, para no romper la lectura ya validada del valle/corral.
+ *
+ * Reusado el scratch (cero basura de GC en el hilo caliente del useFrame).
+ */
+const _projHotspot = new THREE.Vector3();
+
 function Contenido({
   params, hotspots, entrada, tinte, reducedMotion, onHotspot, cielo, animo, energia, piso = 0,
+  franja: franjaDeclarada = null,
   frugal = false, tier = 'alto', hablando = false, focoId = null, focoToken = 0,
   estadoFinca = ESTADO_FINCA_MUESTRA, hayAlerta = false, camaraInicial,
   tierInicial = 'medio',
@@ -60,12 +94,22 @@ function Contenido({
 }) {
   const controls = useRef(null);
   const [activo, setActivo] = useState(null);
+  // El PARTE DE VIAJE de la abeja (auditoría #50): useEntradaAbeja lo escribe
+  // cada frame (fase del cruce + posición viva) y CamaraDirector lo lee para
+  // ESCOLTARLA en la picada de entrada. Un ref compartido, cero re-renders.
+  const viajeAbeja = useRef({ fase: 'oculta', pos: new THREE.Vector3() });
   // `rebote`: cada toque de hotspot lo incrementa → Angelita da un microrrebote
   // (carácter de compañera, ref. el zorro de Ori / el ganso de Untitled Goose).
   const [rebote, setRebote] = useState(0);
   // Háptica del tap (DR-3D-HAPTICA): un tick seco al tocar un hotspot —
   // "toqué algo vivo, respondió". Gate triple interno; no-op en iOS.
   const haptics = useHaptics({ reducedMotion });
+  // Anti-colisión de hotspots (ver bloque de arriba): refs de los botones +
+  // memoria del último "candidato" (histéresis anti-parpadeo, mismo criterio
+  // de RotulosLugares/CartelesNombres).
+  const botonesHotspot = useRef({});
+  const plenaHotspot = useRef(null);
+  const tickHotspot = useRef(0);
   const zoom = entrada?.zoom ?? 6.5;
   const acento = (tinte && tinte[0]) || '#3f8f4e';
   const centro = entrada?.centro || /** @type {[number, number, number]} */ ([0, (params?.alto ?? 1.1) * 0.5, 0]);
@@ -76,7 +120,17 @@ function Contenido({
   // La receta vive en atmosferaMadre (mezclarCielo): ley exportada, mismo
   // resultado aquí y en cualquier consumidor. Memoizado por cielo + franja
   // (la franja cambia unas pocas veces al día; en demo, cada tantos segundos).
-  const { franja } = useCicloDia({ reducedMotion });
+  /* 🔴 La luz obedece la hora DECLARADA por la escena cuando la escena declara
+     una (`franja`); si no, el reloj real. Medido el 2026-09-02 en la bóveda del
+     clima: su cielo, su sol y su fondo están clavados a `hora: 0.62` (media
+     tarde) mientras la luz seguía el reloj del aparato — a las 21:30 la pantalla
+     pintaba un cielo de tarde con luz de NOCHE (intensidad 0.55, clave
+     `#b9c6e6` viniendo de DETRÁS en [-6,7,-4]) y el macizo se leía como una
+     silueta negra. Contradicción medible: con la MISMA malla, los pisos
+     distinguibles pasaban de 7/7 a 5/7 según la hora en que se tomara la
+     captura. Un mundo que declara su hora tiene que iluminarse con ESA hora. */
+  const { franja: franjaReloj } = useCicloDia({ reducedMotion });
+  const franja = franjaDeclarada || franjaReloj;
   const madre = useMemo(() => presetDeHora(franja), [franja]);
   const c = useMemo(() => mezclarCielo(cielo, madre), [cielo, madre]);
 
@@ -104,6 +158,63 @@ function Contenido({
       setResaltado({ id: focoId, token: focoToken });
     }
   }
+
+  // Anti-colisión de hotspots en pantalla (ver `rectoDeHotspot`/`seSolapanHotspot`
+  // arriba): ~12 pasadas/s (corre en el PRIMER frame — importa con
+  // frameloop='demand' de reduced-motion, que renderiza pocos frames), imperativo
+  // sobre `dataset` (cero re-render de React por cuadro). El hotspot `activo`
+  // (tocado, o el que acaba de enfocar un comando de voz — ambos setean `activo`
+  // arriba) manda su espacio primero; si no hay ninguno activo, el más cercano
+  // al centro del encuadre, con histéresis (solo cambia si otro queda 20% más
+  // centrado — anti-parpadeo). Los demás ceden a un punto-chip con solo el
+  // emoji; quien ni así cabe cede del todo (el CSS lo trae de vuelta si el
+  // teclado lo enfoca — mismo contrato que `.v3d-poi` del valle).
+  useFrame(({ camera, size }) => {
+    if (!hotspots || !hotspots.length) return;
+    if (tickHotspot.current++ % 5 !== 0) return;
+
+    const pts = hotspots.map((h) => {
+      _projHotspot.set(h.pos[0], h.pos[1], h.pos[2]);
+      const p = proyectarAPantalla(_projHotspot, _projHotspot, camera, size);
+      return {
+        id: h.id,
+        label: h.label || '',
+        ...p,
+        dc: Math.hypot(p.x - size.width / 2, p.y - size.height / 2),
+      };
+    });
+
+    let candidata = null;
+    if (activo && pts.some((p) => p.id === activo && !p.detras)) {
+      candidata = activo;
+    } else {
+      const previa = pts.find((p) => p.id === plenaHotspot.current && !p.detras);
+      const cercana = pts.filter((p) => !p.detras).sort((a, b) => a.dc - b.dc)[0];
+      candidata = previa && cercana && cercana.dc > previa.dc * 0.8 ? previa.id : (cercana?.id ?? null);
+    }
+    plenaHotspot.current = candidata;
+
+    const tomados = [];
+    const pisa = (r) => tomados.some((o) => seSolapan(r, o));
+    const orden = [...pts].sort((a, b) =>
+      a.id === candidata ? -1 : b.id === candidata ? 1 : a.dc - b.dc,
+    );
+    for (const p of orden) {
+      let modo = 'oculto';
+      if (!p.detras) {
+        const esPlena = p.id === candidata;
+        const r = esPlena
+          ? rectanguloDe(p.x, p.y, 76 + p.label.length * 9, 48)
+          : rectanguloDe(p.x, p.y, 44, 44);
+        if (!pisa(r)) {
+          tomados.push(r);
+          modo = esPlena ? 'plena' : 'punto';
+        }
+      }
+      const btn = botonesHotspot.current[p.id];
+      if (btn && btn.dataset.modo !== modo) btn.dataset.modo = modo;
+    }
+  });
 
   return (
     <>
@@ -183,7 +294,11 @@ function Contenido({
           <group key={h.id} position={h.pos}>
             <Html center distanceFactor={zoom + 2} zIndexRange={[30, 0]}>
               <button
+                ref={(el) => {
+                  botonesHotspot.current[h.id] = el;
+                }}
                 type="button"
+                data-modo={h.id === activo ? 'plena' : 'punto'}
                 className={`mundo-hotspot${activo === h.id ? ' mundo-hotspot--activo' : ''}${esComando ? ' mundo-hotspot--comando' : ''}`}
                 style={{ '--hs-tinte': acento }}
                 onPointerDown={(e) => e.stopPropagation()}
@@ -211,11 +326,13 @@ function Contenido({
         );
       })}
 
-      {/* Angelita: una sola por mundo (la del footer se oculta dentro). `entrando`
-          vive AHORA en si hay hotspot activo — con foco se posa junto a la puerta,
-          sin foco RONDA (idle propio, ya no un fotograma clavado). `hablando` la
-          hace pulsar cuando el agente narra; `rebote` es el microrrebote del toque. */}
-      <AbejaEscena
+      {/* EL COMPAÑERO del mundo: según el avatar elegido (CompaiEscena resuelve
+          el roster-7). Uno solo por mundo (el del footer se oculta
+          dentro). `entrando` vive AHORA en si hay hotspot activo — con foco se
+          posa junto a la puerta, sin foco RONDA (idle propio, ya no un fotograma
+          clavado). `hablando` la hace pulsar cuando el agente narra; `rebote` es
+          el microrrebote del toque. */}
+      <CompaiEscena
         foco={foco}
         entrando={!!activo}
         hablando={hablando}
@@ -228,6 +345,7 @@ function Contenido({
         piso={piso}
         tier={tier}
         mundoId={params?.id || params?.tipo || null}
+        viajeRef={viajeAbeja}
       />
 
       <OrbitControls
@@ -257,6 +375,7 @@ function Contenido({
         duracion={2.1}
         respiro={zoom * 0.005}
         activa={!reducedMotion && !frugal}
+        siga={viajeAbeja}
       />
       {/* Bloom SUTIL solo donde sobra GPU: tier alto sin reduced-motion. El
           gate es estricto a propósito (contrato de costo del DR de gama baja):
@@ -271,6 +390,30 @@ function Contenido({
   );
 }
 
+/** Estado que expone la sonda de medición al arnés visual, solo durante el gate. */
+/** @typedef {{ gl: import('three').WebGLRenderer, scene: import('three').Scene, camera: import('three').Camera }} ThreeSonda */
+
+/* SONDA DE MEDICIÓN (gate del Paso 5 / DOM-tapa-montaña): expone
+   `{ gl, scene, camera }` en `window.__three` para que
+   `_gate/descenso-20260902/medir-pisos-boveda.mjs` proyecte las 7 cotas con
+   la cámara viva. DORMIDA por defecto — mismo patrón que `AuditoriaValle`
+   (`?auditar=1`): solo despierta con `?sonda3d=1` en la query (antes del
+   hash de ruta). Sin ese parámetro no toca `window` ni cuesta nada: cero
+   cambio de arte, cero cambio de comportamiento. */
+function SondaTres3D() {
+  const { gl, scene, camera } = useThree();
+  useLayoutEffect(() => {
+    if (typeof window === 'undefined') return undefined;
+    if (!new URLSearchParams(window.location.search).has('sonda3d')) return undefined;
+    const ventana = /** @type {Window & { __three?: ThreeSonda }} */ (window);
+    ventana.__three = { gl, scene, camera };
+    return () => {
+      delete ventana.__three;
+    };
+  }, [gl, scene, camera]);
+  return null;
+}
+
 export default function EscenaBase3D({
   params, hotspots, entrada, tinte, reducedMotion,
   onHotspot, cielo, animo = 'sereno', energia = 1, camara, piso = 0, tier = 'alto',
@@ -278,9 +421,15 @@ export default function EscenaBase3D({
   /* El estado REAL de la finca (auditoría §5b): Angelita SIEMPRE lo refleja.
      Hoy MUESTRA (reaccionFinca); codex lo cabla con useFincaViva sin tocar
      esta interfaz. `hayAlerta` la pone atenta si hay algo del día pendiente. */
-  estadoFinca = ESTADO_FINCA_MUESTRA, hayAlerta = false, children,
+  estadoFinca = ESTADO_FINCA_MUESTRA, hayAlerta = false,
+  /* Hora DECLARADA por la escena ('amanecer'|'manana'|'mediodia'|'tarde'|
+     'atardecer'|'noche'). Opcional: sin ella manda el reloj real, que es el
+     comportamiento de siempre de todos los mundos. */
+  franja = null,
+  children,
 }) {
   const [listo, setListo] = useState(false);
+  const compaiHoldHandlers = useCompaiHold();
   const zoom = entrada?.zoom ?? 6.5;
   const cam = camara || { position: [zoom * 0.55, zoom * 0.5, zoom], fov: 42 };
   const tierInicial = useMemo(() => detectarTierInicial({ tier, reducedMotion }), [tier, reducedMotion]);
@@ -291,14 +440,17 @@ export default function EscenaBase3D({
   const frugal = tierInicial === 'bajo';
   const dpr = presupuestoInicial.dpr;
   return (
+    <>
     <Canvas
       className={`mundo-canvas${listo ? ' mundo-canvas--listo' : ''}`}
+      {...compaiHoldHandlers}
       dpr={dpr}
       gl={{ antialias: tierInicial === 'alto', powerPreference: 'high-performance' }}
       camera={cam}
       frameloop={reducedMotion ? 'demand' : 'always'}
       onCreated={() => setListo(true)}
     >
+      <SondaTres3D />
       <Suspense fallback={null}>
         <Contenido
           params={params}
@@ -318,6 +470,7 @@ export default function EscenaBase3D({
           focoToken={focoToken}
           estadoFinca={estadoFinca}
           hayAlerta={hayAlerta}
+          franja={franja}
           camaraInicial={cam}
           tierInicial={tierInicial}
           presupuestoInicial={presupuestoInicial}
@@ -326,5 +479,7 @@ export default function EscenaBase3D({
         </Contenido>
       </Suspense>
     </Canvas>
+    <HudRendimiento />
+    </>
   );
 }

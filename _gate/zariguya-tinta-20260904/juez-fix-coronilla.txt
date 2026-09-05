@@ -1,0 +1,15 @@
+A continuación, la descripción de los recortes basándome únicamente en los píxeles visibles:
+
+**Lado IZQUIERDA (tres imágenes de la izquierda):**
+
+*   El pelaje de la coronilla se ve como rayado fino de tinta. Se aprecian múltiples tonos y líneas finas que simulan la textura del pelo, con transiciones graduales entre las áreas de color más oscuro y más claro. No se perciben parches planos y uniformes.
+*   No hay un borde o escalón visible entre la coronilla y la frente. La transición entre el pelaje oscuro de la parte superior y el pelaje más claro de la frente es suave y difuminada, integrándose sin una línea de demarcación dura.
+
+**Lado DERECHA (tres imágenes de la derecha):**
+
+*   El pelaje de la coronilla se ve como un casco/gorro de parches planos con borde. Las áreas de color oscuro son más uniformes en tono y sus contornos son nítidos y definidos por bloques de píxeles, dando la impresión de formas más sólidas y menos texturizadas.
+*   Hay un borde o escalón visible entre la coronilla y la frente. La línea donde el pelaje oscuro de la coronilla se encuentra con el pelaje más claro de la frente es abrupta y angular, creada por los bordes de los píxeles, lo que forma una clara demarcación.
+
+**Comparación:**
+
+La coronilla se lee más como un gorro en el lado **DERECHA**, debido a la apariencia de parches planos y los bordes más definidos y abruptos que separan la coronilla de la frente, resultado de la pixelación más evidente.

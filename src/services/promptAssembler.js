@@ -97,9 +97,10 @@ export const BLOCK_ORDER = [
   'priceDecline', // GUARDA precio sin dato (protegido)
   'fermento', // GUARDA DR-FOOD-3 (protegido, máxima recency)
   'biopreparado', // GROUNDING biopreparados chagra-pro #248 (protegido, máxima recency — anti-negación)
-  'pisoTermico', // GUARDA desajuste de piso térmico chagra-pro #288 (protegido, ÚLTIMA — cross_thermal, SUPRESIÓN-Y-REEMPLAZO)
+  'pisoTermico', // GUARDA desajuste de piso térmico chagra-pro #288 (protegido, máxima recency — cross_thermal, SUPRESIÓN-Y-REEMPLAZO)
   'confusionEspecie', // GUARDA confusión de especie/familia botánica chagra-pro #292 (protegido, máxima recency — confusion_especie, SUPRESIÓN-Y-REEMPLAZO)
   'pestVsDisease', // GUARDA confusión plaga vs enfermedad chagra-pro #293 (protegido, máxima recency — pest_vs_disease, SUPRESIÓN-Y-REEMPLAZO)
+  'toxicSafety', // PISO DE SEGURIDAD ante venenos query-side chagra-pro P0 #2 (protegido, ÚLTIMA — domina: advertencia toxicidad + MIP, independiente del RAG)
 ];
 
 /**

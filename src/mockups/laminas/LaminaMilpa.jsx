@@ -2,7 +2,7 @@ import { useId } from 'react';
 import { AutoDibujo } from '../../visual/effects';
 import {
   Rotulo, TINTA, TINTA_2, VERDE, VERDE_OSC, VERDE_CLARO,
-  GRANO, GRANO_OSC, NARANJA, TIERRA, TIERRA_CLARA, ROJO,
+  GRANO, GRANO_OSC, NARANJA, TIERRA_CLARA, ROJO,
 } from './_kit.jsx';
 
 /*

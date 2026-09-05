@@ -8,6 +8,7 @@ import {
   markProfileDone,
   markProfileSkipped,
   hasSeenProfileOnboarding,
+  resolveDestinoPostLogin,
   buildUserProfileBlock,
   resolveAltitudToSave,
   getNotificationStyle,
@@ -122,6 +123,32 @@ describe('userProfileService (#200)', () => {
     it('markProfileSkipped marca onboarding visto (respeta #283)', () => {
       markProfileSkipped();
       expect(hasSeenProfileOnboarding()).toBe(true);
+    });
+  });
+
+  describe('resolveDestinoPostLogin (BUG-09 2026-09-04)', () => {
+    it('sin flags previos manda al onboarding (primer ingreso real)', () => {
+      localStorage.clear();
+      expect(resolveDestinoPostLogin()).toBe('onboarding-perfil');
+    });
+
+    it('con onboarding completado manda al dashboard', () => {
+      markProfileDone();
+      expect(resolveDestinoPostLogin()).toBe('dashboard');
+    });
+
+    it('con onboarding saltado también manda al dashboard (no vuelve a molestar, #283)', () => {
+      markProfileSkipped();
+      expect(resolveDestinoPostLogin()).toBe('dashboard');
+    });
+
+    it('la decisión es coherente con hasSeenProfileOnboarding', () => {
+      localStorage.clear();
+      expect(hasSeenProfileOnboarding()).toBe(false);
+      expect(resolveDestinoPostLogin()).toBe('onboarding-perfil');
+      markProfileDone();
+      expect(hasSeenProfileOnboarding()).toBe(true);
+      expect(resolveDestinoPostLogin()).toBe('dashboard');
     });
   });
 

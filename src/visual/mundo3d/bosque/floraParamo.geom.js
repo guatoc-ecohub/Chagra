@@ -131,8 +131,11 @@ export function raleParamo(c) {
   return {
     ...c,
     // El frailejonal manda: más gigantes héroe y más gradiente de edad.
+    // (Páramo definitivo 2026-07-22: los jóvenes suben a 2.1× — el operador
+    // pidió "diversidad de especies Y de tamaños": un páramo real tiene
+    // rosetas a ras de suelo por cada tronco viejo de dos metros.)
     frailejonHero: boost(c.frailejonHero, 1.55),
-    frailejonJoven: boost(c.frailejonJoven, 1.5),
+    frailejonJoven: boost(c.frailejonJoven, 2.1),
     frailejon: boost(c.frailejon, 1.5),
     frailejonViejo: boost(c.frailejonViejo, 1.55),
     frailejonFlor: boost(c.frailejonFlor, 1.4),
@@ -553,17 +556,19 @@ export function geomYarumo({ q = 1 } = {}, seed = 2) {
     puntas.push([base[0] + dir[0] * largo, base[1] + dir[1] * largo, base[2] + dir[2] * largo]);
   }
 
-  // Hojas palmeadas: discos aplanados de 7 lóbulos, envés blanco, colgando.
-  const porPunta = Math.max(2, Math.round(3 * q));
+  // Hojas palmeadas: discos aplanados de 7 lóbulos, envés blanco, formando una
+  // SOMBRILLA ancha y CHATA sostenida en lo alto del fuste pálido desnudo — la
+  // firma inconfundible del yarumo (Cecropia) que remata el estrato emergente.
+  const porPunta = Math.max(3, Math.round(4 * q));
   for (const p of puntas) {
     for (let i = 0; i < porPunta; i++) {
       const ang = (i / porPunta) * Math.PI * 2 + r();
-      const rad = 0.18 + r() * 0.12;
-      const hoja = new THREE.ConeGeometry(0.42, 0.09, 7, 1); // 7-gono chato = "mano"
+      const rad = 0.22 + r() * 0.18; // se abre más ancha = parasol
+      const hoja = new THREE.ConeGeometry(0.52, 0.08, 7, 1); // 7-gono chato = "mano"
       apuntar(
         hoja,
-        [p[0] + Math.cos(ang) * rad, p[1] - 0.05 - r() * 0.08, p[2] + Math.sin(ang) * rad],
-        [Math.cos(ang) * 0.4, 0.9, Math.sin(ang) * 0.4],
+        [p[0] + Math.cos(ang) * rad, p[1] - 0.02 - r() * 0.05, p[2] + Math.sin(ang) * rad],
+        [Math.cos(ang) * 0.55, 0.78, Math.sin(ang) * 0.55], // más horizontal = plato
         [1, 0.5, 1],
       );
       partes.push(pintar(hoja, variar(PAL.yarumoEnves, r, 0.05)));
@@ -605,20 +610,23 @@ export function geomRoble({ q = 1 } = {}, seed = 3) {
     partes.push(pintar(rama, PAL.robleTronco));
   }
 
-  // Copa ANCHA: domo central + corona de lóbulos alrededor (masa de hojas).
-  const lobs = [{ c: [top.x, top.y + 0.55, top.z], radio: 0.9 }];
-  const nL = Math.max(3, Math.round(5 * q));
+  // Copa ANCHA y EXTENDIDA: la más ancha del dosel. Domo central APLANADO +
+  // corona de lóbulos que se ABREN horizontal → sombrilla frondosa de roble
+  // (hojas agrupadas hacia los extremos de las ramas, DR). Ancha y baja de
+  // perfil: contrasta con la pirámide invertida del encenillo y la aguja del aliso.
+  const lobs = [{ c: [top.x, top.y + 0.46, top.z], radio: 1.04 }];
+  const nL = Math.max(4, Math.round(6 * q));
   for (let i = 0; i < nL; i++) {
-    const ang = (i / nL) * Math.PI * 2 + r() * 0.6;
-    const rad = 0.6 + r() * 0.5;
+    const ang = (i / nL) * Math.PI * 2 + r() * 0.5;
+    const rad = 0.95 + r() * 0.62; // se ABRE ancho (antes 0.6–1.1)
     lobs.push({
-      c: [Math.cos(ang) * rad, H + 0.1 + r() * 0.7, Math.sin(ang) * rad],
-      radio: 0.55 + r() * 0.32,
+      c: [top.x + Math.cos(ang) * rad, H + 0.12 + r() * 0.48, top.z + Math.sin(ang) * rad],
+      radio: 0.6 + r() * 0.34,
     });
   }
   copaMasa(lobs, {
     base: PAL.robleHoja, sol: PAL.robleHoja2, luz: PAL.robleLuz,
-    q, seed: seed + 7, achatado: 0.82, huecos: 0.44, mordida: 0.4, ao: 0.66, manchas: 0.15,
+    q, seed: seed + 7, achatado: 0.86, huecos: 0.44, mordida: 0.4, ao: 0.66, manchas: 0.15,
   }).forEach((cc) => partes.push(cc));
 
   // Bellotas (unas pocas, cuelgan del borde de la copa).
@@ -645,9 +653,11 @@ export function geomRoble({ q = 1 } = {}, seed = 3) {
 /* -------------------------------------------------------------------------- */
 
 /*
- * Copa oscura, compacta e irregular —masa de hojas sombría— sobre tronco rojizo
- * algo torcido, con barbas de musgo colgando (vive envuelto en niebla). Más
- * estrecho y sombrío que el roble.
+ * LA FIRMA DEL ENCENILLO (DR primario): copa en PIRÁMIDE INVERTIDA / triángulo
+ * invertido, con el follaje concentrado en UNA sola capa superior ANCHA que se
+ * estrecha hacia el tronco rojizo torcido. Barbas de musgo colgando del borde
+ * (vive envuelto en niebla). Esa silueta de "paraguas triangular al revés" es
+ * lo que lo distingue del domo redondo del roble a treinta metros.
  */
 export function geomEncenillo({ q = 1 } = {}, seed = 4) {
   const r = rng(seed);
@@ -662,27 +672,45 @@ export function geomEncenillo({ q = 1 } = {}, seed = 4) {
   partes.push(geo);
   const top = curva.getPointAt(1);
 
-  // Copa estrecha y alta: lóbulos apilados que suben poco a poco.
-  const lobs = [{ c: [top.x, top.y + 0.45, top.z], radio: 0.62 }];
-  const nL = Math.max(3, Math.round(5 * q));
-  for (let i = 0; i < nL; i++) {
-    const f = i / nL;
-    const ang = r() * Math.PI * 2;
-    const rad = 0.15 + r() * 0.42;
-    lobs.push({
-      c: [Math.cos(ang) * rad, H + 0.1 + f * 0.9 + r() * 0.3, Math.sin(ang) * rad],
-      radio: 0.4 + r() * 0.28,
-    });
+  // PIRÁMIDE INVERTIDA: anillos de lóbulos cuyo radio CRECE con la altura →
+  // el vértice del triángulo abajo (pegado al fuste) y la boca ancha arriba.
+  // La masa se concentra en la banda superior (más lóbulos y más grandes),
+  // como manda el DR: "follaje concentrado en una sola capa superior".
+  const cyBase = top.y + 0.02; // donde la copa toca el fuste (vértice angosto)
+  const alturaCopa = 1.4;
+  const lobs = [
+    // El vértice del triángulo invertido: un núcleo ESTRECHO al pie de la copa.
+    { c: [top.x, cyBase + 0.05, top.z], radio: 0.26 },
+  ];
+  const niveles = Math.max(3, Math.round(4 * q));
+  for (let k = 1; k <= niveles; k++) {
+    const f = k / niveles; // 0 abajo (angosto) → 1 arriba (ancho)
+    const y = cyBase + f * alturaCopa;
+    const anilloR = 0.1 + f * f * 1.05; // se ABRE fuerte hacia arriba (embudo)
+    // La masa se concentra ARRIBA (boca ancha del embudo): pocos lóbulos abajo,
+    // muchos en la corona → "follaje en una sola capa superior" (DR).
+    const porNivel = f < 0.34 ? 1 : Math.max(2, Math.round((1 + f * 4) * q));
+    for (let i = 0; i < porNivel; i++) {
+      const ang = (i / porNivel) * Math.PI * 2 + r() * 1.2;
+      const rad = anilloR * (0.72 + r() * 0.46);
+      lobs.push({
+        c: [top.x + Math.cos(ang) * rad, y + (r() - 0.5) * 0.12, top.z + Math.sin(ang) * rad],
+        radio: (0.28 + f * 0.32) + r() * 0.12, // lóbulos más grandes en la corona
+      });
+    }
   }
   copaMasa(lobs, {
     base: PAL.encenilloHoja, sol: PAL.encenilloHoja2, luz: PAL.encenilloLuz,
     q, seed: seed + 7, achatado: 0.78, huecos: 0.4, mordida: 0.34, ao: 0.68, manchas: 0.16,
   }).forEach((cc) => partes.push(cc));
 
-  // Barbas de musgo/usnea colgando del borde de la copa (el velo de la niebla).
+  // Barbas de musgo/usnea colgando del BORDE ANCHO de arriba (los últimos
+  // lóbulos = la boca de la pirámide invertida) → el velo de la niebla cuelga
+  // de la capa superior, no del vértice angosto pegado al fuste.
   const nBarbas = Math.max(2, Math.round(5 * q));
+  const desdeArriba = Math.max(1, Math.floor(lobs.length * 0.45));
   for (let i = 0; i < nBarbas; i++) {
-    const lb = lobs[i % lobs.length];
+    const lb = lobs[lobs.length - 1 - (i % desdeArriba)];
     const ang = r() * Math.PI * 2;
     const largo = 0.28 + r() * 0.3;
     const barba = new THREE.ConeGeometry(0.04, largo, 4, 1);
@@ -719,16 +747,18 @@ export function geomAliso({ q = 1 } = {}, seed = 5) {
   partes.push(geo);
   const top = curva.getPointAt(1);
 
-  // Copa cónica: lóbulos que se estrechan y sesgan hacia arriba desde el fuste.
+  // Copa CÓNICA-AGUJA: columna de lóbulos apilados que se ADELGAZAN hasta una
+  // PUNTA fina — el aliso es el emergente esbelto que pincha el dosel (silueta
+  // opuesta a la sombrilla chata del yarumo). Estrecha, alta y puntiaguda.
   const lobs = [];
-  const nL = Math.max(4, Math.round(6 * q));
+  const nL = Math.max(5, Math.round(7 * q));
   for (let i = 0; i < nL; i++) {
-    const f = i / (nL - 1); // 0 abajo → 1 punta
+    const f = i / (nL - 1); // 0 base → 1 punta
     const ang = r() * Math.PI * 2;
-    const rad = (0.62 - f * 0.5) * (0.4 + r() * 0.7);
+    const rad = (0.5 - f * 0.46) * (0.4 + r() * 0.6); // casi 0 en la punta
     lobs.push({
-      c: [top.x + Math.cos(ang) * rad, H - 1.0 + f * 2.1 + r() * 0.15, top.z + Math.sin(ang) * rad],
-      radio: (0.52 - f * 0.24) + r() * 0.12,
+      c: [top.x + Math.cos(ang) * rad, H - 0.85 + f * 2.2 + r() * 0.12, top.z + Math.sin(ang) * rad],
+      radio: (0.46 - f * 0.34) + r() * 0.08, // se afina hacia la aguja
     });
   }
   copaMasa(lobs, {
@@ -792,19 +822,21 @@ export function geomMortino({ q = 1 } = {}, seed = 7) {
   const r = rng(seed);
   const partes = [];
 
+  // Arbusto BAJO y EXTENDIDO del piso del monte: cojín ancho que abraza el suelo
+  // (más ancho que alto) → lee sotobosque, no arbolito, bajo el dosel.
   const lobs = [];
   const nBlobs = Math.max(3, Math.round(5 * q));
   for (let i = 0; i < nBlobs; i++) {
     const ang = r() * Math.PI * 2;
-    const rad = r() * 0.3;
+    const rad = r() * 0.42; // se extiende ancho por el piso
     lobs.push({
-      c: [Math.cos(ang) * rad, 0.2 + r() * 0.42, Math.sin(ang) * rad],
-      radio: 0.2 + r() * 0.16,
+      c: [Math.cos(ang) * rad, 0.13 + r() * 0.3, Math.sin(ang) * rad], // más bajo
+      radio: 0.2 + r() * 0.17,
     });
   }
   copaMasa(lobs, {
     base: PAL.mortinoHoja, sol: PAL.mortinoHoja2, luz: '#9ab06a',
-    q, seed: seed + 5, achatado: 0.8, huecos: 0.34, mordida: 0.32, ao: 0.58, manchas: 0.18, densidad: 8,
+    q, seed: seed + 5, achatado: 0.84, huecos: 0.34, mordida: 0.32, ao: 0.58, manchas: 0.18, densidad: 8,
   }).forEach((cc) => partes.push(cc));
 
   // Brotes rojizos nuevos (puntas tiernas).
@@ -844,16 +876,19 @@ export function geomRomerillo({ q = 1 } = {}, seed = 8) {
   const r = rng(seed);
   const partes = [];
 
+  // Cojín BAJO de ramitas que se ARQUEAN hacia afuera (mata de páramo que se
+  // abre en abanico), no aguja vertical: silueta de matorral raso del piso.
   const nRamitas = Math.max(6, Math.round(14 * q));
   for (let i = 0; i < nRamitas; i++) {
     const ang = r() * Math.PI * 2;
-    const rad = r() * 0.28;
-    const largo = 0.28 + r() * 0.32;
+    const rad = r() * 0.34; // más extendido por el suelo
+    const largo = 0.22 + r() * 0.26; // ramitas más cortas (cojín)
     const ramita = new THREE.ConeGeometry(0.05, largo, 4, 1);
     apuntar(
       ramita,
-      [Math.cos(ang) * rad, largo * 0.4, Math.sin(ang) * rad],
-      [Math.cos(ang) * 0.35 + (r() - 0.5) * 0.3, 1, Math.sin(ang) * 0.35 + (r() - 0.5) * 0.3],
+      [Math.cos(ang) * rad, 0.16 + largo * 0.26, Math.sin(ang) * rad],
+      // ARQUEA hacia afuera (0.75 lateral vs 0.85 vertical) → abanico bajo
+      [Math.cos(ang) * 0.75 + (r() - 0.5) * 0.3, 0.85, Math.sin(ang) * 0.75 + (r() - 0.5) * 0.3],
     );
     partes.push(pintar(ramita, variar(r() > 0.5 ? PAL.romerilloHoja : PAL.romerilloHoja2, r, 0.1)));
   }
@@ -863,7 +898,7 @@ export function geomRomerillo({ q = 1 } = {}, seed = 8) {
       const ang = r() * Math.PI * 2;
       const rad = r() * 0.26;
       const flor = new THREE.IcosahedronGeometry(0.035, 0);
-      poner(flor, [Math.cos(ang) * rad, 0.35 + r() * 0.3, Math.sin(ang) * rad]);
+      poner(flor, [Math.cos(ang) * rad, 0.24 + r() * 0.2, Math.sin(ang) * rad]);
       partes.push(pintar(flor, PAL.romerilloFlor));
     }
   }
@@ -1041,6 +1076,14 @@ export function distribucionFlora(conteos, seed = 707, bioma = 'bosque') {
       mortino: [4, 12], romerillo: [3, 12], roca: [2, 11], musgo: [1.2, 9],
       gaque: [8.5, 14], roble: [9.5, 16], encenillo: [10, 17], yarumo: [10, 17], aliso: [11, 19],
     };
+  // ESCALAS por bioma (páramo definitivo 2026-07-22). En páramo el rango de
+  // tamaño se ABRE en las dos puntas: rosetas jóvenes casi al ras (0.4) y
+  // patriarcas por encima del héroe estándar (2.4). Es el pedido textual del
+  // operador — "le falta diversidad de páramo en especies y TAMAÑO de
+  // especies": la mezcla de edades es lo que hace verosímil un frailejonal.
+  const E = paramo
+    ? { hero: [1.5, 2.4], joven: [0.4, 1.05], frail: [0.75, 1.5], viejo: [1.0, 1.9], flor: [0.9, 1.6] }
+    : { hero: [1.65, 2.15], joven: [0.8, 1.18], frail: [0.95, 1.4], viejo: [1.05, 1.55], flor: [1.0, 1.45] };
   return {
     // Banda HÉROE (2026-07-20): los gigantes de PRIMER PLANO. Un anillo CERCANO y
     // parejo (uniforme) de adultos GRANDES (esc 1.65-2.15 → 3.5-4.5 m) que rodea
@@ -1050,14 +1093,14 @@ export function distribucionFlora(conteos, seed = 707, bioma = 'bosque') {
     // frente. (El proscenio fijo de FloraParamo.jsx garantiza el trío foreground.)
     // En páramo el anillo se ENSANCHA: héroes también en la media distancia →
     // colosos de frailejón salpicando toda la planicie hasta la niebla.
-    frailejonHero: sembrar(c.frailejonHero, R.hero[0], R.hero[1], rng(seed + 21), { eMin: 1.65, eMax: 2.15, uniforme: true, varia: 0.12, lean: 0.16 }),
+    frailejonHero: sembrar(c.frailejonHero, R.hero[0], R.hero[1], rng(seed + 21), { eMin: E.hero[0], eMax: E.hero[1], uniforme: true, varia: 0.12, lean: 0.16 }),
     // Frailejonal de acompañamiento: TRES edades entremezcladas, agrupadas y
     // ACERCADAS al claro (rMin bajado desde el rediseño 07-16) con mucha
     // variación de tamaño + ladeo → gradiente de edad denso, nada clonado.
-    frailejonJoven: sembrar(c.frailejonJoven, R.joven[0], R.joven[1], rng(seed + 1), { eMin: 0.8, eMax: 1.18, varia: 0.13, lean: 0.15 }),
-    frailejon: sembrar(c.frailejon, R.frail[0], R.frail[1], rng(seed + 12), { eMin: 0.95, eMax: 1.4, varia: 0.14, lean: 0.16 }),
-    frailejonViejo: sembrar(c.frailejonViejo, R.viejo[0], R.viejo[1], rng(seed + 13), { eMin: 1.05, eMax: 1.55, varia: 0.14, lean: 0.18 }),
-    frailejonFlor: sembrar(c.frailejonFlor, R.flor[0], R.flor[1], rng(seed + 2), { eMin: 1.0, eMax: 1.45, varia: 0.1, lean: 0.13 }),
+    frailejonJoven: sembrar(c.frailejonJoven, R.joven[0], R.joven[1], rng(seed + 1), { eMin: E.joven[0], eMax: E.joven[1], varia: 0.13, lean: 0.15 }),
+    frailejon: sembrar(c.frailejon, R.frail[0], R.frail[1], rng(seed + 12), { eMin: E.frail[0], eMax: E.frail[1], varia: 0.14, lean: 0.16 }),
+    frailejonViejo: sembrar(c.frailejonViejo, R.viejo[0], R.viejo[1], rng(seed + 13), { eMin: E.viejo[0], eMax: E.viejo[1], varia: 0.14, lean: 0.18 }),
+    frailejonFlor: sembrar(c.frailejonFlor, R.flor[0], R.flor[1], rng(seed + 2), { eMin: E.flor[0], eMax: E.flor[1], varia: 0.1, lean: 0.13 }),
     // Sotobosque.
     mortino: sembrar(c.mortino, R.mortino[0], R.mortino[1], rng(seed + 3), { eMin: 0.8, eMax: 1.2, varia: 0.12 }),
     romerillo: sembrar(c.romerillo, R.romerillo[0], R.romerillo[1], rng(seed + 4), { eMin: 0.8, eMax: 1.25, varia: 0.14 }),
@@ -1071,4 +1114,41 @@ export function distribucionFlora(conteos, seed = 707, bioma = 'bosque') {
     yarumo: sembrar(c.yarumo, R.yarumo[0], R.yarumo[1], rng(seed + 10), { eMin: 0.9, eMax: 1.15, uniforme: true, varia: 0.06 }),
     aliso: sembrar(c.aliso, R.aliso[0], R.aliso[1], rng(seed + 11), { eMin: 0.9, eMax: 1.12, uniforme: true, varia: 0.08 }),
   };
+}
+
+/*
+ * EL CORREDOR DE LA INMENSIDAD (páramo definitivo 2026-07-22). El encuadre de
+ * reposo mira por la ABRA del anfiteatro (bosqueTakeA: az -2.17) hacia la
+ * cordillera y el mar de nubes; y la cámara vive en el azimut opuesto (+0.97).
+ * Una mata ALTA sembrada al azar dentro de cualquiera de esos dos conos tapa o
+ * el fondo o el primer plano completo. `despejarCorredor` ROTA (mismo radio,
+ * misma escala — no borra nada) las especies altas fuera de ambos conos. Las
+ * bajas (jóvenes, sotobosque, rocas, musgo) se quedan: no llegan al horizonte.
+ */
+const CORREDOR = [
+  { az: -2.17, ancho: 0.6 }, // hacia la abra (el fondo)
+  { az: 0.97, ancho: 0.5 }, // hacia la cámara (el primer plano)
+];
+export function despejarCorredor(dist, claves) {
+  for (const k of claves) {
+    const items = dist[k];
+    if (!items) continue;
+    for (const it of items) {
+      const r = Math.hypot(it.pos[0], it.pos[2]);
+      if (r < 4.5) continue;
+      const az = Math.atan2(it.pos[2], it.pos[0]);
+      for (const cono of CORREDOR) {
+        let d = az - cono.az;
+        while (d > Math.PI) d -= Math.PI * 2;
+        while (d < -Math.PI) d += Math.PI * 2;
+        if (Math.abs(d) < cono.ancho) {
+          const nuevo = cono.az + Math.sign(d || 1) * (cono.ancho + 0.16);
+          it.pos[0] = Math.cos(nuevo) * r;
+          it.pos[2] = Math.sin(nuevo) * r;
+          break;
+        }
+      }
+    }
+  }
+  return dist;
 }

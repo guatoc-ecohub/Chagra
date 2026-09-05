@@ -44,6 +44,78 @@
   max-width: 46rem;
   margin: 0 auto;
 }
+.invivo__config {
+  margin-bottom: 0.7rem;
+  padding: 0.85rem;
+  border: 1px solid rgba(80, 104, 48, 0.28);
+  border-radius: 14px;
+  background: rgba(255, 252, 235, 0.72);
+  box-shadow: 0 8px 20px rgba(71, 82, 42, 0.08);
+}
+.invivo__config-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+.invivo__config-kicker {
+  margin: 0;
+  color: #6b7a2c;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+}
+.invivo__config-title {
+  margin: 0.12rem 0 0;
+  color: #2e402e;
+  font-size: 1rem;
+  font-weight: 800;
+}
+.invivo__config-badge {
+  flex: 0 0 auto;
+  padding: 0.35rem 0.48rem;
+  border-radius: 0.55rem;
+  background: #2e402e;
+  color: #e4e7bc;
+  font-size: 0.67rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+.invivo__config-grid {
+  display: grid;
+  gap: 0.55rem;
+  margin-top: 0.75rem;
+}
+.invivo__config label {
+  display: grid;
+  gap: 0.28rem;
+  color: #55614b;
+  font-size: 0.76rem;
+  font-weight: 700;
+}
+.invivo__config select {
+  min-height: 2.35rem;
+  width: 100%;
+  padding: 0 0.6rem;
+  border: 1px solid rgba(107, 122, 44, 0.35);
+  border-radius: 0.65rem;
+  background: rgba(255, 255, 255, 0.78);
+  color: #2e402e;
+  font: 600 0.84rem/1 system-ui, sans-serif;
+}
+.invivo__config select:focus-visible,
+.invivo__toggle:focus-visible {
+  outline: 3px solid rgba(192, 121, 55, 0.5);
+  outline-offset: 2px;
+}
+.invivo__config-note {
+  margin: 0.62rem 0 0;
+  color: #687256;
+  font-size: 0.74rem;
+  line-height: 1.35;
+}
 .invivo__lienzo {
   position: relative;
   height: min(66vh, 32rem);
@@ -220,6 +292,9 @@
 }
 
 @media (min-width: 640px) {
+  .invivo__config-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
   .invivo__saberes ol {
     grid-template-columns: 1fr 1fr;
   }

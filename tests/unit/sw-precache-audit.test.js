@@ -114,10 +114,14 @@ describe('SW precache contract', () => {
     expect(assets).toContain('/manual/mv-sipsa.html');
   });
 
-  it('RAG_GROUNDING_PRECACHE contiene rag-embeddings.json y cycle-content/manifest.json', () => {
+  it('RAG_GROUNDING_PRECACHE contiene grafo-relations.json (solo asset liviano en install)', () => {
+    // NOTA: Desde la refactorización de optimización de install time, los archivos
+    // pesados (rag-embeddings.json ~1.7MB, cycle-content/ ~3.4MB) ya NO se precachean
+    // en install. En su lugar, se cachean on-demand (cache-on-use) en el fetch handler.
+    // Solo el grafo-relations.json (~66KB) se precachea en install. Ver comentario en
+    // public/sw.js líneas 79-91.
     const precache = extractArray('RAG_GROUNDING_PRECACHE');
-    expect(precache).toContain('/rag-embeddings.json');
-    expect(precache).toContain('/cycle-content/manifest.json');
+    expect(precache).toContain('/grafo-relations.json');
   });
 
   it('MAP_TILE_HOSTS cubre dominios OSM (tile.openstreetmap.org, tile.osm.org)', () => {

@@ -6,7 +6,8 @@
   "scripts": {
     "dev": "vite",
     "test": "vitest run && node scripts/validate-catalog-consistency.mjs --report-only",
-    "prebuild": "node scripts/build-catalog-sqlite.mjs && node scripts/generate-cycle-content-manifest.mjs && node scripts/gen-chagra-stats.mjs",
+    "prebuild": "node scripts/build-catalog-sqlite.mjs && node scripts/generate-cycle-content-manifest.mjs && node scripts/gen-chagra-stats.mjs && node scripts/sync-valle.mjs",
+    "sync:valle": "node scripts/sync-valle.mjs",
     "build": "vite build",
     "build:prod": "node scripts/build-prod.mjs",
     "lint": "eslint .",
@@ -18,6 +19,8 @@
     "coverage": "vitest run --coverage",
     "audit:bundle": "node scripts/audit-bundle.mjs",
     "audit:integraciones": "node scripts/audit-integraciones.mjs",
+    "audit:huerfanos": "node scripts/audit-componente-huerfano.mjs",
+    "detect:unwired": "node scripts/detect-unwired.mjs",
     "grafo:snapshot": "node scripts/snapshot-grafo-crecimiento.mjs",
     "gen:stats": "node scripts/gen-chagra-stats.mjs",
     "validate:ngsi": "node scripts/export-ngsi-ld.mjs",
@@ -27,7 +30,8 @@
     "wake-word:vendor-libs": "node scripts/wake-word/vendor-libs.mjs",
     "wake-word:generate-samples": "node scripts/wake-word/generate-samples.mjs",
     "wake-word:train": "node scripts/wake-word/train-model.mjs",
-    "wake-word:smoke": "node tests/e2e-real/modo-campo-wakeword.smoke.mjs"
+    "wake-word:smoke": "node tests/e2e-real/modo-campo-wakeword.smoke.mjs",
+    "test:juego": "playwright test --config=playwright.juegos.config.js"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",

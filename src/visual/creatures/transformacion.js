@@ -17,9 +17,14 @@
  */
 
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { PERFILES_CONDUCTA } from '../../compai/nucleo/perfilesConducta.js';
 
 /* La clase maestra (por si algún consumidor DOM la togglea sin React). */
 export const CLASE_PODER = 'is-powered-up';
+
+const AURAS_CONDUCTA_CANONICAS = Object.fromEntries(
+  Object.entries(PERFILES_CONDUCTA).map(([slug, perfil]) => [slug, perfil.aura]),
+);
 
 /* Aura por bicho (biblia de personajes — tabla de transformación).
    Claves = slugs estables de la creature. Solo el COLOR difiere; el resto del
@@ -43,6 +48,12 @@ export const AURA_POR_BICHO = Object.freeze({
   'ent-frailejon': '#8fdcae',  // VERDE-PLATEADO del guardián del páramo (modo-guardián: el frailejón se yergue a intervenir)
   dalmata: '#3b7dff',          // AZUL COBALTO leal (el perro atlético de la casa)
   beagle: '#c9772e',           // CANELA DE RASTRO (la nariz de oro del sabueso)
+  zariguya: '#ff9ecb',         // ROSA DE LUNA (la piel desnuda de orejas, trufa y cola prensil, encendida de noche: el color de LA QUE CARGA)
+  'oso-baston': '#43c24f',     // VERDE DEL BASTÓN FLORECIDO (hoja viva encendida: el caminante que hace germinar — distinto del verde-zen de la rana, la semilla de la danta y la menta del guardián)
+  luciernaga: '#c7ff4e',       // VERDE-LINTERNA (el amarillo-verde frío de la bioluminiscencia: el color de LA QUE LEE LA NOCHE)
+  // Pendientes de aprobación de arte (§7.4), pero nunca caen al dorado de Angelita.
+  guacamaya: AURAS_CONDUCTA_CANONICAS.guacamaya,
+  'chivito-punk': AURAS_CONDUCTA_CANONICAS['chivito-punk'],
 });
 
 /* Aura por defecto si el slug no está mapeado (la dorada de la guía). */

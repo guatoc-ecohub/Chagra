@@ -1,0 +1,79 @@
+{
+  "species_slug": "vaccinium_corymbosum",
+  "scientific_name": "Vaccinium corymbosum L.",
+  "common_names": [
+    "Arándano"
+  ],
+  "family": "Ericaceae",
+  "category": "frutales_perennes",
+  "cultivable": true,
+  "conservation_status": "cultivo_comun",
+  "thermal_zones": [
+    "frio",
+    "templado"
+  ],
+  "roles_in_guild": [
+    "crop"
+  ],
+  "antagonists": [],
+  "especies_nativas_sustitutas": [],
+  "propagation": {
+    "methods": [
+      "esqueje",
+      "acodo",
+      "micropropagacion"
+    ],
+    "best_method": "esqueje",
+    "protocol_resumen": "Propagación clonal por estaca semileñosa o leñosa enraizada en sustrato ácido y aireado, o por micropropagación (planta certificada). En Colombia se cultiva con variedades de bajo requerimiento de frío (low-chill) tipo 'Biloxi', 'Misty', 'Sharpblue' adaptadas al trópico de altura. Distancia 0.6-1 m entre plantas × 2.5-3 m entre hileras.",
+    "tiempo_a_establecimiento_dias": 90,
+    "notas": "Fenología por etapas en trópico de altura (sin reposo invernal marcado): (1) Establecimiento de raíz superficial fibrosa 0-12 meses — la raíz es somera, sin pelos radiculares, depende de micorrizas ericoides y de mulch ácido; (2) Brotación vegetativa y formación de madera frutal año 1-2; (3) Floración escalonada y cuajado desde el segundo año; (4) Desarrollo y maduración de baya ~60-90 días desde flor; (5) Cosecha escalonada casi continua con podas de renovación anuales; (6) Plena producción a partir del año 3-4, vida productiva 10-15 años. Acidificar y mantener pH 4.5-5.5 de por vida (monitoreo de pH del agua de riego).",
+    "fuente": "AGROSAVIA Manual de arándano (2018); ICA Resolución 3168/2015."
+  },
+  "requirements": {
+    "agua": "medio",
+    "altitud_msnm": {
+      "min_absoluto": 1800,
+      "optimo_min": 2200,
+      "optimo_max": 2800,
+      "max_absoluto": 3000
+    },
+    "temperatura_c": {
+      "helada_letal": -5,
+      "optimo_min": 12,
+      "optimo_max": 24,
+      "max_tolerable": 30
+    },
+    "radiacion": "sol_pleno",
+    "drenaje_requerido": "excelente"
+  },
+  "valor_pedagogico": "El arándano azul (Vaccinium corymbosum L., familia Ericaceae), conocido en inglés como blueberry o highbush blueberry, es un arbusto frutal de origen norteamericano que se ha convertido en un cultivo de exportación de alto valor en el trópico de altura colombiano, sembrado en Cundinamarca (Sabana de Bogotá, oriente, Sumapaz), Antioquia (oriente antioqueño) y Boyacá entre 2.200 y 2.800 msnm con variedades de bajo requerimiento de frío (low-chill) como 'Biloxi', 'Misty' y 'Sharpblue', que florecen y fructifican de forma casi continua porque en el trópico no existe el reposo invernal de las zonas templadas. La particularidad agronómica que lo define —y que hay que entender antes de sembrarlo— es su exigencia de un suelo MUY ácido (pH 4.5-5.5) y de raíz superficial fibrosa sin pelos radiculares que depende de micorrizas ericoides y de un acolchado (mulch) ácido de corteza o aserrín de pino. En suelo de pH neutro o alcalino la planta sufre clorosis férrica (amarillamiento internerval por falta de hierro asimilable) y muere; por eso NO se debe asociar con cultivos que requieran encalado, y se maneja en cama o contenedor con sustrato acidificado. Sus retos fitosanitarios principales son el moho gris (Botrytis cinerea) y la antracnosis (Colletotrichum) en flor y fruto, los trips en floración, y la mosca de alas manchadas (Drosophila suzukii), plaga cuarentenaria emergente que perfora la baya madura. Manejo agroecológico: sustrato y mulch ácidos de pino, drenaje excelente (Phytophthora cinnamomi pudre la raíz con exceso de agua), Bacillus subtilis preventivo contra Botrytis, biofertilizante de algas para micronutrientes, riego con agua de pH controlado y malla anti-pájaros. El arándano enseña la lección de que el éxito de un frutal depende primero de ajustar el suelo a su fisiología —en este caso la acidez— antes que de cualquier fertilización. Fuentes Tier A: AGROSAVIA Manual de arándano 2018, ICA Resolución 3168/2015, GBIF Backbone, POWO Kew.",
+  "feeding_plan_markdown": "### Plan de alimentación\n\nFuente: AGROSAVIA Manual de arándano (2018) — establecimiento en sustrato acidificado, clima frío 2200-2800 msnm.\n\n- D+0: Plantar en hoyo con sustrato ácido + compost · compost_maduro · 1500 g — Mezclar suelo con corteza/aserrín de pino, turba y compost maduro. NUNCA aplicar cal. Acidificar a pH 4.5-5.5 con azufre elemental si es necesario. Drenaje excelente obligatorio.\n- D+30: Acolchar la base con corteza/aserrín de pino · biofertilizante no especificado · dosis no especificada — Mulch ácido de pino mantiene humedad, baja pH gradualmente y protege la raíz superficial. Reponer cada 6 meses.\n- D+60: Drench con humus líquido acidificado · humus_liquido · 200 ml — Dilución 1:5. Aporte de N orgánico; preferir fuentes de N amoniacal/orgánico (no nitrato) que el arándano asimila mejor en suelo ácido.\n- D+120: Foliar preventivo con Bacillus subtilis en floración · bacillus_subtilis_foliar · 80 ml — Antagonista de Botrytis cinerea y antracnosis en flor/fruto. Aplicar al atardecer.\n- D+180: Foliar con biofertilizante de algas (micronutrientes) · biofertilizante_algas · 60 ml — Aporte de micronutrientes (Fe, Mn, B) quelatados; previene clorosis férrica si el pH se mantiene ácido. Vigilar amarillamiento internerval = señal de pH alto.",
+  "sources": [
+    {
+      "id": "agrosavia-manual-arandano-2018",
+      "title": "agrosavia-manual-arandano-2018",
+      "tier": "A",
+      "url": null
+    },
+    {
+      "id": "ica-resolucion-3168-2015",
+      "title": "ica-resolucion-3168-2015",
+      "tier": "A",
+      "url": null
+    },
+    {
+      "id": "gbif-taxonomic-backbone",
+      "title": "gbif-taxonomic-backbone",
+      "tier": "A",
+      "url": "https://www.gbif.org/dataset/d7dddbf4-2cf0-4f39-9b2a-bb099caae36c"
+    },
+    {
+      "id": "powo-kew",
+      "title": "powo-kew",
+      "tier": "A",
+      "url": "https://powo.science.kew.org"
+    }
+  ],
+  "_generated_by": "scripts/build-cycle-content-from-catalog.mjs",
+  "_generated_at": "2026-09-03T07:40:20.315Z"
+}

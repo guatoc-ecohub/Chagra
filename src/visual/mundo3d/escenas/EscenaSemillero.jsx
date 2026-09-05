@@ -41,15 +41,22 @@ const FAUNA_SEMILLERO = [
 function Brote({ pos, h = 0.12, color = '#6fae4a' }) {
   return (
     <mesh position={pos}>
-      <coneGeometry args={[0.032, h, 5]} />
+      <coneGeometry args={[0.04, h, 5]} />
       <meshLambertMaterial color={color} flatShading />
     </mesh>
   );
 }
 
-/* Una BANDEJA GERMINADORA: cajón con sustrato oscuro y una retícula de brotes en
-   distintas etapas — la germinación hecha visible. Determinista (mismo dibujo
-   2D↔3D): las etapas salen de un patrón fijo, no de aleatorio. */
+/* La MESA del vivero bajo cada bandeja (banco de tablas sobre estacas): en finca
+   la bandeja germinadora va ALZADA, no al ras — la altura la separa de la
+   humedad del piso y, de paso, hace que la bandeja se LEA como bandeja en el
+   encuadre 3/4 (QA visual 2026-07-30: al ras parecía un cajón tirado). */
+const MESA_ALTO = 0.2;
+
+/* Una BANDEJA GERMINADORA: mesa de vivero + cajón con sustrato oscuro y una
+   retícula de brotes en distintas etapas — la germinación hecha visible.
+   Determinista (mismo dibujo 2D↔3D): las etapas salen de un patrón fijo, no de
+   aleatorio. */
 function Bandeja({ pos, rot = 0 }) {
   // 4 x 3 celdas; la etapa (altura del brote) crece de una esquina a la otra:
   // arriba-izquierda apenas semilla, abajo-derecha ya plántula.
@@ -62,26 +69,38 @@ function Bandeja({ pos, rot = 0 }) {
         const t = (i + j) / (cols + filas - 2); // 0..1 progresión de etapa
         const x = (i - (cols - 1) / 2) * 0.11;
         const z = (j - (filas - 1) / 2) * 0.11;
-        out.push({ x, z, h: 0.05 + t * 0.16, color: t < 0.3 ? '#8aa86a' : '#5f9e3f' });
+        out.push({ x, z, h: 0.06 + t * 0.18, color: t < 0.3 ? '#8aa86a' : '#5f9e3f' });
       }
     }
     return out;
   }, []);
   return (
     <group position={pos} rotation={[0, rot, 0]}>
+      {/* las patas de la mesa (estacas del banco de vivero) */}
+      {[[-0.22, -0.14], [0.22, -0.14], [-0.22, 0.14], [0.22, 0.14]].map(([px, pz], i) => (
+        <mesh key={i} position={[px, MESA_ALTO * 0.5, pz]}>
+          <cylinderGeometry args={[0.022, 0.028, MESA_ALTO, 5]} />
+          <meshLambertMaterial color={PALETA.maderaOscura} flatShading />
+        </mesh>
+      ))}
+      {/* el tablón de la mesa */}
+      <mesh position={[0, MESA_ALTO + 0.015, 0]}>
+        <boxGeometry args={[0.62, 0.03, 0.46]} />
+        <meshLambertMaterial color={PALETA.madera} flatShading />
+      </mesh>
       {/* el borde/cajón de la bandeja (madera clara del vivero) */}
-      <mesh position={[0, 0.05, 0]}>
+      <mesh position={[0, MESA_ALTO + 0.08, 0]}>
         <boxGeometry args={[0.56, 0.1, 0.42]} />
         <meshLambertMaterial color={PALETA.maderaClara} flatShading />
       </mesh>
       {/* el sustrato húmedo (tierra negra del semillero) */}
-      <mesh position={[0, 0.11, 0]}>
+      <mesh position={[0, MESA_ALTO + 0.14, 0]}>
         <boxGeometry args={[0.5, 0.04, 0.36]} />
         <meshLambertMaterial color="#3a2c1c" />
       </mesh>
       {/* los brotes por celda, cada uno en su etapa */}
       {celdas.map((c, i) => (
-        <Brote key={i} pos={[c.x, 0.14 + c.h * 0.5, c.z]} h={c.h} color={c.color} />
+        <Brote key={i} pos={[c.x, MESA_ALTO + 0.17 + c.h * 0.5, c.z]} h={c.h} color={c.color} />
       ))}
     </group>
   );
@@ -91,9 +110,9 @@ function Bandeja({ pos, rot = 0 }) {
    negra de vivero. Bolsa (cono truncado oscuro) + tallo + hojas. */
 function Bolsa({ pos, alto = 0.34, color = '#4e8f3f' }) {
   const hojas = [
-    [0, alto + 0.02, 0, 0.11],
-    [0.09, alto - 0.06, 0.03, 0.08],
-    [-0.08, alto - 0.05, -0.03, 0.08],
+    [0, alto + 0.03, 0, 0.13],
+    [0.1, alto - 0.06, 0.04, 0.095],
+    [-0.09, alto - 0.05, -0.04, 0.095],
   ];
   return (
     <group position={pos}>
@@ -108,7 +127,7 @@ function Bolsa({ pos, alto = 0.34, color = '#4e8f3f' }) {
       </mesh>
       {/* el tallo */}
       <mesh position={[0, alto * 0.5 + 0.16, 0]}>
-        <cylinderGeometry args={[0.02, 0.03, alto, 5]} />
+        <cylinderGeometry args={[0.024, 0.034, alto, 5]} />
         <meshLambertMaterial color="#5a6a2e" flatShading />
       </mesh>
       {/* las hojas */}
@@ -189,7 +208,7 @@ function Regadera({ pos }) {
   );
 }
 
-function Diorama({ params, reducedMotion }) {
+function Diorama({ params, reducedMotion, tier, viento }) {
   const bandejas = params?.bandejas || [
     { pos: [-0.35, 0, 0.35], rot: 0.1 },
     { pos: [0.32, 0, 0.3], rot: -0.08 },
@@ -224,21 +243,32 @@ function Diorama({ params, reducedMotion }) {
       {/* EL TÚNEL: los arcos de media-sombra (protección del frío y la lluvia) */}
       {arcos.map((z, i) => (
         <mesh key={i} position={[0, 0, z]}>
-          <torusGeometry args={[radio, 0.03, 6, 22, Math.PI]} />
+          <torusGeometry args={[radio, 0.045, 6, 22, Math.PI]} />
           <meshLambertMaterial color={PALETA.madera} flatShading />
         </mesh>
       ))}
+      {/* el caballete: la vara que amarra los arcos por la cumbrera — sin él los
+          arcos flotaban sueltos y el túnel no se leía como estructura */}
+      <mesh position={[0, radio, 0]} rotation={[Math.PI / 2, 0, 0]}>
+        <cylinderGeometry args={[0.03, 0.03, largo + 0.2, 6]} />
+        <meshLambertMaterial color={PALETA.maderaOscura} flatShading />
+      </mesh>
       {/* el techo traslúcido (la media-sombra): media-luna extruida a lo largo */}
       <mesh position={[0, 0, 0]} rotation={[Math.PI / 2, 0, 0]}>
         <cylinderGeometry args={[radio, radio, largo, 20, 1, true, Math.PI, Math.PI]} />
         <meshBasicMaterial
           color={PALETA.follajeClaro}
           transparent
-          opacity={0.22}
+          opacity={0.28}
           side={2}
           depthWrite={false}
         />
       </mesh>
+      {/* el CALOR GUARDADO: una luz tibia local dentro del túnel (sin sombras,
+          patrón de luces de lectura del corte de la milpa #2815) — bajo la
+          media-sombra las bandejas quedaban apagadas; esta las hace leer y de
+          paso CUENTA la lección: adentro se guarda el calor de la helada */}
+      <pointLight position={[0, 0.95, 0.2]} intensity={0.55} distance={2.3} color="#ffefc9" />
 
       {/* las BANDEJAS germinadoras con sus brotes por etapa */}
       {bandejas.map((b, i) => (
@@ -255,23 +285,50 @@ function Diorama({ params, reducedMotion }) {
       {/* la ESTACIÓN DE SEMILLA: la propia y la comprada, al fondo */}
       <EstacionSemilla pos={[1.05, 0, -0.55]} />
 
-      {/* la ERA DE ENDURECIMIENTO: al borde soleado, FUERA del techo, unas matas
-          se aclimatan al sol y al viento antes de irse al campo */}
-      <Bolsa pos={[0.85, 0, 1.0]} alto={0.42} color="#5a9a3f" />
-      <Bolsa pos={[1.15, 0, 0.75]} alto={0.38} color="#4e8f3f" />
+      {/* la ERA DE ENDURECIMIENTO: al borde soleado, FUERA del techo. El parche
+          claro y tibio la vuelve LUGAR (el borde donde pega el sol), no dos
+          bolsas sueltas en el piso */}
+      <mesh position={[1.0, 0.005, 0.95]} rotation={[-Math.PI / 2, 0, 0]}>
+        <circleGeometry args={[0.62, 20]} />
+        <meshLambertMaterial color="#b09a5e" />
+      </mesh>
+      <Bolsa pos={[0.85, 0, 1.05]} alto={0.42} color="#5a9a3f" />
+      <Bolsa pos={[1.18, 0, 0.78]} alto={0.38} color="#4e8f3f" />
 
       {/* la fauna que anima el vivero (mariposa/colibrí) */}
-      <Fauna items={FAUNA_SEMILLERO} reducedMotion={reducedMotion} />
+      <Fauna items={FAUNA_SEMILLERO} reducedMotion={reducedMotion} tier={tier} viento={viento} />
     </group>
   );
 }
 
+/* Cielo propio del vivero: parte de CIELOS.huerta con un pelín más de luz para
+   que los verdes tiernos de las bandejas canten bajo la media-sombra. Se sigue
+   mezclando hacia la hora dorada del valle en EscenaBase3D (cohesión diurna). */
+const CIELO_SEMILLERO = { ...CIELOS.huerta, fondo: '#dcebc6', cielo: '#f2f7e2', intensidad: 1.12 };
+
+/* Encuadre del vivero (patrón EscenaSanidad, QA visual 2026-07-30): con el zoom
+   7 del manifiesto el semillero quedaba en miniatura — el túnel un moño y las
+   bandejas/bolsas/estación ilegibles. Menor zoom → cámara más cerca; la niebla,
+   el anillo y la órbita escalan solos (contrato de EscenaBase3D). `camara` fija
+   un 3/4 que mira POR LA BOCA ABIERTA del túnel: se ve adentro (las bandejas en
+   su mesa), y a los lados el repique, la semilla y la era soleada. */
+const ZOOM_SEMILLERO = 5.4;
+const CAMARA_SEMILLERO = {
+  position: /** @type {[number, number, number]} */ ([
+    ZOOM_SEMILLERO * 0.52, ZOOM_SEMILLERO * 0.42, ZOOM_SEMILLERO * 1.0,
+  ]),
+  fov: 40,
+};
+
 export default function EscenaSemillero(props) {
-  // Cielo fresco y verde de vivero (se mezcla igual hacia la hora dorada del valle).
-  const cielo = CIELOS.huerta;
   return (
-    <EscenaBase3D {...props} cielo={cielo} entrada={{ ...props.entrada, centro: [0, 0.5, 0] }}>
-      <Diorama params={props.params} reducedMotion={props.reducedMotion} />
+    <EscenaBase3D
+      {...props}
+      cielo={CIELO_SEMILLERO}
+      camara={CAMARA_SEMILLERO}
+      entrada={{ ...props.entrada, zoom: ZOOM_SEMILLERO, centro: [0, 0.45, 0] }}
+    >
+      <Diorama params={props.params} reducedMotion={props.reducedMotion} tier={props.tier} viento={props.estadoFinca?.viento} />
     </EscenaBase3D>
   );
 }

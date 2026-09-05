@@ -20,5 +20,14 @@
     }
   },
   "include": ["src/**/*.js", "src/**/*.jsx", "src/types/**/*.js", "src/types/**/*.d.ts"],
-  "exclude": ["node_modules", "dist", "build", "tests", "tests/e2e"]
+  "exclude": [
+    "node_modules",
+    "dist",
+    "build",
+    "tests",
+    "tests/e2e",
+    "src/visual/mundo3d/sierra/vendor/flora/flora.js",
+    "src/visual/mundo3d/sierra/vendor/flora/flora-eztree-bake.js",
+    "src/visual/mundo3d/sierra/vendor/flora/lodEspecieSylva.js"
+  ]
 }

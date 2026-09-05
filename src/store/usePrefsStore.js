@@ -27,14 +27,13 @@ const SONIDO_MODES = ['off', 'suave', 'on'];
 // prende el flag en Perfil ve la banda de entrada en "Los mundos de su finca"
 // — y solo si su equipo aguanta 3D (device-tier alto/medio, deviceTier.js).
 const STORAGE_KEY_VALLE3D = 'chagra:prefs:valle3d';
-// Migración de ENTRADA a 2D-por-defecto (hotfix regresión chagra.app,
-// 2026-08-21): la migración previa (migrated-v1) forzaba el valle 3D
-// encendido en la primera carga de cada usuario — por eso todos veían el
-// valle 3D como home aunque el default declarado fuera false. Esta
-// migración v2 DESACTIVA el valle 3D una sola vez para quienes quedaron con
-// el flag encendido por la migración vieja, y a partir de ahí respeta lo que
-// el usuario elija en Perfil → experiencia. Quien QUIERA el valle 3D lo
-// prende ahí; el default es 2D.
+// Migración de ENTRADA a 2D-por-defecto (2026-08-02): chagra.app debe ABRIR en
+// 2D. La migración previa (migrated-v1) forzaba el valle 3D encendido en la
+// primera carga de cada usuario — por eso todos veían el valle 3D como home
+// aunque el default declarado fuera false. Esta migración v2 DESACTIVA el valle
+// 3D una sola vez para quienes quedaron con el flag encendido por la migración
+// vieja, y a partir de ahí respeta lo que el usuario elija en Perfil →
+// experiencia. Quien QUIERA el valle 3D lo prende ahí; el default es 2D.
 const STORAGE_KEY_VALLE3D_MIGRATED = 'chagra:prefs:valle3d:migrated-v2-2d-default';
 // Avatar del USUARIO (2026-07-13): el animal de la chagra que la persona
 // elige como su avatar (slug del registro CREATURES de src/visual/creatures).

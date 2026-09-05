@@ -1,0 +1,110 @@
+<!doctype html>
+<!-- Harness 3D de la lámina del tomate Humboldt: el MISMO módulo de escena
+     (atlas + quads cruzados + material + vaivén) a TRES distancias fijas —
+     cerca (una mata), plano medio (un surco), amplia (un campo). Es el
+     banco de pruebas de la envolvente que pide README-ARTE-FABLE; el mundo
+     real se gatea aparte por su ruta. No entra al build. -->
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <title>Tomate Humboldt — cerca / medio / amplia</title>
+    <style>
+      body { margin: 0; background: #1c1a14; }
+      canvas { display: block; }
+    </style>
+  </head>
+  <body>
+    <script type="module">
+      import * as THREE from 'three';
+      import {
+        atlasTomateHumboldt,
+        geomLaminaCruzada,
+        materialLaminaTomate,
+        variantesDeItems,
+        animarVaiven,
+      } from './src/visual/mundo3d/invernadero/tomateHumboldt.js';
+      import { rng } from './src/visual/mundo3d/bosque/entQuenua.geom.js';
+
+      const W = 1280, H = 800;
+      const renderer = new THREE.WebGLRenderer({ antialias: true });
+      renderer.setSize(W, H);
+      renderer.outputColorSpace = THREE.SRGBColorSpace;
+      document.body.appendChild(renderer.domElement);
+
+      const escena = new THREE.Scene();
+      escena.background = new THREE.Color('#cbb98f'); // el aire tibio del túnel
+      escena.fog = new THREE.Fog('#cbb98f', 26, 60);
+
+      const cam = new THREE.PerspectiveCamera(46, W / H, 0.1, 120);
+      cam.position.set(0, 1.35, 3.1);
+      cam.lookAt(0, 1.0, -6);
+
+      // luz pareja de invernadero: hemisferio cálido + sol filtrado
+      escena.add(new THREE.HemisphereLight('#f2e4bd', '#5c4f33', 0.9));
+      const sol = new THREE.DirectionalLight('#fff2cf', 1.15);
+      sol.position.set(6, 10, 4);
+      escena.add(sol);
+
+      const piso = new THREE.Mesh(
+        new THREE.PlaneGeometry(90, 90),
+        new THREE.MeshLambertMaterial({ color: '#4a3a28' }),
+      );
+      piso.rotation.x = -Math.PI / 2;
+      escena.add(piso);
+
+      const atlas = atlasTomateHumboldt(20260818);
+      const geo = geomLaminaCruzada(3);
+      const mat = materialLaminaTomate(atlas);
+
+      function siembra(items) {
+        const mesh = new THREE.InstancedMesh(geo, mat, items.length);
+        const m = new THREE.Matrix4(), q = new THREE.Quaternion();
+        const e = new THREE.Euler(), p = new THREE.Vector3(), s = new THREE.Vector3();
+        items.forEach((it, i) => {
+          p.set(it.pos[0], it.pos[1], it.pos[2]);
+          e.set(0, it.rotY, 0); q.setFromEuler(e);
+          s.setScalar(it.escala); m.compose(p, q, s);
+          mesh.setMatrixAt(i, m);
+        });
+        mesh.geometry = geo.clone();
+        mesh.geometry.setAttribute('aTile', new THREE.InstancedBufferAttribute(variantesDeItems(items.length), 4));
+        mesh.frustumCulled = false;
+        escena.add(mesh);
+        return mesh;
+      }
+
+      const r = rng(733);
+      // CERCA: una mata sola llenando el cuadro (a ~2.2 m del ojo)
+      const cerca = [{ pos: [-0.55, 0, 0.4], rotY: 0.3, escala: 1.0 }];
+      // PLANO MEDIO: un surco doble a 4-9 m
+      const medio = [];
+      for (let i = 0; i < 26; i++) {
+        medio.push({
+          pos: [-3.4 + (i % 13) * 0.55, 0, -3.6 - ((i / 13) | 0) * 1.4 - r() * 0.3],
+          rotY: r() * Math.PI * 2,
+          escala: 0.88 + r() * 0.24,
+        });
+      }
+      // AMPLIA: el campo denso hasta la niebla (12-45 m)
+      const lejos = [];
+      for (let i = 0; i < 900; i++) {
+        lejos.push({
+          pos: [-16 + r() * 32, 0, -12 - r() * 33],
+          rotY: r() * Math.PI * 2,
+          escala: 0.85 + r() * 0.3,
+        });
+      }
+      const meshes = [siembra(cerca), siembra(medio), siembra(lejos)];
+
+      const reloj = new THREE.Clock();
+      function frame() {
+        const t = reloj.getElapsedTime();
+        meshes.forEach((ms) => animarVaiven(ms, t, true));
+        renderer.render(escena, cam);
+        requestAnimationFrame(frame);
+      }
+      frame();
+      window.__laminaLista = true;
+    </script>
+  </body>
+</html>

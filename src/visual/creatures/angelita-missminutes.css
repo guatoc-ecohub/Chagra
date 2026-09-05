@@ -12,10 +12,13 @@
  *                                      a fisgonear, la mirada barre el piso,
  *                                      las antenas apuntan, y las virutas de
  *                                      olor entran hacia su nariz.
- *   4. ENTRADA TEATRAL (.ang-entrada)— asoma pequeñita → (si hace sol) se pone
- *                                      las gafas → anticipa y CRECE con
- *                                      overshoot a tamaño de asistente, con su
- *                                      aro de energía. Timing de cartoon puro.
+ *   4. ENTRADA TEATRAL (.ang-entrada)— asoma pequeñita → se queda QUIETA una
+ *                                      pausa (que el ojo la encuentre) →
+ *                                      CRECE con overshoot a tamaño de
+ *                                      asistente (su aro de energía) → (si
+ *                                      hace sol) YA a tamaño completo se pone
+ *                                      las gafas → BRILLO final que remata.
+ *                                      Timing de cartoon puro.
  *
  * REGLAS DE LA CASA (las mismas de creatures.css / angelita-agente.css):
  *   · Solo transform/opacity (GPU, gama baja).
@@ -154,11 +157,15 @@
 }
 
 /* ═══ 4. LA ENTRADA TEATRAL (.ang-entrada) ═══════════════════════════════════
-   Después del paneo del host: asoma PEQUEÑITA (pop elástico) → si hace sol se
-   pone las gafas (fase quieta a escala chiquita: el show es de las gafas) →
-   anticipa (se recoge) y CRECE con overshoot a su tamaño de asistente, con el
-   aro de energía que revienta al llegar. El JS (AngelitaEntrada.jsx) solo
-   cambia la clase de fase; el timing vive aquí. */
+   Después del paneo del host: asoma PEQUEÑITA (pop elástico) → se queda
+   QUIETA a esa misma escala (pausa de 1-2s: el ojo la encuentra ANTES de que
+   pase algo — feedback del operador: tan pequeña que lo que hacía al fondo no
+   se notaba) → CRECE con overshoot a su tamaño de asistente (el aro de
+   energía revienta al llegar: la entrada MAGISTRAL) → si hace sol, YA a
+   tamaño completo se pone las gafas (se ven y resaltan — a escala chiquita se
+   perdían) → BRILLO final que remata y avisa "ya estoy lista", y se apaga
+   solo. El JS (AngelitaEntrada.jsx) solo cambia la clase de fase; el timing
+   vive aquí. */
 .ang-entrada {
   position: relative;
   display: inline-flex;
@@ -172,7 +179,7 @@
 }
 /* espera: todavía nada (el paneo del host sigue andando) */
 .ang-entrada--espera .ang-entrada__escala { transform: scale(0.36); opacity: 0; }
-/* asoma: pop elástico a tamaño pequeñito */
+/* asoma: pop elástico a tamaño pequeñito — aparece */
 .ang-entrada--asoma .ang-entrada__escala {
   animation: ang-asoma 0.9s cubic-bezier(0.3, 1.4, 0.5, 1) both;
 }
@@ -183,9 +190,13 @@
   82% { transform: scale(0.33); }
   100% { transform: scale(0.36); opacity: 1; }
 }
-/* gafas: quieta a escala chica (el one-shot de las gafas manda) */
-.ang-entrada--gafas .ang-entrada__escala { transform: scale(0.36); }
-/* crece: anticipación (se agacha y recoge) → estirón con overshoot → asienta */
+/* quieta: se queda ESTÁTICA a la misma escala en la que asentó `asoma` (cero
+   salto) — la pausa para que el ojo la encuentre antes del número. Angelita
+   (idleCerebro=false en esta fase) sigue viva por su aleteo/boil base, sin
+   gestos grandes que compitan con la entrada que viene. */
+.ang-entrada--quieta .ang-entrada__escala { transform: scale(0.36); opacity: 1; }
+/* crece: anticipación (se agacha y recoge) → estirón con overshoot → asienta.
+   Arranca en la MISMA escala en la que quedó `quieta` (0.36): cero salto. */
 .ang-entrada--crece .ang-entrada__escala {
   animation: ang-crece 1.3s cubic-bezier(0.3, 0.9, 0.35, 1) both;
 }
@@ -198,6 +209,10 @@
   88% { transform: scale(1.04, 1.05); }                 /* rebotico */
   100% { transform: none; }
 }
+/* gafas / brillo: YA a tamaño completo (mismo valor en el que asentó `crece`:
+   cero salto) — las gafas se ven de verdad, no a escala chiquita perdidas. */
+.ang-entrada--gafas .ang-entrada__escala { transform: none; }
+.ang-entrada--brillo .ang-entrada__escala { transform: none; }
 .ang-entrada--lista .ang-entrada__escala { transform: none; }
 
 /* El ARO DE ENERGÍA que revienta cuando alcanza su tamaño (delay = el pico del
@@ -219,6 +234,32 @@
 @keyframes ang-aro {
   0% { transform: scale(0.4); opacity: 0.9; }
   100% { transform: scale(1.5); opacity: 0; }
+}
+
+/* El BRILLITO final (fase `brillo`): un destello suave y breve que remata el
+   show y avisa "ya estoy lista" — y se apaga SOLO (both, no infinite: nunca
+   queda un glow permanente encendido). Distinto del aro (que celebra que
+   CRECIÓ): este marca el cierre de TODO el número, con o sin gafas. */
+.ang-entrada__brillo {
+  position: absolute;
+  inset: 8%;
+  border-radius: 50%;
+  pointer-events: none;
+  opacity: 0;
+  background: radial-gradient(
+    circle,
+    rgba(255, 224, 130, 0.95) 0%,
+    rgba(255, 200, 90, 0.5) 40%,
+    rgba(255, 200, 90, 0) 72%
+  );
+}
+.ang-entrada--brillo .ang-entrada__brillo {
+  animation: ang-destello-final 0.65s cubic-bezier(0.2, 0.8, 0.3, 1) both;
+}
+@keyframes ang-destello-final {
+  0%   { transform: scale(0.7); opacity: 0; }
+  35%  { transform: scale(1.08); opacity: 1; }
+  100% { transform: scale(1.35); opacity: 0; }
 }
 
 /* ═══ GATES DE LA CASA ═══════════════════════════════════════════════════════ */
@@ -245,15 +286,176 @@
   [data-agente='angelita'][data-agt-estado='husmea'] .rh-mirada,
   .agm-olor,
   .ang-entrada__escala,
-  .ang-entrada__aro {
+  .ang-entrada__aro,
+  .ang-entrada__brillo {
     animation: none !important;
   }
   .ang-entrada--espera .ang-entrada__escala,
   .ang-entrada--asoma .ang-entrada__escala,
+  .ang-entrada--quieta .ang-entrada__escala,
   .ang-entrada--gafas .ang-entrada__escala,
-  .ang-entrada--crece .ang-entrada__escala {
+  .ang-entrada--crece .ang-entrada__escala,
+  .ang-entrada--brillo .ang-entrada__escala {
     transform: none;
     opacity: 1;
   }
   .agm-olor { opacity: 0.55; }
+  /* El brillito final NO se congela encendido: es un remate, no un glow
+     permanente — RM lo apaga del todo (mismo criterio que el aro). */
+  .ang-entrada__brillo { opacity: 0; }
+}
+
+/* ═══ 5. MÍSTICO — aura espectral + motas (compartido entrada/salida) ════════
+   El operador pidió "épico y místico para entrada y salida". Lo épico ya vive
+   en el aro ámbar + brillo. Lo MÍSTICO es esta capa: Angelita se CONDENSA de
+   una luz espectral al entrar y se DISUELVE en ella al salir (reusa la idea de
+   `jaguar-aparicion`: emerge de la bruma / vuelve a la nada). Solo opacity +
+   transform (GPU). La capa envuelve el dibujo por fuera de la escala → no pisa
+   su transform. Las motas son spans que el JS siembra con --i (ángulo/retraso). */
+.ang-mistico {
+  position: absolute;
+  inset: -8%;
+  pointer-events: none;
+  opacity: 0;
+}
+.ang-mistico__aura {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle,
+    rgba(255, 236, 170, 0.55) 0%,
+    rgba(255, 196, 90, 0.34) 34%,
+    rgba(190, 150, 255, 0.22) 60%,  /* borde violeta espectral */
+    rgba(190, 150, 255, 0) 78%
+  );
+  transform: scale(0.6);
+  opacity: 0;
+}
+.ang-mistico__mota {
+  position: absolute;
+  left: 50%;
+  top: 54%;
+  width: 6%;
+  height: 6%;
+  margin: -3% 0 0 -3%;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255, 244, 200, 0.98), rgba(255, 214, 130, 0) 70%);
+  opacity: 0;
+  /* --ang: ángulo de la mota; --r: radio al que orbita; --d: retraso */
+  transform: rotate(var(--ang, 0deg)) translateX(var(--r, 34%)) rotate(calc(-1 * var(--ang, 0deg)));
+}
+
+/* --- MÍSTICO EN LA ENTRADA: se condensa mientras asoma y crece --- */
+.ang-entrada--asoma .ang-mistico,
+.ang-entrada--quieta .ang-mistico,
+.ang-entrada--crece .ang-mistico { opacity: 1; }
+.ang-entrada--asoma .ang-mistico__aura,
+.ang-entrada--crece .ang-mistico__aura {
+  animation: ang-aura-condensa 1.5s cubic-bezier(0.2, 0.7, 0.3, 1) both;
+}
+.ang-entrada--asoma .ang-mistico__mota,
+.ang-entrada--crece .ang-mistico__mota {
+  animation: ang-mota-converge 1.4s ease-out both;
+  animation-delay: var(--d, 0ms);
+}
+@keyframes ang-aura-condensa {
+  0%   { transform: scale(0.55); opacity: 0; }
+  40%  { transform: scale(1.02); opacity: 0.9; }
+  100% { transform: scale(0.9);  opacity: 0; }   /* cede: ya se materializó */
+}
+@keyframes ang-mota-converge {
+  /* la mota llega DESDE afuera (radio grande, tenue) y converge al cuerpo */
+  0%   { opacity: 0; transform: rotate(var(--ang)) translateX(calc(var(--r) * 2.4)) rotate(calc(-1 * var(--ang))) scale(0.6); }
+  35%  { opacity: 1; }
+  100% { opacity: 0; transform: rotate(var(--ang)) translateX(calc(var(--r) * 0.2)) rotate(calc(-1 * var(--ang))) scale(0.9); }
+}
+
+/* ═══ 6. LA SALIDA MÍSTICA (.ang-salida) — espejo de la entrada ══════════════
+   Fases (JS = metrónomo, timing acá): lista (plena) → mistico (junta energía:
+   aura + line-boil, se recoge un poco) → encoge (anticipación y estirón corto
+   → se comprime) → ido (se va a escala 0 disolviéndose, motas se dispersan). */
+.ang-salida {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.ang-salida__escala {
+  display: inline-flex;
+  transform-origin: 50% 78%;
+  will-change: transform;
+}
+.ang-salida--lista .ang-salida__escala { transform: none; opacity: 1; }
+/* mistico: junta energía, se recoge apenas (anticipación de la partida) */
+.ang-salida--mistico .ang-salida__escala {
+  animation: ang-recoge 0.9s cubic-bezier(0.3, 0.9, 0.35, 1) both;
+}
+@keyframes ang-recoge {
+  0%   { transform: none; }
+  55%  { transform: scale(1.06, 1.08) translateY(-2%); }  /* respira hacia arriba */
+  100% { transform: scale(0.96, 0.94) translateY(0.5%); } /* se recoge */
+}
+/* encoge: estirón corto hacia arriba y se comprime (reverso del crece) */
+.ang-salida--encoge .ang-salida__escala {
+  animation: ang-encoge 0.85s cubic-bezier(0.4, 0, 0.7, 0.3) both;
+}
+@keyframes ang-encoge {
+  0%   { transform: scale(0.96, 0.94); opacity: 1; }
+  22%  { transform: scale(0.86, 1.12) translateY(-4%); }  /* último estirón */
+  100% { transform: scale(0.28, 0.24) translateY(2%); opacity: 0.85; }
+}
+/* ido: desaparece a la nada, disolviéndose */
+.ang-salida--ido .ang-salida__escala {
+  animation: ang-desvanece 0.6s ease-in both;
+}
+@keyframes ang-desvanece {
+  0%   { transform: scale(0.28, 0.24); opacity: 0.85; }
+  100% { transform: scale(0.05) translateY(4%); opacity: 0; }
+}
+
+/* místico en la salida: aura crece y se disuelve; motas se dispersan hacia afuera */
+.ang-salida--mistico .ang-mistico,
+.ang-salida--encoge .ang-mistico,
+.ang-salida--ido .ang-mistico { opacity: 1; }
+.ang-salida--mistico .ang-mistico__aura,
+.ang-salida--encoge .ang-mistico__aura {
+  animation: ang-aura-disuelve 1.7s cubic-bezier(0.2, 0.6, 0.3, 1) both;
+}
+.ang-salida--mistico .ang-mistico__mota,
+.ang-salida--encoge .ang-mistico__mota,
+.ang-salida--ido .ang-mistico__mota {
+  animation: ang-mota-dispersa 1.5s ease-in both;
+  animation-delay: var(--d, 0ms);
+}
+@keyframes ang-aura-disuelve {
+  0%   { transform: scale(0.7);  opacity: 0; }
+  38%  { transform: scale(1.06); opacity: 0.95; }
+  100% { transform: scale(1.5);  opacity: 0; }
+}
+@keyframes ang-mota-dispersa {
+  0%   { opacity: 0; transform: rotate(var(--ang)) translateX(calc(var(--r) * 0.3)) rotate(calc(-1 * var(--ang))) scale(0.7); }
+  30%  { opacity: 1; }
+  100% { opacity: 0; transform: rotate(var(--ang)) translateX(calc(var(--r) * 2.6)) rotate(calc(-1 * var(--ang))) translateY(-40%) scale(0.5); }
+}
+
+/* El aro y el brillo también sirven a la salida (mismo look épico) */
+.ang-salida__aro {
+  position: absolute; inset: 12%;
+  border: 2.5px solid rgba(255, 181, 79, 0.9);
+  border-radius: 50%; pointer-events: none; opacity: 0; transform: scale(0.4);
+}
+.ang-salida--mistico .ang-salida__aro {
+  animation: ang-aro 0.85s 0.15s cubic-bezier(0.2, 0.7, 0.3, 1) forwards;
+}
+
+/* ═══ GATES de místico/salida ════════════════════════════════════════════════ */
+[data-tier='bajo'] .ang-mistico { display: none; }  /* raster caro en gama baja */
+@media (prefers-reduced-motion: reduce) {
+  .ang-mistico, .ang-mistico__aura, .ang-mistico__mota,
+  .ang-salida__escala, .ang-salida__aro {
+    animation: none !important;
+  }
+  /* la salida sin teatro: el JS salta directo a 'ido' (se va, fotograma digno) */
+  .ang-salida--ido .ang-salida__escala { transform: scale(0.05); opacity: 0; }
 }

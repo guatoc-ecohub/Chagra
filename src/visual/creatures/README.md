@@ -1,5 +1,11 @@
 # `src/visual/creatures` — personajes de fauna reutilizables
 
+> **LA LEY**: la guía de consistencia rubber-hose (los dos registros, los
+> parámetros canónicos, cómo montar un personaje nuevo y el checklist de
+> revisión) vive en **`src/visual/GUIA-RUBBERHOSE.md`**; sus valores, como
+> datos, en **`rubberhoseSpec.js`**. Un personaje aprobado se ve IGUAL en
+> todas partes — por construcción, no por buena intención.
+
 Librería de **personajes de fauna de la chagra** como componentes SVG limpios,
 parametrizables y sin dependencias nuevas. Nace para **dejar de redibujar el
 mismo bicho** en cada mockup/escena: hoy el colibrí, la abeja angelita, la
@@ -27,8 +33,11 @@ calidad dispar. Aquí vive la **versión canónica** de cada uno.
 | `Perezoso` | *Bradypus variegatus* | Perezoso de tres dedos, templado. **Cuelga de una rama** por sus **garras largas** curvas, con **antifaz** y **tinte verdoso** de algas. La quietud extrema: todo en **cámara lenta** (mecerse zen, parpadeo larguísimo). Poder **turquesa**. Rubber-hose, showcase completo. |
 | `Ardilla` | *Notosciurus granatensis* | Ardilla de cola roja del templado. Rufa con **línea dorsal** oscura (su firma), **cola tupida** y dientes de roedor. Ágil e inquieta: su firma es la **inspección invertida** (se cuelga de cabeza). De suelo, se sienta. Rubber-hose. |
 | `Jaguar` | *Panthera onca* | Felino de tierra cálida. Leonado con **rosetas** (manchas de centro ocre — su firma), musculoso, mirada felina ámbar. Majestuoso y **acechador**: acecho de hombros, cola pesada, rugido. Aura **púrpura**. Rubber-hose. |
+| `ChivitoTrazado` | *Oxypogon guerinii* | Chivito de páramo auto-trazado desde la lámina fuente. La piel punk solo aparece en `modo="actuando"`. |
+| `LuciernagaTrazado` | *Lampyridae* | Luciérnaga auto-trazada desde la lámina fuente, con estado de linterna. |
 | `Morrocoy` | *Chelonoidis carbonarius* | Galápago de patas rojas de tierra cálida. Caparazón de **domo geométrico** (escudos **hexagonales** con anillos de edad — su firma), patas y cabeza **rojizas** con escamas naranja-fuego. **Ancestral, lento, sabio**: caparazón que respira, **retracción elástica** (cabeza y patas entran a la concha), asentimiento sabio. Aura **bronce**. Rubber-hose. |
 | `Borugo` | *Cuniculus taczanowskii* | La paca/lapa de montaña andina, roedor **nocturno**. Pardo con **hileras de motas crema** en los flancos (su firma), hocico con bigotes, ojos grandes que reflejan la luna. **Tierno, tímido, sereno**: olfateo (`olfatea`) y acurrucarse a salvo (`acurruca`). Aura **plata lunar**. El **animal de cierre** — honrado vivo, a salvo y digno. Rubber-hose. |
+| `Zariguya` | *Didelphis marsupialis* | La chucha/fara/runcho: **marsupial nocturno** de la finca, **LA QUE CARGA**. Su firma es **de FORMA, no de color** (pasa el test de negro sobre blanco): **las CRÍAS AL LOMO** — el contorno de la espalda es una escalerita de bultos, y ninguna otra criatura del elenco la tiene —, **hocico en cuña**, **cola prensil desnuda** que nace baja y remata en gancho, y **orejas grandes redondas**. Husmea **erguida** (masa vertical: así NO se confunde con el gurre, que escarba horizontal). Gestos: `husmea` y **`tanatosis`** (se hace la muerta… pero la cola sigue enroscándose). **NO se viste**: la ruana opaca le taparía las crías. Aura **rosa de luna**. Rubber-hose. |
 | `Lombriz` | *Martiodrilus crassus* | Lombriz gigante nativa. Cuerpo segmentado con clitelo. Sin animación propia (su movimiento lo da la escena). |
 | `Mariposa` | *Dione juno* | Pasionaria de alas largas. Cuatro alas que abren y cierran. |
 | `Escarabajo` | *Dichotomius belus* | Estercolero colombiano. Élitros brillantes, cuerno, y bola de abono que rueda. |

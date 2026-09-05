@@ -1,0 +1,124 @@
+<!doctype html>
+<!-- Harness 3D de las láminas del invernadero: el MISMO motor de escena
+     (atlas + quads cruzados + material + vaivén) a TRES distancias fijas —
+     cerca (una mata), plano medio (un surco), amplia (un campo).
+     Uso: ?especie=tomate|pimenton|lechuga  (default tomate).
+     Es el banco de la envolvente que pide README-ARTE-FABLE; el mundo real
+     se gatea aparte por su ruta. No entra al build. -->
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <title>Láminas del invernadero — cerca / medio / amplia</title>
+    <style>
+      body { margin: 0; background: #1c1a14; }
+      canvas { display: block; }
+    </style>
+  </head>
+  <body>
+    <script type="module">
+      import * as THREE from 'three';
+      import {
+        crearAtlasLamina,
+        geomLaminaCruzadaDe,
+        materialLamina,
+        variantesDeItemsEn,
+        animarVaiven,
+      } from './src/visual/mundo3d/invernadero/laminaMasa.js';
+      import { LAMINA_TOMATE } from './src/visual/mundo3d/invernadero/tomateHumboldt.js';
+      import { LAMINA_PIMENTON, LAMINA_LECHUGA } from './src/visual/mundo3d/invernadero/hortalizasHumboldt.js';
+      import { rng } from './src/visual/mundo3d/bosque/entQuenua.geom.js';
+
+      const LAMINAS = { tomate: LAMINA_TOMATE, pimenton: LAMINA_PIMENTON, lechuga: LAMINA_LECHUGA };
+      const especie = new URLSearchParams(location.search).get('especie') || 'tomate';
+      const lamina = LAMINAS[especie] || LAMINA_TOMATE;
+
+      const W = 1280, H = 800;
+      const renderer = new THREE.WebGLRenderer({ antialias: true });
+      renderer.setSize(W, H);
+      renderer.outputColorSpace = THREE.SRGBColorSpace;
+      document.body.appendChild(renderer.domElement);
+
+      const escena = new THREE.Scene();
+      escena.background = new THREE.Color('#cbb98f'); // el aire tibio del túnel
+      escena.fog = new THREE.Fog('#cbb98f', 26, 60);
+
+      // la cámara baja con el porte de la mata: la lechuga se mira de más
+      // cerca y más abajo que la tomatera tutorada
+      const ojo = Math.max(0.5, lamina.alto * 0.7);
+      const cam = new THREE.PerspectiveCamera(46, W / H, 0.1, 120);
+      cam.position.set(0, ojo + 0.35, 3.1 * Math.max(0.42, lamina.alto / 1.92));
+      cam.lookAt(0, ojo * 0.8, -6);
+
+      // luz pareja de invernadero: hemisferio cálido + sol filtrado
+      escena.add(new THREE.HemisphereLight('#f2e4bd', '#5c4f33', 0.9));
+      const sol = new THREE.DirectionalLight('#fff2cf', 1.15);
+      sol.position.set(6, 10, 4);
+      escena.add(sol);
+
+      const piso = new THREE.Mesh(
+        new THREE.PlaneGeometry(90, 90),
+        new THREE.MeshLambertMaterial({ color: '#4a3a28' }),
+      );
+      piso.rotation.x = -Math.PI / 2;
+      escena.add(piso);
+
+      const atlas = crearAtlasLamina(lamina.layout, lamina.pintarTile, lamina.semillaAtlas);
+      const geo = geomLaminaCruzadaDe(lamina.ancho, lamina.alto, lamina.planos, lamina.desfase);
+      const mat = materialLamina(atlas, lamina.alto);
+
+      function siembra(items) {
+        const mesh = new THREE.InstancedMesh(geo, mat, items.length);
+        const m = new THREE.Matrix4(), q = new THREE.Quaternion();
+        const e = new THREE.Euler(), p = new THREE.Vector3(), s = new THREE.Vector3();
+        items.forEach((it, i) => {
+          p.set(it.pos[0], it.pos[1], it.pos[2]);
+          e.set(0, it.rotY, 0); q.setFromEuler(e);
+          s.setScalar(it.escala); m.compose(p, q, s);
+          mesh.setMatrixAt(i, m);
+        });
+        mesh.geometry = geo.clone();
+        mesh.geometry.setAttribute(
+          'aTile',
+          new THREE.InstancedBufferAttribute(variantesDeItemsEn(lamina.layout, items.length, lamina.semillaVariantes), 4),
+        );
+        mesh.frustumCulled = false;
+        escena.add(mesh);
+        return mesh;
+      }
+
+      const r = rng(733);
+      const paso = Math.max(0.34, lamina.ancho * 0.62);
+      // CERCA: una mata sola llenando el cuadro
+      const cerca = [{ pos: [-lamina.ancho * 0.55, 0, 0.4], rotY: 0.3, escala: 1.0 }];
+      // PLANO MEDIO: un surco doble a 4-9 m
+      const medio = [];
+      for (let i = 0; i < 26; i++) {
+        medio.push({
+          pos: [-6.5 * paso + (i % 13) * paso, 0, -3.6 - ((i / 13) | 0) * 1.4 - r() * 0.3],
+          rotY: r() * Math.PI * 2,
+          escala: 0.88 + r() * 0.24,
+        });
+      }
+      // AMPLIA: el campo denso hasta la niebla (12-45 m)
+      const lejos = [];
+      for (let i = 0; i < 900; i++) {
+        lejos.push({
+          pos: [-16 + r() * 32, 0, -12 - r() * 33],
+          rotY: r() * Math.PI * 2,
+          escala: 0.85 + r() * 0.3,
+        });
+      }
+      const meshes = [siembra(cerca), siembra(medio), siembra(lejos)];
+
+      const reloj = new THREE.Clock();
+      function frame() {
+        const t = reloj.getElapsedTime();
+        meshes.forEach((ms) => animarVaiven(ms, t, true));
+        renderer.render(escena, cam);
+        requestAnimationFrame(frame);
+      }
+      frame();
+      window.__laminaLista = true;
+    </script>
+  </body>
+</html>

@@ -1,0 +1,63 @@
+{
+  "species_slug": "heliconia_psittacorum",
+  "scientific_name": "Heliconia psittacorum L.f.",
+  "common_names": [
+    "Heliconia"
+  ],
+  "family": "Heliconiaceae",
+  "category": "ornamentales_nativas",
+  "cultivable": true,
+  "conservation_status": "nativo_silvestre",
+  "thermal_zones": [
+    "calido",
+    "templado"
+  ],
+  "roles_in_guild": [
+    "crop",
+    "pollinator_attractor"
+  ],
+  "antagonists": [],
+  "especies_nativas_sustitutas": [],
+  "propagation": null,
+  "requirements": {
+    "agua": null,
+    "altitud_msnm": {
+      "min_absoluto": 0,
+      "optimo_min": 0,
+      "optimo_max": 1200,
+      "max_absoluto": 1800
+    },
+    "temperatura_c": null,
+    "radiacion": null,
+    "drenaje_requerido": null
+  },
+  "valor_pedagogico": "La heliconia o platanillo (Heliconia psittacorum L.f., familia Heliconiaceae) es una herbácea rizomatosa perenne nativa del Neotrópico, de las cuales Colombia es uno de los países con mayor diversidad de especies del género Heliconia. Sus inflorescencias de brácteas vistosas (rojas, naranjas, amarillas) la convirtieron en una flor tropical de corte de exportación cultivada en zonas cálidas y de piedemonte (Eje Cafetero, Tolima, Llanos, Pacífico). Ecológicamente es clave: sus flores tubulares son polinizadas casi exclusivamente por colibríes, y las brácteas acumulan agua (fitotelmata) que alberga fauna acuática especializada, por lo que sirve para enseñar coevolución planta-polinizador y microhábitats. Comparte con el plátano y el banano (orden Zingiberales) la susceptibilidad al moko (Ralstonia solanacearum raza 2), registrado en la curaduría de Chagra como riesgo de manejo en cultivos asociados. Lección viva sobre biodiversidad nativa colombiana, floricultura tropical sostenible y relaciones colibrí-planta. Fuentes Tier A de taxonomía: GBIF, POWO Kew, Bernal 2015, SiB Colombia.",
+  "sources": [
+    {
+      "id": "gbif-taxonomic-backbone",
+      "title": "gbif-taxonomic-backbone",
+      "tier": "A",
+      "url": "https://www.gbif.org/dataset/d7dddbf4-2cf0-4f39-9b2a-bb099caae36c"
+    },
+    {
+      "id": "powo-kew",
+      "title": "powo-kew",
+      "tier": "A",
+      "url": "https://powo.science.kew.org"
+    },
+    {
+      "id": "bernal-2015-plantas-liquenes-colombia",
+      "title": "bernal-2015-plantas-liquenes-colombia",
+      "tier": "A",
+      "url": "http://catalogoplantasdecolombia.unal.edu.co"
+    },
+    {
+      "id": "sib-colombia",
+      "title": "sib-colombia",
+      "tier": "A",
+      "url": "https://sibcolombia.net"
+    }
+  ],
+  "_generated_by": "scripts/build-cycle-content-from-catalog.mjs",
+  "_generated_at": "2026-09-03T07:40:20.316Z"
+}

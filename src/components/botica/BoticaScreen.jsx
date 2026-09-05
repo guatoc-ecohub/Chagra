@@ -34,10 +34,13 @@ import './botica.css';
  *     ficha lleva su `catalogId` real.
  *   · Solo especies que existen en el catálogo/grafo. Complementa —no duplica—
  *     el mundo "Aromáticas y condimentarias" (la huerta de la cocina): aquí va
- *     la BOTICA medicinal; la hierbabuena y el poleo se quedan en la cocina.
+ *     la BOTICA medicinal; el poleo se queda en la cocina. La yerbabuena aparece
+ *     en ambos mundos SIN duplicar: en la cocina, su uso culinario; aquí, su lado
+ *     de botica, con un `cruce` que remite a la cocina y el aviso de no confundirla
+ *     con el poleo (abortivo).
  *
  * Cinco estaciones (pestañas):
- *   1. Barriga y nervios — digestivas y calmantes (manzanilla, cidrón, toronjil).
+ *   1. Barriga y nervios — digestivas y calmantes (manzanilla, cidrón, toronjil, yerbabuena).
  *   2. Piel y heridas     — uso externo (caléndula, llantén).
  *   3. Gripa y tónico     — pecho y sangre (saúco, ortiga).
  *   4. Cultivar la botica — piso térmico, cosecha de hoja/flor y secado.
@@ -64,7 +67,7 @@ function FotoBotica({ slug, alt, ratio = 'aspect-[16/10]', rounded = '', Fallbac
   const credito = creditoDe(slug);
   const IconoFallback = Fallback;
   return (
-    <div className={`relative overflow-hidden bg-[#182016] ${ratio} ${rounded}`}>
+    <div className={`relative overflow-hidden bg-surface-card ${ratio} ${rounded}`}>
       {ok ? (
         <img
           src={`${FOTO_BASE_BOTICA}/${slug}.jpg`}
@@ -137,7 +140,7 @@ function PlantaCard({ planta }) {
   const peligrosa = p.grupo === 'cuidado';
   return (
     <article
-      className={`rounded-2xl border overflow-hidden ${peligrosa ? 'border-rose-700/50 bg-rose-950/20' : 'border-emerald-900/40 bg-[#141b12]/60'}`}
+      className={`rounded-2xl border overflow-hidden ${peligrosa ? 'border-rose-700/50 bg-rose-950/20' : 'border-emerald-900/40 bg-surface-card/60'}`}
       data-testid={`planta-${p.slug}`}
     >
       <FotoBotica
@@ -163,6 +166,18 @@ function PlantaCard({ planta }) {
           </p>
         )}
 
+        {/* Cruce honesto: mata que también vive en la huerta de la cocina
+            (misma especie, otro uso). Remite sin duplicar el contenido. */}
+        {p.cruce && (
+          <p
+            className="flex items-start gap-1.5 rounded-lg border border-sky-800/40 bg-sky-950/20 p-2 text-[11px] leading-snug text-sky-100/90"
+            data-testid={`cruce-${p.slug}`}
+          >
+            <Sprout size={13} aria-hidden="true" className="shrink-0 mt-0.5 text-sky-300" />
+            <span><span className="font-bold text-sky-200">También vive en {p.cruce.mundo}:</span> {p.cruce.nota}</span>
+          </p>
+        )}
+
         {/* Para qué se usa TRADICIONALMENTE (parte usada + uso) */}
         <div>
           <p className="flex items-center gap-1.5 text-xs font-black uppercase tracking-wide text-emerald-300 mb-1.5">
@@ -175,7 +190,7 @@ function PlantaCard({ planta }) {
           )}
           <p className="text-sm leading-snug text-slate-200">{p.usoTradicional}</p>
           {p.comoSePrepara && (
-            <p className="mt-1.5 flex items-start gap-1.5 text-[11px] leading-snug text-slate-400">
+            <p className="mt-1.5 flex items-start gap-1.5 text-2xs leading-snug text-slate-400">
               <Info size={12} aria-hidden="true" className="shrink-0 mt-0.5 text-slate-500" />
               <span><span className="font-bold text-slate-300">En la casa:</span> {p.comoSePrepara}</span>
             </p>
@@ -185,7 +200,7 @@ function PlantaCard({ planta }) {
         {/* Veto de seguridad honesto (cuando la mata lo pide) */}
         {p.veto && (
           <div className="rounded-lg border border-rose-600/50 bg-rose-950/30 p-2.5" data-testid={`veto-${p.slug}`}>
-            <p className="flex items-start gap-1.5 text-[11px] leading-snug text-rose-100">
+            <p className="flex items-start gap-1.5 text-2xs leading-snug text-rose-100">
               <TriangleAlert size={13} aria-hidden="true" className="shrink-0 mt-0.5 text-rose-300" />
               <span><span className="font-black uppercase tracking-wide">Cuidado:</span> {p.veto}</span>
             </p>
@@ -213,7 +228,7 @@ function PlantaCard({ planta }) {
           </div>
         )}
 
-        <p className="text-[10px] leading-snug text-slate-500">
+        <p className="text-[10px] leading-snug text-slate-400">
           Cultivo groundeado en el catálogo Chagra (piso térmico, luz, agua, propagación). Usos: saber popular campesino.
         </p>
       </div>
@@ -256,7 +271,7 @@ function EstacionCultivo() {
       </PedagogicalBlock>
 
       {/* Tabla-resumen del piso térmico de cada mata (grounded) */}
-      <div className="rounded-2xl border border-slate-700/60 bg-[#141b12]/50 overflow-hidden" data-testid="botica-tabla-cultivo">
+      <div className="rounded-2xl border border-slate-700/60 bg-surface-card/50 overflow-hidden" data-testid="botica-tabla-cultivo">
         <div className="p-3 border-b border-slate-700/60">
           <p className="flex items-center gap-2 text-sm font-black text-emerald-200 uppercase tracking-wide">
             <Mountain size={16} aria-hidden="true" /> Qué mata en qué clima
@@ -283,8 +298,9 @@ function EstacionCultivo() {
       </div>
 
       {/* Cómo secar y guardar (común a toda la botica) */}
-      <div className="rounded-2xl border border-amber-800/40 bg-[#141b12]/50 p-4 space-y-2" data-testid="botica-secado">
+      <div className="rounded-2xl border border-amber-800/40 bg-surface-card/50 p-4 space-y-2" data-testid="botica-secado">
         <p className="flex items-center gap-2 text-sm font-black text-amber-200 uppercase tracking-wide">
+          {/* eslint-disable-next-line chagra-i18n/no-hardcoded-spanish -- título de contenido campesino, migración i18n pendiente para todo el mundo (ADR-050, ver header de boticaCampesina.js) */}
           <Scissors size={16} aria-hidden="true" /> Cosechar, secar y guardar
         </p>
         <ul className="space-y-2 text-xs leading-snug text-slate-300">
@@ -311,7 +327,7 @@ function EstacionCuidado({ onNavigate }) {
       </div>
 
       {/* Reglas de seguridad honestas */}
-      <div className="rounded-2xl border border-slate-700/60 bg-[#141b12]/50 p-4 space-y-3" data-testid="botica-reglas">
+      <div className="rounded-2xl border border-slate-700/60 bg-surface-card/50 p-4 space-y-3" data-testid="botica-reglas">
         <p className="flex items-center gap-2 text-sm font-black text-slate-100 uppercase tracking-wide">
           <ShieldCheck size={16} aria-hidden="true" className="text-emerald-300" /> Reglas de la casa
         </p>
@@ -363,7 +379,7 @@ function CreditosFotos() {
   const [abierto, setAbierto] = useState(false);
   if (!CREDITOS_FOTOS_BOTICA.length) return null;
   return (
-    <div className="rounded-xl border border-slate-700/60 bg-[#141b12]/50 p-3" data-testid="botica-creditos-fotos">
+    <div className="rounded-xl border border-slate-700/60 bg-surface-card/50 p-3" data-testid="botica-creditos-fotos">
       <button
         type="button"
         onClick={() => setAbierto((v) => !v)}
@@ -386,7 +402,7 @@ function CreditosFotos() {
               >
                 {cr.slug}<ExternalLink size={10} className="inline shrink-0" aria-hidden="true" />
               </a>
-              <span className="text-slate-500"> — {cr.autor} · {cr.licencia} · Wikimedia Commons</span>
+              <span className="text-slate-400"> — {cr.autor} · {cr.licencia} · Wikimedia Commons</span>
             </li>
           ))}
         </ul>
@@ -403,18 +419,18 @@ export default function BoticaScreen({ onBack, onNavigate = undefined }) {
     <ScreenShell title="La botica campesina" icon={Leaf} onBack={onBack}>
       <div className="max-w-2xl mx-auto p-4 space-y-4" data-testid="botica-screen">
         {/* Portada breve del mundo + disclaimer siempre visible */}
-        <div className="rounded-2xl border border-emerald-800/40 bg-[#141b12]/50 p-4">
+        <div className="rounded-2xl border border-emerald-800/40 bg-surface-card/50 p-4">
           <p className="flex items-center gap-2 text-sm font-black text-emerald-200 leading-tight">
             <Flower2 size={18} aria-hidden="true" className="shrink-0" />
             La huerta que cura de la finca andina
           </p>
           <p className="mt-1.5 text-xs italic leading-snug text-slate-400">
             Las plantas medicinales de la casa —caléndula, manzanilla, toronjil, cidrón,
-            saúco, ortiga, llantén— contadas por su uso tradicional y por cómo se cultivan
-            y se cosechan. Complementa la huerta de aromáticas de la cocina: esto es la botica.
+            yerbabuena, saúco, ortiga, llantén— contadas por su uso tradicional y por cómo se
+            cultivan y se cosechan. Complementa la huerta de aromáticas de la cocina: esto es la botica.
           </p>
           <div className="mt-2.5 rounded-lg border border-amber-600/40 bg-amber-950/20 p-2.5">
-            <p className="flex items-start gap-1.5 text-[11px] leading-snug text-amber-100">
+            <p className="flex items-start gap-1.5 text-2xs leading-snug text-amber-100">
               <Stethoscope size={13} aria-hidden="true" className="shrink-0 mt-0.5 text-amber-300" />
               <span><span className="font-black">Saber tradicional, no medicina.</span> Estas plantas acompañan molestias leves; no curan enfermedades ni reemplazan al médico. En embarazo, con niños o si toma remedios, consulte a un profesional de la salud.</span>
             </p>
@@ -436,11 +452,11 @@ export default function BoticaScreen({ onBack, onNavigate = undefined }) {
                 className={`rounded-xl border px-2 py-2.5 text-center transition-colors min-h-[56px] ${
                   activo
                     ? 'botica-estacion-activa border-emerald-500/70 bg-emerald-500/15 text-emerald-100'
-                    : 'border-slate-700 bg-[#141b12]/50 text-slate-300 active:bg-slate-800/70'
+                    : 'border-slate-700 bg-surface-card/50 text-slate-300 active:bg-slate-800/70'
                 }`}
               >
                 <span className="block text-sm font-black leading-tight">{e.titulo}</span>
-                <span className={`block text-[10px] leading-tight mt-0.5 ${activo ? 'text-emerald-200/90' : 'text-slate-500'}`}>
+                <span className={`block text-[10px] leading-tight mt-0.5 ${activo ? 'text-emerald-200/90' : 'text-slate-400'}`}>
                   {e.descripcion}
                 </span>
               </button>
@@ -453,7 +469,7 @@ export default function BoticaScreen({ onBack, onNavigate = undefined }) {
             grupo="barriga"
             icon={HeartPulse}
             tituloHero="Las aromáticas de la casa: se toman en agua de tiempo después de comer, para el estómago pesado y los gases, y en la noche para calmar los nervios y ayudar a dormir."
-            lead="La manzanilla, el cidrón y el toronjil son el trío de aguas aromáticas de toda cocina campesina."
+            lead="La manzanilla, el cidrón, el toronjil y la yerbabuena son las aguas aromáticas de toda cocina campesina."
             clave="Son aguas para acompañar una molestia pasajera, no un tratamiento. Se toman con medida y de vez en cuando."
           />
         )}

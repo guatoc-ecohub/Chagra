@@ -21,19 +21,31 @@
  * PALETA (el único azul con permiso es PALETA.agua). Terreno 100% procedural
  * determinista (cero assets remotos → cachea limpio offline).
  *
+ * LA LÁMINA (2026-07-30): el diorama ya no flota en la niebla — `fondoAgua`
+ * le pinta la inmensidad de Humboldt (bóveda, cordillera, LA CHORRERA REAL —
+ * el farallón fiel al cañón de Guatoc con su caída volumétrica escalonada de
+ * ~590 m, portada del valle 3D —, la falda que continúa el terreno y la
+ * quebrada que sigue a la vereda de abajo). La LLEGADA es un vuelo al estilo
+ * del páramo viejo (CamaraJackson): abre pegado al nacimiento, retrocede
+ * quebrada abajo mirando de dónde viene el agua, vira sobre la vega y SE
+ * ASIENTA en el plano general — con letterbox de cine y el chrome en silencio
+ * hasta aterrizar. reduced-motion y gama baja lo saltan.
+ *
  * RENDIMIENTO: MeshLambert/Basic, sin shadow-maps ni post-proceso; partículas
  * instanciadas con presupuesto por `tier` (deviceTier); `reducedMotion` congela
- * flujos y pasa el frameloop a demanda.
+ * flujos y pasa el frameloop a demanda. El fondo es 100% estático (cero
+ * useFrame: se paga una vez al construir).
  *
  * Mockup standalone con su PROPIO <Canvas> — ruta #/mockups/mundo-agua-3d.
  * NO toca mundoData ni el host <Mundo>.
  */
 import { useEffect, useMemo, useRef, useState } from 'react';
 import * as THREE from 'three';
-import { Canvas, useFrame } from '@react-three/fiber';
+import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { Html, OrbitControls, AdaptiveDpr } from '@react-three/drei';
 import { ATMOSFERA, CIELOS, PALETA, mezclarCielo } from '../visual/mundo3d/atmosferaMadre.js';
 import { decidirTier, perfilDeTier } from '../visual/mundo3d/deviceTier.js';
+import FondoAgua from '../visual/mundo3d/agua/fondoAgua.jsx';
 import {
   Cardumen,
   Garza,
@@ -146,6 +158,8 @@ const C_LOMA = new THREE.Color('#9aa66a'); // pajonal de la loma
 const C_PASTO = new THREE.Color(PALETA.follajeClaro);
 const C_HUMEDO = new THREE.Color(PALETA.follaje);
 const C_RIBERA = new THREE.Color(PALETA.follajeOscuro);
+const C_PARCHE = new THREE.Color('#b9cc74'); // el pasto que agarra el sol (pincelada)
+const C_PAJA = new THREE.Color('#c9b168'); // la paja dorada de la loma alta
 function colorTerreno(wx, wz, y, out) {
   out.lerpColors(C_PASTO, C_LOMA, suavizar(0.5, 2.6, y));
   const dAgua = Math.min(
@@ -156,6 +170,17 @@ function colorTerreno(wx, wz, y, out) {
   const humedad = 1 - suavizar(0.3, 2.4, dAgua);
   out.lerp(C_HUMEDO, humedad * 0.55);
   if (dAgua < 0.42) out.lerp(C_RIBERA, 0.5 * (1 - dAgua / 0.42));
+  // Las PINCELADAS de la pradera (acabado ilustrado): manchones de pasto
+  // asoleado a media vega y de paja dorada loma arriba — moteado determinista,
+  // sutil, que rompe el "verde de una sola lata" sin tocar la didáctica de la
+  // humedad (cerca del agua sigue mandando el verde hondo).
+  const parche = ruido(wx * 0.52 + 7.3, wz * 0.52 - 3.1);
+  if (parche > 0.22) out.lerp(C_PARCHE, Math.min(0.26, (parche - 0.22) * 0.5) * (1 - humedad));
+  const altoLoma = suavizar(1.1, 2.9, y);
+  if (altoLoma > 0) {
+    const paja = ruido(wx * 0.37 - 2.2, wz * 0.37 + 5.7);
+    if (paja > 0.15) out.lerp(C_PAJA, altoLoma * Math.min(0.4, (paja - 0.15) * 0.55));
+  }
   return out;
 }
 
@@ -194,6 +219,72 @@ function construirTerreno(seg, plano) {
   return geo;
 }
 
+/* ── CURVAS DE NIVEL (restricción del operador: todo relieve lleva su capa
+      topográfica COINCIDENTE — huesos reales, piel dibujada). Marching
+      squares sobre la MISMA altura() que talla el terreno: las isolíneas
+      coinciden por construcción, no por calco. Tinta café discreta de mapa,
+      un solo draw call (LineSegments). Determinista: se paga una vez. ── */
+function construirCurvasNivel(paso, seg) {
+  const nx = seg + 1;
+  const H = new Float32Array(nx * nx);
+  let hMin = Infinity, hMax = -Infinity;
+  for (let iz = 0; iz <= seg; iz++) {
+    const wz = -FONDO / 2 + (FONDO * iz) / seg;
+    for (let ix = 0; ix <= seg; ix++) {
+      const h = altura(-ANCHO / 2 + (ANCHO * ix) / seg, wz);
+      H[iz * nx + ix] = h;
+      if (h < hMin) hMin = h;
+      if (h > hMax) hMax = h;
+    }
+  }
+  const pos = [];
+  const alza = 0.035; // apenas sobre el pasto, para no pelear con el z-buffer
+  const px = (ix) => -ANCHO / 2 + (ANCHO * ix) / seg;
+  const pz = (iz) => -FONDO / 2 + (FONDO * iz) / seg;
+  for (let nivel = Math.ceil(hMin / paso) * paso; nivel < hMax; nivel += paso) {
+    for (let iz = 0; iz < seg; iz++) {
+      for (let ix = 0; ix < seg; ix++) {
+        const h00 = H[iz * nx + ix], h10 = H[iz * nx + ix + 1];
+        const h01 = H[(iz + 1) * nx + ix], h11 = H[(iz + 1) * nx + ix + 1];
+        const lo = Math.min(h00, h10, h01, h11);
+        const hi = Math.max(h00, h10, h01, h11);
+        if (nivel < lo || nivel >= hi) continue;
+        const x0 = px(ix), x1 = px(ix + 1), z0 = pz(iz), z1 = pz(iz + 1);
+        const cortes = [];
+        const corta = (ha, hb, ax, az, bx, bz) => {
+          if ((ha < nivel) === (hb < nivel)) return;
+          const k = (nivel - ha) / (hb - ha);
+          cortes.push([ax + (bx - ax) * k, az + (bz - az) * k]);
+        };
+        corta(h00, h10, x0, z0, x1, z0);
+        corta(h10, h11, x1, z0, x1, z1);
+        corta(h11, h01, x1, z1, x0, z1);
+        corta(h01, h00, x0, z1, x0, z0);
+        for (let c = 0; c + 1 < cortes.length; c += 2) {
+          pos.push(cortes[c][0], nivel + alza, cortes[c][1]);
+          pos.push(cortes[c + 1][0], nivel + alza, cortes[c + 1][1]);
+        }
+      }
+    }
+  }
+  const geo = new THREE.BufferGeometry();
+  geo.setAttribute('position', new THREE.BufferAttribute(new Float32Array(pos), 3));
+  return geo;
+}
+
+function CurvasDeNivel({ tier }) {
+  const geo = useMemo(
+    () => construirCurvasNivel(tier === 'bajo' ? 0.7 : 0.35, tier === 'alto' ? 110 : 84),
+    [tier],
+  );
+  useEffect(() => () => geo.dispose(), [geo]);
+  return (
+    <lineSegments geometry={geo} frustumCulled={false}>
+      <lineBasicMaterial color="#5d4e32" transparent opacity={0.3} depthWrite={false} />
+    </lineSegments>
+  );
+}
+
 /* Curva 3D sobre el terreno a partir de una polilínea XZ (para cintas de agua
    y para que las gotas viajen). `alza` la levanta apenas del lecho. */
 function curvaSobreTerreno(ptsXZ, alza = 0.06) {
@@ -205,12 +296,23 @@ function curvaSobreTerreno(ptsXZ, alza = 0.06) {
    quebrada y del canal. Cada VÉRTICE se drapea sobre el terreno en su propio
    (x,z): la curva suavizada se aparta de la polilínea tallada, y si la Y solo
    se interpola en los puntos de control la cinta se entierra (visto en el
-   smoke visual). */
+   smoke visual).
+   TRES columnas por muestra (orilla | centro | orilla) con color por vértice:
+   la ESPUMA clara pinta las orillas y el centro guarda el azul hondo — la
+   línea de luz al borde del agua del acabado ilustrado. */
+const C_AGUA_CINTA = new THREE.Color(PALETA.agua);
+const C_ESPUMA = new THREE.Color('#d9ede6');
 function construirCinta(curva, ancho, muestras = 64, alza = 0.09) {
-  const pos = new Float32Array(muestras * 2 * 3);
+  const pos = new Float32Array(muestras * 3 * 3);
+  const col = new Float32Array(muestras * 3 * 3);
   const p = new THREE.Vector3();
   const tang = new THREE.Vector3();
   let k = 0;
+  const meter = (x, z, dy, c) => {
+    pos[k] = x; pos[k + 1] = altura(x, z) + alza + dy; pos[k + 2] = z;
+    col[k] = c.r; col[k + 1] = c.g; col[k + 2] = c.b;
+    k += 3;
+  };
   for (let i = 0; i < muestras; i++) {
     const t = i / (muestras - 1);
     curva.getPointAt(t, p);
@@ -218,20 +320,21 @@ function construirCinta(curva, ancho, muestras = 64, alza = 0.09) {
     const nx = -tang.z, nz = tang.x; // perpendicular en el plano XZ
     const L = Math.hypot(nx, nz) || 1;
     const ox = (nx / L) * ancho * 0.5, oz = (nz / L) * ancho * 0.5;
-    const ax = p.x - ox, az = p.z - oz;
-    const bx = p.x + ox, bz = p.z + oz;
-    pos[k++] = ax; pos[k++] = altura(ax, az) + alza; pos[k++] = az;
-    pos[k++] = bx; pos[k++] = altura(bx, bz) + alza; pos[k++] = bz;
+    meter(p.x - ox, p.z - oz, 0, C_ESPUMA);
+    meter(p.x, p.z, 0.012, C_AGUA_CINTA); // el lomo del agua, apenas coronado
+    meter(p.x + ox, p.z + oz, 0, C_ESPUMA);
   }
   const idx = [];
   for (let i = 0; i < muestras - 1; i++) {
-    const a = i * 2, b = a + 1, d = a + 2, e = a + 3;
-    // winding CCW visto desde ARRIBA (normal +Y): con (a,d,b) la normal caía
-    // hacia abajo y el espejo de agua se culleaba — invisible en el smoke.
-    idx.push(a, b, d, b, e, d);
+    const a = i * 3, c = a + 1, b = a + 2, a2 = a + 3, c2 = a + 4, b2 = a + 5;
+    // winding CCW visto desde ARRIBA (normal +Y): con el orden invertido la
+    // normal caía hacia abajo y el espejo se culleaba — invisible en el smoke.
+    idx.push(a, c, a2, c, c2, a2);
+    idx.push(c, b, c2, b, b2, c2);
   }
   const geo = new THREE.BufferGeometry();
   geo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+  geo.setAttribute('color', new THREE.BufferAttribute(col, 3));
   geo.setIndex(idx);
   geo.computeVertexNormals();
   return geo;
@@ -239,7 +342,8 @@ function construirCinta(curva, ancho, muestras = 64, alza = 0.09) {
 
 /* ── Piezas vivas ─────────────────────────────────────────────────────────── */
 
-/* Espejo de agua que respira (brillo sutil; quieto con reduced-motion). */
+/* Espejo de agua que respira (brillo sutil; quieto con reduced-motion). El
+   color viene por VÉRTICE de la cinta (espuma en las orillas, azul al lomo). */
 function EspejoAgua({ geometria, reducedMotion, fase = 0, opacidad = 0.92 }) {
   const mat = useRef(null);
   useFrame((st) => {
@@ -250,13 +354,55 @@ function EspejoAgua({ geometria, reducedMotion, fase = 0, opacidad = 0.92 }) {
     <mesh geometry={geometria}>
       <meshLambertMaterial
         ref={mat}
-        color={PALETA.agua}
+        vertexColors
         transparent
         opacity={opacidad}
         emissive="#2a6a86"
         emissiveIntensity={0.25}
       />
     </mesh>
+  );
+}
+
+/* DESTELLOS del sol en el agua (acabado ilustrado): chispas doradas que
+   titilan sobre la quebrada y el reservorio — la hora dorada tocando el agua.
+   Instanciadas, aditivas; con reduced-motion quedan quietas a media luz. */
+function DestellosAgua({ anclas, reducedMotion }) {
+  const inst = useRef(null);
+  const tmp = useMemo(
+    () => ({
+      m: new THREE.Matrix4(),
+      p: new THREE.Vector3(),
+      q: new THREE.Quaternion(),
+      s: new THREE.Vector3(),
+    }),
+    [],
+  );
+  useFrame((st) => {
+    if (!inst.current) return;
+    const reloj = reducedMotion ? 1.1 : st.clock.elapsedTime;
+    for (let i = 0; i < anclas.length; i++) {
+      const a = anclas[i];
+      const brillo = Math.max(0, Math.sin(reloj * 1.9 + i * 2.39996)) ** 3;
+      const e = 0.03 + brillo * 0.1;
+      tmp.p.set(a[0], a[1], a[2]);
+      tmp.s.set(e, e, e);
+      tmp.m.compose(tmp.p, tmp.q, tmp.s);
+      inst.current.setMatrixAt(i, tmp.m);
+    }
+    inst.current.instanceMatrix.needsUpdate = true;
+  });
+  return (
+    <instancedMesh ref={inst} args={[undefined, undefined, anclas.length]} frustumCulled={false}>
+      <octahedronGeometry args={[1, 0]} />
+      <meshBasicMaterial
+        color="#fff1bd"
+        transparent
+        opacity={0.85}
+        blending={THREE.AdditiveBlending}
+        depthWrite={false}
+      />
+    </instancedMesh>
   );
 }
 
@@ -706,25 +852,8 @@ function NubeCiclo({ reducedMotion }) {
   );
 }
 
-/* El sol bajo de la hora dorada, hermano del de la Sierra. */
-function SolDorado() {
-  return (
-    <group position={[-12, 4.6, -7.5]}>
-      <mesh>
-        <circleGeometry args={[1.1, 32]} />
-        <meshBasicMaterial color="#fff2cf" transparent opacity={0.98} depthWrite={false} side={THREE.DoubleSide} />
-      </mesh>
-      <mesh position={[0, 0, -0.05]}>
-        <circleGeometry args={[2.0, 32]} />
-        <meshBasicMaterial color="#ffd98f" transparent opacity={0.38} depthWrite={false} side={THREE.DoubleSide} />
-      </mesh>
-      <mesh position={[0, 0, -0.1]}>
-        <circleGeometry args={[3.4, 32]} />
-        <meshBasicMaterial color="#f7c66b" transparent opacity={0.16} depthWrite={false} side={THREE.DoubleSide} />
-      </mesh>
-    </group>
-  );
-}
+/* El sol dorado ahora vive LEJOS, en fondoAgua (SolLejano): el viejo disco a
+   14 m del diorama quedaba donde hoy empieza la falda de la lámina. */
 
 /* Rótulo sobrio de estación (mismo lenguaje que la Sierra). */
 function Rotulo({ pos, texto, sub, distancia = 15 }) {
@@ -796,6 +925,60 @@ const ESTACIONES = [
   },
 ];
 
+/* ── LA LLEGADA (cámara Jackson) ──────────────────────────────────────────────
+      El paneo épico del páramo viejo, adaptado al agua: abre PEGADO al
+      nacimiento, retrocede quebrada abajo con el agua llenando el cuadro y la
+      mirada puesta en la loma de donde viene (el macizo de La Chorrera al
+      fondo), vira ancho sobre la vega —bocatoma, reservorio, camas— y SE
+      ASIENTA exactamente en el plano general de reposo. Mientras vuela, los
+      OrbitControls están desmontados (nadie pelea la cámara); reduced-motion
+      y gama baja lo saltan. */
+const DUR_VUELO = 11.5;
+const _miradaVuelo = new THREE.Vector3();
+function CamaraJacksonAgua({ onFin }) {
+  const { camera } = useThree();
+  const ini = useRef(/** @type {number|null} */ (null));
+  const hecho = useRef(false);
+  const ruta = useMemo(() => {
+    const y = (x, z, alza) => altura(x, z) + alza;
+    return {
+      curva: new THREE.CatmullRomCurve3(
+        [
+          new THREE.Vector3(-2.6, y(-2.6, -2.9, 1.05), -2.9), // pegado al nacimiento
+          new THREE.Vector3(-4.7, y(-4.7, -0.4, 1.55), -0.4), // por la orilla occidental
+          new THREE.Vector3(-1.5, y(-1.5, 3.7, 1.75), 3.7), // bajo, el agua llena el cuadro
+          new THREE.Vector3(3.5, 3.1, 8.4), // virando ancho sobre la vega
+          new THREE.Vector3(9.4, 4.4, 13.0), // abriéndose al plano general
+          new THREE.Vector3(11.2, 4.8, 13.4), // el reposo exacto de los controles
+        ],
+        false,
+        'catmullrom',
+        0.3,
+      ),
+      va: new THREE.Vector3(
+        QUEBRADA_XZ[0][0],
+        altura(...QUEBRADA_XZ[0]) + 0.55,
+        QUEBRADA_XZ[0][1],
+      ),
+      vb: new THREE.Vector3(0.4, 1.5, 0.6), // el target de reposo
+    };
+  }, []);
+  useFrame(({ clock }) => {
+    if (hecho.current) return;
+    if (ini.current == null) ini.current = clock.elapsedTime;
+    const t = Math.min(1, (clock.elapsedTime - ini.current) / DUR_VUELO);
+    const e = t * t * (3 - 2 * t);
+    ruta.curva.getPoint(e, camera.position);
+    _miradaVuelo.copy(ruta.va).lerp(ruta.vb, THREE.MathUtils.smoothstep(e, 0.4, 0.96));
+    camera.lookAt(_miradaVuelo);
+    if (t >= 1) {
+      hecho.current = true;
+      onFin();
+    }
+  });
+  return null;
+}
+
 /* RECORRIDO de cámara: acerca el encuadre a la estación pedida con amortiguación.
    Cualquier gesto del usuario sobre los controles suelta el recorrido. */
 function RecorridoCamara({ controles, estacion, onSoltar }) {
@@ -827,7 +1010,7 @@ function RecorridoCamara({ controles, estacion, onSoltar }) {
 }
 
 /* ── El diorama completo (dentro del Canvas) ──────────────────────────────── */
-function DioramaAgua({ perfil, tier, reducedMotion, estacion, onSoltar, controles }) {
+function DioramaAgua({ perfil, tier, reducedMotion, estacion, onSoltar, controles, vuelo, onFinVuelo }) {
   const geoTerreno = useMemo(
     () => construirTerreno(perfil.segmentosTerreno, perfil.flatShading),
     [perfil.segmentosTerreno, perfil.flatShading],
@@ -883,21 +1066,66 @@ function DioramaAgua({ perfil, tier, reducedMotion, estacion, onSoltar, controle
     return base.slice(0, n);
   }, [tier, ySupReservorio]);
 
+  /* Chispas del sol sobre el agua: quebrada + espejo del reservorio. */
+  const anclasDestellos = useMemo(() => {
+    if (tier === 'bajo') return [];
+    const n = tier === 'alto' ? 12 : 7;
+    const p = new THREE.Vector3();
+    const lista = [];
+    for (let i = 0; i < n; i++) {
+      const t = 0.04 + (i / n) * 0.92;
+      curvas.quebrada.getPointAt(t, p);
+      lista.push([p.x, altura(p.x, p.z) + 0.12, p.z]);
+    }
+    const nR = tier === 'alto' ? 5 : 3;
+    for (let i = 0; i < nR; i++) {
+      const a = (i / nR) * Math.PI * 2 + 0.7;
+      lista.push([
+        RESERVORIO.x + Math.cos(a) * RESERVORIO.r * 0.55,
+        ySupReservorio + 0.03,
+        RESERVORIO.z + Math.sin(a) * RESERVORIO.r * 0.55,
+      ]);
+    }
+    return lista;
+  }, [tier, curvas, ySupReservorio]);
+
   return (
     <>
       <color attach="background" args={[CIELO.fondo]} />
-      {perfil.fog && <fogExp2 attach="fog" args={[CIELO.niebla, 0.024]} />}
+      {/* niebla LIVIANA: con 0.024 el fondo de la loma ya salía crema y la
+          lámina perdía sus verdes — la lejanía la pinta fondoAgua, horneada */}
+      {perfil.fog && <fogExp2 attach="fog" args={[CIELO.niebla, 0.016]} />}
       <hemisphereLight intensity={0.7 * CIELO.intensidad} color={CIELO.cielo} groundColor={CIELO.suelo} />
       <ambientLight intensity={0.3 * CIELO.intensidad} color={ATMOSFERA.luz} />
       {/* el mismo sol del valle: dirección [6,9,4], sin shadow-map */}
       <directionalLight position={[6, 9, 4]} intensity={0.95 * CIELO.intensidad} color={ATMOSFERA.luz} />
       <directionalLight position={[-5, 4, -6]} intensity={0.24} color={ATMOSFERA.relleno} />
+      {/* la CONTRALUZ dorada desde el sol DIBUJADO de la lámina (fondoAgua
+          lo pinta sobre la loma): el borde tibio que hace hora dorada de
+          verdad — luz con origen visible, juez visual 2026-07-30 */}
+      <directionalLight position={[-9, 2.6, -8.5]} intensity={0.3} color="#ffd9a0" />
 
-      <SolDorado />
+      {/* la LÁMINA: bóveda, sol lejano, cordillera, LA CHORRERA REAL (el
+          farallón fiel al cañón con su caída volumétrica escalonada — la
+          forma la dicta el referente del valle, no la imaginación), la
+          niebla del valle y la falda que continúa el terreno */}
+      <FondoAgua
+        cielo={CIELO}
+        altura={altura}
+        mitadX={ANCHO / 2}
+        mitadZ={FONDO / 2}
+        salidaQuebrada={QUEBRADA_XZ[QUEBRADA_XZ.length - 1]}
+        tier={tier}
+        reducedMotion={reducedMotion}
+      />
 
       <mesh geometry={geoTerreno}>
         <meshLambertMaterial vertexColors flatShading={perfil.flatShading} />
       </mesh>
+
+      {/* la capa topográfica: curvas de nivel de la MISMA altura() del
+          terreno (coinciden por construcción) — coordenadas reales visibles */}
+      <CurvasDeNivel tier={tier} />
 
       {/* el agua: quebrada + canal + reservorio, respirando (la quebrada un
           poco más clara para dejar ver la sabaleta que remonta) */}
@@ -967,32 +1195,50 @@ function DioramaAgua({ perfil, tier, reducedMotion, estacion, onSoltar, controle
       {/* vegetación de ribera real: aliso · sauce · guadua a lo largo de la quebrada */}
       <VegetacionRibera curva={curvas.quebrada} altura={altura} />
 
-      {/* rótulos de las estaciones, sobrios */}
-      <Rotulo pos={[QUEBRADA_XZ[0][0], altura(...QUEBRADA_XZ[0]) + 1.9, QUEBRADA_XZ[0][1]]} texto="Nacimiento" sub="protegido con monte" />
-      <Rotulo pos={[-2.6, altura(-2.6, 0.2) + 1.0, 0.2]} texto="Bocatoma" sub="toma solo una parte" distancia={13} />
-      <Rotulo pos={[RESERVORIO.x, 1.5, RESERVORIO.z]} texto="Reservorio" sub="reserva para el verano" distancia={13} />
-      <Rotulo pos={[CASITA.x, altura(CASITA.x, CASITA.z) + 1.9, CASITA.z]} texto="Cosecha de lluvia" sub="el techo también suma" distancia={14} />
-      <Rotulo pos={[3.4, 1.15, 4.5]} texto="Riego por goteo" sub="a la raíz, sin desperdicio" distancia={13} />
-      <Rotulo pos={[CORTE_SUELO.x, 1.95, CORTE_SUELO.z]} texto="El suelo filtra" sub="y el acuífero guarda" distancia={13} />
-      <Rotulo pos={[NUBE.x, NUBE.y + 1.1, NUBE.z]} texto="El ciclo se cierra" sub="vapor · nube · lluvia" distancia={18} />
-      <Rotulo pos={[-2.1, altura(-2.1, 2.6) + 1.2, 2.6]} texto="Sin residuos" sub="la quebrada sigue su camino" distancia={12} />
+      {/* el sol tocando el agua (se enciende al aterrizar el vuelo) */}
+      {anclasDestellos.length > 0 && !vuelo && (
+        <DestellosAgua anclas={anclasDestellos} reducedMotion={reducedMotion} />
+      )}
 
-      <OrbitControls
-        ref={controles}
-        makeDefault
-        enablePan={false}
-        enableZoom
-        minDistance={3.2}
-        maxDistance={20}
-        target={[0.6, 0.8, 0.8]}
-        minPolarAngle={0.3}
-        maxPolarAngle={1.38}
-        enableDamping
-        dampingFactor={0.08}
-        autoRotate={!reducedMotion && !estacion}
-        autoRotateSpeed={0.12}
-      />
-      <RecorridoCamara controles={controles} estacion={estacion} onSoltar={onSoltar} />
+      {/* rótulos de las estaciones, sobrios — en silencio durante la llegada:
+          el paisaje primero se presenta, después se anota (lámina) */}
+      {!vuelo && (
+        <>
+          <Rotulo pos={[QUEBRADA_XZ[0][0], altura(...QUEBRADA_XZ[0]) + 1.9, QUEBRADA_XZ[0][1]]} texto="Nacimiento" sub="protegido con monte" />
+          <Rotulo pos={[-2.6, altura(-2.6, 0.2) + 1.0, 0.2]} texto="Bocatoma" sub="toma solo una parte" distancia={13} />
+          <Rotulo pos={[RESERVORIO.x, 1.5, RESERVORIO.z]} texto="Reservorio" sub="reserva para el verano" distancia={13} />
+          <Rotulo pos={[CASITA.x, altura(CASITA.x, CASITA.z) + 1.9, CASITA.z]} texto="Cosecha de lluvia" sub="el techo también suma" distancia={14} />
+          <Rotulo pos={[3.4, 1.15, 4.5]} texto="Riego por goteo" sub="a la raíz, sin desperdicio" distancia={13} />
+          <Rotulo pos={[CORTE_SUELO.x, 1.95, CORTE_SUELO.z]} texto="El suelo filtra" sub="y el acuífero guarda" distancia={13} />
+          <Rotulo pos={[NUBE.x, NUBE.y + 1.1, NUBE.z]} texto="El ciclo se cierra" sub="vapor · nube · lluvia" distancia={18} />
+          <Rotulo pos={[-2.1, altura(-2.1, 2.6) + 1.2, 2.6]} texto="Sin residuos" sub="la quebrada sigue su camino" distancia={12} />
+        </>
+      )}
+
+      {/* la llegada vuela sola; al asentarse, los controles toman el relevo
+          EXACTAMENTE donde el vuelo terminó (misma posición, mismo target) */}
+      {vuelo ? (
+        <CamaraJacksonAgua onFin={onFinVuelo} />
+      ) : (
+        <>
+          <OrbitControls
+            ref={controles}
+            makeDefault
+            enablePan={false}
+            enableZoom
+            minDistance={3.2}
+            maxDistance={20}
+            target={[0.4, 1.5, 0.6]}
+            minPolarAngle={0.3}
+            maxPolarAngle={1.42}
+            enableDamping
+            dampingFactor={0.08}
+            autoRotate={!reducedMotion && !estacion}
+            autoRotateSpeed={0.12}
+          />
+          <RecorridoCamara controles={controles} estacion={estacion} onSoltar={onSoltar} />
+        </>
+      )}
       <AdaptiveDpr pixelated />
     </>
   );
@@ -1006,10 +1252,23 @@ const CSS_AGUA = `
 .magua-rotulo { display: flex; align-items: center; gap: 0.32rem; white-space: nowrap; font: 600 0.72rem/1.1 system-ui, sans-serif; color: #2c3a2e; text-shadow: 0 1px 3px rgba(244,250,238,0.9); }
 .magua-rotulo__punto { width: 7px; height: 7px; border-radius: 50%; background: #d9f0f4; box-shadow: 0 0 0 2px rgba(44,58,46,0.5); flex: 0 0 auto; }
 .magua-rotulo__txt { display: inline-flex; align-items: baseline; gap: 0.3rem; }
-.magua-rotulo__sub { font-weight: 500; font-style: normal; opacity: 0.7; font-size: 0.9em; }
-.magua-chrome { position: absolute; inset: 0; pointer-events: none; display: flex; flex-direction: column; justify-content: space-between; }
+.magua-rotulo__sub { font: italic 500 0.9em/1.25 Georgia, 'Times New Roman', serif; opacity: 0.72; }
+.magua-chrome { position: absolute; inset: 0; pointer-events: none; display: flex; flex-direction: column; justify-content: space-between; opacity: 1; transition: opacity 0.9s ease; }
+.magua-chrome--vuelo { opacity: 0; }
+.magua-chrome--vuelo * { pointer-events: none !important; }
 .magua-titulo { margin: 0; padding: 0.9rem 1rem 0; color: #2f3a24; text-shadow: 0 1px 4px rgba(246,251,238,0.85); font: 700 1.15rem/1.2 system-ui, sans-serif; }
-.magua-titulo small { display: block; font: 500 0.8rem/1.3 system-ui, sans-serif; opacity: 0.78; margin-top: 0.15rem; }
+.magua-titulo small { display: block; font: italic 500 0.82rem/1.35 Georgia, 'Times New Roman', serif; opacity: 0.8; margin-top: 0.15rem; }
+/* ── el cine de la llegada: letterbox + cartela + viñeta ── */
+.magua-vineta { position: absolute; inset: 0; pointer-events: none; background: radial-gradient(120% 95% at 50% 40%, rgba(0,0,0,0) 56%, rgba(43,30,10,0.2) 100%); }
+.magua-cine { position: absolute; inset: 0; pointer-events: none; z-index: 40; overflow: hidden; }
+.magua-cine__banda { position: absolute; left: 0; right: 0; height: 8.5vh; background: #100e07; transition: transform 1.3s cubic-bezier(0.5, 0, 0.2, 1); }
+.magua-cine__banda--alta { top: 0; }
+.magua-cine__banda--baja { bottom: 0; }
+.magua-cine--fuera .magua-cine__banda--alta { transform: translateY(-101%); }
+.magua-cine--fuera .magua-cine__banda--baja { transform: translateY(101%); }
+.magua-cartela { position: absolute; left: 1rem; right: 1rem; bottom: 12vh; margin: 0; text-align: center; color: #f5eeda; font: italic 500 clamp(0.95rem, 2.6vw, 1.3rem)/1.35 Georgia, 'Times New Roman', serif; letter-spacing: 0.04em; text-shadow: 0 1px 10px rgba(20,16,6,0.75); opacity: 0; animation: magua-cartela 9.6s ease 0.7s forwards; }
+@keyframes magua-cartela { 0% { opacity: 0; } 13% { opacity: 1; } 76% { opacity: 1; } 100% { opacity: 0; } }
+@media (prefers-reduced-motion: reduce) { .magua-cine__banda { transition: none; } .magua-cartela { animation: none; } }
 .magua-estaciones { pointer-events: auto; align-self: flex-start; margin: 0.6rem 0.8rem; padding: 0.45rem; display: flex; flex-direction: column; gap: 0.28rem; list-style: none; border-radius: 0.8rem; background: rgba(250,252,242,0.78); backdrop-filter: blur(3px); box-shadow: 0 4px 14px rgba(52,66,40,0.16); max-width: min(74vw, 19rem); }
 .magua-estaciones button { display: block; width: 100%; text-align: left; padding: 0.3rem 0.55rem; border: 0; border-radius: 0.55rem; background: transparent; color: #2f3a24; font: 600 0.76rem/1.2 system-ui, sans-serif; cursor: pointer; }
 .magua-estaciones button:hover { background: rgba(63,143,176,0.14); }
@@ -1020,7 +1279,19 @@ const CSS_AGUA = `
 .magua-pie p { margin: 0; max-width: 40rem; text-align: center; padding: 0.42rem 0.85rem; border-radius: 0.7rem; background: rgba(26,32,18,0.5); backdrop-filter: blur(3px); color: #f2f4e6; font: 500 0.76rem/1.4 system-ui, sans-serif; }
 .magua-volver { pointer-events: auto; position: absolute; top: 0.8rem; right: 0.8rem; padding: 0.4rem 0.8rem; border: 0; border-radius: 999px; background: rgba(26,32,18,0.55); color: #f2f4e6; font: 600 0.78rem/1 system-ui, sans-serif; cursor: pointer; }
 @media (prefers-reduced-motion: reduce) { .magua-canvas { transition: none; } }
-@media (max-width: 640px) { .magua-estaciones { max-width: 60vw; } .magua-titulo { font-size: 1rem; } }
+/* En teléfono la lista vertical de estaciones tapaba media ladera con el
+   camino del agua (el sujeto). Se vuelve una FILA de chips bajo el título:
+   mismo contenido, una franja de alto, y la escena queda libre. */
+@media (max-width: 640px) {
+  .magua-titulo { font-size: 1rem; }
+  /* El space-between empujaba la fila al CENTRO del cuadro, o sea encima del
+     camino del agua: arriba lo de arriba, y el pie se ancla solo. */
+  .magua-chrome { justify-content: flex-start; }
+  .magua-pie { margin-top: auto; }
+  .magua-estaciones { flex-direction: row; flex-wrap: wrap; gap: 0.25rem; max-width: calc(100vw - 1.6rem); margin: 0.5rem 0.8rem; padding: 0.3rem 0.35rem; }
+  .magua-estaciones button { width: auto; padding: 0.28rem 0.55rem; font-size: 0.72rem; }
+  .magua-estaciones button[aria-pressed="true"] small { display: none; }
+}
 `;
 
 /**
@@ -1036,6 +1307,9 @@ export default function MundoAgua3D({ onBack }) {
   const [{ tier, reducedMotion }] = useState(() => decidirTier());
   const perfil = perfilDeTier(tier);
   const estacion = estacionId ? ESTACIONES.find((e) => e.id === estacionId) : null;
+  // La llegada de Jackson: solo si el equipo aguanta y el usuario no pidió calma.
+  const vueloPosible = tier !== 'bajo' && !reducedMotion;
+  const [vuelo, setVuelo] = useState(vueloPosible);
 
   return (
     <section
@@ -1048,7 +1322,7 @@ export default function MundoAgua3D({ onBack }) {
         className={`magua-canvas${listo ? ' magua-canvas--lista' : ''}`}
         dpr={tier === 'alto' ? [1, 1.5] : tier === 'medio' ? [1, 1.3] : 1}
         gl={{ antialias: perfil.antialias, powerPreference: 'high-performance' }}
-        camera={{ position: [10.5, 7.2, 12.5], fov: 44 }}
+        camera={{ position: [11.2, 4.8, 13.4], fov: 44 }}
         frameloop={reducedMotion ? 'demand' : 'always'}
         onCreated={() => setListo(true)}
       >
@@ -1059,10 +1333,21 @@ export default function MundoAgua3D({ onBack }) {
           estacion={estacion}
           onSoltar={() => setEstacionId(null)}
           controles={controles}
+          vuelo={vuelo}
+          onFinVuelo={() => setVuelo(false)}
         />
       </Canvas>
 
-      <div className="magua-chrome">
+      <div className="magua-vineta" aria-hidden="true" />
+      {vueloPosible && (
+        <div className={`magua-cine${vuelo ? '' : ' magua-cine--fuera'}`} aria-hidden="true">
+          <div className="magua-cine__banda magua-cine__banda--alta" />
+          <div className="magua-cine__banda magua-cine__banda--baja" />
+          {vuelo && <p className="magua-cartela">La quebrada, al pie de La Chorrera</p>}
+        </div>
+      )}
+
+      <div className={`magua-chrome${vuelo ? ' magua-chrome--vuelo' : ''}`}>
         <h2 className="magua-titulo">
           El camino del agua
           <small>Del nacimiento al riego — y de vuelta a la nube</small>

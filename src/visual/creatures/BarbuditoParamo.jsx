@@ -68,7 +68,6 @@ export function BarbuditoParamo({
   const glow = `bp-glow-${uid}`;
   const blur = `bp-blur-${uid}`;
   const vivo = animated;
-  const libando = pose === 'liba';
 
   // Animaciones propias, autocontenidas y con nombres únicos por instancia (no
   // dependen de clases externas): aleteo-borrón al libar, respiro al posar,

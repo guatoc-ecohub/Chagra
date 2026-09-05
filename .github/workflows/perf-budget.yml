@@ -2,7 +2,7 @@ name: Performance Budget
 
 # Gate de presupuesto de rendimiento: verifica que el bundle de produccion
 # no exceda los limites de tamanio definidos en scripts/check-perf-budget.mjs.
-# Corre en PR y push a main + ramas feat/fix/chore.
+# Corre en PR (main/dev/app-3d) y push a main/dev + ramas feat/fix/chore.
 # No se solapa con visual-regression.yml (screenshots UI) ni con playwright.yml
 # (E2E offline-first): este job solo mide tamanios de chunks JS/CSS.
 
@@ -10,7 +10,9 @@ on:
   pull_request:
     branches: [main, dev, app-3d]
   push:
-    branches: [main, feat/**, fix/**, chore/**]
+    # dev incluido (C2a, auditoria de proceso de gates rojos 2026-09-03):
+    # gate ABSOLUTO contra el presupuesto commiteado, no depende del ref base.
+    branches: [main, dev, feat/**, fix/**, chore/**]
 
 permissions:
   contents: read

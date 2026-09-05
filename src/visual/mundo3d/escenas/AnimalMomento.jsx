@@ -8,14 +8,24 @@
  * Tres momentos, la visión del operador ("mis animales son seres, no filas"):
  *
  *   · `nace`   — una CRÍA aparece: crece desde casi nada con un brillo cálido y
- *                unas motas que suben. Alegre, sin estridencia.
+ *                unas motas que suben; al asentar da sus PRIMEROS PASOS con un
+ *                temblorcito que se calma. Alegre, sin estridencia.
  *   · `muerte` — el animal se RETIRA con respeto: se apaga despacio y se inclina,
  *                sube una mota tibia (el adiós) y queda una piedrita con una flor.
  *                Cálido, jamás dramático (no se derrumba, se despide).
  *   · `llega`  — el VENDIDO viaja al MERCADO: camina desde la parcela (al fondo)
- *                hasta los puestos y se posa. El MISMO dato en dos mundos: en el
- *                corral queda su huella-fantasma, aquí llega en cuerpo (la
- *                consistencia cross-mundo del audit).
+ *                hasta los puestos con CICLO DE MARCHA de verdad — las patas
+ *                (`pata` en la tabla de partes) van en pares diagonales girando
+ *                en su cadera, el cuerpo bota y cabecea con el paso, y todo se
+ *                asienta al llegar. El MISMO dato en dos mundos: en el corral
+ *                queda su huella-fantasma, aquí llega en cuerpo.
+ *
+ * La pasada de mundo abierto del corral vive también aquí: el material lleva
+ * parchePelaje (smooth + countershading + rim de hora dorada + grano), la tabla de
+ * partes respeta `soloRaza` (la giba del cebú viaja con él al mercado) y
+ * `rotRecta` (la oreja parada del San Pedreño), y una sombra de contacto
+ * propia lo POSA en el piso (crece al nacer, se desvanece en el adiós):
+ * peso real, no figura que flota.
  *
  * GATE doble (idéntico al resto del corral): sin reduced-motion y con tier
  * suficiente se anima; si no, se pinta el ESTADO FINAL quieto (cría entera,
@@ -23,11 +33,11 @@
  * movimiento. Bajo `frameloop='demand'` de reduced-motion useFrame no corre: por
  * eso el reposo se aplica una vez en el layout.
  */
-import { useLayoutEffect, useRef } from 'react';
+import { useLayoutEffect, useMemo, useRef } from 'react';
 import { useFrame } from '@react-three/fiber';
 import { Text } from '@react-three/drei';
-import * as THREE from 'three';
-import { ESPECIES, GeometriaParte } from './CorralVivo.jsx';
+import { ESPECIES, GeometriaParte, parchePelaje } from './CorralVivo.jsx';
+import { SombraContacto } from './SombraContacto.jsx';
 import { PALETA } from '../atmosferaMadre.js';
 
 /* Duración de cada instante (s): el adiós es el más pausado. */
@@ -42,6 +52,11 @@ const easeOutBack = (p) => {
   const c1 = 1.70158;
   const c3 = c1 + 1;
   return 1 + c3 * (p - 1) ** 3 + c1 * (p - 1) ** 2;
+};
+/* ventana suave [a,b] → 0..1 (para encender el temblor sin golpe) */
+const suaveEntre = (x, a, b) => {
+  const t = clamp01((x - a) / (b - a));
+  return t * t * (3 - 2 * t);
 };
 
 export default function AnimalMomento({
@@ -58,6 +73,8 @@ export default function AnimalMomento({
   const halo = useRef(null);   // brillo de nacimiento
   const motas = useRef(null);  // motas que suben (nace o adiós)
   const memoria = useRef(null);// la piedrita con flor (muerte)
+  const sombra = useRef(null); // la sombra de contacto que lo posa
+  const patas = useRef([]);    // meshes de pata para el ciclo de marcha
   const inicio = useRef(null);
 
   const animar = !reducedMotion && tier !== 'bajo';
@@ -70,8 +87,16 @@ export default function AnimalMomento({
   // no viajan (nacen/mueren donde están).
   const orig = origen || (modo === 'llega' ? [dest[0], dest[1], dest[2] - 2.4] : dest);
 
-  // partes con LOD: en gama baja se cae lo `fina` (crestas, orejas, colas).
-  const partes = esp.partes.filter((p) => !p.fina || tier !== 'bajo');
+  // partes con LOD (en gama baja se cae lo `fina`: crestas, orejas, colas) y
+  // con `soloRaza` (la giba solo si ESTE animal es de esa raza).
+  const raza = (animal.raza || '').toLowerCase().trim();
+  const partes = useMemo(
+    () =>
+      esp.partes.filter(
+        (p) => (!p.fina || tier !== 'bajo') && (!p.soloRaza || p.soloRaza.includes(raza)),
+      ),
+    [esp, tier, raza],
+  );
   const alto = esp.alto * s0;
 
   // El paso a paso del momento: reescribe transform/opacidad de los refs según
@@ -88,21 +113,36 @@ export default function AnimalMomento({
         orig[1] + (dest[1] - orig[1]) * e,
         orig[2] + (dest[2] - orig[2]) * e,
       );
-      c.rotation.set(0, -Math.PI / 2, 0); // mira hacia +z (baja hacia el puesto)
-      // trote que se asienta: un balanceo que decae al llegar
-      c.position.y = Math.abs(Math.sin(p * Math.PI * 7)) * 0.05 * (1 - e);
+      // CICLO DE MARCHA con peso: el paso vive en las patas (pares diagonales
+      // girando en la cadera), el cuerpo bota en contratiempo y cabecea apenas;
+      // todo decae al asentarse en el puesto.
+      const marcha = 1 - e;
+      const paso = p * Math.PI * 14;
+      c.rotation.set(0, -Math.PI / 2, Math.sin(paso * 0.5) * 0.035 * marcha); // mira a +z y cabecea
+      c.position.y = Math.abs(Math.sin(paso)) * 0.045 * marcha;
       c.scale.setScalar(s0);
       opacidadCuerpo(c, 1);
+      moverPatas(paso, marcha);
+      if (sombra.current) {
+        sombra.current.scale.setScalar(1);
+        sombra.current.material.opacity = 0.3;
+      }
     } else if (modo === 'nace') {
       r.position.set(...dest);
       const crece = 0.12 + 0.88 * easeOutBack(p);
       c.scale.setScalar(s0 * crece);
-      c.rotation.set(0, 0, 0);
+      // los PRIMEROS PASOS: un temblorcito de patas nuevas que se va calmando
+      const tiembla = suaveEntre(p, 0.25, 0.45) * (1 - p);
+      c.rotation.set(0, 0, Math.sin(p * 26) * 0.09 * tiembla);
       c.position.y = 0;
       opacidadCuerpo(c, clamp01(p * 2)); // se define en el primer tramo
       if (halo.current) {
         halo.current.scale.setScalar(s0 * (0.5 + 1.9 * easeOutCubic(p)));
         halo.current.material.opacity = 0.5 * (1 - p);
+      }
+      if (sombra.current) {
+        sombra.current.scale.setScalar(0.2 + 0.8 * easeOutCubic(p));
+        sombra.current.material.opacity = 0.3 * clamp01(p * 2);
       }
       subirMotas(p, alto, '#ffe6b0');
     } else if (modo === 'muerte') {
@@ -112,6 +152,10 @@ export default function AnimalMomento({
       c.rotation.set(0, 0, -0.16 * easeOutCubic(p)); // se inclina despacio
       c.position.y = -0.03 * easeInCubic(p);          // se recoge, no se derrumba
       opacidadCuerpo(c, 1 - 0.68 * e);                 // se apaga, no desaparece
+      if (sombra.current) {
+        sombra.current.scale.setScalar(1);
+        sombra.current.material.opacity = 0.3 * (1 - 0.8 * e); // el peso se despide
+      }
       if (memoria.current) {
         const m = clamp01((p - 0.3) / 0.7);
         memoria.current.scale.setScalar(0.5 + 0.5 * easeOutCubic(m));
@@ -130,6 +174,21 @@ export default function AnimalMomento({
     }
   };
 
+  // el paso de cada pata: pares diagonales (0 y 3 contra 1 y 2), girando en su
+  // CADERA (el tope del cilindro) — la pata pendula, no patina.
+  const moverPatas = (paso, marcha) => {
+    for (const it of patas.current) {
+      if (!it) continue;
+      const { mesh, parte } = it;
+      const [x0, y0, z0] = parte.pos;
+      const L = parte.geo[1][2]; // alto del cilindro de la pata
+      const lado = parte.pata === 0 || parte.pata === 3 ? 0 : Math.PI;
+      const ang = Math.sin(paso + lado) * 0.5 * marcha;
+      mesh.rotation.z = ang;
+      mesh.position.set(x0 + Math.sin(ang) * (L / 2), y0 + (L / 2) * (1 - Math.cos(ang)), z0);
+    }
+  };
+
   // motas tenues que suben y se desvanecen (nacimiento o adiós).
   const subirMotas = (p, base, color) => {
     const g = motas.current;
@@ -143,6 +202,17 @@ export default function AnimalMomento({
         mo.material.opacity = 0.8 * Math.sin(fase * Math.PI);
       }
     });
+  };
+
+  // el color de una parte: pelaje de la raza (con `tinte` para manchas — el
+  // color del animal ya viene como THREE.Color desde normalizarAnimales) o el
+  // tono fijo de anatomía de la parte.
+  const colorParte = (parte) => {
+    if (!parte.porRaza) return parte.color;
+    if (parte.tinte && animal.color) {
+      return `#${animal.color.clone().multiplyScalar(parte.tinte).getHexString()}`;
+    }
+    return animal.colorCss;
   };
 
   useLayoutEffect(() => {
@@ -159,8 +229,16 @@ export default function AnimalMomento({
 
   return (
     <group ref={raiz}>
-      {/* el cuerpo del animal: mismas partes del hato, como mallas sueltas para
-          poder animarle escala/opacidad/gesto propios */}
+      {/* la sombra de contacto que lo POSA (nace: crece; muerte: se despide) */}
+      <SombraContacto
+        refExt={sombra}
+        pos={[0, 0.004, 0]}
+        radio={(esp.sombra || 0.3) * s0 * 1.25}
+        opacidad={0.3}
+      />
+      {/* el cuerpo del animal: mismas partes del hato —anatomía y pelaje de la
+          pasada de mundo abierto—, como mallas sueltas para poder animarle
+          escala/opacidad/gesto/marcha propios */}
       <group
         ref={cuerpo}
         onClick={
@@ -175,14 +253,21 @@ export default function AnimalMomento({
         {partes.map((parte, i) => (
           <mesh
             key={i}
+            ref={
+              parte.pata != null
+                ? (el) => {
+                    if (el) patas.current[parte.pata] = { mesh: el, parte };
+                  }
+                : undefined
+            }
             position={parte.pos || [0, 0, 0]}
-            rotation={parte.rot || [0, 0, 0]}
+            rotation={(animal.orejaRecta && parte.rotRecta ? parte.rotRecta : parte.rot) || [0, 0, 0]}
             scale={parte.escala || [1, 1, 1]}
           >
             <GeometriaParte geo={parte.geo} />
             <meshLambertMaterial
-              color={parte.porRaza ? animal.colorCss : parte.color}
-              flatShading
+              color={colorParte(parte)}
+              onBeforeCompile={parchePelaje}
               transparent
               depthWrite={modo !== 'muerte'}
             />

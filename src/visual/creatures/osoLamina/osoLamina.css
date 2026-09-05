@@ -1,0 +1,258 @@
+/* osoLamina.css — LA VIDA DE ANGELITA sobre la piel de la lámina del oso.
+ *
+ * Puerto del sistema del jaguar (`jaguarLamina.css`) a la pose ERGUIDA del
+ * oso del bastón: la lámina es un mapa de bits (capas <canvas> en <div>, no
+ * SVG), la VIDA la producen los MISMOS hooks (OsoBastonLaminaViva.jsx:
+ * useRitmoPropio / useVidaIdle / useMiradaUsted + visema) y este CSS solo la
+ * CONSUME sobre cada pieza:
+ *
+ *   señal (hook/estado)                → qué pieza mueve, aquí
+ *   --rh-blink-dur/-delay (ritmo)      → parpadeo del ÚNICO ojo en cuadro
+ *                                        (pose ¾ — anatomía, no guiño)
+ *   data-rh-mira + --rh-mx/--rh-my     → la CABEZA gira siguiendo al usuario
+ *   data-vida=florece|resopla|reposo   → el idle-cerebro del caminante:
+ *                                        la corona LATE en flor / huff pesado
+ *                                        del pecho / se aquieta con sacudón
+ *   data-agt-estado=listening          → PARA LAS OREJAS + ladea la testa
+ *   data-agt-estado=speaking + --olv-jaw→ mandíbula que habla (lip-sync)
+ *   data-agt-estado=thinking           → mira arriba, orejas apenas atrás
+ *
+ * El oso está PLANTADO en su roca (pies y roca son cuerpo): no hay gait ni
+ * cola — su contrapeso vivo es LA CORONA del bastón, que cabecea desde su
+ * base (la firma "la corola cabecea" de `OsoBaston.jsx`, ahora en la lámina
+ * real). La respiración escala desde LOS APOYOS (transform-origin en los
+ * pies, lo pone el componente): el pecho hincha hacia arriba, las plantas no
+ * se despegan.
+ *
+ * HONESTIDAD: el interior de boca (`.olv-bocaInterior`) es SINTÉTICO (la
+ * lámina es de sonrisa cerrada — ver OsoBastonLaminaViva.jsx / anatomia.js).
+ * Es lo único que no sale del PNG. La mirada es GIRO DE CABEZA, no pupila
+ * suelta. El vaho del resoplido del oso vector NO se replica (serían píxeles
+ * inventados): el huff se lee del pecho que hincha y suelta.
+ *
+ * Gates de la casa: reduced-motion congela todo en fotograma digno (párpado
+ * oculto, boca cerrada); `data-tier='bajo'` corta lo continuo — el
+ * idle-cerebro y la mirada ya los apaga el JS en gama baja.
+ */
+
+.olv-stage {
+  position: relative;
+  display: block;
+  transform-origin: 50% 50%;
+  animation: olv-stageBob 4.8s ease-in-out infinite alternate;
+}
+@keyframes olv-stageBob {
+  from { transform: translateY(-0.5%); }
+  to   { transform: translateY(0.5%); }
+}
+
+.olv-capa {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+/* ═══ IDLE VIVO (por defecto) — alive-in-place: respira desde los apoyos,
+   la testa cabecea suave, las orejas se mecen con follow-through y la corona
+   del bastón cabecea plantada. */
+.olv-cuerpoPivote { position: absolute; inset: 0; animation: olv-respira 4.1s ease-in-out infinite; }
+@keyframes olv-respira {
+  0%, 100% { transform: scale(1); }
+  50%      { transform: scale(1.008, 1.014); }
+}
+
+.olv-cabezaGesto { position: absolute; inset: 0; }
+.olv-cabezaMira  { position: absolute; inset: 0; transition: transform 0.5s cubic-bezier(0.2, 0.7, 0.3, 1); }
+.olv-cabezaPivote { position: absolute; inset: 0; animation: olv-cabeza-idle 4.1s ease-in-out infinite; }
+@keyframes olv-cabeza-idle {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  50%      { transform: translateY(0.5%) rotate(0.35deg); }
+}
+
+/* orejas — mecido de follow-through (rh-sway del kit), fases distintas. */
+.olv-orejaIzqPivote { position: absolute; inset: 0; animation: olv-oreja-sway 3.6s ease-in-out infinite; }
+.olv-orejaDerPivote { position: absolute; inset: 0; animation: olv-oreja-sway 3.6s ease-in-out -1.2s infinite; }
+@keyframes olv-oreja-sway {
+  0%, 100% { transform: rotate(0deg); }
+  50%      { transform: rotate(2.2deg); }
+}
+
+/* LA CORONA — cabecea desde su base en el palo (contrapeso vivo del oso;
+   amplitud chica: el respaldo del cuerpo tapa la costura, no hay que abrirla). */
+.olv-coronaPivote { position: absolute; inset: 0; animation: olv-corona 4.4s ease-in-out infinite alternate; }
+@keyframes olv-corona {
+  from { transform: rotate(-1.3deg); }
+  to   { transform: rotate(1.5deg); }
+}
+
+/* ═══ PARPADEO con RITMO PROPIO — cadencia probada de la familia (rh-blink:
+   parpadeo suelto + blink-blink doble, cierres ~110ms). UN solo párpado (el
+   único ojo en cuadro — pose ¾). Polaridad de parche: scaleY(0)=retraído
+   (ojo abierto), scaleY(1)=tapado (ojo cerrado). */
+.olv-parpado {
+  position: absolute;
+  transform-origin: 50% 0%;
+  animation: olv-blink var(--rh-blink-dur, 5.6s) linear var(--rh-blink-delay, 0s) infinite;
+}
+@keyframes olv-blink {
+  0%, 36%, 40%, 74%, 78%, 82%, 86%, 100% { transform: scaleY(0); }  /* ojo abierto */
+  38% { transform: scaleY(1); }   /* parpadeo suelto */
+  76% { transform: scaleY(1); }   /* blink-blink: dos golpes seguidos */
+  80% { transform: scaleY(1); }
+}
+
+/* ═══ LA MIRADA — la cabeza sigue al usuario (useMiradaUsted) ════════════════ */
+[data-rh-mira='usted'] .olv-cabezaMira {
+  transform: translate(
+    calc(var(--rh-mx, 0px) * var(--olv-mira-k, 4)),
+    calc(var(--rh-my, 0px) * var(--olv-mira-k, 4))
+  );
+}
+
+/* ═══ MANDÍBULA / LIP-SYNC — la mandíbula-lámina baja con el visema ══════════
+   --olv-jaw (0..1) baja la pieza y revela el interior sintético. En reposo
+   (jaw=0) se ve EXACTO como la lámina aprobada (la sonrisota cerrada). */
+.olv-mandibulaPivote {
+  position: absolute;
+  inset: 0;
+  transition: transform 0.13s ease;
+  transform: translateY(calc(var(--olv-jaw, 0) * 3.4%)) rotate(calc(var(--olv-jaw, 0) * 3deg));
+}
+.olv-bocaInterior {
+  pointer-events: none;
+  background: radial-gradient(ellipse 100% 125% at 50% 0%, #71302a 0%, #431814 60%, #240c0a 100%);
+  border-radius: 42% 42% 52% 52% / 14% 14% 90% 90%;
+  transform: rotate(var(--olv-boca-giro, 0deg)) scaleY(var(--olv-jaw, 0));
+  transition: transform 0.13s ease;
+}
+
+/* HABLA (speaking) — aleteo de mandíbula MODULADO por el visema. */
+[data-agt-estado='speaking'] .olv-mandibulaPivote {
+  animation: olv-habla 0.34s ease-in-out infinite;
+}
+@keyframes olv-habla {
+  0%, 100% { transform: translateY(calc(var(--olv-jaw, 0.42) * 1.5%)) rotate(calc(var(--olv-jaw, 0.42) * 1.4deg)); }
+  50%      { transform: translateY(calc(var(--olv-jaw, 0.42) * 4%)) rotate(calc(var(--olv-jaw, 0.42) * 3.6deg)); }
+}
+[data-agt-estado='speaking'] .olv-bocaInterior {
+  animation: olv-habla-interior 0.34s ease-in-out infinite;
+}
+@keyframes olv-habla-interior {
+  0%, 100% { transform: rotate(var(--olv-boca-giro, 0deg)) scaleY(calc(var(--olv-jaw, 0.42) * 0.5)); }
+  50%      { transform: rotate(var(--olv-boca-giro, 0deg)) scaleY(calc(var(--olv-jaw, 0.42) * 1)); }
+}
+
+/* ═══ ESCUCHA (listening) — PARA LAS OREJAS + ladea la testa + parpadea menos.
+   Perk = solo GIRO desde la base (nada de levantar: destaparía fondo bajo la
+   oreja — la lección medida del jaguar; el respaldo baseSub aguanta el giro). */
+[data-agt-estado='listening'] .olv-orejaIzqPivote { animation: olv-orejaIzq-perk 2.8s ease-in-out infinite; }
+[data-agt-estado='listening'] .olv-orejaDerPivote { animation: olv-orejaDer-perk 2.8s ease-in-out infinite; }
+@keyframes olv-orejaIzq-perk {
+  0%        { transform: rotate(0deg); }
+  20%, 100% { transform: rotate(-7deg); }
+  55%       { transform: rotate(-9deg); }   /* twitch de atención */
+  75%       { transform: rotate(-7deg); }
+}
+@keyframes olv-orejaDer-perk {
+  0%        { transform: rotate(0deg); }
+  20%, 100% { transform: rotate(7deg); }
+  55%       { transform: rotate(9deg); }
+  75%       { transform: rotate(7deg); }
+}
+[data-agt-estado='listening'] .olv-cabezaGesto { animation: olv-escucha-cabeza 4s ease-in-out infinite; }
+@keyframes olv-escucha-cabeza {
+  0%, 100% { transform: rotate(0deg) translateY(0); }
+  50%      { transform: rotate(-1.8deg) translateY(-0.4%); }
+}
+[data-agt-estado='listening'] .olv-parpado { animation-duration: calc(var(--rh-blink-dur, 5.2s) * 4.5); }
+
+/* ═══ PIENSA (thinking) — mira arriba, orejas apenas atrás ═══════════════════ */
+[data-agt-estado='thinking'] .olv-cabezaGesto { animation: olv-piensa-cabeza 4.6s ease-in-out infinite; }
+@keyframes olv-piensa-cabeza {
+  0%, 100% { transform: rotate(0deg) translateY(0); }
+  50%      { transform: rotate(-1.2deg) translateY(-1%); }
+}
+[data-agt-estado='thinking'] .olv-orejaIzqPivote { animation: olv-oreja-atras-izq 4.6s ease-in-out infinite; }
+[data-agt-estado='thinking'] .olv-orejaDerPivote { animation: olv-oreja-atras-der 4.6s ease-in-out infinite; }
+@keyframes olv-oreja-atras-izq { 0%, 100% { transform: rotate(0deg); } 50% { transform: rotate(4deg); } }
+@keyframes olv-oreja-atras-der { 0%, 100% { transform: rotate(0deg); } 50% { transform: rotate(-4deg); } }
+
+/* ═══ CAMINA (caminando) — el oso va PLANTADO en su roca: el andar del compai
+   lo pone el roaming del overlay (desplazamiento real). Aquí solo un bob de
+   marcha del conjunto — jamás un gait por-pata fingido (lección del jaguar). */
+[data-agt-estado='caminando'] .olv-cuerpoPivote { animation: olv-caminaBob 0.7s ease-in-out infinite; }
+@keyframes olv-caminaBob {
+  0%, 100% { transform: translateY(0.8%) rotate(0.3deg); }
+  50%      { transform: translateY(-1%) rotate(-0.3deg); }
+}
+[data-agt-estado='caminando'] .olv-cabezaPivote { animation: olv-caminaCabeza 0.7s ease-in-out -0.16s infinite; }
+@keyframes olv-caminaCabeza {
+  0%, 100% { transform: translateY(-0.8%) rotate(-0.4deg); }
+  50%      { transform: translateY(1%) rotate(0.4deg); }
+}
+[data-agt-estado='caminando'] .olv-coronaPivote { animation: olv-corona 1.6s ease-in-out infinite alternate; }
+
+/* ═══ IDLE-CEREBRO (data-vida) — el repertorio del caminante (vidaEstados.js
+   'oso-baston': florece / resopla / reposo). Solo en idle. */
+/* FLORECE — su gesto-firma: la corona LATE EN FLOR (cabeceo más vivo + pulso
+   desde la base). dur 3400ms = 2× 1.7s. */
+[data-vida='florece'] .olv-coronaPivote { animation: olv-florece 1.7s ease-in-out infinite; }
+@keyframes olv-florece {
+  0%, 100% { transform: rotate(-1.6deg) scale(1); }
+  30%      { transform: rotate(0.6deg) scale(1.045); }
+  55%      { transform: rotate(2deg) scale(1.02); }
+  75%      { transform: rotate(0.2deg) scale(1.035); }
+}
+/* RESOPLA — el huff pesado familiar: el pecho hincha HONDO y suelta, la testa
+   acompaña bajando un pelo. dur 4500ms = 3× 1.5s. (Sin vaho: serían píxeles
+   inventados — ver el docstring.) */
+[data-vida='resopla'] .olv-cuerpoPivote { animation: olv-resopla 1.5s ease-in-out infinite; }
+@keyframes olv-resopla {
+  0%, 100% { transform: scale(1); }
+  38%      { transform: scale(1.018, 1.03); }
+  58%      { transform: scale(0.996, 0.992); }
+}
+[data-vida='resopla'] .olv-cabezaGesto { animation: olv-resopla-cabeza 1.5s ease-in-out infinite; }
+@keyframes olv-resopla-cabeza {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  38%      { transform: translateY(-0.7%) rotate(-0.8deg); }
+  58%      { transform: translateY(0.9%) rotate(0.9deg); }
+}
+/* REPOSO — respira hondo y da un SACUDÓN de cabeza al entrar (la firma
+   "me sacudo" de la familia). 8.8s = el dur del momento. */
+[data-vida='reposo'] .olv-cuerpoPivote { animation: olv-reposo-cuerpo 4.4s ease-in-out infinite; }
+@keyframes olv-reposo-cuerpo {
+  0%, 100% { transform: scale(1); }
+  50%      { transform: scale(1.012, 1.02); }
+}
+[data-vida='reposo'] .olv-cabezaGesto { animation: olv-reposo-cabeza 8.8s ease-in-out infinite; }
+@keyframes olv-reposo-cabeza {
+  0%, 12%, 100% { transform: rotate(0deg); }
+  3%  { transform: rotate(-2.2deg); }   /* sacudón */
+  6%  { transform: rotate(2.2deg); }
+  9%  { transform: rotate(-0.8deg); }
+}
+
+/* ═══ GATES DE LA CASA ══════════════════════════════════════════════════════ */
+/* gama baja: corta lo continuo decorativo (idle-cerebro y mirada ya los apaga
+   el JS). Los estados reactivos (lip-sync, escucha) siguen. */
+[data-tier='bajo'] .olv-stage,
+[data-tier='bajo'] .olv-cuerpoPivote,
+[data-tier='bajo'] .olv-cabezaPivote,
+[data-tier='bajo'] .olv-coronaPivote,
+[data-tier='bajo'] .olv-orejaIzqPivote,
+[data-tier='bajo'] .olv-orejaDerPivote { animation: none; }
+
+@media (prefers-reduced-motion: reduce) {
+  .olv-stage, .olv-cuerpoPivote, .olv-cabezaGesto, .olv-cabezaMira, .olv-cabezaPivote,
+  .olv-coronaPivote, .olv-orejaIzqPivote, .olv-orejaDerPivote,
+  .olv-mandibulaPivote, .olv-bocaInterior, .olv-parpado {
+    animation: none !important;
+    transition: none !important;
+  }
+  .olv-cabezaMira, .olv-mandibulaPivote { transform: none !important; }
+  .olv-bocaInterior { transform: scaleY(0) !important; }  /* boca cerrada, digna */
+  .olv-parpado { visibility: hidden !important; }          /* ojo abierto, quieto */
+}

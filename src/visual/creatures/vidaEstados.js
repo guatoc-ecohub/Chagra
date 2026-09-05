@@ -24,6 +24,7 @@
  * CADENCIA vive en `creatures.css`; el RELOJ en `useVidaIdle.js`; el DIBUJO
  * en cada bicho.
  */
+import { PERFILES_CONDUCTA } from '../../compai/nucleo/perfilesConducta.js';
 
 /* ── EL REPERTORIO POR ESPECIE ───────────────────────────────────────────────
    momento → { dur, peso }. El nombre del momento ES el nombre del gesto-firma
@@ -76,14 +77,6 @@ export const VIDA_REPERTORIO = {
       reposo: { dur: 4400, peso: 0.6 }, // 1× rh-g-reposo — descansa POCO
     },
   },
-  jaguar: {
-    descanso: [4200, 9800],
-    momentos: {
-      acecha: { dur: 6400, peso: 2 }, // 2× jaguar-acecho 3.2s · 4× cejas 1.6s
-      ruge: { dur: 3200, peso: 1 }, // 2× jaguar-rugido 1.6s — raro e imponente
-      reposo: { dur: 8800, peso: 1 }, // 2× rh-g-reposo
-    },
-  },
   morrocoy: {
     descanso: [6400, 13200], // ancestral: la sabiduría no corre
     momentos: {
@@ -92,14 +85,8 @@ export const VIDA_REPERTORIO = {
       reposo: { dur: 8800, peso: 1.5 }, // 2× rh-g-reposo — descansar es lo suyo
     },
   },
-  borugo: {
-    descanso: [4200, 9800],
-    momentos: {
-      olfatea: { dur: 3300, peso: 2.5 }, // 6× borugo-olfateo 0.55s · 3× orejas 1.1s
-      acurruca: { dur: 4600, peso: 1 }, // 1× borugo-acurruca 4.6s — el corazón del cierre
-      reposo: { dur: 4400, peso: 1 }, // 1× rh-g-reposo
-    },
-  },
+  /* BORUGO: archivado (operador 2026-07-18, "dibujo rechazado por feo") —
+     fuera de CREATURES. El componente, test y datos quedan por historia. */
   dalmata: {
     descanso: [2600, 6400], // perro joven: gesticula seguido, casi no se aquieta
     momentos: {
@@ -117,6 +104,11 @@ export const VIDA_REPERTORIO = {
     },
   },
 };
+
+// Los seis repertorios canónicos se proyectan de la fuente única de conducta.
+Object.assign(VIDA_REPERTORIO, Object.fromEntries(
+  Object.entries(PERFILES_CONDUCTA).map(([slug, perfil]) => [slug, perfil.vida]),
+));
 
 /* El nombre de momento que significa "pose species-agnostic", no gesto-firma:
    el bicho lo traduce a data-pose='reposo' en vez de a un data-attr propio. */

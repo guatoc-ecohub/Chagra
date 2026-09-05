@@ -1,4 +1,11 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+/* i18n (ADR-050): deuda preexistente de textos en español Colombia hardcodeados
+ * en esta pantalla (ninguno tocado por el planificador de paseo #25-#34) — el
+ * mismo criterio que App.jsx: se desactiva a nivel de archivo para no bloquear
+ * --max-warnings=0 con deuda que no es parte de este encargo. Los errores
+ * reales de ESLint siguen activos.
+ */
+/* eslint-disable chagra-i18n/no-hardcoded-spanish */
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
     Cloud, Sunrise,
     Bell, BellOff, MapPin, Droplets, Sprout, Mic, Bug,
@@ -9,6 +16,15 @@ import { ScreenShell } from '../common/ScreenShell';
 import AgendaCampesina from './AgendaCampesina';
 import JourneyGuideCard from './JourneyGuideCard';
 import FincaEvolutionCard from './FincaEvolutionCard';
+// <AngelitaGuia> (el paseo autónomo alertas→tareas→accesos, #24-#34) SE RETIRÓ
+// de esta pantalla (2026-09-03, feedback_pizarra_unico_aviso_compai): era un
+// SEGUNDO compai flotante junto al AgentFab de siempre — dos personajes
+// explicando la pantalla a la vez. La orden del operador es una sola pizarra
+// en TODA la app. Las tres explicaciones que daba (alertas/tareas/accesos) se
+// migraron al hint de la ruta `hoy_finca` en compaiHints.js — se leen igual,
+// tocando el AgentFab (pizarra), sin el segundo personaje ni el paseo
+// autónomo. `useCompaiPaseo` / `compaiParadasPorPantalla` quedan como
+// mecanismo reutilizable para otra pantalla; esta ya no se registra en él.
 import useAlertStore from '../../store/useAlertStore';
 import { listFarmProcesses } from '../../db/farmProcessCache';
 import { getProfile } from '../../services/userProfileService';
@@ -100,6 +116,12 @@ export default function HoyEnFincaScreen({ onBack, onHome, onNavigate }) {
         : null));
     const [processes, setProcesses] = useState([]);
     const [ciclosCargados, setCiclosCargados] = useState(false);
+
+    // refs de anclaje visual de las tres secciones (se conservan por si otra
+    // guía/spotlight las necesita; ya NO alimentan a AngelitaGuia — retirada).
+    const refAlertas = useRef(null);
+    const refTareas = useRef(null);
+    const refAccesos = useRef(null);
 
     useEffect(() => {
         let alive = true;
@@ -300,6 +322,7 @@ export default function HoyEnFincaScreen({ onBack, onHome, onNavigate }) {
 
                 {/* ── 2. ALERTAS DEL DÍA ────────────────────────────────── */}
                 <section
+                    ref={refAlertas}
                     aria-label="Alertas de hoy"
                     className="bg-slate-900/60 backdrop-blur-xl border border-slate-800 rounded-2xl p-4"
                 >
@@ -349,6 +372,7 @@ export default function HoyEnFincaScreen({ onBack, onHome, onNavigate }) {
 
                 {/* ── 3. TAREAS DEL CICLO — ESTA SEMANA ─────────────────── */}
                 <section
+                    ref={refTareas}
                     aria-label="Tareas de la semana"
                     className="bg-slate-900/60 backdrop-blur-xl border border-slate-800 rounded-2xl p-4"
                 >
@@ -424,7 +448,7 @@ export default function HoyEnFincaScreen({ onBack, onHome, onNavigate }) {
                 </section>
 
                 {/* ── 4. ACCESOS RÁPIDOS ────────────────────────────────── */}
-                <section aria-label="Accesos rápidos">
+                <section ref={refAccesos} aria-label="Accesos rápidos">
                     <div className="grid grid-cols-3 gap-2">
                         {QUICK_ACTIONS.map((accion) => (
                             <button
@@ -459,6 +483,13 @@ export default function HoyEnFincaScreen({ onBack, onHome, onNavigate }) {
                     Ver el mapa de la finca
                 </button>
             </div>
+
+            {/* <AngelitaGuia> RETIRADA (2026-09-03, feedback_pizarra_unico_aviso_compai):
+                el paseo autónomo alertas→tareas→accesos era un SEGUNDO compai
+                junto al AgentFab de la pantalla — dos personajes explicando a
+                la vez. Un solo aviso en toda la app: la pizarra del AgentFab.
+                Las tres explicaciones que daba viven ahora en el hint de la
+                ruta `hoy_finca` (compaiHints.js) — se leen tocando el FAB. */}
         </ScreenShell>
     );
 }

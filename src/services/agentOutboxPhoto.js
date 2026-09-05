@@ -134,3 +134,50 @@ export async function processPhotoItem(item, opts = /** @type {any} */ ({})) {
   const prompt = buildVisionPrompt(finding, caption);
   return { message, prompt, finding, imageUrl };
 }
+
+/**
+ * Procesa una foto con un límite que protege el cierre del turno. La visión es
+ * una mejora del prompt, no una condición para que el operador recupere el
+ * compositor: si el modelo o la red no terminan, seguimos con la nota que sí
+ * escribió la persona.
+ *
+ * `onTimeout` permite al caller abortar el fetch de visión. La carrera sigue
+ * siendo necesaria porque una implementación externa de `analyze` podría no
+ * respetar AbortSignal.
+ *
+ * @param {object} item
+ * @param {{analyze:(b:Blob)=>Promise<any>, createUrl:(b:Blob)=>string|null, timeoutMs?:number, onTimeout?:()=>void}} opts
+ * @returns {Promise<{message:object, prompt:string, finding:any, imageUrl:string|null, timedOut:boolean}>}
+ */
+export async function processPhotoItemBounded(item, opts = /** @type {any} */ ({})) {
+  const timeoutMs = Number.isFinite(opts.timeoutMs) && opts.timeoutMs > 0
+    ? opts.timeoutMs
+    : 20_000;
+  let timeoutId;
+  const fallback = () => {
+    try {
+      opts.onTimeout?.();
+    } catch (_) {
+      // El cierre de turno no depende de que el abort del transporte funcione.
+    }
+    const { message, imageUrl } = buildPhotoUserMessage(item, opts.createUrl);
+    return {
+      message,
+      imageUrl,
+      finding: null,
+      prompt: buildVisionPrompt(null, item?.text || ''),
+      timedOut: true,
+    };
+  };
+
+  try {
+    return await Promise.race([
+      processPhotoItem(item, opts).then((result) => ({ ...result, timedOut: false })),
+      new Promise((resolve) => {
+        timeoutId = setTimeout(() => resolve(fallback()), timeoutMs);
+      }),
+    ]);
+  } finally {
+    clearTimeout(timeoutId);
+  }
+}

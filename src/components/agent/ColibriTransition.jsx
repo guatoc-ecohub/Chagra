@@ -1,18 +1,22 @@
 import { useEffect, useRef, useState } from 'react';
-import Angelita from '../../visual/agente/Angelita';
+import ChagraAgentAvatar from '../ChagraAgentAvatar';
+import useAgentAvatarType, { AVATAR_NOMBRE, DEFAULT_AVATAR_TYPE } from '../../hooks/useAgentAvatarType';
 
 /**
- * Transición home → conversación (~2s): ANGELITA, la abeja agente.
+ * Transición home → conversación (~2s): el compAI que el usuario eligió.
  *
  * Al enviar desde el hero del home, en vez de un corte seco hacia AgentScreen,
- * Angelita aparece a pantalla completa sobre un fondo oscuro suave — grande,
+ * el compAI aparece a pantalla completa sobre un fondo oscuro suave — grande,
  * invitándolo a la conversación ('invita': se inclina y hace "venga" con la
  * manita) — y el overlay se desvanece dejando la conversación montada detrás.
  *
  * 2026-07-18 (operador): "solo abejita". Este overlay mostraba el VIDEO del
  * colibrí (webm foto-realista) como cara del agente; el colibrí queda jubilado
  * del rol de asistente (fauna decorativa en los mundos 3D, nada más) y la
- * transición pasa a ser Angelita — la misma del FAB, el chat y el hero.
+ * transición pasa a ser Angelita por defecto — la misma del FAB, el chat y el
+ * hero — o la planta de maíz si el usuario la eligió (fix 2026-07-25: antes
+ * este overlay mostraba a Angelita SIEMPRE, ignorando la elección, incluido
+ * el rótulo de texto con su nombre).
  * El archivo conserva su nombre para no mover imports; el componente exportado
  * mantiene el contrato de siempre.
  *
@@ -79,6 +83,8 @@ const CSS = `
 function AngelitaOverlay({ onDone }) {
   const [leaving, setLeaving] = useState(false);
   const doneRef = useRef(null);
+  const [avatarType] = useAgentAvatarType();
+  const nombreAgente = AVATAR_NOMBRE[avatarType] || AVATAR_NOMBRE[DEFAULT_AVATAR_TYPE];
 
   // ref-latest del callback fuera de render (react-hooks/refs).
   useEffect(() => { doneRef.current = onDone; });
@@ -107,17 +113,17 @@ function AngelitaOverlay({ onDone }) {
     >
       <style>{CSS}</style>
       <span className="agente-tx-abeja">
-        <Angelita
+        <ChagraAgentAvatar
           estado="invita"
           size={Math.round(Math.min(
             typeof window !== 'undefined' ? window.innerWidth * 0.62 : 280,
             300,
           ))}
           animated={!reduce}
-          title="Angelita lo lleva a la conversación"
+          ariaLabel={`${nombreAgente} lo lleva a la conversación`}
         />
       </span>
-      <span className="agente-tx-nombre">Angelita</span>
+      <span className="agente-tx-nombre">{nombreAgente}</span>
     </div>
   );
 }

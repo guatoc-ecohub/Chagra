@@ -2,8 +2,8 @@ import { useState, useRef, useCallback, useEffect, useMemo } from 'react';
 /* eslint-disable chagra-i18n/no-hardcoded-spanish */
 import {
   ChevronLeft, Camera, Trash2, Upload, X, ArrowLeftRight, BookOpen,
-  FlaskConical, Beaker, AlertTriangle, Lightbulb, Leaf, List, Plus,
-  MapPin, Calendar, Eye, CheckCircle2, Image, Layers, Droplets, Sprout,
+  FlaskConical, AlertTriangle, Lightbulb, Plus,
+  MapPin, Calendar, Eye, CheckCircle2, Layers, Sprout,
 } from 'lucide-react';
 import { formatColombiaDate } from '../utils/colombiaDate';
 import {
@@ -214,89 +214,6 @@ const PRECAUCIONES = [
     icono: '🧤',
     texto:
       'Desecha los guantes y papeles usados en una bolsa aparte, no en la composta.',
-  },
-];
-
-/* ───────── Interpetacion por zonas (las 4 clasicas de Pfeiffer/Restrepo) ─── */
-const ZONAS = [
-  {
-    nombre: 'Zona central o mineral',
-    posicion: 'Cerca del centro del cromatograma',
-    color: 'border-amber-500',
-    bg: 'bg-amber-950/30',
-    texto: 'border-amber-800/60',
-    icono: '🪨',
-    queIndica:
-      'Muestra los minerales y las sales. Un centro claro o blanco indica buena reserva de minerales disponibles para las plantas. Un centro oscuro o manchado puede indicar exceso de sales o compactacion.',
-  },
-  {
-    nombre: 'Zona media o proteica-humica',
-    posicion: 'Anillo entre la zona central y la externa',
-    color: 'border-amber-700',
-    bg: 'bg-amber-900/20',
-    texto: 'border-amber-700/60',
-    icono: '🌱',
-    queIndica:
-      'Representa la materia organica y el humus del suelo. Un anillo marron bien definido y ancho indica buena cantidad de humus estable. Si es muy delgado o ausente, hay poca materia organica o esta muy degradada.',
-  },
-  {
-    nombre: 'Zona externa o enzimatica',
-    posicion: 'Anillo exterior antes de los picos del borde',
-    color: 'border-violet-700',
-    bg: 'bg-violet-950/20',
-    texto: 'border-violet-700/60',
-    icono: '🧬',
-    queIndica:
-      'Refleja la actividad de los microorganismos y las enzimas. Un borde bien definido con tonalidades violetas o rosadas indica un suelo biologicamente activo, con buena vida microbiana. Si es difuso o palido, hay poca actividad.',
-  },
-  {
-    nombre: 'Picos y radiaciones del borde',
-    posicion: 'Borde externo del cromatograma',
-    color: 'border-indigo-500',
-    bg: 'bg-indigo-950/20',
-    texto: 'border-indigo-700/60',
-    icono: '⚡',
-    queIndica:
-      'Los picos o radiaciones que salen del borde indican vida y energia del suelo. Muchas radiaciones definidas y largas senalan un suelo vivo y equilibrado. Pocas o cortas pueden indicar un suelo cansado o con poca biodiversidad microbiana.',
-  },
-];
-
-const COLORES = [
-  {
-    color: 'Marrón oscuro / café',
-    significado:
-      'Buena materia organica y humus estable. Es el color deseable en la zona media.',
-    clase: 'bg-amber-900 border-amber-700',
-  },
-  {
-    color: 'Blanco o crema',
-    significado:
-      'Sales minerales. En el centro indica minerales disponibles; en anillos externos puede indicar acumulacion de sales.',
-    clase: 'bg-stone-200 border-stone-400 text-slate-900',
-  },
-  {
-    color: 'Gris / plomizo',
-    significado:
-      'Suelo compactado, oxidado o con poca vida. Puede indicar exceso de humedad o anaerobiosis.',
-    clase: 'bg-slate-500 border-slate-400',
-  },
-  {
-    color: 'Violeta / lila',
-    significado:
-      'Actividad enzimatica y microbiologica. Indica un suelo vivo y con buena mineralizacion.',
-    clase: 'bg-violet-800 border-violet-600',
-  },
-  {
-    color: 'Rosado',
-    significado:
-      'Actividad biologica de bacterias beneficiosas. Halos rosados son senal positiva.',
-    clase: 'bg-pink-800 border-pink-600',
-  },
-  {
-    color: 'Amarillo / dorado',
-    significado:
-      'Puede indicar presencia de azufre o compuestos organicos especificos. Interpretar junto con las otras zonas.',
-    clase: 'bg-yellow-700 border-yellow-500',
   },
 ];
 

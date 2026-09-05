@@ -16,16 +16,9 @@
     "invasive",
     "biomass_producer"
   ],
-  "antagonists": [
-    "weinmannia_tomentosa"
-  ],
+  "antagonists": [],
   "especies_nativas_sustitutas": [
-    "alnus_acuminata",
-    "hesperomeles_goudotiana",
-    "polylepis_quadrijuga",
-    "vallea_stipularis",
-    "viburnum_triphyllum",
-    "weinmannia_tomentosa"
+    "alnus_acuminata"
   ],
   "propagation": {
     "metodo_principal": "semilla",
@@ -49,7 +42,6 @@
     "drenaje_requerido": "bueno"
   },
   "valor_pedagogico": "SE BUSCA: El 'Sediento de los Andes'. El eucalipto azul australiano (Eucalyptus globulus Labill., familia Myrtaceae) fue introducido en Colombia desde fines del siglo XIX para programas de reforestación industrial (madera y pulpa de papel) y se expandió como especie naturalizada problemática en altiplanos andinos. Se distribuye en Cundinamarca (Sabana de Bogotá), Boyacá (Tunja, Duitama, Sogamoso), Nariño, Antioquia y Eje cafetero entre 1.800 y 3.000 msnm. Árbol perenne 30-50 m altura, alta demanda hídrica (~200-400 L/día por árbol maduro) seca quebradas y nacederos en cuencas altas. Alelopatía severa por aceites esenciales (1,8-cineol, citronelal) inhibe germinación de flora nativa generando 'desierto verde' bajo dosel. Banco de semillas resistente al fuego. Estrategia de manejo agroecológico: anillado (ring-barking) sin cosecha + remplazo progresivo por Alnus acuminata (aliso andino nativo) o Polylepis quadrijuga (colorado) en sistemas silvopastoriles. Listada Res. 684/2018 MADS. Fuentes Tier A: Humboldt Invasoras Andes, ISSG-UICN Invasoras Globales, Resolución 684/2018 MADS, GBIF Backbone Taxonomy.",
-  "antagonists_markdown": "### Antagonistas (no asociar)\n\nEvite sembrar estas especies cerca; compiten o comparten plagas/patógenos:\n- weinmannia_tomentosa — Encenillo (Weinmannia tomentosa L. f.)",
   "sources": [
     {
       "id": "humboldt-invasoras-andes",
@@ -89,5 +81,5 @@
     }
   ],
   "_generated_by": "scripts/build-cycle-content-from-catalog.mjs",
-  "_generated_at": "2026-05-19T00:42:57.360Z"
+  "_generated_at": "2026-09-03T07:40:20.307Z"
 }

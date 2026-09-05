@@ -1,0 +1,70 @@
+{
+  "species_slug": "plukenetia_volubilis",
+  "scientific_name": "Plukenetia volubilis L.",
+  "common_names": [
+    "Sacha inchi"
+  ],
+  "family": "Euphorbiaceae",
+  "category": "granos_legumbres",
+  "cultivable": true,
+  "conservation_status": "cultivo_comun",
+  "thermal_zones": [
+    "calido"
+  ],
+  "roles_in_guild": [
+    "crop"
+  ],
+  "antagonists": [],
+  "especies_nativas_sustitutas": [],
+  "propagation": {
+    "metodo_principal": "semilla",
+    "notas": "Fenologia: germinacion, fase vegetativa voluble, floracion, cuajado de capsulas estrelladas, llenado de semilla oleaginosa y cosecha escalonada de capsulas secas."
+  },
+  "requirements": {
+    "agua": "medio",
+    "altitud_msnm": {
+      "min_absoluto": 0,
+      "optimo_min": 200,
+      "optimo_max": 900,
+      "max_absoluto": 1500
+    },
+    "temperatura_c": {
+      "helada_letal": 8,
+      "optimo_min": 22,
+      "optimo_max": 30,
+      "max_tolerable": 35
+    },
+    "radiacion": "sol_pleno",
+    "drenaje_requerido": "bueno"
+  },
+  "valor_pedagogico": "El sacha inchi (Plukenetia volubilis) es una euforbiacea trepadora amazonica cultivada por semillas oleaginosas ricas en aceites alimentarios. En Colombia encaja en clima calido humedo de Amazonia y piedemontes con tutorado, drenaje bueno y cosecha escalonada. Su fenologia incluye germinacion, crecimiento voluble, floracion, formacion de capsulas estrelladas, llenado de semillas y secado para cosecha. Es pedagogico porque conecta agroforesteria amazonica, valor agregado local y manejo de trepadoras comerciales. Plagas y enfermedades clave reportadas en sistemas tropicales incluyen hormigas cortadoras, acaros, chinches, nematodos, manchas foliares y pudriciones radiculares en suelos mal drenados.",
+  "companions_markdown": "### Especies asociadas favorables\n\nEstas especies favorecen el cultivo cuando se siembran cerca:\n- musa_paradisiaca — Plátano (Musa × paradisiaca L.)\n- manihot_esculenta — Yuca brava amazónica (Manihot esculenta Crantz)",
+  "sources": [
+    {
+      "id": "sinchi-aprovechemos-sacha-inchi",
+      "title": "sinchi-aprovechemos-sacha-inchi",
+      "tier": "A",
+      "url": "https://sinchi.org.co/aprovechemos-el-sacha-inchi"
+    },
+    {
+      "id": "ica-resolucion-3168-2015",
+      "title": "ica-resolucion-3168-2015",
+      "tier": "A",
+      "url": null
+    },
+    {
+      "id": "powo-kew",
+      "title": "powo-kew",
+      "tier": "A",
+      "url": "https://powo.science.kew.org"
+    },
+    {
+      "id": "gbif-taxonomic-backbone",
+      "title": "gbif-taxonomic-backbone",
+      "tier": "A",
+      "url": "https://www.gbif.org/dataset/d7dddbf4-2cf0-4f39-9b2a-bb099caae36c"
+    }
+  ],
+  "_generated_by": "scripts/build-cycle-content-from-catalog.mjs",
+  "_generated_at": "2026-09-03T07:40:20.315Z"
+}

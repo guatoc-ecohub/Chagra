@@ -6,7 +6,7 @@ import { chromium } from 'playwright';
 
 const BASE = process.env.SHOT_BASE || 'http://127.0.0.1:5173';
 const CICLO = process.env.SHOT_CICLO || '22';
-const OUTDIR = process.env.SHOT_OUTDIR || '/tmp/claude-1000/-home-kortux/93695a3d-dc16-45f5-8c0e-608e6e767ffd/scratchpad/shots';
+const OUTDIR = process.env.SHOT_OUTDIR || '/tmp/chagra-shots/valle-noche';
 const TAG = process.env.SHOT_TAG || 'base';
 const RUTA = process.env.SHOT_RUTA || '/#/mockups/entrada-3d';
 const ESPERA = Number(process.env.SHOT_ESPERA || 9000);

@@ -40,6 +40,7 @@ import {
   readAnthropicKey,
   makeAnthropicJudgeCall,
   RECOMMENDED_ANTHROPIC_JUDGE_MODEL,
+  ANTHROPIC_JUDGE_KEY_PATH,
 } from './lib/bench-scorer.mjs';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -509,7 +510,7 @@ function parseBenchFile(path, { targetModel } = {}) {
   return normalizeBenchData([obj], { targetModel });
 }
 
-export function resolveJudgeCall({ env = process.env, fetchImpl = globalThis.fetch } = {}) {
+export function resolveJudgeCall({ env = process.env, keyPath = ANTHROPIC_JUDGE_KEY_PATH, fetchImpl = globalThis.fetch } = {}) {
   const provider = normalizeTargetToken(env?.JUDGE_PROVIDER || JUDGE_PROVIDER || 'anthropic').toLowerCase();
   if (provider !== 'anthropic') {
     throw new Error(
@@ -517,7 +518,7 @@ export function resolveJudgeCall({ env = process.env, fetchImpl = globalThis.fet
     );
   }
 
-  const apiKey = readAnthropicKey({ env });
+  const apiKey = readAnthropicKey({ env, keyPath });
   if (!apiKey) {
     throw new Error(
       '[judge] No se pudo leer la key de Anthropic desde ANTHROPIC_API_KEY ni desde ~/.config/chagra-anthropic-judge-key.',

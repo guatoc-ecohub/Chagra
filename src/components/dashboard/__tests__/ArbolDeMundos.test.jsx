@@ -105,7 +105,7 @@ describe('ArbolDeMundos — enruta a los MISMOS destinos que el menú vivo (no h
     fireEvent.keyDown(rama('agua'), { key: 'Enter' });
     expect(onNavigate).toHaveBeenCalledWith('agua', undefined);
     fireEvent.keyDown(rama('clima'), { key: ' ' });
-    expect(onNavigate).toHaveBeenCalledWith('mundo', { mundo: 'clima' });
+    expect(onNavigate).toHaveBeenCalledWith('clima_boletin', undefined);
   });
 });
 

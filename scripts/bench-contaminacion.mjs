@@ -665,6 +665,16 @@ async function pestVsDiseaseGuard(userMessage, { sidecarUrl = SIDECAR_URL } = {}
  * El bench lo invoca solo para las sondas cross_thermal, sobre la respuesta ya
  * generada, para medir si el guard hubiera corregido el turno real.
  *
+ * BUG-04 (2026-09-03): el endpoint real (chagra-pro server.ts) exige el campo
+ * `agent_response`, no `response_text` -- mismo desajuste de contrato que
+ * tenia `src/services/sidecarClient.js` (confirmado en vivo contra el
+ * sidecar 127.0.0.1:7880 el 2026-09-03: `response_text` -> 400
+ * `{error:"agent_response required"}`). Este script duplicaba el mismo bug
+ * de forma independiente, asi que el bench de contaminacion cross_thermal
+ * media "0% de correccion" del guard sin que fuera un fallo real del guard
+ * -- el bench nunca llegaba a invocarlo con exito. El shape de respuesta
+ * real usa `has_fabricated_species`, no `has_companion_species`.
+ *
  * FAIL-SAFE: cualquier error/timeout/non-2xx degrada a bloque vacio.
  * @param {string} responseText
  * @param {{ sidecarUrl?: string }} [opts]
@@ -681,13 +691,13 @@ export async function companionSpeciesGuard(
     const res = await fetchImpl(`${sidecarUrl}/companion-species-guard`, {
       method: 'POST',
       headers,
-      body: JSON.stringify({ response: responseText }),
+      body: JSON.stringify({ agent_response: responseText }),
       signal: AbortSignal.timeout(5000),
     });
     if (!res.ok) return { has_companion_species: false, system_prompt_block: '' };
     const data = await res.json();
     return {
-      has_companion_species: data.has_companion_species === true || data.has_companion === true || data.needs_correction === true,
+      has_companion_species: data.has_fabricated_species === true,
       system_prompt_block: typeof data.system_prompt_block === 'string' ? data.system_prompt_block : '',
     };
   } catch (err) {
@@ -757,6 +767,14 @@ async function callOllama(model, systemPrompt, userPrompt, { ollamaUrl = OLLAMA_
           { role: 'system', content: systemPrompt },
           { role: 'user', content: userPrompt },
         ],
+        // ⚠️ CORREGIDO 2026-07-21: sin `think:false` los modelos "thinking"
+        // (gemma4:e4b, qwen3.x, glm-flash) gastan TODO el presupuesto de tokens
+        // razonando y devuelven `content` VACÍO con done_reason=length. El bench
+        // del 2026-07-21 midió 69% de vacías en gemma4:e4b y lo descalificó por
+        // "mudo": era NUESTRA configuración, no el modelo. Verificado en vivo:
+        // sin el flag → 0 caracteres; con el flag → 1.523 caracteres.
+        // Un modelo mudo puntúa 0% de contaminación falso (premia el silencio).
+        think: false,
         options: { temperature: 0.7, num_predict: 512 },
         keep_alive: '30m',
       }),
@@ -1224,7 +1242,20 @@ async function main() {
     });
     const jsonlPath = join(BENCH_RUNS_DIR, `contaminacion-${ts}.judged.jsonl`);
     const summaryPath = join(BENCH_RUNS_DIR, `contaminacion-${ts}.summary.json`);
-    const fullSummary = { ...summary, model: argVal('--model', DEFAULT_PROD_MODEL), generated_at: new Date().toISOString() };
+    // El modelo se lee de los PROPIOS resultados, no del default de producción:
+    // rotular con DEFAULT_PROD_MODEL hacía que un juicio de gemma4 saliera
+    // etiquetado `granite3.3:8b` y se leyera como si fuera el modelo de prod.
+    const modelosEnResultados = [...new Set(judged.map((r) => r.model).filter(Boolean))];
+    const modelDeclarado = argVal('--model', null);
+    const fullSummary = {
+      ...summary,
+      model: modelDeclarado || modelosEnResultados.join(' + ') || DEFAULT_PROD_MODEL,
+      models_in_results: modelosEnResultados,
+      generated_at: new Date().toISOString(),
+    };
+    if (modelosEnResultados.length > 1) {
+      console.warn(`[judge] ⚠️  los resultados mezclan ${modelosEnResultados.length} modelos: ${modelosEnResultados.join(', ')}`);
+    }
     writeFileSync(jsonlPath, judged.map((r) => JSON.stringify(r)).join('\n') + '\n');
     writeFileSync(summaryPath, JSON.stringify(fullSummary, null, 2) + '\n');
     console.log(`[judge] escrito: ${jsonlPath}`);

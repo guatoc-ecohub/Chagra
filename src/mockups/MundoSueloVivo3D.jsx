@@ -76,9 +76,9 @@ const P = {
   rocaOscura: mezclar('#6f6552', TINTE, 0.28),
   raiz: mezclar('#b98a52', TINTE, 0.18), // la raíz viva, tono tabaco claro
   raizFina: mezclar('#cba876', TINTE, 0.16), // radícula/pelo radical
-  hifa: '#f2ece0', // micorriza en reposo (casi blanca)
+  hifa: '#e2c58d', // micorriza en reposo (oro suave, NO blanco: no debe estallar)
   hifaOro: '#ffd27a', // micorriza en pulso (oro del hongo)
-  nodo: '#ffe6a8', // punto de intercambio hongo↔raíz
+  nodo: '#f2d69a', // punto de intercambio hongo↔raíz
   organico: '#211610', // mota de materia orgánica en descomposición
   piedra: mezclar(PALETA.piedra, TINTE, 0.34), // canto rodado en B/C
   piedraClara: mezclar('#b6a888', TINTE, 0.28),
@@ -88,7 +88,7 @@ const P = {
   // — la vida del suelo que se agrega en este corte —
   nodulo: '#e79a86', // nódulo de rhizobium en la raíz de frijol (rosado = N₂ fijado)
   noduloAlt: '#f4b39c',
-  micelio: '#f4efe2', // micelio saprofito: hilos casi blancos que digieren la hojarasca
+  micelio: '#ccc0a2', // micelio saprofito: hilos pálidos que digieren la hojarasca (mate, NO blanco)
   hongoTallo: mezclar('#e8dcc4', TINTE, 0.14), // estípite (pie) pálido de la seta
   hongoSombrero: mezclar('#c25a38', TINTE, 0.16), // sombrero teja andino
   hongoSombreroAlt: mezclar('#d98844', TINTE, 0.16),
@@ -100,13 +100,28 @@ const P = {
   hojaVerde: mezclar('#6f9a45', TINTE, 0.16), // hoja recién caída (fresca)
   hojaParda: mezclar('#8a6a30', TINTE, 0.2), // hoja a media descomposición
   hojaEsqueleto: mezclar('#54401f', TINTE, 0.18), // hoja esqueletizada, ya casi humus
+  // — contraste para que el humus NEGRO se lea POBLADO, no como un vacío café —
+  motaClara: mezclar('#8f6f47', TINTE, 0.2), // grumo claro de humus (migaja viva)
+  motaGrano: mezclar('#c1b083', TINTE, 0.24), // grano mineral pálido entre la tierra
+  motaRaiz: mezclar('#d3b285', TINTE, 0.16), // fragmento de raicilla clara
+  motaCarbon: mezclar('#4a3320', TINTE, 0.14), // grumo pardo intermedio
+  // — costuras que separan un horizonte del siguiente (que se lean las capas) —
+  seamOscura: mezclar('#140d07', TINTE, 0.06), // sombra fina bajo cada horizonte
+  seamClara: mezclar('#cdb98d', TINTE, 0.24), // filo claro de transición
+  colembolo: mezclar('#e7ddc4', TINTE, 0.1), // colémbolo: motita blanca saltarina
 };
 
 /* Geometría del bloque cortado. El FRENTE es la cara leída: la vida se pega o
    protruye ahí para que se lea contra el corte (como en MicrofaunaSuelo). */
 const ANCHO = 8; // x: ancho del perfil
 const PROF = 4; // z: fondo del bloque
-const FRENTE = PROF / 2 - 0.15; // z donde vive lo que debe leerse en el corte
+const CARA = PROF / 2; // z de la cara cortada (frente opaco del bloque)
+/* La vida vive JUSTO EN FRENTE de la cara, como bajorrelieve sobre el corte.
+   ANTES estaba 0.15 DETRÁS de la cara (PROF/2 - 0.15) y el bloque opaco la
+   TAPABA: raíces, nódulos, ácaros, hormigas y motas se renderizaban pero nunca
+   se veían —solo asomaban los billboards Html (lombrices) y las puntas de hifas
+   que sobresalían—. Por eso el corte se veía como un muro café vacío. */
+const FRENTE = CARA + 0.05; // z donde vive lo que debe leerse en el corte
 
 /* Los cinco horizontes: [yTop, yBot] con la superficie del suelo en y=0. */
 const HORIZONTES = [
@@ -170,20 +185,21 @@ function SolBajo() {
 }
 
 /* ── Motas/piedras dispersas dentro de un horizonte (1 draw call) ──────────── */
-function Dispersos({ n, yTop, yBot, rMin, rMax, colores, forma, seed }) {
+function Dispersos({ n, yTop, yBot, rMin, rMax, colores, forma, seed, zSpread = 0.14 }) {
   const ref = useRef(null);
   const datos = useMemo(() => {
     const r = rng(seed);
     return Array.from({ length: n }, () => ({
-      // se sesgan hacia el frente para que se lean en la cara cortada
+      // pegadas a la cara cortada (z ~ FRENTE) para que se LEAN como grumos del
+      // corte; antes se hundían PROF-0.5 hacia atrás y el bloque las tapaba.
       x: (r() - 0.5) * (ANCHO - 0.5),
       y: yBot + r() * (yTop - yBot),
-      z: FRENTE - r() * (PROF - 0.5),
+      z: FRENTE - r() * zSpread,
       s: rMin + r() * (rMax - rMin),
       giro: [r() * Math.PI, r() * Math.PI, r() * Math.PI],
       col: colores[Math.floor(r() * colores.length)],
     }));
-  }, [n, yTop, yBot, rMin, rMax, colores, seed]);
+  }, [n, yTop, yBot, rMin, rMax, colores, seed, zSpread]);
 
   useEffect(() => {
     const m = ref.current;
@@ -252,6 +268,21 @@ function BloqueHorizontes({ tier }) {
           <meshLambertMaterial color={h.color} flatShading />
         </mesh>
       ))}
+      {/* costuras entre horizontes: una sombra fina abajo + un filo claro que
+          dibuja la línea de transición, para que O→A→B→C→R se lean como CAPAS
+          distintas y no como un solo café en gradiente. Pegadas al frente. */}
+      {[-1.5, -2.9, -3.9].map((y) => (
+        <group key={`seam-${y}`} position={[0, y, FRENTE - 0.02]}>
+          <mesh position={[0, 0.02, 0]}>
+            <boxGeometry args={[ANCHO, 0.05, 0.06]} />
+            <meshLambertMaterial color={P.seamClara} flatShading />
+          </mesh>
+          <mesh position={[0, -0.03, 0]}>
+            <boxGeometry args={[ANCHO, 0.04, 0.05]} />
+            <meshLambertMaterial color={P.seamOscura} flatShading />
+          </mesh>
+        </group>
+      ))}
 
       {/* superficie viva: una lámina de pasto sobre la hojarasca */}
       <mesh position={[0, 0.315, 0]}>
@@ -272,12 +303,16 @@ function BloqueHorizontes({ tier }) {
         </mesh>
       ))}
 
-      {/* motas de materia orgánica: densas en el humus, entrando también al B */}
-      <Dispersos n={tier === 'bajo' ? 40 : 90} yTop={-0.05} yBot={-1.45} rMin={0.03} rMax={0.075} colores={[P.organico, P.humusAlt]} forma="mota" seed={301} />
-      <Dispersos n={tier === 'bajo' ? 14 : 30} yTop={-1.5} yBot={-2.85} rMin={0.03} rMax={0.06} colores={[P.organico, P.subsueloAlt]} forma="mota" seed={317} />
+      {/* motas de materia orgánica en el humus: se mezclan grumos CLAROS y granos
+          minerales pálidos con los pardos, para que el humus negro se lea como
+          tierra viva y migajosa —no como un vacío café— contra el corte. */}
+      <Dispersos n={tier === 'bajo' ? 60 : 130} yTop={-0.05} yBot={-1.45} rMin={0.03} rMax={0.08} colores={[P.motaClara, P.motaCarbon, P.humusAlt, P.organico]} forma="mota" seed={301} />
+      {/* granos minerales pálidos: el brillo de arena/limo que puntea la tierra */}
+      <Dispersos n={tier === 'bajo' ? 26 : 60} yTop={-0.1} yBot={-1.4} rMin={0.02} rMax={0.045} colores={[P.motaGrano, P.motaRaiz]} forma="mota" seed={307} />
+      <Dispersos n={tier === 'bajo' ? 20 : 44} yTop={-1.5} yBot={-2.85} rMin={0.03} rMax={0.065} colores={[P.motaClara, P.subsueloAlt, P.motaGrano]} forma="mota" seed={317} />
       {/* cantos rodados: pocos en B, más y más pálidos en C */}
-      <Dispersos n={tier === 'bajo' ? 6 : 14} yTop={-1.55} yBot={-2.85} rMin={0.08} rMax={0.18} colores={[P.piedra, P.piedraClara]} forma="piedra" seed={331} />
-      <Dispersos n={tier === 'bajo' ? 10 : 22} yTop={-2.9} yBot={-3.85} rMin={0.12} rMax={0.26} colores={[P.piedra, P.piedraClara, P.saprolito]} forma="piedra" seed={347} />
+      <Dispersos n={tier === 'bajo' ? 10 : 22} yTop={-1.55} yBot={-2.85} rMin={0.08} rMax={0.18} colores={[P.piedra, P.piedraClara]} forma="piedra" seed={331} />
+      <Dispersos n={tier === 'bajo' ? 14 : 30} yTop={-2.9} yBot={-3.85} rMin={0.12} rMax={0.26} colores={[P.piedra, P.piedraClara, P.saprolito]} forma="piedra" seed={347} />
 
       {/* la roca madre: bloques angulares que craquelan la cara del horizonte R */}
       {[
@@ -363,25 +398,26 @@ function generarRaiz(seed, hx, maxDepth) {
           pos: [
             centro.x + (r() - 0.5) * 0.06,
             centro.y + (r() - 0.5) * 0.08,
-            centro.z + (r() - 0.5) * 0.05,
+            centro.z + 0.05 + (r() - 0.5) * 0.04, // hacia la cara: que se vean
           ],
-          s: 0.032 + r() * 0.026,
+          s: 0.05 + r() * 0.03,
         });
       }
     }
-    // penacho de micorrizas en el nodo (la raíz "pesca" nutrientes con el hongo)
-    if (depth >= 1 && r() < 0.85) {
-      const nh = 1 + Math.floor(r() * 2);
-      for (let k = 0; k < nh; k++) {
-        const hd = d
-          .clone()
-          .applyAxisAngle(new THREE.Vector3(0, 0, 1), (r() - 0.5) * 2.4)
-          .applyAxisAngle(new THREE.Vector3(1, 0, 0), (r() - 0.5) * 1.2);
-        const hl = 0.32 + r() * 0.4;
-        const hfin = fin.clone().addScaledVector(hd, hl);
-        hifaSegs.push(segmento(fin, hfin));
-        nodos.push({ pos: [hfin.x, hfin.y, hfin.z] });
-      }
+    // penacho de micorrizas en el nodo: una hifa CORTA y ocasional que abraza la
+    // raíz (la sociedad hongo↔raíz). Antes salían 1-2 largas por cada segmento y,
+    // al traerlas al frente de la cara, estallaban como fuegos artificiales
+    // blancos que tapaban la raíz. Ahora son pelusa dorada, sutiles.
+    if (depth >= 1 && r() < 0.4) {
+      const hd = d
+        .clone()
+        .applyAxisAngle(new THREE.Vector3(0, 0, 1), (r() - 0.5) * 2.2)
+        .applyAxisAngle(new THREE.Vector3(1, 0, 0), (r() - 0.5) * 0.8);
+      hd.z *= 0.4; // se queda cerca de la cara, no dispara hacia el lente
+      const hl = 0.13 + r() * 0.18;
+      const hfin = fin.clone().addScaledVector(hd.normalize(), hl);
+      hifaSegs.push(segmento(fin, hfin));
+      nodos.push({ pos: [hfin.x, hfin.y, hfin.z] });
     }
     if (depth >= maxDepth || fin.y < -2.8) {
       nodos.push({ pos: [fin.x, fin.y, fin.z] });
@@ -395,16 +431,17 @@ function generarRaiz(seed, hx, maxDepth) {
         .applyAxisAngle(new THREE.Vector3(0, 0, 1), (r() - 0.5) * desvio)
         .applyAxisAngle(new THREE.Vector3(1, 0, 0), (r() - 0.5) * desvio * 0.5);
       nd.y -= 0.5; // la raíz siempre tira hacia abajo (gravitropismo)
+      nd.z *= 0.35; // …pero se mantiene cerca de la CARA para leerse en el corte
       nd.normalize();
       crecer(fin, nd, largo * (0.72 + r() * 0.14), radio * 0.72, depth + 1);
     }
   }
-  crecer(new THREE.Vector3(hx, 0.0, FRENTE - 0.25), new THREE.Vector3(0, -1, 0), 0.85, 0.1, 0);
+  crecer(new THREE.Vector3(hx, 0.0, FRENTE - 0.05), new THREE.Vector3(0, -1, 0), 0.88, 0.13, 0);
   return { raizSegs, hifaSegs, nodos, nodulos };
 }
 
-function SistemaRaiz({ hx, maxDepth, reducedMotion }) {
-  const { raizSegs, hifaSegs, nodos, nodulos } = useMemo(() => generarRaiz(41, hx, maxDepth), [hx, maxDepth]);
+function SistemaRaiz({ hx, maxDepth, reducedMotion, seed = 41 }) {
+  const { raizSegs, hifaSegs, nodos, nodulos } = useMemo(() => generarRaiz(seed, hx, maxDepth), [hx, maxDepth, seed]);
   const mats = useRef([]);
   const nodoRefs = useRef([]);
   const colBase = useMemo(() => new THREE.Color(P.hifa), []);
@@ -435,18 +472,19 @@ function SistemaRaiz({ hx, maxDepth, reducedMotion }) {
           <meshLambertMaterial color={s.radio > 0.06 ? P.raiz : P.raizFina} flatShading />
         </mesh>
       ))}
-      {/* las hifas de la micorriza: filamentos que pulsan del blanco al oro */}
+      {/* las hifas de la micorriza: filamentos finos y translúcidos que pulsan
+          al oro (transparentes para que sean pelusa, no rayas duras). */}
       {hifaSegs.map((s, i) => (
-        <mesh key={`h-${i}`} position={s.pos} quaternion={s.quat} scale={[0.01, s.largo, 0.01]}>
+        <mesh key={`h-${i}`} position={s.pos} quaternion={s.quat} scale={[0.008, s.largo, 0.008]}>
           <cylinderGeometry args={[1, 1, 1, 4]} />
-          <meshBasicMaterial ref={(el) => { mats.current[i] = el; }} color={P.hifa} />
+          <meshBasicMaterial ref={(el) => { mats.current[i] = el; }} color={P.hifa} transparent opacity={0.62} />
         </mesh>
       ))}
-      {/* nodos de intercambio hongo↔raíz: puntos dorados que titilan */}
+      {/* nodos de intercambio hongo↔raíz: puntitos dorados que titilan */}
       {nodos.map((n, i) => (
         <mesh key={`n-${i}`} position={n.pos} ref={(el) => { nodoRefs.current[i] = el; }}>
-          <sphereGeometry args={[0.03, 7, 7]} />
-          <meshBasicMaterial color={P.nodo} />
+          <sphereGeometry args={[0.02, 7, 7]} />
+          <meshBasicMaterial color={P.nodo} transparent opacity={0.85} />
         </mesh>
       ))}
       {/* nódulos de rhizobium: bolitas rosadas colgadas de la raíz del frijol.
@@ -527,10 +565,10 @@ function EscarabajoBillboard({ base, px = 74, factor = 2.6, reducedMotion }) {
    No es la micorriza de la raíz (esa es la sociedad hongo↔planta): éste es el
    hongo descomponedor que come la hoja muerta y la vuelve humus. Sombrero teja,
    pie pálido, láminas debajo; y una malla de hilos blancos que baja al humus. */
-function Hongos({ base, n, reducedMotion }) {
+function Hongos({ base, n, reducedMotion, mic = 1, seed = 577 }) {
   const capaRefs = useRef([]);
   const setas = useMemo(() => {
-    const r = rng(577);
+    const r = rng(seed);
     return Array.from({ length: n }, (_, i) => ({
       key: i,
       x: (r() - 0.5) * 0.9,
@@ -541,18 +579,22 @@ function Hongos({ base, n, reducedMotion }) {
       col: r() < 0.5 ? P.hongoSombrero : P.hongoSombreroAlt,
       fase: r() * Math.PI * 2,
     }));
-  }, [n]);
-  // micelio: hilos que salen del pie del racimo y se abren bajando al humus
+  }, [n, seed]);
+  // micelio: hilos que salen del pie del racimo y se abren bajando al humus.
+  // `mic` alarga y densifica la red para los racimos que quedan dentro del corte,
+  // donde la malla saprofita SÍ debe verse comiéndose la hojarasca hacia el humus.
   const hilos = useMemo(() => {
-    const r = rng(601);
+    const r = rng(seed + 24);
     const raiz = new THREE.Vector3(0, -0.02, 0);
-    return Array.from({ length: n * 4 + 6 }, () => {
-      const dir = new THREE.Vector3((r() - 0.5) * 1.4, -0.4 - r() * 0.6, (r() - 0.5) * 0.6).normalize();
-      const largo = 0.28 + r() * 0.45;
+    // una telaraña SOMERA y ancha que abraza la hojarasca (poca caída, corta), no
+    // un chorro descendente: el micelio digiere la hoja muerta en la capa alta.
+    return Array.from({ length: Math.round((n * 2 + 4) * mic) }, () => {
+      const dir = new THREE.Vector3((r() - 0.5) * 1.9, -0.12 - r() * 0.38, (r() - 0.5) * 0.5).normalize();
+      const largo = (0.2 + r() * 0.26) * mic;
       const fin = raiz.clone().addScaledVector(dir, largo);
       return { ...segmento(raiz, fin), largo };
     });
-  }, [n]);
+  }, [n, mic, seed]);
 
   useFrame(({ clock }) => {
     if (reducedMotion) return;
@@ -570,7 +612,7 @@ function Hongos({ base, n, reducedMotion }) {
       {hilos.map((h, i) => (
         <mesh key={`mic-${i}`} position={h.pos} quaternion={h.quat} scale={[0.006, h.largo, 0.006]}>
           <cylinderGeometry args={[1, 1, 1, 4]} />
-          <meshBasicMaterial color={P.micelio} transparent opacity={0.72} />
+          <meshBasicMaterial color={P.micelio} transparent opacity={0.48} />
         </mesh>
       ))}
       {/* el racimo de setas */}
@@ -662,13 +704,13 @@ function HormigasEnFila({ n, reducedMotion }) {
       puntos.push(new THREE.Vector3(
         3.4 - u * 3.2,
         -0.35 - u * 1.15 + Math.sin(u * Math.PI * 2) * 0.12,
-        FRENTE - 0.06 - Math.sin(u * Math.PI) * 0.12,
+        FRENTE + 0.02 - Math.sin(u * Math.PI) * 0.05, // sobre la cara del corte
       ));
     }
     return new THREE.CatmullRomCurve3(puntos);
   }, []);
   const hormigas = useMemo(
-    () => Array.from({ length: n }, (_, i) => ({ key: i, off: i / n, escala: 0.85 + (i % 2) * 0.16 })),
+    () => Array.from({ length: n }, (_, i) => ({ key: i, off: i / n, escala: 1.7 + (i % 2) * 0.35 })),
     [n],
   );
   const up = useMemo(() => new THREE.Vector3(0, 1, 0), []);
@@ -690,6 +732,12 @@ function HormigasEnFila({ n, reducedMotion }) {
 
   return (
     <group>
+      {/* la GALERÍA: el túnel que abren las hormigas, un canal oscuro que baja del
+          humus al subsuelo (donde la tierra ocre lo deja leer como pasadizo). */}
+      <mesh>
+        <tubeGeometry args={[camino, 44, 0.055, 6, false]} />
+        <meshLambertMaterial color={P.organico} flatShading />
+      </mesh>
       {hormigas.map((h, i) => (
         <group key={h.key} ref={(el) => { refs.current[i] = el; }}>
           <Hormiga escala={h.escala} reducedMotion={reducedMotion} />
@@ -796,7 +844,7 @@ function AguaInfiltra({ n, riego, reducedMotion }) {
     const r = rng(211);
     return Array.from({ length: n }, () => ({
       x: (r() - 0.5) * (ANCHO - 0.8),
-      z: FRENTE - 0.05 - r() * (PROF - 0.6),
+      z: FRENTE - 0.02 - r() * 0.18, // sobre la cara: el agua baja por el corte
       s: 0.045 + r() * 0.04,
       fase: r(),
       vel: 0.5 + r() * 0.5,
@@ -894,6 +942,7 @@ function MuestraAmpliada({ tier, reducedMotion, vida }) {
 function EscenaSuelo({ tier, reducedMotion, riego }) {
   const perfil = perfilDeTier(tier);
   const hx = -1.4; // dónde nace la planta héroe (y su raíz)
+  const hxC = 0.7; // segundo frijol, en el EJE del corte (donde enfoca la cámara)
   const maxDepth = tier === 'bajo' ? 2 : 3;
   const nGotas = tier === 'alto' ? 26 : tier === 'medio' ? 16 : 8;
   const vidaMuestra = riego ? 1 : 0.82;
@@ -910,31 +959,55 @@ function EscenaSuelo({ tier, reducedMotion, riego }) {
       <HojarascaDescompone tier={tier} />
       <PlantaHeroe hx={hx} reducedMotion={reducedMotion} />
       <SistemaRaiz hx={hx} maxDepth={maxDepth} reducedMotion={reducedMotion} />
+      {/* SEGUNDO FRIJOL, en el eje del corte: su raíz baja por el centro del
+          encuadre y cuelga los NÓDULOS de rhizobium justo donde se mira —así el
+          corazón del corte deja de ser tierra vacía y muestra la sociedad
+          raíz↔hongo↔bacteria que fija el nitrógeno. */}
+      <PlantaHeroe hx={hxC} reducedMotion={reducedMotion} />
+      <SistemaRaiz hx={hxC} maxDepth={maxDepth + 1} seed={137} reducedMotion={reducedMotion} />
 
-      {/* LOMBRICES: el SVG de la casa asomando por sus túneles en el humus */}
+      {/* LOMBRICES: el SVG de la casa asomando por sus túneles, a distintas
+          PROFUNDIDADES, para que el corte se sienta habitado de arriba abajo. */}
       <LombrizBillboard pos={[1.5, -0.62, FRENTE + 0.02]} giro={-14} fase={0} reducedMotion={reducedMotion} />
+      <LombrizBillboard pos={[-0.55, -0.5, FRENTE + 0.02]} giro={38} fase={1.1} px={54} factor={2.5} reducedMotion={reducedMotion} />
       {tier !== 'bajo' && (
-        <LombrizBillboard pos={[-0.35, -1.12, FRENTE + 0.01]} giro={24} fase={2.1} px={58} factor={2.4} reducedMotion={reducedMotion} />
+        <>
+          <LombrizBillboard pos={[-0.35, -1.12, FRENTE + 0.01]} giro={24} fase={2.1} px={58} factor={2.4} reducedMotion={reducedMotion} />
+          <LombrizBillboard pos={[2.35, -1.55, FRENTE + 0.01]} giro={-30} fase={0.7} px={56} factor={2.5} reducedMotion={reducedMotion} />
+          <LombrizBillboard pos={[0.55, -2.15, FRENTE + 0.0]} giro={12} fase={3.0} px={50} factor={2.7} reducedMotion={reducedMotion} />
+        </>
       )}
 
-      {/* ESCARABAJO ESTERCOLERO: rueda su bola de abono por la superficie */}
+      {/* ESCARABAJO ESTERCOLERO: uno rueda su bola en la superficie; otro, más
+          hondo, entierra el abono por su túnel (así recicla nutrientes el suelo). */}
       <EscarabajoBillboard base={[2.5, 0.52, FRENTE + 0.05]} reducedMotion={reducedMotion} />
+      {tier !== 'bajo' && (
+        <EscarabajoBillboard base={[-1.15, -0.9, FRENTE + 0.0]} px={52} factor={2.7} reducedMotion={reducedMotion} />
+      )}
 
-      {/* HONGOS descomponedores + micelio: comen la hoja muerta y la hacen humus */}
+      {/* HONGOS descomponedores + micelio: comen la hoja muerta y la hacen humus.
+          El racimo del EJE del corte lleva micelio largo (mic) para que la red
+          saprofita se vea BAJANDO al humus, no solo posada arriba. */}
       <Hongos base={[-3.0, 0.33, FRENTE - 0.35]} n={tier === 'bajo' ? 2 : tier === 'medio' ? 3 : 4} reducedMotion={reducedMotion} />
+      <Hongos base={[1.35, 0.33, FRENTE + 0.03]} n={tier === 'bajo' ? 2 : 3} mic={1.15} seed={613} reducedMotion={reducedMotion} />
       {tier === 'alto' && (
-        <Hongos base={[0.7, 0.33, FRENTE - 0.55]} n={2} reducedMotion={reducedMotion} />
+        <Hongos base={[-0.4, 0.33, FRENTE - 0.5]} n={2} mic={1.5} seed={641} reducedMotion={reducedMotion} />
       )}
 
       {/* HORMIGAS en fila por su túnel (airean el suelo, bajan materia orgánica) */}
       {tier !== 'bajo' && (
-        <HormigasEnFila n={tier === 'alto' ? 5 : 3} reducedMotion={reducedMotion} />
+        <HormigasEnFila n={tier === 'alto' ? 6 : 4} reducedMotion={reducedMotion} />
       )}
 
-      {/* ÁCAROS estilizados caminando por la hojarasca */}
+      {/* ÁCAROS estilizados: en la hojarasca Y dentro del perfil (la micro-fauna
+          no vive solo en la superficie; camina también entre los grumos). */}
       <AcaroSuelo base={[-2.0, 0.36, FRENTE - 0.1]} escala={1} fase={0.4} reducedMotion={reducedMotion} />
       {tier !== 'bajo' && (
-        <AcaroSuelo base={[3.2, -0.28, FRENTE - 0.05]} escala={0.85} fase={2.7} reducedMotion={reducedMotion} />
+        <>
+          <AcaroSuelo base={[3.2, -0.28, FRENTE - 0.05]} escala={0.85} fase={2.7} reducedMotion={reducedMotion} />
+          <AcaroSuelo base={[0.95, -0.95, FRENTE + 0.02]} escala={1.05} fase={1.6} reducedMotion={reducedMotion} />
+          <AcaroSuelo base={[2.05, -1.9, FRENTE + 0.02]} escala={0.9} fase={4.2} reducedMotion={reducedMotion} />
+        </>
       )}
 
       <AguaInfiltra n={nGotas} riego={riego} reducedMotion={reducedMotion} />
@@ -958,7 +1031,7 @@ function EscenaSuelo({ tier, reducedMotion, riego }) {
           <EtiquetaVida pos={[2.5, 0.95, FRENTE + 0.2]} emoji="🪲" texto="Escarabajo" />
           <EtiquetaVida pos={[-3.0, 0.85, FRENTE - 0.2]} emoji="🍄" texto="Hongos" />
           <EtiquetaVida pos={[3.2, 0.25, FRENTE + 0.2]} emoji="🐜" texto="Hormigas" />
-          <EtiquetaVida pos={[hx + 0.9, -1.7, FRENTE]} emoji="🌸" texto="Nódulos (nitrógeno)" />
+          <EtiquetaVida pos={[hxC + 0.75, -1.5, FRENTE]} emoji="🌸" texto="Nódulos (nitrógeno)" />
         </>
       )}
 
