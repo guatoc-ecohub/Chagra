@@ -8,6 +8,7 @@
  * tiene un <title> nativo para ver el detalle al pasar/tocar.
  * Datos de Open-Meteo via climaService.
  */
+import { fincaDateISO } from '../../utils/farmDate.js';
 /** @typedef {{ dia: string, tempMax: number, tempMin: number, lluviaMm: number }} DiaClima */
 
 const C = {
@@ -25,8 +26,10 @@ function etiquetaDia(iso) {
   const dt = new Date(`${iso}T12:00:00`);
   if (Number.isNaN(dt.getTime())) return { dow: '', dnum: '', esHoy: false };
   const dow = dt.toLocaleDateString('es-CO', { weekday: 'short' }).replace('.', '');
-  const hoy = new Date();
-  const esHoy = dt.getFullYear() === hoy.getFullYear() && dt.getMonth() === hoy.getMonth() && dt.getDate() === hoy.getDate();
+  // BUG TODAY-UTC-HELADA-20260905: "Hoy" se decide en el calendario de la
+  // FINCA, no en la zona del runtime/UTC (los `date` del forecast son locales
+  // de la finca).
+  const esHoy = iso === fincaDateISO();
   return { dow: dow.charAt(0).toUpperCase() + dow.slice(1, 2), dnum: String(dt.getDate()), esHoy };
 }
 
