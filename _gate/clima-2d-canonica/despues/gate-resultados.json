@@ -1,0 +1,578 @@
+{
+  "base": "http://localhost:5210",
+  "fecha": "2026-09-05T21:19:38.799Z",
+  "gpu": {
+    "modo": "headed-X"
+  },
+  "error": "page.waitForSelector: Timeout 60000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('[data-testid=\"finca-viva-puertas\"]') to be visible\u001b[22m\n\n    at modoBoton (/home/kortux/Workspace/chagra/.worktrees/fable-2d-clima-20260905/_gate/clima-2d-canonica/gate-clima-2d.mjs:241:14)\n    at async file:///home/kortux/Workspace/chagra/.worktrees/fable-2d-clima-20260905/_gate/clima-2d-canonica/gate-clima-2d.mjs:335:44",
+  "capturas": [
+    {
+      "nombre": "home-antes-de-tocar",
+      "ruta": "/home/kortux/Workspace/chagra/.worktrees/fable-2d-clima-20260905/_gate/clima-2d-canonica/despues/home-antes-de-tocar.png",
+      "errores": {
+        "pageErrors": [],
+        "consoleErrors": [
+          "In HTML, %s cannot be a descendant of <%s>.\nThis will cause a hydration error.%s <button> button \n\n  ...\n    <App>\n      <Suspense>\n      <NetworkStatusBar>\n      <NetworkStatusBar>\n      <Suspense>\n      <Confetti>\n      <GpsFincaBanner>\n      <DataLossBanner>\n      <CriticalAlertBanner>\n      <Sus",
+          "<%s> cannot contain a nested %s.\nSee this log for the ancestor stack trace. button <button>",
+          "React does not recognize the `%s` prop on a DOM element. If you intentionally want it to appear in the DOM as a custom attribute, spell it as lowercase `%s` instead. If you accidentally passed it from a parent component, remove it from the DOM element. data-agt-capacidad-respiraOrgano data-agt-capac"
+        ],
+        "requestFailures": []
+      }
+    },
+    {
+      "nombre": "movil-tras-tocar-el-tiempo-CA1",
+      "ruta": "/home/kortux/Workspace/chagra/.worktrees/fable-2d-clima-20260905/_gate/clima-2d-canonica/despues/movil-tras-tocar-el-tiempo-CA1.png",
+      "errores": {
+        "pageErrors": [],
+        "consoleErrors": [
+          "In HTML, %s cannot be a descendant of <%s>.\nThis will cause a hydration error.%s <button> button \n\n  ...\n    <App>\n      <Suspense>\n      <NetworkStatusBar>\n      <NetworkStatusBar>\n      <Suspense>\n      <Confetti>\n      <GpsFincaBanner>\n      <DataLossBanner>\n      <CriticalAlertBanner>\n      <Sus",
+          "<%s> cannot contain a nested %s.\nSee this log for the ancestor stack trace. button <button>",
+          "React does not recognize the `%s` prop on a DOM element. If you intentionally want it to appear in the DOM as a custom attribute, spell it as lowercase `%s` instead. If you accidentally passed it from a parent component, remove it from the DOM element. data-agt-capacidad-respiraOrgano data-agt-capac"
+        ],
+        "requestFailures": []
+      }
+    },
+    {
+      "nombre": "movil-despejado-dia",
+      "ruta": "/home/kortux/Workspace/chagra/.worktrees/fable-2d-clima-20260905/_gate/clima-2d-canonica/despues/movil-despejado-dia.png",
+      "estado": "despejado-dia",
+      "vista": "movil",
+      "errores": {
+        "pageErrors": [],
+        "consoleErrors": [],
+        "requestFailures": []
+      }
+    },
+    {
+      "nombre": "movil-nublado-dia",
+      "ruta": "/home/kortux/Workspace/chagra/.worktrees/fable-2d-clima-20260905/_gate/clima-2d-canonica/despues/movil-nublado-dia.png",
+      "estado": "nublado-dia",
+      "vista": "movil",
+      "errores": {
+        "pageErrors": [],
+        "consoleErrors": [],
+        "requestFailures": []
+      }
+    },
+    {
+      "nombre": "movil-nublado-noche",
+      "ruta": "/home/kortux/Workspace/chagra/.worktrees/fable-2d-clima-20260905/_gate/clima-2d-canonica/despues/movil-nublado-noche.png",
+      "estado": "nublado-noche",
+      "vista": "movil",
+      "errores": {
+        "pageErrors": [],
+        "consoleErrors": [],
+        "requestFailures": []
+      }
+    },
+    {
+      "nombre": "escritorio-mundo-el-tiempo-iframe-CA11",
+      "ruta": "/home/kortux/Workspace/chagra/.worktrees/fable-2d-clima-20260905/_gate/clima-2d-canonica/despues/escritorio-mundo-el-tiempo-iframe-CA11.png",
+      "errores": {
+        "pageErrors": [],
+        "consoleErrors": [
+          "Failed to load resource: the server responded with a status of 404 (Not Found)",
+          "Failed to load resource: the server responded with a status of 404 (Not Found)",
+          "Failed to load resource: the server responded with a status of 404 (Not Found)"
+        ],
+        "requestFailures": []
+      }
+    }
+  ],
+  "ca4": {
+    "lecturas": [
+      {
+        "lectura": "Condición + emoji",
+        "presente": true
+      },
+      {
+        "lectura": "Fase ENSO",
+        "presente": true
+      },
+      {
+        "lectura": "Temperatura",
+        "presente": true
+      },
+      {
+        "lectura": "Se siente como",
+        "presente": true
+      },
+      {
+        "lectura": "Anomalía térmica",
+        "presente": true
+      },
+      {
+        "lectura": "Anomalía de humedad",
+        "presente": true
+      },
+      {
+        "lectura": "Humedad",
+        "presente": false
+      },
+      {
+        "lectura": "Punto de rocío",
+        "presente": true
+      },
+      {
+        "lectura": "UV máximo",
+        "presente": false
+      },
+      {
+        "lectura": "Lluvia hoy",
+        "presente": false
+      },
+      {
+        "lectura": "Probabilidad de lluvia",
+        "presente": true
+      },
+      {
+        "lectura": "ETo",
+        "presente": false
+      },
+      {
+        "lectura": "VPD",
+        "presente": false
+      },
+      {
+        "lectura": "Amplitud térmica",
+        "presente": false
+      },
+      {
+        "lectura": "Horas-frío",
+        "presente": false
+      },
+      {
+        "lectura": "SPI",
+        "presente": false
+      },
+      {
+        "lectura": "SPEI",
+        "presente": false
+      }
+    ],
+    "faltan": [
+      "Humedad",
+      "UV máximo",
+      "Lluvia hoy",
+      "ETo",
+      "VPD",
+      "Amplitud térmica",
+      "Horas-frío",
+      "SPI",
+      "SPEI"
+    ],
+    "textoHoy": "GUATAVITA · VEREDA EL VOLADOR · 2 680 M S. N. M. · PISO FRÍO\n\nBuenas tardes, Rosa\n\n4:12 p. m. · Nublado\n\nFASE NEUTRAL\nSin conexión — valor base\n☁️\n\n16°C\n\nSe siente como 13 °C · máx. 17° · mín. 11°\n\nOpen-Meteo · ahora en su finca\n\nNiebla de piso frío con 61 % de humedad: la hoja amanece mojada, y cada hora de hoja húmeda es hongo que avanza. Espere a que seque para podar o cosechar.\nLectura de Chagra a partir de Open-Meteo (nubosidad, lluvia, ETo, mínima) y las reglas agroclimáticas del piso térmico\n\nHoy está 1.5 °C sobre lo normal y 38 % más húmedo.\n\nComparado con Open-Meteo archive (ERA5), media 2014–2025 · ventana ±10 d · balance de referencia Kc 1.0\n\n¿Qué es la anomalía?\nHoy\nAhora mismo\n7–16 días\nLo que viene\nEl Niño\nLa temporada\n\nHUMEDAD\n\n61%\n\nRocío a 8°C\n\nOpen-Meteo\n\nRAYOS UV\n\n9\n\nMuy alto — protéjase\n\nOpen-Meteo · máx. del día\n\nLLUVIA HOY\n\n1.8mm\n\n94% de probabilidad\n\nOpen-Meteo\n\nETO (REFERENCIA)\n\n3.71mm\n\nagua que se evapora hoy\n\nEstimado por Chagra · Open-Meteo (FAO-56)\n\n¿Qué es la ETo?\n\nSED DEL AIRE (VPD)\n\n0.7kPa\n\nAire en confort para la planta\n\nEstimado por Chagra · Open-Meteo (T+HR)\n\nAMPLITUD TÉRMICA\n\n6.2°C\n\nmoderada\n\nEstimado por Chagra · Open-Meteo (máx−mín)\n\nHORAS-FRÍO\n\n0h\n\nhoras con T menor a 7 °C\n\nOpen-Meteo\n\nEstimado por Chagra · serie horaria Open-Meteo\n\nSPI DE LLUVIA\n\n0.28\n\ncerca del histórico\n\nOpen-Meteo archive (ERA5)\n\nPrecipitación de hoy frente a media y desviación del archivo ERA5\n\nSPEI DE BALANCE\n\n0.2\n\ncerca del histórico\n\nOpen-Meteo archive (ERA5)\n\nLluvia − ETc de referencia (Kc 1.0) frente a media y desviación del archivo ERA5\n\nEl clima para sus cultivos\n🥔\n\nPapa\n\nFrio · el clima para su cultivo hoy\n\nAgua hoy\n\npide 4.3 mm · cae 1.8 mm\n\nLe faltan 2.5 mm hoy — considere regar.\n\nETc = ETo × Kc 1.15 · FAO-56 Tabla 12 (papa)\n\nGota (tizón tardío) de la papa\n\nPRESIÓN ALTA\n\nTemperatura ideal (14 °C) + 10 h de hoja mojada — condiciones de brote.\n\nFuente: Criterio tipo Smith/Hutton · Agrosavia (umbral exacto CO: dr-cross pendiente) · confianza media\n\nReloj térmico: +8.6 °D hoy (calor que acumula el cultivo)\n\nLA ACCIÓN DE HOY\n\nVigile gota (tizón tardío) de la papa: ventile, pode lo enfermo y evite mojar la hoja de noche.\n\n¿Qué es la ETc?\n🫐\n\nMora\n\nFrio · el clima para su cultivo hoy\n\nAgua hoy\n\npide 3.9 mm · cae 1.8 mm\n\nLe faltan 2.1 mm hoy — considere regar.\n\nETc = ETo × Kc 1.05 · FAO-56 (berries ~1.05)\n\nAntracnosis\n\nPRESIÓN BAJA\n\nTemperatura (14 °C) fuera del rango del hongo — presión baja.\n\nFuente: Literatura Colletotrichum (confianza media — dr-cross pendiente) · confianza media\n\nLA ACCIÓN DE HOY\n\nLe faltan 2.1 mm hoy — riegue temprano o refuerce el mulch para no perder humedad.\n\n¿Qué es la ETc?\nVer el mundo del clima en 3D\n\nEl tiempo de su finca en tres miradas — hoy, la semana y la temporada. Números reales con su fuente; lo que no se sabe aún, se dice.",
+    "textoSemana": "GUATAVITA · VEREDA EL VOLADOR · 2 680 M S. N. M. · PISO FRÍO\n\nBuenas tardes, Rosa\n\n4:12 p. m. · Nublado\n\nFASE NEUTRAL\nSin conexión — valor base\n☁️\n\n16°C\n\nSe siente como 13 °C · máx. 17° · mín. 11°\n\nOpen-Meteo · ahora en su finca\n\nNiebla de piso frío con 61 % de humedad: la hoja amanece mojada, y cada hora de hoja húmeda es hongo que avanza. Espere a que seque para podar o cosechar.\nLectura de Chagra a partir de Open-Meteo (nubosidad, lluvia, ETo, mínima) y las reglas agroclimáticas del piso térmico\n\nHoy está 1.5 °C sobre lo normal y 38 % más húmedo.\n\nComparado con Open-Meteo archive (ERA5), media 2014–2025 · ventana ±10 d · balance de referencia Kc 1.0\n\n¿Qué es la anomalía?\nHoy\nAhora mismo\n7–16 días\nLo que viene\nEl Niño\nLa temporada\n\nAPLICAR FOLIAR\n\nSin ventana\n\nViento o lluvia altos estos días.\n\nSECAR GRANO\n\nju 10\n\nSol fuerte y aire seco: buen día de secado.\n\nTemperatura y lluvia · 7 días\n\nMáx\nMín\nLluvia (mm)\n8°\n15°\n22°\n18°\n10°\n17°\n11°\n18°\n9°\n19°\n9°\n19°\n9°\n20°\n10°\n20°\n9°\n2\n2\n2\n2\nmm\nVi 4\nHoy\nDo 6\nLu 7\nMa 8\nMi 9\nJu 10\n\nOpen-Meteo · líneas máx/mín (rojo/azul), barras lluvia\n\nHasta 16 días\n\nVI\n\n🌧️\n\n18°\n\n10°\n\n100%\n\nSÁ\n\n🌧️\n\n17°\n\n11°\n\n94%\n\nDO\n\n🌧️\n\n18°\n\n9°\n\n100%\n\nLU\n\n🌧️\n\n19°\n\n9°\n\n96%\n\nMA\n\n🌧️\n\n19°\n\n9°\n\n92%\n\nMI\n\n🌧️\n\n20°\n\n10°\n\n96%\n\nJU\n\n⛅\n\n20°\n\n9°\n\n37%\n\nVI\n\n☀️\n\n21°\n\n10°\n\n22%\n\nSÁ\n\n🌧️\n\n20°\n\n11°\n\n73%\n\nDO\n\n🌧️\n\n20°\n\n10°\n\n86%\n\nLU\n\n🌧️\n\n19°\n\n11°\n\n90%\n\nMA\n\n🌧️\n\n19°\n\n11°\n\n72%\n\nMI\n\n🌧️\n\n19°\n\n11°\n\n73%\n\nJU\n\n🌧️\n\n18°\n\n10°\n\n78%\n\nVI\n\n🌧️\n\n20°\n\n10°\n\n69%\n\nSÁ\n\n🌧️\n\n20°\n\n10°\n\n70%\n\nDO\n\n🌧️\n\n21°\n\n9°\n\n84%\n\nOpen-Meteo · probabilidad de lluvia bajo cada día\n\nContraste con el IDEAM oficial\nEste pronóstico es de Open-Meteo. El oficial por departamento sale los lunes en el Boletín Semanal para el Sector Agrícola (BSA).\nVer el mundo del clima en 3D\n\nEl tiempo de su finca en tres miradas — hoy, la semana y la temporada. Números reales con su fuente; lo que no se sabe aún, se dice.",
+    "textoEstacional": "GUATAVITA · VEREDA EL VOLADOR · 2 680 M S. N. M. · PISO FRÍO\n\nBuenas tardes, Rosa\n\n4:12 p. m. · Nublado\n\nFASE NEUTRAL\nSin conexión — valor base\n☁️\n\n16°C\n\nSe siente como 13 °C · máx. 17° · mín. 11°\n\nOpen-Meteo · ahora en su finca\n\nNiebla de piso frío con 61 % de humedad: la hoja amanece mojada, y cada hora de hoja húmeda es hongo que avanza. Espere a que seque para podar o cosechar.\nLectura de Chagra a partir de Open-Meteo (nubosidad, lluvia, ETo, mínima) y las reglas agroclimáticas del piso térmico\n\nHoy está 1.5 °C sobre lo normal y 38 % más húmedo.\n\nComparado con Open-Meteo archive (ERA5), media 2014–2025 · ventana ±10 d · balance de referencia Kc 1.0\n\n¿Qué es la anomalía?\nHoy\nAhora mismo\n7–16 días\nLo que viene\nEl Niño\nLa temporada\n\nFASE DEL CLIMA AHORA\n\nNeutral\n\nSin conexión — valor base\n\nNeutral: ni Niño ni Niña marcados\n\nEl ciclo ENSO está en fase neutral: el clima sigue el patrón normal de su región (dos temporadas de lluvia en los Andes, una en llanos y Caribe). Es el momento de planear con calma.\n\nLa fase la fija el IDEAM (boletín ENSO). Chagra la lee y la traduce — no inventa el clima.\n\nEL NIÑO QUE VIENE · DIC 2026 – ENE 2027\n\nEl IDEAM y la NOAA proyectan el pico entre nov – dic 2026, con alivio desde feb – mar 2027 y vuelta a Neutral hacia abr – jun 2027: menos lluvia, más calor y más riesgo de incendio hasta entonces. La probabilidad exacta cambia cada mes — \nse lee del boletín ENSO vigente. Prepárese desde ya.\n\n🐹\n\nDoña Zarigüeya: \"El mar Pacífico es como una olla de sopa. Cuando se calienta mucho —eso es El Niño— el vapor se va para otro lado y a nosotros nos llega menos lluvia y más sol fuerte. Los ríos bajan y la tierra se seca. ¡Hay que guardar agua como guardo yo la comida para el invierno!\"\n\nEL NIÑO, MES A MES\n\nLas probabilidades son la foto del boletín del 2026-08-23 — \nla vigente se lee del boletín en vivo. La acción por cultivo es del manejo del piso frío andino.\n\nAGO – SEP 2026\n· Fortaleciéndose\nAHORA\n\nEl Niño ya está activo y ganando fuerza: el Pacífico ecuatorial sigue caliente (índice Niño 3.4 por encima de +1,2 °C). Aún no aprieta lo más fuerte, pero conviene prepararse desde ya.\n\n100% de persistir en sep–nov, con alta chance de \"muy fuerte\" · NOAA CPC, foto 2026-08-23\n\nPapa y hortaliza del altiplano: empiece a reservar agua y deje listo el riego nocturno anti-helada. Elija variedades precoces para la siembra de segunda.\n\nOCT – DIC 2026\n· El pico\n\nAquí El Niño llega o roza su punto más fuerte: menos lluvia, más calor de día y —la paradoja del altiplano frío— cielo despejado de noche que dispara las HELADAS de madrugada.\n\n~95% de un Niño \"muy fuerte\" en oct–dic; ~69% de que sea de nivel histórico · NOAA CPC, foto 2026-08-23\n\nPapa: máximo riesgo de helada y de sequía. Riegue de madrugada para romper la helada, ponga mulch y no arriesgue siembras tardías sensibles. Pastos: guarde forraje y baje la carga animal.\n\nENE – MAR 2027\n· Se sostiene fuerte\n\nEl pico se mantiene alto y solo hacia feb–mar empieza a ceder despacio. El Niño sigue mandando: siga seco y con heladas en piso frío.\n\n~97% de que El Niño continúe en ene–mar (ya iniciando el declive) · NOAA CPC · IRI, foto 2026-08-23\n\nPlanee la siembra de la PRIMERA temporada (arranca ~marzo) con material precoz; no adelante por costumbre: espere a que se estabilicen las primeras lluvias.\n\nABR – JUN 2027\n· Se alivia\n\nPasado el invierno del norte, El Niño se debilita y el clima tiende a NORMALIZARSE (fase Neutral). Las fuentes no confirman un salto inmediato a La Niña: quedaría en Neutral por ahora.\n\nProbabilidad de transición:\nse lee del boletín vigente\n\nVuelva al ritmo bimodal normal del altiplano, pero con el ojo en el boletín: si tras el alivio el IDEAM abre vigilancia de La Niña, prepare drenaje para exceso de agua.\n\nPico: nov – dic 2026. Se alivia: desde feb – mar 2027, con transición a Neutral hacia abr – jun 2027. No hay La Niña inmediata confirmada.\n\nNOAA CPC · IDEAM · CIIFEN (cross-check DR 2026-08-23)\n\nVer el pronóstico ENSO vigente (NOAA CPC / IDEAM)\n\nEN SU REGIÓN\n\nCon vigilancia de Niño: en piso frío reserva agua para riego nocturno anti-helada; en café/cacao templado prepara sombrío y mulch para amortiguar el calor que se espera si entra el Niño.\n\nLA REGLA DEL MOMENTO\n\nNeutral → siembre al ritmo normal de su región y siga el boletín.\n\nChecklist de preparación\n\n💧\n\nCosechar y guardar agua YA\n\nLlene reservorios y aljibes mientras aún cae agua: en el pico seco cada caneca cuenta.\n\n🌾\n\nMulch y sombrío\n\nCubra el suelo con hojarasca y siembre sombrío en café/cacao para no perder humedad.\n\n🌱\n\nVariedades precoces y rústicas\n\nElija material que madure rápido y aguante seco: menos días expuesto a la sequía.\n\n🔥\n\nRondas cortafuego\n\nCon todo seco una quema se sale de control. Haga cortafuegos y evite quemar.\n\n❄️\n\nAgua para riego nocturno (altiplano)\n\nEn piso frío despejado suben las heladas de madrugada: reserve agua para riego anti-helada.\n\n🐄\n\nAjustar carga animal y forraje\n\nGuarde forraje y baje la carga: el pasto crece menos en seca.\n\nBoletín Semanal para el Sector Agrícola (BSA)\nSEMANAL\nEl pronóstico de lluvia de la semana por departamento: para decidir labores, riego y qué día no llueve. Sale los lunes.\nIDEAM\nBoletín Agroclimático Nacional\nMENSUAL\nPredicción del trimestre que viene con recomendaciones por cultivo. Lo hace la Mesa Técnica Agroclimática (MADR + FAO + IDEAM).\nIDEAM · MADR · FAO\nPredicción climática · seguimiento ENSO\nMENSUAL\nLa fase oficial El Niño / La Niña / Neutral vigente y el pronóstico del mes. Es la fuente de verdad de \"qué viene\".\nIDEAM\n\nMESA TÉCNICA AGROCLIMÁTICA (MTA)\n\nReunión trimestral donde científicos, técnicos y campesinos leen juntos el pronóstico y sacan las medidas por cultivo para cada departamento. De ahí sale el Boletín Agroclimático de su región.\n\nBusque el Boletín Agroclimático de la Mesa Técnica Agroclimática de la región Andina: ahí está la ventana de siembra para su zona.\n\nVENTANA DE SIEMBRA · REGIÓN ANDINA\n\nAltiplano cundiboyacense (clima frío, bimodal andino)\n\nEl altiplano tiene dos temporadas de lluvia: la primera hacia marzo–mayo y la segunda hacia septiembre–noviembre. La siembra suele arrancar al comienzo de cada una.\n\nCon El Niño fortaleciéndose, la segunda temporada (sep–nov) puede llegar más tarde o más floja: conviene sembrar precoz y reservar agua.\n\nLa fecha exacta de siembra vigente para su zona la fija el Boletín MTA región Andina. Chagra no la inventa: se lee del boletín en vivo.\n\nAbrir el Boletín MTA región Andina (en vivo)\nLos boletines de la zona y cuándo salieron\n\nFuente: MADR · UPRA · IDEAM · FAO · Gobernación de Cundinamarca · Boletín agroclimático mensual + Boletín Semanal para el Sector Agrícola (BSA) del IDEAM, los lunes.\n\n🌽\nFenalce — agroclimatología\nSi siembra maíz, fríjol, soya, sorgo o arveja, Fenalce anticipa el clima a 3 meses por región y recomienda semilla, fecha de siembra y manejo del agua.\n¿Y en su finca?\nPregúntele al agente qué variedad y fecha le conviene con esta fase.\nVer el mundo del clima en 3D\n\nEl tiempo de su finca en tres miradas — hoy, la semana y la temporada. Números reales con su fuente; lo que no se sabe aún, se dice.",
+    "errores": {
+      "pageErrors": [],
+      "consoleErrors": [],
+      "requestFailures": []
+    }
+  },
+  "ca7": {
+    "coincidencias": []
+  },
+  "errores": {},
+  "ca5": {
+    "cadenasEnDom": []
+  },
+  "ca2": [
+    {
+      "estado": "despejado-dia",
+      "vista": "movil",
+      "root": {
+        "clima": "despejado",
+        "luz": "dia",
+        "enso": null,
+        "forzado": "1"
+      },
+      "html": {
+        "clima": "despejado",
+        "luz": "dia",
+        "enso": null
+      },
+      "ca-capa--nubes": 0,
+      "ca-cielo--nublado": 0,
+      "ca-capa--lluvia": 0,
+      "ca-capa--luci": 0,
+      "ca-capa--niebla": 0,
+      "ca-capa--estrellas": 0,
+      "ca-capa--polvo": 0.35,
+      "ca-rayos": 0.4,
+      "ca-jiron-ui": 0
+    },
+    {
+      "estado": "nublado-dia",
+      "vista": "movil",
+      "root": {
+        "clima": "nublado",
+        "luz": "dia",
+        "enso": null,
+        "forzado": "1"
+      },
+      "html": {
+        "clima": "nublado",
+        "luz": "dia",
+        "enso": null
+      },
+      "ca-capa--nubes": 1,
+      "ca-cielo--nublado": 1,
+      "ca-capa--lluvia": 0,
+      "ca-capa--luci": 0,
+      "ca-capa--niebla": 0,
+      "ca-capa--estrellas": 0,
+      "ca-capa--polvo": 0,
+      "ca-rayos": 0.22,
+      "ca-jiron-ui": 0
+    },
+    {
+      "estado": "nublado-noche",
+      "vista": "movil",
+      "root": {
+        "clima": "nublado",
+        "luz": "noche",
+        "enso": null,
+        "forzado": "1"
+      },
+      "html": {
+        "clima": "nublado",
+        "luz": "noche",
+        "enso": null
+      },
+      "ca-capa--nubes": 1,
+      "ca-cielo--nublado": 0,
+      "ca-capa--lluvia": 0,
+      "ca-capa--luci": 0.4,
+      "ca-capa--niebla": 0,
+      "ca-capa--estrellas": 0,
+      "ca-capa--polvo": 0,
+      "ca-rayos": 0,
+      "ca-jiron-ui": 0
+    }
+  ],
+  "ca3": [
+    {
+      "estado": "despejado-dia",
+      "vista": "movil",
+      "conteo": {
+        "cielos": 6,
+        "estrellas": 26,
+        "gotas": 30,
+        "bancos": 6,
+        "jirones": 4,
+        "motas": 16,
+        "luciernagas": 11,
+        "rayos": 6,
+        "montes": 3,
+        "frailejones": 4,
+        "hojas": 36,
+        "grades": 6,
+        "scrims": 2,
+        "vineta": 1,
+        "jironUI": 1,
+        "astro": 1,
+        "laderaLuz": 1,
+        "bruma": 1,
+        "suelo": 1,
+        "pasto": 1,
+        "nubes": 7,
+        "rotura": 1
+      }
+    },
+    {
+      "estado": "nublado-dia",
+      "vista": "movil",
+      "conteo": {
+        "cielos": 6,
+        "estrellas": 26,
+        "gotas": 30,
+        "bancos": 6,
+        "jirones": 4,
+        "motas": 16,
+        "luciernagas": 11,
+        "rayos": 6,
+        "montes": 3,
+        "frailejones": 4,
+        "hojas": 36,
+        "grades": 6,
+        "scrims": 2,
+        "vineta": 1,
+        "jironUI": 1,
+        "astro": 1,
+        "laderaLuz": 1,
+        "bruma": 1,
+        "suelo": 1,
+        "pasto": 1,
+        "nubes": 7,
+        "rotura": 1
+      }
+    },
+    {
+      "estado": "nublado-noche",
+      "vista": "movil",
+      "conteo": {
+        "cielos": 6,
+        "estrellas": 26,
+        "gotas": 30,
+        "bancos": 6,
+        "jirones": 4,
+        "motas": 16,
+        "luciernagas": 11,
+        "rayos": 6,
+        "montes": 3,
+        "frailejones": 4,
+        "hojas": 36,
+        "grades": 6,
+        "scrims": 2,
+        "vineta": 1,
+        "jironUI": 1,
+        "astro": 1,
+        "laderaLuz": 1,
+        "bruma": 1,
+        "suelo": 1,
+        "pasto": 1,
+        "nubes": 7,
+        "rotura": 1
+      }
+    }
+  ],
+  "ca6": {
+    "html": {
+      "clima": null,
+      "luz": "dia",
+      "enso": null
+    },
+    "root": {
+      "clima": null,
+      "luz": "dia",
+      "enso": null,
+      "forzado": null
+    },
+    "sinDato": "Aún no tengo el pronóstico de su finca.\n\nConfirme la ubicación de la finca para ver el clima con números reales.\n\npronóstico en camino",
+    "errores": {
+      "pageErrors": [],
+      "consoleErrors": [],
+      "requestFailures": []
+    }
+  },
+  "ca9": [
+    {
+      "estado": "despejado-dia",
+      "elemento": "clima-migaja",
+      "color": "rgba(18, 48, 66, 0.74)",
+      "ratioMedia": 7.35,
+      "ratioDecilAdverso": 5.94,
+      "muestras": 5430
+    },
+    {
+      "estado": "despejado-dia",
+      "elemento": "clima-saludo",
+      "color": "rgb(18, 48, 66)",
+      "ratioMedia": 7.55,
+      "ratioDecilAdverso": 6.08,
+      "muestras": 10498
+    },
+    {
+      "estado": "despejado-dia",
+      "elemento": "clima-temp",
+      "color": "rgb(18, 48, 66)",
+      "ratioMedia": 9.05,
+      "ratioDecilAdverso": 7.83,
+      "muestras": 19136
+    },
+    {
+      "estado": "despejado-dia",
+      "elemento": "clima-condicion",
+      "color": "rgba(18, 48, 66, 0.74)",
+      "ratioMedia": 7.42,
+      "ratioDecilAdverso": 7.14,
+      "muestras": 1311
+    },
+    {
+      "estado": "despejado-dia",
+      "elemento": "clima-se-siente",
+      "color": "rgba(18, 48, 66, 0.74)",
+      "ratioMedia": 8.81,
+      "ratioDecilAdverso": 8.04,
+      "muestras": 6578
+    },
+    {
+      "estado": "nublado-dia",
+      "elemento": "clima-migaja",
+      "color": "rgba(38, 52, 60, 0.74)",
+      "ratioMedia": 6.27,
+      "ratioDecilAdverso": 5.61,
+      "muestras": 5430
+    },
+    {
+      "estado": "nublado-dia",
+      "elemento": "clima-saludo",
+      "color": "rgb(38, 52, 60)",
+      "ratioMedia": 6.02,
+      "ratioDecilAdverso": 5.5,
+      "muestras": 10498
+    },
+    {
+      "estado": "nublado-dia",
+      "elemento": "clima-temp",
+      "color": "rgb(38, 52, 60)",
+      "ratioMedia": 6.46,
+      "ratioDecilAdverso": 5.56,
+      "muestras": 19136
+    },
+    {
+      "estado": "nublado-dia",
+      "elemento": "clima-condicion",
+      "color": "rgba(38, 52, 60, 0.74)",
+      "ratioMedia": 5.57,
+      "ratioDecilAdverso": 5.4,
+      "muestras": 1311
+    },
+    {
+      "estado": "nublado-dia",
+      "elemento": "clima-se-siente",
+      "color": "rgba(38, 52, 60, 0.74)",
+      "ratioMedia": 5.87,
+      "ratioDecilAdverso": 5.51,
+      "muestras": 6578
+    },
+    {
+      "estado": "nublado-noche",
+      "elemento": "clima-migaja",
+      "color": "rgba(230, 237, 250, 0.74)",
+      "ratioMedia": 14.21,
+      "ratioDecilAdverso": 13.08,
+      "muestras": 5430
+    },
+    {
+      "estado": "nublado-noche",
+      "elemento": "clima-saludo",
+      "color": "rgb(230, 237, 250)",
+      "ratioMedia": 14.32,
+      "ratioDecilAdverso": 13.16,
+      "muestras": 10498
+    },
+    {
+      "estado": "nublado-noche",
+      "elemento": "clima-temp",
+      "color": "rgb(230, 237, 250)",
+      "ratioMedia": 13.22,
+      "ratioDecilAdverso": 11.05,
+      "muestras": 19136
+    },
+    {
+      "estado": "nublado-noche",
+      "elemento": "clima-condicion",
+      "color": "rgba(230, 237, 250, 0.74)",
+      "ratioMedia": 14.41,
+      "ratioDecilAdverso": 14.22,
+      "muestras": 1311
+    },
+    {
+      "estado": "nublado-noche",
+      "elemento": "clima-se-siente",
+      "color": "rgba(230, 237, 250, 0.74)",
+      "ratioMedia": 14.66,
+      "ratioDecilAdverso": 14.03,
+      "muestras": 6578
+    }
+  ],
+  "reducedMotion": {
+    "animationName": [
+      "none",
+      "none",
+      "none",
+      "none",
+      "none"
+    ],
+    "errores": {
+      "pageErrors": [],
+      "consoleErrors": [
+        "Failed to load resource: the server responded with a status of 429 (Too Many Requests)",
+        "Failed to load resource: the server responded with a status of 429 (Too Many Requests)"
+      ],
+      "requestFailures": []
+    }
+  },
+  "ca1": {
+    "puertas": [
+      "Mis matas: abre sus siembras y cultivos",
+      "Mis animales: abre sus gallinas, cerdos y demás animales",
+      "El tiempo: abre el clima de hoy y los próximos días",
+      "Vender: abre precios, mercado y su despensa",
+      "Aprender: abre las lecciones y guías del campo",
+      "Toda mi finca: abre todos los mundos de su finca"
+    ],
+    "primera": {
+      "vh": 844,
+      "hash": "",
+      "migaja": {
+        "texto": "GUATAVITA · EL VOLADOR · 2 680 M S. N. M. · PISO FRÍO",
+        "top": 83,
+        "bottom": 97,
+        "visibleSinScroll": true
+      },
+      "condicion": {
+        "texto": "Nublado · niebla de piso frío",
+        "top": 138,
+        "bottom": 160,
+        "visibleSinScroll": true
+      },
+      "temp": {
+        "texto": "16°C",
+        "top": 216,
+        "bottom": 279,
+        "visibleSinScroll": true
+      },
+      "seSiente": {
+        "texto": "Se siente como 13 °C · máx. 17° · mín. 11°",
+        "top": 281,
+        "bottom": 302,
+        "visibleSinScroll": true
+      },
+      "lectura": {
+        "texto": "Niebla de piso frío con 61 % de humedad: la hoja amanece mojada, y cada hora de ",
+        "top": 344,
+        "bottom": 477,
+        "visibleSinScroll": true
+      },
+      "tabs": {
+        "texto": "Hoy\nAhora mismo",
+        "top": 629,
+        "bottom": 699,
+        "visibleSinScroll": true
+      }
+    },
+    "errores": {
+      "pageErrors": [],
+      "consoleErrors": [
+        "In HTML, %s cannot be a descendant of <%s>.\nThis will cause a hydration error.%s <button> button \n\n  ...\n    <App>\n      <Suspense>\n      <NetworkStatusBar>\n      <NetworkStatusBar>\n      <Suspense>\n      <Confetti>\n      <GpsFincaBanner>\n      <DataLossBanner>\n      <CriticalAlertBanner>\n      <Sus",
+        "<%s> cannot contain a nested %s.\nSee this log for the ancestor stack trace. button <button>",
+        "React does not recognize the `%s` prop on a DOM element. If you intentionally want it to appear in the DOM as a custom attribute, spell it as lowercase `%s` instead. If you accidentally passed it from a parent component, remove it from the DOM element. data-agt-capacidad-respiraOrgano data-agt-capac"
+      ],
+      "requestFailures": []
+    }
+  },
+  "ca11": {
+    "frameUrl": "http://localhost:5211/app/#/mockups/clima-atmosfera",
+    "dentro": {
+      "hash": "#/mockups/clima-atmosfera",
+      "root": {
+        "clima": "niebla",
+        "luz": "dia"
+      },
+      "temp": "16°C",
+      "sinDato": null
+    },
+    "errores": {
+      "pageErrors": [],
+      "consoleErrors": [
+        "Failed to load resource: the server responded with a status of 404 (Not Found)",
+        "Failed to load resource: the server responded with a status of 404 (Not Found)",
+        "Failed to load resource: the server responded with a status of 404 (Not Found)"
+      ],
+      "requestFailures": []
+    }
+  }
+}

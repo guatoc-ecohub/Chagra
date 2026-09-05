@@ -93,12 +93,12 @@ import {
     SeguimientoCards,
 } from './FincaCards';
 
-// PERF-1 (medido 2026-07): FincaVivaHero es dev-only (flag
-// VITE_FINCA_VIVA_HOME_PERFIL, ver fincaVivaHomeFlag.js) pero un import
-// estático la mete siempre en el chunk de DashboardLive — el home de TODO
-// operador en prod, la primera pantalla tras login. Lazy-load: en prod
-// (flag OFF, caso normal) su peso nunca se descarga; en dev, se paga una
-// sola vez al montar con la flag ON.
+// PERF-1 (medido 2026-07): FincaVivaHero va detrás de la flag
+// VITE_FINCA_VIVA_HOME_PERFIL (fincaVivaHomeFlag.js). Desde el go-live F2
+// (2026-07-05) deploy.yml, dev-deploy.yml y deploy-3d-guatoc.yml la sirven en
+// `true`: el hero ES el home de prod y dev (ver playwright.config.js). El
+// lazy-load se conserva para que, con la flag OFF, su peso no se descargue, y
+// con la flag ON se pague una sola vez al montar.
 const FincaVivaHero = lazy(() => import('./FincaVivaHero'));
 
 /**
