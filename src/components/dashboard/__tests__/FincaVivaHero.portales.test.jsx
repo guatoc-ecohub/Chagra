@@ -89,10 +89,13 @@ describe('FincaVivaHero — las 6 puertas llevan a su destino correcto', () => {
     expect(onNavigate).toHaveBeenCalledWith('mundo', { mundo: 'animales' });
   });
 
-  test('"El tiempo" abre su día en la finca (hoy_finca)', () => {
+  test('"El tiempo" abre la página del tiempo (clima_boletin), no hoy_finca', () => {
+    // spec 2026-09-06-unificar-2d-clima (D-7): la puerta que se llama como el
+    // clima lleva al clima en UN toque. `hoy_finca` sigue en «Toda mi finca».
     const { onNavigate } = renderHero();
     fireEvent.click(getPuerta('El tiempo'));
-    expect(onNavigate).toHaveBeenCalledWith('hoy_finca');
+    expect(onNavigate).toHaveBeenCalledWith('clima_boletin');
+    expect(onNavigate).not.toHaveBeenCalledWith('hoy_finca');
   });
 
   test('"Vender" abre el mercado', () => {

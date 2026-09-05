@@ -1,0 +1,1259 @@
+/* ═══════════════════════════════════════════════════════════════════════
+   ESCENA ATMOSFÉRICA de la página del tiempo — src/components/clima/
+
+   Origen: el mockup "El clima como atmósfera viva" (#/mockups/clima-atmosfera,
+   PR #2276). El JSX se destripó el 2026-08-12 (PR #2833) pero este CSS siguió
+   versionado; se MUEVE aquí y se REINDEXA (spec 2026-09-06-unificar-2d-clima,
+   D-2): el eje de estado ya no son los 5 chips del mockup
+   (soleado/lluvia/niebla/dorada/noche) sino el del servicio
+   (`atmosphereService.deriveAtmosphere`):
+
+     data-clima = despejado | nublado | lluvia | niebla   (o AUSENTE: sin dato)
+     data-luz   = amanecer | dia | atardecer | noche
+     data-enso  = nina | nino                             (neutral = sin attr)
+
+   Mapa de pieles (tabla cerrada del spec §5 D-2):
+     despejado × dia                → piel "soleado" del mockup
+     despejado × amanecer/atardecer → piel "dorada"
+     (cualquiera) × noche           → piel "noche" (+ fenómeno encima)
+     nublado × dia                  → piel NUEVA: nube-masa con panza y rotura
+     lluvia × cualquiera            → piel "lluvia" (+ nubes al 0.55, + noche)
+     niebla × cualquiera            → piel "niebla" (+ jirón sobre la UI)
+     SIN data-clima                 → solo modula la luz; no afirma fenómeno.
+
+   Patrón central (catálogo §13.17, re-tinte total por variables): UNA sola
+   geometría de escena y las pieles cambian ~45 tokens; todo lo que puede
+   interpolar (colores, sombras, transform, opacity) TRANSICIONA, y lo que no
+   interpola (gradientes de cielo y grades) vive en capas apiladas con
+   crossfade de opacity.
+
+   Reglas de la casa: solo transform/opacity animados; blur/filtros
+   ESTÁTICOS; cero JS por frame; prefers-reduced-motion = fotograma digno.
+   ═══════════════════════════════════════════════════════════════════════ */
+
+.ca-root {
+  /* duración del cambio de clima: lenta, como cambia el cielo de verdad */
+  --ca-lento: 1.8s;
+  --ca-curva: cubic-bezier(0.4, 0.1, 0.2, 1);
+  /* desenfoque del vidrio de las tarjetas (baja en pantallas táctiles, CA-8) */
+  --ca-blur: 12px;
+
+  /* ── Piel base = SIN DATO, de día. Un cielo lechoso que no afirma sol ni
+        nube: astro velado, sin god-rays, sin polvo. Sobre esta base las pieles
+        de abajo sobreescriben tokens. ── */
+  --ca-tinta: #1f3340;
+  --ca-tinta-suave: rgba(31, 51, 64, 0.74);
+  --ca-halo: 0 1px 2px rgba(255, 255, 255, 0.55), 0 0 14px rgba(255, 255, 255, 0.45);
+  --ca-monte1: #a4b9c1;
+  --ca-monte2: #7ea08f;
+  --ca-monte3: #5a836b;
+  --ca-suelo: #4b7757;
+  --ca-pasto: #3d6949;
+  --ca-tallo: #66573d;
+  --ca-hoja: #9db894;
+  --ca-sombra-largo: 0.8;
+  --ca-sombra-op: 0.16;
+  --ca-astro-x: 70vw;
+  --ca-astro-y: 12vh;
+  --ca-astro-s: 1;
+  --ca-astro-op: 0.5;
+  --ca-astro-color: #fbfbf4;
+  --ca-astro-glow: rgba(250, 250, 240, 0.35);
+  --ca-luna-op: 0;
+  --ca-rayo: #fff3c4;
+  --ca-rayos-op: 0;
+  --ca-ladera-op: 0.2;
+  --ca-bruma-color: #d9e2e3;
+  --ca-bruma-op: 0.4;
+  --ca-vineta-op: 0.18;
+  --ca-scrim-alto-color: rgba(240, 246, 248, 0.9);
+  --ca-scrim-bajo-color: rgba(236, 242, 244, 0.92);
+  --ca-scrim-alto-op: 0.35;
+  --ca-scrim-bajo-op: 0.4;
+  --ca-nube-lomo: #f4f6f6;
+  --ca-nube-cuerpo: #d3dadd;
+  --ca-nube-panza: #98a5ad;
+  --ca-rotura-luz: rgba(255, 255, 250, 0.9);
+  --ca-carta-bg: rgba(250, 252, 252, 0.5);
+  --ca-carta-borde: rgba(255, 255, 255, 0.4);
+  --ca-rim: rgba(255, 255, 255, 0.85);
+  --ca-carta-sombra: 0 10px 26px -14px rgba(15, 55, 75, 0.35);
+  --ca-barra-bg: rgba(255, 255, 255, 0.4);
+  /* acentos legibles sobre piel CLARA (≥4.5:1 contra el vidrio claro) */
+  --ca-ac-ambar: #92400e;
+  --ca-ac-cielo: #075985;
+  --ca-ac-verde: #065f46;
+  --ca-ac-rojo: #991b1b;
+  --ca-ac-naranja: #9a3412;
+  --ca-ac-suave-bg: rgba(20, 40, 50, 0.08);
+
+  position: relative;
+  min-height: 100%;
+  font-family: 'Nunito', 'Baloo 2', system-ui, sans-serif;
+  color: var(--ca-tinta);
+  transition: color var(--ca-lento) var(--ca-curva);
+  isolation: isolate;
+}
+
+/* ── Tokens por LUZ (funciona sin red: reloj + efemérides) ────────────── */
+
+/* Amanecer / atardecer sin fenómeno: la piel "dorada" del mockup. Los god-rays
+   y el polvo solo se encienden si el servicio afirma `despejado`. */
+.ca-root[data-luz='amanecer'],
+.ca-root[data-luz='atardecer'] {
+  --ca-tinta: #fff4e4;
+  --ca-tinta-suave: rgba(255, 244, 228, 0.78);
+  --ca-halo: 0 1px 2px rgba(40, 15, 30, 0.6), 0 0 16px rgba(40, 15, 30, 0.45);
+  --ca-monte1: #b08a86;
+  --ca-monte2: #7d5a68;
+  --ca-monte3: #533f55;
+  --ca-suelo: #4c3a50;
+  --ca-pasto: #3e3046;
+  --ca-tallo: #1f1a29;
+  --ca-hoja: #6b5a75;
+  --ca-sombra-largo: 2.8;
+  --ca-sombra-op: 0.45;
+  --ca-astro-x: 60vw;
+  --ca-astro-y: 46vh;
+  --ca-astro-s: 1.9;
+  --ca-astro-op: 0.85;
+  --ca-astro-color: #ffb347;
+  --ca-astro-glow: rgba(255, 150, 60, 0.6);
+  --ca-luna-op: 0;
+  --ca-rayo: #ffcf8a;
+  --ca-rayos-op: 0;
+  --ca-ladera-op: 0.8;
+  --ca-bruma-color: #e8b98a;
+  --ca-bruma-op: 0.4;
+  --ca-vineta-op: 0.34;
+  --ca-scrim-alto-color: rgba(30, 12, 28, 0.92);
+  --ca-scrim-bajo-color: rgba(30, 12, 28, 0.92);
+  --ca-scrim-alto-op: 0.5;
+  --ca-scrim-bajo-op: 0.55;
+  --ca-nube-lomo: #ffd9a8;
+  --ca-nube-cuerpo: #a6707a;
+  --ca-nube-panza: #4a2f4a;
+  --ca-rotura-luz: rgba(255, 214, 150, 0.95);
+  --ca-carta-bg: rgba(60, 30, 50, 0.42);
+  --ca-carta-borde: rgba(255, 226, 190, 0.28);
+  --ca-rim: rgba(255, 216, 150, 0.9);
+  --ca-carta-sombra: -22px 24px 34px -18px rgba(70, 30, 55, 0.5);
+  --ca-barra-bg: rgba(60, 30, 50, 0.35);
+  --ca-ac-ambar: #fcd34d;
+  --ca-ac-cielo: #bae6fd;
+  --ca-ac-verde: #a7f3d0;
+  --ca-ac-rojo: #fecaca;
+  --ca-ac-naranja: #fed7aa;
+  --ca-ac-suave-bg: rgba(255, 240, 220, 0.12);
+}
+
+/* Noche: la piel "noche" del mockup, para cualquier condición. */
+.ca-root[data-luz='noche'] {
+  --ca-tinta: #e6edfa;
+  --ca-tinta-suave: rgba(230, 237, 250, 0.74);
+  --ca-halo: 0 1px 2px rgba(0, 0, 10, 0.6), 0 0 16px rgba(0, 0, 10, 0.4);
+  --ca-monte1: #22304e;
+  --ca-monte2: #182441;
+  --ca-monte3: #101a30;
+  --ca-suelo: #0e1728;
+  --ca-pasto: #0a1220;
+  --ca-tallo: #0b1524;
+  --ca-hoja: #22344f;
+  --ca-sombra-largo: 0.7;
+  --ca-sombra-op: 0.2;
+  --ca-astro-x: 76vw;
+  --ca-astro-y: 9vh;
+  --ca-astro-s: 0.8;
+  --ca-astro-op: 1;
+  --ca-astro-color: #eef3ff;
+  --ca-astro-glow: rgba(190, 210, 255, 0.35);
+  --ca-luna-op: 1;
+  --ca-rayo: #eef3ff;
+  --ca-rayos-op: 0;
+  --ca-ladera-op: 0.14;
+  --ca-bruma-color: #16233c;
+  --ca-bruma-op: 0.5;
+  --ca-vineta-op: 0.5;
+  --ca-scrim-alto-color: rgba(6, 12, 18, 0.9);
+  --ca-scrim-bajo-color: rgba(6, 12, 18, 0.92);
+  --ca-scrim-alto-op: 0.3;
+  --ca-scrim-bajo-op: 0.55;
+  --ca-nube-lomo: #5a6a86;
+  --ca-nube-cuerpo: #2a3550;
+  --ca-nube-panza: #121a2c;
+  --ca-rotura-luz: rgba(200, 215, 255, 0.5);
+  --ca-carta-bg: rgba(10, 20, 40, 0.5);
+  --ca-carta-borde: rgba(120, 150, 210, 0.22);
+  --ca-rim: rgba(190, 215, 255, 0.38);
+  --ca-carta-sombra: 0 12px 30px -14px rgba(0, 0, 10, 0.65);
+  --ca-barra-bg: rgba(8, 16, 34, 0.5);
+  --ca-ac-ambar: #fcd34d;
+  --ca-ac-cielo: #7dd3fc;
+  --ca-ac-verde: #6ee7b7;
+  --ca-ac-rojo: #fca5a5;
+  --ca-ac-naranja: #fdba74;
+  --ca-ac-suave-bg: rgba(200, 220, 255, 0.1);
+}
+
+/* ── Tokens por CONDICIÓN (manda el servicio) ─────────────────────────── */
+
+/* DESPEJADO × día = "soleado": sol alto y blanco, god-rays, polvo tenue. */
+.ca-root[data-clima='despejado'][data-luz='dia'] {
+  --ca-tinta: #123042;
+  --ca-tinta-suave: rgba(18, 48, 66, 0.74);
+  --ca-monte1: #a9c4cf;
+  --ca-monte2: #7ba393;
+  --ca-monte3: #55836c;
+  --ca-suelo: #4a7a58;
+  --ca-pasto: #3c6a4a;
+  --ca-tallo: #6b5a3e;
+  --ca-hoja: #a3c29a;
+  --ca-sombra-largo: 1.15;
+  --ca-sombra-op: 0.32;
+  --ca-astro-op: 1;
+  --ca-astro-color: #fff3c4;
+  --ca-astro-glow: rgba(255, 226, 130, 0.55);
+  --ca-rayo: #fff3c4;
+  --ca-rayos-op: 0.4;
+  --ca-ladera-op: 0.45;
+  --ca-bruma-color: #dfe9ea;
+  --ca-bruma-op: 0.28;
+  --ca-vineta-op: 0.2;
+  --ca-scrim-alto-op: 0.22;
+  --ca-scrim-bajo-op: 0.36;
+  --ca-carta-bg: rgba(255, 255, 255, 0.48);
+  --ca-carta-borde: rgba(255, 255, 255, 0.35);
+  --ca-rim: rgba(255, 252, 235, 0.85);
+  --ca-carta-sombra: 0 10px 26px -14px rgba(15, 55, 75, 0.4);
+}
+/* DESPEJADO × amanecer/atardecer: la "dorada" plena (rayos y polvo al máximo). */
+.ca-root[data-clima='despejado'][data-luz='amanecer'],
+.ca-root[data-clima='despejado'][data-luz='atardecer'] {
+  --ca-astro-op: 1;
+  --ca-rayos-op: 0.75;
+}
+
+/* NUBLADO — piel NUEVA (decisión del operador 2026-09-05: nube-masa con panza
+   y rotura, no gris parejo). Luz plana, sol lechoso detrás del techo, una
+   rotura por donde se cuela luz; los montes siguen VERDES (verde-dominante):
+   en la montaña un día cubierto no vuelve gris el paisaje, solo la luz. */
+.ca-root[data-clima='nublado'] {
+  --ca-tinta: #26343c;
+  --ca-tinta-suave: rgba(38, 52, 60, 0.74);
+  --ca-halo: 0 1px 2px rgba(255, 255, 255, 0.6), 0 0 14px rgba(255, 255, 255, 0.5);
+  --ca-monte1: #9aafb3;
+  --ca-monte2: #7c988c;
+  --ca-monte3: #5c7d6d;
+  --ca-suelo: #4d7158;
+  --ca-pasto: #41634b;
+  --ca-tallo: #5e5442;
+  --ca-hoja: #9fb7a3;
+  --ca-sombra-largo: 0.45;
+  --ca-sombra-op: 0.12;
+  --ca-astro-x: 66vw;
+  --ca-astro-y: 10vh;
+  --ca-astro-s: 1.1;
+  --ca-astro-op: 0.6;
+  --ca-astro-color: #fbfcf6;
+  --ca-astro-glow: rgba(255, 252, 235, 0.55);
+  --ca-luna-op: 0;
+  --ca-rayo: #fff8e1;
+  --ca-rayos-op: 0.34;
+  --ca-ladera-op: 0;
+  --ca-bruma-color: #ccd5d8;
+  --ca-bruma-op: 0.55;
+  --ca-vineta-op: 0.22;
+  --ca-scrim-alto-color: rgba(238, 243, 244, 0.9);
+  --ca-scrim-bajo-color: rgba(232, 238, 240, 0.92);
+  --ca-scrim-alto-op: 0.3;
+  --ca-scrim-bajo-op: 0.42;
+  --ca-nube-lomo: #fbfcfc;
+  --ca-nube-cuerpo: #cbd4d8;
+  --ca-nube-panza: #76858f;
+  --ca-rotura-luz: rgba(255, 255, 250, 0.95);
+  --ca-carta-bg: rgba(246, 249, 249, 0.52);
+  --ca-carta-borde: rgba(255, 255, 255, 0.42);
+  --ca-rim: rgba(255, 255, 255, 0.8);
+  --ca-carta-sombra: 0 8px 22px -14px rgba(30, 45, 55, 0.35);
+  --ca-barra-bg: rgba(240, 244, 244, 0.45);
+  --ca-ac-ambar: #92400e;
+  --ca-ac-cielo: #075985;
+  --ca-ac-verde: #065f46;
+  --ca-ac-rojo: #991b1b;
+  --ca-ac-naranja: #9a3412;
+  --ca-ac-suave-bg: rgba(20, 40, 50, 0.08);
+}
+/* NUBLADO × amanecer/atardecer: el mismo techo, con el tinte cálido abajo y
+   la rotura ámbar (la luz baja entra por debajo de la nube). */
+.ca-root[data-clima='nublado'][data-luz='amanecer'],
+.ca-root[data-clima='nublado'][data-luz='atardecer'] {
+  --ca-tinta: #3a2030;
+  --ca-tinta-suave: rgba(58, 32, 48, 0.76);
+  --ca-halo: 0 1px 2px rgba(255, 236, 210, 0.6), 0 0 14px rgba(255, 236, 210, 0.5);
+  --ca-astro-x: 60vw;
+  --ca-astro-y: 42vh;
+  --ca-astro-s: 1.6;
+  --ca-astro-op: 0.5;
+  --ca-rotura-x: 60%;
+  --ca-rotura-y: 40%;
+  --ca-astro-color: #ffb347;
+  --ca-astro-glow: rgba(255, 150, 60, 0.45);
+  --ca-rayo: #ffcf8a;
+  --ca-rayos-op: 0.3;
+  --ca-ladera-op: 0.4;
+  --ca-bruma-color: #e0b48f;
+  --ca-bruma-op: 0.5;
+  --ca-nube-lomo: #ffe2bd;
+  --ca-nube-cuerpo: #c9a7a4;
+  --ca-nube-panza: #7c5a66;
+  --ca-rotura-luz: rgba(255, 205, 140, 0.95);
+  --ca-carta-bg: rgba(255, 240, 222, 0.48);
+  --ca-carta-borde: rgba(255, 226, 190, 0.36);
+  --ca-rim: rgba(255, 216, 150, 0.9);
+}
+/* NUBLADO × noche: techo oscuro sin estrellas; luciérnagas a media luz. */
+.ca-root[data-clima='nublado'][data-luz='noche'] {
+  --ca-tinta: #e6edfa;
+  --ca-tinta-suave: rgba(230, 237, 250, 0.74);
+  --ca-halo: 0 1px 2px rgba(0, 0, 10, 0.6), 0 0 16px rgba(0, 0, 10, 0.4);
+  --ca-monte1: #1f2b45;
+  --ca-monte2: #15203a;
+  --ca-monte3: #0e172b;
+  --ca-suelo: #0e1728;
+  --ca-pasto: #0a1220;
+  --ca-tallo: #0b1524;
+  --ca-hoja: #1f2f48;
+  --ca-sombra-op: 0.1;
+  --ca-astro-x: 76vw;
+  --ca-astro-y: 9vh;
+  --ca-astro-s: 0.8;
+  --ca-astro-op: 0.55;
+  --ca-astro-color: #eef3ff;
+  --ca-astro-glow: rgba(190, 210, 255, 0.25);
+  --ca-luna-op: 1;
+  --ca-rayos-op: 0;
+  --ca-ladera-op: 0;
+  --ca-bruma-color: #16233c;
+  --ca-bruma-op: 0.55;
+  --ca-vineta-op: 0.5;
+  --ca-scrim-alto-color: rgba(6, 12, 18, 0.9);
+  --ca-scrim-bajo-color: rgba(6, 12, 18, 0.92);
+  --ca-scrim-alto-op: 0.3;
+  --ca-scrim-bajo-op: 0.55;
+  --ca-nube-lomo: #56668a;
+  --ca-nube-cuerpo: #27334e;
+  --ca-nube-panza: #0f1626;
+  --ca-rotura-luz: rgba(200, 215, 255, 0.45);
+  --ca-carta-bg: rgba(10, 20, 40, 0.5);
+  --ca-carta-borde: rgba(120, 150, 210, 0.22);
+  --ca-rim: rgba(190, 215, 255, 0.38);
+  --ca-carta-sombra: 0 12px 30px -14px rgba(0, 0, 10, 0.65);
+  --ca-barra-bg: rgba(8, 16, 34, 0.5);
+  --ca-ac-ambar: #fcd34d;
+  --ca-ac-cielo: #7dd3fc;
+  --ca-ac-verde: #6ee7b7;
+  --ca-ac-rojo: #fca5a5;
+  --ca-ac-naranja: #fdba74;
+  --ca-ac-suave-bg: rgba(200, 220, 255, 0.1);
+}
+
+/* LLUVIA: la piel del mockup + la nube-masa oscura al 0.55 (el aguacero tiene
+   techo). Tinta clara sobre cielo plomizo. */
+.ca-root[data-clima='lluvia'] {
+  --ca-tinta: #f1f6f9;
+  --ca-tinta-suave: rgba(241, 246, 249, 0.78);
+  --ca-halo: 0 1px 2px rgba(10, 20, 28, 0.6), 0 0 16px rgba(10, 20, 28, 0.45);
+  --ca-monte1: #8695a0;
+  --ca-monte2: #677a83;
+  --ca-monte3: #4d5f64;
+  --ca-suelo: #47585a;
+  --ca-pasto: #3b4d4e;
+  --ca-tallo: #4d4a42;
+  --ca-hoja: #7f9a92;
+  --ca-sombra-largo: 0.6;
+  --ca-sombra-op: 0.1;
+  --ca-astro-x: 70vw;
+  --ca-astro-y: 10vh;
+  --ca-astro-s: 0.9;
+  --ca-astro-op: 0.12;
+  --ca-astro-color: #e8eef2;
+  --ca-astro-glow: rgba(210, 225, 235, 0.2);
+  --ca-luna-op: 0;
+  --ca-rayo: #e8eef2;
+  --ca-rayos-op: 0;
+  --ca-ladera-op: 0;
+  --ca-bruma-color: #9fadb4;
+  --ca-bruma-op: 0.55;
+  --ca-vineta-op: 0.34;
+  --ca-scrim-alto-color: rgba(6, 12, 18, 0.9);
+  --ca-scrim-bajo-color: rgba(6, 12, 18, 0.92);
+  --ca-scrim-alto-op: 0.42;
+  --ca-scrim-bajo-op: 0.5;
+  --ca-nube-lomo: #aab5bd;
+  --ca-nube-cuerpo: #6f7d87;
+  --ca-nube-panza: #3f4b54;
+  --ca-rotura-luz: rgba(200, 212, 220, 0.35);
+  --ca-carta-bg: rgba(22, 35, 43, 0.5);
+  --ca-carta-borde: rgba(200, 215, 225, 0.22);
+  --ca-rim: rgba(238, 246, 250, 0.4);
+  --ca-carta-sombra: 0 6px 16px -12px rgba(15, 25, 33, 0.45);
+  --ca-barra-bg: rgba(22, 35, 43, 0.45);
+  --ca-ac-ambar: #fcd34d;
+  --ca-ac-cielo: #bae6fd;
+  --ca-ac-verde: #a7f3d0;
+  --ca-ac-rojo: #fecaca;
+  --ca-ac-naranja: #fed7aa;
+  --ca-ac-suave-bg: rgba(220, 235, 245, 0.1);
+}
+.ca-root[data-clima='lluvia'][data-luz='noche'] {
+  --ca-monte1: #1c2740;
+  --ca-monte2: #141d34;
+  --ca-monte3: #0d1527;
+  --ca-suelo: #0e1728;
+  --ca-pasto: #0a1220;
+  --ca-astro-op: 0.2;
+  --ca-luna-op: 1;
+  --ca-bruma-color: #16233c;
+  --ca-nube-lomo: #4b5872;
+  --ca-nube-cuerpo: #232d45;
+  --ca-nube-panza: #0d1322;
+  --ca-carta-bg: rgba(10, 20, 40, 0.52);
+}
+
+/* NIEBLA: la piel del mockup (bancos + jirones + jirón sobre la UI). */
+.ca-root[data-clima='niebla'] {
+  --ca-tinta: #26363a;
+  --ca-tinta-suave: rgba(38, 54, 58, 0.74);
+  --ca-halo: 0 1px 2px rgba(255, 255, 255, 0.6), 0 0 14px rgba(255, 255, 255, 0.5);
+  --ca-monte1: #b9c6c9;
+  --ca-monte2: #a3b3b4;
+  --ca-monte3: #8ba09b;
+  --ca-suelo: #7e948a;
+  --ca-pasto: #6e8579;
+  --ca-tallo: #6f6a58;
+  --ca-hoja: #b7c9bd;
+  --ca-sombra-largo: 0.5;
+  --ca-sombra-op: 0.08;
+  --ca-astro-x: 68vw;
+  --ca-astro-y: 14vh;
+  --ca-astro-s: 1.05;
+  --ca-astro-op: 0.25;
+  --ca-astro-color: #f4f7f4;
+  --ca-astro-glow: rgba(240, 245, 240, 0.3);
+  --ca-luna-op: 0;
+  --ca-rayo: #f4f7f4;
+  --ca-rayos-op: 0;
+  --ca-ladera-op: 0;
+  --ca-bruma-color: #dfe6e3;
+  --ca-bruma-op: 0.92;
+  --ca-vineta-op: 0.16;
+  --ca-scrim-alto-color: rgba(240, 245, 243, 0.9);
+  --ca-scrim-bajo-color: rgba(236, 242, 240, 0.92);
+  --ca-scrim-alto-op: 0.3;
+  --ca-scrim-bajo-op: 0.4;
+  --ca-carta-bg: rgba(240, 245, 242, 0.5);
+  --ca-carta-borde: rgba(250, 253, 251, 0.4);
+  --ca-rim: rgba(255, 255, 255, 0.75);
+  --ca-carta-sombra: 0 5px 14px -12px rgba(40, 55, 55, 0.28);
+  --ca-barra-bg: rgba(238, 243, 240, 0.45);
+  --ca-ac-ambar: #92400e;
+  --ca-ac-cielo: #075985;
+  --ca-ac-verde: #065f46;
+  --ca-ac-rojo: #991b1b;
+  --ca-ac-naranja: #9a3412;
+  --ca-ac-suave-bg: rgba(20, 40, 50, 0.08);
+}
+.ca-root[data-clima='niebla'][data-luz='noche'] {
+  --ca-tinta: #e6edfa;
+  --ca-tinta-suave: rgba(230, 237, 250, 0.74);
+  --ca-halo: 0 1px 2px rgba(0, 0, 10, 0.6), 0 0 16px rgba(0, 0, 10, 0.4);
+  --ca-monte1: #3a4a62;
+  --ca-monte2: #2b3a52;
+  --ca-monte3: #1f2c42;
+  --ca-suelo: #1a2536;
+  --ca-pasto: #141d2c;
+  --ca-tallo: #0b1524;
+  --ca-hoja: #3d5068;
+  --ca-astro-op: 0.35;
+  --ca-luna-op: 1;
+  --ca-bruma-color: #3a4a62;
+  --ca-bruma-op: 0.8;
+  --ca-scrim-alto-color: rgba(6, 12, 18, 0.9);
+  --ca-scrim-bajo-color: rgba(6, 12, 18, 0.92);
+  --ca-scrim-alto-op: 0.3;
+  --ca-scrim-bajo-op: 0.5;
+  --ca-carta-bg: rgba(20, 30, 50, 0.5);
+  --ca-carta-borde: rgba(160, 180, 220, 0.22);
+  --ca-rim: rgba(200, 220, 255, 0.4);
+  --ca-carta-sombra: 0 12px 30px -14px rgba(0, 0, 10, 0.65);
+  --ca-barra-bg: rgba(8, 16, 34, 0.5);
+  --ca-ac-ambar: #fcd34d;
+  --ca-ac-cielo: #7dd3fc;
+  --ca-ac-verde: #6ee7b7;
+  --ca-ac-rojo: #fca5a5;
+  --ca-ac-naranja: #fdba74;
+  --ca-ac-suave-bg: rgba(200, 220, 255, 0.1);
+}
+
+/* ── Escena ─────────────────────────────────────────────────────────── */
+
+/* Cuña pegajosa: la escena se queda quieta detrás mientras el contenido hace
+   scroll (dentro del <main> del shell, sin tapar la barra superior). La altura
+   real del scrollport la escribe el componente en --ca-alto (una medición al
+   montar + resize; cero JS por frame). */
+.ca-escena-fija {
+  position: sticky;
+  top: 0;
+  height: 0;
+  z-index: 0;
+}
+.ca-escena {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: var(--ca-alto, 100dvh);
+  overflow: hidden;
+  pointer-events: none;
+}
+.ca-contenido {
+  position: relative;
+  z-index: 1;
+}
+
+/* Cielos apilados: crossfade (los gradientes no interpolan) */
+.ca-cielo {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  transition: opacity var(--ca-lento) var(--ca-curva);
+}
+.ca-cielo--despejado { background: linear-gradient(to bottom, #4fa8d8, #a8dcec 55%, #eef7ef); }
+.ca-cielo--nublado { background: linear-gradient(to bottom, #8c98a4, #b6c0c7 48%, #d9dfe2 80%, #e8ecec); }
+.ca-cielo--lluvia { background: linear-gradient(to bottom, #55636f, #7d8c96 55%, #9fabb1); }
+.ca-cielo--niebla { background: linear-gradient(to bottom, #b6c3c8, #cfd8d8 50%, #e4e8e5); }
+.ca-cielo--dorada { background: linear-gradient(to bottom, #3a2b52, #a34b3c 42%, #f0913f 68%, #ffd794); }
+.ca-cielo--noche { background: linear-gradient(to bottom, #050a19, #0d1730 55%, #1a2947); }
+
+/* Qué cielo se ve (tabla D-2). Sin dato de día: despejado + nublado al 0.55 =
+   cielo lechoso que no afirma nada. */
+.ca-root:not([data-luz]) .ca-cielo--despejado,
+.ca-root:not([data-clima])[data-luz='dia'] .ca-cielo--despejado,
+.ca-root[data-clima='despejado'][data-luz='dia'] .ca-cielo--despejado { opacity: 1; }
+.ca-root:not([data-luz]) .ca-cielo--nublado,
+.ca-root:not([data-clima])[data-luz='dia'] .ca-cielo--nublado { opacity: 0.55; }
+.ca-root:not([data-clima])[data-luz='amanecer'] .ca-cielo--dorada,
+.ca-root:not([data-clima])[data-luz='atardecer'] .ca-cielo--dorada,
+.ca-root[data-clima='despejado'][data-luz='amanecer'] .ca-cielo--dorada,
+.ca-root[data-clima='despejado'][data-luz='atardecer'] .ca-cielo--dorada { opacity: 1; }
+.ca-root[data-clima='nublado']:not([data-luz='noche']) .ca-cielo--nublado { opacity: 1; }
+.ca-root[data-clima='lluvia']:not([data-luz='noche']) .ca-cielo--lluvia { opacity: 1; }
+.ca-root[data-clima='niebla']:not([data-luz='noche']) .ca-cielo--niebla { opacity: 1; }
+.ca-root[data-luz='noche'] .ca-cielo--noche { opacity: 1; }
+
+/* Estrellas: titilan solo de noche y solo si el cielo no está tapado */
+.ca-capa { position: absolute; inset: 0; opacity: 0; transition: opacity var(--ca-lento) var(--ca-curva); }
+.ca-capa--estrellas { z-index: 1; }
+.ca-root[data-luz='noche']:not([data-clima='nublado']):not([data-clima='lluvia']):not([data-clima='niebla']) .ca-capa--estrellas { opacity: 1; }
+.ca-root:not([data-clima])[data-luz='noche'] .ca-capa--estrellas { opacity: 0.6; }
+.ca-estrella {
+  position: absolute;
+  border-radius: 50%;
+  background: #eef3ff;
+  animation: ca-titila 3s ease-in-out infinite alternate;
+  animation-play-state: paused;
+}
+.ca-root[data-luz='noche'] .ca-estrella { animation-play-state: running; }
+@keyframes ca-titila {
+  from { opacity: 0.25; }
+  to { opacity: 1; }
+}
+
+/* Astro: un solo disco que viaja, cambia de color y se vuelve luna.
+   Sol alto y blanco al mediodía; bajo, grande y ámbar en la hora dorada;
+   velado tras la lluvia; disco lechoso en la niebla; luna fría de noche. */
+.ca-astro {
+  position: absolute;
+  left: 0;
+  top: 0;
+  z-index: 2;
+  width: 72px;
+  height: 72px;
+  transform: translate3d(var(--ca-astro-x), var(--ca-astro-y), 0) scale(var(--ca-astro-s));
+  opacity: var(--ca-astro-op);
+  transition: transform var(--ca-lento) var(--ca-curva), opacity var(--ca-lento) var(--ca-curva);
+}
+.ca-astro-disco {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: var(--ca-astro-color);
+  box-shadow: 0 0 58px 26px var(--ca-astro-glow);
+  transition: background-color var(--ca-lento) var(--ca-curva), box-shadow var(--ca-lento) var(--ca-curva);
+}
+/* mordisco de luna creciente: disco oscuro que solo aparece de noche */
+.ca-astro-crater {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: #0b1428;
+  transform: translate(26%, -12%) scale(0.88);
+  opacity: var(--ca-luna-op);
+  transition: opacity var(--ca-lento) var(--ca-curva);
+}
+
+/* God-rays: abanico anclado al astro, respiración lenta (catálogo #6) */
+.ca-rayos {
+  position: absolute;
+  left: 0;
+  top: 0;
+  z-index: 2;
+  width: 300px;
+  height: 300px;
+  overflow: visible;
+  transform: translate3d(calc(var(--ca-astro-x) - 114px), calc(var(--ca-astro-y) - 114px), 0);
+  opacity: var(--ca-rayos-op);
+  transition: transform var(--ca-lento) var(--ca-curva), opacity var(--ca-lento) var(--ca-curva);
+}
+.ca-rayos-giro {
+  transform-origin: 100px 100px;
+  animation: ca-respira 9s ease-in-out infinite alternate;
+  animation-play-state: paused;
+}
+.ca-root[data-clima='despejado'] .ca-rayos-giro,
+.ca-root[data-clima='nublado']:not([data-luz='noche']) .ca-rayos-giro { animation-play-state: running; }
+@keyframes ca-respira {
+  from { transform: scale(0.96) rotate(-2deg); opacity: 0.7; }
+  to { transform: scale(1.05) rotate(2deg); opacity: 1; }
+}
+
+/* ── NUBE-MASA (piel nublado; también techo del aguacero) ──
+   Cada masa es UN span con dos gradientes (lomo iluminado arriba + cuerpo que
+   se oscurece hacia la panza) recortado por una máscara radial suave: masa,
+   no polígono (DIRECCION-ARTE-CLIMA §2.8). Las masas se solapan y forman
+   lóbulos; entre los dos techos queda la ROTURA, por donde asoma la luz
+   (`.ca-nube-rotura`, un solo gradiente radial). Solo transform animado. */
+.ca-capa--nubes { z-index: 2; }
+.ca-root[data-clima='nublado'] .ca-capa--nubes { opacity: 1; }
+.ca-root[data-clima='lluvia'] .ca-capa--nubes { opacity: 0.55; }
+.ca-nube-rotura {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse 28% 20% at var(--ca-rotura-x, 66%) var(--ca-rotura-y, 12%), var(--ca-rotura-luz) 0%, transparent 70%);
+  transition: background var(--ca-lento) var(--ca-curva);
+}
+.ca-nube {
+  position: absolute;
+  border-radius: 50%;
+  background:
+    radial-gradient(ellipse 62% 44% at 46% 18%, var(--ca-nube-lomo) 0%, rgba(255, 255, 255, 0) 70%),
+    radial-gradient(ellipse 40% 30% at 74% 30%, var(--ca-nube-lomo) 0%, rgba(255, 255, 255, 0) 70%),
+    linear-gradient(to bottom, var(--ca-nube-cuerpo) 0%, var(--ca-nube-cuerpo) 38%, var(--ca-nube-panza) 88%, var(--ca-nube-panza) 100%);
+  /* Dos máscaras que se INTERSECAN: la radial da el lomo redondo y el borde
+     deshilachado; la lineal corta la base casi plana (el cúmulo asienta sobre
+     el nivel de condensación, no es una esfera). */
+  -webkit-mask-image: radial-gradient(ellipse 52% 56% at 50% 44%, #000 52%, transparent 76%), linear-gradient(to bottom, #000 0%, #000 74%, transparent 90%);
+  -webkit-mask-composite: source-in;
+  mask-image: radial-gradient(ellipse 52% 56% at 50% 44%, #000 52%, transparent 76%), linear-gradient(to bottom, #000 0%, #000 74%, transparent 90%);
+  mask-composite: intersect;
+  animation: ca-nube-deriva 50s ease-in-out infinite alternate;
+  animation-play-state: paused;
+  transition: background var(--ca-lento) var(--ca-curva);
+  will-change: transform;
+}
+.ca-root[data-clima='nublado'] .ca-nube,
+.ca-root[data-clima='lluvia'] .ca-nube { animation-play-state: running; }
+@keyframes ca-nube-deriva {
+  from { transform: translateX(-1.6vw); }
+  to { transform: translateX(1.6vw); }
+}
+
+/* Cordillera: 3 planos con perspectiva aérea — el fill transiciona porque
+   la propiedad usa tokens y `transition: fill` interpola el valor computado */
+.ca-cordillera {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 12vh;
+  z-index: 3;
+  width: 100%;
+  height: 48vh;
+}
+.ca-monte { transition: fill var(--ca-lento) var(--ca-curva); }
+.ca-monte--1 { fill: var(--ca-monte1); }
+.ca-monte--2 { fill: var(--ca-monte2); }
+.ca-monte--3 { fill: var(--ca-monte3); }
+
+/* Luz direccional de ladera (catálogo #7): la cara que mira al astro
+   recibe un lavado cálido; desaparece bajo lluvia y niebla */
+.ca-ladera-luz {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 62vh;
+  z-index: 4;
+  background: linear-gradient(to left, rgba(255, 236, 190, 0.4), transparent 58%);
+  opacity: var(--ca-ladera-op);
+  transition: opacity var(--ca-lento) var(--ca-curva);
+}
+
+/* Banda de bruma (perspectiva aérea, catálogo #8): color sólido que SÍ
+   transiciona + máscara estática que la desvanece hacia arriba */
+.ca-bruma {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 8vh;
+  height: 40vh;
+  z-index: 4;
+  background-color: var(--ca-bruma-color);
+  -webkit-mask-image: linear-gradient(to top, rgba(0, 0, 0, 0.95) 25%, transparent);
+  mask-image: linear-gradient(to top, rgba(0, 0, 0, 0.95) 25%, transparent);
+  opacity: var(--ca-bruma-op);
+  transition: background-color var(--ca-lento) var(--ca-curva), opacity var(--ca-lento) var(--ca-curva);
+}
+
+/* Primer plano: suelo de páramo + frailejones */
+.ca-frente {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 5;
+  width: 100%;
+  height: 26vh;
+  min-height: 150px;
+}
+.ca-suelo { fill: var(--ca-suelo); transition: fill var(--ca-lento) var(--ca-curva); }
+.ca-pasto { fill: var(--ca-pasto); transition: fill var(--ca-lento) var(--ca-curva); }
+.ca-tallo { fill: var(--ca-tallo); transition: fill var(--ca-lento) var(--ca-curva); }
+.ca-hoja { fill: var(--ca-hoja); transition: fill var(--ca-lento) var(--ca-curva); }
+.ca-cicatriz {
+  fill: none;
+  stroke: rgba(10, 16, 12, 0.35);
+  stroke-width: 1;
+}
+/* Sombra proyectada VIVA: se alarga hacia el lado contrario del astro en la
+   hora dorada, casi desaparece bajo niebla, tenue bajo la luna */
+.ca-sombra-planta {
+  fill: #0b1610;
+  transform-box: fill-box;
+  transform-origin: 85% 50%;
+  transform: scaleX(var(--ca-sombra-largo));
+  opacity: var(--ca-sombra-op);
+  transition: transform var(--ca-lento) var(--ca-curva), opacity var(--ca-lento) var(--ca-curva);
+}
+
+/* ── Lluvia: cortina de trazos inclinada por el viento ── */
+.ca-capa--lluvia {
+  z-index: 6;
+  transform: rotate(9deg) scale(1.15);
+}
+.ca-root[data-clima='lluvia'] .ca-capa--lluvia { opacity: 1; }
+.ca-gota {
+  position: absolute;
+  top: -16vh;
+  width: 1.5px;
+  height: 13vh;
+  background: linear-gradient(to bottom, transparent, rgba(214, 230, 250, 0.85));
+  animation: ca-cae 0.7s linear infinite;
+  animation-play-state: paused;
+}
+.ca-root[data-clima='lluvia'] .ca-gota { animation-play-state: running; }
+@keyframes ca-cae {
+  from { transform: translateY(0); }
+  to { transform: translateY(135vh); }
+}
+
+/* ── Niebla volumétrica (catálogo #4): bancos que derivan + jirones finos
+      en dirección CONTRARIA — la textura deshilachada real ── */
+.ca-capa--niebla { z-index: 6; }
+.ca-root[data-clima='niebla'] .ca-capa--niebla { opacity: 1; }
+/* bajo la lluvia queda una bruma residual entre los montes */
+.ca-root[data-clima='lluvia'] .ca-capa--niebla { opacity: 0.3; }
+.ca-banco {
+  position: absolute;
+  left: 50%;
+  height: 24vh;
+  background: radial-gradient(closest-side, rgba(233, 240, 237, 0.9), transparent 72%);
+  animation: ca-deriva 50s ease-in-out infinite alternate;
+  animation-play-state: paused;
+}
+.ca-jiron {
+  position: absolute;
+  left: 50%;
+  width: 150vw;
+  height: 3.5vh;
+  background: linear-gradient(to right, transparent, rgba(240, 246, 243, 0.75) 30%, rgba(240, 246, 243, 0.5) 60%, transparent);
+  animation: ca-contraderiva 38s ease-in-out infinite alternate;
+  animation-play-state: paused;
+  opacity: 0.7;
+}
+.ca-root[data-clima='niebla'] .ca-banco,
+.ca-root[data-clima='niebla'] .ca-jiron,
+.ca-root[data-clima='lluvia'] .ca-banco { animation-play-state: running; }
+@keyframes ca-deriva {
+  from { transform: translateX(-58%); }
+  to { transform: translateX(-42%); }
+}
+@keyframes ca-contraderiva {
+  from { transform: translateX(-42%) scaleY(1); }
+  to { transform: translateX(-58%) scaleY(1.4); }
+}
+
+/* ── Polvo dorado en suspensión: pleno en la hora dorada, tenue al sol ── */
+.ca-capa--polvo { z-index: 6; }
+.ca-root[data-clima='despejado'][data-luz='amanecer'] .ca-capa--polvo,
+.ca-root[data-clima='despejado'][data-luz='atardecer'] .ca-capa--polvo { opacity: 1; }
+.ca-root[data-clima='despejado'][data-luz='dia'] .ca-capa--polvo { opacity: 0.35; }
+.ca-mota {
+  position: absolute;
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  background: #ffd98a;
+  box-shadow: 0 0 6px 1px rgba(255, 205, 120, 0.7);
+  animation: ca-flota 9s ease-in-out infinite alternate;
+  animation-play-state: paused;
+}
+.ca-root[data-clima='despejado']:not([data-luz='noche']) .ca-mota { animation-play-state: running; }
+@keyframes ca-flota {
+  0% { translate: 0 0; opacity: 0.15; }
+  35% { opacity: 0.9; }
+  70% { opacity: 0.35; }
+  100% { translate: -14px -22px; opacity: 0.8; }
+}
+
+/* ── Luciérnagas (catálogo #14): derivan y parpadean, glow estático ── */
+.ca-capa--luci { z-index: 6; }
+.ca-root[data-luz='noche'] .ca-capa--luci { opacity: 1; }
+.ca-root[data-clima='nublado'][data-luz='noche'] .ca-capa--luci { opacity: 0.4; }
+.ca-root[data-clima='niebla'][data-luz='noche'] .ca-capa--luci { opacity: 0.3; }
+.ca-root[data-clima='lluvia'][data-luz='noche'] .ca-capa--luci { opacity: 0; }
+.ca-luci {
+  position: absolute;
+  animation: ca-ronda 10s ease-in-out infinite alternate;
+  animation-play-state: paused;
+}
+.ca-luci i {
+  display: block;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: #d9f76a;
+  box-shadow: 0 0 9px 2px rgba(217, 247, 106, 0.8);
+  animation: ca-parpadea 3s ease-in-out infinite;
+  animation-play-state: paused;
+}
+.ca-root[data-luz='noche']:not([data-clima='lluvia']) .ca-luci,
+.ca-root[data-luz='noche']:not([data-clima='lluvia']) .ca-luci i { animation-play-state: running; }
+@keyframes ca-ronda {
+  0% { transform: translate(0, 0); }
+  40% { transform: translate(22px, -16px); }
+  100% { transform: translate(-14px, 10px); }
+}
+@keyframes ca-parpadea {
+  0%, 100% { opacity: 0; }
+  12%, 30% { opacity: 1; }
+  45% { opacity: 0.1; }
+}
+
+/* ── Grades de luz por estado (catálogo #2): planos fijos, crossfade ── */
+.ca-grade {
+  position: absolute;
+  inset: 0;
+  z-index: 7;
+  opacity: 0;
+  transition: opacity var(--ca-lento) var(--ca-curva);
+}
+.ca-grade--despejado { background: radial-gradient(ellipse at 74% 8%, rgba(255, 248, 214, 0.5), transparent 55%); }
+.ca-grade--nublado { background: linear-gradient(to bottom, rgba(150, 162, 172, 0.34), rgba(196, 205, 210, 0.3)); }
+.ca-grade--lluvia { background: linear-gradient(to bottom, rgba(70, 85, 98, 0.35), rgba(52, 66, 76, 0.3)); }
+.ca-grade--niebla { background: linear-gradient(to bottom, rgba(226, 232, 229, 0.4), rgba(214, 222, 218, 0.45)); }
+.ca-grade--dorada { background: linear-gradient(200deg, rgba(90, 50, 120, 0.28), rgba(255, 140, 50, 0.34) 60%, rgba(255, 190, 100, 0.4)); }
+.ca-grade--noche { background: linear-gradient(to bottom, rgba(4, 8, 22, 0.42), rgba(8, 14, 32, 0.36)); }
+.ca-root[data-clima='despejado'][data-luz='dia'] .ca-grade--despejado { opacity: 1; }
+.ca-root:not([data-clima])[data-luz='amanecer'] .ca-grade--dorada,
+.ca-root:not([data-clima])[data-luz='atardecer'] .ca-grade--dorada,
+.ca-root[data-clima='despejado'][data-luz='amanecer'] .ca-grade--dorada,
+.ca-root[data-clima='despejado'][data-luz='atardecer'] .ca-grade--dorada { opacity: 1; }
+/* nublado al amanecer/atardecer: el tinte cálido bajo entra por el grade dorada */
+.ca-root[data-clima='nublado'][data-luz='amanecer'] .ca-grade--dorada,
+.ca-root[data-clima='nublado'][data-luz='atardecer'] .ca-grade--dorada { opacity: 0.45; }
+.ca-root[data-clima='nublado']:not([data-luz='noche']) .ca-grade--nublado { opacity: 1; }
+.ca-root[data-clima='lluvia']:not([data-luz='noche']) .ca-grade--lluvia { opacity: 1; }
+.ca-root[data-clima='niebla']:not([data-luz='noche']) .ca-grade--niebla { opacity: 1; }
+.ca-root[data-luz='noche'] .ca-grade--noche { opacity: 1; }
+/* de noche el fenómeno se siente encima de la veladura nocturna */
+.ca-root[data-clima='lluvia'][data-luz='noche'] .ca-grade--lluvia { opacity: 0.6; }
+.ca-root[data-clima='niebla'][data-luz='noche'] .ca-grade--niebla { opacity: 0.35; }
+.ca-root[data-clima='nublado'][data-luz='noche'] .ca-grade--nublado { opacity: 0.4; }
+
+/* ── Viñeta + scrims de cine (catálogo #5) ── */
+.ca-vineta {
+  position: absolute;
+  inset: 0;
+  z-index: 8;
+  background: radial-gradient(ellipse at 50% 42%, transparent 52%, rgba(5, 10, 16, 0.85));
+  opacity: var(--ca-vineta-op);
+  transition: opacity var(--ca-lento) var(--ca-curva);
+}
+/* El color del scrim es por piel: oscuro bajo tinta clara (noche, lluvia,
+   dorada), CLARO bajo tinta oscura (soleado, nublado, niebla) — el scrim
+   siempre empuja el fondo hacia el lado contrario del texto. Es lo que
+   sostiene los 4,5:1 de CA-9 sin cajas. */
+.ca-scrim {
+  position: absolute;
+  left: 0;
+  right: 0;
+  z-index: 8;
+  transition: opacity var(--ca-lento) var(--ca-curva), background var(--ca-lento) var(--ca-curva);
+}
+.ca-scrim--alto {
+  top: 0;
+  height: 56vh;
+  background: linear-gradient(to bottom, var(--ca-scrim-alto-color), transparent);
+  opacity: var(--ca-scrim-alto-op);
+}
+.ca-scrim--bajo {
+  bottom: 0;
+  height: 42vh;
+  background: linear-gradient(to top, var(--ca-scrim-bajo-color), transparent);
+  opacity: var(--ca-scrim-bajo-op);
+}
+
+/* ── UI: la interfaz también recibe el clima ────────────────────────── */
+
+.ca-cabecera {
+  position: relative;
+  padding: 14px 18px 0;
+  text-shadow: var(--ca-halo);
+}
+.ca-migaja {
+  margin: 0 0 6px;
+  font-size: 0.66rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ca-tinta-suave);
+  transition: color var(--ca-lento) var(--ca-curva);
+  line-height: 1.5;
+}
+.ca-saludo {
+  margin: 0;
+  font-family: 'Baloo 2', 'Nunito', system-ui, sans-serif;
+  font-size: clamp(1.7rem, 7vw, 2.6rem);
+  line-height: 1.04;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+  color: var(--ca-tinta);
+}
+.ca-hora {
+  margin: 6px 0 0;
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: var(--ca-tinta-suave);
+  transition: color var(--ca-lento) var(--ca-curva);
+}
+.ca-cielo-texto {
+  display: inline-block;
+  animation: ca-entra 0.9s var(--ca-curva) both;
+}
+@keyframes ca-entra {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.ca-enso {
+  margin-top: 10px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  text-shadow: none;
+}
+.ca-enso-mini {
+  width: 54px;
+  height: 30px;
+  display: inline-flex;
+  align-items: center;
+  border-radius: 10px;
+  overflow: hidden;
+  background: var(--ca-carta-bg);
+  border: 1px solid var(--ca-carta-borde);
+}
+.ca-enso-mini svg { width: 100%; height: 100%; max-height: none; }
+.ca-enso-texto {
+  font-size: 0.7rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ca-tinta);
+}
+
+/* La cifra grande: lo primero que busca el campesino. Sin caja. */
+.ca-cifra-grande {
+  position: relative;
+  padding: 10px 18px 0;
+  display: grid;
+  grid-template-columns: auto 1fr;
+  column-gap: 14px;
+  align-items: center;
+  text-shadow: var(--ca-halo);
+}
+.ca-cifra-emoji {
+  font-size: clamp(2.6rem, 11vw, 4rem);
+  line-height: 1;
+  text-shadow: 0 6px 18px rgba(0, 0, 0, 0.25);
+}
+.ca-cifra-temp {
+  margin: 0;
+  font-family: 'Baloo 2', 'Nunito', system-ui, sans-serif;
+  font-size: clamp(3.4rem, 17vw, 5.6rem);
+  line-height: 0.95;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: var(--ca-tinta);
+}
+.ca-cifra-temp small {
+  font-size: 0.42em;
+  font-weight: 800;
+  vertical-align: top;
+  margin-left: 2px;
+  color: var(--ca-tinta-suave);
+}
+.ca-cifra-sub {
+  margin: 2px 0 0;
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--ca-tinta-suave);
+}
+.ca-cifra-fuente {
+  margin: 4px 0 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.66rem;
+  font-weight: 700;
+  color: var(--ca-tinta-suave);
+}
+.ca-refrescar {
+  appearance: none;
+  border: 1px solid var(--ca-carta-borde);
+  background: var(--ca-carta-bg);
+  color: var(--ca-tinta);
+  width: 28px;
+  height: 28px;
+  border-radius: 999px;
+  display: inline-grid;
+  place-items: center;
+  cursor: pointer;
+  vertical-align: middle;
+}
+/* La lectura del cielo: una frase que ENSEÑA la causa (diseñador instruccional),
+   derivada del dato real. */
+.ca-lectura {
+  position: relative;
+  margin: 10px 18px 0;
+  padding: 10px 12px;
+  border-radius: 14px;
+  background: var(--ca-carta-bg);
+  border: 1px solid var(--ca-carta-borde);
+  border-left: 4px solid var(--ca-ac-cielo);
+  font-size: 0.86rem;
+  line-height: 1.4;
+  font-weight: 600;
+  color: var(--ca-tinta);
+  -webkit-backdrop-filter: blur(var(--ca-blur)) saturate(1.15);
+  backdrop-filter: blur(var(--ca-blur)) saturate(1.15);
+}
+.ca-lectura-fuente {
+  display: block;
+  margin-top: 4px;
+  font-size: 0.66rem;
+  font-weight: 700;
+  color: var(--ca-tinta-suave);
+}
+
+/* Banda de HELADA (D-3): alerta prominente sobre la escena, no una piel. */
+.ca-helada {
+  position: relative;
+  margin: 10px 18px 0;
+  padding: 10px 12px;
+  border-radius: 14px;
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  background: rgba(186, 230, 253, 0.28);
+  border: 1px solid rgba(125, 211, 252, 0.6);
+  border-left: 4px solid #0369a1;
+  color: var(--ca-tinta);
+  -webkit-backdrop-filter: blur(var(--ca-blur));
+  backdrop-filter: blur(var(--ca-blur));
+}
+.ca-root[data-luz='noche'] .ca-helada,
+.ca-root[data-clima='lluvia'] .ca-helada,
+.ca-root[data-luz='amanecer'] .ca-helada,
+.ca-root[data-luz='atardecer'] .ca-helada {
+  background: rgba(12, 74, 110, 0.45);
+  border-left-color: #7dd3fc;
+}
+.ca-helada-titulo {
+  margin: 0;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+.ca-helada-texto {
+  margin: 2px 0 0;
+  font-size: 0.86rem;
+  line-height: 1.4;
+  font-weight: 600;
+}
+
+/* Estado honesto sin ubicación / cargando: sin caja, misma jerarquía. */
+.ca-sin-dato {
+  position: relative;
+  padding: 18px 18px 0;
+  text-shadow: var(--ca-halo);
+}
+.ca-sin-dato p { margin: 0; }
+.ca-sin-dato .ca-sin-dato-titulo {
+  font-family: 'Baloo 2', 'Nunito', system-ui, sans-serif;
+  font-size: 1.35rem;
+  font-weight: 800;
+  line-height: 1.1;
+}
+.ca-sin-dato .ca-sin-dato-sub {
+  margin-top: 4px;
+  font-size: 0.86rem;
+  font-weight: 600;
+  color: var(--ca-tinta-suave);
+}
+.ca-sin-dato .ca-sin-dato-slot { margin-top: 8px; text-shadow: none; }
+
+/* ── Vidrio: el contenido del boletín (utilidades Tailwind del dashboard) se
+      RE-TIÑE por piel. Una geometría, N pieles: el mismo markup que hoy pasa
+      los tests, sin cajas opacas que tapen la escena. Se usa [class~=] para no
+      escapar las barras de Tailwind. ── */
+.ca-contenido [class~='text-slate-100'],
+.ca-contenido [class~='text-slate-200'],
+.ca-contenido [class~='text-slate-300'],
+.ca-contenido [class~='text-white'] { color: var(--ca-tinta); }
+.ca-contenido [class~='text-slate-400'],
+.ca-contenido [class~='text-slate-500'] { color: var(--ca-tinta-suave); }
+.ca-contenido [class~='text-amber-200'],
+.ca-contenido [class~='text-amber-300'],
+.ca-contenido [class~='text-amber-200/90'] { color: var(--ca-ac-ambar); }
+.ca-contenido [class~='text-sky-200'],
+.ca-contenido [class~='text-sky-300'],
+.ca-contenido [class~='text-sky-300/90'] { color: var(--ca-ac-cielo); }
+.ca-contenido [class~='text-emerald-200'],
+.ca-contenido [class~='text-emerald-300'],
+.ca-contenido [class~='text-emerald-200/90'] { color: var(--ca-ac-verde); }
+.ca-contenido [class~='text-red-200'],
+.ca-contenido [class~='text-red-300'] { color: var(--ca-ac-rojo); }
+.ca-contenido [class~='text-orange-300'] { color: var(--ca-ac-naranja); }
+
+.ca-contenido [class~='bg-slate-900/40'],
+.ca-contenido [class~='bg-slate-900/50'],
+.ca-contenido [class~='bg-slate-900/60'],
+.ca-contenido [class~='bg-slate-900/70'],
+.ca-contenido [class~='bg-slate-950/40'],
+.ca-contenido [class~='bg-emerald-950/20'],
+.ca-contenido [class~='bg-amber-950/20'],
+.ca-contenido [class~='bg-gradient-to-br'] {
+  background-color: var(--ca-carta-bg);
+  background-image: none;
+  border-color: var(--ca-carta-borde);
+  border-top-color: var(--ca-rim);
+  box-shadow: var(--ca-carta-sombra);
+  -webkit-backdrop-filter: blur(var(--ca-blur)) saturate(1.15);
+  backdrop-filter: blur(var(--ca-blur)) saturate(1.15);
+  transition: background-color var(--ca-lento) var(--ca-curva), border-color var(--ca-lento) var(--ca-curva);
+}
+/* superficies interiores (chips, celdas de la tira, avatar): sin vidrio propio */
+.ca-contenido [class~='bg-slate-800/50'],
+.ca-contenido [class~='bg-slate-800/60'],
+.ca-contenido [class~='bg-slate-800/70'],
+.ca-contenido [class~='bg-slate-800/80'] { background-color: var(--ca-ac-suave-bg); }
+.ca-contenido [class~='border-slate-700'],
+.ca-contenido [class~='border-slate-700/50'],
+.ca-contenido [class~='border-slate-700/60'],
+.ca-contenido [class~='border-slate-600/60'],
+.ca-contenido [class~='border-slate-800/70'],
+.ca-contenido [class~='border-slate-800/80'] { border-color: var(--ca-carta-borde); }
+.ca-contenido [class~='bg-slate-800'] { background-color: var(--ca-ac-suave-bg); }
+
+/* La firma: un jirón de niebla pasa POR ENCIMA de la interfaz */
+.ca-jiron-ui {
+  position: fixed;
+  left: 50%;
+  top: 38%;
+  width: 170vw;
+  height: 16vh;
+  z-index: 30;
+  pointer-events: none;
+  background: linear-gradient(to right, transparent, rgba(238, 244, 241, 0.55) 35%, rgba(238, 244, 241, 0.3) 65%, transparent);
+  opacity: 0;
+  transition: opacity calc(var(--ca-lento) * 1.5) var(--ca-curva);
+  animation: ca-contraderiva 44s ease-in-out infinite alternate;
+  animation-play-state: paused;
+}
+.ca-root[data-clima='niebla'] .ca-jiron-ui {
+  opacity: 0.55;
+  animation-play-state: running;
+}
+
+/* ── Composición MÓVIL (≤ 520 px): el astro baja al costado derecho de la
+      cifra grande, donde no hay texto (la cabecera y la fila ENSO ocupan la
+      franja alta). Sol junto al número; luna junto al número. La rotura de la
+      nube-masa lo sigue. ── */
+@media (max-width: 520px) {
+  .ca-root,
+  .ca-root[data-clima='despejado'][data-luz='dia'] { --ca-astro-x: 74vw; --ca-astro-y: 24vh; }
+  .ca-root[data-luz='amanecer'],
+  .ca-root[data-luz='atardecer'],
+  .ca-root[data-clima='nublado'][data-luz='amanecer'],
+  .ca-root[data-clima='nublado'][data-luz='atardecer'] { --ca-astro-x: 62vw; --ca-astro-y: 40vh; --ca-rotura-x: 66%; --ca-rotura-y: 40%; }
+  .ca-root[data-luz='noche'],
+  .ca-root[data-clima='nublado'][data-luz='noche'],
+  .ca-root[data-clima='lluvia'][data-luz='noche'],
+  .ca-root[data-clima='niebla'][data-luz='noche'] { --ca-astro-x: 76vw; --ca-astro-y: 22vh; }
+  .ca-root[data-clima='nublado'] { --ca-astro-x: 72vw; --ca-astro-y: 24vh; --ca-rotura-x: 76%; --ca-rotura-y: 27%; }
+  .ca-root[data-clima='lluvia'] { --ca-astro-x: 74vw; --ca-astro-y: 22vh; }
+  .ca-root[data-clima='niebla'] { --ca-astro-x: 72vw; --ca-astro-y: 24vh; }
+}
+
+/* ── Responsive: 390 px es el ancho de referencia del proyecto (A-4) ── */
+@media (max-width: 420px) {
+  .ca-migaja { font-size: 0.6rem; letter-spacing: 0.09em; }
+}
+@media (max-width: 390px) {
+  .ca-cabecera, .ca-cifra-grande, .ca-sin-dato { padding-left: 14px; padding-right: 14px; }
+  .ca-lectura, .ca-helada { margin-left: 14px; margin-right: 14px; }
+  .ca-cifra-grande { column-gap: 10px; }
+}
+@media (max-width: 360px) {
+  .ca-cabecera, .ca-cifra-grande, .ca-sin-dato { padding-left: 12px; padding-right: 12px; }
+  .ca-lectura, .ca-helada { margin-left: 12px; margin-right: 12px; }
+  .ca-migaja { letter-spacing: 0.08em; }
+}
+/* Pantalla táctil (el teléfono del campesino, Mali-G78): el desenfoque del
+   vidrio es lo que más fill-rate cuesta; se baja, no se apaga. */
+@media (pointer: coarse) {
+  .ca-root { --ca-blur: 6px; }
+}
+
+/* ── Reduced motion: la escena queda como fotograma bello (catálogo #20).
+      Las transiciones de estado se conservan cortas; los bucles se apagan ── */
+@media (prefers-reduced-motion: reduce) {
+  .ca-root * {
+    animation: none !important;
+  }
+  .ca-root,
+  .ca-root * {
+    transition-duration: 0.2s !important;
+  }
+}

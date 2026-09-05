@@ -2306,7 +2306,9 @@ export default function App() {
         return (
           <ErrorBoundary>
             <ErrorFallback moduleName="Clima y atmósfera">
-              <ClimaAtmosferaMockup onBack={() => navigate('dashboard')} />
+              {/* Ruta pública que embebe 3d.guatoc.co/el-tiempo/: hoy es la
+                  página del tiempo canónica (spec unificar-2d-clima, CA-11). */}
+              <ClimaAtmosferaMockup onBack={() => navigate('dashboard')} onNavigate={navigate} />
             </ErrorFallback>
           </ErrorBoundary>
         );
