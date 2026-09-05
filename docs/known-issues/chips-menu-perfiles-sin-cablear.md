@@ -79,3 +79,29 @@ test dedicado, que falla si alguien lo cablea sin sacarlo de la lista).
 congelamiento (`chipIntentRouter.test.js`) para que la verificación del 2026-09-04 quede en el
 lugar donde alguien miraría antes de cablear. `INTENTS_SIN_ROUTING` NO se toca: no se cableó
 nada, así que no se saca nada de la lista.
+
+## Re-verificación 2026-09-05 (card re-despachada: `card-092-chips-sin-routing-20260905`)
+
+La card se re-encoló el 2026-09-05 02:2x porque la encolada del 09-04 22:20 se perdió en
+silencio. Antes de decidir, se repitió la verificación en vivo **hoy** (no se confió en la de
+ayer), con token del sidecar y **control positivo** (dato que la verificación del 2026-09-04
+no incluyó):
+
+| Capa | Resultado (2026-09-05) |
+|---|---|
+| `GET /healthz` (loopback 7880) | vivo: build `5bd011ff`, `mcp_alive: true`, `started_at` 2026-08-26T17:57:52Z — **sin nuevos despliegues** desde la verificación de ayer |
+| `GET /tools` (con token) | **45 tools**, cero con "fuente" o "doi" |
+| `POST /tools/get_fuente_doi` (con token, body plano) | **HTTP 404** `{"error":"not_found","path":"/tools/get_fuente_doi"}` |
+| **Control positivo**: `POST /tools/get_species` (con token, arg `id_or_name`) | **HTTP 200** con respuesta honesta `found:false` — el endpoint responde autenticado, así que el 404 de arriba es REAL y no un problema de auth/token/formato |
+| Código chagra-pro (`modules/agro-mcp/src` + `modules/agro-mcp/sidecar/src`) | **0 apariciones** de `get_fuente_doi` / `get_fuente` |
+
+**Conclusión**: idéntica a la del 2026-09-04. La tool `get_fuente_doi` sigue sin existir y el
+sidecar no recibió despliegues nuevos. Por el criterio de aceptación de la card, el cableado
+**sigue detenido**: escribir la tool es trabajo del repo `chagra-pro` (sidecar) y queda
+escalado — NO se toca `ALLOWED_TOOLS` ni `planForcedIntent`. `INTENTS_SIN_ROUTING` sigue
+intacto (53/53 tests de `chipIntentRouter.test.js` en verde al momento de este addendum).
+
+`asociaciones`: el estado ya quedó ejecutado por el PR #3144 (merged 2026-09-05): chip
+despintado de la toolbar por rol, `heroRoute` del AgentHero vivo y bypass de operador
+conservado. La decisión de producto (opciones A/B/C/D de la tabla de arriba) sigue abierta
+para el operador.

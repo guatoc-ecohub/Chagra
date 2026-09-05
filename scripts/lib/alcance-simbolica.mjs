@@ -68,13 +68,18 @@ const EXTS_RESOLVE = ['.jsx', '.js', '.mjs', '.ts', '.tsx', '.css', '.json', '.s
 const EXTS_MODULO = new Set(['.js', '.jsx', '.mjs', '.ts', '.tsx']);
 const EXTS_COMPONENTE = new Set(['.jsx', '.tsx']);
 
+// `Dirent` (withFileTypes) NO sigue symlinks: un symlink colgante (láminas
+// archivadas → `/mnt/data/coldstore/...`, ausente en CI) no puede stat-se,
+// y un symlink en general apunta fuera del árbol de src/. Ambos quedan fuera
+// del alcance auditado — igual que en `walk` del gate y que la exclusión de
+// `_archivo/**` en vitest. `statSync` aquí reventaba con ENOENT (medido #3151).
 function walk(dir, out = []) {
   if (!existsSync(dir)) return out;
-  for (const e of readdirSync(dir)) {
-    if (e === 'node_modules' || e.startsWith('.')) continue;
-    const p = join(dir, e);
-    const st = statSync(p);
-    if (st.isDirectory()) walk(p, out);
+  for (const e of readdirSync(dir, { withFileTypes: true })) {
+    if (e.name === 'node_modules' || e.name.startsWith('.')) continue;
+    if (e.isSymbolicLink()) continue; // colgante o no: fuera del árbol de build
+    const p = join(dir, e.name);
+    if (e.isDirectory()) walk(p, out);
     else out.push(p);
   }
   return out;
@@ -190,7 +195,17 @@ function fuente(f) {
 // quedaba sin registrar que importa `App`. Síntoma: el control B1 reportaba
 // `src/App.jsx → App` como componente que nadie importa. Cuando el instrumento
 // acusa al entry point, el sospechoso es el instrumento.
-const RE_IMPORT_FROM = /\bimport\s+(?!\()([^;'"]{0,400}?)\s+from\s*['"]([^'"]+)['"]/g;
+// El tope de la cláusula es anti-backtracking, NO un límite semántico: `[^;'"]`
+// ya impide cruzar de estatuto (un `;` corta) y de string (`"` corta). El tope
+// original de 400 era corto: el import multi-línea de `data/aguaFinca` en
+// AguaScreen.jsx (27 nombres, 421 chars) NO hacía match, el motor daba
+// `aguaFinca.js` por huérfano con la pantalla MONTADA importándolo de verdad,
+// y el control de importadores del remate 2026-09-05 (task
+// audit-gate-remate-20260905) lo pescó a tiempo: declararlo habría sido
+// matar en el allowlist un archivo vivo. 12 imports de src/ superaban los
+// 400 chars (medido 2026-09-05); 4000 da 10× de holgura sobre el mayor
+// (699 chars, milpaGameEngine.test.js).
+const RE_IMPORT_FROM = /\bimport\s+(?!\()([^;'"]{0,4000}?)\s+from\s*['"]([^'"]+)['"]/g;
 const RE_IMPORT_BARE = /\bimport\s*['"]([^'"]+)['"]/g;
 const RE_IMPORT_DIN = /\bimport\s*\(\s*['"]([^'"]+)['"]\s*\)/g;
 const RE_EXPORT_STAR = /\bexport\s*\*\s*(?:as\s+([A-Za-z_$][\w$]*)\s*)?from\s*['"]([^'"]+)['"]/g;

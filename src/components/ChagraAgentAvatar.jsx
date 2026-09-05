@@ -130,9 +130,13 @@ function resolverAvatarCompai(especie) {
     };
 }
 
-export default function ChagraAgentAvatar({ estado = undefined, state = undefined, ...props }) {
+/* `especie`: override explícito del avatar. Sin él manda la preferencia del
+   usuario (useAgentAvatarType). Lo usa CompaiEntradaSalida para sostener el
+   cuerpo que está SALIENDO mientras el elegido ya cambió. El resto de props
+   pasa intacto al adaptador (contrato drop-in de siempre). */
+export default function ChagraAgentAvatar({ estado = undefined, state = undefined, especie = undefined, ...props }) {
     const [type] = useAgentAvatarType();
-    const { perfil, Adaptador } = resolverAvatarCompai(type);
+    const { perfil, Adaptador } = resolverAvatarCompai(especie || type);
     const estadoEntrada = estadoRicoDeEntrada(estado, state);
     const stateEntrada = STATE_DE_ESTADO_RICO[estadoEntrada] || state;
 

@@ -54,7 +54,16 @@ function getChangedFiles(targetBranch) {
 function mapToTests(file) {
   const tests = new Set();
 
-  if (/\.(test|spec)\.(js|jsx)$/.test(file)) {
+  // El archivo cambiado ES un test: se corre tal cual. OJO: solo `.test.*`.
+  // En este repo `.spec.*` es Playwright E2E, NO vitest — `vitest.config.js`
+  // solo incluye `*.test.{js,jsx,mjs}` (y excluye `tests/*.spec.js`). Si un
+  // `.spec.js` (p. ej. un gate de carril en `_gate/`) se manda al job de
+  // vitest, el filtro no matchea ningún archivo incluido y el gate muere con
+  // "No test files found, exiting with code 1" (medido en #3150). El `.spec.`
+  // cae al mapeo de hermanos de abajo (si su cambio amerita un unit test
+  // relacionado, ese se selecciona; si no, el diff no toca la superficie de
+  // vitest y el gate responde "sin tests unitarios relevantes").
+  if (/\.test\.(js|jsx)$/.test(file)) {
     tests.add(file);
     return tests;
   }

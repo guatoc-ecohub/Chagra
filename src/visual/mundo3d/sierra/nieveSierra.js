@@ -277,15 +277,22 @@ export function texturaCinta() {
 
 /**
  * La NUBE-MASA de la Sierra: canvas RGBA con tres tonos por cuerpo (lomo arriba
- * y del lado del sol, panza abajo), 14 lóbulos gaussianos grandes (la silueta
- * se lee), motas en el borde que la rompen sin geometría, alfa densa al centro
- * y rala afuera. Calco reducido de `nubeCanvas` (valle, atmosphere.js). El sol
- * de la hora dorada entra por el occidente (screen-right con la cámara del
- * establishing shot): el lomo carga hacia u → 1.
+ * y del lado del sol, panza abajo), silueta por METABALL con umbral, motas en el
+ * borde que la rompen sin geometría. Calco reducido de `nubeCanvas` (valle,
+ * atmosphere.js). El sol de la hora dorada entra por el occidente (screen-right
+ * con la cámara del establishing shot): el lomo carga hacia u → 1.
+ *
+ * (2026-09-05, arte) v4: la v3 sumaba 11 gaussianas grandes y saturaba en
+ * `min(1, a·0,7)` — la unión era un PLATÓ elíptico sin lomo ni panza: el
+ * «manchón» medido al 300 %. Un cúmulo se lee por la unión de pocos lóbulos
+ * redondos ARRIBA sobre una base ancha y PLANA (la cota de condensación, que
+ * es un dato): alfa = smoothstep sobre la suma de metaballs, así los lóbulos
+ * asoman como lomos en vez de fundirse. Previsualizado en node (mismo cálculo,
+ * semillas 3/5/7); la 5 no hace muesca ni hueco.
  * Devuelve `null` sin contexto 2D (jsdom, canvas bloqueado): la nube cae al
  * billboard liso de antes, nunca tumba la Sierra.
  */
-export function texturaNubeMasa(seed = 3, { lomo = '#faf6ee', panza = '#a4aebf', honda = '#8f9aab', tam = 256 } = {}) {
+export function texturaNubeMasa(seed = 5, { lomo = '#faf6ee', panza = '#a4aebf', honda = '#8f9aab', tam = 256 } = {}) {
   if (typeof document === 'undefined') return null;
   const cv = document.createElement('canvas'); cv.width = cv.height = tam;
   const ctx = typeof cv.getContext === 'function' ? cv.getContext('2d') : null;
@@ -294,20 +301,25 @@ export function texturaNubeMasa(seed = 3, { lomo = '#faf6ee', panza = '#a4aebf',
   const rand = (() => { let s = seed * 4801 + 7297; return () => { s = (s * 9301 + 49297) % 233280; return s / 233280; }; })();
   const L = hexRgb(lomo), P = hexRgb(panza), H = hexRgb(honda);
   const blobs = [];
-  // 11 lóbulos grandes y desiguales: la SILUETA la dan los lóbulos (cúpulas arriba), no la
-  // envolvente — con la envolvente fuerte (v1) cada nube salía como una elipse plana.
-  for (let i = 0; i < 11; i++) blobs.push({ x: tam * (0.10 + rand() * 0.80), y: tam * (0.30 + rand() * 0.36), r: tam * (0.12 + rand() * 0.22), k: 0.7 + rand() * 0.8 });
+  // 4 LOMOS redondos en la mitad alta (r 12-19 % del canvas), repartidos a lo ancho y a
+  // distinta altura: la unión asoma como torres, no como plató. UN solo cuerpo: los lomos
+  // van SOBRE la base y no más anchos que ella (en v4 la base sobresalía por los lados y
+  // la nube leía como dos pisos apilados, medido al 300 %).
+  const LOMOS = 4;
+  for (let i = 0; i < LOMOS; i++) {
+    const u = (i + 0.5) / LOMOS;
+    blobs.push({ x: tam * (0.22 + u * 0.56 + (rand() - 0.5) * 0.10), y: tam * (0.46 - rand() * 0.24), r: tam * (0.12 + rand() * 0.07), sq: 1.0 });
+  }
+  // 3 lóbulos de BASE, algo aplastados (×1,8 en vertical), en la cota de la base plana
+  for (const bx of [0.32, 0.52, 0.70]) blobs.push({ x: tam * (bx + (rand() - 0.5) * 0.06), y: tam * 0.58, r: tam * (0.15 + rand() * 0.04), sq: 1.8 });
   const v = new Float32Array(tam * tam);
   for (let y = 0; y < tam; y++) for (let x = 0; x < tam; x++) {
     let a = 0;
-    for (const b of blobs) { const dx = x - b.x, dy = (y - b.y) * 1.9; a += b.k * Math.exp(-(dx * dx + dy * dy) / (b.r * b.r)); }
-    a = Math.min(1, a * 0.7);
-    const cx = x / tam - 0.5, cy = y / tam - 0.5;
-    a *= Math.exp(-(cx * cx * 2.4 + cy * cy * 5.0));          // envolvente floja: la silueta la dan los lóbulos
-    a *= 1 - sstep(0.70, 0.82, y / tam);                      // base PLANA (estrato de tarde): la nube se apoya en su cota
-    // fundido al borde del canvas del 18 % (con 10 % el lóbulo que llegaba al borde salía
-    // CORTADO en vertical: un borde recto, medido al 300 % en v3)
-    const bd = clamp(Math.min(x, y, tam - 1 - x, tam - 1 - y) / (tam * 0.18), 0, 1);
+    for (const b of blobs) { const dx = x - b.x, dy = (y - b.y) * b.sq; a += Math.exp(-(dx * dx + dy * dy) / (b.r * b.r)); }
+    a = sstep(0.36, 0.95, a);                                 // UMBRAL metaball: la unión conserva los lomos
+    a *= 1 - sstep(0.70, 0.80, y / tam);                      // base PLANA: la nube se apoya en su cota de condensación
+    // fundido al borde del canvas del 12 %: ningún lóbulo llega al borde (medido: cero borde recto)
+    const bd = clamp(Math.min(x, y, tam - 1 - x, tam - 1 - y) / (tam * 0.12), 0, 1);
     v[y * tam + x] = a * bd * bd * (3 - 2 * bd);
   }
   // motas: lóbulos PEQUEÑOS del borde que rompen la silueta. Solo donde ya hay
@@ -326,13 +338,13 @@ export function texturaNubeMasa(seed = 3, { lomo = '#faf6ee', panza = '#a4aebf',
     const t = y / tam, u = x / tam;
     const lado = sstep(0.15, 0.95, u) * 0.35;                // el lomo carga hacia el lado del sol
     const arriba = 1 - sstep(0.22, 0.78, t + lado * (t - 0.5) * -1);
-    // el lomo cubre el centro DENSO de arriba (t < 0,46), no solo el fleco ralo del borde
-    // superior: en v1 (t < 0,32) el lomo quedaba en la zona casi transparente y la nube
-    // leía toda de panza
+    // el lomo cubre los lóbulos de arriba y el cuerpo (t < 0,42); la panza arranca bajo
+    // los lomos y la honda vive en la base plana (t > 0,64): la sombra propia es lo que
+    // hace que la nube se lea como VOLUMEN en el aire y no como placa pegada a la ladera
     let c;
-    if (t < 0.46) c = L;
-    else if (t < 0.72) { const k = (t - 0.46) / 0.26; c = [0, 1, 2].map((i) => mix(L[i], P[i], k)); }
-    else { const k = (t - 0.72) / 0.28; c = [0, 1, 2].map((i) => mix(P[i], H[i], k)); }
+    if (t < 0.42) c = L;
+    else if (t < 0.64) { const k = (t - 0.42) / 0.22; c = [0, 1, 2].map((i) => mix(L[i], P[i], k)); }
+    else { const k = (t - 0.64) / 0.36; c = [0, 1, 2].map((i) => mix(P[i], H[i], k)); }
     const brillo = 1 + 0.06 * lado * arriba;
     const i4 = (y * tam + x) * 4;
     img.data[i4] = Math.min(255, c[0] * brillo * 255) | 0;

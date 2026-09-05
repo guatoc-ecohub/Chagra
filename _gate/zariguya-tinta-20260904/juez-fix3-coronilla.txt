@@ -1,0 +1,4 @@
+IZQUIERDA: Pelaje de la coronilla como rayado fino de tinta; no hay borde visible entre coronilla y frente.  
+DERECHA: Pelaje de la coronilla como casco/gorro de parches planos con borde; hay escalón visible entre coronilla y frente.  
+
+En todas las filas, el lado DERECHA tiene la coronilla que se lee más como gorro (casco/gorro de parches planos con borde).
