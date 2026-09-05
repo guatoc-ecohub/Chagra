@@ -21,7 +21,6 @@ import useAssetStore from './store/useAssetStore';
 import { fetchFromFarmOS } from './services/apiService';
 import { PRIMARY_WORKER_NAME } from './config/workerConfig';
 import { tieneAccesoGlaciarActual, esOperadorActual } from './config/glaciarAccess';
-import { getProfile, getMarco3DPreference } from './services/userProfileService';
 import { getProfile, getMarco3DPreference, resolveDestinoPostLogin } from './services/userProfileService';
 import { parseSeguimientoView } from './config/seguimientoProcesos';
 import { homeCampesinoBActivo } from './config/homeCampesinoBFlag';
@@ -811,6 +810,7 @@ const MOCKUP_HASH_ROUTES = {
   'mockups/salud-finca': 'mockup_salud_finca',
   'mockups/primer-cultivo': 'mockup_primer_cultivo',
   'mockups/mercado': 'mockup_mercado',
+  'mockups/crm-agroecologico': 'mockup_crm_agroecologico',
   'mockups/onboarding-siembra': 'mockup_onboarding_siembra',
   'mockups/montana-mundos': 'mockup_montana_mundos',
   'mockups/montana-mundos-cine': 'mockup_montana_mundos_cine',
@@ -887,7 +887,6 @@ const MOCKUP_HASH_ROUTES = {
   'mockups/navegador-grafo': 'mockup_navegador_grafo',
   'mockups/navegacion-pisos': 'mockup_navegacion_pisos',
   'mockups/agente-dibuja': 'mockup_agente_dibuja',
-  'mockups/crm-agroecologico': 'mockup_crm_agroecologico',
   // (rescate 2026-09-05) arte original del clima como atmósfera viva:
   // 'mockups/clima-atmosfera' quedó como puente al mundo real (#2833).
   'mockups/clima-atmosfera-arte': 'mockup_clima_atmosfera_arte',
@@ -2242,7 +2241,6 @@ export default function App() {
           <ErrorBoundary>
             <ErrorFallback moduleName="Home campesino B">
               <Suspense fallback={<div className="h-[100dvh] w-full bg-[#f7f0df]" />}>
-                <HomeCampesinoB onNavigate={navigate} />
                 <HomeCampesinoB onNavigate={navigate} onLogout={handleLogout} />
               </Suspense>
             </ErrorFallback>
@@ -2505,7 +2503,6 @@ export default function App() {
         return (
           <ErrorBoundary>
             <ErrorFallback moduleName="El suelo vivo 3D">
-              {/* @ts-expect-error onBack prop not in type defs */}
               <MundoSueloVivoMockup onBack={() => navigate('dashboard')} />
             </ErrorFallback>
           </ErrorBoundary>
@@ -2516,7 +2513,6 @@ export default function App() {
         return (
           <ErrorBoundary>
             <ErrorFallback moduleName="Aliados de la finca">
-              {/* @ts-expect-error onBack prop not in type defs */}
               <AliadosFincaMockup onBack={() => navigate('dashboard')} />
             </ErrorFallback>
           </ErrorBoundary>
@@ -2527,7 +2523,6 @@ export default function App() {
         return (
           <ErrorBoundary>
             <ErrorFallback moduleName="El café bajo sombra">
-              {/* @ts-expect-error onBack prop not in type defs */}
               <MundoCafe3DMockup onBack={() => navigate('dashboard')} />
             </ErrorFallback>
           </ErrorBoundary>
@@ -2548,7 +2543,6 @@ export default function App() {
         return (
           <ErrorBoundary>
             <ErrorFallback moduleName="El semillero 3D">
-              {/* @ts-expect-error extra props for mockup */}
               <MundoSemilleroMockup onBack={() => navigate('dashboard')} />
             </ErrorFallback>
           </ErrorBoundary>
@@ -2559,7 +2553,6 @@ export default function App() {
         return (
           <ErrorBoundary>
             <ErrorFallback moduleName="El compost 3D">
-              {/* @ts-expect-error onBack prop not in type defs */}
               <MundoCompostMockup onBack={() => navigate('dashboard')} />
             </ErrorFallback>
           </ErrorBoundary>
@@ -2649,7 +2642,6 @@ export default function App() {
         return (
           <ErrorBoundary>
             <ErrorFallback moduleName="Gemelos 2D de los mundos">
-              {/* @ts-expect-error onBack prop not in type defs */}
               <GemelosMundosMockup onBack={() => navigate('dashboard')} />
             </ErrorFallback>
           </ErrorBoundary>
@@ -2660,7 +2652,6 @@ export default function App() {
         return (
           <ErrorBoundary>
             <ErrorFallback moduleName="La micro-fauna del suelo 3D">
-              {/* @ts-expect-error onBack prop not in type defs */}
               <MundoMicrofaunaMockup onBack={() => navigate('dashboard')} />
             </ErrorFallback>
           </ErrorBoundary>
@@ -4452,10 +4443,6 @@ export default function App() {
     // sin banners de instalación/datos ni FABs encima.
     currentView.startsWith('mockup_');
 
-  // La portada campesina B (dashboard, bandera activa) trae su propia barra
-  // superior con indicador "Con señal / Sin señal" y su propio compai que
-  // camina (CompaiOverlay). Por eso suprime la NetworkStatusBar global y el
-  // AgentFab idle, para no duplicar chrome ni compai encima del layout aprobado.
   // La portada campesina B (dashboard, bandera activa) trae su propio
   // indicador de señal y su propio compai que camina. NetworkStatusBar se
   // mantiene montada porque es la señal durable de la cola offline, pero solo
@@ -4465,9 +4452,6 @@ export default function App() {
   return (
     <>
       {/* Transición Angelita home→conversación (~2s). Encima de todo (z alto);
-          la conversación monta detrás y queda limpia al terminar. */}
-      <ColibriTransition active={colibriTransition} onDone={() => setColibriTransition(false)} />
-      {!esHomeCampesinoB && <NetworkStatusBar />}
           la conversación monta detrás y queda limpia al terminar. Suspense
           local (087): fallback null porque inactivo renderiza null — el
           boundary no debe tirar el árbol entero a un fallback de ruta. */}
@@ -4525,7 +4509,6 @@ export default function App() {
           todas las vistas que ya tienen shell, también durante interacción y
           offline. La entrada mística es la única que puede desvanecerlo. */}
       <Suspense fallback={null}>
-        {currentView !== 'loading' && !currentView.startsWith('mockup_') && !esHomeCampesinoB && <AgentFab onNavigate={navigate} pantalla={currentView} />}
         {!isPreAuthView && !esHomeCampesinoB && <AgentFab onNavigate={navigate} pantalla={currentView} />}
       </Suspense>
       {/* Compai que CAMINA en la portada campesina B: un solo compai (el
