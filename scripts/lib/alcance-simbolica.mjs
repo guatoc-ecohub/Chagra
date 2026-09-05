@@ -68,13 +68,18 @@ const EXTS_RESOLVE = ['.jsx', '.js', '.mjs', '.ts', '.tsx', '.css', '.json', '.s
 const EXTS_MODULO = new Set(['.js', '.jsx', '.mjs', '.ts', '.tsx']);
 const EXTS_COMPONENTE = new Set(['.jsx', '.tsx']);
 
+// `Dirent` (withFileTypes) NO sigue symlinks: un symlink colgante (láminas
+// archivadas → `/mnt/data/coldstore/...`, ausente en CI) no puede stat-se,
+// y un symlink en general apunta fuera del árbol de src/. Ambos quedan fuera
+// del alcance auditado — igual que en `walk` del gate y que la exclusión de
+// `_archivo/**` en vitest. `statSync` aquí reventaba con ENOENT (medido #3151).
 function walk(dir, out = []) {
   if (!existsSync(dir)) return out;
-  for (const e of readdirSync(dir)) {
-    if (e === 'node_modules' || e.startsWith('.')) continue;
-    const p = join(dir, e);
-    const st = statSync(p);
-    if (st.isDirectory()) walk(p, out);
+  for (const e of readdirSync(dir, { withFileTypes: true })) {
+    if (e.name === 'node_modules' || e.name.startsWith('.')) continue;
+    if (e.isSymbolicLink()) continue; // colgante o no: fuera del árbol de build
+    const p = join(dir, e.name);
+    if (e.isDirectory()) walk(p, out);
     else out.push(p);
   }
   return out;
