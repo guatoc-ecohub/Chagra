@@ -1,4 +1,9 @@
 #!/usr/bin/env node
+/* global process, console */
+// Globals de node declarados con el pragma de arriba (y NO con un comentario
+// de entorno tipo eslint-env): ESLint 9 con flat config ya no los honra
+// (warning hoy, error duro en v10) y el reemplazo oficial es /* global */.
+// Mismo patrón que scripts/qa-shimmer-lodpop.mjs y scripts/qa-worst-frame-scout.mjs.
 /**
  * audit-integraciones.mjs — auditor de "construido pero no conectado"
  * =====================================================================
