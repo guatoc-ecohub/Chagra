@@ -1,8 +1,6 @@
-// Pragma node para eslint (process.on más abajo): el arnés siempre fue un
-// script node; se declara explícito al tocar el archivo (cableado pizarra
-// 2026-09-03) para que el hook de eslint (staged, --max-warnings=0) no se
-// tropiece con el no-undef heredado de la config.
-/* global process */
+// El arnés siempre fue un script node; `process` (process.on de limpieza más
+// abajo) entra por import de node:process para que el hook de eslint (staged,
+// --max-warnings=0) no se tropiece con el no-undef heredado de la config.
 /**
  * Arnés de aceptación del control de componente huérfano (card 095).
  *
@@ -222,8 +220,16 @@ describe('TANDA 1 DEL DRENAJE — decisiones escritas (2026-09-04, ops/DRENAJE-H
   ];
 
   // Las 6 PROPUESTAS DE BORRADO de la tanda 1. Aquí NO se borra nada — eso lo
-  // decide el operador. Mientras tanto el control las sigue acusando: si este
-  // test falla es porque alguien las borró o las cableó sin actualizar acá.
+  // decide el operador. Hasta el 2026-09-04 el control las mantenía acusadas
+  // como mecanismo de presión. El 2026-09-05 el operador ordenó el REMATE del
+  // gate de integraciones (task audit-gate-remate-20260905): las 6 quedaron
+  // declaradas en ops/integraciones-no-consumidas.json, y este gate HEREDA esa
+  // excusa (su cargador lee orphan_components del otro allowlist como
+  // `heredado`), así que dejaron de salir como hallazgos ACÁ TAMBIÉN — por
+  // diseño del cargador, no por un cableado. Lo que NO cambió: siguen
+  // inalcanzables, siguen en disco y el BORRADO sigue pendiente del operador.
+  // Este pin sostiene ese estado: si falla, alguien las cableó o las borró
+  // sin pasar por la curaduría.
   const PROPUESTAS_BORRADO = [
     'src/components/ChagraAgentAvatarColibri.jsx',
     'src/components/ChagraAgentAvatarColibriPhoto.jsx',
@@ -263,11 +269,23 @@ describe('TANDA 1 DEL DRENAJE — decisiones escritas (2026-09-04, ops/DRENAJE-H
     }
   });
 
-  it('las 6 propuestas de borrado SIGUEN acusadas: siguen vivas hasta que el operador decida', () => {
+  it('las 6 propuestas de borrado: declaradas por el remate 2026-09-05 (heredado), siguen inalcanzables y en disco', () => {
+    // La excusa ahora viene del allowlist del gate de integraciones (herencia
+    // del cargador de arriba), así que dejaron de salir como hallazgos acá.
+    // Lo que este pin sostiene: la EXCUSA existe, el veredicto NO cambió y el
+    // archivo NO se borró — el borrado sigue siendo curaduría del operador.
+    const al = JSON.parse(
+      readFileSync(join(ROOT, 'ops/integraciones-no-consumidas.json'), 'utf8'),
+    );
+    const porId = new Map((al.orphan_components || []).map((e) => [e.id, e]));
     const ids = new Set(out.hallazgos.map((h) => h.id));
     for (const id of PROPUESTAS_BORRADO) {
-      expect(ids.has(id), `dejó de acusarse sin que se resuelva su propuesta: ${id}`).toBe(true);
+      expect(ids.has(id), `volvió a acusarse: su excusa heredada se rompió — revisar ${id}`).toBe(false);
       expect(NO_ALCANZABLE).toContain(veredicto(id));
+      expect(existsSync(join(ROOT, id)), `archivo borrado sin curaduría del operador: ${id}`).toBe(true);
+      const e = porId.get(id);
+      expect(e, `falta la entrada en ops/integraciones-no-consumidas.json: ${id}`).toBeTruthy();
+      expect(e.date, `la excusa heredada de ${id} ya no es del remate 2026-09-05`).toBe('2026-09-05');
     }
   });
 });
