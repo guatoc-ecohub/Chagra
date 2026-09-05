@@ -154,7 +154,39 @@ export const ESTADO_PISO = {
   NEUTRO: 'neutro', // sin piso de usuario: nada resaltado
 };
 
-/** Piso por id (o `null`). */
+/**
+ * Guard anti-fabricación del marcador de la finca (P1 de la portada):
+ * una altitud NO confirmada no dibuja ninguna curva. Espejo del guard de
+ * `pisoTermicoFromAltitud` (cropSuggestions): altitud ausente o no positiva
+ * devuelve `null`, NUNCA un piso inventado a nivel del mar.
+ *
+ * @param {number|string|null|undefined} msnm
+ * @returns {number|null} la altitud confirmada en metros, o null.
+ */
+export function altitudFincaValida(msnm) {
+  if (msnm === null || msnm === undefined || msnm === '') return null;
+  const n = Number(msnm);
+  return Number.isFinite(n) && n > 0 ? n : null;
+}
+
+/**
+ * La banda visual de la Sierra que contiene esa altitud (0 → cumbre). Útil para
+ * colorear la curva de la finca con el color del piso donde el usuario vive.
+ *
+ * @param {number} msnm
+ * @returns {{ id: string, color: string }|null}
+ */
+export function bandaDeMsnm(msnm) {
+  if (typeof msnm !== 'number' || !Number.isFinite(msnm) || msnm < 0) return null;
+  return (
+    PISOS_TERMICOS_SIERRA.find((b) => msnm >= b.minMsnm && msnm < b.maxMsnm) ??
+    PISOS_TERMICOS_SIERRA[PISOS_TERMICOS_SIERRA.length - 1] ??
+    null
+  );
+}
+
+/**
+ * Piso por id (o `null`). */
 export function pisoPorId(id) {
   if (!id) return null;
   return PISOS_TERMICOS.find((p) => p.id === id) || null;

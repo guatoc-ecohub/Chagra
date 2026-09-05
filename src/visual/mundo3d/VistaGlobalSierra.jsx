@@ -82,13 +82,13 @@ import { ATMOSFERA_SIERRA, SOL_SIERRA, RELLENO_SIERRA } from './sierra/luzSierra
 import { perfilDeTier } from './deviceTier.js';
 import PisosTermicosBandas from './PisosTermicosBandas.jsx';
 import TransicionSierraMundo from './TransicionSierraMundo.jsx';
-import { BANDAS_SIERRA, CLAVE_PISOS_SIERRA, PISOS_TERMICOS_SIERRA } from './pisosTermicos.js';
+import { BANDAS_SIERRA, CLAVE_PISOS_SIERRA, PISOS_TERMICOS_SIERRA, altitudFincaValida, bandaDeMsnm } from './pisosTermicos.js';
 import { franjaCondensacion, leerGateDescenso } from './sierra/descensoSierra.js';
 import {
   NIEVE, anadirAtributoNieve, crearInyectorNieve, muestreadorFacetas, contornoNivel, geometriaCinta, texturaCinta,
 } from './sierra/nieveSierra.js';
 import {
-  alturaSierra, alturaFaldon, ruido, smoothstep, CIMA, COSTA_Z, ANCHO, FONDO, LAGUNAS_PARAMO, exposicionMar, pesoPromontorio,
+  alturaSierra, alturaFaldon, ruido, smoothstep, CIMA, COSTA_Z, ANCHO, FONDO, LAGUNAS_PARAMO, exposicionMar, pesoPromontorio, yDeMsnm,
 } from './sierra/sierraRelieve.js';
 import { atmosferaLinealSierra, crearMaterialDomo, crearInyectorBruma, BRUMA_SIERRA } from './sierra/aireSierra.js';
 import { MarSierra, PERFIL_PLAYA, PERFIL_PARAMO } from './sierra/marSierra.js';
@@ -529,18 +529,25 @@ function MarcadorPiso({ piso }) {
    LÍNEA ÁMBAR de la cota canónica del hielo (4 800 m) con su rótulo — «hasta aquí
    llegaba». Las cintas se apoyan en las FACETAS del terreno tal como se dibujan
    (muestreadorFacetas), no en la función suave: no se hunden. Si hay
-   `pisoUsuario`, las dos curvas de su banda van en el color del piso. */
-function MapaDeNivel({ segmentos, pisoUsuario }) {
+   `pisoUsuario`, las dos curvas de su banda van en el color del piso.
+
+   P1 de DIRECCION-NUMEROS-VIVOS (2026-09-05): con `msnm` CONFIRMADO se dibuja la
+   curva EXACTA de la cota de la finca (`yDeMsnm(msnm)`, no una representativa de
+   banda) en el color del piso donde vive, con su rótulo «a la altura de su
+   finca» colgado del punto más oriental. Sin altitud confirmada NO se dibuja
+   nada de la finca (el hueco es honesto): las bandas siguen igual. */
+function MapaDeNivel({ segmentos, pisoUsuario, msnm }) {
   const capas = useMemo(() => {
     const hF = muestreadorFacetas(alturaSierra, { ancho: ANCHO, fondo: FONDO, segX: segmentos, segZ: segmentos });
     const region = { x0: -ANCHO / 2 + 0.2, x1: ANCHO / 2 - 0.2, z0: COSTA_Z - 1.2, z1: FONDO / 2 - 0.2, paso: 0.08 };
+    const msnmValido = altitudFincaValida(msnm);
     const out = [];
     BANDAS_SIERRA.forEach((b, i) => {
       if (!Number.isFinite(b.tope)) return;
       const lineas = contornoNivel(alturaSierra, b.tope, region);
       if (!lineas.length) return;
       const esHielo = b.id === 'superparamo';
-      const suya = pisoUsuario && (b.id === pisoUsuario || BANDAS_SIERRA[i + 1]?.id === pisoUsuario);
+      const suya = !msnmValido && pisoUsuario && (b.id === pisoUsuario || BANDAS_SIERRA[i + 1]?.id === pisoUsuario);
       out.push({
         key: b.id,
         geo: geometriaCinta(lineas, hF, { ancho: esHielo ? 0.06 : suya ? 0.045 : 0.03 }),
@@ -549,8 +556,29 @@ function MapaDeNivel({ segmentos, pisoUsuario }) {
         ancla: esHielo ? lineas.flat().reduce((m, q) => (q[0] < m[0] ? q : m)) : null,   // el punto más oriental (screen-right): lejos de las etiquetas de banda, que van al occidente
       });
     });
+    /* P1 — la curva de la cota REAL de la finca. Solo con altitud confirmada. */
+    if (msnmValido) {
+      const y = yDeMsnm(msnmValido);
+      const lineas = contornoNivel(alturaSierra, y, region);
+      if (lineas.length) {
+        const banda = bandaDeMsnm(msnmValido);
+        const color = banda?.color ?? NIEVE.tinta;
+        const puntos = lineas.flat();
+        const ancla = puntos.reduce((m, q) => (q[0] < m[0] ? q : m), puntos[0]);
+        out.push({
+          key: 'finca',
+          geo: geometriaCinta(lineas, hF, { ancho: 0.045 }),
+          color,
+          opacidad: 0.88,
+          ancla,
+          esFinca: true,
+          cotaMsnm: msnmValido,
+          yCota: y,
+        });
+      }
+    }
     return out;
-  }, [segmentos, pisoUsuario]);
+  }, [segmentos, pisoUsuario, msnm]);
   useEffect(() => () => capas.forEach((c) => c.geo.dispose()), [capas]);
   const tex = texturaCinta();
   return (
@@ -564,10 +592,19 @@ function MapaDeNivel({ segmentos, pisoUsuario }) {
           />
         </mesh>
       ))}
-      {capas.filter((c) => c.ancla).map((c) => (
+      {capas.filter((c) => c.ancla && c.key === 'superparamo').map((c) => (
         <group key={`${c.key}-rotulo`} position={[c.ancla[0], LINEA_HIELO + 0.22, c.ancla[1]]}>{/* +0,22: con la cámara nueva, a +0,06 el rótulo rozaba el de «Nival» */}
           <Html center distanceFactor={13} zIndexRange={[28, 8]} style={{ pointerEvents: 'none' }}>
             <div className="vsierra-hielo" aria-hidden="true">Hasta aquí llegaba el hielo · 4.800 m</div>
+          </Html>
+        </group>
+      ))}
+      {capas.filter((c) => c.esFinca).map((c) => (
+        <group key="finca-rotulo" position={[c.ancla[0], c.yCota + 0.2, c.ancla[1]]}>
+          <Html center distanceFactor={13} zIndexRange={[28, 8]} style={{ pointerEvents: 'none' }}>
+            <div className="vsierra-finca" style={{ '--finca': c.color }} aria-hidden="true">
+              {c.cotaMsnm.toLocaleString('es-CO')} m · a la altura de su finca
+            </div>
           </Html>
         </group>
       ))}
@@ -659,6 +696,9 @@ function PanelDatosPiso({ pisoId }) {
  * @param {'alto'|'medio'|'bajo'} [props.tier='alto']  presupuesto de render.
  * @param {boolean} [props.reducedMotion=false]  congela aguas/nubes.
  * @param {string}  [props.pisoUsuario]  'calido'|'templado'|'frio'|'paramo'|'superparamo'|'nival'.
+ * @param {number|null} [props.msnm]  altitud CONFIRMADA de la finca en metros:
+ *        dibuja la curva exacta P1 «a la altura de su finca». Sin ella no se
+ *        dibuja nada de la finca (guard anti-fabricación).
  * @param {boolean} [props.luces=true]  monta las luces de la hora dorada.
  * @param {boolean} [props.atmosfera=true]  fondo + domo + bruma por altura.
  * @param {boolean} [props.credito=true]  pie de crédito 3D a los cuatro pueblos.
@@ -669,6 +709,7 @@ export function SierraDiorama({
   tier = 'alto',
   reducedMotion = false,
   pisoUsuario,
+  msnm = null,
   luces = true,
   atmosfera: conAtmosfera = true,
   credito = true,
@@ -679,6 +720,9 @@ export function SierraDiorama({
   const segmentos = SEGMENTOS_SIERRA[tier] ?? SEGMENTOS_SIERRA.medio;
   const conBruma = conAtmosfera && perfil.fog;
   const sombras = perfil.sombras;
+  /* P1 — solo una altitud CONFIRMADA dibuja la curva de la finca. El guard se
+     respeta: sin ella, `MarcadorPiso` sigue el piso representativo de antes. */
+  const msnmConfirmado = altitudFincaValida(msnm);
   const geo = useMemo(() => construirTerreno(segmentos, segmentos), [segmentos]);
   useEffect(() => () => geo.dispose(), [geo]);
   const faldon = useMemo(() => construirFaldon(), []);
@@ -713,8 +757,12 @@ export function SierraDiorama({
       <Rotulo pos={[SIMMONDS.x, SIMMONDS.y, SIMMONDS.z]} texto="Pico Simmonds" sub="5.560 m" distancia={12} alto={0.6} />
       <Rotulo pos={[PALOMINO.x, PALOMINO.y, PALOMINO.z]} texto="Palomino" sub="Caribe · 0 m" distancia={11} alto={0.45} />
 
-      {pisoUsuario && <MarcadorPiso piso={pisoUsuario} />}
-      <MapaDeNivel segmentos={segmentos} pisoUsuario={pisoUsuario} />
+      {pisoUsuario && !msnmConfirmado && <MarcadorPiso piso={pisoUsuario} />}
+      <MapaDeNivel
+        segmentos={segmentos}
+        pisoUsuario={msnmConfirmado ? null : pisoUsuario}
+        msnm={msnmConfirmado}
+      />
       <PisosTermicosBandas
         aura={false}
         pisoUsuario={pisoUsuario}
@@ -740,6 +788,7 @@ const CSS_SIERRA = `
 .vsierra-rotulo__txt { display: inline-flex; align-items: baseline; gap: 0.3rem; }
 .vsierra-rotulo__sub { font-weight: 500; font-style: normal; opacity: 0.72; font-size: 0.9em; }
 .vsierra-hielo { padding: 0.16rem 0.5rem; border-radius: 999px; background: rgba(255,248,233,0.86); color: #6a4a12; border: 1px solid rgba(224,168,74,0.9); font: 600 0.68rem/1.1 system-ui, sans-serif; white-space: nowrap; box-shadow: 0 1px 5px rgba(60,42,24,0.2); }
+.vsierra-finca { padding: 0.18rem 0.6rem; border-radius: 999px; background: rgba(255,248,233,0.9); color: #3a2a18; border: 1px solid rgba(64,44,22,0.3); border-left: 4px solid var(--finca, #4f8f7d); font: 600 0.72rem/1.15 system-ui, sans-serif; white-space: nowrap; box-shadow: 0 1px 6px rgba(60,42,24,0.22); }
 .vsierra-aqui { padding: 0.2rem 0.55rem; border-radius: 999px; background: rgba(64,44,22,0.82); color: #fff3d6; font: 600 0.72rem/1.1 system-ui, sans-serif; white-space: nowrap; box-shadow: 0 2px 8px rgba(30,18,6,0.3); }
 .vsierra-credito { margin: 0; max-width: min(90vw, 40rem); text-align: center; font: 500 0.78rem/1.4 system-ui, sans-serif; color: #f4ecdd; }
 .vsierra-credito--3d { padding: 0.4rem 0.8rem; border-radius: 0.7rem; background: rgba(24,16,7,0.44); backdrop-filter: blur(3px); }
@@ -778,6 +827,9 @@ const CSS_SIERRA = `
  * @param {'alto'|'medio'|'bajo'} [props.tier='alto']  presupuesto de render.
  * @param {boolean} [props.reducedMotion=false]  sin órbita ni nubes; frameloop a demanda.
  * @param {string}  [props.pisoUsuario]  piso de la finca a resaltar (opcional).
+ * @param {number|null} [props.msnm]  altitud CONFIRMADA de la finca (metros).
+ *        Sin la prop, se lee `?msnm=` (gate): si tampoco, nada de la finca se
+ *        dibuja (P1, guard anti-fabricación).
  * @param {(piso:object)=>void} [props.onSeleccionPiso]  se llama al llegar al piso seleccionado.
  * @param {string}  [props.className]  clases extra del contenedor.
  * @param {Array}   [props.sugerencias]  salida de `buildClimaCultivoSuggestions`
@@ -787,6 +839,7 @@ export default function VistaGlobalSierra({
   tier = 'alto',
   reducedMotion = false,
   pisoUsuario,
+  msnm = null,
   onSeleccionPiso,
   className = '',
   sugerencias = [],
@@ -797,6 +850,10 @@ export default function VistaGlobalSierra({
      Se baja al aterrizaje del descenso para que la Sierra absorba el dato que
      ya existe, sin armar un camino paralelo a `climaService`. */
   const climaVivo = useClima3DVivo();
+  /* P1 — la altitud de la finca que manda: la prop del host gana; sin ella, el
+     parámetro de gate `?msnm=` (que el descenso ya usa) puebla la curva para
+     capturas/demo. En el viaje real sin ninguno de los dos, no se dibuja. */
+  const msnmPortada = msnm ?? leerGateDescenso().msnmFijo ?? null;
   /* GATE (2026-09-04): `?viaje=<id de banda>` (antes del hash) arranca el viaje a
      ese piso sin clic — es lo que permite capturar el descenso congelado con
      `?msnm=`. Estado INICIAL perezoso (nada de setState en un efecto); sin el
@@ -844,6 +901,7 @@ export default function VistaGlobalSierra({
           tier={tier}
           reducedMotion={reducedMotion}
           pisoUsuario={pisoUsuario}
+          msnm={msnmPortada}
           credito={false}
           onSeleccionPiso={seleccionarPiso}
           pisoActivo={pisoActivo}
