@@ -38,6 +38,8 @@ import {
   ORDEN_PISOS_SIERRA,
   validarCotasPisosSierra,
   validarOrdenBandas,
+  altitudFincaValida,
+  bandaDeMsnm,
 } from '../../src/visual/mundo3d/pisosTermicos.js';
 
 const N = 7;
@@ -256,5 +258,36 @@ describe('🖼 bóveda, transecto y vista global consumen la MISMA tabla', () =>
     for (const hex of ['#c7a24b', '#8fae55', '#6f9a72', '#9fb6bf']) {
       expect(src.includes(`{ color: '${hex}' }`), `banda inventada ${hex} viva en el gemelo 2D`).toBe(false);
     }
+  });
+});
+
+describe('🖼 P1 — el marcador de la finca y su guard anti-fabricación', () => {
+  it('`altitudFincaValida` devuelve null sin altitud confirmada (nunca un 0 inventado)', () => {
+    expect(altitudFincaValida(null)).toBeNull();
+    expect(altitudFincaValida(undefined)).toBeNull();
+    expect(altitudFincaValida('')).toBeNull();
+    expect(altitudFincaValida(0)).toBeNull();
+    expect(altitudFincaValida(-5)).toBeNull();
+    expect(altitudFincaValida('abc')).toBeNull();
+    expect(altitudFincaValida(NaN)).toBeNull();
+  });
+
+  it('acepta una altitud positiva, también en string numérico', () => {
+    expect(altitudFincaValida(2200)).toBe(2200);
+    expect(altitudFincaValida('2200')).toBe(2200);
+  });
+
+  it('`bandaDeMsnm` ubica la cota en la banda correcta y la colorea con su piso', () => {
+    const frio = bandaDeMsnm(2200);
+    expect(frio.id).toBe('frio');
+    expect(frio.color).toBe(PISOS_TERMICOS.find((p) => p.id === 'frio').color);
+    expect(bandaDeMsnm(400).id).toBe('calido_seco');
+    expect(bandaDeMsnm(0).id).toBe('playa');
+    expect(bandaDeMsnm(5100).id).toBe('nival');
+  });
+
+  it('`bandaDeMsnm` devuelve null para altitudes no numéricas o negativas', () => {
+    expect(bandaDeMsnm(-1)).toBeNull();
+    expect(bandaDeMsnm(NaN)).toBeNull();
   });
 });
