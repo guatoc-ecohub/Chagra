@@ -1,5 +1,11 @@
 /**
- * MOCKUP "El clima como atmósfera viva" — ruta #/mockups/clima-atmosfera.
+ * MOCKUP "El clima como atmósfera viva" (ARTE original) — ruta
+ * #/mockups/clima-atmosfera-arte.
+ *
+ * Rescate 2026-09-05: la ruta canónica #/mockups/clima-atmosfera quedó como
+ * puente al mundo climático real (#2833). Este arte (Fable) se conserva intacto
+ * en su ruta hermana para que siga visible; el CSS que lo pinta
+ * (climaAtmosfera.css) ya vivía en dev sin consumidor.
  *
  * La UI RESPIRA el clima de la finca: un selector de 5 estados (soleado,
  * lluvia, niebla de páramo, hora dorada, noche) re-tiñe TODA la escena —

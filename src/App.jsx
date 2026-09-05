@@ -187,6 +187,12 @@ const AvatarGameLibre = lazy(() => import('./mockups/AvatarGameLibre'));
 // Piezas de decisión visual (acuarela, clima, diagnóstico, evidencia, guardianes).
 const MapaAcuarelaMockup = lazy(() => import('./mockups/MapaAcuarela'));
 const ClimaAtmosferaMockup = lazy(() => import('./mockups/ClimaAtmosfera'));
+// Arte original del mockup "El clima como atmósfera viva" (Fable): pantalla de
+// decisión visual con 5 estados de clima que re-tiñen toda la escena vía
+// tokens data-clima. La ruta canónica #/mockups/clima-atmosfera quedó como
+// puente al mundo real (#2833); el arte vive en su ruta hermana para que
+// ninguna de las dos intenciones se pierda.
+const ClimaAtmosferaArteMockup = lazy(() => import('./mockups/ClimaAtmosferaArte'));
 const DiagnosticoSobreFoto = lazy(() => import('./mockups/DiagnosticoSobreFoto'));
 const EvidenciaIlustrada = lazy(() => import('./mockups/EvidenciaIlustrada'));
 const MockupGuardianesNarrativos = lazy(() => import('./mockups/MockupGuardianesNarrativos'));
@@ -876,6 +882,9 @@ const MOCKUP_HASH_ROUTES = {
   'mockups/navegador-grafo': 'mockup_navegador_grafo',
   'mockups/navegacion-pisos': 'mockup_navegacion_pisos',
   'mockups/agente-dibuja': 'mockup_agente_dibuja',
+  // (rescate 2026-09-05) arte original del clima como atmósfera viva:
+  // 'mockups/clima-atmosfera' quedó como puente al mundo real (#2833).
+  'mockups/clima-atmosfera-arte': 'mockup_clima_atmosfera_arte',
 };
 
 const HASH_VIEW_ROUTES = {
@@ -2277,6 +2286,16 @@ export default function App() {
           <ErrorBoundary>
             <ErrorFallback moduleName="Mapa acuarela">
               <MapaAcuarelaMockup onBack={() => navigate('dashboard')} />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
+      case 'mockup_clima_atmosfera_arte':
+        // Arte original "El clima como atmósfera viva" (Fable): selector de 5
+        // estados re-tiñe cielo, luz, partículas y tarjetas (datos de muestra).
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="Mockup Clima Atmósfera (arte)">
+              <ClimaAtmosferaArteMockup onBack={() => navigate('dashboard')} />
             </ErrorFallback>
           </ErrorBoundary>
         );
