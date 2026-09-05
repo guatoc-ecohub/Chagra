@@ -87,3 +87,17 @@ PR #3119) choca con la evolución 095.b ya mergeada a dev (#3113), que extrajo e
 `scripts/lib/alcance-simbolica.mjs` para que el gate `audit-integraciones.mjs` mida con el
 mismo motor. Esta tanda corrió con la 095.b de dev (la que gatea CI). Reconciliar #3119
 es decisión del operador.
+
+## ADENDA 2026-09-05 — resolución de la tanda 2 (remate del gate de integraciones)
+
+Task `audit-gate-remate-20260905`, orden del operador: el rojo del gate
+`audit-integraciones` (126 hallazgos tras la tanda mundo3d de #3145) represaba 9
+PRs. El remate declaró los 123 restantes en
+`ops/integraciones-no-consumidas.json` (3 de los 126 resultaron VIVOS con el
+fix del tope {0,400} del motor: aguaFinca/cacaoFinca/mangoFinca, importados por
+AguaScreen/CacaoScreen/MangoScreen — no se declararon, se arregló el motor).
+Cada entrada pasó un control de importadores con resolución exacta de
+especificadores (lección useT.js). Las 6 «propuestas de borrado» de esta tanda
+quedaron declaradas por el remate — el BORRADO sigue pendiente de curaduría del
+operador. Detalle de cada decisión: ver las entradas con date 2026-09-05 en el
+allowlist.
