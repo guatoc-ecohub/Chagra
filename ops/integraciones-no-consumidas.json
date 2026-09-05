@@ -491,11 +491,6 @@
       "date": "2026-09-04"
     },
     {
-      "id": "src/services/compaiExplicaPantallas.js",
-      "reason": "El manifiesto de explicaciones fue recuperado en 2026-08-24 y lo consume useCompaiGuiaPantalla, pero el hook y CompaiGuiaPantalla no alcanzan una ruta de producto según el motor simbólico. No se cablea desde este alcance porque requiere montar la guía en el shell, no cambiar el manifiesto de copy.",
-      "date": "2026-09-04"
-    },
-    {
       "id": "src/services/compaiParadasPorPantalla.js",
       "reason": "Parte de la Ola 2 del paseo autónomo (#2820, 2026-07-30). useCompaiPaseo y useCompaiGuiaPantalla lo importan, pero ambos quedan fuera de una ruta viva; el registro de paradas no debe activarse sin el montaje y desmontaje real de cada pantalla. Se conserva como contrato en memoria y con pruebas hasta ese cableado.",
       "date": "2026-09-04"
