@@ -1,0 +1,254 @@
+[
+  {
+    "tipo": "zariguya",
+    "url": "http://127.0.0.1:5249/tests/visual/portal-tinta-gate-harness.html?tipo=zariguya",
+    "consoleErrs": [
+      "error: React does not recognize the `%s` prop on a DOM element. If you intentionally want it to appear in the DOM as a custom attribute, spell it as lowercase `%s` instead. If you accidentally passed it from a parent component, remove it from the DOM element. data-agt-capacidad-respiraOrgano data-agt-capacidad-respiraorgano"
+    ],
+    "pageErrs": [],
+    "reqFail": [],
+    "total": 6,
+    "criaturas": [
+      {
+        "creature": "zariguya",
+        "w": 300,
+        "h": 300,
+        "tieneSvg": true,
+        "rotulo": null,
+        "quieto": false
+      },
+      {
+        "creature": "zariguya",
+        "w": 76,
+        "h": 76,
+        "tieneSvg": true,
+        "rotulo": null,
+        "quieto": false
+      },
+      {
+        "creature": "zariguya",
+        "w": 32,
+        "h": 32,
+        "tieneSvg": true,
+        "rotulo": null,
+        "quieto": false
+      },
+      {
+        "creature": "zariguya",
+        "w": 300,
+        "h": 300,
+        "tieneSvg": true,
+        "rotulo": null,
+        "quieto": false
+      },
+      {
+        "creature": "zariguya",
+        "w": 76,
+        "h": 76,
+        "tieneSvg": true,
+        "rotulo": null,
+        "quieto": false
+      },
+      {
+        "creature": "zariguya",
+        "w": 32,
+        "h": 32,
+        "tieneSvg": true,
+        "rotulo": null,
+        "quieto": false
+      }
+    ],
+    "rotulos": [
+      "zarigüeya"
+    ],
+    "titulo": "Portal 2D→3D — tinta Trazado (PR #3140)"
+  },
+  {
+    "tipo": "luciernaga",
+    "url": "http://127.0.0.1:5249/tests/visual/portal-tinta-gate-harness.html?tipo=luciernaga",
+    "consoleErrs": [],
+    "pageErrs": [],
+    "reqFail": [],
+    "total": 6,
+    "criaturas": [
+      {
+        "creature": "luciernaga",
+        "w": 300,
+        "h": 300,
+        "tieneSvg": true,
+        "rotulo": null,
+        "quieto": false
+      },
+      {
+        "creature": "luciernaga",
+        "w": 76,
+        "h": 76,
+        "tieneSvg": true,
+        "rotulo": null,
+        "quieto": false
+      },
+      {
+        "creature": "luciernaga",
+        "w": 32,
+        "h": 32,
+        "tieneSvg": true,
+        "rotulo": null,
+        "quieto": false
+      },
+      {
+        "creature": "luciernaga",
+        "w": 300,
+        "h": 300,
+        "tieneSvg": true,
+        "rotulo": null,
+        "quieto": false
+      },
+      {
+        "creature": "luciernaga",
+        "w": 76,
+        "h": 76,
+        "tieneSvg": true,
+        "rotulo": null,
+        "quieto": false
+      },
+      {
+        "creature": "luciernaga",
+        "w": 32,
+        "h": 32,
+        "tieneSvg": true,
+        "rotulo": null,
+        "quieto": false
+      }
+    ],
+    "rotulos": [
+      "luciérnaga"
+    ],
+    "titulo": "Portal 2D→3D — tinta Trazado (PR #3140)"
+  },
+  {
+    "tipo": "chivito-punk",
+    "url": "http://127.0.0.1:5249/tests/visual/portal-tinta-gate-harness.html?tipo=chivito-punk",
+    "consoleErrs": [],
+    "pageErrs": [],
+    "reqFail": [],
+    "total": 6,
+    "criaturas": [
+      {
+        "creature": "chivito-punk",
+        "w": 300,
+        "h": 300,
+        "tieneSvg": true,
+        "rotulo": null,
+        "quieto": false
+      },
+      {
+        "creature": "chivito-punk",
+        "w": 76,
+        "h": 76,
+        "tieneSvg": true,
+        "rotulo": null,
+        "quieto": false
+      },
+      {
+        "creature": "chivito-punk",
+        "w": 32,
+        "h": 32,
+        "tieneSvg": true,
+        "rotulo": null,
+        "quieto": false
+      },
+      {
+        "creature": "chivito-punk",
+        "w": 300,
+        "h": 300,
+        "tieneSvg": true,
+        "rotulo": null,
+        "quieto": false
+      },
+      {
+        "creature": "chivito-punk",
+        "w": 76,
+        "h": 76,
+        "tieneSvg": true,
+        "rotulo": null,
+        "quieto": false
+      },
+      {
+        "creature": "chivito-punk",
+        "w": 32,
+        "h": 32,
+        "tieneSvg": true,
+        "rotulo": null,
+        "quieto": false
+      }
+    ],
+    "rotulos": [
+      "chivito punk (actúa)"
+    ],
+    "titulo": "Portal 2D→3D — tinta Trazado (PR #3140)"
+  },
+  {
+    "tipo": "oso-baston",
+    "url": "http://127.0.0.1:5249/tests/visual/portal-tinta-gate-harness.html?tipo=oso-baston",
+    "consoleErrs": [
+      "error: React does not recognize the `%s` prop on a DOM element. If you intentionally want it to appear in the DOM as a custom attribute, spell it as lowercase `%s` instead. If you accidentally passed it from a parent component, remove it from the DOM element. data-agt-capacidad-respiraOrgano data-agt-capacidad-respiraorgano"
+    ],
+    "pageErrs": [],
+    "reqFail": [],
+    "total": 6,
+    "criaturas": [
+      {
+        "creature": "oso-baston",
+        "w": 300,
+        "h": 300,
+        "tieneSvg": false,
+        "rotulo": null,
+        "quieto": false
+      },
+      {
+        "creature": "oso-baston",
+        "w": 76,
+        "h": 76,
+        "tieneSvg": false,
+        "rotulo": null,
+        "quieto": false
+      },
+      {
+        "creature": "oso-baston",
+        "w": 32,
+        "h": 32,
+        "tieneSvg": false,
+        "rotulo": null,
+        "quieto": false
+      },
+      {
+        "creature": "oso-baston",
+        "w": 300,
+        "h": 300,
+        "tieneSvg": false,
+        "rotulo": null,
+        "quieto": false
+      },
+      {
+        "creature": "oso-baston",
+        "w": 76,
+        "h": 76,
+        "tieneSvg": false,
+        "rotulo": null,
+        "quieto": false
+      },
+      {
+        "creature": "oso-baston",
+        "w": 32,
+        "h": 32,
+        "tieneSvg": false,
+        "rotulo": null,
+        "quieto": false
+      }
+    ],
+    "rotulos": [
+      "oso del bastón (CONTROL)"
+    ],
+    "titulo": "Portal 2D→3D — tinta Trazado (PR #3140)"
+  }
+]
