@@ -1,0 +1,12 @@
+URL: http://127.0.0.1:41833/?descenso3d=1&viaje=frio&msnm=2200&enso=el_nino#/mockups/sierra-global
+escena3d=1
+altimetro: 2.200 m | 2.200 m · su predio
+panel (6 líneas):
+  - nublado · 6° · ahora
+  - posible helada de madrugada en páramos y pisos fríos
+  - Puede helar en lo plano: esta noche baja a 2°. El Niño en el piso frío es MÁS helada, no menos.
+  - Está en el piso frío.
+  - El Niño. Va a llover menos — y va a helar MÁS de madrugada, no menos. Guarde agua para el riego nocturno.
+  - Chivito vino a contarle: Esta nube no está encima: usted está adentro. Aquí el aire se enfría lo justo para soltar el agua.
+pageerrors: 0
+requestFailures: 0

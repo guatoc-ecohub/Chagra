@@ -99,3 +99,57 @@ Sí: `src/visual/mundo3d/sierra/lecturaClimaAterrizaje.js` (nuevo, dato puro) ·
 aditivo en el panel de aterrizaje) · `src/visual/mundo3d/VistaGlobalSierra.jsx` (consume el hook y
 lo baja). No: escala de la Sierra, `syncManager`, `dbCore`, `sw.js`, `scripts/tsc-baseline.json`,
 CLAAssistant ni audit-integraciones (rojo en base para todos).
+
+## 5. Gate — mediciones y capturas (GPU headed, X viva, page errors 0)
+
+Vite dev local del worktree (`127.0.0.1:41833`, config `_gate/vite.sierra-absorbe-gate.mjs`
+que solo permite el realpath de `node_modules` para que el sqlite-wasm no dé 403; sin tocar
+`vite.config.js` del repo). Captura `shot3d --headed` (renderer NVIDIA Quadro M6000, ANGLE),
+evidencia de DOM con `_gate/capturas-clima/probe-aterrizaje.mjs` (headed, misma sesión X).
+
+- **Sin dato** (`?descenso3d=1&viaje=frio&msnm=2200&enso=neutral`): page errors 0, request
+  failures 0. Panel del aterrizaje = 2 líneas (piso + anfitrión). CERO tinta/aviso/tiza extra:
+  sin snapshot no se inventa clima. PNG `absorbe-sin-dato.png`.
+- **Con dato** (mismo + `enso=el_nino` + snapshot sembrado del contrato del sidecar en la cache
+  de la app, `SEED=1`; mismos valores que tendría un snapshot Open-Meteo con coordenadas de
+  finca a 2 200 m): page errors 0, request failures 0. Panel = 6 líneas:
+  1. tinta `nublado · 6° · ahora` (condicion + temp + ventana «ahora»)
+  2. aviso local tinta (alertas)
+  3. tiza `Puede helar en lo plano: esta noche baja a 2°. El Niño en el piso frío es MÁS helada,
+     no menos.`
+  4. piso (pisoTermico → «piso frío»)
+  5. línea ENSO por piso (ya existente, se conserva)
+  6. anfitrión
+  PNG `absorbe-con-dato.png`.
+
+**Cuadro y conteo (el resultado, no un «quedó bien»):** de los 26 campos del hook, en el
+aterrizaje CON dato se leen como texto **7**: `condicion` (palabra) · `temp` (grado) ·
+`tempMin` (en la tiza/frase de noche) · `helada` (vía la tiza que dispara) · `alertas` (aviso
+local) · `pisoTermico` (el piso) · `ensoLabel`/`ensoFamily` (El Niño, en su efecto y su línea).
+Los otros 19 tienen su decisión en la tabla §2 (fenómeno visual, a un gesto, control interno o
+«no va» con su razón). Los que el 2D muestra como números y la Sierra NO va a mostrar (lluviaMm,
+nubosidad, humedad, viento, ONI…) están en la tabla con el porqué, que es la gramática de la
+dirección, no un olvido.
+
+**Vitest:** suite tocada y regresión `src/visual/mundo3d/__tests__/` verde (38 files, 507 ok, 1
+expected fail). El `vitest run` completo da 20 tests rojos repartidos en 10 archivos; verificado
+que se reproducen en `origin/dev` SIN mis cambios (worktree base: catalog/migrate-v31-v32,
+AngelitaGuia, GuacamayaCompai, DashboardLive entre otros): son rojos de la base, no de este PR.
+`audit-integraciones` rojo en base, como dice el brief.
+
+**Lo que NO pude verificar (crudo):**
+- No hay coordenadas de finca en el entorno: un snapshot Open-Meteo real no llega, así que la
+  captura «con dato» usa un snapshot sembrado del contrato del sidecar (formato idéntico al que
+  mandaría con coordenadas). Los valores NO son una lectura real de un día: son un estado de
+  composición para medir layout/conteo. Un carril con coordenadas reales debe repetir la captura
+  con dato vivo.
+- La imagen la juzga el operador: este carril no tiene visión. Los PNG son evidencia cruda; los
+  textos del panel están verificados por DOM (líneas de arriba), no por píxel.
+- La tiza de helada convive hoy con el aviso local y la línea ENSO cuando las tres aplican
+  (redundancia controlada, materiales distintos: tinta externa / tiza propia / contexto ENSO).
+  La pasada de arte que retire la píldora puede ordenarla.
+- El carril UTC/día está cerrado en dev por otro carril (`fincaDateISO`); la tiza de helada lee
+  `tempMin` del día ya resuelto en la zona de la finca. Señalado en el PR.
+
+**Telegram (capturas al operador):** `msg_id=6554` (sin dato) · `msg_id=6555` (con dato), ambos
+`ok:true` vía `tg-send` (wrapper oficial; el token jamás se leyó acá).
