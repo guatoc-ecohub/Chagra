@@ -6,6 +6,10 @@ import { cuerpoPortalDe } from '../CompaiTransicion.jsx';
 import AbejaTransicion from '../../../creatures/AbejaTransicion.jsx';
 import { ABEJA_PRESENCIA } from '../../../creatures/abejaIdentidad.js';
 import { AbejaAngelita } from '../../../creatures/AbejaAngelita.jsx';
+import ZariguyaTrazado from '../../../creatures/ZariguyaTrazado.jsx';
+import LuciernagaTrazado from '../../../creatures/LuciernagaTrazado.jsx';
+import ChivitoTrazado from '../../../creatures/ChivitoTrazado.jsx';
+import OsoBaston from '../../../creatures/OsoBaston.jsx';
 import { AVATAR_TYPES } from '../../../../hooks/useAgentAvatarType.js';
 
 afterEach(cleanup);
@@ -98,6 +102,20 @@ describe('compaiRegistry.resolverCompai', () => {
       expect(cuerpoPortalDe(c)).toBe(c.PortalComponent);
     }
     expect(cuerpoPortalDe(resolverCompai('angelita'))).toBe(AbejaAngelita);
+  });
+
+  it('el portal 2D→3D de zarigüeya/luciérnaga/chivito es la TINTA Trazado, NO la piel vieja', () => {
+    // Migración 097 (2026-09-04): el agente PWA y el selector del usuario ya
+    // visten `*Trazado.jsx`; el portal del Valle 3D se quedó montando la piel
+    // rubber-hose vieja y el handoff 2D→3D cambiaba de especie. Este test es
+    // el control negativo real: si alguien revierte UN import del registro a
+    // `Zariguya.jsx`/`Luciernaga.jsx`/`ChivitoPunk.jsx`, este caso ROJO.
+    expect(resolverCompai('zariguya').PortalComponent, 'zariguya volvió a la piel vieja').toBe(ZariguyaTrazado);
+    expect(resolverCompai('luciernaga').PortalComponent, 'luciernaga volvió a la piel vieja').toBe(LuciernagaTrazado);
+    expect(resolverCompai('chivito-punk').PortalComponent, 'chivito-punk volvió a la piel vieja').toBe(ChivitoTrazado);
+    // El OSO DEL BASTÓN queda FUERA de la migración a propósito: su lámina
+    // musculosa está aprobada (SKIN CONSERVADA) y no existe OsoTrazado.
+    expect(resolverCompai('oso-baston').PortalComponent, 'oso-baston cambió de piel sin decisión de arte').toBe(OsoBaston);
   });
 
   it('entrada y vuelta conservan el slug del cuerpo elegido', () => {

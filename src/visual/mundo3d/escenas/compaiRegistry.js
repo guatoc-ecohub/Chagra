@@ -31,12 +31,12 @@
  */
 import { ABEJA_PRESENCIA } from '../../creatures/abejaIdentidad.js';
 import { AbejaAngelita } from '../../creatures/AbejaAngelita.jsx';
-import { Zariguya } from '../../creatures/Zariguya.jsx';
+import ZariguyaTrazado from '../../creatures/ZariguyaTrazado.jsx';
 import JaguarTrazado from '../../creatures/JaguarTrazado.jsx';
 import OsoBaston from '../../creatures/OsoBaston.jsx';
-import { Luciernaga } from '../../creatures/Luciernaga.jsx';
+import LuciernagaTrazado from '../../creatures/LuciernagaTrazado.jsx';
 import GuacamayaCompai from '../../creatures/GuacamayaCompai.jsx';
-import ChivitoPunk from '../../creatures/ChivitoPunk.jsx';
+import ChivitoTrazado from '../../creatures/ChivitoTrazado.jsx';
 import { ZARIGUYA_PRESENCIA } from '../../creatures/zariguyaIdentidad.js';
 import { JAGUAR_PRESENCIA } from '../../creatures/jaguarIdentidad.js';
 import { OSO_BASTON_PRESENCIA } from '../../creatures/osoBastonIdentidad.js';
@@ -98,10 +98,12 @@ const REGISTRO = {
   //
   // La ZARIGÜEYA compañera (fable #5): marsupial nocturno DE PISO — llega
   // trotando, merodea, se encarama al foco en alto y husmea. Crías al lomo
-  // de serie (su firma). Jamás vuela.
+  // de serie (su firma). Jamás vuela. El portal cruza con la TINTA Trazado
+  // (migración 097: misma piel del selector y del billboard — una sola
+  // especie en el handoff 2D→3D, igual que el jaguar).
   zariguya: {
     EscenaComponent: ZariguyaCompaiEscena,
-    PortalComponent: Zariguya,
+    PortalComponent: ZariguyaTrazado,
     presencia: ZARIGUYA_PRESENCIA,
     especie: 'zariguya',
     pendienteFable: false,
@@ -124,12 +126,18 @@ const REGISTRO = {
   // La LUCIÉRNAGA compañera (fable F26): sí vuela, pero NO como la abeja —
   // se ENCIENDE por pulsos al entrar, deriva lento y bajo, PULSA luz, se
   // detiene a leer la noche y con alerta de finca titila 'degradado'.
-  // El portal conserva la linterna y el perfil aéreo de la luciérnaga.
-  luciernaga: { EscenaComponent: LuciernagaCompaiEscena, PortalComponent: Luciernaga, presencia: LUCIERNAGA_PRESENCIA, especie: 'luciernaga', pendienteFable: false },
+  // El portal conserva la linterna y el perfil aéreo de la luciérnaga y
+  // cruza con la TINTA Trazado (migración 097, misma piel del selector).
+  luciernaga: { EscenaComponent: LuciernagaCompaiEscena, PortalComponent: LuciernagaTrazado, presencia: LUCIERNAGA_PRESENCIA, especie: 'luciernaga', pendienteFable: false },
   // Las aves usan sus rigs F24 aprobados en 2D y 3D. La coreografía es
   // compartida, pero cada entrada conserva su arte y su escala de presencia.
   guacamaya: { EscenaComponent: GuacamayaCompaiEscena, PortalComponent: GuacamayaCompai, presencia: GUACAMAYA_PRESENCIA, especie: 'guacamaya', pendienteFable: false },
-  'chivito-punk': { EscenaComponent: ChivitoCompaiEscena, PortalComponent: ChivitoPunk, presencia: CHIVITO_PRESENCIA, especie: 'chivito-punk', pendienteFable: false },
+  // El chivito cruza con la TINTA Trazado (migración 097, misma piel del
+  // selector y del billboard); la escena conserva el rig F24 compartido con
+  // la guacamaya. El oso del bastón NO entra en esta migración: su lámina
+  // musculosa está aprobada y no existe OsoTrazado (decisión de arte, no
+  // tarea de cableado).
+  'chivito-punk': { EscenaComponent: ChivitoCompaiEscena, PortalComponent: ChivitoTrazado, presencia: CHIVITO_PRESENCIA, especie: 'chivito-punk', pendienteFable: false },
 };
 
 /**
