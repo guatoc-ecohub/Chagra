@@ -299,6 +299,9 @@ const VitrinaInfraestructuraMockup = lazy(() => import('./mockups/vitrina3d/Vitr
 // con su encuadre de cámara curado (camaraDioramas) + botón «Entrar» al host real.
 const VitrinaMundosMockup = lazy(() => import('./mockups/vitrina3d/VitrinaMundos'));
 const SierraGlobalMockup = lazy(() => import('./visual/mundo3d/VistaGlobalSierra'));
+// SSOT de pisos térmicos: resuelve el mundo principal de una banda tocada
+// (fix bug P1 huérfanos-3D — tocar piso baja al mundo real, bajo tapa).
+import { mundoPrincipalDePiso } from './visual/mundo3d/pisosTermicos.js';
 const MundoSueloVivoMockup = lazy(() => import('./mockups/MundoSueloVivo3D'));
 const AliadosFincaMockup = lazy(() => import('./mockups/AliadosFinca3D'));
 const MundoCafe3DMockup = lazy(() => import('./mockups/MundoCafe3D'));
@@ -2447,11 +2450,21 @@ export default function App() {
         // Vista global 3D de la Sierra Nevada de Santa Marta: el macizo maestro
         // (Simmonds + Palomino, bandas de piso térmico, hora dorada). Territorio
         // sagrado tratado con dignidad — crédito a Kogui/Arhuaco/Wiwa/Kankuamo.
-        // Ruta #/mockups/sierra-global, sin auth.
+        // Ruta #/mockups/sierra-global, sin auth. Tocar una banda de piso
+        // térmico SÍ navega de verdad (fix bug P1 huérfanos-3D, rescate
+        // 2026-09-05 de fix/valle2d-fallback-y-sierra-clic): `onSeleccionPiso`
+        // se dispara a MITAD de la transición (pantalla cubierta) y baja al
+        // primer mundo real que `pisosTermicos.js` declara para ese piso. Sin
+        // mundo declarado, no navega (nunca finge una ruta).
         return (
           <ErrorBoundary>
             <ErrorFallback moduleName="Vista global Sierra Nevada">
-              <SierraGlobalMockup />
+              <SierraGlobalMockup
+                onSeleccionPiso={(piso) => {
+                  const mundo = mundoPrincipalDePiso(piso);
+                  if (mundo?.view) navigate(mundo.view);
+                }}
+              />
             </ErrorFallback>
           </ErrorBoundary>
         );

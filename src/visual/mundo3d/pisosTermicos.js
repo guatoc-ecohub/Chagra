@@ -161,6 +161,27 @@ export function pisoPorId(id) {
 }
 
 /**
+ * El mundo principal de un piso: el PRIMERO que la tabla canónica declara
+ * para vivir en esa ecología (`piso.mundos[0]`). Acepta tanto un piso de la
+ * tabla de finca (`PISOS_TERMICOS`) como una banda visual de la Sierra
+ * (`PISOS_TERMICOS_SIERRA`): si el id de la banda no está en la tabla (p. ej.
+ * la sub-banda `calido_seco`), resuelve por su campo `piso`, que es el
+ * mapeo banda→piso canónico declarado en la SSOT.
+ *
+ * Honestidad de navegación (bug P1 huérfanos-3D): sin piso, sin mundo
+ * declarado o sin `view` → `null`. Quien navega con esto NO inventa ruta:
+ * si es `null`, no navega.
+ *
+ * @param {{ id?: string, piso?: string, mundos?: { id: string, nombre: string, view: string, transversal?: boolean }[] } | null | undefined} piso
+ * @returns {{ id: string, nombre: string, view: string, transversal?: boolean } | null}
+ */
+export function mundoPrincipalDePiso(piso) {
+  const enTabla = pisoPorId(piso?.id) || pisoPorId(piso?.piso) || piso;
+  const mundo = enTabla?.mundos?.[0];
+  return mundo && mundo.view ? mundo : null;
+}
+
+/**
  * El piso cuyo rango contiene esa altitud (metros). Por debajo de 0 → cálido;
  * por encima de la cumbre → nival. Cada rango es [min, max) salvo el último,
  * que cierra en la cumbre.
