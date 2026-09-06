@@ -88,6 +88,8 @@
  *      un ref) → `camaraRef={camRef}`.
  */
 import { Suspense, lazy, useEffect, useMemo, useRef, useState } from 'react';
+const CompaneroSierra = lazy(() => import('../../components/ChagraAgentAvatar.jsx'));
+
 import { PISOS_TRANSICION_SIERRA as PISOS } from './pisosTermicos.js';
 import { permite3D } from './deviceTier.js';
 import {
@@ -162,6 +164,14 @@ function easeInOutCubic(t) {
  * holgura amplia alrededor de la meseta 45%–55% del contrato. */
 
 const CSS = `
+.tsm__companero { position:absolute; left:4vw; bottom:4vh; pointer-events:auto; }
+.tsm__companero .tsm__pizarra { left:72px; bottom:0; }
+.tsm__continuar { z-index:2; position:absolute; right:4vw; bottom:4vh; pointer-events:auto; padding:12px 18px; background:#fff8e9; color:#402c16; border:1px solid currentColor; }
+.tsm__pizarra summary { cursor:pointer; min-height:24px; }
+@media (prefers-reduced-motion: reduce) {
+  .tsm__llegada__cota, .tsm__llegada__tinta { animation:none !important; }
+}
+
 .tsm {
   position: fixed;
   inset: 0;
@@ -278,16 +288,16 @@ const CSS = `
    'animationend'. Sin dato no se monta ninguna pieza (el hueco es la ausencia). */
 
 .tsm__llegada {
+  z-index:1;
   position: absolute;
-  top: calc(10vh + 2.6rem);
-  left: 50%;
-  transform: translateX(-50%);
+  top: 46%;
+  right: 5vw;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  gap: 0.5rem;
-  max-width: min(88vw, 34rem);
-  text-align: center;
+  align-items: flex-start;
+  gap: 0.25rem;
+  max-width: min(88vw, 25rem);
+  text-align: left;
   pointer-events: none;
 }
 
@@ -295,10 +305,10 @@ const CSS = `
 .tsm__llegada__cota {
   margin: 0;
   padding: 0.5rem 1rem 0.55rem;
-  border-radius: 0.8rem;
+  border-radius: 0;
   background: rgba(255, 248, 233, 0.92);
   color: #402c16;
-  box-shadow: 0 2px 10px rgba(20, 14, 6, 0.28);
+  box-shadow: none;
   font: 600 1.55rem/1.1 system-ui, sans-serif;
   letter-spacing: 0.01em;
   animation: tsm-llega 180ms ease-out both;
@@ -316,10 +326,10 @@ const CSS = `
 .tsm__llegada__tinta {
   margin: 0;
   padding: 0.4rem 0.9rem;
-  border-radius: 0.7rem;
+  border-radius: 0;
   background: rgba(255, 248, 233, 0.78);
   color: #3a2a18;
-  box-shadow: 0 1px 8px rgba(20, 14, 6, 0.2);
+  box-shadow: none;
   font: 560 0.95rem/1.35 system-ui, sans-serif;
   animation: tsm-llega 180ms ease-out both;
 }
@@ -607,6 +617,7 @@ const CSS = `
  * @param {object|null} [props.climaVivo] salida completa de `useClima3DVivo`
  *        (`derivarClima3D`): la fuente única del clima de la finca. El host lo
  *        baja del hook; si no llega, el aterrizaje no inventa números (§8).
+ * @param {boolean} [props.sostenerAterrizaje] conserva T0/T1/T2 hasta continuar.
  * @param {Array} [props.sugerencias] salida de `buildClimaCultivoSuggestions`
  *        (solo si el host ya la calculó; sin plantas no hay prioridad 2).
  * @param {(estado: object) => void} [props.onDescenso] callback por cuadro con
@@ -632,8 +643,10 @@ export default function TransicionSierraMundo({
   humedad = null,
   climaVivo = null,
   sugerencias = [],
+  sostenerAterrizaje = false,
   onDescenso,
 }) {
+  const continuadoRef = useRef(false);
   const mitadRef = useRef(onMitad);
   const finRef = useRef(onFin);
   const altimetroRef = useRef(null);
@@ -664,13 +677,8 @@ export default function TransicionSierraMundo({
      constante `ENSO_WATCH_2026`. El host puede imponerla por prop para pruebas. */
   const gate = useMemo(() => leerGateDescenso(), []);   // ?msnm= ?enso= ?helada= — solo para el gate; null en el viaje real
   const fase = faseEnso ?? gate.fase ?? faseEnsoViva();
-  /* ¿El viaje está PARADO en la cota? Solo ahí se compone el aterrizaje en tres
-     tiempos (§3.3): en un viaje que corre hacia un mundo no hay pizarra que
-     montar (el overlay se desmonta al llegar). `?msnm=` (gate) es la forma de
-     parar HOY; un host futuro puede sostener el viaje en la cota de la finca. */
-  const paradoEnCota = gate.msnmFijo != null;
-  /* Los tres tiempos: 0 = sin aterrizaje · 1 = T0 (la cota) · 2 = T1 (la tinta
-     del ahora) · 3 = T2 (la tiza en la pizarra). Timers deterministas. */
+  // El host sostiene la llegada real; el parámetro solo congela la cámara del gate.
+  const paradoEnCota = sostenerAterrizaje || gate.msnmFijo != null;
   const [paso, setPaso] = useState(0);
   const destino = useMemo(() => cotaDestino(msnmUsuario), [msnmUsuario]);
   /* Con `?msnm=` (gate) y sin finca, la línea y el anfitrión siguen la cota CONGELADA:
@@ -733,13 +741,13 @@ export default function TransicionSierraMundo({
     const tMitad = setTimeout(() => {
       if (!hechoMitad) {
         hechoMitad = true;
-        mitadRef.current?.();
+        if (!sostenerAterrizaje) mitadRef.current?.();
       }
     }, Math.round(total * MITAD_FRAC));
     /* GATE (2026-09-04): con `?msnm=` el viaje está CONGELADO en una cota para
        medirlo/capturarlo; entonces no se programa el cierre (ni se marca «visto»):
        la transición se sostiene hasta desmontar. Sin `?msnm=` nada cambia. */
-    const sostener = gate.msnmFijo != null;
+    const sostener = paradoEnCota;
     const tFin = sostener
       ? null
       : setTimeout(() => {
@@ -755,25 +763,20 @@ export default function TransicionSierraMundo({
       clearTimeout(tMitad);
       if (tFin) clearTimeout(tFin);
     };
-  }, [activa, direccion, tier, reducedMotion, usar3d, gate.msnmFijo]);
+  }, [activa, direccion, tier, reducedMotion, usar3d, paradoEnCota, sostenerAterrizaje]);
 
-  /* EL ATERRIZAJE EN TRES TIEMPOS (§3.3 de DIRECCION-NUMEROS-VIVOS): la píldora
-     se retiró; ahora cada pieza aparece por setTimeout determinista (contrato
-     temporal, nunca `animationend`). La base es el instante en que la píldora
-     vieja asomaba (86 % del viaje, la curva ya frenando); T1 a +800 ms y T2 a
-     +1 600 ms. Con reduced-motion el modo 3D no corre y esto no aplica. */
+  // T0 coincide con la llegada geométrica, no con el inicio del frenado.
+  // Los plazos absolutos comparten inicio con el viaje y se cancelan al salir.
   useEffect(() => {
-    if (!activa || !usar3d || !paradoEnCota) {
-      setPaso(0);
-      return undefined;
+    if (!activa || !paradoEnCota) return undefined;
+    const base = usar3d ? duracionDescenso(tier, reducedMotion) : duracionViaje(tier, reducedMotion);
+    const timers = [setTimeout(() => { continuadoRef.current = false; setPaso(0); }, 0)];
+    if (reducedMotion) {
+      timers.push(setTimeout(() => setPaso(3), base));
+    } else {
+      [1, 2, 3].forEach((p) => timers.push(setTimeout(() => setPaso(p), base + (p - 1) * 800)));
     }
-    const base = Math.round(duracionDescenso(tier, reducedMotion) * 0.86);
-    const timers = [
-      setTimeout(() => setPaso((p) => Math.max(p, 1)), base),
-      setTimeout(() => setPaso((p) => Math.max(p, 2)), base + 800),
-      setTimeout(() => setPaso((p) => Math.max(p, 3)), base + 1600),
-    ];
-    return () => timers.forEach((t) => clearTimeout(t));
+    return () => timers.forEach(clearTimeout);
   }, [activa, usar3d, paradoEnCota, tier, reducedMotion]);
 
   // Tween de cámara OPCIONAL: dolly vertical + push/pull de FOV solo durante
@@ -842,9 +845,10 @@ export default function TransicionSierraMundo({
      trae la elegida entre helada → SU cultivo → sed/hongo; si no aplica
      ninguna, El Niño por piso es la prioridad 5 (y bajo neutral, nada). Si al
      final no hay línea, la pizarra calla: «nada» es un estado válido. */
-  const tizaLinea =
-    lectura.tiza ||
-    (aterrizaje.enso?.titular
+  const tizaLinea = !aterrizaje.conUbicacion
+    ? 'Confirme su finca y la montaña le muestra su clima.'
+    : lectura.tiza ||
+    ((climaVivo?.tieneEnso || faseEnso != null || gate.fase != null) && aterrizaje.enso?.titular
       ? `${aterrizaje.enso.titular} ${aterrizaje.enso.accion}`.trim()
       : null) ||
     null;
@@ -866,7 +870,7 @@ export default function TransicionSierraMundo({
         '--tsm-ms': `${total}ms`,
       }}
       role="status"
-      aria-live="polite"
+      aria-live={paso >= 3 ? "polite" : "off"}
       data-testid="tsm"
     >
       <style>{CSS}</style>
@@ -912,10 +916,16 @@ export default function TransicionSierraMundo({
               {!(paradoEnCota && paso >= 1) && (
                 <p className="tsm__altimetro" aria-hidden="true">
                   <span ref={altimetroRef}>5.775 m</span>
-                  <small>{aterrizaje.lineaCota}</small>
+
                 </p>
               )}
-              {paradoEnCota && (
+
+            </>
+          )}
+          <p className="tsm__txt">{texto}</p>
+        </>
+      )}
+      {paradoEnCota && (
                 <>
                   {/* El aterrizaje, en tres tiempos. Cada pieza aparece por
                       setTimeout; la píldora oscura ya no existe (PASO 1). */}
@@ -928,32 +938,40 @@ export default function TransicionSierraMundo({
                     )}
                     {paso >= 2 &&
                       lectura.hayDato &&
-                      (lectura.tinta.length > 0 || lectura.alertas.length > 0) && (
+                      lectura.tinta.length > 0 && aterrizaje.conUbicacion && (
                         <div className="tsm__llegada__tinta" data-testid="tsm-t1">
-                          {lectura.tinta.map((linea) => (
+                          {lectura.tinta.slice(0, 1).map((linea) => (
                             <p key={linea}>{linea}</p>
                           ))}
-                          {lectura.alertas.map((alerta) => (
-                            <small key={`${alerta.tipo}-${alerta.mensaje}`}>
-                              {alerta.mensaje}
-                            </small>
-                          ))}
+
                         </div>
                       )}
                   </div>
-                  {paso >= 3 && tizaLinea && (
-                    <div className="tsm__pizarra" role="status" data-testid="tsm-t2">
-                      <p className="tsm__pizarra__rotulo">{firmaTiza}</p>
-                      <p className="tsm__pizarra__texto">{tizaLinea}</p>
+                  {paso >= 3 && (
+                    <div className="tsm__companero">
+                      <Suspense fallback={null}>
+                        <CompaneroSierra especie={visita.companero} size={64} />
+                      </Suspense>
+                      {tizaLinea && (
+                        <details className="tsm__pizarra" open={!reducedMotion} data-testid="tsm-t2">
+                          <summary>Leer aviso</summary>
+                          <p className="tsm__pizarra__texto">{tizaLinea}</p>
+                          <p className="tsm__pizarra__rotulo">{`— ${firmaTiza}`}</p>
+                        </details>
+                      )}
                     </div>
+                  )}
+                  {sostenerAterrizaje && paso >= 3 && (
+                    <button className="tsm__continuar" onClick={() => {
+                      if (continuadoRef.current) return;
+                      continuadoRef.current = true;
+                      if (usar3d) marcarDescensoVisto();
+                      mitadRef.current?.();
+                      finRef.current?.();
+                    }}>Continuar al piso</button>
                   )}
                 </>
               )}
-            </>
-          )}
-          <p className="tsm__txt">{texto}</p>
-        </>
-      )}
     </div>
   );
 }

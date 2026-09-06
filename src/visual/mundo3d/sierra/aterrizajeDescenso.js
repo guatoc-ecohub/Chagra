@@ -77,7 +77,7 @@ export function faseEnsoViva() {
 const CONSEJO_ENSO = {
   el_nino: {
     frio: {
-      titular: 'El Niño. Va a llover menos — y va a helar MÁS de madrugada, no menos.',
+      titular: 'El Niño. Va a llover menos y va a helar MÁS de madrugada, no menos.',
       accion: 'Guarde agua para el riego nocturno.',
       mecanismo:
         'El cielo despejado deja escapar el calor de noche: por eso el piso frío se hiela justo cuando hace más sol de día.',

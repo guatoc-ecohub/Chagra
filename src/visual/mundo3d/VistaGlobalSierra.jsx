@@ -81,6 +81,8 @@ import { Html, OrbitControls, AdaptiveDpr } from '@react-three/drei';
 import { ATMOSFERA_SIERRA, SOL_SIERRA, RELLENO_SIERRA } from './sierra/luzSierra.js';
 import { perfilDeTier } from './deviceTier.js';
 import PisosTermicosBandas from './PisosTermicosBandas.jsx';
+import { getProfile } from '../../services/userProfileService.js';
+import { sugerenciasCultivosSierra } from './sierra/lecturaClimaAterrizaje.js';
 import TransicionSierraMundo from './TransicionSierraMundo.jsx';
 import { BANDAS_SIERRA, CLAVE_PISOS_SIERRA, PISOS_TERMICOS_SIERRA, altitudFincaValida, bandaDeMsnm } from './pisosTermicos.js';
 import { franjaCondensacion, leerGateDescenso } from './sierra/descensoSierra.js';
@@ -166,7 +168,6 @@ const PALETA_COSTA = {
 /* La clave de pisos accesible (DOM del modo con Canvas). */
 const CLAVE_PISOS = CLAVE_PISOS_SIERRA;
 
-/* Altitud representativa de cada piso (world Y), para el marcador "usted". */
 
 
 /* MOTEADO del manto (2026-09-05, arte): un dosel no es un degradado liso. Una
@@ -493,8 +494,7 @@ function Rotulo({ pos, texto, sub, distancia = 12, alto = 0.6 }) {
    sobre el relieve en los topes de cada banda, con la tinta de los rótulos, y la
    LÍNEA ÁMBAR de la cota canónica del hielo (4 800 m) con su rótulo — «hasta aquí
    llegaba». Las cintas se apoyan en las FACETAS del terreno tal como se dibujan
-   (muestreadorFacetas), no en la función suave: no se hunden. Si hay
-   `pisoUsuario`, las dos curvas de su banda van en el color del piso.
+   (muestreadorFacetas), no en la función suave: no se hunden.
 
    P1 de DIRECCION-NUMEROS-VIVOS (2026-09-05): con `msnm` CONFIRMADO se dibuja la
    curva EXACTA de la cota de la finca (`yDeMsnm(msnm)`, no una representativa de
@@ -685,7 +685,7 @@ export function SierraDiorama({
   const conBruma = conAtmosfera && perfil.fog;
   const sombras = perfil.sombras;
   /* P1 — solo una altitud CONFIRMADA dibuja la curva de la finca. El guard se
-     respeta: sin ella, `MarcadorPiso` sigue el piso representativo de antes. */
+     respeta: sin ella no se dibuja ningún marcador de finca. */
   const msnmConfirmado = altitudFincaValida(msnm);
   const geo = useMemo(() => construirTerreno(segmentos, segmentos), [segmentos]);
   useEffect(() => () => geo.dispose(), [geo]);
@@ -743,6 +743,8 @@ export function SierraDiorama({
 
 /* Estilos de los rótulos y pie de crédito (viven aquí: son de ESTA escena). */
 const CSS_SIERRA = `
+.vsierra-root[data-viaje="1"] .vsierra-canvas { pointer-events:none; }
+
 .vsierra-root { position: relative; width: 100%; height: 100dvh; min-height: 320px; overflow: hidden; background: ${ATMOSFERA_SIERRA.fondo}; }
 .vsierra-canvas { position: absolute; inset: 0; opacity: 0; transition: opacity 0.7s ease; }
 .vsierra-canvas--lista { opacity: 1; }
@@ -841,6 +843,7 @@ export default function VistaGlobalSierra({
     <section
       className={`vsierra-root${className ? ` ${className}` : ''}`}
       data-tier={tier}
+      data-viaje={viaje ? "1" : "0"}
       aria-label="Vista global de la Sierra Nevada de Santa Marta: portada y mapa por pisos térmicos"
     >
       <style>{CSS_SIERRA}</style>
@@ -892,11 +895,13 @@ export default function VistaGlobalSierra({
         pisoDestino={viaje?.piso.id}
         tier={tier}
         reducedMotion={reducedMotion}
+        sostenerAterrizaje
         onMitad={llegarAPiso}
         onFin={terminarViaje}
         msnmUsuario={altitudFincaValida(msnmPortada)}
+        faseEnso={climaVivo.tieneEnso ? climaVivo.ensoPhase : null}
         climaVivo={climaVivo}
-        sugerencias={sugerencias}
+        sugerencias={sugerencias.length ? sugerencias : sugerenciasCultivosSierra(climaVivo, getProfile()?.cultivos_actuales)}
       />
 
       {/* Chrome DOM anclado a la composición: título arriba; abajo la clave de

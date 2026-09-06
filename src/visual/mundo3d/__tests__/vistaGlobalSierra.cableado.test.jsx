@@ -34,10 +34,12 @@ describe('VistaGlobalSierra, cableado de pisos térmicos', () => {
     fireEvent.click(bandaCalida);
 
     expect(screen.getByTestId('tsm')).toBeInTheDocument();
-    act(() => vi.advanceTimersByTime(750));
+    act(() => vi.advanceTimersByTime(1500));
+    expect(onSeleccionPiso).not.toHaveBeenCalled();
+    expect(screen.getByTestId('tsm-t0')).toBeInTheDocument();
+    act(() => vi.advanceTimersByTime(1600));
+    fireEvent.click(screen.getByText('Continuar al piso'));
     expect(onSeleccionPiso).toHaveBeenCalledWith(expect.objectContaining({ id: 'calido' }));
-
-    act(() => vi.advanceTimersByTime(750));
     expect(screen.queryByTestId('tsm')).not.toBeInTheDocument();
   });
 });

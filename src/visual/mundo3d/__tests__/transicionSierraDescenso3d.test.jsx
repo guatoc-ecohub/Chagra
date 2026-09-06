@@ -11,6 +11,8 @@ import { render, screen, cleanup, act } from '@testing-library/react';
 import TransicionSierraMundo from '../TransicionSierraMundo.jsx';
 import { LLAVE_VISTO } from '../sierra/descensoSierra.js';
 
+vi.mock('../../../components/ChagraAgentAvatar.jsx', () => ({ default: () => <span data-testid="companero-sierra" /> }));
+
 vi.mock('../sierra/EscenaDescensoSierra.jsx', () => ({
   default: ({ plan, fase, tier }) => (
     <div
@@ -169,7 +171,7 @@ describe('lo que el descenso recibe', () => {
     const alt = document.querySelector('.tsm__altimetro');
     expect(alt).not.toBeNull();
     expect(alt.textContent).toContain('5.775 m');
-    expect(alt.textContent.toLowerCase()).toContain('ubicaci');
+    expect(alt.querySelector('small')).toBeNull();
   });
 });
 
@@ -203,7 +205,7 @@ describe('PASO 1 + PASO 3 — píldora retirada y aterrizaje en tres tiempos', (
 
   it('🚪 0 píldoras: la caja oscura `.tsm__aterrizaje` ya no existe', async () => {
     await montarEnCota({ msnm: 2640 });
-    act(() => vi.advanceTimersByTime(5400));
+    act(() => vi.advanceTimersByTime(5900));
     expect(document.querySelector('.tsm__aterrizaje')).toBeNull();
     expect(document.querySelector('.tsm__aviso')).toBeNull();
     expect(document.querySelector('.tsm__tiza')).toBeNull();
@@ -212,7 +214,7 @@ describe('PASO 1 + PASO 3 — píldora retirada y aterrizaje en tres tiempos', (
   it('T0 — la cota para con «a la altura de su finca», sin tinta ni pizarra aún', async () => {
     await montarEnCota({ msnm: 2640 });
     expect(document.querySelector('[data-testid="tsm-t0"]')).toBeNull();
-    act(() => vi.advanceTimersByTime(3700));
+    act(() => vi.advanceTimersByTime(4300));
     const t0 = document.querySelector('[data-testid="tsm-t0"]');
     expect(t0).not.toBeNull();
     expect(t0.textContent).toContain('2.640 m');
@@ -224,8 +226,7 @@ describe('PASO 1 + PASO 3 — píldora retirada y aterrizaje en tres tiempos', (
 
   it('T1 — el ahora en tinta bajo la cota, y T2 aún calla', async () => {
     const climaVivo = {
-      senal: true,
-      tieneOpenMeteo: true,
+      senal: true, tieneOpenMeteo: true,
       condicion: 'niebla',
       temp: 6.4,
       tempMin: 1.9,
@@ -234,12 +235,12 @@ describe('PASO 1 + PASO 3 — píldora retirada y aterrizaje en tres tiempos', (
       alertas: [{ tipo: 'helada', mensaje: 'aviso de helada en el páramo' }],
     };
     await montarEnCota({ msnm: 2640, faseEnso: 'el_nino', climaVivo });
-    act(() => vi.advanceTimersByTime(3700));
+    act(() => vi.advanceTimersByTime(4300));
     act(() => vi.advanceTimersByTime(800)); // 4 500 ms: T1 dentro, T2 aún no
     const t1 = document.querySelector('[data-testid="tsm-t1"]');
     expect(t1).not.toBeNull();
     expect(t1.textContent.toLowerCase()).toContain('niebla de ladera · 6° · ahora');
-    expect(t1.textContent.toLowerCase()).toContain('aviso de helada en el páramo');
+    expect(t1.textContent.toLowerCase()).not.toContain('aviso de helada en el páramo');
     expect(document.querySelector('[data-testid="tsm-t2"]')).toBeNull();
     act(() => vi.advanceTimersByTime(800)); // 5 300 ms: entra T2
     expect(document.querySelector('[data-testid="tsm-t2"]')).not.toBeNull();
@@ -247,8 +248,7 @@ describe('PASO 1 + PASO 3 — píldora retirada y aterrizaje en tres tiempos', (
 
   it('T2 — una sola tiza de helada, firmada, y el ENSO en frío es MÁS helada, no menos', async () => {
     const climaVivo = {
-      senal: true,
-      tieneOpenMeteo: true,
+      senal: true, tieneOpenMeteo: true,
       condicion: 'niebla',
       temp: 6.4,
       tempMin: 1.9,
@@ -257,7 +257,7 @@ describe('PASO 1 + PASO 3 — píldora retirada y aterrizaje en tres tiempos', (
       alertas: [],
     };
     await montarEnCota({ msnm: 2200, faseEnso: 'el_nino', climaVivo });
-    act(() => vi.advanceTimersByTime(5400));
+    act(() => vi.advanceTimersByTime(5900));
     const t2 = document.querySelector('[data-testid="tsm-t2"]');
     expect(t2).not.toBeNull();
     const txt = t2.textContent.toLowerCase();
@@ -269,7 +269,7 @@ describe('PASO 1 + PASO 3 — píldora retirada y aterrizaje en tres tiempos', (
 
   it('🔴 sin señal de helada y bajo El Niño a 2.200 m, la tiza ENSO (prioridad 5) avisa de helada', async () => {
     await montarEnCota({ msnm: 2200, faseEnso: 'el_nino' });
-    act(() => vi.advanceTimersByTime(5400));
+    act(() => vi.advanceTimersByTime(5900));
     const t2 = document.querySelector('[data-testid="tsm-t2"]');
     expect(t2).not.toBeNull();
     expect(t2.textContent.toLowerCase()).toMatch(/hela/);
@@ -278,7 +278,7 @@ describe('PASO 1 + PASO 3 — píldora retirada y aterrizaje en tres tiempos', (
 
   it('a 900 m bajo El Niño la tiza dice calor (el ENSO se lee POR PISO), sin helada', async () => {
     await montarEnCota({ msnm: 900, faseEnso: 'el_nino' });
-    act(() => vi.advanceTimersByTime(5400));
+    act(() => vi.advanceTimersByTime(5900));
     const t2 = document.querySelector('[data-testid="tsm-t2"]');
     expect(t2).not.toBeNull();
     expect(t2.textContent.toLowerCase()).toMatch(/calor/);
@@ -287,7 +287,7 @@ describe('PASO 1 + PASO 3 — píldora retirada y aterrizaje en tres tiempos', (
 
   it('si ninguna prioridad aplica, la pizarra calla: «nada» es válido', async () => {
     await montarEnCota({ msnm: 2640, faseEnso: 'neutral' }); // sin climaVivo ni ENSO
-    act(() => vi.advanceTimersByTime(5400));
+    act(() => vi.advanceTimersByTime(5900));
     expect(document.querySelector('[data-testid="tsm-t2"]')).toBeNull();
   });
 
@@ -295,15 +295,13 @@ describe('PASO 1 + PASO 3 — píldora retirada y aterrizaje en tres tiempos', (
     window.history.replaceState({}, '', '/?descenso3d=1'); // sin `?msnm=`: viaje, no aterrizaje
     render(<TransicionSierraMundo activa escena3d tier="alto" />);
     await esperarLienzo();
-    expect(document.querySelector('.tsm__altimetro small').textContent.toLowerCase()).toContain(
-      'ubicaci',
-    );
+    expect(document.querySelector('.tsm__altimetro small')).toBeNull();
     expect(document.querySelector('[data-testid="tsm-t0"]')).toBeNull();
   });
 
   it('🚪 conteo del gate en T2 final: 1 rótulo de cota · 1 tinta · ≤1 pizarra · 0 píldoras', async () => {
     const climaVivo = {
-      senal: true,
+      senal: true, tieneOpenMeteo: true,
       condicion: 'lluvia',
       temp: 14.2,
       tempMin: 2.1,
@@ -311,7 +309,7 @@ describe('PASO 1 + PASO 3 — píldora retirada y aterrizaje en tres tiempos', (
       ensoFamily: 'neutral',
     };
     await montarEnCota({ msnm: 2640, faseEnso: 'neutral', climaVivo });
-    act(() => vi.advanceTimersByTime(5400));
+    act(() => vi.advanceTimersByTime(5900));
     expect(document.querySelectorAll('.tsm__aterrizaje').length).toBe(0);
     expect(document.querySelectorAll('[data-testid="tsm-t0"]').length).toBe(1);
     expect(document.querySelectorAll('[data-testid="tsm-t1"]').length).toBe(1);
@@ -335,8 +333,7 @@ describe('PASO 1 + PASO 3 — píldora retirada y aterrizaje en tres tiempos', (
 describe('PASO 5 — la tiza de helada por el hook, con su prioridad', () => {
   /* La salida de `derivarClima3D` (la forma que `useClima3DVivo` ya expone). */
   const climaVivo = {
-    senal: true,
-    tieneOpenMeteo: true,
+    senal: true, tieneOpenMeteo: true,
     condicion: 'niebla',
     temp: 6.4,
     tempMin: 1.9,
@@ -366,7 +363,7 @@ describe('PASO 5 — la tiza de helada por el hook, con su prioridad', () => {
       { ...climaVivo, ensoFamily: 'neutral' },
       [{ suggestion: { severity: 'critical', text: 'proteja su gulupa esta noche' } }],
     );
-    act(() => vi.advanceTimersByTime(5400));
+    act(() => vi.advanceTimersByTime(5900));
     const t2 = document.querySelector('[data-testid="tsm-t2"]');
     expect(t2).not.toBeNull();
     expect(t2.textContent).toContain('Puede helar');
@@ -375,10 +372,10 @@ describe('PASO 5 — la tiza de helada por el hook, con su prioridad', () => {
 
   it('sin helada y con la alerta de SU cultivo, la tiza pasa al cultivo', async () => {
     await montarEnCota(
-      { ...climaVivo, helada: false, tempMin: 8, ensoFamily: 'neutral' },
+      { ...climaVivo, helada: false, alertas: [], tempMin: 8, ensoFamily: 'neutral' },
       [{ suggestion: { severity: 'warning', text: 'proteja su gulupa esta noche' } }],
     );
-    act(() => vi.advanceTimersByTime(5400));
+    act(() => vi.advanceTimersByTime(5900));
     const t2 = document.querySelector('[data-testid="tsm-t2"]');
     expect(t2).not.toBeNull();
     expect(t2.textContent).toContain('proteja su gulupa');
@@ -397,12 +394,58 @@ describe('PASO 5 — la tiza de helada por el hook, con su prioridad', () => {
       />,
     );
     await act(async () => {});
-    act(() => vi.advanceTimersByTime(5400));
+    act(() => vi.advanceTimersByTime(5900));
     const t1 = document.querySelector('[data-testid="tsm-t1"]');
     const t2 = document.querySelector('[data-testid="tsm-t2"]');
     expect(t1).toBeNull();
     expect(t2).toBeNull();
     expect(document.querySelector('.tsm__llegada').textContent).not.toMatch(/· ahora/);
     expect(document.querySelector('.tsm__llegada').textContent).not.toMatch(/esta noche baja/);
+  });
+});
+
+describe('llegada real sostenida, sin parámetros del gate', () => {
+  it('T0/T1/T2 completan antes de navegar; continuar dispara una sola vez', async () => {
+    vi.useFakeTimers();
+    const mitad = vi.fn();
+    const fin = vi.fn();
+    render(<TransicionSierraMundo activa escena3d sostenerAterrizaje tier="alto" msnmUsuario={2200}
+      climaVivo={{ senal: true, tieneOpenMeteo: true, temp: 14 }} onMitad={mitad} onFin={fin} />);
+    await act(async () => {});
+    expect(screen.getByTestId('escena3d-mock')).not.toBeNull();
+    act(() => vi.advanceTimersByTime(4199));
+    expect(screen.queryByTestId('tsm-t0')).toBeNull();
+    act(() => vi.advanceTimersByTime(1));
+    expect(screen.getByTestId('tsm-t0').textContent).toContain('2.200 m');
+    expect(screen.queryByTestId('tsm-t1')).toBeNull();
+    act(() => vi.advanceTimersByTime(800));
+    expect(screen.getByTestId('tsm-t1').textContent).toContain('14° · ahora');
+    act(() => vi.advanceTimersByTime(800));
+    expect(mitad).not.toHaveBeenCalled();
+    expect(fin).not.toHaveBeenCalled();
+    const continuar = screen.getByText('Continuar al piso');
+    act(() => { continuar.click(); continuar.click(); });
+    expect(mitad).toHaveBeenCalledTimes(1);
+    expect(fin).toHaveBeenCalledTimes(1);
+  });
+
+  it('reduced motion reúne la llegada y mantiene cerrada la tiza sin ubicación', () => {
+    vi.useFakeTimers();
+    render(<TransicionSierraMundo activa sostenerAterrizaje reducedMotion />);
+    act(() => vi.advanceTimersByTime(160));
+    expect(screen.getByTestId('tsm-t0').textContent).toContain('sin su ubicación');
+    expect(screen.queryByTestId('tsm-t1')).toBeNull();
+    const tiza = screen.getByTestId('tsm-t2');
+    expect(tiza.hasAttribute('open')).toBe(false);
+    expect(tiza.textContent).toContain('Confirme su finca');
+  });
+
+  it('desmontar cancela los plazos pendientes', () => {
+    vi.useFakeTimers();
+    const fin = vi.fn();
+    const { unmount } = render(<TransicionSierraMundo activa sostenerAterrizaje onFin={fin} />);
+    unmount();
+    act(() => vi.advanceTimersByTime(10000));
+    expect(fin).not.toHaveBeenCalled();
   });
 });
