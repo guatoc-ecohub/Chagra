@@ -972,25 +972,60 @@ export function normalizePisoTermicoArg(args) {
 
 /**
  * El planner NLU es un límite no confiable: sus argumentos son inferencias,
- * no una garantía de que tenga el dato. En particular,
- * `get_calendario_siembra` acepta que `mes` y `piso_termico` no se deriven,
- * pero el sidecar no acepta el string vacío como valor de esos campos.
+ * no una garantía de que tenga el dato. En el contrato de
+ * `get_calendario_siembra` el único campo que este saneo puede omitir es
+ * `mes` (OPCIONAL en el schema zod, 1..12; el sidecar usa el mes actual si
+ * no viaja) y el string vacío es un valor inválido para él, así que lo
+ * quitamos.
  *
- * Omitimos únicamente los strings vacíos de este contrato. Un valor ausente
- * conserva la semántica de «no se pudo derivar» y deja que la herramienta use
- * sus defaults o responda un error tipado; nunca llega como un 502 de schema.
+ * `piso_termico` NO se toca aquí: es el campo EXIGIDO del schema (enum
+ * frio|templado|calido, sin tildes). Borrarlo cuando viene vacío no arregla
+ * el 502 — el schema lo reclama igual (invalid_type, received "undefined")
+ * y se cambia un 502 por otro 502 (BUG-03a, 2026-09-05). Cuando falta o
+ * viene vacío, la decisión la toma `callTool`: NO llama al tool y devuelve
+ * el stub `no_piso_termico` (evidencia sintética que obliga al LLM a PEDIR
+ * la altura/municipio en vez de inventar fechas de siembra). Mismo contrato
+ * que clima sin municipio / silvopastoreo sin altura en chipIntentRouter.
  */
 export function omitEmptyCalendarioArgs(toolName, args) {
   if (toolName !== 'get_calendario_siembra' || !args || typeof args !== 'object') return args;
+  if (typeof args.mes !== 'string' || args.mes.trim() !== '') return args;
+  const rest = { ...args };
+  delete rest.mes;
+  return rest;
+}
 
-  let sanitized = null;
-  for (const field of ['mes', 'piso_termico']) {
-    if (typeof args[field] === 'string' && args[field].trim() === '') {
-      sanitized ||= { ...args };
-      delete sanitized[field];
-    }
-  }
-  return sanitized || args;
+/**
+ * BUG-03a (2026-09-05) — ¿el caller de `get_calendario_siembra` vino SIN el
+ * `piso_termico` que el schema zod exige? (ausente, string vacío o solo
+ * espacios). Confirmado en vivo contra el sidecar real (127.0.0.1:7880):
+ * `{"mes":"","piso_termico":""}`, `{}` y `{"piso_termico":""}` responden
+ * todos 502 (invalid_enum_value / invalid_type). El piso lo derivan el
+ * perfil/finca o el planner NLU; cuando no pudieron, el tool NO se llama.
+ *
+ * Evidence sintética (mismo shape que los stubs de chipIntentRouter para
+ * clima sin municipio y silvopastoreo sin altura): `available:false` +
+ * reason + hint, que formatToolEvidence inyecta al LLM para que PIDA la
+ * altura o el municipio y NO invente un calendario.
+ */
+export const CALENDARIO_SIN_PISO_STUB = Object.freeze({
+  available: false,
+  reason: 'no_piso_termico',
+  hint:
+    'pedirle al usuario su municipio o la altura de su finca (msnm) para saber el piso térmico (frío/templado/cálido) y poder sugerir qué sembrar este mes',
+});
+
+/**
+ * Verdadero cuando falta o viene vacío `piso_termico` (el campo EXIGIDO del
+ * schema de `get_calendario_siembra`). Valores no-string también cuentan
+ * como "no determinable": el enum zod espera 'frio'|'templado'|'calido' y
+ * cualquier otra cosa es un 502 garantizado.
+ * @param {object|null|undefined} args
+ * @returns {boolean}
+ */
+export function calendarioSinPisoTermico(args) {
+  if (!args || typeof args !== 'object') return true;
+  return typeof args.piso_termico !== 'string' || args.piso_termico.trim() === '';
 }
 
 export async function callTool(toolName, args) {
@@ -999,10 +1034,15 @@ export async function callTool(toolName, args) {
     console.debug('[sidecar] tool no permitido', toolName);
     return { _error: true, reason: 'not_allowed', tool: toolName };
   }
-  const sanitizedArgs = omitEmptyCalendarioArgs(
-    toolName,
-    normalizePisoTermicoArg(coerceNumericArgs(args || {})),
-  );
+  const normalizedArgs = normalizePisoTermicoArg(coerceNumericArgs(args || {}));
+  if (toolName === 'get_calendario_siembra' && calendarioSinPisoTermico(normalizedArgs)) {
+    // Sin piso térmico NO llamamos el tool (el zod lo exige): evidence
+    // sintética que obliga al LLM a PEDIR la altura/municipio (NO inventar
+    // fechas). Mismo contrato que chipIntentRouter (calendario sin piso) y
+    // que clima sin municipio / silvopastoreo sin altura.
+    return CALENDARIO_SIN_PISO_STUB;
+  }
+  const sanitizedArgs = omitEmptyCalendarioArgs(toolName, normalizedArgs);
   const result = await postJson(`/tools/${toolName}`, sanitizedArgs, TOOL_TIMEOUT_MS);
   if (result !== null) return result;
   // postJson retornó null. Distinguir: tool fue intentado pero falló

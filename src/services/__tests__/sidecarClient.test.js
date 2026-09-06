@@ -402,17 +402,59 @@ describe('sidecarClient — feature flag on', () => {
       expect(JSON.parse(opts.body)).toEqual({ piso_termico: 'frio' });
     });
 
-    it('BUG-03a control negativo: get_calendario_siembra nunca envía mes ni piso_termico como string vacío', async () => {
+    it('BUG-03a: piso_termico vacío (repro exacto del 502) → stub no_piso_termico y NO llama el tool', async () => {
+      // Body que la auditoría capturó en vivo: {"mes":"","piso_termico":""} →
+      // 502 invalid_enum_value. El arreglo viejo borraba piso_termico y seguía
+      // llamando → OTRO 502 (invalid_type, received undefined). El arreglo con
+      // stub NO llama: devuelve evidence sintética available:false (mismo
+      // contrato que clima sin municipio / silvopastoreo sin altura) para que
+      // el LLM PIDA la altura/municipio en vez de inventar un calendario.
       fetchMock.mockResolvedValueOnce(jsonResponse(200, { cultivos: [] }));
       const { callTool } = await importFresh();
 
-      await callTool('get_calendario_siembra', { mes: '', piso_termico: '' });
+      const res = await callTool('get_calendario_siembra', { mes: '', piso_termico: '' });
 
+      expect(res).toEqual({
+        available: false,
+        reason: 'no_piso_termico',
+        hint: expect.stringMatching(/municipio|msnm/i),
+      });
+      expect(res).not.toHaveProperty('_error');
+      expect(fetchMock).not.toHaveBeenCalled();
+    });
+
+    it('BUG-03a: piso_termico ausente también stubea (el zod lo exige, antes daba 502 con body {})', async () => {
+      fetchMock.mockResolvedValueOnce(jsonResponse(200, { cultivos: [] }));
+      const { callTool } = await importFresh();
+
+      const res = await callTool('get_calendario_siembra', { mes: 'enero' });
+
+      expect(res).toEqual({
+        available: false,
+        reason: 'no_piso_termico',
+        hint: expect.stringMatching(/municipio|msnm/i),
+      });
+      expect(fetchMock).not.toHaveBeenCalled();
+    });
+
+    it('BUG-03a camino feliz: mes vacío + piso VÁLIDO → llama el tool y el body NO lleva mes vacío', async () => {
+      // piso_termico presente ('frio', sin tilde) es lo único que el schema
+      // EXIGE: la llamada sale y responde 200 con datos reales. El mes vacío
+      // (opcional) se omite del body en vez de viajar como string inválido.
+      fetchMock.mockResolvedValueOnce(jsonResponse(200, {
+        mes: 9,
+        mes_nombre: 'septiembre',
+        piso_termico: 'frio',
+        cultivos: [],
+      }));
+      const { callTool } = await importFresh();
+
+      const res = await callTool('get_calendario_siembra', { mes: '', piso_termico: 'frio' });
+
+      expect(res).not.toHaveProperty('_error');
       const [, opts] = fetchMock.mock.calls[0];
       const body = JSON.parse(opts.body);
-      expect(body).not.toHaveProperty('mes', '');
-      expect(body).not.toHaveProperty('piso_termico', '');
-      expect(body).toEqual({});
+      expect(body).toEqual({ piso_termico: 'frio' });
     });
   });
 
