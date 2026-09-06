@@ -1,19 +1,26 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import {
     CloudSun, Compass, BookOpenText, MapPin, ExternalLink, Hourglass, Radio,
-    Sun, CloudRain, Cloud, Droplets, Wind, Gauge, Sprout, ListChecks, Waves,
-    ThermometerSun, Sparkles, CalendarClock, Leaf, RefreshCw,
+    Sun, CloudRain, Droplets, Gauge, Sprout, ListChecks, Waves,
+    ThermometerSun, Sparkles, CalendarClock, Leaf, RefreshCw, Snowflake,
 } from 'lucide-react';
 import { ScreenShell } from '../common/ScreenShell';
 import CieloENSO from './CieloENSO';
 import GraficoClimaSemanal from './GraficoClimaSemanal';
 import CultivoTarjeta from './CultivoTarjeta';
+import EscenaAtmosfera from './EscenaAtmosfera';
 import { QueEsEsto, CompaiAvatar } from './pedagogia';
+import {
+    estadoEscena, lecturaDelCielo, riesgoHelada, saludoPorHora, horaCorta,
+    formatoMsnm, etiquetaPiso,
+} from './climaEscenaEstado';
 import { getEnsoPhase, getEnsoLabel, getEnsoPhaseSource } from '../../services/ensoService';
 import { ensoFamily, regionFromProfile, ensoRegionalLine } from '../../services/ensoContext';
 import { getProfile } from '../../services/userProfileService';
-import { fetchClimaSnapshot, resolveClimaLocation } from '../../services/climaService';
+import { fetchClimaSnapshot, resolveClimaLocation, getCachedClimaSnapshot } from '../../services/climaService';
 import { fetchAgroMeteo, fetchNormales } from '../../services/agroMeteoService';
+import { applyAtmosphere, deriveAtmosphere, isAtmosphereEnabled } from '../../services/atmosphereService';
+import { clasificarPisoTermico } from '../../services/pisoTermicoClassifier';
 import {
     parseCultivos, vpdKpa, leerVpd, leerUv, amplitudTermica, anomalia,
     etcMm, balanceHidricoDia, spi, spei,
@@ -27,9 +34,10 @@ import {
 import './clima.css';
 
 /*
- * ClimaBoletinScreen — LA PÁGINA DEL TIEMPO de Chagra (rediseño Fase 2, DOSSIER
- * PAGINA-TIEMPO-AGROCLIMA §5). Sobre la base del traductor ENSO ("El clima que
- * viene"), ahora en TRES HORIZONTES:
+ * ClimaBoletinScreen — LA PÁGINA DEL TIEMPO de Chagra: la vista 2D canónica
+ * (spec 2026-09-06-unificar-2d-clima). Une los EFECTOS de la escena
+ * atmosférica del mockup (EscenaAtmosfera, 18 capas + nube-masa) con los DATOS
+ * completos del boletín agroclimático, en TRES HORIZONTES:
  *
  *   HOY          → el estado ahora (T, se-siente-como, HR, viento, UV, lluvia,
  *                  ETo, VPD, punto de rocío) + ANOMALÍA (hoy vs. lo normal) +
@@ -38,6 +46,19 @@ import './clima.css';
  *   7–16 DÍAS    → pronóstico + alertas + ventanas de labor (aplicar/secar).
  *   EL NIÑO      → fase ENSO en vivo (IDEAM manda) + lectura regional + checklist
  *                  de preparación para la temporada fuerte 2026–27.
+ *
+ * JERARQUÍA (D-9, de arriba abajo): escena a sangre detrás de todo · cabecera
+ * sin caja con dato real (lugar, altitud, piso, saludo, condición, hora, fase
+ * ENSO) · LA CIFRA GRANDE (temperatura + se siente como + emoji WMO, cabe sin
+ * scroll a 390×844) · la lectura del cielo (una frase que enseña la causa) ·
+ * banda de helada (D-3: alerta, no piel) · anomalía · los tres tabs · rejilla
+ * de índices sobre vidrio · tarjetas por cultivo · botón al mundo 3D.
+ *
+ * EJE DE ESTADO (D-2): manda atmosphereService. La escena recibe
+ * {condicion, luz, enso} de `estadoEscena` — snapshot del sidecar o, si no trae
+ * señal, el Open-Meteo directo que esta pantalla ya pide, ADAPTADO y pasado
+ * por `deriveCondicion`. Sin ubicación no hay condición: la escena solo modula
+ * la luz (CA-6). Forzable SOLO por `?clima=`/`?luz=` para el gate (D-5).
  *
  * ARQUITECTURA (DOSSIER, híbrido): el DATO CRUDO viene de agroMeteoService
  * (Open-Meteo, ETo FAO-56 nativo) y del snapshot ENSO del sidecar (autoridad
@@ -71,7 +92,7 @@ function SlotPendiente({ children }) {
     );
 }
 
-function FuenteFase({ source }) {
+function FuenteFase({ source, testid = 'clima-fuente-fase' }) {
     const map = {
         live: { icon: Radio, label: 'En vivo (IDEAM/NOAA)', cls: 'text-emerald-300 border-emerald-500/40 bg-emerald-500/10' },
         manual: { icon: MapPin, label: 'Fijada a mano', cls: 'text-amber-300 border-amber-500/40 bg-amber-500/10' },
@@ -83,7 +104,7 @@ function FuenteFase({ source }) {
     const m = map[source] || map.default;
     const Icon = m.icon;
     return (
-        <span data-testid="clima-fuente-fase" className={`inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-[11px] font-bold ${m.cls}`}>
+        <span data-testid={testid} className={`inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-[11px] font-bold ${m.cls}`}>
             <Icon size={11} aria-hidden="true" />
             {m.label}
         </span>
@@ -95,7 +116,8 @@ function FuenteDato({ children }) {
     return <p className="mt-1 text-[10px] leading-tight text-slate-500">{children}</p>;
 }
 
-/* Ficha de un índice del día (tile). */
+/* Ficha de un índice del día (tile). Vidrio: el fondo lo re-tiñe la piel de la
+   escena (escenaAtmosfera.css → [class~='bg-slate-900/50']). */
 function IndiceTile({ icon, label, valor, unidad, sub, accent = 'slate', testid, children }) {
     const Icon = icon;
     const tint = {
@@ -123,8 +145,161 @@ function IndiceTile({ icon, label, valor, unidad, sub, accent = 'slate', testid,
     );
 }
 
-/* ── HORIZONTE 1 · HOY ─────────────────────────────────────────────────── */
-function HorizonteHoy({ agrometeo, normales, loading, anom, cultivos, sinFicha, faseFamily, faseLabel, onRefresh }) {
+/* ── CABECERA sobre la escena, sin caja (D-9 bloque 2): dato REAL o nada ─── */
+function CabeceraAtmosfera({ location, profile, now, ahora, faseFamily, faseLabel, source, condicionEscena = null }) {
+    const lugar = location?.municipio || location?.vereda || 'Su finca';
+    const vereda = location?.vereda && location.vereda !== location.municipio ? location.vereda : null;
+    // sin la palabra «vereda»: a 390 px la migaja tiene que caber en UNA línea
+    const msnm = formatoMsnm(location?.elevation);
+    const piso = etiquetaPiso(clasificarPisoTermico(Number(location?.elevation))?.id);
+    const nombre = typeof profile?.nombre === 'string' && profile.nombre.trim() ? profile.nombre.trim().slice(0, 28) : null;
+    const migaja = [lugar, vereda, msnm, piso].filter(Boolean).join(' · ');
+    // La observación (código WMO de Open-Meteo) y, si el servicio deriva un
+    // fenómeno distinto por regla de piso térmico (p. ej. niebla a 2 680 m con
+    // cielo cubierto), se dice también: el climatólogo ve las dos cosas.
+    const wmo = now?.weather?.label || null;
+    const derivada = condicionEscena === 'niebla' && wmo && !/neblina|niebla/i.test(wmo) ? 'niebla de piso frío'
+        : condicionEscena === 'lluvia' && wmo && !/lluvia|llovizna|aguacero|tormenta/i.test(wmo) ? 'llueve en la finca'
+            : null;
+    const condicion = wmo ? (derivada ? `${wmo} · ${derivada}` : wmo) : null;
+    return (
+        <header className="ca-cabecera" data-testid="clima-cabecera">
+            <p className="ca-migaja" data-testid="clima-migaja">
+                {migaja}
+                {location?.precision === 'centroid' && ' · aprox.'}
+            </p>
+            <h2 className="ca-saludo" data-testid="clima-saludo">
+                {saludoPorHora(ahora)}{nombre ? `, ${nombre}` : ''}
+            </h2>
+            <p className="ca-hora" data-testid="clima-hora">
+                {horaCorta(ahora)}
+                {condicion && (
+                    <>
+                        {' · '}
+                        <span key={condicion} className="ca-cielo-texto" data-testid="clima-condicion">{condicion}</span>
+                    </>
+                )}
+            </p>
+            <div className="ca-enso">
+                <span className="ca-enso-mini" aria-hidden="true"><CieloENSO family={faseFamily} /></span>
+                <span className="ca-enso-texto" data-testid="clima-fase-cabecera">Fase {faseLabel}</span>
+                <FuenteFase source={source} testid="clima-fuente-fase-cabecera" />
+            </div>
+        </header>
+    );
+}
+
+/* ── LA CIFRA GRANDE (D-9 bloque 3): lo primero que busca el campesino ─── */
+function CifraGrande({ now, today, loading, onRefresh }) {
+    if (!now && loading) {
+        return (
+            <div className="ca-sin-dato" data-testid="clima-cargando">
+                <p className="ca-sin-dato-titulo flex items-center gap-2">
+                    <RefreshCw size={18} className="animate-spin" aria-hidden="true" /> Leyendo el cielo de su finca…
+                </p>
+            </div>
+        );
+    }
+    if (!now) {
+        return (
+            <div className="ca-sin-dato" data-testid="clima-sin-dato">
+                <p className="ca-sin-dato-titulo">Aún no tengo el pronóstico de su finca.</p>
+                <p className="ca-sin-dato-sub">Confirme la ubicación de la finca para ver el clima con números reales.</p>
+                <div className="ca-sin-dato-slot"><SlotPendiente>pronóstico en camino</SlotPendiente></div>
+            </div>
+        );
+    }
+    const tmax = Number.isFinite(today?.temp_max) ? Math.round(today.temp_max) : null;
+    const tmin = Number.isFinite(today?.temp_min) ? Math.round(today.temp_min) : null;
+    return (
+        <section className="ca-cifra-grande" data-testid="clima-cifra-grande" aria-live="polite">
+            <span className="ca-cifra-emoji" aria-hidden="true">{now.weather?.emoji}</span>
+            <div className="min-w-0">
+                <p className="ca-cifra-temp" data-testid="clima-temp">
+                    {Math.round(now.temp)}<small>°C</small>
+                </p>
+                <p className="ca-cifra-sub" data-testid="clima-se-siente">
+                    {Number.isFinite(now.aparente) && <>Se siente como {Math.round(now.aparente)} °C</>}
+                    {tmax != null && tmin != null && (
+                        <> · máx. {tmax}° · mín. {tmin}°</>
+                    )}
+                </p>
+                <p className="ca-cifra-fuente">
+                    Open-Meteo · ahora en su finca
+                    <button
+                        type="button"
+                        onClick={onRefresh}
+                        aria-label="Actualizar pronóstico"
+                        className="ca-refrescar"
+                    >
+                        <RefreshCw size={13} aria-hidden="true" />
+                    </button>
+                </p>
+            </div>
+        </section>
+    );
+}
+
+/* ── LA LECTURA DEL CIELO: la pantalla ENSEÑA la causa, no solo el número ─── */
+function LecturaCielo({ lectura }) {
+    if (!lectura) return null;
+    return (
+        <p className="ca-lectura" data-testid="clima-lectura-cielo">
+            {lectura.texto}
+            <span className="ca-lectura-fuente">{lectura.fuente}</span>
+        </p>
+    );
+}
+
+/* ── BANDA DE HELADA (D-3): alerta prominente sobre la escena, no una piel ─── */
+function BandaHelada({ helada }) {
+    if (!helada) return null;
+    return (
+        <div className="ca-helada" role="status" data-testid="clima-banda-helada" data-origen={helada.origen}>
+            <Snowflake size={20} aria-hidden="true" className="shrink-0 mt-0.5" />
+            <div className="min-w-0">
+                <p className="ca-helada-titulo">{helada.origen === 'alerta' ? 'Alerta de helada' : 'Riesgo de helada'}</p>
+                <p className="ca-helada-texto">{helada.mensaje}</p>
+                {Array.isArray(helada.dias) && helada.dias.length > 0 && (
+                    <p className="ca-helada-texto" style={{ fontSize: '0.78rem' }}>Días: {helada.dias.join(', ')}</p>
+                )}
+                <span className="ca-lectura-fuente">{helada.fuente}</span>
+            </div>
+        </div>
+    );
+}
+
+/* ── ANOMALÍA (D-9 bloque 4): hoy frente a lo normal, con su fuente ─── */
+function Anomalia({ anom }) {
+    return (
+        <div className="px-4 pt-3">
+            {anom ? (
+                <div className="flex items-start gap-2 rounded-2xl border border-amber-500/25 bg-slate-900/50 p-2.5" data-testid="clima-anomalia">
+                    <ThermometerSun size={16} className="shrink-0 mt-0.5 text-amber-300" aria-hidden="true" />
+                    <div>
+                        <p className="text-sm font-bold text-amber-200 leading-snug">
+                            Hoy está {anom.frases.join(' y ')}.
+                        </p>
+                        <FuenteDato>Comparado con {anom.fuente}</FuenteDato>
+                    </div>
+                </div>
+            ) : (
+                <p className="text-[11px] text-slate-500 flex items-center gap-1.5">
+                    <ThermometerSun size={12} aria-hidden="true" />
+                    Anomalía (hoy vs. lo normal): <SlotPendiente>normales en camino</SlotPendiente>
+                </p>
+            )}
+            <QueEsEsto titulo="¿Qué es la anomalía?" compai="colibri" testid="que-es-anomalia">
+                Imagine que cada día del año tiene una temperatura "de costumbre", como la estatura normal de una
+                persona para su edad. La <b>anomalía</b> es cuánto se salió el día de esa costumbre: si hace más calor o
+                está más seco de lo que suele estar. Así sabemos si El Niño ya está apretando.
+            </QueEsEsto>
+        </div>
+    );
+}
+
+/* ── HORIZONTE 1 · HOY: rejilla de índices + tarjetas por cultivo ─────────── */
+function HorizonteHoy({ agrometeo, normales, cultivos, sinFicha, faseFamily }) {
     const now = agrometeo?.now;
     const today = agrometeo?.today;
     const vpd = now ? vpdKpa(now.temp, now.rh) : null;
@@ -139,73 +314,7 @@ function HorizonteHoy({ agrometeo, normales, loading, anom, cultivos, sinFicha, 
 
     return (
         <section className="clima-seccion space-y-4" data-testid="horizonte-hoy">
-            {/* HERO: el estado ahora, honesto */}
-            <div className={`rounded-3xl border p-4 ${FASE_ACENTO[faseFamily].border} bg-gradient-to-br from-slate-900/70 to-slate-950/40`}>
-                {!now && loading && (
-                    <div className="flex items-center gap-2 py-6 text-sm text-slate-400">
-                        <RefreshCw size={16} className="animate-spin" aria-hidden="true" /> Leyendo el cielo de su finca…
-                    </div>
-                )}
-                {!now && !loading && (
-                    <div className="py-6 text-center">
-                        <p className="text-sm text-slate-300">Aún no tengo el pronóstico de su finca.</p>
-                        <p className="mt-1 text-xs text-slate-500">Confirme la ubicación de la finca para ver el clima con números reales.</p>
-                        <SlotPendiente>pronóstico en camino</SlotPendiente>
-                    </div>
-                )}
-                {now && (
-                    <>
-                        <div className="flex items-center gap-3">
-                            <span aria-hidden="true" className="text-5xl leading-none">{now.weather?.emoji}</span>
-                            <div className="min-w-0 flex-1">
-                                <p className="text-[11px] font-bold uppercase tracking-wide text-slate-400">
-                                    {now.weather?.label} · fase {faseLabel}
-                                </p>
-                                <p className="text-4xl font-black leading-none text-slate-100">
-                                    {Math.round(now.temp)}<span className="text-2xl text-slate-400">°C</span>
-                                </p>
-                                {Number.isFinite(now.aparente) && (
-                                    <p className="text-xs text-slate-400 mt-0.5">Se siente como {Math.round(now.aparente)}°C</p>
-                                )}
-                            </div>
-                            <button
-                                type="button"
-                                onClick={onRefresh}
-                                aria-label="Actualizar pronóstico"
-                                className="shrink-0 self-start rounded-full border border-slate-700 bg-slate-800/60 p-2 text-slate-400 active:bg-slate-700"
-                            >
-                                <RefreshCw size={14} aria-hidden="true" />
-                            </button>
-                        </div>
-
-                        {/* ANOMALÍA tangible */}
-                        {anom ? (
-                            <div className="mt-3 flex items-start gap-2 rounded-2xl border border-amber-500/25 bg-amber-500/5 p-2.5" data-testid="clima-anomalia">
-                                <ThermometerSun size={16} className="shrink-0 mt-0.5 text-amber-300" aria-hidden="true" />
-                                <div>
-                                    <p className="text-sm font-bold text-amber-200 leading-snug">
-                                        Hoy está {anom.frases.join(' y ')}.
-                                    </p>
-                                    <FuenteDato>Comparado con {anom.fuente}</FuenteDato>
-                                </div>
-                            </div>
-                        ) : (
-                            <p className="mt-3 text-[11px] text-slate-500 flex items-center gap-1.5">
-                                <ThermometerSun size={12} aria-hidden="true" />
-                                Anomalía (hoy vs. lo normal): <SlotPendiente>normales en camino</SlotPendiente>
-                            </p>
-                        )}
-
-                        <QueEsEsto titulo="¿Qué es la anomalía?" compai="colibri" testid="que-es-anomalia">
-                            Imagina que cada día del año tiene una temperatura "de costumbre", como tu estatura normal para
-                            tu edad. La <b>anomalía</b> es cuánto se salió el día de esa costumbre: si hace más calor o
-                            está más seco de lo que suele estar. Así sabemos si El Niño ya está apretando.
-                        </QueEsEsto>
-                    </>
-                )}
-            </div>
-
-            {/* Rejilla de índices del día */}
+            {/* Rejilla de índices del día (vidrio sobre la escena) */}
             {now && (
                 <div className="grid grid-cols-2 gap-2.5" data-testid="clima-indices-hoy">
                     <IndiceTile icon={Droplets} label="Humedad" valor={Number.isFinite(now.rh) ? Math.round(now.rh) : null} unidad="%" accent="sky"
@@ -687,6 +796,17 @@ function HorizonteEstacional({ faseFamily, faseLabel, source, regionLine, mtaReg
 }
 
 /* ── Pantalla principal ────────────────────────────────────────────────── */
+function leerSearchEscena() {
+    try {
+        const search = window.location.search || '';
+        // también `#/tiempo?clima=lluvia` (el hash del enrutador lleva el query)
+        const enHash = (window.location.hash || '').split('?')[1];
+        return search || (enHash ? `?${enHash}` : '');
+    } catch (_) {
+        return '';
+    }
+}
+
 export default function ClimaBoletinScreen({ onBack, onNavigate = undefined, location: locationProp = undefined, initialHorizonte = 'hoy' }) {
     const [horizonte, setHorizonte] = useState(
         ['hoy', 'semana', 'estacional'].includes(initialHorizonte) ? initialHorizonte : 'hoy',
@@ -696,6 +816,9 @@ export default function ClimaBoletinScreen({ onBack, onNavigate = undefined, loc
     const [normales, setNormales] = useState(null);
     const [loading, setLoading] = useState(true);
     const [refreshTick, setRefreshTick] = useState(0);
+    // Reloj de la escena: se re-evalúa cada 10 min (mismo ritmo que
+    // useClimaAtmosphere) para seguir el paso del sol sin JS por frame.
+    const [ahora, setAhora] = useState(() => new Date());
 
     // Fase ENSO EN VIVO (fuente única, ensoService alimentado por el sidecar).
     const phase = getEnsoPhase();
@@ -742,6 +865,11 @@ export default function ClimaBoletinScreen({ onBack, onNavigate = undefined, loc
         return () => { alive = false; };
     }, [location]);
 
+    useEffect(() => {
+        const id = setInterval(() => setAhora(new Date()), 10 * 60 * 1000);
+        return () => clearInterval(id);
+    }, []);
+
     const anom = useMemo(() => {
         const today = agrometeo?.today;
         if (!today || !normales) return null;
@@ -749,71 +877,111 @@ export default function ClimaBoletinScreen({ onBack, onNavigate = undefined, loc
         return anomalia(tempMedia, today.precip_mm, normales);
     }, [agrometeo, normales]);
 
-    const alertas = snapshot?.alertas_locales || snapshot?.openmeteo?.alertas || [];
+    const alertas = useMemo(() => snapshot?.alertas_locales || snapshot?.openmeteo?.alertas || [], [snapshot]);
+
+    // ESTADO DE LA ESCENA (D-2): manda el servicio; sin ubicación no hay condición.
+    const escena = useMemo(
+        () => estadoEscena({ snapshot, agrometeo, now: ahora, location, ensoPhase: phase, search: leerSearchEscena() }),
+        [snapshot, agrometeo, ahora, location, phase],
+    );
+    const pisoId = clasificarPisoTermico(Number(location?.elevation))?.id || null;
+    const lectura = useMemo(
+        () => lecturaDelCielo({ condicion: escena.condicion, luz: escena.luz, now: agrometeo?.now, today: agrometeo?.today, piso: pisoId, ensoFamily: faseFamily }),
+        [escena.condicion, escena.luz, agrometeo, pisoId, faseFamily],
+    );
+    const helada = useMemo(
+        () => riesgoHelada({ alertas, today: agrometeo?.today, condicion: escena.condicion, piso: pisoId }),
+        [alertas, agrometeo, escena.condicion, pisoId],
+    );
+
+    // La atmósfera GLOBAL (<html data-clima/luz/enso>, clima-atmosfera.css) se
+    // alinea con lo que esta pantalla muestra, usando la misma función del
+    // servicio. Al salir se restaura lo que el hook global calcularía.
+    useEffect(() => {
+        if (!isAtmosphereEnabled()) return undefined;
+        applyAtmosphere({ condicion: escena.condicion, luz: escena.luz, enso: escena.enso });
+        return () => {
+            applyAtmosphere(deriveAtmosphere({ snapshot: getCachedClimaSnapshot(), now: new Date(), location }));
+        };
+    }, [escena.condicion, escena.luz, escena.enso, location]);
 
     return (
         <ScreenShell title="La página del tiempo" icon={CloudSun} onBack={onBack}>
-            <div className="max-w-2xl mx-auto p-4 space-y-4" data-testid="clima-boletin-screen">
-                {/* Portada: cielo de la fase + ubicación */}
-                <div className="rounded-2xl border border-slate-700/60 bg-slate-900/50 p-4">
-                    <CieloENSO family={faseFamily} />
-                    <p className="mt-1.5 flex items-center justify-center gap-1.5 text-sm font-bold text-slate-100">
-                        <MapPin size={13} className="text-emerald-300" aria-hidden="true" />
-                        {location?.municipio || location?.vereda || 'Su finca'}
-                        {location?.precision === 'centroid' && <span className="text-[11px] font-normal text-slate-500">· aprox.</span>}
-                    </p>
-                    <p className="mt-1 text-center text-[11px] italic leading-snug text-slate-500">
-                        El tiempo de su finca en tres miradas — hoy, la semana y la temporada. Números reales con su fuente; lo que no se sabe aún, se dice.
-                    </p>
+            <EscenaAtmosfera condicion={escena.condicion} luz={escena.luz} enso={escena.enso} forzado={escena.forzado}>
+                <div className="clima-canonica max-w-2xl mx-auto pb-4" data-testid="clima-boletin-screen" data-escena-fuente={escena.fuente || 'ninguna'}>
+                    {/* 2 · Cabecera sin caja, dato real */}
+                    <CabeceraAtmosfera
+                        location={location} profile={profile} now={agrometeo?.now} ahora={ahora}
+                        faseFamily={faseFamily} faseLabel={faseLabel} source={source}
+                        condicionEscena={escena.condicion}
+                    />
 
-                    {/* Enlace al mundo 3D del clima */}
-                    <button
-                        type="button"
-                        onClick={() => onNavigate?.('mockup_mundo3d_clima')}
-                        className="mt-3 w-full flex items-center justify-center gap-2 rounded-xl border border-sky-600/40 bg-sky-500/10 px-4 py-2.5 text-sm font-bold text-sky-200 active:bg-sky-500/20 transition-colors"
-                        data-testid="clima-ver-mundo3d"
-                    >
-                        <Sparkles size={16} aria-hidden="true" />
-                        Ver el mundo del clima en 3D
-                    </button>
-                </div>
-
-                {/* Navegación por horizontes */}
-                <div className="grid grid-cols-3 gap-2" role="tablist" aria-label="Horizontes del tiempo">
-                    {HORIZONTES.map((h) => {
-                        const activo = horizonte === h.id;
-                        const Icon = h.icon;
-                        return (
-                            <button key={h.id} type="button" role="tab" aria-selected={activo}
-                                data-testid={`horizonte-tab-${h.id}`} onClick={() => setHorizonte(h.id)}
-                                className={`rounded-xl border px-2 py-2.5 text-center transition-colors min-h-[60px] ${
-                                    activo ? 'clima-tab-activo border-sky-500/70 bg-sky-500/15 text-sky-200'
-                                        : 'border-slate-700 bg-slate-900/50 text-slate-300 active:bg-slate-800/70'
-                                }`}>
-                                <Icon size={16} className="mx-auto mb-0.5" aria-hidden="true" />
-                                <span className="block text-sm font-black leading-tight">{h.titulo}</span>
-                                <span className={`block text-[10px] leading-tight ${activo ? 'text-sky-300/90' : 'text-slate-500'}`}>{h.sub}</span>
-                            </button>
-                        );
-                    })}
-                </div>
-
-                {horizonte === 'hoy' && (
-                    <HorizonteHoy
-                        agrometeo={agrometeo} normales={normales} loading={loading} anom={anom}
-                        cultivos={cultivos} sinFicha={sinFicha}
-                        faseFamily={faseFamily} faseLabel={faseLabel}
+                    {/* 3 · La cifra grande */}
+                    <CifraGrande
+                        now={agrometeo?.now} today={agrometeo?.today} loading={loading}
                         onRefresh={() => { setLoading(true); setRefreshTick((t) => t + 1); }}
                     />
-                )}
-                {horizonte === 'semana' && <HorizonteSemana agrometeo={agrometeo} alertas={alertas} />}
-                {horizonte === 'estacional' && (
-                    <HorizonteEstacional
-                        faseFamily={faseFamily} faseLabel={faseLabel} source={source}
-                        regionLine={regionLine} mtaRegional={mtaRegional} onNavigate={onNavigate}
-                    />
-                )}
-            </div>
+
+                    {/* La lectura del cielo (enseña la causa) + helada (D-3) */}
+                    <LecturaCielo lectura={lectura} />
+                    <BandaHelada helada={helada} />
+
+                    {/* 4 · Anomalía con su fuente */}
+                    {agrometeo?.now && <Anomalia anom={anom} />}
+
+                    <div className="p-4 space-y-4">
+                        {/* 5 · Navegación por horizontes */}
+                        <div className="grid grid-cols-3 gap-2" role="tablist" aria-label="Horizontes del tiempo">
+                            {HORIZONTES.map((h) => {
+                                const activo = horizonte === h.id;
+                                const Icon = h.icon;
+                                return (
+                                    <button key={h.id} type="button" role="tab" aria-selected={activo}
+                                        data-testid={`horizonte-tab-${h.id}`} onClick={() => setHorizonte(h.id)}
+                                        className={`rounded-xl border px-2 py-2.5 text-center transition-colors min-h-[60px] ${
+                                            activo ? 'clima-tab-activo border-sky-500/70 bg-sky-500/15 text-sky-200'
+                                                : 'border-slate-700 bg-slate-900/50 text-slate-300 active:bg-slate-800/70'
+                                        }`}>
+                                        <Icon size={16} className="mx-auto mb-0.5" aria-hidden="true" />
+                                        <span className="block text-sm font-black leading-tight">{h.titulo}</span>
+                                        <span className={`block text-[10px] leading-tight ${activo ? 'text-sky-300/90' : 'text-slate-500'}`}>{h.sub}</span>
+                                    </button>
+                                );
+                            })}
+                        </div>
+
+                        {/* 6 y 7 · índices sobre vidrio + tarjetas por cultivo */}
+                        {horizonte === 'hoy' && (
+                            <HorizonteHoy
+                                agrometeo={agrometeo} normales={normales}
+                                cultivos={cultivos} sinFicha={sinFicha}
+                                faseFamily={faseFamily}
+                            />
+                        )}
+                        {horizonte === 'semana' && <HorizonteSemana agrometeo={agrometeo} alertas={alertas} />}
+                        {horizonte === 'estacional' && (
+                            <HorizonteEstacional
+                                faseFamily={faseFamily} faseLabel={faseLabel} source={source}
+                                regionLine={regionLine} mtaRegional={mtaRegional} onNavigate={onNavigate}
+                            />
+                        )}
+
+                        {/* 8 · Enlace al mundo 3D del clima */}
+                        <button
+                            type="button"
+                            onClick={() => onNavigate?.('mockup_mundo3d_clima')}
+                            className="w-full flex items-center justify-center gap-2 rounded-xl border border-sky-600/40 bg-slate-900/50 px-4 py-2.5 text-sm font-bold text-sky-200 active:bg-sky-500/20 transition-colors"
+                            data-testid="clima-ver-mundo3d"
+                        >
+                            <Sparkles size={16} aria-hidden="true" />
+                            Ver el mundo del clima en 3D
+                        </button>
+                        <p className="text-center text-[11px] italic leading-snug text-slate-500">
+                            El tiempo de su finca en tres miradas — hoy, la semana y la temporada. Números reales con su fuente; lo que no se sabe aún, se dice.
+                        </p>
+                    </div>
+                </div>
+            </EscenaAtmosfera>
         </ScreenShell>
     );
 }
