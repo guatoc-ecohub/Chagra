@@ -236,3 +236,78 @@ describe('La página del tiempo — puente al mundo 3D', () => {
     expect(onNavigate).toHaveBeenCalledWith('mockup_mundo3d_clima');
   });
 });
+
+/* ── Unificación 2D (spec 2026-09-06-unificar-2d-clima) ─────────────────── */
+describe('La página del tiempo — la escena atmosférica vive detrás del dato', () => {
+  it('monta la escena aria-hidden con las capas y el contenido encima; sin ubicación no hay data-clima (CA-6)', async () => {
+    render(<ClimaBoletinScreen onBack={() => {}} />);
+    const escena = screen.getByTestId('escena-atmosfera');
+    expect(escena).toHaveAttribute('aria-hidden', 'true');
+    expect(escena.querySelectorAll('.ca-gota').length).toBe(30);
+    expect(escena.querySelectorAll('.ca-frailejon').length).toBe(4);
+    const root = screen.getByTestId('escena-atmosfera-root');
+    expect(root.hasAttribute('data-clima')).toBe(false);
+    expect(['amanecer', 'dia', 'atardecer', 'noche']).toContain(root.getAttribute('data-luz'));
+    await screen.findByTestId('clima-sin-dato');
+    expect(document.documentElement.hasAttribute('data-clima')).toBe(false);
+  });
+
+  it('con dato real: la cabecera, la cifra grande, la lectura del cielo y la condición reindexan la escena (CA-1, CA-2)', async () => {
+    vi.mocked(fetchAgroMeteo).mockResolvedValueOnce({
+      available: true, elevation: 2680,
+      now: { temp: 16.2, aparente: 13, rh: 62, dew: 9, cloud: 82, precip: 0, weather: { emoji: '☁️', label: 'Nublado', family: 'nubes' } },
+      today: { date: '2026-09-05', temp_max: 18, temp_min: 11.8, precip_mm: 1.8, precip_prob: 94, eto_mm: 3.71, uv_max: 9, horas_frio: 0, cloud_mean: 70 },
+      daily: [{ date: '2026-09-05', precip_mm: 1.8, cloud_mean: 70, temp_max: 18, temp_min: 11.8 }],
+    });
+    render(<ClimaBoletinScreen onBack={() => {}} location={{ lat: 4.9345, lng: -73.8331, elevation: 2680, municipio: 'Guatavita', vereda: 'El Volador' }} />);
+    const cifra = await screen.findByTestId('clima-cifra-grande');
+    expect(screen.getByTestId('clima-temp')).toHaveTextContent('16°C');
+    expect(screen.getByTestId('clima-se-siente')).toHaveTextContent(/Se siente como 13 °C/);
+    expect(cifra).toBeInTheDocument();
+    expect(screen.getByTestId('clima-migaja')).toHaveTextContent(/Guatavita/);
+    expect(screen.getByTestId('clima-migaja')).toHaveTextContent(/2 680 m s\. n\. m\./) // jest-dom normaliza el U+202F a espacio;
+    expect(screen.getByTestId('clima-migaja')).toHaveTextContent(/piso frío/);
+    expect(screen.getByTestId('clima-condicion')).toHaveTextContent('Nublado');
+    expect(screen.getByTestId('clima-lectura-cielo')).toHaveTextContent(/Cielo cubierto|Niebla/);
+    // A 2 680 m con 82 % de nubes el servicio dice NIEBLA (regla de piso frío);
+    // la escena y el <html> global obedecen al servicio, no a un chip.
+    const root = screen.getByTestId('escena-atmosfera-root');
+    expect(root.getAttribute('data-clima')).toBe('niebla');
+    expect(document.documentElement.getAttribute('data-clima')).toBe('niebla');
+    expect(screen.getByTestId('clima-boletin-screen')).toHaveAttribute('data-escena-fuente', 'openmeteo');
+    // ninguna cadena de muestra del mockup (CA-5)
+    const texto = document.body.textContent;
+    for (const muestra of ['doña Rosa', 'Finca La Esperanza', 'DATOS DE MUESTRA', 'Datos de muestra', '10:40 a. m.']) {
+      expect(texto).not.toContain(muestra);
+    }
+  });
+
+  it('la helada aparece como banda de alerta (D-3), nunca como piel', async () => {
+    vi.mocked(fetchAgroMeteo).mockResolvedValueOnce({
+      available: true, elevation: 2680,
+      now: { temp: 6, aparente: 3, rh: 70, cloud: 5, precip: 0, weather: { emoji: '☀️', label: 'Despejado', family: 'sol' } },
+      today: { date: '2026-09-05', temp_max: 15, temp_min: 1.5, precip_mm: 0, eto_mm: 3, uv_max: 8, cloud_mean: 10 },
+      daily: [{ date: '2026-09-05', precip_mm: 0, cloud_mean: 10, temp_max: 15, temp_min: 1.5 }],
+    });
+    render(<ClimaBoletinScreen onBack={() => {}} location={{ lat: 4.9345, lng: -73.8331, elevation: 2680, municipio: 'Guatavita' }} />);
+    const banda = await screen.findByTestId('clima-banda-helada');
+    expect(banda).toHaveAttribute('data-origen', 'derivado');
+    expect(banda).toHaveTextContent(/1,5 °C/);
+    expect(screen.getByTestId('escena-atmosfera-root').getAttribute('data-clima')).toBe('despejado');
+  });
+
+  it('el bloque pedagógico de la anomalía trata de usted (CA-7)', async () => {
+    vi.mocked(fetchAgroMeteo).mockResolvedValueOnce({
+      available: true, elevation: 2680,
+      now: { temp: 16, aparente: 13, rh: 62, cloud: 30, precip: 0, weather: { emoji: '🌤️', label: 'Casi despejado', family: 'sol' } },
+      today: { date: '2026-09-05', temp_max: 18, temp_min: 9, precip_mm: 0, eto_mm: 3.7, uv_max: 6, cloud_mean: 30 },
+      daily: [],
+    });
+    render(<ClimaBoletinScreen onBack={() => {}} location={{ lat: 4.9345, lng: -73.8331, elevation: 2680 }} />);
+    const chip = await screen.findByTestId('que-es-anomalia');
+    fireEvent.click(chip);
+    const texto = document.body.textContent;
+    expect(texto).toMatch(/Imagine que cada día/);
+    expect(texto).not.toMatch(/\btu estatura\b|\btu edad\b|Imagina que/);
+  });
+});

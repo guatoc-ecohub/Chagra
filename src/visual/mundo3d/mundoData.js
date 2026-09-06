@@ -437,7 +437,9 @@ export const MUNDO = {
       enso: { fase: 'neutral' },
     },
     hotspots: [
-      { id: 'hoy', pos: [2.7, 3.4, 0.6], emoji: '⛅', label: 'El tiempo hoy', view: 'hoy_finca' },
+      // 2026-09-05 (operador, spec unificar-2d-clima): «tiempo» significa lo
+      // mismo en las tres caras — el rótulo va a la página del tiempo canónica.
+      { id: 'hoy', pos: [2.7, 3.4, 0.6], emoji: '⛅', label: 'El tiempo hoy', view: 'clima_boletin' },
       // 2026-09-02 (gate DOM-tapa-montaña): en [0, 1.7, 1.9] su píldora abierta
       // proyectaba SOBRE la cara del macizo (medido con la cámara viva: tapaba
       // templado con ΔE≈180 contra su propio color real). La corrección DY de

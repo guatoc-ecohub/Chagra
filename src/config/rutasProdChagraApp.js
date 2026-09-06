@@ -1180,7 +1180,7 @@ export const EXCLUIDO = [
   },
   {
     path: 'mockup_clima_atmosfera',
-    motivo: 'Prototipo clima-atmósfera. Reemplazado por ClimaBoletinScreen + EscenaBoveda.',
+    motivo: 'Prototipo clima-atmósfera. Sus efectos viven en EscenaAtmosfera dentro de ClimaBoletinScreen; la ruta renderiza la pantalla canónica (spec unificar-2d-clima).',
   },
   {
     path: 'mockup_dia_en_finca',
