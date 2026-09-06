@@ -74,7 +74,7 @@
  *
  * El contenedor padre define el alto (como `.mundo-root`).
  */
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { lazy, Suspense, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import * as THREE from 'three';
 import { Canvas, useFrame } from '@react-three/fiber';
 import { Html, OrbitControls, AdaptiveDpr } from '@react-three/drei';
@@ -83,21 +83,25 @@ import { perfilDeTier } from './deviceTier.js';
 import PisosTermicosBandas from './PisosTermicosBandas.jsx';
 import { getProfile } from '../../services/userProfileService.js';
 import { sugerenciasCultivosSierra } from './sierra/lecturaClimaAterrizaje.js';
+import MapaDeNivel from './sierra/MapaDeNivel.jsx';
 import TransicionSierraMundo from './TransicionSierraMundo.jsx';
-import { BANDAS_SIERRA, CLAVE_PISOS_SIERRA, PISOS_TERMICOS_SIERRA, altitudFincaValida, bandaDeMsnm } from './pisosTermicos.js';
+import { BANDAS_SIERRA, CLAVE_PISOS_SIERRA, PISOS_TERMICOS_SIERRA, altitudFincaValida } from './pisosTermicos.js';
 import { franjaCondensacion, leerGateDescenso } from './sierra/descensoSierra.js';
 import {
-  NIEVE, anadirAtributoNieve, crearInyectorNieve, muestreadorFacetas, contornoNivel, geometriaCinta, texturaCinta,
+  NIEVE, anadirAtributoNieve, crearInyectorNieve,
 } from './sierra/nieveSierra.js';
 import {
-  alturaSierra, alturaFaldon, ruido, smoothstep, CIMA, COSTA_Z, ANCHO, FONDO, LAGUNAS_PARAMO, exposicionMar, pesoPromontorio, yDeMsnm,
+  alturaSierra, alturaFaldon, ruido, smoothstep, CIMA, COSTA_Z, ANCHO, FONDO, LAGUNAS_PARAMO, exposicionMar, pesoPromontorio,
 } from './sierra/sierraRelieve.js';
 import { atmosferaLinealSierra, crearMaterialDomo, crearInyectorBruma, BRUMA_SIERRA } from './sierra/aireSierra.js';
 import { MarSierra, PERFIL_PLAYA, PERFIL_PARAMO } from './sierra/marSierra.js';
 import { NUBES_POR_TIER, nubesAlisios, nubesOrograficas, nubesInterior, geometriaCumulos } from './sierra/nubesSierra.js';
-import { faseEnsoViva } from './sierra/aterrizajeDescenso.js';
+import { faseEnsoViva, companeroDelUsuario, anfitrionDeBanda } from './sierra/aterrizajeDescenso.js';
 import { datoPisoPorId, TOTAL_ESPECIES_CATALOGO } from '../../services/sierraPisosDatos.js';
 import useClima3DVivo from '../../hooks/useClima3DVivo.js';
+
+const CompaneroPortada = lazy(() => import('../../components/ChagraAgentAvatar.jsx'));
+const AVISO_UBICACION = 'sierra:aviso-ubicacion-visto';
 
 /* ── Geografía del macizo: la ley de altura, la costa y las cotas viven en
       `sierra/sierraRelieve.js` (una sola montaña para la vista global, el
@@ -501,80 +505,6 @@ function Rotulo({ pos, texto, sub, distancia = 12, alto = 0.6 }) {
    banda) en el color del piso donde vive, con su rótulo «a la altura de su
    finca» colgado del punto más oriental. Sin altitud confirmada NO se dibuja
    nada de la finca (el hueco es honesto): las bandas siguen igual. */
-function MapaDeNivel({ segmentos, msnm }) {
-  const capas = useMemo(() => {
-    const hF = muestreadorFacetas(alturaSierra, { ancho: ANCHO, fondo: FONDO, segX: segmentos, segZ: segmentos });
-    const region = { x0: -ANCHO / 2 + 0.2, x1: ANCHO / 2 - 0.2, z0: COSTA_Z - 1.2, z1: FONDO / 2 - 0.2, paso: 0.08 };
-    const msnmValido = altitudFincaValida(msnm);
-    const out = [];
-    BANDAS_SIERRA.forEach((b) => {
-      if (!Number.isFinite(b.tope)) return;
-      const lineas = contornoNivel(alturaSierra, b.tope, region);
-      if (!lineas.length) return;
-      const esHielo = b.id === 'superparamo';
-      out.push({
-        key: b.id,
-        geo: geometriaCinta(lineas, hF, { ancho: esHielo ? 0.06 : 0.03 }),
-        color: esHielo ? NIEVE.ambar : NIEVE.tinta,
-        opacidad: esHielo ? 0.92 : 0.34,
-        ancla: esHielo ? lineas.flat().reduce((m, q) => (q[0] < m[0] ? q : m)) : null,   // el punto más oriental (screen-right): lejos de las etiquetas de banda, que van al occidente
-      });
-    });
-    /* P1 — la curva de la cota REAL de la finca. Solo con altitud confirmada. */
-    if (msnmValido) {
-      const y = yDeMsnm(msnmValido);
-      const lineas = contornoNivel(alturaSierra, y, region);
-      if (lineas.length) {
-        const banda = bandaDeMsnm(msnmValido);
-        const color = banda?.color ?? NIEVE.tinta;
-        const puntos = lineas.flat();
-        const ancla = puntos.reduce((m, q) => (q[0] < m[0] ? q : m), puntos[0]);
-        out.push({
-          key: 'finca',
-          geo: geometriaCinta(lineas, hF, { ancho: 0.045 }),
-          color,
-          opacidad: 0.88,
-          ancla,
-          esFinca: true,
-          cotaMsnm: msnmValido,
-          yCota: y,
-        });
-      }
-    }
-    return out;
-  }, [segmentos, msnm]);
-  useEffect(() => () => capas.forEach((c) => c.geo.dispose()), [capas]);
-  const tex = texturaCinta();
-  return (
-    <group name="mapa-de-nivel">
-      {capas.map((c) => (
-        <mesh key={c.key} geometry={c.geo}>
-          <meshBasicMaterial
-            map={tex} alphaMap={tex} color={c.color} transparent opacity={c.opacidad}
-            depthWrite={false} side={THREE.DoubleSide} toneMapped={false}
-            polygonOffset polygonOffsetFactor={-2} polygonOffsetUnits={-2}
-          />
-        </mesh>
-      ))}
-      {capas.filter((c) => c.ancla && c.key === 'superparamo').map((c) => (
-        <group key={`${c.key}-rotulo`} position={[c.ancla[0], LINEA_HIELO + 0.22, c.ancla[1]]}>{/* +0,22: con la cámara nueva, a +0,06 el rótulo rozaba el de «Nival» */}
-          <Html center distanceFactor={13} zIndexRange={[28, 8]} style={{ pointerEvents: 'none' }}>
-            <div className="vsierra-hielo" aria-hidden="true">Hasta aquí llegaba el hielo · 4.800 m</div>
-          </Html>
-        </group>
-      ))}
-      {capas.filter((c) => c.esFinca).map((c) => (
-        <group key="finca-rotulo" position={[c.ancla[0], c.yCota + 0.2, c.ancla[1]]}>
-          <Html center distanceFactor={13} zIndexRange={[28, 8]} style={{ pointerEvents: 'none' }}>
-            <div className="vsierra-finca" style={{ '--finca': c.color }} aria-hidden="true">
-              {c.cotaMsnm.toLocaleString('es-CO')} m · a la altura de su finca
-            </div>
-          </Html>
-        </group>
-      ))}
-    </group>
-  );
-}
 
 /* El pie de crédito a los cuatro pueblos, anclado en 3D (para el grupo
    componible). El modo con Canvas usa además el pie DOM accesible. */
@@ -744,6 +674,11 @@ export function SierraDiorama({
 /* Estilos de los rótulos y pie de crédito (viven aquí: son de ESTA escena). */
 const CSS_SIERRA = `
 .vsierra-root[data-viaje="1"] .vsierra-canvas { pointer-events:none; }
+.vsierra-sindato { position:absolute; z-index:40; bottom:13vh; left:4vw; display:flex; align-items:flex-end; gap:12px; max-width:88vw; }
+.vsierra-sindato__pizarra { position:relative; background:#253128; color:#f5f1e7; border:2px solid #0c110e; padding:18px; max-width:260px; font-size:14px; }
+.vsierra-sindato__pizarra button { position:absolute; right:2px; top:2px; background:transparent; color:inherit; border:0; cursor:pointer; }
+.vsierra-sindato__pizarra p { margin:0 0 8px; }
+
 
 .vsierra-root { position: relative; width: 100%; height: 100dvh; min-height: 320px; overflow: hidden; background: ${ATMOSFERA_SIERRA.fondo}; }
 .vsierra-canvas { position: absolute; inset: 0; opacity: 0; transition: opacity 0.7s ease; }
@@ -809,6 +744,9 @@ export default function VistaGlobalSierra({
   sugerencias = [],
 }) {
   const [listo, setListo] = useState(false);
+  const [mostrarAyuda, setMostrarAyuda] = useState(() => {
+    try { return sessionStorage.getItem(AVISO_UBICACION) !== '1'; } catch { return true; }
+  });
   /* El clima de la finca entra por el MISMO hook que la vitrina 2D y la Página
      del Tiempo (`useClima3DVivo`): lee la cache compartida y escucha el evento.
      Se baja al aterrizaje del descenso para que la Sierra absorba el dato que
@@ -839,6 +777,14 @@ export default function VistaGlobalSierra({
     if (viaje?.piso) onSeleccionPiso?.(viaje.piso);
   }, [onSeleccionPiso, viaje]);
   const terminarViaje = useCallback(() => setViaje(null), []);
+  const sinAltitud = altitudFincaValida(msnmPortada) == null;
+  useEffect(() => {
+    if (sinAltitud && mostrarAyuda && !viaje) {
+      try { sessionStorage.setItem(AVISO_UBICACION, '1'); } catch { /* La ayuda sigue disponible sin storage. */ }
+    }
+  }, [sinAltitud, mostrarAyuda, viaje]);
+  const companero = companeroDelUsuario();
+
   return (
     <section
       className={`vsierra-root${className ? ` ${className}` : ''}`}
@@ -890,12 +836,23 @@ export default function VistaGlobalSierra({
         <AdaptiveDpr pixelated />
       </Canvas>
 
+      {sinAltitud && mostrarAyuda && !viaje && (
+        <aside className="vsierra-sindato" aria-label="Ubicación de la finca">
+          <Suspense fallback={null}><CompaneroPortada especie={companero} size={64} /></Suspense>
+          <div className="vsierra-sindato__pizarra">
+            <button aria-label="Cerrar aviso" onClick={() => setMostrarAyuda(false)}>×</button>
+            <p>Confirme su finca y la montaña le muestra su clima.</p>
+            <small>{anfitrionDeBanda('', companero).firmaCompai}</small>
+          </div>
+        </aside>
+      )}
       <TransicionSierraMundo
         activa={viaje?.activa ?? false}
         pisoDestino={viaje?.piso.id}
         tier={tier}
         reducedMotion={reducedMotion}
         sostenerAterrizaje
+        avisarUbicacion={false}
         onMitad={llegarAPiso}
         onFin={terminarViaje}
         msnmUsuario={altitudFincaValida(msnmPortada)}

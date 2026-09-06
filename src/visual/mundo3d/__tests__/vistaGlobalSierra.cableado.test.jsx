@@ -1,7 +1,7 @@
 import React from 'react';
 import { act, fireEvent, render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom';
-import { afterEach, describe, expect, test, vi } from 'vitest';
+import { beforeEach, afterEach, describe, expect, test, vi } from 'vitest';
 
 vi.mock('@react-three/fiber', () => ({
   Canvas: ({ children }) => <div data-testid="canvas-sierra">{children}</div>,
@@ -20,7 +20,9 @@ vi.mock('@react-three/drei', () => ({
 }));
 
 import VistaGlobalSierra from '../VistaGlobalSierra.jsx';
+import MapaDeNivel from '../sierra/MapaDeNivel.jsx';
 
+beforeEach(() => sessionStorage.clear());
 afterEach(() => vi.useRealTimers());
 
 describe('VistaGlobalSierra, cableado de pisos térmicos', () => {
@@ -54,4 +56,22 @@ test('la curva rotula la altitud real de la finca', () => {
   render(<VistaGlobalSierra msnm={2200} />);
   expect(document.querySelectorAll('.vsierra-finca')).toHaveLength(1);
   expect(document.querySelector('.vsierra-finca')).toHaveTextContent('2.200 m · a la altura de su finca');
+});
+
+
+test('la ayuda sin ubicación aparece una sola vez por sesión', () => {
+  const { unmount } = render(<VistaGlobalSierra />);
+  expect(screen.getByText('Confirme su finca y la montaña le muestra su clima.')).toBeInTheDocument();
+  unmount();
+  render(<VistaGlobalSierra />);
+  expect(screen.queryByText('Confirme su finca y la montaña le muestra su clima.')).toBeNull();
+});
+
+
+test('el aterrizaje reutiliza una sola curva, sin las curvas de escala', () => {
+  const { rerender } = render(<MapaDeNivel segmentos={48} msnm={2200} soloFinca />);
+  expect(document.querySelectorAll('mesh[name="curva-cota-finca"]')).toHaveLength(1);
+  expect(document.querySelectorAll('mesh')).toHaveLength(1);
+  rerender(<MapaDeNivel segmentos={48} msnm={null} soloFinca />);
+  expect(document.querySelectorAll('mesh')).toHaveLength(0);
 });

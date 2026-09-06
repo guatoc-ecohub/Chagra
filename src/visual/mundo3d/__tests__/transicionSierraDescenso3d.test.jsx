@@ -14,14 +14,14 @@ import { LLAVE_VISTO } from '../sierra/descensoSierra.js';
 vi.mock('../../../components/ChagraAgentAvatar.jsx', () => ({ default: () => <span data-testid="companero-sierra" /> }));
 
 vi.mock('../sierra/EscenaDescensoSierra.jsx', () => ({
-  default: ({ plan, fase, tier }) => (
+  default: ({ plan, fase, tier, rotuloLlegada }) => (
     <div
       data-testid="escena3d-mock"
       data-cota={plan?.destino}
       data-total={plan?.total}
       data-fase={fase}
       data-tier={tier}
-    />
+    >{rotuloLlegada}</div>
   ),
 }));
 
@@ -399,8 +399,8 @@ describe('PASO 5 — la tiza de helada por el hook, con su prioridad', () => {
     const t2 = document.querySelector('[data-testid="tsm-t2"]');
     expect(t1).toBeNull();
     expect(t2).toBeNull();
-    expect(document.querySelector('.tsm__llegada').textContent).not.toMatch(/· ahora/);
-    expect(document.querySelector('.tsm__llegada').textContent).not.toMatch(/esta noche baja/);
+    expect(document.querySelector('[data-testid="tsm-llegada"]').textContent).not.toMatch(/· ahora/);
+    expect(document.querySelector('[data-testid="tsm-llegada"]').textContent).not.toMatch(/esta noche baja/);
   });
 });
 

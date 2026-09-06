@@ -617,6 +617,7 @@ const CSS = `
  * @param {object|null} [props.climaVivo] salida completa de `useClima3DVivo`
  *        (`derivarClima3D`): la fuente única del clima de la finca. El host lo
  *        baja del hook; si no llega, el aterrizaje no inventa números (§8).
+ * @param {boolean} [props.avisarUbicacion] el host puede haber mostrado el aviso en portada.
  * @param {boolean} [props.sostenerAterrizaje] conserva T0/T1/T2 hasta continuar.
  * @param {Array} [props.sugerencias] salida de `buildClimaCultivoSuggestions`
  *        (solo si el host ya la calculó; sin plantas no hay prioridad 2).
@@ -644,6 +645,7 @@ export default function TransicionSierraMundo({
   climaVivo = null,
   sugerencias = [],
   sostenerAterrizaje = false,
+  avisarUbicacion = true,
   onDescenso,
 }) {
   const continuadoRef = useRef(false);
@@ -846,7 +848,7 @@ export default function TransicionSierraMundo({
      ninguna, El Niño por piso es la prioridad 5 (y bajo neutral, nada). Si al
      final no hay línea, la pizarra calla: «nada» es un estado válido. */
   const tizaLinea = !aterrizaje.conUbicacion
-    ? 'Confirme su finca y la montaña le muestra su clima.'
+    ? (avisarUbicacion ? 'Confirme su finca y la montaña le muestra su clima.' : null)
     : lectura.tiza ||
     ((climaVivo?.tieneEnso || faseEnso != null || gate.fase != null) && aterrizaje.enso?.titular
       ? `${aterrizaje.enso.titular} ${aterrizaje.enso.accion}`.trim()
@@ -856,6 +858,27 @@ export default function TransicionSierraMundo({
      visitante escribe y firma; sin relevo, firma el compañero del usuario,
      que es quien lo dedujo. El compañero del usuario nunca desaparece. */
   const firmaTiza = visita.hayRelevo ? visita.firma : visita.firmaCompai;
+
+  const rotuloLlegada = (
+<div className={usar3d && aterrizaje.conUbicacion ? "tsm__rotulo-curva" : "tsm__llegada"} data-testid="tsm-llegada">
+                    {paso >= 1 && (
+                      <p className="tsm__llegada__cota" data-testid="tsm-t0">
+                        <strong>{aterrizaje.cotaNumero}</strong>
+                        <span>{aterrizaje.cotaNota}</span>
+                      </p>
+                    )}
+                    {paso >= 2 &&
+                      lectura.hayDato &&
+                      lectura.tinta.length > 0 && aterrizaje.conUbicacion && (
+                        <div className="tsm__llegada__tinta" aria-label="Análisis meteorológico de Open-Meteo" data-testid="tsm-t1">
+                          {lectura.tinta.slice(0, 1).map((linea) => (
+                            <p key={linea}>{linea}</p>
+                          ))}
+
+                        </div>
+                      )}
+                  </div>
+  );
 
   return (
     <div
@@ -882,6 +905,8 @@ export default function TransicionSierraMundo({
           {usar3d && (
             <Suspense fallback={null}>
               <EscenaDescensoSierra
+                cotaLlegada={paradoEnCota && paso >= 1 && aterrizaje.conUbicacion ? aterrizaje.cota : null}
+                rotuloLlegada={paradoEnCota && paso >= 1 && aterrizaje.conUbicacion ? rotuloLlegada : null}
                 plan={plan}
                 fase={fase}
                 humedad={humedad}
@@ -929,24 +954,7 @@ export default function TransicionSierraMundo({
                 <>
                   {/* El aterrizaje, en tres tiempos. Cada pieza aparece por
                       setTimeout; la píldora oscura ya no existe (PASO 1). */}
-                  <div className="tsm__llegada" data-testid="tsm-llegada">
-                    {paso >= 1 && (
-                      <p className="tsm__llegada__cota" data-testid="tsm-t0">
-                        <strong>{aterrizaje.cotaNumero}</strong>
-                        <span>{aterrizaje.cotaNota}</span>
-                      </p>
-                    )}
-                    {paso >= 2 &&
-                      lectura.hayDato &&
-                      lectura.tinta.length > 0 && aterrizaje.conUbicacion && (
-                        <div className="tsm__llegada__tinta" data-testid="tsm-t1">
-                          {lectura.tinta.slice(0, 1).map((linea) => (
-                            <p key={linea}>{linea}</p>
-                          ))}
-
-                        </div>
-                      )}
-                  </div>
+                  {(!usar3d || !aterrizaje.conUbicacion) && rotuloLlegada}
                   {paso >= 3 && (
                     <div className="tsm__companero">
                       <Suspense fallback={null}>
