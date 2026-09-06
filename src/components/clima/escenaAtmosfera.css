@@ -1,3 +1,40 @@
+.ca-root.ca-atmosfera {
+  --ca-tinta: #16232b;
+  --ca-tinta-suave: rgba(22, 35, 43, 0.72);
+  --ca-monte1: #8695a0;
+  --ca-monte2: #677a83;
+  --ca-monte3: #4d5f64;
+  --ca-suelo: #47585a;
+  --ca-pasto: #3b4d4e;
+  --ca-tallo: #4d4a42;
+  --ca-hoja: #3c5a52;
+  --ca-sombra-largo: 0.6;
+  --ca-sombra-op: 0.1;
+  --ca-astro-x: 70vw;
+  --ca-astro-y: 10vh;
+  --ca-astro-s: 0.9;
+  --ca-astro-op: 0.12;
+  --ca-astro-color: #e8eef2;
+  --ca-astro-glow: rgba(210, 225, 235, 0.2);
+  --ca-luna-op: 0;
+  --ca-rayo: #e8eef2;
+  --ca-rayos-op: 0;
+  --ca-ladera-op: 0;
+  --ca-bruma-color: #9fadb4;
+  --ca-bruma-op: 0.55;
+  --ca-vineta-op: 0.34;
+  --ca-scrim-alto-op: 0.26;
+  --ca-scrim-bajo-op: 0.42;
+  --ca-carta-bg: rgba(222, 232, 238, 0.42);
+  --ca-carta-borde: rgba(235, 243, 247, 0.3);
+  --ca-rim: rgba(238, 246, 250, 0.5);
+  --ca-carta-sombra: 0 6px 16px -12px rgba(15, 25, 33, 0.35);
+  --ca-barra-bg: rgba(226, 234, 240, 0.38);
+  --ca-chip-activo: #223642;
+  --ca-chip-activo-tinta: #eef5f9;
+}
+
+
 /* ═══════════════════════════════════════════════════════════════════════
    MOCKUP "El clima como atmósfera viva" — #/mockups/clima-atmosfera
 
@@ -29,7 +66,7 @@
 
 /* ── Tokens por estado de clima ─────────────────────────────────────── */
 
-.ca-root[data-clima='soleado'] {
+.ca-root:is([data-clima='soleado'], [data-clima='despejado'][data-luz='dia']) {
   --ca-tinta: #123042;
   --ca-tinta-suave: rgba(18, 48, 66, 0.72);
   --ca-monte1: #a9c4cf;
@@ -137,7 +174,7 @@
   --ca-chip-activo-tinta: #f1f6f3;
 }
 
-.ca-root[data-clima='dorada'] {
+.ca-root:is([data-clima='dorada'], [data-clima='despejado']:is([data-luz='amanecer'], [data-luz='atardecer'])) {
   --ca-tinta: #3a2030;
   --ca-tinta-suave: rgba(58, 32, 48, 0.74);
   --ca-monte1: #b08a86;
@@ -173,7 +210,7 @@
   --ca-chip-activo-tinta: #ffedd6;
 }
 
-.ca-root[data-clima='noche'] {
+.ca-root:is([data-clima='noche'], [data-clima='despejado'][data-luz='noche']) {
   --ca-tinta: #e6edfa;
   --ca-tinta-suave: rgba(230, 237, 250, 0.72);
   --ca-monte1: #22304e;
@@ -231,16 +268,16 @@
 .ca-cielo--niebla { background: linear-gradient(to bottom, #b6c3c8, #cfd8d8 50%, #e4e8e5); }
 .ca-cielo--dorada { background: linear-gradient(to bottom, #3a2b52, #a34b3c 42%, #f0913f 68%, #ffd794); }
 .ca-cielo--noche { background: linear-gradient(to bottom, #050a19, #0d1730 55%, #1a2947); }
-.ca-root[data-clima='soleado'] .ca-cielo--soleado,
+.ca-root:is([data-clima='soleado'], [data-clima='despejado'][data-luz='dia']) .ca-cielo--soleado,
 .ca-root[data-clima='lluvia'] .ca-cielo--lluvia,
 .ca-root[data-clima='niebla'] .ca-cielo--niebla,
-.ca-root[data-clima='dorada'] .ca-cielo--dorada,
-.ca-root[data-clima='noche'] .ca-cielo--noche { opacity: 1; }
+.ca-root:is([data-clima='dorada'], [data-clima='despejado']:is([data-luz='amanecer'], [data-luz='atardecer'])) .ca-cielo--dorada,
+.ca-root:is([data-clima='noche'], [data-clima='despejado'][data-luz='noche']) .ca-cielo--noche { opacity: 1; }
 
 /* Estrellas: titilan solo de noche */
 .ca-capa { position: absolute; inset: 0; opacity: 0; transition: opacity var(--ca-lento) var(--ca-curva); }
 .ca-capa--estrellas { z-index: 1; }
-.ca-root[data-clima='noche'] .ca-capa--estrellas { opacity: 1; }
+.ca-root:is([data-clima='noche'], [data-clima='despejado'][data-luz='noche']) .ca-capa--estrellas { opacity: 1; }
 .ca-estrella {
   position: absolute;
   border-radius: 50%;
@@ -248,7 +285,7 @@
   animation: ca-titila 3s ease-in-out infinite alternate;
   animation-play-state: paused;
 }
-.ca-root[data-clima='noche'] .ca-estrella { animation-play-state: running; }
+.ca-root:is([data-clima='noche'], [data-clima='despejado'][data-luz='noche']) .ca-estrella { animation-play-state: running; }
 @keyframes ca-titila {
   from { opacity: 0.25; }
   to { opacity: 1; }
@@ -305,8 +342,8 @@
   animation: ca-respira 9s ease-in-out infinite alternate;
   animation-play-state: paused;
 }
-.ca-root[data-clima='soleado'] .ca-rayos-giro,
-.ca-root[data-clima='dorada'] .ca-rayos-giro { animation-play-state: running; }
+.ca-root:is([data-clima='soleado'], [data-clima='despejado'][data-luz='dia']) .ca-rayos-giro,
+.ca-root:is([data-clima='dorada'], [data-clima='despejado']:is([data-luz='amanecer'], [data-luz='atardecer'])) .ca-rayos-giro { animation-play-state: running; }
 @keyframes ca-respira {
   from { transform: scale(0.96) rotate(-2deg); opacity: 0.7; }
   to { transform: scale(1.05) rotate(2deg); opacity: 1; }
@@ -448,8 +485,8 @@
 
 /* ── Polvo dorado en suspensión: pleno en la hora dorada, tenue al sol ── */
 .ca-capa--polvo { z-index: 6; }
-.ca-root[data-clima='dorada'] .ca-capa--polvo { opacity: 1; }
-.ca-root[data-clima='soleado'] .ca-capa--polvo { opacity: 0.35; }
+.ca-root:is([data-clima='dorada'], [data-clima='despejado']:is([data-luz='amanecer'], [data-luz='atardecer'])) .ca-capa--polvo { opacity: 1; }
+.ca-root:is([data-clima='soleado'], [data-clima='despejado'][data-luz='dia']) .ca-capa--polvo { opacity: 0.35; }
 .ca-mota {
   position: absolute;
   width: 3px;
@@ -460,8 +497,8 @@
   animation: ca-flota 9s ease-in-out infinite alternate;
   animation-play-state: paused;
 }
-.ca-root[data-clima='dorada'] .ca-mota,
-.ca-root[data-clima='soleado'] .ca-mota { animation-play-state: running; }
+.ca-root:is([data-clima='dorada'], [data-clima='despejado']:is([data-luz='amanecer'], [data-luz='atardecer'])) .ca-mota,
+.ca-root:is([data-clima='soleado'], [data-clima='despejado'][data-luz='dia']) .ca-mota { animation-play-state: running; }
 @keyframes ca-flota {
   0% { translate: 0 0; opacity: 0.15; }
   35% { opacity: 0.9; }
@@ -471,7 +508,7 @@
 
 /* ── Luciérnagas (catálogo #14): derivan y parpadean, glow estático ── */
 .ca-capa--luci { z-index: 6; }
-.ca-root[data-clima='noche'] .ca-capa--luci { opacity: 1; }
+.ca-root:is([data-clima='noche'], [data-clima='despejado'][data-luz='noche']) .ca-capa--luci { opacity: 1; }
 .ca-luci {
   position: absolute;
   animation: ca-ronda 10s ease-in-out infinite alternate;
@@ -487,8 +524,8 @@
   animation: ca-parpadea 3s ease-in-out infinite;
   animation-play-state: paused;
 }
-.ca-root[data-clima='noche'] .ca-luci,
-.ca-root[data-clima='noche'] .ca-luci i { animation-play-state: running; }
+.ca-root:is([data-clima='noche'], [data-clima='despejado'][data-luz='noche']) .ca-luci,
+.ca-root:is([data-clima='noche'], [data-clima='despejado'][data-luz='noche']) .ca-luci i { animation-play-state: running; }
 @keyframes ca-ronda {
   0% { transform: translate(0, 0); }
   40% { transform: translate(22px, -16px); }
@@ -513,11 +550,11 @@
 .ca-grade--niebla { background: linear-gradient(to bottom, rgba(226, 232, 229, 0.4), rgba(214, 222, 218, 0.45)); }
 .ca-grade--dorada { background: linear-gradient(200deg, rgba(90, 50, 120, 0.28), rgba(255, 140, 50, 0.34) 60%, rgba(255, 190, 100, 0.4)); }
 .ca-grade--noche { background: linear-gradient(to bottom, rgba(4, 8, 22, 0.42), rgba(8, 14, 32, 0.36)); }
-.ca-root[data-clima='soleado'] .ca-grade--soleado,
+.ca-root:is([data-clima='soleado'], [data-clima='despejado'][data-luz='dia']) .ca-grade--soleado,
 .ca-root[data-clima='lluvia'] .ca-grade--lluvia,
 .ca-root[data-clima='niebla'] .ca-grade--niebla,
-.ca-root[data-clima='dorada'] .ca-grade--dorada,
-.ca-root[data-clima='noche'] .ca-grade--noche { opacity: 1; }
+.ca-root:is([data-clima='dorada'], [data-clima='despejado']:is([data-luz='amanecer'], [data-luz='atardecer'])) .ca-grade--dorada,
+.ca-root:is([data-clima='noche'], [data-clima='despejado'][data-luz='noche']) .ca-grade--noche { opacity: 1; }
 
 /* ── Viñeta + scrims de cine (catálogo #5) ── */
 .ca-vineta {
@@ -786,4 +823,83 @@
   .ca-root * {
     transition-duration: 0.2s !important;
   }
+}
+
+/* Canonical scene: independent condition and light, no default weather. */
+.ca-root.ca-atmosfera {
+  position: absolute;
+  inset: 0;
+  min-height: 0;
+  display: block;
+  isolation: auto;
+  overflow: clip;
+  pointer-events: none;
+  background: #34454b;
+  --ca-astro-op: 0;
+  --ca-rayos-op: 0;
+}
+.ca-atmosfera .ca-escena { height: 100dvh; position: sticky; top: 0; }
+.ca-atmosfera .ca-jiron-ui { position: absolute; top: 38vh; }
+.ca-atmosfera[data-clima='despejado'] { --ca-astro-op: 1; }
+.ca-atmosfera[data-clima='despejado'][data-luz='dia'] { --ca-rayos-op: 0.4; }
+.ca-atmosfera[data-clima='despejado']:is([data-luz='amanecer'], [data-luz='atardecer']) { --ca-rayos-op: 0.75; }
+.ca-atmosfera[data-clima='niebla'] { --ca-astro-op: 0.25; }
+.ca-atmosfera[data-clima='lluvia'] { --ca-astro-op: 0.12; }
+.ca-atmosfera[data-clima='nublado'] {
+  --ca-monte1: #a1b4b9;
+  --ca-monte2: #78968c;
+  --ca-monte3: #557565;
+  --ca-suelo: #496c53;
+  --ca-pasto: #3c5e47;
+  --ca-bruma-color: #c3cdce;
+  --ca-bruma-op: 0.7;
+  --ca-ladera-op: 0;
+}
+.ca-cielo--nublado { background: linear-gradient(#899ba5, #b7c5ca 55%, #d3dcd7); }
+.ca-grade--nublado { background: linear-gradient(#81949b22, #adc3ba22); }
+.ca-atmosfera[data-clima='nublado'] .ca-cielo--nublado,
+.ca-atmosfera[data-clima='nublado'] .ca-grade--nublado { opacity: 1; }
+.ca-atmosfera[data-clima='nublado'] .ca-bruma { bottom: 22vh; }
+.ca-atmosfera[data-clima='nublado']:is([data-luz='amanecer'], [data-luz='atardecer']) .ca-grade--dorada { opacity: 0.45; }
+.ca-atmosfera[data-luz='noche'] {
+  --ca-monte1: #22304e;
+  --ca-monte2: #182441;
+  --ca-monte3: #101a30;
+  --ca-suelo: #0e1728;
+  --ca-pasto: #0a1220;
+  --ca-bruma-color: #16233c;
+  --ca-astro-color: #eef3ff;
+  --ca-luna-op: 1;
+}
+.ca-atmosfera[data-luz='noche'] .ca-grade--noche { opacity: 1; }
+.ca-atmosfera[data-clima='nublado'][data-luz='noche'] .ca-cielo--noche { opacity: 1; }
+.ca-atmosfera[data-clima='nublado'][data-luz='noche'] .ca-cielo--nublado { opacity: 0; }
+.ca-atmosfera[data-clima='nublado'][data-luz='noche'] .ca-capa--luci { opacity: 0.4; }
+.ca-atmosfera[data-clima='nublado'][data-luz='noche'] .ca-luci,
+.ca-atmosfera[data-clima='nublado'][data-luz='noche'] .ca-luci i { animation-play-state: running; }
+.ca-atmosfera:not([data-clima]) .ca-astro { opacity: 0; }
+.ca-atmosfera:not([data-clima])[data-luz='noche'] .ca-cielo--noche { opacity: 1; }
+.ca-atmosfera:not([data-clima]):is([data-luz='amanecer'], [data-luz='atardecer']) .ca-grade--dorada { opacity: 0.3; }
+
+/* Dark glass supports the dashboard's light text across all scene skins. */
+.clima-atmosfera-screen { position: relative; isolation: isolate; min-height: 100dvh; }
+.clima-atmosfera-contenido { position: relative; z-index: 10; }
+.clima-atmosfera-contenido .ca-carta {
+  background: rgba(8, 20, 30, 0.78);
+  border-color: rgba(218, 235, 234, 0.35);
+  border-top-color: rgba(235, 248, 240, 0.65);
+  box-shadow: 0 12px 30px -14px #0008;
+}
+.clima-atmosfera-contenido :is(.text-slate-400, .text-slate-500) { color: #d2dfe3; }
+.clima-atmosfera-contenido > header { color: #f1f5f9; text-shadow: 0 1px 3px #07121c; }
+.ca-atmosfera .ca-scrim--alto { height: 65vh; opacity: 1; background: linear-gradient(#06121bea, #06121b99 70%, transparent); }
+.ca-atmosfera .ca-scrim--bajo { opacity: 0.8; }
+@media (min-width: 900px) {
+  .clima-atmosfera-contenido { max-width: 960px; }
+  .clima-atmosfera-contenido [data-testid='clima-indices-hoy'] { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+@media (max-width: 390px) {
+  .clima-atmosfera-contenido { padding: 12px; }
+  .clima-atmosfera-contenido .ca-carta { padding: 12px; }
+  .ca-atmosfera .ca-frente { height: auto; min-height: 0; aspect-ratio: 800 / 190; }
 }

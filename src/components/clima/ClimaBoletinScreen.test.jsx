@@ -17,6 +17,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent, cleanup } from '@testing-library/react';
 import ClimaBoletinScreen from './ClimaBoletinScreen.jsx';
 import { setEnsoPhase, clearEnsoPhase } from '../../services/ensoService.js';
+import { fetchClimaSnapshot } from '../../services/climaService.js';
 import { fetchAgroMeteo, fetchNormales } from '../../services/agroMeteoService.js';
 
 // Perfil andino (Boyacá) → región 'andina' para la lectura regional.
@@ -39,6 +40,8 @@ const gotoElNino = () => fireEvent.click(screen.getByTestId('horizonte-tab-estac
 
 beforeEach(() => {
   cleanup();
+  window.history.replaceState({}, '', '/');
+  vi.clearAllMocks();
   clearEnsoPhase();
   try { localStorage.clear(); } catch { /* jsdom */ }
 });
@@ -47,7 +50,7 @@ describe('La página del tiempo — render base', () => {
   it('monta con el cielo ENSO y los 3 horizontes', () => {
     render(<ClimaBoletinScreen onBack={() => {}} />);
     expect(screen.getByTestId('clima-boletin-screen')).toBeInTheDocument();
-    expect(screen.getByTestId('cielo-enso')).toBeInTheDocument();
+    expect(document.querySelector('.ca-escena')).toHaveAttribute('aria-hidden', 'true');
     expect(screen.getByTestId('horizonte-tab-hoy')).toBeInTheDocument();
     expect(screen.getByTestId('horizonte-tab-semana')).toBeInTheDocument();
     expect(screen.getByTestId('horizonte-tab-estacional')).toBeInTheDocument();
@@ -234,5 +237,76 @@ describe('La página del tiempo — puente al mundo 3D', () => {
     expect(btnMundo3d).toHaveTextContent(/Ver el mundo del clima en 3D/i);
     fireEvent.click(btnMundo3d);
     expect(onNavigate).toHaveBeenCalledWith('mockup_mundo3d_clima');
+  });
+});
+
+
+describe('Atmósfera canónica con snapshot existente', () => {
+  it('sin ubicación ignora el clima del snapshot y mantiene solo luz', async () => {
+    vi.mocked(fetchClimaSnapshot).mockResolvedValueOnce({
+      openmeteo: { available: true, forecast_7d: [{ estado: 'lluvia' }] },
+      alertas_locales: [{ tipo: 'helada', mensaje: 'Riesgo de helada' }],
+    });
+    render(<ClimaBoletinScreen onBack={() => {}} />);
+    await screen.findByText('Aún no tengo el pronóstico de su finca.');
+    expect(document.querySelector('.ca-atmosfera')).not.toHaveAttribute('data-clima');
+    expect(document.querySelector('.ca-atmosfera')).toHaveAttribute('data-luz');
+    expect(screen.queryByTestId('clima-alerta-helada')).not.toBeInTheDocument();
+    expect(fetchAgroMeteo).not.toHaveBeenCalled();
+  });
+
+  it('lee la condición, ENSO y helada del snapshot sin otra petición', async () => {
+    vi.mocked(fetchClimaSnapshot).mockResolvedValueOnce({
+      openmeteo: { available: true, forecast_7d: [{ cloud_cover_pct: 70, precip_mm: 0 }] },
+      enso_status: { phase: 'nina' },
+      alertas_locales: [
+        { tipo: 'helada', mensaje: 'Riesgo de helada al amanecer', dias: ['2026-09-07'] },
+        { tipo: 'viento', mensaje: 'Viento fuerte' },
+      ],
+    });
+    render(<ClimaBoletinScreen onBack={() => {}} location={{ lat: 5, lng: -73, elevation: 1500, municipio: 'Municipio', vereda: 'Vereda' }} />);
+    const banda = await screen.findByTestId('clima-alerta-helada');
+    expect(banda).toHaveTextContent('2026-09-07');
+    expect(banda).not.toHaveTextContent('Viento fuerte');
+    expect(document.querySelector('.ca-atmosfera')).toHaveAttribute('data-clima', 'nublado');
+    expect(document.querySelector('.ca-atmosfera')).toHaveAttribute('data-enso', 'nina');
+    expect(screen.getByTestId('clima-cabecera')).toHaveTextContent('Vereda · Municipio');
+    expect(screen.getByTestId('clima-cabecera')).toHaveTextContent('1500 m s. n. m. · Piso templado');
+    expect(fetchClimaSnapshot).toHaveBeenCalledTimes(1);
+    expect(fetchAgroMeteo).toHaveBeenCalledTimes(1);
+  });
+
+  it.each([['lluvia', 'noche', 'lluvia', 'noche'], ['soleado', 'dorada', null, null]])(
+    'valida los controles invisibles de gate %s / %s', async (clima, luz, esperado, luzEsperada) => {
+      window.history.replaceState({}, '', `/?clima=${clima}&luz=${luz}`);
+      render(<ClimaBoletinScreen onBack={() => {}} />);
+      await screen.findByText('Aún no tengo el pronóstico de su finca.');
+      const escena = document.querySelector('.ca-atmosfera');
+      if (esperado) expect(escena).toHaveAttribute('data-clima', esperado);
+      else expect(escena).not.toHaveAttribute('data-clima');
+      if (luzEsperada) expect(escena).toHaveAttribute('data-luz', luzEsperada);
+      else expect(escena.getAttribute('data-luz')).not.toBe('dorada');
+      expect(document.querySelector('.ca-selector')).toBeNull();
+    },
+  );
+
+  it('conserva temperatura y anomalía antes de tabs y trata de usted', async () => {
+    vi.mocked(fetchAgroMeteo).mockResolvedValueOnce({
+      now: { temp: 16, aparente: 13, rh: 62, weather: { emoji: '☁️', label: 'Nublado' } },
+      today: { temp_max: 20, temp_min: 10 }, daily: [],
+    });
+    render(<ClimaBoletinScreen onBack={() => {}} location={{ lat: 5, lng: -73 }} />);
+    await screen.findByText('Se siente como 13°C');
+    const ahora = screen.getByTestId('clima-ahora');
+    expect(ahora.compareDocumentPosition(screen.getByRole('tablist')) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    expect(ahora).toHaveTextContent('16°C');
+    expect(screen.getByTestId('clima-indices-hoy').children).toHaveLength(9);
+    expect(screen.getByTestId('clima-indices-hoy').compareDocumentPosition(screen.getByTestId('clima-ver-mundo3d')) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    expect(ahora).toHaveTextContent('Open-Meteo');
+    fireEvent.click(screen.getByText('¿Qué es la anomalía?'));
+    expect(ahora).toHaveTextContent('Imagine que');
+    expect(ahora).not.toHaveTextContent(/\btu\b/);
+    fireEvent.click(screen.getByTestId('horizonte-tab-estacional'));
+    expect(screen.getByText('Se siente como 13°C')).toBeInTheDocument();
   });
 });
