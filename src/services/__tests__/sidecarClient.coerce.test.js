@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { coerceNumericArgs, normalizePisoTermicoArg, omitEmptyCalendarioArgs } from '../sidecarClient';
+import { coerceNumericArgs, normalizePisoTermicoArg, omitEmptyCalendarioArgs, calendarioSinPisoTermico } from '../sidecarClient';
 
 // Fix P0 (test integral Daniel 2026-06-13): el sidecar (Zod) espera number en
 // altitud_msnm; el chat LLM lo pasaba como string → 502 → Daniel sin respuesta.
@@ -79,16 +79,42 @@ describe('normalizePisoTermicoArg', () => {
 });
 
 describe('omitEmptyCalendarioArgs', () => {
-  it('BUG-03a: omite mes y piso_termico vacíos del planner, nunca los convierte en valores válidos falsos', () => {
+  it('BUG-03a: omite solo el mes vacío (opcional); piso_termico vacío NO se borra', () => {
+    // piso_termico es el campo EXIGIDO del schema zod: borrarlo cambia el 502
+    // de invalid_enum_value por otro 502 de invalid_type (received undefined).
+    // El único string vacío que este saneo puede omitir es `mes` (opcional).
     expect(omitEmptyCalendarioArgs('get_calendario_siembra', {
       mes: '',
       piso_termico: '   ',
       cultivo: 'rucula',
-    })).toEqual({ cultivo: 'rucula' });
+    })).toEqual({ piso_termico: '   ', cultivo: 'rucula' });
+  });
+
+  it('deja piso_termico vacío intacto: la decisión de NO llamar el tool es de callTool', () => {
+    expect(omitEmptyCalendarioArgs('get_calendario_siembra', { mes: '', piso_termico: '' }))
+      .toEqual({ piso_termico: '' });
   });
 
   it('no toca strings vacíos de herramientas con otro contrato', () => {
     const args = { mes: '', piso_termico: '' };
     expect(omitEmptyCalendarioArgs('get_species', args)).toBe(args);
+  });
+});
+
+describe('calendarioSinPisoTermico', () => {
+  it('detecta el repro BUG-03a exacto (mes y piso_termico en string vacío)', () => {
+    expect(calendarioSinPisoTermico({ mes: '', piso_termico: '' })).toBe(true);
+  });
+
+  it('detecta piso ausente, solo-espacios y args no-objeto', () => {
+    expect(calendarioSinPisoTermico({})).toBe(true);
+    expect(calendarioSinPisoTermico({ piso_termico: '   ' })).toBe(true);
+    expect(calendarioSinPisoTermico(null)).toBe(true);
+    expect(calendarioSinPisoTermico(undefined)).toBe(true);
+  });
+
+  it('acepta piso válido aunque mes venga vacío (camino feliz intacto)', () => {
+    expect(calendarioSinPisoTermico({ mes: '', piso_termico: 'frio' })).toBe(false);
+    expect(calendarioSinPisoTermico({ piso_termico: 'frio', mes: 8 })).toBe(false);
   });
 });
