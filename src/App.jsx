@@ -170,6 +170,7 @@ const DiaEnFincaMockup = lazy(() => import('./mockups/DiaEnFinca'));
 const SaludFincaMockup = lazy(() => import('./mockups/SaludFinca'));
 const PrimerCultivoMockup = lazy(() => import('./mockups/PrimerCultivo'));
 const MercadoMockup = lazy(() => import('./mockups/Mercado'));
+const CrmAgroecologicoMockup = lazy(() => import('./mockups/CrmAgroecologico'));
 const OnboardingSiembraMockup = lazy(() => import('./mockups/OnboardingSiembra'));
 // Navegación como paisaje (montaña de los mundos) + variantes.
 const MontanaMundosMockup = lazy(() => import('./mockups/MontanaMundos'));
@@ -809,6 +810,7 @@ const MOCKUP_HASH_ROUTES = {
   'mockups/salud-finca': 'mockup_salud_finca',
   'mockups/primer-cultivo': 'mockup_primer_cultivo',
   'mockups/mercado': 'mockup_mercado',
+  'mockups/crm-agroecologico': 'mockup_crm_agroecologico',
   'mockups/onboarding-siembra': 'mockup_onboarding_siembra',
   'mockups/montana-mundos': 'mockup_montana_mundos',
   'mockups/montana-mundos-cine': 'mockup_montana_mundos_cine',
@@ -2183,6 +2185,14 @@ export default function App() {
           <ErrorBoundary>
             <ErrorFallback moduleName="Mercado de procedencia">
               <MercadoMockup onBack={() => navigate('dashboard')} />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
+      case 'mockup_crm_agroecologico':
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="CRM agroecológico">
+              <CrmAgroecologicoMockup onBack={() => navigate('dashboard')} />
             </ErrorFallback>
           </ErrorBoundary>
         );
