@@ -1,0 +1,24 @@
+
+== portal-tinta-zariguya.png ==
+contenido 700x426: {"oscuroPct":53,"claroPct":36,"colorPct":1,"coloresTop":["#04040c(35%)","#3c3c3c(34%)","#040404(12%)","#14140c(2%)","#0c0c0c(2%)","#0c0c04(2%)"]}
+panel claro 320x300: {"oscuroPct":10,"claroPct":74,"colorPct":1,"coloresTop":["#3c3c3c(70%)","#14140c(3%)","#0c0c04(2%)","#0c0c0c(2%)","#1c1c14(2%)","#1c1414(2%)"]}
+panel noche 320x300: {"oscuroPct":85,"claroPct":2,"colorPct":1,"coloresTop":["#04040c(73%)","#0c0c0c(3%)","#040404(3%)","#0c0c04(3%)","#14140c(2%)","#140c0c(2%)"]}
+crop juez → juez-crop-zariguya.png
+
+== portal-tinta-luciernaga.png ==
+contenido 700x426: {"oscuroPct":57,"claroPct":35,"colorPct":1,"coloresTop":["#04040c(35%)","#3c3c3c(35%)","#040404(12%)","#0c0c04(3%)","#0c0404(2%)","#140c0c(2%)"]}
+panel claro 320x300: {"oscuroPct":16,"claroPct":72,"colorPct":1,"coloresTop":["#3c3c3c(71%)","#0c0c04(4%)","#0c0404(3%)","#14140c(3%)","#140c0c(3%)","#040404(3%)"]}
+panel noche 320x300: {"oscuroPct":89,"claroPct":0,"colorPct":1,"coloresTop":["#04040c(72%)","#0c0c04(4%)","#0c0404(3%)","#040404(3%)","#14140c(3%)","#140c0c(3%)"]}
+crop juez → juez-crop-luciernaga.png
+
+== portal-tinta-chivito-punk.png ==
+contenido 700x426: {"oscuroPct":53,"claroPct":37,"colorPct":1,"coloresTop":["#04040c(36%)","#3c3c3c(36%)","#040404(11%)","#14140c(3%)","#1c1c14(2%)","#0c0c0c(2%)"]}
+panel claro 320x300: {"oscuroPct":8,"claroPct":76,"colorPct":1,"coloresTop":["#3c3c3c(75%)","#14140c(4%)","#1c1c14(3%)","#0c0c04(2%)","#0c0c0c(2%)","#24241c(1%)"]}
+panel noche 320x300: {"oscuroPct":85,"claroPct":1,"colorPct":1,"coloresTop":["#04040c(75%)","#14140c(4%)","#0c0c0c(3%)","#1c1c14(3%)","#0c0c04(2%)","#140c0c(1%)"]}
+crop juez → juez-crop-chivito-punk.png
+
+== portal-tinta-oso-baston.png ==
+contenido 700x426: {"oscuroPct":60,"claroPct":30,"colorPct":3,"coloresTop":["#04040c(27%)","#3c3c3c(21%)","#040404(13%)","#0c0c0c(9%)","#0c0404(6%)","#3c3c34(4%)"]}
+panel claro 320x300: {"oscuroPct":26,"claroPct":56,"colorPct":5,"coloresTop":["#3c3c3c(35%)","#3c3c34(11%)","#0c0c0c(10%)","#0c0404(9%)","#34342c(4%)","#0c0c04(3%)"]}
+panel noche 320x300: {"oscuroPct":88,"claroPct":2,"colorPct":5,"coloresTop":["#04040c(49%)","#0c0c0c(15%)","#0c0404(10%)","#040404(4%)","#0c0c04(3%)","#141414(3%)"]}
+crop juez → juez-crop-oso-baston.png
