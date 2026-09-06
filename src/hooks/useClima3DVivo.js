@@ -110,6 +110,15 @@ export function derivarClima3D(snapshot, now = new Date()) {
 
   return Object.freeze({
     senal,
+    // Procedencia para los rótulos: no usar una condición atmosférica derivada
+    // como si fuera una lectura actual ni un día de respaldo como hoy.
+    actual: current,
+    dia: day,
+    fechaLocal: hoyISO(),
+    coordenadasConfirmadas: location?.precision === 'exact'
+      && typeof location?.lat === 'number' && Number.isFinite(location.lat)
+      && typeof location?.lng === 'number' && Number.isFinite(location.lng),
+    stale: snapshot?.stale === true,
     tieneOpenMeteo,
     tieneEnso,
     condicion,

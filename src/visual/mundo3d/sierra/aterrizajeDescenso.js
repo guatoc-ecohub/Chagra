@@ -77,7 +77,7 @@ export function faseEnsoViva() {
 const CONSEJO_ENSO = {
   el_nino: {
     frio: {
-      titular: 'El Niño. Va a llover menos — y va a helar MÁS de madrugada, no menos.',
+      titular: 'El Niño. Va a llover menos y va a helar MÁS de madrugada, no menos.',
       accion: 'Guarde agua para el riego nocturno.',
       mecanismo:
         'El cielo despejado deja escapar el calor de noche: por eso el piso frío se hiela justo cuando hace más sol de día.',
@@ -155,7 +155,7 @@ export function resolverAterrizaje({ msnmUsuario = null, clima = null, fase, reg
     msnmUsuario !== undefined &&
     msnmUsuario !== '' &&
     Number.isFinite(Number(msnmUsuario)) &&
-    Number(msnmUsuario) >= 0;
+    Number(msnmUsuario) > 0;
 
   const cota = hay ? Number(msnmUsuario) : COTA_SIN_UBICACION;
   const piso = pisoPorAltitud(cota);
@@ -173,10 +173,20 @@ export function resolverAterrizaje({ msnmUsuario = null, clima = null, fase, reg
   }
 
   const lineaCota = hay
-    ? `${Math.round(cota).toLocaleString('es-CO')} m · su predio`
+    ? `${Math.round(cota).toLocaleString('es-CO')} m · a la altura de su finca`
     : 'sin su ubicación todavía';
 
   const lineaPiso = hay && piso ? `Está en el piso ${piso.nombre.toLowerCase()}.` : '';
+
+  /* T0 del aterrizaje (§3.3): el número y su nota, separados para la
+     composición. Sin ubicación confirmada la nota lo dice, nunca se inventa
+     un piso (el guard `cotaDestino` ya cayó a `COTA_SIN_UBICACION`). */
+  const cotaNumero = `${Math.round(cota).toLocaleString('es-CO')} m`;
+  const cotaNota = hay
+    ? piso
+      ? `a la altura de su finca · piso ${piso.nombre.toLowerCase()}`
+      : 'a la altura de su finca'
+    : 'sin su ubicación todavía';
 
   return {
     conUbicacion: hay,
@@ -186,6 +196,8 @@ export function resolverAterrizaje({ msnmUsuario = null, clima = null, fase, reg
     lineaCota,
     lineaClima,
     lineaPiso,
+    cotaNumero,
+    cotaNota,
     enso,
   };
 }
@@ -251,13 +263,20 @@ export function anfitrionDeBanda(bandaId, companero) {
   const candidato = ANFITRION_POR_BANDA[bandaId] ?? null;
   const existe = candidato != null && Object.prototype.hasOwnProperty.call(ELENCO, candidato);
   const anfitrion = existe && candidato !== suyo ? candidato : null;
+  const nombreDe = (slug) => (ELENCO[slug]?.nombre ?? slug ?? '');
   return {
     companero: suyo,
     anfitrion,
     hayRelevo: anfitrion != null,
     idea: IDEA_POR_BANDA[bandaId] ?? '',
-    // El rótulo del patrón `QueEsEsto`: "X vino a contarle".
-    rotulo: anfitrion ? `${ELENCO[anfitrion]?.nombre ?? anfitrion} vino a contarle` : '',
+    // El rótulo del patrón `QueEsEsto`: "X vino a contarle". (Regla de la casa
+    // 2026-09-04: NO se monta en pantalla; queda para tests/gate.)
+    rotulo: anfitrion ? `${nombreDe(anfitrion)} vino a contarle` : '',
+    // Quién FIRMA la tiza del aterrizaje (T2, decisión del operador): el
+    // anfitrión visitante escribe y firma; si no hay relevo, firma el compai
+    // del usuario (el que dedujo).
+    firma: anfitrion ? nombreDe(anfitrion) : nombreDe(suyo),
+    firmaCompai: nombreDe(suyo),
   };
 }
 

@@ -173,3 +173,22 @@ describe('resumenClimaAterrizaje — el orden de la dirección', () => {
     expect(r.tiza).toBeNull();
   });
 });
+
+describe('procedencia y ausencia en el ahora', () => {
+  it('ENSO sin Open-Meteo no se transforma en tiempo actual', () => {
+    expect(lineaAhora(clima({ temp: 14, openmeteo: false }))).toBeNull();
+  });
+  it('sin coordenadas confirmadas calla aunque haya cache de municipio', () => {
+    expect(lineaAhora({ ...clima({ temp: 14 }), coordenadasConfirmadas: false })).toBeNull();
+  });
+  it('el current vacío no hereda temperatura ni condición de un derivado', () => {
+    expect(lineaAhora({ ...clima({ temp: 14, condicion: 'lluvia' }), actual: {} })).toBeNull();
+  });
+  it('cache vencida lleva edad; sin fecha no se inventa edad', () => {
+    expect(lineaAhora({ ...clima({ temp: 14 }), stale: true, actualizado: new Date(Date.now() - 7200000).toISOString() })).toBe('14° · hace 2 h');
+    expect(lineaAhora({ ...clima({ temp: 14 }), stale: true })).toBeNull();
+  });
+  it('un día de respaldo ajeno a hoy no produce una mínima de esta noche', () => {
+    expect(lineaHelada({ ...clima({ tempMin: -2 }), dia: { date: '2026-09-07' }, fechaLocal: '2026-09-06' }, { pisoId: 'frio' })).toBeNull();
+  });
+});

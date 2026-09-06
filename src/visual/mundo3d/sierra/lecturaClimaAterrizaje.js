@@ -24,6 +24,11 @@
  * reciben ya calculadas por `buildClimaCultivoSuggestions` y se eligen por
  * prioridad. Este módulo no fabrica ninguna.
  */
+import { hayHelada } from './vendor/clima/climaPorPiso.js';
+import { describeWeathercode } from '../../../services/agroMeteoService.js';
+import { balanceHidricoDia, etcMm, kcDeCultivo, parseCultivos, presionEnfermedad } from '../../../services/agroIndices.js';
+import { evaluarAlertasAgroclimaticas } from '../../../data/fichasAgroclimaticas.js';
+
 const PISOS_FRIOS = new Set(['frio', 'paramo', 'superparamo', 'nival']);
 
 /** ¿Este piso hiela? La helada es un fenómeno de piso frío; bajo 2 000 m no. */
@@ -74,13 +79,24 @@ function familiaEnso(climaVivo) {
  * @returns {string|null}  «cielo despejado · 14° · ahora» o null si no hay dato.
  */
 export function lineaAhora(climaVivo) {
-  if (!climaVivo?.senal) return null;
+  if (!climaVivo?.senal || !climaVivo.tieneOpenMeteo || climaVivo.coordenadasConfirmadas === false) return null;
   const partes = [];
-  const condicion = palabraCondicion(climaVivo.condicion);
-  const temp = numero(climaVivo.temp);
+  const actual = climaVivo.actual;
+  const codigo = numero(actual?.weathercode ?? actual?.weather_code);
+  const condicion = actual
+    ? (codigo == null ? null : describeWeathercode(codigo, actual.is_day !== 0).label.toLowerCase())
+    : palabraCondicion(climaVivo.condicion);
+  const temp = actual
+    ? numero(actual.temp ?? actual.temperature ?? actual.temperature_2m)
+    : numero(climaVivo.temp);
   if (condicion) partes.push(condicion);
   if (temp != null) partes.push(`${Math.round(temp)}°`);
   if (partes.length === 0) return null;
+  if (climaVivo.stale) {
+    const edad = (Date.now() - Date.parse(climaVivo.actualizado)) / 3600000;
+    if (!Number.isFinite(edad) || edad < 0) return null;
+    return `${partes.join(' · ')} · hace ${Math.max(1, Math.floor(edad))} h`;
+  }
   return `${partes.join(' · ')} · ahora`;
 }
 
@@ -115,7 +131,7 @@ export function alertasAterrizaje(climaVivo) {
 /** La alerta de SU cultivo (prioridad 2-3-4): solo la más severa, texto ya escrito. */
 export function sugerenciaDeCultivo(sugerencias) {
   const lista = Array.isArray(sugerencias) ? sugerencias : [];
-  const item = lista.find(
+  const item = [...lista].sort((a, b) => (a?.prioridad ?? 2) - (b?.prioridad ?? 2)).find(
     (s) => s?.suggestion && (s.suggestion.severity === 'critical' || s.suggestion.severity === 'warning'),
   );
   const texto = item?.suggestion?.text;
@@ -134,8 +150,16 @@ export function sugerenciaDeCultivo(sugerencias) {
 export function lineaHelada(climaVivo, { pisoId } = {}) {
   if (!climaVivo?.senal || !esPisoFrio(pisoId)) return null;
   const min = numero(climaVivo.tempMin);
-  const riesgo = climaVivo.helada === true || (min != null && min <= 3);
-  if (!riesgo) return null;
+  if (climaVivo.coordenadasConfirmadas === false || climaVivo.stale) return null;
+  if ('dia' in climaVivo && climaVivo.dia?.date !== climaVivo.fechaLocal) return null;
+  const riesgo = hayHelada({
+    piso: pisoId, tempMin: min,
+    nubosidad: numero(climaVivo.nubosidad), viento: numero(climaVivo.viento),
+    alertas: climaVivo.alertas ?? [],
+    // El contexto ENSO compite en prioridad 5; no inventa una mínima nocturna.
+    ensoFamily: 'neutro',
+  });
+  if (!['aviso', 'escarcha', 'negra'].includes(riesgo.nivel)) return null;
   const base =
     min != null
       ? `Puede helar en lo plano: esta noche baja a ${Math.round(min)}°.`
@@ -157,7 +181,7 @@ export function lineaHelada(climaVivo, { pisoId } = {}) {
  * @returns {{hayDato:boolean, tinta:string[], alertas:{tipo:string,mensaje:string}[], tiza:string|null, familia:string}}
  */
 export function resumenClimaAterrizaje(climaVivo, { pisoId = null, sugerencias = [] } = {}) {
-  const hayDato = Boolean(climaVivo?.senal);
+  const hayDato = Boolean(climaVivo?.senal) && climaVivo.coordenadasConfirmadas !== false;
   const tinta = [];
   const tiza = [];
   let alertas = [];
@@ -184,4 +208,46 @@ export function resumenClimaAterrizaje(climaVivo, { pisoId = null, sugerencias =
     tiza: tiza.length > 0 ? tiza.join(' ') : null,
     familia: familiaEnso(climaVivo),
   };
+}
+
+/**
+ * Candidatas del perfil, ordenadas globalmente: ficha, sed, hongo.
+ * El día debe coincidir con la fecha de la finca. No se selecciona otro día
+ * ni se interpreta ausencia de precipitación/mojado como cero.
+ * @param {object} climaVivo
+ * @param {string} textoCultivos
+ * @returns {Array<{prioridad:number, suggestion:{severity:string, text:string}}>}
+ */
+export function sugerenciasCultivosSierra(climaVivo, textoCultivos) {
+  const dia = climaVivo?.dia;
+  if (!climaVivo?.tieneOpenMeteo || climaVivo.coordenadasConfirmadas !== true
+    || climaVivo.stale || !dia?.date || dia.date !== climaVivo.fechaLocal) return [];
+  const cultivos = parseCultivos(textoCultivos).cultivos;
+  const candidatas = [];
+  const min = numero(dia.temp_min ?? dia.temp_min_c ?? dia.temperature_2m_min);
+  const max = numero(dia.temp_max ?? dia.temp_max_c ?? dia.temperature_2m_max);
+  const precip = numero(dia.precip_mm ?? dia.precipitation_sum);
+  const eto = numero(dia.eto_mm ?? dia.et0_fao_evapotranspiration);
+  const mojado = numero(dia.horas_hr_alta);
+  const agregar = (prioridad, text) => candidatas.push({ prioridad, suggestion: { severity: 'warning', text } });
+  for (const ficha of cultivos) {
+    const alerta = evaluarAlertasAgroclimaticas(ficha.fichaAgroclimatica, {
+      tempMin: min, tempMax: max, humedad: numero(dia.rh_mean),
+    })[0];
+    if (alerta) agregar(2, `Hoy, ${ficha.nombre}: ${alerta.accion}`);
+    if (precip != null && eto != null && ['alta', 'media'].includes(ficha.kcConfianza)) {
+      const balance = balanceHidricoDia(precip, etcMm(eto, kcDeCultivo(ficha)));
+      if (balance?.estado === 'riego') agregar(3, `Hoy, ${ficha.nombre}: puede faltarle agua. Revise la humedad del suelo.`);
+    }
+    if (min != null && max != null && mojado != null) {
+      for (const enfermedad of ficha.enfermedades ?? []) {
+        const presion = presionEnfermedad(enfermedad, { tempMedia: (min + max) / 2, horasMojado: mojado });
+        if (presion?.nivel === 'rojo') {
+          agregar(4, `Hoy, ${ficha.nombre}: el clima puede favorecer ${presion.modelo.nombre.toLowerCase()}. Revise las hojas.`);
+          break;
+        }
+      }
+    }
+  }
+  return candidatas.sort((a, b) => a.prioridad - b.prioridad);
 }

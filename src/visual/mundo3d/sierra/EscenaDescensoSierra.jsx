@@ -1,3 +1,4 @@
+import MapaDeNivel from './MapaDeNivel.jsx';
 /*
  * EscenaDescensoSierra — la escena 3D que corre DEBAJO de la tapa de
  * `TransicionSierraMundo`. Es el modo `escena3d` del PASO 3.
@@ -770,6 +771,8 @@ function Piloto({ plan, fase, humedad, tier, refEstado, onEstado, t0, inicioRef,
 
 /**
  * @param {object}   props
+ * @param {number|null} [props.cotaLlegada] cota confirmada, solo al parar.
+ * @param {import('react').ReactNode} [props.rotuloLlegada] tinta T0/T1 colgada de la curva.
  * @param {object}   props.plan       plan de `planDescenso()` (cota + reloj).
  * @param {string}   props.fase       fase ENSO VIVA ('neutral'|'el_nino'|'la_nina').
  * @param {number}   [props.humedad]  humedad relativa real (0..100) o null.
@@ -797,6 +800,8 @@ function Piloto({ plan, fase, humedad, tier, refEstado, onEstado, t0, inicioRef,
  *                                              null = sin dato → solo «aviso» bajo Niño.
  */
 export default function EscenaDescensoSierra({
+  cotaLlegada = null,
+  rotuloLlegada = null,
   plan,
   fase = 'neutral',
   humedad = null,
@@ -890,6 +895,7 @@ export default function EscenaDescensoSierra({
         helada={helada}
       />
       <Ladera segmentos={segmentos} refEstado={refEstado} />
+      <MapaDeNivel segmentos={segmentos} msnm={cotaLlegada} soloFinca rotuloFinca={rotuloLlegada} />
       <MarCaribe />
       <EstratosNube cuantos={estratos} refEstado={refEstado} />
       <BrumaDescenso refEstado={refEstado} jirones={jironesBruma} haces={hacesBruma} />

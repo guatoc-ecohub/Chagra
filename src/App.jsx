@@ -1,3 +1,4 @@
+import { pisoTermicoFromAltitud } from './data/cropSuggestions.js';
 /*
  * i18n (ADR-050): App.jsx contiene etiquetas de navegación en español Colombia
  * (Plantas, Mapa, Insumos, Perfil, títulos de módulos…) pendientes de migrar a
@@ -2489,6 +2490,8 @@ export default function App() {
           <ErrorBoundary>
             <ErrorFallback moduleName="Vista global Sierra Nevada">
               <SierraGlobalMockup
+                pisoUsuario={pisoTermicoFromAltitud(getProfile()?.finca_altitud ?? getProfile()?.altitud)}
+                msnm={getProfile()?.finca_altitud ?? getProfile()?.altitud ?? null}
                 onSeleccionPiso={(piso) => {
                   const mundo = mundoPrincipalDePiso(piso);
                   if (mundo?.view) navigate(mundo.view);
