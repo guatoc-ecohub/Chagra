@@ -44,13 +44,20 @@ import * as THREE from 'three';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { OrbitControls, AdaptiveDpr, Html } from '@react-three/drei';
 import { ATMOSFERA } from '../atmosferaMadre.js';
+import LluviaValle from '../atmosfera/clima/LluviaValle.jsx';
+import NieblaLadera from '../atmosfera/clima/NieblaLadera.jsx';
+import HeladaValle from '../atmosfera/clima/HeladaValle.jsx';
 import { decidirTier, perfilDeTier } from '../deviceTier.js';
 import { PISOS_TERMICOS } from '../pisosTermicos.js';
+import useClima3DVivo from '../../../hooks/useClima3DVivo.js';
 import {
   R_MONTE, H_PICO, Y_MAR,
-  geometriaMonte,
+  alturaTerreno, geometriaMonte,
   curvaQuebrada, puntoEnLadera, metrosDeY, yDeMetros,
 } from './sierraMonte.geom.js';
+import { NUBES_POR_TIER, nubesInterior } from './nubesSierra.js';
+import { texturaNubeMasa } from './nieveSierra.js';
+import { perfilClimaSierra } from './climaSierra.js';
 import {
   geomsEspeciesSierra, vegSierraDeTier, calidadSierra, distribuirEspeciesReales,
   geomVenadoCuerpo, geomVenadoPata, geomAguilaCuerpo, geomAguilaAla,
@@ -533,14 +540,97 @@ function HotspotsPisos({ onEntrar }) {
   );
 }
 
-/* Cielo cálido de fondo (degradado por vértice, cero textura). */
-function CieloFondo() {
+/* Nubes masa de la Sierra. La siembra viene del mismo módulo de nubes que
+   consume la vista global anterior, pero la cantidad nace de la cobertura
+   climática real y no de una animación fija. La textura procedural existente
+   evita que el cielo se lea como bolas facetadas. */
+function NubeCieloMasa({ nube, clima, semilla }) {
+  const ref = useRef(null);
+  const { camera } = useThree();
+  const textura = useMemo(() => texturaNubeMasa(semilla, {
+    lomo: clima.lluvia ? '#d5dce0' : '#f6f7f0',
+    panza: clima.lluvia ? '#68757e' : '#aab8be',
+    honda: clima.lluvia ? '#4c5a63' : '#87969e',
+  }), [clima.lluvia, semilla]);
+  useEffect(() => () => textura?.dispose(), [textura]);
+  useFrame(() => {
+    if (ref.current) ref.current.quaternion.copy(camera.quaternion);
+  });
+  if (!textura) return null;
+  return (
+    <mesh
+      ref={ref}
+      position={[nube.x, nube.y, nube.z]}
+      scale={[nube.ancho * 1.25, 1.05 + nube.alto * 0.6, 1]}
+      renderOrder={1}
+    >
+      <planeGeometry args={[2.8, 1.7]} />
+      <meshBasicMaterial
+        map={textura}
+        transparent
+        opacity={0.58 + clima.cobertura * 0.26}
+        depthWrite={false}
+      />
+    </mesh>
+  );
+}
+
+function NubesClimaSierra({ tier, reducedMotion, climaVivo }) {
+  const clima = useMemo(() => perfilClimaSierra(climaVivo), [climaVivo]);
+  const perfil = NUBES_POR_TIER[tier] || NUBES_POR_TIER.medio;
+  const nubes = useMemo(() => {
+    if (!clima.senal || clima.nubes === 0) return [];
+    const datos = nubesInterior({
+      cuantas: Math.min(perfil.interior, clima.nubes),
+      fase: climaVivo?.ensoFamily || 'neutral',
+      semilla: 77,
+      lobulos: perfil.lobulos,
+    });
+    // Las nubes interiores nacen sobre la llanura. Subirlas y ensancharlas las
+    // deja en la bóveda visible, detrás del macizo, donde se leen como masa de
+    // cielo y no como objetos pequeños pegados a la ladera.
+    return datos.map((nube, index) => ({
+      ...nube,
+      x: nube.x * 0.58,
+      y: 11.3 + (index % 4) * 0.55,
+      z: -13.5 - (index % 3) * 1.2,
+      ancho: nube.ancho * 1.65,
+      alto: nube.alto * 1.55,
+      largo: nube.largo * 1.45,
+    }));
+  }, [clima, climaVivo?.ensoFamily, perfil.interior, perfil.lobulos]);
+  const grupo = useRef(null);
+  useFrame(({ clock }) => {
+    if (reducedMotion || !grupo.current) return;
+    grupo.current.position.x = Math.sin(clock.elapsedTime * 0.025) * 0.7;
+  });
+  if (!nubes.length) return null;
+  return (
+    <group ref={grupo}>
+      {nubes.map((nube, index) => (
+        <NubeCieloMasa key={`${nube.x}-${nube.z}`} nube={nube} clima={clima} semilla={77 + index} />
+      ))}
+    </group>
+  );
+}
+
+/* Cielo cálido de fondo, enfriado y apagado por la cobertura real. */
+function CieloFondo({ climaVivo }) {
+  const clima = useMemo(() => perfilClimaSierra(climaVivo), [climaVivo]);
   const geo = useMemo(() => {
     const g = new THREE.SphereGeometry(90, 20, 12);
     const pos = g.getAttribute('position');
     const col = new Float32Array(pos.count * 3);
-    const alto = new THREE.Color('#9cb7c8');
-    const bajo = new THREE.Color('#f6ead2');
+    const altoClaro = new THREE.Color('#9cb7c8');
+    const bajoClaro = new THREE.Color('#f6ead2');
+    const altoNublado = new THREE.Color('#657782');
+    const bajoNublado = new THREE.Color('#bac5c8');
+    const alto = altoClaro.clone().lerp(altoNublado, clima.cobertura);
+    const bajo = bajoClaro.clone().lerp(bajoNublado, clima.cobertura);
+    if (clima.helada) {
+      alto.lerp(new THREE.Color('#7896ae'), 0.24);
+      bajo.lerp(new THREE.Color('#dcebf1'), 0.18);
+    }
     const c = new THREE.Color();
     for (let i = 0; i < pos.count; i++) {
       const t = Math.min(1, Math.max(0, pos.getY(i) / 90 + 0.25));
@@ -549,7 +639,7 @@ function CieloFondo() {
     }
     g.setAttribute('color', new THREE.BufferAttribute(col, 3));
     return g;
-  }, []);
+  }, [clima]);
   useEffect(() => () => geo.dispose(), [geo]);
   return (
     <mesh geometry={geo}>
@@ -560,16 +650,19 @@ function CieloFondo() {
 
 /* Luz de hora dorada que MODELA el relieve: un sol bajo direccional (la clave de
    que la ladera se lea 3D y no plana), relleno frío opuesto y hemisférico. */
-function LucesMonte({ tier }) {
+function LucesMonte({ tier, climaVivo }) {
   const perfil = perfilDeTier(tier);
+  const clima = useMemo(() => perfilClimaSierra(climaVivo), [climaVivo]);
+  const cielo = clima.cobertura > 0.55 ? '#c5d1d4' : ATMOSFERA.cielo;
+  const luz = clima.helada ? '#d7e7f0' : clima.cobertura > 0.55 ? '#c4d0d3' : ATMOSFERA.luz;
   return (
     <>
-      <hemisphereLight intensity={0.88} color={ATMOSFERA.cielo} groundColor={ATMOSFERA.suelo} />
-      <ambientLight intensity={0.4} color="#fff2d8" />
+      <hemisphereLight intensity={0.88 * clima.luzIntensidad} color={cielo} groundColor={ATMOSFERA.suelo} />
+      <ambientLight intensity={0.4 * clima.luzIntensidad} color={clima.cobertura > 0.55 ? '#d9e2e2' : '#fff2d8'} />
       <directionalLight
         position={[-R_MONTE * 0.9, H_PICO * 1.5, R_MONTE * 0.7]}
-        intensity={1.25}
-        color={ATMOSFERA.luz}
+        intensity={1.25 * clima.luzIntensidad}
+        color={luz}
         castShadow={perfil.sombras}
         shadow-mapSize-width={1024}
         shadow-mapSize-height={1024}
@@ -580,7 +673,7 @@ function LucesMonte({ tier }) {
         shadow-camera-top={R_MONTE}
         shadow-camera-bottom={-R_MONTE}
       />
-      <directionalLight position={[R_MONTE, H_PICO, -R_MONTE]} intensity={0.4} color={ATMOSFERA.relleno} />
+      <directionalLight position={[R_MONTE, H_PICO, -R_MONTE]} intensity={0.4 * clima.luzIntensidad} color={ATMOSFERA.relleno} />
     </>
   );
 }
@@ -588,21 +681,58 @@ function LucesMonte({ tier }) {
 /**
  * La escena del macizo (grupo r3f). Cielo, mar, montaña con vegetación por piso,
  * agua del páramo, velo de bruma, hotspots navegables y la cámara que orbita.
- * @param {{tier:'alto'|'medio'|'bajo', reducedMotion:boolean, onEntrarPiso?:(id:string)=>void}} props
+ * @param {{
+ *   tier:'alto'|'medio'|'bajo',
+ *   reducedMotion:boolean,
+ *   onEntrarPiso?:(id:string)=>void,
+ *   climaVivo?: object
+ * }} props
  */
-function EscenaMonte({ tier, reducedMotion, onEntrarPiso }) {
+function EscenaMonte({ tier, reducedMotion, onEntrarPiso, climaVivo }) {
   const perfil = perfilDeTier(tier);
   const agua = tier !== 'bajo';
+  const clima = useMemo(() => perfilClimaSierra(climaVivo), [climaVivo]);
   return (
     <>
       <color attach="background" args={[ATMOSFERA.fondo]} />
       {perfil.fog && <fog attach="fog" args={[ATMOSFERA.niebla, R_MONTE * 3.0, R_MONTE * 6.2]} />}
-      <LucesMonte tier={tier} />
-      <CieloFondo />
+      <LucesMonte tier={tier} climaVivo={climaVivo} />
+      <CieloFondo climaVivo={climaVivo} />
+      <NubesClimaSierra tier={tier} reducedMotion={reducedMotion} climaVivo={climaVivo} />
       <Mar />
       <Macizo tier={tier} onEntrar={onEntrarPiso} />
       {agua && <Quebrada tier={tier} reducedMotion={reducedMotion} />}
       {agua && <VeloParamo tier={tier} reducedMotion={reducedMotion} />}
+      {clima.lluvia && (
+        <LluviaValle
+          intensidad={clima.intensidadLluvia}
+          tier={tier}
+          reducedMotion={reducedMotion}
+          alturaDe={alturaTerreno}
+          area={[R_MONTE * 1.5, H_PICO * 1.2, R_MONTE * 1.5]}
+          viento={climaVivo?.viento == null ? 0.35 : Math.min(1.2, climaVivo.viento / 30)}
+          nocturno={climaVivo?.luz === 'noche'}
+        />
+      )}
+      {clima.niebla && (
+        <NieblaLadera
+          intensidad={clima.intensidadNiebla}
+          tier={tier}
+          reducedMotion={reducedMotion}
+          alturaDe={alturaTerreno}
+          modo={climaVivo?.luz === 'amanecer' ? 'amanecer' : 'ladera'}
+          nocturno={climaVivo?.luz === 'noche'}
+        />
+      )}
+      {clima.helada && (
+        <HeladaValle
+          intensidad={0.82}
+          tier={tier}
+          reducedMotion={reducedMotion}
+          alturaDe={alturaTerreno}
+          luzFria={climaVivo?.luz === 'noche' ? 0.7 : 0.35}
+        />
+      )}
       <FaunaSierra tier={tier} reducedMotion={reducedMotion} />
       <HotspotsPisos onEntrar={onEntrarPiso} />
       <OrbitControls
@@ -684,6 +814,7 @@ export default function SierraMonte3D({
   const tier = tierProp || decidido.tier;
   const reducedMotion = rmProp != null ? rmProp : decidido.reducedMotion;
   const perfil = perfilDeTier(tier);
+  const climaVivo = useClima3DVivo();
 
   const entrarPiso = onEntrarPiso
     ?? (onNavigate ? (pisoId) => onNavigate('montana_mundos', { piso: pisoId }) : undefined);
@@ -707,7 +838,12 @@ export default function SierraMonte3D({
         frameloop={reducedMotion ? 'demand' : 'always'}
         onCreated={() => setListo(true)}
       >
-        <EscenaMonte tier={tier} reducedMotion={reducedMotion} onEntrarPiso={entrarPiso} />
+        <EscenaMonte
+          tier={tier}
+          reducedMotion={reducedMotion}
+          onEntrarPiso={entrarPiso}
+          climaVivo={climaVivo}
+        />
       </Canvas>
       <div className="smonte-vineta" aria-hidden="true" />
 
