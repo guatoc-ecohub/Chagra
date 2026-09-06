@@ -11,6 +11,7 @@ import userEvent from '@testing-library/user-event';
 import '@testing-library/jest-dom';
 import { afterEach, describe, expect, test, vi } from 'vitest';
 import InventoryDashboard from '../InventoryDashboard.jsx';
+import { VALID_UNITS } from '../../services/inventoryEvents.js';
 
 const MATERIAL = {
   id: 'asset--material-1',
@@ -22,8 +23,22 @@ const MATERIAL = {
   },
 };
 
+// BUG-10 (2026-09-05): los materiales creados por el formulario simple de
+// Activos NO fijan inventory_unit. La tarjeta fabricaba el fallback 'unidades'
+// (plural), que no existe en VALID_UNITS ('unidad') → el RecountDrawer lo
+// mandaba al payload y createInventoryEvent lo rechazaba con
+// `got "unidades"`, dejando inventory_events en 0.
+const MATERIAL_SIN_UNIDAD = {
+  id: 'asset--material-sin-unidad',
+  name: 'Cal agrícola',
+  attributes: {
+    name: 'Cal agrícola',
+    inventory_value: '3.5',
+  },
+};
+
 const estadoStore = {
-  materials: [MATERIAL],
+  materials: [MATERIAL, MATERIAL_SIN_UNIDAD],
   refillMaterial: vi.fn(),
 };
 
@@ -95,5 +110,21 @@ describe('InventoryDashboard — cableo de onRecount/onViewAudit (BUG-08)', () =
     expect(screen.queryByTestId('inventory-card-audit-actions')).not.toBeInTheDocument();
     expect(screen.queryByText('Conteo manual')).not.toBeInTheDocument();
     expect(screen.queryByText('Bitácora')).not.toBeInTheDocument();
+  });
+
+  test('BUG-10: material sin inventory_unit pasa al conteo una unidad del enum, no "unidades"', async () => {
+    const onRecount = vi.fn();
+    render(<InventoryDashboard onRecount={onRecount} />);
+
+    await userEvent.click(screen.getByTestId('inventory-recount-asset--material-sin-unidad'));
+
+    expect(onRecount).toHaveBeenCalledTimes(1);
+    const [itemId, stock, unit] = onRecount.mock.calls[0];
+    expect(itemId).toBe('asset--material-sin-unidad');
+    expect(stock).toBe(3.5);
+    // El default fabricado debe ser un valor del enum de la casa, no un
+    // plural inventado que el validador de inventoryEvents va a rechazar.
+    expect(unit).toBe('unidad');
+    expect(VALID_UNITS.has(unit)).toBe(true);
   });
 });
