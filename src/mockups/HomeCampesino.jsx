@@ -51,7 +51,7 @@ const MUESTRA = {
 const PUERTAS = [
   { id: 'matas', emoji: '🌱', nombre: 'Mis matas', tinte: 'verde', abre: 'sus siembras y cultivos' },
   { id: 'animales', emoji: '🐔', nombre: 'Mis animales', tinte: 'teja', abre: 'sus gallinas, cerdos y demás animales' },
-  { id: 'tiempo', emoji: '🌦️', nombre: 'El tiempo', tinte: 'cielo', abre: 'el clima de hoy y los próximos días' },
+  { id: 'tiempo', route: 'clima_boletin', emoji: '🌦️', nombre: 'El tiempo', tinte: 'cielo', abre: 'el clima de hoy y los próximos días' },
   { id: 'vender', emoji: '🧺', nombre: 'Vender', tinte: 'ambar', abre: 'precios, mercado y su despensa' },
   { id: 'aprender', emoji: '📖', nombre: 'Aprender', tinte: 'uva', abre: 'las lecciones y guías del campo' },
   { id: 'finca', emoji: '🏡', nombre: 'Toda mi finca', tinte: 'menta', abre: 'todos los mundos de su finca' },
@@ -63,7 +63,7 @@ function saludoPorHora(h) {
   return 'Buenas noches';
 }
 
-export default function HomeCampesino({ onBack }) {
+export default function HomeCampesino({ onBack, onNavigate }) {
   const hora = new Date().getHours();
   const esDeNoche = hora >= 18 || hora < 5;
   const [modo, setModo] = useState(esDeNoche ? 'noche' : 'dia');
@@ -185,7 +185,7 @@ export default function HomeCampesino({ onBack }) {
               type="button"
               className={`hcm-puerta t-${p.tinte}`}
               aria-label={`${p.nombre}: abre ${p.abre}`}
-              onClick={() => avisar(`Aquí se abren ${p.abre}.`)}
+              onClick={() => p.route && onNavigate ? onNavigate(p.route) : avisar(`Aquí se abren ${p.abre}.`)}
             >
               <span className="hcm-puerta-emoji" aria-hidden="true">{p.emoji}</span>
               <span className="hcm-puerta-nombre">{p.nombre}</span>

@@ -1,28 +1,35 @@
-/*
- * Vitrina #/mockups/clima-atmosfera — smoke.
- *
- * La ruta legacy quedo como puente al mundo del clima real. En jsdom no hay
- * WebGL, asi que el host debe caer al gemelo 2D del mundo y seguir exponiendo
- * el boton de regreso para el shell.
- */
+/* La ruta legacy conserva la entrada al clima 2D canónico. */
 import React from 'react';
-import { render, screen, fireEvent, cleanup } from '@testing-library/react';
+import { render, cleanup, fireEvent, screen } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { afterEach, describe, expect, test, vi } from 'vitest';
-
+import appSource from '../../App.jsx?raw';
 import ClimaAtmosfera from '../ClimaAtmosfera.jsx';
+import HomeCampesino from '../HomeCampesino.jsx';
 
 afterEach(() => cleanup());
 
-describe('vitrina legacy del clima (mockups/clima-atmosfera)', () => {
-  test('monta el mundo climatico real y conserva el retorno al shell', () => {
-    const onBack = vi.fn();
-    const { container } = render(<ClimaAtmosfera onBack={onBack} />);
+describe('entrada legacy del clima (mockups/clima-atmosfera)', () => {
+  test('redirige al clima canónico sin montar otro mundo', () => {
+    const onNavigate = vi.fn();
+    const { container } = render(<ClimaAtmosfera onNavigate={onNavigate} />);
 
-    expect(screen.getByRole('heading', { level: 1, name: 'El mundo del clima' })).toBeInTheDocument();
-    expect(container.querySelector('.mundo-root[data-dim="2d"]')).toBeInTheDocument();
+    expect(onNavigate).toHaveBeenCalledWith('clima_boletin');
+    expect(container).toBeEmptyDOMElement();
+  });
 
-    fireEvent.click(screen.getByRole('button', { name: '← Volver' }));
-    expect(onBack).toHaveBeenCalledTimes(1);
+  test('App conecta la ruta legacy y entrega su navegador al puente', () => {
+    expect(appSource).toContain("'mockups/clima-atmosfera': 'mockup_clima_atmosfera'");
+    const route = appSource.split("case 'mockup_clima_atmosfera':")[1].split("case '")[0];
+    expect(route).toContain('<ClimaAtmosferaMockup onNavigate={navigate} />');
+    expect(appSource).toContain("case 'clima_boletin':");
+  });
+
+  test('El tiempo del mockup del home abre el mismo destino', () => {
+    const onNavigate = vi.fn();
+    render(<HomeCampesino onBack={vi.fn()} onNavigate={onNavigate} />);
+    fireEvent.click(screen.getByRole('button', { name: /^El tiempo:/ }));
+    expect(onNavigate).toHaveBeenCalledWith('clima_boletin');
+    expect(appSource).toContain("<HomeCampesinoMockup onBack={() => navigate('dashboard')} onNavigate={navigate} />");
   });
 });

@@ -1175,7 +1175,7 @@ const PLENO_SOL_KEY = 'chagra:home:pleno-sol';
  *   · Mis matas     → la portada del mundo Cultivos ('mundo_cultivos').
  *   · Mis animales  → el mundo Animales ('mundo' + {mundo:'animales'}),
  *                     gateado por perfil (mostrarAnimales, igual que el home).
- *   · El tiempo     → 'hoy_finca' (su día: lluvia, heladas y avisos).
+ *   · El tiempo     → 'clima_boletin' (el clima de hoy y los próximos días).
  *   · Vender        → 'mercado'.
  *   · Aprender      → 'aprende'.
  *   · Toda mi finca → LOS MUNDOS completos en la hoja de abajo (revelar).
@@ -1184,7 +1184,7 @@ function buildPuertas({ onNavigate, irATodaMiFinca, mostrarAnimales }) {
   const puertas = [
     { id: 'matas', emoji: '🌱', nombre: 'Mis matas', tinte: 'verde', abre: 'sus siembras y cultivos', onClick: () => onNavigate?.('mundo_cultivos') },
     { id: 'animales', emoji: '🐔', nombre: 'Mis animales', tinte: 'teja', abre: 'sus gallinas, cerdos y demás animales', onClick: () => onNavigate?.('mundo', { mundo: 'animales' }) },
-    { id: 'tiempo', emoji: '🌦️', nombre: 'El tiempo', tinte: 'cielo', abre: 'el clima de hoy y los próximos días', onClick: () => onNavigate?.('hoy_finca') },
+    { id: 'tiempo', emoji: '🌦️', nombre: 'El tiempo', tinte: 'cielo', abre: 'el clima de hoy y los próximos días', onClick: () => onNavigate?.('clima_boletin') },
     { id: 'vender', emoji: '🧺', nombre: 'Vender', tinte: 'ambar', abre: 'precios, mercado y su despensa', onClick: () => onNavigate?.('mercado') },
     { id: 'aprender', emoji: '📖', nombre: 'Aprender', tinte: 'uva', abre: 'las lecciones y guías del campo', onClick: () => onNavigate?.('aprende') },
     { id: 'finca', emoji: '🏡', nombre: 'Toda mi finca', tinte: 'menta', abre: 'todos los mundos de su finca', onClick: () => irATodaMiFinca() },

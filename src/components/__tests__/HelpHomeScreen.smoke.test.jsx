@@ -50,6 +50,13 @@ describe('HelpHomeScreen smoke', () => {
     expect(onSelect).toHaveBeenCalledWith('datos');
   });
 
+  test('El tiempo abre la pantalla canónica del clima', () => {
+    const onNavigate = vi.fn();
+    render(<H onSelect={() => {}} onNavigate={onNavigate} />);
+    fireEvent.click(screen.getByText('El tiempo').closest('button'));
+    expect(onNavigate).toHaveBeenCalledWith('clima_boletin');
+  });
+
   test('El copy del home no contiene voseo argentino', () => {
     const { container } = render(/** @type {any} */ (<H onSelect={() => {}} />));
     const text = container.textContent || '';
