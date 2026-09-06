@@ -41,3 +41,15 @@ describe('VistaGlobalSierra, cableado de pisos térmicos', () => {
     expect(screen.queryByTestId('tsm')).not.toBeInTheDocument();
   });
 });
+
+test.each([null, 0, -1, undefined])('sin altitud confirmada (%s) no marca una finca representativa', (msnm) => {
+  render(<VistaGlobalSierra pisoUsuario="frio" msnm={msnm} />);
+  expect(document.querySelector('.vsierra-finca')).toBeNull();
+  expect(document.querySelector('.vsierra-aqui')).toBeNull();
+});
+
+test('la curva rotula la altitud real de la finca', () => {
+  render(<VistaGlobalSierra msnm={2200} />);
+  expect(document.querySelectorAll('.vsierra-finca')).toHaveLength(1);
+  expect(document.querySelector('.vsierra-finca')).toHaveTextContent('2.200 m · a la altura de su finca');
+});

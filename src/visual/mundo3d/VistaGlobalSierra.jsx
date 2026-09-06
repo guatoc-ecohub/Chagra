@@ -167,9 +167,7 @@ const PALETA_COSTA = {
 const CLAVE_PISOS = CLAVE_PISOS_SIERRA;
 
 /* Altitud representativa de cada piso (world Y), para el marcador "usted". */
-const PISOS_Y = {
-  calido: 0.6, templado: 1.4, frio: 2.2, paramo: 3.0, superparamo: 3.9, nival: 4.6,
-};
+
 
 /* MOTEADO del manto (2026-09-05, arte): un dosel no es un degradado liso. Una
    modulación de VALOR por vértice, determinista (el mismo `ruido` del relieve, a
@@ -491,39 +489,6 @@ function Rotulo({ pos, texto, sub, distancia = 12, alto = 0.6 }) {
   );
 }
 
-/* Marcador "usted está aquí": punto de luz suave + aro fino pegado al suelo, a la
-   altitud del piso de la finca. Sobrio, sin gamificación. Solo si `pisoUsuario`
-   es válido. */
-function MarcadorPiso({ piso }) {
-  const punto = useMemo(() => {
-    const objetivo = PISOS_Y[piso];
-    if (objetivo == null) return null;
-    const wx = -4.2; // flanco occidental, cara norte visible
-    let wz = COSTA_Z + 0.5, mejor = 99;
-    for (let z = COSTA_Z + 0.3; z < 8; z += 0.2) {
-      const d = Math.abs(alturaSierra(wx, z) - objetivo);
-      if (d < mejor) { mejor = d; wz = z; }
-    }
-    return [wx, alturaSierra(wx, wz), wz];
-  }, [piso]);
-  if (!punto) return null;
-  return (
-    <group position={/** @type {[number, number, number]} */ (punto)}>
-      <mesh position={[0, 0.05, 0]} rotation={[-Math.PI / 2, 0, 0]}>
-        <ringGeometry args={[0.5, 0.72, 24]} />
-        <meshBasicMaterial color="#ffdf9c" transparent opacity={0.7} depthWrite={false} side={THREE.DoubleSide} />
-      </mesh>
-      <mesh position={[0, 0.26, 0]}>
-        <circleGeometry args={[0.22, 24]} />
-        <meshBasicMaterial color="#fff0c2" transparent opacity={0.5} depthWrite={false} side={THREE.DoubleSide} />
-      </mesh>
-      <Html center distanceFactor={16} position={[0, 0.9, 0]} zIndexRange={[40, 20]} style={{ pointerEvents: 'none' }}>
-        <div className="vsierra-aqui" aria-hidden="true">Aquí está usted</div>
-      </Html>
-    </group>
-  );
-}
-
 /* EL MAPA VERTICAL, dibujado como mapa (2026-09-04, arte): curvas de nivel finas
    sobre el relieve en los topes de cada banda, con la tinta de los rótulos, y la
    LÍNEA ÁMBAR de la cota canónica del hielo (4 800 m) con su rótulo — «hasta aquí
@@ -536,23 +501,22 @@ function MarcadorPiso({ piso }) {
    banda) en el color del piso donde vive, con su rótulo «a la altura de su
    finca» colgado del punto más oriental. Sin altitud confirmada NO se dibuja
    nada de la finca (el hueco es honesto): las bandas siguen igual. */
-function MapaDeNivel({ segmentos, pisoUsuario, msnm }) {
+function MapaDeNivel({ segmentos, msnm }) {
   const capas = useMemo(() => {
     const hF = muestreadorFacetas(alturaSierra, { ancho: ANCHO, fondo: FONDO, segX: segmentos, segZ: segmentos });
     const region = { x0: -ANCHO / 2 + 0.2, x1: ANCHO / 2 - 0.2, z0: COSTA_Z - 1.2, z1: FONDO / 2 - 0.2, paso: 0.08 };
     const msnmValido = altitudFincaValida(msnm);
     const out = [];
-    BANDAS_SIERRA.forEach((b, i) => {
+    BANDAS_SIERRA.forEach((b) => {
       if (!Number.isFinite(b.tope)) return;
       const lineas = contornoNivel(alturaSierra, b.tope, region);
       if (!lineas.length) return;
       const esHielo = b.id === 'superparamo';
-      const suya = !msnmValido && pisoUsuario && (b.id === pisoUsuario || BANDAS_SIERRA[i + 1]?.id === pisoUsuario);
       out.push({
         key: b.id,
-        geo: geometriaCinta(lineas, hF, { ancho: esHielo ? 0.06 : suya ? 0.045 : 0.03 }),
-        color: esHielo ? NIEVE.ambar : suya ? b.hexColor : NIEVE.tinta,
-        opacidad: esHielo ? 0.92 : suya ? 0.85 : 0.34,
+        geo: geometriaCinta(lineas, hF, { ancho: esHielo ? 0.06 : 0.03 }),
+        color: esHielo ? NIEVE.ambar : NIEVE.tinta,
+        opacidad: esHielo ? 0.92 : 0.34,
         ancla: esHielo ? lineas.flat().reduce((m, q) => (q[0] < m[0] ? q : m)) : null,   // el punto más oriental (screen-right): lejos de las etiquetas de banda, que van al occidente
       });
     });
@@ -578,7 +542,7 @@ function MapaDeNivel({ segmentos, pisoUsuario, msnm }) {
       }
     }
     return out;
-  }, [segmentos, pisoUsuario, msnm]);
+  }, [segmentos, msnm]);
   useEffect(() => () => capas.forEach((c) => c.geo.dispose()), [capas]);
   const tex = texturaCinta();
   return (
@@ -757,10 +721,8 @@ export function SierraDiorama({
       <Rotulo pos={[SIMMONDS.x, SIMMONDS.y, SIMMONDS.z]} texto="Pico Simmonds" sub="5.560 m" distancia={12} alto={0.6} />
       <Rotulo pos={[PALOMINO.x, PALOMINO.y, PALOMINO.z]} texto="Palomino" sub="Caribe · 0 m" distancia={11} alto={0.45} />
 
-      {pisoUsuario && !msnmConfirmado && <MarcadorPiso piso={pisoUsuario} />}
       <MapaDeNivel
         segmentos={segmentos}
-        pisoUsuario={msnmConfirmado ? null : pisoUsuario}
         msnm={msnmConfirmado}
       />
       <PisosTermicosBandas
@@ -932,6 +894,7 @@ export default function VistaGlobalSierra({
         reducedMotion={reducedMotion}
         onMitad={llegarAPiso}
         onFin={terminarViaje}
+        msnmUsuario={altitudFincaValida(msnmPortada)}
         climaVivo={climaVivo}
         sugerencias={sugerencias}
       />

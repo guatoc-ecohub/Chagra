@@ -2479,6 +2479,7 @@ export default function App() {
           <ErrorBoundary>
             <ErrorFallback moduleName="Vista global Sierra Nevada">
               <SierraGlobalMockup
+                msnm={getProfile()?.finca_altitud ?? getProfile()?.altitud ?? null}
                 onSeleccionPiso={(piso) => {
                   const mundo = mundoPrincipalDePiso(piso);
                   if (mundo?.view) navigate(mundo.view);

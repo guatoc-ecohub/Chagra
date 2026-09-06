@@ -155,7 +155,7 @@ export function resolverAterrizaje({ msnmUsuario = null, clima = null, fase, reg
     msnmUsuario !== undefined &&
     msnmUsuario !== '' &&
     Number.isFinite(Number(msnmUsuario)) &&
-    Number(msnmUsuario) >= 0;
+    Number(msnmUsuario) > 0;
 
   const cota = hay ? Number(msnmUsuario) : COTA_SIN_UBICACION;
   const piso = pisoPorAltitud(cota);
