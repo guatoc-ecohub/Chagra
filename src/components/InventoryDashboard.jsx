@@ -38,7 +38,7 @@ const BAR_CAPACITY = 50;
 const MaterialCard = ({ item, onRefill, onRecount, onViewAudit }) => {
   const name = item.attributes?.name || item.name || 'Insumo sin nombre';
   const stock = parseFloat(item.attributes?.inventory_value) || 0;
-  const unit = item.attributes?.inventory_unit || 'unidades';
+  const unit = item.attributes?.inventory_unit || 'unidad';
   const isLow = stock < LOW_THRESHOLD;
   const progressPct = Math.min((stock / BAR_CAPACITY) * 100, 100);
   const isPending = item._pending;
