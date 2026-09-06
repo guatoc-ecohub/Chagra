@@ -1399,6 +1399,16 @@
       "id": "src/visual/creatures/zariguyaGeminiLamina/capas.js",
       "reason": "Apoyo de ZariguyaGeminiLaminaViva.jsx (el set raster Gemini de la zarigüeya, horneado en 8 capas): su único importador es el test capas.test.jsx (el test de regresión de assets la descubre por fs, no la importa, así que no cuenta como consumidor para este gate). El componente dueño fue desconectado de ZariguyaCompaiEscena (monta la piel TINTA ZariguyaTrazado desde #3151) y archivado 2026-09-04 en _archivo/ como symlink reversible al disco frío — regla dura «compais solo con TINTA». Su hermana anatomia.js NO se declara: sigue viva (el trazado la reutiliza vía zariguyaTrazado/posesTrazado.js) y es la que ancla la carpeta. Se declara solo este apoyo hasta decidir la vuelta o la baja del set Gemini (curaduría del operador); al cablear o retirar, borrar la entrada.",
       "date": "2026-09-05"
+    },
+    {
+      "id": "src/services/crmService.js",
+      "reason": "Servicio del CRM agroecológico mínimo (PR #2859): crea contactos como asset--person y actividades como log--activity en IndexedDB. Su única pantalla hoy es el mockup #/mockups/crm-agroecologico, que renderiza con datos de muestra a propósito (un mockup no debe escribir en IndexedDB); los componentes de esa ruta reciben los datos por props y no llaman al servicio. El servicio se cablea cuando el CRM pase de mockup a pantalla viva (decisión de producto).",
+      "date": "2026-09-05"
+    },
+    {
+      "id": "src/types/crm.js",
+      "reason": "Tipos JSDoc del CRM agroecológico mínimo (PR #2859): contactos e interacciones que modelan asset--person y log--activity. Declarados junto a su servicio crmService.js, que aún no tiene ruta viva; los componentes del mockup tipan con literales inline hoy. Se consume en la misma decisión de producto que cablea el servicio.",
+      "date": "2026-09-05"
     }
   ]
 }
