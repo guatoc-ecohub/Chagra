@@ -681,7 +681,12 @@ function LucesMonte({ tier, climaVivo }) {
 /**
  * La escena del macizo (grupo r3f). Cielo, mar, montaña con vegetación por piso,
  * agua del páramo, velo de bruma, hotspots navegables y la cámara que orbita.
- * @param {{tier:'alto'|'medio'|'bajo', reducedMotion:boolean, onEntrarPiso?:(id:string)=>void}} props
+ * @param {{
+ *   tier:'alto'|'medio'|'bajo',
+ *   reducedMotion:boolean,
+ *   onEntrarPiso?:(id:string)=>void,
+ *   climaVivo?: object
+ * }} props
  */
 function EscenaMonte({ tier, reducedMotion, onEntrarPiso, climaVivo }) {
   const perfil = perfilDeTier(tier);
