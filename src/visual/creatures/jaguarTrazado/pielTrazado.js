@@ -152,6 +152,17 @@ const casqueteCalco = (region, banda) =>
   `<g clip-path="url(#jt-r-${region})"><g clip-path="url(#jtSilueta)">` +
   `<g clip-path="url(#jt-b-${banda})"><use href="#jtCalco-${region}" filter="url(#${FILTRO_BANDA[banda]})"/></g></g></g>`;
 
+/** Parche estático de vientre para la raíz de la pata delantera cercana.
+    A diferencia del casquete (que va debajo del hijo y responde a huecos),
+    este va DESPUÉS de la pata: el cuerpo tapa el borde superior recto del
+    recorte mientras el hombro gira. Copia píxeles ya existentes del calco y
+    se desvanece dentro de la pata, así que no inventa una raya ni un color. */
+const parcheVientreHombro = () =>
+  `<g clip-path="url(#jt-b-vientreHombro)" mask="url(#jt-m-vientreHombro)">` +
+  `<g clip-path="url(#jtSilueta)">` +
+  `<use href="#jtCalco-troncoCuerpo"/><use href="#jtCalco-cuello"/>` +
+  `</g></g>`;
+
 /* Bandas de juntura (elipses generosas centradas en el corte).
    🔴 atlas NO es elipse: es un TRAZO DE NUCA. La elipse subía hasta y≈16 y
    al girar la cabeza a −18° el casquete pintaba una ALETA borrosa parada
@@ -167,6 +178,7 @@ const BANDAS = `
   <clipPath id="jt-b-atlas"><path d="M153,45 C142,46 132,44 124,43 C118,42 114,41 112,40 L106,60 L106,140 L118,220 L150,266 L232,266 L232,140 L216,58 L186,37 Z"/></clipPath>
   <clipPath id="jt-b-cruz"><ellipse cx="247" cy="152" rx="42" ry="115" transform="rotate(6 247 152)"/></clipPath>
   <clipPath id="jt-b-hombro"><ellipse cx="222" cy="248" rx="46" ry="36" transform="rotate(-6 222 248)"/></clipPath>
+  <clipPath id="jt-b-vientreHombro"><path d="M184,218 C204,213 237,216 258,229 C258,246 252,263 244,276 C226,273 204,270 187,260 C185,246 184,232 184,218 Z"/></clipPath>
   <clipPath id="jt-b-colaMedia"><circle cx="553" cy="157" r="28"/></clipPath>
   <clipPath id="jt-b-colaPunta"><ellipse cx="676" cy="258" rx="40" ry="19" transform="rotate(20 676 258)"/></clipPath>`;
 
@@ -187,7 +199,11 @@ const DEFS = `<defs>
   <linearGradient id="jtFadeTras" x1="0" y1="214" x2="0" y2="250" gradientUnits="userSpaceOnUse">
     <stop offset="0" stop-color="#000"/><stop offset="1" stop-color="#fff"/>
   </linearGradient>
+  <linearGradient id="jtFadeVientreHombro" x1="0" y1="232" x2="0" y2="274" gradientUnits="userSpaceOnUse">
+    <stop offset="0" stop-color="#fff"/><stop offset=".62" stop-color="#fff"/><stop offset="1" stop-color="#000"/>
+  </linearGradient>
   ${MASCARAS}
+  <mask id="jt-m-vientreHombro" maskUnits="userSpaceOnUse" x="180" y="210" width="84" height="72"><path d="M184,218 C204,213 237,216 258,229 C258,246 252,263 244,276 C226,273 204,270 187,260 C185,246 184,232 184,218 Z" fill="url(#jtFadeVientreHombro)"/></mask>
   <linearGradient id="jtCuello" x1="200" y1="55" x2="215" y2="250" gradientUnits="userSpaceOnUse">
     <stop offset="0" stop-color="#a55524"/>
     <stop offset=".45" stop-color="#cd814a"/>
@@ -340,6 +356,7 @@ ${DEFS}
         ${pata('TrasCerca')}
         ${casqueteCalco('pataDelCercaAlto', 'hombro')}
         ${pata('DelCerca')}
+        ${parcheVientreHombro()}
         ${casqueteCalco('cuello', 'cruz')}
         <g class="jh-hueso jh-cuello"${origin('cuello')}>
           ${usoCalco('cuello')}
