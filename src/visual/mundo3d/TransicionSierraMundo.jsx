@@ -669,8 +669,10 @@ export default function TransicionSierraMundo({
      montar (el overlay se desmonta al llegar). `?msnm=` (gate) es la forma de
      parar HOY; un host futuro puede sostener el viaje en la cota de la finca. */
   const paradoEnCota = gate.msnmFijo != null;
-  /* Los tres tiempos: 0 = sin aterrizaje · 1 = T0 (la cota) · 2 = T1 (la tinta
-     del ahora) · 3 = T2 (la tiza en la pizarra). Timers deterministas. */
+  /* Los tres tiempos del aterrizaje: 0 = sin aterrizaje · 1 = T0 (la cota) ·
+     2 = T1 (la tinta del ahora) · 3 = T2 (la tiza en la pizarra). Se suben y se
+     RESETEAN solo desde callbacks de timers (nada de setState síncrono en el
+     efecto): el reset a 0 va en el tick 0 de cada parada en cota. */
   const [paso, setPaso] = useState(0);
   const destino = useMemo(() => cotaDestino(msnmUsuario), [msnmUsuario]);
   /* Con `?msnm=` (gate) y sin finca, la línea y el anfitrión siguen la cota CONGELADA:
@@ -759,16 +761,15 @@ export default function TransicionSierraMundo({
 
   /* EL ATERRIZAJE EN TRES TIEMPOS (§3.3 de DIRECCION-NUMEROS-VIVOS): la píldora
      se retiró; ahora cada pieza aparece por setTimeout determinista (contrato
-     temporal, nunca `animationend`). La base es el instante en que la píldora
+     temporal, nunca 'animationend'). La base es el instante en que la píldora
      vieja asomaba (86 % del viaje, la curva ya frenando); T1 a +800 ms y T2 a
-     +1 600 ms. Con reduced-motion el modo 3D no corre y esto no aplica. */
+     +1 600 ms. El tick 0 resetea el paso de una parada anterior. Con
+     reduced-motion el modo 3D no corre y esto no aplica. */
   useEffect(() => {
-    if (!activa || !usar3d || !paradoEnCota) {
-      setPaso(0);
-      return undefined;
-    }
+    if (!activa || !usar3d || !paradoEnCota) return undefined;
     const base = Math.round(duracionDescenso(tier, reducedMotion) * 0.86);
     const timers = [
+      setTimeout(() => setPaso(0), 0),
       setTimeout(() => setPaso((p) => Math.max(p, 1)), base),
       setTimeout(() => setPaso((p) => Math.max(p, 2)), base + 800),
       setTimeout(() => setPaso((p) => Math.max(p, 3)), base + 1600),
