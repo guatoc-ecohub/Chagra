@@ -26,7 +26,7 @@
  */
 import React from 'react';
 import { describe, it, test, expect, vi, beforeAll, beforeEach, afterEach } from 'vitest';
-import { render, screen, cleanup, within, waitFor } from '@testing-library/react';
+import { render, screen, cleanup, within, waitFor, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
@@ -144,6 +144,14 @@ describe('Bug 2 · DOM — hero F2: 6 puertas visibles + hoja "resto" separada',
     // Usabilidad campesina #5 (2026-07): SEIS puertas de 1-2 palabras
     // reemplazan los 4 portales con descripción.
     expect(labels).toEqual(['Mis matas', 'Mis animales', 'El tiempo', 'Vender', 'Aprender', 'Toda mi finca']);
+  });
+
+  test('El tiempo navega al clima canónico desde el dashboard', async () => {
+    const onNavigate = vi.fn();
+    render(<DashboardLive onNavigate={onNavigate} />);
+    const nav = await screen.findByTestId('finca-viva-puertas', {}, { timeout: 15000 });
+    fireEvent.click(within(nav).getByRole('button', { name: /^El tiempo:/ }));
+    expect(onNavigate).toHaveBeenCalledWith('clima_boletin');
   });
 
   test('la hoja "resto" NO contiene las puertas (superficies separadas)', { retry: 2 }, async () => {

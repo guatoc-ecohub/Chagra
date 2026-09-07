@@ -1,0 +1,33 @@
+{
+  "tag": "niebla-atardecer",
+  "url": "http://localhost:5391/?clima=niebla&luz=atardecer#/clima-boletin",
+  "vista": true,
+  "fps": [
+    53.1,
+    52.9
+  ],
+  "fpsMediana": 53.0,
+  "estado": {
+    "clima": "niebla",
+    "luz": "atardecer",
+    "bancos": 9,
+    "jirones": 7,
+    "capaNiebla": "1",
+    "capaLluvia": "0",
+    "capaLuci": "0.3",
+    "capaEstrellas": "0",
+    "capaPolvo": "0",
+    "rayos": "1",
+    "corriendo": 59,
+    "dpr": 3.5,
+    "w": 411,
+    "h": 794,
+    "ua": "Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome",
+    "reducido": false,
+    "animaciones": 132
+  },
+  "pageErrors": [],
+  "interceptadas": 20,
+  "screencap": "/tmp/astra-clima-2d-20260906/_gate/clima2d-efectos-20260906/pixel-final/niebla-atardecer-pixel.png",
+  "fecha": "2026-09-06T23:45:22"
+}

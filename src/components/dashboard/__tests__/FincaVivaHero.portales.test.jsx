@@ -8,7 +8,7 @@ import { describe, test, expect, vi, beforeEach, afterEach } from 'vitest';
 // existe en App.jsx:
 //   · Mis matas     → 'mundo_cultivos' (portada del mundo Cultivos).
 //   · Mis animales  → 'mundo' + { mundo: 'animales' } (gate por perfil).
-//   · El tiempo     → 'hoy_finca'.
+//   · El tiempo     → 'clima_boletin'.
 //   · Vender        → 'mercado'.
 //   · Aprender      → 'aprende'.
 //   · Toda mi finca → onTodaMiFinca (revela LOS MUNDOS en la hoja de abajo);
@@ -89,10 +89,10 @@ describe('FincaVivaHero — las 6 puertas llevan a su destino correcto', () => {
     expect(onNavigate).toHaveBeenCalledWith('mundo', { mundo: 'animales' });
   });
 
-  test('"El tiempo" abre su día en la finca (hoy_finca)', () => {
+  test('"El tiempo" abre la pantalla canónica del clima (clima_boletin)', () => {
     const { onNavigate } = renderHero();
     fireEvent.click(getPuerta('El tiempo'));
-    expect(onNavigate).toHaveBeenCalledWith('hoy_finca');
+    expect(onNavigate).toHaveBeenCalledWith('clima_boletin');
   });
 
   test('"Vender" abre el mercado', () => {
