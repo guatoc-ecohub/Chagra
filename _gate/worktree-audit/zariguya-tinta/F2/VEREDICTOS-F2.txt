@@ -1,0 +1,105 @@
+REGISTRO CRUDO — zarigüeya tinta FASE 2 (poses Gemini por estado) · 2026-08-26
+
+JUEZ PRIMARIO: app Gemini del Pixel (cuenta con plan, sin cuota) vía
+/tmp/juez-pixel2.sh (la UI de la app cambió: ahora vive en
+googlequicksearchbox/…voice.robin; gemini-pixel.sh viejo no encuentra los
+labels — flujo re-mapeado: Add attachments → Files → DocumentsUI carpeta
+gemini-gate → tarjeta; respuesta en resource-id assistant_robin_text).
+gemini-vision.sh (API gemini-3-flash-preview) quedó SIN CUOTA (20/día,
+RESOURCE_EXHAUSTED) tras los 2 controles del arranque.
+
+CONTROLES DEL INSTRUMENTO (canal Pixel, antes de confiar):
+ · Idéntico (lámina|lámina, 05-CONTROL-identico-escucha.png):
+   "identicas SI · diferencias NINGUNA · color SI · personaje SI" — PASÓ.
+ · Negativo (FINAL/37-CONTROL-NEG.png, render viejo con 6 defectos):
+   cazó los 6 exactos (ceja sobre ojo, mancha mejilla, codo, talón,
+   discos rosa cola, sombra suelo) + color NO-coincide — PASÓ.
+(La API gemini-3-flash-preview pasó los mismos 2 controles antes de agotarse.)
+
+── GATE LÁMINA 1 · ESCUCHA (listening) ──
+Comparador alineado por contenido (13-JUEZ-escucha03-alineado.png:
+render | lámina, ambos trim a contenido y ancla sur — el primer comparador
+04- tenía la lámina 15 px más abajo por error de composición MÍO y el juez
+lo leyó como "recorte de silueta"; alineado, desaparece):
+ 1. misma-pose: SI
+ 2. parches/manchas/cortes que la lámina NO tiene: NO
+ 3. color-coincide: SI
+ 4. mismo-personaje: SI
+ 5. silueta-superior-cortada: SI "EN AMBAS imágenes" → verificado al 4×
+    (14-*.png): el corte recto del tope de la oreja y el bloquecito gris
+    junto a la cabeza están EN LA LÁMINA ORIGINAL Gemini (de fábrica).
+    El render los reproduce fiel — no son defectos del trazado.
+ 6. diferencias: NINGUNA ("visualmente idénticas en color, trazo, detalles")
+
+NÚMEROS:
+ · bbox contenido: render 409×434 · lámina escalada 410×434 (Δ≤1px) —
+   misma escala de figura, sin recorte.
+ · pixel-diff alineado (fuzz 5%): 1 178 px de 184 800 = 0.64% (ruido de
+   re-muestreo del navegador; 12r.png vs 12l.png).
+ · CICLO VIVO probado: dos capturas GPU-headed espaciadas ⇒ la región del
+   "listening VIVO" cambió 10.2% de píxeles (07-vivo-t1-t2.png: frame
+   mano-a-oreja vs frame oreja-gigante 04) — el ciclo 02→03→04→03 corre.
+ · close-up escucha-01 activo a 100px (< UMBRAL_CLOSEUP=120) — misma raíz
+   data-creature (cero swap de nodo; el test integral lo fija).
+
+── GATE LÁMINA 2 · VER-LUPA (thinking) ──
+Comparador alineado por contenido (23-JUEZ-verlupa-alineado.png).
+Veredicto juez (Pixel, calibrado):
+ 1. misma-pose: SI
+ 2. parches que la lámina NO tiene: SI — "parche gris oscuro en el lomo,
+    justo detrás del cuello" → VERIFICADO al 3× (24-cmp-lomo-3x.png): el
+    parche está EN AMBAS mitades, mismo punto del lomo = artefacto DE
+    FÁBRICA de la lámina Gemini (como el bloquecito gris de escucha).
+    El diffmap (24-diffmap.png) NO lo marca: es idéntico en ambas.
+ 3. color-coincide: SI
+ 4. mismo-personaje: SI
+ 5. diferencias: "patas recortadas más abajo" → 1 px de redondeo del trim
+    del comparador (render 475×347 vs lámina 475×348).
+NÚMEROS: bbox contenido 475×347 vs 475×348 (Δ1px, misma escala);
+pixel-diff alineado (fuzz 5%): 637 px de 168 960 = 0.38%.
+
+── GATE LÁMINA 3 · MUERTA (vida tanatosis = firma "se-hace-la-muerta") ──
+Comparador alineado apilado (33-JUEZ-muerta-alineado.png: arriba render,
+abajo lámina). Veredicto juez (Pixel, calibrado):
+ 1. misma-pose: SI · 2. parches nuevos: NO · 3. color: SI ·
+ 4. personaje: SI · 5. diferencias: NINGUNA
+NÚMEROS: bbox contenido 475×228 vs 474×228 (Δ1px); pixel-diff alineado
+(fuzz 5%): 437 px de 112 288 = 0.39%.
+La firma vive en VIDA_REPERTORIO.zariguya.tanatosis (ya existía — es el
+nombre técnico de "se-hace-la-muerta"; anotado en vidaEstados.js). El gag
+respira a escondidas (ztFinge 2.2s) y también es forzable (vidaForzada).
+
+── GATE LÁMINA 4 · CUTE (contenta) + CRÍAS AL LOMO (vida forzada) ──
+CUTE (43-JUEZ-cute-alineado.png, izquierda render | derecha lámina):
+ pose SI · parches nuevos NO · color SI · personaje SI · diferencias
+ NINGUNA ("idénticas píxel a píxel").
+ Números: bbox 269×436 vs 269×438 (Δ2px por fuzz del trim; diffmap
+ 44- uniforme de textura = corrimiento de 2px del comparador, sin
+ parches); pixel-diff alineado 2.97% (fuzz 5%).
+CRÍAS (46-JUEZ-crias-alineado.png, arriba render | abajo lámina):
+ pose SI · mismas-crías SI · parches nuevos NO · color SI · personaje SI
+ · diferencias NINGUNA. Números: bbox 473×363 vs 473×362 (Δ1px);
+ pixel-diff alineado 3.77% (fuzz 5%; corrimiento 1px del trim).
+'crias' NO entra al azar del idle: canal vidaForzada del host (orden
+operador 2026-08-24 — pose especial en momentos positivos), igual que la
+hermana Gemini.
+
+── CONGRUENCIA · avatar 2D = selector = valle (una sola piel) ──
+ChagraAgentAvatarZariguya repunteado ZariguyaGeminiLaminaViva →
+ZariguyaTrazado (la MISMA piel del elenco CREATURES.zariguya que ya usan
+selector/roster/valle; el test integral documentaba ese destino).
+Tablero GPU-headed (52-pagina-congruencia-v2.png · 53-bloque-avatar2d-v2):
+ · FAB 48px: idle=rig · listening=close-up escucha-01 (48<120) ·
+   thinking=ver-lupa · speaking=rig+mandíbula (SIN pose: lip-sync vivo) ·
+   caminando=rig marcha · contenta=cute.
+ · 180px: listening=ciclo escucha · thinking=ver-lupa · speaking=rig ·
+   contenta=cute.
+FIX en el camino (mirada crítica del tablero v1, 51-bloque-avatar2d.png):
+el AURA rosa del modo actuando (reloj 70/30) se colaba DETRÁS de las
+viñetas (blob rosa tras ver-lupa) → [data-pose] .zh-aura off — las poses
+van limpias como en la hermana Gemini. El aura sigue viva para el RIG
+(comportamiento FASE 1 intacto).
+Suite: ZariguyaTrazado.integral (12) + ElencoUnificado (32) verdes tras el
+repoint. Los fallos restantes de la suite global (guacamaya visema,
+repertorio-vs-registro cóndor/danta/gallina/maíz, FermentosView, etc.)
+son PRE-EXISTENTES de la rama de integración — cero zarigüeya.

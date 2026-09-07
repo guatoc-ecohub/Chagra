@@ -1,0 +1,1 @@
+identify: unable to open image '/tmp/laminas-fuera-20260904/_gate/galeria-compais-despues-no-desplegado.png': No such file or directory @ error/blob.c/OpenBlob/3635.
