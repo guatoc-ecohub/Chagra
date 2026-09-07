@@ -169,6 +169,7 @@ const contraste = (l1, l2) => (Math.max(l1, l2) + 0.05) / (Math.min(l1, l2) + 0.
 // puede tumbar cualquier texto a 1,17:1. Es un elemento de la app, ajeno a la
 // escena de clima: se aparta para medir la escena, y se reporta aparte.
 async function apartarFlotantes(page) {
+  if (args.includes('--con-flotantes')) return 0; // medir CON el compai encima
   return page.evaluate(() => {
     let n = 0;
     for (const el of document.querySelectorAll('body *')) {

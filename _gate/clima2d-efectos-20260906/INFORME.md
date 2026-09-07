@@ -57,6 +57,36 @@ Partículas con opacidad efectiva > 0,02 y su animación corriendo. Medición, n
 | `niebla` / `noche` | bancos 6, jirones 4, astro 0.25, jirón-UI 0.55 | bancos 9, jirones 7, luciérnagas 11, astro 0.25, jirón-UI 0.34 |
 
 
+### 2.b Prueba de que están vivas, no solo presentes
+
+Una partícula «encendida» cuenta solo si su opacidad efectiva supera 0,02 **y** su animación está
+en `running`. El mismo `barrido.json` lo registra por grupo (`particulas[grupo].visibles` y
+`.animando`); esto es su resumen:
+
+| combinación | partículas visibles Y animando: ANTES | DESPUÉS |
+|---|---:|---:|
+| `despejado/amanecer` | 22 | 29 |
+| `despejado/dia` | 22 | 22 |
+| `despejado/atardecer` | 22 | 40 |
+| `despejado/noche` | 37 | 37 |
+| `nublado/amanecer` | **0** | 16 |
+| `nublado/dia` | **0** | 16 |
+| `nublado/atardecer` | **0** | 27 |
+| `nublado/noche` | 11 | 27 |
+| `lluvia/amanecer` | 36 | 46 |
+| `lluvia/dia` | 36 | 46 |
+| `lluvia/atardecer` | 36 | 46 |
+| `lluvia/noche` | 36 | 57 |
+| `niebla/amanecer` | 10 | 22 |
+| `niebla/dia` | 10 | 22 |
+| `niebla/atardecer` | 10 | 33 |
+| `niebla/noche` | 10 | 27 |
+
+Combinaciones sin una sola partícula viva — ANTES 3/16, DESPUÉS 0/16.
+
+Ese es el número que resuelve el encargo: **ninguna de las 16 se queda sin una sola partícula
+viva.** El caso extremo era `nublado` de día, amanecer y atardecer, con cero.
+
 ## 3. Contraste — el mismo instrumento en las dos columnas
 
 ⚠️ **El instrumento heredado mentía.** Ocultaba todo el contenido (`visibility: hidden`) antes
@@ -93,8 +123,10 @@ El **compai flotante** (z-index 40, 84×84, sin clase) se pasea por encima del b
 cualquier texto que le quede debajo hasta **1,17:1**. Es un elemento de la app, ajeno a la escena
 de clima, y va con posición dependiente del tiempo: se aparta del muestreo en **las dos** columnas
 para no contaminar la comparación, y cada corrida lo deja registrado en `flotantesApartados`.
-**Lo reporto, no lo toqué** — con él en pantalla, el mínimo real de cualquiera de las dos
-versiones baja a 1,17:1.
+**Lo reporto, no lo toqué.** Con él en pantalla el mínimo medido baja a **1,10:1**
+(`medidas/barrido-DESPUES-con-compai-flotante.json`, `flotantesApartados: 0` en las 16): golpea
+solo a las combinaciones sobre las que le toca pasar, y cambia de una corrida a otra porque su
+posición depende del tiempo. Es un techo que ninguna mejora de la escena puede levantar.
 
 ## 4. fps en el Pixel 6 Pro (Mali-G78) — el gate real
 
