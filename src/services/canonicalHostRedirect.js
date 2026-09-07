@@ -34,6 +34,8 @@ export function isLocalDevHost(hostname) {
     host === '::1' ||
     host.endsWith('.localhost') ||
     host.endsWith('.local') ||
+    /^100\.(6[4-9]|[7-9]\d|1[01]\d|12[0-7])\./.test(host) || // tailscale CGNAT 100.64/10 (preview aislado)
+    host.endsWith('.ts.net') || // tailscale MagicDNS (preview aislado)
     /(^|[.-])dev([.-]|$)/.test(host)
   );
 }
