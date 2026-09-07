@@ -56,6 +56,7 @@ import SceneTrazoMinimal from './SceneTrazoMinimal';
 // a src/components/_archivado/. Las puertas como cartas (PortalesMano) siguen
 // como la vía a los mundos. Ver ops/ARCHIVO-HOME-2D-20260826.md.
 import PortalesMano from './PortalesMano';
+import ValleHoverConfirm from './ValleHoverConfirm';
 import './scene-finca-organismo.css';
 import './scene-finca-nature.css';
 import './scene-huerto-vivo.css';
@@ -128,6 +129,8 @@ const COLIBRI_REAL = colibriRealActivo();
  * @param {string} [props.titulo]  título accesible (default "Mi finca viva").
  */
 export default function FincaVivaHero({ onNavigate, onOpenAgent, onGestionar, onTodaMiFinca, children, titulo }) {
+  const [valleHoverActivo, setValleHoverActivo] = useState(false);
+  const [dialogoValleAbierto, setDialogoValleAbierto] = useState(false);
   // Piel del tema activo: el ícono de marca del agente (la A roja en biopunk, la
   // sol-mano en verde-vivo, etc.) sigue al tema, igual que la escena toma su piel
   // del tema vía los tokens --c-*/--fvh-* del CSS. Con la flag OFF este hero no se
@@ -538,7 +541,14 @@ export default function FincaVivaHero({ onNavigate, onOpenAgent, onGestionar, on
 
         <main className="fvh-main">
           {/* ── ESCENA ISOMÉTRICA (o slot institucional) ────────────────────── */}
-          <div className={`fvh-escena-wrap${escenaVivaActiva ? ' fvh-escena-wrap--viva' : ''}${organismoActivo ? ' fvh-escena-wrap--organismo' : ''}`}>
+          <div
+            className={`fvh-escena-wrap${escenaVivaActiva ? ' fvh-escena-wrap--viva' : ''}${organismoActivo ? ' fvh-escena-wrap--organismo' : ''}`}
+            onPointerEnter={() => { if (tieneFincaPropia) setValleHoverActivo(true); }}
+            onPointerLeave={() => { if (!dialogoValleAbierto) setValleHoverActivo(false); }}
+            onPointerDown={(event) => {
+              if (tieneFincaPropia && event.pointerType !== 'mouse') setValleHoverActivo(true);
+            }}
+          >
             <div className="fvh-escena">
               {/* globo del agente colibrí */}
               <button
@@ -615,6 +625,15 @@ export default function FincaVivaHero({ onNavigate, onOpenAgent, onGestionar, on
                 <div className="fvh-institucional">{children}</div>
               )}
             </div>
+
+            {tieneFincaPropia && (
+              <ValleHoverConfirm
+                active={valleHoverActivo}
+                onDismiss={() => setValleHoverActivo(false)}
+                onDialogOpenChange={setDialogoValleAbierto}
+                onNavigate={onNavigate}
+              />
+            )}
 
             {/* [ARCHIVADO 2026-08-26] Aquí iba el PANEL DE VITALIDAD DEL
                 ESPÍRITU, debajo de la escena. Desmontado del home 2D por orden
