@@ -1,0 +1,388 @@
+{
+  "baseUrl": "http://localhost:5173",
+  "crmUrl": "http://localhost:5173/#/mockups/crm-agroecologico",
+  "startedAt": "2026-09-06T19:17:52.708Z",
+  "screenshots": [
+    "/home/kortux/Workspace/chagra-crm-hard-test/_gate/crm-hard-test/crm-natural-door.png",
+    "/home/kortux/Workspace/chagra-crm-hard-test/_gate/crm-hard-test/crm-route-header.png",
+    "/home/kortux/Workspace/chagra-crm-hard-test/_gate/crm-hard-test/crm-network-overview.png",
+    "/home/kortux/Workspace/chagra-crm-hard-test/_gate/crm-hard-test/crm-offline-read.png"
+  ],
+  "networkWrites": [],
+  "consoleErrors": [
+    "[Config] Variable de entorno requerida no definida: VITE_FARMOS_CLIENT_ID. Revise .env o .env.local.",
+    "Failed to load resource: the server responded with a status of 403 (Forbidden)",
+    "wasm streaming compile failed: TypeError: Failed to execute 'compile' on 'WebAssembly': HTTP status code is not ok",
+    "falling back to ArrayBuffer instantiation",
+    "Failed to load resource: the server responded with a status of 403 (Forbidden)",
+    "failed to asynchronously prepare wasm: both async and sync fetching of the wasm failed",
+    "Aborted(both async and sync fetching of the wasm failed)",
+    "Exception loading sqlite3 module: RuntimeError: Aborted(both async and sync fetching of the wasm failed). Build with -sASSERTIONS for more info.\n    at abort (http://localhost:5173/node_modules/.vite/deps/@sqlite__org_sqlite-wasm.js?v=9142a2ff:393:11)\n    at instantiateArrayBuffer (http://localhost:",
+    "[SQLite WASM] Failed to initialize catalog db: RuntimeError: Aborted(both async and sync fetching of the wasm failed). Build with -sASSERTIONS for more info.\n    at abort (http://localhost:5173/node_modules/.vite/deps/@sqlite__org_sqlite-wasm.js?v=9142a2ff:393:11)\n    at instantiateArrayBuffer (http",
+    "Failed to load resource: the server responded with a status of 403 (Forbidden)",
+    "wasm streaming compile failed: TypeError: Failed to execute 'compile' on 'WebAssembly': HTTP status code is not ok",
+    "falling back to ArrayBuffer instantiation",
+    "Failed to load resource: the server responded with a status of 403 (Forbidden)",
+    "failed to asynchronously prepare wasm: both async and sync fetching of the wasm failed",
+    "Aborted(both async and sync fetching of the wasm failed)",
+    "Exception loading sqlite3 module: RuntimeError: Aborted(both async and sync fetching of the wasm failed). Build with -sASSERTIONS for more info.\n    at abort (http://localhost:5173/node_modules/.vite/deps/@sqlite__org_sqlite-wasm.js?v=9142a2ff:393:11)\n    at instantiateArrayBuffer (http://localhost:",
+    "[SQLite WASM] Failed to initialize catalog db: RuntimeError: Aborted(both async and sync fetching of the wasm failed). Build with -sASSERTIONS for more info.\n    at abort (http://localhost:5173/node_modules/.vite/deps/@sqlite__org_sqlite-wasm.js?v=9142a2ff:393:11)\n    at instantiateArrayBuffer (http"
+  ],
+  "pageErrors": [],
+  "requestFailures": [],
+  "naturalDoor": {
+    "url": "http://localhost:5173/",
+    "crmTextCount": 0,
+    "crmActionCount": 0
+  },
+  "route": {
+    "headingVisible": true,
+    "contactCountTextVisible": true,
+    "createContactButtonCount": 0,
+    "createInteractionButtonCount": 0,
+    "editContactControlCount": 0
+  },
+  "indexedDbBefore": {
+    "Chagra": {
+      "stores": {
+        "local-forage-detect-blob-support": {
+          "count": 0,
+          "records": []
+        },
+        "syncQueue": {
+          "count": 0,
+          "records": []
+        }
+      }
+    },
+    "ChagraDB": {
+      "stores": {
+        "agent_outbox": {
+          "count": 0,
+          "records": []
+        },
+        "agent_requests": {
+          "count": 0,
+          "records": []
+        },
+        "assets": {
+          "count": 0,
+          "records": []
+        },
+        "conversation_memory": {
+          "count": 0,
+          "records": []
+        },
+        "failed_transactions": {
+          "count": 0,
+          "records": []
+        },
+        "farm_process_events": {
+          "count": 0,
+          "records": []
+        },
+        "farm_processes": {
+          "count": 0,
+          "records": []
+        },
+        "glaciar_draft": {
+          "count": 0,
+          "records": []
+        },
+        "glaciar_reportes": {
+          "count": 0,
+          "records": []
+        },
+        "inventory_events": {
+          "count": 0,
+          "records": []
+        },
+        "inventory_stock_snapshot": {
+          "count": 0,
+          "records": []
+        },
+        "llm_telemetry": {
+          "count": 0,
+          "records": []
+        },
+        "logs": {
+          "count": 0,
+          "records": []
+        },
+        "marketplace_ofertas": {
+          "count": 0,
+          "records": []
+        },
+        "media_cache": {
+          "count": 0,
+          "records": []
+        },
+        "pending_tasks": {
+          "count": 0,
+          "records": []
+        },
+        "pending_transactions": {
+          "count": 0,
+          "records": []
+        },
+        "pending_voice_recordings": {
+          "count": 0,
+          "records": []
+        },
+        "pilot_telemetry": {
+          "count": 1,
+          "records": [
+            {
+              "id": "pt_mtq723fiv5ooi9h7",
+              "type": null,
+              "asset_type": null,
+              "asset_id": null,
+              "crm_contact_type": null,
+              "crm_interaction_type": null,
+              "timestamp": null,
+              "pending": false
+            }
+          ]
+        },
+        "plans": {
+          "count": 0,
+          "records": []
+        },
+        "rag_corpus_cache": {
+          "count": 0,
+          "records": []
+        },
+        "rag_telemetry": {
+          "count": 0,
+          "records": []
+        },
+        "red_transactions": {
+          "count": 0,
+          "records": []
+        },
+        "sync_meta": {
+          "count": 0,
+          "records": []
+        },
+        "taxonomy_terms": {
+          "count": 0,
+          "records": []
+        },
+        "vision_queue": {
+          "count": 0,
+          "records": []
+        },
+        "voice_telemetry": {
+          "count": 0,
+          "records": []
+        }
+      }
+    }
+  },
+  "indexedDbBeforeCounts": {
+    "ChagraDB.assets": 0,
+    "ChagraDB.logs": 0,
+    "ChagraDB.pending_transactions": 0
+  },
+  "offline": {
+    "pageStillVisible": true,
+    "filteredReadStillWorks": true
+  },
+  "indexedDbAfter": {
+    "Chagra": {
+      "stores": {
+        "local-forage-detect-blob-support": {
+          "count": 0,
+          "records": []
+        },
+        "syncQueue": {
+          "count": 0,
+          "records": []
+        }
+      }
+    },
+    "ChagraDB": {
+      "stores": {
+        "agent_outbox": {
+          "count": 0,
+          "records": []
+        },
+        "agent_requests": {
+          "count": 0,
+          "records": []
+        },
+        "assets": {
+          "count": 0,
+          "records": []
+        },
+        "conversation_memory": {
+          "count": 0,
+          "records": []
+        },
+        "failed_transactions": {
+          "count": 0,
+          "records": []
+        },
+        "farm_process_events": {
+          "count": 0,
+          "records": []
+        },
+        "farm_processes": {
+          "count": 0,
+          "records": []
+        },
+        "glaciar_draft": {
+          "count": 0,
+          "records": []
+        },
+        "glaciar_reportes": {
+          "count": 0,
+          "records": []
+        },
+        "inventory_events": {
+          "count": 0,
+          "records": []
+        },
+        "inventory_stock_snapshot": {
+          "count": 0,
+          "records": []
+        },
+        "llm_telemetry": {
+          "count": 0,
+          "records": []
+        },
+        "logs": {
+          "count": 0,
+          "records": []
+        },
+        "marketplace_ofertas": {
+          "count": 0,
+          "records": []
+        },
+        "media_cache": {
+          "count": 0,
+          "records": []
+        },
+        "pending_tasks": {
+          "count": 0,
+          "records": []
+        },
+        "pending_transactions": {
+          "count": 0,
+          "records": []
+        },
+        "pending_voice_recordings": {
+          "count": 0,
+          "records": []
+        },
+        "pilot_telemetry": {
+          "count": 2,
+          "records": [
+            {
+              "id": "pt_mtq723fiv5ooi9h7",
+              "type": null,
+              "asset_type": null,
+              "asset_id": null,
+              "crm_contact_type": null,
+              "crm_interaction_type": null,
+              "timestamp": null,
+              "pending": false
+            },
+            {
+              "id": "pt_mtq725pn1xh5ggo5",
+              "type": null,
+              "asset_type": null,
+              "asset_id": null,
+              "crm_contact_type": null,
+              "crm_interaction_type": null,
+              "timestamp": null,
+              "pending": false
+            }
+          ]
+        },
+        "plans": {
+          "count": 0,
+          "records": []
+        },
+        "rag_corpus_cache": {
+          "count": 0,
+          "records": []
+        },
+        "rag_telemetry": {
+          "count": 0,
+          "records": []
+        },
+        "red_transactions": {
+          "count": 0,
+          "records": []
+        },
+        "sync_meta": {
+          "count": 0,
+          "records": []
+        },
+        "taxonomy_terms": {
+          "count": 0,
+          "records": []
+        },
+        "vision_queue": {
+          "count": 0,
+          "records": []
+        },
+        "voice_telemetry": {
+          "count": 2,
+          "records": [
+            {
+              "id": "vt_mtq725kgjyxvfv1z",
+              "type": null,
+              "asset_type": null,
+              "asset_id": null,
+              "crm_contact_type": null,
+              "crm_interaction_type": null,
+              "timestamp": null,
+              "pending": false
+            },
+            {
+              "id": "vt_mtq725p10ki7ydzu",
+              "type": null,
+              "asset_type": null,
+              "asset_id": null,
+              "crm_contact_type": null,
+              "crm_interaction_type": null,
+              "timestamp": null,
+              "pending": false
+            }
+          ]
+        }
+      }
+    }
+  },
+  "indexedDbAfterCounts": {
+    "ChagraDB.assets": 0,
+    "ChagraDB.logs": 0,
+    "ChagraDB.pending_transactions": 0
+  },
+  "persistence": {
+    "crmAssetsBefore": [],
+    "crmAssetsAfter": [],
+    "crmLogsBefore": [],
+    "crmLogsAfter": [],
+    "backendWritesObserved": [],
+    "result": "La ruta no expone una acción de escritura, por lo tanto no se puede demostrar una persistencia CRM desde la puerta natural."
+  },
+  "enums": {
+    "contactTypeValues": [
+      "campesino",
+      "tecnico",
+      "proveedor"
+    ],
+    "interactionTypeValues": [
+      "visita",
+      "llamada",
+      "mensaje",
+      "intercambio",
+      "venta",
+      "asesoria"
+    ],
+    "pluralEnumValuesFound": []
+  }
+}
