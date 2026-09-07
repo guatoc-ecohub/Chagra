@@ -1,7 +1,7 @@
 {
   "schema_version": "3.2",
   "seed_version": "0.2.0-oss-subset",
-  "generated_at": "2026-08-31",
+  "generated_at": "2026-09-04",
   "generated_by": "scripts/migrate-v31-to-v32.mjs — transform automático v3.1 → v3.2. ADR-030 Regla 1 (tracking_mode). Revisión agronómica requerida para especies con tracking_mode=null.",
   "_meta": {
     "fuente_migracion": "chagra-catalog-seed-v3.1.json",
@@ -5873,116 +5873,6 @@
       "_anti_confusion": "El 'mirto' aquí es Murraya paniculata (Rutaceae, ornamental asiático), NO el mirto mediterráneo (Myrtus communis, Myrtaceae). Pertenece a la misma familia (Rutaceae) que los cítricos, de ahí su papel como reservorio del psílido vector del HLB.",
       "valor_pedagogico": "El mirto o azahar de la India (Murraya paniculata (L.) Jack, familia Rutaceae) es un arbusto ornamental siempreverde originario de Asia tropical, muy usado como cerca viva y seto recortado en jardines y antejardines de tierra cálida y templada en Colombia por sus flores blancas perfumadas (similares al azahar de los cítricos) y su follaje denso. Pertenece a la familia Rutaceae, la misma de los cítricos, y por ello es importante en sanidad vegetal: es el hospedero preferido y reservorio del psílido asiático de los cítricos (Diaphorina citri), insecto vector de la bacteria del Huanglongbing (HLB) o 'dragón amarillo', la enfermedad más destructiva de la citricultura mundial. El ICA y la curaduría de Chagra desaconsejan sembrar mirto cerca de huertos cítricos precisamente por servir de puente epidemiológico del vector. No debe confundirse con el mirto mediterráneo (Myrtus communis). Lección viva sobre epidemiología vegetal, plantas reservorio de vectores y el principio de no introducir hospederos de plagas cerca de cultivos sensibles. Fuentes Tier A de taxonomía: GBIF, POWO Kew, Bernal 2015.",
       "tracking_mode": "aggregate"
-    },
-    {
-      "_curation_status": "VALIDADO: taxonomía y distribución colombiana en POWO; manejo hortícola y MIP respaldados por fuentes de extensión/IPM citadas. Rendimiento: SlotPendiente.",
-      "id": "eruca_vesicaria",
-      "nombre_comun": "Rúcula / Arúgula",
-      "nombre_comunes_regionales": [
-        "rúgula",
-        "oruga",
-        "rocket"
-      ],
-      "nombre_cientifico": "Eruca vesicaria (L.) Cav.",
-      "familia_botanica": "Brassicaceae",
-      "category": "hortalizas_hoja",
-      "thermal_zones": [
-        "templado",
-        "frio"
-      ],
-      "roles_in_guild": [
-        "crop"
-      ],
-      "cultivable": true,
-      "conservation_status": "naturalizada",
-      "altitud_msnm": {
-        "min_absoluto": 1910,
-        "optimo_min": 1910,
-        "optimo_max": 2600,
-        "max_absoluto": 2600
-      },
-      "radiacion": "sol_pleno",
-      "agua": "medio",
-      "drenaje_requerido": "bueno",
-      "harvest_type": "hoja",
-      "cycleMonths": 1.5,
-      "propagation": {
-        "metodo_principal": "semilla",
-        "notas": "Siembra directa. Las guías de extensión consultadas la tratan como hortaliza de estación fresca y reportan primera cosecha aproximada de 25-45 días, según sistema y variedad; no usar ese intervalo como rendimiento."
-      },
-      "source_ids": [
-        "powo-kew",
-        "gbif-taxonomic-backbone",
-        "bernal-2015-plantas-liquenes-colombia",
-        "uc-ipm-cole-crops-arugula",
-        "umn-vegetable-planning-arugula",
-        "agrosavia-inocuidad-frutas-hortalizas-2019",
-        "jbb-rugula-density-2021"
-      ],
-      "valor_pedagogico": "La rúcula o arúgula (Eruca vesicaria (L.) Cav., Brassicaceae) es una hortaliza anual de hoja. POWO registra una distribución adventicia en Colombia entre 1910 y 2600 msnm, en los Andes, y acepta este nombre científico. Las guías de extensión consultadas la describen como cultivo de estación fresca, tolerante a heladas y apto para siembra directa. Para MIP, UC IPM documenta en rúcula la roya blanca (Albugo candida) y el daño de la chinche bagrada en crucíferas; recomienda evitar lotes con antecedentes de roya blanca, reducir humedad foliar y monitorear plagas. AGROSAVIA documenta producción ecológica, manejo de plagas y biopreparados para frutas y hortalizas, pero no se encontró una cifra de rendimiento específica y transferible para esta entrada: rendimiento = SlotPendiente, no inventar.",
-      "companions": [],
-      "antagonists": [],
-      "confidence_notes": "La franja 1910-2600 msnm es distribución colombiana reportada por POWO, no un óptimo productivo experimental. La aptitud final del lote depende de temperatura, humedad, suelo y variedad. Rendimiento pendiente de una fuente específica para el sistema de la finca evaluada.",
-      "tracking_mode": "aggregate"
-    },
-    {
-      "_curation_status": "VALIDADO: taxonomía aceptada por POWO; entorno productivo colombiano y manejo MIP respaldados por AGROSAVIA y UC IPM. Rendimiento: SlotPendiente.",
-      "id": "cucurbita_pepo",
-      "nombre_comun": "Calabacín / Zucchini",
-      "nombre_comunes_regionales": [
-        "calabacita"
-      ],
-      "nombre_cientifico": "Cucurbita pepo L.",
-      "familia_botanica": "Cucurbitaceae",
-      "category": "hortalizas_fruto_flor",
-      "thermal_zones": [
-        "templado",
-        "frio"
-      ],
-      "roles_in_guild": [
-        "crop"
-      ],
-      "cultivable": true,
-      "conservation_status": "cultivo_comun",
-      "altitud_msnm": {
-        "min_absoluto": 1800,
-        "optimo_min": 1800,
-        "optimo_max": 2600,
-        "max_absoluto": 2600
-      },
-      "radiacion": "sol_pleno",
-      "agua": "medio",
-      "drenaje_requerido": "bueno",
-      "harvest_type": "fruto",
-      "cycleMonths": null,
-      "rendimiento": null,
-      "rendimiento_estado": "SlotPendiente",
-      "rendimiento_fuente": null,
-      "propagation": {
-        "metodo_principal": "semilla",
-        "notas": "La semilla puede establecerse de forma directa o mediante plántula según el sistema. El fruto se cosecha tierno, antes de la maduración completa."
-      },
-      "plagas_criticas": [
-        "Gusano perforador de cucurbitáceas (Diaphania spp.)"
-      ],
-      "enfermedades_criticas": [
-        "Mildeo polvoso (Podosphaera xanthii)",
-        "Mildeo velloso (Pseudoperonospora cubensis)",
-        "Pudrición por Phytophthora (Phytophthora capsici)"
-      ],
-      "source_ids": [
-        "powo-kew",
-        "gbif-taxonomic-backbone",
-        "agrosavia-modelo-calabacin-2019",
-        "uc-ipm-cucurbits",
-        "agrosavia-manual-biopreparados-2015",
-        "agrosavia-inocuidad-frutas-hortalizas-2019"
-      ],
-      "valor_pedagogico": "El calabacín, zucchini o calabacita (Cucurbita pepo L., Cucurbitaceae) es una hortaliza anual cuyo fruto se consume tierno. POWO acepta C. pepo y registra calabacín y calabacita entre sus nombres vernáculos. El modelo productivo de AGROSAVIA para Cundinamarca y Antioquia documenta zonas productoras entre 1.800 y 2.600 msnm, por lo que 2.200 msnm cae dentro del entorno productivo documentado, sujeto a temperatura, suelo, agua, variedad y manejo del lote. El MIP debe partir de observación, saneamiento, buen drenaje y manejo de la humedad foliar; UC IPM documenta mildeo polvoso, mildeo velloso y pudrición por Phytophthora en cucurbitáceas. Bocashi y purín de ortiga quedan como apoyos agroecológicos generales del catálogo, no como controles específicos validados para C. pepo. Rendimiento = SlotPendiente, no inventar.",
-      "companions": [],
-      "antagonists": [],
-      "confidence_notes": "El rango 1.800-2.600 msnm describe zonas productoras de Cundinamarca y Antioquia documentadas por AGROSAVIA, no un límite fisiológico universal. El rendimiento de la publicación citada corresponde a condiciones de investigación y no se promueve aquí como cifra general; queda SlotPendiente para el sistema de la finca evaluada.",
-      "tracking_mode": "aggregate"
     }
   ],
   "biopreparados": [
@@ -7416,51 +7306,6 @@
   ],
   "sources": [
     {
-      "id": "uc-ipm-cole-crops-arugula",
-      "tipo": "manual_tecnico",
-      "autores": "UC Statewide Integrated Pest Management Program",
-      "año": null,
-      "titulo": "Pest Management Guidelines: Cole Crops",
-      "institucion": "University of California Agriculture and Natural Resources",
-      "url": "https://ipm.ucanr.edu/pdf/pmg/pmgcolecrops.pdf",
-      "tier": "A",
-      "observaciones": "Incluye rúcula entre los hospederos de roya blanca y describe manejo IPM para crucíferas."
-    },
-    {
-      "id": "umn-vegetable-planning-arugula",
-      "tipo": "manual_tecnico",
-      "autores": "University of Minnesota Extension",
-      "año": 2026,
-      "titulo": "Crop and field planning tools for vegetable farmers",
-      "institucion": "University of Minnesota Extension",
-      "url": "https://extension.umn.edu/vegetable-growing-guides-farmers/crop-and-field-planning-tools-vegetable-farmers",
-      "tier": "A",
-      "observaciones": "Clasifica la rúcula como hortaliza de hoja de clima fresco, tolerante a heladas, y ofrece un intervalo de días a madurez para ese contexto de extensión."
-    },
-    {
-      "id": "agrosavia-inocuidad-frutas-hortalizas-2019",
-      "tipo": "manual_tecnico",
-      "autores": "AGROSAVIA",
-      "año": 2019,
-      "titulo": "Cultivando la inocuidad de mis frutas y hortalizas",
-      "institucion": "AGROSAVIA",
-      "doi": "10.21930/agrosavia.nbook.7403084",
-      "url": "https://editorial.agrosavia.co/index.php/publicaciones/catalog/book/98",
-      "tier": "A",
-      "observaciones": "Aborda buenas prácticas, manejo de plagas y enfermedades, producción ecológica, biopreparados y compostaje."
-    },
-    {
-      "id": "jbb-rugula-density-2021",
-      "tipo": "informe_tecnico",
-      "autores": "Jardín Botánico de Bogotá José Celestino Mutis",
-      "año": 2021,
-      "titulo": "Semillas por propagación tradicional y de productividad de 4 especies útiles para la agricultura urbana",
-      "institucion": "Jardín Botánico de Bogotá José Celestino Mutis",
-      "url": "https://catalogador.jbb.gov.co/app/resource?r=001_bio-em_sc_2021038_2",
-      "tier": "A",
-      "observaciones": "Recurso experimental que incluye Eruca vesicaria y mediciones de crecimiento y biomasa; no se usa para afirmar un rendimiento general."
-    },
-    {
       "id": "agrosavia-bacillus-2018",
       "tipo": "manual_tecnico",
       "autores": "AGROSAVIA",
@@ -8278,29 +8123,6 @@
       "institucion": "AGROSAVIA / Universidad Nacional de Colombia / Universidad Catolica de Oriente",
       "tier": "A",
       "observaciones": "Articulo revisado por pares con participacion AGROSAVIA sobre conservacion de oca en Narino."
-    },
-    {
-      "id": "agrosavia-modelo-calabacin-2019",
-      "tipo": "manual_tecnico",
-      "autores": "Jorge Jaramillo Noreña et al.",
-      "año": 2019,
-      "titulo": "Modelo productivo de calabacín (Cucurbita pepo) para los departamentos de Cundinamarca y Antioquia",
-      "institucion": "Corporación Colombiana de Investigación Agropecuaria (AGROSAVIA)",
-      "doi": "10.21930/agrosavia.model.7402759",
-      "url": "https://editorial.agrosavia.co/index.php/publicaciones/catalog/book/29",
-      "tier": "A",
-      "observaciones": "Modelo productivo colombiano que describe C. pepo, el entorno de zonas productoras entre 1.800 y 2.600 msnm y un esquema de manejo integrado de plagas y enfermedades. Sus cifras de investigación no se importan como rendimiento general."
-    },
-    {
-      "id": "uc-ipm-cucurbits",
-      "tipo": "manual_tecnico",
-      "autores": "UC Statewide Integrated Pest Management Program",
-      "año": 2016,
-      "titulo": "Pest Management Guidelines: Cucurbits",
-      "institucion": "University of California Agriculture and Natural Resources",
-      "url": "https://ipm.ucanr.edu/pdf/pmg/pmgcucurbits.pdf",
-      "tier": "A",
-      "observaciones": "Guía MIP para cucurbitáceas que documenta mildeo polvoso, mildeo velloso y pudrición de fruto y corona por Phytophthora, con monitoreo, saneamiento, rotación y manejo del agua."
     }
   ]
 }
