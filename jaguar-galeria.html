@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="es-CO">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Galería del Jaguar — variantes · Chagra</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ctext y='26' font-size='26'%3E%F0%9F%90%86%3C/text%3E%3C/svg%3E">
+<style>
+  :root{
+    --papel:#e9e4d6; --tinta:#241408; --pared:#1d261b; --crema:#f4ead5;
+    --oro:#e0b86c; --verde:#6fae5a; --rojo:#d06a5a; --gris:#8a8a6c;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html,body{min-height:100%}
+  body{
+    font-family:Georgia,'Times New Roman',serif; color:var(--crema);
+    background:radial-gradient(1200px 700px at 50% -10%, #3d4931 0%, var(--pared) 45%, #11140f 100%);
+    min-height:100vh; padding:0 0 40px;
+  }
+  .top{text-align:center;padding:34px 18px 8px;max-width:920px;margin:0 auto}
+  .eyebrow{color:var(--oro);font:700 .72rem/1.2 ui-monospace,monospace;letter-spacing:.28em;text-transform:uppercase}
+  .top h1{font-size:clamp(1.6rem,3.6vw,2.6rem);font-style:italic;letter-spacing:-.01em;margin:8px 0 10px;color:#f6efdc}
+  .lead{color:#cfcbb2;font-size:clamp(.95rem,1.6vw,1.08rem);line-height:1.5}
+  .lead strong{color:var(--oro)}
+  .grid{
+    display:grid;gap:22px;max-width:1320px;margin:26px auto 0;padding:0 20px;
+    grid-template-columns:repeat(auto-fill,minmax(320px,1fr));
+  }
+  .card{
+    background:linear-gradient(160deg,rgba(39,54,35,.92),rgba(12,16,12,.95));
+    border:1px solid rgba(224,184,108,.24);border-radius:20px;overflow:hidden;
+    box-shadow:0 22px 60px rgba(0,0,0,.4),inset 0 1px rgba(255,255,255,.06);
+    display:flex;flex-direction:column;
+  }
+  .card-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;padding:16px 18px 10px}
+  .card-head h2{font-size:1.12rem;color:#f6efdc;font-weight:600;line-height:1.2}
+  .sub{color:#a9b199;font:.74rem/1.35 ui-sans-serif,system-ui,sans-serif;margin-top:4px}
+  .badge{
+    flex:none;font:700 .62rem/1 ui-monospace,monospace;letter-spacing:.06em;
+    padding:6px 9px;border-radius:99px;text-transform:uppercase;white-space:nowrap;
+    border:1px solid transparent;
+  }
+  .badge-ok{background:rgba(111,174,90,.16);color:var(--verde);border-color:rgba(111,174,90,.5)}
+  .badge-bad{background:rgba(208,106,90,.16);color:var(--rojo);border-color:rgba(208,106,90,.5)}
+  .badge-neutral{background:rgba(224,184,108,.12);color:var(--oro);border-color:rgba(224,184,108,.4)}
+  .stage{
+    position:relative;display:grid;place-items:center;min-height:320px;
+    margin:6px 14px;border-radius:14px;background:var(--papel);
+    border:1px solid rgba(36,20,8,.25);overflow:hidden;
+  }
+  .stage svg{max-width:100%;height:auto;display:block}
+  .frame{width:100%;height:320px;border:0;display:block;background:var(--papel)}
+  .controls{display:flex;flex-wrap:wrap;gap:7px;justify-content:center;padding:12px 14px 16px}
+  .controls button{
+    font-family:inherit;font-size:.82rem;font-style:italic;padding:6px 13px;border-radius:99px;cursor:pointer;
+    background:#f2e8cd;color:#241408;border:2px solid #241408;box-shadow:0 3px 0 #241408;
+    transition:transform .12s ease,box-shadow .12s ease;
+  }
+  .controls button:hover{transform:translateY(-2px);box-shadow:0 5px 0 #241408}
+  .controls button.on{background:var(--oro);font-weight:bold}
+  .hint{padding:12px 14px 16px;text-align:center;color:var(--gris);font:.72rem/1.4 ui-sans-serif,system-ui,sans-serif}
+  .foot{text-align:center;margin-top:34px;color:#9ca890;font:.74rem/1.5 ui-monospace,monospace;padding:0 18px}
+  .foot code{color:var(--oro)}
+
+  .card.featured{border-color:rgba(111,174,90,.6);box-shadow:0 26px 70px rgba(0,0,0,.5),0 0 0 1px rgba(111,174,90,.4),inset 0 1px rgba(255,255,255,.06);grid-column:1/-1}
+  .card.featured .stage{min-height:380px}
+  .card.archivar{opacity:.82}
+  .card.archivar .stage{filter:grayscale(.15)}
+  .nota{padding:10px 16px 0;text-align:center;color:#d6e0c6;font:italic .82rem/1.4 Georgia,serif}
+  .card.featured .nota{color:#bfe0ac}
+  @media (max-width:640px){ .grid{grid-template-columns:1fr} .card.featured{grid-column:auto} }
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script type="module" src="/jaguar-galeria.jsx"></script>
+</body>
+</html>
