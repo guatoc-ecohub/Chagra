@@ -1,0 +1,50 @@
+Aquí está el análisis de cada lado y la comparación final:
+
+---
+
+**IMAGEN IZQUIERDA**
+
+*   **Hueco o cuña de color papel entre cabeza y cuello o en la comisura de la boca:**
+    *   Sí, hay una cuña de color papel (blanco-crema, del fondo) en la comisura derecha de la boca del animal (la que está hacia el centro de la imagen). Es un hueco rectangular que rompe el contorno de la boca.
+    *   No hay hueco o cuña de color papel entre la cabeza y el cuello.
+
+*   **Línea o barra blanca en la boca o la mejilla:**
+    *   Sí, en el lado izquierdo del labio inferior del animal (el más cercano al borde de la imagen), hay una línea horizontal blanca y definida, que parece un corte o una barra.
+    *   No hay línea o barra blanca en la mejilla.
+
+*   **Parche, doble barbilla o doble contorno bajo el mentón:**
+    *   No se observa un parche, doble barbilla o doble contorno anómalo bajo el mentón.
+
+*   **Gorro o casquete sobre la coronilla:**
+    *   No se observa un gorro o casquete.
+
+*   **Borde duro que no sea del dibujo:**
+    *   Sí, los bordes de la cuña de color papel en la comisura de la boca y de la línea blanca en el labio inferior son duros y rectos, y no parecen ser parte intencional del dibujo o del sombreado.
+
+---
+
+**IMAGEN DERECHA**
+
+*   **Hueco o cuña de color papel entre cabeza y cuello o en la comisura de la boca:**
+    *   No se observa ningún hueco o cuña de color papel en la comisura de la boca. El contorno es continuo.
+    *   No hay hueco o cuña de color papel entre la cabeza y el cuello.
+
+*   **Línea o barra blanca en la boca o la mejilla:**
+    *   No se observa ninguna línea o barra blanca en la boca ni en la mejilla.
+
+*   **Parche, doble barbilla o doble contorno bajo el mentón:**
+    *   No se observa un parche, doble barbilla o doble contorno anómalo bajo el mentón.
+
+*   **Gorro o casquete sobre la coronilla:**
+    *   No se observa un gorro o casquete.
+
+*   **Borde duro que no sea del dibujo:**
+    *   No se observan bordes duros o anómalos que no sean parte del estilo pixelado o de la estructura del dibujo en sí. Los contornos generales del animal son coherentes.
+
+---
+
+**¿Cuál articula más limpio y por qué?**
+
+La imagen **DERECHA** articula más limpio.
+
+**Razón:** La imagen derecha no presenta los defectos de interrupción del contorno con color de fondo (la cuña en la comisura de la boca) ni la línea blanca abrupta en el labio, que sí están presentes en la imagen izquierda. Aunque la imagen derecha tiene un aspecto más pixelado en general, sus formas y contornos están completos y coherentes con la intención del dibujo, sin los "cortes" o "agujeros" no deseados que se ven en la versión izquierda.
