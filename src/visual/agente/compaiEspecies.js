@@ -41,7 +41,8 @@ const POSES_SUELO = {
   caminando: 'camina',
 };
 
-// Chivito y guacamaya viven posados; «vuela» solo describe el desplazamiento.
+// El chivito vive posado; «vuela» solo describe su desplazamiento. La guacamaya
+// conserva su pose aérea en la conversación y solo aterriza cuando el rig lo pide.
 const POSES_POSADO = {
   ...POSES_AIRE,
   acompana: 'reposo',
@@ -204,7 +205,7 @@ const crearEntrada = (avatarType) => {
   const conducta = PERFILES_CONDUCTA[base.creatureSlug];
   const poses = avatarType === 'oso-baston'
     ? POSES_OSO
-    : avatarType === 'chivito-punk' || avatarType === 'guacamaya' ? POSES_POSADO
+    : avatarType === 'chivito-punk' ? POSES_POSADO
     : base.medio === 'aire' ? POSES_AIRE : POSES_SUELO;
   const anclas = ANCLAS[base.medio];
 

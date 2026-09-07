@@ -40,7 +40,7 @@ describe('useAngelitaStore', () => {
   });
 
   it('entrarMundo husmea con comentario grounded', () => {
-    useAngelitaStore.getState().entrarMundo('mis_animales', { total: 6 });
+    useAngelitaStore.getState().entrarMundo('mis_animales', { total: 6 }, { rand: () => 1 });
     const s = useAngelitaStore.getState();
     expect(s.estado).toBe('husmea');
     expect(s.visualEstado).toBe('senala');

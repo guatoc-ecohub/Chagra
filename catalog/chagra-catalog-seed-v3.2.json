@@ -8,9 +8,9 @@
     "adr_referencia": "ADR-030 Regla 1: Granularidad de inserción + tracking_mode",
     "cambio_principal": "Adición de campo tracking_mode en species con default por categoría según ADR-030",
     "estadisticas": {
-      "total_especies": 72,
+      "total_especies": 74,
       "tracking_individual": 28,
-      "tracking_aggregate": 38,
+      "tracking_aggregate": 40,
       "tracking_null": 6,
       "requeridas_revision_manual": 0
     },
