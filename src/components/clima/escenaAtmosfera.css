@@ -309,7 +309,7 @@
   position: absolute;
   inset: 0;
   border-radius: 50%;
-  background: var(--ca-astro-color);
+  background: radial-gradient(closest-side, var(--ca-astro-color) var(--ca-astro-nucleo, 96%), transparent);
   box-shadow: 0 0 58px 26px var(--ca-astro-glow);
   transition: background-color var(--ca-lento) var(--ca-curva), box-shadow var(--ca-lento) var(--ca-curva);
 }
@@ -389,8 +389,8 @@
   height: 40vh;
   z-index: 4;
   background-color: var(--ca-bruma-color);
-  -webkit-mask-image: linear-gradient(to top, rgba(0, 0, 0, 0.95) 25%, transparent);
-  mask-image: linear-gradient(to top, rgba(0, 0, 0, 0.95) 25%, transparent);
+  -webkit-mask-image: linear-gradient(to top, transparent, rgba(0, 0, 0, 0.95) 14%, rgba(0, 0, 0, 0.95) 34%, transparent);
+  mask-image: linear-gradient(to top, transparent, rgba(0, 0, 0, 0.95) 14%, rgba(0, 0, 0, 0.95) 34%, transparent);
   opacity: var(--ca-bruma-op);
   transition: background-color var(--ca-lento) var(--ca-curva), opacity var(--ca-lento) var(--ca-curva);
 }
@@ -457,30 +457,34 @@
   position: absolute;
   left: 50%;
   height: 24vh;
-  background: radial-gradient(closest-side, rgba(233, 240, 237, 0.9), transparent 72%);
+  background: radial-gradient(closest-side, var(--ca-banco-color, rgba(233, 240, 237, 0.9)), transparent 72%);
   animation: ca-deriva 50s ease-in-out infinite alternate;
+  animation-duration: calc(var(--ca-dur, 50s) * var(--ca-masa-ritmo, 1));
   animation-play-state: paused;
+  transform: translate(-50%, var(--ca-masa-alto, 0));
 }
 .ca-jiron {
   position: absolute;
   left: 50%;
   width: 150vw;
   height: 3.5vh;
-  background: linear-gradient(to right, transparent, rgba(240, 246, 243, 0.75) 30%, rgba(240, 246, 243, 0.5) 60%, transparent);
+  background: linear-gradient(to right, transparent, var(--ca-jiron-color, rgba(240, 246, 243, 0.75)) 30%, var(--ca-jiron-color-2, rgba(240, 246, 243, 0.5)) 60%, transparent);
   animation: ca-contraderiva 38s ease-in-out infinite alternate;
+  animation-duration: calc(var(--ca-dur, 38s) * var(--ca-masa-ritmo, 1));
   animation-play-state: paused;
   opacity: 0.7;
 }
 .ca-root[data-clima='niebla'] .ca-banco,
 .ca-root[data-clima='niebla'] .ca-jiron,
-.ca-root[data-clima='lluvia'] .ca-banco { animation-play-state: running; }
+.ca-root[data-clima='lluvia'] .ca-banco,
+.ca-root[data-clima='lluvia'] .ca-jiron { animation-play-state: running; }
 @keyframes ca-deriva {
-  from { transform: translateX(-58%); }
-  to { transform: translateX(-42%); }
+  from { transform: translate(-58%, var(--ca-masa-alto, 0)); }
+  to { transform: translate(-42%, var(--ca-masa-alto, 0)); }
 }
 @keyframes ca-contraderiva {
-  from { transform: translateX(-42%) scaleY(1); }
-  to { transform: translateX(-58%) scaleY(1.4); }
+  from { transform: translate(-42%, var(--ca-masa-alto, 0)) scaleY(1); }
+  to { transform: translate(-58%, var(--ca-masa-alto, 0)) scaleY(1.4); }
 }
 
 /* ── Polvo dorado en suspensión: pleno en la hora dorada, tenue al sol ── */
@@ -855,7 +859,11 @@
   --ca-bruma-op: 0.7;
   --ca-ladera-op: 0;
 }
-.ca-cielo--nublado { background: linear-gradient(#899ba5, #b7c5ca 55%, #d3dcd7); }
+.ca-cielo--nublado {
+  background:
+    radial-gradient(128% 88% at var(--ca-claro-x, 70%) var(--ca-claro-y, 22%), var(--ca-claro-1, rgba(247, 251, 253, 0.8)), rgba(247, 251, 253, 0)),
+    linear-gradient(var(--ca-nublado-1, #7f929d), var(--ca-nublado-2, #b3c2c7 55%), var(--ca-nublado-3, #d3dcd7));
+}
 .ca-grade--nublado { background: linear-gradient(#81949b22, #adc3ba22); }
 .ca-atmosfera[data-clima='nublado'] .ca-cielo--nublado,
 .ca-atmosfera[data-clima='nublado'] .ca-grade--nublado { opacity: 1; }
@@ -903,3 +911,307 @@
   .clima-atmosfera-contenido .ca-carta { padding: 12px; }
   .ca-atmosfera .ca-frente { height: auto; min-height: 0; aspect-ratio: 800 / 190; }
 }
+
+/* ═══════════════════════════════════════════════════════════════════════
+   EFECTOS VIVOS — ninguna de las 16 combinaciones queda vacía
+   (condición × luz: despejado/nublado/lluvia/niebla × amanecer/día/
+   atardecer/noche). No se dibuja nada nuevo encima: se REASIGNAN las capas
+   que ya existen, con criterio de lo que de verdad se ve en ese cielo.
+
+   Medición previa (`_gate/clima2d-efectos-20260906/antes/barrido.json`):
+   nublado de día, amanecer y atardecer tenían CERO partículas visibles, y
+   el velo superior (65 vh a opacidad 0,92) aplastaba el cielo de las 16
+   —hasta el despejado de mediodía se leía como noche—.
+   ═══════════════════════════════════════════════════════════════════════ */
+
+/* ── 1. El velo se recorta al alto del texto ──────────────────────────
+   El scrim tapaba 65 vh a opacidad 0,92: el cielo de las 16 combinaciones
+   moría bajo él. Pero medido de verdad (con el instrumento corregido, ver
+   el informe) la cabecera SÍ lo necesita: sobre niebla el blanco cae a
+   2,8:1 sin velo. El cielo y el texto se pelean los mismos píxeles en un
+   teléfono, así que el reparto es: velo firme donde vive el texto (los
+   primeros ~34 vh) y cielo libre de ahí para abajo, que es donde se
+   reubican el astro, el techo de nubes y las estrellas (regla 9). */
+.ca-atmosfera .ca-scrim--alto {
+  height: 50vh;
+  opacity: 1;
+  background: linear-gradient(#06121bf0, #06121bbb 62%, transparent);
+}
+.ca-atmosfera .ca-scrim--bajo { opacity: 0.55; }
+
+/* ── 2. Las pestañas se sostienen solas ───────────────────────────────
+   Fallaban con cielo claro porque su fondo es translúcido (bg-slate-900/50):
+   con niebla detrás quedaban en 2,06:1. Se opacan como ya se hizo con las
+   cartas del boletín. */
+.clima-atmosfera-contenido [role='tab'] {
+  background: #0d1a24;
+  border-color: rgba(150, 172, 188, 0.44);
+}
+.clima-atmosfera-contenido [role='tab'][aria-selected='true'] {
+  background: #0a2c42;
+  border-color: rgba(56, 160, 220, 0.8);
+}
+/* el renglón chico de la pestaña activa venía en sky-300/90: se aclara */
+.clima-atmosfera-contenido [role='tab'][aria-selected='true'] span:last-child { color: #d8efff; }
+
+/* ── 3. El multiplicador de humedad de la fase ENSO ───────────────────
+   `data-enso` se escribía en la raíz y NINGUNA regla lo leía: atributo
+   muerto. El Niño en piso frío despeja el cielo (por eso hiela de
+   madrugada); La Niña lo carga. Es un ajuste fino, no una piel nueva. */
+.ca-root.ca-atmosfera .ca-bruma { opacity: calc(var(--ca-bruma-op) * var(--ca-enso-humedad, 1)); }
+.ca-root.ca-atmosfera .ca-capa--niebla { opacity: calc(var(--ca-masa-op, 0) * var(--ca-enso-humedad, 1)); }
+.ca-atmosfera[data-enso='nino'] { --ca-enso-humedad: 0.84; }
+.ca-atmosfera[data-enso='nina'] { --ca-enso-humedad: 1.14; }
+
+/* La opacidad de la masa de aire pasa a token para que el multiplicador de
+   arriba la alcance. Mismos valores que tenían las reglas originales. */
+.ca-atmosfera[data-clima='niebla'] { --ca-masa-op: 1; }
+.ca-atmosfera[data-clima='lluvia'] { --ca-masa-op: 0.3; }
+
+/* ── 4. NUBLADO: el hueco grande ──────────────────────────────────────
+   Un cielo cubierto no es un rectángulo gris: es un techo de nubes con
+   textura que corre, y un parche claro donde está el sol. Los bancos y
+   jirones —el único material de la escena que sabe parecer masa de aire—
+   se re-tintan de gris, suben y se vuelven lentos. El astro pasa de
+   invisible a disco velado: entre la niebla (0,25) y el sol franco (1),
+   que es justo lo que es ópticamente un estrato. */
+.ca-atmosfera[data-clima='nublado'] {
+  --ca-masa-op: 0.72;
+  --ca-masa-alto: 3vh;
+  --ca-masa-ritmo: 1.9;
+  --ca-banco-color: rgba(212, 222, 225, 0.76);
+  --ca-jiron-color: rgba(220, 229, 231, 0.6);
+  --ca-jiron-color-2: rgba(220, 229, 231, 0.34);
+  --ca-astro-op: 0;
+  --ca-astro-color: #e6eef1;
+  --ca-astro-glow: rgba(228, 240, 244, 0.6);
+}
+.ca-atmosfera[data-clima='nublado'] .ca-banco,
+.ca-atmosfera[data-clima='nublado'] .ca-jiron { animation-play-state: running; }
+/* el wash plano de antes (alpha 0x22) no se veía; ahora modela el techo */
+.ca-grade--nublado {
+  background: linear-gradient(rgba(116, 134, 145, 0.3), rgba(156, 176, 172, 0.16) 58%, rgba(196, 210, 200, 0.08));
+}
+
+/* Amanecer y atardecer cubiertos: la PANZA del techo es lo que se enciende
+   —el cielo más vistoso del altiplano no es el despejado, es este—. */
+.ca-atmosfera[data-clima='nublado']:is([data-luz='amanecer'], [data-luz='atardecer']) {
+  --ca-banco-color: rgba(226, 190, 172, 0.58);
+  --ca-jiron-color: rgba(238, 202, 176, 0.44);
+  --ca-jiron-color-2: rgba(226, 178, 150, 0.26);
+  --ca-claro-x: 62%;
+  --ca-claro-y: 46%;
+  --ca-claro-1: rgba(255, 206, 150, 0.82);
+  --ca-nublado-1: #7c7683;
+  --ca-nublado-2: #b89a92 55%;
+  --ca-nublado-3: #dcbb9c;
+}
+.ca-atmosfera[data-clima='nublado']:is([data-luz='amanecer'], [data-luz='atardecer']) .ca-grade--dorada { opacity: 0.6; }
+
+/* Noche cubierta: sin estrellas (el techo las tapa, y así es), la luna como
+   mancha difusa y el techo apenas insinuado contra el cielo oscuro. */
+.ca-atmosfera[data-clima='nublado'][data-luz='noche'] {
+  --ca-masa-op: 0.42;
+  --ca-banco-color: rgba(118, 138, 172, 0.42);
+  --ca-jiron-color: rgba(128, 148, 180, 0.34);
+  --ca-jiron-color-2: rgba(118, 138, 172, 0.2);
+  --ca-astro-op: 0.24;
+  --ca-astro-nucleo: 26%;
+  --ca-astro-s: 1.5;
+  --ca-astro-color: #cdd9ee;
+  --ca-astro-glow: rgba(176, 196, 236, 0.42);
+}
+
+/* ── 5. Crepúsculo despejado: el lucero ───────────────────────────────
+   A la media luz solo se ven los astros brillantes. Las estrellas grandes
+   del arreglo son exactamente las de índice múltiplo de 4 (7 de 26), que
+   `:nth-child(4n+1)` recorta sin tocar el JSX. */
+.ca-atmosfera[data-clima='despejado']:is([data-luz='amanecer'], [data-luz='atardecer']) .ca-capa--estrellas { opacity: 0.62; }
+.ca-atmosfera[data-clima='despejado']:is([data-luz='amanecer'], [data-luz='atardecer']) .ca-estrella {
+  animation-name: none;
+  opacity: 0;
+}
+.ca-atmosfera[data-clima='despejado']:is([data-luz='amanecer'], [data-luz='atardecer']) .ca-estrella:nth-child(4n + 1) {
+  animation-name: ca-titila;
+  animation-play-state: running;
+}
+
+/* ── 6. Rayos donde de verdad se ven ──────────────────────────────────
+   El abanico volumétrico solo es visible si hay partículas que lo revelen:
+   su sitio natural NO es el mediodía despejado sino el sol atravesando la
+   niebla. Bajo cielo cubierto no hay haz, y por eso siguen en cero. */
+.ca-atmosfera[data-clima='niebla'][data-luz='dia'] { --ca-rayos-op: 0.42; }
+.ca-atmosfera[data-clima='niebla']:is([data-luz='amanecer'], [data-luz='atardecer']) { --ca-rayos-op: 0.58; }
+.ca-atmosfera[data-clima='niebla']:not([data-luz='noche']) .ca-rayos-giro { animation-play-state: running; }
+
+/* ── 7. Luciérnagas por humedad y por hora ────────────────────────────
+   No son un adorno de "noche despejada": salen al caer la tarde y su mejor
+   noche es la húmeda y cubierta. El aguacero las apaga casi del todo. */
+.ca-atmosfera[data-clima='despejado'][data-luz='atardecer'] .ca-capa--luci { opacity: 0.5; }
+.ca-atmosfera[data-clima='nublado'][data-luz='atardecer'] .ca-capa--luci { opacity: 0.45; }
+.ca-atmosfera[data-clima='niebla'][data-luz='atardecer'] .ca-capa--luci { opacity: 0.3; }
+.ca-atmosfera[data-clima='niebla'][data-luz='noche'] .ca-capa--luci { opacity: 0.38; }
+.ca-atmosfera[data-clima='lluvia'][data-luz='noche'] .ca-capa--luci { opacity: 0.14; }
+.ca-atmosfera[data-clima='despejado'][data-luz='atardecer'] .ca-luci,
+.ca-atmosfera[data-clima='despejado'][data-luz='atardecer'] .ca-luci i,
+.ca-atmosfera[data-clima='nublado'][data-luz='atardecer'] .ca-luci,
+.ca-atmosfera[data-clima='nublado'][data-luz='atardecer'] .ca-luci i,
+.ca-atmosfera[data-clima='niebla']:is([data-luz='atardecer'], [data-luz='noche']) .ca-luci,
+.ca-atmosfera[data-clima='niebla']:is([data-luz='atardecer'], [data-luz='noche']) .ca-luci i,
+.ca-atmosfera[data-clima='lluvia'][data-luz='noche'] .ca-luci,
+.ca-atmosfera[data-clima='lluvia'][data-luz='noche'] .ca-luci i { animation-play-state: running; }
+
+/* ── 8. Lluvia y niebla dejan de ser iguales a las cuatro horas ───────
+   Antes las cuatro luces daban el MISMO cuadro salvo el grade de noche.
+   El aguacero de las cinco tiene luz cálida por debajo; la niebla del
+   amanecer es la postal del páramo; la de la noche es azul y cerrada. */
+.ca-atmosfera[data-clima='lluvia']:is([data-luz='amanecer'], [data-luz='atardecer']) .ca-grade--dorada { opacity: 0.3; }
+.ca-atmosfera[data-clima='lluvia']:is([data-luz='amanecer'], [data-luz='atardecer']) {
+  --ca-banco-color: rgba(226, 206, 196, 0.78);
+  --ca-astro-op: 0.2;
+  --ca-astro-color: #f0b98a;
+}
+.ca-atmosfera[data-clima='niebla']:is([data-luz='amanecer'], [data-luz='atardecer']) .ca-grade--dorada { opacity: 0.34; }
+.ca-atmosfera[data-clima='niebla']:is([data-luz='amanecer'], [data-luz='atardecer']) {
+  --ca-banco-color: rgba(246, 226, 206, 0.86);
+  --ca-jiron-color: rgba(250, 232, 210, 0.7);
+  --ca-astro-color: #ffd9a0;
+}
+.ca-atmosfera[data-clima='niebla'][data-luz='noche'] {
+  --ca-banco-color: rgba(148, 168, 192, 0.6);
+  --ca-jiron-color: rgba(158, 178, 200, 0.48);
+  --ca-jiron-color-2: rgba(148, 168, 192, 0.3);
+  --ca-masa-op: 0.85;
+}
+.ca-atmosfera[data-clima='lluvia'][data-luz='noche'] {
+  --ca-banco-color: rgba(150, 168, 186, 0.7);
+}
+
+/* ── 9. Bajar el cielo a la franja donde se ve ────────────────────────
+   Los efectos de altura (astro, estrellas) nacían en 2–12 vh, justo debajo
+   del velo de la cabecera: encendidos pero invisibles. Bajarlos es un
+   token, no una capa nueva, y sigue siendo cielo honesto — un sol de media
+   mañana sobre una cordillera que arranca en 40 vh. */
+.ca-atmosfera[data-clima='despejado'][data-luz='dia'] { --ca-astro-y: 27vh; }
+.ca-atmosfera[data-clima='despejado'][data-luz='noche'] { --ca-astro-y: 24vh; }
+.ca-atmosfera[data-clima='niebla']:not([data-luz='noche']) { --ca-astro-y: 30vh; }
+.ca-atmosfera .ca-capa--estrellas { transform: translateY(17vh); }
+
+/* ── 10. El velo, por piel ────────────────────────────────────────────
+   Un cielo de niebla es casi blanco y otro de noche casi negro: pedirle el
+   MISMO velo a los dos es lo que dejaba la noche estrellada tan tapada como
+   el mediodía. El velo se gradúa por piel, con el suelo de 4,5:1 medido. */
+.ca-atmosfera .ca-scrim--alto {
+  height: 48vh;
+  opacity: var(--ca-velo-alto, 1);
+  background: linear-gradient(#06121be6, #06121bad 60%, transparent);
+}
+.ca-atmosfera[data-clima='niebla'] { --ca-velo-alto: 0.96; }
+.ca-atmosfera[data-clima='despejado'] { --ca-velo-alto: 0.82; }
+.ca-atmosfera[data-clima='nublado'] { --ca-velo-alto: 0.76; }
+.ca-atmosfera[data-clima='lluvia'] { --ca-velo-alto: 0.78; }
+.ca-atmosfera[data-luz='noche'] { --ca-velo-alto: 0.6; }
+.ca-atmosfera[data-clima='niebla'][data-luz='noche'] { --ca-velo-alto: 0.76; }
+
+/* El sol velado por la lluvia y el disco lechoso de la niebla ya existían
+   como opacidad; les faltaba perder el borde duro del disco. */
+.ca-atmosfera[data-clima='lluvia'] { --ca-astro-nucleo: 10%; }
+.ca-atmosfera[data-clima='niebla'] { --ca-astro-nucleo: 26%; }
+
+/* ── 11. La cifra grande trae su propia superficie ────────────────────
+   Es el único bloque del boletín que flota sin carta: por sostenerlo había
+   que oscurecer TODO el cielo. Con un respaldo local y suave —el mismo
+   recurso que ya usan las cartas y las pestañas— el velo general puede
+   ceder y el cielo se ve. El texto sigue encima de la escena, no la escena
+   encima del texto. */
+.clima-atmosfera-contenido .clima-ahora { position: relative; }
+.clima-atmosfera-contenido .clima-ahora::before {
+  content: '';
+  position: absolute;
+  inset: -12px -16px -8px;
+  z-index: -1;
+  border-radius: 24px;
+  background: radial-gradient(126% 122% at 45% 46%, rgba(6, 18, 27, 0.82), rgba(6, 18, 27, 0.6) 52%, rgba(6, 18, 27, 0.26) 80%, transparent);
+}
+
+/* ── 12. El jirón que cruza por delante de la interfaz ────────────────
+   Es la firma del original y se queda: la niebla de verdad pasa por
+   delante de todo. Pero medido, su núcleo casi blanco a 0,55 tumbaba el
+   texto que cruza (pestañas y línea de fuente) a 3,9–4,4:1 con niebla.
+   Se conserva el gesto y se le baja el cuerpo, con una máscara que le
+   quita el borde duro de arriba y abajo. */
+.ca-atmosfera[data-clima='niebla'] .ca-jiron-ui {
+  opacity: 0.34;
+  -webkit-mask-image: linear-gradient(transparent, #000 42%, #000 58%, transparent);
+  mask-image: linear-gradient(transparent, #000 42%, #000 58%, transparent);
+}
+
+/* ── 13. El primer plano estaba DEBAJO del pliegue ────────────────────
+   Medido: `.ca-frente` (suelo, pasto y los cuatro frailejones) caía en
+   y 828–921 con una ventana de 844. La escena pide `100dvh` pero vive
+   dentro del área que scrollea, que es más corta que la ventana por el
+   alto de la cabecera de la app (77 px medidos). Resultado: el primer
+   plano del páramo —lo más característico de la escena— no se veía NUNCA
+   en ninguna de las 16 combinaciones.
+   ⚠️ El descuento va en token porque es el alto de un chrome ajeno a esta
+   pantalla: si esa cabecera cambia, se ajusta acá y en un solo sitio. */
+.ca-atmosfera { --ca-tope-app: 77px; }
+.ca-atmosfera .ca-escena { height: calc(100dvh - var(--ca-tope-app)); }
+
+/* ── 14. El amanecer dejó de ser el atardecer al revés ────────────────
+   Las dos horas doradas compartían piel Y posición del astro: dos cuadros
+   idénticos. El sol sale por el oriente y se pone por el occidente; es un
+   token, y de paso la escena deja de mentir. */
+.ca-atmosfera[data-luz='amanecer'] {
+  --ca-astro-x: 22vw;
+  --ca-claro-x: 26%;
+}
+.ca-atmosfera[data-clima='despejado'][data-luz='amanecer'] { --ca-astro-x: 20vw; }
+/* la ladera se ilumina por el lado del que venga la luz */
+.ca-atmosfera[data-luz='amanecer'] .ca-ladera-luz {
+  background: linear-gradient(to right, rgba(255, 236, 190, 0.4), transparent 58%);
+}
+
+/* ── 15. Rayos que de verdad se vean en la niebla ─────────────────────
+   Los encendí con `--ca-rayo: #f4f7f4`, que es el MISMO blanco de la
+   niebla: haz blanco sobre fondo blanco = nada. Un haz solo se ve si trae
+   más temperatura que el aire que atraviesa. */
+.ca-atmosfera[data-clima='niebla']:is([data-luz='amanecer'], [data-luz='atardecer']) {
+  --ca-rayo: #ffdca6;
+  --ca-rayos-op: 1;
+}
+.ca-atmosfera[data-clima='niebla'][data-luz='dia'] {
+  --ca-rayo: #fff8e0;
+  --ca-rayos-op: 0.85;
+}
+
+/* ── 16. El haz va POR ENCIMA del aire que lo revela ──────────────────
+   Encendí los rayos en la niebla y seguían sin verse: `.ca-rayos` está en
+   z 2, debajo de la bruma (z 4) y de la masa de aire (z 6), las dos casi
+   opacas con niebla. Un haz volumétrico ES la luz dispersada por esas
+   partículas: va delante de ellas, no detrás. */
+.ca-atmosfera[data-clima='niebla'] .ca-rayos { z-index: 7; }
+
+/* ── 17. El techo de nubes, menos a rayas ─────────────────────────────
+   Nueve bancos anchos a la misma altura leen como bandas horizontales
+   duras. Bajar el cuerpo y dejar que se solapen da grano de estrato en
+   vez de rayas. Queda banding suave: es el defecto que más se le nota. */
+.ca-atmosfera[data-clima='nublado'] {
+  --ca-masa-op: 0.58;
+  --ca-banco-color: rgba(214, 224, 227, 0.62);
+  --ca-jiron-color: rgba(222, 231, 233, 0.44);
+  --ca-jiron-color-2: rgba(222, 231, 233, 0.22);
+}
+.ca-atmosfera[data-clima='nublado']:is([data-luz='amanecer'], [data-luz='atardecer']) {
+  --ca-banco-color: rgba(230, 196, 176, 0.5);
+  --ca-jiron-color: rgba(242, 208, 182, 0.36);
+  --ca-jiron-color-2: rgba(230, 184, 156, 0.2);
+}
+
+/* ── 18. La cordillera terminaba en un corte recto ────────────────────
+   `.ca-cordillera` acaba en `bottom: 12vh`, justo donde empieza el primer
+   plano, cuyo SVG es transparente en su parte alta: el borde inferior del
+   SVG de montañas quedaba a la vista como una raya recta de lado a lado.
+   Antes no se notaba porque el primer plano estaba fuera de pantalla y el
+   velo lo tapaba todo. Se baja para que el corte quede DETRÁS del suelo. */
+.ca-atmosfera .ca-cordillera { bottom: 5vh; }

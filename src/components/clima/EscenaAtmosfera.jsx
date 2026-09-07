@@ -9,17 +9,20 @@ const GOTAS = Array.from({ length: 30 }, (_, i) => ({
   op: 0.35 + ((i * 7) % 5) / 12,
 }));
 
-const BANCOS = Array.from({ length: 6 }, (_, i) => ({
-  top: 22 + ((i * 23) % 55),
-  w: 70 + ((i * 31) % 60),
-  dur: 46 + ((i * 17) % 30),
+// Bancos y jirones son el ÚNICO material de la escena que sabe parecer masa de
+// aire en movimiento: sirven de niebla al ras y, re-tintados y más lentos, de
+// techo de nubes. Por eso se amplían aquí (6→9 y 4→7) en vez de inventar capas.
+const BANCOS = Array.from({ length: 9 }, (_, i) => ({
+  top: 12 + ((i * 23) % 68),
+  w: 62 + ((i * 31) % 74),
+  dur: 44 + ((i * 17) % 38),
   delay: -((i * 19) % 40),
-  op: 0.5 + ((i * 11) % 4) / 10,
+  op: 0.42 + ((i * 11) % 5) / 10,
 }));
 
-const JIRONES = Array.from({ length: 4 }, (_, i) => ({
-  top: 30 + ((i * 29) % 50),
-  dur: 34 + ((i * 13) % 22),
+const JIRONES = Array.from({ length: 7 }, (_, i) => ({
+  top: 16 + ((i * 29) % 62),
+  dur: 30 + ((i * 13) % 28),
   delay: -((i * 23) % 30),
 }));
 
@@ -90,7 +93,7 @@ export default function EscenaAtmosfera({ condicion = null, luz = null, enso = n
           <div key={id} className={`ca-cielo ca-cielo--${id}`} />
         ))}
 
-        {/* Estrellas (solo noche) */}
+        {/* Estrellas: noche despejada llena; en el crepúsculo solo las brillantes */}
         <div className="ca-capa ca-capa--estrellas">
           {ESTRELLAS.map((s, i) => (
             <span
@@ -195,8 +198,8 @@ export default function EscenaAtmosfera({ condicion = null, luz = null, enso = n
           ))}
         </div>
 
-        {/* Niebla volumétrica: bancos anchos que derivan + jirones finos en
-            contra — la textura deshilachada real (catálogo #4). */}
+        {/* Masa de aire: bancos anchos que derivan + jirones finos en contra.
+            Al ras es niebla; alto, gris y lento es el techo del cielo nublado. */}
         <div className="ca-capa ca-capa--niebla">
           {BANCOS.map((b, i) => (
             <span
@@ -206,7 +209,7 @@ export default function EscenaAtmosfera({ condicion = null, luz = null, enso = n
                 top: `${b.top}%`,
                 width: `${b.w}vw`,
                 opacity: b.op,
-                animationDuration: `${b.dur}s`,
+                '--ca-dur': `${b.dur}s`,
                 animationDelay: `${b.delay}s`,
               }}
             />
@@ -217,7 +220,7 @@ export default function EscenaAtmosfera({ condicion = null, luz = null, enso = n
               className="ca-jiron"
               style={{
                 top: `${j.top}%`,
-                animationDuration: `${j.dur}s`,
+                '--ca-dur': `${j.dur}s`,
                 animationDelay: `${j.delay}s`,
               }}
             />
@@ -241,7 +244,7 @@ export default function EscenaAtmosfera({ condicion = null, luz = null, enso = n
           ))}
         </div>
 
-        {/* Luciérnagas nocturnas: derivan y parpadean (catálogo #14) */}
+        {/* Luciérnagas: salen con la humedad y al caer la tarde, no solo de noche */}
         <div className="ca-capa ca-capa--luci">
           {LUCIERNAGAS.map((l, i) => (
             <span

@@ -1,0 +1,33 @@
+{
+  "tag": "nublado-dia",
+  "url": "http://localhost:5391/?clima=nublado&luz=dia#/clima-boletin",
+  "vista": true,
+  "fps": [
+    46.6,
+    48.5
+  ],
+  "fpsMediana": 47.55,
+  "estado": {
+    "clima": "nublado",
+    "luz": "dia",
+    "bancos": 9,
+    "jirones": 7,
+    "capaNiebla": "0.58",
+    "capaLluvia": "0",
+    "capaLuci": "0",
+    "capaEstrellas": "0",
+    "capaPolvo": "0",
+    "rayos": "0",
+    "corriendo": 38,
+    "dpr": 3.5,
+    "w": 411,
+    "h": 794,
+    "ua": "Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome",
+    "reducido": false,
+    "animaciones": 135
+  },
+  "pageErrors": [],
+  "interceptadas": 20,
+  "screencap": "/tmp/astra-clima-2d-20260906/_gate/clima2d-efectos-20260906/pixel/nublado-dia-pixel.png",
+  "fecha": "2026-09-06T22:56:21"
+}
