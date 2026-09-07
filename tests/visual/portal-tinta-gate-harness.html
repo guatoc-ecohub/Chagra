@@ -1,0 +1,26 @@
+<!doctype html>
+<!--
+  portal-tinta-gate-harness.html — GATE VISUAL del PR #3140 (migración 097):
+  el portal 2D→3D (CompaiTransicion → AbejaTransicion → Cuerpo) cruza con la
+  TINTA Trazado para zarigüeya, luciérnaga y chivito-punk, y el oso-baston
+  conserva su lámina (control, piel DISTINTA).
+
+  Cada celda monta el cuerpo EXACTO del registro (resolverCompai(tipo)
+  .PortalComponent), es decir lo mismo que monta el handoff 2D→3D. Query
+  `?tipo=<slug>` aísla UN compai (capturas por compai para Telegram); sin
+  query monta la grilla de los cuatro (vista general).
+
+  Temporal — no participa de ningún test de regresión con snapshots.
+-->
+<html lang="es-CO">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" href="data:," />
+    <title>Portal 2D→3D — tinta Trazado (PR #3140)</title>
+  </head>
+  <body style="margin:0;background:#0b1017">
+    <div id="portal-root"></div>
+    <script type="module" src="./portal-tinta-gate-harness.jsx"></script>
+  </body>
+</html>
