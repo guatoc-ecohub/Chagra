@@ -1,0 +1,303 @@
+{
+ "tag": "auth2-home",
+ "url": "https://chagra-dev.guatoc.co/",
+ "user": "admin                                                                                                       ",
+ "authTarget": "tile-registrar-unificado",
+ "stages": {
+  "navLogin": 0,
+  "loginForm": 6971,
+  "submitClick": 7026,
+  "onbDetected": 37454,
+  "onbSkipped": 37454,
+  "dashSeen": 86060,
+  "dashSettled": 92060
+ },
+ "dashboard": {
+  "title": "Chagra",
+  "url": "https://chagra-dev.guatoc.co/",
+  "hash": "",
+  "buildSha": "24748c25",
+  "bodyText": "PASO 1 DE 6\n\nSaltar todo\nCuéntenos de usted\n\nDos toques y arrancamos. Todo se puede saltar.\n\n¿CÓMO SE LLAMA?\n\n¿QUÉ HACE EN EL CAMPO?\n\n🌱\nCultivo comida\nSiembro y cosecho\n🐄\nTengo animales\nGallinas, cerdos o ganado\n🌳\nRestauro la tierra\nNativas, bosque, páramo\n🏙️\nCultivo urbano\nBalcón, terraza o patio\n🔬\nAcompaño técnicamente\nAgrónomo/a o asesor/a\n\nELIJA SU COMPAI\n\nAvatar del agente\n\nElige cómo se ve la IA en la app. Cambio inmediato.\n\nAngelita, la abeja\n\nLa vecina que sabe de finca (recomendado)\n\nZarigüeya\n\nLa que carga a sus crías al lomo\n\nJaguar\n\nEl guardián de monte\n\nOso de anteojos\n\nEl caminante de los Andes\n\nLuciérnaga\n\nLa que lee la noche\n\nChivito de páramo\n\nEl que vela por el agua qu",
+  "hasTile": false,
+  "hasClima": false
+ },
+ "phases": [
+  {
+   "name": "login",
+   "start": 3605.1999999284744,
+   "end": 3717,
+   "fcp": -189,
+   "lcp": 3447,
+   "lcpSize": 8352,
+   "longTasks": 0,
+   "longTasksList": [],
+   "blockingMs": 0,
+   "shifts": 0
+  },
+  {
+   "name": "dashboard",
+   "start": 37453.09999990463,
+   "end": 54698,
+   "fcp": -34037,
+   "lcp": null,
+   "lcpSize": null,
+   "longTasks": 21,
+   "longTasksList": [
+    {
+     "t": 34706,
+     "d": 64,
+     "blocking": 14
+    },
+    {
+     "t": 43262,
+     "d": 221,
+     "blocking": 171
+    },
+    {
+     "t": 43651,
+     "d": 180,
+     "blocking": 130
+    },
+    {
+     "t": 43912,
+     "d": 3909,
+     "blocking": 3859
+    },
+    {
+     "t": 47827,
+     "d": 360,
+     "blocking": 310
+    },
+    {
+     "t": 48259,
+     "d": 675,
+     "blocking": 625
+    },
+    {
+     "t": 48935,
+     "d": 3273,
+     "blocking": 3223
+    },
+    {
+     "t": 52271,
+     "d": 167,
+     "blocking": 117
+    },
+    {
+     "t": 52439,
+     "d": 141,
+     "blocking": 91
+    },
+    {
+     "t": 52591,
+     "d": 138,
+     "blocking": 88
+    },
+    {
+     "t": 52738,
+     "d": 135,
+     "blocking": 85
+    },
+    {
+     "t": 52875,
+     "d": 134,
+     "blocking": 84
+    },
+    {
+     "t": 53014,
+     "d": 132,
+     "blocking": 82
+    },
+    {
+     "t": 53146,
+     "d": 118,
+     "blocking": 68
+    },
+    {
+     "t": 53265,
+     "d": 443,
+     "blocking": 393
+    },
+    {
+     "t": 53711,
+     "d": 129,
+     "blocking": 79
+    },
+    {
+     "t": 53848,
+     "d": 139,
+     "blocking": 89
+    },
+    {
+     "t": 53989,
+     "d": 132,
+     "blocking": 82
+    },
+    {
+     "t": 54125,
+     "d": 141,
+     "blocking": 91
+    },
+    {
+     "t": 54276,
+     "d": 137,
+     "blocking": 87
+    }
+   ],
+   "blockingMs": 9856,
+   "shifts": 0
+  }
+ ],
+ "transition": null,
+ "shotPath": "_gate/perf-auth2-home.png",
+ "requestsTotal": 498,
+ "requestsPostSubmit": 317,
+ "statusCountsPostSubmit": {
+  "200": 317
+ },
+ "topPostSubmitByUrl": [
+  [
+   "catalog.sqlite",
+   2
+  ],
+  [
+   "oauth/token",
+   1
+  ],
+  [
+   "assets/IosInstallBanner--3fic1cP.js",
+   1
+  ],
+  [
+   "assets/usePwaInstall-CT3JaqOH.js",
+   1
+  ],
+  [
+   "assets/OnboardingCondensado-JAGgRzgI.js",
+   1
+  ],
+  [
+   "assets/AvatarSelector-D5EzCoew.js",
+   1
+  ],
+  [
+   "assets/useGeolocation-D7B-fA1K.js",
+   1
+  ],
+  [
+   "assets/usePerfilFincaStore-DVFi7PA-.js",
+   1
+  ],
+  [
+   "assets/AgentFab-Dk_rtUDp.js",
+   1
+  ],
+  [
+   "assets/agroecologia-DVYNAAOK.js",
+   1
+  ],
+  [
+   "assets/useAngelitaStore-DYH8ULSU.js",
+   1
+  ],
+  [
+   "assets/angelitaVariedad-Ti7_3hlD.js",
+   1
+  ],
+  [
+   "assets/proactiveGreeting-Bl_TTJvu.js",
+   1
+  ],
+  [
+   "assets/angelitaAvisoTipos-XHBkd0pV.js",
+   1
+  ],
+  [
+   "assets/useInventarioCompai-CGXCkefn.js",
+   1
+  ],
+  [
+   "assets/useComportamientoCompai-DTQiLxrC.js",
+   1
+  ],
+  [
+   "assets/useComportamientoCompai-CbEDNuZT.css",
+   1
+  ],
+  [
+   "assets/speciesResolver-D79NSVY8.js",
+   1
+  ],
+  [
+   "assets/AgentFab-CN6FehxG.css",
+   1
+  ],
+  [
+   "assets/EscuchaOverlay-2picfa_y.js",
+   1
+  ],
+  [
+   "assets/ManoChagraGlyph-CgTAs4wX.js",
+   1
+  ],
+  [
+   "assets/voiceService-CLPDPE83.js",
+   1
+  ],
+  [
+   "assets/EscuchaOverlay-BQR93N8n.css",
+   1
+  ],
+  [
+   "assets/AndroidInstallBanner-Btakrxnj.js",
+   1
+  ],
+  [
+   "api/ollama/api/generate",
+   1
+  ],
+  [
+   "assets/CompaiFotosOverlay-DTGIaOLa.js",
+   1
+  ],
+  [
+   "api/file/file",
+   1
+  ],
+  [
+   "cycle-content/manifest.json",
+   1
+  ],
+  [
+   "assets/sqlite3-BVKGSWc-.wasm",
+   1
+  ],
+  [
+   "version.json",
+   1
+  ]
+ ],
+ "consoleMsgs": [
+  "[warning] [API] Token no disponible. Continuando en modo offline.",
+  "[warning] [LogStore] Fallo en pull de log--seeding: Token no disponible.",
+  "[warning] [API] Token no disponible. Continuando en modo offline.",
+  "[warning] [LogStore] Fallo en pull de log--planting: Token no disponible.",
+  "[warning] [API] Token no disponible. Continuando en modo offline.",
+  "[warning] [LogStore] Fallo en pull de log--harvest: Token no disponible.",
+  "[warning] [API] Token no disponible. Continuando en modo offline.",
+  "[warning] [LogStore] Fallo en pull de log--input: Token no disponible.",
+  "[warning] [API] Token no disponible. Continuando en modo offline.",
+  "[warning] [LogStore] Fallo en pull de log--task: Token no disponible.",
+  "[warning] [API] Token no disponible. Continuando en modo offline.",
+  "[warning] [LogStore] Fallo en pull de log--observation: Token no disponible.",
+  "[warning] [Auth] Intentando login password grant (DEPRECATED) para: admin                                                                                                       ",
+  "[warning] [operatorIdentity] Generated NEW account_uuid_master. Backup recommended.",
+  "[warning] The resource https://chagra-dev.guatoc.co/fonts/nunito-latin.woff2 was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropria",
+  "[warning] The resource https://chagra-dev.guatoc.co/fonts/nunito-latin.woff2 was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropria",
+  "[warning] The resource https://chagra-dev.guatoc.co/fonts/nunito-latin.woff2 was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropria",
+  "[warning] The resource https://chagra-dev.guatoc.co/fonts/nunito-latin.woff2 was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropria",
+  "[warning] The resource https://chagra-dev.guatoc.co/fonts/nunito-latin.woff2 was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropria"
+ ],
+ "jsErrors": [],
+ "badHttp": []
+}

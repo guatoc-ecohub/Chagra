@@ -1,0 +1,320 @@
+{
+ "tag": "auth7",
+ "url": "https://chagra-dev.guatoc.co/",
+ "user": "admin                                                                                                       ",
+ "stages": {
+  "start": 1,
+  "loginForm": 8003,
+  "submit": 8262,
+  "firstDest": 62091,
+  "afterSkip": 72165,
+  "dashAt": 106725,
+  "settle": 114726,
+  "transDone": 119467
+ },
+ "dest": {
+  "onb": true,
+  "tile": false,
+  "head": "PASO 1 DE 6  Saltar todo Cuéntenos de usted  Dos toques y arrancamos. Todo se pu"
+ },
+ "transition": {
+  "msToMarker": 4741,
+  "reached": true,
+  "regVoz": true,
+  "regManual": false,
+  "regDone": false,
+  "head": "Registrar hablando  Cuéntame qué hiciste o qué viste y lo guardo.  🎤  Hable nat"
+ },
+ "events": [
+  {
+   "k": "lt",
+   "t": 2129,
+   "d": 159
+  },
+  {
+   "k": "paint:first-paint",
+   "t": 2396,
+   "s": 0
+  },
+  {
+   "k": "paint:first-contentful-paint",
+   "t": 2396,
+   "s": 0
+  },
+  {
+   "k": "lcp",
+   "t": 2396,
+   "s": 2557
+  },
+  {
+   "k": "lt",
+   "t": 2478,
+   "d": 868
+  },
+  {
+   "k": "lcp",
+   "t": 5552,
+   "s": 4200
+  },
+  {
+   "k": "lcp",
+   "t": 9568,
+   "s": 10810
+  },
+  {
+   "k": "lt",
+   "t": 14752,
+   "d": 50
+  },
+  {
+   "k": "lt",
+   "t": 26300,
+   "d": 152
+  },
+  {
+   "k": "lt",
+   "t": 31944,
+   "d": 205
+  },
+  {
+   "k": "lt",
+   "t": 32205,
+   "d": 163
+  },
+  {
+   "k": "lt",
+   "t": 32464,
+   "d": 1929
+  },
+  {
+   "k": "lt",
+   "t": 34397,
+   "d": 152
+  },
+  {
+   "k": "lt",
+   "t": 34577,
+   "d": 316
+  },
+  {
+   "k": "lt",
+   "t": 34895,
+   "d": 1658
+  },
+  {
+   "k": "lt",
+   "t": 36560,
+   "d": 325
+  },
+  {
+   "k": "lt",
+   "t": 36886,
+   "d": 1261
+  },
+  {
+   "k": "lt",
+   "t": 38211,
+   "d": 76
+  },
+  {
+   "k": "lt",
+   "t": 38302,
+   "d": 1624
+  },
+  {
+   "k": "lt",
+   "t": 39940,
+   "d": 149
+  },
+  {
+   "k": "lt",
+   "t": 40103,
+   "d": 165
+  },
+  {
+   "k": "lcp",
+   "t": 40028,
+   "s": 32487
+  },
+  {
+   "k": "lt",
+   "t": 40269,
+   "d": 131
+  },
+  {
+   "k": "lt",
+   "t": 40400,
+   "d": 266
+  },
+  {
+   "k": "lt",
+   "t": 40667,
+   "d": 1556
+  },
+  {
+   "k": "lt",
+   "t": 42306,
+   "d": 1254
+  },
+  {
+   "k": "lt",
+   "t": 43589,
+   "d": 139
+  }
+ ],
+ "shotPath": "_gate/perf-auth7.png",
+ "requestsTotal": 1208,
+ "consoleMsgs": [
+  {
+   "t": 918,
+   "type": "warning",
+   "text": "The PerformanceObserver does not support buffered flag with the entryTypes argument."
+  },
+  {
+   "t": 5102,
+   "type": "warning",
+   "text": "[API] Token no disponible. Continuando en modo offline."
+  },
+  {
+   "t": 5102,
+   "type": "warning",
+   "text": "[LogStore] Fallo en pull de log--seeding: Token no disponible."
+  },
+  {
+   "t": 5104,
+   "type": "warning",
+   "text": "[API] Token no disponible. Continuando en modo offline."
+  },
+  {
+   "t": 5104,
+   "type": "warning",
+   "text": "[LogStore] Fallo en pull de log--planting: Token no disponible."
+  },
+  {
+   "t": 5105,
+   "type": "warning",
+   "text": "[API] Token no disponible. Continuando en modo offline."
+  },
+  {
+   "t": 5105,
+   "type": "warning",
+   "text": "[LogStore] Fallo en pull de log--harvest: Token no disponible."
+  },
+  {
+   "t": 5105,
+   "type": "warning",
+   "text": "[API] Token no disponible. Continuando en modo offline."
+  },
+  {
+   "t": 5105,
+   "type": "warning",
+   "text": "[LogStore] Fallo en pull de log--input: Token no disponible."
+  },
+  {
+   "t": 5105,
+   "type": "warning",
+   "text": "[API] Token no disponible. Continuando en modo offline."
+  },
+  {
+   "t": 5105,
+   "type": "warning",
+   "text": "[LogStore] Fallo en pull de log--task: Token no disponible."
+  },
+  {
+   "t": 5105,
+   "type": "warning",
+   "text": "[API] Token no disponible. Continuando en modo offline."
+  },
+  {
+   "t": 5106,
+   "type": "warning",
+   "text": "[LogStore] Fallo en pull de log--observation: Token no disponible."
+  },
+  {
+   "t": 8229,
+   "type": "warning",
+   "text": "[Auth] Intentando login password grant (DEPRECATED) para: admin                                                                             "
+  },
+  {
+   "t": 8856,
+   "type": "warning",
+   "text": "[operatorIdentity] Generated NEW account_uuid_master. Backup recommended."
+  },
+  {
+   "t": 14183,
+   "type": "warning",
+   "text": "The resource https://chagra-dev.guatoc.co/fonts/nunito-latin.woff2 was preloaded using link preload but not used within a few seconds from t"
+  },
+  {
+   "t": 28298,
+   "type": "warning",
+   "text": "The resource https://chagra-dev.guatoc.co/fonts/nunito-latin.woff2 was preloaded using link preload but not used within a few seconds from t"
+  },
+  {
+   "t": 62110,
+   "type": "warning",
+   "text": "The resource https://chagra-dev.guatoc.co/fonts/nunito-latin.woff2 was preloaded using link preload but not used within a few seconds from t"
+  },
+  {
+   "t": 74305,
+   "type": "warning",
+   "text": "[RAG] Failed to load magnolia_yarumalensis: TypeError: Failed to fetch\n    at q (https://chagra-dev.guatoc.co/assets/ragRetriever-XAN0toMG.j"
+  },
+  {
+   "t": 74305,
+   "type": "warning",
+   "text": "[RAG] Failed to load masdevallia_coccinea: TypeError: Failed to fetch\n    at q (https://chagra-dev.guatoc.co/assets/ragRetriever-XAN0toMG.js"
+  },
+  {
+   "t": 74305,
+   "type": "warning",
+   "text": "[RAG] Failed to load manihot_esculenta: TypeError: Failed to fetch\n    at q (https://chagra-dev.guatoc.co/assets/ragRetriever-XAN0toMG.js:2:"
+  },
+  {
+   "t": 74306,
+   "type": "warning",
+   "text": "[RAG] Failed to load malus_domestica_sabanera: TypeError: Failed to fetch\n    at q (https://chagra-dev.guatoc.co/assets/ragRetriever-XAN0toM"
+  },
+  {
+   "t": 74306,
+   "type": "warning",
+   "text": "[RAG] Failed to load magnolia_caricifragrans: TypeError: Failed to fetch\n    at q (https://chagra-dev.guatoc.co/assets/ragRetriever-XAN0toMG"
+  },
+  {
+   "t": 74306,
+   "type": "warning",
+   "text": "[RAG] Failed to load manilkara_zapota: TypeError: Failed to fetch\n    at q (https://chagra-dev.guatoc.co/assets/ragRetriever-XAN0toMG.js:2:1"
+  },
+  {
+   "t": 74306,
+   "type": "warning",
+   "text": "[RAG] Failed to load lupinus_carrikeri: TypeError: Failed to fetch\n    at q (https://chagra-dev.guatoc.co/assets/ragRetriever-XAN0toMG.js:2:"
+  },
+  {
+   "t": 74307,
+   "type": "warning",
+   "text": "[RAG] Failed to load lupinus_mutabilis: TypeError: Failed to fetch\n    at q (https://chagra-dev.guatoc.co/assets/ragRetriever-XAN0toMG.js:2:"
+  },
+  {
+   "t": 74307,
+   "type": "warning",
+   "text": "[RAG] Failed to load mangifera_indica: TypeError: Failed to fetch\n    at q (https://chagra-dev.guatoc.co/assets/ragRetriever-XAN0toMG.js:2:1"
+  },
+  {
+   "t": 74308,
+   "type": "warning",
+   "text": "[RAG] Failed to load manihot_glaziovii: TypeError: Failed to fetch\n    at q (https://chagra-dev.guatoc.co/assets/ragRetriever-XAN0toMG.js:2:"
+  },
+  {
+   "t": 74308,
+   "type": "warning",
+   "text": "[RAG] Failed to load mammea_americana: TypeError: Failed to fetch\n    at q (https://chagra-dev.guatoc.co/assets/ragRetriever-XAN0toMG.js:2:1"
+  },
+  {
+   "t": 74308,
+   "type": "warning",
+   "text": "[RAG] Failed to load macleania_rupestris: TypeError: Failed to fetch\n    at q (https://chagra-dev.guatoc.co/assets/ragRetriever-XAN0toMG.js:"
+  }
+ ],
+ "jsErrors": []
+}

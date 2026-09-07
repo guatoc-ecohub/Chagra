@@ -1,0 +1,508 @@
+{
+ "tag": "auth5",
+ "url": "https://chagra-dev.guatoc.co/",
+ "user": "admin                                                                                                       ",
+ "stages": {
+  "start": 0,
+  "loginForm": 7579,
+  "submit": 7761,
+  "firstDest": 51080,
+  "firstDestWaitEnd": 51080,
+  "afterSkip": 63615,
+  "lsDump": 65584,
+  "reloadStart": 65625,
+  "dashFirst": 112970,
+  "settled": 121971
+ },
+ "lsDump": {
+  "chagra:active_tenant_id": "admin",
+  "chagra:profile:skipped:v1:admin": "1"
+ },
+ "firstDest": {
+  "onb": true,
+  "tile": false,
+  "head": "PASO 1 DE 6  Saltar todo Cuéntenos de usted  Dos toques y arrancamos. Todo se puede saltar"
+ },
+ "dashMetrics": {
+  "fcp": 1708,
+  "lcp": null,
+  "navTtfb": 299,
+  "longtasks": [],
+  "longTaskCount": 0,
+  "blocking": 0
+ },
+ "transition": null,
+ "shotPath": "_gate/perf-auth5.png",
+ "requestsTotal": 1189,
+ "postSubmitReqs": 1007,
+ "statusCounts": {
+  "200": 977,
+  "204": 1,
+  "none": 29
+ },
+ "consoleMsgs": [
+  {
+   "t": 4073,
+   "type": "info",
+   "text": "[DB] Upgrading schema to v27…"
+  },
+  {
+   "t": 4170,
+   "type": "info",
+   "text": "[Migration] Tareas migradas con éxito."
+  },
+  {
+   "t": 4171,
+   "type": "info",
+   "text": "[Migration] Tareas migradas con éxito."
+  },
+  {
+   "t": 4171,
+   "type": "info",
+   "text": "[Migration] Tareas migradas con éxito."
+  },
+  {
+   "t": 4172,
+   "type": "warning",
+   "text": "[API] Token no disponible. Continuando en modo offline."
+  },
+  {
+   "t": 4172,
+   "type": "warning",
+   "text": "[LogStore] Fallo en pull de log--seeding: Token no disponible."
+  },
+  {
+   "t": 4173,
+   "type": "warning",
+   "text": "[API] Token no disponible. Continuando en modo offline."
+  },
+  {
+   "t": 4174,
+   "type": "warning",
+   "text": "[LogStore] Fallo en pull de log--planting: Token no disponible."
+  },
+  {
+   "t": 4174,
+   "type": "warning",
+   "text": "[API] Token no disponible. Continuando en modo offline."
+  },
+  {
+   "t": 4175,
+   "type": "warning",
+   "text": "[LogStore] Fallo en pull de log--harvest: Token no disponible."
+  },
+  {
+   "t": 4175,
+   "type": "warning",
+   "text": "[API] Token no disponible. Continuando en modo offline."
+  },
+  {
+   "t": 4175,
+   "type": "warning",
+   "text": "[LogStore] Fallo en pull de log--input: Token no disponible."
+  },
+  {
+   "t": 4175,
+   "type": "warning",
+   "text": "[API] Token no disponible. Continuando en modo offline."
+  },
+  {
+   "t": 4176,
+   "type": "warning",
+   "text": "[LogStore] Fallo en pull de log--task: Token no disponible."
+  },
+  {
+   "t": 4176,
+   "type": "warning",
+   "text": "[API] Token no disponible. Continuando en modo offline."
+  },
+  {
+   "t": 4176,
+   "type": "warning",
+   "text": "[LogStore] Fallo en pull de log--observation: Token no disponible."
+  },
+  {
+   "t": 5281,
+   "type": "info",
+   "text": "[AlertEngine] Iniciando motor de alertas (clima real)..."
+  },
+  {
+   "t": 5281,
+   "type": "info",
+   "text": "[AlertEngine] Verificando thresholds (clima real)..."
+  },
+  {
+   "t": 5284,
+   "type": "info",
+   "text": "[AlertEngine] Sin coordenadas en el perfil — no se evalúa clima (degradación limpia, sin mock)."
+  },
+  {
+   "t": 5284,
+   "type": "info",
+   "text": "[AlertEngine] Verificación completada. Alertas activas: 0"
+  },
+  {
+   "t": 7732,
+   "type": "warning",
+   "text": "[Auth] Intentando login password grant (DEPRECATED) para: admin                                                                                                 "
+  },
+  {
+   "t": 7963,
+   "type": "info",
+   "text": "Service Worker registrado: https://chagra-dev.guatoc.co/"
+  },
+  {
+   "t": 8407,
+   "type": "warning",
+   "text": "[operatorIdentity] Generated NEW account_uuid_master. Backup recommended."
+  },
+  {
+   "t": 9751,
+   "type": "debug",
+   "text": "[useOllamaWarmStore] qwen3.5:4b warm-up OK (pinned)"
+  },
+  {
+   "t": 12078,
+   "type": "debug",
+   "text": "[agentTelemetrySync] consentimiento denegado — no sync"
+  },
+  {
+   "t": 12078,
+   "type": "debug",
+   "text": "[usageTelemetrySync] consentimiento denegado — no sync"
+  },
+  {
+   "t": 13513,
+   "type": "warning",
+   "text": "The resource https://chagra-dev.guatoc.co/fonts/nunito-latin.woff2 was preloaded using link preload but not used within a few seconds from the window's load eve"
+  },
+  {
+   "t": 15328,
+   "type": "info",
+   "text": "[SQLite WASM] Engine loaded successfully."
+  },
+  {
+   "t": 22569,
+   "type": "warning",
+   "text": "The resource https://chagra-dev.guatoc.co/fonts/nunito-latin.woff2 was preloaded using link preload but not used within a few seconds from the window's load eve"
+  },
+  {
+   "t": 31222,
+   "type": "info",
+   "text": "[SQLite WASM] Catalog loaded from /catalog.sqlite (tier=OSS)"
+  },
+  {
+   "t": 31240,
+   "type": "info",
+   "text": "[SQLite WASM] Opened SQLite DB locally from Memory deserialization"
+  },
+  {
+   "t": 31275,
+   "type": "info",
+   "text": "[RAG] Tier gate: 517 slugs en manifest, 469 dentro del catalogo (48 excluidos)."
+  },
+  {
+   "t": 35773,
+   "type": "info",
+   "text": "[SW] Service Worker activo y listo."
+  },
+  {
+   "t": 51232,
+   "type": "warning",
+   "text": "The resource https://chagra-dev.guatoc.co/fonts/nunito-latin.woff2 was preloaded using link preload but not used within a few seconds from the window's load eve"
+  },
+  {
+   "t": 63441,
+   "type": "warning",
+   "text": "The resource https://chagra-dev.guatoc.co/fonts/nunito-latin.woff2 was preloaded using link preload but not used within a few seconds from the window's load eve"
+  },
+  {
+   "t": 66070,
+   "type": "warning",
+   "text": "[RAG] Failed to load lolium_perenne: TypeError: Failed to fetch\n    at q (https://chagra-dev.guatoc.co/assets/ragRetriever-XAN0toMG.js:2:13937)\n    at https://c"
+  },
+  {
+   "t": 66070,
+   "type": "warning",
+   "text": "[RAG] Failed to load lavandula_dentata: TypeError: Failed to fetch\n    at q (https://chagra-dev.guatoc.co/assets/ragRetriever-XAN0toMG.js:2:13937)\n    at https:"
+  },
+  {
+   "t": 66070,
+   "type": "warning",
+   "text": "[RAG] Failed to load loricaria_complanata: TypeError: Failed to fetch\n    at q (https://chagra-dev.guatoc.co/assets/ragRetriever-XAN0toMG.js:2:13937)\n    at htt"
+  },
+  {
+   "t": 66070,
+   "type": "warning",
+   "text": "[RAG] Failed to load lecythis_minor: TypeError: Failed to fetch\n    at q (https://chagra-dev.guatoc.co/assets/ragRetriever-XAN0toMG.js:2:13937)\n    at https://c"
+  },
+  {
+   "t": 66070,
+   "type": "warning",
+   "text": "[RAG] Failed to load lonchocarpus_velutinus: TypeError: Failed to fetch\n    at q (https://chagra-dev.guatoc.co/assets/ragRetriever-XAN0toMG.js:2:13937)\n    at h"
+  },
+  {
+   "t": 66072,
+   "type": "warning",
+   "text": "[RAG] Failed to load lemna_minor: TypeError: Failed to fetch\n    at q (https://chagra-dev.guatoc.co/assets/ragRetriever-XAN0toMG.js:2:13937)\n    at https://chag"
+  },
+  {
+   "t": 66073,
+   "type": "warning",
+   "text": "[RAG] Failed to load lupinus_alopecuroides: TypeError: Failed to fetch\n    at q (https://chagra-dev.guatoc.co/assets/ragRetriever-XAN0toMG.js:2:13937)\n    at ht"
+  },
+  {
+   "t": 66073,
+   "type": "warning",
+   "text": "[RAG] Failed to load levisticum_officinale: TypeError: Failed to fetch\n    at q (https://chagra-dev.guatoc.co/assets/ragRetriever-XAN0toMG.js:2:13937)\n    at ht"
+  },
+  {
+   "t": 66073,
+   "type": "warning",
+   "text": "[RAG] Failed to load leucaena_leucocephala: TypeError: Failed to fetch\n    at q (https://chagra-dev.guatoc.co/assets/ragRetriever-XAN0toMG.js:2:13937)\n    at ht"
+  },
+  {
+   "t": 66073,
+   "type": "warning",
+   "text": "[RAG] Failed to load lippia_alba: TypeError: Failed to fetch\n    at q (https://chagra-dev.guatoc.co/assets/ragRetriever-XAN0toMG.js:2:13937)\n    at https://chag"
+  },
+  {
+   "t": 66074,
+   "type": "warning",
+   "text": "[RAG] Failed to load lepidium_meyenii: TypeError: Failed to fetch\n    at q (https://chagra-dev.guatoc.co/assets/ragRetriever-XAN0toMG.js:2:13937)\n    at https:/"
+  },
+  {
+   "t": 66074,
+   "type": "warning",
+   "text": "[RAG] Failed to load lens_culinaris_andina: TypeError: Failed to fetch\n    at q (https://chagra-dev.guatoc.co/assets/ragRetriever-XAN0toMG.js:2:13937)\n    at ht"
+  },
+  {
+   "t": 66074,
+   "type": "debug",
+   "text": "[sidecar] fail {path: /tools/get_precio_sipsa, reason: Failed to fetch}"
+  },
+  {
+   "t": 66074,
+   "type": "error",
+   "text": "Error obteniendo tareas de FarmOS: TypeError: Failed to fetch\n    at P (https://chagra-dev.guatoc.co/assets/apiService-hPKz3981.js:2:6713)\n    at K (https://cha"
+  },
+  {
+   "t": 66074,
+   "type": "error",
+   "text": "Error sincronizando activos: TypeError: Failed to fetch\n    at P (https://chagra-dev.guatoc.co/assets/apiService-hPKz3981.js:2:6713)\n    at K (https://chagra-de"
+  },
+  {
+   "t": 66705,
+   "type": "info",
+   "text": "[API] Bundle obsoleto en FarmOS 4.x ignorado: /api/asset/person?filter[name][condition][path]=name&filter[name][condition][operator]=CONTAINS&filter[name][condi"
+  },
+  {
+   "t": 66705,
+   "type": "info",
+   "text": "[assetService] No se encontró persona \"Jimmy\" en FarmOS."
+  },
+  {
+   "t": 66705,
+   "type": "info",
+   "text": "[Migration] Renombrado completado o innecesario."
+  },
+  {
+   "t": 67555,
+   "type": "info",
+   "text": "[AlertEngine] Iniciando motor de alertas (clima real)..."
+  },
+  {
+   "t": 67555,
+   "type": "info",
+   "text": "[AlertEngine] Verificando thresholds (clima real)..."
+  },
+  {
+   "t": 67555,
+   "type": "info",
+   "text": "[AlertEngine] Sin coordenadas en el perfil — no se evalúa clima (degradación limpia, sin mock)."
+  },
+  {
+   "t": 67555,
+   "type": "info",
+   "text": "[AlertEngine] Verificación completada. Alertas activas: 0"
+  },
+  {
+   "t": 70305,
+   "type": "info",
+   "text": "[SW] Service Worker activo y listo."
+  },
+  {
+   "t": 70308,
+   "type": "info",
+   "text": "Service Worker registrado: https://chagra-dev.guatoc.co/"
+  },
+  {
+   "t": 70579,
+   "type": "debug",
+   "text": "[useOllamaWarmStore] qwen3.5:4b warm-up OK (pinned)"
+  },
+  {
+   "t": 74685,
+   "type": "debug",
+   "text": "[agentTelemetrySync] consentimiento denegado — no sync"
+  },
+  {
+   "t": 74685,
+   "type": "debug",
+   "text": "[usageTelemetrySync] consentimiento denegado — no sync"
+  },
+  {
+   "t": 76885,
+   "type": "warning",
+   "text": "The resource https://chagra-dev.guatoc.co/fonts/nunito-latin.woff2 was preloaded using link preload but not used within a few seconds from the window's load eve"
+  },
+  {
+   "t": 80556,
+   "type": "info",
+   "text": "[SQLite WASM] Engine loaded successfully."
+  },
+  {
+   "t": 80577,
+   "type": "info",
+   "text": "[SQLite WASM] Catalog loaded from /catalog.sqlite (tier=OSS)"
+  },
+  {
+   "t": 80592,
+   "type": "info",
+   "text": "[SQLite WASM] Opened SQLite DB locally from Memory deserialization"
+  },
+  {
+   "t": 80625,
+   "type": "info",
+   "text": "[RAG] Tier gate: 517 slugs en manifest, 469 dentro del catalogo (48 excluidos)."
+  },
+  {
+   "t": 95199,
+   "type": "info",
+   "text": "[RAG] Índice del corpus persistido en IndexedDB (15667 passages)."
+  },
+  {
+   "t": 98043,
+   "type": "warning",
+   "text": "The resource https://chagra-dev.guatoc.co/fonts/nunito-latin.woff2 was preloaded using link preload but not used within a few seconds from the window's load eve"
+  },
+  {
+   "t": 119120,
+   "type": "debug",
+   "text": "[sidecar] fail {path: /tools/get_precio_sipsa, reason: timeout}"
+  },
+  {
+   "t": 122868,
+   "type": "warning",
+   "text": "Deprecated API for given entry type."
+  },
+  {
+   "t": 122869,
+   "type": "warning",
+   "text": "Deprecated API for given entry type."
+  }
+ ],
+ "jsErrors": [],
+ "byUrlPost": [
+  [
+   "chagra-stats.json",
+   3
+  ],
+  [
+   "api/log/activity",
+   3
+  ],
+  [
+   "assets/sqlite3-BVKGSWc-.wasm",
+   2
+  ],
+  [
+   "assets/IosInstallBanner--3fic1cP.js",
+   2
+  ],
+  [
+   "assets/usePwaInstall-CT3JaqOH.js",
+   2
+  ],
+  [
+   "assets/AgentFab-Dk_rtUDp.js",
+   2
+  ],
+  [
+   "assets/agroecologia-DVYNAAOK.js",
+   2
+  ],
+  [
+   "assets/useAngelitaStore-DYH8ULSU.js",
+   2
+  ],
+  [
+   "assets/angelitaVariedad-Ti7_3hlD.js",
+   2
+  ],
+  [
+   "assets/proactiveGreeting-Bl_TTJvu.js",
+   2
+  ],
+  [
+   "assets/angelitaAvisoTipos-XHBkd0pV.js",
+   2
+  ],
+  [
+   "assets/useInventarioCompai-CGXCkefn.js",
+   2
+  ],
+  [
+   "assets/useComportamientoCompai-DTQiLxrC.js",
+   2
+  ],
+  [
+   "assets/useComportamientoCompai-CbEDNuZT.css",
+   2
+  ],
+  [
+   "assets/speciesResolver-D79NSVY8.js",
+   2
+  ],
+  [
+   "assets/AgentFab-CN6FehxG.css",
+   2
+  ],
+  [
+   "assets/EscuchaOverlay-2picfa_y.js",
+   2
+  ],
+  [
+   "assets/ManoChagraGlyph-CgTAs4wX.js",
+   2
+  ],
+  [
+   "assets/voiceService-CLPDPE83.js",
+   2
+  ],
+  [
+   "assets/EscuchaOverlay-BQR93N8n.css",
+   2
+  ],
+  [
+   "assets/AndroidInstallBanner-Btakrxnj.js",
+   2
+  ],
+  [
+   "api/ollama/api/generate",
+   2
+  ],
+  [
+   "assets/CompaiFotosOverlay-DTGIaOLa.js",
+   2
+  ],
+  [
+   "cycle-content/manifest.json",
+   2
+  ],
+  [
+   "version.json",
+   2
+  ]
+ ]
+}

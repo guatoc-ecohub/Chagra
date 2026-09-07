@@ -1,0 +1,573 @@
+<!doctype html>
+<html lang="es-CO">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Sylva s13 — Helechos y musgo Bézier (sotobosque del valle)</title>
+<style>
+  html,body{margin:0;height:100%;overflow:hidden;background:#0b120c;font-family:system-ui,-apple-system,"Segoe UI",sans-serif}
+  #c{display:block;width:100vw;height:100vh;touch-action:none}
+  #hud{position:fixed;top:14px;left:14px;padding:10px 14px;border-radius:12px;
+    background:rgba(10,18,12,.58);color:#eaffef;font-size:13px;line-height:1.55;
+    backdrop-filter:blur(8px);z-index:10;min-width:318px;box-shadow:0 8px 24px rgba(0,0,0,.25)}
+  #hud .row{display:flex;justify-content:space-between;gap:18px}
+  #hud .k{opacity:.68}
+  #hud b{font-variant-numeric:tabular-nums}
+  #err{position:fixed;inset:auto 14px 14px auto;max-width:72vw;color:#ffd9d9;background:rgba(90,20,20,.78);
+    padding:8px 12px;border-radius:10px;font-size:12px;white-space:pre-wrap;z-index:20;display:none}
+</style>
+<script type="importmap">
+{
+  "imports": {
+    "three": "./vendor/three.module.js",
+    "three/addons/": "./vendor/addons/"
+  }
+}
+</script>
+</head>
+<body>
+<canvas id="c"></canvas>
+<div id="hud">
+  <div class="row"><span class="k">FPS</span><b id="fps">--</b></div>
+  <div class="row"><span class="k">Sotobosque</span><b id="modo">--</b></div>
+  <div class="row"><span class="k">Semilla / Cámara</span><b id="seed">--</b></div>
+  <div class="row"><span class="k">Helechos (frondas / pinnas)</span><b id="n">--</b></div>
+  <div class="row"><span class="k">Volumetría fronda λmin/λmax</span><b id="vol">--</b></div>
+  <div class="row"><span class="k">Musgo cojines / relieve</span><b id="musgo">--</b></div>
+  <div class="row"><span class="k">Draw calls / tris</span><b id="draws">--</b></div>
+</div>
+<div id="err"></div>
+<script type="module">
+// ═══════════════════════════════════════════════════════════════════════════
+// Sylva s13 — HELECHOS Y MUSGO BÉZIER (sotobosque)
+// realistic-forest (github.com/Token-Gremlin/realistic-forest, MIT © 2026 Token
+// Gremlin; notice retenido en lib3d/flora/LICENSE-sylva-MIT) NO dibuja la
+// vegetación baja como tarjetas planas ni como carteles: cada arquetipo es
+// GEOMETRÍA REAL (clutterShapes.js): el helecho es una corona de frondas que
+// salen del centro y se arquean/doblan (rachis = curva que se dobla con bend),
+// y cada fronda lleva sus pinnas dibujadas a lo largo del raquis con perfil
+// que se afila hacia la punta; el musgo son cojines hemisféricos (blob) sobre
+// el suelo húmedo. El comentario de Sylva es explícito: "un helecho que es una
+// tarjeta plana se lee al instante como tarjeta plana" — a la distancia a la
+// que se ve el sotobosque, la silueta importa.
+//
+// Este banco lo emula sobre el piso del valle (verde dominante, sotobosque de
+// potrero húmedo) con A/B pareado en el MISMO seed y cámara — cambia SOLO la
+// representación, no la siembra:
+//   ?s13=0  baseline: helecho = TARJETA plana vertical (un solo plano de hojas,
+//           como el cartel viejo) y musgo = disco plano pegado al suelo. Cerca
+//           se lee cartulina plana; de lejos ya es masa.
+//   ?s13=1  (default) SYLVA: helecho = corona de frondas con raquis curvo
+//           (arco con bend, frondas que suben y caen) y pinnas reales a lo
+//           largo de cada fronda con perfil que se afila; musgo = cojines
+//           hemisféricos bajos. Cerca conserva la FORMA de helecho (pinnado,
+//           en volumen) y de lejos se funde a la masa verde del sotobosque.
+// La siembra de helechos y cojines usa un lattice con hash y jitter
+// determinista (la misma doctrina de s12): el A/B es byte a byte la misma
+// escena sembrada; sólo cambia el constructor del individuo.
+// La implementación es emulación original del patrón (fronda = cinta curva con
+// pinnas), no código literal de Sylva; no se agregó dependencia.
+// ═══════════════════════════════════════════════════════════════════════════
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+
+const err = document.getElementById('err');
+addEventListener('error', (e) => { err.style.display = 'block'; err.textContent = 'ERROR: ' + (e.message || e); });
+addEventListener('unhandledrejection', (e) => { err.style.display = 'block'; err.textContent = 'REJECT: ' + ((e.reason && e.reason.message) || e.reason); });
+
+const q = new URLSearchParams(location.search);
+const S13 = q.get('s13') !== '0';                       // 1 = sylva geometría real; 0 = tarjeta plana
+const _seed = Number(q.get('seed'));
+const SEED = Number.isInteger(_seed) && _seed >= 0 ? _seed : 20027;
+const CAM = q.get('cam') || 'mid';
+const RADIO = Math.max(16, Math.min(60, Number(q.get('r')) || 26));   // radio del sotobosque
+const ESP = Math.max(1.6, Math.min(6, Number(q.get('d')) || 2.6));     // celda lattice (u)
+const UMBRAL_FERN = Math.max(0.2, Math.min(0.6, Number(q.get('uf')) || 0.36));  // densidad helechos
+const UMBRAL_MOSS = Math.max(0.5, Math.min(1.0, Number(q.get('um')) || 0.78));  // humedad musgo
+
+// PRNG mulberry32 + hash de celda determinista (mismos puntos en A y B).
+function mulberry32(a) {
+  return function () {
+    a |= 0; a = a + 0x6D2B79F5 | 0;
+    let t = Math.imul(a ^ a >>> 15, 1 | a);
+    t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t;
+    return ((t ^ t >>> 14) >>> 0) / 4294967296;
+  };
+}
+const rndCelda = (i, j, s = 0) => {
+  const a = (SEED ^ Math.imul(i + 37 + s * 101, 0x9e3779b9) ^ Math.imul(j + 11, 0x85ebca6b)) >>> 0;
+  return mulberry32(a || 1);
+};
+function fbm(x, z, oct = 3) {
+  let a = 1, f = 1, s = 0, n = 0;
+  for (let o = 0; o < oct; o++) {
+    s += a * (Math.sin(x * f * 0.021 + 3.1) * Math.sin(z * f * 0.017 + 1.7) + Math.cos(x * f * 0.013 + z * f * 0.011));
+    a *= 0.5; f *= 2.0; n += a;
+  }
+  return s / n;
+}
+// humedad del sotobosque: los helechos prefieren la franja húmeda/sombreada.
+const fert = (x, z) => 0.5 + 0.5 * Math.tanh(fbm(x + 17, z - 9, 3) + 0.15 * Math.sin(x * 0.043) * Math.cos(z * 0.037));
+
+// ── siembra: dos lattices deterministas (helechos y cojines de musgo) ────────
+const helechos = [];
+{
+  const pasos = Math.ceil(RADIO / ESP);
+  for (let j = -pasos; j <= pasos; j++) {
+    for (let i = -pasos; i <= pasos; i++) {
+      const x = i * ESP, z = j * ESP;
+      if (x * x + z * z > RADIO * RADIO) continue;
+      const r = rndCelda(i, j);
+      const dx = (r() - 0.5) * 1.2 * ESP, dz = (r() - 0.5) * 1.2 * ESP;
+      const fx = x + dx, fz = z + dz;
+      if (fx * fx + fz * fz > RADIO * RADIO) continue;
+      const h = fert(fx, fz);
+      if (h < 0.5) continue;                        // claros secos: no crece helecho
+      if (r() > 0.72 + 0.28 * (h - 0.5) * 2) continue;
+      if (fx * fx + fz * fz < 6.0) continue;        // el centro queda para el héroe
+      const esc = 0.6 + r() * 0.9;                  // talla por individuo
+      helechos.push({ x: fx, z: fz, esc, giro: r() });
+    }
+  }
+}
+// héroe garantizado en el origen (grande y SIEMPRE presente): la cámara `near`
+// lo encuadra en todas las semillas, así el A/B cerca compara el mismo porte.
+helechos.push({ x: 0, z: 0, esc: 1.3, giro: 0.4, heroe: true });
+const musgoPts = [];
+{
+  const e2 = Math.max(1.4, ESP * 0.5);
+  const pasos = Math.ceil(RADIO / e2);
+  for (let j = -pasos; j <= pasos; j++) {
+    for (let i = -pasos; i <= pasos; i++) {
+      const x = i * e2, z = j * e2;
+      if (x * x + z * z > (RADIO - 1.5) * (RADIO - 1.5)) continue;
+      const r = rndCelda(i, j, 3);
+      const fx = x + (r() - 0.5) * e2 * 0.9, fz = z + (r() - 0.5) * e2 * 0.9;
+      if (fx * fx + fz * fz > (RADIO - 1.5) * (RADIO - 1.5)) continue;
+      const h = fert(fx, fz);
+      if (h < 0.55) continue;                       // musgo: más húmedo aún
+      if (r() > 0.85) continue;
+      const radio = 0.10 + r() * 0.30;
+      musgoPts.push({ x: fx, z: fz, radio });
+    }
+  }
+}
+
+// ── escena ───────────────────────────────────────────────────────────────────
+const renderer = new THREE.WebGLRenderer({ canvas: document.getElementById('c'), antialias: true });
+renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.5));
+renderer.setSize(innerWidth, innerHeight);
+renderer.toneMapping = THREE.AgXToneMapping;
+renderer.toneMappingExposure = 1.5;
+renderer.outputColorSpace = THREE.SRGBColorSpace;
+window.__r = renderer;
+
+const scene = new THREE.Scene();
+const fogColor = 0xcfdac8;
+scene.background = new THREE.Color(fogColor);
+scene.fog = new THREE.Fog(fogColor, RADIO * 3.4, RADIO * 9.5);
+window.__escena = scene;
+
+const camera = new THREE.PerspectiveCamera(50, innerWidth / innerHeight, 0.1, 1200);
+window.__cam = camera;
+const controls = new OrbitControls(camera, renderer.domElement);
+controls.enableDamping = false;   // capturas estables (A/B idéntico a ojo)
+window.__ctl = controls;
+
+scene.add(new THREE.HemisphereLight(0x93a8c2, 0x1c2314, 0.6));
+const sol = new THREE.DirectionalLight(0xffe0c0, 2.7);
+sol.position.set(-40, 85, 30);
+scene.add(sol);
+
+// piso del sotobosque: verde dominante, un poco más húmedo que el potrero.
+const groundGeo = new THREE.CircleGeometry(RADIO + 10, 96);
+groundGeo.rotateX(-Math.PI / 2);
+const ground = new THREE.Mesh(groundGeo,
+  new THREE.MeshStandardMaterial({ color: 0x54743b, roughness: 1, metalness: 0 }));
+ground.position.y = -0.02;
+scene.add(ground);
+
+// ── builders de geometría ────────────────────────────────────────────────────
+// Cada fronda es un raquis que sube desde el centro y se arquea/va cayendo
+// (misma idea que `arc(start, dir, len, segs, bend)` de Sylva: la dirección se
+// va doblando con el avance) y sobre el raquis se cuelgan PINNAS triangulares
+// alternadas con perfil que se afila hacia la punta. Vertex colors verdes.
+const _V = new THREE.Vector3(), _N = new THREE.Vector3(), _M = new THREE.Vector3(), _T = new THREE.Vector3();
+const _S = new THREE.Vector3(), _U = new THREE.Vector3(0, 1, 0);
+
+function coloresFronda(t, rnd, out) {
+  // base verde oscuro → ápice verde medio; algo de variación por individuo
+  const g = rnd * 0.14;
+  out.set(
+    0.16 + g + 0.16 * t,
+    0.38 + g * 0.7 + 0.16 * t,
+    0.10 + g * 0.5 + 0.07 * t,
+  ).multiplyScalar(1.35);   // compensa la luz del valle (albedo ~lineal)
+  return out;
+}
+const cA = new THREE.Color(), cB = new THREE.Color(), cC = new THREE.Color();
+
+class BB {
+  constructor() { this.pos = []; this.nor = []; this.col = []; }
+  vertex(p, n, c) { this.pos.push(p.x, p.y, p.z); this.nor.push(n.x, n.y, n.z); this.col.push(c.r, c.g, c.b); }
+  tri(a, b, c) {
+    _N.subVectors(b, a).cross(_T.subVectors(c, a)).normalize();
+    this.vertex(a, _N, cA); this.vertex(b, _N, cB); this.vertex(c, _N, cC);
+  }
+  geo() {
+    const g = new THREE.BufferGeometry();
+    g.setAttribute('position', new THREE.BufferAttribute(new Float32Array(this.pos), 3));
+    g.setAttribute('normal', new THREE.BufferAttribute(new Float32Array(this.nor), 3));
+    g.setAttribute('color', new THREE.BufferAttribute(new Float32Array(this.col), 3));
+    g.computeBoundingSphere();
+    return g;
+  }
+}
+
+// puntos del raquis de una fronda: arco tipo SYLVA — nace hacia arriba-afuera,
+// se arquea y la punta cae (fuente de helecho), en el plano vertical de azimut
+// `az`. `tilt` (0..1.2) cuánto se abre hacia afuera; `bend` cuánto cae la punta.
+function raquisFronda(x, z, az, tilt, len, bend, segs) {
+  const pts = [];
+  const d = _V.set(Math.cos(az) * tilt * 0.9, 1 - tilt * 0.45, Math.sin(az) * tilt * 0.9).normalize();
+  const p = _M.set(Math.cos(az) * 0.06 * tilt, 0.05, Math.sin(az) * 0.06 * tilt);
+  const step = len / segs;
+  for (let i = 0; i <= segs; i++) {
+    pts.push(p.clone());
+    d.addScaledVector(_U, -bend * step * (0.25 + 0.75 * (i / segs)));
+    d.normalize();
+    p.addScaledVector(d, step);
+  }
+  const out = pts.map((q) => new THREE.Vector3(q.x + x, q.y, q.z + z));
+  out.forEach((v) => { v.y = Math.max(v.y, 0); });
+  return out;
+}
+
+function colorFrondaEn(t, rnd) { coloresFronda(t, rnd, cA); return cA.clone(); }
+
+// fronda con pinnas reales: raquis (cinta angosta) + pinnas triangulares alternadas
+// devuelve los puntos del raquis (curva bendada) para la métrica de volumen.
+function pintarFronda(bb, rnd0, frondaRnd, az, x, z, baseEsc) {
+  const len = (1.15 + frondaRnd * 0.55) * baseEsc;
+  const bend = 0.9 + frondaRnd * 1.2;
+  const tilt = 0.72 + frondaRnd * 0.35;   // fuente abierta, no tuft vertical
+  const pts = raquisFronda(x, z, az, tilt, len, bend, 9);
+  const pinnas = 7 + Math.floor(frondaRnd * 4);
+  // raquis: cinta angosta entre puntos consecutivos (se va afinando)
+  let prevL = null, prevR = null;
+  for (let i = 0; i < pts.length - 1; i++) {
+    const p = pts[i], q = pts[i + 1];
+    _T.subVectors(q, p).normalize();
+    _S.crossVectors(_T, _U);
+    if (_S.lengthSq() < 1e-6) _S.set(1, 0, 0);
+    _S.normalize();
+    const t = i / (pts.length - 1);
+    const w = baseEsc * 0.035 * (1 - t * 0.75);
+    const col = colorFrondaEn(t, frondaRnd);
+    _V.copy(p).addScaledVector(_S, -w);
+    _N.copy(p).addScaledVector(_S, w);
+    const l = _V.clone(), r2 = _N.clone();
+    const il = { x: l.x, y: l.y, z: l.z }, ir = { x: r2.x, y: r2.y, z: r2.z };
+    if (i === 0) { prevL = il; prevR = ir; continue; }
+    cA.copy(col); cB.copy(col); cC.copy(col);
+    // quad prevL,prevR,r,l → dos triángulos
+    bb.tri(prevL, prevR, ir);
+    bb.tri(prevL, ir, il);
+    prevL = il; prevR = ir;
+  }
+  // pinnas a lo largo del raquis (sin tocar la base del helecho)
+  const nPin = 9 + Math.floor(frondaRnd * 3);
+  for (let k = 1; k < nPin; k++) {
+    const t = k / nPin;
+    const i = Math.min(pts.length - 2, Math.floor(t * (pts.length - 1)));
+    const p = pts[i], q = pts[i + 1];
+    _T.subVectors(q, p).normalize();
+    _S.crossVectors(_T, _U);
+    if (_S.lengthSq() < 1e-6) _S.set(1, 0, 0);
+    _S.normalize();
+    const lado = (k % 2 === 0 ? 1 : -1);
+    // perfil de la pinna: corta en la base, máxima a 1/3, afilada hacia el ápice
+    const prof = Math.pow(Math.max(Math.sin(Math.PI * Math.min(1, t * 0.95 + 0.05)), 0), 0.5);
+    const lPin = baseEsc * (0.55 + 0.25 * frondaRnd) * prof;
+    const anchoPin = baseEsc * (0.11 + 0.05 * frondaRnd) * prof;
+    // dirección de la pinna: se abre a su lado PERO con inclinación de lectura
+    // hacia arriba, para que la corona se lea como pluma pinnada (y no de canto
+    // desde una cámara baja).
+    _S.multiplyScalar(lado);
+    const leer = new THREE.Vector3().copy(_S).multiplyScalar(1).addScaledVector(_U, 0.34).normalize();
+    const base = p.clone().addScaledVector(_S, anchoPin * 0.25);
+    const punta = base.clone().addScaledVector(leer, lPin);
+    punta.y -= lPin * 0.06;                        // caída natural de la pinna
+    const tCol = t;
+    cA.copy(colorFrondaEn(tCol, frondaRnd));
+    cB.copy(colorFrondaEn(Math.min(1, tCol + 0.08), frondaRnd));
+    cC.copy(colorFrondaEn(Math.min(1, tCol + 0.05), frondaRnd));
+    const lado2 = p.clone().addScaledVector(_S, -anchoPin * 0.5);
+    const lado1 = p.clone().addScaledVector(_S, -anchoPin * 0.15);
+    bb.tri({ x: base.x, y: base.y, z: base.z }, { x: lado1.x, y: lado1.y, z: lado1.z }, { x: punta.x, y: punta.y, z: punta.z });
+    bb.tri({ x: base.x, y: base.y, z: base.z }, { x: punta.x, y: punta.y, z: punta.z }, { x: lado2.x, y: lado2.y, z: lado2.z });
+  }
+  return pts;
+}
+
+// helecho SYLVA: corona de 6–10 frondas curvas con pinnas; devuelve la nube de
+// puntos del raquis (muestreada) para la métrica de volumetría.
+function helechoSylva(bb, h) {
+  const r = rndCelda(Math.floor(h.x * 7), Math.floor(h.z * 7), 7);
+  const nFr = 6 + Math.floor(r() * 5);
+  const puntas = [];
+  for (let i = 0; i < nFr; i++) {
+    const az = (i / nFr) * Math.PI * 2 + (r() - 0.5) * 0.7;
+    const pts = pintarFronda(bb, r(), r(), az, h.x, h.z, h.esc);
+    // el raquis completo se reparte en tres direcciones: la corona NO es un
+    // plano. Muestreo cada 2 puntos para no cargar la métrica.
+    for (let k = 0; k < pts.length; k += 2) puntas.push(pts[k].clone());
+  }
+  return { puntas, frondas: nFr, pinnasPorFronda: 8 };
+}
+
+// helecho TARJETA (baseline): un solo plano vertical doble-cara (cartel), que
+// de cerca se lee plano y sin profundidad. Se orienta de frente al centro de la
+// escena (como un billboard): el héroe del encuadre `near` SIEMPRE se ve de
+// frente, así el A/B no depende de la suerte del giro sino de la forma.
+function helechoTarjeta(bb, h) {
+  const r = rndCelda(Math.floor(h.x * 7), Math.floor(h.z * 7), 7);
+  const ancho = h.esc * (0.95 + r() * 0.4);
+  const alto = h.esc * (1.15 + r() * 0.3);
+  const x = h.x, z = h.z;
+  // plano vertical cuyo vector horizontal apunta al origen (billboard radial)
+  const ang = Math.atan2(-z, -x);
+  const cg = Math.cos(ang), sg = Math.sin(ang);
+  const ax = _V.set(cg, 0, sg), ay = _U;
+  const col = colorFrondaEn(0.5, r());
+  const P = (sx, sy) => {
+    _M.set(x, 0, z).addScaledVector(ax, sx * ancho * 0.5).addScaledVector(ay, sy * alto);
+    return _M.clone();
+  };
+  const v0 = P(0, 0), vT = P(0, 1), vR = P(1, 0.55), vL = P(-1, 0.55);
+  // perfil en punta hacia arriba: dos triángulos forman una hoja plana
+  cA.copy(col); cB.copy(col); cC.copy(col);
+  bb.tri(v0, vR, vT);
+  bb.tri(v0, vT, vL);
+  // duplico el plano con normales invertidas es la misma cara: uso DoubleSide
+  return { puntas: [v0, vT, vR, vL], frondas: 1, pinnasPorFronda: 0 };
+}
+
+// cojín de musgo SYLVA: hemisferio bajo con leve relieve (dome), verde oliva.
+function cojinMusgo(bb, cx, cz, radio, rnd) {
+  const seg = 7, rings = 3;
+  const colBase = new THREE.Color(0.30, 0.50, 0.22);
+  for (let j = 0; j < rings; j++) {
+    const phi = (j / rings) * Math.PI * 0.5;
+    const phin = ((j + 1) / rings) * Math.PI * 0.5;
+    for (let i = 0; i < seg; i++) {
+      const th = (i / seg) * Math.PI * 2, thn = ((i + 1) % seg) / seg * Math.PI * 2;
+      const rr = radio, ry = radio * 0.32;
+      const rndR = (k) => 1 + 0.10 * Math.sin(i * 3 + j * 2 + k * 7 + rnd * 30);
+      const a = new THREE.Vector3(cx + Math.cos(th) * Math.sin(phi) * rr * rndR(1),
+        Math.cos(phi) * ry * (1 - 0.25 * Math.sin(th * 4 + rnd * 9)),
+        cz + Math.sin(th) * Math.sin(phi) * rr * rndR(2));
+      const b = new THREE.Vector3(cx + Math.cos(thn) * Math.sin(phi) * rr * rndR(1),
+        Math.cos(phi) * ry * (1 - 0.25 * Math.sin(thn * 4 + rnd * 9)),
+        cz + Math.sin(thn) * Math.sin(phi) * rr * rndR(2));
+      const c2 = new THREE.Vector3(cx + Math.cos(thn) * Math.sin(phin) * rr * rndR(1),
+        Math.cos(phin) * ry * (1 - 0.25 * Math.sin(thn * 4 + rnd * 9)),
+        cz + Math.sin(thn) * Math.sin(phin) * rr * rndR(2));
+      const d2 = new THREE.Vector3(cx + Math.cos(th) * Math.sin(phin) * rr * rndR(1),
+        Math.cos(phin) * ry * (1 - 0.25 * Math.sin(th * 4 + rnd * 9)),
+        cz + Math.sin(th) * Math.sin(phin) * rr * rndR(2));
+      const tono = (v) => new THREE.Color().copy(colBase).multiplyScalar(0.85 + 0.3 * Math.sin(i * 2 + j * 3 + rnd * 20));
+      cA.copy(tono(0)); cB.copy(tono(1)); cC.copy(tono(2));
+      bb.tri(a, b, c2); bb.tri(a, c2, d2);
+    }
+  }
+}
+
+// ── construir la escena según modo ───────────────────────────────────────────
+const bb = new BB();
+const puntasTodas = [];
+let frondasTotal = 0, pinnasTotal = 0, cojines = 0, relieves = [];
+let volAll = [], volFr = 0;
+
+const rndMusgo = mulberry32((SEED ^ 0x5f356495) >>> 0);
+
+if (S13) {
+  // SYLVA: helechos con frondas curvas + pinnas; musgo cojines hemisféricos
+  for (const h of helechos) {
+    const { puntas, frondas, pinnasPorFronda } = helechoSylva(bb, h);
+    puntasTodas.push(puntas); frondasTotal += frondas; pinnasTotal += frondas * pinnasPorFronda;
+  }
+  for (const m of musgoPts) {
+    const lumps = 1 + Math.floor(rndMusgo() * 3);
+    for (let i = 0; i < lumps; i++) {
+      const ox = (rndMusgo() - 0.5) * m.radio * 1.4;
+      const oz = (rndMusgo() - 0.5) * m.radio * 1.4;
+      cojinMusgo(bb, m.x + ox, m.z + oz, m.radio * (0.5 + rndMusgo() * 0.5), rndMusgo());
+      cojines++;
+      relieves.push(0.32);   // dome height/radio fijo del cojín
+    }
+  }
+} else {
+  // BASELINE: tarjetas planas + discos de musgo planos
+  for (const h of helechos) {
+    const { puntas, frondas } = helechoTarjeta(bb, h);
+    puntasTodas.push(puntas); frondasTotal += frondas;
+  }
+  const colMusgo = new THREE.Color(0.34, 0.52, 0.24);
+  for (const m of musgoPts) {
+    const seg = 7;
+    for (let i = 0; i < seg; i++) {
+      const th = (i / seg) * Math.PI * 2, thn = ((i + 1) % seg) / seg * Math.PI * 2;
+      cA.copy(colMusgo); cB.copy(colMusgo); cC.copy(colMusgo);
+      bb.tri({ x: m.x, y: 0.005, z: m.z },
+        { x: m.x + Math.cos(th) * m.radio, y: 0.005, z: m.z + Math.sin(th) * m.radio },
+        { x: m.x + Math.cos(thn) * m.radio, y: 0.005, z: m.z + Math.sin(thn) * m.radio });
+    }
+    cojines++;
+    relieves.push(0);   // disco plano
+  }
+}
+
+// ── métrica de volumetría: λmin/λmax de la nube de puntas de cada helecho ────
+// Jacobi para la matriz simétrica 3×3 (autovalores exactos): una tarjeta plana
+// tiene λmin≈0 (toda su masa en un plano), una corona de frondas curvas ocupa
+// volumen en las tres direcciones → λmin/λmax > 0. Misma semilla + misma
+// siembra → el A/B mide SOLO el constructor del individuo, no la distribución.
+function volumetria(puntas) {
+  const n = puntas.length; if (n < 4) return 0;
+  let mx = 0, my = 0, mz = 0;
+  for (const p of puntas) { mx += p.x; my += p.y; mz += p.z; }
+  mx /= n; my /= n; mz /= n;
+  let cxx = 0, cyy = 0, czz = 0, cxy = 0, cxz = 0, cyz = 0;
+  for (const p of puntas) {
+    const dx = p.x - mx, dy = p.y - my, dz = p.z - mz;
+    cxx += dx * dx; cyy += dy * dy; czz += dz * dz;
+    cxy += dx * dy; cxz += dx * dz; cyz += dy * dz;
+  }
+  cxx /= n; cyy /= n; czz /= n; cxy /= n; cxz /= n; cyz /= n;
+  // rotaciones de Jacobi hasta converger (3×3 → ≤10 barridos bastan)
+  const A = [[cxx, cxy, cxz], [cxy, cyy, cyz], [cxz, cyz, czz]];
+  for (let sweep = 0; sweep < 16; sweep++) {
+    let off = 0;
+    for (let p2 = 0; p2 < 3; p2++) for (let q2 = p2 + 1; q2 < 3; q2++) off += A[p2][q2] * A[p2][q2];
+    if (off < 1e-18) break;
+    for (let p2 = 0; p2 < 2; p2++) {
+      for (let q2 = p2 + 1; q2 < 3; q2++) {
+        if (Math.abs(A[p2][q2]) < 1e-12) continue;
+        const phi = 0.5 * Math.atan2(2 * A[p2][q2], A[q2][q2] - A[p2][p2]);
+        const s2 = Math.sin(phi), c2 = Math.cos(phi);
+        for (let k = 0; k < 3; k++) {
+          const akp = A[k][p2], akq = A[k][q2];
+          A[k][p2] = c2 * akp - s2 * akq;
+          A[k][q2] = s2 * akp + c2 * akq;
+        }
+        for (let k = 0; k < 3; k++) {
+          const apk = A[p2][k], aqk = A[q2][k];
+          A[p2][k] = c2 * apk - s2 * aqk;
+          A[q2][k] = s2 * apk + c2 * aqk;
+        }
+      }
+    }
+  }
+  const ev = [Math.abs(A[0][0]), Math.abs(A[1][1]), Math.abs(A[2][2])].sort((a, b) => b - a);
+  const lamMax = Math.max(ev[0], 1e-9);
+  return Math.max(0, Math.min(1, ev[2] / lamMax));
+}
+
+// ── malla final: un solo mesh con vertex colors (follaje = MASA) ─────────────
+const geo = bb.geo();
+const mat = new THREE.MeshStandardMaterial({
+  vertexColors: true, roughness: 0.92, metalness: 0, side: THREE.DoubleSide, flatShading: false,
+});
+const masa = new THREE.Mesh(geo, mat);
+masa.name = 's13-sotobosque';
+masa.frustumCulled = false;
+scene.add(masa);
+
+// ── hooks del gate ───────────────────────────────────────────────────────────
+function mediana(xs) {
+  if (!xs.length) return 0;
+  const s = [...xs].sort((a, b) => a - b);
+  return s[s.length >> 1];
+}
+function medirS13() {
+  const vol = puntasTodas.map(volumetria);
+  volFr = mediana(vol);
+  volAll = vol;
+  return {
+    s13: S13 ? 1 : 0,
+    seed: SEED,
+    camara: CAM,
+    modo: S13 ? 'sylva-frondas-bezier' : 'tarjeta-baseline',
+    helechos: helechos.length,
+    musgo: cojines,
+    frondas: frondasTotal,
+    pinnas: pinnasTotal,
+    volumetria: +volFr.toFixed(3),
+    relieveMusgo: +mediana(relieves).toFixed(3),
+    gl: window.__r?.getContext?.()?.getError?.() ?? null,
+    dibujados: renderer.info.render.triangles,
+  };
+}
+window.__medirS13 = medirS13;
+window.__s13 = {
+  activa: S13, seed: SEED,
+  helechos: helechos.slice(0, 3000).map((p) => [+p.x.toFixed(2), +p.z.toFixed(2)]),
+  musgo: musgoPts.slice(0, 3000).map((p) => [+p.x.toFixed(2), +p.z.toFixed(2)]),
+};
+window.__ARRANQUE_OK = true;
+
+// ── cámaras ──────────────────────────────────────────────────────────────────
+const heroe = helechos.reduce((best, p) =>
+  (p.x * p.x + p.z * p.z < best.x * best.x + best.z * best.z ? p : best), helechos[0]);
+const CAMERAS = {
+  near: { tgt: [heroe.x, 0.75, heroe.z], fov: 55 },
+  mid:  { pos: [0, 10, 32], tgt: [0, 0, 0], fov: 55 },
+  wide: { pos: [6, 13, 44], tgt: [0, 0.5, -2], fov: 68 },
+};
+let c = CAMERAS[CAM] || CAMERAS.mid;
+if (CAM === 'near') {
+  // encuadre CERRADO sobre el helecho héroe: un solo individuo domina el cuadro
+  // (así la forma —tarjeta vs frondas pinnadas— es legible sin vecinos).
+  const ang = Math.atan2(heroe.z, heroe.x) + Math.PI;
+  const esc = Math.max(0.9, heroe.esc);
+  const dist = 3.6 + esc * 0.5;
+  c = { pos: [heroe.x + Math.cos(ang) * dist, 1.15, heroe.z + Math.sin(ang) * dist], ...CAMERAS.near };
+}
+camera.position.set(...c.pos);
+camera.fov = c.fov;
+camera.updateProjectionMatrix();
+controls.target.set(...c.tgt);
+controls.update();
+
+function pintarHud() {
+  const m = medirS13();
+  document.getElementById('modo').textContent = m.modo;
+  document.getElementById('seed').textContent = `${SEED} · ${CAM}`;
+  document.getElementById('n').textContent = `${m.helechos} (${m.frondas} / ${m.pinnas})`;
+  document.getElementById('vol').textContent = m.volumetria;
+  document.getElementById('musgo').textContent = `${m.musgo} / ${m.relieveMusgo}`;
+  document.getElementById('draws').textContent = `${renderer.info.render.calls} / ${(renderer.info.render.triangles / 1e3).toFixed(1)}k`;
+}
+pintarHud();
+
+const clock = new THREE.Clock();
+let frames = 0, fpsT = 0;
+function tick() {
+  requestAnimationFrame(tick);
+  renderer.render(scene, camera);
+  frames++; fpsT += clock.getDelta();
+  if (fpsT >= 0.5) {
+    document.getElementById('fps').textContent = Math.round(frames / fpsT);
+    frames = 0; fpsT = 0;
+  }
+}
+tick();
+addEventListener('resize', () => {
+  camera.aspect = innerWidth / innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(innerWidth, innerHeight);
+});
+</script>
+</body>
+</html>

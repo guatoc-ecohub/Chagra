@@ -1,0 +1,259 @@
+<!doctype html>
+<html lang="es-CO">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Sylva s39 — AO horneada por árbol (copa de masa del valle)</title>
+<style>
+  html,body{margin:0;height:100%;overflow:hidden;background:#0b0f0c;font-family:system-ui,-apple-system,"Segoe UI",sans-serif}
+  #c{display:block;width:100vw;height:100vh;touch-action:none}
+  #hud{position:fixed;top:14px;left:14px;padding:10px 14px;border-radius:12px;
+    background:rgba(10,18,12,.55);color:#eaffef;font-size:13px;line-height:1.55;
+    backdrop-filter:blur(8px);z-index:10;min-width:250px;box-shadow:0 8px 24px rgba(0,0,0,.25)}
+  #hud .row{display:flex;justify-content:space-between;gap:18px}
+  #hud .k{opacity:.68}
+  #hud b{font-variant-numeric:tabular-nums}
+  #err{position:fixed;inset:auto 14px 14px auto;max-width:72vw;color:#ffd9d9;background:rgba(90,20,20,.78);
+    padding:8px 12px;border-radius:10px;font-size:12px;white-space:pre-wrap;z-index:20;display:none}
+</style>
+<script type="importmap">
+{
+  "imports": {
+    "three": "./vendor/three.module.js",
+    "three/addons/": "./vendor/addons/"
+  }
+}
+</script>
+</head>
+<body>
+<canvas id="c"></canvas>
+<div id="hud">
+  <div class="row"><span class="k">FPS</span><b id="fps">--</b></div>
+  <div class="row"><span class="k">AO horneada</span><b id="ao">--</b></div>
+  <div class="row"><span class="k">fuerza / directo</span><b id="fd">--</b></div>
+  <div class="row"><span class="k">Semilla</span><b id="seed">--</b></div>
+  <div class="row"><span class="k">Cámara</span><b id="cam">--</b></div>
+  <div class="row"><span class="k">Árboles</span><b id="n">--</b></div>
+  <div class="row"><span class="k">Draw calls / tris</span><b id="draws">--</b></div>
+  <div class="row"><span class="k">ao héroe (media·p05)</span><b id="medir">--</b></div>
+</div>
+<div id="err"></div>
+<script type="module">
+// Banco del robo Sylva s39 (Token-Gremlin/realistic-forest, MIT): oclusión
+// HORNEADA por árbol, sin SSAO. Usa el código REAL del bosque del valle:
+//   bakearArbolMasa (flora-eztree-bake) → copa de masa de FollajeMasa con el
+//   atributo aoHorneada nacido en el bake; fusionarCopaMasa +
+//   materialCopaMasaInstanciada exportados de flora.js (misma malla y material
+//   que instancia el valle). Luces, tone-mapping y exposición = main.js.
+// A/B: ?ao=0 deja los materiales SIN parche (baseline compilado);
+//      window.__setAO(fuerza, directo) cambia el uniform en la MISMA escena
+//      (mismo scatter, misma cámara) — el diff de píxeles es el dial puro.
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { bakearArbolMasa } from './flora-eztree-bake.js';
+import { fusionarCopaMasa, materialCopaMasaInstanciada } from './flora.js';
+import { configurarOclusionHorneada, aplicarOclusionHorneada, atributoOclusionTronco, setOclusionHorneada } from './lib3d/flora/FollajeMasa.js';
+
+const err = document.getElementById('err');
+addEventListener('error', (e) => { err.style.display = 'block'; err.textContent = 'ERROR: ' + (e.message || e); });
+addEventListener('unhandledrejection', (e) => { err.style.display = 'block'; err.textContent = 'REJECT: ' + ((e.reason && e.reason.message) || e.reason); });
+
+const q = new URLSearchParams(location.search);
+const AO = q.get('ao') !== '0';
+const FUERZA = q.has('aoF') ? Number(q.get('aoF')) : 1;
+const DIRECTO = q.has('aoD') ? Number(q.get('aoD')) : 0.5;
+const _seed = Number(q.get('seed'));
+const SEED = Number.isInteger(_seed) && _seed >= 0 ? _seed : 20027;
+const CAM = q.get('cam') || 'mid';
+const N_ARBOLES = Math.max(1, Math.min(400, Number(q.get('n')) || 48));
+
+// El bake decide si parchea materiales según el estado del módulo: se fija
+// ANTES de hornear. ?ao=0 = ningún material toca el shader (baseline real).
+configurarOclusionHorneada({ activo: AO, fuerza: FUERZA, directo: DIRECTO });
+
+// PRNG sembrado (mulberry32): mismo rodal en todas las variantes de un seed.
+function mulberry32(a) {
+  return function () {
+    a |= 0; a = a + 0x6D2B79F5 | 0;
+    let t = Math.imul(a ^ a >>> 15, 1 | a);
+    t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t;
+    return ((t ^ t >>> 14) >>> 0) / 4294967296;
+  };
+}
+const rn = mulberry32(SEED);
+// bakearArbolMasa/FollajeMasa usan sus PRNG propios por seed; Math.random solo
+// lo usa el jitter de color de ez-tree → se siembra también para el A/B.
+Math.random = mulberry32(SEED ^ 0x9e3779b9);
+
+const renderer = new THREE.WebGLRenderer({ canvas: document.getElementById('c'), antialias: true });
+renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.5));
+renderer.setSize(innerWidth, innerHeight);
+renderer.toneMapping = THREE.AgXToneMapping;      // = main.js del valle
+renderer.toneMappingExposure = 1.55;
+renderer.outputColorSpace = THREE.SRGBColorSpace;
+window.__r = renderer;
+
+const scene = new THREE.Scene();
+const fogColor = 0xbfd0c6;
+scene.background = new THREE.Color(fogColor);
+scene.fog = new THREE.Fog(fogColor, 90, 420);
+window.__escena = scene;
+
+const camera = new THREE.PerspectiveCamera(50, innerWidth / innerHeight, 0.1, 1200);
+window.__cam = camera;
+const controls = new OrbitControls(camera, renderer.domElement);
+controls.enableDamping = true;
+window.__ctl = controls;
+
+// Luces del valle (atmosphere.js): hemisferio frío + sol cálido dominante.
+scene.add(new THREE.HemisphereLight(0x93a8c2, 0x1c2314, 0.55));
+const sol = new THREE.DirectionalLight(0xffe0c0, 2.7);
+sol.position.set(-40, 85, 30);
+scene.add(sol);
+
+// suelo del potrero
+const groundGeo = new THREE.CircleGeometry(260, 64);
+groundGeo.rotateX(-Math.PI / 2);
+const ground = new THREE.Mesh(groundGeo, new THREE.MeshStandardMaterial({ color: 0x4e6a36, roughness: 1, metalness: 0 }));
+ground.position.y = -0.02;
+scene.add(ground);
+
+// ── bakes: los MISMOS perfiles/tonos del bosque del valle (flora.js) ─────────
+const PERFILES = [
+  { clave: 'encenillo', tono: '#3d6d32', claro: '#6e9145', oscuro: '#203e20' },
+  { clave: 'roble_negro', tono: '#315b2b', claro: '#5d8140', oscuro: '#1b351b' },
+  { clave: 'aliso_andino', tono: '#477b3d', claro: '#7aa34f', oscuro: '#294d27' },
+];
+const bakes = PERFILES.map((p, i) => bakearArbolMasa(p.clave, { tono: p.tono, claro: p.claro, oscuro: p.oscuro, seed: SEED + 811 + i }));
+
+// ── rodal sembrado: héroe (encenillo, 12 m) en el origen con claro de 9 m,
+//    y N-1 árboles en anillo 12..46 m con jitter. Altura 8–14 m como el valle.
+const matricesPor = bakes.map(() => []);
+const composer = (bake, x, z, hm, giro) => {
+  const k = hm / bake.alturaNatural;
+  const qy = new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0, 1, 0), giro);
+  return new THREE.Matrix4().compose(new THREE.Vector3(x, -0.3, z), qy, new THREE.Vector3(k, k * (0.9 + rn() * 0.2), k));
+};
+matricesPor[0].push(composer(bakes[0], 0, 0, 12, 0.7));
+let puestos = 1, intentos = 0;
+const pts = [[0, 0]];
+while (puestos < N_ARBOLES && intentos < N_ARBOLES * 60) {
+  intentos++;
+  const a = rn() * Math.PI * 2, r = 12 + Math.sqrt(rn()) * 34;
+  const x = Math.cos(a) * r, z = Math.sin(a) * r;
+  if (pts.some(([px, pz]) => Math.hypot(px - x, pz - z) < 5.5)) continue;
+  if (Math.hypot(x, z) < 9) continue;
+  pts.push([x, z]);
+  const i = Math.floor(rn() * bakes.length);
+  matricesPor[i].push(composer(bakes[i], x, z, 8 + rn() * 6, rn() * Math.PI * 2));
+  puestos++;
+}
+
+// copas: misma malla fusionada y mismo material que instancia flora.js
+const copas = [];
+bakes.forEach((bake, i) => {
+  const mats = matricesPor[i];
+  if (!mats.length) return;
+  const mesh = new THREE.InstancedMesh(fusionarCopaMasa(bake), materialCopaMasaInstanciada(bake), mats.length);
+  mats.forEach((m, j) => mesh.setMatrixAt(j, m));
+  mesh.instanceMatrix.needsUpdate = true;
+  mesh.name = 'copa-' + bake.clave;
+  mesh.frustumCulled = false;
+  scene.add(mesh);
+  copas.push(mesh);
+});
+// fustes: mismo cilindro del lote común del valle + contacto horneado (Sylva bark)
+const trunkGeo = new THREE.CylinderGeometry(0.22, 0.34, 2.4, 5);
+trunkGeo.translate(0, 1.0, 0);
+const trunkMat = new THREE.MeshStandardMaterial({ color: 0x4a3826, roughness: 0.95, flatShading: true });
+atributoOclusionTronco(THREE, trunkGeo);
+if (AO) aplicarOclusionHorneada(THREE, trunkMat);
+const todas = matricesPor.flat();
+const troncos = new THREE.InstancedMesh(trunkGeo, trunkMat, todas.length);
+todas.forEach((m, j) => troncos.setMatrixAt(j, m));
+troncos.instanceMatrix.needsUpdate = true;
+troncos.frustumCulled = false;
+scene.add(troncos);
+
+// ── hooks del gate ───────────────────────────────────────────────────────────
+window.__ao = { activo: AO, fuerza: FUERZA, directo: DIRECTO, semilla: SEED, arboles: todas.length };
+window.__setAO = (f, d) => {
+  const n = setOclusionHorneada(f, d);
+  window.__ao.fuerza = Number.isFinite(f) ? f : window.__ao.fuerza;
+  if (Number.isFinite(d)) window.__ao.directo = d;
+  pintarHud();
+  return n;
+};
+// estadísticas del atributo horneado del héroe (malla fusionada núcleo+cards)
+function medirAO() {
+  const g = copas[0].geometry.attributes.aoHorneada;
+  if (!g) return null;
+  const a = Array.from(g.array).sort((x, y) => x - y);
+  const media = a.reduce((s, v) => s + v, 0) / a.length;
+  return { n: a.length, media: +media.toFixed(3), p05: +a[Math.floor(a.length * 0.05)].toFixed(3), min: +a[0].toFixed(3), max: +a[a.length - 1].toFixed(3) };
+}
+window.__medirAO = medirAO;
+// rectángulo en pantalla de la COPA del héroe (bbox de la malla × matriz del héroe)
+window.__rectCopa = () => {
+  const geo = copas[0].geometry;
+  geo.computeBoundingBox();
+  const bb = geo.boundingBox;
+  const M = new THREE.Matrix4(); copas[0].getMatrixAt(0, M);
+  let x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity;
+  const v = new THREE.Vector3();
+  for (const cx of [bb.min.x, bb.max.x]) for (const cy of [bb.min.y, bb.max.y]) for (const cz of [bb.min.z, bb.max.z]) {
+    v.set(cx, cy, cz).applyMatrix4(M).project(camera);
+    const sx = (v.x + 1) / 2 * innerWidth, sy = (1 - v.y) / 2 * innerHeight;
+    x0 = Math.min(x0, sx); y0 = Math.min(y0, sy); x1 = Math.max(x1, sx); y1 = Math.max(y1, sy);
+  }
+  return { x0: Math.round(x0), y0: Math.round(y0), x1: Math.round(x1), y1: Math.round(y1), ancho: innerWidth, alto: innerHeight };
+};
+
+// ── cámaras de envelope: el héroe es el sujeto (copa ≈ y 3..12) ──────────────
+const CAMERAS = {
+  near: { pos: [6.5, 2.6, 8.5], tgt: [0, 4.6, 0], fov: 55 },   // panza de la copa + contacto del fuste
+  mid:  { pos: [2, 7.5, 27],    tgt: [0, 6.2, 0], fov: 50 },   // árbol entero
+  wide: { pos: [22, 17, 64],    tgt: [0, 6, -8],  fov: 50 },   // rodal
+};
+const c = CAMERAS[CAM] || CAMERAS.mid;
+camera.position.set(...c.pos);
+camera.fov = c.fov;
+camera.updateProjectionMatrix();
+controls.target.set(...c.tgt);
+controls.update();
+
+function pintarHud() {
+  document.getElementById('ao').textContent = AO ? 'SÍ (parche activo)' : 'no (baseline)';
+  document.getElementById('fd').textContent = `${window.__ao.fuerza} / ${window.__ao.directo}`;
+  document.getElementById('seed').textContent = SEED;
+  document.getElementById('cam').textContent = CAM;
+  document.getElementById('n').textContent = todas.length;
+  const m = medirAO();
+  document.getElementById('medir').textContent = m ? `${m.media} · ${m.p05}` : '—';
+}
+pintarHud();
+window.__ARRANQUE_OK = true;
+
+const clock = new THREE.Clock();
+let frames = 0, fpsT = 0;
+function tick() {
+  requestAnimationFrame(tick);
+  const dt = clock.getDelta();
+  controls.update();
+  renderer.render(scene, camera);
+  frames++; fpsT += dt;
+  if (fpsT >= 0.5) {
+    document.getElementById('fps').textContent = Math.round(frames / fpsT);
+    frames = 0; fpsT = 0;
+  }
+  document.getElementById('draws').textContent = `${renderer.info.render.calls} / ${(renderer.info.render.triangles / 1e3).toFixed(0)} k`;
+}
+tick();
+addEventListener('resize', () => {
+  camera.aspect = innerWidth / innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(innerWidth, innerHeight);
+});
+</script>
+</body>
+</html>

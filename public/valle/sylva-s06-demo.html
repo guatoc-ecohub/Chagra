@@ -1,0 +1,202 @@
+<!doctype html>
+<html lang="es-CO">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Sylva s06 — Root flare / contrafuertes (ez-tree)</title>
+<style>
+  html,body{margin:0;height:100%;overflow:hidden;background:#0b0f0c;font-family:system-ui,-apple-system,"Segoe UI",sans-serif}
+  #c{display:block;width:100vw;height:100vh;touch-action:none}
+  #hud{position:fixed;top:14px;left:14px;padding:10px 14px;border-radius:12px;
+    background:rgba(10,18,12,.55);color:#eaffef;font-size:13px;line-height:1.55;
+    backdrop-filter:blur(8px);z-index:10;min-width:230px;box-shadow:0 8px 24px rgba(0,0,0,.25)}
+  #hud .row{display:flex;justify-content:space-between;gap:18px}
+  #hud .k{opacity:.68}
+  #hud b{font-variant-numeric:tabular-nums}
+  #err{position:fixed;inset:auto 14px 14px auto;max-width:72vw;color:#ffd9d9;background:rgba(90,20,20,.78);
+    padding:8px 12px;border-radius:10px;font-size:12px;white-space:pre-wrap;z-index:20;display:none}
+</style>
+<script type="importmap">
+{
+  "imports": {
+    "three": "./vendor/three.module.js",
+    "three/addons/": "./vendor/addons/"
+  }
+}
+</script>
+</head>
+<body>
+<canvas id="c"></canvas>
+<div id="hud">
+  <div class="row"><span class="k">FPS</span><b id="fps">--</b></div>
+  <div class="row"><span class="k">Root flare</span><b id="flare">--</b></div>
+  <div class="row"><span class="k">Contrafuertes</span><b id="buttress">--</b></div>
+  <div class="row"><span class="k">Especie</span><b id="especie">--</b></div>
+  <div class="row"><span class="k">Semilla</span><b id="seed">--</b></div>
+  <div class="row"><span class="k">Flare base/raíz</span><b id="medir">--</b></div>
+  <div class="row"><span class="k">Draw calls</span><b id="draws">--</b></div>
+</div>
+<div id="err"></div>
+<script type="module">
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { Tree } from './flora/ez-tree/tree.js';
+import TreeOptions from './flora/ez-tree/options.js';
+import { ESPECIES_EZTREE } from './flora/especies-eztree.js';
+
+const err = document.getElementById('err');
+addEventListener('error', (e) => { err.style.display = 'block'; err.textContent = 'ERROR: ' + (e.message || e); });
+addEventListener('unhandledrejection', (e) => { err.style.display = 'block'; err.textContent = 'REJECT: ' + ((e.reason && e.reason.message) || e.reason); });
+
+const q = new URLSearchParams(location.search);
+const FLARE = q.get('flare') !== '0';
+const _especie = q.get('especie');
+const ESPECIE = ESPECIES_EZTREE[_especie] ? _especie : 'ceiba';
+const _seed = Number(q.get('seed'));
+const SEED = Number.isInteger(_seed) && _seed >= 0 ? _seed : 20002;
+const CAM = q.get('cam') || 'mid';
+const TIEMPO_FIJO = (() => { const t = Number(q.get('t')); return Number.isFinite(t) ? t : null; })();
+
+const renderer = new THREE.WebGLRenderer({ canvas: document.getElementById('c'), antialias: true });
+renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.5));
+renderer.setSize(innerWidth, innerHeight);
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure = 1.1;
+window.__r = renderer;
+
+const scene = new THREE.Scene();
+const fogColor = 0xc9dbd0;
+scene.background = new THREE.Color(fogColor);
+scene.fog = new THREE.Fog(fogColor, 30, 180);
+window.__escena = scene;
+
+const camera = new THREE.PerspectiveCamera(50, innerWidth / innerHeight, 0.1, 900);
+window.__cam = camera;
+
+const controls = new OrbitControls(camera, renderer.domElement);
+controls.enableDamping = true;
+controls.target.set(0, 2.5, 0);
+
+scene.add(new THREE.HemisphereLight(0xcfe8d0, 0x2a3a24, 0.8));
+const sun = new THREE.DirectionalLight(0xfff2d8, 1.6);
+sun.position.set(22, 34, 14);
+scene.add(sun);
+
+// ── suelo: la línea de la unión tronco-suelo que el flare debe dejar de
+//    parecer estaca ────────────────────────────────────────────────────────────
+const groundGeo = new THREE.CircleGeometry(70, 48);
+groundGeo.rotateX(-Math.PI / 2);
+const groundMat = new THREE.MeshStandardMaterial({ color: 0x4a6033, roughness: 1, metalness: 0 });
+const ground = new THREE.Mesh(groundGeo, groundMat);
+ground.position.y = -0.15;
+scene.add(ground);
+
+function buildTree() {
+  const def = ESPECIES_EZTREE[ESPECIE];
+  if (!def || def.arquetipo !== 'arbol') throw new Error(`especie "${ESPECIE}" no es arbol`);
+  const opts = new TreeOptions();
+  opts.copy(def.options);
+  opts.seed = SEED;
+  if (FLARE) {
+    // Contrafuertes para la especie: el ensanche de pie en `height`, aletas
+    // que suben `lobeRise`× más alto y `buttresses` lóbulos alrededor. Valores
+    // por defecto de options.js (especie sin bloque propio) calibrados sobre
+    // ceiba — la especie de contrafuertes por antonomasia.
+    opts.rootFlare.enabled = true;
+    opts.rootFlare.height = 1.4;
+    opts.rootFlare.strength = 0.9;
+    opts.rootFlare.buttresses = 6;
+    opts.rootFlare.lobeDepth = 0.7;
+    opts.rootFlare.lobeRise = 1.6;
+    opts.rootFlare.lobeWidth = 2;
+    opts.rootFlare.offset = 0.52;
+  }
+  const tree = new Tree(opts);
+  tree.generate();
+  return tree;
+}
+
+const tree = buildTree();
+scene.add(tree);
+window.__arbol = tree;
+window.__flare = FLARE;
+
+// ── Métrica determinista del flare: lee la MALLA real (no el esqueleto).
+//    baseR = radio horizontal máximo del anillo del pie (banda y≈0);
+//    raizR = radio MEDIANO del fuste justo por encima de la zona de flare
+//            (banda ancha que siempre contiene un anillo del fuste);
+//    ratio = baseR/raizR. Sin flare el ratio es ≈1 (solo el taper del fuste);
+//    con flare el pie se ensancha claramente. Mismo seed → mismo número exacto.
+function medirFlare() {
+  const pos = tree.branchesMesh.geometry.attributes.position;
+  const arr = pos.array;
+  const H = tree.options.rootFlare.height || 0;
+  const bLo = H * 1.25, bHi = bLo + 1.6;
+  let baseR = 0;
+  const radiosRaiz = [];
+  for (let i = 0; i < arr.length; i += 3) {
+    const x = arr[i], y = arr[i + 1], z = arr[i + 2];
+    const r = Math.hypot(x, z);
+    if (y >= -0.1 && y <= 0.2) {
+      if (r > baseR) baseR = r;
+    } else if (y > bLo && y < bHi) {
+      radiosRaiz.push(r);
+    }
+  }
+  if (!radiosRaiz.length || baseR <= 0) return { baseR, raizR: 0, ratio: 0, bLo: +bLo.toFixed(2), bHi: +bHi.toFixed(2) };
+  radiosRaiz.sort((a, b) => a - b);
+  const raiz = radiosRaiz[radiosRaiz.length >> 1];
+  return { baseR: +baseR.toFixed(3), raizR: +raiz.toFixed(3), ratio: +(baseR / raiz).toFixed(3), bLo: +bLo.toFixed(2), bHi: +bHi.toFixed(2) };
+}
+window.__medirFlare = medirFlare;
+
+// ── cámaras de envelope para el gate: la unión tronco-suelo es el sujeto ─────
+const CAMERAS = {
+  near:  { pos: [2.2, 0.9, 2.6],  tgt: [0, 1.1, 0], fov: 55 },
+  mid:   { pos: [0, 2.4, 7.2],    tgt: [0, 1.8, 0], fov: 50 },
+  wide:  { pos: [0, 9, 24],       tgt: [0, 6, 0],   fov: 50 },
+};
+if (CAMERAS[CAM]) {
+  const c = CAMERAS[CAM];
+  camera.position.set(...c.pos);
+  camera.fov = c.fov;
+  camera.updateProjectionMatrix();
+  controls.target.set(...c.tgt);
+  controls.update();
+}
+
+document.getElementById('flare').textContent = FLARE ? 'SÍ' : 'no';
+document.getElementById('buttress').textContent = FLARE ? tree.options.rootFlare.buttresses : '—';
+document.getElementById('especie').textContent = ESPECIE;
+document.getElementById('seed').textContent = SEED;
+document.getElementById('medir').textContent = JSON.stringify(medirFlare());
+
+window.__ARRANQUE_OK = true;
+
+// ── bucle ───────────────────────────────────────────────────────────────────
+const clock = new THREE.Clock();
+let frames = 0, fpsT = 0, fps = 0;
+function tick() {
+  requestAnimationFrame(tick);
+  const dt = TIEMPO_FIJO !== null ? 0 : clock.getDelta();
+  if (TIEMPO_FIJO !== null) tree.update(TIEMPO_FIJO); else tree.update(clock.elapsedTime);
+  controls.update();
+  renderer.render(scene, camera);
+  frames++; fpsT += dt;
+  if (fpsT >= 0.5) {
+    fps = Math.round(frames / fpsT);
+    frames = 0; fpsT = 0;
+    document.getElementById('fps').textContent = fps;
+  }
+  document.getElementById('draws').textContent = renderer.info.render.calls;
+}
+tick();
+
+addEventListener('resize', () => {
+  camera.aspect = innerWidth / innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(innerWidth, innerHeight);
+});
+</script>
+</body>
+</html>
