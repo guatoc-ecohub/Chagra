@@ -17,20 +17,23 @@ import {
   duracionDeDescanso,
   crearRitmoPropio,
 } from '../vidaEstados.js';
-/* El repertorio vigente es deliberadamente más pequeño que CREATURES: solo
-   estas especies tienen gestos propios; el resto conserva su identidad base. */
-const CON_VIDA = Object.keys(VIDA_REPERTORIO);
+import { CREATURES } from '../index.js';
+
+/* Estas entradas del registro no consumen useVidaIdle. Guacamaya sí lo consume
+   como compai elegible, aunque su superficie no sea el registro CREATURES. */
+const SIN_VIDA = new Set([
+  'abeja-angelita', 'lombriz', 'mariposa', 'escarabajo', 'ent-frailejon',
+  'condor', 'danta', 'gallina', 'crisopa', 'trichogramma', 'sirfido', 'maiz',
+]);
+const CON_VIDA = [
+  ...Object.keys(CREATURES).filter((slug) => !SIN_VIDA.has(slug)),
+  'guacamaya',
+].sort();
 
 describe('1. El repertorio cubre exactamente las especies con vida propia', () => {
-  // TODO(2026-09-04): VIDA_REPERTORIO y CON_VIDA están desincronizados — el
-  // repertorio no cubre todas las especies que el registro declara con vida.
-  // Es repertorio incompleto o test aspiracional; encolado para investigar
-  // (`auditar-vida-repertorio-20260904`). Se skipea para desbloquear el
-  // reviewer-gate, conservando la intención del commit 526d2fc3b, que se hizo
-  // sobre la versión anterior de este archivo y no aplicaba limpio.
-  it.skip('cada especie declarada en el repertorio tiene sus datos de vida', () => {
+  it('cada especie con vida tiene repertorio y no hay repertorios huérfanos', () => {
     expect(Object.keys(VIDA_REPERTORIO).sort()).toEqual(CON_VIDA.sort());
-    // Se suman chivito y guacamaya: ya no quedan en identidad muda.
+    // Los perfiles canónicos, la guacamaya compai y borugo ya están registrados.
     expect(CON_VIDA).toHaveLength(15);
   });
 
