@@ -1,0 +1,295 @@
+{
+  "fecha": "2026-09-07T03:35:03.490Z",
+  "pageErrors": [],
+  "consoleErrors": [
+    "Failed to load resource: the server responded with a status of 403 (Forbidden)",
+    "wasm streaming compile failed: TypeError: Failed to execute 'compile' on 'WebAssembly': HTTP status code is not ok",
+    "falling back to ArrayBuffer instantiation",
+    "Failed to load resource: the server responded with a status of 403 (Forbidden)",
+    "failed to asynchronously prepare wasm: both async and sync fetching of the wasm failed",
+    "Aborted(both async and sync fetching of the wasm failed)",
+    "Exception loading sqlite3 module: RuntimeError: Aborted(both async and sync fetching of the wasm failed). Build with -sASSERTIONS for more info.\n    at abort (http://localhost:5391/node_modules/.vite/",
+    "[SQLite WASM] Failed to initialize catalog db: RuntimeError: Aborted(both async and sync fetching of the wasm failed). Build with -sASSERTIONS for more info.\n    at abort (http://localhost:5391/node_m",
+    "Failed to load resource: the server responded with a status of 403 (Forbidden)",
+    "wasm streaming compile failed: TypeError: Failed to execute 'compile' on 'WebAssembly': HTTP status code is not ok",
+    "falling back to ArrayBuffer instantiation",
+    "Failed to load resource: the server responded with a status of 403 (Forbidden)",
+    "failed to asynchronously prepare wasm: both async and sync fetching of the wasm failed",
+    "Aborted(both async and sync fetching of the wasm failed)",
+    "Exception loading sqlite3 module: RuntimeError: Aborted(both async and sync fetching of the wasm failed). Build with -sASSERTIONS for more info.\n    at abort (http://localhost:5391/node_modules/.vite/",
+    "[SQLite WASM] Failed to initialize catalog db: RuntimeError: Aborted(both async and sync fetching of the wasm failed). Build with -sASSERTIONS for more info.\n    at abort (http://localhost:5391/node_m",
+    "Failed to load resource: the server responded with a status of 404 (Not Found)",
+    "Failed to load resource: the server responded with a status of 403 (Forbidden)",
+    "wasm streaming compile failed: TypeError: Failed to execute 'compile' on 'WebAssembly': HTTP status code is not ok",
+    "falling back to ArrayBuffer instantiation",
+    "Failed to load resource: the server responded with a status of 403 (Forbidden)",
+    "failed to asynchronously prepare wasm: both async and sync fetching of the wasm failed",
+    "Aborted(both async and sync fetching of the wasm failed)",
+    "Exception loading sqlite3 module: RuntimeError: Aborted(both async and sync fetching of the wasm failed). Build with -sASSERTIONS for more info.\n    at abort (http://localhost:5391/node_modules/.vite/",
+    "[SQLite WASM] Failed to initialize catalog db: RuntimeError: Aborted(both async and sync fetching of the wasm failed). Build with -sASSERTIONS for more info.\n    at abort (http://localhost:5391/node_m",
+    "Failed to load resource: the server responded with a status of 403 (Forbidden)",
+    "wasm streaming compile failed: TypeError: Failed to execute 'compile' on 'WebAssembly': HTTP status code is not ok",
+    "falling back to ArrayBuffer instantiation",
+    "Failed to load resource: the server responded with a status of 403 (Forbidden)",
+    "failed to asynchronously prepare wasm: both async and sync fetching of the wasm failed",
+    "Aborted(both async and sync fetching of the wasm failed)",
+    "Exception loading sqlite3 module: RuntimeError: Aborted(both async and sync fetching of the wasm failed). Build with -sASSERTIONS for more info.\n    at abort (http://localhost:5391/node_modules/.vite/",
+    "[SQLite WASM] Failed to initialize catalog db: RuntimeError: Aborted(both async and sync fetching of the wasm failed). Build with -sASSERTIONS for more info.\n    at abort (http://localhost:5391/node_m",
+    "Failed to load resource: the server responded with a status of 404 (Not Found)",
+    "Failed to load resource: the server responded with a status of 404 (Not Found)",
+    "Failed to load resource: the server responded with a status of 429 (Too Many Requests)",
+    "Failed to load resource: the server responded with a status of 429 (Too Many Requests)",
+    "Failed to load resource: the server responded with a status of 404 (Not Found)",
+    "Failed to load resource: the server responded with a status of 404 (Not Found)"
+  ],
+  "resultados": [
+    {
+      "clima": "niebla",
+      "luz": "amanecer",
+      "fps": null,
+      "contrastes": [
+        {
+          "id": "cabecera-lugar",
+          "texto": "Paramo alto · Guatavita, Cundinamarca",
+          "min": 10.32,
+          "p05": 10.58
+        },
+        {
+          "id": "cabecera-altura",
+          "texto": "2900 m s. n. m. · Piso frío",
+          "min": 9.36,
+          "p05": 9.73
+        },
+        {
+          "id": "cabecera-saludo",
+          "texto": "Buenas noches",
+          "min": 8.44,
+          "p05": 8.74
+        },
+        {
+          "id": "cabecera-condicion",
+          "texto": "Nublado · 10:34 p. m.",
+          "min": 7.81,
+          "p05": 8.09
+        },
+        {
+          "id": "cifra-grande",
+          "texto": "10°C",
+          "min": 12.99,
+          "p05": 13.36
+        },
+        {
+          "id": "tab-hoy",
+          "texto": "Hoy",
+          "min": 9.65,
+          "p05": 9.8
+        },
+        {
+          "id": "tab-semana",
+          "texto": "7–16 días",
+          "min": 10.27,
+          "p05": 10.43
+        },
+        {
+          "id": "tab-estacional",
+          "texto": "El Niño",
+          "min": 10.78,
+          "p05": 10.9
+        },
+        {
+          "id": "CONTROL-21",
+          "texto": "CONTROL",
+          "min": 21,
+          "p05": 21
+        },
+        {
+          "id": "CONTROL-4.54",
+          "texto": "CONTROL",
+          "min": 4.54,
+          "p05": 4.54
+        }
+      ],
+      "todoTexto": [
+        {
+          "texto": "92",
+          "p05": 6.97
+        },
+        {
+          "texto": "1.2",
+          "p05": 7.73
+        },
+        {
+          "texto": "10:34 p. m.",
+          "p05": 8.06
+        },
+        {
+          "texto": "Muy alto — protéjase",
+          "p05": 8.38
+        },
+        {
+          "texto": "Rocío a 8°C",
+          "p05": 8.52
+        },
+        {
+          "texto": "Open-Meteo · máx. del día",
+          "p05": 8.52
+        },
+        {
+          "texto": "Open-Meteo",
+          "p05": 8.65
+        },
+        {
+          "texto": "Buenas noches",
+          "p05": 8.74
+        },
+        {
+          "texto": "Open-Meteo (WMO) · fase ENSO: IDEA",
+          "p05": 8.78
+        },
+        {
+          "texto": "mm",
+          "p05": 9.32
+        },
+        {
+          "texto": "mm",
+          "p05": 9.35
+        },
+        {
+          "texto": "100% de probabilidad",
+          "p05": 9.48
+        },
+        {
+          "texto": "agua que se evapora hoy",
+          "p05": 9.49
+        },
+        {
+          "texto": "2900 m s. n. m. · Piso frío",
+          "p05": 9.73
+        },
+        {
+          "texto": "Estimado por Chagra · Open-Meteo (",
+          "p05": 9.73
+        },
+        {
+          "texto": "Open-Meteo",
+          "p05": 9.76
+        },
+        {
+          "texto": "Hoy",
+          "p05": 9.79
+        },
+        {
+          "texto": "Se siente como 9°C",
+          "p05": 10.31
+        },
+        {
+          "texto": "7–16 días",
+          "p05": 10.43
+        },
+        {
+          "texto": "El Niño",
+          "p05": 10.9
+        },
+        {
+          "texto": "°C",
+          "p05": 11.01
+        },
+        {
+          "texto": "Nublado · fase Neutral",
+          "p05": 11.29
+        },
+        {
+          "texto": "Ahora mismo",
+          "p05": 12.2
+        },
+        {
+          "texto": "Lo que viene",
+          "p05": 12.94
+        },
+        {
+          "texto": "La temporada",
+          "p05": 12.94
+        },
+        {
+          "texto": "☁️",
+          "p05": 13.44
+        }
+      ],
+      "enso": null,
+      "capas": {
+        "cielo:soleado": 0,
+        "cielo:lluvia": 0,
+        "cielo:niebla": 1,
+        "cielo:dorada": 0,
+        "cielo:noche": 0,
+        "cielo:nublado": 0,
+        "grade:soleado": 0,
+        "grade:lluvia": 0,
+        "grade:niebla": 1,
+        "grade:dorada": 0.34,
+        "grade:noche": 0,
+        "grade:nublado": 0,
+        "astro": 0.25,
+        "rayos": 0.58,
+        "bruma": 0.92,
+        "laderaLuz": 0,
+        "vineta": 0.16,
+        "scrimAlto": 1,
+        "scrimBajo": 0.55,
+        "jironUI": 0.34,
+        "capa:estrellas": 0,
+        "capa:lluvia": 0,
+        "capa:niebla": 1,
+        "capa:polvo": 0,
+        "capa:luci": 0
+      },
+      "particulas": {
+        "estrellas": {
+          "total": 26,
+          "visibles": 0,
+          "animando": 0,
+          "opCapa": 0
+        },
+        "gotas": {
+          "total": 30,
+          "visibles": 0,
+          "animando": 0,
+          "opCapa": 0
+        },
+        "bancos": {
+          "total": 9,
+          "visibles": 9,
+          "animando": 9,
+          "opCapa": 1
+        },
+        "jirones": {
+          "total": 7,
+          "visibles": 7,
+          "animando": 7,
+          "opCapa": 1
+        },
+        "motas": {
+          "total": 16,
+          "visibles": 0,
+          "animando": 0,
+          "opCapa": 0
+        },
+        "luciernagas": {
+          "total": 11,
+          "visibles": 0,
+          "animando": 0,
+          "opCapa": 0
+        },
+        "rayos": {
+          "total": 6,
+          "visibles": 6,
+          "animando": 1,
+          "opCapa": 0.58
+        }
+      },
+      "animCorriendo": 41,
+      "animVivasVisibles": 40,
+      "nodosEscena": 210
+    }
+  ]
+}

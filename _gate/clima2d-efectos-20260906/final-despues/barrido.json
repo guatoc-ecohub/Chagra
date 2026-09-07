@@ -1,0 +1,4111 @@
+{
+  "fecha": "2026-09-07T04:33:00.774Z",
+  "pageErrors": [],
+  "consoleErrors": [
+    "Failed to load resource: the server responded with a status of 403 (Forbidden)",
+    "wasm streaming compile failed: TypeError: Failed to execute 'compile' on 'WebAssembly': HTTP status code is not ok",
+    "falling back to ArrayBuffer instantiation",
+    "Failed to load resource: the server responded with a status of 403 (Forbidden)",
+    "failed to asynchronously prepare wasm: both async and sync fetching of the wasm failed",
+    "Aborted(both async and sync fetching of the wasm failed)",
+    "Exception loading sqlite3 module: RuntimeError: Aborted(both async and sync fetching of the wasm failed). Build with -sASSERTIONS for more info.\n    at abort (http://localhost:5391/node_modules/.vite/",
+    "[SQLite WASM] Failed to initialize catalog db: RuntimeError: Aborted(both async and sync fetching of the wasm failed). Build with -sASSERTIONS for more info.\n    at abort (http://localhost:5391/node_m",
+    "Failed to load resource: the server responded with a status of 403 (Forbidden)",
+    "wasm streaming compile failed: TypeError: Failed to execute 'compile' on 'WebAssembly': HTTP status code is not ok",
+    "falling back to ArrayBuffer instantiation",
+    "Failed to load resource: the server responded with a status of 403 (Forbidden)",
+    "failed to asynchronously prepare wasm: both async and sync fetching of the wasm failed",
+    "Aborted(both async and sync fetching of the wasm failed)",
+    "Exception loading sqlite3 module: RuntimeError: Aborted(both async and sync fetching of the wasm failed). Build with -sASSERTIONS for more info.\n    at abort (http://localhost:5391/node_modules/.vite/",
+    "[SQLite WASM] Failed to initialize catalog db: RuntimeError: Aborted(both async and sync fetching of the wasm failed). Build with -sASSERTIONS for more info.\n    at abort (http://localhost:5391/node_m",
+    "Failed to load resource: the server responded with a status of 404 (Not Found)",
+    "Failed to load resource: the server responded with a status of 403 (Forbidden)",
+    "wasm streaming compile failed: TypeError: Failed to execute 'compile' on 'WebAssembly': HTTP status code is not ok",
+    "falling back to ArrayBuffer instantiation",
+    "Failed to load resource: the server responded with a status of 403 (Forbidden)",
+    "failed to asynchronously prepare wasm: both async and sync fetching of the wasm failed",
+    "Aborted(both async and sync fetching of the wasm failed)",
+    "Exception loading sqlite3 module: RuntimeError: Aborted(both async and sync fetching of the wasm failed). Build with -sASSERTIONS for more info.\n    at abort (http://localhost:5391/node_modules/.vite/",
+    "[SQLite WASM] Failed to initialize catalog db: RuntimeError: Aborted(both async and sync fetching of the wasm failed). Build with -sASSERTIONS for more info.\n    at abort (http://localhost:5391/node_m",
+    "Failed to load resource: the server responded with a status of 403 (Forbidden)",
+    "wasm streaming compile failed: TypeError: Failed to execute 'compile' on 'WebAssembly': HTTP status code is not ok",
+    "falling back to ArrayBuffer instantiation",
+    "Failed to load resource: the server responded with a status of 403 (Forbidden)",
+    "failed to asynchronously prepare wasm: both async and sync fetching of the wasm failed",
+    "Aborted(both async and sync fetching of the wasm failed)",
+    "Exception loading sqlite3 module: RuntimeError: Aborted(both async and sync fetching of the wasm failed). Build with -sASSERTIONS for more info.\n    at abort (http://localhost:5391/node_modules/.vite/",
+    "[SQLite WASM] Failed to initialize catalog db: RuntimeError: Aborted(both async and sync fetching of the wasm failed). Build with -sASSERTIONS for more info.\n    at abort (http://localhost:5391/node_m",
+    "Failed to load resource: the server responded with a status of 429 (Too Many Requests)",
+    "Failed to load resource: the server responded with a status of 429 (Too Many Requests)",
+    "Failed to load resource: the server responded with a status of 404 (Not Found)",
+    "Failed to load resource: the server responded with a status of 404 (Not Found)",
+    "Failed to load resource: the server responded with a status of 404 (Not Found)",
+    "Failed to load resource: the server responded with a status of 404 (Not Found)"
+  ],
+  "resultados": [
+    {
+      "clima": "despejado",
+      "luz": "amanecer",
+      "fps": null,
+      "contrastes": [
+        {
+          "id": "cabecera-lugar",
+          "texto": "Paramo alto · Guatavita, Cundinamarca",
+          "min": 9.34,
+          "p05": 13.57
+        },
+        {
+          "id": "cabecera-altura",
+          "texto": "2900 m s. n. m. · Piso frío",
+          "min": 12.94,
+          "p05": 13.11
+        },
+        {
+          "id": "cabecera-saludo",
+          "texto": "Buenas noches",
+          "min": 7.33,
+          "p05": 12.23
+        },
+        {
+          "id": "cabecera-condicion",
+          "texto": "Nublado · 11:31 p. m.",
+          "min": 9.59,
+          "p05": 11.66
+        },
+        {
+          "id": "cifra-grande",
+          "texto": "9°C",
+          "min": 14.38,
+          "p05": 14.67
+        },
+        {
+          "id": "tab-hoy",
+          "texto": "Hoy",
+          "min": 10.9,
+          "p05": 10.9
+        },
+        {
+          "id": "tab-semana",
+          "texto": "7–16 días",
+          "min": 11.88,
+          "p05": 11.88
+        },
+        {
+          "id": "tab-estacional",
+          "texto": "El Niño",
+          "min": 11.88,
+          "p05": 11.88
+        },
+        {
+          "id": "CONTROL-21",
+          "texto": "CONTROL",
+          "min": 21,
+          "p05": 21
+        },
+        {
+          "id": "CONTROL-4.54",
+          "texto": "CONTROL",
+          "min": 4.54,
+          "p05": 4.54
+        }
+      ],
+      "flotantesApartados": 1,
+      "nTextos": 27,
+      "todoTexto": [
+        {
+          "texto": "94",
+          "p05": 8.33
+        },
+        {
+          "texto": "1.2",
+          "p05": 9.36
+        },
+        {
+          "texto": "3.01",
+          "p05": 10.23
+        },
+        {
+          "texto": "Rocío a 8°C",
+          "p05": 10.37
+        },
+        {
+          "texto": "Muy alto — protéjase",
+          "p05": 10.46
+        },
+        {
+          "texto": "Open-Meteo (WMO) · fase ENSO: IDEA",
+          "p05": 10.47
+        },
+        {
+          "texto": "Open-Meteo",
+          "p05": 10.54
+        },
+        {
+          "texto": "Open-Meteo · máx. del día",
+          "p05": 10.65
+        },
+        {
+          "texto": "Hoy",
+          "p05": 10.9
+        },
+        {
+          "texto": "mm",
+          "p05": 11.45
+        },
+        {
+          "texto": "Se siente como 8°C",
+          "p05": 11.56
+        },
+        {
+          "texto": "11:31 p. m.",
+          "p05": 11.65
+        },
+        {
+          "texto": "mm",
+          "p05": 11.84
+        },
+        {
+          "texto": "7–16 días",
+          "p05": 11.88
+        },
+        {
+          "texto": "El Niño",
+          "p05": 11.88
+        },
+        {
+          "texto": "100% de probabilidad",
+          "p05": 11.89
+        },
+        {
+          "texto": "°C",
+          "p05": 11.92
+        },
+        {
+          "texto": "agua que se evapora hoy",
+          "p05": 12.03
+        },
+        {
+          "texto": "Nublado · fase Neutral",
+          "p05": 12.19
+        },
+        {
+          "texto": "Ahora mismo",
+          "p05": 12.2
+        },
+        {
+          "texto": "Buenas noches",
+          "p05": 12.23
+        },
+        {
+          "texto": "Open-Meteo",
+          "p05": 12.32
+        },
+        {
+          "texto": "Estimado por Chagra · Open-Meteo (",
+          "p05": 12.32
+        },
+        {
+          "texto": "Lo que viene",
+          "p05": 12.94
+        },
+        {
+          "texto": "La temporada",
+          "p05": 12.94
+        },
+        {
+          "texto": "2900 m s. n. m. · Piso frío",
+          "p05": 13.11
+        },
+        {
+          "texto": "☁️",
+          "p05": 15.14
+        }
+      ],
+      "enso": null,
+      "capas": {
+        "cielo:soleado": 0,
+        "cielo:lluvia": 0,
+        "cielo:niebla": 0,
+        "cielo:dorada": 1,
+        "cielo:noche": 0,
+        "cielo:nublado": 0,
+        "grade:soleado": 0,
+        "grade:lluvia": 0,
+        "grade:niebla": 0,
+        "grade:dorada": 1,
+        "grade:noche": 0,
+        "grade:nublado": 0,
+        "astro": 1,
+        "rayos": 0.75,
+        "bruma": 0.4,
+        "laderaLuz": 0.8,
+        "vineta": 0.34,
+        "scrimAlto": 0.82,
+        "scrimBajo": 0.55,
+        "jironUI": 0,
+        "capa:estrellas": 0.62,
+        "capa:lluvia": 0,
+        "capa:niebla": 0,
+        "capa:polvo": 1,
+        "capa:luci": 0
+      },
+      "particulas": {
+        "estrellas": {
+          "total": 26,
+          "visibles": 7,
+          "animando": 7,
+          "opCapa": 0.62
+        },
+        "gotas": {
+          "total": 30,
+          "visibles": 0,
+          "animando": 0,
+          "opCapa": 0
+        },
+        "bancos": {
+          "total": 9,
+          "visibles": 0,
+          "animando": 0,
+          "opCapa": 0
+        },
+        "jirones": {
+          "total": 7,
+          "visibles": 0,
+          "animando": 0,
+          "opCapa": 0
+        },
+        "motas": {
+          "total": 16,
+          "visibles": 16,
+          "animando": 16,
+          "opCapa": 1
+        },
+        "luciernagas": {
+          "total": 11,
+          "visibles": 0,
+          "animando": 0,
+          "opCapa": 0
+        },
+        "rayos": {
+          "total": 6,
+          "visibles": 6,
+          "animando": 1,
+          "opCapa": 0.75
+        }
+      },
+      "animCorriendo": 46,
+      "animVivasVisibles": 46,
+      "nodosEscena": 210
+    },
+    {
+      "clima": "despejado",
+      "luz": "dia",
+      "fps": null,
+      "contrastes": [
+        {
+          "id": "cabecera-lugar",
+          "texto": "Paramo alto · Guatavita, Cundinamarca",
+          "min": 6.77,
+          "p05": 6.95
+        },
+        {
+          "id": "cabecera-altura",
+          "texto": "2900 m s. n. m. · Piso frío",
+          "min": 6.95,
+          "p05": 7.24
+        },
+        {
+          "id": "cabecera-saludo",
+          "texto": "Buenas noches",
+          "min": 6.2,
+          "p05": 6.42
+        },
+        {
+          "id": "cabecera-condicion",
+          "texto": "Nublado · 11:31 p. m.",
+          "min": 5.97,
+          "p05": 6.21
+        },
+        {
+          "id": "cifra-grande",
+          "texto": "9°C",
+          "min": 12.49,
+          "p05": 12.81
+        },
+        {
+          "id": "tab-hoy",
+          "texto": "Hoy",
+          "min": 10.9,
+          "p05": 10.9
+        },
+        {
+          "id": "tab-semana",
+          "texto": "7–16 días",
+          "min": 11.88,
+          "p05": 11.88
+        },
+        {
+          "id": "tab-estacional",
+          "texto": "El Niño",
+          "min": 11.88,
+          "p05": 11.88
+        },
+        {
+          "id": "CONTROL-21",
+          "texto": "CONTROL",
+          "min": 21,
+          "p05": 21
+        },
+        {
+          "id": "CONTROL-4.54",
+          "texto": "CONTROL",
+          "min": 4.54,
+          "p05": 4.54
+        }
+      ],
+      "flotantesApartados": 1,
+      "nTextos": 27,
+      "todoTexto": [
+        {
+          "texto": "11:31 p. m.",
+          "p05": 6.15
+        },
+        {
+          "texto": "Buenas noches",
+          "p05": 6.42
+        },
+        {
+          "texto": "2900 m s. n. m. · Piso frío",
+          "p05": 7.24
+        },
+        {
+          "texto": "94",
+          "p05": 7.69
+        },
+        {
+          "texto": "Open-Meteo (WMO) · fase ENSO: IDEA",
+          "p05": 8.73
+        },
+        {
+          "texto": "1.2",
+          "p05": 9.01
+        },
+        {
+          "texto": "Muy alto — protéjase",
+          "p05": 9.4
+        },
+        {
+          "texto": "Rocío a 8°C",
+          "p05": 9.55
+        },
+        {
+          "texto": "Open-Meteo · máx. del día",
+          "p05": 9.65
+        },
+        {
+          "texto": "Open-Meteo",
+          "p05": 9.83
+        },
+        {
+          "texto": "3.01",
+          "p05": 9.86
+        },
+        {
+          "texto": "Se siente como 8°C",
+          "p05": 10.02
+        },
+        {
+          "texto": "Nublado · fase Neutral",
+          "p05": 10.3
+        },
+        {
+          "texto": "°C",
+          "p05": 10.42
+        },
+        {
+          "texto": "Hoy",
+          "p05": 10.9
+        },
+        {
+          "texto": "mm",
+          "p05": 11.15
+        },
+        {
+          "texto": "mm",
+          "p05": 11.3
+        },
+        {
+          "texto": "agua que se evapora hoy",
+          "p05": 11.61
+        },
+        {
+          "texto": "100% de probabilidad",
+          "p05": 11.74
+        },
+        {
+          "texto": "7–16 días",
+          "p05": 11.88
+        },
+        {
+          "texto": "El Niño",
+          "p05": 11.88
+        },
+        {
+          "texto": "Estimado por Chagra · Open-Meteo (",
+          "p05": 12.01
+        },
+        {
+          "texto": "Open-Meteo",
+          "p05": 12.17
+        },
+        {
+          "texto": "Ahora mismo",
+          "p05": 12.2
+        },
+        {
+          "texto": "☁️",
+          "p05": 12.94
+        },
+        {
+          "texto": "Lo que viene",
+          "p05": 12.94
+        },
+        {
+          "texto": "La temporada",
+          "p05": 12.94
+        }
+      ],
+      "enso": null,
+      "capas": {
+        "cielo:soleado": 1,
+        "cielo:lluvia": 0,
+        "cielo:niebla": 0,
+        "cielo:dorada": 0,
+        "cielo:noche": 0,
+        "cielo:nublado": 0,
+        "grade:soleado": 1,
+        "grade:lluvia": 0,
+        "grade:niebla": 0,
+        "grade:dorada": 0,
+        "grade:noche": 0,
+        "grade:nublado": 0,
+        "astro": 1,
+        "rayos": 0.4,
+        "bruma": 0.28,
+        "laderaLuz": 0.45,
+        "vineta": 0.2,
+        "scrimAlto": 0.82,
+        "scrimBajo": 0.55,
+        "jironUI": 0,
+        "capa:estrellas": 0,
+        "capa:lluvia": 0,
+        "capa:niebla": 0,
+        "capa:polvo": 0.35,
+        "capa:luci": 0
+      },
+      "particulas": {
+        "estrellas": {
+          "total": 26,
+          "visibles": 0,
+          "animando": 0,
+          "opCapa": 0
+        },
+        "gotas": {
+          "total": 30,
+          "visibles": 0,
+          "animando": 0,
+          "opCapa": 0
+        },
+        "bancos": {
+          "total": 9,
+          "visibles": 0,
+          "animando": 0,
+          "opCapa": 0
+        },
+        "jirones": {
+          "total": 7,
+          "visibles": 0,
+          "animando": 0,
+          "opCapa": 0
+        },
+        "motas": {
+          "total": 16,
+          "visibles": 16,
+          "animando": 16,
+          "opCapa": 0.35
+        },
+        "luciernagas": {
+          "total": 11,
+          "visibles": 0,
+          "animando": 0,
+          "opCapa": 0
+        },
+        "rayos": {
+          "total": 6,
+          "visibles": 6,
+          "animando": 1,
+          "opCapa": 0.4
+        }
+      },
+      "animCorriendo": 39,
+      "animVivasVisibles": 39,
+      "nodosEscena": 210
+    },
+    {
+      "clima": "despejado",
+      "luz": "atardecer",
+      "fps": null,
+      "contrastes": [
+        {
+          "id": "cabecera-lugar",
+          "texto": "Paramo alto · Guatavita, Cundinamarca",
+          "min": 13.23,
+          "p05": 13.57
+        },
+        {
+          "id": "cabecera-altura",
+          "texto": "2900 m s. n. m. · Piso frío",
+          "min": 10.43,
+          "p05": 13.11
+        },
+        {
+          "id": "cabecera-saludo",
+          "texto": "Buenas noches",
+          "min": 9.82,
+          "p05": 12.38
+        },
+        {
+          "id": "cabecera-condicion",
+          "texto": "Nublado · 11:31 p. m.",
+          "min": 11.38,
+          "p05": 11.74
+        },
+        {
+          "id": "cifra-grande",
+          "texto": "9°C",
+          "min": 15.07,
+          "p05": 15.28
+        },
+        {
+          "id": "tab-hoy",
+          "texto": "Hoy",
+          "min": 10.9,
+          "p05": 10.9
+        },
+        {
+          "id": "tab-semana",
+          "texto": "7–16 días",
+          "min": 11.88,
+          "p05": 11.88
+        },
+        {
+          "id": "tab-estacional",
+          "texto": "El Niño",
+          "min": 11.88,
+          "p05": 11.88
+        },
+        {
+          "id": "CONTROL-21",
+          "texto": "CONTROL",
+          "min": 21,
+          "p05": 21
+        },
+        {
+          "id": "CONTROL-4.54",
+          "texto": "CONTROL",
+          "min": 4.54,
+          "p05": 4.54
+        }
+      ],
+      "flotantesApartados": 1,
+      "nTextos": 27,
+      "todoTexto": [
+        {
+          "texto": "94",
+          "p05": 8.48
+        },
+        {
+          "texto": "1.2",
+          "p05": 9.56
+        },
+        {
+          "texto": "3.01",
+          "p05": 10.2
+        },
+        {
+          "texto": "Muy alto — protéjase",
+          "p05": 10.31
+        },
+        {
+          "texto": "Rocío a 8°C",
+          "p05": 10.51
+        },
+        {
+          "texto": "Open-Meteo · máx. del día",
+          "p05": 10.51
+        },
+        {
+          "texto": "Open-Meteo",
+          "p05": 10.78
+        },
+        {
+          "texto": "Hoy",
+          "p05": 10.9
+        },
+        {
+          "texto": "Open-Meteo (WMO) · fase ENSO: IDEA",
+          "p05": 11.4
+        },
+        {
+          "texto": "mm",
+          "p05": 11.6
+        },
+        {
+          "texto": "mm",
+          "p05": 11.7
+        },
+        {
+          "texto": "11:31 p. m.",
+          "p05": 11.71
+        },
+        {
+          "texto": "7–16 días",
+          "p05": 11.88
+        },
+        {
+          "texto": "El Niño",
+          "p05": 11.88
+        },
+        {
+          "texto": "agua que se evapora hoy",
+          "p05": 11.89
+        },
+        {
+          "texto": "100% de probabilidad",
+          "p05": 12.03
+        },
+        {
+          "texto": "Se siente como 8°C",
+          "p05": 12.11
+        },
+        {
+          "texto": "Estimado por Chagra · Open-Meteo (",
+          "p05": 12.19
+        },
+        {
+          "texto": "Ahora mismo",
+          "p05": 12.2
+        },
+        {
+          "texto": "Buenas noches",
+          "p05": 12.38
+        },
+        {
+          "texto": "°C",
+          "p05": 12.39
+        },
+        {
+          "texto": "Nublado · fase Neutral",
+          "p05": 12.42
+        },
+        {
+          "texto": "Open-Meteo",
+          "p05": 12.45
+        },
+        {
+          "texto": "Lo que viene",
+          "p05": 12.94
+        },
+        {
+          "texto": "La temporada",
+          "p05": 12.94
+        },
+        {
+          "texto": "2900 m s. n. m. · Piso frío",
+          "p05": 13.11
+        },
+        {
+          "texto": "☁️",
+          "p05": 16.2
+        }
+      ],
+      "enso": null,
+      "capas": {
+        "cielo:soleado": 0,
+        "cielo:lluvia": 0,
+        "cielo:niebla": 0,
+        "cielo:dorada": 1,
+        "cielo:noche": 0,
+        "cielo:nublado": 0,
+        "grade:soleado": 0,
+        "grade:lluvia": 0,
+        "grade:niebla": 0,
+        "grade:dorada": 1,
+        "grade:noche": 0,
+        "grade:nublado": 0,
+        "astro": 1,
+        "rayos": 0.75,
+        "bruma": 0.4,
+        "laderaLuz": 0.8,
+        "vineta": 0.34,
+        "scrimAlto": 0.82,
+        "scrimBajo": 0.55,
+        "jironUI": 0,
+        "capa:estrellas": 0.62,
+        "capa:lluvia": 0,
+        "capa:niebla": 0,
+        "capa:polvo": 1,
+        "capa:luci": 0.5
+      },
+      "particulas": {
+        "estrellas": {
+          "total": 26,
+          "visibles": 7,
+          "animando": 7,
+          "opCapa": 0.62
+        },
+        "gotas": {
+          "total": 30,
+          "visibles": 0,
+          "animando": 0,
+          "opCapa": 0
+        },
+        "bancos": {
+          "total": 9,
+          "visibles": 0,
+          "animando": 0,
+          "opCapa": 0
+        },
+        "jirones": {
+          "total": 7,
+          "visibles": 0,
+          "animando": 0,
+          "opCapa": 0
+        },
+        "motas": {
+          "total": 16,
+          "visibles": 16,
+          "animando": 16,
+          "opCapa": 1
+        },
+        "luciernagas": {
+          "total": 11,
+          "visibles": 11,
+          "animando": 22,
+          "opCapa": 0.5
+        },
+        "rayos": {
+          "total": 6,
+          "visibles": 6,
+          "animando": 1,
+          "opCapa": 0.75
+        }
+      },
+      "animCorriendo": 68,
+      "animVivasVisibles": 66,
+      "nodosEscena": 210
+    },
+    {
+      "clima": "despejado",
+      "luz": "noche",
+      "fps": null,
+      "contrastes": [
+        {
+          "id": "cabecera-lugar",
+          "texto": "Paramo alto · Guatavita, Cundinamarca",
+          "min": 17.32,
+          "p05": 17.43
+        },
+        {
+          "id": "cabecera-altura",
+          "texto": "2900 m s. n. m. · Piso frío",
+          "min": 17.28,
+          "p05": 17.41
+        },
+        {
+          "id": "cabecera-saludo",
+          "texto": "Buenas noches",
+          "min": 11.26,
+          "p05": 17.41
+        },
+        {
+          "id": "cabecera-condicion",
+          "texto": "Nublado · 11:31 p. m.",
+          "min": 17.28,
+          "p05": 17.38
+        },
+        {
+          "id": "cifra-grande",
+          "texto": "9°C",
+          "min": 13.37,
+          "p05": 17.22
+        },
+        {
+          "id": "tab-hoy",
+          "texto": "Hoy",
+          "min": 10.9,
+          "p05": 10.9
+        },
+        {
+          "id": "tab-semana",
+          "texto": "7–16 días",
+          "min": 11.88,
+          "p05": 11.88
+        },
+        {
+          "id": "tab-estacional",
+          "texto": "El Niño",
+          "min": 11.88,
+          "p05": 11.88
+        },
+        {
+          "id": "CONTROL-21",
+          "texto": "CONTROL",
+          "min": 21,
+          "p05": 21
+        },
+        {
+          "id": "CONTROL-4.54",
+          "texto": "CONTROL",
+          "min": 4.54,
+          "p05": 4.54
+        }
+      ],
+      "flotantesApartados": 1,
+      "nTextos": 27,
+      "todoTexto": [
+        {
+          "texto": "Hoy",
+          "p05": 10.9
+        },
+        {
+          "texto": "94",
+          "p05": 10.95
+        },
+        {
+          "texto": "1.2",
+          "p05": 11.14
+        },
+        {
+          "texto": "7–16 días",
+          "p05": 11.88
+        },
+        {
+          "texto": "El Niño",
+          "p05": 11.88
+        },
+        {
+          "texto": "3.01",
+          "p05": 12.09
+        },
+        {
+          "texto": "Ahora mismo",
+          "p05": 12.2
+        },
+        {
+          "texto": "Lo que viene",
+          "p05": 12.94
+        },
+        {
+          "texto": "La temporada",
+          "p05": 12.94
+        },
+        {
+          "texto": "Muy alto — protéjase",
+          "p05": 13.39
+        },
+        {
+          "texto": "Rocío a 8°C",
+          "p05": 13.4
+        },
+        {
+          "texto": "Open-Meteo · máx. del día",
+          "p05": 13.4
+        },
+        {
+          "texto": "Open-Meteo",
+          "p05": 13.5
+        },
+        {
+          "texto": "mm",
+          "p05": 13.63
+        },
+        {
+          "texto": "mm",
+          "p05": 13.63
+        },
+        {
+          "texto": "agua que se evapora hoy",
+          "p05": 13.63
+        },
+        {
+          "texto": "100% de probabilidad",
+          "p05": 13.64
+        },
+        {
+          "texto": "Open-Meteo",
+          "p05": 13.64
+        },
+        {
+          "texto": "Estimado por Chagra · Open-Meteo (",
+          "p05": 13.64
+        },
+        {
+          "texto": "Open-Meteo (WMO) · fase ENSO: IDEA",
+          "p05": 13.76
+        },
+        {
+          "texto": "Se siente como 8°C",
+          "p05": 13.82
+        },
+        {
+          "texto": "Nublado · fase Neutral",
+          "p05": 13.84
+        },
+        {
+          "texto": "°C",
+          "p05": 13.84
+        },
+        {
+          "texto": "11:31 p. m.",
+          "p05": 17.38
+        },
+        {
+          "texto": "2900 m s. n. m. · Piso frío",
+          "p05": 17.41
+        },
+        {
+          "texto": "Buenas noches",
+          "p05": 17.41
+        },
+        {
+          "texto": "☁️",
+          "p05": 18.86
+        }
+      ],
+      "enso": null,
+      "capas": {
+        "cielo:soleado": 0,
+        "cielo:lluvia": 0,
+        "cielo:niebla": 0,
+        "cielo:dorada": 0,
+        "cielo:noche": 1,
+        "cielo:nublado": 0,
+        "grade:soleado": 0,
+        "grade:lluvia": 0,
+        "grade:niebla": 0,
+        "grade:dorada": 0,
+        "grade:noche": 1,
+        "grade:nublado": 0,
+        "astro": 1,
+        "rayos": 0,
+        "bruma": 0.5,
+        "laderaLuz": 0.14,
+        "vineta": 0.5,
+        "scrimAlto": 0.6,
+        "scrimBajo": 0.55,
+        "jironUI": 0,
+        "capa:estrellas": 1,
+        "capa:lluvia": 0,
+        "capa:niebla": 0,
+        "capa:polvo": 0,
+        "capa:luci": 1
+      },
+      "particulas": {
+        "estrellas": {
+          "total": 26,
+          "visibles": 26,
+          "animando": 26,
+          "opCapa": 1
+        },
+        "gotas": {
+          "total": 30,
+          "visibles": 0,
+          "animando": 0,
+          "opCapa": 0
+        },
+        "bancos": {
+          "total": 9,
+          "visibles": 0,
+          "animando": 0,
+          "opCapa": 0
+        },
+        "jirones": {
+          "total": 7,
+          "visibles": 0,
+          "animando": 0,
+          "opCapa": 0
+        },
+        "motas": {
+          "total": 16,
+          "visibles": 0,
+          "animando": 0,
+          "opCapa": 0
+        },
+        "luciernagas": {
+          "total": 11,
+          "visibles": 11,
+          "animando": 22,
+          "opCapa": 1
+        },
+        "rayos": {
+          "total": 6,
+          "visibles": 0,
+          "animando": 0,
+          "opCapa": 0
+        }
+      },
+      "animCorriendo": 70,
+      "animVivasVisibles": 69,
+      "nodosEscena": 210
+    },
+    {
+      "clima": "nublado",
+      "luz": "amanecer",
+      "fps": null,
+      "contrastes": [
+        {
+          "id": "cabecera-lugar",
+          "texto": "Paramo alto · Guatavita, Cundinamarca",
+          "min": 8.02,
+          "p05": 8.17
+        },
+        {
+          "id": "cabecera-altura",
+          "texto": "2900 m s. n. m. · Piso frío",
+          "min": 7.63,
+          "p05": 7.74
+        },
+        {
+          "id": "cabecera-saludo",
+          "texto": "Buenas noches",
+          "min": 6.88,
+          "p05": 7.09
+        },
+        {
+          "id": "cabecera-condicion",
+          "texto": "Nublado · 11:31 p. m.",
+          "min": 6.5,
+          "p05": 6.68
+        },
+        {
+          "id": "cifra-grande",
+          "texto": "9°C",
+          "min": 13.06,
+          "p05": 13.27
+        },
+        {
+          "id": "tab-hoy",
+          "texto": "Hoy",
+          "min": 10.9,
+          "p05": 10.9
+        },
+        {
+          "id": "tab-semana",
+          "texto": "7–16 días",
+          "min": 11.88,
+          "p05": 11.88
+        },
+        {
+          "id": "tab-estacional",
+          "texto": "El Niño",
+          "min": 11.88,
+          "p05": 11.88
+        },
+        {
+          "id": "CONTROL-21",
+          "texto": "CONTROL",
+          "min": 21,
+          "p05": 21
+        },
+        {
+          "id": "CONTROL-4.54",
+          "texto": "CONTROL",
+          "min": 4.54,
+          "p05": 4.54
+        }
+      ],
+      "flotantesApartados": 1,
+      "nTextos": 27,
+      "todoTexto": [
+        {
+          "texto": "11:31 p. m.",
+          "p05": 6.67
+        },
+        {
+          "texto": "Buenas noches",
+          "p05": 7.09
+        },
+        {
+          "texto": "2900 m s. n. m. · Piso frío",
+          "p05": 7.74
+        },
+        {
+          "texto": "94",
+          "p05": 7.98
+        },
+        {
+          "texto": "1.2",
+          "p05": 9.41
+        },
+        {
+          "texto": "Open-Meteo (WMO) · fase ENSO: IDEA",
+          "p05": 9.46
+        },
+        {
+          "texto": "Muy alto — protéjase",
+          "p05": 10
+        },
+        {
+          "texto": "Rocío a 8°C",
+          "p05": 10.01
+        },
+        {
+          "texto": "3.01",
+          "p05": 10.18
+        },
+        {
+          "texto": "Open-Meteo · máx. del día",
+          "p05": 10.32
+        },
+        {
+          "texto": "Open-Meteo",
+          "p05": 10.43
+        },
+        {
+          "texto": "Se siente como 8°C",
+          "p05": 10.5
+        },
+        {
+          "texto": "Nublado · fase Neutral",
+          "p05": 10.77
+        },
+        {
+          "texto": "°C",
+          "p05": 10.8
+        },
+        {
+          "texto": "Hoy",
+          "p05": 10.9
+        },
+        {
+          "texto": "mm",
+          "p05": 11.51
+        },
+        {
+          "texto": "mm",
+          "p05": 11.78
+        },
+        {
+          "texto": "agua que se evapora hoy",
+          "p05": 11.81
+        },
+        {
+          "texto": "7–16 días",
+          "p05": 11.88
+        },
+        {
+          "texto": "El Niño",
+          "p05": 11.88
+        },
+        {
+          "texto": "100% de probabilidad",
+          "p05": 11.91
+        },
+        {
+          "texto": "Estimado por Chagra · Open-Meteo (",
+          "p05": 12.05
+        },
+        {
+          "texto": "Ahora mismo",
+          "p05": 12.2
+        },
+        {
+          "texto": "Open-Meteo",
+          "p05": 12.21
+        },
+        {
+          "texto": "Lo que viene",
+          "p05": 12.94
+        },
+        {
+          "texto": "La temporada",
+          "p05": 12.94
+        },
+        {
+          "texto": "☁️",
+          "p05": 13.75
+        }
+      ],
+      "enso": null,
+      "capas": {
+        "cielo:soleado": 0,
+        "cielo:lluvia": 0,
+        "cielo:niebla": 0,
+        "cielo:dorada": 0,
+        "cielo:noche": 0,
+        "cielo:nublado": 1,
+        "grade:soleado": 0,
+        "grade:lluvia": 0,
+        "grade:niebla": 0,
+        "grade:dorada": 0.6,
+        "grade:noche": 0,
+        "grade:nublado": 1,
+        "astro": 0,
+        "rayos": 0,
+        "bruma": 0.7,
+        "laderaLuz": 0,
+        "vineta": 0.34,
+        "scrimAlto": 0.76,
+        "scrimBajo": 0.55,
+        "jironUI": 0,
+        "capa:estrellas": 0,
+        "capa:lluvia": 0,
+        "capa:niebla": 0.58,
+        "capa:polvo": 0,
+        "capa:luci": 0
+      },
+      "particulas": {
+        "estrellas": {
+          "total": 26,
+          "visibles": 0,
+          "animando": 0,
+          "opCapa": 0
+        },
+        "gotas": {
+          "total": 30,
+          "visibles": 0,
+          "animando": 0,
+          "opCapa": 0
+        },
+        "bancos": {
+          "total": 9,
+          "visibles": 9,
+          "animando": 9,
+          "opCapa": 0.58
+        },
+        "jirones": {
+          "total": 7,
+          "visibles": 7,
+          "animando": 7,
+          "opCapa": 0.58
+        },
+        "motas": {
+          "total": 16,
+          "visibles": 0,
+          "animando": 0,
+          "opCapa": 0
+        },
+        "luciernagas": {
+          "total": 11,
+          "visibles": 0,
+          "animando": 0,
+          "opCapa": 0
+        },
+        "rayos": {
+          "total": 6,
+          "visibles": 0,
+          "animando": 0,
+          "opCapa": 0
+        }
+      },
+      "animCorriendo": 38,
+      "animVivasVisibles": 38,
+      "nodosEscena": 210
+    },
+    {
+      "clima": "nublado",
+      "luz": "dia",
+      "fps": null,
+      "contrastes": [
+        {
+          "id": "cabecera-lugar",
+          "texto": "Paramo alto · Guatavita, Cundinamarca",
+          "min": 5.97,
+          "p05": 6.09
+        },
+        {
+          "id": "cabecera-altura",
+          "texto": "2900 m s. n. m. · Piso frío",
+          "min": 5.91,
+          "p05": 6.09
+        },
+        {
+          "id": "cabecera-saludo",
+          "texto": "Buenas noches",
+          "min": 5.29,
+          "p05": 5.47
+        },
+        {
+          "id": "cabecera-condicion",
+          "texto": "Nublado · 11:31 p. m.",
+          "min": 5.14,
+          "p05": 5.31
+        },
+        {
+          "id": "cifra-grande",
+          "texto": "9°C",
+          "min": 12.17,
+          "p05": 12.49
+        },
+        {
+          "id": "tab-hoy",
+          "texto": "Hoy",
+          "min": 10.9,
+          "p05": 10.9
+        },
+        {
+          "id": "tab-semana",
+          "texto": "7–16 días",
+          "min": 11.88,
+          "p05": 11.88
+        },
+        {
+          "id": "tab-estacional",
+          "texto": "El Niño",
+          "min": 11.88,
+          "p05": 11.88
+        },
+        {
+          "id": "CONTROL-21",
+          "texto": "CONTROL",
+          "min": 21,
+          "p05": 21
+        },
+        {
+          "id": "CONTROL-4.54",
+          "texto": "CONTROL",
+          "min": 4.54,
+          "p05": 4.54
+        }
+      ],
+      "flotantesApartados": 1,
+      "nTextos": 27,
+      "todoTexto": [
+        {
+          "texto": "11:31 p. m.",
+          "p05": 5.29
+        },
+        {
+          "texto": "Buenas noches",
+          "p05": 5.47
+        },
+        {
+          "texto": "2900 m s. n. m. · Piso frío",
+          "p05": 6.09
+        },
+        {
+          "texto": "94",
+          "p05": 7.89
+        },
+        {
+          "texto": "Open-Meteo (WMO) · fase ENSO: IDEA",
+          "p05": 8.72
+        },
+        {
+          "texto": "1.2",
+          "p05": 9.56
+        },
+        {
+          "texto": "Muy alto — protéjase",
+          "p05": 9.69
+        },
+        {
+          "texto": "Se siente como 8°C",
+          "p05": 9.8
+        },
+        {
+          "texto": "Rocío a 8°C",
+          "p05": 9.83
+        },
+        {
+          "texto": "Nublado · fase Neutral",
+          "p05": 10.03
+        },
+        {
+          "texto": "Open-Meteo · máx. del día",
+          "p05": 10.1
+        },
+        {
+          "texto": "°C",
+          "p05": 10.17
+        },
+        {
+          "texto": "Open-Meteo",
+          "p05": 10.25
+        },
+        {
+          "texto": "3.01",
+          "p05": 10.33
+        },
+        {
+          "texto": "Hoy",
+          "p05": 10.9
+        },
+        {
+          "texto": "mm",
+          "p05": 11.69
+        },
+        {
+          "texto": "7–16 días",
+          "p05": 11.88
+        },
+        {
+          "texto": "El Niño",
+          "p05": 11.88
+        },
+        {
+          "texto": "mm",
+          "p05": 11.98
+        },
+        {
+          "texto": "100% de probabilidad",
+          "p05": 12.11
+        },
+        {
+          "texto": "agua que se evapora hoy",
+          "p05": 12.11
+        },
+        {
+          "texto": "Ahora mismo",
+          "p05": 12.2
+        },
+        {
+          "texto": "Estimado por Chagra · Open-Meteo (",
+          "p05": 12.25
+        },
+        {
+          "texto": "Open-Meteo",
+          "p05": 12.49
+        },
+        {
+          "texto": "☁️",
+          "p05": 12.8
+        },
+        {
+          "texto": "Lo que viene",
+          "p05": 12.94
+        },
+        {
+          "texto": "La temporada",
+          "p05": 12.94
+        }
+      ],
+      "enso": null,
+      "capas": {
+        "cielo:soleado": 0,
+        "cielo:lluvia": 0,
+        "cielo:niebla": 0,
+        "cielo:dorada": 0,
+        "cielo:noche": 0,
+        "cielo:nublado": 1,
+        "grade:soleado": 0,
+        "grade:lluvia": 0,
+        "grade:niebla": 0,
+        "grade:dorada": 0,
+        "grade:noche": 0,
+        "grade:nublado": 1,
+        "astro": 0,
+        "rayos": 0,
+        "bruma": 0.7,
+        "laderaLuz": 0,
+        "vineta": 0.34,
+        "scrimAlto": 0.76,
+        "scrimBajo": 0.55,
+        "jironUI": 0,
+        "capa:estrellas": 0,
+        "capa:lluvia": 0,
+        "capa:niebla": 0.58,
+        "capa:polvo": 0,
+        "capa:luci": 0
+      },
+      "particulas": {
+        "estrellas": {
+          "total": 26,
+          "visibles": 0,
+          "animando": 0,
+          "opCapa": 0
+        },
+        "gotas": {
+          "total": 30,
+          "visibles": 0,
+          "animando": 0,
+          "opCapa": 0
+        },
+        "bancos": {
+          "total": 9,
+          "visibles": 9,
+          "animando": 9,
+          "opCapa": 0.58
+        },
+        "jirones": {
+          "total": 7,
+          "visibles": 7,
+          "animando": 7,
+          "opCapa": 0.58
+        },
+        "motas": {
+          "total": 16,
+          "visibles": 0,
+          "animando": 0,
+          "opCapa": 0
+        },
+        "luciernagas": {
+          "total": 11,
+          "visibles": 0,
+          "animando": 0,
+          "opCapa": 0
+        },
+        "rayos": {
+          "total": 6,
+          "visibles": 0,
+          "animando": 0,
+          "opCapa": 0
+        }
+      },
+      "animCorriendo": 38,
+      "animVivasVisibles": 38,
+      "nodosEscena": 210
+    },
+    {
+      "clima": "nublado",
+      "luz": "atardecer",
+      "fps": null,
+      "contrastes": [
+        {
+          "id": "cabecera-lugar",
+          "texto": "Paramo alto · Guatavita, Cundinamarca",
+          "min": 8.02,
+          "p05": 8.17
+        },
+        {
+          "id": "cabecera-altura",
+          "texto": "2900 m s. n. m. · Piso frío",
+          "min": 7.63,
+          "p05": 7.74
+        },
+        {
+          "id": "cabecera-saludo",
+          "texto": "Buenas noches",
+          "min": 6.88,
+          "p05": 7.09
+        },
+        {
+          "id": "cabecera-condicion",
+          "texto": "Nublado · 11:31 p. m.",
+          "min": 6.5,
+          "p05": 6.7
+        },
+        {
+          "id": "cifra-grande",
+          "texto": "9°C",
+          "min": 13.06,
+          "p05": 13.27
+        },
+        {
+          "id": "tab-hoy",
+          "texto": "Hoy",
+          "min": 10.9,
+          "p05": 10.9
+        },
+        {
+          "id": "tab-semana",
+          "texto": "7–16 días",
+          "min": 11.88,
+          "p05": 11.88
+        },
+        {
+          "id": "tab-estacional",
+          "texto": "El Niño",
+          "min": 11.88,
+          "p05": 11.88
+        },
+        {
+          "id": "CONTROL-21",
+          "texto": "CONTROL",
+          "min": 21,
+          "p05": 21
+        },
+        {
+          "id": "CONTROL-4.54",
+          "texto": "CONTROL",
+          "min": 4.54,
+          "p05": 4.54
+        }
+      ],
+      "flotantesApartados": 1,
+      "nTextos": 27,
+      "todoTexto": [
+        {
+          "texto": "11:31 p. m.",
+          "p05": 6.67
+        },
+        {
+          "texto": "Buenas noches",
+          "p05": 7.09
+        },
+        {
+          "texto": "2900 m s. n. m. · Piso frío",
+          "p05": 7.74
+        },
+        {
+          "texto": "94",
+          "p05": 7.98
+        },
+        {
+          "texto": "1.2",
+          "p05": 9.41
+        },
+        {
+          "texto": "Open-Meteo (WMO) · fase ENSO: IDEA",
+          "p05": 9.46
+        },
+        {
+          "texto": "Muy alto — protéjase",
+          "p05": 10
+        },
+        {
+          "texto": "Rocío a 8°C",
+          "p05": 10.01
+        },
+        {
+          "texto": "3.01",
+          "p05": 10.18
+        },
+        {
+          "texto": "Open-Meteo · máx. del día",
+          "p05": 10.31
+        },
+        {
+          "texto": "Open-Meteo",
+          "p05": 10.45
+        },
+        {
+          "texto": "Se siente como 8°C",
+          "p05": 10.5
+        },
+        {
+          "texto": "Nublado · fase Neutral",
+          "p05": 10.77
+        },
+        {
+          "texto": "°C",
+          "p05": 10.8
+        },
+        {
+          "texto": "Hoy",
+          "p05": 10.9
+        },
+        {
+          "texto": "mm",
+          "p05": 11.51
+        },
+        {
+          "texto": "mm",
+          "p05": 11.78
+        },
+        {
+          "texto": "agua que se evapora hoy",
+          "p05": 11.81
+        },
+        {
+          "texto": "7–16 días",
+          "p05": 11.88
+        },
+        {
+          "texto": "El Niño",
+          "p05": 11.88
+        },
+        {
+          "texto": "100% de probabilidad",
+          "p05": 11.91
+        },
+        {
+          "texto": "Estimado por Chagra · Open-Meteo (",
+          "p05": 12.05
+        },
+        {
+          "texto": "Ahora mismo",
+          "p05": 12.2
+        },
+        {
+          "texto": "Open-Meteo",
+          "p05": 12.21
+        },
+        {
+          "texto": "Lo que viene",
+          "p05": 12.94
+        },
+        {
+          "texto": "La temporada",
+          "p05": 12.94
+        },
+        {
+          "texto": "☁️",
+          "p05": 13.75
+        }
+      ],
+      "enso": null,
+      "capas": {
+        "cielo:soleado": 0,
+        "cielo:lluvia": 0,
+        "cielo:niebla": 0,
+        "cielo:dorada": 0,
+        "cielo:noche": 0,
+        "cielo:nublado": 1,
+        "grade:soleado": 0,
+        "grade:lluvia": 0,
+        "grade:niebla": 0,
+        "grade:dorada": 0.6,
+        "grade:noche": 0,
+        "grade:nublado": 1,
+        "astro": 0,
+        "rayos": 0,
+        "bruma": 0.7,
+        "laderaLuz": 0,
+        "vineta": 0.34,
+        "scrimAlto": 0.76,
+        "scrimBajo": 0.55,
+        "jironUI": 0,
+        "capa:estrellas": 0,
+        "capa:lluvia": 0,
+        "capa:niebla": 0.58,
+        "capa:polvo": 0,
+        "capa:luci": 0.45
+      },
+      "particulas": {
+        "estrellas": {
+          "total": 26,
+          "visibles": 0,
+          "animando": 0,
+          "opCapa": 0
+        },
+        "gotas": {
+          "total": 30,
+          "visibles": 0,
+          "animando": 0,
+          "opCapa": 0
+        },
+        "bancos": {
+          "total": 9,
+          "visibles": 9,
+          "animando": 9,
+          "opCapa": 0.58
+        },
+        "jirones": {
+          "total": 7,
+          "visibles": 7,
+          "animando": 7,
+          "opCapa": 0.58
+        },
+        "motas": {
+          "total": 16,
+          "visibles": 0,
+          "animando": 0,
+          "opCapa": 0
+        },
+        "luciernagas": {
+          "total": 11,
+          "visibles": 11,
+          "animando": 22,
+          "opCapa": 0.45
+        },
+        "rayos": {
+          "total": 6,
+          "visibles": 0,
+          "animando": 0,
+          "opCapa": 0
+        }
+      },
+      "animCorriendo": 60,
+      "animVivasVisibles": 58,
+      "nodosEscena": 210
+    },
+    {
+      "clima": "nublado",
+      "luz": "noche",
+      "fps": null,
+      "contrastes": [
+        {
+          "id": "cabecera-lugar",
+          "texto": "Paramo alto · Guatavita, Cundinamarca",
+          "min": 12.93,
+          "p05": 13.83
+        },
+        {
+          "id": "cabecera-altura",
+          "texto": "2900 m s. n. m. · Piso frío",
+          "min": 14.02,
+          "p05": 14.2
+        },
+        {
+          "id": "cabecera-saludo",
+          "texto": "Buenas noches",
+          "min": 13.77,
+          "p05": 13.95
+        },
+        {
+          "id": "cabecera-condicion",
+          "texto": "Nublado · 11:31 p. m.",
+          "min": 13.59,
+          "p05": 13.8
+        },
+        {
+          "id": "cifra-grande",
+          "texto": "9°C",
+          "min": 16.2,
+          "p05": 16.36
+        },
+        {
+          "id": "tab-hoy",
+          "texto": "Hoy",
+          "min": 10.9,
+          "p05": 10.9
+        },
+        {
+          "id": "tab-semana",
+          "texto": "7–16 días",
+          "min": 11.88,
+          "p05": 11.88
+        },
+        {
+          "id": "tab-estacional",
+          "texto": "El Niño",
+          "min": 11.88,
+          "p05": 11.88
+        },
+        {
+          "id": "CONTROL-21",
+          "texto": "CONTROL",
+          "min": 21,
+          "p05": 21
+        },
+        {
+          "id": "CONTROL-4.54",
+          "texto": "CONTROL",
+          "min": 4.54,
+          "p05": 4.54
+        }
+      ],
+      "flotantesApartados": 1,
+      "nTextos": 27,
+      "todoTexto": [
+        {
+          "texto": "94",
+          "p05": 10.57
+        },
+        {
+          "texto": "1.2",
+          "p05": 10.87
+        },
+        {
+          "texto": "Hoy",
+          "p05": 10.9
+        },
+        {
+          "texto": "7–16 días",
+          "p05": 11.88
+        },
+        {
+          "texto": "El Niño",
+          "p05": 11.88
+        },
+        {
+          "texto": "3.01",
+          "p05": 11.88
+        },
+        {
+          "texto": "Ahora mismo",
+          "p05": 12.2
+        },
+        {
+          "texto": "Muy alto — protéjase",
+          "p05": 12.8
+        },
+        {
+          "texto": "Rocío a 8°C",
+          "p05": 12.9
+        },
+        {
+          "texto": "Open-Meteo · máx. del día",
+          "p05": 12.9
+        },
+        {
+          "texto": "Open-Meteo (WMO) · fase ENSO: IDEA",
+          "p05": 12.91
+        },
+        {
+          "texto": "Open-Meteo",
+          "p05": 12.93
+        },
+        {
+          "texto": "Nublado · fase Neutral",
+          "p05": 12.94
+        },
+        {
+          "texto": "Lo que viene",
+          "p05": 12.94
+        },
+        {
+          "texto": "La temporada",
+          "p05": 12.94
+        },
+        {
+          "texto": "°C",
+          "p05": 13.14
+        },
+        {
+          "texto": "Se siente como 8°C",
+          "p05": 13.19
+        },
+        {
+          "texto": "mm",
+          "p05": 13.29
+        },
+        {
+          "texto": "100% de probabilidad",
+          "p05": 13.29
+        },
+        {
+          "texto": "Estimado por Chagra · Open-Meteo (",
+          "p05": 13.31
+        },
+        {
+          "texto": "Open-Meteo",
+          "p05": 13.32
+        },
+        {
+          "texto": "mm",
+          "p05": 13.4
+        },
+        {
+          "texto": "agua que se evapora hoy",
+          "p05": 13.41
+        },
+        {
+          "texto": "11:31 p. m.",
+          "p05": 13.77
+        },
+        {
+          "texto": "Buenas noches",
+          "p05": 13.95
+        },
+        {
+          "texto": "2900 m s. n. m. · Piso frío",
+          "p05": 14.17
+        },
+        {
+          "texto": "☁️",
+          "p05": 17.92
+        }
+      ],
+      "enso": null,
+      "capas": {
+        "cielo:soleado": 0,
+        "cielo:lluvia": 0,
+        "cielo:niebla": 0,
+        "cielo:dorada": 0,
+        "cielo:noche": 1,
+        "cielo:nublado": 0,
+        "grade:soleado": 0,
+        "grade:lluvia": 0,
+        "grade:niebla": 0,
+        "grade:dorada": 0,
+        "grade:noche": 1,
+        "grade:nublado": 1,
+        "astro": 0.24,
+        "rayos": 0,
+        "bruma": 0.7,
+        "laderaLuz": 0,
+        "vineta": 0.34,
+        "scrimAlto": 0.6,
+        "scrimBajo": 0.55,
+        "jironUI": 0,
+        "capa:estrellas": 0,
+        "capa:lluvia": 0,
+        "capa:niebla": 0.42,
+        "capa:polvo": 0,
+        "capa:luci": 0.4
+      },
+      "particulas": {
+        "estrellas": {
+          "total": 26,
+          "visibles": 0,
+          "animando": 0,
+          "opCapa": 0
+        },
+        "gotas": {
+          "total": 30,
+          "visibles": 0,
+          "animando": 0,
+          "opCapa": 0
+        },
+        "bancos": {
+          "total": 9,
+          "visibles": 9,
+          "animando": 9,
+          "opCapa": 0.42
+        },
+        "jirones": {
+          "total": 7,
+          "visibles": 7,
+          "animando": 7,
+          "opCapa": 0.42
+        },
+        "motas": {
+          "total": 16,
+          "visibles": 0,
+          "animando": 0,
+          "opCapa": 0
+        },
+        "luciernagas": {
+          "total": 11,
+          "visibles": 11,
+          "animando": 22,
+          "opCapa": 0.4
+        },
+        "rayos": {
+          "total": 6,
+          "visibles": 0,
+          "animando": 0,
+          "opCapa": 0
+        }
+      },
+      "animCorriendo": 60,
+      "animVivasVisibles": 57,
+      "nodosEscena": 210
+    },
+    {
+      "clima": "lluvia",
+      "luz": "amanecer",
+      "fps": null,
+      "contrastes": [
+        {
+          "id": "cabecera-lugar",
+          "texto": "Paramo alto · Guatavita, Cundinamarca",
+          "min": 9.72,
+          "p05": 10.83
+        },
+        {
+          "id": "cabecera-altura",
+          "texto": "2900 m s. n. m. · Piso frío",
+          "min": 9.08,
+          "p05": 10.56
+        },
+        {
+          "id": "cabecera-saludo",
+          "texto": "Buenas noches",
+          "min": 8.32,
+          "p05": 10.22
+        },
+        {
+          "id": "cabecera-condicion",
+          "texto": "Nublado · 11:31 p. m.",
+          "min": 9.6,
+          "p05": 10.09
+        },
+        {
+          "id": "cifra-grande",
+          "texto": "9°C",
+          "min": 14.41,
+          "p05": 14.74
+        },
+        {
+          "id": "tab-hoy",
+          "texto": "Hoy",
+          "min": 10.9,
+          "p05": 10.9
+        },
+        {
+          "id": "tab-semana",
+          "texto": "7–16 días",
+          "min": 11.88,
+          "p05": 11.88
+        },
+        {
+          "id": "tab-estacional",
+          "texto": "El Niño",
+          "min": 11.88,
+          "p05": 11.88
+        },
+        {
+          "id": "CONTROL-21",
+          "texto": "CONTROL",
+          "min": 21,
+          "p05": 21
+        },
+        {
+          "id": "CONTROL-4.54",
+          "texto": "CONTROL",
+          "min": 4.54,
+          "p05": 4.54
+        }
+      ],
+      "flotantesApartados": 1,
+      "nTextos": 27,
+      "todoTexto": [
+        {
+          "texto": "94",
+          "p05": 8.9
+        },
+        {
+          "texto": "1.2",
+          "p05": 9.82
+        },
+        {
+          "texto": "11:31 p. m.",
+          "p05": 10.05
+        },
+        {
+          "texto": "Buenas noches",
+          "p05": 10.26
+        },
+        {
+          "texto": "2900 m s. n. m. · Piso frío",
+          "p05": 10.56
+        },
+        {
+          "texto": "3.01",
+          "p05": 10.62
+        },
+        {
+          "texto": "Open-Meteo (WMO) · fase ENSO: IDEA",
+          "p05": 10.84
+        },
+        {
+          "texto": "Muy alto — protéjase",
+          "p05": 10.86
+        },
+        {
+          "texto": "Hoy",
+          "p05": 10.9
+        },
+        {
+          "texto": "Rocío a 8°C",
+          "p05": 10.9
+        },
+        {
+          "texto": "Open-Meteo · máx. del día",
+          "p05": 11.04
+        },
+        {
+          "texto": "Open-Meteo",
+          "p05": 11.17
+        },
+        {
+          "texto": "Se siente como 8°C",
+          "p05": 11.7
+        },
+        {
+          "texto": "7–16 días",
+          "p05": 11.88
+        },
+        {
+          "texto": "El Niño",
+          "p05": 11.88
+        },
+        {
+          "texto": "°C",
+          "p05": 11.97
+        },
+        {
+          "texto": "Nublado · fase Neutral",
+          "p05": 12
+        },
+        {
+          "texto": "mm",
+          "p05": 12.01
+        },
+        {
+          "texto": "mm",
+          "p05": 12.15
+        },
+        {
+          "texto": "Ahora mismo",
+          "p05": 12.2
+        },
+        {
+          "texto": "100% de probabilidad",
+          "p05": 12.31
+        },
+        {
+          "texto": "agua que se evapora hoy",
+          "p05": 12.31
+        },
+        {
+          "texto": "Estimado por Chagra · Open-Meteo (",
+          "p05": 12.57
+        },
+        {
+          "texto": "Open-Meteo",
+          "p05": 12.69
+        },
+        {
+          "texto": "Lo que viene",
+          "p05": 12.94
+        },
+        {
+          "texto": "La temporada",
+          "p05": 12.94
+        },
+        {
+          "texto": "☁️",
+          "p05": 15.42
+        }
+      ],
+      "enso": null,
+      "capas": {
+        "cielo:soleado": 0,
+        "cielo:lluvia": 1,
+        "cielo:niebla": 0,
+        "cielo:dorada": 0,
+        "cielo:noche": 0,
+        "cielo:nublado": 0,
+        "grade:soleado": 0,
+        "grade:lluvia": 1,
+        "grade:niebla": 0,
+        "grade:dorada": 0.3,
+        "grade:noche": 0,
+        "grade:nublado": 0,
+        "astro": 0.2,
+        "rayos": 0,
+        "bruma": 0.55,
+        "laderaLuz": 0,
+        "vineta": 0.34,
+        "scrimAlto": 0.78,
+        "scrimBajo": 0.55,
+        "jironUI": 0,
+        "capa:estrellas": 0,
+        "capa:lluvia": 1,
+        "capa:niebla": 0.3,
+        "capa:polvo": 0,
+        "capa:luci": 0
+      },
+      "particulas": {
+        "estrellas": {
+          "total": 26,
+          "visibles": 0,
+          "animando": 0,
+          "opCapa": 0
+        },
+        "gotas": {
+          "total": 30,
+          "visibles": 30,
+          "animando": 30,
+          "opCapa": 1
+        },
+        "bancos": {
+          "total": 9,
+          "visibles": 9,
+          "animando": 9,
+          "opCapa": 0.3
+        },
+        "jirones": {
+          "total": 7,
+          "visibles": 7,
+          "animando": 7,
+          "opCapa": 0.3
+        },
+        "motas": {
+          "total": 16,
+          "visibles": 0,
+          "animando": 0,
+          "opCapa": 0
+        },
+        "luciernagas": {
+          "total": 11,
+          "visibles": 0,
+          "animando": 0,
+          "opCapa": 0
+        },
+        "rayos": {
+          "total": 6,
+          "visibles": 0,
+          "animando": 0,
+          "opCapa": 0
+        }
+      },
+      "animCorriendo": 68,
+      "animVivasVisibles": 68,
+      "nodosEscena": 210
+    },
+    {
+      "clima": "lluvia",
+      "luz": "dia",
+      "fps": null,
+      "contrastes": [
+        {
+          "id": "cabecera-lugar",
+          "texto": "Paramo alto · Guatavita, Cundinamarca",
+          "min": 10.29,
+          "p05": 11.09
+        },
+        {
+          "id": "cabecera-altura",
+          "texto": "2900 m s. n. m. · Piso frío",
+          "min": 9.69,
+          "p05": 10.66
+        },
+        {
+          "id": "cabecera-saludo",
+          "texto": "Buenas noches",
+          "min": 8.85,
+          "p05": 9.83
+        },
+        {
+          "id": "cabecera-condicion",
+          "texto": "Nublado · 11:31 p. m.",
+          "min": 8.43,
+          "p05": 9.85
+        },
+        {
+          "id": "cifra-grande",
+          "texto": "9°C",
+          "min": 14.41,
+          "p05": 14.75
+        },
+        {
+          "id": "tab-hoy",
+          "texto": "Hoy",
+          "min": 10.9,
+          "p05": 10.9
+        },
+        {
+          "id": "tab-semana",
+          "texto": "7–16 días",
+          "min": 11.88,
+          "p05": 11.88
+        },
+        {
+          "id": "tab-estacional",
+          "texto": "El Niño",
+          "min": 11.88,
+          "p05": 11.88
+        },
+        {
+          "id": "CONTROL-21",
+          "texto": "CONTROL",
+          "min": 21,
+          "p05": 21
+        },
+        {
+          "id": "CONTROL-4.54",
+          "texto": "CONTROL",
+          "min": 4.54,
+          "p05": 4.54
+        }
+      ],
+      "flotantesApartados": 1,
+      "nTextos": 27,
+      "todoTexto": [
+        {
+          "texto": "94",
+          "p05": 8.92
+        },
+        {
+          "texto": "11:31 p. m.",
+          "p05": 9.84
+        },
+        {
+          "texto": "Buenas noches",
+          "p05": 9.87
+        },
+        {
+          "texto": "1.2",
+          "p05": 9.95
+        },
+        {
+          "texto": "3.01",
+          "p05": 10.65
+        },
+        {
+          "texto": "2900 m s. n. m. · Piso frío",
+          "p05": 10.66
+        },
+        {
+          "texto": "Open-Meteo (WMO) · fase ENSO: IDEA",
+          "p05": 10.88
+        },
+        {
+          "texto": "Hoy",
+          "p05": 10.9
+        },
+        {
+          "texto": "Muy alto — protéjase",
+          "p05": 10.91
+        },
+        {
+          "texto": "Rocío a 8°C",
+          "p05": 11.05
+        },
+        {
+          "texto": "Open-Meteo · máx. del día",
+          "p05": 11.05
+        },
+        {
+          "texto": "Open-Meteo",
+          "p05": 11.19
+        },
+        {
+          "texto": "Se siente como 8°C",
+          "p05": 11.65
+        },
+        {
+          "texto": "7–16 días",
+          "p05": 11.88
+        },
+        {
+          "texto": "El Niño",
+          "p05": 11.88
+        },
+        {
+          "texto": "Nublado · fase Neutral",
+          "p05": 11.89
+        },
+        {
+          "texto": "°C",
+          "p05": 11.89
+        },
+        {
+          "texto": "mm",
+          "p05": 12.16
+        },
+        {
+          "texto": "mm",
+          "p05": 12.16
+        },
+        {
+          "texto": "Ahora mismo",
+          "p05": 12.2
+        },
+        {
+          "texto": "agua que se evapora hoy",
+          "p05": 12.43
+        },
+        {
+          "texto": "100% de probabilidad",
+          "p05": 12.45
+        },
+        {
+          "texto": "Estimado por Chagra · Open-Meteo (",
+          "p05": 12.7
+        },
+        {
+          "texto": "Open-Meteo",
+          "p05": 12.84
+        },
+        {
+          "texto": "Lo que viene",
+          "p05": 12.94
+        },
+        {
+          "texto": "La temporada",
+          "p05": 12.94
+        },
+        {
+          "texto": "☁️",
+          "p05": 15.45
+        }
+      ],
+      "enso": null,
+      "capas": {
+        "cielo:soleado": 0,
+        "cielo:lluvia": 1,
+        "cielo:niebla": 0,
+        "cielo:dorada": 0,
+        "cielo:noche": 0,
+        "cielo:nublado": 0,
+        "grade:soleado": 0,
+        "grade:lluvia": 1,
+        "grade:niebla": 0,
+        "grade:dorada": 0,
+        "grade:noche": 0,
+        "grade:nublado": 0,
+        "astro": 0.12,
+        "rayos": 0,
+        "bruma": 0.55,
+        "laderaLuz": 0,
+        "vineta": 0.34,
+        "scrimAlto": 0.78,
+        "scrimBajo": 0.55,
+        "jironUI": 0,
+        "capa:estrellas": 0,
+        "capa:lluvia": 1,
+        "capa:niebla": 0.3,
+        "capa:polvo": 0,
+        "capa:luci": 0
+      },
+      "particulas": {
+        "estrellas": {
+          "total": 26,
+          "visibles": 0,
+          "animando": 0,
+          "opCapa": 0
+        },
+        "gotas": {
+          "total": 30,
+          "visibles": 30,
+          "animando": 30,
+          "opCapa": 1
+        },
+        "bancos": {
+          "total": 9,
+          "visibles": 9,
+          "animando": 9,
+          "opCapa": 0.3
+        },
+        "jirones": {
+          "total": 7,
+          "visibles": 7,
+          "animando": 7,
+          "opCapa": 0.3
+        },
+        "motas": {
+          "total": 16,
+          "visibles": 0,
+          "animando": 0,
+          "opCapa": 0
+        },
+        "luciernagas": {
+          "total": 11,
+          "visibles": 0,
+          "animando": 0,
+          "opCapa": 0
+        },
+        "rayos": {
+          "total": 6,
+          "visibles": 0,
+          "animando": 0,
+          "opCapa": 0
+        }
+      },
+      "animCorriendo": 68,
+      "animVivasVisibles": 68,
+      "nodosEscena": 210
+    },
+    {
+      "clima": "lluvia",
+      "luz": "atardecer",
+      "fps": null,
+      "contrastes": [
+        {
+          "id": "cabecera-lugar",
+          "texto": "Paramo alto · Guatavita, Cundinamarca",
+          "min": 9.45,
+          "p05": 11.19
+        },
+        {
+          "id": "cabecera-altura",
+          "texto": "2900 m s. n. m. · Piso frío",
+          "min": 9.66,
+          "p05": 10.73
+        },
+        {
+          "id": "cabecera-saludo",
+          "texto": "Buenas noches",
+          "min": 8.99,
+          "p05": 10.33
+        },
+        {
+          "id": "cabecera-condicion",
+          "texto": "Nublado · 11:31 p. m.",
+          "min": 9.64,
+          "p05": 10.19
+        },
+        {
+          "id": "cifra-grande",
+          "texto": "9°C",
+          "min": 14.43,
+          "p05": 14.74
+        },
+        {
+          "id": "tab-hoy",
+          "texto": "Hoy",
+          "min": 10.9,
+          "p05": 10.9
+        },
+        {
+          "id": "tab-semana",
+          "texto": "7–16 días",
+          "min": 11.88,
+          "p05": 11.88
+        },
+        {
+          "id": "tab-estacional",
+          "texto": "El Niño",
+          "min": 11.88,
+          "p05": 11.88
+        },
+        {
+          "id": "CONTROL-21",
+          "texto": "CONTROL",
+          "min": 21,
+          "p05": 21
+        },
+        {
+          "id": "CONTROL-4.54",
+          "texto": "CONTROL",
+          "min": 4.54,
+          "p05": 4.54
+        }
+      ],
+      "flotantesApartados": 1,
+      "nTextos": 27,
+      "todoTexto": [
+        {
+          "texto": "94",
+          "p05": 8.9
+        },
+        {
+          "texto": "1.2",
+          "p05": 9.82
+        },
+        {
+          "texto": "11:31 p. m.",
+          "p05": 10.15
+        },
+        {
+          "texto": "Buenas noches",
+          "p05": 10.33
+        },
+        {
+          "texto": "3.01",
+          "p05": 10.62
+        },
+        {
+          "texto": "2900 m s. n. m. · Piso frío",
+          "p05": 10.73
+        },
+        {
+          "texto": "Open-Meteo (WMO) · fase ENSO: IDEA",
+          "p05": 10.85
+        },
+        {
+          "texto": "Muy alto — protéjase",
+          "p05": 10.86
+        },
+        {
+          "texto": "Hoy",
+          "p05": 10.9
+        },
+        {
+          "texto": "Rocío a 8°C",
+          "p05": 10.9
+        },
+        {
+          "texto": "Open-Meteo · máx. del día",
+          "p05": 11.04
+        },
+        {
+          "texto": "Open-Meteo",
+          "p05": 11.17
+        },
+        {
+          "texto": "Se siente como 8°C",
+          "p05": 11.69
+        },
+        {
+          "texto": "7–16 días",
+          "p05": 11.88
+        },
+        {
+          "texto": "El Niño",
+          "p05": 11.88
+        },
+        {
+          "texto": "°C",
+          "p05": 11.97
+        },
+        {
+          "texto": "Nublado · fase Neutral",
+          "p05": 12
+        },
+        {
+          "texto": "mm",
+          "p05": 12.01
+        },
+        {
+          "texto": "mm",
+          "p05": 12.14
+        },
+        {
+          "texto": "Ahora mismo",
+          "p05": 12.2
+        },
+        {
+          "texto": "100% de probabilidad",
+          "p05": 12.31
+        },
+        {
+          "texto": "agua que se evapora hoy",
+          "p05": 12.31
+        },
+        {
+          "texto": "Estimado por Chagra · Open-Meteo (",
+          "p05": 12.57
+        },
+        {
+          "texto": "Open-Meteo",
+          "p05": 12.69
+        },
+        {
+          "texto": "Lo que viene",
+          "p05": 12.94
+        },
+        {
+          "texto": "La temporada",
+          "p05": 12.94
+        },
+        {
+          "texto": "☁️",
+          "p05": 15.52
+        }
+      ],
+      "enso": null,
+      "capas": {
+        "cielo:soleado": 0,
+        "cielo:lluvia": 1,
+        "cielo:niebla": 0,
+        "cielo:dorada": 0,
+        "cielo:noche": 0,
+        "cielo:nublado": 0,
+        "grade:soleado": 0,
+        "grade:lluvia": 1,
+        "grade:niebla": 0,
+        "grade:dorada": 0.3,
+        "grade:noche": 0,
+        "grade:nublado": 0,
+        "astro": 0.2,
+        "rayos": 0,
+        "bruma": 0.55,
+        "laderaLuz": 0,
+        "vineta": 0.34,
+        "scrimAlto": 0.78,
+        "scrimBajo": 0.55,
+        "jironUI": 0,
+        "capa:estrellas": 0,
+        "capa:lluvia": 1,
+        "capa:niebla": 0.3,
+        "capa:polvo": 0,
+        "capa:luci": 0
+      },
+      "particulas": {
+        "estrellas": {
+          "total": 26,
+          "visibles": 0,
+          "animando": 0,
+          "opCapa": 0
+        },
+        "gotas": {
+          "total": 30,
+          "visibles": 30,
+          "animando": 30,
+          "opCapa": 1
+        },
+        "bancos": {
+          "total": 9,
+          "visibles": 9,
+          "animando": 9,
+          "opCapa": 0.3
+        },
+        "jirones": {
+          "total": 7,
+          "visibles": 7,
+          "animando": 7,
+          "opCapa": 0.3
+        },
+        "motas": {
+          "total": 16,
+          "visibles": 0,
+          "animando": 0,
+          "opCapa": 0
+        },
+        "luciernagas": {
+          "total": 11,
+          "visibles": 0,
+          "animando": 0,
+          "opCapa": 0
+        },
+        "rayos": {
+          "total": 6,
+          "visibles": 0,
+          "animando": 0,
+          "opCapa": 0
+        }
+      },
+      "animCorriendo": 68,
+      "animVivasVisibles": 67,
+      "nodosEscena": 210
+    },
+    {
+      "clima": "lluvia",
+      "luz": "noche",
+      "fps": null,
+      "contrastes": [
+        {
+          "id": "cabecera-lugar",
+          "texto": "Paramo alto · Guatavita, Cundinamarca",
+          "min": 10.56,
+          "p05": 12.46
+        },
+        {
+          "id": "cabecera-altura",
+          "texto": "2900 m s. n. m. · Piso frío",
+          "min": 12.11,
+          "p05": 12.25
+        },
+        {
+          "id": "cabecera-saludo",
+          "texto": "Buenas noches",
+          "min": 12.11,
+          "p05": 12.41
+        },
+        {
+          "id": "cabecera-condicion",
+          "texto": "Nublado · 11:31 p. m.",
+          "min": 11.89,
+          "p05": 12.25
+        },
+        {
+          "id": "cifra-grande",
+          "texto": "9°C",
+          "min": 15.28,
+          "p05": 15.6
+        },
+        {
+          "id": "tab-hoy",
+          "texto": "Hoy",
+          "min": 10.9,
+          "p05": 10.9
+        },
+        {
+          "id": "tab-semana",
+          "texto": "7–16 días",
+          "min": 11.88,
+          "p05": 11.88
+        },
+        {
+          "id": "tab-estacional",
+          "texto": "El Niño",
+          "min": 11.88,
+          "p05": 11.88
+        },
+        {
+          "id": "CONTROL-21",
+          "texto": "CONTROL",
+          "min": 21,
+          "p05": 21
+        },
+        {
+          "id": "CONTROL-4.54",
+          "texto": "CONTROL",
+          "min": 4.54,
+          "p05": 4.54
+        }
+      ],
+      "flotantesApartados": 1,
+      "nTextos": 27,
+      "todoTexto": [
+        {
+          "texto": "94",
+          "p05": 10.66
+        },
+        {
+          "texto": "Hoy",
+          "p05": 10.9
+        },
+        {
+          "texto": "1.2",
+          "p05": 11.05
+        },
+        {
+          "texto": "7–16 días",
+          "p05": 11.88
+        },
+        {
+          "texto": "El Niño",
+          "p05": 11.88
+        },
+        {
+          "texto": "Open-Meteo (WMO) · fase ENSO: IDEA",
+          "p05": 12.01
+        },
+        {
+          "texto": "3.01",
+          "p05": 12.07
+        },
+        {
+          "texto": "Ahora mismo",
+          "p05": 12.2
+        },
+        {
+          "texto": "2900 m s. n. m. · Piso frío",
+          "p05": 12.25
+        },
+        {
+          "texto": "11:31 p. m.",
+          "p05": 12.25
+        },
+        {
+          "texto": "Buenas noches",
+          "p05": 12.3
+        },
+        {
+          "texto": "Se siente como 8°C",
+          "p05": 12.5
+        },
+        {
+          "texto": "Nublado · fase Neutral",
+          "p05": 12.57
+        },
+        {
+          "texto": "°C",
+          "p05": 12.65
+        },
+        {
+          "texto": "Muy alto — protéjase",
+          "p05": 12.81
+        },
+        {
+          "texto": "Lo que viene",
+          "p05": 12.94
+        },
+        {
+          "texto": "La temporada",
+          "p05": 12.94
+        },
+        {
+          "texto": "Rocío a 8°C",
+          "p05": 13.04
+        },
+        {
+          "texto": "Open-Meteo · máx. del día",
+          "p05": 13.04
+        },
+        {
+          "texto": "Open-Meteo",
+          "p05": 13.07
+        },
+        {
+          "texto": "100% de probabilidad",
+          "p05": 13.41
+        },
+        {
+          "texto": "Estimado por Chagra · Open-Meteo (",
+          "p05": 13.51
+        },
+        {
+          "texto": "mm",
+          "p05": 13.52
+        },
+        {
+          "texto": "mm",
+          "p05": 13.52
+        },
+        {
+          "texto": "Open-Meteo",
+          "p05": 13.53
+        },
+        {
+          "texto": "agua que se evapora hoy",
+          "p05": 13.53
+        },
+        {
+          "texto": "☁️",
+          "p05": 16.74
+        }
+      ],
+      "enso": null,
+      "capas": {
+        "cielo:soleado": 0,
+        "cielo:lluvia": 1,
+        "cielo:niebla": 0,
+        "cielo:dorada": 0,
+        "cielo:noche": 0,
+        "cielo:nublado": 0,
+        "grade:soleado": 0,
+        "grade:lluvia": 1,
+        "grade:niebla": 0,
+        "grade:dorada": 0,
+        "grade:noche": 1,
+        "grade:nublado": 0,
+        "astro": 0.12,
+        "rayos": 0,
+        "bruma": 0.55,
+        "laderaLuz": 0,
+        "vineta": 0.34,
+        "scrimAlto": 0.6,
+        "scrimBajo": 0.55,
+        "jironUI": 0,
+        "capa:estrellas": 0,
+        "capa:lluvia": 1,
+        "capa:niebla": 0.3,
+        "capa:polvo": 0,
+        "capa:luci": 0.14
+      },
+      "particulas": {
+        "estrellas": {
+          "total": 26,
+          "visibles": 0,
+          "animando": 0,
+          "opCapa": 0
+        },
+        "gotas": {
+          "total": 30,
+          "visibles": 30,
+          "animando": 30,
+          "opCapa": 1
+        },
+        "bancos": {
+          "total": 9,
+          "visibles": 9,
+          "animando": 9,
+          "opCapa": 0.3
+        },
+        "jirones": {
+          "total": 7,
+          "visibles": 7,
+          "animando": 7,
+          "opCapa": 0.3
+        },
+        "motas": {
+          "total": 16,
+          "visibles": 0,
+          "animando": 0,
+          "opCapa": 0
+        },
+        "luciernagas": {
+          "total": 11,
+          "visibles": 11,
+          "animando": 22,
+          "opCapa": 0.14
+        },
+        "rayos": {
+          "total": 6,
+          "visibles": 0,
+          "animando": 0,
+          "opCapa": 0
+        }
+      },
+      "animCorriendo": 90,
+      "animVivasVisibles": 84,
+      "nodosEscena": 210
+    },
+    {
+      "clima": "niebla",
+      "luz": "amanecer",
+      "fps": null,
+      "contrastes": [
+        {
+          "id": "cabecera-lugar",
+          "texto": "Paramo alto · Guatavita, Cundinamarca",
+          "min": 9.18,
+          "p05": 9.33
+        },
+        {
+          "id": "cabecera-altura",
+          "texto": "2900 m s. n. m. · Piso frío",
+          "min": 8.66,
+          "p05": 8.86
+        },
+        {
+          "id": "cabecera-saludo",
+          "texto": "Buenas noches",
+          "min": 7.81,
+          "p05": 8.06
+        },
+        {
+          "id": "cabecera-condicion",
+          "texto": "Nublado · 11:31 p. m.",
+          "min": 7.28,
+          "p05": 7.57
+        },
+        {
+          "id": "cifra-grande",
+          "texto": "9°C",
+          "min": 12.62,
+          "p05": 12.99
+        },
+        {
+          "id": "tab-hoy",
+          "texto": "Hoy",
+          "min": 9.65,
+          "p05": 9.8
+        },
+        {
+          "id": "tab-semana",
+          "texto": "7–16 días",
+          "min": 10.27,
+          "p05": 10.43
+        },
+        {
+          "id": "tab-estacional",
+          "texto": "El Niño",
+          "min": 10.78,
+          "p05": 10.9
+        },
+        {
+          "id": "CONTROL-21",
+          "texto": "CONTROL",
+          "min": 21,
+          "p05": 21
+        },
+        {
+          "id": "CONTROL-4.54",
+          "texto": "CONTROL",
+          "min": 4.54,
+          "p05": 4.54
+        }
+      ],
+      "flotantesApartados": 1,
+      "nTextos": 27,
+      "todoTexto": [
+        {
+          "texto": "94",
+          "p05": 7.29
+        },
+        {
+          "texto": "11:31 p. m.",
+          "p05": 7.51
+        },
+        {
+          "texto": "Buenas noches",
+          "p05": 8.06
+        },
+        {
+          "texto": "1.2",
+          "p05": 8.32
+        },
+        {
+          "texto": "Open-Meteo (WMO) · fase ENSO: IDEA",
+          "p05": 8.65
+        },
+        {
+          "texto": "2900 m s. n. m. · Piso frío",
+          "p05": 8.86
+        },
+        {
+          "texto": "3.01",
+          "p05": 8.94
+        },
+        {
+          "texto": "Muy alto — protéjase",
+          "p05": 9.01
+        },
+        {
+          "texto": "Rocío a 8°C",
+          "p05": 9.05
+        },
+        {
+          "texto": "Open-Meteo · máx. del día",
+          "p05": 9.17
+        },
+        {
+          "texto": "Open-Meteo",
+          "p05": 9.31
+        },
+        {
+          "texto": "Hoy",
+          "p05": 9.79
+        },
+        {
+          "texto": "Se siente como 8°C",
+          "p05": 10.12
+        },
+        {
+          "texto": "mm",
+          "p05": 10.18
+        },
+        {
+          "texto": "mm",
+          "p05": 10.18
+        },
+        {
+          "texto": "7–16 días",
+          "p05": 10.43
+        },
+        {
+          "texto": "agua que se evapora hoy",
+          "p05": 10.6
+        },
+        {
+          "texto": "100% de probabilidad",
+          "p05": 10.63
+        },
+        {
+          "texto": "°C",
+          "p05": 10.7
+        },
+        {
+          "texto": "El Niño",
+          "p05": 10.9
+        },
+        {
+          "texto": "Estimado por Chagra · Open-Meteo (",
+          "p05": 10.93
+        },
+        {
+          "texto": "Nublado · fase Neutral",
+          "p05": 11.03
+        },
+        {
+          "texto": "Open-Meteo",
+          "p05": 11.08
+        },
+        {
+          "texto": "Ahora mismo",
+          "p05": 12.2
+        },
+        {
+          "texto": "Lo que viene",
+          "p05": 12.94
+        },
+        {
+          "texto": "La temporada",
+          "p05": 12.94
+        },
+        {
+          "texto": "☁️",
+          "p05": 13.04
+        }
+      ],
+      "enso": null,
+      "capas": {
+        "cielo:soleado": 0,
+        "cielo:lluvia": 0,
+        "cielo:niebla": 1,
+        "cielo:dorada": 0,
+        "cielo:noche": 0,
+        "cielo:nublado": 0,
+        "grade:soleado": 0,
+        "grade:lluvia": 0,
+        "grade:niebla": 1,
+        "grade:dorada": 0.34,
+        "grade:noche": 0,
+        "grade:nublado": 0,
+        "astro": 0.25,
+        "rayos": 1,
+        "bruma": 0.92,
+        "laderaLuz": 0,
+        "vineta": 0.16,
+        "scrimAlto": 0.96,
+        "scrimBajo": 0.55,
+        "jironUI": 0.34,
+        "capa:estrellas": 0,
+        "capa:lluvia": 0,
+        "capa:niebla": 1,
+        "capa:polvo": 0,
+        "capa:luci": 0
+      },
+      "particulas": {
+        "estrellas": {
+          "total": 26,
+          "visibles": 0,
+          "animando": 0,
+          "opCapa": 0
+        },
+        "gotas": {
+          "total": 30,
+          "visibles": 0,
+          "animando": 0,
+          "opCapa": 0
+        },
+        "bancos": {
+          "total": 9,
+          "visibles": 9,
+          "animando": 9,
+          "opCapa": 1
+        },
+        "jirones": {
+          "total": 7,
+          "visibles": 7,
+          "animando": 7,
+          "opCapa": 1
+        },
+        "motas": {
+          "total": 16,
+          "visibles": 0,
+          "animando": 0,
+          "opCapa": 0
+        },
+        "luciernagas": {
+          "total": 11,
+          "visibles": 0,
+          "animando": 0,
+          "opCapa": 0
+        },
+        "rayos": {
+          "total": 6,
+          "visibles": 6,
+          "animando": 1,
+          "opCapa": 1
+        }
+      },
+      "animCorriendo": 41,
+      "animVivasVisibles": 41,
+      "nodosEscena": 210
+    },
+    {
+      "clima": "niebla",
+      "luz": "dia",
+      "fps": null,
+      "contrastes": [
+        {
+          "id": "cabecera-lugar",
+          "texto": "Paramo alto · Guatavita, Cundinamarca",
+          "min": 8.7,
+          "p05": 8.86
+        },
+        {
+          "id": "cabecera-altura",
+          "texto": "2900 m s. n. m. · Piso frío",
+          "min": 8.18,
+          "p05": 8.32
+        },
+        {
+          "id": "cabecera-saludo",
+          "texto": "Buenas noches",
+          "min": 7.2,
+          "p05": 7.45
+        },
+        {
+          "id": "cabecera-condicion",
+          "texto": "Nublado · 11:31 p. m.",
+          "min": 6.88,
+          "p05": 7.1
+        },
+        {
+          "id": "cifra-grande",
+          "texto": "9°C",
+          "min": 12.31,
+          "p05": 12.69
+        },
+        {
+          "id": "tab-hoy",
+          "texto": "Hoy",
+          "min": 9.54,
+          "p05": 9.79
+        },
+        {
+          "id": "tab-semana",
+          "texto": "7–16 días",
+          "min": 10.27,
+          "p05": 10.4
+        },
+        {
+          "id": "tab-estacional",
+          "texto": "El Niño",
+          "min": 10.78,
+          "p05": 10.89
+        },
+        {
+          "id": "CONTROL-21",
+          "texto": "CONTROL",
+          "min": 21,
+          "p05": 21
+        },
+        {
+          "id": "CONTROL-4.54",
+          "texto": "CONTROL",
+          "min": 4.54,
+          "p05": 4.54
+        }
+      ],
+      "flotantesApartados": 1,
+      "nTextos": 27,
+      "todoTexto": [
+        {
+          "texto": "11:31 p. m.",
+          "p05": 7.01
+        },
+        {
+          "texto": "94",
+          "p05": 7.09
+        },
+        {
+          "texto": "Buenas noches",
+          "p05": 7.45
+        },
+        {
+          "texto": "1.2",
+          "p05": 8.23
+        },
+        {
+          "texto": "Open-Meteo (WMO) · fase ENSO: IDEA",
+          "p05": 8.29
+        },
+        {
+          "texto": "2900 m s. n. m. · Piso frío",
+          "p05": 8.32
+        },
+        {
+          "texto": "Muy alto — protéjase",
+          "p05": 8.71
+        },
+        {
+          "texto": "3.01",
+          "p05": 8.77
+        },
+        {
+          "texto": "Rocío a 8°C",
+          "p05": 8.83
+        },
+        {
+          "texto": "Open-Meteo · máx. del día",
+          "p05": 8.94
+        },
+        {
+          "texto": "Open-Meteo",
+          "p05": 9.07
+        },
+        {
+          "texto": "Hoy",
+          "p05": 9.68
+        },
+        {
+          "texto": "Se siente como 8°C",
+          "p05": 9.79
+        },
+        {
+          "texto": "mm",
+          "p05": 10.06
+        },
+        {
+          "texto": "mm",
+          "p05": 10.06
+        },
+        {
+          "texto": "7–16 días",
+          "p05": 10.4
+        },
+        {
+          "texto": "°C",
+          "p05": 10.45
+        },
+        {
+          "texto": "agua que se evapora hoy",
+          "p05": 10.51
+        },
+        {
+          "texto": "100% de probabilidad",
+          "p05": 10.62
+        },
+        {
+          "texto": "Nublado · fase Neutral",
+          "p05": 10.87
+        },
+        {
+          "texto": "El Niño",
+          "p05": 10.89
+        },
+        {
+          "texto": "Estimado por Chagra · Open-Meteo (",
+          "p05": 10.93
+        },
+        {
+          "texto": "Open-Meteo",
+          "p05": 11.09
+        },
+        {
+          "texto": "Ahora mismo",
+          "p05": 12.04
+        },
+        {
+          "texto": "☁️",
+          "p05": 12.72
+        },
+        {
+          "texto": "Lo que viene",
+          "p05": 12.81
+        },
+        {
+          "texto": "La temporada",
+          "p05": 12.81
+        }
+      ],
+      "enso": null,
+      "capas": {
+        "cielo:soleado": 0,
+        "cielo:lluvia": 0,
+        "cielo:niebla": 1,
+        "cielo:dorada": 0,
+        "cielo:noche": 0,
+        "cielo:nublado": 0,
+        "grade:soleado": 0,
+        "grade:lluvia": 0,
+        "grade:niebla": 1,
+        "grade:dorada": 0,
+        "grade:noche": 0,
+        "grade:nublado": 0,
+        "astro": 0.25,
+        "rayos": 0.85,
+        "bruma": 0.92,
+        "laderaLuz": 0,
+        "vineta": 0.16,
+        "scrimAlto": 0.96,
+        "scrimBajo": 0.55,
+        "jironUI": 0.34,
+        "capa:estrellas": 0,
+        "capa:lluvia": 0,
+        "capa:niebla": 1,
+        "capa:polvo": 0,
+        "capa:luci": 0
+      },
+      "particulas": {
+        "estrellas": {
+          "total": 26,
+          "visibles": 0,
+          "animando": 0,
+          "opCapa": 0
+        },
+        "gotas": {
+          "total": 30,
+          "visibles": 0,
+          "animando": 0,
+          "opCapa": 0
+        },
+        "bancos": {
+          "total": 9,
+          "visibles": 9,
+          "animando": 9,
+          "opCapa": 1
+        },
+        "jirones": {
+          "total": 7,
+          "visibles": 7,
+          "animando": 7,
+          "opCapa": 1
+        },
+        "motas": {
+          "total": 16,
+          "visibles": 0,
+          "animando": 0,
+          "opCapa": 0
+        },
+        "luciernagas": {
+          "total": 11,
+          "visibles": 0,
+          "animando": 0,
+          "opCapa": 0
+        },
+        "rayos": {
+          "total": 6,
+          "visibles": 6,
+          "animando": 1,
+          "opCapa": 0.85
+        }
+      },
+      "animCorriendo": 40,
+      "animVivasVisibles": 40,
+      "nodosEscena": 210
+    },
+    {
+      "clima": "niebla",
+      "luz": "atardecer",
+      "fps": null,
+      "contrastes": [
+        {
+          "id": "cabecera-lugar",
+          "texto": "Paramo alto · Guatavita, Cundinamarca",
+          "min": 9.18,
+          "p05": 9.33
+        },
+        {
+          "id": "cabecera-altura",
+          "texto": "2900 m s. n. m. · Piso frío",
+          "min": 8.66,
+          "p05": 8.86
+        },
+        {
+          "id": "cabecera-saludo",
+          "texto": "Buenas noches",
+          "min": 7.81,
+          "p05": 8.06
+        },
+        {
+          "id": "cabecera-condicion",
+          "texto": "Nublado · 11:31 p. m.",
+          "min": 7.34,
+          "p05": 7.59
+        },
+        {
+          "id": "cifra-grande",
+          "texto": "9°C",
+          "min": 12.62,
+          "p05": 13
+        },
+        {
+          "id": "tab-hoy",
+          "texto": "Hoy",
+          "min": 9.4,
+          "p05": 9.54
+        },
+        {
+          "id": "tab-semana",
+          "texto": "7–16 días",
+          "min": 10.24,
+          "p05": 10.37
+        },
+        {
+          "id": "tab-estacional",
+          "texto": "El Niño",
+          "min": 10.78,
+          "p05": 10.81
+        },
+        {
+          "id": "CONTROL-21",
+          "texto": "CONTROL",
+          "min": 21,
+          "p05": 21
+        },
+        {
+          "id": "CONTROL-4.54",
+          "texto": "CONTROL",
+          "min": 4.54,
+          "p05": 4.54
+        }
+      ],
+      "flotantesApartados": 1,
+      "nTextos": 27,
+      "todoTexto": [
+        {
+          "texto": "94",
+          "p05": 7.28
+        },
+        {
+          "texto": "11:32 p. m.",
+          "p05": 7.51
+        },
+        {
+          "texto": "Buenas noches",
+          "p05": 8.06
+        },
+        {
+          "texto": "1.2",
+          "p05": 8.32
+        },
+        {
+          "texto": "Open-Meteo (WMO) · fase ENSO: IDEA",
+          "p05": 8.53
+        },
+        {
+          "texto": "2900 m s. n. m. · Piso frío",
+          "p05": 8.86
+        },
+        {
+          "texto": "3.01",
+          "p05": 8.94
+        },
+        {
+          "texto": "Muy alto — protéjase",
+          "p05": 9.04
+        },
+        {
+          "texto": "Rocío a 8°C",
+          "p05": 9.07
+        },
+        {
+          "texto": "Open-Meteo · máx. del día",
+          "p05": 9.17
+        },
+        {
+          "texto": "Open-Meteo",
+          "p05": 9.31
+        },
+        {
+          "texto": "Hoy",
+          "p05": 9.53
+        },
+        {
+          "texto": "Se siente como 8°C",
+          "p05": 10.12
+        },
+        {
+          "texto": "mm",
+          "p05": 10.18
+        },
+        {
+          "texto": "mm",
+          "p05": 10.18
+        },
+        {
+          "texto": "7–16 días",
+          "p05": 10.37
+        },
+        {
+          "texto": "agua que se evapora hoy",
+          "p05": 10.6
+        },
+        {
+          "texto": "100% de probabilidad",
+          "p05": 10.63
+        },
+        {
+          "texto": "°C",
+          "p05": 10.7
+        },
+        {
+          "texto": "El Niño",
+          "p05": 10.81
+        },
+        {
+          "texto": "Estimado por Chagra · Open-Meteo (",
+          "p05": 10.93
+        },
+        {
+          "texto": "Nublado · fase Neutral",
+          "p05": 11.03
+        },
+        {
+          "texto": "Open-Meteo",
+          "p05": 11.08
+        },
+        {
+          "texto": "Ahora mismo",
+          "p05": 11.91
+        },
+        {
+          "texto": "Lo que viene",
+          "p05": 12.68
+        },
+        {
+          "texto": "La temporada",
+          "p05": 12.81
+        },
+        {
+          "texto": "☁️",
+          "p05": 13.06
+        }
+      ],
+      "enso": null,
+      "capas": {
+        "cielo:soleado": 0,
+        "cielo:lluvia": 0,
+        "cielo:niebla": 1,
+        "cielo:dorada": 0,
+        "cielo:noche": 0,
+        "cielo:nublado": 0,
+        "grade:soleado": 0,
+        "grade:lluvia": 0,
+        "grade:niebla": 1,
+        "grade:dorada": 0.34,
+        "grade:noche": 0,
+        "grade:nublado": 0,
+        "astro": 0.25,
+        "rayos": 1,
+        "bruma": 0.92,
+        "laderaLuz": 0,
+        "vineta": 0.16,
+        "scrimAlto": 0.96,
+        "scrimBajo": 0.55,
+        "jironUI": 0.34,
+        "capa:estrellas": 0,
+        "capa:lluvia": 0,
+        "capa:niebla": 1,
+        "capa:polvo": 0,
+        "capa:luci": 0.3
+      },
+      "particulas": {
+        "estrellas": {
+          "total": 26,
+          "visibles": 0,
+          "animando": 0,
+          "opCapa": 0
+        },
+        "gotas": {
+          "total": 30,
+          "visibles": 0,
+          "animando": 0,
+          "opCapa": 0
+        },
+        "bancos": {
+          "total": 9,
+          "visibles": 9,
+          "animando": 9,
+          "opCapa": 1
+        },
+        "jirones": {
+          "total": 7,
+          "visibles": 7,
+          "animando": 7,
+          "opCapa": 1
+        },
+        "motas": {
+          "total": 16,
+          "visibles": 0,
+          "animando": 0,
+          "opCapa": 0
+        },
+        "luciernagas": {
+          "total": 11,
+          "visibles": 11,
+          "animando": 22,
+          "opCapa": 0.3
+        },
+        "rayos": {
+          "total": 6,
+          "visibles": 6,
+          "animando": 1,
+          "opCapa": 1
+        }
+      },
+      "animCorriendo": 62,
+      "animVivasVisibles": 57,
+      "nodosEscena": 210
+    },
+    {
+      "clima": "niebla",
+      "luz": "noche",
+      "fps": null,
+      "contrastes": [
+        {
+          "id": "cabecera-lugar",
+          "texto": "Paramo alto · Guatavita, Cundinamarca",
+          "min": 9.65,
+          "p05": 9.81
+        },
+        {
+          "id": "cabecera-altura",
+          "texto": "2900 m s. n. m. · Piso frío",
+          "min": 9.54,
+          "p05": 9.54
+        },
+        {
+          "id": "cabecera-saludo",
+          "texto": "Buenas noches",
+          "min": 8.84,
+          "p05": 8.96
+        },
+        {
+          "id": "cabecera-condicion",
+          "texto": "Nublado · 11:32 p. m.",
+          "min": 8.49,
+          "p05": 8.64
+        },
+        {
+          "id": "cifra-grande",
+          "texto": "9°C",
+          "min": 14.06,
+          "p05": 14.24
+        },
+        {
+          "id": "tab-hoy",
+          "texto": "Hoy",
+          "min": 9.27,
+          "p05": 9.39
+        },
+        {
+          "id": "tab-semana",
+          "texto": "7–16 días",
+          "min": 10.11,
+          "p05": 10.27
+        },
+        {
+          "id": "tab-estacional",
+          "texto": "El Niño",
+          "min": 10.66,
+          "p05": 10.78
+        },
+        {
+          "id": "CONTROL-21",
+          "texto": "CONTROL",
+          "min": 21,
+          "p05": 21
+        },
+        {
+          "id": "CONTROL-4.54",
+          "texto": "CONTROL",
+          "min": 4.54,
+          "p05": 4.54
+        }
+      ],
+      "flotantesApartados": 1,
+      "nTextos": 27,
+      "todoTexto": [
+        {
+          "texto": "11:32 p. m.",
+          "p05": 8.65
+        },
+        {
+          "texto": "Buenas noches",
+          "p05": 8.96
+        },
+        {
+          "texto": "Hoy",
+          "p05": 9.38
+        },
+        {
+          "texto": "2900 m s. n. m. · Piso frío",
+          "p05": 9.54
+        },
+        {
+          "texto": "94",
+          "p05": 9.81
+        },
+        {
+          "texto": "7–16 días",
+          "p05": 10.26
+        },
+        {
+          "texto": "Open-Meteo (WMO) · fase ENSO: IDEA",
+          "p05": 10.28
+        },
+        {
+          "texto": "1.2",
+          "p05": 10.37
+        },
+        {
+          "texto": "El Niño",
+          "p05": 10.78
+        },
+        {
+          "texto": "3.01",
+          "p05": 11.33
+        },
+        {
+          "texto": "Se siente como 8°C",
+          "p05": 11.43
+        },
+        {
+          "texto": "Nublado · fase Neutral",
+          "p05": 11.57
+        },
+        {
+          "texto": "°C",
+          "p05": 11.57
+        },
+        {
+          "texto": "Muy alto — protéjase",
+          "p05": 11.72
+        },
+        {
+          "texto": "Ahora mismo",
+          "p05": 11.75
+        },
+        {
+          "texto": "Open-Meteo · máx. del día",
+          "p05": 11.88
+        },
+        {
+          "texto": "Rocío a 8°C",
+          "p05": 12.01
+        },
+        {
+          "texto": "Open-Meteo",
+          "p05": 12.13
+        },
+        {
+          "texto": "Lo que viene",
+          "p05": 12.43
+        },
+        {
+          "texto": "La temporada",
+          "p05": 12.58
+        },
+        {
+          "texto": "mm",
+          "p05": 12.68
+        },
+        {
+          "texto": "100% de probabilidad",
+          "p05": 12.68
+        },
+        {
+          "texto": "mm",
+          "p05": 12.68
+        },
+        {
+          "texto": "Open-Meteo",
+          "p05": 12.69
+        },
+        {
+          "texto": "Estimado por Chagra · Open-Meteo (",
+          "p05": 12.69
+        },
+        {
+          "texto": "agua que se evapora hoy",
+          "p05": 12.8
+        },
+        {
+          "texto": "☁️",
+          "p05": 14.88
+        }
+      ],
+      "enso": null,
+      "capas": {
+        "cielo:soleado": 0,
+        "cielo:lluvia": 0,
+        "cielo:niebla": 1,
+        "cielo:dorada": 0,
+        "cielo:noche": 0,
+        "cielo:nublado": 0,
+        "grade:soleado": 0,
+        "grade:lluvia": 0,
+        "grade:niebla": 1,
+        "grade:dorada": 0,
+        "grade:noche": 1,
+        "grade:nublado": 0,
+        "astro": 0.25,
+        "rayos": 0,
+        "bruma": 0.92,
+        "laderaLuz": 0,
+        "vineta": 0.16,
+        "scrimAlto": 0.76,
+        "scrimBajo": 0.55,
+        "jironUI": 0.34,
+        "capa:estrellas": 0,
+        "capa:lluvia": 0,
+        "capa:niebla": 0.85,
+        "capa:polvo": 0,
+        "capa:luci": 0.38
+      },
+      "particulas": {
+        "estrellas": {
+          "total": 26,
+          "visibles": 0,
+          "animando": 0,
+          "opCapa": 0
+        },
+        "gotas": {
+          "total": 30,
+          "visibles": 0,
+          "animando": 0,
+          "opCapa": 0
+        },
+        "bancos": {
+          "total": 9,
+          "visibles": 9,
+          "animando": 9,
+          "opCapa": 0.85
+        },
+        "jirones": {
+          "total": 7,
+          "visibles": 7,
+          "animando": 7,
+          "opCapa": 0.85
+        },
+        "motas": {
+          "total": 16,
+          "visibles": 0,
+          "animando": 0,
+          "opCapa": 0
+        },
+        "luciernagas": {
+          "total": 11,
+          "visibles": 11,
+          "animando": 22,
+          "opCapa": 0.38
+        },
+        "rayos": {
+          "total": 6,
+          "visibles": 0,
+          "animando": 0,
+          "opCapa": 0
+        }
+      },
+      "animCorriendo": 61,
+      "animVivasVisibles": 60,
+      "nodosEscena": 210
+    }
+  ]
+}
