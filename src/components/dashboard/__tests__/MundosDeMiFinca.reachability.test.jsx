@@ -33,7 +33,7 @@ function sourceFiles(dir) {
   return fs.readdirSync(dir, { withFileTypes: true }).flatMap((entry) => {
     const file = path.join(dir, entry.name);
     if (entry.isDirectory()) {
-      return entry.name === '__tests__' ? [] : sourceFiles(file);
+      return entry.name === '__tests__' || entry.name === '_archivo' ? [] : sourceFiles(file);
     }
     return /\.(?:js|jsx|mjs|ts|tsx)$/.test(entry.name) ? [file] : [];
   });

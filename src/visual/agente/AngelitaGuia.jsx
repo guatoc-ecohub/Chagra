@@ -93,6 +93,7 @@ export function AngelitaGuia({
             direccion={guia.direccion}
             size={tamano}
             ariaLabel={nombreElegido}
+            title={nombreElegido}
             especie={avatarType}
             data-creature={especie}
           />

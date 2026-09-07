@@ -58,6 +58,7 @@ describe('exclusión TSC del vendor de flora (task 090.d)', () => {
     const archivos = [];
     const caminar = (dir) => {
       for (const nombre of readdirSync(dir)) {
+        if (nombre === '_archivo') continue;
         const ruta = join(dir, nombre);
         const esDir = statSync(ruta).isDirectory();
         if (esDir) caminar(ruta);

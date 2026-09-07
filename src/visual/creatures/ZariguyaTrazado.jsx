@@ -95,6 +95,7 @@ function ZariguyaTrazadoRig({
   // COMPLETA; sin PNG servido, el trazado degrada a la FASE 1 (rig hero). ═══
   const [cargadas, setCargadas] = useState({});
   useEffect(() => {
+    if (reducedMotion || tier === 'bajo') return undefined;
     let vivo = true;
     for (const k of POSES_TRAZADO_KEYS) {
       const img = new Image();
@@ -105,7 +106,7 @@ function ZariguyaTrazadoRig({
       img.src = srcDePose(k);
     }
     return () => { vivo = false; };
-  }, []);
+  }, [reducedMotion, tier]);
 
   // El ciclo de escucha aprobado (02→03→04→03, vaivén de atención). El tick
   // NO se resetea al salir: re-entrar a media vuelta es tan válido como en 02.

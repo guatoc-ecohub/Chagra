@@ -59,8 +59,10 @@ describe('migrate-v31-to-v32', () => {
       expect(v32Seed.schema_version).toBe('3.2');
     });
 
-    it('debe tener el mismo número de especies que v3.1', () => {
-      expect(v32Seed.species.length).toBe(v31Seed.species.length);
+    it('debe conservar todas las especies de v3.1 y permitir altas posteriores', () => {
+      const idsV32 = new Set(v32Seed.species.map((species) => species.id));
+      expect(v31Seed.species.every((species) => idsV32.has(species.id))).toBe(true);
+      expect(v32Seed.species.length).toBeGreaterThanOrEqual(v31Seed.species.length);
     });
 
     it('debe preservar biopreparados de v3.1', () => {
@@ -68,9 +70,12 @@ describe('migrate-v31-to-v32', () => {
       expect(v32Seed.biopreparados).toEqual(v31Seed.biopreparados);
     });
 
-    it('debe preservar sources de v3.1', () => {
-      expect(v32Seed.sources.length).toBe(v31Seed.sources.length);
-      expect(v32Seed.sources).toEqual(v31Seed.sources);
+    it('debe conservar todas las sources de v3.1 y permitir altas posteriores', () => {
+      const sourcesV32 = new Map(v32Seed.sources.map((source) => [source.id, source]));
+      for (const source of v31Seed.sources) {
+        expect(sourcesV32.get(source.id)).toEqual(source);
+      }
+      expect(v32Seed.sources.length).toBeGreaterThanOrEqual(v31Seed.sources.length);
     });
 
     it('debe tener _meta con estadísticas de tracking_mode', () => {
@@ -93,7 +98,7 @@ describe('migrate-v31-to-v32', () => {
       
       for (const spV32 of v32Seed.species) {
         const spV31 = v31Seed.species.find(s => s.id === spV32.id);
-        expect(spV31).toBeDefined();
+        if (!spV31) continue;
         
         for (const field of v31Fields) {
           expect(spV32[field]).toBeDefined();
@@ -105,7 +110,7 @@ describe('migrate-v31-to-v32', () => {
     it('todas las especies conservan sus companions y antagonists', () => {
       for (const spV32 of v32Seed.species) {
         const spV31 = v31Seed.species.find(s => s.id === spV32.id);
-        
+        if (!spV31) continue;
         expect(spV32.companions).toEqual(spV31.companions);
         expect(spV32.antagonists).toEqual(spV31.antagonists);
       }
@@ -114,6 +119,7 @@ describe('migrate-v31-to-v32', () => {
     it('todas las especies conservan altitud_msnm', () => {
       for (const spV32 of v32Seed.species) {
         const spV31 = v31Seed.species.find(s => s.id === spV32.id);
+        if (!spV31) continue;
         expect(spV32.altitud_msnm).toEqual(spV31.altitud_msnm);
       }
     });

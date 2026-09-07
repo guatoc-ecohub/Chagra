@@ -80,13 +80,23 @@ describe('P1 contrato integrado del elenco compai', () => {
     it(`${especie} recibe los 10 estados ricos y caminando sin degradar el rig`, () => {
       elegir(especie);
       const perfil = COMPAI_ESPECIES[especie];
+      const { container, rerender, unmount } = render(
+        <ChagraAgentAvatar
+          estado={ESTADOS_DE_PERFIL[0]}
+          visema={VISEMA}
+          clima={CLIMA}
+          reducedMotion={especie === 'zariguya'}
+          reaccionaPresencia={false}
+        />,
+      );
 
       for (const estado of ESTADOS_DE_PERFIL) {
-        const { container, unmount } = render(
+        rerender(
           <ChagraAgentAvatar
             estado={estado}
             visema={VISEMA}
             clima={CLIMA}
+            reducedMotion={especie === 'zariguya'}
             reaccionaPresencia={false}
           />,
         );
@@ -102,8 +112,8 @@ describe('P1 contrato integrado del elenco compai', () => {
         if (especie !== 'angelita') {
           expect(rig).not.toHaveAttribute('data-creature', 'abeja-angelita');
         }
-        unmount();
       }
+      unmount();
     });
   }
 

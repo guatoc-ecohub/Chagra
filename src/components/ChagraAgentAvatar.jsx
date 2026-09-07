@@ -144,6 +144,7 @@ export default function ChagraAgentAvatar({ estado = undefined, state = undefine
         <Suspense fallback={<span role="img" aria-label="Compañero cargando" data-agt-especie={perfil.avatarType} />}>
             <CompaiAgente
                 {...props}
+                title={props.ariaLabel}
                 especie={perfil.avatarType}
                 estado={estadoEntrada}
                 state={stateEntrada}

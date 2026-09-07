@@ -183,10 +183,10 @@ const useAngelitaStore = create(
        * para el caso más común (navegación entre mundos).
        * @param {string} mundo
        * @param {Object} [datos] — datos reales del mundo (ver comentarioDeMundo).
-       * @param {{ ocupado?: boolean, ahoraMs?: number }} [opts]
+       * @param {{ ocupado?: boolean, ahoraMs?: number, rand?: () => number }} [opts]
        */
       entrarMundo: (mundo, datos = {}, opts = {}) =>
-        get().evaluar({ mundo, datosMundo: datos, ocupado: opts.ocupado, ahoraMs: opts.ahoraMs }),
+        get().evaluar({ mundo, datosMundo: datos, ocupado: opts.ocupado, ahoraMs: opts.ahoraMs, rand: opts.rand }),
 
       /**
        * Celebrar un logro REAL (cosecha registrada, racha, meta). Dedup por id:

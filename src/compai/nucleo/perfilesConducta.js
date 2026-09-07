@@ -45,10 +45,10 @@ export const PERFILES_CONDUCTA = Object.freeze({
   },
   luciernaga: {
     masa: 0.10, medio: 'aire', poseBase: 'vuela', poseDigna: 'posada-luz-0.7',
-    respira: { freq: 2.03, amp: 0.015, vaiven: 0.40, organo: 'luz', luz: { min: 0.65, max: 1.0 } },
+    respira: { freq: 1.85, amp: 0.015, vaiven: 0.40, organo: 'luz', luz: { min: 0.65, max: 1.0 } },
     mira: { modo: 'antenas', freq: 0.78, amp: 6 }, aseo: { base: 10, jitter: 3, dur: 0.9, tipos: ['limpiaAntenas', 'abreElitros'] },
     vuelta: null, gesto: { base: 14, jitter: 3, dur: 1.1, alza: 0.03, incl: 5, nombre: 'destello' }, reposo: { base: 34, jitter: 6, dur: 5.5, pose: 'posada', luz: 0.5, diaDur: 2 }, celebra: { dur: 1.5, grados: 0, gesto: 'triDestello(3x0.3,1.0->1.4)+brinco4' },
-    noche: { modo: 'activo', linterna: 'fuerte', destellaPeso: 1.6, descanso: [2600, 6000], diaLinterna: 'apagada', diaGestos: 0.5 },
+    noche: { modo: 'activo', freq: 1.2, linterna: 'fuerte', destellaPeso: 1.6, descanso: [2600, 6000], diaLinterna: 'apagada', diaGestos: 0.5 },
     vida: { descanso: [3000, 7200], momentos: { destella: { dur: 2600, peso: 2.5 }, lee: { dur: 3200, peso: 1.2 }, reposo: { dur: 4400, peso: 1 }, limpiaAntenas: { dur: 900, peso: 1 }, abreElitros: { dur: 500, peso: 0.6 }, mirausted: { dur: 2000, peso: 1.2 } } },
     locomocion: { modo: 'vuela', trayectoria: 'S', ampY: 0.06, periodoS: 2.2, velCuerposS: 0.80, luzPulsaS: 1.3, vertical: 'vuela', excursion: { radioX: 140, radioY: 160, dwellMs: 700 } },
     habla: { organo: 'luz', jaw: { V1: 0.65, V2: 0.85, V3: 1.15, V4: 0.95 }, debounceMinMs: 90 }, mirada: 'antenas',
