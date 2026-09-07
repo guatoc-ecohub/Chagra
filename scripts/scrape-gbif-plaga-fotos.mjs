@@ -32,37 +32,9 @@ const LOG_PATH = path.join(REPO_ROOT, 'scripts', 'gbif-plaga-fotos-log.jsonl');
 // Config
 const GBIF_API_BASE = 'https://api.gbif.org/v1/occurrence/search';
 const MAX_IMAGES_PER_PEST = 3;
-const MIN_IMAGES_PER_PEST = 2;
 const IMAGE_MAX_WIDTH = 1200;
 const JPEG_QUALITY = 82;
 const REQUEST_DELAY_MS = 1500; // cortés con GBIF
-
-// Licencias aceptadas (CC0, CC-BY, CC-BY-SA, CC-BY-NC)
-const ACCEPTED_LICENSES = new Set([
-  'http://creativecommons.org/publicdomain/zero/1.0/',
-  'http://creativecommons.org/publicdomain/zero/1.0/legalcode',
-  'http://creativecommons.org/licenses/by/4.0/',
-  'http://creativecommons.org/licenses/by/4.0/legalcode',
-  'http://creativecommons.org/licenses/by/3.0/',
-  'http://creativecommons.org/licenses/by/3.0/us/',
-  'http://creativecommons.org/licenses/by/2.0/',
-  'http://creativecommons.org/licenses/by-sa/4.0/',
-  'http://creativecommons.org/licenses/by-sa/4.0/legalcode',
-  'http://creativecommons.org/licenses/by-sa/3.0/',
-  'http://creativecommons.org/licenses/by-sa/3.0/us/',
-  'http://creativecommons.org/licenses/by-sa/2.0/',
-  'https://creativecommons.org/licenses/by/4.0/',
-  'https://creativecommons.org/licenses/by/3.0/',
-  'https://creativecommons.org/licenses/by-sa/4.0/',
-  'https://creativecommons.org/licenses/by-sa/3.0/',
-  'https://creativecommons.org/licenses/by-sa/2.0/',
-  'https://creativecommons.org/publicdomain/zero/1.0/',
-  'https://creativecommons.org/publicdomain/zero/1.0/legalcode',
-  'cc_0',
-  'cc_by',
-  'cc_by_sa',
-  'cc_by_nc',
-]);
 
 // ---- Helpers ----
 
@@ -131,7 +103,20 @@ function downloadFile(url, destPath, maxRetries = 2) {
 }
 
 function ensureDir(dir) {
-  if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+  fs.mkdirSync(dir, { recursive: true });
+}
+
+function safeLogValue(value) {
+  return String(value).replace(/[\r\n]/g, ' ');
+}
+
+function readJsonOrFallback(filePath, fallback) {
+  try {
+    return JSON.parse(fs.readFileSync(filePath, 'utf-8'));
+  } catch (err) {
+    if (err.code === 'ENOENT') return fallback;
+    throw err;
+  }
 }
 
 function slugify(name) {
@@ -259,7 +244,7 @@ function loadPestMapping() {
   };
 
   const result = {};
-  for (const [pestKey, pestData] of Object.entries(pestIndex)) {
+  for (const [pestKey] of Object.entries(pestIndex)) {
     const pkLower = pestKey.toLowerCase().trim();
     let sci = null;
 
@@ -358,7 +343,7 @@ async function processPest(pestKey, mapping, manifest, logEntries, dryRun, resum
   try {
     gbifResponse = await queryGbif(binomial, { limit: 50 });
   } catch (err) {
-    console.error(`  [ERROR] GBIF query failed for ${binomial}: ${err.message}`);
+    console.error(`  [ERROR] GBIF query failed for ${safeLogValue(binomial)}: ${safeLogValue(err.message)}`);
     return [];
   }
 
@@ -445,7 +430,7 @@ async function processPest(pestKey, mapping, manifest, logEntries, dryRun, resum
 
         console.log(`    [OK] ${finalFileName} (${(stats.size / 1024).toFixed(1)} KB, ${entry.width}x${entry.height})`);
       } catch (err) {
-        console.error(`    [FAIL] ${fileName}: ${err.message}`);
+        console.error(`    [FAIL] ${safeLogValue(fileName)}: ${safeLogValue(err.message)}`);
         // Clean up failed download
         if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
         if (fs.existsSync(finalPath)) fs.unlinkSync(finalPath);
@@ -482,20 +467,22 @@ async function main() {
   ensureDir(PLAGA_IMAGES_DIR);
   ensureDir(path.dirname(ATRIBUCION_PATH));
 
-  const manifest = fs.existsSync(MANIFEST_PATH)
-    ? JSON.parse(fs.readFileSync(MANIFEST_PATH, 'utf-8'))
-    : { generated_at: new Date().toISOString(), source: 'GBIF occurrence media (StillImage, CC0/CC-BY/CC-BY-SA/CC-BY-NC only)', count: 0, images: [] };
+  const manifest = readJsonOrFallback(MANIFEST_PATH, { generated_at: new Date().toISOString(), source: 'GBIF occurrence media (StillImage, CC0/CC-BY/CC-BY-SA/CC-BY-NC only)', count: 0, images: [] });
 
   // Load attribution
-  const atribucion = fs.existsSync(ATRIBUCION_PATH)
-    ? JSON.parse(fs.readFileSync(ATRIBUCION_PATH, 'utf-8'))
-    : { generated_at: new Date().toISOString(), source: 'GBIF occurrence media', photos: [] };
+  const atribucion = readJsonOrFallback(ATRIBUCION_PATH, { generated_at: new Date().toISOString(), source: 'GBIF occurrence media', photos: [] });
 
   // Load existing download log for resume
   const logEntries = [];
 
-  if (resume && fs.existsSync(LOG_PATH)) {
-    const lines = fs.readFileSync(LOG_PATH, 'utf-8').trim().split('\n').filter(Boolean);
+  if (resume) {
+    let previousLog = '';
+    try {
+      previousLog = fs.readFileSync(LOG_PATH, 'utf-8');
+    } catch (err) {
+      if (err.code !== 'ENOENT') throw err;
+    }
+    const lines = previousLog.trim().split('\n').filter(Boolean);
     for (const line of lines) {
       try { logEntries.push(JSON.parse(line)); } catch {}
     }

@@ -5,46 +5,36 @@
  */
 
 import { describe, it, expect, beforeEach } from 'vitest';
-import fs from 'node:fs';
-import path from 'node:path';
 
 // Importar funciones del script
-import {
-  normalizeBinomio,
-  extractGenus,
-  matchByBinomioExacto,
-  matchByGenero,
-  matchBySinonimos,
-  emitCoRelevantRel,
-  wrapCypher,
-} from '../puente-nonco.mjs';
+import * as puente from '../puente-nonco.mjs';
 
 describe('puente-nonco - utilidades', () => {
   describe('normalizeBinomio', () => {
     it('debería normalizar binomios correctamente', () => {
-      expect(normalizeBinomio('Spodoptera frugiperda')).toBe('spodoptera frugiperda');
-      expect(normalizeBinomio('  Spodoptera  frugiperda  ')).toBe('spodoptera frugiperda');
-      expect(normalizeBinomio('SPODOPTERA FRUGIPERDA')).toBe('spodoptera frugiperda');
+      expect(puente.normalizeBinomio('Spodoptera frugiperda')).toBe('spodoptera frugiperda');
+      expect(puente.normalizeBinomio('  Spodoptera  frugiperda  ')).toBe('spodoptera frugiperda');
+      expect(puente.normalizeBinomio('SPODOPTERA FRUGIPERDA')).toBe('spodoptera frugiperda');
     });
 
     it('debería manejar null/undefined', () => {
-      expect(normalizeBinomio(null)).toBeNull();
-      expect(normalizeBinomio(undefined)).toBeNull();
-      expect(normalizeBinomio('')).toBeNull();
+      expect(puente.normalizeBinomio(null)).toBeNull();
+      expect(puente.normalizeBinomio(undefined)).toBeNull();
+      expect(puente.normalizeBinomio('')).toBeNull();
     });
   });
 
   describe('extractGenus', () => {
     it('debería extraer el género correctamente', () => {
-      expect(extractGenus('Spodoptera frugiperda')).toBe('spodoptera');
-      expect(extractGenus('Spodoptera sp.')).toBe('spodoptera');
-      expect(extractGenus('Spodoptera spp.')).toBe('spodoptera');
+      expect(puente.extractGenus('Spodoptera frugiperda')).toBe('spodoptera');
+      expect(puente.extractGenus('Spodoptera sp.')).toBe('spodoptera');
+      expect(puente.extractGenus('Spodoptera spp.')).toBe('spodoptera');
     });
 
     it('debería manejar null/undefined', () => {
-      expect(extractGenus(null)).toBeNull();
-      expect(extractGenus(undefined)).toBeNull();
-      expect(extractGenus('')).toBeNull();
+      expect(puente.extractGenus(null)).toBeNull();
+      expect(puente.extractGenus(undefined)).toBeNull();
+      expect(puente.extractGenus('')).toBeNull();
     });
   });
 });
@@ -70,7 +60,7 @@ describe('puente-nonco - emparejamiento', () => {
   describe('matchByBinomioExacto', () => {
     it('debería emparejar por binomio exacto', () => {
       const allPests = [pestMock];
-      const matches = matchByBinomioExacto(noncoPestMock, allPests);
+      const matches = puente.matchByBinomioExacto(noncoPestMock, allPests);
 
       expect(matches).toHaveLength(1);
       expect(matches[0]).toMatchObject({
@@ -87,7 +77,7 @@ describe('puente-nonco - emparejamiento', () => {
         id: 'spodoptera_eralis',
         nombre_cientifico: 'Spodoptera eralis',
       }];
-      const matches = matchByBinomioExacto(noncoPestMock, allPests);
+      const matches = puente.matchByBinomioExacto(noncoPestMock, allPests);
 
       expect(matches).toHaveLength(0);
     });
@@ -98,7 +88,7 @@ describe('puente-nonco - emparejamiento', () => {
         nombre: 'Alguna plaga',
       };
       const allPests = [pestMock];
-      const matches = matchByBinomioExacto(noncoPestSinBinomio, allPests);
+      const matches = puente.matchByBinomioExacto(noncoPestSinBinomio, allPests);
 
       expect(matches).toHaveLength(0);
     });
@@ -112,7 +102,7 @@ describe('puente-nonco - emparejamiento', () => {
         nombre_cientifico: 'Spodoptera sp.',
       };
       const allPests = [pestMock];
-      const matches = matchByGenero(noncoPestSp, allPests);
+      const matches = puente.matchByGenero(noncoPestSp, allPests);
 
       expect(matches).toHaveLength(1);
       expect(matches[0]).toMatchObject({
@@ -126,7 +116,7 @@ describe('puente-nonco - emparejamiento', () => {
 
     it('no debería emparejar si NoncoPest tiene epíteto específico', () => {
       const allPests = [pestMock];
-      const matches = matchByGenero(noncoPestMock, allPests);
+      const matches = puente.matchByGenero(noncoPestMock, allPests);
 
       expect(matches).toHaveLength(0);
     });
@@ -140,7 +130,7 @@ describe('puente-nonco - emparejamiento', () => {
         id: 'spodoptera_sp_nonco',
         nombre_cientifico: 'Spodoptera sp.',
       };
-      const matches = matchByGenero(noncoPestSp, allPests);
+      const matches = puente.matchByGenero(noncoPestSp, allPests);
 
       expect(matches).toHaveLength(0);
     });
@@ -165,7 +155,7 @@ describe('puente-nonco - emparejamiento', () => {
       };
 
       const allPests = [pestBroca];
-      const matches = matchBySinonimos(noncoPestBroca, allPests, pestSynonyms);
+      const matches = puente.matchBySinonimos(noncoPestBroca, allPests, pestSynonyms);
 
       expect(matches).toHaveLength(1);
       expect(matches[0]).toMatchObject({
@@ -188,7 +178,7 @@ describe('puente-nonco - emparejamiento', () => {
       };
 
       const allPests = [pestBroca];
-      const matches = matchBySinonimos(noncoPestBroca, allPests, {});
+      const matches = puente.matchBySinonimos(noncoPestBroca, allPests, {});
 
       expect(matches).toHaveLength(0);
     });
@@ -198,7 +188,7 @@ describe('puente-nonco - emparejamiento', () => {
 describe('puente-nonco - generación SQL', () => {
   describe('emitCoRelevantRel', () => {
     it('debería generar SQL válido para puente CO_RELEVANT', () => {
-      const sql = emitCoRelevantRel(
+      const sql = puente.emitCoRelevantRel(
         10977524091715694,
         2251799813685379,
         'binomio_exacto',
@@ -222,7 +212,7 @@ describe('puente-nonco - generación SQL', () => {
   describe('wrapCypher', () => {
     it('debería envolver Cypher en SELECT FROM cypher', () => {
       const cypher = 'MATCH (n:Pest) RETURN n';
-      const wrapped = wrapCypher(cypher);
+      const wrapped = puente.wrapCypher(cypher);
 
       expect(wrapped).toContain("SELECT * FROM cypher('chagra_kg'");
       expect(wrapped).toContain('$$');
