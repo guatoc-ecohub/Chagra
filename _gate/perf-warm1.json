@@ -1,0 +1,454 @@
+{
+  "tag": "warm1",
+  "url": "https://chagra-dev.guatoc.co/",
+  "injectedSession": false,
+  "wallclockMs": 10319,
+  "pollRes": {
+    "loaderGone": true,
+    "rootKids": 3
+  },
+  "metrics": {
+    "url": "https://chagra-dev.guatoc.co/",
+    "title": "Chagra",
+    "buildSha": "24748c25",
+    "hasRoot": true,
+    "rootKids": 2,
+    "navTimes": {
+      "ttfb": 422,
+      "domInteractive": 3815,
+      "domContentLoaded": 3829,
+      "loadEventEnd": 3830,
+      "transferSize": 3767
+    },
+    "fcp": 3832,
+    "lcp": {
+      "t": 3832,
+      "size": 2557
+    },
+    "longTasks": [],
+    "longTaskCount": 0,
+    "totalBlockingMs": 0,
+    "cls": 0,
+    "totalResources": 178,
+    "totalBytesEncoded": 1052524,
+    "byType": {
+      "link/css": {
+        "count": 28,
+        "bytes": 178500
+      },
+      "script": {
+        "count": 145,
+        "bytes": 864801
+      },
+      "xhr/fetch": {
+        "count": 3,
+        "bytes": 5200
+      },
+      "other": {
+        "count": 1,
+        "bytes": 1555
+      },
+      "css": {
+        "count": 1,
+        "bytes": 2768
+      }
+    },
+    "topResources": [
+      {
+        "url": "https://chagra-dev.guatoc.co/assets/main-D8QPsAnI.js",
+        "initiator": "script",
+        "dur": 3245,
+        "encoded": 74752,
+        "decoded": 269599,
+        "transfer": 75052
+      },
+      {
+        "url": "https://chagra-dev.guatoc.co/assets/catalogDB-DmdFKJ3l.js",
+        "initiator": "script",
+        "dur": 4479,
+        "encoded": 70801,
+        "decoded": 217622,
+        "transfer": 71101
+      },
+      {
+        "url": "https://chagra-dev.guatoc.co/assets/DashboardLive-BzAMuO5r.js",
+        "initiator": "script",
+        "dur": 4509,
+        "encoded": 69172,
+        "decoded": 227172,
+        "transfer": 69472
+      },
+      {
+        "url": "https://chagra-dev.guatoc.co/assets/outputGuards-DaDCyJek.js",
+        "initiator": "script",
+        "dur": 2762,
+        "encoded": 61341,
+        "decoded": 171704,
+        "transfer": 61641
+      },
+      {
+        "url": "https://chagra-dev.guatoc.co/assets/vendor-react-D8sd61i3.js",
+        "initiator": "script",
+        "dur": 2842,
+        "encoded": 61237,
+        "decoded": 182176,
+        "transfer": 61537
+      },
+      {
+        "url": "https://chagra-dev.guatoc.co/assets/sello-confianza-BLfs4ivW.css",
+        "initiator": "link",
+        "dur": 3286,
+        "encoded": 43165,
+        "decoded": 277998,
+        "transfer": 43465
+      },
+      {
+        "url": "https://chagra-dev.guatoc.co/fonts/nunito-latin.woff2",
+        "initiator": "link",
+        "dur": 1168,
+        "encoded": 39128,
+        "decoded": 39128,
+        "transfer": 39428
+      },
+      {
+        "url": "https://chagra-dev.guatoc.co/assets/userProfileService-DPvbVNoY.js",
+        "initiator": "script",
+        "dur": 2336,
+        "encoded": 34175,
+        "decoded": 118290,
+        "transfer": 34475
+      },
+      {
+        "url": "https://chagra-dev.guatoc.co/assets/syncManager-Dhndfyd0.js",
+        "initiator": "script",
+        "dur": 2092,
+        "encoded": 33788,
+        "decoded": 96888,
+        "transfer": 34088
+      },
+      {
+        "url": "https://chagra-dev.guatoc.co/fonts/baloo2-latin.woff2",
+        "initiator": "link",
+        "dur": 1016,
+        "encoded": 33188,
+        "decoded": 33188,
+        "transfer": 33488
+      },
+      {
+        "url": "https://chagra-dev.guatoc.co/assets/vendor-icons-oTeIlwf8.js",
+        "initiator": "script",
+        "dur": 1830,
+        "encoded": 26262,
+        "decoded": 76721,
+        "transfer": 26562
+      },
+      {
+        "url": "https://chagra-dev.guatoc.co/assets/mundo3d-BtF7uFd_.js",
+        "initiator": "script",
+        "dur": 3378,
+        "encoded": 25066,
+        "decoded": 77428,
+        "transfer": 25366
+      },
+      {
+        "url": "https://chagra-dev.guatoc.co/assets/agentService-C-7Mzd1o.js",
+        "initiator": "script",
+        "dur": 1650,
+        "encoded": 22728,
+        "decoded": 55306,
+        "transfer": 23028
+      },
+      {
+        "url": "https://chagra-dev.guatoc.co/assets/creatures-Cp8yWv2b.js",
+        "initiator": "script",
+        "dur": 3350,
+        "encoded": 21562,
+        "decoded": 70840,
+        "transfer": 21862
+      },
+      {
+        "url": "https://chagra-dev.guatoc.co/assets/BotonAnarquiaGlyph-D6RpjoVC.js",
+        "initiator": "script",
+        "dur": 3009,
+        "encoded": 17310,
+        "decoded": 45471,
+        "transfer": 17610
+      },
+      {
+        "url": "https://chagra-dev.guatoc.co/assets/_filters-vEo2yPRM.css",
+        "initiator": "link",
+        "dur": 3386,
+        "encoded": 15232,
+        "decoded": 82713,
+        "transfer": 15532
+      },
+      {
+        "url": "https://chagra-dev.guatoc.co/assets/Ardilla-CpwsW-j3.js",
+        "initiator": "script",
+        "dur": 3036,
+        "encoded": 14063,
+        "decoded": 51647,
+        "transfer": 14363
+      },
+      {
+        "url": "https://chagra-dev.guatoc.co/assets/LoginScreen-BQj77S5L.js",
+        "initiator": "script",
+        "dur": 2575,
+        "encoded": 12659,
+        "decoded": 37188,
+        "transfer": 12959
+      },
+      {
+        "url": "https://chagra-dev.guatoc.co/assets/GuacamayaCompai-DS9-5kUN.js",
+        "initiator": "script",
+        "dur": 2907,
+        "encoded": 12237,
+        "decoded": 38037,
+        "transfer": 12537
+      },
+      {
+        "url": "https://chagra-dev.guatoc.co/assets/vendor-state-u2S7F8oI.js",
+        "initiator": "script",
+        "dur": 1244,
+        "encoded": 11623,
+        "decoded": 33446,
+        "transfer": 11923
+      }
+    ],
+    "slowResources": [
+      {
+        "url": "https://chagra-dev.guatoc.co/assets/DashboardLive-BzAMuO5r.js",
+        "initiator": "script",
+        "dur": 4509,
+        "encoded": 69172,
+        "decoded": 227172,
+        "transfer": 69472
+      },
+      {
+        "url": "https://chagra-dev.guatoc.co/assets/catalogDB-DmdFKJ3l.js",
+        "initiator": "script",
+        "dur": 4479,
+        "encoded": 70801,
+        "decoded": 217622,
+        "transfer": 71101
+      },
+      {
+        "url": "https://chagra-dev.guatoc.co/assets/_filters-vEo2yPRM.css",
+        "initiator": "link",
+        "dur": 3386,
+        "encoded": 15232,
+        "decoded": 82713,
+        "transfer": 15532
+      },
+      {
+        "url": "https://chagra-dev.guatoc.co/assets/mundo3d-BtF7uFd_.js",
+        "initiator": "script",
+        "dur": 3378,
+        "encoded": 25066,
+        "decoded": 77428,
+        "transfer": 25366
+      },
+      {
+        "url": "https://chagra-dev.guatoc.co/assets/creatures-Cp8yWv2b.js",
+        "initiator": "script",
+        "dur": 3350,
+        "encoded": 21562,
+        "decoded": 70840,
+        "transfer": 21862
+      },
+      {
+        "url": "https://chagra-dev.guatoc.co/assets/sello-confianza-BLfs4ivW.css",
+        "initiator": "link",
+        "dur": 3286,
+        "encoded": 43165,
+        "decoded": 277998,
+        "transfer": 43465
+      },
+      {
+        "url": "https://chagra-dev.guatoc.co/assets/main-D8QPsAnI.js",
+        "initiator": "script",
+        "dur": 3245,
+        "encoded": 74752,
+        "decoded": 269599,
+        "transfer": 75052
+      },
+      {
+        "url": "https://chagra-dev.guatoc.co/assets/Ardilla-CpwsW-j3.js",
+        "initiator": "script",
+        "dur": 3036,
+        "encoded": 14063,
+        "decoded": 51647,
+        "transfer": 14363
+      },
+      {
+        "url": "https://chagra-dev.guatoc.co/assets/BotonAnarquiaGlyph-D6RpjoVC.js",
+        "initiator": "script",
+        "dur": 3009,
+        "encoded": 17310,
+        "decoded": 45471,
+        "transfer": 17610
+      },
+      {
+        "url": "https://chagra-dev.guatoc.co/assets/AgentLamina-BBEWPkCh.js",
+        "initiator": "script",
+        "dur": 2997,
+        "encoded": 11613,
+        "decoded": 40540,
+        "transfer": 11913
+      },
+      {
+        "url": "https://chagra-dev.guatoc.co/assets/GuacamayaCompai-DS9-5kUN.js",
+        "initiator": "script",
+        "dur": 2907,
+        "encoded": 12237,
+        "decoded": 38037,
+        "transfer": 12537
+      },
+      {
+        "url": "https://chagra-dev.guatoc.co/assets/vendor-react-D8sd61i3.js",
+        "initiator": "script",
+        "dur": 2842,
+        "encoded": 61237,
+        "decoded": 182176,
+        "transfer": 61537
+      },
+      {
+        "url": "https://chagra-dev.guatoc.co/assets/juego-finca-B_GznAlf.js",
+        "initiator": "script",
+        "dur": 2787,
+        "encoded": 11345,
+        "decoded": 37009,
+        "transfer": 11645
+      },
+      {
+        "url": "https://chagra-dev.guatoc.co/assets/OsoBaston-DoL3Do-t.js",
+        "initiator": "script",
+        "dur": 2766,
+        "encoded": 11350,
+        "decoded": 34968,
+        "transfer": 11650
+      },
+      {
+        "url": "https://chagra-dev.guatoc.co/assets/outputGuards-DaDCyJek.js",
+        "initiator": "script",
+        "dur": 2762,
+        "encoded": 61341,
+        "decoded": 171704,
+        "transfer": 61641
+      },
+      {
+        "url": "https://chagra-dev.guatoc.co/assets/mundos-finca-YMmumw_M.js",
+        "initiator": "script",
+        "dur": 2611,
+        "encoded": 6570,
+        "decoded": 29888,
+        "transfer": 6870
+      },
+      {
+        "url": "https://chagra-dev.guatoc.co/assets/LoginScreen-BQj77S5L.js",
+        "initiator": "script",
+        "dur": 2575,
+        "encoded": 12659,
+        "decoded": 37188,
+        "transfer": 12959
+      },
+      {
+        "url": "https://chagra-dev.guatoc.co/assets/Angelita-DUYJ3hrR.css",
+        "initiator": "link",
+        "dur": 2508,
+        "encoded": 6581,
+        "decoded": 33069,
+        "transfer": 6881
+      },
+      {
+        "url": "https://chagra-dev.guatoc.co/assets/phenologyTemplates-BS7-N5cK.js",
+        "initiator": "script",
+        "dur": 2486,
+        "encoded": 7383,
+        "decoded": 29987,
+        "transfer": 7683
+      },
+      {
+        "url": "https://chagra-dev.guatoc.co/assets/cicloVivoArte-vSmHgAyM.js",
+        "initiator": "script",
+        "dur": 2440,
+        "encoded": 6930,
+        "decoded": 22675,
+        "transfer": 7230
+      }
+    ]
+  },
+  "swState": {
+    "supported": true,
+    "count": 1,
+    "controller": false,
+    "active": [
+      null
+    ]
+  },
+  "consoleLogs": [
+    "[warning] The resource https://chagra-dev.guatoc.co/fonts/nunito-latin.woff2 was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropriate `as` value and it is preloaded intentionally.",
+    "[warning] [API] Token no disponible. Continuando en modo offline.",
+    "[warning] [LogStore] Fallo en pull de log--seeding: Token no disponible.",
+    "[warning] [API] Token no disponible. Continuando en modo offline.",
+    "[warning] [LogStore] Fallo en pull de log--planting: Token no disponible.",
+    "[warning] [API] Token no disponible. Continuando en modo offline.",
+    "[warning] [LogStore] Fallo en pull de log--harvest: Token no disponible.",
+    "[warning] [API] Token no disponible. Continuando en modo offline.",
+    "[warning] [LogStore] Fallo en pull de log--input: Token no disponible.",
+    "[warning] [API] Token no disponible. Continuando en modo offline.",
+    "[warning] [LogStore] Fallo en pull de log--task: Token no disponible.",
+    "[warning] [API] Token no disponible. Continuando en modo offline.",
+    "[warning] [LogStore] Fallo en pull de log--observation: Token no disponible.",
+    "[info] [AlertEngine] Iniciando motor de alertas (clima real)...",
+    "[info] [AlertEngine] Verificando thresholds (clima real)...",
+    "[info] [AlertEngine] Sin coordenadas en el perfil — no se evalúa clima (degradación limpia, sin mock).",
+    "[info] [AlertEngine] Verificación completada. Alertas activas: 0",
+    "[warning] The resource https://chagra-dev.guatoc.co/fonts/nunito-latin.woff2 was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropriate `as` value and it is preloaded intentionally."
+  ],
+  "jsErrors": [],
+  "requestFailures": [
+    {
+      "url": "https://chagra-dev.guatoc.co/assets/mundo3d-BtF7uFd_.js",
+      "err": "net::ERR_ABORTED"
+    },
+    {
+      "url": "https://chagra-dev.guatoc.co/assets/catalogDB-DmdFKJ3l.js",
+      "err": "net::ERR_ABORTED"
+    },
+    {
+      "url": "https://chagra-dev.guatoc.co/cdn-cgi/rum?",
+      "err": "net::ERR_ABORTED"
+    },
+    {
+      "url": "https://chagra-dev.guatoc.co/assets/ZariguyaTrazado-CaV953pq.js",
+      "err": "net::ERR_ABORTED"
+    },
+    {
+      "url": "https://chagra-dev.guatoc.co/assets/Ardilla-CpwsW-j3.js",
+      "err": "net::ERR_ABORTED"
+    },
+    {
+      "url": "https://chagra-dev.guatoc.co/assets/creatures-Cp8yWv2b.js",
+      "err": "net::ERR_ABORTED"
+    },
+    {
+      "url": "https://chagra-dev.guatoc.co/assets/DashboardLive-BzAMuO5r.js",
+      "err": "net::ERR_ABORTED"
+    },
+    {
+      "url": "https://chagra-dev.guatoc.co/assets/trazadoCreature-CsxRLPpt.js",
+      "err": "net::ERR_ABORTED"
+    },
+    {
+      "url": "https://chagra-dev.guatoc.co/assets/JaguarTrazado-D-jlRNIi.js",
+      "err": "net::ERR_ABORTED"
+    },
+    {
+      "url": "https://chagra-dev.guatoc.co/assets/_filters-vEo2yPRM.css",
+      "err": "net::ERR_ABORTED"
+    }
+  ],
+  "badResponses": [],
+  "shotPath": "_gate/perf-warm1.png"
+}

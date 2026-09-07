@@ -1,0 +1,300 @@
+<!doctype html>
+<html lang="es-CO">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Sylva s47 — Decimación de mid-mesh por distancia (masa del valle)</title>
+<style>
+  html,body{margin:0;height:100%;overflow:hidden;background:#0b0f0c;font-family:system-ui,-apple-system,"Segoe UI",sans-serif}
+  #c{display:block;width:100vw;height:100vh;touch-action:none}
+  #hud{position:fixed;top:14px;left:14px;padding:10px 14px;border-radius:12px;
+    background:rgba(10,18,12,.55);color:#eaffef;font-size:13px;line-height:1.55;
+    backdrop-filter:blur(8px);z-index:10;min-width:296px;box-shadow:0 8px 24px rgba(0,0,0,.25)}
+  #hud .row{display:flex;justify-content:space-between;gap:18px}
+  #hud .k{opacity:.68}
+  #hud b{font-variant-numeric:tabular-nums}
+  #err{position:fixed;inset:auto 14px 14px auto;max-width:72vw;color:#ffd9d9;background:rgba(90,20,20,.78);
+    padding:8px 12px;border-radius:10px;font-size:12px;white-space:pre-wrap;z-index:20;display:none}
+</style>
+<script type="importmap">
+{
+  "imports": {
+    "three": "./vendor/three.module.js",
+    "three/addons/": "./vendor/addons/"
+  }
+}
+</script>
+</head>
+<body>
+<canvas id="c"></canvas>
+<div id="hud">
+  <div class="row"><span class="k">FPS</span><b id="fps">--</b></div>
+  <div class="row"><span class="k">s47 mid-mesh</span><b id="modo">--</b></div>
+  <div class="row"><span class="k">Cámara</span><b id="cam">--</b></div>
+  <div class="row"><span class="k">Semilla / árboles</span><b id="seed">--</b></div>
+  <div class="row"><span class="k">Tier full · mid · lejos</span><b id="tiers">--</b></div>
+  <div class="row"><span class="k">Tris bake f/m/l</span><b id="tris">--</b></div>
+  <div class="row"><span class="k">Umbral px (full/mid)</span><b id="th">--</b></div>
+  <div class="row"><span class="k">Triángulos dibujados</span><b id="drawtris">--</b></div>
+</div>
+<div id="err"></div>
+<script type="module">
+// Banco del robo Sylva s47 (Token-Gremlin/realistic-forest, MIT): DECIMACIÓN DE
+// LA MALLA MEDIA POR DISTANCIA. En Sylva el MISMO esqueleto se meshea a varios
+// LODs (TreeGenerator LOD_PROFILE): cada escalón baja `radial`, recorre menos
+// anillos (`segStride`), poda ramas finas (`prune`) y conserva solo una
+// fracción `keep` de las hojas, que se agrandan por 1/sqrt(keep) para que el
+// ÁREA de follaje —silueta y densidad— no caiga al alejarse. Los árboles se
+// asignan en vivo por altura en píxeles: "mid-mesh while a stem is large on
+// screen; cards past that". Acá se emula sobre la copa-masa REAL del valle
+// (crearCopaMasa + fusionarCopaMasa + materialCopaMasaInstanciada): el mismo
+// arquetipo horneado a tres niveles (full/mid/lejos = keep 1 / 0.62 / 0.34,
+// ver flora-eztree-bake.js bakearArbolMasa nivel) y cada árbol se dibuja con el
+// bake que le toca por su tamaño proyectado, con histéresis.
+// MIT notice retenido (realistic-forest © 2026 Token Gremlin) en
+// lib3d/flora/LICENSE-sylva-MIT. La curva keep→(maxCards, tamCard) es emulación
+// original sobre los rangos de FollajeMasa, no código copiado literal.
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { bakearArbolMasa } from './flora-eztree-bake.js';
+import { fusionarCopaMasa, materialCopaMasaInstanciada } from './flora.js';
+
+const err = document.getElementById('err');
+addEventListener('error', (e) => { err.style.display = 'block'; err.textContent = 'ERROR: ' + (e.message || e); });
+addEventListener('unhandledrejection', (e) => { err.style.display = 'block'; err.textContent = 'REJECT: ' + ((e.reason && e.reason.message) || e.reason); });
+
+const q = new URLSearchParams(location.search);
+const S47 = q.get('s47') !== '0';                    // 1 = decimación por distancia; 0 = baseline (todo full)
+const _seed = Number(q.get('seed'));
+const SEED = Number.isInteger(_seed) && _seed >= 0 ? _seed : 20027;
+const CAM = q.get('cam') || 'mid';
+const N_ARBOLES = Math.max(1, Math.min(900, Number(q.get('n')) || 260));
+// Umbrales de altura proyectada (px). En Sylva se eligen contra presupuesto de
+// triángulos; acá los fija el A/B. Histéresis: entrar full requiere más px que
+// quedarse; salir de un nivel requiere caer bajo su umbral de salida.
+const _th = {
+  fullEnter: Number(q.get('fullEnter')) || 230,
+  fullExit: Number(q.get('fullExit')) || 170,
+  midEnter: Number(q.get('midEnter')) || 95,
+  midExit: Number(q.get('midExit')) || 55,
+};
+const PERFIL = { clave: 'encenillo', tono: '#3d6d32', claro: '#6e9145', oscuro: '#203e20' };
+
+// ── PRNG sembrado (mismo rodal entre A y B) ─────────────────────────────────
+function mulberry32(a) {
+  return function () {
+    a |= 0; a = a + 0x6D2B79F5 | 0;
+    let t = Math.imul(a ^ a >>> 15, 1 | a);
+    t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t;
+    return ((t ^ t >>> 14) >>> 0) / 4294967296;
+  };
+}
+const porIndice = (i, sal) => mulberry32((SEED + 0x9e3779b9 * i + 0x85ebca6b * sal) >>> 0)();
+
+// ── rodal: héroe en el origen + N-1 en anillo determinista (radio creciente +
+//    ángulo áureo) → posiciones IDÉNTICAS entre s47=0 y s47=1: el A/B cambia
+//    solo la geometría con la que se dibuja cada árbol según su distancia.
+const GOLDEN = Math.PI * (3 - Math.sqrt(5));
+const arboles = [];
+for (let i = 0; i < N_ARBOLES; i++) {
+  const giro = porIndice(i, 3) * Math.PI * 2;
+  if (i === 0) { arboles.push({ x: 0, z: 0, hm: 12, ancho: 1.05, giro }); continue; }
+  const r = 14 + Math.sqrt((i - 1) / Math.max(1, N_ARBOLES - 1)) * 165;
+  const a = (i - 1) * GOLDEN + porIndice(i, 1) * 0.6;
+  const x = Math.cos(a) * r, z = Math.sin(a) * r;
+  const hm = 8 + porIndice(i, 6) * 6;                 // uniforme 8–14 m
+  arboles.push({ x, z, hm, ancho: 1, giro });
+}
+
+const renderer = new THREE.WebGLRenderer({ canvas: document.getElementById('c'), antialias: true });
+renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.5));
+renderer.setSize(innerWidth, innerHeight);
+renderer.toneMapping = THREE.AgXToneMapping;      // = main.js del valle
+renderer.toneMappingExposure = 1.55;
+renderer.outputColorSpace = THREE.SRGBColorSpace;
+window.__r = renderer;
+
+const scene = new THREE.Scene();
+const fogColor = 0xbfd0c6;
+scene.background = new THREE.Color(fogColor);
+scene.fog = new THREE.Fog(fogColor, 90, 420);
+window.__escena = scene;
+
+const camera = new THREE.PerspectiveCamera(50, innerWidth / innerHeight, 0.1, 1200);
+window.__cam = camera;
+const controls = new OrbitControls(camera, renderer.domElement);
+controls.enableDamping = true;
+window.__ctl = controls;
+
+scene.add(new THREE.HemisphereLight(0x93a8c2, 0x1c2314, 0.55));
+const sol = new THREE.DirectionalLight(0xffe0c0, 2.7);
+sol.position.set(-40, 85, 30);
+scene.add(sol);
+
+const groundGeo = new THREE.CircleGeometry(320, 96);
+groundGeo.rotateX(-Math.PI / 2);
+scene.add(new THREE.Mesh(groundGeo, new THREE.MeshStandardMaterial({ color: 0x4e6a36, roughness: 1, metalness: 0 })));
+
+// ── LOS TRES BAJES del MISMO arquetipo (misma seed de esqueleto → misma
+//    silueta; cambia el presupuesto de cards/núcleo). ─────────────────────────
+const bakeBase = { ...PERFIL, seed: SEED + 811 };
+const bakes = {
+  full: bakearArbolMasa(PERFIL.clave, { ...bakeBase, nivel: 'full' }),
+  mid: bakearArbolMasa(PERFIL.clave, { ...bakeBase, nivel: 'mid' }),
+  lejos: bakearArbolMasa(PERFIL.clave, { ...bakeBase, nivel: 'lejos' }),
+};
+// triángulos reales de cada bake fusionado (copa = núcleo + cards, no-indexada)
+const trisBake = {};
+for (const k of Object.keys(bakes)) {
+  const fused = fusionarCopaMasa(bakes[k]);
+  trisBake[k] = fused.attributes.position.count / 3;
+  fused.dispose();
+}
+
+const _q2 = new THREE.Quaternion(); const _sv = new THREE.Vector3(); const _pv = new THREE.Vector3();
+const _m = new THREE.Matrix4();
+const matrices = new Map(); // índice → Matrix4 (idéntico entre A y B)
+arboles.forEach((t, i) => {
+  const k = t.hm / bakes.full.alturaNatural;
+  _q2.setFromAxisAngle(new THREE.Vector3(0, 1, 0), t.giro);
+  _sv.set(k * t.ancho, k * (0.9 + porIndice(i, 11) * 0.2), k * t.ancho);
+  _pv.set(t.x, -0.3, t.z);
+  matrices.set(i, _m.compose(_pv, _q2, _sv).clone());
+});
+
+// Un InstancedMesh por nivel; cada árbol se escribe en el que le toca.
+const copas = {};
+for (const k of Object.keys(bakes)) {
+  const mesh = new THREE.InstancedMesh(fusionarCopaMasa(bakes[k]), materialCopaMasaInstanciada(bakes[k]), N_ARBOLES);
+  mesh.count = 0;
+  mesh.visible = false;
+  mesh.frustumCulled = false;
+  mesh.name = `copa-${k}`;
+  copas[k] = mesh;
+  scene.add(mesh);
+}
+const nivelDe = new Int8Array(N_ARBOLES);         // 0 full, 1 mid, 2 lejos
+const contNivel = { full: 0, mid: 0, lejos: 0 };
+
+const trunkGeo = new THREE.CylinderGeometry(0.22, 0.34, 2.4, 5);
+trunkGeo.translate(0, 1.0, 0);
+const trunkMat = new THREE.MeshStandardMaterial({ color: 0x4a3826, roughness: 0.95, flatShading: true });
+const troncos = new THREE.InstancedMesh(trunkGeo, trunkMat, N_ARBOLES);
+troncos.frustumCulled = false;
+matrices.forEach((m, i) => troncos.setMatrixAt(i, m));
+troncos.instanceMatrix.needsUpdate = true;
+scene.add(troncos);
+
+// altura proyectada del árbol i (px verticales del framebuffer). Misma forma
+// que tamanoEnPixeles de lib/impostor-lod.js: profundidad de cámara, no al
+// origen; focalPx desde proyección + viewport real.
+const _punto = new THREE.Vector3();
+function alturaEnPixeles(i, camera, viewportHeight) {
+  const t = arboles[i];
+  _punto.set(t.x, t.hm * 0.5, t.z).applyMatrix4(camera.matrixWorldInverse);
+  if (_punto.z >= -camera.near) return 0;
+  const prof = -_punto.z;
+  const focalPx = viewportHeight * 0.5 * Math.abs(camera.projectionMatrix.elements[5]);
+  return t.hm * focalPx / prof;
+}
+
+// ── reparto por distancia (histéresis) ──────────────────────────────────────
+const _tmp = new THREE.Matrix4();
+function sincronizar(camera, viewportHeight, forzar) {
+  if (!forzar) return;
+  for (const k of Object.keys(copas)) copas[k].count = 0;
+  contNivel.full = contNivel.mid = contNivel.lejos = 0;
+  for (let i = 0; i < N_ARBOLES; i++) {
+    const px = alturaEnPixeles(i, camera, viewportHeight);
+    let nivel;
+    if (S47) {
+      const actual = nivelDe[i];
+      if (actual === 0) nivel = px < _th.fullExit ? (px > _th.midEnter ? 1 : 2) : 0;
+      else if (actual === 1) nivel = px > _th.fullEnter ? 0 : (px < _th.midExit ? 2 : 1);
+      else nivel = px > _th.fullEnter ? 0 : (px > _th.midEnter ? 1 : 2);
+      nivelDe[i] = nivel;
+    } else {
+      nivel = 0;                                      // baseline: todo full
+      nivelDe[i] = 0;
+    }
+    const mesh = copas[nivel === 0 ? 'full' : nivel === 1 ? 'mid' : 'lejos'];
+    mesh.setMatrixAt(mesh.count, matrices.get(i));
+    mesh.count++;
+    if (nivel === 0) contNivel.full++; else if (nivel === 1) contNivel.mid++; else contNivel.lejos++;
+  }
+  for (const k of Object.keys(copas)) {
+    copas[k].visible = copas[k].count > 0;
+    copas[k].instanceMatrix.needsUpdate = true;
+  }
+}
+window.__sincronizarS47 = sincronizar;
+
+const CAMERAS = {
+  near: { pos: [8, 6, 18], tgt: [0, 6, 0], fov: 55 },
+  mid: { pos: [4, 34, 120], tgt: [0, 8, 0], fov: 50 },
+  wide: { pos: [40, 130, 340], tgt: [0, 8, -20], fov: 50 },
+};
+const c = CAMERAS[CAM] || CAMERAS.mid;
+camera.position.set(...c.pos);
+camera.fov = c.fov;
+camera.updateProjectionMatrix();
+controls.target.set(...c.tgt);
+controls.update();
+controls.enableDamping = false;   // capturas estables (A/B idéntico a ojo)
+
+// hooks del gate
+window.__s47 = {
+  activa: S47, semilla: SEED, camara: CAM, arboles: N_ARBOLES,
+  umbrales: { ..._th },
+  bakes: trisBake,
+  contadores: contNivel,
+};
+window.__medirS47 = () => ({
+  activa: S47, semilla: SEED, camara: CAM, arboles: N_ARBOLES,
+  umbrales: { ..._th },
+  trisPorBake: { ...trisBake },
+  niveles: { full: contNivel.full, mid: contNivel.mid, lejos: contNivel.lejos },
+  gl: window.__r?.getContext?.()?.getError?.() ?? null,
+  dibujados: renderer.info.render.triangles,
+});
+window.__ARRANQUE_OK = true;
+
+function pintarHud() {
+  document.getElementById('modo').textContent = S47 ? 'decimación por distancia' : 'baseline (todo full)';
+  document.getElementById('cam').textContent = `${CAM}`;
+  document.getElementById('seed').textContent = `${SEED} · ${N_ARBOLES}`;
+  document.getElementById('tiers').textContent = `${contNivel.full} / ${contNivel.mid} / ${contNivel.lejos}`;
+  document.getElementById('tris').textContent = `${trisBake.full} / ${trisBake.mid} / ${trisBake.lejos}`;
+  document.getElementById('th').textContent = `${_th.fullEnter}/${_th.midEnter}`;
+  document.getElementById('drawtris').textContent = renderer.info.render.triangles;
+}
+pintarHud();
+
+const drawingBuffer = new THREE.Vector2();
+const clock = new THREE.Clock();
+let frames = 0, fpsT = 0;
+let ultimoCam = null;
+function tick() {
+  requestAnimationFrame(tick);
+  controls.update();
+  renderer.getDrawingBufferSize(drawingBuffer);
+  const camSig = `${camera.position.x.toFixed(2)}|${camera.position.y.toFixed(2)}|${camera.position.z.toFixed(2)}`;
+  if (camSig !== ultimoCam) { sincronizar(camera, drawingBuffer.y, true); ultimoCam = camSig; }
+  renderer.render(scene, camera);
+  frames++; fpsT += clock.getDelta();
+  if (fpsT >= 0.5) {
+    document.getElementById('fps').textContent = Math.round(frames / fpsT);
+    document.getElementById('drawtris').textContent = renderer.info.render.triangles;
+    document.getElementById('tiers').textContent = `${contNivel.full} / ${contNivel.mid} / ${contNivel.lejos}`;
+    frames = 0; fpsT = 0;
+  }
+}
+tick();
+addEventListener('resize', () => {
+  camera.aspect = innerWidth / innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(innerWidth, innerHeight);
+});
+</script>
+</body>
+</html>

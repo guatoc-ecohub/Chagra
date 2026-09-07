@@ -1,0 +1,278 @@
+<!doctype html>
+<html lang="es-CO">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Sylva s42 — Varianza de edad joven/viejo en el rodal (masa del valle)</title>
+<style>
+  html,body{margin:0;height:100%;overflow:hidden;background:#0b0f0c;font-family:system-ui,-apple-system,"Segoe UI",sans-serif}
+  #c{display:block;width:100vw;height:100vh;touch-action:none}
+  #hud{position:fixed;top:14px;left:14px;padding:10px 14px;border-radius:12px;
+    background:rgba(10,18,12,.55);color:#eaffef;font-size:13px;line-height:1.55;
+    backdrop-filter:blur(8px);z-index:10;min-width:290px;box-shadow:0 8px 24px rgba(0,0,0,.25)}
+  #hud .row{display:flex;justify-content:space-between;gap:18px}
+  #hud .k{opacity:.68}
+  #hud b{font-variant-numeric:tabular-nums}
+  #err{position:fixed;inset:auto 14px 14px auto;max-width:72vw;color:#ffd9d9;background:rgba(90,20,20,.78);
+    padding:8px 12px;border-radius:10px;font-size:12px;white-space:pre-wrap;z-index:20;display:none}
+</style>
+<script type="importmap">
+{
+  "imports": {
+    "three": "./vendor/three.module.js",
+    "three/addons/": "./vendor/addons/"
+  }
+}
+</script>
+</head>
+<body>
+<canvas id="c"></canvas>
+<div id="hud">
+  <div class="row"><span class="k">FPS</span><b id="fps">--</b></div>
+  <div class="row"><span class="k">Edad</span><b id="edad">--</b></div>
+  <div class="row"><span class="k">Semilla / Cámara</span><b id="seed">--</b></div>
+  <div class="row"><span class="k">Árboles</span><b id="n">--</b></div>
+  <div class="row"><span class="k">cv altura / cv masa</span><b id="cv">--</b></div>
+  <div class="row"><span class="k">joven·maduro·viejo</span><b id="cohortes">--</b></div>
+  <div class="row"><span class="k">masa / masa base</span><b id="masa">--</b></div>
+  <div class="row"><span class="k">Draw calls / tris</span><b id="draws">--</b></div>
+</div>
+<div id="err"></div>
+<script type="module">
+// Banco del robo Sylva s42 (Token-Gremlin/realistic-forest, MIT): varianza de
+// EDAD joven/viejo dentro de la misma especie. Sylva no planta clones: cada
+// árbol nace con una edad (Trees.js: age = clamp(pow(rnd,1.6)*0.7 + bias*0.55,
+// 0.16, 1.25) y scale = age*lerp(0.85,1.15,rnd)) que le cambia la talla y la
+// proporción de copa — un rodal mezcla juveniles finos con veteranos anchos.
+// Este banco lo emula sobre el código REAL del bosque del valle (mismos bakes,
+// misma fusión de copa y material instanciado que flora.js). A/B pareado en la
+// MISMA escena sembrada (misma semilla → mismas posiciones, mismos giros, mismo
+// conteo; cada individuo saca sus números de un PRNG POR ÍNDICE, no secuencial):
+//   ?edad=0  baseline: alturas uniformes 8–14 m con copa de ancho 1 (el rodal
+//            actual, que se lee como plantación coetánea — repetición).
+//   ?edad=1  cohortes joven/maduro/viejo con ancho de copa por edad, reescaladas
+//            para CONSERVAR la masa total de follaje del baseline (la mezcla
+//            rompe la repetición sin pelar el dosel).
+// MIT notice retenido (realistic-forest © 2026 Token Gremlin) en
+// lib3d/flora/LICENSE-sylva-MIT, que ya cubre los robos Sylva. La curva de edad
+// es adaptación original sobre los rangos del valle, no código copiado literal.
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { bakearArbolMasa } from './flora-eztree-bake.js';
+import { fusionarCopaMasa, materialCopaMasaInstanciada } from './flora.js';
+
+const err = document.getElementById('err');
+addEventListener('error', (e) => { err.style.display = 'block'; err.textContent = 'ERROR: ' + (e.message || e); });
+addEventListener('unhandledrejection', (e) => { err.style.display = 'block'; err.textContent = 'REJECT: ' + ((e.reason && e.reason.message) || e.reason); });
+
+const q = new URLSearchParams(location.search);
+const EDAD = q.get('edad') !== '0';              // 1 = cohortes de edad; 0 = baseline
+const _seed = Number(q.get('seed'));
+const SEED = Number.isInteger(_seed) && _seed >= 0 ? _seed : 20027;
+const CAM = q.get('cam') || 'mid';
+const N_ARBOLES = Math.max(1, Math.min(400, Number(q.get('n')) || 48));
+const PERFIL = { clave: 'encenillo', tono: '#3d6d32', claro: '#6e9145', oscuro: '#203e20' };
+
+// PRNG sembrado por semilla (mulberry32).
+function mulberry32(a) {
+  return function () {
+    a |= 0; a = a + 0x6D2B79F5 | 0;
+    let t = Math.imul(a ^ a >>> 15, 1 | a);
+    t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t;
+    return ((t ^ t >>> 14) >>> 0) / 4294967296;
+  };
+}
+// Un PRNG POR ÍNDICE: cada individuo deriva sus números de una semilla fija
+// (SEED + índice), así la geometría (posición, giro, jitter vertical) es
+// IDÉNTICA entre edad=0 y edad=1 — el A/B cambia solo el muestreo de edad.
+const porIndice = (i, sal) => mulberry32((SEED + 0x9e3779b9 * i + 0x85ebca6b * sal) >>> 0)();
+
+// ── cohortes de edad sobre la MISMA especie ─────────────────────────────────
+// r ∈ [0,1) decide la cohorte; la copa (ancho) usa una segunda extracción para
+// no correlacionar altura con ancho dentro de una misma cohorte. Altura-meta
+// de un árbol maduro del valle ≈ 11 m (centro del rango 8–14 del rodal).
+//   joven  35% · factor 0.55–0.75 · copa ESTRECHA  (ancho ~0.78–0.86)
+//   maduro 45% · factor 0.92–1.10 · copa ~1.0
+//   viejo  20% · factor 1.15–1.35 · copa ANCHA     (ancho ~1.10–1.22)
+function muestraEdad(r, jitter) {
+  if (r < 0.35) return { edad: 0.55 + 0.20 * (r / 0.35), ancho: 0.78 + 0.08 * jitter };
+  if (r < 0.80) return { edad: 0.92 + 0.18 * ((r - 0.35) / 0.45), ancho: 0.94 + 0.10 * jitter };
+  return { edad: 1.15 + 0.20 * ((r - 0.80) / 0.20), ancho: 1.10 + 0.12 * jitter };
+}
+
+// ── rodal sembrado: héroe maduro en el origen y N-1 en anillo determinista
+//    (radio creciente + ángulo áureo → separación mínima sin rechazo, y por eso
+//    IDÉNTICO entre edad=0 y edad=1: el A/B cambia solo altura/ancho de copa).
+const GOLDEN = Math.PI * (3 - Math.sqrt(5));
+const arboles = [];
+for (let i = 0; i < N_ARBOLES; i++) {
+  const giro = porIndice(i, 3) * Math.PI * 2;
+  if (i === 0) {
+    arboles.push({ x: 0, z: 0, hm: 12, ancho: 1.05, giro });   // héroe maduro
+    continue;
+  }
+  const r = 12 + Math.sqrt((i - 1) / Math.max(1, N_ARBOLES - 1)) * 34;
+  const a = (i - 1) * GOLDEN + porIndice(i, 1) * 0.6;          // desfase sutil por semilla
+  const x = Math.cos(a) * r, z = Math.sin(a) * r;
+  const base = EDAD
+    ? muestraEdad(porIndice(i, 4), porIndice(i, 7))
+    : { edad: 0.73 + 0.54 * porIndice(i, 5), ancho: 1 };   // ancho=1 en baseline
+  const hm = EDAD ? 11 * base.edad : 8 + porIndice(i, 6) * 6;  // uniforme 8–14
+  arboles.push({ x, z, hm, ancho: base.ancho, giro });
+}
+
+// masa de follaje por individuo ∝ (hm·ancho)²·hm = hm³·ancho².
+const masa = (t) => Math.pow(t.hm, 3) * t.ancho * t.ancho;
+// Referencia = la MISMA escena bajo el rodal uniforme 8–14 m con ancho=1 (la
+// distribución actual del valle). Se calcula con los mismos uniformes por
+// índice que usa edad=0, así es idéntica en los dos modos de la semilla.
+const masaBaseline = (() => {
+  let s = Math.pow(12, 3) * 1.05 * 1.05;                       // héroe
+  for (let i = 1; i < N_ARBOLES; i++) s += Math.pow(8 + porIndice(i, 6) * 6, 3);
+  return s;
+})();
+// Con edad=1 se reescala el conjunto (factor c³ en masa) para que Σ masa ==
+// masaBaseline: el A/B aísla la DISTRIBUCIÓN de edades de la CANTIDAD total
+// de follaje (la mezcla rompe repetición sin pelar el dosel).
+if (EDAD) {
+  const sumaEdad = arboles.reduce((s, t) => s + masa(t), 0);
+  const c = Math.cbrt(masaBaseline / sumaEdad);
+  for (const t of arboles) t.hm *= c;
+}
+
+const renderer = new THREE.WebGLRenderer({ canvas: document.getElementById('c'), antialias: true });
+renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.5));
+renderer.setSize(innerWidth, innerHeight);
+renderer.toneMapping = THREE.AgXToneMapping;      // = main.js del valle
+renderer.toneMappingExposure = 1.55;
+renderer.outputColorSpace = THREE.SRGBColorSpace;
+window.__r = renderer;
+
+const scene = new THREE.Scene();
+const fogColor = 0xbfd0c6;
+scene.background = new THREE.Color(fogColor);
+scene.fog = new THREE.Fog(fogColor, 90, 420);
+window.__escena = scene;
+
+const camera = new THREE.PerspectiveCamera(50, innerWidth / innerHeight, 0.1, 1200);
+window.__cam = camera;
+const controls = new OrbitControls(camera, renderer.domElement);
+controls.enableDamping = true;
+window.__ctl = controls;
+
+// Luces del valle (atmosphere.js): hemisferio frío + sol cálido dominante.
+scene.add(new THREE.HemisphereLight(0x93a8c2, 0x1c2314, 0.55));
+const sol = new THREE.DirectionalLight(0xffe0c0, 2.7);
+sol.position.set(-40, 85, 30);
+scene.add(sol);
+
+const groundGeo = new THREE.CircleGeometry(260, 64);
+groundGeo.rotateX(-Math.PI / 2);
+scene.add(new THREE.Mesh(groundGeo, new THREE.MeshStandardMaterial({ color: 0x4e6a36, roughness: 1, metalness: 0 })));
+
+const bake = bakearArbolMasa(PERFIL.clave, { tono: PERFIL.tono, claro: PERFIL.claro, oscuro: PERFIL.oscuro, seed: SEED + 811 });
+
+const _q2 = new THREE.Quaternion(); const _sv = new THREE.Vector3(); const _pv = new THREE.Vector3();
+const _m = new THREE.Matrix4();
+function matrizDe(t, i) {
+  const k = t.hm / bake.alturaNatural;
+  _q2.setFromAxisAngle(new THREE.Vector3(0, 1, 0), t.giro);
+  _sv.set(k * t.ancho, k * (0.9 + porIndice(i, 11) * 0.2), k * t.ancho);
+  _pv.set(t.x, -0.3, t.z);
+  return _m.compose(_pv, _q2, _sv).clone();
+}
+const matrices = arboles.map(matrizDe);
+
+const copa = new THREE.InstancedMesh(fusionarCopaMasa(bake), materialCopaMasaInstanciada(bake), arboles.length);
+matrices.forEach((m, j) => copa.setMatrixAt(j, m));
+copa.instanceMatrix.needsUpdate = true;
+copa.name = 'copa-encenillo';
+copa.frustumCulled = false;
+scene.add(copa);
+
+const trunkGeo = new THREE.CylinderGeometry(0.22, 0.34, 2.4, 5);
+trunkGeo.translate(0, 1.0, 0);
+const trunkMat = new THREE.MeshStandardMaterial({ color: 0x4a3826, roughness: 0.95, flatShading: true });
+const troncos = new THREE.InstancedMesh(trunkGeo, trunkMat, arboles.length);
+matrices.forEach((m, j) => troncos.setMatrixAt(j, m));
+troncos.instanceMatrix.needsUpdate = true;
+troncos.frustumCulled = false;
+scene.add(troncos);
+
+// ── hooks del gate ───────────────────────────────────────────────────────────
+const cv = (xs) => {
+  if (xs.length < 2) return 0;
+  const m = xs.reduce((a, b) => a + b, 0) / xs.length;
+  const v = xs.reduce((a, b) => a + (b - m) * (b - m), 0) / xs.length;
+  return Math.sqrt(v) / m;
+};
+function medirEdad() {
+  const alturas = arboles.map((t) => t.hm);
+  const n = { joven: 0, maduro: 0, viejo: 0 };
+  for (const t of arboles) {
+    if (t.hm < 9) n.joven++;
+    else if (t.hm > 12.5) n.viejo++;
+    else n.maduro++;
+  }
+  return {
+    activa: EDAD, semilla: SEED, arboles: arboles.length,
+    cvAltura: +cv(alturas).toFixed(4),
+    cvMasa: +cv(alturas.map((h) => h * h * h)).toFixed(4),
+    hmMin: +Math.min(...alturas).toFixed(2), hmMax: +Math.max(...alturas).toFixed(2),
+    cohortes: n,
+    masaTotal: +arboles.reduce((s, t) => s + masa(t), 0).toFixed(1),
+    masaReferencia: +masaBaseline.toFixed(1),
+  };
+}
+window.__medirEdad = medirEdad;
+window.__edad = {
+  activa: EDAD, semilla: SEED, arboles: arboles.length,
+  lista: arboles.map((t) => ({ x: +t.x.toFixed(1), z: +t.z.toFixed(1), hm: +t.hm.toFixed(2), ancho: +t.ancho.toFixed(3) })),
+};
+
+const CAMERAS = {
+  near: { pos: [4.2, 2.2, 7.5], tgt: [2, 3.4, 0], fov: 55 },   // joven fino junto a veterano ancho
+  mid:  { pos: [2, 8.5, 30],     tgt: [0, 6.5, 0], fov: 50 },  // rodal entero
+  wide: { pos: [26, 22, 78],     tgt: [0, 6, -10], fov: 50 },  // mezcla de edades vs muro coetáneo
+};
+const c = CAMERAS[CAM] || CAMERAS.mid;
+camera.position.set(...c.pos);
+camera.fov = c.fov;
+camera.updateProjectionMatrix();
+controls.target.set(...c.tgt);
+controls.update();
+
+function pintarHud() {
+  document.getElementById('edad').textContent = EDAD ? 'cohortes joven/viejo' : 'uniforme 8–14 m (baseline)';
+  document.getElementById('seed').textContent = `${SEED} · ${CAM}`;
+  document.getElementById('n').textContent = arboles.length;
+  const m = medirEdad();
+  document.getElementById('cv').textContent = `${m.cvAltura} / ${m.cvMasa}`;
+  document.getElementById('cohortes').textContent = `${m.cohortes.joven}·${m.cohortes.maduro}·${m.cohortes.viejo}`;
+  document.getElementById('masa').textContent = `${m.masaTotal} / ${m.masaReferencia}`;
+}
+pintarHud();
+window.__ARRANQUE_OK = true;
+
+const clock = new THREE.Clock();
+let frames = 0, fpsT = 0;
+function tick() {
+  requestAnimationFrame(tick);
+  controls.update();
+  renderer.render(scene, camera);
+  frames++; fpsT += clock.getDelta();
+  if (fpsT >= 0.5) {
+    document.getElementById('fps').textContent = Math.round(frames / fpsT);
+    frames = 0; fpsT = 0;
+  }
+  document.getElementById('draws').textContent = `${renderer.info.render.calls} / ${(renderer.info.render.triangles / 1e3).toFixed(0)} k`;
+}
+tick();
+addEventListener('resize', () => {
+  camera.aspect = innerWidth / innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(innerWidth, innerHeight);
+});
+</script>
+</body>
+</html>
