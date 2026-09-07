@@ -39,6 +39,31 @@ const LUCIERNAGAS = Array.from({ length: 11 }, (_, i) => ({
   delay: -((i * 19) % 11),
 }));
 
+/* NUBLADO — masas sueltas (vh de la ESCENA, que arranca ~9 vh bajo el borde de la pantalla):
+   una panza que cierra la grieta por la izquierda, una nube baja con el lomo encendido dentro
+   de la grieta y cuatro hilachas oscuras que barren con el viento (dos por la grieta, dos por
+   el techo). Techo, panza, claro y banco derivan por CSS; nada se repinta por frame. */
+const NUBES = [
+  { x: -8, y: 30, w: 56, h: 10, tono: 'panza', dur: 96, delay: -12 },
+  { x: 54, y: 31.5, w: 30, h: 6, tono: 'luz', dur: 118, delay: -49 },
+  { x: 44, y: 33.4, w: 36, h: 1.4, tono: 'jiron', dur: 22, delay: -9 },
+  { x: 62, y: 36.2, w: 34, h: 1.2, tono: 'jiron', dur: 27, delay: -20 },
+  { x: 10, y: 9, w: 40, h: 1.6, tono: 'jiron', dur: 31, delay: -4 },
+  { x: 40, y: 15.5, w: 44, h: 1.3, tono: 'jiron', dur: 25, delay: -16 },
+];
+
+/* NUBLADO — lo que pasa POR DELANTE de la UI (vh del viewport): masas que cruzan la pantalla
+   entera de izquierda a derecha (viento del páramo) e hilachas más rápidas. */
+const NUBES_FRENTE = [
+  { y: 2, w: 88, h: 30, tono: 'masa', dur: 58, delay: -30 },
+  { y: 30, w: 80, h: 28, tono: 'masa', dur: 48, delay: -8 },
+  { y: 56, w: 92, h: 30, tono: 'masa', dur: 68, delay: -51 },
+  { y: 18, w: 70, h: 22, tono: 'masa', dur: 76, delay: -62 },
+  { y: 12, w: 64, h: 4, tono: 'hilacha', dur: 22, delay: -6 },
+  { y: 40, w: 58, h: 3.4, tono: 'hilacha', dur: 28, delay: -19 },
+  { y: 69, w: 68, h: 4.2, tono: 'hilacha', dur: 25, delay: -12 },
+];
+
 const ESTRELLAS = Array.from({ length: 26 }, (_, i) => ({
   x: (i * 39 + 5) % 100,
   y: 2 + ((i * 23) % 52),
@@ -83,6 +108,7 @@ export default function EscenaAtmosfera({ condicion = null, luz = null, enso = n
   return (
     <div className="ca-root ca-atmosfera" data-clima={condicion || undefined}
       data-luz={luz || undefined} data-enso={enso === 'nino' || enso === 'nina' ? enso : undefined} aria-hidden="true">
+      <div className="ca-pegajoso">
       <div className="ca-escena" aria-hidden="true">
         {/* Cielos: un gradiente por estado, crossfade de opacity (los
             background-image no interpolan; el velo cruzado sí). */}
@@ -135,6 +161,31 @@ export default function EscenaAtmosfera({ condicion = null, luz = null, enso = n
             ))}
           </g>
         </svg>
+
+        {/* Techo de nubes (nublado): claro de la grieta, panza (sombra colgante), techo con
+            borde deshecho por máscara de ruido, banco bajo con lomo, y las 4 masas sueltas. Solo se enciende con data-clima="nublado"; deriva lentísima por transform. */}
+        <div className="ca-capa ca-capa--nubes">
+          <div className="ca-claro" />
+          <div className="ca-techo-sombra" />
+          <div className="ca-techo" />
+          <div className="ca-techo-bajo-base" />
+          <div className="ca-techo-bajo-lomo" />
+          <div className="ca-techo-bajo" />
+          {NUBES.map((n, i) => (
+            <span
+              key={i}
+              className={`ca-nube ca-nube--${n.tono}`}
+              style={{
+                left: `${n.x}vw`,
+                top: `${n.y}vh`,
+                width: `${n.w}vw`,
+                height: `${n.h}vh`,
+                animationDuration: `${n.dur}s`,
+                animationDelay: `${n.delay}s`,
+              }}
+            />
+          ))}
+        </div>
 
         {/* Cordillera en 3 planos: perspectiva aérea (catálogo #8) + luz
             direccional de ladera (#7) vía gradiente fijo sobre los montes. */}
@@ -268,6 +319,31 @@ export default function EscenaAtmosfera({ condicion = null, luz = null, enso = n
         <div className="ca-vineta" />
         <div className="ca-scrim ca-scrim--alto" />
         <div className="ca-scrim ca-scrim--bajo" />
+      </div>
+
+      {/* NUBLADO — la nube pasa POR ENCIMA de la página (z 30, sobre el contenido), como el
+          jirón sobre la UI del catálogo (#18): con esta densidad de texto, lo que queda detrás
+          se pierde (corrección del operador 2026-09-06). Tres masas bajas que cruzan la
+          pantalla, tres hilachas rápidas, la sombra de la nube que oscurece al pasar y una
+          bruma que lame el borde inferior. Tonos y alfas topados para que el texto quede
+          ≥ 4,5:1 debajo. Solo transform. */}
+      <div className="ca-frente-nublado" aria-hidden="true">
+        <div className="ca-sombra-pasa" />
+        {NUBES_FRENTE.map((n, i) => (
+          <span
+            key={i}
+            className={`ca-nube-frente ca-nube-frente--${n.tono}`}
+            style={{
+              top: `${n.y}vh`,
+              width: `${n.w}vw`,
+              height: `${n.h}vh`,
+              animationDuration: `${n.dur}s`,
+              animationDelay: `${n.delay}s`,
+            }}
+          />
+        ))}
+        <div className="ca-bruma-frente" />
+      </div>
       </div>
 
       <div className="ca-jiron-ui" />

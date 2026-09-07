@@ -2240,7 +2240,7 @@ export default function App() {
         return (
           <ErrorBoundary>
             <ErrorFallback moduleName="Home campesino">
-              <HomeCampesinoMockup onBack={() => navigate('dashboard')} />
+              <HomeCampesinoMockup onBack={() => navigate('dashboard')} onNavigate={navigate} />
             </ErrorFallback>
           </ErrorBoundary>
         );
@@ -2306,7 +2306,7 @@ export default function App() {
         return (
           <ErrorBoundary>
             <ErrorFallback moduleName="Clima y atmósfera">
-              <ClimaAtmosferaMockup onBack={() => navigate('dashboard')} />
+              <ClimaAtmosferaMockup onNavigate={navigate} />
             </ErrorFallback>
           </ErrorBoundary>
         );

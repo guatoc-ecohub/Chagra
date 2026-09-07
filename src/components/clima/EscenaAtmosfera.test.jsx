@@ -10,6 +10,8 @@ const CONTEOS = {
   '.ca-monte': 3, '.ca-tallo': 4, '.ca-hoja': 36, '.ca-sombra-planta': 4,
   '.ca-grade': 6, '.ca-scrim': 2, '.ca-vineta': 1, '.ca-jiron-ui': 1,
   '.ca-astro': 1, '.ca-ladera-luz': 1, '.ca-bruma': 1, '.ca-suelo': 1, '.ca-pasto': 1,
+  '.ca-capa--nubes': 1, '.ca-techo': 1, '.ca-techo-sombra': 1, '.ca-claro': 1, '.ca-techo-bajo': 1, '.ca-techo-bajo-lomo': 1, '.ca-techo-bajo-base': 1, '.ca-nube': 6,
+  '.ca-pegajoso': 1, '.ca-frente-nublado': 1, '.ca-nube-frente': 7, '.ca-sombra-pasa': 1, '.ca-bruma-frente': 1,
 };
 
 describe('Escena atmosférica decorativa', () => {

@@ -838,29 +838,276 @@
   --ca-astro-op: 0;
   --ca-rayos-op: 0;
 }
-.ca-atmosfera .ca-escena { height: 100dvh; position: sticky; top: 0; }
+/* el envoltorio pegajoso sigue al viewport; adentro, la escena (z 0, detrás del contenido)
+   y la capa frontal del nublado (z 30, delante). El envoltorio NO crea contexto de apilamiento. */
+.ca-atmosfera .ca-pegajoso { position: sticky; top: 0; height: 100dvh; }
+.ca-atmosfera .ca-escena { position: absolute; inset: 0; }
 .ca-atmosfera .ca-jiron-ui { position: absolute; top: 38vh; }
 .ca-atmosfera[data-clima='despejado'] { --ca-astro-op: 1; }
 .ca-atmosfera[data-clima='despejado'][data-luz='dia'] { --ca-rayos-op: 0.4; }
 .ca-atmosfera[data-clima='despejado']:is([data-luz='amanecer'], [data-luz='atardecer']) { --ca-rayos-op: 0.75; }
 .ca-atmosfera[data-clima='niebla'] { --ca-astro-op: 0.25; }
 .ca-atmosfera[data-clima='lluvia'] { --ca-astro-op: 0.12; }
+/* ── Piel NUBLADO: techo de estrato con PANZA y ROTURA (nube-masa, no polígonos).
+      Decisión del operador 2026-09-05: nada de gris parejo. Se consigue con recursos
+      baratos — gradientes radiales en 7 elementos con pseudo-lóbulos (21 masas), un
+      techo moteado, un claro de luz detrás de la rotura y el astro que ya existe
+      adivinándose tras la nube. Solo transform/opacity animados, muy lentos; cero JS.
+      Composición pensada para el boletín real: la parte alta (detrás de la cabecera y
+      de la cifra grande) es PANZA oscura — cielo cubierto visto desde abajo — y la
+      rotura con los lóbulos iluminados vive a la derecha y sobre las cumbres, donde
+      no compite con el texto (contraste ≥ 4,5:1 medido contra el fondo real). ── */
 .ca-atmosfera[data-clima='nublado'] {
-  --ca-monte1: #a1b4b9;
-  --ca-monte2: #78968c;
-  --ca-monte3: #557565;
-  --ca-suelo: #496c53;
-  --ca-pasto: #3c5e47;
-  --ca-bruma-color: #c3cdce;
-  --ca-bruma-op: 0.7;
-  --ca-ladera-op: 0;
+  --ca-monte1: #9fb0b5;
+  --ca-monte2: #74908a;
+  --ca-monte3: #527163;
+  --ca-suelo: #476a52;
+  --ca-pasto: #3b5c46;
+  --ca-bruma-color: #c6cfd0;
+  --ca-bruma-op: 0.55;
+  --ca-sombra-largo: 0.5;
+  --ca-sombra-op: 0.06;
+  --ca-ladera-op: 0.35;
+  /* tonos de la nube: luz (lomo), media, panza y panza profunda; claro = luz de la rotura */
+  --ca-ruido: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 320 160' preserveAspectRatio='none'%3E%3Cfilter id='n' x='0' y='0' width='100%25' height='100%25'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.02 0.038' numOctaves='4' seed='11' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 4.5 4.5 4.5 0 -6.1'/%3E%3C/filter%3E%3Crect width='320' height='160' filter='url(%23n)'/%3E%3C/svg%3E");
+  /* TOPE de luminancia L ≤ 0,13 en toda la capa (ver nota de la capa): el boletín escribe en
+     cualquier parte y su texto debe quedar ≥ 4,5:1 caiga donde caiga. La rotura es, entonces,
+     lo MENOS oscuro del techo, no un blanco. */
+  --ca-nube-techo-alto: #262f37;
+  --ca-nube-techo: #303a43;
+  --ca-nube-techo-bajo: #4a565f;
+  --ca-nube-luz: #5c6871;
+  --ca-nube-media: #48545c;
+  --ca-nube-panza: #323c44;
+  --ca-nube-panza-oscura: #1b2228;
+  --ca-nube-claro: rgba(255, 252, 240, 0.14);
+  --ca-nube-claro-borde: rgba(236, 242, 240, 0.07);
+  /* el sol se adivina detrás del punto más delgado del techo */
+  --ca-astro-op: 0.28;
+  --ca-astro-x: 74vw;
+  --ca-astro-y: 31vh;
+  --ca-astro-s: 0.7;
+  --ca-astro-color: #fbfaf2;
+  --ca-astro-glow: rgba(255, 250, 230, 0.3);
+  --ca-rayo: #fbfaf2;
+  --ca-rayos-op: 0.12;
 }
-.ca-cielo--nublado { background: linear-gradient(#899ba5, #b7c5ca 55%, #d3dcd7); }
-.ca-grade--nublado { background: linear-gradient(#81949b22, #adc3ba22); }
+/* De abajo hacia arriba: panza oscura del techo arriba, luz difusa y clara junto al
+   horizonte — la luz de un día cubierto llega por debajo del borde de la nube. */
+.ca-cielo--nublado { background: linear-gradient(to bottom, #5c6a74, #7b8992 30%, #a7b4ba 46%, #d8e0e2 58%, #e9ede9 74%, #e6ebe6); }
+.ca-grade--nublado { background: linear-gradient(to bottom, rgba(112, 126, 134, 0.18), rgba(173, 195, 186, 0.1)); }
 .ca-atmosfera[data-clima='nublado'] .ca-cielo--nublado,
-.ca-atmosfera[data-clima='nublado'] .ca-grade--nublado { opacity: 1; }
+.ca-atmosfera[data-clima='nublado'] .ca-grade--nublado,
+.ca-atmosfera[data-clima='nublado'] .ca-capa--nubes { opacity: 1; }
 .ca-atmosfera[data-clima='nublado'] .ca-bruma { bottom: 22vh; }
+/* la luz de la rotura cae sobre la ladera derecha (reusa la capa de luz de ladera) */
+.ca-atmosfera[data-clima='nublado'] .ca-ladera-luz {
+  background: radial-gradient(ellipse 34vw 16vh at 78% 26%, rgba(255, 250, 232, 0.34), rgba(255, 250, 232, 0.12) 45%, transparent 72%);
+}
+.ca-atmosfera[data-clima='nublado']:is([data-luz='amanecer'], [data-luz='atardecer']) {
+  --ca-nube-techo-alto: #2c2731;
+  --ca-nube-techo: #3a3340;
+  --ca-nube-techo-bajo: #5a4f58;
+  --ca-nube-luz: #6e5e67;
+  --ca-nube-media: #564a52;
+  --ca-nube-panza: #3c333a;
+  --ca-nube-panza-oscura: #1f1a1f;
+  --ca-nube-claro: rgba(255, 214, 160, 0.16);
+  --ca-nube-claro-borde: rgba(255, 226, 190, 0.07);
+  --ca-astro-op: 0.3;
+  --ca-astro-s: 0.8;
+  --ca-astro-color: #ffb347;
+  --ca-astro-glow: rgba(255, 160, 70, 0.5);
+  --ca-rayo: #ffcf8a;
+  --ca-rayos-op: 0.2;
+}
+.ca-atmosfera[data-clima='nublado']:is([data-luz='amanecer'], [data-luz='atardecer']) .ca-cielo--nublado {
+  background: linear-gradient(to bottom, #5a5361, #857680 30%, #bfa5a0 46%, #ead2bf 58%, #f4e4d0 74%, #f1e1cf);
+}
 .ca-atmosfera[data-clima='nublado']:is([data-luz='amanecer'], [data-luz='atardecer']) .ca-grade--dorada { opacity: 0.45; }
+.ca-atmosfera[data-clima='nublado'][data-luz='noche'] {
+  --ca-nube-techo-alto: #0a1020;
+  --ca-nube-techo: #101a2c;
+  --ca-nube-techo-bajo: #1a2740;
+  --ca-nube-luz: #46587c;
+  --ca-nube-media: #2b3a57;
+  --ca-nube-panza: #17223a;
+  --ca-nube-panza-oscura: #060b16;
+  --ca-nube-claro: rgba(176, 196, 236, 0.12);
+  --ca-nube-claro-borde: rgba(150, 175, 225, 0.05);
+  --ca-astro-op: 0.34;
+  --ca-astro-s: 0.9;
+  --ca-astro-glow: rgba(190, 210, 255, 0.3);
+  --ca-rayos-op: 0;
+}
+.ca-atmosfera[data-clima='nublado'][data-luz='noche'] .ca-ladera-luz { opacity: 0.18; }
+
+/* Capa de nubes — z 9, POR ENCIMA de los scrims (bajo el contenido, z 10): en un día
+   cubierto el techo de nubes ES el oscurecedor. Su panza oscura sostiene el contraste del
+   texto donde hay texto, y la ROTURA se abre donde el boletín no escribe nada: la franja
+   entre la anomalía y las pestañas. La MASA sale de una máscara de ruido fractal (un SVG de
+   ~400 bytes con feTurbulence, rasterizado UNA vez como imagen de máscara: ni canvas ni JS
+   ni filtro vivo) intersectada con un degradado: el borde bajo del techo se deshace en
+   lóbulos y agujeros irregulares — nube-masa, no polígonos ni óvalos. La PANZA es una copia
+   oscura del mismo techo corrida 1,4 vh hacia abajo y pintada debajo: cada lóbulo recibe su
+   sombra colgante. Un banco bajo, oscuro, se sienta sobre las cumbres detrás de las pestañas
+   (les sube el contraste) con el lomo apenas encendido hacia la grieta.
+   VIDA (corrección del operador 2026-09-06: «cero animado, es solo un fondo»): todo deriva
+   con el viento del páramo — techo y panza a ritmos distintos (paralaje: la panza respira),
+   el banco bajo en contra, hilachas oscuras que BARREN la grieta de lado a lado (22-28 s),
+   la nube encendida que sube y baja, la luz de la grieta que pulsa, el sol que se asoma y se
+   esconde, rayos crepusculares que se cuelan por la rotura (capa #6, respira), bancos de
+   niebla reales entre los montes (capa #4) y el jirón sobre la UI (#18) muy tenue. Solo
+   transform/opacity: cero repintado, cero JS por frame.
+   ⚠ TOPE DE LUMINANCIA: la anomalía aparece y desaparece según el dato y las pestañas suben
+   9 vh sin ella — el texto puede caer en cualquier parte. Por eso ningún píxel de esta capa
+   pasa de L≈0,13 (blanco ≥ 4,5:1 encima; slate-300 tras el vidrio 0,5 de las pestañas también)
+   y la rotura es lo MENOS oscuro del techo, con el sol adivinándose detrás, no un blanco.
+   ⚠ Coordenadas en vh DE LA ESCENA: la escena arranca 75 px (≈9 vh) bajo el borde superior
+   de la pantalla (la barra del ScreenShell); las zonas de texto del boletín, medidas a
+   390×844 y ya restados esos 9 vh: cabecera 1-13 · cifra 16-22 (x 42-78) · «se siente» 23-26
+   · anomalía 28-36,5 (vidrio) · chip 37-40,5 (x 3-42) · pestañas 42-50,5 (vidrio 0,5) ·
+   tarjetas ≥ 52,5. Bolsillos SIN texto: x ≥ 46, y 36,6-41,4 (la grieta) y x 79-100, y 20-27. */
+.ca-capa--nubes { z-index: 9; }
+.ca-capa--nubes * { animation-play-state: paused; }
+.ca-atmosfera[data-clima='nublado'] .ca-capa--nubes * { animation-play-state: running; }
+.ca-techo,
+.ca-techo-sombra,
+.ca-techo-bajo,
+.ca-techo-bajo-lomo,
+.ca-nube {
+  position: absolute;
+  mask-repeat: no-repeat;
+  mask-composite: intersect;
+  will-change: transform;
+}
+/* techo y panza: más anchos que la pantalla para poder derivar sin dejar borde */
+.ca-techo,
+.ca-techo-sombra {
+  top: 0;
+  left: -20vw;
+  width: 140vw;
+  height: 41vh;
+  mask-image: var(--ca-ruido), linear-gradient(to bottom, #000 0%, #000 52%, transparent 100%);
+  mask-size: 230vw 120vh, 100% 100%;
+  mask-position: -50vw -40vh, 0 0;
+  animation: ca-techo-deriva 30s ease-in-out infinite alternate;
+}
+.ca-techo {
+  background:
+    radial-gradient(ellipse 34vw 9vh at 22% 26%, rgba(30, 40, 48, 0.8), transparent 100%),
+    radial-gradient(ellipse 36vw 10vh at 68% 16%, rgba(34, 44, 52, 0.75), transparent 100%),
+    radial-gradient(ellipse 30vw 8vh at 46% 58%, rgba(32, 42, 50, 0.7), transparent 100%),
+    linear-gradient(to bottom, var(--ca-nube-techo-alto) 0%, var(--ca-nube-techo) 55%, var(--ca-nube-techo-bajo) 100%);
+}
+.ca-techo-sombra {
+  top: 1.4vh;
+  background: linear-gradient(to bottom, var(--ca-nube-panza-oscura) 0%, var(--ca-nube-panza-oscura) 70%, var(--ca-nube-panza) 100%);
+  animation-duration: 24s;
+  animation-delay: -9s;
+}
+@keyframes ca-techo-deriva {
+  from { transform: translate3d(-10vw, 0, 0); }
+  to { transform: translate3d(10vw, 0.8vh, 0); }
+}
+/* la grieta de luz: cielo claro entre el techo y el banco; pulsa como la luz que pasa entre nubes */
+.ca-claro {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 16vw 7vh at 76vw 33vh, var(--ca-nube-claro), var(--ca-nube-claro-borde) 55%, transparent 100%),
+    radial-gradient(ellipse 34vw 6vh at 64vw 35vh, var(--ca-nube-claro-borde), transparent 100%),
+    radial-gradient(ellipse 26vw 4vh at 50vw 37vh, rgba(236, 242, 240, 0.05), transparent 100%);
+  transition: background var(--ca-lento) var(--ca-curva);
+  animation: ca-luz-pulsa 7s ease-in-out infinite alternate, ca-claro-vaga 40s ease-in-out infinite alternate;
+  will-change: transform, opacity;
+}
+@keyframes ca-claro-vaga {
+  from { transform: translate3d(-12vw, 0, 0); }
+  to { transform: translate3d(8vw, -1vh, 0); }
+}
+@keyframes ca-luz-pulsa {
+  from { opacity: 0.6; }
+  to { opacity: 1; }
+}
+/* banco bajo: sentado sobre las cumbres, detrás de las pestañas; deriva EN CONTRA del techo */
+.ca-techo-bajo,
+.ca-techo-bajo-lomo {
+  top: 39.6vh;
+  left: -22vw;
+  width: 144vw;
+  height: 21vh;
+  mask-image: var(--ca-ruido), linear-gradient(to bottom, transparent 0%, #000 18%, #000 66%, transparent 100%);
+  mask-size: 210vw 80vh, 100% 100%;
+  mask-position: -80vw -50vh, 0 0;
+  animation: ca-banco-deriva 36s ease-in-out infinite alternate;
+}
+.ca-techo-bajo-lomo {
+  top: 38.6vh;
+  background: linear-gradient(to bottom, var(--ca-nube-media) 0%, var(--ca-nube-panza) 18%, var(--ca-nube-panza-oscura) 100%);
+}
+.ca-techo-bajo {
+  background: linear-gradient(to bottom, var(--ca-nube-panza) 0%, var(--ca-nube-panza-oscura) 18%, var(--ca-nube-panza-oscura) 100%);
+}
+@keyframes ca-banco-deriva {
+  from { transform: translate3d(10vw, 0, 0); }
+  to { transform: translate3d(-10vw, -0.6vh, 0); }
+}
+/* masas sueltas: panza que cierra la grieta por la izquierda (sobre el chip), nube baja
+   encendida dentro de la grieta e hilachas oscuras que la BARREN con el viento */
+.ca-nube {
+  mask-image: var(--ca-ruido), radial-gradient(ellipse closest-side, #000 50%, transparent 100%);
+  mask-size: 320% 420%, 100% 100%;
+  mask-position: -90% -140%, 0 0;
+  animation: ca-nube-deriva 32s ease-in-out infinite alternate;
+}
+.ca-nube--panza { background: linear-gradient(to bottom, var(--ca-nube-panza-oscura) 0%, var(--ca-nube-panza-oscura) 60%, var(--ca-nube-panza) 100%); }
+.ca-nube--luz {
+  background: linear-gradient(to bottom, var(--ca-nube-luz) 0%, var(--ca-nube-media) 50%, var(--ca-nube-panza) 100%);
+  animation-name: ca-nube-flota;
+}
+.ca-nube--jiron {
+  background: var(--ca-nube-panza-oscura);
+  opacity: 0.9;
+  will-change: transform;
+  animation: ca-viento 22s linear infinite;
+}
+@keyframes ca-nube-deriva {
+  from { transform: translate3d(-6vw, 0, 0); }
+  to { transform: translate3d(6vw, 0.6vh, 0); }
+}
+@keyframes ca-nube-flota {
+  0% { transform: translate3d(-8vw, 0.4vh, 0) scale(1); }
+  50% { transform: translate3d(0, -0.6vh, 0) scale(1.08); }
+  100% { transform: translate3d(8vw, 0.3vh, 0) scale(1); }
+}
+@keyframes ca-viento {
+  from { transform: translate3d(-46vw, 0, 0); }
+  to { transform: translate3d(46vw, 0, 0); }
+}
+/* el sol se asoma y se esconde tras lo más delgado del techo */
+.ca-atmosfera[data-clima='nublado'] .ca-astro-disco { animation: ca-sol-asoma 7s ease-in-out infinite alternate; }
+@keyframes ca-sol-asoma {
+  from { opacity: 0.45; }
+  to { opacity: 1; }
+}
+/* capa viva que YA existía y que el nublado reúsa: los rayos crepusculares (#6) se cuelan por
+   la rotura y respiran. (Los bancos de niebla y el jirón sobre la UI se probaron y se
+   descartaron: son claros, cruzan el texto de las pestañas y lo bajan de 4,5:1 — y además
+   harían que «nublado» se leyera como «niebla».) */
+.ca-atmosfera[data-clima='nublado'] .ca-rayos-giro { animation-play-state: running; }
+/* base sorda del banco bajo: rellena los agujeros del ruido detrás de las pestañas para que
+   su texto quede siempre sobre nube densa (≥ 4,5:1); visualmente, nube más gruesa */
+.ca-techo-bajo-base {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 40.5vh;
+  height: 19vh;
+  background: var(--ca-nube-panza-oscura);
+  opacity: 0.72;
+  mask-image: linear-gradient(to bottom, transparent 0%, #000 22%, #000 70%, transparent 100%);
+}
 .ca-atmosfera[data-luz='noche'] {
   --ca-monte1: #22304e;
   --ca-monte2: #182441;
@@ -903,3 +1150,85 @@
   .clima-atmosfera-contenido .ca-carta { padding: 12px; }
   .ca-atmosfera .ca-frente { height: auto; min-height: 0; aspect-ratio: 800 / 190; }
 }
+
+/* ── NUBLADO por DELANTE de la UI (z 30) ─────────────────────────────────────────────────
+   La densidad de texto del boletín entierra cualquier cielo. Como el jirón sobre la UI (#18),
+   la nube cruza la pantalla por encima de todo: se lee aunque el ojo esté en la cifra. Tonos y
+   alfas TOPADOS: masa L≈0,35 con alfa ≤ 0,22 → el blanco queda ≥ 5:1 y el slate-300 de las
+   pestañas ≥ 4,8:1 debajo; hilachas y sombra son oscuras (suben el contraste, no lo bajan). */
+.ca-frente-nublado {
+  position: absolute;
+  inset: 0;
+  z-index: 30;
+  overflow: hidden;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity calc(var(--ca-lento) * 1.5) var(--ca-curva);
+}
+.ca-atmosfera[data-clima='nublado'] .ca-frente-nublado { opacity: 1; }
+.ca-frente-nublado * { animation-play-state: paused; }
+.ca-atmosfera[data-clima='nublado'] .ca-frente-nublado * { animation-play-state: running; }
+.ca-nube-frente {
+  position: absolute;
+  left: -100vw;
+  mask-image: var(--ca-ruido), radial-gradient(ellipse closest-side, #000 38%, transparent 100%);
+  mask-size: 260% 320%, 100% 100%;
+  mask-position: -70% -110%, 0 0;
+  mask-repeat: no-repeat;
+  mask-composite: intersect;
+  will-change: transform;
+  animation: ca-cruza 60s linear infinite;
+}
+/* masa frontal con PANZA: lomo claro (alfa topada) y vientre oscuro que pesa — la nube se lee
+   como volumen aunque pase por encima de la cifra */
+.ca-nube-frente--masa {
+  background: linear-gradient(to bottom, rgba(170, 184, 192, 0.22) 0%, rgba(120, 134, 144, 0.2) 34%, rgba(40, 50, 60, 0.34) 68%, rgba(10, 16, 22, 0.42) 100%);
+}
+.ca-nube-frente--hilacha {
+  background: rgba(10, 16, 22, 0.7);
+  mask-size: 300% 500%, 100% 100%;
+  mask-position: -90% -180%, 0 0;
+}
+/* recorre 200 vw: entra por la izquierda, sale por la derecha, sin costura */
+@keyframes ca-cruza {
+  from { transform: translate3d(0, 0, 0); }
+  to { transform: translate3d(200vw, 0, 0); }
+}
+/* la sombra de la nube que pasa: la pantalla se oscurece y vuelve a aclarar */
+.ca-sombra-pasa {
+  position: absolute;
+  top: -10vh;
+  bottom: -10vh;
+  left: -110vw;
+  width: 110vw;
+  background: radial-gradient(ellipse 55% 60% at 50% 50%, rgba(4, 10, 16, 0.44), rgba(4, 10, 16, 0.16) 60%, transparent 100%);
+  will-change: transform;
+  animation: ca-cruza 66s linear infinite;
+  animation-delay: -40s;
+}
+/* bruma que lame el borde inferior, oscilando */
+.ca-bruma-frente {
+  position: absolute;
+  left: -10vw;
+  right: -10vw;
+  bottom: -4vh;
+  height: 26vh;
+  background: linear-gradient(to top, rgba(170, 184, 190, 0.2), rgba(150, 164, 172, 0.1) 50%, transparent);
+  mask-image: var(--ca-ruido);
+  mask-size: 260% 400%;
+  mask-position: -30% -60%;
+  mask-repeat: no-repeat;
+  will-change: transform;
+  animation: ca-bruma-oscila 22s ease-in-out infinite alternate;
+}
+@keyframes ca-bruma-oscila {
+  from { transform: translate3d(-3vw, 0.6vh, 0); }
+  to { transform: translate3d(3vw, -0.4vh, 0); }
+}
+.ca-atmosfera[data-clima='nublado']:is([data-luz='amanecer'], [data-luz='atardecer']) .ca-nube-frente--masa {
+  background: linear-gradient(to bottom, rgba(196, 170, 156, 0.22) 0%, rgba(140, 118, 118, 0.2) 34%, rgba(56, 44, 50, 0.34) 68%, rgba(16, 12, 16, 0.42) 100%);
+}
+.ca-atmosfera[data-clima='nublado'][data-luz='noche'] .ca-nube-frente--masa {
+  background: linear-gradient(to bottom, rgba(70, 88, 124, 0.22) 0%, rgba(40, 54, 84, 0.22) 34%, rgba(12, 20, 36, 0.36) 68%, rgba(4, 8, 18, 0.44) 100%);
+}
+.ca-atmosfera[data-clima='nublado'][data-luz='noche'] .ca-bruma-frente { opacity: 0.5; }

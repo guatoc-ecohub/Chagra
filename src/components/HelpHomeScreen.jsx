@@ -1,7 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import {
   BookOpen, Sprout, ChevronRight, Library, Search, X,
-  Leaf, CalendarDays, Store, HelpCircle, Gamepad2, MessageSquare,
+  Leaf, CalendarDays, Store, HelpCircle, Gamepad2, MessageSquare, CloudSun,
 } from 'lucide-react';
 import HelpRegionSelector from './HelpRegionSelector.jsx';
 import ManoChagraGlyph from './dashboard/ManoChagraGlyph.jsx';
@@ -147,10 +147,18 @@ export default function HelpHomeScreen({ onSelect, onNavigate }) {
     },
   ];
 
-  // Los cuatro lugares de Chagra (home F2 "Finca Viva"): el mapa mental que
-  // un campesino nuevo necesita para no perderse. Cada uno abre una pantalla
-  // real. Mismos nombres que los portales del home (FincaVivaHero).
+  // Accesos a pantallas de Chagra. El tiempo comparte nombre y destino
+  // con la puerta del home F2 (FincaVivaHero).
   const lugares = [
+    {
+      key: 'tiempo',
+      icon: CloudSun,
+      title: 'El tiempo',
+      sub: 'El clima de hoy y los próximos días.',
+      route: 'clima_boletin',
+      iconColor: 'text-sky-300',
+      ring: 'border-sky-600/40 hover:border-sky-400/70',
+    },
     {
       key: 'gestionar',
       icon: Sprout,
@@ -283,7 +291,7 @@ export default function HelpHomeScreen({ onSelect, onNavigate }) {
           className="rounded-2xl border border-emerald-800/40 bg-gradient-to-br from-emerald-950/60 to-slate-950/70 p-4"
         >
           <p id="lugares-chagra" className="text-[11px] uppercase tracking-wider text-emerald-400/90 font-bold mb-1">
-            Chagra tiene cuatro lugares
+            Lugares de Chagra
           </p>
           <p className="text-xs text-slate-400 leading-relaxed mb-3">
             En la pantalla de inicio (su finca dibujada) toca uno de estos lugares. Aquí los abre directo:

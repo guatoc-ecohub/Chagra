@@ -1,0 +1,26 @@
+[pixel nublado-dia] am start: Starting: Intent { act=android.intent.action.VIEW dat=http://localhost:5390/... cmp=com.android.chrome/com.google.android.apps.chrome.Main }
+[pixel nublado-dia] PAGE: http://localhost:5390/#login
+[pixel nublado-dia] ws: /devtools/page/199
+[pixel nublado-dia] Runtime.enable ok
+[pixel nublado-dia] Network.enable ok
+[pixel nublado-dia] formulario de login enviado: True interceptadas: 1
+[pixel nublado-dia] pantalla del boletín visible: True en 8.4s interceptadas: 20
+[pixel nublado-dia] estado: {"clima":"nublado","luz":"dia","capaNubes":"1","techo":"1","nube":"1","dpr":3.5,"w":411,"h":746,"ua":"Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome","reducido":false,"animaciones":154}
+Traceback (most recent call last):
+  File "/home/kortux/Workspace/chagra/.worktrees/fable-nublado-20260906/_gate/nublado-nube-masa-20260906/pixel-fps-boletin.py", line 192, in <module>
+    f1 = medir(); bombear(1); f2 = medir()
+         ^^^^^^^
+  File "/home/kortux/Workspace/chagra/.worktrees/fable-nublado-20260906/_gate/nublado-nube-masa-20260906/pixel-fps-boletin.py", line 189, in medir
+    return evaluar("""new Promise((res) => { let n = 0; const t0 = performance.now();
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/kortux/Workspace/chagra/.worktrees/fable-nublado-20260906/_gate/nublado-nube-masa-20260906/pixel-fps-boletin.py", line 138, in evaluar
+    r = call('Runtime.evaluate', {'expression': js, 'returnByValue': True, 'awaitPromise': True}, to)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/kortux/Workspace/chagra/.worktrees/fable-nublado-20260906/_gate/nublado-nube-masa-20260906/pixel-fps-boletin.py", line 117, in call
+    f = frame()
+        ^^^^^^^
+  File "/home/kortux/Workspace/chagra/.worktrees/fable-nublado-20260906/_gate/nublado-nube-masa-20260906/pixel-fps-boletin.py", line 73, in frame
+    while len(buf) < 2: buf += s.recv(65536)
+                               ^^^^^^^^^^^^^
+TimeoutError: timed out
+exit=1
