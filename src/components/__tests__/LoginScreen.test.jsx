@@ -59,6 +59,7 @@ vi.mock('../../visual/agente/AngelitaSalida.jsx', () => ({
 import LoginScreen from '../LoginScreen';
 import { authenticateUser, iniciarLoginPKCE, resolverCaminoLogin } from '../../services/authService';
 import { setCurrentOperator } from '../../services/operatorIdentityService';
+import { prewarmCorpus } from '../../services/ragRetriever';
 
 function setup() {
   const onLoginSuccess = vi.fn();
@@ -136,6 +137,22 @@ describe('LoginScreen — submit y lógica de auth (intacta)', () => {
     await waitFor(() => expect(onLoginSuccess).toHaveBeenCalledTimes(1));
     expect(authenticateUser).toHaveBeenCalledWith('juanita', 'clave-buena');
     expect(setCurrentOperator).toHaveBeenCalledWith('juanita');
+  });
+
+  it('PERF arranque: login exitoso NO dispara el prewarm del corpus (el dueño es el efecto del dashboard en App)', async () => {
+    vi.mocked(authenticateUser).mockResolvedValue({ success: true });
+    const { onLoginSuccess } = setup();
+    fireEvent.change(screen.getByLabelText('Usuario'), { target: { value: 'juanita' } });
+    fireEvent.change(screen.getByLabelText('Contraseña'), { target: { value: 'clave-buena' } });
+    fireEvent.click(screen.getByRole('button', { name: /Ingresar/i }));
+    await waitFor(() => expect(onLoginSuccess).toHaveBeenCalledTimes(1));
+    // Diag ops/DIAGNOSTICO-PERF-DEV-20260905 (orden 1): el prewarm disparado
+    // en el handler de submit metía ~940 fetches de corpus en la ventana
+    // crítica submit→primera pantalla (delta medido: 48.501 s), compitiendo
+    // con el chunk del dashboard y catalog.sqlite. El calentamiento del corpus
+    // es responsabilidad del efecto de App.jsx cuando currentView==='dashboard',
+    // nunca del handler de login.
+    expect(prewarmCorpus).not.toHaveBeenCalled();
   });
 
   it('credenciales inválidas avisan por onSave con isError y no navegan', async () => {

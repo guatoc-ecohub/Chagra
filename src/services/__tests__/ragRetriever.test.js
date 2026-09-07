@@ -303,7 +303,8 @@ describe('ragRetriever — pre-tokenize perf fix', () => {
  * respondía en prod.
  *
  * El fix dispara los fetches en lotes con concurrencia acotada
- * (CORPUS_FETCH_CONCURRENCY = 12). Estos tests verifican empíricamente:
+ * (CORPUS_FETCH_CONCURRENCY; 6 desde el diag PERF 2026-09-05, antes 12).
+ * Estos tests verifican empíricamente:
  *   - loadCorpus COMPLETA (no cuelga) con un corpus grande (>concurrency).
  *   - El fetch NO es estrictamente secuencial — hay >1 request en vuelo a la vez.
  *   - El nivel de concurrencia NO excede el límite (no abre 491 sockets juntos).
@@ -311,9 +312,11 @@ describe('ragRetriever — pre-tokenize perf fix', () => {
  *     instantáneo después, y nunca lanza aunque la carga falle.
  */
 describe('ragRetriever — loadCorpus paralelo-acotado (hotfix prod-down 2026-06-02)', () => {
-  const CONCURRENCY_LIMIT = 12;
+  // Espejo local de CORPUS_FETCH_CONCURRENCY (no exportada). Si se cambia el
+  // límite en ragRetriever.js, actualizar acá también.
+  const CONCURRENCY_LIMIT = 6;
 
-  // Manifest grande para ejercitar varios lotes (3 lotes de 12 + resto).
+  // Manifest grande para ejercitar varios lotes (7 lotes de 6 + resto con N=40).
   function makeBigManifest(n) {
     return { generated_at: '2026-06-02T00:00:00Z', slugs: Array.from({ length: n }, (_, i) => `sp_${i}`) };
   }
@@ -384,7 +387,7 @@ describe('ragRetriever — loadCorpus paralelo-acotado (hotfix prod-down 2026-06
     const { retrieve, getCorpusStats } = await import('../ragRetriever.js');
 
     // Fuerza la carga del corpus completo. Si fuera serial-bloqueante, esto
-    // tomaría N×delay; con batches corre en ceil(N/12) barreras.
+    // tomaría N×delay; con batches corre en ceil(N/6) barreras.
     await retrieve('documento sintético corpus indexable', 5);
 
     const stats = await getCorpusStats();
@@ -400,7 +403,7 @@ describe('ragRetriever — loadCorpus paralelo-acotado (hotfix prod-down 2026-06
     const tracker = setupConcurrencyFetchMock(makeBigManifest(N));
     const { retrieve } = await import('../ragRetriever.js');
     await retrieve('documento sintético corpus indexable', 5);
-    // Con batches de 12, jamás debe haber 13+ requests simultáneos. Esto evita
+    // Con batches de 6, jamás debe haber 7+ requests simultáneos. Esto evita
     // abrir 491 sockets juntos contra el server / saturar la red móvil rural.
     expect(tracker.peak).toBeLessThanOrEqual(CONCURRENCY_LIMIT);
     // Y debe haber alcanzado el techo (o casi), confirmando que SÍ paraleliza
@@ -612,7 +615,8 @@ describe('ragRetriever — tier-gate del catalogo (SEC-002 / UXC-004)', () => {
  *   - Orden determinístico: los docs se insertan en orden lote-a-lote.
  */
 describe('ragRetriever — anti-regresión fetch serial 491 slugs (PROD-DOWN #1271)', () => {
-  const CONCURRENCY_LIMIT = 12;
+  // Espejo local de CORPUS_FETCH_CONCURRENCY (no exportada).
+  const CONCURRENCY_LIMIT = 6;
 
   function makeManifest(n) {
     return { generated_at: '2026-06-12T00:00:00Z', slugs: Array.from({ length: n }, (_, i) => `sp_${i}`) };
@@ -715,12 +719,12 @@ describe('ragRetriever — anti-regresión fetch serial 491 slugs (PROD-DOWN #12
     expect(tracker.peak).toBeLessThanOrEqual(CONCURRENCY_LIMIT);
 
     // Con serial de 491 fetches × 5ms = ~2.5s.
-    // Con batches de 12, ceil(491/12) barreras × 5ms ≈ 205ms.
+    // Con batches de 6, ceil(491/6) barreras × 5ms ≈ 410ms.
     // Asumimos que si dura < 1s, NO es serial.
     expect(duration).toBeLessThan(1000);
   });
 
-  it('PROD-DOWN #1271 — con exactamente CONCURRENCY_LIMIT (12) slugs hace un solo batch', async () => {
+  it('PROD-DOWN #1271 — con exactamente CONCURRENCY_LIMIT slugs hace un solo batch', async () => {
     const N = CONCURRENCY_LIMIT;
     vi.doMock('../../db/catalogDB', () => ({
       getAllSpecies: vi.fn().mockResolvedValue(makeSpeciesCatalog(N)),
@@ -738,8 +742,8 @@ describe('ragRetriever — anti-regresión fetch serial 491 slugs (PROD-DOWN #12
     expect(tracker.peak).toBe(CONCURRENCY_LIMIT);
   });
 
-  it('PROD-DOWN #1271 — con menos de CONCURRENCY_LIMIT (8) slugs hace un solo batch', async () => {
-    const N = 8;
+  it('PROD-DOWN #1271 — con menos de CONCURRENCY_LIMIT (4) slugs hace un solo batch', async () => {
+    const N = 4; // < límite (6) → un solo lote, peak = N
     vi.doMock('../../db/catalogDB', () => ({
       getAllSpecies: vi.fn().mockResolvedValue(makeSpeciesCatalog(N)),
     }));
@@ -752,7 +756,7 @@ describe('ragRetriever — anti-regresión fetch serial 491 slugs (PROD-DOWN #12
     expect(stats.totalDocs).toBe(N);
     expect(tracker.docFetches).toBe(N);
 
-    // Con un solo batch de 8, peak debe ser 8.
+    // Con un solo batch de 4, peak debe ser 4.
     expect(tracker.peak).toBe(N);
   });
 
@@ -881,7 +885,7 @@ describe('ragRetriever — anti-regresión fetch serial 491 slugs (PROD-DOWN #12
   });
 
   it('PROD-DOWN #1271 — determinismo: docs se insertan en orden lote-a-lote', async () => {
-    const N = 36; // 3 lotes completos de 12
+    const N = 36; // 6 lotes completos de 6 (límite actual)
     vi.doMock('../../db/catalogDB', () => ({
       getAllSpecies: vi.fn().mockResolvedValue(makeSpeciesCatalog(N)),
     }));
@@ -927,10 +931,11 @@ describe('ragRetriever — anti-regresión fetch serial 491 slugs (PROD-DOWN #12
     // Debemos tener 36 docs insertados
     expect(insertionOrder.length).toBe(N);
 
-    // Verificar que los docs están ordenados por lotes:
-    // - Lote 0: sp_0 a sp_11 (en cualquier orden entre ellos)
-    // - Lote 1: sp_12 a sp_23 (en cualquier orden entre ellos)
-    // - Lote 2: sp_24 a sp_35 (en cualquier orden entre ellos)
+    // Verificar que los docs están ordenados por lotes (agrupando de a 2
+    // lotes de 6, que es el límite actual: 36/6 = 6 lotes):
+    // - Primeros 12 insertados: sp_0 a sp_11 (en cualquier orden entre ellos)
+    // - Siguientes 12: sp_12 a sp_23 (en cualquier orden entre ellos)
+    // - Últimos 12: sp_24 a sp_35 (en cualquier orden entre ellos)
     const batch0 = new Set(Array.from({ length: 12 }, (_, i) => `sp_${i}`));
     const batch1 = new Set(Array.from({ length: 12 }, (_, i) => `sp_${i + 12}`));
     const batch2 = new Set(Array.from({ length: 12 }, (_, i) => `sp_${i + 24}`));

@@ -12,7 +12,6 @@ import LaminaMilpa from '../visual/laminas/LaminaMilpa.jsx';
 import LegalLinks from './LegalLinks';
 import WelcomeStatsHero from './WelcomeStatsHero';
 import useOllamaWarmStore from '../store/useOllamaWarmStore';
-import { prewarmCorpus } from '../services/ragRetriever';
 import useThemeBackgroundStore, { getBackgroundSrc, esGradiente } from '../store/useThemeBackgroundStore';
 import { friendlyMessage } from '../utils/friendlyErrors';
 import { MSG } from '../config/messages';
@@ -209,16 +208,17 @@ export default function LoginScreen({ onLoginSuccess, onSave }) {
         // No bloquear login si falla (ej. tests sin fetch global).
         console.warn('[LoginScreen] ollama warm-up dispatch failed:', err);
       }
-      // Hotfix prod-down 2026-06-02: pre-cargar el corpus RAG en background
-      // junto al warm-up de Ollama. Antes, loadCorpus() corría serial al
-      // disparar la PRIMERA query (incluido un saludo) y colgaba ~3min. Pre-
-      // cargándolo acá (fire-and-forget, no bloqueante) el corpus queda
-      // cacheado durante el tiempo humano login→dashboard→agente.
-      try {
-        prewarmCorpus();
-      } catch (err) {
-        console.warn('[LoginScreen] corpus pre-warm dispatch failed:', err);
-      }
+      // PERF arranque (diag ops/DIAGNOSTICO-PERF-DEV-20260905, orden 1): el
+      // pre-warm del corpus RAG ya NO se dispara acá, en el handler de submit
+      // antes de navegar. Medido en chagra-dev (build 0afe6f0a): del submit a
+      // la primera pantalla autenticada pasaban 48.501 s y 44.879 s, con
+      // 1.245 solicitudes post-submit (940 del corpus) compitiendo por la red
+      // contra el chunk del dashboard y catalog.sqlite (2,93 MB) + WASM
+      // (427 KB). El dueño del pre-warm ahora es el efecto de App.jsx que
+      // corre cuando `currentView === 'dashboard'` (ya existía como fallback
+      // para sesión persistida): el corpus se calienta DESPUÉS de que el shell
+      // autenticado se montó, no antes de navegar. prewarmCorpus sigue siendo
+      // idempotente, así que no hay doble trabajo.
       setLoading(false);
       onLoginSuccess();
     } else {
