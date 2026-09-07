@@ -1,0 +1,1359 @@
+{
+  "fecha": "2026-09-07T04:25:47.884Z",
+  "pageErrors": [],
+  "consoleErrors": [
+    "Failed to load resource: the server responded with a status of 403 (Forbidden)",
+    "wasm streaming compile failed: TypeError: Failed to execute 'compile' on 'WebAssembly': HTTP status code is not ok",
+    "falling back to ArrayBuffer instantiation",
+    "Failed to load resource: the server responded with a status of 403 (Forbidden)",
+    "failed to asynchronously prepare wasm: both async and sync fetching of the wasm failed",
+    "Aborted(both async and sync fetching of the wasm failed)",
+    "Exception loading sqlite3 module: RuntimeError: Aborted(both async and sync fetching of the wasm failed). Build with -sASSERTIONS for more info.\n    at abort (http://localhost:5391/node_modules/.vite/",
+    "[SQLite WASM] Failed to initialize catalog db: RuntimeError: Aborted(both async and sync fetching of the wasm failed). Build with -sASSERTIONS for more info.\n    at abort (http://localhost:5391/node_m",
+    "Failed to load resource: the server responded with a status of 403 (Forbidden)",
+    "wasm streaming compile failed: TypeError: Failed to execute 'compile' on 'WebAssembly': HTTP status code is not ok",
+    "falling back to ArrayBuffer instantiation",
+    "Failed to load resource: the server responded with a status of 403 (Forbidden)",
+    "failed to asynchronously prepare wasm: both async and sync fetching of the wasm failed",
+    "Aborted(both async and sync fetching of the wasm failed)",
+    "Exception loading sqlite3 module: RuntimeError: Aborted(both async and sync fetching of the wasm failed). Build with -sASSERTIONS for more info.\n    at abort (http://localhost:5391/node_modules/.vite/",
+    "[SQLite WASM] Failed to initialize catalog db: RuntimeError: Aborted(both async and sync fetching of the wasm failed). Build with -sASSERTIONS for more info.\n    at abort (http://localhost:5391/node_m",
+    "Failed to load resource: the server responded with a status of 404 (Not Found)",
+    "Failed to load resource: the server responded with a status of 403 (Forbidden)",
+    "wasm streaming compile failed: TypeError: Failed to execute 'compile' on 'WebAssembly': HTTP status code is not ok",
+    "falling back to ArrayBuffer instantiation",
+    "Failed to load resource: the server responded with a status of 403 (Forbidden)",
+    "failed to asynchronously prepare wasm: both async and sync fetching of the wasm failed",
+    "Aborted(both async and sync fetching of the wasm failed)",
+    "Exception loading sqlite3 module: RuntimeError: Aborted(both async and sync fetching of the wasm failed). Build with -sASSERTIONS for more info.\n    at abort (http://localhost:5391/node_modules/.vite/",
+    "[SQLite WASM] Failed to initialize catalog db: RuntimeError: Aborted(both async and sync fetching of the wasm failed). Build with -sASSERTIONS for more info.\n    at abort (http://localhost:5391/node_m",
+    "Failed to load resource: the server responded with a status of 403 (Forbidden)",
+    "wasm streaming compile failed: TypeError: Failed to execute 'compile' on 'WebAssembly': HTTP status code is not ok",
+    "falling back to ArrayBuffer instantiation",
+    "Failed to load resource: the server responded with a status of 403 (Forbidden)",
+    "failed to asynchronously prepare wasm: both async and sync fetching of the wasm failed",
+    "Aborted(both async and sync fetching of the wasm failed)",
+    "Exception loading sqlite3 module: RuntimeError: Aborted(both async and sync fetching of the wasm failed). Build with -sASSERTIONS for more info.\n    at abort (http://localhost:5391/node_modules/.vite/",
+    "[SQLite WASM] Failed to initialize catalog db: RuntimeError: Aborted(both async and sync fetching of the wasm failed). Build with -sASSERTIONS for more info.\n    at abort (http://localhost:5391/node_m",
+    "Failed to load resource: the server responded with a status of 404 (Not Found)",
+    "Failed to load resource: the server responded with a status of 429 (Too Many Requests)",
+    "Failed to load resource: the server responded with a status of 404 (Not Found)",
+    "Failed to load resource: the server responded with a status of 429 (Too Many Requests)",
+    "Failed to load resource: the server responded with a status of 404 (Not Found)",
+    "Failed to load resource: the server responded with a status of 404 (Not Found)"
+  ],
+  "resultados": [
+    {
+      "clima": "despejado",
+      "luz": "amanecer",
+      "fps": null,
+      "contrastes": null,
+      "todoTexto": null,
+      "enso": null,
+      "capas": {
+        "cielo:soleado": 0,
+        "cielo:lluvia": 0,
+        "cielo:niebla": 0,
+        "cielo:dorada": 1,
+        "cielo:noche": 0,
+        "cielo:nublado": 0,
+        "grade:soleado": 0,
+        "grade:lluvia": 0,
+        "grade:niebla": 0,
+        "grade:dorada": 1,
+        "grade:noche": 0,
+        "grade:nublado": 0,
+        "astro": 1,
+        "rayos": 0.75,
+        "bruma": 0.4,
+        "laderaLuz": 0.8,
+        "vineta": 0.34,
+        "scrimAlto": 1,
+        "scrimBajo": 0.8,
+        "jironUI": 0,
+        "capa:estrellas": 0,
+        "capa:lluvia": 0,
+        "capa:niebla": 0,
+        "capa:polvo": 1,
+        "capa:luci": 0
+      },
+      "particulas": {
+        "estrellas": {
+          "total": 26,
+          "visibles": 0,
+          "animando": 0,
+          "opCapa": 0
+        },
+        "gotas": {
+          "total": 30,
+          "visibles": 0,
+          "animando": 0,
+          "opCapa": 0
+        },
+        "bancos": {
+          "total": 6,
+          "visibles": 0,
+          "animando": 0,
+          "opCapa": 0
+        },
+        "jirones": {
+          "total": 4,
+          "visibles": 0,
+          "animando": 0,
+          "opCapa": 0
+        },
+        "motas": {
+          "total": 16,
+          "visibles": 16,
+          "animando": 16,
+          "opCapa": 1
+        },
+        "luciernagas": {
+          "total": 11,
+          "visibles": 0,
+          "animando": 0,
+          "opCapa": 0
+        },
+        "rayos": {
+          "total": 6,
+          "visibles": 6,
+          "animando": 1,
+          "opCapa": 0.75
+        }
+      },
+      "animCorriendo": 39,
+      "animVivasVisibles": 38,
+      "nodosEscena": 204
+    },
+    {
+      "clima": "despejado",
+      "luz": "dia",
+      "fps": null,
+      "contrastes": null,
+      "todoTexto": null,
+      "enso": null,
+      "capas": {
+        "cielo:soleado": 1,
+        "cielo:lluvia": 0,
+        "cielo:niebla": 0,
+        "cielo:dorada": 0,
+        "cielo:noche": 0,
+        "cielo:nublado": 0,
+        "grade:soleado": 1,
+        "grade:lluvia": 0,
+        "grade:niebla": 0,
+        "grade:dorada": 0,
+        "grade:noche": 0,
+        "grade:nublado": 0,
+        "astro": 1,
+        "rayos": 0.4,
+        "bruma": 0.28,
+        "laderaLuz": 0.45,
+        "vineta": 0.2,
+        "scrimAlto": 1,
+        "scrimBajo": 0.8,
+        "jironUI": 0,
+        "capa:estrellas": 0,
+        "capa:lluvia": 0,
+        "capa:niebla": 0,
+        "capa:polvo": 0.35,
+        "capa:luci": 0
+      },
+      "particulas": {
+        "estrellas": {
+          "total": 26,
+          "visibles": 0,
+          "animando": 0,
+          "opCapa": 0
+        },
+        "gotas": {
+          "total": 30,
+          "visibles": 0,
+          "animando": 0,
+          "opCapa": 0
+        },
+        "bancos": {
+          "total": 6,
+          "visibles": 0,
+          "animando": 0,
+          "opCapa": 0
+        },
+        "jirones": {
+          "total": 4,
+          "visibles": 0,
+          "animando": 0,
+          "opCapa": 0
+        },
+        "motas": {
+          "total": 16,
+          "visibles": 16,
+          "animando": 16,
+          "opCapa": 0.35
+        },
+        "luciernagas": {
+          "total": 11,
+          "visibles": 0,
+          "animando": 0,
+          "opCapa": 0
+        },
+        "rayos": {
+          "total": 6,
+          "visibles": 6,
+          "animando": 1,
+          "opCapa": 0.4
+        }
+      },
+      "animCorriendo": 39,
+      "animVivasVisibles": 39,
+      "nodosEscena": 204
+    },
+    {
+      "clima": "despejado",
+      "luz": "atardecer",
+      "fps": null,
+      "contrastes": null,
+      "todoTexto": null,
+      "enso": null,
+      "capas": {
+        "cielo:soleado": 0,
+        "cielo:lluvia": 0,
+        "cielo:niebla": 0,
+        "cielo:dorada": 1,
+        "cielo:noche": 0,
+        "cielo:nublado": 0,
+        "grade:soleado": 0,
+        "grade:lluvia": 0,
+        "grade:niebla": 0,
+        "grade:dorada": 1,
+        "grade:noche": 0,
+        "grade:nublado": 0,
+        "astro": 1,
+        "rayos": 0.75,
+        "bruma": 0.4,
+        "laderaLuz": 0.8,
+        "vineta": 0.34,
+        "scrimAlto": 1,
+        "scrimBajo": 0.8,
+        "jironUI": 0,
+        "capa:estrellas": 0,
+        "capa:lluvia": 0,
+        "capa:niebla": 0,
+        "capa:polvo": 1,
+        "capa:luci": 0
+      },
+      "particulas": {
+        "estrellas": {
+          "total": 26,
+          "visibles": 0,
+          "animando": 0,
+          "opCapa": 0
+        },
+        "gotas": {
+          "total": 30,
+          "visibles": 0,
+          "animando": 0,
+          "opCapa": 0
+        },
+        "bancos": {
+          "total": 6,
+          "visibles": 0,
+          "animando": 0,
+          "opCapa": 0
+        },
+        "jirones": {
+          "total": 4,
+          "visibles": 0,
+          "animando": 0,
+          "opCapa": 0
+        },
+        "motas": {
+          "total": 16,
+          "visibles": 16,
+          "animando": 16,
+          "opCapa": 1
+        },
+        "luciernagas": {
+          "total": 11,
+          "visibles": 0,
+          "animando": 0,
+          "opCapa": 0
+        },
+        "rayos": {
+          "total": 6,
+          "visibles": 6,
+          "animando": 1,
+          "opCapa": 0.75
+        }
+      },
+      "animCorriendo": 39,
+      "animVivasVisibles": 39,
+      "nodosEscena": 204
+    },
+    {
+      "clima": "despejado",
+      "luz": "noche",
+      "fps": null,
+      "contrastes": null,
+      "todoTexto": null,
+      "enso": null,
+      "capas": {
+        "cielo:soleado": 0,
+        "cielo:lluvia": 0,
+        "cielo:niebla": 0,
+        "cielo:dorada": 0,
+        "cielo:noche": 1,
+        "cielo:nublado": 0,
+        "grade:soleado": 0,
+        "grade:lluvia": 0,
+        "grade:niebla": 0,
+        "grade:dorada": 0,
+        "grade:noche": 1,
+        "grade:nublado": 0,
+        "astro": 1,
+        "rayos": 0,
+        "bruma": 0.5,
+        "laderaLuz": 0.14,
+        "vineta": 0.5,
+        "scrimAlto": 1,
+        "scrimBajo": 0.8,
+        "jironUI": 0,
+        "capa:estrellas": 1,
+        "capa:lluvia": 0,
+        "capa:niebla": 0,
+        "capa:polvo": 0,
+        "capa:luci": 1
+      },
+      "particulas": {
+        "estrellas": {
+          "total": 26,
+          "visibles": 26,
+          "animando": 26,
+          "opCapa": 1
+        },
+        "gotas": {
+          "total": 30,
+          "visibles": 0,
+          "animando": 0,
+          "opCapa": 0
+        },
+        "bancos": {
+          "total": 6,
+          "visibles": 0,
+          "animando": 0,
+          "opCapa": 0
+        },
+        "jirones": {
+          "total": 4,
+          "visibles": 0,
+          "animando": 0,
+          "opCapa": 0
+        },
+        "motas": {
+          "total": 16,
+          "visibles": 0,
+          "animando": 0,
+          "opCapa": 0
+        },
+        "luciernagas": {
+          "total": 11,
+          "visibles": 11,
+          "animando": 22,
+          "opCapa": 1
+        },
+        "rayos": {
+          "total": 6,
+          "visibles": 0,
+          "animando": 0,
+          "opCapa": 0
+        }
+      },
+      "animCorriendo": 70,
+      "animVivasVisibles": 69,
+      "nodosEscena": 204
+    },
+    {
+      "clima": "nublado",
+      "luz": "amanecer",
+      "fps": null,
+      "contrastes": null,
+      "todoTexto": null,
+      "enso": null,
+      "capas": {
+        "cielo:soleado": 0,
+        "cielo:lluvia": 0,
+        "cielo:niebla": 0,
+        "cielo:dorada": 0,
+        "cielo:noche": 0,
+        "cielo:nublado": 1,
+        "grade:soleado": 0,
+        "grade:lluvia": 0,
+        "grade:niebla": 0,
+        "grade:dorada": 0.45,
+        "grade:noche": 0,
+        "grade:nublado": 1,
+        "astro": 0,
+        "rayos": 0,
+        "bruma": 0.7,
+        "laderaLuz": 0,
+        "vineta": 0.34,
+        "scrimAlto": 1,
+        "scrimBajo": 0.8,
+        "jironUI": 0,
+        "capa:estrellas": 0,
+        "capa:lluvia": 0,
+        "capa:niebla": 0,
+        "capa:polvo": 0,
+        "capa:luci": 0
+      },
+      "particulas": {
+        "estrellas": {
+          "total": 26,
+          "visibles": 0,
+          "animando": 0,
+          "opCapa": 0
+        },
+        "gotas": {
+          "total": 30,
+          "visibles": 0,
+          "animando": 0,
+          "opCapa": 0
+        },
+        "bancos": {
+          "total": 6,
+          "visibles": 0,
+          "animando": 0,
+          "opCapa": 0
+        },
+        "jirones": {
+          "total": 4,
+          "visibles": 0,
+          "animando": 0,
+          "opCapa": 0
+        },
+        "motas": {
+          "total": 16,
+          "visibles": 0,
+          "animando": 0,
+          "opCapa": 0
+        },
+        "luciernagas": {
+          "total": 11,
+          "visibles": 0,
+          "animando": 0,
+          "opCapa": 0
+        },
+        "rayos": {
+          "total": 6,
+          "visibles": 0,
+          "animando": 0,
+          "opCapa": 0
+        }
+      },
+      "animCorriendo": 22,
+      "animVivasVisibles": 22,
+      "nodosEscena": 204
+    },
+    {
+      "clima": "nublado",
+      "luz": "dia",
+      "fps": null,
+      "contrastes": null,
+      "todoTexto": null,
+      "enso": null,
+      "capas": {
+        "cielo:soleado": 0,
+        "cielo:lluvia": 0,
+        "cielo:niebla": 0,
+        "cielo:dorada": 0,
+        "cielo:noche": 0,
+        "cielo:nublado": 1,
+        "grade:soleado": 0,
+        "grade:lluvia": 0,
+        "grade:niebla": 0,
+        "grade:dorada": 0,
+        "grade:noche": 0,
+        "grade:nublado": 1,
+        "astro": 0,
+        "rayos": 0,
+        "bruma": 0.7,
+        "laderaLuz": 0,
+        "vineta": 0.34,
+        "scrimAlto": 1,
+        "scrimBajo": 0.8,
+        "jironUI": 0,
+        "capa:estrellas": 0,
+        "capa:lluvia": 0,
+        "capa:niebla": 0,
+        "capa:polvo": 0,
+        "capa:luci": 0
+      },
+      "particulas": {
+        "estrellas": {
+          "total": 26,
+          "visibles": 0,
+          "animando": 0,
+          "opCapa": 0
+        },
+        "gotas": {
+          "total": 30,
+          "visibles": 0,
+          "animando": 0,
+          "opCapa": 0
+        },
+        "bancos": {
+          "total": 6,
+          "visibles": 0,
+          "animando": 0,
+          "opCapa": 0
+        },
+        "jirones": {
+          "total": 4,
+          "visibles": 0,
+          "animando": 0,
+          "opCapa": 0
+        },
+        "motas": {
+          "total": 16,
+          "visibles": 0,
+          "animando": 0,
+          "opCapa": 0
+        },
+        "luciernagas": {
+          "total": 11,
+          "visibles": 0,
+          "animando": 0,
+          "opCapa": 0
+        },
+        "rayos": {
+          "total": 6,
+          "visibles": 0,
+          "animando": 0,
+          "opCapa": 0
+        }
+      },
+      "animCorriendo": 22,
+      "animVivasVisibles": 22,
+      "nodosEscena": 204
+    },
+    {
+      "clima": "nublado",
+      "luz": "atardecer",
+      "fps": null,
+      "contrastes": null,
+      "todoTexto": null,
+      "enso": null,
+      "capas": {
+        "cielo:soleado": 0,
+        "cielo:lluvia": 0,
+        "cielo:niebla": 0,
+        "cielo:dorada": 0,
+        "cielo:noche": 0,
+        "cielo:nublado": 1,
+        "grade:soleado": 0,
+        "grade:lluvia": 0,
+        "grade:niebla": 0,
+        "grade:dorada": 0.45,
+        "grade:noche": 0,
+        "grade:nublado": 1,
+        "astro": 0,
+        "rayos": 0,
+        "bruma": 0.7,
+        "laderaLuz": 0,
+        "vineta": 0.34,
+        "scrimAlto": 1,
+        "scrimBajo": 0.8,
+        "jironUI": 0,
+        "capa:estrellas": 0,
+        "capa:lluvia": 0,
+        "capa:niebla": 0,
+        "capa:polvo": 0,
+        "capa:luci": 0
+      },
+      "particulas": {
+        "estrellas": {
+          "total": 26,
+          "visibles": 0,
+          "animando": 0,
+          "opCapa": 0
+        },
+        "gotas": {
+          "total": 30,
+          "visibles": 0,
+          "animando": 0,
+          "opCapa": 0
+        },
+        "bancos": {
+          "total": 6,
+          "visibles": 0,
+          "animando": 0,
+          "opCapa": 0
+        },
+        "jirones": {
+          "total": 4,
+          "visibles": 0,
+          "animando": 0,
+          "opCapa": 0
+        },
+        "motas": {
+          "total": 16,
+          "visibles": 0,
+          "animando": 0,
+          "opCapa": 0
+        },
+        "luciernagas": {
+          "total": 11,
+          "visibles": 0,
+          "animando": 0,
+          "opCapa": 0
+        },
+        "rayos": {
+          "total": 6,
+          "visibles": 0,
+          "animando": 0,
+          "opCapa": 0
+        }
+      },
+      "animCorriendo": 22,
+      "animVivasVisibles": 22,
+      "nodosEscena": 204
+    },
+    {
+      "clima": "nublado",
+      "luz": "noche",
+      "fps": null,
+      "contrastes": null,
+      "todoTexto": null,
+      "enso": null,
+      "capas": {
+        "cielo:soleado": 0,
+        "cielo:lluvia": 0,
+        "cielo:niebla": 0,
+        "cielo:dorada": 0,
+        "cielo:noche": 1,
+        "cielo:nublado": 0,
+        "grade:soleado": 0,
+        "grade:lluvia": 0,
+        "grade:niebla": 0,
+        "grade:dorada": 0,
+        "grade:noche": 1,
+        "grade:nublado": 1,
+        "astro": 0,
+        "rayos": 0,
+        "bruma": 0.7,
+        "laderaLuz": 0,
+        "vineta": 0.34,
+        "scrimAlto": 1,
+        "scrimBajo": 0.8,
+        "jironUI": 0,
+        "capa:estrellas": 0,
+        "capa:lluvia": 0,
+        "capa:niebla": 0,
+        "capa:polvo": 0,
+        "capa:luci": 0.4
+      },
+      "particulas": {
+        "estrellas": {
+          "total": 26,
+          "visibles": 0,
+          "animando": 0,
+          "opCapa": 0
+        },
+        "gotas": {
+          "total": 30,
+          "visibles": 0,
+          "animando": 0,
+          "opCapa": 0
+        },
+        "bancos": {
+          "total": 6,
+          "visibles": 0,
+          "animando": 0,
+          "opCapa": 0
+        },
+        "jirones": {
+          "total": 4,
+          "visibles": 0,
+          "animando": 0,
+          "opCapa": 0
+        },
+        "motas": {
+          "total": 16,
+          "visibles": 0,
+          "animando": 0,
+          "opCapa": 0
+        },
+        "luciernagas": {
+          "total": 11,
+          "visibles": 11,
+          "animando": 22,
+          "opCapa": 0.4
+        },
+        "rayos": {
+          "total": 6,
+          "visibles": 0,
+          "animando": 0,
+          "opCapa": 0
+        }
+      },
+      "animCorriendo": 44,
+      "animVivasVisibles": 42,
+      "nodosEscena": 204
+    },
+    {
+      "clima": "lluvia",
+      "luz": "amanecer",
+      "fps": null,
+      "contrastes": null,
+      "todoTexto": null,
+      "enso": null,
+      "capas": {
+        "cielo:soleado": 0,
+        "cielo:lluvia": 1,
+        "cielo:niebla": 0,
+        "cielo:dorada": 0,
+        "cielo:noche": 0,
+        "cielo:nublado": 0,
+        "grade:soleado": 0,
+        "grade:lluvia": 1,
+        "grade:niebla": 0,
+        "grade:dorada": 0,
+        "grade:noche": 0,
+        "grade:nublado": 0,
+        "astro": 0.12,
+        "rayos": 0,
+        "bruma": 0.55,
+        "laderaLuz": 0,
+        "vineta": 0.34,
+        "scrimAlto": 1,
+        "scrimBajo": 0.8,
+        "jironUI": 0,
+        "capa:estrellas": 0,
+        "capa:lluvia": 1,
+        "capa:niebla": 0.3,
+        "capa:polvo": 0,
+        "capa:luci": 0
+      },
+      "particulas": {
+        "estrellas": {
+          "total": 26,
+          "visibles": 0,
+          "animando": 0,
+          "opCapa": 0
+        },
+        "gotas": {
+          "total": 30,
+          "visibles": 30,
+          "animando": 30,
+          "opCapa": 1
+        },
+        "bancos": {
+          "total": 6,
+          "visibles": 6,
+          "animando": 6,
+          "opCapa": 0.3
+        },
+        "jirones": {
+          "total": 4,
+          "visibles": 4,
+          "animando": 0,
+          "opCapa": 0.3
+        },
+        "motas": {
+          "total": 16,
+          "visibles": 0,
+          "animando": 0,
+          "opCapa": 0
+        },
+        "luciernagas": {
+          "total": 11,
+          "visibles": 0,
+          "animando": 0,
+          "opCapa": 0
+        },
+        "rayos": {
+          "total": 6,
+          "visibles": 0,
+          "animando": 0,
+          "opCapa": 0
+        }
+      },
+      "animCorriendo": 58,
+      "animVivasVisibles": 58,
+      "nodosEscena": 204
+    },
+    {
+      "clima": "lluvia",
+      "luz": "dia",
+      "fps": null,
+      "contrastes": null,
+      "todoTexto": null,
+      "enso": null,
+      "capas": {
+        "cielo:soleado": 0,
+        "cielo:lluvia": 1,
+        "cielo:niebla": 0,
+        "cielo:dorada": 0,
+        "cielo:noche": 0,
+        "cielo:nublado": 0,
+        "grade:soleado": 0,
+        "grade:lluvia": 1,
+        "grade:niebla": 0,
+        "grade:dorada": 0,
+        "grade:noche": 0,
+        "grade:nublado": 0,
+        "astro": 0.12,
+        "rayos": 0,
+        "bruma": 0.55,
+        "laderaLuz": 0,
+        "vineta": 0.34,
+        "scrimAlto": 1,
+        "scrimBajo": 0.8,
+        "jironUI": 0,
+        "capa:estrellas": 0,
+        "capa:lluvia": 1,
+        "capa:niebla": 0.3,
+        "capa:polvo": 0,
+        "capa:luci": 0
+      },
+      "particulas": {
+        "estrellas": {
+          "total": 26,
+          "visibles": 0,
+          "animando": 0,
+          "opCapa": 0
+        },
+        "gotas": {
+          "total": 30,
+          "visibles": 30,
+          "animando": 30,
+          "opCapa": 1
+        },
+        "bancos": {
+          "total": 6,
+          "visibles": 6,
+          "animando": 6,
+          "opCapa": 0.3
+        },
+        "jirones": {
+          "total": 4,
+          "visibles": 4,
+          "animando": 0,
+          "opCapa": 0.3
+        },
+        "motas": {
+          "total": 16,
+          "visibles": 0,
+          "animando": 0,
+          "opCapa": 0
+        },
+        "luciernagas": {
+          "total": 11,
+          "visibles": 0,
+          "animando": 0,
+          "opCapa": 0
+        },
+        "rayos": {
+          "total": 6,
+          "visibles": 0,
+          "animando": 0,
+          "opCapa": 0
+        }
+      },
+      "animCorriendo": 58,
+      "animVivasVisibles": 58,
+      "nodosEscena": 204
+    },
+    {
+      "clima": "lluvia",
+      "luz": "atardecer",
+      "fps": null,
+      "contrastes": null,
+      "todoTexto": null,
+      "enso": null,
+      "capas": {
+        "cielo:soleado": 0,
+        "cielo:lluvia": 1,
+        "cielo:niebla": 0,
+        "cielo:dorada": 0,
+        "cielo:noche": 0,
+        "cielo:nublado": 0,
+        "grade:soleado": 0,
+        "grade:lluvia": 1,
+        "grade:niebla": 0,
+        "grade:dorada": 0,
+        "grade:noche": 0,
+        "grade:nublado": 0,
+        "astro": 0.12,
+        "rayos": 0,
+        "bruma": 0.55,
+        "laderaLuz": 0,
+        "vineta": 0.34,
+        "scrimAlto": 1,
+        "scrimBajo": 0.8,
+        "jironUI": 0,
+        "capa:estrellas": 0,
+        "capa:lluvia": 1,
+        "capa:niebla": 0.3,
+        "capa:polvo": 0,
+        "capa:luci": 0
+      },
+      "particulas": {
+        "estrellas": {
+          "total": 26,
+          "visibles": 0,
+          "animando": 0,
+          "opCapa": 0
+        },
+        "gotas": {
+          "total": 30,
+          "visibles": 30,
+          "animando": 30,
+          "opCapa": 1
+        },
+        "bancos": {
+          "total": 6,
+          "visibles": 6,
+          "animando": 6,
+          "opCapa": 0.3
+        },
+        "jirones": {
+          "total": 4,
+          "visibles": 4,
+          "animando": 0,
+          "opCapa": 0.3
+        },
+        "motas": {
+          "total": 16,
+          "visibles": 0,
+          "animando": 0,
+          "opCapa": 0
+        },
+        "luciernagas": {
+          "total": 11,
+          "visibles": 0,
+          "animando": 0,
+          "opCapa": 0
+        },
+        "rayos": {
+          "total": 6,
+          "visibles": 0,
+          "animando": 0,
+          "opCapa": 0
+        }
+      },
+      "animCorriendo": 58,
+      "animVivasVisibles": 58,
+      "nodosEscena": 204
+    },
+    {
+      "clima": "lluvia",
+      "luz": "noche",
+      "fps": null,
+      "contrastes": null,
+      "todoTexto": null,
+      "enso": null,
+      "capas": {
+        "cielo:soleado": 0,
+        "cielo:lluvia": 1,
+        "cielo:niebla": 0,
+        "cielo:dorada": 0,
+        "cielo:noche": 0,
+        "cielo:nublado": 0,
+        "grade:soleado": 0,
+        "grade:lluvia": 1,
+        "grade:niebla": 0,
+        "grade:dorada": 0,
+        "grade:noche": 1,
+        "grade:nublado": 0,
+        "astro": 0.12,
+        "rayos": 0,
+        "bruma": 0.55,
+        "laderaLuz": 0,
+        "vineta": 0.34,
+        "scrimAlto": 1,
+        "scrimBajo": 0.8,
+        "jironUI": 0,
+        "capa:estrellas": 0,
+        "capa:lluvia": 1,
+        "capa:niebla": 0.3,
+        "capa:polvo": 0,
+        "capa:luci": 0
+      },
+      "particulas": {
+        "estrellas": {
+          "total": 26,
+          "visibles": 0,
+          "animando": 0,
+          "opCapa": 0
+        },
+        "gotas": {
+          "total": 30,
+          "visibles": 30,
+          "animando": 30,
+          "opCapa": 1
+        },
+        "bancos": {
+          "total": 6,
+          "visibles": 6,
+          "animando": 6,
+          "opCapa": 0.3
+        },
+        "jirones": {
+          "total": 4,
+          "visibles": 4,
+          "animando": 0,
+          "opCapa": 0.3
+        },
+        "motas": {
+          "total": 16,
+          "visibles": 0,
+          "animando": 0,
+          "opCapa": 0
+        },
+        "luciernagas": {
+          "total": 11,
+          "visibles": 0,
+          "animando": 0,
+          "opCapa": 0
+        },
+        "rayos": {
+          "total": 6,
+          "visibles": 0,
+          "animando": 0,
+          "opCapa": 0
+        }
+      },
+      "animCorriendo": 58,
+      "animVivasVisibles": 58,
+      "nodosEscena": 204
+    },
+    {
+      "clima": "niebla",
+      "luz": "amanecer",
+      "fps": null,
+      "contrastes": null,
+      "todoTexto": null,
+      "enso": null,
+      "capas": {
+        "cielo:soleado": 0,
+        "cielo:lluvia": 0,
+        "cielo:niebla": 1,
+        "cielo:dorada": 0,
+        "cielo:noche": 0,
+        "cielo:nublado": 0,
+        "grade:soleado": 0,
+        "grade:lluvia": 0,
+        "grade:niebla": 1,
+        "grade:dorada": 0,
+        "grade:noche": 0,
+        "grade:nublado": 0,
+        "astro": 0.25,
+        "rayos": 0,
+        "bruma": 0.92,
+        "laderaLuz": 0,
+        "vineta": 0.16,
+        "scrimAlto": 1,
+        "scrimBajo": 0.8,
+        "jironUI": 0.55,
+        "capa:estrellas": 0,
+        "capa:lluvia": 0,
+        "capa:niebla": 1,
+        "capa:polvo": 0,
+        "capa:luci": 0
+      },
+      "particulas": {
+        "estrellas": {
+          "total": 26,
+          "visibles": 0,
+          "animando": 0,
+          "opCapa": 0
+        },
+        "gotas": {
+          "total": 30,
+          "visibles": 0,
+          "animando": 0,
+          "opCapa": 0
+        },
+        "bancos": {
+          "total": 6,
+          "visibles": 6,
+          "animando": 6,
+          "opCapa": 1
+        },
+        "jirones": {
+          "total": 4,
+          "visibles": 4,
+          "animando": 4,
+          "opCapa": 1
+        },
+        "motas": {
+          "total": 16,
+          "visibles": 0,
+          "animando": 0,
+          "opCapa": 0
+        },
+        "luciernagas": {
+          "total": 11,
+          "visibles": 0,
+          "animando": 0,
+          "opCapa": 0
+        },
+        "rayos": {
+          "total": 6,
+          "visibles": 0,
+          "animando": 0,
+          "opCapa": 0
+        }
+      },
+      "animCorriendo": 34,
+      "animVivasVisibles": 34,
+      "nodosEscena": 204
+    },
+    {
+      "clima": "niebla",
+      "luz": "dia",
+      "fps": null,
+      "contrastes": null,
+      "todoTexto": null,
+      "enso": null,
+      "capas": {
+        "cielo:soleado": 0,
+        "cielo:lluvia": 0,
+        "cielo:niebla": 1,
+        "cielo:dorada": 0,
+        "cielo:noche": 0,
+        "cielo:nublado": 0,
+        "grade:soleado": 0,
+        "grade:lluvia": 0,
+        "grade:niebla": 1,
+        "grade:dorada": 0,
+        "grade:noche": 0,
+        "grade:nublado": 0,
+        "astro": 0.25,
+        "rayos": 0,
+        "bruma": 0.92,
+        "laderaLuz": 0,
+        "vineta": 0.16,
+        "scrimAlto": 1,
+        "scrimBajo": 0.8,
+        "jironUI": 0.55,
+        "capa:estrellas": 0,
+        "capa:lluvia": 0,
+        "capa:niebla": 1,
+        "capa:polvo": 0,
+        "capa:luci": 0
+      },
+      "particulas": {
+        "estrellas": {
+          "total": 26,
+          "visibles": 0,
+          "animando": 0,
+          "opCapa": 0
+        },
+        "gotas": {
+          "total": 30,
+          "visibles": 0,
+          "animando": 0,
+          "opCapa": 0
+        },
+        "bancos": {
+          "total": 6,
+          "visibles": 6,
+          "animando": 6,
+          "opCapa": 1
+        },
+        "jirones": {
+          "total": 4,
+          "visibles": 4,
+          "animando": 4,
+          "opCapa": 1
+        },
+        "motas": {
+          "total": 16,
+          "visibles": 0,
+          "animando": 0,
+          "opCapa": 0
+        },
+        "luciernagas": {
+          "total": 11,
+          "visibles": 0,
+          "animando": 0,
+          "opCapa": 0
+        },
+        "rayos": {
+          "total": 6,
+          "visibles": 0,
+          "animando": 0,
+          "opCapa": 0
+        }
+      },
+      "animCorriendo": 33,
+      "animVivasVisibles": 32,
+      "nodosEscena": 204
+    },
+    {
+      "clima": "niebla",
+      "luz": "atardecer",
+      "fps": null,
+      "contrastes": null,
+      "todoTexto": null,
+      "enso": null,
+      "capas": {
+        "cielo:soleado": 0,
+        "cielo:lluvia": 0,
+        "cielo:niebla": 1,
+        "cielo:dorada": 0,
+        "cielo:noche": 0,
+        "cielo:nublado": 0,
+        "grade:soleado": 0,
+        "grade:lluvia": 0,
+        "grade:niebla": 1,
+        "grade:dorada": 0,
+        "grade:noche": 0,
+        "grade:nublado": 0,
+        "astro": 0.25,
+        "rayos": 0,
+        "bruma": 0.92,
+        "laderaLuz": 0,
+        "vineta": 0.16,
+        "scrimAlto": 1,
+        "scrimBajo": 0.8,
+        "jironUI": 0.55,
+        "capa:estrellas": 0,
+        "capa:lluvia": 0,
+        "capa:niebla": 1,
+        "capa:polvo": 0,
+        "capa:luci": 0
+      },
+      "particulas": {
+        "estrellas": {
+          "total": 26,
+          "visibles": 0,
+          "animando": 0,
+          "opCapa": 0
+        },
+        "gotas": {
+          "total": 30,
+          "visibles": 0,
+          "animando": 0,
+          "opCapa": 0
+        },
+        "bancos": {
+          "total": 6,
+          "visibles": 6,
+          "animando": 6,
+          "opCapa": 1
+        },
+        "jirones": {
+          "total": 4,
+          "visibles": 4,
+          "animando": 4,
+          "opCapa": 1
+        },
+        "motas": {
+          "total": 16,
+          "visibles": 0,
+          "animando": 0,
+          "opCapa": 0
+        },
+        "luciernagas": {
+          "total": 11,
+          "visibles": 0,
+          "animando": 0,
+          "opCapa": 0
+        },
+        "rayos": {
+          "total": 6,
+          "visibles": 0,
+          "animando": 0,
+          "opCapa": 0
+        }
+      },
+      "animCorriendo": 33,
+      "animVivasVisibles": 33,
+      "nodosEscena": 204
+    },
+    {
+      "clima": "niebla",
+      "luz": "noche",
+      "fps": null,
+      "contrastes": null,
+      "todoTexto": null,
+      "enso": null,
+      "capas": {
+        "cielo:soleado": 0,
+        "cielo:lluvia": 0,
+        "cielo:niebla": 1,
+        "cielo:dorada": 0,
+        "cielo:noche": 0,
+        "cielo:nublado": 0,
+        "grade:soleado": 0,
+        "grade:lluvia": 0,
+        "grade:niebla": 1,
+        "grade:dorada": 0,
+        "grade:noche": 1,
+        "grade:nublado": 0,
+        "astro": 0.25,
+        "rayos": 0,
+        "bruma": 0.92,
+        "laderaLuz": 0,
+        "vineta": 0.16,
+        "scrimAlto": 1,
+        "scrimBajo": 0.8,
+        "jironUI": 0.55,
+        "capa:estrellas": 0,
+        "capa:lluvia": 0,
+        "capa:niebla": 1,
+        "capa:polvo": 0,
+        "capa:luci": 0
+      },
+      "particulas": {
+        "estrellas": {
+          "total": 26,
+          "visibles": 0,
+          "animando": 0,
+          "opCapa": 0
+        },
+        "gotas": {
+          "total": 30,
+          "visibles": 0,
+          "animando": 0,
+          "opCapa": 0
+        },
+        "bancos": {
+          "total": 6,
+          "visibles": 6,
+          "animando": 6,
+          "opCapa": 1
+        },
+        "jirones": {
+          "total": 4,
+          "visibles": 4,
+          "animando": 4,
+          "opCapa": 1
+        },
+        "motas": {
+          "total": 16,
+          "visibles": 0,
+          "animando": 0,
+          "opCapa": 0
+        },
+        "luciernagas": {
+          "total": 11,
+          "visibles": 0,
+          "animando": 0,
+          "opCapa": 0
+        },
+        "rayos": {
+          "total": 6,
+          "visibles": 0,
+          "animando": 0,
+          "opCapa": 0
+        }
+      },
+      "animCorriendo": 33,
+      "animVivasVisibles": 33,
+      "nodosEscena": 204
+    }
+  ]
+}

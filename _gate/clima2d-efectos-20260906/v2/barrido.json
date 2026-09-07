@@ -1,0 +1,2317 @@
+{
+  "fecha": "2026-09-07T02:59:25.391Z",
+  "pageErrors": [],
+  "consoleErrors": [
+    "Failed to load resource: the server responded with a status of 403 (Forbidden)",
+    "wasm streaming compile failed: TypeError: Failed to execute 'compile' on 'WebAssembly': HTTP status code is not ok",
+    "falling back to ArrayBuffer instantiation",
+    "Failed to load resource: the server responded with a status of 403 (Forbidden)",
+    "failed to asynchronously prepare wasm: both async and sync fetching of the wasm failed",
+    "Aborted(both async and sync fetching of the wasm failed)",
+    "Exception loading sqlite3 module: RuntimeError: Aborted(both async and sync fetching of the wasm failed). Build with -sASSERTIONS for more info.\n    at abort (http://localhost:5391/node_modules/.vite/",
+    "[SQLite WASM] Failed to initialize catalog db: RuntimeError: Aborted(both async and sync fetching of the wasm failed). Build with -sASSERTIONS for more info.\n    at abort (http://localhost:5391/node_m",
+    "Failed to load resource: the server responded with a status of 403 (Forbidden)",
+    "wasm streaming compile failed: TypeError: Failed to execute 'compile' on 'WebAssembly': HTTP status code is not ok",
+    "falling back to ArrayBuffer instantiation",
+    "Failed to load resource: the server responded with a status of 403 (Forbidden)",
+    "failed to asynchronously prepare wasm: both async and sync fetching of the wasm failed",
+    "Aborted(both async and sync fetching of the wasm failed)",
+    "Exception loading sqlite3 module: RuntimeError: Aborted(both async and sync fetching of the wasm failed). Build with -sASSERTIONS for more info.\n    at abort (http://localhost:5391/node_modules/.vite/",
+    "[SQLite WASM] Failed to initialize catalog db: RuntimeError: Aborted(both async and sync fetching of the wasm failed). Build with -sASSERTIONS for more info.\n    at abort (http://localhost:5391/node_m",
+    "Failed to load resource: the server responded with a status of 404 (Not Found)",
+    "Failed to load resource: the server responded with a status of 403 (Forbidden)",
+    "wasm streaming compile failed: TypeError: Failed to execute 'compile' on 'WebAssembly': HTTP status code is not ok",
+    "falling back to ArrayBuffer instantiation",
+    "Failed to load resource: the server responded with a status of 403 (Forbidden)",
+    "failed to asynchronously prepare wasm: both async and sync fetching of the wasm failed",
+    "Aborted(both async and sync fetching of the wasm failed)",
+    "Exception loading sqlite3 module: RuntimeError: Aborted(both async and sync fetching of the wasm failed). Build with -sASSERTIONS for more info.\n    at abort (http://localhost:5391/node_modules/.vite/",
+    "[SQLite WASM] Failed to initialize catalog db: RuntimeError: Aborted(both async and sync fetching of the wasm failed). Build with -sASSERTIONS for more info.\n    at abort (http://localhost:5391/node_m",
+    "Failed to load resource: the server responded with a status of 403 (Forbidden)",
+    "wasm streaming compile failed: TypeError: Failed to execute 'compile' on 'WebAssembly': HTTP status code is not ok",
+    "falling back to ArrayBuffer instantiation",
+    "Failed to load resource: the server responded with a status of 403 (Forbidden)",
+    "failed to asynchronously prepare wasm: both async and sync fetching of the wasm failed",
+    "Aborted(both async and sync fetching of the wasm failed)",
+    "Exception loading sqlite3 module: RuntimeError: Aborted(both async and sync fetching of the wasm failed). Build with -sASSERTIONS for more info.\n    at abort (http://localhost:5391/node_modules/.vite/",
+    "[SQLite WASM] Failed to initialize catalog db: RuntimeError: Aborted(both async and sync fetching of the wasm failed). Build with -sASSERTIONS for more info.\n    at abort (http://localhost:5391/node_m",
+    "Failed to load resource: the server responded with a status of 404 (Not Found)",
+    "Failed to load resource: the server responded with a status of 404 (Not Found)",
+    "Failed to load resource: the server responded with a status of 404 (Not Found)",
+    "Failed to load resource: the server responded with a status of 404 (Not Found)"
+  ],
+  "resultados": [
+    {
+      "clima": "despejado",
+      "luz": "amanecer",
+      "fps": 60.2,
+      "contrastes": [
+        {
+          "id": "cabecera-lugar",
+          "texto": "Paramo alto · Guatavita, Cundinamarca",
+          "min": 11.62,
+          "p05": 11.84
+        },
+        {
+          "id": "cabecera-altura",
+          "texto": "2900 m s. n. m. · Piso frío",
+          "min": 6.19,
+          "p05": 11.02
+        },
+        {
+          "id": "cabecera-saludo",
+          "texto": "Buenas noches",
+          "min": 9.48,
+          "p05": 9.84
+        },
+        {
+          "id": "cabecera-condicion",
+          "texto": "Nublado · 9:57 p. m.",
+          "min": 7.25,
+          "p05": 8.98
+        },
+        {
+          "id": "cifra-grande",
+          "texto": "10°C",
+          "min": 4.74,
+          "p05": 6.41
+        },
+        {
+          "id": "tab-hoy",
+          "texto": "Hoy",
+          "min": 9.47,
+          "p05": 9.47
+        },
+        {
+          "id": "tab-semana",
+          "texto": "7–16 días",
+          "min": 10.46,
+          "p05": 10.46
+        },
+        {
+          "id": "tab-estacional",
+          "texto": "El Niño",
+          "min": 1,
+          "p05": 1.08
+        },
+        {
+          "id": "CONTROL-21",
+          "texto": "CONTROL",
+          "min": 21,
+          "p05": 21
+        },
+        {
+          "id": "CONTROL-4.54",
+          "texto": "CONTROL",
+          "min": 4.54,
+          "p05": 4.54
+        }
+      ],
+      "enso": null,
+      "capas": {
+        "cielo:soleado": 0,
+        "cielo:lluvia": 0,
+        "cielo:niebla": 0,
+        "cielo:dorada": 1,
+        "cielo:noche": 0,
+        "cielo:nublado": 0,
+        "grade:soleado": 0,
+        "grade:lluvia": 0,
+        "grade:niebla": 0,
+        "grade:dorada": 1,
+        "grade:noche": 0,
+        "grade:nublado": 0,
+        "astro": 1,
+        "rayos": 0.75,
+        "bruma": 0.4,
+        "laderaLuz": 0.8,
+        "vineta": 0.34,
+        "scrimAlto": 1,
+        "scrimBajo": 0.55,
+        "jironUI": 0,
+        "capa:estrellas": 0.62,
+        "capa:lluvia": 0,
+        "capa:niebla": 0,
+        "capa:polvo": 1,
+        "capa:luci": 0
+      },
+      "particulas": {
+        "estrellas": {
+          "total": 26,
+          "visibles": 7,
+          "animando": 7,
+          "opCapa": 0.62
+        },
+        "gotas": {
+          "total": 30,
+          "visibles": 0,
+          "animando": 0,
+          "opCapa": 0
+        },
+        "bancos": {
+          "total": 9,
+          "visibles": 0,
+          "animando": 0,
+          "opCapa": 0
+        },
+        "jirones": {
+          "total": 7,
+          "visibles": 0,
+          "animando": 0,
+          "opCapa": 0
+        },
+        "motas": {
+          "total": 16,
+          "visibles": 16,
+          "animando": 16,
+          "opCapa": 1
+        },
+        "luciernagas": {
+          "total": 11,
+          "visibles": 0,
+          "animando": 0,
+          "opCapa": 0
+        },
+        "rayos": {
+          "total": 6,
+          "visibles": 6,
+          "animando": 1,
+          "opCapa": 0.75
+        }
+      },
+      "animCorriendo": 46,
+      "animVivasVisibles": 46,
+      "nodosEscena": 210
+    },
+    {
+      "clima": "despejado",
+      "luz": "dia",
+      "fps": 59.4,
+      "contrastes": [
+        {
+          "id": "cabecera-lugar",
+          "texto": "Paramo alto · Guatavita, Cundinamarca",
+          "min": 3.12,
+          "p05": 3.31
+        },
+        {
+          "id": "cabecera-altura",
+          "texto": "2900 m s. n. m. · Piso frío",
+          "min": 4.01,
+          "p05": 4.47
+        },
+        {
+          "id": "cabecera-saludo",
+          "texto": "Buenas noches",
+          "min": 3.4,
+          "p05": 3.63
+        },
+        {
+          "id": "cabecera-condicion",
+          "texto": "Nublado · 9:57 p. m.",
+          "min": 3.25,
+          "p05": 3.39
+        },
+        {
+          "id": "cifra-grande",
+          "texto": "10°C",
+          "min": 2.23,
+          "p05": 2.34
+        },
+        {
+          "id": "tab-hoy",
+          "texto": "Hoy",
+          "min": 8.51,
+          "p05": 8.51
+        },
+        {
+          "id": "tab-semana",
+          "texto": "7–16 días",
+          "min": 9.42,
+          "p05": 9.43
+        },
+        {
+          "id": "tab-estacional",
+          "texto": "El Niño",
+          "min": 9.41,
+          "p05": 9.41
+        },
+        {
+          "id": "CONTROL-21",
+          "texto": "CONTROL",
+          "min": 21,
+          "p05": 21
+        },
+        {
+          "id": "CONTROL-4.54",
+          "texto": "CONTROL",
+          "min": 4.54,
+          "p05": 4.54
+        }
+      ],
+      "enso": null,
+      "capas": {
+        "cielo:soleado": 1,
+        "cielo:lluvia": 0,
+        "cielo:niebla": 0,
+        "cielo:dorada": 0,
+        "cielo:noche": 0,
+        "cielo:nublado": 0,
+        "grade:soleado": 1,
+        "grade:lluvia": 0,
+        "grade:niebla": 0,
+        "grade:dorada": 0,
+        "grade:noche": 0,
+        "grade:nublado": 0,
+        "astro": 1,
+        "rayos": 0.4,
+        "bruma": 0.28,
+        "laderaLuz": 0.45,
+        "vineta": 0.2,
+        "scrimAlto": 1,
+        "scrimBajo": 0.55,
+        "jironUI": 0,
+        "capa:estrellas": 0,
+        "capa:lluvia": 0,
+        "capa:niebla": 0,
+        "capa:polvo": 0.35,
+        "capa:luci": 0
+      },
+      "particulas": {
+        "estrellas": {
+          "total": 26,
+          "visibles": 0,
+          "animando": 0,
+          "opCapa": 0
+        },
+        "gotas": {
+          "total": 30,
+          "visibles": 0,
+          "animando": 0,
+          "opCapa": 0
+        },
+        "bancos": {
+          "total": 9,
+          "visibles": 0,
+          "animando": 0,
+          "opCapa": 0
+        },
+        "jirones": {
+          "total": 7,
+          "visibles": 0,
+          "animando": 0,
+          "opCapa": 0
+        },
+        "motas": {
+          "total": 16,
+          "visibles": 16,
+          "animando": 16,
+          "opCapa": 0.35
+        },
+        "luciernagas": {
+          "total": 11,
+          "visibles": 0,
+          "animando": 0,
+          "opCapa": 0
+        },
+        "rayos": {
+          "total": 6,
+          "visibles": 6,
+          "animando": 1,
+          "opCapa": 0.4
+        }
+      },
+      "animCorriendo": 39,
+      "animVivasVisibles": 39,
+      "nodosEscena": 210
+    },
+    {
+      "clima": "despejado",
+      "luz": "atardecer",
+      "fps": 60,
+      "contrastes": [
+        {
+          "id": "cabecera-lugar",
+          "texto": "Paramo alto · Guatavita, Cundinamarca",
+          "min": 11.62,
+          "p05": 11.84
+        },
+        {
+          "id": "cabecera-altura",
+          "texto": "2900 m s. n. m. · Piso frío",
+          "min": 8.09,
+          "p05": 11.02
+        },
+        {
+          "id": "cabecera-saludo",
+          "texto": "Buenas noches",
+          "min": 9.48,
+          "p05": 9.84
+        },
+        {
+          "id": "cabecera-condicion",
+          "texto": "Nublado · 9:57 p. m.",
+          "min": 8.01,
+          "p05": 8.98
+        },
+        {
+          "id": "cifra-grande",
+          "texto": "10°C",
+          "min": 3.86,
+          "p05": 6.41
+        },
+        {
+          "id": "tab-hoy",
+          "texto": "Hoy",
+          "min": 9.47,
+          "p05": 9.47
+        },
+        {
+          "id": "tab-semana",
+          "texto": "7–16 días",
+          "min": 10.46,
+          "p05": 10.46
+        },
+        {
+          "id": "tab-estacional",
+          "texto": "El Niño",
+          "min": 10.13,
+          "p05": 10.14
+        },
+        {
+          "id": "CONTROL-21",
+          "texto": "CONTROL",
+          "min": 21,
+          "p05": 21
+        },
+        {
+          "id": "CONTROL-4.54",
+          "texto": "CONTROL",
+          "min": 4.54,
+          "p05": 4.54
+        }
+      ],
+      "enso": null,
+      "capas": {
+        "cielo:soleado": 0,
+        "cielo:lluvia": 0,
+        "cielo:niebla": 0,
+        "cielo:dorada": 1,
+        "cielo:noche": 0,
+        "cielo:nublado": 0,
+        "grade:soleado": 0,
+        "grade:lluvia": 0,
+        "grade:niebla": 0,
+        "grade:dorada": 1,
+        "grade:noche": 0,
+        "grade:nublado": 0,
+        "astro": 1,
+        "rayos": 0.75,
+        "bruma": 0.4,
+        "laderaLuz": 0.8,
+        "vineta": 0.34,
+        "scrimAlto": 1,
+        "scrimBajo": 0.55,
+        "jironUI": 0,
+        "capa:estrellas": 0.62,
+        "capa:lluvia": 0,
+        "capa:niebla": 0,
+        "capa:polvo": 1,
+        "capa:luci": 0.5
+      },
+      "particulas": {
+        "estrellas": {
+          "total": 26,
+          "visibles": 7,
+          "animando": 7,
+          "opCapa": 0.62
+        },
+        "gotas": {
+          "total": 30,
+          "visibles": 0,
+          "animando": 0,
+          "opCapa": 0
+        },
+        "bancos": {
+          "total": 9,
+          "visibles": 0,
+          "animando": 0,
+          "opCapa": 0
+        },
+        "jirones": {
+          "total": 7,
+          "visibles": 0,
+          "animando": 0,
+          "opCapa": 0
+        },
+        "motas": {
+          "total": 16,
+          "visibles": 16,
+          "animando": 16,
+          "opCapa": 1
+        },
+        "luciernagas": {
+          "total": 11,
+          "visibles": 11,
+          "animando": 22,
+          "opCapa": 0.5
+        },
+        "rayos": {
+          "total": 6,
+          "visibles": 6,
+          "animando": 1,
+          "opCapa": 0.75
+        }
+      },
+      "animCorriendo": 68,
+      "animVivasVisibles": 66,
+      "nodosEscena": 210
+    },
+    {
+      "clima": "despejado",
+      "luz": "noche",
+      "fps": 60.1,
+      "contrastes": [
+        {
+          "id": "cabecera-lugar",
+          "texto": "Paramo alto · Guatavita, Cundinamarca",
+          "min": 15.49,
+          "p05": 16.45
+        },
+        {
+          "id": "cabecera-altura",
+          "texto": "2900 m s. n. m. · Piso frío",
+          "min": 11.77,
+          "p05": 17.43
+        },
+        {
+          "id": "cabecera-saludo",
+          "texto": "Buenas noches",
+          "min": 17.3,
+          "p05": 17.43
+        },
+        {
+          "id": "cabecera-condicion",
+          "texto": "Nublado · 9:57 p. m.",
+          "min": 17.28,
+          "p05": 17.4
+        },
+        {
+          "id": "cifra-grande",
+          "texto": "10°C",
+          "min": 4.46,
+          "p05": 17.31
+        },
+        {
+          "id": "tab-hoy",
+          "texto": "Hoy",
+          "min": 10.99,
+          "p05": 10.99
+        },
+        {
+          "id": "tab-semana",
+          "texto": "7–16 días",
+          "min": 12.42,
+          "p05": 12.42
+        },
+        {
+          "id": "tab-estacional",
+          "texto": "El Niño",
+          "min": 12.13,
+          "p05": 12.32
+        },
+        {
+          "id": "CONTROL-21",
+          "texto": "CONTROL",
+          "min": 21,
+          "p05": 21
+        },
+        {
+          "id": "CONTROL-4.54",
+          "texto": "CONTROL",
+          "min": 4.54,
+          "p05": 4.54
+        }
+      ],
+      "enso": null,
+      "capas": {
+        "cielo:soleado": 0,
+        "cielo:lluvia": 0,
+        "cielo:niebla": 0,
+        "cielo:dorada": 0,
+        "cielo:noche": 1,
+        "cielo:nublado": 0,
+        "grade:soleado": 0,
+        "grade:lluvia": 0,
+        "grade:niebla": 0,
+        "grade:dorada": 0,
+        "grade:noche": 1,
+        "grade:nublado": 0,
+        "astro": 1,
+        "rayos": 0,
+        "bruma": 0.5,
+        "laderaLuz": 0.14,
+        "vineta": 0.5,
+        "scrimAlto": 1,
+        "scrimBajo": 0.55,
+        "jironUI": 0,
+        "capa:estrellas": 1,
+        "capa:lluvia": 0,
+        "capa:niebla": 0,
+        "capa:polvo": 0,
+        "capa:luci": 1
+      },
+      "particulas": {
+        "estrellas": {
+          "total": 26,
+          "visibles": 26,
+          "animando": 26,
+          "opCapa": 1
+        },
+        "gotas": {
+          "total": 30,
+          "visibles": 0,
+          "animando": 0,
+          "opCapa": 0
+        },
+        "bancos": {
+          "total": 9,
+          "visibles": 0,
+          "animando": 0,
+          "opCapa": 0
+        },
+        "jirones": {
+          "total": 7,
+          "visibles": 0,
+          "animando": 0,
+          "opCapa": 0
+        },
+        "motas": {
+          "total": 16,
+          "visibles": 0,
+          "animando": 0,
+          "opCapa": 0
+        },
+        "luciernagas": {
+          "total": 11,
+          "visibles": 11,
+          "animando": 22,
+          "opCapa": 1
+        },
+        "rayos": {
+          "total": 6,
+          "visibles": 0,
+          "animando": 0,
+          "opCapa": 0
+        }
+      },
+      "animCorriendo": 70,
+      "animVivasVisibles": 65,
+      "nodosEscena": 210
+    },
+    {
+      "clima": "nublado",
+      "luz": "amanecer",
+      "fps": 57.6,
+      "contrastes": [
+        {
+          "id": "cabecera-lugar",
+          "texto": "Paramo alto · Guatavita, Cundinamarca",
+          "min": 6.13,
+          "p05": 6.3
+        },
+        {
+          "id": "cabecera-altura",
+          "texto": "2900 m s. n. m. · Piso frío",
+          "min": 5.77,
+          "p05": 5.89
+        },
+        {
+          "id": "cabecera-saludo",
+          "texto": "Buenas noches",
+          "min": 4.93,
+          "p05": 5.09
+        },
+        {
+          "id": "cabecera-condicion",
+          "texto": "Nublado · 9:57 p. m.",
+          "min": 4.34,
+          "p05": 4.42
+        },
+        {
+          "id": "cifra-grande",
+          "texto": "10°C",
+          "min": 2.93,
+          "p05": 3.02
+        },
+        {
+          "id": "tab-hoy",
+          "texto": "Hoy",
+          "min": 8.86,
+          "p05": 8.97
+        },
+        {
+          "id": "tab-semana",
+          "texto": "7–16 días",
+          "min": 10.05,
+          "p05": 10.06
+        },
+        {
+          "id": "tab-estacional",
+          "texto": "El Niño",
+          "min": 10.07,
+          "p05": 10.09
+        },
+        {
+          "id": "CONTROL-21",
+          "texto": "CONTROL",
+          "min": 21,
+          "p05": 21
+        },
+        {
+          "id": "CONTROL-4.54",
+          "texto": "CONTROL",
+          "min": 4.54,
+          "p05": 4.54
+        }
+      ],
+      "enso": null,
+      "capas": {
+        "cielo:soleado": 0,
+        "cielo:lluvia": 0,
+        "cielo:niebla": 0,
+        "cielo:dorada": 0,
+        "cielo:noche": 0,
+        "cielo:nublado": 1,
+        "grade:soleado": 0,
+        "grade:lluvia": 0,
+        "grade:niebla": 0,
+        "grade:dorada": 0.6,
+        "grade:noche": 0,
+        "grade:nublado": 1,
+        "astro": 0.5,
+        "rayos": 0,
+        "bruma": 0.7,
+        "laderaLuz": 0,
+        "vineta": 0.34,
+        "scrimAlto": 1,
+        "scrimBajo": 0.55,
+        "jironUI": 0,
+        "capa:estrellas": 0,
+        "capa:lluvia": 0,
+        "capa:niebla": 0.72,
+        "capa:polvo": 0,
+        "capa:luci": 0
+      },
+      "particulas": {
+        "estrellas": {
+          "total": 26,
+          "visibles": 0,
+          "animando": 0,
+          "opCapa": 0
+        },
+        "gotas": {
+          "total": 30,
+          "visibles": 0,
+          "animando": 0,
+          "opCapa": 0
+        },
+        "bancos": {
+          "total": 9,
+          "visibles": 9,
+          "animando": 9,
+          "opCapa": 0.72
+        },
+        "jirones": {
+          "total": 7,
+          "visibles": 7,
+          "animando": 7,
+          "opCapa": 0.72
+        },
+        "motas": {
+          "total": 16,
+          "visibles": 0,
+          "animando": 0,
+          "opCapa": 0
+        },
+        "luciernagas": {
+          "total": 11,
+          "visibles": 0,
+          "animando": 0,
+          "opCapa": 0
+        },
+        "rayos": {
+          "total": 6,
+          "visibles": 0,
+          "animando": 0,
+          "opCapa": 0
+        }
+      },
+      "animCorriendo": 38,
+      "animVivasVisibles": 38,
+      "nodosEscena": 210
+    },
+    {
+      "clima": "nublado",
+      "luz": "dia",
+      "fps": 60.2,
+      "contrastes": [
+        {
+          "id": "cabecera-lugar",
+          "texto": "Paramo alto · Guatavita, Cundinamarca",
+          "min": 4.94,
+          "p05": 5.15
+        },
+        {
+          "id": "cabecera-altura",
+          "texto": "2900 m s. n. m. · Piso frío",
+          "min": 5.04,
+          "p05": 5.19
+        },
+        {
+          "id": "cabecera-saludo",
+          "texto": "Buenas noches",
+          "min": 4.41,
+          "p05": 4.62
+        },
+        {
+          "id": "cabecera-condicion",
+          "texto": "Nublado · 9:57 p. m.",
+          "min": 3.84,
+          "p05": 3.93
+        },
+        {
+          "id": "cifra-grande",
+          "texto": "10°C",
+          "min": 2.46,
+          "p05": 2.55
+        },
+        {
+          "id": "tab-hoy",
+          "texto": "Hoy",
+          "min": 8.72,
+          "p05": 8.72
+        },
+        {
+          "id": "tab-semana",
+          "texto": "7–16 días",
+          "min": 9.74,
+          "p05": 9.74
+        },
+        {
+          "id": "tab-estacional",
+          "texto": "El Niño",
+          "min": 9.76,
+          "p05": 9.86
+        },
+        {
+          "id": "CONTROL-21",
+          "texto": "CONTROL",
+          "min": 21,
+          "p05": 21
+        },
+        {
+          "id": "CONTROL-4.54",
+          "texto": "CONTROL",
+          "min": 4.54,
+          "p05": 4.54
+        }
+      ],
+      "enso": null,
+      "capas": {
+        "cielo:soleado": 0,
+        "cielo:lluvia": 0,
+        "cielo:niebla": 0,
+        "cielo:dorada": 0,
+        "cielo:noche": 0,
+        "cielo:nublado": 1,
+        "grade:soleado": 0,
+        "grade:lluvia": 0,
+        "grade:niebla": 0,
+        "grade:dorada": 0,
+        "grade:noche": 0,
+        "grade:nublado": 1,
+        "astro": 0.4,
+        "rayos": 0,
+        "bruma": 0.7,
+        "laderaLuz": 0,
+        "vineta": 0.34,
+        "scrimAlto": 1,
+        "scrimBajo": 0.55,
+        "jironUI": 0,
+        "capa:estrellas": 0,
+        "capa:lluvia": 0,
+        "capa:niebla": 0.72,
+        "capa:polvo": 0,
+        "capa:luci": 0
+      },
+      "particulas": {
+        "estrellas": {
+          "total": 26,
+          "visibles": 0,
+          "animando": 0,
+          "opCapa": 0
+        },
+        "gotas": {
+          "total": 30,
+          "visibles": 0,
+          "animando": 0,
+          "opCapa": 0
+        },
+        "bancos": {
+          "total": 9,
+          "visibles": 9,
+          "animando": 9,
+          "opCapa": 0.72
+        },
+        "jirones": {
+          "total": 7,
+          "visibles": 7,
+          "animando": 7,
+          "opCapa": 0.72
+        },
+        "motas": {
+          "total": 16,
+          "visibles": 0,
+          "animando": 0,
+          "opCapa": 0
+        },
+        "luciernagas": {
+          "total": 11,
+          "visibles": 0,
+          "animando": 0,
+          "opCapa": 0
+        },
+        "rayos": {
+          "total": 6,
+          "visibles": 0,
+          "animando": 0,
+          "opCapa": 0
+        }
+      },
+      "animCorriendo": 38,
+      "animVivasVisibles": 38,
+      "nodosEscena": 210
+    },
+    {
+      "clima": "nublado",
+      "luz": "atardecer",
+      "fps": 60.2,
+      "contrastes": [
+        {
+          "id": "cabecera-lugar",
+          "texto": "Paramo alto · Guatavita, Cundinamarca",
+          "min": 6.13,
+          "p05": 6.3
+        },
+        {
+          "id": "cabecera-altura",
+          "texto": "2900 m s. n. m. · Piso frío",
+          "min": 5.77,
+          "p05": 5.9
+        },
+        {
+          "id": "cabecera-saludo",
+          "texto": "Buenas noches",
+          "min": 4.93,
+          "p05": 5.09
+        },
+        {
+          "id": "cabecera-condicion",
+          "texto": "Nublado · 9:57 p. m.",
+          "min": 4.29,
+          "p05": 4.45
+        },
+        {
+          "id": "cifra-grande",
+          "texto": "10°C",
+          "min": 2.94,
+          "p05": 3.04
+        },
+        {
+          "id": "tab-hoy",
+          "texto": "Hoy",
+          "min": 8.85,
+          "p05": 8.97
+        },
+        {
+          "id": "tab-semana",
+          "texto": "7–16 días",
+          "min": 10.05,
+          "p05": 10.06
+        },
+        {
+          "id": "tab-estacional",
+          "texto": "El Niño",
+          "min": 10.07,
+          "p05": 10.09
+        },
+        {
+          "id": "CONTROL-21",
+          "texto": "CONTROL",
+          "min": 21,
+          "p05": 21
+        },
+        {
+          "id": "CONTROL-4.54",
+          "texto": "CONTROL",
+          "min": 4.54,
+          "p05": 4.54
+        }
+      ],
+      "enso": null,
+      "capas": {
+        "cielo:soleado": 0,
+        "cielo:lluvia": 0,
+        "cielo:niebla": 0,
+        "cielo:dorada": 0,
+        "cielo:noche": 0,
+        "cielo:nublado": 1,
+        "grade:soleado": 0,
+        "grade:lluvia": 0,
+        "grade:niebla": 0,
+        "grade:dorada": 0.6,
+        "grade:noche": 0,
+        "grade:nublado": 1,
+        "astro": 0.5,
+        "rayos": 0,
+        "bruma": 0.7,
+        "laderaLuz": 0,
+        "vineta": 0.34,
+        "scrimAlto": 1,
+        "scrimBajo": 0.55,
+        "jironUI": 0,
+        "capa:estrellas": 0,
+        "capa:lluvia": 0,
+        "capa:niebla": 0.72,
+        "capa:polvo": 0,
+        "capa:luci": 0.45
+      },
+      "particulas": {
+        "estrellas": {
+          "total": 26,
+          "visibles": 0,
+          "animando": 0,
+          "opCapa": 0
+        },
+        "gotas": {
+          "total": 30,
+          "visibles": 0,
+          "animando": 0,
+          "opCapa": 0
+        },
+        "bancos": {
+          "total": 9,
+          "visibles": 9,
+          "animando": 9,
+          "opCapa": 0.72
+        },
+        "jirones": {
+          "total": 7,
+          "visibles": 7,
+          "animando": 7,
+          "opCapa": 0.72
+        },
+        "motas": {
+          "total": 16,
+          "visibles": 0,
+          "animando": 0,
+          "opCapa": 0
+        },
+        "luciernagas": {
+          "total": 11,
+          "visibles": 11,
+          "animando": 22,
+          "opCapa": 0.45
+        },
+        "rayos": {
+          "total": 6,
+          "visibles": 0,
+          "animando": 0,
+          "opCapa": 0
+        }
+      },
+      "animCorriendo": 60,
+      "animVivasVisibles": 58,
+      "nodosEscena": 210
+    },
+    {
+      "clima": "nublado",
+      "luz": "noche",
+      "fps": 59.9,
+      "contrastes": [
+        {
+          "id": "cabecera-lugar",
+          "texto": "Paramo alto · Guatavita, Cundinamarca",
+          "min": 12.61,
+          "p05": 12.93
+        },
+        {
+          "id": "cabecera-altura",
+          "texto": "2900 m s. n. m. · Piso frío",
+          "min": 13.82,
+          "p05": 14.17
+        },
+        {
+          "id": "cabecera-saludo",
+          "texto": "Buenas noches",
+          "min": 13.83,
+          "p05": 14.14
+        },
+        {
+          "id": "cabecera-condicion",
+          "texto": "Nublado · 9:57 p. m.",
+          "min": 13.3,
+          "p05": 13.58
+        },
+        {
+          "id": "cifra-grande",
+          "texto": "10°C",
+          "min": 11.44,
+          "p05": 11.77
+        },
+        {
+          "id": "tab-hoy",
+          "texto": "Hoy",
+          "min": 10.59,
+          "p05": 10.59
+        },
+        {
+          "id": "tab-semana",
+          "texto": "7–16 días",
+          "min": 11.88,
+          "p05": 11.88
+        },
+        {
+          "id": "tab-estacional",
+          "texto": "El Niño",
+          "min": 11.98,
+          "p05": 12.08
+        },
+        {
+          "id": "CONTROL-21",
+          "texto": "CONTROL",
+          "min": 21,
+          "p05": 21
+        },
+        {
+          "id": "CONTROL-4.54",
+          "texto": "CONTROL",
+          "min": 4.54,
+          "p05": 4.54
+        }
+      ],
+      "enso": null,
+      "capas": {
+        "cielo:soleado": 0,
+        "cielo:lluvia": 0,
+        "cielo:niebla": 0,
+        "cielo:dorada": 0,
+        "cielo:noche": 1,
+        "cielo:nublado": 0,
+        "grade:soleado": 0,
+        "grade:lluvia": 0,
+        "grade:niebla": 0,
+        "grade:dorada": 0,
+        "grade:noche": 1,
+        "grade:nublado": 1,
+        "astro": 0.22,
+        "rayos": 0,
+        "bruma": 0.7,
+        "laderaLuz": 0,
+        "vineta": 0.34,
+        "scrimAlto": 1,
+        "scrimBajo": 0.55,
+        "jironUI": 0,
+        "capa:estrellas": 0,
+        "capa:lluvia": 0,
+        "capa:niebla": 0.42,
+        "capa:polvo": 0,
+        "capa:luci": 0.4
+      },
+      "particulas": {
+        "estrellas": {
+          "total": 26,
+          "visibles": 0,
+          "animando": 0,
+          "opCapa": 0
+        },
+        "gotas": {
+          "total": 30,
+          "visibles": 0,
+          "animando": 0,
+          "opCapa": 0
+        },
+        "bancos": {
+          "total": 9,
+          "visibles": 9,
+          "animando": 9,
+          "opCapa": 0.42
+        },
+        "jirones": {
+          "total": 7,
+          "visibles": 7,
+          "animando": 7,
+          "opCapa": 0.42
+        },
+        "motas": {
+          "total": 16,
+          "visibles": 0,
+          "animando": 0,
+          "opCapa": 0
+        },
+        "luciernagas": {
+          "total": 11,
+          "visibles": 11,
+          "animando": 22,
+          "opCapa": 0.4
+        },
+        "rayos": {
+          "total": 6,
+          "visibles": 0,
+          "animando": 0,
+          "opCapa": 0
+        }
+      },
+      "animCorriendo": 60,
+      "animVivasVisibles": 57,
+      "nodosEscena": 210
+    },
+    {
+      "clima": "lluvia",
+      "luz": "amanecer",
+      "fps": 58.7,
+      "contrastes": [
+        {
+          "id": "cabecera-lugar",
+          "texto": "Paramo alto · Guatavita, Cundinamarca",
+          "min": 7.95,
+          "p05": 9.07
+        },
+        {
+          "id": "cabecera-altura",
+          "texto": "2900 m s. n. m. · Piso frío",
+          "min": 7.33,
+          "p05": 8.48
+        },
+        {
+          "id": "cabecera-saludo",
+          "texto": "Buenas noches",
+          "min": 6.69,
+          "p05": 7.81
+        },
+        {
+          "id": "cabecera-condicion",
+          "texto": "Nublado · 9:58 p. m.",
+          "min": 6.29,
+          "p05": 7.43
+        },
+        {
+          "id": "cifra-grande",
+          "texto": "10°C",
+          "min": 5.19,
+          "p05": 6.17
+        },
+        {
+          "id": "tab-hoy",
+          "texto": "Hoy",
+          "min": 9.65,
+          "p05": 9.67
+        },
+        {
+          "id": "tab-semana",
+          "texto": "7–16 días",
+          "min": 10.89,
+          "p05": 11.02
+        },
+        {
+          "id": "tab-estacional",
+          "texto": "El Niño",
+          "min": 6.36,
+          "p05": 6.63
+        },
+        {
+          "id": "CONTROL-21",
+          "texto": "CONTROL",
+          "min": 21,
+          "p05": 21
+        },
+        {
+          "id": "CONTROL-4.54",
+          "texto": "CONTROL",
+          "min": 4.54,
+          "p05": 4.54
+        }
+      ],
+      "enso": null,
+      "capas": {
+        "cielo:soleado": 0,
+        "cielo:lluvia": 1,
+        "cielo:niebla": 0,
+        "cielo:dorada": 0,
+        "cielo:noche": 0,
+        "cielo:nublado": 0,
+        "grade:soleado": 0,
+        "grade:lluvia": 1,
+        "grade:niebla": 0,
+        "grade:dorada": 0.3,
+        "grade:noche": 0,
+        "grade:nublado": 0,
+        "astro": 0.2,
+        "rayos": 0,
+        "bruma": 0.55,
+        "laderaLuz": 0,
+        "vineta": 0.34,
+        "scrimAlto": 1,
+        "scrimBajo": 0.55,
+        "jironUI": 0,
+        "capa:estrellas": 0,
+        "capa:lluvia": 1,
+        "capa:niebla": 0.3,
+        "capa:polvo": 0,
+        "capa:luci": 0
+      },
+      "particulas": {
+        "estrellas": {
+          "total": 26,
+          "visibles": 0,
+          "animando": 0,
+          "opCapa": 0
+        },
+        "gotas": {
+          "total": 30,
+          "visibles": 30,
+          "animando": 30,
+          "opCapa": 1
+        },
+        "bancos": {
+          "total": 9,
+          "visibles": 9,
+          "animando": 9,
+          "opCapa": 0.3
+        },
+        "jirones": {
+          "total": 7,
+          "visibles": 7,
+          "animando": 7,
+          "opCapa": 0.3
+        },
+        "motas": {
+          "total": 16,
+          "visibles": 0,
+          "animando": 0,
+          "opCapa": 0
+        },
+        "luciernagas": {
+          "total": 11,
+          "visibles": 0,
+          "animando": 0,
+          "opCapa": 0
+        },
+        "rayos": {
+          "total": 6,
+          "visibles": 0,
+          "animando": 0,
+          "opCapa": 0
+        }
+      },
+      "animCorriendo": 68,
+      "animVivasVisibles": 68,
+      "nodosEscena": 210
+    },
+    {
+      "clima": "lluvia",
+      "luz": "dia",
+      "fps": 60.3,
+      "contrastes": [
+        {
+          "id": "cabecera-lugar",
+          "texto": "Paramo alto · Guatavita, Cundinamarca",
+          "min": 8.58,
+          "p05": 9.13
+        },
+        {
+          "id": "cabecera-altura",
+          "texto": "2900 m s. n. m. · Piso frío",
+          "min": 8.31,
+          "p05": 8.44
+        },
+        {
+          "id": "cabecera-saludo",
+          "texto": "Buenas noches",
+          "min": 6.68,
+          "p05": 7.48
+        },
+        {
+          "id": "cabecera-condicion",
+          "texto": "Nublado · 9:58 p. m.",
+          "min": 6.28,
+          "p05": 7.24
+        },
+        {
+          "id": "cifra-grande",
+          "texto": "10°C",
+          "min": 4.01,
+          "p05": 6.2
+        },
+        {
+          "id": "tab-hoy",
+          "texto": "Hoy",
+          "min": 9.76,
+          "p05": 9.77
+        },
+        {
+          "id": "tab-semana",
+          "texto": "7–16 días",
+          "min": 10.92,
+          "p05": 11.04
+        },
+        {
+          "id": "tab-estacional",
+          "texto": "El Niño",
+          "min": 7.84,
+          "p05": 8.32
+        },
+        {
+          "id": "CONTROL-21",
+          "texto": "CONTROL",
+          "min": 21,
+          "p05": 21
+        },
+        {
+          "id": "CONTROL-4.54",
+          "texto": "CONTROL",
+          "min": 4.54,
+          "p05": 4.54
+        }
+      ],
+      "enso": null,
+      "capas": {
+        "cielo:soleado": 0,
+        "cielo:lluvia": 1,
+        "cielo:niebla": 0,
+        "cielo:dorada": 0,
+        "cielo:noche": 0,
+        "cielo:nublado": 0,
+        "grade:soleado": 0,
+        "grade:lluvia": 1,
+        "grade:niebla": 0,
+        "grade:dorada": 0,
+        "grade:noche": 0,
+        "grade:nublado": 0,
+        "astro": 0.12,
+        "rayos": 0,
+        "bruma": 0.55,
+        "laderaLuz": 0,
+        "vineta": 0.34,
+        "scrimAlto": 1,
+        "scrimBajo": 0.55,
+        "jironUI": 0,
+        "capa:estrellas": 0,
+        "capa:lluvia": 1,
+        "capa:niebla": 0.3,
+        "capa:polvo": 0,
+        "capa:luci": 0
+      },
+      "particulas": {
+        "estrellas": {
+          "total": 26,
+          "visibles": 0,
+          "animando": 0,
+          "opCapa": 0
+        },
+        "gotas": {
+          "total": 30,
+          "visibles": 30,
+          "animando": 30,
+          "opCapa": 1
+        },
+        "bancos": {
+          "total": 9,
+          "visibles": 9,
+          "animando": 9,
+          "opCapa": 0.3
+        },
+        "jirones": {
+          "total": 7,
+          "visibles": 7,
+          "animando": 7,
+          "opCapa": 0.3
+        },
+        "motas": {
+          "total": 16,
+          "visibles": 0,
+          "animando": 0,
+          "opCapa": 0
+        },
+        "luciernagas": {
+          "total": 11,
+          "visibles": 0,
+          "animando": 0,
+          "opCapa": 0
+        },
+        "rayos": {
+          "total": 6,
+          "visibles": 0,
+          "animando": 0,
+          "opCapa": 0
+        }
+      },
+      "animCorriendo": 68,
+      "animVivasVisibles": 68,
+      "nodosEscena": 210
+    },
+    {
+      "clima": "lluvia",
+      "luz": "atardecer",
+      "fps": 59.7,
+      "contrastes": [
+        {
+          "id": "cabecera-lugar",
+          "texto": "Paramo alto · Guatavita, Cundinamarca",
+          "min": 8.1,
+          "p05": 9.52
+        },
+        {
+          "id": "cabecera-altura",
+          "texto": "2900 m s. n. m. · Piso frío",
+          "min": 8.29,
+          "p05": 8.47
+        },
+        {
+          "id": "cabecera-saludo",
+          "texto": "Buenas noches",
+          "min": 7.08,
+          "p05": 7.88
+        },
+        {
+          "id": "cabecera-condicion",
+          "texto": "Nublado · 9:58 p. m.",
+          "min": 6.17,
+          "p05": 7.51
+        },
+        {
+          "id": "cifra-grande",
+          "texto": "10°C",
+          "min": 4.62,
+          "p05": 6.09
+        },
+        {
+          "id": "tab-hoy",
+          "texto": "Hoy",
+          "min": 9.65,
+          "p05": 9.67
+        },
+        {
+          "id": "tab-semana",
+          "texto": "7–16 días",
+          "min": 11.02,
+          "p05": 11.02
+        },
+        {
+          "id": "tab-estacional",
+          "texto": "El Niño",
+          "min": 11.02,
+          "p05": 11.02
+        },
+        {
+          "id": "CONTROL-21",
+          "texto": "CONTROL",
+          "min": 21,
+          "p05": 21
+        },
+        {
+          "id": "CONTROL-4.54",
+          "texto": "CONTROL",
+          "min": 4.54,
+          "p05": 4.54
+        }
+      ],
+      "enso": null,
+      "capas": {
+        "cielo:soleado": 0,
+        "cielo:lluvia": 1,
+        "cielo:niebla": 0,
+        "cielo:dorada": 0,
+        "cielo:noche": 0,
+        "cielo:nublado": 0,
+        "grade:soleado": 0,
+        "grade:lluvia": 1,
+        "grade:niebla": 0,
+        "grade:dorada": 0.3,
+        "grade:noche": 0,
+        "grade:nublado": 0,
+        "astro": 0.2,
+        "rayos": 0,
+        "bruma": 0.55,
+        "laderaLuz": 0,
+        "vineta": 0.34,
+        "scrimAlto": 1,
+        "scrimBajo": 0.55,
+        "jironUI": 0,
+        "capa:estrellas": 0,
+        "capa:lluvia": 1,
+        "capa:niebla": 0.3,
+        "capa:polvo": 0,
+        "capa:luci": 0
+      },
+      "particulas": {
+        "estrellas": {
+          "total": 26,
+          "visibles": 0,
+          "animando": 0,
+          "opCapa": 0
+        },
+        "gotas": {
+          "total": 30,
+          "visibles": 30,
+          "animando": 30,
+          "opCapa": 1
+        },
+        "bancos": {
+          "total": 9,
+          "visibles": 9,
+          "animando": 9,
+          "opCapa": 0.3
+        },
+        "jirones": {
+          "total": 7,
+          "visibles": 7,
+          "animando": 7,
+          "opCapa": 0.3
+        },
+        "motas": {
+          "total": 16,
+          "visibles": 0,
+          "animando": 0,
+          "opCapa": 0
+        },
+        "luciernagas": {
+          "total": 11,
+          "visibles": 0,
+          "animando": 0,
+          "opCapa": 0
+        },
+        "rayos": {
+          "total": 6,
+          "visibles": 0,
+          "animando": 0,
+          "opCapa": 0
+        }
+      },
+      "animCorriendo": 68,
+      "animVivasVisibles": 67,
+      "nodosEscena": 210
+    },
+    {
+      "clima": "lluvia",
+      "luz": "noche",
+      "fps": 60.2,
+      "contrastes": [
+        {
+          "id": "cabecera-lugar",
+          "texto": "Paramo alto · Guatavita, Cundinamarca",
+          "min": 12.43,
+          "p05": 12.95
+        },
+        {
+          "id": "cabecera-altura",
+          "texto": "2900 m s. n. m. · Piso frío",
+          "min": 11.11,
+          "p05": 12.08
+        },
+        {
+          "id": "cabecera-saludo",
+          "texto": "Buenas noches",
+          "min": 10.29,
+          "p05": 11.89
+        },
+        {
+          "id": "cabecera-condicion",
+          "texto": "Nublado · 9:58 p. m.",
+          "min": 11.26,
+          "p05": 11.55
+        },
+        {
+          "id": "cifra-grande",
+          "texto": "10°C",
+          "min": 10.21,
+          "p05": 10.29
+        },
+        {
+          "id": "tab-hoy",
+          "texto": "Hoy",
+          "min": 10.45,
+          "p05": 10.45
+        },
+        {
+          "id": "tab-semana",
+          "texto": "7–16 días",
+          "min": 11.51,
+          "p05": 11.63
+        },
+        {
+          "id": "tab-estacional",
+          "texto": "El Niño",
+          "min": 11.75,
+          "p05": 11.75
+        },
+        {
+          "id": "CONTROL-21",
+          "texto": "CONTROL",
+          "min": 21,
+          "p05": 21
+        },
+        {
+          "id": "CONTROL-4.54",
+          "texto": "CONTROL",
+          "min": 4.54,
+          "p05": 4.54
+        }
+      ],
+      "enso": null,
+      "capas": {
+        "cielo:soleado": 0,
+        "cielo:lluvia": 1,
+        "cielo:niebla": 0,
+        "cielo:dorada": 0,
+        "cielo:noche": 0,
+        "cielo:nublado": 0,
+        "grade:soleado": 0,
+        "grade:lluvia": 1,
+        "grade:niebla": 0,
+        "grade:dorada": 0,
+        "grade:noche": 1,
+        "grade:nublado": 0,
+        "astro": 0.12,
+        "rayos": 0,
+        "bruma": 0.55,
+        "laderaLuz": 0,
+        "vineta": 0.34,
+        "scrimAlto": 1,
+        "scrimBajo": 0.55,
+        "jironUI": 0,
+        "capa:estrellas": 0,
+        "capa:lluvia": 1,
+        "capa:niebla": 0.3,
+        "capa:polvo": 0,
+        "capa:luci": 0.14
+      },
+      "particulas": {
+        "estrellas": {
+          "total": 26,
+          "visibles": 0,
+          "animando": 0,
+          "opCapa": 0
+        },
+        "gotas": {
+          "total": 30,
+          "visibles": 30,
+          "animando": 30,
+          "opCapa": 1
+        },
+        "bancos": {
+          "total": 9,
+          "visibles": 9,
+          "animando": 9,
+          "opCapa": 0.3
+        },
+        "jirones": {
+          "total": 7,
+          "visibles": 7,
+          "animando": 7,
+          "opCapa": 0.3
+        },
+        "motas": {
+          "total": 16,
+          "visibles": 0,
+          "animando": 0,
+          "opCapa": 0
+        },
+        "luciernagas": {
+          "total": 11,
+          "visibles": 11,
+          "animando": 22,
+          "opCapa": 0.14
+        },
+        "rayos": {
+          "total": 6,
+          "visibles": 0,
+          "animando": 0,
+          "opCapa": 0
+        }
+      },
+      "animCorriendo": 90,
+      "animVivasVisibles": 84,
+      "nodosEscena": 210
+    },
+    {
+      "clima": "niebla",
+      "luz": "amanecer",
+      "fps": 60,
+      "contrastes": [
+        {
+          "id": "cabecera-lugar",
+          "texto": "Paramo alto · Guatavita, Cundinamarca",
+          "min": 4.19,
+          "p05": 4.28
+        },
+        {
+          "id": "cabecera-altura",
+          "texto": "2900 m s. n. m. · Piso frío",
+          "min": 3.61,
+          "p05": 3.68
+        },
+        {
+          "id": "cabecera-saludo",
+          "texto": "Buenas noches",
+          "min": 3.01,
+          "p05": 3.19
+        },
+        {
+          "id": "cabecera-condicion",
+          "texto": "Nublado · 9:58 p. m.",
+          "min": 2.79,
+          "p05": 2.88
+        },
+        {
+          "id": "cifra-grande",
+          "texto": "10°C",
+          "min": 2.09,
+          "p05": 2.13
+        },
+        {
+          "id": "tab-hoy",
+          "texto": "Hoy",
+          "min": 8.58,
+          "p05": 8.58
+        },
+        {
+          "id": "tab-semana",
+          "texto": "7–16 días",
+          "min": 9.58,
+          "p05": 9.58
+        },
+        {
+          "id": "tab-estacional",
+          "texto": "El Niño",
+          "min": 9.58,
+          "p05": 9.58
+        },
+        {
+          "id": "CONTROL-21",
+          "texto": "CONTROL",
+          "min": 21,
+          "p05": 21
+        },
+        {
+          "id": "CONTROL-4.54",
+          "texto": "CONTROL",
+          "min": 4.54,
+          "p05": 4.54
+        }
+      ],
+      "enso": null,
+      "capas": {
+        "cielo:soleado": 0,
+        "cielo:lluvia": 0,
+        "cielo:niebla": 1,
+        "cielo:dorada": 0,
+        "cielo:noche": 0,
+        "cielo:nublado": 0,
+        "grade:soleado": 0,
+        "grade:lluvia": 0,
+        "grade:niebla": 1,
+        "grade:dorada": 0.34,
+        "grade:noche": 0,
+        "grade:nublado": 0,
+        "astro": 0.25,
+        "rayos": 0.58,
+        "bruma": 0.92,
+        "laderaLuz": 0,
+        "vineta": 0.16,
+        "scrimAlto": 1,
+        "scrimBajo": 0.55,
+        "jironUI": 0.548,
+        "capa:estrellas": 0,
+        "capa:lluvia": 0,
+        "capa:niebla": 1,
+        "capa:polvo": 0,
+        "capa:luci": 0
+      },
+      "particulas": {
+        "estrellas": {
+          "total": 26,
+          "visibles": 0,
+          "animando": 0,
+          "opCapa": 0
+        },
+        "gotas": {
+          "total": 30,
+          "visibles": 0,
+          "animando": 0,
+          "opCapa": 0
+        },
+        "bancos": {
+          "total": 9,
+          "visibles": 9,
+          "animando": 9,
+          "opCapa": 1
+        },
+        "jirones": {
+          "total": 7,
+          "visibles": 7,
+          "animando": 7,
+          "opCapa": 1
+        },
+        "motas": {
+          "total": 16,
+          "visibles": 0,
+          "animando": 0,
+          "opCapa": 0
+        },
+        "luciernagas": {
+          "total": 11,
+          "visibles": 0,
+          "animando": 0,
+          "opCapa": 0
+        },
+        "rayos": {
+          "total": 6,
+          "visibles": 6,
+          "animando": 1,
+          "opCapa": 0.58
+        }
+      },
+      "animCorriendo": 41,
+      "animVivasVisibles": 40,
+      "nodosEscena": 210
+    },
+    {
+      "clima": "niebla",
+      "luz": "dia",
+      "fps": 60.1,
+      "contrastes": [
+        {
+          "id": "cabecera-lugar",
+          "texto": "Paramo alto · Guatavita, Cundinamarca",
+          "min": 3.75,
+          "p05": 3.95
+        },
+        {
+          "id": "cabecera-altura",
+          "texto": "2900 m s. n. m. · Piso frío",
+          "min": 3.19,
+          "p05": 3.3
+        },
+        {
+          "id": "cabecera-saludo",
+          "texto": "Buenas noches",
+          "min": 2.63,
+          "p05": 2.78
+        },
+        {
+          "id": "cabecera-condicion",
+          "texto": "Nublado · 9:58 p. m.",
+          "min": 2.41,
+          "p05": 2.53
+        },
+        {
+          "id": "cifra-grande",
+          "texto": "10°C",
+          "min": 1.92,
+          "p05": 1.96
+        },
+        {
+          "id": "tab-hoy",
+          "texto": "Hoy",
+          "min": 8.47,
+          "p05": 8.47
+        },
+        {
+          "id": "tab-semana",
+          "texto": "7–16 días",
+          "min": 9.48,
+          "p05": 9.48
+        },
+        {
+          "id": "tab-estacional",
+          "texto": "El Niño",
+          "min": 9.48,
+          "p05": 9.48
+        },
+        {
+          "id": "CONTROL-21",
+          "texto": "CONTROL",
+          "min": 21,
+          "p05": 21
+        },
+        {
+          "id": "CONTROL-4.54",
+          "texto": "CONTROL",
+          "min": 4.54,
+          "p05": 4.54
+        }
+      ],
+      "enso": null,
+      "capas": {
+        "cielo:soleado": 0,
+        "cielo:lluvia": 0,
+        "cielo:niebla": 1,
+        "cielo:dorada": 0,
+        "cielo:noche": 0,
+        "cielo:nublado": 0,
+        "grade:soleado": 0,
+        "grade:lluvia": 0,
+        "grade:niebla": 1,
+        "grade:dorada": 0,
+        "grade:noche": 0,
+        "grade:nublado": 0,
+        "astro": 0.25,
+        "rayos": 0.42,
+        "bruma": 0.92,
+        "laderaLuz": 0,
+        "vineta": 0.16,
+        "scrimAlto": 1,
+        "scrimBajo": 0.55,
+        "jironUI": 0.55,
+        "capa:estrellas": 0,
+        "capa:lluvia": 0,
+        "capa:niebla": 1,
+        "capa:polvo": 0,
+        "capa:luci": 0
+      },
+      "particulas": {
+        "estrellas": {
+          "total": 26,
+          "visibles": 0,
+          "animando": 0,
+          "opCapa": 0
+        },
+        "gotas": {
+          "total": 30,
+          "visibles": 0,
+          "animando": 0,
+          "opCapa": 0
+        },
+        "bancos": {
+          "total": 9,
+          "visibles": 9,
+          "animando": 9,
+          "opCapa": 1
+        },
+        "jirones": {
+          "total": 7,
+          "visibles": 7,
+          "animando": 7,
+          "opCapa": 1
+        },
+        "motas": {
+          "total": 16,
+          "visibles": 0,
+          "animando": 0,
+          "opCapa": 0
+        },
+        "luciernagas": {
+          "total": 11,
+          "visibles": 0,
+          "animando": 0,
+          "opCapa": 0
+        },
+        "rayos": {
+          "total": 6,
+          "visibles": 6,
+          "animando": 1,
+          "opCapa": 0.42
+        }
+      },
+      "animCorriendo": 40,
+      "animVivasVisibles": 40,
+      "nodosEscena": 210
+    },
+    {
+      "clima": "niebla",
+      "luz": "atardecer",
+      "fps": 60.4,
+      "contrastes": [
+        {
+          "id": "cabecera-lugar",
+          "texto": "Paramo alto · Guatavita, Cundinamarca",
+          "min": 4.19,
+          "p05": 4.28
+        },
+        {
+          "id": "cabecera-altura",
+          "texto": "2900 m s. n. m. · Piso frío",
+          "min": 3.57,
+          "p05": 3.67
+        },
+        {
+          "id": "cabecera-saludo",
+          "texto": "Buenas noches",
+          "min": 3,
+          "p05": 3.15
+        },
+        {
+          "id": "cabecera-condicion",
+          "texto": "Nublado · 9:58 p. m.",
+          "min": 2.75,
+          "p05": 2.84
+        },
+        {
+          "id": "cifra-grande",
+          "texto": "10°C",
+          "min": 2.09,
+          "p05": 2.13
+        },
+        {
+          "id": "tab-hoy",
+          "texto": "Hoy",
+          "min": 8.58,
+          "p05": 8.58
+        },
+        {
+          "id": "tab-semana",
+          "texto": "7–16 días",
+          "min": 9.58,
+          "p05": 9.58
+        },
+        {
+          "id": "tab-estacional",
+          "texto": "El Niño",
+          "min": 9.58,
+          "p05": 9.58
+        },
+        {
+          "id": "CONTROL-21",
+          "texto": "CONTROL",
+          "min": 21,
+          "p05": 21
+        },
+        {
+          "id": "CONTROL-4.54",
+          "texto": "CONTROL",
+          "min": 4.54,
+          "p05": 4.54
+        }
+      ],
+      "enso": null,
+      "capas": {
+        "cielo:soleado": 0,
+        "cielo:lluvia": 0,
+        "cielo:niebla": 1,
+        "cielo:dorada": 0,
+        "cielo:noche": 0,
+        "cielo:nublado": 0,
+        "grade:soleado": 0,
+        "grade:lluvia": 0,
+        "grade:niebla": 1,
+        "grade:dorada": 0.34,
+        "grade:noche": 0,
+        "grade:nublado": 0,
+        "astro": 0.25,
+        "rayos": 0.58,
+        "bruma": 0.92,
+        "laderaLuz": 0,
+        "vineta": 0.16,
+        "scrimAlto": 1,
+        "scrimBajo": 0.55,
+        "jironUI": 0.55,
+        "capa:estrellas": 0,
+        "capa:lluvia": 0,
+        "capa:niebla": 1,
+        "capa:polvo": 0,
+        "capa:luci": 0.3
+      },
+      "particulas": {
+        "estrellas": {
+          "total": 26,
+          "visibles": 0,
+          "animando": 0,
+          "opCapa": 0
+        },
+        "gotas": {
+          "total": 30,
+          "visibles": 0,
+          "animando": 0,
+          "opCapa": 0
+        },
+        "bancos": {
+          "total": 9,
+          "visibles": 9,
+          "animando": 9,
+          "opCapa": 1
+        },
+        "jirones": {
+          "total": 7,
+          "visibles": 7,
+          "animando": 7,
+          "opCapa": 1
+        },
+        "motas": {
+          "total": 16,
+          "visibles": 0,
+          "animando": 0,
+          "opCapa": 0
+        },
+        "luciernagas": {
+          "total": 11,
+          "visibles": 11,
+          "animando": 22,
+          "opCapa": 0.3
+        },
+        "rayos": {
+          "total": 6,
+          "visibles": 6,
+          "animando": 1,
+          "opCapa": 0.58
+        }
+      },
+      "animCorriendo": 62,
+      "animVivasVisibles": 58,
+      "nodosEscena": 210
+    },
+    {
+      "clima": "niebla",
+      "luz": "noche",
+      "fps": 60.2,
+      "contrastes": [
+        {
+          "id": "cabecera-lugar",
+          "texto": "Paramo alto · Guatavita, Cundinamarca",
+          "min": 7.61,
+          "p05": 7.85
+        },
+        {
+          "id": "cabecera-altura",
+          "texto": "2900 m s. n. m. · Piso frío",
+          "min": 7.29,
+          "p05": 7.43
+        },
+        {
+          "id": "cabecera-saludo",
+          "texto": "Buenas noches",
+          "min": 6.36,
+          "p05": 6.64
+        },
+        {
+          "id": "cabecera-condicion",
+          "texto": "Nublado · 9:58 p. m.",
+          "min": 5.9,
+          "p05": 6.06
+        },
+        {
+          "id": "cifra-grande",
+          "texto": "10°C",
+          "min": 4.49,
+          "p05": 4.61
+        },
+        {
+          "id": "tab-hoy",
+          "texto": "Hoy",
+          "min": 9.64,
+          "p05": 9.64
+        },
+        {
+          "id": "tab-semana",
+          "texto": "7–16 días",
+          "min": 10.9,
+          "p05": 10.9
+        },
+        {
+          "id": "tab-estacional",
+          "texto": "El Niño",
+          "min": 10.9,
+          "p05": 10.9
+        },
+        {
+          "id": "CONTROL-21",
+          "texto": "CONTROL",
+          "min": 21,
+          "p05": 21
+        },
+        {
+          "id": "CONTROL-4.54",
+          "texto": "CONTROL",
+          "min": 4.54,
+          "p05": 4.54
+        }
+      ],
+      "enso": null,
+      "capas": {
+        "cielo:soleado": 0,
+        "cielo:lluvia": 0,
+        "cielo:niebla": 1,
+        "cielo:dorada": 0,
+        "cielo:noche": 0,
+        "cielo:nublado": 0,
+        "grade:soleado": 0,
+        "grade:lluvia": 0,
+        "grade:niebla": 1,
+        "grade:dorada": 0,
+        "grade:noche": 1,
+        "grade:nublado": 0,
+        "astro": 0.25,
+        "rayos": 0,
+        "bruma": 0.92,
+        "laderaLuz": 0,
+        "vineta": 0.16,
+        "scrimAlto": 1,
+        "scrimBajo": 0.55,
+        "jironUI": 0.55,
+        "capa:estrellas": 0,
+        "capa:lluvia": 0,
+        "capa:niebla": 0.85,
+        "capa:polvo": 0,
+        "capa:luci": 0.38
+      },
+      "particulas": {
+        "estrellas": {
+          "total": 26,
+          "visibles": 0,
+          "animando": 0,
+          "opCapa": 0
+        },
+        "gotas": {
+          "total": 30,
+          "visibles": 0,
+          "animando": 0,
+          "opCapa": 0
+        },
+        "bancos": {
+          "total": 9,
+          "visibles": 9,
+          "animando": 9,
+          "opCapa": 0.85
+        },
+        "jirones": {
+          "total": 7,
+          "visibles": 7,
+          "animando": 7,
+          "opCapa": 0.85
+        },
+        "motas": {
+          "total": 16,
+          "visibles": 0,
+          "animando": 0,
+          "opCapa": 0
+        },
+        "luciernagas": {
+          "total": 11,
+          "visibles": 11,
+          "animando": 22,
+          "opCapa": 0.38
+        },
+        "rayos": {
+          "total": 6,
+          "visibles": 0,
+          "animando": 0,
+          "opCapa": 0
+        }
+      },
+      "animCorriendo": 61,
+      "animVivasVisibles": 58,
+      "nodosEscena": 210
+    }
+  ]
+}

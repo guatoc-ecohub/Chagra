@@ -1,0 +1,33 @@
+{
+  "tag": "lluvia-noche",
+  "url": "http://localhost:5391/?clima=lluvia&luz=noche#/clima-boletin",
+  "vista": true,
+  "fps": [
+    55.3,
+    52
+  ],
+  "fpsMediana": 53.65,
+  "estado": {
+    "clima": "lluvia",
+    "luz": "noche",
+    "bancos": 6,
+    "jirones": 4,
+    "capaNiebla": "0.3",
+    "capaLluvia": "1",
+    "capaLuci": "0",
+    "capaEstrellas": "0",
+    "capaPolvo": "0",
+    "rayos": "0",
+    "corriendo": 57,
+    "dpr": 3.5,
+    "w": 411,
+    "h": 794,
+    "ua": "Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome",
+    "reducido": false,
+    "animaciones": 128
+  },
+  "pageErrors": [],
+  "interceptadas": 20,
+  "screencap": "/tmp/astra-clima-2d-20260906/_gate/clima2d-efectos-20260906/pixel-base/lluvia-noche-pixel.png",
+  "fecha": "2026-09-06T23:04:33"
+}
