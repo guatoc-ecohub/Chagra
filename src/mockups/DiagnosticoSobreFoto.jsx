@@ -1,217 +1,323 @@
-import React, { useEffect, useState } from 'react';
+/* eslint-disable chagra-i18n/no-hardcoded-spanish -- mockup de diseño: copy de UI de muestra, no producción (ADR-050) */
+import React, { useCallback, useRef, useState } from 'react';
 import { ScreenShell } from '../components/common/ScreenShell';
-import { ScanEye, ShieldAlert, Sparkles, Info, Camera, Leaf } from 'lucide-react';
-import {
-    FOTO_DIAGNOSTICO_CAFE,
-    HALLAZGOS_DIAGNOSTICO_CAFE,
-} from './diagnosticoFotoData.js';
+import { ScanEye, ShieldAlert, Sparkles, Info, Camera, Leaf, Image as ImageIcon, AlertTriangle, CheckCircle2 } from 'lucide-react';
+import { recognizeSpeciesGrounded, analyzeFoliage } from '../services/aiService';
+import { optimizeImage, blobToDataUrl } from '../utils/imageProcessor';
+import { compressImage, IMAGE_TOO_LARGE_MESSAGE } from '../utils/imageCompress';
 import './diagnostico-sobre-foto.css';
 
 /**
- * MOCKUP DE GALERÍA — "El agente dibuja el diagnóstico SOBRE la foto".
+ * "El agente dibuja el diagnóstico SOBRE la foto" — pipeline de visión REAL
+ * (#67, 2026-07-30). Antes era una demo de galería con datos de muestra fijos
+ * (roya del café hardcodeada); ahora la foto la sube el usuario y el
+ * diagnóstico sale del MISMO pipeline anti-alucinación que ya usa el resto
+ * de la app:
  *
- * Moonshot: cuando el campesino sube una hoja enferma, el agente no solo
- * responde en texto — MARCA en la misma foto dónde está el síntoma
- * (círculo punteado + etiqueta), como un doctor señalando la radiografía.
+ *   1. `recognizeSpeciesGrounded` (aiService.js) — identifica la especie con
+ *      el modelo de visión local (Ollama, `ENV.VISION_MODEL`) y la CRUZA
+ *      contra el catálogo Chagra vía el sidecar (`validate_visual_match`).
+ *      Si el modelo alucina una especie que no existe en catálogo, el
+ *      resultado llega marcado `_grounded.status: 'rejected'` — nunca se
+ *      presenta como verificado algo que no lo está.
+ *   2. `analyzeFoliage` — diagnóstico agroecológico grounded con RAG
+ *      (`cycle-content/*.json`): issues + sugerencia de manejo, citando la
+ *      fuente del catálogo cuando aplica.
  *
- * Esto es una DEMOSTRACIÓN con datos de MUESTRA: no hay modelo real detrás.
- * La foto es de sanidad vegetal REAL y bien groundeada (roya del café,
- * Hemileia vastatrix — el problema bandera del cafetal colombiano), de
- * `public/plaga-images/` (Wikimedia Commons, licencia libre).
+ * Sin coordenadas de lesión reales (el modelo no devuelve bounding boxes),
+ * el overlay ya no finge señalar un punto exacto de la hoja: la mira única
+ * queda centrada en la foto como "aquí miré", y el detalle real vive en la
+ * lista de hallazgos de la derecha — grounded, no inventado.
  *
  * Ruta: #/mockups/diagnostico-foto (sin gate).
- *
- * Técnica de la capa: la foto y un <svg> comparten una caja con
- * `aspect-ratio` fijo (900/675 = el de la imagen). El SVG usa el mismo
- * viewBox en píxeles de la foto, así los marcadores caen SIEMPRE sobre la
- * lesión — coordenadas calibradas contra la foto real. Como la caja
- * conserva la proporción, los círculos siguen siendo círculos a 320px.
  */
 
-function Marcador({ h }) {
-    const badgeX = h.cx + h.r * 0.72;
-    const badgeY = h.cy - h.r * 0.72;
-    return (
-        <g className="dx-marker" data-sev={h.sev} style={{ '--d': `${1.3 + h.n * 0.35}s` }}>
-            {/* onda "sonar" que se expande y se desvanece */}
-            <circle className="dx-pulse" cx={h.cx} cy={h.cy} r={h.r} />
-            {/* halo oscuro por debajo → el aro se lee sobre verde Y sobre naranja */}
-            <circle className="dx-halo" cx={h.cx} cy={h.cy} r={h.r} />
-            {/* aro punteado que gira despacio (la mira del agente) */}
-            <circle className="dx-ring" cx={h.cx} cy={h.cy} r={h.r} />
-            {/* cruceta de puntería */}
-            <g className="dx-ticks">
-                <line x1={h.cx} y1={h.cy - h.r - 12} x2={h.cx} y2={h.cy - h.r + 8} />
-                <line x1={h.cx} y1={h.cy + h.r - 8} x2={h.cx} y2={h.cy + h.r + 12} />
-                <line x1={h.cx - h.r - 12} y1={h.cy} x2={h.cx - h.r + 8} y2={h.cy} />
-                <line x1={h.cx + h.r - 8} y1={h.cy} x2={h.cx + h.r + 12} y2={h.cy} />
-            </g>
-            {/* número que amarra con la ficha de al lado */}
-            <circle className="dx-badge" cx={badgeX} cy={badgeY} r="26" />
-            <text className="dx-badge-num" x={badgeX} y={badgeY}>{h.n}</text>
-        </g>
-    );
+const FOTO_ALT = 'Foto que usted subió para el diagnóstico.';
+
+/** Traduce `_grounded.status` de recognizeSpeciesGrounded a una etiqueta corta en usted. */
+const ESTADO_GROUNDING = {
+  verified: { label: 'Verificado en catálogo Chagra', tono: 'ok' },
+  'partial-match': { label: 'Base verificada; variedad sin confirmar', tono: 'medio' },
+  rejected: { label: 'No lo encontré en el catálogo — tómelo con pinzas', tono: 'bajo' },
+  'sidecar-disabled': { label: 'Validación de catálogo apagada', tono: 'medio' },
+  offline: { label: 'Sin conexión: no pude verificar contra el catálogo', tono: 'medio' },
+  'no-binomial': { label: 'No logré leer un nombre científico claro', tono: 'bajo' },
+  'sidecar-error': { label: 'El catálogo no respondió a tiempo', tono: 'medio' },
+};
+
+function Marcador({ tono }) {
+  // Sin bounding box real del modelo: una sola mira centrada ("aquí miré"),
+  // no seis puntos inventados sobre lesiones que no midió.
+  return (
+    <g className="dx-marker" data-sev={tono === 'bajo' ? 'temprana' : 'alta'} style={{ '--d': '1.3s' }}>
+      <circle className="dx-pulse" cx={450} cy={337} r={110} />
+      <circle className="dx-halo" cx={450} cy={337} r={110} />
+      <circle className="dx-ring" cx={450} cy={337} r={110} />
+    </g>
+  );
 }
 
 export default function DiagnosticoSobreFoto({ onBack }) {
-    // Fase de "escaneo": arranca mirando la foto y luego revela el diagnóstico.
-    // Con reduced-motion resolvemos directo a 'done' en el inicializador (no
-    // hay barrido) — así evitamos un setState síncrono dentro del efecto.
-    const [phase, setPhase] = useState(() =>
-        typeof window !== 'undefined'
-        && window.matchMedia?.('(prefers-reduced-motion: reduce)')?.matches
-            ? 'done'
-            : 'scan',
-    );
-    useEffect(() => {
-        if (phase !== 'scan') return undefined;
-        const t = setTimeout(() => setPhase('done'), 1750);
-        return () => clearTimeout(t);
-    }, [phase]);
+  // 'pick' → esperando foto. 'scan' → corriendo el pipeline. 'done' → resultado.
+  // El error de "no pude leer la foto" se muestra inline en 'pick' — no
+  // confundir con "el modelo no identificó nada", que SÍ es un resultado
+  // válido y se muestra en 'done'.
+  const [phase, setPhase] = useState('pick');
+  const [fotoUrl, setFotoUrl] = useState(null);
+  const [especie, setEspecie] = useState(null);
+  const [diagnostico, setDiagnostico] = useState(null);
+  const [errorMsg, setErrorMsg] = useState('');
+  const cameraInputRef = useRef(null);
+  const galleryInputRef = useRef(null);
 
-    // Ancla del chip (marcador 1) en porcentaje, para que siga a la foto.
-    const chipLeft = `${(HALLAZGOS_DIAGNOSTICO_CAFE[0].cx / 900) * 100}%`;
-    const chipTop = `${((HALLAZGOS_DIAGNOSTICO_CAFE[0].cy - HALLAZGOS_DIAGNOSTICO_CAFE[0].r) / 675) * 100}%`;
+  const reducedMotion = typeof window !== 'undefined'
+    && window.matchMedia?.('(prefers-reduced-motion: reduce)')?.matches;
 
-    return (
-        <ScreenShell
-            title="Diagnóstico sobre la foto"
-            icon={ScanEye}
-            onBack={onBack}
-        >
-            <div className="dx-wrap" data-phase={phase}>
-                <span className="dx-demo-badge">
-                    <Sparkles size={13} /> Muestra de demostración
-                </span>
+  const procesarFoto = useCallback(async (file) => {
+    setErrorMsg('');
+    setPhase('scan');
+    try {
+      const preCompressed = await compressImage(file);
+      if (!preCompressed.ok) {
+        setErrorMsg(
+          /** @type {any} */ (preCompressed).reason === 'too_large'
+            ? IMAGE_TOO_LARGE_MESSAGE
+            : 'No se pudo procesar esa foto. Intente con otra.',
+        );
+        setPhase('pick');
+        return;
+      }
+      const optimized = await optimizeImage(preCompressed.blob);
+      const dataUrl = await blobToDataUrl(optimized);
+      setFotoUrl(dataUrl);
 
-                {/* La foto que "subió" el campesino, como mensaje de chat */}
-                <div className="dx-ask">
-                    <span className="dx-ask-photo" aria-hidden>
-                        <Camera size={16} />
-                    </span>
-                    <p>
-                        Vea, le mando esta hoja de mi cafetal. La veo como con un
-                        polvillo por debajo. ¿Qué será que le pasa?
-                    </p>
-                </div>
+      // Especie + diagnóstico en paralelo — mismo pipeline grounded que ya
+      // usan EvidenceCapture/AgentScreen, no un llamado nuevo inventado.
+      const [speciesResult, diagResult] = await Promise.all([
+        recognizeSpeciesGrounded(optimized).catch(() => null),
+        analyzeFoliage(optimized).catch(() => null),
+      ]);
+      setEspecie(speciesResult);
+      setDiagnostico(diagResult);
+      if (reducedMotion) {
+        setPhase('done');
+      } else {
+        // Deja ver un instante el barrido de escaneo aunque el modelo haya
+        // respondido rápido (cache hit) — la UI no debe "parpadear" de pick a
+        // done sin que el usuario vea que sí miró la foto.
+        setTimeout(() => setPhase('done'), 900);
+      }
+    } catch (err) {
+      console.error('[DiagnosticoSobreFoto] error procesando foto:', err);
+      setErrorMsg('No pude analizar esa foto. Intente de nuevo.');
+      setPhase('pick');
+    }
+  }, [reducedMotion]);
 
-                <div className="dx-grid">
-                    {/* ── La radiografía: foto + capa del agente ─────────────── */}
-                    <figure className="dx-stage" data-phase={phase}>
-                        <img
-                            className="dx-photo"
-                            src={FOTO_DIAGNOSTICO_CAFE}
-                            width="900"
-                            height="675"
-                            alt="Hoja de café sostenida en la mano, con manchas de polvillo naranja de roya por el envés."
-                            loading="eager"
-                            decoding="async"
-                        />
+  const handleFile = (e) => {
+    const file = e.target.files?.[0];
+    e.target.value = '';
+    if (!file) return;
+    if (!file.type?.startsWith('image/')) {
+      setErrorMsg('Solo se permiten imágenes.');
+      return;
+    }
+    procesarFoto(file);
+  };
 
-                        {/* barrido de escaneo (una sola pasada al abrir) */}
-                        <div className="dx-scanline" aria-hidden />
+  const reiniciar = () => {
+    setPhase('pick');
+    setFotoUrl(null);
+    setEspecie(null);
+    setDiagnostico(null);
+    setErrorMsg('');
+  };
 
-                        {/* capa vectorial de marcas — mismo viewBox que la foto */}
-                        <svg
-                            className="dx-overlay"
-                            viewBox="0 0 900 675"
-                            preserveAspectRatio="none"
-                            aria-hidden
-                        >
-                            {HALLAZGOS_DIAGNOSTICO_CAFE.map((h) => <Marcador key={h.n} h={h} />)}
-                        </svg>
+  const grounding = especie?._grounded ? ESTADO_GROUNDING[especie._grounded.status] : null;
+  const nombreComun = especie?.common_name_es || '';
+  const nombreCientifico = especie?.scientific_name || '';
+  const tieneEspecie = Boolean(nombreComun || nombreCientifico);
+  const issues = Array.isArray(diagnostico?.issues) ? diagnostico.issues : [];
+  const tieneHallazgos = issues.length > 0;
+  const escaneando = phase === 'scan';
 
-                        {/* etiqueta flotante del hallazgo principal */}
-                        <figcaption
-                            className="dx-chip"
-                            style={{ left: chipLeft, top: chipTop }}
-                        >
-                            <span className="dx-chip-num">1</span>
-                            {HALLAZGOS_DIAGNOSTICO_CAFE[0].chip}
-                        </figcaption>
+  return (
+    <ScreenShell
+      title="Diagnóstico sobre la foto"
+      icon={ScanEye}
+      onBack={onBack}
+    >
+      <div className="dx-wrap" data-phase={phase}>
+        <span className="dx-demo-badge">
+          <Sparkles size={13} /> Identificación en vivo · modelo de visión local
+        </span>
 
-                        {/* estado del agente sobre la foto */}
-                        <div className="dx-status" role="status">
-                            {phase === 'scan'
-                                ? (<><ScanEye size={15} /> Mirando su foto…</>)
-                                : (<><ScanEye size={15} /> Lo que encontré</>)}
-                        </div>
-
-                        <span className="dx-credit">
-                            Foto CC BY-SA · Wikimedia
-                        </span>
-                    </figure>
-
-                    {/* ── El dictamen, en cristiano campesino ────────────────── */}
-                    <section className="dx-report" aria-label="Diagnóstico">
-                        <header className="dx-report-head">
-                            <span className="dx-avatar" aria-hidden><Leaf size={18} /></span>
-                            <div>
-                                <p className="dx-kicker">Chagra le responde</p>
-                                <h2 className="dx-title">Es la <strong>roya del café</strong></h2>
-                                <p className="dx-latin">Hemileia vastatrix · en el envés de la hoja</p>
-                            </div>
-                        </header>
-
-                        {/* confianza */}
-                        <div className="dx-conf">
-                            <div className="dx-conf-top">
-                                <span>Qué tan seguro estoy</span>
-                                <strong>Alta · 88%</strong>
-                            </div>
-                            <div className="dx-conf-bar" role="img" aria-label="Confianza 88 por ciento">
-                                <span style={{ width: '88%' }} />
-                            </div>
-                        </div>
-
-                        {/* hallazgos numerados = las marcas de la foto */}
-                        <ul className="dx-finds">
-                            {HALLAZGOS_DIAGNOSTICO_CAFE.map((h) => (
-                                <li key={h.n} className="dx-find" data-sev={h.sev}>
-                                    <span className="dx-find-num">{h.n}</span>
-                                    <div>
-                                        <p className="dx-find-title">
-                                            {h.titulo}
-                                            <em>{h.sev === 'alta' ? 'avanzado' : 'apenas empezando'}</em>
-                                        </p>
-                                        <p className="dx-find-detail">{h.detalle}</p>
-                                    </div>
-                                </li>
-                            ))}
-                        </ul>
-
-                        {/* severidad */}
-                        <p className="dx-sev">
-                            <ShieldAlert size={16} />
-                            <span>
-                                Ataque <strong>moderado</strong>: conviene actuar
-                                pronto, todavía está a tiempo.
-                            </span>
-                        </p>
-
-                        {/* recomendación agroecológica, sin dosis ni químicos */}
-                        <div className="dx-reco">
-                            <p className="dx-reco-head">Qué le recomiendo</p>
-                            <ul>
-                                <li>Recoja y saque del lote las hojas más enfermas (las del polvillo).</li>
-                                <li>Deje entrar aire y luz: regule la sombra para que la hoja seque rápido.</li>
-                                <li>Revise si su variedad es de las resistentes a la roya.</li>
-                            </ul>
-                            <button type="button" className="dx-cta" disabled>
-                                <Sparkles size={15} /> Ver el mundo del café
-                            </button>
-                        </div>
-
-                        <p className="dx-source">
-                            <Info size={13} />
-                            <span>
-                                Con base en el catálogo de sanidad de Chagra ·
-                                Cenicafé. Datos de muestra para esta demostración.
-                            </span>
-                        </p>
-                    </section>
-                </div>
+        {phase === 'pick' && (
+          <div className="dx-pick">
+            <p className="dx-pick-lead">
+              Suba o tome una foto de su mata. La reviso con el mismo modelo
+              de visión que usa el resto de Chagra — especie cruzada contra
+              el catálogo, diagnóstico con lo que de verdad se ve.
+            </p>
+            <div className="dx-pick-actions">
+              <button type="button" className="dx-pick-btn dx-pick-btn--primary" onClick={() => cameraInputRef.current?.click()}>
+                <Camera size={22} /> Tomar foto
+              </button>
+              <button type="button" className="dx-pick-btn" onClick={() => galleryInputRef.current?.click()}>
+                <ImageIcon size={22} /> Subir de galería
+              </button>
             </div>
-        </ScreenShell>
-    );
+            {errorMsg && (
+              <p className="dx-pick-error"><AlertTriangle size={14} /> {errorMsg}</p>
+            )}
+            <input
+              ref={cameraInputRef}
+              type="file"
+              accept="image/*"
+              capture="environment"
+              className="dx-hidden-input"
+              onChange={handleFile}
+              aria-label="Tomar foto con cámara"
+            />
+            <input
+              ref={galleryInputRef}
+              type="file"
+              accept="image/*"
+              className="dx-hidden-input"
+              onChange={handleFile}
+              aria-label="Subir foto de galería"
+            />
+          </div>
+        )}
+
+        {phase !== 'pick' && (
+          <>
+            {/* La "pregunta" del campesino, como mensaje de chat */}
+            <div className="dx-ask">
+              <span className="dx-ask-photo" aria-hidden>
+                <Camera size={16} />
+              </span>
+              <p>Vea, le mando esta foto de mi cafetal. ¿Qué será que tiene?</p>
+            </div>
+
+            <div className="dx-grid">
+              <figure className="dx-stage" data-phase={escaneando ? 'scan' : 'done'}>
+                {fotoUrl && (
+                  <img
+                    className="dx-photo"
+                    src={fotoUrl}
+                    alt={FOTO_ALT}
+                    loading="eager"
+                    decoding="async"
+                  />
+                )}
+
+                {!reducedMotion && <div className="dx-scanline" aria-hidden />}
+
+                <svg className="dx-overlay" viewBox="0 0 900 675" preserveAspectRatio="none" aria-hidden>
+                  {phase === 'done' && (tieneEspecie || tieneHallazgos) && (
+                    <Marcador tono={grounding?.tono || 'medio'} />
+                  )}
+                </svg>
+
+                <div className="dx-status" role="status">
+                  {escaneando
+                    ? (<><ScanEye size={15} /> Mirando su foto…</>)
+                    : (<><ScanEye size={15} /> Lo que encontré</>)}
+                </div>
+              </figure>
+
+              <section className="dx-report" aria-label="Diagnóstico">
+                <header className="dx-report-head">
+                  <span className="dx-avatar" aria-hidden><Leaf size={18} /></span>
+                  <div>
+                    <p className="dx-kicker">Chagra le responde</p>
+                    {escaneando ? (
+                      <h2 className="dx-title">Analizando…</h2>
+                    ) : tieneEspecie ? (
+                      <>
+                        <h2 className="dx-title">Parece <strong>{nombreComun || 'su planta'}</strong></h2>
+                        {nombreCientifico && <p className="dx-latin">{nombreCientifico}</p>}
+                      </>
+                    ) : (
+                      <h2 className="dx-title">No logré identificar la especie</h2>
+                    )}
+                  </div>
+                </header>
+
+                {!escaneando && grounding && (
+                  <p className={`dx-grounding dx-grounding--${grounding.tono}`}>
+                    {grounding.tono === 'ok' ? <CheckCircle2 size={14} /> : <AlertTriangle size={14} />}
+                    <span>{grounding.label}</span>
+                  </p>
+                )}
+
+                {!escaneando && typeof especie?.confidence === 'number' && (
+                  <div className="dx-conf">
+                    <div className="dx-conf-top">
+                      <span>Qué tan seguro estoy de la especie</span>
+                      <strong>{Math.round(especie.confidence * 100)}%</strong>
+                    </div>
+                    <div className="dx-conf-bar" role="img" aria-label={`Confianza ${Math.round(especie.confidence * 100)} por ciento`}>
+                      <span style={{ width: `${Math.round(especie.confidence * 100)}%` }} />
+                    </div>
+                  </div>
+                )}
+
+                {!escaneando && tieneHallazgos && (
+                  <ul className="dx-finds">
+                    {issues.map((issue, i) => (
+                      <li key={`${issue}-${i}`} className="dx-find" data-sev={diagnostico.score < 50 ? 'alta' : 'temprana'}>
+                        <span className="dx-find-num">{i + 1}</span>
+                        <div>
+                          <p className="dx-find-detail">{issue}</p>
+                        </div>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+
+                {!escaneando && !tieneHallazgos && diagnostico && (
+                  <p className="dx-sev">
+                    <ShieldAlert size={16} />
+                    <span>No vi problemas evidentes en esta foto (estado {diagnostico.score}/100).</span>
+                  </p>
+                )}
+
+                {!escaneando && !diagnostico && (
+                  <p className="dx-sev">
+                    <AlertTriangle size={16} />
+                    <span>No pude correr el diagnóstico esta vez — puede ser que la foto no muestre una planta, o que el modelo local no esté disponible ahora.</span>
+                  </p>
+                )}
+
+                {!escaneando && diagnostico?.treatment_suggestion && (
+                  <div className="dx-reco">
+                    <p className="dx-reco-head">Qué le recomiendo</p>
+                    <ul>
+                      <li>{diagnostico.treatment_suggestion}</li>
+                    </ul>
+                  </div>
+                )}
+
+                {!escaneando && (
+                  <button type="button" className="dx-cta" onClick={reiniciar}>
+                    <Camera size={15} /> Probar con otra foto
+                  </button>
+                )}
+
+                <p className="dx-source">
+                  <Info size={13} />
+                  <span>
+                    Modelo de visión local + catálogo de sanidad de Chagra.
+                    Diagnóstico orientativo — confírmelo en campo.
+                  </span>
+                </p>
+              </section>
+            </div>
+          </>
+        )}
+      </div>
+    </ScreenShell>
+  );
 }

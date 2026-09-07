@@ -1,0 +1,63 @@
+{
+  "_meta": {
+    "descripcion": "Allowlist del control de componente huérfano (scripts/audit-componente-huerfano.mjs, card 095). Declara lo que NO está montado A PROPÓSITO. Cada entrada exige reason + date.",
+    "regla_dura": "Una entrada que no le hace match a ningún sujeto real se reporta como [allowlist-obsoleta]. Es la lección del CHUNK_ALLOWLIST, que exceptuaba 'creatures-' mientras el chunk que reventaba se llamaba 'trazadoCreature-': la excepción por nombre literal se cae con cada rename y nadie se entera. Acá se entera.",
+    "no_poner_aca": "Las vitrinas públicas bajo MOCKUP_HASH_ROUTES NO necesitan entrada: el control las deriva del router de App.jsx, así que un rename no las vuelve a marcar. Si una vitrina aparece en el reporte es porque la sacaron del router — eso SÍ hay que mirarlo.",
+    "formato_id": "controlA → ruta del archivo (src/...). B1 → '<ruta>::componentes'. B2 → '<ruta>::modulo'. C → 'chip:<intent>'.",
+    "heredado": "ops/integraciones-no-consumidas.json (orphan_components) se lee como allowlist heredado para no duplicar razones ya escritas; se marca como heredada en el reporte."
+  },
+  "componentes": [
+    {
+      "id": "src/components/aprendizaje/GuiaEspecieCards.jsx",
+      "reason": "Prototipo del módulo de aprendizaje (PR #1674) alimentado por GUIAS_DEMO (papa y café escritos a mano en src/data/aprendizaje/guias-demo.js). Montarlo hoy en el directorio de especies o el calendario inyectaría datos demo en pantallas grounded desde catalog.sqlite, contra la regla de grounding del repo. Declarado mientras lee del catálogo real (su propio TODO apunta a catálogo v3.1+); cuando eso aterrice se decide su ruta de producto. Decisión tanda 1 del drenaje (095).",
+      "date": "2026-09-04"
+    },
+    {
+      "id": "src/components/_archivado/UmbralValle.jsx",
+      "reason": "Archivado a propósito en src/components/_archivado/. Era la puerta grande del home al valle 3D; la entrada viva del valle hoy es otra. No debe volver a montarse sin revivirlo como decisión explícita. Mismo criterio que las entradas _archivo del allowlist heredado (integraciones-no-consumidas.json). Decisión tanda 1 del drenaje (095).",
+      "date": "2026-09-04"
+    },
+    {
+      "id": "src/components/_archivo/OnboardingModal.jsx",
+      "reason": "Archivado el 2026-07-22 (la razón vive en su encabezado): no era un onboarding de perfil; FarmOSSetupModal conserva la configuración técnica que este contenía. Nadie debe montarlo de nuevo: el flujo vivo es otro. Decisión tanda 1 del drenaje (095).",
+      "date": "2026-09-04"
+    },
+    {
+      "id": "src/components/_archivo/BienvenidaFinca.jsx",
+      "reason": "Archivado el 2026-07-22 (la razón vive en su encabezado): duplicaba la entrada de primer uso; OnboardingCondensado lo reemplaza e incorpora sus capacidades útiles. Decisión tanda 1 del drenaje (095).",
+      "date": "2026-09-04"
+    },
+    {
+      "id": "src/components/_archivo/OnboardingHero.jsx",
+      "reason": "Archivado el 2026-07-22 (la razón vive en su encabezado): mezclaba configuración técnica y primer registro; OnboardingCondensado lo reemplaza y PrimerRegistroCard conserva sus tres CTA. Decisión tanda 1 del drenaje (095).",
+      "date": "2026-09-04"
+    },
+    {
+      "id": "src/components/_archivo/OnboardingProfile.jsx",
+      "reason": "Archivado el 2026-07-22 (la razón vive en su encabezado): el flujo extendido de perfil quedó reemplazado por OnboardingCondensado; las preguntas diferidas siguen disponibles en Perfil. Decisión tanda 1 del drenaje (095).",
+      "date": "2026-09-04"
+    },
+    {
+      "id": "src/components/_archivado/PanelVitalidadEspiritu.jsx",
+      "reason": "Desmontado del home 2D a propósito el 2026-08-26 (comentario en src/components/dashboard/FincaVivaHero.jsx: '[ARCHIVADO 2026-08-26] PanelVitalidadEspiritu'). El panel queda archivado con su CSS; si algún día se reviva, vitalidadEspirituService sigue siendo su fuente real. Decisión tanda 1 del drenaje (095).",
+      "date": "2026-09-04"
+    },
+    {
+      "id": "src/visual/mundo3d/atmosfera/DemoAtmosferaViva.jsx",
+      "reason": "Demo aislada por contrato A4, lo declara su propio encabezado: viñeta de QA/arte para verificar a ojo el arco del día de AtmosferaViva (deslizador día/noche, lluvia/seca). No es producto; quien quiera verla la monta a mano. Cablearla a una ruta rompería el contrato. Decisión tanda 1 del drenaje (095).",
+      "date": "2026-09-04"
+    },
+    {
+      "id": "src/components/lotes/LoteCroquisPlaceholder.jsx",
+      "reason": "Andamiaje declarado transitorio por su propio encabezado: será reemplazado por el canvas real de dibujo (Leaflet + herramienta de polígono/punto). Su valor hoy es la capa de datos ya cableada (useLoteStore + loteService) que documenta el contrato del croquis; no debe montarse como UI final. Decisión tanda 1 del drenaje (095).",
+      "date": "2026-09-04"
+    },
+    {
+      "id": "src/components/dashboard/ValleHoverConfirm.jsx",
+      "reason": "Rescatado de un worktree huérfano del 27-ago (PR #3132) con el hunk de FincaVivaHero.jsx sin aplicar. Auditado al integrar: PR #3051 (2026-08-29) ya trajo ValleHomeGateway, que envuelve la MISMA fvh-escena-wrap con el mismo flujo hover/touch → teaser de 3 frames (VALLE_TEASER_FRAMES) → diálogo de confirmación → TransicionNewDonk → navegar a valle3d, y sigue vivo en dev (PR #3112, 2026-09-03, le sacó el voseo). Aplicar el hunk hoy anidaría dos capas de hover-confirm sobre la misma región: UI duplicada y rota. Se declara huérfano a propósito; el componente y su test quedan en el árbol por si se necesita comparar la implementación, pero NO se monta. Decisión de integración del rescate de worktrees (2026-09-04).",
+      "date": "2026-09-04"
+    }
+  ],
+  "exports": [],
+  "afordancias": []
+}

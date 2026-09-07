@@ -68,7 +68,7 @@ export const BACKGROUND_CATALOG = Object.freeze([
 
 /** ¿El valor de fondo es un gradiente CSS (vs una ruta de imagen)? */
 export function esGradiente(v) {
-  return typeof v === 'string' && /-gradient\(/.test(v);
+  return typeof v === 'string' && /gradient\(/i.test(v);
 }
 
 /**

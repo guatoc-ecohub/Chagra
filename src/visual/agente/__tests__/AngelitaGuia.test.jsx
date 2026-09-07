@@ -15,7 +15,10 @@ import { render, cleanup, screen, fireEvent, act } from '@testing-library/react'
 import { createRef } from 'react';
 import { AngelitaGuia } from '../AngelitaGuia.jsx';
 
-afterEach(cleanup);
+afterEach(() => {
+  cleanup();
+  localStorage.clear();
+});
 
 /** Deja correr varios cortes cortos de act() (ver nota en useAngelitaGuia.test.js). */
 async function asentar(comprobar, { intentos = 15, pasoMs = 20 } = {}) {
@@ -58,6 +61,27 @@ describe('<AngelitaGuia> — el gesto y el texto declarados llegan al DOM', () =
     // angelitaVariedad puede anteponerle una apertura ('Mire:', 'Pendiente:'…);
     // lo que importa es que el NÚCLEO factual llegue intacto.
     expect(textoBurbuja()).toMatch(/café mojado coge hongos/i);
+  });
+
+  it('muestra el compai elegido y conserva el gesto de guía', async () => {
+    localStorage.setItem('compai:companero', 'jaguar');
+    const ref = createRef();
+    render(
+      <>
+        <div ref={ref}>el jaguar</div>
+        <AngelitaGuia
+          paradas={[{ id: 'jaguar', ref, texto: 'Mire el jaguar.', gesto: 'invita' }]}
+          demoraInicialMs={0}
+        />
+      </>,
+    );
+
+    await asentar(panelListo);
+    const cuerpo = document.querySelector('[data-creature="jaguar"]');
+    expect(cuerpo).toBeTruthy();
+    expect(cuerpo).toHaveAttribute('data-agt-estado', 'invita');
+    expect(cuerpo).toHaveAttribute('title', 'el jaguar');
+    expect(textoBurbuja()).toMatch(/Mire el jaguar/i);
   });
 
   it('sin gesto declarado, Angelita actúa "senala" por defecto', async () => {

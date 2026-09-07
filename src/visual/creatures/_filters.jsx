@@ -15,7 +15,11 @@ export function CreatureFilters({ glow, blur }) {
           <feMergeNode in="SourceGraphic" />
         </feMerge>
       </filter>
-      <filter id={blur}>
+      {/* Región explícita: con la default (-10%..110%) el blur del aura se
+          RECORTABA en un cuadrado de borde suave — un parche rectangular
+          fantasma detrás del bicho, visible sobre fondos planos (2026-08-23).
+          Se abre la región para que el halo termine redondo, como debe. */}
+      <filter id={blur} x="-60%" y="-60%" width="220%" height="220%">
         <feGaussianBlur stdDeviation="3" />
       </filter>
     </>

@@ -81,6 +81,23 @@
   min-height: 48px;
 }
 
+/* El faro acompaña la lectura panorámica como señal, no como otro título.
+   Al enfocarlo, el nombre vuelve a abrirse para confirmar qué anuncia. */
+.v3d-alerta:not([data-expandido='1']) {
+  width: 48px;
+  height: 48px;
+  min-width: 48px;
+  padding: 0;
+  justify-content: center;
+  gap: 0;
+}
+.v3d-alerta:not([data-expandido='1']) .valle-alerta__txt {
+  display: none;
+}
+.v3d-alerta .valle-alerta__icono {
+  line-height: 1;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .v3d-poi {
     transition: none;

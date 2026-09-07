@@ -11,7 +11,7 @@
  *     renderizan Angelita (el colibrí jubiló del rol de agente).
  */
 import React from 'react';
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen, fireEvent, act } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { describe, test, expect, vi, afterEach } from 'vitest';
 import ChagraAgentAvatar from '../ChagraAgentAvatar';
@@ -44,6 +44,35 @@ describe('ChagraAgentAvatar — Angelita default: glow + double-click + migraci�
   test('slug legacy colibri en localStorage TAMBIÉN renderiza Angelita', () => {
     localStorage.setItem('chagra:agent-avatar-type', 'colibri');
     const { container } = render(<ChagraAgentAvatar state="idle" />);
+    expect(container.querySelector('svg.agt-angelita')).toBeInTheDocument();
+  });
+
+  test('cambia al compai elegido cuando llega el evento global del selector', () => {
+    const { container } = render(<ChagraAgentAvatar state="idle" />);
+    expect(container.querySelector('svg.agt-angelita')).toBeInTheDocument();
+
+    act(() => {
+      localStorage.setItem('compai:companero', 'jaguar');
+      window.dispatchEvent(new CustomEvent('chagra:agent-avatar-changed', { detail: 'jaguar' }));
+    });
+
+    // Jaguar dejó de ser SVG (feat/jaguar-lamina-sobre-esqueleto): ahora es
+    // la lámina real recortada en capas, montada en <div>s — el contrato
+    // observable (data-creature, role=img) es el mismo, el tag no.
+    expect(container.querySelector('[data-creature="jaguar"]')).toBeInTheDocument();
+    expect(container.querySelector('svg.agt-angelita')).not.toBeInTheDocument();
+  });
+
+  test('maiz se retiró del roster (2026-08-14): el evento global con maiz ya no cambia el avatar', () => {
+    const { container } = render(<ChagraAgentAvatar state="idle" />);
+    expect(container.querySelector('svg.agt-angelita')).toBeInTheDocument();
+
+    act(() => {
+      window.dispatchEvent(new CustomEvent('chagra:agent-avatar-changed', { detail: 'maiz' }));
+    });
+
+    // 'maiz' ya no está en AVATAR_TYPES: el hook ignora el evento y el
+    // avatar se queda en Angelita (no en chagra-maiz).
     expect(container.querySelector('svg.agt-angelita')).toBeInTheDocument();
   });
 
@@ -117,11 +146,64 @@ describe('ChagraAgentAvatar — Angelita default: glow + double-click + migraci�
     ).toBeInTheDocument();
   });
 
+  test('la API rica también pasa por el adaptador canónico de Angelita', () => {
+    const { container } = render(
+      <ChagraAgentAvatar
+        estado="respondiendo"
+        visema="V4"
+        tier="bajo"
+        animated={false}
+        lineBoil
+        gafas
+      />,
+    );
+    const agente = container.querySelector('svg.agt-angelita');
+    expect(agente).toHaveAttribute('data-agt-estado', 'respondiendo');
+    expect(agente).toHaveAttribute('data-agt-visema', 'V4');
+    expect(agente).toHaveAttribute('data-tier', 'bajo');
+    expect(container.querySelector('[data-lineboil="1"]')).toBeInTheDocument();
+    expect(container.querySelector('[data-gafas="1"]')).toBeInTheDocument();
+  });
+
   test('glow + state coexisten sin conflicto', () => {
     const { container } = render(<ChagraAgentAvatar state="speaking" glow />);
     const svg = container.querySelector('svg.agt-angelita');
     expect(svg.getAttribute('data-agt-estado')).toBe('respondiendo');
     expect(svg.classList.contains('agt-avatar-glow')).toBe(true);
+  });
+});
+
+describe('ChagraAgentAvatar — guacamaya promovida a "avatar rico" (2026-08-21)', () => {
+  afterEach(() => {
+    localStorage.clear();
+  });
+
+  test('type="guacamaya" con API rica (estado) NO se degrada por STATE_DE_ESTADO_RICO', () => {
+    localStorage.setItem('chagra:agent-avatar-type', 'guacamaya');
+    const { container } = render(<ChagraAgentAvatar estado="contenta" />);
+    const svg = container.querySelector('svg[data-creature="guacamaya"]');
+    expect(svg).toBeInTheDocument();
+    // Si se hubiera traducido a la baja (STATE_DE_ESTADO_RICO no mapea
+    // 'contenta'), habría caído a data-estado="idle" — la fidelidad se
+    // pierde justo ahí. El bypass nuevo debe llegar directo a 'sana'.
+    expect(svg).toHaveAttribute('data-estado', 'sana');
+  });
+
+  test('type="guacamaya" con API rica también recibe visema real', () => {
+    localStorage.setItem('chagra:agent-avatar-type', 'guacamaya');
+    const { container } = render(<ChagraAgentAvatar estado="respondiendo" visema="V3" />);
+    const svg = container.querySelector('svg[data-creature="guacamaya"]');
+    expect(svg).toHaveAttribute('data-estado', 'hablar');
+    expect(svg).toHaveAttribute('data-visema', 'V3');
+  });
+
+  test('type="guacamaya" con API angosta (state) sigue igual que antes', () => {
+    localStorage.setItem('chagra:agent-avatar-type', 'guacamaya');
+    const { container } = render(<ChagraAgentAvatar state="speaking" />);
+    const svg = container.querySelector('svg[data-creature="guacamaya"]');
+    expect(svg).toBeInTheDocument();
+    expect(svg).toHaveAttribute('data-estado', 'hablar');
+    expect(svg).toHaveAttribute('data-visema', 'V2');
   });
 });
 

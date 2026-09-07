@@ -45,8 +45,11 @@ describe('Borugo — contrato base intacto', () => {
   });
 
   it('está registrado como el binomio correcto (Cuniculus taczanowskii)', () => {
-    expect(CREATURES.borugo).toBeTruthy();
-    expect(CREATURES.borugo.cientifico).toBe('Cuniculus taczanowskii');
+    expect(CREATURES.borugo).toMatchObject({
+      Component: Borugo,
+      nombre: 'Borugo',
+      cientifico: 'Cuniculus taczanowskii',
+    });
   });
 });
 

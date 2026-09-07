@@ -260,7 +260,7 @@ function DetalleCapa({ capa, alto, red, tier, reducedMotion }) {
       <group>
         {terrones.map((t) => <Terron key={t.key} pos={t.pos} r={t.rr} color={capa.color} />)}
         {hojas.map((h) => (
-          <mesh key={h.key} position={h.pos} rotation={[-Math.PI / 2, 0, h.giro]} scale={[1.4, 1, 1]}>
+          <mesh key={h.key} position={/** @type {[number, number, number]} */ (h.pos)} rotation={[-Math.PI / 2, 0, h.giro]} scale={[1.4, 1, 1]}>
             <circleGeometry args={[0.08, 5]} />
             <meshLambertMaterial color={h.key % 2 ? '#8a5a2c' : '#a06a34'} side={THREE.DoubleSide} flatShading />
           </mesh>
@@ -316,7 +316,7 @@ function DetalleCapa({ capa, alto, red, tier, reducedMotion }) {
     return (
       <group>
         {rocas.map((ro) => (
-          <mesh key={ro.key} position={ro.pos} scale={ro.esc} rotation={[r(), r(), r()]}>
+          <mesh key={ro.key} position={/** @type {[number, number, number]} */ (ro.pos)} scale={ro.esc} rotation={[r(), r(), r()]}>
             <icosahedronGeometry args={[1, 0]} />
             <meshLambertMaterial color={ro.key % 2 ? '#565560' : '#43424b'} flatShading />
           </mesh>

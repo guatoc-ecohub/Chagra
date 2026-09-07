@@ -7,10 +7,11 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { listFarmProcesses } from '../../db/farmProcessCache';
 import useAssetStore from '../../store/useAssetStore';
-import useCosechaStore from '../../store/useCosechaStore';
 import { buildFincaScene } from '../../services/fincaSceneService';
-import { buildVitalidadEspiritu } from '../../services/vitalidadEspirituService';
-import { getDiagnosticoSueloGuardado } from '../../services/soilDiagnostic';
+// [ARCHIVADO 2026-08-26] useCosechaStore / buildVitalidadEspiritu /
+// getDiagnosticoSueloGuardado alimentaban el PanelVitalidadEspiritu
+// ("VITALIDAD DEL ESPÍRITU"), desmontado del home 2D y archivado en
+// src/components/_archivado/. Ver ops/ARCHIVO-HOME-2D-20260826.md.
 import { selectSceneVariant, SCENE_KINDS } from '../../services/fincaSceneProfileSelector';
 import { getProfile, saveProfile, getInvernaderoEstructura, hasManualModuleVisibility } from '../../services/userProfileService';
 import { esPerfilUrbano } from '../../services/homeModuleSelector';
@@ -23,7 +24,6 @@ import { useTheme, resolveAutoTheme } from '../../hooks/useTheme';
 import { iconForTheme } from './themeIcon';
 import { colibriRealActivo } from '../../config/colibriFlag';
 import { BarbuditoIlustrado, BarbuditoRealLoop } from '../colibri/Barbudito';
-import Angelita from '../../visual/agente/Angelita';
 // Campana de notificaciones en el header F2 (regresión 2026-07-04): con la flag
 // F2 ON el TopBar legacy (que la montaba) NO se renderiza, así que el home se
 // quedó sin campana. `variant="f2"` es la misma píldora redonda que ya usa
@@ -44,20 +44,21 @@ import NotificationsBell from '../NotificationsBell';
 //   · minimalista → "Un solo trazo" (line-art que se dibuja sobre papel).
 // Las escalas balcon/invernadero conservan sus escenas isométricas intactas.
 import SceneFincaOrganismo from './SceneFincaOrganismo';
-// PANEL DE VITALIDAD DEL ESPÍRITU — la lectura de vida del organismo (mockup
-// aprobado #/mockups/avatar-biopunk), groundeada con los registros REALES de
-// la finca (ver vitalidadEspirituService). Solo se monta con la escena
-// Finca Organismo (biopunk2), debajo de la escena.
-import PanelVitalidadEspiritu from './PanelVitalidadEspiritu';
+// [ARCHIVADO 2026-08-26] PanelVitalidadEspiritu ("VITALIDAD DEL ESPÍRITU")
+// desmontado del home 2D por orden del operador (le restaba valor a lo
+// importante). Componente + CSS movidos a src/components/_archivado/.
+// Candidato a un JUEGO / otra sección. Ver ops/ARCHIVO-HOME-2D-20260826.md.
 import SceneFincaNature from './SceneFincaNature';
 import SceneHuertoVivo from './SceneHuertoVivo';
 import SceneTrazoMinimal from './SceneTrazoMinimal';
-// EL UMBRAL DEL VALLE + LAS PUERTAS COMO CARTAS (encargo FABLE_50 §A6,
-// "home máximo" 2026-07-16): la vista viva que ES la puerta cinematográfica
-// al valle 3D, y las puertas pintadas como cartas en la mano. Los destinos
-// siguen saliendo de buildPuertas (fuente única); solo cambió la piel.
-import UmbralValle from './UmbralValle';
+// [ARCHIVADO 2026-08-26] UmbralValle ("Entrar a mi valle / Camine su finca en
+// 3D") desmontado del home 2D por orden del operador. Componente + CSS movidos
+// a src/components/_archivado/. Las puertas como cartas (PortalesMano) siguen
+// como la vía a los mundos. Ver ops/ARCHIVO-HOME-2D-20260826.md.
 import PortalesMano from './PortalesMano';
+// LA PUERTA DEL VALLE: teaser con CUADROS REALES del valle + entrada New Donk.
+// Reintroduce el acceso al valle 3D desde el home 2D con una capa ligera.
+import ValleHomeGateway from './ValleHomeGateway';
 import './scene-finca-organismo.css';
 import './scene-finca-nature.css';
 import './scene-huerto-vivo.css';
@@ -320,44 +321,12 @@ export default function FincaVivaHero({ onNavigate, onOpenAgent, onGestionar, on
   // usan). Tras el split vive en biopunk2 (donde quedó la Finca Organismo).
   const organismoActivo = escenaVivaActiva && temaEfectivo === 'biopunk2';
 
-  // ── PANEL DE VITALIDAD DEL ESPÍRITU (solo con la Finca Organismo) ─────────
-  // Cada valor sale de una fuente REAL (contrato en vitalidadEspirituService):
-  // vitalidad = scene.vitalidad (ciclos reales) · especies = procesos +
-  // plantas-asset · clima = snapshot guardado + condición de la atmósfera (la
-  // MISMA de la escena) · cosechas = useCosechaStore (log--harvest reales) ·
-  // suelo = diagnóstico DR-SUELOS-1 cuando exista (hoy no se persiste →
-  // "dato en camino", nunca un número inventado).
-  const plantAssets = useAssetStore((s) => s.plants);
-  const cosechaSummary = useCosechaStore((s) => s.summary);
-  useEffect(() => {
-    if (!organismoActivo || cosechaSummary) return;
-    // Carga offline-first de los log--harvest (IDB). Si falla, el contador
-    // queda honesto en "dato en camino" (el store guarda el error).
-    useCosechaStore.getState().loadHarvests().catch(() => {});
-    // Solo debe dispararse al activar la escena; el summary llega por el store.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [organismoActivo]);
-  const vitalidadEspiritu = useMemo(() => {
-    if (!organismoActivo) return null;
-    let snapshot = null;
-    try { snapshot = getCachedClimaSnapshot(); } catch (_) { /* sin señal guardada */ }
-    // 🪱 El suelo: el ÚLTIMO diagnóstico REAL que el usuario hizo en la
-    // pantalla de suelo (DR-SUELOS-1), persistido por guardarDiagnosticoSuelo.
-    // Nunca hizo uno → null → el eje queda honesto en "dato en camino".
-    let diagSuelo = null;
-    try { diagSuelo = getDiagnosticoSueloGuardado(); } catch (_) { /* sin diagnóstico */ }
-    return buildVitalidadEspiritu({
-      scene,
-      processes,
-      plants: plantAssets,
-      climaSnapshot: snapshot,
-      condicion: atmosfera?.condicion || null,
-      harvestSummary: cosechaSummary,
-      diagSuelo,
-    });
-    // `atmosfera` también re-lee el snapshot cacheado (se refresca con el
-    // MISMO evento CLIMA_UPDATED_EVENT que alimenta el cielo de la escena).
-  }, [organismoActivo, scene, processes, plantAssets, cosechaSummary, atmosfera]);
+  // [ARCHIVADO 2026-08-26] El cómputo del PANEL DE VITALIDAD DEL ESPÍRITU
+  // (vitalidadEspirituService: vitalidad, especies, clima, suelo, cosechas)
+  // vivía aquí y alimentaba <PanelVitalidadEspiritu>. Desmontado del home 2D
+  // por orden del operador; el servicio y el componente quedan archivados
+  // (src/components/_archivado/) como candidatos a un JUEGO / otra sección.
+  // Ver ops/ARCHIVO-HOME-2D-20260826.md.
 
   // ── GATE DE ANIMALES (potrero de la escena + puerta "Mis animales") ───────
   // Mismo criterio que DashboardLive.mostrarAnimales (el usuario solo ve lo
@@ -573,7 +542,8 @@ export default function FincaVivaHero({ onNavigate, onOpenAgent, onGestionar, on
         <main className="fvh-main">
           {/* ── ESCENA ISOMÉTRICA (o slot institucional) ────────────────────── */}
           <div className={`fvh-escena-wrap${escenaVivaActiva ? ' fvh-escena-wrap--viva' : ''}${organismoActivo ? ' fvh-escena-wrap--organismo' : ''}`}>
-            <div className="fvh-escena">
+            <ValleHomeGateway onNavigate={onNavigate} enabled={tieneFincaPropia && escala === 'finca'}>
+              <div className="fvh-escena">
               {/* globo del agente colibrí */}
               <button
                 type="button"
@@ -618,20 +588,12 @@ export default function FincaVivaHero({ onNavigate, onOpenAgent, onGestionar, on
                     )
                   )}
 
-                  {/* fauna sobre la escena. ANGELITA (la abeja agente) vuela
-                      SIEMPRE — es la guía, no ganado; acompaña también la
-                      finca recién empezada ("solo abejita", operador
-                      2026-07-18: el colibrí jubiló del rol de insignia del
-                      agente). La mariposa y la abeja emoji (fauna que
-                      prospera) sólo aparecen cuando la finca está poblada.
-                      Con una ESCENA VIVA de tema activa NO se superpone
-                      fauna: cada escena trae la suya. */}
+                  {/* Fauna decorativa sobre la escena. El compai único vive en
+                      el FAB global, no se duplica dentro del home. */}
                   {!escenaVivaActiva && (
                   <div className="fvh-bichos" aria-hidden="true">
-                    {/* Con la flag VITE_COLIBRI ON (dev) = modo A/B TEMPORAL
-                        de barbuditos de páramo (fauna decorativa, no el
-                        agente). Con la flag OFF (prod), ANGELITA volando —
-                        idle vivo 'acompana' con su cerebro de micro-gestos. */}
+                    {/* Con la flag VITE_COLIBRI ON (dev) = modo A/B temporal
+                        de barbuditos de páramo, fauna decorativa. */}
                     {COLIBRI_REAL ? (
                       <>
                         <span className="fvh-bicho fvh-colibri-ab fvh-colibri-ab-izq" style={{ left: '4%', top: '12%' }}>
@@ -643,11 +605,7 @@ export default function FincaVivaHero({ onNavigate, onOpenAgent, onGestionar, on
                           <span className="fvh-ab-tag">real</span>
                         </span>
                       </>
-                    ) : (
-                      <span className="fvh-bicho fvh-colibri-vuela" style={{ left: '60%', top: '14%' }}>
-                        <Angelita estado="acompana" size={72} title="Angelita acompaña la finca" />
-                      </span>
-                    )}
+                    ) : null}
                     {poblada && (
                       <>
                         <span className="fvh-bicho" style={{ left: '16%', top: '18%', animationDelay: '.1s' }}>🦋</span>
@@ -660,15 +618,13 @@ export default function FincaVivaHero({ onNavigate, onOpenAgent, onGestionar, on
               ) : (
                 <div className="fvh-institucional">{children}</div>
               )}
-            </div>
+              </div>
+            </ValleHomeGateway>
 
-            {/* ── PANEL DE VITALIDAD DEL ESPÍRITU (mockup avatar-biopunk) ──
-                La lectura de vida del organismo, DEBAJO de la escena (no tapa
-                el potrero/la vaca ni el globo del colibrí). Datos 100% reales;
-                lo que falte se pinta "—" = dato en camino. */}
-            {vitalidadEspiritu && tieneFincaPropia && (
-              <PanelVitalidadEspiritu modelo={vitalidadEspiritu} />
-            )}
+            {/* [ARCHIVADO 2026-08-26] Aquí iba el PANEL DE VITALIDAD DEL
+                ESPÍRITU, debajo de la escena. Desmontado del home 2D por orden
+                del operador (le restaba valor a lo importante). Componente en
+                src/components/_archivado/. Ver ops/ARCHIVO-HOME-2D-20260826.md. */}
           </div>
 
           {/* ── COLUMNA derecha en desktop / debajo en móvil ────────────────── */}
@@ -768,12 +724,12 @@ export default function FincaVivaHero({ onNavigate, onOpenAgent, onGestionar, on
           </div>
         </main>
 
-        {/* ── EL UMBRAL DEL VALLE (encargo "home máximo" 2026-07-16) ──────────
-            La vista viva del valle andino a la hora real — y LA PUERTA GRANDE:
-            tocarla inunda la pantalla con el cielo de la franja y aterriza en
-            el valle 3D ('valle3d', existe en ambos shells). Solo con finca
-            propia: la RED institucional del extensionista no es un valle. */}
-        {tieneFincaPropia && <UmbralValle onNavigate={onNavigate} />}
+        {/* [ARCHIVADO 2026-08-26] Aquí iba EL UMBRAL DEL VALLE, el cuadro que
+            decía "Entrar a mi valle / Camine su finca en 3D" (con el barbudito
+            de páramo). Desmontado del home 2D por orden del operador. El acceso
+            a los mundos sigue por las puertas-cartas de abajo (PortalesMano) y
+            MundosDeMiFinca. Componente en src/components/_archivado/.
+            Ver ops/ARCHIVO-HOME-2D-20260826.md. */}
 
         {/* ── LAS 6 PUERTAS como CARTAS EN LA MANO (usabilidad campesina #5 +
             FABLE_50 §A6). Antes: tarjetas planas con emoji. Ahora: viñetas de
@@ -813,7 +769,7 @@ const PISO_LABEL = {
 function buildUbicacion() {
   let loc = {};
   let perfil = {};
-  try { perfil = getProfile() || {}; } catch (_) { perfil = {}; }
+  try { perfil = getProfile(); } catch (_) { perfil = {}; }
   try { loc = resolveClimaLocation({ profile: perfil }) || {}; } catch (_) { loc = {}; }
 
   const vereda = limpiar(loc.vereda || perfil.vereda);

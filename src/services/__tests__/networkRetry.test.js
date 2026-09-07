@@ -52,13 +52,14 @@ describe('networkRetry.fetchWithRetry', () => {
     vi.mocked(globalThis.fetch).mockRejectedValue(new TypeError('Failed to fetch'));
 
     const promise = fetchWithRetry('/api/test');
+    const rejection = expect(promise).rejects.toThrow('Failed to fetch');
 
     // Avanzar timers: 1s + 2s + 4s
     await vi.advanceTimersByTimeAsync(1000);
     await vi.advanceTimersByTimeAsync(2000);
     await vi.advanceTimersByTimeAsync(4000);
 
-    await expect(promise).rejects.toThrow('Failed to fetch');
+    await rejection;
     expect(globalThis.fetch).toHaveBeenCalledTimes(4);
   });
 
@@ -110,10 +111,11 @@ describe('networkRetry.fetchWithRetry', () => {
     vi.mocked(globalThis.fetch).mockRejectedValue(new TypeError('Failed to fetch'));
 
     const promise = fetchWithRetry('/api/test', { retries: 1 });
+    const rejection = expect(promise).rejects.toThrow('Failed to fetch');
 
     await vi.advanceTimersByTimeAsync(1000);
 
-    await expect(promise).rejects.toThrow('Failed to fetch');
+    await rejection;
     expect(globalThis.fetch).toHaveBeenCalledTimes(2); // 1 initial + 1 retry
   });
 

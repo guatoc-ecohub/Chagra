@@ -13,10 +13,18 @@
          CRITICO: script-src DEBE incluir 'wasm-unsafe-eval'; sin eso el navegador
          bloquea WebAssembly -> sqlite-wasm (capa de datos) no carga -> app muerta
          (Failed to fetch, todo en 0). worker-src para el service worker de la PWA.
-         Regresion cubierta por el smoke en tests/offline.spec.js (WebAssembly.compile). -->
+         Regresion cubierta por el smoke en tests/offline.spec.js (WebAssembly.compile).
+         CRITICO 2: script-src DEBE incluir blob:; el <Text> 3D de drei
+         (troika-three-text: letreros del hato en corral/mercado) levanta su
+         typesetter en un worker blob que hace importScripts(blob:) — el worker
+         hereda esta CSP y sin blob: el rehydrate falla ("Worker module function
+         was called but `init` did not return a callable function"), el <Text>
+         suspende dentro del Canvas y el diorama ENTERO queda invisible (cielo
+         solo, sin error visible). Detectado en gate visual del mundo mercado
+         2026-07-30. -->
     <meta http-equiv="Content-Security-Policy" content="
       default-src 'self';
-      script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval' https:;
+      script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval' blob: https:;
       style-src 'self' 'unsafe-inline' https:;
       img-src 'self' data: blob: https:;
       connect-src 'self' https: wss:;

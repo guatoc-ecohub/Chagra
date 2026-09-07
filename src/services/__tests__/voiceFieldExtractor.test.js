@@ -167,3 +167,73 @@ describe('timestamp relativo se calcula contra now inyectado', () => {
     expect(r.timestampMs).toBe(NOW);
   });
 });
+
+// ─────────── Deducción rica del registro por voz (AC-4 operador, 2026-08-27) ───────────
+// Frase objetivo DURA: "sembré 20 tomate cherry aquí en este surco hace 3 meses,
+// ya están produciendo" → especie=tomate cherry, variedad=cherry, cantidad=20,
+// ubicación=surco, fenología≈producción, fecha=hoy−3 meses. Sin inventar cifras.
+import { parseRelativeTime } from '../voiceFieldExtractor';
+
+const D = 86400000;
+
+describe('parseRelativeTime — unidades día/semana/mes/año', () => {
+  it('convierte cada unidad a offsetDays (mes≈30, año≈365)', () => {
+    expect(parseRelativeTime('hace dos dias').offsetDays).toBe(-2);
+    expect(parseRelativeTime('hace 2 semanas').offsetDays).toBe(-14);
+    expect(parseRelativeTime('hace 3 meses').offsetDays).toBe(-90);
+    expect(parseRelativeTime('hace un año').offsetDays).toBe(-365);
+    expect(parseRelativeTime('el mes pasado').offsetDays).toBe(-30);
+    expect(parseRelativeTime('la semana pasada').offsetDays).toBe(-7);
+    expect(parseRelativeTime('el año pasado').offsetDays).toBe(-365);
+    expect(parseRelativeTime('hoy').offsetDays).toBe(0);
+    expect(parseRelativeTime('').offsetDays).toBe(0);
+  });
+});
+
+describe('Frase objetivo — sembré 20 tomate cherry en este surco hace 3 meses', () => {
+  const r = run('sembré 20 tomate cherry aquí en este surco hace 3 meses, ya están produciendo');
+  it('clasifica registrar_siembra', () => {
+    expect(r.intent).toBe(INTENTS.SIEMBRA);
+  });
+  it('resuelve la especie a Tomate Cherry (no al genérico)', () => {
+    expect(slugs(r)).toContain('solanum_lycopersicum_cherry');
+  });
+  it('captura la variedad "cherry" sin perderla', () => {
+    expect(r.variedad).toBe('cherry');
+  });
+  it('cuenta 20 (N + especie del catálogo, offline)', () => {
+    expect(r.measures.cantidad).toBe(20);
+  });
+  it('deduce la zona "surco" como ubicación', () => {
+    expect(r.position.raw).toBe('surco');
+  });
+  it('deduce fenología en producción', () => {
+    expect(r.phenology.some((p) => p.canon.includes('producción'))).toBe(true);
+  });
+  it('fecha de siembra ≈ hoy − 3 meses (−90 días)', () => {
+    expect(r.time.offsetDays).toBe(-90);
+    expect(r.timestampMs).toBe(NOW - 90 * D);
+  });
+});
+
+describe('Variantes — cantidad + zona + tiempo relativo', () => {
+  it('50 lechugas en la cama 3 hace 2 semanas', () => {
+    const r = run('50 lechugas en la cama 3 hace 2 semanas');
+    expect(r.measures.cantidad).toBe(50);
+    expect(slugs(r)).toContain('lactuca_sativa');
+    expect(r.position.raw).toBe('cama 3');
+    expect(r.time.offsetDays).toBe(-14);
+    expect(r.timestampMs).toBe(NOW - 14 * D);
+  });
+  it('planté cilantro el mes pasado → siembra, −30 días', () => {
+    const r = run('planté cilantro el mes pasado');
+    expect(r.intent).toBe(INTENTS.SIEMBRA);
+    expect(r.time.offsetDays).toBe(-30);
+  });
+  it('no inventa cantidad cuando la especie está fuera del catálogo (aguacate)', () => {
+    const r = run('sembré 15 aguacates la semana pasada');
+    expect(slugs(r)).toHaveLength(0); // aguacate no está en CROP_TAXONOMY
+    expect(r.measures.cantidad).toBeUndefined(); // NO inventa 15 sin especie groundeada
+    expect(r.time.offsetDays).toBe(-7);
+  });
+});

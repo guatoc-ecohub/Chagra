@@ -90,6 +90,16 @@ test.describe('IDB schema v9 — índice compuesto asset_id+timestamp', () => {
         }),
       })
     );
+
+    // BUG-09 (2026-09-04): tras login el destino post-login lo decide
+    // resolveDestinoPostLogin(); para que este usuario E2E caiga en el
+    // dashboard como siempre, se prima el flag done del tenant
+    // e2e-operator ANTES del arranque (estado "usuario recurrente",
+    // determinista). El routing a 'onboarding-perfil' tiene unit tests
+    // propios; el gate offline no debe depender de la UI del onboarding.
+    await context.addInitScript(() => {
+      window.localStorage.setItem('chagra:profile:done:v1:e2e-operator', '1');
+    });
   });
 
   test('logs store tiene índice compuesto asset_id_timestamp y retorna logs ordenados', async ({ page }) => {
@@ -211,6 +221,12 @@ test.describe('Offline-first — siembra pendiente y reconexión', () => {
       })
     );
 
+    // Mismo priming de "usuario recurrente" del describe anterior (BUG-09):
+    // el gate offline presume dashboard post-login, no onboarding.
+    await context.addInitScript(() => {
+      window.localStorage.setItem('chagra:profile:done:v1:e2e-operator', '1');
+    });
+
     // Cualquier otro tráfico saliente a FarmOS/HA/Ollama se bloquea —
     // el test depende solo de la capa offline, nunca de red externa.
     // El abort se retrasa ~400ms a propósito: al reconectar, mantiene la petición
@@ -250,6 +266,9 @@ test.describe('Offline-first — siembra pendiente y reconexión', () => {
 
     // Simula desconexión de red.
     await context.setOffline(true);
+    await expect
+      .poll(() => page.evaluate(() => navigator.onLine), { timeout: 5_000 })
+      .toBe(false);
     await page.evaluate(() => window.dispatchEvent(new Event('offline')));
 
     await expect(page.getByText(/sin conexion|offline-first/i).first()).toBeVisible({

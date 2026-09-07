@@ -9,6 +9,7 @@ import {
   photoBubbleText,
   buildPhotoUserMessage,
   processPhotoItem,
+  processPhotoItemBounded,
 } from '../agentOutboxPhoto';
 
 describe('agentOutboxPhoto.hasVisionFinding', () => {
@@ -172,5 +173,22 @@ describe('agentOutboxPhoto.processPhotoItem (drain → visión + foto)', () => {
     );
     expect(analyze).not.toHaveBeenCalled();
     expect(prompt.trim().length).toBeGreaterThan(0);
+  });
+
+  it('control negativo: una visión que nunca resuelve deja un prompt utilizable y cierra el turno', async () => {
+    const analyze = vi.fn(() => new Promise(() => {}));
+    const onTimeout = vi.fn();
+
+    const result = await processPhotoItemBounded(
+      { kind: 'photo', text: 'las hojas tienen manchas', blob },
+      { analyze, createUrl: () => 'blob:still-here', timeoutMs: 1, onTimeout },
+    );
+
+    expect(analyze).toHaveBeenCalledWith(blob);
+    expect(onTimeout).toHaveBeenCalledTimes(1);
+    expect(result.timedOut).toBe(true);
+    expect(result.finding).toBeNull();
+    expect(result.prompt).toContain('las hojas tienen manchas');
+    expect(result.prompt.trim()).not.toBe('');
   });
 });

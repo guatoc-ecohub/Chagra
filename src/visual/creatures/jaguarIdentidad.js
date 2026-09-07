@@ -48,16 +48,16 @@ export const JAGUAR_PALETA = {
   colmillo: '#fff8ec',      // colmillos del rugido
   vibrisa: '#f7edd8',       // bigotes (vibrisas) crema claro
   sombraSuelo: 'rgba(36,22,8,0.38)', // la sombra bajo las zarpas (peso real)
-  /* ── Místico (el jaguar-espíritu del chamán, cosmología andino-amazónica) ──
-     Paleta de acentos: violeta/azul (cielo nocturno, la piel = noche estrellada)
-     + DORADO/COBRE (orfebrería andina Tairona/Zenú + el sol del jaguar). */
-  espectral: '#b98cff',     // aura etérea / presencia sagrada (violeta espectral)
-  estrella: '#efe6ff',      // el titileo de las constelaciones en las rosetas
-  ojoBrillo: '#ffe6a0',     // fosforescencia del ojo-espíritu (visión nocturna)
-  bruma: '#cdb4ff',         // el velo de niebla del mundo-espíritu a los pies
-  mota: '#ece1ff',          // motas de luz que flotan lento (polvo del espíritu)
+  /* ── Registro NOCTURNO (el felino que anda de noche, como LUZ y no como
+     símbolo) — acentos violeta/azul del cielo de noche + un cobre cálido que
+     lo amarra al resto del elenco. */
+  espectral: '#b98cff',     // el halo tenue que lo envuelve (violeta espectral)
+  estrella: '#efe6ff',      // el titileo de estrellas sobre las rosetas
+  ojoBrillo: '#ffe6a0',     // el ojo que devuelve la luz de noche (tapetum)
+  bruma: '#cdb4ff',         // el velo de niebla a los pies
+  mota: '#ece1ff',          // motas de luz que flotan lento
   marcaEspiritu: '#c9a4ff', // las rosetas gemelas que BRILLAN en la revelación
-  cobre: '#e0a24a',         // glifos de geometría sagrada (cobre de orfebrería)
+  cobre: '#e0a24a',         // glifos de ornamento geométrico (acento cobre)
 };
 
 export const JAGUAR_PROPORCION = {
@@ -82,4 +82,60 @@ export const PERFIL_JAGUAR = Object.freeze({
   humedad: 0.6,
   difusa: 0.5,
   sequia: 0.3,
+});
+
+/*
+ * JAGUAR_PRESENCIA — cómo ocupa una escena 3D (el molde es ABEJA_PRESENCIA:
+ * mismos campos, otro animal). El jaguar es FELINO DE SUELO: `percha.y` y
+ * `rondaAltura` son la altura del CENTRO de su billboard sobre el PISO
+ * mientras camina — jamás una altura de vuelo (no vuela, no trota: acecha).
+ * Se planta un paso más allá del foco que la zarigüeya (distancia de
+ * depredador que observa) y su sombra de contacto es FIRME: un felino grande
+ * PESA (sombraSuelo es parte de su identidad — "no un sticker").
+ */
+export const JAGUAR_PRESENCIA = {
+  /* Billboard <Html>: px base + ganancia por energía (0..1) y el
+     distanceFactor de cámara. Grande (felino imponente) pero con ganancia
+     corta: su poder es CONTENIDO — la energía no lo agranda, lo afila. */
+  billboardBase: 58,
+  billboardPorEnergia: 8,
+  distancia: 6,
+  /* Su marca junto al foco (llega CAMINANDO, agazapado) y la altura del
+     centro del billboard mientras anda por el piso. */
+  percha: { x: 0.62, y: 0.3, z: 0.72 },
+  rondaAltura: 0.3,
+  /* Sombra de contacto con peso real: casi siempre pegada a él (nunca se
+     despega del suelo); apenas se atenúa si la coreografía lo sube a algo. */
+  sombra: {
+    radio: 0.46,
+    opacidad: 0.3,
+    opacidadBase: 0.36,
+    opacidadMin: 0.16,
+    atenuaPorAltura: 0.1,
+    ensanchaPorAltura: 0.06,
+  },
+};
+
+/*
+ * JAGUAR_PODER_KART — el PODER del jaguar como piloto del kart, derivado de la
+ * ecología (no al revés). Mismo shape que el `poder` de los pilotos benéficos
+ * (id, alcance, titulo, efecto, porQue) para que el juego lo consuma sin
+ * traducción. El GESTO que lo representa en el cuerpo 2.5D es el prop
+ * `paisajeDelMiedo` de Jaguar.jsx (la onda de presencia + la mirada afilada).
+ *
+ * El "paisaje del miedo" (landscape of fear) es un concepto ecológico real: la
+ * sola PRESENCIA de un depredador ápice como el jaguar (Panthera onca) altera
+ * la conducta de las presas en TODO el paisaje —dónde comen, por dónde pasan—
+ * sin que medie una sola depredación. Por eso el poder es de ÁREA y NO apunta a
+ * nadie: no caza a un rival, reordena a todos con solo estar ahí.
+ */
+export const JAGUAR_PODER_KART = Object.freeze({
+  id: 'paisaje-del-miedo',
+  alcance: 'area',
+  titulo: 'Paisaje del miedo',
+  efecto: 'Suelta una onda de presencia depredadora: los rivales cercanos frenan y '
+    + 'se dispersan un instante, sin tocarlos. No apunta a nadie — cambia el terreno.',
+  porQue: 'El "paisaje del miedo" es real en ecología: la sola presencia del jaguar, '
+    + 'depredador ápice, altera la conducta de las presas en todo el paisaje sin '
+    + 'depredación directa. El poder es de ÁREA porque el miedo no elige a uno: los reordena a todos.',
 });

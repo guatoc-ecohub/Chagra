@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Chagra 3D | Rigged jaguar y oso</title>
+    <style>
+      :root { color-scheme: dark; font-family: Georgia, 'Times New Roman', serif; background: #11140f; color: #f4ead5; }
+      * { box-sizing: border-box; }
+      body { margin: 0; min-width: 320px; min-height: 100vh; background: radial-gradient(circle at 50% -15%, #3d4931 0, #1d261b 36%, #11140f 76%); }
+      .shell { width: min(1180px, 100%); min-height: 100vh; margin: 0 auto; padding: 26px; display: grid; grid-template-rows: auto 1fr auto; gap: 18px; }
+      header { display: flex; align-items: end; justify-content: space-between; gap: 18px; }
+      h1 { margin: 0; font-size: clamp(1.45rem, 3vw, 2.5rem); letter-spacing: -0.04em; font-weight: 600; }
+      .eyebrow { margin: 0 0 7px; color: #d8ad61; font: 700 0.68rem/1.2 ui-monospace, SFMono-Regular, Menlo, monospace; letter-spacing: 0.2em; text-transform: uppercase; }
+      .note { max-width: 400px; margin: 0; color: #c9c8ae; font: 0.82rem/1.45 ui-sans-serif, system-ui, sans-serif; text-align: right; }
+      .stage { position: relative; min-height: 560px; overflow: hidden; border: 1px solid rgba(231, 202, 145, 0.2); border-radius: 26px; background: linear-gradient(145deg, rgba(39, 54, 35, 0.9), rgba(10, 15, 12, 0.94)); box-shadow: 0 26px 90px rgba(0, 0, 0, 0.32), inset 0 1px rgba(255, 255, 255, 0.08); }
+      canvas { display: block; width: 100%; height: 100%; min-height: 560px; }
+      .legend { position: absolute; top: 18px; left: 20px; display: grid; gap: 8px; pointer-events: none; }
+      .legend span { display: inline-flex; align-items: center; gap: 8px; color: #d6d8c3; font: 0.72rem/1 ui-sans-serif, system-ui, sans-serif; }
+      .legend i { width: 9px; height: 9px; border-radius: 50%; background: var(--dot); box-shadow: 0 0 14px var(--dot); }
+      .controls { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+      .card { padding: 14px; border: 1px solid rgba(231, 202, 145, 0.15); border-radius: 16px; background: rgba(21, 26, 18, 0.8); }
+      .card h2 { display: flex; justify-content: space-between; margin: 0 0 10px; color: #f4ead5; font-size: 1rem; font-weight: 600; }
+      .status { color: #b4c79d; font: 0.68rem ui-monospace, SFMono-Regular, Menlo, monospace; font-weight: 400; }
+      .buttons { display: flex; flex-wrap: wrap; gap: 7px; }
+      button { border: 1px solid rgba(231, 202, 145, 0.26); border-radius: 999px; padding: 8px 11px; color: #efe4c8; background: #283524; cursor: pointer; font: 0.72rem ui-sans-serif, system-ui, sans-serif; transition: 160ms ease; }
+      button:hover, button:focus-visible { border-color: #e0b86c; background: #3a4a31; transform: translateY(-1px); outline: none; }
+      footer { color: #9ca890; font: 0.72rem/1.4 ui-monospace, SFMono-Regular, Menlo, monospace; }
+      @media (max-width: 700px) { .shell { padding: 16px; } header { display: block; } .note { margin-top: 10px; text-align: left; } .stage, canvas { min-height: 440px; } .controls { grid-template-columns: 1fr; } }
+    </style>
+  </head>
+  <body>
+    <main class="shell">
+      <header>
+        <div>
+          <p class="eyebrow">GPU verification / no FBX</p>
+          <h1>Jaguar y oso, con esqueleto vivo</h1>
+        </div>
+        <p class="note">RiggedActor con clips idle, walk, golpe y muerte. La lámina 2D sigue siendo el renderer por defecto.</p>
+      </header>
+      <section class="stage" aria-label="Preview 3D de los actores rigueados">
+        <canvas id="rigged-canvas"></canvas>
+        <div class="legend" aria-hidden="true">
+          <span><i style="--dot:#d9a94d"></i>Jaguar, Panthera onca</span>
+          <span><i style="--dot:#9e8063"></i>Oso andino</span>
+        </div>
+      </section>
+      <section id="controls" class="controls" aria-label="Controles de animación"></section>
+      <footer>El botón polvo usa actor.playDeath() y actor.setDissolve() sobre los materiales del rig.</footer>
+    </main>
+    <script type="module" src="/src/visual/creatures/rigged/rigged-preview.js"></script>
+  </body>
+</html>

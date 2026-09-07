@@ -44,6 +44,12 @@
  * vecina — y la única forma de garantizarlo es que salgan del mismo archivo.
  */
 import { ABEJA_PALETA } from '../../creatures/abejaIdentidad.js';
+/* El AIRE del mundo viene del kit de cielos de la casa (dato puro, three-free):
+   este mundo venía inventando su propio celeste de mediodía y su propio índigo
+   de noche, y era el único de Chagra que se veía de OTRO juego. El día de la
+   finca es el mediodía andino del valle; su noche es LA noche estrellada del
+   valle. Congruencia de elenco (brief #11): el mismo día para todos. */
+import { CIELOS_HORA } from '../cielosHoraData.js';
 
 export { ABEJA_PALETA, ABEJA_TINTA } from '../../creatures/abejaIdentidad.js';
 
@@ -58,15 +64,18 @@ export { ABEJA_PALETA, ABEJA_TINTA } from '../../creatures/abejaIdentidad.js';
  * donde solo quedan encendidas las flores pálidas y el murciélago.
  */
 export const PAL = {
-  // Aire y suelo
-  cieloDia: '#bfe3f2',
-  cieloNoche: '#141d33',
-  nieblaDia: '#d5eaf0',
-  nieblaNoche: '#1b2645',
-  suelo: '#6b7f47',
-  sueloRico: '#55693a', // la tierra bajo el monte (materia orgánica)
-  potrero: '#96a45c', // el pasto limpio: verde pobre, sin flor
-  monte: '#3f5a35', // el rincón de monte: verde hondo
+  // Aire: LAS HORAS DE LA CASA (cielosHoraData), no un cielo propio. El día es
+  // el marfil alto del mediodía andino; la noche, el índigo de la noche madre.
+  cieloDia: CIELOS_HORA.mediodia.fondo,
+  cieloNoche: CIELOS_HORA.noche.fondo,
+  nieblaDia: CIELOS_HORA.mediodia.niebla,
+  nieblaNoche: CIELOS_HORA.noche.niebla,
+  // Suelo: parientes directos de la paleta madre (paletaMadre.js) — se citan
+  // aquí como hex porque este archivo es three-free y aquella no:
+  suelo: '#6b7f47', // ≈ mezclar(VERDES.trabajo, TIERRAS.camino, 0.35): huerta trabajada
+  sueloRico: '#55693a', // ≈ mezclar(VERDES.monte, TIERRAS.siembra, 0.3): tierra bajo el monte
+  potrero: '#96a45c', // ≈ mezclar(VERDES.calido, TIERRAS.piedra, 0.4): pasto pobre, sin flor
+  monte: '#3f5a35', // ≈ mezclar(VERDES.monte, NEUTROS.tinta, 0.2): el rincón hondo
 
   // EL SERVICIO (el trueque hecho color)
   polen: '#ffc94a', // el polen que VIAJA: ámbar dorado

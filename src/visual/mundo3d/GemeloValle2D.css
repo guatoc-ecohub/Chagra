@@ -25,17 +25,35 @@
   will-change: transform;
 }
 
-/* Lienzo con la razón exacta del viewBox (480×360): crece hasta CUBRIR el
-   contenedor sin deformarse, y los hijos posicionados en % quedan alineados
-   1:1 con el dibujo. */
+/* Lienzo con la razón exacta del viewBox (480×360): se ESCALA para que se vea
+   completo en cualquier orientación sin deformarse, y los hijos posicionados
+   en % quedan alineados 1:1 con el dibujo. */
 .gemelo-valle__lienzo {
   position: absolute;
   left: 50%;
   top: 50%;
   transform: translate(-50%, -50%);
   aspect-ratio: 480 / 360;
-  min-width: 100%;
-  min-height: 100%;
+  width: auto;
+  height: auto;
+  max-width: 100%;
+  max-height: 100%;
+}
+
+/* En landscape, el lienzo cubre todo el ancho (el valle es horizontal por diseño) */
+@media (orientation: landscape) {
+  .gemelo-valle__lienzo {
+    width: 100%;
+    height: auto;
+  }
+}
+
+/* En portrait, el lienzo se contiene dentro del alto (vertical) para que se vea completo */
+@media (orientation: portrait) {
+  .gemelo-valle__lienzo {
+    width: auto;
+    height: 100%;
+  }
 }
 
 .gemelo-valle__svg {

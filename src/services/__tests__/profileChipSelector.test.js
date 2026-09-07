@@ -7,7 +7,7 @@ import {
   selectChipIntents,
   selectChipDefs,
 } from '../profileChipSelector.js';
-import { CHIP_INTENTS, CHIP_DEFS } from '../agentCapabilities.js';
+import { CHIP_INTENTS, CHIP_DEFS, CAPABILITY_MANIFEST } from '../agentCapabilities.js';
 
 /**
  * Tests del SELECTOR DE CHIPS POR PERFIL (onboarding por perfil + chips
@@ -110,15 +110,20 @@ describe('profileChipSelector — selectChipIntentsForRole (núcleo puro)', () =
     const intents = selectChipIntentsForRole({ role: PROFILE_ROLES.campesino });
     expect(intents).toEqual([
       CHIP_INTENTS.siembro,
-      CHIP_INTENTS.calendario,
+      // CHIP_INTENTS.asociaciones despintada de la toolbar (card 092,
+      // 2026-09-04): sin routing determinístico el turno con texto caía al
+      // NLU en silencio. La decisión de re-pintado es del operador.
       CHIP_INTENTS.plaga,
       CHIP_INTENTS.biopreparado,
       CHIP_INTENTS.clima,
+      CHIP_INTENTS.calendario,
       CHIP_INTENTS.precio,
     ]);
     // NO debe mostrar páramo a un campesino que no pidió restauración.
     expect(intents).not.toContain(CHIP_INTENTS.paramo);
     expect(intents).not.toContain(CHIP_INTENTS.restauracion);
+    // Despintada (card 092): el chip no se ofrece a ningún rol por la toolbar.
+    expect(intents).not.toContain(CHIP_INTENTS.asociaciones);
   });
 
   it('restaurador: chips de restauración primero', () => {
@@ -262,6 +267,69 @@ describe('profileChipSelector — selectChipDefs (objetos para el componente)', 
     for (const d of defs) {
       expect(CHIP_DEFS.some((c) => c.intent === d.intent)).toBe(true);
     }
+  });
+
+  // Card 092 (2026-09-04): `asociaciones` DESPINTADA de la toolbar por rol.
+  // Sin routing determinístico en planForcedIntent, el turno con texto caía al
+  // NLU en silencio ("pintado sin efecto"). La alternativa honesta de la card
+  // cuando no hay decisión de producto es despintarla. La capacidad NO muere:
+  // el heroRoute del AgentHero (kind:'nav' → vista 'asociaciones') sigue vivo
+  // y el bypass de operador conserva el chip para evaluarla.
+  it('asociaciones NO se pinta en la toolbar por perfil (card 092: despintada hasta decisión del operador)', () => {
+    for (const role of Object.values(PROFILE_ROLES)) {
+      const intents = selectChipIntentsForRole({ role });
+      expect(intents).not.toContain(CHIP_INTENTS.asociaciones);
+    }
+    // Y tampoco por el path de alto nivel con perfil real de campesino/técnico.
+    expect(selectChipIntents({ rol: 'campesino' })).not.toContain(CHIP_INTENTS.asociaciones);
+    expect(selectChipIntents({ rol: 'tecnico' })).not.toContain(CHIP_INTENTS.asociaciones);
+  });
+
+  it('asociaciones sigue existiendo en el manifiesto (heroRoute del AgentHero intacto)', () => {
+    // Despintar NO es borrar: la entrada del manifiesto (kind:'nav', hero:true,
+    // featured:true, heroRoute → vista 'asociaciones') debe seguir viva para
+    // que la mano/AgentHero navegue a la vista real. El heroRoute vive en
+    // CAPABILITY_MANIFEST (CHIP_DEFS es una proyección sin navegación).
+    const def = CAPABILITY_MANIFEST.find((d) => d.intent === CHIP_INTENTS.asociaciones);
+    expect(def).toBeTruthy();
+    expect(def.kind).toBe('nav');
+    expect(def.heroRoute).toEqual({ kind: 'nav', view: 'asociaciones' });
+  });
+
+  it('técnico tiene chips de variedades, fenología, polinización y fuente/DOI', () => {
+    const intents = selectChipIntents({ rol: 'tecnico' });
+    expect(intents).toContain(CHIP_INTENTS.variedades);
+    expect(intents).toContain(CHIP_INTENTS.fenologia);
+    expect(intents).toContain(CHIP_INTENTS.polinizacion);
+    expect(intents).toContain(CHIP_INTENTS.fuente_doi);
+  });
+
+  it('fuente_doi sigue pintada para técnico (deuda documentada card 092: tool NO verificada, NO se cablea)', () => {
+    // Estado congelado a propósito: la tool get_fuente_doi NO existe en el
+    // sidecar (verificación en vivo 4 capas 2026-09-04, build 5bd011ff: 45
+    // tools, ninguna con fuente/doi; POST → 404; fuera de ALLOWED_TOOLS).
+    // La card 092 manda PARAR el cableado hasta que la tool exista. El chip
+    // queda pintado para el técnico como deuda ABIERTA y visible — quitarlo
+    // también sería una decisión de producto que nadie tomó.
+    const intents = selectChipIntents({ rol: 'tecnico' });
+    expect(intents).toContain(CHIP_INTENTS.fuente_doi);
+  });
+
+  it('técnico tiene chips de cultivo base más los técnicos', () => {
+    const intents = selectChipIntents({ rol: 'tecnico' });
+    // Cultivo base
+    expect(intents).toContain(CHIP_INTENTS.siembro);
+    expect(intents).toContain(CHIP_INTENTS.plaga);
+    expect(intents).toContain(CHIP_INTENTS.biopreparado);
+    expect(intents).toContain(CHIP_INTENTS.clima);
+    expect(intents).toContain(CHIP_INTENTS.calendario);
+    // Técnicos
+    expect(intents).toContain(CHIP_INTENTS.variedades);
+    expect(intents).toContain(CHIP_INTENTS.fenologia);
+    expect(intents).toContain(CHIP_INTENTS.polinizacion);
+    expect(intents).toContain(CHIP_INTENTS.fuente_doi);
+    // Restauración
+    expect(intents).toContain(CHIP_INTENTS.restauracion);
   });
 });
 

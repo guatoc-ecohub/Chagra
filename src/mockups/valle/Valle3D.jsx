@@ -23,12 +23,15 @@
 /* Nota: las props de three (position, args, intensity, castShadow, etc.) son
    válidas en el reconciliador de R3F, no en el DOM — el config de ESLint del
    repo no activa react/no-unknown-property, así que no requieren disable. */
-import { Suspense, useEffect, useMemo, useRef, useState } from 'react';
+import { Suspense, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import {
   Html, Float, Stars, OrbitControls, Detailed, Instances, Instance,
 } from '@react-three/drei';
 import * as THREE from 'three';
+import { pegarAlTerreno } from '../../../lib3d/locomocion/snakey.js';
+import { crearSuperficieErosionada } from '../../../lib3d/terrain/superficie.js';
+import { crearClimaVolumetrico } from '../../../lib3d/terrain/clima.js';
 import { perfilDeTier } from '../../visual/mundo3d/deviceTier.js';
 import CamaraDirector from '../../visual/mundo3d/escenas/CamaraDirector.jsx';
 import DirectorValle from './DirectorValle.jsx';
@@ -43,7 +46,25 @@ import { AbejaAngelita } from '../../visual/creatures/AbejaAngelita.jsx';
    (CompaneroAbeja) lo usa para husmear con criterio: comentarios grounded
    por mundo, con la anti-molestia (cooldowns) resuelta adentro del store. */
 import useAngelitaStore from '../../store/useAngelitaStore';
+/* EL COMPAI HABLA CON DATOS REALES (auditoría 2026-07-26, ítem #38): el
+   inventario vivo de la finca + su traducción a lo que cada comentarista sabe
+   leer, y el sensor de "¿está a mitad de algo?" que el motor esperaba desde
+   siempre y nadie alimentaba. Los tres cuelgan del núcleo portable del compAI
+   (src/compai/nucleo) — la fuente única que comparte con 3d.guatoc.co. */
+import useInventarioCompai from '../../hooks/useInventarioCompai';
+import { datosDeMundo } from '../../compai/nucleo/datosFinca.js';
+import { estaOcupado } from '../../services/compaiOcupado.js';
+import { husmeoCadenciaMs, vueltasCompletas } from './husmeoCadencia.js';
 import BurbujaAngelita from '../../visual/agente/BurbujaAngelita';
+/* #88 — QUE EL COMPAI HABLE SUS TIPS: hasta hoy el husmeo solo pintaba la
+   burbuja (mensajeAngelita), nunca lo decía en voz — speak/speakKokoro ya
+   existían y nadie los llamaba desde aquí. Mismo patrón que useAcompanante
+   (AcompananteMundo.jsx) y el shell (EntradaValle3D.jsx): Kokoro primero,
+   Web Speech si no responde. Gateado por el silencio real del operador
+   (usePrefsStore.ttsEnabled, la misma bandera que apaga la voz en
+   AgentScreen) y por reducedMotion (silencio también es respeto). */
+import { speak, speakKokoro } from '../../services/ttsService.js';
+import usePrefsStore from '../../store/usePrefsStore.js';
 /* La CAPA DE ESTADO de Angelita (auditoría §5b): módulo puro, sin three — el
    mismo repertorio (mojada/sed/comiendo/vuelo) que usan los mundos 3D. */
 import { reaccionDeFinca, ESTADO_FINCA_MUESTRA } from '../../visual/mundo3d/escenas/reaccionFinca.js';
@@ -64,10 +85,11 @@ import LaderaAltaValle from './LaderaAltaValle.jsx';
 import ArrieriaValle from './ArrieriaValle.jsx';
 import AguaVivaValle from './AguaVivaValle.jsx';
 import DetalleSueloValle from './DetalleSueloValle.jsx';
+import PastoVivoValle from './PastoVivoValle.jsx';
 import { CampesinosValle } from './CampesinosValle.jsx';
 import HatoMovil from './HatoMovil.jsx';
 /* Árboles POR ESPECIE (no genéricos): las mismas mallas del bosque altoandino
-   (roble, aliso, gaque) que ya viven en floraParamo — cada árbol se distingue. */
+   (roble, aliso, gaque) que ya viven en floraParamo. */
 import { geomRoble, geomAliso, geomGaque } from '../../visual/mundo3d/bosque/floraParamo.geom.js';
 /* Luciérnagas de la noche: el kit instanciado que ya existe (1-3 draw calls),
    sembrado sobre la tierra baja del valle cuando la franja las trae. */
@@ -102,7 +124,9 @@ import { CriaturaNocturnaAvatar } from '../../components/dashboard/CriaturasNoct
    árboles, matas, vecinos) — sin ella los objetos flotan sobre la loma.
    2 draw calls instanciados, textura radial pre-horneada, cero costo/frame. */
 import SombrasContacto from './SombrasContacto.jsx';
+import EntsDelValle from './EntsDelValle.jsx';
 import './rotulosValle3D.css';
+import { chipEnRadioMovil, seleccionarIdsPlenos } from './rotulosValle3D.js';
 import {
   MUNDOS_VALLE,
   COSA_DEL_DIA,
@@ -132,6 +156,7 @@ const LUGAR_A_MUNDO_ANGELITA = {
   semillero: 'mis_matas',
   abono: 'mis_matas',
   micorrizas: 'bosque',
+  chorrera: 'clima',
   animales: 'mis_animales',
   agua: 'clima',
   clima: 'clima',
@@ -139,16 +164,21 @@ const LUGAR_A_MUNDO_ANGELITA = {
   disenio: 'bosque',
   aprender: 'aprender',
   paramo: 'paramo',
+  cacao: 'mis_matas',
+  papa: 'mis_matas',
+  abejas: 'mis_animales',
+  lluvia: 'clima',
+  sierra: 'bosque',
+  compost: 'mis_matas',
+  bosque: 'bosque',
 };
 
-/* Los 6 lugares que Angelita husmea SOLA en reposo — los mismos 6 portales
-   principales (PORTALES_VALLE en composicionValle.js): rotan uno a la vez,
-   espaciados por HUSMEO_MS; el propio store (cooldown de 20 min por mundo)
-   decide si de verdad vale la pena interrumpir. Nunca a mitad de un viaje
-   real, nunca con reduced-motion. */
-const HUSMEO_LUGARES = ['cultivos', 'animales', 'clima', 'mercado', 'aprender', 'disenio'];
 const HUSMEO_PRIMERO_MS = 4200; // el primer husmeo llega pronto: se ve viva al cargar
-const HUSMEO_CADA_MS = 13000; // cadencia entre husmeos (feedback operador: 40s se sentía MUERTA; 13s = viva sin ser errática)
+/* Cadencia entre husmeos: YA NO un número fijo. `husmeoCadenciaMs` (ítem #58
+   del GAP compAI, 2026-08-13) reconcilia el SPEC (46s) con el feedback en
+   vivo del operador (13s: "40s se sentía MUERTA") — arranca en 13s y se
+   asienta hacia 46s tras varias vueltas sin que el usuario interactúe. Ver
+   ./husmeoCadencia.js. */
 const HUSMEO_VISIBLE_MS = 7000; // piso: ningún aviso dura menos que esto
 /* Cuánto se queda un aviso en pantalla: lo que tarda la máquina de escribir en
    ponerlo (≈16 ms por letra) MÁS el tiempo de leerlo con calma (≈70 ms por
@@ -172,6 +202,44 @@ function alturaTerreno(x, z) {
   const ondul = Math.sin(x * 0.42) * 0.14 + Math.cos(z * 0.36 + x * 0.2) * 0.12;
   const cauce = -0.32 * Math.exp(-((x - 1.2) ** 2) / 6) * Math.exp(-((z + 1) ** 2) / 55);
   return subida + ondul + cauce;
+}
+
+/**
+ * Devuelve los landmarks cuyo volumen aproximado cruza el frustum actual.
+ * La decisión se toma contra la cámara viva, no contra la lista de portales
+ * ni contra un orden fijo. El radio incluye el volumen de la geometría para
+ * que un lugar parcialmente visible también pueda recibir un husmeo.
+ *
+ * @param {Array<{id:string, pos:number[], escala?:number}>} mundos
+ * @param {import('three').Camera|null|undefined} camera
+ * @returns {string[]}
+ */
+function lugaresVisiblesEnFrustum(mundos, camera) {
+  if (!Array.isArray(mundos) || !camera) return [];
+  const projection = new THREE.Matrix4().multiplyMatrices(
+    camera.projectionMatrix,
+    camera.matrixWorldInverse,
+  );
+  const frustum = new THREE.Frustum().setFromProjectionMatrix(projection);
+  const centro = new THREE.Vector3();
+  const visibles = [];
+
+  for (const mundo of mundos) {
+    if (!mundo?.id || !Array.isArray(mundo.pos)) continue;
+    const escala = Math.abs(Number(mundo.escala) || 1);
+    centro.set(
+      Number(mundo.pos[0]) || 0,
+      Number.isFinite(mundo.pos[1]) ? mundo.pos[1] : alturaTerreno(mundo.pos[0], mundo.pos[2]),
+      Number(mundo.pos[2]) || 0,
+    );
+    if (frustum.intersectsSphere(new THREE.Sphere(centro, Math.max(1.2, escala * 1.5)))) {
+      visibles.push({ id: mundo.id, distancia: camera.position.distanceToSquared(centro) });
+    }
+  }
+
+  // La proximidad a la cámara hace estable la elección mientras el usuario
+  // mueve los controles, pero la fuente de candidatos sigue siendo el frustum.
+  return visibles.sort((a, b) => a.distancia - b.distancia).map(({ id }) => id);
 }
 
 /* Color del suelo a una altura z: interpola entre los colores de los pisos
@@ -215,7 +283,7 @@ function colorSueloEnZ(z, alto, nocturno, out) {
       según el piso térmico de cada franja (páramo frío arriba → tierra caliente
       abajo). El color sale de PISOS_TERMICOS: franjas de altitud legibles, con
       la cresta apenas más clara para dar relieve. ── */
-function Terreno({ nocturno, innerRef, perfil }) {
+function Terreno({ nocturno, innerRef, perfil, superficie }) {
   const seg = perfil.segmentosTerreno;
   const geo = useMemo(() => {
     const g = new THREE.PlaneGeometry(34, 34, seg, seg);
@@ -226,7 +294,7 @@ function Terreno({ nocturno, innerRef, perfil }) {
     for (let i = 0; i < pos.count; i++) {
       const x = pos.getX(i);
       const z = pos.getZ(i);
-      const y = alturaTerreno(x, z);
+      const y = superficie.heightAt(x, z);
       pos.setY(i, y);
       const subida = THREE.MathUtils.smoothstep(-z, -8, 11) * 5.4;
       const alto = THREE.MathUtils.clamp((y - subida + 0.3) / 0.6, 0, 1);
@@ -238,7 +306,7 @@ function Terreno({ nocturno, innerRef, perfil }) {
     g.setAttribute('color', new THREE.BufferAttribute(colores, 3));
     g.computeVertexNormals();
     return g;
-  }, [nocturno, seg]);
+  }, [nocturno, seg, superficie]);
   return (
     <mesh ref={innerRef} geometry={geo} receiveShadow={perfil.sombras}>
       {perfil.materialRico ? (
@@ -279,7 +347,7 @@ const PICOS_LEJANOS = [
 
 function PicosLejanos({ color }) {
   return (
-    <Instances limit={PICOS_LEJANOS.length}>
+    <Instances frames={1} limit={PICOS_LEJANOS.length}>
       <coneGeometry args={[1, 1, 5]} />
       <meshLambertMaterial color={color} opacity={0.85} transparent />
       {PICOS_LEJANOS.map((p, i) => (
@@ -295,7 +363,7 @@ function Cordillera({ color, innerRef, perfil }) {
     // escalado por instancia. El raycast de occlude funciona igual.
     return (
       <group ref={innerRef}>
-        <Instances limit={PICOS_CORDILLERA.length}>
+        <Instances frames={1} limit={PICOS_CORDILLERA.length}>
           <coneGeometry args={[1, 1, 6]} />
           <meshLambertMaterial color={color} opacity={0.92} transparent />
           {PICOS_CORDILLERA.map((p, i) => (
@@ -306,14 +374,21 @@ function Cordillera({ color, innerRef, perfil }) {
       </group>
     );
   }
+  // Rico (tier 'alto'): MISMO look (meshStandardMaterial + flatShading) pero
+  // INSTANCIADO (PERF-VALLE-INSTANCING 2026-07-23) — un cono unidad escalado
+  // por instancia a (r,h,r) reproduce el coneGeometry(r,h) exacto de antes
+  // (escalar un cono unidad de forma isotrópica en XZ y por separado en Y da
+  // el MISMO cono que construirlo con esos radios/alto — three.js corrige
+  // las normales con la matriz inversa-transpuesta, así que la luz no cambia).
   return (
     <group ref={innerRef}>
-      {PICOS_CORDILLERA.map((p, i) => (
-        <mesh key={i} position={[p.x, p.base + p.h / 2, p.z]}>
-          <coneGeometry args={[p.r, p.h, 6]} />
-          <meshStandardMaterial color={color} flatShading roughness={1} opacity={0.92} transparent />
-        </mesh>
-      ))}
+      <Instances frames={1} limit={PICOS_CORDILLERA.length}>
+        <coneGeometry args={[1, 1, 6]} />
+        <meshStandardMaterial color={color} flatShading roughness={1} opacity={0.92} transparent />
+        {PICOS_CORDILLERA.map((p, i) => (
+          <Instance key={i} position={[p.x, p.base + p.h / 2, p.z]} scale={[p.r, p.h, p.r]} />
+        ))}
+      </Instances>
       <PicosLejanos color={color} />
     </group>
   );
@@ -323,7 +398,7 @@ function Cordillera({ color, innerRef, perfil }) {
       LO QUE MÁS BRILLA del suelo (el reflejo de la luna sobre el agua, la
       firma del día-por-noche): emissive tenue que además guía el ojo ladera
       abajo — el agua se vuelve el sendero luminoso del valle dormido. ── */
-function Quebrada({ color, viva, perfil, nocturno = false }) {
+function Quebrada({ color, viva, perfil, nocturno = false, alturaDe = alturaTerreno }) {
   const ref = useRef(null);
   useFrame((state) => {
     // `ref` apunta al material (no al mesh): animar su opacidad directamente.
@@ -342,12 +417,12 @@ function Quebrada({ color, viva, perfil, nocturno = false }) {
       [1.6, 1.8],
       [2.6, 5.4],
       [3.6, 8],
-    ].map(([x, z]) => new THREE.Vector3(x, alturaTerreno(x, z) + 0.06, z));
+    ].map(([x, z]) => new THREE.Vector3(x, alturaDe(x, z) + 0.06, z));
     const curve = new THREE.CatmullRomCurve3(pts);
     // Frugal: menos anillos/segmentos — la cinta se lee igual desde lejos.
     const g = new THREE.TubeGeometry(curve, rico ? 80 : 48, 0.34, rico ? 7 : 5, false);
     return g;
-  }, [rico]);
+  }, [alturaDe, rico]);
   return (
     <mesh geometry={geo}>
       {rico ? (
@@ -376,10 +451,9 @@ function Quebrada({ color, viva, perfil, nocturno = false }) {
 }
 
 /* ── La arboleda POR ESPECIE del landmark 'bosque': roble andino (copa ancha
-      oscura), aliso (cónico de tronco claro) y gaque (domo bajo lustroso) —
-      cada árbol se distingue, nada de conos genéricos. Las mallas son las de
-      floraParamo (color horneado por vértice, 1 draw call por árbol); escala
-      ~0.5 para el diorama. `q` baja el detalle en perfil frugal. ── */
+      oscura con bellotas), aliso (cónico de tronco claro) y gaque (domo bajo
+      lustroso) — cada árbol se distingue, nada de conos genéricos. Las mallas
+      son las de floraParamo (color horneado); escala ~0.5 para el diorama. ── */
 const SITIOS_ARBOLEDA = [
   // (El monte del portal "toda mi finca" se espesó: 5 árboles, 3 especies —
   //  dosel multiespecie, no un parche de conos.)
@@ -402,7 +476,7 @@ function ArboledaEspecies({ q }) {
           key={i}
           geometry={a.geo}
           material={MATERIAL_FINCA}
-          position={/** @type {[number, number, number]} */ (a.args)}
+          position={a.args}
           rotation={[0, a.rot, 0]}
           scale={a.esc}
           castShadow
@@ -415,15 +489,37 @@ function ArboledaEspecies({ q }) {
 /* ── Materiales/paletas de cada landmark de mundo, por `tipo`. Formas
       redondeadas (cilindros, conos, esferas) — pocas piezas por lugar para
       dejar aire. La arboleda va por especie (mallas de floraParamo); `q` baja
-      el detalle geométrico en perfil frugal. ── */
-function LandmarkGeom({ tipo, tinte, reducedMotion, q = 1 }) {
+      el detalle geométrico en perfil frugal.
+
+   PERF-VALLE-INSTANCING 2026-07-23 — por qué TODA <Instances/> de este
+   archivo lleva `frames={1}`: por defecto drei recalcula la matriz de CADA
+   instancia en CADA frame (para soportar instancias que se mueven). Todo lo
+   que se instancia acá (matas, landmarks) es geometría ESTÁTICA — se siembra
+   una vez y no vuelve a moverse — así que ese recálculo perpetuo es puro
+   desperdicio de CPU. Con ~50 bloques <Instances/> nuevos, el desperdicio
+   dejó de ser gratis: la primera pasada (sin `frames`) BAJÓ el fps pese a
+   haber recortado los draw calls a más de la mitad (menos GPU, pero más CPU
+   por frame). `frames={1}` calcula la matriz UNA vez al montar y no vuelve a
+   tocarla — es la razón por la que el ahorro de draw calls SÍ se nota en
+   fps. Si algún día una instancia necesita moverse, se le quita `frames` a
+   ESE bloque puntual, no a todos. ── */
+function LandmarkGeom({ tipo, tinte, reducedMotion, q = 1, forma = null }) {
   const [fuerte, suave] = tinte;
   switch (tipo) {
-    case 'milpa': // LA PARCELA VIVA (estilo granja de Age of Empires, en modo
+    case 'milpa': { // LA PARCELA VIVA (estilo granja de Age of Empires, en modo
       // milpa): la tierra labrada como base, y encima las TRES HERMANAS
       // juntas — maíz (caña con penacho), fríjol (bejuco enroscado a la
       // caña) y calabaza (frutos naranjas con su hoja ancha tapando el
       // suelo). Se lee POLICULTIVO de un vistazo: nada de hileras clonadas.
+      // PERF-VALLE-INSTANCING 2026-07-23: cada pieza repetida (surco, caña,
+      // hoja, penacho, fríjol, calabaza) pasa de N <mesh> sueltos a 1
+      // <Instances/> — el grupo era el que más pesaba del valle (45→10 draw
+      // calls). Posiciones LOCALES idénticas a las de antes, solo aplanadas.
+      const FILAS_MAIZ = [
+        [-0.75, -0.5, 1.35], [-0.1, -0.25, 1.5], [0.6, -0.55, 1.25],
+        [-0.45, 0.25, 1.45], [0.3, 0.4, 1.3],
+      ];
+      const CALABAZAS = [[-0.55, 0.75], [0.15, 0.85], [0.75, 0.1], [-0.85, 0.05]];
       return (
         <group>
           {/* la tierra labrada de la parcela (la "granja" que se lee de lejos) */}
@@ -432,70 +528,87 @@ function LandmarkGeom({ tipo, tinte, reducedMotion, q = 1 }) {
             <meshStandardMaterial color="#5f4429" flatShading roughness={1} />
           </mesh>
           {/* surcos suaves (dos lomos que cruzan la parcela) */}
-          {[-0.45, 0.35].map((dz, i) => (
-            <mesh key={i} position={[0, 0.09, dz]} rotation={[0, 0, Math.PI / 2]}>
-              <capsuleGeometry args={[0.06, 1.85, 3, 6]} />
-              <meshStandardMaterial color="#6b4e30" flatShading roughness={1} />
-            </mesh>
-          ))}
-          {/* el maíz con su fríjol trepado (quincunce, alturas variadas) */}
-          {[
-            [-0.75, -0.5, 1.35], [-0.1, -0.25, 1.5], [0.6, -0.55, 1.25],
-            [-0.45, 0.25, 1.45], [0.3, 0.4, 1.3],
-          ].map(([dx, dz, h], i) => (
-            <group key={i} position={[dx, 0.08, dz]}>
-              <mesh position={[0, h / 2, 0]} castShadow>
-                <cylinderGeometry args={[0.045, 0.075, h, 6]} />
-                <meshStandardMaterial color={fuerte} flatShading roughness={1} />
-              </mesh>
-              {/* hojas de la caña */}
-              <mesh position={[0.15, h * 0.62, 0]} rotation={[0, 0, -0.7]} scale={[1, 1, 0.3]}>
-                <coneGeometry args={[0.11, 0.46, 4]} />
-                <meshStandardMaterial color={suave} flatShading roughness={1} />
-              </mesh>
-              <mesh position={[-0.15, h * 0.44, 0]} rotation={[0, Math.PI, -0.7]} scale={[1, 1, 0.3]}>
-                <coneGeometry args={[0.11, 0.46, 4]} />
-                <meshStandardMaterial color={suave} flatShading roughness={1} />
-              </mesh>
-              {/* el penacho */}
-              <mesh position={[0, h + 0.16, 0]}>
-                <coneGeometry args={[0.07, 0.36, 6]} />
-                <meshStandardMaterial color="#e7c96b" flatShading />
-              </mesh>
-              {/* el FRÍJOL enroscado a la caña (dos vueltas del bejuco) */}
-              <mesh position={[0, h * 0.3, 0]} rotation={[Math.PI / 2.3, 0, 0.2]}>
-                <torusGeometry args={[0.1, 0.028, 5, 10]} />
-                <meshStandardMaterial color="#2f6b34" flatShading roughness={1} />
-              </mesh>
-              <mesh position={[0.02, h * 0.55, 0]} rotation={[Math.PI / 1.9, 0, -0.3]}>
-                <torusGeometry args={[0.09, 0.026, 5, 10]} />
-                <meshStandardMaterial color="#2f6b34" flatShading roughness={1} />
-              </mesh>
-            </group>
-          ))}
-          {/* las CALABAZAS tapando el suelo entre matas (fruto + hoja ancha) */}
-          {[[-0.55, 0.75], [0.15, 0.85], [0.75, 0.1], [-0.85, 0.05]].map(([dx, dz], i) => (
-            <group key={i} position={[dx, 0.09, dz]}>
-              <mesh position={[0, 0.09, 0]} scale={[1, 0.72, 1]} castShadow>
-                <sphereGeometry args={[0.14, 9, 7]} />
-                <meshStandardMaterial color="#d98e2b" flatShading roughness={1} />
-              </mesh>
-              <mesh position={[0, 0.16, 0]}>
-                <cylinderGeometry args={[0.018, 0.025, 0.07, 5]} />
-                <meshStandardMaterial color="#4f7a3a" flatShading />
-              </mesh>
-              {/* la hoja ancha que cubre el suelo */}
-              <mesh position={[0.18, 0.06, 0.1]} rotation={[-Math.PI / 2.2, 0, 0.6]} scale={[1, 1, 0.5]}>
-                <circleGeometry args={[0.16, 7]} />
-                <meshStandardMaterial color={suave} flatShading roughness={1} side={2} />
-              </mesh>
-            </group>
-          ))}
+          <Instances frames={1} limit={2}>
+            <capsuleGeometry args={[0.06, 1.85, 3, 6]} />
+            <meshStandardMaterial color="#6b4e30" flatShading roughness={1} />
+            {[-0.45, 0.35].map((dz, i) => (
+              <Instance key={i} position={[0, 0.09, dz]} rotation={[0, 0, Math.PI / 2]} />
+            ))}
+          </Instances>
+          {/* el maíz con su fríjol trepado (quincunce, alturas variadas):
+              caña/hoja/penacho/fríjol, cada pieza en su propia <Instances/> */}
+          <Instances frames={1} limit={FILAS_MAIZ.length} castShadow>
+            <cylinderGeometry args={[0.045, 0.075, 1, 6]} />
+            <meshStandardMaterial color={fuerte} flatShading roughness={1} />
+            {FILAS_MAIZ.map(([dx, dz, h], i) => (
+              <Instance key={i} position={[dx, 0.08 + h / 2, dz]} scale={[1, h, 1]} />
+            ))}
+          </Instances>
+          <Instances frames={1} limit={FILAS_MAIZ.length * 2}>
+            <coneGeometry args={[0.11, 0.46, 4]} />
+            <meshStandardMaterial color={suave} flatShading roughness={1} />
+            {FILAS_MAIZ.flatMap(([dx, dz, h], i) => [
+              <Instance key={`${i}a`} position={[dx + 0.15, 0.08 + h * 0.62, dz]} rotation={[0, 0, -0.7]} scale={[1, 1, 0.3]} />,
+              <Instance key={`${i}b`} position={[dx - 0.15, 0.08 + h * 0.44, dz]} rotation={[0, Math.PI, -0.7]} scale={[1, 1, 0.3]} />,
+            ])}
+          </Instances>
+          <Instances frames={1} limit={FILAS_MAIZ.length}>
+            <coneGeometry args={[0.07, 0.36, 6]} />
+            <meshStandardMaterial color="#e7c96b" flatShading />
+            {FILAS_MAIZ.map(([dx, dz, h], i) => (
+              <Instance key={i} position={[dx, 0.08 + h + 0.16, dz]} />
+            ))}
+          </Instances>
+          {/* el FRÍJOL enroscado a la caña (dos vueltas del bejuco, cada una
+              con su propio radio de tubo → dos <Instances/>) */}
+          <Instances frames={1} limit={FILAS_MAIZ.length}>
+            <torusGeometry args={[0.1, 0.028, 5, 10]} />
+            <meshStandardMaterial color="#2f6b34" flatShading roughness={1} />
+            {FILAS_MAIZ.map(([dx, dz, h], i) => (
+              <Instance key={i} position={[dx, 0.08 + h * 0.3, dz]} rotation={[Math.PI / 2.3, 0, 0.2]} />
+            ))}
+          </Instances>
+          <Instances frames={1} limit={FILAS_MAIZ.length}>
+            <torusGeometry args={[0.09, 0.026, 5, 10]} />
+            <meshStandardMaterial color="#2f6b34" flatShading roughness={1} />
+            {FILAS_MAIZ.map(([dx, dz, h], i) => (
+              <Instance key={i} position={[dx + 0.02, 0.08 + h * 0.55, dz]} rotation={[Math.PI / 1.9, 0, -0.3]} />
+            ))}
+          </Instances>
+          {/* las CALABAZAS tapando el suelo entre matas (fruto + tallo + hoja ancha) */}
+          <Instances frames={1} limit={CALABAZAS.length} castShadow>
+            <sphereGeometry args={[0.14, 9, 7]} />
+            <meshStandardMaterial color="#d98e2b" flatShading roughness={1} />
+            {CALABAZAS.map(([dx, dz], i) => (
+              <Instance key={i} position={[dx, 0.18, dz]} scale={[1, 0.72, 1]} />
+            ))}
+          </Instances>
+          <Instances frames={1} limit={CALABAZAS.length}>
+            <cylinderGeometry args={[0.018, 0.025, 0.07, 5]} />
+            <meshStandardMaterial color="#4f7a3a" flatShading />
+            {CALABAZAS.map(([dx, dz], i) => (
+              <Instance key={i} position={[dx, 0.25, dz]} />
+            ))}
+          </Instances>
+          {/* la hoja ancha que cubre el suelo */}
+          <Instances frames={1} limit={CALABAZAS.length}>
+            <circleGeometry args={[0.16, 7]} />
+            <meshStandardMaterial color={suave} flatShading roughness={1} side={2} />
+            {CALABAZAS.map(([dx, dz], i) => (
+              <Instance key={i} position={[dx + 0.18, 0.15, dz + 0.1]} rotation={[-Math.PI / 2.2, 0, 0.6]} scale={[1, 1, 0.5]} />
+            ))}
+          </Instances>
         </group>
       );
-    case 'cafetal': // café CON SOMBRÍO (policultivo, no hilera): los arbustos
+    }
+    case 'cafetal': { // café CON SOMBRÍO (policultivo, no hilera): los arbustos
       // cargados de cereza roja DEBAJO de su guamo de sombra y con una mata
       // de plátano al lado — el trío clásico del cafetal campesino.
+      // PERF-VALLE-INSTANCING 2026-07-23: hojas del plátano, arbustos y
+      // cerezas van a <Instances/> (27→7 draw calls); el guamo y el
+      // pseudotallo del plátano son piezas únicas, se quedan como <mesh/>.
+      const ARBUSTOS = [[-0.6, 0.35], [0.05, 0.15], [0.5, 0.55], [-0.2, 0.7]];
+      const CEREZA_OFFSETS = [[0.16, 0.5, 0.16], [-0.14, 0.42, 0.18], [0.05, 0.6, -0.2]];
       return (
         <group>
           {/* el GUAMO de sombrío: tronco alto + copa ancha y plana encima */}
@@ -515,60 +628,127 @@ function LandmarkGeom({ tipo, tinte, reducedMotion, q = 1 }) {
               <cylinderGeometry args={[0.08, 0.12, 1.0, 7]} />
               <meshStandardMaterial color="#7a9a55" flatShading roughness={1} />
             </mesh>
-            {[0, 1, 2, 3].map((k) => (
-              <mesh
-                key={k}
-                position={[0, 0.95, 0]}
-                rotation={[0, (k / 4) * Math.PI * 2 + 0.4, -0.9]}
-                scale={[1, 1, 0.28]}
-                castShadow
-              >
-                <coneGeometry args={[0.2, 0.85, 4]} />
-                <meshStandardMaterial color="#4f9a44" flatShading roughness={1} />
-              </mesh>
-            ))}
+            <Instances frames={1} limit={4} castShadow>
+              <coneGeometry args={[0.2, 0.85, 4]} />
+              <meshStandardMaterial color="#4f9a44" flatShading roughness={1} />
+              {[0, 1, 2, 3].map((k) => (
+                <Instance
+                  key={k}
+                  position={[0, 0.95, 0]}
+                  rotation={[0, (k / 4) * Math.PI * 2 + 0.4, -0.9]}
+                  scale={[1, 1, 0.28]}
+                />
+              ))}
+            </Instances>
           </group>
           {/* los arbustos de café bajo la sombra, con su cereza roja */}
-          {[[-0.6, 0.35], [0.05, 0.15], [0.5, 0.55], [-0.2, 0.7]].map(([dx, dz], i) => (
-            <group key={i} position={[dx, 0, dz]}>
-              <mesh position={[0, 0.16, 0]}>
-                <cylinderGeometry args={[0.05, 0.07, 0.32, 6]} />
-                <meshStandardMaterial color="#6b4a2e" flatShading />
-              </mesh>
-              <mesh position={[0, 0.44, 0]} castShadow>
-                <sphereGeometry args={[0.3, 10, 9]} />
-                <meshStandardMaterial color={fuerte} flatShading roughness={1} />
-              </mesh>
-              {/* la cereza madura que pinta el arbusto */}
-              {[[0.16, 0.5, 0.16], [-0.14, 0.42, 0.18], [0.05, 0.6, -0.2]].map(([bx, by, bz], j) => (
-                <mesh key={j} position={[bx, by, bz]}>
-                  <sphereGeometry args={[0.035, 6, 5]} />
-                  <meshBasicMaterial color="#c9392e" />
-                </mesh>
-              ))}
-            </group>
-          ))}
+          <Instances frames={1} limit={ARBUSTOS.length}>
+            <cylinderGeometry args={[0.05, 0.07, 0.32, 6]} />
+            <meshStandardMaterial color="#6b4a2e" flatShading />
+            {ARBUSTOS.map(([dx, dz], i) => (
+              <Instance key={i} position={[dx, 0.16, dz]} />
+            ))}
+          </Instances>
+          <Instances frames={1} limit={ARBUSTOS.length} castShadow>
+            <sphereGeometry args={[0.3, 10, 9]} />
+            <meshStandardMaterial color={fuerte} flatShading roughness={1} />
+            {ARBUSTOS.map(([dx, dz], i) => (
+              <Instance key={i} position={[dx, 0.44, dz]} />
+            ))}
+          </Instances>
+          {/* la cereza madura que pinta el arbusto (3 por arbusto) */}
+          <Instances frames={1} limit={ARBUSTOS.length * CEREZA_OFFSETS.length}>
+            <sphereGeometry args={[0.035, 6, 5]} />
+            <meshBasicMaterial color="#c9392e" />
+            {ARBUSTOS.flatMap(([dx, dz], i) => CEREZA_OFFSETS.map(([bx, by, bz], j) => (
+              <Instance key={`${i}-${j}`} position={[dx + bx, by, dz + bz]} />
+            )))}
+          </Instances>
         </group>
       );
-    case 'era': // eras del semillero: camellones redondeados (lomos de tierra)
+    }
+    case 'era': { // eras del semillero: camellones redondeados (lomos de tierra)
+      // PERF-VALLE-INSTANCING 2026-07-23: 12→2 draw calls.
+      const CAMELLONES = [-0.42, 0, 0.42];
+      const BROTES = [-0.35, 0, 0.35];
       return (
         <group>
-          {[-0.42, 0, 0.42].map((dz, i) => (
-            <group key={i} position={[0, 0, dz]}>
-              {/* camellón: cilindro tumbado con puntas de esfera */}
-              <mesh position={[0, 0.1, 0]} rotation={[0, 0, Math.PI / 2]} castShadow receiveShadow>
-                <capsuleGeometry args={[0.14, 1.1, 4, 8]} />
-                <meshStandardMaterial color="#6b4630" flatShading roughness={1} />
-              </mesh>
-              {/* brotes verdes del semillero */}
-              {[-0.35, 0, 0.35].map((bx, j) => (
-                <mesh key={j} position={[bx, 0.26, 0]}>
-                  <coneGeometry args={[0.07, 0.2, 5]} />
-                  <meshStandardMaterial color={suave} flatShading />
-                </mesh>
-              ))}
-            </group>
-          ))}
+          {/* camellón: cilindro tumbado con puntas de esfera */}
+          <Instances frames={1} limit={CAMELLONES.length} castShadow receiveShadow>
+            <capsuleGeometry args={[0.14, 1.1, 4, 8]} />
+            <meshStandardMaterial color="#6b4630" flatShading roughness={1} />
+            {CAMELLONES.map((dz, i) => (
+              <Instance key={i} position={[0, 0.1, dz]} rotation={[0, 0, Math.PI / 2]} />
+            ))}
+          </Instances>
+          {/* brotes verdes del semillero (3 por camellón) */}
+          <Instances frames={1} limit={CAMELLONES.length * BROTES.length}>
+            <coneGeometry args={[0.07, 0.2, 5]} />
+            <meshStandardMaterial color={suave} flatShading />
+            {CAMELLONES.flatMap((dz, i) => BROTES.map((bx, j) => (
+              <Instance key={`${i}-${j}`} position={[bx, 0.26, dz]} />
+            )))}
+          </Instances>
+        </group>
+      );
+    }
+    case 'tanque':
+      return (
+        <group>
+          <mesh position={[0, 0.48, 0]} castShadow>
+            <cylinderGeometry args={[0.48, 0.52, 0.9, 14]} />
+            <meshStandardMaterial color="#477b8f" flatShading roughness={0.65} />
+          </mesh>
+          <mesh position={[0, 0.95, 0]}>
+            <cylinderGeometry args={[0.5, 0.5, 0.06, 14]} />
+            <meshStandardMaterial color="#315c6d" flatShading roughness={0.8} />
+          </mesh>
+          <mesh position={[0.45, 0.22, 0.1]} rotation={[0, 0, Math.PI / 2]}>
+            <cylinderGeometry args={[0.045, 0.045, 0.32, 7]} />
+            <meshStandardMaterial color="#b6c2c3" metalness={0.3} roughness={0.5} />
+          </mesh>
+        </group>
+      );
+    case 'lluvia':
+      return (
+        <group>
+          <mesh position={[0, 0.34, 0]} castShadow>
+            <cylinderGeometry args={[0.38, 0.42, 0.65, 12]} />
+            <meshStandardMaterial color="#4c7f92" flatShading roughness={0.7} />
+          </mesh>
+          <mesh position={[0, 0.82, 0]} rotation={[Math.PI, 0, 0]}>
+            <coneGeometry args={[0.68, 0.36, 12, 1, true]} />
+            <meshStandardMaterial color="#a8c8d5" transparent opacity={0.72} side={2} />
+          </mesh>
+          {/* las gotas colgando del embudo — INSTANCIADAS (3→1 draw call) */}
+          <Instances frames={1} limit={3}>
+            <capsuleGeometry args={[0.025, 0.16, 3, 5]} />
+            <meshBasicMaterial color="#bfe5f4" transparent opacity={0.8} />
+            {[-0.38, 0, 0.38].map((x) => (
+              <Instance key={x} position={[x, 1.25, 0]} />
+            ))}
+          </Instances>
+        </group>
+      );
+    case 'acueducto':
+      return (
+        <group>
+          <mesh position={[0, 0.48, 0]}>
+            <cylinderGeometry args={[0.07, 0.07, 0.96, 8]} />
+            <meshStandardMaterial color="#b8c1c2" metalness={0.35} roughness={0.45} />
+          </mesh>
+          <mesh position={[0.2, 0.92, 0]} rotation={[0, 0, Math.PI / 2]}>
+            <cylinderGeometry args={[0.07, 0.07, 0.42, 8]} />
+            <meshStandardMaterial color="#b8c1c2" metalness={0.35} roughness={0.45} />
+          </mesh>
+          <mesh position={[0.41, 0.78, 0]}>
+            <cylinderGeometry args={[0.045, 0.045, 0.28, 7]} />
+            <meshStandardMaterial color="#8fa2a4" metalness={0.4} roughness={0.4} />
+          </mesh>
+          <mesh position={[0.41, 0.52, 0]} scale={[0.7, 1.2, 0.7]}>
+            <sphereGeometry args={[0.08, 8, 6]} />
+            <meshBasicMaterial color="#73b6d2" transparent opacity={0.8} />
+          </mesh>
         </group>
       );
     case 'quebrada': // nacimiento: charca redonda + juncos
@@ -578,47 +758,57 @@ function LandmarkGeom({ tipo, tinte, reducedMotion, q = 1 }) {
             <cylinderGeometry args={[0.55, 0.62, 0.12, 20]} />
             <meshStandardMaterial color="#3a7fa0" transparent opacity={0.85} metalness={0.4} roughness={0.2} />
           </mesh>
-          {[-0.28, 0.12, 0.4].map((dx, i) => (
-            <mesh key={i} position={[dx, 0.4, 0.2]} rotation={[0.12, 0, 0.08]}>
-              <cylinderGeometry args={[0.025, 0.03, 0.7, 5]} />
-              <meshStandardMaterial color="#4e7d3f" flatShading />
-            </mesh>
-          ))}
+          {/* los juncos de la charca — INSTANCIADOS (3→1 draw call) */}
+          <Instances frames={1} limit={3}>
+            <cylinderGeometry args={[0.025, 0.03, 0.7, 5]} />
+            <meshStandardMaterial color="#4e7d3f" flatShading />
+            {[-0.28, 0.12, 0.4].map((dx, i) => (
+              <Instance key={i} position={[dx, 0.4, 0.2]} rotation={[0.12, 0, 0.08]} />
+            ))}
+          </Instances>
         </group>
       );
-    case 'animales': // los animales de la finca (reemplaza la vieja casita)
+    case 'animales': // el hato realista por raza (vaca, cerdos, gallinas, perro)
       return <AnimalesDeFinca reducedMotion={reducedMotion} q={q} />;
-    case 'huerta': // camas de la huerta: lomos redondeados con matas
+    case 'huerta': { // camas de la huerta: lomos redondeados con matas
+      // PERF-VALLE-INSTANCING 2026-07-23: 8→2 draw calls.
+      const CAMAS = [-0.42, 0.42];
+      const MATAS_CAMA = [-0.28, 0, 0.28];
       return (
         <group>
-          {[-0.42, 0.42].map((dx, i) => (
-            <group key={i} position={[dx, 0, 0]}>
-              <mesh position={[0, 0.12, 0]} rotation={[Math.PI / 2, 0, 0]} castShadow>
-                <capsuleGeometry args={[0.16, 0.7, 4, 8]} />
-                <meshStandardMaterial color="#6b4a30" flatShading roughness={1} />
-              </mesh>
-              {[-0.28, 0, 0.28].map((dz, j) => (
-                <mesh key={j} position={[0, 0.3, dz]} castShadow>
-                  <sphereGeometry args={[0.16, 9, 8]} />
-                  <meshStandardMaterial color={fuerte} flatShading roughness={1} />
-                </mesh>
-              ))}
-            </group>
-          ))}
+          <Instances frames={1} limit={CAMAS.length} castShadow>
+            <capsuleGeometry args={[0.16, 0.7, 4, 8]} />
+            <meshStandardMaterial color="#6b4a30" flatShading roughness={1} />
+            {CAMAS.map((dx, i) => (
+              <Instance key={i} position={[dx, 0.12, 0]} rotation={[Math.PI / 2, 0, 0]} />
+            ))}
+          </Instances>
+          <Instances frames={1} limit={CAMAS.length * MATAS_CAMA.length} castShadow>
+            <sphereGeometry args={[0.16, 9, 8]} />
+            <meshStandardMaterial color={fuerte} flatShading roughness={1} />
+            {CAMAS.flatMap((dx, i) => MATAS_CAMA.map((dz, j) => (
+              <Instance key={`${i}-${j}`} position={[dx, 0.3, dz]} />
+            )))}
+          </Instances>
         </group>
       );
+    }
     case 'bosque': // arboleda POR ESPECIE: roble andino + aliso + gaque
       return <ArboledaEspecies q={q} />;
-    case 'mercado': // puesto de mercado campesino: toldo a dos aguas + mesa + canasto
+    case 'mercado': { // puesto de mercado campesino: toldo a dos aguas + mesa + canasto
+      // PERF-VALLE-INSTANCING 2026-07-23: 10→5 draw calls.
+      const PATAS = [[-0.32, 0.22], [0.32, 0.22], [-0.32, -0.22], [0.32, -0.22]];
+      const FRUTAS = [[0, 0.7, 0.08], [0.08, 0.68, 0.13], [-0.05, 0.68, 0.04]];
       return (
         <group>
-          {/* las patas y la mesa del puesto */}
-          {[[-0.32, 0.22], [0.32, 0.22], [-0.32, -0.22], [0.32, -0.22]].map(([x, z], i) => (
-            <mesh key={i} position={[x, 0.24, z]} castShadow>
-              <cylinderGeometry args={[0.03, 0.035, 0.48, 5]} />
-              <meshStandardMaterial color="#7a5a38" flatShading roughness={1} />
-            </mesh>
-          ))}
+          {/* las patas de la mesa del puesto */}
+          <Instances frames={1} limit={PATAS.length} castShadow>
+            <cylinderGeometry args={[0.03, 0.035, 0.48, 5]} />
+            <meshStandardMaterial color="#7a5a38" flatShading roughness={1} />
+            {PATAS.map(([x, z], i) => (
+              <Instance key={i} position={[x, 0.24, z]} />
+            ))}
+          </Instances>
           <mesh position={[0, 0.49, 0]} castShadow>
             <boxGeometry args={[0.82, 0.06, 0.56]} />
             <meshStandardMaterial color="#a9814f" flatShading roughness={1} />
@@ -633,29 +823,75 @@ function LandmarkGeom({ tipo, tinte, reducedMotion, q = 1 }) {
             <cylinderGeometry args={[0.13, 0.1, 0.14, 9]} />
             <meshStandardMaterial color="#a9773f" flatShading roughness={1} />
           </mesh>
-          {[[0, 0.7, 0.08], [0.08, 0.68, 0.13], [-0.05, 0.68, 0.04]].map(([x, y, z], i) => (
-            <mesh key={i} position={[x, y, z]}>
-              <sphereGeometry args={[0.055, 7, 6]} />
-              <meshStandardMaterial color={suave} flatShading roughness={1} />
-            </mesh>
-          ))}
+          <Instances frames={1} limit={FRUTAS.length}>
+            <sphereGeometry args={[0.055, 7, 6]} />
+            <meshStandardMaterial color={suave} flatShading roughness={1} />
+            {FRUTAS.map(([x, y, z], i) => (
+              <Instance key={i} position={[x, y, z]} />
+            ))}
+          </Instances>
         </group>
       );
+    }
     case 'veleta': // poste con veleta que gira con el viento
       return <Veleta color={fuerte} reducedMotion={reducedMotion} />;
-    case 'invernadero': // el MICRO-MUNDO del semillero: un invernadero de
+    case 'invernadero': { // el MICRO-MUNDO del semillero: un invernadero de
       // verdad — arcos de madera, el plástico traslúcido que brilla al sol,
       // la puerta abierta y las mesas de germinación adentro. Se destaca
       // como pieza propia del valle: la fábrica de la matica.
+      // PERF-VALLE-INSTANCING 2026-07-23: parales/paneles/arcos/mesas/brotes
+      // repetidos → <Instances/> en las 3 formas (cuadrado/túnel).
+      if (forma === 'cuadrado') {
+        const PARALES = [[-0.62, -0.65], [0.62, -0.65], [-0.62, 0.65], [0.62, 0.65]];
+        return (
+          <group>
+            <Instances frames={1} limit={PARALES.length} castShadow>
+              <cylinderGeometry args={[0.035, 0.045, 0.9, 5]} />
+              <meshStandardMaterial color="#8a6a44" flatShading roughness={1} />
+              {PARALES.map(([x, z], i) => (
+                <Instance key={i} position={[x, 0.45, z]} />
+              ))}
+            </Instances>
+            <Instances frames={1} limit={2} castShadow>
+              <boxGeometry args={[0.78, 0.035, 1.42]} />
+              <meshStandardMaterial color="#eef7f2" transparent opacity={0.48} side={2} />
+              <Instance position={[-0.32, 0.88, 0]} rotation={[0, 0, -0.5]} />
+              <Instance position={[0.32, 0.88, 0]} rotation={[0, 0, 0.5]} />
+            </Instances>
+            <mesh position={[0, 0.45, 0]}>
+              <boxGeometry args={[1.24, 0.84, 1.34]} />
+              <meshStandardMaterial color="#e4f2ea" transparent opacity={0.2} side={2} />
+            </mesh>
+          </group>
+        );
+      }
+      if (forma === 'casa_sombra') {
+        return (
+          <group>
+            <mesh position={[0, 0.48, 0]}>
+              <boxGeometry args={[1.3, 0.95, 1.35]} />
+              <meshStandardMaterial color="#6f9b72" wireframe transparent opacity={0.78} />
+            </mesh>
+            <mesh position={[0, 0.98, 0]}>
+              <boxGeometry args={[1.38, 0.05, 1.43]} />
+              <meshStandardMaterial color="#aac8a7" transparent opacity={0.56} side={2} />
+            </mesh>
+          </group>
+        );
+      }
+      const ARCOS = [-0.65, -0.22, 0.22, 0.65];
+      const MESAS = [-0.26, 0.26];
+      const BROTES_M = [-0.42, -0.14, 0.14, 0.42];
       return (
         <group>
           {/* los arcos del túnel (medio-toroide de pie), en tono madera */}
-          {[-0.65, -0.22, 0.22, 0.65].map((dz, i) => (
-            <mesh key={i} position={[0, 0, dz]}>
-              <torusGeometry args={[0.62, 0.03, 6, 18, Math.PI]} />
-              <meshStandardMaterial color="#8a6a44" flatShading roughness={1} />
-            </mesh>
-          ))}
+          <Instances frames={1} limit={ARCOS.length}>
+            <torusGeometry args={[0.62, 0.03, 6, 18, Math.PI]} />
+            <meshStandardMaterial color="#8a6a44" flatShading roughness={1} />
+            {ARCOS.map((dz, i) => (
+              <Instance key={i} position={[0, 0, dz]} />
+            ))}
+          </Instances>
           {/* la cumbrera que amarra los arcos */}
           <mesh position={[0, 0.62, 0]} rotation={[Math.PI / 2, 0, 0]}>
             <cylinderGeometry args={[0.025, 0.025, 1.5, 5]} />
@@ -675,7 +911,9 @@ function LandmarkGeom({ tipo, tinte, reducedMotion, q = 1 }) {
               roughness={0.6}
             />
           </mesh>
-          {/* el testero trasero cerrado y el delantero con PUERTA abierta */}
+          {/* el testero trasero cerrado y el delantero con PUERTA abierta
+              (geometrías DISTINTAS — ángulos de arco diferentes — quedan
+              cada una como pieza única, no se instancian). */}
           <mesh position={[0, 0, -0.72]}>
             <circleGeometry args={[0.62, 16, 0, Math.PI]} />
             <meshStandardMaterial color="#eef7f2" transparent opacity={0.3} side={2} roughness={0.6} />
@@ -685,20 +923,20 @@ function LandmarkGeom({ tipo, tinte, reducedMotion, q = 1 }) {
             <meshStandardMaterial color="#eef7f2" transparent opacity={0.3} side={2} roughness={0.6} />
           </mesh>
           {/* las DOS mesas de germinación con sus brotecitos en fila viva */}
-          {[-0.26, 0.26].map((dx, i) => (
-            <group key={i} position={[dx, 0, 0]}>
-              <mesh position={[0, 0.18, 0]}>
-                <boxGeometry args={[0.34, 0.05, 1.2]} />
-                <meshStandardMaterial color="#5a4326" flatShading roughness={1} />
-              </mesh>
-              {[-0.42, -0.14, 0.14, 0.42].map((bz, j) => (
-                <mesh key={j} position={[(j % 2) * 0.1 - 0.05, 0.27, bz]}>
-                  <coneGeometry args={[0.05, 0.15, 5]} />
-                  <meshStandardMaterial color={fuerte} flatShading roughness={1} />
-                </mesh>
-              ))}
-            </group>
-          ))}
+          <Instances frames={1} limit={MESAS.length}>
+            <boxGeometry args={[0.34, 0.05, 1.2]} />
+            <meshStandardMaterial color="#5a4326" flatShading roughness={1} />
+            {MESAS.map((dx, i) => (
+              <Instance key={i} position={[dx, 0.18, 0]} />
+            ))}
+          </Instances>
+          <Instances frames={1} limit={MESAS.length * BROTES_M.length}>
+            <coneGeometry args={[0.05, 0.15, 5]} />
+            <meshStandardMaterial color={fuerte} flatShading roughness={1} />
+            {MESAS.flatMap((dx, i) => BROTES_M.map((bz, j) => (
+              <Instance key={`${i}-${j}`} position={[dx + (j % 2) * 0.1 - 0.05, 0.27, bz]} />
+            )))}
+          </Instances>
           {/* el barril de agua junto a la puerta (el riego del vivero) */}
           <mesh position={[0.62, 0.14, 0.78]} castShadow>
             <cylinderGeometry args={[0.11, 0.12, 0.28, 9]} />
@@ -706,23 +944,26 @@ function LandmarkGeom({ tipo, tinte, reducedMotion, q = 1 }) {
           </mesh>
         </group>
       );
+    }
     case 'compost': // LA BIOFÁBRICA: la pila de compost con apariencia de tal
       // — el cajón de madera en U, la pila humeante por capas (estiércol
       // abajo, material fresco, la capa de paja encima) y la horqueta
       // clavada. El ciclo estiércol→abono, legible.
       return (
         <group>
-          {/* el cajón de madera en U que contiene la pila */}
-          {[
-            { p: [0, 0.16, -0.5], s: [1.15, 0.32, 0.08] },
-            { p: [-0.56, 0.16, -0.05], s: [0.08, 0.32, 0.95] },
-            { p: [0.56, 0.16, -0.05], s: [0.08, 0.32, 0.95] },
-          ].map((w, i) => (
-            <mesh key={i} position={/** @type {any} */ (w.p)} castShadow>
-              <boxGeometry args={/** @type {any} */ (w.s)} />
-              <meshStandardMaterial color="#7a5a38" flatShading roughness={1} />
-            </mesh>
-          ))}
+          {/* el cajón de madera en U que contiene la pila: la pared frontal
+              es una pieza única; las dos paredes laterales COMPARTEN
+              geometría (mismo tamaño, espejadas en x) → INSTANCIADAS. */}
+          <mesh position={[0, 0.16, -0.5]} castShadow>
+            <boxGeometry args={[1.15, 0.32, 0.08]} />
+            <meshStandardMaterial color="#7a5a38" flatShading roughness={1} />
+          </mesh>
+          <Instances frames={1} limit={2} castShadow>
+            <boxGeometry args={[0.08, 0.32, 0.95]} />
+            <meshStandardMaterial color="#7a5a38" flatShading roughness={1} />
+            <Instance position={[-0.56, 0.16, -0.05]} />
+            <Instance position={[0.56, 0.16, -0.05]} />
+          </Instances>
           {/* la PILA por capas: estiércol oscuro, compost pardo, paja clara */}
           <mesh position={[0, 0.14, -0.05]} scale={[1, 0.5, 0.9]} castShadow>
             <sphereGeometry args={[0.48, 10, 8]} />
@@ -770,12 +1011,13 @@ function LandmarkGeom({ tipo, tinte, reducedMotion, q = 1 }) {
               <boxGeometry args={[0.66, 0.045, 0.52]} />
               <meshStandardMaterial color="#8a6a44" flatShading roughness={1} />
             </mesh>
-            {[-0.2, 0.2].map((dz, i) => (
-              <mesh key={i} position={[0, 0.015, dz]}>
-                <boxGeometry args={[0.7, 0.03, 0.09]} />
-                <meshStandardMaterial color="#6b4a2e" flatShading roughness={1} />
-              </mesh>
-            ))}
+            <Instances frames={1} limit={2}>
+              <boxGeometry args={[0.7, 0.03, 0.09]} />
+              <meshStandardMaterial color="#6b4a2e" flatShading roughness={1} />
+              {[-0.2, 0.2].map((dz, i) => (
+                <Instance key={i} position={[0, 0.015, dz]} />
+              ))}
+            </Instances>
             {/* la caneca grande con su tapa y la mediana */}
             <mesh position={[-0.16, 0.29, -0.04]} castShadow>
               <cylinderGeometry args={[0.13, 0.13, 0.42, 9]} />
@@ -790,12 +1032,13 @@ function LandmarkGeom({ tipo, tinte, reducedMotion, q = 1 }) {
               <meshStandardMaterial color="#3a86b8" flatShading roughness={0.8} />
             </mesh>
             {/* los tarros del biopreparado listos para el lote (en fila) */}
-            {[-0.02, 0.12, 0.26].map((dx, i) => (
-              <mesh key={i} position={[dx, 0.12, 0.28]}>
-                <cylinderGeometry args={[0.045, 0.045, 0.13, 7]} />
-                <meshStandardMaterial color="#e8e0cf" flatShading roughness={1} />
-              </mesh>
-            ))}
+            <Instances frames={1} limit={3}>
+              <cylinderGeometry args={[0.045, 0.045, 0.13, 7]} />
+              <meshStandardMaterial color="#e8e0cf" flatShading roughness={1} />
+              {[-0.02, 0.12, 0.26].map((dx, i) => (
+                <Instance key={i} position={[dx, 0.12, 0.28]} />
+              ))}
+            </Instances>
           </group>
         </group>
       );
@@ -805,12 +1048,13 @@ function LandmarkGeom({ tipo, tinte, reducedMotion, q = 1 }) {
       return (
         <group>
           {/* los dos parales y el techito de paja a un agua */}
-          {[-0.5, 0.5].map((dx, i) => (
-            <mesh key={i} position={[dx, 0.55, -0.15]} castShadow>
-              <cylinderGeometry args={[0.04, 0.05, 1.1, 6]} />
-              <meshStandardMaterial color="#8a6a44" flatShading roughness={1} />
-            </mesh>
-          ))}
+          <Instances frames={1} limit={2} castShadow>
+            <cylinderGeometry args={[0.04, 0.05, 1.1, 6]} />
+            <meshStandardMaterial color="#8a6a44" flatShading roughness={1} />
+            {[-0.5, 0.5].map((dx, i) => (
+              <Instance key={i} position={[dx, 0.55, -0.15]} />
+            ))}
+          </Instances>
           <mesh position={[0, 1.14, -0.05]} rotation={[0.28, 0, 0]} castShadow>
             <boxGeometry args={[1.3, 0.07, 0.75]} />
             <meshStandardMaterial color="#c9a55a" flatShading roughness={1} />
@@ -820,7 +1064,8 @@ function LandmarkGeom({ tipo, tinte, reducedMotion, q = 1 }) {
             <boxGeometry args={[0.86, 0.5, 0.05]} />
             <meshStandardMaterial color="#2e5941" flatShading roughness={1} />
           </mesh>
-          {/* las tres rayitas de tiza del tablero (la lección de hoy) */}
+          {/* las tres rayitas de tiza del tablero (anchos DISTINTOS → piezas
+              únicas, no se instancian) */}
           {[0.74, 0.62, 0.5].map((y, i) => (
             <mesh key={i} position={[i * 0.06 - 0.1, y, -0.11]}>
               <boxGeometry args={[0.42 - i * 0.1, 0.022, 0.01]} />
@@ -832,7 +1077,10 @@ function LandmarkGeom({ tipo, tinte, reducedMotion, q = 1 }) {
             <cylinderGeometry args={[0.09, 0.09, 0.9, 8]} />
             <meshStandardMaterial color="#7a5a38" flatShading roughness={1} />
           </mesh>
-          {/* el libro abierto sobre la banca (dos tapitas en V) */}
+          {/* el libro abierto sobre la banca (dos tapitas en V): la carga de
+              esta pieza es marginal (2 <mesh/>) y su padre tiene rotación
+              propia — no se fuerza el aplanado a <Instances/> para no
+              arriesgar el álgebra de una malla que apenas pesa. */}
           <group position={[0.15, 0.24, 0.55]} rotation={[0, -0.4, 0]}>
             <mesh position={[-0.06, 0, 0]} rotation={[0, 0, 0.5]}>
               <boxGeometry args={[0.14, 0.015, 0.18]} />
@@ -845,74 +1093,98 @@ function LandmarkGeom({ tipo, tinte, reducedMotion, q = 1 }) {
           </group>
         </group>
       );
-    case 'frailejonal': // LA PUERTA DEL PÁRAMO: el frailejonal con su niebla
+    case 'frailejonal': { // LA PUERTA DEL PÁRAMO: el frailejonal con su niebla
       // fría — la seña del alto (coherente con MundoParamo3D: frailejones,
       // piedra y bruma). Tocar aquí sube al mundo del páramo.
+      // PERF-VALLE-INSTANCING 2026-07-23: 19→6 draw calls. Los 4 frailejones
+      // vivían en <group scale={s}>; para instanciar se multiplica esa escala
+      // uniforme s por la posición/escala LOCAL de cada pieza (el mismo
+      // resultado que produce three.js al anidar un mesh dentro de un grupo
+      // escalado, pero aplanado a mano para que quepa en una sola <Instances/>).
+      const FRAILEJONES = [[-0.5, 0.22, 1], [0.2, -0.3, 0.85], [0.55, 0.35, 0.7], [-0.05, 0.5, 0.6]];
+      const NIEBLA = [[-0.35, 0.55, 0.4, 0.3], [0.4, 0.75, 0.1, 0.24], [0, 1.0, -0.25, 0.19]];
+      const HITO = [0.16, 0.11, 0.07];
       return (
         <group>
           {/* el grupito de frailejones (roseta plateada sobre tronco lanudo) */}
-          {[[-0.5, 0.22, 1], [0.2, -0.3, 0.85], [0.55, 0.35, 0.7], [-0.05, 0.5, 0.6]].map(([x, z, s], i) => (
-            <group key={i} position={[x, 0, z]} scale={s}>
-              <mesh position={[0, 0.45, 0]} castShadow>
-                <cylinderGeometry args={[0.11, 0.14, 0.9, 7]} />
-                <meshStandardMaterial color="#6e6a52" flatShading roughness={1} />
-              </mesh>
-              <mesh position={[0, 0.98, 0]} scale={[1, 0.5, 1]} castShadow>
-                <coneGeometry args={[0.34, 0.5, 8]} />
-                <meshStandardMaterial color={suave} flatShading roughness={1} />
-              </mesh>
-              {/* la flor amarilla del frailejón (la seña de la Espeletia) */}
-              <mesh position={[0.1, 1.16, 0.06]}>
-                <sphereGeometry args={[0.05, 6, 5]} />
-                <meshStandardMaterial color="#e8c94f" flatShading />
-              </mesh>
-            </group>
-          ))}
-          {/* la piedra del alto, con su musgo */}
+          <Instances frames={1} limit={FRAILEJONES.length} castShadow>
+            <cylinderGeometry args={[0.11, 0.14, 0.9, 7]} />
+            <meshStandardMaterial color="#6e6a52" flatShading roughness={1} />
+            {FRAILEJONES.map(([x, z, s], i) => (
+              <Instance key={i} position={[x, s * 0.45, z]} scale={s} />
+            ))}
+          </Instances>
+          <Instances frames={1} limit={FRAILEJONES.length} castShadow>
+            <coneGeometry args={[0.34, 0.5, 8]} />
+            <meshStandardMaterial color={suave} flatShading roughness={1} />
+            {FRAILEJONES.map(([x, z, s], i) => (
+              <Instance key={i} position={[x, s * 0.98, z]} scale={[s, s * 0.5, s]} />
+            ))}
+          </Instances>
+          {/* la flor amarilla del frailejón (la seña de la Espeletia) */}
+          <Instances frames={1} limit={FRAILEJONES.length}>
+            <sphereGeometry args={[0.05, 6, 5]} />
+            <meshStandardMaterial color="#e8c94f" flatShading />
+            {FRAILEJONES.map(([x, z, s], i) => (
+              <Instance key={i} position={[x + s * 0.1, s * 1.16, z + s * 0.06]} scale={s} />
+            ))}
+          </Instances>
+          {/* la piedra del alto, con su musgo (pieza única) */}
           <mesh position={[0.6, 0.12, -0.35]} scale={[1, 0.7, 0.9]} castShadow>
             <icosahedronGeometry args={[0.22, 0]} />
             <meshStandardMaterial color="#828b90" flatShading roughness={1} />
           </mesh>
           {/* LA NIEBLA FRÍA que arropa el frailejonal (motas traslúcidas que
               hacen páramo, como el vaho de la pila pero frío) */}
-          {[[-0.35, 0.55, 0.4, 0.3], [0.4, 0.75, 0.1, 0.24], [0, 1.0, -0.25, 0.19]].map(([x, yv, z, r], i) => (
-            <mesh key={i} position={[x, yv, z]}>
-              <sphereGeometry args={[r, 8, 6]} />
-              <meshBasicMaterial color="#dfe8ea" transparent opacity={0.2} depthWrite={false} />
-            </mesh>
-          ))}
+          <Instances frames={1} limit={NIEBLA.length}>
+            <sphereGeometry args={[1, 8, 6]} />
+            <meshBasicMaterial color="#dfe8ea" transparent opacity={0.2} depthWrite={false} />
+            {NIEBLA.map(([x, yv, z, r], i) => (
+              <Instance key={i} position={[x, yv, z]} scale={r} />
+            ))}
+          </Instances>
           {/* el hito de piedras apiladas: la seña del sendero de páramo */}
-          {[0.16, 0.11, 0.07].map((r, i) => (
-            <mesh key={i} position={[-0.72, 0.1 + i * 0.17, -0.1]} scale={[1, 0.65, 1]}>
-              <icosahedronGeometry args={[r, 0]} />
-              <meshStandardMaterial color={fuerte} flatShading roughness={1} />
-            </mesh>
-          ))}
+          <Instances frames={1} limit={HITO.length}>
+            <icosahedronGeometry args={[1, 0]} />
+            <meshStandardMaterial color={fuerte} flatShading roughness={1} />
+            {HITO.map((r, i) => (
+              <Instance key={i} position={[-0.72, 0.1 + i * 0.17, -0.1]} scale={[r, r * 0.65, r]} />
+            ))}
+          </Instances>
         </group>
       );
-    case 'hongos': // el suelo vivo: hongos que asoman (el fruto del micelio), con
+    }
+    case 'hongos': { // el suelo vivo: hongos que asoman (el fruto del micelio), con
       // un halo de red bajo la tierra. Toque para BAJAR al mundo subterráneo.
+      // PERF-VALLE-INSTANCING 2026-07-23: 13→4 draw calls. El pie tiene alto
+      // `h` distinto por hongo → geometría unidad (alto 1) escalada en Y.
+      const HONGOS = [[-0.3, 0.1, 0.44], [0.16, -0.22, 0.54], [0.42, 0.26, 0.36], [-0.04, 0.42, 0.3]];
       return (
         <group>
-          {[[-0.3, 0.1, 0.44], [0.16, -0.22, 0.54], [0.42, 0.26, 0.36], [-0.04, 0.42, 0.3]].map(([x, z, h], i) => (
-            <group key={i} position={[x, 0, z]}>
-              {/* pie del hongo, pálido */}
-              <mesh position={[0, h * 0.5, 0]} castShadow>
-                <cylinderGeometry args={[0.05, 0.075, h, 7]} />
-                <meshStandardMaterial color="#e8e0cf" flatShading roughness={1} />
-              </mesh>
-              {/* sombrero que brilla apenas (bioluminiscencia del suelo) */}
-              <mesh position={[0, h + 0.02, 0]} castShadow>
-                <sphereGeometry args={[0.17, 12, 8, 0, Math.PI * 2, 0, Math.PI / 2]} />
-                <meshStandardMaterial color={fuerte} emissive={fuerte} emissiveIntensity={0.35} flatShading roughness={0.8} />
-              </mesh>
-              {/* laminillas claras bajo el sombrero */}
-              <mesh position={[0, h - 0.015, 0]}>
-                <cylinderGeometry args={[0.16, 0.06, 0.03, 10]} />
-                <meshStandardMaterial color={suave} emissive={suave} emissiveIntensity={0.4} />
-              </mesh>
-            </group>
-          ))}
+          {/* pie del hongo, pálido */}
+          <Instances frames={1} limit={HONGOS.length} castShadow>
+            <cylinderGeometry args={[0.05, 0.075, 1, 7]} />
+            <meshStandardMaterial color="#e8e0cf" flatShading roughness={1} />
+            {HONGOS.map(([x, z, h], i) => (
+              <Instance key={i} position={[x, h * 0.5, z]} scale={[1, h, 1]} />
+            ))}
+          </Instances>
+          {/* sombrero que brilla apenas (bioluminiscencia del suelo) */}
+          <Instances frames={1} limit={HONGOS.length} castShadow>
+            <sphereGeometry args={[0.17, 12, 8, 0, Math.PI * 2, 0, Math.PI / 2]} />
+            <meshStandardMaterial color={fuerte} emissive={fuerte} emissiveIntensity={0.35} flatShading roughness={0.8} />
+            {HONGOS.map(([x, z, h], i) => (
+              <Instance key={i} position={[x, h + 0.02, z]} />
+            ))}
+          </Instances>
+          {/* laminillas claras bajo el sombrero */}
+          <Instances frames={1} limit={HONGOS.length}>
+            <cylinderGeometry args={[0.16, 0.06, 0.03, 10]} />
+            <meshStandardMaterial color={suave} emissive={suave} emissiveIntensity={0.4} />
+            {HONGOS.map(([x, z, h], i) => (
+              <Instance key={i} position={[x, h - 0.015, z]} />
+            ))}
+          </Instances>
           {/* el anillo de micelio asomando en la tierra (la red que baja) */}
           <mesh position={[0, 0.02, 0.1]} rotation={[-Math.PI / 2, 0, 0]}>
             <ringGeometry args={[0.5, 0.64, 22]} />
@@ -920,6 +1192,42 @@ function LandmarkGeom({ tipo, tinte, reducedMotion, q = 1 }) {
           </mesh>
         </group>
       );
+    }
+    case 'chorrera': { // EL SALTO DE LA QUEBRADA: escarpe estratificado + hilo de
+      // agua que cae a un pocito, con su vaho. La seña del alto húmedo — tocar
+      // aquí BAJA al mundo de la chorrera. (anti-conflicto: caso nuevo antes de default.)
+      const ESTRATOS = [0.18, 0.42, 0.66, 0.9];
+      return (
+        <group>
+          {/* el escarpe: lajas apiladas (roca sedimentaria) — INSTANCIADO */}
+          <Instances frames={1} limit={ESTRATOS.length}>
+            <boxGeometry args={[0.7, 0.2, 0.34]} />
+            <meshStandardMaterial color="#6f7a85" flatShading roughness={1} />
+            {ESTRATOS.map((y, i) => (
+              <Instance key={i} position={[0, y, -0.2]} scale={[1 - i * 0.08, 1, 1]} />
+            ))}
+          </Instances>
+          {/* el hilo de agua que cae por el escarpe */}
+          <mesh position={[0, 0.55, -0.02]}>
+            <boxGeometry args={[0.16, 0.86, 0.04]} />
+            <meshStandardMaterial color="#8fc7cf" transparent opacity={0.8} roughness={0.2} metalness={0.3} />
+          </mesh>
+          {/* el pocito cristalino de la base */}
+          <mesh position={[0, 0.06, 0.28]}>
+            <cylinderGeometry args={[0.34, 0.38, 0.1, 18]} />
+            <meshStandardMaterial color="#3a7fa0" transparent opacity={0.82} metalness={0.4} roughness={0.2} />
+          </mesh>
+          {/* el vaho del salto (motas frías, como el frailejonal) */}
+          <Instances frames={1} limit={3}>
+            <sphereGeometry args={[1, 8, 6]} />
+            <meshBasicMaterial color="#dfe8ea" transparent opacity={0.22} depthWrite={false} />
+            {[[0, 0.3, 0.2, 0.22], [-0.12, 0.62, 0.05, 0.16], [0.12, 0.5, 0.15, 0.14]].map(([x, y, z, r], i) => (
+              <Instance key={i} position={[x, y, z]} scale={r} />
+            ))}
+          </Instances>
+        </group>
+      );
+    }
     default:
       return (
         <mesh position={[0, 0.3, 0]}>
@@ -932,69 +1240,117 @@ function LandmarkGeom({ tipo, tinte, reducedMotion, q = 1 }) {
 
 /* ── Matas de un piso térmico (frailejón, papa, café, plátano): pocas, a los
       lados, para que se lea el cambio de vegetación por altura sin amontonar. ── */
-function MataDePiso({ tipo, nocturno }) {
-  switch (tipo) {
-    case 'frailejon': // roseta plateada sobre tronco (Espeletia del páramo)
-      return (
-        <group>
-          <mesh position={[0, 0.45, 0]} castShadow>
+/* ── Matas FIELES instanciadas (PERF-VALLE-INSTANCING 2026-07-23, tier
+      'alto'): antes cada mata dibujaba su propia malla suelta (~2-6 <mesh>
+      por mata × 12 matas = 39 draw calls). Mismo geometría/color/roughness
+      exactos que la vieja <MataDePiso/> (byte-idéntico al ojo) — solo cambia
+      CÓMO se manda a la GPU: una <Instances/> por PIEZA (tronco/copa/hoja),
+      de modo que N matas del mismo tipo comparten 1 solo draw call por
+      pieza. No confundir con <VegetacionInstanciada/> (abajo): esa es la
+      silueta SIMPLIFICADA de los tiers frugales (unidades genéricas +
+      color por instancia); esta conserva el detalle geométrico pleno. ── */
+function MatasFieles({ nocturno, alturaDe = alturaTerreno }) {
+  const matas = useMemo(
+    () => VEGETACION_PISOS.map((v) => {
+      const [x, z] = v.pos;
+      return { x, y: alturaDe(x, z), z, tipo: v.tipo };
+    }),
+    [alturaDe],
+  );
+  const frailejones = useMemo(() => matas.filter((m) => m.tipo === 'frailejon'), [matas]);
+  const papas = useMemo(() => matas.filter((m) => m.tipo === 'papa'), [matas]);
+  const cafes = useMemo(() => matas.filter((m) => m.tipo === 'cafe'), [matas]);
+  const platanos = useMemo(() => matas.filter((m) => m.tipo === 'platano'), [matas]);
+  // las 3 papas y las 5 hojas de plátano de CADA mata, aplanadas en una sola
+  // lista de instancias (mismos offsets locales que la <MataDePiso/> vieja).
+  const montonesPapa = useMemo(
+    () => papas.flatMap((m) => [-0.28, 0.06, 0.32].map((dx, j) => ({ m, dx, j }))),
+    [papas],
+  );
+  const hojasPlatano = useMemo(
+    () => platanos.flatMap((m) => [0, 1, 2, 3, 4].map((k) => ({ m, k }))),
+    [platanos],
+  );
+  return (
+    <group>
+      {frailejones.length > 0 && (
+        <>
+          {/* roseta plateada sobre tronco (Espeletia del páramo) */}
+          <Instances frames={1} limit={frailejones.length} castShadow>
             <cylinderGeometry args={[0.11, 0.14, 0.9, 7]} />
             <meshStandardMaterial color={nocturno ? '#3a4038' : '#6e6a52'} flatShading roughness={1} />
-          </mesh>
-          {/* roseta: cono achatado plateado */}
-          <mesh position={[0, 0.98, 0]} scale={[1, 0.5, 1]} castShadow>
+            {frailejones.map((m, i) => (
+              <Instance key={i} position={[m.x, m.y + 0.45, m.z]} />
+            ))}
+          </Instances>
+          <Instances frames={1} limit={frailejones.length} castShadow>
             <coneGeometry args={[0.34, 0.5, 8]} />
             <meshStandardMaterial color={nocturno ? '#4a5b52' : '#9fb59a'} flatShading roughness={1} />
-          </mesh>
-        </group>
-      );
-    case 'papa': // matas bajas y redondas (surco de papa del clima frío)
-      return (
-        <group>
-          {[-0.28, 0.06, 0.32].map((dx, i) => (
-            <mesh key={i} position={[dx, 0.14, (i % 2) * 0.22]} scale={[1, 0.7, 1]} castShadow>
-              <icosahedronGeometry args={[0.22, 0]} />
-              <meshStandardMaterial color={nocturno ? '#2f5240' : '#3f7d52'} flatShading roughness={1} />
-            </mesh>
+            {frailejones.map((m, i) => (
+              <Instance key={i} position={[m.x, m.y + 0.98, m.z]} scale={[1, 0.5, 1]} />
+            ))}
+          </Instances>
+        </>
+      )}
+      {montonesPapa.length > 0 && (
+        // matas bajas y redondas (surco de papa del clima frío)
+        <Instances frames={1} limit={montonesPapa.length} castShadow>
+          <icosahedronGeometry args={[0.22, 0]} />
+          <meshStandardMaterial color={nocturno ? '#2f5240' : '#3f7d52'} flatShading roughness={1} />
+          {montonesPapa.map(({ m, dx, j }, i) => (
+            <Instance
+              key={i}
+              position={[m.x + dx, m.y + 0.14, m.z + (j % 2) * 0.22]}
+              scale={[1, 0.7, 1]}
+            />
           ))}
-        </group>
-      );
-    case 'cafe': // arbusto de café suelto del clima medio
-      return (
-        <group>
-          <mesh position={[0, 0.14, 0]}>
+        </Instances>
+      )}
+      {cafes.length > 0 && (
+        <>
+          {/* arbusto de café suelto del clima medio */}
+          <Instances frames={1} limit={cafes.length}>
             <cylinderGeometry args={[0.05, 0.06, 0.28, 6]} />
             <meshStandardMaterial color="#6b4a2e" flatShading />
-          </mesh>
-          <mesh position={[0, 0.4, 0]} castShadow>
+            {cafes.map((m, i) => (
+              <Instance key={i} position={[m.x, m.y + 0.14, m.z]} />
+            ))}
+          </Instances>
+          <Instances frames={1} limit={cafes.length} castShadow>
             <sphereGeometry args={[0.3, 10, 9]} />
             <meshStandardMaterial color={nocturno ? '#254a30' : '#3f7d3a'} flatShading roughness={1} />
-          </mesh>
-        </group>
-      );
-    case 'platano': // mata de plátano: pseudotallo + hojas grandes colgantes
-    default:
-      return (
-        <group>
-          <mesh position={[0, 0.55, 0]} castShadow>
+            {cafes.map((m, i) => (
+              <Instance key={i} position={[m.x, m.y + 0.4, m.z]} />
+            ))}
+          </Instances>
+        </>
+      )}
+      {platanos.length > 0 && (
+        <>
+          {/* mata de plátano: pseudotallo + hojas grandes colgantes */}
+          <Instances frames={1} limit={platanos.length} castShadow>
             <cylinderGeometry args={[0.1, 0.14, 1.1, 7]} />
             <meshStandardMaterial color={nocturno ? '#3a5030' : '#7a9a55'} flatShading roughness={1} />
-          </mesh>
-          {[0, 1, 2, 3, 4].map((k) => (
-            <mesh
-              key={k}
-              position={[0, 1.05, 0]}
-              rotation={[0, (k / 5) * Math.PI * 2, -0.9]}
-              scale={[1, 1, 0.28]}
-              castShadow
-            >
-              <coneGeometry args={[0.24, 1.0, 4]} />
-              <meshStandardMaterial color={nocturno ? '#2f5236' : '#4f9a44'} flatShading roughness={1} />
-            </mesh>
-          ))}
-        </group>
-      );
-  }
+            {platanos.map((m, i) => (
+              <Instance key={i} position={[m.x, m.y + 0.55, m.z]} />
+            ))}
+          </Instances>
+          <Instances frames={1} limit={hojasPlatano.length} castShadow>
+            <coneGeometry args={[0.24, 1.0, 4]} />
+            <meshStandardMaterial color={nocturno ? '#2f5236' : '#4f9a44'} flatShading roughness={1} />
+            {hojasPlatano.map(({ m, k }, i) => (
+              <Instance
+                key={i}
+                position={[m.x, m.y + 1.05, m.z]}
+                rotation={[0, (k / 5) * Math.PI * 2, -0.9]}
+                scale={[1, 1, 0.28]}
+              />
+            ))}
+          </Instances>
+        </>
+      )}
+    </group>
+  );
 }
 
 /* ── SILUETAS instanciadas de las matas (perfil frugal, DR FIX 2): cada mata
@@ -1019,14 +1375,14 @@ const SILUETAS_MATA = {
   },
 };
 
-function VegetacionInstanciada({ nocturno, cada }) {
+function VegetacionInstanciada({ nocturno, cada, alturaDe = alturaTerreno }) {
   const matas = useMemo(
     () =>
       VEGETACION_PISOS.filter((_, i) => i % cada === 0).map((v) => {
         const [x, z] = v.pos;
-        return { x, y: alturaTerreno(x, z), z, sil: SILUETAS_MATA[v.tipo] || SILUETAS_MATA.platano };
+        return { x, y: alturaDe(x, z), z, sil: SILUETAS_MATA[v.tipo] || SILUETAS_MATA.platano };
       }),
-    [cada],
+    [alturaDe, cada],
   );
   const troncos = matas.filter((m) => m.sil.tronco);
   const conos = matas.filter((m) => m.sil.copa.forma === 'cono');
@@ -1035,7 +1391,7 @@ function VegetacionInstanciada({ nocturno, cada }) {
   return (
     <group>
       {troncos.length > 0 && (
-        <Instances limit={troncos.length}>
+        <Instances frames={1} limit={troncos.length}>
           <cylinderGeometry args={[0.85, 1, 1, 6]} />
           <meshLambertMaterial />
           {troncos.map((m, i) => (
@@ -1049,7 +1405,7 @@ function VegetacionInstanciada({ nocturno, cada }) {
         </Instances>
       )}
       {conos.length > 0 && (
-        <Instances limit={conos.length}>
+        <Instances frames={1} limit={conos.length}>
           <coneGeometry args={[1, 1, 7]} />
           <meshLambertMaterial />
           {conos.map((m, i) => (
@@ -1063,7 +1419,7 @@ function VegetacionInstanciada({ nocturno, cada }) {
         </Instances>
       )}
       {bolas.length > 0 && (
-        <Instances limit={bolas.length}>
+        <Instances frames={1} limit={bolas.length}>
           <sphereGeometry args={[1, 9, 8]} />
           <meshLambertMaterial />
           {bolas.map((m, i) => (
@@ -1082,24 +1438,14 @@ function VegetacionInstanciada({ nocturno, cada }) {
 
 /* Siembra las matas de muestra de cada piso sobre el terreno (posadas en su y).
    Layout por datos: recorre VEGETACION_PISOS. En perfil frugal las matas se
-   dibujan INSTANCIADAS (3 draw calls); en 'alto' conservan su detalle pleno. */
-function VegetacionPisos({ nocturno, perfil }) {
+   dibujan con siluetas simplificadas (3 draw calls); en 'alto' conservan su
+   detalle pleno pero YA INSTANCIADO por pieza (<MatasFieles/>, PERF-VALLE-
+   INSTANCING 2026-07-23): mismo render, de ~39 draw calls sueltos a 7. */
+function VegetacionPisos({ nocturno, perfil, alturaDe = alturaTerreno }) {
   if (perfil.matasInstanciadas) {
-    return <VegetacionInstanciada nocturno={nocturno} cada={perfil.matasCada} />;
+    return <VegetacionInstanciada nocturno={nocturno} cada={perfil.matasCada} alturaDe={alturaDe} />;
   }
-  return (
-    <group>
-      {VEGETACION_PISOS.map((v, i) => {
-        const [x, z] = v.pos;
-        const y = alturaTerreno(x, z);
-        return (
-          <group key={i} position={[x, y, z]}>
-            <MataDePiso tipo={v.tipo} nocturno={nocturno} />
-          </group>
-        );
-      })}
-    </group>
-  );
+  return <MatasFieles nocturno={nocturno} alturaDe={alturaDe} />;
 }
 
 function Veleta({ color, reducedMotion = false }) {
@@ -1155,7 +1501,7 @@ function CriaturaSvg({ tipo, size, animated }) {
   return <Lombriz size={size} animated={animated} />;
 }
 
-function CriaturasValle({ reducedMotion, cupo, tier }) {
+function CriaturasValle({ reducedMotion, cupo, tier, alturaDe = alturaTerreno }) {
   const rendimiento = useTierPerformance({ tier, reducedMotion });
   const cupoVivo = Math.min(
     cupo ?? rendimiento.presupuesto.maxCriaturasAmbientales,
@@ -1167,7 +1513,7 @@ function CriaturasValle({ reducedMotion, cupo, tier }) {
   return (
     <group>
       {CRIATURAS_VALLE.slice(0, cupoVivo).map((c, i) => {
-        const y = alturaTerreno(c.x, c.z) + c.dy;
+        const y = alturaDe(c.x, c.z) + c.dy;
         return (
           <group key={i} position={[c.x, y, c.z]}>
             <Html center distanceFactor={c.factor} zIndexRange={[8, 0]} pointerEvents="none">
@@ -1243,8 +1589,15 @@ function ProxyLandmark({ tipo, tinte }) {
       píxeles + foco/proximidad + anti-colisión). En perfil frugal el detalle
       completo SOLO se dibuja de cerca (<Detailed>): la panorámica de arranque
       —el peor momento— queda en siluetas baratas. ── */
-function MundoLugar({ mundo, reducedMotion, perfil, onEntrar = null }) {
-  const y = alturaTerreno(mundo.pos[0], mundo.pos[2]);
+function MundoLugar({ mundo, reducedMotion, perfil, onEntrar = null, alturaDe = alturaTerreno }) {
+  const grounded = useMemo(() => {
+    const object = { position: new THREE.Vector3(mundo.pos[0], 0, mundo.pos[2]) };
+    return pegarAlTerreno(object, alturaDe, { alignToNormal: false });
+  }, [alturaDe, mundo.pos]);
+  const orientation = useMemo(
+    () => new THREE.Quaternion().setFromUnitVectors(new THREE.Vector3(0, 1, 0), grounded.normal),
+    [grounded.normal],
+  );
   const detalle = mundo.tipo === 'veleta' ? (
     <Veleta color={mundo.tinte[0]} reducedMotion={reducedMotion} />
   ) : (
@@ -1253,11 +1606,13 @@ function MundoLugar({ mundo, reducedMotion, perfil, onEntrar = null }) {
       tinte={mundo.tinte}
       reducedMotion={reducedMotion}
       q={perfil.materialRico ? 1 : 0.55}
+      forma={mundo.invernaderoTipo}
     />
   );
   return (
     <group
-      position={[mundo.pos[0], y, mundo.pos[2]]}
+      position={grounded.position}
+      quaternion={orientation}
       scale={mundo.escala}
       onClick={
         onEntrar
@@ -1310,7 +1665,27 @@ function MundoLugar({ mundo, reducedMotion, perfil, onEntrar = null }) {
  * mundos en cualquiera de los dos modos visibles — la navegación no cambia. ── */
 const _proj = new THREE.Vector3();
 
-function RotulosLugares({ mundos, focoId, onEntrar, occluders, controls = null, kReposo = 1 }) {
+/* Ancho aproximado (px) del chip según su modo — MISMO criterio que usan las
+ * cajas de anti-colisión de abajo (rectoDe): 'plena' crece con el título,
+ * 'punto'/'oculto' es el círculo fijo de 44px. El nudge anti-corte de borde
+ * (BUG-VALLE-390) reutiliza esta cuenta para no clampear con un margen
+ * distinto al que en verdad ocupa el chip en pantalla. */
+function anchoRotulo(modo, titulo) {
+  return modo === 'plena' ? 76 + titulo.length * 9 : 44;
+}
+
+/* Clampa v al rango [mitad, total-mitad] (deja `mitad` px de aire contra
+ * cada borde). Si el rango se invierte — un título larguísimo en una
+ * pantalla diminuta, el chip no cabe entero de ningún modo — cede al
+ * centro: mejor centrado que pegado a un filo. */
+function clamp1D(v, mitad, total) {
+  const lo = mitad;
+  const hi = total - mitad;
+  if (lo > hi) return total / 2;
+  return Math.min(Math.max(v, lo), hi);
+}
+
+function RotulosLugares({ mundos, focoId, onEntrar, occluders, controls = null, kReposo = 1, alturaDe = alturaTerreno }) {
   const botones = useRef({});
   const tapados = useRef({});
   const plena = useRef(null);
@@ -1328,19 +1703,19 @@ function RotulosLugares({ mundos, focoId, onEntrar, occluders, controls = null, 
         m,
         pos: new THREE.Vector3(
           m.pos[0],
-          alturaTerreno(m.pos[0], m.pos[2]) + 1.7 * (m.escala || 1),
+          alturaDe(m.pos[0], m.pos[2]) + 1.7 * (m.escala || 1),
           m.pos[2],
         ),
       })),
-    [mundos],
+    [mundos, alturaDe],
   );
 
   // La alerta del día (el faro) siempre se reserva su espacio en pantalla.
   const anclaAlerta = useMemo(() => {
     const a = MUNDO_DIR_BY_ID[COSA_DEL_DIA.anclaMundo];
     if (!a) return null;
-    return new THREE.Vector3(a.pos[0], alturaTerreno(a.pos[0], a.pos[2]) + 2.7, a.pos[2]);
-  }, []);
+    return new THREE.Vector3(a.pos[0], alturaDe(a.pos[0], a.pos[2]) + 2.7, a.pos[2]);
+  }, [alturaDe]);
 
   useFrame(({ camera, size }) => {
     // ~12 pasadas/s alcanzan para rótulos; corre en el PRIMER frame (importa
@@ -1390,9 +1765,15 @@ function RotulosLugares({ mundos, focoId, onEntrar, occluders, controls = null, 
       candidata = previa && cercana && cercana.dc > previa.dc * 0.8 ? previa.id : (cercana?.id ?? null);
     }
     plena.current = candidata;
+    const idsPlenos = seleccionarIdsPlenos({
+      puntos: pts,
+      banda: enBanda,
+      candidata,
+    });
 
     // Anti-colisión: la alerta primero, la plena después, los puntos por
-    // cercanía al centro; quien pisa un espacio ya tomado, cede.
+    // cercanía al centro; quien pisa un espacio ya tomado, cede. La lista de
+    // nombres completos ya viene limitada por banda, incluso si sobra espacio.
     const MARGEN = 8;
     const tomados = [];
     const rectoDe = (x, y, w, h) => ({
@@ -1406,34 +1787,40 @@ function RotulosLugares({ mundos, focoId, onEntrar, occluders, controls = null, 
       const a = enPantalla(anclaAlerta);
       if (!a.detras) tomados.push(rectoDe(a.x, a.y, 64 + COSA_DEL_DIA.titulo.length * 9, 52));
     }
-    const orden = [...pts].sort((a, b) =>
-      a.id === candidata ? -1 : b.id === candidata ? 1 : a.dc - b.dc,
-    );
+    const orden = [...pts].sort((a, b) => {
+      const aPlena = idsPlenos.has(a.id);
+      const bPlena = idsPlenos.has(b.id);
+      if (aPlena !== bPlena) return aPlena ? -1 : 1;
+      return a.dc - b.dc;
+    });
     for (const p of orden) {
       let modo = 'oculto';
       if (p.elegible) {
-        const esPlena = p.id === candidata;
+        const esPlena = idsPlenos.has(p.id);
+        const puedeMostrarChip = chipEnRadioMovil({
+          dc: p.dc,
+          ancho: size.width,
+          esFoco: p.id === focoId,
+        });
         if (enBanda === 'lejos') {
-          /* ESTRATÉGICA (lejos): el mapa AoE — cada rótulo que quepa muestra
-             su nombre completo; el que no cabe cae a punto-chip, luego cede.
-             La finca entera se entiende de un vistazo. */
-          const rp = rectoDe(p.x, p.y, 76 + p.titulo.length * 9, 48);
-          if (!pisa(rp)) {
-            tomados.push(rp);
+          /* ESTRATÉGICA (lejos): solo el portal más cercano al centro conserva
+             nombre. Los demás pasan por chip y, en móvil, por el radio central. */
+          const r = esPlena
+            ? rectoDe(p.x, p.y, 76 + p.titulo.length * 9, 48)
+            : rectoDe(p.x, p.y, 44, 44);
+          if (esPlena && !pisa(r)) {
+            tomados.push(r);
             modo = 'plena';
-          } else {
-            const rq = rectoDe(p.x, p.y, 44, 44);
-            if (!pisa(rq)) {
-              tomados.push(rq);
-              modo = 'punto';
-            }
+          } else if (!esPlena && puedeMostrarChip && !pisa(r)) {
+            tomados.push(r);
+            modo = 'punto';
           }
         } else if (enBanda === 'cerca' && p.id !== focoId) {
           /* DETALLE (cerca): mandan las texturas, los bichos y las matas —
              solo el lugar apuntado conserva un punto-chip (sigue tocable);
              el resto descansa. El mundo activo (focoId) cae al caso de abajo
              y conserva su nombre completo mientras se entra. */
-          if (esPlena) {
+          if (esPlena && puedeMostrarChip) {
             const rq = rectoDe(p.x, p.y, 44, 44);
             if (!pisa(rq)) {
               tomados.push(rq);
@@ -1446,7 +1833,7 @@ function RotulosLugares({ mundos, focoId, onEntrar, occluders, controls = null, 
           const r = esPlena
             ? rectoDe(p.x, p.y, 76 + p.titulo.length * 9, 48)
             : rectoDe(p.x, p.y, 44, 44);
-          if (!pisa(r)) {
+          if (!pisa(r) && (esPlena || puedeMostrarChip)) {
             tomados.push(r);
             modo = esPlena ? 'plena' : 'punto';
           }
@@ -1458,6 +1845,26 @@ function RotulosLugares({ mundos, focoId, onEntrar, occluders, controls = null, 
         // La banda queda en el DOM (data-banda): CSS futuro puede reaccionar
         // (p. ej. chips más grandes en estratégica) sin tocar este JS.
         if (btn.dataset.banda !== enBanda) btn.dataset.banda = enBanda;
+        // Anti-corte de borde (BUG-VALLE-390): el ancla 3D no sabe de bordes
+        // de pantalla — en equipos angostos (390px) un rótulo cerca del filo
+        // del encuadre perdía sus primeras letras (o quedaba imposible de
+        // tocar entero) fuera de cuadro. Se NUDGEA con un transform propio,
+        // por ENCIMA del centrado que ya aplica drei, lo justo para que el
+        // chip completo quede legible y tocable — el portal no se mueve de
+        // su lugar en el valle, solo se corrige dónde CAE su etiqueta.
+        if (modo === 'oculto') {
+          if (btn.style.transform) btn.style.transform = '';
+        } else {
+          const BORDE = 10;
+          const ancho = anchoRotulo(modo, p.titulo);
+          const alto = modo === 'plena' ? 48 : 44;
+          const cx = clamp1D(p.x, ancho / 2 + BORDE, size.width);
+          const cy = clamp1D(p.y, alto / 2 + BORDE, size.height);
+          const dx = cx - p.x;
+          const dy = cy - p.y;
+          const nuevo = dx || dy ? `translate(${dx.toFixed(1)}px, ${dy.toFixed(1)}px)` : '';
+          if (btn.style.transform !== nuevo) btn.style.transform = nuevo;
+        }
       }
     }
   });
@@ -1503,14 +1910,37 @@ function Beacon({ onAlerta, reducedMotion, conLuz = true }) {
   const ancla = MUNDO_DIR_BY_ID[COSA_DEL_DIA.anclaMundo];
   const luz = useRef(null);
   const halo = useRef(null);
+  const boton = useRef(null);
+  const [enfocado, setEnfocado] = useState(false);
   useFrame((state) => {
-    if (reducedMotion) return;
-    const p = (Math.sin(state.clock.elapsedTime * 1.6) + 1) / 2;
-    if (luz.current) luz.current.intensity = 1.4 + p * 2.6;
-    if (halo.current) {
-      const s = 1 + p * 0.5;
-      halo.current.scale.set(s, s, s);
-      halo.current.material.opacity = 0.5 - p * 0.35;
+    if (!reducedMotion) {
+      const p = (Math.sin(state.clock.elapsedTime * 1.6) + 1) / 2;
+      if (luz.current) luz.current.intensity = 1.4 + p * 2.6;
+      if (halo.current) {
+        const s = 1 + p * 0.5;
+        halo.current.scale.set(s, s, s);
+        halo.current.material.opacity = 0.5 - p * 0.35;
+      }
+    }
+    // Anti-corte de borde (BUG-VALLE-390), mismo criterio que RotulosLugares:
+    // el faro del día es un solo chip fijo, pero su ancla puede caer cerca
+    // del filo de la pantalla en equipos angostos y perder sus primeras
+    // letras. Se nudgea hacia adentro sin moverlo de su lugar en el valle.
+    if (boton.current && ancla) {
+      const alturaAncla = alturaTerreno(ancla.pos[0], ancla.pos[2]);
+      _proj.set(ancla.pos[0], alturaAncla + 2.7, ancla.pos[2]).project(state.camera);
+      const sx = (_proj.x * 0.5 + 0.5) * state.size.width;
+      const sy = (0.5 - _proj.y * 0.5) * state.size.height;
+      const BORDE = 10;
+      const expandido = boton.current.dataset.expandido === '1';
+      const ancho = expandido ? 64 + COSA_DEL_DIA.titulo.length * 9 : 48;
+      const alto = expandido ? 52 : 48;
+      const cx = clamp1D(sx, ancho / 2 + BORDE, state.size.width);
+      const cy = clamp1D(sy, alto / 2 + BORDE, state.size.height);
+      const dx = cx - sx;
+      const dy = cy - sy;
+      const nuevo = dx || dy ? `translate(${dx.toFixed(1)}px, ${dy.toFixed(1)}px)` : '';
+      if (boton.current.style.transform !== nuevo) boton.current.style.transform = nuevo;
     }
   });
   if (!ancla) return null;
@@ -1535,8 +1965,16 @@ function Beacon({ onAlerta, reducedMotion, conLuz = true }) {
       {/* Sin distanceFactor: la alerta mantiene su tamaño táctil en píxeles. */}
       <Html center position={[0, 2.7, 0]} zIndexRange={[30, 0]}>
         <button
+          ref={boton}
           type="button"
           className="valle-alerta v3d-alerta"
+          data-expandido={enfocado ? '1' : '0'}
+          onFocus={() => setEnfocado(true)}
+          onBlur={() => setEnfocado(false)}
+          onPointerEnter={() => setEnfocado(true)}
+          onPointerLeave={(e) => {
+            if (e.currentTarget !== document.activeElement) setEnfocado(false);
+          }}
           onClick={(e) => {
             e.stopPropagation();
             onAlerta();
@@ -1565,10 +2003,12 @@ const CALMA_ABEJA = {
   z: CASA_VALLE.pos[1] + 1.5,
 };
 
-function CompaneroAbeja({ foco, focoId = null, entrando, animo, energia, reducedMotion, estadoFinca = null, hayAlerta = false, posRef = null, conLuz = false, onTocar = null }) {
+function CompaneroAbeja({ foco, focoId = null, entrando, animo, energia, reducedMotion, estadoFinca = null, hayAlerta = false, posRef = null, conLuz = false, onTocar = null, mundos = MUNDOS_DIR }) {
   const ref = useRef(null);
   const caraRef = useRef(null);
   const prevX = useRef(foco.x);
+  const { camera } = useThree();
+  const mundosById = useMemo(() => Object.fromEntries(mundos.map((m) => [m.id, m])), [mundos]);
   const yCalma = useMemo(() => alturaTerreno(CALMA_ABEJA.x, CALMA_ABEJA.z), []);
   // Reacción al estado REAL de la finca (§5b): mismo repertorio que los mundos.
   // Con estadoFinca manda la reacción; sin él, el contrato viejo (animo/energia).
@@ -1591,7 +2031,69 @@ function CompaneroAbeja({ foco, focoId = null, entrando, animo, energia, reduced
   const mensajeAngelita = useAngelitaStore((s) => s.mensaje);
   const tipoAngelita = useAngelitaStore((s) => s.tipo);
   const entrarMundoAngelita = useAngelitaStore((s) => s.entrarMundo);
+
+  /* #88 — EL COMPAI HABLA SUS TIPS: cada vez que llega un mensaje NUEVO
+     (navegación real o husmeo autónomo), además de pintar la burbuja lo DICE.
+     Kokoro primero; si no responde (equipo sin soporte, timeout), cae a la
+     voz del navegador — nunca queda muda una finca que ya escribe. Silencio
+     real (usePrefsStore.ttsEnabled) y reducedMotion apagan la voz sin tocar
+     la burbuja: el texto sigue siendo la voz de quien no puede/no quiere oír. */
+  const ttsEnabled = usePrefsStore((s) => s.ttsEnabled);
+  const dichoRef = useRef(null);
+  useEffect(() => {
+    if (!mensajeAngelita || reducedMotion || !ttsEnabled) return;
+    if (dichoRef.current === mensajeAngelita) return; // ya se dijo este mismo texto
+    dichoRef.current = mensajeAngelita;
+    speakKokoro(mensajeAngelita, { lang: 'es', rate: 0.98 })
+      .then((audio) => {
+        if (!audio) speak(mensajeAngelita, { rate: 0.98, pitch: 1 });
+      })
+      .catch(() => {
+        speak(mensajeAngelita, { rate: 0.98, pitch: 1 });
+      });
+  }, [mensajeAngelita, reducedMotion, ttsEnabled]);
   const reposarAngelita = useAngelitaStore((s) => s.reposar);
+
+  /* ── LOS DATOS REALES DE LA FINCA (auditoría 2026-07-26, ítem #38) ────────
+     ESTE ERA EL BUG MÁS CARO DEL compAI: los dos disparadores de abajo
+     llamaban `entrarMundoAngelita(mundo, {})` — con el objeto VACÍO. Por eso
+     cada comentario caía a la rama honesta-pero-genérica ("todavía no me ha
+     contado qué tiene sembrado") AUNQUE el usuario tuviera sus matas en
+     IndexedDB. El motor siempre supo hablar con datos; nadie se los pasaba.
+
+     `useInventarioCompai` lee el store de activos (offline-first sobre
+     IndexedDB) y `datosDeMundo` lo traduce a la forma exacta que cada
+     comentarista sabe leer. Cero red, cero dato inventado: finca vacía sigue
+     cayendo a la rama honesta, que es como debe ser. Va por ref para que un
+     cambio de inventario no re-ate la cadencia del husmeo. */
+  const inventarioCompai = useInventarioCompai();
+  const inventarioRef = useRef(inventarioCompai);
+  useEffect(() => { inventarioRef.current = inventarioCompai; }, [inventarioCompai]);
+  /* El clima que el shell alcanzó a cachear — el único dato del husmeo que NO
+     sale del inventario. Sin él, el comentarista del clima dice la verdad.
+     Dependencia por el objeto completo (no `?.snapshotClima` recortado):
+     mismo patrón que `reaccion` arriba — React Compiler solo puede preservar
+     la memoización manual si la dep declarada coincide con lo que infiere
+     (objeto completo), no con una propiedad anidada más específica. */
+  const climaExtra = useMemo(
+    () => (estadoFinca?.snapshotClima ? { snapshot: estadoFinca.snapshotClima } : undefined),
+    [estadoFinca],
+  );
+  const climaExtraRef = useRef(climaExtra);
+  useEffect(() => { climaExtraRef.current = climaExtra; }, [climaExtra]);
+  /* Un solo lugar donde se arman los datos: los dos disparadores lo usan. */
+  const datosParaMundo = useCallback(
+    (mundo) => datosDeMundo(mundo, inventarioRef.current, climaExtraRef.current || {}),
+    [],
+  );
+
+  // Cuántos husmeos autónomos van sonados (ver husmeoCadencia.js, #58) — vive
+  // arriba de los dos efectos porque el #1 (navegación real) la REINICIA: el
+  // usuario acaba de interactuar de verdad, así que el husmeo vuelve a
+  // sonar "vivo" (13s) en vez de seguir asentado hacia el ritmo del SPEC.
+  const husmeoIdx = useRef(0);
+  const lugaresVisiblesRef = useRef([]);
+  const barridoFrustumRef = useRef(0);
 
   // 1) Navegación real: al entrar/salir de un mundo de verdad, la abeja
   //    husmea ese lugar (o vuelve a calma al salir). `focoId` es el id CRUDO
@@ -1600,12 +2102,17 @@ function CompaneroAbeja({ foco, focoId = null, entrando, animo, energia, reduced
   const focoIdPrevio = useRef(focoId);
   useEffect(() => {
     if (focoId && focoId !== focoIdPrevio.current) {
-      entrarMundoAngelita(LUGAR_A_MUNDO_ANGELITA[focoId] || 'finca', {});
+      const mundo = LUGAR_A_MUNDO_ANGELITA[focoId] || 'finca';
+      entrarMundoAngelita(mundo, datosParaMundo(mundo));
+      // El usuario interactuó de verdad: la cadencia del husmeo autónomo
+      // vuelve a arrancar "viva" (#58) — no se queda asentada en 46s solo
+      // porque llevaba rato sin que nadie tocara nada ANTES de esta visita.
+      husmeoIdx.current = 0;
     } else if (!focoId && focoIdPrevio.current) {
       reposarAngelita();
     }
     focoIdPrevio.current = focoId;
-  }, [focoId, entrarMundoAngelita, reposarAngelita]);
+  }, [focoId, entrarMundoAngelita, reposarAngelita, datosParaMundo]);
 
   // 2) Husmeo autónomo: nunca a mitad de un viaje real (entrandoRef, para
   //    que un viaje NO reinicie la cadencia), nunca con reduced-motion (cero
@@ -1616,7 +2123,6 @@ function CompaneroAbeja({ foco, focoId = null, entrando, animo, energia, reduced
   //    debe repintar el resto del árbol.
   const entrandoRef = useRef(entrando);
   useEffect(() => { entrandoRef.current = entrando; }, [entrando]);
-  const husmeoIdx = useRef(0);
   const husmeoLugarRef = useRef(null);
   useEffect(() => {
     if (reducedMotion) return undefined;
@@ -1628,26 +2134,34 @@ function CompaneroAbeja({ foco, focoId = null, entrando, animo, energia, reduced
       /* Cuánto se queda EL AVISO DE ESTA VUELTA: depende de su largo. */
       let duraEste = HUSMEO_VISIBLE_MS;
       if (!entrandoRef.current) {
-        const lugar = HUSMEO_LUGARES[husmeoIdx.current % HUSMEO_LUGARES.length];
-        husmeoIdx.current += 1;
-        const mundo = LUGAR_A_MUNDO_ANGELITA[lugar];
-        const decision = mundo ? entrarMundoAngelita(mundo, {}) : null;
-        if (decision?.interrumpe) {
-          husmeoLugarRef.current = lugar;
-          if (ocultarTimer) clearTimeout(ocultarTimer);
-          /* El aviso dura LO QUE CUESTA LEERLO, no un tiempo fijo (feedback del
-             operador: "desaparecen muy rápido"). Escritura + lectura cómoda.
-             Si la decisión no trae texto, cae al piso digno. */
-          duraEste = duracionAviso(decision?.mensaje ?? decision?.texto);
-          ocultarTimer = setTimeout(() => {
-            husmeoLugarRef.current = null;
-            reposarAngelita();
-          }, duraEste);
+        const lugaresVisibles = lugaresVisiblesRef.current;
+        if (lugaresVisibles.length > 0) {
+          const lugar = lugaresVisibles[husmeoIdx.current % lugaresVisibles.length];
+          husmeoIdx.current += 1;
+          const mundo = LUGAR_A_MUNDO_ANGELITA[lugar];
+          const decision = mundo
+            ? entrarMundoAngelita(mundo, datosParaMundo(mundo), { ocupado: estaOcupado() })
+            : null;
+          if (decision?.interrumpe) {
+            husmeoLugarRef.current = lugar;
+            if (ocultarTimer) clearTimeout(ocultarTimer);
+            /* El aviso dura LO QUE CUESTA LEERLO, no un tiempo fijo (feedback del
+               operador: "desaparecen muy rápido"). Escritura + lectura cómoda.
+               Si la decisión no trae texto, cae al piso digno. */
+            duraEste = duracionAviso(decision?.mensaje ?? decision?.texto);
+            ocultarTimer = setTimeout(() => {
+              husmeoLugarRef.current = null;
+              reposarAngelita();
+            }, duraEste);
+          }
         }
       }
-      /* El siguiente husmeo espera a que el anterior TERMINE de leerse (+ respiro):
-         un aviso largo ya no se lo come el que viene detrás. */
-      temporizador = setTimeout(tick, Math.max(HUSMEO_CADA_MS, duraEste + 3500));
+      /* El siguiente husmeo espera a que el anterior TERMINE de leerse (+
+         respiro): un aviso largo ya no se lo come el que viene detrás. La
+         cadencia BASE (#58) ya no es fija: arranca en 13s ("viva") y se
+         asienta hacia los 46s del SPEC tras varias vueltas sin interacción. */
+      const cadenciaBase = husmeoCadenciaMs(vueltasCompletas(husmeoIdx.current, Math.max(1, lugaresVisiblesRef.current.length)));
+      temporizador = setTimeout(tick, Math.max(cadenciaBase, duraEste + 3500));
     };
     temporizador = setTimeout(tick, HUSMEO_PRIMERO_MS);
     return () => {
@@ -1656,11 +2170,19 @@ function CompaneroAbeja({ foco, focoId = null, entrando, animo, energia, reduced
       if (ocultarTimer) clearTimeout(ocultarTimer);
     };
     // `entrando` vive en entrandoRef a propósito: un viaje real no debe
-    // reiniciar la cadencia del husmeo autónomo.
-  }, [reducedMotion, entrarMundoAngelita, reposarAngelita]);
+    // reiniciar la cadencia del husmeo autónomo. `datosParaMundo` es estable
+    // (useCallback sin deps, lee refs) — el inventario cambia sin re-atar nada.
+  }, [reducedMotion, entrarMundoAngelita, reposarAngelita, datosParaMundo]);
 
   useFrame((state) => {
     if (!ref.current) return;
+    // El barrido es barato y no requiere raycasts: sólo clasifica los lugares
+    // que la cámara ya encuadra. Se actualiza varias veces por segundo para
+    // que un paneo cambie el conjunto de candidatos sin repintar React.
+    if (barridoFrustumRef.current++ % 6 === 0) {
+      lugaresVisiblesRef.current = lugaresVisiblesEnFrustum(mundos, camera)
+        .filter((id) => LUGAR_A_MUNDO_ANGELITA[id] && mundosById[id]);
+    }
     const t = state.clock.elapsedTime;
     // Modificadores de reaccionDeFinca: mojada pesa (baja/lenta), sed baja a
     // buscar agua, comiendo tiembla mordisqueando. Sin estado, todo queda en 1.
@@ -1675,7 +2197,7 @@ function CompaneroAbeja({ foco, focoId = null, entrando, animo, energia, reduced
     // aceptó (husmeoLugarRef) manda un TERCER destino — un solo lugar a la
     // vez, temporal, nunca un círculo errático.
     const lugarHusmeo = !entrando ? husmeoLugarRef.current : null;
-    const anclaHusmeo = lugarHusmeo ? MUNDO_DIR_BY_ID[lugarHusmeo] : null;
+    const anclaHusmeo = lugarHusmeo ? mundosById[lugarHusmeo] : null;
     // POSICIÓN DE CALMA: al reposo (sin viaje real NI husmeo activo) Angelita
     // ya no ronda el valle en un círculo errático — flota serena sobre el
     // patio de la casa con una deriva mínima y lenta (respiración). Al
@@ -2177,6 +2699,10 @@ function amortiguarAtmosfera(actual, objetivo, k) {
 
 function AtmosferaValle({ c, perfil, reducedMotion }) {
   const objetivo = useMemo(() => estadoAtmosfera(c), [c]);
+  const climaRuntime = useMemo(() => crearClimaVolumetrico({
+    estadoInicial: c.lluviaViva ? 'rain' : c.nieblaLejos <= 20 ? 'fog' : 'fair',
+    seed: 20260824,
+  }), [c]);
   // La piel del primer montaje: alimenta los valores declarativos del JSX (que
   // nunca deben cambiar tras montar) — un re-render no pisa la animación.
   const [ini] = useState(() => c);
@@ -2188,11 +2714,11 @@ function AtmosferaValle({ c, perfil, reducedMotion }) {
   const ambRef = useRef(null);
   const solRef = useRef(null);
 
-  const pintar = (e) => {
+  const pintar = (e, weather = climaRuntime.env) => {
     if (fondoRef.current) fondoRef.current.copy(e.fondo);
     if (fogRef.current) {
       fogRef.current.color.copy(e.niebla);
-      fogRef.current.far = e.nieblaLejos;
+      fogRef.current.far = e.nieblaLejos * (1 - weather.fogDensity * 0.18);
     }
     if (hemiRef.current) {
       hemiRef.current.intensity = e.intensidad * 0.55;
@@ -2204,7 +2730,7 @@ function AtmosferaValle({ c, perfil, reducedMotion }) {
       ambRef.current.color.copy(e.luz);
     }
     if (solRef.current) {
-      solRef.current.intensity = e.intensidad;
+      solRef.current.intensity = e.intensidad * weather.sunAttenuation;
       solRef.current.color.copy(e.luz);
       solRef.current.position.copy(e.solPos);
     }
@@ -2214,15 +2740,16 @@ function AtmosferaValle({ c, perfil, reducedMotion }) {
   useEffect(() => {
     if (!reducedMotion) return;
     amortiguarAtmosfera(actual, objetivo, 1);
-    pintar(actual);
+    pintar(actual, climaRuntime.tick(0));
   });
 
   // Transición viva: amortiguación exponencial estable en dt variable.
   useFrame((_, dt) => {
     if (reducedMotion) return;
     const k = 1 - Math.exp((-3 / TRANSICION.duracion) * Math.min(dt, 0.1));
+    const weather = climaRuntime.tick(dt);
     amortiguarAtmosfera(actual, objetivo, k);
-    pintar(actual);
+    pintar(actual, weather);
   });
 
   return (
@@ -2374,11 +2901,21 @@ function poseValleParaAspecto(aspect) {
 }
 
 /* ── Contenido de la escena (dentro del Canvas). ── */
-function Escena({ clima, focoId, animo, energia, onEntrar, onAlerta, onCasa = null, onAngelita = null, reducedMotion, perfil, tier = 'alto', estadoFinca = null, hayAlerta = false, aplanando = false, camaraDirector = false, beatsRef = null, portada = false, pose = null }) {
+function Escena({ clima, focoId, animo, energia, onEntrar, onAlerta, onCasa = null, onAngelita = null, reducedMotion, perfil, tier = 'alto', estadoFinca = null, hayAlerta = false, aplanando = false, camaraDirector = false, beatsRef = null, portada = false, pose = null, mundos = MUNDOS_DIR }) {
   /* La pose de reposo (aspecto-consciente, viene del host del Canvas). */
   const poseReposo = pose || { position: CAMARA_VALLE.position, fov: CAMARA_VALLE.fov, k: 1, mira: MIRA_VALLE };
   const miraReposo = poseReposo.mira || MIRA_VALLE;
   const controls = useRef(null);
+  const superficie = useMemo(() => {
+    const opcionesSuperficie = {
+      resolution: perfil.segmentosTerreno,
+      sampleBase: alturaTerreno,
+      seed: 20260824 + (tier === 'alto' ? 3 : tier === 'medio' ? 2 : 1),
+      droplets: tier === 'alto' ? 900 : tier === 'medio' ? 450 : 160,
+    };
+    return crearSuperficieErosionada(opcionesSuperficie);
+  }, [perfil.segmentosTerreno, tier]);
+  const altura = superficie.heightAt;
   /* La cámara de director (FASE 4, flag `camaraDirector`) se monta DESPUÉS de
      CamaraViajera y gana por orden de frame durante su barrido. `avatarRef`
      recibe la posición viva de Angelita (Vector3 estable) para el follow. */
@@ -2395,9 +2932,9 @@ function Escena({ clima, focoId, animo, energia, onEntrar, onAlerta, onCasa = nu
     // regla de tercios) — la mira de reposo es ASPECTO-CONSCIENTE: en vertical
     // baja y avanza hacia la finca (CamaraViajera le suma 0.6 en y).
     if (!m) return new THREE.Vector3(miraReposo[0], miraReposo[1] - 0.6, miraReposo[2]);
-    const y = alturaTerreno(m.pos[0], m.pos[2]);
+    const y = altura(m.pos[0], m.pos[2]);
     return new THREE.Vector3(m.pos[0], y, m.pos[2]);
-  }, [focoId, miraReposo]);
+  }, [altura, focoId, miraReposo]);
   const autoOrbit = !reducedMotion && !focoId;
   const entrando = !!focoId;
   const nocturno = clima === 'noche';
@@ -2415,6 +2952,15 @@ function Escena({ clima, focoId, animo, energia, onEntrar, onAlerta, onCasa = nu
       {!reducedMotion && <MonitorRendimiento key={tier} tier={tier} />}
       {/* Fondo + niebla + luces, amortiguadas hacia la franja del día. */}
       <AtmosferaValle c={c} perfil={perfil} reducedMotion={reducedMotion} />
+      {/* Los Guardianes del gradiente — el Ent del piso térmico + vecinos.
+          pisoTermico=null → default (templado/roble); cablear el valor real
+          cuando el valle exponga el piso. Rescatado del huérfano 2026-08-01. */}
+      <EntsDelValle
+        pisoTermico={null}
+        alturaDe={altura}
+        tier={/** @type {'alto'|'medio'|'bajo'} */ (tier)}
+        reducedMotion={reducedMotion}
+      />
       {fracEstrellas > 0 && perfil.estrellas > 0 && (
         <Stars
           radius={40}
@@ -2443,32 +2989,37 @@ function Escena({ clima, focoId, animo, energia, onEntrar, onAlerta, onCasa = nu
       {/* La LUNA: la autora de la luz nocturna. Verla ancla el contraluz. */}
       {nocturno && <LunaValle reducedMotion={reducedMotion} />}
 
-      <Terreno nocturno={nocturno} innerRef={terrenoRef} perfil={perfil} />
+      <Terreno nocturno={nocturno} innerRef={terrenoRef} perfil={perfil} superficie={superficie} />
       {/* AoE: detalle de suelo (pasto corto/flores/piedras) + surcos de cultivo — mata el verde vacío */}
-      <DetalleSueloValle alturaDe={alturaTerreno} tier={tier} reducedMotion={reducedMotion} nocturno={nocturno} />
+      <DetalleSueloValle alturaDe={altura} tier={tier} reducedMotion={reducedMotion} nocturno={nocturno} />
+      {/* Pasto alto instanciado: raíz fija al relieve, viento solo en la copa,
+          color en parches y presupuesto por tier. Complementa el detalle corto
+          sin tocar caminos, casa ni cauce. */}
+      <PastoVivoValle alturaDe={altura} tier={tier} reducedMotion={reducedMotion} nocturno={nocturno} />
       <Cordillera color={nocturno ? '#48598a' : c.niebla} innerRef={cordilleraRef} perfil={perfil} />
       {/* AGUA VIVA: el hilo que baja del páramo + las acequias que se ramifican
           a las eras, el semillero y la huerta, con sus compuertas y pozas. */}
-      <AguaVivaValle alturaDe={alturaTerreno} tier={tier} reducedMotion={reducedMotion} nocturno={nocturno} caudal={c.lluviaViva ? 1 : 0.85} />
+      <AguaVivaValle alturaDe={altura} tier={tier} reducedMotion={reducedMotion} nocturno={nocturno} caudal={c.lluviaViva ? 1 : 0.85} />
       <Quebrada
         color={nocturno ? '#7fb3d9' : '#5fb2c9'}
         viva={c.lluviaViva}
         perfil={perfil}
         nocturno={nocturno}
+        alturaDe={altura}
       />
-      <VegetacionPisos nocturno={nocturno} perfil={perfil} />
+      <VegetacionPisos nocturno={nocturno} perfil={perfil} alturaDe={altura} />
       {/* AoE: bosque denso 3x + detalle de suelo/surcos + campesinos en faena + hato en movimiento */}
-      <BosqueDensoValle alturaDe={alturaTerreno} tier={tier} reducedMotion={reducedMotion} nocturno={nocturno} />
+      <BosqueDensoValle alturaDe={altura} tier={tier} reducedMotion={reducedMotion} nocturno={nocturno} />
       {/* CLIMA VIVO: la lluvia que cae de verdad, la niebla que rueda por la
           ladera y la ESCARCHA de la helada — el clima real escrito en el suelo. */}
       {c.lluviaViva && (
-        <LluviaValle alturaDe={alturaTerreno} tier={tier} reducedMotion={reducedMotion} nocturno={nocturno} />
+        <LluviaValle alturaDe={altura} tier={tier} reducedMotion={reducedMotion} nocturno={nocturno} />
       )}
       {clima === 'niebla' && (
-        <NieblaLadera alturaDe={alturaTerreno} tier={tier} reducedMotion={reducedMotion} />
+        <NieblaLadera alturaDe={altura} tier={tier} reducedMotion={reducedMotion} />
       )}
       {clima === 'amanecer' && (
-        <NieblaLadera modo="amanecer" intensidad={0.55} alturaDe={alturaTerreno} tier={tier} reducedMotion={reducedMotion} />
+        <NieblaLadera modo="amanecer" intensidad={0.55} alturaDe={altura} tier={tier} reducedMotion={reducedMotion} />
       )}
       {/* EL MAR DE NUBES: el colchón de niebla de radiación posado en la
           tierra baja del frente — la finca amanece FLOTANDO sobre él. Deriva
@@ -2479,25 +3030,25 @@ function Escena({ clima, focoId, animo, energia, onEntrar, onAlerta, onCasa = nu
           intensidad={0.5}
           velocidad={0.45}
           banda={BANDA_MAR_NUBES}
-          alturaDe={alturaTerreno}
+          alturaDe={altura}
           tier={tier}
           reducedMotion={reducedMotion}
           semilla={43}
         />
       )}
       {hayAlerta && COSA_DEL_DIA.tono === 'helada' && (clima === 'noche' || clima === 'amanecer' || clima === 'helada') && (
-        <HeladaValle alturaDe={alturaTerreno} tier={tier} reducedMotion={reducedMotion} />
+        <HeladaValle alturaDe={altura} tier={tier} reducedMotion={reducedMotion} />
       )}
-      <CafetalDensoValle alturaDe={alturaTerreno} tier={tier} nocturno={nocturno} zona={[{ cx: 5.2, cz: 1.6, rx: 2.6, rz: 2.2 }]} />
-      <ParamoDensoValle alturaDe={alturaTerreno} tier={tier} nocturno={nocturno} />
+      <CafetalDensoValle alturaDe={altura} tier={tier} nocturno={nocturno} zona={[{ cx: 5.2, cz: 1.6, rx: 2.6, rz: 2.2 }]} />
+      <ParamoDensoValle alturaDe={altura} tier={tier} nocturno={nocturno} />
       {/* La LADERA ALTA poblada: terrazas de clima frío en policultivo (papa,
           haba, cubio, arracacha + barbecho), cerca de piedra, camino y abrigo. */}
-      <LaderaAltaValle alturaDe={alturaTerreno} tier={tier} nocturno={nocturno} reducedMotion={reducedMotion} />
-      {!portada && <CampesinosValle alturaDe={alturaTerreno} tier={tier} reducedMotion={reducedMotion} />}
-      {!portada && <HatoMovil alturaDe={alturaTerreno} tier={tier === 'alto' ? 10 : tier === 'bajo' ? 4 : 7} radio={4.8} reducedMotion={reducedMotion} />}
+      <LaderaAltaValle alturaDe={altura} tier={tier} nocturno={nocturno} reducedMotion={reducedMotion} />
+      {!portada && <CampesinosValle alturaDe={altura} tier={tier} reducedMotion={reducedMotion} />}
+      {!portada && <HatoMovil alturaDe={altura} tier={tier === 'alto' ? 10 : tier === 'bajo' ? 4 : 7} radio={4.8} reducedMotion={reducedMotion} />}
       {/* LOGÍSTICA VISIBLE (alma Settlers): la mula acarrea estiércol→pila,
           compost→eras y cosecha→casa por los senderos, y las pilas crecen. */}
-      {!portada && <ArrieriaValle alturaDe={alturaTerreno} tier={tier} reducedMotion={reducedMotion} />}
+      {!portada && <ArrieriaValle alturaDe={altura} tier={tier} reducedMotion={reducedMotion} />}
 
       {/* LA DIRECCIÓN DEL CUADRO: la casa donde descansa el ojo (su puerta
           iluminada es la vía SECUNDARIA a la ventana de los mundos), los
@@ -2506,28 +3057,28 @@ function Escena({ clima, focoId, animo, energia, onEntrar, onAlerta, onCasa = nu
           miniatura, no espejos), los pórticos humildes de lo secundario, la
           vista del páramo con su Ent, y los patios bajo cada lugar. */}
       <CasaCampesina
-        alturaDe={alturaTerreno}
+        alturaDe={altura}
         perfil={perfil}
         nocturno={nocturno}
         practicas={practicas}
         reducedMotion={reducedMotion}
         onPuerta={portada ? null : onCasa}
       />
-      <SenderosValle alturaDe={alturaTerreno} perfil={perfil} />
+      <SenderosValle alturaDe={altura} perfil={perfil} />
       {/* JERARQUÍA DE PORTALES (regla del operador): los 6 grandes son
           PAISAJES vivos — cada arco enmarca la viñeta 3D de su mundo (cero
           discos-espejo); los toris de madera quedan SOLO para los lugares
           secundarios de menos uso. */}
       <VentanasVivas
-        mundos={MUNDOS_DIR}
-        alturaDe={alturaTerreno}
+        mundos={mundos}
+        alturaDe={altura}
         nocturno={nocturno}
         practicas={practicas}
         reducedMotion={reducedMotion}
         perfil={perfil}
         onEntrar={portada ? null : onEntrar}
       />
-      <PorticosSecundarios mundos={MUNDOS_DIR} alturaDe={alturaTerreno} />
+      <PorticosSecundarios mundos={mundos} alturaDe={altura} />
       {/* EL ACCESO AL PÁRAMO — el Ent-queñua+frailejones del filo (VistaParamoEnt)
           se ARCHIVÓ 2026-07-18 (pedido del operador): se veía amontonado en la
           vista del valle. Ver src/mockups/valle/_archivo/vistaParamo.archivado.jsx.
@@ -2542,21 +3093,22 @@ function Escena({ clima, focoId, animo, energia, onEntrar, onAlerta, onCasa = nu
           en su loma. Separa la profundidad sin mover nada — la casa, los
           hitos y las matas dejan de flotar. De noche se atenúa, no se va. */}
       <SombrasContacto
-        mundos={MUNDOS_DIR}
-        alturaDe={alturaTerreno}
+        mundos={mundos}
+        alturaDe={altura}
         nocturno={nocturno}
         franja={clima}
       />
       {!portada && (
-        <PatiosLugares mundos={MUNDOS_DIR} alturaDe={alturaTerreno} nocturno={nocturno} />
+        <PatiosLugares mundos={mundos} alturaDe={altura} nocturno={nocturno} />
       )}
 
-      {MUNDOS_DIR.map((m) => (
+      {mundos.map((m) => (
         <MundoLugar
           key={m.id}
           mundo={m}
           reducedMotion={reducedMotion}
           perfil={perfil}
+          alturaDe={altura}
           onEntrar={portada ? null : onEntrar}
         />
       ))}
@@ -2567,35 +3119,42 @@ function Escena({ clima, focoId, animo, energia, onEntrar, onAlerta, onCasa = nu
           (el operador no debería necesitar GPU rica para conocer al oso);
           la franja horaria decide quién está afuera. */}
       <VecinosDelValle
-        alturaDe={alturaTerreno}
+        alturaDe={altura}
         reducedMotion={reducedMotion}
         franja={clima}
       />
       {/* EL OSO NEGRO del monte (biopunk, decisión del operador): el mayor
           de los vecinos de tierra, visible en el borde del bosque. */}
-      <OsoNegroDelMonte alturaDe={alturaTerreno} />
+      <OsoNegroDelMonte alturaDe={altura} />
       {/* MODO PORTADA (la cara de prod.chagra.app): el valle es ATMÓSFERA de
           la entrada — sin rótulos que compitan con el formulario ni faro que
           pida un toque que aún no puede darse. La vida (criaturas, Angelita,
           ciclo del día) se queda: la finca espera, no está muerta. */}
       {!portada && (
         <RotulosLugares
-          mundos={MUNDOS_DIR}
+          mundos={mundos}
           focoId={focoId}
           onEntrar={onEntrar}
           occluders={occluders}
           controls={controls}
           kReposo={poseReposo.k}
+          alturaDe={altura}
         />
       )}
 
-      <CriaturasValle reducedMotion={reducedMotion} cupo={perfil.criaturas} tier={tier} />
+      <CriaturasValle
+        reducedMotion={reducedMotion}
+        cupo={perfil.criaturas}
+        tier={tier}
+        alturaDe={altura}
+      />
       {!portada && (
         <Beacon onAlerta={onAlerta} reducedMotion={reducedMotion} conLuz={perfil.luzBeacon} />
       )}
       <CompaneroAbeja
         foco={foco}
         focoId={focoId}
+        mundos={mundos}
         entrando={entrando}
         animo={animo}
         energia={energia}
@@ -2695,6 +3254,13 @@ export default function Valle3D({
      vivo pero como paisaje que ESPERA — sin rótulos de mundos ni faro del día,
      con una llegada de cámara más lenta. La UI de la entrada vive en el host. */
   portada = false,
+  /* VALLE DINÁMICO (spec paso 2): los lugares de ESTA finca, ya compuestos por
+     el director (componerMundos). El host los siembra del perfil con
+     construirMundosValle(perfil). Default = el valle completo de siempre: sin
+     perfil, la escena es idéntica a la de antes.
+     OJO: `perfil` (arriba) es el perfil de RENDER del tier — no confundir con
+     el perfil de la FINCA, que llega ya resuelto en esta lista. */
+  mundos = MUNDOS_DIR,
 }) {
   const [listo, setListo] = useState(false);
   /* GUARD DEL NEGRO INTERMITENTE (auditoría 2026-07-16): sin oyente de
@@ -2772,6 +3338,7 @@ export default function Valle3D({
           beatsRef={beatsRef}
           portada={portada}
           pose={pose}
+          mundos={mundos}
         />
       </Suspense>
     </Canvas>

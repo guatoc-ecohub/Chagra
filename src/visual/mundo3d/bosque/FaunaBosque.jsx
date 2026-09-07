@@ -1,11 +1,12 @@
 /*
  * FaunaBosque — LA VIDA del Bosque Vivo. Un bosque sin bichos es un decorado.
  *
- * EL REGISTRO (decisión del operador, 2026-07): la fauna EMBLEMÁTICA del
- * bosque — oso, rana, colibrí, borugo, jaguar, danta — va con los SVG
- * rubber-hose de `src/visual/creatures/` como billboards <Html>: son el
- * estándar de calidad de la casa (la danta ya tiene su SVG — Danta.jsx, la
- * jardinera del bosque — y anda de día/atardecer con los vecinos). La fauna AMBIENTAL de fondo —
+ * EL REGISTRO (decisión del operador, 2026-07, afinado 2026-07-29): la fauna
+ * EMBLEMÁTICA del páramo — rana y colibrí — va con los SVG rubber-hose de
+ * `src/visual/creatures/` como billboards <Html>: son el estándar de calidad
+ * de la casa. El OSO y el JAGUAR SALIERON del elenco del páramo por orden del
+ * operador (feedback mundos 2026-07-29); siguen en CREATURES para otros
+ * mundos. La fauna AMBIENTAL de fondo —
  * cóndor, venado en la niebla, bandada, quetzal fugaz, mariposas, abejas,
  * escarabajo, luciérnagas — sí es geometría mínima procedural (siluetas que
  * el fog completa). Hubo un intento de oso/rana procedurales: quedó jubilado
@@ -19,10 +20,8 @@
  *   · MEDIO  — los VECINOS rubber-hose en SU casa, ya no muebles: un
  *     IDLE-CEREBRO local (el patrón useVidaIdle de PR #2482, adaptado) hojea
  *     el repertorio que cada bicho YA sabe hacer con un reloj con jitter —
- *     el oso PASEA unos pasos y vuelve (movimiento 3D real del billboard),
- *     resopla, se rasca, se sienta; el jaguar acecha y ruge en la niebla; el
- *     borugo olfatea y se acurruca; la rana pega su brinquito. Nunca el
- *     mismo gesto dos veces seguidas, nunca al unísono.
+ *     la rana pega su brinquito y reposa. Nunca el mismo gesto dos veces
+ *     seguidas, nunca al unísono.
  *   · CERCA — MARIPOSAS (la Morpho azul manda) y ABEJAS sobre el frailejonar,
  *     el COLIBRÍ que llega a una flor, liba y se va a otra (y a veces se
  *     pierde un rato del cuadro), un ESCARABAJO arrastrándose por el musgo y
@@ -31,7 +30,7 @@
  * Ritmo, no metrónomo: cada bicho lleva su fase, su reloj y su jitter propios
  * (nada aparece ni parpadea al unísono, ningún ciclo se siente en loop). La
  * franja del día sale de useCicloDia (?ciclo= para fotografiar una hora).
- * Tier-safe: bajo = solo el oso y el colibrí, quietos; medio = vecinos vivos +
+ * Tier-safe: bajo = solo la rana y el colibrí, quietos; medio = vecinos vivos +
  * cóndor + visitantes + pocas mariposas; alto = todo. reducedMotion = nada
  * animado ni intermitente: fotograma digno.
  *
@@ -40,7 +39,7 @@
  * son SVG en <Html>. Importa three/@react-three → montar SOLO dentro del
  * <Canvas> del bosque.
  */
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import * as THREE from 'three';
 import { useFrame } from '@react-three/fiber';
 import { Html } from '@react-three/drei';
@@ -54,7 +53,7 @@ const azar = (a, b) => a + Math.random() * (b - a);
    Un reloj con jitter: descanso (identidad) → gesto → descanso → otro
    gesto… Nunca repite el mismo gesto dos veces seguidas. El primer compás
    llega rápido (el bosque no arranca muerto) y `primero` deja fijar el
-   gesto de apertura (el oso SIEMPRE abre paseando: se ve que está vivo).
+   gesto de apertura (un bicho que abre moviéndose se ve que está vivo).
    Gate `activo=false` (reduced-motion, tier bajo) = ni un timer vivo. */
 function useRelojDeVida(vida, activo) {
   const [momento, setMomento] = useState(/** @type {string|null} */ (null));
@@ -498,9 +497,15 @@ function QuetzalFugaz() {
   });
   return (
     <group ref={grupo} visible={false}>
+      {/* El esmeralda es un ACENTO iridiscente legítimo (como el oro aposemático
+          o la barba del colibrí), pero el GLOW propio no: ningún animal del
+          elenco se autoilumina con emissive plano — la única iridiscencia
+          sancionada es la barba del colibrí, dirigida por ángulo (×0.5). El
+          cometa lo hacen la MOTION fugaz + la luz dorada de la escena, no un
+          neón verde. Antes: emissive="#073d20" en cuerpo y cabeza. */}
       <mesh scale={[1.4, 1, 1]}>
         <sphereGeometry args={[0.1, 7, 6]} />
-        <meshLambertMaterial color="#1fa05a" emissive="#073d20" />
+        <meshLambertMaterial color="#1fa05a" />
       </mesh>
       {/* el pecho rojo */}
       <mesh position={[0.06, -0.06, 0]} scale={[1, 0.9, 0.85]}>
@@ -509,7 +514,7 @@ function QuetzalFugaz() {
       </mesh>
       <mesh position={[0.12, 0.06, 0]}>
         <sphereGeometry args={[0.06, 6, 5]} />
-        <meshLambertMaterial color="#23b565" emissive="#073d20" />
+        <meshLambertMaterial color="#23b565" />
       </mesh>
       <mesh position={[0.18, 0.05, 0]} rotation={[0, 0, -Math.PI / 2]}>
         <coneGeometry args={[0.018, 0.05, 4]} />
@@ -552,10 +557,14 @@ function QuetzalFugaz() {
    acompañan desde el frailejonar y el borde del monte). `franjas` = cuándo
    sale (null = siempre). `vida` = su repertorio de gestos (los que el bicho
    YA sabe hacer: props opt-in de su componente) y el compás de su reloj.
-   `paseo` = hasta dónde camina y vuelve (el oso y la danta, cada uno con su
-   rumbo y su compás — nunca en fila ni al unísono). */
+   `paseo` = hasta dónde camina y vuelve (movimiento 3D real del billboard,
+   con su rumbo y su compás propios — nunca en fila ni al unísono). */
 const VECINOS_BOSQUE = [
   {
+    /* ORDEN DEL OPERADOR (feedback mundos 2026-07-29): del elenco del páramo
+       SALEN el oso y el jaguar — y se QUEDAN el colibrí y los pájaros
+       dibujados ("se ven espectacular"). El oso-guardian y el jaguar siguen
+       vivos en CREATURES para otros mundos; este roster ya no los llama. */
     slug: 'rana-andina',
     pos: [3.1, 0.32, 3.2],
     px: 24,
@@ -569,47 +578,12 @@ const VECINOS_BOSQUE = [
       },
     },
   },
-  {
-    /* LA DANTA — la jardinera del bosque, por fin en SVG de la casa. Mole
-       diurna y mansa: sale del arbolado del costado derecho y PASEA hacia el
-       claro con su andar pesado (rumbo y compás propios, nunca en fila con el
-       oso), husmea con la trompa en periscopio, reposa y otea. Al caer la
-       noche se retira monte adentro (franjas de día/atardecer). */
-    slug: 'danta',
-    pos: [3.0, 0.95, 2.1],
-    px: 66,
-    factor: 18,
-    franjas: ['manana', 'mediodia', 'tarde', 'atardecer'],
-    vida: {
-      primero: 'pasea',
-      descanso: [6000, 13000],
-      momentos: {
-        pasea: { dur: 10500, props: { pose: 'anda' }, paseo: [-2.0, 0, 1.1] },
-        husmea: { dur: 4200, props: { husmea: true } },
-        reposo: { dur: 5600, props: { pose: 'reposo' } },
-        mira: { dur: 3200, props: { pose: 'señala' } },
-      },
-    },
-  },
-  {
-    slug: 'jaguar',
-    pos: [-6.8, 0.7, -4.8],
-    px: 44,
-    factor: 15,
-    mistico: true,
-    franjas: ['amanecer', 'atardecer', 'noche'],
-    vida: {
-      primero: 'acecha',
-      descanso: [14000, 30000],
-      momentos: {
-        acecha: { dur: 6000, props: { acecha: true } },
-        ruge: { dur: 2600, props: { ruge: true } },
-      },
-    },
-  },
 ];
 
-const VECINOS_TIER_BAJO = new Set(['oso-andino']);
+/* En tier bajo queda la rana, quieta (el colibrí va aparte): el slug DEBE ser
+   uno del roster de arriba — con el oso fuera del elenco (orden del operador),
+   la rana es la única vecina de a pie que queda en el páramo. */
+const VECINOS_TIER_BAJO = new Set(['rana-andina']);
 
 const ESTILO_CRITTER = {
   filter: 'drop-shadow(0 2px 3px rgba(25, 32, 28, 0.35))',
@@ -699,7 +673,45 @@ function VecinosDelBosque({ tier, reducedMotion, franja }) {
 /* ── EL CÓNDOR — la capa lejana ──────────────────────────────────────────
    Silueta oscura de alas planas en V leve que ORBITA el claro por encima de
    los árboles, dentro de la niebla (el fog lo come y lo devuelve: aparece y
-   se pierde solo, sin código extra). Tres mallas, un solo bicho. */
+   se pierde solo, sin código extra).
+   Aunque sea silueta, la FORMA es el retrato del cóndor andino: envergadura
+   enorme y recta, primarias abiertas como DEDOS en la punta del ala, cola
+   corta y cuadrada, y el collar blanco — su firma — bajo la cabeza. La
+   versión anterior era un cono vertical con dos tablas: una mancha. */
+const PRIMARIAS_CONDOR = [
+  // [abanico hacia atrás (rad), largo, ancho] — los dedos del planeo.
+  // Abanico ANCHO y dedos angostos: el vano entre dedo y dedo tiene que ser
+  // mayor que el dedo, o de lejos se funden en un bloque aserrado.
+  [-0.36, 0.4, 0.055], [-0.16, 0.52, 0.06], [0.06, 0.6, 0.062],
+  [0.3, 0.56, 0.06], [0.55, 0.46, 0.055], [0.8, 0.34, 0.05],
+];
+const MAT_CONDOR = { color: '#1d2023', side: THREE.DoubleSide };
+/** Un ala local: se extiende hacia +x, vuela hacia +z (el borde de fuga es −z). */
+function AlaCondor() {
+  return (
+    <>
+      {/* la tabla del brazo: ancha y RECTA, la plancha del planeo */}
+      <mesh position={[0.62, 0, -0.02]}>
+        <boxGeometry args={[1.24, 0.04, 0.6]} />
+        <meshLambertMaterial {...MAT_CONDOR} />
+      </mesh>
+      {/* la mano, apenas más angosta y retrasada */}
+      <mesh position={[1.46, 0, -0.08]}>
+        <boxGeometry args={[0.48, 0.038, 0.46]} />
+        <meshLambertMaterial {...MAT_CONDOR} />
+      </mesh>
+      {/* las primarias digitadas: dedos separados que barren hacia atrás */}
+      {PRIMARIAS_CONDOR.map(([fan, largo, ancho], i) => (
+        <group key={i} position={[1.68, 0, -0.06 - i * 0.015]} rotation={[0, fan, 0]}>
+          <mesh position={[largo / 2, 0, 0]}>
+            <boxGeometry args={[largo, 0.032, ancho]} />
+            <meshLambertMaterial {...MAT_CONDOR} />
+          </mesh>
+        </group>
+      ))}
+    </>
+  );
+}
 function CondorDeAltura({ reducedMotion }) {
   const ave = useRef(null);
   const alaIzq = useRef(null);
@@ -708,10 +720,15 @@ function CondorDeAltura({ reducedMotion }) {
     if (!ave.current) return;
     const t = clock.getElapsedTime();
     const a = t * 0.09 + 3.4; // una vuelta cada ~70 s: paciencia de cóndor
-    const r = 14 + Math.sin(t * 0.05) * 2;
-    ave.current.position.set(Math.cos(a) * r, 11.2 + Math.sin(t * 0.21) * 0.8, Math.sin(a) * r);
+    // Órbita más ADENTRO que antes (r 14→12, y 11.2→10.4): a r 14 el fog del
+    // bosque (far ~47-68) se lo comía entero y la silueta no se leía nunca.
+    const r = 12 + Math.sin(t * 0.05) * 2;
+    ave.current.position.set(Math.cos(a) * r, 10.4 + Math.sin(t * 0.21) * 0.8, Math.sin(a) * r);
     ave.current.rotation.y = -a; // el pico hacia donde vuela (tangente)
-    ave.current.rotation.z = 0.14 + Math.sin(t * 0.13) * 0.08; // banqueo suave
+    // Banqueo marcado (0.14→0.34): la cámara va casi al nivel del ave y sin
+    // inclinación las alas quedan de CANTO (4 cm de grosor = invisibles). Con
+    // ~19° el plano del ala se muestra — así es como circula un cóndor real.
+    ave.current.rotation.z = 0.34 + Math.sin(t * 0.13) * 0.08;
     // Casi nunca aletea: dos golpes de ala cada tanto, el resto plancha.
     const rafaga = Math.max(0, Math.sin(t * 0.23) - 0.86) * 7;
     const aleteo = Math.sin(t * 9) * 0.35 * rafaga;
@@ -719,25 +736,38 @@ function CondorDeAltura({ reducedMotion }) {
     if (alaDer.current) alaDer.current.rotation.z = -0.12 - aleteo;
   });
   return (
-    <group ref={ave} position={reducedMotion ? [-9, 11, -8] : [14, 11.2, 0]}>
-      {/* cuerpo con el collar blanco insinuado */}
-      <mesh rotation={[0, Math.PI / 2, 0]}>
-        <coneGeometry args={[0.22, 1.1, 5]} />
+    <group ref={ave} position={reducedMotion ? [-6, 9.8, -4] : [12, 10.4, 0]}>
+      {/* cuerpo fusiforme HORIZONTAL, tendido en la dirección del vuelo (+z) */}
+      <mesh position={[0, 0, 0.02]} scale={[0.72, 0.62, 2.1]}>
+        <sphereGeometry args={[0.3, 7, 6]} />
         <meshLambertMaterial color="#23262a" />
       </mesh>
-      <mesh position={[0, 0.1, 0.32]}>
-        <sphereGeometry args={[0.13, 6, 5]} />
-        <meshLambertMaterial color="#d8d4c8" />
+      {/* EL COLLAR BLANCO — la firma: un anillo mullido bajo la cabeza */}
+      <mesh position={[0, 0.05, 0.52]} rotation={[Math.PI / 2, 0, 0]}>
+        <cylinderGeometry args={[0.2, 0.2, 0.14, 8]} />
+        <meshLambertMaterial color="#e8e3d4" />
       </mesh>
-      {/* alas planas de puntas digitadas (cajas finas: silueta, no plumaje) */}
-      <mesh ref={alaIzq} position={[0, 0.06, 0]}>
-        <boxGeometry args={[3.6, 0.045, 0.7]} />
+      {/* cabeza pequeña y pico corto */}
+      <mesh position={[0, 0.1, 0.72]}>
+        <sphereGeometry args={[0.09, 6, 5]} />
+        <meshLambertMaterial color="#23262a" />
+      </mesh>
+      <mesh position={[0, 0.08, 0.86]} rotation={[Math.PI / 2, 0, 0]}>
+        <coneGeometry args={[0.045, 0.16, 5]} />
         <meshLambertMaterial color="#1d2023" />
       </mesh>
-      <mesh ref={alaDer} position={[0, 0.06, 0]} rotation={[0, Math.PI, 0]}>
-        <boxGeometry args={[3.6, 0.045, 0.7]} />
-        <meshLambertMaterial color="#1d2023" />
+      {/* la cola CORTA y CUADRADA (nada de flechas de golondrina) */}
+      <mesh position={[0, 0, -0.72]}>
+        <boxGeometry args={[0.44, 0.032, 0.44]} />
+        <meshLambertMaterial {...MAT_CONDOR} />
       </mesh>
+      {/* alas: tabla recta + mano + primarias como dedos (ver AlaCondor) */}
+      <group ref={alaIzq} position={[0.08, 0.05, 0.06]}>
+        <AlaCondor />
+      </group>
+      <group ref={alaDer} position={[-0.08, 0.05, 0.06]} scale={[-1, 1, 1]}>
+        <AlaCondor />
+      </group>
     </group>
   );
 }
@@ -1128,7 +1158,20 @@ function Luciernagas() {
    Revolotean entre los frailejones con rumbo propio (lissajous + fase): nada
    vuela en fila ni bate al unísono. Dos planos por bicha, aleteo de verdad.
    La PRIMERA es la Morpho azul del referente: más grande que todas, la
-   protagonista del primer plano. */
+   protagonista del primer plano.
+   Instanciadas (perf/hermanos-valle-instancing, 2026-07-23): eran 3 <mesh>
+   sueltos por bicha (2 alas + cuerpo) — hasta 24 draw calls en tier alto
+   (8 mariposas), medido como el mayor contribuyente sin instanciar del
+   páramo definitivo (ver ops/informes/hermanos-valle-2026-07-23.md). Ahora
+   son 3 InstancedMesh TOTALES (ala-izq/ala-der/cuerpo) que sirven para las
+   8 a la vez, con el MISMO aleteo/lissajous de siempre: el offset+rotación
+   local del ala (posición 0.11 en X, giro −90° en X, el flip de lado) queda
+   HORNEADO en la geometría (geomAla), así que lo único que cambia por frame
+   es la matriz del cuerpo (posición/yaw/banqueo/escala) compuesta con el
+   aleteo (rotación Z local) vía Matrix4 — mismo patrón que HatoMovil usa
+   para oveja/gallina. Sin `frames={1}`: a diferencia de la vegetación
+   estática del valle, esto SÍ se mueve cada frame (bug documentado en
+   #2710 era al revés: recalcular de más contenido QUIETO). */
 const MARIPOSAS = [
   { color: '#2e7ef0', centro: [2.4, 1.75, 4.4], rx: 1.6, rz: 1.2, v: 0.5, fase: 0.0, esc: 1.7 }, // LA MORPHO
   { color: '#b7a4ff', centro: [-2.0, 1.5, 5.2], rx: 1.3, rz: 1.5, v: 0.62, fase: 2.1 },
@@ -1140,15 +1183,90 @@ const MARIPOSAS = [
   { color: '#4aa3ff', centro: [-0.9, 1.4, 4.2], rx: 1.8, rz: 1.0, v: 0.6, fase: 2.9 },
 ];
 
+/* Geometría del ala, horneada con el MISMO offset/rotación/flip que antes
+   vivía en <group scale={[lado,1,1]}><mesh position={[0.11,0,0]}
+   rotation={[-Math.PI/2,0,0]}>: se rota, LUEGO se traslada (world space del
+   grupo) y por último se aplica el flip de lado — mismo orden T·R·S que
+   componían los Object3D anidados (verificado a mano: BufferGeometry
+   aplica cada llamada al acumulado, así que rotateX→translate→scale replica
+   exactamente scale(translate(rotateX(v)))). El único transform dinámico
+   por frame es el aleteo (rotación Z), que se compone DESPUÉS multiplicando
+   a la derecha de la matriz del cuerpo (mismo efecto que un hijo anidado). */
+function geomAla(lado) {
+  const g = new THREE.PlaneGeometry(0.2, 0.13).rotateX(-Math.PI / 2).translate(0.11, 0, 0);
+  return lado < 0 ? g.scale(-1, 1, 1) : g;
+}
+
 function MariposasDelParamo({ n }) {
-  const cuerpos = useRef([]);
   const bichas = useMemo(() => MARIPOSAS.slice(0, n), [n]);
+  const refAlaIzq = useRef(/** @type {THREE.InstancedMesh|null} */ (null));
+  const refAlaDer = useRef(/** @type {THREE.InstancedMesh|null} */ (null));
+  const refCuerpo = useRef(/** @type {THREE.InstancedMesh|null} */ (null));
+  const geoAlaIzq = useMemo(() => geomAla(1), []);
+  const geoAlaDer = useMemo(() => geomAla(-1), []);
+  const geoCuerpo = useMemo(() => new THREE.CylinderGeometry(0.012, 0.016, 0.14, 4).rotateX(Math.PI / 2), []);
+  // OJO: SIN vertexColors aquí — el color por instancia lo pone
+  // USE_INSTANCING_COLOR (activo solo con mesh.instanceColor, ver setColorAt
+  // abajo), que es independiente del flag `vertexColors`. Con
+  // `vertexColors:true` puesto (bug encontrado en la verificación visual de
+  // esta misma rama), three.js agrega el atributo de color POR VÉRTICE
+  // (USE_COLOR) — que este PlaneGeometry no tiene — y al faltar el atributo
+  // WebGL lo lee como (0,0,0): vColor se multiplica por negro ANTES de
+  // multiplicarlo por el tinte de instancia, y el ala sale negra pese a que
+  // `instanceColor` esté bien pintado. Los materiales de Banco/BancoInstancias
+  // sí llevan vertexColors:true porque SUS geometrías (frailejón, roble…)
+  // vienen con sombreado horneado por vértice de verdad — no es el mismo caso.
+  const matAla = useMemo(
+    () => new THREE.MeshBasicMaterial({
+      color: '#ffffff', side: THREE.DoubleSide, transparent: true, opacity: 0.92,
+    }),
+    [],
+  );
+  const matCuerpo = useMemo(() => new THREE.MeshBasicMaterial({ color: '#3a3428' }), []);
+  // Escrachos reusados: cero alocación por frame/instancia (mismo patrón que
+  // HatoMovil.util.o para oveja/gallina).
+  const util = useMemo(() => ({
+    pos: new THREE.Vector3(),
+    esc: new THREE.Vector3(),
+    euler: new THREE.Euler(0, 0, 0, 'XYZ'),
+    quat: new THREE.Quaternion(),
+    mCuerpo: new THREE.Matrix4(),
+    mFlap: new THREE.Matrix4(),
+    mFinal: new THREE.Matrix4(),
+    col: new THREE.Color(),
+  }), []);
+
+  useLayoutEffect(() => () => {
+    geoAlaIzq.dispose();
+    geoAlaDer.dispose();
+    geoCuerpo.dispose();
+    matAla.dispose();
+    matCuerpo.dispose();
+  }, [geoAlaIzq, geoAlaDer, geoCuerpo, matAla, matCuerpo]);
+
+  // El tinte por bicha (color de ala) no cambia en el tiempo: se pinta una
+  // sola vez, igual que el color por instancia de Banco/BancoInstancias.
+  useLayoutEffect(() => {
+    const pinta = (mesh) => {
+      if (!mesh) return;
+      for (let i = 0; i < bichas.length; i++) mesh.setColorAt(i, util.col.set(bichas[i].color));
+      if (mesh.instanceColor) mesh.instanceColor.needsUpdate = true;
+    };
+    pinta(refAlaIzq.current);
+    pinta(refAlaDer.current);
+  }, [bichas, util]);
+
   useFrame(({ clock }) => {
+    const ai = refAlaIzq.current;
+    const ad = refAlaDer.current;
+    const cu = refCuerpo.current;
+    if (!ai || !ad || !cu) return;
     const t = clock.getElapsedTime();
-    for (let i = 0; i < cuerpos.current.length; i++) {
-      const g = cuerpos.current[i];
+    const {
+      pos, esc, euler, quat, mCuerpo, mFlap, mFinal,
+    } = util;
+    for (let i = 0; i < bichas.length; i++) {
       const m = bichas[i];
-      if (!g || !m) continue;
       const w = t * m.v + m.fase;
       const x = m.centro[0] + Math.sin(w) * m.rx;
       const z = m.centro[2] + Math.sin(w * 1.31 + 1.2) * m.rz;
@@ -1156,53 +1274,61 @@ function MariposasDelParamo({ n }) {
       // El rumbo sale del propio camino (derivada): la bicha mira a donde va.
       const dx = Math.cos(w) * m.rx * m.v;
       const dz = Math.cos(w * 1.31 + 1.2) * m.rz * m.v * 1.31;
-      g.position.set(x, y, z);
-      g.rotation.y = Math.atan2(dx, dz);
+      const yaw = Math.atan2(dx, dz);
       // Banqueo: se ladea en las curvas — vista desde arriba deja de ser
       // un papelito plano y se le ve el cuerpo de bicho.
-      g.rotation.z = Math.sin(w * 0.9) * 0.35;
+      const bank = Math.sin(w * 0.9) * 0.35;
       // Aleteo: cada una a su compás (7.5–10 Hz aprox, fase propia). Las alas
       // pasan más tiempo ARRIBA en V (así se leen mariposa, no confeti).
       const flap = Math.sin(t * (7.5 + i * 0.9) + m.fase) * 0.85 + 0.55;
-      if (g.children[0]) g.children[0].rotation.z = flap;
-      if (g.children[1]) g.children[1].rotation.z = -flap;
+
+      pos.set(x, y, z);
+      euler.set(0, yaw, bank);
+      quat.setFromEuler(euler);
+      esc.setScalar(m.esc ?? 1);
+      mCuerpo.compose(pos, quat, esc);
+
+      mFinal.copy(mCuerpo).multiply(mFlap.makeRotationZ(flap));
+      ai.setMatrixAt(i, mFinal);
+      mFinal.copy(mCuerpo).multiply(mFlap.makeRotationZ(-flap));
+      ad.setMatrixAt(i, mFinal);
+      cu.setMatrixAt(i, mCuerpo);
     }
+    ai.instanceMatrix.needsUpdate = true;
+    ad.instanceMatrix.needsUpdate = true;
+    cu.instanceMatrix.needsUpdate = true;
   });
+
+  if (!bichas.length) return null;
   return (
-    <group>
-      {bichas.map((m, i) => (
-        <group
-          key={i}
-          position={/** @type {[number, number, number]} */ (m.centro)}
-          scale={m.esc ?? 1}
-          ref={(el) => {
-            cuerpos.current[i] = el;
-          }}
-        >
-          {/* Dos alas HORIZONTALES con bisagra en el cuerpo (el grupo rota en
-              z = el ala sube y baja de verdad; el plano vive acostado en XZ y
-              extendido hacia afuera para que el pivote quede en el lomo). */}
-          {[1, -1].map((lado) => (
-            <group key={lado} scale={[lado, 1, 1]}>
-              <mesh position={[0.11, 0, 0]} rotation={[-Math.PI / 2, 0, 0]}>
-                <planeGeometry args={[0.2, 0.13]} />
-                <meshBasicMaterial color={m.color} side={2} transparent opacity={0.92} />
-              </mesh>
-            </group>
-          ))}
-          {/* el cuerpito: la línea oscura entre las alas */}
-          <mesh rotation={[Math.PI / 2, 0, 0]}>
-            <cylinderGeometry args={[0.012, 0.016, 0.14, 4]} />
-            <meshBasicMaterial color="#3a3428" />
-          </mesh>
-        </group>
-      ))}
-    </group>
+    <>
+      <instancedMesh
+        key={`ala-izq-${bichas.length}`}
+        ref={refAlaIzq}
+        args={[geoAlaIzq, matAla, bichas.length]}
+        frustumCulled={false}
+      />
+      <instancedMesh
+        key={`ala-der-${bichas.length}`}
+        ref={refAlaDer}
+        args={[geoAlaDer, matAla, bichas.length]}
+        frustumCulled={false}
+      />
+      <instancedMesh
+        key={`cuerpo-mariposa-${bichas.length}`}
+        ref={refCuerpo}
+        args={[geoCuerpo, matCuerpo, bichas.length]}
+        frustumCulled={false}
+      />
+    </>
   );
 }
 
 /* ── LAS ABEJAS DEL FRAILEJONAR — el zumbido del primer plano ────────────
-   Tres puntos ámbar orbitando las flores, cada uno a su velocidad. */
+   Tres puntos ámbar orbitando las flores, cada uno a su velocidad.
+   Instanciadas (mismo barrido de perf/hermanos-valle-instancing): 3 <mesh>
+   sueltos → 1 InstancedMesh (solo posición cambia por frame, mismo color
+   para las tres — no hace falta instanceColor). */
 const ABEJAS = [
   { anclaje: [2.9, 1.05, 4.7], r: 0.34, v: 2.6, fase: 0 },
   { anclaje: [3.3, 0.9, 4.3], r: 0.28, v: 3.4, fase: 2.4 },
@@ -1210,37 +1336,33 @@ const ABEJAS = [
 ];
 
 function AbejasDelFrailejonar() {
-  const puntos = useRef([]);
+  const ref = useRef(/** @type {THREE.InstancedMesh|null} */ (null));
+  const geo = useMemo(() => new THREE.SphereGeometry(0.038, 6, 5), []);
+  const mat = useMemo(() => new THREE.MeshBasicMaterial({ color: '#e8b13a' }), []);
+  const util = useMemo(() => ({ m: new THREE.Matrix4(), pos: new THREE.Vector3() }), []);
+  useLayoutEffect(() => () => {
+    geo.dispose();
+    mat.dispose();
+  }, [geo, mat]);
   useFrame(({ clock }) => {
+    const mesh = ref.current;
+    if (!mesh) return;
     const t = clock.getElapsedTime();
+    const { m, pos } = util;
     for (let i = 0; i < ABEJAS.length; i++) {
-      const p = puntos.current[i];
       const b = ABEJAS[i];
-      if (!p) continue;
       const w = t * b.v + b.fase;
-      p.position.set(
+      pos.set(
         b.anclaje[0] + Math.cos(w) * b.r,
         b.anclaje[1] + Math.sin(t * 3.1 + b.fase) * 0.09,
         b.anclaje[2] + Math.sin(w) * b.r,
       );
+      m.makeTranslation(pos.x, pos.y, pos.z);
+      mesh.setMatrixAt(i, m);
     }
+    mesh.instanceMatrix.needsUpdate = true;
   });
-  return (
-    <group>
-      {ABEJAS.map((b, i) => (
-        <mesh
-          key={i}
-          position={/** @type {[number, number, number]} */ (b.anclaje)}
-          ref={(el) => {
-            puntos.current[i] = el;
-          }}
-        >
-          <sphereGeometry args={[0.038, 6, 5]} />
-          <meshBasicMaterial color="#e8b13a" />
-        </mesh>
-      ))}
-    </group>
-  );
+  return <instancedMesh ref={ref} args={[geo, mat, ABEJAS.length]} frustumCulled={false} />;
 }
 
 /**

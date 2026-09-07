@@ -51,7 +51,7 @@ function makeFakeCaches(getFetch) {
   };
 }
 
-function loadSW({ online = true, indexHtml, assetExists = () => true } = {}) {
+function loadSW({ online = true, indexHtml, assetExists = () => true, assetResponse } = {}) {
   const listeners = {};
   let fetchImpl;
   const fakeCaches = makeFakeCaches(() => fetchImpl);
@@ -74,7 +74,17 @@ function loadSW({ online = true, indexHtml, assetExists = () => true } = {}) {
       return { ok: true, status: 200, text: async () => '{"slugs":[]}', clone() { return this; } };
     }
     const exists = assetExists(pathname);
-    return { ok: exists, status: exists ? 200 : 404, url: urlStr, clone() { return { ok: exists, status: this.status, url: urlStr }; } };
+    const configured = assetResponse?.(pathname);
+    const status = configured?.status ?? (exists ? 200 : 404);
+    const contentType = configured?.contentType ?? 'text/javascript';
+    const response = {
+      ok: status >= 200 && status < 300,
+      status,
+      url: urlStr,
+      headers: { get: (name) => (name.toLowerCase() === 'content-type' ? contentType : null) },
+    };
+    response.clone = () => ({ ...response, clone: response.clone });
+    return response;
   });
 
   const self = {
@@ -108,15 +118,19 @@ function loadSW({ online = true, indexHtml, assetExists = () => true } = {}) {
 }
 
 function fireEvent(cb, request) {
-  let waited = null;
+  const waits = [];
   let responded = null;
   const event = {
     request,
-    waitUntil: (p) => { waited = p; },
+    waitUntil: (p) => { waits.push(p); },
     respondWith: (p) => { responded = p; },
   };
   cb(event);
-  return { waited, responded };
+  return {
+    waited: Promise.all(waits),
+    waitForBackground: () => Promise.all(waits),
+    responded,
+  };
 }
 
 const SAMPLE_INDEX = '<!doctype html><html><head>' +
@@ -127,7 +141,12 @@ const SAMPLE_INDEX = '<!doctype html><html><head>' +
   '</body></html>';
 
 describe('SW RAG grounding precache (T108)', () => {
-  it('install precachea rag-embeddings.json en bucket grounding separado', async () => {
+  it('install precachea grafo-relations.json en bucket grounding separado', async () => {
+    // NOTA: Desde la refactorización de optimización de install time, los archivos
+    // pesados (rag-embeddings.json ~1.7MB, cycle-content/ ~3.4MB) ya NO se precachean
+    // en install. En su lugar, se cachean on-demand (cache-on-use) en el fetch handler.
+    // Solo el grafo-relations.json (~66KB) se precachea en install por ser liviano
+    // y esencial para el grounding offline. Ver comentario en public/sw.js líneas 79-91.
     const { listeners, fakeCaches } = loadSW({ online: true, indexHtml: SAMPLE_INDEX });
     const { waited } = fireEvent(listeners.install, {});
     await waited;
@@ -138,8 +157,7 @@ describe('SW RAG grounding precache (T108)', () => {
 
     const groundingCache = await fakeCaches.open(groundingBuckets[0]);
     const keys = (await groundingCache.keys()).map((r) => new URL(r.url).pathname);
-    expect(keys).toContain('/rag-embeddings.json');
-    expect(keys).toContain('/cycle-content/manifest.json');
+    expect(keys).toContain('/grafo-relations.json');
   });
 
   it('install precachea iconos PWA en bucket shell', async () => {
@@ -203,6 +221,56 @@ describe('SW map tiles cache (T108)', () => {
   });
 });
 
+describe('SW cache-on-use RAG grounding (T108)', () => {
+  it('cachea rag-embeddings.json on-demand (no en install)', async () => {
+    // Los archivos pesados (~1.7MB) se cachean la PRIMERA vez que se usan,
+    // no en install. Esto optimiza el install time. Ver comentario en sw.js líneas 79-91.
+    const { listeners, fakeCaches } = loadSW({ online: true, indexHtml: SAMPLE_INDEX });
+    await fireEvent(listeners.install, {}).waited;
+
+    // Simula una petición de rag-embeddings.json
+    const req = { url: 'https://chagra.guatoc.co/rag-embeddings.json', method: 'GET' };
+    const { responded } = fireEvent(listeners.fetch, req);
+    await responded;
+
+    const groundingCache = await fakeCaches.open('chagra-rag-grounding-v1');
+    const keys = (await groundingCache.keys()).map((r) => new URL(r.url).pathname);
+    expect(keys).toContain('/rag-embeddings.json');
+  });
+
+  it('cachea cycle-content/manifest.json on-demand (no en install)', async () => {
+    // Los archivos de cycle-content se cachean on-demand en el fetch handler.
+    const { listeners, fakeCaches } = loadSW({ online: true, indexHtml: SAMPLE_INDEX });
+    await fireEvent(listeners.install, {}).waited;
+
+    // Simula una petición de cycle-content/manifest.json
+    const req = { url: 'https://chagra.guatoc.co/cycle-content/manifest.json', method: 'GET' };
+    const { responded } = fireEvent(listeners.fetch, req);
+    await responded;
+
+    const groundingCache = await fakeCaches.open('chagra-rag-grounding-v1');
+    const keys = (await groundingCache.keys()).map((r) => new URL(r.url).pathname);
+    expect(keys).toContain('/cycle-content/manifest.json');
+  });
+
+  it('sirve grounding cacheado offline', async () => {
+    // Una vez cacheado, el grounding debe servir offline sin error.
+    const { listeners } = loadSW({ online: true, indexHtml: SAMPLE_INDEX });
+    await fireEvent(listeners.install, {}).waited;
+
+    // Primera petición online para cachear
+    const req = { url: 'https://chagra.guatoc.co/rag-embeddings.json', method: 'GET' };
+    await fireEvent(listeners.fetch, req).responded;
+
+    // Segunda petición offline (fakeCaches.fetch devuelve TypeError)
+    const { listeners: listeners2 } = loadSW({ online: false, indexHtml: SAMPLE_INDEX });
+    const req2 = { url: 'https://chagra.guatoc.co/rag-embeddings.json', method: 'GET' };
+    const { responded: responded2 } = fireEvent(listeners2.fetch, req2);
+    const res2 = await responded2;
+    expect(res2).toBeTruthy();
+  });
+});
+
 describe('SW cold reload offline (T108)', () => {
   it('sirve index.html desde cache estando offline', async () => {
     const { listeners, fetchImpl } = loadSW({ online: true, indexHtml: SAMPLE_INDEX });
@@ -236,6 +304,38 @@ describe('SW cold reload offline (T108)', () => {
     const res = await responded;
     expect(res).toBeTruthy();
     expect(res.status).toBe(504);
+  });
+
+  it('control negativo: un 200 text/html para un chunk JS no entra al cache', async () => {
+    const { listeners, fakeCaches } = loadSW({
+      online: true,
+      indexHtml: SAMPLE_INDEX,
+      assetResponse: (pathname) =>
+        pathname === '/assets/chunk-ausente.js'
+          ? { status: 200, contentType: 'text/html' }
+          : undefined,
+    });
+    const req = { url: 'https://chagra.guatoc.co/assets/chunk-ausente.js', method: 'GET' };
+    const event = fireEvent(listeners.fetch, req);
+
+    const response = await event.responded;
+    await event.waitForBackground();
+    expect(response.status).toBe(200);
+
+    const shell = await fakeCaches.open('chagra-dev');
+    expect(await shell.match(req)).toBeUndefined();
+  });
+
+  it('control positivo: un chunk JS con MIME JavaScript sí entra al cache', async () => {
+    const { listeners, fakeCaches } = loadSW({ online: true, indexHtml: SAMPLE_INDEX });
+    const req = { url: 'https://chagra.guatoc.co/assets/chunk-real.js', method: 'GET' };
+    const event = fireEvent(listeners.fetch, req);
+
+    await event.responded;
+    await event.waitForBackground();
+
+    const shell = await fakeCaches.open('chagra-dev');
+    expect(await shell.match(req)).toBeTruthy();
   });
 
   it('offline + /catalog.sqlite no cacheado → 504', async () => {

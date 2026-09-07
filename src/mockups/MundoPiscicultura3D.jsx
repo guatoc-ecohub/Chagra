@@ -48,9 +48,9 @@ import { construirTerreno } from '../visual/mundo3d/kit/terreno.js';
 import {
   geomCuerpoPez,
   geomColaPez,
-  repartirCardumen,
   PAL_PECES,
 } from '../visual/mundo3d/piscicultura/pecesPiscicultura.geom.js';
+import { avanzarCardumen, crearCardumen } from '../visual/mundo3d/piscicultura/cardumen.js';
 
 /* Cielo del mundo mezclado a la hora dorada (misma receta que los demás mundos
    → entrar aquí se siente del MISMO atardecer). Constante de módulo. */
@@ -256,43 +256,12 @@ function EspejoEstanque({ estanque, color, reducedMotion, radial = 30 }) {
   );
 }
 
-/* ── UN PEZ: cuerpo fusiforme + cola que aletea, nadando en su elipse dentro del
-      estanque. Comparte geometría/material con su cardumen. ── */
-function Pez({ plan, geoCuerpo, geoCola, matCuerpo, matCola, reducedMotion }) {
-  const grupo = useRef(null);
-  const cola = useRef(null);
-  useFrame((st) => {
-    const g = grupo.current;
-    if (!g) return;
-    const reloj = reducedMotion ? 0 : st.clock.elapsedTime;
-    const ang = plan.fase + reloj * plan.vel;
-    const [ox, oz] = plan.centro;
-    const [rx, rz] = plan.radio;
-    const x = ox + Math.cos(ang) * rx;
-    const z = oz + Math.sin(ang) * rz;
-    // dirección de avance (derivada de la elipse)
-    const hx = -Math.sin(ang) * rx;
-    const hz = Math.cos(ang) * rz;
-    g.position.set(x, plan.y + Math.sin(reloj * 1.6 + plan.fase) * 0.03, z);
-    g.rotation.y = Math.atan2(-hz, hx);
-    if (cola.current && !reducedMotion) {
-      cola.current.rotation.y = Math.sin(reloj * (6 + plan.vel * 12) + plan.fase) * 0.5;
-    }
-  });
-  return (
-    <group ref={grupo} scale={plan.escala}>
-      <mesh geometry={geoCuerpo} material={matCuerpo} />
-      {/* la cola pivota en la base del cuerpo (x = −largo/2) y aletea en Y */}
-      <group ref={cola} position={[-(plan._largo || 0.5) / 2, 0, 0]}>
-        <mesh geometry={geoCola} material={matCola} />
-      </group>
-    </group>
-  );
-}
-
-/* ── UN CARDUMEN: arma la geometría/material de la especie una vez y siembra los
-      peces con reparto determinista. ── */
-function Cardumen({ especie, peces, reducedMotion }) {
+/* ── UN CARDUMEN Reynolds: dos InstancedMesh por especie (cuerpo + cola).
+      El motor es puro y determinista; aquí sólo se traducen sus matrices a GPU. ── */
+function Cardumen({ especie, estado, reducedMotion }) {
+  const cuerpos = useRef(null);
+  const colas = useRef(null);
+  const preparado = useRef(false);
   const geoCuerpo = useMemo(() => geomCuerpoPez(especie), [especie]);
   const geoCola = useMemo(() => geomColaPez(especie), [especie]);
   const matCuerpo = useMemo(
@@ -313,20 +282,52 @@ function Cardumen({ especie, peces, reducedMotion }) {
     [geoCuerpo, geoCola, matCuerpo, matCola],
   );
   const largo = (PAL_PECES[especie] || PAL_PECES.mojarra).largo;
+  const matrices = useMemo(() => ({
+    cuerpo: new THREE.Matrix4(),
+    cola: new THREE.Matrix4(),
+    localCola: new THREE.Matrix4(),
+    pos: new THREE.Vector3(),
+    escala: new THREE.Vector3(),
+    origenCola: new THREE.Vector3(),
+    uno: new THREE.Vector3(1, 1, 1),
+    giro: new THREE.Quaternion(),
+    aleteo: new THREE.Quaternion(),
+  }), []);
+  const pintar = (reloj) => {
+    if (!cuerpos.current || !colas.current) return;
+    estado.peces.forEach((pez, i) => {
+      const yaw = Math.atan2(-pez.vz, pez.vx);
+      matrices.pos.set(pez.x, pez.y, pez.z);
+      matrices.escala.setScalar(pez.escala);
+      matrices.giro.setFromAxisAngle(THREE.Object3D.DEFAULT_UP, yaw);
+      matrices.cuerpo.compose(matrices.pos, matrices.giro, matrices.escala);
+      cuerpos.current.setMatrixAt(i, matrices.cuerpo);
+      matrices.aleteo.setFromAxisAngle(
+        THREE.Object3D.DEFAULT_UP,
+        reducedMotion ? 0 : Math.sin(reloj * 7.2 + pez.fase) * 0.48,
+      );
+      matrices.origenCola.set(-largo / 2, 0, 0);
+      matrices.localCola.compose(matrices.origenCola, matrices.aleteo, matrices.uno);
+      matrices.cola.multiplyMatrices(matrices.cuerpo, matrices.localCola);
+      colas.current.setMatrixAt(i, matrices.cola);
+    });
+    cuerpos.current.instanceMatrix.needsUpdate = true;
+    colas.current.instanceMatrix.needsUpdate = true;
+  };
+  useFrame((st, dt) => {
+    if (!preparado.current && cuerpos.current && colas.current) {
+      cuerpos.current.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
+      colas.current.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
+      preparado.current = true;
+    }
+    if (!reducedMotion) avanzarCardumen(estado, dt);
+    pintar(reducedMotion ? 0 : st.clock.elapsedTime);
+  });
   return (
-    <group>
-      {peces.map((p, i) => (
-        <Pez
-          key={i}
-          plan={{ ...p, _largo: largo }}
-          geoCuerpo={geoCuerpo}
-          geoCola={geoCola}
-          matCuerpo={matCuerpo}
-          matCola={matCola}
-          reducedMotion={reducedMotion}
-        />
-      ))}
-    </group>
+    <>
+      <instancedMesh ref={cuerpos} args={[geoCuerpo, matCuerpo, estado.peces.length]} frustumCulled={false} dispose={null} />
+      <instancedMesh ref={colas} args={[geoCola, matCola, estado.peces.length]} frustumCulled={false} dispose={null} />
+    </>
   );
 }
 
@@ -423,7 +424,7 @@ function TuboEntrada({ pos }) {
 
 /* La MESA de ACUAPONÍA: cama de cultivo elevada con lechugas, alimentada por el
    agua del estanque (tubo de ida) y devolviéndola limpia (tubo de retorno). */
-function Acuaponia({ reducedMotion }) {
+function Acuaponia() {
   const y = altura(HUERTA.x, HUERTA.z);
   const lechugas = useMemo(() => {
     const arr = [];
@@ -694,17 +695,17 @@ function DioramaPiscicultura({ perfil, tier, reducedMotion, estacion, onSoltar, 
     const nC = Math.max(1, Math.round(2 * q)); // cachamas (20 %)
     const nB = Math.max(2, Math.round(4 * q)); // bocachicos (fondo)
     return {
-      trucha: repartirCardumen({
-        n: nT, ...ESTANQUE_FRIO, semilla: 11,
+      trucha: crearCardumen({
+        n: nT, estanque: ESTANQUE_FRIO, semilla: 11,
       }),
-      mojarra: repartirCardumen({
-        n: nM, ...ESTANQUE_CALIDO, semilla: 22,
+      mojarra: crearCardumen({
+        n: nM, estanque: ESTANQUE_CALIDO, semilla: 22,
       }),
-      cachama: repartirCardumen({
-        n: nC, ...ESTANQUE_CALIDO, semilla: 33,
+      cachama: crearCardumen({
+        n: nC, estanque: ESTANQUE_CALIDO, semilla: 33,
       }),
-      bocachico: repartirCardumen({
-        n: nB, ...ESTANQUE_CALIDO, fondo: 1, semilla: 44,
+      bocachico: crearCardumen({
+        n: nB, estanque: ESTANQUE_CALIDO, fondo: 1, semilla: 44,
       }),
     };
   }, [tier]);
@@ -751,10 +752,10 @@ function DioramaPiscicultura({ perfil, tier, reducedMotion, estacion, onSoltar, 
       <EspejoEstanque estanque={ESTANQUE_CALIDO} color={AGUA_CALIDA} reducedMotion={reducedMotion} />
 
       {/* los peces por piso térmico */}
-      <Cardumen especie="trucha" peces={cardumenes.trucha} reducedMotion={reducedMotion} />
-      <Cardumen especie="mojarra" peces={cardumenes.mojarra} reducedMotion={reducedMotion} />
-      <Cardumen especie="cachama" peces={cardumenes.cachama} reducedMotion={reducedMotion} />
-      <Cardumen especie="bocachico" peces={cardumenes.bocachico} reducedMotion={reducedMotion} />
+      <Cardumen especie="trucha" estado={cardumenes.trucha} reducedMotion={reducedMotion} />
+      <Cardumen especie="mojarra" estado={cardumenes.mojarra} reducedMotion={reducedMotion} />
+      <Cardumen especie="cachama" estado={cardumenes.cachama} reducedMotion={reducedMotion} />
+      <Cardumen especie="bocachico" estado={cardumenes.bocachico} reducedMotion={reducedMotion} />
 
       {/* el agua se mueve entre estanques + el chorro que oxigena el frío */}
       <FlujoGotas curva={curvas.cano} cuantas={nGotas} velocidad={0.06} radio={0.045} color="#cfe6ea" reducedMotion={reducedMotion} />
@@ -817,7 +818,19 @@ const CSS_PISCI = `
 .mpisci-pie p { margin: 0; max-width: 42rem; text-align: center; padding: 0.42rem 0.85rem; border-radius: 0.7rem; background: rgba(26,32,18,0.5); backdrop-filter: blur(3px); color: #f2f4e6; font: 500 0.76rem/1.4 system-ui, sans-serif; }
 .mpisci-volver { pointer-events: auto; position: absolute; top: 0.8rem; right: 0.8rem; padding: 0.4rem 0.8rem; border: 0; border-radius: 999px; background: rgba(26,32,18,0.55); color: #f2f4e6; font: 600 0.78rem/1 system-ui, sans-serif; cursor: pointer; }
 @media (prefers-reduced-motion: reduce) { .mpisci-canvas { transition: none; } }
-@media (max-width: 640px) { .mpisci-estaciones { max-width: 62vw; } .mpisci-titulo { font-size: 1rem; } }
+/* En teléfono la lista vertical de estaciones tapaba justo los estanques (el
+   sujeto). Se vuelve una FILA de chips bajo el título: mismo contenido, una
+   franja de alto, y la escena queda libre. */
+@media (max-width: 640px) {
+  .mpisci-titulo { font-size: 1rem; }
+  /* El space-between empujaba la fila al CENTRO del cuadro, o sea encima de
+     los estanques: arriba lo de arriba, y el pie se ancla solo. */
+  .mpisci-chrome { justify-content: flex-start; }
+  .mpisci-pie { margin-top: auto; }
+  .mpisci-estaciones { flex-direction: row; flex-wrap: wrap; gap: 0.25rem; max-width: calc(100vw - 1.6rem); margin: 0.5rem 0.8rem; padding: 0.3rem 0.35rem; }
+  .mpisci-estaciones button { width: auto; padding: 0.28rem 0.55rem; font-size: 0.72rem; }
+  .mpisci-estaciones button[aria-pressed="true"] small { display: none; }
+}
 `;
 
 /**

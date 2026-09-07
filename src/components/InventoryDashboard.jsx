@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import { Package, AlertTriangle, Plus, X, Download } from 'lucide-react';
+import { Package, AlertTriangle, Plus, X, Download, ClipboardList, History } from 'lucide-react';
 import EmptyStateCampo from './common/EmptyStateCampo.jsx';
 import useAssetStore from '../store/useAssetStore';
 import { UNIT_OPTIONS } from '../config/materials';
@@ -31,10 +31,14 @@ const LOW_THRESHOLD = 5;
 const BAR_CAPACITY = 50;
 
 // Card individual extraída para respetar rules of hooks (useConsumptionMetrics).
-const MaterialCard = ({ item, onRefill }) => {
+// BUG-08 2026-09-04: ahora también recibe onRecount/onViewAudit (BUG-08: los
+// props llegaban desde InventoryPage pero nadie los consumía → RecountDrawer
+// era inalcanzable y inventory_events se quedaba en 0). Ambos son OPCIONALES:
+// sin callbacks la tarjeta conserva su comportamiento de siempre.
+const MaterialCard = ({ item, onRefill, onRecount, onViewAudit }) => {
   const name = item.attributes?.name || item.name || 'Insumo sin nombre';
   const stock = parseFloat(item.attributes?.inventory_value) || 0;
-  const unit = item.attributes?.inventory_unit || 'unidades';
+  const unit = item.attributes?.inventory_unit || 'unidad';
   const isLow = stock < LOW_THRESHOLD;
   const progressPct = Math.min((stock / BAR_CAPACITY) * 100, 100);
   const isPending = item._pending;
@@ -108,6 +112,35 @@ const MaterialCard = ({ item, onRefill }) => {
       >
         <Plus size={16} /> Abastecer
       </button>
+
+      {/* BUG-08: puertas al event sourcing (ADR-027). "Conteo manual" abre el
+          RecountDrawer (inventario_counted) con el stock actual prellenado;
+          "Bitácora" lleva a InventoryAuditTrail del ítem. Solo se renderizan
+          si InventoryPage cableó los callbacks. */}
+      {(onRecount || onViewAudit) && (
+        <div className="flex gap-2" data-testid="inventory-card-audit-actions">
+          {onRecount && (
+            <button
+              type="button"
+              onClick={() => onRecount(item.id, stock, unit)}
+              data-testid={`inventory-recount-${item.id}`}
+              className="flex-1 py-1.5 bg-slate-800/60 hover:bg-slate-800 text-slate-400 hover:text-slate-200 rounded-lg text-xs font-bold flex items-center justify-center gap-1.5 transition-colors min-h-[32px]"
+            >
+              <ClipboardList size={13} /> {MSG.ui.conteoManual}
+            </button>
+          )}
+          {onViewAudit && (
+            <button
+              type="button"
+              onClick={() => onViewAudit(item.id)}
+              data-testid={`inventory-audit-${item.id}`}
+              className="flex-1 py-1.5 bg-slate-800/60 hover:bg-slate-800 text-slate-400 hover:text-slate-200 rounded-lg text-xs font-bold flex items-center justify-center gap-1.5 transition-colors min-h-[32px]"
+            >
+              <History size={13} /> {MSG.ui.bitacora}
+            </button>
+          )}
+        </div>
+      )}
     </div>
   );
 };
@@ -122,10 +155,20 @@ const MaterialCard = ({ item, onRefill }) => {
  * - Detección automática de stock bajo contra umbral configurable.
  * - Exportación del inventario como archivo descargable (CSV/JSON).
  * - Sparklines de consumo histórico derivados de logs de tipo input.
+ * - Puertas al event sourcing (BUG-08 2026-09-04): por tarjeta, "Conteo
+ *   manual" (onRecount → RecountDrawer → evento inventory_counted) y
+ *   "Bitácora" (onViewAudit → InventoryAuditTrail). Antes InventoryPage
+ *   pasaba ambos props y este componente los ignoraba → inventory_events
+ *   se quedaba en 0 porque su único escritor de UI era inalcanzable.
  *
+ * @param {object} props
+ * @param {(itemId: string, currentQty?: number, currentUnit?: string) => void} [props.onRecount]
+ *   abre el RecountDrawer de InventoryPage para el ítem dado.
+ * @param {(itemId: string) => void} [props.onViewAudit]
+ *   navega a la bitácora (InventoryAuditTrail) del ítem dado.
  * @returns {React.ReactNode}
  */
-export const InventoryDashboard = (/** @type {any} */ _props) => {
+export const InventoryDashboard = ({ onRecount, onViewAudit }) => {
   const materials = useAssetStore((s) => s.materials);
   const refillMaterial = useAssetStore((s) => s.refillMaterial);
 
@@ -352,7 +395,13 @@ export const InventoryDashboard = (/** @type {any} */ _props) => {
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {sortedMaterials.map((item) => (
-            <MaterialCard key={item.id} item={item} onRefill={openRefillModal} />
+            <MaterialCard
+              key={item.id}
+              item={item}
+              onRefill={openRefillModal}
+              onRecount={onRecount}
+              onViewAudit={onViewAudit}
+            />
           ))}
         </div>
       )}

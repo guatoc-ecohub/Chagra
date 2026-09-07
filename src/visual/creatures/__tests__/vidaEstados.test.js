@@ -1,5 +1,5 @@
 /**
- * vidaEstados.test.js — la LÓGICA PURA del idle-cerebro de los 8 bichos
+ * vidaEstados.test.js — la LÓGICA PURA del idle-cerebro del repertorio vigente
  * (la vara de Angelita v2 species-agnostic). Verifica:
  *   1. El repertorio cubre EXACTO a los 8 bichos rubber-hose del registro
  *      (ni especies fantasma ni bichos huérfanos de vida).
@@ -19,17 +19,22 @@ import {
 } from '../vidaEstados.js';
 import { CREATURES } from '../index.js';
 
-/* Los 8 con vida propia: todos los personajes del registro menos la abeja
-   (su cerebro v2 vive en el agente — es la vara), la microfauna decorativa
-   y el Ent (árbol-maestro, otro compás). */
-const CON_VIDA = Object.keys(CREATURES).filter(
-  (s) => !['abeja-angelita', 'lombriz', 'mariposa', 'escarabajo', 'ent-frailejon'].includes(s),
-);
+/* Estas entradas del registro no consumen useVidaIdle. Guacamaya sí lo consume
+   como compai elegible, aunque su superficie no sea el registro CREATURES. */
+const SIN_VIDA = new Set([
+  'abeja-angelita', 'lombriz', 'mariposa', 'escarabajo', 'ent-frailejon',
+  'condor', 'danta', 'gallina', 'crisopa', 'trichogramma', 'sirfido', 'maiz',
+]);
+const CON_VIDA = [
+  ...Object.keys(CREATURES).filter((slug) => !SIN_VIDA.has(slug)),
+  'guacamaya',
+].sort();
 
-describe('1. El repertorio cubre exacto a los 8 bichos', () => {
-  it('cada bicho del registro (menos abeja/microfauna/Ent) tiene repertorio', () => {
+describe('1. El repertorio cubre exactamente las especies con vida propia', () => {
+  it('cada especie con vida tiene repertorio y no hay repertorios huérfanos', () => {
     expect(Object.keys(VIDA_REPERTORIO).sort()).toEqual(CON_VIDA.sort());
-    expect(CON_VIDA).toHaveLength(8);
+    // Los perfiles canónicos, la guacamaya compai y borugo ya están registrados.
+    expect(CON_VIDA).toHaveLength(15);
   });
 
   it('cada repertorio trae descanso [min,max] y ≥2 gestos con peso > 0', () => {

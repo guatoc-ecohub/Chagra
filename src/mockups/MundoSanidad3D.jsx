@@ -53,6 +53,7 @@ import { decidirTier, perfilDeTier } from '../visual/mundo3d/deviceTier.js';
 import { ParticulasAmbientales } from '../visual/mundo3d/ParticulasAmbientales.jsx';
 import { crearRng } from '../visual/mundo3d/particulasData.js';
 import { Bicho } from '../visual/mundo3d/escenas/FaunaEscena.jsx';
+import EtiquetasMundo from '../visual/mundo3d/kit/EtiquetasMundo.jsx';
 import { MariquitaRubber } from '../visual/creatures/FaunaRubberhose.jsx';
 import { Crisopa } from '../visual/creatures/Crisopa.jsx';
 import { Trichogramma } from '../visual/creatures/Trichogramma.jsx';
@@ -219,19 +220,13 @@ function NubesDia() {
   );
 }
 
-/* Etiqueta didáctica sobre la escena (solo en modo «ver las estaciones»). */
-function Etiqueta({ pos, texto, paso }) {
-  return (
-    <group position={pos}>
-      <Html center distanceFactor={9} zIndexRange={[30, 0]}>
-        <div className="clivo-chip" aria-hidden="true">
-          {paso != null && <b>{paso}</b>}
-          {texto}
-        </div>
-      </Html>
-    </group>
-  );
-}
+/* Las etiquetas didácticas (solo en modo «ver las estaciones») ya NO se pisan
+   entre sí: cada estación pasa TODAS sus etiquetas juntas a <EtiquetasMundo>
+   (kit/EtiquetasMundo.jsx), que las resuelve contra la pantalla cada cuadro
+   — la que no cabe entera cede a un punto mínimo, y la que ni así cabe cede
+   del todo (mismo `.clivo-chip` de siempre; solo cambia CÓMO se decide quién
+   se ve, ver reglas `[data-modo]` arriba en el CSS). Antes cada `Etiqueta`
+   montaba su propio <Html> sin saber de las demás — el BUG reportado. */
 
 /* ══════════════════════ LA HOJA-LÁMINA Y SUS SÍNTOMAS ══════════════════════ */
 
@@ -400,10 +395,13 @@ function TableroComparacion({ etiquetas }) {
       </mesh>
 
       {etiquetas && (
-        <>
-          <Etiqueta pos={[-0.68, 2.72, 0.2]} texto="Hoja sana" />
-          <Etiqueta pos={[0.72, 2.72, 0.2]} texto="Hoja enferma" />
-        </>
+        <EtiquetasMundo
+          className="clivo-chip"
+          items={[
+            { id: 'tablero-sana', pos: [-0.68, 2.72, 0.2], titulo: 'Hoja sana' },
+            { id: 'tablero-enferma', pos: [0.72, 2.72, 0.2], titulo: 'Hoja enferma' },
+          ]}
+        />
       )}
     </group>
   );
@@ -569,12 +567,15 @@ function EstanteLaminas({ etiquetas }) {
       </group>
 
       {etiquetas && (
-        <>
-          <Etiqueta pos={[-1.5, 2.28, 0.2]} texto="Broca" />
-          <Etiqueta pos={[-0.5, 2.32, 0.2]} texto="Minador" />
-          <Etiqueta pos={[0.5, 2.32, 0.2]} texto="Áfidos / cochinilla" />
-          <Etiqueta pos={[1.5, 2.32, 0.2]} texto="Gota (tizón)" />
-        </>
+        <EtiquetasMundo
+          className="clivo-chip"
+          items={[
+            { id: 'lamina-broca', pos: [-1.5, 2.28, 0.2], titulo: 'Broca' },
+            { id: 'lamina-minador', pos: [-0.5, 2.32, 0.2], titulo: 'Minador' },
+            { id: 'lamina-afidos', pos: [0.5, 2.32, 0.2], titulo: 'Áfidos / cochinilla' },
+            { id: 'lamina-gota', pos: [1.5, 2.32, 0.2], titulo: 'Gota (tizón)' },
+          ]}
+        />
       )}
     </group>
   );
@@ -648,10 +649,13 @@ function CartelDistincion({ etiquetas }) {
       </group>
 
       {etiquetas && (
-        <>
-          <Etiqueta pos={[-0.5, 2.16, 0.1]} texto="Se mueve" />
-          <Etiqueta pos={[0.5, 2.16, 0.1]} texto="Se expande" />
-        </>
+        <EtiquetasMundo
+          className="clivo-chip"
+          items={[
+            { id: 'cartel-mueve', pos: [-0.5, 2.16, 0.1], titulo: 'Se mueve' },
+            { id: 'cartel-expande', pos: [0.5, 2.16, 0.1], titulo: 'Se expande' },
+          ]}
+        />
       )}
     </group>
   );
@@ -823,11 +827,14 @@ function JardinAliados({ reducedMotion, etiquetas }) {
       />
 
       {etiquetas && (
-        <>
-          <Etiqueta pos={[7.0, Y_SUELO + 2.4, 3.2]} texto="Los aliados" />
-          <Etiqueta pos={[8.6, Y_SUELO + 1.85, 2.0]} texto="Trampa (para medir)" />
-          <Etiqueta pos={[6.4, Y_SUELO + 1.1, 4.6]} texto="Caldo y poda" />
-        </>
+        <EtiquetasMundo
+          className="clivo-chip"
+          items={[
+            { id: 'jardin-aliados', pos: [7.0, Y_SUELO + 2.4, 3.2], titulo: 'Los aliados' },
+            { id: 'jardin-trampa', pos: [8.6, Y_SUELO + 1.85, 2.0], titulo: 'Trampa (para medir)' },
+            { id: 'jardin-caldo', pos: [6.4, Y_SUELO + 1.1, 4.6], titulo: 'Caldo y poda' },
+          ]}
+        />
       )}
     </group>
   );
@@ -1023,11 +1030,14 @@ function CultivoVivo({ reducedMotion, etiquetas }) {
       </group>
 
       {etiquetas && (
-        <>
-          <Etiqueta pos={[-8.4, Y_SUELO + 2.5, 3.0]} texto="Cafeto sano" />
-          <Etiqueta pos={[-6.4, Y_SUELO + 2.5, 4.6]} texto="Cafeto con señas" />
-          <Etiqueta pos={[-4.9, Y_SUELO + 1.15, 6.2]} texto="Papa con gota" />
-        </>
+        <EtiquetasMundo
+          className="clivo-chip"
+          items={[
+            { id: 'cultivo-sano', pos: [-8.4, Y_SUELO + 2.5, 3.0], titulo: 'Cafeto sano' },
+            { id: 'cultivo-senas', pos: [-6.4, Y_SUELO + 2.5, 4.6], titulo: 'Cafeto con señas' },
+            { id: 'cultivo-gota', pos: [-4.9, Y_SUELO + 1.15, 6.2], titulo: 'Papa con gota' },
+          ]}
+        />
       )}
     </group>
   );
@@ -1131,8 +1141,16 @@ const CSS_CLIVO = `
 .clivo-boton { pointer-events: auto; appearance: none; border: 1px solid rgba(56,64,31,0.35); border-radius: 999px; padding: 0.44rem 1rem; background: rgba(250,247,232,0.85); color: #43481c; font: 600 0.8rem/1.1 system-ui, sans-serif; cursor: pointer; backdrop-filter: blur(3px); transition: background 0.2s ease, border-color 0.2s ease; }
 .clivo-boton:hover, .clivo-boton:focus-visible { background: rgba(255,255,255,0.95); border-color: rgba(56,64,31,0.6); outline: none; }
 .clivo-boton[aria-pressed='true'] { background: #dbe6ac; border-color: rgba(67,72,28,0.75); color: #38401f; }
-.clivo-chip { pointer-events: none; display: inline-flex; align-items: center; gap: 0.3em; padding: 2px 8px; border-radius: 999px; background: rgba(40,44,24,0.82); color: #f3f6df; font: 600 10px/1.5 system-ui, sans-serif; white-space: nowrap; box-shadow: 0 2px 6px rgba(28,30,10,0.3); }
+.clivo-chip { pointer-events: none; display: inline-flex; align-items: center; gap: 0.3em; padding: 2px 8px; border-radius: 999px; background: rgba(40,44,24,0.82); color: #f3f6df; font: 600 10px/1.5 system-ui, sans-serif; white-space: nowrap; box-shadow: 0 2px 6px rgba(28,30,10,0.3); transition: opacity 0.18s ease; }
 .clivo-chip b { display: inline-flex; align-items: center; justify-content: center; width: 1.35em; height: 1.35em; border-radius: 50%; background: #8bab4a; color: #24300f; font-size: 9px; }
+/* anti-colisión (EtiquetasMundo, kit/etiquetasAntiColision.js): dos etiquetas
+   que quedarían pisándose en pantalla ceden — primero el texto (queda un
+   punto mínimo), luego el punto entero (BUG arreglado: antes cada estación
+   montaba sus chips sueltos, sin saber unos de otros). */
+.clivo-chip[data-modo='punto'] { width: 10px; height: 10px; min-width: 0; padding: 0; border-radius: 50%; }
+.clivo-chip[data-modo='punto'] > * { display: none; }
+.clivo-chip[data-modo='oculto'] { opacity: 0; }
+@media (prefers-reduced-motion: reduce) { .clivo-chip { transition: none; } }
 .mundo-fauna { pointer-events: none; filter: drop-shadow(0 2px 5px rgba(30, 30, 10, 0.24)); }
 .clivo-leyenda { padding: 1.4rem 1rem 0; }
 .clivo-leyenda h2 { margin: 0 0 0.3rem; font-size: 1.12rem; color: #38401f; }

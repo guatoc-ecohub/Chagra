@@ -19,7 +19,6 @@
 import { memo } from 'react';
 
 const TINTA = '#2c1e12';
-const TINTA2 = '#4a3320';
 
 /* Ojos saltones reutilizables (el sello "villano" del bestiario). */
 function OjosMalvados({ cx1, cx2, cy, r = 4.4, mira = 1, enojo = true }) {

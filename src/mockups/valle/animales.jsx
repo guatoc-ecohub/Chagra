@@ -25,7 +25,7 @@
  * con alma. Esto es el ganado, y va realista. Decorativo (aria-hidden): el
  * botón accesible del mundo lo pone MundoLugar.
  */
-import { useMemo, useRef } from 'react';
+import { useLayoutEffect, useMemo, useRef } from 'react';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 import {
@@ -36,6 +36,37 @@ import {
   geomPerro,
   geomOveja,
 } from '../../visual/mundo3d/finca/fincaRealista.geom.js';
+import { GESTOS } from './gestosAnimal.js';
+
+const POSICION_CERDA = [-1.55, 0, 0.35];
+
+/* Transforms de las ovejas y lechones instanciados (Tarea A) — MISMOS
+   valores que las <Animal>/<Lechon> sueltas que reemplazan; constantes a
+   nivel de módulo para que `individuos` sea referencialmente estable entre
+   renders (evita recalcular las matrices base en cada montaje de padre). */
+const OVEJAS_INDIVIDUOS = [
+  { pos: [-0.45, 0, 1.05], giro: 1.4, escala: 0.52, fase: 1.7 },
+  { pos: [0.15, 0, 1.35], giro: 0.5, escala: 0.48, fase: 4.1 },
+];
+const LECHONES_INDIVIDUOS = [
+  { cerdaPos: POSICION_CERDA, desplazamiento: [0.35, 0, 0.27], giro: -0.4, fase: 0.8 },
+  { cerdaPos: POSICION_CERDA, desplazamiento: [-0.2, 0, 0.37], giro: 0.9, escala: 0.9, fase: 2.7 },
+];
+
+/*
+ * Jitter determinista compartido por <Animal> Y por las instancias del
+ * rebaño (DR presupuesto §Tarea A): la escala no uniforme + inclinación
+ * mínima sembrada por `fase`, EXTRAÍDA para que un rebaño instanciado use
+ * exactamente la misma fórmula que el animal individual — cero deriva entre
+ * los dos caminos.
+ */
+function calcularJitter(escala, giro, fase) {
+  const j = (k) => Math.sin(fase * 12.9898 + k * 78.233) * 0.5; // determinista
+  return {
+    esc: [escala * (1 + j(1) * 0.07), escala * (1 + j(2) * 0.05), escala * (1 + j(3) * 0.07)],
+    rot: [j(4) * 0.03, giro, j(5) * 0.035],
+  };
+}
 
 /* El material de las mallas fusionadas con color horneado por vértice que usa
    la ARBOLEDA por especie. flatShading le da carácter a un tronco — pero a un
@@ -53,66 +84,178 @@ export const MATERIAL_HATO = new THREE.MeshLambertMaterial({
   vertexColors: true,
 });
 
-/* Los GESTOS de idle: reescriben solo la rotación del grupo-cabeza (el cuerpo
-   queda plantado). Amplitudes chicas: vida, no espectáculo. */
-const GESTOS = {
-  // La vaca pasta: baja el hocico al pasto con calma y lo sube a rumiar.
-  pasta: (g, t, fase) => {
-    g.rotation.z = -0.15 - (Math.sin(t * 0.55 + fase) * 0.5 + 0.5) * 0.55;
-  },
-  // La gallina picotea: golpes secos con pausas.
-  picotea: (g, t, fase) => {
-    const c = (Math.sin(t * 2.4 + fase) + 1) / 2;
-    g.rotation.z = -Math.pow(c, 4) * 0.9;
-  },
-  // El cerdo hocica el suelo: empuja el morro hacia abajo-adelante.
-  hocica: (g, t, fase) => {
-    const c = Math.max(0, Math.sin(t * 1.1 + fase));
-    g.rotation.z = -(c ** 4) * 0.35;
-  },
-  // El perro mira: barre el paisaje con la cabeza, a veces la ladea.
-  mira: (g, t, fase) => {
-    g.rotation.y = Math.sin(t * 0.4 + fase) * 0.45;
-    g.rotation.x = Math.sin(t * 0.23 + fase * 2) * 0.1;
-  },
-  // La oveja tantea el pasto, más tímida que la vaca.
-  tantea: (g, t, fase) => {
-    g.rotation.z = -0.1 - (Math.sin(t * 0.7 + fase) * 0.5 + 0.5) * 0.35;
-  },
-};
-
 /*
  * Un animal realista: cuerpo + cabeza pivotante. `geom` es el resultado de la
  * fábrica ({cuerpo, cabeza, pivote}); `gesto` elige el idle de la cabeza.
- * El jitter determinista por instancia (escala no uniforme + inclinación
- * mínima, sembrado por `fase`) evita que dos animales de la misma raza sean
- * clones — la repetición evidente mata la escena (DR §1).
  */
-function Animal({ geom, gesto, pos = [0, 0, 0], giro = 0, escala = 1, fase = 0, reducedMotion }) {
+function Animal({
+  geom,
+  gesto,
+  pos = [0, 0, 0],
+  giro = 0,
+  escala = 1,
+  fase = 0,
+  reducedMotion,
+  /* Presupuesto (Tarea A): el gallinero (<30cm) no proyecta sombra propia —
+     ya hay vaca/cerdo/comedero cerca anclando la escena, y la sombra de un
+     pollo a esta distancia de cámara no se lee. Quita 2 draw-calls de la
+     pasada de sombra por ave sin tocar geometría, color ni gesto. */
+  castShadow = true,
+}) {
   const cabeza = useRef(null);
   useFrame((state) => {
     if (reducedMotion || !cabeza.current) return;
     const mueve = GESTOS[gesto];
     if (mueve) mueve(cabeza.current, state.clock.elapsedTime, fase);
   });
-  const jitter = useMemo(() => {
-    const j = (k) => Math.sin(fase * 12.9898 + k * 78.233) * 0.5; // determinista
-    return {
-      esc: [escala * (1 + j(1) * 0.07), escala * (1 + j(2) * 0.05), escala * (1 + j(3) * 0.07)],
-      rot: [j(4) * 0.03, giro, j(5) * 0.035],
-    };
-  }, [escala, giro, fase]);
+  const jitter = useMemo(() => calcularJitter(escala, giro, fase), [escala, giro, fase]);
   return (
     <group
       position={[pos[0], pos[1], pos[2]]}
       rotation={/** @type {[number, number, number]} */ (jitter.rot)}
       scale={/** @type {[number, number, number]} */ (jitter.esc)}
     >
-      <mesh geometry={geom.cuerpo} material={MATERIAL_HATO} castShadow />
+      <mesh geometry={geom.cuerpo} material={MATERIAL_HATO} castShadow={castShadow} />
       <group ref={cabeza} position={geom.pivote}>
-        <mesh geometry={geom.cabeza} material={MATERIAL_HATO} castShadow />
+        <mesh geometry={geom.cabeza} material={MATERIAL_HATO} castShadow={castShadow} />
       </group>
     </group>
+  );
+}
+
+/*
+ * OVEJAS instanciadas (Tarea A — presupuesto): las dos ovejas comparten
+ * `geomOveja` — la fábrica NO toma raza, solo semilla de PRNG interno, y
+ * ambas ya se llamaban con la MISMA calidad — así que son el mismo
+ * arquetipo real (no una aproximación): dos <instancedMesh> (cuerpo +
+ * cabeza) reemplazan 2 animales × 2 mallas = 4 draw-calls por 2. El jitter
+ * y el gesto ("tantea") son EXACTAMENTE los de <Animal> — mismo
+ * `calcularJitter` y las mismas funciones de GESTOS, aplicadas a mano por
+ * instancia con `setMatrixAt` en vez de un <group> de React por oveja.
+ *
+ * `individuos`: [{ pos:[x,y,z], giro, escala, fase }]. La malla de cuerpo es
+ * estática tras montar (el jitter no depende del tiempo); solo la cabeza se
+ * recalcula cuadro a cuadro para el gesto.
+ */
+function RebanoInstanciado({ geom, gesto, individuos, reducedMotion, castShadow = true }) {
+  const refCuerpo = useRef(null);
+  const refCabeza = useRef(null);
+  const n = individuos.length;
+
+  /* Matriz de cuerpo por instancia (posición + jitter): constante, no
+     depende del tiempo — igual que las props JSX de <Animal>. */
+  const base = useMemo(
+    () =>
+      individuos.map((ind) => {
+        const j = calcularJitter(ind.escala ?? 1, ind.giro ?? 0, ind.fase ?? 0);
+        const m = new THREE.Matrix4().compose(
+          new THREE.Vector3(ind.pos[0], ind.pos[1], ind.pos[2]),
+          new THREE.Quaternion().setFromEuler(new THREE.Euler(j.rot[0], j.rot[1], j.rot[2])),
+          new THREE.Vector3(j.esc[0], j.esc[1], j.esc[2]),
+        );
+        return { m, fase: ind.fase ?? 0 };
+      }),
+    [individuos],
+  );
+
+  const util = useMemo(() => ({ gestoObj: new THREE.Object3D(), m: new THREE.Matrix4() }), []);
+
+  // Cuerpo (estático) + cabeza en reposo (primer cuadro / reducedMotion).
+  useLayoutEffect(() => {
+    const cB = refCuerpo.current;
+    const cC = refCabeza.current;
+    if (!cB || !cC) return;
+    const pivoteM = new THREE.Matrix4().makeTranslation(geom.pivote[0], geom.pivote[1], geom.pivote[2]);
+    base.forEach(({ m }, i) => {
+      cB.setMatrixAt(i, m);
+      cC.setMatrixAt(i, new THREE.Matrix4().multiplyMatrices(m, pivoteM));
+    });
+    cB.instanceMatrix.needsUpdate = true;
+    cC.instanceMatrix.needsUpdate = true;
+  }, [base, geom]);
+
+  // Gesto de cabeza: reusa GESTOS tal cual (mismo idle que <Animal>).
+  useFrame((state) => {
+    const cC = refCabeza.current;
+    if (reducedMotion || !cC) return;
+    const mueve = GESTOS[gesto];
+    if (!mueve) return;
+    const t = state.clock.elapsedTime;
+    base.forEach(({ m, fase }, i) => {
+      util.gestoObj.rotation.set(0, 0, 0);
+      util.gestoObj.position.set(0, 0, 0);
+      mueve(util.gestoObj, t, fase);
+      util.gestoObj.position.set(geom.pivote[0], geom.pivote[1], geom.pivote[2]);
+      util.gestoObj.updateMatrix();
+      util.m.multiplyMatrices(m, util.gestoObj.matrix);
+      cC.setMatrixAt(i, util.m);
+    });
+    cC.instanceMatrix.needsUpdate = true;
+  });
+
+  return (
+    <group>
+      <instancedMesh
+        ref={refCuerpo}
+        args={[geom.cuerpo, MATERIAL_HATO, n]}
+        frustumCulled={false}
+        castShadow={castShadow}
+      />
+      <instancedMesh
+        ref={refCabeza}
+        args={[geom.cabeza, MATERIAL_HATO, n]}
+        frustumCulled={false}
+        castShadow={castShadow}
+      />
+    </group>
+  );
+}
+
+/*
+ * LECHONES instanciados (Tarea A): los dos lechones YA compartían la MISMA
+ * geometría (`g.lechon` se calcula una sola vez) — solo variaban en
+ * transform, así que instanciar es exacto, no una aproximación. Una malla
+ * (no pivota cabeza) → UN <instancedMesh> reemplaza 2 mallas sueltas.
+ * `sigueCerda` no usa jitter (a diferencia de <Animal>): posición y rotación
+ * salen DIRECTO del gesto, igual que en el <Lechon> original. Sin sombra
+ * propia (<30cm, presupuesto §Tarea A): la cerda y el comedero cercanos
+ * ya anclan la escena.
+ */
+function LechonesInstanciados({ geom, individuos, reducedMotion }) {
+  const ref = useRef(null);
+  const util = useMemo(() => ({ o: new THREE.Object3D() }), []);
+  const n = individuos.length;
+
+  useLayoutEffect(() => {
+    if (!ref.current) return;
+    individuos.forEach((ind, i) => {
+      util.o.position.set(
+        ind.cerdaPos[0] + ind.desplazamiento[0],
+        ind.cerdaPos[1] + ind.desplazamiento[1],
+        ind.cerdaPos[2] + ind.desplazamiento[2],
+      );
+      util.o.rotation.set(0, ind.giro, 0);
+      util.o.scale.setScalar(ind.escala ?? 1);
+      util.o.updateMatrix();
+      ref.current.setMatrixAt(i, util.o.matrix);
+    });
+    ref.current.instanceMatrix.needsUpdate = true;
+  }, [individuos, util]);
+
+  useFrame((state) => {
+    if (reducedMotion || !ref.current) return;
+    const t = state.clock.elapsedTime;
+    individuos.forEach((ind, i) => {
+      util.o.scale.setScalar(ind.escala ?? 1);
+      GESTOS.sigueCerda(util.o, t, ind.fase, ind.cerdaPos, ind.desplazamiento, ind.giro);
+      util.o.updateMatrix();
+      ref.current.setMatrixAt(i, util.o.matrix);
+    });
+    ref.current.instanceMatrix.needsUpdate = true;
+  });
+
+  return (
+    <instancedMesh ref={ref} args={[geom, MATERIAL_HATO, n]} frustumCulled={false} castShadow={false} />
   );
 }
 
@@ -135,17 +278,18 @@ export default function AnimalesDeFinca({ reducedMotion = false, q = 1 }) {
   const g = useMemo(
     () => ({
       holstein: geomVaca({ raza: 'holstein', q }),
-      ternera: geomVaca({ raza: 'criolla', ubre: false, cuerno: 0, q }, 23),
+      ternera: geomVaca({ raza: 'criolla', ubre: false, q }),
       zungo: geomCerdo({ raza: 'zungo', q }),
-      duroc: geomCerdo({ raza: 'duroc', q }, 33),
-      landrace: geomCerdo({ raza: 'landrace', q }, 35),
+      duroc: geomCerdo({ raza: 'duroc', q }),
+      landrace: geomCerdo({ raza: 'landrace', q }),
       lechon: geomLechon({ raza: 'landrace' }),
-      oveja1: geomOveja({ q }),
-      oveja2: geomOveja({ q }, 67),
+      // Rebaño instanciado (Tarea A): geomOveja no toma raza — UNA sola
+      // malla real para las dos, no una aproximación.
+      oveja: geomOveja({ q }),
       campesina: geomGallina({ tipo: 'campesina', q }),
-      negra: geomGallina({ tipo: 'negra', q }, 43),
-      blanca: geomGallina({ tipo: 'blanca', q }, 45),
-      gallo: geomGallina({ tipo: 'gallo', q }, 47),
+      negra: geomGallina({ tipo: 'negra', q }),
+      blanca: geomGallina({ tipo: 'blanca', q }),
+      gallo: geomGallina({ tipo: 'gallo', q }),
       perro: geomPerro({ q }),
     }),
     [q],
@@ -159,17 +303,29 @@ export default function AnimalesDeFinca({ reducedMotion = false, q = 1 }) {
       {/* los cerdos POR RAZA: negro zungo, colorado duroc, landrace con cría */}
       <Animal geom={g.zungo} gesto="hocica" pos={[-1.45, 0, -0.5]} giro={0.3} escala={0.62} reducedMotion={rm} />
       <Animal geom={g.duroc} gesto="hocica" pos={[-0.95, 0, -1.0]} giro={1.1} escala={0.6} fase={1.9} reducedMotion={rm} />
-      <Animal geom={g.landrace} gesto="hocica" pos={[-1.55, 0, 0.35]} giro={-0.7} escala={0.62} fase={3.4} reducedMotion={rm} />
-      <mesh geometry={g.lechon} material={MATERIAL_HATO} position={[-1.2, 0, 0.62]} rotation={[0, -0.4, 0]} castShadow />
-      <mesh geometry={g.lechon} material={MATERIAL_HATO} position={[-1.75, 0, 0.72]} rotation={[0, 0.9, 0]} scale={0.9} castShadow />
-      {/* las ovejas criollas — vellones DISTINTOS (seed propia) */}
-      <Animal geom={g.oveja1} gesto="tantea" pos={[-0.45, 0, 1.05]} giro={1.4} escala={0.52} fase={1.7} reducedMotion={rm} />
-      <Animal geom={g.oveja2} gesto="tantea" pos={[0.15, 0, 1.35]} giro={0.5} escala={0.48} fase={4.1} reducedMotion={rm} />
-      {/* el gallinero suelto: tres gallinas + el gallo vigilante */}
-      <Animal geom={g.campesina} gesto="picotea" pos={[1.15, 0, 0.6]} giro={2.4} escala={0.8} fase={0.4} reducedMotion={rm} />
-      <Animal geom={g.negra} gesto="picotea" pos={[1.5, 0, 0.05]} giro={-1.2} escala={0.76} fase={2.1} reducedMotion={rm} />
-      <Animal geom={g.blanca} gesto="picotea" pos={[0.7, 0, 1.1]} giro={0.9} escala={0.78} fase={3.6} reducedMotion={rm} />
-      <Animal geom={g.gallo} gesto="picotea" pos={[1.45, 0, 0.95]} giro={-2.2} escala={0.9} fase={5.2} reducedMotion={rm} />
+      <Animal geom={g.landrace} gesto="hocica" pos={POSICION_CERDA} giro={-0.7} escala={0.62} fase={3.4} reducedMotion={rm} />
+      {/* lechones instanciados: misma malla, 2 mallas sueltas → 1 draw-call,
+          sin sombra propia (<30cm, la cerda/comedero ya anclan la zona) */}
+      <LechonesInstanciados
+        geom={g.lechon}
+        reducedMotion={rm}
+        individuos={LECHONES_INDIVIDUOS}
+      />
+      {/* las ovejas criollas — instanciadas: mismo arquetipo real (geomOveja
+          no toma raza), 2 animales × 2 mallas → 2 draw-calls en vez de 4 */}
+      <RebanoInstanciado
+        geom={g.oveja}
+        gesto="tantea"
+        reducedMotion={rm}
+        individuos={OVEJAS_INDIVIDUOS}
+      />
+      {/* el gallinero suelto: tres gallinas + el gallo vigilante — sin
+          sombra propia (<30cm, presupuesto §Tarea A: castShadow de a uno,
+          la malla y el gesto de cada ave quedan intactos) */}
+      <Animal geom={g.campesina} gesto="picotea" pos={[1.15, 0, 0.6]} giro={2.4} escala={0.8} fase={0.4} reducedMotion={rm} castShadow={false} />
+      <Animal geom={g.negra} gesto="picotea" pos={[1.5, 0, 0.05]} giro={-1.2} escala={0.76} fase={2.1} reducedMotion={rm} castShadow={false} />
+      <Animal geom={g.blanca} gesto="picotea" pos={[0.7, 0, 1.1]} giro={0.9} escala={0.78} fase={3.6} reducedMotion={rm} castShadow={false} />
+      <Animal geom={g.gallo} gesto="picotea" pos={[1.45, 0, 0.95]} giro={-2.2} escala={0.9} fase={5.2} reducedMotion={rm} castShadow={false} />
       {/* el perro criollo, echado el ojo a todo desde su esquina */}
       <Animal geom={g.perro} gesto="mira" pos={[1.05, 0, -0.85]} giro={-2.6} escala={0.7} fase={1.2} reducedMotion={rm} />
       <Comedero pos={[1.55, 0.16, -0.45]} />

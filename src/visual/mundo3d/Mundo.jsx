@@ -4,7 +4,7 @@
  *   <Mundo mundoId tier reducedMotion onHotspot onSalir animo energia
  *          estadoFinca hayAlerta />
  *
- * `estadoFinca` = { clima, enso, cosechaReciente, saludFinca, animales } — el
+ * `estadoFinca` = { clima, enso, viento, cosechaReciente, saludFinca, animales } — el
  * estado REAL de la finca que Angelita SIEMPRE refleja (auditoría §5b). Si el
  * host no lo pasa, se cose aquí con `useFincaViva()` (el espejo vivo del dato
  * real, offline-first y anti-fabricación); un `estadoFinca` explícito lo pisa.
@@ -25,7 +25,8 @@ import Mundo2D from './Mundo2D.jsx';
 import useAudioMundo from './useAudioMundo.js';
 import useFincaViva from './useFincaViva.js';
 import InvitacionAudioMundo from './InvitacionAudioMundo.jsx';
-import AbejaTransicion, { AlMontarEscena } from '../creatures/AbejaTransicion.jsx';
+import { AlMontarEscena } from '../creatures/AbejaTransicion.jsx';
+import Caida3DBoundary from './Caida3DBoundary.jsx';
 import './mundo.css';
 
 /* Los dioramas 3D se cargan PEREZOSO: three/@react-three viven en su propio
@@ -47,6 +48,16 @@ const IMPORTA_ESCENA = {
   // El Suelo Vivo (red micorrízica) trae su propia escena flagship (Canvas
   // propio, atmósfera subterránea), fuera de escenas/ pero con el mismo contrato.
   micorrizas: () => import('./micorrizas/EscenaMicorrizas.jsx'),
+  // El Páramo: adaptador (como `valle`) que reusa el páramo definitivo aprobado
+  // (bosque/EscenaBosqueVivo: inmensidad + frailejonal + niebla) y le añade la
+  // capa de navegación del framework.
+  paramo: () => import('./escenas/EscenaParamo.jsx'),
+  // El bosque nativo altoandino de 3 estratos: escena a ESCALA DE BOSQUE,
+  // autocontenida (Canvas propio) como el valle — no un diorama de la base.
+  bosque: () => import('./escenas/EscenaBosque.jsx'),
+  // La QUEBRADA con su salto (bosque de niebla andino): cauce rocoso, chorrera,
+  // pozo cristalino y helechos arborescentes. (anti-conflicto: importador nuevo al final.)
+  chorrera: () => import('./escenas/EscenaChorrera.jsx'),
 };
 /* React.lazy EXIGE que la promesa resuelva a `{ default: Componente }`. El
    `importa().then(m => m.default || m)` resolvía al COMPONENTE pelado, así que
@@ -56,6 +67,11 @@ const IMPORTA_ESCENA = {
 const ESCENAS_3D = Object.fromEntries(
   Object.entries(IMPORTA_ESCENA).map(([k, importa]) => [k, lazy(() => importa().then(m => ({ default: (/** @type {any} */ (m)).default || m })))]),
 );
+
+/* El portal consulta el registro dentro del chunk perezoso de mundos. Mantener
+   este import dinámico evita arrastrar compaiRegistry y sus escenas 3D al bundle
+   base, incluso aunque el portal viva en este host. */
+const CompaiTransicion = lazy(() => import('./escenas/CompaiTransicion.jsx'));
 
 /* Cuánto esperamos el chunk 3D antes de la CAÍDA DIGNA al 2D. Con señal
    intermitente (el caso normal del campo) un fetch colgado NO lanza error —
@@ -115,7 +131,7 @@ function MigaVolver({ onSalir, mundoId }) {
 function MundoInterno({
   mundoId, tier = 'alto', reducedMotion = false, onHotspot, onSalir, animo = 'sereno', energia = 1,
   hablando = false, focoId = null, focoToken = 0,
-  estadoFinca = undefined, hayAlerta = false, // undefined → la escena usa su MUESTRA
+  estadoFinca = undefined, climaLive = undefined, hayAlerta = false, // undefined → la escena usa su MUESTRA
 }) {
   /* CAÍDA DIGNA (BUG-UX-05 / SPEC-UX-05): si el chunk 3D no baja en
      CARGA_3D_TIMEOUT_MS, caemos al espejo 2D del mundo. `intento` fabrica un
@@ -197,46 +213,51 @@ function MundoInterno({
       : plan.entrada.params;
     return (
       <div className="mundo-root" data-dim="3d" data-mundo={mundoId}>
-        <Suspense fallback={<MundoCargando tinte={tinte} onTimeout={alTimeout3D} />}>
-          {/* `Escena` es un `lazy` resuelto en useMemo (fresco al reintentar —
-              mecanismo de caída digna, ver cabecera). react-hooks/static-components
-              no distingue ese patrón deliberado del anti-patrón; se silencia con
-              criterio (deuda preexistente en dev, ajena a este cambio). */}
-          {/* eslint-disable-next-line react-hooks/static-components */}
-          <Escena
-            mundoId={mundoId}
-            params={paramsEscena}
-            hotspots={plan.entrada.hotspots}
-            entrada={plan.entrada.entrada}
-            tinte={tinte}
-            tier={/** @type {"bajo"|"alto"|"medio"} */ (tier)}
-            reducedMotion={reducedMotion}
-            onHotspot={onHotspot}
-            onSalir={onSalir}
-            animo={animo}
-            energia={energia}
-            estadoFinca={estadoReal}
-            hayAlerta={hayAlerta}
-            hablando={hablando}
-            focoId={focoId}
-            focoToken={focoToken}
-          />
-          {/* CRUCE 2D→3D: hermano de <Escena> — su useEffect dispara cuando el
-              chunk 3D resolvió y la escena montó (Suspense revela a los hijos
-              juntos). Enciende el overlay de Angelita cruzando de 2D a 3D. */}
-          <AlMontarEscena onMonta={() => { if (!reducedMotion) setCruce('entrar'); }} />
-        </Suspense>
-        {/* El overlay del cruce 2D→3D (Angelita "entra" a la escena). Se
-            desmonta solo al terminar (onFin); reducedMotion → no monta nada. */}
+        <Caida3DBoundary key={intento} onCaida={alTimeout3D}>
+          <Suspense fallback={<MundoCargando tinte={tinte} onTimeout={alTimeout3D} />}>
+            {/* `Escena` es un `lazy` resuelto en useMemo (fresco al reintentar —
+                mecanismo de caída digna, ver cabecera). react-hooks/static-components
+                no distingue ese patrón deliberado del anti-patrón; se silencia con
+                criterio (deuda preexistente en dev, ajena a este cambio). */}
+            {/* eslint-disable-next-line react-hooks/static-components */}
+            <Escena
+              mundoId={mundoId}
+              params={paramsEscena}
+              hotspots={plan.entrada.hotspots}
+              entrada={plan.entrada.entrada}
+              tinte={tinte}
+              tier={/** @type {"bajo"|"alto"|"medio"} */ (tier)}
+              reducedMotion={reducedMotion}
+              onHotspot={onHotspot}
+              onSalir={onSalir}
+              animo={animo}
+              energia={energia}
+              estadoFinca={estadoReal}
+              hayAlerta={hayAlerta}
+              climaLive={climaLive}
+              hablando={hablando}
+              focoId={focoId}
+              focoToken={focoToken}
+            />
+            {/* CRUCE 2D→3D: hermano de <Escena> — su useEffect dispara cuando el
+                chunk 3D resolvió y la escena montó (Suspense revela a los hijos
+                juntos). Enciende el overlay de Angelita cruzando de 2D a 3D. */}
+            <AlMontarEscena onMonta={() => { if (!reducedMotion) setCruce('entrar'); }} />
+          </Suspense>
+        </Caida3DBoundary>
+        {/* El overlay cruza al compañero elegido. La resolución vive en el
+            chunk lazy para conservar el límite del bundle base. */}
         {cruce === 'entrar' && !reducedMotion && (
-          <AbejaTransicion
-            sentido="entrar"
-            tier={tier}
-            animo={animo}
-            energia={energia}
-            reducedMotion={reducedMotion}
-            onFin={() => setCruce(null)}
-          />
+          <Suspense fallback={null}>
+            <CompaiTransicion
+              sentido="entrar"
+              tier={tier}
+              animo={animo}
+              energia={energia}
+              reducedMotion={reducedMotion}
+              onFin={() => setCruce(null)}
+            />
+          </Suspense>
         )}
         {/* Invitación de PRIMER USO del sonido ambiental (una sola vez): vive
             en el host para cubrir app y vitrinas por igual (allá no hay Perfil). */}

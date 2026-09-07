@@ -21,7 +21,7 @@
  * Todo offline: cero red en runtime. Sin nombres propios de personas.
  */
 
-import { CULTIVOS, ASOCIACIONES } from '../../services/milpaGameEngine';
+import { CULTIVOS } from '../../services/milpaGameEngine';
 export { OCUPACION_CULTIVO, SLOTS_POR_PARCELA } from '../../services/milpaGameEngine';
 
 /**

@@ -36,7 +36,7 @@ for (const vista of VISTAS) {
   try {
     await page.goto(`${BASE}/scripts/diag/hato.html?vista=${vista}`, { waitUntil: 'load', timeout: 40000 });
     await sleep(5000);
-    const f = `/tmp/claude-1000/-home-kortux/93695a3d-dc16-45f5-8c0e-608e6e767ffd/scratchpad/hato-${etiqueta}-${vista}.png`;
+    const f = `/tmp/chagra-shots/hato-${etiqueta}-${vista}.png`;
     await page.screenshot({ path: f, timeout: 60000 });
     console.log('OK', vista, f);
   } catch (e) { console.log('FAIL', vista, String(e).slice(0, 120)); }

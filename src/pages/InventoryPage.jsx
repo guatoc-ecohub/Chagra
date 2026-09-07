@@ -27,6 +27,7 @@
 
 import { useState, useCallback } from 'react';
 import { Scale } from 'lucide-react';
+import { MSG } from '../config/messages.js';
 import InventoryDashboard from '../components/InventoryDashboard.jsx';
 import InventoryAuditTrail from '../components/InventoryAuditTrail.jsx';
 import InventoryAuditDashboard from '../components/InventoryAuditDashboard.jsx';
@@ -39,8 +40,12 @@ export default function InventoryPage() {
   const [recountTarget, setRecountTarget] = useState(null);
   const [refreshKey, setRefreshKey] = useState(0);
 
-  const handleRecount = useCallback((itemId) => {
-    setRecountTarget({ itemId });
+  // BUG-08 2026-09-04: el dashboard ahora SÍ llama onRecount (antes ignoraba
+  // el prop → RecountDrawer inalcanzable → inventory_events en 0). Acepta
+  // cantidad/unidad opcionales para prellenar el drawer con el stock actual;
+  // desde la bitácora sigue llegando solo el itemId (queda en el valor manual).
+  const handleRecount = useCallback((itemId, currentQty, currentUnit) => {
+    setRecountTarget({ itemId, currentQty, currentUnit });
   }, []);
 
   const handleRecountSubmitted = useCallback(() => {
@@ -118,7 +123,7 @@ export default function InventoryPage() {
             <button onClick={handleBackToDashboard} aria-label="Volver al dashboard">
               ← Volver
             </button>
-            <h1 style={{ margin: 0, fontSize: '1.1rem' }}>Bitácora · {selectedItemId}</h1>
+            <h1 style={{ margin: 0, fontSize: '1.1rem' }}>{MSG.ui.bitacoraDeItem(selectedItemId)}</h1>
           </header>
           <InventoryAuditTrail itemId={selectedItemId} />
           <div style={{ padding: '1rem', textAlign: 'center' }}>

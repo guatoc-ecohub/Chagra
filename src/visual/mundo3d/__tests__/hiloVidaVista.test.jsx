@@ -87,8 +87,10 @@ describe('HiloVidaVista — accesibilidad y acciones', () => {
   });
 
   test('sin onIrA no hay botones (la capa es solo narrativa)', () => {
+    // #2349 hizo accionables los pendientes cuando existe el callback. Esta
+    // variante valida el contrato complementario omitiendo la prop.
     const { queryByRole } = render(
-      <HiloVidaVista cielo="" lugar="" pendientes={[{ tema: 'riego', view: 'agua' }]} onIrA={() => {}} />,
+      <HiloVidaVista cielo="" lugar="" pendientes={[{ tema: 'riego', view: 'agua' }]} />,
     );
     expect(queryByRole('button')).toBeNull();
   });

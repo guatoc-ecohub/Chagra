@@ -1,0 +1,22 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>GATE — FX del descenso por la Sierra</title>
+    <style>
+      html, body, #raiz { margin: 0; height: 100%; background: #0b1015; overflow: hidden; }
+      #hud {
+        position: fixed; left: 8px; top: 8px; z-index: 9;
+        font: 12px/1.45 ui-monospace, monospace; color: #cfe6f5;
+        background: rgba(6,12,18,.62); padding: 6px 9px; border-radius: 6px;
+        white-space: pre; pointer-events: none;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="raiz"></div>
+    <div id="hud">cargando…</div>
+    <script type="module" src="./descenso-fx.jsx"></script>
+  </body>
+</html>

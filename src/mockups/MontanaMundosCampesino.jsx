@@ -21,8 +21,10 @@
  *      gran plano general → regreso a la finca con el momento de llegada.
  *   3. LOS NODOS-MUNDO SON ESCENAS REALES REUSADAS — "Su finca por dentro"
  *      abre SceneFincaOrganismo (la escena biopunk del home vivo), "Su
- *      guardián" abre GuardianEspiritu y "Sus mundos" abre ArbolDeMundos,
- *      en una hoja cinematográfica sobre la montaña. Nada de cajas grises.
+ *      guardián" abre AgentAvatarSelector (2026-08-14: reemplazó a
+ *      GuardianEspiritu, sistema paralelo desconectado) y "Sus mundos" abre
+ *      ArbolDeMundos, en una hoja cinematográfica sobre la montaña. Nada de
+ *      cajas grises.
  *   4. DATOS CONCRETOS DE MUESTRA — los mundos de SU piso hablan con sus
  *      cosas: "Su papa pastusa · 3 surcos · 42 días", "Su corral · 12
  *      gallinas · la vaca Lucero", el mercado con precio del día, y la
@@ -44,9 +46,14 @@ import './montana-mundos-campesino.css';
 // (en el home lo importa FincaVivaHero) — aquí lo importamos nosotros.
 import SceneFincaOrganismo from '../components/dashboard/SceneFincaOrganismo';
 import '../components/dashboard/scene-finca-organismo.css';
-import GuardianEspiritu from '../components/dashboard/GuardianEspiritu';
+// GuardianEspiritu (5 fauna) se retiró de aquí el 2026-08-14 (unificación
+// compAI): sistema paralelo desconectado del roster real de 7 compañeros. La
+// escena "Su guardián" ahora abre el mismo AgentAvatarSelector del resto de
+// la app — ver el render de `escena === 'guardian'` más abajo.
+import AgentAvatarSelector from '../components/Settings/AgentAvatarSelector';
 import ArbolDeMundos from '../components/dashboard/ArbolDeMundos';
 import { navegarDesde3D } from '../prodApp/wire3DNav.js';
+import useClima3DVivo from '../hooks/useClima3DVivo.js';
 
 // ── Geometría de la escena (unidades del viewBox 390×1440) ──────────────────
 const VB_W = 390;
@@ -70,8 +77,21 @@ const FINCA = {
   nombre: 'El Recuerdo',
   vereda: 'El Roble',
   clima: 'Clima frío · 2.600 m',
-  hoy: 'Hoy: 13 °C · aguacero por la tarde',
 };
+
+const NOMBRE_CONDICION = {
+  despejado: 'cielo despejado',
+  nublado: 'cielo nublado',
+  lluvia: 'lluvia',
+  niebla: 'niebla',
+};
+
+function resumenClimaReal(clima) {
+  if (!clima?.senal) return 'Clima de hoy: esperando el dato real';
+  const temperatura = Number.isFinite(clima.temp) ? `Hoy: ${clima.temp.toFixed(1)} °C` : 'Clima de hoy';
+  const condicion = NOMBRE_CONDICION[clima.condicion] || (clima.lluvia ? 'lluvia' : 'lectura disponible');
+  return `${temperatura} · ${condicion}`;
+}
 
 // Mundos tocables (anclas de la geometría validada en las pasadas 1-3).
 // En SU piso los mundos hablan CONCRETO (dato de muestra bajo la etiqueta);
@@ -721,6 +741,8 @@ function PrimerPlanoSvg() {
 
 // `onBack` con default: los tests montan el mockup sin prop (gate tsc checkJs).
 export default function MontanaMundosCampesino({ onBack = null }) {
+  const climaVivo = useClima3DVivo();
+  const climaHoy = useMemo(() => resumenClimaReal(climaVivo), [climaVivo]);
   const [modo, setModo] = useState('finca'); // 'finca' | 'montana'
   const [piso, setPiso] = useState(PISO_FINCA);
   const [aviso, setAviso] = useState(null);
@@ -1067,8 +1089,8 @@ export default function MontanaMundosCampesino({ onBack = null }) {
           </div>
           <h1 className="mm2-titulo">La Montaña de los Mundos</h1>
           <div className="mm4-cedula" data-testid="mm4-cedula">
-            <span className="mm4-cedula-nombre">⭐ Finca {FINCA.nombre} — vereda {FINCA.vereda}</span>
-            <span className="mm4-cedula-dato">{FINCA.clima} · {FINCA.hoy}</span>
+            <span className="mm4-cedula-nombre">⭐ Finca {FINCA.nombre}, vereda {FINCA.vereda}</span>
+            <span className="mm4-cedula-dato">{FINCA.clima} · {climaHoy}</span>
           </div>
         </header>
 
@@ -1096,9 +1118,9 @@ export default function MontanaMundosCampesino({ onBack = null }) {
 
       {/* ── HOJA DE ESCENA REAL (idea 3): el nodo-mundo no abre una caja —
           abre la escena de verdad del home vivo, sobre la montaña, con
-          noche de cine detrás. SceneFincaOrganismo llega con datos de
-          muestra; GuardianEspiritu y ArbolDeMundos son los componentes
-          reales tal cual viven en el dashboard. ── */}
+          noche de cine detrás. SceneFincaOrganismo, AgentAvatarSelector y
+          ArbolDeMundos son los componentes reales tal cual viven en el
+          dashboard. ── */}
       {escena && (
         <div className="mm4-hoja" role="dialog" aria-modal="true" aria-label={ESCENAS[escena].titulo} data-testid="mm4-hoja">
           <button
@@ -1132,11 +1154,7 @@ export default function MontanaMundosCampesino({ onBack = null }) {
                   />
                 </div>
               )}
-              {escena === 'guardian' && (
-                <GuardianEspiritu
-                  onChange={(id, especie) => avisar(`Su guardián ahora es ${especie?.nombre || 'otra especie'}.`)}
-                />
-              )}
+              {escena === 'guardian' && <AgentAvatarSelector />}
               {escena === 'arbol' && (
                 <ArbolDeMundos
                   onNavigate={() => avisar('Aquí se entra a ese mundo de su finca.')}

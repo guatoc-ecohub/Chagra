@@ -139,6 +139,25 @@ describe('ragRetriever — corpus extendido v2', () => {
     });
   });
 
+  it('flattenDoc indexa campos cortos de clima y numericos con contexto', async () => {
+    const { flattenDoc } = await import('../ragRetriever.js');
+    const passages = flattenDoc({
+      species_slug: 'clima_test',
+      clima: 'frio',
+      ph: 5.8,
+      altitud_msnm: 1850,
+      temperatura: 18,
+      humedad: 82,
+      dosis: '2 ml',
+      distancia: '30 cm',
+    });
+
+    expect(passages.length).toBeGreaterThan(0);
+    expect(passages.some((p) => p.text.includes('clima'))).toBe(true);
+    expect(passages.some((p) => p.text.includes('5.8'))).toBe(true);
+    expect(passages.some((p) => p.text.includes('1850'))).toBe(true);
+  });
+
   it('retrieve("plan alimentación fresa") devuelve passage con "### Plan de alimentación"', async () => {
     const { retrieve } = await import('../ragRetriever.js');
     const hits = await retrieve('plan alimentación fresa bocashi humus', 5);

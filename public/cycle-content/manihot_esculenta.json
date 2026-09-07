@@ -38,6 +38,7 @@
     "drenaje_requerido": "bueno"
   },
   "valor_pedagogico": "La yuca brava amazónica o mandioca amarga (Manihot esculenta Crantz, familia Euphorbiaceae) es un arbusto leñoso (2-4 m altura) nativo de las tierras bajas de Sudamérica tropical, domesticada hace 8.000-10.000 años en el sudoeste de la cuenca amazónica (frontera Brasil-Bolivia, área de Rondônia) según evidencia arqueobotánica y genética (Olsen & Schaal 1999), considerada la cuarta fuente de carbohidratos para la humanidad después del arroz, el trigo y el maíz, y la base alimentaria milenaria de los pueblos amazónicos colombianos (tikuna, huitoto, bora, miraña, muinane, andoke, ocaina, yagua, kichwa, siona, kofán, secoya, inga, kamëntsá, makuna, yukpa, sikuani, piaroa). Existen dos grupos varietales tradicionales bien diferenciados: yuca dulce (mansa, bajo contenido de glucósidos cianogénicos <50 mg HCN/kg, consumo directo cocida) y yuca brava o amarga (alto contenido cianogénico 100-500 mg HCN/kg, requiere procesamiento elaborado para eliminar el ácido cianhídrico y transformarse en casabe, fariña o manicuera fermentada). El proceso tradicional indígena para procesar la yuca brava — rallado en tabla de aserrín de palma o concha, prensado en sebucán (cilindro tejido de palma con torsión gravitacional) para extraer el manipueira o yare (líquido amarillo cianhídrico tóxico), tamizado de la masa, tostado en budare o tiesto cerámico para hacer casabe (torta delgada) o fariña (granulado seco) — es uno de los logros etnoquímicos más sofisticados de la humanidad precolombina, comparable al procesamiento del maíz por nixtamalización mesoamericana. Lección viva: planta-pilar de la chagra amazónica colombiana que enseña cinco conceptos críticos: (1) la domesticación temprana de plantas tóxicas (yuca amarga) por pueblos amazónicos como ejemplo magistral de coevolución cultura-naturaleza, donde un cultivo venenoso se vuelve alimento básico mediante una tecnología procesual milenaria; (2) la diferencia entre yuca dulce y yuca brava como caso de selección artificial divergente — la yuca brava conserva su defensa cianogénica natural contra herbívoros y la cultura humana la procesa, mientras la yuca dulce ha perdido esa defensa por selección y se cultiva en zonas con menor presión de saqueo (ej. periurbano colombiano); (3) la chagra amazónica de yuca como sistema rotatorio milenario sostenible: tumba-pudre o slash-and-mulch, ciclo de 1-3 años de cultivo seguido de barbecho de 8-15 años, lección magistral de agricultura itinerante de bosque tropical sin uso de fuego en muchas variantes; (4) la soberanía alimentaria amazónica — el casabe y la fariña son alimentos vivos de la identidad cultural de pueblos como los huitoto, tikuna y bora, y la pérdida del manejo tradicional implica erosión cultural y genética simultánea (>200 variedades locales documentadas en chagras del trapecio amazónico colombiano por SINCHI); (5) la bioquímica defensiva vegetal: los glucósidos cianogénicos (linamarina, lotaustralina) liberan HCN al ser hidrolizados por la enzima linamarasa, lección de bioquímica de defensa estructural disociada espacialmente (los glucósidos en vacuola, la enzima en citoplasma, contacto solo al daño mecánico). Manejo agroecológico: siembra en chagras nuevas (tumba-pudre tradicional), asocio con plátano, piña, copoazú, ají, achiote, cocona; cosecha escalonada manual; cero agroquímicos; control biológico de Phenacoccus manihoti (cochinilla de la yuca) con Anagyrus lopezi (avispita brasileña). Fuentes Tier A: POWO Kew, GBIF Backbone Taxonomy, GBIF Colombia, AGROSAVIA Manual Frutales Tropicales, Bernal 2015 Catálogo Plantas Colombia, SINCHI Amazonía, FAO EcoCrop, Pérez-Arbeláez 1947.",
+  "companions_markdown": "### Especies asociadas favorables\n\nEstas especies favorecen el cultivo cuando se siembran cerca:\n- zea_mays — Maíz criollo (Zea mays L.)\n- phaseolus_vulgaris — Frijol arbustivo / voluble (Phaseolus vulgaris L.)\n- cajanus_cajan — Gandul (Cajanus cajan (L.) Huth)\n- musa_paradisiaca — Plátano (Musa × paradisiaca L.)\n- plukenetia_volubilis — Sacha inchi (Plukenetia volubilis L.)",
   "sources": [
     {
       "id": "powo-kew",
@@ -67,7 +68,7 @@
       "id": "sinchi-amazonia-colombiana",
       "title": "sinchi-amazonia-colombiana",
       "tier": "A",
-      "url": null
+      "url": "https://www.sinchi.org.co"
     },
     {
       "id": "bernal-2015-plantas-liquenes-colombia",
@@ -89,5 +90,5 @@
     }
   ],
   "_generated_by": "scripts/build-cycle-content-from-catalog.mjs",
-  "_generated_at": "2026-05-19T00:42:57.382Z"
+  "_generated_at": "2026-09-03T07:40:20.312Z"
 }

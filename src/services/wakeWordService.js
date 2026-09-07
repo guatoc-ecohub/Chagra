@@ -51,8 +51,9 @@
  * Español colombiano (tú/usted), NUNCA voseo argentino.
  */
 import { MSG } from '../config/messages';
+import { MODO_CAMPO_WAKE_WORD, modoCampoDisponible } from '../config/modoCampoFlag';
 
-export const WAKE_WORD = 'hola chagra';
+export const WAKE_WORD = MODO_CAMPO_WAKE_WORD;
 export const OTHER_LABEL = 'otro';
 export const NOISE_LABEL = '_background_noise_';
 export const WAKE_THRESHOLD = 0.9; // conservador: preferimos perder un disparo a un falso +
@@ -314,6 +315,11 @@ export function startListening({ transfer, wakeIndex, onWake, onScore }) {
  * @returns {Promise<{ stop:()=>Promise<void>, source:'personal'|'ready-cached'|'ready-fresh', wordLabels:string[] }>}
  */
 export async function createWakeWordDetector({ onWake, onError, onProgress, onScore }) {
+  if (!modoCampoDisponible()) {
+    const error = new Error('El wake-word está desactivado por VITE_MODO_CAMPO');
+    onError?.(error);
+    throw error;
+  }
   try {
     const { transfer, wordLabels, wakeIndex, source } = await prepareRecognizer({ onProgress });
     const stopListening = startListening({ transfer, wakeIndex, onWake, onScore });

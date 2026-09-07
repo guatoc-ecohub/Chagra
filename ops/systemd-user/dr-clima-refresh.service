@@ -1,0 +1,10 @@
+[Unit]
+Description=Refresco de fuentes agroclimáticas con calendario colombiano
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+ExecStart=%h/.local/bin/dr-clima-refresh-calendar.mjs
+Nice=10
+TimeoutStartSec=3600

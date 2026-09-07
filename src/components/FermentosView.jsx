@@ -15,29 +15,37 @@ import {
   Users,
   BookOpen,
   ListChecks,
+  Camera,
+  Hourglass,
+  Refrigerator,
 } from 'lucide-react';
 import { getAllFermentos } from '../db/catalogDB';
+import PedagogicalText from './common/PedagogicalText';
+import { getFermentoFoto, getFotoPorArchivo, FOTO_PORTADA_ARCHIVO } from '../data/fermentoFotos';
 
 /**
- * FermentosView — galería de fermentos alimentarios tradicionales y vetos de
- * seguridad. SEGURIDAD-FIRST.
+ * FermentosView — mini-app de fermentos alimentarios tradicionales y vetos de
+ * seguridad. SEGURIDAD-FIRST, pero VIVA: cada fermento entra por su foto
+ * apetitosa, su texto se lee estructurado (PedagogicalText) y su bloque de
+ * seguridad es el ancla visual, nunca un muro.
  *
  * Estructura:
- *   1. VETOS CRÍTICOS transversales (botulismo, plomo, cianuro, lácteos crudos)
+ *   1. Portada con foto (fermentación en frascos) + recordatorio de inocuidad.
+ *   2. VETOS CRÍTICOS transversales (botulismo, plomo, cianuro, lácteos crudos)
  *      en rojo, imposibles de ignorar: aplican a varios fermentos a la vez.
- *   2. Filtro por "tipo de fermento" (categoría práctica, no taxonomía).
- *   3. Cada fermento alimentario muestra pasos, tiempos, vida útil y un bloque
- *      DESTACADO de SEGURIDAD (alertas, señales para descartar, población de
- *      riesgo) que sale del catálogo (catalog/fermentos-seed.json).
- *   4. Sección de FUENTES con instituciones públicas reales (INVIMA, FAO/WHO,
+ *   3. Filtro por "tipo de fermento" (categoría práctica, no taxonomía).
+ *   4. Tarjeta por fermento: foto/tarjetón por tipo, descripción legible, pasos,
+ *      y un bloque DESTACADO de SEGURIDAD (alertas, señales para descartar,
+ *      población de riesgo) que sale del catálogo (catalog/fermentos-seed.json).
+ *   5. Sección de FUENTES con instituciones públicas reales (INVIMA, FAO/WHO,
  *      FDA, CDC).
  *
  * Principio: un fermento es un alimento, no un medicamento. Esta pantalla NO
  * hace afirmaciones medicinales/curativas. El riesgo real (enfermar por mala
  * práctica) se comunica claro y en lenguaje campesino.
  *
- * Theme-aware: usa los tokens de color del sistema de temas (slate/emerald/
- * amber/red mapeados a variables CSS en tailwind.config.js), no colores fijos.
+ * Fotos: CC de `catalog/fotos/` con crédito visible (respeta BY / BY-SA). Ver
+ * src/data/fermentoFotos.js.
  */
 
 /** Mapea cada fermento a un "tipo práctico" para el filtro/agrupación. */
@@ -50,6 +58,24 @@ function tipoPractico(f) {
   if (/vinagre/.test(id)) return 'Vinagres';
   if (/pan_masa/.test(id)) return 'Panadería';
   return 'Otros';
+}
+
+/**
+ * Identidad visual (emoji + gradiente de tierra) por tipo práctico. Sirve de
+ * "tarjetón" cuando el fermento no tiene foto propia, y de acento cuando sí.
+ */
+const TIPO_ESTILO = {
+  'Lácteos': { emoji: '🥛', grad: 'from-amber-500/30 to-orange-700/30', ring: 'ring-amber-500/20' },
+  'Bebidas tradicionales': { emoji: '🍯', grad: 'from-fuchsia-500/25 to-violet-700/30', ring: 'ring-fuchsia-500/20' },
+  'Bebidas con cultivo (SCOBY/gránulos)': { emoji: '🍵', grad: 'from-teal-500/25 to-cyan-700/30', ring: 'ring-teal-500/20' },
+  'Verduras fermentadas': { emoji: '🥬', grad: 'from-lime-500/25 to-emerald-700/30', ring: 'ring-lime-500/20' },
+  'Vinagres': { emoji: '🍶', grad: 'from-rose-500/25 to-red-800/30', ring: 'ring-rose-500/20' },
+  'Panadería': { emoji: '🍞', grad: 'from-amber-500/30 to-yellow-700/25', ring: 'ring-amber-500/20' },
+  'Otros': { emoji: '🫙', grad: 'from-slate-500/25 to-slate-700/30', ring: 'ring-slate-500/20' },
+};
+
+function estiloTipo(tipo) {
+  return TIPO_ESTILO[tipo] || TIPO_ESTILO['Otros'];
 }
 
 /** Estilos del bloque de seguridad según el nivel declarado en el seed. */
@@ -100,6 +126,76 @@ function formatTiempo(f) {
       : `${Math.ceil(f.tiempo_elaboracion_horas / 24)} d`;
   }
   return null;
+}
+
+/** Crédito de foto CC — discreto pero visible (respeta BY / BY-SA). */
+function CreditoFoto({ foto, className = '' }) {
+  if (!foto || !foto.autor) return null;
+  const texto = `${foto.autor}${foto.licencia ? ` · ${foto.licencia}` : ''}`;
+  const contenido = (
+    <span className="inline-flex items-center gap-1 max-w-full">
+      <Camera size={9} className="shrink-0" aria-hidden="true" />
+      <span className="truncate">{texto}</span>
+    </span>
+  );
+  return (
+    <div
+      className={`text-[9px] leading-none text-white/70 bg-black/45 backdrop-blur-sm rounded-md px-1.5 py-1 max-w-[85%] ${className}`}
+      title={foto.titulo || texto}
+    >
+      {foto.url_fuente ? (
+        <a
+          href={foto.url_fuente}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="hover:text-white"
+        >
+          {contenido}
+        </a>
+      ) : (
+        contenido
+      )}
+    </div>
+  );
+}
+
+/** Cabecera visual de la tarjeta: foto CC con overlay, o tarjetón por tipo. */
+function CabeceraFermento({ fermento, tipo }) {
+  const foto = getFermentoFoto(fermento.id);
+  const est = estiloTipo(tipo);
+  return (
+    <div className={`relative h-36 overflow-hidden ring-1 ${est.ring}`}>
+      {foto ? (
+        <>
+          <img
+            src={foto.url}
+            alt={fermento.nombre}
+            loading="lazy"
+            className="absolute inset-0 h-full w-full object-cover"
+          />
+          {/* Velo inferior para que el emoji/crédito se lean sobre la foto. */}
+          <div className="absolute inset-0 bg-gradient-to-t from-slate-950/85 via-slate-950/15 to-transparent" />
+        </>
+      ) : (
+        <div className={`absolute inset-0 bg-gradient-to-br ${est.grad} flex items-center justify-center`}>
+          <span className="text-5xl drop-shadow-lg opacity-90" aria-hidden="true">
+            {est.emoji}
+          </span>
+        </div>
+      )}
+
+      {/* Chip de tipo, arriba a la derecha. */}
+      <span className="absolute top-2 right-2 px-2 py-0.5 rounded-full text-[10px] font-bold text-white/95 bg-black/40 backdrop-blur-sm border border-white/10">
+        <span aria-hidden="true" className="mr-1">{est.emoji}</span>
+        {tipo}
+      </span>
+
+      {/* Crédito de la foto, abajo a la derecha. */}
+      {foto && (
+        <CreditoFoto foto={foto} className="absolute bottom-2 right-2" />
+      )}
+    </div>
+  );
 }
 
 /** Bloque de seguridad por fermento — DESTACADO, nunca enterrado. */
@@ -158,6 +254,121 @@ function BloqueSeguridad({ seguridad }) {
   );
 }
 
+/** Tarjeta de un fermento alimentario. */
+function TarjetaFermento({ fermento }) {
+  const tipo = tipoPractico(fermento);
+  const tiempo = formatTiempo(fermento);
+  return (
+    <article
+      data-testid={`fermento-${fermento.id}`}
+      className="bg-slate-900/60 border border-slate-800 rounded-2xl overflow-hidden flex flex-col hover:border-slate-700 transition-colors"
+    >
+      <CabeceraFermento fermento={fermento} tipo={tipo} />
+
+      <div className="p-4 flex flex-col flex-1">
+        <h3 className="text-base font-bold text-slate-100 leading-tight mb-2">
+          {fermento.nombre}
+        </h3>
+
+        {fermento.descripcion && (
+          <PedagogicalText texto={fermento.descripcion} tone="slate" />
+        )}
+
+        {Array.isArray(fermento.pasos) && fermento.pasos.length > 0 && (
+          <div className="mt-3">
+            <p className="flex items-center gap-1.5 text-[10px] uppercase tracking-wider text-emerald-400/80 font-bold mb-2">
+              <ListChecks size={12} aria-hidden="true" /> Cómo se hace
+            </p>
+            <ol className="space-y-1.5">
+              {fermento.pasos.map((paso, i) => (
+                <li key={i} className="flex gap-2.5 text-xs text-slate-300 leading-snug">
+                  <span
+                    aria-hidden="true"
+                    className="shrink-0 h-5 w-5 rounded-full bg-emerald-500/15 text-emerald-300 text-[10px] font-bold flex items-center justify-center mt-px"
+                  >
+                    {i + 1}
+                  </span>
+                  <span className="pt-0.5">{paso}</span>
+                </li>
+              ))}
+            </ol>
+          </div>
+        )}
+
+        {/* Bloque de SEGURIDAD destacado por fermento */}
+        <BloqueSeguridad seguridad={fermento.seguridad} />
+
+        {(tiempo || fermento.vida_util_dias) && (
+          <div className="flex items-center flex-wrap gap-2 mt-3 pt-3 border-t border-slate-800">
+            {tiempo && (
+              <span className="inline-flex items-center gap-1.5 text-[11px] font-medium text-slate-300 bg-slate-800/60 rounded-lg px-2 py-1">
+                <Hourglass size={12} className="text-emerald-400" aria-hidden="true" />
+                Listo en {tiempo}
+              </span>
+            )}
+            {fermento.vida_util_dias && (
+              <span className="inline-flex items-center gap-1.5 text-[11px] font-medium text-slate-300 bg-slate-800/60 rounded-lg px-2 py-1">
+                <Refrigerator size={12} className="text-sky-400" aria-hidden="true" />
+                Dura {fermento.vida_util_dias} d
+              </span>
+            )}
+          </div>
+        )}
+
+        {Array.isArray(fermento.fuentes) && fermento.fuentes.length > 0 && (
+          <p className="text-[10px] text-slate-500 mt-2 leading-snug">
+            <span className="font-bold">Fuentes:</span> {fermento.fuentes.join(' · ')}
+          </p>
+        )}
+      </div>
+    </article>
+  );
+}
+
+/** Tarjeta de un VETO de seguridad — el ancla roja imposible de ignorar. */
+function TarjetaVeto({ veto }) {
+  return (
+    <article
+      data-testid={`veto-${veto.id}`}
+      className="bg-red-950/60 border border-red-800 rounded-xl p-4"
+    >
+      <div className="flex items-start gap-3">
+        <AlertTriangle size={24} className="text-red-400 shrink-0 mt-0.5" aria-hidden="true" />
+        <div className="flex-1 min-w-0">
+          <header className="flex items-start justify-between gap-2 mb-2">
+            <h3 className="text-base font-bold text-red-100 leading-tight">
+              {veto.nombre.replace(/^VETO:\s*/i, '')}
+            </h3>
+            <span
+              className={`shrink-0 px-2 py-0.5 rounded-full text-[10px] font-bold uppercase border ${
+                veto.riesgo_nivel === 'CRÍTICO'
+                  ? 'bg-red-900 text-red-100 border-red-700'
+                  : 'bg-orange-900 text-orange-100 border-orange-700'
+              }`}
+            >
+              {veto.riesgo_nivel}
+            </span>
+          </header>
+          <p className="text-sm text-red-200 leading-snug mb-2">{veto.descripcion}</p>
+          {veto.razon_veto && (
+            <div className="bg-red-950/80 rounded-lg p-3 border border-red-900/50">
+              <p className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wider text-red-400 mb-1.5">
+                Por qué
+              </p>
+              <PedagogicalText texto={veto.razon_veto} tone="slate" />
+            </div>
+          )}
+          {veto.consecuencia_potencial && (
+            <p className="text-[10px] text-red-300 mt-2 font-semibold">
+              Consecuencia: {veto.consecuencia_potencial}
+            </p>
+          )}
+        </div>
+      </div>
+    </article>
+  );
+}
+
 export default function FermentosView() {
   const [fermentos, setFermentos] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -201,6 +412,8 @@ export default function FermentosView() {
     [alimentarios, filtroTipo],
   );
 
+  const fotoPortada = getFotoPorArchivo(FOTO_PORTADA_ARCHIVO);
+
   if (loading) {
     return (
       <div className="flex items-center justify-center py-12">
@@ -211,17 +424,36 @@ export default function FermentosView() {
 
   return (
     <div className="px-4 py-4 space-y-6 max-w-3xl mx-auto">
-      {/* Intro corta + recordatorio de inocuidad institucional */}
-      <div className="bg-emerald-950/40 border border-emerald-800/50 rounded-xl p-4 flex gap-3">
-        <Beaker size={24} className="text-emerald-300 shrink-0" aria-hidden="true" />
-        <div className="text-sm text-emerald-100/90">
-          <p className="font-bold text-emerald-200">Fermentos de la finca y la casa</p>
-          <p className="text-emerald-300/80 mt-1 leading-relaxed">
-            Recetas tradicionales con su seguridad al lado. Un fermento es un
-            alimento, no un medicamento: aquí no prometemos curas. Lo que sí cuida
-            es la higiene, la acidez y la sal. Para venderlos o procesarlos en
-            cantidad, rija las normas de inocuidad (INVIMA).
-          </p>
+      {/* ── PORTADA con foto CC + recordatorio de inocuidad ───────────────────── */}
+      <div className="rounded-2xl overflow-hidden border border-emerald-800/50">
+        <div className="relative h-40">
+          {fotoPortada ? (
+            <img
+              src={fotoPortada.url}
+              alt="Frascos de verduras en fermentación"
+              className="absolute inset-0 h-full w-full object-cover"
+            />
+          ) : (
+            <div className="absolute inset-0 bg-gradient-to-br from-emerald-700/40 to-teal-900/40" />
+          )}
+          <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/50 to-slate-950/10" />
+          <div className="absolute inset-0 p-4 flex flex-col justify-end">
+            <div className="flex items-center gap-2">
+              <Beaker size={22} className="text-emerald-300 shrink-0" aria-hidden="true" />
+              <h1 className="text-xl font-black text-white leading-tight drop-shadow">
+                Fermentos de la finca y la casa
+              </h1>
+            </div>
+            <p className="text-xs text-emerald-100/90 mt-1 max-w-lg drop-shadow">
+              Recetas tradicionales con su seguridad al lado.
+            </p>
+          </div>
+          {fotoPortada && <CreditoFoto foto={fotoPortada} className="absolute bottom-2 right-2" />}
+        </div>
+        <div className="bg-emerald-950/40 px-4 py-3 text-xs text-emerald-100/85 leading-relaxed">
+          Un fermento es un <strong className="text-emerald-200">alimento, no un medicamento</strong>:
+          aquí no prometemos curas. Lo que sí cuida es la higiene, la acidez y la sal.
+          Para venderlos o procesarlos en cantidad, rija las normas de inocuidad (INVIMA).
         </div>
       </div>
 
@@ -245,48 +477,7 @@ export default function FermentosView() {
 
           <div className="space-y-3">
             {vetos.map((veto) => (
-              <article
-                key={veto.id}
-                data-testid={`veto-${veto.id}`}
-                className="bg-red-950/60 border border-red-800 rounded-xl p-4"
-              >
-                <div className="flex items-start gap-3">
-                  <AlertTriangle
-                    size={24}
-                    className="text-red-400 shrink-0 mt-0.5"
-                    aria-hidden="true"
-                  />
-                  <div className="flex-1 min-w-0">
-                    <header className="flex items-start justify-between gap-2 mb-2">
-                      <h3 className="text-base font-bold text-red-100 leading-tight">
-                        {veto.nombre.replace(/^VETO:\s*/i, '')}
-                      </h3>
-                      <span
-                        className={`shrink-0 px-2 py-0.5 rounded-full text-[10px] font-bold uppercase border ${
-                          veto.riesgo_nivel === 'CRÍTICO'
-                            ? 'bg-red-900 text-red-100 border-red-700'
-                            : 'bg-orange-900 text-orange-100 border-orange-700'
-                        }`}
-                      >
-                        {veto.riesgo_nivel}
-                      </span>
-                    </header>
-                    <p className="text-sm text-red-200 leading-snug mb-2">
-                      {veto.descripcion}
-                    </p>
-                    <div className="bg-red-950/80 rounded-lg p-3 border border-red-900/50">
-                      <p className="text-xs text-red-100 leading-relaxed">
-                        <strong className="text-red-400">Por qué:</strong> {veto.razon_veto}
-                      </p>
-                    </div>
-                    {veto.consecuencia_potencial && (
-                      <p className="text-[10px] text-red-300 mt-2 font-semibold">
-                        Consecuencia: {veto.consecuencia_potencial}
-                      </p>
-                    )}
-                  </div>
-                </div>
-              </article>
+              <TarjetaVeto key={veto.id} veto={veto} />
             ))}
           </div>
         </section>
@@ -304,7 +495,7 @@ export default function FermentosView() {
         {/* Filtro por tipo práctico */}
         {tipos.length > 2 && (
           <nav
-            className="flex gap-1.5 overflow-x-auto scrollbar-hide pb-2 mb-1 -mx-1 px-1"
+            className="flex gap-1.5 overflow-x-auto scrollbar-hide pb-2 mb-3 -mx-1 px-1"
             aria-label="Filtrar por tipo de fermento"
           >
             {tipos.map((t) => (
@@ -331,71 +522,9 @@ export default function FermentosView() {
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {visibles.map((fermento) => {
-              const tiempo = formatTiempo(fermento);
-              return (
-                <article
-                  key={fermento.id}
-                  data-testid={`fermento-${fermento.id}`}
-                  className="bg-slate-900/60 border border-slate-800 rounded-xl p-4 flex flex-col"
-                >
-                  <header className="flex items-center justify-between gap-2 mb-1">
-                    <div className="flex items-center gap-2 min-w-0">
-                      <Beaker size={18} className="text-emerald-400 shrink-0" aria-hidden="true" />
-                      <h3 className="text-base font-bold text-slate-100 truncate">
-                        {fermento.nombre}
-                      </h3>
-                    </div>
-                  </header>
-                  <span className="text-[10px] uppercase tracking-wider text-emerald-400/70 font-bold mb-2">
-                    {tipoPractico(fermento)}
-                  </span>
-
-                  <p className="text-sm text-slate-300 leading-relaxed mb-3">
-                    {fermento.descripcion}
-                  </p>
-
-                  {Array.isArray(fermento.pasos) && fermento.pasos.length > 0 && (
-                    <div>
-                      <p className="flex items-center gap-1.5 text-[10px] uppercase tracking-wider text-slate-500 font-bold mb-2">
-                        <ListChecks size={12} aria-hidden="true" /> Pasos de preparación
-                      </p>
-                      <ol className="space-y-1.5">
-                        {fermento.pasos.map((paso, i) => (
-                          <li key={i} className="text-xs text-slate-300 pl-4">
-                            <span className="text-emerald-400 mr-2">{i + 1}.</span>
-                            {paso}
-                          </li>
-                        ))}
-                      </ol>
-                    </div>
-                  )}
-
-                  {/* Bloque de SEGURIDAD destacado por fermento */}
-                  <BloqueSeguridad seguridad={fermento.seguridad} />
-
-                  <div className="flex items-center flex-wrap gap-x-4 gap-y-1 mt-3 pt-3 border-t border-slate-800">
-                    {tiempo && (
-                      <div className="flex items-center gap-1.5 text-xs text-slate-400">
-                        <Clock size={12} aria-hidden="true" />
-                        <span>Listo en {tiempo}</span>
-                      </div>
-                    )}
-                    {fermento.vida_util_dias && (
-                      <span className="text-[10px] text-slate-500">
-                        Vida útil: {fermento.vida_util_dias} d
-                      </span>
-                    )}
-                  </div>
-
-                  {Array.isArray(fermento.fuentes) && fermento.fuentes.length > 0 && (
-                    <p className="text-[10px] text-slate-500 mt-2 leading-snug">
-                      <span className="font-bold">Fuentes:</span> {fermento.fuentes.join(' · ')}
-                    </p>
-                  )}
-                </article>
-              );
-            })}
+            {visibles.map((fermento) => (
+              <TarjetaFermento key={fermento.id} fermento={fermento} />
+            ))}
           </div>
         )}
       </section>
@@ -451,6 +580,10 @@ export default function FermentosView() {
           Esta pantalla es informativa. Ante síntomas de intoxicación (visión
           doble, debilidad, parálisis, fiebre alta) acuda de inmediato al puesto
           de salud.
+        </p>
+        <p className="text-[9px] text-slate-600 mt-2 leading-snug">
+          Fotos con licencia Creative Commons; crédito y licencia sobre cada
+          imagen. Detalle en catalog/fotos/fotos-atribucion.json.
         </p>
       </section>
     </div>

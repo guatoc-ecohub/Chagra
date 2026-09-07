@@ -1,5 +1,5 @@
 import React from 'react';
-import { PawPrint, Rabbit, ChevronRight, Recycle } from 'lucide-react';
+import { PawPrint, ChevronRight, Recycle } from 'lucide-react';
 import { ScreenShell } from './common/ScreenShell';
 import FotoAnimal from './animales/FotoAnimal';
 

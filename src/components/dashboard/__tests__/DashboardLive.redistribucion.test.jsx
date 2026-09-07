@@ -42,7 +42,7 @@ vi.mock('../FincaVivaHero', () => ({
   },
 }));
 vi.mock('../FincaRedInstitucional', () => ({ default: () => <div /> }));
-vi.mock('../../OnboardingHero', () => ({ default: () => <div /> }));
+vi.mock('../../PrimerRegistroCard', () => ({ default: () => <div /> }));
 vi.mock('../SelectedBackgroundReveal', () => ({ default: () => <div /> }));
 vi.mock('../MiFincaVivaHomeCard', () => ({ default: () => <div /> }));
 vi.mock('../../CaseStudyTopWidget', () => ({ default: () => null }));
@@ -193,11 +193,10 @@ describe('Home F2 — reestructuración 2.0 "Los mundos de mi finca" (V4)', () =
     fireEvent.click(screen.getByTestId('mundo-abono'));
     expect(onNavigate).toHaveBeenCalledWith('mundo', { mundo: 'abono' });
 
-    // Clima ganó su propia mini-app (#2045): ahora tiene DOS entradas
-    // (su día en la finca + el boletín del clima que viene), así que ya no
-    // es de una sola pantalla → abre la pantalla de mundo genérica.
+    // Clima conserva sus dos entradas, pero la tarjeta abre primero el boletín
+    // canónico para evitar un toque extra en la grilla plegada.
     fireEvent.click(screen.getByTestId('mundo-clima'));
-    expect(onNavigate).toHaveBeenCalledWith('mundo', { mundo: 'clima' });
+    expect(onNavigate).toHaveBeenCalledWith('clima_boletin', undefined);
   });
 
   test('las tiles sueltas viejas ya NO existen en F2 (viven dentro de sus mundos)', async () => {

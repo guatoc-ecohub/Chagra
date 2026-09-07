@@ -1,4 +1,5 @@
 import Angelita from '../visual/agente/Angelita';
+import { useAngelitaPresencia, esPasivo } from '../visual/agente/useAngelitaPresencia';
 
 /**
  * ChagraAgentAvatarAngelita — Angelita (la abeja angelita, Tetragonisca
@@ -22,13 +23,16 @@ import Angelita from '../visual/agente/Angelita';
    cae a 'acompana' (estadoCanonico ya es tolerante, esto solo documenta). */
 const ESTADO_DE_STATE = {
     idle: 'acompana',
+    // eslint-disable-next-line chagra-i18n/no-hardcoded-spanish
     thinking: 'pensando',
+    // eslint-disable-next-line chagra-i18n/no-hardcoded-spanish
     speaking: 'respondiendo',
     listening: 'escuchando',
 };
 
 export default function ChagraAgentAvatarAngelita({
     state = 'idle',
+    estado = undefined,
     size = 48,
     withLabel = false,
     onClick = undefined,
@@ -41,16 +45,67 @@ export default function ChagraAgentAvatarAngelita({
     // modo científico (0..1 o 'alta'|'media'|'baja' → anillo de certeza).
     visema = null,
     confianza = null,
+    // Props del cuerpo canónico. El adaptador histórico no debe descartar
+    // estos controles: selector, FAB, chat y galería tienen que ver la misma
+    // Angelita viva, incluidos rubber-hose, lip-sync y reduced-motion.
+    direccion = 'derecha',
+    animated = true,
+    tier = undefined,
+    clima = null,
+    enso = 'neutro',
+    animo = undefined,
+    energia = 1,
+    mundoId = null,
+    lineBoil = false,
+    idleCerebro = true,
+    gafas = false,
+    cejas = undefined,
+    title = undefined,
+    'data-agt-estado': dataEstado = undefined,
+    'data-pose': dataPose = undefined,
+    'data-visema': dataVisema = undefined,
+    // Presencia (pedido operador 2026-08-24): con reaccionaPresencia, Angelita
+    // se mueve a su estado natural (idle vivo 'acompana') cuando la persona
+    // hace mouse over o toca la pantalla — sin pisar un estado activo real.
+    reaccionaPresencia = true,
+    ...rest
 }) {
-    const estado = ESTADO_DE_STATE[state] || 'acompana';
+    // `estado` es el contrato rico de Angelita; `state` conserva compatibilidad
+    // con los call-sites históricos del avatar.
+    const estadoCanonico = estado || ESTADO_DE_STATE[state] || 'acompana';
+    const { despierta, handlers: handlersPresencia } = useAngelitaPresencia({
+        activo: reaccionaPresencia,
+    });
+    // La presencia solo despierta cuando está en un estado pasivo: no interrumpe
+    // 'pensando'/'respondiendo'/'preocupada' porque la persona mueva el mouse.
+    const despiertaNatural = despierta && esPasivo(estadoCanonico);
+    const estadoEfectivo = despiertaNatural ? 'acompana' : estadoCanonico;
     const abeja = (
         <Angelita
-            estado={estado}
+            estado={estadoEfectivo}
             size={size}
+            direccion={direccion}
+            animated={animated}
             visema={visema}
             confianza={confianza}
+            tier={tier}
+            clima={clima}
+            enso={enso}
+            animo={animo}
+            energia={energia}
+            mundoId={mundoId}
+            lineBoil={lineBoil}
+            idleCerebro={idleCerebro || despiertaNatural}
+            gafas={gafas}
+            cejas={cejas}
             className={`${glow ? 'agt-avatar-glow ' : ''}${className}`.trim() || undefined}
-            title={ariaLabel}
+            title={title || ariaLabel}
+            {...rest}
+            // Los atributos visuales del dispatcher son contrato de salida,
+            // por eso quedan después de cualquier prop residual.
+            data-agt-estado={dataEstado}
+            data-pose={dataPose}
+            data-visema={dataVisema}
         />
     );
 
@@ -74,6 +129,7 @@ export default function ChagraAgentAvatarAngelita({
                 aria-label={ariaLabel}
                 title={ariaLabel}
                 style={{ background: 'none', border: 'none', padding: 0, cursor: 'pointer', lineHeight: 0 }}
+                {...handlersPresencia}
             >
                 {contenido}
             </button>

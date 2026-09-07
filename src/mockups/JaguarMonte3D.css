@@ -1,0 +1,257 @@
+/*
+ * JaguarMonte3D — la hoja de personaje del jaguar.
+ * Fondo de monte al atardecer (los mismos tonos cálidos del resto de vitrinas),
+ * el retrato mandando en la primera pantalla y todo apilándose en móvil.
+ */
+
+.jmonte {
+  --jm-tinta: #241608;
+  --jm-papel: #f6ead2;
+  --jm-papel-hondo: #e7d7ba;
+  --jm-monte: #3f6f3a;
+  --jm-pelaje: #d99a45;
+  --jm-borde: rgba(36, 22, 8, 0.16);
+
+  min-height: 100dvh;
+  margin: 0;
+  padding: clamp(1rem, 3vw, 2.5rem);
+  background:
+    radial-gradient(120% 80% at 50% 0%, #f3e6cc 0%, #e2d0ae 55%, #cdb98f 100%);
+  color: var(--jm-tinta);
+  font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+  line-height: 1.55;
+}
+
+.jmonte__head {
+  max-width: 62ch;
+  margin: 0 auto clamp(1.2rem, 3vw, 2.2rem);
+  text-align: center;
+}
+
+.jmonte__kicker {
+  margin: 0 0 0.35rem;
+  font-size: 0.78rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  opacity: 0.62;
+}
+
+.jmonte__head h1 {
+  margin: 0 0 0.6rem;
+  font-size: clamp(1.5rem, 4.6vw, 2.5rem);
+  line-height: 1.15;
+}
+
+.jmonte__lema {
+  margin: 0;
+  font-size: clamp(0.95rem, 2.2vw, 1.06rem);
+  opacity: 0.85;
+}
+
+/* ── EL RETRATO ─────────────────────────────────────────────────────────── */
+
+.jmonte__retrato {
+  display: grid;
+  gap: clamp(1rem, 2.5vw, 2rem);
+  grid-template-columns: minmax(0, 1fr);
+  max-width: 1080px;
+  margin: 0 auto clamp(1.4rem, 3.5vw, 2.6rem);
+}
+
+@media (min-width: 860px) {
+  .jmonte__retrato { grid-template-columns: 1.05fr 1fr; align-items: center; }
+}
+
+.jmonte__figura {
+  margin: 0;
+  padding: clamp(0.8rem, 2vw, 1.4rem);
+  background: linear-gradient(170deg, #f7edd6 0%, #eadcbc 100%);
+  border: 1px solid var(--jm-borde);
+  border-radius: 18px;
+  box-shadow: 0 12px 28px rgba(36, 22, 8, 0.14);
+  text-align: center;
+}
+
+.jmonte__retratoSvg {
+  display: block;
+  width: 100%;
+  max-width: 460px;
+  height: auto;
+  margin: 0 auto;
+}
+
+.jmonte__figura figcaption {
+  margin: 0.5rem auto 0;
+  max-width: 44ch;
+  font-size: 0.92rem;
+  opacity: 0.78;
+}
+
+.jmonte__regla h2 {
+  margin: 0 0 0.4rem;
+  font-size: clamp(1.1rem, 3vw, 1.4rem);
+}
+
+.jmonte__regla > p {
+  margin: 0 0 0.9rem;
+  font-size: 0.96rem;
+  opacity: 0.82;
+}
+
+.jmonte__lamina {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 0.9rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.jmonte__marca {
+  padding: 0.7rem;
+  background: rgba(255, 253, 245, 0.72);
+  border: 1px solid var(--jm-borde);
+  border-radius: 14px;
+  text-align: center;
+}
+
+.jmonte__marca svg {
+  display: block;
+  width: 100%;
+  max-width: 94px;
+  height: auto;
+  margin: 0 auto 0.45rem;
+  border-radius: 8px;
+}
+
+.jmonte__marcaNombre {
+  margin: 0 0 0.2rem;
+  font-weight: 700;
+  font-size: 0.94rem;
+}
+
+.jmonte__marcaPie {
+  margin: 0;
+  font-size: 0.82rem;
+  opacity: 0.76;
+}
+
+/* ── LA ESCENA 3D ───────────────────────────────────────────────────────── */
+
+.jmonte__escena {
+  position: relative;
+  max-width: 1080px;
+  height: clamp(300px, 56vh, 560px);
+  margin: 0 auto clamp(1.4rem, 3.5vw, 2.6rem);
+  overflow: hidden;
+  background: #ded0b4;
+  border: 1px solid var(--jm-borde);
+  border-radius: 18px;
+  box-shadow: 0 14px 32px rgba(36, 22, 8, 0.16);
+}
+
+.jmonte__escena canvas { display: block; }
+
+.jmonte__cargando,
+.jmonte__ficha {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  padding: 1.4rem;
+  text-align: center;
+}
+
+.jmonte__ficha p {
+  max-width: 46ch;
+  margin: 0;
+  font-size: 0.94rem;
+  opacity: 0.8;
+}
+
+.jmonte__toggle {
+  position: absolute;
+  right: 0.8rem;
+  bottom: 0.8rem;
+  padding: 0.5rem 0.95rem;
+  color: var(--jm-papel);
+  font: inherit;
+  font-size: 0.86rem;
+  background: rgba(36, 22, 8, 0.82);
+  border: 0;
+  border-radius: 999px;
+  cursor: pointer;
+}
+
+.jmonte__toggle:hover { background: rgba(36, 22, 8, 0.95); }
+
+/* ── POSES Y SABERES ────────────────────────────────────────────────────── */
+
+.jmonte__poses,
+.jmonte__saberes {
+  max-width: 1080px;
+  margin: 0 auto clamp(1.4rem, 3.5vw, 2.6rem);
+}
+
+.jmonte__poses h2,
+.jmonte__saberes h2 {
+  margin: 0 0 0.9rem;
+  font-size: clamp(1.1rem, 3vw, 1.4rem);
+  text-align: center;
+}
+
+.jmonte__poses ul,
+.jmonte__saberes ul {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+  gap: 1rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.jmonte__poses li {
+  padding: 1rem 0.9rem;
+  background: rgba(255, 253, 245, 0.68);
+  border: 1px solid var(--jm-borde);
+  border-radius: 16px;
+  text-align: center;
+}
+
+.jmonte__poses li svg { display: block; margin: 0 auto 0.5rem; }
+
+.jmonte__poses li p {
+  margin: 0;
+  font-size: 0.9rem;
+  opacity: 0.84;
+}
+
+.jmonte__saberes li {
+  padding: 1rem;
+  background: rgba(255, 253, 245, 0.68);
+  border: 1px solid var(--jm-borde);
+  border-radius: 16px;
+}
+
+.jmonte__saberes li span {
+  display: block;
+  font-size: 1.5rem;
+  line-height: 1;
+}
+
+.jmonte__saberes li h3 {
+  margin: 0.4rem 0 0.35rem;
+  font-size: 1rem;
+}
+
+.jmonte__saberes li p {
+  margin: 0;
+  font-size: 0.9rem;
+  opacity: 0.84;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .jmonte * { animation-duration: 0.001ms !important; animation-iteration-count: 1 !important; }
+}

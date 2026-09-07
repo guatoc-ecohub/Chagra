@@ -1,13 +1,15 @@
-import { Angelita } from './Angelita.jsx';
+import ChagraAgentAvatar from '../../components/ChagraAgentAvatar.jsx';
+import useAgentAvatarType, { AVATAR_NOMBRE, DEFAULT_AVATAR_TYPE } from '../../hooks/useAgentAvatarType.js';
 import BurbujaAngelita from './BurbujaAngelita.jsx';
 import { useAngelitaGuia } from '../../hooks/useAngelitaGuia.js';
 import './angelita-guia.css';
 
 /*
- * <AngelitaGuia> — Angelita vuela hasta un elemento real de la pantalla, lo
- * señala/invita/mira (el gesto que usted declaró — reutiliza
- * angelitaEstados.js, CERO estados nuevos) y explica QUÉ hay ahí, con
- * criterio agroecológico real. Reutilizable en CUALQUIER vista 2D.
+ * <AngelitaGuia> — la guía histórica conserva su export, pero muestra el
+ * compañero elegido hasta un elemento real de la pantalla, lo señala/invita/
+ * mira (el gesto que usted declaró, reutiliza angelitaEstados.js, CERO estados
+ * nuevos) y explica QUÉ hay ahí, con criterio agroecológico real. Reutilizable
+ * en CUALQUIER vista 2D.
  *
  * ADOPCIÓN EN OTRA PANTALLA (las 3 líneas que hacen falta):
  *
@@ -54,7 +56,13 @@ export function AngelitaGuia({
   recordarCierreId = undefined,
   demoraInicialMs = undefined,
   className = '',
+  AvatarComponent = null,
+  nombreCompai = undefined,
 }) {
+  const [avatarType] = useAgentAvatarType();
+  const especie = avatarType === 'angelita' ? 'abeja-angelita' : avatarType;
+  const nombreElegido = nombreCompai || AVATAR_NOMBRE[avatarType] || AVATAR_NOMBRE[DEFAULT_AVATAR_TYPE];
+  const AvatarActivo = AvatarComponent || ChagraAgentAvatar;
   const guia = useAngelitaGuia(paradas, { activo, tamano, recordarCierreId, demoraInicialMs });
 
   if (!guia.parada) return null;
@@ -78,18 +86,26 @@ export function AngelitaGuia({
           type="button"
           className="ang-guia__cuerpo"
           onClick={avanzar}
-          aria-label={guia.esUltima ? 'Angelita: cerrar la guía' : 'Angelita: ver lo siguiente'}
-        >
-          <Angelita estado={guia.parada.gesto} direccion={guia.direccion} size={tamano} />
+            aria-label={guia.esUltima ? `${nombreElegido}: cerrar la guía` : `${nombreElegido}: ver lo siguiente`}
+          >
+          <AvatarActivo
+            estado={guia.parada.gesto}
+            direccion={guia.direccion}
+            size={tamano}
+            ariaLabel={nombreElegido}
+            especie={avatarType}
+            data-creature={especie}
+          />
         </button>
       </div>
 
       {guia.visible && (
-        <div className="ang-guia__panel" role="group" aria-label="Guía de Angelita">
+        <div className="ang-guia__panel" role="group" aria-label={`Guía de ${nombreElegido}`}>
           <BurbujaAngelita
             mensaje={guia.parada.texto}
             tipo={guia.parada.tipo}
             className="ang-guia__burbuja"
+            permiteEscucha
           />
           <div className="ang-guia__nav">
             {guia.total > 1 && (
@@ -108,7 +124,7 @@ export function AngelitaGuia({
             <button
               type="button"
               className="ang-guia__cerrar"
-              aria-label="Cerrar la guía de Angelita"
+              aria-label={`Cerrar la guía de ${nombreElegido}`}
               onClick={guia.cerrar}
             >
               ×

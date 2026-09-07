@@ -41,6 +41,11 @@ import {
   motasSuelo,
   tallosSuperficie,
   tuboRaizGeom,
+  muestrasDeRed,
+  entornoSuelo,
+  pelusaDeRed,
+  pelosRadicales,
+  hojasSuperficie,
 } from './micorrizas.geom.js';
 
 /* CSS mínimo del lienzo (self-contained: sirve igual en el mockup y en el host
@@ -58,30 +63,33 @@ const CSS = `
 /* ── La RED de micelio: una sola malla fundida (un draw-call), material aditivo
       bioluminiscente con color por vértice. Respira apenas (opacidad). ── */
 function RedMicelio({ geo, reducedMotion }) {
-  const mat = useMemo(
-    () => new THREE.MeshBasicMaterial({
-      vertexColors: true,
-      transparent: true,
-      opacity: 0.92,
-      blending: THREE.AdditiveBlending,
-      depthWrite: false,
-    }),
-    [],
-  );
-  useLayoutEffect(() => () => mat.dispose(), [mat]);
-  // El material es estable (useMemo): la respiración se anima en él directamente.
+  // La respiración muta el material vía ref (el patrón de `Pulsos`): mutar un
+  // valor capturado por el hook viola react-hooks/immutability.
+  const matRef = useRef(null);
   useFrame((st) => {
-    if (reducedMotion) return;
-    mat.opacity = 0.86 + Math.sin(st.clock.elapsedTime * 0.9) * 0.09;
+    if (reducedMotion || !matRef.current) return;
+    matRef.current.opacity = 0.86 + Math.sin(st.clock.elapsedTime * 0.9) * 0.09;
   });
-  return <mesh geometry={geo} material={mat} frustumCulled={false} />;
+  return (
+    <mesh geometry={geo} frustumCulled={false}>
+      <meshBasicMaterial
+        ref={matRef}
+        vertexColors
+        transparent
+        opacity={0.92}
+        blending={THREE.AdditiveBlending}
+        depthWrite={false}
+      />
+    </mesh>
+  );
 }
 
 /* ── Los NODOS del micelio: uniones instanciadas. Arbúsculos (puntas de raíz,
-      cálidos), nodos (verde-blanco) y esporas (malva). Un InstancedMesh. ── */
+      cálidos), nodos (verde-blanco) y esporas (malva). Un InstancedMesh.
+      Esfera suave, no octaedro: un glow facetado delata el poliedro. ── */
 function NodosRed({ nodos }) {
   const ref = useRef(null);
-  const geo = useMemo(() => new THREE.OctahedronGeometry(0.05, 0), []);
+  const geo = useMemo(() => new THREE.SphereGeometry(0.05, 12, 9), []);
   const mat = useMemo(
     () => new THREE.MeshBasicMaterial({ transparent: true, opacity: 0.95, blending: THREE.AdditiveBlending, depthWrite: false }),
     [],
@@ -202,18 +210,63 @@ function Raices({ geo }) {
   return <mesh geometry={geo} material={mat} frustumCulled={false} />;
 }
 
-/* ── La SUPERFICIE: la línea de tierra (y=0) translúcida, con un halo cálido de
-      luz de arriba, y los TALLITOS de las tres hermanas asomando. Da el "arriba"
-      sin robarle protagonismo al subsuelo. ── */
-function Superficie({ tallos }) {
+/* ── El ENTORNO del suelo: pared + techo + piedras en UNA malla horneada por
+      vértice (la red le hornea su luz encima). Lambert: el relieve fbm
+      responde a la luz tenue de la escena. ── */
+function EntornoSuelo({ geo }) {
+  const mat = useMemo(() => new THREE.MeshLambertMaterial({ vertexColors: true }), []);
+  useLayoutEffect(() => () => mat.dispose(), [mat]);
+  if (!geo) return null;
+  return <mesh geometry={geo} material={mat} frustumCulled={false} />;
+}
+
+/* ── La PELUSA del micelio: el vello aditivo que convierte el diagrama en masa.
+      Respira a destiempo de la red (desfase fijo) para que el conjunto ondule
+      como organismo y no como un solo dimmer. ── */
+function PelusaRed({ geo, reducedMotion }) {
+  const matRef = useRef(null);
+  useFrame((st) => {
+    if (reducedMotion || !matRef.current) return;
+    matRef.current.opacity = 0.55 + Math.sin(st.clock.elapsedTime * 0.7 + 1.7) * 0.1;
+  });
+  if (!geo) return null;
+  return (
+    <lineSegments geometry={geo} frustumCulled={false}>
+      <lineBasicMaterial
+        ref={matRef}
+        vertexColors
+        transparent
+        opacity={0.62}
+        blending={THREE.AdditiveBlending}
+        depthWrite={false}
+      />
+    </lineSegments>
+  );
+}
+
+/* ── Los PELOS RADICALES: materia (blending normal), no luz. ── */
+function PelosRaiz({ geo }) {
+  const mat = useMemo(
+    () => new THREE.LineBasicMaterial({ vertexColors: true, transparent: true, opacity: 0.8 }),
+    [],
+  );
+  useLayoutEffect(() => () => mat.dispose(), [mat]);
+  if (!geo) return null;
+  return <lineSegments geometry={geo} material={mat} frustumCulled={false} />;
+}
+
+/* ── La SUPERFICIE: la franja de luz donde el sol toca la tierra, los TALLOS
+      de las tres hermanas y sus HOJAS de verdad (malla fundida horneada — los
+      conos `flatShading` de la versión anterior eran la estética prohibida).
+      El techo de tierra ya lo pone `EntornoSuelo`. ── */
+function Superficie({ tallos, hojasGeo }) {
+  const matHojas = useMemo(
+    () => new THREE.MeshLambertMaterial({ vertexColors: true, side: THREE.DoubleSide }),
+    [],
+  );
+  useLayoutEffect(() => () => matHojas.dispose(), [matHojas]);
   return (
     <group>
-      {/* la lámina de tierra vista desde abajo: oscura y translúcida (el techo
-          del mundo subterráneo) */}
-      <mesh position={[0, 0, SUELO.zAtras + (SUELO.z0 - SUELO.zAtras) / 2]} rotation={[-Math.PI / 2, 0, 0]}>
-        <planeGeometry args={[SUELO.ancho + 1.5, SUELO.z0 - SUELO.zAtras + 1.2]} />
-        <meshBasicMaterial color={PALETA.tierraAlta} transparent opacity={0.55} depthWrite={false} side={THREE.DoubleSide} />
-      </mesh>
       {/* una franja de luz difusa donde el sol toca la tierra (arriba) */}
       <mesh position={[0, 0.02, SUELO.z0 + 0.2]} rotation={[-Math.PI / 2.4, 0, 0]}>
         <planeGeometry args={[SUELO.ancho + 2, 1.6]} />
@@ -222,23 +275,12 @@ function Superficie({ tallos }) {
       {tallos.map((t) => (
         <group key={t.id} position={[t.x, 0, t.z]}>
           <mesh position={[0, t.alto / 2, 0]}>
-            <cylinderGeometry args={[0.03, 0.05, t.alto, 6]} />
+            <cylinderGeometry args={[0.03, 0.05, t.alto, 8]} />
             <meshLambertMaterial color={t.tinte} />
           </mesh>
-          {/* hojita/penacho según planta */}
-          {t.ahuyama ? (
-            <mesh position={[0.18, 0.08, 0.06]} rotation={[-Math.PI / 2, 0, 0.3]}>
-              <coneGeometry args={[0.22, 0.05, 5]} />
-              <meshLambertMaterial color={t.tinte} flatShading />
-            </mesh>
-          ) : (
-            <mesh position={[0.09, t.alto * 0.72, 0]} rotation={[0, 0, -0.7]}>
-              <coneGeometry args={[0.05, 0.34, 4]} />
-              <meshLambertMaterial color={t.tinte} flatShading />
-            </mesh>
-          )}
         </group>
       ))}
+      {hojasGeo && <mesh geometry={hojasGeo} material={matHojas} frustumCulled={false} />}
     </group>
   );
 }
@@ -270,18 +312,38 @@ function Mundo({ tier, reducedMotion, hotspots, onHotspot }) {
     const pulsos = pulsosDeRed(hilos, P.pulsos, 53);
     const motas = motasSuelo(P.motas, 71);
     const tallos = tallosSuperficie();
-    return { nodos, curvasHilo, redGeo, raizGeo, pulsos, motas, tallos };
+    // la pasada de arte «suelo vivo»: el entorno horneado con la luz de la
+    // red, la pelusa del micelio, los pelos radicales y las hojas de verdad
+    const entornoGeo = entornoSuelo(
+      { luces: muestrasDeRed(hilos), seg: P.segEntorno, piedras: P.piedras }, 91,
+    );
+    const pelusaGeo = pelusaDeRed(
+      hilos, puntasRaiz, { porHilo: P.pelusaPorHilo, manto: P.mantoPorPunta }, 97,
+    );
+    const pelosGeo = pelosRadicales(raizCurvas, { porRaiz: P.pelosPorRaiz }, 101);
+    const hojasGeo = hojasSuperficie(103);
+    return {
+      nodos, curvasHilo, redGeo, raizGeo, pulsos, motas, tallos,
+      entornoGeo, pelusaGeo, pelosGeo, hojasGeo,
+    };
   }, [P]);
 
   useLayoutEffect(() => () => {
     datos.redGeo?.dispose();
     datos.raizGeo?.dispose();
+    datos.entornoGeo?.dispose();
+    datos.pelusaGeo?.dispose();
+    datos.pelosGeo?.dispose();
+    datos.hojasGeo?.dispose();
   }, [datos]);
 
   return (
     <>
       <color attach="background" args={[PALETA.tierra]} />
-      <fog attach="fog" args={[PALETA.tierra.getHex(), 5.5, 13]} />
+      {/* niebla un paso más lejos que antes: la pared del fondo ahora tiene
+          relieve y horneado que merecen leerse; la hondura la sigue dando el
+          degradado de profundidad de la propia pared */}
+      <fog attach="fog" args={[PALETA.tierra.getHex(), 6.2, 14.5]} />
 
       {/* Luz: tenue y cálida desde ARRIBA (el sol que apenas entra a la tierra) +
           un relleno frío bajo tierra. La red no depende de la luz (brilla sola);
@@ -291,15 +353,15 @@ function Mundo({ tier, reducedMotion, hotspots, onHotspot }) {
       <directionalLight position={[2, 8, 4]} intensity={0.9} color="#ffe6bf" />
       <pointLight position={[0, -1.8, 1.2]} intensity={0.5} color="#37d6b0" distance={9} decay={2} />
 
-      {/* backdrop de tierra con degradado (profundidad) */}
-      <mesh position={[0, -SUELO.hondo / 2, SUELO.zAtras - 0.6]}>
-        <planeGeometry args={[SUELO.ancho + 4, SUELO.hondo + 2]} />
-        <meshBasicMaterial color={PALETA.tierra} />
-      </mesh>
+      {/* el suelo VIVO: pared con relieve, techo que cuelga, piedras — y la
+          luz de la red horneada encima (reemplaza el backdrop plano) */}
+      <EntornoSuelo geo={datos.entornoGeo} />
 
-      <Superficie tallos={datos.tallos} />
+      <Superficie tallos={datos.tallos} hojasGeo={datos.hojasGeo} />
       <Raices geo={datos.raizGeo} />
+      <PelosRaiz geo={datos.pelosGeo} />
       <RedMicelio geo={datos.redGeo} reducedMotion={reducedMotion} />
+      <PelusaRed geo={datos.pelusaGeo} reducedMotion={reducedMotion} />
       <NodosRed nodos={datos.nodos} />
       <Pulsos curvas={datos.curvasHilo} pulsos={datos.pulsos} reducedMotion={reducedMotion} />
       <Motas motas={datos.motas} reducedMotion={reducedMotion} />

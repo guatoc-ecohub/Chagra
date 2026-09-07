@@ -1,5 +1,6 @@
-import { useEffect, useState } from 'react';
+import { createElement, useEffect, useMemo, useState } from 'react';
 import { Activity, Wifi, WifiOff, ThermometerSun, CloudSun, Brain, Sparkles } from 'lucide-react';
+import { deriveLivePulse, getMostRecentActivity, livePulseCopy } from '../../utils/livePulse.js';
 
 /**
  * AIStatusFooter — barra inferior con status proactivo IA general.
@@ -146,7 +147,7 @@ function getAgentChip(hint) {
     };
 }
 
-function Chip({ Icon, label, sub, color, bg, border, onClick, ariaLabel }) {
+function Chip({ Icon: IconComponent, label, sub, color, bg, border, onClick, ariaLabel }) {
     return (
         <button
             type="button"
@@ -154,7 +155,7 @@ function Chip({ Icon, label, sub, color, bg, border, onClick, ariaLabel }) {
             aria-label={ariaLabel}
             className={`flex-1 min-w-0 flex items-center gap-2 px-3 py-2.5 rounded-xl border backdrop-blur-xl transition-all active:scale-[0.97] hover:-translate-y-0.5 ${bg} ${border}`}
         >
-            <Icon size={18} className={`shrink-0 ${color}`} />
+            {createElement(IconComponent, { size: 18, className: `shrink-0 ${color}` })}
             <div className="flex flex-col items-start min-w-0">
                 <span className={`text-xs font-black tracking-wide truncate w-full text-left ${color}`}>{label}</span>
                 <span className="text-[10px] font-medium text-slate-400 truncate w-full text-left">{sub}</span>
@@ -165,15 +166,29 @@ function Chip({ Icon, label, sub, color, bg, border, onClick, ariaLabel }) {
 
 export default function AIStatusFooter({ sensors = [], climaSnapshot = null, agentHint = null, onNavigate }) {
     const [animateIn, setAnimateIn] = useState(false);
+    const [now, setNow] = useState(() => Date.now());
 
     useEffect(() => {
         const t = setTimeout(() => setAnimateIn(true), 100);
-        return () => clearTimeout(t);
+        const clock = setInterval(() => setNow(Date.now()), 30_000);
+        return () => {
+            clearTimeout(t);
+            clearInterval(clock);
+        };
     }, []);
 
     const sensorChip = getSensorChip(sensors);
     const climaChip = getClimaChip(climaSnapshot);
     const agentChip = getAgentChip(agentHint);
+    const lastActivityAt = useMemo(() => getMostRecentActivity(sensors), [sensors]);
+    const pulseState = deriveLivePulse(lastActivityAt, now);
+    const pulse = livePulseCopy(pulseState, lastActivityAt, now);
+    const pulseColor = {
+        live: 'text-morpho-glow',
+        idle: 'text-amber-300',
+        stale: 'text-rose-300',
+        unknown: 'text-slate-400',
+    }[pulseState];
 
     return (
         <div
@@ -187,12 +202,17 @@ export default function AIStatusFooter({ sensors = [], climaSnapshot = null, age
             {/* Header con tokens morpho (theme-aware: cyan neón en biopunk,
                 salvia/verde en los temas claros) en vez de cyan-* crudo. */}
             <div className="flex items-center gap-2 mb-2 px-1">
-                <Activity size={14} className="text-morpho motion-safe:animate-pulse" />
+                <Activity size={14} className={`${pulseColor} ${pulseState === 'live' ? 'motion-safe:animate-pulse' : ''}`} />
                 <span className="text-[10px] font-bold text-morpho-glow uppercase tracking-[0.18em]">
                     Status proactivo IA
                 </span>
-                <span className="px-1.5 py-0.5 rounded text-[9px] font-black bg-morpho/20 text-morpho-glow uppercase tracking-wider">
-                    Live
+                <span
+                    role="status"
+                    aria-live="polite"
+                    title={pulse.detail}
+                    className={`px-1.5 py-0.5 rounded text-[9px] font-black bg-morpho/20 uppercase tracking-wider ${pulseColor}`}
+                >
+                    {pulse.label}
                 </span>
                 <div className="flex-1 h-px bg-gradient-to-r from-morpho/40 to-transparent" />
             </div>

@@ -14,7 +14,9 @@
 import { describe, it, expect, afterEach } from 'vitest';
 import { render, cleanup } from '@testing-library/react';
 import { Jaguar } from '../Jaguar.jsx';
+import { Ardilla } from '../Ardilla.jsx';
 import { auraDeBicho } from '../transformacion.js';
+import { JAGUAR_PODER_KART } from '../jaguarIdentidad.js';
 
 afterEach(cleanup);
 
@@ -191,6 +193,45 @@ describe('6. Toque místico — el animal-espíritu del chamán (permanente y su
     // el jaguar-espíritu se revela: aura + estrellas viven dentro del wrapper
     expect(wrap.querySelector('.jaguar-aura-espectral')).toBeTruthy();
     expect(wrap.querySelectorAll('.jaguar-estrella').length).toBeGreaterThan(1);
+  });
+});
+
+describe('7. Paisaje del miedo — su poder de kart (landscape of fear)', () => {
+  it('paisajeDelMiedo marca el estado y dibuja la onda de presencia', () => {
+    const { container } = render(<Jaguar tier="medio" paisajeDelMiedo animated />);
+    expect(container.querySelector('svg').getAttribute('data-paisaje-del-miedo')).toBe('1');
+    // la onda de miedo se expande por el terreno (anillos concéntricos)
+    expect(container.querySelectorAll('.jaguar-miedo-onda').length).toBeGreaterThan(1);
+  });
+
+  it('sin paisajeDelMiedo NO hay onda (frugal, avatar sereno)', () => {
+    const { container } = render(<Jaguar tier="medio" animated />);
+    expect(container.querySelector('svg').getAttribute('data-paisaje-del-miedo')).toBeNull();
+    expect(container.querySelector('.jaguar-miedo-onda')).toBeNull();
+  });
+
+  it('el poder es DATO canónico de ÁREA, derivado de la ecología (para el kart)', () => {
+    // mismo shape que el `poder` de los pilotos benéficos del kart (id/alcance/
+    // titulo/efecto/porQue): el juego lo consume sin traducción.
+    expect(JAGUAR_PODER_KART.id).toBe('paisaje-del-miedo');
+    expect(JAGUAR_PODER_KART.alcance).toBe('area');
+    expect(JAGUAR_PODER_KART.porQue).toMatch(/depredador|paisaje del miedo/i);
+  });
+});
+
+describe('8. Prohibido el mortal — el jaguar ES MÍSTICO (regla dura 2026-09-03)', () => {
+  it('vivo NO monta rh-antic/rh-travieso (la vuelta de campana está prohibida)', () => {
+    const { container } = render(<Jaguar tier="medio" animated />);
+    expect(container.querySelector('.rh-antic')).toBeNull();
+    expect(container.querySelector('.rh-travieso')).toBeNull();
+    // el corte es por místico, no por pose: tampoco en marcha ni en línea
+    expect(container.querySelector('svg[data-creature="jaguar"] .rh-antic')).toBeNull();
+  });
+
+  it('control negativo: la casa SÍ monta rh-antic en otras criaturas (ardilla)', () => {
+    const { container } = render(<Ardilla tier="alto" animated />);
+    // si esto fallara, la sonda de arriba no estaría detectando nada
+    expect(container.querySelector('.rh-antic')).toBeTruthy();
   });
 });
 

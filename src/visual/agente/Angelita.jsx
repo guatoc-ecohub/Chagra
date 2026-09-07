@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import './angelita-agente.css';
+import { CompaiAgente } from './CompaiAgente.jsx';
 import { AbejaAngelita } from '../creatures/AbejaAngelita.jsx';
 import { RH_INK, RH_CHEEK } from '../creatures/_rubberhose.jsx';
 import { ABEJA_PALETA } from '../creatures/abejaIdentidad.js';
@@ -43,8 +44,11 @@ import {
  *   contenta     → brinca celebrando (pose celebra) con chispas doradas.
  *   preocupada   → alerta honesta: cejas fruncidas, gota de sudor, aro coral
  *                  que late, vibración inquieta. Para plaga/sequía/riesgo.
- *   no-se        → LA HONESTA: se encoge de hombros con las palmas arriba y
- *                  un "?" dibujado a mano. Sonríe: no saber no la avergüenza.
+ *   no-se        → LA HONESTA: NIEGA CON LA CABEZA mientras se encoge de
+ *                  hombros con las palmas arriba y un "?" dibujado a mano.
+ *                  Sonríe: no saber no la avergüenza. El texto que la
+ *                  acompaña debe decir "No sé" claro, sin rodeos
+ *                  (angelitaEstados.TEXTO_NO_SE).
  *   senala       → guía: se inclina y apunta (pose señala) con destello en
  *                  el punto señalado.
  *   invita       → guía: se inclina hacia usted y hace "venga" con la manita.
@@ -204,6 +208,18 @@ function MotaDeVilano() {
   );
 }
 
+/* Las zetitas del sueño (momento 'cabecea'): dos z dibujadas a mano que brotan
+   junto a su cabeza mientras se le van los ojos — y se ESFUMAN de golpe cuando
+   despierta del brinco (el CSS las corta con el susto). Trazo de la casa. */
+function Zetitas() {
+  return (
+    <g stroke={RH_INK} strokeLinecap="round" strokeLinejoin="round" fill="none" aria-hidden="true">
+      <path className="agt-zzz" d="M12.6,-9.2 h2.5 l-2.5,2.4 h2.5" strokeWidth="0.8" />
+      <path className="agt-zzz agt-zzz--2" d="M15.8,-13.2 h1.8 l-1.8,1.8 h1.8" strokeWidth="0.65" />
+    </g>
+  );
+}
+
 /**
  * Angelita — el cuerpo visible del agente de Chagra. Solo arte: el host cablea
  * la inteligencia y este componente la ENCARNA por estados.
@@ -211,8 +227,8 @@ function MotaDeVilano() {
  * @param {Object} props
  * @param {string} [props.estado='acompana']  estado conversacional (o sinónimo).
  * @param {number|string|null} [props.confianza=null]  0..1 o 'alta'|'media'|'baja'.
- * @param {'derecha'|'izquierda'} [props.direccion='derecha']  hacia dónde mira/
- *   señala/invita (izquierda = espejo del dibujo completo).
+ * @param {'derecha'|'izquierda'} [props.direccion='derecha']  compatibilidad
+ *   de API para la guía. La presencia nunca voltea el arte.
  * @param {number} [props.size=96]
  * @param {string} [props.className]
  * @param {boolean} [props.animated=true]  false = fotograma digno.
@@ -224,11 +240,14 @@ function MotaDeVilano() {
  * @param {number} [props.energia]
  * @param {string|null} [props.mundoId]  su herramienta por mundo (PropEnMano).
  * @param {boolean} [props.lineBoil]  contorno que hierve (momentos heroicos).
- * @param {boolean|'poniendose'} [props.gafas]  gafas para la entrada teatral.
- * @param {string} [props.cejas]  expresión de cejas opcional.
+ * @param {boolean} [props.idleCerebro=true]  false apaga SOLO el reloj de
+ *   micro-gestos (mira/distraída-con-mota/acicala/rasca/sacude/posa) del idle
+ *   'acompana' — el aleteo y el boil base de <AbejaAngelita> siguen intactos.
+ *   Para momentos "viva pero quieta" (la pausa de AngelitaEntrada antes del
+ *   número: nada que compita con la entrada que viene).
  * @param {string} [props.title]  pisa la narración aria derivada del estado.
  */
-export function Angelita({
+function AngelitaRig({
   estado = 'acompana',
   confianza = null,
   direccion = 'derecha',
@@ -243,6 +262,7 @@ export function Angelita({
   energia = 1,
   mundoId = null,
   lineBoil = false,
+  idleCerebro = true,
   /* Gafas de sol (día soleado / entrada teatral): passthrough al cuerpo.
      false | true | 'poniendose' (la caída one-shot). */
   gafas = false,
@@ -250,6 +270,9 @@ export function Angelita({
      (CEJAS_DE_ESTADO — el que habla hace eyebrow-flash, la contenta arquea). */
   cejas = undefined,
   title = undefined,
+  'data-agt-estado': dataEstado = undefined,
+  'data-pose': dataPose = undefined,
+  'data-visema': dataVisema = undefined,
   ...rest
 }) {
   const e = estadoCanonico(estado);
@@ -268,7 +291,7 @@ export function Angelita({
   /* ═══ IDLE-CEREBRO (solo acompana) — el reloj con jitter que hojea el
      repertorio de micro-gestos. flota → gesto → flota…; posa encadena
      posada → despega. Gates: animated, estado, tier bajo, reduced-motion. */
-  const idleActivo = vivo && e === 'acompana' && tier !== 'bajo';
+  const idleActivo = vivo && e === 'acompana' && tier !== 'bajo' && idleCerebro;
   const [momento, setMomento] = useState('flota');
   useEffect(() => {
     if (!idleActivo || prefiereQuietud()) return undefined;
@@ -305,7 +328,7 @@ export function Angelita({
     let soltar = 0;
     let px = 0;
     let py = 0;
-    const signo = direccion === 'izquierda' ? -1 : 1; // el espejo voltea la x
+    const signo = 1;
     const liberar = () => svg.removeAttribute('data-agt-mira');
     const mirar = () => {
       raf = 0;
@@ -341,7 +364,7 @@ export function Angelita({
       svg.style.removeProperty('--agt-mx');
       svg.style.removeProperty('--agt-my');
     };
-  }, [sigueUsted, direccion]);
+  }, [sigueUsted]);
 
   // El estado tiñe el ánimo del cuerpo base (aura/antics) salvo que el host
   // mande el suyo: contenta brilla 'pleno', preocupada se pone 'atento'.
@@ -519,6 +542,11 @@ export function Angelita({
   const mota = (vivo && e === 'acompana' && momento === 'distraida')
     ? <MotaDeVilano />
     : null;
+  // Las zetitas del 'cabecea': viven montadas durante todo el acompana
+  // (invisibles, opacity 0) y las DISPARA el selector [data-agt-idle='cabecea']
+  // del CSS — así el one-shot corre cada vez que el gesto entra, sin depender
+  // de un remontaje de React.
+  const zetitas = (vivo && e === 'acompana') ? <Zetitas /> : null;
   // SEÑALA — el destello donde apunta (abajo-derecha, donde cae su bracito).
   const destelloPoi = e === 'senala' ? (
     <g
@@ -567,12 +595,9 @@ export function Angelita({
      estado) → cuerpo (abeja + señales de cara, UN wrapper que los estados
      mueven junto) → aire (burbuja, ondas, chispas, signos, la mota).
      `.agt-vuelo` va con key=estado: al cambiar de estado se REMONTA y su
-     animación de entrada (anticipación → overshoot → asienta) vuelve a correr
-     — la transición fluye en vez de saltar. direccion 'izquierda' espeja TODO
-     el dibujo (señala/invita hacia el otro lado); el ritmo propio de parpadeo
-     viaja como CSS vars. */
-  const espejo = direccion === 'izquierda' ? { transform: 'scaleX(-1)' } : null;
-  const estilo = { ...ritmoPropio, ...espejo };
+     animación de entrada vuelve a correr. La transición conserva el arte sin
+     voltear; el ritmo propio de parpadeo viaja como CSS vars. */
+  const estilo = { ...ritmoPropio };
   return (
     <svg
       ref={svgRef}
@@ -584,7 +609,7 @@ export function Angelita({
       role="img"
       aria-label={aria}
       data-agente="angelita"
-      data-agt-estado={e}
+      data-agt-direccion={direccion}
       data-agt-vivo={vivo ? '1' : undefined}
       /* El visema del TTS también en el root: el CSS acopla las ondas de miel
          al movimiento real de la boquita (V1 = silencio). Solo se estampa si
@@ -594,6 +619,11 @@ export function Angelita({
       data-agt-confianza={nivel || undefined}
       data-tier={tier || undefined}
       {...rest}
+      // El caller puede proyectar un estado transversal como locomoción sin
+      // ampliar el vocabulario conversacional interno de Angelita.
+      data-agt-estado={dataEstado ?? e}
+      data-pose={dataPose ?? (vivo ? pose : undefined)}
+      data-visema={dataVisema ?? visema ?? undefined}
     >
       <title>{aria}</title>
       {halo}
@@ -629,7 +659,64 @@ export function Angelita({
       {estelasInvita}
       {virutasOlor}
       {mota}
+      {zetitas}
     </svg>
+  );
+}
+
+/*
+ * Adaptador del perfil dorado. CompaiAgente resuelve el contrato común y este
+ * adaptador conserva el cuerpo histórico sin dejar que los metadatos del
+ * registro terminen como props desconocidas sobre el SVG.
+ */
+function AdaptadorAngelita({
+  especie: _especie,
+  creatureSlug: _creatureSlug,
+  capacidades: _capacidades,
+  perfil: _perfil,
+  idlePerfil: _idlePerfil,
+  climaPerfil: _climaPerfil,
+  pose: _pose,
+  reducedMotion: _reducedMotion,
+  'data-agt-especie': dataEspecie,
+  'data-creature': dataCreature,
+  'data-agt-estado': dataEstado,
+  'data-pose': dataPose,
+  'data-visema': dataVisema,
+  'data-clima': dataClima,
+  'data-tier': dataTier,
+  ...props
+}) {
+  return (
+    <AngelitaRig
+      {...props}
+      data-agt-especie={dataEspecie}
+      data-creature={dataCreature}
+      data-agt-estado={dataEstado}
+      data-pose={dataPose}
+      data-visema={dataVisema}
+      data-clima={dataClima}
+      data-tier={dataTier}
+    />
+  );
+}
+
+/**
+ * Fachada histórica de Angelita sobre el contrato común de Compai.
+ *
+ * `chrome={false}` es intencional: Angelita ya contiene sus halos, ondas,
+ * burbujas, señales y gestos aprobados. El shell común sigue resolviendo el
+ * perfil, la pose y los atributos, pero no duplica una señal visible.
+ */
+export function Angelita(props) {
+  return (
+    <CompaiAgente
+      {...props}
+      especie="angelita"
+      chrome={false}
+      preserveRigAnimation
+      adaptador={AdaptadorAngelita}
+    />
   );
 }
 

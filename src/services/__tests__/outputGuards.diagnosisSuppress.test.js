@@ -215,7 +215,7 @@ describe('#348 applyOutputGuards — integración path PWA (síntoma vago sin fo
       hadVision: false,
     });
     expect(out.modified).toBe(true);
-    expect(out.reasons).toContain('diagnostico_sin_foto');
+    expect(out.reasons).toContain('triaje_sintoma_observable');
     expect(out.text.toLowerCase()).not.toContain('alternaria');
     expect(out.text).not.toMatch(/Alternaria\s+solani/);
     expect(out.text).toMatch(/foto|c[aá]mara/i);

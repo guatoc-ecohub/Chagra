@@ -1020,13 +1020,42 @@ Hint del tool: ${hint}
 NO INVENTES valores numéricos ni listas para esos campos. Responde literal: "El catálogo Chagra todavía no tiene documentados los valores de [campo] para [especie]. Tu consulta queda como pendiente de curaduría editorial."`
       : '';
 
+  const speciesForYield = result && typeof result === 'object' ? result.species || result : null;
+  const yieldKeys = [
+    'rendimiento',
+    'yield',
+    'rendimientos',
+    'productividad',
+    'produccion',
+    'producción',
+    'rendimiento_promedio_t_ha',
+    'rendimiento_kg_ha',
+    'yield_kg_ha',
+    'cosecha_estimada_kg_por_planta',
+  ];
+  const hasYield =
+    speciesForYield &&
+    yieldKeys.some((key) => {
+      const value = speciesForYield[key];
+      if (value === null || value === undefined || value === '') return false;
+      if (typeof value === 'string' && /slotpendiente|pendiente|sin dato|no document/i.test(value)) return false;
+      return true;
+    });
+  const missingYieldWarning =
+    toolEvidence.tool === 'get_species' && speciesForYield && !hasYield
+      ? `
+
+⚠️ RENDIMIENTO = SlotPendiente.
+Esta ficha no contiene una cifra de rendimiento verificada para la especie y sistema consultados. No inventes kg/ha, kg/planta ni porcentajes. Responde literalmente: "SlotPendiente: rendimiento pendiente de curaduría editorial. Fuente: catálogo Chagra, ficha sin campo de rendimiento verificado."`
+      : '';
+
   // Caso "found:true" — wording autoritativo (PR #998) condensado.
   return `
 
 === DATOS VERIFICADOS (chagra-agro-mcp tool: ${toolEvidence.tool}) — VERDAD AUTORITATIVA ===
 Estos datos vienen del knowledge graph del catálogo Chagra (Apache AGE, validado). RESPONDE BASADO EXCLUSIVAMENTE en ellos: NO inventes especies que no estén aquí, NO los mezcles con el inventario de la finca del usuario, cita los nombres exactos (común + científico). Si el bloque no contiene la respuesta, dilo: "El catálogo Chagra no tiene esa relación documentada todavía" — NO inventes.
 ${payload}${truncated ? '\n<!-- nota interna sistema: record truncado para ahorrar contexto. NO lo menciones al usuario ni digas "truncated". Responde con los datos visibles arriba. -->' : ''}
-=== FIN DATOS VERIFICADOS ===${emptyFieldsWarning}
+=== FIN DATOS VERIFICADOS ===${emptyFieldsWarning}${missingYieldWarning}
 
 RESPONDE SOLO a lo que el usuario preguntó usando ÚNICAMENTE los datos verificados de arriba.`;
 };

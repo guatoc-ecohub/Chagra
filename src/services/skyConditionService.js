@@ -44,6 +44,8 @@
  *   - ENSO Andes: El Niño seco/soleado, La Niña nublado/lluvioso (DR-MISSION-2/4).
  */
 
+import { pisoDeFinca } from '../visual/mundo3d/pisosTermicos.js';
+
 const LS_KEY = 'chagra:sky:snapshot-v1';
 const CACHE_TTL_MS = 30 * 60 * 1000;
 const FETCH_TIMEOUT_MS = 8000;
@@ -85,14 +87,16 @@ function ensoFamily(phase) {
   return 'neutral';
 }
 
-/** Piso térmico Caldas/IDEAM (slug sin tilde, igual que alertEngine). */
+/**
+ * Piso térmico de FINCA (slug sin tilde, igual que alertEngine). Desde
+ * 2026-09-04 delega en el canónico `pisoDeFinca` de pisosTermicos.js (las 7
+ * cotas de la Sierra colapsadas a 4 en UN solo lugar): superpáramo y nival
+ * caen en `paramo`, nunca en el default de 3 °C de alertThresholds.
+ */
 export function pisoFromMsnm(msnm) {
   const n = Number(msnm);
   if (!Number.isFinite(n)) return null;
-  if (n >= 3000) return 'paramo';
-  if (n >= 2000) return 'frio';
-  if (n >= 1000) return 'templado';
-  return 'calido';
+  return pisoDeFinca(n);
 }
 
 /**

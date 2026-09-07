@@ -36,7 +36,15 @@ export default defineConfig({
       // entrada alimentaria debe traer su bloque de seguridad no vacío.
       'catalog/__tests__/**/*.test.{js,mjs}',
     ],
-    exclude: ['node_modules', 'dist', 'tests/*.spec.js'],
+    exclude: [
+      'node_modules',
+      'dist',
+      'tests/*.spec.js',
+      // 2026-09-04: las láminas-viva archivadas viven en disco frío como
+      // symlinks a rutas fuera del repo. Su suite y su componente no corren
+      // en vitest (Vite no sirve archivos fuera de la raíz del proyecto).
+      'src/visual/creatures/_archivo/**',
+    ],
     css: false,
     testTimeout: 30000,
     coverage: {

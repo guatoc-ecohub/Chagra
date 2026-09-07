@@ -20,7 +20,7 @@ const BM25_PARAMS = {
 const BM25_WEIGHT = 1.0;
 const SEMANTIC_WEIGHT = 1.5;
 
-// ── Kill-switch REVERSIBLE de la capa SEMÁNTICA (arctic-embed2) ────────────
+// ── Kill-switch REVERSIBLE de la capa SEMÁNTICA (nomic-embed-text) ────────────
 // La semántica (similitud coseno sobre embeddings snowflake-arctic-embed2) va
 // ACTIVADA por defecto en producción — es el comportamiento aprobado: mejora
 // la resolución folk (papa criolla↔Solanum phureja, broca↔Hypothenemus,
@@ -32,8 +32,8 @@ const SEMANTIC_WEIGHT = 1.5;
 // valor ⇒ ON (default seguro para prod). Ver .env.example y docs/RAG.md.
 //
 // Por qué existe el flag y no es "siempre on": la mitad SEMÁNTICA embebe la
-// query EN VIVO vía Ollama (embedQuery). Si el embedder arctic-embed2 (4.6 GB)
-// co-reside con granite3.3:8b (~7.2 GB) en la M6000 (12 GiB) puede disparar un
+// query EN VIVO vía Ollama (embedQuery). Si el embedder (nomic-embed-text, 588 MB)
+// co-reside con gemma4:e2b (~8.1 GB) en la M6000 (12 GiB) puede disparar un
 // cudaMalloc OOM que tumba al agente. La mitigación de runtime es
 // keep_alive:'0s' (ver embedQuery); este flag es el kill-switch si aún así hay
 // presión de VRAM en prod.
@@ -203,61 +203,78 @@ function resolveSpeciesSlug(doc, speciesSlug = null) {
   return '';
 }
 
+function normalizeKey(key) {
+  return String(key)
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '');
+}
+
+function formatKeyLabel(key) {
+  return String(key)
+    .replace(/_/g, ' ')
+    .replace(/([a-z])([A-Z])/g, '$1 $2')
+    .trim();
+}
+
 /**
- * Claves que NO se indexan como dato corto: son identificadores/plumbing y
- * solo diluirían el IDF del BM25 sin responder ninguna pregunta del campesino.
- * Se comparan contra el ÚLTIMO segmento de la clave (`requirements.id` → `id`).
+ * Campos técnicos/plumbing que NO se deben indexar porque diluyen el IDF
+ * y no tienen valor semántico para el usuario (ids, slugs, versiones, timestamps).
  */
-const CLAVES_RUIDO = new Set([
-  'id', 'slug', 'uuid', '_id', 'key', 'ref', 'url', 'href', 'src', 'icon',
-  'version', 'schema_version', 'orden', 'order', 'index', 'idx', 'color', 'hex',
+const PLUMBING_FIELDS = new Set([
+  'id', 'slug', 'species_slug', 'speciesid', 'version', 'created_at', 'updated_at', 'timestamp',
+  'createdat', 'updatedat', 'uuid', 'key', '_id', '_key',
 ]);
 
-/** true si la clave es plumbing y su valor corto no aporta recuperación. */
-function esClaveRuido(clavePlana) {
-  const ultimo = String(clavePlana).split('.').pop().replace(/\[\d+\]$/, '');
-  return CLAVES_RUIDO.has(ultimo.toLowerCase());
+function isContextualField(key, val) {
+  if (typeof val === 'number' && Number.isFinite(val)) return true;
+  const normalizedKey = normalizeKey(key);
+  return /(^|[^a-z0-9])(clima|ph|altitud|temperatura|dosis|humedad|distancia|msnm|thermal|zone)([^a-z0-9]|$)/.test(normalizedKey);
+}
+
+function buildContextualText(key, val) {
+  const label = formatKeyLabel(key);
+  const value = typeof val === 'string' ? val.trim() : String(val);
+  return label ? `${label} ${value}` : value;
+}
+
+// Un passage vale la pena indexar si tiene contenido semántico, no si es largo.
+// El umbral viejo `length > 20` botaba términos cortos valiosos ("roya", "broca",
+// "papa criolla") mientras dejaba pasar ruido largo. Ahora: ≥3 chars Y con al
+// menos una palabra alfabética de ≥3 letras (bota "12", ids hex, "si"/"no").
+function esTextoIndexable(v) {
+  if (typeof v !== 'string') return false;
+  const t = v.trim();
+  if (t.length < 3) return false;
+  return /[a-záéíóúñ]{3,}/i.test(t);
 }
 
 export function flattenDoc(doc, prefix = '', speciesSlug = null) {
   const slug = resolveSpeciesSlug(doc, speciesSlug);
   const passages = [];
-
-  // Un dato corto sin su clave es inservible: "calido" suelto no dice nada, y
-  // "0" menos. Se indexa `clave: valor` para que la clave aporte la semántica y
-  // el BM25 pueda casar "zona termica calido" contra `thermal_zones: calido`.
-  const addDatoCorto = (key, val) => {
-    const clave = `${prefix}${key}`;
-    if (esClaveRuido(clave)) return;
-    const legible = String(key).replace(/[_.]/g, ' ').trim();
-    passages.push({ key: clave, text: `${legible}: ${val}`, species: slug });
-  };
-
+  const fieldLabel = (key) => formatKeyLabel(`${prefix}${key}`.replace(/\.$/, ''));
   const addPassage = (key, val) => {
-    if (typeof val === 'string' && val.length > 20) {
-      passages.push({ key: `${prefix}${key}`, text: val, species: slug });
-    } else if (typeof val === 'string' && val.trim()) {
-      // ANTES se caían en silencio: `thermal_zones: 'calido'` (6 chars),
-      // `piso: 'frio'` (4). Medido 2026-07-15: 4.272 de 9.671 valores.
-      addDatoCorto(key, val.trim());
-    } else if (typeof val === 'number' && Number.isFinite(val)) {
-      // ANTES se caían en silencio: `altitud_msnm.optimo_min: 1800`,
-      // `temp_min: 12`. Medido 2026-07-15: 1.770 de 9.671 valores.
-      addDatoCorto(key, val);
+    const path = `${prefix}${key}`;
+    // Skip plumbing/technical fields that don't add semantic value
+    if (PLUMBING_FIELDS.has(normalizeKey(key))) return;
+
+    if (isContextualField(path, val) && (typeof val === 'string' || typeof val === 'number')) {
+      passages.push({ key: path, text: buildContextualText(fieldLabel(key), val), species: slug });
+    } else if (esTextoIndexable(val)) {
+      passages.push({ key: path, text: val, species: slug });
     } else if (Array.isArray(val)) {
       val.forEach((item, i) => {
-        if (typeof item === 'string' && item.length > 20) {
-          passages.push({ key: `${prefix}${key}[${i}]`, text: item, species: slug });
-        } else if (typeof item === 'string' && item.trim()) {
-          addDatoCorto(`${key}[${i}]`, item.trim());
-        } else if (typeof item === 'number' && Number.isFinite(item)) {
-          addDatoCorto(`${key}[${i}]`, item);
+        const itemPath = `${path}[${i}]`;
+        if (isContextualField(itemPath, item) && (typeof item === 'string' || typeof item === 'number')) {
+          passages.push({ key: itemPath, text: buildContextualText(formatKeyLabel(itemPath), item), species: slug });
+        } else if (esTextoIndexable(item)) {
+          passages.push({ key: itemPath, text: item, species: slug });
         } else if (typeof item === 'object' && item !== null) {
-          flattenDoc(item, `${prefix}${key}[${i}].`, slug).forEach((p) => passages.push(p));
+          flattenDoc(item, `${path}[${i}].`, slug).forEach((p) => passages.push(p));
         }
       });
     } else if (typeof val === 'object' && val !== null) {
-      flattenDoc(val, `${prefix}${key}.`, slug).forEach((p) => passages.push(p));
+      flattenDoc(val, `${path}.`, slug).forEach((p) => passages.push(p));
     }
   };
 
@@ -677,29 +694,25 @@ async function embedQuery(queryText) {
       // conserva pero en Ollama 0.24 NO fuerza CPU (verificado en vivo) — la
       // mitigación que sí funciona es keep_alive:'0s'.
       //
-      // FIX P0 (auditoría RAG 2026-07-02): el commit anterior de esta rama
-      // había puesto `model: 'nomic-embed-text'` aquí, con el comentario (falso)
-      // de que "el corpus se generó con nomic-embed-text". El corpus real de
-      // `public/rag-embeddings.json` (verificado: 501 vectores, TODOS de
-      // dimensión 1024) fue re-indexado con snowflake-arctic-embed2 en #1825 y
-      // #1828 — nomic-embed-text emite 768d. Con el modelo equivocado pasan dos
-      // cosas, cualquiera de las dos deja el híbrido en BM25-only silencioso:
-      // (a) si el modelo no está pulled en el host de Ollama, el POST devuelve
-      // 404 y embedQuery() retorna null; (b) si SÍ está pulled, cosineSimilarity()
-      // descarta el par por `a.length !== b.length` (768 vs 1024) y el score
-      // semántico da 0 para TODOS los docs. En ambos casos combineResults()
-      // fusiona con semanticNorm=0 en todo el corpus, así que el ranking final
-      // es idéntico al de BM25-only — exactamente el +0.0pp que reportó el
-      // benchmark de este PR. snowflake-arctic-embed2 es también el modelo
-      // documentado como fuente de verdad en Chagra-strategy/ops/MODELS.md
-      // ("embeddings (RAG) | snowflake-arctic-embed2 | ragRetriever.js:442") y
-      // el que usa scripts/bench-complejos-con-tools.mjs. Restaurado en esta línea.
+      // INVARIANTE CRÍTICA: el modelo de acá DEBE coincidir con el que indexó
+      // `public/rag-embeddings.json`. Si no coinciden, cosineSimilarity() descarta
+      // todos los pares por `a.length !== b.length` (dimensiones distintas) y el
+      // híbrido cae a BM25-only EN SILENCIO (+0.0pp semántico). Ya pasó el
+      // 2026-07-02 con arctic(1024d) vs un corpus nomic(768d).
+      //
+      // 2026-07-23: se MIGRÓ de snowflake-arctic-embed2 a nomic-embed-text, con
+      // el corpus re-indexado a 768d (RAG_EMBED_MODEL=nomic-embed-text
+      // build-rag-embeddings.mjs). Motivo, medido sobre eval/rag-golden.json (50
+      // queries) con AMBOS re-indexados: nomic recall@5 44% / @3 42% / MRR .351
+      // vs arctic 38% / 38% / .340 — nomic gana +6pp@5. Y nomic pesa 274MB vs
+      // 1.3GB de arctic (verificado en VRAM), así que convive con gemma4:e2b sin
+      // que Ollama lo desaloje. Actualizar también Chagra-strategy/ops/MODELS.md.
       body: JSON.stringify({
-        model: 'snowflake-arctic-embed2',
+        model: 'nomic-embed-text', // 2026-07-23: nomic gana recall (+6pp@5) y es +liviano (274MB, convive con gemma sin desalojo). Corpus re-indexado a 768d.
         prompt: queryText,
         // Descarga arctic tras el embed (anti-OOM por co-residencia con granite).
-        keep_alive: '0s',
-        options: { num_gpu: 0 },
+        keep_alive: '5m', // 2026-07-23: nomic (588MB) convive con gemma4:e2b (verificado 8.7/12GB); residente para velocidad. Revertir a '0s' si hay OOM.
+        // 2026-07-23: se quitó num_gpu:0 (heredado de arctic anti-OOM). nomic (565MB) cabe en GPU con gemma; en CPU era lento y la GPU quedaba ociosa.
       }),
       signal: AbortSignal.timeout(TOOL_TIMEOUT_MS),
     });

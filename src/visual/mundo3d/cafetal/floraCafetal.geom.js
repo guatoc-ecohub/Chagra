@@ -133,9 +133,9 @@ export function construirLadera(seg, plano) {
  * el conteo del InstancedMesh de frutos (repartidos entre las matas cargadas).
  */
 export const FLORA_CAFETAL = {
-  alto: { cafeto: 120, cereza: 460, flor: 90, guamo: 10, nogal: 4, platano: 9, hojarasca: 14, piedra: 6 },
-  medio: { cafeto: 70, cereza: 250, flor: 40, guamo: 6, nogal: 2, platano: 5, hojarasca: 8, piedra: 4 },
-  bajo: { cafeto: 30, cereza: 100, flor: 0, guamo: 3, nogal: 1, platano: 2, hojarasca: 4, piedra: 2 },
+  alto: { cafeto: 120, cereza: 680, flor: 90, guamo: 10, nogal: 4, platano: 9, hojarasca: 14, piedra: 6 },
+  medio: { cafeto: 70, cereza: 380, flor: 40, guamo: 6, nogal: 2, platano: 5, hojarasca: 8, piedra: 4 },
+  bajo: { cafeto: 30, cereza: 150, flor: 0, guamo: 3, nogal: 1, platano: 2, hojarasca: 4, piedra: 2 },
 };
 
 /** Conteos para un tier (desconocido → frugal, nunca el más caro). */
@@ -162,11 +162,13 @@ export const PAL = {
   cafetoBrote: '#8cb752', // cogollo tierno arriba
 
   // Los estados de la cereza (van POR INSTANCIA, no aquí; referencia — la gama
-  // real de la foto de cosecha: verde → pintón naranja → rojo cereza → VINO):
-  cerezaVerde: '#7aa244',
-  cerezaPinton: '#e0a33a',
-  cerezaRoja: '#cf2a1d',
-  cerezaVino: '#8e1a20',
+  // real de la foto de cosecha: verde → pintón naranja → rojo cereza → VINO).
+  // Subidos de valor a propósito: bajo el sombrío el fruto tiene que GRITAR
+  // (es lo que hace reconocible el cafetal y lo que enseña la lección).
+  cerezaVerde: '#88b44c',
+  cerezaPinton: '#f2a52f',
+  cerezaRoja: '#e62f1c',
+  cerezaVino: '#b0202a',
 
   // La flor axilar blanca del arábica (nace pegada a la rama, como la cereza)
   florCafe: '#f6f1e2',
@@ -531,7 +533,10 @@ export function geomCafeto({ q = 1, porte = 'tallo' } = {}, seed = 1) {
 /** La cereza del café: OVOIDE (como en la rama real), pintada blanca — el
     color verdadero (verde→pintón→rojo→vino) va POR INSTANCIA. */
 export function geomCereza() {
-  const g = new THREE.IcosahedronGeometry(0.068, 0);
+  /* Radio EXAGERADO adrede (rubber-hose): la cereza real mide 1.5 cm, pero a
+     los 12–14 m de la cámara eso son 3–4 px — invisible. La cuenta gorda es
+     la que deja LEER el racimo verde→rojo desde la entrada. */
+  const g = new THREE.IcosahedronGeometry(0.095, 0);
   g.scale(1, 1.28, 1);
   return pintar(g.index ? g.toNonIndexed() : g, '#ffffff');
 }
@@ -739,12 +744,18 @@ export function geomPiedra(seed = 6) {
    frente-derecha, fuera del cono de la cámara, donde SIGUE dando sombra a los
    surcos del frente — que era para lo que estaba: café sin sombrío parece
    potrero. Verificable: `node scripts/diag/encuadre-mundo.mjs cafe`. */
+/* ⚠️ Gate 2026-07-30: el guamo [11.0, -2.5] y el nogal [9.5, -10.5] caían
+   EXACTOS sobre la línea cámara→casa del beneficio — la casa que corona la
+   loma (y su puerta `beneficio`) quedaba invisible detrás de sus copas. Se
+   corren al flanco derecho, donde SIGUEN sombreando sus surcos, y queda
+   abierto el corredor visual de la composición: camino → surcos → casa →
+   montes con niebla. Misma jugada documentada arriba con el segundo sitio. */
 const SITIOS_GUAMO = [
   [-8.5, -5.5], [8.8, 4.4], [6.5, -6.0], [-6.8, 1.6], [-1.5, -8.5],
-  [11.0, -2.5], [14.2, 1.2], [-12.5, -10.0], [-4.5, -2.0], [2.5, -12.5],
+  [13.5, -2.0], [14.2, 1.2], [-12.5, -10.0], [-4.5, -2.0], [2.5, -12.5],
 ];
 const SITIOS_NOGAL = [
-  [9.5, -10.5], [-6.5, -13.0], [14.0, -7.5], [-15.2, -3.0],
+  [16.0, -10.5], [-6.5, -13.0], [14.0, -7.5], [-15.2, -3.0],
 ];
 const SITIOS_PLATANO = [
   [-11.5, -3.0], [-2.4, 1.9], [4.0, -3.8], [9.8, 2.8], [-3.0, -11.0],
@@ -768,7 +779,13 @@ export const SITIO_CAFETO_HERO = /** @type {[number, number]} */ ([-2.8, 5.6]);
  * Mira loma arriba desde el camino de llegada — entrar es subir.
  */
 export const CAMARA = {
-  reposo: /** @type {[number, number, number]} */ ([7.6, 7.8, 15.6]),
+  /* Se retiró y se levantó otro paso (gate 2026-07-30): desde [7.6, 7.8, 15.6]
+     el ojo quedaba DENTRO del techo de sombra — copas de guamo llenando la
+     banda alta del cuadro, cero cielo, cero montes, la casa invisible. Desde
+     aquí el sombrío se lee como techo (se pasa POR DEBAJO), la loma revela la
+     casa del beneficio y arriba queda la banda de cielo con los montes comidos
+     por la niebla. La mirada NO cambia (mundoData deriva su `centro` de ella). */
+  reposo: /** @type {[number, number, number]} */ ([10.2, 9.9, 21.4]),
   mirada: /** @type {[number, number, number]} */ ([-0.4, 3.8, -3.4]),
   fov: 40,
 };
@@ -962,15 +979,17 @@ export function distribucionCafetal(conteos, seed = 311, q = 1) {
       if (t > 0.82) break; // la punta de la rama es de las hojas
       // el estado del fruto: la madurez de la mata + su propio azar
       const m = clamp(s.maduro + (rCer() - 0.5) * 0.45, 0, 1);
+      /* El VINO solo asoma (0.55 de mezcla máxima): el granate en penumbra lee
+         NEGRO y borraba la cosecha — el maduro se queda rojo cereza. */
       if (m < 0.35) col.lerpColors(verde, pinton, m / 0.35);
       else if (m < 0.68) col.lerpColors(pinton, roja, (m - 0.35) / 0.33);
-      else col.lerpColors(roja, vino, (m - 0.68) / 0.32);
-      col.multiplyScalar(0.94 + rCer() * 0.12);
+      else col.lerpColors(roja, vino, ((m - 0.68) / 0.32) * 0.55);
+      col.multiplyScalar(0.98 + rCer() * 0.1);
       cereza.push({
         pos: enRama(s, e, i, j, t, -0.045, 0.035, rCer), // colgada APENAS bajo la rama
         rotY: rCer() * Math.PI,
         // en el héroe la cuenta es un pelín más gorda: legible desde la entrada
-        escala: (0.8 + rCer() * 0.45) * (s.hero ? 1.3 : 1),
+        escala: (1.0 + rCer() * 0.5) * (s.hero ? 1.4 : 1),
         tint: [col.r, col.g, col.b],
       });
     }
@@ -1000,10 +1019,17 @@ export function distribucionCafetal(conteos, seed = 311, q = 1) {
   }
 
   // --- El sombrío y el plátano (sitios fijos recortados por tier). ---
+  // El FACTOR DE FILO (gate 2026-07-30): los árboles del filo de la loma crecen
+  // menos — expuestos al viento de la cuchilla, como en la montaña real. Además
+  // de verdad agronómica es dirección de arte: con el dosel del filo a ~11 m el
+  // ojo de la vitrina (clamp de OrbitControls ≤ ~9.9 m) quedaba SIEMPRE debajo
+  // de esas copas y la banda alta del cuadro era pura copa — ni montes ni cielo.
+  // Capadas a ~8.7 m, la loma revela casa, silueta de montes y cielo detrás.
+  const filo = (p) => 1 - 0.4 * smoothstep(2.5, 5.2, alturaLadera(p[0], p[1]));
   const enLadera = (p, esc, rr) => ({
     pos: [p[0], alturaLadera(p[0], p[1]), p[1]],
     rotY: rr() * Math.PI * 2,
-    escala: esc,
+    escala: esc * filo(p),
     tint: [0.94 + rr() * 0.12, 0.94 + rr() * 0.12, 0.94 + rr() * 0.12],
   });
   const rArb = rng(seed + 4);

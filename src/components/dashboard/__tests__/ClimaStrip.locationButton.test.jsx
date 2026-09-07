@@ -110,7 +110,7 @@ describe('ClimaStrip — botón "Configurar ubicación" (bug fix Brave 2026-05-2
     test('si no hay onNavigate, despacha evento global "chagra:nav"', async () => {
         const eventSpy = vi.fn();
         window.addEventListener('chagra:nav', eventSpy);
-        render(<ClimaStrip onNavigate={() => {}} />);
+        render(<ClimaStrip />);
         const cta = await screen.findByText('Configurar ubicación');
         fireEvent.click(cta);
         await waitFor(() => expect(eventSpy).toHaveBeenCalledTimes(1));
