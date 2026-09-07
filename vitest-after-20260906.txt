@@ -1,0 +1,1088 @@
+
+> chagra@1.0.55 test:unit
+> vitest run
+
+
+ RUN  v4.1.8 /home/kortux/Workspace/chagra/.worktrees/vitest-2649-dev-20260906
+
+ ❯ src/services/__tests__/waterDiagnostic.test.js (24 tests | 1 failed) 58ms
+     × incluye captacion, riego, conservacion, guardas 38ms
+ ❯ scripts/__tests__/audit-integraciones.test.mjs (38 tests | 2 failed) 767ms
+       × el allowlist no tiene NI UNA entrada fantasma 13ms
+       × las entradas con date 2026-09-05 son exactamente 126 (remate 123 + 3 apoyos de láminas) y todas siguen siendo hallazgos allowlisted 3ms
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+stderr | src/components/__tests__/ProfileScreen.hub.test.jsx > ProfileScreen — el morral (hub bento) > Apariencia trae la galería de temas con preview y aplicar persiste
+React does not recognize the `data-agt-capacidad-respiraOrgano` prop on a DOM element. If you intentionally want it to appear in the DOM as a custom attribute, spell it as lowercase `data-agt-capacidad-respiraorgano` instead. If you accidentally passed it from a parent component, remove it from the DOM element.
+In HTML, <button> cannot be a descendant of <button>.
+This will cause a hydration error.
+
+  <ProfileScreen onBack={function onBack} onHome={function onHome}>
+    <ScreenShell title="Apariencia" icon={{...}} onBack={function} onHome={function onHome}>
+      <div className="h-[100dvh]...">
+        <header>
+        <main className="flex-1 ove...">
+          <div ref={{...}} className="flex flex-..." data-testid="profile-hu...">
+            <button>
+            <div className="space-y-5" data-testid="profile-pa...">
+              <div>
+              <BackgroundSelector>
+              <AvatarSelector>
+              <AgentAvatarSelector>
+                <div className="bg-slate-9...">
+                  <div>
+                  <div className="grid grid-...">
+>                   <button
+>                     type="button"
+>                     onClick={function onClick}
+>                     aria-pressed={true}
+>                     className="relative flex flex-col items-center gap-1.5 px-1.5 py-3 rounded-xl border-2 transitio..."
+>                   >
+                      <span>
+                      <ChagraAgentAvatarAngelita state="thinking" size={64} onDoubleClick={function onDoubleClick} ...>
+>                       <button
+>                         type="button"
+>                         onClick={undefined}
+>                         onDoubleClick={function onDoubleClick}
+>                         aria-label="Angelita, la abeja"
+>                         title="Angelita, la abeja"
+>                         style={{background:"none",border:"none",padding:0,cursor:"pointer",lineHeight:0}}
+>                         onPointerEnter={function}
+>                         onPointerDown={function}
+>                         onTouchStart={function}
+>                       >
+                      ...
+                    ...
+              ...
+            ...
+
+<button> cannot contain a nested <button>.
+See this log for the ancestor stack trace.
+
+stderr | src/components/__tests__/ProfileScreen.hub.test.jsx
+[Config] Variable de entorno requerida no definida: VITE_FARMOS_CLIENT_ID. Revise .env o .env.local.
+
+ ❯ src/components/__tests__/ProfileScreen.hub.test.jsx (6 tests | 1 failed) 34386ms
+     × Apariencia trae la galería de temas con preview y aplicar persiste 33019ms
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+ ❯ src/components/__tests__/ChagraAgentAvatar.estadosP1.test.jsx (9 tests | 1 failed) 39828ms
+     × entrega los cinco estados ricos críticos a los siete adaptadores 30903ms
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+stderr | src/mockups/__tests__/visualLib.smoke.test.jsx > VisualLib storybook > monta la vitrina completa sin lanzar
+React does not recognize the `data-agt-capacidad-respiraOrgano` prop on a DOM element. If you intentionally want it to appear in the DOM as a custom attribute, spell it as lowercase `data-agt-capacidad-respiraorgano` instead. If you accidentally passed it from a parent component, remove it from the DOM element.
+Received `true` for a non-boolean attribute `ruge`.
+
+If you want to write it to the DOM, pass a string instead: ruge="true" or ruge={value.toString()}.
+Received `true` for a non-boolean attribute `acecha`.
+
+If you want to write it to the DOM, pass a string instead: acecha="true" or acecha={value.toString()}.
+Received `true` for a non-boolean attribute `vestuario`.
+
+If you want to write it to the DOM, pass a string instead: vestuario="true" or vestuario={value.toString()}.
+React does not recognize the `mundoId` prop on a DOM element. If you intentionally want it to appear in the DOM as a custom attribute, spell it as lowercase `mundoid` instead. If you accidentally passed it from a parent component, remove it from the DOM element.
+Received `true` for a non-boolean attribute `poder`.
+
+If you want to write it to the DOM, pass a string instead: poder="true" or poder={value.toString()}.
+React does not recognize the `lineBoil` prop on a DOM element. If you intentionally want it to appear in the DOM as a custom attribute, spell it as lowercase `lineboil` instead. If you accidentally passed it from a parent component, remove it from the DOM element.
+
+ ❯ src/mockups/__tests__/visualLib.smoke.test.jsx (2 tests | 1 failed) 43994ms
+     × monta la vitrina completa sin lanzar 43976ms
+stderr | src/components/dashboard/__tests__/DashboardLive.extensionistaMundos.test.jsx > DashboardLive — operador/extensionista ve los mundos (aditivo, no reemplazo) > la RED institucional es la portada Y "Los mundos de mi finca" se ven debajo
+In HTML, <button> cannot be a descendant of <button>.
+This will cause a hydration error.
+
+  <DashboardLive onNavigate={function Mock}>
+    <div className="relative f..." data-scroll-key="dashboard-...">
+      <Suspense>
+      <div className="fvh-resto" data-testid="fvh-resto">
+        <div className="fvh-resto-...">
+          <div className="px-4 pt-3 ..." data-testid="bloque-gua...">
+            <p>
+            <AgentAvatarSelector>
+              <div className="bg-slate-9...">
+                <div>
+                <div className="grid grid-...">
+>                 <button
+>                   type="button"
+>                   onClick={function onClick}
+>                   aria-pressed={true}
+>                   className="relative flex flex-col items-center gap-1.5 px-1.5 py-3 rounded-xl border-2 transition-..."
+>                 >
+                    <span>
+                    <ChagraAgentAvatarAngelita state="thinking" size={64} onDoubleClick={function onDoubleClick} ...>
+>                     <button
+>                       type="button"
+>                       onClick={undefined}
+>                       onDoubleClick={function onDoubleClick}
+>                       aria-label="Angelita, la abeja"
+>                       title="Angelita, la abeja"
+>                       style={{background:"none",border:"none",padding:0,cursor:"pointer",lineHeight:0}}
+>                       onPointerEnter={function}
+>                       onPointerDown={function}
+>                       onTouchStart={function}
+>                     >
+                    ...
+                  ...
+          ...
+
+<button> cannot contain a nested <button>.
+See this log for the ancestor stack trace.
+React does not recognize the `data-agt-capacidad-respiraOrgano` prop on a DOM element. If you intentionally want it to appear in the DOM as a custom attribute, spell it as lowercase `data-agt-capacidad-respiraorgano` instead. If you accidentally passed it from a parent component, remove it from the DOM element.
+
+stderr | src/components/dashboard/__tests__/DashboardLive.extensionistaMundos.test.jsx > DashboardLive — operador/extensionista ve los mundos (aditivo, no reemplazo) > la RED institucional es la portada Y "Los mundos de mi finca" se ven debajo
+[useChagraStats] Error: Failed to parse URL from /chagra-stats.json
+
+ ❯ src/components/dashboard/__tests__/DashboardLive.extensionistaMundos.test.jsx (1 test | 1 failed) 25393ms
+     × la RED institucional es la portada Y "Los mundos de mi finca" se ven debajo 25383ms
+stderr | src/components/__tests__/CompaiP1.contract.test.jsx
+WARNING: Multiple instances of Three.js being imported.
+
+ ❯ src/components/__tests__/CompaiP1.contract.test.jsx (11 tests | 1 failed) 87743ms
+     × zariguya recibe los 10 estados ricos y caminando sin degradar el rig 57548ms
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: navigation to another Document
+Warning: A vi.mock("../llmTelemetryService") call in "/home/kortux/Workspace/chagra/.worktrees/vitest-2649-dev-20260906/src/services/__tests__/offlineContracts.test.js" is not at the top level of the module. Although it appears nested, it will be hoisted and executed before any tests run. Move it to the top level to reflect its actual execution order. This will become an error in a future version.
+See: https://vitest.dev/guide/mocking/modules#how-it-works
+Warning: A vi.mock("../llmTelemetryService") call in "/home/kortux/Workspace/chagra/.worktrees/vitest-2649-dev-20260906/src/services/__tests__/offlineContracts.test.js" is not at the top level of the module. Although it appears nested, it will be hoisted and executed before any tests run. Move it to the top level to reflect its actual execution order. This will become an error in a future version.
+See: https://vitest.dev/guide/mocking/modules#how-it-works
+[cenchrus_clandestinus] (especies_invasoras) → tracking_mode=NULL (revisión manual requerida)
+[eucalyptus_globulus] (especies_invasoras) → tracking_mode=NULL (revisión manual requerida)
+[pteridium_aquilinum] (especies_invasoras) → tracking_mode=NULL (revisión manual requerida)
+[ulex_europaeus] (especies_invasoras) → tracking_mode=NULL (revisión manual requerida)
+[melinis_minutiflora] (especies_invasoras) → tracking_mode=NULL (revisión manual requerida)
+[eichhornia_crassipes] (especies_invasoras) → tracking_mode=NULL (revisión manual requerida)
+
+[ABORTO] la migración perdería datos ya presentes en el catálogo v3.2:
+  - especie eruca_vesicaria
+  - especie cucurbita_pepo
+  - fuente uc-ipm-cole-crops-arugula
+  - fuente umn-vegetable-planning-arugula
+  - fuente agrosavia-inocuidad-frutas-hortalizas-2019
+  - fuente jbb-rugula-density-2021
+  - fuente agrosavia-modelo-calabacin-2019
+  - fuente uc-ipm-cucurbits
+
+Si el borrado es intencional, corré con la bandera --permitir-bajas.
+Not implemented: navigation to another Document
+Not implemented: navigation to another Document
+Not implemented: navigation to another Document
+Not implemented: navigation to another Document
+Not implemented: navigation to another Document
+Not implemented: navigation to another Document
+Not implemented: navigation to another Document
+Not implemented: navigation to another Document
+Not implemented: navigation to another Document
+Not implemented: navigation to another Document
+Not implemented: navigation to another Document
+Not implemented: navigation to another Document
+Not implemented: navigation to another Document
+Not implemented: navigation to another Document
+Not implemented: navigation to another Document
+Not implemented: navigation to another Document
+Not implemented: navigation to another Document
+Not implemented: navigation to another Document
+Not implemented: navigation to another Document
+Not implemented: navigation to another Document
+Not implemented: navigation to another Document
+Not implemented: navigation to another Document
+Warning: A vi.mock("../climaService.js") call in "/home/kortux/Workspace/chagra/.worktrees/vitest-2649-dev-20260906/src/services/__tests__/alertEngine.guards.test.js" is not at the top level of the module. Although it appears nested, it will be hoisted and executed before any tests run. Move it to the top level to reflect its actual execution order. This will become an error in a future version.
+See: https://vitest.dev/guide/mocking/modules#how-it-works
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 8 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  scripts/__tests__/audit-integraciones.test.mjs > ops/integraciones-no-consumidas.json (repo real) > remate 2026-09-05 > el allowlist no tiene NI UNA entrada fantasma
+AssertionError: hay entradas de orphan_components que ya no le hacen match a ningún hallazgo — borrarlas (curaduría), no dejarlas pudrirse: expected '\u001b[33m⚠\u001b[0m chagra-pro no di…' not to contain 'ya NO le hacen match'
+
+- Expected
++ Received
+
+- ya NO le hacen match
++ [33m⚠[0m chagra-pro no disponible en "/__no_existe__" (ni CHAGRA_PRO_PATH) — se salta la auditoría de endpoints del sidecar.
++ [33m⚠[0m Esto es esperado en CI del repo público. Para la auditoría completa, correr con chagra-pro clonado al lado (o CHAGRA_PRO_PATH=<ruta>).
++ Chagra — auditor de integraciones no consumidas
++   targets same-repo:     3
++   chagra-pro disponible: no
++   endpoints auditados:   0 (saltado)
++   piezas de src/ auditadas (alcance por símbolo): 1616
++     entradas del build: index.html, mercado.html, species-visor.html, rigged-preview.html, index-prod.html, shot-sierra.html
++     vistas del router: 226 (114 producto · 104 vitrina) · bindings lazy(): 218
++
++ [33m⚠[0m same-repo SIN consumidor pero allowlisted: grafoRelations.getKnowledgeTopics — Conocimiento offline (piso_termico/micorrizas/polinizacion/cambio_climatico/fitoquimica/alelopatia) agregado a grafo-relations.json 2026-07-14. La función existe y tiene test, pero cablearla al prompt del agente requiere decidir un disparador (¿qué mensaje amerita inyectar qué tópico? — no hay heurística todavía, y hacerlo mal infla el prompt sin criterio) más presupuesto de tokens. Es una decisión de diseño de grounding, no un cableado de una línea. Caso 1 del ADR — pendiente de diseño, no de olvido. (2026-07-15)
++ [33m⚠[0m same-repo SIN consumidor pero allowlisted: grafoRelations.getKnowledgeTopic — Mismo caso que getKnowledgeTopics — accesor de un tópico puntual, sin disparador todavía. Ver esa entrada. (2026-07-15)
++ [33m⚠[0m same-repo SIN consumidor pero allowlisted: grafoRelations.buildKnowledgeTopicBlock — Formatea el bloque de grounding para el system prompt a partir de getKnowledgeTopic — mismo caso, depende de que exista el disparador antes de que tenga sentido cablear el formateador. (2026-07-15)
++ [33m⚠[0m pieza SIN ruta viva pero allowlisted: src/compai/nucleo/gestos.js — Gestos táctiles del compai: solo lo importan sus tests (gestos.test.js, zariguyaGestos.test.js). La actuación compai de producto no los pide todavía; se declara hasta que la capa de gesto se adopte. (2026-09-05)
++ [33m⚠[0m pieza SIN ruta viva pero allowlisted: src/compai/nucleo/zariguyaGestos.js — Gestos específicos de la zarigüeya: solo su test lo importa. Mismo caso que gestos.js. (2026-09-05)
++ [33m⚠[0m pieza SIN ruta viva pero allowlisted: src/components/AgentDemoExample.jsx — Mini-demo predefinida del agente (decisión UX-4, issue #285): solo su test lo importa; el botón «Ver ejemplo (sin foto)» del AgentScreen que la montaría no existe en la pantalla viva. Se declara hasta decidir si la demo entra al chat real. (2026-09-05)
++ [33m⚠[0m pieza SIN ruta viva pero allowlisted: src/components/AgentScreen/SuggestedActions.jsx — Acciones sugeridas post-respuesta: lo único que lo importa es el barril AgentScreen/index.js (también declarado aquí, sin importador). La decisión de UX (chips post-respuesta vs toolbar viva) está pendiente. (2026-09-05)
++ [33m⚠[0m pieza SIN ruta viva pero allowlisted: src/components/AgentScreen/index.js — Barril de AgentScreen sin un solo importador: AgentScreen.jsx se importa directo desde App.jsx. Candidato a borrado (curaduría del operador). (2026-09-05)
++ [33m⚠[0m pieza SIN ruta viva pero allowlisted: src/components/AgentScreen/photoAnalysis.js — Armado del mensaje de análisis de foto (FEAT-2, #291): solo su test lo importa; el flujo vivo de foto del agente no pasa por este módulo hoy. Se declara hasta decidir si se adopta o se retira. (2026-09-05)
++ [33m⚠[0m pieza SIN ruta viva pero allowlisted: src/components/AltitudeBadge.jsx — Badge de altitud sin consumidor: solo su test lo importa. Las pantallas vivas muestran la altitud por otras vías; adoptarlo es higiene transversal pantalla por pantalla, no un cableado. (2026-09-05)
++ [33m⚠[0m pieza SIN ruta viva pero allowlisted: src/components/ChagraAgentAvatarColibri.jsx — Espejo tanda 1 (ítem 10): el avatar vivo lo escoge useAgentAvatarType y el mapa lazy de ChagraAgentAvatar (angelita, zariguya, jaguar, oso-baston, luciernaga, guacamaya, chivito-punk) — colibrí no está en el mapa. Solo una fila del README lo menciona. Propuesta de borrado: borrar lo decide el operador. (2026-09-05)
++ [33m⚠[0m pieza SIN ruta viva pero allowlisted: src/components/ChagraAgentAvatarColibriPhoto.jsx — Espejo tanda 1 (ítem 11): variante foto del colibrí fuera del mapa canónico de avatares de ChagraAgentAvatar. Propuesta de borrado (curaduría del operador). (2026-09-05)
++ [33m⚠[0m pieza SIN ruta viva pero allowlisted: src/components/ChagraAgentAvatarMaiz.jsx — Espejo tanda 1 (ítem 12): maíz no está en el mapa de useAgentAvatarType; solo un comentario en GuacamayaCompai.jsx y su test lo sostienen. Propuesta de borrado (curaduría del operador). (2026-09-05)
++ [33m⚠[0m pieza SIN ruta viva pero allowlisted: src/components/ErrorBoundaryRuta.jsx — Espejo de la declaratoria del drenaje tanda 1 (#3120, ops/componentes-huerfanos-allowlist.json, que este gate no lee) escrita en ops/DRENAJE-HUERFANOS-TANDA-1-2026-09-04.md. Reemplazaría el patrón ErrorBoundary+ErrorFallback de las 224 case del router: refactor transversal, no un cableado de una línea. Nadie lo importa. (2026-09-05)
++ [33m⚠[0m pieza SIN ruta viva pero allowlisted: src/components/OnboardingTour.jsx — Tour guiado de onboarding sin montar: nadie lo importa. El onboarding vivo es OnboardingCondensado + PrimerRegistroCard; un tour paso a paso es una decisión de producto no tomada. (2026-09-05)
++ [33m⚠[0m pieza SIN ruta viva pero allowlisted: src/components/PestMonitoringWindow.jsx — Ventana de monitoreo lunar de plagas: su fuente lunarPestService.js ya está declarada (2026-09-04) por el mismo motivo. Nadie la importa hoy; se declara hasta montar la superficie de monitoreo. (2026-09-05)
++ [33m⚠[0m pieza SIN ruta viva pero allowlisted: src/components/QuickChipsBar.jsx — Espejo tanda 1 (ítem 15): su sucesor montado es ChipsToolbar en AgentScreen (decisión UX-5, issue #286). Solo su smoke test lo sostiene. Propuesta de borrado (curaduría del operador). (2026-09-05)
++ [33m⚠[0m pieza SIN ruta viva pero allowlisted: src/components/SplashAngelita.jsx — Espejo tanda 1 (ítem 13): splash nunca adoptada; el boot vivo es ChagraGrowLoader con VIEW_LOADING_LABELS por vista (App.jsx), que ya da mensaje contextual. Propuesta de borrado (curaduría del operador). (2026-09-05)
++ [33m⚠[0m pieza SIN ruta viva pero allowlisted: src/components/_archivado/PanelVitalidadEspiritu.jsx — Espejo de la declaratoria del drenaje tanda 1 (#3120, ops/componentes-huerfanos-allowlist.json, que este gate no lee) escrita en ops/DRENAJE-HUERFANOS-TANDA-1-2026-09-04.md. Panel desmontado del home 2D a propósito el 2026-08-26 (comentario en FincaVivaHero.jsx); su hermano de servicios vitalidadEspirituService.js ya está declarado aquí (2026-09-04). Hoy solo su test lo importa. Al rediseñar el panel se decide su vuelta. (2026-09-05)
++ [33m⚠[0m pieza SIN ruta viva pero allowlisted: src/components/_archivado/UmbralValle.jsx — Espejo de la declaratoria del drenaje tanda 1 (#3120, ops/componentes-huerfanos-allowlist.json, que este gate no lee) escrita en ops/DRENAJE-HUERFANOS-TANDA-1-2026-09-04.md. Archivado a propósito: era la puerta grande home→valle 3D y la entrada viva es otra. Nadie lo importa (ni producto, ni vitrina, ni test). (2026-09-05)
++ [33m⚠[0m pieza SIN ruta viva pero allowlisted: src/components/_archivo/BienvenidaFinca.jsx — Espejo de la declaratoria del drenaje tanda 1 (#3120, ops/componentes-huerfanos-allowlist.json, que este gate no lee) escrita en ops/DRENAJE-HUERFANOS-TANDA-1-2026-09-04.md. Archivado 2026-07-22; OnboardingCondensado lo reemplaza. Solo su test lo importa. (2026-09-05)
++ [33m⚠[0m pieza SIN ruta viva pero allowlisted: src/components/_archivo/OnboardingHero.jsx — Espejo de la declaratoria del drenaje tanda 1 (#3120, ops/componentes-huerfanos-allowlist.json, que este gate no lee) escrita en ops/DRENAJE-HUERFANOS-TANDA-1-2026-09-04.md. Archivado 2026-07-22; OnboardingCondensado + PrimerRegistroCard conservan lo útil. Solo sus tests lo importan. (2026-09-05)
++ [33m⚠[0m pieza SIN ruta viva pero allowlisted: src/components/_archivo/OnboardingModal.jsx — Espejo de la declaratoria del drenaje tanda 1 (#3120, ops/componentes-huerfanos-allowlist.json, que este gate no lee) escrita en ops/DRENAJE-HUERFANOS-TANDA-1-2026-09-04.md. Archivado 2026-07-22; FarmOSSetupModal conserva la configuración técnica. Nadie lo importa. (2026-09-05)
++ [33m⚠[0m pieza SIN ruta viva pero allowlisted: src/components/_archivo/OnboardingProfile.jsx — Espejo de la declaratoria del drenaje tanda 1 (#3120, ops/componentes-huerfanos-allowlist.json, que este gate no lee) escrita en ops/DRENAJE-HUERFANOS-TANDA-1-2026-09-04.md. Archivado 2026-07-22; el flujo extendido vive en OnboardingCondensado + Perfil. Solo sus tests lo importan. (2026-09-05)
++ [33m⚠[0m pieza SIN ruta viva pero allowlisted: src/components/admin/AdminPanel.jsx — Panel de administración sin ruta: nadie lo importa (ni producto, ni vitrina, ni test). Montarlo exige decidir quién administra y con qué roles — decisión de producto documentada como pendiente en la tanda 1 del drenaje, no un cableado. (2026-09-05)
++ [33m⚠[0m pieza SIN ruta viva pero allowlisted: src/components/admin/DashboardAdopcion.jsx — Dashboard de adopción sin consumidor: nadie lo importa. La telemetría que mostraría (agentTelemetryFlywheel.js, declarado 2026-09-04) tampoco tiene ruta viva; decidir qué métrica se hace visible y a quién es decisión de producto. (2026-09-05)
++ [33m⚠[0m pieza SIN ruta viva pero allowlisted: src/components/agent/AgentMetricsDashboard.jsx — Declarado junto a su fuente: agentTelemetryFlywheel.js (su único consumidor de producto) ya está declarado sin ruta viva (2026-09-04). Ni el dashboard ni la captura de métricas son alcanzables hoy; la pantalla de métricas sigue sin decidirse. (2026-09-05)
++ [33m⚠[0m pieza SIN ruta viva pero allowlisted: src/components/agent/FeedbackSutil.jsx — Botones 👍/👎 de calidad por respuesta (su encabezado declara privacidad primero); registraría en agentTelemetryFlywheel.js, ya declarado sin ruta (2026-09-04). Nadie lo importa: montarlo sin decidir la política de la señal (quién la lee y cómo se agrega) dejaría una señal que nadie escucha. (2026-09-05)
++ [33m⚠[0m pieza SIN ruta viva pero allowlisted: src/components/aprendizaje/GuiaEspecieCards.jsx — Espejo de la declaratoria del drenaje tanda 1 (#3120, ops/componentes-huerfanos-allowlist.json, que este gate no lee) escrita en ops/DRENAJE-HUERFANOS-TANDA-1-2026-09-04.md. (ítem 1) Prototipo del módulo de aprendizaje (PR #1674) con datos demo (guias-demo.js, que también se declara aquí). Montarlo hoy inyectaría datos demo en pantallas grounded desde catalog.sqlite; cuando lea del catálogo real (su propio TODO v3.1+) se decide su ruta. (2026-09-05)
++ [33m⚠[0m pieza SIN ruta viva pero allowlisted: src/components/common/ScreenLoadingStatus.jsx — Espejo de la declaratoria del drenaje tanda 1 (#3120, ops/componentes-huerfanos-allowlist.json, que este gate no lee) escrita en ops/DRENAJE-HUERFANOS-TANDA-1-2026-09-04.md. Estado de carga/vacío/error reutilizable: solo lo importan los tests empty-states y screen-reader. Su adopción es transversal, pantalla por pantalla. (2026-09-05)
++ [33m⚠[0m pieza SIN ruta viva pero allowlisted: src/components/dashboard/ValleHoverConfirm.jsx — Portal home→valle 3D con confirmación por hover (teaser webp + TransicionNewDonk). El rescate #3134 lo dejó con tests verdes pero NO lo montó: hoy solo su test lo importa (verificado con el control de importadores del remate). El montaje —cuándo ofrecer el salto al valle— es decisión de producto. (2026-09-05)
++ [33m⚠[0m pieza SIN ruta viva pero allowlisted: src/components/escucha/EscuchaFab.jsx — Espejo tanda 1 (ítem 14): el trigger de escucha vivo es AgentFab (hold + «Hola Chagra», decisión del operador 2026-08-27). Su import en App.jsx está COMENTADO a propósito (líneas 62-68). Ojo del remate: un grep por substring lo cuenta como importado por App.jsx; el control del 2026-09-05 verificó que el import está en comentario y el motor (que quita comentarios) lo tiene por SOLO_TEST. Propuesta de borrado pendiente del operador. (2026-09-05)
++ [33m⚠[0m pieza SIN ruta viva pero allowlisted: src/components/extensionista/ExtensionistaDashboard.jsx — Dashboard del rol extensionista sin ruta: nadie lo importa. El rol existe como copy pero no hay pantalla de extensionista decidida; montarlo antes de esa decisión sería una vitrina sin público. (2026-09-05)
++ [33m⚠[0m pieza SIN ruta viva pero allowlisted: src/components/juego/index.js — Barril del módulo juego sin un solo importador: los juegos vivos se importan directo desde App.jsx. Candidato a borrado (curaduría del operador). (2026-09-05)
++ [33m⚠[0m pieza SIN ruta viva pero allowlisted: src/components/loginAngelitaMensajes.js — Copy de la coreografía del login: su propio encabezado lo declara pendiente — «el operador define la voz de las cuatro invitaciones, por eso no se rellenan con tono inventado». Sin importador hasta que esa voz se escriba: es un pendiente explícito del operador, no un olvido. (2026-09-05)
++ [33m⚠[0m pieza SIN ruta viva pero allowlisted: src/components/lotes/LoteCroquisPlaceholder.jsx — Espejo de la declaratoria del drenaje tanda 1 (#3120, ops/componentes-huerfanos-allowlist.json, que este gate no lee) escrita en ops/DRENAJE-HUERFANOS-TANDA-1-2026-09-04.md. (ítem 9) Andamiaje transitorio declarado en su encabezado; espera el canvas real (Leaflet + polígono). No debe montarse como UI final. (2026-09-05)
++ [33m⚠[0m pieza SIN ruta viva pero allowlisted: src/components/red/ExitosChagra.jsx — Vitrina de éxitos de la red: el módulo red quedó en andamiaje sin pantallas de Fase 1 (#2792; redService.js ya declarado 2026-09-04). Nadie lo importa; se declara hasta que la fase social de la red se decida. (2026-09-05)
++ [33m⚠[0m pieza SIN ruta viva pero allowlisted: src/data/aprendizaje/guias-demo.js — Datos demo de GuiaEspecieCards.jsx (declarada aquí): su único importador. Se declara junto a su componente; su propio encabezado dice «integrar con fuente real (catálogo v3.1+)». (2026-09-05)
++ [33m⚠[0m pieza SIN ruta viva pero allowlisted: src/data/fenologySpecies.js — Datos fenológicos de fenologyRecommendations.js (motor declarado 2026-09-04): su único importador. Se declara junto a su motor hasta que una pantalla de siembra pida pronóstico. (Sus hermanos aguaFinca/cacaoFinca/mangoFinca ya NO se declaran: el fix del tope {0,400} del motor del 2026-09-05 los alcanza vía AguaScreen/CacaoScreen/MangoScreen, que están MONTADAS.) (2026-09-05)
++ [33m⚠[0m pieza SIN ruta viva pero allowlisted: src/data/juegos/vocabularioAgroecologico.js — Dataset de vocabulario agroecológico para un juego sin consumidor: ningún juego vivo lo pide (los juegos vivos traen sus datos por otra vía). Se declara hasta que el juego de vocabulario exista. (2026-09-05)
++ [33m⚠[0m pieza SIN ruta viva pero allowlisted: src/hooks/useAngelitaHusmeador.js — Husmeo proactivo de Angelita al cambiar de mundo: sin un solo importador. Cablearlo exige decidir la política de interrupción voz-first (¿cuándo puede hablar la compai sin que la pidan?) — la misma decisión de producto que frena a useInteraccionUsuario. (2026-09-05)
++ [33m⚠[0m pieza SIN ruta viva pero allowlisted: src/hooks/useBackgroundImage.js — Solo su test lo importa. El fondo vivo corre por useThemeBackgroundStore (importado por App.jsx y la pantalla de tema), que es el camino que quedó. Candidato a borrado (curaduría del operador). (2026-09-05)
++ [33m⚠[0m pieza SIN ruta viva pero allowlisted: src/hooks/useBusquedaUnificada.js — Búsqueda instantánea local sobre catálogo (Ctrl+K, su encabezado): sin importador. Exige decidir una superficie de búsqueda global (paleta de comandos) — decisión de producto, no cableado. (2026-09-05)
++ [33m⚠[0m pieza SIN ruta viva pero allowlisted: src/hooks/useCompaiPaseo.js — Ola 2 del paseo autónomo (#2820): su planificador (compaiPaseoPlanificador.js) y su registro de paradas (compaiParadasPorPantalla.js) ya están declarados sin ruta (2026-09-04). El hook solo lo importan tests hasta que la cadena del paseo tenga montaje y desmontaje reales por pantalla. (2026-09-05)
++ [33m⚠[0m pieza SIN ruta viva pero allowlisted: src/hooks/useEstadoFincaReal.js — Construye estadoFinca desde IndexedDB para que el valle 3D refleje la finca real: solo su test lo importa. El valle vivo se sirve por iframe a /valle/ (fuera de este bundle); cablear aquí exige decidir qué estado cruza esa frontera. (2026-09-05)
++ [33m⚠[0m pieza SIN ruta viva pero allowlisted: src/hooks/useInteraccionUsuario.js — Señal de «el usuario está usando la pantalla AHORA» (base de la política dura del compai): sin importador. Depende de la misma decisión de política de interrupción que useAngelitaHusmeador.js. (2026-09-05)
++ [33m⚠[0m pieza SIN ruta viva pero allowlisted: src/hooks/useRecorridoVoz.js — Hermano del recorrido por voz (#2152): recorridoService.js (declarado 2026-09-04) y useRecorridoStore.js (declarado aquí) completan el cluster. Solo su test lo sostiene hasta montar el recorrido. (2026-09-05)
++ [33m⚠[0m pieza SIN ruta viva pero allowlisted: src/hooks/useSecurityRole.js — PLANO 2 de federación (rol de seguridad, DISENO-FEDERACION-USUARIOS.md §0; distinto del rol de producto de userProfileService): sin importador. Su adopción depende de la fase de federación junto a didKeyService/ucanService (declarados aquí). (2026-09-05)
++ [33m⚠[0m pieza SIN ruta viva pero allowlisted: src/hooks/useT.js — Hook de i18n (detecta idioma del navegador e interpola sobre config/messages.js). CONTROL DE IMPORTADORES del remate 2026-09-05: 0 importadores reales. Los «14 importadores» que se le atribuyeron el 2026-09-04 eran matches por substring de useTheme/useTts/useTunel — un grep sin frontera de palabra lo da por vivo; el grep con frontera (el correcto, verificado dos veces) no halla ninguno. La app resolvió las cadenas por MSG directo de config/messages.js (useRecorridoStore, useAssetStore) y los idiomas adicionales nunca llegaron. Adoptar i18n o borrar el hook es decisión de producto; NO se borra aquí. (2026-09-05)
++ [33m⚠[0m pieza SIN ruta viva pero allowlisted: src/mockups/GuacamayaViva.jsx — Mockup experimental de la guacamaya como séptima criatura del elenco (Ara macao, rig F24). El comentario menciona ruta #/mockups/guacamaya-viva pero no está en MOCKUP_HASH_ROUTES. Parece ser un experimento paralelo a AngelitaViva que nunca se cableó completamente. Los componentes hermano (GuacamayaEntrada/GuacamayaSalida) también están huérfanos, indicando que el sistema de guacamaya como compai alternativo no se terminó. (2026-08-30)
++ [33m⚠[0m pieza SIN ruta viva pero allowlisted: src/mockups/TransicionesOdysseyDemo.jsx — Demo de transiciones Odyssey que nunca se cableó. El nombre 'Demo' indica explícitamente que es una demo experimental, no producción. No existe ruta correspondiente en MOCKUP_HASH_ROUTES. (2026-08-30)
++ [33m⚠[0m pieza SIN ruta viva pero allowlisted: src/mockups/_archivo/BosqueVivo3D-legacy.jsx — Archivo en directorio _archivo (archivado intencionalmente). Versión legacy del BosqueVivo3D reemplazada por ParamoDefinitivoMockup. El sufijo -legacy indica explícitamente que es una versión antigua mantenida por razones históricas, no para producción. (2026-08-30)
++ [33m⚠[0m pieza SIN ruta viva pero allowlisted: src/mockups/_archivo/BosqueVivo3D.jsx — Archivo en directorio _archivo (archivado intencionalmente). Versión previa del BosqueVivo3D reemplazada por ParamoDefinitivoMockup (ver comentario en App.jsx línea 196-198: 'Reemplaza a BosqueVivo3D, MundoParamo3D y SueloDemo3D (los tres archivados en src/mockups/_archivo/)'). (2026-08-30)
++ [33m⚠[0m pieza SIN ruta viva pero allowlisted: src/mockups/_archivo/CasaAdentro3D.jsx — Archivo en directorio _archivo (archivado intencionalmente). Mockup previo reemplazado por otras implementaciones. La ruta 'casa_adentro' y 'mockups/casa-adentro' en MOCKUP_HASH_ROUTES apuntan a 'mundo_casa_adentro', no a este archivo archivado. (2026-08-30)
++ [33m⚠[0m pieza SIN ruta viva pero allowlisted: src/mockups/_archivo/MundoParamo3D.jsx — Archivo en directorio _archivo (archivado intencionalmente). Versión previa del páramo reemplazada por ParamoDefinitivoMockup (ver comentario en App.jsx línea 196-198). (2026-08-30)
++ [33m⚠[0m pieza SIN ruta viva pero allowlisted: src/mockups/_archivo/SueloDemo3D-legacy.jsx — Archivo en directorio _archivo con sufijo -legacy (archivado intencionalmente). Versión antigua del demo de suelo, reemplazada por implementaciones más recientes. (2026-08-30)
++ [33m⚠[0m pieza SIN ruta viva pero allowlisted: src/mockups/_archivo/SueloDemo3D.jsx — Archivo en directorio _archivo (archivado intencionalmente). Versión previa del demo de suelo reemplazada por ParamoDefinitivoMockup y otras implementaciones. (2026-08-30)
++ [33m⚠[0m pieza SIN ruta viva pero allowlisted: src/mockups/mercado/CintaAltitud.jsx — Componente del módulo mercado (CintaAltitud con altitud de fincas en la montaña) que nunca se cableó. Es una pieza de UI para visualizar fincas por piso térmico en una cinta vertical. Parece ser un experimento de visualización de mercado que no se terminó de integrar. (2026-08-30)
++ [33m⚠[0m pieza SIN ruta viva pero allowlisted: src/mockups/mercado/ProductoIlustracion.jsx — Componente del módulo mercado (ilustración de productos) que nunca se cableó. Parece ser una pieza de visualización para el mercado campesino que no se terminó de integrar. (2026-08-30)
++ [33m⚠[0m pieza SIN ruta viva pero allowlisted: src/mockups/mercado/Rostro.jsx — Componente del módulo mercado (rostro de productor, usado por CintaAltitud) que nunca se cableó. Es una pieza de UI para mostrar fotos/rostros de productores en la visualización de mercado. El módulo mercado completo parece ser un experimento inconcluso. (2026-08-30)
++ [33m⚠[0m pieza SIN ruta viva pero allowlisted: src/mockups/valle/_archivo/vistaParamo.archivado.jsx — Archivo con nombre literal 'archivado' en subdirectorio _archivo dentro de valle. Indicador explícito de que es código archivado intencionalmente, no un olvido de integración. (2026-08-30)
++ [33m⚠[0m pieza SIN ruta viva pero allowlisted: src/services/agentTelemetryFlywheel.js — Recuperado en #2668 (2026-07-21) como captura local-first de interacciones y señales de calidad. El único uso de producto de exportarJSONL vive en AgentMetricsDashboard, que el alcance simbólico marca sin ruta viva; registrarInteraccion y actualizarSenal no tienen llamada desde el agente. Mantener el módulo y sus pruebas evita perder el contrato de telemetría mientras se decide el punto de captura y la pantalla de métricas. (2026-09-04)
++ [33m⚠[0m pieza SIN ruta viva pero allowlisted: src/services/biodiversidadMonitor.js — Creado en #1451 (2026-06-11) como adaptador del catálogo de indicadores de biodiversidad. checklistBiodiversidad solo tiene consumidores de prueba: no hay pantalla ni recomendación viva que presente esos umbrales al usuario. Conservarlo permite cablear el mismo shape curado cuando se diseñe esa superficie. (2026-09-04)
++ [33m⚠[0m pieza SIN ruta viva pero allowlisted: src/services/compaiParadasPorPantalla.js — Parte de la Ola 2 del paseo autónomo (#2820, 2026-07-30). useCompaiPaseo y useCompaiGuiaPantalla lo importan, pero ambos quedan fuera de una ruta viva; el registro de paradas no debe activarse sin el montaje y desmontaje real de cada pantalla. Se conserva como contrato en memoria y con pruebas hasta ese cableado. (2026-09-04)
++ [33m⚠[0m pieza SIN ruta viva pero allowlisted: src/services/compaiPaseoPlanificador.js — El planificador puro también llegó en #2820 (2026-07-30). Su único consumidor es useCompaiPaseo, que el alcance simbólico reporta no alcanzable; por ello no autoriza paseos en ninguna vista de producto hoy. Borrarlo descartaría la lógica y pruebas del paseo antes de decidir su montaje real. (2026-09-04)
++ [33m⚠[0m pieza SIN ruta viva pero allowlisted: src/services/crmService.js — Servicio del CRM agroecológico mínimo (PR #2859): crea contactos como asset--person y actividades como log--activity en IndexedDB. Su única pantalla hoy es el mockup #/mockups/crm-agroecologico, que renderiza con datos de muestra a propósito (un mockup no debe escribir en IndexedDB); los componentes de esa ruta reciben los datos por props y no llaman al servicio. El servicio se cablea cuando el CRM pase de mockup a pantalla viva (decisión de producto). (2026-09-05)
++ [33m⚠[0m pieza SIN ruta viva pero allowlisted: src/services/crypto/didKeyService.js — Identidad did:key de la Fase 2 de federación (ADR-036): su único importador es ucanService.js (declarado aquí). Sin flujo vivo que cree identidades; se declara junto a la fase de federación. (2026-09-05)
++ [33m⚠[0m pieza SIN ruta viva pero allowlisted: src/services/crypto/ucanService.js — Delegación UCAN (Fase 2, ADR-036, DISENO-FEDERACION-USUARIOS.md §5.2/§6.6): sin un solo importador. Cablearlo sin la fase de federación sería firma de capabilities sin emisor ni verificador; se declara hasta esa fase. (2026-09-05)
++ [33m⚠[0m pieza SIN ruta viva pero allowlisted: src/services/datosAbiertos.js — Es una referencia de fuentes y normalizador SIPSA, no un cliente de producción: el propio módulo documenta que faltan proxy CORS y caché local. normalizarPrecioSIPSA solo se usa en pruebas y MercadoScreen no lo consume. No se cablea para no presentar precios sin una ruta de actualización verificable. (2026-09-04)
++ [33m⚠[0m pieza SIN ruta viva pero allowlisted: src/services/ensoModulador.js — Creado en #1451 (2026-06-11) para añadir contexto ENSO a una recomendación ya resuelta. modularPorENSO conserva pruebas, pero ningún recomendador vivo le entrega una recomendación base ni una fase ENSO actual. Integrarlo sin esa fuente convertiría el módulo en copy sin dato real. (2026-09-04)
++ [33m⚠[0m pieza SIN ruta viva pero allowlisted: src/services/fenologyRecommendations.js — Motor puro recuperado en 2026-08-24 para la cola 010: recibe pronóstico por inyección para seguir offline-first. No hay ruta viva que construya esa solicitud ni le inyecte pronóstico; solo lo cubren pruebas. Se conserva hasta que una pantalla de siembra defina la entrada climática y la presentación de sus advertencias. (2026-09-04)
++ [33m⚠[0m pieza SIN ruta viva pero allowlisted: src/services/fincaScope.js — Fundación MF-1 de multi-finca en #1804 (2026-06-22), protegida por VITE_MULTI_FINCA y diseñada como no-op con el flag apagado. Ningún store vivo estampa o filtra _finca_id todavía; cablearlo exigiría una migración coordinada de persistencia, no una importación local. Se mantiene con sus pruebas de compatibilidad single-finca. (2026-09-04)
++ [33m⚠[0m pieza SIN ruta viva pero allowlisted: src/services/fotoOfflineService.js — Rescatado en #2668 (2026-07-21) como cola IndexedDB separada de fotos pendientes. El flujo actual de medios usa mediaCache/photoService y no llama a esta cola; no se conectan dos mecanismos de persistencia sin decidir cuál conserva la fuente de verdad. Sus pruebas documentan el comportamiento para una futura consolidación. (2026-09-04)
++ [33m⚠[0m pieza SIN ruta viva pero allowlisted: src/services/glaciarCaaml.js — Exportador CAAML v6 creado en #1552 (2026-06-14). Genera XML y descarga de reportes, pero no existe una ruta viva de reportes glaciares que ofrezca esa exportación; solo sus pruebas invocan el módulo. Se conserva el formato interoperable mientras se decide si esa superficie sigue en el producto. (2026-09-04)
++ [33m⚠[0m pieza SIN ruta viva pero allowlisted: src/services/glaciarZenodoMeta.js — Generador de metadatos para publicar conjuntos de reportes, creado en #1551 (2026-06-14). No hay flujo de exportación o publicación de glaciares alcanzable desde la PWA y buildZenodoMetadata solo tiene pruebas. Mantenerlo evita rehacer el mapeo si vuelve la interfaz de reporte. (2026-09-04)
++ [33m⚠[0m pieza SIN ruta viva pero allowlisted: src/services/hojaVidaMataService.js — Construido en #045b054b0 (2026-08-03) para cruzar procesos, logs y grafo AGE. No tiene consumidor fuera de sus pruebas y la UI viva no debe persistir una hoja de vida: debe renderizar el timeline derivado de logs. Se declara, en vez de cablearlo, hasta que se diseñe ese selector derivado conforme al modelo Asset+Log. (2026-09-04)
++ [33m⚠[0m pieza SIN ruta viva pero allowlisted: src/services/iotCostCalculator.js — Calculadora de componentes IoT incorporada en #1445 (2026-06-11). estimarCostoIoT solo aparece en pruebas; ninguna pantalla captura la configuración ni muestra el resultado. No se cablea para evitar que una estimación fija se presente como cotización o decisión de compra. (2026-09-04)
++ [33m⚠[0m pieza SIN ruta viva pero allowlisted: src/services/iotValeLaPena.js — Heurística de conveniencia IoT de #1451 (2026-06-11), cubierta por pruebas pero sin formulario o asesor activo que aporte sus cinco señales de entrada. Mostrar su veredicto sin la conversación que recolecta esas señales sería una recomendación sin contexto; se conserva para ese flujo futuro. (2026-09-04)
++ [33m⚠[0m pieza SIN ruta viva pero allowlisted: src/services/lunarPestService.js — Creado para PestMonitoringWindow en #174 (2026-05-06). Ese componente importa pestMonitoringMessage, pero no está en una ruta viva según el alcance simbólico; por tanto la ventana lunar no se muestra al usuario. Se preserva el cálculo y su cobertura hasta montar la superficie de monitoreo de plagas. (2026-09-04)
++ [33m⚠[0m pieza SIN ruta viva pero allowlisted: src/services/networkRetry.js — Helper de fetch con reintento y backoff, cubierto solo por networkRetry.test.js. Ningún cliente de red de producto lo importa: sustituir fetch de forma global cambiaría timeouts y degradación offline sin una decisión por endpoint. Se mantiene como utilidad probada, no como política implícita. (2026-09-04)
++ [33m⚠[0m pieza SIN ruta viva pero allowlisted: src/services/ragWithPhotos.js — Añadido en #933 (2026-05-19) como join lateral entre resultados RAG y fotos del usuario. retrieveWithPhotos solo tiene prueba; el agente vivo no consume ni gestiona sus URLs de Blob. Se conserva separado del RAG textual hasta que una vista defina la presentación y liberación de esos recursos. (2026-09-04)
++ [33m⚠[0m pieza SIN ruta viva pero allowlisted: src/services/recorridoService.js — Las tripas del recorrido por voz llegaron en #2152 (2026-07-09). useRecorridoStore lo usa, pero ese store no entra a una ruta viva en el alcance actual; GPS, resumen y TTS no se activan hoy. Borrarlo perdería el contrato offline y las pruebas antes de montar el recorrido. (2026-09-04)
++ [33m⚠[0m pieza SIN ruta viva pero allowlisted: src/services/redService.js — Cliente de los cuatro endpoints de trueque creado en #2792 (2026-07-25) como andamiaje explícitamente sin pantallas de Fase 1. El producto usa el módulo distinto services/red/redService.js para su red local; este cliente sidecar no tiene importador. Se mantiene hasta decidir si esa fase remota se integra o se retira de forma coordinada. (2026-09-04)
++ [33m⚠[0m pieza SIN ruta viva pero allowlisted: src/services/restauracionRecetaFormatter.js — Formateador de diagnóstico agroecológico de #1451 (2026-06-11). Tiene pruebas, pero ninguna pantalla ni respuesta de agente usa formatearRecetaAgroecologica para presentar roles, sucesión y alertas. Se conserva porque cablearlo exige decidir la fuente de diagnóstico y la superficie de lectura. (2026-09-04)
++ [33m⚠[0m pieza SIN ruta viva pero allowlisted: src/services/socialPrefiltro.js — Prefiltro de seguridad creado en #1457 (2026-06-11) y probado de forma aislada. No existe flujo social alcanzable que lo invoque antes de publicar o responder; conectarlo a una ruta no social sería aplicar una política distinta a su propósito. Se mantiene para el flujo social cuando se habilite. (2026-09-04)
++ [33m⚠[0m pieza SIN ruta viva pero allowlisted: src/services/subgrafoToText.js — Adaptador AGE a texto incorporado en #1457 (2026-06-11). No hay consumidor vivo que reciba un subgrafo y lo muestre con este formato; solo el test lo invoca. Se conserva como formato determinista mientras se define qué respuestas del agente deben exponer relaciones del grafo. (2026-09-04)
++ [33m⚠[0m pieza SIN ruta viva pero allowlisted: src/services/vitalidadEspirituService.js — Modelo fundamentado del panel de vitalidad creado en #2244 (2026-07-09). El único panel que importa buildVitalidadEspiritu está archivado y FincaVivaHero solo lo referencia en comentarios, por lo que no hay montaje vivo. Se conserva para no reemplazar sus métricas derivadas por estado persistido cuando se rediseñe el panel. (2026-09-04)
++ [33m⚠[0m pieza SIN ruta viva pero allowlisted: src/store/persistMiddleware.js — T47, middleware Zustand→localStorage: ningún store vivo lo usa. Adoptarlo toca la persistencia de preferencias — decisión coordinada (misma cola que fincaScope.js, declarado 2026-09-04). (2026-09-05)
++ [33m⚠[0m pieza SIN ruta viva pero allowlisted: src/store/useLoteStore.js — Store de lotes: lo importan LoteCroquisPlaceholder.jsx (declarado aquí) y useRecorridoStore.js (también declarado). Ninguna ruta viva lo alcanza; se declara junto a su cluster. (2026-09-05)
++ [33m⚠[0m pieza SIN ruta viva pero allowlisted: src/store/useRecorridoStore.js — Store del recorrido por voz (#2152): lo importa useRecorridoVoz.js (declarado aquí) y su servicio recorridoService.js ya está declarado (2026-09-04). El cluster del recorrido queda declarado completo hasta decidir su montaje. (2026-09-05)
++ [33m⚠[0m pieza SIN ruta viva pero allowlisted: src/types/asset.js — FALSO POSITIVO CONOCIDO (capa runtime): assetService.js (MONTADO) lo referencia vía @returns {{Promise<import('../types/asset.js').Asset|null>}} en JSDoc. El gate no ve comentarios; el consumo de tipos es real (checkJs). (2026-09-05)
++ [33m⚠[0m pieza SIN ruta viva pero allowlisted: src/types/crm.js — Tipos JSDoc del CRM agroecológico mínimo (PR #2859): contactos e interacciones que modelan asset--person y log--activity. Declarados junto a su servicio crmService.js, que aún no tiene ruta viva; los componentes del mockup tipan con literales inline hoy. Se consume en la misma decisión de producto que cablea el servicio. (2026-09-05)
++ [33m⚠[0m pieza SIN ruta viva pero allowlisted: src/types/css-custom-properties.d.ts — Declaración TypeScript AMBIENTAL: la carga jsconfig.json por include (src/types/**/*.d.ts), no un import. La semántica del gate (consumo runtime) no aplica a .d.ts — falso positivo por categoría, verificado el 2026-09-05. (2026-09-05)
++ [33m⚠[0m pieza SIN ruta viva pero allowlisted: src/types/global.d.ts — Declaración ambiental de Window (__ARRANQUE_OK/__ARRANQUE_FALLO de los gates visuales headless): la carga jsconfig include, no un import. Falso positivo por categoría. (2026-09-05)
++ [33m⚠[0m pieza SIN ruta viva pero allowlisted: src/types/index.d.ts — Declaración ambiental: la carga jsconfig include, no un import. Falso positivo por categoría. (2026-09-05)
++ [33m⚠[0m pieza SIN ruta viva pero allowlisted: src/types/index.js — FALSO POSITIVO CONOCIDO en la capa runtime, consumido de verdad en la capa de tipos: aiService, payloadService, photoService, inventoryEvents (todos MONTADOS), useAssetStore y planGeneratorService referencian sus @typedef vía JSDoc import('../types'). El gate mide consumo RUNTIME y quita comentarios, así que no ve JSDoc — verificado a mano el 2026-09-05 (control de importadores). No es código muerto: borrarlo rompería checkJs de esos servicios. (2026-09-05)
++ [33m⚠[0m pieza SIN ruta viva pero allowlisted: src/types/leaflet-stub.d.ts — Stub tipado de leaflet cargado por el mapping paths.leaflet de jsconfig.json (no por import): falso positivo por categoría. Borrarlo rompería checkJs de todo lo que toca leaflet. (2026-09-05)
++ [33m⚠[0m pieza SIN ruta viva pero allowlisted: src/types/log.js — Vocabulario @typedef del modelo Asset+Log (log--seeding/input/harvest/observation…, estilo farmOS) sin referencia aún, ni runtime ni JSDoc. Se conserva como contrato del modelo mientras el par asset/log se adopta en stores y sync (misma cola que fincaScope.js y syncEvent.js). (2026-09-05)
++ [33m⚠[0m pieza SIN ruta viva pero allowlisted: src/types/static-assets-shim.d.ts — Shims ambientales de assets estáticos para checkJs (TS2882/TS2307; queue/069.6): los carga jsconfig include. Falso positivo por categoría. (2026-09-05)
++ [33m⚠[0m pieza SIN ruta viva pero allowlisted: src/types/syncEvent.js — @typedef SyncEvent (cola de sincronización del modelo Asset+Log) sin referencia aún. Mismo caso que types/log.js: contrato del modelo a la espera de adopción. (2026-09-05)
++ [33m⚠[0m pieza SIN ruta viva pero allowlisted: src/types/three-cdn-shim.d.ts — Shim ambiental del specifier CDN de Three.js del visor standalone de especies (A1): lo carga jsconfig include. Falso positivo por categoría. (2026-09-05)
++ [33m⚠[0m pieza SIN ruta viva pero allowlisted: src/types/vite-env.d.ts — Declaración ambiental estándar de Vite: la carga jsconfig include, no un import. Falso positivo por categoría. (2026-09-05)
++ [33m⚠[0m pieza SIN ruta viva pero allowlisted: src/types/vitest-stub.d.ts — Declaración ambiental para los globals de vitest: la carga jsconfig include. Falso positivo por categoría. (2026-09-05)
++ [33m⚠[0m pieza SIN ruta viva pero allowlisted: src/utils/atajosTeclado.js — Atajos de teclado para power users (modal ?): sin un solo importador. Cablearlo implica decidir el set de atajos por pantalla — mejora sin dueño de ruta, se declara hasta que se adopte. (2026-09-05)
++ [33m⚠[0m pieza SIN ruta viva pero allowlisted: src/utils/auditLog.js — Log circular de SISTEMA para debugging del operador (su encabezado aclara: no es telemetría de usuario): sin importador. Se declara hasta decidir dónde se consulta el log (consola/pantalla de operador). (2026-09-05)
++ [33m⚠[0m pieza SIN ruta viva pero allowlisted: src/utils/backoff.js — T42, backoff exponencial con jitter para reintentos de sync: su encabezado dice «usado por syncManager», pero verificado con el control de importadores del remate (2026-09-05) ningún módulo vivo lo importa. Adoptarlo cambia la política de reintentos — decisión por endpoint, no un import. (2026-09-05)
++ [33m⚠[0m pieza SIN ruta viva pero allowlisted: src/utils/validacionFormularios.js — T43, validación de formularios en tiempo real: sin importador. Su adopción es pantalla por pantalla; se declara mientras tanto. (2026-09-05)
++ [33m⚠[0m pieza SIN ruta viva pero allowlisted: src/utils/wcagContraste.js — Utilidad de contraste WCAG: solo su test la importa. Se declara hasta que el pulido de accesibilidad la adopte en componentes vivos. (2026-09-05)
++ [33m⚠[0m pieza SIN ruta viva pero allowlisted: src/visual/agente/GuacamayaEntrada.jsx — Componente de entrada teatral para guacamaya como compai, equivalente a AngelitaEntrada pero nunca cableado. El sistema de guacamaya (GuacamayaEntrada, GuacamayaSalida, GuacamayaCompai) parece ser un experimento de séptima criatura que nunca se terminó de integrar al sistema de compaís. (2026-08-30)
++ [33m⚠[0m pieza SIN ruta viva pero allowlisted: src/visual/agente/GuacamayaSalida.jsx — Componente de salida épica para guacamaya como compai, equivalente a la salida que Angelita aún no tiene. Comentado en GuacamayaViva como 'la salida épica' pero el sistema de guacamaya completo quedó inconcluso. (2026-08-30)
++ [33m⚠[0m pieza SIN ruta viva pero allowlisted: src/visual/agente/compaiEstadoVisual.js — Contrato visual común de estados del compai: solo su test lo importa. La actuación viva va por los adaptadores del elenco; unificar el contrato es refactor transversal sin dueño hoy. (2026-09-05)
++ [33m⚠[0m pieza SIN ruta viva pero allowlisted: src/visual/confianza/AdvertenciaPeso.jsx — Componente del módulo confianza (piedra de advertencia sobre peso de afirmaciones). El módulo confianza (7 componentes) parece ser un experimento de lenguaje visual anti-alucinación que nunca se cableó en el producto. GaleriaConfianza.jsx describe una 'vitrina viva del lenguaje de la confianza' pero nunca se montó en ninguna ruta. (2026-08-30)
++ [33m⚠[0m pieza SIN ruta viva pero allowlisted: src/visual/confianza/FichaFuente.jsx — Componente del módulo confianza (ficha de herbario con fuente). Pieza del sistema de confianza que muestra procedencia de información (fuentes de Agrosavia, etc.). El módulo completo nunca se integró al producto. (2026-08-30)
++ [33m⚠[0m pieza SIN ruta viva pero allowlisted: src/visual/confianza/GaleriaConfianza.jsx — Componente principal del módulo confianza (vitrina del vocabulario completo). Comentado como 'Standalone y sin wiring: se monta donde haga falta revisarla' pero nunca se encontró el lugar. El sistema de 7 componentes (confianzaTokens, TrazoConfianza, etc.) quedó como experimento sin integrar. (2026-08-30)
++ [33m⚠[0m pieza SIN ruta viva pero allowlisted: src/visual/confianza/MarcaOrigen.jsx — Componente del módulo confianza (marca de origen: finca, laboratorio, herbario). Visualiza si la info viene de la finca del campesino, de validación científica, o de tradición. Parte del experimento inconcluso. (2026-08-30)
++ [33m⚠[0m pieza SIN ruta viva pero allowlisted: src/visual/confianza/NoSeHonesto.jsx — Componente del módulo confianza (el 'no sé' honesto con letreros visuales). Pieza del sistema anti-alucinación que enseña a Chagra a decir 'no sé' con claridad. El módulo completo quedó sin wirear. (2026-08-30)
++ [33m⚠[0m pieza SIN ruta viva pero allowlisted: src/visual/confianza/SaberTradicion.jsx — Componente del módulo confianza (guarda del saber campesino tradicional). Visualiza conocimiento de tradición oral vs validación científica. Parte del experimento inconcluso. (2026-08-30)
++ [33m⚠[0m pieza SIN ruta viva pero allowlisted: src/visual/confianza/TrazoConfianza.jsx — Componente del módulo confianza (hilo de confianza que conecta nivel alto/medio/bajo). Visualización del gradiente de confianza (4 hilos de colores). El módulo completo (7 componentes) quedó como experimento sin integrar. (2026-08-30)
++ [33m⚠[0m pieza SIN ruta viva pero allowlisted: src/visual/confianza/confianzaTokens.js — Tokens del módulo confianza (experimento anti-alucinación declarado sin montar el 2026-08-30): lo importan AdvertenciaPeso.jsx y FichaFuente.jsx, dentro del cluster declarado. (2026-09-05)
++ [33m⚠[0m pieza SIN ruta viva pero allowlisted: src/visual/confianza/index.js — Barril del módulo confianza sin un solo importador: sus componentes (declarados 2026-08-30) se importan directo entre sí. (2026-09-05)
++ [33m⚠[0m pieza SIN ruta viva pero allowlisted: src/visual/creatures/BarbuditoParamo.jsx — Criatura especial (barbudito del páramo) que nunca se cableó. Parece ser parte del elenco de criaturas emblemáticas (como el jaguar, zariguya) que se diseñaron pero no se integraron a los mundos principales. (2026-08-30)
++ [33m⚠[0m pieza SIN ruta viva pero allowlisted: src/visual/creatures/Borugo.jsx — Criatura rubber-hose del elenco: solo la alcanza el re-export del barril creatures/index.js sin que ningún consumidor le pida el nombre (barril que lava — el gate por símbolo lo destapó; control LAVADOS_POR_EL_BARRIL del arnés). Su montaje natural es el esfuerzo de ramas feat/huerfanos-al-valle-3d: qué criaturas entran al valle y cómo es decisión de producto (tanda 1), no se cablea pieza por pieza. Particular: el borugo fue ARCHIVADO por decisión del operador el 2026-07-18 (commit 1979888ec, «archivar borugo completamente (rechazado)») — candidato a borrado junto a borugoIdentidad.js. (2026-09-05)
++ [33m⚠[0m pieza SIN ruta viva pero allowlisted: src/visual/creatures/ChivitoTinta.jsx — Criatura rubber-hose del elenco: solo la alcanza el re-export del barril creatures/index.js sin que ningún consumidor le pida el nombre (barril que lava — el gate por símbolo lo destapó; control LAVADOS_POR_EL_BARRIL del arnés). Su montaje natural es el esfuerzo de ramas feat/huerfanos-al-valle-3d: qué criaturas entran al valle y cómo es decisión de producto (tanda 1), no se cablea pieza por pieza. (2026-09-05)
++ [33m⚠[0m pieza SIN ruta viva pero allowlisted: src/visual/creatures/JaguarHuesos.jsx — Criatura especial (jaguar de huesos) que nunca se cableó. Parece ser una representación artística/esquemática del jaguar, diferente a la versión realista. El elenco de criaturas especiales quedó como experimento visual. (2026-08-30)
++ [33m⚠[0m pieza SIN ruta viva pero allowlisted: src/visual/creatures/LuciernagaTinta.jsx — Criatura rubber-hose del elenco: solo la alcanza el re-export del barril creatures/index.js sin que ningún consumidor le pida el nombre (barril que lava — el gate por símbolo lo destapó; control LAVADOS_POR_EL_BARRIL del arnés). Su montaje natural es el esfuerzo de ramas feat/huerfanos-al-valle-3d: qué criaturas entran al valle y cómo es decisión de producto (tanda 1), no se cablea pieza por pieza. (2026-09-05)
++ [33m⚠[0m pieza SIN ruta viva pero allowlisted: src/visual/creatures/MomentoGuardianes.jsx — Criatura rubber-hose del elenco: solo la alcanza el re-export del barril creatures/index.js sin que ningún consumidor le pida el nombre (barril que lava — el gate por símbolo lo destapó; control LAVADOS_POR_EL_BARRIL del arnés). Su montaje natural es el esfuerzo de ramas feat/huerfanos-al-valle-3d: qué criaturas entran al valle y cómo es decisión de producto (tanda 1), no se cablea pieza por pieza. Es además el único importador de PerroHeroe.jsx y PerroTransicion.jsx (ambas declaradas aquí). (2026-09-05)
++ [33m⚠[0m pieza SIN ruta viva pero allowlisted: src/visual/creatures/OsoAndino.jsx — Criatura rubber-hose del elenco: solo la alcanza el re-export del barril creatures/index.js sin que ningún consumidor le pida el nombre (barril que lava — el gate por símbolo lo destapó; control LAVADOS_POR_EL_BARRIL del arnés). Su montaje natural es el esfuerzo de ramas feat/huerfanos-al-valle-3d: qué criaturas entran al valle y cómo es decisión de producto (tanda 1), no se cablea pieza por pieza. (2026-09-05)
++ [33m⚠[0m pieza SIN ruta viva pero allowlisted: src/visual/creatures/OsoAnteojos.jsx — Criatura rubber-hose del elenco: solo la alcanza el re-export del barril creatures/index.js sin que ningún consumidor le pida el nombre (barril que lava — el gate por símbolo lo destapó; control LAVADOS_POR_EL_BARRIL del arnés). Su montaje natural es el esfuerzo de ramas feat/huerfanos-al-valle-3d: qué criaturas entran al valle y cómo es decisión de producto (tanda 1), no se cablea pieza por pieza. (2026-09-05)
++ [33m⚠[0m pieza SIN ruta viva pero allowlisted: src/visual/creatures/PerroHeroe.jsx — Criatura rubber-hose del elenco: solo la alcanza el re-export del barril creatures/index.js sin que ningún consumidor le pida el nombre (barril que lava — el gate por símbolo lo destapó; control LAVADOS_POR_EL_BARRIL del arnés). Su montaje natural es el esfuerzo de ramas feat/huerfanos-al-valle-3d: qué criaturas entran al valle y cómo es decisión de producto (tanda 1), no se cablea pieza por pieza. Sus importadores: MomentoGuardianes.jsx (declarado aquí) y el barril. (2026-09-05)
++ [33m⚠[0m pieza SIN ruta viva pero allowlisted: src/visual/creatures/PerroTransicion.jsx — Criatura rubber-hose del elenco: solo la alcanza el re-export del barril creatures/index.js sin que ningún consumidor le pida el nombre (barril que lava — el gate por símbolo lo destapó; control LAVADOS_POR_EL_BARRIL del arnés). Su montaje natural es el esfuerzo de ramas feat/huerfanos-al-valle-3d: qué criaturas entran al valle y cómo es decisión de producto (tanda 1), no se cablea pieza por pieza. Sus importadores: MomentoGuardianes.jsx (declarado aquí) y el barril. (2026-09-05)
++ [33m⚠[0m pieza SIN ruta viva pero allowlisted: src/visual/creatures/Zariguya.jsx — Criatura rubber-hose del elenco: solo la alcanza el re-export del barril creatures/index.js sin que ningún consumidor le pida el nombre (barril que lava — el gate por símbolo lo destapó; control LAVADOS_POR_EL_BARRIL del arnés). Su montaje natural es el esfuerzo de ramas feat/huerfanos-al-valle-3d: qué criaturas entran al valle y cómo es decisión de producto (tanda 1), no se cablea pieza por pieza. La zarigüeya rubber-hose (PR #2613) compone el kit _rubberhose.jsx y zariguyaIdentidad.js; el registro CREATURES del barril la re-exporta sin que nadie le pida el nombre. (2026-09-05)
++ [33m⚠[0m pieza SIN ruta viva pero allowlisted: src/visual/creatures/borugoIdentidad.js — Identidad del Borugo: sus importadores son Borugo.jsx y el barril (ambos sin montar; el borugo fue archivado por el operador el 2026-07-18, commit 1979888ec). Candidato a borrado junto a su criatura (curaduría del operador). (2026-09-05)
++ [33m⚠[0m pieza SIN ruta viva pero allowlisted: src/visual/creatures/chivitoLamina/anatomia.js — Apoyo de ChivitoPunkLaminaViva.jsx (lámina fuera del montaje activo, declarada 2026-09-03 como compatibilidad histórica) y del capas hermano. Mismo patrón: queda en disco por historia; su borrado es curaduría del operador. (2026-09-05)
++ [33m⚠[0m pieza SIN ruta viva pero allowlisted: src/visual/creatures/chivitoLamina/capas.js — Apoyo de ChivitoPunkLaminaViva.jsx (declarada 2026-09-03). Queda en disco por historia; borrado = curaduría del operador. (2026-09-05)
++ [33m⚠[0m pieza SIN ruta viva pero allowlisted: src/visual/creatures/chivitoTintaIdentidad.js — Identidad de ChivitoTinta: la importan ChivitoTinta.jsx y el barril (criatura rubber-hose sin montar, declarada aquí). Se cablea junto con su criatura. (2026-09-05)
++ [33m⚠[0m pieza SIN ruta viva pero allowlisted: src/visual/creatures/escenaGuardianes.js — Apoyo de MomentoGuardianes.jsx (momento de guardianes sin montar, declarado aquí): sus únicos importadores son esa criatura y el barril. (2026-09-05)
++ [33m⚠[0m pieza SIN ruta viva pero allowlisted: src/visual/creatures/faunaRubberhose.registry.js — Registro slug→componente de la fauna benéfica rubber-hose (binomio verificado por ficha). Su propio encabezado dice «lo cablea Opus» — pendiente de ese cableado consciente; hoy sin un solo importador. (2026-09-05)
++ [33m⚠[0m pieza SIN ruta viva pero allowlisted: src/visual/creatures/jaguarHuesos/pielHuesos.js — Apoyo de JaguarHuesos.jsx (criatura especial declarada sin montar el 2026-08-30): su único importador. Se cablea junto con su criatura. (2026-09-05)
++ [33m⚠[0m pieza SIN ruta viva pero allowlisted: src/visual/creatures/jaguarLamina/anatomia.js — Apoyo de JaguarLaminaViva.jsx (huérfana gated 2026-08-30) y del capas hermano. Se declara junto a su lámina. (2026-09-05)
++ [33m⚠[0m pieza SIN ruta viva pero allowlisted: src/visual/creatures/jaguarLamina/capas.js — Apoyo de JaguarLaminaViva.jsx (huérfana gated 2026-08-30). Se declara junto a su lámina. (2026-09-05)
++ [33m⚠[0m pieza SIN ruta viva pero allowlisted: src/visual/creatures/jaguarTrazado/generar-calco.mjs — HERRAMIENTA CLI, no módulo runtime: se corre «node generar-calco.mjs <svg>» para hornear calcoTrazado.js (cuyo output SÍ vive en el jaguar de producto). El gate mide consumo runtime de src/, una CLI no participa de esa semántica — falso positivo por categoría. NO borrar: regenera el calco (pipeline documentado en su encabezado). (2026-09-05)
++ [33m⚠[0m pieza SIN ruta viva pero allowlisted: src/visual/creatures/luciernagaLamina/anatomia.js — Apoyo de LuciernagaLaminaViva.jsx (declarada 2026-09-03 como compatibilidad histórica) y del capas hermano. (2026-09-05)
++ [33m⚠[0m pieza SIN ruta viva pero allowlisted: src/visual/creatures/luciernagaLamina/capas.js — Apoyo de LuciernagaLaminaViva.jsx (declarada 2026-09-03). (2026-09-05)
++ [33m⚠[0m pieza SIN ruta viva pero allowlisted: src/visual/creatures/luciernagaTintaIdentidad.js — Identidad de LuciernagaTinta: la importan LuciernagaTinta.jsx y el barril (criatura sin montar, declarada aquí). (2026-09-05)
++ [33m⚠[0m pieza SIN ruta viva pero allowlisted: src/visual/creatures/osoAnteojosIdentidad.js — Identidad de OsoAnteojos: la importan OsoAnteojos.jsx y el barril (criatura sin montar, declarada aquí). (2026-09-05)
++ [33m⚠[0m pieza SIN ruta viva pero allowlisted: src/visual/creatures/osoLamina/anatomia.js — Apoyo de OsoBastonLaminaViva.jsx (la anatomía MEDIDA de la lámina real aprobada del oso de anteojos, para el corte por alfa): sus únicos importadores son capas.js (hermano del mismo módulo) y el test capas.test.js. El componente dueño fue desconectado del registro CREATURES (la entrada 'oso-baston' monta la piel TINTA OsoBaston) y archivado 2026-09-04 en _archivo/ como symlink reversible al disco frío — regla dura del operador «compais solo con TINTA» (#3151; archivar ≠ borrar). La carpeta de apoyo NO se movió a propósito (mismo criterio que zariguyaGeminiLamina en #3151): si la lámina vuelve del disco frío, anatomia+capas son su rig. Se declara hasta decidir la vuelta o la baja de la lámina (curaduría del operador); al cablear o retirar, borrar la entrada junto con la de capas.js. (2026-09-05)
++ [33m⚠[0m pieza SIN ruta viva pero allowlisted: src/visual/creatures/osoLamina/capas.js — Apoyo de OsoBastonLaminaViva.jsx (hornea oso.png en capas por alfa: cuerpo, cabeza, orejas, mandíbula, corona del bastón): su único importador es el test capas.test.js — el dueño archivado era su otro consumidor y ya no es visible para este gate (symlink). Mismo caso que su hermano anatomia.js (declarado aquí): el método de la casa («la piel es la lámina exacta, cero dibujo nuevo») queda preservado con sus pruebas mientras la lámina del oso espera en el disco frío (regla dura solo-tinta, #3151). Al cablear o retirar la lámina, borrar la entrada junto con la de anatomia.js. (2026-09-05)
++ [33m⚠[0m pieza SIN ruta viva pero allowlisted: src/visual/creatures/rigged/index.js — Barril del módulo rigged sin un solo importador: nadie lo pide en producto, vitrina ni test. Candidato a borrado (curaduría del operador). (2026-09-05)
++ [33m⚠[0m pieza SIN ruta viva pero allowlisted: src/visual/creatures/useEntGuion.js — Guion de la voz que enseña del Ent del páramo: solo lo alcanza el barril creatures/index.js. Se cablea junto con la criatura Ent que lo consuma (misma decisión de producto del elenco). (2026-09-05)
++ [33m⚠[0m pieza SIN ruta viva pero allowlisted: src/visual/creatures/zariguyaGeminiLamina/capas.js — Apoyo de ZariguyaGeminiLaminaViva.jsx (el set raster Gemini de la zarigüeya, horneado en 8 capas): su único importador es el test capas.test.jsx (el test de regresión de assets la descubre por fs, no la importa, así que no cuenta como consumidor para este gate). El componente dueño fue desconectado de ZariguyaCompaiEscena (monta la piel TINTA ZariguyaTrazado desde #3151) y archivado 2026-09-04 en _archivo/ como symlink reversible al disco frío — regla dura «compais solo con TINTA». Su hermana anatomia.js NO se declara: sigue viva (el trazado la reutiliza vía zariguyaTrazado/posesTrazado.js) y es la que ancla la carpeta. Se declara solo este apoyo hasta decidir la vuelta o la baja del set Gemini (curaduría del operador); al cablear o retirar, borrar la entrada. (2026-09-05)
++ [33m⚠[0m pieza SIN ruta viva pero allowlisted: src/visual/creatures/zariguyaLamina/anatomia.js — Apoyo de ZariguyaLaminaViva.jsx (huérfana gated 2026-08-30; ZariguyaGeminiLaminaViva es la viva) y del capas hermano. (2026-09-05)
++ [33m⚠[0m pieza SIN ruta viva pero allowlisted: src/visual/creatures/zariguyaLamina/capas.js — Apoyo de ZariguyaLaminaViva.jsx (huérfana gated 2026-08-30). (2026-09-05)
++ [33m⚠[0m pieza SIN ruta viva pero allowlisted: src/visual/creatures/zariguyaTrazado/generar-calco.mjs — HERRAMIENTA CLI, no módulo runtime: hornea calcoTrazado.js de la zarigüeya (output vivo en producto). Falso positivo por categoría (el gate mide consumo runtime); NO borrar: regenera el calco. (2026-09-05)
++ [33m⚠[0m pieza SIN ruta viva pero allowlisted: src/visual/cuaderno/CuadernoVivo.jsx — Componente principal del módulo cuaderno (cuaderno campesino vivo). El módulo cuaderno (5 componentes) parece ser un experimento de interfaz tipo cuaderno de campo que nunca se cableó. La descripción menciona un cuaderno que se abre y respira pero nunca se encontró el lugar de montaje. (2026-08-30)
++ [33m⚠[0m pieza SIN ruta viva pero allowlisted: src/visual/cuaderno/LaPaciencia.jsx — Componente del módulo cuaderno (la pacienciada del cultivo). Pieza educativa que muestra el tiempo de espera en ciclos de cultivo. Parte del experimento inconcluso. (2026-08-30)
++ [33m⚠[0m pieza SIN ruta viva pero allowlisted: src/visual/cuaderno/PaginaCuaderno.jsx — Componente del módulo cuaderno (página individual del cuaderno). Pieza de UI para páginas de cuaderno de campo. El módulo completo quedó sin wirear. (2026-08-30)
++ [33m⚠[0m pieza SIN ruta viva pero allowlisted: src/visual/cuaderno/TrazoVivo.jsx — Componente del módulo cuaderno (trazo/dibujo vivo en el cuaderno). Pieza de animación de trazos como dibujo en progreso. Parte del experimento inconcluso. (2026-08-30)
++ [33m⚠[0m pieza SIN ruta viva pero allowlisted: src/visual/cuaderno/TresTemporadas.jsx — Componente del módulo cuaderno (tres temporadas de cultivo). Pieza educativa que muestra ciclos temporales. El módulo completo quedó sin integrar. (2026-08-30)
++ [33m⚠[0m pieza SIN ruta viva pero allowlisted: src/visual/cuaderno/cuadernoData.js — Apoyo de CuadernoVivo.jsx y PaginaCuaderno.jsx (módulo cuaderno declarado sin montar el 2026-08-30). (2026-09-05)
++ [33m⚠[0m pieza SIN ruta viva pero allowlisted: src/visual/cuaderno/cuadernoTokens.js — Apoyo de LaPaciencia.jsx y PaginaCuaderno.jsx (módulo cuaderno declarado sin montar el 2026-08-30). (2026-09-05)
++ [33m⚠[0m pieza SIN ruta viva pero allowlisted: src/visual/cuaderno/index.js — Barril del módulo cuaderno sin un solo importador: sus componentes (declarados 2026-08-30) se importan directo entre sí. (2026-09-05)
++ [33m⚠[0m pieza SIN ruta viva pero allowlisted: src/visual/diferencial/LaminaDiferencial.jsx — Componente del módulo diferencial (lámina que muestra diferencias). El módulo diferencial (4 componentes) parece ser un sistema de láminas comparativas/educativas que nunca se cableó. Tipo infografías de antes/después o diferencias clave. (2026-08-30)
++ [33m⚠[0m pieza SIN ruta viva pero allowlisted: src/visual/diferencial/LaminaDuda.jsx — Componente del módulo diferencial (lámina de duda/incertidumbre). Pieza que visualiza 'no estoy seguro' o 'necesito más info'. Parte del experimento inconcluso. (2026-08-30)
++ [33m⚠[0m pieza SIN ruta viva pero allowlisted: src/visual/diferencial/LaminaLlave.jsx — Componente del módulo diferencial (lámina llave/clave). Pieza que muestra la clave o insight principal. Parte del sistema de láminas inconcluso. (2026-08-30)
++ [33m⚠[0m pieza SIN ruta viva pero allowlisted: src/visual/diferencial/formasBicho.js — Apoyo de LaminaDuda.jsx y del barril diferencial/index.js (láminas del módulo diferencial declaradas sin montar el 2026-08-30). (2026-09-05)
++ [33m⚠[0m pieza SIN ruta viva pero allowlisted: src/visual/diferencial/formasHoja.js — Apoyo de LaminaDiferencial.jsx y LaminaDuda.jsx (declaradas sin montar el 2026-08-30). (2026-09-05)
++ [33m⚠[0m pieza SIN ruta viva pero allowlisted: src/visual/diferencial/index.js — Barril del módulo diferencial sin un solo importador: sus láminas (declaradas 2026-08-30) se importan directo entre sí. (2026-09-05)
++ [33m⚠[0m pieza SIN ruta viva pero allowlisted: src/visual/diferencial/motivosDano.jsx — Componente del módulo diferencial (motivos de daño en lámina). Pieza educativa que muestra causas de problemas. El módulo completo quedó sin integrar. (2026-08-30)
++ [33m⚠[0m pieza SIN ruta viva pero allowlisted: src/visual/diferencial/paletaDano.js — Apoyo de LaminaDiferencial.jsx y LaminaDuda.jsx (declaradas sin montar el 2026-08-30). (2026-09-05)
++ [33m⚠[0m pieza SIN ruta viva pero allowlisted: src/visual/iconos/TazaCafe.jsx — Icono de taza de café que nunca se cableó. Parece ser un icono ilustrado para UI del tema café que no se encontró lugar de uso. Los iconos principales de la app vienen de lucide-react. (2026-08-30)
++ [33m⚠[0m pieza SIN ruta viva pero allowlisted: src/visual/icons/IconosEtapaCiclo.jsx — Set de 6 glifos de etapa de ciclo (semilla→cosecha→guardado) para catálogo/cards: solo lo alcanza el barril icons/index.js (declarado aquí, cuyo único importador es GuiaEspecieCards.jsx, también declarada). El catálogo vivo muestra las etapas sin estos glifos todavía. (2026-09-05)
++ [33m⚠[0m pieza SIN ruta viva pero allowlisted: src/visual/icons/index.js — Barril de iconos ilustrados: su único importador es GuiaEspecieCards.jsx (declarada aquí). Se declara junto a su consumidor. (2026-09-05)
++ [33m⚠[0m pieza SIN ruta viva pero allowlisted: src/visual/laminas/botanicas/LaminaBotanica.jsx — Lámina botánica principal del sistema de láminas botánicas. El módulo (4 componentes en botánicas + pintores) parece ser un sistema de fichas botánicas ilustradas que nunca se cableó. Comentado como sistema de hábito, órganos, tipografía pero nunca se montó. (2026-08-30)
++ [33m⚠[0m pieza SIN ruta viva pero allowlisted: src/visual/laminas/botanicas/especies/index.js — Barril de fichas por piso térmico del sistema de láminas botánicas (sin montar, 2026-08-30): su único importador es el barril raíz botanicas/index.js (declarado aquí). (2026-09-05)
++ [33m⚠[0m pieza SIN ruta viva pero allowlisted: src/visual/laminas/botanicas/especies/pisoCalido.js — Ficha de lámina botánica del piso cálido: solo la importan el barril especies/index.js (declarado aquí), dentro del sistema sin montar (2026-08-30). (2026-09-05)
++ [33m⚠[0m pieza SIN ruta viva pero allowlisted: src/visual/laminas/botanicas/especies/pisoFrio.js — Ficha de lámina botánica del piso frío: solo la importan el barril especies/index.js (declarado aquí), dentro del sistema sin montar (2026-08-30). (2026-09-05)
++ [33m⚠[0m pieza SIN ruta viva pero allowlisted: src/visual/laminas/botanicas/especies/pisoTemplado.js — Ficha de lámina botánica del piso templado: solo la importan el barril especies/index.js (declarado aquí), dentro del sistema sin montar (2026-08-30). (2026-09-05)
++ [33m⚠[0m pieza SIN ruta viva pero allowlisted: src/visual/laminas/botanicas/geometria/flor.js — Apoyo de organos.jsx y del barril botanicas/index.js (piezas del sistema de láminas botánicas declarado sin montar el 2026-08-30). Se declara junto con su sistema. (2026-09-05)
++ [33m⚠[0m pieza SIN ruta viva pero allowlisted: src/visual/laminas/botanicas/geometria/fruto.js — Apoyo de organos.jsx y del barril botanicas/index.js (sistema sin montar, 2026-08-30). Se declara junto con su sistema. (2026-09-05)
++ [33m⚠[0m pieza SIN ruta viva pero allowlisted: src/visual/laminas/botanicas/geometria/habito.js — Apoyo de PintaHabito.jsx y del barril botanicas/index.js (sistema sin montar, 2026-08-30). Se declara junto con su sistema. (2026-09-05)
++ [33m⚠[0m pieza SIN ruta viva pero allowlisted: src/visual/laminas/botanicas/geometria/hoja.js — Apoyo de PintaHabito.jsx y del barril botanicas/index.js (sistema sin montar, 2026-08-30). Se declara junto con su sistema. (2026-09-05)
++ [33m⚠[0m pieza SIN ruta viva pero allowlisted: src/visual/laminas/botanicas/geometria/raiz.js — Apoyo de LaminaBotanica.jsx y del barril botanicas/index.js (sistema sin montar, 2026-08-30). Se declara junto con su sistema. (2026-09-05)
++ [33m⚠[0m pieza SIN ruta viva pero allowlisted: src/visual/laminas/botanicas/geometria/sintoma.js — Apoyo de organos.jsx y del barril botanicas/index.js (sistema sin montar, 2026-08-30). Se declara junto con su sistema. (2026-09-05)
++ [33m⚠[0m pieza SIN ruta viva pero allowlisted: src/visual/laminas/botanicas/index.js — Barril raíz del sistema de láminas botánicas sin un solo importador: sus piezas (LaminaBotanica.jsx y pintores, declarados 2026-08-30) se importan directo. Se cablea junto con el sistema (decisión de producto de la tanda 1). (2026-09-05)
++ [33m⚠[0m pieza SIN ruta viva pero allowlisted: src/visual/laminas/botanicas/nucleo/paletaLamina.js — Núcleo de paleta del sistema de láminas botánicas (sin montar, 2026-08-30): la importan LaminaBotanica.jsx y geometria/sintoma.js, todos dentro del cluster declarado. (2026-09-05)
++ [33m⚠[0m pieza SIN ruta viva pero allowlisted: src/visual/laminas/botanicas/nucleo/rng.js — Núcleo de azar determinista del sistema de láminas botánicas (sin montar, 2026-08-30): lo importan LaminaBotanica.jsx y geometria/flor.js, dentro del cluster declarado. (2026-09-05)
++ [33m⚠[0m pieza SIN ruta viva pero allowlisted: src/visual/laminas/botanicas/nucleo/trama.js — Núcleo de trama del sistema de láminas botánicas (sin montar, 2026-08-30): lo importan LaminaBotanica.jsx y geometria/fruto.js, dentro del cluster declarado. (2026-09-05)
++ [33m⚠[0m pieza SIN ruta viva pero allowlisted: src/visual/laminas/botanicas/nucleo/trazo.js — Núcleo de trazo del sistema de láminas botánicas (sin montar, 2026-08-30): lo importan LaminaBotanica.jsx y geometria/flor.js, dentro del cluster declarado. (2026-09-05)
++ [33m⚠[0m pieza SIN ruta viva pero allowlisted: src/visual/laminas/botanicas/pintores/PintaHabito.jsx — Componente del sistema de láminas botánicas (pinta hábito de crecimiento). Pieza que visualiza el hábito (arbusto, árbol, hierba) de una especie. El sistema completo quedó inconcluso. (2026-08-30)
++ [33m⚠[0m pieza SIN ruta viva pero allowlisted: src/visual/laminas/botanicas/pintores/organos.jsx — Componente del sistema de láminas botánicas (pinta órganos de la planta). Pieza que visualiza hojas, flores, frutos. El módulo de láminas botánicas (4 archivos) quedó sin wirear. (2026-08-30)
++ [33m⚠[0m pieza SIN ruta viva pero allowlisted: src/visual/laminas/botanicas/pintores/tipografia.jsx — Componente del sistema de láminas botánicas (tipografía de lámina). Sistema de letras/tipografía para fichas botánicas. El módulo completo quedó como experimento sin integrar. (2026-08-30)
++ [33m⚠[0m pieza SIN ruta viva pero allowlisted: src/visual/mundo3d/CamaraDioramas.jsx — Verificado con grep: nadie importa el componente React <CamaraDioramas>. Lo que SÍ está cableado (App.jsx, mockups/vitrina3d/VitrinaMundos.jsx) es resolverEncuadre() desde el módulo hermano camaraDioramas.js — la lógica de encuadre se usa directo, sin pasar por el wrapper de componente. El 'import CamaraDioramas from ...' que aparece en el docstring de camaraDioramas.js es un ejemplo de uso en prosa, no código real (y su ruta relativa ni siquiera resuelve). Encontrado por el nuevo check. (2026-07-21)
++ [33m⚠[0m pieza SIN ruta viva pero allowlisted: src/visual/mundo3d/CielosHora.jsx — El propio comentario de CapaVivaMundo.jsx dice literalmente 'CielosHora.jsx no existe en dev a la fecha de esta capa; cuando aterrice, se compone aquí mismo' — es un scaffold para una integración futura documentada, todavía sin consumidor real. Encontrado por el nuevo check; no se cablea en este PR (decisión de producto pendiente, no un olvido silencioso). (2026-07-21)
++ [33m⚠[0m pieza SIN ruta viva pero allowlisted: src/visual/mundo3d/artesania/ArtesaniaKit.jsx — Kit de artesanía andina (vasijas, segmentos) que nunca se cableó. El archivo hermano ArtesaniaAndina.jsx sí se usa en mockups/artesania-andina, pero este kit quedó huérfano. Parece ser la lógica de rendering de vasijas que no se terminó de integrar. (2026-08-30)
++ [33m⚠[0m pieza SIN ruta viva pero allowlisted: src/visual/mundo3d/artesania/geometriasArtesania.js — Apoyo de ArtesaniaKit.jsx (kit de artesanía andina; ArtesaniaAndina.jsx, el componente que sí vive en vitrina, importa sus datos directo y no por este kit): sus únicos importadores son ArtesaniaKit.jsx y el barril artesania/index.js. El componente dueño fue declarado sin consumidor el 2026-08-30 (experimento de mundo 3D sin cablear). Hallazgo del barrido ancho del gate (095.b, #3113): hasta el 2026-09-03 este gate solo miraba componentes .jsx, por eso los componentes dueños se declararon el 2026-08-30 sin sus módulos de apoyo. Se cablea junto con su escena (decisión de producto, tanda 2 del drenaje — ops/DRENAJE-HUERFANOS-TANDA-1-2026-09-04.md); al cablear, borrar ambas entradas. (2026-09-04)
++ [33m⚠[0m pieza SIN ruta viva pero allowlisted: src/visual/mundo3d/artesania/index.js — Barril del módulo artesanía sin un solo importador: nadie lo pide en producto, vitrina ni test; sus piezas (ArtesaniaKit.jsx y hermanos) — declarados el 2026-08-30 — se importan entre sí o directo desde sus vitrinas. Candidato a borrado (decisión de curaduría del operador, misma cola de propuestas del drenaje tanda 1). (2026-09-04)
++ [33m⚠[0m pieza SIN ruta viva pero allowlisted: src/visual/mundo3d/artesania/materialesArtesania.js — Apoyo de ArtesaniaKit.jsx (kit de artesanía andina; ArtesaniaAndina.jsx, el componente que sí vive en vitrina, importa sus datos directo y no por este kit): sus únicos importadores son ArtesaniaKit.jsx y el barril artesania/index.js. El componente dueño fue declarado sin consumidor el 2026-08-30 (experimento de mundo 3D sin cablear). Hallazgo del barrido ancho del gate (095.b, #3113): hasta el 2026-09-03 este gate solo miraba componentes .jsx, por eso los componentes dueños se declararon el 2026-08-30 sin sus módulos de apoyo. Se cablea junto con su escena (decisión de producto, tanda 2 del drenaje — ops/DRENAJE-HUERFANOS-TANDA-1-2026-09-04.md); al cablear, borrar ambas entradas. (2026-09-04)
++ [33m⚠[0m pieza SIN ruta viva pero allowlisted: src/visual/mundo3d/artesania/texturasArtesania.js — Apoyo de ArtesaniaKit.jsx (kit de artesanía andina; ArtesaniaAndina.jsx, el componente que sí vive en vitrina, importa sus datos directo y no por este kit): sus únicos importadores son materialesArtesania.js y el barril artesania/index.js. El componente dueño fue declarado sin consumidor el 2026-08-30 (experimento de mundo 3D sin cablear). Hallazgo del barrido ancho del gate (095.b, #3113): hasta el 2026-09-03 este gate solo miraba componentes .jsx, por eso los componentes dueños se declararon el 2026-08-30 sin sus módulos de apoyo. Se cablea junto con su escena (decisión de producto, tanda 2 del drenaje — ops/DRENAJE-HUERFANOS-TANDA-1-2026-09-04.md); al cablear, borrar ambas entradas. (2026-09-04)
++ [33m⚠[0m pieza SIN ruta viva pero allowlisted: src/visual/mundo3d/artesania/tramaAndina.js — Apoyo de ArtesaniaKit.jsx (kit de artesanía andina; ArtesaniaAndina.jsx, el componente que sí vive en vitrina, importa sus datos directo y no por este kit): sus únicos importadores son ArtesaniaKit.jsx y geometriasArtesania.js. El componente dueño fue declarado sin consumidor el 2026-08-30 (experimento de mundo 3D sin cablear). Hallazgo del barrido ancho del gate (095.b, #3113): hasta el 2026-09-03 este gate solo miraba componentes .jsx, por eso los componentes dueños se declararon el 2026-08-30 sin sus módulos de apoyo. Se cablea junto con su escena (decisión de producto, tanda 2 del drenaje — ops/DRENAJE-HUERFANOS-TANDA-1-2026-09-04.md); al cablear, borrar ambas entradas. (2026-09-04)
++ [33m⚠[0m pieza SIN ruta viva pero allowlisted: src/visual/mundo3d/atmosfera/DemoAtmosferaViva.jsx — Demo aislada por contrato A4 (su encabezado lo declara): viñeta de QA/arte del arco del día. Cablearla rompería el contrato. Espeja la decisión ya escrita en ops/componentes-huerfanos-allowlist.json por el drenaje tanda 1 (#3120): este gate mantiene su propio allowlist y no lee el otro. (2026-09-04)
++ [33m⚠[0m pieza SIN ruta viva pero allowlisted: src/visual/mundo3d/beneficos/EscenaBeneficos.jsx — Escena 3D de organismos benéficos (control biológico) que nunca se cableó. Parece ser una escena educativa sobre mariquitas, crisopas, trichogramas (aliados contra plagas) que no se montó en ningún mundo. (2026-08-30)
++ [33m⚠[0m pieza SIN ruta viva pero allowlisted: src/visual/mundo3d/beneficos/beneficos.geom.js — Apoyo de EscenaBeneficos.jsx (organismos benéficos: mariquitas, crisopas, trichogramas): sus únicos importadores son esa escena. El componente dueño fue declarado sin consumidor el 2026-08-30 (experimento de mundo 3D sin cablear). Hallazgo del barrido ancho del gate (095.b, #3113): hasta el 2026-09-03 este gate solo miraba componentes .jsx, por eso los componentes dueños se declararon el 2026-08-30 sin sus módulos de apoyo. Se cablea junto con su escena (decisión de producto, tanda 2 del drenaje — ops/DRENAJE-HUERFANOS-TANDA-1-2026-09-04.md); al cablear, borrar ambas entradas. (2026-09-04)
++ [33m⚠[0m pieza SIN ruta viva pero allowlisted: src/visual/mundo3d/beneficos/beneficosIdentidad.js — Apoyo de EscenaBeneficos.jsx (organismos benéficos: mariquitas, crisopas, trichogramas): sus únicos importadores son esa escena y beneficos.geom.js. El componente dueño fue declarado sin consumidor el 2026-08-30 (experimento de mundo 3D sin cablear). Hallazgo del barrido ancho del gate (095.b, #3113): hasta el 2026-09-03 este gate solo miraba componentes .jsx, por eso los componentes dueños se declararon el 2026-08-30 sin sus módulos de apoyo. Se cablea junto con su escena (decisión de producto, tanda 2 del drenaje — ops/DRENAJE-HUERFANOS-TANDA-1-2026-09-04.md); al cablear, borrar ambas entradas. (2026-09-04)
++ [33m⚠[0m pieza SIN ruta viva pero allowlisted: src/visual/mundo3d/beneficos/dinamicaPlaga.js — Apoyo de EscenaBeneficos.jsx (organismos benéficos: mariquitas, crisopas, trichogramas): sus únicos importadores son esa escena y el barril beneficos/index.js. El componente dueño fue declarado sin consumidor el 2026-08-30 (experimento de mundo 3D sin cablear). Hallazgo del barrido ancho del gate (095.b, #3113): hasta el 2026-09-03 este gate solo miraba componentes .jsx, por eso los componentes dueños se declararon el 2026-08-30 sin sus módulos de apoyo. Se cablea junto con su escena (decisión de producto, tanda 2 del drenaje — ops/DRENAJE-HUERFANOS-TANDA-1-2026-09-04.md); al cablear, borrar ambas entradas. (2026-09-04)
++ [33m⚠[0m pieza SIN ruta viva pero allowlisted: src/visual/mundo3d/beneficos/index.js — Barril del módulo beneficos sin un solo importador: nadie lo pide en producto, vitrina ni test; sus piezas (EscenaBeneficos.jsx y hermanos) — declarados el 2026-08-30 — se importan entre sí o directo desde sus vitrinas. Candidato a borrado (decisión de curaduría del operador, misma cola de propuestas del drenaje tanda 1). (2026-09-04)
++ [33m⚠[0m pieza SIN ruta viva pero allowlisted: src/visual/mundo3d/bosque/DoselBiodiverso.jsx — Escena 3D del dosel biodiverso del bosque que nunca se cableó. Visualización estratificada del bosque (dosel alto, medio, bajo) con biodiversidad en cada capa. Parece ser una pieza educativa que no se integró al mundo bosque. (2026-08-30)
++ [33m⚠[0m pieza SIN ruta viva pero allowlisted: src/visual/mundo3d/bosque/EscenaEntMaestro.jsx — Escena 3D del Ent maestro del bosque que nunca se cableó. Versión principal/maestra del Ent de la queñua (Polylepis) que no se montó. La versión usada está en MundoEntBosque.jsx (paramo-definitivo), esta parece ser una versión alternativa que quedó huérfana. (2026-08-30)
++ [33m⚠[0m pieza SIN ruta viva pero allowlisted: src/visual/mundo3d/bosque/corteSuelo.geom.js — Apoyo de EscenaEntMaestro.jsx (versión maestra no montada del Ent de la queñua; la que vive es MundoEntBosque.jsx): sus únicos importadores son esa escena. El componente dueño fue declarado sin consumidor el 2026-08-30 (experimento de mundo 3D sin cablear). Hallazgo del barrido ancho del gate (095.b, #3113): hasta el 2026-09-03 este gate solo miraba componentes .jsx, por eso los componentes dueños se declararon el 2026-08-30 sin sus módulos de apoyo. Se cablea junto con su escena (decisión de producto, tanda 2 del drenaje — ops/DRENAJE-HUERFANOS-TANDA-1-2026-09-04.md); al cablear, borrar ambas entradas. (2026-09-04)
++ [33m⚠[0m pieza SIN ruta viva pero allowlisted: src/visual/mundo3d/bosque/doselBiodiverso.geom.js — Apoyo de DoselBiodiverso.jsx (visualización estratificada del bosque, sin montar): sus únicos importadores son ese componente. El componente dueño fue declarado sin consumidor el 2026-08-30 (experimento de mundo 3D sin cablear). Hallazgo del barrido ancho del gate (095.b, #3113): hasta el 2026-09-03 este gate solo miraba componentes .jsx, por eso los componentes dueños se declararon el 2026-08-30 sin sus módulos de apoyo. Se cablea junto con su escena (decisión de producto, tanda 2 del drenaje — ops/DRENAJE-HUERFANOS-TANDA-1-2026-09-04.md); al cablear, borrar ambas entradas. (2026-09-04)
++ [33m⚠[0m pieza SIN ruta viva pero allowlisted: src/visual/mundo3d/escenas/MaizCompaiEscena.jsx — Escena 3D del compai maíz que nunca se cableó. Parece ser una visualización del compai (abeja) en el contexto del cultivo de maíz que no se terminó de integrar al sistema de compaís. (2026-08-30)
++ [33m⚠[0m pieza SIN ruta viva pero allowlisted: src/visual/mundo3d/estiercol/Biocompostera.jsx — Componente del módulo estiercol (biocompostera) que nunca se cableó. Visualización 3D de una compostera. El módulo completo (4 componentes: Biocompostera, Biodigestor, CicloCerrado, EscenaEstiercol) parece ser un experimento de manejo de estiercol que no se integró. (2026-08-30)
++ [33m⚠[0m pieza SIN ruta viva pero allowlisted: src/visual/mundo3d/estiercol/Biodigestor.jsx — Componente del módulo estiercol (biodigestor) que nunca se cableó. Visualización 3D de un biodigestor para biogás. Parte del experimento inconcluso de manejo de estiercol. (2026-08-30)
++ [33m⚠[0m pieza SIN ruta viva pero allowlisted: src/visual/mundo3d/estiercol/CicloCerrado.jsx — Componente del módulo estiercol (ciclo cerrado de nutrientes) que nunca se cableó. Visualización del ciclo de estiercol→compost→suelo→cultivo. Parte del experimento inconcluso. (2026-08-30)
++ [33m⚠[0m pieza SIN ruta viva pero allowlisted: src/visual/mundo3d/estiercol/EscenaEstiercol.jsx — Escena principal del módulo estiercol que nunca se cableó. Agrupa los componentes (Biocompostera, Biodigestor, CicloCerrado) en una escena completa. El módulo de 4 componentes quedó como experimento sin wirear. (2026-08-30)
++ [33m⚠[0m pieza SIN ruta viva pero allowlisted: src/visual/mundo3d/estiercol/biodigestor.geom.js — Apoyo de los componentes del módulo (Biocompostera.jsx, Biodigestor.jsx, CicloCerrado.jsx, EscenaEstiercol.jsx — experimento de manejo de estiércol sin montar): sus únicos importadores son Biodigestor.jsx y EscenaEstiercol.jsx. El componente dueño fue declarado sin consumidor el 2026-08-30 (experimento de mundo 3D sin cablear). Hallazgo del barrido ancho del gate (095.b, #3113): hasta el 2026-09-03 este gate solo miraba componentes .jsx, por eso los componentes dueños se declararon el 2026-08-30 sin sus módulos de apoyo. Se cablea junto con su escena (decisión de producto, tanda 2 del drenaje — ops/DRENAJE-HUERFANOS-TANDA-1-2026-09-04.md); al cablear, borrar ambas entradas. (2026-09-04)
++ [33m⚠[0m pieza SIN ruta viva pero allowlisted: src/visual/mundo3d/estiercol/compostera.geom.js — Apoyo de los componentes del módulo (Biocompostera.jsx, Biodigestor.jsx, CicloCerrado.jsx, EscenaEstiercol.jsx — experimento de manejo de estiércol sin montar): sus únicos importadores son Biocompostera.jsx y el barril estiercol/index.js. El componente dueño fue declarado sin consumidor el 2026-08-30 (experimento de mundo 3D sin cablear). Hallazgo del barrido ancho del gate (095.b, #3113): hasta el 2026-09-03 este gate solo miraba componentes .jsx, por eso los componentes dueños se declararon el 2026-08-30 sin sus módulos de apoyo. Se cablea junto con su escena (decisión de producto, tanda 2 del drenaje — ops/DRENAJE-HUERFANOS-TANDA-1-2026-09-04.md); al cablear, borrar ambas entradas. (2026-09-04)
++ [33m⚠[0m pieza SIN ruta viva pero allowlisted: src/visual/mundo3d/estiercol/estiercol.geom.js — Apoyo de los componentes del módulo (Biocompostera.jsx, Biodigestor.jsx, CicloCerrado.jsx, EscenaEstiercol.jsx — experimento de manejo de estiércol sin montar): sus únicos importadores son Biocompostera.jsx y Biodigestor.jsx. El componente dueño fue declarado sin consumidor el 2026-08-30 (experimento de mundo 3D sin cablear). Hallazgo del barrido ancho del gate (095.b, #3113): hasta el 2026-09-03 este gate solo miraba componentes .jsx, por eso los componentes dueños se declararon el 2026-08-30 sin sus módulos de apoyo. Se cablea junto con su escena (decisión de producto, tanda 2 del drenaje — ops/DRENAJE-HUERFANOS-TANDA-1-2026-09-04.md); al cablear, borrar ambas entradas. (2026-09-04)
++ [33m⚠[0m pieza SIN ruta viva pero allowlisted: src/visual/mundo3d/estiercol/index.js — Barril del módulo estiercol sin un solo importador: nadie lo pide en producto, vitrina ni test; sus cuatro componentes — declarados el 2026-08-30 — se importan entre sí o directo desde sus vitrinas. Candidato a borrado (decisión de curaduría del operador, misma cola de propuestas del drenaje tanda 1). (2026-09-04)
++ [33m⚠[0m pieza SIN ruta viva pero allowlisted: src/visual/mundo3d/fauna/AguilaParamo.jsx — Criatura 3D (águila del páramo) que nunca se cableó. Parece ser parte de la fauna emblemática del páramo que se diseñó pero no se integró al mundo paramo/bosque. (2026-08-30)
++ [33m⚠[0m pieza SIN ruta viva pero allowlisted: src/visual/mundo3d/fauna/ColibriGuardian.jsx — Criatura 3D (colibrí guardián) que nunca se cableó. Parte de la fauna emblemática que se diseñó para los mundos pero no se encontró lugar de montaje. (2026-08-30)
++ [33m⚠[0m pieza SIN ruta viva pero allowlisted: src/visual/mundo3d/fauna/CuadrupedoRealista.jsx — Criatura 3D (cuadrúpedo realista genérico) que nunca se cableó. Parece ser una base para animales como venados, osos, etc. que no se terminó de integrar a la fauna de los mundos. (2026-08-30)
++ [33m⚠[0m pieza SIN ruta viva pero allowlisted: src/visual/mundo3d/fauna/EscenaFaunaEmblematica.jsx — Escena 3D de fauna emblemática que nunca se cableó. Agrupa las criaturas emblemáticas (águila, colibrí, rana arlequín, etc.) en una escena. El módulo fauna (5 componentes) quedó como experimento sin integrar. (2026-08-30)
++ [33m⚠[0m pieza SIN ruta viva pero allowlisted: src/visual/mundo3d/fauna/RanaArlequin.jsx — Criatura 3D (rana arlequín del páramo) que nunca se cableó. Parte de la fauna emblemática que se diseñó pero no se montó en ningún mundo. (2026-08-30)
++ [33m⚠[0m pieza SIN ruta viva pero allowlisted: src/visual/mundo3d/fauna/anatomiaFauna.geom.js — Apoyo de las criaturas del módulo (AguilaParamo.jsx, ColibriGuardian.jsx, CuadrupedoRealista.jsx, EscenaFaunaEmblematica.jsx, RanaArlequin.jsx — fauna emblemática sin montar): sus únicos importadores son AguilaParamo.jsx y ColibriGuardian.jsx. El componente dueño fue declarado sin consumidor el 2026-08-30 (experimento de mundo 3D sin cablear). Hallazgo del barrido ancho del gate (095.b, #3113): hasta el 2026-09-03 este gate solo miraba componentes .jsx, por eso los componentes dueños se declararon el 2026-08-30 sin sus módulos de apoyo. Se cablea junto con su escena (decisión de producto, tanda 2 del drenaje — ops/DRENAJE-HUERFANOS-TANDA-1-2026-09-04.md); al cablear, borrar ambas entradas. (2026-09-04)
++ [33m⚠[0m pieza SIN ruta viva pero allowlisted: src/visual/mundo3d/fauna/faunaEmblematica.js — Apoyo de las criaturas del módulo (AguilaParamo.jsx, ColibriGuardian.jsx, CuadrupedoRealista.jsx, EscenaFaunaEmblematica.jsx, RanaArlequin.jsx — fauna emblemática sin montar): sus únicos importadores son EscenaFaunaEmblematica.jsx y el barril fauna/index.js. El componente dueño fue declarado sin consumidor el 2026-08-30 (experimento de mundo 3D sin cablear). Hallazgo del barrido ancho del gate (095.b, #3113): hasta el 2026-09-03 este gate solo miraba componentes .jsx, por eso los componentes dueños se declararon el 2026-08-30 sin sus módulos de apoyo. Se cablea junto con su escena (decisión de producto, tanda 2 del drenaje — ops/DRENAJE-HUERFANOS-TANDA-1-2026-09-04.md); al cablear, borrar ambas entradas. (2026-09-04)
++ [33m⚠[0m pieza SIN ruta viva pero allowlisted: src/visual/mundo3d/fauna/index.js — Barril del módulo fauna sin un solo importador: nadie lo pide en producto, vitrina ni test; sus criaturas — declarados el 2026-08-30 — se importan entre sí o directo desde sus vitrinas. Candidato a borrado (decisión de curaduría del operador, misma cola de propuestas del drenaje tanda 1). (2026-09-04)
++ [33m⚠[0m pieza SIN ruta viva pero allowlisted: src/visual/mundo3d/fauna/iridiscencia.js — Apoyo de las criaturas del módulo (AguilaParamo.jsx, ColibriGuardian.jsx, CuadrupedoRealista.jsx, EscenaFaunaEmblematica.jsx, RanaArlequin.jsx — fauna emblemática sin montar): sus únicos importadores son ColibriGuardian.jsx y el barril fauna/index.js. El componente dueño fue declarado sin consumidor el 2026-08-30 (experimento de mundo 3D sin cablear). Hallazgo del barrido ancho del gate (095.b, #3113): hasta el 2026-09-03 este gate solo miraba componentes .jsx, por eso los componentes dueños se declararon el 2026-08-30 sin sus módulos de apoyo. Se cablea junto con su escena (decisión de producto, tanda 2 del drenaje — ops/DRENAJE-HUERFANOS-TANDA-1-2026-09-04.md); al cablear, borrar ambas entradas. (2026-09-04)
++ [33m⚠[0m pieza SIN ruta viva pero allowlisted: src/visual/mundo3d/fauna/marcha.js — Apoyo de las criaturas del módulo (AguilaParamo.jsx, ColibriGuardian.jsx, CuadrupedoRealista.jsx, EscenaFaunaEmblematica.jsx, RanaArlequin.jsx — fauna emblemática sin montar): sus únicos importadores son CuadrupedoRealista.jsx y RanaArlequin.jsx. El componente dueño fue declarado sin consumidor el 2026-08-30 (experimento de mundo 3D sin cablear). Hallazgo del barrido ancho del gate (095.b, #3113): hasta el 2026-09-03 este gate solo miraba componentes .jsx, por eso los componentes dueños se declararon el 2026-08-30 sin sus módulos de apoyo. Se cablea junto con su escena (decisión de producto, tanda 2 del drenaje — ops/DRENAJE-HUERFANOS-TANDA-1-2026-09-04.md); al cablear, borrar ambas entradas. (2026-09-04)
++ [33m⚠[0m pieza SIN ruta viva pero allowlisted: src/visual/mundo3d/fauna/pelajes.js — Apoyo de las criaturas del módulo (AguilaParamo.jsx, ColibriGuardian.jsx, CuadrupedoRealista.jsx, EscenaFaunaEmblematica.jsx, RanaArlequin.jsx — fauna emblemática sin montar): sus únicos importadores son faunaEmblematica.js y el barril fauna/index.js. El componente dueño fue declarado sin consumidor el 2026-08-30 (experimento de mundo 3D sin cablear). Hallazgo del barrido ancho del gate (095.b, #3113): hasta el 2026-09-03 este gate solo miraba componentes .jsx, por eso los componentes dueños se declararon el 2026-08-30 sin sus módulos de apoyo. Se cablea junto con su escena (decisión de producto, tanda 2 del drenaje — ops/DRENAJE-HUERFANOS-TANDA-1-2026-09-04.md); al cablear, borrar ambas entradas. (2026-09-04)
++ [33m⚠[0m pieza SIN ruta viva pero allowlisted: src/visual/mundo3d/infraestructura/index.js — Barril del módulo infraestructura sin un solo importador: las vitrinas (mockup_vitrina_infra, mockup_infraestructura_3d, mockup_catalogo_infra) importan los componentes directo, sin pasar por el barril. Candidato a borrado (decisión de curaduría del operador, misma cola de propuestas del drenaje tanda 1). (2026-09-04)
++ [33m⚠[0m pieza SIN ruta viva pero allowlisted: src/visual/mundo3d/kit/geometria.js — Superficie pública declarada del taller de geometría: su encabezado re-exporta la canónica de sombreadoVegetal.js para que toda escena nueva importe de un solo lugar, y prohíbe mover el código para evitar churn en las escenas que ya importan la canónica directo. Las escenas vivas siguen importando sombreadoVegetal.js y ninguna escena nueva ha llegado; su único importador es el barril kit/index.js (vivo, pero nadie le pide geometria). Se declara como superficie esperando adopción, no como código muerto: borrarla rompería el contrato del taller. (2026-09-04)
++ [33m⚠[0m pieza SIN ruta viva pero allowlisted: src/visual/mundo3d/laminas2d/MundoValle2D.jsx — Mundo 2D del valle que nunca se cableó. Parece ser una versión plana/2D del valle 3D para equipos sin WebGL o como alternativa visual. La versión principal del valle es 3D (iframe a /valle/), esta quedó huérfana. (2026-08-30)
++ [33m⚠[0m pieza SIN ruta viva pero allowlisted: src/visual/mundo3d/olor/CocheraEnCorte.jsx — Componente del módulo olor (cochera en corte de perfil) que nunca se cableó. El módulo olor (9 componentes) es un sistema educativo sobre carbono/orgánico visible que quedó inconcluso. Este componente es la cochera en formato SVG para equipos sin 3D. (2026-08-30)
++ [33m⚠[0m pieza SIN ruta viva pero allowlisted: src/visual/mundo3d/olor/EscenaOlorVisible.jsx — Escena principal del módulo olor que nunca se cableó. Comentado como 'pieza completa: la cochera y su aire' pero no se encontró lugar de montaje. El módulo completo de 9 componentes (OlorVisible, PaladaDeSeco, etc.) quedó como experimento sin wirear. (2026-08-30)
++ [33m⚠[0m pieza SIN ruta viva pero allowlisted: src/visual/mundo3d/olor/MoscasDelCharco.jsx — Componente del módulo olor (moscas del charco) que nunca se cableó. Visualización de moscas en charco de estiercol como indicador. Parte del experimento inconcluso. (2026-08-30)
++ [33m⚠[0m pieza SIN ruta viva pero allowlisted: src/visual/mundo3d/olor/NitrogenoQueSeVa.jsx — Componente del módulo olor (nitrógeno que se volatiliza) que nunca se cableó. Animación de pérdida de nitrógeno (gas volando). Parte del sistema educativo sobre manejo de carbono/nitrógeno. (2026-08-30)
++ [33m⚠[0m pieza SIN ruta viva pero allowlisted: src/visual/mundo3d/olor/NubeQueCruzaLaCerca.jsx — Componente del módulo olor (nube de olor que cruza la cerca) que nunca se cableó. Metáfora visual de olor/gas que se escapa de la finca. Parte del experimento inconcluso. (2026-08-30)
++ [33m⚠[0m pieza SIN ruta viva pero allowlisted: src/visual/mundo3d/olor/OlorVisible.jsx — Componente principal del módulo olor que nunca se cableó. Comentado como 'el anfitrión' que junta las tres cosas (decide tier, monta cochera, pone palada). El módulo completo (9 componentes) de educación visual sobre carbono quedó sin integrar. (2026-08-30)
++ [33m⚠[0m pieza SIN ruta viva pero allowlisted: src/visual/mundo3d/olor/PaladaDeSeco.jsx — Componente del módulo olor (palada de material seco) que nunca se cableó. Visualización de carbono en forma de palada de estierco seco. Parte del experimento inconcluso. (2026-08-30)
++ [33m⚠[0m pieza SIN ruta viva pero allowlisted: src/visual/mundo3d/olor/PozoQueCalla.jsx — Componente del módulo olor (pozo que calla/sin emisiones) que nunca se cableó. Metáfora visual de manejo correcto (pozo bien manejado no huele). Parte del experimento inconcluso. (2026-08-30)
++ [33m⚠[0m pieza SIN ruta viva pero allowlisted: src/visual/mundo3d/olor/VeloQuePesa.jsx — Componente del módulo olor (velo que pesa/opresa) que nunca se cableó. Metáfora visual de mal manejo (olor como velo pesado). Parte del experimento inconcluso. (2026-08-30)
++ [33m⚠[0m pieza SIN ruta viva pero allowlisted: src/visual/mundo3d/olor/aireCargado.js — Apoyo de los 9 componentes del módulo olor (educación visual de carbono/nitrógeno alrededor de la cochera, sin montar): sus únicos importadores son CocheraEnCorte.jsx y EscenaOlorVisible.jsx. El componente dueño fue declarado sin consumidor el 2026-08-30 (experimento de mundo 3D sin cablear). Hallazgo del barrido ancho del gate (095.b, #3113): hasta el 2026-09-03 este gate solo miraba componentes .jsx, por eso los componentes dueños se declararon el 2026-08-30 sin sus módulos de apoyo. Se cablea junto con su escena (decisión de producto, tanda 2 del drenaje — ops/DRENAJE-HUERFANOS-TANDA-1-2026-09-04.md); al cablear, borrar ambas entradas. (2026-09-04)
++ [33m⚠[0m pieza SIN ruta viva pero allowlisted: src/visual/mundo3d/olor/index.js — Barril del módulo olor sin un solo importador: nadie lo pide en producto, vitrina ni test; sus nueve componentes — declarados el 2026-08-30 — se importan entre sí o directo desde sus vitrinas. Candidato a borrado (decisión de curaduría del operador, misma cola de propuestas del drenaje tanda 1). (2026-09-04)
++ [33m⚠[0m pieza SIN ruta viva pero allowlisted: src/visual/mundo3d/olor/olor.geom.js — Apoyo de los 9 componentes del módulo olor (educación visual de carbono/nitrógeno alrededor de la cochera, sin montar): sus únicos importadores son CocheraEnCorte.jsx y EscenaOlorVisible.jsx. El componente dueño fue declarado sin consumidor el 2026-08-30 (experimento de mundo 3D sin cablear). Hallazgo del barrido ancho del gate (095.b, #3113): hasta el 2026-09-03 este gate solo miraba componentes .jsx, por eso los componentes dueños se declararon el 2026-08-30 sin sus módulos de apoyo. Se cablea junto con su escena (decisión de producto, tanda 2 del drenaje — ops/DRENAJE-HUERFANOS-TANDA-1-2026-09-04.md); al cablear, borrar ambas entradas. (2026-09-04)
++ [33m⚠[0m pieza SIN ruta viva pero allowlisted: src/visual/mundo3d/olor/senalesDelCuerpo.js — Apoyo de los 9 componentes del módulo olor (educación visual de carbono/nitrógeno alrededor de la cochera, sin montar): sus únicos importadores son PaladaDeSeco.jsx y el barril olor/index.js. El componente dueño fue declarado sin consumidor el 2026-08-30 (experimento de mundo 3D sin cablear). Hallazgo del barrido ancho del gate (095.b, #3113): hasta el 2026-09-03 este gate solo miraba componentes .jsx, por eso los componentes dueños se declararon el 2026-08-30 sin sus módulos de apoyo. Se cablea junto con su escena (decisión de producto, tanda 2 del drenaje — ops/DRENAJE-HUERFANOS-TANDA-1-2026-09-04.md); al cablear, borrar ambas entradas. (2026-09-04)
++ [33m⚠[0m pieza SIN ruta viva pero allowlisted: src/visual/mundo3d/olor/texturasOlor.js — Apoyo de los 9 componentes del módulo olor (educación visual de carbono/nitrógeno alrededor de la cochera, sin montar): sus únicos importadores son NitrogenoQueSeVa.jsx y NubeQueCruzaLaCerca.jsx. El componente dueño fue declarado sin consumidor el 2026-08-30 (experimento de mundo 3D sin cablear). Hallazgo del barrido ancho del gate (095.b, #3113): hasta el 2026-09-03 este gate solo miraba componentes .jsx, por eso los componentes dueños se declararon el 2026-08-30 sin sus módulos de apoyo. Se cablea junto con su escena (decisión de producto, tanda 2 del drenaje — ops/DRENAJE-HUERFANOS-TANDA-1-2026-09-04.md); al cablear, borrar ambas entradas. (2026-09-04)
++ [33m⚠[0m pieza SIN ruta viva pero allowlisted: src/visual/mundo3d/polinizadores/index.js — Barril del módulo polinizadores sin un solo importador: la vitrina (mockup_mundo_polinizadores_3d) importa EscenaPolinizadores.jsx y hermanos directo, sin pasar por el barril. Candidato a borrado (decisión de curaduría del operador). (2026-09-04)
++ [33m⚠[0m pieza SIN ruta viva pero allowlisted: src/visual/mundo3d/semillas/EscenaBancoSemillas.jsx — Escena 3D del banco de semillas que nunca se cableó. Visualización 3D de un vivero/banco de semillas con germinación, repique, endurecimiento. Comentado como el mundo del semillero, pero no se montó (la ruta mockups/mundo3d-semillero existe pero usa otro componente). (2026-08-30)
++ [33m⚠[0m pieza SIN ruta viva pero allowlisted: src/visual/mundo3d/semillas/bancoSemillas.geom.js — Apoyo de EscenaBancoSemillas.jsx (la ruta mockups/mundo3d-semillero monta otro componente): sus únicos importadores son esa escena. El componente dueño fue declarado sin consumidor el 2026-08-30 (experimento de mundo 3D sin cablear). Hallazgo del barrido ancho del gate (095.b, #3113): hasta el 2026-09-03 este gate solo miraba componentes .jsx, por eso los componentes dueños se declararon el 2026-08-30 sin sus módulos de apoyo. Se cablea junto con su escena (decisión de producto, tanda 2 del drenaje — ops/DRENAJE-HUERFANOS-TANDA-1-2026-09-04.md); al cablear, borrar ambas entradas. (2026-09-04)
++ [33m⚠[0m pieza SIN ruta viva pero allowlisted: src/visual/mundo3d/semillas/semillasData.js — Apoyo de EscenaBancoSemillas.jsx (la ruta mockups/mundo3d-semillero monta otro componente): sus únicos importadores son esa escena y el geom hermano bancoSemillas.geom.js. El componente dueño fue declarado sin consumidor el 2026-08-30 (experimento de mundo 3D sin cablear). Hallazgo del barrido ancho del gate (095.b, #3113): hasta el 2026-09-03 este gate solo miraba componentes .jsx, por eso los componentes dueños se declararon el 2026-08-30 sin sus módulos de apoyo. Se cablea junto con su escena (decisión de producto, tanda 2 del drenaje — ops/DRENAJE-HUERFANOS-TANDA-1-2026-09-04.md); al cablear, borrar ambas entradas. (2026-09-04)
++ [33m⚠[0m pieza SIN ruta viva pero allowlisted: src/visual/mundo3d/sierra/vendor/flora/FollajeMasa.js — Vendorizado por el arnés de medición móvil del descenso (#3103, 2026-09-03), copia del monorepo Sylva. Su integración a escena es la misma decisión pendiente que la de sus hermanos ya declarados sierra/vendor/godRaysSylva.js y sierra/vendor/clima/climaPorPiso.js: el pase de flora del descenso se cablea en la próxima tanda del operador. Al cablear, borrar esta entrada. Fue de los arreglados en raíz durante el 090.d (tipos JSDoc, sondas window, tuplas de Map) precisamente para NO excluirlo del TSC. (2026-09-04)
++ [33m⚠[0m pieza SIN ruta viva pero allowlisted: src/visual/mundo3d/sierra/vendor/flora/arbolesAltoandinos.js — Vendorizado por el arnés de medición móvil del descenso (#3103, 2026-09-03), copia del monorepo Sylva. Su integración a escena es la misma decisión pendiente que la de sus hermanos ya declarados sierra/vendor/godRaysSylva.js y sierra/vendor/clima/climaPorPiso.js: el pase de flora del descenso se cablea en la próxima tanda del operador. Al cablear, borrar esta entrada. Fue de los arreglados en raíz durante el 090.d (tipos JSDoc, sondas window, tuplas de Map) precisamente para NO excluirlo del TSC. (2026-09-04)
++ [33m⚠[0m pieza SIN ruta viva pero allowlisted: src/visual/mundo3d/sierra/vendor/flora/flora-eztree-bake.js — Vendorizado por el arnés de medición móvil del descenso (#3103, 2026-09-03), copia del monorepo Sylva. Su integración a escena es la misma decisión pendiente que la de sus hermanos ya declarados sierra/vendor/godRaysSylva.js y sierra/vendor/clima/climaPorPiso.js: el pase de flora del descenso se cablea en la próxima tanda del operador. Al cablear, borrar esta entrada. Además quedó fuera del gate TSC por decisión documentada en src/visual/mundo3d/__tests__/gateVendorFloraExclusion.test.js, que fija como premisa que permanece huérfano hasta la integración (importa módulos del monorepo Sylva que no se vendorizaron). (2026-09-04)
++ [33m⚠[0m pieza SIN ruta viva pero allowlisted: src/visual/mundo3d/sierra/vendor/flora/flora.js — Vendorizado por el arnés de medición móvil del descenso (#3103, 2026-09-03), copia del monorepo Sylva. Su integración a escena es la misma decisión pendiente que la de sus hermanos ya declarados sierra/vendor/godRaysSylva.js y sierra/vendor/clima/climaPorPiso.js: el pase de flora del descenso se cablea en la próxima tanda del operador. Al cablear, borrar esta entrada. Además quedó fuera del gate TSC por decisión documentada en src/visual/mundo3d/__tests__/gateVendorFloraExclusion.test.js, que fija como premisa que permanece huérfano hasta la integración (importa módulos del monorepo Sylva que no se vendorizaron). (2026-09-04)
++ [33m⚠[0m pieza SIN ruta viva pero allowlisted: src/visual/mundo3d/sierra/vendor/flora/frailejonFabrica.js — Vendorizado por el arnés de medición móvil del descenso (#3103, 2026-09-03), copia del monorepo Sylva. Su integración a escena es la misma decisión pendiente que la de sus hermanos ya declarados sierra/vendor/godRaysSylva.js y sierra/vendor/clima/climaPorPiso.js: el pase de flora del descenso se cablea en la próxima tanda del operador. Al cablear, borrar esta entrada. Fue de los arreglados en raíz durante el 090.d (tipos JSDoc, sondas window, tuplas de Map) precisamente para NO excluirlo del TSC. (2026-09-04)
++ [33m⚠[0m pieza SIN ruta viva pero allowlisted: src/visual/mundo3d/sierra/vendor/flora/lodEspecieSylva.js — Vendorizado por el arnés de medición móvil del descenso (#3103, 2026-09-03), copia del monorepo Sylva. Su integración a escena es la misma decisión pendiente que la de sus hermanos ya declarados sierra/vendor/godRaysSylva.js y sierra/vendor/clima/climaPorPiso.js: el pase de flora del descenso se cablea en la próxima tanda del operador. Al cablear, borrar esta entrada. Además quedó fuera del gate TSC por decisión documentada en src/visual/mundo3d/__tests__/gateVendorFloraExclusion.test.js, que fija como premisa que permanece huérfano hasta la integración (importa módulos del monorepo Sylva que no se vendorizaron). (2026-09-04)
++ [33m⚠[0m pieza SIN ruta viva pero allowlisted: src/visual/mundo3d/sierra/vendor/flora/matrizParamo.js — Vendorizado por el arnés de medición móvil del descenso (#3103, 2026-09-03), copia del monorepo Sylva. Su integración a escena es la misma decisión pendiente que la de sus hermanos ya declarados sierra/vendor/godRaysSylva.js y sierra/vendor/clima/climaPorPiso.js: el pase de flora del descenso se cablea en la próxima tanda del operador. Al cablear, borrar esta entrada. Fue de los arreglados en raíz durante el 090.d (tipos JSDoc, sondas window, tuplas de Map) precisamente para NO excluirlo del TSC. (2026-09-04)
++ [33m⚠[0m pieza SIN ruta viva pero allowlisted: src/visual/mundo3d/sierra/vendor/flora/pisosTermicos.js — Vendorizado por el arnés de medición móvil del descenso (#3103, 2026-09-03), copia del monorepo Sylva. Su integración a escena es la misma decisión pendiente que la de sus hermanos ya declarados sierra/vendor/godRaysSylva.js y sierra/vendor/clima/climaPorPiso.js: el pase de flora del descenso se cablea en la próxima tanda del operador. Al cablear, borrar esta entrada. Fue de los arreglados en raíz durante el 090.d (tipos JSDoc, sondas window, tuplas de Map) precisamente para NO excluirlo del TSC. (2026-09-04)
++ [33m⚠[0m pieza SIN ruta viva pero allowlisted: src/visual/mundo3d/sierra/vendor/flora/quickGrass.js — Vendorizado por el arnés de medición móvil del descenso (#3103, 2026-09-03), copia del monorepo Sylva. Su integración a escena es la misma decisión pendiente que la de sus hermanos ya declarados sierra/vendor/godRaysSylva.js y sierra/vendor/clima/climaPorPiso.js: el pase de flora del descenso se cablea en la próxima tanda del operador. Al cablear, borrar esta entrada. Fue de los arreglados en raíz durante el 090.d (tipos JSDoc, sondas window, tuplas de Map) precisamente para NO excluirlo del TSC. (2026-09-04)
++ [33m⚠[0m pieza SIN ruta viva pero allowlisted: src/visual/mundo3d/sierra/vendor/flora/vientoMundos.js — Vendorizado por el arnés de medición móvil del descenso (#3103, 2026-09-03), copia del monorepo Sylva. Su integración a escena es la misma decisión pendiente que la de sus hermanos ya declarados sierra/vendor/godRaysSylva.js y sierra/vendor/clima/climaPorPiso.js: el pase de flora del descenso se cablea en la próxima tanda del operador. Al cablear, borrar esta entrada. Fue de los arreglados en raíz durante el 090.d (tipos JSDoc, sondas window, tuplas de Map) precisamente para NO excluirlo del TSC. (2026-09-04)
++ [33m⚠[0m pieza SIN ruta viva pero allowlisted: src/visual/mundo3d/sierra/vendor/godRaysSylva.js — Vendorizado por el arnés de medición móvil del descenso (#3103, 2026-09-03) para que la banda 4 use los MISMOS rayos de dosel del valle; su byte-a-byte lo fija fxSylva.vendor.test.js. No tiene consumidor de producto: EscenaDescensoSierra.jsx no monta un pase de god rays — FX_POR_BANDA lo lista para páramo/frío pero la escena, mirada en el gate, deja los haces de bruma en 0 por un defecto visto (franjas de borde recto cruzando el cielo sin dosel que las recorte; comentario en la propia escena) y el pase de rayos exige un sol EN CUADRO (en el valle se apaga sin fuente fingida desde 2026-09-04). Declarado por el audit ampliado (454 → 1593 sujetos, 2026-09-03). Decisión pendiente de dirección: rayos solo en el hero shot de la banda 4 a contraluz (contrato §3.2). Al cablear, borrar esta entrada. (2026-09-04)
++ [33m⚠[0m pieza SIN ruta viva pero allowlisted: src/visual/mundo3d/sonidosAmbientales.js — T48: paletas sonoras ambientales procedurales por mundo (WebAudio con osciladores y ruido filtrado, sin archivos de audio). Rescatado de una rama muerta en #2668 y sin un solo importador desde entonces. Cablearlo exige decidir la política de audio del mundo 3D (autoplay, reduced-motion, volumen por mundo): decisión de producto, no un cableado de una línea. Al cablear, borrar esta entrada. (2026-09-04)
++ [33m⚠[0m pieza SIN ruta viva pero allowlisted: src/visual/mundo3d/suelo-comparado/EscenaSueloComparado.jsx — Escena 3D de suelo comparado (antes/después) que nunca se cableó. Visualización comparativa de suelo degradado vs suelo sano con compost. Parece ser una pieza educativa sobre manejo de suelo que no se integró. (2026-08-30)
++ [33m⚠[0m pieza SIN ruta viva pero allowlisted: src/visual/mundo3d/suelo-comparado/index.js — Barril del módulo suelo-comparado sin un solo importador: nadie lo pide en producto, vitrina ni test; sus piezas — declarados el 2026-08-30 — se importan entre sí o directo desde sus vitrinas. Candidato a borrado (decisión de curaduría del operador, misma cola de propuestas del drenaje tanda 1). (2026-09-04)
++ [33m⚠[0m pieza SIN ruta viva pero allowlisted: src/visual/mundo3d/suelo-comparado/sueloComparado.geom.js — Apoyo de EscenaSueloComparado.jsx (suelo degradado vs suelo sano, sin montar): sus únicos importadores son esa escena. El componente dueño fue declarado sin consumidor el 2026-08-30 (experimento de mundo 3D sin cablear). Hallazgo del barrido ancho del gate (095.b, #3113): hasta el 2026-09-03 este gate solo miraba componentes .jsx, por eso los componentes dueños se declararon el 2026-08-30 sin sus módulos de apoyo. Se cablea junto con su escena (decisión de producto, tanda 2 del drenaje — ops/DRENAJE-HUERFANOS-TANDA-1-2026-09-04.md); al cablear, borrar ambas entradas. (2026-09-04)
++ [33m⚠[0m pieza SIN ruta viva pero allowlisted: src/visual/mundo3d/suelo-comparado/sueloComparadoTextos.js — Apoyo de EscenaSueloComparado.jsx (suelo degradado vs suelo sano, sin montar): sus únicos importadores son esa escena. El componente dueño fue declarado sin consumidor el 2026-08-30 (experimento de mundo 3D sin cablear). Hallazgo del barrido ancho del gate (095.b, #3113): hasta el 2026-09-03 este gate solo miraba componentes .jsx, por eso los componentes dueños se declararon el 2026-08-30 sin sus módulos de apoyo. Se cablea junto con su escena (decisión de producto, tanda 2 del drenaje — ops/DRENAJE-HUERFANOS-TANDA-1-2026-09-04.md); al cablear, borrar ambas entradas. (2026-09-04)
++ [33m⚠[0m pieza SIN ruta viva pero allowlisted: src/visual/mundo3d/transiciones/CamaraCruce.jsx — Cámara de cruce (transición entre mundos) que nunca se cableó. Visualización 3D de cámara que cruza de un mundo a otro (ej. valle→sierra). Parece ser una pieza de transición cinematográfica que no se encontró lugar de montaje. (2026-08-30)
++ [33m⚠[0m pieza SIN ruta viva pero allowlisted: src/visual/mundo3d/transiciones/useCruceMundo.js — Máquina de estados del cruce Odyssey publicada como "lista para cablear" (lo declara su encabezado). Sus únicos importadores: el barril transiciones/index.js y TransicionesOdysseyDemo.jsx (demo declarada 2026-08-30). VeloOdyssey.jsx, montado en vitrina, la documenta como API de consumo pero ningún host la usa todavía: cablearla exige decidir el host del cruce entre mundos (decisión de producto, emparientada con el portal 2D→3D de #3140). Al cablear, borrar esta entrada. (2026-09-04)
++ [33m⚠[0m pieza SIN ruta viva pero allowlisted: src/visual/mundo3d/transiciones/useTunelLamina.js — Hermana de useCruceMundo con memoria del rectángulo de la lámina de origen ("lista para cablear", encabezado). Su único importador es el barril transiciones/index.js (vivo por la vitrina, pero nadie le pide este nombre). TunelLamina.jsx, montado en vitrina, la menciona en su docstring como modo de uso previsto, pero hoy el host captura el rectángulo a mano. Cablearla exige decidir el host (decisión de producto). Al cablear, borrar esta entrada. (2026-09-04)
++ [32m✓[0m alcance de src/: MONTADO 1093 · SOLO_VITRINA 227 · HUERFANO 221 · SOLO_TEST 45 · SOLO_PAGINA_SUELTA 30
++ [33m⚠[0m allowlist: 5 entrada(s) de orphan_components ya NO le hacen match a ningún hallazgo
++ [33m⚠[0m   src/visual/creatures/_archivo/JaguarLaminaViva.jsx — el archivo ya no existe en src/
++ [33m⚠[0m   src/visual/creatures/_archivo/ZariguyaLaminaViva.jsx — el archivo ya no existe en src/
++ [33m⚠[0m   src/visual/creatures/_archivo/ChivitoPunkLaminaViva.jsx — el archivo ya no existe en src/
++ [33m⚠[0m   src/visual/creatures/_archivo/LuciernagaLaminaViva.jsx — el archivo ya no existe en src/
++ [33m⚠[0m   src/visual/mundo3d/sierra/vendor/clima/climaPorPiso.js — hoy sale MONTADO (vista mockup_vitrina_maestra ← src/visual/mundo3d/sierra/lecturaClimaAterrizaje.js ← src/visual/mundo3d/VistaGlobalSierra.jsx ← src/mockups/VitrinaMaestraMundos.jsx)
++ [33m⚠[0m   Son excepciones protegiendo un fantasma. Revisar una por una y borrarlas (decisión de curaduría, no del gate).
++
++ [32m✓[0m Auditoría limpia — 269 excepción(es) declarada(s), 0 huérfanos sin declarar.
++
+
+ ❯ scripts/__tests__/audit-integraciones.test.mjs:666:14
+    664|     it('el allowlist no tiene NI UNA entrada fantasma', function () {
+    665|       expect(r.stdout, 'hay entradas de orphan_components que ya no le…
+    666|         .not.toContain('ya NO le hacen match');
+       |              ^
+    667|     });
+    668|
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/8]⎯
+
+ FAIL  scripts/__tests__/audit-integraciones.test.mjs > ops/integraciones-no-consumidas.json (repo real) > remate 2026-09-05 > las entradas con date 2026-09-05 son exactamente 126 (remate 123 + 3 apoyos de láminas) y todas siguen siendo hallazgos allowlisted
+AssertionError: el remate declaró 123 y la tanda láminas 3 (126 en total): si este número cambia, actualícelo conscientemente (con control de importadores por entrada): expected 128 to be 126 // Object.is equality
+
+- Expected
++ Received
+
+- 126
++ 128
+
+ ❯ scripts/__tests__/audit-integraciones.test.mjs:696:9
+    694|         remate.length,
+    695|         'el remate declaró 123 y la tanda láminas 3 (126 en total): si…
+    696|       ).toBe(126);
+       |         ^
+    697|       const flojos = remate.filter(function (e) {
+    698|         return !salida.includes(`pieza SIN ruta viva pero allowlisted:…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/8]⎯
+
+ FAIL  src/mockups/__tests__/visualLib.smoke.test.jsx > VisualLib storybook > monta la vitrina completa sin lanzar
+Error: Test timed out in 30000ms.
+If this is a long-running test, pass a timeout value as the last argument or configure it globally with "testTimeout".
+ ❯ src/mockups/__tests__/visualLib.smoke.test.jsx:12:3
+     10|
+     11| describe('VisualLib storybook', () => {
+     12|   test('monta la vitrina completa sin lanzar', () => {
+       |   ^
+     13|     const { container, getByText } = render(<VisualLib />);
+     14|     expect(getByText('Librería visual')).toBeInTheDocument();
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/8]⎯
+
+ FAIL  src/services/__tests__/waterDiagnostic.test.js > formatearGroundingAgua > incluye captacion, riego, conservacion, guardas
+AssertionError: expected '**Captacion estimada:** 55,080 L/año …' to contain '55.080'
+
+- Expected
++ Received
+
+- 55.080
++ **Captacion estimada:** 55,080 L/año (151 L/dia) desde 60m² de techo con 1200mm de lluvia y Ce=0.9.
++
++ **Problemas detectados:** deficit_hidrico, estres_sequia.
++
++ **Sistemas de riego recomendados:**
++
++ - Goteo con cinta 16mm (eficiencia 88%, Funciona por gravedad desde tanque a 1.5m de altura. 1-2 L/h por gotero.)
++
++ - Riego por mecha (wicking) (eficiencia 80%, Algodon o tela de mecha entre un reservorio y la planta. Para almácigos y pequeñas areas.)
++
++ **Practicas de conservacion:**
++
++ - Mulch o cobertura: Reduce evaporacion 30-70%, uso de agua 29%. Capa >=5cm de residuos vegetales.
++
++ - Materia organica en el suelo: Cada 1% de MO retiene ~15-20mm mas por metro de suelo. Conecta con modulo de suelos.
++
++ **Acciones ante sequia/ENSO:**
++
++ - cosechar agua masivo
++
++ - reservorios
++
++ - mulch en perennes
++
++ **GUARDAS:**
++
++ - La marchitez al mediodia NO significa que necesita riego — es cierre estomatico normal por calor. Haga la prueba del punado a 15-20cm: si el suelo arena NO forma bola esta seco; si arcilla forma cinta sin escurrir esta en capacidad de campo. Regar con suelo humedo enfria las raices (shock) y desperdicia agua.
++
++ - Regar en la manana o madrugada (menos evaporacion, las plantas absorben antes del calor). Regar de noche puede favorecer hongos en clima frio.
++
++ - Desvie los primeros 0.5-1mm de lluvia (1L por m2 de techo). Lava polvo, heces de aves y hojas acumuladas.
++
++ - Tape el tanque con tapa hermosa o malla anti-zancudo. En clima calido la evaporacion puede ser 5-7mm/dia.
++
++ Fuente: DR-AGUA-1-consolidado (3/3 DeepSeek+Gemini+Meta, 2026-06-11)
+
+ ❯ src/services/__tests__/waterDiagnostic.test.js:157:15
+    155|     const f = formatearGroundingAgua(d);
+    156|     expect(f).toContain('Captacion estimada');
+    157|     expect(f).toContain('55.080');
+       |               ^
+    158|     expect(f).toContain('GUARDAS');
+    159|     expect(f).toContain('DR-AGUA-1');
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/8]⎯
+
+ FAIL  src/components/__tests__/ChagraAgentAvatar.estadosP1.test.jsx > ChagraAgentAvatar — P1 estados ricos por especie > entrega los cinco estados ricos críticos a los siete adaptadores
+Error: Test timed out in 30000ms.
+If this is a long-running test, pass a timeout value as the last argument or configure it globally with "testTimeout".
+ ❯ src/components/__tests__/ChagraAgentAvatar.estadosP1.test.jsx:57:3
+     55|   });
+     56|
+     57|   it('entrega los cinco estados ricos críticos a los siete adaptadores…
+       |   ^
+     58|     for (const especie of ELENCO) {
+     59|       elegir(especie);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/8]⎯
+
+ FAIL  src/components/__tests__/CompaiP1.contract.test.jsx > P1 contrato integrado del elenco compai > zariguya recibe los 10 estados ricos y caminando sin degradar el rig
+Error: Test timed out in 30000ms.
+If this is a long-running test, pass a timeout value as the last argument or configure it globally with "testTimeout".
+ ❯ src/components/__tests__/CompaiP1.contract.test.jsx:80:5
+     78|
+     79|   for (const especie of ROSTER) {
+     80|     it(`${especie} recibe los 10 estados ricos y caminando sin degrada…
+       |     ^
+     81|       elegir(especie);
+     82|       const perfil = COMPAI_ESPECIES[especie];
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[6/8]⎯
+
+ FAIL  src/components/__tests__/ProfileScreen.hub.test.jsx > ProfileScreen — el morral (hub bento) > Apariencia trae la galería de temas con preview y aplicar persiste
+Error: Test timed out in 30000ms.
+If this is a long-running test, pass a timeout value as the last argument or configure it globally with "testTimeout".
+ ❯ src/components/__tests__/ProfileScreen.hub.test.jsx:65:3
+     63|   });
+     64|
+     65|   test('Apariencia trae la galería de temas con preview y aplicar pers…
+       |   ^
+     66|     render(<ProfileScreen onBack={() => {}} onHome={() => {}} />);
+     67|     fireEvent.click(screen.getByTestId('profile-section-apariencia'));
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[7/8]⎯
+
+ FAIL  src/components/dashboard/__tests__/DashboardLive.extensionistaMundos.test.jsx > DashboardLive — operador/extensionista ve los mundos (aditivo, no reemplazo) > la RED institucional es la portada Y "Los mundos de mi finca" se ven debajo
+TestingLibraryElementError: Unable to find an element by: [data-testid="red-institucional"]
+
+Ignored nodes: comments, script, style
+[36m<body>[39m
+  [36m<div>[39m
+    [36m<div[39m
+      [33mclass[39m=[32m"relative flex flex-col w-full h-full overflow-y-auto pb-6"[39m
+      [33mdata-scroll-key[39m=[32m"dashboard-live"[39m
+    [36m>[39m
+      [36m<div[39m
+        [33mclass[39m=[32m"h-[100dvh]"[39m
+      [36m/>[39m
+      [36m<div[39m
+        [33mclass[39m=[32m"fvh-resto"[39m
+        [33mdata-testid[39m=[32m"fvh-resto"[39m
+      [36m>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"fvh-resto-shell"[39m
+        [36m>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"px-4 pt-3 fvh-resto-block"[39m
+            [33mdata-testid[39m=[32m"bloque-guardian"[39m
+          [36m>[39m
+            [36m<p[39m
+              [33mclass[39m=[32m"flex items-center gap-2 text-xs font-bold uppercase tracking-wider mb-2.5 fvh-block-label"[39m
+            [36m>[39m
+              [36m<span[39m
+                [33maria-hidden[39m=[32m"true"[39m
+                [33mclass[39m=[32m"h-3.5 w-1 rounded-full bg-gradient-to-b from-teal-400 to-violet-400"[39m
+              [36m/>[39m
+              [0mSu compañero[0m
+            [36m</p>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"bg-slate-900/60 border border-slate-800 rounded-2xl p-4 space-y-3"[39m
+            [36m>[39m
+              [36m<div>[39m
+                [36m<h4[39m
+                  [33mclass[39m=[32m"text-sm font-bold text-slate-200"[39m
+                [36m>[39m
+                  [0mAvatar del agente[0m
+                [36m</h4>[39m
+                [36m<p[39m
+                  [33mclass[39m=[32m"text-xs text-slate-500 leading-relaxed mt-0.5"[39m
+                [36m>[39m
+                  [0mElige cómo se ve la IA en la app. Cambio inmediato.[0m
+                [36m</p>[39m
+              [36m</div>[39m
+              [36m<div[39m
+                [33mclass[39m=[32m"grid grid-cols-3 gap-2"[39m
+              [36m>[39m
+                [36m<button[39m
+                  [33maria-pressed[39m=[32m"true"[39m
+                  [33mclass[39m=[32m"relative flex flex-col items-center gap-1.5 px-1.5 py-3 rounded-xl border-2 transition-all active:scale-95 border-emerald-500 bg-emerald-900/20 ring-2 ring-emerald-500/40"[39m
+                  [33mtype[39m=[32m"button"[39m
+                [36m>[39m
+                  [36m<span[39m
+                    [33mclass[39m=[32m"absolute top-1.5 right-1.5 inline-flex items-center justify-center w-5 h-5 rounded-full bg-emerald-500 text-white"[39m
+                  [36m>[39m
+                    [36m<svg[39m
+                      [33maria-hidden[39m=[32m"true"[39m
+                      [33mclass[39m=[32m"lucide lucide-check"[39m
+                      [33mfill[39m=[32m"none"[39m
+                      [33mheight[39m=[32m"12"[39m
+                      [33mstroke[39m=[32m"currentColor"[39m
+                      [33mstroke-linecap[39m=[32m"round"[39m
+                      [33mstroke-linejoin[39m=[32m"round"[39m
+                      [33mstroke-width[39m=[32m"3"[39m
+                      [33mviewBox[39m=[32m"0 0 24 24"[39m
+                      [33mwidth[39m=[32m"12"[39m
+                      [33mxmlns[39m=[32m"http://www.w3.org/2000/svg"[39m
+                    [36m>[39m
+                      [36m<path[39m
+                        [33md[39m=[32m"M20 6 9 17l-5-5"[39m
+                      [36m/>[39m
+                    [36m</svg>[39m
+                  [36m</span>[39m
+                  [36m<button[39m
+                    [33maria-label[39m=[32m"Angelita, la abeja"[39m
+                    [33mstyle[39m=[32m"background: none; border: medium; padding: 0px; cursor: pointer; line-height: 0;"[39m
+                    [33mtitle[39m=[32m"Angelita, la abeja"[39m
+                    [33mtype[39m=[32m"button"[39m
+                  [36m>[39m
+                    [36m<svg[39m
+                      [33maria-label[39m=[32m"Angelita, la abeja"[39m
+                      [33mclass[39m=[32m"agt-angelita"[39m
+                      [33mdata-agente[39m=[32m"angelita"[39m
+                      [33mdata-agt-capacidad-cara[39m=[32m"native"[39m
+                      [33mdata-agt-capacidad-clima[39m=[32m"native"[39m
+                      [33mdata-agt-capacidad-entrada[39m=[32m"native"[39m
+                      [33mdata-agt-capacidad-guia[39m=[32m"overlay"[39m
+                      [33mdata-agt-capacidad-marcha[39m=[32m"vuela"[39m
+                      [33mdata-agt-capacidad-visema[39m=[32m"native"[39m
+                      [33mdata-agt-direccion[39m=[32m"derecha"[39m
+                      [33mdata-agt-especie[39m=[32m"angelita"[39m
+                      [33mdata-agt-estado[39m=[32m"pensando"[39m
+                      [33mdata-agt-vivo[39m=[32m"1"[39m
+                      [33mdata-creature[39m=[32m"abeja-angelita"[39m
+                      [33mdata-pose[39m=[32m"vuela"[39m
+                      [33mheight[39m=[32m"64"[39m
+                      [33mrole[39m=[32m"img"[39m
+                      [33mviewBox[39m=[32m"-23 -30 46 46"[39m
+                      [33mwidth[39m=[32m"64"[39m
+                    [36m>[39m
+                      [36m<title>[39m
+                        [0mAngelita, la abeja[0m
+                      [36m</title>[39m
+                      [36m<g[39m
+                        [33mclass[39m=[32m"agt-vuelo"[39m
+                      [36m>[39m
+                        [36m<g[39m
+                          [33mclass[39m=[32m"agt-cuerpo"[39m
+                        [36m>[39m
+                          [36m<g[39m
+                            [33mclass[39m=[32m""[39m
+                            [33mdata-animo[39m=[32m"sereno"[39m
+                            [33mdata-creature[39m=[32m"abeja-angelita"[39m
+                            [33mdata-pose[39m=[32m"vuela"[39m
+                          [36m>[39m
+                            [36m<defs>[39m
+                              [36m<filter[39m
+                                [33mheight[39m=[32m"260%"[39m
+                                [33mid[39m=[32m"crt-glow-r0"[39m
+                                [33mwidth[39m=[32m"260%"[39m
+                                [33mx[39m=[32m"-80%"[39m
+                                [33my[39m=[32m"-80%"[39m
+                              [36m>[39m
+                                [36m<fegaussianblur[39m
+                                  [33mresult[39m=[32m"b"[39m
+                                  [33mstdDeviation[39m=[32m"2.1"[39m
+                                [36m/>[39m
+                                [36m<femerge>[39m
+                                  [36m<femergenode[39m
+                                    [33min[39m=[32m"b"[39m
+                                  [36m/>[39m
+                 ...
+
+Ignored nodes: comments, script, style
+[36m<html>[39m
+  [36m<head />[39m
+  [36m<body>[39m
+    [36m<div>[39m
+      [36m<div[39m
+        [33mclass[39m=[32m"relative flex flex-col w-full h-full overflow-y-auto pb-6"[39m
+        [33mdata-scroll-key[39m=[32m"dashboard-live"[39m
+      [36m>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"h-[100dvh]"[39m
+        [36m/>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"fvh-resto"[39m
+          [33mdata-testid[39m=[32m"fvh-resto"[39m
+        [36m>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"fvh-resto-shell"[39m
+          [36m>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"px-4 pt-3 fvh-resto-block"[39m
+              [33mdata-testid[39m=[32m"bloque-guardian"[39m
+            [36m>[39m
+              [36m<p[39m
+                [33mclass[39m=[32m"flex items-center gap-2 text-xs font-bold uppercase tracking-wider mb-2.5 fvh-block-label"[39m
+              [36m>[39m
+                [36m<span[39m
+                  [33maria-hidden[39m=[32m"true"[39m
+                  [33mclass[39m=[32m"h-3.5 w-1 rounded-full bg-gradient-to-b from-teal-400 to-violet-400"[39m
+                [36m/>[39m
+                [0mSu compañero[0m
+              [36m</p>[39m
+              [36m<div[39m
+                [33mclass[39m=[32m"bg-slate-900/60 border border-slate-800 rounded-2xl p-4 space-y-3"[39m
+              [36m>[39m
+                [36m<div>[39m
+                  [36m<h4[39m
+                    [33mclass[39m=[32m"text-sm font-bold text-slate-200"[39m
+                  [36m>[39m
+                    [0mAvatar del agente[0m
+                  [36m</h4>[39m
+                  [36m<p[39m
+                    [33mclass[39m=[32m"text-xs text-slate-500 leading-relaxed mt-0.5"[39m
+                  [36m>[39m
+                    [0mElige cómo se ve la IA en la app. Cambio inmediato.[0m
+                  [36m</p>[39m
+                [36m</div>[39m
+                [36m<div[39m
+                  [33mclass[39m=[32m"grid grid-cols-3 gap-2"[39m
+                [36m>[39m
+                  [36m<button[39m
+                    [33maria-pressed[39m=[32m"true"[39m
+                    [33mclass[39m=[32m"relative flex flex-col items-center gap-1.5 px-1.5 py-3 rounded-xl border-2 transition-all active:scale-95 border-emerald-500 bg-emerald-900/20 ring-2 ring-emerald-500/40"[39m
+                    [33mtype[39m=[32m"button"[39m
+                  [36m>[39m
+                    [36m<span[39m
+                      [33mclass[39m=[32m"absolute top-1.5 right-1.5 inline-flex items-center justify-center w-5 h-5 rounded-full bg-emerald-500 text-white"[39m
+                    [36m>[39m
+                      [36m<svg[39m
+                        [33maria-hidden[39m=[32m"true"[39m
+                        [33mclass[39m=[32m"lucide lucide-check"[39m
+                        [33mfill[39m=[32m"none"[39m
+                        [33mheight[39m=[32m"12"[39m
+                        [33mstroke[39m=[32m"currentColor"[39m
+                        [33mstroke-linecap[39m=[32m"round"[39m
+                        [33mstroke-linejoin[39m=[32m"round"[39m
+                        [33mstroke-width[39m=[32m"3"[39m
+                        [33mviewBox[39m=[32m"0 0 24 24"[39m
+                        [33mwidth[39m=[32m"12"[39m
+                        [33mxmlns[39m=[32m"http://www.w3.org/2000/svg"[39m
+                      [36m>[39m
+                        [36m<path[39m
+                          [33md[39m=[32m"M20 6 9 17l-5-5"[39m
+                        [36m/>[39m
+                      [36m</svg>[39m
+                    [36m</span>[39m
+                    [36m<button[39m
+                      [33maria-label[39m=[32m"Angelita, la abeja"[39m
+                      [33mstyle[39m=[32m"background: none; border: medium; padding: 0px; cursor: pointer; line-height: 0;"[39m
+                      [33mtitle[39m=[32m"Angelita, la abeja"[39m
+                      [33mtype[39m=[32m"button"[39m
+                    [36m>[39m
+                      [36m<svg[39m
+                        [33maria-label[39m=[32m"Angelita, la abeja"[39m
+                        [33mclass[39m=[32m"agt-angelita"[39m
+                        [33mdata-agente[39m=[32m"angelita"[39m
+                        [33mdata-agt-capacidad-cara[39m=[32m"native"[39m
+                        [33mdata-agt-capacidad-clima[39m=[32m"native"[39m
+                        [33mdata-agt-capacidad-entrada[39m=[32m"native"[39m
+                        [33mdata-agt-capacidad-guia[39m=[32m"overlay"[39m
+                        [33mdata-agt-capacidad-marcha[39m=[32m"vuela"[39m
+                        [33mdata-agt-capacidad-visema[39m=[32m"native"[39m
+                        [33mdata-agt-direccion[39m=[32m"derecha"[39m
+                        [33mdata-agt-especie[39m=[32m"angelita"[39m
+                        [33mdata-agt-estado[39m=[32m"pensando"[39m
+                        [33mdata-agt-vivo[39m=[32m"1"[39m
+                        [33mdata-creature[39m=[32m"abeja-angelita"[39m
+                        [33mdata-pose[39m=[32m"vuela"[39m
+                        [33mheight[39m=[32m"64"[39m
+                        [33mrole[39m=[32m"img"[39m
+                        [33mviewBox[39m=[32m"-23 -30 46 46"[39m
+                        [33mwidth[39m=[32m"64"[39m
+                      [36m>[39m
+                        [36m<title>[39m
+                          [0mAngelita, la abeja[0m
+                        [36m</title>[39m
+                        [36m<g[39m
+                          [33mclass[39m=[32m"agt-vuelo"[39m
+                        [36m>[39m
+                          [36m<g[39m
+                            [33mclass[39m=[32m"agt-cuerpo"[39m
+                          [36m>[39m
+                            [36m<g[39m
+                              [33mclass[39m=[32m""[39m
+                              [33mdata-animo[39m=[32m"sereno"[39m
+                              [33mdata-creature[39m=[32m"abeja-angelita"[39m
+                              [33mdata-pose[39m=[32m"vuela"[39m
+                            [36m>[39m
+                              [36m<defs>[39m
+                                [36m<filter[39m
+                                  [33mheight[39m=[32m"260%"[39m
+                                  [33mid[39m=[32m"crt-glow-r0"[39m
+                                  [33mwidth[39m=[32m"260%"[39m
+                                  [33mx[39m=[32m"-80%"[39m
+                                  [33my[39m=[32m"-80%"[39m
+                                [36m>[39m
+                                  [36m<fegaussianblur[39m
+                                    [33mresult[39m=[32m"b"[39m
+                                    [33mstdDeviation[39m=[32m"2...
+ ❯ Proxy.waitForWrapper ../../node_modules/@testing-library/dom/dist/wait-for.js:163:27
+ ❯ src/components/dashboard/__tests__/DashboardLive.extensionistaMundos.test.jsx:100:11
+     98|     // import() dinámico tarda más que el default de waitFor (1000ms) …
+     99|     // pipeline de transform de vitest.
+    100|     await waitFor(() => expect(screen.getByTestId('red-institucional')…
+       |           ^
+    101|     expect(screen.getByTestId('finca-viva-hero').getAttribute('data-ti…
+    102|       .toBe('Red de fincas que acompaño');
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[8/8]⎯
+
+⎯⎯⎯⎯⎯⎯ Unhandled Errors ⎯⎯⎯⎯⎯⎯
+
+Vitest caught 5 unhandled errors during the test run.
+This might cause false positive tests. Resolve unhandled errors to make sure your tests are not affected.
+
+⎯⎯⎯⎯ Unhandled Rejection ⎯⎯⎯⎯⎯
+EnvironmentTeardownError: [vitest-worker]: Closing rpc while "onUserConsoleLog" was pending
+This error originated in "src/components/juego/__tests__/MilpaSimulator.test.jsx" test file. It doesn't mean the error was thrown inside the file itself, but while it was running.
+
+⎯⎯⎯⎯ Unhandled Rejection ⎯⎯⎯⎯⎯
+ReferenceError: window is not defined
+ ❯ resolveUpdatePriority ../../node_modules/react-dom/cjs/react-dom-client.development.js:1308:7
+ ❯ requestUpdateLane ../../node_modules/react-dom/cjs/react-dom-client.development.js:16345:11
+ ❯ dispatchSetState ../../node_modules/react-dom/cjs/react-dom-client.development.js:9126:14
+ ❯ src/components/MercadosScreen.jsx:86:7
+     84|       setErrorCarga(true);
+     85|     } finally {
+     86|       setCargando(false);
+       |       ^
+     87|     }
+     88|   }, []);
+ ❯ runNextTicks node:internal/process/task_queues:64:5
+ ❯ processImmediate node:internal/timers:452:9
+
+This error originated in "src/components/__tests__/MercadosScreen.sipsaVivo.test.jsx" test file. It doesn't mean the error was thrown inside the file itself, but while it was running.
+
+⎯⎯⎯⎯ Unhandled Rejection ⎯⎯⎯⎯⎯
+ReferenceError: window is not defined
+ ❯ resolveUpdatePriority ../../node_modules/react-dom/cjs/react-dom-client.development.js:1308:7
+ ❯ requestUpdateLane ../../node_modules/react-dom/cjs/react-dom-client.development.js:16345:11
+ ❯ dispatchSetState ../../node_modules/react-dom/cjs/react-dom-client.development.js:9126:14
+ ❯ src/components/MercadosScreen.jsx:86:7
+     84|       setErrorCarga(true);
+     85|     } finally {
+     86|       setCargando(false);
+       |       ^
+     87|     }
+     88|   }, []);
+ ❯ runNextTicks node:internal/process/task_queues:64:5
+ ❯ processImmediate node:internal/timers:452:9
+
+This error originated in "src/components/__tests__/MercadosScreen.sipsaVivo.test.jsx" test file. It doesn't mean the error was thrown inside the file itself, but while it was running.
+
+⎯⎯⎯⎯ Unhandled Rejection ⎯⎯⎯⎯⎯
+ReferenceError: window is not defined
+ ❯ resolveUpdatePriority ../../node_modules/react-dom/cjs/react-dom-client.development.js:1308:7
+ ❯ requestUpdateLane ../../node_modules/react-dom/cjs/react-dom-client.development.js:16345:11
+ ❯ dispatchSetState ../../node_modules/react-dom/cjs/react-dom-client.development.js:9126:14
+ ❯ src/components/MercadosScreen.jsx:86:7
+     84|       setErrorCarga(true);
+     85|     } finally {
+     86|       setCargando(false);
+       |       ^
+     87|     }
+     88|   }, []);
+ ❯ runNextTicks node:internal/process/task_queues:64:5
+ ❯ processImmediate node:internal/timers:452:9
+
+This error originated in "src/components/__tests__/MercadosScreen.precioReferencia.test.jsx" test file. It doesn't mean the error was thrown inside the file itself, but while it was running.
+
+⎯⎯⎯⎯ Unhandled Rejection ⎯⎯⎯⎯⎯
+ReferenceError: window is not defined
+ ❯ resolveUpdatePriority ../../node_modules/react-dom/cjs/react-dom-client.development.js:1308:7
+ ❯ requestUpdateLane ../../node_modules/react-dom/cjs/react-dom-client.development.js:16345:11
+ ❯ dispatchSetState ../../node_modules/react-dom/cjs/react-dom-client.development.js:9126:14
+ ❯ src/hooks/usePendingSyncCount.js:30:68
+     28|           syncManager.getSyncStats()
+     29|             .then((stats) => setPending(stats?.pendingCount ?? 0))
+     30|             .catch(() => _leerDeIDB().then(setPending).catch(() => set…
+       |                                                                    ^
+     31|         } else {
+     32|           _leerDeIDB().then(setPending).catch(() => setPending(0));
+
+This error originated in "src/__tests__/App.estiercol-route.test.jsx" test file. It doesn't mean the error was thrown inside the file itself, but while it was running.
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+
+
+ Test Files  7 failed | 1063 passed | 3 skipped (1073)
+      Tests  8 failed | 14118 passed | 3 expected fail | 41 skipped (14170)
+     Errors  5 errors
+   Start at  19:36:37
+   Duration  466.83s (transform 167.73s, setup 452.18s, import 472.21s, tests 1550.18s, environment 2120.69s)
+
+exit=1
