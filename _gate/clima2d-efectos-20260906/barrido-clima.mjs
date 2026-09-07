@@ -231,8 +231,7 @@ async function medirTodoElTexto(page) {
     out.push({ texto: c.texto, p05: +vals[Math.floor(vals.length * 0.05)].toFixed(2) });
   }
   out.sort((a, b) => a.p05 - b.p05);
-  out.flotantesApartados = flotantes;
-  return out;
+  return { flotantesApartados: flotantes, n: out.length, textos: out };
 }
 
 async function medirContraste(page, tag) {
@@ -299,12 +298,15 @@ for (const [clima, luz] of combos) {
     await page.waitForTimeout(150);
   }
   const contrastes = args.includes('--sin-contraste') ? null : await medirContraste(page, `${clima}-${luz}`);
-  const todoTexto = args.includes('--sin-contraste') ? null : await medirTodoElTexto(page);
+  const medida = args.includes('--sin-contraste') ? null : await medirTodoElTexto(page);
+  const todoTexto = medida ? medida.textos : null;
   const peor = contrastes ? contrastes.filter((c) => !c.ausente).reduce((a, c) => (c.p05 < a.p05 ? c : a)) : null;
-  resultados.push({ clima, luz, fps, contrastes, todoTexto, ...estado });
+  resultados.push({ clima, luz, fps, contrastes,
+    flotantesApartados: medida ? medida.flotantesApartados : null,
+    nTextos: medida ? medida.n : null, todoTexto, ...estado });
   log(`${clima}/${luz}`, `animVivas=${estado.animVivasVisibles}`, `fps=${fps ?? '-'}`,
     peor ? `peorObjetivo=${peor.id}:${peor.p05}` : '',
-    todoTexto ? `PEOR-TEXTO=${todoTexto[0].p05} (${JSON.stringify(todoTexto[0].texto)}) n=${todoTexto.length}` : '',
+    medida ? `PEOR-TEXTO=${medida.textos[0].p05} (${JSON.stringify(medida.textos[0].texto)}) n=${medida.n} flotantesApartados=${medida.flotantesApartados}` : '',
     Object.entries(estado.particulas).filter(([, v]) => v.visibles > 0).map(([k, v]) => `${k}:${v.visibles}/${v.animando}`).join(' ') || 'SIN PARTICULAS');
 }
 fs.writeFileSync(path.join(OUT, 'barrido.json'), JSON.stringify({ fecha: new Date().toISOString(), pageErrors, consoleErrors, resultados }, null, 2));

@@ -64,12 +64,12 @@ de muestrear, así que medía *texto contra cielo* e ignoraba el fondo propio de
 aprobados falsos. El corregido vuelve transparente **solo el glifo**, y se valida en cada corrida
 contra dos controles de valor analítico conocido: devuelve **21,00:1** y **4,54:1** exactos.
 
-El gate ya no son 8 objetivos curados sino **los 26 nodos de texto** de la pantalla.
+El gate ya no son 8 objetivos curados sino **los 27 nodos de texto** de la pantalla.
 
 | combinación | peor texto ANTES | peor texto DESPUÉS |
 |---|---|---|
 | `despejado` / `amanecer` | **3.07:1** | 8.33:1 |
-| `despejado` / `dia` | **1.71:1** | 6.14:1 |
+| `despejado` / `dia` | **1.71:1** | 6.15:1 |
 | `despejado` / `atardecer` | **3.07:1** | 8.48:1 |
 | `despejado` / `noche` | 8.92:1 | 10.90:1 |
 | `nublado` / `amanecer` | **2.08:1** | 6.67:1 |
@@ -79,17 +79,22 @@ El gate ya no son 8 objetivos curados sino **los 26 nodos de texto** de la panta
 | `lluvia` / `amanecer` | **3.57:1** | 8.90:1 |
 | `lluvia` / `dia` | **3.58:1** | 8.92:1 |
 | `lluvia` / `atardecer` | **3.59:1** | 8.90:1 |
-| `lluvia` / `noche` | 5.46:1 | 10.66:1 |
+| `lluvia` / `noche` | 5.47:1 | 10.66:1 |
 | `niebla` / `amanecer` | **1.49:1** | 7.29:1 |
-| `niebla` / `dia` | **1.38:1** | 6.86:1 |
-| `niebla` / `atardecer` | **1.34:1** | 7.30:1 |
-| `niebla` / `noche` | **1.99:1** | 8.35:1 |
+| `niebla` / `dia` | **1.38:1** | 7.01:1 |
+| `niebla` / `atardecer` | **1.34:1** | 7.28:1 |
+| `niebla` / `noche` | **2.00:1** | 8.65:1 |
 
-Combinaciones por debajo de 4,5:1 — ANTES 13/16, DESPUÉS 0/16. Mínimo global 1.34:1 → 5.29:1.
+Combinaciones por debajo de 4,5:1 — **ANTES 13/16, DESPUÉS 0/16**. Mínimo global **1.34:1 → 5.29:1**.
 
-Se excluye del muestreo el **compai flotante** (z-index 40, 84×84, sin clase), que se pasea por
-encima del boletín y tumba cualquier texto que le quede debajo hasta **1,17:1**. Es un elemento
-de la app, ajeno a la escena de clima. **Lo reporto, no lo toqué.**
+Las dos columnas miden el **mismo conjunto**: `nTextos` = 27 en la referencia y 27 después, en las 16. `flotantesApartados` = 1 y 1 respectivamente — el compai flotante queda **fuera del muestreo en las dos columnas**, y el JSON lo registra por combinación.
+
+El **compai flotante** (z-index 40, 84×84, sin clase) se pasea por encima del boletín y tumba
+cualquier texto que le quede debajo hasta **1,17:1**. Es un elemento de la app, ajeno a la escena
+de clima, y va con posición dependiente del tiempo: se aparta del muestreo en **las dos** columnas
+para no contaminar la comparación, y cada corrida lo deja registrado en `flotantesApartados`.
+**Lo reporto, no lo toqué** — con él en pantalla, el mínimo real de cualquiera de las dos
+versiones baja a 1,17:1.
 
 ## 4. fps en el Pixel 6 Pro (Mali-G78) — el gate real
 
