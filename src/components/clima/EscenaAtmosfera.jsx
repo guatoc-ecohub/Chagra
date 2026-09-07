@@ -1,115 +1,7 @@
-/**
- * MOCKUP "El clima como atmósfera viva" (ARTE original) — ruta
- * #/mockups/clima-atmosfera-arte.
- *
- * Rescate 2026-09-05: la ruta canónica #/mockups/clima-atmosfera quedó como
- * puente al mundo climático real (#2833). Este arte (Fable) se conserva intacto
- * en su ruta hermana para que siga visible; el CSS que lo pinta
- * (climaAtmosfera.css) ya vivía en dev sin consumidor.
- *
- * La UI RESPIRA el clima de la finca: un selector de 5 estados (soleado,
- * lluvia, niebla de páramo, hora dorada, noche) re-tiñe TODA la escena —
- * cielo, cordillera, luz, sombras, partículas y hasta las tarjetas de la
- * interfaz — para que la app "viva el afuera".
- *
- * Datos DE MUESTRA (no cablea Open-Meteo ni sesión): decisión visual pura.
- *
- * Técnicas reusadas del catálogo de elementos gráficos (§13):
- *  - #2  grade de luz por estado (planos de color, crossfade de opacity)
- *  - #4  niebla volumétrica viva (bancos + jirones finos que derivan en contra)
- *  - #5  viñeta + scrims de cine (la UI flota sin cajas, el texto siempre lee)
- *  - #6  god-rays con respiración lenta desde el astro
- *  - #7  luz direccional de ladera (la cara que mira al astro recibe luz)
- *  - #8  perspectiva aérea (cordilleras cada vez más pálidas + banda de bruma)
- *  - #14 vida ambiental (luciérnagas que parpadean y derivan)
- *  - #17 re-tinte total por variables (UNA geometría, 5 pieles vía data-clima)
- *  - #20 prefers-reduced-motion como fotograma digno
- *
- * Reglas de la casa: solo transform/opacity animados (blur/filtros estáticos),
- * cero JS por frame (React solo cambia data-clima, el CSS transiciona),
- * responsive hasta 320px, copy en usted cordial.
- */
-/* eslint-disable chagra-i18n/no-hardcoded-spanish -- mockup dev con datos de
-   muestra (no UI de producto); si se productiza, el copy migra a messages.js
-   (ADR-050). */
-import { useState } from 'react';
-import '../components/clima/escenaAtmosfera.css';
+import { useId } from 'react';
+import './escenaAtmosfera.css';
 
-/* ── Estados de clima (datos de muestra, plausibles para páramo ~2.900 m) ── */
-
-const ESTADOS = [
-  { id: 'soleado', etiqueta: 'Soleado' },
-  { id: 'lluvia', etiqueta: 'Lluvia' },
-  { id: 'niebla', etiqueta: 'Niebla' },
-  { id: 'dorada', etiqueta: 'Hora dorada' },
-  { id: 'noche', etiqueta: 'Noche' },
-];
-
-const MUESTRA = {
-  soleado: {
-    saludo: 'Buenos días',
-    hora: '10:40 a. m.',
-    cielo: 'Cielo despejado',
-    temp: '19 °C',
-    humedad: '48 %',
-    viento: '8 km/h',
-    consejo:
-      'Riegue temprano o al caer la tarde: al mediodía el sol evapora el agua antes de que llegue a la raíz.',
-    huerta: 'Buena mañana para deshierbar',
-    corral: 'Abra el corral al pastoreo',
-  },
-  lluvia: {
-    saludo: 'Buenas tardes',
-    hora: '3:15 p. m.',
-    cielo: 'Lluvia constante · 6 mm en la última hora',
-    temp: '11 °C',
-    humedad: '93 %',
-    viento: '14 km/h',
-    consejo:
-      'Deje descansar los foliares: la lluvia lava el biopreparado antes de que alcance a actuar.',
-    huerta: 'Suelo mojado: no pise las eras',
-    corral: 'Revise las goteras del techo',
-  },
-  niebla: {
-    saludo: 'Buenos días',
-    hora: '6:50 a. m.',
-    cielo: 'Niebla de páramo · visibilidad 80 m',
-    temp: '9 °C',
-    humedad: '98 %',
-    viento: '4 km/h',
-    consejo:
-      'La niebla riega por usted: revise que el drenaje de las eras no se encharque.',
-    huerta: 'Hoja húmeda: espere para podar',
-    corral: 'Deje el corral cerrado un rato más',
-  },
-  dorada: {
-    saludo: 'Buenas tardes',
-    hora: '5:48 p. m.',
-    cielo: 'Última luz del día',
-    temp: '14 °C',
-    humedad: '67 %',
-    viento: '6 km/h',
-    consejo:
-      'Última luz buena para cosechar aromáticas: el aceite esencial está en su punto.',
-    huerta: 'Hora de cosechar aromáticas',
-    corral: 'Hora de encerrar las gallinas',
-  },
-  noche: {
-    saludo: 'Buenas noches',
-    hora: '9:30 p. m.',
-    cielo: 'Noche despejada y fría',
-    temp: '7 °C',
-    humedad: '88 %',
-    viento: '3 km/h',
-    consejo:
-      'Si la temperatura baja de 5 °C, cubra los tomates con la manta térmica antes de acostarse.',
-    huerta: 'Las eras descansan',
-    corral: 'Corral cerrado, todo en calma',
-  },
-};
-
-/* ── Partículas deterministas (sin Math.random: mismo cuadro en cada render) ── */
-
+// Geometría y partículas recuperadas del original versionado.
 const GOTAS = Array.from({ length: 30 }, (_, i) => ({
   x: (i * 37 + 11) % 100,
   dur: 0.55 + ((i * 13) % 9) / 20,
@@ -185,20 +77,17 @@ function Frailejon({ x, y, escala }) {
   );
 }
 
-/* ── Vista principal ── */
-
-export default function ClimaAtmosfera({ onBack }) {
-  const [clima, setClima] = useState('niebla');
-  const d = MUESTRA[clima];
-
+/** Escena decorativa: el consumidor entrega los tres ejes del servicio. */
+export default function EscenaAtmosfera({ condicion = null, luz = null, enso = null }) {
+  const rayoId = useId();
   return (
-    <div className="ca-root" data-clima={clima}>
-      {/* ══ ESCENA (decorativa, aria-hidden): capas de atmósfera ══ */}
+    <div className="ca-root ca-atmosfera" data-clima={condicion || undefined}
+      data-luz={luz || undefined} data-enso={enso === 'nino' || enso === 'nina' ? enso : undefined} aria-hidden="true">
       <div className="ca-escena" aria-hidden="true">
         {/* Cielos: un gradiente por estado, crossfade de opacity (los
             background-image no interpolan; el velo cruzado sí). */}
-        {ESTADOS.map((e) => (
-          <div key={e.id} className={`ca-cielo ca-cielo--${e.id}`} />
+        {['soleado', 'lluvia', 'niebla', 'dorada', 'noche', 'nublado'].map((id) => (
+          <div key={id} className={`ca-cielo ca-cielo--${id}`} />
         ))}
 
         {/* Estrellas (solo noche) */}
@@ -230,7 +119,7 @@ export default function ClimaAtmosfera({ onBack }) {
         {/* God-rays: abanico que respira, visible con sol franco (catálogo #6) */}
         <svg className="ca-rayos" viewBox="0 0 200 200">
           <defs>
-            <linearGradient id="caRayo" x1="0" y1="0" x2="0" y2="1">
+            <linearGradient id={rayoId} x1="0" y1="0" x2="0" y2="1">
               <stop offset="0" stopColor="var(--ca-rayo)" stopOpacity="0.5" />
               <stop offset="1" stopColor="var(--ca-rayo)" stopOpacity="0" />
             </linearGradient>
@@ -240,7 +129,7 @@ export default function ClimaAtmosfera({ onBack }) {
               <path
                 key={ang}
                 d="M100 100 L92 210 L108 210 Z"
-                fill="url(#caRayo)"
+                fill={`url(#${rayoId})`}
                 transform={`rotate(${ang} 100 100)`}
               />
             ))}
@@ -371,8 +260,8 @@ export default function ClimaAtmosfera({ onBack }) {
         </div>
 
         {/* Grades de luz por estado (catálogo #2): crossfade de planos */}
-        {ESTADOS.map((e) => (
-          <div key={e.id} className={`ca-grade ca-grade--${e.id}`} />
+        {['soleado', 'lluvia', 'niebla', 'dorada', 'noche', 'nublado'].map((id) => (
+          <div key={id} className={`ca-grade ca-grade--${id}`} />
         ))}
 
         {/* Viñeta + scrims de cine (catálogo #5) */}
@@ -381,83 +270,7 @@ export default function ClimaAtmosfera({ onBack }) {
         <div className="ca-scrim ca-scrim--bajo" />
       </div>
 
-      {/* ══ UI: también recibe el clima (tinte, rim de luz, sombra larga) ══ */}
-      <header className="ca-cabecera">
-        {onBack && (
-          <button type="button" className="ca-volver" onClick={onBack}>
-            ← Volver
-          </button>
-        )}
-        <p className="ca-migaja">
-          Finca La Esperanza · Choachí, 2 890 m s. n. m.
-          <span className="ca-muestra">Datos de muestra</span>
-        </p>
-        <h1 className="ca-saludo">
-          {d.saludo},<br />
-          doña Rosa
-        </h1>
-        <p className="ca-hora">
-          {d.hora} · <span key={clima} className="ca-cielo-texto">{d.cielo}</span>
-        </p>
-      </header>
-
-      <main className="ca-cuerpo">
-        <section className="ca-carta ca-carta--clima" aria-live="polite">
-          <div className="ca-cifras">
-            <div className="ca-cifra">
-              <strong>{d.temp}</strong>
-              <span>Temperatura</span>
-            </div>
-            <div className="ca-cifra">
-              <strong>{d.humedad}</strong>
-              <span>Humedad</span>
-            </div>
-            <div className="ca-cifra">
-              <strong>{d.viento}</strong>
-              <span>Viento</span>
-            </div>
-          </div>
-          <p className="ca-consejo">
-            <span className="ca-consejo-titulo">Consejo de la finca</span>
-            {d.consejo}
-          </p>
-        </section>
-
-        <div className="ca-mundos">
-          <section className="ca-carta ca-carta--mundo">
-            <h2>La huerta</h2>
-            <p>{d.huerta}</p>
-          </section>
-          <section className="ca-carta ca-carta--mundo">
-            <h2>El corral</h2>
-            <p>{d.corral}</p>
-          </section>
-        </div>
-      </main>
-
-      {/* ══ Selector de estado del clima (el control del mockup) ══ */}
-      <nav
-        className="ca-selector"
-        role="radiogroup"
-        aria-label="Estado del clima (datos de muestra)"
-      >
-        {ESTADOS.map((e) => (
-          <button
-            key={e.id}
-            type="button"
-            role="radio"
-            aria-checked={clima === e.id}
-            className={`ca-chip${clima === e.id ? ' ca-chip--activo' : ''}`}
-            onClick={() => setClima(e.id)}
-          >
-            {e.etiqueta}
-          </button>
-        ))}
-      </nav>
-
-      {/* Jirón de niebla que pasa POR ENCIMA de la interfaz: la firma del
-          mockup — el afuera toca la UI (solo en niebla, pointer-events none). */}
-      <div className="ca-jiron-ui" aria-hidden="true" />
+      <div className="ca-jiron-ui" />
     </div>
   );
 }
