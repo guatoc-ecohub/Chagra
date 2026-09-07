@@ -1,0 +1,182 @@
+{
+  "tag": "nublado-dia",
+  "clima": "nublado",
+  "luz": "dia",
+  "captura": "/home/kortux/Workspace/chagra/.worktrees/fable-nublado-20260906/_gate/nublado-nube-masa-20260906/v12/nublado-dia.png",
+  "viewport": "390x844",
+  "dpr": 2,
+  "headed": true,
+  "fps": 59.8,
+  "renderer": "ANGLE (NVIDIA Corporation, Quadro M6000/PCIe/SSE2, OpenGL 4.5.0)",
+  "estado": {
+    "data-clima": "nublado",
+    "data-luz": "dia",
+    "opacidades": {
+      ".ca-cielo--nublado": "1",
+      ".ca-cielo--soleado": "0",
+      ".ca-cielo--noche": "0",
+      ".ca-capa--lluvia": "0",
+      ".ca-capa--luci": "0",
+      ".ca-capa--niebla": "0",
+      ".ca-capa--polvo": "0",
+      ".ca-rayos": "0.14",
+      ".ca-astro": "0.7",
+      ".ca-bruma": "0.55",
+      ".ca-grade--nublado": "1",
+      ".ca-capa--nubes": "1",
+      ".ca-techo": "1",
+      ".ca-claro": "0.870813",
+      ".ca-nube": "1"
+    },
+    "nodosEscena": 215,
+    "claroBg": "radial-gradient(12vw 2.8vh at 80vw 39vh, rgba(255, 252, 240, 0.9), rgb",
+    "astroTransform": "matrix(0.62, 0, 0, 0.62, 296.4, 282.74)",
+    "capaZ": "9",
+    "nubesCount": 4
+  },
+  "contraste": [
+    {
+      "id": "cabecera-lugar",
+      "texto": "Páramo alto · Guatavita, Cundinamarca",
+      "color": "rgb(241, 245, 249)",
+      "min": 10.69,
+      "p05": 10.93,
+      "media": 12.33,
+      "px": 19380
+    },
+    {
+      "id": "cabecera-altura",
+      "texto": "2900 m s. n. m. · Piso frío",
+      "color": "rgb(241, 245, 249)",
+      "min": 10.93,
+      "p05": 11.1,
+      "media": 11.88,
+      "px": 8730
+    },
+    {
+      "id": "cabecera-saludo",
+      "texto": "Buenas noches",
+      "color": "rgb(241, 245, 249)",
+      "min": 11.11,
+      "p05": 11.44,
+      "media": 12.68,
+      "px": 21402
+    },
+    {
+      "id": "cabecera-condicion",
+      "texto": "Nublado · 8:46 p. m.",
+      "color": "rgb(241, 245, 249)",
+      "min": 11.3,
+      "p05": 11.61,
+      "media": 12.28,
+      "px": 9180
+    },
+    {
+      "id": "cifra-grande",
+      "texto": "10°C",
+      "color": "rgb(241, 245, 249)",
+      "min": 10.01,
+      "p05": 10.32,
+      "media": 11.86,
+      "px": 12496
+    },
+    {
+      "id": "cifra-label",
+      "texto": "Nublado · fase Neutral",
+      "color": "rgb(210, 223, 227)",
+      "min": 9.31,
+      "p05": 9.96,
+      "media": 10.99,
+      "px": 8540
+    },
+    {
+      "id": "cifra-siente",
+      "texto": "Se siente como 9°C",
+      "color": "rgb(210, 223, 227)",
+      "min": 8.07,
+      "p05": 8.3,
+      "media": 9.1,
+      "px": 6780
+    },
+    {
+      "id": "anomalia-titulo",
+      "ausente": true
+    },
+    {
+      "id": "tab-hoy",
+      "texto": "Hoy",
+      "color": "rgb(186, 230, 253)",
+      "min": 3.91,
+      "p05": 4.06,
+      "media": 5.02,
+      "px": 1938
+    },
+    {
+      "id": "tab-semana",
+      "texto": "7–16 días",
+      "color": "rgb(203, 213, 225)",
+      "min": 2.18,
+      "p05": 3.23,
+      "media": 4.25,
+      "px": 4352
+    },
+    {
+      "id": "tab-estacional",
+      "texto": "El Niño",
+      "color": "rgb(203, 213, 225)",
+      "min": 2.07,
+      "p05": 2.26,
+      "media": 3.32,
+      "px": 3298
+    }
+  ],
+  "pageErrors": [],
+  "consoleErrors": [
+    "Failed to load resource: the server responded with a status of 403 (Forbidden)",
+    "wasm streaming compile failed: TypeError: Failed to execute 'compile' on 'WebAssembly': HTTP status code is not ok",
+    "falling back to ArrayBuffer instantiation",
+    "Failed to load resource: the server responded with a status of 403 (Forbidden)",
+    "failed to asynchronously prepare wasm: both async and sync fetching of the wasm failed",
+    "Aborted(both async and sync fetching of the wasm failed)",
+    "Exception loading sqlite3 module: RuntimeError: Aborted(both async and sync fetching of the wasm failed). Build with -sASSERTIONS for more info.\n    at abort (http://127.0.0.1:5390/.vite-cache-fable-n",
+    "[SQLite WASM] Failed to initialize catalog db: RuntimeError: Aborted(both async and sync fetching of the wasm failed). Build with -sASSERTIONS for more info.\n    at abort (http://127.0.0.1:5390/.vite-",
+    "Failed to load resource: the server responded with a status of 403 (Forbidden)",
+    "wasm streaming compile failed: TypeError: Failed to execute 'compile' on 'WebAssembly': HTTP status code is not ok",
+    "falling back to ArrayBuffer instantiation",
+    "Failed to load resource: the server responded with a status of 403 (Forbidden)",
+    "failed to asynchronously prepare wasm: both async and sync fetching of the wasm failed",
+    "Aborted(both async and sync fetching of the wasm failed)",
+    "Exception loading sqlite3 module: RuntimeError: Aborted(both async and sync fetching of the wasm failed). Build with -sASSERTIONS for more info.\n    at abort (http://127.0.0.1:5390/.vite-cache-fable-n",
+    "[SQLite WASM] Failed to initialize catalog db: RuntimeError: Aborted(both async and sync fetching of the wasm failed). Build with -sASSERTIONS for more info.\n    at abort (http://127.0.0.1:5390/.vite-",
+    "Failed to load resource: the server responded with a status of 404 (Not Found)",
+    "Failed to load resource: the server responded with a status of 403 (Forbidden)",
+    "wasm streaming compile failed: TypeError: Failed to execute 'compile' on 'WebAssembly': HTTP status code is not ok",
+    "falling back to ArrayBuffer instantiation",
+    "Failed to load resource: the server responded with a status of 403 (Forbidden)",
+    "failed to asynchronously prepare wasm: both async and sync fetching of the wasm failed",
+    "Aborted(both async and sync fetching of the wasm failed)",
+    "Exception loading sqlite3 module: RuntimeError: Aborted(both async and sync fetching of the wasm failed). Build with -sASSERTIONS for more info.\n    at abort (http://127.0.0.1:5390/.vite-cache-fable-n",
+    "[SQLite WASM] Failed to initialize catalog db: RuntimeError: Aborted(both async and sync fetching of the wasm failed). Build with -sASSERTIONS for more info.\n    at abort (http://127.0.0.1:5390/.vite-",
+    "Failed to load resource: the server responded with a status of 403 (Forbidden)",
+    "wasm streaming compile failed: TypeError: Failed to execute 'compile' on 'WebAssembly': HTTP status code is not ok",
+    "falling back to ArrayBuffer instantiation",
+    "Failed to load resource: the server responded with a status of 403 (Forbidden)",
+    "failed to asynchronously prepare wasm: both async and sync fetching of the wasm failed",
+    "Aborted(both async and sync fetching of the wasm failed)",
+    "Exception loading sqlite3 module: RuntimeError: Aborted(both async and sync fetching of the wasm failed). Build with -sASSERTIONS for more info.\n    at abort (http://127.0.0.1:5390/.vite-cache-fable-n",
+    "[SQLite WASM] Failed to initialize catalog db: RuntimeError: Aborted(both async and sync fetching of the wasm failed). Build with -sASSERTIONS for more info.\n    at abort (http://127.0.0.1:5390/.vite-",
+    "Failed to load resource: the server responded with a status of 404 (Not Found)",
+    "Failed to load resource: the server responded with a status of 404 (Not Found)",
+    "Failed to load resource: the server responded with a status of 429 (Too Many Requests)",
+    "Failed to load resource: the server responded with a status of 429 (Too Many Requests)",
+    "Failed to load resource: the server responded with a status of 404 (Not Found)",
+    "Failed to load resource: the server responded with a status of 404 (Not Found)"
+  ],
+  "fecha": "2026-09-07T01:46:43.970Z",
+  "openMeteo": [
+    "429 https://archive-api.open-meteo.com/v1/archive?latitude=4.935&longitude=-73.833&start_date=",
+    "429 https://archive-api.open-meteo.com/v1/archive?latitude=4.935&longitude=-73.833&start_date=",
+    "200 https://api.open-meteo.com/v1/forecast?latitude=4.935&longitude=-73.833&daily=weathercode%",
+    "200 https://api.open-meteo.com/v1/forecast?latitude=4.935&longitude=-73.833&daily=weathercode%"
+  ]
+}
