@@ -1,0 +1,254 @@
+{
+  "hash": "0ac10862",
+  "configHash": "a66c51fb",
+  "lockfileHash": "390d108e",
+  "browserHash": "3ad8101b",
+  "optimized": {
+    "@dnd-kit/core": {
+      "src": "../../../../home/kortux/Workspace/chagra/node_modules/@dnd-kit/core/dist/core.esm.js",
+      "file": "@dnd-kit_core.js",
+      "fileHash": "f638bb69",
+      "needsInterop": false
+    },
+    "@dnd-kit/sortable": {
+      "src": "../../../../home/kortux/Workspace/chagra/node_modules/@dnd-kit/sortable/dist/sortable.esm.js",
+      "file": "@dnd-kit_sortable.js",
+      "fileHash": "e74af4f9",
+      "needsInterop": false
+    },
+    "@dnd-kit/utilities": {
+      "src": "../../../../home/kortux/Workspace/chagra/node_modules/@dnd-kit/utilities/dist/utilities.esm.js",
+      "file": "@dnd-kit_utilities.js",
+      "fileHash": "8a6e10be",
+      "needsInterop": false
+    },
+    "@react-three/drei": {
+      "src": "../../../../home/kortux/Workspace/chagra/node_modules/@react-three/drei/index.js",
+      "file": "@react-three_drei.js",
+      "fileHash": "2badc364",
+      "needsInterop": false
+    },
+    "@react-three/fiber": {
+      "src": "../../../../home/kortux/Workspace/chagra/node_modules/@react-three/fiber/dist/react-three-fiber.esm.js",
+      "file": "@react-three_fiber.js",
+      "fileHash": "9ecb5dc4",
+      "needsInterop": false
+    },
+    "@sqlite.org/sqlite-wasm": {
+      "src": "../../../../home/kortux/Workspace/chagra/node_modules/@sqlite.org/sqlite-wasm/dist/index.mjs",
+      "file": "@sqlite__org_sqlite-wasm.js",
+      "fileHash": "b9a86afa",
+      "needsInterop": false
+    },
+    "dompurify": {
+      "src": "../../../../home/kortux/Workspace/chagra/node_modules/dompurify/dist/purify.es.mjs",
+      "file": "dompurify.js",
+      "fileHash": "32111d15",
+      "needsInterop": false
+    },
+    "jspdf": {
+      "src": "../../../../home/kortux/Workspace/chagra/node_modules/jspdf/dist/jspdf.es.min.js",
+      "file": "jspdf.js",
+      "fileHash": "487d394a",
+      "needsInterop": false
+    },
+    "leaflet": {
+      "src": "../../../../home/kortux/Workspace/chagra/node_modules/leaflet/dist/leaflet-src.js",
+      "file": "leaflet.js",
+      "fileHash": "bf1e1e59",
+      "needsInterop": true
+    },
+    "localforage": {
+      "src": "../../../../home/kortux/Workspace/chagra/node_modules/localforage/dist/localforage.js",
+      "file": "localforage.js",
+      "fileHash": "727008d9",
+      "needsInterop": true
+    },
+    "lucide-react": {
+      "src": "../../../../home/kortux/Workspace/chagra/node_modules/lucide-react/dist/esm/lucide-react.js",
+      "file": "lucide-react.js",
+      "fileHash": "98ab8fb5",
+      "needsInterop": false
+    },
+    "maath/easing": {
+      "src": "../../../../home/kortux/Workspace/chagra/node_modules/maath/easing/dist/maath-easing.esm.js",
+      "file": "maath_easing.js",
+      "fileHash": "58feb7e7",
+      "needsInterop": false
+    },
+    "react-dom": {
+      "src": "../../../../home/kortux/Workspace/chagra/node_modules/react-dom/index.js",
+      "file": "react-dom.js",
+      "fileHash": "abaec3cf",
+      "needsInterop": true
+    },
+    "react-dom/client": {
+      "src": "../../../../home/kortux/Workspace/chagra/node_modules/react-dom/client.js",
+      "file": "react-dom_client.js",
+      "fileHash": "d29ba4f3",
+      "needsInterop": true
+    },
+    "react-leaflet": {
+      "src": "../../../../home/kortux/Workspace/chagra/node_modules/react-leaflet/lib/index.js",
+      "file": "react-leaflet.js",
+      "fileHash": "684f7717",
+      "needsInterop": false
+    },
+    "react-virtuoso": {
+      "src": "../../../../home/kortux/Workspace/chagra/node_modules/react-virtuoso/dist/index.mjs",
+      "file": "react-virtuoso.js",
+      "fileHash": "91c7e5ed",
+      "needsInterop": false
+    },
+    "react": {
+      "src": "../../../../home/kortux/Workspace/chagra/node_modules/react/index.js",
+      "file": "react.js",
+      "fileHash": "2086265e",
+      "needsInterop": true
+    },
+    "react/jsx-dev-runtime": {
+      "src": "../../../../home/kortux/Workspace/chagra/node_modules/react/jsx-dev-runtime.js",
+      "file": "react_jsx-dev-runtime.js",
+      "fileHash": "fefe1c5f",
+      "needsInterop": true
+    },
+    "react/jsx-runtime": {
+      "src": "../../../../home/kortux/Workspace/chagra/node_modules/react/jsx-runtime.js",
+      "file": "react_jsx-runtime.js",
+      "fileHash": "1dc28fea",
+      "needsInterop": true
+    },
+    "three": {
+      "src": "../../../../home/kortux/Workspace/chagra/node_modules/three/build/three.module.js",
+      "file": "three.js",
+      "fileHash": "ba993e01",
+      "needsInterop": false
+    },
+    "three/addons/lines/LineMaterial.js": {
+      "src": "../../../../home/kortux/Workspace/chagra/node_modules/three/examples/jsm/lines/LineMaterial.js",
+      "file": "three_addons_lines_LineMaterial__js.js",
+      "fileHash": "62322644",
+      "needsInterop": false
+    },
+    "three/addons/lines/LineSegments2.js": {
+      "src": "../../../../home/kortux/Workspace/chagra/node_modules/three/examples/jsm/lines/LineSegments2.js",
+      "file": "three_addons_lines_LineSegments2__js.js",
+      "fileHash": "7720d3a4",
+      "needsInterop": false
+    },
+    "three/addons/lines/LineSegmentsGeometry.js": {
+      "src": "../../../../home/kortux/Workspace/chagra/node_modules/three/examples/jsm/lines/LineSegmentsGeometry.js",
+      "file": "three_addons_lines_LineSegmentsGeometry__js.js",
+      "fileHash": "3dcebc58",
+      "needsInterop": false
+    },
+    "three/addons/objects/Sky.js": {
+      "src": "../../../../home/kortux/Workspace/chagra/node_modules/three/examples/jsm/objects/Sky.js",
+      "file": "three_addons_objects_Sky__js.js",
+      "fileHash": "d04722ce",
+      "needsInterop": false
+    },
+    "three/addons/postprocessing/EffectComposer.js": {
+      "src": "../../../../home/kortux/Workspace/chagra/node_modules/three/examples/jsm/postprocessing/EffectComposer.js",
+      "file": "three_addons_postprocessing_EffectComposer__js.js",
+      "fileHash": "2e168338",
+      "needsInterop": false
+    },
+    "three/addons/postprocessing/OutputPass.js": {
+      "src": "../../../../home/kortux/Workspace/chagra/node_modules/three/examples/jsm/postprocessing/OutputPass.js",
+      "file": "three_addons_postprocessing_OutputPass__js.js",
+      "fileHash": "ec03222d",
+      "needsInterop": false
+    },
+    "three/addons/postprocessing/RenderPass.js": {
+      "src": "../../../../home/kortux/Workspace/chagra/node_modules/three/examples/jsm/postprocessing/RenderPass.js",
+      "file": "three_addons_postprocessing_RenderPass__js.js",
+      "fileHash": "8dd88a03",
+      "needsInterop": false
+    },
+    "three/addons/postprocessing/UnrealBloomPass.js": {
+      "src": "../../../../home/kortux/Workspace/chagra/node_modules/three/examples/jsm/postprocessing/UnrealBloomPass.js",
+      "file": "three_addons_postprocessing_UnrealBloomPass__js.js",
+      "fileHash": "b30c8d97",
+      "needsInterop": false
+    },
+    "three/addons/utils/BufferGeometryUtils.js": {
+      "src": "../../../../home/kortux/Workspace/chagra/node_modules/three/examples/jsm/utils/BufferGeometryUtils.js",
+      "file": "three_addons_utils_BufferGeometryUtils__js.js",
+      "fileHash": "8e7261fc",
+      "needsInterop": false
+    },
+    "ulid": {
+      "src": "../../../../home/kortux/Workspace/chagra/node_modules/ulid/dist/browser/index.js",
+      "file": "ulid.js",
+      "fileHash": "0308492a",
+      "needsInterop": false
+    },
+    "zustand": {
+      "src": "../../../../home/kortux/Workspace/chagra/node_modules/zustand/esm/index.mjs",
+      "file": "zustand.js",
+      "fileHash": "d62d1cc3",
+      "needsInterop": false
+    },
+    "zustand/middleware": {
+      "src": "../../../../home/kortux/Workspace/chagra/node_modules/zustand/esm/middleware.mjs",
+      "file": "zustand_middleware.js",
+      "fileHash": "efef31e3",
+      "needsInterop": false
+    }
+  },
+  "chunks": {
+    "CopyShader-Bp1AkcI0": {
+      "file": "CopyShader-Bp1AkcI0.js",
+      "isDynamicEntry": false
+    },
+    "Pass-BFRCcRtX": {
+      "file": "Pass-BFRCcRtX.js",
+      "isDynamicEntry": false
+    },
+    "chunk-B4lejLz5": {
+      "file": "chunk-B4lejLz5.js",
+      "isDynamicEntry": false
+    },
+    "core.esm-DqmA62jX": {
+      "file": "core.esm-DqmA62jX.js",
+      "isDynamicEntry": false
+    },
+    "easing-0f4db1c0.esm-DLzs4aZd": {
+      "file": "easing-0f4db1c0.esm-DLzs4aZd.js",
+      "isDynamicEntry": false
+    },
+    "html2canvas-BksFLLDe": {
+      "file": "html2canvas-BksFLLDe.js",
+      "isDynamicEntry": true
+    },
+    "index.es-DExhCOyl": {
+      "file": "index.es-DExhCOyl.js",
+      "isDynamicEntry": true
+    },
+    "react-three-fiber.esm-C6oVKdCL": {
+      "file": "react-three-fiber.esm-C6oVKdCL.js",
+      "isDynamicEntry": false
+    },
+    "scheduler-BH4P7XRu": {
+      "file": "scheduler-BH4P7XRu.js",
+      "isDynamicEntry": false
+    },
+    "three.module-BUyxIFmx": {
+      "file": "three.module-BUyxIFmx.js",
+      "isDynamicEntry": false
+    },
+    "typeof-CYdzsJnD": {
+      "file": "typeof-CYdzsJnD.js",
+      "isDynamicEntry": false
+    },
+    "vanilla-BgwjHQL3": {
+      "file": "vanilla-BgwjHQL3.js",
+      "isDynamicEntry": false
+    },
+    "vision_bundle-roi55xUh": {
+      "file": "vision_bundle-roi55xUh.js",
+      "isDynamicEntry": true
+    }
+  }
+}
