@@ -623,8 +623,8 @@ const HelpManual = lazy(() => import('./components/HelpManual'));
 // el import dinámico en vuelo se ABORTA y React.lazy tira "Failed to fetch
 // dynamically imported module", cayendo al ErrorBoundary. En dev/CI el grafo de
 // módulos es grande y la ventana de la carrera se ensancha. Fix: memoizamos el
-// import y lo PREcargamos mientras el usuario está en el login (ver useEffect de
-// prefetch del home), de modo que al navegar al dashboard el módulo ya está en
+// import y lo PREcargamos al éxito de autenticación (ver prefetchHomeAlAutenticar),
+// de modo que al navegar al dashboard el módulo ya está en
 // caché del navegador y no depende de la red. `lazy` reusa la MISMA promesa
 // memoizada (prefetchHomeChunks) → sin doble fetch.
 // Memoiza el import dinámico pero SIN cachear un rechazo: si el fetch se aborta
@@ -1574,21 +1574,26 @@ export default function App() {
     });
   }, []);
 
-  // Prefetch del HOME mientras el usuario está en el login: baja los chunks de
-  // TopBar + DashboardLive ANTES de navegar al dashboard, para que la
-  // transición no dependa de la red en ese instante. Cierra la carrera del gate
-  // offline-first (context.setOffline apenas ve "Cola de tareas" —barra global,
-  // fuera del Suspense— abortaba el import en vuelo del dashboard → ErrorBoundary
-  // "Failed to fetch dynamically imported module"). Fire-and-forget y no-throw:
-  // si falla o no alcanza a terminar, el flujo lazy normal sigue vigente.
-  useEffect(() => {
-    if (currentView !== 'login') return;
+  // PERF arranque (diag ops/DIAGNOSTICO-PERF-DEV-20260905, orden 3): el
+  // prefetch del home (TopBar + DashboardLive) YA NO corre mientras la vista
+  // es 'login'. Medido en chagra-dev: el formulario de login aparecía entre
+  // 8.898 y 11.873 ms con un waterfall de 183 solicitudes que incluía chunks
+  // de rutas posteriores (DashboardLive, mundo3d, creatures). El prefetch se
+  // dispara ahora al ÉXITO de autenticación (ver onLoginSuccess y el
+  // onSuccess de OAuthCallback, ambos abajo): baja los chunks justo antes de
+  // navegar al dashboard, de modo que la transición no dependa de la red en
+  // ese instante y la carrera del gate offline-first siga cerrada
+  // (context.setOffline apenas ve "Cola de tareas" —barra global, fuera del
+  // Suspense— abortaba el import en vuelo del dashboard → ErrorBoundary
+  // "Failed to fetch dynamically imported module"). Fire-and-forget y
+  // no-throw: si falla, el flujo lazy normal sigue vigente.
+  const prefetchHomeAlAutenticar = () => {
     try {
       prefetchHomeChunks();
     } catch (err) {
       console.warn('[App] Prefetch del home no se pudo disparar:', err?.message);
     }
-  }, [currentView]);
+  };
 
   // alertas-reales (2026-05-30): arranca el motor de alertas con CLIMA REAL.
   // Inicializa los listeners del store (escucha alertTriggered/alertCleared) y
@@ -1806,7 +1811,7 @@ export default function App() {
                 onboarding (ni completado ni saltado), cae en
                 'onboarding-perfil' en vez del dashboard. "Saltar todo" marca
                 skipped, así que solo pasa una vez (#283). */}
-            <LoginScreen onLoginSuccess={() => { setSinSesion(false); navigate(resolveDestinoPostLogin()); }} onSave={showToast} />
+            <LoginScreen onLoginSuccess={() => { setSinSesion(false); prefetchHomeAlAutenticar(); navigate(resolveDestinoPostLogin()); }} onSave={showToast} />
           </ErrorBoundary>
         );
       case 'oauth-callback':
@@ -1817,7 +1822,7 @@ export default function App() {
         return (
           <ErrorBoundary>
             <OAuthCallback
-              onSuccess={() => navigate(resolveDestinoPostLogin())}
+              onSuccess={() => { prefetchHomeAlAutenticar(); navigate(resolveDestinoPostLogin()); }}
               onError={(msg) => {
                 showToast(msg || 'No se pudo iniciar sesión con PKCE.', true);
                 navigate('login');

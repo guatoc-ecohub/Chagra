@@ -84,11 +84,20 @@ let corpusLoadPromise = null;
 // loadCorpus hacía `for (const slug) { await fetch }` SERIAL sobre los ~491
 // slugs del manifest → ~491 × ~390ms = ~3.2min bloqueando la primera query de
 // cada sesión (incluido un simple saludo), y el chat nunca respondía. Con
-// batches acotados de 12, los fetches corren en paralelo de a 12 → ~15-20s.
-// El límite evita saturar la conexión móvil rural o gatillar throttling del
-// servidor (no queremos 491 sockets simultáneos). La lógica per-doc
-// (flattenDoc + pre-tokenize) se conserva idéntica; solo cambia serial→batch.
-const CORPUS_FETCH_CONCURRENCY = 12;
+// batches acotados, los fetches corren en paralelo → ~15-20s a 12.
+//
+// PERF arranque (diag ops/DIAGNOSTICO-PERF-DEV-20260905, órdenes 1 y 4): 12
+// en vuelo saturaba la conexión durante el arranque — 940 solicitudes
+// cycle-content post-submit y una transición home→Registrar que pasó de
+// 4.516 s (corrida limpia) a 14.148 s (con corpus descargando). 6 es el
+// presupuesto de conexiones paralelas por origen que maneja por defecto un
+// navegador (HTTP/1.1): el corpus nunca forma una segunda cola sobre los
+// chunks críticos del shell. Costo aceptado: el warm es estrictamente
+// background post-dashboard (ver prewarmCorpus), así que terminar unos
+// segundos más tarde no bloquea ninguna interacción. La lógica per-doc
+// (flattenDoc + pre-tokenize) se conserva idéntica; solo cambia el tamaño de
+// lote.
+const CORPUS_FETCH_CONCURRENCY = 6;
 
 // Métrica de bloqueo del tier-gate (audit P0-1, 2026-07-03). Cuenta cuántas
 // veces buildCorpus tuvo que degradar FAIL-CLOSED por no poder confiar en el
