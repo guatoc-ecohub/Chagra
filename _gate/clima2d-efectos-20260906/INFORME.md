@@ -139,7 +139,13 @@ Por Chrome DevTools sobre el equipo físico, dos conteos rAF de 5 s cada uno.
 | `despejado` / `noche` | 52,6 · 57,1 → **54,85** | 47,5 · 51,2 → **49,35** |
 | `niebla` / `atardecer` | — | 53,1 · 52,9 → **53** |
 
-**Gate ≥30 fps: pasa con margen** — la peor mediana es 49,35. Las cuatro medidas «shippeado» son
+La condición más cara de las cuatro (`despejado/noche`) se repitió **4 veces = 8 conteos**:
+47,5 · 51,2 · 53,0 · 54,2 · 50,7 · 48,0 · 50,0 · 47,1. Rango **47,1–54,2**, peor conteo suelto
+**47,1 fps**.
+
+**Gate ≥30 fps: pasa con margen** en las cuatro condiciones medidas — el umbral de 30 es el que
+fija el encargo (equipo del campesino, Mali-G78), no una lectura de configuración. No es una
+medida global del dispositivo: son cuatro condiciones, elegidas por ser las de más carga. Las cuatro medidas «shippeado» son
 sobre el código que va en el PR. El costo real está entre 1,6 y 5,5 fps, mayor en
 `despejado/noche` (−5,5). La varianza entre los dos conteos de un mismo estado llega a 4 fps, así
 que para `nublado` y `lluvia` la diferencia está dentro del ruido; para `despejado/noche` no.

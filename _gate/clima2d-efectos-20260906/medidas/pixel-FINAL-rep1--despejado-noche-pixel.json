@@ -1,0 +1,33 @@
+{
+  "tag": "despejado-noche",
+  "url": "http://localhost:5391/?clima=despejado&luz=noche#/clima-boletin",
+  "vista": true,
+  "fps": [
+    53,
+    54.2
+  ],
+  "fpsMediana": 53.6,
+  "estado": {
+    "clima": "despejado",
+    "luz": "noche",
+    "bancos": 9,
+    "jirones": 7,
+    "capaNiebla": "0",
+    "capaLluvia": "0",
+    "capaLuci": "1",
+    "capaEstrellas": "1",
+    "capaPolvo": "0",
+    "rayos": "0",
+    "corriendo": 70,
+    "dpr": 3.5,
+    "w": 411,
+    "h": 794,
+    "ua": "Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome",
+    "reducido": false,
+    "animaciones": 135
+  },
+  "pageErrors": [],
+  "interceptadas": 20,
+  "screencap": "/tmp/astra-clima-2d-20260906/_gate/clima2d-efectos-20260906/pixel-rep1/despejado-noche-pixel.png",
+  "fecha": "2026-09-06T23:52:15"
+}
