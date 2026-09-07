@@ -3,10 +3,10 @@
   "url": "http://localhost:5391/?clima=despejado&luz=noche#/clima-boletin",
   "vista": true,
   "fps": [
-    48.1,
-    48.5
+    47.5,
+    51.2
   ],
-  "fpsMediana": 48.3,
+  "fpsMediana": 49.35,
   "estado": {
     "clima": "despejado",
     "luz": "noche",
@@ -18,16 +18,16 @@
     "capaEstrellas": "1",
     "capaPolvo": "0",
     "rayos": "0",
-    "corriendo": 67,
+    "corriendo": 69,
     "dpr": 3.5,
     "w": 411,
     "h": 794,
     "ua": "Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome",
     "reducido": false,
-    "animaciones": 132
+    "animaciones": 134
   },
   "pageErrors": [],
   "interceptadas": 20,
-  "screencap": "/tmp/astra-clima-2d-20260906/_gate/clima2d-efectos-20260906/pixel/despejado-noche-pixel.png",
-  "fecha": "2026-09-06T22:59:37"
+  "screencap": "/tmp/astra-clima-2d-20260906/_gate/clima2d-efectos-20260906/pixel-final/despejado-noche-pixel.png",
+  "fecha": "2026-09-06T23:43:49"
 }

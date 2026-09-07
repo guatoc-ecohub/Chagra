@@ -3,10 +3,10 @@
   "url": "http://localhost:5391/?clima=nublado&luz=dia#/clima-boletin",
   "vista": true,
   "fps": [
-    46.6,
-    48.5
+    53.1,
+    49.1
   ],
-  "fpsMediana": 47.55,
+  "fpsMediana": 51.1,
   "estado": {
     "clima": "nublado",
     "luz": "dia",
@@ -28,6 +28,6 @@
   },
   "pageErrors": [],
   "interceptadas": 20,
-  "screencap": "/tmp/astra-clima-2d-20260906/_gate/clima2d-efectos-20260906/pixel/nublado-dia-pixel.png",
-  "fecha": "2026-09-06T22:56:21"
+  "screencap": "/tmp/astra-clima-2d-20260906/_gate/clima2d-efectos-20260906/pixel-final/nublado-dia-pixel.png",
+  "fecha": "2026-09-06T23:11:08"
 }

@@ -132,16 +132,17 @@ posición depende del tiempo. Es un techo que ninguna mejora de la escena puede 
 
 Por Chrome DevTools sobre el equipo físico, dos conteos rAF de 5 s cada uno.
 
-| combinación | base | después |
+| combinación | base | shippeado |
 |---|---|---|
-| `nublado` / `dia` | 51,9 · 53,4 → **52,7** | 53,1 · 49,1 → **51,1** |
-| `lluvia` / `noche` | 55,3 · 52,0 → **53,7** | 51,5 · 52,3 → **51,9** |
-| `despejado` / `noche` | 52,6 · 57,1 → **54,9** | 48,1 · 48,5 → **48,3** |
-| `niebla` / `atardecer` | — | 55,0 · 51,6 → **53,3** |
+| `nublado` / `dia` | 51,9 · 53,4 → **52,65** | 53,1 · 49,1 → **51,1** |
+| `lluvia` / `noche` | 55,3 · 52 → **53,65** | 52,7 · 49,3 → **51** |
+| `despejado` / `noche` | 52,6 · 57,1 → **54,85** | 47,5 · 51,2 → **49,35** |
+| `niebla` / `atardecer` | — | 53,1 · 52,9 → **53** |
 
-**Gate ≥30 fps: pasa con margen.** El costo real es de 2 a 7 fps, y en `despejado/noche` es el
-mayor (−6,6). La varianza entre dos conteos del mismo estado llega a 3 fps, así que para
-`nublado` y `lluvia` la diferencia está cerca del ruido; para `despejado/noche` no.
+**Gate ≥30 fps: pasa con margen** — la peor mediana es 49,35. Las cuatro medidas «shippeado» son
+sobre el código que va en el PR. El costo real está entre 1,6 y 5,5 fps, mayor en
+`despejado/noche` (−5,5). La varianza entre los dos conteos de un mismo estado llega a 4 fps, así
+que para `nublado` y `lluvia` la diferencia está dentro del ruido; para `despejado/noche` no.
 
 ## 5. Qué reasigné y con qué criterio
 
